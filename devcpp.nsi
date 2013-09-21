@@ -1,7 +1,7 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "5.0.0.1"
+!define DEVCPP_VERSION "5.0.0.2"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 Var LOCAL_APPDATA
@@ -312,7 +312,7 @@ Section "Create shortcuts in Start Menu" SectionShortcuts
   cont:
 
   SetShellVarContext all
-  MessageBox MB_YESNO "Do you want to install Dev-C++ for all users on this computer ?" IDYES AllUsers
+  MessageBox MB_YESNO "Do you want to install Dev-C++ for all users on this computer?" IDYES AllUsers
   SetShellVarContext current
 AllUsers:
   StrCpy $0 $SMPROGRAMS
@@ -621,6 +621,7 @@ Section "Uninstall"
   Delete "$INSTDIR\NEWS.txt"
   Delete "$INSTDIR\devcpp.map"
   Delete "$INSTDIR\devcpp.exe"
+  Delete "$INSTDIR\devcpp.exe.manifest"
   Delete "$INSTDIR\copying.txt"
 
   RMDir /r "$INSTDIR\bin"
@@ -636,6 +637,6 @@ Section "Uninstall"
   RMDir /r "$INSTDIR\Templates"
 
 Done:
-  MessageBox MB_OK "Dev-C++ has been uninstalled. Please now delete the $INSTDIR directory if it doesn't contain some of your documents"
+  MessageBox MB_OK "Dev-C++ has been uninstalled. Please now delete the $INSTDIR directory if it doesn't contain some of your documents."
 
 SectionEnd

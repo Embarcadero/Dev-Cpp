@@ -194,7 +194,7 @@ const
   ID_ITEM_CLOSEALL                 = 234;
   ID_FULLSCREEN_MSG                = 235;
   ID_ITEM_CLOSEALLBUTTHIS          = 236;
-  ID_ITEM_LIST                     = 237;     
+  ID_ITEM_LIST                     = 237;
   //free to 239 for window items
 
   //help menu

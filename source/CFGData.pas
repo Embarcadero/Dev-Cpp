@@ -158,8 +158,8 @@ end;
 
 procedure TConfigData.SetIni(s : string);
 begin
-  fIniFileName := s;
-  GetINI.SetIniFile(s);
+    fIniFileName := s;
+    GetINI.SetIniFile(s);
 end;
 
 procedure TConfigData.ReadConfigData;

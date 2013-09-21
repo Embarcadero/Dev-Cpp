@@ -230,7 +230,6 @@ implementation
 resourcestring
   SCodeToolTipIndexXOfX = '%d / %d';
 
-  
 var
  Identifiers : array[#0..#255] of ByteBool;
 
@@ -287,41 +286,39 @@ var
     Result := Copy(S, Index, I-Index);
   end;
 
-  function GetPrototypeName(const S: string): string;
-  var
-    iStart, iLen: Integer;
-  begin
-    Result := '';
-    iStart := AnsiPos('(', S);
+function GetPrototypeName(const S: string): string;
+var
+	iStart, iLen: Integer;
+begin
+	// functie(args) moet 'functie' returnen
+	Result := '';
+	iStart := AnsiPos('(', S);
+	iLen := 1;
 
-    if iStart > 0 then
-    begin
+	// Als we de ( van een functie gevonden hebben
+	if iStart > 0 then begin
 
-      // Skip blanks and TAB's
-      repeat
-        Dec(iStart);
-      until not (S[iStart] in [#32,#9]);
-      Inc(iStart);
-    
-      Dec(iStart);
-      iLen := 0;
-      repeat
-        Dec(iStart);
-        Inc(iLen);
-      until (S[iStart] in [#0..#32]);
-      Result := Copy(S, iStart+1, iLen);
-    end;
-  end;
-  
-  function CountCommas(const S: string): Integer;
-  var
-    J: Integer;
-  begin
-    Result := 0;
-    for J := 1 to Length(S) do
-      if S[J] = ',' then Inc(Result);
-  end;
-  
+		repeat
+			Dec(iStart);
+		until not (S[iStart] in [#32,#9]);
+		repeat
+			Dec(iStart);
+			Inc(iLen);
+		until (S[iStart] in [#0..#32]) or (iStart = 1); // This fixes an unsigned 0 - 1 range error
+
+		Result := Copy(S, iStart, iLen);
+	end;
+end;
+
+function CountCommas(const S: string): Integer;
+var
+	J: Integer;
+begin
+	Result := 0;
+	for J := 1 to Length(S) do
+		if S[J] = ',' then Inc(Result);
+end;
+
 //----------------- TCustomCodeToolTipButton ---------------------------------------------------------------------------
 
 constructor TCustomCodeToolTipButton.Create;
@@ -431,7 +428,7 @@ begin
   // then use FDelimiters := ',' 
   FDelimiters := ',';
   
-  FStartWhenChr := '(';          // Start to check, when one of this char is pressed
+  FStartWhenChr := '('; // Start to check, when one of this char is pressed
   EndWhenChr := ';\';
   FActivateKey := ShortCut(Ord(#32), [ssCtrl,ssShift]);
   FCurCharW := 0;
@@ -990,7 +987,7 @@ var
     until P[CurPos] in [#0];
   end;
 begin
-  
+
   ASSERT(nil <> FToolTips, 'FToolTips must not be nil');
   ASSERT(nil <> FEditor, 'FEditor must not be nil');
   ASSERT(nil <> FEditor.Highlighter, 'FEditor.Highlighter must not be nil');
@@ -1006,7 +1003,7 @@ begin
   // get the current position in the text
   Idx := FEditor.SelStart;
   CurPos := FEditor.SelStart;
-  
+
   // get a pointer to the text
   P := PChar(FEditor.Lines.Text);
 
@@ -1017,7 +1014,7 @@ begin
 
   if P[CurPos-1] = ')' then Inc(nBraces,1);
   if P[CurPos] = ')' then Inc(nBraces,1);
-    
+
   I := 1;
   nCommas := 0;
   
@@ -1098,7 +1095,7 @@ begin
     if S1 = S then
     begin
       ProtoFound := True;
-      if not Activated then FSelIndex := I;      
+      if not Activated then FSelIndex := I;
       Break;
     enD;
   end;
@@ -1192,9 +1189,8 @@ end;
 //----------------------------------------------------------------------------------------------------------------------
 
 initialization
-  MakeIdentTable;  
-  
+  MakeIdentTable;
+
 finalization
 
-  
 end.

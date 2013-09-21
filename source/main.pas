@@ -585,6 +585,8 @@ type
 		actModifyWatch: TAction;
 		ClearallWatchPop: TMenuItem;
 		CompilerOutput: TListView;
+    N5: TMenuItem;
+    Class1: TMenuItem;
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
 		procedure FormDestroy(Sender: TObject);
@@ -837,9 +839,11 @@ type
 		procedure PageControlChanging(Sender: TObject;var AllowChange: Boolean);
 		procedure mnuCVSClick(Sender: TObject);
 
-        // Orwell 2011
+		// Orwell 2011
 		procedure actMsgCopyAllExecute(Sender: TObject);
 		procedure actMsgSaveAllExecute(Sender: TObject);
+
+        procedure actNewClassExecute(Sender: TObject);
 
 	private
 		fTab				: integer;
@@ -2854,13 +2858,13 @@ begin
 	end;
 
 	for idx:= 0 to pred(PageControl.PageCount) do begin
-		 e := GetEditor(idx);
-		 if (e.Modified) and ((not e.InProject) or e.IsRes)	then
-				if not SaveFile(GetEditor(idx)) then
-					 Break;
+		e := GetEditor(idx);
+		if (e.Modified) and ((not e.InProject) or e.IsRes) then
+			if not SaveFile(GetEditor(idx)) then
+				Break;
 	end;
 
-	 if wa then
+	if wa then
 		devFileMonitor1.Activate;
 end;
 
@@ -2871,11 +2875,11 @@ end;
 
 procedure TMainForm.actCloseAllExecute(Sender: TObject);
 var
- idx: integer;
+	idx: integer;
 begin
 	for idx := pred(PageControl.PageCount) downto 0 do
-			if not CloseEditor(0, True) then
-					Break;
+		if not CloseEditor(0, True) then
+			Break;
 
 	// if no project is open, clear the parsed info...
 	if not Assigned(fProject) and (PageControl.PageCount=0) then begin
@@ -3016,21 +3020,21 @@ var
 begin
 	e:= GetEditor;
 	if assigned(e) then
-	 e.Text.Undo;
+		e.Text.Undo;
 end;
 
 procedure TMainForm.actRedoExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then
-	 e.Text.Redo;
+		e.Text.Redo;
 end;
 
 procedure TMainForm.actCutExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then begin
@@ -3041,11 +3045,11 @@ end;
 
 procedure TMainForm.actCopyExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then
-	 e.Text.CopyToClipboard;
+		e.Text.CopyToClipboard;
 end;
 
 procedure TMainForm.actPasteExecute(Sender: TObject);
@@ -3076,7 +3080,7 @@ end;
 
 procedure TMainForm.actDeleteExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) and e.Text.SelAvail then
@@ -6570,5 +6574,9 @@ begin
 	mnuCVSCurrent.Enabled := PageControl.PageCount > 0;
 end;
 
+procedure TMainForm.actNewClassExecute(Sender: TObject);
+begin
+	MsgBox('hoi','hoi');
+end;
 end.
 

@@ -34,7 +34,7 @@ resourcestring
 	// misc strings
 	GCC_VERSION          = '4.5.2';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.0.0.1';
+	DEVCPP_VERSION       = '5.0.0.2';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -59,7 +59,7 @@ resourcestring
 	LIB_DIR              = '%path%' + pd + 'lib;%path%' + pd + 'lib' + pd + 'gcc';
 	C_INCLUDE_DIR        = '%path%' + pd + 'include';
 	CPP_INCLUDE_DIR      = '%path%' + pd + 'include;' +
-                       //  '%path%' + pd + 'include' + pd + 'sys;' +
+                        // '%path%' + pd + 'include' + pd + 'sys;' +
                            '%path%' + pd + 'include' + pd + 'ddk;' +
                            '%path%' + pd + 'include' + pd + 'gdiplus;' +
                            '%path%' + pd + 'include' + pd + 'GL';
@@ -104,7 +104,7 @@ resourcestring
 
   DEFCOMPILERSET       = 'Default Compiler';
 
-  //Filters
+  // Filters
   FLT_BASE             = 'All known Files||';
   FLT_ALLFILES         = 'All files (*.*)|*.*|';
   FLT_PROJECTS         = 'Dev-C++ project (*.dev)|*.dev';
@@ -122,7 +122,7 @@ resourcestring
   cSel                 = 'Selected text';
   
 const
-  //  source file extensions
+  // source file extensions
   C_EXT                = '.c';
   CPP_EXT              = '.cpp';
   CC_EXT               = '.cc';

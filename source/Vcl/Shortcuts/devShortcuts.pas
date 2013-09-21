@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Messages, SysUtils, Classes, Menus, Controls, IniFiles, Graphics, ActnList;
+  Windows, Messages, devcfg, SysUtils, Classes, Menus, Controls, IniFiles, Graphics, ActnList;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QMenus, QControls, IniFiles, QGraphics, QActnList;
@@ -275,7 +275,10 @@ var
 begin
   if fFileName = '' then
     Exit;
-  Fini := TIniFile.Create(fFileName);
+  if(fFileName[2] <> ':') then // if relative
+	Fini := TIniFile.Create(devdirs.Exec+fFileName)
+  else
+	Fini := TIniFile.Create(fFileName);
   try
     for I := 0 to frmShortcutsEditor.Count - 1 do begin
       frmShortcutsEditor.Items[I].ShortCut := frmShortcutsEditor.ShortCuts[I];
@@ -287,7 +290,7 @@ begin
       if Scut = '' then
         Scut := 'none';
       Fini.WriteString('Shortcuts', Smenu, Scut);
-    end;
+    end; // BEZIG
   finally
     Fini.Free;
   end;

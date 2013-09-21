@@ -658,7 +658,7 @@ end;
 
 procedure TEditor.SetDone(msg:string);
 begin
-	// keep statusbar updated BEZIG
+	// keep statusbar updated
 	MainForm.Statusbar.Panels[3].Text:= msg;
 end;
 

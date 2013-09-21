@@ -281,8 +281,8 @@ begin
 		AddItemByValues('switch()','switch statement','switch(*|*) {'+#13#10+'	default:'+#13#10+'}',2);
 
 		// C++
-		AddItemByValues('Class','Class','class *|* {'+#13#10+'	public:'+#13#10+'		// Public Declarations'+#13#10+'}',2);
-		AddItemByValues('Class Header Template','Class','#ifndef SOMETHING_INCLUDED'+#13#10+'#define SOMETHING_INCLUDED'+#13#10#13#10+'class *|* {'+#13#10+'	public:'+#13#10+'		// Public Declarations'+#13#10+'}'+#13#10+'#endif',2);
+		AddItemByValues('Class','Class','class *|* {'+#13#10+'	public:'+#13#10+'		// Public Declarations'+#13#10+'};',2);
+		AddItemByValues('Class Header Template','Class','#ifndef SOMETHING_INCLUDED'+#13#10+'#define SOMETHING_INCLUDED'+#13#10#13#10+'class *|* {'+#13#10+'	public:'+#13#10+'		// Public Declarations'+#13#10+'};'+#13#10+'#endif',2);
 
 		// Preprocessor
 		AddItemByValues('#ifdef','Preprocessor if','#ifdef *|*'+#13#10#13#10+'#endif',3);

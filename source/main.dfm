@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 843
-  Top = 312
+  Left = 451
+  Top = 207
   Width = 759
   Height = 685
   Color = clBtnFace
@@ -1297,6 +1297,13 @@ object MainForm: TMainForm
         object NewTemplateItem: TMenuItem
           Action = actNewTemplate
         end
+        object N5: TMenuItem
+          Caption = '-'
+        end
+        object Class1: TMenuItem
+          Action = actBrowserNewClass
+          Caption = 'Class...'
+        end
       end
       object N34: TMenuItem
         Caption = '-'
@@ -1901,9 +1908,11 @@ object MainForm: TMainForm
       end
       object NextItem: TMenuItem
         Action = actNext
+        ShortCut = 16393
       end
       object PreviousItem: TMenuItem
         Action = actPrev
+        ShortCut = 24585
       end
       object N32: TMenuItem
         Caption = '-'
@@ -1946,6 +1955,7 @@ object MainForm: TMainForm
     Top = 212
     object Close1: TMenuItem
       Action = actClose
+      ShortCut = 16471
     end
     object CloseAll1: TMenuItem
       Action = actCloseAll

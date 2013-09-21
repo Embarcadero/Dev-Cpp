@@ -121,106 +121,100 @@ uses
 {$R *.res}
 
 type
-  TMainFormHack = class(TMainForm);
-  
-var
-    // ConfigMode moved to devcfg, 'cause I need it in enviroform (for AltConfigFile)
-    UserHome, strLocalAppData, strAppData, strIniFile: String;
-    tempc: array [0..MAX_PATH] of char;
+	TMainFormHack = class(TMainForm);
 
+var
+	// ConfigMode moved to devcfg, 'cause I need it in enviroform (for AltConfigFile)
+	UserHome, strLocalAppData, strAppData, strIniFile, exefolder: String;
+	tempc: array [0..MAX_PATH] of char;
 begin
-	strIniFile := ChangeFileExt(ExtractFileName(Application.EXEName), INI_EXT);
+	strIniFile := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
+	exefolder := StringReplace(Application.ExeName,ExtractFileName(Application.ExeName),'',[rfReplaceAll]);
 
 	if (ParamCount > 0) and (ParamStr(1) = CONFIG_PARAM) then begin
-		if not DirectoryExists(ParamStr(2)) then begin
+		if not DirectoryExists(ParamStr(2)) then
 			CreateDir(ParamStr(2));
-		end;
-		devData.INIFile := IncludeTrailingBackslash(ParamStr(2)) + strIniFile;
+
+		if ParamStr(2)[2] <> ':' then// if a relative path is specified...
+			devData.INIFile := exefolder + IncludeTrailingBackslash(ParamStr(2)) + strIniFile
+		else
+			devData.INIFile := IncludeTrailingBackslash(ParamStr(2)) + strIniFile;
 		ConfigMode := CFG_PARAM;
 	end else if IsWinNT then begin
-     //default dir should be %APPDATA%\Dev-Cpp
-     strLocalAppData := '';
-     if SUCCEEDED(SHGetFolderPath(0, CSIDL_LOCAL_APPDATA, 0, 0, tempc)) then
-       strLocalAppData := IncludeTrailingBackslash(String(tempc));
+		//default dir should be %APPDATA%\Dev-Cpp
+		strLocalAppData := '';
+		if SUCCEEDED(SHGetFolderPath(0, CSIDL_LOCAL_APPDATA, 0, 0, tempc)) then
+			strLocalAppData := IncludeTrailingBackslash(String(tempc));
 
-     strAppData := '';
-     if SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, tempc)) then
-       strAppData := IncludeTrailingBackslash(String(tempc));
+		strAppData := '';
+		if SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, tempc)) then
+			strAppData := IncludeTrailingBackslash(String(tempc));
 
-     if (strLocalAppData <> '') and
-     FileExists(strLocalAppData + strIniFile) then begin
-       UserHome := strLocalAppData;
-       devData.INIFile := UserHome + strIniFile;
-       ConfigMode := CFG_USER;
-     end
-     else if (strAppData <> '')
-     and FileExists(strAppData + strIniFile) then begin
-       UserHome := strAppData;
-       devData.INIFile := UserHome + strIniFile;
-       ConfigMode := CFG_USER;
-     end
-     else if (strAppData <> '')
-     and (DirectoryExists(strAppData + 'Dev-Cpp') or CreateDir(strAppData + 'Dev-Cpp')) then begin
-       UserHome := strAppData + 'Dev-Cpp\';
-       devData.INIFile := UserHome + strIniFile;
-       ConfigMode := CFG_USER;
-     end
-     else
-       devData.INIFile:= ChangeFileExt(Application.EXEName, INI_EXT);
-  end
-  else
-    devData.INIFile:= ChangeFileExt(Application.EXEName, INI_EXT);
+		if (strLocalAppData <> '') and FileExists(strLocalAppData + strIniFile) then begin
+			UserHome := strLocalAppData;
+			devData.INIFile := UserHome + strIniFile;
+			ConfigMode := CFG_USER;
+		end else if (strAppData <> '') and FileExists(strAppData + strIniFile) then begin
+			UserHome := strAppData;
+			devData.INIFile := UserHome + strIniFile;
+			ConfigMode := CFG_USER;
+		end else if (strAppData <> '') and (DirectoryExists(strAppData + 'Dev-Cpp') or CreateDir(strAppData + 'Dev-Cpp')) then begin
+			UserHome := strAppData + 'Dev-Cpp\';
+			devData.INIFile := UserHome + strIniFile;
+			ConfigMode := CFG_USER;
+		end else
+			devData.INIFile:= ChangeFileExt(Application.EXEName, INI_EXT);
+	end else
+		devData.INIFile:= ChangeFileExt(Application.EXEName, INI_EXT);
 
-  devData.UseRegistry:= FALSE;
-  devData.BoolAsWords:= FALSE;
-  devData.INISection:= OPT_OPTIONS;
+	devData.UseRegistry:= FALSE;
+	devData.BoolAsWords:= FALSE;
+	devData.INISection:= OPT_OPTIONS;
 
-  // support for user-defined alternate ini file (permanent, but overriden by command-line -c)
-  if ConfigMode <> CFG_PARAM then begin
-    StandardConfigFile:=devData.INIFile;
-    CheckForAltConfigFile(devData.INIFile);
-    if UseAltConfigFile and (AltConfigFile<>'') and FileExists(AltConfigFile) then
-      devData.INIFile:=AltConfigFile;
-  end;
+	// support for user-defined alternate ini file (permanent, but overriden by command-line -c)
+	if ConfigMode <> CFG_PARAM then begin
+		StandardConfigFile:=devData.INIFile;
+		CheckForAltConfigFile(devData.INIFile);
+		if UseAltConfigFile and (AltConfigFile<>'') and FileExists(AltConfigFile) then
+			devData.INIFile:=AltConfigFile;
+	end;
 
-  InitializeOptions;
-  if ConfigMode = CFG_PARAM then
-    devDirs.Config := IncludeTrailingBackslash(ParamStr(2))
-  else if ConfigMode = CFG_USER then
-    devDirs.Config := UserHome;
-  devData.ReadConfigData;
-  devTheme:= TdevTheme.Create;
+	InitializeOptions;
+	if ConfigMode = CFG_PARAM then begin
+		if ParamStr(2)[2] <> ':' then // if a relative path is specified...
+			devDirs.Config := exefolder + IncludeTrailingBackslash(ParamStr(2))
+		else
+			devDirs.Config := IncludeTrailingBackslash(ParamStr(2));
+	end else if ConfigMode = CFG_USER then
+		devDirs.Config := UserHome;
+	devData.ReadConfigData;
 
-  if not devData.NoSplashScreen then 
-  begin
-    SplashForm := TSplashForm.Create(Application);
-    SplashForm.Show;
-    SplashForm.Update;
-  end;
-  
-  Application.Initialize;
-  Application.Title := 'Dev-C++';
-  Application.CreateForm(TMainForm, MainForm);
-  MainForm.Hide; // hide it
-  
-  {*** modified by peter ***}
-  // make the creation when the splashscreen is displayed
-  // because it takes quite a while ...
-  TMainFormHack(MainForm).DoCreateEverything;
+	// Display it a bit earlier
+	if not devData.NoSplashScreen then begin
+		SplashForm := TSplashForm.Create(Application);
+		SplashForm.Show;
+		SplashForm.Update;
+	end;
 
-  
-  Application.CreateForm(TfrmIncremental, frmIncremental);
-  Application.CreateForm(TfrmFind, frmFind);
-  Application.CreateForm(TfrmReplace, frmReplace);
-  Application.CreateForm(TWebUpdateForm, WebUpdateForm);
+	devTheme:= TdevTheme.Create;
 
-  if not devData.NoSplashScreen then
-    SplashForm.Free;
-  
-  {*** modified by peter ***}
-  // apply the window placement. this method forces
-  // the form to show,
-  TMainFormHack(MainForm).DoApplyWindowPlacement;
-  
-  Application.Run;
+	Application.Initialize;
+	Application.Title := 'Dev-C++';
+	Application.CreateForm(TMainForm, MainForm);
+	MainForm.Hide;
+
+	// do the creation stuff when the splashscreen is displayed because it takes quite a while ...
+	TMainFormHack(MainForm).DoCreateEverything;
+	Application.CreateForm(TfrmIncremental, frmIncremental);
+	Application.CreateForm(TfrmFind, frmFind);
+	Application.CreateForm(TfrmReplace, frmReplace);
+	Application.CreateForm(TWebUpdateForm, WebUpdateForm);
+
+	if not devData.NoSplashScreen then
+		SplashForm.Free;
+
+	// apply the window placement. this method forces the form to show
+	TMainFormHack(MainForm).DoApplyWindowPlacement;
+
+	Application.Run;
 end.
