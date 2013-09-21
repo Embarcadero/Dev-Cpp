@@ -982,7 +982,7 @@ begin
   fToolbarSearchX:=261;
   fToolbarSearchY:=2;
   fToolbarClasses:=TRUE;
-  fToolbarClassesX:=267;
+  fToolbarClassesX:=255;
   fToolbarClassesY:=30;
 
   //read associations set by installer as defaults

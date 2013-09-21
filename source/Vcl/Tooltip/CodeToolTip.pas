@@ -404,7 +404,7 @@ begin
 
 	// since we support scanning over multiple lines,
 	// we have a limit of how many chars we scan maximal...
-	FMaxScanLength := 1024;
+	FMaxScanLength := 256;
 
 	FKeyDownProc  := EditorKeyDown;
 
@@ -513,7 +513,7 @@ function TBaseCodeToolTip.GetCommaIndex(P: PChar; BraceStart, CurPos: Integer):I
 //  to know where the cursor in the prototype is.
 //  this functions returns the count of commas from the beginning
 //  prototype.
-//  for example: 
+//  for example:
 //  definition is -> void foo(int a, int b, int c);
 //  we write this -> foo(1, 2|
 //  The '|' represents the cursor. In this example this function returns 1, since
@@ -562,7 +562,7 @@ var
         '\':
           if P[i+1] = '"' then
             Inc(i);
-            
+
         '"': Break;
       end;
       Inc(i);
@@ -619,7 +619,7 @@ begin
         else FSelIndex := FToolTips.Count-1;
         NeedRefresh := True;
         FCustomSelIndex := True;
-      end; 
+      end;
 
     finally
       FEditor.SetFocus;
@@ -781,9 +781,9 @@ begin
   Pt := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos))));
 
   ActivateHint(Rect(Pt.X,
-                    YPos+2+FEditor.LineHeight, 
-                    Pt.X+NewWidth, 
-                    YPos+4+Canvas.TextHeight('Wg')+FEditor.LineHeight), 
+                    YPos+2+FEditor.LineHeight,
+                    Pt.X+NewWidth,
+                    YPos+4+Canvas.TextHeight('Wg')+FEditor.LineHeight),
                     Caption);
 end;
 
@@ -792,7 +792,7 @@ end;
 function TBaseCodeToolTip.Select(ToolTip: string): Integer;
 
 //  selects the tooltip specified by ToolTip and returns
-//  the index from it, in the list. 
+//  the index from it, in the list.
 //  the tooltip must be already added to the tooltiplist,
 //  otherwise it cannot find it and returns -1
 //
@@ -803,7 +803,7 @@ var
   I: Integer;
 begin
   Result := -1;
-  
+
   if FToolTips.Count <> -1 then
   begin
     for I := 0 to FToolTips.Count-1 do
@@ -815,7 +815,7 @@ begin
         Break;
       end;
     end;
-  end;  
+  end;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -828,7 +828,7 @@ begin
   FEditor := Value;
 
   if (FEditor <> nil) then
-  begin   
+  begin
     FEditor.AddKeyDownHandler(FKeyDownProc);
     FEditor.FreeNotification(FEditor);
   end;
@@ -845,7 +845,7 @@ begin
   if Value <> FSelIndex then
   begin
     FSelIndex := Value;
-    if Activated then 
+    if Activated then
     begin
       FCustomSelIndex := True;
       Show;
@@ -873,8 +873,6 @@ var
 	Idx: Integer;
 	nCommas: Integer;
 	ProtoFound: Boolean;
-//	attr: TSynHighlighterAttributes;
-//	attrstr: String;
 
 	// skip c/c++ commentblocks
 	procedure SkipCommentBlock;
@@ -904,35 +902,52 @@ begin
 	// get a pointer to the text
 	P := PChar(FEditor.Lines.Text);
 
-	// Start at the end of the loop + 1
-	while P[CurPos] <> ')' do begin
-		if P[CurPos] = '(' then begin
+	nBraces := 0;
+	nCommas := 0;
+
+	// Find out where the function ends...
+	for I := 1 to FMaxScanLength do begin
+		if P[CurPos] = '(' then
+			Inc(nBraces);
+		if P[CurPos] = ')' then begin
+			if nBraces = 0 then
+				break
+			else
+				Dec(nBraces);
+		end;
+		if P[CurPos] = ';' then begin
 			ReleaseHandle;
 			Exit;
 		end;
 		Inc(CurPos);
 	end;
+
+	// If we couldn't find the closing brace
+	if nBraces <> 0 then begin
+		ReleaseHandle;
+		Exit;
+	end;
+
 	Inc(CurPos);
-	nBraces := 0;
-	nCommas := 0;
 
 	// Then walk back and analyse everything
 	for I:=1 to FMaxScanLength do begin
+		Dec(CurPos);
 		case P[CurPos] of
 			'/':
 				if P[CurPos-1] = '*' then
 					SkipCommentBlock;
 
 			')': begin
-				Dec(nBraces);
+				Inc(nBraces);//Dec(nBraces);
 				if nBraces = 0 then begin
-					Inc(CurPos);
-					Break;
+					ReleaseHandle;
+					Exit;
 				end;
 			end;
 
 			'(': begin
-				Inc(nBraces);
+				Dec(nBraces);//Inc(nBraces);
 				if nBraces = 0 then begin
 					Inc(CurPos);
 					Break;
@@ -940,13 +955,12 @@ begin
 			end;
 
 			',': begin
-				Inc(nCommas);
+				if nBraces = 1 then
+					Inc(nCommas);
 			end;
-
 			#0: Exit;
 		end;
 
-		Dec(CurPos);
 	{	if CurPos <= 1 then begin
 			CurPos := FEditor.SelStart;
 			Inc(CurPos);

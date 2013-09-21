@@ -408,6 +408,7 @@ const
   ID_EOPT_HIGHLIGHTCURRLINE        = 455;
   ID_EOPT_HINTHIGHLIGHT            = 456;
   ID_EOPT_HINTWHITESPACE           = 457;
+  ID_EOPT_CLOSEBRACE               = 458;
 
 
     // Display Tab

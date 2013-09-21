@@ -2416,11 +2416,10 @@ begin
 	AddFindOutputItem(inttostr(SR.pt.X), inttostr(SR.pt.y), SR.InFile, S);
 end;
 
-procedure TMainForm.ProjectViewContextPopup(Sender: TObject;
-	MousePos: TPoint; var Handled: Boolean);
+procedure TMainForm.ProjectViewContextPopup(Sender: TObject;MousePos: TPoint; var Handled: Boolean);
 var
- pt: TPoint;
- Node: TTreeNode;
+	pt: TPoint;
+	Node: TTreeNode;
 begin
 	if not assigned(fProject) or devData.FullScreen then exit;
 	pt:= ProjectView.ClientToScreen(MousePos);
@@ -2428,18 +2427,18 @@ begin
 	if not assigned(Node) then exit;
 	ProjectView.Selected:= Node;
 	if Node.Level = 0 then
-	 ProjectPopup.Popup(pt.x, pt.Y)
+		ProjectPopup.Popup(pt.x, pt.Y)
 	else begin
-	 BuildOpenWith;
-	 RemoveFilefromprojectPopItem.Visible:=Node.Data<>Pointer(-1);
-	 RenamefilePopItem.Visible:=Node.Data<>Pointer(-1);
-	 OpenPopItem.Visible:=Node.Data<>Pointer(-1);
-	 ClosefilePopItem.Visible:=Node.Data<>Pointer(-1);
-	 Removefolder1.Visible:=Node.Data=Pointer(-1);
-	 Renamefolder1.Visible:=Node.Data=Pointer(-1);
-	 Addfile1.Visible:=Node.Data=Pointer(-1);
-	 mnuUnitProperties.Visible:=Node.Data<>Pointer(-1);
-	 UnitPopup.Popup(pt.X, pt.Y);
+		BuildOpenWith;
+		RemoveFilefromprojectPopItem.Visible:=Node.Data<>Pointer(-1);
+		RenamefilePopItem.Visible:=Node.Data<>Pointer(-1);
+		OpenPopItem.Visible:=Node.Data<>Pointer(-1);
+		ClosefilePopItem.Visible:=Node.Data<>Pointer(-1);
+		Removefolder1.Visible:=Node.Data=Pointer(-1);
+		Renamefolder1.Visible:=Node.Data=Pointer(-1);
+		Addfile1.Visible:=Node.Data=Pointer(-1);
+		mnuUnitProperties.Visible:=Node.Data<>Pointer(-1);
+		UnitPopup.Popup(pt.X, pt.Y);
 	end;
 	Handled:= TRUE;
 end;
@@ -6407,6 +6406,7 @@ var
 	text : string;
 	wantbrace : integer;
 	wantquote : boolean;
+//	Ptr : PChar;
 begin
 	Result := nil;
 
@@ -6426,6 +6426,8 @@ begin
 	end;
 
 	if member <> '' then begin
+
+	//	Ptr := PChar(e.Text.Lines.Text);
 
 		len:=0;
 		len2:=0;

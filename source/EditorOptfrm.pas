@@ -532,6 +532,7 @@ begin
   cbHalfPage.Caption:=           Lang[ID_EOPT_HALFPAGE];
   cbScrollHint.Caption:=         Lang[ID_EOPT_SCROLLHINT];
   cbParserHints.Caption:=        Lang[ID_EOPT_PARSERHINTS];
+  cbCloseBrace.Caption:=         Lang[ID_EOPT_CLOSEBRACE];
 
   cbSyntaxHighlight.Caption:=    Lang[ID_EOPT_USESYNTAX];
   lblTabSize.Caption:=           Lang[ID_EOPT_TABSIZE];

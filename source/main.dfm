@@ -991,13 +991,13 @@ object MainForm: TMainForm
     object tbSpecials: TToolBar
       Left = 11
       Top = 30
-      Width = 243
+      Width = 231
       Height = 22
       AutoSize = True
       ButtonWidth = 60
       Caption = 'Specials'
-      Constraints.MaxWidth = 243
-      Constraints.MinWidth = 243
+      Constraints.MaxWidth = 500
+      Constraints.MinWidth = 231
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -1011,34 +1011,38 @@ object MainForm: TMainForm
       object NewAllBtn: TToolButton
         Left = 0
         Top = 0
+        AutoSize = True
         Caption = 'New'
         ImageIndex = 0
         OnClick = NewAllBtnClick
       end
       object InsertBtn: TToolButton
-        Left = 60
+        Left = 53
         Top = 0
+        AutoSize = True
         Caption = 'Insert'
         ImageIndex = 1
         OnClick = InsertBtnClick
       end
       object ToggleBtn: TToolButton
-        Left = 120
+        Left = 110
         Top = 0
+        AutoSize = True
         Caption = 'Toggle'
         ImageIndex = 2
         OnClick = ToggleBtnClick
       end
       object GotoBtn: TToolButton
-        Left = 180
+        Left = 174
         Top = 0
+        AutoSize = True
         Caption = 'Goto'
         ImageIndex = 3
         OnClick = GotoBtnClick
       end
     end
     object tbClasses: TToolBar
-      Left = 267
+      Left = 255
       Top = 30
       Width = 452
       Height = 22

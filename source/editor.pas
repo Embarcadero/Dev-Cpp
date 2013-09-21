@@ -643,9 +643,9 @@ begin
 end;
 
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
-var
-	len : integer;
-	allowshow : boolean;
+//var
+//	len : integer;
+//	allowshow : boolean;
 begin
 	if scModified in Changes then begin
 		if Modified then
@@ -690,9 +690,9 @@ begin
 			end else begin
 				// it's not showing yet, so we check if the cursor
 				// is in a function argument list, and then show
-				len := fText.DisplayToBufferPos(fText.DisplayXY).Char-1;
-				if Assigned(FText) and (not FText.SelAvail) then begin
-					allowshow := false;
+			//	len := fText.DisplayToBufferPos(fText.DisplayXY).Char-1;
+				if Assigned(FText) and (not FText.SelAvail) and (FText.SelStart > 1) then begin
+				{	allowshow := false;
 					while (len > 1) and (len < Length(fText.LineText)) do begin
 						if (fText.LineText[len] in [')']) then begin
 							allowshow := false;
@@ -704,8 +704,7 @@ begin
 						end;
 						Dec(len);
 					end;
-					if allowshow then begin
-                       {	MainForm.MsgBox('allow','Hoi'); }FCodeToolTip.Show; end;
+					if allowshow then }FCodeToolTip.Show;
 				end;
 			end;
 		end;
@@ -1692,7 +1691,7 @@ begin
 				fText.Canvas.TextOut(Pix.X, Pix.Y, S);
 				P := fText.GetMatchingBracketEx(P);
 
-				if not(TransientType = ttAfter) then
+				if not(TransientType = ttAfter) and not (P.Line = fText.CaretY) then
 					fText.Canvas.Brush.Color:= fText.Highlighter.WhitespaceAttribute.Background;
 
 				if (P.Char > 0) and (P.Line > 0) then begin
