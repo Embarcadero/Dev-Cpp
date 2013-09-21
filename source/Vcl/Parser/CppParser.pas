@@ -231,14 +231,15 @@ type
     procedure FillListOfFunctions(const Full: AnsiString; List: TStringList);
     function FindAndScanBlockAt(const Filename : AnsiString; Row : integer; Stream: TStream): integer;
     function FindStatementOf(FileName, Phrase : AnsiString; Row : integer; Stream: TStream): PStatement; overload;
-    function FindStatementOf(Phrase : AnsiString; curclass : integer): PStatement; overload;
-    function FindVariableOf(const Phrase: AnsiString; ParentID : integer) : PStatement;
+    function FindStatementOf(Phrase : AnsiString; fCurrentIndex : integer): PStatement; overload;
+    function FindVariableOf(const Phrase: AnsiString; fCurrentIndex : integer) : PStatement;
     function FindTypeStatementOf(const aType : AnsiString) : PStatement;
     function GetClass(const Phrase : AnsiString) : AnsiString;
     function GetMember(const Phrase : AnsiString) : AnsiString;
     function GetOperator(const Phrase : AnsiString) : AnsiString;
     function FindLastOperator(const Phrase : AnsiString) : integer;
-    function AddInheritance(const InheritanceString :  AnsiString; List : TIntList) : Ansistring;
+    procedure GetInheritance(st : PStatement; List : TIntList); overload;
+    procedure GetInheritance(index : Integer; List : TIntList); overload;
     function GetThisPointerID: integer;
   published
     property BaseIndex: integer read fBaseIndex write fBaseIndex;
@@ -2772,19 +2773,40 @@ begin
 	Result := 0;
 end;
 
-function TCppParser.AddInheritance(const InheritanceString :  AnsiString; List : TIntList) : Ansistring;
+procedure TCppParser.GetInheritance(st : PStatement; List : TIntList);
 var
 	sl : TStringList;
-	I : integer;
+	I, tmp, donecount : integer;
 begin
+	// Walk the whole inheritance tree, all branches, to the bottom
 	sl := TStringList.Create;
 	try
-		sl.CommaText := InheritanceString;
+		// Add first list
+		sl.CommaText := st^._InheritsFromIDs;
 		for I := 0 to sl.Count - 1 do
 			List.Add(StrToIntDef(sl[i],-1));
+		donecount := 0;
+
+		// then process inheritance of new items
+		while donecount < List.Count do begin
+			tmp := IndexOfStatement(List[donecount]); // slooow
+
+			// Add inheritance of inherited
+			sl.CommaText := PStatement(fStatementList[tmp])^._InheritsFromIDs;
+			for I := 0 to sl.Count - 1 do
+				List.Add(StrToIntDef(sl[i],-1));
+
+			Inc(donecount);
+		end;
 	finally
 		sl.Free;
 	end;
+end;
+
+procedure TCppParser.GetInheritance(index : Integer; List : TIntList);
+begin
+	if index <> -1 then
+		GetInheritance(PStatement(fStatementList[index]),List);
 end;
 
 procedure TCppParser.FillListOfFunctions(const Full: AnsiString; List: TStringList);
@@ -2813,10 +2835,15 @@ begin
 	end;
 end;
 
-function TCppParser.FindVariableOf(const Phrase: AnsiString; ParentID : integer) : PStatement; // max = 1
+function TCppParser.FindVariableOf(const Phrase: AnsiString; fCurrentIndex : integer) : PStatement; // max = 1
 var
 	I: integer;
+	inheritanceIDs: TIntList;
 begin
+	// First, assume the parentword is a type (type names have more priority than variables)
+	result := FindTypeStatementOf(Phrase);
+	if Assigned(result) then
+		Exit;
 
 	// First, assume the parentword is a local variable, either visible in body or argument list
 	for I := fStatementList.Count - 1 downto 0 do begin
@@ -2830,16 +2857,30 @@ begin
 	end;
 
 	// Then, assume the variable belongs to the current scope/class, if there is one
-	if ParentID <> -1 then begin
+	if fCurrentIndex <> -1 then begin
 
-		// Start scanning backwards, because owner data is found there
-		for I := fStatementList.Count - 1 downto 0 do begin
-			if PStatement(fStatementList[I])^._ParentID = ParentID then begin
-				if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,Phrase) then begin
-					result := fStatementList[I];
-					Exit;
+		inheritanceIDs := TIntList.Create;
+		try
+			// Accept inherited stuff from current class too
+			GetInheritance(fCurrentIndex,inheritanceIDs); // slow
+
+			// Start scanning backwards, because owner data is found there
+			for I := fStatementList.Count - 1 downto 0 do begin
+				if PStatement(fStatementList[I])^._ParentID = PStatement(fStatementList[fCurrentIndex])^._ID then begin
+					if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,Phrase) then begin
+						result := fStatementList[I];
+						Exit;
+					end;
+				end else if (inheritanceIDs.IndexOf(PStatement(fStatementList[I])^._ParentID) <> -1) then begin // try inheritance
+					// hide private stuff?
+					if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,Phrase) then begin
+						result := fStatementList[I];
+						Exit;
+					end;
 				end;
 			end;
+		finally
+			inheritanceIDs.Free;
 		end;
 	end;
 
@@ -2869,19 +2910,21 @@ begin
 		Delete(s,J+1,Length(s)-1);
 
 	for I := 0 to fStatementList.Count - 1 do begin
-		if PStatement(fStatementList[I])^._Kind = skClass then begin // these have type 'class'
+		if PStatement(fStatementList[I])^._ParentID = -1 then begin // is this always true?
+			if PStatement(fStatementList[I])^._Kind = skClass then begin // these have type 'class'
 
-			// We have found the statement of the type directly
-			if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,s) then begin
-				result := fStatementList[I];
-				Exit;
-			end;
-		end else if PStatement(fStatementList[I])^._Kind in [skVariable,skFunction] then begin
+				// We have found the statement of the type directly
+				if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,s) then begin
+					result := fStatementList[I];
+					Exit;
+				end;
+			end else if PStatement(fStatementList[I])^._Kind in [skVariable,skFunction] then begin
 
-			// We have found a variable with the same name, search for type
-			if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,s) then begin
-				result := fStatementList[I];
-				Exit;
+				// We have found a variable with the same name, search for type
+				if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,s) then begin
+					result := fStatementList[I];
+					Exit;
+				end;
 			end;
 		end;
 	end;
@@ -2889,11 +2932,12 @@ begin
 	Result := nil;
 end;
 
-function TCppParser.FindStatementOf(Phrase : AnsiString; curclass : integer): PStatement;
+function TCppParser.FindStatementOf(Phrase : AnsiString; fCurrentIndex : integer): PStatement;
 var
 	parenttype : PStatement;
 	i : integer;
 	parentword,memberword,operator : AnsiString;
+	inheritanceIDs: TIntList; // reuse?
 begin
 
 	// Get the FIRST class and member, surrounding the FIRST operator
@@ -2902,56 +2946,70 @@ begin
 	memberword := GetMember(Phrase);
 
 	// Determine which variable we are dealing with
-	result := FindVariableOf(parentword,curclass);
+	result := FindVariableOf(parentword,fCurrentIndex);
 	if not Assigned(result) then
 		Exit;
 
 	// Then determine which type it has (so we can use it as a parent ID)
-	parenttype := FindTypeStatementOf(result^._Type);
-	if not Assigned(parenttype) then
-		Exit;
-
-	// Walk the chain of operators
-	while (memberword <> '') do begin
-
-		// Add members of this type
-		for I := 0 to fStatementList.Count - 1 do begin
-			if PStatement(fStatementList[I])^._ParentID = parenttype^._ID then begin
-				if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,memberword) then begin
-					result := fStatementList[I];
-					break; // there can be only one with an equal name
-				end;
-			end;
-		end;
-
-		// next operator
-		Delete(phrase,1,Length(parentword) + Length(operator));
-
-		// Get the NEXT member, surrounding the next operator
-		parentword := GetClass(Phrase);
-		operator := GetOperator(Phrase);
-		memberword := GetMember(Phrase);
-
-		// Don't bother finding types
-		if memberword = '' then
-			break;
-
-		// At this point, we have a list of statements that conform to the a(operator)b demand.
-		// Now make these statements "a(operator)b" the parents, so we can use them as filters again
+	if (result^._Kind = skClass) then begin // already found type
+		parenttype := result;
+	end else begin
 		parenttype := FindTypeStatementOf(result^._Type);
 		if not Assigned(parenttype) then
 			Exit;
 	end;
+
+	inheritanceIDs := TIntList.Create;
+	try
+
+		// Walk the chain of operators
+		while (memberword <> '') do begin
+
+			inheritanceIDs.Clear;
+			GetInheritance(parenttype,inheritanceIDs);
+
+			// Add members of this type
+			for I := 0 to fStatementList.Count - 1 do begin
+				if PStatement(fStatementList[I])^._ParentID = parenttype^._ID then begin
+					if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,memberword) then begin
+						result := fStatementList[I];
+						break; // there can be only one with an equal name
+					end;
+				end else if (inheritanceIDs.IndexOf(PStatement(fStatementList[I])^._ParentID) <> -1) then begin // try inheritance
+					// hide private stuff?
+					if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,memberword) then begin
+						result := fStatementList[I];
+						break;
+					end;
+				end;
+			end;
+
+			// next operator
+			Delete(phrase,1,Length(parentword) + Length(operator));
+
+			// Get the NEXT member, surrounding the next operator
+			parentword := GetClass(Phrase);
+			operator := GetOperator(Phrase);
+			memberword := GetMember(Phrase);
+
+			// Don't bother finding types
+			if memberword = '' then
+				break;
+
+			// At this point, we have a list of statements that conform to the a(operator)b demand.
+			// Now make these statements "a(operator)b" the parents, so we can use them as filters again
+			parenttype := FindTypeStatementOf(result^._Type);
+			if not Assigned(parenttype) then
+				Exit;
+		end;
+	finally
+		inheritanceIDs.Free;
+	end;
 end;
 
 function TCppParser.FindStatementOf(FileName,Phrase : AnsiString; Row : integer; Stream: TStream): PStatement;
-var
-	fCurClassID : integer;
 begin
-	fCurClassID := FindAndScanBlockAt(FileName, Row, Stream);
-	if fCurClassID <> -1 then
-		fCurClassID := PStatement(fStatementList[fCurClassID])^._ID;
-	Result := FindStatementOf(Phrase,fCurClassID);
+	Result := FindStatementOf(Phrase,FindAndScanBlockAt(FileName, Row, Stream));
 end;
 
 procedure TCppParser.DeleteTemporaries;

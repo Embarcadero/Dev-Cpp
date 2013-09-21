@@ -58,10 +58,10 @@ type
     fOnKeyPress: TKeyPressEvent;
     fOnResize: TNotifyEvent;
     fOnlyGlobals: boolean;
-    fCurrentClass: integer;
+    fCurrentIndex: integer;
     fIncludedFiles: TStringList;
-    function ApplyClassFilter(Index, ParentID: integer; InheritanceIDs: TIntList): boolean;
-    function ApplyMemberFilter(Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
+    function ApplyClassFilter(Index, CurrentID: integer; InheritanceIDs: TIntList): boolean;
+    function ApplyMemberFilter(Index, CurrentID, ParentID: integer; InheritanceIDs: TIntList): boolean;
     procedure GetCompletionFor(Phrase : AnsiString);
     procedure FilterList(const Member : AnsiString);
     procedure SetPosition(Value: TPoint);
@@ -89,7 +89,7 @@ type
     property OnKeyPress: TKeyPressEvent read fOnKeyPress write fOnKeyPress;
     property OnResize: TNotifyEvent read fOnResize write fOnResize;
     property OnlyGlobals: boolean read fOnlyGlobals write fOnlyGlobals;
-    property CurrentClass: integer read fCurrentClass write fCurrentClass;
+    property CurrentIndex: integer read fCurrentIndex write fCurrentIndex;
   end;
 
 implementation
@@ -130,7 +130,7 @@ begin
   inherited Destroy;
 end;
 
-function TCodeCompletion.ApplyClassFilter(Index, ParentID: integer; InheritanceIDs: TIntList): boolean;
+function TCodeCompletion.ApplyClassFilter(Index, CurrentID: integer; InheritanceIDs: TIntList): boolean;
 begin
   Result :=
     (
@@ -138,7 +138,7 @@ begin
     (
     (PStatement(fParser.Statements[Index])^._Scope = ssClassLocal) and // class var
     (
-    (PStatement(fParser.Statements[Index])^._ParentID = ParentID) or // from current class
+    (PStatement(fParser.Statements[Index])^._ParentID = CurrentID) or // from current class
     (
     (InheritanceIDs.IndexOf(PStatement(fParser.Statements[Index])^._ParentID) <> -1) and
     (PStatement(fParser.Statements[Index])^._ClassScope <> scsPrivate)
@@ -150,7 +150,7 @@ begin
     IsIncluded(PStatement(fParser.Statements[Index])^._DeclImplFileName));
 end;
 
-function TCodeCompletion.ApplyMemberFilter(Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
+function TCodeCompletion.ApplyMemberFilter(Index, CurrentID, ParentID: integer; InheritanceIDs: TIntList): boolean;
 var
   cs: set of TStatementClassScope;
 begin
@@ -158,16 +158,16 @@ begin
   if not Result then Exit;
 
   // all members of current class
-  Result := Result and ((ClassIDs.IndexOf(CurrentID) <> -1) and (PStatement(fParser.Statements[Index])^._ParentID = CurrentID));
+  Result := Result and ((ParentID = CurrentID) and (PStatement(fParser.Statements[Index])^._ParentID = CurrentID));
 
   // all public and published members of var's class
   Result := Result or
     (
-    (ClassIDs.IndexOf(PStatement(fParser.Statements[Index])^._ParentID) <> -1) and
+    (ParentID = PStatement(fParser.Statements[Index])^._ParentID) and
     (not (PStatement(fParser.Statements[Index])^._ClassScope in [scsProtected, scsPrivate])) // or member of an inherited class
     );
 
-  if (CurrentID = -1) or (PStatement(fParser.Statements[Index])^._ParentID = fCurrentClass) then
+  if (CurrentID = -1) or (PStatement(fParser.Statements[Index])^._ParentID = CurrentID) then
     cs := [scsPrivate, scsProtected]
   else
     cs := [scsPrivate];
@@ -184,32 +184,16 @@ procedure TCodeCompletion.GetCompletionFor(Phrase : AnsiString);
 var
 	I: integer;
 	InheritanceIDs: TIntList;
-	ClassIDs: TIntList;
-	fCurrentID: integer;
+	fCurrentID, fParentID: integer;
 	parent : PStatement;
-
-	procedure AddInheritanceOf(Index: integer);
-	begin
-		if index <> -1 then begin
-
-			// obtain a list of IDs to inherit from
-			fParser.AddInheritance(PStatement(fParser.Statements[Index])^._InheritsFromIDs,InheritanceIDs);
-
-			// also include these files
-			fIncludedFiles.Add(PStatement(fParser.Statements[Index])^._Filename);
-			fIncludedFiles.Add(PStatement(fParser.Statements[Index])^._DeclImplFilename);
-		end;
-	end;
-
 begin
 	// Pulling off the same trick as in TCppParser.FindStatementOf, but ignore everything after last operator
-	ClassIDs := TIntList.Create;
 	InheritanceIDs := TIntList.Create;
 	try
 
 		// ID of current class
-		if fCurrentClass <> -1 then
-			fCurrentID := PStatement(fParser.Statements[fCurrentClass])^._ID
+		if fCurrentIndex <> -1 then
+			fCurrentID := PStatement(fParser.Statements[fCurrentIndex])^._ID
 		else
 			fCurrentID := -1;
 
@@ -219,8 +203,7 @@ begin
 			// only add globals and members of the current class
 
 			// Also consider classes the current class inherits from
-			AddInheritanceOf(fCurrentClass);
-
+			fParser.GetInheritance(fCurrentIndex,InheritanceIDs);
 			for I := 0 to fParser.Statements.Count - 1 do
 				if ApplyClassFilter(I, fCurrentID, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
@@ -235,22 +218,23 @@ begin
 			if not Assigned(parent) then
 				Exit;
 
-			// Obtain type declaration of parent
-			parent := fParser.FindTypeStatementOf(parent^._Type);
-			if not Assigned(parent) then
-				Exit;
+			// Then determine which type it has (so we can use it as a parent ID)
+			if (parent^._Kind <> skClass) then begin // already found type
+				parent := fParser.FindTypeStatementOf(parent^._Type);
+				if not Assigned(parent) then
+					Exit;
+			end;
 
-			ClassIDs.Add(parent^._ID); // we need types!
-			AddInheritanceOf(fParser.IndexOfStatement(parent^._ID)); // slow...
+			fParentID := parent^._ID;
+			fParser.GetInheritance(fParentID,InheritanceIDs); // slow...
 
 			// Then add members of the ClassIDs and InheritanceIDs
 			for I := 0 to fParser.Statements.Count - 1 do
-				if ApplyMemberFilter(I, fCurrentID, ClassIDs, InheritanceIDs) then
+				if ApplyMemberFilter(I, fCurrentID, fParentID, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
 		end;
 	finally
 		InheritanceIDs.Free;
-		ClassIDs.Free;
 	end;
 end;
 
@@ -271,6 +255,7 @@ var
 	I: integer;
 begin
 	fCompletionStatementList.Clear;
+	fCompletionStatementList.Capacity := fFullCompletionStatementList.Count;
 	for I := 0 to fFullCompletionStatementList.Count - 1 do
 		if StartsText(Member, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
 			fCompletionStatementList.Add(fFullCompletionStatementList[I]);

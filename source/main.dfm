@@ -3073,7 +3073,7 @@ object MainForm: TMainForm
     MaxHeight = 0
     OnResize = CodeCompletionResize
     OnlyGlobals = False
-    CurrentClass = 0
+    CurrentIndex = 0
     Left = 60
     Top = 164
   end

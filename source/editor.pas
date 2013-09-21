@@ -1068,7 +1068,7 @@ begin
 
 		// Scan the current function
 		fText.UnCollapsedLines.SaveToStream(M);
-		fCompletionBox.CurrentClass := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M)
+		fCompletionBox.CurrentIndex := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M)
 	finally
 		M.Free;
 	end;
@@ -1533,7 +1533,7 @@ begin
 			// reset the cursor
 			fText.Cursor:=crIBeam;
 
-			line:=fText.Lines[p.Row-1];
+			line := Trim(fText.Lines[p.Row-1]);
 			if StartsStr('#include',line) then begin
 
 				// We've clicked an #include...

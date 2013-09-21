@@ -21,7 +21,7 @@ unit ClassBrowser;
 
 interface
 
-uses 
+uses
 {$IFDEF WIN32}
   Windows, Messages, Classes, SysUtils, U_IntList, Controls, ComCtrls, Forms, Graphics,
   CppParser;
@@ -196,7 +196,7 @@ end;
 
 procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
 var
-  I, iFrom, tmp, donecount: integer;
+  I, iFrom, tmp: integer;
   ParNode, NewNode: TTreeNode;
   bInherited: boolean;
   inheritanceids : TIntList;
@@ -218,19 +218,9 @@ begin
 
 	inheritanceids := TIntList.Create;
 	try
-		// allow inheritance propagation
+		// allow inheritance propagation, including MI
 		if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass) then begin
-
-			// Add inheritance of current node
-			fParser.AddInheritance(PStatement(fParser.Statements[ParentIndex])^._InheritsFromIDs,inheritanceids);
-			donecount := 0; // done means found last base class
-
-			// then process inheritance of new items
-			while donecount < inheritanceids.Count do begin
-				tmp := fParser.IndexOfStatement(inheritanceids[donecount]); // slooow
-				fParser.AddInheritance(PStatement(fParser.Statements[tmp])^._InheritsFromIDs,inheritanceids);
-				Inc(donecount);
-			end;
+			fParser.GetInheritance(ParentIndex,inheritanceids);
 		end;
 
 		bInherited := False;

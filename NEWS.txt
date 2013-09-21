@@ -20,6 +20,9 @@ Version 5.3.1 - *
 - One can now refresh the current cache contents.
 - Improved array evaluating under mouse when debugging.
 - Fixed a bug that emerged in code folding and improved its performance thanks to that.
+- Redesigned the code tooltip and code completion: they now support (M)I and multiple levels of parent->member structures.
+- The class browser now supports multiple inheritance.
+- Many more bugfixes here and there.
 
 Version 5.3.0.4 - 31 December 2012
 
