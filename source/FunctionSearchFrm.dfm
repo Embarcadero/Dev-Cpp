@@ -1,10 +1,10 @@
 object FunctionSearchForm: TFunctionSearchForm
-  Left = 717
-  Top = 386
+  Left = 516
+  Top = 265
   BorderStyle = bsDialog
   Caption = 'Goto function...'
-  ClientHeight = 332
-  ClientWidth = 451
+  ClientHeight = 374
+  ClientWidth = 469
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,44 +15,25 @@ object FunctionSearchForm: TFunctionSearchForm
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnShow = FormShow
+  DesignSize = (
+    469
+    374)
   PixelsPerInch = 96
   TextHeight = 15
-  object Panel1: TPanel
-    Left = 0
-    Top = 0
-    Width = 451
-    Height = 29
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 0
-    DesignSize = (
-      451
-      29)
-    object Label1: TLabel
-      Left = 4
-      Top = 8
-      Width = 56
-      Height = 15
-      Caption = 'Search for:'
-    end
-    object txtSearch: TEdit
-      Left = 84
-      Top = 4
-      Width = 361
-      Height = 23
-      Anchors = [akLeft, akTop, akRight]
-      TabOrder = 0
-      OnChange = txtSearchChange
-      OnExit = txtSearchExit
-      OnKeyDown = txtSearchKeyDown
-    end
+  object Label1: TLabel
+    Left = 4
+    Top = 8
+    Width = 56
+    Height = 15
+    Caption = 'Search for:'
   end
   object lvEntries: TListView
     Left = 0
-    Top = 29
-    Width = 451
-    Height = 303
-    Align = alClient
+    Top = 32
+    Width = 469
+    Height = 342
+    Align = alCustom
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
         Width = 30
@@ -73,10 +54,21 @@ object FunctionSearchForm: TFunctionSearchForm
     RowSelect = True
     SmallImages = dmMain.ClassImages
     StateImages = dmMain.ClassImages
-    TabOrder = 1
+    TabOrder = 0
     TabStop = False
     ViewStyle = vsReport
     OnCompare = lvEntriesCompare
     OnDblClick = lvEntriesDblClick
+  end
+  object txtSearch: TEdit
+    Left = 84
+    Top = 4
+    Width = 379
+    Height = 23
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 1
+    OnChange = txtSearchChange
+    OnKeyDown = txtSearchKeyDown
+    OnKeyPress = txtSearchKeyPress
   end
 end

@@ -34,6 +34,6 @@ object CodeComplForm: TCodeComplForm
     TabOrder = 0
     OnDblClick = lbCompletionDblClick
     OnDrawItem = lbCompletionDrawItem
-    OnKeyDown = lbCompletionKeyDown
+    OnKeyPress = lbCompletionKeyPress
   end
 end

@@ -30,23 +30,20 @@ type
 	TSynCollapsingMarkStyle = (msSquare, msEllipse);
 
 	TSynEditFoldRange = class;
-	TSynEditAllFoldRanges = class;
 	TFoldRegions = class;
 
-	TSynCodeFolding = class(TPersistent)
+	TSynCodeFolding = class
 	private
 		fIndentGuides: Boolean;
 		fShowCollapsedLine: Boolean;
 		fCollapsedLineColor: TColor;
 		fFolderBarLinesColor: TColor;
 		fCollapsingMarkStyle: TSynCollapsingMarkStyle;
-		fCaseSensitive: Boolean;
 		fFoldRegions: TFoldRegions;
 	public
 		constructor Create;
 		destructor Destroy; override;
 
-		property CaseSensitive: Boolean read fCaseSensitive write fCaseSensitive;
 		property CollapsedLineColor: TColor read fCollapsedLineColor write fCollapsedLineColor;
 		property CollapsingMarkStyle: TSynCollapsingMarkStyle read fCollapsingMarkStyle write fCollapsingMarkStyle;
 		property FolderBarLinesColor: TColor read fFolderBarLinesColor write fFolderBarLinesColor;
@@ -59,11 +56,9 @@ type
 	private
 		fType: TFoldRegionType;
 		fAddEnding: Boolean;
-		fNoSubFoldRegions: Boolean;
 		fSubFoldRegions: TFoldRegions;
 		fOpen: PChar;
 		fClose: PChar;
-		fName: String;
 
 		procedure SetClose(const Value: PChar);
 		procedure SetOpen(const Value: PChar);
@@ -72,11 +67,9 @@ type
 		destructor Destroy; override;
 		property FoldRegionType: TFoldRegionType read fType write fType;
 		property AddEnding: Boolean read fAddEnding write fAddEnding;
-		property NoSubFoldRegions: Boolean read fNoSubFoldRegions write fNoSubFoldRegions;
 		property SubFoldRegions: TFoldRegions read fSubFoldRegions;
 		property Open: PChar read fOpen write SetOpen;
 		property Close: PChar read fClose write SetClose;
-		property Name: String read fName write fName;
 	end;
 
 	TFoldRegions = class(TCollection)
@@ -85,7 +78,7 @@ type
 	public
 		constructor Create(ItemClass: TCollectionItemClass);
 		destructor Destroy; override;
-		function Add(AType: TFoldRegionType; AAddEnding, ANoSubFoldRegions: Boolean; AOpen, AClose: PChar): TFoldRegionItem;
+		function Add(AType: TFoldRegionType; AAddEnding: boolean;AOpen, AClose: PChar): TFoldRegionItem;
 
 		property Items[Index: Integer]: TFoldRegionItem read GetItem; default;
 	end;
@@ -94,43 +87,30 @@ type
 	TSynEditFoldRanges = class(TObject)
 	private
 		fRanges: TList;
-		function GetSynEditFoldRange(Index: Integer): TSynEditFoldRange;
+		fOwnsObjects : boolean;
+		function Get(Index: Integer): TSynEditFoldRange;
 		function GetCount: Integer;
 	public
 		constructor Create;
 		destructor Destroy; override;
 
-		function AddByParts(AAllFold: TSynEditAllFoldRanges; AFromLine,ALevel, ARealLevel: Integer; AFoldRegion: TFoldRegionItem;AToLine: Integer = 0): TSynEditFoldRange;
+		function AddByParts(AAllFold: TSynEditFoldRanges; AFromLine,AIndent, ARealLevel: Integer; AFoldRegion: TFoldRegionItem;AToLine: Integer = 0): TSynEditFoldRange;
 		procedure AddObject(FoldRange: TSynEditFoldRange);
-
-		property Count: Integer read GetCount;
-		property FoldRanges[Index: Integer]: TSynEditFoldRange read GetSynEditFoldRange; default;
-		property Ranges: TList read fRanges;
-	end;
-
-	// Top-level fold list containing ALL FOLDS
-	TSynEditAllFoldRanges = class(TSynEditFoldRanges)
-	private
-		fAllRanges: TList;
-		function GetAllCount: Integer;
-		function GetAllFoldRange(Index: Integer): TSynEditFoldRange;
-	public
-		constructor Create;
-		destructor Destroy; override;
 
 		procedure Delete(Index: Integer);
 
-		property AllCount: Integer read GetAllCount;
-		property AllFoldRanges[Index: Integer]: TSynEditFoldRange read GetAllFoldRange; default;
-		property AllRanges: TList read fAllRanges;
+		property OwnsObjects : boolean read fOwnsObjects write fOwnsObjects;
+		property Count: Integer read GetCount;
+		property FoldRanges[Index: Integer]: TSynEditFoldRange read Get; default;
+		property Ranges: TList read fRanges;
 	end;
 
 	// A single fold
-	TSynEditFoldRange = class
+	TSynEditFoldRange = class(TObject)
 	private
 		fFromLine, // Beginning line
 		fToLine, // End line
-		fLevel, // Indent level (physcial)
+		fIndent, // Indent level (physcial)
 		fLinesCollapsed, // Number of collapsed lines
 		fCollapsedBy: Integer; // Parent fold range index
 		fRealLevel: Integer; // Fold range level
@@ -138,7 +118,7 @@ type
 		fCollapsed, // Is collapsed?
 		fParentCollapsed: Boolean; // Is collapsed together with it's parent?
 		fCollapsedLines: TStringList; // Collapsed lines
-		fAllFoldRanges: TSynEditAllFoldRanges; // TAllFoldRanges pointer
+		fAllFoldRanges: TSynEditFoldRanges; // TAllFoldRanges pointer
 		fFoldRegion: TFoldRegionItem; // FoldRegion pointer
 		fHintMarkLeft: Integer;
 
@@ -159,18 +139,18 @@ type
 		procedure MoveBy(LineCount: Integer);
 		procedure MoveChildren(By: Integer);
 		procedure Widen(LineCount: Integer);
-		function Collapsable: Boolean;
 
 		procedure Backup;
 		procedure Fix;
 		procedure BackupPCOfSubFoldRanges;
 		procedure FixPCOfSubFoldRanges;
 
+		property AllFolds : TSynEditFoldRanges read fAllFoldRanges;
 		property RealLevel: Integer read fRealLevel write SetRealLevel;
 		property SubFoldRanges: TSynEditFoldRanges read fSubFoldRanges;
 		property FromLine: Integer read fFromLine write fFromLine;
 		property ToLine: Integer read fToLine write fToLine;
-		property Level: Integer read fLevel write fLevel;
+		property Indent: Integer read fIndent write fIndent;
 		property LinesCollapsed: Integer read fLinesCollapsed write fLinesCollapsed;
 		property CollapsedBy: Integer read fCollapsedBy write fCollapsedBy;
 		property Collapsed: Boolean read fCollapsed write fCollapsed;
@@ -183,65 +163,7 @@ type
 
 implementation
 
-{ TSynEditAllFoldRanges }
-
-constructor TSynEditAllFoldRanges.Create;
-begin
-	inherited;
-	fAllRanges := TList.Create;
-end;
-
-destructor TSynEditAllFoldRanges.Destroy;
-var
-	I : integer;
-begin
-	for I:=0 to fAllRanges.Count - 1 do begin
-		TObject(fAllRanges[i]).Free;
-		fAllRanges[i] := nil;
-	end;
-	fAllRanges.Free;
-	inherited;
-end;
-
-procedure TSynEditAllFoldRanges.Delete(Index: Integer);
-begin
-	TObject(fAllRanges[Index]).Free;
-	fAllRanges.Delete(Index);
-end;
-
-function TSynEditAllFoldRanges.GetAllCount: Integer;
-begin
-	Result := fAllRanges.Count;
-end;
-
-function TSynEditAllFoldRanges.GetAllFoldRange(Index: Integer): TSynEditFoldRange;
-begin
-	Result := fAllRanges[Index];
-end;
-
 { TSynEditFoldRanges }
-
-function TSynEditFoldRanges.AddByParts(AAllFold: TSynEditAllFoldRanges; AFromLine,ALevel, ARealLevel: Integer; AFoldRegion: TFoldRegionItem;AToLine: Integer): TSynEditFoldRange;
-begin
-	Result := TSynEditFoldRange.Create;
-	with Result do begin
-		fFromLine := AFromLine;
-		fToLine := AToLine;
-		fLevel := ALevel;
-		fRealLevel := ARealLevel;
-		fAllFoldRanges := AAllFold;
-		fFoldRegion := AFoldRegion;
-	end;
-
-	// Add pointers
-	fRanges.Add(Result);
-	AAllFold.fAllRanges.Add(Result);
-end;
-
-procedure TSynEditFoldRanges.AddObject(FoldRange: TSynEditFoldRange);
-begin
-	fRanges.Add(FoldRange);
-end;
 
 constructor TSynEditFoldRanges.Create;
 begin
@@ -250,9 +172,53 @@ begin
 end;
 
 destructor TSynEditFoldRanges.Destroy;
+var
+	I : integer;
 begin
+	if OwnsObjects then
+		for I:=0 to fRanges.Count - 1 do begin
+			TObject(fRanges[i]).Free;
+			fRanges[i] := nil;
+		end;
 	fRanges.Free;
 	inherited;
+end;
+
+function TSynEditFoldRanges.AddByParts(AAllFold: TSynEditFoldRanges; AFromLine,AIndent, ARealLevel: Integer; AFoldRegion: TFoldRegionItem;AToLine: Integer): TSynEditFoldRange;
+begin
+	Result := TSynEditFoldRange.Create;
+	with Result do begin
+		fFromLine := AFromLine;
+		fToLine := AToLine;
+		fIndent := AIndent;
+		fRealLevel := ARealLevel;
+		fAllFoldRanges := AAllFold;
+		fFoldRegion := AFoldRegion;
+	end;
+
+	// Add pointers to our parent
+	fRanges.Add(Result);
+
+	// Don't add double pointers to the parent-of-all
+	if Self <> AAllFold then
+		AAllFold.fRanges.Add(Result);
+end;
+
+procedure TSynEditFoldRanges.AddObject(FoldRange: TSynEditFoldRange);
+begin
+	fRanges.Add(FoldRange);
+end;
+
+procedure TSynEditFoldRanges.Delete(Index: Integer);
+begin
+	if OwnsObjects then
+		TObject(fRanges[Index]).Free;
+	fRanges.Delete(Index);
+end;
+
+function TSynEditFoldRanges.Get(Index: Integer): TSynEditFoldRange;
+begin
+	Result := TSynEditFoldRange(fRanges[Index]);
 end;
 
 function TSynEditFoldRanges.GetCount: Integer;
@@ -260,22 +226,13 @@ begin
 	Result := fRanges.Count;
 end;
 
-function TSynEditFoldRanges.GetSynEditFoldRange(Index: Integer): TSynEditFoldRange;
-begin
-	Result := TSynEditFoldRange(fRanges[Index]);
-end;
-
 { TSynEditFoldRange }
-
-function TSynEditFoldRange.Collapsable: Boolean;
-begin
-	Result := fFromLine <> fToLine;
-end;
 
 constructor TSynEditFoldRange.Create;
 begin
 	inherited;
 	fSubFoldRanges := TSynEditFoldRanges.Create;
+	fSubFoldRanges.OwnsObjects := false;
 	fCollapsedLines := TStringList.Create;
 	fCollapsedBy := -1;
 end;
@@ -299,7 +256,7 @@ var
 begin
 	for i := 0 to fSubFoldRanges.Count - 1 do begin
 		fSubFoldRanges[i].MoveChildren(By);
-		with fAllFoldRanges.FAllRanges do
+		with fAllFoldRanges.fRanges do
 			if fSubFoldRanges[i].fParentCollapsed then
 				Move(IndexOf(fSubFoldRanges[i]), IndexOf(fSubFoldRanges[i]) + By);
 	end;
@@ -420,14 +377,12 @@ end;
 
 { TFoldRegions }
 
-function TFoldRegions.Add(AType: TFoldRegionType; AAddEnding,
-		ANoSubFoldRegions: Boolean; AOpen, AClose: PChar): TFoldRegionItem;
+function TFoldRegions.Add(AType: TFoldRegionType; AAddEnding: boolean;AOpen, AClose: PChar): TFoldRegionItem;
 begin
 	Result := TFoldRegionItem(inherited Add);
 	with Result do begin
 		fType := AType;
 		fAddEnding := AAddEnding;
-		fNoSubFoldRegions := ANoSubFoldRegions;
 		Open := AOPen;
 		Close := AClose;
 	end;
@@ -473,12 +428,11 @@ begin
 	CollapsedLineColor := clBlack;
 	FolderBarLinesColor := clBlack;
 	CollapsingMarkStyle := msSquare;
-	CaseSensitive := True;
 
 	fFoldRegions := TFoldRegions.Create(TFoldRegionItem); // TODO: Leaky?
 	with fFoldRegions do begin
-		Add(rtChar, False, False, '{', '}');
-		Add(rtKeyword, False, False, 'BEGIN', 'END');
+		Add(rtChar, False, '{', '}');
+		Add(rtKeyword, False, 'BEGIN', 'END');
 	end;
 end;
 

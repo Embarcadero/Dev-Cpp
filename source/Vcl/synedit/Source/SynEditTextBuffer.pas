@@ -128,6 +128,9 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    // EDIT
+    function GetTextLength : integer;
+    // EDIT
     function Add(const S: string): integer; override;
     procedure AddStrings(Strings: TStrings); override;
     procedure Clear; override;
@@ -306,102 +309,6 @@ begin
   end;
 end;
 
-{ TSynEditFileReader }
-
-(*
-type
-  TSynEditFileReader = class(TSynEditFiler)
-  protected
-    fFilePos: Cardinal;
-    fFileSize: Cardinal;
-    procedure FillBuffer;
-  public
-    constructor Create(const FileName: string);
-    function EOF: boolean;
-    function ReadLine: string;
-  end;
-
-constructor TSynEditFileReader.Create(const FileName: string);
-begin
-  inherited Create;
-  fFiler := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-  fFileSize := fFiler.Size;
-  fFiler.Seek(0, soFromBeginning);
-end;
-
-function TSynEditFileReader.EOF: boolean;
-begin
-  Result := (fBuffer[fBufPtr] = #0) and (fFilePos >= fFileSize);
-end;
-
-procedure TSynEditFileReader.FillBuffer;
-var
-  Count: Cardinal;
-begin
-  if fBufPtr >= fBufSize - 1 then
-    fBufPtr := 0;
-  Count := fFileSize - fFilePos;
-  if Count >= fBufSize - fBufPtr then
-    Count := fBufSize - fBufPtr - 1;
-  fFiler.ReadBuffer(fBuffer[fBufPtr], Count);
-  fBuffer[fBufPtr + Count] := #0;
-  fFilePos := fFilePos + Count;
-  fBufPtr := 0;
-end;
-
-function TSynEditFileReader.ReadLine: string;
-var
-  E, P, S: PChar;
-begin
-  repeat
-    S := PChar(@fBuffer[fBufPtr]);
-    if S[0] = #0 then begin
-      FillBuffer;
-      S := PChar(@fBuffer[0]);
-    end;
-    E := PChar(@fBuffer[fBufSize]);
-    P := S;
-    while P + 2 < E do begin
-      case P[0] of
-        #10, #13:
-          begin
-            SetString(Result, S, P - S);
-            if P[0] = #13 then
-            begin
-              if P[1] = #10 then
-              begin
-                fFileFormat := sffDos;
-                Inc(P);
-              end
-              else
-                fFileFOrmat := sffMac;
-            end;
-            Inc(P);
-            fBufPtr := P - fBuffer;
-            exit;
-          end;
-        #0:
-          if fFilePos >= fFileSize then begin
-            fBufPtr := P - fBuffer;
-            SetString(Result, S, P - S);
-            exit;
-          end;
-      end;
-      Inc(P);
-    end;
-    // put the partial string to the start of the buffer, and refill the buffer
-    Inc(P);
-    if S > fBuffer then
-      StrLCopy(fBuffer, S, P - S);
-    fBufPtr := P - S;
-    fBuffer[fBufPtr] := #0;
-    // if line is longer than half the buffer then grow it first
-    if 2 * Cardinal(P - S) > fBufSize then
-      SetBufferSize(fBufSize + fBufSize);
-  until FALSE;
-end;
-*)
-
 { TSynEditFileWriter }
 
 type
@@ -503,6 +410,21 @@ begin
     Finalize(fList^[0], fCount);
   fCount := 0;
   SetCapacity(0);
+end;
+
+// This one's about three times faster than Length(TStringList.Text)...
+function TSynEditStringList.GetTextLength : integer;
+var
+	i : integer;
+begin
+	Result := 0;
+	for i := 0 to Count - 1 do begin
+		Inc(Result,Length(Strings[i]));
+		if fFileFormat = sffDos then
+			Inc(Result,2)
+		else
+			Inc(Result);
+	end;
 end;
 
 function TSynEditStringList.Add(const S: string): integer;
@@ -849,7 +771,6 @@ end;
 
 procedure TSynEditStringList.LoadFromFile(const FileName: string);
 var
-//  Reader: TSynEditFileReader;
   Stream: TStream;
 begin
   Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
@@ -858,23 +779,6 @@ begin
   finally
     Stream.Free;
   end;
-
-(*//Old Code, for reference
-  Reader := TSynEditFileReader.Create(FileName);
-  try
-    BeginUpdate;
-    try
-      Clear;
-      while not Reader.EOF do
-        Add(Reader.ReadLine);
-      fFileFormat := Reader.FileFormat;
-    finally
-      EndUpdate;
-    end;
-  finally
-    Reader.Free;
-  end;
-*)
 end;
 
 procedure TSynEditStringList.LoadFromStream(Stream: TStream);
@@ -927,7 +831,6 @@ begin
         Add('');
     end;
   finally
-
     EndUpdate;
   end;
 

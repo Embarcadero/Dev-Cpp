@@ -1,3 +1,14 @@
+Version 5.3.0.0 - *
+
+- Indent guides are now painted faster, reducing flicker.
+- Code completion is now more clear and pops up faster.
+- Color selectors in Editor Options now properly set their own defaults, not those of other controls.
+- Automatic symbol completion and indentation is much faster now.
+- Added OpenMP libraries and tools to TDM-GCC x64.
+- Code folding is updated much faster now.
+- The code parser now understands multiple definitions after the } symbol of structs.
+- Much more performance enhancements in the typing/editing department.
+
 Version 5.2.0.3 - 25 Juni 2012
 
 - Fixed the function argument tip not selecting the function with the right number of arguments first.

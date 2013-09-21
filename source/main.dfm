@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 500
-  Top = 427
+  Left = 505
+  Top = 426
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -1149,7 +1149,7 @@ object MainForm: TMainForm
     Top = 70
     Width = 193
     Height = 299
-    ActivePage = ClassSheet
+    ActivePage = DebugLeftSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 6
@@ -1192,7 +1192,7 @@ object MainForm: TMainForm
     object ClassSheet: TTabSheet
       Caption = 'Classes'
       ImageIndex = -1
-      object ClassBrowser1: TClassBrowser
+      object ClassBrowser: TClassBrowser
         Left = 0
         Top = 0
         Width = 185
@@ -3211,10 +3211,10 @@ object MainForm: TMainForm
     Width = 320
     Height = 240
     Enabled = True
-    MinWidth = 128
+    MinWidth = 256
     MinHeight = 128
-    MaxWidth = 640
-    MaxHeight = 480
+    MaxWidth = 0
+    MaxHeight = 0
     OnResize = CodeCompletionResize
     OnlyGlobals = False
     CurrentClass = 0

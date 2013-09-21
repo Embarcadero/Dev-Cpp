@@ -71,7 +71,6 @@ end;
 procedure TCompOptionsFrame.tabsChange(Sender: TObject);
 var
 	I,J,idx : integer;
-	ShowOption: boolean;
 	currenttab : AnsiString;
 begin
 	vle.Strings.Clear;
@@ -79,8 +78,7 @@ begin
 	currenttab := tabs.Tabs[tabs.TabIndex];
 
 	for I := 0 to devCompiler.OptionsCount - 1 do begin
-		ShowOption := (not Assigned(fProject)) or (Assigned(fProject) and not (fProject.Options.typ in devCompiler.Options[I].optExcludeFromTypes));
-		if ShowOption and (CompareStr(devCompiler.Options[I].optSection, currenttab) = 0) then begin
+		if SameStr(devCompiler.Options[I].optSection, currenttab) then begin
 			if Assigned(devCompiler.Options[I].optChoices) and (devCompiler.Options[I].optValue < devCompiler.Options[I].optChoices.Count) then
 				idx := vle.InsertRow(devCompiler.Options[I].optName, devCompiler.Options[I].optChoices.Names[devCompiler.Options[I].optValue], True)
 			else

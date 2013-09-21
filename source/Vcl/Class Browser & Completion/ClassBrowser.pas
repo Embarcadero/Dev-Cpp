@@ -278,7 +278,7 @@ begin
           if fUseColors then
             NewNode := Items.AddChildObject(ParNode, '  ' + _FullText + '  ', PStatement(fParser.Statements[I]))
           else
-            NewNode := Items.AddChildObject(ParNode, _Command, PStatement(fParser.Statements[I]));
+            NewNode := Items.AddChildObject(ParNode, _ScopeCmd, PStatement(fParser.Statements[I]));
           SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
           if (PStatement(fParser.Statements[I])^._Kind = skClass) and (I <> ParentID) then  // CL: fixed potential infinite loop bug
             AddMembers(NewNode, I);
@@ -458,7 +458,7 @@ procedure TClassBrowser.ShowSampleData;
       _FullText := Full;
       _Type := Typ;
       _ScopelessCmd := Cmd;
-      _Command := _ScopelessCmd;
+      _ScopeCmd := Cmd;
       _Args := Args;
       _Visible := True;
       _Valid := True;
@@ -473,68 +473,68 @@ begin
   Items.Clear;
   with Items do begin
     Statement := CreateTempStatement('class Class1', 'class', 'Class1', '', skClass, scsNone);
-    Node := AddChildObject(nil, '  ' + Statement^._Command + '  ', Statement);
+    Node := AddChildObject(nil, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(Node, Statement);
 
     Statement := CreateTempStatement('Class1()', '', 'Class1', '', skConstructor, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('~Class1()', '', '~Class1', '', skDestructor, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('int private_Var1', 'int', 'private_Var1', '', skVariable, scsPrivate);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('int private_Var2', 'int', 'private_Var2', '', skVariable, scsPrivate);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('void protected_Func1(int x, int y)', 'void', 'protected_Func1', '(int x, int y)', skFunction, scsProtected);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('double public_Var1', 'double', 'public_Var1', '', skVariable, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('bool published_Func1(char* temp)', 'bool', 'published_Func1', '(char* temp)', skFunction, scsPublished);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
     Expand(Node);
 
     Statement := CreateTempStatement('class Class2', 'class', 'Class2', '', skClass, scsNone);
-    Node := AddChildObject(nil, '  ' + Statement^._Command + '  ', Statement);
+    Node := AddChildObject(nil, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(Node, Statement);
 
     Statement := CreateTempStatement('Class2()', '', 'Class2', '', skConstructor, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('~Class2()', '', '~Class2', '', skDestructor, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('int private_Var1', 'int', 'private_Var1', '', skVariable, scsPrivate);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('int private_Var2', 'int', 'private_Var2', '', skVariable, scsPrivate);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('void protected_Func1(int x, int y)', 'void', 'protected_Func1', '(int x, int y)', skFunction, scsProtected);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('double public_Var1', 'double', 'public_Var1', '', skVariable, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
 
     Statement := CreateTempStatement('bool published_Func1(char* temp)', 'bool', 'published_Func1', '(char* temp)', skFunction, scsPublished);
-    SubNode := AddChildObject(Node, '  ' + Statement^._Command + '  ', Statement);
+    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
     SetNodeImages(SubNode, Statement);
     Expand(Node);
   end;
@@ -892,20 +892,19 @@ begin
     (Node <> Selected);
 end;
 
-procedure TClassBrowser.myMouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
+procedure TClassBrowser.myMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
 var
-  Node: TTreeNode;
+	Node: TTreeNode;
 begin
-  if fParserBusy then
-    Exit;
-  Node := GetNodeAt(X, Y);
-  if Assigned(Node) and Assigned(Node.Data) and (Node.ImageIndex <> fImagesRecord.fGlobalsImg) then begin
-    Hint := PStatement(Node.Data)^._FullText;
-    Application.ActivateHint(ClientToScreen(Point(X, Y)));
-  end
-  else
-    Application.HideHint;
+	if fParserBusy then
+		Exit;
+
+	Node := GetNodeAt(X,Y);
+	if Assigned(Node) and Assigned(Node.Data) and (Node.ImageIndex <> fImagesRecord.fGlobalsImg) then begin
+		Hint := PStatement(Node.Data)^._FullText;
+		Application.ActivateHint(ClientToScreen(Point(X, Y)));
+	end else
+		Application.HideHint;
 end;
 
 procedure TClassBrowser.RenameFolder(Old, New: AnsiString);

@@ -35,7 +35,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('dev-c++', [TCppTokenizer, TCppParser, TCodeCompletion, TClassBrowser]);
+  RegisterComponents('Dev-C++', [TCppTokenizer, TCppParser, TCodeCompletion, TClassBrowser]);
 end;
 
 end.

@@ -110,7 +110,7 @@ begin
   finally
     sl.Free;
   end;
-  cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser1.Selected.Data)^._Command);
+  cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser.Selected.Data)^._ScopeCmd);
 
   cmbType.SetFocus;
 end;

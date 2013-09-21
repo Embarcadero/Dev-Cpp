@@ -180,7 +180,7 @@ begin
 			MainForm.CppParser.Tokenizer:= MainForm.CppTokenizer;
 			MainForm.CppParser.Enabled := true;
 
-			MainForm.ClassBrowser1.SetUpdateOff;
+			MainForm.ClassBrowser.SetUpdateOff;
 
 			s := TStringList.Create;
 			if (AltCache.Checked) then begin
@@ -235,7 +235,7 @@ begin
 			MainForm.CppParser.OnEndParsing := MainForm.CppParserEndParsing;
 			MainForm.CppParser.OnTotalProgress := MainForm.CppParserTotalProgress;
 
-			MainForm.ClassBrowser1.SetUpdateOn;
+			MainForm.ClassBrowser.SetUpdateOn;
 
 			Screen.Cursor:=crDefault;
 			s.Free;

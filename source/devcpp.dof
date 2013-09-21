@@ -9,7 +9,7 @@ E=0
 F=0
 G=1
 H=1
-I=0
+I=1
 J=0
 K=0
 L=1
@@ -17,8 +17,8 @@ M=0
 N=1
 O=1
 P=0
-Q=0
-R=0
+Q=1
+R=1
 S=0
 T=0
 U=0
@@ -97,7 +97,7 @@ PackageDCPOutputDir=
 SearchPath=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
 Packages=vcl;rtl;vclactnband;vclx;vcldb;dbrtl;dbexpress;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;VclSmp;dbxcds;soaprtl;vclshlctrls;ClassBrowsing
 Conditionals=
-DebugSourceDirs=
+DebugSourceDirs=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\
 UsePackages=0
 [Parameters]
 RunParams=
@@ -109,9 +109,9 @@ DebugCWD=
 IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=5
-MinorVer=2
+MinorVer=3
 Release=0
-Build=3
+Build=0
 Debug=0
 PreRelease=0
 Special=0
@@ -122,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Bloodshed Software
 FileDescription=Dev-C++ IDE
-FileVersion=5.2.0.3
+FileVersion=5.3.0.0
 InternalName=devcpp.exe
 LegalCopyright=Copyright Bloodshed Software
 LegalTrademarks=
@@ -130,16 +130,18 @@ OriginalFilename=devcpp.exe
 ProductName=Dev-C++
 ProductVersion=5
 Comments=Under the GNU General Public License
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\
+[HistoryLists\hlConditionals]
+Count=1
+Item0=UNICODE
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=5
+Count=1
 Item0=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
-Item1=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;.\;Tools\webupdate;Tools\Packman
-Item2=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;.\;Tools\webupdate
-Item3=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip;.\
-Item4=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
 [HistoryLists\hlUnitOutputDirectory]
 Count=1
 Item0=units

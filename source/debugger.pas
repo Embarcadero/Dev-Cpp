@@ -147,7 +147,6 @@ begin
   Wait.broken := b;
 end;
 
-
 function TDebugger.IsBroken : boolean;
 begin
   if Wait = nil then

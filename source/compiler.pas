@@ -157,62 +157,64 @@ end;
 // create makefile for fproject if assigned
 procedure TCompiler.BuildMakeFile;
 begin
-	if not assigned(fProject) then begin
+	if not Assigned(fProject) then begin
 		fMakeFile:= '';
-		exit;
-	end else begin
-		if fProject.UseCustomMakefile then begin
-			fMakefile:=fProject.CustomMakefile;
-			Exit;
-		end;
+		Exit;
+	end else if fProject.UseCustomMakefile then begin
+		fMakefile:=fProject.CustomMakefile;
+		Exit;
 	end;
-	if Assigned(CompileProgressForm) then
-		CompileProgressForm.btnClose.Enabled:=False;
+
 	case Project.Options.typ of
 		dptStat: CreateStaticMakeFile;
 		dptDyn: CreateDynamicMakeFile;
 	else
 		CreateMakeFile;
 	end;
+
 	if FileExists(fMakeFile) then
 		FileSetDate(fMakefile, DateTimeToFileDate(Now)); // fix the "Clock skew detected" warning ;)
-	if Assigned(CompileProgressForm) then
-		CompileProgressForm.btnClose.Enabled:=True;
 end;
 
 function TCompiler.NewMakeFile(var F : TextFile) : boolean;
-resourcestring
-	cAppendStr = '%s %s';
 var
 	ObjResFile, Objects, LinkObjects, Comp_ProgCpp, Comp_Prog, ofile, tfile, tmp: AnsiString;
 	i: integer;
 	opt: TCompilerOption;
 	idx: integer;
-
 begin
+
+	// Create OBJ output directory
+	SetPath(fProject.Directory);
+	if fProject.Options.ObjectOutput <> '' then
+		if not DirectoryExists(fProject.Options.ObjectOutput) then
+			MkDir(fProject.Options.ObjectOutput);
+
 	Objects := '';
-	for i:= 0 to Pred(fProject.Units.Count) do begin
+
+	// Create a list of object files
+	for i := 0 to Pred(fProject.Units.Count) do begin
 		if GetFileTyp(fProject.Units[i].FileName) = utResSrc then
 			Continue;
 
-		if (not fProject.Units[i].Compile) and (not fProject.Units[i].Link) then
+		if not fProject.Units[i].Compile and not fProject.Units[i].Link then
 			Continue;
 
+		// Only process source files
 		tfile := ExtractRelativePath(fProject.FileName,fProject.Units[i].FileName);
 		if not (GetFileTyp(tfile) in [utcHead,utcppHead]) then begin
 			if fProject.Options.ObjectOutput <> '' then begin
-				SetPath(fProject.Directory);
-				if not DirectoryExists(fProject.Options.ObjectOutput) then
-					MkDir(fProject.Options.ObjectOutput);
+
+				// ofile = C:\MyProgram\obj\main.o
 				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(fProject.Units[i].FileName);
 				ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)), True, True);
-				Objects := Format(cAppendStr, [Objects, ofile]);
+				Objects := Objects + ' ' + ofile;
 				if fProject.Units[i].Link then
-					LinkObjects := Format(cAppendStr, [LinkObjects, ofile]);
+					LinkObjects := LinkObjects + ' ' + ofile;
 			end else begin
-				Objects := Format(cAppendStr, [Objects,GenMakePath(ChangeFileExt(tfile, OBJ_EXT), True, True)]);
+				Objects := Objects + ' ' + GenMakePath(ChangeFileExt(tfile, OBJ_EXT), True, True);
 				if fProject.Units[i].Link then
-					LinkObjects := Format(cAppendStr, [LinkObjects, GenMakePath1(ChangeFileExt(tfile, OBJ_EXT))]);
+					LinkObjects := LinkObjects + ' ' + GenMakePath1(ChangeFileExt(tfile, OBJ_EXT));
 			end;
 		end;
 	end;
@@ -221,9 +223,6 @@ begin
 		ObjResFile := ''
 	else begin
 		if fProject.Options.ObjectOutput<>'' then begin
-			SetPath(fProject.Directory);
-			if not DirectoryExists(fProject.Options.ObjectOutput) then
-				MkDir(fProject.Options.ObjectOutput);
 			ObjResFile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ChangeFileExt(fProject.Options.PrivateResource, RES_EXT);
 			ObjResFile := GenMakePath1(ExtractRelativePath(fProject.FileName, ObjResFile));
 		end else
@@ -495,7 +494,8 @@ begin
 end;
 
 procedure TCompiler.CreateDynamicMakefile;
-var F : TextFile;
+var
+	F : TextFile;
 	pfile,tfile: AnsiString;
 begin
 	if not NewMakeFile(F) then
@@ -529,7 +529,7 @@ begin
 end;
 
 procedure TCompiler.GetCompileParams;
-	procedure AppendStr(var s: AnsiString; value: AnsiString);
+	procedure AppendStr(var s: AnsiString;const value: AnsiString);
 	begin
 		s:= s + ' ' + value;
 	end;
@@ -555,7 +555,7 @@ begin
 
 		for I := 0 to devCompiler.OptionsCount - 1 do begin
 			// consider project specific options for the compiler, else global compiler options
-			if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions)) and not (fProject.Options.typ in devCompiler.Options[I].optExcludeFromTypes)) or (not Assigned(fProject) and (devCompiler.Options[I].optValue > 0)) then begin
+			if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and (devCompiler.Options[I].optValue > 0)) then begin
 				if devCompiler.Options[I].optIsC then begin
 					if Assigned(devCompiler.Options[I].optChoices) then begin
 						if Assigned(fProject) then
@@ -619,18 +619,18 @@ begin
 
 	DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
 
-	GetCompileParams;
-	GetLibrariesParams;
-	GetIncludesParams;
+	// Done by buildmakefile
+	if not Assigned(fProject) then begin
+		GetCompileParams;
+		GetLibrariesParams;
+		GetIncludesParams;
+	end;
 
 	if fTarget = ctProject then begin
 		BuildMakeFile;
 
 		if SingleFile <> '' then begin
 			if fProject.Options.ObjectOutput<>'' then begin
-				SetPath(fProject.Directory);
-				if not DirectoryExists(fProject.Options.ObjectOutput) then
-					MkDir(fProject.Options.ObjectOutput);
 				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(SingleFile);
 				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
 			end else
@@ -802,12 +802,12 @@ var
 	s		: AnsiString;
 	cs		: integer;
 begin
-	fSingleFile:=True; // fool rebuild; don't run deps checking since all files will be rebuilt
+	fSingleFile := True; // fool rebuild; don't run deps checking since all files will be rebuilt
 	Result := True;
-	cs:=SwitchToProjectCompilerSet;
+	cs := SwitchToProjectCompilerSet;
 
 	InitProgressForm('Rebuilding...');
-	if Project <> nil then begin
+	if Assigned(Project) then begin
 
 		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
 		BuildMakeFile;
@@ -815,7 +815,7 @@ begin
 			SwitchToOriginalCompilerSet(cs);
 			DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
 			DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
-			MessageBox(Application.MainForm.Handle,PAnsiChar(Lang[ID_ERR_NOMAKEFILE]),PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
+			MessageBox(Application.Handle,PAnsiChar(Lang[ID_ERR_NOMAKEFILE]),PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
 			Result := False;
 			Exit;
 		end;
@@ -1381,7 +1381,7 @@ begin
 
 	fLibrariesParams := fLibrariesParams + ' ';
 	for I := 0 to devCompiler.OptionsCount - 1 do
-		if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions)) and not (fProject.Options.typ in devCompiler.Options[I].optExcludeFromTypes)) or (not Assigned(fProject) and (devCompiler.Options[I].optValue > 0)) then begin
+		if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and (devCompiler.Options[I].optValue > 0)) then begin
 			if devCompiler.Options[I].optIsLinker then
 				if Assigned(devCompiler.Options[I].optChoices) then begin
 					if Assigned(fProject) then

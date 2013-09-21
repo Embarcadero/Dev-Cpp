@@ -27,7 +27,7 @@ uses
 type
  TCFGINI = class(TObject)
   private
-   fOwner: TComponent;                 // assumes a TConfigData
+   fOwner: TComponent; // assumes a TConfigData
    fini: Tinifile;
     procedure ReadFrominifile(Obj: TPersistent; const Section: AnsiString);
     procedure ReadObject(const Name: AnsiString; Obj: TPersistent);

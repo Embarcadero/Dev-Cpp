@@ -33,42 +33,6 @@ uses
 {$ENDIF}
 
 type
- TdevINI = class(TObject)
-  private
-   fINIFile: TmemINIFile;
-    fSection: AnsiString;
-    fFileName: AnsiString;
-    procedure SetFileName(const Value: AnsiString);
-    procedure SetSection(const Value: AnsiString);
-  public
-   destructor Destroy; override;
-
-   procedure Write(Name, value: AnsiString); overload;
-   procedure Write(Name: AnsiString; value: boolean); overload;
-   procedure Write(Name: AnsiString; value: integer); overload;
-   procedure Write(index: integer; value: AnsiString); overload;
-   procedure Write(index: integer; Item: AnsiString; Value: AnsiString); overload;
-   procedure Write(index: integer; Item: AnsiString; Value: boolean); overload;
-   procedure Write(index: integer; Item: AnsiString; Value: integer); overload;
-
-   function Read(Name, Default: AnsiString): AnsiString; overload;
-   function Read(Name: AnsiString; Default: boolean): boolean; overload;
-   function Read(Name: AnsiString; Default: integer): integer; overload;
-   function Read(index: integer): AnsiString; overload; // read unit entry
-   function Read(index: integer; Item: AnsiString; default: AnsiString): AnsiString; overload;
-   function Read(index: integer; Item: AnsiString; default: boolean): boolean; overload;
-   function Read(index: integer; Item: AnsiString; default: integer): integer; overload;
-
-   function ValueExists(const value: AnsiString): boolean;
-   procedure DeleteKey(const value: AnsiString);
-   // uses fsection if section = ''
-   procedure ClearSection(const Section: AnsiString = '');
-   procedure EraseUnit(const index: integer);
-   procedure UpdateFile;
-   property FileName: AnsiString read fFileName write SetFileName;
-   property Section: AnsiString read fSection write SetSection;
- end;
-
  TProjUnit = class;
 
  TUnitList = class
@@ -132,7 +96,7 @@ type
   private
    fUnits: TUnitList;
    fOptions: TProjOptions;
-   finiFile: Tdevini;
+   finiFile: TMemIniFile;
    fName: AnsiString;
    fFileName: AnsiString;
    fNode: TTreeNode;
@@ -166,7 +130,7 @@ type
    property Executable : AnsiString read GetExecutableName;
 
    property Units: TUnitList read fUnits write fUnits;
-   property INIFile: TdevINI read fINIFile write fINIFile;
+   property INIFile: TMemIniFile read fINIFile write fINIFile;
    property Modified: boolean read GetModified write SetModified;
 
    property CmdLineArgs: AnsiString read fCmdLineArgs write SetCmdLineArgs;
@@ -193,7 +157,7 @@ type
    procedure SaveUnitLayout(e: TEditor; Index: integer);
    function MakeProjectNode : TTreeNode;
    { begin XXXKF changed }
-   function MakeNewFileNode(s : AnsiString; IsFolder: boolean; NewParent: TTreeNode) : TTreeNode;
+   function MakeNewFileNode(const s : AnsiString; IsFolder: boolean; NewParent: TTreeNode) : TTreeNode;
    { end XXXKF changed }
    procedure BuildPrivateResource(ForceSave: boolean = False);
    procedure Update;
@@ -240,109 +204,47 @@ uses
 
 constructor TProjUnit.Create(aOwner: TProject);
 begin
-  fEditor:= nil;
-  fNode:= nil;
-  fParent:= aOwner;
+	fEditor:= nil;
+	fNode:= nil;
+	fParent:= aOwner;
 end;
 
 destructor TProjUnit.Destroy;
 begin
-  if Assigned(fEditor) then
-    FreeAndNil(fEditor);
-  fNode:=nil;
-  inherited;
-end;
-
-procedure TProject.SaveToLog;
-var
-	temp: AnsiString;
-	temp2: AnsiString;
-	i : integer;
-	logfile : TextFile;
-begin
-	temp := '';
-
-	// The commented line below is used by the project logger
-	if fOptions.LogOutputEnabled then begin
-
-		// Formatted log
-		if (MainForm.CompilerOutput.Items.Count > 0) then begin
-			AssignFile(logfile,fOptions.LogOutput + '\Formatted Compiler Output.txt');
-			try
-				if FileExists(fOptions.LogOutput + '\Formatted Compiler Output.txt') = false then begin
-					Rewrite(logfile);
-					Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
-				end else begin
-					Reset(logfile);
-					Append(logfile);
-					Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);
-				end;
-
-				for i:=0 to pred(MainForm.CompilerOutput.Items.Count) do begin
-					temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
-					temp2 := StringReplace(temp2,#10,#9,[]);
-					temp2 := StringReplace(temp2,#13#10,#9,[]);
-					temp2 := StringReplace(temp2,#13#10,#9,[]);
-					temp := temp + temp2;
-				end;
-				Write(logfile,temp);
-			finally
-				CloseFile(logfile);
-			end;
-		end;
-
-		// Raw log
-		if Length(MainForm.LogOutput.Text) > 0 then begin
-			AssignFile(logfile,fOptions.LogOutput + '\Raw Build Output.txt');
-			try
-				if FileExists(fOptions.LogOutput + '\Raw Build Output.txt') = false then begin
-					Rewrite(logfile);
-					Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
-				end else begin
-					Reset(logfile);
-					Append(logfile);
-					Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);
-				end;
-				Write(logfile,MainForm.LogOutput.Lines.Text);
-			finally
-				CloseFile(logfile);
-			end;
-		end;
-	end;
+	if Assigned(fEditor) then
+		FreeAndNil(fEditor);
+	fNode:=nil;
+	inherited;
 end;
 
 function TProjUnit.Save: boolean;
 begin
-  if (fFileName = '') or (fNew) then
-   result:= SaveAs
-  else
-   try
-    // if no editor created open one save file and close
-    // creates a blank file.
-    if (not assigned(fEditor) and not FileExists(fFileName)) then
-     begin
-       fEditor:= TEditor.Create;
-       fEditor.Init(TRUE, ExtractFileName(fFileName), fFileName, FALSE);
-       fEditor.Text.UnCollapsedLines.SavetoFile(fFileName);
-       fEditor.New := False;
-       fEditor.Text.Modified := False;
-       FreeAndNil(fEditor);
-     end
-    else
-    if assigned(fEditor) and fEditor.Text.Modified then
-     begin
-       fEditor.Text.UnCollapsedLines.SaveToFile(fEditor.FileName);
-       if FileExists(fEditor.FileName) then
-         FileSetDate(fEditor.FileName, DateTimeToFileDate(Now)); // fix the "Clock skew detected" warning ;)
-       fEditor.New := False;
-       fEditor.Text.Modified:= FALSE;
-     end;
-    if assigned(fNode) then
-     fNode.Text:= ExtractfileName(fFileName);
-    result:= TRUE;
-   except
-    result:= FALSE;
-   end;
+	if (fFileName = '') or (fNew) then
+		result:= SaveAs
+	else
+		try
+			// if no editor created open one save file and close
+			// creates a blank file.
+			if not assigned(fEditor) and not FileExists(fFileName) then begin
+				fEditor:= TEditor.Create;
+				fEditor.Init(TRUE, ExtractFileName(fFileName), fFileName, FALSE);
+				fEditor.Text.UnCollapsedLines.SavetoFile(fFileName);
+				fEditor.New := False;
+				fEditor.Text.Modified := False;
+				FreeAndNil(fEditor);
+			end else if assigned(fEditor) and fEditor.Text.Modified then begin
+				fEditor.Text.UnCollapsedLines.SaveToFile(fEditor.FileName);
+				if FileExists(fEditor.FileName) then
+					FileSetDate(fEditor.FileName, DateTimeToFileDate(Now)); // fix the "Clock skew detected" warning ;)
+				fEditor.New := False;
+				fEditor.Text.Modified:= False;
+			end;
+			if assigned(fNode) then
+				fNode.Text:= ExtractfileName(fFileName);
+			result:= TRUE;
+		except
+			result:= FALSE;
+		end;
 end;
 
 function TProjUnit.SaveAs: boolean;
@@ -415,16 +317,16 @@ end;
 
 function TProjUnit.GetDirty: boolean;
 begin
-  if assigned(fEditor) then
-   result:= fEditor.Text.Modified
-  else
-   result:= FALSE;
+	if assigned(fEditor) then
+		result:= fEditor.Text.Modified
+	else
+		result:= FALSE;
 end;
 
 procedure TProjUnit.SetDirty(value: boolean);
 begin
-  if assigned(fEditor) then
-   fEditor.Text.Modified:= value;
+	if assigned(fEditor) then
+		fEditor.Text.Modified:= value;
 end;
 
 procedure TProjUnit.Assign(Source: TProjUnit);
@@ -458,23 +360,15 @@ begin
 
 	fUnits:= TUnitList.Create;
 	fFileName := nFileName;
-	finiFile:= TdevINI.Create;
-	try
-		finiFile.FileName:= fFileName;
-	except
-		fFileName := '';
-		MessageDlg('Could not read project file, make sure you have the correct permissions to read it.', mtError, [mbOK], 0);
-		exit;
-	end;
-	finiFile.Section:= 'Project';
+	finiFile:= TMemIniFile.Create(fFileName);
 
 	InitOptionsRec(fOptions);
 	if nName = DEV_INTERNAL_OPEN then
 		Open
 	else begin
 		fName := nName;
-		fIniFile.Write('filename', nFileName);
-		fIniFile.Write('name', nName);
+		fIniFile.WriteString('Project','filename', nFileName);
+		fIniFile.WriteString('Project','name', nName);
 		fNode := MakeProjectNode;
 	end;
 end;
@@ -496,6 +390,64 @@ begin
   inherited;
 end;
 
+procedure TProject.SaveToLog;
+var
+	temp: AnsiString;
+	temp2: AnsiString;
+	i : integer;
+	logfile : TextFile;
+begin
+	temp := '';
+
+	// The commented line below is used by the project logger
+	if fOptions.LogOutputEnabled then begin
+
+		// Formatted log
+		if (MainForm.CompilerOutput.Items.Count > 0) then begin
+			AssignFile(logfile,fOptions.LogOutput + '\Formatted Compiler Output.txt');
+			try
+				if FileExists(fOptions.LogOutput + '\Formatted Compiler Output.txt') = false then begin
+					Rewrite(logfile);
+					Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
+				end else begin
+					Reset(logfile);
+					Append(logfile);
+					Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);
+				end;
+
+				for i:=0 to pred(MainForm.CompilerOutput.Items.Count) do begin
+					temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
+					temp2 := StringReplace(temp2,#10,#9,[]);
+					temp2 := StringReplace(temp2,#13#10,#9,[]);
+					temp2 := StringReplace(temp2,#13#10,#9,[]);
+					temp := temp + temp2;
+				end;
+				Write(logfile,temp);
+			finally
+				CloseFile(logfile);
+			end;
+		end;
+
+		// Raw log
+		if Length(MainForm.LogOutput.Text) > 0 then begin
+			AssignFile(logfile,fOptions.LogOutput + '\Raw Build Output.txt');
+			try
+				if FileExists(fOptions.LogOutput + '\Raw Build Output.txt') = false then begin
+					Rewrite(logfile);
+					Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
+				end else begin
+					Reset(logfile);
+					Append(logfile);
+					Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);
+				end;
+				Write(logfile,MainForm.LogOutput.Lines.Text);
+			finally
+				CloseFile(logfile);
+			end;
+		end;
+	end;
+end;
+
 function TProject.MakeProjectNode : TTreeNode;
 begin
   MakeProjectNode := MainForm.ProjectView.Items.Add(nil, Name);
@@ -505,7 +457,7 @@ begin
 end;
 
 { begin XXXKF changed }
-function TProject.MakeNewFileNode(s : AnsiString; IsFolder: boolean; NewParent: TTreeNode) : TTreeNode;
+function TProject.MakeNewFileNode(const s : AnsiString; IsFolder: boolean; NewParent: TTreeNode) : TTreeNode;
 begin
   MakeNewFileNode := MainForm.ProjectView.Items.AddChild(NewParent, s);
 
@@ -517,12 +469,6 @@ begin
     MakeNewFileNode.SelectedIndex := 1;
     MakeNewFileNode.ImageIndex := 1;
   end;
-
-{
-  KF: in my opinion, such a blanket expand is a bit too much for large prjs
-  MainForm.ProjectView.FullExpand;
-  moved to RebuildTreeNodes now
-  }
 end;
 { end XXXKF changed }
 
@@ -752,50 +698,48 @@ end;
 
 function TProject.NewUnit(NewProject : boolean; CustomFileName: AnsiString): integer;
 var
- newunit: TProjUnit;
- s: AnsiString;
-{ begin XXXKF changed }
- ParentNode, CurNode: TTreeNode;
-{ end XXXKF changed }
+	newunit: TProjUnit;
+	s: AnsiString;
+	ParentNode, CurNode: TTreeNode;
 begin
-  NewUnit:= TProjUnit.Create(Self);
-  ParentNode:=Node;
-  with NewUnit do
-   try
-    if Length(CustomFileName) = 0 then
-        s:= Directory +Lang[ID_Untitled] +inttostr(dmMain.GetNum)
-    else begin
-        if ExtractFilePath(CustomFileName)='' then // just filename, no path
-            // make it full path filename, so that the save dialog, starts at the right directory ;)
-            s:= Directory+ CustomFileName
-        else
-            s:= CustomFileName;
-    end;
-    if FileAlreadyExists(s) then
-     repeat
-      s:= Directory +Lang[ID_Untitled] +inttostr(dmMain.GetNum);
-     until not FileAlreadyExists(s);
-    Filename := s;
-    New := True;
-    Editor:= nil;
-{ begin XXXKF changed }
-    CurNode := MakeNewFileNode(ExtractFileName(FileName),false,ParentNode);
-    NewUnit.Node := CurNode;
-{ end XXXKF changed }
-    result:= fUnits.Add(NewUnit);
-    CurNode.Data:= pointer(result);
-    Dirty:= TRUE;
-    Compile:=True;
-    CompileCpp:=Self.Options.useGPP;
-    Link:=True;
-    Priority:=1000;
-    OverrideBuildCmd:=False;
-    BuildCmd:='';
-    SetModified(TRUE);
-   except
-    result:= -1;
-    NewUnit.Free;
-   end;
+	NewUnit:= TProjUnit.Create(Self);
+	ParentNode:=Node;
+	with NewUnit do
+		try
+			if Length(CustomFileName) = 0 then
+				s:= Directory +Lang[ID_Untitled] +inttostr(dmMain.GetNum)
+			else begin
+				if ExtractFilePath(CustomFileName)='' then // just filename, no path
+					// make it full path filename, so that the save dialog, starts at the right directory ;)
+					s:= Directory+ CustomFileName
+				else
+					s:= CustomFileName;
+			end;
+
+			if FileAlreadyExists(s) then
+				repeat
+					s:= Directory + Lang[ID_Untitled] + inttostr(dmMain.GetNum);
+				until not FileAlreadyExists(s);
+
+		Filename := s;
+		New := True;
+		Editor:= nil;
+		CurNode := MakeNewFileNode(ExtractFileName(FileName),false,ParentNode);
+		NewUnit.Node := CurNode;
+		result:= fUnits.Add(NewUnit);
+		CurNode.Data:= pointer(result);
+		Dirty:= TRUE;
+		Compile:=True;
+		CompileCpp:=Self.Options.useGPP;
+		Link:=True;
+		Priority:=1000;
+		OverrideBuildCmd:=False;
+		BuildCmd:='';
+		SetModified(TRUE);
+	except
+		result:= -1;
+		NewUnit.Free;
+	end;
 end;
 
 { begin XXXKF changed }
@@ -870,10 +814,10 @@ end;
 procedure TProject.Update;
 begin
 	with finifile do begin
-		Section:= 'Project';
-		fName:= Read('name', '');
-		fOptions.Icon:= Read('icon', '');
-		fOptions.Ver := Read('Ver', 0);
+
+		fName := ReadString('Project','name', '');
+		fOptions.Icon := ReadString('Project','icon', '');
+		fOptions.Ver := ReadInteger('Project','Ver', 0);
 		if(fOptions.Ver > 0) then begin // ver > 0 is at least a v5 project
 
 			if(fOptions.Ver < 2) then begin
@@ -881,78 +825,77 @@ begin
 				MessageDlg('The compiler settings format of Orwell Dev-C++ has changed.' + #13#10#13#10 + 'Please update your settings at Project >> Project Options >> Compiler and save your project.', MtInformation, [MbOK], 0);
 			end;
 
-			fOptions.typ:= Read('type', 0);
-			fOptions.cmdLines.Compiler:= Read('Compiler', '');
-			fOptions.cmdLines.CppCompiler:= Read('CppCompiler', '');
-			fOptions.cmdLines.Linker:= Read('Linker', '');
-			fOptions.ObjFiles.DelimitedText:= Read('ObjFiles', '');
-			fOptions.Libs.DelimitedText:= Read('Libs', '');
-			fOptions.Includes.DelimitedText:= Read('Includes', '');
-			fOptions.PrivateResource := Read('PrivateResource', '');
-			fOptions.ResourceIncludes.DelimitedText:= Read('ResourceIncludes', '');
-			fOptions.MakeIncludes.DelimitedText:= Read('MakeIncludes', '');
-			fOptions.UseGpp:= Read('IsCpp', FALSE);
-			fOptions.ExeOutput := Read('ExeOutput', '');
-			fOptions.ObjectOutput := Read('ObjectOutput', '');
-			fOptions.LogOutput := Read('LogOutput', '');
-			fOptions.LogOutputEnabled := Read('LogOutputEnabled', FALSE);
-			fOptions.OverrideOutput := Read('OverrideOutput', FALSE);
-			fOptions.OverridenOutput := Read('OverrideOutputName', '');
-			fOptions.HostApplication := Read('HostApplication', '');
+			fOptions.typ := ReadInteger('Project','type', 0);
+			fOptions.cmdLines.Compiler := ReadString('Project','Compiler', '');
+			fOptions.cmdLines.CppCompiler := ReadString('Project','CppCompiler', '');
+			fOptions.cmdLines.Linker := ReadString('Project','Linker', '');
+			fOptions.ObjFiles.DelimitedText := ReadString('Project','ObjFiles', '');
+			fOptions.Libs.DelimitedText := ReadString('Project','Libs', '');
+			fOptions.Includes.DelimitedText := ReadString('Project','Includes', '');
+			fOptions.PrivateResource := ReadString('Project','PrivateResource', '');
+			fOptions.ResourceIncludes.DelimitedText := ReadString('Project','ResourceIncludes', '');
+			fOptions.MakeIncludes.DelimitedText := ReadString('Project','MakeIncludes', '');
+			fOptions.UseGpp:= ReadBool('Project','IsCpp', FALSE);
+			fOptions.ExeOutput := ReadString('Project','ExeOutput', '');
+			fOptions.ObjectOutput := ReadString('Project','ObjectOutput', '');
+			fOptions.LogOutput := ReadString('Project','LogOutput', '');
+			fOptions.LogOutputEnabled := ReadBool('Project','LogOutputEnabled', FALSE);
+			fOptions.OverrideOutput := ReadBool('Project','OverrideOutput', FALSE);
+			fOptions.OverridenOutput := ReadString('Project','OverrideOutputName', '');
+			fOptions.HostApplication := ReadString('Project','HostApplication', '');
 
-			fFolders.CommaText := Read('Folders', '');
-			fCmdLineArgs:=Read('CommandLine', '');
+			fFolders.CommaText := ReadString('Project','Folders', '');
+			fCmdLineArgs :=ReadString('Project','CommandLine', '');
 
-			fUseCustomMakefile := Read('UseCustomMakefile', FALSE);
-			fCustomMakefile := Read('CustomMakefile', '');
+			fUseCustomMakefile := ReadBool('Project','UseCustomMakefile', FALSE);
+			fCustomMakefile := ReadString('Project','CustomMakefile', '');
 
-			fOptions.IncludeVersionInfo:=Read('IncludeVersionInfo', False);
-			fOptions.SupportXPThemes:=Read('SupportXPThemes', False);
-			fOptions.CompilerSet:=Read('CompilerSet', devCompiler.CompilerSet);
-			if fOptions.CompilerSet>devCompilerSet.Sets.Count-1 then begin
+			fOptions.IncludeVersionInfo := ReadBool('Project','IncludeVersionInfo', False);
+			fOptions.SupportXPThemes := ReadBool('Project','SupportXPThemes', False);
+			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompiler.CompilerSet);
+			if fOptions.CompilerSet > devCompilerSet.Sets.Count-1 then begin
 				MessageDlg('The compiler set you have selected for this project, no longer exists.'#13#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
 				fOptions.CompilerSet:=devCompiler.CompilerSet;
 			end;
-			fOptions.CompilerOptions:=Read('CompilerSettings', devCompiler.OptionStr);
+			fOptions.CompilerOptions:=ReadString('Project','CompilerSettings', devCompiler.OptionStr);
 
-			Section:= 'VersionInfo';
-			fOptions.VersionInfo.Major:=            Read('Major',             0);
-			fOptions.VersionInfo.Minor:=            Read('Minor',             1);
-			fOptions.VersionInfo.Release:=          Read('Release',           1);
-			fOptions.VersionInfo.Build:=            Read('Build',             1);
-			fOptions.VersionInfo.LanguageID:=       Read('LanguageID',        $0409);
-			fOptions.VersionInfo.CharsetID:=        Read('CharsetID',         $04E4);
-			fOptions.VersionInfo.CompanyName:=      Read('CompanyName',       '');
-			fOptions.VersionInfo.FileVersion:=      Read('FileVersion',       '0.1');
-			fOptions.VersionInfo.FileDescription:=  Read('FileDescription',   'Developed using the Dev-C++ IDE');
-			fOptions.VersionInfo.InternalName:=     Read('InternalName',      '');
-			fOptions.VersionInfo.LegalCopyright:=   Read('LegalCopyright',    '');
-			fOptions.VersionInfo.LegalTrademarks:=  Read('LegalTrademarks',   '');
-			fOptions.VersionInfo.OriginalFilename:= Read('OriginalFilename',  ExtractFilename(Executable));
-			fOptions.VersionInfo.ProductName:=      Read('ProductName',       Name);
-			fOptions.VersionInfo.ProductVersion:=   Read('ProductVersion',    '0.1.1.1');
-			fOptions.VersionInfo.AutoIncBuildNr:=   Read('AutoIncBuildNr',    False);
-			fOptions.VersionInfo.SyncProduct:=      Read('SyncProduct',       False);
+			fOptions.VersionInfo.Major:=            ReadInteger('VersionInfo','Major',             0);
+			fOptions.VersionInfo.Minor:=            ReadInteger('VersionInfo','Minor',             1);
+			fOptions.VersionInfo.Release:=          ReadInteger('VersionInfo','Release',           1);
+			fOptions.VersionInfo.Build:=            ReadInteger('VersionInfo','Build',             1);
+			fOptions.VersionInfo.LanguageID:=       ReadInteger('VersionInfo','LanguageID',        $0409);
+			fOptions.VersionInfo.CharsetID:=        ReadInteger('VersionInfo','CharsetID',         $04E4);
+			fOptions.VersionInfo.CompanyName:=      ReadString('VersionInfo','CompanyName',       '');
+			fOptions.VersionInfo.FileVersion:=      ReadString('VersionInfo','FileVersion',       '0.1');
+			fOptions.VersionInfo.FileDescription:=  ReadString('VersionInfo','FileDescription',   'Developed using the Dev-C++ IDE');
+			fOptions.VersionInfo.InternalName:=     ReadString('VersionInfo','InternalName',      '');
+			fOptions.VersionInfo.LegalCopyright:=   ReadString('VersionInfo','LegalCopyright',    '');
+			fOptions.VersionInfo.LegalTrademarks:=  ReadString('VersionInfo','LegalTrademarks',   '');
+			fOptions.VersionInfo.OriginalFilename:= ReadString('VersionInfo','OriginalFilename',  ExtractFilename(Executable));
+			fOptions.VersionInfo.ProductName:=      ReadString('VersionInfo','ProductName',       Name);
+			fOptions.VersionInfo.ProductVersion:=   ReadString('VersionInfo','ProductVersion',    '0.1.1.1');
+			fOptions.VersionInfo.AutoIncBuildNr:=   ReadBool('VersionInfo','AutoIncBuildNr',    False);
+			fOptions.VersionInfo.SyncProduct:=      ReadBool('VersionInfo','SyncProduct',       False);
 		end else begin // dev-c < 4
 			fOptions.Ver:= -1;
-			if not Read('NoConsole', TRUE) then
+			if not ReadBool('Project','NoConsole', TRUE) then
 				fOptions.typ:= dptCon
-			else if Read('IsDLL', FALSE) then
+			else if ReadBool('Project','IsDLL', FALSE) then
 				fOptions.Typ:= dptDyn
 			else
 				fOptions.typ:= dptGUI;
 
-			fOptions.PrivateResource := Read('PrivateResource', '');
-			fOptions.ResourceIncludes.DelimitedText:= Read('ResourceIncludes', '');
-			fOptions.ObjFiles.Add(read('ObjFiles', ''));
-			fOptions.Includes.Add(Read('IncludeDirs', ''));
-			fOptions.cmdLines.Compiler:= Read('CompilerOptions', '');
-			fOptions.usegpp:= Read('Use_GPP', FALSE);
-			fOptions.ExeOutput := Read('ExeOutput', '');
-			fOptions.ObjectOutput := Read('ObjectOutput', '');
-			fOptions.OverrideOutput := Read('OverrideOutput', FALSE);
-			fOptions.OverridenOutput := Read('OverrideOutputName', '');
-			fOptions.HostApplication := Read('HostApplication', '');
+			fOptions.PrivateResource := ReadString('Project','PrivateResource', '');
+			fOptions.ResourceIncludes.DelimitedText:= ReadString('Project','ResourceIncludes', '');
+			fOptions.ObjFiles.Add(ReadString('Project','ObjFiles', ''));
+			fOptions.Includes.Add(ReadString('Project','IncludeDirs', ''));
+			fOptions.cmdLines.Compiler:= ReadString('Project','CompilerOptions', '');
+			fOptions.usegpp:= ReadBool('Project','Use_GPP', FALSE);
+			fOptions.ExeOutput := ReadString('Project','ExeOutput', '');
+			fOptions.ObjectOutput := ReadString('Project','ObjectOutput', '');
+			fOptions.OverrideOutput := ReadBool('Project','OverrideOutput', FALSE);
+			fOptions.OverridenOutput := ReadString('Project','OverrideOutputName', '');
+			fOptions.HostApplication := ReadString('Project','HostApplication', '');
 		end;
 	end;
 end;
@@ -960,76 +903,71 @@ end;
 procedure TProject.UpdateFile;
 begin
 	with finifile do begin
-		Section:= 'Project';
+		WriteString('Project','FileName', ExtractRelativePath(Directory, fFileName));
+		WriteString('Project','Name', fName);
+		WriteInteger('Project','Type', fOptions.typ);
+		WriteInteger('Project','Ver', 2); // Is 2 as of Dev-C++ 5.2.0.3
+		WriteString('Project','ObjFiles', fOptions.ObjFiles.DelimitedText);
+		WriteString('Project','Includes', fOptions.Includes.DelimitedText);
+		WriteString('Project','Libs', fOptions.Libs.DelimitedText);
+		WriteString('Project','PrivateResource', fOptions.PrivateResource);
+		WriteString('Project','ResourceIncludes', fOptions.ResourceIncludes.DelimitedText);
+		WriteString('Project','MakeIncludes', fOptions.MakeIncludes.DelimitedText);
+		WriteString('Project','Compiler', fOptions.cmdLines.Compiler);
+		WriteString('Project','CppCompiler', fOptions.cmdLines.CppCompiler);
+		WriteString('Project','Linker', fOptions.cmdLines.Linker);
+		WriteBool('Project','IsCpp', fOptions.UseGpp);
+		WriteString('Project','Icon', ExtractRelativePath(Directory, fOptions.Icon));
+		WriteString('Project','ExeOutput', fOptions.ExeOutput);
+		WriteString('Project','ObjectOutput', fOptions.ObjectOutput);
+		WriteString('Project','LogOutput', fOptions.LogOutput);
+		WriteBool('Project','LogOutputEnabled', fOptions.LogOutputEnabled);
+		WriteBool('Project','OverrideOutput', fOptions.OverrideOutput);
+		WriteString('Project','OverrideOutputName', fOptions.OverridenOutput);
+		WriteString('Project','HostApplication', fOptions.HostApplication);
 
-		Write('FileName', ExtractRelativePath(Directory, fFileName));
-		Write('Name', fName);
-		Write('Type', fOptions.typ);
-		Write('Ver', 2); // Is 2 as of Dev-C++ 5.2.0.3
-		Write('ObjFiles', fOptions.ObjFiles.DelimitedText);
-		Write('Includes', fOptions.Includes.DelimitedText);
-		Write('Libs', fOptions.Libs.DelimitedText);
-		Write('PrivateResource', fOptions.PrivateResource);
-		Write('ResourceIncludes', fOptions.ResourceIncludes.DelimitedText);
-		Write('MakeIncludes', fOptions.MakeIncludes.DelimitedText);
-		Write('Compiler', fOptions.cmdLines.Compiler);
-		Write('CppCompiler', fOptions.cmdLines.CppCompiler);
-		Write('Linker', fOptions.cmdLines.Linker);
-		Write('IsCpp', fOptions.UseGpp);
-		Write('Icon', ExtractRelativePath(Directory, fOptions.Icon));
-		Write('ExeOutput', fOptions.ExeOutput);
-		Write('ObjectOutput', fOptions.ObjectOutput);
-		Write('LogOutput', fOptions.LogOutput);
-		Write('LogOutputEnabled', fOptions.LogOutputEnabled);
-		Write('OverrideOutput', fOptions.OverrideOutput);
-		Write('OverrideOutputName', fOptions.OverridenOutput);
-		Write('HostApplication', fOptions.HostApplication);
+		WriteString('Project','Folders', fFolders.CommaText);
+		WriteString('Project','CommandLine', fCmdLineArgs);
 
-		Write('Folders', fFolders.CommaText);
-		Write('CommandLine', fCmdLineArgs);
+		WriteBool('Project','UseCustomMakefile', fUseCustomMakefile);
+		WriteString('Project','CustomMakefile', fCustomMakefile);
 
-		Write('UseCustomMakefile', fUseCustomMakefile);
-		Write('CustomMakefile', fCustomMakefile);
-
-		Write('IncludeVersionInfo', fOptions.IncludeVersionInfo);
-		Write('SupportXPThemes', fOptions.SupportXPThemes);
-		Write('CompilerSet', fOptions.CompilerSet);
+		WriteBool('Project','IncludeVersionInfo', fOptions.IncludeVersionInfo);
+		WriteBool('Project','SupportXPThemes', fOptions.SupportXPThemes);
+		WriteInteger('Project','CompilerSet', fOptions.CompilerSet);
 		if(Length(fOptions.CompilerOptions) > 0) then
-			Write('CompilerSettings', fOptions.CompilerOptions)
+			WriteString('Project','CompilerSettings', fOptions.CompilerOptions)
 		else begin
-			Write('CompilerSettings', devCompiler.OptionStr);
+			WriteString('Project','CompilerSettings', devCompiler.OptionStr);
 			fOptions.CompilerOptions := devCompiler.OptionStr;
 		end;
 
-		Section:= 'VersionInfo';
-		Write('Major',            fOptions.VersionInfo.Major);
-		Write('Minor',            fOptions.VersionInfo.Minor);
-		Write('Release',          fOptions.VersionInfo.Release);
-		Write('Build',            fOptions.VersionInfo.Build);
-		Write('LanguageID',       fOptions.VersionInfo.LanguageID);
-		Write('CharsetID',        fOptions.VersionInfo.CharsetID);
-		Write('CompanyName',      fOptions.VersionInfo.CompanyName);
-		Write('FileVersion',      fOptions.VersionInfo.FileVersion);
-		Write('FileDescription',  fOptions.VersionInfo.FileDescription);
-		Write('InternalName',     fOptions.VersionInfo.InternalName);
-		Write('LegalCopyright',   fOptions.VersionInfo.LegalCopyright);
-		Write('LegalTrademarks',  fOptions.VersionInfo.LegalTrademarks);
-		Write('OriginalFilename', fOptions.VersionInfo.OriginalFilename);
-		Write('ProductName',      fOptions.VersionInfo.ProductName);
-		Write('ProductVersion',   fOptions.VersionInfo.ProductVersion);
-		Write('AutoIncBuildNr',   fOptions.VersionInfo.AutoIncBuildNr);
-		Write('SyncProduct',      fOptions.VersionInfo.SyncProduct);
-
-		Section:= 'Project';
+		WriteInteger('VersionInfo','Major',            fOptions.VersionInfo.Major);
+		WriteInteger('VersionInfo','Minor',            fOptions.VersionInfo.Minor);
+		WriteInteger('VersionInfo','Release',          fOptions.VersionInfo.Release);
+		WriteInteger('VersionInfo','Build',            fOptions.VersionInfo.Build);
+		WriteInteger('VersionInfo','LanguageID',       fOptions.VersionInfo.LanguageID);
+		WriteInteger('VersionInfo','CharsetID',        fOptions.VersionInfo.CharsetID);
+		WriteString('VersionInfo','CompanyName',      fOptions.VersionInfo.CompanyName);
+		WriteString('VersionInfo','FileVersion',      fOptions.VersionInfo.FileVersion);
+		WriteString('VersionInfo','FileDescription',  fOptions.VersionInfo.FileDescription);
+		WriteString('VersionInfo','InternalName',     fOptions.VersionInfo.InternalName);
+		WriteString('VersionInfo','LegalCopyright',   fOptions.VersionInfo.LegalCopyright);
+		WriteString('VersionInfo','LegalTrademarks',  fOptions.VersionInfo.LegalTrademarks);
+		WriteString('VersionInfo','OriginalFilename', fOptions.VersionInfo.OriginalFilename);
+		WriteString('VersionInfo','ProductName',      fOptions.VersionInfo.ProductName);
+		WriteString('VersionInfo','ProductVersion',   fOptions.VersionInfo.ProductVersion);
+		WriteBool('VersionInfo','AutoIncBuildNr',   fOptions.VersionInfo.AutoIncBuildNr);
+		WriteBool('VersionInfo','SyncProduct',      fOptions.VersionInfo.SyncProduct);
 
 		if fOptions.Ver <= 0 then begin
 			//delete outdated dev4 project options
-			DeleteKey('NoConsole');
-			DeleteKey('IsDLL');
-			DeleteKey('ResFiles');
-			DeleteKey('IncludeDirs');
-			DeleteKey('CompilerOptions');
-			DeleteKey('Use_GPP');
+			DeleteKey('Project','NoConsole');
+			DeleteKey('Project','IsDLL');
+			DeleteKey('Project','ResFiles');
+			DeleteKey('Project','IncludeDirs');
+			DeleteKey('Project','CompilerOptions');
+			DeleteKey('Project','Use_GPP');
 		end;
 	end;
 end;
@@ -1040,50 +978,46 @@ var
  idx: integer;
  rd_only : boolean;
 begin
-  Result := False;
-  Count:= 0;
-  idx:= 0;
-  rd_only := false;
-  while idx <= pred(fUnits.Count) do
-  begin
-		with fUnits[idx] do
-     begin
-        {$WARN SYMBOL_PLATFORM OFF}
-         if fUnits[idx].Dirty and FileExists(fUnits[idx].FileName) and (FileGetAttr(fUnits[idx].FileName) and faReadOnly <> 0) then begin
-          // file is read-only
-          if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [fUnits[idx].FileName]), mtConfirmation, [mbYes, mbNo], 0)=mrNo then
-            rd_only := false
-          else if FileSetAttr(fUnits[idx].FileName, FileGetAttr(fUnits[idx].FileName)-faReadOnly) <> 0 then begin
-            MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [fUnits[idx].FileName]), mtError, [mbOk], 0);
-            rd_only := false;
-          end;
-        end;
-        {$WARN SYMBOL_PLATFORM ON}
+	Result := False;
+	Count:= 0;
+	rd_only := false;
+	for idx := 0 to pred(fUnits.Count) do begin
+		with fUnits[idx] do begin
 
-        if (not rd_only) and (not fUnits[idx].Save) and New then
-           Exit;
+			{$WARN SYMBOL_PLATFORM OFF}
+			if fUnits[idx].Dirty and FileExists(fUnits[idx].FileName) and (FileGetAttr(fUnits[idx].FileName) and faReadOnly <> 0) then begin
+				// file is read-only
+				if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [fUnits[idx].FileName]), mtConfirmation, [mbYes, mbNo], 0)=mrNo then
+					rd_only := false
+				else if FileSetAttr(fUnits[idx].FileName, FileGetAttr(fUnits[idx].FileName)-faReadOnly) <> 0 then begin
+					MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [fUnits[idx].FileName]), mtError, [mbOk], 0);
+					rd_only := false;
+				end;
+			end;
+			{$WARN SYMBOL_PLATFORM ON}
 
-        // saved new file or an existing file add to project file
-        if (New and not Dirty) or not New then
-        begin
-           finifile.Write(Count, ExtractRelativePath(Directory, fUnits[idx].FileName));
-           inc(Count);
-        end;
-        case GetFileTyp(fUnits[idx].FileName) of
-          utcHead, utcppHead, utcSrc, utcppSrc: finifile.Write(idx, 'CompileCpp', CompileCpp);
-          utResSrc: if Folder='' then Folder:='Resources';
-        end;
-        finifile.Write(idx, 'Folder', Folder);
-        finifile.Write(idx, 'Compile', Compile);
-        finifile.Write(idx, 'Link', Link);
-        finifile.Write(idx, 'Priority', Priority);
-        finifile.Write(idx, 'OverrideBuildCmd', OverrideBuildCmd);
-        finifile.Write(idx, 'BuildCmd', BuildCmd);
-     end;
-     inc(idx);
-  end;
-  finifile.Write('UnitCount', Count);
-  Result := True;
+			if not rd_only and (not fUnits[idx].Save) and New then
+				Exit;
+
+			// saved new file or an existing file add to project file
+			if not (New and Dirty) then begin
+				finifile.WriteString('Unit' + IntToStr(Count+1), 'FileName', ExtractRelativePath(Directory, fUnits[idx].FileName));
+				inc(Count);
+			end;
+			case GetFileTyp(fUnits[idx].FileName) of
+				utcHead, utcppHead, utcSrc, utcppSrc: finifile.WriteBool('Unit' + IntToStr(idx+1), 'CompileCpp', CompileCpp);
+				utResSrc: if Folder='' then Folder:='Resources';
+			end;
+			finifile.WriteString('Unit' + IntToStr(idx+1), 'Folder', Folder);
+			finifile.WriteBool('Unit' + IntToStr(idx+1), 'Compile', Compile);
+			finifile.WriteBool('Unit' + IntToStr(idx+1), 'Link', Link);
+			finifile.WriteInteger('Unit' + IntToStr(idx+1), 'Priority', Priority);
+			finifile.WriteBool('Unit' + IntToStr(idx+1), 'OverrideBuildCmd', OverrideBuildCmd);
+			finifile.WriteString('Unit' + IntToStr(idx+1), 'BuildCmd', BuildCmd);
+		end;
+	end;
+	finifile.WriteInteger('Project','UnitCount', Count);
+	Result := True;
 end;
 
 { begin XXXKF }
@@ -1145,80 +1079,67 @@ begin
 		fUnits[idx].Node.Data:=pointer(idx);
 end;
 
-{ end XXXKF }
-
-{ begin XXXKF changed }
-
-// open is used to determine if layout info is present in the file.
-// if it is present the users AutoOpen settings are ignored,
-// perhaps we should make it another option?
 procedure TProject.Open;
 var
- ucount,
- i : integer;
- NewUnit: TProjUnit;
+	ucount,
+	i : integer;
+	NewUnit: TProjUnit;
 begin
-  {$WARN SYMBOL_PLATFORM OFF}
-  if FileExists(FileName) and (FileGetAttr(FileName) and faReadOnly <> 0) then begin
-    // file is read-only
-    if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [FileName]), mtConfirmation, [mbYes, mbNo], 0)=mrYes then
-      if FileSetAttr(FileName, FileGetAttr(FileName)-faReadOnly) <> 0 then begin
-        MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [FileName]), mtError, [mbOk], 0);
-      end;
-  end;
-  {$WARN SYMBOL_PLATFORM ON}
+	{$WARN SYMBOL_PLATFORM OFF}
+	if FileExists(FileName) and (FileGetAttr(FileName) and faReadOnly <> 0) then begin
+		// file is read-only
+		if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [FileName]), mtConfirmation, [mbYes, mbNo], 0)=mrYes then
+			if FileSetAttr(FileName, FileGetAttr(FileName)-faReadOnly) <> 0 then begin
+				MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [FileName]), mtError, [mbOk], 0);
+			end;
+	end;
+	{$WARN SYMBOL_PLATFORM ON}
 
-  Update;
-  fNode := MakeProjectNode;
+	Update;
+	fNode := MakeProjectNode;
 
-  CheckProjectFileForUpdate;
+	CheckProjectFileForUpdate;
 
-  finifile.Section:= 'Project';
-  uCount := fIniFile.Read('UnitCount', 0);
-  CreateFolderNodes;
-  for i:= 0 to pred(uCount) do
-   begin
-     NewUnit:= TProjUnit.Create(Self);
-     with NewUnit do
-      begin
-        FileName:= ExpandFileto(finifile.Read(i), Directory);
-        if not FileExists(FileName) then
-        begin
-            Application.MessageBox(PAnsiChar(Format(Lang[ID_ERR_FILENOTFOUND],
-              [FileName])), 'Error', MB_ICONHAND);
-            SetModified(TRUE);
-            Continue;
-        end;
-        Folder:=finifile.Read(i, 'Folder', '');
+	uCount := fIniFile.ReadInteger('Project','UnitCount', 0);
+	CreateFolderNodes;
+	for i := 0 to pred(uCount) do begin
+		NewUnit := TProjUnit.Create(Self);
+		with NewUnit do begin
+			FileName := ExpandFileto(finifile.ReadString('Unit' + IntToStr(i+1),'FileName',''), Directory);
+			if not FileExists(FileName) then begin
+				MessageBox(Application.Handle,PAnsiChar(Format(Lang[ID_ERR_FILENOTFOUND],[FileName])), 'Error', MB_ICONERROR);
+				SetModified(TRUE);
+			end else begin
 
-        Compile:=finifile.Read(i, 'Compile', True);
-        if finifile.Read(i, 'CompileCpp', 2)=2 then // check if feature not present in this file
-          CompileCpp:=Self.Options.useGPP
-        else
-          CompileCpp:=finifile.Read(i, 'CompileCpp', False);
-        Link:=finifile.Read(i, 'Link', True);
-        Priority:=finifile.Read(i, 'Priority', 1000);
-        OverrideBuildCmd:=finifile.Read(i, 'OverrideBuildCmd', False);
-        BuildCmd:=finifile.Read(i, 'BuildCmd', '');
+				Folder := finifile.ReadString('Unit' + IntToStr(i+1), 'Folder', '');
+				Compile := finifile.ReadBool('Unit' + IntToStr(i+1), 'Compile', True);
+				if finifile.ReadInteger('Unit' + IntToStr(i+1), 'CompileCpp', 2)=2 then // check if feature not present in this file
+					CompileCpp:=Self.Options.useGPP
+				else
+					CompileCpp:=finifile.ReadBool('Unit' + IntToStr(i+1), 'CompileCpp', False);
+				Link := finifile.ReadBool('Unit' + IntToStr(i+1), 'Link', True);
+				Priority := finifile.ReadInteger('Unit' + IntToStr(i+1), 'Priority', 1000);
+				OverrideBuildCmd := finifile.ReadBool('Unit' + IntToStr(i+1), 'OverrideBuildCmd', False);
+				BuildCmd := finifile.ReadString('Unit' + IntToStr(i+1), 'BuildCmd', '');
 
-        Editor:= nil;
-        New:= FALSE;
-        fParent:=self;
+				Editor:= nil;
+				New:= FALSE;
+				fParent:=self;
 
-        Node:= MakeNewFileNode(ExtractFileName(FileName), False, FolderNodeFromName(Folder));
-        Node.Data:= pointer(fUnits.Add(NewUnit));
-
-      end;
-   end;
+				Node:= MakeNewFileNode(ExtractFileName(FileName), False, FolderNodeFromName(Folder));
+				Node.Data:= pointer(fUnits.Add(NewUnit));
+			end;
+		end;
+	end;
 
 	case devData.AutoOpen of
 		0: begin
 			for i:= 0 to pred(fUnits.Count) do
 				OpenUnit(i); // Open all
-			fUnits[0].Editor.Activate;
+			fUnits[0].Editor.Activate; // Show first
 		end;
 		1:
-			OpenUnit(0).Activate; // Open first
+			OpenUnit(0).Activate; // Open and show first
 		2:
 			LoadLayout; // Open previous selection
 	end;
@@ -1235,27 +1156,27 @@ var
  sl: TStringList;
  idx, currIdx: integer;
 begin
-  sl:=TStringList.Create;
-  try
-    layIni:=TIniFile.Create(ChangeFileExt(Filename, '.layout'));
-    try
-      top:=layIni.ReadInteger('Editors', 'Focused', -1);
-      // read order of open files and open them accordingly
-      sl.CommaText:=layIni.ReadString('Editors', 'Order', '');
-    finally
-      layIni.Free;
-    end;
+	sl:=TStringList.Create;
+	try
+		layIni:=TIniFile.Create(ChangeFileExt(Filename, '.layout'));
+		try
+			top:=layIni.ReadInteger('Editors', 'Focused', -1);
+			// read order of open files and open them accordingly
+			sl.CommaText:=layIni.ReadString('Editors', 'Order', '');
+		finally
+			layIni.Free;
+		end;
 
-    for idx:=0 to sl.Count-1 do begin
-      currIdx:=StrToIntDef(sl[idx], -1);
-      LoadUnitLayout(OpenUnit(currIdx), currIdx);
-    end;
-  finally
-    sl.Free;
-  end;
+		for idx:=0 to sl.Count-1 do begin
+			currIdx:=StrToIntDef(sl[idx], -1);
+			LoadUnitLayout(OpenUnit(currIdx), currIdx);
+		end;
+	finally
+		sl.Free;
+	end;
 
-  if (Top> -1) and (fUnits.Count > 0) and (top<fUnits.Count) and Assigned(fUnits[top].Editor) then
-   fUnits[top].Editor.Activate;
+	if (Top> -1) and (fUnits.Count > 0) and (top<fUnits.Count) and Assigned(fUnits[top].Editor) then
+		fUnits[top].Editor.Activate;
 end;
 
 procedure TProject.LoadUnitLayout(e: TEditor; Index: integer);
@@ -1283,39 +1204,35 @@ var
  sl: TStringList;
  S: AnsiString;
 begin
-  s := ChangeFileExt(Filename, '.layout');
-  if FileIsReadOnly(s) then
-    exit;
-  layIni:=TIniFile.Create(s);
-  try
-//  finifile.Section:= 'Views';
-//  finifile.Write('ProjectView', devData.ProjectView);
-  finifile.Section:= 'Project';
+	s := ChangeFileExt(Filename, '.layout');
+	if FileIsReadOnly(s) then
+		exit;
+	layIni:=TIniFile.Create(s);
+	try
+		sl:=TStringList.Create;
+		try
+			// write order of open files
+			for idx := 0 to MainForm.PageControl.PageCount-1 do begin
+				S:=MainForm.PageControl.Pages[idx].Caption;
 
-  sl:=TStringList.Create;
-  try
-    // write order of open files
-    sl.Clear;
-    for idx:=0 to MainForm.PageControl.PageCount-1 do begin
-      S:=MainForm.PageControl.Pages[idx].Caption;
-      if (Length(S)>4) and
-        (Copy(S, 1, 4)='[*] ') then
-        // the file is modified and the tabsheet's caption starts with '[*] ' - delete it
-        S:=Copy(S, 5, Length(S)-4);
-      if sl.IndexOf(IntToStr(fUnits.Indexof(S)))=-1 then
-        sl.Add(IntToStr(fUnits.Indexof(S)));
-      if MainForm.PageControl.ActivePageIndex=idx then
-        layIni.WriteInteger('Editors', 'Focused', fUnits.Indexof(S));
-    end;
-    layIni.WriteString('Editors', 'Order', sl.CommaText);
-  finally
-    sl.Free;
-  end;
+				// the file is modified and the tabsheet's caption starts with '[*] ' - delete it
+				if (Length(S)>4) and (Copy(S, 1, 4)='[*] ') then
+					S:=Copy(S, 5, Length(S)-4);
 
-  // save editor info
-  for idx:= 0 to pred(fUnits.Count) do
-   with fUnits[idx] do
-    begin
+				// if this file belongs to the project...
+				if sl.IndexOf(IntToStr(fUnits.Indexof(S)))=-1 then
+					sl.Add(IntToStr(fUnits.Indexof(S)));
+				if MainForm.PageControl.ActivePageIndex=idx then
+					layIni.WriteInteger('Editors', 'Focused', fUnits.Indexof(S));
+			end;
+			layIni.WriteString('Editors', 'Order', sl.CommaText);
+		finally
+			sl.Free;
+		end;
+
+		// save editor info
+		for idx:= 0 to pred(fUnits.Count) do
+			with fUnits[idx] do begin
       // save info on open state
       aset:= Assigned(editor);
       layIni.WriteBool('Editor_'+IntToStr(idx), 'Open', aset);
@@ -1329,21 +1246,16 @@ begin
       end;
 
       // remove old data from project file
-      fIniFile.Section:='Unit'+IntToStr(idx+1);
-      fIniFile.DeleteKey('Open');
-      fIniFile.DeleteKey('Top');
-      fIniFile.DeleteKey('CursorCol');
-      fIniFile.DeleteKey('CursorRow');
-      fIniFile.DeleteKey('TopLine');
-      fIniFile.DeleteKey('LeftChar');
+      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'Open');
+      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'Top');
+      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'CursorCol');
+      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'CursorRow');
+      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'TopLine');
+      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'LeftChar');
     end;
- {   ** not good !!** if fModified then
-      finiFile.UpdateFile; }
-
   finally
     layIni.Free;
   end;
-  fIniFile.Section:='Project';
 end;
 
 procedure TProject.SaveUnitLayout(e: TEditor; Index: integer);
@@ -1399,8 +1311,7 @@ begin
 
 		{ this causes problems if the project isn't saved after this, since the erase happens phisically at this moment }
 		//if not fUnits.GetItem(index).fNew then
-		finifile.EraseUnit(index);
-
+		finifile.EraseSection('Unit' +inttostr(index +1));
 		fUnits.GetItem(index).fNode.Delete;
 		fUnits.Remove(index);
 
@@ -1420,50 +1331,43 @@ end;
 
 function TProject.FileAlreadyExists(s : AnsiString) : boolean;
 begin
-  result := TRUE;
-  if fUnits.Indexof(s) > -1 then exit;
-  result:= FALSE;
+	if fUnits.Indexof(s) > -1 then
+		result := true
+	else
+		result := false;
 end;
 
 function TProject.OpenUnit(index : integer): TEditor;
 begin
-  result:= nil;
-  if (index < 0) or (index > pred(fUnits.Count)) then exit;
+	result:= nil;
+	if (index < 0) or (index > pred(fUnits.Count)) then exit;
 
-  with fUnits[index] do
-   begin
-     fEditor := TEditor.Create;
-     if FileName <> ''then
-      try
-       chdir(Directory);
-       fEditor.Init(TRUE, ExtractFileName(FileName), ExpandFileName(FileName), not New);
-       if New then
-         fEditor.InsertDefaultText;
-       LoadUnitLayout(fEditor, index);
-       result:= fEditor;
-      except
-       MessageDlg(format(Lang[ID_ERR_OPENFILE], [Filename]), mtError, [mbOK], 0);
-       FreeAndNil(fEditor);
-      end
-     else
-       FreeAndNil(fEditor);
-   end;
+	with fUnits[index] do begin
+		if FileName <> '' then begin
+			try
+				fEditor := TEditor.Create;
+				chdir(Directory);
+				fEditor.Init(TRUE, ExtractFileName(FileName), ExpandFileName(FileName), not New);
+				if New then
+					fEditor.InsertDefaultText;
+				LoadUnitLayout(fEditor, index);
+				result := fEditor;
+			except
+				MessageDlg(format(Lang[ID_ERR_OPENFILE], [Filename]), mtError, [mbOK], 0);
+			end;
+		end;
+	end;
 end;
 
-{ begin XXXKF changed, doesn't help much though :-( }
 procedure TProject.CloseUnit(index: integer);
 begin
-  if (index< 0) or (index> pred(fUnits.Count)) then exit;
-  with fUnits[index] do
-   begin
-     if assigned(fEditor) then
-     begin
-       SaveUnitLayout(fEditor, index);
-       FreeAndNil(fEditor);
-     end;
-   end;
+	with fUnits[index] do begin
+		if assigned(fEditor) then begin
+			SaveUnitLayout(fEditor, index);
+			FreeAndNil(fEditor);
+		end;
+	end;
 end;
-{ end XXXKF changed }
 
 procedure TProject.SaveUnitAs(i : integer; sFileName : AnsiString);
 begin
@@ -1482,7 +1386,7 @@ begin
       end;
      Node.Text := ExtractFileName(sFileName);
      New := False;
-     fInifile.Write(i, ExtractRelativePath(Directory, sFileName));
+     fInifile.WriteString('Unit' + IntToStr(i+1), 'FileName', ExtractRelativePath(Directory, sFileName));
    end;
    Modified := true;
 end;
@@ -1586,7 +1490,7 @@ begin
   if fFileName<>value then begin
     fFileName:= value;
     SetModified(True);
-    finifile.finifile.Rename(value, FALSE);
+    finifile.Rename(value, FALSE);
   end;
 end;
 
@@ -1782,7 +1686,10 @@ begin
 		if aTemplate.Version = -1 then begin
 			fName:= format(Lang[ID_NEWPROJECT], [dmmain.GetNumber]);
 			fNode.Text:= fName;
-			finiFile.FileName:= aFileName;
+			if Assigned(finiFile) then
+				finiFile.Rename(aFileName,false)
+			else
+				fIniFile := TMemIniFile.Create(aFileName);
 			NewUnit(FALSE);
 			with fUnits[fUnits.Count - 1] do begin
 				Editor:= TEditor.Create;
@@ -1794,7 +1701,10 @@ begin
 		end;
 
 		fName:= aTemplate.ProjectName;
-		finifile.FileName:= aFileName;
+		if Assigned(finiFile) then
+			finiFile.Rename(aFileName,false)
+		else
+			fIniFile := TMemIniFile.Create(aFileName);
 		Options:= aTemplate.OptionsRec;
 		AssignOptionsRec(Options, fOptions);
 
@@ -1997,11 +1907,10 @@ var
   cnvt: boolean;
 begin
   cnvt:=False;
-  finifile.Section:= 'Project';
-  uCount := fIniFile.Read('UnitCount', 0);
+  uCount := fIniFile.ReadInteger('Project','UnitCount', 0);
 
   // check if using old way to store resources and fix it
-  oldRes:=finifile.Read('Resources', '');
+  oldRes:=finifile.ReadString('Project','Resources', '');
   if oldRes<>'' then begin
     CopyFile(PAnsiChar(Filename), PAnsiChar(FileName+'.bak'), False);
     sl:=TStringList.Create;
@@ -2009,17 +1918,17 @@ begin
       sl.Delimiter:=';';
       sl.DelimitedText:=oldRes;
       for i:=0 to sl.Count-1 do begin
-        finifile.Write(uCount+i, 'Filename', sl[i]);
-        finifile.Write(uCount+i, 'Folder', 'Resources');
-        finifile.Write(uCount+i, 'Compile', True);
+        finifile.WriteString(IntToStr(uCount+i), 'Filename', sl[i]);
+        finifile.WriteString(IntToStr(uCount+i), 'Folder',  'Resources');
+        finifile.WriteBool(IntToStr(uCount+i), 'Compile',  True);
       end;
-      fIniFile.Write('UnitCount', uCount+sl.Count);
-      oldRes:=finifile.Read('Folders', '');
+      fIniFile.WriteInteger('Project','UnitCount', uCount+sl.Count);
+      oldRes:=finifile.ReadString('Project','Folders', '');
       if oldRes<>'' then
         oldRes:=oldRes+',Resources'
       else
         oldRes:='Resources';
-      fIniFile.Write('Folders', oldRes);
+      fIniFile.WriteString('Project','Folders', oldRes);
       fFolders.Add('Resources');
     finally
       sl.Free;
@@ -2027,11 +1936,11 @@ begin
     cnvt:=True;
   end;
 
-  finifile.DeleteKey('Resources');
-  finifile.DeleteKey('Focused');
-  finifile.DeleteKey('Order');
-  finifile.DeleteKey('DebugInfo');
-  finifile.DeleteKey('ProfileInfo');
+  finifile.DeleteKey('Project','Resources');
+  finifile.DeleteKey('Project','Focused');
+  finifile.DeleteKey('Project','Order');
+  finifile.DeleteKey('Project','DebugInfo');
+  finifile.DeleteKey('Project','ProfileInfo');
 
   if cnvt then
     MessageDlg('Your project was succesfully updated to a newer file format!'#13#10+
@@ -2164,164 +2073,6 @@ begin
 		if TProjUnit(fList[result]).Node = Node then
 			exit;
 	result:= -1;
-end;
-
-{ TdevINI }
-
-destructor TdevINI.Destroy;
-begin
-	if assigned(fIniFile) then
-		fIniFile.Free;
-	inherited;
-end;
-
-procedure TdevINI.SetFileName(const Value: AnsiString);
-begin
-  fFileName := Value;
-  if not assigned(fINIFile) then
-   fINIFile:= TmemINIFile.Create(fFileName)
-  else
-   fINIFile.ReName(fFileName, FALSE);
-end;
-
-procedure TdevINI.SetSection(const Value: AnsiString);
-begin
-  fSection := Value;
-end;
-
-// reads a boolean value from fsection
-function TdevINI.Read(Name: AnsiString; Default: boolean): boolean;
-begin
-  result:= fINIFile.ReadBool(fSection, Name, Default);
-end;
-
-// reads a integer value from fsection
-function TdevINI.Read(Name: AnsiString; Default: integer): integer;
-begin
-  result:= fINIFile.ReadInteger(fSection, Name, Default);
-end;
-
-// reads unit filename for passed index
-function TdevINI.Read(index: integer): AnsiString;
-begin
-  result:= fINIFile.ReadString('Unit'+inttostr(index +1), 'FileName', '');
-end;
-
-// reads a AnsiString subitem from a unit entry
-function TdevINI.Read(index: integer; Item: AnsiString; default: AnsiString): AnsiString;
-begin
-  result:= fINIFile.ReadString('Unit' +inttostr(index +1), Item, default);
-end;
-
-// reads a boolean subitem from a unit entry
-function TdevINI.Read(index: integer; Item: AnsiString; default: boolean): boolean;
-begin
-  result:= fINIFile.ReadBool('Unit' +inttostr(index +1), Item, default);
-end;
-
-// reads an integer subitem from a unit entry
-function TdevINI.Read(index: integer; Item: AnsiString; default: integer): integer;
-begin
-  result:= fINIFile.ReadInteger('Unit' +inttostr(index +1), Item, default);
-end;
-
-// reads AnsiString value from fsection
-function TdevINI.Read(Name, Default: AnsiString): AnsiString;
-begin
-  result:= fINIFile.ReadString(fSection, Name, Default);
-end;
-
-// write unit entry for passed index
-procedure TdevINI.Write(index: integer; value: AnsiString);
-begin
-  finifile.WriteString('Unit' +inttostr(index +1), 'FileName', value);
-end;
-
-// write a AnsiString subitem in a unit entry
-procedure TdevINI.Write(index: integer; Item: AnsiString; Value: AnsiString);
-begin
-  finifile.WriteString('Unit' +inttostr(index +1), Item, Value);
-end;
-
-// write a boolean subitem in a unit entry
-procedure TdevINI.Write(index: integer; Item: AnsiString; Value: boolean);
-begin
-  finifile.WriteBool('Unit' +inttostr(index +1), Item, Value);
-end;
-
-// write an integer subitem in a unit entry
-procedure TdevINI.Write(index: integer; Item: AnsiString; Value: integer);
-begin
-  finifile.WriteInteger('Unit' +inttostr(index +1), Item, Value);
-end;
-
-// write AnsiString value to fsection
-procedure TdevINI.Write(Name, value: AnsiString);
-begin
-  finifile.WriteString(fSection, Name, Value);
-end;
-
-// write boolean value to fsection
-procedure TdevINI.Write(Name: AnsiString; value: boolean);
-begin
-  fINIFile.WriteBool(fSection, Name, Value);
-end;
-
-// write integer value to fsection
-procedure TdevINI.Write(Name: AnsiString; value: integer);
-begin
-  fINIFile.WriteInteger(fSection, Name, Value);
-end;
-
-procedure TdevINI.UpdateFile;
-begin
-{$WARN SYMBOL_PLATFORM OFF}
-	if not FileExists(FileName) or (FileExists(FileName) and (FileGetAttr(FileName) and faReadOnly = 0)) then
-{$WARN SYMBOL_PLATFORM ON}
-		fINIFile.UpdateFile;
-end;
-
-procedure TdevINI.ClearSection(const Section: AnsiString = '');
-var
- s: AnsiString;
- tmp: TStringList;
- idx: integer;
-begin
-  if Section = '' then
-   s:= fSection
-  else
-   s:= Section;
-
-  if not finifile.SectionExists(s) then exit;
-  tmp:= TStringList.Create;
-  try
-   finifile.ReadSectionValues(s, tmp);
-   if tmp.Count = 0 then exit;
-   for idx:= 0 to pred(tmp.Count) do
-    finifile.DeleteKey(s, tmp[idx]);
-  finally
-   tmp.Free;
-  end;
-end;
-
-procedure TdevINI.EraseUnit(const index: integer);
-var
- s: AnsiString;
-begin
-  s:= 'Unit' +inttostr(index +1);
-  if finifile.SectionExists(s) then
-   finifile.EraseSection(s);
-end;
-
-procedure TdevINI.DeleteKey(const value: AnsiString);
-begin
-  if ValueExists(value) then
-   finifile.DeleteKey(fSection, value);
-end;
-
-function TdevINI.ValueExists(const value: AnsiString): boolean;
-begin
-  result:= finifile.ValueExists(fSection, value);
 end;
 
 end.

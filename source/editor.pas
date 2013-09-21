@@ -25,7 +25,7 @@ uses
 {$IFDEF WIN32}
   Windows, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser,
   Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version, SynEditCodeFolding,
-  SynCompletionProposal, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, CodeToolTip, SynAutoIndent;
+  SynCompletionProposal, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, CodeToolTip;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, Graphics, QControls, QForms, QDialogs, CodeCompletion, CppParser,
@@ -71,7 +71,7 @@ type
     fMouseOverTimer : TTimer;
     fAllowMouseOver : boolean;
     fLastPos : TBufferCoord;
-    fAutoIndent: TSynAutoIndent;
+  
     HasCompletedParentheses : integer; // Set to 2 on completion during KeyPress, to 1 immediately after by KeyDown, and to 0 upon next key
     HasCompletedArray : integer; // ...
     HasCompletedCurly : integer; // ...
@@ -128,7 +128,7 @@ type
     procedure UpdateCaption(const NewCaption: AnsiString);
     procedure InsertDefaultText;
     procedure PaintMatchingBrackets(TransientType: TTransientType);
-
+    
     procedure CommentSelection;
     procedure UncommentSelection;
     procedure IndentSelection;
@@ -227,8 +227,8 @@ begin
 		fNew := True;
 
 	fText.Parent := fTabSheet;
-	fText.Align := alClient;
 	fText.Visible := True;
+	fText.Align := alClient;
 	fText.PopupMenu := MainForm.EditorPopupMenu;
 	fText.WantTabs := True;
 	fText.ShowHint := True;
@@ -284,12 +284,6 @@ begin
 	fFunctionTip.Editor := FText;
 	fFunctionTip.Parser := MainForm.CppParser;
 
-	// Auto indent synedit plugin
-	FAutoIndent := TSynAutoIndent.Create(Application);
-	FAutoIndent.Editor := FText;
-	FAutoIndent.IndentChars := '{:';
-	FAutoIndent.UnIndentChars := '}';
-
 	// Setup a monitor which keeps track of outside-of-editor changes
 	MainForm.devFileMonitor.Files.Add(fFileName);
 	MainForm.devFileMonitor.Refresh(True);
@@ -327,7 +321,7 @@ begin
 	// Free everything
 	fDebugGutter.Free;
 	fFunctionTip.Free;
-	fAutoIndent.Free;
+	//fAutoIndent.Free;
 	fText.Free;
 
 	// Activates previous tab instead of first one when closing
@@ -352,7 +346,7 @@ begin
 
 		if fText.Visible then
 			fText.SetFocus;
-		if MainForm.ClassBrowser1.Enabled then
+		if MainForm.ClassBrowser.Enabled then
 			MainForm.PageControlChange(MainForm.PageControl); // this makes sure that the classbrowser is consistent
 	end;
 end;
@@ -594,8 +588,6 @@ begin
 		if Text.Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
 			UpdateCaption('[*] '+ExtractfileName(fFileName));
-			if fText.UnCollapsedLines.Count = 0 then
-				fText.ReScan;
 		end else begin
 			UpdateCaption(ExtractfileName(fFileName));
 			MainForm.SetStatusbarMessage('');
@@ -706,7 +698,7 @@ begin
 	GotoForm := TGotoLineForm.Create(nil);
 	try
 		if GotoForm.ShowModal = mrOK then
-			fText.CaretXY:= BufferCoord(1, Max(GotoForm.Line.Value,fText.Lines.Count));
+			fText.CaretXY := BufferCoord(1, Min(GotoForm.Line.Value,fText.Lines.Count));
 
 		Activate;
 	finally
@@ -747,8 +739,8 @@ begin
 	fText.SelText:= value;
 
 	// Update the cursor
-	fText.CaretXY:= NewCursorPos;
-	fText.EnsureCursorPosVisible;
+	fText.CaretXY := NewCursorPos;
+	fText.EnsureCursorPosVisible; // not needed?
 end;
 
 function TEditor.Search(isReplace: boolean): boolean;
@@ -901,14 +893,14 @@ procedure TEditor.EditorKeyPress(Sender: TObject; var Key: Char);
 var
 	P: TPoint;
 	allowcompletion : boolean;
-	cursorpos,indent : integer;
+	indent : integer;
 	attr : TSynHighlighterAttributes;
-	s : AnsiString;
+	s,s2 : AnsiString;
 	Ptr : PAnsiChar;
 begin
 
 	// Doing this here instead of in EditorKeyDown to be able to delete some key messages
-	if devEditor.CompleteSymbols and not (Sender is TForm) and not fText.SelAvail then begin
+	if devEditor.CompleteSymbols and not fText.SelAvail and not (Sender is TForm) then begin
 
 		// Allerhande voorwaarden
 		allowcompletion := true;
@@ -942,64 +934,59 @@ begin
 					InsertString('*/',false);
 			end else if (Key = '{') and devEditor.BraceComplete then begin
 
-				Ptr := PAnsiChar(fText.Lines.Text);
-				cursorpos := fText.RowColToCharIndex(fText.CaretXY);
+				s := fText.LineText;
+				s2 := Trim(fText.LineText);
 
-				// If there's any text before the cursor...
-				if not (Ptr[cursorpos-1] in [#13,#10]) and not (cursorpos = 0) then begin
+				if EndsStr(')',s2) or EndsStr('else',s2) or (s2 = '') then begin
 
-					// See what the last nonblank character before the cursor is
-					repeat
-						Dec(cursorpos);
-					until (cursorpos = 0) or not (Ptr[cursorpos] in [#9,#32]);
-
-					// Complete curly braces of if blocks or function etc.
-					if (Ptr[cursorpos] in [')']) or (StrLComp(@Ptr[cursorpos-3],'else',4) = 0) then begin
-
-						// Check indentation
-						indent:=0;
-						repeat
-							Inc(indent);
-						until not (fText.LineText[indent] in [#9,#32]);
-
-						// { + enter + Indent + }
-						InsertString('{' + #13#10 + Copy(fText.LineText,1,indent-1) + '}',false);
-						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
-						Key:=#0;
-					end else if StartsStr('struct',  TrimLeft(fText.LineText)) or
-								StartsStr('union',   TrimLeft(fText.LineText)) or
-								StartsStr('class',   TrimLeft(fText.LineText)) or
-								StartsStr('enum',    TrimLeft(fText.LineText)) or
-								StartsStr('typedef', TrimLeft(fText.LineText)) then begin
-
-						// Check indentation
-						indent:=0;
-						repeat
-							Inc(indent);
-						until not (fText.LineText[indent] in [#9,#32]);
-
-						// { + enter + indent + };
-						InsertString('{' + #13#10 + Copy(fText.LineText,1,indent-1) + '};',false);
-						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
-						Key:=#0;
-					end else if StartsStr('case',TrimLeft(fText.LineText)) then begin
-
-						// Check indentation
-						indent:=0;
-						repeat
-							Inc(indent);
-						until not (fText.LineText[indent] in [#9,#32]);
-
-						// { + enter + indent + tab + break; + enter + }
-						InsertString('{' + #13#10 + Copy(fText.LineText,1,indent-1) + #9 + 'break;' + #13#10 + Copy(fText.LineText,1,indent-1) + '}',false);
-						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
-						Key:=#0;
-					end else begin
-						HasCompletedCurly := 2;
-						InsertString('}',false);
+					// Copy indentation
+					indent := 0;
+					Ptr := PAnsiChar(s);
+					while Ptr^ in [#1..#32] do begin
+						Inc(indent);
+						Inc(Ptr);
 					end;
-				end else
-					InsertString(#13#10 + '}',false);
+
+					// { + enter + indent + }
+					InsertString('{' + #13#10 + Copy(s,1,indent) + '}',false);
+					fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+					Key:=#0;
+				end else if StartsStr('struct',  s2) or
+							StartsStr('union',   s2) or
+							StartsStr('class',   s2) or
+							StartsStr('enum',    s2) or
+							StartsStr('typedef', s2) then begin
+
+					// Copy indentation
+					indent := 0;
+					Ptr := PAnsiChar(s);
+					while Ptr^ in [#1..#32] do begin
+						Inc(indent);
+						Inc(Ptr);
+					end;
+
+					// { + enter + indent + };
+					InsertString('{' + #13#10 + Copy(s,1,indent) + '};',false);
+					fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+					Key:=#0;
+				end else if StartsStr('case', s2) then begin
+
+					// Copy indentation
+					indent := 0;
+					Ptr := PAnsiChar(s);
+					while Ptr^ in [#1..#32] do begin
+						Inc(indent);
+						Inc(Ptr);
+					end;
+
+					// { + enter + indent + tab + break; + enter + }
+					InsertString('{' + #13#10 + Copy(s,1,indent) + #9 + 'break;' + #13#10 + Copy(s,1,indent) + '}',false);
+					fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+					Key:=#0;
+				end else begin
+					HasCompletedCurly := 2;
+					InsertString('}',false);
+				end;
 			end else if (Key = '}') and (HasCompletedCurly > 0) then begin
 				fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
 				HasCompletedCurly := 0;
@@ -1026,23 +1013,31 @@ begin
 				':': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
 				' ': if fCompletionEatSpace then Key:=#0; // eat space if it was ctrl+space (code-completion)
 			end;
-			P := fText.RowColumnToPixels(fText.DisplayXY);
-			P.Y := P.Y + 16;
 
-			P := fText.ClientToScreen(P);
-			fCompletionBox.Position:=P;
+			if fCompletionTimer.Enabled or fCompletionEatSpace then begin
+				P := fText.RowColumnToPixels(fText.DisplayXY);
+				P.Y := P.Y + 16;
+
+				P := fText.ClientToScreen(P);
+				fCompletionBox.Position:=P;
+			end;
 
 		// The completion form is already shown
 		end else begin
 			case Key of
-				Char(VK_BACK): if fText.SelStart > 0 then begin
-					fText.SelStart := fText.SelStart - 1;
-					fText.SelEnd := fText.SelStart+1;
-					fText.SelText := '';
-					fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+				Char(VK_BACK): begin
+					if fText.SelStart > 0 then begin
+						fText.SelStart := fText.SelStart - 1;
+						fText.SelEnd := fText.SelStart + 1;
+						fText.SelText := '';
+						fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+					end;
 				end;
 				Char(VK_RETURN): begin
 					SetEditorText(Key);
+					fCompletionBox.Hide;
+				end;
+				Char(VK_ESCAPE): begin
 					fCompletionBox.Hide;
 				end;
 				';', '(', ' ': begin
@@ -1105,7 +1100,6 @@ var
 	attr: TSynHighlighterAttributes;
 begin
 	fCompletionTimer.Enabled:=False;
-	curr:=CurrentPhrase;
 
 	if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1, fText.CaretY), s, attr)) then begin
 		if (attr = fText.Highlighter.StringAttribute) or
@@ -1124,6 +1118,7 @@ begin
 		M.Free;
 	end;
 
+	curr:=CurrentPhrase;
 	case fCompletionTimerKey of
 	'.':
 		fCompletionBox.Search(nil, curr, fFileName);
@@ -1205,8 +1200,8 @@ var
 	combiningcharfound : boolean;
 	text : PChar;
 begin
-	text := PChar(fText.Lines.Text);
-	wordend := fText.RowColToCharIndex(fText.CaretXY);
+	text := PChar(fText.LineText);
+	wordend := fText.CaretX-1;
 	wordstart := wordend;
 	arraystart := 0;
 	arrayend := 0;
@@ -1244,6 +1239,7 @@ begin
 	if arrayend <> arraystart then
 		Delete(Result,arraystart-wordstart,arrayend-arraystart+1);
 end;
+
 
 procedure TEditor.SetEditorText(Key: Char);
 var
@@ -1284,8 +1280,8 @@ begin
 		fText.SelStart := fText.RowColToCharIndex(fText.WordStart);
 		fText.SelEnd := fText.RowColToCharIndex(fText.WordEnd);
 
-		// replae the selection
-		fText.SelText:=Statement^._Command + FuncAddOn;
+		// replace the selection
+		fText.SelText:=Statement^._ScopelessCmd + FuncAddOn;
 
 		// if we added "()" move caret inside parenthesis
 		// only if Key<>'.' and Key<>'>'
@@ -1297,8 +1293,6 @@ begin
 		end;
 	end;
 end;
-
-//////// CODE-COMPLETION - mandrav - END ///////
 
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
@@ -1313,9 +1307,9 @@ begin
 	// If the mouse can be found INSIDE the window
 	if fText.GetPositionOfMouse(p) and fAllowMouseOver then begin
 
-		// Only show info about variables
+		// Only show info about variables or includes
 		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
-			if not (attr = fText.Highlighter.IdentifierAttribute) then begin
+			if not (attr = fText.Highlighter.IdentifierAttribute) and not (SameStr(attr.Name,'Preprocessor')) then begin
 				Application.CancelHint;
 				fText.Hint := '';
 				Exit;
@@ -1323,7 +1317,7 @@ begin
 
 		s := fText.GetWordAtRowCol(p);
 
-		if(s <> '')then begin
+		if(s <> '') then begin
 
 			// Handle Ctrl+Click too
 			if ssCtrl in Shift then
@@ -1340,19 +1334,20 @@ begin
 					if localfind <> '' then begin
 						Application.CancelHint;
 						if (p.Char <> 12345) and (p.Line <> 12345) then
-							fText.Hint:=localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(p.Line) + ') - Ctrl+Click to follow'
+							fText.Hint := localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(p.Line) + ') - Ctrl+Click to follow'
 						else
-							fText.Hint:=localfind;
+							fText.Hint := localfind;
 					end else if Assigned(st) then begin
 						Application.CancelHint;
-						fText.Hint:=Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
+						fText.Hint := st^._FullText + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
 					end else begin
 						Application.CancelHint;
-						fCurrentWord := s;
 						fText.Hint := '';
 					end;
 				end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
 					MainForm.fDebugger.SendCommand(GDB_DISPLAY, s);
+
+					Sleep(500); // ???
 
 					Application.CancelHint;
 					fText.Hint:=MainForm.fDebugger.WatchVar + ' = ' + MainForm.fDebugger.WatchValue;
@@ -1367,7 +1362,8 @@ begin
 			Application.CancelHint;
 			fText.Hint := '';
 		end;
-	end;
+	end else
+		fCurrentWord := s; // Reinit mouseovers when hovering above anything else than words
 end;
 
 procedure TEditor.CommentSelection;
@@ -1524,43 +1520,53 @@ end;
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
 var
 	p: TDisplayCoord;
-	line,fname: AnsiString;
+	line,fname,headername: AnsiString;
 	walker,start : integer;
 	e : TEditor;
 begin
-	p := fText.PixelsToRowColumn(X,Y);
-
 	// if ctrl+clicked
-	if (ssCtrl in Shift) and (Button = mbLeft) and (p.Row <= fText.Lines.Count) and not fText.SelAvail then begin
+	if (ssCtrl in Shift) and (Button = mbLeft) and not fText.SelAvail then begin
 
-		// reset the cursor
-		fText.Cursor:=crIBeam;
+		p := fText.PixelsToRowColumn(X,Y);
+		if P.Row < fText.Lines.Count then begin
 
-		line:=fText.Lines[p.Row-1];
-		if StartsStr('#include',line) then begin
+			// reset the cursor
+			fText.Cursor:=crIBeam;
 
-			// We've clicked an #include...
-			walker := 0;
-			repeat
-				Inc(walker);
-			until line[walker] in ['<','"'];
-			start := walker + 1;
+			line:=fText.Lines[p.Row-1];
+			if StartsStr('#include',line) then begin
 
-			repeat
-				Inc(walker);
-			until line[walker] in ['>','"'];
+				// We've clicked an #include...
+				walker := 0;
+				repeat
+					Inc(walker);
+				until line[walker] in ['<','"'];
+				start := walker + 1;
 
-			fname := MainForm.CppParser.GetFullFileName(Copy(line, start, walker-start));
-			if fname = ExtractFileName(fname) then // no path info, so prepend path of active file
-				fname:=ExtractFilePath(fFileName)+fname;
+				repeat
+					Inc(walker);
+				until line[walker] in ['>','"'];
 
-			// refer to the editor of the filename (will open if needed and made active)
-			e:=MainForm.GetEditorFromFileName(fname);
-			if Assigned(e) then
-				e.GotoLineNr(1);
+				headername := Copy(line, start, walker-start);
+
+				// assume std:: C++ header
+				if (headername[1] = 'c') and (Pos('.h',headername) = 0) then begin
+					Delete(headername,1,1); // remove 'c'
+					headername := headername + '.h';
+				end;
+
+				fname := MainForm.CppParser.GetFullFileName(headername);
+				if fname = ExtractFileName(fname) then // no path info, so prepend path of active file
+					fname:=ExtractFilePath(fFileName)+fname;
+
+				// refer to the editor of the filename (will open if needed and made active)
+				e:=MainForm.GetEditorFromFileName(fname);
+				if Assigned(e) then
+					e.GotoLineNr(1);
+			end;
+
+			MainForm.actGotoImplDeclEditorExecute(self);
 		end;
-
-		MainForm.actGotoImplDeclEditorExecute(self);
 	end;
 end;
 

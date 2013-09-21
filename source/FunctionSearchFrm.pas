@@ -33,19 +33,18 @@ uses
 
 type
   TFunctionSearchForm = class(TForm)
-    Panel1: TPanel;
     Label1: TLabel;
     txtSearch: TEdit;
     lvEntries: TListView;
-    procedure FormShow(Sender: TObject);
     procedure txtSearchChange(Sender: TObject);
-    procedure txtSearchExit(Sender: TObject);
-    procedure txtSearchKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure lvEntriesDblClick(Sender: TObject);
     procedure lvEntriesCompare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure txtSearchKeyPress(Sender: TObject; var Key: Char);
+    procedure txtSearchKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
     procedure LoadText;
@@ -54,9 +53,6 @@ type
     fParser: TCppParser;
     fFileName: TFileName;
   end;
-
-//var
-//  FunctionSearchForm: TFunctionSearchForm;
 
 implementation
 
@@ -70,105 +66,92 @@ uses
 
 {$R *.dfm}
 
-procedure TFunctionSearchForm.FormShow(Sender: TObject);
-begin
-  txtSearch.Text := '';
-  txtSearchChange(nil);
-end;
-
 procedure TFunctionSearchForm.txtSearchChange(Sender: TObject);
 var
-  I: integer;
+	I: integer;
 begin
-  if not Assigned(fParser) then
-    Exit;
+	if not Assigned(fParser) then
+		Exit;
 
-  lvEntries.Items.BeginUpdate;
-  lvEntries.Items.Clear;
+	lvEntries.Items.BeginUpdate;
+	lvEntries.Items.Clear;
 
-  for I := 0 to fParser.Statements.Count - 1 do
-    if PStatement(fParser.Statements[I])^._Kind = skFunction then
-      if (PStatement(fParser.Statements[I])^._IsDeclaration and
-        (CompareText(PStatement(fParser.Statements[I])^._DeclImplFileName, fFilename) = 0)) or
-        (not PStatement(fParser.Statements[I])^._IsDeclaration and
-        (CompareText(PStatement(fParser.Statements[I])^._FileName, fFilename) = 0)) then
-        if (txtSearch.Text = '') or
-          (Pos(LowerCase(txtSearch.Text), LowerCase(PStatement(fParser.Statements[I])^._ScopelessCmd)) > 0) then begin
-          with lvEntries.Items.Add do begin
-            ImageIndex := -1;
-            case PStatement(fParser.Statements[I])^._ClassScope of
-              scsPrivate: StateIndex := 5;
-              scsProtected: StateIndex := 6;
-              scsPublic: StateIndex := 7;
-              scsPublished: StateIndex := 7;
-            end;
-            SubItems.Add(PStatement(fParser.Statements[I])^._Type);
-            SubItems.Add(PStatement(fParser.Statements[I])^._Command);
-            if PStatement(fParser.Statements[I])^._IsDeclaration then
-              SubItems.Add(IntToStr(PStatement(fParser.Statements[I])^._DeclImplLine))
-            else
-              SubItems.Add(IntToStr(PStatement(fParser.Statements[I])^._Line));
-            Data := fParser.Statements[I];
-          end;
-        end;
-  lvEntries.AlphaSort;
-  if lvEntries.ItemIndex = -1 then
-    if lvEntries.Items.Count > 0 then
-      lvEntries.ItemIndex := 0;
-  lvEntries.Items.EndUpdate;
+	for I := 0 to fParser.Statements.Count - 1 do
+		if PStatement(fParser.Statements[I])^._Kind = skFunction then
+			if (PStatement(fParser.Statements[I])^._IsDeclaration and SameText(PStatement(fParser.Statements[I])^._DeclImplFileName, fFilename)) or
+			   (not PStatement(fParser.Statements[I])^._IsDeclaration and SameText(PStatement(fParser.Statements[I])^._FileName, fFilename)) then
 
-  // without this, the user has to press the down arrow twice to
-  // move down the listview entries (only the first time!)...
+				if (txtSearch.Text = '') or (Pos(LowerCase(txtSearch.Text), LowerCase(PStatement(fParser.Statements[I])^._ScopelessCmd)) > 0) then begin
+					with lvEntries.Items.Add do begin
+						ImageIndex := -1;
+						case PStatement(fParser.Statements[I])^._ClassScope of
+							scsPrivate: StateIndex := 5;
+							scsProtected: StateIndex := 6;
+							scsPublic: StateIndex := 7;
+							scsPublished: StateIndex := 7;
+						end;
+						SubItems.Add(PStatement(fParser.Statements[I])^._Type);
+						SubItems.Add(PStatement(fParser.Statements[I])^._ScopeCmd);
+						if PStatement(fParser.Statements[I])^._IsDeclaration then
+							SubItems.Add(IntToStr(PStatement(fParser.Statements[I])^._DeclImplLine))
+						else
+							SubItems.Add(IntToStr(PStatement(fParser.Statements[I])^._Line));
+						Data := fParser.Statements[I];
+					end;
+				end;
+
+	lvEntries.AlphaSort;
+	if lvEntries.ItemIndex = -1 then
+		if lvEntries.Items.Count > 0 then
+				lvEntries.ItemIndex := 0;
+
+	lvEntries.Items.EndUpdate;
+
+	// without this, the user has to press the down arrow twice to
+	// move down the listview entries (only the first time!)...
 {$IFDEF WIN32}
-  lvEntries.Perform(WM_KEYDOWN, VK_DOWN, 0);
+	lvEntries.Perform(WM_KEYDOWN, VK_DOWN, 0);
 {$ENDIF}
 {$IFDEF LINUX}
-  lvEntries.Perform(WM_KEYDOWN, XK_DOWN, 0);
+	lvEntries.Perform(WM_KEYDOWN, XK_DOWN, 0);
 {$ENDIF}
 end;
 
-procedure TFunctionSearchForm.txtSearchExit(Sender: TObject);
+procedure TFunctionSearchForm.txtSearchKeyPress(Sender: TObject;var Key: Char);
 begin
-  txtSearch.SetFocus;
-  txtSearch.SelStart := Length(txtSearch.Text);
+	if lvEntries = nil then Exit;
+	case Key of
+		Chr(VK_ESCAPE): begin
+			ModalResult := mrCancel;
+			Key := #0;
+		end;
+		Chr(VK_RETURN): begin
+			ModalResult := mrOK;
+			Key := #0;
+		end;
+	end;
 end;
 
-procedure TFunctionSearchForm.txtSearchKeyDown(Sender: TObject;
-  var Key: Word; Shift: TShiftState);
+procedure TFunctionSearchForm.txtSearchKeyDown(Sender: TObject;var Key: Word; Shift: TShiftState);
 begin
-  if lvEntries = nil then Exit;
-
-  case Key of
-{$IFDEF WIN32}
-    VK_UP, VK_DOWN, VK_PRIOR, VK_NEXT: begin
-{$ENDIF}
-{$IFDEF LINUX}
-    XK_UP, XK_DOWN, XK_PRIOR, XK_NEXT: begin
-{$ENDIF}
-        lvEntries.Perform(WM_KEYDOWN, Key, 0);
-        Key := 0;
-      end;
-{$IFDEF WIN32}
-    VK_ESCAPE: ModalResult := mrCancel;
-    VK_RETURN: if lvEntries.Selected <> nil then ModalResult := mrOK;
-{$ENDIF}
-{$IFDEF LINUX}
-    XK_ESCAPE: ModalResult := mrCancel;
-    XK_RETURN: if lvEntries.Selected <> nil then ModalResult := mrOK;
-{$ENDIF}
-  end;
+	if lvEntries = nil then Exit;
+	case Key of
+		VK_DOWN, VK_UP: begin
+			lvEntries.Perform(WM_KEYDOWN, Key, 0); // send the key to lventries
+		end;
+	end;
 end;
 
 procedure TFunctionSearchForm.lvEntriesDblClick(Sender: TObject);
 begin
-  if lvEntries.Selected <> nil then
-    ModalResult := mrOK;
+	if lvEntries.Selected <> nil then
+		ModalResult := mrOK;
 end;
 
 procedure TFunctionSearchForm.lvEntriesCompare(Sender: TObject; Item1,
   Item2: TListItem; Data: Integer; var Compare: Integer);
 begin
-  Compare := CompareText(Item1.SubItems[1], Item2.SubItems[1]);
+	Compare := CompareText(Item1.SubItems[1], Item2.SubItems[1]);
 end;
 
 procedure TFunctionSearchForm.LoadText;
@@ -177,16 +160,21 @@ begin
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
-  Caption := StringReplace(Lang[ID_ITEM_GOTOFUNCTION], '&', '', []);
-  Label1.Caption := Lang[ID_GF_TEXT];
-  lvEntries.Column[1].Caption := Lang[ID_GF_TYPE];
-  lvEntries.Column[2].Caption := Lang[ID_GF_FUNCTION];
-  lvEntries.Column[3].Caption := Lang[ID_GF_LINE];
+	Caption := StringReplace(Lang[ID_ITEM_GOTOFUNCTION], '&', '', []);
+	Label1.Caption := Lang[ID_GF_TEXT];
+	lvEntries.Column[1].Caption := Lang[ID_GF_TYPE];
+	lvEntries.Column[2].Caption := Lang[ID_GF_FUNCTION];
+	lvEntries.Column[3].Caption := Lang[ID_GF_LINE];
 end;
 
 procedure TFunctionSearchForm.FormCreate(Sender: TObject);
 begin
-  LoadText;
+	LoadText;
+end;
+
+procedure TFunctionSearchForm.FormShow(Sender: TObject);
+begin
+	txtSearchChange(self);
 end;
 
 end.

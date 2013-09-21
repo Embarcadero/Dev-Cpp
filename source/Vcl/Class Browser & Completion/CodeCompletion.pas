@@ -40,9 +40,6 @@ uses
 {$ENDIF}
 
 type
-  {** Modified by Peter **}
-  TCompletionEvent = procedure(Sender: TObject; const AStatement: TStatement; const AIndex: Integer) of object;
-  
   TCodeCompletion = class(TComponent)
   private
     fParser: TCppParser;
@@ -62,21 +59,15 @@ type
     fOnlyGlobals: boolean;
     fCurrClassID: integer;
     fIncludedFiles: TStringList;
-    function GetOnCompletion: TCompletionEvent; {** Modified by Peter **}
-    procedure SetOnCompletion(Value: TCompletionEvent); {** Modified by Peter **}
     function GetTypeID(_Value: AnsiString; il: TIntList): integer;
-    function ApplyStandardFilter(Index: integer): boolean;
     function ApplyClassFilter(Index, ParentID: integer; InheritanceIDs: TIntList): boolean;
     function ApplyMemberFilter(const _Class: AnsiString; Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
-    procedure GetCompletionFor(const _Class, _Value: AnsiString; HasDot: boolean = False);
-    procedure FilterList(const _Class, _Value: AnsiString; HasDot: boolean = False);
+    procedure GetCompletionFor(const _Class, _Value: AnsiString; HasDot: boolean);
+    procedure FilterList(const _Class, _Value: AnsiString; HasDot: boolean);
     function GetMember(const Phrase: AnsiString): AnsiString;
     function GetHasDot(const Phrase: AnsiString): boolean;
-    procedure SetParser(Value: TCppParser);
     procedure SetPosition(Value: TPoint);
-    procedure ComplKeyPress(Sender: TObject; var Key: Char);
     procedure OnFormResize(Sender: TObject);
-    procedure SetColor(Value: TColor);
     function IsIncluded(const FileName: AnsiString): boolean;
   public
     constructor Create(AOwner: TComponent); override;
@@ -87,9 +78,9 @@ type
     function SelectedIsFunction: boolean;
     function GetClass(Phrase: AnsiString): AnsiString;
   published
-    property Parser: TCppParser read fParser write SetParser;
+    property Parser: TCppParser read fParser write fParser;
     property Position: TPoint read fPos write SetPosition;
-    property Color: TColor read fColor write SetColor;
+    property Color: TColor read fColor write fColor;
     property Width: integer read fWidth write fWidth;
     property Height: integer read fHeight write fHeight;
     property Enabled: boolean read fEnabled write fEnabled;
@@ -97,7 +88,6 @@ type
     property MinHeight: integer read fMinHeight write fMinHeight;
     property MaxWidth: integer read fMaxWidth write fMaxWidth;
     property MaxHeight: integer read fMaxHeight write fMaxHeight;
-    property OnCompletion: TCompletionEvent read GetOnCompletion write SetOnCompletion; {** Modified by Peter **}
     property OnKeyPress: TKeyPressEvent read fOnKeyPress write fOnKeyPress;
     property OnResize: TNotifyEvent read fOnResize write fOnResize;
     property OnlyGlobals: boolean read fOnlyGlobals write fOnlyGlobals;
@@ -117,18 +107,15 @@ begin
   fIncludedFiles := TStringList.Create;
   fIncludedFiles.Sorted := True;
   fIncludedFiles.Duplicates := dupIgnore;
+
   fCompletionStatementList := TList.Create;
   fFullCompletionStatementList := TList.Create;
+
   CodeComplForm := TCodeComplForm.Create(Self);
-  CodeComplForm.fParser := fParser;
-  CodeComplForm.fCompletionStatementList := fCompletionStatementList;
   CodeComplForm.OnResize := OnFormResize;
+
   fWidth := 320;
   fHeight := 240;
-  fMinWidth := 256;
-  fMinHeight := 128;
-  fMaxWidth := 0;
-  fMaxHeight := 0;
   fColor := clWindow;
   fEnabled := True;
   fOnlyGlobals := False;
@@ -195,11 +182,6 @@ begin
   end;
 end;
 
-function TCodeCompletion.ApplyStandardFilter(Index: integer): boolean;
-begin
-  Result := not PStatement(fParser.Statements[Index])^._NoCompletion;
-end;
-
 function TCodeCompletion.ApplyClassFilter(Index, ParentID: integer; InheritanceIDs: TIntList): boolean;
 begin
   Result :=
@@ -250,7 +232,7 @@ begin
     );
 end;
 
-procedure TCodeCompletion.GetCompletionFor(const _Class, _Value: AnsiString; HasDot: boolean = False);
+procedure TCodeCompletion.GetCompletionFor(const _Class, _Value: AnsiString; HasDot: boolean);
 var
   I, I1: integer;
   InheritanceIDs: TIntList;
@@ -279,7 +261,7 @@ var
           if iID = -1 then
             Continue;
           InheritanceIDs.Add(iID);
-          iST := iID;//fParser.IndexOfStatement(iID);
+          iST := iID;
           if iST = -1 then
             Continue;
           pST := PStatement(fParser.Statements[iST]);
@@ -291,88 +273,72 @@ var
     end;
   end;
 begin
-  bOnlyLocal := False;
-  ClassIDs := TIntList.Create;
-  InheritanceIDs := TIntList.Create;
-  sl := TStringList.Create;
-  try
-    ParID := -1;
-    if not HasDot then begin
-      GetInheritance(fCurrClassID);
-      for I := 0 to fParser.Statements.Count - 1 do begin
-        if ApplyStandardFilter(I) and
-          ApplyClassFilter(I, ParID, InheritanceIDs) then
-          fCompletionStatementList.Add(PStatement(fParser.Statements[I]));
-      end;
-    end
-    else begin // looking for class members only
-      for I1 := 0 to fParser.Statements.Count - 1 do
-        if PStatement(fParser.Statements[I1])^._ScopelessCmd = _Class then begin
-          if PStatement(fParser.Statements[I1])^._Kind = skClass then begin
-            // added for the case "Class::Member", where "Class" is the actual class
-            ClassIDs.Clear;
-            ClassIDs.Add(I1);
-            bOnlyLocal := True;
-          end
-          else
-            GetTypeID(PStatement(fParser.Statements[I1])^._Type, ClassIDs);
-        end;
+	bOnlyLocal := False;
+	ClassIDs := TIntList.Create;
+	InheritanceIDs := TIntList.Create;
+	sl := TStringList.Create;
+	try
+		ParID := -1;
+		if not HasDot then begin // only add globals and members of the current class
+			GetInheritance(fCurrClassID);
+			for I := 0 to fParser.Statements.Count - 1 do begin
+				if ApplyClassFilter(I, ParID, InheritanceIDs) then
+					fFullCompletionStatementList.Add(fParser.Statements[I]);
+			end;
+		end else begin // look for class members only
+			for I1 := 0 to fParser.Statements.Count - 1 do
+				if SameStr(PStatement(fParser.Statements[I1])^._ScopelessCmd,_Class) then begin
+					if PStatement(fParser.Statements[I1])^._Kind = skClass then begin
 
-      if not bOnlyLocal then
-        for I1 := 0 to ClassIDs.Count - 1 do
-          GetInheritance(ClassIDs[I1]);//fParser.IndexOfStatement(ClassIDs[I1]));
+						// added for the case "Class::Member", where "Class" is the actual class
+						ClassIDs.Clear;
+						ClassIDs.Add(I1);
+						bOnlyLocal := True;
+					end else
+						GetTypeID(PStatement(fParser.Statements[I1])^._Type, ClassIDs);
+				end;
 
-      if fCurrClassID <> -1 then
-        CurrentID := fCurrClassID
-      else
-        CurrentID := -1;
-      for I := 0 to fParser.Statements.Count - 1 do begin
-        if ApplyStandardFilter(I) and
-          ApplyMemberFilter(_Class, I, CurrentID, ClassIDs, InheritanceIDs) then
-          fCompletionStatementList.Add(PStatement(fParser.Statements[I]));
-      end;
-    end;
-  finally
-    sl.Free;
-    InheritanceIDs.Free;
-    ClassIDs.Free;
-  end;
+			if not bOnlyLocal then
+				for I1 := 0 to ClassIDs.Count - 1 do
+					GetInheritance(ClassIDs[I1]);
+
+			if fCurrClassID <> -1 then
+				CurrentID := fCurrClassID
+			else
+				CurrentID := -1;
+
+			for I := 0 to fParser.Statements.Count - 1 do
+				if ApplyMemberFilter(_Class, I, CurrentID, ClassIDs, InheritanceIDs) then
+					fFullCompletionStatementList.Add(fParser.Statements[I]);
+
+		end;
+	finally
+		sl.Free;
+		InheritanceIDs.Free;
+		ClassIDs.Free;
+	end;
 end;
 
 procedure TCodeCompletion.FilterList(const _Class, _Value: AnsiString;HasDot: boolean);
 var
-  I: integer;
+	I: integer;
 begin
-  CodeComplForm.lbCompletion.Items.BeginUpdate;
-  CodeComplForm.lbCompletion.Items.Clear;
-  try
-    if _Class <> '' then begin //empty
-      fCompletionStatementList.Clear;
-      for I := 0 to fFullCompletionStatementList.Count - 1 do
-        if not HasDot then begin //class only
-          if Assigned(fFullCompletionStatementList[I]) and StartsText(_Class, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then begin
-            fCompletionStatementList.Add(fFullCompletionStatementList[I]);
-            CodeComplForm.lbCompletion.Items.Add('');
-          end;
-        end
-        else begin //class and method
-        // ignore "this" pointer as a member
-          if Assigned(fFullCompletionStatementList[I]) and (I <> fParser.GetThisPointerID) then
-            if StartsText(_Value, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then begin
-              fCompletionStatementList.Add(fFullCompletionStatementList[I]);
-              CodeComplForm.lbCompletion.Items.Add('');
-            end;
-        end;
-    end
-    else begin
-      for I := 0 to fFullCompletionStatementList.Count - 1 do
-        CodeComplForm.lbCompletion.Items.Add('');
-      fCompletionStatementList.Clear;
-      fCompletionStatementList.Assign(fFullCompletionStatementList);
-    end;
-  except
-  end;
-  CodeComplForm.lbCompletion.Items.EndUpdate;
+	fCompletionStatementList.Clear;
+	if _Class <> '' then begin
+		if not HasDot then begin // class only
+			for I := 0 to fFullCompletionStatementList.Count - 1 do
+				if StartsText(_Class, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
+					fCompletionStatementList.Add(fFullCompletionStatementList[I]);
+		end else begin // class and method
+			for I := 0 to fFullCompletionStatementList.Count - 1 do
+				// ignore "this" pointer as a member
+				if (I <> fParser.GetThisPointerID) and StartsText(_Value, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
+					fCompletionStatementList.Add(fFullCompletionStatementList[I]);
+		end;
+	end else begin
+		for I := 0 to fFullCompletionStatementList.Count - 1 do
+			fCompletionStatementList.Add(fFullCompletionStatementList[I]);
+	end;
 end;
 
 function TCodeCompletion.GetHasDot(const Phrase: AnsiString): boolean;
@@ -440,107 +406,70 @@ end;
 
 procedure TCodeCompletion.Hide;
 begin
-  CodeComplForm.Hide;
-end;
-
-procedure TCodeCompletion.ComplKeyPress(Sender: TObject; var Key: Char);
-begin
-  if fEnabled then begin
-    case Key of
-{$IFDEF WIN32}
-      Char(vk_Escape), '.', '>': CodeComplForm.Hide;
-{$ENDIF}
-{$IFDEF LINUX}
-      Char(xk_Escape), '.', '>': CodeComplForm.Hide;
-{$ENDIF}
-    end;
-
-    if Assigned(fOnKeyPress) then
-      fOnKeyPress(Sender, Key);
-  end;
+	CodeComplForm.Hide;
 end;
 
 function ListSort(Item1, Item2: Pointer): Integer;
 begin
-  // first take into account that parsed statements need to be higher
-  // in the list than loaded ones
-  Result := 0;
-  if PStatement(Item1)^._Loaded and not PStatement(Item2)^._Loaded then
-    Result := 1
-  else if not PStatement(Item1)^._Loaded and PStatement(Item2)^._Loaded then
-    Result := -1;
+	// first take into account that parsed statements need to be higher
+	// in the list than loaded ones
+	Result := 0;
+	if PStatement(Item1)^._Loaded and not PStatement(Item2)^._Loaded then
+		Result := 1
+	else if not PStatement(Item1)^._Loaded and PStatement(Item2)^._Loaded then
+		Result := -1;
 
-  // after that, consider AnsiString comparison
-  if Result = 0 then
-    Result := CompareText(PStatement(Item1)^._ScopelessCmd, PStatement(Item2)^._ScopelessCmd);
+	// after that, consider string comparison
+	if Result = 0 then
+		Result := CompareText(PStatement(Item1)^._ScopelessCmd, PStatement(Item2)^._ScopelessCmd);
 end;
 
 procedure TCodeCompletion.Search(Sender: TWinControl;const Phrase, Filename: AnsiString);
 var
-  P: TPoint;
-  C: AnsiString;
-  M: AnsiString;
-  D: boolean;
+	C: AnsiString;
+	M: AnsiString;
+	D: boolean;
+	I : integer;
 begin
-  if fEnabled then begin
-    CodeComplForm.OnKeyPress := ComplKeyPress;
-    CodeComplForm.SetColor(fColor);
-    
-    if (Sender <> nil) and (Sender is TWinControl) then
-     begin
-      P.X := TWinControl(Sender).Left;
-      P.Y := TWinControl(Sender).Top + 16;
-      if (Sender.Parent <> nil) and (Sender.Parent is TWinControl) then
-        P := TWinControl(Sender.Parent).ClientToScreen(P)
-      else
-        P := TWinControl(Sender).ClientToScreen(P);
-      fPos := P;
-      SetPosition(fPos);
-    end;
+	if fEnabled then begin
 
-    CodeComplForm.Constraints.MinWidth := fMinWidth;
-    CodeComplForm.Constraints.MinHeight := fMinHeight;
+		C := GetClass(Phrase);
+		M := GetMember(Phrase);
+		D := GetHasDot(Phrase);
 
-    // 23 may 2004 - peter schraut (peter_)
-    // we set MaxWidth and MaxHeight to 0, to solve this bug:
-    // https://sourceforge.net/tracker/index.php?func=detail&aid=935068&group_id=10639&atid=110639
-    CodeComplForm.Constraints.MaxWidth := 0;
-    CodeComplForm.Constraints.MaxHeight := 0;
-    
-    CodeComplForm.lbCompletion.Visible := False;
+		if not D or (C <> '') then begin
 
-    C := GetClass(Phrase);
-    M := GetMember(Phrase);
-    D := GetHasDot(Phrase); // and (M<>'');
-    if not D or (D and (C <> '')) then try
-      Screen.Cursor := crHourglass;
-      // only perform new search if just invoked
-      if not CodeComplForm.Showing then begin
-        fCompletionStatementList.Clear;
-        fFullCompletionStatementList.Clear;
-        fIncludedFiles.CommaText := fParser.GetFileIncludes(Filename);
-        GetCompletionFor(C, M, D);
-        fFullCompletionStatementList.Assign(fCompletionStatementList);
-      end;
-      // perform filtering in list
-      FilterList(C, M, D);
-    finally
-      Screen.Cursor := crDefault;
-    end;
+			Screen.Cursor := crHourglass;
 
-    CodeComplForm.lbCompletion.Visible := True;
-    if fCompletionStatementList.Count > 0 then begin
-      fCompletionStatementList.Sort(@ListSort);
-      SetWindowPos(CodeComplForm.Handle, 0, CodeComplForm.Left, CodeComplForm.Top, fWidth, fHeight, SWP_NOZORDER);
-      CodeComplForm.lbCompletion.Repaint;
-      CodeComplForm.Show;
-      CodeComplForm.lbCompletion.SetFocus;
-      if CodeComplForm.lbCompletion.Items.Count > 0 then
-        CodeComplForm.lbCompletion.ItemIndex := 0;
-    end
-    else
-      CodeComplForm.Hide;
-  end;
+			// only perform full new search if just invoked
+			if not CodeComplForm.Showing then begin
+				fFullCompletionStatementList.Clear;
+				fIncludedFiles.CommaText := fParser.GetFileIncludes(Filename);
+				GetCompletionFor(C, M, D);
+			end;
+
+			// filter fFullCompletionStatementList to fCompletionStatementList
+			FilterList(C, M, D);
+			Screen.Cursor := crDefault;
+		end;
+
+		if fCompletionStatementList.Count > 0 then begin
+			fCompletionStatementList.Sort(@ListSort);
+
+			CodeComplForm.lbCompletion.Items.BeginUpdate;
+			CodeComplForm.lbCompletion.Items.Clear;
+
+			for I := 0 to fCompletionStatementList.Count - 1 do
+				CodeComplForm.lbCompletion.Items.AddObject('',fCompletionStatementList[I]);
+
+			CodeComplForm.lbCompletion.Items.EndUpdate;
+
+			CodeComplForm.Show;
+			CodeComplForm.lbCompletion.SetFocus;
+			CodeComplForm.lbCompletion.ItemIndex := 0;
+		end else
+			CodeComplForm.Hide;
+	end;
 end;
 
 function TCodeCompletion.SelectedIsFunction: boolean;
@@ -574,14 +503,6 @@ begin
     Result := nil;
 end;
 
-procedure TCodeCompletion.SetParser(Value: TCppParser);
-begin
-  if fParser <> Value then begin
-    fParser := Value;
-    CodeComplForm.fParser := Value;
-  end;
-end;
-
 procedure TCodeCompletion.SetPosition(Value: TPoint);
 begin
   fPos := Value;
@@ -605,26 +526,9 @@ begin
   end;
 end;
 
-procedure TCodeCompletion.SetColor(Value: TColor);
-begin
-  fColor := Value;
-end;
-
 function TCodeCompletion.IsIncluded(const FileName: AnsiString): boolean;
 begin
   Result := fIncludedFiles.IndexOf(Filename) <> -1;
-end;
-
-{** Modified by Peter **}
-function TCodeCompletion.GetOnCompletion: TCompletionEvent;
-begin
-  Result := CodeComplForm.OnCompletion;
-end;
-
-{** Modified by Peter **}
-procedure TCodeCompletion.SetOnCompletion(Value: TCompletionEvent);
-begin
-  CodeComplForm.OnCompletion := Value;
 end;
 
 end.

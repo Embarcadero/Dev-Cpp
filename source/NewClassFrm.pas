@@ -110,8 +110,8 @@ begin
   finally
     sl.Free;
   end;
-  if Assigned(MainForm.ClassBrowser1.Selected) and (PStatement(MainForm.ClassBrowser1.Selected.Data)^._Kind = skClass) then begin
-    cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser1.Selected.Data)^._Command);
+  if Assigned(MainForm.ClassBrowser.Selected) and (PStatement(MainForm.ClassBrowser.Selected.Data)^._Kind = skClass) then begin
+    cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser.Selected.Data)^._ScopeCmd);
     chkInherit.Checked := True;
   end
   else begin

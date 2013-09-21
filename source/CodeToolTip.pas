@@ -564,12 +564,11 @@ begin
 		Inc(Result, 3 + FDownButton.Width + FUpButton.Left);
 	end;
 
-	CurPos := 1;
 	ArgumentIndex := -1;
 	HighlightStart := 0;
 
 	// now loop through the hint and draw each letter
-	while Caption[CurPos] <> #0 do begin
+	for CurPos := 1 to Length(Caption) do begin
 
 		// we use a lookup editor to get the syntax coloring for our tooltips and check for strings
 		FLookupEditor.CaretX := CurPos;
@@ -601,8 +600,6 @@ begin
 
 			Inc(Result, TextWidth(Caption[CurPos]));
 		end;
-
-		Inc(CurPos);
 	end;
 end;
 
@@ -643,12 +640,11 @@ begin
 		Inc(WidthParam, 3 + FDownButton.Width + FUpButton.Left);
 	end;
 
-	CurPos := 1;
 	ArgumentIndex := -1;
 	HighlightStart := 0;
 
 	// now loop through the hint and draw each letter
-	while Caption[CurPos] <> #0 do begin
+	for CurPos := 1 to Length(Caption) do begin
 
 		// we use a lookup editor to get the syntax coloring for our tooltips and check for strings
 		FLookupEditor.CaretX := CurPos;
@@ -681,8 +677,6 @@ begin
 			TextOut(WidthParam, 1, Caption[CurPos]);
 			Inc(WidthParam, TextWidth(Caption[CurPos]));
 		end;
-
-		Inc(CurPos);
 	end;
 	Canvas.CopyRect(ClientRect, FBmp.Canvas, ClientRect);
 end;
@@ -805,7 +799,7 @@ var
 	nCommas : Integer;
 begin
 
-	// get the current position in the uncollapsed text
+	// get the current position in the collapsed text
 	Idx := FEditor.RowColToCharIndex(FEditor.CaretXY,true);
 	CurPos := Idx;
 
@@ -969,7 +963,7 @@ end;
 procedure TCodeToolTip.WMEraseBkgnd(var Message: TWMEraseBkgnd);
 // override WMEraseBkgnd to avoid flickering
 begin
-  Message.Result := 1;
+	Message.Result := 1;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------

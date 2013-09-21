@@ -100,7 +100,7 @@ type
     tabCBBrowser: TTabSheet;
     tabCBCompletion: TTabSheet;
     lblClassBrowserSample: TLabel;
-    ClassBrowser1: TClassBrowser;
+    ClassBrowser: TClassBrowser;
     gbCBEngine: TGroupBox;
     chkCBParseGlobalH: TCheckBox;
     chkCBParseLocalH: TCheckBox;
@@ -216,6 +216,9 @@ type
     procedure edEditorSizeChange(Sender: TObject);
     procedure edGutterSizeChange(Sender: TObject);
     procedure cboEditorFontChange(Sender: TObject);
+    procedure cpHighColorDefaultSelect(Sender: TObject);
+    procedure cpHighColorHint(Sender: TObject; Cell: Integer;
+      var Hint: String);
   private
     ffgColor: TColor;
     fbgColor: TColor;
@@ -701,10 +704,10 @@ begin
 
 	// Class browsing
 	chkEnableClassBrowser.Checked:=devClassBrowsing.Enabled;
-	ClassBrowser1.Enabled:=chkEnableClassBrowser.Checked;
-	ClassBrowser1.UseColors:=devClassBrowsing.UseColors;
-	ClassBrowser1.ShowInheritedMembers:=devClassBrowsing.ShowInheritedMembers;
-	ClassBrowser1.ShowSampleData; // Class browsing page preview
+	ClassBrowser.Enabled:=chkEnableClassBrowser.Checked;
+	ClassBrowser.UseColors:=devClassBrowsing.UseColors;
+	ClassBrowser.ShowInheritedMembers:=devClassBrowsing.ShowInheritedMembers;
+	ClassBrowser.ShowSampleData; // Class browsing page preview
 	chkCBParseLocalH.Checked:= devClassBrowsing.ParseLocalHeaders;
 	chkCBParseGlobalH.Checked:= devClassBrowsing.ParseGlobalHeaders;
 	chkCBParseLocalH.Enabled:= chkEnableClassBrowser.Checked;
@@ -855,7 +858,7 @@ begin
 	end;
 
 	// Save our code snippet even if we opted not to use it (user may want to keep it)
-	if Length(seDefault.Text) > 0 then
+	if not IsEmpty(seDefault) then
 		seDefault.Lines.SavetoFile(devDirs.Config + DEV_DEFAULTCODE_FILE)
 	else
 		DeleteFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
@@ -993,14 +996,14 @@ end;
 
 procedure TEditorOptForm.DefaultSelect(Sender: TObject);
 begin
-  with (Sender as TColorPickerButton) do
-    SelectionColor:= clNone;
+	with (Sender as TColorPickerButton) do
+		SelectionColor:= clNone;
 end;
 
 procedure TEditorOptForm.PickerHint(Sender: TObject; Cell: integer; var Hint: AnsiString);
 begin
-  if Cell = DEFAULTCELL then
-   Hint:= Lang[ID_EOPT_HINTWHITESPACE];
+	if Cell = DEFAULTCELL then
+		Hint:= Lang[ID_EOPT_HINTWHITESPACE];
 end;
 
 procedure TEditorOptForm.StyleChange(Sender: TObject);
@@ -1145,16 +1148,26 @@ begin
   end;
 end;
 
-procedure TEditorOptForm.cpMarginColorHint(Sender: TObject; Cell: Integer;
-  var Hint: AnsiString);
-begin
-  if Cell = DEFAULTCELL then
-   Hint:= Lang[ID_EOPT_HINTHIGHLIGHT];
-end;
-
 procedure TEditorOptForm.cpMarginColorDefaultSelect(Sender: TObject);
 begin
-	cpMarginColor.SelectionColor:= clHighlightText;
+	cpMarginColor.SelectionColor:= cl3DLight;
+end;
+
+procedure TEditorOptForm.cpMarginColorHint(Sender: TObject; Cell: Integer;var Hint: AnsiString);
+begin
+	if Cell = DEFAULTCELL then
+		Hint:= Lang[ID_EOPT_HINTHIGHLIGHT];
+end;
+
+procedure TEditorOptForm.cpHighColorDefaultSelect(Sender: TObject);
+begin
+	cpHighColor.SelectionColor:= $FFFFCC;
+end;
+
+procedure TEditorOptForm.cpHighColorHint(Sender: TObject; Cell: Integer;var Hint: String);
+begin
+	if Cell = DEFAULTCELL then
+		Hint:= Lang[ID_EOPT_HINTWHITESPACE];
 end;
 
 procedure TEditorOptForm.cbLineNumClick(Sender: TObject);
@@ -1174,7 +1187,7 @@ var
  i: integer;
  attr: TSynHighlighterAttributes;
 begin
-	if cboQuickColor.ItemIndex > 6 then begin
+	if cboQuickColor.ItemIndex > 7 then begin
 		// custom style; load from disk
 		LoadSyntax(cboQuickColor.Items[cboQuickColor.ItemIndex]);
 		Exit;
@@ -1366,7 +1379,7 @@ end;
 procedure TEditorOptForm.chkEnableClassBrowserClick(Sender: TObject);
 begin
   // browser
-  ClassBrowser1.Enabled:=chkEnableClassBrowser.Checked;
+  ClassBrowser.Enabled:=chkEnableClassBrowser.Checked;
   chkCBParseLocalH.Enabled:= chkEnableClassBrowser.Checked;
   chkCBParseGlobalH.Enabled:= chkEnableClassBrowser.Checked;
   chkCBUseColors.Enabled:= chkEnableClassBrowser.Checked;
@@ -1471,8 +1484,8 @@ end;
 
 procedure TEditorOptForm.chkCBUseColorsClick(Sender: TObject);
 begin
-  ClassBrowser1.UseColors:=chkCBUseColors.Checked;
-  ClassBrowser1.Refresh;
+  ClassBrowser.UseColors:=chkCBUseColors.Checked;
+  ClassBrowser.Refresh;
 end;
 
 procedure TEditorOptForm.btnCCCnewClick(Sender: TObject);
@@ -1600,8 +1613,8 @@ end;
 
 procedure TEditorOptForm.chkCBShowInheritedClick(Sender: TObject);
 begin
-  ClassBrowser1.ShowInheritedMembers:=chkCBShowInherited.Checked;
-  ClassBrowser1.Refresh;
+  ClassBrowser.ShowInheritedMembers:=chkCBShowInherited.Checked;
+  ClassBrowser.Refresh;
 end;
 
 procedure TEditorOptForm.OnGutterClick(Sender: TObject;

@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 863
-  Top = 503
+  Left = 1155
+  Top = 517
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 462
@@ -288,8 +288,8 @@ object EditorOptForm: TEditorOptForm
           DefaultText = 'default'
           PopupSpacing = 8
           ShowSystemColors = False
-          OnDefaultSelect = cpMarginColorDefaultSelect
-          OnHint = cpMarginColorHint
+          OnDefaultSelect = cpHighColorDefaultSelect
+          OnHint = cpHighColorHint
         end
         object cbHighlightColor: TLabel
           Left = 115
@@ -682,7 +682,7 @@ object EditorOptForm: TEditorOptForm
           'Keyword'
           'Number'
           'Background'
-          'AnsiString'
+          'String'
           'Symbol'
           'WhiteSpace'
           'Directives')
@@ -740,7 +740,8 @@ object EditorOptForm: TEditorOptForm
           'Ocean'
           'Visual Studio'
           'Borland'
-          'Matrix')
+          'Matrix'
+          'Obsidian')
       end
       object edSyntaxExt: TEdit
         Left = 168
@@ -1008,7 +1009,7 @@ object EditorOptForm: TEditorOptForm
             Height = 15
             Caption = 'Sample:'
           end
-          object ClassBrowser1: TClassBrowser
+          object ClassBrowser: TClassBrowser
             Left = 84
             Top = 156
             Width = 333

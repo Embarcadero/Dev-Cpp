@@ -50,10 +50,10 @@ type
 
    // load/save functions
    procedure SaveSettingB(const key: AnsiString; const entry: AnsiString; const value: boolean);
-   procedure SaveSettingS(const key: AnsiString; const Entry: AnsiString; const value: AnsiString);
+   procedure SaveSettingS(const key: AnsiString; const entry: AnsiString; const value: AnsiString);
 
-   function LoadSettingB(const key,entry: AnsiString): boolean; overload;
-   function LoadSettingB(const key,entry,default: AnsiString): boolean; overload;
+   function LoadSettingB(const key: AnsiString; const entry: AnsiString): boolean; overload;
+   function LoadSettingB(const key: AnsiString; const entry: AnsiString; const default: AnsiString): boolean; overload;
    function LoadSettingS(const key: AnsiString; const entry: AnsiString): AnsiString;
 
    // load/save TCFGOptions
@@ -176,12 +176,12 @@ begin
 	end;
 end;
 
-function TConfigData.LoadSettingS(const key, entry: AnsiString): AnsiString;
+function TConfigData.LoadSettingS(const key: AnsiString; const entry: AnsiString): AnsiString;
 begin
 	result:= GetINI.LoadSetting(key, Entry);
 end;
 
-procedure TConfigData.SaveSettingS(const key: AnsiString; const Entry: AnsiString;const value: AnsiString);
+procedure TConfigData.SaveSettingS(const key: AnsiString; const entry: AnsiString; const value: AnsiString);
 begin
 	GetINI.SaveSettingS(key, Entry, Value);
 end;

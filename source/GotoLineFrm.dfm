@@ -1,6 +1,6 @@
 object GotoLineForm: TGotoLineForm
-  Left = 467
-  Top = 408
+  Left = 587
+  Top = 624
   ActiveControl = Line
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
@@ -32,8 +32,8 @@ object GotoLineForm: TGotoLineForm
     Top = 28
     Width = 137
     Height = 24
-    MaxValue = 2
-    MinValue = 1
+    MaxValue = 0
+    MinValue = 0
     TabOrder = 0
     Value = 1
     OnKeyDown = LineKeyDown

@@ -63,9 +63,9 @@ type
     function Open(const FileName: AnsiString): boolean;
     procedure SetLang(const Lang: AnsiString);
 
-    function FileFromDescription(Desc: AnsiString): AnsiString;
+    function FileFromDescription(const Desc: AnsiString): AnsiString;
 
-    property Strings[index: integer]: AnsiString read GetString; default;//write SetString;
+    property Strings[index: integer]: AnsiString read GetString; default;
     property CurrentLanguage: AnsiString read GetLangName;
     property Langs: ToysStringList read fLangList write fLangList;
   end;
@@ -280,18 +280,18 @@ begin
     end;
 end;
 
-function TdevMultiLangSupport.FileFromDescription(Desc: AnsiString): AnsiString;
+function TdevMultiLangSupport.FileFromDescription(const Desc: AnsiString): AnsiString;
 var
-  idx: integer;
+	i: integer;
 begin
-  // returns the filename of the lang file described as Desc
-  // for example with Desc="English (Original)", returns "English.lng"
-  Result:=Desc;
-  for idx:=0 to fLangList.Count-1 do
-    if CompareText(fLangList.Values[idx], Desc)=0 then begin
-      Result:=ExtractFilename(fLangList.Names[idx]);
-      Break;
-    end;
+	// returns the filename of the lang file described as Desc
+	// for example with Desc="English (Original)", returns "English.lng"
+	Result:=Desc;
+	for i := 0 to fLangList.Count - 1 do
+		if SameText(fLangList.Values[i], Desc) then begin
+			Result:=ExtractFilename(fLangList.Names[i]);
+			Break;
+		end;
 end;
 
 end.

@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
- Windows, Classes, Sysutils, Forms, ShellAPI, Dialogs, SynEditHighlighter,
+ Windows, Classes, Sysutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
  Menus, Registry;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -121,7 +121,7 @@ type
 
 	function ProgramHasConsole(const path : AnsiString) : boolean;
 
-// Fast replacements of Ansi functions
+// Fast replacements of localized functions
 function EndsStr(const subtext, text: AnsiString): boolean;
 function EndsText(const subtext, text: AnsiString): boolean;
 
@@ -140,6 +140,8 @@ function StartsText(const subtext,text : AnsiString) : boolean;
 function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
 function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
 
+function IsEmpty(editor : TSynEdit) : boolean;
+
 implementation
 
 uses
@@ -149,6 +151,19 @@ uses
 {$IFDEF LINUX}
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
+
+function IsEmpty(editor : TSynEdit) : boolean;
+var
+	i : integer;
+begin
+	Result := true;
+	for i := 0 to editor.Lines.Count - 1 do begin
+		if Length(editor.Lines[i]) > 0 then begin
+			Result := false;
+			break;
+		end;
+	end;
+end;
 
 function EndsStr(const subtext, text: AnsiString): boolean;
 var
@@ -212,7 +227,7 @@ begin
 	Result := SameText(subtext, Copy(text, 1, Length(subtext)));
 end;
 
-function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
+function ReplaceFirstStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 var
 	Offset: Integer;
 begin
@@ -227,7 +242,7 @@ begin
 	end;
 end;
 
-function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
+function ReplaceFirstText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 var
 	Offset: Integer;
 	UpperS,UpperOldPattern : string;
@@ -270,7 +285,7 @@ begin
 end;
 
 // got tired of typing application.handle,PAnsiChar,PAnsiChar MB_OK, etc ;)
-procedure MsgBox(const text:AnsiString;const caption:AnsiString);
+procedure MsgBox(const text,caption:AnsiString);
 begin
 	MessageBox(application.handle,PAnsiChar(text),PAnsiChar(caption),MB_OK);
 end;

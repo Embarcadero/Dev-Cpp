@@ -32,34 +32,19 @@ uses
 {$ENDIF}
 
 type
-  {** Modified by Peter **}
-  TCompletionEvent = procedure(Sender: TObject; const AStatement: TStatement; const AIndex: Integer) of object;
-  
   TCodeComplForm = class(TForm)
     lbCompletion: TListBox;
     procedure FormShow(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
     procedure lbCompletionDblClick(Sender: TObject);
-    procedure lbCompletionDrawItem(Control: TWinControl; Index: Integer;
-      Rect: TRect; State: TOwnerDrawState);
-    procedure lbCompletionKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure lbCompletionDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
+    procedure lbCompletionKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     fOwner: TCodeCompletion;
-    fColor: TColor;
-    FOnCompletion: TCompletionEvent; {** Modified by Peter **}
-  protected
-    procedure DoCompletion; virtual;
   public
-    { Public declarations }
-    fCompletionStatementList: TList;
-    fParser: TCppParser;
     constructor Create(AOwner: TComponent); override;
     procedure CreateParams(var Params: TCreateParams); override;
-    procedure SetColor(Value: TColor);
-  published
-    property OnCompletion: TCompletionEvent read FOnCompletion write FOnCompletion; {** Modified by Peter **}
   end;
 
 var
@@ -70,165 +55,111 @@ implementation
 {$R *.dfm}
 
 procedure TCodeComplForm.FormShow(Sender: TObject);
-begin       
-  Width := fOwner.Width;
-  Height := fOwner.Height;
-  lbCompletion.Font.Name := 'Tahoma';  {** Modified by Peter **}
-  lbCompletion.Font.Size := 8; {** Modified by Peter **}
-  lbCompletion.DoubleBuffered := True;
-  lbCompletion.SetFocus;
-  if lbCompletion.Items.Count > 0 then
-    lbCompletion.ItemIndex := 0;
+begin
+	Width := fOwner.Width;
+	Height := fOwner.Height;
 end;
 
 procedure TCodeComplForm.FormDeactivate(Sender: TObject);
 begin
-  Hide;
+	fOwner.Hide;
 end;
 
 procedure TCodeComplForm.CreateParams(var Params: TCreateParams);
 begin
-  inherited CreateParams(Params);
+	inherited CreateParams(Params);
 
-  Params.Style := Params.Style or WS_SIZEBOX;
+	Params.Style := Params.Style or WS_SIZEBOX;
 end;
 
 constructor TCodeComplForm.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-  
-  fOwner := TCodeCompletion(AOwner); 
-end;
+	inherited Create(AOwner);
 
-{** Modified by Peter **}
-procedure TCodeComplForm.DoCompletion;
-begin
-  Hide;
-  Application.ProcessMessages;
-   
-  with lbCompletion do
-  begin
-    if (FCompletionStatementList.Count > ItemIndex) and (ItemIndex > -1) then
-    begin
-      if Assigned(FOnCompletion) then
-        FOnCompletion(FOwner, PStatement(FCompletionStatementList[ItemIndex])^, ItemIndex); 
-    end;
-  end;
-end;
+	lbCompletion.Font.Name := 'Courier New';
+	lbCompletion.Font.Size := 10;
+	lbCompletion.DoubleBuffered := True;
 
-procedure TCodeComplForm.SetColor(Value: TColor);
-begin
-  if Value <> fColor then begin
-    fColor := Value;
-    lbCompletion.Color := fColor;
-    Color := fColor;
-  end;
+	fOwner := TCodeCompletion(AOwner);
 end;
 
 procedure TCodeComplForm.lbCompletionDblClick(Sender: TObject);
 var
-  Key: Char;
+	Key: Char;
 begin
-  if Assigned(OnKeyPress) then 
-  begin
-    Key := #13;
-    OnKeyPress(Self, Key);
-  end;
-  {** Modified by Peter **}
-  DoCompletion;
-  //Hide;
+	// Send command to TEditor
+	if Assigned(OnKeyPress) then begin
+		Key := Char(VK_RETURN);
+		fOwner.OnKeyPress(self,Key);
+	end;
 end;
 
-procedure TCodeComplForm.lbCompletionDrawItem(Control: TWinControl;
-  Index: Integer; Rect: TRect; State: TOwnerDrawState);
+procedure TCodeComplForm.lbCompletionDrawItem(Control: TWinControl;Index: Integer; Rect: TRect; State: TOwnerDrawState);
 var
-  Offset: integer;
-  C, BC: TColor;
+	Offset: integer;
+	statement : PStatement;
 begin
-  if fCompletionStatementList = nil then
-    Exit;
-  if not lbCompletion.Visible then
-    Exit;
-  if fCompletionStatementList.Count <= Index {+ 1  ??? }then
-    Exit;
-  if fCompletionStatementList[Index] = nil then
-    Exit;
 
-    
-  with lbCompletion do begin
-    if fCompletionStatementList.Count > 0 then begin
-      if odSelected in State then begin
-        Canvas.Brush.Color := clHighlight;
-        Canvas.FillRect(Rect);
-        Canvas.Font.Color := clHighlightText;
-      end
-      else begin
-        Canvas.Brush.Color := fColor;
-        Canvas.FillRect(Rect);
-        case PStatement(fCompletionStatementList[Index])^._Kind of
-          skFunction: Canvas.Font.Color := clGreen;
-          skClass: Canvas.Font.Color := clMaroon;
-          skVariable: Canvas.Font.Color := clBlue;
-          skTypedef: Canvas.Font.Color := clOlive;
-          skPreprocessor: Canvas.Font.Color := clPurple;
-          skEnum: Canvas.Font.Color := clNavy;
-        else
-          Canvas.Font.Color := clGray;
-        end;
-      end;
+	Offset := 4;
 
-      Offset := Rect.Bottom - Rect.Top;
-      C := Canvas.Font.Color;
-      BC := Canvas.Brush.Color;
-      Canvas.Font.Color := clWhite;
-      Canvas.Pen.Style := psClear;
-      Canvas.Rectangle(Rect.Left, Rect.Top, Rect.Left + Offset, Rect.Bottom);
-      case PStatement(fCompletionStatementList[Index])^._ClassScope of
-        scsPrivate: Canvas.Brush.Color := clRed;
-        scsProtected: Canvas.Brush.Color := clMaroon;
-        scsPublic, scsPublished: Canvas.Brush.Color := clGreen;
-      end;
-      Canvas.Rectangle(Rect.Left + 4, Rect.Top + 4, Rect.Left + Offset - 4, Rect.Bottom - 4);
-      Inc(Offset, 8);
+	with lbCompletion do begin
 
-      Canvas.Brush.Color := BC;
-      Canvas.Font.Color := C;
-      Canvas.TextOut(Rect.Left + Offset, Rect.Top, fParser.StatementKindStr(PStatement(fCompletionStatementList[Index])^._Kind));
-      if not (odSelected in State) then
-        Canvas.Font.Color := clWindowText;
-      Canvas.Font.Style := [];
+		statement := PStatement(Items.Objects[Index]);
 
-      Canvas.TextOut(64 + Rect.Left + Offset, Rect.Top, PStatement(fCompletionStatementList[Index])^._Type);
-      Offset := Offset + Canvas.TextWidth(PStatement(fCompletionStatementList[Index])^._Type + ' ');
-      Canvas.Font.Style := [fsBold];
-      Canvas.TextOut(64 + Rect.Left + Offset, Rect.Top, PStatement(fCompletionStatementList[Index])^._ScopelessCmd);
-      Offset := Offset + Canvas.TextWidth(PStatement(fCompletionStatementList[Index])^._ScopelessCmd + ' ');
-      Canvas.Font.Style := [];
-      Canvas.TextOut(64 + Rect.Left + Offset, Rect.Top, PStatement(fCompletionStatementList[Index])^._Args);
-    end;
-  end;
+		// Draw statement kind string, like 'Preprocessor'
+		if odSelected in State then begin
+			Canvas.Brush.Color := clHighlight;
+			Canvas.FillRect(Rect);
+			Canvas.Font.Color := clHighlightText;
+		end else begin
+			Canvas.Brush.Color := fOwner.Color;
+			Canvas.FillRect(Rect);
+			case statement^._Kind of
+				skFunction: Canvas.Font.Color := clGreen;
+				skClass: Canvas.Font.Color := clMaroon;
+				skVariable: Canvas.Font.Color := clBlue;
+				skTypedef: Canvas.Font.Color := clOlive;
+				skPreprocessor: Canvas.Font.Color := clPurple;
+				skEnum: Canvas.Font.Color := clNavy;
+			else
+				Canvas.Font.Color := clGray;
+			end;
+		end;
+		Canvas.TextOut(Offset, Rect.Top, fOwner.Parser.StatementKindStr(statement^._Kind));
+		Offset := Offset + Canvas.TextWidth('Preprocessor '); // worst case width + spacing
+		if not (odSelected in State) then
+			Canvas.Font.Color := clWindowText;
+
+		// Draw data type string, like 'int', hide for defines/others that don't have this property
+		if Length(statement^._Type) > 0 then begin
+			Canvas.TextOut(Offset, Rect.Top, statement^._Type);
+			Offset := Offset + Canvas.TextWidth(statement^._Type + ' ');
+		end;
+
+		// draw statement name, like 'foo'
+		Canvas.Font.Style := [fsBold];
+		Canvas.TextOut(Offset, Rect.Top, statement^._ScopelessCmd);
+		Offset := Offset + Canvas.TextWidth(statement^._ScopelessCmd + ' ');
+
+		// if applicable, draw arguments
+		if statement^._Kind in [skFunction,skConstructor,skDestructor] then begin
+			Canvas.Font.Style := [];
+			Canvas.TextOut(Offset, Rect.Top, statement^._Args);
+		end;
+	end;
 end;
 
-procedure TCodeComplForm.lbCompletionKeyDown(Sender: TObject;
-  var Key: Word; Shift: TShiftState);
+procedure TCodeComplForm.lbCompletionKeyPress(Sender: TObject;var Key: Char);
 begin
-  {** Modified by Peter **}
-  case Key of
-{$IFDEF WIN32}
-    VK_TAB,
-    VK_RETURN:     
-{$ENDIF}
-{$IFDEF LINUX}
-    XK_TAB,
-    XK_RETURN:     
-{$ENDIF}
-      begin
-        DoCompletion;  
-      end;
-  end;
+	case Key of
+		Char(VK_ESCAPE), '.', '>': begin
+			fOwner.Hide;
+		end;
+	end;
+
+	if Assigned(fOwner.OnKeyPress) then
+		fOwner.OnKeyPress(self, Key);
 end;
-
-
 
 end.
 
