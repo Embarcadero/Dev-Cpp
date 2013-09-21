@@ -32,8 +32,8 @@ const
 
 	// misc strings
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.2.0.2 RC6';
-	DEVCPP_BUILDTIME     = 'May 23 2012 - 9:44';
+	DEVCPP_VERSION       = '5.2.0.2 RC7';
+	DEVCPP_BUILDTIME     = 'May 23 2012 - 20:58';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';

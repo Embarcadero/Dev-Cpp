@@ -1411,40 +1411,17 @@ end;
 
 procedure TEditor.CommentSelection;
 var
-	CurPos: Integer;
-	localcopy : AnsiString;
-	P : PAnsiChar;
+	pre,post,I : integer;
 begin
 	// start an undoblock, so we can undo it afterwards!
 	fText.BeginUndoBlock;
 	fText.BeginUpdate;
 
-	if fText.SelAvail then begin
+	pre := fText.BlockBegin.Line;
+	post := fText.BlockEnd.Line;
 
-		// Comment the first line
-		localcopy := '//' + FText.SelText;
-		P := PAnsiChar(localcopy);
-		CurPos := 0;
-
-		while P[CurPos] <> #0 do begin
-
-			// Found an enter sequence, stop after end
-			if(P[CurPos] in [#13,#10]) then begin
-				repeat
-					Inc(CurPos);
-				until not (P[CurPos] in [#13,#10]);
-
-				// And insert '//'
-				Insert('//',localcopy,CurPos+1);
-			end;
-			Inc(CurPos);
-		end;
-
-		fText.SelText := localcopy;
-	end else begin
-		fText.LineText := '//' + fText.LineText;
-		fText.CaretX := fText.CaretX + 2;
-	end;
+	for I := pre - 1 to post - 1 do
+		fText.Lines[I] := '//' + fText.Lines[I];
 
 	fText.EndUpdate;
 	fText.EndUndoBlock;
@@ -1469,53 +1446,31 @@ end;
 
 procedure TEditor.UncommentSelection;
 var
-	CurPos: Integer;
-	localcopy : AnsiString;
-	P : PAnsiChar;
+	pre,post,I,J : integer;
+	line : string;
 begin
 	// start an undoblock, so we can undo it afterwards!
 	fText.BeginUndoBlock;
 	fText.BeginUpdate;
 
-	if fText.SelAvail then
-		localcopy := FText.SelText
-	else
-		localcopy := FText.LineText;
+	pre := fText.BlockBegin.Line;
+	post := fText.BlockEnd.Line;
 
-	P := PAnsiChar(localcopy);
-	CurPos := 0;
-	while P[CurPos] <> #0 do begin
-
-		// We've found an enter or we started at a blank character, look for next nonblank
-		if (P[CurPos] = #13) or (P[CurPos] = #10) or ((CurPos = 0) and (P[CurPos] in [#0..#32])) then begin
-			repeat
-				Inc(CurPos);
-			until not (P[CurPos] in [#0..#32]);
+	for I := pre - 1 to post - 1 do begin
+		line := fText.Lines[I];
+		for J := 1 to Length(line) - 1 do begin
+			if (line[J] = '/') and (line[J+1] = '/') then begin
+				Delete(line,J,2);
+				fText.Lines[I] := line;
+				break;
+			end;
+			if not (line[J] in [#0..#32]) then break;
 		end;
-
-		// Is this next nonblank equal to // ?
-		if (P[CurPos] = '/') and (P[CurPos+1] = '/') then begin
-			Delete(localcopy,CurPos+1,2); // one based...
-
-			// Walk up to next enter to prevent multiple uncomments
-			repeat
-				Inc(CurPos);
-			until P[CurPos] in [#13,#10];
-		end;
-
-		Inc(CurPos);
-	end;
-
-	if fText.SelAvail then
-		FText.SelText := localcopy
-	else begin
-		fText.CaretX := fText.CaretX - 2;
-		fText.LineText := localcopy;
 	end;
 
 	fText.EndUpdate;
-	FText.EndUndoBlock;
-	FText.UpdateCaret;
+	fText.EndUndoBlock;
+	fText.UpdateCaret;
 end;
 
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
