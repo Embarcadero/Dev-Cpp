@@ -35,7 +35,7 @@ uses
 
 type
   TEditor = class;
-  TDebugGutter = class(TSynEditPlugin)
+  TDebugGutter = class(TSynEditPlugin) // use other name, used for compiler/find messages too now
   protected
     e : TEditor;
     procedure AfterPaint(ACanvas: TCanvas; const AClip: TRect;FirstLine, LastLine: integer); override;
@@ -89,7 +89,7 @@ type
 
     procedure MouseOverTimer(Sender : TObject);
 
-    procedure SetEditorText(Key: Char);
+    procedure CompletionInsert(const append: AnsiString);
     procedure CompletionTimer(Sender: TObject);
 
     function FunctionTipAllowed : boolean;
@@ -176,29 +176,70 @@ end;
 
 procedure TDebugGutter.LinesInserted(FirstLine, Count: integer);
 var
-	I : integer;
+	I,line : integer;
 	bp : PBreakPoint;
+
+	procedure LinesInsertedList(Items : TListItems);
+	var
+		I : integer;
+	begin
+		for I := 0 to Items.Count - 1 do begin
+			if SameFileName(e.fFileName,Items[i].SubItems[1]) then begin
+				line := StrToIntDef(Items[i].Caption,-1);
+				if (line >= FirstLine) then
+					Items[i].Caption := IntToStr(line + Count);
+			end;
+		end;
+	end;
 begin
 	for I := 0 to MainForm.fDebugger.BreakPointList.Count - 1 do begin
 		bp := PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I]);
 		if (integer(bp^.editor) = integer(e)) and (bp^.line >= FirstLine) then
 			Inc(bp^.line,Count);
 	end;
+
+	LinesInsertedList(MainForm.CompilerOutput.Items);
+	LinesInsertedList(MainForm.ResourceOutput.Items);
+	LinesInsertedList(MainForm.FindOutput.Items);
 end;
 
 procedure TDebugGutter.LinesDeleted(FirstLine, Count: integer);
 var
-	I : integer;
+	I,line : integer;
 	bp : PBreakPoint;
+
+	procedure LinesDeletedList(Items : TListItems);
+	var
+		I : integer;
+	begin
+		for I := Items.Count - 1 downto 0 do begin
+			if SameFileName(e.fFileName,Items[i].SubItems[1]) then begin
+				line := StrToIntDef(Items[i].Caption,-1);
+				if (line >= FirstLine) then begin
+					if (line >= FirstLine + Count) then
+						Items[i].Caption := IntToStr(line - Count)
+					else
+						Items.Delete(I);
+				end;
+			end;
+		end;
+	end;
+
 begin
-	for I := MainForm.fDebugger.BreakPointList.Count - 1 downto 0 do begin
+	for I := MainForm.fDebugger.BreakPointList.Count -1 downto 0 do begin
 		bp := PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I]);
-		if (integer(bp^.editor) = integer(e)) and (bp^.line >= FirstLine) then
+		if (integer(bp^.editor) = integer(e)) and (bp^.line >= FirstLine) then begin
 			if (bp^.line >= FirstLine + Count) then
 				Dec(bp^.line,Count)
 			else
 				e.ToggleBreakPoint(bp^.line); // remove breakpoints INSIDE deleted selection
+		end;
 	end;
+
+	// really delete items?
+	LinesDeletedList(MainForm.CompilerOutput.Items);
+	LinesDeletedList(MainForm.ResourceOutput.Items);
+	LinesDeletedList(MainForm.FindOutput.Items);
 end;
 
 { TEditor }
@@ -482,8 +523,7 @@ end;
 // Handle WM_KILLFOCUS instead of all the special cases to hide the code tooltip
 procedure TEditor.EditorExit(Sender : TObject);
 begin
-	if Assigned(fFunctionTip) then
-		fFunctionTip.ReleaseHandle;
+	fFunctionTip.ReleaseHandle;
 end;
 
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
@@ -838,34 +878,20 @@ procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);
 begin
 	// We received a key from the completion box...
 	if fCompletionBox.Enabled then begin
-
-		// The completion form is already shown
-		case Key of
-			Char(VK_BACK): begin
-				if fText.SelStart > 0 then begin
-					fText.SelStart := fText.SelStart - 1;
-					fText.SelEnd := fText.SelStart + 1;
-					fText.SelText := '';
-					fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
-				end;
-			end;
-
-			// We have finished making a selection
-			Char(VK_RETURN),';','(',#9,#32: begin
-				SetEditorText(Key);
-				fCompletionBox.Hide;
-			end;
-
-			// Abort, don't insert anything
-			Char(VK_ESCAPE): begin
-				fCompletionBox.Hide;
-			end;
-
-			// Continue filtering
-			else begin
-				fText.SelText := Key;
-				fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
-			end;
+		if (Key in fText.IdentChars) then begin // Continue filtering
+			fText.SelText := Key;
+			fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
+		end else if Key = Char(VK_BACK) then begin
+			fText.ExecuteCommand(ecDeleteLastChar,#0,nil); // Simulate backspace in editor
+			fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
+		end else if Key = Char(VK_ESCAPE) then begin
+			fCompletionBox.Hide;
+		end else if (Key in [Char(VK_RETURN),'(']) then begin  // Ending chars, don't insert
+			CompletionInsert('');
+			fCompletionBox.Hide;
+		end else begin
+			CompletionInsert(Key);
+			fCompletionBox.Hide;
 		end;
 	end;
 end;
@@ -1063,10 +1089,9 @@ begin
 
 	fCompletionBox.OnKeyPress := CompletionKeyPress;
 
+	// Scan the current function body
 	M := TMemoryStream.Create;
 	try
-
-		// Scan the current function
 		fText.UnCollapsedLines.SaveToStream(M);
 		fCompletionBox.CurrentIndex := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M)
 	finally
@@ -1102,8 +1127,10 @@ begin
 		fFunctionTipTimer.Enabled:=True;
 		fFunctionTipTimer.OnTimer:=FunctionTipTimer;
 		fFunctionTipTimer.Interval:=2*GetCaretBlinkTime; // fancy
-	end else if Assigned(fFunctionTip) then
-		fFunctionTip.ReleaseHandle;
+	end else begin
+		fFunctionTip.ReleaseHandle; // hide
+		FreeAndNil(fFunctionTipTimer); // remove timer, because we only have a limited number avaiable
+	end;
 
 	if devEditor.ParserHints or devData.WatchHint then begin
 		if not Assigned(fMouseOverTimer) then
@@ -1111,6 +1138,8 @@ begin
 		fMouseOverTimer.Enabled:=True;
 		fMouseOverTimer.OnTimer:=MouseOverTimer;
 		fMouseOverTimer.Interval:=500;
+	end else begin
+		FreeAndNil(fMouseOverTimer);
 	end;
 
 	// The other stuff is fully completion dependant
@@ -1123,6 +1152,8 @@ begin
 		fCompletionTimer.Enabled:=False;
 		fCompletionTimer.OnTimer:=CompletionTimer;
 		fCompletionTimer.Interval:=devCodeCompletion.Delay;
+	end else begin
+		FreeAndNil(fCompletionTimer);
 	end;
 end;
 
@@ -1211,12 +1242,13 @@ begin
 
 	// strip pointer bits
 	curpos := 1;
+	len := Length(result); // length can hanve changed
 	while (curpos <= len) and (result[curpos] in ['*','&']) do
 		Inc(curpos);
 	Delete(Result,1,curpos-1);
 end;
 
-procedure TEditor.SetEditorText(Key: Char);
+procedure TEditor.CompletionInsert(const append: AnsiString);
 var
 	Statement: PStatement;
 	FuncAddOn: AnsiString;
@@ -1225,33 +1257,27 @@ begin
 	if not Assigned(Statement) then Exit;
 
 	// if we are inserting a function,
-	if fCompletionBox.SelectedIsFunction then begin
+	if Statement^._Kind in [skFunction, skConstructor, skDestructor] then begin
 
 		// If they argument list is already there, don't add another ()
 		if fText.LineText[fText.WordEnd.Char] <> '(' then begin
-			if Key = ';' then
-				FuncAddOn := '();'
-			else
-				FuncAddOn := '()';
+			FuncAddOn := '()';
 		end else
 			FuncAddOn := '';
 	end else
 		FuncAddOn := '';
-
-	// delete selections made
-	fText.SelText := '';
 
 	// delete the part of the word that's already been typed ...
 	fText.SelStart := fText.RowColToCharIndex(fText.WordStart);
 	fText.SelEnd := fText.RowColToCharIndex(fText.WordEnd);
 
 	// ... by replacing the selection
-	fText.SelText := Statement^._ScopelessCmd + FuncAddOn;
+	fText.SelText := Statement^._ScopelessCmd + FuncAddOn + append;
 
 	// Move caret inside the ()'s, only when the user has something to do there...
 	if (FuncAddOn<>'') and (Statement^._Args <> '()') and (Statement^._Args <> '(void)') then begin
 
-		fText.CaretX := fText.CaretX - Length(FuncAddOn) + 1;
+		fText.CaretX := fText.CaretX - Length(FuncAddOn) - Length(append) + 1;
 
 		// immediately activate function hint
 		if devEditor.ShowFunctionTip and Assigned(fText.Highlighter) then begin
@@ -1326,9 +1352,12 @@ begin
 					M.Free;
 				end;
 
-				if Assigned(st) then
-					fText.Hint := Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow'
-				else
+				if Assigned(st) then begin
+					if st^._ClassScope <> scsNone then
+						fText.Hint := MainForm.CppParser.StatementClassScopeStr(st^._ClassScope) + ' ' + Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow'
+					else
+						fText.Hint := Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow';
+				end else
 					// couldn't find anything? disable hint
 					fText.Hint := '';
 			end;
@@ -1431,7 +1460,7 @@ procedure TEditor.UncommentSelection;
 var
 	oldbbegin,oldbend,oldcaret : TBufferCoord;
 	localcopy : AnsiString;
-	CurPos,len : integer;
+	CurPos : integer;
 begin
 	oldbbegin := fText.BlockBegin;
 	oldbend := fText.BlockEnd;
@@ -1443,21 +1472,15 @@ begin
 	if fText.BlockBegin.Line <> fText.BlockEnd.Line then begin
 		localcopy := fText.SelText;
 		CurPos := 1;
-		len := Length(localcopy);
+		while(CurPos <= Length(localcopy)) do begin
 
-		// Delete the first one
-		if StrLComp(@localcopy[1],'//',2) = 0 then
-			Delete(localcopy,CurPos,2);
-
-		while(CurPos < len) do begin
-
-			// find any enter sequence...
-			if(localcopy[CurPos] in [#13,#10]) then begin
-				repeat
+			// find any enter sequence, and skip all blanks after that...
+			if (localcopy[CurPos] in [#13,#10]) or (CurPos = 1) then begin
+				while (CurPos <= Length(localcopy)) and (localcopy[CurPos] in [#0..#32]) do
 					Inc(CurPos);
-				until (CurPos = len-1) or not (localcopy[CurPos] in [#0..#32]);
 
-				if (CurPos+1 < len) and (StrLComp(@localcopy[CurPos],'//',2) = 0) then
+				// Is the first nonblank text equal to '//' ?
+				if (CurPos + 1 <= Length(localcopy)) and (StrLComp(@localcopy[CurPos],'//',2) = 0) then
 					Delete(localcopy,CurPos,2);
 			end;
 			Inc(CurPos);
@@ -1467,14 +1490,13 @@ begin
 
 		localcopy := fText.LineText;
 		CurPos := 1;
-		len := Length(localcopy);
 
 		// Skip spaces
-		while((CurPos < len) and (localcopy[CurPos] in [#0..#32])) do
+		while(CurPos <= Length(localcopy)) and (localcopy[CurPos] in [#0..#32]) do
 			Inc(CurPos);
 
 		// First nonblank is comment? Remove
-		if (CurPos+1 < len) and (StrLComp(@localcopy[CurPos],'//',2) = 0) then begin
+		if (CurPos+1 <= Length(localcopy)) and (StrLComp(@localcopy[CurPos],'//',2) = 0) then begin
 			fText.BeginUndoBlock;
 
 			Delete(localcopy,CurPos,2);

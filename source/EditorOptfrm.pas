@@ -863,7 +863,7 @@ begin
 
 		// Create the timer when we changed the enable option
 		if not Assigned(MainForm.AutoSaveTimer) then
-			MainForm.AutoSaveTimer := TTImer.Create(Self);
+			MainForm.AutoSaveTimer := TTimer.Create(Self);
 
 		// And set corresponding options
 		MainForm.AutoSaveTimer.Interval := devEditor.Interval*60*1000; // miliseconds to minutes

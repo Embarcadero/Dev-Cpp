@@ -491,7 +491,7 @@ begin
       begin
           Icon := ExtractRelativePath(FileName, Icon);
           Icon := StringReplace(Icon, '\', '/', [rfReplaceAll]);
-          ResFile.Add('A ICON MOVEABLE PURE LOADONCALL DISCARDABLE "' + Icon + '"')
+          ResFile.Add('A ICON "' + Icon + '"')
       end
       else
           fOptions.Icon := '';

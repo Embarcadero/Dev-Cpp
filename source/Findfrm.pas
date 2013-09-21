@@ -396,7 +396,7 @@ begin
 	grpOrigin.Visible := isfind or isreplace;
 	grpScope.Visible := isfind or isreplace;
 	grpWhere.Visible := isfindfiles or isreplacefiles;
-	grpDirection.Visible := not isfindfiles;
+	grpDirection.Visible := isfind or isreplace;
 	// grpOption is always visible
 
 	// Disable project search option when none is open

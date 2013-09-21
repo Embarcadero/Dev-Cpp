@@ -101,6 +101,7 @@ begin
 	with lbCompletion do begin
 
 		statement := PStatement(Items.Objects[Index]);
+		if not Assigned(statement) then Exit;
 
 		// Draw statement kind string, like 'Preprocessor'
 		if odSelected in State then begin

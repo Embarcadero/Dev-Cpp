@@ -248,6 +248,7 @@ type
     procedure SettoDefaults;
     procedure SaveSettings;
     procedure LoadSettings;
+    property OriginalPath: AnsiString read fOldPath write fOldPath; // don't bother to remember, read on startup
   published
     property Exec: AnsiString read fExec write fExec;
     property Config: AnsiString read fConfig write fConfig;
@@ -257,7 +258,6 @@ type
     property Lang: AnsiString read fLang write fLang;
     property Templates: AnsiString read fTemp write fTemp;
     property Themes: AnsiString read fThemes write fThemes;
-    property OriginalPath: AnsiString read fOldPath write fOldPath;
   end;
 
   // editor options -- syntax, synedit options, etc...
@@ -1016,6 +1016,8 @@ begin
 	CurrentSet := Index;
 
 	SetPath(fBinDir);
+
+	// Perform some validation
 end;
 
 procedure TdevCompiler.SaveSet(Index: integer);
@@ -1076,7 +1078,7 @@ begin
 	fLinkAdd := false;
 
 	fDelay := 0;
-	fFastDep := false;
+	fFastDep := true; // handy default
 
 	fBinDir := '';
 	fCDir := '';
@@ -1427,11 +1429,11 @@ begin
 	fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 	fConfig := fExec;
 
-	fHelp   := fExec + HELP_DIR;
-	fIcons  := fExec + ICON_DIR;
-	fLang   := fExec + LANGUAGE_DIR;
-	fTemp   := fExec + TEMPLATE_DIR;
-	fThemes := fExec + THEME_DIR;
+	fHelp    := fExec + HELP_DIR;
+	fIcons   := fExec + ICON_DIR;
+	fLang    := fExec + LANGUAGE_DIR;
+	fTemp    := fExec + TEMPLATE_DIR;
+	fThemes  := fExec + THEME_DIR;
 end;
 
 procedure TdevDirs.LoadSettings;

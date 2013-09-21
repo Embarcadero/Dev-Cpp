@@ -227,15 +227,13 @@ end;
 function GetPrettyLine(hwnd : TListView;i : integer) : AnsiString;
 begin
 	if (i = -1) then begin // selection
-		if (hwnd.itemindex <> -1) then
-			result := StringReplace(StringReplace(hwnd.Items[hwnd.itemindex].Caption + ' ' + hwnd.Items[hwnd.itemindex].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll])
+		if hwnd.ItemIndex <> -1 then
+			result := GetPrettyLine(hwnd,hwnd.ItemIndex)
 		else
 			result := '';
 	end else begin
-		result := hwnd.Items[i].Caption + #10 + hwnd.Items[i].SubItems.Text;
-		result := StringReplace(result,#10,#9,[]);
-		result := StringReplace(result,#13#10,#9,[]);
-		result := StringReplace(result,#13#10,#9,[]);
+		result := hwnd.Items[i].Caption + #13#10 + hwnd.Items[i].SubItems.Text; // CRLF separated columns
+		result := Trim(StringReplace(result,#13#10,#9,[rfReplaceAll]));
 	end;
 end;
 
@@ -1164,6 +1162,5 @@ begin
 		if s[i] = c then
 			Inc(result);
 end;
-
 
 end.

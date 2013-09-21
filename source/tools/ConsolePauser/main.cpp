@@ -1,5 +1,5 @@
 // Execute & Pause
-// Runs a program, then keepsd the console window open after it finishes
+// Runs a program, then keeps the console window open after it finishes
 
 #include <stdio.h>
 #include <windows.h>
@@ -60,6 +60,8 @@ int main(int argc, char** argv) {
 		LocalFree(errortext);
 		return 1;
 	}
+	
+	SetConsoleTitle(argv[1]); // program name
 	
 	WaitForSingleObject(pi.hProcess, INFINITE); // Wait for it to finish
 	

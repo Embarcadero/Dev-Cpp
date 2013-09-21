@@ -130,7 +130,7 @@ type
     MessageControl: TPageControl;
     CompSheet: TTabSheet;
     ResSheet: TTabSheet;
-    ResourceOutput: TListBox;
+    ResourceOutput: TListView;
     LogSheet: TTabSheet;
     Toolbar: TControlBar;
     tbMain: TToolBar;
@@ -327,7 +327,6 @@ type
     N25: TMenuItem;
     Programreset1: TMenuItem;
     CommentheaderMenuItem: TMenuItem;
-    SplitterBottom: TSplitter;
     actComment: TAction;
     actUncomment: TAction;
     actIndent: TAction;
@@ -599,6 +598,7 @@ type
     actSearchAgain1: TMenuItem;
     N75: TMenuItem;
     ToolButton3: TToolButton;
+    SplitterBottom: TSplitter;
 
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
@@ -796,7 +796,6 @@ type
     procedure ReportWindowClose(Sender: TObject; var Action: TCloseAction);
     procedure FloatingPojectManagerItemClick(Sender: TObject);
     procedure actCompileCurrentFileExecute(Sender: TObject);
-    procedure actCompileCurrentFileUpdate(Sender: TObject);
     procedure actSaveProjectAsExecute(Sender: TObject);
     procedure mnuOpenWithClick(Sender: TObject);
     procedure cmbClassesChange(Sender: TObject);
@@ -874,7 +873,7 @@ type
     procedure WMDropFiles(var msg: TMessage); message WM_DROPFILES;
     procedure LogEntryProc(const msg: AnsiString);
     procedure CompOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
-    procedure CompResOutputProc(const _Line, _Unit, _Message: AnsiString);
+    procedure CompResOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
     procedure CompSuccessProc;
     procedure LoadText;
     function SaveFileAs(e : TEditor): Boolean;
@@ -1407,6 +1406,10 @@ begin
 	CompilerOutput.Columns[1].Caption:=	Lang[ID_COL_COL];
 	CompilerOutput.Columns[2].Caption:=	Lang[ID_COL_FILE];
 	CompilerOutput.Columns[3].Caption:=	Lang[ID_COL_MSG];
+	ResourceOutput.Columns[0].Caption:=	Lang[ID_COL_LINE];
+	ResourceOutput.Columns[1].Caption:=	Lang[ID_COL_COL];
+	ResourceOutput.Columns[2].Caption:=	Lang[ID_COL_FILE];
+	ResourceOutput.Columns[3].Caption:=	Lang[ID_COL_MSG];
 	FindOutput.Columns[0].Caption :=	Lang[ID_COL_LINE];
 	FindOutput.Columns[1].Caption :=	Lang[ID_COL_COL];
 	FindOutput.Columns[2].Caption :=	Lang[ID_COL_FILE];
@@ -1901,12 +1904,14 @@ begin
 	end;
 end;
 
-procedure TMainForm.CompResOutputProc(const _Line, _Unit, _Message: AnsiString);
+procedure TMainForm.CompResOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
 begin
-	if (_Line <> '') and (_Unit <> '') then
-		ResourceOutput.Items.Add('Line ' + _Line + ' in file ' + _Unit + ' : ' + _Message)
-	else
-		ResourceOutput.Items.Add(_Message);
+	with ResourceOutput.Items.Add do begin
+		Caption:= _Line;
+		SubItems.Add(_Col);
+		SubItems.Add(GetRealPath(_Unit));
+		SubItems.Add(_Message);
+	end;
 end;
 
 procedure TMainForm.CompSuccessProc;
@@ -1920,13 +1925,18 @@ begin
 	TotalWarnings.Text := IntToStr(fCompiler.WarningCount);
 
 	// Close it if there's nothing to show
-	if (CompilerOutput.Items.Count = 0) and actCompOnNeed.Checked then
+	if (CompilerOutput.Items.Count = 0) and (ResourceOutput.Items.Count = 0) and actCompOnNeed.Checked then begin
 		OpenCloseMessageSheet(FALSE)
 
 	// Or open it if there is anything to show
-	else begin
-		if MessageControl.ActivePage <> CompSheet then
-			MessageControl.ActivePage := CompSheet;
+	end else begin
+		if (CompilerOutput.Items.Count > 0) then begin
+			if MessageControl.ActivePage <> CompSheet then
+				MessageControl.ActivePage := CompSheet;
+		end else if (ResourceOutput.Items.Count > 0) then begin
+			if MessageControl.ActivePage <> ResSheet then
+				MessageControl.ActivePage := ResSheet;
+		end;
 		OpenCloseMessageSheet(TRUE);
 	end;
 
@@ -1966,7 +1976,7 @@ begin
 
 					// This item has a line number, proceed to set cursor properly
 					CompilerOutput.Selected:=CompilerOutput.Items[I];
-					CompilerOutputDblClick(nil);
+					CompilerOutputDblClick(CompilerOutput);
 					Exit;
 				end;
 			end;
@@ -1977,7 +1987,7 @@ begin
 			if not SameStr(CompilerOutput.Items[I].Caption,'') then begin
 				if StartsStr('[Warning]',CompilerOutput.Items[I].SubItems[2]) then begin
 					CompilerOutput.Selected:=CompilerOutput.Items[I];
-					CompilerOutputDblClick(nil);
+					CompilerOutputDblClick(CompilerOutput);
 					Exit;
 				end;
 			end;
@@ -1987,9 +1997,15 @@ begin
 		for I := 0 to CompilerOutput.Items.Count-1 do begin
 			if not SameStr(CompilerOutput.Items[I].Caption,'') then begin
 				CompilerOutput.Selected:=CompilerOutput.Items[I];
-				CompilerOutputDblClick(nil);
+				CompilerOutputDblClick(CompilerOutput);
 				Exit;
 			end;
+		end;
+
+		// Then try to find a resource error
+		if ResourceOutput.Items.Count > 0 then begin
+			ResourceOutput.Selected := ResourceOutput.Items[0];
+			CompilerOutputDblClick(ResourceOutput);
 		end;
 	end;
 end;
@@ -2186,8 +2202,8 @@ var
 begin
 	with TOpenDialog.Create(Self) do try
 
-		Filter:= FLT_ALLFILES;
-		Title:= Lang[ID_NV_OPENFILE];
+		Filter := BuildFilter([FLT_PROJECTS, FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]);
+		Title := Lang[ID_NV_OPENFILE];
 
 		if Execute and (Files.Count > 0) then begin
 			for I := 0 to Files.Count - 1 do
@@ -3050,6 +3066,7 @@ var
 	optD,optS : PCompilerOption;
 	debug,strip : boolean;
 	idxD,idxS : integer;
+	filepath : AnsiString;
 begin
 
 	// Check if we enabled proper options
@@ -3103,8 +3120,10 @@ begin
 		// Reset UI, remove invalid breakpoints
 		PrepareDebugger;
 
+		filepath := fProject.Executable;
+
 		fDebugger.Start;
-		fDebugger.SendCommand('file','"' + StringReplace(fProject.Executable, '\', '/', [rfReplaceAll]) + '"');
+		fDebugger.SendCommand('file','"' + StringReplace(filepath, '\', '/', [rfReplaceAll]) + '"');
 
 		if fProject.Options.typ = dptDyn then
 			fDebugger.SendCommand('exec-file', '"' + StringReplace(fProject.Options.HostApplication, '\', '/', [rfReplaceAll]) +'"');
@@ -3127,8 +3146,10 @@ begin
 
 			PrepareDebugger;
 
+			filepath := ChangeFileExt(e.FileName,EXE_EXT);
+
 			fDebugger.Start;
-			fDebugger.SendCommand('file', '"' + StringReplace(ChangeFileExt(e.FileName,EXE_EXT), '\', '/', [rfReplaceAll]) + '"');
+			fDebugger.SendCommand('file', '"' + StringReplace(filepath, '\', '/', [rfReplaceAll]) + '"');
 		end;
 	end;
 
@@ -3159,8 +3180,10 @@ begin
 		fDebugger.AddBreakpoint(i);
 
 	// Run the debugger
+	fDebugger.SendCommand('set','width 0'); // don't wrap output, very annoying
 	fDebugger.SendCommand('set','new-console on');
 	fDebugger.SendCommand('set','confirm off');
+	fDebugger.SendCommand('cd', ExtractFileDir(filepath)); // restore working directory
 	fDebugger.SendCommand('run',fCompiler.RunParams);
 end;
 
@@ -3314,8 +3337,7 @@ begin
 		0:
 			Clipboard.AsText := GetPrettyLine(CompilerOutput);
 		1:
-			if Resourceoutput.ItemIndex <> -1 then
-				Clipboard.AsText := ResourceOutput.Items[ResourceOutput.ItemIndex];
+			Clipboard.AsText := GetPrettyLine(ResourceOutput);
 		2: begin
 			if TotalErrors.Focused then
 				TotalErrors.CopyToClipboard
@@ -3349,11 +3371,13 @@ begin
 		0: begin
 			ClipBoard.AsText := '';
 			for i:=0 to pred(CompilerOutput.Items.Count) do
-				Clipboard.AsText := Clipboard.AsText + GetPrettyLine(CompilerOutput,i);
+				Clipboard.AsText := Clipboard.AsText + GetPrettyLine(CompilerOutput,i) + #13#10;
 		end;
-		1:
+		1: begin
+			ClipBoard.AsText := '';
 			for i:=0 to pred(ResourceOutput.Items.Count) do
-				Clipboard.AsText:= Clipboard.AsText + ResourceOutput.Items[I] + #13#10;
+				Clipboard.AsText := Clipboard.AsText + GetPrettyLine(ResourceOutput,i) + #13#10;
+		end;
 		2:
 			LogOutput.CopyToClipboard;
 		3: begin
@@ -3369,7 +3393,7 @@ begin
 		4: begin
 			ClipBoard.AsText := '';
 			for i:=0 to pred(FindOutput.Items.Count) do
-				Clipboard.AsText := Clipboard.AsText + GetPrettyLine(FindOutput,i);
+				Clipboard.AsText := Clipboard.AsText + GetPrettyLine(FindOutput,i) + #13#10;
 		end;
 	end;
 end;
@@ -3414,29 +3438,23 @@ end;
 
 procedure TMainForm.actMsgSaveAllExecute(Sender: TObject);
 var
-	i:integer;
-	fulloutput,curline:AnsiString;
+	i: integer;
+	fulloutput: AnsiString;
 	Stream: TFileStream;
-	e : TEditor;
+	e: TEditor;
 begin
 	fulloutput := '';
 	with TSaveDialog.Create(self) do try
 		case MessageControl.ActivePageIndex of
 			0: begin
-				FileName:= 'Formatted Compiler Output';
-				for i := 0 to CompilerOutput.Items.Count - 1 do begin
-					curline := CompilerOutput.Items[i].Caption + #10 + CompilerOutput.Items[i].SubItems.Text;
-					curline := ReplaceFirstStr(curline,#10,#9);
-					curline := ReplaceFirstStr(curline,#13#10,#9);
-					curline := ReplaceFirstStr(curline,#13#10,#9);
-					fulloutput := fulloutput + curline;
-				end;
+				FileName := 'Formatted Compiler Output';
+				for i := 0 to CompilerOutput.Items.Count - 1 do
+					fulloutput := fulloutput + GetPrettyLine(CompilerOutput,i) + #13#10;
 			end;
 			1: begin
 				FileName:= 'Resource Error Log';
-				for i := 0 to ResourceOutput.Items.Count - 1 do begin
-					fulloutput := fulloutput + ResourceOutput.Items[I];
-				end;
+				for i := 0 to ResourceOutput.Items.Count - 1 do
+					fulloutput := fulloutput + GetPrettyLine(ResourceOutput,i) + #13#10;
 			end;
 			2: begin
 				FileName:= 'Raw Build Log';
@@ -3450,13 +3468,8 @@ begin
 			end;
 			4: begin
 				FileName:= 'Find Results';
-				for i:=0 to pred(FindOutput.Items.Count) do begin
-					curline := FindOutput.Items[i].Caption + #10 + FindOutput.Items[i].SubItems.Text;
-					curline := ReplaceFirstStr(curline,#10,#9);
-					curline := ReplaceFirstStr(curline,#13#10,#9);
-					curline := ReplaceFirstStr(curline,#13#10,#9);
-					fulloutput := fulloutput + curline;
-				end;
+				for i:=0 to FindOutput.Items.Count - 1 do
+					fulloutput := fulloutput + GetPrettyLine(FindOutput,i) + #13#10;
 			end;
 		end;
 
@@ -3548,7 +3561,7 @@ var
 	selection : TListItem;
 	errorfiletab: TEditor;
 begin
-	selection := CompilerOutput.Selected;
+	selection := TListView(Sender).Selected; // used by compile and resource lists
 	if Assigned(selection) then begin
 		Line := StrToIntDef(selection.Caption,1);
 		Col := StrToIntDef(selection.SubItems[0],1);
@@ -3981,6 +3994,7 @@ var
 	e : TEditor;
 	CFile,HFile,ToFile: AnsiString;
 	isalreadyopen,iscfile,ishfile : boolean;
+	oldtabindex : integer;
 begin
 	e:= GetEditor;
 	if not Assigned(e) then
@@ -3990,27 +4004,32 @@ begin
 	ishfile := CppParser.IsHfile(e.FileName);
 
 	CppParser.GetSourcePair(e.FileName,CFile,HFile);
-	if iscfile then
+	if iscfile then begin
 		ToFile := HFile
-	else if ishfile then
+	end else if ishfile then begin
 		ToFile := CFile
-	else
-		ToFile := '';
+	end else begin
+		Exit; // don't know file type, don't bother searching
+	end;
 
 	// TODO: Couldn't find our counterpart next to us on disk? Search the project instead?
 
 	// Check before actually opening the file
-	isalreadyopen := FileIsOpen(ToFile) > 0;
+	isalreadyopen := FileIsOpen(ToFile) <> -1;
+	oldtabindex := PageControl.ActivePageIndex; // changed by GetEditorFromFileName
 
 	e := GetEditorFromFileName(ToFile);
 	if Assigned(e) then begin
 
 		// move new file tab next to the old one
 		if not isalreadyopen then
-			e.SetTabIndex(PageControl.ActivePageIndex + 1);
+			e.SetTabIndex(oldtabindex + 1);
 		e.Activate;
-	end else
-		SetStatusBarMessage('Could not find corresponding header/source file!');
+	end else if iscfile then begin
+		SetStatusBarMessage(Lang[ID_MSG_CORRESPONDINGHEADER]);
+	end else if ishfile then begin
+		SetStatusBarMessage(Lang[ID_MSG_CORRESPONDINGSOURCE]);
+	end;
 end;
 
 procedure TMainForm.actSyntaxCheckExecute(Sender: TObject);
@@ -5386,11 +5405,6 @@ begin
 	fCompiler.Compile(e.FileName);
 end;
 
-procedure TMainForm.actCompileCurrentFileUpdate(Sender: TObject);
-begin
-	TCustomAction(Sender).Enabled:= (assigned(fProject) and (PageControl.PageCount > 0)) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling;
-end;
-
 procedure TMainForm.actSaveProjectAsExecute(Sender: TObject);
 begin
 	if not Assigned(fProject) then
@@ -5905,17 +5919,20 @@ begin
 end;
 
 procedure TMainForm.CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+var
+	lowersubitem : AnsiString;
 begin
-	// Color...
-	if ContainsStr(Item.SubItems[2],'[Warning]') then
-		Sender.Canvas.Font.Color := TColor($0066FF); // Orange
-	if ContainsStr(Item.SubItems[2],'[Error]') then
-		Sender.Canvas.Font.Color := clRed;
-	if ContainsStr(Item.SubItems[2],'[Hint]') then
+	if StartsStr('[Warning] ',Item.SubItems[2]) then
+		Sender.Canvas.Font.Color := TColor($0066FF) // Orange
+	else if StartsStr('[Error] ',Item.SubItems[2]) then
+		Sender.Canvas.Font.Color := clRed
+	else if StartsStr('[Hint] ',Item.SubItems[2]) then
 		Sender.Canvas.Font.Color := clYellow;
 
-	// In function/member/etc
-	if StartsStr('in ',LowerCase(Item.SubItems[2])) or StartsStr('at ',LowerCase(Item.SubItems[2])) then
+	// Make direction stuff bold
+	lowersubitem := Trim(LowerCase(Item.SubItems[2]));
+	if StartsStr('in ',lowersubitem) or
+       StartsStr('at ',lowersubitem) then // direction stuff
 		Sender.Canvas.Font.Style := [fsBold];
 end;
 

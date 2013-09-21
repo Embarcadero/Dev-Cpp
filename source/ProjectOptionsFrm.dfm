@@ -1,6 +1,6 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 1048
-  Top = 246
+  Left = 527
+  Top = 304
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -509,25 +509,22 @@ object frmProjectOptions: TfrmProjectOptions
       object lblCompiler: TLabel
         Left = 10
         Top = 24
-        Width = 137
-        Height = 13
-        AutoSize = False
-        Caption = 'Compiler:'
+        Width = 63
+        Height = 15
+        Caption = 'C Compiler:'
       end
       object lblCppCompiler: TLabel
         Left = 190
         Top = 24
-        Width = 141
-        Height = 13
-        AutoSize = False
+        Width = 79
+        Height = 15
         Caption = 'C++ Compiler:'
       end
       object lblLinker: TLabel
         Left = 368
         Top = 24
-        Width = 153
-        Height = 13
-        AutoSize = False
+        Width = 32
+        Height = 15
         Caption = 'Linker'
         WordWrap = True
       end

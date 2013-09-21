@@ -852,6 +852,7 @@ const
   ID_POPT_OPENICO                       = 55020;
   ID_POPT_OPENOBJ                       = 55021;
   ID_POPT_RESDIRS                       = 55022;
+  ID_POPT_CCOMP                         = 55031;
 
   // build output tab
   ID_POPT_OUTDIRGRP                     = 55024;
@@ -970,6 +971,9 @@ const
   ID_MSG_SEGFAULT                       = 60022;
   ID_MSG_SOURCEMORERECENT               = 60023;
   ID_MSG_ATTACH                         = 60024;
+  ID_MSG_CORRESPONDINGSOURCE            = 60025;
+  ID_MSG_CORRESPONDINGHEADER            = 60026;
+
 
   //errors 1500+
   ID_ERR_OPENFILE                       = 61001;

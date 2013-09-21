@@ -186,8 +186,8 @@ begin
 	'	wc.hCursor		 = LoadCursor(NULL, IDC_ARROW);'+#13#10+
 	'	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);'+#13#10+
 	'	wc.lpszClassName = "WindowClass";'+#13#10+
-	'	wc.hIcon		 = LoadIcon(NULL, IDI_APPLICATION);'+#13#10+
-	'	wc.hIconSm		 = LoadIcon(NULL, IDI_APPLICATION);'+#13#10+
+	'	wc.hIcon		 = LoadIcon(NULL, IDI_APPLICATION); /* use "A" as icon name when you want to use the project icon */'+#13#10+
+	'	wc.hIconSm		 = LoadIcon(NULL, IDI_APPLICATION); /* as above */'+#13#10+
 	''+#13#10+
 	'	if(!RegisterClassEx(&wc)) {'+#13#10+
 	'		MessageBox(NULL, "Window Registration Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);'+#13#10+

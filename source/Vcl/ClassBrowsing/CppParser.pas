@@ -892,7 +892,7 @@ begin
           fLastID := AddStatement(cID,
             GetCurrentClass,
             fCurrentFile,
-            Prefix + PToken(fTokenizer.Tokens[fIndex])^.Text,
+            Prefix + ' ' + PToken(fTokenizer.Tokens[fIndex])^.Text,
             Prefix,
             PToken(fTokenizer.Tokens[fIndex])^.Text,
             '',
@@ -930,7 +930,7 @@ begin
             cID := GetClassID(Trim(S1), skClass);
             if cID = -1 then
               cID := CheckForOutstandingTypedef(Trim(S1));
-            fLastID := AddStatement(cID, //UseID,
+            fLastID := AddStatement(cID,
               GetCurrentClass,
               fCurrentFile,
               Prefix + ' ' + Trim(S1),
@@ -2902,7 +2902,6 @@ var
 	s : AnsiString;
 begin
 
-
 	// Remove pointer stuff from type
 	s := aType; // 'Type' is a keyword
 	position := Length(s);
@@ -2922,15 +2921,17 @@ begin
 
 				// We have found the statement of the type directly
 				if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,s) then begin
-					result := fStatementList[I];
+					result := fStatementList[I]; // 'class foo'
 					Exit;
 				end;
 			end else if PStatement(fStatementList[I])^._Kind in [skVariable,skFunction] then begin
+				if SameStr(PStatement(fStatementList[I])^._Type,'') then begin
 
-				// We have found a variable with the same name, search for type
-				if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,s) then begin
-					result := fStatementList[I];
-					Exit;
+					// We have found a variable with the same name, search for type
+					if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,s) then begin
+						result := fStatementList[I];
+						Exit;
+					end;
 				end;
 			end;
 		end;

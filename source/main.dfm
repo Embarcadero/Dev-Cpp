@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 481
-  Top = 256
+  Left = 222
+  Top = 205
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -63,7 +63,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -102,18 +102,44 @@ object MainForm: TMainForm
     object ResSheet: TTabSheet
       Caption = 'Resource'
       ImageIndex = 2
-      object ResourceOutput: TListBox
+      object ResourceOutput: TListView
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
-        BevelInner = bvNone
         BevelOuter = bvNone
-        ItemHeight = 13
+        BorderStyle = bsNone
+        Columns = <
+          item
+            Caption = 'Line'
+            Width = 40
+          end
+          item
+            Caption = 'Col'
+            Width = 40
+          end
+          item
+            Caption = 'Unit'
+            Width = 320
+          end
+          item
+            AutoSize = True
+            Caption = 'Message'
+          end>
+        ColumnClick = False
+        GridLines = True
+        HideSelection = False
+        ReadOnly = True
+        RowSelect = True
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
+        ViewStyle = vsReport
+        OnAdvancedCustomDraw = CompilerOutputAdvancedCustomDraw
+        OnAdvancedCustomDrawItem = CompilerOutputAdvancedCustomDrawItem
+        OnDblClick = CompilerOutputDblClick
+        OnKeyDown = CompilerOutputKeyDown
       end
     end
     object LogSheet: TTabSheet
@@ -192,7 +218,7 @@ object MainForm: TMainForm
       object CompResGroupBox: TPanel
         Left = 233
         Top = 0
-        Width = 595
+        Width = 655
         Height = 154
         Align = alClient
         BevelOuter = bvNone
@@ -200,7 +226,7 @@ object MainForm: TMainForm
         object LogOutput: TMemo
           Left = 0
           Top = 0
-          Width = 595
+          Width = 655
           Height = 154
           Align = alClient
           ReadOnly = True
@@ -217,13 +243,13 @@ object MainForm: TMainForm
         Left = 471
         Top = 0
         Width = 417
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           417
-          155)
+          154)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -245,7 +271,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 410
-          Height = 112
+          Height = 108
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -257,7 +283,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 471
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -265,7 +291,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           471
-          155)
+          154)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -427,7 +453,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 13
+          Height = 9
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -467,7 +493,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -2870,7 +2896,7 @@ object MainForm: TMainForm
       ImageIndex = 28
       ShortCut = 16504
       OnExecute = actCompileCurrentFileExecute
-      OnUpdate = actCompileCurrentFileUpdate
+      OnUpdate = actCompileUpdate
     end
     object actAttachProcess: TAction
       Category = 'Debug'

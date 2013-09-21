@@ -640,7 +640,7 @@ begin
   // compiler tab
   tabCompOpts.Caption:=    Lang[ID_PARAM_CAPTION];
   lblAdditions.Caption:=   '  '+Lang[ID_POPT_ADDITIONAL]+'  ';
-  lblCompiler.Caption:=    Lang[ID_POPT_COMP];
+  lblCompiler.Caption:=    Lang[ID_POPT_CCOMP];
   lblCppCompiler.Caption:= Lang[ID_COPT_GRP_CPP];
   lblLinker.Caption:=      Lang[ID_COPT_LINKERTAB];
   AddLibBtn.Caption:=      Lang[ID_POPT_ADDLIBRARY];

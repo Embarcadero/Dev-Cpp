@@ -55,7 +55,10 @@ procedure TCompOptionsList.DrawDropDownButton(ACol, ARow: Integer;ARect: TRect; 
 var
 	Details: TThemedElementDetails;
 begin
-	if Assigned(EditList) and (ACol = 1) and (ARow >= FixedRows) and not (gdFocused in AState) and ItemProps[ARow - FixedRows].HasPickList then begin
+	if not Assigned(EditList) then Exit; // this can be the case at design time
+	if not ThemeServices.ThemesEnabled then Exit;
+
+	if (ACol = 1) and (ARow >= FixedRows) and not (gdFocused in AState) and ItemProps[ARow - FixedRows].HasPickList then begin
 		ARect.Left := ARect.Right - EditList.ButtonWidth;
 		Details := ThemeServices.GetElementDetails(tcDropDownButtonNormal);
 		ThemeServices.DrawElement(Canvas.Handle, Details, ARect);
@@ -68,21 +71,23 @@ var
 	ARow: Integer;
 begin
 	inherited MouseDown(Button, Shift, X, Y);
-	if Assigned(EditList) then begin
-		MouseToCell(X, Y, ACol, ARow);
-		if (Button = mbLeft) and (ARow > FixedRows) and
-			ItemProps[ARow - FixedRows].HasPickList and
-			not EditList.ListVisible and MouseOverButton(X) then
-			begin
-			EditorMode := True;
-			TInplaceEditListAccess(EditList).DropDown;
-		end;
+
+	if not Assigned(EditList) then Exit;
+	if not ThemeServices.ThemesEnabled then Exit;
+
+	MouseToCell(X, Y, ACol, ARow);
+	if (Button = mbLeft) and (ARow > FixedRows) and
+		ItemProps[ARow - FixedRows].HasPickList and
+		not EditList.ListVisible and MouseOverButton(X) then
+	begin
+		EditorMode := True;
+		TInplaceEditListAccess(EditList).DropDown;
 	end;
 end;
 
 function TCompOptionsList.MouseOverButton(X: Integer): Boolean;
 begin
-	if Assigned(EditList) then
+	if Assigned(EditList) and ThemeServices.ThemesEnabled then
 		Result := (UseRightToLeftAlignment and (X < EditList.ButtonWidth)) or
 				  (not UseRightToLeftAlignment and (X > ClientWidth - EditList.ButtonWidth))
 	else

@@ -1,3 +1,13 @@
+Version 5.4.1 - *
+
+- When accidentally clearing the code completion list, one is now given a second wind before the list is hidden.
+- Fixed an out of bounds error in the code completion code.
+- Fixed an error that caused crashes in Compiler Options >> Settings under Windows 2000 (and older).
+- Typedef structs now get formatted as "struct Foo" instead of "structFoo" in mouseover hints.
+- The debugger now preserves the current working directory when running programs.
+- Redesigned the compiler output formatter code, which now uses half the amount of code.
+- The mouseover tooltip now shows scope information too.
+
 Version 5.4.0 - 14 Februari 2013
 
 - The console pauser will now provide more detailed information when it decides not to work.
