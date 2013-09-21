@@ -951,7 +951,6 @@ begin
   FToolTips.Assign(Strings);
 end;
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
 procedure TBaseCodeToolTip.Show;
@@ -1078,7 +1077,7 @@ begin
     FCustomSelIndex := False;
   end;
 
-  // get the previous word, this is the word infron
+  // get the previous word, this is the word infront
   // of the brace. for example from
   // foo(int a, int b
   // the previous word would be 'foo'  

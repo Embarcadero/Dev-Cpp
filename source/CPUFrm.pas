@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, SynEdit, XPMenu;
+  Dialogs, StdCtrls, Buttons, SynEdit, XPMenu, StrUtils;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -67,6 +67,10 @@ type
     SSText: TEdit;
     lblES: TLabel;
     ESText: TEdit;
+    lblFS: TLabel;
+    FSText: TEdit;
+    lblGS: TLabel;
+    GSText: TEdit;
     XPMenu: TXPMenu;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edFuncKeyPress(Sender: TObject; var Key: Char);
@@ -76,13 +80,11 @@ type
     ActiveLine : integer;
 
     procedure LoadText;
-    procedure OnRegistersReady;
-    procedure OnActiveLine(Sender: TObject; Line: Integer;
-                           var Special: Boolean; var FG, BG: TColor);
 
-    { Private declarations }
+    procedure OnActiveLine(Sender: TObject; Line: Integer;var Special: Boolean; var FG, BG: TColor);
+
   public
-    { Public declarations }
+    procedure OnRegistersReady;
   end;
 
 var
@@ -103,28 +105,43 @@ begin
 end;
 
 procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
+var
+	tmp : string;
 begin
-  if key = #13 then begin
-    if (MainForm.fDebugger.Executing) then
-      CodeList.Lines.Clear;
-      MainForm.fDebugger.SendCommand(GDB_DISASSEMBLE, edFunc.Text);
-  end;
+	if key = #13 then begin
+		if (MainForm.fDebugger.Executing) then
+			CodeList.Lines.Clear;
+			tmp:=edFunc.Text;
+			if AnsiEndsStr('()',edFunc.Text) then begin
+				Delete(tmp,length(tmp)-1,2);
+				edFunc.Text:=tmp;
+			end;
+			MainForm.fDebugger.SendCommand(GDB_DISASSEMBLE,tmp);
+	end;
 end;
 
 procedure TCPUForm.rbSyntaxClick(Sender: TObject);
-var cb : TCheckBox;
+var
+	cb : TCheckBox;
+	tmp : string;
 begin
   cb := TCheckBox(sender);
   while (MainForm.fDebugger.InAssembler) do
-    sleep(20);
+   sleep(20);
   if (MainForm.fDebugger.Executing) then begin
     CodeList.Lines.Clear;
     if cb.Tag = 0 then
       MainForm.fDebugger.SendCommand(GDB_SETFLAVOR, GDB_ATT)
     else
       MainForm.fDebugger.SendCommand(GDB_SETFLAVOR, GDB_INTEL);
+
     MainForm.fDebugger.Idle;
-    MainForm.fDebugger.SendCommand(GDB_DISASSEMBLE, edFunc.Text);
+
+    if AnsiEndsStr('()',edFunc.Text) then begin
+		Delete(tmp,length(tmp)-1,2);
+		edFunc.Text:=tmp;
+	end;
+    MainForm.fDebugger.SendCommand(GDB_DISASSEMBLE,tmp);
     MainForm.fDebugger.Idle;
   end;
 end;
@@ -137,9 +154,9 @@ begin
     XPMenu.Active := false;
   with Lang do begin
     Caption := Strings[ID_CPU_CAPTION];
-    gbAsm.Caption := Strings[ID_CPU_ASMCODE];
-    gbSyntax.Caption := Strings[ID_CPU_SYNTAX];
-    gbRegisters.Caption := Strings[ID_CPU_REGISTERS];
+    gbAsm.Caption := '  '+Strings[ID_CPU_ASMCODE]+'  ';
+    gbSyntax.Caption := '  '+Strings[ID_CPU_SYNTAX]+'  ';
+    gbRegisters.Caption := '  '+Strings[ID_CPU_REGISTERS]+'  ';
     lblFunc.Caption := Strings[ID_CPU_FUNC];
   end;
 end;
@@ -153,7 +170,8 @@ begin
 end;
 
 procedure TCPUForm.OnRegistersReady;
-var i : integer;
+var
+	i : integer;
 begin
   EAXText.Text := MainForm.fDebugger.Registers[EAX];
   EBXText.Text := MainForm.fDebugger.Registers[EBX];
@@ -164,10 +182,12 @@ begin
   EBPText.Text := MainForm.fDebugger.Registers[EBP];
   ESPText.Text := MainForm.fDebugger.Registers[ESP];
   EIPText.Text := MainForm.fDebugger.Registers[EIP];
-  CSText.Text := MainForm.fDebugger.Registers[CS];
-  DSText.Text := MainForm.fDebugger.Registers[DS];
-  SSText.Text := MainForm.fDebugger.Registers[SS];
-  ESText.Text := MainForm.fDebugger.Registers[ES];
+  CSText.Text :=  MainForm.fDebugger.Registers[CS];
+  DSText.Text :=  MainForm.fDebugger.Registers[DS];
+  SSText.Text :=  MainForm.fDebugger.Registers[SS];
+  ESText.Text :=  MainForm.fDebugger.Registers[ES];
+  FSText.Text :=  MainForm.fDebugger.Registers[FS];
+  GSText.Text :=  MainForm.fDebugger.Registers[GS];
   for i := 0 to CodeList.Lines.Count - 1 do
     if pos(EIPText.Text, CodeList.Lines[i]) <> 0 then begin
       if (ActiveLine <> i) and (ActiveLine <> -1) then
@@ -180,8 +200,7 @@ begin
     end;
 end;
 
-procedure TCPUForm.OnActiveLine(Sender: TObject; Line: Integer;
-                                var Special: Boolean; var FG, BG: TColor);
+procedure TCPUForm.OnActiveLine(Sender: TObject; Line: Integer;var Special: Boolean; var FG, BG: TColor);
 var pt : TPoint;
 begin
    if (Line = ActiveLine) then begin

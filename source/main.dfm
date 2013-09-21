@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 1056
-  Top = 424
+  Left = 1057
+  Top = 408
   Width = 587
   Height = 587
   Color = clBtnFace
@@ -46,7 +46,7 @@ object MainForm: TMainForm
     Top = 397
     Width = 571
     Height = 113
-    ActivePage = DebugSheet
+    ActivePage = FindSheet
     Align = alBottom
     Constraints.MinHeight = 1
     Images = dmMain.MenuImages_Gnome
@@ -64,7 +64,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 559
-        Height = 81
+        Height = 80
         Align = alClient
         BevelOuter = bvRaised
         BevelKind = bkSoft
@@ -107,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 559
-        Height = 81
+        Height = 80
         Align = alClient
         BevelKind = bkSoft
         BorderStyle = bsNone
@@ -186,12 +186,12 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           334
-          81)
+          80)
         object LogOutput: TMemo
           Left = 7
           Top = 16
           Width = 1477
-          Height = 62
+          Height = 70
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelInner = bvNone
           BevelKind = bkTile
@@ -210,8 +210,8 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 559
-        Height = 81
-        ActivePage = tabVars
+        Height = 80
+        ActivePage = tabDebugOutput
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -590,7 +590,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 551
-            Height = 50
+            Height = 49
             Align = alClient
             Columns = <
               item
@@ -624,7 +624,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 22
             Width = 551
-            Height = 28
+            Height = 27
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -676,7 +676,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 559
-        Height = 81
+        Height = 80
         Align = alClient
         BevelOuter = bvRaised
         BevelKind = bkSoft
@@ -1174,7 +1174,7 @@ object MainForm: TMainForm
     Top = 100
     Width = 169
     Height = 293
-    ActivePage = ProjectSheet
+    ActivePage = DebugLeftSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 6

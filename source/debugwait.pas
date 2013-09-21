@@ -52,7 +52,7 @@ type
   end;
 
   type TRegister  = (EAX, EBX, ECX, EDX, ESI, EDI,
-                     EBP, ESP, EIP, CS, DS, SS, ES);
+                     EBP, ESP, EIP, CS, DS, SS, ES, FS, GS);
   type TRegisters = array [TRegister] of string;
 
   TDebugNode = class(TObject)
@@ -127,7 +127,7 @@ type
 implementation
 
 uses 
-  main, devcfg, utils;
+  main, devcfg, CPUFrm, debugger, utils;
 
 constructor TDebugNode.Create;
 begin
@@ -183,7 +183,6 @@ begin
     broken:=true;
 end;
 
-
 procedure TDebugWait.SkipSpaces;
 begin
   while (pos < len) and (Reader.Output[pos] in SPACES) do
@@ -204,8 +203,6 @@ begin
     pos := pos + 1;
   end;
 end;
-
-
 
 function TDebugWait.GetNextLine : string;
 begin
@@ -277,32 +274,53 @@ end;
 
 procedure TDebugWait.GetRegisters(name, value : string);
 begin
-  if name = GDB_EAX then
-    Registers[EAX] := value
-  else if name = GDB_EBX then
-    Registers[EBX] := value
-  else if name = GDB_ECX then
-    Registers[ECX] := value
-  else if name = GDB_EDX then
-    Registers[EDX] := value
-  else if name = GDB_ESI then
-    Registers[ESI] := value
-  else if name = GDB_EDI then
-    Registers[EDI] := value
-  else if name = GDB_EBP then
-    Registers[EBP] := value
-  else if name = GDB_ESP then
-    Registers[ESP] := value
-  else if name = GDB_EIP then
-    Registers[EIP] := value
-  else if name = GDB_CS then
-    Registers[CS] := value
-  else if name = GDB_DS then
-    Registers[DS] := value
-  else if name = GDB_SS then
-    Registers[SS] := value
-  else if name = GDB_ES then
-    Registers[ES] := value
+  if name = GDB_EAX then begin
+    Registers[EAX] := value;
+    MainForm.SendCommand(GDB_REG,GDB_EBX);
+  end else if name = GDB_EBX then begin
+    Registers[EBX] := value;
+    MainForm.SendCommand(GDB_REG,GDB_ECX);
+  end else if name = GDB_ECX then begin
+    Registers[ECX] := value;
+    MainForm.SendCommand(GDB_REG,GDB_EDX);
+  end else if name = GDB_EDX then begin
+    Registers[EDX] := value;
+    MainForm.SendCommand(GDB_REG,GDB_ESI);
+  end else if name = GDB_ESI then begin
+    Registers[ESI] := value;
+    MainForm.SendCommand(GDB_REG,GDB_EDI);
+  end else if name = GDB_EDI then begin
+    Registers[EDI] := value;
+    MainForm.SendCommand(GDB_REG,GDB_EBP);
+  end else if name = GDB_EBP then begin
+    Registers[EBP] := value;
+    MainForm.SendCommand(GDB_REG,GDB_ESP);
+  end else if name = GDB_ESP then begin
+    Registers[ESP] := value;
+    MainForm.SendCommand(GDB_REG,GDB_EIP);
+  end else if name = GDB_EIP then begin
+    Registers[EIP] := value;
+    MainForm.SendCommand(GDB_REG,GDB_CS);
+  end else if name = GDB_CS then begin
+    Registers[CS] := value;
+    MainForm.SendCommand(GDB_REG,GDB_DS);
+  end else if name = GDB_DS then begin
+    Registers[DS] := value;
+    MainForm.SendCommand(GDB_REG,GDB_SS);
+  end else if name = GDB_SS then begin
+    Registers[SS] := value;
+    MainForm.SendCommand(GDB_REG,GDB_ES);
+  end else if name = GDB_ES then begin
+    Registers[ES] := value;
+    MainForm.SendCommand(GDB_REG,GDB_FS);
+  end else if name = GDB_FS then begin
+    Registers[FS] := value;
+    MainForm.SendCommand(GDB_REG,GDB_GS);
+  end else if name = GDB_GS then begin
+    Registers[GS] := value;
+    CPUForm.OnRegistersReady;
+    MainForm.SendCommand(GDB_DISASSEMBLE,'main');
+  end;
 end;
 
 function CountChar(s : string; c : char) : integer;

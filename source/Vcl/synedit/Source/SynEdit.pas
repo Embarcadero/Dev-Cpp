@@ -3589,7 +3589,7 @@ begin
   EnsureCursorPosVisible;
   // Selection should have changed...
   StatusChanged([scSelection]);
-  DoOnPaintTransient(ttAfter);                                                
+  DoOnPaintTransient(ttAfter);
 end;
 
 procedure TCustomSynEdit.SelectAll;

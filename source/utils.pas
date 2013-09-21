@@ -141,7 +141,7 @@ var
 begin
   Directory := IncludeTrailingPathDelimiter(Directory);
 
-  { First, find the required file... }
+  // First, find the required file...
   Attr := faAnyFile;
   if ShowDirs = False then
      Attr := Attr - faDirectory;
@@ -150,7 +150,7 @@ begin
   begin
      while (Error = 0) do
      begin
-     { Found one! }
+     // Found one!
         Files.Add(Directory + SearchRec.Name);
         Error := FindNext(SearchRec);
         if Multitasking then
@@ -159,7 +159,7 @@ begin
      FindClose(SearchRec);
   end;
 
-  { Then walk through all subdirectories. }
+  // Then walk through all subdirectories.
   if Subdirs then
   begin
      Error := FindFirst(Directory + '*.*', faAnyFile, SearchRec);
@@ -167,10 +167,10 @@ begin
      begin
         while (Error = 0) do
         begin
-           { Found one! }
+           // Found one!
            if (SearchRec.Name[1] <> '.') and (SearchRec.Attr and
              faDirectory <> 0) then
-              { We do this recursively! }
+              // We do this recursively!
               FilesFromWildcard(Directory + SearchRec.Name, Mask, Files,
                 Subdirs, ShowDirs, Multitasking);
            Error := FindNext(SearchRec);

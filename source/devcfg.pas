@@ -1110,6 +1110,14 @@ begin
 	sl.Add('Med=2');
 	sl.Add('High=3');
 	AddOption(Lang[ID_COPT_OPTIMIZE], False, True, True, True, 0, '-O', Lang[ID_COPT_GRP_CODEGEN], [], sl);
+
+	// C++ Standards
+	sl := TStringList.Create;
+	sl.Add('GNU C++=gnu++98');
+	sl.Add('ISO C++=c++98');
+	sl.Add('GNU C++0x=gnu++0x');
+	sl.Add('ISO C++0x=c++0x');
+	AddOption(Lang[ID_COPT_STD], False, True, True, True, 0, '-std=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 end;
 
 procedure TdevCompiler.AddOption(_Name: string; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer;_Setting, _Section: string; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);

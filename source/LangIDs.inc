@@ -96,6 +96,8 @@ const
   //free to 159 for file menu items
 
   //edit menu
+  ID_ITEM_DECL                     = 158;
+  ID_ITEM_DEFINE                   = 159;
   ID_ITEM_UNDO                     = 160;
   ID_ITEM_REDO                     = 161;
   ID_ITEM_CUT                      = 162;
@@ -1112,3 +1114,4 @@ const
   ID_COPT_ARCH                     = 3401;
   ID_COPT_BUILTINPROC              = 3402;
   ID_COPT_OPTIMIZE                 = 3403;
+  ID_COPT_STD                      = 3404;

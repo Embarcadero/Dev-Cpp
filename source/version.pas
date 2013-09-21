@@ -34,7 +34,7 @@ resourcestring
 	// misc strings
 	GCC_VERSION          = '4.5.2';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '4.9.9.8';
+	DEVCPP_VERSION       = '4.9.9.9';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -160,7 +160,8 @@ const
   GDB_DELETE           = 'delete';
   GDB_PROMPT           = '(gdb) ';
   GDB_BACKTRACE        = 'bt';
-  GDB_DISASSEMBLE      = 'disas';
+  GDB_KILL             = 'kill';
+  GDB_DISASSEMBLE      = 'disassemble';
   GDB_SETFLAVOR        = 'set disassembly-flavor';
   GDB_INTEL            = 'intel';
   GDB_ATT              = 'att';
@@ -178,6 +179,8 @@ const
   GDB_DS               = '$ds';
   GDB_SS               = '$ss';
   GDB_ES               = '$es';
+  GDB_FS               = '$fs';
+  GDB_GS               = '$gs';
   GDB_SETARGS          = 'set args';
   GDB_ATTACH           = 'attach';
   GDB_SET              = 'set'; 

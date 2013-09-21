@@ -651,7 +651,7 @@ end;
 procedure TEditor.SetLineCol;
 begin
 	// keep statusbar updated
-	MainForm.Statusbar.Panels[0].Text:= format('%6d: %d', [fText.CaretY, fText.CaretX]);
+	MainForm.Statusbar.Panels[0].Text:= format('%6d: %d', [fText.DisplayY, fText.DisplayX]);
 	MainForm.Statusbar.Panels[3].Text:= format(Lang[ID_LINECOUNT], [fText.Lines.Count]);
 end;
 
@@ -665,7 +665,7 @@ begin
 	end;
 	with MainForm.Statusbar do begin
 		if Changes * [scAll, scCaretX, scCaretY] <> [] then begin
-			Panels[0].Text:= format('%6d: %d', [fText.CaretY, fText.CaretX]);
+			Panels[0].Text:= format('%6d: %d', [fText.DisplayY, fText.DisplayX]);
 			if not fErrSetting and (fErrorLine <> -1) then begin
 				fText.InvalidateLine(fErrorLine);
 				fText.InvalidateGutterLine(fErrorLine);
@@ -1159,7 +1159,7 @@ begin
   NestedPar:=0;
   AllowPar:=((Length(fText.LineText)>1) and (Copy(fText.LineText, I-1, 2) = ').')) or
              (Length(fText.LineText)>2) and (Copy(fText.LineText, I-2, 3) = ')->');
-  while (I <> 0) and (fText.LineText <> '') and (fText.LineText[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_', '.', '-', '>', ':', '(', ')', '[', ']']) do begin
+  while (I <> 0) and (fText.LineText <> '') and (fText.LineText[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_', '.', '-', '>', ':', '(', ')', {'[',} ']']) do begin
     if (fText.LineText[I]=')') then begin
       if not AllowPar then
         Break
@@ -1506,8 +1506,7 @@ begin
 end;
 
 
-procedure TEditor.EditorMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TEditor.EditorMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
   procedure DoOpen(Fname: string; Line: integer; wrd: string);
   var
     e: TEditor;
@@ -1623,7 +1622,7 @@ begin
         line:=umSt^._Line;
       end;
 
-      DoOpen(fname, line, s);
+      DoOpen(fname, line, s); // BEZIG
 
       // the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
       Abort;

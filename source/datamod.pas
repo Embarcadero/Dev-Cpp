@@ -274,7 +274,6 @@ begin
   UpdateHighlighter;
 end;
 
-
  { ---------- MRU ---------- }
 
 procedure TdmMain.AddtoHistory(s: string);

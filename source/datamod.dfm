@@ -21,7 +21,7 @@ object dmMain: TdmMain
     Top = 74
   end
   object SynExporterRTF: TSynExporterRTF
-    Color = clWindow
+    Color = clNone
     DefaultFilter = 'Rich Text Format (*.rtf)|*.rtf'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
@@ -35,7 +35,7 @@ object dmMain: TdmMain
     Top = 74
   end
   object SynExporterHTML: TSynExporterHTML
-    Color = clWindow
+    Color = clNone
     DefaultFilter = 'HTML Document (*.htm,*.html)|*.htm;*.html'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
@@ -64,15 +64,15 @@ object dmMain: TdmMain
     Footer.DefaultFont.Height = -13
     Footer.DefaultFont.Name = 'Arial'
     Footer.DefaultFont.Style = []
-    Margins.Left = 25
-    Margins.Right = 15
-    Margins.Top = 25
-    Margins.Bottom = 25
-    Margins.Header = 15
-    Margins.Footer = 15
-    Margins.LeftHFTextIndent = 2
-    Margins.RightHFTextIndent = 2
-    Margins.HFInternalMargin = 0.5
+    Margins.Left = 25.000000000000000000
+    Margins.Right = 15.000000000000000000
+    Margins.Top = 25.000000000000000000
+    Margins.Bottom = 25.000000000000000000
+    Margins.Header = 15.000000000000000000
+    Margins.Footer = 15.000000000000000000
+    Margins.LeftHFTextIndent = 2.000000000000000000
+    Margins.RightHFTextIndent = 2.000000000000000000
+    Margins.HFInternalMargin = 0.500000000000000000
     Margins.MirrorMargins = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -9228,13 +9228,9 @@ object dmMain: TdmMain
     DefaultType = ctHint
     Options = [scoCaseSensitive, scoLimitToMatchedText, scoUsePrettyText]
     NbLinesInWindow = 1
-    ClSelect = clHighlight
-    ClSelectedText = clHighlightText
-    ClBackground = clWindow
     Width = 262
     EndOfTokenChr = '()[]. '
     TriggerChars = '.'
-    ClTitleBackground = clBtnFace
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -9245,6 +9241,7 @@ object dmMain: TdmMain
     TitleFont.Height = -11
     TitleFont.Name = 'MS Sans Serif'
     TitleFont.Style = [fsBold]
+    Columns = <>
     ShortCut = 16416
     TimerInterval = 2000
     Left = 224
