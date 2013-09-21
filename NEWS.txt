@@ -1,0 +1,430 @@
+Version 5.0.0.5 - * Oktober 2011
+
+- Rewritten the tooltip generator. It now uses better code scanning techniques and does not show up above what you were typing anymore.
+- Brace completion is now disabled inside strings and comments. It now also supports closing the < character.
+- The tooltip now also works when typing foo[bar].member and hovering above member.
+- The empty project now contains an empty Untitled unsaved file. Why would anyone NOT want or need that?
+- The function tooltip now also displays tips for completed and empty function parameter bodies.
+- Some more minor fixups.
+
+Version 5.0.0.4 - 25 September 2011
+
+- Upgraded the compiler to GCC 4.6.1.
+- The main tab control now has the optional (check Environment options) ability to spread tabs over multiple lines.
+- Added Goto Declaration and Goto Definition buttonsto the editor right click menu. This buttons make code navigation much easier.
+- The old code for Ctrl+Click now uses the new code for the buttons and uses two-way navigation.
+- Added Profiling tot the Compiler toolbar.
+- Removed the useless About/Help toolbar.
+- The splash screen now shows what Dev is currently loading.
+- Code Completion Cache can now also be browsed through.
+- Added icons for profiling buttons and added them to the compiling toolbar.
+- Updated the incremental Search window: it now has a previous and next button.
+- Corrected a few regression bugs in the class scanner.
+- Fixed a bug in the tooltip content generator.
+- And much more minor stuff...
+
+Version 5.0.0.3 - 8 September 2011
+
+- Rewritten and reorganized the Profile Analysis code.
+- Added an option to delete Profiling Information which detects by itself if it can be executed.
+- Corrected a few errors in the GCC profiling flag generation code.
+- Doubled the stack limits.
+- Improved Tab handling.
+- Fixed a memory leak in the Compiling form.
+- Restyled the Configure Tools window.
+- Remade the Help File. It now uses HTML Help (.chm) instead of WinHelp, which was removed from Vista and newer Windows OS's.
+- Help File couplings now directly take you to the help content of the currently open window.
+- Added optional automatic brace closing to the Editor Options.
+- Added an options tab to the Profiler.
+- Rewritten the GPROF output reader.
+- Removed any references to the flaky Help Item Customizer.
+- Added support for 'other' file counting in the Project Options window.
+- Resolved a few bugs that caused debugging and profiling options to not be saved.
+- Well, I've probably editted more stuff, but I can't recall.
+
+Version 5.0.0.2 - 30 Augustus 2011
+
+- Dev-C++ Portable now does not close a project with an exception error.
+- Shortcuts can now be saved properly by the portable version too.
+- Fixed a range error (unsigned 0 - 1) in the function prototype tooltip.
+- Copied the new class form to New >> Class..., making it easier to find.
+
+Version 5.0.0.1 - 28 Augustus 2011
+
+- Emergency update.
+- The Delete now does not get hijacked by the project browser anymore.
+- When nothing is selected, the tab key now puts a tab instead of doing nothing.
+- Dev-C++ now shows how long compiling took.
+
+Version 5.0.0.0 - 27 Augustus 2011
+
+- Restyled pretty much everything.
+- Reorganized a few windows to make better use of space.
+- Several SynEdits now do not have an infinitely long scrollbar anymore.
+- The splash screen now does not show up behind the tooltips anymore.
+- Improved startup speed for the New Look theme.
+- Updated the splash screen text.
+- Added more keyboard shortcuts to rightclick menus.
+- Removed everything XPMenu related. This shaves off about 7000 lines of code and makes Dev a bit faster.
+- Added a bunch of code insertion templates. For example, WinMain, WindProc and a do-while() loop.
+- Added copy all to right click menus of the rollout message sheet.
+- A bunch of Copy menu items now listen to shortcuts like Ctrl-C too.
+- Tab shortcuts now use Tabs instead of Shift-Ctrl-I and Shift-Ctrl-U (who came up with that fingerbreaking combination anyway?).
+- Removed a few borders around some tabs below, increasing used space and cleaning the UI up.
+- The Fullscreen close button is now visible again.
+- Removed a few deprecated components like TBevel.
+- Added Save all to rollout rightclick menus.
+- Improved layout of some Project Options tab and the welcome form.
+- You can now assign any combination of tab to any shortcut item you like.
+- I have to admit I've lost track of a lot of changes.
+
+Version 4.9.9.9 - 18 Augustus 2011
+
+- Fixed a regression: class or variable browsing by control clicking now works again.
+- Pasting chunks of code that require scrolling now force a refresh instead of showing gibberish.
+- The portable shortcut now runs .\devcpp.exe instead of one in Program Files.
+- Fixed: Typing stuff like foo[bar.member] spawned the completion tooltip of foo when typing the '.' after bar.
+- Added a D3D9 examplke template.
+- The shortcut is now a proper autoit executable.
+- Rewritten the GDB communication code that retrieves register contents.
+- Added a standards (-std) selection option.
+
+Version 4.9.9.8 - 1 Augustus 2011
+
+- Fixed the uninstallers name: it used to report '4.9.9.5'.
+- Added formatting for 'unknown escape sequence:'.
+- Portable configurations are now saved in .\config\ instead of '.\'. Looks much cleaner this way.
+- The Simple Window example now works correctly.
+- Added the flags that are actually set to Compiler Options.
+- The compiler now correctly remembers if it has created debug symbols.
+- And some more stuff I forgot about.
+
+Version 4.9.9.7 - 26 Juli 2011
+
+- Function candidates are now properly listed and formatted.
+- When code completion was disabled, block tabs/untabs weren't working.
+- Added formatting for the rare 'candidate is' (when there's one candidate of course) message.
+- Removed the include\sys directory from default auto includes. It was conflicting with ctime/time.h.
+- Updated a few English window and control captions.
+- Removed a faulty cast the Delhpi Debugger pointed me to.
+- Projects now open the first file in the list by default.
+- When switching between files, the statusbar (line:col and number of lines) now gets updated automatically.
+- Added formatting for "error: candidate is:".
+- Fixed a bug in the directory scanner: it used to omit every first file in any given directory.
+- Block indentation is now only triggered by tab when multiple lines are selected.
+- devDirs now saves relative paths too.
+
+Version 4.9.9.6 - 20 Juli 2011
+
+- Fixed the language option in the executable information tab. It didn't properly set the listbox to the saved setting (losing settings upon next save).
+- Fixed a bug in the file association code: icons were missing.
+- Lines like 'in member function', 'in constructor' and 'in destructor' are now properly formatted in the Compiler Tab (no line and col numbers anymore).
+- Added line and column formatting for 'In static member function'.
+- Fixed the file version string: it now keeps in sync with incremented build numbers.
+- The spin edits which control the Project file version are now kept in sync with the strings below.
+- Added an option to synchronize product and file versions.
+- Set the default installation directory to C:\Program Files (x86)\Dev-Cpp instead of C:\Dev-Cpp.
+
+Version 4.9.9.5 - 16 Juli 2011
+
+- Added column reporting for a few more error types.
+- Made a proper portable version this time: it comes in a 7zip file, saving a few more registry entries compared to 4.9.9.4's portable setup.
+- The uninstaller now adds itself to Windows' "Programs and Features" list.
+
+Version 4.9.9.4 - 12 Juli 2011
+
+- Added a %path% macro to every path. Use this string in the config files to add relative paths to Compiler Directories.
+- Fixed a bug in the Code Completion Cache Creator (CCCC :D): it used to add 2 copies of every file (one relatively referred to and one referred to with a full path).
+- Cleaned up a few duplicate and unused headers and binaries. The installer is now a whopping 200KiB smaller.
+- Updated the make.exe searcher to check for GCC 4.5.2's make.exe.
+- Added a few install profiles: minimalist and portable.
+- Fixed a few grammar errors.
+- Updated the About window.
+- Added an icon to the installer.
+
+Version 4.9.9.3 - 24 Juni 2011
+
+- Upgraded the Default Compiler to GCC 4.5.2.
+- When encountering an error, Dev will now point you to the error line and (new) positions the cursor next to it.
+- Added some more -march generic optimization options (core2, k8-sse3, amdfam10). Also added 'native' and 'generic' for advanced use. :P
+- Cleaned the explicit -m(some instruction set) options. Added a few more (but they're a bit useless, -march essentialy controls them).
+- Cleaned up the TODO viewer.
+- Fixed a bug in the Compiler Error parser: it used to read 1 byte too much afer the \0 of each error line, possibly causing crashes.
+- Added a column column in the Compiler log.
+- Tweaked the default settings. Enable line numbers by default for example.
+- Fixed a bug in the Compiler Set creator: it didn't feel like storing command line options for each Compiler.
+- Added more UI controls for frequently used GCC flags like -Wall, -Wextra and -pedantic.
+- Moved warning related flag options to a new section called 'Code Warnings'.
+- Removed the silly optimization controls. Now has a proper None/Low/Med/High combobox.
+- Updated the default directory listings to GCC 4.5.2's directories.
+- Removed the [Compiler] section from the ini file. Instead of saving the current Compiler Set twice, it saves a Compiler index to refer to.
+- And some more stuff I forgot about.
+
+#########################################################################################
+
+Version 4.9.9.2
+* Changes unknown to mankind
+
+Version 4.9.9.1
+* Many bug fixes
+* Improved editor
+
+Version 4.9.9.0
+* Support for latest Mingw compiler system builds
+* Bug fixes
+
+Version 4.9.8.9
+* New code tooltip display
+* Improved Indent/Unindent and Remove Comment
+* Improved automatic indent
+* Added support for the "interface" keyword
+* WebUpdate should now report installation problems from PackMan
+* New splash screen and association icons
+* Improved installer
+* Many bug fixes
+
+Version 4.9.8.7
+* Added support for GCC > 3.2
+* Debug variables are now resent during next debug session
+* Watched Variables not in correct context are now kept and updated when it is needed
+* Added new compiler/linker options: 
+  - Strip executable
+  - Generate instructions for a specific machine (i386, i486, i586, i686, pentium, pentium-mmx, pentiumpro, pentium2, pentium3, pentium4, 
+    k6, k6-2, k6-3, athlon, athlon-tbird, athlon-4, athlon-xp, athlon-mp, winchip-c6, winchip2, k8, c3 and c3-2)
+  - Enable use of processor specific built-in functions (mmmx, sse, sse2, pni, 3dnow)
+* "Default" button in Compiler Options is back
+* Error messages parsing improved
+* Bug fixes
+
+Version 4.9.8.5
+* Added the possibility to modify the value of a variable during debugging (right click on a watch variable and select "Modify value")
+* During Dev-C++ First Time COnfiguration window, users can now choose between using or not class browser and code completion features.
+* Many bug fixes
+
+Version 4.9.8.4
+* Added the possibility to specify an include directory for the code completion cache to be created at Dev-C++ first startup
+* Improved code completion cache
+* WebUpdate will now backup downloaded DevPaks in Dev-C++\Packages directory, and Dev-C++ executable in devcpp.exe.BACKUP
+* Big speed up in function parameters listing while editing
+* Bug fixes
+
+Version 4.9.8.3
+* On Dev-C++ first time configuration dialog, a code completion cache of all the standard 
+  include files can now be generated.
+* Improved WebUpdate module
+* Many bug fixes
+
+Version 4.9.8.2
+* New debug feature for DLLs: attach to a running process
+* New project option: Use custom Makefile. 
+* New WebUpdater module.
+* Allow user to specify an alternate configuration file in Environment Options 
+  (still can be overriden by using "-c" command line parameter).
+* Lots of bug fixes.
+
+Version 4.9.8.1
+* When creating a DLL, the created static lib respects now the project-defined output directory
+
+Version 4.9.8.0
+* Changed position of compiler/linker parameters in Project Options.
+* Improved help file
+* Bug fixes
+
+Version 4.9.7.9
+* Resource errors are now reported in the Resource sheet
+* Many bug fixes
+
+Version 4.9.7.8
+* Made whole bottom report control floating instead of only debug output.
+* Many bug fixes
+
+Version 4.9.7.7
+* Printing settings are now saved
+* New environment options : "watch variable under mouse" and "Report watch errors"
+* Bug fixes
+
+Version 4.9.7.6
+* Debug variable browser
+* Added possibility to include in a Template the Project's directories (include, libs and ressources)
+* Changed tint of Class browser pictures colors to match the New Look style
+* Bug fixes
+
+Version 4.9.7.5
+* Bug fixes
+
+Version 4.9.7.4
+* When compiling with debugging symbols, an extra definition is passed to the
+  compiler: -D__DEBUG__
+* Each project creates a <project_name>_private.h file containing version
+  information definitions
+* When compiling the current file only, no dependency checks are performed
+* ~300% Speed-up in class parser
+* Added "External programs" in Tools/Environment Options (for units "Open with")
+* Added "Open with" in project units context menu
+* Added "Classes" toolbar
+* Fixed pre-compilation dependency checks to work correctly
+* Added new file menu entry: Save Project As
+* Bug-fix for double quotes in devcpp.cfg file read by vUpdate
+* Other bug fixes
+
+Version 4.9.7.3
+* When adding debugging symbols on request, remove "-s" option from linker
+* Compiling progress window
+* Environment options : "Show progress window" and "Auto-close progress window"
+* Bug fixes
+
+Version 4.9.7.2
+* Bug fixes
+
+Version 4.9.7.1
+* "Build priority" per-unit
+* "Include file in linking process" per-unit
+* New feature: compile current file only
+* Separated C++ compiler options from C compiler options in Makefile (see bug report #654744)
+* Separated C++ include dirs from C include dirs in Makefile (see bug report #654744)
+* Necessary UI changes in Project Options
+* Added display of project filename, project output and a summary of the project files in Project Options General tab.
+* Fixed the "compiler-dirs-with-spaces" bug that crept-in in 4.9.7.0
+* Multi-select files in project-view (when "double-click to open" is configured in Environment Settings)
+* Resource files are treated as ordinary files now
+* Updates in "Project Options/Files" code
+* MSVC import now creates the folders structure of the original VC project
+* Bug fixes
+
+Version 4.9.7.0
+* Allow customizing of per-unit compile command in projects
+* Added two new macros: <DATE> and <DATETIME>
+* Added support for macros in the "default source code" (Tools/Editor Options/Code)
+* Separated layout info from project file. It is now kept in a different file
+  (the same filename as the project's but with extension ".layout"). If you
+  have your project under CVS control, you ''ll know why this had to happen...
+* Compiler settings per-project
+* Compiler set per-project
+* Implemented new compiler settings framework
+* "Compile as C++" per-unit
+* "Include file in compilation process" per-unit
+* Project version info (creates the relevant VERSIONINFO struct in the private
+  resource)
+* Support XP Themes (creates the CommonControls 6.0 manifest file and includes
+  it in the private resource)
+* Added CVS "login" and "logout" commands
+* Project manager and debugging window (in Debug tab) can now be trasnformed into floating windows.
+* Added "Add Library" button in Project Options
+* Bug fixes
+
+Version 4.9.6.9
+* Implemented search in help files for the word at cursor (context sensitive help)
+* Implemented "compiler sets" infrastructure to switch between different compilers easily (e.g. gcc-2.95 and gcc-3.2)
+* Added "Files" tab in CVS form to allow selection of more than one file for
+  the requested CVS action
+  
+Version 4.9.6.8
+* support for DLL application hosting, for debugging and executing DLLs under Dev-C++.
+* New class browser option: "Show inherited members"
+* Added support for the '::' member access operator in code-completion
+* Added *working* function arguments hint
+* Added bracket highlighting. When the caret is on a bracket, that bracket and
+  its counterpart are highlighted
+* Nested folders in project view
+
+Version 4.9.6.7
+* XP Theme support
+* Added CVS commands "Add" and "Remove"
+* Added configuration option for "Templates Directory" in "Environment Options"
+* Code-completion updates
+* Bug fixes
+
+Version 4.9.6.6
+* Editor colors are initialized properly on Dev-C++ first-run
+* Added doxygen-style comments in NewClass, NewMemberFunction and NewMemberVariable wizards
+* Added file's date/time stamp in File/Properties window
+* Current windows listing in Window menu
+* Bug fixes
+
+Version 4.9.6.5
+* CVS support
+* Window list (in Window menu)
+* bug fixes
+
+version 4.9.6.4
+* added ENTER key for opening file in project browser, DEL to delete from the project.
+* bug fixes
+
+version 4.9.6.3
+* Bug fixes
+
+version 4.9.6.2
+* Bug fixes
+
+version 4.9.6.1
+* New "Abort compilation" button
+* Bug fixes
+* Now checks for vRoach existance when sending a crash report
+
+Version 4.9.5.5
+* New option in Editor Options: Show editor hints. User can disable the hints
+  displayed in the editor when the mouse moves over a word. Since this was the
+  cause of many errors (although it should be fixed by now), we are giving the
+  user the option to disable this feature.
+* New option in Editor Options (code-completion): Use code-completion cache.
+  Well, it adds caching to code-completion. Depending on the cache size,
+  the program may take a bit longer to start-up, but provides very fast
+  code-completion and the user has all the commands (belonging to the files
+  he added in the cache) at his fingertips. If, for example, the user adds
+  "windows.h", he gets all the WinAPI! If he adds "wx/wx.h", he gets all of
+  wxWindows! You get the picture...
+* Removed "Only show classes from current file" option in class browser settings.
+  It used to be a checkbox, allowing only two states (on or off), but there is
+  a third relevant option now: "Project classes" so it didn't fit the purpose...
+  The user can define this in the class browser's context menu under "View mode".
+* Fixed the dreaded "Clock skew detected" compiler warning!
+* Fixed many class browser bugs, including some that had to do with class folders.
+
+Version 4.9.5.4
+* Under NT, 2000 and XP, user application data directory will be used to store config files (i.e : C:\Documents and Settings\Username\Local Settings\Application Data)
+
+Version 4.9.5.3
+* Added ExceptionsAnalyzer. If the devcpp.map file is in the devcpp.exe directory
+  then we even get a stack trace in the bug report!
+* Added new WebUpdate module (inactive temporarily).
+* Added new code for code-completion caching of files (disabled - work in progress).
+
+Version 4.9.5.2
+* Added new option in class-browser: Use colors
+  (available when right-clicking the class-browser
+  and selecting "View mode").
+* Dev-C++ now traps access violation of your programs (and of itself too ;)
+
+Version 4.9.5.1
+* Implemented the "File/Export/Project to HTML" function.
+* Added "Tip of the day" system.
+* When running a source file in explorer, don't spawn new instance.
+  Instead open the file in an already launched Dev-C++.
+* Class-parser speed-up (50% to 85% improvement timed!!!)
+* Many code-completion updates. Now takes into account context,
+  class inheritance and visibility (shows items only from files
+  #included directly or indirectly)!
+* Caching of result set of code-completion for speed-up.
+* New option "Execution/Parameters" (and "Debug/Parameters").
+
+Version 4.9.5.0 (5.0 beta 5):
+* CPU Window (still in development)
+* ToDo  list
+* Backtrace in debugging
+* Run to cursor
+* Folders in Project and Class Browser
+* Send custom commands to GDB
+* Makefile can now be customized.
+* Modified the behaviour of the -c param : 
+  -c <config file directory>
+* Saving of custom syntax parameter group
+* Possibility of changing compilers and tools filename.
+* Many bug fixes
+
+
+Version 4.9.4.1 (5.0 beta 4.1):
+
+* back to gcc 2.95.3
+* Profiling support
+* new update/packages checker (vUpdate)
+* Lots of bugfixes

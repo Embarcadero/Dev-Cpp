@@ -93,14 +93,13 @@ var
 begin
   // added on 28march 2004
   // we dont need to go further when the hint is already
-  // active, BECAUSE we already got all neccessary prototimes!
+  // active, BECAUSE we already got all neccessary prototypes!
   if Activated then Exit;
   
   AToolTips.Clear;
 
   if Parser = nil then
     raise TDevCodeToolTipError.Create('No parser available!');
-  
   Parser.FillListOf(APrototypeName, False, FList);
   AToolTips.BeginUpdate;
   try

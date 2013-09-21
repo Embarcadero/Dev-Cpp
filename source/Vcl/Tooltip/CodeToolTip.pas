@@ -726,7 +726,7 @@ var
     HLAttr: TSynHighlighterAttributes;
   begin
     // we use a lookup editor to get the syntax coloring
-    // for out tooltips :)
+    // for our tooltips :)
     FLookupEditor.CaretX := Index;
     FLookupEditor.GetHighlighterAttriAtRowCol(FLookupEditor.CaretXY, StrToken, HLAttr);
     
@@ -742,7 +742,7 @@ var
       begin
         Font.Style := [fsBold];
         if (ttoCurrentArgumentBlackOnly in FOptions) then
-          Font.Color := clBlack;        
+          Font.Color := clBlack;
       end
       else if HLAttr <> nil then
         Font.Style := HLAttr.Style;
@@ -760,7 +760,7 @@ var
       // draw the char and then increase the current width by the
       // width of the just drawn char ...
       TextOut(WidthParam, 1, FLookupEditor.Text[Index]);
-      Inc(WidthParam, CharW);      
+      Inc(WidthParam, CharW);
     end;
   end;
 begin
@@ -860,7 +860,7 @@ begin
   Inc(YPos, FEditor.LineHeight);
 
   // draw the tooltop on the offscreen bitmap
-  // and return the length of the drawn text  
+  // and return the length of the drawn text
   NewWidth := PaintToolTip;
 
   // this displays the rect below the current line and at the
@@ -917,7 +917,7 @@ begin
   if (FEditor <> nil) then
   begin   
     FEditor.AddKeyDownHandler(FKeyDownProc);
-    FEditor.FreeNotification(FEditor);    
+    FEditor.FreeNotification(FEditor);
   end;
 end;
 

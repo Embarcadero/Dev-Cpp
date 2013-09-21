@@ -693,17 +693,16 @@ type
     property Canvas;
     property SelStart: Integer read GetSelStart write SetSelStart;
     property SelEnd: Integer read GetSelEnd write SetSelEnd;
-    property AlwaysShowCaret: Boolean read FAlwaysShowCaret
-                                      write SetAlwaysShowCaret;
+    property AlwaysShowCaret: Boolean read FAlwaysShowCaret write SetAlwaysShowCaret;
     procedure UpdateCaret;
-{$IFDEF SYN_COMPILER_4_UP}                                                     
+{$IFDEF SYN_COMPILER_4_UP}
     procedure AddKey(Command: TSynEditorCommand; Key1: word; SS1: TShiftState;
       Key2: word = 0; SS2: TShiftState = []);
 {$ELSE}
     procedure AddKey(Command: TSynEditorCommand; Key1: word; SS1: TShiftState;
       Key2: word; SS2: TShiftState);
 {$ENDIF}
-    procedure BeginUndoBlock;           
+    procedure BeginUndoBlock;
     procedure BeginUpdate;
     function CaretInView: Boolean;
     function CharIndexToRowCol(Index: integer): TBufferCoord;

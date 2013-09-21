@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 495
-  Top = 205
+  Left = 532
+  Top = 210
   Width = 848
   Height = 685
   Color = clBtnFace
@@ -25,17 +25,16 @@ object MainForm: TMainForm
   object SplitterLeft: TSplitter
     Left = 193
     Top = 72
-    Width = 2
-    Height = 422
+    Height = 421
     AutoSnap = False
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 494
+    Top = 493
     Width = 832
-    Height = 2
+    Height = 3
     Cursor = crVSplit
     Align = alBottom
     OnCanResize = SplitterBottomCanResize
@@ -46,7 +45,7 @@ object MainForm: TMainForm
     Top = 496
     Width = 832
     Height = 112
-    ActivePage = DebugSheet
+    ActivePage = CompSheet
     Align = alBottom
     Constraints.MinHeight = 1
     Images = dmMain.MenuImages_NewLook
@@ -64,7 +63,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 820
-        Height = 80
+        Height = 79
         Align = alClient
         BevelOuter = bvRaised
         BorderStyle = bsNone
@@ -187,12 +186,12 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           563
-          80)
+          79)
         object LogOutput: TMemo
           Left = 7
           Top = 16
           Width = -1423
-          Height = 62
+          Height = 60
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelInner = bvSpace
           BevelKind = bkTile
@@ -211,7 +210,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 820
-        Height = 80
+        Height = 79
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -223,7 +222,7 @@ object MainForm: TMainForm
             Left = 468
             Top = 0
             Width = 156
-            Height = 49
+            Height = 48
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 0
@@ -302,7 +301,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 156
-            Height = 49
+            Height = 48
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 1
@@ -397,7 +396,7 @@ object MainForm: TMainForm
             Left = 156
             Top = 0
             Width = 156
-            Height = 49
+            Height = 48
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 2
@@ -492,7 +491,7 @@ object MainForm: TMainForm
             Left = 312
             Top = 0
             Width = 156
-            Height = 49
+            Height = 48
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 3
@@ -625,7 +624,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 22
             Width = 812
-            Height = 27
+            Height = 26
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -1114,10 +1113,10 @@ object MainForm: TMainForm
     UseSystemFont = False
   end
   object PageControl: TPageControl
-    Left = 195
+    Left = 196
     Top = 72
-    Width = 637
-    Height = 422
+    Width = 636
+    Height = 421
     Align = alClient
     HotTrack = True
     MultiLine = True
@@ -1137,7 +1136,7 @@ object MainForm: TMainForm
     Align = alTop
     BevelOuter = bvNone
     Caption = 
-      'Dev-C++ version 5.0.0.4 Fullscreen. Press F10 to toggle this bar' +
+      'Dev-C++ version 5.0.0.5 Fullscreen. Press F10 to toggle this bar' +
       ', F11 to toggle Toolbars or F12 to toggle Fullscreen.'
     TabOrder = 4
     Visible = False
@@ -1179,8 +1178,8 @@ object MainForm: TMainForm
     Left = 0
     Top = 72
     Width = 193
-    Height = 422
-    ActivePage = ProjectSheet
+    Height = 421
+    ActivePage = ClassSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 6
@@ -1191,7 +1190,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 394
+        Height = 393
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1227,7 +1226,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 394
+        Height = 393
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1265,7 +1264,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 394
+        Height = 393
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
