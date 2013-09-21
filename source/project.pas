@@ -262,6 +262,7 @@ var
 	logfile : TextFile;
 begin
 	temp := '';
+
 	// The commented line below is used by the project logger
 	if fOptions.LogOutputEnabled and (MainForm.CompilerOutput.Items.Count > 0) then begin
 

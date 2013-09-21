@@ -1504,7 +1504,8 @@ begin
 			ReleaseProgressForm;
 	end;
 
-	fProject.SaveToLog;
+	if Assigned(fProject) then
+		fProject.SaveToLog;
 end;
 
 procedure TCompiler.ProcessProgressForm(Line: string);
