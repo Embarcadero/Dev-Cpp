@@ -1,0 +1,70 @@
+** This file contains information on Dev-C++ source files **
+
+-- in "source" directory:
+
+AboutFrm: the about box window
+AddToDoFrm: window for adding a ToDo
+CFGData: contains TConfigData, class for storing settings
+CFGIni : class for storing settings in an INI file
+CFGReg : class for storing settings in the registry
+cfgTypes: abstract class for storing sub forms settings
+CodeIns : code insertion support
+CompileProgressFrm : progress window showed during compilation
+CompOptionsFrm : compiler options window
+CPUFrm : CPU window form 
+CVSFrm : CVS dialog
+CVSPasswdFrm : used for getting a password from the user (not used)
+CVSThread : thread for managing the connection to CVS
+DataMod : various data used in Dev-C++
+DebugFrm : Used to debug Dev-C++
+Debugger : interface between Dev-C++ and the debugger thread
+DebugReader: retrieves GDB output
+DebugWait: parses GDB output 
+devcfg : Dev-C+ configuration classes
+devExec : class for executing programs
+devrun : another class for executing programs
+DevThemes : Dev-C++ theme support
+editor : contains implementation of the editor in Dev-C++
+EditorOptForm : editor options window
+EnviroFrm : Environment options window
+ExceptionAnalyzer: retrieves Dev-C++ crash info (when it crashes)
+FileAssocs : manages file associations
+FilePropertiesFm : file properties window
+FindFrm : search window
+FunctionSearchFm : goto function window
+GotoLineFrm : goto line window
+HelpFrm : help window
+IconFrm : select icon window
+ImportMSVCFm : import vc++ project window
+IncremntalFrm : incremental search window
+LangFrm : Dev-C++ first time configuration settings window
+Macros : Dev-C++ macros handling
+Main : main window of Dev-C++
+ModifyVarFrm : modify debug variable window
+MultiLangSupport : multi languages support
+NewClassFm : window for adding a new class
+NewMemberFm : window for adding a new member
+NewProjectFrm : window for creating a new project
+NewTemplateFm : window for creating a new template
+NewVarFm : window for adding a new variable
+oysUtils : list utilities
+ParamsFrm : execution parameters window
+PrintFrm : print source code window
+prjtypes : project types handling
+ProcessListFrm : attach to process window
+ProfileAnalysisFm : profiling window
+Project : project handling
+ProjectOptionsFrm : project options window
+RemoveUnitFrm : window for removing a file from a project
+ReplaceFrm : Search and replace window
+ResourceSelector: resource selector window
+Search_Center : search management
+Splash: splash screen window
+Templates: template handling
+TipOfTheDayFm : tip of the day window
+ToolEditFrm : tool edit window
+ToolFrm : tool window
+Utils : various utilities functions
+Version : version information and string constants
+ViewToDoFm : view ToDo items window
+WindowListFrm : winodw listing dialog

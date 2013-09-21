@@ -1,0 +1,79 @@
+package synedit_kylix_OE;
+
+{$R *.res}
+{$R '../Source/SynEditReg.dcr'}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'SynEdit package for Kylix OE'}
+{$IMPLICITBUILD OFF}
+{$DEFINE SYN_DELPHI_PE}
+
+requires
+  rtl,
+  visualclx,
+  designide,
+  vcl;
+
+contains
+  kTextDrawer in '../Source/kTextDrawer.pas',
+  QSynAutoCorrect in '../Source/QSynAutoCorrect.pas',
+  QSynAutoCorrectEditor in '../Source/QSynAutoCorrectEditor.pas',
+  QSynCompletionProposal in '../Source/QSynCompletionProposal.pas',
+  QSynEdit in '../Source/QSynEdit.pas',
+  QSynEditAutoComplete in '../Source/QSynEditAutoComplete.pas',
+  QSynEditExport in '../Source/QSynEditExport.pas',
+  QSynEditHighlighter in '../Source/QSynEditHighlighter.pas',
+  QSynEditKbdHandler in '../Source/QSynEditKbdHandler.pas',
+  QSynEditKeyCmdEditor in '../Source/QSynEditKeyCmdEditor.pas' {SynEditKeystrokeEditorForm},
+  QSynEditKeyCmds in '../Source/QSynEditKeyCmds.pas',
+  QSynEditKeyCmdsEditor in '../Source/QSynEditKeyCmdsEditor.pas' {SynEditKeystrokesEditorForm},
+  QSynEditKeyConst in '../Source/QSynEditKeyConst.pas',
+  QSynEditMiscClasses in '../Source/QSynEditMiscClasses.pas',
+  QSynEditMiscProcs in '../Source/QSynEditMiscProcs.pas',
+  QSynEditOptionsDialog in '../Source/QSynEditOptionsDialog.pas',
+  QSynEditPlugins in '../Source/QSynEditPlugins.pas',
+  QSynEditPrint in '../Source/QSynEditPrint.pas',
+  QSynEditPrinterInfo in '../Source/QSynEditPrinterInfo.pas',
+  QSynEditPrintHeaderFooter in '../Source/QSynEditPrintHeaderFooter.pas',
+  QSynEditPrintMargins in '../Source/QSynEditPrintMargins.pas',
+  QSynEditPrintMarginsDialog in '../Source/QSynEditPrintMarginsDialog.pas' {SynEditPrintMarginsDlg},
+  QSynEditPrintPreview in '../Source/QSynEditPrintPreview.pas',
+  QSynEditPrintTypes in '../Source/QSynEditPrintTypes.pas',
+  QSynEditPropertyReg in '../Source/QSynEditPropertyReg.pas',
+  QSynEditPythonBehaviour in '../Source/QSynEditPythonBehaviour.pas',
+  QSynEditReg in '../Source/QSynEditReg.pas',
+  QSynEditSearch in '../Source/QSynEditSearch.pas',
+  QSynEditStrConst in '../Source/QSynEditStrConst.pas',
+  QSynEditTextBuffer in '../Source/QSynEditTextBuffer.pas',
+  QSynEditTypes in '../Source/QSynEditTypes.pas',
+  QSynEditWordWrap in '../Source/QSynEditWordWrap.pas',
+  QSynExportHTML in '../Source/QSynExportHTML.pas',
+  QSynExportRTF in '../Source/QSynExportRTF.pas',
+  QSynHighlighterCpp in '../Source/QSynHighlighterCpp.pas',
+  QSynHighlighterManager in '../Source/QSynHighlighterManager.pas',
+  QSynHighlighterMulti in '../Source/QSynHighlighterMulti.pas',
+  QSynHighlighterRC in '../Source/QSynHighlighterRC.pas',
+  QSynMacroRecorder in '../Source/QSynMacroRecorder.pas',
+  QSynMemo in '../Source/QSynMemo.pas',
+  QSynRegExpr in '../Source/QSynRegExpr.pas';
+
+end.

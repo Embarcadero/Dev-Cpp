@@ -1,0 +1,372 @@
+<HTML><HEAD>
+<TITLE>XP Menu</TITLE>
+<META content="text/html; charset=Windows-1252" http-equiv=Content-Type>
+<style>
+A  {
+	color : #008000;
+	text-decoration : none;
+}
+
+A:Visited  {
+        color : #800000;
+}
+
+A:Active  {}
+
+A:Hover  {
+	color : #FF8000;
+	text-decoration : underline;
+}
+TABLE  {
+	font-size : x-small;
+}
+TD  {
+	background-color : #f7ede5;
+    vertical-align:Top;
+}    
+Body {     
+	font-family : Verdana, Tahoma, Arial, Helvetica, Geneva, Sans-Serif;
+    font-size : x-small;
+    background-color : #f7ede5;  
+}
+</style>
+
+<META content="RR" name=GENERATOR></HEAD>
+<BODY>
+<CENTER>
+<TABLE border=0 cellSpacing=4>
+  <TBODY>
+  <TR>
+    <TD align=middle width=200>
+      <P align=left>&nbsp;</P></TD>
+    <TD vAlign=top width=450>&nbsp; 
+      <h2 align=left><font size=7>XP 
+      Menu </font></h2>
+      <P class=sidenote><A href="mailto:shagrouni@hotmail.com" >Khaled Shagrouni</A> 
+      ,&nbsp;October 5, 2002</P></TD></TR>
+  <TR>
+    <TD vAlign=top width=200>
+      <p align=center><br>&nbsp;</p>
+      <p align=left>&nbsp;</p>
+      <P align=center></P>
+      <P>&nbsp;</P>
+      <P></P>
+      <div align=center>&nbsp;</div>
+      <P align=center>&nbsp;</P>
+      <P>&nbsp;</P>
+      <P>&nbsp;</P>
+      <P>&nbsp;</P>
+      <P>&nbsp;</P></TD>
+    <TD vAlign=top width=450>
+      <p align=right>(Free with source) D4 D5 D6 CB5 
+CB6</p>
+      <p><font size=4>XP</font> Menu 
+      is a none-visual component that changes the visual aspects of 
+      menus,&nbsp;toolbars and&nbsp;many other controls to nearly the same look 
+      and feel of MS Office XP. No code required, you do not have to reconstruct 
+      menus or toolbars using controls other than those shipped with Delphi. 
+</p>
+      <p align=center><IMG alt="" id=IMG2 src="xpmenu.gif" ></p>
+      <p align=left>&nbsp;</p>
+      <p align=center><IMG alt="" src="xpm2.gif" ></p>
+      <p><BR></p>
+      <p>&nbsp;</p>
+      <hr SIZE=1 width="100%">
+
+      <p>&nbsp;</p>
+      <p>This component is FREEWARE with source code. I 
+      still hold the copyright, but you can use it for whatever you like: 
+      freeware, shareware or commercial software. If you have any ideas for 
+      improvement or bug reports, don't hesitate to <A href="mailto:shagrouni@hotmail.com" ><font size=1 
+      >e-mail me</font></A> <shagrouni@HOTMAIL.COM 
+      >(Please state the XPMenu version and OS information), 
+      an example will be appreciated. </p>
+      <p>
+      <hr SIZE=1 width="100%">
+
+      <p>&nbsp;</p>
+      <p><strong><a name=#Installation 
+      ><strong 
+      >Installation</strong></a></strong></p>
+      <ul>
+        <li>A. Unzip the files: XPMENU.PAS and XPMENU.DCR 
+        Into the same directory. 
+        <li>B. From Delphi menu, Select File| New: Package. 
+
+        <li>C. Press Add, and browse to add the unit 
+        XPMENU.PAS. 
+        <li>D. Press Install. 
+        <li>E. The component is now installed in a new 'XP' 
+        page. 
+        <li>F. Save the package.</li></ul>
+      <p>If you have a previous version installed:</p>
+      <ul>
+        <li>Replace the old files (xpmenu.pas and 
+        xpmenu.dcr) with the new one, open the package and recompile. 
+        <li>If you encounter any problems remove all the 
+        compiled units .dcu, .bpl, .dcp (try to locate them also in 'C:\Program 
+        Files\Borland\DelphiX\Projects\Bpl' and 'C:\Program 
+        Files\Borland\DelphiX\lib'), then install pre-compiled units again. 
+      </li></ul>
+      <hr SIZE=1 width="100%">
+
+      <p>&nbsp;</p>
+      <p></p>
+      <p><strong><a name=#notes 
+      ><strong>Notes on 
+      proprties</strong></a></strong></p>
+      <p><font color=navy 
+      >Active</font>&nbsp;property: To activate/deactivate 
+      xpMenu, also,&nbsp;set this property to <em 
+      >False</em> then to <em>True</em> 
+      when new items added at run time.</p>
+      <p><font color=navy 
+      >AutoDetect</font>&nbsp;property: Set this property to 
+      <em>True </em>to force xpMenu to include new added 
+      items automatically.</p>
+      <p align=left><font color=navy 
+      >UseSystemColors</font>&nbsp;property: The global 
+      windows color scheme will be used, setting this property to true will 
+      override other color related properties.</p>
+      <p><font color=navy 
+      >OverrideOwnerDraw</font>&nbsp;property: By default, 
+      xpMenu will not affect menu items that has owner draw handler assigned 
+      (any code in <em>OnDrawItem</em> event). To override 
+      any custom draw set this property to true. <font color=navy 
+      ></font></p>
+      <p><font color=navy 
+      >Gradient</font>&nbsp;property: <em 
+      >IconBackcolor</em> will be used as a gradient color 
+      for the entire menu, <em>Color</em> property wil be 
+      ignored.</p>
+      <p align=left><font color=navy 
+      >FlatMenu</font> &nbsp;property: To turn 
+      menu's&nbsp;border to flat (drop-down and pop-up menu). Any way, a flat 
+      effect will not appear until a menu item is selected.</p>
+      <p align=left><font color=navy 
+      >Form</font>&nbsp;property:&nbsp;The default is the 
+      host form, if you want to target a different form other than the one 
+      hosting the component; set <em>Form</em> property to 
+      that form.</p>
+      <p align=left><font color=navy 
+      >XPControls</font> property: Specifies which control 
+      types affected by xpMenu. To prevent xpMenu from drawing a certain 
+      control; set the control's Tag property value to 999.</p>
+      <p align=left><font color=navy 
+      >XPContainers</font> property: Determine whether the 
+      Controls hosted by the specifies containers are affected by xpMenu.<br 
+      ></p>
+      <p align=left><font color=navy 
+      >GrayLevel</font> property: To control image appearance 
+      in disabled items.&nbsp;&nbsp;&nbsp;</p>
+      <hr SIZE=1 width="100%">
+
+      <p>&nbsp;</p>
+      <p align=left></p>
+      <p><font color=navy 
+      >ImageLists</font>:<br>For 
+      toolbars only ImageList assigned to <em>Images</em> 
+      property is used; xpMenu automatically generate dim and grayed images for 
+      non-hot and disabled items.</p>
+      <p><font color=navy>Buttons with 
+      tbsDivider style</font>:<br>xpMenu cannot draw 
+      toolbar buttons with <em>tbsDivider</em> style, 
+      Windows override any owner draw for this style (I am using Win 98). To 
+      work around this, set the button style to tbsSeparator and set its <em 
+      >Tag</em> property to none zero value.</p>
+      <p><font color=navy>Creation 
+      order</font>:<br>Make sure that the creation order of 
+      TXPMenu comes after any menu or toolbar component. To change the creation 
+      order, choose Edit | Creation Order from Delphi menu to open the Creation 
+      Order dialog box.<br>&nbsp;&nbsp;<br 
+      >
+      <hr SIZE=1 width="100%">
+
+      <p>&nbsp;</p>
+      <p></p>
+      <p><strong><a name=#KnownIssues 
+      ><strong>Known 
+      issues</strong></a></strong></p>
+      <ul>
+        <li>Toolbar doesn't&nbsp;supported&nbsp;in Delphi 
+        4. <br><br>
+        <li>In Delphi 6, XPMenu doesn't recognize buttons 
+        populated by Toolbar.Menu property,&nbsp;you need to reset Active 
+        property to true at run time. <br><br 
+        >
+        <li>In menu toolbar an Imagelist must be assigned 
+        to the MainMenu. <br>A fix suggested by Liyang <A href="mailto:liyang@guangdainfo.com" >liyang@guangdainfo.com</A> 
+        to Delphi's comtrls.pas, line 18758 : <pre><strong>function</strong> TToolBar.CheckMenuDropdown(Button: TToolButton):<br>   Boolean;
+  .............
+      <strong>if</strong> ParentMenu &lt;&gt; <strong>nil then</strong>
+      <font color=#663300><strong>begin</strong></font>
+        FTempMenu.BiDiMode := ParentMenu.BiDiMode;
+<font color=#663300>        FTempMenu.OwnerDraw := ParentMenu.OwnerDraw;
+      <strong>end;</strong></font></pre>
+        <li>Edit box associated with UpDown control doesn't 
+        reflect the changing value (Win98). To solve this; change the Ctl3D 
+        property to false. <br><br>
+        <li>Window menu&nbsp;in MDI parent form and system 
+        menu are not supported.<br><br>
+        <li>C++ Builder 6 update patch 1: Solves building 
+        with Delphi sources and 3rd party components <a 
+        href="http://community.borland.com/article/0,1410,28415,00.html" 
+        >http://community.borland.com/article/0,1410,28415,00.html</a></li></ul>
+      <p><font color=red><a 
+      name=#caution><font color=red 
+      >Caution</font></a></font></p>
+      <ul>
+        <li>Deactivate XPMenu from within controls affected 
+        by xpMenu may cause error, this can happen also when changing any value 
+        of XPControls and XPContainers properies. <br 
+      ></li></ul>
+      <hr SIZE=1 width="100%">
+
+      <p>&nbsp;</p>
+      <p><strong><a name=#tips 
+      ><strong 
+      >Tips</strong></a></strong></p>
+      <p><font color=navy>How to 
+      create menu toolbar:</font><br>&nbsp;(Extracted from 
+      Delphi Help - TToolButton.MenuItem) <br>To create an 
+      "IE4-style" (Office-style) toolbar that corresponds to an existing menu: 
+      </p>
+      <ul>
+        <li>1 Drop a ToolBar on the form and add a 
+        ToolButton for each top-level menu item you wish to create. 
+        <li>2 Set the MenuItem property of each ToolButton 
+        to correspond to the top level menu items. 
+        <li>3 Set the Grouped property of each ToolButton 
+        to True. 
+        <li>4 Clear the MainMenu property of the Form (if 
+        it is assigned)<br></li></ul>
+      <p><font color=navy>Images in 
+      toolbars and menus</font>: <br>To make an image 
+      transparent, be sure to fill the background with a unique color-a color 
+      your image is not using. Also, make sure that the color of the bottom 
+      leftmost pixel shown onscreen has the same background color; xpMenu will 
+      use this pixel to determine the transparent color. </p>
+      <p><font color=navy>Edit 
+      box</font>: <br>Set the Ctl3D property to false, this 
+      eliminate the time consumed when drawing edit box for the 
+      first&nbsp;time.&nbsp;&nbsp; </p>
+      <p><a name=#history><b 
+      >History</b></a></p>
+      <p>Oct&nbsp;5, 2002, 2.22</p>
+      <ul>
+        <li>Support for TDBNavigator and&nbsp;(partly) 
+        TDBLookupComboBox. 
+        <li>More bug fixes.</li></ul>
+      <p>May 18, 2002, 2.21</p>
+      <ul>
+        <li>More bug fixes.</li></ul>
+      <p>Apr&nbsp;29, 2002, V2.2</p>
+      <ul>
+        <li>Bug fixes. 
+        <li><comanche@963.NET>Fixing 
+        Leftjustify allignmen in CheckBox and RadioButton.</li></ul>
+      <p>Jan&nbsp;10, 2002, V2.1</p>
+      <ul>
+        <li>Adding support for SpeedButton, PageScroller, 
+        Panel and GroupBox.&nbsp; 
+        <li>Enhancing controls appearanceEnhancing EditBox 
+        appearance. 
+        <li>Support for HotImages and DisabledImages for 
+        Toolbar, kindly added by <A href="mailto:sylvain2@pinksoft.co.za" >Sylvain 
+        Ntumba</A><sylvain2@PINKSOFT.CO.ZA>. 
+        <li>Many Bug fixes.</li></ul>
+      <p>Dec 14, 2001, V2.0</p>
+      <ul>
+        <li>Supporting new controls, thanks to <A href="mailto:domains@planetsymphony.com" >Heath Provost</A> who 
+        made the basic code to subclass and paint combobox. The controls 
+        supported so far are: ComboBox, CustomEdit, CheckBox, RadioButton, 
+        Button, BitBtn and of course, Toolbar and Menu. 
+        <li>Disabled text in tool bar buttons is drawn 
+        correctly now. 
+        <li>xpMenu can detect menus and toolbars inside 
+        Frame. 
+        <li>DimLevel and GrayLevel properties added to 
+        control the appearance of the bitmaps. (suggested by <A href="mailto:@" >Warner</A> and <A href="mailto:postmaster@imazzo.com" >Enzo</A>) 
+        <li>Drawing bitmaps assigned to menu items is 
+        improved. - Fixing some problem caused by FlatMenu property. 
+        <li>Active property behavior is changed, to enforce 
+        the component to draw new added controls; it must be set to false first. 
+
+        <li>Adding 8 pixels to top menu items for WinNT 
+        based systems. (Suggested&nbsp;by <a href="http://www.neikeisoft.de" 
+        >Niki Bugarcici</a> and <a 
+        href="http://www.digitalwired.net">Brian Slack</a> 
+        &nbsp; ) 
+        <li>Fixing some drawing aspects.</li></ul>
+      <p>Nov 2, 2001, V1.506</p>
+      <ul>
+        <li>Changing the default color of menu bar. 
+        <li>&nbsp;Changing Form property type to 
+        TScrollingWinControl.&nbsp;(Suggested by <A href="mailto:M.M.K@t-online.de" >Michael Martin</A> .)</li></ul>
+      <p>Oct 7, 2001, V1.505</p>
+      <ul>
+        <li>Supporting ControlBar. Added by <A href="mailto:michiel@iego-development.nl" >Michiel van 
+        Oudheusden</A>.&nbsp;</li></ul>
+      <p>Sept 5, 2001, V1.504</p>
+      <ul>
+        <li>Removing some problematic code lines in the 
+        procedure:&nbsp; ToolBarDrawButton. This code causes unwanted effect on 
+        desktop&nbsp; when activating the component at run time with form 
+        contains a ToolBarButton with MenuItem.</li></ul>
+      <p>Sept 4, 2001 - V1.503</p>
+      <ul>
+        <li>Bug fixed.</li></ul>
+      <p>Sept 3, 2001 - V1.502</p>
+      <ul>
+        <li>Bugs fixed. </li></ul>
+      <p>Sept 1, 2001 - V1.501</p>
+      <ul>
+        <li>Passing beta stage. 
+        <li>Some minor changes and bugs fixed.</li></ul>
+      <p>July 29, 2001, V1.501 (Beta) </p>
+      <ul>
+        <li>Adding AutoDetect property. 
+        <li>Compatibility issues with Delphi4.</li></ul>
+      <p>July 25, 2001, V1.5 </p>
+      <ul>
+        <li>Support for TToolbar. 
+        <li>Getting closer to XP style appearance. 
+        <li>New options. </li></ul>
+      <p>June 23, 2001</p>
+      <ul>
+        <li>Compatibility issues with Delphi4. 
+        <li>Changing the way of menus itration. 
+        <li>Making the blue select rectangle little 
+        thinner. </li></ul>
+      <p>June 21, 2001</p>
+      <ul>
+        <li>Bug fixes. 
+        <li>Items correctly sized even if no image list 
+        assigned. 
+        <li>Shaded colors for top menu items if fixed for 
+        some menu bar colors.</li></ul>
+      <p>June 19, 2001 </p>
+      <ul>
+        <li>Release the first version.</li></ul>
+      <p>
+      <hr id=HR1 SIZE=1 width="100%">
+
+      <p></p>
+      <p></p>
+      <p><font size=1 
+      ></font>&nbsp;This component is based 
+      on&nbsp;article&nbsp;I&nbsp;posted at <a 
+      href="http://www.delphi3000.com/articles/article_2246.asp" 
+      >Delphi3000.com</a>.</p>
+      <hr SIZE=1 width="100%">
+
+      <p></p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p></TD></TR></TBODY></TABLE>
+<P>&nbsp;</P>
+<P align=center>&nbsp;</P>
+<P align=center><FONT size=-3><a 
+href="http://www.shagrouni.com">Shagrouni</a>&nbsp;2002 Khaled Shagrouni <A href="mailto:khaled@shagrouni.com" >khaled@shagrouni.com</A> 
+</FONT></P></CENTER>
+
+</BODY></HTML>

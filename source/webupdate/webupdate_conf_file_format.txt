@@ -1,0 +1,103 @@
+webupdate.conf file format description
+Written by Michal Molhanec
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This is brief description of Dev-C++ WebUpdate webupdate.conf file format. 
+
+The file starts with line:
+{WebUpdate_config_file}
+which uses WebUpdate to recognize if it's really webupdate.conf file.
+Then there are devpak chunks. Each devpak has this entry:
+
+[SectionName]
+Name=Some name
+Description=This is some devpak.<CR>Another line.
+RemoteFilename=xxx.DevPak
+LocalFilename=xxx.DevPak
+Group=Compression
+InstallPath=
+Version=5.6.7
+Size=9543534
+Date=2004-03-02 23:22
+Execute=1
+
+Name ............. Name of the devpak which will be used in Dev-C++ 4.9.8.11
+                   and higher. Different devpaks can have same name. If this
+                   field is not present, SectionName is used as a devpak's
+                   name.
+SectionName ...... Name of a section, typically created as a combination of
+                   Name and Version field. SectionName must be unique, there
+                   cannot be two records in webupdate.conf with same
+                   SectionName. This field is used in Dev-C++ up to 4.9.8.10
+                   as a name of a devpak.
+Description ...... Description of the devpak. The <CR> will be interpreted as
+                   a new line.
+RemoteFilename ... Name of devpak file on a server. It can be relative path
+                   (e.g. RemoteFilename=files/bla.DevPak) or complete url
+                   (e.g. RemoteFilename=http://www.server.org/bla.DevPak) which
+                   starts with http:// and can lead to completely different
+                   server.
+LocalFilename .... Name under which will be the devpak stored on user's machine.
+Group ............ Name of a group the devpak is assigned to.
+                   Under Dev-C++ 4.9.8.11 and higher it is possible to enter
+                   more groups divided by comma (e.g. Group=Allegro,OpenGL).
+InstallPath ...... Path where to install the devpak. For normal devpak this
+                   would be empty. There can be some special values:
+                   {OriginalPath}, {Config}, {Help}, {Lang}, {Exec} but I have
+                   no exact idea what are they for :-). But these macros work
+                   only if Execute=0!
+Version .......... Optional version description. If you don't know version don't
+                   leave this field blank (it won't work), simply omit this
+                   field at all (Simply: "Version=" won't work).
+Size ............. Optional size in bytes. It really has to be a number, don't
+                   put there something like "51 kB", the WebUpdate will do this
+                   automatically. In contrast to Version field this can be blank
+                   but you can also completely omit it.
+Date ............. Date and time in format "YYYY-MM-DD HH:MM".
+Execute .......... Execute=1 means to run PackMan.exe on the devpak after
+                   downloading. You have to use this for normal devpaks, if you
+                   want them to be installed.
+
+WARNING: for WebUpdate and Packman to cooperate well, Name and Version parameters should
+be the exact same strings as the ones used in DevPak's Name and Version fields
+(in Packman or PackMaker). DevPak's Name and Version fields are encoded in DevPaks
+Devpakage, and may have nothing to do with the Devpak's filename.
+
+Example of webupdate.conf:
+================================ cut here =====================================
+{WebUpdate_config_file}
+
+[Allegro 4.1.14]
+Name=Allegro
+Description=A game programming library.
+RemoteFilename=http://heanet.dl.sourceforge.net/sourceforge/devpaks/allegro14.DevPak
+LocalFilename=allegro.DevPak
+Group=Allegro
+InstallPath=
+Version=4.1.14
+Size=2094741
+Date=2004-05-02 18:34
+Execute=1
+
+[Allegro 4.1.13]
+Name=Allegro
+Description=A game programming library.
+RemoteFilename=http://heanet.dl.sourceforge.net/sourceforge/devpaks/allegro13.DevPak
+LocalFilename=allegro.DevPak
+Group=Allegro
+InstallPath=
+Version=4.1.13
+Size=2094567
+Date=2004-03-05 14:23
+Execute=1
+
+[libiberty]
+Description=Header file for libiberty.a distributed with MinGW (but without a header file).
+RemoteFilename=http://molhanec.net/devpaks/files/libiberty.DevPak
+LocalFilename=libiberty.DevPak
+Group=Other
+InstallPath=
+Size=14539
+Date=2004-01-07 11:45
+Execute=1
+
+================================ cut here =====================================

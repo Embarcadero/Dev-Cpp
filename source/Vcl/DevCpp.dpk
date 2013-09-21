@@ -1,0 +1,49 @@
+package DevCpp;
+
+{$R *.res}
+{$R 'devReg.dcr'}
+{$R 'devShortcuts.dcr'}
+{$R 'XPMenu.dcr'}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'Dev-c++ components'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  vcl,
+  vclx,
+  designide,
+  rtl;
+
+contains
+  devReg in 'devReg.pas',
+  devTabs in 'devTabs.pas',
+  ColorPickerButton in 'ColorPickerButton.pas',
+  devShortcuts in 'devShortcuts.pas',
+  devShortcutsEditorForm in 'devShortcutsEditorForm.pas' {frmShortcutsEditor},
+  devFileMonitor in 'devFileMonitor.pas',
+  devMonitorThread in 'devMonitorThread.pas',
+  devMonitorTypes in 'devMonitorTypes.pas',
+  XPMenu in 'XPMenu.pas';
+
+end.

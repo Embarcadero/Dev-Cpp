@@ -1,0 +1,816 @@
+IMPORTING THE CURRENT SYNEDIT INTO DEV-CPP TREE:
+
+1. keep the files from old synedit and 
+   copy them into Export dir (see below)
+    Source\SynAutoIndent.pas
+    Source\SynAutoIndent.res
+    Source\QSynAutoIndent.pas
+
+2. copy files.
+cd into SynEdit directory, create a directory Export,
+and run the followind batch file:
+-----
+mkdir Export\Packages
+copy    Packages\SynEdit_D6.dpk    Export\Packages\
+copy    Packages\SynEdit_D6_PE.dpk    Export\Packages\
+copy    Packages\SynEdit_D7.dpk    Export\Packages\
+copy    Packages\SynEdit_D7_PE.dpk    Export\Packages\
+copy    Packages\synedit_kylix.dpk    Export\Packages\
+copy    Packages\synedit_kylix.res    Export\Packages\
+copy    Packages\synedit_kylix_OE.dpk    Export\Packages\
+copy    Packages\SynEdit_R6.dpk    Export\Packages\
+copy    Packages\SynEdit_R6_PE.dpk    Export\Packages\
+copy    Packages\SynEdit_R7.dpk    Export\Packages\
+
+mkdir Export\Source
+copy    Source\Contributors.txt    Export\Source\
+copy    Source\kTextDrawer.pas    Export\Source\
+
+copy    Source\QSynAutoCorrect.pas    Export\Source\
+copy    Source\QSynAutoCorrectEditor.dfm    Export\Source\
+copy    Source\QSynAutoCorrectEditor.pas    Export\Source\
+copy    Source\QSynCompletionProposal.pas    Export\Source\
+copy    Source\QSynDBEdit.pas    Export\Source\
+copy    Source\QSynEdit.pas    Export\Source\
+copy    Source\QSynEditAutoComplete.pas    Export\Source\
+copy    Source\QSynEditExport.pas    Export\Source\
+copy    Source\QSynEditHighlighter.pas    Export\Source\
+copy    Source\QSynEditKbdHandler.pas    Export\Source\
+copy    Source\QSynEditKeyCmdEditor.dfm    Export\Source\
+copy    Source\QSynEditKeyCmdEditor.pas    Export\Source\
+copy    Source\QSynEditKeyCmds.pas    Export\Source\
+copy    Source\QSynEditKeyCmdsEditor.dfm    Export\Source\
+copy    Source\QSynEditKeyCmdsEditor.pas    Export\Source\
+copy    Source\QSynEditKeyConst.pas    Export\Source\
+copy    Source\QSynEditMiscClasses.pas    Export\Source\
+copy    Source\QSynEditMiscProcs.pas    Export\Source\
+copy    Source\QSynEditOptionsDialog.dfm    Export\Source\
+copy    Source\QSynEditOptionsDialog.pas    Export\Source\
+copy    Source\QSynEditPlugins.pas    Export\Source\
+copy    Source\QSynEditPrint.pas    Export\Source\
+copy    Source\QSynEditPrinterInfo.pas    Export\Source\
+copy    Source\QSynEditPrintHeaderFooter.pas    Export\Source\
+copy    Source\QSynEditPrintMargins.pas    Export\Source\
+copy    Source\QSynEditPrintMarginsDialog.dfm    Export\Source\
+copy    Source\QSynEditPrintMarginsDialog.pas    Export\Source\
+copy    Source\QSynEditPrintPreview.pas    Export\Source\
+copy    Source\QSynEditPrintTypes.pas    Export\Source\
+copy    Source\QSynEditPropertyReg.pas    Export\Source\
+copy    Source\QSynEditPythonBehaviour.pas    Export\Source\
+copy    Source\QSynEditReg.pas    Export\Source\
+copy    Source\QSynEditSearch.pas    Export\Source\
+copy    Source\QSynEditStrConst.pas    Export\Source\
+copy    Source\QSynEditTextBuffer.pas    Export\Source\
+copy    Source\QSynEditTypes.pas    Export\Source\
+copy    Source\QSynEditWordWrap.pas    Export\Source\
+copy    Source\QSynExportHTML.pas    Export\Source\
+copy    Source\QSynExportRTF.pas    Export\Source\
+copy    Source\QSynHighlighterCpp.pas    Export\Source\
+copy    Source\QSynHighlighterManager.pas    Export\Source\
+copy    Source\QSynHighlighterMulti.pas    Export\Source\
+copy    Source\QSynHighlighterRC.pas    Export\Source\
+copy    Source\QSynMacroRecorder.pas    Export\Source\
+copy    Source\QSynMemo.pas    Export\Source\
+copy    Source\QSynRegExpr.pas    Export\Source\
+
+copy    Source\SynAutoCorrect.pas    Export\Source\
+copy    Source\SynAutoCorrectEditor.dfm    Export\Source\
+copy    Source\SynAutoCorrectEditor.pas    Export\Source\
+copy    Source\SynCompletionProposal.pas    Export\Source\
+copy    Source\SynDBEdit.pas    Export\Source\
+copy    Source\SynEdit.inc    Export\Source\
+copy    Source\SynEdit.pas    Export\Source\
+copy    Source\SynEdit.res    Export\Source\
+copy    Source\SynEditAutoComplete.pas    Export\Source\
+copy    Source\SynEditExport.pas    Export\Source\
+copy    Source\SynEditHighlighter.pas    Export\Source\
+copy    Source\SynEditKbdHandler.pas    Export\Source\
+copy    Source\SynEditKeyCmdEditor.dfm    Export\Source\
+copy    Source\SynEditKeyCmdEditor.pas    Export\Source\
+copy    Source\SynEditKeyCmds.pas    Export\Source\
+copy    Source\SynEditKeyCmdsEditor.dfm    Export\Source\
+copy    Source\SynEditKeyCmdsEditor.pas    Export\Source\
+copy    Source\SynEditKeyConst.pas    Export\Source\
+copy    Source\SynEditMiscClasses.pas    Export\Source\
+copy    Source\SynEditMiscProcs.pas    Export\Source\
+copy    Source\SynEditOptionsDialog.dfm    Export\Source\
+copy    Source\SynEditOptionsDialog.pas    Export\Source\
+copy    Source\SynEditPlugins.pas    Export\Source\
+copy    Source\SynEditPrint.pas    Export\Source\
+copy    Source\SynEditPrinterInfo.pas    Export\Source\
+copy    Source\SynEditPrintHeaderFooter.pas    Export\Source\
+copy    Source\SynEditPrintMargins.pas    Export\Source\
+copy    Source\SynEditPrintMarginsDialog.dfm    Export\Source\
+copy    Source\SynEditPrintMarginsDialog.pas    Export\Source\
+copy    Source\SynEditPrintPreview.pas    Export\Source\
+copy    Source\SynEditPrintTypes.pas    Export\Source\
+copy    Source\SynEditPropertyReg.pas    Export\Source\
+copy    Source\SynEditPythonBehaviour.pas    Export\Source\
+copy    Source\SynEditReg.dcr    Export\Source\
+copy    Source\SynEditReg.pas    Export\Source\
+copy    Source\SynEditReg.res    Export\Source\
+copy    Source\SynEditSearch.pas    Export\Source\
+copy    Source\SynEditStrConst.pas    Export\Source\
+copy    Source\SynEditTextBuffer.pas    Export\Source\
+copy    Source\SynEditTypes.pas    Export\Source\
+copy    Source\SynEditWordWrap.pas    Export\Source\
+copy    Source\SynExportHTML.pas    Export\Source\
+copy    Source\SynExportRTF.pas    Export\Source\
+copy    Source\SynHighlighterCpp.pas    Export\Source\
+copy    Source\SynHighlighterManager.pas    Export\Source\
+copy    Source\SynHighlighterMulti.pas    Export\Source\
+copy    Source\SynHighlighterRC.pas    Export\Source\
+copy    Source\SynMacroRecorder.pas    Export\Source\
+copy    Source\SynMemo.pas    Export\Source\
+copy    Source\SynRegExpr.pas    Export\Source\
+copy    Source\SynTextDrawer.pas    Export\Source\
+---
+
+3. Modify SynEditReg:
+---
+diff -u -r1.33 SynEditReg.pas
+--- SynEditReg.pas	13 Jun 2004 17:22:40 -0000	1.33
++++ SynEditReg.pas	13 Nov 2004 19:10:30 -0000
+@@ -55,7 +55,6 @@
+   QSynEditExport,
+   QSynExportHTML,
+   QSynExportRTF,
+-  QSynExportTeX,
+   QSynHighlighterMulti,
+   QSynCompletionProposal,
+   QSynEditPythonBehaviour,
+@@ -64,65 +63,10 @@
+   QSynMacroRecorder,
+   QSynAutoCorrect,
+   QSynEditSearch,
+-  QSynEditRegexSearch,
+   QSynHighlighterManager,
+   QSynEditOptionsDialog,
+-  QSynHighlighterADSP21xx,
+-  QSynHighlighterAsm,
+-  QSynHighlighterAWK,
+-  QSynHighlighterBaan,
+-  QSynHighlighterBat,
+-  QSynHighlighterCAC,
+-  QSynHighlighterCache,
+-  QSynHighlighterCobol,
+   QSynHighlighterCpp,
+-  QSynHighlighterCS,
+-  QSynHighlighterCss,
+-  QSynHighlighterDfm,
+-  QSynHighlighterDml,
+-  QSynHighlighterDOT,
+-  QSynHighlighterEiffel,
+-  QSynHighlighterFortran,
+-  QSynHighlighterFoxpro,
+-  QSynHighlighterGalaxy,
+-  QSynHighlighterGeneral,
+-  QSynHighlighterHaskell,
+-  QSynHighlighterHC11,
+-  QSynHighlighterHP48,
+-  QSynHighlighterHtml,
+-  QSynHighlighterIni,
+-  QSynHighlighterInno,
+-  QSynHighlighterJava,
+-  QSynHighlighterJScript,
+-  QSynHighlighterKix,
+-  QSynHighlighterModelica,
+-  QSynHighlighterM3,
+-  QSynHighlighterPas,
+-  QSynHighlighterPerl,
+-  QSynHighlighterPHP,
+-  QSynHighlighterProgress,
+-  QSynHighlighterPython,
+   QSynHighlighterRC,
+-  QSynHighlighterRuby,
+-  QSynHighlighterSml,
+-  QSynHighlighterSQL,
+-  QSynHighlighterTclTk,
+-  QSynHighlighterTeX,
+-  QSynHighlighterUNIXShellScript,
+-  QSynHighlighterURI,
+-  QSynHighlighterVB,
+-  QSynHighlighterVBScript,
+-  QSynHighlighterVrml97,
+-  QSynHighlighterGWS,
+-  QSynHighlighterCPM,
+-  QSynHighlighterSDD,
+-  QSynHighlighterXML,
+-  QSynHighlighterMsg,
+-  QSynHighlighterIDL,
+-  QSynHighlighterUnreal,
+-  QSynHighlighterST,
+-  QSynHighlighterLDraw,
+-  QSynURIOpener,
+ {$ELSE}
+   // SynEdit components
+   SynEdit,
+@@ -137,7 +81,6 @@
+   SynEditExport,
+   SynExportHTML,
+   SynExportRTF,
+-  SynExportTeX,
+   SynHighlighterMulti,
+   SynCompletionProposal,
+   SynEditPythonBehaviour,
+@@ -146,67 +89,12 @@
+   SynMacroRecorder,
+   SynAutoCorrect,
+   SynEditSearch,
+-  SynEditRegexSearch,
+   {$IFDEF SYN_COMPILER_4_UP}
+   SynHighlighterManager,
+   {$ENDIF}
+   SynEditOptionsDialog,
+-  SynHighlighterADSP21xx,
+-  SynHighlighterAsm,
+-  SynHighlighterAWK,
+-  SynHighlighterBaan,
+-  SynHighlighterBat,
+-  SynHighlighterCAC,
+-  SynHighlighterCache,
+-  SynHighlighterCobol,
+   SynHighlighterCpp,
+-  SynHighlighterCS,
+-  SynHighlighterCss,
+-  SynHighlighterDfm,
+-  SynHighlighterDml,
+-  SynHighlighterDOT,
+-  SynHighlighterEiffel,
+-  SynHighlighterFortran,
+-  SynHighlighterFoxpro,
+-  SynHighlighterGalaxy,
+-  SynHighlighterGeneral,
+-  SynHighlighterHaskell,
+-  SynHighlighterHC11,
+-  SynHighlighterHP48,
+-  SynHighlighterHtml,
+-  SynHighlighterIni,
+-  SynHighlighterInno,
+-  SynHighlighterJava,
+-  SynHighlighterJScript,
+-  SynHighlighterKix,
+-  SynHighlighterModelica,
+-  SynHighlighterM3,
+-  SynHighlighterPas,
+-  SynHighlighterPerl,
+-  SynHighlighterPHP,
+-  SynHighlighterProgress,
+-  SynHighlighterPython,
+   SynHighlighterRC,
+-  SynHighlighterRuby,
+-  SynHighlighterSml,
+-  SynHighlighterSQL,
+-  SynHighlighterTclTk,
+-  SynHighlighterTeX,
+-  SynHighlighterUNIXShellScript,
+-  SynHighlighterURI,
+-  SynHighlighterVB,
+-  SynHighlighterVBScript,
+-  SynHighlighterVrml97,
+-  SynHighlighterGWS,
+-  SynHighlighterCPM,
+-  SynHighlighterSDD,
+-  SynHighlighterXML,
+-  SynHighlighterMsg,
+-  SynHighlighterIDL,
+-  SynHighlighterUnreal,
+-  SynHighlighterST,
+-  SynHighlighterLDraw,
+-  SynURIOpener,
+ {$ENDIF}
+   Classes;
+ 
+@@ -237,15 +125,14 @@
+   GroupDescendentsWith(TSynEditPythonBehaviour, TSynEdit);
+   GroupDescendentsWith(TSynHighlighterManager, TSynEdit);
+   GroupDescendentsWith(TSynEditOptionsDialog, TSynEdit);
+-  GroupDescendentsWith(TSynURIOpener, TSynEdit);
+ {$ENDIF}
+ 
+ // SynEdit extra components
+   RegisterComponents(SYNS_ComponentsPage, [TSynExporterHTML, TSynExporterRTF,
+-    TSynExporterTeX, TSynEditPythonBehaviour, TSynMultiSyn,
++    TSynEditPythonBehaviour, TSynMultiSyn,
+     TSynCompletionProposal, TSynAutoComplete, TSynMacroRecorder,
+     TSynEditPrint, TSynEditPrintPreview, TSynAutoCorrect,
+-    TSynEditSearch, TSynEditRegexSearch, TSynEditOptionsDialog, TSynURIOpener]);
++    TSynEditSearch, TSynEditOptionsDialog]);
+ {$IFDEF SYN_COMPILER_4_UP}
+   RegisterComponents(SYNS_ComponentsPage, [TSynHighlighterManager]);
+ {$ENDIF}
+@@ -253,26 +140,9 @@
+ // SynEdit highlighters
+   RegisterComponents(SYNS_HighlightersPage, [
+     //classic
+-    TSynCppSyn, TSynEiffelSyn, TSynFortranSyn, TSynGeneralSyn, TSynJavaSyn,
+-    TSynM3Syn, TSynPasSyn, TSynVBSyn, TSynCobolSyn, TSynCSSyn,
+-    // internet
+-    TSynCssSyn, TSynHTMLSyn, TSynJScriptSyn, TSynPHPSyn, TSynVBScriptSyn,
+-    TSynXMLSyn, TSynVrml97Syn,
+-    //interpreted
+-    TSynAWKSyn, TSynBATSyn, TSynKixSyn, TSynPerlSyn, TSynPythonSyn,
+-    TSynTclTkSyn, TSynGWScriptSyn, TSynRubySyn, TSynUNIXShellScriptSyn, 
+-    //database
+-    TSynCACSyn, TSynCacheSyn, TSynFoxproSyn, TSynSQLSyn, TSynSDDSyn,
+-    //assembler
+-    TSynADSP21xxSyn, TSynAsmSyn, TSynHC11Syn, TSynHP48Syn, TSynSTSyn,
+-    //data modeling
+-    TSynDmlSyn, TSynModelicaSyn, TSynSMLSyn,
+-    //data
+-    TSynDfmSyn, TSynIniSyn, TSynInnoSyn,
++    TSynCppSyn,
+     // other
+-    TSynBaanSyn, TSynGalaxySyn, TSynProgressSyn, TSynMsgSyn,
+-    TSynIdlSyn, TSynUnrealSyn, TSynCPMSyn, TSynTeXSyn, 
+-    TSynHaskellSyn, TSynLDRSyn, TSynURISyn, TSynDOTSyn, TSynRCSyn
++    TSynRCSyn
+   ]);
+ end;
+ 
+
+---
+4. Modify Packages:
+--
+cvs -z3 diff -u SynEdit_D6.dpk SynEdit_D6_PE.dpk SynEdit_D7.dpk SynEdit_D7_PE.dpk synedit_kylix.dpk synedit_kylix.res synedit_kylix_OE.dpk SynEdit_R6.dpk SynEdit_R6_PE.dpk SynEdit_R7.dpk (in directory C:\projects\SynEdit\Packages\)
+cvs diff: Empty password used - try 'cvs login' with a real password
+
+Index: SynEdit_D6.dpk
+===================================================================
+RCS file: /cvsroot/synedit/SynEdit/Packages/SynEdit_D6.dpk,v
+retrieving revision 1.5
+diff -u -r1.5 SynEdit_D6.dpk
+--- SynEdit_D6.dpk	31 Dec 2003 11:08:26 -0000	1.5
++++ SynEdit_D6.dpk	13 Nov 2004 20:12:12 -0000
+@@ -1,6 +1,6 @@
+ package SynEdit_D6;
+ 
+-{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
++{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
+ 
+ {$R *.res}
+ {$R '..\Source\SynEditReg.dcr'}
+Index: SynEdit_D7.dpk
+===================================================================
+RCS file: /cvsroot/synedit/SynEdit/Packages/SynEdit_D7.dpk,v
+retrieving revision 1.4
+diff -u -r1.4 SynEdit_D7.dpk
+--- SynEdit_D7.dpk	22 Apr 2004 21:01:21 -0000	1.4
++++ SynEdit_D7.dpk	13 Nov 2004 20:12:12 -0000
+@@ -1,6 +1,6 @@
+ package SynEdit_D7;
+ 
+-{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
++{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
+ 
+ {$R *.res}
+ {$R '..\Source\SynEditReg.dcr'}
+Index: synedit_kylix.dpk
+===================================================================
+RCS file: /cvsroot/synedit/SynEdit/Packages/synedit_kylix.dpk,v
+retrieving revision 1.6
+diff -u -r1.6 synedit_kylix.dpk
+--- synedit_kylix.dpk	19 Nov 2004 14:20:01 -0000	1.6
++++ synedit_kylix.dpk	20 Nov 2004 19:02:38 -0000
+@@ -62,7 +62,6 @@
+   QSynEditPropertyReg in '../Source/QSynEditPropertyReg.pas',
+   QSynEditPythonBehaviour in '../Source/QSynEditPythonBehaviour.pas',
+   QSynEditReg in '../Source/QSynEditReg.pas',
+-  QSynEditRegexSearch in '../Source/QSynEditRegexSearch.pas',
+   QSynEditSearch in '../Source/QSynEditSearch.pas',
+   QSynEditStrConst in '../Source/QSynEditStrConst.pas',
+   QSynEditTextBuffer in '../Source/QSynEditTextBuffer.pas',
+@@ -70,68 +69,12 @@
+   QSynEditWordWrap in '../Source/QSynEditWordWrap.pas',
+   QSynExportHTML in '../Source/QSynExportHTML.pas',
+   QSynExportRTF in '../Source/QSynExportRTF.pas',
+-  QSynExportTeX in '../Source/QSynExportTeX.pas',
+-  QSynHighlighterADSP21xx in '../Source/QSynHighlighterADSP21xx.pas',
+-  QSynHighlighterAsm in '../Source/QSynHighlighterAsm.pas',
+-  QSynHighlighterAWK in '../Source/QSynHighlighterAWK.pas',
+-  QSynHighlighterBaan in '../Source/QSynHighlighterBaan.pas',
+-  QSynHighlighterBat in '../Source/QSynHighlighterBat.pas',
+-  QSynHighlighterCAC in '../Source/QSynHighlighterCAC.pas',
+-  QSynHighlighterCache in '../Source/QSynHighlighterCache.pas',
+-  QSynHighlighterCobol in '../Source/QSynHighlighterCobol.pas',
+-  QSynHighlighterCPM in '../Source/QSynHighlighterCPM.pas',
+   QSynHighlighterCpp in '../Source/QSynHighlighterCpp.pas',
+-  QSynHighlighterCS in '../Source/QSynHighlighterCS.pas',
+-  QSynHighlighterCss in '../Source/QSynHighlighterCss.pas',
+-  QSynHighlighterDfm in '../Source/QSynHighlighterDfm.pas',
+-  QSynHighlighterDml in '../Source/QSynHighlighterDml.pas',
+-  QSynHighlighterDOT in '../Source/QSynHighlighterDOT.pas',
+-  QSynHighlighterEiffel in '../Source/QSynHighlighterEiffel.pas',
+-  QSynHighlighterFortran in '../Source/QSynHighlighterFortran.pas',
+-  QSynHighlighterFoxpro in '../Source/QSynHighlighterFoxpro.pas',
+-  QSynHighlighterGalaxy in '../Source/QSynHighlighterGalaxy.pas',
+-  QSynHighlighterGeneral in '../Source/QSynHighlighterGeneral.pas',
+-  QSynHighlighterGWS in '../Source/QSynHighlighterGWS.pas',
+-  QSynHighlighterHashEntries in '../Source/QSynHighlighterHashEntries.pas',
+-  QSynHighlighterHaskell in '../Source/QSynHighlighterHaskell.pas',
+-  QSynHighlighterHC11 in '../Source/QSynHighlighterHC11.pas',
+-  QSynHighlighterHP48 in '../Source/QSynHighlighterHP48.pas',
+-  QSynHighlighterHtml in '../Source/QSynHighlighterHtml.pas',
+-  QSynHighlighterIDL in '../Source/QSynHighlighterIDL.pas',
+-  QSynHighlighterIni in '../Source/QSynHighlighterIni.pas',
+-  QSynHighlighterInno in '../Source/QSynHighlighterInno.pas',
+-  QSynHighlighterJava in '../Source/QSynHighlighterJava.pas',
+-  QSynHighlighterJScript in '../Source/QSynHighlighterJScript.pas',
+-  QSynHighlighterKix in '../Source/QSynHighlighterKix.pas',
+-  QSynHighlighterLDraw in '../Source/QSynHighlighterLDraw.pas',
+-  QSynHighlighterM3 in '../Source/QSynHighlighterM3.pas',
+   QSynHighlighterManager in '../Source/QSynHighlighterManager.pas',
+-  QSynHighlighterModelica in '../Source/QSynHighlighterModelica.pas',
+-  QSynHighlighterMsg in '../Source/QSynHighlighterMsg.pas',
+   QSynHighlighterMulti in '../Source/QSynHighlighterMulti.pas',
+-  QSynHighlighterPas in '../Source/QSynHighlighterPas.pas',
+-  QSynHighlighterPerl in '../Source/QSynHighlighterPerl.pas',
+-  QSynHighlighterPHP in '../Source/QSynHighlighterPHP.pas',
+-  QSynHighlighterProgress in '../Source/QSynHighlighterProgress.pas',
+-  QSynHighlighterPython in '../Source/QSynHighlighterPython.pas',
+   QSynHighlighterRC in '../Source/QSynHighlighterRC.pas',
+-  QSynHighlighterRuby in '../Source/QSynHighlighterRuby.pas',
+-  QSynHighlighterSDD in '../Source/QSynHighlighterSDD.pas',
+-  QSynHighlighterSml in '../Source/QSynHighlighterSml.pas',
+-  QSynHighlighterSQL in '../Source/QSynHighlighterSQL.pas',
+-  QSynHighlighterST in '../Source/QSynHighlighterST.pas',
+-  QSynHighlighterTclTk in '../Source/QSynHighlighterTclTk.pas',
+-  QSynHighlighterTeX in '../Source/QSynHighlighterTeX.pas',
+-  QSynHighlighterUNIXShellScript in '../Source/QSynHighlighterUNIXShellScript.pas',
+-  QSynHighlighterUnreal in '../Source/QSynHighlighterUnreal.pas',
+-  QSynHighlighterURI in '../Source/QSynHighlighterURI.pas',
+-  QSynHighlighterVB in '../Source/QSynHighlighterVB.pas',
+-  QSynHighlighterVBScript in '../Source/QSynHighlighterVBScript.pas',
+-  QSynHighlighterVrml97 in '../Source/QSynHighlighterVrml97.pas',
+-  QSynHighlighterXML in '../Source/QSynHighlighterXML.pas',
+   QSynMacroRecorder in '../Source/QSynMacroRecorder.pas',
+   QSynMemo in '../Source/QSynMemo.pas',
+-  QSynRegExpr in '../Source/QSynRegExpr.pas',
+-  QSynURIOpener in '../Source/QSynURIOpener.pas';
++  QSynRegExpr in '../Source/QSynRegExpr.pas';
+ 
+ end.
+Index: synedit_kylix_OE.dpk
+===================================================================
+RCS file: /cvsroot/synedit/SynEdit/Packages/synedit_kylix_OE.dpk,v
+retrieving revision 1.12
+diff -u -r1.12 synedit_kylix_OE.dpk
+--- synedit_kylix_OE.dpk	19 Nov 2004 14:20:18 -0000	1.12
++++ synedit_kylix_OE.dpk	20 Nov 2004 19:02:50 -0000
+@@ -61,7 +61,6 @@
+   QSynEditPropertyReg in '../Source/QSynEditPropertyReg.pas',
+   QSynEditPythonBehaviour in '../Source/QSynEditPythonBehaviour.pas',
+   QSynEditReg in '../Source/QSynEditReg.pas',
+-  QSynEditRegexSearch in '../Source/QSynEditRegexSearch.pas',
+   QSynEditSearch in '../Source/QSynEditSearch.pas',
+   QSynEditStrConst in '../Source/QSynEditStrConst.pas',
+   QSynEditTextBuffer in '../Source/QSynEditTextBuffer.pas',
+@@ -69,68 +68,12 @@
+   QSynEditWordWrap in '../Source/QSynEditWordWrap.pas',
+   QSynExportHTML in '../Source/QSynExportHTML.pas',
+   QSynExportRTF in '../Source/QSynExportRTF.pas',
+-  QSynExportTeX in '../Source/QSynExportTeX.pas',
+-  QSynHighlighterADSP21xx in '../Source/QSynHighlighterADSP21xx.pas',
+-  QSynHighlighterAsm in '../Source/QSynHighlighterAsm.pas',
+-  QSynHighlighterAWK in '../Source/QSynHighlighterAWK.pas',
+-  QSynHighlighterBaan in '../Source/QSynHighlighterBaan.pas',
+-  QSynHighlighterBat in '../Source/QSynHighlighterBat.pas',
+-  QSynHighlighterCAC in '../Source/QSynHighlighterCAC.pas',
+-  QSynHighlighterCache in '../Source/QSynHighlighterCache.pas',
+-  QSynHighlighterCobol in '../Source/QSynHighlighterCobol.pas',
+-  QSynHighlighterCPM in '../Source/QSynHighlighterCPM.pas',
+   QSynHighlighterCpp in '../Source/QSynHighlighterCpp.pas',
+-  QSynHighlighterCS in '../Source/QSynHighlighterCS.pas',
+-  QSynHighlighterCss in '../Source/QSynHighlighterCss.pas',
+-  QSynHighlighterDfm in '../Source/QSynHighlighterDfm.pas',
+-  QSynHighlighterDml in '../Source/QSynHighlighterDml.pas',
+-  QSynHighlighterDOT in '../Source/QSynHighlighterDOT.pas',
+-  QSynHighlighterEiffel in '../Source/QSynHighlighterEiffel.pas',
+-  QSynHighlighterFortran in '../Source/QSynHighlighterFortran.pas',
+-  QSynHighlighterFoxpro in '../Source/QSynHighlighterFoxpro.pas',
+-  QSynHighlighterGalaxy in '../Source/QSynHighlighterGalaxy.pas',
+-  QSynHighlighterGeneral in '../Source/QSynHighlighterGeneral.pas',
+-  QSynHighlighterGWS in '../Source/QSynHighlighterGWS.pas',
+-  QSynHighlighterHashEntries in '../Source/QSynHighlighterHashEntries.pas',
+-  QSynHighlighterHaskell in '../Source/QSynHighlighterHaskell.pas',
+-  QSynHighlighterHC11 in '../Source/QSynHighlighterHC11.pas',
+-  QSynHighlighterHP48 in '../Source/QSynHighlighterHP48.pas',
+-  QSynHighlighterHtml in '../Source/QSynHighlighterHtml.pas',
+-  QSynHighlighterIDL in '../Source/QSynHighlighterIDL.pas',
+-  QSynHighlighterIni in '../Source/QSynHighlighterIni.pas',
+-  QSynHighlighterInno in '../Source/QSynHighlighterInno.pas',
+-  QSynHighlighterJava in '../Source/QSynHighlighterJava.pas',
+-  QSynHighlighterJScript in '../Source/QSynHighlighterJScript.pas',
+-  QSynHighlighterKix in '../Source/QSynHighlighterKix.pas',
+-  QSynHighlighterLDraw in '../Source/QSynHighlighterLDraw.pas',
+-  QSynHighlighterM3 in '../Source/QSynHighlighterM3.pas',
+   QSynHighlighterManager in '../Source/QSynHighlighterManager.pas',
+-  QSynHighlighterModelica in '../Source/QSynHighlighterModelica.pas',
+-  QSynHighlighterMsg in '../Source/QSynHighlighterMsg.pas',
+   QSynHighlighterMulti in '../Source/QSynHighlighterMulti.pas',
+-  QSynHighlighterPas in '../Source/QSynHighlighterPas.pas',
+-  QSynHighlighterPerl in '../Source/QSynHighlighterPerl.pas',
+-  QSynHighlighterPHP in '../Source/QSynHighlighterPHP.pas',
+-  QSynHighlighterProgress in '../Source/QSynHighlighterProgress.pas',
+-  QSynHighlighterPython in '../Source/QSynHighlighterPython.pas',
+   QSynHighlighterRC in '../Source/QSynHighlighterRC.pas',
+-  QSynHighlighterRuby in '../Source/QSynHighlighterRuby.pas',
+-  QSynHighlighterSDD in '../Source/QSynHighlighterSDD.pas',
+-  QSynHighlighterSml in '../Source/QSynHighlighterSml.pas',
+-  QSynHighlighterSQL in '../Source/QSynHighlighterSQL.pas',
+-  QSynHighlighterST in '../Source/QSynHighlighterST.pas',
+-  QSynHighlighterTclTk in '../Source/QSynHighlighterTclTk.pas',
+-  QSynHighlighterTeX in '../Source/QSynHighlighterTeX.pas',
+-  QSynHighlighterUNIXShellScript in '../Source/QSynHighlighterUNIXShellScript.pas',
+-  QSynHighlighterUnreal in '../Source/QSynHighlighterUnreal.pas',
+-  QSynHighlighterURI in '../Source/QSynHighlighterURI.pas',
+-  QSynHighlighterVB in '../Source/QSynHighlighterVB.pas',
+-  QSynHighlighterVBScript in '../Source/QSynHighlighterVBScript.pas',
+-  QSynHighlighterVrml97 in '../Source/QSynHighlighterVrml97.pas',
+-  QSynHighlighterXML in '../Source/QSynHighlighterXML.pas',
+   QSynMacroRecorder in '../Source/QSynMacroRecorder.pas',
+   QSynMemo in '../Source/QSynMemo.pas',
+-  QSynRegExpr in '../Source/QSynRegExpr.pas',
+-  QSynURIOpener in '../Source/QSynURIOpener.pas';
++  QSynRegExpr in '../Source/QSynRegExpr.pas';
+ 
+ end.
+Index: SynEdit_R6.dpk
+===================================================================
+RCS file: /cvsroot/synedit/SynEdit/Packages/SynEdit_R6.dpk,v
+retrieving revision 1.7
+diff -u -r1.7 SynEdit_R6.dpk
+--- SynEdit_R6.dpk	13 Jun 2004 17:14:18 -0000	1.7
++++ SynEdit_R6.dpk	13 Nov 2004 20:12:12 -0000
+@@ -1,6 +1,6 @@
+ package SynEdit_R6;
+ 
+-{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
++{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
+ 
+ {$R *.res}
+ {$ALIGN 8}
+@@ -61,74 +61,17 @@
+   SynEditPrintPreview in '..\Source\SynEditPrintPreview.pas',
+   SynEditPrintTypes in '..\Source\SynEditPrintTypes.pas',
+   SynEditPythonBehaviour in '..\Source\SynEditPythonBehaviour.pas',
+-  SynEditRegexSearch in '..\Source\SynEditRegexSearch.pas',
+   SynEditSearch in '..\Source\SynEditSearch.pas',
+   SynEditStrConst in '..\Source\SynEditStrConst.pas',
+   SynEditTextBuffer in '..\Source\SynEditTextBuffer.pas',
+   SynEditTypes in '..\Source\SynEditTypes.pas',
+   SynExportHTML in '..\Source\SynExportHTML.pas',
+   SynExportRTF in '..\Source\SynExportRTF.pas',
+-  SynExportTeX in '..\Source\SynExportTeX.pas',
+-  SynHighlighterADSP21xx in '..\Source\SynHighlighterADSP21xx.pas',
+-  SynHighlighterAsm in '..\Source\SynHighlighterAsm.pas',
+-  SynHighlighterAWK in '..\Source\SynHighlighterAWK.pas',
+-  SynHighlighterBaan in '..\Source\SynHighlighterBaan.pas',
+-  SynHighlighterBat in '..\Source\SynHighlighterBat.pas',
+-  SynHighlighterCAC in '..\Source\SynHighlighterCAC.pas',
+-  SynHighlighterCache in '..\Source\SynHighlighterCache.pas',
+-  SynHighlighterCobol in '..\Source\SynHighlighterCobol.pas',
+-  SynHighlighterCPM in '..\Source\SynHighlighterCPM.pas',
+   SynHighlighterCpp in '..\Source\SynHighlighterCpp.pas',
+-  SynHighlighterCS in '..\Source\SynHighlighterCS.pas',
+-  SynHighlighterDfm in '..\Source\SynHighlighterDfm.pas',
+-  SynHighlighterDml in '..\Source\SynHighlighterDml.pas',
+-  SynHighlighterFortran in '..\Source\SynHighlighterFortran.pas',
+-  SynHighlighterFoxpro in '..\Source\SynHighlighterFoxpro.pas',
+-  SynHighlighterGalaxy in '..\Source\SynHighlighterGalaxy.pas',
+-  SynHighlighterGeneral in '..\Source\SynHighlighterGeneral.pas',
+-  SynHighlighterGWS in '..\Source\SynHighlighterGWS.pas',
+-  SynHighlighterHashEntries in '..\Source\SynHighlighterHashEntries.pas',
+-  SynHighlighterHaskell in '..\Source\SynHighlighterHaskell.pas',
+-  SynHighlighterHC11 in '..\Source\SynHighlighterHC11.pas',
+-  SynHighlighterHP48 in '..\Source\SynHighlighterHP48.pas',
+-  SynHighlighterHtml in '..\Source\SynHighlighterHtml.pas',
+-  SynHighlighterIDL in '..\Source\SynHighlighterIDL.pas',
+-  SynHighlighterIni in '..\Source\SynHighlighterIni.pas',
+-  SynHighlighterInno in '..\Source\SynHighlighterInno.pas',
+-  SynHighlighterJava in '..\Source\SynHighlighterJava.pas',
+-  SynHighlighterJScript in '..\Source\SynHighlighterJScript.pas',
+-  SynHighlighterKix in '..\Source\SynHighlighterKix.pas',
+-  SynHighlighterM3 in '..\Source\SynHighlighterM3.pas',
+-  SynHighlighterModelica in '..\Source\SynHighlighterModelica.pas',
+-  SynHighlighterMsg in '..\Source\SynHighlighterMsg.pas',
+   SynHighlighterMulti in '..\Source\SynHighlighterMulti.pas',
+-  SynHighlighterPas in '..\Source\SynHighlighterPas.pas',
+-  SynHighlighterPerl in '..\Source\SynHighlighterPerl.pas',
+-  SynHighlighterPHP in '..\Source\SynHighlighterPHP.pas',
+-  SynHighlighterProgress in '..\Source\SynHighlighterProgress.pas',
+-  SynHighlighterPython in '..\Source\SynHighlighterPython.pas',
+   SynHighlighterRC in '..\Source\SynHighlighterRC.pas',
+-  SynHighlighterRuby in '..\Source\SynHighlighterRuby.pas',
+-  SynHighlighterSDD in '..\Source\SynHighlighterSDD.pas',
+-  SynHighlighterSml in '..\Source\SynHighlighterSml.pas',
+-  SynHighlighterSQL in '..\Source\SynHighlighterSQL.pas',
+-  SynHighlighterST in '..\Source\SynHighlighterST.pas',
+-  SynHighlighterTclTk in '..\Source\SynHighlighterTclTk.pas',
+-  SynHighlighterTeX in '..\Source\SynHighlighterTeX.pas',
+-  SynHighlighterUNIXShellScript in '..\Source\SynHighlighterUNIXShellScript.pas',
+-  SynHighlighterUnreal in '..\Source\SynHighlighterUnreal.pas',
+-  SynHighlighterVB in '..\Source\SynHighlighterVB.pas',
+-  SynHighlighterVBScript in '..\Source\SynHighlighterVBScript.pas',
+-  SynHighlighterXML in '..\Source\SynHighlighterXML.pas',
+   SynMacroRecorder in '..\Source\SynMacroRecorder.pas',
+   SynMemo in '..\Source\SynMemo.pas',
+-  SynRegExpr in '..\Source\SynRegExpr.pas',
+-  SynHighlighterCSS in '..\Source\SynHighlighterCss.pas',
+-  SynHighlighterLDraw in '..\Source\SynHighlighterLDraw.pas',
+-  SynHighlighterURI in '..\Source\SynHighlighterURI.pas',
+-  SynURIOpener in '..\Source\SynURIOpener.pas',
+-  SynHighlighterDOT in '..\Source\SynHighlighterDOT.pas',
+-  SynHighlighterVrml97 in '..\Source\SynHighlighterVrml97.pas',
+-  SynHighlighterEiffel in '..\Source\SynHighlighterEiffel.pas';
++  SynRegExpr in '..\Source\SynRegExpr.pas';
+ 
+ end.
+Index: SynEdit_R6_PE.dpk
+===================================================================
+RCS file: /cvsroot/synedit/SynEdit/Packages/SynEdit_R6_PE.dpk,v
+retrieving revision 1.1
+diff -u -r1.1 SynEdit_R6_PE.dpk
+--- SynEdit_R6_PE.dpk	25 Aug 2004 10:38:58 -0000	1.1
++++ SynEdit_R6_PE.dpk	13 Nov 2004 20:26:48 -0000
+@@ -1,6 +1,6 @@
+ package SynEdit_R6_PE;
+ 
+-{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
++{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
+ 
+ {$R *.res}
+ {$ALIGN 8}
+@@ -59,74 +59,17 @@
+   SynEditPrintPreview in '..\Source\SynEditPrintPreview.pas',
+   SynEditPrintTypes in '..\Source\SynEditPrintTypes.pas',
+   SynEditPythonBehaviour in '..\Source\SynEditPythonBehaviour.pas',
+-  SynEditRegexSearch in '..\Source\SynEditRegexSearch.pas',
+   SynEditSearch in '..\Source\SynEditSearch.pas',
+   SynEditStrConst in '..\Source\SynEditStrConst.pas',
+   SynEditTextBuffer in '..\Source\SynEditTextBuffer.pas',
+   SynEditTypes in '..\Source\SynEditTypes.pas',
+   SynExportHTML in '..\Source\SynExportHTML.pas',
+   SynExportRTF in '..\Source\SynExportRTF.pas',
+-  SynExportTeX in '..\Source\SynExportTeX.pas',
+-  SynHighlighterADSP21xx in '..\Source\SynHighlighterADSP21xx.pas',
+-  SynHighlighterAsm in '..\Source\SynHighlighterAsm.pas',
+-  SynHighlighterAWK in '..\Source\SynHighlighterAWK.pas',
+-  SynHighlighterBaan in '..\Source\SynHighlighterBaan.pas',
+-  SynHighlighterBat in '..\Source\SynHighlighterBat.pas',
+-  SynHighlighterCAC in '..\Source\SynHighlighterCAC.pas',
+-  SynHighlighterCache in '..\Source\SynHighlighterCache.pas',
+-  SynHighlighterCobol in '..\Source\SynHighlighterCobol.pas',
+-  SynHighlighterCPM in '..\Source\SynHighlighterCPM.pas',
+   SynHighlighterCpp in '..\Source\SynHighlighterCpp.pas',
+-  SynHighlighterCS in '..\Source\SynHighlighterCS.pas',
+-  SynHighlighterDfm in '..\Source\SynHighlighterDfm.pas',
+-  SynHighlighterDml in '..\Source\SynHighlighterDml.pas',
+-  SynHighlighterFortran in '..\Source\SynHighlighterFortran.pas',
+-  SynHighlighterFoxpro in '..\Source\SynHighlighterFoxpro.pas',
+-  SynHighlighterGalaxy in '..\Source\SynHighlighterGalaxy.pas',
+-  SynHighlighterGeneral in '..\Source\SynHighlighterGeneral.pas',
+-  SynHighlighterGWS in '..\Source\SynHighlighterGWS.pas',
+-  SynHighlighterHashEntries in '..\Source\SynHighlighterHashEntries.pas',
+-  SynHighlighterHaskell in '..\Source\SynHighlighterHaskell.pas',
+-  SynHighlighterHC11 in '..\Source\SynHighlighterHC11.pas',
+-  SynHighlighterHP48 in '..\Source\SynHighlighterHP48.pas',
+-  SynHighlighterHtml in '..\Source\SynHighlighterHtml.pas',
+-  SynHighlighterIDL in '..\Source\SynHighlighterIDL.pas',
+-  SynHighlighterIni in '..\Source\SynHighlighterIni.pas',
+-  SynHighlighterInno in '..\Source\SynHighlighterInno.pas',
+-  SynHighlighterJava in '..\Source\SynHighlighterJava.pas',
+-  SynHighlighterJScript in '..\Source\SynHighlighterJScript.pas',
+-  SynHighlighterKix in '..\Source\SynHighlighterKix.pas',
+-  SynHighlighterM3 in '..\Source\SynHighlighterM3.pas',
+-  SynHighlighterModelica in '..\Source\SynHighlighterModelica.pas',
+-  SynHighlighterMsg in '..\Source\SynHighlighterMsg.pas',
+   SynHighlighterMulti in '..\Source\SynHighlighterMulti.pas',
+-  SynHighlighterPas in '..\Source\SynHighlighterPas.pas',
+-  SynHighlighterPerl in '..\Source\SynHighlighterPerl.pas',
+-  SynHighlighterPHP in '..\Source\SynHighlighterPHP.pas',
+-  SynHighlighterProgress in '..\Source\SynHighlighterProgress.pas',
+-  SynHighlighterPython in '..\Source\SynHighlighterPython.pas',
+   SynHighlighterRC in '..\Source\SynHighlighterRC.pas',
+-  SynHighlighterRuby in '..\Source\SynHighlighterRuby.pas',
+-  SynHighlighterSDD in '..\Source\SynHighlighterSDD.pas',
+-  SynHighlighterSml in '..\Source\SynHighlighterSml.pas',
+-  SynHighlighterSQL in '..\Source\SynHighlighterSQL.pas',
+-  SynHighlighterST in '..\Source\SynHighlighterST.pas',
+-  SynHighlighterTclTk in '..\Source\SynHighlighterTclTk.pas',
+-  SynHighlighterTeX in '..\Source\SynHighlighterTeX.pas',
+-  SynHighlighterUNIXShellScript in '..\Source\SynHighlighterUNIXShellScript.pas',
+-  SynHighlighterUnreal in '..\Source\SynHighlighterUnreal.pas',
+-  SynHighlighterVB in '..\Source\SynHighlighterVB.pas',
+-  SynHighlighterVBScript in '..\Source\SynHighlighterVBScript.pas',
+-  SynHighlighterXML in '..\Source\SynHighlighterXML.pas',
+   SynMacroRecorder in '..\Source\SynMacroRecorder.pas',
+   SynMemo in '..\Source\SynMemo.pas',
+-  SynRegExpr in '..\Source\SynRegExpr.pas',
+-  SynHighlighterCSS in '..\Source\SynHighlighterCss.pas',
+-  SynHighlighterLDraw in '..\Source\SynHighlighterLDraw.pas',
+-  SynHighlighterURI in '..\Source\SynHighlighterURI.pas',
+-  SynURIOpener in '..\Source\SynURIOpener.pas',
+-  SynHighlighterDOT in '..\Source\SynHighlighterDOT.pas',
+-  SynHighlighterVrml97 in '..\Source\SynHighlighterVrml97.pas',
+-  SynHighlighterEiffel in '..\Source\SynHighlighterEiffel.pas';
++  SynRegExpr in '..\Source\SynRegExpr.pas';
+ 
+ end.
+Index: SynEdit_R7.dpk
+===================================================================
+RCS file: /cvsroot/synedit/SynEdit/Packages/SynEdit_R7.dpk,v
+retrieving revision 1.4
+diff -u -r1.4 SynEdit_R7.dpk
+--- SynEdit_R7.dpk	13 Jun 2004 17:14:18 -0000	1.4
++++ SynEdit_R7.dpk	13 Nov 2004 20:12:12 -0000
+@@ -1,6 +1,6 @@
+ package SynEdit_R7;
+ 
+-{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
++{ $Id: IMPORTING_SYNEDIT.txt,v 1.4 2005/01/08 17:06:26 specu Exp $ }
+ 
+ {$R *.res}
+ {$ALIGN 8}
+@@ -61,74 +61,17 @@
+   SynEditPrintPreview in '..\Source\SynEditPrintPreview.pas',
+   SynEditPrintTypes in '..\Source\SynEditPrintTypes.pas',
+   SynEditPythonBehaviour in '..\Source\SynEditPythonBehaviour.pas',
+-  SynEditRegexSearch in '..\Source\SynEditRegexSearch.pas',
+   SynEditSearch in '..\Source\SynEditSearch.pas',
+   SynEditStrConst in '..\Source\SynEditStrConst.pas',
+   SynEditTextBuffer in '..\Source\SynEditTextBuffer.pas',
+   SynEditTypes in '..\Source\SynEditTypes.pas',
+   SynExportHTML in '..\Source\SynExportHTML.pas',
+   SynExportRTF in '..\Source\SynExportRTF.pas',
+-  SynExportTeX in '..\Source\SynExportTeX.pas',
+-  SynHighlighterADSP21xx in '..\Source\SynHighlighterADSP21xx.pas',
+-  SynHighlighterAsm in '..\Source\SynHighlighterAsm.pas',
+-  SynHighlighterAWK in '..\Source\SynHighlighterAWK.pas',
+-  SynHighlighterBaan in '..\Source\SynHighlighterBaan.pas',
+-  SynHighlighterBat in '..\Source\SynHighlighterBat.pas',
+-  SynHighlighterCAC in '..\Source\SynHighlighterCAC.pas',
+-  SynHighlighterCache in '..\Source\SynHighlighterCache.pas',
+-  SynHighlighterCobol in '..\Source\SynHighlighterCobol.pas',
+-  SynHighlighterCPM in '..\Source\SynHighlighterCPM.pas',
+   SynHighlighterCpp in '..\Source\SynHighlighterCpp.pas',
+-  SynHighlighterCS in '..\Source\SynHighlighterCS.pas',
+-  SynHighlighterDfm in '..\Source\SynHighlighterDfm.pas',
+-  SynHighlighterDml in '..\Source\SynHighlighterDml.pas',
+-  SynHighlighterFortran in '..\Source\SynHighlighterFortran.pas',
+-  SynHighlighterFoxpro in '..\Source\SynHighlighterFoxpro.pas',
+-  SynHighlighterGalaxy in '..\Source\SynHighlighterGalaxy.pas',
+-  SynHighlighterGeneral in '..\Source\SynHighlighterGeneral.pas',
+-  SynHighlighterGWS in '..\Source\SynHighlighterGWS.pas',
+-  SynHighlighterHashEntries in '..\Source\SynHighlighterHashEntries.pas',
+-  SynHighlighterHaskell in '..\Source\SynHighlighterHaskell.pas',
+-  SynHighlighterHC11 in '..\Source\SynHighlighterHC11.pas',
+-  SynHighlighterHP48 in '..\Source\SynHighlighterHP48.pas',
+-  SynHighlighterHtml in '..\Source\SynHighlighterHtml.pas',
+-  SynHighlighterIDL in '..\Source\SynHighlighterIDL.pas',
+-  SynHighlighterIni in '..\Source\SynHighlighterIni.pas',
+-  SynHighlighterInno in '..\Source\SynHighlighterInno.pas',
+-  SynHighlighterJava in '..\Source\SynHighlighterJava.pas',
+-  SynHighlighterJScript in '..\Source\SynHighlighterJScript.pas',
+-  SynHighlighterKix in '..\Source\SynHighlighterKix.pas',
+-  SynHighlighterM3 in '..\Source\SynHighlighterM3.pas',
+-  SynHighlighterModelica in '..\Source\SynHighlighterModelica.pas',
+-  SynHighlighterMsg in '..\Source\SynHighlighterMsg.pas',
+   SynHighlighterMulti in '..\Source\SynHighlighterMulti.pas',
+-  SynHighlighterPas in '..\Source\SynHighlighterPas.pas',
+-  SynHighlighterPerl in '..\Source\SynHighlighterPerl.pas',
+-  SynHighlighterPHP in '..\Source\SynHighlighterPHP.pas',
+-  SynHighlighterProgress in '..\Source\SynHighlighterProgress.pas',
+-  SynHighlighterPython in '..\Source\SynHighlighterPython.pas',
+   SynHighlighterRC in '..\Source\SynHighlighterRC.pas',
+-  SynHighlighterRuby in '..\Source\SynHighlighterRuby.pas',
+-  SynHighlighterSDD in '..\Source\SynHighlighterSDD.pas',
+-  SynHighlighterSml in '..\Source\SynHighlighterSml.pas',
+-  SynHighlighterSQL in '..\Source\SynHighlighterSQL.pas',
+-  SynHighlighterST in '..\Source\SynHighlighterST.pas',
+-  SynHighlighterTclTk in '..\Source\SynHighlighterTclTk.pas',
+-  SynHighlighterTeX in '..\Source\SynHighlighterTeX.pas',
+-  SynHighlighterUNIXShellScript in '..\Source\SynHighlighterUNIXShellScript.pas',
+-  SynHighlighterUnreal in '..\Source\SynHighlighterUnreal.pas',
+-  SynHighlighterVB in '..\Source\SynHighlighterVB.pas',
+-  SynHighlighterVBScript in '..\Source\SynHighlighterVBScript.pas',
+-  SynHighlighterXML in '..\Source\SynHighlighterXML.pas',
+   SynMacroRecorder in '..\Source\SynMacroRecorder.pas',
+   SynMemo in '..\Source\SynMemo.pas',
+-  SynRegExpr in '..\Source\SynRegExpr.pas',
+-  SynHighlighterCSS in '..\Source\SynHighlighterCss.pas',
+-  SynHighlighterLDraw in '..\Source\SynHighlighterLDraw.pas',
+-  SynHighlighterURI in '..\Source\SynHighlighterURI.pas',
+-  SynURIOpener in '..\Source\SynURIOpener.pas',
+-  SynHighlighterDOT in '..\Source\SynHighlighterDOT.pas',
+-  SynHighlighterVrml97 in '..\Source\SynHighlighterVrml97.pas',
+-  SynHighlighterEiffel in '..\Source\SynHighlighterEiffel.pas';
++  SynRegExpr in '..\Source\SynRegExpr.pas';
+ 
+ end.
+
+***** CVS exited normally with code 1 *****
+
+--
+
+5. When compiling add ..\Source into Search Path

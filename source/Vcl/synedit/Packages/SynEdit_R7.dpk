@@ -1,0 +1,77 @@
+package SynEdit_R7;
+
+{ $Id: SynEdit_R7.dpk,v 1.4 2005/01/08 17:04:26 specu Exp $ }
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'SynEdit component suite runtime'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  vcl,
+  vcldb,
+  vclx;
+
+contains
+  SynTextDrawer in '..\Source\SynTextDrawer.pas',
+  SynAutoCorrect in '..\Source\SynAutoCorrect.pas',
+  SynAutoCorrectEditor in '..\Source\SynAutoCorrectEditor.pas' {frmAutoCorrectEditor},
+  SynCompletionProposal in '..\Source\SynCompletionProposal.pas',
+  SynDBEdit in '..\Source\SynDBEdit.pas',
+  SynEdit in '..\Source\SynEdit.pas',
+  SynEditAutoComplete in '..\Source\SynEditAutoComplete.pas',
+  SynEditExport in '..\Source\SynEditExport.pas',
+  SynEditHighlighter in '..\Source\SynEditHighlighter.pas',
+  SynEditKbdHandler in '..\Source\SynEditKbdHandler.pas',
+  SynEditKeyCmdEditor in '..\Source\SynEditKeyCmdEditor.pas' {SynEditKeystrokeEditorForm},
+  SynEditKeyCmds in '..\Source\SynEditKeyCmds.pas',
+  SynEditKeyCmdsEditor in '..\Source\SynEditKeyCmdsEditor.pas' {SynEditKeystrokesEditorForm},
+  SynEditKeyConst in '..\Source\SynEditKeyConst.pas',
+  SynEditMiscClasses in '..\Source\SynEditMiscClasses.pas',
+  SynEditMiscProcs in '..\Source\SynEditMiscProcs.pas',
+  SynEditOptionsDialog in '..\Source\SynEditOptionsDialog.pas' {fmEditorOptionsDialog},
+  SynEditPlugins in '..\Source\SynEditPlugins.pas',
+  SynEditWordWrap in '..\Source\SynEditWordWrap.pas',
+  SynEditPrint in '..\Source\SynEditPrint.pas',
+  SynEditPrinterInfo in '..\Source\SynEditPrinterInfo.pas',
+  SynEditPrintHeaderFooter in '..\Source\SynEditPrintHeaderFooter.pas',
+  SynEditPrintMargins in '..\Source\SynEditPrintMargins.pas',
+  SynEditPrintMarginsDialog in '..\Source\SynEditPrintMarginsDialog.pas' {SynEditPrintMarginsDlg},
+  SynEditPrintPreview in '..\Source\SynEditPrintPreview.pas',
+  SynEditPrintTypes in '..\Source\SynEditPrintTypes.pas',
+  SynEditPythonBehaviour in '..\Source\SynEditPythonBehaviour.pas',
+  SynEditSearch in '..\Source\SynEditSearch.pas',
+  SynEditStrConst in '..\Source\SynEditStrConst.pas',
+  SynEditTextBuffer in '..\Source\SynEditTextBuffer.pas',
+  SynEditTypes in '..\Source\SynEditTypes.pas',
+  SynExportHTML in '..\Source\SynExportHTML.pas',
+  SynExportRTF in '..\Source\SynExportRTF.pas',
+  SynHighlighterCpp in '..\Source\SynHighlighterCpp.pas',
+  SynHighlighterMulti in '..\Source\SynHighlighterMulti.pas',
+  SynHighlighterRC in '..\Source\SynHighlighterRC.pas',
+  SynMacroRecorder in '..\Source\SynMacroRecorder.pas',
+  SynMemo in '..\Source\SynMemo.pas',
+  SynRegExpr in '..\Source\SynRegExpr.pas';
+
+end.

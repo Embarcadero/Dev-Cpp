@@ -1,0 +1,170 @@
+English lng ..\lang\English.lng
+
+NOIMG BITMAP ".\images\noimg.bmp"
+
+/* default order of highlighter component
+   may be good idea to make more concrete
+(fore, back, bold, italic, under)
+1 assembler
+2 character
+3 comment
+4 float
+5 hex
+6 identifier
+7 illegal char
+8 number
+9 octal
+10 preprocess
+11 key word
+12 whitespace
+13 string
+14 symbol
+15 <selection color>
+16 <right margin>
+17 Breakpoint
+18 Error Line
+19 Active Breakpoint
+20 Gutter
+21 Selected Text
+*/
+STRINGTABLE
+{
+/* Classic */
+ 1, "clBlue, clNone, 0, 0, 0"
+ 2, "clBlack, clNone, 0, 0, 0"
+ 3, "clHighlight, clNone, 0, 1, 0"
+ 4, "clPurple, clNone, 0, 0, 0"
+ 5, "clPurple, clNone, 0, 0, 0"
+ 6, "clBlack, clNone, 0, 0, 0"
+ 7, "clBlack, clNone, 0, 0, 0"
+ 8, "clPurple, clNone, 0, 0, 0"
+ 9, "clPurple, clNone, 0, 0, 0"
+ 10, "clGreen, clNone, 0, 0, 0"
+ 11, "clBlack, clNone, 1, 0, 0"
+ 12, "clBlack, clWhite, 0, 0, 0"
+ 13, "clRed, clNone, 0, 0, 0"
+ 14, "clBlack, clNone, 0, 0, 0"
+ 15, "clHighlight, clWhite, 0, 0, 0"
+ 16, "clWhite, clMaroon, 0, 0, 0"
+ 17, "clWhite, clRed"
+ 18, "clWhite, clMaroon"
+ 19, "clWhite, clBlue"
+ 20, "clnone, clnone"
+ 21, "clWhite, clNavy"
+
+/* Twilight */
+ 1001, "clLime, clNone, 0, 0, 0"
+ 1002, "clYellow, clNone, 0, 0, 0"
+ 1003, "clSilver, clNone, 0, 1, 0"
+ 1004, "clFuchsia, clNone, 0, 0, 0"
+ 1005, "clFuchsia, clNone, 0, 0, 0"
+ 1006, "clWhite, clNone, 0, 0, 0"
+ 1007, "clYellow, clMaroon, 0, 0, 0"
+ 1008, "clFuchsia, clNone, 0, 0, 0"
+ 1009, "clFuchsia, clNone, 0, 0, 0"
+ 1010, "clGreen, clNone, 0, 0, 0"
+ 1011, "clAqua, clNone, 0, 0, 0"
+ 1012, "clWhite, clBlack, 0, 0, 0"
+ 1013, "clYellow, clNone, 0, 0, 0"
+ 1014, "clAqua, clNone, 0, 0, 0"
+ 1015, "clWhite, clRed, 0, 0, 0"
+ 1016, "clWhite, clMaroon, 0, 0, 0"
+ 1017, "clWhite, clRed"
+ 1018, "clWhite, clMaroon"
+ 1019, "clWhite, clBlue"
+ 1020, "clWhite, clBlack"
+ 1021, "clWhite, clNavy"
+
+/* Ocean */
+ 2001, "clBlue, clNone, 0, 0, 0"
+ 2002, "clPurple, clNone, 0, 0, 0"
+ 2003, "clTeal, clNone, 0, 1, 0"
+ 2004, "clOlive, clNone, 0, 0, 0"
+ 2005, "clOlive, clNone, 0, 0, 0"
+ 2006, "clBlue, clNone, 0, 0, 0"
+ 2007, "clWhite, clMaroon, 0, 0, 0"
+ 2008, "clOlive, clNone, 0, 0, 0"
+ 2009, "clOlive, clNone, 0, 0, 0"
+ 2010, "clBlack, clNone, 0, 0, 0"
+ 2011, "clBlack, clNone, 0, 0, 0"
+ 2012, "clBlue, clAqua, 0, 0, 0"
+ 2013, "clPurple, clNone, 0, 0, 0"
+ 2014, "clBlack, clNone, 0, 0, 0"
+ 2015, "clWhite, clRed, 0, 0, 0"
+ 2016, "clWhite, clMaroon, 0, 0, 0"
+ 2017, "clWhite, clRed"
+ 2018, "clWhite, clMaroon"
+ 2019, "clWhite, clBlue"
+ 2020, "clBlack, clAqua"
+ 2021, "clWhite, clNavy"
+
+/* Visual Studio */
+ 3001, "clBlack, clNone, 0, 0, 0"
+ 3002, "clBlack, clNone, 0, 0, 0"
+ 3003, "clGreen, clNone, 0, 0, 0"
+ 3004, "clBlack, clNone, 0, 0, 0"
+ 3005, "clBlack, clNone, 0, 0, 0"
+ 3006, "clBlack, clNone, 0, 0, 0"
+ 3007, "clRed, clNone, 0, 0, 0"
+ 3008, "clBlack, clNone, 0, 0, 0"
+ 3009, "clBlack, clNone, 0, 0, 0"
+ 3010, "clBlue, clNone, 0, 0, 0"
+ 3011, "clBlue, clNone, 0, 0, 0"
+ 3012, "clNone, clWhite, 0, 0, 0"
+ 3013, "clBlack, clNone, 0, 0, 0"
+ 3014, "clBlack, clNone, 0, 0, 0"
+ 3015, "clGreen, clNone, 0, 0, 0"
+ 3016, "clRed, clNone, 0, 0, 0"
+ 3017, "clWhite, clRed"
+ 3018, "clRed, clNone"
+ 3019, "clWhite, clBlue"
+ 3020, "clNone, clNone"
+ 3021, "clWhite, clNavy"
+
+/* Borland */
+ 4001, "clLime, clNone, 0, 0, 0"
+ 4002, "clYellow, clNone, 0, 0, 0"
+ 4003, "clSilver, clNone, 0, 0, 0"
+ 4004, "clYellow, clNone, 0, 0, 0"
+ 4005, "clYellow, clNone, 0, 0, 0"
+ 4006, "clYellow, clNone, 0, 0, 0"
+ 4007, "clYellow, clNone, 0, 0, 0"
+ 4008, "clYellow, clNone, 0, 0, 0"
+ 4009, "clYellow, clNone, 0, 0, 0"
+ 4010, "clYellow, clNone, 0, 0, 0"
+ 4011, "clWhite, clNone, 0, 0, 0"
+ 4012, "clYellow, clNavy, 0, 0, 0"
+ 4013, "clYellow, clNone, 0, 0, 0"
+ 4014, "clYellow, clNone, 0, 0, 0"
+ 4015, "clWhite, clRed, 0, 0, 0"
+ 4016, "clWhite, clMaroon, 0, 0, 0"
+ 4017, "clWhite, clRed"
+ 4018, "clWhite, clMaroon"
+ 4019, "clBlack, clAqua"
+ 4020, "clBlack, clNone"
+ 4021, "clBlack, clSilver"
+
+/* Matrix */
+ 5001, "clLime, clNone, 0, 0, 0"
+ 5002, "$00FF6633, clNone, 0, 0, 0"
+ 5003, "$00FF6633, clNone, 0, 1, 0"
+ 5004, "clFuchsia, clNone, 0, 0, 0"
+ 5005, "clFuchsia, clNone, 0, 0, 0"
+ 5006, "clLime, clNone, 0, 0, 0"
+ 5007, "clRed, clMaroon, 0, 0, 0"
+ 5008, "clBlue, clNone, 0, 0, 0"
+ 5009, "clFuchsia, clNone, 0, 0, 0"
+ 5010, "clLime, clNone, 0, 0, 0"
+ 5011, "clGreen, clNone, 0, 0, 0"
+ 5012, "clWhite, clBlack, 0, 0, 0"
+ 5013, "$00C3C3C3, clNone, 0, 0, 0"
+ 5014, "clLime, clNone, 0, 0, 0"
+ 5015, "clHighlight, clWhite, 0, 0, 0"
+ 5016, "clWhite, clMaroon, 0, 0, 0"
+ 5017, "16777215, 8421504"
+ 5018, "16777215, 255"
+ 5019, "16777215, 16711680"
+ 5020, "clLime, clBlack"
+ 5021, "clWhite, clNavy"
+}
+

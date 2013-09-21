@@ -1,0 +1,62 @@
+{WebUpdate_config_file}
+# Don't remove the first line!!!
+
+[Dev-C++ Update]
+Description=This is the latest update of Dev-C++. Changes:<CR><CR>"List index out of bounds" error fixed!
+RemoteFilename=devcpp.exe
+LocalFilename=devcpp.exe
+Group=Application
+InstallPath={exec}
+Version=4.9.5.3
+Size=2360320
+Date=10 Sep 2002 20:40
+
+[Dev-C++ Update debug info]
+Description=Additional debugging information to help the developers find errors faster through your bug reports ;)
+RemoteFilename=devcpp.map1
+LocalFilename=devcpp.map
+Group=Application
+InstallPath={exec}
+Version=4.9.5.3
+Size=3774239
+Date=10 Sep 2002 20:40
+
+[English language]
+Description=This is the English language file
+RemoteFilename=english.lng
+LocalFilename=english.lng
+Group=Language files
+InstallPath={exec}\Lang
+Version=
+Size=16270
+Date=
+
+[English tips]
+Description=This is the English tips file
+RemoteFilename=english.tips
+LocalFilename=english.tips
+Group=Tip files
+InstallPath={exec}\Lang
+Version=
+Size=5559
+Date=
+
+[Greek language]
+Description=This is the Greek language file
+RemoteFilename=greek.lng
+LocalFilename=greek.lng
+Group=Language files
+InstallPath={exec}\Lang
+Version=
+Size=18516
+Date=
+
+[WebUpdater mirrors list]
+Description=Provides a list of mirrors for the WebUpdater
+RemoteFilename=mirrors.cfg
+LocalFilename=mirrors.cfg
+Group=Mirrors
+InstallPath={config}
+Version=
+Size=
+Date=
