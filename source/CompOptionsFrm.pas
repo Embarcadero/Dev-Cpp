@@ -79,6 +79,7 @@ type
     Linker: TMemo;
     CompOptionsFrame1: TCompOptionsFrame;
     grpCompSet: TGroupBox;
+    OptionsTip: TLabel;
     cmbCompilerSetComp: TComboBox;
     btnAddCompilerSet: TSpeedButton;
     btnDelCompilerSet: TSpeedButton;
@@ -422,6 +423,8 @@ begin
 	// Makefile generation
 	grpMakefileGen.Caption:=             ' '+Lang[ID_COPT_MAKEFILEGEN]+' ';
 	cbFastDep.Caption:=                  Lang[ID_COPT_FASTDEP];
+
+	OptionsTip.Caption:=                 Lang[ID_COPT_COMPILERTIP];
 
 	// Programs (you may want to...)
 	lblProgramsText.Caption:=            Lang[ID_COPT_PROGRAMS];

@@ -95,7 +95,7 @@ object EnviroForm: TEnviroForm
         Caption = 'Max Files in History List:'
       end
       object lblMsgTabs: TLabel
-        Left = 312
+        Left = 302
         Top = 62
         Width = 160
         Height = 15
@@ -103,7 +103,7 @@ object EnviroForm: TEnviroForm
         Caption = 'Editor Tab Location:'
       end
       object lblLang: TLabel
-        Left = 312
+        Left = 302
         Top = 110
         Width = 160
         Height = 15
@@ -111,7 +111,7 @@ object EnviroForm: TEnviroForm
         Caption = 'Language'
       end
       object lblTheme: TLabel
-        Left = 312
+        Left = 302
         Top = 158
         Width = 160
         Height = 13
@@ -264,9 +264,9 @@ object EnviroForm: TEnviroForm
         Value = 0
       end
       object cboTabsTop: TComboBox
-        Left = 312
+        Left = 302
         Top = 80
-        Width = 147
+        Width = 160
         Height = 23
         Style = csDropDownList
         ItemHeight = 15
@@ -278,18 +278,18 @@ object EnviroForm: TEnviroForm
           'Right')
       end
       object cboLang: TComboBox
-        Left = 312
+        Left = 302
         Top = 128
-        Width = 147
+        Width = 160
         Height = 23
         Style = csDropDownList
         ItemHeight = 15
         TabOrder = 12
       end
       object cboTheme: TComboBox
-        Left = 312
+        Left = 302
         Top = 176
-        Width = 147
+        Width = 160
         Height = 23
         Style = csDropDownList
         ItemHeight = 15

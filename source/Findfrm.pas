@@ -105,8 +105,13 @@ var
 	enginebackup : TSynEditSearchCustom;
 begin
 	// Make sure we do not find the same word again and again when using 'from cursor'
-	if editor.SelAvail then
-		editor.CaretX := editor.BlockEnd.Char;
+	if (ssoBackwards in fSearchOptions) then begin
+		if editor.SelAvail then
+			editor.CaretX := editor.BlockBegin.Char;
+	end else begin
+		if editor.SelAvail then
+			editor.CaretX := editor.BlockEnd.Char;
+	end;
 
 	enginebackup := editor.SearchEngine;
 	editor.SearchEngine := fSearchEngine;

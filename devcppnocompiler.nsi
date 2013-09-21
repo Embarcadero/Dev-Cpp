@@ -1,9 +1,10 @@
 ####################################################################
 # Startup
 
-!define COMPILERNAME "MinGW32"
-!define DEVCPP_VERSION "5.2.0.3"
-!define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} MinGW32 Setup.exe"
+!define COMPILERNAME "No Compiler"
+!define COMPILERFOLDER ""
+!define DEVCPP_VERSION "5.3.0.0"
+!define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 Var LOCAL_APPDATA
@@ -140,13 +141,6 @@ Section "Icon files" SectionIcons
   SectionIn 1
   SetOutPath $INSTDIR\Icons
   File /nonfatal /r "Icons\*.*"
-SectionEnd
-
-Section "${COMPILERNAME} compiler" SectionMinGW
-  SectionIn 1 2
-  SetOutPath $INSTDIR
-
-  File /nonfatal /r "${COMPILERNAME}"
 SectionEnd
 
 Section "Language files" SectionLangs
@@ -381,7 +375,6 @@ SectionEnd
 LangString DESC_SectionMain        ${LANG_ENGLISH} "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
 LangString DESC_SectionExamples    ${LANG_ENGLISH} "Example projects for simple console and GUI applications"
 LangString DESC_SectionIcons       ${LANG_ENGLISH} "Various icons that you can use in your programs"
-LangString DESC_SectionMinGW       ${LANG_ENGLISH} "The ${COMPILERNAME} compiler and associated tools, headers and libraries"
 LangString DESC_SectionLangs       ${LANG_ENGLISH} "The Dev-C++ interface translated to different languages (other than English which is built-in)"
 LangString DESC_SectionAssocs      ${LANG_ENGLISH} "Use Dev-C++ as the default application for opening these types of files"
 LangString DESC_SectionShortcuts   ${LANG_ENGLISH} "Create shortcuts to Dev-C++ in various folders"
@@ -391,7 +384,6 @@ LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configur
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        $(DESC_SectionMain)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionExamples}    $(DESC_SectionExamples)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       $(DESC_SectionIcons)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionMinGW}       $(DESC_SectionMinGW)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       $(DESC_SectionLangs)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      $(DESC_SectionAssocs)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   $(DESC_SectionShortcuts)
@@ -590,7 +582,6 @@ Section "Uninstall"
   Delete "$INSTDIR\ConsolePauser.exe"
   Delete "$INSTDIR\copying.txt"
 
-  RMDir /r "$INSTDIR\${COMPILERNAME}"
   RMDir /r "$INSTDIR\Lang"
   RMDir /r "$INSTDIR\Examples"
   RMDir /r "$INSTDIR\Help"

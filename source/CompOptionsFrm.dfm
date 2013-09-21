@@ -321,18 +321,18 @@ object CompOptForm: TCompOptForm
       Caption = 'Settings'
       object OptionsTip: TLabel
         Left = 0
-        Top = 354
-        Width = 456
-        Height = 17
+        Top = 356
+        Width = 476
+        Height = 20
         Alignment = taCenter
         AutoSize = False
         Caption = 'For more information about GCC'#39's options, please visit'
       end
       object OptionsLink: TLabel
         Left = 0
-        Top = 376
-        Width = 456
-        Height = 18
+        Top = 375
+        Width = 476
+        Height = 20
         Cursor = crHandPoint
         Alignment = taCenter
         AutoSize = False

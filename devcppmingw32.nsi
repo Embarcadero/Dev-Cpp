@@ -1,9 +1,10 @@
 ####################################################################
 # Startup
 
-!define COMPILERNAME "MinGW64"
-!define DEVCPP_VERSION "5.2.0.3"
-!define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} TDM-GCC x64 Setup.exe"
+!define COMPILERNAME "MinGW 4.7.0"
+!define COMPILERFOLDER "MinGW32"
+!define DEVCPP_VERSION "5.3.0.0"
+!define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 Var LOCAL_APPDATA
@@ -146,7 +147,7 @@ Section "${COMPILERNAME} compiler" SectionMinGW
   SectionIn 1 2
   SetOutPath $INSTDIR
 
-  File /nonfatal /r "${COMPILERNAME}"
+  File /nonfatal /r "${COMPILERFOLDER}"
 SectionEnd
 
 Section "Language files" SectionLangs
@@ -590,7 +591,7 @@ Section "Uninstall"
   Delete "$INSTDIR\ConsolePauser.exe"
   Delete "$INSTDIR\copying.txt"
 
-  RMDir /r "$INSTDIR\${COMPILERNAME}"
+  RMDir /r "$INSTDIR\${COMPILERFOLDER}"
   RMDir /r "$INSTDIR\Lang"
   RMDir /r "$INSTDIR\Examples"
   RMDir /r "$INSTDIR\Help"

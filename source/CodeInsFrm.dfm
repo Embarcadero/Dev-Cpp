@@ -2,7 +2,7 @@ object frmCodeEdit: TfrmCodeEdit
   Left = 649
   Top = 284
   BorderStyle = bsToolWindow
-  Caption = '<> Code Insert Entry'
+  Caption = 'Code Insert Entry'
   ClientHeight = 152
   ClientWidth = 354
   Color = clBtnFace

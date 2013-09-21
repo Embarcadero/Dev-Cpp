@@ -76,7 +76,7 @@ type
     procedure AddBreakPoint(Linein : integer;e : TEditor); overload;
     procedure RemoveBreakPoint(Linein : integer;e : TEditor); overload;
 
-    procedure RefreshBreakPoints;
+    procedure DeleteBreakPointsOf(editor : TEditor);
 
     // watch var
     procedure AddWatchVar(i : integer); overload;
@@ -307,14 +307,14 @@ begin
 	end;
 end;
 
-procedure TDebugger.RefreshBreakPoints;
+procedure TDebugger.DeleteBreakPointsOf(editor : TEditor);
 var
 	I : integer;
 begin
 	// Breakpoints in closed files need to be deleted
 	for i := BreakPointList.Count - 1 downto 0 do
 
-		if not Assigned(PBreakPoint(BreakPointList.Items[i])^.editor) then begin
+		if PBreakPoint(BreakPointList.Items[i])^.editor = editor then begin
 
 			// Remove from list
 			Dispose(PBreakPoint(BreakPointList.Items[i]));

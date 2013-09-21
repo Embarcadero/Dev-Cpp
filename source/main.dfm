@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 821
-  Top = 336
+  Left = 525
+  Top = 251
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -65,7 +65,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -83,8 +83,8 @@ object MainForm: TMainForm
             Width = 320
           end
           item
+            AutoSize = True
             Caption = 'Message'
-            Width = 480
           end>
         ColumnClick = False
         GridLines = True
@@ -95,6 +95,7 @@ object MainForm: TMainForm
         ShowHint = True
         TabOrder = 0
         ViewStyle = vsReport
+        OnAdvancedCustomDraw = CompilerOutputAdvancedCustomDraw
         OnAdvancedCustomDrawItem = CompilerOutputAdvancedCustomDrawItem
         OnDblClick = CompilerOutputDblClick
         OnKeyDown = CompilerOutputKeyDown
@@ -107,7 +108,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -202,13 +203,13 @@ object MainForm: TMainForm
         Left = 471
         Top = 0
         Width = 357
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           357
-          154)
+          155)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -230,7 +231,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 350
-          Height = 114
+          Height = 112
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -242,7 +243,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 471
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -250,7 +251,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           471
-          154)
+          155)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -412,7 +413,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 19
+          Height = 17
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -452,7 +453,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -470,18 +471,18 @@ object MainForm: TMainForm
             Width = 320
           end
           item
+            AutoSize = True
             Caption = 'Message'
-            Width = 480
           end>
         ColumnClick = False
         GridLines = True
-        HideSelection = False
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
         ViewStyle = vsReport
+        OnAdvancedCustomDraw = FindOutputAdvancedCustomDraw
         OnAdvancedCustomDrawSubItem = FindOutputAdvancedCustomDrawSubItem
         OnDblClick = FindOutputDblClick
         OnKeyDown = FindOutputKeyDown
@@ -946,7 +947,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -982,7 +983,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1018,7 +1019,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -2949,32 +2950,32 @@ object MainForm: TMainForm
       OnUpdate = actUpdateDebuggerRunning
     end
     object actMsgCut: TAction
-      Caption = 'actMsgCut'
+      Caption = 'Cut'
       ShortCut = 16472
       OnExecute = actMsgCutExecute
     end
     object actMsgCopy: TAction
-      Caption = 'actMsgCopy'
+      Caption = 'Copy'
       ShortCut = 16451
       OnExecute = actMsgCopyExecute
     end
     object actMsgCopyAll: TAction
-      Caption = 'actMsgCopyAll'
+      Caption = 'Copy All'
       ShortCut = 24643
       OnExecute = actMsgCopyAllExecute
     end
     object actMsgPaste: TAction
-      Caption = 'actMsgPaste'
+      Caption = 'Paste'
       ShortCut = 16470
       OnExecute = actMsgPasteExecute
     end
     object actMsgSaveAll: TAction
-      Caption = 'actMsgSaveAll'
+      Caption = 'Save All'
       ShortCut = 16467
       OnExecute = actMsgSaveAllExecute
     end
     object actMsgClear: TAction
-      Caption = 'actMsgClear'
+      Caption = 'Clear'
       OnExecute = actMsgClearExecute
     end
   end
@@ -2993,8 +2994,14 @@ object MainForm: TMainForm
     object MsgPasteItem: TMenuItem
       Action = actMsgPaste
     end
+    object N71: TMenuItem
+      Caption = '-'
+    end
     object MsgSaveAllItem: TMenuItem
       Action = actMsgSaveAll
+    end
+    object N73: TMenuItem
+      Caption = '-'
     end
     object MsgClearItem: TMenuItem
       Action = actMsgClear

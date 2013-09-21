@@ -17,6 +17,7 @@ object frmIncremental: TfrmIncremental
   FormStyle = fsStayOnTop
   KeyPreview = True
   OldCreateOrder = False
+  PopupMenu = IncrementalPop
   OnClose = FormClose
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
@@ -67,5 +68,39 @@ object frmIncremental: TfrmIncremental
     ParentFont = False
     TabOrder = 2
     OnChange = EditChange
+  end
+  object IncrementalPop: TPopupMenu
+    Left = 184
+    object IncrementalUndo: TMenuItem
+      Caption = 'Undo'
+      ShortCut = 16474
+      OnClick = IncrementalUndoClick
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object IncrementalCut: TMenuItem
+      Caption = 'Cut'
+      ShortCut = 16472
+      OnClick = IncrementalCutClick
+    end
+    object IncrementalCopy: TMenuItem
+      Caption = 'Copy'
+      ShortCut = 16451
+      OnClick = IncrementalCopyClick
+    end
+    object IncrementalPaste: TMenuItem
+      Caption = 'Paste'
+      ShortCut = 16470
+      OnClick = IncrementalPasteClick
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object IncrementalSelAll: TMenuItem
+      Caption = 'Select All'
+      ShortCut = 16449
+      OnClick = IncrementalSelAllClick
+    end
   end
 end

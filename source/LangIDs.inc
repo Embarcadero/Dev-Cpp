@@ -1187,3 +1187,4 @@ const
   ID_CMPPRG_FILE                        = 74003;
   ID_CMPPRG_ERRORS                      = 74004;
   ID_CMPPRG_WARNINGS                    = 74005;
+  ID_CMPPRG_CAPTION                     = 74006;

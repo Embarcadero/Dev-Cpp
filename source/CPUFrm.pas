@@ -50,19 +50,22 @@ type
     RadioIntel: TRadioButton;
     lblBacktrace: TLabel;
     CPUPopup: TPopupMenu;
-    MenuCopy: TMenuItem;
-    MenuCopyAll: TMenuItem;
-    MenuPaste: TMenuItem;
-    MenuCut: TMenuItem;
+    CPUCopy: TMenuItem;
+    CPUCopyAll: TMenuItem;
+    CPUPaste: TMenuItem;
+    CPUCut: TMenuItem;
+    N2: TMenuItem;
+    CPUSelectAll: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edFuncKeyPress(Sender: TObject; var Key: Char);
     procedure FormCreate(Sender: TObject);
     procedure gbSyntaxClick(Sender: TObject);
-    procedure MenuCopyClick(Sender: TObject);
-    procedure MenuCopyAllClick(Sender: TObject);
-    procedure MenuPasteClick(Sender: TObject);
-    procedure MenuCutClick(Sender: TObject);
+    procedure CPUCopyClick(Sender: TObject);
+    procedure CPUCopyAllClick(Sender: TObject);
+    procedure CPUPasteClick(Sender: TObject);
+    procedure CPUCutClick(Sender: TObject);
     procedure StackTraceClick(Sender: TObject);
+    procedure CPUSelectAllClick(Sender: TObject);
   private
     fRegisters : TList;
     fAssembler : TStringList;
@@ -121,7 +124,7 @@ begin
 			if EndsStr('()',propercmd) then
 				propercmd := ReplaceLastStr(propercmd,'()','(void)');
 			MainForm.fDebugger.SendCommand('disas',propercmd);
-			if Length(edFunc.Text) > 0 then
+			if (Length(edFunc.Text) > 0) and (edFunc.Items.IndexOf(edFunc.Text) = -1) then
 				edFunc.AddItem(edFunc.Text,nil);
 		end;
 	end;
@@ -137,10 +140,11 @@ begin
 	lblFunc.Caption := Lang[ID_CPU_FUNC];
 	lblBacktrace.Caption := Lang[ID_DEB_BACKTRACE];
 
-	MenuCut.Caption := Lang[ID_ITEM_CUT];
-	MenuCopy.Caption := Lang[ID_ITEM_COPY];
-	MenuCopyAll.Caption := Lang[ID_ITEM_COPYALL];
-	MenuPaste.Caption := Lang[ID_ITEM_PASTE];
+	CPUCut.Caption := Lang[ID_ITEM_CUT];
+	CPUCopy.Caption := Lang[ID_ITEM_COPY];
+	CPUCopyAll.Caption := Lang[ID_ITEM_COPYALL];
+	CPUPaste.Caption := Lang[ID_ITEM_PASTE];
+	CPUSelectAll.Caption := Lang[ID_ITEM_SELECTALL];
 end;
 
 procedure TCPUForm.OnBacktraceReady;
@@ -255,7 +259,7 @@ begin
 	edFuncKeyPress(nil,key);
 end;
 
-procedure TCPUForm.MenuCutClick(Sender: TObject);
+procedure TCPUForm.CPUCutClick(Sender: TObject);
 begin
 	if edFunc.Focused then begin
 		ClipBoard.AsText := edFunc.SelText;
@@ -263,7 +267,7 @@ begin
 	end;
 end;
 
-procedure TCPUForm.MenuCopyClick(Sender: TObject);
+procedure TCPUForm.CPUCopyClick(Sender: TObject);
 begin
 	if edFunc.Focused then
 		ClipBoard.AsText := edFunc.SelText
@@ -275,7 +279,7 @@ begin
 		Clipboard.AsText := GetPrettyLine(RegisterListbox);
 end;
 
-procedure TCPUForm.MenuCopyAllClick(Sender: TObject);
+procedure TCPUForm.CPUCopyAllClick(Sender: TObject);
 var
 	i:integer;
 begin
@@ -294,10 +298,16 @@ begin
 	end;
 end;
 
-procedure TCPUForm.MenuPasteClick(Sender: TObject);
+procedure TCPUForm.CPUPasteClick(Sender: TObject);
 begin
 	if edFunc.Focused then
 		edFunc.SelText := ClipBoard.AsText;
+end;
+
+procedure TCPUForm.CPUSelectAllClick(Sender: TObject);
+begin
+	if edFunc.Focused then
+		edFunc.SelectAll;
 end;
 
 procedure TCPUForm.StackTraceClick(Sender: TObject);

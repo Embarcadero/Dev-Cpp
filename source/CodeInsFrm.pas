@@ -280,7 +280,9 @@ begin
 		AddItemByValues('switch()','switch statement','switch(*|*) {'+#13#10+'	default:'+#13#10+'}',2);
 
 		// C++
-		AddItemByValues('Class','Class','class *|* {'+#13#10+
+		AddItemByValues('Class','Class',
+
+	'class *|* {'+#13#10+
 	'	// Private section'+#13#10+
 	'	public:'+#13#10+
 	'		// Public Declarations'+#13#10+
@@ -288,10 +290,12 @@ begin
 	'		// Protected Declarations'+#13#10+
 	'};',2);
 
-		AddItemByValues('Class Header Template','Class','#ifndef SOMETHING_INCLUDED'+#13#10+
+		AddItemByValues('Class Header Template','Class',
+
+	'#ifndef SOMETHING_INCLUDED'+#13#10+
 	'#define SOMETHING_INCLUDED'+#13#10#13#10+
 	'class *|* {'+#13#10+
-	'// Private section'+#13#10+
+	'	// Private section'+#13#10+
 	'	public:'+#13#10+
 	'		// Public Declarations'+#13#10+
 	'	protected:'+#13#10+

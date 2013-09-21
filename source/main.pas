@@ -255,7 +255,7 @@ type
 		RedoBtn: TToolButton;
 		tbSearch: TToolBar;
 		FindBtn: TToolButton;
-    ReplaceBtn: TToolButton;
+		ReplaceBtn: TToolButton;
 		FindNextBtn: TToolButton;
 		GotoLineBtn: TToolButton;
 		OpenPopItem: TMenuItem;
@@ -590,6 +590,8 @@ type
 		N72: TMenuItem;
     actMsgCut: TAction;
     actMsgCut1: TMenuItem;
+    N71: TMenuItem;
+    N73: TMenuItem;
 
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
 		procedure FormDestroy(Sender: TObject);
@@ -835,7 +837,13 @@ type
 		procedure actReplaceAllExecute(Sender: TObject);
 		procedure DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView;Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;var PaintImages, DefaultDraw: Boolean);
 		procedure FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;Stage: TCustomDrawStage; var DefaultDraw: Boolean);
-    procedure actMsgCutExecute(Sender: TObject);
+		procedure actMsgCutExecute(Sender: TObject);
+    procedure FindOutputAdvancedCustomDraw(Sender: TCustomListView;
+      const ARect: TRect; Stage: TCustomDrawStage;
+      var DefaultDraw: Boolean);
+    procedure CompilerOutputAdvancedCustomDraw(Sender: TCustomListView;
+      const ARect: TRect; Stage: TCustomDrawStage;
+      var DefaultDraw: Boolean);
 	private
 		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
 		fTools            : TToolController; // tool list controller
@@ -849,7 +857,6 @@ type
 		WindowPlacement   : TWindowPlacement; // idem
 		fFirstShow        : boolean; // true for first WM_SHOW, false for others
 
-		function AskBeforeClose(e : TEditor; Rem : boolean) : boolean;
 		function ParseParams(s : AnsiString) : AnsiString;
 		procedure BuildBookMarkMenus;
 		procedure SetHints;
@@ -914,7 +921,7 @@ uses
 	NewTemplateFrm, FunctionSearchFrm, NewMemberFrm, NewVarFrm, NewClassFrm,
 	ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
 	ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
-	WindowListFrm, devThemes, ParamsFrm, WebUpdate, ProcessListFrm, SynEditHighlighter;
+	WindowListFrm, devThemes, RemoveUnitFrm, ParamsFrm, WebUpdate, ProcessListFrm, SynEditHighlighter;
 {$ENDIF}
 {$IFDEF LINUX}
 	Xlib, IniFiles, QClipbrd, MultiLangSupport, version,
@@ -1563,39 +1570,32 @@ begin
 		devFileMonitor.Activate;
 end;
 
-function TMainForm.AskBeforeClose(e : TEditor; Rem : boolean) : boolean;
-var
- s: AnsiString;
-begin
-	result:= TRUE;
-	if not e.Text.Modified then exit;
-
-	if e.FileName = '' then
-	 s:= e.TabSheet.Caption
-	else
-	 s:= e.FileName;
-
-	case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [s]),mtConfirmation, mbYesNoCancel, 0) of
-		mrYes:
-			Result := SaveFile(e);
-
-		mrNo:
-			begin
-				result:= TRUE;
-				if Rem and assigned(fProject) and e.New and (not e.IsRes) and (e.InProject) then
-					fProject.Remove(fProject.GetUnitFromString(s), false);
-			end;
-		mrCancel: result:= FALSE;
-	end;
-end;
-
 function TMainForm.CloseEditor(index: integer; Rem : boolean): Boolean;
 var
 	e: TEditor;
+	s : AnsiString;
 begin
 	Result := False;
-	e:= GetEditor(index);
-	if assigned(e) and AskBeforeClose(e, Rem) then begin
+	e := GetEditor(index);
+	if assigned(e) then begin
+
+		// Ask user if he wants to save
+		if e.Text.Modified then begin
+
+			if e.FileName = '' then
+				s:= e.TabSheet.Caption
+			else
+				s:= e.FileName;
+
+			case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [s]),mtConfirmation, mbYesNoCancel, 0) of
+				mrYes:
+					SaveFile(e);
+				mrCancel:
+					Exit; // stop closing
+			end;
+		end;
+
+		// We're allowed to close stuff...
 		Result := True;
 		if not e.InProject then begin
 			dmMain.AddtoHistory(e.FileName);
@@ -2747,8 +2747,17 @@ end;
 { end XXXKF changed }
 
 procedure TMainForm.actProjectRemoveExecute(Sender: TObject);
+var
+	I : integer;
 begin
-	fProject.Remove(-1, true);
+	with TRemoveUnitForm.Create(MainForm) do begin
+
+		// Add list of project files
+		for i := 0 to fProject.Units.Count - 1 do
+			UnitList.Items.Append(fProject.Units[i].FileName);
+
+		ShowModal;
+	end;
 end;
 
 procedure TMainForm.actProjectOptionsExecute(Sender: TObject);
@@ -3010,14 +3019,11 @@ begin
 			Dispose(PWatchMember(node.Data));
 			node.Delete;
 		end;
-		Dispose(PWatchParent(fDebugger.WatchVarList.Items[I]));
 
 		wparent^.gdbindex := -1;
-		wparent^.node.Text := 'Execute to evaluate';
+		wparent^.value := 'Execute to evaluate';
+		wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
 	end;
-
-	// Clear invalid breakpoints, only on debugger startup, allow closing editors after starting debugger
-	fDebugger.RefreshBreakPoints;
 end;
 
 procedure TMainForm.actDebugExecute(Sender: TObject);
@@ -3031,108 +3037,130 @@ var
 	debug,strip : boolean;
 	idxD,idxS : integer;
 begin
-	if not fDebugger.Executing then begin
 
-		debug := CheckCompileOption('-g3',optD,idxD);
-		strip := CheckCompileOption('-s',optS,idxS);
+	// Run the GDB file used by the project compiler set if a project is opened
+	fCompiler.SwitchToProjectCompilerSet;
 
-		if not debug or strip then begin
-			if MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+	// Check if we enabled proper options
+	debug := CheckCompileOption('-g3',optD,idxD);
+	strip := CheckCompileOption('-s',optS,idxS);
+	if not debug or strip then begin
+		if MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 
-				// ENABLE debugging
-				if Assigned(fProject) then
-					SetProjCompOpt(idxD, '1')
-				else
-					devCompiler.SetOption(optD,idxD,'1');
+			// ENABLE debugging
+			if Assigned(fProject) then
+				SetProjCompOpt(idxD, '1')
+			else
+				devCompiler.SetOption(optD,idxD,'1');
 
-				// DISABLE stripping
-				if Assigned(fProject) then
-					SetProjCompOpt(idxS, '0')
-				else
-					devCompiler.SetOption(optS,idxS,'0');
+			// DISABLE stripping
+			if Assigned(fProject) then
+				SetProjCompOpt(idxS, '0')
+			else
+				devCompiler.SetOption(optS,idxS,'0');
 
-				if not Assigned(fProject) then
-					devCompiler.SaveSet(devCompiler.CurrentIndex);
+			if not Assigned(fProject) then
+				devCompiler.SaveSet(devCompiler.CurrentIndex);
 
-				actRebuildExecute(nil);
+			actRebuildExecute(nil);
 
-				Exit;
+			// TODO: Try to continue after rebuilding?
+			fCompiler.SwitchToOriginalCompilerSet;
+			Exit;
+		end;
+	end;
+
+	if Assigned(fProject) then begin
+
+		// Did we compile?
+		if not FileExists(fProject.Executable) then begin
+			MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
+			fCompiler.SwitchToOriginalCompilerSet; // reset compiler choices
+			exit;
+		end;
+
+		// Did we choose a host application for our DLL?
+		if fProject.Options.typ = dptDyn then begin
+			if fProject.Options.HostApplication = '' then begin
+				MessageDlg(Lang[ID_ERR_HOSTMISSING], mtWarning, [mbOK], 0);
+				fCompiler.SwitchToOriginalCompilerSet;
+				exit;
+			end else if not FileExists(fProject.Options.HostApplication) then begin
+				MessageDlg(Lang[ID_ERR_HOSTNOTEXIST], mtWarning, [mbOK], 0);
+				fCompiler.SwitchToOriginalCompilerSet;
+				exit;
 			end;
 		end;
 
-		if Assigned(fProject) then begin
-			if not FileExists(fProject.Executable) then begin
-				MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
-				exit;
+		// Reset UI, remove invalid breakpoints
+		PrepareDebugger;
+
+		fDebugger.Start;
+		fDebugger.SendCommand('file','"' + StringReplace(fProject.Executable, '\', '/', [rfReplaceAll]) + '"');
+
+		if fProject.Options.typ = dptDyn then
+			fDebugger.SendCommand('exec-file', '"' + StringReplace(fProject.Options.HostApplication, '\', '/', [rfReplaceAll]) +'"');
+	end else begin
+		e := GetEditor;
+		if assigned(e) then begin
+
+			// Did we compile?
+			if not FileExists(ChangeFileExt(e.FileName, EXE_EXT)) then begin
+				MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
+				fCompiler.SwitchToOriginalCompilerSet;
+				Exit;
 			end;
-			if fProject.Options.typ = dptDyn then begin
-				if fProject.Options.HostApplication = '' then begin
-					MessageDlg(Lang[ID_ERR_HOSTMISSING], mtWarning, [mbOK], 0);
-					exit;
-				end else if not FileExists(fProject.Options.HostApplication) then begin
-					MessageDlg(Lang[ID_ERR_HOSTNOTEXIST], mtWarning, [mbOK], 0);
-					exit;
+
+			// Did we save?
+			if e.Text.Modified then // if file is modified
+				if not SaveFile(e) then begin// save it first
+					fCompiler.SwitchToOriginalCompilerSet;
+					Exit;
 				end;
-			end;
+
+			//chdir(ExtractFilePath(e.FileName));
 
 			PrepareDebugger;
 
 			fDebugger.Start;
-			fDebugger.SendCommand('file','"' + StringReplace(fProject.Executable, '\', '/', [rfReplaceAll]) + '"');
-
-			if fProject.Options.typ = dptDyn then
-				fDebugger.SendCommand('exec-file', '"' + StringReplace(fProject.Options.HostApplication, '\', '/', [rfReplaceAll]) +'"');
-		end else begin
-			e:= GetEditor;
-			if assigned(e) then begin
-				if not FileExists(ChangeFileExt(e.FileName, EXE_EXT)) then begin
-					MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
-					exit;
-				end;
-				if e.Text.Modified then // if file is modified
-					if not SaveFile(e) then // save it first
-						Abort; // if it's not saved, abort
-				chdir(ExtractFilePath(e.FileName));
-
-				PrepareDebugger;
-
-				fDebugger.Start;
-				fDebugger.SendCommand('file', '"' + StringReplace(ChangeFileExt(e.FileName,EXE_EXT), '\', '/', [rfReplaceAll]) + '"');
-			end;
+			fDebugger.SendCommand('file', '"' + StringReplace(ChangeFileExt(e.FileName,EXE_EXT), '\', '/', [rfReplaceAll]) + '"');
 		end;
-
-		dirs := TStringList.Create;
-
-		// hack fix due to:
-		// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
-		ExtractStrings([';'],[],PChar(devCompiler.LibDir),dirs);
-		for I := 0 to dirs.Count - 1 do
-			fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
-
-		// Add include folders
-		ExtractStrings([';'],[],PChar(devCompiler.CDir),dirs);
-		for I := 0 to dirs.Count - 1 do
-			fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
-
-		// Add more include folders, duplicates will be added/moved to front of list
-		ExtractStrings([';'],[],PChar(devCompiler.CppDir),dirs);
-		for I := 0 to dirs.Count - 1 do
-			fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
-
-		dirs.Free;
-
-		// Add breakpoints and watch vars
-		for i := 0 to fDebugger.WatchVarList.Count - 1 do
-			fDebugger.AddWatchVar(i);
-
-		for i := 0 to fDebugger.BreakPointList.Count - 1 do
-			fDebugger.AddBreakpoint(i);
-
-		// Run the debugger
-		fDebugger.SendCommand('set','new-console on');
-		fDebugger.SendCommand('set','confirm off');
-		fDebugger.SendCommand('run',fCompiler.RunParams);
 	end;
+
+	dirs := TStringList.Create;
+
+	// hack fix due to:
+	// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
+	ExtractStrings([';'],[],PChar(devCompiler.LibDir),dirs);
+	for I := 0 to dirs.Count - 1 do
+		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
+
+	// Add include folders
+	ExtractStrings([';'],[],PChar(devCompiler.CDir),dirs);
+	for I := 0 to dirs.Count - 1 do
+		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
+
+	// Add more include folders, duplicates will be added/moved to front of list
+	ExtractStrings([';'],[],PChar(devCompiler.CppDir),dirs);
+	for I := 0 to dirs.Count - 1 do
+		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
+
+	dirs.Free;
+
+	// Add breakpoints and watch vars
+	for i := 0 to fDebugger.WatchVarList.Count - 1 do
+		fDebugger.AddWatchVar(i);
+
+	for i := 0 to fDebugger.BreakPointList.Count - 1 do
+		fDebugger.AddBreakpoint(i);
+
+	// Run the debugger
+	fDebugger.SendCommand('set','new-console on');
+	fDebugger.SendCommand('set','confirm off');
+	fDebugger.SendCommand('run',fCompiler.RunParams);
+
+	// And reset compiler choices
+	fCompiler.SwitchToOriginalCompilerSet;
 end;
 
 procedure TMainForm.actEnviroOptionsExecute(Sender: TObject);
@@ -3612,7 +3640,10 @@ procedure TMainForm.GotoBreakpoint(const bfile : AnsiString; bline : integer);
 var
 	e : TEditor;
 begin
-	// correct win32 path
+	// Remove line focus in files left behind
+	RemoveActiveBreakpoints;
+
+	// Then active the current line in the current file
 	e := GetEditorFromFileName(StringReplace(bfile, '/', '\', [rfReplaceAll]));
 	if assigned(e) then begin
 		e.Activate;
@@ -4043,7 +4074,6 @@ begin
 	if PageControl.ActivePageIndex > -1 then begin
 		e:=GetEditor(PageControl.ActivePageIndex);
 		if Assigned(e) then begin
-			e.RemoveBreakpointFocus;
 			e.Text.SetFocus;
 
 			// keep Statusbar updated
@@ -4657,7 +4687,9 @@ begin
 			if Length(edGDBCommand.Text) > 0 then begin
 				Key := #0;
 				fDebugger.SendCommand(edGDBCommand.Text,'');
-				edGDBCommand.AddItem(edGDBCommand.Text,nil);
+
+				if edGDBCommand.Items.IndexOf(edGDBCommand.Text) = -1 then
+					edGDBCommand.AddItem(edGDBCommand.Text,nil);
 			end;
 		end;
 	end;
@@ -6272,7 +6304,10 @@ begin
 				Key := #0;
 				fDebugger.OnEvalReady := OnInputEvalReady;
 				fDebugger.SendCommand('print',EvaluateInput.Text);
-				EvaluateInput.AddItem(EvaluateInput.Text,nil);
+
+				// Add to history
+				if EvaluateInput.Items.IndexOf(EvaluateInput.Text) = -1 then
+					EvaluateInput.AddItem(EvaluateInput.Text,nil);
 			end;
 		end;
 	end;
@@ -6359,6 +6394,7 @@ procedure TMainForm.FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView;
 var
 	boldstart,boldlen,i : integer;
 	rect : TRect;
+	oldbcolor,oldfcolor : TColor;
 
 	procedure Draw(const s : AnsiString);
 	var
@@ -6369,20 +6405,37 @@ var
 		// Get text extent
 		FillChar(sizerect,sizeof(sizerect),0);
 		DrawText(Sender.Canvas.Handle,PAnsiChar(s),Length(s),sizerect,DT_CALCRECT or DT_EXPANDTABS or DT_NOCLIP or DT_HIDEPREFIX);
-		Inc(rect.Left,sizerect.Right-sizerect.Left);
+		Inc(rect.Left,sizerect.Right-sizerect.Left+1); // 1 extra pixel for extra width caused by bold
 	end;
 begin
-	if SubItem = 3 then begin
+	if (SubItem = 3) then begin
+
+		// shut up compiler warning...
+		oldbcolor := 0;
+		oldfcolor := 0;
+
 		boldstart := StrToInt(Item.SubItems[0]);
 		boldlen := Integer(Item.Data);
 
 		// Get rect of subitem
 		rect := Item.DisplayRect(drBounds);
-		OffsetRect(rect,1,1); // make it appear as if Windows drawed it
+
 		for i := 0 to 2 do begin
 			rect.Left := rect.Left + Sender.Column[i].Width;
 			rect.Right := rect.Right + Sender.Column[i].Width;
 		end;
+
+		// Draw blue highlight
+		if (cdsSelected in State) then begin
+			oldbcolor := Sender.Canvas.Brush.Color;
+			oldfcolor := Sender.Canvas.Font.Color;
+			Sender.Canvas.Brush.Color := clHighlight;
+			Sender.Canvas.Font.Color := clWhite;
+			Sender.Canvas.FillRect(rect);
+		end;
+
+		// Make text appear 'native'
+		OffsetRect(rect,1,1);
 
 		// Draw part before bold highlight
 		Draw(Copy(Item.SubItems[2],1,boldstart-1));
@@ -6401,8 +6454,23 @@ begin
 		// Draw part after bold highlight
 		Draw(Copy(Item.SubItems[2],boldstart+boldlen,Length(Item.SubItems[2])-boldstart-boldlen+1));
 
+		if (cdsSelected in State) then begin
+			Sender.Canvas.Brush.Color := oldbcolor;
+			Sender.Canvas.Font.Color := oldfcolor;
+		end;
+
 		DefaultDraw := false;
 	end;
+end;
+
+procedure TMainForm.FindOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+begin
+	SendMessage(FindOutput.Handle,WM_CHANGEUISTATE, MAKEWPARAM(UIS_SET,UISF_HIDEFOCUS), 0);
+end;
+
+procedure TMainForm.CompilerOutputAdvancedCustomDraw(Sender: TCustomListView; const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
+begin
+	SendMessage(CompilerOutput.Handle,WM_CHANGEUISTATE, MAKEWPARAM(UIS_SET,UISF_HIDEFOCUS), 0);
 end;
 
 end.

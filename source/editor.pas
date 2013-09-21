@@ -285,13 +285,13 @@ end;
 
 destructor TEditor.Destroy;
 var
-	idx: integer;
+	I: integer;
 	lastActPage: Integer;
 begin
 	// Deactivate the file change monitor
-	idx:=MainForm.devFileMonitor.Files.IndexOf(fFileName);
-	if idx<>-1 then begin
-		MainForm.devFileMonitor.Files.Delete(idx);
+	I := MainForm.devFileMonitor.Files.IndexOf(fFileName);
+	if I <> -1 then begin
+		MainForm.devFileMonitor.Files.Delete(I);
 		MainForm.devFileMonitor.Refresh(False);
 	end;
 
@@ -301,6 +301,9 @@ begin
 	// Free everything
 	fFunctionTip.Free;
 	fText.Free;
+
+	// Delete breakpoints in this editor
+	MainForm.fDebugger.DeleteBreakPointsOf(self);
 
 	// Activates previous tab instead of first one when closing
 	with fTabSheet.PageControl do begin
@@ -360,7 +363,7 @@ var
 begin
 	result:= -1;
 	for I := 0 to MainForm.fDebugger.BreakPointList.Count - 1 do
-		if PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I])^.editor = self then
+		if integer(PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I])^.editor) = integer(self) then
 			if PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I])^.line = Line then begin
 				Result := I;
  				break;
@@ -445,8 +448,13 @@ end;
 procedure TEditor.EditorDblClick(Sender: TObject);
 begin
 	if devEditor.DblClkLine then begin
-		fText.BlockBegin := BufferCoord(1, fText.CaretY);
-		fText.BlockEnd := BufferCoord(1, fText.CaretY + 1);
+		if fText.CaretY < fText.Lines.Count then begin
+			fText.BlockBegin := BufferCoord(1, fText.CaretY);
+			fText.BlockEnd := BufferCoord(1, fText.CaretY + 1);
+		end else begin
+			fText.BlockBegin := BufferCoord(1, fText.CaretY);
+			fText.BlockEnd := BufferCoord(Length(fText.Lines[fText.CaretY-1])+1, fText.CaretY);
+		end;
 	end;
 end;
 
@@ -652,20 +660,23 @@ end;
 
 procedure TEditor.SetActiveBreakpointFocus(Line: integer);
 begin
-	// Disable previous active focus
-	if fActiveLine <> -1 then begin
+	if Line <> fActiveLine then begin
+
+		// Disable previous active focus
+		if fActiveLine <> -1 then begin
+			fText.InvalidateGutterLine(fActiveLine);
+			fText.InvalidateLine(fActiveLine);
+		end;
+
+		fActiveLine := Line;
+
+		fText.CaretXY := BufferCoord(1, fActiveLine);
+		fText.EnsureCursorPosVisible;
+
+		// Invalidate new active line
 		fText.InvalidateGutterLine(fActiveLine);
 		fText.InvalidateLine(fActiveLine);
 	end;
-
-	fActiveLine := Line;
-
-	fText.CaretXY := BufferCoord(1, fActiveLine);
-	fText.EnsureCursorPosVisible;
-
-	// Invalidate new active line
-	fText.InvalidateGutterLine(fActiveLine);
-	fText.InvalidateLine(fActiveLine);
 end;
 
 procedure TEditor.RemoveBreakpointFocus;
@@ -867,14 +878,13 @@ begin
 	if fCompletionBox.Enabled then begin
 
 		// Use a timer to show the completion window when we just typed a few parent-member linking chars
-		fCompletionTimer.Enabled := False;
 		case Key of
 			'.': fCompletionTimer.Enabled:=True;
 			'>': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
 			':': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
 			' ': begin
 
-				// If Ctrl is down, show completionbox when key is down
+				// If Ctrl is down, immediately show completionbox when space is hit
 				if CtrlDown then begin
 
 					P := fText.RowColumnToPixels(fText.DisplayXY);
@@ -910,6 +920,10 @@ begin
 			Dec(HasCompletedCurly);
 		end;
 	end;
+
+	// Disable completion when user has continued typing
+	if fCompletionBox.Enabled then
+		fCompletionTimer.Enabled := False;
 
 	// Update the cursor if it is hovering above a keyword and ctrl is pressed
 	if (ssCtrl in Shift) and fText.GetPositionOfMouse(p) and fAllowMouseOver then begin

@@ -80,6 +80,8 @@ begin
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
+	Caption:=              Lang[ID_CMPPRG_CAPTION];
+
 	btnClose.Caption:=     Lang[ID_BTN_CANCEL];
 	infoCompiler.Caption:= Lang[ID_CMPRPG_COMPILER];
 	infoStatus.Caption:=   Lang[ID_CMPPRG_STATUS];

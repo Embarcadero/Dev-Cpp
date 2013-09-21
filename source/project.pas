@@ -1052,8 +1052,8 @@ procedure TProject.UpdateNodeIndexes;
 var
 	idx: integer;
 begin
-	for idx:= 0 to pred(fUnits.Count) do
-		fUnits[idx].Node.Data:=pointer(idx);
+	for idx := 0 to fUnits.Count - 1 do
+		fUnits[idx].Node.Data := pointer(idx);
 end;
 
 procedure TProject.Open;
@@ -1271,39 +1271,27 @@ begin
 end;
 
 function TProject.Remove(index : integer; DoClose : boolean) : boolean;
-var
- i: integer;
 begin
 	result := false;
-	if index > -1 then begin
-		// if a resource was removed, force (re)creation of private resource...
-		if GetFileTyp(fUnits.GetItem(index).FileName)=utResSrc then
-			BuildPrivateResource(True);
-		if DoClose and Assigned(fUnits.GetItem(index).fEditor) then begin
-			if not MainForm.CloseEditor(fUnits.GetItem(index).fEditor.TabSheet.PageIndex, False) then
-				exit;
-		end;
 
-		result := true;
+	// if a resource was removed, force (re)creation of private resource...
+	if GetFileTyp(fUnits.GetItem(index).FileName)=utResSrc then
+		BuildPrivateResource(True);
+	if DoClose and Assigned(fUnits.GetItem(index).fEditor) then begin
+		if not MainForm.CloseEditor(fUnits.GetItem(index).fEditor.TabSheet.PageIndex, False) then
+			exit;
+	end;
 
-		{ this causes problems if the project isn't saved after this, since the erase happens phisically at this moment }
-		//if not fUnits.GetItem(index).fNew then
-		finifile.EraseSection('Unit' +inttostr(index +1));
-		fUnits.GetItem(index).fNode.Delete;
-		fUnits.Remove(index);
+	result := true;
 
-		UpdateNodeIndexes();
-		SetModified(TRUE);
-	end else
-		with TRemoveUnitForm.Create(MainForm) do
-			try
-				for i:= 0 to pred(fUnits.Count) do
-					UnitList.Items.Append(fUnits[i].FileName);
-				if (ShowModal = mrOk) and (UnitList.ItemIndex <> -1) then
-					Remove(UnitList.ItemIndex, true);
-			finally
-				Free;
-			end;
+	{ this causes problems if the project isn't saved after this, since the erase happens phisically at this moment }
+	//if not fUnits.GetItem(index).fNew then
+	finifile.EraseSection('Unit' +inttostr(index +1));
+	fUnits.GetItem(index).fNode.Delete;
+	fUnits.Remove(index);
+
+	UpdateNodeIndexes();
+	SetModified(TRUE);
 end;
 
 function TProject.FileAlreadyExists(const s : AnsiString) : boolean;
@@ -1980,11 +1968,10 @@ function TUnitList.Indexof(const FileName: AnsiString): integer;
 var
 	s1, s2: AnsiString;
 begin
-	for result := 0 to pred(fList.Count) do begin
+	for result := 0 to fList.Count - 1 do begin
 		s1 := GetRealPath(TProjUnit(fList[result]).FileName,TProjUnit(fList[result]).fParent.Directory);
 		s2 := GetRealPath(FileName, TProjUnit(fList[result]).fParent.Directory);
-		if CompareText(s1, s2) = 0 then
-			exit;
+		if SameText(s1, s2) then exit;
 	end;
 	result:= -1;
 end;

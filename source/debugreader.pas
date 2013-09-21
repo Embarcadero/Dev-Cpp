@@ -36,7 +36,7 @@ type
                    TSource,
                    TDisplayBegin, TDisplayEnd,
                    TDisplayExpression,
-                   TFrameSourceFile, TFrameSourceBegin, TFrameSourceLine, TFrameFunctionName,
+                   TFrameSourceFile, TFrameSourceBegin, TFrameSourceLine, TFrameFunctionName, TFrameWhere,
                    TFrameArgs,
                    TFrameBegin,TFrameEnd,
                    TErrorBegin, TErrorEnd,
@@ -103,6 +103,7 @@ type
 	dorescanwatches : boolean;
 	doevalready : boolean;
 	doprocessexited : boolean;
+	doupdatecpuwindow : boolean;
 	doupdateexecution : boolean;
 	doreceivedsignal : boolean;
 
@@ -171,12 +172,12 @@ begin
 	if doupdateexecution then begin
 		MainForm.GotoBreakpoint(bfile, bline); // set active line
 		MainForm.fDebugger.RefreshWatchVars; // update variable information
+	end;
 
-		if Assigned(CPUForm) then begin
-			MainForm.fDebugger.SendCommand('disas','');
-			MainForm.fDebugger.SendCommand('info','registers');
-			MainForm.fDebugger.SendCommand('backtrace','');
-		end;
+	if doupdatecpuwindow and Assigned(CPUForm) then begin
+		MainForm.fDebugger.SendCommand('disas','');
+		MainForm.fDebugger.SendCommand('info registers','');
+		MainForm.fDebugger.SendCommand('backtrace','');
 	end;
 end;
 
@@ -338,6 +339,8 @@ begin
 		result := TFrameBegin
 	else if SameStr(s,'frame-end') then
 		result := TFrameEnd
+	else if SameStr(s,'frame-where') then
+		result := TFrameWhere
 	else if SameStr(s,'source') then
 		result := TSource
 	else if SameStr(s,'exited') then
@@ -546,6 +549,7 @@ begin
 	doprocessexited := false;
 	doupdateexecution := false;
 	doreceivedsignal := false;
+	doupdatecpuwindow := false;
 
 	while curpos < len do begin
 		case GetNextAnnotation of
@@ -591,7 +595,10 @@ begin
 				doprocessexited := true;
 			end;
 			TFrameBegin : begin
-				s := GetNextFilledLine;
+
+				s := GetNextLine;
+
+				// Is this a backtrace dump?
 				if Assigned(Backtrace) and StartsStr('#',s) then begin
 
 					trace := new(PTrace);
@@ -612,66 +619,66 @@ begin
 
 					// Arguments are either () or detailed list
 					s := GetNextLine;
-					if SameStr(s,'()') then begin // empty param list
-						t := '()';
-					end else begin // walk past args
 
-						t := '(';
-						while (PeekAnnotation = TArgBegin) do begin
+					while (PeekAnnotation = TArgBegin) do begin
 
-							// argument name
-							if not FindAnnotation(TArgBegin) then begin
-								Dispose(PTrace(trace));
-								Exit;
-							end;
-
-							t := t + GetNextFilledLine;
-
-							// =
-							if not FindAnnotation(TArgNameEnd) then begin
-								Dispose(PTrace(trace));
-								Exit;
-							end;
-
-							t := t + ' ' + GetNextFilledLine + ' '; // should be =
-
-							// argument value
-							if not FindAnnotation(TArgValue) then begin
-								Dispose(PTrace(trace));
-								Exit;
-							end;
-
-							t := t + GetNextFilledLine;
-
-							// argument end
-							if not FindAnnotation(TArgEnd) then begin
-								Dispose(PTrace(trace));
-								Exit;
-							end;
-
-							// check if we're done, else add comma
-							if PeekAnnotation = TArgBegin then t := t + ', ';
+						// argument name
+						if not FindAnnotation(TArgBegin) then begin
+							Dispose(PTrace(trace));
+							Exit;
 						end;
-						t := t + ')';
+
+						s := s + GetNextLine;
+
+						// =
+						if not FindAnnotation(TArgNameEnd) then begin
+							Dispose(PTrace(trace));
+							Exit;
+						end;
+
+						s := s + ' ' + GetNextLine + ' '; // should be =
+
+						// argument value
+						if not FindAnnotation(TArgValue) then begin
+							Dispose(PTrace(trace));
+							Exit;
+						end;
+
+						s := s + GetNextLine;
+
+						// argument end
+						if not FindAnnotation(TArgEnd) then begin
+							Dispose(PTrace(trace));
+							Exit;
+						end;
+
+						s := s + GetNextLine;
 					end;
 
-					trace^.funcname := trace^.funcname + t;
+					trace^.funcname := trace^.funcname + Trim(s);
 
-					// Find filename
-					if not FindAnnotation(TFrameSourceFile) then begin
-						Dispose(PTrace(trace));
-						Exit;
+					// If source info can't be found, skip
+					if PeekAnnotation = TFrameSourceBegin then begin
+
+						// Find filename
+						if not FindAnnotation(TFrameSourceFile) then begin
+							Dispose(PTrace(trace));
+							Exit;
+						end;
+
+						trace^.filename := GetNextLine;
+
+						// find line
+						if not FindAnnotation(TFrameSourceLine) then begin
+							Dispose(PTrace(trace));
+							Exit;
+						end;
+
+						trace^.line := GetNextLine;
+					end else begin
+						trace^.filename := '';
+						trace^.line := '';
 					end;
-
-					trace^.filename := GetNextLine;
-
-					// find line
-					if not FindAnnotation(TFrameSourceLine) then begin
-						Dispose(PTrace(trace));
-						Exit;
-					end;
-
-					trace^.line := GetNextLine;
 
 					Backtrace.Add(trace);
 
@@ -684,12 +691,13 @@ begin
 						// End of stack trace dump!
 						dobacktraceready := true;
 					end;
-				end;
+				end else
+					doupdatecpuwindow := true;
 			end;
 			TInfoAsm : begin
 				if Assigned(Disassembly) then begin
 
-					// Skip info messages
+					// Get info message
 					s := GetNextLine; // Dump of ... foo()
 
 					// the current function name will be saved at index 0
@@ -824,6 +832,7 @@ begin
 				bfile := s;
 
 				doupdateexecution := true;
+				doupdatecpuwindow := true;
 			end;
 		end;
 	end;
