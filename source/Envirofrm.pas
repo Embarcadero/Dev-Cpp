@@ -104,6 +104,7 @@ type
     cvsdownloadlabel: TLabel;
     cbUIfontsize: TComboBox;
     cbPauseConsole: TCheckBox;
+    cbCheckAssocs: TCheckBox;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -213,6 +214,7 @@ begin
 		cbdblFiles.Checked:= DblFiles;
 		cbNoSplashScreen.Checked:= NoSplashScreen;
 		cbPauseConsole.Checked:=ConsolePause;
+		cbCheckAssocs.Checked:=CheckAssocs;
 		seMRUMax.Value:= MRUMax;
 
 		// List the languages
@@ -299,6 +301,7 @@ begin
 		MinOnRun:= cbMinOnRun.Checked;
 		DblFiles:= cbdblFiles.Checked;
 		ConsolePause:= cbPauseConsole.Checked;
+		CheckAssocs:=cbCheckAssocs.Checked;
 		MRUMax:= seMRUMax.Value;
 		if not MultiLineTab then begin
 			if cboTabsTop.ItemIndex in [2,3] then begin
@@ -320,10 +323,21 @@ begin
 		AutoCloseProgress := cbAutoCloseProgress.Checked;
 		WatchHint := cbWatchHint.Checked;
 		InterfaceFont := cbUIFont.Text;
-		InterfaceFontSize := strtoint(cbUIfontsize.Text);
+		InterfaceFontSize := StrToIntDef(cbUIfontsize.Text,9);
+	end;
 
-		MainForm.Font.Name := devData.InterfaceFont;
-		MainForm.Font.Size := devData.InterfaceFontSize;
+	MainForm.Font.Name := devData.InterfaceFont;
+	MainForm.Font.Size := devData.InterfaceFontSize;
+
+	try
+		for idx:=0 to AssociationsCount - 1 do
+			if lstAssocFileTypes.Checked[idx] then
+				Associate(idx)
+			else
+				Unassociate(idx);
+	except
+		MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
+		devData.CheckAssocs := false; // don't bother the user again
 	end;
 
 	devDirs.Icons:= IncludeTrailingPathDelimiter(ExpandFileto(edIcoLib.Text, devDirs.Exec));
@@ -336,16 +350,6 @@ begin
 	end;
 
 	devExternalPrograms.Programs.Assign(vleExternal.Strings);
-
-	try
-		for idx:=0 to AssociationsCount - 1 do
-			if lstAssocFileTypes.Checked[idx] then
-				Associate(idx)
-			else
-				Unassociate(idx);
-	except
-		MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
-	end;
 
 	devCVSHandler.Executable:= edCVSExec.Text;
 	devCVSHandler.Compression:= spnCVSCompression.Value;
@@ -381,6 +385,7 @@ begin
   cbdblFiles.Caption:=           Lang[ID_ENV_DBLFILES];
   cbNoSplashScreen.Caption:=     Lang[ID_ENV_NOSPLASH];
   cbPauseConsole.Caption:=       Lang[ID_ENV_PAUSECONSOLE];
+  cbCheckAssocs.Caption:=        Lang[ID_ENV_CHECKASSOCS];
 
   gbProgress.Caption:=           ' '+Lang[ID_ENV_COMPPROGRESSWINDOW]+' ';
   cbShowProgress.Caption:=       Lang[ID_ENV_SHOWPROGRESS];

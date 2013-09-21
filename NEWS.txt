@@ -17,6 +17,9 @@ Version 5.3.0.5 - *
 - Updated chinese (TW) translations.
 - Added an example save file name to Editor Options >> Autosave.
 - More bug fixes and feature additions here and there.
+- One can now refresh the current cache contents.
+- Improved array evaluating under mouse when debugging.
+- Fixed a bug that emerged in code folding and improved its performance thanks to that.
 
 Version 5.3.0.4 - 31 December 2012
 

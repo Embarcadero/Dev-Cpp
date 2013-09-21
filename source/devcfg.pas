@@ -457,7 +457,8 @@ type
 		fAssociateDev: boolean;
 		fAssociateRc: boolean;
 		fAssociateTemplate: boolean;
-
+		fCheckAssocs : boolean;
+    
 		// More misc stuff
 		fShowTipsOnStart: boolean;
 		fLastTip: integer;
@@ -562,7 +563,8 @@ type
     property AssociateDev: boolean read fAssociateDev write fAssociateDev;
     property AssociateRc: boolean read fAssociateRc write fAssociateRc;
     property AssociateTemplate: boolean read fAssociateTemplate write fAssociateTemplate;
-
+    property CheckAssocs : boolean read fCheckAssocs write fCheckAssocs;
+  
     // tip of the day
     property ShowTipsOnStart: boolean read fShowTipsOnStart write fShowTipsOnStart;
     property LastTip: integer read fLastTip write fLastTip;
@@ -872,6 +874,7 @@ begin
   fAssociateDev := getAssociation(4);
   fAssociateRc := getAssociation(5);
   fAssociateTemplate := getAssociation(6);
+  fCheckAssocs  := true; // will disable on first hickup
 
   fShowTipsOnStart := TRUE;
   fLastTip := 0;

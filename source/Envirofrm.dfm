@@ -340,6 +340,14 @@ object EnviroForm: TEnviroForm
         Caption = 'Pause console programs after return'
         TabOrder = 16
       end
+      object cbCheckAssocs: TCheckBox
+        Left = 16
+        Top = 188
+        Width = 265
+        Height = 17
+        Caption = 'Check file associations on startup'
+        TabOrder = 17
+      end
     end
     object tabPaths: TTabSheet
       Caption = 'Directories'

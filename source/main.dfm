@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 410
-          Height = 114
+          Height = 113
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -427,7 +427,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 15
+          Height = 14
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True

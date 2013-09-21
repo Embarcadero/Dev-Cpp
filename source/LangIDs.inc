@@ -505,7 +505,9 @@ const
   ID_EOPT_AUTOSAVETIME                  = 27062;
   ID_EOPT_AUTOSAVEMODE                  = 27063;
   ID_EOPT_AUTOSAVEEXAMPLE               = 27064;
-  
+  ID_EOPT_CLEARCACHE                    = 27065;
+  ID_EOPT_REFRESHHINT                   = 27066;
+
   // new project
   ID_NP_PRJNAME                         = 28001;
   ID_NP_DEFAULTC                        = 28002;
@@ -647,6 +649,7 @@ const
 
   ID_ENV_PAUSECONSOLE                   = 38054;
   ID_ENV_AUTOREMEMBER                   = 38055;
+  ID_ENV_CHECKASSOCS                    = 38061;
 
   ID_FIND_REPLACE                       = 38056;
   ID_FIND_REPLACEFILES                  = 38057;
@@ -1011,7 +1014,9 @@ const
   ID_STATUSBARPLUS                      = 62019;
   ID_DONEPARSING                        = 62020;
   ID_SEARCHCOUNT                        = 62021;
-
+  ID_DONEPARSINGIN                      = 62022;
+  ID_DONEPARSINGHINT                    = 62023;
+  
 { -- Button Captions -- }
   ID_BTN_OK                             = 63001;
   ID_BTN_CANCEL                         = 63002;
@@ -1035,6 +1040,7 @@ const
   ID_BTN_IMPORT                         = 63020;
   ID_BTN_FLOATDEBUG                     = 63021;
   ID_BTN_CLEAR                          = 63022;
+  ID_BTN_REFRESH                        = 63023;
   // free to 2600
 
 { -- end buttons -- }

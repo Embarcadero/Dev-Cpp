@@ -10753,10 +10753,7 @@ end;
 
 procedure TCustomSynEdit.ReScanForFoldRanges;
 var
-	i, j, FoldLookupCount: Integer;
-	FoldLookup: array of Boolean;
-	RealLineNumbersLookup: array of Integer;
-	TemporaryLines: TSynEditStringList;
+	i, j: Integer;
 	TemporaryAllFoldRanges: TSynEditFoldRanges;
 begin
 	// Delete all uncollapsed folds
@@ -10768,38 +10765,10 @@ begin
 	// Did we leave any collapsed folds and are we viewing a code file?
 	if fAllFoldRanges.Count > 0 then begin
 
-		// Create a lookup table with information which lines have folds and which don't
-		SetLength(FoldLookup, Lines.Count);
-		FoldLookupCount := 0;
-
-		// Set FoldLookup to true for every line that contains a fold!
-		for i := 0 to fAllFoldRanges.Count - 1 do
-			with fAllFoldRanges[i] do
-				if not ParentCollapsed then begin
-					FoldLookup[FromLine - 1] := True; // 1 based?
-					Inc(FoldLookupCount);
-				end;
-
-		TemporaryLines := TSynEditStringList.Create;
-		SetLength(RealLineNumbersLookup, Lines.Count - FoldLookupCount);
-
-		// Then, copy every line that has NO fold from Lines to TemporaryLines
-		for i := 0 to Lines.Count - 1 do
-			if not FoldLookup[i] then begin
-				TemporaryLines.Add(Lines[i]);
-				RealLineNumbersLookup[TemporaryLines.Count-1] := Succ(i);
-			end;
-
+		// Add folds to a separate list
 		TemporaryAllFoldRanges := TSynEditFoldRanges.Create;
 		TemporaryAllFoldRanges.OwnsObjects := false;
-		ScanForFoldRanges(TemporaryAllFoldRanges, TemporaryLines);
-
-		// Now we need to correct the FromLine and ToLine properites of the new folds
-		for i := 0 to TemporaryAllFoldRanges.Count - 1 do
-			with TemporaryAllFoldRanges[i] do begin
-				FromLine := RealLineNumbersLookup[FromLine - 1];
-				ToLine := RealLineNumbersLookup[ToLine - 1];
-			end;
+		ScanForFoldRanges(TemporaryAllFoldRanges, fLines);
 
 		// Combine new with old folds, preserve parent order
 		for i := 0 to TemporaryAllFoldRanges.Count - 1 do begin
@@ -10815,15 +10784,12 @@ begin
 			end;
 		end;
 
-		// Free everything
-		FoldLookup := nil;
-		RealLineNumbersLookup := nil;
-		TemporaryLines.Free;
+		// Pointers have been moved to fAllFoldRanges, remove this list
 		TemporaryAllFoldRanges.Free;
 	end else begin
 
 		// We ended up with no folds after deleting, just pass standard data...
-		ScanForFoldRanges(fAllFoldRanges, Lines);
+		ScanForFoldRanges(fAllFoldRanges, fLines);
 	end;
 end;
 

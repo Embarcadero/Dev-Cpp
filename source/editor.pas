@@ -90,7 +90,6 @@ type
     procedure MouseOverTimer(Sender : TObject);
 
     procedure SetEditorText(Key: Char);
-    function EvaluationPhrase(p : TBufferCoord): AnsiString;
     procedure CompletionTimer(Sender: TObject);
 
     function FunctionTipAllowed : boolean;
@@ -127,6 +126,8 @@ type
     procedure InsertDefaultText;
     procedure PaintMatchingBrackets(TransientType: TTransientType);
 
+    function FindComplement(const s : AnsiString; fromtoken,totoken: char;var curpos : integer; increment : integer) : boolean;
+    function EvaluationPhrase(p : TBufferCoord): AnsiString;
     function CompletionPhrase(p : TBufferCoord): AnsiString;
 
     procedure CommentSelection;
@@ -1144,9 +1145,32 @@ begin
 		fAllowMouseOver := true;
 end;
 
+// Walk to either the closing A or B, starting at curpos, walking with increment steps
+function TEditor.FindComplement(const s : AnsiString; fromtoken,totoken: char;var curpos : integer; increment : integer) : boolean;
+var
+	level,curposbackup : integer;
+begin
+	curposbackup := curpos;
+	level := 0;
+	while(curpos <= Length(s)) and (curpos > 0) do begin
+		if(s[curpos] = fromtoken) then begin
+			Inc(level);
+		end else if(s[curpos] = totoken) then begin
+			Dec(level);
+			if level = 0 then begin
+				Result := true;
+				Exit;
+			end;
+		end;
+		Inc(curpos,increment);
+	end;
+	curpos := curposbackup;
+	Result := false;
+end; // move to utils?
+
 function TEditor.EvaluationPhrase(p : TBufferCoord): AnsiString;
 var
-	phrasebegin,phraseend,len,braceindent : integer;
+	phrasebegin,phraseend,len : integer;
 	s : AnsiString;
 begin
 	result := '';
@@ -1154,82 +1178,77 @@ begin
 	if (p.Line >= 1) and (p.Line <= fText.Lines.Count) then begin
 		s := fText.Lines[p.Line-1];
 		len := Length(s);
-		if len = 0 then Exit;
 
-		phrasebegin := p.Char;
-		phraseend := p.Char;
+		phrasebegin := p.Char - 1;
+		phraseend := p.Char - 1;
 
-		// Copy forward until end of identifier
-		while((phraseend <= len) and (s[phraseend] in fText.IdentChars)) do
-			Inc(phraseend);
-
-		braceindent := 0;
+		// Copy forward until end of identifier, accept array stuff at the end
+		while(phraseend + 1 <= len) do begin
+			if s[phraseend + 1] = '[' then begin
+				if not FindComplement(s,'[',']',phraseend,1) then break;
+			end else if (s[phraseend + 1] in fText.IdentChars) then
+				Inc(phraseend)
+			else
+				break;
+		end;
 
 		// Copy backward until some chars
-		while(phrasebegin > 1) do begin
+		while(phrasebegin > 0) and (phrasebegin <= len) do begin
 
-			if s[phrasebegin-1] = '[' then begin
-				if braceindent = 0 then break;
-				Dec(braceindent);
-			end else if s[phrasebegin-1] = ']' then begin
-				Inc(braceindent);
+			// Accept array and function stuff
+			if s[phrasebegin] = ']' then begin
+				if FindComplement(s,']','[',phrasebegin,-1) then
+					Dec(phrasebegin)
+				else
+					break;
+			end else if s[phrasebegin] = ')' then begin
+				if FindComplement(s,')','[',phrasebegin,-1) then
+					Dec(phrasebegin)
+				else
+					break;
 			end;
 
-			if (s[phrasebegin-1] in fText.IdentChars) or (s[phrasebegin-1] in ['.','&',':','[',']']) then
+			// Accept -> :: & .
+			if (s[phrasebegin] in fText.IdentChars) or (s[phrasebegin] in ['.','&',':']) then
 				Dec(phrasebegin)
-			else if (phrasebegin > 2) and (s[phrasebegin-2] = '-') and (s[phrasebegin-1] = '>') then
-				Dec(phrasebegin)
-			else if (s[phrasebegin-1] = '-') and (s[phrasebegin] = '>') then
-				Dec(phrasebegin)
+			else if (phrasebegin > 1) and (s[phrasebegin-1] = '-') and (s[phrasebegin] = '>') then
+				Dec(phrasebegin,2)
 			else
 				break;
 		end;
 
 		if phraseend > phrasebegin then
-			result := Copy(s,phrasebegin,phraseend-phrasebegin);
+			result := Copy(s,phrasebegin + 1,phraseend-phrasebegin);
 	end;
 end;
 
 function TEditor.CompletionPhrase(P : TBufferCoord): AnsiString;
 var
-	braceindent,stripptr,len,curpos,arraybegin,arrayend : integer;
+	len,curpos,stripbeg : integer;
 begin
 	Result := EvaluationPhrase(p);
-
 	len := Length(result);
+
+	// strip array and function bits
 	curpos := 1;
-	braceindent := 0;
-	arraybegin := 1;
-	arrayend := 1;
-
-	// Strip array bits
 	while (curpos <= len) do begin
-
 		if result[curpos] = '[' then begin
-			if braceindent = 0 then
-				arraybegin := curpos;
-			Inc(braceindent);
-		end else if result[curpos] = ']' then begin
-			Dec(braceindent);
-			if braceindent = 0 then begin
-				arrayend := curpos;
-				break;
-			end;
+			stripbeg := curpos;
+			if FindComplement(Result,'[',']',curpos,1) then
+				Delete(Result,stripbeg,curpos - stripbeg + 1);
+		end else if result[curpos] = '[' then begin
+			stripbeg := curpos;
+			if FindComplement(Result,'(',')',curpos,1) then
+				Delete(Result,stripbeg,curpos - stripbeg + 1);
 		end;
-
 		Inc(curpos);
 	end;
 
-	if arrayend <> arraybegin then
-		Delete(Result,arraybegin,arrayend-arraybegin+1);
-
-	// Strip &'s too
-	stripptr := 1;
-	while (stripptr <= len) and (result[stripptr] = '&') do
-		Inc(stripptr);
-
-	if stripptr > 1 then
-		Delete(Result,1,stripptr-1);
+	// strip pointer bits
+	curpos := 1;
+	while (curpos <= len) and (result[curpos] = '&') do
+		Inc(curpos);
+	Delete(Result,1,curpos-1);
 end;
 
 procedure TEditor.SetEditorText(Key: Char);

@@ -111,9 +111,13 @@ var
 	toplinebackup : integer;
 begin
 
-	// Make sure we do not find the same word again and again when using From Cursor
+	// Don't affect global actions
 	if action in [faFind,faReplace] then begin
-		if not (ssoEntireScope in fSearchOptions) then begin
+
+		// Only set the cursor to the end of the selection when not using the selection and when using from cursor
+		if not (ssoEntireScope in fSearchOptions) and not (ssoSelectedOnly in fSearchOptions) then begin
+
+			// Make sure we do not find the same word again and again when using From Cursor
 			if (ssoBackwards in fSearchOptions) then begin
 				if editor.SelAvail then
 					editor.CaretX := editor.BlockBegin.Char;

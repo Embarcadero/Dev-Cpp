@@ -158,6 +158,8 @@ type
     chkCBParseGlobalH: TCheckBox;
     chkCBParseLocalH: TCheckBox;
     lblTimeStampExample: TLabel;
+    btnCCCrefresh: TButton;
+    lblRefreshHint: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure SetGutter;
     procedure ElementListClick(Sender: TObject);
@@ -206,6 +208,7 @@ type
       var CanSelect: Boolean);
     procedure PagesMainChange(Sender: TObject);
     procedure NameOptionsClick(Sender: TObject);
+    procedure btnCCCrefreshClick(Sender: TObject);
   private
     ffgColor: TColor;
     fbgColor: TColor;
@@ -478,14 +481,14 @@ begin
   // Completion Tab
   chkEnableCompletion.Caption:=  Lang[ID_EOPT_COMPLETIONENABLE];
   lblCompletionColor.Caption:=   Lang[ID_EOPT_COMPLETIONCOLOR];
-
-  // Class browsing Tab
   gbCBEngine.Caption:=           ' '+Lang[ID_EOPT_BROWSERENGINE]+' ';
   chkCBParseLocalH.Caption:=     Lang[ID_EOPT_BROWSERLOCAL];
   chkCBParseGlobalH.Caption:=    Lang[ID_EOPT_BROWSERGLOBAL];
   chkCCCache.Caption:=           Lang[ID_EOPT_CCCACHECHECK];
   btnCCCnew.Caption:=            Lang[ID_BTN_ADD];
   btnCCCdelete.Caption:=         Lang[ID_BTN_CLEAR];
+  btnCCCrefresh.Caption:=        Lang[ID_BTN_REFRESH];
+  lblRefreshHint.Caption:=       Lang[ID_EOPT_REFRESHHINT];
 
   // Code snippet tab
   btnAdd.Caption:=               Lang[ID_BTN_ADD];
@@ -1528,31 +1531,58 @@ begin
 end;
 
 procedure TEditorOptForm.btnCCCdeleteClick(Sender: TObject);
+begin
+	if lbCCC.Items.Count=0 then
+		Exit;
+
+	if MessageDlg(Lang[ID_EOPT_CLEARCACHE], mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
+
+		// Delete cache from disk
+		DeleteFile(devDirs.Config + DEV_COMPLETION_CACHE);
+
+		// Delete everything from RAM
+		CppParser.Reset(false);
+
+		lbCCC.Clear;
+
+		chkCCCache.Tag := 1; // mark modified
+	end;
+end;
+
+procedure TEditorOptForm.btnCCCrefreshClick(Sender: TObject);
 var
+	sl : TStringList;
 	I : integer;
 begin
 	if lbCCC.Items.Count=0 then
 		Exit;
 
-	if MessageDlg('Are you sure you want to clear the cache?', mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
-		DeleteFile(devDirs.Config+DEV_COMPLETION_CACHE);
+	// Don't ask for confirmation, not dangerous
 
-		FreeAndNil(CppParser);
-		CppParser:=TCppParser.Create(Self);
-		CppParser.Tokenizer:=MainForm.CppTokenizer;
-		CppParser.ParseLocalHeaders:=True;
-		CppParser.ParseGlobalHeaders:=True;
-		CppParser.OnStartParsing:=CppParser1StartParsing;
-		CppParser.OnEndParsing:=CppParser1EndParsing;
-		CppParser.OnTotalProgress:=CppParser1TotalProgress;
+	sl := TStringList.Create;
+	try
+		Screen.Cursor := crHourglass;
+		Application.ProcessMessages;
 
-		lbCCC.Items.BeginUpdate;
-		lbCCC.Clear;
-		for I := 0 to CppParser.CacheContents.Count - 1 do
-			lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,'.\'));
-		lbCCC.Items.EndUpdate;
+		// Backup cache contents
+		sl.Assign(CppParser.CacheContents);
 
+		// Delete cache from disk
+		DeleteFile(devDirs.Config + DEV_COMPLETION_CACHE);
+
+		// Delete everything from RAM
+		CppParser.Reset(false);
+
+		// Parse list again
+		for I := 0 to sl.Count - 1 do
+			CppParser.AddFileToScan(sl[i]);
+		CppParser.ParseList;
+		CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
+
+		Screen.Cursor := crDefault;
 		chkCCCache.Tag := 1; // mark modified
+	finally
+		sl.Free;
 	end;
 end;
 
@@ -1563,7 +1593,7 @@ begin
 	Screen.Cursor := crHourglass;
 	Application.ProcessMessages;
 
-	CppParser.Load(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
+	CppParser.Load(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
 
 	lbCCC.Items.BeginUpdate;
 	lbCCC.Clear;

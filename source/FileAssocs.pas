@@ -29,12 +29,13 @@ uses
   SysUtils, Classes, QForms;
 {$ENDIF}
 
+procedure RegisterFiletype(const extension, filetype, description, verb, serverapp, IcoNum: AnsiString);
+procedure RegisterDDEServer(const filetype, verb, topic, servername, macro: AnsiString);
 procedure CheckAssociations;
 procedure Associate(Index: integer);
 procedure UnAssociate(Index: integer);
 function IsAssociated(Index: integer): boolean;
-function CheckFiletype(const extension, filetype, description,
-  verb, serverapp: AnsiString): boolean;
+function CheckFiletype(const extension, filetype, description,verb, serverapp: AnsiString): boolean;
 
 var
   DDETopic: AnsiString;
@@ -59,15 +60,11 @@ const
 
 implementation
 
-uses 
+uses
   devcfg;
 
 var
   Associated: array[0..AssociationsCount - 1] of boolean;
-
-// forward decls
-procedure RegisterFiletype(const extension, filetype, description, verb, serverapp, IcoNum: AnsiString); forward;
-procedure RegisterDDEServer(const filetype, verb, topic, servername, macro: AnsiString); forward;
 
 procedure RefreshIcons;
 begin
@@ -161,7 +158,7 @@ begin
   try
     Result := False;
     reg.Rootkey := HKEY_CLASSES_ROOT;
-    if not reg.OpenKey(extension, False) then
+    if not reg.OpenKey(extension, False) then // does not prevent exception throwing
       Exit;
     reg.CloseKey;
     if not reg.OpenKey(filetype, False) then

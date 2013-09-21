@@ -3890,9 +3890,9 @@ end;
 
 procedure TMainForm.ScanActiveProject;
 var
- I: integer;
- I1: Cardinal;
- e: TEditor;
+	I: integer;
+	starttime,passedtime: Cardinal;
+	e: TEditor;
 begin
 	Application.ProcessMessages;
 	if Assigned(fProject) then
@@ -3904,7 +3904,9 @@ begin
 		else
 			ClassBrowser.ProjectDir:='';
 	end;
-	I1:=GetTickCount;
+
+	starttime := GetTickCount;
+
 	with CppParser do begin
 		Reset;
 		if Assigned(fProject) then begin
@@ -3928,7 +3930,13 @@ begin
 				ClassBrowser.CurrentFile:=e.FileName;
 		end;
 	end;
-	SetStatusbarMessage(Lang[ID_DONEPARSING] + ' in ' + FormatFloat('#,###,##0.00', (GetTickCount-I1)/1000)+' seconds');
+
+	passedtime := (GetTickCount-starttime);
+
+	if passedtime > 5000 then // 5 sec
+		SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN],[passedtime/1000]) + ', ' + Lang[ID_DONEPARSINGHINT])
+	else
+		SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN],[passedtime/1000])); // divide later to preserve comma stuff
 end;
 
 procedure TMainForm.ClassBrowserSelect(Sender: TObject;Filename: TFileName; Line: Integer);
@@ -5981,8 +5989,17 @@ begin
 	// Fix Alt key painting problems
 	//TVistaAltFix.Create(Self); // causes too much flicker :(
 
+	// Writing to the registry causes exceptions, so offer a way to disable and catch exceptions
 	DDETopic:=DevCppDDEServer.Name;
-	CheckAssociations; // register file associations and DDE services <-- !!!
+	if devData.CheckAssocs then begin
+		try
+			CheckAssociations;
+		except
+			MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
+			devData.CheckAssocs := false; // don't bother again
+		end;
+	end;
+
 	DragAcceptFiles(Self.Handle, TRUE);
 	dmMain:= TdmMain.Create(Self);
 

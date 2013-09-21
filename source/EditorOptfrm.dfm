@@ -994,29 +994,38 @@ object EditorOptForm: TEditorOptForm
       end
       object btnCCCnew: TSpeedButton
         Left = 8
-        Top = 360
-        Width = 101
+        Top = 342
+        Width = 80
         Height = 25
         Caption = 'Add files'
         OnClick = btnCCCnewClick
       end
       object btnCCCdelete: TSpeedButton
-        Left = 112
-        Top = 360
-        Width = 101
+        Left = 90
+        Top = 342
+        Width = 80
         Height = 25
         Caption = 'Clear'
         OnClick = btnCCCdeleteClick
+      end
+      object lblRefreshHint: TLabel
+        Left = 288
+        Top = 352
+        Width = 158
+        Height = 30
+        Alignment = taCenter
+        Caption = 'Please refresh the cache when updating Dev-C++'
+        WordWrap = True
       end
       object tbCompletionDelay: TTrackBar
         Left = 16
         Top = 132
         Width = 297
         Height = 37
-        Max = 10000
+        Max = 5000
         Min = 1
         ParentShowHint = False
-        Frequency = 500
+        Frequency = 100
         Position = 1000
         ShowHint = False
         TabOrder = 1
@@ -1045,7 +1054,7 @@ object EditorOptForm: TEditorOptForm
         Left = 8
         Top = 200
         Width = 457
-        Height = 153
+        Height = 137
         ItemHeight = 15
         ParentShowHint = False
         ShowHint = True
@@ -1053,10 +1062,10 @@ object EditorOptForm: TEditorOptForm
         TabOrder = 3
       end
       object pbCCCache: TProgressBar
-        Left = 216
-        Top = 360
-        Width = 249
-        Height = 25
+        Left = 8
+        Top = 370
+        Width = 244
+        Height = 20
         BorderWidth = 1
         TabOrder = 4
         Visible = False
@@ -1084,6 +1093,15 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Scan local files referenced in #include'#39's'
           TabOrder = 0
         end
+      end
+      object btnCCCrefresh: TButton
+        Left = 172
+        Top = 342
+        Width = 80
+        Height = 25
+        Caption = 'Refresh'
+        TabOrder = 6
+        OnClick = btnCCCrefreshClick
       end
     end
     object tabAutosave: TTabSheet
