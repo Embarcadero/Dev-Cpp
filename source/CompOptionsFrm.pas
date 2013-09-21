@@ -25,12 +25,12 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, devTabs, Spin,
+  Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, Spin,
   CompilerOptionsFrame;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-  QButtons, QStdCtrls, Inifiles, QExtCtrls, QComCtrls, devTabs,
+  QButtons, QStdCtrls, Inifiles, QExtCtrls, QComCtrls,
   CompilerOptionsFrame;
 {$ENDIF}
 
@@ -40,11 +40,11 @@ type
     btnCancel: TBitBtn;
     btnDefault: TBitBtn;
     btnHelp: TBitBtn;
-    MainPages: TdevPages;
-    tabDirectories: TdevPage;
-    tabCompiler: TdevPage;
-    tabCodeGen: TdevPage;
-    DirTabs: TdevTabs;
+    MainPages: TPageControl;
+    tabDirectories: TTabSheet;
+    tabCompiler: TTabSheet;
+    tabCodeGen: TTabSheet;
+    DirTabs: TTabControl;
     btnUp: TSpeedButton;
     btnDown: TSpeedButton;
     lstDirs: TListBox;
@@ -53,7 +53,7 @@ type
     btnDelete: TButton;
     btnAdd: TButton;
     btnReplace: TButton;
-    tabPrograms: TdevPage;
+    tabPrograms: TTabSheet;
     lblProgramsText: TLabel;
     lblgcc: TLabel;
     GccEdit: TEdit;
@@ -98,7 +98,6 @@ type
     procedure btnDefaultClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure DirTabsChange(Sender: TObject);
-    procedure DirTabsChanging(Sender: TObject; NewIndex: Integer;var AllowChange: Boolean);
     procedure lstDirsClick(Sender: TObject);
     procedure lstDirsDblClick(Sender: TObject);
     procedure edEntryChange(Sender: TObject);
@@ -120,7 +119,6 @@ type
     procedure WindresEditChange(Sender: TObject);
     procedure DllwrapEditChange(Sender: TObject);
     procedure GprofEditChange(Sender: TObject);
-    procedure MainPagesChange(Sender: TObject);
    private
     fBins: string;
     fLibs: string;
@@ -129,7 +127,6 @@ type
     procedure SetOptions;
     procedure UpdateButtons;
     procedure LoadText;
-    procedure StyleFix;
   end;
 
 var
@@ -167,7 +164,6 @@ begin
 		MessageDlg('You have selected the "Add compiler commands" option but no commands have been specified.', MtError,[MbOK],0);
 		cbCompAdd.Checked := False;
 	end;
-
 
 	if cbLinkerAdd.Checked and (Linker.Text = '') then begin
 		MessageDlg('You have selected the "Add linker commands" option but no commands have been specified.', MtError,[MbOK],0);
@@ -226,30 +222,6 @@ procedure TCompForm.FormActivate(Sender: TObject);
 begin
   SetOptions;
   DirTabsChange(Self);
-  StyleFix;
-end;
-
-procedure TCompForm.StyleFix;
-begin
-    lblDelay.Refresh;
-    lblDelayMsg.Refresh;
-
-    lblProgramsText.Refresh;
-    lblgcc.Refresh;
-    lblgpp.Refresh;
-    lblmake.Refresh;
-    lblgdb.Refresh;
-    lblwindres.Refresh;
-    lbldllwrap.Refresh;
-    lblgprof.Refresh;
-
-    btnbrowse2.Refresh;
-    btnbrowse3.Refresh;
-    btnbrowse4.Refresh;
-    btnbrowse5.Refresh;
-    btnbrowse6.Refresh;
-    btnbrowse7.Refresh;
-    btnbrowse8.Refresh;
 end;
 
 procedure TCompForm.SetOptions;
@@ -299,12 +271,6 @@ begin
    3: StrtoList(fCpp,  TStrings(lstDirs.Items));
   end;
   edEntry.Clear;
-  UpdateButtons;
-end;
-
-procedure TCompForm.DirTabsChanging(Sender: TObject; NewIndex: Integer;
-  var AllowChange: Boolean);
-begin
   UpdateButtons;
 end;
 
@@ -501,7 +467,7 @@ begin
 	devCompilerSet.AddtoComp:=cbCompAdd.Checked;
 
 	devCompilerSet.SaveSet(currentSet);
-    devCompilerSet.LoadSet(cmbCompilerSetComp.ItemIndex);
+	devCompilerSet.LoadSet(cmbCompilerSetComp.ItemIndex);
 	currentSet:=cmbCompilerSetComp.ItemIndex;
 
   with devCompilerSet do begin
@@ -650,11 +616,6 @@ end;
 procedure TCompForm.GprofEditChange(Sender: TObject);
 begin
   devCompilerSet.gprofName := GprofEdit.Text;
-end;
-
-procedure TCompForm.MainPagesChange(Sender: TObject);
-begin
-	StyleFix;
 end;
 
 end.

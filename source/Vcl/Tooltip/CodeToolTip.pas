@@ -73,7 +73,11 @@
 //    26/03/2004
 //      Fixed a bug where no hint appeared when the cursor was directly before a '('
 //
-//
+//    2011
+//      Rewritten the code that tries to find out which function needs to be displayed.
+//      Completely restyled the tooltip font. Now only highlights the currently needed argument.
+//      The tooltip now also shows when placing the cursor inside completed arglists between ().
+//      The tooltip now updates automatically when hopping from function to function.
 
 unit CodeToolTip;
 
@@ -915,6 +919,7 @@ begin
 			else
 				Dec(nBraces);
 		end;
+		if P[CurPos] = #0 then break;
 		if P[CurPos] = ';' then begin
 			ReleaseHandle;
 			Exit;
@@ -939,7 +944,7 @@ begin
 					SkipCommentBlock;
 
 			')': begin
-				Inc(nBraces);//Dec(nBraces);
+				Inc(nBraces);
 				if nBraces = 0 then begin
 					ReleaseHandle;
 					Exit;
@@ -947,7 +952,7 @@ begin
 			end;
 
 			'(': begin
-				Dec(nBraces);//Inc(nBraces);
+				Dec(nBraces);
 				if nBraces = 0 then begin
 					Inc(CurPos);
 					Break;
@@ -960,17 +965,10 @@ begin
 			end;
 			#0: Exit;
 		end;
-
-	{	if CurPos <= 1 then begin
-			CurPos := FEditor.SelStart;
-			Inc(CurPos);
-			Break;
-		end;  }
 	end;
 
 	// Get the name of the function we're about to show
 	S := PreviousWordString(P, CurPos);
-//	MessageBox(application.handle,PChar(S),PChar('func'),MB_OK);
 	if (S <> OldFunction) or not Activated then begin
 		FSelIndex := 0;
 		FCustomSelIndex := False;
@@ -1006,6 +1004,9 @@ begin
 	end;
 
 	if (S <> '') then begin
+
+	//	Sleep(2000);
+
 		// set the hint caption
 		Caption := S;
 
@@ -1017,11 +1018,8 @@ begin
 		// get the index of the current bracket where the cursor it
 		FCurParamIndex := GetCommaIndex(P, CurPos, Idx-1);
 		RethinkCoordAndActivate;
-	end else {if (AnsiPos(Chr(FCurCharW), FEndWhenChr) > 0) then} begin
+	end else begin
 		ReleaseHandle;
-//	end else begin
-	//	if nBraces <> 0 then // Braces dont match? Then hide ..
-//			ReleaseHandle;
 	end;
 end;
 

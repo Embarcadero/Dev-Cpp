@@ -1,6 +1,6 @@
 object frmReplace: TfrmReplace
-  Left = 264
-  Top = 180
+  Left = 417
+  Top = 258
   ActiveControl = cboFindText
   BorderIcons = []
   BorderStyle = bsDialog

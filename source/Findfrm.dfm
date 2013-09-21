@@ -107,12 +107,13 @@ object frmFind: TfrmFind
     TabOrder = 1
     OnClick = btnCancelClick
   end
-  object FindTabs: TdevTabs
+  object FindTabs: TTabControl
     Left = 0
     Top = 0
     Width = 303
     Height = 21
     Align = alTop
+    TabOrder = 7
     Tabs.Strings = (
       'Find'
       'Find in Files')

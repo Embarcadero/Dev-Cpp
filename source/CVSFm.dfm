@@ -2,7 +2,7 @@ object CVSForm: TCVSForm
   Left = 238
   Top = 155
   Width = 562
-  Height = 460
+  Height = 474
   BorderIcons = [biSystemMenu]
   Caption = 'CVS'
   Color = clBtnFace
@@ -21,33 +21,22 @@ object CVSForm: TCVSForm
   OnShow = FormShow
   DesignSize = (
     546
-    422)
+    436)
   PixelsPerInch = 96
   TextHeight = 13
-  object devPages1: TdevPages
+  object devPages1: TPageControl
     Left = 8
     Top = 8
     Width = 538
-    Height = 382
+    Height = 393
     ActivePage = tabUpdate
     Anchors = [akLeft, akTop, akRight, akBottom]
-    object tabImport: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 0
-      Visible = False
+    TabOrder = 0
+    object tabImport: TTabSheet
       Caption = 'Import'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object lblCVSImportDir: TLabel
         Left = 12
         Top = 16
@@ -113,7 +102,7 @@ object CVSForm: TCVSForm
       end
       object vle: TValueListEditor
         Left = 116
-        Top = 220
+        Top = 231
         Width = 404
         Height = 124
         Anchors = [akLeft, akRight, akBottom]
@@ -150,7 +139,7 @@ object CVSForm: TCVSForm
         Left = 116
         Top = 120
         Width = 404
-        Height = 89
+        Height = 100
         Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'memImpMsg')
@@ -169,23 +158,11 @@ object CVSForm: TCVSForm
         OnChange = txtImpModuleChange
       end
     end
-    object tabCheckout: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 3
-      Visible = False
+    object tabCheckout: TTabSheet
       Caption = 'Checkout'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object lblCOModule: TLabel
         Left = 12
         Top = 16
@@ -305,23 +282,11 @@ object CVSForm: TCVSForm
         TabOrder = 10
       end
     end
-    object tabCommit: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 4
-      Visible = False
+    object tabCommit: TTabSheet
       Caption = 'Commit'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object lblCommitMsg: TLabel
         Left = 12
         Top = 16
@@ -333,7 +298,7 @@ object CVSForm: TCVSForm
         Left = 116
         Top = 12
         Width = 352
-        Height = 277
+        Height = 288
         Anchors = [akLeft, akTop, akRight, akBottom]
         ScrollBars = ssBoth
         TabOrder = 0
@@ -341,22 +306,11 @@ object CVSForm: TCVSForm
         WordWrap = False
       end
     end
-    object tabUpdate: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 5
+    object tabUpdate: TTabSheet
       Caption = 'Update'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object chkUpdRecurse: TCheckBox
         Left = 12
         Top = 16
@@ -462,23 +416,11 @@ object CVSForm: TCVSForm
         TabOrder = 3
       end
     end
-    object tabDiff: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 6
-      Visible = False
+    object tabDiff: TTabSheet
       Caption = 'Diff'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object chkDiffRecurse: TCheckBox
         Left = 12
         Top = 16
@@ -588,23 +530,11 @@ object CVSForm: TCVSForm
         end
       end
     end
-    object tabLog: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 7
-      Visible = False
+    object tabLog: TTabSheet
       Caption = 'Log'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object chkLogRecurse: TCheckBox
         Left = 12
         Top = 16
@@ -701,7 +631,7 @@ object CVSForm: TCVSForm
           Width = 201
           Height = 21
           Enabled = False
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 3
           Text = 'cmbLogFbyDate'
         end
@@ -721,23 +651,11 @@ object CVSForm: TCVSForm
         end
       end
     end
-    object tabAdd: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 9
-      Visible = False
+    object tabAdd: TTabSheet
       Caption = 'Add'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object lblAddMsg: TLabel
         Left = 12
         Top = 16
@@ -749,7 +667,7 @@ object CVSForm: TCVSForm
         Left = 116
         Top = 12
         Width = 352
-        Height = 277
+        Height = 288
         Anchors = [akLeft, akTop, akRight, akBottom]
         ScrollBars = ssBoth
         TabOrder = 0
@@ -757,23 +675,11 @@ object CVSForm: TCVSForm
         WordWrap = False
       end
     end
-    object tabRemove: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 10
-      Visible = False
+    object tabRemove: TTabSheet
       Caption = 'Remove'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object chkRemove: TCheckBox
         Left = 12
         Top = 16
@@ -784,23 +690,11 @@ object CVSForm: TCVSForm
         TabOrder = 0
       end
     end
-    object tabFiles: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 11
-      Visible = False
+    object tabFiles: TTabSheet
       Caption = 'Files'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object lblFiles: TLabel
         Left = 12
         Top = 16
@@ -812,7 +706,7 @@ object CVSForm: TCVSForm
         Left = 116
         Top = 12
         Width = 403
-        Height = 329
+        Height = 340
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -827,23 +721,11 @@ object CVSForm: TCVSForm
         OnDrawItem = lstFilesDrawItem
       end
     end
-    object tabRepos: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 1
-      Visible = False
+    object tabRepos: TTabSheet
       Caption = 'Repository'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object lblRep: TLabel
         Left = 12
         Top = 16
@@ -969,29 +851,17 @@ object CVSForm: TCVSForm
         Height = 21
         AutoDropDown = True
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 1
         Text = 'cmbRepos'
         OnChange = cmbReposChange
       end
     end
-    object tabGlobal: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 2
-      Visible = False
+    object tabGlobal: TTabSheet
       Caption = 'Global Options'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object lblCompression: TLabel
         Left = 12
         Top = 16
@@ -1022,28 +892,16 @@ object CVSForm: TCVSForm
         TabOrder = 1
       end
     end
-    object tabOutput: TdevPage
-      Left = 0
-      Top = 23
-      Width = 538
-      Height = 359
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 8
-      Visible = False
+    object tabOutput: TTabSheet
       Caption = 'CVS Output'
       DesignSize = (
-        534
-        355)
+        530
+        365)
       object memOutput: TRichEdit
         Left = 4
         Top = 4
         Width = 526
-        Height = 344
+        Height = 355
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -1063,7 +921,7 @@ object CVSForm: TCVSForm
   end
   object btnOK: TButton
     Left = 357
-    Top = 400
+    Top = 406
     Width = 91
     Height = 25
     Anchors = [akRight, akBottom]
@@ -1074,7 +932,7 @@ object CVSForm: TCVSForm
   end
   object btnCancel: TButton
     Left = 453
-    Top = 400
+    Top = 406
     Width = 91
     Height = 25
     Anchors = [akRight, akBottom]

@@ -1,6 +1,6 @@
 object NewTemplateForm: TNewTemplateForm
-  Left = 398
-  Top = 182
+  Left = 744
+  Top = 358
   BorderStyle = bsDialog
   Caption = 'New Template'
   ClientHeight = 321
@@ -16,26 +16,15 @@ object NewTemplateForm: TNewTemplateForm
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object devPages1: TdevPages
+  object devPages1: TPageControl
     Left = 0
     Top = 0
     Width = 358
     Height = 281
-    Align = alTop
     ActivePage = pgExtras
-    object pgTemplate: TdevPage
-      Left = 0
-      Top = 23
-      Width = 358
-      Height = 258
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 0
-      Visible = False
+    Align = alTop
+    TabOrder = 0
+    object pgTemplate: TTabSheet
       Caption = 'Template info'
       object lblName: TLabel
         Left = 8
@@ -212,19 +201,7 @@ object NewTemplateForm: TNewTemplateForm
         OnChange = cmbNameChange
       end
     end
-    object pgFiles: TdevPage
-      Left = 0
-      Top = 23
-      Width = 358
-      Height = 258
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 1
-      Visible = False
+    object pgFiles: TTabSheet
       Caption = 'Files'
       object lblFiles: TLabel
         Left = 8
@@ -242,18 +219,7 @@ object NewTemplateForm: TNewTemplateForm
         TabOrder = 0
       end
     end
-    object pgExtras: TdevPage
-      Left = 0
-      Top = 23
-      Width = 358
-      Height = 258
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 2
+    object pgExtras: TTabSheet
       Caption = 'Extras'
       object lblCompiler: TLabel
         Left = 8

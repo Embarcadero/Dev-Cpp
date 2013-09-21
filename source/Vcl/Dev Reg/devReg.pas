@@ -23,10 +23,10 @@ interface
 
 uses
 {$IFDEF WIN32}
- Classes, Controls, devTabs, ColorPickerButton, devFileMonitor,
+ Classes, Controls, ColorPickerButton, devFileMonitor,
 {$ENDIF}
 {$IFDEF LINUX}
- Classes, QControls, devTabs, ColorPickerButton, devFileMonitor,
+ Classes, QControls, ColorPickerButton, devFileMonitor,
 {$ENDIF}
 
 {$IFDEF VER130}
@@ -38,9 +38,6 @@ uses
 
 type
  TdevPageEditor = class(TComponentEditor)
-  function GetVerb(index: integer): string; override;
-  function GetVerbCount: integer; override;
-  procedure ExecuteVerb(index: integer); override;
  end;
 
 procedure Register;
@@ -49,54 +46,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('dev-c++',
-    [TdevTabs, TdevPages, TColorPickerButton, TdevFileMonitor]);
-  RegisterClasses([TdevPage]);
-  RegisterComponentEditor(TdevPages, TdevPageEditor);
-  RegisterComponentEditor(TdevPage, TdevPageEditor);
-end;
-
-
-{ TdevPageEditor }
-
-procedure TdevPageEditor.ExecuteVerb(index: integer);
-var
- Pages: TdevCustomPages;
-begin
-  if Component is TdevPages then
-   Pages:= TdevPages(Component)
-  else
-   Pages:= TdevPage(Component).Pages;
-
-  if index = 0 then
-   begin
-     Pages.ControlStyle:= Pages.ControlStyle +[csAcceptsControls];
-     try
-      Designer.CreateComponent(TdevPage, Pages, 0, 0, 0, 0);
-     finally
-      Pages.ControlStyle:= Pages.ControlStyle -[csAcceptsControls];
-     end;
-   end
-{$IFDEF VER130}
-  else
-   Designer.DeleteSelection;
-{$ENDIF}
-end;
-
-function TdevPageEditor.GetVerb(index: integer): string;
-begin
-  result:= 'New Page';
-  if index = 1 then
-   result:= 'Delete Page';
-end;
-
-function TdevPageEditor.GetVerbCount: integer;
-begin
-{$IFDEF VER130}
-  result:= 1;
-{$ELSE}
-  result:= 2;
-{$ENDIF}
+  RegisterComponents('Dev-C++',[TColorPickerButton, TdevFileMonitor]);
 end;
 
 end.

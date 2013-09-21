@@ -25,12 +25,12 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Spin, ExtCtrls, devTabs, ExtDlgs, Buttons,
-  CheckLst, Grids, ValEdit;
+  Dialogs, StdCtrls, Spin, ExtCtrls, ExtDlgs, Buttons,
+  CheckLst, Grids, ValEdit, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QComCtrls, QExtCtrls, devTabs, QButtons,
+  QDialogs, QStdCtrls, QComCtrls, QExtCtrls, QButtons,
   QCheckLst, QGrids;
 {$ENDIF}
 
@@ -40,8 +40,8 @@ type
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     btnHelp: TBitBtn;
-    PagesMain: TdevPages;
-    tabGeneral: TdevPage;
+    PagesMain: TPageControl;
+    tabGeneral: TTabSheet;
     lblMRU: TLabel;
     lblMsgTabs: TLabel;
     lblLang: TLabel;
@@ -65,7 +65,7 @@ type
     cboTabsTop: TComboBox;
     cboLang: TComboBox;
     cboTheme: TComboBox;
-    tabPaths: TdevPage;
+    tabPaths: TTabSheet;
     lblUserDir: TLabel;
     lblTemplatesDir: TLabel;
     lblSplash: TLabel;
@@ -85,16 +85,16 @@ type
     btnAltConfig: TSpeedButton;
     chkAltConfig: TCheckBox;
     edAltConfig: TEdit;
-    tabExternal: TdevPage;
+    tabExternal: TTabSheet;
     lblExternal: TLabel;
     btnExtAdd: TSpeedButton;
     btnExtDel: TSpeedButton;
     vleExternal: TValueListEditor;
-    tabAssocs: TdevPage;
+    tabAssocs: TTabSheet;
     lblAssocFileTypes: TLabel;
     lblAssocDesc: TLabel;
     lstAssocFileTypes: TCheckListBox;
-    tabCVS: TdevPage;
+    tabCVS: TTabSheet;
     lblCVSExec: TLabel;
     lblCVSCompression: TLabel;
     btnCVSExecBrws: TSpeedButton;
@@ -113,10 +113,8 @@ type
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
   private
     procedure LoadText;
-	procedure StyleFix;
   end;
 
 implementation
@@ -259,30 +257,6 @@ begin
 		spnCVSCompression.Value:= devCVSHandler.Compression;
 		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
 	end;
-end;
-
-procedure TEnviroForm.StyleFix;
-begin
-	lblMru.Refresh;
-    lblMsgTabs.Refresh;
-    lblLang.Refresh;
-    lblTheme.Refresh;
-
-    lblUserDir.Refresh;
-    lblTemplatesDir.Refresh;
-    Lblicolib.Refresh;
-    lblLangPath.Refresh;
-    lblSplash.Refresh;
-
-    btnDefBrws.Refresh;
-    btnOutPutBrws.Refresh;
-    btnBrwIcon.Refresh;
-    btnBrwLang.Refresh;
-    btnBrwSplash.Refresh;
-
-    lblCVSExec.Refresh;
-    lblCVSCompression.Refresh;
-    btnCVSExecbrws.Refresh;
 end;
 
 procedure TEnviroForm.btnOkClick(Sender: TObject);
@@ -458,7 +432,6 @@ end;
 procedure TEnviroForm.PagesMainChange(Sender: TObject);
 begin
   HelpKeyword:= Help_Topics[PagesMain.ActivePageIndex];
-  StyleFix;
 end;
 
 procedure TEnviroForm.FormKeyDown(Sender: TObject; var Key: Word;
@@ -528,11 +501,6 @@ begin
   chkAltConfig.Enabled:=ConfigMode <> CFG_PARAM;
   edAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
   btnAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
-end;
-
-procedure TEnviroForm.FormActivate(Sender: TObject);
-begin
-	StyleFix;
 end;
 
 end.

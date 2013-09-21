@@ -146,25 +146,24 @@ object NewProjectForm: TNewProjectForm
       TabOrder = 3
     end
   end
-  object TabsMain: TdevTabs
+  object TabsMain: TTabControl
     Left = 8
     Top = 8
     Width = 495
     Height = 105
     Anchors = [akLeft, akTop, akRight, akBottom]
-    BevelInner = bvLowered
+    TabOrder = 3
     Tabs.Strings = (
       'Basic')
     TabIndex = 0
     OnChange = TabsMainChange
     object ProjView: TListView
-      Left = 0
-      Top = 23
-      Width = 495
-      Height = 82
+      Left = 4
+      Top = 24
+      Width = 487
+      Height = 77
       Align = alClient
-      BevelOuter = bvRaised
-      BevelKind = bkSoft
+      BevelOuter = bvNone
       BorderStyle = bsNone
       Color = clWhite
       Columns = <>

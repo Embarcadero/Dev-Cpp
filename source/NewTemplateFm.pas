@@ -24,20 +24,20 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, CheckLst, devTabs, ExtCtrls, Buttons, ComCtrls,
+  Dialogs, StdCtrls, CheckLst, ExtCtrls, Buttons, ComCtrls,
   project, ImgList, ExtDlgs, IniFiles;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QCheckLst, devTabs, QExtCtrls, QButtons, QComCtrls,
+  QDialogs, QStdCtrls, QCheckLst, QExtCtrls, QButtons, QComCtrls,
   project, QImgList, IniFiles, Types;
 {$ENDIF}
 
 type
   TNewTemplateForm = class(TForm)
-    devPages1: TdevPages;
-    pgTemplate: TdevPage;
-    pgFiles: TdevPage;
+    devPages1: TPageControl;
+    pgTemplate: TTabSheet;
+    pgFiles: TTabSheet;
     lblName: TLabel;
     lblDescr: TLabel;
     lblCateg: TLabel;
@@ -47,7 +47,7 @@ type
     txtProjName: TEdit;
     lblFiles: TLabel;
     lstFiles: TCheckListBox;
-    pgExtras: TdevPage;
+    pgExtras: TTabSheet;
     lblCompiler: TLabel;
     memCompiler: TMemo;
     lblLinker: TLabel;

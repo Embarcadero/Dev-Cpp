@@ -1,4 +1,17 @@
-Version 5.0.0.6 - 2 November 2011
+Version 5.0.0.7 - *
+
+- The compiler log output now always outputs the raw text even when no errors have been found in the code.
+- The parameters now default to nothing (let MinGW decide) instead of ISO C99.
+- The find output saver now correctly outputs its items.
+- Added a few more fixes to the tools menu.
+- New untitled files now get saved properly.
+- The { autocompletion now only inserts an extra newline when building function parameters and can also detect structs, and will append }; for them.
+- The code hint will now auto-hide after 10 seconds instead of 2,5.
+- Added a new autosave function.
+- Added some preparation code for TDM MinGW64.
+- And some more stuff I forgot about.
+
+Version 5.0.0.6 - 3 November 2011
 
 - Fixed an nil pointer read crash in the append closing brace code.
 - Updated the comment/uncomment functions.
@@ -9,6 +22,10 @@ Version 5.0.0.6 - 2 November 2011
 - Files now open up much faster thanks to avoiding repaints.
 - Fixed a buffer overflow in the tooltip generator and rewritten the locals scanner, which is now 50% faster.
 - The append closing braces function now works on every keyboard Win32 supports.
+- Removed any reference to DevTabs, which were too flaky edits (for example, the ComCtrl Manifest caused it to not paint child windows) of TPageControl and TTabControl.
+- Fixed a bug in the code that checks for the existence of tools.
+- Added new Chinese_TC translations created by cin.getline.
+- The uninstaller now does not forget to delete Dev's help file and folder if it's empty.
 
 Version 5.0.0.5 - 24 Oktober 2011
 

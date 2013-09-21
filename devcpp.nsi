@@ -1,7 +1,7 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "5.0.0.5"
+!define DEVCPP_VERSION "5.0.0.6"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 Var LOCAL_APPDATA
@@ -406,7 +406,7 @@ LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configur
 # Functions
 
 Function .onInit
-  MessageBox MB_OK "Welcome to Dev-C++'s install program. Please do not install this version of Dev-C++ over an existing installation."
+  !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
 
 ;backup file association
@@ -519,6 +519,21 @@ Function un.GetLocalAppData
   StrCpy $LOCAL_APPDATA $0
 FunctionEnd
 
+Function un.DeleteDirIfEmpty
+  FindFirst $R0 $R1 "$0\*.*"
+  strcmp $R1 "." 0 NoDelete
+   FindNext $R0 $R1
+   strcmp $R1 ".." 0 NoDelete
+    ClearErrors
+    FindNext $R0 $R1
+    IfErrors 0 NoDelete
+     FindClose $R0
+     Sleep 1000
+     RMDir "$0"
+  NoDelete:
+   FindClose $R0
+FunctionEnd
+
 #############################################################################
 # [UnInstallation]
 
@@ -568,7 +583,31 @@ Section "Uninstall"
   DeleteRegKey HKCR "DevCpp.rc"
   DeleteRegKey HKCR "DevCpp.devpak"
   DeleteRegKey HKCR "DevCpp.devpackage"
-  DeleteRegKey HKCR "DevCpp.template" 
+  DeleteRegKey HKCR "DevCpp.template"
+
+  Delete "$INSTDIR\Packman.map"
+  Delete "$INSTDIR\Packman.exe"
+  Delete "$INSTDIR\NEWS.txt"
+  Delete "$INSTDIR\devcpp.map"
+  Delete "$INSTDIR\devcpp.exe"
+  Delete "$INSTDIR\devcpp.exe.manifest"
+  Delete "$INSTDIR\copying.txt"
+  Delete "$INSTDIR\devcpp.chm"
+
+  RMDir /r "$INSTDIR\bin"
+  RMDir /r "$INSTDIR\Examples"
+  RMDir /r "$INSTDIR\Help"
+  RMDir /r "$INSTDIR\Icons"
+  RMDir /r "$INSTDIR\include"
+  RMDir /r "$INSTDIR\Lang"
+  RMDir /r "$INSTDIR\lib"
+  RMDir /r "$INSTDIR\libexec"
+  RMDir /r "$INSTDIR\mingw32"
+  RMDir /r "$INSTDIR\Packages"
+  RMDir /r "$INSTDIR\Templates"
+
+  StrCpy $0 "$INSTDIR"
+  Call un.DeleteDirIfEmpty
 
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++"
@@ -605,38 +644,6 @@ Section "Uninstall"
   Delete "$APPDATA\mirrors.cfg"
   Delete "$APPDATA\tools.ini"
   Delete "$APPDATA\devcpp.ci"
-  
-  Delete "$INSTDIR\devcpp.ini"
-  Delete "$INSTDIR\devcpp.cfg"
-  Delete "$INSTDIR\cache.ccc"
-  Delete "$INSTDIR\defaultcode.cfg"
-  Delete "$INSTDIR\devshortcuts.cfg"
-  Delete "$INSTDIR\classfolders.dcf"
-  Delete "$INSTDIR\mirrors.cfg"
-  Delete "$INSTDIR\tools.ini"
-  Delete "$INSTDIR\devcpp.ci"
-
-  Delete "$INSTDIR\Packman.map"
-  Delete "$INSTDIR\Packman.exe"
-  Delete "$INSTDIR\NEWS.txt"
-  Delete "$INSTDIR\devcpp.map"
-  Delete "$INSTDIR\devcpp.exe"
-  Delete "$INSTDIR\devcpp.exe.manifest"
-  Delete "$INSTDIR\copying.txt"
-
-  RMDir /r "$INSTDIR\bin"
-  RMDir /r "$INSTDIR\Examples"
-  RMDir /r "$INSTDIR\Help"
-  RMDir /r "$INSTDIR\Icons"
-  RMDir /r "$INSTDIR\include"
-  RMDir /r "$INSTDIR\Lang"
-  RMDir /r "$INSTDIR\lib"
-  RMDir /r "$INSTDIR\libexec"
-  RMDir /r "$INSTDIR\mingw32"
-  RMDir /r "$INSTDIR\Packages"
-  RMDir /r "$INSTDIR\Templates"
 
 Done:
-  MessageBox MB_OK "Dev-C++ has been uninstalled. Please now delete the $INSTDIR directory if it doesn't contain some of your documents."
-
 SectionEnd

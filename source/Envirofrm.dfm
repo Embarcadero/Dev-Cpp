@@ -1,6 +1,6 @@
 object EnviroForm: TEnviroForm
-  Left = 849
-  Top = 412
+  Left = 915
+  Top = 348
   BorderStyle = bsDialog
   Caption = 'Environment Options'
   ClientHeight = 403
@@ -14,7 +14,6 @@ object EnviroForm: TEnviroForm
   KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
-  OnActivate = FormActivate
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
@@ -73,32 +72,23 @@ object EnviroForm: TEnviroForm
     OnClick = btnHelpClick
     Kind = bkHelp
   end
-  object PagesMain: TdevPages
+  object PagesMain: TPageControl
     Left = 8
     Top = 8
     Width = 400
     Height = 352
     ActivePage = tabGeneral
     Anchors = [akLeft, akTop, akRight, akBottom]
+    HotTrack = True
+    TabOrder = 3
     OnChange = PagesMainChange
-    object tabGeneral: TdevPage
-      Left = 0
-      Top = 23
-      Width = 400
-      Height = 329
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
+    object tabGeneral: TTabSheet
+      Caption = 'General'
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 0
-      Caption = 'General'
       DesignSize = (
-        396
-        325)
+        392
+        324)
       object lblMRU: TLabel
         Left = 192
         Top = 8
@@ -321,22 +311,10 @@ object EnviroForm: TEnviroForm
         TabOrder = 14
       end
     end
-    object tabPaths: TdevPage
-      Left = 0
-      Top = 23
-      Width = 400
-      Height = 329
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
+    object tabPaths: TTabSheet
+      Caption = 'Directories'
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 1
-      Visible = False
-      Caption = 'Files && Directories'
       object lblUserDir: TLabel
         Left = 8
         Top = 93
@@ -653,23 +631,11 @@ object EnviroForm: TEnviroForm
         end
       end
     end
-    object tabExternal: TdevPage
-      Left = 0
-      Top = 23
-      Width = 400
-      Height = 329
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 4
-      Visible = False
+    object tabExternal: TTabSheet
       Caption = 'External Programs'
       DesignSize = (
-        396
-        325)
+        392
+        324)
       object lblExternal: TLabel
         Left = 8
         Top = 8
@@ -678,8 +644,8 @@ object EnviroForm: TEnviroForm
         Caption = 'External programs associations:'
       end
       object btnExtAdd: TSpeedButton
-        Left = 91
-        Top = 249
+        Left = 82
+        Top = 293
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -687,8 +653,8 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtAddClick
       end
       object btnExtDel: TSpeedButton
-        Left = 185
-        Top = 249
+        Left = 191
+        Top = 293
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -698,8 +664,8 @@ object EnviroForm: TEnviroForm
       object vleExternal: TValueListEditor
         Left = 16
         Top = 24
-        Width = 337
-        Height = 220
+        Width = 333
+        Height = 265
         Anchors = [akLeft, akTop, akRight, akBottom]
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         Options = [goVertLine, goHorzLine, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -711,28 +677,16 @@ object EnviroForm: TEnviroForm
         OnValidate = vleExternalValidate
         ColWidths = (
           72
-          291)
+          255)
       end
     end
-    object tabAssocs: TdevPage
-      Left = 0
-      Top = 23
-      Width = 400
-      Height = 329
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
+    object tabAssocs: TTabSheet
+      Caption = 'File Associations'
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 2
-      Visible = False
-      Caption = 'File Associations'
       DesignSize = (
-        396
-        325)
+        392
+        324)
       object lblAssocFileTypes: TLabel
         Left = 8
         Top = 8
@@ -742,8 +696,8 @@ object EnviroForm: TEnviroForm
       end
       object lblAssocDesc: TLabel
         Left = 16
-        Top = 241
-        Width = 337
+        Top = 277
+        Width = 333
         Height = 35
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
@@ -755,29 +709,17 @@ object EnviroForm: TEnviroForm
       object lstAssocFileTypes: TCheckListBox
         Left = 16
         Top = 24
-        Width = 337
-        Height = 212
+        Width = 333
+        Height = 249
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
       end
     end
-    object tabCVS: TdevPage
-      Left = 0
-      Top = 23
-      Width = 400
-      Height = 329
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
+    object tabCVS: TTabSheet
+      Caption = 'CVS Support'
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 3
-      Visible = False
-      Caption = 'CVS Support'
       object lblCVSExec: TLabel
         Left = 8
         Top = 9

@@ -64,14 +64,13 @@ type
     fOnBreakPointToggle: TBreakpointToggleEvent;
     fHintTimer: TTimer;
     fCurrentHint: string;
-    fCurrentHintFull: string;
+    fCurrentWord: string;
     //////// CODE-COMPLETION - mandrav /////////////
     fCompletionEatSpace: boolean;
     fTimer: TTimer;
     fTimerKey: Char;
     fCompletionBox: TCodeCompletion;
     fRunToCursorLine: integer;
-    fFunctionArgs: TSynCompletionProposal;
     fLastParamFunc : TList;
     FCodeToolTip: TDevCodeToolTip;  {** Modified by Peter **}
     FAutoIndent: TSynAutoIndent; {** Modified by Peter **}
@@ -105,7 +104,6 @@ type
     procedure SetFileName(value: string);
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
-    procedure FunctionArgsExecute(Kind: SynCompletionType; Sender: TObject;var AString: String; var x, y: Integer; var CanExecute: Boolean);
    protected
     procedure DoOnCodeCompletion(Sender: TObject; const AStatement: TStatement; const AIndex: Integer); {** Modified by Peter **}
    public
@@ -250,20 +248,17 @@ begin
 
 	// Create a tooltip timer
 	fHintTimer := TTimer.Create(Application);
-	fHintTimer.Interval := 100;
+	fHintTimer.Interval := 500;
 	fHintTimer.OnTimer := EditorHintTimer;
-	fHintTimer.Enabled := False;
+	fHintTimer.Enabled := false;
 
 	// Set a whole lot of data
 	fText.Parent := fTabSheet;
 	fText.Align := alClient;
-//	fText.BorderStyle := bsNone;
 	fText.Visible := True;
 	fText.PopupMenu := MainForm.EditorPopupMenu;
 	fText.Font.Color:= clWindowText;
 	fText.Color:= clWindow;
-//	fText.Font.Name:= 'Courier New';
-//	fText.Font.Size:= 10;
 	fText.WantTabs := True;
 	fText.OnStatusChange:= EditorStatusChange;
 	fText.OnSpecialLineColors:= EditorSpecialLineColors;
@@ -296,27 +291,6 @@ begin
 
 	// Initialize code completion
 	InitCompletion;
-
-	// Function arguments
-	fFunctionArgs:=TSynCompletionProposal.Create(fText);
-	with fFunctionArgs do begin
-		EndOfTokenChr:='';
-		// TriggerChars:='('; {** Modified by Peter **}
-		// we dont need triggerchars here anymore, because the tooltips
-		// are handled by FCodeToolTip now
-		TriggerChars:=''; {** Modified by Peter **}
-		TimerInterval:=devCodeCompletion.Delay;
-		DefaultType:=ctParams;
-		OnExecute:=FunctionArgsExecute;
-		Editor:=fText;
-		Options:=Options+[scoUseBuiltInTimer];
-{$IFDEF WIN32}
-		ShortCut:=Menus.ShortCut(Word(VK_SPACE), [ssCtrl, ssShift]);
-{$ENDIF}
-{$IFDEF LINUX}
-		ShortCut:=Menus.ShortCut(Word(XK_SPACE), [ssCtrl, ssShift]);
-{$ENDIF}
-	end;
 
 	// Function parameter tips
 	FCodeToolTip := TDevCodeToolTip.Create(Application);
@@ -641,9 +615,6 @@ begin
 end;
 
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
-//var
-//	len : integer;
-//	allowshow : boolean;
 begin
 	if scModified in Changes then begin
 		if Modified then
@@ -680,29 +651,14 @@ begin
 	{** Modified by Peter **}
 	if (scCaretX in Changes) or (scCaretY in Changes) then begin
 		if Assigned(FCodeToolTip) and FCodeToolTip.Enabled then begin
-			// when the hint is already activated when call
+			// when the hint is already activated we call
 			// ShowHint again, because the current argument could have
 			// changed, which means we need to edit the boldface stuff
 			if FCodeToolTip.Activated then begin
 				FCodeToolTip.Show;
 			end else begin
-				// it's not showing yet, so we check if the cursor
-				// is in a function argument list, and then show
-			//	len := fText.DisplayToBufferPos(fText.DisplayXY).Char-1;
 				if Assigned(FText) and (not FText.SelAvail) and (FText.SelStart > 1) then begin
-				{	allowshow := false;
-					while (len > 1) and (len < Length(fText.LineText)) do begin
-						if (fText.LineText[len] in [')']) then begin
-							allowshow := false;
-							break;
-						end;
-						if (fText.LineText[len] in ['(']) then begin
-							allowshow := true;
-							break;
-						end;
-						Dec(len);
-					end;
-					if allowshow then }FCodeToolTip.Show;
+					FCodeToolTip.Show;
 				end;
 			end;
 		end;
@@ -1017,6 +973,7 @@ begin
 	end;
 end;
 
+// Looks like the completion stuff doesn't like eoTrimTrailingSpaces at all...
 procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 var
 	M: TMemoryStream;
@@ -1081,16 +1038,35 @@ begin
 			end else if localizedkey = '[' then begin
 				InsertString(']',false);
 			end else if localizedkey = '{' then begin
-				counter:=0;
+
+				// If there's any text before the cursor
 				if Length(fText.LineText) > 1 then begin
+
+					// Kijk wat we aan het typen zijn
+					counter:=0;
 					repeat
 						Inc(counter);
-					until not (fText.LineText[counter] in [#9,#32]);
-					fText.Lines.Insert(FText.CaretY,Copy(FText.LineText,1,counter-1) + '}');
+					until not (fText.LineText[fText.CaretX-counter] in [#9,#32]);
+
+					// First check if the user is opening a function
+					if (fText.LineText[fText.CaretX-counter] = ')') then begin
+						counter:=0;
+						repeat
+							Inc(counter);
+						until not (fText.LineText[counter] in [#9,#32]);
+						InsertString(Copy(fText.LineText,1,counter-1) + #13#10 + '}',false);
+					end else if AnsiStartsStr('struct',fText.LineText) or
+								AnsiStartsStr('union',fText.LineText)  or
+								AnsiStartsStr('class',fText.LineText)  or
+								AnsiStartsStr('enum',fText.LineText) then begin
+						InsertString(#13#10 + '};',false);
+					end else
+						InsertString('}',false);
 				end else
 					InsertString(#13#10 + '}',false);
+
 			end else if localizedkey = '<' then begin
-				if (AnsiStartsStr('#include',TrimLeft(fText.LineText))) then
+				if AnsiStartsStr('#include',fText.LineText) then
 					InsertString('>',false);
 			end;
 		end;
@@ -1302,8 +1278,6 @@ begin
     and (FuncAddOn<>'')
     and ( (Length(ST^._Args)>2) or (ST^._Args='()') ) then begin
       fText.CaretX:=fText.CaretX-Length(FuncAddOn)+1;
-      // popup the arguments hint now
-      fFunctionArgs.ExecuteEx(Phrase, fText.DisplayX, fText.DisplayY, ctParams);
     end;
   end;
 end;
@@ -1400,7 +1374,6 @@ var
 	localfind : string;
 	localfindpoint : TPoint;
 	thisword : string;
-//	M: TMemoryStream;
 begin
 	fHintTimer.Enabled := false;
 	p:=fText.ScreenToClient(Mouse.CursorPos);
@@ -1415,8 +1388,8 @@ begin
 
 			// Skip if we're scanning for the second time...
 			thisword := fText.WordAtMouse;
-			if thisword = fCurrentHintFull then Exit;
-			fCurrentHintFull := thisword;
+			if thisword = fCurrentWord then Exit;
+			fCurrentWord := thisword;
 
 			st:=MainForm.findstatement(localfind,localfindpoint,false);
 
@@ -1424,15 +1397,6 @@ begin
 			r.Top := Mouse.CursorPos.Y - 2*fText.LineHeight;
 			r.Bottom := Mouse.CursorPos.Y + 10 + fText.LineHeight;
 			r.Right := Mouse.CursorPos.X + 60;
-
-		//	M:=TMemoryStream.Create;
-		//	try
-		//		fText.Lines.SaveToStream(M);
-		//		MainForm.CppParser1.FindAndScanBlockAt(fFileName, fText.PixelsToRowColumn(fText.ScreenToClient(Mouse.CursorPos).X,fText.ScreenToClient(Mouse.CursorPos).Y).Row, M)
-		//	finally
-		//		M.Free;
-		//	end;
-		//	st:=PStatement(MainForm.CppParser1.Locate(fCurrentHint, False));
 
 			if localfind <> '' then begin
 				fCurrentHint:=localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(localfindpoint.y) + ') - Ctrl+Click to follow';
@@ -1720,88 +1684,6 @@ procedure TEditor.EditorPaintTransient(Sender: TObject; Canvas: TCanvas;Transien
 begin
 	if (Assigned(fText.Highlighter)) and devEditor.Match then
 		PaintMatchingBrackets(TransientType);
-end;
-
-procedure TEditor.FunctionArgsExecute(Kind: SynCompletionType; Sender: TObject;var AString: String; var x, y: Integer; var CanExecute: Boolean);
-var
-	locline, lookup: String;
-	TmpX, savepos, StartX,ParenCounter : Integer;
-	FoundMatch : Boolean;
-	sl: TList;
-begin
-	sl := nil;
-	try
-		with TSynCompletionProposal(Sender).Editor do begin
-			locLine := LineText;
-
-			// Go back from the cursor and find the first open paren
-			TmpX := CaretX;
-			if TmpX > length(locLine) then
-				TmpX := length(locLine)
-			else
-				dec(TmpX);
-			FoundMatch := False;
-
-			while (TmpX > 0) and not(FoundMatch) do begin
-				if LocLine[TmpX] = ')' then begin
-
-					// We found a close, go till it's opening paren
-					ParenCounter := 1;
-					dec(TmpX);
-					while (TmpX > 0) and (ParenCounter > 0) do begin
-						if LocLine[TmpX] = ')' then
-							inc(ParenCounter)
-						else if LocLine[TmpX] = '(' then
-							dec(ParenCounter);
-						dec(TmpX);
-					end;
-
-					if TmpX > 0 then
-						dec(TmpX); // eat the open paren
-
-				end else if locLine[TmpX] = '(' then begin
-
-					// We have a valid open paren, lets see what the word before it is
-					StartX := TmpX;
-					while (TmpX > 0) and not(locLine[TmpX] in TSynValidStringChars) do
-						Dec(TmpX);
-					if TmpX > 0 then begin
-						SavePos := TmpX;
-						while (TmpX > 0) and (locLine[TmpX] in TSynValidStringChars) do
-							dec(TmpX);
-						inc(TmpX);
-
-						// We found the functions' name, now scan for it
-						lookup := Copy(LocLine, TmpX, SavePos - TmpX + 1);
-						if Assigned(fLastParamFunc) then begin
-							if (fLastParamFunc.Count > 0) then
-								if (PStatement(fLastParamFunc.Items[0])^._Command = lookup) then // this avoid too much calls to CppParser.FillListOf
-									sl := fLastParamFunc;
-						end;
-						if not Assigned(sl) then begin
-							//P:=MainForm.CppParser1.Locate(lookup, False);  // we should really avoid a Locate for each char typed, this call takes a long time to execute when the cache is huge
-							sl := TList.Create;
-							if MainForm.CppParser1.FillListOf(Lookup, False, sl) then begin  // and try to use only a minimum of FillListOf
-								if Assigned(fLastParamFunc) then
-									FreeAndNil(fLastParamFunc);
-								fLastParamFunc := sl;
-							end else
-								FreeAndNil(sl);
-						end;
-						FoundMatch := Assigned(sl);
-						if not(FoundMatch) then begin
-							TmpX := StartX;
-							dec(TmpX);
-						end;
-					end;
-				end else
-					dec(TmpX);
-			end;
-		end;
-		CanExecute := FoundMatch;
-	finally
-		// Take the beating
-	end;
 end;
 
 // This code is executed whenever a function parameter suggestion balloon is shown

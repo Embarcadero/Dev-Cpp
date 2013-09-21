@@ -9,7 +9,7 @@ E=0
 F=0
 G=1
 H=1
-I=0
+I=1
 J=0
 K=0
 L=1
@@ -17,8 +17,8 @@ M=0
 N=1
 O=1
 P=1
-Q=0
-R=0
+Q=1
+R=1
 S=0
 T=0
 U=0
@@ -111,7 +111,7 @@ AutoIncBuild=0
 MajorVer=5
 MinorVer=0
 Release=0
-Build=6
+Build=7
 Debug=0
 PreRelease=0
 Special=0
@@ -122,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Bloodshed Software
 FileDescription=Dev-C++ IDE
-FileVersion=5.0.0.6
+FileVersion=5.0.0.7
 InternalName=devcpp.exe
 LegalCopyright=Copyright Bloodshed Software
 LegalTrademarks=
@@ -130,3 +130,15 @@ OriginalFilename=devcpp.exe
 ProductName=Dev-C++
 ProductVersion=5
 Comments=Under the GNU General Public License
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\Dev Tabs;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=units
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=..

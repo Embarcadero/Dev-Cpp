@@ -116,7 +116,7 @@ type
 implementation
 
 uses ToolEditFrm, inifiles, devcfg, utils, MultiLangSupport, datamod,
-  version;
+  version, main;
 
 {$R *.dfm}
 
@@ -290,11 +290,7 @@ var
 	Item: TMenuItem;
 	Icon: TIcon;
 	s: string;
-
-	// Icon stuff
-	numicons : integer;
-	SmallIcons : ^HICON;
-	LargeIcons : ^HICON;
+	w: word;
 begin
 	if Assigned(fMenu) then
 		I:= fMenu.Count - 1 // Clear Tools menu
@@ -336,49 +332,34 @@ begin
 					if FileExists(S) then begin
 
 						// Er moet een variabele meegegeven worden
-						LargeIcons := nil;
-						SmallIcons := nil;
+						w:=0;
+						Icon.Handle:=ExtractAssociatedIcon(hInstance, PChar(S), w);
 
-						// Lijst opbouwen die alle icons bevat
-						numicons:=ExtractIconEx(PChar(S),-1,LargeIcons^,SmallIcons^,0);
+						// Add the icon to the image lists if it exists
+						if Icon.Handle <> 0 then begin
 
-						if numicons > 0 then begin
-
-							// Pluk de kleinste eruit
-							GetMem(SmallIcons,sizeof(HICON)*numicons);
-							ExtractIconEx(PChar(S),0,LargeIcons^,SmallIcons^,numicons);
-							Icon.Handle:=SmallIcons^;
-
+							// Hier proberen te saven werkt gewoon...
 						//	Icon.savetofile('C:\Users\Johan Mes\Desktop\icon' + inttostr(I) + '.ico');
 
-							// Add the icon to the image lists if it exists
-							if Icon.Handle <> 0 then begin
+							// Add it to every theme
+							fToolList.Items[I].IcoNumNewLook:=dmMain.MenuImages_NewLook.AddIcon(Icon);
+							fToolList.Items[I].IcoNumBlue:=dmMain.MenuImages_Blue.AddIcon(Icon);
+							fToolList.Items[I].IcoNumGnome:=dmMain.MenuImages_Gnome.AddIcon(Icon);
+							fToolList.Items[I].HasIcon:=True;
 
-								// Add it to every theme
-								fToolList.Items[I].IcoNumNewLook:=dmMain.MenuImages_NewLook.AddIcon(Icon);
-								fToolList.Items[I].IcoNumBlue:=dmMain.MenuImages_Blue.AddIcon(Icon);
-								fToolList.Items[I].IcoNumGnome:=dmMain.MenuImages_Gnome.AddIcon(Icon);
-								fToolList.Items[I].HasIcon:=True;
-                            //    Item.ImageIndex := fToolList.Items[I].IcoNumNewLook;
-                            //    MainForm.ToolsMenu.Find('Configure Tools...').ImageIndex := fToolList.Items[I].IcoNumNewLook;
+							// Setting the image index to 'not -1' should do the trick
+							if devData.Theme=DEV_GNOME_THEME then
+								Item.ImageIndex:=fToolList.Items[I].IcoNumGnome
+							else if devData.Theme=DEV_BLUE_THEME then
+								Item.ImageIndex:=fToolList.Items[I].IcoNumBlue
+							else
+								Item.ImageIndex:=fToolList.Items[I].IcoNumNewLook;
 
-                            //    dmMain.MenuImages_NewLook.GetIcon(1,Icon);
-
-                            //    Icon.savetofile('C:\Users\Johan Mes\Desktop\testiconfromlib' + inttostr(1) + '.ico');
-
-								// Setting the image index to 'not -1' should do the trick
-								if devData.Theme=DEV_GNOME_THEME then
-									Item.ImageIndex:=fToolList.Items[I].IcoNumGnome
-								else if devData.Theme=DEV_BLUE_THEME then
-									Item.ImageIndex:=fToolList.Items[I].IcoNumBlue
-								else
-									Item.ImageIndex:=fToolList.Items[I].IcoNumNewLook;
+						//	MainForm.FileMenu.ImageIndex := fToolList.Items[I].IcoNumNewLook;
 
 //MessageBox(application.Handle,PChar('Icon belonging to ' + S + ' exists. Added as index ' + inttostr(Item.ImageIndex) + '!'),PChar('bericht'),MB_OK);
 
-							end;
 						end;
-						FreeMem(SmallIcons,sizeof(HICON)*numicons); // gevaarlijk, maar van later zorg
 					end;
 				finally
 					Icon.Free;

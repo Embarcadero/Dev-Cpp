@@ -426,7 +426,7 @@ const
   ID_EOPT_GUTTERFNT                = 469;
   ID_EOPT_GUTTERPRE                = 470;
 
-    // Syntax tab
+  // Syntax tab
   ID_EOPT_FORE                     = 471;
   ID_EOPT_BACK                     = 472;
   ID_EOPT_STYLE                    = 473;
@@ -458,9 +458,15 @@ const
   ID_EOPT_BROWSERSAMPLE            = 492;
   ID_EOPT_BROWSERENGINE            = 493;
   ID_EOPT_BROWSERVIEW              = 494;
-  ID_EOPT_BROWSERENABLE	      	   = 495;
+  ID_EOPT_BROWSERENABLE            = 495;
   ID_EOPT_BROWSERGLOBAL            = 496;
-  // free to 499 for editor options
+
+  ID_EOPT_ENABLEAUTOSAVE           = 497;
+  ID_EOPT_AUTOSAVEINTERNAL         = 498;
+  ID_EOPT_SAVEALLFILES             = 499;
+  ID_EOPT_SAVEONLYOPENFILE         = 490;
+  ID_EOPT_AUTOSAVEFILE             = 412;
+  ID_EOPT_OPTIONS                  = 413;
 
   // new project
   ID_NP                            = 500;
@@ -1124,3 +1130,4 @@ const
   ID_COPT_BUILTINPROC              = 3402;
   ID_COPT_OPTIMIZE                 = 3403;
   ID_COPT_STD                      = 3404;
+  ID_COPT_PTRWIDTH                 = 3405;

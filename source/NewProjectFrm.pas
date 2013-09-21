@@ -25,13 +25,11 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ImgList, Buttons, ComCtrls, Templates, Inifiles,
-  devTabs;
+  StdCtrls, ExtCtrls, ImgList, Buttons, ComCtrls, Templates, Inifiles;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-  QStdCtrls, QExtCtrls, QImgList, QButtons, QComCtrls, Templates, Inifiles,
-  devTabs;
+  QStdCtrls, QExtCtrls, QImgList, QButtons, QComCtrls, Templates, Inifiles;
 {$ENDIF}
 
 type
@@ -46,7 +44,7 @@ type
     ImageList: TImageList;
     lblPrjName: TLabel;
     edProjectName: TEdit;
-    TabsMain: TdevTabs;
+    TabsMain: TTabControl;
     ProjView: TListView;
     pnlDesc: TPanel;
     lblDesc: TLabel;

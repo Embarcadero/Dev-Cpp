@@ -28,12 +28,12 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
-  devTabs, prjtypes, Spin, ValEdit, CompilerOptionsFrame, ShellApi, Grids;
+  prjtypes, Spin, ValEdit, CompilerOptionsFrame, ShellApi, Grids;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
   QStdCtrls, QExtCtrls, QButtons, QComCtrls, main, project,
-  devTabs, prjtypes, CompilerOptionsFrame, Types;
+  prjtypes, CompilerOptionsFrame, Types;
 {$ENDIF}
 
 type
@@ -43,9 +43,9 @@ type
     btnHelp: TBitBtn;
     dlgOpen: TOpenDialog;
     dlgPic: TOpenPictureDialog;
-    PageControl: TdevPages;
-    tabGeneral: TdevPage;
-    tabFilesDir: TdevPage;
+    PageControl: TPageControl;
+    tabGeneral: TTabSheet;
+    tabFilesDir: TTabSheet;
     lblPrjName: TLabel;
     grpIcon: TGroupBox;
     btnIconBrwse: TBitBtn;
@@ -55,7 +55,7 @@ type
     edProjectName: TEdit;
     btnUp: TSpeedButton;
     btnDown: TSpeedButton;
-    SubTabs: TdevTabs;
+    SubTabs: TTabControl;
     lstList: TListBox;
     btnAdd: TButton;
     btnDelete: TButton;
@@ -65,14 +65,13 @@ type
     btnRemoveIcon: TBitBtn;
     Panel1: TPanel;
     Icon: TImage;
-    tabOutputDir: TdevPage;
+    tabOutputDir: TTabSheet;
     grpOutDirectories: TGroupBox;
     lblExeOutput: TLabel;
     lblObjOutput: TLabel;
     edExeOutput: TEdit;
     edObjOutput: TEdit;
-    tabMakefile: TdevPage;
-    Panel2: TPanel;
+    tabMakefile: TTabSheet;
     IncMakeLabel: TLabel;
     MakeIncludes: TListBox;
     btnMakUp: TSpeedButton;
@@ -86,12 +85,12 @@ type
     InfoMakeBtn: TSpeedButton;
     edOverridenOutput: TEdit;
     chkOverrideOutput: TCheckBox;
-    tabFiles: TdevPage;
+    tabFiles: TTabSheet;
     lvFiles: TTreeView;
     grpUnitOptions: TGroupBox;
     chkCompile: TCheckBox;
     chkCompileCpp: TCheckBox;
-    tabVersion: TdevPage;
+    tabVersion: TTabSheet;
     chkVersionInfo: TCheckBox;
     grpVersion: TGroupBox;
     lblVerMajor: TLabel;
@@ -105,7 +104,7 @@ type
     spnBuild: TSpinEdit;
     vleVersion: TValueListEditor;
     cmbLangID: TComboBox;
-    tabCompiler: TdevPage;
+    tabCompiler: TTabSheet;
     chkSupportXP: TCheckBox;
     OpenLibDialog: TOpenDialog;
     chkOverrideBuildCmd: TCheckBox;
@@ -121,7 +120,7 @@ type
     spnPriority: TSpinEdit;
     chkAutoIncBuild: TCheckBox;
     chkSyncProduct: TCheckBox;
-    tabCompOpts: TdevPage;
+    tabCompOpts: TTabSheet;
     CompOptionsFrame1: TCompOptionsFrame;
     cmbCompiler: TComboBox;
     lblCompilerSet: TLabel;
@@ -185,8 +184,6 @@ type
     procedure cbUseCustomMakefileClick(Sender: TObject);
     procedure MakeIncludesDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
     procedure SetFileVersion(Sender: TObject);
-    procedure PageControlChange(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
     procedure btnLogOutputDirClick(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
   private
@@ -201,7 +198,6 @@ type
     procedure InitVersionInfo;
     function DefaultBuildCommand(idx: integer): string;
     procedure SaveDirSettings;
-    procedure StyleFix;
   public
     property Options: TProjOptions read GetOptions write SetOptions;
     property Project: TProject read fProject write fProject;
@@ -600,33 +596,6 @@ begin
   CompOptionsFrame1.FillOptions(fProject);
   SubTabsChange(Self);
   UpdateMakButtons();
-end;
-
-procedure TfrmProjectOptions.StyleFix;
-begin
-	lblPrjName.Refresh;
-    lblFname.Refresh;
-    lblPrjOutput.Refresh;
-    lblUnits.Refresh;
-    lblPrjFname.Refresh;
-    lblPrjOutPutFname.Refresh;
-    lblPrjUnits.Refresh;
-
-    lblCompileInfo.Refresh;
-    lblCompilerSet.Refresh;
-
-    lblAdditions.Refresh;
-    lblCompiler.Refresh;
-    lblCppCompiler.Refresh;
-    lblLinker.Refresh;
-
-    btnUp.Refresh;
-    btnDown.Refresh;
-    btnBrowse.Refresh;
-
-	CheckBox1.Refresh;
-	lblLogOutput.Refresh;
-	Label1.Refresh;
 end;
 
 procedure TfrmProjectOptions.btnIconLibClick(Sender: TObject);
@@ -1257,16 +1226,6 @@ procedure TfrmProjectOptions.MakeIncludesDrawItem(Control: TWinControl;Index: In
 begin
   btnMakUp.Enabled := MakeIncludes.Items.Count > 0;
   btnMakDown.Enabled := MakeIncludes.Items.Count > 0;
-end;
-
-procedure TfrmProjectOptions.PageControlChange(Sender: TObject);
-begin
-	StyleFix;
-end;
-
-procedure TfrmProjectOptions.FormActivate(Sender: TObject);
-begin
-	StyleFix;
 end;
 
 procedure TfrmProjectOptions.CheckBox1Click(Sender: TObject);

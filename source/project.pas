@@ -264,30 +264,32 @@ begin
 	temp := '';
 
 	// The commented line below is used by the project logger
-	if fOptions.LogOutputEnabled and (MainForm.CompilerOutput.Items.Count > 0) then begin
+	if fOptions.LogOutputEnabled then begin
 
 		// Formatted log
-		AssignFile(logfile,fOptions.LogOutput + '\Formatted Compiler Output.txt');
-		try
-			if FileExists(fOptions.LogOutput + '\Formatted Compiler Output.txt') = false then begin
-				Rewrite(logfile);
-				Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
-			end else begin
-				Reset(logfile);
-				Append(logfile);
-				Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);
-			end;
+		if (MainForm.CompilerOutput.Items.Count > 0) then begin
+			AssignFile(logfile,fOptions.LogOutput + '\Formatted Compiler Output.txt');
+			try
+				if FileExists(fOptions.LogOutput + '\Formatted Compiler Output.txt') = false then begin
+					Rewrite(logfile);
+					Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
+				end else begin
+					Reset(logfile);
+					Append(logfile);
+					Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);
+				end;
 
-			for i:=0 to pred(MainForm.CompilerOutput.Items.Count) do begin
-				temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
-				temp2 := StringReplace(temp2,#10,#9,[]);
-				temp2 := StringReplace(temp2,#13#10,#9,[]);
-				temp2 := StringReplace(temp2,#13#10,#9,[]);
-				temp := temp + temp2;
+				for i:=0 to pred(MainForm.CompilerOutput.Items.Count) do begin
+					temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
+					temp2 := StringReplace(temp2,#10,#9,[]);
+					temp2 := StringReplace(temp2,#13#10,#9,[]);
+					temp2 := StringReplace(temp2,#13#10,#9,[]);
+					temp := temp + temp2;
+				end;
+				Write(logfile,temp);
+			finally
+				CloseFile(logfile);
 			end;
-			Write(logfile,temp);
-		finally
-			CloseFile(logfile);
 		end;
 
 		// Raw log

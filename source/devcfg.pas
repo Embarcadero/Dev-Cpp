@@ -368,7 +368,7 @@ type
 
    fPastEOF: boolean;          // Cursor moves past end of file
    fPastEOL: boolean;          // Cursor moves past end of lines
-   fTrailBlanks: boolean;      // Blanks past EOL are not trimmed
+   fRemoveTrailBlanks: boolean;// Blanks past EOL are trimmed
    fdblLine: boolean;          // Double Click selects a line
    fFindText: boolean;         // Text at cursor defaults in find dialog
    fEHomeKey: boolean;         // Home key like visual studio
@@ -390,6 +390,10 @@ type
    fHighCurrLine: boolean;     // Highlight current line
    fHighColor: TColor;         // Color of current line when highlighted
 
+      // Autosave
+   fEnableAutoSave : boolean;
+   fInterval : integer;
+   fSaveType : integer;
   public
    constructor Create;
    destructor Destroy; override;
@@ -405,7 +409,7 @@ type
    property TabToSpaces: boolean read fTabToSpaces write fTabToSpaces;
    property SmartTabs: boolean read fSmartTabs write fSmartTabs;
    property SmartUnindent: boolean read fSmartUnindent write fSmartUnindent;
-   property TrailBlank: boolean read fTrailBlanks write fTrailBlanks;
+   property RemoveTrailBlanks: boolean read fRemoveTrailBlanks write fRemoveTrailBlanks;
    property GroupUndo: boolean read fGroupUndo write fGroupUndo;
    property EHomeKey: boolean read fEHomeKey write fEHomeKey;
    property PastEOF: boolean read fPastEOF write fPastEOF;
@@ -450,6 +454,10 @@ type
    property HighCurrLine: boolean read fHighCurrLine write fHighCurrLine;
    property HighColor: TColor read fHighColor write fHighColor;
 
+   // Autosave
+   property EnableAutoSave: boolean read fEnableAutoSave write fEnableAutoSave;
+   property Interval: integer read fInterval write fInterval;
+   property SaveType: integer read fSaveType write fSaveType;
  end;
 
  // master option object -- contains program globals
@@ -1110,8 +1118,15 @@ begin
 	sl.Add('Highest (fast)=fast');
 	AddOption(Lang[ID_COPT_OPTIMIZE], False, True, True, True, 0, '-O', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 
+	// 32bit/64bit
+	sl := TStringList.Create;
+	sl.Add('32bit=32');
+	sl.Add('64bit=64');
+	AddOption(Lang[ID_COPT_PTRWIDTH], False, True, True, True, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], [], sl);
+
 	// C++ Standards
 	sl := TStringList.Create;
+	sl.Add(''); // Passing nothing effectively lets the compiler decide
 	sl.Add('ISO C99=c99');
 	sl.Add('ISO C++=c++98');
 	sl.Add('ISO C++0x=c++0x');
@@ -1261,9 +1276,8 @@ end;
 
 procedure TdevCompiler.SaveSettings;
 begin
-	with devData do begin
+	with devData do
 		SaveSettingS('Compiler', 'CompilerSet',  IntToStr(fCompilerSet));
-	end;
 end;
 
 procedure TdevCompiler.SetCompilerSet(const Value: integer);
@@ -1457,7 +1471,7 @@ begin
 	fInsertMode:= TRUE;
 	fTabtoSpaces:= FALSE; // Use Tab Character (inverse)
 	fSmartTabs:= FALSE;
-	fTrailBlanks:= TRUE;
+	fRemoveTrailBlanks:= FALSE;
 	fSmartUnindent:= TRUE; // Backspace unindents
 	fGroupUndo:= TRUE;
 	fInsDropFiles:= FALSE;
@@ -1509,6 +1523,11 @@ begin
 	fGutterFont.Name:= 'Courier New';
 	fGutterFont.Size:= 10;
 	fGutterSize:= 32;
+
+	// Autosave
+	fEnableAutoSave := FALSE;
+	Interval := 10;
+	fSaveType := 0;
 end;
 
 procedure TdevEditor.AssignEditor(Editor: TSynEdit);
@@ -1582,14 +1601,14 @@ begin
 		if fPastEOL then
 			Options := Options + [eoScrollPastEOL];
 		if fShowScrollHint then
-			Options := Options + [eoScrollHintFollows]; // Can also be eoSowScrollHint
+			Options := Options + [eoScrollHintFollows,eoShowScrollHint];
 		if fSmartTabs then
 			Options := Options + [eoSmartTabs];
 		if fSmartTabs then
 			Options := Options + [eoSmartTabDelete];
 		if fTabtoSpaces then
 			Options := Options + [eoTabsToSpaces];
-		if fTrailBlanks then
+		if fRemoveTrailBlanks then
 			Options := Options + [eoTrimTrailingSpaces];
 		if fSpecialChar then
 			Options := Options + [eoShowSpecialChars];

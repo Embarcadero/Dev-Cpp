@@ -25,12 +25,12 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, devTabs, StdCtrls, Spin, devRun, ComCtrls, StrUtils, FileCtrl,
+  Dialogs, StdCtrls, Spin, devRun, ComCtrls, StrUtils, FileCtrl,
   Grids, ValEdit, CVSThread, Menus, CheckLst, DateUtils;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, devTabs, QStdCtrls, devRun, QComCtrls, StrUtils, 
+  QDialogs, QStdCtrls, devRun, QComCtrls, StrUtils,
   QGrids, CVSThread, QMenus, QCheckLst, DateUtils, Types;
 {$ENDIF}
 
@@ -38,24 +38,24 @@ type
   TCVSAction = (caImport, caCheckout, caCommit, caUpdate, caDiff, caLog, caAdd, caRemove, caLogin, caLogout);
 
   TCVSForm = class(TForm)
-    devPages1: TdevPages;
-    tabImport: TdevPage;
-    tabRepos: TdevPage;
+    devPages1: TPageControl;
+    tabImport: TTabSheet;
+    tabRepos: TTabSheet;
     btnOK: TButton;
     btnCancel: TButton;
-    tabGlobal: TdevPage;
+    tabGlobal: TTabSheet;
     lblCompression: TLabel;
     spnCompression: TSpinEdit;
-    tabCheckout: TdevPage;
-    tabCommit: TdevPage;
-    tabUpdate: TdevPage;
-    tabDiff: TdevPage;
-    tabLog: TdevPage;
+    tabCheckout: TTabSheet;
+    tabCommit: TTabSheet;
+    tabUpdate: TTabSheet;
+    tabDiff: TTabSheet;
+    tabLog: TTabSheet;
     chkUpdRecurse: TCheckBox;
     chkUpdResetSticky: TCheckBox;
     chkUpdCreateDirs: TCheckBox;
     chkUpdCleanCopy: TCheckBox;
-    tabOutput: TdevPage;
+    tabOutput: TTabSheet;
     chkUseSSH: TCheckBox;
     memOutput: TRichEdit;
     chkDiffRecurse: TCheckBox;
@@ -123,12 +123,12 @@ type
     rgbDiff: TRadioButton;
     rgbDiff1: TRadioButton;
     rgbDiff2: TRadioButton;
-    tabAdd: TdevPage;
-    tabRemove: TdevPage;
+    tabAdd: TTabSheet;
+    tabRemove: TTabSheet;
     lblAddMsg: TLabel;
     memAddMsg: TMemo;
     chkRemove: TCheckBox;
-    tabFiles: TdevPage;
+    tabFiles: TTabSheet;
     lblFiles: TLabel;
     lstFiles: TCheckListBox;
     txtPort: TEdit;

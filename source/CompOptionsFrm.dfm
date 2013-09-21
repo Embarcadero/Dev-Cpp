@@ -1,6 +1,6 @@
 object CompForm: TCompForm
-  Left = 1149
-  Top = 529
+  Left = 1082
+  Top = 390
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -117,29 +117,18 @@ object CompForm: TCompForm
     OnClick = btnHelpClick
     Kind = bkHelp
   end
-  object MainPages: TdevPages
-    Left = 4
-    Top = 10
-    Width = 440
+  object MainPages: TPageControl
+    Left = 7
+    Top = 8
+    Width = 438
     Height = 337
-    ActivePage = tabCompiler
-    OnChange = MainPagesChange
-    object tabCompiler: TdevPage
-      Left = 0
-      Top = 23
-      Width = 440
-      Height = 314
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 1
+    ActivePage = tabDirectories
+    TabOrder = 4
+    object tabCompiler: TTabSheet
       Caption = 'Compiler'
       DesignSize = (
-        436
-        310)
+        430
+        309)
       object lblDelay: TLabel
         Left = 16
         Top = 228
@@ -162,7 +151,7 @@ object CompForm: TCompForm
       object cbCompAdd: TCheckBox
         Left = 16
         Top = 60
-        Width = 409
+        Width = 407
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Add the following commands when calling the compiler:'
@@ -171,9 +160,11 @@ object CompForm: TCompForm
       object Commands: TMemo
         Left = 28
         Top = 78
-        Width = 390
+        Width = 388
         Height = 43
         Anchors = [akLeft, akTop, akRight]
+        Ctl3D = True
+        ParentCtl3D = False
         ScrollBars = ssVertical
         TabOrder = 1
         WantReturns = False
@@ -207,7 +198,7 @@ object CompForm: TCompForm
       object cbLinkerAdd: TCheckBox
         Left = 16
         Top = 131
-        Width = 373
+        Width = 371
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Add these commands to the linker command line'
@@ -351,58 +342,36 @@ object CompForm: TCompForm
         end
       end
     end
-    object tabCodeGen: TdevPage
-      Left = 0
-      Top = 23
-      Width = 440
-      Height = 314
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 2
-      Visible = False
+    object tabCodeGen: TTabSheet
       Caption = 'Settings'
       inline CompOptionsFrame1: TCompOptionsFrame
         Left = 0
         Top = 0
-        Width = 436
-        Height = 310
+        Width = 430
+        Height = 309
         Align = alClient
         TabOrder = 0
         inherited Splitter1: TSplitter
-          Height = 310
+          Height = 309
         end
         inherited tv: TTreeView
-          Height = 310
+          Height = 309
         end
         inherited vle: TValueListEditor
-          Width = 317
-          Height = 310
+          Width = 311
+          Height = 309
         end
       end
     end
-    object tabDirectories: TdevPage
-      Left = 0
-      Top = 23
-      Width = 440
-      Height = 314
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 0
-      Visible = False
+    object tabDirectories: TTabSheet
       Caption = 'Directories'
-      object DirTabs: TdevTabs
-        Left = 11
-        Top = 12
-        Width = 413
-        Height = 297
+      object DirTabs: TTabControl
+        Left = 0
+        Top = 0
+        Width = 430
+        Height = 309
+        Align = alClient
+        TabOrder = 0
         Tabs.Strings = (
           'Binaries'
           'Libraries'
@@ -410,13 +379,12 @@ object CompForm: TCompForm
           'C++ Includes')
         TabIndex = 0
         OnChange = DirTabsChange
-        OnChanging = DirTabsChanging
         DesignSize = (
-          413
-          297)
+          430
+          309)
         object btnUp: TSpeedButton
-          Left = 385
-          Top = 101
+          Left = 400
+          Top = 113
           Width = 23
           Height = 22
           Anchors = [akRight, akBottom]
@@ -467,8 +435,8 @@ object CompForm: TCompForm
           OnClick = UpDownClick
         end
         object btnDown: TSpeedButton
-          Left = 385
-          Top = 131
+          Left = 400
+          Top = 143
           Width = 23
           Height = 22
           Anchors = [akRight, akBottom]
@@ -519,8 +487,8 @@ object CompForm: TCompForm
           OnClick = UpDownClick
         end
         object btnBrowse: TSpeedButton
-          Left = 359
-          Top = 231
+          Left = 399
+          Top = 243
           Width = 23
           Height = 22
           Glyph.Data = {
@@ -555,8 +523,8 @@ object CompForm: TCompForm
         object lstDirs: TListBox
           Left = 8
           Top = 27
-          Width = 371
-          Height = 194
+          Width = 388
+          Height = 206
           Anchors = [akLeft, akTop, akRight, akBottom]
           ItemHeight = 13
           TabOrder = 0
@@ -565,8 +533,8 @@ object CompForm: TCompForm
         end
         object edEntry: TEdit
           Left = 8
-          Top = 231
-          Width = 347
+          Top = 243
+          Width = 385
           Height = 21
           Anchors = [akLeft, akRight, akBottom]
           TabOrder = 1
@@ -576,7 +544,7 @@ object CompForm: TCompForm
         object btnDelInval: TButton
           Tag = 4
           Left = 323
-          Top = 265
+          Top = 277
           Width = 90
           Height = 23
           Anchors = [akLeft, akBottom]
@@ -587,7 +555,7 @@ object CompForm: TCompForm
         object btnDelete: TButton
           Tag = 3
           Left = 218
-          Top = 265
+          Top = 277
           Width = 90
           Height = 23
           Anchors = [akLeft, akBottom]
@@ -599,7 +567,7 @@ object CompForm: TCompForm
         object btnAdd: TButton
           Tag = 2
           Left = 113
-          Top = 265
+          Top = 277
           Width = 90
           Height = 23
           Anchors = [akLeft, akBottom]
@@ -611,7 +579,7 @@ object CompForm: TCompForm
         object btnReplace: TButton
           Tag = 1
           Left = 8
-          Top = 265
+          Top = 277
           Width = 90
           Height = 23
           Anchors = [akLeft, akBottom]
@@ -622,19 +590,7 @@ object CompForm: TCompForm
         end
       end
     end
-    object tabPrograms: TdevPage
-      Left = 0
-      Top = 23
-      Width = 440
-      Height = 314
-      HorzScrollBar.Smooth = True
-      HorzScrollBar.Tracking = True
-      VertScrollBar.Smooth = True
-      VertScrollBar.Tracking = True
-      Align = alClient
-      BevelKind = bkTile
-      TabOrder = 3
-      Visible = False
+    object tabPrograms: TTabSheet
       Caption = 'Programs'
       object lblProgramsText: TLabel
         Left = 20

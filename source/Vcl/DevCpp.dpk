@@ -36,7 +36,6 @@ requires
 
 contains
   devReg in 'Dev Reg\devReg.pas',
-  devTabs in 'Dev Tabs\devTabs.pas',
   ColorPickerButton in 'Color Picker\ColorPickerButton.pas',
   devShortcuts in 'Shortcuts\devShortcuts.pas',
   devShortcutsEditorForm in 'Shortcuts\devShortcutsEditorForm.pas' {frmShortcutsEditor},

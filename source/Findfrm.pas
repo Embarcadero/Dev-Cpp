@@ -24,18 +24,18 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  SynEdit, StdCtrls, devTabs, SynEditTypes;
+  SynEdit, StdCtrls, SynEditTypes, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms,
-  QSynEdit, QStdCtrls, devTabs, QSynEditTypes;
+  QSynEdit, QStdCtrls, QSynEditTypes;
 {$ENDIF}
 
 type
   TfrmFind = class(TForm)
     btnFind: TButton;
     btnCancel: TButton;
-    FindTabs: TdevTabs;
+    FindTabs: TTabControl;
     lblFind: TLabel;
     cboFindText: TComboBox;
     grpOptions: TGroupBox;
