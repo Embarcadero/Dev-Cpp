@@ -123,7 +123,7 @@ begin
 		ObjectOutput := '';
 		HostApplication := '';
 		SupportXPThemes:=False;
-		CompilerSet:=devCompiler.CurrentIndex;
+		CompilerSet:=devCompiler.CurrentSet;
 		CompilerOptions:=devCompiler.fOptionString;
 
 		IncludeVersionInfo:=False;

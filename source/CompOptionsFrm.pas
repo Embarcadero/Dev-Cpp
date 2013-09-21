@@ -25,7 +25,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, Spin,
+  Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, Spin, Math,
   CompOptionsFrame, CompOptionsList;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -122,13 +122,15 @@ type
     procedure cbLinkerAddClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnFindCompilersClick(Sender: TObject);
+    procedure cmbCompilerSetCompEnter(Sender: TObject);
   private
+    fOldSelection: integer;
     fBins: AnsiString;
     fLibs: AnsiString;
     fC: AnsiString;
     fCpp: AnsiString;
-    CurrentSet : Integer;
-    procedure SetOptions(first : boolean);
+    procedure LoadSet(Index : integer);
+    procedure SaveSet(Index : integer);
     procedure UpdateButtons;
     procedure LoadText;
   end;
@@ -152,53 +154,28 @@ end;
 
 procedure TCompOptForm.btnOkClick(Sender: TObject);
 begin
-	// Set general options for the current compiler...
-	devCompiler.AddtoComp := cbCompAdd.Checked;
-	devCompiler.AddtoLink := cbLinkerAdd.Checked;
+	// Save current compiler set
+	if cmbCompilerSetComp.ItemIndex > 0 then
+		SaveSet(cmbCompilerSetComp.ItemIndex);
 
-	devCompiler.CompOpts := Commands.Lines.Text;
-	devCompiler.LinkOpts := Linker.Lines.Text;
-
-	devCompiler.Delay := seCompDelay.Value;
-	devCompiler.FastDep := cbFastDep.Checked;
-
-	// directories are saved to devCompiler by the UI components
-
-	// compiler/linker flags are saved to devCompiler by the UI components
-
-	// program names are saved to devCompiler by the UI components
-
-	// write compiler list
+	// write full compiler list
 	devCompiler.Sets.Assign(cmbCompilerSetComp.Items);
 	devCompiler.WriteSets;
-
-	// rewrite current compiler options
-	devCompiler.SaveSet(CurrentSet);
 
 	// Set Path with New Bins
 	SetPath(fBins);
 end;
 
-procedure TCompOptForm.SetOptions(first : boolean);
+procedure TCompOptForm.LoadSet(Index : integer);
 begin
-	// fill compiler lists
-	if first then begin
-		cmbCompilerSetComp.Items.Assign(devCompiler.Sets);
 
-		if devCompiler.CurrentIndex < cmbCompilerSetComp.Items.Count then
-			cmbCompilerSetComp.ItemIndex := devCompiler.CurrentIndex
-		else if cmbCompilerSetComp.Items.Count > 0 then
-			cmbCompilerSetComp.ItemIndex := 0;
-	end;
-
-	// Load the new set
-	CurrentSet := cmbCompilerSetComp.ItemIndex;
-	if CurrentSet <> -1 then
-		devCompiler.LoadSet(cmbCompilerSetComp.ItemIndex)
+	// Load the new set from disk or clear
+	if Index = -1 then
+		devCompiler.ClearSet
 	else
-		devCompiler.ClearSet;
+		devCompiler.LoadSet(Index);
 
-		// Apply the new set to the UI
+	// Apply the new set to the UI
 	with devCompiler do begin
 		fBins := BinDir;
 		fC := CDir;
@@ -224,6 +201,23 @@ begin
 	// fill tab controls
 	CompOptionsFrame1.FillOptions(nil);
 	DirTabsChange(Self);
+end;
+
+procedure TCompOptForm.SaveSet(Index: integer);
+begin
+	// Save the set to disk (can't be undone by Cancel...)
+	devCompiler.CompOpts := Commands.Lines.Text;
+	devCompiler.LinkOpts := Linker.Lines.Text;
+
+	devCompiler.AddtoLink := cbLinkerAdd.Checked;
+	devCompiler.AddtoComp := cbCompAdd.Checked;
+
+	devCompiler.FastDep := cbFastDep.Checked;
+	devCompiler.Delay := seCompDelay.Value;
+
+	// other settings of a compiler profile are saved to devCompiler by the UI components!
+
+	devCompiler.SaveSet(Index);
 end;
 
 procedure TCompOptForm.btnHelpClick(Sender: TObject);
@@ -373,7 +367,17 @@ end;
 procedure TCompOptForm.FormCreate(Sender: TObject);
 begin
 	LoadText;
-	SetOptions(true);
+
+	// fill compiler lists
+	cmbCompilerSetComp.Items.Assign(devCompiler.Sets);
+
+	if devCompiler.CurrentSet < cmbCompilerSetComp.Items.Count then
+		cmbCompilerSetComp.ItemIndex := devCompiler.CurrentSet
+	else if cmbCompilerSetComp.Items.Count > 0 then
+		cmbCompilerSetComp.ItemIndex := 0;
+
+	LoadSet(devCompiler.CurrentSet);
+
 	cbCompAddClick(cbCompAdd);
 	cbLinkerAddClick(cbLinkerAdd);
 end;
@@ -435,22 +439,15 @@ end;
 
 procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);
 begin
-	// Save the old set
-	devCompiler.CompOpts := Commands.Lines.Text;
-	devCompiler.LinkOpts := Linker.Lines.Text;
 
-	devCompiler.AddtoLink := cbLinkerAdd.Checked;
-	devCompiler.AddtoComp := cbCompAdd.Checked;
+	// Save old
+	if MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[fOldSelection]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+		SaveSet(fOldSelection);
 
-	devCompiler.FastDep := cbFastDep.Checked;
-	devCompiler.Delay := seCompDelay.Value;
-
-	// other settings are saved to devCompiler by the UI components!
-
-	devCompiler.SaveSet(CurrentSet);
+	fOldSelection := cmbCompilerSetComp.ItemIndex;
 
 	// Load the new set, apply new set to UI
-	SetOptions(false);
+	LoadSet(fOldSelection);
 end;
 
 procedure TCompOptForm.btnBrws1Click(Sender: TObject);
@@ -472,67 +469,96 @@ begin
   if not Assigned(Obj) then
     Exit;
 
-  dmMain.OpenDialog.Filter:=FLT_ALLFILES;
-  sl:=TStringList.Create;
-  try
-    sl.Delimiter:=';';
-    sl.DelimitedText:=devCompiler.BinDir;
-    if sl.Count>0 then
-      dmMain.OpenDialog.InitialDir:=sl[0];
-  finally
-    sl.Free;
-  end;
+	with TOpenDialog.Create(Self) do try
+		Filter:=FLT_ALLFILES;
 
-  dmMain.OpenDialog.FileName:=IncludeTrailingPathDelimiter(dmMain.OpenDialog.InitialDir)+Obj.Text;
-  if dmMain.OpenDialog.Execute then begin
-    Obj.Text:=ExtractFileName(dmMain.OpenDialog.FileName);
-    devCompiler.gccName:=GccEdit.Text;
-    devCompiler.gppName:=GppEdit.Text;
-    devCompiler.gdbName:=GdbEdit.Text;
-    devCompiler.makeName:=MakeEdit.Text;
-    devCompiler.windresName:=WindresEdit.Text;
-    devCompiler.dllwrapName:=DllwrapEdit.Text;
-    devCompiler.gprofName:=GprofEdit.Text;
-  end;
+		// Start in the bin folder
+		sl := TStringList.Create;
+		StrToList(devCompiler.BinDir,sl,';');
+		if sl.count > 0 then
+			InitialDir := sl[0];
+		sl.Free;
+
+		FileName := IncludeTrailingPathDelimiter(InitialDir) + Obj.Text;
+		if Execute then begin
+			Obj.Text:=ExtractFileName(FileName);
+			devCompiler.gccName:=GccEdit.Text;
+			devCompiler.gppName:=GppEdit.Text;
+			devCompiler.gdbName:=GdbEdit.Text;
+			devCompiler.makeName:=MakeEdit.Text;
+			devCompiler.windresName:=WindresEdit.Text;
+			devCompiler.dllwrapName:=DllwrapEdit.Text;
+			devCompiler.gprofName:=GprofEdit.Text;
+		end;
+	finally
+		Free;
+	end;
 end;
 
 procedure TCompOptForm.btnAddCompilerSetClick(Sender: TObject);
 var
-  S: AnsiString;
+	S: AnsiString;
 begin
-  S:='New compiler';
-  if not InputQuery(Lang[ID_COPT_NEWCOMPSET], Lang[ID_COPT_PROMPTNEWCOMPSET], S) or (S='') then
-    Exit;
+	S := 'New compiler';
+	if not InputQuery(Lang[ID_COPT_NEWCOMPSET], Lang[ID_COPT_PROMPTNEWCOMPSET], S) or (S='') then
+		Exit;
 
-  cmbCompilerSetComp.ItemIndex:=cmbCompilerSetComp.Items.Add(S);
-  cmbCompilerSetCompChange(nil);
-  devCompiler.Sets.Add(S);
+	// Save old
+	if MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+		SaveSet(fOldSelection);
+
+	// Add blank compiler
+	cmbCompilerSetComp.ItemIndex := cmbCompilerSetComp.Items.Add(S);
+
+	// Load a blank one to clear UI
+	LoadSet(-1);
 end;
 
 procedure TCompOptForm.btnDelCompilerSetClick(Sender: TObject);
+var
+	deleteindex,I : integer;
 begin
 	if cmbCompilerSetComp.ItemIndex <> -1 then begin
 		if MessageDlg(Lang[ID_COPT_DELETECOMPSET], mtConfirmation, [mbYes, mbNo], 0)=mrNo then
 			Exit;
 
-		devCompiler.Sets.Delete(cmbCompilerSetComp.ItemIndex);
-		cmbCompilerSetComp.Items.Delete(cmbCompilerSetComp.ItemIndex);
-		cmbCompilerSetComp.ItemIndex:=0;
-		cmbCompilerSetCompChange(nil);
+		deleteindex := cmbCompilerSetComp.ItemIndex;
+
+		// Move all set configurations DOWN by one... edit disk contents :(
+		for I := deleteindex + 1 to cmbCompilerSetComp.Items.Count - 1 do begin
+			devCompiler.LoadSet(I);
+			devCompiler.SaveSet(I - 1);
+		end;
+
+		// Remove last set
+		devCompiler.EraseSet(cmbCompilerSetComp.Items.Count - 1);
+
+		// Remove from list
+		cmbCompilerSetComp.Items.Delete(deleteindex);
+
+		// load previous (if it exists)
+		if cmbCompilerSetComp.Items.Count > 0 then
+			cmbCompilerSetComp.ItemIndex := max(0,deleteindex - 1)
+		else
+			cmbCompilerSetComp.ItemIndex := -1;
+
+		LoadSet(cmbCompilerSetComp.ItemIndex);
 	end;
 end;
 
 procedure TCompOptForm.btnRenameCompilerSetClick(Sender: TObject);
 var
 	S: AnsiString;
+	selindex : integer;
 begin
 	if cmbCompilerSetComp.ItemIndex <> -1 then begin
 		S:=cmbCompilerSetComp.Text;
 		if not InputQuery(Lang[ID_COPT_RENAMECOMPSET], Lang[ID_COPT_PROMPTRENAMECOMPSET], S) or (S='') or (S=cmbCompilerSetComp.Text) then
 			Exit;
 
-		cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex]:=S;
-		cmbCompilerSetComp.ItemIndex:=cmbCompilerSetComp.Items.IndexOf(S);
+		selindex := cmbCompilerSetComp.ItemIndex;
+		cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex] := S;
+		cmbCompilerSetComp.ItemIndex := selindex;
 	end;
 end;
 
@@ -608,7 +634,7 @@ begin
 
 	// Dialog asked to clear the current compiler list...
 	if dlgresult = mrYes then
-		devCompiler.Sets.Clear;
+		cmbCompilerSetComp.Clear;
 
 	// copy from InitializeOptions
 
@@ -619,13 +645,17 @@ begin
 		if compilername = '' then
 			compilername := 'MinGW64';
 
-		devCompiler.Sets.Add(compilername + ' 64-bit');
-		devCompiler.SettoDefaults(compilername + ' 64-bit','MinGW64');
-		devCompiler.SaveSet(devCompiler.Sets.Count-1);
+		// Add to UI only
+		cmbCompilerSetComp.Items.Add(compilername + ' 64-bit');
 
-		devCompiler.Sets.Add(compilername + ' 32-bit');
+		// Save defaults to disk :(
+		devCompiler.SettoDefaults(compilername + ' 64-bit','MinGW64');
+		devCompiler.SaveSet(cmbCompilerSetComp.Items.Count-1);
+
+		cmbCompilerSetComp.Items.Add(compilername + ' 32-bit');
+
 		devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW64');
-		devCompiler.SaveSet(devCompiler.Sets.Count-1);
+		devCompiler.SaveSet(cmbCompilerSetComp.Items.Count-1);
 	end;
 	if DirectoryExists(devDirs.Exec + 'MinGW32\') then begin
 
@@ -633,21 +663,27 @@ begin
 		if compilername = '' then
 			compilername := 'MinGW32';
 
-		devCompiler.Sets.Add(compilername + ' 32-bit');
+		// Add to UI only
+		cmbCompilerSetComp.Items.Add(compilername + ' 32-bit');
+
 		devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW32');
-		devCompiler.SaveSet(devCompiler.Sets.Count-1);
+		devCompiler.SaveSet(cmbCompilerSetComp.Items.Count-1);
 	end;
 
-	// Write the compiler list
-	devCompiler.WriteSets;
+	if cmbCompilerSetComp.Items.Count > 0 then
+		cmbCompilerSetComp.ItemIndex := 0
+	else
+		cmbCompilerSetComp.ItemIndex := -1;
 
-	cmbCompilerSetComp.Items.Assign(devCompiler.Sets);
-	cmbCompilerSetComp.ItemIndex := 0;
-	devCompiler.CurrentIndex := 0;
+	// Load the default one
+	LoadSet(cmbCompilerSetComp.ItemIndex);
 
 	cmbCompilerSetComp.Items.EndUpdate;
+end;
 
-	cmbCompilerSetCompChange(nil);
+procedure TCompOptForm.cmbCompilerSetCompEnter(Sender: TObject);
+begin
+	fOldSelection := cmbCompilerSetComp.ItemIndex;
 end;
 
 end.

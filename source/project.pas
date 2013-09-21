@@ -23,7 +23,7 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  IniFiles, SysUtils, Dialogs, ComCtrls, Editor, Contnrs,
+  IniFiles, SysUtils, Dialogs, ComCtrls, Editor, Contnrs, SynExportHTML,
   Classes, Controls, version, prjtypes, Templates, Forms,
   Windows;
 {$ENDIF}
@@ -159,7 +159,7 @@ type
     function GetUnitFromString(const s : AnsiString) : integer;
     procedure RebuildNodes;
     function ListUnitStr(sep: char): AnsiString;
-    procedure Exportto(HTML: boolean);
+    procedure ExportAll;
     procedure ShowOptions;
     function AssignTemplate(const aFileName: AnsiString;aTemplate: TTemplate): boolean;
     procedure SetHostApplication(const s : AnsiString);
@@ -192,7 +192,7 @@ destructor TProjUnit.Destroy;
 begin
 	if Assigned(fEditor) then
 		FreeAndNil(fEditor);
-	fNode:=nil;
+	fNode := nil;
 	inherited;
 end;
 
@@ -228,70 +228,58 @@ end;
 
 function TProjUnit.SaveAs: boolean;
 var
- flt: AnsiString;
- CFilter, CppFilter, HFilter: Integer;
+	flt: AnsiString;
+	CFilter, CppFilter, HFilter: Integer;
 begin
-  with dmMain.SaveDialog do
-   begin
-     if fFileName = '' then
-      FileName:= fEditor.TabSheet.Caption
-     else
-      FileName:= ExtractFileName(fFileName);
+	with TSaveDialog.Create(nil) do try
+		if fFileName = '' then
+			FileName:= fEditor.TabSheet.Caption
+		else
+			FileName:= ExtractFileName(fFileName);
 
-     if fParent.Options.useGPP then
-      begin
-        BuildFilter(flt, [FLT_CPPS, FLT_CS, FLT_HEADS]);
-        DefaultExt:= CPP_EXT;
-        CFilter := 3;
-        CppFilter := 2;
-        HFilter := 4;
-      end
-     else
-      begin
-        BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_HEADS]);
-        DefaultExt:= C_EXT;
-        CFilter := 2;
-        CppFilter := 3;
-        HFilter := 4;
-      end;
+		if fParent.Options.useGPP then begin
+			BuildFilter(flt, [FLT_CPPS, FLT_CS, FLT_HEADS]);
+			DefaultExt:= CPP_EXT;
+			CFilter := 3;
+			CppFilter := 2;
+			HFilter := 4;
+		end else begin
+			BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_HEADS]);
+			DefaultExt:= C_EXT;
+			CFilter := 2;
+			CppFilter := 3;
+			HFilter := 4;
+		end;
 
-     Filter:= flt;
-     if (CompareText(ExtractFileExt(FileName), '.h') = 0) or
-       (CompareText(ExtractFileExt(FileName), '.hpp') = 0) or
-       (CompareText(ExtractFileExt(FileName), '.hh') = 0) then
-     begin
-         FilterIndex := HFilter;
-     end else
-     begin
-         if fParent.Options.useGPP then
-             FilterIndex := CppFilter
-         else
-             FilterIndex := CFilter;
-     end;
+		Filter:= flt;
 
-     InitialDir:= ExtractFilePath(fFileName);
-     Title:= Lang[ID_NV_SAVEFILE];
-     if Execute then
-      try
-       if FileExists(FileName) and
-           (MessageDlg(Lang[ID_MSG_FILEEXISTS],
-             mtWarning, [mbYes, mbNo], 0) = mrNo) then
-       begin
-           Result := False;
-           Exit;
-       end;
+		if GetFileTyp(ExtractFileExt(FileName)) in [utcHead,utcppHead] then begin
+			FilterIndex := HFilter;
+		end else if fParent.Options.useGPP then begin
+			FilterIndex := CppFilter;
+		end else begin
+			FilterIndex := CFilter;
+		end;
 
-       fNew:= FALSE;
-       fFileName:= FileName;
-       if assigned(fEditor) then
-        fEditor.FileName:= fFileName;
-       result:= Save;
-      except
-       result:= FALSE;
-      end
-     else
-      result:= FALSE;
-   end;
+		InitialDir:= ExtractFilePath(fFileName);
+		Title:= Lang[ID_NV_SAVEFILE];
+		Options := Options + [ofOverwritePrompt];
+
+		if Execute then begin
+			try
+				fNew:= FALSE;
+				fFileName:= FileName;
+				if assigned(fEditor) then
+					fEditor.FileName:= fFileName;
+				result:= Save;
+			except
+				result:= FALSE;
+			end;
+		end else
+			result:= FALSE;
+	finally
+		Free;
+	end;
 end;
 
 function TProjUnit.GetDirty: boolean;
@@ -831,10 +819,10 @@ begin
 
 			fOptions.IncludeVersionInfo := ReadBool('Project','IncludeVersionInfo', False);
 			fOptions.SupportXPThemes := ReadBool('Project','SupportXPThemes', False);
-			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompiler.CurrentIndex);
+			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompiler.CurrentSet);
 			if fOptions.CompilerSet > devCompiler.Sets.Count-1 then begin
 				MessageDlg('The compiler set you have selected for this project, no longer exists.'#13#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
-				fOptions.CompilerSet:=devCompiler.CurrentIndex;
+				fOptions.CompilerSet:=devCompiler.CurrentSet;
 			end;
 			fOptions.CompilerOptions:=ReadString('Project','CompilerSettings', devCompiler.fOptionString);
 
@@ -1450,17 +1438,17 @@ begin
    fNode:= Value;
 end;
 
-procedure TProject.Exportto(HTML: boolean);
-  function ConvertFilename(Filename, FinalPath, Extension: AnsiString): AnsiString;
-  begin
-    Result:=ExtractRelativePath(Directory, Filename);
-    Result:=StringReplace(Result, '.', '_', [rfReplaceAll]);
-    Result:=StringReplace(Result, '\', '_', [rfReplaceAll]);
-    Result:=StringReplace(Result, '/', '_', [rfReplaceAll]);
-    Result:=IncludeTrailingPathDelimiter(FinalPath)+Result+Extension;
-  end;
+procedure TProject.ExportAll;
+	function ConvertFilename(const Filename, FinalPath, Extension: AnsiString): AnsiString;
+	begin
+		Result:=ExtractRelativePath(Directory, Filename);
+		Result:=StringReplace(Result, '.', '_', [rfReplaceAll]);
+		Result:=StringReplace(Result, '\', '_', [rfReplaceAll]);
+		Result:=StringReplace(Result, '/', '_', [rfReplaceAll]);
+		Result:=IncludeTrailingPathDelimiter(FinalPath)+Result+Extension;
+	end;
 var
-  idx: integer;
+  I: integer;
   sl: TStringList;
   fname: AnsiString;
   Size: integer;
@@ -1468,64 +1456,80 @@ var
   link: AnsiString;
   BaseDir: AnsiString;
   hFile: integer;
+	SynExporterHTML : TSynExporterHTML;
 begin
-   with dmMain.SaveDialog do begin
-      Filter:= dmMain.SynExporterHTML.DefaultFilter;
-      DefaultExt := HTML_EXT;
-      Title:= Lang[ID_NV_EXPORT];
-      if not Execute then
-        Abort;
-      fname:=Filename;
-   end;
+	SynExporterHTML := TSynExporterHTML.Create(nil);
+	with TSaveDialog.Create(nil) do try
 
-  BaseDir:=ExtractFilePath(fname);
-  CreateDir(IncludeTrailingPathDelimiter(BaseDir)+'files');
-  sl:=TStringList.Create;
-  try
-    // create index file
-    sl.Add('<HTML>');
-    sl.Add('<HEADE><TITLE>Dev-C++ project: '+Name+'</TITLE></HEAD>');
-    sl.Add('<BODY BGCOLOR=#FFFFFF>');
-    sl.Add('<H2>Project: '+Name+'</H2>');
-    sl.Add('<B>Index of files:</B>');
-    sl.Add('<HR WIDTH="80%">');
-    sl.Add('<TABLE ALIGN="CENTER" CELLSPACING=20>');
-    sl.Add('<TR><TD><B><U>Filename</U></B></TD><TD><B><U>Location</U></B></TD><TD><B><U>Size</U></B></TD></TR>');
-    for idx:=0 to Units.Count-1 do begin
-      hFile:=FileOpen(Units[idx].FileName, fmOpenRead);
-      if hFile>0 then begin
-        Size:=FileSeek(hFile, 0, 2);
-        if Size>=1024 then
-          SizeStr:=IntToStr(Size div 1024)+' Kb'
-        else
-          SizeStr:=IntToStr(Size)+' bytes';
-        FileClose(hFile);
-      end
-      else
-        SizeStr:='0 bytes';
-      link:=ExtractFilename(ConvertFilename(ExtractRelativePath(Directory, Units[idx].FileName), BaseDir, HTML_EXT));
-      sl.Add('<TR><TD><A HREF="files/'+link+'">'+ExtractFilename(Units[idx].FileName)+'</A></TD><TD>'+ExpandFilename(Units[idx].FileName)+'</TD><TD>'+SizeStr+'</TD></TR>');
-    end;
-    sl.Add('</TABLE>');
-    sl.Add('<HR WIDTH="80%">');
-    sl.Add('<P ALIGN="CENTER"><FONT SIZE=1>Exported by <A HREF="http://www.bloodshed.net/dev">'+DEVCPP+'</A> v'+DEVCPP_VERSION+'</FONT></P>');
-    sl.Add('</BODY>');
-    sl.Add('</HTML>');
-    sl.SaveToFile(fname);
+		Filter:= SynExporterHTML.DefaultFilter;
+		Title:= Lang[ID_NV_EXPORT];
+		DefaultExt := HTML_EXT;
+		FileName := ChangeFileExt(fFileName,HTML_EXT);
+		Options := Options + [ofOverwritePrompt];
 
-    // export project files
-    for idx:=0 to Units.Count-1 do begin
-      fname:=Units[idx].FileName;
-      sl.LoadFromFile(fname);
-      fname:=ConvertFilename(ExtractRelativePath(Directory, Units[idx].FileName), IncludeTrailingPathDelimiter(BaseDir)+'files', HTML_EXT);
-      if HTML then
-        dmMain.ExportToHtml(sl, fname)
-      else
-        dmMain.ExportToRtf(sl, fname);
-    end;
-  finally
-    sl.Free;
-  end;
+		if not Execute then begin
+			SynExporterHTML.Free;
+			Exit;
+		end;
+
+		fname:=FileName;
+	finally
+		Free;
+	end;
+
+	BaseDir := ExtractFilePath(fname);
+	CreateDir(BaseDir + '\files');
+	sl:=TStringList.Create;
+	try
+		sl.Add('<html>');
+		sl.Add('<head><title>Dev-C++ project: ' + Name + '</title></head>');
+		sl.Add('<body bgcolor=#FFFFFF>');
+		sl.Add('<h2>Project: ' + Name + '</h2>');
+		sl.Add('<b>Index of files:</b>');
+		sl.Add('<hr width="80%"/>');
+
+		sl.Add('<table align="center" cellspacing="20">');
+		sl.Add('<tr><td><b><u>Filename</u></b></td><td><b><u>Location</u></b></td><td><b><u>Size</u></b></td></tr>');
+
+		for I := 0 to Units.Count-1 do begin
+			hFile := FileOpen(Units[I].FileName, fmOpenRead);
+			if hFile > 0 then begin
+				Size := FileSeek(hFile, 0, 2);
+				if Size < 1024 then
+					SizeStr := IntToStr(Size) + ' ' + Lang[ID_BYTES]
+				else if Size < 1024*1024 then
+					SizeStr := FloatToStr(Size/1024) + ' KiB'
+				else if Size < 1024*1024*1024 then
+					SizeStr := FloatToStr((Size/1024)/1024) + ' MiB'
+				else
+					SizeStr := FloatToStr(((Size/1024)/1024)/1024) + ' GiB';
+
+				FileClose(hFile);
+			end else
+				SizeStr := 'Unknown';
+
+			link := ExtractFilename(ConvertFilename(ExtractRelativePath(Directory, Units[I].FileName), BaseDir, HTML_EXT));
+			sl.Add('<tr><td><a href="files/'+link+'">'+ExtractFilename(Units[I].FileName)+'</a></td><td>'+ExpandFilename(Units[I].FileName)+'</td><td>'+SizeStr+'</td></tr>');
+		end;
+
+		sl.Add('</table>');
+		sl.Add('<hr width="80%"/>');
+		sl.Add('<p align="center"><font size="1">Exported by <a href="http://www.bloodshed.net/dev">'+DEVCPP+'</a> v'+DEVCPP_VERSION+'</font></p>');
+		sl.Add('</body>');
+		sl.Add('</html>');
+		sl.SaveToFile(fname);
+
+		// export project files
+		for I:=0 to Units.Count-1 do begin
+			fname:=Units[I].FileName;
+			sl.LoadFromFile(fname);
+			fname:=ConvertFilename(ExtractRelativePath(Directory, Units[I].FileName), IncludeTrailingPathDelimiter(BaseDir)+'files', HTML_EXT);
+			Units[I].fEditor.ExportToHtml(fname);
+		end;
+	finally
+		sl.Free;
+		SynExporterHTML.Free;
+	end;
 end;
 
 procedure TProject.ShowOptions;
@@ -1580,7 +1584,7 @@ begin
 		end;
 
 		// discard changes made to scratch profile
-		devCompiler.LoadSet(devCompiler.CurrentIndex);
+		devCompiler.LoadSet(devCompiler.CurrentSet);
 	finally
 		L.Free;
 		I.Free;

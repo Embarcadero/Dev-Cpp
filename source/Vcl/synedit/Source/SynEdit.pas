@@ -427,7 +427,7 @@ type
 	procedure GetUncollapsedLines;
 	procedure ReScan;
 	procedure MoveFoldRangesAfter(FoldRange: TSynEditFoldRange;LineCount: Integer);
-	procedure ScanForFoldRanges(TopFoldRanges: TSynEditFoldRanges;Strings: TStrings);
+	procedure ScanForFoldRanges(TopFoldRanges: TSynEditFoldRanges;txt: TStrings);
 	function GetLineIndent(const Line : AnsiString): Integer;
 	procedure MoveRangesBy(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
 	procedure MoveCollapsedRangesFromBy(CurrentLine, LineCount: Integer);
@@ -873,7 +873,7 @@ type
     property SelectedColor: TSynSelectedColor
       read FSelectedColor write FSelectedColor;
     //### Code Folding
-    property UseCodeFolding : boolean read fUseCodeFolding write SetUseCodeFolding;
+    property UseCodeFolding : boolean read fUseCodeFolding write SetUseCodeFolding default False;
     //### End Code Folding
     property SelectionMode: TSynSelectionMode
       read FSelectionMode write SetSelectionMode default smNormal;
@@ -1432,8 +1432,8 @@ begin
 	//### Code Folding ###
 	fAllFoldRanges := TSynEditFoldRanges.Create;
 	fAllFoldRanges.OwnsObjects := true;
-	fCodeFolding := TSynCodeFolding.Create(fUseCodeFolding);
-	fUncollapsedLines := TSynEditStringList.Create;
+	fCodeFolding := TSynCodeFolding.Create;
+	fUncollapsedLines := fLines; // folding is disabled by default, so use pointer instead of copy
 	//### End Code Folding ###
 end;
 
@@ -1544,7 +1544,8 @@ begin
 
 	//### Code Folding ###
 	fAllFoldRanges.Free;
-	fUncollapsedLines.Free;
+	if fUseCodeFolding then // this means we were storing a copy
+		fUncollapsedLines.Free;
 	fCodeFolding.Free;
 	//### End Code Folding ###
 end;
@@ -2122,7 +2123,7 @@ begin
 		InvalidateRect(fInvalidateRect, False);
 		FillChar(fInvalidateRect, SizeOf(TRect), 0);
 		if fGutter.ShowLineNumbers and fGutter.AutoSize then
-			fGutter.AutoSizeDigitCount(Lines.Count);
+			fGutter.AutoSizeDigitCount(LineToUncollapsedLine(Lines.Count));
 		if not (eoScrollPastEof in Options) then
 			TopLine := TopLine;
 	end;
@@ -2368,7 +2369,7 @@ var
 	//### End Code Folding ###
 begin
 	//### Code Folding ###
-	if CodeFolding.Enabled then begin
+	if fUseCodeFolding then begin
 		FoldRange := FoldStartAtLine(RowToLine(PixelsToRowColumn(X, Y).Row));
 		if Assigned(FoldRange) then begin
 
@@ -2613,7 +2614,7 @@ begin
 				rcLine.Bottom := rcLine.Top + fTextHeight;
 
 				//### Code Folding ###
-				if CodeFolding.Enabled then
+				if fUseCodeFolding then
 					s := fGutter.FormatLineNumber(LineToUncollapsedLine(cLine))
 				else
 					s := fGutter.FormatLineNumber(cLine);
@@ -2685,7 +2686,7 @@ begin
 {$ENDIF}
 
 	//### Code Folding ###
-	if CodeFolding.Enabled then begin
+	if fUseCodeFolding then begin
 		for cLine := vFirstLine to vLastLine do begin
 
 			rect.Left := Gutter.RealGutterWidth(CharWidth) - Gutter.RightOffset;
@@ -3315,7 +3316,7 @@ var
     for nLine := vFirstLine to vLastLine do
     begin
       //### Code Folding ###
-      if CodeFolding.Enabled then
+      if fUseCodeFolding then
         FoldRange := FoldStartAtLine(nLine)
       else
         FoldRange := nil;
@@ -3528,7 +3529,7 @@ var
 
 		//### Code Folding ###
 		// Indent guides painting
-		if CodeFolding.Enabled then begin
+		if fUseCodeFolding then begin
 			if CodeFolding.IndentGuides then begin
 
 				OldColor := Canvas.Pen.Color;
@@ -7962,7 +7963,7 @@ begin
   if not (csLoading in ComponentState) then
   begin
     if fGutter.ShowLineNumbers and fGutter.AutoSize then
-      fGutter.AutoSizeDigitCount(Lines.Count);
+      fGutter.AutoSizeDigitCount(LineToUncollapsedLine(Lines.Count));
     if fGutter.UseFontStyle then
     begin
       fTextDrawer.SetBaseFont(fGutter.Font);
@@ -10741,12 +10742,12 @@ end;
 
 procedure TCustomSynEdit.ReScan;
 begin
-	if CodeFolding.Enabled then
+	if fUseCodeFolding then
 		ReScanForFoldRanges;
 
 	GetUnCollapsedLines;
 
-	if CodeFolding.Enabled then
+	if fUseCodeFolding then
 		InvalidateGutter;
 end;
 
@@ -10832,11 +10833,8 @@ var
 	hascollapsedfold : boolean;
 begin
 
-	// Copy the collapsed text
-	fUncollapsedLines.Assign(fLines); // TODO: use pointer when folding is disabled?
-
 	// Scan for uncollapsable stuff only when we edit code files
-	if CodeFolding.Enabled then begin
+	if fUseCodeFolding then begin
 
 		// Copy the collapsed text
 		fUncollapsedLines.Assign(fLines);
@@ -10885,144 +10883,130 @@ begin
 				fAllFoldRanges[i].FixPCOfSubFoldRanges;
 			end;
 		end;
-	end;
+	end else
+		fUncollapsedLines := fLines; // don't bother using a copy
 
 	// Avoids call to GetTextStr!
 	fUncollapsedLinesLength := fUncollapsedLines.GetTextLength;
 end;
 
-procedure TCustomSynEdit.ScanForFoldRanges(TopFoldRanges: TSynEditFoldRanges; Strings: TStrings);
+
+procedure TCustomSynEdit.ScanForFoldRanges(TopFoldRanges: TSynEditFoldRanges; txt: TStrings);
 var
-	Line,Level : integer;
-	Ptr : PAnsiChar;
+	Line,Col,Level,FoldIndex : integer;
+	token : AnsiString;
+	attr : TSynHighlighterAttributes;
 
-	function SkipCrLf(var Ptr: PChar; var Line: Integer): Boolean;
-	begin
-		Result := False;
-		repeat
-			// Win
-			if (Ptr^ = #13) and ((Ptr+1)^ = #10) then
-				repeat
-					Inc(Ptr, 2);
-					Inc(Line);
-					Result := True;
-				until not ((Ptr^ = #13) and ((Ptr+1)^ = #10));
-
-			// Unix
-			if Ptr^ = #13 then
-				repeat
-					Inc(Ptr);
-					Inc(Line);
-					Result := True;
-				until Ptr^ <> #13;
-
-			// Mac
-			if Ptr^ = #10 then
-				repeat
-					Inc(Ptr);
-					Inc(Line);
-					Result := True;
-				until Ptr^ <> #10;
-		until (Ptr^ <> #10) and (Ptr^ <> #13);
-	end;
-
-	function CharOnLine(Ptr : PChar;Char: Char): Boolean;
-	begin
-		Result := false;
-
-		// Backward scan...
-		repeat
-			if(Ptr^ = Char) then begin
-				Result := true;
-				break;
-			end;
-			Dec(Ptr);
-		until (Ptr^ = #13) or (Ptr^ = #10) or (Ptr^ = #0);
-
-		// Forward scan...
-		repeat
-			if(Ptr^ = Char) then begin
-				Result := true;
-				break;
-			end;
-			Inc(Ptr);
-		until (Ptr^ = #13) or (Ptr^ = #10) or (Ptr^ = #0);
-	end;
-
-	procedure FindSubFoldRange(var Ptr: PChar;Parent : TSynEditFoldRange);
+	function LineHasChar(character : char) : boolean;
 	var
-		FoldRange : TSynEditFoldRange;
+		i : integer;
 	begin
-		while Ptr^ <> #0 do begin
-			SkipCrLf(Ptr,Line);
+		result := false;
+		for I := 1 to Length(txt[line]) do begin
+			if txt[line][i] = character then begin
 
-			// We've found a starting character, but ignore lines with both opening and closing chars in them
-			if (Ptr^ = CodeFolding.FoldRegions[0].Open^) and not CharOnLine(Ptr,CodeFolding.FoldRegions[0].Close^) then begin
-
-				// Add it to the top list of folds
-				if not Assigned(Parent) then begin
-					FoldRange := TopFoldRanges.AddByParts(
-						TopFoldRanges,
-						Line,
-						GetLineIndent(Strings[Line-1]),
-						Level,
-						CodeFolding.FoldRegions[0],
-						Line);
-
-				// Or to our caller...
-				end else begin
-					FoldRange := Parent.SubFoldRanges.AddByParts(
-						TopFoldRanges,
-						Line,
-						GetLineIndent(Strings[Line-1]),
-						Level,
-						CodeFolding.FoldRegions[0],
-						Line);
+				// Char must have proper highlighting (ignore stuff inside comments...)
+				if (GetHighlighterAttriAtRowCol(BufferCoord(i,line + 1),token,attr) and (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
+					result := true;
+					break;
 				end;
-
-				Inc(Level);
-
-				// Skip until a newline
-				while not SkipCrLf(Ptr,Line) do
-					Inc(Ptr);
-
-				// Then, inside this fold, try to find more folds or our own closing...
-				FindSubFoldRange(Ptr,FoldRange);
-
-			end else if(Ptr^ = CodeFolding.FoldRegions[0].Close^) and not CharOnLine(Ptr,CodeFolding.FoldRegions[0].Open^) then begin
-
-				// Stop the recursion if we find a closing char, and return to our parent
-				if Assigned(Parent) then
-					Parent.ToLine := Line; // causes crashes when its on the final line of Strings?
-
-				Dec(Level);
-
-				// Skip until a newline
-				while not SkipCrLf(Ptr,Line) do
-					Inc(Ptr);
-
-				Dec(Ptr); // make sure we don't miss any chars directly after the newline!
-
-				Exit;
 			end;
-			Inc(Ptr);
+		end;
+	end;
+
+	procedure FindSubFoldRange(Parent : TSynEditFoldRange);
+	begin
+		while (Line < txt.Count) do begin
+			Col := 1;
+			while (Col <= Length(txt[line])) do begin
+
+				// We've found a starting character
+				if StrLComp(@txt[line][col],CodeFolding.FoldRegions[FoldIndex].Open,CodeFolding.FoldRegions[FoldIndex].OpenLength) = 0 then begin
+
+					// Char must have proper highlighting (ignore stuff inside comments...)
+					if (GetHighlighterAttriAtRowCol(BufferCoord(col,line + 1),token,attr) and (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
+
+						// And ignore lines with both opening and closing chars in them
+						if not LineHasChar(CodeFolding.FoldRegions[FoldIndex].Close^) then begin
+
+							// Add it to the top list of folds
+							if not Assigned(Parent) then begin
+								Parent := TopFoldRanges.AddByParts(
+									nil,
+									TopFoldRanges,
+									Line + 1,
+									GetLineIndent(txt[Line]),
+									Level,
+									CodeFolding.FoldRegions[FoldIndex],
+									Line + 1);
+
+							// Or to our caller...
+							end else begin
+								Parent := Parent.SubFoldRanges.AddByParts(
+									Parent,
+									TopFoldRanges,
+									Line + 1,
+									GetLineIndent(txt[Line]),
+									Level,
+									CodeFolding.FoldRegions[FoldIndex],
+									Line + 1);
+							end;
+
+							Inc(Level);
+
+							// Skip until a newline
+							break;
+						end;
+					end;
+				end else if StrLComp(@txt[line][col],CodeFolding.FoldRegions[FoldIndex].Close,CodeFolding.FoldRegions[FoldIndex].CloseLength) = 0 then begin
+
+					// Char must have symbol attri too
+					if (GetHighlighterAttriAtRowCol(BufferCoord(col,line + 1),token,attr) and (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
+
+						// And ignore lines with both opening and closing chars in them
+						if not LineHasChar(CodeFolding.FoldRegions[FoldIndex].Open^) then begin
+
+							// Stop the recursion if we find a closing char, and return to our parent
+							if Assigned(Parent) then begin
+								Parent.ToLine := Line + 1;
+								Parent := Parent.Parent;
+							end;
+
+							Dec(Level);
+
+							// Skip until a newline
+							break;
+						end;
+					end;
+				end;
+				Inc(Col); // next char
+			end;
+			Inc(line);
 		end;
 	end;
 
 begin
-	Level := 0;
-	Line := 1;
-	Ptr := PAnsiChar(Strings.Text); // todo: remove GetText call
 
-	// Recursively scan for folds
-	FindSubFoldRange(Ptr,nil);
+	// Recursively scan for folds (all types)
+	for FoldIndex := 0 to CodeFolding.FoldRegions.Count - 1 do begin
+		Level := 0;
+		Line := 0; // 0 based
+		Col := 1; // 1 based
+		FindSubFoldRange(nil);
+	end;
 end;
 
 procedure TCustomSynEdit.SetUseCodeFolding(value : boolean);
 begin
 	if value <> fUseCodeFolding then begin
 		fUseCodeFolding := value;
-		fCodeFolding.Enabled := value;// and Assigned(fHighlighter);
+
+		if fUseCodeFolding then // Swap from pointer to copy
+			fUncollapsedLines := TSynEditStringList.Create
+		else // delete copy
+			fUncollapsedLines.Free;
+
+		ReScan;
 	end;
 end;
 

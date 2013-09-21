@@ -856,6 +856,7 @@ const
   ID_POPT_OVERRIDEOUT                   = 55027;
   ID_POPT_ADDLIBRARY                    = 55028;
   ID_POPT_UNITSFORMAT                   = 55029;
+  ID_POPT_LOGAUTOSAVE                   = 55030;
 
   //New template form
   ID_NEWTPL_NAME                        = 56001;
@@ -894,11 +895,9 @@ const
   ID_NEWVAR_MSG_NOIMPL                  = 57014;
   ID_NEWVAR_MSG_NOLINE                  = 57015;
 
-  //New member form
+  //New class/member form
   ID_NEWMEMB_MEMBNAME                   = 57016;
   ID_NEWMEMB_ARGS                       = 57017;
-
-  //New class form
   ID_NEWCLASS_NAME                      = 57018;
   ID_NEWCLASS_INHERIT                   = 57019;
   ID_NEWCLASS_INHERITANCE               = 57020;
@@ -907,10 +906,9 @@ const
   ID_NEWCLASS_CPPFILE                   = 57023;
   ID_NEWCLASS_HFILE                     = 57024;
   ID_NEWCLASS_ADDTOPROJ                 = 57025;
-
-  //New member form
   ID_NEWMEMB_ATTRS                      = 57026;
-  // free to 979
+  ID_NEWCLASS_CONSTRUCTOR               = 57027;
+  ID_NEWCLASS_DESTRUCTOR                = 57028;
 
   //File properties form
   ID_PROPS_FILENAME                     = 58001;

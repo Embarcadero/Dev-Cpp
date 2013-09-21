@@ -487,7 +487,7 @@ end;
 
 procedure TDebugReader.ProcessWatchStruct(parentnode : TTreeNode);
 var
-	evalout,s : AnsiString;
+	evalout : AnsiString;
 	parent : TTreeNode;
 	curpos, len, indent, previndent : integer;
 
@@ -537,16 +537,11 @@ begin
 
 		if indent > previndent then begin // set new parent
 			parent := parent.GetLastChild;
+			DebugTree.Items.AddChild(parent,GetRemainingLine);
 		end else if indent < previndent then begin // return to old parent
 			parent := parent.Parent;
-			previndent := indent;
-			s := GetRemainingLine;
-			continue;
-		end;
-
-		s := GetRemainingLine;
-		if not SameStr('};',s) then
-			DebugTree.Items.AddChild(parent,s);
+		end else
+			DebugTree.Items.AddChild(parent,GetRemainingLine);
 
 		previndent := indent;
 	end;
@@ -949,6 +944,7 @@ begin
 
 						DebugTree.Items.BeginUpdate;
 
+						// Advance up to the value
 						if not FindAnnotation(TDisplayExpression) then Exit;
 
 						wparent^.gdbindex := StrToInt(s);
@@ -957,16 +953,7 @@ begin
 
 						// Refresh members...
 						wparent^.node.DeleteChildren;
-						case PeekNextAnnotation of
-							TFieldBegin : begin
-								ProcessWatchStruct(wparent^.node);
-							end;
-							TArrayBegin : begin
-								if PeekNextAnnotation(2) = TFieldBegin then
-									ProcessWatchStruct(wparent^.node);
-							end;
-						end;
-
+						ProcessWatchStruct(wparent^.node);
 						DebugTree.Items.EndUpdate;
 
 						break;

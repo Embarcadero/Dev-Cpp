@@ -644,7 +644,7 @@ object EditorOptForm: TEditorOptForm
         Gutter.GradientEndColor = clBackground
         HideSelection = True
         Highlighter = cpp
-        UseCodeFolding = False
+        UseCodeFolding = True
         Options = [eoAutoIndent, eoDisableScrollArrows, eoHideShowScrollbars, eoNoCaret, eoNoSelection, eoSmartTabs, eoTrimTrailingSpaces]
         ReadOnly = True
         RightEdge = 0
@@ -856,7 +856,7 @@ object EditorOptForm: TEditorOptForm
             Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
             Highlighter = cpp
-            UseCodeFolding = False
+            UseCodeFolding = True
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4
             WantTabs = True
@@ -967,7 +967,6 @@ object EditorOptForm: TEditorOptForm
             Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
             Highlighter = cpp
-            UseCodeFolding = False
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4
             WantTabs = True

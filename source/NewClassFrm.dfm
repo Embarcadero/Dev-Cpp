@@ -1,6 +1,6 @@
 object NewClassForm: TNewClassForm
-  Left = 771
-  Top = 293
+  Left = 1170
+  Top = 330
   BorderStyle = bsDialog
   Caption = 'New class'
   ClientHeight = 500
@@ -256,7 +256,7 @@ object NewClassForm: TNewClassForm
   object chkConstruct: TCheckBox
     Left = 88
     Top = 62
-    Width = 121
+    Width = 137
     Height = 17
     Caption = 'Create Constructor'
     TabOrder = 10
@@ -264,7 +264,7 @@ object NewClassForm: TNewClassForm
   object chkDestruct: TCheckBox
     Left = 232
     Top = 62
-    Width = 121
+    Width = 129
     Height = 17
     Caption = 'Create Destructor'
     TabOrder = 11

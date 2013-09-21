@@ -93,7 +93,7 @@ object frmFind: TfrmFind
       Width = 140
       Height = 87
       Caption = '  Options:  '
-      TabOrder = 1
+      TabOrder = 2
       object cbMatchCase: TCheckBox
         Left = 8
         Top = 16
@@ -125,7 +125,7 @@ object frmFind: TfrmFind
       Width = 140
       Height = 70
       Caption = '  Direction:  '
-      TabOrder = 2
+      TabOrder = 3
       object rbBackward: TRadioButton
         Left = 8
         Top = 42
@@ -151,7 +151,7 @@ object frmFind: TfrmFind
       Width = 140
       Height = 87
       Caption = '  Where:  '
-      TabOrder = 3
+      TabOrder = 4
       object rbProjectFiles: TRadioButton
         Left = 8
         Top = 18
@@ -185,7 +185,7 @@ object frmFind: TfrmFind
       Width = 140
       Height = 70
       Caption = '  Scope:  '
-      TabOrder = 4
+      TabOrder = 5
       object rbGlobal: TRadioButton
         Left = 8
         Top = 18
@@ -211,7 +211,7 @@ object frmFind: TfrmFind
       Width = 140
       Height = 70
       Caption = '  Origin:  '
-      TabOrder = 5
+      TabOrder = 6
       object rbFromCursor: TRadioButton
         Left = 8
         Top = 18
@@ -237,7 +237,7 @@ object frmFind: TfrmFind
       Width = 289
       Height = 21
       ItemHeight = 13
-      TabOrder = 6
+      TabOrder = 1
     end
   end
   object FindPopup: TPopupMenu

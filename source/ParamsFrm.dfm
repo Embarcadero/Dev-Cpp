@@ -97,10 +97,4 @@ object ParamsForm: TParamsForm
     TabOrder = 3
     Kind = bkCancel
   end
-  object OpenDialog: TOpenDialog
-    DefaultExt = '.exe'
-    Filter = 'Applications (*.exe)|*.exe'
-    Left = 24
-    Top = 88
-  end
 end

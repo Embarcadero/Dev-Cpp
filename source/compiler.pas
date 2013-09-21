@@ -185,7 +185,7 @@ begin
 	SetPath(fProject.Directory);
 	if fProject.Options.ObjectOutput <> '' then
 		if not DirectoryExists(fProject.Options.ObjectOutput) then
-			MkDir(fProject.Options.ObjectOutput);
+			CreateDir(fProject.Options.ObjectOutput);
 
 	Objects := '';
 
@@ -354,14 +354,12 @@ begin
 			tfile:= ExtractFileName(tFile)
 		else
 			tfile:= ExtractRelativePath(Makefile, tfile);
+
+		// Only process source files
 		if not (GetFileTyp(tfile) in [utcHead,utcppHead]) then begin
 			writeln(F);
 			if fProject.Options.ObjectOutput<>'' then begin
-				SetPath(fProject.Directory);
-				if not DirectoryExists(fProject.Options.ObjectOutput) then
-					MkDir(fProject.Options.ObjectOutput);
-
-				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(fProject.Units[i].FileName);
+				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput) + ExtractFileName(fProject.Units[i].FileName);
 				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
 			end else
 				ofile := GenMakePath1(ChangeFileExt(tfile, OBJ_EXT));
@@ -597,7 +595,7 @@ begin
 
 	InitProgressForm('Compiling...');
 
-	DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
+	DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentSet]]));
 
 	// Done by buildmakefile
 	if not Assigned(fProject) then begin
@@ -736,7 +734,7 @@ begin
 	
 	if Assigned(fProject) then begin
 		SwitchToProjectCompilerSet;
-		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
+		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentSet]]));
 		Result := True;
 		InitProgressForm('Cleaning...');
 		BuildMakeFile;
@@ -773,7 +771,7 @@ begin
 
 		InitProgressForm('Rebuilding...');
 
-		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
+		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentSet]]));
 		BuildMakeFile;
 		if not FileExists(fMakefile) then begin
 
@@ -1385,14 +1383,14 @@ end;
 
 procedure TCompiler.SwitchToOriginalCompilerSet;
 begin
-	if Assigned(fProject) and (devCompiler.CurrentIndex <> fOriginalSet) then
+	if Assigned(fProject) and (devCompiler.CurrentSet <> fOriginalSet) then
 		devCompiler.LoadSet(fOriginalSet);
 end;
 
 procedure TCompiler.SwitchToProjectCompilerSet;
 begin
-	fOriginalSet := devCompiler.CurrentIndex;
-	if Assigned(fProject) and (devCompiler.CurrentIndex <> fProject.Options.CompilerSet) then
+	fOriginalSet := devCompiler.CurrentSet;
+	if Assigned(fProject) and (devCompiler.CurrentSet <> fProject.Options.CompilerSet) then
 		devCompiler.LoadSet(fProject.Options.CompilerSet);
 end;
 
@@ -1408,11 +1406,11 @@ begin
 	with CompileProgressForm do begin
 
 		memoMiniLog.Lines.Clear;
-		memoMiniLog.Lines.Add(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
+		memoMiniLog.Lines.Add(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentSet]]));
 
 		btnClose.OnClick:=OnAbortCompile;
 
-		lblCompiler.Caption:=devCompiler.Sets[devCompiler.CurrentIndex];
+		lblCompiler.Caption:=devCompiler.Sets[devCompiler.CurrentSet];
 		lblStatus.Caption:=Status;
 		lblStatus.Font.Style:=[];
 

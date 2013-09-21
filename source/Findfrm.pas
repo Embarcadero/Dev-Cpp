@@ -32,6 +32,7 @@ uses
 {$ENDIF}
 
 type
+  TFindAction = (faFind, faFindFiles, faReplace, faReplaceFiles);
   TfrmFind = class(TForm)
     btnFind: TButton;
     btnCancel: TButton;
@@ -82,8 +83,7 @@ type
     fTempSynEdit : TSynEdit;
     procedure LoadText;
     procedure FindAllAction(Sender: TObject; const aSearch,aReplace: AnsiString; Line, Column: integer; var Action: TSynReplaceAction);
-    function FindReplaceFirst(editor : TSynEdit) : integer;
-    function FindReplaceFiles(editor : TSynEdit;isreplace : boolean) : integer;
+    function Execute(editor : TSynEdit;action : TFindAction) : integer;
   public
     property TabIndex : integer read fTabIndex write fTabIndex;
   end;
@@ -103,36 +103,26 @@ uses
 
 {$R *.dfm}
 
-function TfrmFind.FindReplaceFirst(editor : TSynEdit) : integer;
-var
-	enginebackup : TSynEditSearchCustom;
-begin
-	// Make sure we do not find the same word again and again when using 'from cursor'
-	if (ssoBackwards in fSearchOptions) then begin
-		if editor.SelAvail then
-			editor.CaretX := editor.BlockBegin.Char;
-	end else begin
-		if editor.SelAvail then
-			editor.CaretX := editor.BlockEnd.Char;
-	end;
-
-	// Swap search engire for ours
-	enginebackup := editor.SearchEngine;
-	editor.SearchEngine := fSearchEngine;
-
-	result := editor.SearchReplace(cboFindText.Text,cboReplaceText.Text,fSearchOptions);
-
-	// Apply search engine backup
-	editor.SearchEngine := enginebackup;
-end;
-
-function TfrmFind.FindReplaceFiles(editor : TSynEdit;isreplace : boolean) : integer;
+function TfrmFind.Execute(editor : TSynEdit;action : TFindAction) : integer;
 var
 	caretbackup,blockbeginbackup,blockendbackup : TBufferCoord;
 	onreplacebackup : TReplaceTextEvent;
 	enginebackup : TSynEditSearchCustom;
 	toplinebackup : integer;
 begin
+
+	// Make sure we do not find the same word again and again when using From Cursor
+	if action in [faFind,faReplace] then begin
+		if not (ssoEntireScope in fSearchOptions) then begin
+			if (ssoBackwards in fSearchOptions) then begin
+				if editor.SelAvail then
+					editor.CaretX := editor.BlockBegin.Char;
+			end else begin
+				if editor.SelAvail then
+					editor.CaretX := editor.BlockEnd.Char;
+			end;
+		end;
+	end;
 
 	// Back some data up
 	caretbackup := editor.CaretXY;
@@ -143,35 +133,44 @@ begin
 	enginebackup := editor.SearchEngine;
 
 	// When using find in files, report each find using OnReplaceText
-	if not isreplace then
+	if action = faFindFiles then
 		editor.OnReplaceText := FindAllAction;
 
-	// And do the final search
+	// Swap search engire for ours
 	editor.SearchEngine := fSearchEngine;
 	result := editor.SearchReplace(cboFindText.Text,cboReplaceText.Text,fSearchOptions);
-	editor.SearchEngine := enginebackup;
 
-	editor.CaretXY := caretbackup;
-	editor.BlockBegin := blockbeginbackup;
-	editor.BlockEnd := blockendbackup;
-	editor.TopLine := toplinebackup;
+	// Don't touch editors which we are only scanning
+	if action in [faFindFiles] then begin
+
+		// Put backup back into place
+		editor.CaretXY := caretbackup;
+		editor.BlockBegin := blockbeginbackup;
+		editor.BlockEnd := blockendbackup;
+		editor.TopLine := toplinebackup;
+	end;
+
 	editor.OnReplaceText := onreplacebackup;
+	editor.SearchEngine := enginebackup;
 end;
 
 procedure TfrmFind.btnFindClick(Sender: TObject);
 var
-	isfind,isfindfiles,isreplace,isreplacefiles : boolean;
 	I,findcount : integer;
 	e : TEditor;
+	actiontype : TFindAction;
 begin
 
 	findcount := 0;
 
-	// Assemble search options
-	isfind := (FindTabs.TabIndex = 0);
-	isfindfiles := (FindTabs.TabIndex = 1);
-	isreplace := (FindTabs.TabIndex = 2);
-	isreplacefiles := (FindTabs.TabIndex = 3);
+	case FindTabs.TabIndex of
+		0: actiontype := faFind;
+		1: actiontype := faFindFiles;
+		2: actiontype := faReplace;
+		3: actiontype := faReplaceFiles;
+		else
+			Exit;
+	end;
 
 	// Add input to history
 	if (cboFindText.Text <> '') then begin
@@ -186,8 +185,8 @@ begin
 		Exit;
 	end;
 
-	// Replacing something by nothing is allowed...
-	if (cboReplaceText.Text <> '') and (isreplace or isreplacefiles) then
+	// Add nonempty strings to history
+	if (cboReplaceText.Text <> '') and (actiontype in [faReplace,faReplaceFiles]) then
 		if cboReplaceText.Items.IndexOf(cboReplaceText.Text) = -1 then
 			cboReplaceText.AddItem(cboReplaceText.Text,nil);
 
@@ -198,7 +197,7 @@ begin
 		Include(fSearchOptions,ssoMatchCase);
 	if cbWholeWord.Checked then
 		Include(fSearchOptions,ssoWholeWord);
-	if cbPrompt.Checked or isfindfiles then // do a fake prompted replace when using find in files
+	if cbPrompt.Checked or (actiontype = faFindFiles) then // do a fake prompted replace when using find in files
 		Include(fSearchOptions,ssoPrompt);
 
 	// Apply scope, when visible
@@ -220,35 +219,29 @@ begin
 	end;
 
 	// Use entire scope for file finding/replacing
-	if isfindfiles or isreplacefiles then
+	if actiontype in [faFindFiles,faReplaceFiles] then
 		Include(fSearchOptions,ssoEntireScope);
 
 	// do a fake prompted replace when using find in files
-	if isfindfiles or isreplace or isreplacefiles then
+	if actiontype in [faFindFiles,faReplace,faReplaceFiles] then
 		Include(fSearchOptions,ssoReplace);
 
-	if isfindfiles or isreplacefiles then
+	if actiontype in [faFindFiles,faReplaceFiles] then
 		Include(fSearchOptions,ssoReplaceAll);
 
 	MainForm.FindOutput.Items.BeginUpdate;
 
 	// Find the first one, then quit
-	if isfind or isreplace then begin
+	if actiontype in [faFind,faReplace] then begin
 		e := MainForm.GetEditor;
 
-		Inc(findcount,FindReplaceFirst(e.Text));
-
-		if findcount = 0 then
-			MessageBox(
-				Application.Handle,
-				PAnsiChar(Format(Lang[ID_MSG_TEXTNOTFOUND],[cboFindText.Text])),
-				PAnsiChar(Lang[ID_INFO]),
-				MB_ICONINFORMATION or MB_TOPMOST);
+		Inc(findcount,Execute(e.Text,actiontype));
 
 	// Or find everything
 	end else begin
 
-		if isfindfiles then
+		// Enumerate results in message view when finding in files
+		if actiontype = faFindFiles then
 			MainForm.FindOutput.Clear;
 
 		// loop through pagecontrol
@@ -260,10 +253,10 @@ begin
 				fCurFile := e.FileName;
 
 				// Bring an editor up front if we use prompting
-				if isreplacefiles and (ssoPrompt in fSearchOptions) then
+				if (actiontype = faReplaceFiles) and (ssoPrompt in fSearchOptions) then
 					e.Activate;
 
-				Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
+				Inc(findcount,Execute(e.Text,actiontype));
 			end;
 
 		// loop through project
@@ -276,22 +269,23 @@ begin
 				if Assigned(e) then begin
 
 					// Bring an editor up front if we use prompting
-					if isreplacefiles and (ssoPrompt in fSearchOptions) then
+					if (actiontype = faReplaceFiles) and (ssoPrompt in fSearchOptions) then
 						e.Activate;
 
-					Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
+					Inc(findcount,Execute(e.Text,actiontype));
 
 				// not open? load from disk
 				end else begin
 
-					if isreplacefiles then begin
+					if (actiontype = faReplaceFiles) then begin
 
 						// we have to open an editor...
 						if ssoPrompt in fSearchOptions then begin
 							e := MainForm.GetEditorFromFileName(fCurFile);
 							if Assigned(e) then begin
 								e.Activate;
-								Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
+
+								Inc(findcount,Execute(e.Text,actiontype));
 
 								// Save and close
 								MainForm.SaveFile(e);
@@ -301,14 +295,14 @@ begin
 
 							// Stealth replace
 							fTempSynEdit.Lines.LoadFromFile(fCurFile);
-							Inc(findcount,FindReplaceFiles(fTempSynEdit,isreplacefiles));
+							Inc(findcount,Execute(fTempSynEdit,actiontype));
 							fTempSynEdit.Lines.SaveToFile(fCurFile);
 						end;
 					end else begin
 
 						// Only finding...
 						fTempSynEdit.Lines.LoadFromFile(fCurFile);
-						Inc(findcount,FindReplaceFiles(fTempSynEdit,isreplacefiles));
+						Inc(findcount,Execute(fTempSynEdit,actiontype));
 					end;
 				end;
 			end;
@@ -319,19 +313,25 @@ begin
 
 				fCurFile := e.FileName;
 
-				Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
+				Inc(findcount,Execute(e.Text,actiontype));
 			end;
 		end;
 	end;
 
 	MainForm.FindOutput.Items.EndUpdate;
 
-	if isfindfiles then begin
+	if actiontype = faFindFiles then begin
 		MainForm.MessageControl.ActivePageIndex := 4; // Find Tab
 		MainForm.AddFindOutputItem('','','',Format(Lang[ID_SEARCHCOUNT],[findcount]),'');
 		MainForm.OpenCloseMessageSheet(TRUE);
-	end else
-		MainForm.OpenCloseMessageSheet(FALSE);
+	end else begin
+		if findcount = 0 then
+			MessageBox(
+				Application.Handle,
+				PAnsiChar(Format(Lang[ID_MSG_TEXTNOTFOUND],[cboFindText.Text])),
+				PAnsiChar(Lang[ID_INFO]),
+				MB_ICONINFORMATION or MB_TOPMOST);
+	end;
 end;
 
 procedure TfrmFind.FindAllAction(Sender: TObject;const aSearch, aReplace: AnsiString; Line, Column: integer;var Action: TSynReplaceAction);

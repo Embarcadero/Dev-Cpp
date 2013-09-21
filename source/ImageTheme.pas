@@ -57,29 +57,26 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: AnsiString); virtual;
+    procedure LoadFromFile(const AFilename: AnsiString); virtual;
   end;
 
   TDevImageTheme = class(TCustomImageTheme)
   private
     FMenuImages,
-    FHelpImages,
     FProjectImages,
     FSpecialImages,
     FBrowserImages: TImageList;
     procedure SetMenuImages(const Img: TImageList);
-    procedure SetHelpImages(const Img: TImageList);
     procedure SetProjectImages(const Img: TImageList);
     procedure SetSpecialImages(const Img: TImageList);
     procedure SetBrowserImages(const Img: TImageList);
   public
     constructor Create; override;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: AnsiString); override;
-    procedure SaveToFile(AFilename: AnsiString);
+    procedure LoadFromFile(const AFilename: AnsiString); override;
+    procedure SaveToFile(const AFilename: AnsiString);
 
     property MenuImages: TImageList read FMenuImages write SetMenuImages;
-    property HelpImages: TImageList read FHelpImages write SetHelpImages;
     property ProjectImages: TImageList read FProjectImages write SetProjectImages;
     property SpecialImages: TImageList read FSpecialImages write SetSpecialImages;
     property BrowserImages: TImageList read FBrowserImages write SetBrowserImages;
@@ -199,7 +196,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TCustomImageTheme.LoadFromFile(AFilename: AnsiString);
+procedure TCustomImageTheme.LoadFromFile(const AFilename: AnsiString);
 begin
   FFilename := AFilename;
   FBitmap.LoadFromFile(AFilename);
@@ -219,7 +216,7 @@ constructor TDevImageTheme.Create;
 	function _CreateImageList: TImageList;
 	begin
 		Result := TImageList.Create(nil);
-		//Result.OnChange := OnChangeEvent;
+		Result.OnChange := OnChangeEvent;
 		Result.Masked := True;
 	end;
 
@@ -227,7 +224,6 @@ begin
   inherited;
 
   FMenuImages := _CreateImageList;
-  FHelpImages := _CreateImageList;
   FProjectImages := _CreateImageList;
   FSpecialImages := _CreateImageList;
   FBrowserImages := _CreateImageList;
@@ -238,7 +234,6 @@ end;
 destructor TDevImageTheme.Destroy;
 begin
   FMenuImages.Free;
-  FHelpImages.Free;
   FProjectImages.Free;
   FSpecialImages.Free;
   FBrowserImages.Free;
@@ -251,7 +246,7 @@ const
   cTileW=16;
   cTileH=16;
   
-procedure TDevImageTheme.LoadFromFile(AFilename: AnsiString);
+procedure TDevImageTheme.LoadFromFile(const AFilename: AnsiString);
 var
   Bmp: TBitmap;
 
@@ -283,10 +278,9 @@ begin
   Bmp := TBitmap.Create;
   try
     MakeImageList(FMenuImages,    0);
-    MakeImageList(FHelpImages,    1);
-    MakeImageList(FProjectImages, 2);
-    MakeImageList(FSpecialImages, 3);
-    MakeImageList(FBrowserImages, 4);
+    MakeImageList(FProjectImages, 1);
+    MakeImageList(FSpecialImages, 2);
+    MakeImageList(FBrowserImages, 3);
   finally
     Bmp.Free;
   end;
@@ -294,7 +288,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TDevImageTheme.SaveToFile(AFilename: AnsiString);
+procedure TDevImageTheme.SaveToFile(const AFilename: AnsiString);
 var
   I: Integer;
   X,Y: Integer;
@@ -305,10 +299,9 @@ var
 begin
   
   ImgLists[0] := FMenuImages;
-  ImgLists[1] := FHelpImages;
-  ImgLists[2] := FProjectImages;
-  ImgLists[3] := FSpecialImages;
-  ImgLists[4] := FBrowserImages;
+  ImgLists[1] := FProjectImages;
+  ImgLists[2] := FSpecialImages;
+  ImgLists[3] := FBrowserImages;
 
   MaxW := 0;
   for I := Low(ImgLists) to High(ImgLists) do
@@ -357,16 +350,6 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TDevImageTheme.SetHelpImages(const Img: TImageList);
-begin
-  if Img <> FHelpImages then
-  begin
-    FHelpImages.Assign(Img);
-  end;
-end;
-
-//----------------------------------------------------------------------------------------------------------------------
-
 procedure TDevImageTheme.SetProjectImages(const Img: TImageList);
 begin
   if Img <> FProjectImages then
@@ -402,7 +385,6 @@ begin
   inherited;
 
   MenuImages    := dmMain.MenuImages_Gnome;
-  HelpImages    := dmMain.HelpImages_Gnome;
   ProjectImages := dmMain.ProjectImage_Gnome;
   SpecialImages := dmMain.SpecialImages_Gnome;
   BrowserImages := dmMain.ClassImages;
@@ -417,7 +399,6 @@ begin
   inherited;
 
   MenuImages    := dmMain.MenuImages_NewLook;
-  HelpImages    := dmMain.HelpImages_NewLook;
   ProjectImages := dmMain.ProjectImage_NewLook;
   SpecialImages := dmMain.SpecialImages_NewLook;
   BrowserImages := dmMain.ClassImages;
@@ -432,7 +413,6 @@ begin
   inherited;
 
   MenuImages    := dmMain.MenuImages_Blue;
-  HelpImages    := dmMain.HelpImages_Blue;
   ProjectImages := dmMain.ProjectImage_Blue;
   SpecialImages := dmMain.SpecialImages_Blue;
   BrowserImages := dmMain.ClassImages;

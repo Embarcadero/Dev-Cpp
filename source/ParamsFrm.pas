@@ -38,7 +38,6 @@ type
     grpHost: TGroupBox;
     HostEdit: TEdit;
     LoadBtn: TSpeedButton;
-    OpenDialog: TOpenDialog;
     OkBtn: TBitBtn;
     CancelBtn: TBitBtn;
     procedure LoadBtnClick(Sender: TObject);
@@ -73,8 +72,12 @@ end;
 
 procedure TParamsForm.LoadBtnClick(Sender: TObject);
 begin
-  if OpenDialog.Execute then
-    HostEdit.Text := OpenDialog.FileName;
+	with TOpenDialog.Create(self) do try
+		if Execute then
+			HostEdit.Text := FileName;
+	finally
+		Free;
+	end;
 end;
 
 procedure TParamsForm.DisableHost;

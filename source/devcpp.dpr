@@ -63,7 +63,6 @@ uses
   debugreader in 'debugreader.pas',
   debugger in 'debugger.pas',
   CFGData in 'CFGData.pas',
-  CFGINI in 'CFGINI.pas',
   CheckForUpdate in 'CheckForUpdate.pas',
   prjtypes in 'prjtypes.pas',
   ResourceSelectorFrm in 'ResourceSelectorFrm.pas' {ResourceSelectorForm},
@@ -88,7 +87,6 @@ uses
   WindowListFrm in 'WindowListFrm.pas' {WindowListForm},
   CVSThread in 'CVSThread.pas',
   CVSPasswdFrm in 'CVSPasswdFrm.pas' {CVSPasswdForm},
-  DevThemes in 'DevThemes.pas',
   ParamsFrm in 'ParamsFrm.pas' {ParamsForm},
   CompOptionsFrame in 'CompOptionsFrame.pas' {CompOptionsFrame: TFrame},
   CompOptionsFrm in 'CompOptionsFrm.pas' {CompOptionsForm},
@@ -114,9 +112,9 @@ begin
 			CreateDir(ParamStr(2));
 
 		if ParamStr(2)[2] <> ':' then // if a relative path is specified...
-			devData.INIFile := exefolder + IncludeTrailingBackslash(ParamStr(2)) + inifilename
+			devData.INIFileName := exefolder + IncludeTrailingBackslash(ParamStr(2)) + inifilename
 		else
-			devData.INIFile := IncludeTrailingBackslash(ParamStr(2)) + inifilename;
+			devData.INIFileName := IncludeTrailingBackslash(ParamStr(2)) + inifilename;
 
 		ConfigMode := CFG_PARAM;
 	end else begin
@@ -127,12 +125,12 @@ begin
 			appdata := IncludeTrailingBackslash(AnsiString(tempc));
 
 		if (appdata <> '') and (DirectoryExists(appdata + 'Dev-Cpp') or CreateDir(appdata + 'Dev-Cpp')) then begin
-			devData.INIFile := appdata + 'Dev-Cpp\' + inifilename;
+			devData.INIFileName := appdata + 'Dev-Cpp\' + inifilename;
 			ConfigMode := CFG_APPDATA;
 		end else begin
 
 			// store it in the default portable config folder anyways...
-			devData.INIFile := exefolder + 'config\' + inifilename;
+			devData.INIFileName := exefolder + 'config\' + inifilename;
 			ConfigMode := CFG_EXEFOLDER;
 		end;
 	end;
@@ -144,14 +142,14 @@ begin
 
 	// support for user-defined alternate ini file (permanent, but overriden by command-line -c)
 	if ConfigMode <> CFG_PARAM then begin
-		StandardConfigFile := devData.INIFile;
-		CheckForAltConfigFile(devData.INIFile);
+		StandardConfigFile := devData.INIFileName;
+		CheckForAltConfigFile(devData.INIFileName);
 		if UseAltConfigFile and (AltConfigFile<>'') and FileExists(AltConfigFile) then
-			devData.INIFile:=AltConfigFile;
+			devData.INIFileName:=AltConfigFile;
 	end;
 
 	// Create and fill settings structures
-	devData.ReadConfigData; // fill devData
+	devData.ReadSelf;
 	InitializeOptions;
 
 	// Display it as soon as possible, and only if its worth viewing...
@@ -161,7 +159,8 @@ begin
 	Application.Initialize;
 	Application.Title := 'Dev-C++';
 	Application.CreateForm(TMainForm, MainForm);
-  if Assigned(SplashForm) then
+
+	if Assigned(SplashForm) then
 		SplashForm.Close;
 
 	Application.Run;

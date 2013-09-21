@@ -25,568 +25,568 @@ interface
 
 uses
 {$IFDEF WIN32}
-	Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-	Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils,
-	Project, editor, DateUtils, compiler, ActnList, ToolFrm, AppEvnts,
-	debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
-	StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan,
-	CVSFrm, devShortcuts, debugreader, CommCtrl, devcfg, VistaAltFixUnit;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils, SynEditPrint,
+  Project, editor, DateUtils, compiler, ActnList, ToolFrm, AppEvnts,
+  debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
+  StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan,
+  CVSFrm, devShortcuts, debugreader, CommCtrl, devcfg, VistaAltFixUnit;
 {$ENDIF}
 {$IFDEF LINUX}
-	SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-	QMenus, QStdCtrls, QComCtrls, QExtCtrls, QButtons, utils,
-	project, editor, compiler, QActnList,
-	debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
-	devShortcuts, StrUtils, devFileMonitor, devMonitorTypes,
-	CVSFm, Types;
+  SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
+  QMenus, QStdCtrls, QComCtrls, QExtCtrls, QButtons, utils,
+  project, editor, compiler, QActnList,
+  debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
+  devShortcuts, StrUtils, devFileMonitor, devMonitorTypes,
+  CVSFm, Types;
 {$ENDIF}
 
 type
-	TMainForm = class(TForm)
-		MainMenu: TMainMenu;
-		FileMenu: TMenuItem;
-		NewprojectItem: TMenuItem;
-		NewTemplateItem: TMenuItem;
-		N34: TMenuItem;
-		OpenprojectItem: TMenuItem;
-		ReOpenItem: TMenuItem;
-		ClearhistoryItem: TMenuItem;
-		N11: TMenuItem;
-		NewSourceFileItem: TMenuItem;
-		NewresourcefileItem: TMenuItem;
-		N12: TMenuItem;
-		SaveUnitItem: TMenuItem;
-		SaveUnitAsItem: TMenuItem;
-		SaveallItem: TMenuItem;
-		N33: TMenuItem;
-		CloseprojectItem: TMenuItem;
-		CloseItem: TMenuItem;
-		ExportItem: TMenuItem;
-		HTMLItem: TMenuItem;
-		RTFItem: TMenuItem;
-		N19: TMenuItem;
-		ProjecttoHTMLItem: TMenuItem;
-		PrintItem: TMenuItem;
-		PrinterSetupItem: TMenuItem;
-		N3: TMenuItem;
-		ExitItem: TMenuItem;
-		EditMenu: TMenuItem;
-		UndoItem: TMenuItem;
-		RedoItem: TMenuItem;
-		N4: TMenuItem;
-		CutItem: TMenuItem;
-		CopyItem: TMenuItem;
-		PasteItem: TMenuItem;
-		N14: TMenuItem;
-		ToggleBookmarksItem: TMenuItem;
-		GotoBookmarksItem: TMenuItem;
-		SelectallItem: TMenuItem;
-		SearchMenu: TMenuItem;
-		FindItem: TMenuItem;
-		ReplaceItem: TMenuItem;
-		N7: TMenuItem;
-		GotolineItem: TMenuItem;
-		ViewMenu: TMenuItem;
-		ProjectManagerItem: TMenuItem;
-		StatusbarItem: TMenuItem;
-		CompileroutputItem: TMenuItem;
-		AlwaysShowItem: TMenuItem;
-		N37: TMenuItem;
-		ShowonlywhenneededItem: TMenuItem;
-		ToolbarsItem: TMenuItem;
-		ToolMainItem: TMenuItem;
-		ToolCompileandRunItem: TMenuItem;
-		ToolProjectItem: TMenuItem;
-		ToolSpecialsItem: TMenuItem;
-		ProjectMenu: TMenuItem;
-		NewunitinprojectItem: TMenuItem;
-		AddtoprojectItem: TMenuItem;
-		RemovefromprojectItem: TMenuItem;
-		N6: TMenuItem;
-		ProjectoptionsItem: TMenuItem;
-		ExecuteMenu: TMenuItem;
-		CompileItem: TMenuItem;
-		RunItem: TMenuItem;
-		N10: TMenuItem;
-		CompileandRunItem: TMenuItem;
-		RebuildallItem: TMenuItem;
-		N8: TMenuItem;
-		DebugItem: TMenuItem;
-		CompileroptionsItem: TMenuItem;
-		EnvironmentoptionsItem: TMenuItem;
-		ToolsMenu: TMenuItem;
-		ConfiguretoolsItem: TMenuItem;
-		mnuToolSep1: TMenuItem;
-		WindowMenu: TMenuItem;
-		CloseAllItem: TMenuItem;
-		N28: TMenuItem;
-		FullscreenmodeItem: TMenuItem;
-		N36: TMenuItem;
-		NextItem: TMenuItem;
-		PreviousItem: TMenuItem;
-		N32: TMenuItem;
-		HelpMenu: TMenuItem;
-		AboutDevCppItem: TMenuItem;
-		MessageControl: TPageControl;
-		CompSheet: TTabSheet;
-		ResSheet: TTabSheet;
-		ResourceOutput: TListBox;
-		LogSheet: TTabSheet;
-		Toolbar: TControlBar;
-		tbMain: TToolBar;
-		OpenBtn: TToolButton;
-		tbCompile: TToolBar;
-		CleanItem: TMenuItem;
-		NewFileBtn: TToolButton;
-		SaveUnitBtn: TToolButton;
-		CloseBtn: TToolButton;
-		ToolButton7: TToolButton;
-		PrintBtn: TToolButton;
-		CompileBtn: TToolButton;
-		RunBtn: TToolButton;
-		CompileAndRunBtn: TToolButton;
-		DebugBtn: TToolButton;
-		RebuildAllBtn: TToolButton;
-		tbProject: TToolBar;
-		AddToProjectBtn: TToolButton;
-		RemoveFromProjectBtn: TToolButton;
-		ToolButton20: TToolButton;
-		ProjectOptionsBtn: TToolButton;
-		CloseSheet: TTabSheet;
-		SaveAllBtn: TToolButton;
-		SplitterLeft: TSplitter;
-		EditorPopupMenu: TPopupMenu;
-		UndoPopItem: TMenuItem;
-		RedoPopItem: TMenuItem;
-		MenuItem1: TMenuItem;
-		CutPopItem: TMenuItem;
-		CopyPopItem: TMenuItem;
-		PastePopItem: TMenuItem;
-		MenuItem2: TMenuItem;
-		InsertPopItem: TMenuItem;
-		CommentheaderPopItem: TMenuItem;
-		DateandtimePopItem: TMenuItem;
-		MenuItem3: TMenuItem;
-		TogglebookmarksPopItem: TMenuItem;
-		GotobookmarksPopItem: TMenuItem;
-		SelectAllPopItem: TMenuItem;
-		UnitPopup: TPopupMenu;
-		RemoveFilefromprojectPopItem: TMenuItem;
-		RenamefilePopItem: TMenuItem;
-		N30: TMenuItem;
-		ClosefilePopItem: TMenuItem;
-		ProjectPopup: TPopupMenu;
-		NewunitinprojectPopItem: TMenuItem;
-		AddtoprojectPopItem: TMenuItem;
-		RemovefromprojectPopItem: TMenuItem;
-		MenuItem18: TMenuItem;
-		ProjectoptionsPopItem: TMenuItem;
-		InfoGroupBox: TPanel;
-		Statusbar: TStatusbar;
-		ErrorLabel: TLabel;
-		SizeOfOutput: TLabel;
-		FindSheet: TTabSheet;
-		FindOutput: TListView;
-		FindinallfilesItem: TMenuItem;
-		N20: TMenuItem;
-		mnuNew: TMenuItem;
-		N13: TMenuItem;
-		ActionList: TActionList;
-		actNewSource: TAction;
-		actNewProject: TAction;
-		actNewRes: TAction;
-		actNewTemplate: TAction;
-		actOpen: TAction;
-		actHistoryClear: TAction;
-		actSave: TAction;
-		actSaveAs: TAction;
-		actSaveAll: TAction;
-		actClose: TAction;
-		actCloseAll: TAction;
-		actCloseProject: TAction;
-		actXHTML: TAction;
-		actXRTF: TAction;
-		actXProject: TAction;
-		actPrint: TAction;
-		actPrintSU: TAction;
-		actExit: TAction;
-		actUndo: TAction;
-		actRedo: TAction;
-		actCut: TAction;
-		actCopy: TAction;
-		actPaste: TAction;
-		actSelectAll: TAction;
-		actFind: TAction;
-		actFindAll: TAction;
-		actReplace: TAction;
-		actGotoLine: TAction;
-		actProjectManager: TAction;
-		actStatusbar: TAction;
-		actCompOutput: TAction;
-		actCompOnNeed: TAction;
-		actProjectNew: TAction;
-		actProjectAdd: TAction;
-		actProjectRemove: TAction;
-		actProjectOptions: TAction;
-		actCompile: TAction;
-		actRun: TAction;
-		actCompRun: TAction;
-		actRebuild: TAction;
-		actClean: TAction;
-		actDebug: TAction;
-		actCompOptions: TAction;
-		actEnviroOptions: TAction;
-		actEditorOptions: TAction;
-		actConfigTools: TAction;
-		actFullScreen: TAction;
-		actNext: TAction;
-		actPrev: TAction;
-		actUpdateCheck: TAction;
-		actAbout: TAction;
-		actProjectSource: TAction;
-		actUnitRemove: TAction;
-		actUnitRename: TAction;
-		actUnitHeader: TAction;
-		actUnitOpen: TAction;
-		actUnitClose: TAction;
-		EditorOptions1: TMenuItem;
-		tbEdit: TToolBar;
-		UndoBtn: TToolButton;
-		RedoBtn: TToolButton;
-		tbSearch: TToolBar;
-		FindBtn: TToolButton;
-		ReplaceBtn: TToolButton;
-		FindNextBtn: TToolButton;
-		GotoLineBtn: TToolButton;
-		OpenPopItem: TMenuItem;
-		ToolEditItem: TMenuItem;
-		ToolSearchItem: TMenuItem;
-		N2: TMenuItem;
-		N9: TMenuItem;
-		tbSpecials: TToolBar;
-		actProjectMakeFile: TAction;
-		MessagePopup: TPopupMenu;
-		MsgCopyItem: TMenuItem;
-		MsgCopyAllItem: TMenuItem;
-		MsgSaveAllItem: TMenuItem;
-		MsgClearItem: TMenuItem;
-		actBreakPoint: TAction;
-		actIncremental: TAction;
-		IncrementalSearch1: TMenuItem;
-		actShowBars: TAction;
+  TMainForm = class(TForm)
+    MainMenu: TMainMenu;
+    FileMenu: TMenuItem;
+    NewprojectItem: TMenuItem;
+    NewTemplateItem: TMenuItem;
+    N34: TMenuItem;
+    OpenprojectItem: TMenuItem;
+    ReOpenItem: TMenuItem;
+    ClearhistoryItem: TMenuItem;
+    N11: TMenuItem;
+    NewSourceFileItem: TMenuItem;
+    NewresourcefileItem: TMenuItem;
+    N12: TMenuItem;
+    SaveUnitItem: TMenuItem;
+    SaveUnitAsItem: TMenuItem;
+    SaveallItem: TMenuItem;
+    N33: TMenuItem;
+    CloseprojectItem: TMenuItem;
+    CloseItem: TMenuItem;
+    ExportItem: TMenuItem;
+    HTMLItem: TMenuItem;
+    RTFItem: TMenuItem;
+    N19: TMenuItem;
+    ProjecttoHTMLItem: TMenuItem;
+    PrintItem: TMenuItem;
+    PrinterSetupItem: TMenuItem;
+    N3: TMenuItem;
+    ExitItem: TMenuItem;
+    EditMenu: TMenuItem;
+    UndoItem: TMenuItem;
+    RedoItem: TMenuItem;
+    N4: TMenuItem;
+    CutItem: TMenuItem;
+    CopyItem: TMenuItem;
+    PasteItem: TMenuItem;
+    N14: TMenuItem;
+    ToggleBookmarksItem: TMenuItem;
+    GotoBookmarksItem: TMenuItem;
+    SelectallItem: TMenuItem;
+    SearchMenu: TMenuItem;
+    FindItem: TMenuItem;
+    ReplaceItem: TMenuItem;
+    N7: TMenuItem;
+    GotolineItem: TMenuItem;
+    ViewMenu: TMenuItem;
+    ProjectManagerItem: TMenuItem;
+    StatusbarItem: TMenuItem;
+    CompileroutputItem: TMenuItem;
+    AlwaysShowItem: TMenuItem;
+    N37: TMenuItem;
+    ShowonlywhenneededItem: TMenuItem;
+    ToolbarsItem: TMenuItem;
+    ToolMainItem: TMenuItem;
+    ToolCompileandRunItem: TMenuItem;
+    ToolProjectItem: TMenuItem;
+    ToolSpecialsItem: TMenuItem;
+    ProjectMenu: TMenuItem;
+    NewunitinprojectItem: TMenuItem;
+    AddtoprojectItem: TMenuItem;
+    RemovefromprojectItem: TMenuItem;
+    N6: TMenuItem;
+    ProjectoptionsItem: TMenuItem;
+    ExecuteMenu: TMenuItem;
+    CompileItem: TMenuItem;
+    RunItem: TMenuItem;
+    N10: TMenuItem;
+    CompileandRunItem: TMenuItem;
+    RebuildallItem: TMenuItem;
+    N8: TMenuItem;
+    DebugItem: TMenuItem;
+    CompileroptionsItem: TMenuItem;
+    EnvironmentoptionsItem: TMenuItem;
+    ToolsMenu: TMenuItem;
+    ConfiguretoolsItem: TMenuItem;
+    mnuToolSep1: TMenuItem;
+    WindowMenu: TMenuItem;
+    CloseAllItem: TMenuItem;
+    N28: TMenuItem;
+    FullscreenmodeItem: TMenuItem;
+    N36: TMenuItem;
+    NextItem: TMenuItem;
+    PreviousItem: TMenuItem;
+    N32: TMenuItem;
+    HelpMenu: TMenuItem;
+    AboutDevCppItem: TMenuItem;
+    MessageControl: TPageControl;
+    CompSheet: TTabSheet;
+    ResSheet: TTabSheet;
+    ResourceOutput: TListBox;
+    LogSheet: TTabSheet;
+    Toolbar: TControlBar;
+    tbMain: TToolBar;
+    OpenBtn: TToolButton;
+    tbCompile: TToolBar;
+    CleanItem: TMenuItem;
+    NewFileBtn: TToolButton;
+    SaveUnitBtn: TToolButton;
+    CloseBtn: TToolButton;
+    ToolButton7: TToolButton;
+    PrintBtn: TToolButton;
+    CompileBtn: TToolButton;
+    RunBtn: TToolButton;
+    CompileAndRunBtn: TToolButton;
+    DebugBtn: TToolButton;
+    RebuildAllBtn: TToolButton;
+    tbProject: TToolBar;
+    AddToProjectBtn: TToolButton;
+    RemoveFromProjectBtn: TToolButton;
+    ToolButton20: TToolButton;
+    ProjectOptionsBtn: TToolButton;
+    CloseSheet: TTabSheet;
+    SaveAllBtn: TToolButton;
+    SplitterLeft: TSplitter;
+    EditorPopupMenu: TPopupMenu;
+    UndoPopItem: TMenuItem;
+    RedoPopItem: TMenuItem;
+    MenuItem1: TMenuItem;
+    CutPopItem: TMenuItem;
+    CopyPopItem: TMenuItem;
+    PastePopItem: TMenuItem;
+    MenuItem2: TMenuItem;
+    InsertPopItem: TMenuItem;
+    CommentheaderPopItem: TMenuItem;
+    DateandtimePopItem: TMenuItem;
+    MenuItem3: TMenuItem;
+    TogglebookmarksPopItem: TMenuItem;
+    GotobookmarksPopItem: TMenuItem;
+    SelectAllPopItem: TMenuItem;
+    UnitPopup: TPopupMenu;
+    RemoveFilefromprojectPopItem: TMenuItem;
+    RenamefilePopItem: TMenuItem;
+    N30: TMenuItem;
+    ClosefilePopItem: TMenuItem;
+    ProjectPopup: TPopupMenu;
+    NewunitinprojectPopItem: TMenuItem;
+    AddtoprojectPopItem: TMenuItem;
+    RemovefromprojectPopItem: TMenuItem;
+    MenuItem18: TMenuItem;
+    ProjectoptionsPopItem: TMenuItem;
+    InfoGroupBox: TPanel;
+    Statusbar: TStatusbar;
+    ErrorLabel: TLabel;
+    SizeOfOutput: TLabel;
+    FindSheet: TTabSheet;
+    FindOutput: TListView;
+    FindinallfilesItem: TMenuItem;
+    N20: TMenuItem;
+    mnuNew: TMenuItem;
+    N13: TMenuItem;
+    ActionList: TActionList;
+    actNewSource: TAction;
+    actNewProject: TAction;
+    actNewRes: TAction;
+    actNewTemplate: TAction;
+    actOpen: TAction;
+    actHistoryClear: TAction;
+    actSave: TAction;
+    actSaveAs: TAction;
+    actSaveAll: TAction;
+    actClose: TAction;
+    actCloseAll: TAction;
+    actCloseProject: TAction;
+    actXHTML: TAction;
+    actXRTF: TAction;
+    actXProject: TAction;
+    actPrint: TAction;
+    actPrintSU: TAction;
+    actExit: TAction;
+    actUndo: TAction;
+    actRedo: TAction;
+    actCut: TAction;
+    actCopy: TAction;
+    actPaste: TAction;
+    actSelectAll: TAction;
+    actFind: TAction;
+    actFindAll: TAction;
+    actReplace: TAction;
+    actGotoLine: TAction;
+    actProjectManager: TAction;
+    actStatusbar: TAction;
+    actCompOutput: TAction;
+    actCompOnNeed: TAction;
+    actProjectNew: TAction;
+    actProjectAdd: TAction;
+    actProjectRemove: TAction;
+    actProjectOptions: TAction;
+    actCompile: TAction;
+    actRun: TAction;
+    actCompRun: TAction;
+    actRebuild: TAction;
+    actClean: TAction;
+    actDebug: TAction;
+    actCompOptions: TAction;
+    actEnviroOptions: TAction;
+    actEditorOptions: TAction;
+    actConfigTools: TAction;
+    actFullScreen: TAction;
+    actNext: TAction;
+    actPrev: TAction;
+    actUpdateCheck: TAction;
+    actAbout: TAction;
+    actProjectSource: TAction;
+    actUnitRemove: TAction;
+    actUnitRename: TAction;
+    actUnitHeader: TAction;
+    actUnitOpen: TAction;
+    actUnitClose: TAction;
+    EditorOptions1: TMenuItem;
+    tbEdit: TToolBar;
+    UndoBtn: TToolButton;
+    RedoBtn: TToolButton;
+    tbSearch: TToolBar;
+    FindBtn: TToolButton;
+    ReplaceBtn: TToolButton;
+    FindNextBtn: TToolButton;
+    GotoLineBtn: TToolButton;
+    OpenPopItem: TMenuItem;
+    ToolEditItem: TMenuItem;
+    ToolSearchItem: TMenuItem;
+    N2: TMenuItem;
+    N9: TMenuItem;
+    tbSpecials: TToolBar;
+    actProjectMakeFile: TAction;
+    MessagePopup: TPopupMenu;
+    MsgCopyItem: TMenuItem;
+    MsgCopyAllItem: TMenuItem;
+    MsgSaveAllItem: TMenuItem;
+    MsgClearItem: TMenuItem;
+    actBreakPoint: TAction;
+    actIncremental: TAction;
+    IncrementalSearch1: TMenuItem;
+    actShowBars: TAction;
     PageControl: TPageControl;
-		Close1: TMenuItem;
-		N16: TMenuItem;
-		DebugMenu: TMenuItem;
-		N18: TMenuItem;
-		DbgNextItem: TMenuItem;
-		StepoverItem: TMenuItem;
-		N21: TMenuItem;
-		DebugSheet: TTabSheet;
-		actAddWatch: TAction;
-		actEditWatch: TAction;
-		pnlFull: TPanel;
-		btnFullScrRevert: TSpeedButton;
-		actNextLine: TAction;
-		actStepOver: TAction;
-		actWatchItem: TAction;
-		actRemoveWatch: TAction;
-		actStopExecute: TAction;
-		StopExecution1: TMenuItem;
-		InsertBtn: TToolButton;
-		ToggleBtn: TToolButton;
-		GotoBtn: TToolButton;
-		actFileMenu: TAction;
-		actEditMenu: TAction;
-		actSearchMenu: TAction;
-		actViewMenu: TAction;
-		actProjectMenu: TAction;
-		actExecuteMenu: TAction;
-		actDebugMenu: TAction;
-		actToolsMenu: TAction;
-		actWindowMenu: TAction;
-		actHelpMenu: TAction;
-		CppTokenizer: TCppTokenizer;
-		CppParser: TCppParser;
-		CodeCompletion: TCodeCompletion;
-		N22: TMenuItem;
-		Swapheadersource1: TMenuItem;
-		N23: TMenuItem;
-		Swapheadersource2: TMenuItem;
-		actSwapHeaderSource: TAction;
-		SizeFile: TEdit;
-		TotalErrors: TEdit;
-		InsertItem: TMenuItem;
-		SyntaxCheckItem: TMenuItem;
-		actSyntaxCheck: TAction;
-		devShortcuts: TdevShortcuts;
-		actConfigdevShortcuts: TAction;
-		ConfiguredevShortcuts1: TMenuItem;
-		DateTimeMenuItem: TMenuItem;
-		actProgramReset: TAction;
-		N25: TMenuItem;
-		Programreset1: TMenuItem;
-		CommentheaderMenuItem: TMenuItem;
-		SplitterBottom: TSplitter;
-		actComment: TAction;
-		actUncomment: TAction;
-		actIndent: TAction;
-		actUnindent: TAction;
-		N26: TMenuItem;
-		Comment1: TMenuItem;
-		Uncomment1: TMenuItem;
-		Indent1: TMenuItem;
-		Unindent1: TMenuItem;
-		N27: TMenuItem;
-		actGotoFunction: TAction;
-		Gotofunction1: TMenuItem;
-		BrowserPopup: TPopupMenu;
-		mnuBrowserGotoDecl: TMenuItem;
-		mnuBrowserGotoImpl: TMenuItem;
-		mnuBrowserSep1: TMenuItem;
-		mnuBrowserNewClass: TMenuItem;
-		mnuBrowserNewMember: TMenuItem;
-		mnuBrowserNewVariable: TMenuItem;
-		mnuBrowserSep3: TMenuItem;
-		mnuBrowserViewMode: TMenuItem;
-		mnuBrowserViewAll: TMenuItem;
-		mnuBrowserViweCurrent: TMenuItem;
-		actBrowserGotoDecl: TAction;
-		actBrowserGotoImpl: TAction;
-		actBrowserNewClass: TAction;
-		actBrowserNewMember: TAction;
-		actBrowserNewVar: TAction;
-		actBrowserViewAll: TAction;
-		actBrowserViewCurrent: TAction;
-		actProfileProject: TAction;
-		N29: TMenuItem;
-		Profileanalysis1: TMenuItem;
-		N24: TMenuItem;
-		CheckforupdatesItem: TMenuItem;
-		N31: TMenuItem;
-		actBrowserAddFolder: TAction;
-		actBrowserRemoveFolder: TAction;
-		mnuBrowserAddFolder: TMenuItem;
-		mnuBrowserRemoveFolder: TMenuItem;
-		actBrowserRenameFolder: TAction;
-		mnuBrowserRenameFolder: TMenuItem;
-		actCloseAllButThis: TAction;
-		CloseAll1: TMenuItem;
-		Closeallexceptthis1: TMenuItem;
-		CloseAll2: TMenuItem;
-		actStepLine: TAction;
-		DbgSingleStep: TMenuItem;
-		DebugVarsPopup: TPopupMenu;
-		AddwatchPop: TMenuItem;
-		RemoveWatchPop: TMenuItem;
-		devFileMonitor: TdevFileMonitor;
-		actFileProperties: TAction;
-		N35: TMenuItem;
-		N1: TMenuItem;
-		Properties1: TMenuItem;
-		actViewToDoList: TAction;
-		actAddToDo: TAction;
-		AddToDoitem1: TMenuItem;
-		N38: TMenuItem;
-		oDolist1: TMenuItem;
-		N39: TMenuItem;
-		actProjectNewFolder: TAction;
-		actProjectRemoveFolder: TAction;
-		actProjectRenameFolder: TAction;
-		Newfolder1: TMenuItem;
-		N40: TMenuItem;
-		Addfolder1: TMenuItem;
-		Removefolder1: TMenuItem;
-		Renamefolder1: TMenuItem;
-		actImportMSVC: TAction;
-		ImportItem: TMenuItem;
-		N41: TMenuItem;
-		ToggleBreakpointPopupItem: TMenuItem;
-		AddWatchPopupItem: TMenuItem;
-		ViewCPUItem: TMenuItem;
-		actViewCPU: TAction;
-		actExecParams: TAction;
-		mnuExecParameters: TMenuItem;
-		DevCppDDEServer: TDdeServerConv;
-		actShowTips: TAction;
-		ShowTipsItem: TMenuItem;
-		N42: TMenuItem;
-		Usecolors1: TMenuItem;
-		actBrowserUseColors: TAction;
-		HelpMenuItem: TMenuItem;
-		actBrowserViewProject: TAction;
-		mnuBrowserViewProject: TMenuItem;
-		N43: TMenuItem;
-		PackageManagerItem: TMenuItem;
-		btnAbortCompilation: TSpeedButton;
-		actAbortCompilation: TAction;
-		N44: TMenuItem;
-		Addfile1: TMenuItem;
-		actCVSImport: TAction;
-		actCVSCheckout: TAction;
-		actCVSUpdate: TAction;
-		actCVSCommit: TAction;
-		actCVSDiff: TAction;
-		actCVSLog: TAction;
-		N45: TMenuItem;
-		CVS1: TMenuItem;
-		N47: TMenuItem;
-		mnuCVSLog3: TMenuItem;
-		mnuCVSUpdate3: TMenuItem;
-		mnuCVSDiff3: TMenuItem;
-		mnuCVSCommit3: TMenuItem;
-		N48: TMenuItem;
-		CVS2: TMenuItem;
-		mnuCVSCommit1: TMenuItem;
-		mnuCVSUpdate1: TMenuItem;
-		mnuCVSDiff1: TMenuItem;
-		N55: TMenuItem;
-		mnuCVSLog1: TMenuItem;
-		N49: TMenuItem;
-		CVS3: TMenuItem;
-		mnuCVSCommit2: TMenuItem;
-		mnuCVSUpdate2: TMenuItem;
-		mnuCVSDiff2: TMenuItem;
-		N51: TMenuItem;
-		mnuCVSLog2: TMenuItem;
-		mnuCVS: TMenuItem;
-		mnuCVSUpdate: TMenuItem;
-		mnuCVSDiff: TMenuItem;
-		N53: TMenuItem;
-		mnuCVSCommit: TMenuItem;
-		N56: TMenuItem;
-		mnuCVSLog: TMenuItem;
-		mnuCVSCurrent: TMenuItem;
-		mnuCVSWhole: TMenuItem;
-		mnuCVSImportP: TMenuItem;
-		mnuCVSCheckoutP: TMenuItem;
-		mnuCVSUpdateP: TMenuItem;
-		mnuCVSDiffP: TMenuItem;
-		N58: TMenuItem;
-		mnuCVSLogP: TMenuItem;
-		N52: TMenuItem;
-		N59: TMenuItem;
-		N60: TMenuItem;
-		N46: TMenuItem;
-		Commit1: TMenuItem;
-		ListItem: TMenuItem;
-		GotoprojectmanagerItem: TMenuItem;
-		N50: TMenuItem;
-		mnuFileProps: TMenuItem;
-		N54: TMenuItem;
-		mnuUnitProperties: TMenuItem;
-		actCVSAdd: TAction;
-		actCVSRemove: TAction;
-		N61: TMenuItem;
-		mnuCVSAdd: TMenuItem;
-		mnuCVSRemove: TMenuItem;
-		N62: TMenuItem;
-		mnuCVSAdd2: TMenuItem;
-		mnuCVSRemove2: TMenuItem;
-		N63: TMenuItem;
-		GoToClassBrowserItem: TMenuItem;
-		actBrowserShowInherited: TAction;
-		Showinheritedmembers1: TMenuItem;
-		actCVSLogin: TAction;
-		actCVSLogout: TAction;
-		N65: TMenuItem;
-		Login1: TMenuItem;
-		Logout1: TMenuItem;
-		N66: TMenuItem;
-		LeftPageControl: TPageControl;
-		ProjectSheet: TTabSheet;
-		ProjectView: TTreeView;
-		ClassSheet: TTabSheet;
-		ClassBrowser: TClassBrowser;
-		AddWatchBtn: TButton;
-		RemoveWatchBtn: TButton;
-		FloatingPojectManagerItem: TMenuItem;
-		actCompileCurrentFile: TAction;
-		Compilecurrentfile1: TMenuItem;
-		actSaveProjectAs: TAction;
-		SaveprojectasItem: TMenuItem;
-		mnuOpenWith: TMenuItem;
-		tbClasses: TToolBar;
-		cmbClasses: TComboBox;
-		cmbMembers: TComboBox;
-		N17: TMenuItem;
-		ToolClassesItem: TMenuItem;
-		DebugLeftSheet: TTabSheet;
-		DebugTree: TTreeView;
-		StepOverBtn: TButton;
-		DebugStartPanel: TPanel;
-		DDebugBtn: TSpeedButton;
-		StopExecBtn: TSpeedButton;
-		N67: TMenuItem;
-		FloatingReportwindowItem: TMenuItem;
-		N57: TMenuItem;
-		AttachtoprocessItem: TMenuItem;
-		actAttachProcess: TAction;
-		ModifyWatchPop: TMenuItem;
-		actModifyWatch: TAction;
-		ClearallWatchPop: TMenuItem;
-		CompilerOutput: TListView;
-		N5: TMenuItem;
-		Class1: TMenuItem;
-		DeleteProfilingInformation: TMenuItem;
-		actDeleteProfileProject: TAction;
-		GotoDefineEditor: TMenuItem;
-		GotoDeclEditor: TMenuItem;
-		N15: TMenuItem;
-		actGotoDeclEditor: TAction;
-		actGotoImplEditor: TAction;
-		actHideFSBar: TAction;
-		ToolButton1: TToolButton;
-		ToolButton2: TToolButton;
-		ProfileBtn: TToolButton;
-		ProfilingInforBtn: TToolButton;
-		CompResGroupBox: TPanel;
-		LogOutput: TMemo;
-		N64: TMenuItem;
-		CollapseAll: TMenuItem;
-		UncollapseAll: TMenuItem;
-		actCollapse: TAction;
-		actUnCollapse: TAction;
-		actInsert: TAction;
-		actToggle: TAction;
-		actGoto: TAction;
-		TEXItem: TMenuItem;
-		actXTex: TAction;
-		NextLineBtn: TButton;
-		IntoLineBtn: TButton;
-		lblSendCommandGdb: TLabel;
+    Close1: TMenuItem;
+    N16: TMenuItem;
+    DebugMenu: TMenuItem;
+    N18: TMenuItem;
+    DbgNextItem: TMenuItem;
+    StepoverItem: TMenuItem;
+    N21: TMenuItem;
+    DebugSheet: TTabSheet;
+    actAddWatch: TAction;
+    actEditWatch: TAction;
+    pnlFull: TPanel;
+    btnFullScrRevert: TSpeedButton;
+    actNextLine: TAction;
+    actStepOver: TAction;
+    actWatchItem: TAction;
+    actRemoveWatch: TAction;
+    actStopExecute: TAction;
+    StopExecution1: TMenuItem;
+    InsertBtn: TToolButton;
+    ToggleBtn: TToolButton;
+    GotoBtn: TToolButton;
+    actFileMenu: TAction;
+    actEditMenu: TAction;
+    actSearchMenu: TAction;
+    actViewMenu: TAction;
+    actProjectMenu: TAction;
+    actExecuteMenu: TAction;
+    actDebugMenu: TAction;
+    actToolsMenu: TAction;
+    actWindowMenu: TAction;
+    actHelpMenu: TAction;
+    CppTokenizer: TCppTokenizer;
+    CppParser: TCppParser;
+    CodeCompletion: TCodeCompletion;
+    N22: TMenuItem;
+    Swapheadersource1: TMenuItem;
+    N23: TMenuItem;
+    Swapheadersource2: TMenuItem;
+    actSwapHeaderSource: TAction;
+    SizeFile: TEdit;
+    TotalErrors: TEdit;
+    InsertItem: TMenuItem;
+    SyntaxCheckItem: TMenuItem;
+    actSyntaxCheck: TAction;
+    devShortcuts: TdevShortcuts;
+    actConfigdevShortcuts: TAction;
+    ConfiguredevShortcuts1: TMenuItem;
+    DateTimeMenuItem: TMenuItem;
+    actProgramReset: TAction;
+    N25: TMenuItem;
+    Programreset1: TMenuItem;
+    CommentheaderMenuItem: TMenuItem;
+    SplitterBottom: TSplitter;
+    actComment: TAction;
+    actUncomment: TAction;
+    actIndent: TAction;
+    actUnindent: TAction;
+    N26: TMenuItem;
+    Comment1: TMenuItem;
+    Uncomment1: TMenuItem;
+    Indent1: TMenuItem;
+    Unindent1: TMenuItem;
+    N27: TMenuItem;
+    actGotoFunction: TAction;
+    Gotofunction1: TMenuItem;
+    BrowserPopup: TPopupMenu;
+    mnuBrowserGotoDecl: TMenuItem;
+    mnuBrowserGotoImpl: TMenuItem;
+    mnuBrowserSep1: TMenuItem;
+    mnuBrowserNewClass: TMenuItem;
+    mnuBrowserNewMember: TMenuItem;
+    mnuBrowserNewVariable: TMenuItem;
+    mnuBrowserSep3: TMenuItem;
+    mnuBrowserViewMode: TMenuItem;
+    mnuBrowserViewAll: TMenuItem;
+    mnuBrowserViweCurrent: TMenuItem;
+    actBrowserGotoDecl: TAction;
+    actBrowserGotoImpl: TAction;
+    actBrowserNewClass: TAction;
+    actBrowserNewMember: TAction;
+    actBrowserNewVar: TAction;
+    actBrowserViewAll: TAction;
+    actBrowserViewCurrent: TAction;
+    actProfileProject: TAction;
+    N29: TMenuItem;
+    Profileanalysis1: TMenuItem;
+    N24: TMenuItem;
+    CheckforupdatesItem: TMenuItem;
+    N31: TMenuItem;
+    actBrowserAddFolder: TAction;
+    actBrowserRemoveFolder: TAction;
+    mnuBrowserAddFolder: TMenuItem;
+    mnuBrowserRemoveFolder: TMenuItem;
+    actBrowserRenameFolder: TAction;
+    mnuBrowserRenameFolder: TMenuItem;
+    actCloseAllButThis: TAction;
+    CloseAll1: TMenuItem;
+    Closeallexceptthis1: TMenuItem;
+    CloseAll2: TMenuItem;
+    actStepLine: TAction;
+    DbgSingleStep: TMenuItem;
+    DebugVarsPopup: TPopupMenu;
+    AddwatchPop: TMenuItem;
+    RemoveWatchPop: TMenuItem;
+    devFileMonitor: TdevFileMonitor;
+    actFileProperties: TAction;
+    N35: TMenuItem;
+    N1: TMenuItem;
+    Properties1: TMenuItem;
+    actViewToDoList: TAction;
+    actAddToDo: TAction;
+    AddToDoitem1: TMenuItem;
+    N38: TMenuItem;
+    oDolist1: TMenuItem;
+    N39: TMenuItem;
+    actProjectNewFolder: TAction;
+    actProjectRemoveFolder: TAction;
+    actProjectRenameFolder: TAction;
+    Newfolder1: TMenuItem;
+    N40: TMenuItem;
+    Addfolder1: TMenuItem;
+    Removefolder1: TMenuItem;
+    Renamefolder1: TMenuItem;
+    actImportMSVC: TAction;
+    ImportItem: TMenuItem;
+    N41: TMenuItem;
+    ToggleBreakpointPopupItem: TMenuItem;
+    AddWatchPopupItem: TMenuItem;
+    ViewCPUItem: TMenuItem;
+    actViewCPU: TAction;
+    actExecParams: TAction;
+    mnuExecParameters: TMenuItem;
+    DevCppDDEServer: TDdeServerConv;
+    actShowTips: TAction;
+    ShowTipsItem: TMenuItem;
+    N42: TMenuItem;
+    Usecolors1: TMenuItem;
+    actBrowserUseColors: TAction;
+    HelpMenuItem: TMenuItem;
+    actBrowserViewProject: TAction;
+    mnuBrowserViewProject: TMenuItem;
+    N43: TMenuItem;
+    PackageManagerItem: TMenuItem;
+    btnAbortCompilation: TSpeedButton;
+    actAbortCompilation: TAction;
+    N44: TMenuItem;
+    Addfile1: TMenuItem;
+    actCVSImport: TAction;
+    actCVSCheckout: TAction;
+    actCVSUpdate: TAction;
+    actCVSCommit: TAction;
+    actCVSDiff: TAction;
+    actCVSLog: TAction;
+    N45: TMenuItem;
+    CVS1: TMenuItem;
+    N47: TMenuItem;
+    mnuCVSLog3: TMenuItem;
+    mnuCVSUpdate3: TMenuItem;
+    mnuCVSDiff3: TMenuItem;
+    mnuCVSCommit3: TMenuItem;
+    N48: TMenuItem;
+    CVS2: TMenuItem;
+    mnuCVSCommit1: TMenuItem;
+    mnuCVSUpdate1: TMenuItem;
+    mnuCVSDiff1: TMenuItem;
+    N55: TMenuItem;
+    mnuCVSLog1: TMenuItem;
+    N49: TMenuItem;
+    CVS3: TMenuItem;
+    mnuCVSCommit2: TMenuItem;
+    mnuCVSUpdate2: TMenuItem;
+    mnuCVSDiff2: TMenuItem;
+    N51: TMenuItem;
+    mnuCVSLog2: TMenuItem;
+    mnuCVS: TMenuItem;
+    mnuCVSUpdate: TMenuItem;
+    mnuCVSDiff: TMenuItem;
+    N53: TMenuItem;
+    mnuCVSCommit: TMenuItem;
+    N56: TMenuItem;
+    mnuCVSLog: TMenuItem;
+    mnuCVSCurrent: TMenuItem;
+    mnuCVSWhole: TMenuItem;
+    mnuCVSImportP: TMenuItem;
+    mnuCVSCheckoutP: TMenuItem;
+    mnuCVSUpdateP: TMenuItem;
+    mnuCVSDiffP: TMenuItem;
+    N58: TMenuItem;
+    mnuCVSLogP: TMenuItem;
+    N52: TMenuItem;
+    N59: TMenuItem;
+    N60: TMenuItem;
+    N46: TMenuItem;
+    Commit1: TMenuItem;
+    ListItem: TMenuItem;
+    GotoprojectmanagerItem: TMenuItem;
+    N50: TMenuItem;
+    mnuFileProps: TMenuItem;
+    N54: TMenuItem;
+    mnuUnitProperties: TMenuItem;
+    actCVSAdd: TAction;
+    actCVSRemove: TAction;
+    N61: TMenuItem;
+    mnuCVSAdd: TMenuItem;
+    mnuCVSRemove: TMenuItem;
+    N62: TMenuItem;
+    mnuCVSAdd2: TMenuItem;
+    mnuCVSRemove2: TMenuItem;
+    N63: TMenuItem;
+    GoToClassBrowserItem: TMenuItem;
+    actBrowserShowInherited: TAction;
+    Showinheritedmembers1: TMenuItem;
+    actCVSLogin: TAction;
+    actCVSLogout: TAction;
+    N65: TMenuItem;
+    Login1: TMenuItem;
+    Logout1: TMenuItem;
+    N66: TMenuItem;
+    LeftPageControl: TPageControl;
+    ProjectSheet: TTabSheet;
+    ProjectView: TTreeView;
+    ClassSheet: TTabSheet;
+    ClassBrowser: TClassBrowser;
+    AddWatchBtn: TButton;
+    RemoveWatchBtn: TButton;
+    FloatingPojectManagerItem: TMenuItem;
+    actCompileCurrentFile: TAction;
+    Compilecurrentfile1: TMenuItem;
+    actSaveProjectAs: TAction;
+    SaveprojectasItem: TMenuItem;
+    mnuOpenWith: TMenuItem;
+    tbClasses: TToolBar;
+    cmbClasses: TComboBox;
+    cmbMembers: TComboBox;
+    N17: TMenuItem;
+    ToolClassesItem: TMenuItem;
+    DebugLeftSheet: TTabSheet;
+    DebugTree: TTreeView;
+    StepOverBtn: TButton;
+    DebugStartPanel: TPanel;
+    DDebugBtn: TSpeedButton;
+    StopExecBtn: TSpeedButton;
+    N67: TMenuItem;
+    FloatingReportwindowItem: TMenuItem;
+    N57: TMenuItem;
+    AttachtoprocessItem: TMenuItem;
+    actAttachProcess: TAction;
+    ModifyWatchPop: TMenuItem;
+    actModifyWatch: TAction;
+    ClearallWatchPop: TMenuItem;
+    CompilerOutput: TListView;
+    N5: TMenuItem;
+    Class1: TMenuItem;
+    DeleteProfilingInformation: TMenuItem;
+    actDeleteProfileProject: TAction;
+    GotoDefineEditor: TMenuItem;
+    GotoDeclEditor: TMenuItem;
+    N15: TMenuItem;
+    actGotoDeclEditor: TAction;
+    actGotoImplEditor: TAction;
+    actHideFSBar: TAction;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    ProfileBtn: TToolButton;
+    ProfilingInforBtn: TToolButton;
+    CompResGroupBox: TPanel;
+    LogOutput: TMemo;
+    N64: TMenuItem;
+    CollapseAll: TMenuItem;
+    UncollapseAll: TMenuItem;
+    actCollapse: TAction;
+    actUnCollapse: TAction;
+    actInsert: TAction;
+    actToggle: TAction;
+    actGoto: TAction;
+    TEXItem: TMenuItem;
+    actXTex: TAction;
+    NextLineBtn: TButton;
+    IntoLineBtn: TButton;
+    lblSendCommandGdb: TLabel;
     edGdbCommand: TComboBox;
-		DebugOutput: TMemo;
-		DebugSendPanel: TPanel;
-		ViewCPUBtn: TButton;
-		ModifyWatchBtn: TButton;
-		N68: TMenuItem;
-		Abortcompilation1: TMenuItem;
-		Modifywatch1: TMenuItem;
-		Removewatch1: TMenuItem;
+    DebugOutput: TMemo;
+    DebugSendPanel: TPanel;
+    ViewCPUBtn: TButton;
+    ModifyWatchBtn: TButton;
+    N68: TMenuItem;
+    Abortcompilation1: TMenuItem;
+    Modifywatch1: TMenuItem;
+    Removewatch1: TMenuItem;
     EvaluateInput: TComboBox;
-		lblEvaluate: TLabel;
-		EvalOutput: TMemo;
-		SkipFuncBtn: TButton;
-		actSkipFunction: TAction;
-		IntoInsBtn: TButton;
-		actNextIns: TAction;
-		NextInsBtn: TButton;
-		actStepIns: TAction;
-		MsgPasteItem: TMenuItem;
-		actMsgCopy: TAction;
-		actMsgCopyAll: TAction;
-		actMsgPaste: TAction;
-		actMsgClear: TAction;
-		actMsgSaveAll: TAction;
-		Skipfunction1: TMenuItem;
-		N69: TMenuItem;
-		actNextIns1: TMenuItem;
-		Intoinstruction1: TMenuItem;
-		N70: TMenuItem;
-		actReplaceAll: TAction;
-		ReplaceAll1: TMenuItem;
-		N72: TMenuItem;
+    lblEvaluate: TLabel;
+    EvalOutput: TMemo;
+    SkipFuncBtn: TButton;
+    actSkipFunction: TAction;
+    IntoInsBtn: TButton;
+    actNextIns: TAction;
+    NextInsBtn: TButton;
+    actStepIns: TAction;
+    MsgPasteItem: TMenuItem;
+    actMsgCopy: TAction;
+    actMsgCopyAll: TAction;
+    actMsgPaste: TAction;
+    actMsgClear: TAction;
+    actMsgSaveAll: TAction;
+    Skipfunction1: TMenuItem;
+    N69: TMenuItem;
+    actNextIns1: TMenuItem;
+    Intoinstruction1: TMenuItem;
+    N70: TMenuItem;
+    actReplaceAll: TAction;
+    ReplaceAll1: TMenuItem;
+    N72: TMenuItem;
     actMsgCut: TAction;
     actMsgCut1: TMenuItem;
     N71: TMenuItem;
@@ -596,349 +596,350 @@ type
     actMsgSelAll: TAction;
     WarningLabel: TLabel;
     TotalWarnings: TEdit;
+    actNewClass: TAction;
 
-		procedure FormClose(Sender: TObject; var Action: TCloseAction);
-		procedure FormDestroy(Sender: TObject);
-		procedure SetStatusbarLineCol;
-		procedure SetStatusbarMessage(const msg:AnsiString);
-		procedure ToggleBookmarkClick(Sender: TObject);
-		procedure GotoBookmarkClick(Sender: TObject);
-		procedure MessageControlChange(Sender: TObject);
-		procedure ProjectViewContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
-		procedure ProjectViewDblClick(Sender: TObject);
-		procedure ToolbarClick(Sender: TObject);
-		procedure ToolbarContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
-		procedure SplitterBottomMoved(Sender: TObject);
-		procedure actNewSourceExecute(Sender: TObject);
-		procedure actNewProjectExecute(Sender: TObject);
-		procedure actNewResExecute(Sender: TObject);
-		procedure actNewTemplateExecute(Sender: TObject);
-		procedure actOpenExecute(Sender: TObject);
-		procedure actHistoryClearExecute(Sender: TObject);
-		procedure actSaveExecute(Sender: TObject);
-		procedure actSaveAsExecute(Sender: TObject);
-		procedure actSaveAllExecute(Sender: TObject);
-		procedure actCloseExecute(Sender: TObject);
-		procedure actCloseAllExecute(Sender: TObject);
-		procedure actCloseProjectExecute(Sender: TObject);
-		procedure actXHTMLExecute(Sender: TObject);
-		procedure actXRTFExecute(Sender: TObject);
-		procedure actXTexExecute(Sender: TObject);
-		procedure actXProjectExecute(Sender: TObject);
-		procedure actPrintExecute(Sender: TObject);
-		procedure actPrintSUExecute(Sender: TObject);
-		procedure actExitExecute(Sender: TObject);
-		procedure actUndoExecute(Sender: TObject);
-		procedure actRedoExecute(Sender: TObject);
-		procedure actCutExecute(Sender: TObject);
-		procedure actCopyExecute(Sender: TObject);
-		procedure actPasteExecute(Sender: TObject);
-		procedure actSelectAllExecute(Sender: TObject);
-		procedure actProjectManagerExecute(Sender: TObject);
-		procedure actStatusBarExecute(Sender: TObject);
-		procedure actCompOutputExecute(Sender: TObject);
-		procedure actCompOnNeedExecute(Sender: TObject);
-		procedure actFullScreenExecute(Sender: TObject);
-		procedure actNextExecute(Sender: TObject);
-		procedure actPrevExecute(Sender: TObject);
-		procedure actCompOptionsExecute(Sender: TObject);
-		procedure actEditorOptionsExecute(Sender: TObject);
-		procedure actConfigToolsExecute(Sender: TObject);
-		procedure actUnitRemoveExecute(Sender: TObject);
-		procedure actUnitRenameExecute(Sender: TObject);
-		procedure actUnitOpenExecute(Sender: TObject);
-		procedure actUnitCloseExecute(Sender: TObject);
-		procedure actUpdateCheckExecute(Sender: TObject);
-		procedure actAboutExecute(Sender: TObject);
-		procedure actProjectNewExecute(Sender: TObject);
-		procedure actProjectAddExecute(Sender: TObject);
-		procedure actProjectRemoveExecute(Sender: TObject);
-		procedure actProjectOptionsExecute(Sender: TObject);
-		procedure actProjectSourceExecute(Sender: TObject);
-		procedure actFindExecute(Sender: TObject);
-		procedure actFindAllExecute(Sender: TObject);
-		procedure actReplaceExecute(Sender: TObject);
-		procedure actGotoLineExecute(Sender: TObject);
-		procedure actCompileExecute(Sender: TObject);
-		procedure actRunExecute(Sender: TObject);
-		procedure actCompRunExecute(Sender: TObject);
-		procedure actRebuildExecute(Sender: TObject);
-		procedure actCleanExecute(Sender: TObject);
-		procedure actDebugExecute(Sender: TObject);
-		procedure actEnviroOptionsExecute(Sender: TObject);
-		procedure actProjectMakeFileExecute(Sender: TObject);
-		procedure actMsgCopyExecute(Sender: TObject);
-		procedure actMsgClearExecute(Sender: TObject);
-		procedure actMsgHideExecute(Sender: TObject);
-		procedure actUpdatePageCount(Sender: TObject);			// enable on pagecount> 0
-		procedure actUpdateProject(Sender: TObject);			// enable on fproject assigned
-		procedure actUpdatePageProject(Sender: TObject);		// enable on both above
-		procedure actUpdatePageorProject(Sender: TObject);		// enable on either of above
-		procedure actUpdateEmptyEditor(Sender: TObject);		// enable on unempty editor
-		procedure actUpdateDebuggerRunning(Sender: TObject);	// enable when debugger running
-		procedure actUpdateDeleteWatch(Sender: TObject);		// enable on watch var selection
-		procedure actIncrementalExecute(Sender: TObject);
-		procedure CompilerOutputDblClick(Sender: TObject);
-		procedure FindOutputDblClick(Sender: TObject);
-		procedure actShowBarsExecute(Sender: TObject);
-		procedure btnFullScrRevertClick(Sender: TObject);
-		procedure FormContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
-		procedure actAddWatchExecute(Sender: TObject);
-		procedure ProjectViewClick(Sender: TObject);
-		procedure actNextLineExecute(Sender: TObject);
-		procedure actRemoveWatchExecute(Sender: TObject);
-		procedure actStepOverExecute(Sender: TObject);
-		procedure actForceStopExecuteExecute(Sender: TObject);
-		procedure actUndoUpdate(Sender: TObject);
-		procedure actRedoUpdate(Sender: TObject);
-		procedure actCutUpdate(Sender: TObject);
-		procedure actCopyUpdate(Sender: TObject);
-		procedure actPasteUpdate(Sender: TObject);
-		procedure actSaveUpdate(Sender: TObject);
-		procedure actSaveAsUpdate(Sender: TObject);
-		procedure actFileMenuExecute(Sender: TObject);
-		procedure actToolsMenuExecute(Sender: TObject);
-		procedure actDeleteExecute(Sender: TObject);
-		procedure ClassBrowserSelect(Sender: TObject; Filename: TFileName;Line: Integer);
-		procedure CppParserTotalProgress(Sender: TObject;const FileName: string;Total, Current: Integer);
-		procedure CodeCompletionResize(Sender: TObject);
-		procedure actSwapHeaderSourceUpdate(Sender: TObject);
-		procedure actSwapHeaderSourceExecute(Sender: TObject);
-		procedure actSyntaxCheckExecute(Sender: TObject);
-		procedure actUpdateExecute(Sender: TObject);
-		procedure PageControlChange(Sender: TObject);
-		procedure actConfigdevShortcutsExecute(Sender: TObject);
-		procedure DateTimeMenuItemClick(Sender: TObject);
-		procedure actProgramResetExecute(Sender: TObject);
-		procedure actProgramResetUpdate(Sender: TObject);
-		procedure CommentheaderMenuItemClick(Sender: TObject);
-		procedure PageControlMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
-		procedure actNewTemplateUpdate(Sender: TObject);
-		procedure actCommentExecute(Sender: TObject);
-		procedure actUncommentExecute(Sender: TObject);
-		procedure actIndentExecute(Sender: TObject);
-		procedure actUnindentExecute(Sender: TObject);
-		procedure PageControlDragOver(Sender, Source: TObject; X, Y: Integer;State: TDragState; var Accept: Boolean);
-		procedure PageControlDragDrop(Sender, Source: TObject; X, Y: Integer);
-		procedure actGotoFunctionExecute(Sender: TObject);
-		procedure actBrowserGotoDeclUpdate(Sender: TObject);
-		procedure actBrowserGotoImplUpdate(Sender: TObject);
-		procedure actBrowserGotoDeclExecute(Sender: TObject);
-		procedure actBrowserGotoImplExecute(Sender: TObject);
-		procedure actBrowserNewClassUpdate(Sender: TObject);
-		procedure actBrowserNewMemberUpdate(Sender: TObject);
-		procedure actBrowserNewVarUpdate(Sender: TObject);
-		procedure actBrowserViewAllUpdate(Sender: TObject);
-		procedure actBrowserNewClassExecute(Sender: TObject);
-		procedure actBrowserNewMemberExecute(Sender: TObject);
-		procedure actBrowserNewVarExecute(Sender: TObject);
-		procedure actBrowserViewAllExecute(Sender: TObject);
-		procedure actBrowserViewCurrentExecute(Sender: TObject);
-		procedure actProfileProjectExecute(Sender: TObject);
-		procedure actBrowserAddFolderExecute(Sender: TObject);
-		procedure actBrowserRemoveFolderExecute(Sender: TObject);
-		procedure actBrowserAddFolderUpdate(Sender: TObject);
-		procedure actBrowserRenameFolderExecute(Sender: TObject);
-		procedure actCloseAllButThisExecute(Sender: TObject);
-		procedure actStepLineExecute(Sender: TObject);
-		procedure lvBacktraceCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
-		procedure lvBacktraceMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
-		procedure actRunUpdate(Sender: TObject);
-		procedure actCompileRunUpdate(Sender: TObject);
-		procedure actCompileUpdate(Sender: TObject);
-		procedure devFileMonitorNotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: string);
-		procedure actFilePropertiesExecute(Sender: TObject);
-		procedure actViewToDoListExecute(Sender: TObject);
-		procedure actAddToDoExecute(Sender: TObject);
-		procedure actProjectNewFolderExecute(Sender: TObject);
-		procedure actProjectRemoveFolderExecute(Sender: TObject);
-		procedure actProjectRenameFolderExecute(Sender: TObject);
-		procedure ProjectViewDragOver(Sender, Source: TObject; X, Y: Integer;State: TDragState; var Accept: Boolean);
-		procedure ProjectViewDragDrop(Sender, Source: TObject; X, Y: Integer);
-		procedure actImportMSVCExecute(Sender: TObject);
-		procedure ViewCPUItemClick(Sender: TObject);
-		procedure edGdbCommandKeyPress(Sender: TObject; var Key: Char);
-		procedure actExecParamsExecute(Sender: TObject);
-		procedure DevCppDDEServerExecuteMacro(Sender: TObject; Msg: TStrings);
-		procedure actShowTipsExecute(Sender: TObject);
-		procedure actBrowserUseColorsExecute(Sender: TObject);
-		procedure HelpMenuItemClick(Sender: TObject);
-		procedure CppParserStartParsing(Sender: TObject);
-		procedure CppParserEndParsing(Sender: TObject);
-		procedure actBrowserViewProjectExecute(Sender: TObject);
-		procedure PackageManagerItemClick(Sender: TObject);
-		procedure actAbortCompilationUpdate(Sender: TObject);
-		procedure actAbortCompilationExecute(Sender: TObject);
-		procedure ProjectViewKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
-		procedure RemoveItem(Node: TTreeNode);
-		procedure ProjectViewChanging(Sender: TObject; Node: TTreeNode;var AllowChange: Boolean);
-		procedure dynactOpenEditorByTagExecute(Sender: TObject);
-		procedure actWindowMenuExecute(Sender: TObject);
-		procedure actGotoProjectManagerExecute(Sender: TObject);
-		procedure actCVSImportExecute(Sender: TObject);
-		procedure actCVSCheckoutExecute(Sender: TObject);
-		procedure actCVSUpdateExecute(Sender: TObject);
-		procedure actCVSCommitExecute(Sender: TObject);
-		procedure actCVSDiffExecute(Sender: TObject);
-		procedure actCVSLogExecute(Sender: TObject);
-		procedure ListItemClick(Sender: TObject);
-		procedure ProjectViewCompare(Sender: TObject; Node1, Node2: TTreeNode;Data: Integer; var Compare: Integer);
-		procedure ProjectViewKeyPress(Sender: TObject; var Key: Char);
-		procedure ProjectViewMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
-		procedure actCVSAddExecute(Sender: TObject);
-		procedure actCVSRemoveExecute(Sender: TObject);
-		procedure GoToClassBrowserItemClick(Sender: TObject);
-		procedure actBrowserShowInheritedExecute(Sender: TObject);
-		procedure actCVSLoginExecute(Sender: TObject);
-		procedure actCVSLogoutExecute(Sender: TObject);
-		procedure ReportWindowClose(Sender: TObject; var Action: TCloseAction);
-		procedure FloatingPojectManagerItemClick(Sender: TObject);
-		procedure actCompileCurrentFileExecute(Sender: TObject);
-		procedure actCompileCurrentFileUpdate(Sender: TObject);
-		procedure actSaveProjectAsExecute(Sender: TObject);
-		procedure mnuOpenWithClick(Sender: TObject);
-		procedure cmbClassesChange(Sender: TObject);
-		procedure cmbMembersChange(Sender: TObject);
-		procedure CompilerOutputKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
-		procedure FindOutputKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
-		procedure DebugTreeKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
-		procedure DebugVarsPopupPopup(Sender: TObject);
-		procedure FloatingReportwindowItemClick(Sender: TObject);
-		procedure actAttachProcessUpdate(Sender: TObject);
-		procedure actAttachProcessExecute(Sender: TObject);
-		procedure actModifyWatchExecute(Sender: TObject);
-		procedure actModifyWatchUpdate(Sender: TObject);
-		procedure ClearallWatchPopClick(Sender: TObject);
-		procedure mnuCVSClick(Sender: TObject);
-		procedure actMsgCopyAllExecute(Sender: TObject);
-		procedure actMsgSaveAllExecute(Sender: TObject);
-		procedure actDeleteProfileProjectExecute(Sender: TObject);
-		procedure actGotoImplDeclEditorExecute(Sender: TObject);
-		procedure actHideFSBarExecute(Sender: TObject);
-		procedure UpdateSplash(const text : AnsiString);
-		procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-		procedure ImportCBCprojectClick(Sender: TObject);
-		procedure CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
-		procedure cmbMembersDropDown(Sender: TObject);
-		procedure NewFileBtnClick(Sender: TObject);
-		procedure actUnCollapseExecute(Sender: TObject);
-		procedure actCollapseExecute(Sender: TObject);
-		procedure actInsertExecute(Sender: TObject);
-		procedure actToggleExecute(Sender: TObject);
-		procedure actGotoExecute(Sender: TObject);
-		procedure actEditMenuUpdate(Sender: TObject);
-		procedure FormCreate(Sender: TObject);
-		procedure PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
-		procedure actBreakPointExecute(Sender: TObject);
-		procedure EvaluateInputKeyPress(Sender: TObject; var Key: Char);
-		procedure FormShow(Sender: TObject);
-		procedure actSkipFunctionExecute(Sender: TObject);
-		procedure actNextInsExecute(Sender: TObject);
-		procedure actStepInsExecute(Sender: TObject);
-		procedure actMsgPasteExecute(Sender: TObject);
-		procedure actUpdateDebuggerRunningCPU(Sender: TObject);
-		procedure actUpdateEmptyEditorFindForm(Sender: TObject);
-		procedure actReplaceAllExecute(Sender: TObject);
-		procedure DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView;Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;var PaintImages, DefaultDraw: Boolean);
-		procedure FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;Stage: TCustomDrawStage; var DefaultDraw: Boolean);
-		procedure actMsgCutExecute(Sender: TObject);
-		procedure FindOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
-		procedure CompilerOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
-		procedure actMsgSelAllExecute(Sender: TObject);
-		procedure FormActivate(Sender: TObject);
-	private
-		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
-		fTools            : TToolController; // tool list controller
-		ProjectToolWindow : TForm; // floating left tab control
-		ReportToolWindow  : TForm; // floating bottom tab control
-		OldLeft           : integer; // stores position of window when going fullscreen
-		OldTop            : integer; // idem
-		OldWidth          : integer; // idem
-		OldHeight         : integer; // idem
-		WindowPlacement   : TWindowPlacement; // idem
-		fFirstShow        : boolean; // true for first WM_SHOW, false for others
-		fFirstActivate    : boolean; // see above
-		fShowTips         : boolean;
-		fRemoveOptions    : boolean;
-		fOptionsDir       : AnsiString;
-		fCurrentPageHint  : AnsiString;
-		function ParseParams(s : AnsiString) : AnsiString;
-		procedure BuildBookMarkMenus;
-		procedure SetHints;
-		procedure MRUClick(Sender: TObject);
-		procedure CodeInsClick(Sender: TObject);
-		procedure ToolItemClick(Sender: TObject);
-		procedure WMDropFiles(var msg: TMessage); message WM_DROPFILES;
-		procedure LogEntryProc(const msg: AnsiString);
-		procedure CompOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
-		procedure CompResOutputProc(const _Line, _Unit, _Message: AnsiString);
-		procedure CompSuccessProc;
-		procedure LoadText;
-		function SaveFileAs(e : TEditor): Boolean;
-		procedure OpenUnit;
-		function PrepareForCompile: Boolean;
-		procedure LoadTheme;
-		procedure ScanActiveProject;
-		procedure CheckForDLLProfiling;
-		procedure DoCVSAction(Sender: TObject; whichAction: TCVSAction);
-		procedure ProjectWindowClose(Sender: TObject; var Action: TCloseAction);
-		procedure SetupProjectView;
-		procedure BuildOpenWith;
-		procedure RebuildClassesToolbar;
-		procedure PrepareDebugger;
-		procedure ClearMessageControl;
-	public
-		AutoSaveTimer : TTimer;
-		fProject : TProject;
-		fDebugger : TDebugger;
-		fCompiler : TCompiler;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
+    procedure SetStatusbarLineCol;
+    procedure SetStatusbarMessage(const msg:AnsiString);
+    procedure ToggleBookmarkClick(Sender: TObject);
+    procedure GotoBookmarkClick(Sender: TObject);
+    procedure MessageControlChange(Sender: TObject);
+    procedure ProjectViewContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
+    procedure ProjectViewDblClick(Sender: TObject);
+    procedure ToolbarClick(Sender: TObject);
+    procedure ToolbarContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
+    procedure SplitterBottomMoved(Sender: TObject);
+    procedure actNewSourceExecute(Sender: TObject);
+    procedure actNewProjectExecute(Sender: TObject);
+    procedure actNewResExecute(Sender: TObject);
+    procedure actNewTemplateExecute(Sender: TObject);
+    procedure actOpenExecute(Sender: TObject);
+    procedure actHistoryClearExecute(Sender: TObject);
+    procedure actSaveExecute(Sender: TObject);
+    procedure actSaveAsExecute(Sender: TObject);
+    procedure actSaveAllExecute(Sender: TObject);
+    procedure actCloseExecute(Sender: TObject);
+    procedure actCloseAllExecute(Sender: TObject);
+    procedure actCloseProjectExecute(Sender: TObject);
+    procedure actXHTMLExecute(Sender: TObject);
+    procedure actXRTFExecute(Sender: TObject);
+    procedure actXTexExecute(Sender: TObject);
+    procedure actXProjectExecute(Sender: TObject);
+    procedure actPrintExecute(Sender: TObject);
+    procedure actPrintSUExecute(Sender: TObject);
+    procedure actExitExecute(Sender: TObject);
+    procedure actUndoExecute(Sender: TObject);
+    procedure actRedoExecute(Sender: TObject);
+    procedure actCutExecute(Sender: TObject);
+    procedure actCopyExecute(Sender: TObject);
+    procedure actPasteExecute(Sender: TObject);
+    procedure actSelectAllExecute(Sender: TObject);
+    procedure actProjectManagerExecute(Sender: TObject);
+    procedure actStatusBarExecute(Sender: TObject);
+    procedure actCompOutputExecute(Sender: TObject);
+    procedure actCompOnNeedExecute(Sender: TObject);
+    procedure actFullScreenExecute(Sender: TObject);
+    procedure actNextExecute(Sender: TObject);
+    procedure actPrevExecute(Sender: TObject);
+    procedure actCompOptionsExecute(Sender: TObject);
+    procedure actEditorOptionsExecute(Sender: TObject);
+    procedure actConfigToolsExecute(Sender: TObject);
+    procedure actUnitRemoveExecute(Sender: TObject);
+    procedure actUnitRenameExecute(Sender: TObject);
+    procedure actUnitOpenExecute(Sender: TObject);
+    procedure actUnitCloseExecute(Sender: TObject);
+    procedure actUpdateCheckExecute(Sender: TObject);
+    procedure actAboutExecute(Sender: TObject);
+    procedure actProjectNewExecute(Sender: TObject);
+    procedure actProjectAddExecute(Sender: TObject);
+    procedure actProjectRemoveExecute(Sender: TObject);
+    procedure actProjectOptionsExecute(Sender: TObject);
+    procedure actProjectSourceExecute(Sender: TObject);
+    procedure actFindExecute(Sender: TObject);
+    procedure actFindAllExecute(Sender: TObject);
+    procedure actReplaceExecute(Sender: TObject);
+    procedure actGotoLineExecute(Sender: TObject);
+    procedure actCompileExecute(Sender: TObject);
+    procedure actRunExecute(Sender: TObject);
+    procedure actCompRunExecute(Sender: TObject);
+    procedure actRebuildExecute(Sender: TObject);
+    procedure actCleanExecute(Sender: TObject);
+    procedure actDebugExecute(Sender: TObject);
+    procedure actEnviroOptionsExecute(Sender: TObject);
+    procedure actProjectMakeFileExecute(Sender: TObject);
+    procedure actMsgCopyExecute(Sender: TObject);
+    procedure actMsgClearExecute(Sender: TObject);
+    procedure actMsgHideExecute(Sender: TObject);
+    procedure actUpdatePageCount(Sender: TObject);      // enable on pagecount> 0
+    procedure actUpdateProject(Sender: TObject);      // enable on fproject assigned
+    procedure actUpdatePageProject(Sender: TObject);    // enable on both above
+    procedure actUpdatePageorProject(Sender: TObject);    // enable on either of above
+    procedure actUpdateEmptyEditor(Sender: TObject);    // enable on unempty editor
+    procedure actUpdateDebuggerRunning(Sender: TObject);  // enable when debugger running
+    procedure actUpdateDeleteWatch(Sender: TObject);    // enable on watch var selection
+    procedure actIncrementalExecute(Sender: TObject);
+    procedure CompilerOutputDblClick(Sender: TObject);
+    procedure FindOutputDblClick(Sender: TObject);
+    procedure actShowBarsExecute(Sender: TObject);
+    procedure btnFullScrRevertClick(Sender: TObject);
+    procedure FormContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
+    procedure actAddWatchExecute(Sender: TObject);
+    procedure ProjectViewClick(Sender: TObject);
+    procedure actNextLineExecute(Sender: TObject);
+    procedure actRemoveWatchExecute(Sender: TObject);
+    procedure actStepOverExecute(Sender: TObject);
+    procedure actForceStopExecuteExecute(Sender: TObject);
+    procedure actUndoUpdate(Sender: TObject);
+    procedure actRedoUpdate(Sender: TObject);
+    procedure actCutUpdate(Sender: TObject);
+    procedure actCopyUpdate(Sender: TObject);
+    procedure actPasteUpdate(Sender: TObject);
+    procedure actSaveUpdate(Sender: TObject);
+    procedure actSaveAsUpdate(Sender: TObject);
+    procedure actFileMenuExecute(Sender: TObject);
+    procedure actToolsMenuExecute(Sender: TObject);
+    procedure actDeleteExecute(Sender: TObject);
+    procedure ClassBrowserSelect(Sender: TObject; Filename: TFileName;Line: Integer);
+    procedure CppParserTotalProgress(Sender: TObject;const FileName: string;Total, Current: Integer);
+    procedure CodeCompletionResize(Sender: TObject);
+    procedure actSwapHeaderSourceUpdate(Sender: TObject);
+    procedure actSwapHeaderSourceExecute(Sender: TObject);
+    procedure actSyntaxCheckExecute(Sender: TObject);
+    procedure actUpdateExecute(Sender: TObject);
+    procedure PageControlChange(Sender: TObject);
+    procedure actConfigdevShortcutsExecute(Sender: TObject);
+    procedure DateTimeMenuItemClick(Sender: TObject);
+    procedure actProgramResetExecute(Sender: TObject);
+    procedure actProgramResetUpdate(Sender: TObject);
+    procedure CommentheaderMenuItemClick(Sender: TObject);
+    procedure PageControlMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
+    procedure actNewTemplateUpdate(Sender: TObject);
+    procedure actCommentExecute(Sender: TObject);
+    procedure actUncommentExecute(Sender: TObject);
+    procedure actIndentExecute(Sender: TObject);
+    procedure actUnindentExecute(Sender: TObject);
+    procedure PageControlDragOver(Sender, Source: TObject; X, Y: Integer;State: TDragState; var Accept: Boolean);
+    procedure PageControlDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure actGotoFunctionExecute(Sender: TObject);
+    procedure actBrowserGotoDeclUpdate(Sender: TObject);
+    procedure actBrowserGotoImplUpdate(Sender: TObject);
+    procedure actBrowserGotoDeclExecute(Sender: TObject);
+    procedure actBrowserGotoImplExecute(Sender: TObject);
+    procedure actBrowserNewClassUpdate(Sender: TObject);
+    procedure actBrowserNewMemberUpdate(Sender: TObject);
+    procedure actBrowserNewVarUpdate(Sender: TObject);
+    procedure actBrowserViewAllUpdate(Sender: TObject);
+    procedure actBrowserNewClassExecute(Sender: TObject);
+    procedure actBrowserNewMemberExecute(Sender: TObject);
+    procedure actBrowserNewVarExecute(Sender: TObject);
+    procedure actBrowserViewAllExecute(Sender: TObject);
+    procedure actBrowserViewCurrentExecute(Sender: TObject);
+    procedure actProfileProjectExecute(Sender: TObject);
+    procedure actBrowserAddFolderExecute(Sender: TObject);
+    procedure actBrowserRemoveFolderExecute(Sender: TObject);
+    procedure actBrowserAddFolderUpdate(Sender: TObject);
+    procedure actBrowserRenameFolderExecute(Sender: TObject);
+    procedure actCloseAllButThisExecute(Sender: TObject);
+    procedure actStepLineExecute(Sender: TObject);
+    procedure lvBacktraceCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure lvBacktraceMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
+    procedure actRunUpdate(Sender: TObject);
+    procedure actCompileRunUpdate(Sender: TObject);
+    procedure actCompileUpdate(Sender: TObject);
+    procedure devFileMonitorNotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: string);
+    procedure actFilePropertiesExecute(Sender: TObject);
+    procedure actViewToDoListExecute(Sender: TObject);
+    procedure actAddToDoExecute(Sender: TObject);
+    procedure actProjectNewFolderExecute(Sender: TObject);
+    procedure actProjectRemoveFolderExecute(Sender: TObject);
+    procedure actProjectRenameFolderExecute(Sender: TObject);
+    procedure ProjectViewDragOver(Sender, Source: TObject; X, Y: Integer;State: TDragState; var Accept: Boolean);
+    procedure ProjectViewDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure actImportMSVCExecute(Sender: TObject);
+    procedure ViewCPUItemClick(Sender: TObject);
+    procedure edGdbCommandKeyPress(Sender: TObject; var Key: Char);
+    procedure actExecParamsExecute(Sender: TObject);
+    procedure DevCppDDEServerExecuteMacro(Sender: TObject; Msg: TStrings);
+    procedure actShowTipsExecute(Sender: TObject);
+    procedure actBrowserUseColorsExecute(Sender: TObject);
+    procedure HelpMenuItemClick(Sender: TObject);
+    procedure CppParserStartParsing(Sender: TObject);
+    procedure CppParserEndParsing(Sender: TObject);
+    procedure actBrowserViewProjectExecute(Sender: TObject);
+    procedure PackageManagerItemClick(Sender: TObject);
+    procedure actAbortCompilationUpdate(Sender: TObject);
+    procedure actAbortCompilationExecute(Sender: TObject);
+    procedure ProjectViewKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+    procedure RemoveItem(Node: TTreeNode);
+    procedure ProjectViewChanging(Sender: TObject; Node: TTreeNode;var AllowChange: Boolean);
+    procedure dynactOpenEditorByTagExecute(Sender: TObject);
+    procedure actWindowMenuExecute(Sender: TObject);
+    procedure actGotoProjectManagerExecute(Sender: TObject);
+    procedure actCVSImportExecute(Sender: TObject);
+    procedure actCVSCheckoutExecute(Sender: TObject);
+    procedure actCVSUpdateExecute(Sender: TObject);
+    procedure actCVSCommitExecute(Sender: TObject);
+    procedure actCVSDiffExecute(Sender: TObject);
+    procedure actCVSLogExecute(Sender: TObject);
+    procedure ListItemClick(Sender: TObject);
+    procedure ProjectViewCompare(Sender: TObject; Node1, Node2: TTreeNode;Data: Integer; var Compare: Integer);
+    procedure ProjectViewKeyPress(Sender: TObject; var Key: Char);
+    procedure ProjectViewMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
+    procedure actCVSAddExecute(Sender: TObject);
+    procedure actCVSRemoveExecute(Sender: TObject);
+    procedure GoToClassBrowserItemClick(Sender: TObject);
+    procedure actBrowserShowInheritedExecute(Sender: TObject);
+    procedure actCVSLoginExecute(Sender: TObject);
+    procedure actCVSLogoutExecute(Sender: TObject);
+    procedure ReportWindowClose(Sender: TObject; var Action: TCloseAction);
+    procedure FloatingPojectManagerItemClick(Sender: TObject);
+    procedure actCompileCurrentFileExecute(Sender: TObject);
+    procedure actCompileCurrentFileUpdate(Sender: TObject);
+    procedure actSaveProjectAsExecute(Sender: TObject);
+    procedure mnuOpenWithClick(Sender: TObject);
+    procedure cmbClassesChange(Sender: TObject);
+    procedure cmbMembersChange(Sender: TObject);
+    procedure CompilerOutputKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+    procedure FindOutputKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+    procedure DebugTreeKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+    procedure DebugVarsPopupPopup(Sender: TObject);
+    procedure FloatingReportwindowItemClick(Sender: TObject);
+    procedure actAttachProcessUpdate(Sender: TObject);
+    procedure actAttachProcessExecute(Sender: TObject);
+    procedure actModifyWatchExecute(Sender: TObject);
+    procedure actModifyWatchUpdate(Sender: TObject);
+    procedure ClearallWatchPopClick(Sender: TObject);
+    procedure mnuCVSClick(Sender: TObject);
+    procedure actMsgCopyAllExecute(Sender: TObject);
+    procedure actMsgSaveAllExecute(Sender: TObject);
+    procedure actDeleteProfileProjectExecute(Sender: TObject);
+    procedure actGotoImplDeclEditorExecute(Sender: TObject);
+    procedure actHideFSBarExecute(Sender: TObject);
+    procedure UpdateSplash(const text : AnsiString);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure ImportCBCprojectClick(Sender: TObject);
+    procedure CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
+    procedure cmbMembersDropDown(Sender: TObject);
+    procedure NewFileBtnClick(Sender: TObject);
+    procedure actUnCollapseExecute(Sender: TObject);
+    procedure actCollapseExecute(Sender: TObject);
+    procedure actInsertExecute(Sender: TObject);
+    procedure actToggleExecute(Sender: TObject);
+    procedure actGotoExecute(Sender: TObject);
+    procedure actEditMenuUpdate(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
+    procedure actBreakPointExecute(Sender: TObject);
+    procedure EvaluateInputKeyPress(Sender: TObject; var Key: Char);
+    procedure FormShow(Sender: TObject);
+    procedure actSkipFunctionExecute(Sender: TObject);
+    procedure actNextInsExecute(Sender: TObject);
+    procedure actStepInsExecute(Sender: TObject);
+    procedure actMsgPasteExecute(Sender: TObject);
+    procedure actUpdateDebuggerRunningCPU(Sender: TObject);
+    procedure actUpdateEmptyEditorFindForm(Sender: TObject);
+    procedure actReplaceAllExecute(Sender: TObject);
+    procedure DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView;Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;var PaintImages, DefaultDraw: Boolean);
+    procedure FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+    procedure actMsgCutExecute(Sender: TObject);
+    procedure FindOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
+    procedure CompilerOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
+    procedure actMsgSelAllExecute(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+  private
+    fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
+    fTools            : TToolController; // tool list controller
+    ProjectToolWindow : TForm; // floating left tab control
+    ReportToolWindow  : TForm; // floating bottom tab control
+    OldLeft           : integer; // stores position of window when going fullscreen
+    OldTop            : integer; // idem
+    OldWidth          : integer; // idem
+    OldHeight         : integer; // idem
+    WindowPlacement   : TWindowPlacement; // idem
+    fFirstShow        : boolean; // true for first WM_SHOW, false for others
+    fFirstActivate    : boolean; // see above
+    fShowTips         : boolean;
+    fRemoveOptions    : boolean;
+    fOptionsDir       : AnsiString;
 
-		procedure InitClassBrowser(ReloadCache: boolean);
-		procedure UpdateAppTitle;
-		procedure OpenCloseMessageSheet(Open: boolean);
-		function SaveFile(e : TEditor): Boolean;
-		procedure OpenFile(const s : AnsiString);
-		procedure OpenProject(const s: AnsiString);
-		function FileIsOpen(const s: AnsiString; inprj: boolean = false): integer;
-		function GetEditor(index: integer = -1): TEditor;
-		function GetEditorFromFileName(const ffile : AnsiString) : TEditor;
-		procedure GotoBreakpoint(const bfile: AnsiString; bline: integer);
-		procedure RemoveActiveBreakpoints;
-		procedure AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
-		procedure SetProjCompOpt(idx: integer; Value: char);
-		function CheckCompileOption(const option : AnsiString;var optionstructout : PCompilerOption;var optionindexout : integer) : boolean;
-		function CloseEditor(index : integer): Boolean;
-		procedure EditorSaveTimer(sender : TObject);
-		procedure OnInputEvalReady(const evalvalue : AnsiString);
+    function ParseParams(s : AnsiString) : AnsiString;
+    procedure BuildBookMarkMenus;
+    procedure SetHints;
+    procedure MRUClick(Sender: TObject);
+    procedure CodeInsClick(Sender: TObject);
+    procedure ToolItemClick(Sender: TObject);
+    procedure WMDropFiles(var msg: TMessage); message WM_DROPFILES;
+    procedure LogEntryProc(const msg: AnsiString);
+    procedure CompOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
+    procedure CompResOutputProc(const _Line, _Unit, _Message: AnsiString);
+    procedure CompSuccessProc;
+    procedure LoadText;
+    function SaveFileAs(e : TEditor): Boolean;
+    procedure OpenUnit;
+    function PrepareForCompile: Boolean;
+    procedure LoadTheme;
+    procedure ScanActiveProject;
+    procedure CheckForDLLProfiling;
+    procedure DoCVSAction(Sender: TObject; whichAction: TCVSAction);
+    procedure ProjectWindowClose(Sender: TObject; var Action: TCloseAction);
+    procedure SetupProjectView;
+    procedure BuildOpenWith;
+    procedure RebuildClassesToolbar;
+    procedure PrepareDebugger;
+    procedure ClearMessageControl;
+  public
+    AutoSaveTimer : TTimer;
+    fProject : TProject;
+    fDebugger : TDebugger;
+    fCompiler : TCompiler;
+    fCurrentPageHint  : AnsiString;
+    procedure InitClassBrowser(ReloadCache: boolean);
+    procedure UpdateAppTitle;
+    procedure OpenCloseMessageSheet(Open: boolean);
+    function SaveFile(e : TEditor): Boolean;
+    procedure OpenFile(const s : AnsiString);
+    procedure OpenProject(const s: AnsiString);
+    function FileIsOpen(const s: AnsiString; inprj: boolean = false): integer;
+    function GetEditor(index: integer = -1): TEditor;
+    function GetEditorFromFileName(const ffile : AnsiString) : TEditor;
+    procedure GotoBreakpoint(const bfile: AnsiString; bline: integer);
+    procedure RemoveActiveBreakpoints;
+    procedure AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
+    procedure SetProjCompOpt(idx: integer; Value: char);
+    function CheckCompileOption(const option : AnsiString;var optionstructout : PCompilerOption;var optionindexout : integer) : boolean;
+    function CloseEditor(index : integer): Boolean;
+    procedure EditorSaveTimer(sender : TObject);
+    procedure OnInputEvalReady(const evalvalue : AnsiString);
 end;
 
 var
-	MainForm : TMainForm;
+  MainForm : TMainForm;
 
 implementation
 
 uses
 {$IFDEF WIN32}
-	ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
-	datamod, NewProjectFrm, AboutFrm, PrintFrm,
-	CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
-	SynEdit, Math, ImageTheme,
-	Types, FindFrm, Prjtypes, devExec,
-	NewTemplateFrm, FunctionSearchFrm, NewMemberFrm, NewVarFrm, NewClassFrm,
-	ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
-	ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
-	WindowListFrm, devThemes, RemoveUnitFrm, ParamsFrm, WebUpdate, ProcessListFrm, SynEditHighlighter;
+  ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
+  datamod, NewProjectFrm, AboutFrm, PrintFrm,
+  CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
+  SynEdit, Math, ImageTheme,
+  Types, FindFrm, Prjtypes, devExec,
+  NewTemplateFrm, FunctionSearchFrm, NewMemberFrm, NewVarFrm, NewClassFrm,
+  ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
+  ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
+  WindowListFrm, RemoveUnitFrm, ParamsFrm, WebUpdate, ProcessListFrm, SynEditHighlighter;
 {$ENDIF}
 {$IFDEF LINUX}
-	Xlib, IniFiles, QClipbrd, MultiLangSupport, version,
-	devcfg, datamod, NewProjectFrm, AboutFrm, PrintFrm,
-	CompOptionsFrm, EditorOptfrm, Incrementalfrm, Search_Center, Envirofrm,
-	QSynEdit, QSynEditTypes,
-	debugfrm, Prjtypes, devExec,
-	NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
-	ProfileAnalysisFm, FilePropertiesFm, AddToDoFm, ViewToDoFm,
-	ImportMSVCFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
-	WindowListFrm, ParamsFrm, WebUpdate, ProcessListFrm, ModifyVarFrm;
+  Xlib, IniFiles, QClipbrd, MultiLangSupport, version,
+  devcfg, datamod, NewProjectFrm, AboutFrm, PrintFrm,
+  CompOptionsFrm, EditorOptfrm, Incrementalfrm, Search_Center, Envirofrm,
+  QSynEdit, QSynEditTypes,
+  debugfrm, Prjtypes, devExec,
+  NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
+  ProfileAnalysisFm, FilePropertiesFm, AddToDoFm, ViewToDoFm,
+  ImportMSVCFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
+  WindowListFrm, ParamsFrm, WebUpdate, ProcessListFrm, ModifyVarFrm;
 {$ENDIF}
 
 {$R *.dfm}
@@ -964,13 +965,10 @@ begin
 			tbedit.Images          := CurrentTheme.MenuImages;
 			tbSearch.Images        := CurrentTheme.MenuImages;
 			tbSpecials.Images      := CurrentTheme.SpecialImages;
-			HelpMenu.SubMenuImages := CurrentTheme.HelpImages;
 			DebugVarsPopup.Images  := CurrentTheme.MenuImages;
 			ClassBrowser.Images    := CurrentTheme.BrowserImages;
 		end;
 	end;
-
-	fTools.BuildMenu;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1030,7 +1028,6 @@ begin
 
 	// Free non-singletons
 	devImageThemes.Free;
-	devTheme.Free;
 	fCompiler.Free;
 	fDebugger.Free;
 	devExecutor.Free;
@@ -1181,6 +1178,7 @@ begin
 	actNewProject.Caption:=				Lang[ID_ITEM_NEWPROJECT];
 	actNewTemplate.Caption:=			Lang[ID_ITEM_NEWTEMPLATE];
 	actNewRes.Caption:=					Lang[ID_ITEM_NEWRESOURCE];
+	actNewClass.Caption:=				Lang[ID_ITEM_NEWCLASS];
 
 	actOpen.Caption:=					Lang[ID_ITEM_OPEN];
 	ReOpenItem.Caption:=				Lang[ID_SUB_REOPEN];
@@ -1495,9 +1493,11 @@ begin
 
 	s := e.FileName;
 
-	with dmMain.SaveDialog do begin
+	with TSaveDialog.Create(nil) do try
+
 		Title:= Lang[ID_NV_SAVEFILE];
 		Filter:= flt;
+		Options := Options + [ofOverwritePrompt];
 
 		// select appropriate filter
 		if GetFileTyp(s) in [utcHead,utcppHead] then begin
@@ -1548,7 +1548,9 @@ begin
 			end;
 		end else
 			Result := False;
-	 end;
+	finally
+		Free;
+	end;
 end;
 
 function TMainForm.SaveFile(e : TEditor): Boolean;
@@ -2149,28 +2151,32 @@ procedure TMainForm.actNewProjectExecute(Sender: TObject);
 var
 	s: AnsiString;
 begin
-	with TNewProjectForm.Create(Self) do
-	try
+	with TNewProjectForm.Create(Self) do try
 		rbCpp.Checked := devData.DefCpp;
 		rbC.Checked := not rbCpp.Checked;
 		if ShowModal = mrOk then begin
-			if (cbDefault.Checked) then
+			if cbDefault.Checked then
 				devData.DefCpp := rbCpp.Checked;
-			if assigned(fProject) then begin
+			if Assigned(fProject) then begin
 				if fProject.Name = '' then
-					s:= fProject.FileName
+					s := fProject.FileName
 				else
-					s:= fProject.Name;
-					if MessageDlg(format(Lang[ID_MSG_CLOSECREATEPROJECT], [s]), mtConfirmation,[mbYes, mbNo], 0) = mrYes then
-						actCloseProject.Execute
-					else
-						Exit;
+					s := fProject.Name;
+
+				if MessageDlg(format(Lang[ID_MSG_CLOSECREATEPROJECT], [s]), mtConfirmation,[mbYes, mbNo], 0) = mrYes then
+					actCloseProject.Execute
+				else
+					Exit;
 			end;
+
 			s := edProjectName.Text + DEV_EXT;
-			with dmMain.SaveDialog do begin
+
+			with TSaveDialog.Create(nil) do try
 				Filter:= FLT_PROJECTS;
 				InitialDir:= devDirs.Default;
 				FileName:= s;
+				Options := Options + [ofOverwritePrompt];
+
 				if not Execute then
 					Exit;
 				s:= FileName;
@@ -2180,6 +2186,8 @@ begin
 					else
 						Exit;
 				end;
+			finally
+				Free;
 			end;
 
 			fProject:= TProject.Create(s, edProjectName.Text);
@@ -2188,6 +2196,7 @@ begin
 				MessageBox(Application.Handle, PAnsiChar(Lang[ID_ERR_TEMPLATE]), PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
 				Exit;
 			end;
+
 			fCompiler.Project:= fProject;
 			fProject.SaveProjectFile;
 
@@ -2236,29 +2245,26 @@ end;
 
 procedure TMainForm.actOpenExecute(Sender: TObject);
 var
-	idx,prj: integer;
-	flt: AnsiString;
+	I: integer;
 begin
-	prj:= -1;
-	if not BuildFilter(flt, ftOpen) then
-		if not BuildFilter(flt, [FLT_PROJECTS, FLT_HEADS, FLT_CS, FLT_CPPS, FLT_RES]) then
-			flt:= FLT_ALLFILES;
+	with TOpenDialog.Create(Self) do try
 
-	with dmMain.OpenDialog do begin
-		Filter:= flt;
+		Filter:= FLT_ALLFILES;
 		Title:= Lang[ID_NV_OPENFILE];
+
 		if Execute and (Files.Count > 0) then begin
-			for idx:= 0 to pred(Files.Count) do
-				if CompareText(ExtractFileExt(Files[idx]), DEV_EXT) = 0 then begin
-					prj:= idx;
-					break;
+			for I := 0 to Files.Count - 1 do
+				if GetFileTyp(Files[I]) = utPrj then begin
+					OpenProject(Files[I]); // open only the first found project
+					Exit;
 				end;
-			if prj = -1 then // not found
-				for idx:= 0 to pred(Files.Count) do
-					OpenFile(Files[idx]) // open all files
-			else
-				OpenProject(Files[prj]); // else open found project
+
+			// Didn't find a project? Open the whole list
+			for I := 0 to Files.Count - 1 do
+				OpenFile(Files[I]); // open all files
 		end;
+	finally
+		Free;
 	end;
 end;
 
@@ -2366,7 +2372,7 @@ var
 begin
 	e:= GetEditor;
 	if assigned(e) then
-		e.Exportto(0);
+		e.ExportToHTML('');
 end;
 
 procedure TMainForm.actXRTFExecute(Sender: TObject);
@@ -2375,7 +2381,7 @@ var
 begin
 	e:= GetEditor;
 	if assigned(e) then
-		e.Exportto(1);
+		e.ExportToRTF('');
 end;
 
 procedure TMainForm.actXTexExecute(Sender: TObject);
@@ -2384,13 +2390,13 @@ var
 begin
 	e:= GetEditor;
 	if assigned(e) then
-		e.Exportto(2);
+		e.ExportToTEX('');
 end;
 
 procedure TMainForm.actXProjectExecute(Sender: TObject);
 begin
 	if assigned(fProject) then
-		fProject.Exportto(true);
+		fProject.ExportAll;
 end;
 
 procedure TMainForm.actPrintExecute(Sender: TObject);
@@ -2398,34 +2404,45 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then
-		with TPrintForm.Create(Self) do begin
-			if ShowModal = mrOk then begin
-				with dmMain.SynEditPrint do begin
-					SynEdit:= e.Text;
-					Highlighter:= e.Text.Highlighter;
-					Colors:= cbColors.Checked;
-					Highlight:= cbHighlight.Checked;
-					Wrap:= cbWordWrap.Checked;
-					LineNumbers:= not rbNoLN.checked;
-					LineNumbersInMargin:= rbLNMargin.Checked;
-					Copies:= seCopies.Value;
-					SelectedOnly:= cbSelection.Checked;
-					Print;
-				end;
-				devData.PrintColors := cbColors.Checked;
-				devData.PrintHighlight := cbHighlight.Checked;
-				devData.PrintWordWrap := cbWordWrap.Checked;
-				devData.PrintLineNumbers := rbLN.Checked;
-				devData.PrintLineNumbersMargins := rbLNMargin.Checked;
+	if not assigned(e) then Exit; // Action checks this...
+
+	with TPrintForm.Create(Self) do try
+		if ShowModal = mrOk then begin
+
+			with TSynEditPrint.Create(Self) do try
+				SynEdit:= e.Text;
+				Highlighter:= e.Text.Highlighter;
+				Colors:= cbColors.Checked;
+				Highlight:= cbHighlight.Checked;
+				Wrap:= cbWordWrap.Checked;
+				LineNumbers:= not rbNoLN.checked;
+				LineNumbersInMargin:= rbLNMargin.Checked;
+				Copies:= seCopies.Value;
+				SelectedOnly:= cbSelection.Checked;
+				Print;
+			finally
+				Free;
 			end;
+
+			devData.PrintColors := cbColors.Checked;
+			devData.PrintHighlight := cbHighlight.Checked;
+			devData.PrintWordWrap := cbWordWrap.Checked;
+			devData.PrintLineNumbers := rbLN.Checked;
+			devData.PrintLineNumbersMargins := rbLNMargin.Checked;
 		end;
+	finally
+		Close;
+	end;
 end;
 
 procedure TMainForm.actPrintSUExecute(Sender: TObject);
+var
+	PrinterSetupDialog : TPrinterSetupDialog;
 begin
 	try
-		dmMain.PrinterSetupDialog.Execute;
+		PrinterSetupDialog := TPrinterSetupDialog.Create(Self);
+		PrinterSetupDialog.Execute;
+		// frees itself on close
 	except
 		MessageDlg(Lang[ID_ENV_PRINTERFAIL], mtError, [mbOK], 0);
 	end;
@@ -2602,13 +2619,12 @@ end;
 
 procedure TMainForm.actCompOptionsExecute(Sender: TObject);
 begin
-	with TCompOptForm.Create(Self) do
-		try
-			ShowModal;
+	with TCompOptForm.Create(Self) do try
+		if ShowModal = mrOk then
 			CheckForDLLProfiling;
-		finally
-			Close;
-		end;
+	finally
+		Close;
+	end;
 end;
 
 procedure TMainForm.actEditorOptionsExecute(Sender: TObject);
@@ -2616,38 +2632,37 @@ var
 	I : integer;
 	e : TEditor;
 begin
-	with TEditorOptForm.Create(Self) do
-		try
-			if ShowModal = mrOk then begin
-				dmMain.UpdateHighlighter;
-				for I := 0 to PageControl.PageCount - 1 do begin
-					e := TEditor(PageControl.Pages[I].Tag);
-					devEditor.AssignEditor(e.Text,e.FileName);
-					e.InitCompletion;
-				end;
-
-				// Cache options have changed...
-				if chkCCCache.Tag = 1 then begin
-					CppParser.Reset(true);
-				end;
-
-				InitClassBrowser(chkCCCache.Tag = 1);
-
-				// Cache options have changed, do a rescan
-				if chkCCCache.Tag = 1 then begin
-					ClassBrowser.Clear;
-					ScanActiveProject;
-				end;
-
-				// if class-browsing is disabled, clear the class-browser
-				// if there is no active editor, clear the class-browser
-				e := GetEditor;
-				if not ClassBrowser.Enabled or (not Assigned(e) and (ClassBrowser.ShowFilter = sfCurrent)) then
-					ClassBrowser.Clear;
+	with TEditorOptForm.Create(Self) do try
+		if ShowModal = mrOk then begin
+			dmMain.UpdateHighlighter;
+			for I := 0 to PageControl.PageCount - 1 do begin
+				e := TEditor(PageControl.Pages[I].Tag);
+				devEditor.AssignEditor(e.Text,e.FileName);
+				e.InitCompletion;
 			end;
-		finally
-			Free;
+
+			// Cache options have changed...
+			if chkCCCache.Tag = 1 then begin
+				CppParser.Reset(true);
+			end;
+
+			InitClassBrowser(chkCCCache.Tag = 1);
+
+			// Cache options have changed, do a rescan
+			if chkCCCache.Tag = 1 then begin
+				ClassBrowser.Clear;
+				ScanActiveProject;
+			end;
+
+			// if class-browsing is disabled, clear the class-browser
+			// if there is no active editor, clear the class-browser
+			e := GetEditor;
+			if not ClassBrowser.Enabled or (not Assigned(e) and (ClassBrowser.ShowFilter = sfCurrent)) then
+				ClassBrowser.Clear;
 		end;
+	finally
+		Close;
+	end;
 end;
 
 procedure TMainForm.actConfigToolsExecute(Sender: TObject);
@@ -2792,7 +2807,7 @@ begin
 
 	if not BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]) then BuildFilter(flt, ftAll);
 
-	with dmMain.OpenDialog do begin
+	with TOpenDialog.Create(Self) do try
 		Title:= Lang[ID_NV_OPENADD];
 		Filter:= flt;
 		if Execute then begin
@@ -2809,6 +2824,8 @@ begin
 			fProject.RebuildNodes;
 			CppParser.ParseList;
 		end;
+	finally
+		Free;
 	end;
 end;
 
@@ -2852,7 +2869,7 @@ begin
 
 		// Create it when needed!
 		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Application);
+			frmFind := TfrmFind.Create(Self);
 
 		s := e.Text.SelText;
 		if s = '' then
@@ -2872,9 +2889,9 @@ begin
 	e := GetEditor;
 	if Assigned(e) then begin
 
-		// Create it when needed!
+		// Create it only when needed!
 		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Application);
+			frmFind := TfrmFind.Create(Self);
 
 		s := e.Text.SelText;
 		if s = '' then
@@ -2896,7 +2913,7 @@ begin
 
 		// Create it when needed!
 		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Application);
+			frmFind := TfrmFind.Create(Self);
 
 		s := e.Text.SelText;
 		if s = '' then
@@ -2918,7 +2935,7 @@ begin
 
 		// Create it when needed!
 		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Application);
+			frmFind := TfrmFind.Create(Self);
 
 		s := e.Text.SelText;
 		if s = '' then
@@ -3111,7 +3128,7 @@ begin
 				devCompiler.SetOption(optS,idxS,'0');
 
 			if not Assigned(fProject) then
-				devCompiler.SaveSet(devCompiler.CurrentIndex);
+				devCompiler.SaveSet(devCompiler.CurrentSet);
 
 			actRebuildExecute(nil);
 			Exit;
@@ -3173,19 +3190,18 @@ begin
 
 	dirs := TStringList.Create;
 
-	// hack fix due to:
-	// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
-	ExtractStrings([';'],[],PChar(devCompiler.LibDir),dirs);
+	// Add library folders
+	StrtoList(devCompiler.LibDir,dirs,';');
 	for I := 0 to dirs.Count - 1 do
 		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
 
 	// Add include folders
-	ExtractStrings([';'],[],PChar(devCompiler.CDir),dirs);
+	StrtoList(devCompiler.CDir,dirs,';');
 	for I := 0 to dirs.Count - 1 do
 		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
 
 	// Add more include folders, duplicates will be added/moved to front of list
-	ExtractStrings([';'],[],PChar(devCompiler.CppDir),dirs);
+	StrtoList(devCompiler.CppDir,dirs,';');
 	for I := 0 to dirs.Count - 1 do
 		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
 
@@ -3253,7 +3269,7 @@ end;
 
 procedure TMainForm.actCompileUpdate(Sender: TObject);
 begin
-	TCustomAction(Sender).Enabled := (assigned(fProject) or (PageControl.PageCount > 0)) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling and (devCompiler.Sets.Count > 0);
+	TCustomAction(Sender).Enabled := (assigned(fProject) or (PageControl.PageCount > 0)) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling and (devCompiler.CurrentSet >= 0) and (devCompiler.CurrentSet < devCompiler.Sets.Count);
 end;
 
 procedure TMainForm.actUpdatePageProject(Sender: TObject);
@@ -3455,81 +3471,79 @@ end;
 procedure TMainForm.actMsgSaveAllExecute(Sender: TObject);
 var
 	i:integer;
-	temp,temp2:AnsiString;
+	fulloutput,curline:AnsiString;
 	Stream: TFileStream;
-	savedialog : TSaveDialog;
 	e : TEditor;
 begin
-	temp := '';
-	savedialog := TSaveDialog.Create(self);
-	try
+	fulloutput := '';
+	with TSaveDialog.Create(self) do try
 		case MessageControl.ActivePageIndex of
 			0: begin
-				savedialog.FileName:= 'Formatted Compiler Output';
+				FileName:= 'Formatted Compiler Output';
 				for i := 0 to CompilerOutput.Items.Count - 1 do begin
-					temp2 := CompilerOutput.Items[i].Caption + #10 + CompilerOutput.Items[i].SubItems.Text;
-					temp2 := ReplaceFirstStr(temp2,#10,#9);
-					temp2 := ReplaceFirstStr(temp2,#13#10,#9);
-					temp2 := ReplaceFirstStr(temp2,#13#10,#9);
-					temp := temp + temp2;
+					curline := CompilerOutput.Items[i].Caption + #10 + CompilerOutput.Items[i].SubItems.Text;
+					curline := ReplaceFirstStr(curline,#10,#9);
+					curline := ReplaceFirstStr(curline,#13#10,#9);
+					curline := ReplaceFirstStr(curline,#13#10,#9);
+					fulloutput := fulloutput + curline;
 				end;
 			end;
 			1: begin
-				savedialog.FileName:= 'Resource Error Log';
+				FileName:= 'Resource Error Log';
 				for i := 0 to ResourceOutput.Items.Count - 1 do begin
-					temp := temp + ResourceOutput.Items[I];
+					fulloutput := fulloutput + ResourceOutput.Items[I];
 				end;
 			end;
 			2: begin
-				savedialog.FileName:= 'Raw Build Log';
+				FileName:= 'Raw Build Log';
 				if Length(LogOutput.Text) > 0 then
-					temp := LogOutput.Text;
+					fulloutput := LogOutput.Text;
 			end;
 			3: begin
-				savedialog.FileName:= 'Raw GDB Output';
+				FileName:= 'Raw GDB Output';
 				if Length(DebugOutput.Text) > 0 then
-					temp := DebugOutput.Text;
+					fulloutput := DebugOutput.Text;
 			end;
 			4: begin
-				savedialog.FileName:= 'Find Results';
+				FileName:= 'Find Results';
 				for i:=0 to pred(FindOutput.Items.Count) do begin
-					temp2 := FindOutput.Items[i].Caption + #10 + FindOutput.Items[i].SubItems.Text;
-					temp2 := ReplaceFirstStr(temp2,#10,#9);
-					temp2 := ReplaceFirstStr(temp2,#13#10,#9);
-					temp2 := ReplaceFirstStr(temp2,#13#10,#9);
-					temp := temp + temp2;
+					curline := FindOutput.Items[i].Caption + #10 + FindOutput.Items[i].SubItems.Text;
+					curline := ReplaceFirstStr(curline,#10,#9);
+					curline := ReplaceFirstStr(curline,#13#10,#9);
+					curline := ReplaceFirstStr(curline,#13#10,#9);
+					fulloutput := fulloutput + curline;
 				end;
 			end;
 		end;
 
-		if Length(temp) > 0 then begin
-			savedialog.Title:= Lang[ID_NV_SAVEFILE];
-			savedialog.Filter:= 'Text file|*.txt';
-			savedialog.DefaultExt := 'txt';
-			savedialog.FilterIndex:=1;
-			saveDialog.Options := saveDialog.Options + [ofOverwritePrompt];
+		if Length(fulloutput) > 0 then begin
+			Title:= Lang[ID_NV_SAVEFILE];
+			Filter:= 'Text file|*.txt';
+			DefaultExt := 'txt';
+			FilterIndex := 1;
+			Options := Options + [ofOverwritePrompt];
 
 			if Assigned(fProject) then begin
-				savedialog.InitialDir:=fProject.Directory;
+				InitialDir:=fProject.Directory;
 			end else begin
 				e:=GetEditor;
 				if Assigned(e) then
-					savedialog.InitialDir:=ExtractFilePath(e.FileName)
+					InitialDir:=ExtractFilePath(e.FileName)
 				else
-					saveDialog.InitialDir:='C:\';
+					InitialDir:='C:\';
 			end;
 
-			if savedialog.Execute then begin
-				Stream := TFileStream.Create(savedialog.FileName, fmCreate);
+			if Execute then begin
+				Stream := TFileStream.Create(FileName, fmCreate);
 				try
-					Stream.Write(temp[1], Length(temp));
+					Stream.Write(fulloutput[1], Length(fulloutput));
 				finally
 					Stream.Free;
 				end;
 			end;
 		end;
 	finally
-		savedialog.Free;
+		Free;
 	end;
 end;
 
@@ -3893,14 +3907,15 @@ begin
 
 	// Add the include dirs to the parser
 	sl := TStringList.Create;
-	ExtractStrings([';'], [' '], PAnsiChar(devCompiler.CDir), sl);
+
+	StrToList(devCompiler.CDir,sl,';');
 	for I := 0 to sl.Count - 1 do
 		CppParser.AddIncludePath(sl[I]);
 
-	sl.Clear;
-	ExtractStrings([';'], [' '], PAnsiChar(devCompiler.CppDir), sl);
+	StrToList(devCompiler.CppDir,sl,';');
 	for I := 0 to sl.Count - 1 do
 		CppParser.AddIncludePath(sl[I]);
+
 	sl.Free;
 
 	// This takes up about 99% of our time
@@ -4502,7 +4517,7 @@ begin
 				devCompiler.SetOption(optS,idxS,'0');
 
 			if not Assigned(fProject) then
-				devCompiler.SaveSet(devCompiler.CurrentIndex);
+				devCompiler.SaveSet(devCompiler.CurrentSet);
 
 			actRebuildExecute(nil);
 			Exit;
@@ -5212,18 +5227,28 @@ end;
 
 procedure TMainForm.ListItemClick(Sender: TObject);
 var
-	w : TWindowListForm;
-	i : integer;
+	I : integer;
+	e : TEditor;
+	item : TListItem;
 begin
-	w := TWindowListForm.Create(self);
-	try
-		for i := 0 to PageControl.PageCount - 1 do
-			w.UnitList.Items.Add(PageControl.Pages[i].Caption);
-		if (w.ShowModal = mrOk) and (w.UnitList.ItemIndex > -1) then begin
-			PageControl.ActivePageIndex := w.UnitList.ItemIndex;
+	with TWindowListForm.Create(self) do try
+
+		// Fill here instead of in Window itself?
+		UnitList.Items.BeginUpdate;
+		for I := 0 to PageControl.PageCount - 1 do begin
+
+			e := GetEditor(i);
+
+			item := UnitList.Items.Add;
+			item.Caption := ExtractFileName(e.FileName);
+			item.SubItems.Add(e.FileName);
 		end;
+		UnitList.Items.EndUpdate;
+
+		if (ShowModal = mrOk) and (UnitList.ItemIndex <> -1) then
+			PageControl.ActivePageIndex := UnitList.ItemIndex;
 	finally
-		w.Free;
+		Close;
 	end;
 end;
 { begin XXXKF }
@@ -5415,13 +5440,19 @@ procedure TMainForm.actSaveProjectAsExecute(Sender: TObject);
 begin
 	if not Assigned(fProject) then
 		Exit;
-	with dmMain.SaveDialog do begin
+
+	with TSaveDialog.Create(nil) do try
+
 		Filter:= FLT_PROJECTS;
+		Options := Options + [ofOverwritePrompt];
+
 		if Execute then begin
 			fProject.FileName:=FileName;
 			fProject.Save;
 			UpdateAppTitle;
 		end;
+	finally
+		Free;
 	end;
 end;
 
@@ -5480,10 +5511,12 @@ begin
 	item:=TMenuItem(Sender);
 	if item = mnuOpenWith then begin
 		idx:=-2;
-		with dmMain.OpenDialog do begin
+		with TOpenDialog.Create(Self) do try
 			Filter:=FLT_ALLFILES;
 			if Execute then
 				idx:=devExternalPrograms.AddProgram(ExtractFileExt(fProject.Units[idx2].FileName), Filename);
+		finally
+			Free;
 		end;
 	end
 	else
@@ -6026,7 +6059,7 @@ begin
 	DragAcceptFiles(Self.Handle, TRUE);
 	dmMain:= TdmMain.Create(Self);
 
-	// Set paths
+	// Backup PATH variable
 	devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 
 	// Set left panel to previous state
@@ -6057,32 +6090,25 @@ begin
 	MessageControl.Height:=devData.OutputHeight;
 	fPreviousHeight:= MessageControl.Height;
 
+	// Create icon themes
+	devImageThemes := TDevImageThemeFactory.Create;
+	devImageThemes.LoadFromDirectory(devDirs.Themes);
+
 	// Custom tools
 	fTools:= TToolController.Create;
 	with fTools do begin
 		Menu:= ToolsMenu;
 		Offset:= ToolsMenu.Indexof(PackageManagerItem);
 		ToolClick:= ToolItemClick;
-	//	BuildMenu; // Done by themes
+		BuildMenu;
 	end;
-
-	// Create custom theme loader
-	devTheme := TdevTheme.Create;
-
-	// Create icon themes
-	devImageThemes := TDevImageThemeFactory.Create;
-	devImageThemes.LoadFromDirectory(devDirs.Themes);
 
 	// Set languages and other first time stuff
 	if devData.First or (devData.Language = '') then begin
-		Lang.SelectLanguage;
-		if devData.ThemeChange then
-			LoadTheme;
-		devData.FileDate := FileAge(Application.ExeName);
+		Lang.SelectLanguage; // Open LangFrm, does much more than changing language
 		devData.First:= FALSE;
-	end else begin
+	end else
 		Lang.Open(devData.Language);
-	end;
 
 	// Load bookmarks, captions and hints
 	LoadText;
@@ -6104,22 +6130,6 @@ begin
 	ToolSearchItem.Checked:= devData.ToolbarSearch;
 	ToolClassesItem.Checked:= devData.ToolbarClasses;
 	ToolbarClick(nil);
-
-	// Toolbar positions
-	tbMain.Left:= devData.ToolbarMainX;
-	tbMain.Top:= devData.ToolbarMainY;
-	tbEdit.Left:= devData.ToolbarEditX;
-	tbEdit.Top:= devData.ToolbarEditY;
-	tbCompile.Left:= devData.ToolbarCompileX;
-	tbCompile.Top:= devData.ToolbarCompileY;
-	tbProject.Left:= devData.ToolbarProjectX;
-	tbProject.Top:= devData.ToolbarProjectY;
-	tbSpecials.Left:= devData.ToolbarSpecialsX;
-	tbSpecials.Top:= devData.ToolbarSpecialsY;
-	tbSearch.Left:= devData.ToolbarSearchX;
-	tbSearch.Top:= devData.ToolbarSearchY;
-	tbClasses.Left:= devData.ToolbarClassesX;
-	tbClasses.Top:= devData.ToolbarClassesY;
 
 	// PageControl settings
 	if devData.MsgTabs = 0 then
@@ -6235,28 +6245,49 @@ begin
 		MessageControl.ActivePageIndex:= 0;
 		OpenCloseMessageSheet(devData.ShowOutput);
 
+		// Toolbar positions, needs to be done here, because on Create, the width of the TControlBar isn't yet set
+		tbMain.Left:= devData.ToolbarMainX;
+		tbMain.Top:= devData.ToolbarMainY;
+		tbEdit.Left:= devData.ToolbarEditX;
+		tbEdit.Top:= devData.ToolbarEditY;
+		tbCompile.Left:= devData.ToolbarCompileX;
+		tbCompile.Top:= devData.ToolbarCompileY;
+		tbProject.Left:= devData.ToolbarProjectX;
+		tbProject.Top:= devData.ToolbarProjectY;
+		tbSpecials.Left:= devData.ToolbarSpecialsX;
+		tbSpecials.Top:= devData.ToolbarSpecialsY;
+		tbSearch.Left:= devData.ToolbarSearchX;
+		tbSearch.Top:= devData.ToolbarSearchY;
+		tbClasses.Left:= devData.ToolbarClassesX;
+		tbClasses.Top:= devData.ToolbarClassesY;
+
 		// Open files passed to us (HAS to be done at FormShow)
 		i := 1;
 		fShowTips := true;
 		while I <= ParamCount do begin
 
-				// Skip the config stuff
-			if (ParamStr(i) = '-c') then // -c
+			// Skip the configuration redirect stuff
+			if (ParamStr(i) = '-c') then
 				i := i + 2;
 
 			// Open the files passed to Dev-C++
 			if FileExists(ParamStr(i)) then begin
 				if GetFileTyp(ParamStr(i)) = utPrj then begin
+					fShowTips := false; // don't show tips when opening files
 					OpenProject(ParamStr(i));
 					break; // only open 1 project
-				end else
+				end else begin
+					fShowTips := false; // don't show tips when opening files
 					OpenFile(ParamStr(i));
-				fShowTips := false;
+				end;
 			end;
 			inc(i);
 		end;
 
+		// Update after opening files
 		UpdateAppTitle;
+
+		// Set default dir for open dialogs?
 	end;
 end;
 

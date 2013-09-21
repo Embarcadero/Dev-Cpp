@@ -766,15 +766,16 @@ var
 	I : Integer;
 	nBraces : Integer;
 	S : AnsiString;
-	Idx : Integer;
+	CaretPos : Integer;
 	nCommas : Integer;
 	token : AnsiString;
 	HLAttr : TSynHighlighterAttributes;
+	FuncStartXY : TBufferCoord;
 begin
 
 	// get the current position in the collapsed text
-	Idx := FEditor.RowColToCharIndex(FEditor.CaretXY,true);
-	CurPos := Idx;
+	CaretPos := FEditor.RowColToCharIndex(FEditor.CaretXY,true);
+	CurPos := CaretPos;
 
 	// get a pointer to the collapsed text
 	P := PAnsiChar(FEditor.Lines.Text);
@@ -875,10 +876,11 @@ begin
 		Dec(CurPos);
 
 	// Get the name of the function we're about to show
-	S := FEditor.GetWordAtRowCol(FEditor.CharIndexToRowCol(CurPos-1));
+	FuncStartXY := FEditor.CharIndexToRowCol(CurPos-1,true);
+	S := FEditor.GetWordAtRowCol(FuncStartXY);
 
 	// Don't bother scanning the database when there's no identifier to scan for
-	FEditor.GetHighlighterAttriAtRowCol(FEditor.CharIndexToRowCol(CurPos-1),token,HLAttr);
+	FEditor.GetHighlighterAttriAtRowCol(FuncStartXY,token,HLAttr);
 	if not (HLAttr = FEditor.Highlighter.IdentifierAttribute) then begin
 		ReleaseHandle;
 		Exit;
@@ -928,7 +930,7 @@ begin
 	FLookupEditor.Highlighter := FEditor.Highlighter;
 
 	// get the index of the current argument (where the cursor is)
-	FCurParamIndex := GetCommaIndex(P, FFunctionStart + 1, Idx - 1);
+	FCurParamIndex := GetCommaIndex(P, FFunctionStart + 1, CaretPos - 1);
 	RethinkCoordAndActivate;
 end;
 

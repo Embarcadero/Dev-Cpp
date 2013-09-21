@@ -787,7 +787,7 @@ begin
 	if fIndex < fTokenizer.Tokens.Count - 1 then
 		for I := 0 to 1 do // check the current and the next token
 			if CheckForKeyword or
-				(PToken(fTokenizer.Tokens[fIndex + I])^.Text[1] in [',', ';', ':', '{', '}', '!', '/', '+', '-']) or
+				(PToken(fTokenizer.Tokens[fIndex + I])^.Text[1] in [',', ';', ':', '{', '}', '!', '/', '+', '-']) or // { can be used for identifier lists
 				(PToken(fTokenizer.Tokens[fIndex + I])^.Text[Length(PToken(fTokenizer.Tokens[fIndex + I])^.Text)] = '.') or
 				((Length(PToken(fTokenizer.Tokens[fIndex + I])^.Text) > 1) and
 				(PToken(fTokenizer.Tokens[fIndex + I])^.Text[Length(PToken(fTokenizer.Tokens[fIndex + I])^.Text) - 1] = '-') and
@@ -2290,7 +2290,6 @@ begin
 		fNextID := fStatementList.Count;
 		fBaseIndex := fStatementList.Count;
 		fScannedBaseIndex := fCacheContents.Count;
-		PostProcessInheritance;
 	end;
 end;
 

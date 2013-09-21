@@ -90,7 +90,7 @@ type
 implementation
 
 uses 
-  MultiLangSupport, datamod, DevThemes, devcfg, utils, main, version;
+  MultiLangSupport, datamod, devcfg, utils, main, version, ImageTheme;
 
 {$R *.dfm}
 
@@ -279,7 +279,7 @@ var
 	I: integer;
 	s: AnsiString;
 begin
-	with dmMain.OpenDialog do begin
+	with TOpenDialog.Create(self) do try
 		Filter:= FLT_HEADS;
 		Title:= Lang[ID_NV_OPENFILE];
 		InitialDir := devCompiler.CppDir;
@@ -289,19 +289,14 @@ begin
 				AltFileList.Items.Add(s);
 			end;
 		end;
+	finally
+		Free;
 	end;
 end;
 
 procedure TLangForm.ButtonRemoveClick(Sender: TObject);
-//var
-//	I : integer;
 begin
 	AltFileList.DeleteSelected;
-//	for I:= 0 to AltFileList.Count-1 do begin
-//		if AltFileList.Selected[I] then begin
-//			AltFileList.Items.Delete(i);
-//		end;
-//	end;
 end;
 
 procedure TLangForm.ButtonAddFolderClick(Sender: TObject);
@@ -323,8 +318,6 @@ begin
 end;
 
 procedure TLangForm.FormShow(Sender: TObject);
-var
-	tmp : TStrings;
 begin
 	// Set interface font
 	Font.Name := devData.InterfaceFont;
@@ -332,10 +325,8 @@ begin
 
 	HasProgressStarted := false;
 
-	// Themes
-	tmp := devTheme.ThemeList;
-	ThemeBox.Items.AddStrings(tmp);
-	tmp.Free;
+	// Obtain a list of themes
+	devImageThemes.GetThemeTitles(ThemeBox.Items);
 
 	ThemeBox.ItemIndex := 0;
 

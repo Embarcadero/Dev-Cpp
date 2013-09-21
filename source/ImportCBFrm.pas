@@ -128,7 +128,7 @@ end;
 
 procedure TImportCBForm.ImportFile(Filename: AnsiString);
 begin
-	SetPath(ExtractFilePath(FileName),false);
+	SetPath(ExtractFilePath(FileName));
 	fSL.LoadFromFile(Filename);
 end;
 

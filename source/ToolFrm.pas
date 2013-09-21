@@ -401,29 +401,28 @@ end;
 
 procedure TToolForm.btnAddClick(Sender: TObject);
 var
- NewItem: PToolItem;
+	NewItem: PToolItem;
 begin
-  with TToolEditForm.Create(Self) do
-   try
-    new(NewItem);
-    edTitle.Text := '';
-    edProgram.Text := '';
-    edWorkDir.Text := '';
-    edParams.Text := '';
-    if ShowModal = mrOK then
-     begin
-       NewItem.Title:= edTitle.Text;
-       NewItem.Exec:= edProgram.Text;
-       NewItem.WorkDir:= edWorkDir.Text;
-       NewItem.Params:= edParams.Text;
+	with TToolEditForm.Create(Self) do try
+		if ShowModal = mrOK then begin
+			new(NewItem);
+			edTitle.Text := '';
+			edProgram.Text := '';
+			edWorkDir.Text := '';
+			edParams.Text := '';
+	
+			NewItem.Title:= edTitle.Text;
+			NewItem.Exec:= edProgram.Text;
+			NewItem.WorkDir:= edWorkDir.Text;
+			NewItem.Params:= edParams.Text;
 
-       fController.ToolList.AddItem(NewItem);
-       UpdateList;
-     end;
-   finally
-    Free;
-    UpdateButtons;
-   end;
+			fController.ToolList.AddItem(NewItem);
+			UpdateList;
+		end;
+	finally
+		Free;
+		UpdateButtons;
+	end;
 end;
 
 procedure TToolForm.btnDeleteClick(Sender: TObject);

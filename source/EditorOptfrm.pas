@@ -1563,16 +1563,24 @@ begin
     sl.Free;
   end;
 
-	with dmMain do begin
-		BuildFilter(flt, [FLT_HEADS]);
-		OpenDialog.Filter:=flt;
+	with TOpenDialog.Create(Self) do try
 
-		if OpenDialog.Execute then begin
+		BuildFilter(flt, [FLT_HEADS]);
+		Filter:=flt;
+
+		// Start in the include folder
+		sl := TStringList.Create;
+		StrToList(devCompiler.CppDir,sl,';');
+		if sl.count > 0 then
+			InitialDir := sl[0];
+		sl.Free;
+
+		if Execute then begin
 			Screen.Cursor:=crHourglass;
 			Application.ProcessMessages;
 
-			for I:=0 to OpenDialog.Files.Count-1 do
-				CppParser.AddFileToScan(OpenDialog.Files[I]);
+			for I:=0 to Files.Count-1 do
+				CppParser.AddFileToScan(Files[I]);
 			CppParser.ParseList;
 			CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
 
@@ -1582,9 +1590,11 @@ begin
 				lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,'.\'));
 			lbCCC.Items.EndUpdate;
 
-			Screen.Cursor:=crDefault;
-			chkCCCache.Tag:=1; // mark modified
+			Screen.Cursor := crDefault;
+			chkCCCache.Tag := 1; // mark modified
 		end;
+	finally
+		Free;
 	end;
 end;
 

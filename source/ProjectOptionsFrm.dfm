@@ -475,11 +475,10 @@ object frmProjectOptions: TfrmProjectOptions
         inherited tabs: TTabControl
           Width = 526
           Height = 217
-          inherited vle: TValueListEditor
+          inherited vle: TCompOptionsList
             Width = 518
             Height = 207
             DefaultColWidth = 215
-            DisplayOptions = [doKeyColFixed]
             ParentShowHint = False
             ColWidths = (
               215
@@ -814,7 +813,7 @@ object frmProjectOptions: TfrmProjectOptions
     end
     object tabOutputDir: TTabSheet
       Caption = 'Build Options'
-      object Label1: TLabel
+      object lblOverrideOutput: TLabel
         Left = 8
         Top = 234
         Width = 136

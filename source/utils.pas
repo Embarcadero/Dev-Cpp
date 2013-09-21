@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
- Windows, Classes, Sysutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
+ Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
  Menus, Registry, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -59,8 +59,8 @@ type
 	function GetShortName(const FileName: AnsiString): AnsiString;
 
 	function CommaStrToStr(s : AnsiString; formatstr : AnsiString) : AnsiString;
-	function IncludeQuoteIfSpaces(s : AnsiString) : AnsiString;
-	function IncludeQuoteIfNeeded(s : AnsiString) : AnsiString;
+	function IncludeQuoteIfSpaces(const s : AnsiString) : AnsiString;
+	function IncludeQuoteIfNeeded(const s : AnsiString) : AnsiString;
 
 	procedure MsgErr(const text:AnsiString;const caption:AnsiString = 'Error');
 	procedure MsgBox(const text:AnsiString;const caption:AnsiString = 'Message'); overload;
@@ -83,8 +83,8 @@ type
 	procedure StrtoPoint(var pt: TPoint;const value: AnsiString);
 	function PointtoStr(pt: TPoint): AnsiString;
 
-	function ListtoStr(List: TStrings): AnsiString;
-	procedure StrtoList(s: AnsiString;List: TStrings; delimiter: char=';');
+	function ListToStr(List: TStrings): AnsiString;
+	procedure StrToList(const s: AnsiString;List: TStrings; delimiter: char=';');
 
 	function GetFileTyp(const FileName: AnsiString): TExUnitType;
 
@@ -116,6 +116,8 @@ type
 	procedure OpenHelpFile;
 
 	function ProgramHasConsole(const path : AnsiString) : boolean;
+
+	function GetBuildTime(const path : AnsiString) : TDateTime;
 
 	function IsEmpty(editor : TSynEdit) : boolean;
 
@@ -383,6 +385,29 @@ begin
 		Result := (opt_header.Subsystem = IMAGE_SUBSYSTEM_WINDOWS_CUI);
 	end else
 		Result := false;
+
+	CloseHandle(handle);
+end;
+
+// Delphi 7 doesn't write the PE header correctly, so we can't use this to create the timestamp...
+function GetBuildTime(const path : AnsiString) : TDateTime;
+var
+	handle : Cardinal;
+	bytesread : DWORD;
+	signature : DWORD;
+	dos_header : _IMAGE_DOS_HEADER;
+	pe_header  : _IMAGE_FILE_HEADER;
+begin
+	handle := CreateFile(PAnsiChar(path),GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
+	if handle <> INVALID_HANDLE_VALUE then begin
+		ReadFile(Handle, dos_header, sizeof(dos_header), bytesread, nil);
+		SetFilePointer(Handle, dos_header._lfanew, nil, 0);
+		ReadFile(Handle, signature,  sizeof(signature),  bytesread, nil);
+		ReadFile(Handle, pe_header,  sizeof(pe_header),  bytesread, nil);
+
+		Result := UnixToDateTime(pe_header.TimeDateStamp);
+	end else
+		Result := 0;
 
 	CloseHandle(handle);
 end;
@@ -810,37 +835,25 @@ begin
 		result := format(formatstr, [result, s]);
 end;
 
-procedure StrtoList(s: AnsiString; List: TStrings; delimiter : char);
-var
-	tmp : AnsiString;
-	i   : integer;
+// hack fix due to:
+// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
+procedure StrtoList(const s : AnsiString; List: TStrings; delimiter : char);
 begin
-	List.BeginUpdate;
-	try
-		List.Clear;
-		while pos(delimiter, s) > 0 do begin
-			i := pos(delimiter, s);
-			tmp := Copy(s, 1, i - 1);
-			Delete(s, 1, i);
-			List.Add(tmp);
-		end;
-		if s <> '' then
-			List.Add(s);
-	finally
-		List.EndUpdate;
-	end;
+	List.Clear;
+	ExtractStrings([delimiter],[],PChar(S),List);
 end;
 
 function ListtoStr(List: TStrings): AnsiString;
-var i : integer;
+var
+	i : integer;
 begin
-  result := '';
-  for i := 0 to List.Count - 1 do begin
-    if i = 0 then
-      result := List.Strings[0]
-    else
-      result := result + ';' + List.Strings[i];
-  end;
+	result := '';
+	for i := 0 to List.Count - 1 do begin
+		if i = 0 then
+			result := List.Strings[0]
+		else
+			result := result + ';' + List.Strings[i];
+	end;
 end;
 
 function GetFileTyp(const FileName: AnsiString): TExUnitType;
@@ -1037,7 +1050,7 @@ begin
       Result := 128;
 end;
 
-function IncludeQuoteIfSpaces(s : AnsiString) : AnsiString;
+function IncludeQuoteIfSpaces(const s : AnsiString) : AnsiString;
 begin
   if pos(' ', s) > 0 then
     result := '"' + s + '"'
@@ -1045,7 +1058,7 @@ begin
     result := s;
 end;
 
-function IncludeQuoteIfNeeded(s : AnsiString) : AnsiString;
+function IncludeQuoteIfNeeded(const s : AnsiString) : AnsiString;
 begin
   if pos('"', s) = 0 then
     result := '"' + s + '"'

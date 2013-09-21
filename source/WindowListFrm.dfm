@@ -1,8 +1,8 @@
 object WindowListForm: TWindowListForm
-  Left = 462
-  Top = 283
-  Width = 354
-  Height = 317
+  Left = 549
+  Top = 446
+  Width = 616
+  Height = 438
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Window List'
   Color = clBtnFace
@@ -13,48 +13,25 @@ object WindowListForm: TWindowListForm
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
-    Left = 0
-    Top = 0
-    Width = 338
-    Height = 6
-    Align = alTop
-    AutoSize = False
-  end
-  object Label2: TLabel
-    Left = 0
-    Top = 6
-    Width = 6
-    Height = 232
-    Align = alLeft
-    AutoSize = False
-  end
-  object Label3: TLabel
-    Left = 332
-    Top = 6
-    Width = 6
-    Height = 232
-    Align = alRight
-    AutoSize = False
-  end
   object Panel: TPanel
     Left = 0
-    Top = 238
-    Width = 338
-    Height = 41
+    Top = 365
+    Width = 600
+    Height = 35
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      338
-      41)
+      600
+      35)
     object OkBtn: TBitBtn
-      Left = 150
-      Top = 10
+      Left = 412
+      Top = 4
       Width = 91
       Height = 25
       Anchors = [akRight, akBottom]
@@ -82,8 +59,8 @@ object WindowListForm: TWindowListForm
       NumGlyphs = 2
     end
     object CancelBtn: TBitBtn
-      Left = 241
-      Top = 10
+      Left = 503
+      Top = 4
       Width = 91
       Height = 25
       Anchors = [akRight, akBottom]
@@ -92,57 +69,34 @@ object WindowListForm: TWindowListForm
       Kind = bkCancel
     end
   end
-  object GroupBox: TGroupBox
-    Left = 6
-    Top = 6
-    Width = 326
-    Height = 232
-    Align = alClient
-    Caption = 'Select the window you want to edit :'
+  object UnitList: TListView
+    Left = 8
+    Top = 5
+    Width = 585
+    Height = 358
+    Align = alCustom
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    Columns = <
+      item
+        Caption = 'Name'
+        Width = -1
+        WidthType = (
+          -1)
+      end
+      item
+        Caption = 'Path'
+        Width = -1
+        WidthType = (
+          -1)
+      end>
+    ReadOnly = True
+    RowSelect = True
+    SortType = stText
     TabOrder = 1
-    object Label4: TLabel
-      Left = 2
-      Top = 15
-      Width = 322
-      Height = 3
-      Align = alTop
-      AutoSize = False
-    end
-    object Label5: TLabel
-      Left = 2
-      Top = 18
-      Width = 6
-      Height = 206
-      Align = alLeft
-      AutoSize = False
-    end
-    object Label6: TLabel
-      Left = 318
-      Top = 18
-      Width = 6
-      Height = 206
-      Align = alRight
-      AutoSize = False
-    end
-    object Label7: TLabel
-      Left = 2
-      Top = 224
-      Width = 322
-      Height = 6
-      Align = alBottom
-      AutoSize = False
-    end
-    object UnitList: TListBox
-      Left = 8
-      Top = 18
-      Width = 310
-      Height = 199
-      Align = alClient
-      IntegralHeight = True
-      ItemHeight = 13
-      TabOrder = 0
-      OnDblClick = UnitListDblClick
-      OnKeyDown = UnitListKeyDown
-    end
+    ViewStyle = vsReport
+    OnColumnClick = UnitListColumnClick
+    OnCompare = UnitListCompare
+    OnDblClick = UnitListDblClick
+    OnKeyDown = UnitListKeyDown
   end
 end

@@ -23,10 +23,9 @@ unit SynEditCodeFolding;
 interface
 
 uses
-	Graphics, Types, Classes, SysUtils;
+	Graphics, Types, Classes, SysUtils, SynEditHighlighter;
 
 type
-	TFoldRegionType = (rtChar, rtKeyWord);
 	TSynCollapsingMarkStyle = (msSquare, msEllipse);
 
 	TSynEditFoldRange = class;
@@ -40,11 +39,8 @@ type
 		fFolderBarLinesColor: TColor;
 		fCollapsingMarkStyle: TSynCollapsingMarkStyle;
 		fFoldRegions: TFoldRegions;
-		fEnabled : boolean;
-
-		procedure SetEnabled(value : boolean);
 	public
-		constructor Create(enable : boolean);
+		constructor Create;
 		destructor Destroy; override;
 
 		property CollapsedLineColor: TColor read fCollapsedLineColor write fCollapsedLineColor;
@@ -53,27 +49,30 @@ type
 		property IndentGuides: Boolean read fIndentGuides write fIndentGuides;
 		property ShowCollapsedLine: Boolean read fShowCollapsedLine write fShowCollapsedLine;
 		property FoldRegions: TFoldRegions read fFoldRegions write fFoldRegions;
-		property Enabled : Boolean read fEnabled write SetEnabled;
 	end;
 
 	TFoldRegionItem = class(TCollectionItem)
 	private
-		fType: TFoldRegionType;
 		fAddEnding: Boolean;
 		fSubFoldRegions: TFoldRegions;
 		fOpen: PChar;
 		fClose: PChar;
+		fHighlight: AnsiString;
+		fOpenLength: Integer;
+		fCloseLength: Integer;
 
 		procedure SetClose(const Value: PChar);
 		procedure SetOpen(const Value: PChar);
 	public
 		constructor Create(Collection: TCollection); override;
 		destructor Destroy; override;
-		property FoldRegionType: TFoldRegionType read fType write fType;
 		property AddEnding: Boolean read fAddEnding write fAddEnding;
 		property SubFoldRegions: TFoldRegions read fSubFoldRegions;
 		property Open: PChar read fOpen write SetOpen;
 		property Close: PChar read fClose write SetClose;
+		property OpenLength: Integer read fOpenLength;
+		property CloseLength: Integer read fCloseLength;
+		property Highlight: AnsiString read fHighlight write fHighlight;
 	end;
 
 	TFoldRegions = class(TCollection)
@@ -82,7 +81,7 @@ type
 	public
 		constructor Create(ItemClass: TCollectionItemClass);
 		destructor Destroy; override;
-		function Add(AType: TFoldRegionType; AAddEnding: boolean;AOpen, AClose: PChar): TFoldRegionItem;
+		function Add(AAddEnding: boolean;AOpen, AClose: PChar;AHighlight : AnsiString): TFoldRegionItem;
 
 		property Items[Index: Integer]: TFoldRegionItem read GetItem; default;
 	end;
@@ -98,7 +97,7 @@ type
 		constructor Create;
 		destructor Destroy; override;
 
-		function AddByParts(AAllFold: TSynEditFoldRanges; AFromLine,AIndent, ARealLevel: Integer; AFoldRegion: TFoldRegionItem;AToLine: Integer = 0): TSynEditFoldRange;
+		function AddByParts(AParent : TSynEditFoldRange;AAllFold: TSynEditFoldRanges; AFromLine,AIndent, ARealLevel: Integer; AFoldRegion: TFoldRegionItem;AToLine: Integer = 0): TSynEditFoldRange;
 		procedure AddObject(FoldRange: TSynEditFoldRange);
 
 		procedure Delete(Index: Integer);
@@ -125,6 +124,7 @@ type
 		fAllFoldRanges: TSynEditFoldRanges; // TAllFoldRanges pointer
 		fFoldRegion: TFoldRegionItem; // FoldRegion pointer
 		fHintMarkLeft: Integer;
+		fParent : TSynEditFoldRange;
 
 		// For GetUncollapsedLines
 		fFromLineBackup : integer;
@@ -162,6 +162,7 @@ type
 		property CollapsedLines: TStringList read fCollapsedLines;
 		property FoldRegion: TFoldRegionItem read fFoldRegion write fFoldRegion;
 		property HintMarkLeft: Integer read fHintMarkLeft write fHintMarkLeft;
+		property Parent: TSynEditFoldRange read fParent write fParent;
 		property Modified : Boolean read fModified write fModified;
 	end;
 
@@ -188,10 +189,11 @@ begin
 	inherited;
 end;
 
-function TSynEditFoldRanges.AddByParts(AAllFold: TSynEditFoldRanges; AFromLine,AIndent, ARealLevel: Integer; AFoldRegion: TFoldRegionItem;AToLine: Integer): TSynEditFoldRange;
+function TSynEditFoldRanges.AddByParts(AParent : TSynEditFoldRange;AAllFold: TSynEditFoldRanges; AFromLine,AIndent, ARealLevel: Integer; AFoldRegion: TFoldRegionItem;AToLine: Integer): TSynEditFoldRange;
 begin
 	Result := TSynEditFoldRange.Create;
 	with Result do begin
+		fParent := AParent;
 		fFromLine := AFromLine;
 		fToLine := AToLine;
 		fIndent := AIndent;
@@ -381,14 +383,14 @@ end;
 
 { TFoldRegions }
 
-function TFoldRegions.Add(AType: TFoldRegionType; AAddEnding: boolean;AOpen, AClose: PChar): TFoldRegionItem;
+function TFoldRegions.Add(AAddEnding: boolean;AOpen, AClose: PChar;AHighlight : AnsiString): TFoldRegionItem;
 begin
 	Result := TFoldRegionItem(inherited Add);
 	with Result do begin
-		fType := AType;
 		fAddEnding := AAddEnding;
 		Open := AOPen;
 		Close := AClose;
+		fHighlight := AHighlight;
 	end;
 end;
 
@@ -412,7 +414,8 @@ begin
 	if fClose <> nil then
 		FreeMem(fClose);
 
-	GetMem(fClose, StrLen(Value) + 1);
+	fCloseLength := StrLen(Value);
+	GetMem(fClose, fCloseLength + 1);
 	StrCopy(fClose, Value);
 end;
 
@@ -421,25 +424,23 @@ begin
 	if fOpen <> nil then
 		FreeMem(fOpen);
 
-	GetMem(fOpen, StrLen(Value) + 1);
+	fOpenLength := StrLen(Value);
+	GetMem(fOpen, fOpenLength + 1);
 	StrCopy(fOpen, Value);
 end;
 
-constructor TSynCodeFolding.Create(enable : boolean);
+constructor TSynCodeFolding.Create;
 begin
 	fIndentGuides := True;
 	fShowCollapsedLine := True;
 	fCollapsedLineColor := clBlack;
 	fFolderBarLinesColor := clBlack;
 	fCollapsingMarkStyle := msSquare;
-	fEnabled := false;
 
-	if fEnabled then begin
-		fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
-		with fFoldRegions do begin
-			Add(rtChar, False, '{', '}');
-			Add(rtKeyword, False, 'BEGIN', 'END');
-		end;
+	fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
+	with fFoldRegions do begin
+		Add(True, '{', '}','Symbol');
+		Add(True, 'BEGIN','END','Identifier');
 	end;
 end;
 
@@ -448,26 +449,5 @@ begin
 	fFoldRegions.Free;
 	inherited;
 end;
-
-procedure TSynCodeFolding.SetEnabled(value : boolean);
-begin
-	if value <> fEnabled then begin
-		fEnabled := value;
-
-		// Disabling? Free fold regions
-		if not fEnabled then begin
-			fFoldRegions.Free;
-
-		// Enabling? Other way round
-		end else begin
-			fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
-			with fFoldRegions do begin
-				Add(rtChar, False, '{', '}');
-				Add(rtKeyword, False, 'BEGIN', 'END');
-			end;
-		end;
-	end;
-end;
-
 
 end.

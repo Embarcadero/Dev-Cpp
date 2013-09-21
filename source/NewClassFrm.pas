@@ -79,9 +79,6 @@ type
     { Public declarations }
   end;
 
-//var
-//  NewClassForm: TNewClassForm;
-
 implementation
 
 uses 
@@ -382,6 +379,9 @@ begin
   Label8.Caption := Lang[ID_NEWVAR_COMMENTSSTYLE];
   btnCreate.Caption := Lang[ID_NEWVAR_BTN_CREATE];
   btnCancel.Caption := Lang[ID_NEWVAR_BTN_CANCEL];
+
+	chkConstruct.Caption := Lang[ID_NEWCLASS_CONSTRUCTOR];
+	chkDestruct.Caption := Lang[ID_NEWCLASS_DESTRUCTOR];
 end;
 
 end.

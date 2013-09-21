@@ -1,6 +1,6 @@
 object CompOptForm: TCompOptForm
-  Left = 500
-  Top = 273
+  Left = 722
+  Top = 383
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -347,8 +347,7 @@ object CompOptForm: TCompOptForm
           ItemHeight = 15
           TabOrder = 0
           OnChange = cmbCompilerSetCompChange
-          Items.Strings = (
-            'MinGW GCC 4.6.1 32-bit')
+          OnEnter = cmbCompilerSetCompEnter
         end
       end
     end

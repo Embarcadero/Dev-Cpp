@@ -144,7 +144,7 @@ type
     lblLogOutput: TLabel;
     btnLogOutputDir: TSpeedButton;
     chkLogOutput: TCheckBox;
-    Label1: TLabel;
+    lblOverrideOutput: TLabel;
     OptionsTip: TLabel;
     OptionsLink: TLabel;
     chkDefCpp: TCheckBox;
@@ -342,7 +342,8 @@ end;
 procedure TfrmProjectOptions.ListClick(Sender: TObject);
 begin
 	UpdateDirButtons;
-	edDirEntry.Text:= lstDirList.Items[lstDirList.Itemindex];
+	if lstDirList.Itemindex <> -1 then
+		edDirEntry.Text:= lstDirList.Items[lstDirList.Itemindex];
 end;
 
 procedure TfrmProjectOptions.UpDownClick(Sender: TObject);
@@ -405,7 +406,7 @@ begin
 
 		// Compiler
 		CompilerOptions := devCompiler.fOptionString;
-		devCompiler.LoadSet(devCompiler.CurrentIndex);
+		devCompiler.LoadSet(devCompiler.CurrentSet);
 
 		// General
 		SupportXPThemes:=chkSupportXP.Checked;
@@ -655,9 +656,10 @@ begin
   SubTabs.Tabs.Append(Lang[ID_POPT_RESDIRS]);
 
   //output tab
-  lblExeOutput.Caption:=     Lang[ID_POPT_EXEOUT];
-  lblObjOutput.Caption:=     Lang[ID_POPT_OBJOUT];
-  chkOverrideOutput.Caption:=Lang[ID_POPT_OVERRIDEOUT];
+  lblExeOutput.Caption:=      Lang[ID_POPT_EXEOUT];
+  lblObjOutput.Caption:=      Lang[ID_POPT_OBJOUT];
+  lblLogOutput.Caption:=      Lang[ID_POPT_LOGAUTOSAVE];
+  lblOverrideOutput.Caption:= Lang[ID_POPT_OVERRIDEOUT];
 
   //dialogs
   dlgPic.Title:=        Lang[ID_POPT_OPENICO];

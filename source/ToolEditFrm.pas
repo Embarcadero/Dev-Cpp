@@ -38,7 +38,6 @@ type
     edTitle: TEdit;
     lblProg: TLabel;
     edProgram: TEdit;
-    OpenDialog: TOpenDialog;
     lblWorkDir: TLabel;
     edWorkDir: TEdit;
     lblParam: TLabel;
@@ -72,7 +71,7 @@ implementation
 
 uses 
 {$IFDEF WIN32}
-  FileCtrl, MultiLangSupport, devcfg, utils;
+  FileCtrl, MultiLangSupport, devcfg, utils, main;
 {$ENDIF}
 {$IFDEF LINUX}
   MultiLangSupport, devcfg, utils;
@@ -116,12 +115,19 @@ end;
 
 procedure TToolEditForm.btnProgClick(Sender: TObject);
 begin
-  OpenDialog.Filter := 'Applications (*.exe;*.bat;*.com;)|*.exe;*.bat;*.com|All files (*.*)|*.*';
-  if OpenDialog.Execute then
-   begin
-     edProgram.Text := OpenDialog.FileName;
-     edWorkDir.Text := ExtractFilePath(OpenDialog.FileName);
-   end;
+	with TOpenDialog.Create(self) do try
+		Filter := 'Applications (*.exe;*.bat;*.com;)|*.exe;*.bat;*.com|All files (*.*)|*.*';
+
+		if Assigned(MainForm.fProject) then
+			InitialDir := MainForm.fProject.Directory;
+
+		if Execute then begin
+			edProgram.Text := FileName;
+			edWorkDir.Text := ExtractFilePath(FileName);
+		end;
+	finally
+		Free;
+	end;
 end;
 
 procedure TToolEditForm.btnWorkDirClick(Sender: TObject);

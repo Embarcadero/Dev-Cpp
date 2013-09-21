@@ -52,9 +52,6 @@ type
     procedure LoadText;
   end;
 
-//var
-//  PrintForm: TPrintForm;
-
 implementation
 
 uses 

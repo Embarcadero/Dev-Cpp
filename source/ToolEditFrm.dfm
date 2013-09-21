@@ -255,9 +255,4 @@ object ToolEditForm: TToolEditForm
     ReadOnly = True
     TabOrder = 9
   end
-  object OpenDialog: TOpenDialog
-    Filter = 'Applications (*.exe)|*.exe|All files (*.*)|*.*'
-    Left = 4
-    Top = 268
-  end
 end

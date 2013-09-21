@@ -137,7 +137,7 @@ uses
 
 procedure TEnviroForm.BrowseClick(Sender: TObject);
 var
- s: AnsiString;
+	s: AnsiString;
 begin
   case TComponent(Sender).Tag of
    1: // default dir browse
@@ -154,7 +154,6 @@ begin
        edTemplatesDir.Text:= IncludeTrailingPathDelimiter(s);
     end;
 
-    // why was it commented-out???
    3: // icon library browse
     begin
       s:= ExpandFileto(edIcoLib.Text, devDirs.Exec);
@@ -176,22 +175,28 @@ begin
        edLang.Text:= IncludeTrailingPathDelimiter(ExtractRelativePath(devDirs.Exec, s));
     end;
 
-   6: // CVS Executable Filename
-    begin
-      dmMain.OpenDialog.Filter:=FLT_ALLFILES;
-      dmMain.OpenDialog.FileName:=edCVSExec.Text;
-      if dmMain.OpenDialog.Execute then
-        edCVSExec.Text:=dmMain.OpenDialog.FileName;
-    end;
+		6: begin // CVS Executable Filename
+			with TOpenDialog.Create(self) do try
+				Filter := FLT_ALLFILES;
+				FileName := edCVSExec.Text;
+				if Execute then
+					edCVSExec.Text := FileName;
+			finally
+				Free;
+			end;
+		end;
 
-   7: // Alternate Configuration File
-    begin
-      dmMain.OpenDialog.Filter:=FLT_ALLFILES;
-      dmMain.OpenDialog.FileName:=edAltConfig.Text;
-      if dmMain.OpenDialog.Execute then
-        edAltConfig.Text:=dmMain.OpenDialog.FileName;
-    end;
-  end;
+		7: begin // Alternate Configuration File
+			with TOpenDialog.Create(self) do try
+				Filter := FLT_ALLFILES;
+				FileName := edAltConfig.Text;
+				if Execute then
+					edAltConfig.Text := FileName;
+			finally
+				Free;
+			end;
+		end;
+	end;
 end;
 
 procedure TEnviroForm.FormShow(Sender: TObject);
@@ -330,14 +335,6 @@ begin
 		Lang.CheckLanguageFiles;
 	end;
 
-	with dmMain.OpenDialog do begin
-		OptionsEx:= [];
-		Options:= Options - [ofOldStyleDialog, ofNoLongNames];
-	end;
-
-	dmMain.SaveDialog.OptionsEx:= dmMain.OpenDialog.OptionsEx;
-	dmMain.SaveDialog.Options:= dmMain.OpenDialog.Options;
-
 	devExternalPrograms.Programs.Assign(vleExternal.Strings);
 
 	try
@@ -447,11 +444,13 @@ begin
     Exit;
   end;
 
-  with dmMain.OpenDialog do begin
-    Filter:=FLT_ALLFILES;
-    if Execute then
-      vleExternal.Cells[1, vleExternal.Row]:=Filename;
-  end;
+	with TOpenDialog.Create(Self) do try
+		Filter:=FLT_ALLFILES;
+		if Execute then
+			vleExternal.Cells[1, vleExternal.Row] := Filename;
+	finally
+		Free;
+	end;
 end;
 
 procedure TEnviroForm.vleExternalValidate(Sender: TObject; ACol,

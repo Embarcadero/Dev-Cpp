@@ -1,3 +1,17 @@
+Version 5.3.0.5 - *
+
+- The toolbars now do not get cut off on restart after about the 800th horizontal pixel.
+- The tip of the day form now does not show up anymore when opening files (again).
+- Gutter auto sizing now takes folding into account.
+- Files that aren't highlighted are now loaded much faster.
+- Added a few hardcoded labels to the lang tables.
+- Reworked the Window List form.
+- Fixed some set management issues in the Compiler Options form.
+- Slightly reduced compilation overhead of the IDE shell around GCC.
+- Reduced memory usage.
+- Exporting editors to HTML now provides a perfect copy of the color scheme.
+- Fixed a memory leak in the Tools window.
+
 Version 5.3.0.4 - 31 December 2012
 
 - The class browser now always differentiates between private and public members.

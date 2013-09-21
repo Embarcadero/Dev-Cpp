@@ -23,8 +23,8 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser,
-  Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version, SynEditCodeFolding,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX, SynEditExport, SynExportRTF,
+  Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version, SynEditCodeFolding, SynExportHTML,
   SynCompletionProposal, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils, CodeToolTip;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -114,7 +114,11 @@ type
     procedure Activate;
     procedure GotoLine;
     procedure SetCaretPos(line,col : integer;settopline : boolean = true); // takes folds into account
-    procedure Exportto(filetype: integer);
+
+    procedure ExportToHTML(const OverwriteFileName : AnsiString);
+    procedure ExportToRTF(const OverwriteFileName : AnsiString);
+    procedure ExportToTEX(const OverwriteFileName : AnsiString);
+
     procedure InsertString(Value: AnsiString;MoveCursor: boolean);
     procedure SetErrorFocus(Col, Line: integer);
     procedure SetActiveBreakpointFocus(Line: integer);
@@ -236,7 +240,6 @@ begin
 	end else
 		fNew := True;
 
-	fText.UseCodeFolding := true;
 	fText.Parent := fTabSheet;
 	fText.Visible := True;
 	fText.Align := alClient;
@@ -312,19 +315,12 @@ begin
 	// Delete breakpoints in this editor
 	MainForm.fDebugger.DeleteBreakPointsOf(self);
 
-	SendMessage(MainForm.Handle,WM_SETREDRAW,0,0);
-
 	// Open up the previous tab, not the first one...
 	with fTabSheet.PageControl do begin
 		curactive := ActivePageIndex;
 		fTabSheet.Free; // sets activepageindex to 0, causes lots of flicker???
 		ActivePageIndex := max(0,curactive - 1);
 	end;
-
-	SendMessage(MainForm.Handle,WM_SETREDRAW,1,0);
-
-	// Repaint!
-	RedrawWindow(MainForm.PageControl.Handle, nil, 0, RDW_FRAME or RDW_INVALIDATE or RDW_ALLCHILDREN);
 
 	inherited;
 end;
@@ -563,38 +559,121 @@ begin
 		fFunctionTip.Show;
 end;
 
-procedure TEditor.Exportto(filetype: integer);
+procedure TEditor.ExportToHTML(const OverwriteFileName : AnsiString);
+var
+	SynExporterHTML : TSynExporterHTML;
+	SaveFileName : AnsiString;
 begin
-	if filetype = 0 then begin
-		with dmMain.SaveDialog do begin
-			Filter:= dmMain.SynExporterHTML.DefaultFilter;
-			Title:= Lang[ID_NV_EXPORT];
-			DefaultExt := HTML_EXT;
-			if Execute then begin
-				dmMain.ExportToHtml(fText.UnCollapsedLines, dmMain.SaveDialog.FileName);
-				fText.BlockEnd:= fText.BlockBegin;
+	SynExporterHTML := TSynExporterHTML.Create(nil);
+	try
+		if OverwriteFileName = '' then begin
+			with TSaveDialog.Create(nil) do try
+
+				Filter := SynExporterHTML.DefaultFilter;
+				Title := Lang[ID_NV_EXPORT];
+				DefaultExt := HTML_EXT;
+				FileName := ChangeFileExt(fFileName,HTML_EXT);
+				Options := Options + [ofOverwritePrompt];
+
+				if Execute then
+					SaveFileName := FileName
+				else
+					Exit; // automatically gotos finally
+			finally
+				Free;
 			end;
-		end;
-	end else if filetype = 1 then begin
-		with dmMain.SaveDialog do begin
-			Filter:= dmMain.SynExporterRTF.DefaultFilter;
-			Title:= Lang[ID_NV_EXPORT];
-			DefaultExt := RTF_EXT;
-			if Execute then begin
-				dmMain.ExportToRtf(fText.UnCollapsedLines, dmMain.SaveDialog.FileName);
-				fText.BlockEnd:= fText.BlockBegin;
+		end else
+			SaveFileName := OverwriteFileName;
+
+		SynExporterHTML.Title := ExtractFileName(SaveFileName);
+		SynExporterHTML.CreateHTMLFragment := False;
+		SynExporterHTML.ExportAsText := True;
+		SynExporterHTML.UseBackground := True;
+		SynExporterHTML.Font := fText.Font;
+		SynExporterHTML.Highlighter := fText.Highlighter;
+
+		SynExporterHTML.ExportAll(fText.UnCollapsedLines);
+		SynExporterHTML.SaveToFile(SaveFileName);
+	finally
+		SynExporterHTML.Free;
+	end;
+end;
+
+procedure TEditor.ExportToRTF(const OverwriteFileName : AnsiString);
+var
+	SynExporterRTF : TSynExporterRTF;
+	SaveFileName : AnsiString;
+begin
+	SynExporterRTF := TSynExporterRTF.Create(nil);
+	try
+		if OverwriteFileName = '' then begin
+			with TSaveDialog.Create(nil) do try
+
+				Filter:= SynExporterRTF.DefaultFilter;
+				Title:= Lang[ID_NV_EXPORT];
+				DefaultExt := RTF_EXT;
+				FileName := ChangeFileExt(fFileName,RTF_EXT);
+				Options := Options + [ofOverwritePrompt];
+
+				if Execute then
+					SaveFileName := FileName
+				else
+					Exit;
+			finally
+				Free;
 			end;
-		end;
-	end else begin
-		with dmMain.SaveDialog do begin
-			Filter:= dmMain.SynExporterTex.DefaultFilter;
-			Title:= Lang[ID_NV_EXPORT];
-			DefaultExt := TEX_EXT;
-			if Execute then begin
-				dmMain.ExportToTex(fText.UnCollapsedLines, dmMain.SaveDialog.FileName);
-				fText.BlockEnd:= fText.BlockBegin;
+		end else
+			SaveFileName := OverwriteFileName;
+
+		SynExporterRTF.Title := ExtractFileName(SaveFileName);
+		SynExporterRTF.ExportAsText := True;
+		SynExporterRTF.UseBackground := True;
+		SynExporterRTF.Font := fText.Font;
+		SynExporterRTF.Highlighter := fText.Highlighter;
+
+		SynExporterRTF.ExportAll(fText.UnCollapsedLines);
+		SynExporterRTF.SaveToFile(SaveFileName);
+	finally
+		SynExporterRTF.Free;
+	end;
+end;
+
+procedure TEditor.ExportToTEX(const OverwriteFileName : AnsiString);
+var
+	SynExporterTEX : TSynExporterTEX;
+	SaveFileName : AnsiString;
+begin
+	SynExporterTEX := TSynExporterTEX.Create(nil);
+	try
+		if OverwriteFileName = '' then begin
+			with TSaveDialog.Create(nil) do try
+
+				Filter:= SynExporterTEX.DefaultFilter;
+				Title:= Lang[ID_NV_EXPORT];
+				DefaultExt := TEX_EXT;
+				FileName := ChangeFileExt(fFileName,TEX_EXT);
+				Options := Options + [ofOverwritePrompt];
+
+				if Execute then
+					SaveFileName := FileName
+				else
+					Exit;
+			finally
+				Free;
 			end;
-		end;
+		end else
+			SaveFileName := OverwriteFileName;
+
+		SynExporterTex.Title := ExtractFileName(SaveFileName);
+		SynExporterTex.ExportAsText := True;
+		SynExporterTex.UseBackground := True;
+		SynExporterTex.Font := fText.Font;
+		SynExporterTex.Highlighter := fText.Highlighter;
+
+		SynExporterTex.ExportAll(fText.UnCollapsedLines);
+		SynExporterTex.SaveToFile(SaveFileName);
+	finally
+		SynExporterTEX.Free;
 	end;
 end;
 
@@ -1200,14 +1279,17 @@ var
 	procedure CancelHint;
 	begin
 		MainForm.fDebugger.OnEvalReady := nil;
-		fCurrentWord := '';
-		fText.Cursor := crIBeam;
+
+		// disable editor hint
 		Application.CancelHint;
+		fCurrentWord := '';
 		fText.Hint := '';
+
+		// disable page control hint
+		MainForm.fCurrentPageHint := '';
+		MainForm.PageControl.Hint := '';
 	end;
 begin
-
-	fTabSheet.PageControl.Hint := '';
 
 	// If the mouse can be found INSIDE the window
 	if HandpointAllowed(p) then begin
