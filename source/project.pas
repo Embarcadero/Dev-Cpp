@@ -29,8 +29,7 @@ uses
 {$ENDIF}
 {$IFDEF LINUX}
   IniFiles, SysUtils, QDialogs, QComCtrls, Editor, Contnrs,
-  Classes, QControls, version, prjtypes, Templates, QForms
-  ;
+  Classes, QControls, version, prjtypes, Templates, QForms;
 {$ENDIF}
 
 type
@@ -827,20 +826,18 @@ end;
 
 procedure TProject.Update;
 begin
-  with finifile do
-   begin
-     Section:= 'Project';
-     fName:= Read('name', '');
-     fOptions.Icon:= Read('icon', '');
-     if (Read('Ver', 0)> 0) then //ver> 0 is at least a v5 project
-      begin
-        fOptions.typ:= Read('type', 0);
-        fOptions.cmdLines.Compiler:= Read('Compiler', '');
-        fOptions.cmdLines.CppCompiler:= Read('CppCompiler', '');
-        fOptions.cmdLines.Linker:= Read('Linker', '');
-        fOptions.ObjFiles.DelimitedText:= Read('ObjFiles', '');
-        fOptions.Libs.DelimitedText:= Read('Libs', '');
-        fOptions.Includes.DelimitedText:= Read('Includes', '');
+	with finifile do begin
+		Section:= 'Project';
+		fName:= Read('name', '');
+		fOptions.Icon:= Read('icon', '');
+		if (Read('Ver', 0)> 0) then begin //ver> 0 is at least a v5 project
+			fOptions.typ:= Read('type', 0);
+			fOptions.cmdLines.Compiler:= Read('Compiler', '');
+			fOptions.cmdLines.CppCompiler:= Read('CppCompiler', '');
+			fOptions.cmdLines.Linker:= Read('Linker', '');
+			fOptions.ObjFiles.DelimitedText:= Read('ObjFiles', '');
+			fOptions.Libs.DelimitedText:= Read('Libs', '');
+			fOptions.Includes.DelimitedText:= Read('Includes', '');
         fOptions.PrivateResource := Read('PrivateResource', '');
         fOptions.ResourceIncludes.DelimitedText:= Read('ResourceIncludes', '');
         fOptions.MakeIncludes.DelimitedText:= Read('MakeIncludes', '');
@@ -863,9 +860,7 @@ begin
         fOptions.CompilerOptions:=Read('CompilerSettings', devCompiler.OptionStr);
         if fOptions.CompilerSet>devCompilerSet.Sets.Count-1 then begin
           fOptions.CompilerSet:=devCompiler.CompilerSet;
-          MessageDlg('The compiler set you have selected for this project, no longer '+
-                     'exists.'#10'It will be substituted by the global compiler set...',
-                     mtError, [mbOk], 0);
+          MessageDlg('The compiler set you have selected for this project, no longer exists.'#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
         end;
 
         Section:= 'VersionInfo';

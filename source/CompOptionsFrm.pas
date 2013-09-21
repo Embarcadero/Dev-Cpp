@@ -164,50 +164,48 @@ end;
 
 procedure TCompForm.btnOkClick(Sender: TObject);
 begin
-  if cbCompAdd.Checked and (Commands.Text = '') then
-   begin
-     MessageDlg('You have selected the "Add commands" option but no commands have been specified.', MtError,[MbOK],0);
-     cbCompAdd.Checked := False;
-   end;
-
-  if (fBins = '') then
-   begin
-     MessageDlg('You have not indicated the location of your binaries (compiler).'#13' Please do so now.', mtWarning, [mbOK], 0);
-     ModalResult := mrNone;
-     exit;
-   end;
-
-   //RNC
-   devCompilerSet.CmdOpts:= Commands.Lines.Text;
-   devCompilerSet.AddtoLink:= cbLinkerAdd.Checked;
-   devCompilerSet.AddtoComp:= cbCompAdd.Checked;
-   devCompilerSet.LinkOpts:= Linker.Lines.Text;
-   devCompilerSet.SaveSettings;
-   devCompilerSet.OptionsStr:=devCompiler.OptionStr;
-   devCompilerSet.SaveSet(currentSet);
-   devCompilerSet.SaveSettings;
-
-  with devCompiler do
-   begin
-     Delay:= seCompDelay.Value;
-     FastDep:= cbFastDep.Checked;
+	if cbCompAdd.Checked and (Commands.Text = '') then begin
+		MessageDlg('You have selected the "Add compiler commands" option but no commands have been specified.', MtError,[MbOK],0);
+		cbCompAdd.Checked := False;
+	end;
 
 
+	if cbLinkerAdd.Checked and (Linker.Text = '') then begin
+		MessageDlg('You have selected the "Add linker commands" option but no commands have been specified.', MtError,[MbOK],0);
+		cbLinkerAdd.Checked := False;
+	end;
 
+	if (fBins = '') then begin
+		MessageDlg('You have not indicated the location of your binaries (compiler).'#13' Please do so now.', mtWarning, [mbOK], 0);
+		ModalResult := mrNone;
+		exit;
+	end;
 
-     CompilerSet:=cmbCompilerSetComp.ItemIndex;
-     devCompilerSet.Sets.Assign(cmbCompilerSetComp.Items);
+	//RNC
+	devCompilerSet.AddtoComp:= cbCompAdd.Checked;
+	devCompilerSet.AddtoLink:= cbLinkerAdd.Checked;
+	devCompilerSet.CompOpts:= Commands.Lines.Text;
+	devCompilerSet.LinkOpts:= Linker.Lines.Text;
 
-     gccName:=devCompilerSet.gccName;
-     gppName:=devCompilerSet.gppName;
-     makeName:=devCompilerSet.makeName;
-     gdbName:=devCompilerSet.gdbName;
-     windresName:=devCompilerSet.windresName;
-     dllwrapName:=devCompilerSet.dllwrapName;
-     gprofName:=devCompilerSet.gprofName;
-   end;
+	devCompilerSet.OptionsStr:=devCompiler.OptionStr;
+	devCompilerSet.SaveSet(currentSet);
+	devCompilerSet.SaveSettings;
 
+	with devCompiler do begin
+		Delay:= seCompDelay.Value;
+		FastDep:= cbFastDep.Checked;
 
+		CompilerSet:=cmbCompilerSetComp.ItemIndex;
+		devCompilerSet.Sets.Assign(cmbCompilerSetComp.Items);
+
+		gccName:=devCompilerSet.gccName;
+		gppName:=devCompilerSet.gppName;
+		makeName:=devCompilerSet.makeName;
+		gdbName:=devCompilerSet.gdbName;
+		windresName:=devCompilerSet.windresName;
+		dllwrapName:=devCompilerSet.dllwrapName;
+		gprofName:=devCompilerSet.gprofName;
+	end;
 
   with devDirs do
    begin
@@ -235,17 +233,11 @@ begin
    begin
      seCompDelay.Value:= Delay;
      cbFastDep.Checked:= FastDep;
-//RNC
-     //Commands.Lines.Text:= CmdOpts;
-     Commands.Lines.Text:= devCompilerSet.CmdOpts;
+
      cbCompAdd.Checked:= devCompilerSet.AddtoComp;
-    // cbCompAdd.Checked:= AddToComp;
-
-     //Linker.Lines.Text:= LinkOpts;
-     Linker.Lines.Text:= devCompilerSet.LinkOpts;
+     Commands.Text:= devCompilerSet.CompOpts;
      cbLinkerAdd.Checked:= devCompilerSet.AddtoLink;
-    // cbLinkerAdd.Checked:= AddtoLink;
-
+     Linker.Text:= devCompilerSet.LinkOpts;
 
      cmbCompilerSetComp.Items.Clear;
      cmbCompilerSetComp.Items.Assign(devCompilerSet.Sets);
@@ -432,73 +424,74 @@ end;
 
 procedure TCompForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
-  Caption:=                            Lang[ID_COPT];
-  //tabs
-  tabCompiler.Caption:=                Lang[ID_COPT_COMPTAB];
-  tabDirectories.Caption:=             Lang[ID_COPT_DIRTAB];
-  tabCodeGen.Caption:=                 Lang[ID_COPT_CODEGENTAB];
-  tabPrograms.Caption:=                Lang[ID_COPT_PROGRAMSTAB];
+	XPMenu.Active := devData.XPTheme;
 
-  // subtabs
-  DirTabs.Tabs.Clear;
-  DirTabs.Tabs.Append(Lang[ID_COPT_BIN]);
-  DirTabs.Tabs.Append(Lang[ID_COPT_LIB]);
-  DirTabs.Tabs.Append(Lang[ID_COPT_INCC]);
-  DirTabs.Tabs.Append(Lang[ID_COPT_INCCPP]);
+	Caption:=                            Lang[ID_COPT];
 
-  //buttons
-  btnReplace.Caption:=                 Lang[ID_BTN_REPLACE];
-  btnAdd.Caption:=                     Lang[ID_BTN_ADD];
-  btnDelete.Caption:=                  Lang[ID_BTN_DELETE];
-  btnDelInval.Caption:=                Lang[ID_BTN_DELINVAL];
-  btnOk.Caption:=                      Lang[ID_BTN_OK];
-  btnCancel.Caption:=                  Lang[ID_BTN_CANCEL];
-  btnHelp.Caption:=                    Lang[ID_BTN_HELP];
-  btnDefault.Caption:=                 Lang[ID_BTN_DEFAULT];
+	// Tabs
+	tabCompiler.Caption:=                Lang[ID_COPT_COMPTAB];
+	tabCodeGen.Caption:=                 Lang[ID_COPT_CODEGENTAB];
+	tabDirectories.Caption:=             Lang[ID_COPT_DIRTAB];
+	tabPrograms.Caption:=                Lang[ID_COPT_PROGRAMSTAB];
 
-  //controls (compiler tab)
-  cbCompAdd.Caption:=                  Lang[ID_COPT_ADDCOMP];
-  lblDelay.Caption:=                   Lang[ID_COPT_DELAY];
-  lblDelayMsg.Caption:=                Lang[ID_COPT_DELAYMSG];
-  cbLinkerAdd.Caption:=                Lang[ID_COPT_LINKADD];
+	// Directories, subtabs
+	DirTabs.Tabs.Clear;
+	DirTabs.Tabs.Append(Lang[ID_COPT_BIN]);
+	DirTabs.Tabs.Append(Lang[ID_COPT_LIB]);
+	DirTabs.Tabs.Append(Lang[ID_COPT_INCC]);
+	DirTabs.Tabs.Append(Lang[ID_COPT_INCCPP]);
 
-  //controls (code gen tab)
-  grpMakefileGen.Caption:=             '  ' +Lang[ID_COPT_MAKEFILEGEN] +'  ';
-  cbFastDep.Caption:=                  Lang[ID_COPT_FASTDEP];
+	// Buttons for all tabs
+	btnReplace.Caption:=                 Lang[ID_BTN_REPLACE];
+	btnAdd.Caption:=                     Lang[ID_BTN_ADD];
+	btnDelete.Caption:=                  Lang[ID_BTN_DELETE];
+	btnDelInval.Caption:=                Lang[ID_BTN_DELINVAL];
+	btnDefault.Caption:=                 Lang[ID_BTN_DEFAULT];
+	btnOk.Caption:=                      Lang[ID_BTN_OK];
+	btnCancel.Caption:=                  Lang[ID_BTN_CANCEL];
+	btnHelp.Caption:=                    Lang[ID_BTN_HELP];
 
-  // conrols (Programs tab)
-  lblProgramsText.Caption:=            Lang[ID_COPT_PROGRAMS];
+	// Checkboxes and delay
+	cbCompAdd.Caption:=                  Lang[ID_COPT_ADDCOMP];
+	cbLinkerAdd.Caption:=                Lang[ID_COPT_LINKADD];
+	lblDelay.Caption:=                   Lang[ID_COPT_DELAY];
+	lblDelayMsg.Caption:=                Lang[ID_COPT_DELAYMSG];
 
-  grpCompSet.Caption:=                Lang[ID_COPT_COMPSETS];
+	// Makefile generation
+	grpMakefileGen.Caption:=             '  '+Lang[ID_COPT_MAKEFILEGEN]+'  ';
+	cbFastDep.Caption:=                  Lang[ID_COPT_FASTDEP];
+
+	// Programs (you may want to...)
+	lblProgramsText.Caption:=            Lang[ID_COPT_PROGRAMS];
+
+	// Text above compiler select
+	grpCompSet.Caption:=                 '  '+Lang[ID_COPT_COMPSETS]+'  ';
 end;
 
 procedure TCompForm.cmbCompilerSetCompChange(Sender: TObject);
 begin
-  devCompilerSet.OptionsStr:=devCompiler.OptionStr;
-  devCompilerSet.CmdOpts:=Commands.Lines.Text;
-  devCompilerSet.LinkOpts:=Linker.Lines.Text;
+	devCompilerSet.OptionsStr:=devCompiler.OptionStr;
+	devCompilerSet.CompOpts:=Commands.Lines.Text;
+	devCompilerSet.LinkOpts:=Linker.Lines.Text;
 
-  devCompilerSet.AddtoLink:=cbLinkerAdd.Checked;
-  devCompilerSet.AddtoComp:=cbCompAdd.Checked;
+	devCompilerSet.AddtoLink:=cbLinkerAdd.Checked;
+	devCompilerSet.AddtoComp:=cbCompAdd.Checked;
 
-  devCompilerSet.SaveSet(currentSet);
-  devCompilerSet.LoadSet(cmbCompilerSetComp.ItemIndex);
-  currentSet:=cmbCompilerSetComp.ItemIndex;
-
+	devCompilerSet.SaveSet(currentSet);
+    devCompilerSet.LoadSet(cmbCompilerSetComp.ItemIndex);
+	currentSet:=cmbCompilerSetComp.ItemIndex;
 
   with devCompilerSet do begin
     fBins:=BinDir;
     fC:=CDir;
     fCpp:=CppDir;
     fLibs:=LibDir;
-    Commands.Lines.Text:= CmdOpts;
+    Commands.Lines.Text:= CompOpts;
     Linker.Lines.Text:= LinkOpts;
     cbCompAdd.Checked:=AddtoComp;
     cbLinkerAdd.Checked:=AddtoLink;
+    Commands.Lines.Text:=CompOpts;
+    Linker.Lines.Text:=LinkOpts;
 
   end;
   DirTabsChange(DirTabs);

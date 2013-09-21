@@ -121,7 +121,7 @@ object CompForm: TCompForm
     Top = 10
     Width = 440
     Height = 337
-    ActivePage = tabDirectories
+    ActivePage = tabCompiler
     object tabCompiler: TdevPage
       Left = 0
       Top = 23
@@ -134,7 +134,6 @@ object CompForm: TCompForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 1
-      Visible = False
       Caption = 'Compiler'
       DesignSize = (
         436
@@ -378,7 +377,7 @@ object CompForm: TCompForm
           Height = 310
         end
         inherited vle: TValueListEditor
-          Width = 311
+          Width = 317
           Height = 310
         end
       end
@@ -395,6 +394,7 @@ object CompForm: TCompForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 0
+      Visible = False
       Caption = 'Directories'
       object DirTabs: TdevTabs
         Left = 11

@@ -40,7 +40,7 @@ type
     FLineOutput: TLineOutputEvent;
     fCheckAbort: TCheckAbortFunc;
     fNeedPassword: TNeedPasswordEvent;
-    procedure TypePassword(Pass: string);
+  //  procedure TypePassword(Pass: string);
   protected
     procedure Execute; override;
     procedure CallLineOutputEvent;
@@ -198,25 +198,25 @@ begin
   Result := FOutput + ' ' + IntToStr(nRead);
 end;
 
-procedure TCVSThread.TypePassword(Pass: string);
-var
-  Key: Byte;
-  I: integer;
-begin
-  for I := 1 to Length(Pass) do begin
-    Key := VkKeyScan(Pass[I]);
-    keybd_event(LoByte(Key), 0, 0, 0);
-    keybd_event(LoByte(Key), 0, KEYEVENTF_KEYUP, 0);
-  end;
-{$IFDEF WIN32}
-  keybd_event(VK_RETURN, 0, 0, 0);
-  keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0);
-{$ENDIF}
-{$IFDEF LINUX}
-  keybd_event(XK_RETURN, 0, 0, 0);
-  keybd_event(XK_RETURN, 0, KEYEVENTF_KEYUP, 0);
-{$ENDIF}
-end;
+//procedure TCVSThread.TypePassword(Pass: string);
+//var
+//  Key: Byte;
+//  I: integer;
+//begin
+//  for I := 1 to Length(Pass) do begin
+//    Key := VkKeyScan(Pass[I]);
+//    keybd_event(LoByte(Key), 0, 0, 0);
+//    keybd_event(LoByte(Key), 0, KEYEVENTF_KEYUP, 0);
+//  end;
+//{$IFDEF WIN32}
+//  keybd_event(VK_RETURN, 0, 0, 0);
+//  keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0);
+//{$ENDIF}
+//{$IFDEF LINUX}
+//  keybd_event(XK_RETURN, 0, 0, 0);
+//  keybd_event(XK_RETURN, 0, KEYEVENTF_KEYUP, 0);
+//{$ENDIF}
+//end;
 
 end.
 

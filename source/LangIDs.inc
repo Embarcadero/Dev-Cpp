@@ -285,6 +285,7 @@ const
 
   //column headers
   ID_COL_LINE                      = 315;
+  ID_COL_COL                       = 321; // hax, copy de oude
   ID_COL_FILE                      = 316;
   ID_COL_ARGS                      = 318;
   ID_COL_MSG                       = 317;
@@ -648,7 +649,7 @@ const
   ID_COPT_ADDCOMP                  = 732;
   ID_COPT_DELAY                    = 733;
   ID_COPT_DELAYMSG                 = 734;
-  ID_COPT_ERRORLINE                = 735;     
+  ID_COPT_ERRORLINE                = 735;
 
   //CodeGen Tab
   ID_COPT_GRP_CODEGEN              = 740;
@@ -686,10 +687,6 @@ const
   ID_COPT_PROMPTRENAMECOMPSET      = 777;
   ID_COPT_FURTHEROPTS              = 778;
 
-  // free to 780 for compiler options
-
-  // end compiler options
-
   // Help Menu Editor Form
   ID_HE                            = 780;
   ID_HE_COL1                       = 781;
@@ -704,6 +701,10 @@ const
   ID_HE_SEARCHWORD                 = 790;
   ID_HE_AFFECTF1                   = 791;
 
+  ID_COPT_WARNINGPLUS              = 792;
+  ID_COPT_WARNINGEX                = 793;
+  ID_COPT_ISOCONFORM               = 794;
+  ID_COPT_GRP_WARN                 = 795;
 
   // Print form
   ID_PRT                           = 800;
@@ -1105,4 +1106,5 @@ const
   // New compilter options
   ID_COPT_STRIP                    = 3400;
   ID_COPT_ARCH                     = 3401;
-  ID_COPT_BUILTINPROC              = 3402;     
+  ID_COPT_BUILTINPROC              = 3402;
+  ID_COPT_OPTIMIZE                 = 3403;

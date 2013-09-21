@@ -1,6 +1,6 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 483
-  Top = 340
+  Left = 802
+  Top = 409
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -72,7 +72,7 @@ object frmProjectOptions: TfrmProjectOptions
     Top = 8
     Width = 458
     Height = 265
-    ActivePage = tabMakefile
+    ActivePage = tabFilesDir
     object tabGeneral: TdevPage
       Left = 0
       Top = 23
@@ -302,7 +302,7 @@ object frmProjectOptions: TfrmProjectOptions
           Top = 75
           Width = 202
           Height = 17
-          Caption = 'Support WindowsXP Themes'
+          Caption = 'Support Windows XP Themes'
           TabOrder = 1
         end
       end
@@ -312,8 +312,8 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 354
         Height = 21
         Hint = 
-          'Note: The exe filename is taken from the project filename not th' +
-          'is name'
+          'Note: The exe filename is taken from the project filename, not t' +
+          'his name'
         TabOrder = 2
       end
     end
@@ -483,7 +483,7 @@ object frmProjectOptions: TfrmProjectOptions
           Height = 170
         end
         inherited vle: TValueListEditor
-          Width = 313
+          Width = 319
           Height = 170
         end
       end
@@ -621,7 +621,6 @@ object frmProjectOptions: TfrmProjectOptions
       Align = alClient
       BevelKind = bkTile
       TabOrder = 1
-      Visible = False
       Caption = 'Directories'
       object btnUp: TSpeedButton
         Left = 421
@@ -981,6 +980,7 @@ object frmProjectOptions: TfrmProjectOptions
       VertScrollBar.Tracking = True
       Align = alClient
       TabOrder = 3
+      Visible = False
       Caption = 'Makefile'
       object Panel2: TPanel
         Left = 0

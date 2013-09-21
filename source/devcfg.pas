@@ -1,215 +1,215 @@
 {
-    This file is part of Dev-C++
-    Copyright (c) 2004 Bloodshed Software
+	This file is part of Dev-C++
+	Copyright (c) 2004 Bloodshed Software
 
-    Dev-C++ is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	Dev-C++ is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    Dev-C++ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	Dev-C++ is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Dev-C++; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with Dev-C++; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-(*
- unit: devCFG.pas
- programmer: Michael Berg
- date: 9.1.1 - 12.10.1
- description: Singletion pattern object for control of dev-c options.
-                To initialize call initializeOptions function.
-                To save call SaveOptions function.
-
- ToUse: just call the option you want:
-           i.e. devDirs.ExecDir:= NewValue;
-           or   DevCppDir:=  devDirs.ExecDir;
-
-        do not create instance explicitly:
-           i.e. opt:= TdevData.Create;
-*)
 unit devcfg;
 
 interface
 
 uses
 {$IFDEF WIN32}
-  Dialogs, Windows, Classes, Graphics, SynEdit, CFGData, CFGTypes, IniFiles, prjtypes;
+  Dialogs, Windows, Classes, Graphics, SynEdit, CFGData, CFGTypes, IniFiles, prjtypes,EditorOptfrm;
 {$ENDIF}
 {$IFDEF LINUX}
-  QDialogs, Classes, QGraphics, QSynEdit, CFGData, CFGTypes, IniFiles, prjtypes;
+  QDialogs, Classes, QGraphics, QSynEdit, CFGData, CFGTypes, IniFiles, prjtypes,EditorOptfrm;
 {$ENDIF}
 
 const
-  BoolValYesNo: array[boolean] of string = ('No', 'Yes');
-  BoolVal10: array[0..27] of string = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',   // Had to use letters for multiple choices
-                                       'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                                       's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+	BoolValYesNo: array[boolean] of string = ('No', 'Yes');
+	BoolVal10: array[0..27] of string = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+                                         'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+                                         's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
 type
-  // the comments are an example of the record
-  PCompilerOption = ^TCompilerOption;
-  TCompilerOption = packed record
-    optName: string; // "Generate debugging info"
-    optIsGroup: boolean; // False
-    optIsC: boolean; // True  (C option?)
-    optIsCpp: boolean; // True (C++ option?) - can be both C and C++ option...
-    optIsLinker: boolean; // Is it a linker param
-    optValue: Integer; // True
-    optSetting: string; // "-g3"
-    optSection: string; // "Linker options"
-    optExcludeFromTypes: TProjTypeSet; // [dptGUI] (don't show option if project is of type dptGUI)
-    optChoices : TStringList; // replaces "Yes/No" standard choices (max 26 different choices)
-  end;
+	// the comments are an example of the record
+	PCompilerOption = ^TCompilerOption;
+	TCompilerOption = packed record
+		optName: string; // "Generate debugging info"
+		optIsGroup: boolean; // False
+		optIsC: boolean;
+		optIsCpp: boolean; // True (C++ option?) - can be both C and C++ option...
+		optIsLinker: boolean; // Is it a linker param
+		optValue: Integer; // True
+		optSetting: string; // "-g3"
+		optSection: string; // "Linker options"
+		optExcludeFromTypes: TProjTypeSet; // [dptGUI] (don't show option if project is of type dptGUI)
+		optChoices : TStringList; // replaces "Yes/No" standard choices (max 30 different choices)
+	end;
 
- // compiler-set configuration
- TdevCompilerSet = class(TCFGOptions)
- private
-   fSets: TStrings;
-   fgccName : string;
-   fgppName : string;
-   fgdbName : string;
-   fmakeName : string;
-   fwindresName : string;
-   fdllwrapName : string;
-   fgprofName : string;
-   fBinDir : string;
-   fCDir : string;
-   fCppDir : string;
-   fLibDir : string;
-   fOptions : string;
-   //RNC
-   fCompAdd: boolean;          // add fcmdopts to compiler command line
-   fLinkAdd: boolean;          // add flinkopts to linker command line
-   fCmdOptions : string;
-   fLinkOptions : string;
+	// compiler-set configuration
+	TdevCompilerSet = class(TCFGOptions)
+	private
+		// Sets
+		fSets: TStrings;
 
-   procedure WriteSets;
-   procedure UpdateSets;
- public
-   constructor Create;
-   destructor Destroy; override;
-   procedure SettoDefaults; override;
-   procedure SaveSettings; override;
-   procedure LoadSettings; override;
-   procedure SaveSet(Index: integer);
-   procedure SaveSetDirs(Index: integer);
-   procedure SaveSetProgs(Index: integer);
-   procedure LoadSet(Index: integer);
-   procedure LoadSetDirs(Index: integer);
-   procedure LoadSetProgs(Index: integer);
-   procedure AssignToCompiler;
-   property Name;
-   function SetName(Index: integer): string;
-   property Sets: TStrings read fSets write fSets;
- published
-   property gccName: string read fgccName write fgccName;
-   property gppName: string read fgppName write fgppName;
-   property gdbName: string read fgdbName write fgdbName;
-   property makeName: string read fmakeName write fmakeName;
-   property windresName: string read fwindresName write fwindresName;
-   property dllwrapName: string read fdllwrapName write fdllwrapName;
-   property gprofName: string read fgprofName write fgprofName;
-   property BinDir: string read fBinDir write fBinDir;
-   property CDir: string read fCDir write fCDir;
-   property CppDir: string read fCppDir write fCppDir;
-   property LibDir: string read fLibDir write fLibDir;
-   property OptionsStr: string read fOptions write fOptions;
-//RNC
-   property CmdOpts: string read fCmdOptions write fCmdOptions;
-   property LinkOpts: string read fLinkOptions write fLinkOptions;
-   property AddtoComp: boolean read fCompAdd write fCompAdd;
-   property AddtoLink: boolean read fLinkAdd write fLinkAdd;
+		// Exe Directories
+		fgccName : string;
+		fgppName : string;
+		fmakeName : string;
+		fgdbName : string;
+		fwindresName : string;
+		fdllwrapName : string;
+		fgprofName : string;
 
- end;
+		// Folders
+		fBinDir : string;
+		fCDir : string;
+		fCppDir : string;
+		fLibDir : string;
 
- // compiler options
- TdevCompiler = class(TCFGOptions)
-  private
-   fUseParams: boolean;        // Use fparams when running prog
-   fIntermediate: string;      // directory for mid-compile files -- if needed
-   fOutputDir: string;         // directory to place compiled files
-   fRunParams: string;         // params to send on execution
+		// User Parameters
+		fCompAdd : boolean;
+		fLinkAdd : boolean;
+		fCompOpt : string;
+		flinkOpt : string;
 
-   // program filenames
-   fgccName : string;
-   fgppName : string;
-   fgdbName : string;
-   fmakeName : string;
-   fwindresName : string;
-   fdllwrapName : string;
-   fgprofName : string;
-   fCompilerSet: integer;
+		// All options
+		fOptions : string;
 
-   //Compiler options
-   fOptions: TList;
+		// Not included in each compiler profile: fastdep,delay
 
-   //Makefile
-   fFastDep: Boolean;
+		procedure WriteSets;
+		procedure UpdateSets;
+	public
+		constructor Create;
+		destructor Destroy; override;
+		procedure SettoDefaults; override;
+		procedure SaveSettings; override;
+		procedure LoadSettings; override;
+		procedure SaveSet(Index: integer);
+		procedure SaveSetDirs(Index: integer);
+		procedure SaveSetProgs(Index: integer);
+		procedure LoadSet(Index: integer);
+		procedure LoadSetDirs(Index: integer);
+		procedure LoadSetProgs(Index: integer);
+		procedure AssignToCompiler;
+		property Name;
+		function SetName(Index: integer): string;
+		property Sets: TStrings read fSets write fSets;
+	published
+		property gccName: string read fgccName write fgccName;
+		property gppName: string read fgppName write fgppName;
+		property makeName: string read fmakeName write fmakeName;
+		property gdbName: string read fgdbName write fgdbName;
+		property windresName: string read fwindresName write fwindresName;
+		property dllwrapName: string read fdllwrapName write fdllwrapName;
+		property gprofName: string read fgprofName write fgprofName;
 
-   //Debugger
-   fModified: boolean;         // has options been changed since last compile
+		property BinDir: string read fBinDir write fBinDir;
+		property CDir: string read fCDir write fCDir;
+		property CppDir: string read fCppDir write fCppDir;
+		property LibDir: string read fLibDir write fLibDir;
 
-   fcmdOpts: string;           // command-line adds for compiler
-   flinkopts: string;          // command-line adds for linker
+		property OptionsStr: string read fOptions write fOptions;
 
-   fSaveLog: boolean;          // Save Compiler Output
-   fDelay: integer;            // delay in milliseconds -- for compiling
-    procedure SetCompilerSet(const Value: integer);
-    function GetOptions(Index: integer): TCompilerOption;
-    procedure SetOptions(Index: integer; const Value: TCompilerOption);
-    function GetOptionStr: string;
-    procedure SetOptionStr(const Value: string);
-  protected
-    procedure AddDefaultOptions;
-  public
-   constructor Create;
-   destructor Destroy; override;
-   procedure SettoDefaults; override;
-   procedure SaveSettings; override;
-   procedure LoadSettings; override;
-   property Name;
-   property Modified: boolean read fModified write fModified;
-    procedure AddOption(_Name: string; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer; _Setting, _Section: string; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);
-    function OptionsCount: integer;
-    procedure ClearOptions;
-    procedure DeleteOption(Index: integer);
-    property Options[Index: integer]: TCompilerOption read GetOptions write SetOptions;
-    property OptionStr: string read GetOptionStr write SetOptionStr;
-    function FindOption(Setting: string; var opt: TCompilerOption; var Index: integer): boolean; // returns the option with setting=<Setting>
-    procedure ChangeOptionsLang;
-    function ConvertCharToValue(c : char) : integer;
-  published
-   property FastDep: Boolean read fFastDep write fFastDep;
+		property AddtoComp: boolean read fCompAdd write fCompAdd;
+		property AddtoLink: boolean read fLinkAdd write fLinkAdd;
+		property CompOpts: string read fCompOpt write fCompOpt;
+		property LinkOpts: string read fLinkOpt write fLinkOpt;
+	end;
 
-//   property AddtoComp: boolean read fCompAdd write fCompAdd;
-//   property AddtoLink: boolean read fLinkAdd write fLinkAdd;
-//RNC
-//   property CmdOpts: string read fCmdOpts write fCmdOpts;
-//   property LinkOpts: string read fLinkopts write fLinkOpts;
+	// Each compiler is contained in one class
+	TdevCompiler = class(TCFGOptions)
+	private
+		// The set to load
+		fCompilerSet: integer;
 
-   property RunParams: string read fRunParams write fRunParams;
-   property OutputDir: string read fOutputDir write fOutputDir;          // ** unused
-   property Intermediate: string read fIntermediate write fIntermediate; // ** unused
-   property UseExecParams: boolean read fUseParams write fUseParams;
-   property SaveLog: boolean read fSaveLog write fSaveLog;
-   property Delay: integer read fDelay write fDelay;
+		// Non-set options
+		fUseParams: boolean;        // Use fparams when running prog
+		fIntermediate: string;      // directory for mid-compile files -- if needed
+		fOutputDir: string;         // directory to place compiled files
+		fRunParams: string;         // params to send on execution
 
-   property gccName: string read fgccName write fgccName;
-   property gppName: string read fgppName write fgppName;
-   property gdbName: string read fgdbName write fgdbName;
-   property makeName: string read fmakeName write fmakeName;
-   property windresName: string read fwindresName write fwindresName;
-   property dllwrapName: string read fdllwrapName write fdllwrapName;
-   property gprofName: string read fgprofName write fgprofName;
+		// Exe Directories
+		fgccName : string;
+		fgppName : string;
+		fmakeName : string;
+		fgdbName : string;
+		fwindresName : string;
+		fdllwrapName : string;
+		fgprofName : string;
 
-   property CompilerSet: integer read fCompilerSet write SetCompilerSet;
+		// User Parameters
+		fCompAdd : boolean;
+		fLinkAdd : boolean;
+		fCompOpt : string;
+		flinkOpt : string;
 
- end;
+		// All options
+		fOptions: TList;
+
+		// Makefile (global)
+		fFastDep: Boolean;
+
+		// Debugger
+		fModified: boolean;         // has options been changed since last compile
+		fSaveLog: boolean;          // Save Compiler Output
+		fDelay: integer;            // delay in milliseconds -- for compiling
+
+		procedure SetCompilerSet(const Value: integer);
+		function GetOptions(Index: integer): TCompilerOption;
+		procedure SetOptions(Index: integer; const Value: TCompilerOption);
+		function GetOptionStr: string;
+		procedure SetOptionStr(const Value: string);
+	protected
+		procedure AddDefaultOptions;
+	public
+		constructor Create;
+		destructor Destroy; override;
+		procedure SettoDefaults; override;
+		procedure SaveSettings; override;
+		procedure LoadSettings; override;
+		property Name;
+		property Modified: boolean read fModified write fModified;
+		procedure AddOption(_Name: string; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer; _Setting, _Section: string; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);
+		function OptionsCount: integer;
+		procedure ClearOptions;
+		procedure DeleteOption(Index: integer);
+		property Options[Index: integer]: TCompilerOption read GetOptions write SetOptions;
+		property OptionStr: string read GetOptionStr write SetOptionStr;
+		function FindOption(Setting: string; var opt: TCompilerOption; var Index: integer): boolean; // returns the option with setting=<Setting>
+		procedure ChangeOptionsLang;
+		function ConvertCharToValue(c : char) : integer;
+	published
+		property FastDep: Boolean read fFastDep write fFastDep;
+
+		property RunParams: string read fRunParams write fRunParams;
+		property OutputDir: string read fOutputDir write fOutputDir;          // ** unused
+		property Intermediate: string read fIntermediate write fIntermediate; // ** unused
+		property UseExecParams: boolean read fUseParams write fUseParams;
+		property SaveLog: boolean read fSaveLog write fSaveLog;
+		property Delay: integer read fDelay write fDelay;
+
+		property gccName: string read fgccName write fgccName;
+		property gppName: string read fgppName write fgppName;
+		property gdbName: string read fgdbName write fgdbName;
+		property makeName: string read fmakeName write fmakeName;
+		property windresName: string read fwindresName write fwindresName;
+		property dllwrapName: string read fdllwrapName write fdllwrapName;
+		property gprofName: string read fgprofName write fgprofName;
+
+		property AddtoComp: boolean read fCompAdd write fCompAdd;
+		property AddtoLink: boolean read fLinkAdd write fLinkAdd;
+		property CompOpts: string read fCompOpt write fCompOpt;
+		property LinkOpts: string read fLinkOpt write fLinkOpt;
+
+		property CompilerSet: integer read fCompilerSet write SetCompilerSet;
+	end;
 
  // code-completion window size and other config
  TdevCodeCompletion = class(TCFGOptions)
@@ -490,8 +490,9 @@ type
    fdblFiles: boolean;               // double click opens files out of project manager
    fLangChange: boolean;             // flag for language change
    fthemeChange: boolean;            // did the theme changed
-   fNoSplashScreen : boolean;        // disable splash screen   
-   fToolbarMain: boolean;
+   fNoSplashScreen : boolean;        // disable splash screen
+
+   fToolbarMain: boolean;            // These ones follow the enable/x-offset/y-offset patern
    fToolbarMainX: integer;
    fToolbarMainY: integer;
    fToolbarEdit: boolean;
@@ -515,6 +516,7 @@ type
    fToolbarClasses: boolean;
    fToolbarClassesX: integer;
    fToolbarClassesY: integer;
+
    // file associations (see FileAssocs.pas)
    fAssociateCpp: boolean;
    fAssociateC: boolean;
@@ -523,23 +525,26 @@ type
    fAssociateDev: boolean;
    fAssociateRc: boolean;
    fAssociateTemplate: boolean;
-   // tip of the day
-   fShowTipsOnStart: boolean;
-   fLastTip: integer;
-   fXPTheme : boolean;                  // Use XP theme
-   fFileDate : integer;                 // Dev-C++ File Date for checking old configurations
-   fShowProgress : boolean;             // Show progress window during compile
-   fAutoCloseProgress : boolean;        // Auto close progress bar window after compile
-   // Printer
-   fPrintColors         : boolean;      // print colors
-   fPrintHighlight      : boolean;
-   fPrintWordWrap       : boolean;
-   fPrintLineNumbers    : boolean;
-   fPrintLineNumbersMargins : boolean;
 
-   // Debug variable browser
-   fWatchHint           : boolean;      // watch variable under mouse
-   fWatchError          : boolean;      // report watch errors
+		// More misc stuff
+		fShowTipsOnStart: boolean;
+		fLastTip: integer;
+		fXPTheme : boolean;               // Use XP theme
+		fFileDate : integer;              // Dev-C++ File Date for checking old configurations
+		fShowProgress : boolean;          // Show progress window during compile
+		fAutoCloseProgress : boolean;     // Auto close progress bar window after compile
+
+		// Printer
+		fPrintColors : boolean;           // print colors
+		fPrintHighlight : boolean;
+		fPrintWordWrap : boolean;
+		fPrintLineNumbers : boolean;
+		fPrintLineNumbersMargins : boolean;
+
+		// Debug variable browser
+		fWatchHint : boolean;             // watch variable under mouse
+		fWatchError : boolean;            // report watch errors
+
   public
    constructor Create(aOwner: TComponent); override;
    destructor Destroy; override;
@@ -688,31 +693,30 @@ function ValidatePaths(dirList: String; var badDirs: String): String;
 //badDirs returns ; delimited list of non existing dirs
 //also remove duplicates and empty entries
 var
-  strs: TStrings;
-  i,j: Integer;
-  currdir: String;
+	strs: TStrings;
+	i,j: Integer;
+	currdir: String;
 
-  function makeFullPath(dir: String): String;
-  begin
-    Result := dir;
-    //check if full path
+	function makeFullPath(dir: String): String;
+	begin
+		Result := dir;
+		//check if it's a full path
 {$IFDEF WIN32}
-    if Length(dir) > 1 then
-      if dir[2] = ':' then
-        Exit;
-    if Length(dir) > 0 then
-      if dir[1] = '\' then
-        Exit;
+		if Length(dir) > 1 then
+			if dir[2] = ':' then
+				Exit;
+		if Length(dir) > 0 then
+			if dir[1] = '\' then
+				Exit;
 {$ENDIF}
 {$IFDEF LINUX}
-    if Length(dir) > 0 then
-      if dir[1] = '/' then
-        Exit;
+		if Length(dir) > 0 then
+			if dir[1] = '/' then
+				Exit;
 {$ENDIF}
-    //otherwise just add path
-    Result := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName))
-      + Result;
-  end;
+		//otherwise just add path
+		Result := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) + Result;
+	end;
 
 begin
   Result := '';
@@ -836,7 +840,6 @@ begin
 
   devEditor.SaveSettings;
   devEditor.Free;
-
   devCodeCompletion.SaveSettings;
   devCodeCompletion.Free;
 
@@ -866,7 +869,7 @@ begin
     Ini.Free;
   end;
 end;
-//C:\Documents and Settings\MANDRAVELLOS\Local Settings\Application Data\Copy of devcpp-1.ini
+
 procedure UpdateAltConfigFile;
 var
     Ini: TIniFile;
@@ -1024,126 +1027,135 @@ begin
   fWatchError := true;
 end;
 
-
 { TCompilerOpts }
 
 procedure TdevCompiler.AddDefaultOptions;
-var i : integer;
-    sl : TStringList;
+var
+	i : integer;
+	sl : TStringList;
 begin
-  // WARNING: do *not* re-arrange the options. Their values are written to the ini file
-  // with the same order. If you change the order here, the next time the configuration
-  // is read, it will assign the values to the *wrong* options...
-  // Anyway, the tree that displays the options is sorted, so no real reason to re-arrange
-  // anything here ;)
-  //
-  // NOTE: As you see, to indicate sub-groups use the "/" char...
-  for i := 0 to fOptions.Count - 1 do begin
-    if Assigned(PCompilerOption(fOptions.Items[i]).optChoices) then
-      PCompilerOption(fOptions.Items[i]).optChoices.Free;
-    Dispose(fOptions.Items[i]);
-  end;
-  fOptions.Clear;
+	// WARNING: do *not* re-arrange the options. Their values are written to the ini file
+	// with the same order. If you change the order here, the next time the configuration
+	// is read, it will assign the values to the *wrong* options...
+	// Anyway, the tree that displays the options is sorted, so no real reason to re-arrange
+	// anything here ;)
 
-  AddOption(Lang[ID_COPT_ANSIC], False, True, True, False, 0, '-ansi', Lang[ID_COPT_GRP_C], [], nil);
-  AddOption(Lang[ID_COPT_TRADITIONAL], False, True, True, False, 0, '-traditional-cpp', Lang[ID_COPT_GRP_C], [], nil);
-  AddOption(Lang[ID_COPT_WARNING], False, True, True, False, 0, '-w', Lang[ID_COPT_GRP_C], [], nil);
-  AddOption(Lang[ID_COPT_ACCESS], False, True, True, False, 0, '-fno-access-control', Lang[ID_COPT_GRP_CPP], [], nil);
-  AddOption(Lang[ID_COPT_DOLLAR], False, True, True, False, 0, '-fdollar-in-identifiers', Lang[ID_COPT_GRP_CPP], [], nil);
-  AddOption(Lang[ID_COPT_HEURISTICS], False, True, True, False, 0, '-fsave-memoized', Lang[ID_COPT_GRP_CPP], [], nil);
-  AddOption(Lang[ID_COPT_EXCEPT], False, True, True, False, 0, '-fexceptions', Lang[ID_COPT_GRP_CODEGEN], [], nil);
-  AddOption(Lang[ID_COPT_DBLFLOAT], False, True, True, False, 0, '-fshort-double', Lang[ID_COPT_GRP_CODEGEN], [], nil);
-  AddOption(Lang[ID_COPT_MEM], False, True, True, False, 0, '-fverbose-asm', Lang[ID_COPT_GRP_CODEGEN], [], nil);
-  AddOption(Lang[ID_COPT_OPTMINOR], False, True, True, False, 0, '-fexpensive-optimizations', Lang[ID_COPT_GRP_OPTIMIZE], [], nil);
-  AddOption(Lang[ID_COPT_OPT1], True, True, True, False, 0, '-O1', Lang[ID_COPT_GRP_OPTIMIZE]+'/'+Lang[ID_COPT_FURTHEROPTS], [], nil);
-  AddOption(Lang[ID_COPT_OPTMORE], True, True, True, False, 0, '-O2', Lang[ID_COPT_GRP_OPTIMIZE]+'/'+Lang[ID_COPT_FURTHEROPTS], [], nil);
-  AddOption(Lang[ID_COPT_OPTBEST], True, True, True, False, 0, '-O3', Lang[ID_COPT_GRP_OPTIMIZE]+'/'+Lang[ID_COPT_FURTHEROPTS], [], nil);
-  AddOption(Lang[ID_COPT_PROFILE], False, True, True, False, 0, '-pg', Lang[ID_COPT_PROFILING], [], nil);
-  AddOption(Lang[ID_COPT_OBJC], False, False, False, True, 0, '-lobjc', Lang[ID_COPT_LINKERTAB], [], nil);
-  AddOption(Lang[ID_COPT_DEBUG], False, True, True, True, 0, '-g3', Lang[ID_COPT_LINKERTAB], [], nil);
-  AddOption(Lang[ID_COPT_NOLIBS], False, True, True, True, 0, '-nostdlib', Lang[ID_COPT_LINKERTAB], [], nil);
-  AddOption(Lang[ID_COPT_WIN32], False, True, True, True, 0, '-mwindows', Lang[ID_COPT_LINKERTAB], [dptGUI], nil);
-  AddOption(Lang[ID_COPT_ERRORLINE], False, True, True, True, 0, '-fmessage-length=0', Lang[ID_COPT_GRP_C], [], nil);
-  AddOption(Lang[ID_COPT_STRIP], False, False, False, True, 0, '-s', Lang[ID_COPT_LINKERTAB], [], nil);
+	// NOTE: As you see, to indicate sub-groups use the "/" char...
+	for i := 0 to fOptions.Count - 1 do begin
+		if Assigned(PCompilerOption(fOptions.Items[i]).optChoices) then
+			PCompilerOption(fOptions.Items[i]).optChoices.Free;
+		Dispose(fOptions.Items[i]);
+	end;
+	fOptions.Clear;
 
-  // Architecture params
-  sl := TStringList.Create;
-  sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
-  sl.Add('i386=i386');
-  sl.Add('i486=i486');
-  sl.Add('i586=i586');
-  sl.Add('i686=i686');
-  sl.Add('Pentium=pentium');
-  sl.Add('Pentium MMX=pentium-mmx');
-  sl.Add('Pentium Pro=pentiumpro');
-  sl.Add('Pentium 2=pentium2');
-  sl.Add('Pentium 3=pentium3');
-  sl.Add('Pentium 4=pentium4');
-  sl.Add('K6=k6');
-  sl.Add('K6-2=k6-2');
-  sl.Add('K6-3=k6-3');
-  sl.Add('Athlon=athlon');
-  sl.Add('Athlon Tbird=athlon-tbird');
-  sl.Add('Athlon 4=athlon-4');
-  sl.Add('Athlon XP=athlon-xp');
-  sl.Add('Athlon MP=athlon-mp');
-  sl.Add('Winchip C6=winchip-c6');
-  sl.Add('Winchip 2=winchip2');
-  sl.Add('K8=k8');
-  sl.Add('C3=c3');
-  sl.Add('C3-2=c3-2');
+	AddOption(Lang[ID_COPT_ANSIC],       False, True,  True,  False, 0, '-ansi',                     Lang[ID_COPT_GRP_C],       [],       nil);
+	AddOption(Lang[ID_COPT_ERRORLINE],   False, True,  True,  True,  0, '-fmessage-length=0',        Lang[ID_COPT_GRP_C],       [],       nil);
+	AddOption(Lang[ID_COPT_TRADITIONAL], False, True,  True,  False, 0, '-traditional-cpp',          Lang[ID_COPT_GRP_C],       [],       nil);
+	AddOption(Lang[ID_COPT_ACCESS],      False, True,  True,  False, 0, '-fno-access-control',       Lang[ID_COPT_GRP_CPP],     [],       nil);
+	AddOption(Lang[ID_COPT_DOLLAR],      False, True,  True,  False, 0, '-fdollar-in-identifiers',   Lang[ID_COPT_GRP_CPP],     [],       nil);
+	AddOption(Lang[ID_COPT_HEURISTICS],  False, True,  True,  False, 0, '-fsave-memoized',           Lang[ID_COPT_GRP_CPP],     [],       nil);
+	AddOption(Lang[ID_COPT_EXCEPT],      False, True,  True,  False, 0, '-fexceptions',              Lang[ID_COPT_GRP_CODEGEN], [],       nil);
+	AddOption(Lang[ID_COPT_DBLFLOAT],    False, True,  True,  False, 0, '-fshort-double',            Lang[ID_COPT_GRP_CODEGEN], [],       nil);
+	AddOption(Lang[ID_COPT_MEM],         False, True,  True,  False, 0, '-fverbose-asm',             Lang[ID_COPT_GRP_CODEGEN], [],       nil);
+	AddOption(Lang[ID_COPT_WARNING],     False, True,  True,  False, 0, '-w',                        Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_WARNINGPLUS], False, True,  True,  False, 0, '-Wall',                     Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_WARNINGEX],   False, True,  True,  False, 0, '-Wextra',                   Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_ISOCONFORM],  False, True,  True,  False, 0, '-pedantic',                 Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_PROFILE],     False, True,  True,  False, 0, '-pg',                       Lang[ID_COPT_PROFILING],   [],       nil);
+	AddOption(Lang[ID_COPT_OBJC],        False, False, False, True,  0, '-lobjc',                    Lang[ID_COPT_LINKERTAB],   [],       nil);
+	AddOption(Lang[ID_COPT_DEBUG],       False, True,  True,  True,  0, '-g3',                       Lang[ID_COPT_LINKERTAB],   [],       nil);
+	AddOption(Lang[ID_COPT_NOLIBS],      False, True,  True,  True,  0, '-nostdlib',                 Lang[ID_COPT_LINKERTAB],   [],       nil);
+	AddOption(Lang[ID_COPT_WIN32],       False, True,  True,  True,  0, '-mwindows',                 Lang[ID_COPT_LINKERTAB],   [dptGUI], nil);
+	AddOption(Lang[ID_COPT_STRIP],       False, False, False, True,  0, '-s',                        Lang[ID_COPT_LINKERTAB],   [],       nil);
 
-  AddOption(Lang[ID_COPT_ARCH], False, True, True, True, 0, '-march=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
+	// Architecture params
+	sl := TStringList.Create;
+	sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
+	sl.Add('Generic=generic');
+	sl.Add('This CPU=native');
+	sl.Add('i386=i386');
+	sl.Add('i486=i486');
+	sl.Add('i586=i586');
+	sl.Add('i686=i686');
+	sl.Add('Pentium=pentium');
+	sl.Add('Pentium MMX=pentium-mmx');
+	sl.Add('Pentium Pro=pentiumpro');
+	sl.Add('Pentium 2=pentium2');
+	sl.Add('Pentium 3=pentium3');
+	sl.Add('Pentium 4=pentium4');
+	sl.Add('Conroe=core2');
+	sl.Add('K6=k6');
+	sl.Add('K6-2=k6-2');
+	sl.Add('K6-3=k6-3');
+	sl.Add('Athlon=athlon');
+	sl.Add('Athlon Tbird=athlon-tbird');
+	sl.Add('Athlon 4=athlon-4');
+	sl.Add('Athlon XP=athlon-xp');
+	sl.Add('Athlon MP=athlon-mp');
+	sl.Add('K8=k8');
+	sl.Add('K8 Rev.E=k8-sse3');
+	sl.Add('K10=barcelona');
+	AddOption(Lang[ID_COPT_ARCH], False, True, True, True, 0, '-march=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 
-  // Built-in processor functions
-  sl := TStringList.Create;
-  sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
-  sl.Add('MMX=mmx');
-  sl.Add('SSE=sse');
-  sl.Add('SSE 2=sse2');
-  sl.Add('PNI=pni');
-  sl.Add('3D Now=3dnow');
+	// Built-in processor functions
+	sl := TStringList.Create;
+	sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
+	sl.Add('MMX=mmx');
+	sl.Add('SSE=sse');
+	sl.Add('SSE2=sse2');
+	sl.Add('SSE3=sse3');
+	sl.Add('SSSE3=ssse3');
+	sl.Add('SSE4A=sse4a');
+	sl.Add('SSE4.1=sse4.1');
+	sl.Add('SSE4.2=sse4.2');
+	sl.Add('3D Now=3dnow');
+	AddOption(Lang[ID_COPT_BUILTINPROC], False, True, True, True, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 
-  AddOption(Lang[ID_COPT_BUILTINPROC], False, True, True, True, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], [], sl);
+	// Optimization
+	sl := TStringList.Create;
+	sl.Add('None=0');
+	sl.Add('Low=1');
+	sl.Add('Med=2');
+	sl.Add('High=3');
+	AddOption(Lang[ID_COPT_OPTIMIZE], False, True, True, True, 0, '-O', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 end;
 
-procedure TdevCompiler.AddOption(_Name: string; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer;
-  _Setting, _Section: string; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);
+procedure TdevCompiler.AddOption(_Name: string; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer;_Setting, _Section: string; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);
 var
-  P: PCompilerOption;
+	option: PCompilerOption;
 begin
-  P := New(PCompilerOption);
-  with P^ do begin
-    optName := _Name;
-    optIsGroup := _IsGroup;
-    optIsC := _IsC;
-    optIsCpp := _IsCpp;
-    optIsLinker := IsLinker;
-    optValue := _Value;
-    optSetting := _Setting;
-    optSection := _Section;
-    optExcludeFromTypes := ExcludeFromTypes;
-    optChoices := Choices;
-  end;
-  fOptions.Add(P);
+	option := New(PCompilerOption);
+	with option^ do begin
+		optName := _Name;
+		optIsGroup := _IsGroup;
+		optIsC := _IsC;
+		optIsCpp := _IsCpp;
+		optIsLinker := IsLinker;
+		optValue := _Value;
+		optSetting := _Setting;
+		optSection := _Section;
+		optExcludeFromTypes := ExcludeFromTypes;
+		optChoices := Choices;
+	end;
+	fOptions.Add(option);
 end;
 
 procedure TdevCompiler.ChangeOptionsLang;
 begin
-  ClearOptions;
-  AddDefaultOptions;
-  LoadSettings;
+	ClearOptions;
+	AddDefaultOptions;
+	LoadSettings;
 end;
 
 procedure TdevCompiler.ClearOptions;
 begin
-  while fOptions.Count > 0 do begin
-    if Assigned(PCompilerOption(fOptions[0]).optChoices) then
-      PCompilerOption(fOptions[0]).optChoices.Free;
-    if Assigned(fOptions[0]) then
-      Dispose(fOptions[0]);
-    fOptions.Delete(0);
-  end;
+	while fOptions.Count > 0 do begin
+		if Assigned(PCompilerOption(fOptions[0]).optChoices) then
+			PCompilerOption(fOptions[0]).optChoices.Free;
+		if Assigned(fOptions[0]) then
+			Dispose(fOptions[0]);
+		fOptions.Delete(0);
+	end;
 end;
 
 constructor TdevCompiler.Create;
@@ -1172,16 +1184,16 @@ end;
 
 function TdevCompiler.FindOption(Setting: string; var opt: TCompilerOption; var Index: integer): boolean;
 var
-  I: integer;
+	I: integer;
 begin
-  Result:=False;
-  for I:=0 to fOptions.Count-1 do
-    if Options[I].optSetting = Setting then begin
-      opt:=Options[I];
-      Index:=I;
-      Result:=True;
-      Break;
-    end;
+	Result:=False;
+	for I:=0 to fOptions.Count-1 do
+		if Options[I].optSetting = Setting then begin
+			opt:=Options[I];
+			Index:=I;
+			Result:=True;
+			Break;
+		end;
 end;
 
 function TdevCompiler.GetOptions(Index: integer): TCompilerOption;
@@ -1191,51 +1203,57 @@ end;
 
 function TdevCompiler.GetOptionStr: string;
 var
-  I: integer;
+	I: integer;
 begin
-  Result:='';
-   for I := 0 to OptionsCount - 1 do
-     Result:=Result+BoolVal10[Options[I].optValue];
+	Result:='';
+	for I := 0 to OptionsCount - 1 do
+		Result:=Result+BoolVal10[Options[I].optValue];
 end;
 
 procedure TdevCompiler.LoadSettings;
 var
- s,
- key: string;
- I: integer;
- opt: TCompilerOption;
+	dummystring, key	: string;
+	I,J					: integer;
+	opt					: TCompilerOption;
 begin
-  with devData do
-   begin
-     key:= 'Compiler';
-     fUseParams:= LoadBoolSetting(key, 'UseParams');
-     fIntermediate:= LoadSetting(key, 'InterDir');
-     fOutputDir:= LoadSetting(key, 'OutputDir');
-     fRunParams:= LoadSetting(key, 'RunParams');
-     //fCompAdd:= LoadBoolSetting(key, 'CompAdd');
-     //fLinkAdd:= LoadBoolSetting(key, 'LinkAdd');
-     fcmdOpts:= LoadSetting(key, 'cmdline');
-     flinkopts:= LoadSetting(key, 'LinkLine');
+	with devData do begin
+		// Figure out which set we're using
+		CompilerSet := StrToIntDef(LoadSettingS('Compiler', 'CompilerSet'), 0);
+		key := 'CompilerSets_' + IntToStr(CompilerSet);
 
-     fSaveLog:= LoadBoolSetting(key, 'Log');
-     s:= LoadSetting(key, 'Delay');
-     if s <> '' then fDelay:= strtoint(s);
+		fUseParams:=    LoadSettingB(key, 'UseParams');
+		fIntermediate:= LoadSettingS(key, 'InterDir');
+		fOutputDir:=    LoadSettingS(key, 'OutputDir');
+		fRunParams:=    LoadSettingS(key, 'RunParams');
+		fCompAdd:=      LoadSettingB(key, 'CompAdd');
+		fLinkAdd:=      LoadSettingB(key, 'LinkAdd');
+		fCompOpt:=      LoadSettingS(key, 'CompOpt');
+		fLinkOpt:=      LoadSettingS(key, 'LinkOpt');
+		fSaveLog:=      LoadSettingB(key, 'Log');
 
-     CompilerSet := StrToIntDef(LoadSetting(key, 'CompilerSet'), 0);
+		dummystring:=   LoadSettingS(key, 'Delay');
+		if dummystring <> '' then fDelay:= strtoint(dummystring);
 
-     S := LoadSetting(key, 'Options');
-     for I := 0 to fOptions.Count - 1 do begin
-       opt := Options[I];
-       if (I < Length(S)) and (StrToIntDef(S[I+1], 0) = 1) then
-         opt.optValue := 1
-       else
-         opt.optValue := 0;
-       Options[I] := opt;
-     end;
+		dummystring := LoadSettingS(key, 'Options');
+		for I := 0 to fOptions.Count - 1 do begin
+			opt := Options[I];
+			// Unknown options are set to false
+			if (I >= Length(dummystring)) then
+				opt.optValue := 0
+			else
+			// Else, scan boolval
+				for J := 0 to 28 do begin
+					if dummystring[I+1] = BoolVal10[J] then begin
+						opt.optValue := J;
+						Break;
+					end;
+				end;
+			Options[I] := opt;
+		end;
 
-     key:= 'Makefile';
-     fFastDep:= LoadboolSetting(fFastDep, key, 'FastDep');
-   end;
+		// Entry might nog exist yet, so pass a default
+		fFastDep:= LoadSettingB('Makefile', 'FastDep','TRUE');
+	end;
 end;
 
 function TdevCompiler.OptionsCount: integer;
@@ -1244,79 +1262,54 @@ begin
 end;
 
 procedure TdevCompiler.SaveSettings;
-var
- S, key: string;
- I: integer;
 begin
-  with devData do
-   begin
-     key:= 'Compiler';
-     SaveboolSetting(key, 'UseParams', fUseParams);
-     SaveSetting(key, 'InterDir', fIntermediate);
-     SaveSetting(key, 'OutputDir', fOutputDir);
-     SaveSetting(key, 'RunParams', fRunParams);
-     //SaveBoolSetting(key, 'CompAdd', fCompAdd);
-     //SaveBoolSetting(key, 'LinkAdd', fLinkAdd);
-     //SaveSetting(key, 'cmdline', fcmdOpts);
-     //SaveSetting(key, 'LinkLine', flinkopts);
-
-     SaveBoolSetting(key, 'Log', fSaveLog);
-     SaveSetting(key, 'Delay', inttostr(fDelay));
-
-     SaveSetting(key, GCC_PROGRAM, fgccName);
-     SaveSetting(key, GPP_PROGRAM, fgppName);
-     SaveSetting(key, GDB_PROGRAM, fgdbName);
-     SaveSetting(key, MAKE_PROGRAM, fmakeName);
-     SaveSetting(key, WINDRES_PROGRAM, fwindresName);
-     SaveSetting(key, DLLWRAP_PROGRAM, fdllwrapName);
-     SaveSetting(key, GPROF_PROGRAM, fgprofName);
-     SaveSetting(key, 'CompilerSet', IntToStr(fCompilerSet));
-
-     S := '';
-     for I := 0 to fOptions.Count - 1 do
-       with PCompilerOption(fOptions[I])^ do
-         S := S + BoolVal10[optValue];
-     SaveSetting(key, 'Options', S);
-
-     key:= 'Makefile';
-     SaveBoolSetting(key, 'FastDep', fFastDep);
-   end;
+	with devData do begin
+		SaveSettingS('Compiler', 'CompilerSet',  IntToStr(fCompilerSet));
+	end;
 end;
 
 procedure TdevCompiler.SetCompilerSet(const Value: integer);
 begin
- if fCompilerSet=Value then Exit;
- if not Assigned(devCompilerSet) then
-   devCompilerSet:=TdevCompilerSet.Create;
- devCompilerSet.LoadSet(Value);
-// Programs
-  fCompilerSet:=Value;
-  if devDirs.OriginalPath = '' then // first time only
-    devDirs.OriginalPath := GetEnvironmentVariable('PATH');
-  SetPath(devDirs.Bins);
-//  devCompilerSet.LoadSet(Value);
-//  fgccName := devCompilerSet.gccName;
-//  fgppName := devCompilerSet.gppName;
-//  fgdbName := devCompilerSet.gdbName;
-//  fmakeName := devCompilerSet.makeName;
-//  fwindresName := devCompilerSet.windresName;
-//  fdllwrapName := devCompilerSet.dllwrapName;
-//  fgprofName := devCompilerSet.gprofName;
-  // TODO: basedir
+	// If this one is already active
+	if fCompilerSet=Value then Exit;
+
+	// If we don't have this one yet (user created one)
+	if not Assigned(devCompilerSet) then
+		devCompilerSet:=TdevCompilerSet.Create;
+
+	devCompilerSet.LoadSet(Value);
+
+	// Programs
+	fCompilerSet:=Value;
+	if devDirs.OriginalPath = '' then // first time only
+		devDirs.OriginalPath := GetEnvironmentVariable('PATH');
+
+	SetPath(devDirs.Bins);
+	fgccName := devCompilerSet.gccName;
+	fgppName := devCompilerSet.gppName;
+	fgdbName := devCompilerSet.gdbName;
+	fmakeName := devCompilerSet.makeName;
+	fwindresName := devCompilerSet.windresName;
+	fdllwrapName := devCompilerSet.dllwrapName;
+	fgprofName := devCompilerSet.gprofName;
+
+	fCompOpt := devCompilerSet.CompOpts;
+	fLinkOpt := devCompilerSet.LinkOpts;
+	fCompAdd := devCompilerSet.AddToComp;
+	fLinkAdd := devCompilerSet.AddToLink;
 end;
 
-procedure TdevCompiler.SetOptions(Index: integer;
-  const Value: TCompilerOption);
+procedure TdevCompiler.SetOptions(Index: integer;const Value: TCompilerOption);
 begin
-  with TCompilerOption(fOptions[Index]^) do begin
-    optName := Value.optName;
-    optIsGroup := Value.optIsGroup;
-    optIsC := Value.optIsC;
-    optIsCpp := Value.optIsCpp;
-    optValue := Value.optValue;
-    optSetting := Value.optSetting;
-    optSection := Value.optSection;
-  end;
+	with TCompilerOption(fOptions[Index]^) do begin
+		optName := Value.optName;
+		optIsGroup := Value.optIsGroup;
+		optIsC := Value.optIsC;
+		optIsCpp := Value.optIsCpp;
+		optValue := Value.optValue;
+		optSetting := Value.optSetting;
+		optSection := Value.optSection;
+	end;
 end;
 
 procedure TdevCompiler.SetOptionStr(const Value: string);
@@ -1341,32 +1334,24 @@ end;
 
 procedure TdevCompiler.SettoDefaults;
 begin
-  fRunParams:= '';
-  fUseParams:= FALSE;
-  fModified:= TRUE;
-  fSaveLog:= FALSE;
-  //fCompAdd:= FALSE;
-  //fLinkAdd:= FALSE;
-  fcmdOpts:= '';
-  flinkOpts:= '';
-  fDelay:= 0;
+	// Executable commands
+	fRunParams:= '';
+	fUseParams:= FALSE;
+	fModified:= TRUE;
+	fSaveLog:= FALSE;
 
-  // makefile
-  fFastDep:= TRUE;
+	// Compile delau
+	fDelay:= 0;
 
-  // Programs
-  fgccName := GCC_PROGRAM;
-  fgppName := GPP_PROGRAM;
-  fgdbName := GDB_PROGRAM;
-  fmakeName := MAKE_PROGRAM;
-  fwindresName := WINDRES_PROGRAM;
-  fdllwrapName := DLLWRAP_PROGRAM;
-  fgprofName := GPROF_PROGRAM;
-  fCompilerSet:=0;
+	// Makefile
+	fFastDep:= TRUE;
 
-  AddDefaultOptions;
+	// Everything else gets loaded from this set
+	fCompilerSet:=0;
+
+	// Fill option HWND's
+	AddDefaultOptions;
 end;
-
 
 { TDevDirs }
 
@@ -1380,43 +1365,45 @@ end;
 
 procedure TdevDirs.SettoDefaults;
 var
-  tempstr: String;
+	tempstr: String;
 begin
-  fDefault:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
-  fBinDir:= ValidatePaths(fDefault + BIN_DIR, tempstr);
-  fCDir:= ValidatePaths(fDefault + C_INCLUDE_DIR, tempstr);
-  fCppDir:= ValidatePaths(fDefault
-    + StringReplace(CPP_INCLUDE_DIR, ';', ';' + fDefault, [rfReplaceAll]), tempstr);
-  fLibDir:= ValidatePaths(fDefault + LIB_DIR, tempstr);
+	fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 
-  fExec:= ExtractFilePath(Application.ExeName);
-  fConfig:= fExec;
-  fHelp:= fExec + HELP_DIR;
-  fIcons:= fExec + ICON_DIR;
-  fLang:= fExec + LANGUAGE_DIR;
-  fTemp:= fExec + TEMPLATE_DIR;
-  fThemes:= fExec + THEME_DIR;
+	fBinDir:= ValidatePaths(fExec + StringReplace(BIN_DIR, ';', ';' + fExec, [rfReplaceAll]), tempstr);
+	if(LIB_DIR <> '') then
+		fLibDir:= LIB_DIR;
+	if(C_INCLUDE_DIR <> '') then
+		fCDir:= C_INCLUDE_DIR;
+	if(CPP_INCLUDE_DIR <> '') then
+		fCppDir:= CPP_INCLUDE_DIR;
+
+	fConfig:= fExec;
+	fHelp:= fExec + HELP_DIR;
+	fIcons:= fExec + ICON_DIR;
+	fLang:= fExec + LANGUAGE_DIR;
+	fTemp:= fExec + TEMPLATE_DIR;
+	fThemes:= fExec + THEME_DIR;
 end;
 
 procedure TdevDirs.LoadSettings;
 begin
   devData.LoadObject(Self);
   fExec:= ExtractFilePath(Application.ExeName);
-  if fHelp = '' then fHelp:= fExec +HELP_DIR;
-  if fIcons = '' then fIcons:= fExec +ICON_DIR;
-  if fLang = '' then fLang:= fExec +LANGUAGE_DIR;
-  if fTemp = '' then fTemp:= fExec +TEMPLATE_DIR;
-  if fThemes = '' then  fThemes:= fExec +THEME_DIR;
+  if fHelp = ''   then  fHelp:=   fExec + HELP_DIR;
+  if fIcons = ''  then  fIcons:=  fExec + ICON_DIR;
+  if fLang = ''   then  fLang:=   fExec + LANGUAGE_DIR;
+  if fTemp = ''   then  fTemp:=   fExec + TEMPLATE_DIR;
+  if fThemes = '' then  fThemes:= fExec + THEME_DIR;
   FixPaths;
 end;
 
 procedure TdevDirs.SaveSettings;
 begin
-  fHelp:= ExtractRelativePath(fExec, fHelp);
-  fIcons:= ExtractRelativePath(fExec, fIcons);
-  fLang:= ExtractRelativePath(fExec, fLang);
-  fTemp:= ExtractRelativePath(fExec, fTemp);
-  fMingw:= ExtractRelativePath(fExec, fMingw);
+  fHelp:=   ExtractRelativePath(fExec, fHelp);
+  fIcons:=  ExtractRelativePath(fExec, fIcons);
+  fLang:=   ExtractRelativePath(fExec, fLang);
+  fTemp:=   ExtractRelativePath(fExec, fTemp);
+  fMingw:=  ExtractRelativePath(fExec, fMingw);
   fThemes:= ExtractRelativePath(fExec, fThemes);
   devData.SaveObject(Self);
   FixPaths;
@@ -1429,204 +1416,196 @@ begin
   // really screwed up...
   // Basically it checks if it is a relative path (as it should be).
   // If so, it prepends the base Dev-C++ directory...
-  if ExtractFileDrive(fHelp)='' then
-    fHelp:=fExec+fHelp;
-  if ExtractFileDrive(fIcons)='' then
-    fIcons:=fExec+fIcons;
-  if ExtractFileDrive(fLang)='' then
-    fLang:=fExec+fLang;
-  if ExtractFileDrive(fTemp)='' then
-    fTemp:=fExec+fTemp;
-  if ExtractFileDrive(fThemes)='' then
-    fThemes:=fExec+fThemes;
-  if ExtractFileDrive(fMingw)='' then
-    fMingw:=fExec+fMingw;
+  if ExtractFileDrive(fHelp)=''   then fHelp:=   fExec+fHelp;
+  if ExtractFileDrive(fIcons)=''  then fIcons:=  fExec+fIcons;
+  if ExtractFileDrive(fLang)=''   then fLang:=   fExec+fLang;
+  if ExtractFileDrive(fTemp)=''   then fTemp:=   fExec+fTemp;
+  if ExtractFileDrive(fThemes)='' then fThemes:= fExec+fThemes;
+  if ExtractFileDrive(fMingw)=''  then fMingw:=  fExec+fMingw;
 end;
-
-{ TDevEditor }
 
 constructor TdevEditor.Create;
 begin
-  inherited;
-  Name:= OPT_EDITOR;
+	inherited;
+	Name:= OPT_EDITOR;
 
-  fFont:= TFont.Create;
-  fGutterfont:= TFont.Create;
-  fSyntax:= TStringList.Create;
-  TStringList(fSynTax).Duplicates:=  dupIgnore;
-  SettoDefaults;
-  LoadSettings;
+	fFont:= TFont.Create;
+	fGutterfont:= TFont.Create;
+	fSyntax:= TStringList.Create;
+	TStringList(fSynTax).Duplicates:= dupIgnore;
+
+	SettoDefaults;
+	LoadSettings;
 end;
 
 destructor TdevEditor.Destroy;
 begin
-  fFont.Free;
-  fGutterfont.Free;
-  fSynTax.Free;
-  inherited;
+	fFont.Free;
+	fGutterfont.Free;
+	fSynTax.Free;
+	inherited;
 end;
 
 procedure TdevEditor.LoadSettings;
 begin
-  devData.LoadObject(Self);
+	devData.LoadObject(Self);
 end;
 
 procedure TdevEditor.SaveSettings;
 begin
-  devData.SaveObject(Self);
+	devData.SaveObject(Self);
 end;
 
 procedure TdevEditor.SettoDefaults;
 begin
-  fFont.name:= 'Courier New';
-  fFont.Size:= 10;
-  fTabSize:= 4;
-  fShowGutter:= TRUE;
-  fCustomGutter:= TRUE;
-  fGutterSize:= 32;
-  fGutterFont.Name:= 'Terminal';
-  fGutterFont.Size:= 9;
-  fGutterAuto:= FALSE;
+	// General
+	fAutoIndent:= TRUE;
+	fInsertMode:= TRUE;
+	fTabtoSpaces:= FALSE; // Use Tab Character (inverse)
+	fSmartTabs:= FALSE;
+	fTrailBlanks:= FALSE;
+	fSmartUnindent:= TRUE; // Backspace unindents
+	fGroupUndo:= TRUE;
+	fInsDropFiles:= FALSE;
+	fSpecialChar:= FALSE;
+	fAppendNewline := TRUE; // Newline at end of file
 
-  fInsertCaret:= 0;
-  fOverwriteCaret:= 0;
+	// General #2
+	fEHomeKey:= TRUE;
+	fPastEOF:= FALSE;
+	fPastEOL:= FALSE;
+	fdblLine:= FALSE;
+	fFindText:= TRUE;
+	fShowScrollbars:= TRUE; // Show as needed
+	fHalfPage:= FALSE;
+	fShowScrollHint:= TRUE;
+	fParserHints:= TRUE; // Editor hints
+	fAutoCloseBrace:= FALSE; // Buggy
 
-  fMarginVis:= TRUE;
-  fMarginSize:= 80;
-  fMarginColor:= cl3DLight;
+	// Caret
+	fInsertCaret:= 0;
+	fOverwriteCaret:= 3;
+	fMatch := TRUE;
 
-  fGroupUndo:= TRUE;
+	// Margin
+	fMarginVis:= TRUE;
+	fMarginSize:= 80;
+	fMarginColor:= cl3DLight;
 
-  fLineNumbers:= FALSE;
-  fLeadZero:= FALSE;
-  fFirstisZero:= FALSE;
-  fEHomeKey:= FALSE;
+	// Misc.
+	fUseSyn:= TRUE;
+	//last ; is for files with no extension
+	//which should be treated as cpp header files
+	fSynExt:= 'c;cpp;h;hpp;cc;cxx;cp;hp;rh;fx;;';
+	fHighCurrLine:= TRUE;
+	fHighColor:= $FFFFCC; // Light Turquoise
+	fTabSize:= 4;
 
-  fShowScrollHint:= TRUE;
-  fShowScrollbars:= TRUE;
-  fHalfPage:= FALSE;
+	// Display
+	fFont.name:= 'Courier New';
+	fFont.Size:= 10;
 
-  fPastEOF:= FALSE;
-  fPastEOL:= FALSE;
-  fTrailBlanks:= FALSE;
-  fdblLine:= FALSE;
-  fFindText:= TRUE;
+	// Display #2
+	fShowGutter:= TRUE;
+	fGutterAuto:= FALSE;
+	fCustomGutter:= TRUE;
+	fLineNumbers:= TRUE;
+	fFirstisZero:= FALSE;
+	fLeadZero:= FALSE;
+	fGutterFont.Name:= 'Courier New';
+	fGutterFont.Size:= 10;
+	fGutterSize:= 32;
 
-  fAutoCloseBrace:= FALSE;  // not working well/turned off
-
-  fInsertMode:= TRUE;
-  fAutoIndent:= TRUE;
-  fSmartTabs:= TRUE;
-  fSmartUnindent:= TRUE;
-  fTabtoSpaces:= TRUE;
-
-  fUseSyn:= TRUE;
-  //last ; is for files with no extension
-  //which should be treated as cpp header files
-  fSynExt:= 'c;cpp;h;hpp;cc;cxx;cp;hp;rh;';
-
-  fParserHints:= TRUE;
-  fMatch := false;
-
-  fHighCurrLine := True;
-  fHighColor := $FFFFCC; //Light Turquoise
-
-  fAppendNewline := True;
 end;
 
 procedure TdevEditor.AssignEditor(Editor: TSynEdit);
 var
- pt: TPoint;
- x: integer;
+	pt,guttercolor: TPoint;
+	x: integer;
 begin
-  if (not assigned(Editor)) or (not (Editor is TCustomSynEdit)) then exit;
-  with Editor do
-   begin
-     BeginUpdate;
-     try
-      TabWidth:= fTabSize;
+	if (not assigned(Editor)) or (not (Editor is TCustomSynEdit)) then exit;
+	with Editor do begin
+		BeginUpdate;
+	try
+		TabWidth:= fTabSize;
+		Font.Assign(fFont);
+		with Gutter do begin
+			UseFontStyle:= fCustomGutter;
+			Font.Assign(fGutterFont);
+			Width:= fGutterSize;
+			Visible:= fShowGutter;
+			AutoSize:= fGutterAuto;
+			ShowLineNumbers:= fLineNumbers;
+			LeadingZeros:= fLeadZero;
+			ZeroStart:= fFirstisZero;
+			x:= fSyntax.IndexofName(cGut);
+			if x <> -1 then begin
+				// Hacky color fix
+				guttercolor.x:= clBtnFace;
+				guttercolor.y:= clBlack;
+				fSyntax.Values[cGut]:= PointtoStr(guttercolor);
+				StrtoPoint(pt, fSyntax.Values[cGut]);
+				Color:= pt.x;
+				Font.Color:= pt.y;
+			end;
+		end;
 
-      Font.Assign(fFont);
-      with Gutter do
-       begin
-         UseFontStyle:= fCustomGutter;
-         Font.Assign(fGutterFont);
-         Width:= fGutterSize;
-         Visible:= fShowGutter;
-         AutoSize:= fGutterAuto;
-         ShowLineNumbers:= fLineNumbers;
-         LeadingZeros:= fLeadZero;
-         ZeroStart:= fFirstisZero;
-         x:= fSyntax.IndexofName(cGut);
-         if x <> -1 then
-          begin
-            StrtoPoint(pt, fSyntax.Values[cGut]);
-            Color:= pt.x;
-            Font.Color:= pt.y;
-          end;
-       end;
+		if fMarginVis then
+			RightEdge:= fMarginSize
+		else
+			RightEdge:= 0;
 
-      if fMarginVis then
-       RightEdge:= fMarginSize
-      else
-       RightEdge:= 0;
+		RightEdgeColor:= fMarginColor;
 
-      RightEdgeColor:= fMarginColor;
+		InsertCaret:= TSynEditCaretType(fInsertCaret);
+		OverwriteCaret:= TSynEditCaretType(fOverwriteCaret);
 
-      InsertCaret:= TSynEditCaretType(fInsertCaret);
-      OverwriteCaret:= TSynEditCaretType(fOverwriteCaret);
+		ScrollHintFormat:= shfTopToBottom;
 
-      ScrollHintFormat:= shfTopToBottom;
+		if HighCurrLine then
+			ActiveLineColor := HighColor
+		else
+			ActiveLineColor := clNone;
 
-      if HighCurrLine then
-        ActiveLineColor := HighColor
-      else
-        ActiveLineColor := clNone;
+		Options := [
+			eoAltSetsColumnMode, eoDisableScrollArrows,
+			eoDragDropEditing, eoDropFiles, eoKeepCaretX,
+			eoRightMouseMovesCursor, eoScrollByOneLess, eoAutoSizeMaxScrollWidth
+		];
 
-      Options := [
-        eoAltSetsColumnMode, eoDisableScrollArrows,
-        eoDragDropEditing, eoDropFiles, eoKeepCaretX,
-        //eoAutoSizeMaxLeftChar was replaced by eoAutoSizeMaxScrollWidth
-        eoRightMouseMovesCursor, eoScrollByOneLess, eoAutoSizeMaxScrollWidth
-        {eoNoCaret, eoNoSelection, eoScrollHintFollows, }
-      ];
+		//Optional synedit options in devData
+		if fAutoIndent then
+			Options := Options + [eoAutoIndent];
+		if fEHomeKey then
+			Options := Options + [eoEnhanceHomeKey];
+		if fGroupUndo then
+			Options := Options + [eoGroupUndo];
+		if fHalfPage then
+			Options := Options + [eoHalfPageScroll];
+		if fShowScrollbars then
+			Options := Options + [eoHideShowScrollbars];
+		if fPastEOF then
+			Options := Options + [eoScrollPastEOF];
+		if fPastEOL then
+			Options := Options + [eoScrollPastEOL];
+		if fShowScrollHint then
+			Options := Options + [eoScrollHintFollows]; // Can also be eoSowScrollHint
+		if fSmartTabs then
+			Options := Options + [eoSmartTabs];
+		if fSmartTabs then
+			Options := Options + [eoSmartTabDelete];
+		if fTabtoSpaces then
+			Options := Options + [eoTabsToSpaces];
+		if fTrailBlanks then
+			Options := Options + [eoTrimTrailingSpaces];
+		if fSpecialChar then
+			Options := Options + [eoShowSpecialChars];
 
-      //Optional synedit options in devData
-      if fAutoIndent then
-        Options := Options + [eoAutoIndent];
-      if fEHomeKey then
-        Options := Options + [eoEnhanceHomeKey];
-      if fGroupUndo then
-        Options := Options + [eoGroupUndo];
-      if fHalfPage then
-        Options := Options + [eoHalfPageScroll];
-      if fShowScrollbars then
-        Options := Options + [eoHideShowScrollbars];
-      if fPastEOF then
-        Options := Options + [eoScrollPastEOF];
-      if fPastEOL then
-        Options := Options + [eoScrollPastEOL];
-      if fShowScrollHint then
-        Options := Options + [eoShowScrollHint];
-      if fSmartTabs then
-        Options := Options + [eoSmartTabs];
-      if fSmartTabs then
-        Options := Options + [eoSmartTabDelete];
-      if fTabtoSpaces then
-        Options := Options + [eoTabsToSpaces];
-      if fTrailBlanks then
-        Options := Options + [eoTrimTrailingSpaces];
-      if fSpecialChar then
-        Options := Options + [eoShowSpecialChars];
-
-     finally
-      EndUpdate;
-     end;
-   end;
+		finally
+			EndUpdate;
+		end;
+	end;
 end;
-
-
-{ TdevCodeCompletion }
 
 constructor TdevCodeCompletion.Create;
 begin
@@ -1738,25 +1717,21 @@ end;
 
 procedure TdevCompilerSet.AssignToCompiler;
 begin
-  devCompiler.gccName:=devCompilerSet.gccName;
-  devCompiler.gppName:=devCompilerSet.gppName;
-  devCompiler.gdbName:=devCompilerSet.gdbName;
-  devCompiler.makeName:=devCompilerSet.makeName;
-  devCompiler.windresName:=devCompilerSet.windresName;
-  devCompiler.dllwrapName:=devCompilerSet.dllwrapName;
-  devCompiler.gprofName:=devCompilerSet.gprofName;
-  //RNC
-  devCompiler.fcmdOpts:=devCompilerSet.fCmdOptions;
-  devCompiler.flinkopts:=devCompilerSet.fLinkOptions;
+	devCompiler.gccName:=devCompilerSet.gccName;
+	devCompiler.gppName:=devCompilerSet.gppName;
+	devCompiler.gdbName:=devCompilerSet.gdbName;
+	devCompiler.makeName:=devCompilerSet.makeName;
+	devCompiler.windresName:=devCompilerSet.windresName;
+	devCompiler.dllwrapName:=devCompilerSet.dllwrapName;
+	devCompiler.gprofName:=devCompilerSet.gprofName;
 
-  // we have to set the devDirs too
-  devDirs.Bins:=devCompilerSet.BinDir;
-  devDirs.C:=devCompilerSet.CDir;
-  devDirs.Cpp:=devCompilerSet.CppDir;
-  devDirs.Lib:=devCompilerSet.LibDir;
+	// we have to set the devDirs too
+	devDirs.Bins:=devCompilerSet.BinDir;
+	devDirs.C:=devCompilerSet.CDir;
+	devDirs.Cpp:=devCompilerSet.CppDir;
+	devDirs.Lib:=devCompilerSet.LibDir;
 
-
-  devCompiler.OptionStr:=fOptions;
+	devCompiler.OptionStr:=fOptions;
 end;
 
 constructor TdevCompilerSet.Create;
@@ -1788,39 +1763,19 @@ var
   maindir: String;
   makeSig, mingwmakeSig: String;
 
-{
-  function isPathInList(pathList, path: String): Boolean;
-  var
-    i: Integer;
-    strs: TStrings;
-  begin
-    Result := False;
-    strs := TStringList.Create;
-    strs.Delimiter := ';';
-    strs.DelimitedText := pathList;
-    for i := 0 to strs.Count -1 do
-      if strs[i] = path then
-      begin
-        Result := True;
-        break;
-      end;
-    strs.Free;
-  end;
-}
-
 begin
   if Index<0 then Exit;
   with devData do
    begin
      key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
      // dirs
-     fBinDir := LoadSetting(key, 'Bins');
+     fBinDir := LoadSettingS(key, 'Bins');
      if fBinDir='' then fBinDir:=devDirs.Bins;
-     fCDir := LoadSetting(key, 'C');
+     fCDir := LoadSettingS(key, 'C');
      if fCDir='' then fCDir:=devDirs.C;
-     fCppDir := LoadSetting(key, 'Cpp');
+     fCppDir := LoadSettingS(key, 'Cpp');
      if fCppDir='' then fCppDir:=devDirs.Cpp;
-     fLibDir := LoadSetting(key, 'Lib');
+     fLibDir := LoadSettingS(key, 'Lib');
      if fLibDir='' then fLibDir:=devDirs.Lib;
 
      //check for valid paths
@@ -1981,36 +1936,35 @@ end;
 
 procedure TdevCompilerSet.LoadSetProgs(Index: integer);
 var
- key: string;
+	key: string;
 begin
-  if Index<0 then Exit;
-  with devData do
-   begin
-     key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
-     // Programs
-     fgccName := LoadSetting(key, GCC_PROGRAM);
-     if fgccName='' then fgccName:=GCC_PROGRAM;
-     fgppName := LoadSetting(key, GPP_PROGRAM);
-     if fgppName='' then fgppName:=GPP_PROGRAM;
-     fgdbName := LoadSetting(key, GDB_PROGRAM);
-     if fgdbName='' then fgdbName:=GDB_PROGRAM;
-     fmakeName := LoadSetting(key, MAKE_PROGRAM);
-     if fmakeName='' then fmakeName:=MAKE_PROGRAM;
-     fwindresName := LoadSetting(key, WINDRES_PROGRAM);
-     if fwindresName='' then fwindresName:=WINDRES_PROGRAM;
-     fdllwrapName := LoadSetting(key, DLLWRAP_PROGRAM);
-     if fdllwrapName='' then fdllwrapName:=DLLWRAP_PROGRAM;
-     fgprofName := LoadSetting(key, GPROF_PROGRAM);
-     if fgprofName='' then fgprofName:=GPROF_PROGRAM;
-     fOptions := LoadSetting(key, 'Options');
+	if Index<0 then Exit;
+	with devData do begin
+		key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
 
-     //RNC
-    fCmdOptions:= LoadSetting(key, 'cmdline');
-    fLinkOptions:=LoadSetting(key, 'LinkLine');
-    fCompAdd:= LoadBoolSetting(key, 'CompAdd');
-    fLinkAdd:= LoadBoolSetting(key, 'LinkAdd');
+		// Programs
+		fgccName :=     LoadSettingS(key, GCC_PROGRAM);
+		fgppName :=     LoadSettingS(key, GPP_PROGRAM);
+		fgdbName :=     LoadSettingS(key, GDB_PROGRAM);
+		fmakeName :=    LoadSettingS(key, MAKE_PROGRAM);
+		fwindresName := LoadSettingS(key, WINDRES_PROGRAM);
+		fdllwrapName := LoadSettingS(key, DLLWRAP_PROGRAM);
+		fgprofName :=   LoadSettingS(key, GPROF_PROGRAM);
+		fOptions :=     LoadSettingS(key, 'Options');
 
-   end;
+		if fgccName=''     then fgccName:=     GCC_PROGRAM;
+		if fgppName=''     then fgppName:=     GPP_PROGRAM;
+		if fgdbName=''     then fgdbName:=     GDB_PROGRAM;
+		if fmakeName=''    then fmakeName:=    MAKE_PROGRAM;
+		if fwindresName='' then fwindresName:= WINDRES_PROGRAM;
+		if fdllwrapName='' then fdllwrapName:= DLLWRAP_PROGRAM;
+		if fgprofName=''   then fgprofName:=   GPROF_PROGRAM;
+
+		fCompOpt:= LoadSettingS(key, 'CompOpt');
+		fLinkOpt:= LoadSettingS(key, 'LinkOpt');
+		fCompAdd:= LoadSettingB(key, 'CompAdd');
+		fLinkAdd:= LoadSettingB(key, 'LinkAdd');
+	end;
 end;
 
 procedure TdevCompilerSet.LoadSettings;
@@ -2033,10 +1987,10 @@ begin
    begin
      key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
      // dirs
-     SaveSetting(key, 'Bins', fBinDir);
-     SaveSetting(key, 'C', fCDir);
-     SaveSetting(key, 'Cpp', fCppDir);
-     SaveSetting(key, 'Lib', fLibDir);
+     SaveSettingS(key, 'Bins', fBinDir);
+     SaveSettingS(key, 'C',    fCDir);
+     SaveSettingS(key, 'Cpp',  fCppDir);
+     SaveSettingS(key, 'Lib',  fLibDir);
    end;
 end;
 
@@ -2049,32 +2003,32 @@ begin
    begin
      key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
      // Programs
-     SaveSetting(key, GCC_PROGRAM, fgccName);
-     SaveSetting(key, GPP_PROGRAM, fgppName);
-     SaveSetting(key, GDB_PROGRAM, fgdbName);
-     SaveSetting(key, MAKE_PROGRAM, fmakeName);
-     SaveSetting(key, WINDRES_PROGRAM, fwindresName);
-     SaveSetting(key, DLLWRAP_PROGRAM, fdllwrapName);
-     SaveSetting(key, GPROF_PROGRAM, fgprofName);
-     SaveSetting(key, 'Options', fOptions);
-     SaveSetting(key, 'cmdline', fCmdOptions);
-     SaveSetting(key, 'LinkLine', fLinkOptions);
-     SaveBoolSetting(key, 'CompAdd', fCompAdd);
-     SaveBoolSetting(key, 'LinkAdd', fLinkAdd);
+     SaveSettingS(key, GCC_PROGRAM,     fgccName);
+     SaveSettingS(key, GPP_PROGRAM,     fgppName);
+     SaveSettingS(key, GDB_PROGRAM,     fgdbName);
+     SaveSettingS(key, MAKE_PROGRAM,    fmakeName);
+     SaveSettingS(key, WINDRES_PROGRAM, fwindresName);
+     SaveSettingS(key, DLLWRAP_PROGRAM, fdllwrapName);
+     SaveSettingS(key, GPROF_PROGRAM,   fgprofName);
+     SaveSettingS(key, 'Options',       fOptions);
+     SaveSettingS(key, 'CompOpt',       fCompOpt);
+     SaveSettingS(key, 'LinkOpt',       fLinkOpt);
+     SaveSettingB(key, 'CompAdd',       fCompAdd);
+     SaveSettingB(key, 'LinkAdd',       fLinkAdd);
    end;
 end;
 
 procedure TdevCompilerSet.SaveSettings;
 begin
-  WriteSets;
+	WriteSets;
 end;
 
 function TdevCompilerSet.SetName(Index: integer): string;
 begin
-  if (Index>=0) and (Index<devCompilerSet.Sets.Count) then
-    Result:=devCompilerSet.Sets[Index]
-  else
-    Result:=DEFCOMPILERSET;
+	if (Index>=0) and (Index<devCompilerSet.Sets.Count) then
+		Result:=devCompilerSet.Sets[Index]
+	else
+		Result:=DEFCOMPILERSET;
 end;
 
 procedure TdevCompilerSet.SettoDefaults;
@@ -2088,10 +2042,9 @@ begin
   fdllwrapName := DLLWRAP_PROGRAM;
   fgprofName := GPROF_PROGRAM;
   fCompAdd:= FALSE;
-  fLinkAdd:= FALSE;
-  fCmdOptions:='';
-  fLinkOptions:='';
-
+  fLinkAdd:= TRUE;
+  fCompOpt:='';
+  fLinkOpt:='-static-libstdc++ -static-libgcc';
 
   // dirs
   fBinDir := devDirs.Bins;

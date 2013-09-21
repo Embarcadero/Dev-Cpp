@@ -178,7 +178,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
   end
   object btnClose: TButton
     Left = 304
-    Top = 188
+    Top = 207
     Width = 77
     Height = 25
     Cancel = True
@@ -189,7 +189,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
   object chkNotAgain: TCheckBox
     Left = 4
     Top = 216
-    Width = 377
+    Width = 150
     Height = 16
     Caption = 'Don'#39't display tips on startup'
     TabOrder = 3

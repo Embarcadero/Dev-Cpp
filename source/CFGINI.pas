@@ -50,9 +50,8 @@ type
    procedure LoadObject(var Obj: TCFGOptions);
    procedure SaveObject(var  Obj: TCFGOptions);
 
-   function LoadSetting(const key: string; const Entry: string): string; overload;
-   function LoadSetting(val : boolean; const key, Entry: string): string; overload;
-   procedure SaveSetting(const key: string; const entry: string; const value: string);
+   function LoadSetting(const key: string; const Entry: string): string;
+   procedure SaveSettingS(const key: string; const entry: string; const value: string);
  end;
 
 
@@ -327,45 +326,21 @@ begin
   result:= fini.ReadString(Key, Entry, '');
 end;
 
-function TCFGINI.LoadSetting(val : boolean; const key, Entry: string): string;
-begin
-  result := fini.ReadString(Key, Entry, '');
-  if result = '' then begin
-    if val then
-      result := '1'
-    else
-      result := '0';
-  end;
-end;
-
 procedure TCFGINI.SaveObject(var Obj: TCFGOptions);
 begin
   if not assigned(Obj) then exit;
   WriteObject(Obj.Name, Obj);
 end;
 
-procedure TCFGINI.SaveSetting(const key, entry, value: string);
+procedure TCFGINI.SaveSettingS(const key, entry, value: string);
 begin
   fini.WriteString(Key, Entry, Value);
 end;
 
 procedure TCFGINI.ClearSection(const Name: string);
-//var
-// tmp: TStrings;
-// idx: integer;
 begin
-  // This way it's much easier...
-  if fini.SectionExists(Name) then
-    fini.EraseSection(Name);
-//  tmp:= TStringList.Create;
-//  try
-//   fini.ReadSectionValues(Name, tmp);
-//   if tmp.Count> 0 then
-//    for idx:= 0 to pred(tmp.Count) do
-//     fini.DeleteKey(Name, tmp[idx]);
-//  finally
-//   tmp.Free;
-//  end;
+	if fini.SectionExists(Name) then
+		fini.EraseSection(Name);
 end;
 
 end.

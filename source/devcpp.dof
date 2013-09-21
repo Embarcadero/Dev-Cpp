@@ -1,5 +1,5 @@
 [FileVersion]
-Version=6.0
+Version=7.0
 [Compiler]
 A=8
 B=0
@@ -9,7 +9,7 @@ E=0
 F=0
 G=1
 H=1
-I=1
+I=0
 J=0
 K=0
 L=1
@@ -30,6 +30,55 @@ Z=1
 ShowHints=1
 ShowWarnings=1
 UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+NamespacePrefix=
+SymbolDeprecated=1
+SymbolLibrary=1
+SymbolPlatform=0
+UnitLibrary=1
+UnitPlatform=0
+UnitDeprecated=1
+HResultCompat=1
+HidingMember=1
+HiddenVirtual=1
+Garbage=1
+BoundsError=1
+ZeroNilCompat=1
+StringConstTruncated=1
+ForLoopVarVarPar=1
+TypedConstVarPar=1
+AsgToTypedConst=1
+CaseLabelRange=1
+ForVariable=1
+ConstructingAbstract=1
+ComparisonFalse=1
+ComparisonTrue=1
+ComparingSignedUnsigned=1
+CombiningSignedUnsigned=1
+UnsupportedConstruct=1
+FileOpen=1
+FileOpenUnitSrc=1
+BadGlobalSymbol=1
+DuplicateConstructorDestructor=1
+InvalidDirective=1
+PackageNoLink=1
+PackageThreadVar=1
+ImplicitImport=1
+HPPEMITIgnored=1
+NoRetVal=1
+UseBeforeDef=1
+ForLoopVarUndef=1
+UnitNameMismatch=1
+NoCFGFileFound=1
+MessageDirective=1
+ImplicitVariants=1
+UnicodeToLocale=1
+LocaleToUnicode=1
+ImagebaseMultiple=1
+SuspiciousTypecast=1
+PrivatePropAccessor=1
+UnsafeType=0
+UnsafeCode=0
+UnsafeCast=0
 [Linker]
 MapFile=3
 OutputObjs=0
@@ -37,7 +86,7 @@ ConsoleApp=1
 DebugInfo=0
 RemoteSymbols=0
 MinStackSize=16384
-MaxStackSize=1048576
+MaxStackSize=2097152
 ImageBase=4194304
 ExeDescription=
 [Directories]
@@ -62,7 +111,7 @@ AutoIncBuild=0
 MajorVer=4
 MinorVer=9
 Release=9
-Build=2
+Build=3
 Debug=0
 PreRelease=0
 Special=0
@@ -73,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Bloodshed Software
 FileDescription=Dev-C++ IDE
-FileVersion=4.9.9.2
+FileVersion=4.9.9.3
 InternalName=devcpp.exe
 LegalCopyright=Copyright Bloodshed Software
 LegalTrademarks=
@@ -81,12 +130,21 @@ OriginalFilename=devcpp.exe
 ProductName=Dev-C++
 ProductVersion=5
 Comments=Under the GNU General Public License
-[Excluded Packages]
-c:\program files\borland\delphi6\Projects\Bpl\Package1.bpl=(untitled)
-c:\program files\borland\delphi6\Projects\Bpl\dclusr60.bpl=Borland User Components
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=C:\V5\source\Vcl\codetooltip\;C:\V5\source\Vcl\Parser\;C:\V5\source\Vcl\synedit\Source\
+[HistoryLists\hlConditionals]
+Count=1
+Item0=BETAVERSION
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=vcl;vcl\parser;vcl\synedit\source;vcl\codetooltip
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=units
 [HistoryLists\hlOutputDirectorry]
 Count=1
 Item0=..

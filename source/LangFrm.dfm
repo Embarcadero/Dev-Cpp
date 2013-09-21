@@ -207,12 +207,12 @@ object LangForm: TLangForm
     object Label3: TLabel
       Left = 4
       Top = 64
-      Width = 247
+      Width = 245
       Height = 52
       Caption = 
-        'Do you want to create the code completion cache now? This can t' +
-        'ake several minutes. It is possible to create this cache later i' +
-        'n Editor Options, Class Browsing, Completion.'
+        'Do you want to create the code completion cache now? This can ta' +
+        'ke several minutes. It is possible to create this cache later in' +
+        ' Editor Options, Class Browsing, Completion.'
       WordWrap = True
     end
     object ProgressPanel: TPanel
@@ -236,8 +236,6 @@ object LangForm: TLangForm
         Top = 62
         Width = 235
         Height = 16
-        Min = 0
-        Max = 100
         TabOrder = 0
         Visible = False
       end

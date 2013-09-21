@@ -30,7 +30,7 @@ object EditorOptForm: TEditorOptForm
     Top = 8
     Width = 415
     Height = 365
-    ActivePage = tabGeneral
+    ActivePage = tabSyntax
     Anchors = [akLeft, akTop, akRight, akBottom]
     OnChange = PagesMainChange
     OnKeyDown = FormKeyDown
@@ -46,6 +46,7 @@ object EditorOptForm: TEditorOptForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 0
+      Visible = False
       Caption = 'General'
       object bvlEditor: TBevel
         Left = 10
@@ -522,7 +523,7 @@ object EditorOptForm: TEditorOptForm
           Width = 180
           Height = 21
           Anchors = [akLeft, akRight, akBottom]
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 6
           OnChange = FontChange
           OnDblClick = cboDblClick
@@ -533,7 +534,7 @@ object EditorOptForm: TEditorOptForm
           Width = 86
           Height = 21
           Anchors = [akLeft, akRight, akBottom]
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 7
           OnChange = FontSizeChange
           OnDblClick = cboDblClick
@@ -578,7 +579,7 @@ object EditorOptForm: TEditorOptForm
           Top = 32
           Width = 180
           Height = 21
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
           OnDblClick = cboDblClick
           OnSelect = FontChange
@@ -588,7 +589,7 @@ object EditorOptForm: TEditorOptForm
           Top = 32
           Width = 80
           Height = 21
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 1
           OnChange = FontSizeChange
           OnDblClick = cboDblClick
@@ -623,7 +624,6 @@ object EditorOptForm: TEditorOptForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 2
-      Visible = False
       Caption = 'Syntax'
       object cpForeground: TColorPickerButton
         Left = 161
@@ -1266,16 +1266,12 @@ object EditorOptForm: TEditorOptForm
             Height = 29
             LineSize = 50
             Max = 1500
-            Orientation = trHorizontal
             PageSize = 50
             Frequency = 50
             Position = 500
-            SelEnd = 0
-            SelStart = 0
             TabOrder = 1
             ThumbLength = 16
             TickMarks = tmTopLeft
-            TickStyle = tsAuto
             OnChange = tbCompletionDelayChange
           end
           object chkEnableCompletion: TCheckBox
@@ -1310,8 +1306,6 @@ object EditorOptForm: TEditorOptForm
             Top = 184
             Width = 89
             Height = 16
-            Min = 0
-            Max = 100
             TabOrder = 4
             Visible = False
           end

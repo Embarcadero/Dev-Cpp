@@ -283,8 +283,7 @@ begin
   MessageDlg('Error with debugging process : ' + s, mtError, [mbOK], 0);
 end;
 
-procedure TDebugger.Launch(hChildStdOut, hChildStdIn,
-                           hChildStdErr : THandle);
+procedure TDebugger.Launch(hChildStdOut, hChildStdIn,hChildStdErr : THandle);
 var
   pi : TProcessInformation;
   si : TStartupInfo;

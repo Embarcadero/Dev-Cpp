@@ -168,8 +168,7 @@ type
     procedure ElementListClick(Sender: TObject);
     procedure FontChange(Sender: TObject);
     procedure FontSizeChange(Sender: TObject);
-    procedure cpMarginColorHint(Sender: TObject; Cell: Integer;
-      var Hint: String);
+    procedure cpMarginColorHint(Sender: TObject; Cell: Integer;var Hint: String);
     procedure cpMarginColorDefaultSelect(Sender: TObject);
     procedure cppEditStatusChange(Sender: TObject; Changes: TSynStatusChanges);
     procedure DefaultSelect(Sender: TObject);
@@ -228,7 +227,6 @@ type
     fABPColor: TPoint;
     fSelColor: TPoint;
     HasProgressStarted : boolean;
-    //fBMColor : TPoint;
     procedure LoadFontNames;
     procedure LoadFontSize;
     procedure LoadText;
@@ -536,7 +534,6 @@ begin
   lblOverCaret.Caption:=         Lang[ID_EOPT_OVERCARET];
   cbMatch.Caption:=              Lang[ID_EOPT_MATCH];
 
-{$MESSAGE 'need to add to translations}
   cbHighCurrLine.Caption :=      Lang[ID_EOPT_HIGHLIGHTCURRLINE];
 
   cboInsertCaret.Clear;
@@ -552,12 +549,12 @@ begin
   cboOverwriteCaret.Items.Append(Lang[ID_EOPT_CARET4]);
 
 // Display Tab
-  grpEditorFont.Caption:=        '  '+Lang[ID_EOPT_EDFONT] +'  ';
+  grpEditorFont.Caption:=        '  '+Lang[ID_EOPT_EDFONT]+'  ';
   lblEditorFont.Caption:=        Lang[ID_EOPT_FONT];
   lblEditorSize.Caption:=        Lang[ID_EOPT_SIZE];
   pnlEditorPreview.Caption:=     Lang[ID_EOPT_EDITORPRE];
 
-  grpGutter.Caption:=            '  '+Lang[ID_EOPT_GUTTER] +'  ';
+  grpGutter.Caption:=            '  '+Lang[ID_EOPT_GUTTER]+'  ';
   cbGutterVis.Caption:=          Lang[ID_EOPT_VISIBLE];
   cbGutterAuto.Caption:=         Lang[ID_EOPT_GUTTERAUTO];
   cbLineNum.Caption:=            Lang[ID_EOPT_LINENUM];
@@ -816,11 +813,10 @@ var
  a, idx: integer;
  e : TEditor;
 begin
-  with devEditor do
-   begin
-     AutoIndent:=          cbAutoIndent.Checked;
-     InsertMode:=          cbInsertMode.Checked;
-     TabToSpaces:=         not cbTabtoSpaces.Checked;
+	with devEditor do begin
+		AutoIndent:=          cbAutoIndent.Checked;
+		InsertMode:=          cbInsertMode.Checked;
+		TabToSpaces:=         not cbTabtoSpaces.Checked;
      SmartTabs:=           cbSmartTabs.Checked;
      SmartUnindent:=       cbSmartUnindent.Checked;
      TrailBlank:=          not cbTrailingBlanks.Checked;
@@ -856,42 +852,39 @@ begin
      Gutterfont.Name:=     cboGutterFont.Text;
      GutterFont.Size:=     strtoint(cboGutterSize.Text);
 
-     Gutterfnt:=           cbGutterFnt.Checked;
-     GutterAuto:=          cbGutterAuto.Checked;
-     GutterVis:=           cbGutterVis.Checked;
-     GutterSize:=          edGutterWidth.Value;
-     LineNumbers:=         cbLineNum.Checked;
-     LeadZero:=            cbLeadZero.Checked;
-     FirstLineZero:=       cbFirstZero.Checked;
-     InsDropFiles:=        cbDropFiles.Checked;
+		Gutterfnt:=           cbGutterFnt.Checked;
+		GutterAuto:=          cbGutterAuto.Checked;
+		GutterVis:=           cbGutterVis.Checked;
+		GutterSize:=          edGutterWidth.Value;
+		LineNumbers:=         cbLineNum.Checked;
+		LeadZero:=            cbLeadZero.Checked;
+		FirstLineZero:=       cbFirstZero.Checked;
+		InsDropFiles:=        cbDropFiles.Checked;
 
-     ParserHints:=         cbParserHints.Checked;
+		ParserHints:=         cbParserHints.Checked;
 
-     // load in attributes
-     for idx:= 0 to pred(cpp.AttrCount) do
-      begin
-        aName:= cpp.Attribute[idx].Name;
-        a:= Syntax.IndexOfName(aName);
-        if a = -1 then
-         Syntax.Append(format('%s=%s',
-           [aName, AttrtoStr(cpp.Attribute[idx])]))
-        else
-         Syntax.Values[aName]:= AttrtoStr(cpp.Attribute[idx]);
-      end;
-     // additional attributes
+		// load in attributes
+		for idx:= 0 to pred(cpp.AttrCount) do begin
+			aName:= cpp.Attribute[idx].Name;
+			a:= Syntax.IndexOfName(aName);
+			if a = -1 then
+				Syntax.Append(format('%s=%s',[aName, AttrtoStr(cpp.Attribute[idx])]))
+			else
+				Syntax.Values[aName]:= AttrtoStr(cpp.Attribute[idx]);
+		end;
 
-     //gutter
-     if fgutColor.x = clNone then
-      fgutColor.x:= clBlack;
-     if fgutColor.y = clNone then
-      fgutColor.Y:= clBtnFace;
+		// Gutter colors, (xy = bg/fg)
+		if fgutColor.x = clNone then
+			fgutColor.x:= clBtnFace;
+		if fgutColor.y = clNone then
+			fgutColor.Y:= clBlack;
 
-     s:= PointtoStr(fgutColor);
-     a:= Syntax.IndexofName(cGut);
-     if a = -1 then
-      Syntax.Append(format('%s=%s', [cGut, s]))
-     else
-      Syntax.Values[cGut]:= s;
+		s:= PointtoStr(fgutColor);
+		a:= Syntax.IndexofName(cGut);
+		if a = -1 then
+			Syntax.Append(format('%s=%s', [cGut, s]))
+		else
+			Syntax.Values[cGut]:= s;
 
      // selected text
      s:= PointtoStr(fSelColor);
@@ -1000,17 +993,17 @@ end;
 
 procedure TEditorOptForm.SetGutter;
 begin
-  // if gutter background = clnone set to button face
-  if fgutcolor.x = clnone then
-   fgutcolor.x:= clBtnFace;
+	// if gutter background = clnone set to button face
+	if fgutcolor.x = clnone then
+		fgutcolor.x:= clBtnFace;
 
-  // if gutter foreground = clnone set to black
-  if fgutcolor.y = clnone then
-   fgutcolor.y:= clBlack;
+	// if gutter foreground = clnone set to black
+	if fgutcolor.y = clnone then
+		fgutcolor.y:= clBlack;
 
-  // update preview
-  cppedit.Gutter.Color:= fgutColor.x;
-  cppedit.Gutter.Font.Color:= fgutColor.y;
+	// update preview
+	cppedit.Gutter.Color:= fgutColor.x;
+	cppedit.Gutter.Font.Color:= fgutColor.y;
 end;
 
 procedure TEditorOptForm.ElementListClick(Sender: TObject);

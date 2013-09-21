@@ -1,20 +1,20 @@
 {
-    This file is part of Dev-C++
-    Copyright (c) 2004 Bloodshed Software
+	This file is part of Dev-C++
+	Copyright (c) 2004 Bloodshed Software
 
-    Dev-C++ is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	Dev-C++ is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    Dev-C++ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	Dev-C++ is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Dev-C++; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with Dev-C++; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
 unit editor;
@@ -456,6 +456,7 @@ procedure TEditor.TurnOnBreakpoint(line: integer);
 var
 index:integer;
 begin
+	index := 0;
   if(line > 0) and (line <= fText.Lines.Count) then
     begin
       fText.InvalidateLine(line);
@@ -502,49 +503,47 @@ end;
 
 function TEditor.ToggleBreakpoint(Line: integer): boolean;
 var
- idx: integer;
+	idx: integer;
 begin
-  result:= FALSE;
-  if (line > 0) and (line <= fText.Lines.Count) then
-  begin
-    fText.InvalidateGutterLine(line);
-    fText.InvalidateLine(line);
-    idx:= HasBreakPoint(Line);
-    //RNC moved the check to see if the debugger is running to here
-    if idx <> -1 then begin
-        if (MainForm.fDebugger.Executing and MainForm.fDebugger.IsBroken) or not MainForm.fDebugger.Executing then begin
-            idx := MainForm.RemoveBreakPointFromList(line, self);  // RNC
-        end
-        else if (MainForm.fDebugger.Executing and not MainForm.fDebugger.IsBroken) then begin
-            MessageDlg('Cannot remove a breakpoint while the debugger is executing.', mtError, [mbOK], 0);
-        end;
-    end
-    else begin
-        if (MainForm.fDebugger.Executing and MainForm.fDebugger.IsBroken) or not MainForm.fDebugger.Executing then begin
-           MainForm.AddBreakPointToList(line, self, self.TabSheet.Caption);   // RNC
-           idx := BreakPointList.Count -1;
-           result:= TRUE;
-        end
-        else if (MainForm.fDebugger.Executing and not MainForm.fDebugger.IsBroken) then begin
-            MessageDlg('Cannot add a breakpoint while the debugger is executing.', mtError, [mbOK], 0);
-        end;
-    end;
-  end
-  else
-    fText.Invalidate;
-  if Assigned(fOnBreakpointToggle) then
-     fOnBreakpointToggle(idx, Result);
+	idx := 0; // Was declared but not defined, could've contained random data
+	result:= FALSE;
+	if (line > 0) and (line <= fText.Lines.Count) then begin
+		fText.InvalidateGutterLine(line);
+		fText.InvalidateLine(line);
+		idx:= HasBreakPoint(Line);
+
+		//RNC moved the check to see if the debugger is running to here
+		if idx <> -1 then begin
+			if (MainForm.fDebugger.Executing and MainForm.fDebugger.IsBroken) or not MainForm.fDebugger.Executing then begin
+				idx := MainForm.RemoveBreakPointFromList(line, self); // RNC
+			end else if (MainForm.fDebugger.Executing and not MainForm.fDebugger.IsBroken) then begin
+				MessageDlg('Cannot remove a breakpoint while the debugger is executing.', mtError, [mbOK], 0);
+			end;
+		end else begin
+			if (MainForm.fDebugger.Executing and MainForm.fDebugger.IsBroken) or not MainForm.fDebugger.Executing then begin
+				MainForm.AddBreakPointToList(line, self, self.TabSheet.Caption); // RNC
+				idx := BreakPointList.Count -1;
+				result:= TRUE;
+			end else if (MainForm.fDebugger.Executing and not MainForm.fDebugger.IsBroken) then begin
+				MessageDlg('Cannot add a breakpoint while the debugger is executing.', mtError, [mbOK], 0);
+			end;
+		end;
+	end else
+		fText.Invalidate;
+	if Assigned(fOnBreakpointToggle) then
+		fOnBreakpointToggle(idx, Result);
 end;
 
 //Rnc change to use the new list of breakpoints
 function TEditor.HasBreakPoint(line_number: integer): integer;
 begin
-  for result:= 0 to BreakPointList.Count-1 do begin
-    if PBreakPointEntry(BreakPointList.Items[result])^.editor = self then begin
-         if PBreakPointEntry(BreakPointList.Items[result])^.line = line_number then exit;
-    end;
-  end;
-  result:= -1;
+	for result:= 0 to BreakPointList.Count-1 do begin
+		if PBreakPointEntry(BreakPointList.Items[result])^.editor = self then begin
+			if PBreakPointEntry(BreakPointList.Items[result])^.line = line_number then
+ 				exit;
+		end;
+	end;
+	result:= -1;
 end;
 
 procedure TEditor.EditorSpecialLineColors(Sender: TObject; Line: Integer;
@@ -630,10 +629,9 @@ begin
   ToggleBreakPoint(Line);
 end;
 
-procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch,
-  aReplace: string; Line, Column: integer; var Action: TSynReplaceAction);
+procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch,aReplace: string; Line, Column: integer; var Action: TSynReplaceAction);
 var
- pt: TPoint;
+	pt	: TPoint;
 begin
   if SearchCenter.SingleFile then
    begin
@@ -659,63 +657,55 @@ begin
 end;
 
 
-procedure TEditor.EditorStatusChange(Sender: TObject;
-  Changes: TSynStatusChanges);
+procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
-  if scModified in Changes then begin
-    if Modified then
-      UpdateCaption('[*] '+ExtractfileName(fFileName))
-    else
-      UpdateCaption(ExtractfileName(fFileName));
-  end;
-  with MainForm.Statusbar do
-   begin
-     if Changes * [scAll, scCaretX, scCaretY] <> [] then
-      begin
-        Panels[0].Text:= format('%6d: %-4d', [fText.DisplayY, fText.DisplayX]);
-        if not fErrSetting and (fErrorLine <> -1) then
-         begin
-           fText.InvalidateLine(fErrorLine);
-           fText.InvalidateGutterLine(fErrorLine);
-           fErrorLine:= -1;
-           fText.InvalidateLine(fErrorLine);
-           fText.InvalidateGutterLine(fErrorLine);
-           Application.ProcessMessages;
-         end;
-      end;
-     if Changes * [scAll, scModified] <> [] then
-      if fText.Modified then
-       Panels[1].Text:= Lang[ID_MODIFIED]
-      else
-       Panels[1].Text:= '';
-     if fText.ReadOnly then
-      Panels[2].Text:= Lang[ID_READONLY]
-     else
-      if fText.InsertMode then
-       Panels[2].Text:= Lang[ID_INSERT]
-      else
-       Panels[2].Text:= Lang[ID_OVERWRITE];
-     Panels[3].Text:= format(Lang[ID_LINECOUNT], [fText.Lines.Count]);
-   end;
+	if scModified in Changes then begin
+		if Modified then
+			UpdateCaption('[*] '+ExtractfileName(fFileName))
+		else
+			UpdateCaption(ExtractfileName(fFileName));
+	end;
+	with MainForm.Statusbar do begin
+		if Changes * [scAll, scCaretX, scCaretY] <> [] then begin
+			Panels[0].Text:= format('%6d: %d', [fText.CaretY, fText.CaretX]);
+			if not fErrSetting and (fErrorLine <> -1) then begin
+				fText.InvalidateLine(fErrorLine);
+				fText.InvalidateGutterLine(fErrorLine);
+				fErrorLine:= -1;
+				fText.InvalidateLine(fErrorLine);
+				fText.InvalidateGutterLine(fErrorLine);
+				Application.ProcessMessages;
+			end;
+		end;
+		if Changes * [scAll, scModified] <> [] then
+			if fText.Modified then
+				Panels[1].Text:= Lang[ID_MODIFIED]
+			else
+				Panels[1].Text:= '';
+		if fText.ReadOnly then
+			Panels[2].Text:= Lang[ID_READONLY]
+		else if fText.InsertMode then
+			Panels[2].Text:= Lang[ID_INSERT]
+		else
+			Panels[2].Text:= Lang[ID_OVERWRITE];
+		Panels[3].Text:= format(Lang[ID_LINECOUNT], [fText.Lines.Count]);
+	end;
 
-
-  {** Modified by Peter **}
-  if (scCaretX in Changes) or (scCaretY in Changes) then
-    begin
-      if assigned(FCodeToolTip) and FCodeToolTip.Enabled then
-      begin
-        // when the hint is already activated when call
-        // ShowHint again, because the current arugment could have
-        // been changed, so we need to make another arg in bold
-        if FCodeToolTip.Activated then
-          FCodeToolTip.Show
-        else
-        // it's not showing yet, so we check if the cursor
-        // is at the bracket and when it is, we show the hint
-        if assigned(FText) and (not FText.SelAvail) and (FText.SelStart > 1) and (Copy(FText.Text, FText.SelStart-1, 1) = '(') then
-          FCodeToolTip.Show;
-      end;
-    end;
+	{** Modified by Peter **}
+	if (scCaretX in Changes) or (scCaretY in Changes) then begin
+		if assigned(FCodeToolTip) and FCodeToolTip.Enabled then begin
+			// when the hint is already activated when call
+			// ShowHint again, because the current arugment could have
+			// been changed, so we need to make another arg in bold
+			if FCodeToolTip.Activated then
+				FCodeToolTip.Show
+			else
+				// it's not showing yet, so we check if the cursor
+				// is at the bracket and when it is, we show the hint
+				if assigned(FText) and (not FText.SelAvail) and (FText.SelStart > 1) and (Copy(FText.Text, FText.SelStart-1, 1) = '(') then
+					FCodeToolTip.Show;
+		end;
+	end;
 end;
 
 procedure TEditor.ExportTo(const isHTML: boolean);
@@ -858,46 +848,44 @@ end;
 
 procedure TEditor.SearchAgain;
 var
- Options: TSynSearchOptions;
- return: integer;
+	Options	: TSynSearchOptions;
+	return	: integer;
 begin
-  SearchCenter.Editor := Self;
-  SearchCenter.AssignSearchEngine;
+	SearchCenter.Editor := Self;
+	SearchCenter.AssignSearchEngine;
 
-  if not SearchCenter.SingleFile then exit;
-  if SearchCenter.FindText = '' then begin
-    Search(false);
-    exit;
-  end;
-  Options:= SearchCenter.Options;
-  Exclude(Options, ssoEntireScope);
+	if not SearchCenter.SingleFile then
+		exit;
+	if SearchCenter.FindText = '' then begin
+		Search(false);
+		exit;
+	end;
+	Options:= SearchCenter.Options;
+	Exclude(Options, ssoEntireScope);
 
-  return:= fText.SearchReplace( SearchCenter.FindText,
-                                SearchCenter.ReplaceText,
-                                Options);
-  if return <> 0 then
-   Activate
-  else
-   MessageDlg(format(Lang[ID_MSG_TEXTNOTFOUND], [SearchCenter.FindText]),
-       mtInformation, [mbOk], 0);
+	return:= fText.SearchReplace( SearchCenter.FindText,SearchCenter.ReplaceText,Options);
+	if return <> 0 then
+		Activate
+	else
+		MessageDlg(format(Lang[ID_MSG_TEXTNOTFOUND], [SearchCenter.FindText]),mtInformation, [mbOk], 0);
 end;
 
 procedure TEditor.SetErrorFocus(const Col, Line: integer);
 begin
-  fErrSetting:= TRUE;
-  Application.ProcessMessages;
-  if fErrorLine <> Line then
-   begin
-     if fErrorLine <> -1 then
-      fText.InvalidateLine(fErrorLine);
-      fText.InvalidateGutterLine(fErrorLine);
-     fErrorLine:= Line;
-     fText.InvalidateLine(fErrorLine);
-     fText.InvalidateGutterLine(fErrorLine);
-   end;
-     fText.CaretXY:= BufferCoord(col, line);
-     fText.EnsureCursorPosVisible;
-  fErrSetting:= FALSE;
+	fErrSetting:= TRUE;
+	Application.ProcessMessages;
+	if fErrorLine <> Line then begin
+		if fErrorLine <> -1 then
+			fText.InvalidateLine(fErrorLine);
+
+		fText.InvalidateGutterLine(fErrorLine);
+		fErrorLine := Line;
+		fText.InvalidateLine(fErrorLine);
+		fText.InvalidateGutterLine(fErrorLine);
+	end;
+	fText.CaretXY := BufferCoord(Col, Line);
+	fText.EnsureCursorPosVisible;
+	fErrSetting := FALSE;
 end;
 
 procedure TEditor.SetActiveBreakpointFocus(const Line: integer);

@@ -138,14 +138,6 @@ begin
   ThemeBox.ItemIndex := 0;
   Image2.Picture.Bitmap.LoadFromResourceName(HInstance, 'THEMENEWLOOK');
   GetUserName(s, d);
-  {$IFDEF BETAVERSION}
-   MessageBox(Self.Handle,
-              PChar('This is a beta version of Dev-C++.'
-              +'Please report bugs at http://bloodshed.net/bugs. We provide updates often, so be sure to check for them in Tools menu, Check for Updates/Packages.'+ #13#13
-              +'Your config files will be stored in ' +  ExtractFileDir(devData.INIFile) + #13
-              +'Otherwise, you can pass the following parameter to Dev-C++ : -c c:\config_file_directory'),
-              PChar('Beta version Notice'), MB_OK);
-  {$ENDIF}
 end;
 
 procedure TLangForm.CppParserStartParsing(Sender: TObject);
@@ -174,85 +166,87 @@ begin
 end;
 
 procedure TLangForm.OkBtnClick(Sender: TObject);
-var s, f : TStringList;
-    i, j : integer;
+var
+	s, f : TStringList;
+	i, j : integer;
 begin
-  if OkBtn.Tag = 0 then begin
-    OkBtn.Tag := 1;
-    SecondPanel.Visible := true;
-    FirstPanel.Visible := false;
-    devData.ThemeChange := true;
-    devData.Theme := ThemeBox.Items[ThemeBox.ItemIndex];
-    devData.XPTheme := XPCheckBox.Checked;
-  end
-  else if OkBtn.Tag = 1 then begin
-    if YesClassBrowser.Checked then begin
-      OkBtn.Tag := 2;
-      CachePanel.Visible := true;
-      SecondPanel.Visible := false;
-    end
-    else begin
-      OkBtn.Tag := 3;
-      OkBtn.Kind := bkOK;
-      OkBtn.ModalResult := mrOK;
-      FinishPanel.Visible := true;
-      SecondPanel.Visible := false;
-      devCodeCompletion.Enabled := false;
-      devCodeCompletion.UseCacheFiles := false;
-      devClassBrowsing.Enabled := false;
-      devClassBrowsing.ParseLocalHeaders := false;
-      devClassBrowsing.ParseGlobalHeaders := false;
-      SaveOptions;
-    end;
-  end
-  else if OkBtn.Tag = 2 then begin
-    if YesCache.Checked then begin
-       YesCache.Enabled := false;
-       NoCache.Enabled := false;
-       OkBtn.Enabled := false;
-       DirEdit.Enabled := false;
-       DirCheckBox.Enabled := false;
-       LoadBtn.Enabled := false;
-       BuildPanel.Visible := False;
-       ProgressPanel.Visible := True;
-       OkBtn.Caption := 'Please wait...';
-       MainForm.CacheCreated := true;
-       Application.ProcessMessages;
-       devCodeCompletion.Enabled := true;
-       devCodeCompletion.UseCacheFiles := true;
-       devClassBrowsing.Enabled := true;
-       devClassBrowsing.ParseLocalHeaders := true;
-       devClassBrowsing.ParseGlobalHeaders := false;
-       SaveOptions;
+	if OkBtn.Tag = 0 then begin
+		OkBtn.Tag := 1;
+		SecondPanel.Visible := true;
+		FirstPanel.Visible := false;
+		devData.ThemeChange := true;
+		devData.Theme := ThemeBox.Items[ThemeBox.ItemIndex];
+		devData.XPTheme := XPCheckBox.Checked;
+	end else if OkBtn.Tag = 1 then begin
+		if YesClassBrowser.Checked then begin
+			OkBtn.Tag := 2;
+			CachePanel.Visible := true;
+			SecondPanel.Visible := false;
+		end else begin
+			OkBtn.Tag := 3;
+			OkBtn.Kind := bkOK;
+			OkBtn.ModalResult := mrOK;
+			FinishPanel.Visible := true;
+			SecondPanel.Visible := false;
+			devCodeCompletion.Enabled := false;
+			devCodeCompletion.UseCacheFiles := false;
+			devClassBrowsing.Enabled := false;
+			devClassBrowsing.ParseLocalHeaders := false;
+			devClassBrowsing.ParseGlobalHeaders := false;
+			SaveOptions;
+		end;
+	end else if OkBtn.Tag = 2 then begin
+		if YesCache.Checked then begin
+			YesCache.Enabled := false;
+			NoCache.Enabled := false;
+			OkBtn.Enabled := false;
+			DirEdit.Enabled := false;
+			DirCheckBox.Enabled := false;
+			LoadBtn.Enabled := false;
+			BuildPanel.Visible := False;
+			ProgressPanel.Visible := True;
+			OkBtn.Caption := 'Please wait...';
+			MainForm.CacheCreated := true;
+			Application.ProcessMessages;
+			devCodeCompletion.Enabled := true;
+			devCodeCompletion.UseCacheFiles := true;
+			devClassBrowsing.Enabled := true;
+			devClassBrowsing.ParseLocalHeaders := true;
+			devClassBrowsing.ParseGlobalHeaders := false;
+			SaveOptions;
 
-       MainForm.CppParser1.ParseLocalHeaders := True;
-       MainForm.CppParser1.ParseGlobalHeaders := True;
-       MainForm.CppParser1.OnStartParsing := CppParserStartParsing;
-       MainForm.CppParser1.OnEndParsing := CppParserEndParsing;
-       MainForm.CppParser1.OnTotalProgress := CppParserTotalProgress;
-       MainForm.CppParser1.Tokenizer:= MainForm.CppTokenizer1;
-       MainForm.CppParser1.Enabled := true;
+			MainForm.CppParser1.ParseLocalHeaders := True;
+			MainForm.CppParser1.ParseGlobalHeaders := True;
+			MainForm.CppParser1.OnStartParsing := CppParserStartParsing;
+			MainForm.CppParser1.OnEndParsing := CppParserEndParsing;
+			MainForm.CppParser1.OnTotalProgress := CppParserTotalProgress;
+			MainForm.CppParser1.Tokenizer:= MainForm.CppTokenizer1;
+			MainForm.CppParser1.Enabled := true;
 
-       MainForm.ClassBrowser1.SetUpdateOff;
+			MainForm.ClassBrowser1.SetUpdateOff;
 
-       s := TStringList.Create;
-       if (DirCheckBox.Checked) then
-         StrToList(DirEdit.Text, s)
-       else
-         StrToList(devDirs.Cpp, s);
+			s := TStringList.Create;
+			if (DirCheckBox.Checked) then
+				StrToList(DirEdit.Text, s)
+			else
+				StrToList(devDirs.Cpp, s);
 
-       f := TStringList.Create;
-       for i := 0 to s.Count - 1 do begin
-         if DirectoryExists(s[i]) then begin
-           FilesFromWildcard(s[i], '*.*', f, false, false, false);
-           Screen.Cursor:=crHourglass;
-           Application.ProcessMessages;
-           for j := 0 to f.Count - 1 do
-             MainForm.CppParser1.AddFileToScan(f[j]);
-         end
-         else
-           MessageDlg('Directory "' + s[i] + '" does not exists', mtWarning, [mbOK], 0);
-       end;
+			// Make it look busy
+			Screen.Cursor:=crHourglass;
+			Application.ProcessMessages;
+
+			f := TStringList.Create;
+			for i := 0 to s.Count - 1 do begin
+				if DirectoryExists(s[i]) then begin
+					FilesFromWildcard(s[i], '*.*', f, false, false, false);
+					for j := 0 to f.Count - 1 do begin
+						MainForm.CppParser1.AddFileToScan(f[j]);
+					end;
+				end else
+					MessageDlg('Directory "' + s[i] + '" does not exists', mtWarning, [mbOK], 0);
+			end;
+
+
        MainForm.CppParser1.ParseList;
        ParseLabel.Caption := 'Finalizing... Please wait';
        Application.ProcessMessages;
@@ -263,9 +257,6 @@ begin
        MainForm.CppParser1.OnTotalProgress := MainForm.CppParser1TotalProgress;
 
        MainForm.ClassBrowser1.SetUpdateOn;
-
-     { MainForm.ClassBrowser1.Parser := MainForm.CppParser1;
-       MainForm.CodeCompletion1.Parser := MainForm.CppParser1;}
 
        Application.ProcessMessages;
        Screen.Cursor:=crDefault;

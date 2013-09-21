@@ -1,8 +1,8 @@
 object ViewToDoForm: TViewToDoForm
   Left = 192
   Top = 107
-  Width = 565
-  Height = 237
+  Width = 572
+  Height = 247
   BorderStyle = bsSizeToolWin
   Caption = 'To-Do list'
   Color = clBtnFace
@@ -20,8 +20,8 @@ object ViewToDoForm: TViewToDoForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    557
-    210)
+    580
+    199)
   PixelsPerInch = 96
   TextHeight = 13
   object lblFilter: TLabel
@@ -35,7 +35,7 @@ object ViewToDoForm: TViewToDoForm
   object lv: TListView
     Left = 0
     Top = 0
-    Width = 556
+    Width = 557
     Height = 161
     Anchors = [akLeft, akTop, akRight, akBottom]
     Checkboxes = True
@@ -45,16 +45,16 @@ object ViewToDoForm: TViewToDoForm
         Width = 42
       end
       item
-        Caption = 'Pri'
-        Width = 32
+        Caption = 'Priority'
+        Width = 46
       end
       item
         Caption = 'Description'
-        Width = 224
+        Width = 231
       end
       item
         Caption = 'Filename'
-        Width = 150
+        Width = 144
       end
       item
         Caption = 'User'
@@ -73,7 +73,7 @@ object ViewToDoForm: TViewToDoForm
     OnMouseDown = lvMouseDown
   end
   object btnClose: TButton
-    Left = 477
+    Left = 470
     Top = 176
     Width = 75
     Height = 25
@@ -89,7 +89,7 @@ object ViewToDoForm: TViewToDoForm
     Width = 289
     Height = 13
     Anchors = [akLeft, akBottom]
-    Caption = 'Don'#39't show items marked as done'
+    Caption = 'Don''t show items marked as done'
     TabOrder = 2
     OnClick = chkNoDoneClick
   end

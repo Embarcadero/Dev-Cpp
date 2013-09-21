@@ -1,91 +1,86 @@
 {
-    This file is part of Dev-C++
-    Copyright (c) 2004 Bloodshed Software
+	This file is part of Dev-C++
+	Copyright (c) 2004 Bloodshed Software
 
-    Dev-C++ is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	Dev-C++ is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    Dev-C++ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	Dev-C++ is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Dev-C++; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with Dev-C++; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
 unit version;
 
 interface
 
+//path delimiter
 const
-  GCC_VERSION          = '3.4.2';
-  //path delimiter
 {$IFDEF WIN32}
-  pd                   = '\';
+	pd                   = '\';
 {$ENDIF}
 {$IFDEF LINUX}
-  pd                   = '/';
+	pd                   = '/';
 {$ENDIF}
 
 resourcestring
-  // misc strings
-  DEVCPP               = 'Dev-C++';
-  DEVCPP_VERSION       = '4.9.9.2';
-  DEFAULT_LANG_FILE    = 'English.lng';
-  HTTP                 = 'http://';
-  DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
-  DEV_SEARCHLOOP       = '$__DEV_SEARCH_LOOP';
-  DEV_COMPLETION_CACHE = 'cache.ccc';
-  DEV_DEFAULTCODE_FILE = 'defaultcode.cfg';
-  DEV_SHORTCUTS_FILE   = 'devshortcuts.cfg';
-  DEV_CLASSFOLDERS_FILE= 'classfolders.dcf';
-  DEV_WEBMIRRORS_FILE  = 'mirrors.cfg';
-  DEV_MAKE_FILE        = 'Makefile.win';
-  DEV_TOOLS_FILE       = 'tools.ini';
-  DEV_HELP_INI         = 'devhelp.ini';
-  DEV_CODEINS_FILE     = 'devcpp.ci';
-  DEV_MAINHELP_FILE    = 'devcpp.hlp';
-  DEV_GNOME_THEME      = 'Gnome';
-  DEV_NEWLOOK_THEME    = 'New Look';
-  DEV_BLUE_THEME       = 'Blue';
-  DEV_INTERNAL_THEME   = 'New Look';
-  // default directories
-  BIN_DIR              = 'Bin';
-  LIB_DIR              = 'lib';
-  C_INCLUDE_DIR        = 'include';
-  CPP_INCLUDE_DIR      = 'include'
-                       //one of below directories will be deleted if don't exist, later
-                       + ';include' + pd + 'c++' + pd + GCC_VERSION
-                       + ';include' + pd + 'c++' + pd + GCC_VERSION + pd + 'mingw32'
-                       + ';include' + pd + 'c++' + pd + GCC_VERSION + pd + 'backward'
-                       + ';lib' + pd + 'gcc' + pd + 'mingw32' + pd + GCC_VERSION + pd + 'include'
-                       + ';include' + pd + 'c++' + pd + '3.3.1'
-                       + ';include' + pd + 'c++' + pd + '3.3.1' + pd + 'mingw32'
-                       + ';include' + pd + 'c++' + pd + '3.3.1' + pd + 'backward'
-                       + ';lib' + pd + 'gcc-lib' + pd + 'mingw32' + pd + '3.3.1' + pd + 'include'
-                       ;
-  LANGUAGE_DIR         = 'Lang' + pd;
-  ICON_DIR             = 'Icons' + pd;
-  HELP_DIR             = 'Help' + pd;
-  TEMPLATE_DIR         = 'Templates' + pd;
-  THEME_DIR            = 'Themes' + pd;
-  PACKAGES_DIR         = 'Packages' + pd;
+	// misc strings
+	GCC_VERSION          = '4.5.2';
+	DEVCPP               = 'Dev-C++';
+	DEVCPP_VERSION       = '4.9.9.3';
+	DEFAULT_LANG_FILE    = 'English.lng';
+	HTTP                 = 'http://';
+	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
+	DEV_SEARCHLOOP       = '$__DEV_SEARCH_LOOP';
+	DEV_COMPLETION_CACHE = 'cache.ccc';
+	DEV_DEFAULTCODE_FILE = 'defaultcode.cfg';
+	DEV_SHORTCUTS_FILE   = 'devshortcuts.cfg';
+	DEV_CLASSFOLDERS_FILE= 'classfolders.dcf';
+	DEV_WEBMIRRORS_FILE  = 'mirrors.cfg';
+	DEV_MAKE_FILE        = 'Makefile.win';
+	DEV_TOOLS_FILE       = 'tools.ini';
+	DEV_HELP_INI         = 'devhelp.ini';
+	DEV_CODEINS_FILE     = 'devcpp.ci';
+	DEV_MAINHELP_FILE    = 'devcpp.hlp';
+	DEV_GNOME_THEME      = 'Gnome';
+	DEV_NEWLOOK_THEME    = 'New Look';
+	DEV_BLUE_THEME       = 'Blue';
+	DEV_INTERNAL_THEME   = 'New Look';
 
-  // file fxtensions
-  LIB_EXT              = '.a';
-  OBJ_EXT              = '.o';
-  DLL_EXT              = '.dll';
-  EXE_EXT              = '.exe';
-  DEV_EXT              = '.dev';
-  HTML_EXT             = '.html';
-  RTF_EXT              = '.rtf';
-  INI_EXT              = '.ini';
-  TEMPLATE_EXT         = '.template';
-  SYNTAX_EXT           = '.syntax';
+	// default directories
+	BIN_DIR              = 'bin;';
+	LIB_DIR              = 'lib;lib' + pd + 'gcc;';
+	C_INCLUDE_DIR        = 'include;';
+	CPP_INCLUDE_DIR      = 'include;' +
+                           'include' + pd + 'sys;' +
+                           'include' + pd + 'ddk;' +
+                           'include' + pd + 'gdiplus;' +
+                           'include' + pd + 'GL;';
+	LANGUAGE_DIR         = 'Lang' + pd;
+	ICON_DIR             = 'Icons' + pd;
+	HELP_DIR             = 'Help' + pd;
+	TEMPLATE_DIR         = 'Templates' + pd;
+	THEME_DIR            = 'Themes' + pd;
+	PACKAGES_DIR         = 'Packages' + pd;
+
+	// file fxtensions
+	LIB_EXT              = '.a';
+	OBJ_EXT              = '.o';
+	DLL_EXT              = '.dll';
+	EXE_EXT              = '.exe';
+	DEV_EXT              = '.dev';
+	HTML_EXT             = '.html';
+	RTF_EXT              = '.rtf';
+	INI_EXT              = '.ini';
+	TEMPLATE_EXT         = '.template';
+	SYNTAX_EXT           = '.syntax';
 
   // programs
   MAKE_PROGRAM         = 'make.exe';

@@ -54,7 +54,7 @@ type
 
    function LoadSetting(const key: string; const Entry: string): string; overload;
    function LoadSetting(val : boolean; const key, Entry: string): string; overload;
-   procedure SaveSetting(const key: string; const entry: string; const value: string);
+   procedure SaveSettingS(const key: string; const entry: string; const value: string);
  end;
 
 implementation
@@ -419,7 +419,7 @@ begin
   end;
 end;
 
-procedure TCFGReg.SaveSetting(const key, entry, value: string);
+procedure TCFGReg.SaveSettingS(const key, entry, value: string);
 var
  Oldkey: string;
 begin

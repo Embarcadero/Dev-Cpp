@@ -38,7 +38,7 @@ type
     fMonitor: TdevMonitorThread;
     fFiles: TStrings;
     fNotifyChange: TdevMonitorChange;
-    procedure MonitorTerminated(Sender: TObject);
+  //  procedure MonitorTerminated(Sender: TObject);
     function GetActive: boolean;
     procedure SetActive(const Value: boolean);
     procedure SetFiles(const Value: TStrings);
@@ -118,10 +118,10 @@ begin
   Result := Assigned(fMonitor);
 end;
 
-procedure TdevFileMonitor.MonitorTerminated(Sender: TObject);
-begin
-  fMonitor := nil;
-end;
+//procedure TdevFileMonitor.MonitorTerminated(Sender: TObject);
+//begin
+//  fMonitor := nil;
+//end;
 
 {
 procedure TdevFileMonitor.Notify(ChangeType: TdevMonitorChangeType;

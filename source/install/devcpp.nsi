@@ -1,6 +1,6 @@
 ;--------------------------------
 
-!define DEVCPP_VERSION "4.9.9.2"
+!define DEVCPP_VERSION "4.9.9.3"
 !define DISPLAY_NAME "Dev-C++ 5 beta 9 release (${DEVCPP_VERSION})"
 !define HAVE_MINGW
 !define NEW_INTERFACE

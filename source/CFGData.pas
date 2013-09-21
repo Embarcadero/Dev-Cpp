@@ -58,24 +58,16 @@ type
    // load/save windowplacement structure
    procedure SaveWindowPlacement(const key: string; value: TWindowPlacement);
 
-   function LoadWindowPlacement(const key: string;
-      var Value: TWindowPlacement): boolean;
+   function LoadWindowPlacement(const key: string; var Value: TWindowPlacement): boolean;
 
-   // load/save individual setting
-   procedure SaveSetting(const key: string;
-       const Entry: string; const value: string);
+   // load/save functions
+   procedure SaveSettingB(const key: string; const entry: string; const value: boolean);
+   procedure SaveSettingS(const key: string; const Entry: string; const value: string);
 
-   function LoadSetting(const key: string;
-       const entry: string): string;
+   function LoadSettingB(const key: string; const entry: string): boolean; overload;
+   function LoadSettingB(const key: string; const entry: string; const default: string): boolean; overload;
+   function LoadSettingS(const key: string; const entry: string): string;
 
-   // load/save boolean setting
-   procedure SaveboolSetting(const key: string;
-       const entry: string; const value: boolean);
-
-   function LoadboolSetting(const key: string;
-       const entry: string): boolean; overload;
-   function LoadboolSetting(val : boolean; const key: string;
-       const entry: string): boolean; overload;
    // load/save TCFGOptions
    procedure SaveObject(obj: TCFGOptions); virtual;
    procedure LoadObject(obj: TCFGOptions); virtual;
@@ -164,27 +156,9 @@ begin
   inherited Destroy;
 end;
 
-{function TConfigData.GetINI: TCFGINI;
-begin
-  try
-   result:= TCFGINI.Create(Self);
-  except
-   result:= nil;
-  end;
-end;
-
-function TConfigData.GetReg: TCFGReg;
-begin
-  try
-   result:= TCFGReg.Create(Self);
-  except
-   result:= nil;
-  end;
-end;  }
-
 procedure TConfigData.SetIni(s : string);
 begin
-  fIniFileName := s;                                            
+  fIniFileName := s;
   GetINI.SetIniFile(s);
 end;
 
@@ -212,8 +186,7 @@ begin
    except end;
 end;
 
-function TConfigData.LoadWindowPlacement(const key: string;
-  var Value: TWindowPlacement): boolean;
+function TConfigData.LoadWindowPlacement(const key: string; var Value: TWindowPlacement): boolean;
 
   // convert string to TWindowPlacement record
   function StrtoWinPlace(s: string): TWindowPlacement;
@@ -278,9 +251,9 @@ begin
   try
    s:= WinPlacetoStr(Value);
    if fUseRegistry then
-    GetReg.SaveSetting(key, 'WinPlace', s)
+    GetReg.SaveSettingS(key, 'WinPlace', s)
    else
-    GetINI.SaveSetting(key, 'WinPlace', s);
+    GetINI.SaveSettingS(key, 'WinPlace', s);
   except end;
 end;
 
@@ -304,47 +277,49 @@ begin
   except end;
 end;
 
-function TConfigData.LoadboolSetting(const key, entry: string): boolean;
+function TConfigData.LoadSettingB(const key, entry: string): boolean;
 var
- s: string;
+	s: string;
 begin
-  try
-   if fUseRegistry then
-    s:= GetReg.LoadSetting(Key, Entry)
-   else
-    s:= GetINI.LoadSetting(key, Entry);
+	try
+		if fUseRegistry then
+			s:= GetReg.LoadSetting(Key, Entry)
+		else
+			s:= GetINI.LoadSetting(key, Entry);
 
-   if s = '' then s:= '0';
-   if fboolAsWords then
-    result:= ReadboolString(s)
-   else
-    result:= strtoint(s) = 1;
-  except
-   result:= FALSE;
-  end;
+		if s = '' then
+			s:= '0';
+		if fboolAsWords then
+			result:= ReadboolString(s)
+		else
+			result:= strtoint(s) = 1;
+	except
+		result:= FALSE;
+	end;
 end;
 
-function TConfigData.LoadboolSetting(val : boolean; const key, entry: string): boolean;
+function TConfigData.LoadSettingB(const key, entry, default: string): boolean;
 var
- s: string;
+	s: string;
 begin
-  try
-   if fUseRegistry then
-    s:= GetReg.LoadSetting(val, Key, Entry)
-   else
-    s:= GetINI.LoadSetting(val, key, Entry);
+	try
+		if fUseRegistry then
+			s:= GetReg.LoadSetting(Key, Entry)
+		else
+			s:= GetINI.LoadSetting(key, Entry);
 
-   if s = '' then s:= '0';
-   if fboolAsWords then
-    result:= ReadboolString(s)
-   else
-    result:= strtoint(s) = 1;
-  except
-   result:= FALSE;
-  end;
+		if s = '' then
+			s:= 'TRUE';
+		if fboolAsWords then
+			result:= ReadboolString(s)
+		else
+			result:= strtoint(s) = 1;
+	except
+		result:= TRUE;
+	end;
 end;
 
-function TConfigData.LoadSetting(const key, entry: string): string;
+function TConfigData.LoadSettingS(const key, entry: string): string;
 begin
   try
    if fUseRegistry then
@@ -354,18 +329,18 @@ begin
   except end;
 end;
 
-procedure TConfigData.SaveSetting(const key: string; const Entry: string;
+procedure TConfigData.SaveSettingS(const key: string; const Entry: string;
   const value: string);
 begin
   try
    if fUseRegistry then
-    GetReg.SaveSetting(key, Entry, Value)
+    GetReg.SaveSettingS(key, Entry, Value)
    else
-    GetINI.SaveSetting(key, Entry, Value);
+    GetINI.SaveSettingS(key, Entry, Value);
   except end;
 end;
 
-procedure TConfigData.SaveboolSetting(const key: string; const entry: string;
+procedure TConfigData.SaveSettingB(const key: string; const entry: string;
   const value: boolean);
 var
  s: string;
@@ -377,9 +352,9 @@ begin
     s:= inttostr(ord(value));
 
    if fUseRegistry then
-    GetReg.SaveSetting(key, Entry, s)
+    GetReg.SaveSettingS(key, Entry, s)
    else
-    GetINI.SaveSetting(key, Entry, s);
+    GetINI.SaveSettingS(key, Entry, s);
   except end;
 end;
 

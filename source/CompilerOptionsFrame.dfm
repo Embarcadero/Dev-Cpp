@@ -16,7 +16,7 @@ object CompOptionsFrame: TCompOptionsFrame
   object tv: TTreeView
     Left = 0
     Top = 0
-    Width = 121
+    Width = 115
     Height = 420
     Align = alLeft
     HideSelection = False
@@ -29,7 +29,7 @@ object CompOptionsFrame: TCompOptionsFrame
   object vle: TValueListEditor
     Left = 125
     Top = 0
-    Width = 448
+    Width = 454
     Height = 420
     Align = alClient
     DisplayOptions = []
