@@ -34,7 +34,7 @@ uses
 type
   TCompileProgressForm = class(TForm)
     btnClose: TButton;
-    Memo1: TMemo;
+    memoMiniLog: TMemo;
     infoCompiler: TLabel;
     lblCompiler: TLabel;
     infoStatus: TLabel;
@@ -56,7 +56,6 @@ type
   private
   public
     starttime : cardinal;
-    stoptime : cardinal;
     procedure LoadText;
   end;
 

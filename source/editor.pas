@@ -219,20 +219,6 @@ begin
 	// Create an editor
 	fText := TSynEdit.Create(fTabSheet);
 
-	// Load the file using lines, we're not using CodeFolding here yet
-	if (DoOpen) then begin
-		fText.Lines.LoadFromFile(FileName);
-		fText.ReScan;
-		fNew := False;
-		if devData.Backups then begin
-			s:= ExtractfileExt(FileName);
-			Insert('~', s, AnsiPos('.', s) + 1);
-			Delete(s, Length(s) -1, 1);
-			fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
-		end;
-	end else
-		fNew := True;
-
 	// Set a whole lot of data
 	fText.Parent := fTabSheet;
 	fText.Align := alClient;
@@ -266,6 +252,20 @@ begin
 		fText.Highlighter:= dmMain.Res
 	else
 		fText.Highlighter:= dmMain.cpp;
+
+	// Load the file using lines - make sure the highlighter is assigned
+	if (DoOpen) then begin
+		fText.Lines.LoadFromFile(FileName);
+		fText.ReScan;
+		fNew := False;
+		if devData.Backups then begin
+			s:= ExtractfileExt(FileName);
+			Insert('~', s, AnsiPos('.', s) + 1);
+			Delete(s, Length(s) -1, 1);
+			fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
+		end;
+	end else
+		fNew := True;
 
 	// Set the text color
 	StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
@@ -1468,24 +1468,19 @@ procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TSh
 			e.GotoLineNr(line);
 	end;
 var
-	p: TPoint;
+	p: TDisplayCoord;
 	line: string;
 	walker,start : integer;
 begin
-	p.X := X;
-	p.Y := Y;
-
-	p.X := fText.PixelsToRowColumn(p.X, p.Y).Column;
-	p.Y := fText.PixelsToRowColumn(p.X, p.Y).Row;
+	p := fText.PixelsToRowColumn(X,Y);
 
 	// if ctrl+clicked
-	if (ssCtrl in Shift) and (Button = mbLeft) and (p.Y <= fText.UnCollapsedLines.Count) and not fText.SelAvail then begin
+	if (ssCtrl in Shift) and (Button = mbLeft) and (p.Row <= fText.Lines.Count) and not fText.SelAvail then begin
 
 		// reset the cursor
 		fText.Cursor:=crIBeam;
 
-		// see if it's #include
-		line:=fText.UnCollapsedLines[p.Y-1];
+		line:=fText.Lines[p.Row-1];
 		if AnsiStartsStr('#include',line) then begin
 
 			// We've clicked an #include...

@@ -354,43 +354,48 @@ object EnviroForm: TEnviroForm
       ShowHint = False
       object lblUserDir: TLabel
         Left = 8
-        Top = 93
-        Width = 123
+        Top = 85
+        Width = 400
         Height = 15
+        AutoSize = False
         Caption = 'User'#39's Default Directory'
       end
       object lblTemplatesDir: TLabel
         Left = 8
-        Top = 149
-        Width = 106
+        Top = 140
+        Width = 400
         Height = 15
+        AutoSize = False
         Caption = 'Templates Directory'
       end
       object lblSplash: TLabel
         Left = 8
-        Top = 311
-        Width = 108
+        Top = 305
+        Width = 400
         Height = 15
+        AutoSize = False
         Caption = 'Splash Screen Image'
       end
       object lblIcoLib: TLabel
         Left = 8
-        Top = 205
-        Width = 89
+        Top = 195
+        Width = 400
         Height = 15
+        AutoSize = False
         Caption = 'Icon Library Path'
       end
       object lblLangPath: TLabel
         Left = 8
-        Top = 258
-        Width = 79
+        Top = 250
+        Width = 400
         Height = 15
+        AutoSize = False
         Caption = 'Language Path'
       end
       object btnDefBrws: TSpeedButton
         Tag = 1
         Left = 414
-        Top = 108
+        Top = 105
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -425,7 +430,7 @@ object EnviroForm: TEnviroForm
       object btnOutputbrws: TSpeedButton
         Tag = 2
         Left = 413
-        Top = 165
+        Top = 160
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -460,7 +465,7 @@ object EnviroForm: TEnviroForm
       object btnBrwIcon: TSpeedButton
         Tag = 3
         Left = 413
-        Top = 221
+        Top = 215
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -495,7 +500,7 @@ object EnviroForm: TEnviroForm
       object btnBrwLang: TSpeedButton
         Tag = 5
         Left = 413
-        Top = 274
+        Top = 270
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -530,7 +535,7 @@ object EnviroForm: TEnviroForm
       object btnBrwSplash: TSpeedButton
         Tag = 4
         Left = 413
-        Top = 327
+        Top = 325
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -564,7 +569,7 @@ object EnviroForm: TEnviroForm
       end
       object edUserDir: TEdit
         Left = 16
-        Top = 109
+        Top = 105
         Width = 385
         Height = 23
         ReadOnly = True
@@ -573,7 +578,7 @@ object EnviroForm: TEnviroForm
       end
       object edTemplatesDir: TEdit
         Left = 16
-        Top = 165
+        Top = 160
         Width = 385
         Height = 23
         ReadOnly = True
@@ -582,7 +587,7 @@ object EnviroForm: TEnviroForm
       end
       object edSplash: TEdit
         Left = 16
-        Top = 327
+        Top = 325
         Width = 385
         Height = 23
         ReadOnly = True
@@ -591,7 +596,7 @@ object EnviroForm: TEnviroForm
       end
       object edIcoLib: TEdit
         Left = 16
-        Top = 221
+        Top = 215
         Width = 385
         Height = 23
         ReadOnly = True
@@ -600,7 +605,7 @@ object EnviroForm: TEnviroForm
       end
       object edLang: TEdit
         Left = 16
-        Top = 274
+        Top = 270
         Width = 385
         Height = 23
         ReadOnly = True
@@ -698,10 +703,10 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtDelClick
       end
       object vleExternal: TValueListEditor
-        Left = 32
-        Top = 24
+        Left = 28
+        Top = 30
         Width = 397
-        Height = 306
+        Height = 300
         Anchors = [akLeft, akTop, akRight, akBottom]
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         Options = [goVertLine, goHorzLine, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -731,11 +736,11 @@ object EnviroForm: TEnviroForm
         Caption = 'File Types:'
       end
       object lblAssocDesc: TLabel
-        Left = 40
-        Top = 326
-        Width = 397
-        Height = 35
-        Anchors = [akLeft, akRight, akBottom]
+        Left = 0
+        Top = 325
+        Width = 456
+        Height = 37
+        Alignment = taCenter
         AutoSize = False
         Caption = 
           'Just check or un-check for which file types Dev-C++ will be regi' +
@@ -743,8 +748,8 @@ object EnviroForm: TEnviroForm
         WordWrap = True
       end
       object lstAssocFileTypes: TCheckListBox
-        Left = 32
-        Top = 24
+        Left = 28
+        Top = 30
         Width = 397
         Height = 290
         Anchors = [akLeft, akTop, akRight, akBottom]

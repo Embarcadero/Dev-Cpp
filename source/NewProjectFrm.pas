@@ -37,7 +37,6 @@ type
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     ImageList1: TImageList;
-    grpPrjOpts: TGroupBox;
     rbC: TRadioButton;
     rbCpp: TRadioButton;
     cbDefault: TCheckBox;
@@ -46,8 +45,6 @@ type
     edProjectName: TEdit;
     TabsMain: TTabControl;
     ProjView: TListView;
-    pnlDesc: TPanel;
-    lblDesc: TLabel;
     TemplateLabel: TLabel;
     btnHelp: TBitBtn;
     procedure ProjViewChange(Sender: TObject; Item: TListItem;Change: TItemChange);
@@ -174,17 +171,19 @@ end;
 
 procedure TNewProjectForm.LoadText;
 begin
-  Caption :=              Lang[ID_NP];
-  lblDesc.Caption :=      Lang[ID_NP_DESC];
-  lblPrjName.Caption:=    Lang[ID_NP_PRJNAME];
-  rbC.Caption :=          Lang[ID_NP_DEFAULTC];
-  rbCpp.Caption :=        Lang[ID_NP_DEFAULTCPP];
-  cbDefault.Caption :=    Lang[ID_NP_MAKEDEFAULT];
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
 
-  grpPrjOpts.Caption :=   '  '+Lang[ID_NP_PRJOPTIONS]+'  ';
-  btnOk.Caption :=        Lang[ID_BTN_OK];
-  btnCancel.Caption :=    Lang[ID_BTN_CANCEL];
-  btnHelp.Caption:=       Lang[ID_BTN_HELP];
+	Caption :=              Lang[ID_NP];
+	lblPrjName.Caption:=    Lang[ID_NP_PRJNAME];
+	rbC.Caption :=          Lang[ID_NP_DEFAULTC];
+	rbCpp.Caption :=        Lang[ID_NP_DEFAULTCPP];
+	cbDefault.Caption :=    Lang[ID_NP_MAKEDEFAULT];
+
+	btnOk.Caption :=        Lang[ID_BTN_OK];
+	btnCancel.Caption :=    Lang[ID_BTN_CANCEL];
+	btnHelp.Caption:=       Lang[ID_BTN_HELP];
 end;
 
 procedure TNewProjectForm.UpdateView;

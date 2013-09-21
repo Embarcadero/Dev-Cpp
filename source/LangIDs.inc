@@ -299,10 +299,10 @@ const
   ID_COL_FILE                           = 15002;
   ID_COL_ARGS                           = 15004;
   ID_COL_MSG                            = 15003;
-  ID_COL_FLINE                      = 15003;
+  ID_COL_FLINE                          = 15003;
   ID_COL_FCOL                           = 16002;
-  ID_COL_FFILE                      = 16002;
-  ID_COL_FMSG                       = 16002;
+  ID_COL_FFILE                          = 16002;
+  ID_COL_FMSG                           = 16002;
   ID_COL_WATCHNAME                      = 16003;
   ID_COL_WATCHVAL                       = 16004;
 

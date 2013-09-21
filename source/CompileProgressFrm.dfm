@@ -1,6 +1,6 @@
 object CompileProgressForm: TCompileProgressForm
-  Left = 995
-  Top = 421
+  Left = 721
+  Top = 525
   BorderIcons = []
   BorderStyle = bsToolWindow
   Caption = 'Compile Progress'
@@ -169,7 +169,7 @@ object CompileProgressForm: TCompileProgressForm
     Step = 1
     TabOrder = 1
   end
-  object Memo1: TMemo
+  object memoMiniLog: TMemo
     Left = 328
     Top = 9
     Width = 249

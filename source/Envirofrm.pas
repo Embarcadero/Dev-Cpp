@@ -371,64 +371,65 @@ begin
   Caption:=                  Lang[ID_ENV];
 
   //Tabs
-  tabGeneral.Caption:=       Lang[ID_ENV_GENTAB];
-  tabPaths.Caption:=         Lang[ID_ENV_PATHTAB];
-  tabAssocs.Caption:=        Lang[ID_ENV_FASSTAB];
-  tabCVS.Caption:=           Lang[ID_ENV_CVSTAB];
-  tabExternal.Caption:=      Lang[ID_ENV_EXTERNALS];
+  tabGeneral.Caption:=           Lang[ID_ENV_GENTAB];
+  tabPaths.Caption:=             Lang[ID_ENV_PATHTAB];
+  tabAssocs.Caption:=            Lang[ID_ENV_FASSTAB];
+  tabCVS.Caption:=               Lang[ID_ENV_CVSTAB];
+  tabExternal.Caption:=          Lang[ID_ENV_EXTERNALS];
 
   //Buttons
-  btnOk.Caption:=            Lang[ID_BTN_OK];
-  btnCancel.Caption:=        Lang[ID_BTN_CANCEL];
-  btnHelp.Caption:=          Lang[ID_BTN_HELP];
+  btnOk.Caption:=                Lang[ID_BTN_OK];
+  btnCancel.Caption:=            Lang[ID_BTN_CANCEL];
+  btnHelp.Caption:=              Lang[ID_BTN_HELP];
 
   //Controls
-  cbDefCpp.Caption:=         Lang[ID_ENV_DEFCPP];
-  cbShowBars.Caption:=       Lang[ID_ENV_SHOWBARS];
-  cbMultiLineTab.Caption:=   Lang[ID_ENV_MULTILINETABS];
-  cbBackups.Caption:=        Lang[ID_ENV_BACKUPS];
-  cbMinOnRun.Caption:=       Lang[ID_ENV_MINONRUN];
-  cbdblFiles.Caption:=       Lang[ID_ENV_DBLFILES];
-  cbNoSplashScreen.Caption:= Lang[ID_ENV_NOSPLASH];
-  cbPauseConsole.Caption:=   Lang[ID_ENV_PAUSECONSOLE];
+  cbDefCpp.Caption:=             Lang[ID_ENV_DEFCPP];
+  cbShowBars.Caption:=           Lang[ID_ENV_SHOWBARS];
+  cbMultiLineTab.Caption:=       Lang[ID_ENV_MULTILINETABS];
+  cbBackups.Caption:=            Lang[ID_ENV_BACKUPS];
+  cbMinOnRun.Caption:=           Lang[ID_ENV_MINONRUN];
+  cbdblFiles.Caption:=           Lang[ID_ENV_DBLFILES];
+  cbNoSplashScreen.Caption:=     Lang[ID_ENV_NOSPLASH];
+  cbPauseConsole.Caption:=       Lang[ID_ENV_PAUSECONSOLE];
 
-  gbProgress.Caption :=      '  '+Lang[ID_ENV_COMPPROGRESSWINDOW]+'  ';
-  cbShowProgress.Caption :=  Lang[ID_ENV_SHOWPROGRESS];
-  cbAutoCloseProgress.Caption :=  Lang[ID_ENV_AUTOCLOSEPROGRESS];
+  gbProgress.Caption:=           ' '+Lang[ID_ENV_COMPPROGRESSWINDOW]+' ';
+  cbShowProgress.Caption:=       Lang[ID_ENV_SHOWPROGRESS];
+  cbAutoCloseProgress.Caption:=  Lang[ID_ENV_AUTOCLOSEPROGRESS];
 
-  cbWatchHint.Caption := Lang[ID_ENV_WATCHHINT];
-  cbWatchError.Caption := Lang[ID_ENV_WATCHERROR];
-  gbDebugger.Caption := Lang[ID_ENV_DEBUGGER];
+  cbWatchHint.Caption :=         Lang[ID_ENV_WATCHHINT];
+  cbWatchError.Caption :=        Lang[ID_ENV_WATCHERROR];
+  gbDebugger.Caption :=          ' '+Lang[ID_ENV_DEBUGGER]+' ';
 
-  rgbAutoOpen.Caption:=      '  '+Lang[ID_ENV_AUTOOPEN]+'  ';
-  rgbAutoOpen.Items[0]:=     Lang[ID_ENV_AUTOALL];
-  rgbAutoOpen.Items[1]:=     Lang[ID_ENV_AUTOFIRST];
-  rgbAutoOpen.Items[2]:=     Lang[ID_ENV_AUTOREMEMBER];
-  rgbAutoOpen.Items[3]:=     Lang[ID_ENV_AUTONONE];
+  rgbAutoOpen.Caption:=          ' '+Lang[ID_ENV_AUTOOPEN]+' ';
+  rgbAutoOpen.Items[0]:=         Lang[ID_ENV_AUTOALL];
+  rgbAutoOpen.Items[1]:=         Lang[ID_ENV_AUTOFIRST];
+  rgbAutoOpen.Items[2]:=         Lang[ID_ENV_AUTOREMEMBER];
+  rgbAutoOpen.Items[3]:=         Lang[ID_ENV_AUTONONE];
 
-  gbAltConfig.Caption:=      Lang[ID_ENV_GBALTCONFIG];
-  lblLang.Caption:=          Lang[ID_ENV_LANGUAGE];
-  lblTheme.Caption:=         Lang[ID_ENV_THEME];
-  lblmsgTabs.Caption:=       Lang[ID_ENV_MSGTABS];
-  lblMRU.Caption:=           Lang[ID_ENV_MRU];
+  gbAltConfig.Caption:=          ' '+Lang[ID_ENV_GBALTCONFIG]+' ';
+  lblLang.Caption:=              Lang[ID_ENV_LANGUAGE];
+  lblTheme.Caption:=             Lang[ID_ENV_THEME];
+  lblmsgTabs.Caption:=           Lang[ID_ENV_MSGTABS];
+  lblMRU.Caption:=               Lang[ID_ENV_MRU];
 
-  lblUserDir.Caption:=       Lang[ID_ENV_USERDIR];
-  lblTemplatesDir.Caption:=  Lang[ID_ENV_TEMPLATESDIR];
-  lblIcoLib.Caption:=        Lang[ID_ENV_ICOLIB];
-  lblSplash.Caption:=        Lang[ID_ENV_SPLASH];
-  lblLangPath.Caption:=      Lang[ID_ENV_SELLANGDIR];
+  lblUserDir.Caption:=           Lang[ID_ENV_USERDIR];
+  lblTemplatesDir.Caption:=      Lang[ID_ENV_TEMPLATESDIR];
+  lblIcoLib.Caption:=            Lang[ID_ENV_ICOLIB];
+  lblSplash.Caption:=            Lang[ID_ENV_SPLASH];
+  lblLangPath.Caption:=          Lang[ID_ENV_SELLANGDIR];
 
   // externals tab
-  lblExternal.Caption:=      Lang[ID_ENV_EXTERNPROGASSOCS];
+  lblExternal.Caption:=          Lang[ID_ENV_EXTERNPROGASSOCS];
   vleExternal.TitleCaptions.Clear;
   vleExternal.TitleCaptions.Add(Lang[ID_ENV_EXTERNEXT]);
   vleExternal.TitleCaptions.Add(Lang[ID_ENV_EXTERNPROG]);
-  btnExtAdd.Caption:=        Lang[ID_BTN_ADD];
-  btnExtDel.Caption:=        Lang[ID_BTN_DELETE];
+
+  btnExtAdd.Caption:=            Lang[ID_BTN_ADD];
+  btnExtDel.Caption:=            Lang[ID_BTN_DELETE];
 
   // associations tab
-  lblAssocFileTypes.Caption:=Lang[ID_ENV_FASSTYPES];
-  lblAssocDesc.Caption:=     Lang[ID_ENV_FASSDESC];
+  lblAssocFileTypes.Caption:=    Lang[ID_ENV_FASSTYPES];
+  lblAssocDesc.Caption:=         Lang[ID_ENV_FASSDESC];
 
   // CVS support tab
   lblCVSExec.Caption:=       Lang[ID_ENV_CVSEXE];

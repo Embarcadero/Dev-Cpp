@@ -158,7 +158,12 @@ end;
 procedure TCompOptForm.btnOkClick(Sender: TObject);
 begin
 	if (fBins = '') then begin
-		MessageDlg('You have not indicated the location of your binaries (compiler).'#13' Please do so now.', mtWarning, [mbOK], 0);
+		MessageDlg('You have not indicated the location of your compiler binaries.'#13' Please do so now.', mtWarning, [mbOK], 0);
+
+		MainPages.ActivePage := tabDirectories;
+		DirTabs.TabIndex := 0;
+		DirTabs.OnChange(nil);
+
 		ModalResult := mrNone;
 		exit;
 	end;
@@ -431,14 +436,14 @@ begin
 	lblDelayMsg.Caption:=                Lang[ID_COPT_DELAYMSG];
 
 	// Makefile generation
-	grpMakefileGen.Caption:=             '  '+Lang[ID_COPT_MAKEFILEGEN]+'  ';
+	grpMakefileGen.Caption:=             ' '+Lang[ID_COPT_MAKEFILEGEN]+' ';
 	cbFastDep.Caption:=                  Lang[ID_COPT_FASTDEP];
 
 	// Programs (you may want to...)
 	lblProgramsText.Caption:=            Lang[ID_COPT_PROGRAMS];
 
 	// Text above compiler select
-	grpCompSet.Caption:=                 '  '+Lang[ID_COPT_COMPSETS]+'  ';
+	grpCompSet.Caption:=                 ' '+Lang[ID_COPT_COMPSETS]+' ';
 end;
 
 procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);

@@ -389,7 +389,7 @@ begin
   tabSymbols.Caption:=           Lang[ID_EOPT_CPSYMBOLS];
 
 // General Tab
-  grpEditorOpts.Caption:=        '  ' +Lang[ID_EOPT_EDOPTIONS] +'  ';
+  grpEditorOpts.Caption:=        ' '+Lang[ID_EOPT_EDOPTIONS]+' ';
   cbAutoIndent.Caption:=         Lang[ID_EOPT_AUTOINDENT];
   cbInsertMode.Caption:=         Lang[ID_EOPT_INSERTMODE];
   cbUseTabs.Caption:=            Lang[ID_EOPT_TAB2SPC];
@@ -412,14 +412,14 @@ begin
   cbSyntaxHighlight.Caption:=    Lang[ID_EOPT_USESYNTAX];
   lblTabSize.Caption:=           Lang[ID_EOPT_TABSIZE];
 
-  grpMargin.Caption:=            '  '+Lang[ID_EOPT_MARGIN]+'  ';
+  grpMargin.Caption:=            ' '+Lang[ID_EOPT_MARGIN]+' ';
   cbMarginVis.Caption:=          Lang[ID_EOPT_HIGHLIGHTCURRLINE];
   lblMarginWidth.Caption:=       Lang[ID_EOPT_WIDTH];
   lblMarginColor.Caption:=       Lang[ID_EOPT_COLOR];
   HighCurLineBox.Caption:=       Lang[ID_EOPT_HIGHCURLINE];
   cbHighlightColor.Caption:=     Lang[ID_EOPT_COLOR];
 
-  grpCaret.Caption:=             '  '+Lang[ID_EOPT_CARET]+'  ';
+  grpCaret.Caption:=             ' '+Lang[ID_EOPT_CARET]+' ';
   lblInsertCaret.Caption:=       Lang[ID_EOPT_INSCARET];
   lblOverCaret.Caption:=         Lang[ID_EOPT_OVERCARET];
   cbMatch.Caption:=              Lang[ID_EOPT_MATCH];
@@ -439,11 +439,11 @@ begin
   cboOverwriteCaret.Items.Append(Lang[ID_EOPT_CARET4]);
 
 // Display Tab
-  grpEditorFont.Caption:=        '  '+Lang[ID_EOPT_EDFONT]+'  ';
+  grpEditorFont.Caption:=        ' '+Lang[ID_EOPT_EDFONT]+' ';
   lblEditorFont.Caption:=        Lang[ID_EOPT_FONT];
   lblEditorSize.Caption:=        Lang[ID_EOPT_SIZE];
 
-  grpGutter.Caption:=            '  '+Lang[ID_EOPT_GUTTER]+'  ';
+  grpGutter.Caption:=            ' '+Lang[ID_EOPT_GUTTER]+' ';
   cbGutterVis.Caption:=          Lang[ID_EOPT_VISIBLE];
   cbGutterAuto.Caption:=         Lang[ID_EOPT_GUTTERAUTO];
   cbLineNum.Caption:=            Lang[ID_EOPT_LINENUM];
@@ -457,7 +457,7 @@ begin
 // Syntax tab
   lblForeground.Caption:=        Lang[ID_EOPT_FORE];
   lblBackground.Caption:=        Lang[ID_EOPT_BACK];
-  grpStyle.Caption:=             '  '+Lang[ID_EOPT_STYLE] +'  ';
+  grpStyle.Caption:=             ' '+Lang[ID_EOPT_STYLE] +' ';
   cbBold.Caption:=               Lang[ID_EOPT_BOLD];
   cbItalic.Caption:=             Lang[ID_EOPT_ITALIC];
   cbUnderlined.Caption:=         Lang[ID_EOPT_UNDERLINE];
@@ -471,7 +471,7 @@ begin
   cbDefaultCode.Caption:=        Lang[ID_EOPT_DEFCODE];
 
   cbSymbolComplete.Caption:=     Lang[ID_EOPT_SYMBOLCOMPLETE];
-  grpSpecific.Caption:=          Lang[ID_EOPT_SYMBOLGROUP];
+  grpSpecific.Caption:=          ' '+Lang[ID_EOPT_SYMBOLGROUP]+' ';
   cbBraces.Caption:=             Lang[ID_EOPT_SYMBOLBRACES];
   cbParenth.Caption:=            Lang[ID_EOPT_SYMBOLPARENT];
   cbInclude.Caption:=            Lang[ID_EOPT_SYMBOLINCLUDE];
@@ -484,8 +484,8 @@ begin
   lblCompletionColor.Caption:=   Lang[ID_EOPT_COMPLETIONCOLOR];
 
 // Class browsing Tab
-  gbCBEngine.Caption:=           '  '+Lang[ID_EOPT_BROWSERENGINE]+'  ';
-  gbCBView.Caption:=             '  '+Lang[ID_EOPT_BROWSERVIEW]+'  ';
+  gbCBEngine.Caption:=           ' '+Lang[ID_EOPT_BROWSERENGINE]+' ';
+  gbCBView.Caption:=             ' '+Lang[ID_EOPT_BROWSERVIEW]+' ';
   chkEnableClassBrowser.Caption:=Lang[ID_EOPT_BROWSERENABLE];
   lblClassBrowserSample.Caption:=Lang[ID_EOPT_BROWSERSAMPLE];
   chkCBParseLocalH.Caption:=     Lang[ID_EOPT_BROWSERLOCAL];
@@ -511,10 +511,10 @@ begin
   // Autosave
   EnableDisableAutosave.Caption:=Lang[ID_EOPT_ENABLEAUTOSAVE];
   SaveInterval.Caption:=         Lang[ID_EOPT_AUTOSAVEINTERNAL];
-  FileOptions.Caption:=          Lang[ID_EOPT_AUTOSAVEFILE];
+  FileOptions.Caption:=          ' '+Lang[ID_EOPT_AUTOSAVEFILE]+' ';
   FileOptions.Items[0]:=         Lang[ID_EOPT_SAVEONLYOPENFILE];
   FileOptions.Items[1]:=         Lang[ID_EOPT_SAVEALLFILES];
-  OptionsGroup.Caption:=         Lang[ID_EOPT_OPTIONS];
+  OptionsGroup.Caption:=         ' '+Lang[ID_EOPT_OPTIONS]+' ';
 end;
 
 procedure TEditorOptForm.LoadSampleText;

@@ -221,41 +221,37 @@ end;
 
 function TdmMain.GetHighlighter(const FileName: string): TSynCustomHighlighter;
 var
- ext: string;
- idx: integer;
- tmp: TStrings;
+	ext: string;
+	idx: integer;
+	tmp: TStrings;
 begin
-  UpdateHighlighter;
-  result:= nil;
-  if devEditor.UseSyntax then
-   begin
-     if (FileName = '') or (AnsiPos(Lang[ID_UNTITLED], FileName) = 1) then
-      result:= cpp
-     else
-      begin
-        ext:= ExtractFileExt(FileName);
-        if AnsiCompareText(ext, RC_EXT) = 0 then
-         result:= Res
-        else
-         begin
-           tmp:= TStringList.Create;
-           try
-            delete(ext, 1, 1);
-            tmp.Delimiter:= ';';
-            tmp.DelimitedText:= devEditor.SyntaxExt;
-            if tmp.Count> 0 then
-             for idx:= 0 to pred(tmp.Count) do
-              if AnsiCompareText(Ext, tmp[idx]) = 0 then
-                begin
-                  result:= cpp;
-                  Exit;
-                end;
-           finally
-            tmp.Free;
-           end;
-         end;
-      end;
-   end;
+	UpdateHighlighter;
+	result:= nil;
+	if devEditor.UseSyntax then begin
+		if (FileName = '') or (AnsiPos(Lang[ID_UNTITLED], FileName) = 1) then
+			result:= cpp
+		else begin
+			ext:= ExtractFileExt(FileName);
+			if AnsiCompareText(ext, RC_EXT) = 0 then
+				result:= Res
+			else begin
+				tmp:= TStringList.Create;
+				try
+					delete(ext, 1, 1);
+					tmp.Delimiter:= ';';
+					tmp.DelimitedText:= devEditor.SyntaxExt;
+					if tmp.Count> 0 then
+						for idx:= 0 to pred(tmp.Count) do
+							if AnsiCompareText(Ext, tmp[idx]) = 0 then begin
+								result:= cpp;
+								Exit;
+							end;
+				finally
+					tmp.Free;
+				end;
+			end;
+		end;
+	end;
 end;
 
 function TdmMain.GetNum: integer;

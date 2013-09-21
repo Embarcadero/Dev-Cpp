@@ -593,8 +593,8 @@ type
 		actInsert: TAction;
 		actToggle: TAction;
 		actGoto: TAction;
-    TEXItem: TMenuItem;
-    actXTex: TAction;
+		TEXItem: TMenuItem;
+		actXTex: TAction;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -885,7 +885,7 @@ type
 		procedure LogEntryProc(const msg: string);
 		procedure CompOutputProc(const _Line, _Col, _Unit, _Message: string);
 		procedure CompResOutputProc(const _Line, _Unit, _Message: string);
-		procedure CompSuccessProc(messages : integer);
+		procedure CompSuccessProc;
 		procedure MainSearchProc(const SR: TdevSearchResult);
 		procedure LoadText;
 		function SaveFileAs(e : TEditor): Boolean;
@@ -1463,8 +1463,8 @@ begin
 							OpenFile(szFileName)
 				end;
 	finally
-	 msg.Result:= 0;
-	 DragFinish(THandle(msg.WParam));
+		msg.Result:= 0;
+		DragFinish(THandle(msg.WParam));
 	end;
 end;
 
@@ -1694,6 +1694,9 @@ begin
 	actBrowserRenameFolder.Caption:=	Lang[ID_POP_RENAMEFOLDER];
 	actBrowserUseColors.Caption:=		Lang[ID_POP_USECOLORS];
 	actBrowserShowInherited.Caption:=	Lang[ID_POP_SHOWINHERITED];
+
+	actGotoDeclEditor.Caption:=			Lang[ID_POP_GOTODECL];
+	actGotoImplEditor.Caption:=			Lang[ID_POP_GOTOIMPL];
 
 	// Message Control tabs
 	CompSheet.Caption :=				Lang[ID_SHEET_COMP];
@@ -2289,13 +2292,6 @@ begin
 		SubItems.Add(GetRealPath(_Unit));
 		SubItems.Add(_Message);
 	end;
-	TotalErrors.Text := IntToStr(fCompiler.ErrorCount);
-
-	if MessageControl.ActivePage <> CompSheet then
-		MessageControl.ActivePage := CompSheet;
-
-	if actCompOnNeed.Checked then
-		OpenCloseMessageSheet(TRUE);
 end;
 
 procedure TMainForm.CompResOutputProc(const _Line, _Unit, _Message: string);
@@ -2304,10 +2300,9 @@ begin
 		ResourceOutput.Items.Add('Line ' + _Line + ' in file ' + _Unit + ' : ' + _Message)
 	else
 		ResourceOutput.Items.Add(_Message);
-	ResSheet.Highlighted := true;
 end;
 
-procedure TMainForm.CompSuccessProc(messages : integer);
+procedure TMainForm.CompSuccessProc;
 var
 	F: TSearchRec;
 	HasSize : boolean;
@@ -2340,8 +2335,13 @@ begin
 			end;
 		end;
 
-	if (messages = 0) and actCompOnNeed.Checked then
-		OpenCloseMessageSheet(FALSE);
+	if (CompilerOutput.Items.Count = 0) and actCompOnNeed.Checked then
+		OpenCloseMessageSheet(FALSE)
+	else begin
+		if MessageControl.ActivePage <> CompSheet then
+			MessageControl.ActivePage := CompSheet;
+		OpenCloseMessageSheet(TRUE);
+	end;
 end;
 
 procedure TMainForm.LogEntryProc(const msg: string);
@@ -6210,8 +6210,7 @@ begin
 	end;
 
 	if path <> '' then begin
-		if FileExists(path) then begin
-			DeleteFile(path);
+		if DeleteFile(PChar(path)) then begin
 			SetStatusbarMessage('Deleted profiling data file "' + path + '"');
 		end else
 			SetStatusbarMessage('Could not find profiling file "' + path + '"!');
@@ -6297,22 +6296,26 @@ begin
 		end;
 
 	// otherwise, we clicked an 'unattached' variable. First check if we're inside a class header body
-	{end else begin
+	end else begin
 
-		for I:=cursorpos.Line-1 downto 0 do begin
+		cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
+		I := cursorindex;
+		while I > cursorindex-1024 do begin
 
 			// We're inside a class definition, save the name of the parent class...
-			if AnsiCompareStr('class ',TrimLeft(actualtext[I])) = 0 then begin
-				classdefline := TrimLeft(actualtext[I]);
+			compare1 := Copy(text,I,6);
+			if AnsiCompareStr('class ',compare1) = 0 then begin
 
-				len:=7;
-				while (len <= Length(classdefline)) and not (classdefline[len] in ['{',#9,#32]) do
-					Inc(len);
+				wordstart := I + 7; // start at the end of 'class'
+				wordend := wordstart;
+				while text[wordend] in e.Text.IdentChars do
+					Inc(wordend);
 
-				parent := Copy(classdefline,7,len-7);
+				ParentType := Copy(text,wordstart-1,wordend-wordstart+2);
 				break;
 			end;
-		end;}
+			Dec(I);
+		end;
 	end;
 
 	// If we couldn't directly find its parent, assume it belongs to the class function we're in
@@ -6327,33 +6330,34 @@ begin
 					Inc(wordstart);
 				until not (text[wordstart] in e.Text.IdentChars);
 				ParentType := Copy(text,wordstart,cursorindex-wordstart);
+				break;
 			end;
 		end;
+	end;
 
-		if ParentType <> '' then begin
-			compare1 := ParentType + '::' + statement;
+	if (ParentType <> '') and not FoundParentType then begin
+		compare1 := ParentType + '::' + statement;
 
-			// Check if the found class instance actually contains the variable...
-			for I:=0 to CppParser.Statements.Count-1 do begin
-				with PStatement(CppParser.Statements[I])^ do begin
-					if _ParentID <> -1 then begin
-						if _Kind = skFunction then begin
-							if _ScopeCmd <> '' then
-								compare2 := _ScopeCmd
-							else
-								compare2 := _ScopelessCmd;
-						end else begin
-							if _ScopeCmd <> '' then
-								compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopeCmd
-							else
-								compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopelessCmd;
-						end;
+		// Check if the found class instance actually contains the variable...
+		for I:=0 to CppParser.Statements.Count-1 do begin
+			with PStatement(CppParser.Statements[I])^ do begin
+				if _ParentID <> -1 then begin
+					if _Kind = skFunction then begin
+						if _ScopeCmd <> '' then
+							compare2 := _ScopeCmd
+						else
+							compare2 := _ScopelessCmd;
+					end else begin
+						if _ScopeCmd <> '' then
+							compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopeCmd
+						else
+							compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopelessCmd;
+					end;
 
-						if AnsiCompareStr(compare1,compare2) = 0 then begin
-							ParentType := Copy(compare1,1,Pos('::',compare1)-1);
-							FoundParentType := true;
-							Break;
-						end;
+					if AnsiCompareStr(compare1,compare2) = 0 then begin
+						ParentType := Copy(compare1,1,Pos('::',compare1)-1);
+						FoundParentType := true;
+						Break;
 					end;
 				end;
 			end;
@@ -6385,7 +6389,7 @@ begin
 
 			// Wwe've found a word that matches what we were looking for...
 			compare2 := e.Text.GetWordAtRowCol(e.Text.CharIndexToRowCol(I));
-			if (AnsiCompareStr(compare1,compare2) = 0) then begin
+			if AnsiCompareStr(compare1,compare2) = 0 then begin
 
 				wordstart := e.Text.RowColToCharIndex(e.Text.WordStartEx(e.Text.CharIndexToRowCol(I)),true);
 				wordend := e.Text.RowColToCharIndex(e.Text.WordEndEx(e.Text.CharIndexToRowCol(I)),true);

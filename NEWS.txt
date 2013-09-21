@@ -7,6 +7,10 @@ Version 5.2.0.2 - *
 - Watched variable deleting now does not delete wrong variables anymore.
 - Added TeX formatted code exporting.
 - Updated the Chinese (TC) translations (by cin.getline).
+- Compiling progress now properly updates error and warning count.
+- Warning and error logs are now updated while compiling.
+- Updated the new project window.
+- More bug fixes.
 
 Version 5.2.0.1 - 28 April 2012
 

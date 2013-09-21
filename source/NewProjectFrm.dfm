@@ -4,13 +4,13 @@ object NewProjectForm: TNewProjectForm
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'New Project'
-  ClientHeight = 267
+  ClientHeight = 222
   ClientWidth = 508
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
@@ -18,42 +18,34 @@ object NewProjectForm: TNewProjectForm
   OnDestroy = FormDestroy
   DesignSize = (
     508
-    267)
+    222)
   PixelsPerInch = 96
-  TextHeight = 13
-  object pnlDesc: TPanel
+  TextHeight = 15
+  object TemplateLabel: TLabel
+    Left = 24
+    Top = 110
+    Width = 240
+    Height = 25
+    AutoSize = False
+    Caption = '<desc>'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+  end
+  object lblPrjName: TLabel
     Left = 8
-    Top = 112
-    Width = 495
-    Height = 51
+    Top = 140
+    Width = 38
+    Height = 15
     Anchors = [akLeft, akRight, akBottom]
-    BevelInner = bvRaised
-    Color = clWindow
-    TabOrder = 4
-    object lblDesc: TLabel
-      Left = 4
-      Top = 4
-      Width = 56
-      Height = 13
-      Caption = 'Description:'
-    end
-    object TemplateLabel: TLabel
-      Left = 16
-      Top = 20
-      Width = 35
-      Height = 13
-      Caption = '<desc>'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clNavy
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-    end
+    Caption = 'Name: '
   end
   object btnOk: TBitBtn
     Left = 241
-    Top = 236
+    Top = 191
     Width = 81
     Height = 24
     Anchors = [akRight, akBottom]
@@ -83,7 +75,7 @@ object NewProjectForm: TNewProjectForm
   end
   object btnCancel: TBitBtn
     Left = 329
-    Top = 236
+    Top = 191
     Width = 83
     Height = 24
     Anchors = [akRight, akBottom]
@@ -92,77 +84,23 @@ object NewProjectForm: TNewProjectForm
     OnClick = btnCancelClick
     Kind = bkCancel
   end
-  object grpPrjOpts: TGroupBox
-    Left = 8
-    Top = 168
-    Width = 492
-    Height = 65
-    Anchors = [akRight, akBottom]
-    Caption = 'Project Options'
-    TabOrder = 2
-    DesignSize = (
-      492
-      65)
-    object lblPrjName: TLabel
-      Left = 8
-      Top = 15
-      Width = 34
-      Height = 13
-      Anchors = [akLeft, akRight, akBottom]
-      Caption = 'Name: '
-    end
-    object rbC: TRadioButton
-      Left = 280
-      Top = 11
-      Width = 65
-      Height = 17
-      Caption = '&C project'
-      TabOrder = 0
-    end
-    object rbCpp: TRadioButton
-      Left = 392
-      Top = 11
-      Width = 73
-      Height = 17
-      Caption = 'C&++ project'
-      Checked = True
-      TabOrder = 1
-      TabStop = True
-    end
-    object cbDefault: TCheckBox
-      Left = 280
-      Top = 37
-      Width = 201
-      Height = 17
-      Caption = '&Make default language'
-      TabOrder = 2
-    end
-    object edProjectName: TEdit
-      Left = 8
-      Top = 36
-      Width = 258
-      Height = 21
-      Anchors = [akLeft, akRight, akBottom]
-      TabOrder = 3
-    end
-  end
   object TabsMain: TTabControl
-    Left = 8
-    Top = 8
-    Width = 495
-    Height = 105
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 3
+    Left = 0
+    Top = 0
+    Width = 508
+    Height = 97
+    TabOrder = 2
     Tabs.Strings = (
       'Basic')
     TabIndex = 0
     OnChange = TabsMainChange
     object ProjView: TListView
       Left = 4
-      Top = 24
-      Width = 487
-      Height = 77
+      Top = 26
+      Width = 500
+      Height = 67
       Align = alClient
+      BevelInner = bvNone
       BevelOuter = bvNone
       BorderStyle = bsNone
       Color = clWhite
@@ -185,20 +123,54 @@ object NewProjectForm: TNewProjectForm
   end
   object btnHelp: TBitBtn
     Left = 426
-    Top = 236
+    Top = 191
     Width = 75
     Height = 24
     Anchors = [akRight, akBottom]
     Enabled = False
-    TabOrder = 5
+    TabOrder = 3
     OnClick = btnHelpClick
     Kind = bkHelp
+  end
+  object cbDefault: TCheckBox
+    Left = 280
+    Top = 133
+    Width = 201
+    Height = 17
+    Caption = '&Make default language'
+    TabOrder = 4
+  end
+  object rbCpp: TRadioButton
+    Left = 376
+    Top = 107
+    Width = 105
+    Height = 17
+    Caption = 'C&++ project'
+    Checked = True
+    TabOrder = 5
+    TabStop = True
+  end
+  object rbC: TRadioButton
+    Left = 280
+    Top = 107
+    Width = 81
+    Height = 17
+    Caption = '&C project'
+    TabOrder = 6
+  end
+  object edProjectName: TEdit
+    Left = 8
+    Top = 162
+    Width = 489
+    Height = 23
+    Anchors = [akLeft, akRight, akBottom]
+    TabOrder = 7
   end
   object ImageList1: TImageList
     Height = 32
     Width = 32
-    Left = 216
-    Top = 107
+    Left = 8
+    Top = 195
     Bitmap = {
       494C010101000400040020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000002000000001002000000000000040
@@ -738,8 +710,8 @@ object NewProjectForm: TNewProjectForm
   object ImageList: TImageList
     Height = 32
     Width = 32
-    Left = 268
-    Top = 107
+    Left = 44
+    Top = 195
     Bitmap = {
       494C010105000900040020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0

@@ -1865,10 +1865,17 @@ begin
 
 			// If confirmed, insert working dirs into default path list
 			if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-				fBinDir:= goodBinDir + ';' + StringReplace(BIN_DIR32,        '%path%\',devDirs.fExec,[rfReplaceAll]);
-				fLibDir:= goodLibDir + ';' + StringReplace(LIB_DIR32,        '%path%\',devDirs.fExec,[rfReplaceAll]);
-				fCDir  := goodCDir   + ';' + StringReplace(C_INCLUDE_DIR32,  '%path%\',devDirs.fExec,[rfReplaceAll]);
-				fCppDir:= goodCppDir + ';' + StringReplace(CPP_INCLUDE_DIR32,'%path%\',devDirs.fExec,[rfReplaceAll]);
+				if DirectoryExists(devDirs.fExec + 'MinGW32') then begin
+					fBinDir:= goodBinDir + ';' + StringReplace(BIN_DIR32,        '%path%\',devDirs.fExec,[rfReplaceAll]);
+					fLibDir:= goodLibDir + ';' + StringReplace(LIB_DIR32,        '%path%\',devDirs.fExec,[rfReplaceAll]);
+					fCDir  := goodCDir   + ';' + StringReplace(C_INCLUDE_DIR32,  '%path%\',devDirs.fExec,[rfReplaceAll]);
+					fCppDir:= goodCppDir + ';' + StringReplace(CPP_INCLUDE_DIR32,'%path%\',devDirs.fExec,[rfReplaceAll]);
+				end else if DirectoryExists(devDirs.fExec + 'MinGW64') then begin
+					fBinDir:= goodBinDir + ';' + StringReplace(BIN_DIR64,        '%path%\',devDirs.fExec,[rfReplaceAll]);
+					fLibDir:= goodLibDir + ';' + StringReplace(LIB_DIR64,        '%path%\',devDirs.fExec,[rfReplaceAll]);
+					fCDir  := goodCDir   + ';' + StringReplace(C_INCLUDE_DIR64,  '%path%\',devDirs.fExec,[rfReplaceAll]);
+					fCppDir:= goodCppDir + ';' + StringReplace(CPP_INCLUDE_DIR64,'%path%\',devDirs.fExec,[rfReplaceAll]);
+				end;
 			end;
 		end;
 	end;
