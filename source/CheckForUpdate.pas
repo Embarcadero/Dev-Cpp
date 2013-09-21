@@ -72,7 +72,6 @@ end;
 constructor TCheckForUpdate.Create;
 begin
   inherited Create;
-  Application.ProcessMessages;
 end;
 
 function TCheckForUpdate.Connect;

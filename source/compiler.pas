@@ -625,7 +625,6 @@ begin
 
 	if fTarget = ctProject then begin
 		BuildMakeFile;
-		Application.ProcessMessages;
 
 		if SingleFile <> '' then begin
 			if fProject.Options.ObjectOutput<>'' then begin
@@ -840,7 +839,6 @@ begin
 	if Assigned(fDevRun) then
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0)
 	else begin
-		Application.ProcessMessages;
 		fAbortThread:=False;
 		fDevRun := TDevRun.Create(true);
 		fDevRun.Command := s;
@@ -893,7 +891,6 @@ begin
 	end else if fAbortThread then
 		DoLogEntry(Lang[ID_COMPILEABORT]);
 	SwitchToOriginalCompilerSet(fOriginalSet);
-	Application.ProcessMessages;
 end;
 
 procedure TCompiler.OnLineOutput(Sender: TObject; const Line: AnsiString);

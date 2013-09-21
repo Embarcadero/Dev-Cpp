@@ -109,7 +109,7 @@ end;
 
 function TLangForm.GetSelected: integer;
 begin
-  result:= ListBox.ItemIndex;
+	result:= ListBox.ItemIndex;
 end;
 
 procedure TLangForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
@@ -165,7 +165,6 @@ begin
 			ProgressPanel.Visible := True;
 			OkBtn.Caption := 'Please wait...';
 			MainForm.CacheCreated := true;
-			//Application.ProcessMessages;
 			devCodeCompletion.Enabled := true;
 			devCodeCompletion.UseCacheFiles := true;
 			devClassBrowsing.Enabled := true;
@@ -193,7 +192,6 @@ begin
 
 			// Make it look busy
 			Screen.Cursor:=crHourglass;
-			//Application.ProcessMessages;
 
 			f := TStringList.Create;
 			if not AltCache.Checked then begin

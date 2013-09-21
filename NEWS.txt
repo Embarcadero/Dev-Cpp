@@ -1,4 +1,4 @@
-Version 5.2.0.3 - 15 Juni 2012
+Version 5.2.0.3 - 25 Juni 2012
 
 - Fixed the function argument tip not selecting the function with the right number of arguments first.
 - Fixed that tip showing in various wrong places.
@@ -15,6 +15,8 @@ Version 5.2.0.3 - 15 Juni 2012
 - Fixed editor options not applying function tip timer settings properly, causing crashes when typing.
 - Updated the greek translations (by migf1).
 - Various dialogs and buttons are now more spacious, allowing longer translations.
+- Double clicking on errors now always correctly shows the caret.
+- Fixed a lot of erroneous translations of non-English and non-Chinese languages.
 
 Version 5.2.0.2 - 31 Mei 2012
 

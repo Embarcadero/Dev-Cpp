@@ -8546,7 +8546,7 @@ procedure TCustomSynEdit.MoveCaretAndSelection(const ptBefore, ptAfter: TBufferC
   SelectionCommand: boolean);
 begin
   if (eoGroupUndo in FOptions) and UndoList.CanUndo then
-    fUndoList.AddGroupBreak;                                                 
+    fUndoList.AddGroupBreak;
 
   IncPaintLock;
   if SelectionCommand then

@@ -58,7 +58,6 @@ type
     fTabSheet: TTabSheet;
     fErrorLine: integer;
     fActiveLine: integer;
-    fErrSetting: boolean;
     fDebugGutter: TDebugGutter;
     fOnBreakPointToggle: TBreakpointToggleEvent;
     fCurrentWord: AnsiString;
@@ -623,14 +622,6 @@ begin
 		FLastPos.Char := fText.CaretX;
 		FLastPos.Line := fText.CaretY;
 
-		if not fErrSetting and (fErrorLine <> -1) then begin
-			fText.InvalidateLine(fErrorLine);
-			fText.InvalidateGutterLine(fErrorLine);
-			fErrorLine:= -1;
-			fText.InvalidateLine(fErrorLine);
-			fText.InvalidateGutterLine(fErrorLine);
-		end;
-
 		if Assigned(fFunctionTipTimer) then begin
 			if fFunctionTip.Activated and FunctionTipAllowed then
 				fFunctionTip.Show
@@ -638,6 +629,13 @@ begin
 				fFunctionTipTimer.Enabled := false;
 				fFunctionTipTimer.Enabled := true;
 			end;
+		end;
+
+		// Remove error line colors
+		if (fErrorLine <> -1) then begin
+			fText.InvalidateLine(fErrorLine);
+			fText.InvalidateGutterLine(fErrorLine);
+			fErrorLine:= -1;
 		end;
 	end;
 
@@ -800,19 +798,14 @@ end;
 
 procedure TEditor.SetErrorFocus(Col, Line: integer);
 begin
-	fErrSetting:= TRUE;
-	if fErrorLine <> Line then begin
-		if fErrorLine <> -1 then
-			fText.InvalidateLine(fErrorLine);
+	// Fool EditorStatusChange
+	fErrorLine := -1;
 
-		fText.InvalidateGutterLine(fErrorLine);
-		fErrorLine := Line;
-		fText.InvalidateLine(fErrorLine);
-		fText.InvalidateGutterLine(fErrorLine);
-	end;
 	fText.CaretXY := BufferCoord(Col, Line);
 	fText.EnsureCursorPosVisible;
-	fErrSetting := FALSE;
+
+	// Fool EditorStatusChange
+	fErrorLine := Line;
 end;
 
 procedure TEditor.SetActiveBreakpointFocus(Line: integer);
@@ -973,10 +966,11 @@ begin
 						InsertString('{' + #13#10 + Copy(fText.LineText,1,indent-1) + '}',false);
 						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
 						Key:=#0;
-					end else if StartsStr('struct',TrimLeft(fText.LineText)) or
-								StartsStr('union', TrimLeft(fText.LineText)) or
-								StartsStr('class', TrimLeft(fText.LineText)) or
-								StartsStr('enum',  TrimLeft(fText.LineText)) then begin
+					end else if StartsStr('struct',  TrimLeft(fText.LineText)) or
+								StartsStr('union',   TrimLeft(fText.LineText)) or
+								StartsStr('class',   TrimLeft(fText.LineText)) or
+								StartsStr('enum',    TrimLeft(fText.LineText)) or
+								StartsStr('typedef', TrimLeft(fText.LineText)) then begin
 
 						// Check indentation
 						indent:=0;
@@ -1171,7 +1165,8 @@ begin
 		fFunctionTipTimer.Enabled:=True;
 		fFunctionTipTimer.OnTimer:=FunctionTipTimer;
 		fFunctionTipTimer.Interval:=2*GetCaretBlinkTime; // fancy
-	end;
+	end else if Assigned(fFunctionTip) then
+		fFunctionTip.ReleaseHandle;
 
 	if devEditor.ParserHints or devData.WatchHint then begin
 		if not Assigned(fMouseOverTimer) then
@@ -1312,13 +1307,13 @@ var
 	attr : TSynHighlighterAttributes;
 	st: PStatement;
 begin
-	// If the mouse van be found INSIDE the window
+
+	TabSheet.PageControl.Hint := '';
+
+	// If the mouse can be found INSIDE the window
 	if fText.GetPositionOfMouse(p) and fAllowMouseOver then begin
 
-		// Remove leftover filename hint which is shown if fText.Hint is ''
-		TabSheet.PageControl.Hint := '';
-
-		// Check if we're inside a comment or string by looking at text color. If we are, skip without showing a tooltip
+		// Only show info about variables
 		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
 			if not (attr = fText.Highlighter.IdentifierAttribute) then begin
 				Application.CancelHint;

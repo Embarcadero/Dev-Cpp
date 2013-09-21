@@ -2330,16 +2330,17 @@ begin
 				SizeFile.Text := SizeFile.Text + ' (' + IntToStr(F.Size div 1024) + ' KB)';
 		end else
 			SizeFile.Text := '0';
-		end else begin
-			// errors exist; goto first one...
-			for I:=0 to CompilerOutput.Items.Count-1 do begin
-				if StrToIntDef(CompilerOutput.Items[I].Caption, -1)<>-1 then begin
-					CompilerOutput.Selected:=CompilerOutput.Items[I];
-					CompilerOutputDblClick(nil);
-					Break;
-				end;
+	end else begin
+
+		// errors exist; goto first one...
+		for I := 0 to CompilerOutput.Items.Count-1 do begin
+			if StrToIntDef(CompilerOutput.Items[I].Caption, -1) <> -1 then begin
+				CompilerOutput.Selected:=CompilerOutput.Items[I];
+				CompilerOutputDblClick(nil);
+				Break;
 			end;
 		end;
+	end;
 
 	if (CompilerOutput.Items.Count = 0) and actCompOnNeed.Checked then
 		OpenCloseMessageSheet(FALSE)
@@ -2956,7 +2957,7 @@ begin
 				for I:= 0 to pred(PageControl.PageCount) do
 					with TEditor(PageControl.Pages[I].Tag) do begin
 						devEditor.AssignEditor(Text);
-						Text.Highlighter:= dmMain.GetHighlighter(FileName);
+						Text.Highlighter := dmMain.GetHighlighter(FileName);
 						InitCompletion;
 					end;
 
@@ -3291,7 +3292,6 @@ begin
 	if fCompiler.Target = ctProject then
 		DeleteFile(fProject.Executable);
 	fCompiler.Compile;
-	//Application.ProcessMessages;
 end;
 
 procedure TMainForm.actRunExecute(Sender: TObject);
@@ -3335,7 +3335,6 @@ begin
 	if not PrepareForCompile then
 		Exit;
 	fCompiler.RebuildAll;
-	//Application.ProcessMessages;
 end;
 
 procedure TMainForm.actCleanExecute(Sender: TObject);
@@ -3346,7 +3345,6 @@ begin
 		Exit;
 	end;
 	fCompiler.Clean;
-	//Application.ProcessMessages;
 end;
 
 procedure TMainForm.PrepareDebugger;
@@ -3823,10 +3821,10 @@ begin
 		errorfile:= SubItems[1];
 		errorfiletab := GetEditorFromFileName(errorfile);
 	end;
-	//Application.ProcessMessages;
-	if assigned(errorfiletab) then begin
-		errorfiletab.SetErrorFocus(Col, Line);
+
+	if Assigned(errorfiletab) then begin
 		errorfiletab.Activate;
+		errorfiletab.SetErrorFocus(Col, Line);
 	end;
 end;
 
@@ -3994,7 +3992,6 @@ begin
 	bfile:= StringReplace(bfile, '/', '\', [rfReplaceAll]);
 
 	e := GetEditorFromFileName(bfile);
-	//Application.ProcessMessages;
 	if assigned(e) then begin
 		e.SetActiveBreakpointFocus(bline);
 		e.Activate;
@@ -4236,7 +4233,6 @@ var
  I1: Cardinal;
  e: TEditor;
 begin
-	Application.ProcessMessages;
 	if not ClassBrowser1.Enabled then
 		Exit;
 	if Assigned(fProject) then
@@ -5772,7 +5768,6 @@ begin
 	if not PrepareForCompile then
 		Exit;
 	fCompiler.Compile(e.FileName);
-	//Application.ProcessMessages;
 end;
 
 procedure TMainForm.actCompileCurrentFileUpdate(Sender: TObject);
@@ -6674,7 +6669,7 @@ var
 	e : TEditor;
 begin
 	thispage:=PageControl.IndexOfTabAt(X, Y);
-	if thispage>-1 then begin
+	if thispage <> -1 then begin
 		e:=GetEditor(thispage);
 		if Assigned(e) then
 			PageControl.Hint:=e.FileName;

@@ -51,7 +51,7 @@ object MainForm: TMainForm
     Top = 372
     Width = 784
     Height = 100
-    ActivePage = DebugSheet
+    ActivePage = CompSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -107,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 72
+        Height = 71
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -202,7 +202,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 72
+        Height = 71
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -214,7 +214,7 @@ object MainForm: TMainForm
             Left = 468
             Top = 0
             Width = 156
-            Height = 41
+            Height = 40
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 0
@@ -293,7 +293,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 156
-            Height = 41
+            Height = 40
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 1
@@ -388,7 +388,7 @@ object MainForm: TMainForm
             Left = 156
             Top = 0
             Width = 156
-            Height = 41
+            Height = 40
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 2
@@ -483,7 +483,7 @@ object MainForm: TMainForm
             Left = 312
             Top = 0
             Width = 156
-            Height = 41
+            Height = 40
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 3
@@ -582,7 +582,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 768
-            Height = 41
+            Height = 40
             Align = alClient
             Columns = <
               item
@@ -616,7 +616,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 22
             Width = 768
-            Height = 19
+            Height = 18
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -667,7 +667,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 72
+        Height = 71
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone

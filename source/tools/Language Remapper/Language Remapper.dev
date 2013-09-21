@@ -2,7 +2,7 @@
 FileName=Language Remapper.dev
 Name=Language Remapper
 Type=1
-Ver=1
+Ver=2
 ObjFiles=
 Includes=
 Libs=
@@ -28,8 +28,8 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=1
-CompilerSettings=000000000011100000000100010
-UnitCount=1
+CompilerSettings=00000001f0111000000001000
+UnitCount=3
 
 [VersionInfo]
 Major=1
@@ -52,6 +52,26 @@ SyncProduct=1
 
 [Unit1]
 FileName=main.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit2]
+FileName=translation.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit3]
+FileName=mutation.h
 CompileCpp=1
 Folder=
 Compile=1

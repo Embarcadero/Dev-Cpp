@@ -143,7 +143,7 @@ object CompOptForm: TCompOptForm
         Left = 22
         Top = 95
         Width = 443
-        Height = 80
+        Height = 75
         Anchors = []
         ScrollBars = ssVertical
         TabOrder = 1
@@ -151,9 +151,9 @@ object CompOptForm: TCompOptForm
       end
       object grpMakefileGen: TGroupBox
         Left = 8
-        Top = 280
+        Top = 284
         Width = 457
-        Height = 106
+        Height = 100
         Caption = '  Makefile generation:  '
         TabOrder = 2
         object lblDelay: TLabel
@@ -184,7 +184,7 @@ object CompOptForm: TCompOptForm
           TabOrder = 0
         end
         object seCompDelay: TSpinEdit
-          Left = 103
+          Left = 111
           Top = 32
           Width = 54
           Height = 24
@@ -196,7 +196,7 @@ object CompOptForm: TCompOptForm
       end
       object cbLinkerAdd: TCheckBox
         Left = 10
-        Top = 180
+        Top = 175
         Width = 450
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -206,9 +206,9 @@ object CompOptForm: TCompOptForm
       end
       object Linker: TMemo
         Left = 22
-        Top = 205
+        Top = 200
         Width = 443
-        Height = 65
+        Height = 75
         Anchors = []
         ScrollBars = ssVertical
         TabOrder = 4

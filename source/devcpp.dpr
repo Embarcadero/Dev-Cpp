@@ -98,11 +98,11 @@ uses
   ParamsFrm in 'ParamsFrm.pas' {ParamsForm},
   CompilerOptionsFrame in 'CompilerOptionsFrame.pas' {CompOptionsFrame: TFrame},
   CompileProgressFrm in 'CompileProgressFrm.pas' {CompileProgressForm},
-  WebThread in 'webupdate\WebThread.pas',
-  WebUpdate in 'webupdate\WebUpdate.pas' {WebUpdateForm},
+  WebThread in 'Tools\webupdate\WebThread.pas',
+  WebUpdate in 'Tools\webupdate\WebUpdate.pas' {WebUpdateForm},
   ProcessListFrm in 'ProcessListFrm.pas' {ProcessListForm},
   ModifyVarFrm in 'ModifyVarFrm.pas' {ModifyVarForm},
-  PackmanExitCodesU in 'packman\PackmanExitCodesU.pas',
+  PackmanExitCodesU in 'Tools\Packman\PackmanExitCodesU.pas',
   ImageTheme in 'ImageTheme.pas';
 
 {$R *.res}

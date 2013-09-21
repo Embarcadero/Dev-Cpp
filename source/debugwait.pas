@@ -909,7 +909,6 @@ begin
     if (Assigned(item)) then begin
       if item.Count <> CurNode.Next.Count then begin
         DebugTree.Items.Delete(item);
-        Application.ProcessMessages;
         CreateDebugNodes(nil, CurNode);
       end
       else

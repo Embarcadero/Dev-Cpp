@@ -50,8 +50,7 @@ implementation
 
 procedure TDevConnect.Sync;
 begin
-  L.Caption := msg;
-  Application.ProcessMessages;
+	L.Caption := msg;
 end;
 
 procedure TDevConnect.Execute;

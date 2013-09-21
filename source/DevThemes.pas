@@ -263,22 +263,18 @@ begin
     for idx:= 0 to pred(MNU_CNT) do
      GetImage(idx +MNU_OFF, fMenus);
 
-    Application.ProcessMessages;
     // fill Help
     for idx:= 0 to pred(HLP_CNT) do
      GetImage(idx +HLP_OFF, fHelp);
 
-    Application.ProcessMessages;
     // fill Projects
     for idx:= 0 to pred(PRJ_CNT) do
      GetImage(idx +PRJ_OFF, fProjects);
 
-    Application.ProcessMessages;
     // fill Specials
     for idx:= 0 to pred(SPL_CNT) do
      GetImage(idx +SPL_OFF, fSpecials);
 
-    Application.ProcessMessages;
     // fill Browser
     for idx:= 0 to pred(BRW_CNT) do
      GetImage(idx +BRW_OFF, fBrowser);

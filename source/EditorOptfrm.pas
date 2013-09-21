@@ -413,7 +413,7 @@ begin
   lblTabSize.Caption:=           Lang[ID_EOPT_TABSIZE];
 
   grpMargin.Caption:=            ' '+Lang[ID_EOPT_MARGIN]+' ';
-  cbMarginVis.Caption:=          Lang[ID_EOPT_HIGHLIGHTCURRLINE];
+  cbMarginVis.Caption:=          Lang[ID_EOPT_GENERICENABLED];
   lblMarginWidth.Caption:=       Lang[ID_EOPT_WIDTH];
   lblMarginColor.Caption:=       Lang[ID_EOPT_COLOR];
   HighCurLineBox.Caption:=       Lang[ID_EOPT_HIGHCURLINE];
@@ -1523,8 +1523,8 @@ begin
     BuildFilter(flt, [FLT_HEADS]);
     OpenDialog.Filter:=flt;
     if OpenDialog.Execute then begin
-      Application.ProcessMessages;
       Screen.Cursor:=crHourglass;
+      Application.ProcessMessages;
       for I:=0 to OpenDialog.Files.Count-1 do
         CppParser.AddFileToScan(OpenDialog.Files[I]);
       CppParser.ParseList;
