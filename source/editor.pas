@@ -73,7 +73,7 @@ type
     fRunToCursorLine: integer;
     fLastParamFunc : TList;
     FCodeToolTip: TCodeToolTip;//** Modified by Peter **}
-    FCodeToolTipLastPos : TBufferCoord;
+    FLastPos : TBufferCoord;
     FAutoIndent: TSynAutoIndent;
     procedure CompletionTimer( Sender: TObject );
     procedure EditorKeyPress( Sender: TObject; var Key: Char );
@@ -339,8 +339,6 @@ begin
 		else
 			Panels[1].Text:= Lang[ID_OVERWRITE];
 	end;
-
-	fTabSheet.PageControl.ActivePage := fTabSheet;
 end;
 
 destructor TEditor.Destroy;
@@ -659,6 +657,15 @@ begin
 		MainForm.SetStatusbarLineCol;
 
 	if Changes * [scCaretX, scCaretY] <> [] then begin
+
+		// Prevent loading twice (on CaretX and CaretY change)
+		if (fText.CaretX = FLastPos.Char) and (fText.CaretY = FLastPos.Line) then
+			Exit;
+
+		// Store old pos
+		FLastPos.Char := fText.CaretX;
+		FLastPos.Line := fText.CaretY;
+
 		// Only on caret changes...
 		if not fErrSetting and (fErrorLine <> -1) then begin
 			fText.InvalidateLine(fErrorLine);
@@ -669,18 +676,8 @@ begin
 			Application.ProcessMessages;
 		end;
 
-		// Rescan for prototypes when the caret changes
-		if FCodeToolTip.Activated or (not fText.SelAvail) then begin
-
-			// Prevent loading twice (on CaretX and CaretY change)
-			if (fText.CaretX <> FCodeToolTipLastPos.Char) or (fText.CaretY <> FCodeToolTipLastPos.Line) then begin
-				FCodeToolTip.Show;
-
-				// Store old pos
-				FCodeToolTipLastPos.Char := fText.CaretX;
-				FCodeToolTipLastPos.Line := fText.CaretY;
-			end
-		end;
+		if FCodeToolTip.Activated or (not fText.SelAvail) and fText.Focused then
+			FCodeToolTip.Show;
 	end;
 
 	if scInsertMode in Changes then begin

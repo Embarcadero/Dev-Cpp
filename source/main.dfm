@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 315
-  Top = 287
+  Left = 362
+  Top = 118
   Width = 1243
   Height = 761
   HorzScrollBar.Visible = False
@@ -50,7 +50,7 @@ object MainForm: TMainForm
     Top = 550
     Width = 1227
     Height = 133
-    ActivePage = CompSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -222,7 +222,7 @@ object MainForm: TMainForm
             Left = 468
             Top = 0
             Width = 156
-            Height = 69
+            Height = 70
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 0
@@ -301,7 +301,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 156
-            Height = 69
+            Height = 70
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 1
@@ -396,7 +396,7 @@ object MainForm: TMainForm
             Left = 156
             Top = 0
             Width = 156
-            Height = 69
+            Height = 70
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 2
@@ -491,7 +491,7 @@ object MainForm: TMainForm
             Left = 312
             Top = 0
             Width = 156
-            Height = 69
+            Height = 70
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 3

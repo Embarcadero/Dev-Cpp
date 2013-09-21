@@ -1,6 +1,6 @@
 object ToolEditForm: TToolEditForm
-  Left = 412
-  Top = 354
+  Left = 782
+  Top = 351
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Edit tool'

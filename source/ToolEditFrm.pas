@@ -119,6 +119,7 @@ end;
 
 procedure TToolEditForm.btnProgClick(Sender: TObject);
 begin
+  OpenDialog.Filter := 'Applications (*.exe;*.bat;*.com;)|*.exe;*.bat;*.com|All files (*.*)|*.*';
   if OpenDialog.Execute then
    begin
      edProgram.Text := OpenDialog.FileName;

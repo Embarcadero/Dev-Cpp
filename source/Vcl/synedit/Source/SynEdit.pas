@@ -10958,6 +10958,7 @@ function TCustomSynEdit.GetUncollapsedStrings: TStrings;
 var
 	i : integer;
 	fromtolinebackup : array of integer;
+	collapsedbackup : array of boolean;
 
 	procedure SpecialUncollapseLevel(ALevel : integer);
 	var
@@ -10965,24 +10966,30 @@ var
 	begin
 		for j := fAllFoldRanges.AllCount - 1 downto 0 do
 			with fAllFoldRanges[j] do begin
-				if (RealLevel = ALevel) and (Collapsed){ and (not ParentCollapsed)} then begin
+				if (RealLevel = ALevel) and (Collapsed){ and (not ParentCollapsed) }then begin
+
+					// This is the UnCollapse part
 					for k := 0 to CollapsedLines.Count - 1 do
 						fActualLines.Insert(FromLine, CollapsedLines[k]);
 					if FoldRegion.AddEnding then
 						fActualLines[FromLine-1] := Copy(fActualLines[FromLine-1], 1,Length(fActualLines[FromLine-1]) - Length(FoldRegion.Close));
 
 					// Update fold positions
+					Collapsed := False;
 					MoveFoldRangesAfter(fAllFoldRanges[j], CollapsedLines.Count);
+					//SetPCOfSubFoldRanges(False, RealLevel);
 				end;
 			end;
 	end;
 begin
 
-	// Back up the FromLine and ToLine values
+	// Back up the FromLine and ToLine and Collapsed values
 	SetLength(fromtolinebackup,fAllFoldRanges.AllCount*2);
+	SetLength(collapsedbackup,fAllFoldRanges.AllCount);
 	for i:=0 to fAllFoldRanges.AllCount - 1 do begin
 		fromtolinebackup[2*i] := fAllFoldRanges[i].FromLine;
 		fromtolinebackup[2*i+1] := fAllFoldRanges[i].ToLine;
+		collapsedbackup[i] := fAllFoldRanges[i].Collapsed;
 	end;
 
 	// Copy the collapsed text
@@ -11005,8 +11012,10 @@ begin
 	for i:=0 to fAllFoldRanges.AllCount - 1 do begin
 		fAllFoldRanges[i].FromLine := fromtolinebackup[2*i];
 		fAllFoldRanges[i].ToLine := fromtolinebackup[2*i+1];
+		fAllFoldRanges[i].Collapsed := collapsedbackup[i];
 	end;
 	fromtolinebackup := nil;
+	collapsedbackup := nil;
 end;
 
 procedure TCustomSynEdit.MoveFoldRangesAfter(FoldRange: TSynEditFoldRange; LineCount: Integer);

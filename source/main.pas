@@ -6298,14 +6298,12 @@ procedure TMainForm.HideCodeToolTip;
 // https://sourceforge.net/tracker/?func=detail&atid=110639&aid=957025&group_id=10639
 //
 var
-	CurrentEditor: TEditor;
+	e: TEditor;
 begin
-	CurrentEditor := GetEditor(PageControl.ActivePageIndex);
-
-	if Assigned(CurrentEditor) and Assigned(CurrentEditor.CodeToolTip) then
-		CurrentEditor.CodeToolTip.ReleaseHandle;
+	e := GetEditor;
+	if Assigned(e) and Assigned(e.CodeToolTip) then
+		e.CodeToolTip.ReleaseHandle;
 end;
-
 
 procedure TMainForm.ApplicationEventsDeactivate(Sender: TObject);
 begin
