@@ -1,10 +1,10 @@
 object AboutForm: TAboutForm
-  Left = 374
-  Top = 200
+  Left = 689
+  Top = 364
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'About Dev-C++ :-)'
-  ClientHeight = 425
+  ClientHeight = 436
   ClientWidth = 393
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,7 +18,7 @@ object AboutForm: TAboutForm
   PixelsPerInch = 96
   TextHeight = 13
   object VersionLabel: TLabel
-    Left = 280
+    Left = 216
     Top = 74
     Width = 38
     Height = 13
@@ -2202,7 +2202,7 @@ object AboutForm: TAboutForm
   end
   object btnOk: TBitBtn
     Left = 310
-    Top = 394
+    Top = 402
     Width = 75
     Height = 25
     Caption = '&OK'
@@ -2211,7 +2211,7 @@ object AboutForm: TAboutForm
   end
   object GroupBox1: TGroupBox
     Left = 8
-    Top = 96
+    Top = 104
     Width = 379
     Height = 121
     Caption = 'GNU General Public License : '
@@ -2956,7 +2956,7 @@ object AboutForm: TAboutForm
   end
   object GroupBox2: TGroupBox
     Left = 8
-    Top = 224
+    Top = 232
     Width = 378
     Height = 161
     Caption = 'Web sites / email : '
@@ -3118,7 +3118,7 @@ object AboutForm: TAboutForm
   end
   object btnAuthors: TBitBtn
     Left = 227
-    Top = 394
+    Top = 402
     Width = 83
     Height = 25
     Caption = '&Authors'
@@ -3156,7 +3156,7 @@ object AboutForm: TAboutForm
   end
   object btnUpdateCheck: TBitBtn
     Left = 8
-    Top = 394
+    Top = 402
     Width = 185
     Height = 25
     Caption = '&Check for updates'

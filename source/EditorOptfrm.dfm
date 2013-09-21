@@ -30,7 +30,7 @@ object EditorOptForm: TEditorOptForm
     Top = 8
     Width = 415
     Height = 365
-    ActivePage = tabGeneral
+    ActivePage = tabDisplay
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     OnChange = PagesMainChange
@@ -480,7 +480,10 @@ object EditorOptForm: TEditorOptForm
           Top = 32
           Width = 190
           Height = 15
+          Hint = 'Gutter width adapts to line number width'
           Caption = 'Auto Size'
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 1
         end
         object cbGutterFnt: TCheckBox

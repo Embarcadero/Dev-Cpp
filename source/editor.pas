@@ -1042,7 +1042,7 @@ begin
 				// If there's any text before the cursor
 				if Length(fText.LineText) > 1 then begin
 
-					// Kijk wat we aan het typen zijn
+					// Check what we're typing at the moment
 					counter:=0;
 					repeat
 						Inc(counter);
@@ -1050,21 +1050,30 @@ begin
 
 					// First check if the user is opening a function
 					if (fText.LineText[fText.CaretX-counter] = ')') then begin
+
+						// Check indentation
 						counter:=0;
 						repeat
 							Inc(counter);
 						until not (fText.LineText[counter] in [#9,#32]);
-						InsertString(Copy(fText.LineText,1,counter-1) + #13#10 + '}',false);
-					end else if AnsiStartsStr('struct',fText.LineText) or
-								AnsiStartsStr('union',fText.LineText)  or
-								AnsiStartsStr('class',fText.LineText)  or
-								AnsiStartsStr('enum',fText.LineText) then begin
-						InsertString(#13#10 + '};',false);
+
+						InsertString(#13#10 + Copy(fText.LineText,1,counter-1) + '}',false);
+					end else if AnsiStartsStr('struct',TrimLeft(fText.LineText)) or
+								AnsiStartsStr('union',TrimLeft(fText.LineText))  or
+								AnsiStartsStr('class',TrimLeft(fText.LineText))  or
+								AnsiStartsStr('enum',TrimLeft(fText.LineText)) then begin
+
+						// Check indentation too
+						counter:=0;
+						repeat
+							Inc(counter);
+						until not (fText.LineText[counter] in [#9,#32]);
+
+						InsertString(#13#10 + Copy(fText.LineText,1,counter-1) + '};',false);
 					end else
 						InsertString('}',false);
 				end else
 					InsertString(#13#10 + '}',false);
-
 			end else if localizedkey = '<' then begin
 				if AnsiStartsStr('#include',fText.LineText) then
 					InsertString('>',false);

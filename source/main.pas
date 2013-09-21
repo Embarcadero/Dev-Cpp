@@ -1120,14 +1120,14 @@ begin
 	{ *** RNC Create breakpoint list *** }
 	BreakPointList := TList.create;
 
-	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Initializing class browser...';
-	InitClassBrowser(true{not CacheCreated});
-
 	// Create an autosave timer
 	AutoSaveTimer := TTimer.Create(Application);
 	AutoSaveTimer.Interval := devEditor.Interval*60*1000;
 	AutoSaveTimer.OnTimer := EditorSaveTimer;
 	AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
+
+	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Initializing class browser...';
+	InitClassBrowser(true{not CacheCreated});
 end;
 
 { *** RNC add global breakpoint *** }
@@ -3169,13 +3169,12 @@ end;
 
 procedure TMainForm.actAboutExecute(Sender: TObject);
 begin
-	with TAboutForm.Create(Self) do
-	 try
-		VersionLabel.Caption:= VersionLabel.Caption + DEVCPP_VERSION;
+	with TAboutForm.Create(Self) do try
+		VersionLabel.Caption:= VersionLabel.Caption + DEVCPP_VERSION + #13#10 + 'Build time: ' + DEVCPP_BUILDTIME;
 		ShowModal;
-	 finally
+	finally
 		Free;
-	 end;
+	end;
 end;
 
 procedure TMainForm.actProjectNewExecute(Sender: TObject);
@@ -4232,13 +4231,14 @@ begin
 	CodeCompletion1.Height:=devCodeCompletion.Height;
 	ClassBrowser1.Enabled:=devClassBrowsing.Enabled;
 	ClassBrowser1.ShowFilter:=TShowFilter(devClassBrowsing.ShowFilter);
-	// if class-browsing is disabled, clear the class-browser
-	// if there is no active editor, clear the class-browser
+
+	// if class-browsing is disabled or if there is no active editor, clear the class-browser
 	e:=GetEditor;
 	if not ClassBrowser1.Enabled or (not Assigned(e) and (ClassBrowser1.ShowFilter=sfCurrent)) then begin
 		CppParser1.Reset;
 		ClassBrowser1.Clear;
 	end;
+
 	actBrowserViewAll.Checked:=ClassBrowser1.ShowFilter=sfAll;
 	actBrowserViewProject.Checked:=ClassBrowser1.ShowFilter=sfProject;
 	actBrowserViewCurrent.Checked:=ClassBrowser1.ShowFilter=sfCurrent;
@@ -4248,7 +4248,6 @@ begin
 	actBrowserShowInherited.Checked:=devClassBrowsing.ShowInheritedMembers;
 	ClassBrowser1.ShowInheritedMembers:=devClassBrowsing.ShowInheritedMembers;
 
-	Screen.Cursor:=crHourglass;
 	if Full and CppParser1.Enabled then begin
 		Application.ProcessMessages;
 		ClassBrowser1.Parser:=nil;
@@ -4287,7 +4286,6 @@ begin
 				ScanActiveProject;
 		end;
 	end;
-	Screen.Cursor:=crDefault;
 end;
 
 {
@@ -4420,7 +4418,7 @@ var
 begin
 	e:= GetEditor;
 	if not Assigned(e) then
-			Exit;
+		Exit;
 
 	Ext := ExtractFileExt(e.FileName);
 	FileName := '';
@@ -4615,7 +4613,8 @@ begin
 end;
 
 procedure TMainForm.DateTimeMenuItemClick(Sender: TObject);
-var e : TEditor;
+var
+	e : TEditor;
 begin
 	e := GetEditor;
 	if Assigned(e) then
@@ -4991,7 +4990,6 @@ procedure TMainForm.actCloseAllButThisExecute(Sender: TObject);
 var
 	idx: integer;
 	current: integer;
-//	e: TEditor;
 begin
 	current:=PageControl.ActivePageIndex;
 	for idx := 0 to current-1 do
@@ -4999,18 +4997,9 @@ begin
 			Break;
 
 	// our editor is now first
-	for idx := 1 to PageControl.PageCount-1 do
+	for idx := 0 to PageControl.PageCount-1 do
 		if not CloseEditor(PageControl.PageCount-1, True) then
 			Break;
-
-//	e:=GetEditor;
-//	if Assigned(e) then begin
-//		// don't know why, but at this point the editor does not show its caret.
-//		// if we shift the focus to another control and back to the editor,
-//		// everything is fine. (I smell another SynEdit bug?)
-//		e.TabSheet.SetFocus;
-//		e.Text.SetFocus;
-//	end;
 end;
 
 procedure TMainForm.DebugSubPagesChange(Sender: TObject);

@@ -9,6 +9,8 @@ Version 5.0.0.7 - *
 - The code hint will now auto-hide after 10 seconds instead of 2,5.
 - Added a new autosave function.
 - Added some preparation code for TDM MinGW64.
+- The function tooltip now does not stay on the screen when leaving a function.
+- Added a build date to About.
 - And some more stuff I forgot about.
 
 Version 5.0.0.6 - 3 November 2011

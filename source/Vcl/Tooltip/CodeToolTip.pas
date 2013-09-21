@@ -193,7 +193,7 @@ type
     property Editor: TCustomSynEdit read FEditor write SetEditor;
     property EndWhenChr: String read FEndWhenChr write FEndWhenChr;
     property Hints: TStringList read FToolTips write SetToolTips;
-    property MaxScanLength: Integer read FMaxScanLength write FMaxScanLength default 256;
+    property MaxScanLength: Integer read FMaxScanLength write FMaxScanLength;
     property Options: TToolTipOptions read FOptions write FOptions;
     property SelIndex: Integer read FSelIndex write SetSelIndex;
     property StartWhenChr: String read FStartWhenChr write FStartWhenChr;
@@ -427,7 +427,7 @@ destructor TBaseCodeToolTip.Destroy;
 begin
 	if Activated then ReleaseHandle;
 
-	FKeyDownProc  := nil;
+	FKeyDownProc := nil;
 
 	FEditor := nil;
 
@@ -919,8 +919,7 @@ begin
 			else
 				Dec(nBraces);
 		end;
-		if P[CurPos] = #0 then break;
-		if P[CurPos] = ';' then begin
+		if ((P[CurPos] = #0) and (nBraces = 0)) or (P[CurPos] = ';') then begin
 			ReleaseHandle;
 			Exit;
 		end;
@@ -936,7 +935,7 @@ begin
 	Inc(CurPos);
 
 	// Then walk back and analyse everything
-	for I:=1 to FMaxScanLength do begin
+	for I := 1 to FMaxScanLength do begin
 		Dec(CurPos);
 		case P[CurPos] of
 			'/':
@@ -977,7 +976,7 @@ begin
 	OldFunction := S;
 
 	// get the current token position in the text
-	// this is where the prototypename usually starts
+	// this is where the prototype name usually starts
 	FTokenPos := CurPos - Length(S) - 1;
 
 	// check if the token is added to the list
@@ -994,8 +993,8 @@ begin
 	// If we can't find it, hide
 	if not ProtoFound then S := '';
 
+	// Search for the best possible match according to comma count
 	if (S <> '') then begin
-		// Search for the best possible match according to comma count
 		if (shoFindBestMatchingToolTip in FOptions) then
 			if not FCustomSelIndex then
 				S := FindClosestToolTip(S, nCommas);
@@ -1004,8 +1003,6 @@ begin
 	end;
 
 	if (S <> '') then begin
-
-	//	Sleep(2000);
 
 		// set the hint caption
 		Caption := S;
