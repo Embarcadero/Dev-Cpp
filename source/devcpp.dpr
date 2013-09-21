@@ -201,7 +201,6 @@ begin
 	Application.Initialize;
 	Application.Title := 'Dev-C++';
 	Application.CreateForm(TMainForm, MainForm);
-	MainForm.Hide;
 
 	// do the creation stuff when the splashscreen is displayed because it takes quite a while ...
 	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Applying settings...';

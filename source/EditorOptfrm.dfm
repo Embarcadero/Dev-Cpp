@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 1198
-  Top = 536
+  Left = 606
+  Top = 344
   HelpType = htKeyword
   BorderStyle = bsDialog
   Caption = 'Editor Options'
@@ -45,7 +45,7 @@ object EditorOptForm: TEditorOptForm
       end
       object cpHighColor: TColorPickerButton
         Left = 337
-        Top = 284
+        Top = 276
         Width = 61
         Height = 22
         DefaultText = 'default'
@@ -56,7 +56,7 @@ object EditorOptForm: TEditorOptForm
       end
       object cbSyntaxHighlight: TCheckBox
         Left = 16
-        Top = 288
+        Top = 280
         Width = 180
         Height = 17
         Caption = 'Use Syntax Highlight'
@@ -82,7 +82,7 @@ object EditorOptForm: TEditorOptForm
       end
       object grpMargin: TGroupBox
         Left = 248
-        Top = 196
+        Top = 188
         Width = 154
         Height = 84
         Caption = '  Right Margin  '
@@ -135,12 +135,12 @@ object EditorOptForm: TEditorOptForm
         Left = 9
         Top = 3
         Width = 393
-        Height = 193
+        Height = 182
         Caption = '  Editor Options  '
         TabOrder = 6
         object cbCloseBrace: TCheckBox
           Left = 201
-          Top = 172
+          Top = 156
           Width = 184
           Height = 17
           Caption = 'Append closing braces'
@@ -148,7 +148,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbAppendNewline: TCheckBox
           Left = 8
-          Top = 172
+          Top = 156
           Width = 177
           Height = 17
           Caption = 'Ensure that file ends with newline'
@@ -174,7 +174,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbDropFiles: TCheckBox
           Left = 8
-          Top = 138
+          Top = 122
           Width = 177
           Height = 17
           Caption = 'Insert Dropped Files'
@@ -200,7 +200,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbParserHints: TCheckBox
           Left = 201
-          Top = 156
+          Top = 140
           Width = 184
           Height = 17
           Caption = 'Show editor hints'
@@ -208,7 +208,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbHalfPage: TCheckBox
           Left = 201
-          Top = 121
+          Top = 105
           Width = 184
           Height = 17
           Hint = 'page up/down will move text by half a page instead of full page'
@@ -217,7 +217,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbGroupUndo: TCheckBox
           Left = 8
-          Top = 121
+          Top = 105
           Width = 177
           Height = 17
           Hint = 'handle all changes of same type as single action'
@@ -225,7 +225,7 @@ object EditorOptForm: TEditorOptForm
           TabOrder = 9
         end
         object cbFindText: TCheckBox
-          Left = 201
+          Left = 9
           Top = 87
           Width = 184
           Height = 17
@@ -253,7 +253,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbScrollHint: TCheckBox
           Left = 201
-          Top = 138
+          Top = 122
           Width = 184
           Height = 17
           Hint = 'shows current line when scrolling'
@@ -262,7 +262,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbSmartScroll: TCheckBox
           Left = 201
-          Top = 104
+          Top = 88
           Width = 184
           Height = 17
           Hint = 'show scrollbars only when content is available'
@@ -271,23 +271,11 @@ object EditorOptForm: TEditorOptForm
         end
         object cbSpecialChars: TCheckBox
           Left = 8
-          Top = 156
+          Top = 140
           Width = 177
           Height = 17
           Caption = 'Show Special Line Chars'
           TabOrder = 15
-        end
-        object cbTrailingBlanks: TCheckBox
-          Left = 8
-          Top = 87
-          Width = 177
-          Height = 17
-          Hint = 'Blanks at end of lines will be saved with file'
-          Caption = 'Keep Trailing Blanks'
-          Checked = True
-          Enabled = False
-          State = cbChecked
-          TabOrder = 16
         end
         object cbTabtoSpaces: TCheckBox
           Left = 8
@@ -295,7 +283,7 @@ object EditorOptForm: TEditorOptForm
           Width = 177
           Height = 17
           Caption = 'Use Tab Character'
-          TabOrder = 17
+          TabOrder = 16
         end
         object cbSmartTabs: TCheckBox
           Left = 8
@@ -306,21 +294,12 @@ object EditorOptForm: TEditorOptForm
             'on tab cursor is moved to first nonblank space of preceeding lin' +
             'e'
           Caption = 'Smart Tabs'
-          TabOrder = 18
-        end
-        object cbSmartUnIndent: TCheckBox
-          Left = 8
-          Top = 104
-          Width = 177
-          Height = 17
-          Hint = 'cursor is moved to nonblank space of previous line '
-          Caption = 'Backspace Unindents'
-          TabOrder = 19
+          TabOrder = 17
         end
       end
       object grpCaret: TGroupBox
         Left = 9
-        Top = 196
+        Top = 188
         Width = 235
         Height = 84
         Caption = '  Caret  '
@@ -380,7 +359,7 @@ object EditorOptForm: TEditorOptForm
       end
       object cbHighCurrLine: TCheckBox
         Left = 216
-        Top = 288
+        Top = 280
         Width = 121
         Height = 17
         Caption = 'Highlight current line'
@@ -835,7 +814,7 @@ object EditorOptForm: TEditorOptForm
           object lblCode: TLabel
             Left = 0
             Top = 108
-            Width = 399
+            Width = 28
             Height = 13
             Align = alBottom
             Caption = 'Code:'
@@ -1227,9 +1206,9 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Interval:'
         end
         object MinutesDelay: TTrackBar
-          Left = 112
+          Left = 136
           Top = 16
-          Width = 273
+          Width = 249
           Height = 40
           Max = 60
           Min = 1

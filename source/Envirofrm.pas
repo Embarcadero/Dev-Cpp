@@ -101,6 +101,8 @@ type
     edCVSExec: TEdit;
     spnCVSCompression: TSpinEdit;
     chkCVSUseSSH: TCheckBox;
+    Label1: TLabel;
+    cbUIfont: TComboBox;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -197,9 +199,17 @@ begin
   end;
 end;
 
+function EnumFontFamilyProc(LogFont: PEnumLogFont; var TextMetric: PNewTextMetric;FontType: integer; LParam: integer): integer; stdcall;
+begin
+	// if LogFont.elfLogFont.lfPitchAndFamily and FF_MODERN = FF_MODERN then
+	TStrings(LParam).Add(LogFont.elfLogFont.lfFaceName); // Just add all fonts, SynEdit will monospace them
+	result:= -1;
+end;
+
 procedure TEnviroForm.FormShow(Sender: TObject);
 var
- idx: integer;
+	idx: integer;
+ 	DC: HDC;
 begin
 	with devData do begin
 		rgbAutoOpen.ItemIndex:= AutoOpen;
@@ -256,6 +266,13 @@ begin
 		edCVSExec.Text:= devCVSHandler.Executable;
 		spnCVSCompression.Value:= devCVSHandler.Compression;
 		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
+
+		// Font opstellen
+		DC:= GetDC(application.handle);
+		EnumFontFamilies(DC, nil, @EnumFontFamilyProc, integer(cbUIfont.Items));
+		ReleaseDC(0, DC);
+		cbUIfont.Sorted:= TRUE;
+        cbUIfont.Text:=InterfaceFont;
 	end;
 end;
 
@@ -301,6 +318,10 @@ begin
 		AutoCloseProgress := cbAutoCloseProgress.Checked;
 		WatchHint := cbWatchHint.Checked;
 		WatchError := cbWatchError.Checked;
+		InterfaceFont := cbUIFont.Text;
+
+		// Set the UI font
+		MainForm.UpdateFont;
 	end;
 
 	devDirs.Icons:= IncludeTrailingPathDelimiter(ExpandFileto(edIcoLib.Text, devDirs.Exec));

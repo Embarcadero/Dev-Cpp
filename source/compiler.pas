@@ -1278,7 +1278,7 @@ begin
 				end else begin
 					// foo.bar:1
 					cpos := GetLastPos(':', Line);
-					if StrToIntDef(Copy(Line, cpos + 1, Length(Line) - cpos - 1), -1) <> -1 then begin
+					if StrToIntDef(Copy(Line, cpos + 1, Length(Line) - cpos), -1) <> -1 then begin
 						O_Line := Copy(Line, cpos + 1, Length(Line) - cpos);
 						Delete(Line, cpos, Length(Line) - cpos + 1);
 						O_File := Line;

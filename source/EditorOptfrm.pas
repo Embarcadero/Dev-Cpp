@@ -136,10 +136,8 @@ type
     edGutterWidth: TSpinEdit;
     cbHighCurrLine: TCheckBox;
     cpHighColor: TColorPickerButton;
-    cbTrailingBlanks: TCheckBox;
     cbTabtoSpaces: TCheckBox;
     cbSpecialChars: TCheckBox;
-    cbSmartUnIndent: TCheckBox;
     cbSmartTabs: TCheckBox;
     cbSmartScroll: TCheckBox;
     cbScrollHint: TCheckBox;
@@ -505,8 +503,6 @@ begin
   cbInsertMode.Caption:=         Lang[ID_EOPT_INSERTMODE];
   cbTabtoSpaces.Caption:=        Lang[ID_EOPT_TAB2SPC];
   cbSmartTabs.Caption:=          Lang[ID_EOPT_SMARTTABS];
-  cbTrailingBlanks.Caption:=     Lang[ID_EOPT_TRAILBLANKS];
-  cbSmartUnIndent.Caption:=      Lang[ID_EOPT_SMARTUN];
   cbGroupUndo.Caption:=          Lang[ID_EOPT_GROUPUNDO];
   cbDropFiles.Caption:=          Lang[ID_EOPT_DROPFILES];
   cbSpecialChars.Caption:=       Lang[ID_EOPT_SPECIALCHARS];
@@ -674,8 +670,6 @@ begin
      cbInsertMode.Checked:=          InsertMode;
      cbTabtoSpaces.Checked:=         not TabToSpaces;
      cbSmartTabs.Checked:=           SmartTabs;
-     cbSmartUnindent.Checked:=       SmartUnindent;
-     cbTrailingBlanks.Checked:=      not RemoveTrailBlanks;
      cbGroupUndo.Checked:=           GroupUndo;
      cbEHomeKey.Checked:=            EHomeKey;
      cbPastEOF.Checked:=             PastEOF;
@@ -830,8 +824,6 @@ begin
 		InsertMode:=          cbInsertMode.Checked;
 		TabToSpaces:=         not cbTabtoSpaces.Checked;
 		SmartTabs:=           cbSmartTabs.Checked;
-		SmartUnindent:=       cbSmartUnindent.Checked;
-		RemoveTrailBlanks:=   not cbTrailingBlanks.Checked;
 		GroupUndo:=           cbGroupUndo.Checked;
 		EHomeKey:=            cbEHomeKey.Checked;
 		PastEOF:=             cbPastEOF.Checked;

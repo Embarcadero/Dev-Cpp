@@ -923,6 +923,11 @@ begin
 			ReleaseHandle;
 			Exit;
 		end;
+		if (P[CurPos] = '/') and (P[CurPos+1] = '/') then begin
+			repeat
+				Inc(CurPos);
+			until P[CurPos] = #10;
+		end;
 		Inc(CurPos);
 	end;
 
@@ -962,7 +967,6 @@ begin
 				if nBraces = 1 then
 					Inc(nCommas);
 			end;
-			#0: Exit;
 		end;
 	end;
 

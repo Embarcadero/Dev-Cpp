@@ -930,6 +930,7 @@ type
 		procedure SetProjCompOpt(idx: integer; Value: boolean); // set project's compiler option indexed 'idx' to value 'Value'
 		function CloseEditor(index : integer; Rem : boolean): Boolean;
 		procedure RefreshContext;
+		procedure UpdateFont;
 
 		{ *** RNC Global Breakpoint Declarations *** }
 		procedure AddBreakPointToList(line_number: integer; e : TEditor; filename:string);
@@ -1074,6 +1075,9 @@ begin
 	devShortcuts1.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
 	devShortcuts1.Load;
 
+	// Set fonts
+	UpdateFont;
+
 	Application.HelpFile:= devDirs.Help + DEV_MAINHELP_FILE;
 
 	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Setting layout options...';
@@ -1128,6 +1132,12 @@ begin
 
 	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Initializing class browser...';
 	InitClassBrowser(true{not CacheCreated});
+end;
+
+procedure TMainForm.UpdateFont;
+begin
+	MainForm.Font.Name := devData.InterfaceFont;
+//	fEnviroFrm.
 end;
 
 { *** RNC add global breakpoint *** }
@@ -1592,7 +1602,7 @@ begin
 		actSyntaxCheck.Caption:=			Strings[ID_ITEM_SYNTAXCHECK];
 		actProgramReset.Caption:=			Strings[ID_ITEM_PROGRAMRESET];
 		actProfileProject.Caption:=			Strings[ID_ITEM_PROFILE];
-		actDeleteProfileProject.Caption:=	Strings[ID_ITEM_DELPROFILE];
+		actDeleteProfileProject.Caption:=	Strings[ID_ITEM_DELPROFINFORMATION];
 		actAbortCompilation.Caption:=		Strings[ID_ITEM_ABORTCOMP];
 		actExecParams.Caption:=				Strings[ID_ITEM_EXECPARAMS];
 
@@ -3599,7 +3609,7 @@ end;
 
 procedure TMainForm.actUpdateEmptyEditor(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then
@@ -4895,28 +4905,32 @@ var
 	optP, optS: TCompilerOption;
 	idxP, idxS: integer;
 	prof, strp: boolean;
+	path : string;
+	e : TEditor;
 begin
 	// search for the item and let it supply the option index
 	prof:=devCompiler.FindOption('-pg', optP, idxP);
 	if prof then begin
 		if Assigned(fProject) then begin
-			if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[idxP + 1]='1') then
+			if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[idxP + 1]='1') then begin
 				prof := true
-			else
+			end else begin
 				prof := false;
+			end;
 		end else
-			prof := optP.optValue > 0;
+			prof := optS.optValue > 0;
 	end;
+
 	// see if exe stripping is enabled
 	strp:=devCompiler.FindOption('-s', optS, idxS);
 	if strp then begin
 		if Assigned(fProject) then begin
-			if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[idxS + 1]='1') then
+			if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[idxS + 1]='1') then begin
 				strp := true
-			else
+			end else begin
 				strp := false;
-			end
-		else
+			end;
+		end else
 			strp := optS.optValue > 0;
 	end;
 
@@ -4926,27 +4940,42 @@ begin
 			// ENABLE profiling
 			optP.optValue:=1;
 			if Assigned(fProject) then
-				SetProjCompOpt(idxP, True);
-			devCompiler.Options[idxP]:=optP;
+				SetProjCompOpt(idxP, True)
+			else
+				devCompiler.Options[idxP]:=optP;
 
 			// DISABLE stripping
 			optS.optValue:=0;
 			if Assigned(fProject) then
-				SetProjCompOpt(idxS, False);
-			devCompiler.Options[idxS]:=optS;
+				SetProjCompOpt(idxS, False)
+			else
+				devCompiler.Options[idxS]:=optS;
 
 			actRebuildExecute(nil);
 			Exit
 		end else
 			Exit;
-	if Assigned(fProject) then
-		if not FileExists(ExtractFilePath(fProject.Executable)+GPROF_CHECKFILE) then begin
-			if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtError, [mbYes, mbNo], 0)=mrYes then begin
-				actRunExecute(nil);
-				Exit;
-			end else
-				Exit;
-		end;
+
+	// If we're done setting up options, check if there's data already
+	path := '';
+	if Assigned(fProject) then begin
+		path := ExtractFilePath(fProject.Executable)+GPROF_CHECKFILE;
+	end else begin
+		e:=GetEditor;
+		if Assigned(e) then
+			path := ExtractFilePath(ChangeFileExt(e.FileName, EXE_EXT))+GPROF_CHECKFILE;
+	end;
+
+	// Ask the user if he wants to generate data...
+	if not FileExists(path) then begin
+		if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtInformation, [mbYes, mbNo], 0)=mrYes then begin
+			actRunExecute(nil);
+			Exit;
+		end else
+			Exit;
+	end;
+
+	// If the data is there, open up the form
 	if not Assigned(ProfileAnalysisForm) then
 		ProfileAnalysisForm:=TProfileAnalysisForm.Create(Self);
 	ProfileAnalysisForm.Show;
@@ -5598,8 +5627,7 @@ begin
 		if ProjectView.Selected.Data<>Pointer(-1) then { if not a directory }
 		begin
 			OpenUnit;
-			if Shift=[ssShift] then
-			begin
+			if Shift=[ssShift] then begin
 				{
 					crap hack, SHIFT+ENTER=open file and close projman
 					I *really* don't think it's the acceptable interface idea.
@@ -6371,13 +6399,24 @@ end;
 procedure TMainForm.actDeleteProfileProjectExecute(Sender: TObject);
 var
 	path : string;
+	e : TEditor;
 begin
-	path := ExtractFilePath(fProject.Executable)+GPROF_CHECKFILE;
-	if Assigned(fProject) then
-		if FileExists(path) then
-			DeleteFile(path)
-		else
+	path := '';
+	if Assigned(fProject) then begin
+		path := ExtractFilePath(fProject.Executable)+GPROF_CHECKFILE;
+	end else begin
+		e:=GetEditor;
+		if Assigned(e) then
+			path := ExtractFilePath(ChangeFileExt(e.FileName, EXE_EXT))+GPROF_CHECKFILE;
+	end;
+
+	if path <> '' then begin
+		if FileExists(path) then begin
+			DeleteFile(path);
+			SetStatusBarMessage('Deleted profiling data file "' + path + '"');
+		end else
 			MessageBox(Application.handle,PChar('Could not find profiling file ' + path + '!'),PChar('Error'),MB_ICONERROR);
+	end;
 end;
 
 // Monolithic function that reads code and tries to find definitons. Uses mouse or caret to determine word and returns a statement or a findpoint
@@ -6402,8 +6441,9 @@ var
 	comparewith : string;
 	// globals
 	isglobal : boolean;
-	text : string;
+	text : PChar;//string;
 	wantbrace : integer;
+	wantcomment : integer;
 	wantquote : boolean;
 	found : boolean;
 	curtext : string;
@@ -6547,12 +6587,36 @@ begin
 
 		// Als we uiteindelijk nog steeds niks hebben gevonden, scan de functie voor locals
 		if isglobal then begin
-			cpos := e.Text.RowColToCharIndex(cursorpos);
-			text := Copy(e.Text.Text,max(1,cpos-1024),min(cpos,1024));
-			apos := Length(text); // Variable recycling
+
+			cpos := e.Text.RowColToCharIndex(cursorpos)-Length(member)-3;
+			text := PChar(e.Text.Lines.Text);
 			wantbrace := 0;
 			wantquote := false;
-			for I:=apos downto 1 do begin
+			wantcomment := 0;
+			for I:=cpos downto (cpos-1024) do begin
+
+				// if we're entering a new line backwards...
+				if text[I] = #10 then begin
+					len := 0;
+
+					// Then check if that line contains a newline
+					repeat
+						Inc(len);
+
+						// if the current line is a comment, skip by 'len' steps
+						if (text[I-len] = '/') and (text[I-len+1] = '/') then begin
+							Inc(wantcomment);
+							break;
+						end;
+					until (I-len = 1) or (text[I-len] in [#10]);
+				end;
+
+				// Skip multi-line comments
+				if (text[I] = '*') and (text[I+1] = '/') then
+					Inc(wantcomment);
+				if ((text[I] = '/') and (text[I+1] = '*')) or ((text[I] = '/') and (text[I+1] = '/')) then
+					Dec(wantcomment);
+				if wantcomment > 0 then continue;
 
 				// Skip strings
 				if text[I] = '"' then
@@ -6566,8 +6630,8 @@ begin
 					Dec(wantbrace);
 				if wantbrace > 0 then continue;
 
-				curtext := Copy(text,I,apos-I);
-				found := AnsiStartsStr(' ' + member,curtext);
+				curtext := Copy(text,I,length(member)+2);
+				found := AnsiStartsStr(' '    + member,curtext);
 				if not found then found := AnsiStartsStr(' *'  + member,curtext);
 				if not found then found := AnsiStartsStr(' &'  + member,curtext);
 				if not found then found := AnsiStartsStr('	'  + member,curtext);
@@ -6575,36 +6639,66 @@ begin
 				if not found then found := AnsiStartsStr('	&' + member,curtext);
 				if found then begin
 
-					// Offset toevoegen
+					// Add starting offset
 					parampos := I;
 
-					// Type bepalen, doorgaan tot blank
+					// First, starting at the found point, scan backwards until we find a stopping character
 					len := 0;
+					len2 := 0;
 					repeat
 						Inc(len);
-					until not (text[parampos-len] in [#65..#90,#97..#122,'#']);
 
-					// Kijken wat we gevonden hebben...
-					len2 := 0;
-					if AnsiStartsStr('#',text[parampos-len+1]) then begin
+						// Skip single-line comments
+						if text[parampos-len] = #10 then begin
+							repeat
+								Inc(len2);
+								if (text[I-len-len2] = '/') and (text[I-len-len2+1] = '/') then begin
+									len2 := 9999;
+									break;
+								end;
+							until text[I-len-len2] in [#10];
+						end;
+
+					until (len2 = 9999) or (text[parampos-len] in ['>','<','+','-','/','=','(',')',';','#','{','}',',']);
+
+					// If we encountered a #define, continue at the end until a newline
+					if AnsiStartsStr('#',text[parampos-len]) then begin
 
 						// Define gevonden
+						len2 := 0;
 						repeat
 							Inc(len2);
-						until (parampos+len2 = apos) or (text[parampos+len2] in [#13,#10,'#']);
+						until (text[parampos+len2] in [#13,#10,'#']);
+
+					// Otherwise, demand a [,=,( or ; after the member...
 					end else begin
 
-						// Daarna vooruit door tot = of [ of ;
+						// Whitespace ervoor trimmen
 						repeat
+							Dec(len);
+						until not (text[parampos-len] in [';',#9,#32,#13,#10]);
+
+						// See if we found a correct character, first walk up to the end of the name
+						len2 := Length(member);
+						if text[parampos] in ['*','&'] then Inc(len2);
+
+						while (text[parampos+len2] in [#9,#32,#10,#13]) do
 							Inc(len2);
-						until (parampos+len2 = apos) or (text[parampos+len2] in ['#','{',';','=',')',',']);
+
+						// At this point, we NEED a specific character
+						if not (text[parampos+len2] in ['=',')',';','(','[','(',',']) then
+							len := 0;
+
+						// If we found a correct character, keep going until our useful information stops...
+						while not (text[parampos+len2] in ['=','{',';','=','(',')',',']) do
+							Inc(len2);
 					end;
 
 					// Als er wat zinnigs staat
-					if len > 2 then begin
-						localfind := Copy(text,parampos-len+1,len+len2-1);
-						localfindpoint.x := e.Text.CharIndexToRowCol(cpos-min(cpos,1024)+I).Char-1;
-						localfindpoint.y := e.Text.CharIndexToRowCol(cpos-min(cpos,1024)+I).Line;
+					if (len > 2) then begin
+						localfind := Copy(text,parampos-len+1,len+len2);
+						localfindpoint.x := e.Text.CharIndexToRowCol(I).Char-1;
+						localfindpoint.y := e.Text.CharIndexToRowCol(I).Line;
 						Screen.Cursor := crDefault;
 						Exit;
 					end;
@@ -6664,7 +6758,7 @@ var
 begin
 	e:=GetEditor;
 	if e.Text.GetHighlighterAttriAtRowCol(e.Text.CaretXY, s, attr) then
-		if (attr = e.Text.Highlighter.StringAttribute) or (attr = e.Text.Highlighter.CommentAttribute) then
+		if Assigned(attr) and ((attr = e.Text.Highlighter.StringAttribute) or (attr = e.Text.Highlighter.CommentAttribute)) then
 			Exit;
 
 	if Sender.ClassName = 'TEditor' then
@@ -6725,7 +6819,7 @@ begin
 	GetKeyboardState(State);
 	e := GetEditor;
 
-	// Check if we're focussing on an editor
+	// Check if we're focussing on an editor and holding ctrl
 	if Assigned(e) and (Screen.ActiveControl = e.Text) and ((State[vk_Control] and 128) <> 0) then begin
 
 		for I:=0 to pred(PageControl.PageCount) do begin

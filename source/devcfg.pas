@@ -368,7 +368,6 @@ type
 
    fPastEOF: boolean;          // Cursor moves past end of file
    fPastEOL: boolean;          // Cursor moves past end of lines
-   fRemoveTrailBlanks: boolean;// Blanks past EOL are trimmed
    fdblLine: boolean;          // Double Click selects a line
    fFindText: boolean;         // Text at cursor defaults in find dialog
    fEHomeKey: boolean;         // Home key like visual studio
@@ -377,7 +376,6 @@ type
    fInsertMode: boolean;       // Editor defaults to insert mode
    fAutoIndent: boolean;       // Auto-indent code lines
    fSmartTabs: boolean;        // Tab to next no whitespace char
-   fSmartUnindent: boolean;    // on backspace move to prev non-whitespace char
    fSpecialChar: boolean;      // special line characters visible
    fAppendNewline: boolean;    // append newline character to the end of line
    fTabtoSpaces: boolean;      // convert tabs to spaces
@@ -408,8 +406,6 @@ type
    property InsertMode: boolean read fInsertMode write fInsertMode;
    property TabToSpaces: boolean read fTabToSpaces write fTabToSpaces;
    property SmartTabs: boolean read fSmartTabs write fSmartTabs;
-   property SmartUnindent: boolean read fSmartUnindent write fSmartUnindent;
-   property RemoveTrailBlanks: boolean read fRemoveTrailBlanks write fRemoveTrailBlanks;
    property GroupUndo: boolean read fGroupUndo write fGroupUndo;
    property EHomeKey: boolean read fEHomeKey write fEHomeKey;
    property PastEOF: boolean read fPastEOF write fPastEOF;
@@ -492,6 +488,7 @@ type
    fLangChange: boolean;             // flag for language change
    fthemeChange: boolean;            // did the theme changed
    fNoSplashScreen : boolean;        // disable splash screen
+   fInterfaceFont : string;
 
    fToolbarMain: boolean;            // These ones follow the enable/x-offset/y-offset patern
    fToolbarMainX: integer;
@@ -572,6 +569,7 @@ type
 
    //Windows
    property MsgTabs: integer read fMsgTabs write fMsgTabs;
+   property InterfaceFont: string read fInterfaceFont write fInterfaceFont;
 
    property ShowBars: boolean read fShowbars write fShowbars;
    property MultiLineTab: boolean read fMultiLineTab write fMultiLineTab;
@@ -992,6 +990,7 @@ begin
   fToolbarClasses:=TRUE;
   fToolbarClassesX:=255;
   fToolbarClassesY:=30;
+  fInterfaceFont:='MS Sans Serif';
 
   //read associations set by installer as defaults
   fAssociateC := getAssociation(0);
@@ -1471,8 +1470,6 @@ begin
 	fInsertMode:= TRUE;
 	fTabtoSpaces:= FALSE; // Use Tab Character (inverse)
 	fSmartTabs:= FALSE;
-	fRemoveTrailBlanks:= FALSE;
-	fSmartUnindent:= TRUE; // Backspace unindents
 	fGroupUndo:= TRUE;
 	fInsDropFiles:= FALSE;
 	fSpecialChar:= FALSE;
@@ -1608,8 +1605,6 @@ begin
 			Options := Options + [eoSmartTabDelete];
 		if fTabtoSpaces then
 			Options := Options + [eoTabsToSpaces];
-		if fRemoveTrailBlanks then
-			Options := Options + [eoTrimTrailingSpaces];
 		if fSpecialChar then
 			Options := Options + [eoShowSpecialChars];
 

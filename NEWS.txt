@@ -1,3 +1,14 @@
+Version 5.0.0.8 - *
+
+- Remapped all language ID so that much more translations will fit nicely in the tables.
+- Profiling can now also be properly used without a project.
+- The function scanner now ignores comments.
+- Added an option to change the UI font.
+- Rescaled portions of the statusbar to accomodate other fonts.
+- Again updated big parts of the local variable scanner.
+- Removed 'Backspace Unindents' and 'Keep trailing spaces'. These options were too buggy and/or useless.
+- Set the mouseover delay to 1500 by default now.
+
 Version 5.0.0.7 - 9 November 2011
 
 - The compiler log output now always outputs the raw text even when no errors have been found in the code.
