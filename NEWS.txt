@@ -17,6 +17,7 @@ Version 5.0.0.5 - * Oktober 2011
 - The obj output directory now does not get created in the wrong 'current directory' in rare cases.
 - Dependency checking and compile delays are now saved, and on a per-compiler basis.
 - Restyled the editor tooltip balloon.
+- The function tooltip balloon now updates on the fly.
 - The editor hints option now properly disables hints.
 
 Version 5.0.0.4 - 25 September 2011

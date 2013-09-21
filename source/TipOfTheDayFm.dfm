@@ -27,7 +27,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Color = clWhite
-    TabOrder = 4
+    TabOrder = 5
     object Image: TImage
       Left = 8
       Top = 16
@@ -183,7 +183,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Height = 25
     Cancel = True
     Caption = 'Close'
-    TabOrder = 2
+    TabOrder = 4
     OnClick = btnCloseClick
   end
   object chkNotAgain: TCheckBox
@@ -200,7 +200,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Width = 77
     Height = 25
     Caption = 'Random Tip'
-    TabOrder = 5
+    TabOrder = 2
     OnClick = btnRandomClick
   end
 end

@@ -1831,11 +1831,11 @@ begin
 	if devDirs.OriginalPath = '' then // first time only
 		devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 
-	// First check if MinGW exists (it's newer)
+	// First check if the current one exist
 	SetPath(fBinDir);
 	mingwmakereply := RunAndGetOutput(devCompilerSet.makeName + ' -v',fBinDir, nil, nil, nil);
 
-	// If MinGW does not reply
+	// If the currently selected Make does not reply
 	if not AnsiStartsStr('GNU Make ', mingwmakereply) then begin
 
 		// Try the old GNU one
@@ -1844,26 +1844,49 @@ begin
 
 		// Yay, there's an old make.exe in the bin directory!
 		if AnsiStartsStr('GNU Make ', gnumakereply) then begin
-			msg := 'Dev-C++ was unable to find MinGW Make with current settings '
-			+ 'however a (probably older) GNU Make has been found. '
+			msg := 'Dev-C++ was unable to find the current make processor ('
+			+ devCompilerSet.makeName  + ') in '
+			+ fBinDir + ' with current settings, '
+			+ 'however a probably older GNU make.exe has been found in that folder. '
 			+ 'Would you like Dev-C++ to adjust the settings for you to '
 			+ 'use GNU Make?'
 			+ #13#10#13#10
 			+ 'Unless you know exactly what you''re doing, it is recommended '
-			+ 'that you click Yes';
+			+ 'that you click Yes.';
 
 			if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 				devCompilerSet.makeName := 'make.exe';
 				devCompiler.makeName := 'make.exe';
 			end;
 		end else begin
-			msg := 'There doesn''t seem to be any Make file in Dev-C++''s Bin path. '
-			+ 'Please make sure that you have correctly set '
-			+ 'GNU Make and adjust the Bin settings environment '
-			+ 'variable and that the make setting in Compiler Option '
-			+ 'contains a correct filename, otherwise you will not '
-			+ 'be able to compile anything.';
-			MessageDlg(msg, mtConfirmation, [mbOK], 0);
+
+			// Try MinGW
+			SetPath(fBinDir);
+			mingwmakereply := RunAndGetOutput('mingw32-make.exe -v',fBinDir, nil, nil, nil);
+
+			if AnsiStartsStr('GNU Make ', mingwmakereply) then begin
+				msg := 'Dev-C++ was unable to find the current make processor ('
+				+ devCompilerSet.makeName  + ') in '
+				+ fBinDir + ' with current settings, '
+				+ 'however a MinGW mingw32-make.exe has been found in that folder. '
+				+ 'Would you like Dev-C++ to adjust the settings for you to '
+				+ 'use MinGW Make?'
+				+ #13#10#13#10
+				+ 'Unless you know exactly what you''re doing, it is recommended '
+				+ 'that you click Yes.';
+				if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+					devCompilerSet.makeName := 'mingw32-make.exe';
+					devCompiler.makeName := 'mingw32-make.exe';
+				end;
+			end else begin
+				msg := 'There doesn''t seem to be any Make file in Dev-C++''s Bin path ('
+				+ fBinDir + '). Please make sure that you have correctly set '
+				+ 'GNU Make and adjust the Bin settings environment '
+				+ 'variable and that the make setting in Compiler Option '
+				+ 'contains a correct filename, otherwise you will not '
+				+ 'be able to compile anything.';
+				MessageDlg(msg, mtConfirmation, [mbOK], 0);
+			end;
 		end;
 	end;
 end;

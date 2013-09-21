@@ -262,6 +262,7 @@ var
 	logfile : TextFile;
 begin
 	temp := '';
+	// The commented line below is used by the project logger
 	if fOptions.LogOutputEnabled and (MainForm.CompilerOutput.Items.Count > 0) then begin
 
 		// Formatted log
@@ -279,8 +280,8 @@ begin
 			for i:=0 to pred(MainForm.CompilerOutput.Items.Count) do begin
 				temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
 				temp2 := StringReplace(temp2,#10,#9,[]);
-				temp2 := StringReplace(temp2,#10,#9,[]);
-				temp2 := StringReplace(temp2,#10,#9,[]);
+				temp2 := StringReplace(temp2,#13#10,#9,[]);
+				temp2 := StringReplace(temp2,#13#10,#9,[]);
 				temp := temp + temp2;
 			end;
 			Write(logfile,temp);

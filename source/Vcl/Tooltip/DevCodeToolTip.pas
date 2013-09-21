@@ -68,8 +68,6 @@ type
   
 implementation
 
-//----------------------------------------------------------------------------------------------------------------------
-
 constructor TDevCodeToolTip.Create(AOwner: TComponent);
 begin
   inherited;
@@ -77,39 +75,27 @@ begin
   FList := TList.Create;
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-
 destructor TDevCodeToolTip.Destroy;
 begin
-  FList.Free;
-  inherited;
+	FList.Free;
+	inherited;
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 procedure TDevCodeToolTip.DoBeforeShow(const AToolTips: TStringList; const APrototypeName: string);
 var
-  I: Integer;
+	I: Integer;
 begin
-  // added on 28march 2004
-  // we dont need to go further when the hint is already
-  // active, BECAUSE we already got all neccessary prototypes!
-  if Activated then Exit;
-  
-  AToolTips.Clear;
+	AToolTips.Clear;
 
-  if Parser = nil then
-    raise TDevCodeToolTipError.Create('No parser available!');
-  Parser.FillListOf(APrototypeName, False, FList);
-  AToolTips.BeginUpdate;
-  try
-    for I := 0 to FList.Count-1 do
-    begin
-      AToolTips.Add(PStatement(FList.Items[I])^._FullText);
-    end;
-  finally
-    AToolTips.EndUpdate;
-  end;
+	Parser.FillListOf(APrototypeName, False, FList);
+	AToolTips.BeginUpdate;
+	try
+		for I := 0 to FList.Count-1 do begin
+			AToolTips.Add(PStatement(FList.Items[I])^._FullText);
+		end;
+	finally
+		AToolTips.EndUpdate;
+	end;
 end;
 
 

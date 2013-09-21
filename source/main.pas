@@ -1207,7 +1207,6 @@ begin
 	Show;
 end;
 
-
 procedure TMainForm.LoadTheme;
 var
 	Idx: Integer;
@@ -1748,7 +1747,7 @@ end;
 
 function TMainForm.FileIsOpen(const s: string; inPrj: boolean = FALSE): integer;
 var
- e: TEditor;
+	e: TEditor;
 begin
 	for result:= 0 to pred(PageControl.PageCount) do begin
 		e:= GetEditor(result);

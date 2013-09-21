@@ -193,8 +193,8 @@ begin
     else SetClassLong(Handle,GCL_STYLE, GetClassLong(Handle, GCL_STYLE) and not CS_DROPSHADOW);
   end;
   
-  //SetAlphaBlend(FAlphaBlend); 
-  SetAlphaBlendValue(FAlphaBlendValue);      
+  //SetAlphaBlend(FAlphaBlend);
+  SetAlphaBlendValue(FAlphaBlendValue);
   
   inherited;
 end;

@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 356
-  Top = 227
+  Left = 648
+  Top = 243
   Width = 1024
-  Height = 768
+  Height = 769
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   Color = clBtnFace
@@ -29,14 +29,14 @@ object MainForm: TMainForm
   object SplitterLeft: TSplitter
     Left = 193
     Top = 72
-    Height = 483
+    Height = 484
     AutoSnap = False
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 555
+    Top = 556
     Width = 1008
     Height = 3
     Cursor = crVSplit
@@ -46,7 +46,7 @@ object MainForm: TMainForm
   end
   object MessageControl: TPageControl
     Left = 0
-    Top = 558
+    Top = 559
     Width = 1008
     Height = 133
     ActivePage = CompSheet
@@ -1092,7 +1092,7 @@ object MainForm: TMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 691
+    Top = 692
     Width = 1008
     Height = 19
     Panels = <
@@ -1115,7 +1115,7 @@ object MainForm: TMainForm
     Left = 196
     Top = 72
     Width = 812
-    Height = 483
+    Height = 484
     Align = alClient
     HotTrack = True
     MultiLine = True
@@ -1177,7 +1177,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 72
     Width = 193
-    Height = 483
+    Height = 484
     ActivePage = ClassSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
@@ -1189,7 +1189,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 455
+        Height = 456
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1225,7 +1225,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 455
+        Height = 456
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1261,7 +1261,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 455
+        Height = 456
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone

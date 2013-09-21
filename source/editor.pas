@@ -681,12 +681,12 @@ begin
 
 	{** Modified by Peter **}
 	if (scCaretX in Changes) or (scCaretY in Changes) then begin
-		if assigned(FCodeToolTip) and FCodeToolTip.Enabled then begin
+		if Assigned(FCodeToolTip) and FCodeToolTip.Enabled then begin
 			// when the hint is already activated when call
 			// ShowHint again, because the current argument could have
 			// changed, which means we need to edit the boldface stuff
 			if FCodeToolTip.Activated then begin
-				FCodeToolTip.Show
+				FCodeToolTip.Show;
 			end else begin
 				// it's not showing yet, so we check if the cursor
 				// is in a function argument list, and then show
@@ -1028,6 +1028,7 @@ var
 	counter : integer;
 	attr: TSynHighlighterAttributes;
 	s : string;
+	allowcompletion : boolean;
 begin
 	// Indent/Unindent selected text with TAB key, like Visual C++ ...
 {$IFDEF WIN32}
@@ -1048,30 +1049,39 @@ begin
 
 	// Code wordt niet toegevoegd in string, comment en onbekend bestandsformaat...
 	if devEditor.AutoCloseBrace then begin
+
+		// Allerhande voorwaarden
+		allowcompletion := true;
 		fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr);
-		if Assigned(attr) or (Length(Trim(fText.LineText)) = 0) then begin
-			if (Length(Trim(fText.LineText)) = 0) or (attr <> fText.Highlighter.StringAttribute) and (attr <> fText.Highlighter.CommentAttribute) then begin
-				if Key = 57 then begin // 9 key + shift = (
-					if (ssShift in Shift) then
-						InsertString(')',false);
-				end else if Key = 219 then begin // [ key on US standard layout according to MSDN
-					if (ssShift in Shift) then begin
-						counter:=0;
-						if Length(fText.LineText) > 1 then begin
-							repeat
-								Inc(counter);
-							until not (fText.LineText[counter] in [#9,#32]);
-							fText.Lines.Insert(FText.CaretY,Copy(FText.LineText,1,counter-1) + '}');
-						end else
-							InsertString(#13#10 + '}',false);
-					end;
-				end else if Key = 188 then begin // , key + shift = <
-					if (ssShift in Shift) and (AnsiStartsStr('#include',TrimLeft(fText.LineText))) then
-						InsertString('>',false);
-		//		end else if Key = 222 then begin // ' key + shift = "
-		//			if (ssShift in Shift) then
-		//				InsertString('""',false); // Annoying...
+		if Assigned(attr) or (Length(fText.LineText) = 0) then
+			allowcompletion := true;
+	//	if(Length(fText.LineText) > 1) then
+	//		if(fText.LineText[fText.CaretX-1] in [#9,#32]) then
+	//			allowcompletion := true;
+		if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
+			allowcompletion := false;
+
+		if allowcompletion then begin
+			if Key = 57 then begin // 9 key + shift = (
+				if (ssShift in Shift) then
+					InsertString(')',false);
+			end else if Key = 219 then begin // [ key on US standard layout according to MSDN
+				if (ssShift in Shift) then begin
+					counter:=0;
+					if Length(fText.LineText) > 1 then begin
+						repeat
+							Inc(counter);
+						until not (fText.LineText[counter] in [#9,#32]);
+						fText.Lines.Insert(FText.CaretY,Copy(FText.LineText,1,counter-1) + '}');
+					end else
+						InsertString(#13#10 + '}',false);
 				end;
+			end else if Key = 188 then begin // , key + shift = <
+				if (ssShift in Shift) and (AnsiStartsStr('#include',TrimLeft(fText.LineText))) then
+					InsertString('>',false);
+//			end else if Key = 222 then begin // ' key + shift = "
+//				if (ssShift in Shift) then
+//					InsertString('""',false); // Annoying...
 			end;
 		end;
 	end;
@@ -1789,26 +1799,10 @@ end;
 
 // This code is executed whenever a function parameter suggestion balloon is shown
 procedure TEditor.DoOnCodeCompletion(Sender: TObject; const AStatement: TStatement; const AIndex: Integer);
-//var
-//	stubborntooltip : boolean;
 begin
 	// disable the tooltip here, becasue we check against Enabled
 	// in the 'EditorStatusChange' event to prevent it's redrawing there
 	if Assigned(FCodeToolTip) then begin
-		//FCodeToolTip may not be initialized under some circumstances when creating TEditor
-		//I suspect it's in TProject.OpenUnit --specu
-//		stubborntooltip := false;
-//		try
-//			FCodeToolTip.Enabled := False;
-//		except
-//			stubborntooltip := true;
-//		end;
-//		if stubborntooltip then begin
-//			FCodeToolTip := nil;
-//			FCodeToolTip := TDevCodeToolTip.Create(Application);
-//			FCodeToolTip.Editor := FText;
-//			FCodeToolTip.Parser := MainForm.CppParser1;
-//		end;
 		FCodeToolTip.Enabled := False;
 		FCodeToolTip.ReleaseHandle;
 		FCodeToolTip.Show;
