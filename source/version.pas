@@ -34,8 +34,8 @@ resourcestring
 	// misc strings
 	GCC_VERSION          = '4.6.1';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.0.0.7 RC2';
-	DEVCPP_BUILDTIME     = 'Nov 8 2011 - 16:24:55';
+	DEVCPP_VERSION       = '5.0.0.7';
+	DEVCPP_BUILDTIME     = 'Nov 9 2011 - 14:15:06';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';

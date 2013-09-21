@@ -1,4 +1,4 @@
-Version 5.0.0.7 - *
+Version 5.0.0.7 - 9 November 2011
 
 - The compiler log output now always outputs the raw text even when no errors have been found in the code.
 - The parameters now default to nothing (let MinGW decide) instead of ISO C99.
