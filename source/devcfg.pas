@@ -287,13 +287,13 @@ type
 
     fPastEOF: boolean;          // Cursor moves past end of file
     fPastEOL: boolean;          // Cursor moves past end of lines
-    fdblLine: boolean;          // Double Click selects a line
     fFindText: boolean;         // Text at cursor defaults in find dialog
     fEHomeKey: boolean;         // Home key like visual studio
     fGroupUndo: boolean;        // treat same undo's as single undo
     fInsDropFiles: boolean;     // Insert files when drag/dropped else open
     fInsertMode: boolean;       // Editor defaults to insert mode
     fAutoIndent: boolean;       // Auto-indent code lines
+    fAddIndent: boolean;        // Add indent when typing { and :
     fSmartTabs: boolean;        // Tab to next no whitespace char
     fSpecialChar: boolean;      // special line characters visible
     fUseTabs: boolean;          // convert tabs to spaces
@@ -329,8 +329,8 @@ type
 
     procedure AssignEditor(editor : TSynEdit;const FileName : AnsiString);
   published
-    //Editor props
     property AutoIndent: boolean read fAutoIndent write fAutoIndent;
+    property AddIndent: boolean read fAddIndent write fAddIndent;
     property InsertMode: boolean read fInsertMode write fInsertMode;
     property UseTabs: boolean read fUseTabs write fUseTabs;
     property SmartTabs: boolean read fSmartTabs write fSmartTabs;
@@ -338,7 +338,6 @@ type
     property EHomeKey: boolean read fEHomeKey write fEHomeKey;
     property PastEOF: boolean read fPastEOF write fPastEOF;
     property PastEOL: boolean read fPastEOL write fPastEOL;
-    property DblClkLine: boolean read fdblLine write fdblLine;
     property FindText: boolean read fFindText write fFindText;
     property Scrollbars: boolean read fShowScrollbars write fShowScrollbars;
     property HalfPageScroll: boolean read fHalfPage write fHalfPage;
@@ -427,9 +426,9 @@ type
     fMRUMax: integer;                 // Max number of files in history list
     fBackup: boolean;                 // Create backup files
     fAutoOpen: integer;               // Auto Open Project Files Style
-    fShowProject: boolean;            // Show the project explorer
+    fShowLeftPages: boolean;          // Show the left page control
     fProjectWidth: integer;           // Width of project browser
-    fClassView: boolean;              // if true, shows the class view, else shows the file view
+    fLeftActivePage: integer;         // 0 == project, 1 == class, 2 == debug
     fOutput: boolean;                 // show compiler message window
     fOutputOnNeed: boolean;           // show compiler messages only when problem
     fOutputHeight: integer;           // the height of the output window
@@ -556,8 +555,8 @@ type
     property ShowOutput: boolean read fOutput write fOutput;
     property OutputOnNeed: boolean read fOutputOnNeed write fOutputOnNeed;
     property OutputHeight: integer read fOutputHeight write fOutputHeight;
-    property ProjectView: boolean read fShowProject write fShowProject;
-    property ClassView: boolean read fClassView write fClassView;
+    property ShowLeftPages: boolean read fShowLeftPages write fShowLeftPages;
+    property LeftActivePage: integer read fLeftActivePage write fLeftActivePage;
     property ProjectWidth: integer read fProjectWidth write fProjectWidth;
     property Statusbar: boolean read fStatusbar write fStatusbar;
     property FullScreen: boolean read fFullScr write fFullScr;
@@ -651,13 +650,11 @@ var
   devCVSHandler: TdevCVSHandler = nil;
   devExternalPrograms: TdevExternalPrograms = nil;
 
-	// %APPDATA% storgage, usage of -c, %APPDATA% not found, but not portable
-	ConfigMode             : (CFG_APPDATA, CFG_PARAM, CFG_EXEFOLDER) = CFG_APPDATA;
-
-	StandardConfigFile     : AnsiString;
-	UseAltConfigFile       : boolean;
-	AltConfigFile          : AnsiString;
-	DontRecreateSingletons : boolean;
+  ConfigMode : (CFG_APPDATA, CFG_PARAM, CFG_EXEFOLDER) = CFG_APPDATA;
+  StandardConfigFile : AnsiString;
+  UseAltConfigFile : boolean;
+  AltConfigFile : AnsiString;
+  DontRecreateSingletons : boolean;
 
 implementation
 
@@ -836,8 +833,8 @@ begin
   fMinOnRun:= FALSE;
   fBackup:= FALSE;
   fAutoOpen:= 2; // Reopen
-  fShowProject:= TRUE;
-  fClassView:= FALSE;
+  fShowLeftPages:= TRUE;
+  fLeftActivePage:= 0;
   fProjectWidth:=161;
   fOutput:= FALSE;
   fOutputOnNeed:= TRUE;
@@ -1795,6 +1792,7 @@ procedure TdevEditor.SettoDefaults;
 begin
 	// General
 	fAutoIndent:= TRUE;
+	fAddIndent:= TRUE;
 	fInsertMode:= TRUE;
 	fUseTabs:= TRUE;
 	fSmartTabs:= FALSE;
@@ -1806,7 +1804,6 @@ begin
 	fEHomeKey:= TRUE;
 	fPastEOF:= FALSE;
 	fPastEOL:= FALSE;
-	fdblLine:= FALSE;
 	fFindText:= TRUE;
 	fShowScrollbars:= TRUE; // Show as needed
 	fHalfPage:= FALSE;
@@ -1941,6 +1938,8 @@ begin
 			//Optional synedit options in devData
 			if fAutoIndent then
 				Options := Options + [eoAutoIndent];
+			if fAddIndent then
+				Options := Options + [eoAddIndent];
 			if fEHomeKey then
 				Options := Options + [eoEnhanceHomeKey];
 			if fGroupUndo then

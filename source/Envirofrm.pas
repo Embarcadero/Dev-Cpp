@@ -499,9 +499,9 @@ end;
 
 procedure TEnviroForm.chkAltConfigClick(Sender: TObject);
 begin
-  chkAltConfig.Enabled:=ConfigMode <> CFG_PARAM;
-  edAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
-  btnAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
+  chkAltConfig.Enabled := ConfigMode <> CFG_PARAM;
+  edAltConfig.Enabled := chkAltConfig.Enabled and chkAltConfig.Checked;
+  btnAltConfig.Enabled := chkAltConfig.Enabled and chkAltConfig.Checked;
 end;
 
 procedure TEnviroForm.cvsdownloadlabelClick(Sender: TObject);

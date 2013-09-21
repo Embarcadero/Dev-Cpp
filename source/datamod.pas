@@ -421,7 +421,7 @@ begin
 				Item := TMenuItem.Create(Parent);
 				Item.Caption:= Format('&%1x %s', [count, PMRUItem(fMRU[I])^.filename]);
 				Item.OnClick:= fMRUClick;
-				Item.Tag:= count;
+				Item.Tag:= I;
 				Parent.Insert(startidx + count,Item);
 
 				// Hand a pointer to the MRU item, so it can remove it itself

@@ -58,6 +58,7 @@ type
     procedure IncrementalUndoClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure EditKeyPress(Sender: TObject; var Key: Char);
   private
     fOptions : TSynSearchOptions;
     fSearchEngine : TSynEditSearch;
@@ -192,12 +193,12 @@ end;
 
 procedure TIncrementalForm.FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 begin
-	if Key = VK_DOWN then begin
-		btnNextClick(nil);
+	if Key = VK_RETURN then begin
 		Key := 0; // Stop processing by input window
-	end else if Key = VK_UP then begin
-		btnPrevClick(nil);
-		Key := 0;
+		if Shift = [ssShift] then
+			btnPrevClick(nil)
+		else
+			btnNextClick(nil);
 	end;
 end;
 
@@ -226,4 +227,11 @@ begin
 	Edit.SelectAll;
 end;
 
+procedure TIncrementalForm.EditKeyPress(Sender: TObject; var Key: Char);
+begin
+	if Key = Chr(VK_RETURN) then
+		Key := #0;
+end;
+
 end.
+

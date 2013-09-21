@@ -175,6 +175,7 @@ type
   TSynEditorOption = (
     eoAltSetsColumnMode,       //Holding down the Alt Key will put the selection mode into columnar format
     eoAutoIndent,              //Will indent the caret on new lines with the same amount of leading white space as the preceding line
+    eoAddIndent,               //Will add one tab width of indent when typing { and :, and remove the same amount when typing }
     eoAutoSizeMaxScrollWidth,  //Automatically resizes the MaxScrollWidth property when inserting text
     eoDisableScrollArrows,     //Disables the scroll bar arrow buttons when you can't scroll in that direction any more
     eoDragDropEditing,         //Allows you to select a block of text and drag it within the document to another location
@@ -833,7 +834,7 @@ type
     property SelTabBlock: Boolean read GetSelTabBlock;
     property SelTabLine: Boolean read GetSelTabLine;
     property SelText: string read GetSelText write SetSelTextExternal;
-    property StateFlags: TSynStateFlags read fStateFlags;
+    property StateFlags: TSynStateFlags read fStateFlags write fStateFlags;
     property Text: string read SynGetText write SynSetText;
     property TopLine: Integer read fTopLine write SetTopLine;
     property WordAtCursor: string read GetWordAtCursor;
@@ -6949,7 +6950,6 @@ begin
                 // join this line with the last line if possible
                 if CaretY > 1 then
                 begin
-                  Lines.BeginUpdate; // make sure LineChanged doesn't fire twice
                   InternalCaretY := CaretY - 1;
                   InternalCaretX := Length(Lines[CaretY - 1]) + 1;
                   Lines.Delete(CaretY);
@@ -6959,7 +6959,6 @@ begin
 
                   LineText := LineText + Temp;
                   Helper := #13#10;
-                  Lines.EndUpdate; // make sure LineChanged doesn't fire twice
                 end;
               end
               else begin
@@ -7074,7 +7073,7 @@ begin
           else begin
             // Call UpdateLastCaretX. Even though the caret doesn't move, the
             // current caret position should "stick" whenever text is modified.
-            UpdateLastCaretX;                           
+            UpdateLastCaretX;
             Temp := LineText;
             Len := Length(Temp);
             if CaretX <= Len then
@@ -7195,7 +7194,7 @@ begin
             Helper := Helper + #13#10;
             fUndoList.AddChange(crSilentDeleteAfterCursor, BufferCoord(1, CaretY),
               BufferCoord(1, CaretY + 1), Helper, smNormal);
-            DoLinesDeleted(CaretY - 1, 1);
+            DoLinesDeleted(CaretY, 1);
           end;
           InternalCaretXY := BufferCoord(1, CaretY); // like seen in the Delphi editor
           DoOnPaintTransient(ttAfter);
@@ -7269,7 +7268,7 @@ begin
                 begin
                   Lines[CaretY] := Copy(Lines[BackCounter], 1, SpaceCount2); // copy previous indent
                 end;
-                if (eoAutoIndent in Options) and GetHighlighterAttriAtRowCol(BufferCoord(Length(Temp),CaretY),Temp,Attr) then begin // only add indent to source files
+                if (eoAddIndent in Options) and GetHighlighterAttriAtRowCol(BufferCoord(Length(Temp),CaretY),Temp,Attr) then begin // only add indent to source files
                   if Attr <> Highlighter.CommentAttribute then begin // and outside of comments
                     if Temp[Length(Temp)] in ['{',':'] then begin // add more indent for these too
                       if not (eoTabsToSpaces in Options) then begin
@@ -7334,7 +7333,7 @@ begin
           end;
 
           // EDIT
-          if eoAutoIndent in Options then begin
+          if eoAddIndent in Options then begin
 
             // Remove TabWidth of indent of the current line when typing a }
             if AChar in ['}'] then begin
@@ -7356,7 +7355,7 @@ begin
                   Dec(i);
                 end;
                 Lines[CaretY-1] := Copy(Lines[CaretY-1],1,i);
-                InternalCaretXY := BufferCoord(CaretX + 1 - SpaceCount1,CaretY);
+                InternalCaretXY := BufferCoord(CaretX - SpaceCount1,CaretY);
               end;
             end;
           end;
@@ -10887,20 +10886,21 @@ end;
 
 procedure TCustomSynEdit.ScanForFoldRanges(TopFoldRanges: TSynEditFoldRanges; txt: TStrings);
 var
-	Line,Col,Level,FoldIndex : integer;
+	Level,FoldIndex : integer;
 	token : AnsiString;
 	attr : TSynHighlighterAttributes;
+	CurLine : AnsiString;
 
-	function LineHasChar(character : char) : boolean;
+	function LineHasChar(Line: integer;character : char) : boolean; // faster than Pos!
 	var
 		i : integer;
 	begin
 		result := false;
-		for I := 1 to Length(txt[line]) do begin
-			if txt[line][i] = character then begin
+		for I := 1 to Length(CurLine) do begin
+			if CurLine[i] = character then begin
 
 				// Char must have proper highlighting (ignore stuff inside comments...)
-				if (GetHighlighterAttriAtRowCol(BufferCoord(i,line + 1),token,attr) and (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
+				if (GetHighlighterAttriAtRowCol(BufferCoord(i,Line + 1),token,attr) and (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
 					result := true;
 					break;
 				end;
@@ -10909,19 +10909,22 @@ var
 	end;
 
 	procedure FindSubFoldRange(Parent : TSynEditFoldRange);
+	var
+		Col,Line : integer;
 	begin
-		while (Line < txt.Count) do begin
-			Col := 1;
-			while (Col <= Length(txt[line])) do begin
+		for Line := 0 to txt.Count - 1 do begin
+			CurLine := txt[Line];
+			for Col := 1 to Length(CurLine) do begin
 
 				// We've found a starting character
-				if StrLComp(@txt[line][col],CodeFolding.FoldRegions[FoldIndex].Open,CodeFolding.FoldRegions[FoldIndex].OpenLength) = 0 then begin
+				if CurLine[col] = CodeFolding.FoldRegions[FoldIndex].Open then begin
 
 					// Char must have proper highlighting (ignore stuff inside comments...)
-					if (GetHighlighterAttriAtRowCol(BufferCoord(col,line + 1),token,attr) and (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
+					if (GetHighlighterAttriAtRowCol(BufferCoord(Col,Line + 1),token,attr) and
+					   (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
 
 						// And ignore lines with both opening and closing chars in them
-						if not LineHasChar(CodeFolding.FoldRegions[FoldIndex].Close^) then begin
+						if not LineHasChar(Line,CodeFolding.FoldRegions[FoldIndex].Close) then begin
 
 							// Add it to the top list of folds
 							if not Assigned(Parent) then begin
@@ -10929,7 +10932,7 @@ var
 									nil,
 									TopFoldRanges,
 									Line + 1,
-									GetLineIndent(txt[Line]),
+									GetLineIndent(CurLine),
 									Level,
 									CodeFolding.FoldRegions[FoldIndex],
 									Line + 1);
@@ -10940,7 +10943,7 @@ var
 									Parent,
 									TopFoldRanges,
 									Line + 1,
-									GetLineIndent(txt[Line]),
+									GetLineIndent(CurLine),
 									Level,
 									CodeFolding.FoldRegions[FoldIndex],
 									Line + 1);
@@ -10952,13 +10955,14 @@ var
 							break;
 						end;
 					end;
-				end else if StrLComp(@txt[line][col],CodeFolding.FoldRegions[FoldIndex].Close,CodeFolding.FoldRegions[FoldIndex].CloseLength) = 0 then begin
+				end else if CurLine[col] = CodeFolding.FoldRegions[FoldIndex].Close then begin
 
 					// Char must have symbol attri too
-					if (GetHighlighterAttriAtRowCol(BufferCoord(col,line + 1),token,attr) and (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
+					if (GetHighlighterAttriAtRowCol(BufferCoord(Col,Line + 1),token,attr) and
+					   (attr.Name = CodeFolding.FoldRegions[FoldIndex].Highlight)) then begin
 
 						// And ignore lines with both opening and closing chars in them
-						if not LineHasChar(CodeFolding.FoldRegions[FoldIndex].Open^) then begin
+						if not LineHasChar(Line,CodeFolding.FoldRegions[FoldIndex].Open) then begin
 
 							// Stop the recursion if we find a closing char, and return to our parent
 							if Assigned(Parent) then begin
@@ -10973,19 +10977,14 @@ var
 						end;
 					end;
 				end;
-				Inc(Col); // next char
 			end;
-			Inc(line);
 		end;
 	end;
 
 begin
-
 	// Recursively scan for folds (all types)
 	for FoldIndex := 0 to CodeFolding.FoldRegions.Count - 1 do begin
 		Level := 0;
-		Line := 0; // 0 based
-		Col := 1; // 1 based
 		FindSubFoldRange(nil);
 	end;
 end;

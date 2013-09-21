@@ -55,21 +55,18 @@ type
 	private
 		fAddEnding: Boolean;
 		fSubFoldRegions: TFoldRegions;
-		fOpen: PChar;
-		fClose: PChar;
+		fOpen: Char;
+		fClose: Char;
 		fHighlight: AnsiString;
 		fOpenLength: Integer;
 		fCloseLength: Integer;
-
-		procedure SetClose(const Value: PChar);
-		procedure SetOpen(const Value: PChar);
 	public
 		constructor Create(Collection: TCollection); override;
 		destructor Destroy; override;
 		property AddEnding: Boolean read fAddEnding write fAddEnding;
 		property SubFoldRegions: TFoldRegions read fSubFoldRegions;
-		property Open: PChar read fOpen write SetOpen;
-		property Close: PChar read fClose write SetClose;
+		property Open: Char read fOpen write fOpen;
+		property Close: Char read fClose write fClose;
 		property OpenLength: Integer read fOpenLength;
 		property CloseLength: Integer read fCloseLength;
 		property Highlight: AnsiString read fHighlight write fHighlight;
@@ -81,7 +78,7 @@ type
 	public
 		constructor Create(ItemClass: TCollectionItemClass);
 		destructor Destroy; override;
-		function Add(AAddEnding: boolean;AOpen, AClose: PChar;AHighlight : AnsiString): TFoldRegionItem;
+		function Add(AAddEnding: boolean;AOpen, AClose: Char;AHighlight : AnsiString): TFoldRegionItem;
 
 		property Items[Index: Integer]: TFoldRegionItem read GetItem; default;
 	end;
@@ -374,16 +371,12 @@ end;
 destructor TFoldRegionItem.Destroy;
 begin
 	fSubFoldRegions.Free;
-	if Assigned(fOpen) then
-		FreeMem(fOpen);
-	if Assigned(fClose) then
-		FreeMem(fClose);
 	inherited;
 end;
 
 { TFoldRegions }
 
-function TFoldRegions.Add(AAddEnding: boolean;AOpen, AClose: PChar;AHighlight : AnsiString): TFoldRegionItem;
+function TFoldRegions.Add(AAddEnding: boolean;AOpen, AClose: Char;AHighlight : AnsiString): TFoldRegionItem;
 begin
 	Result := TFoldRegionItem(inherited Add);
 	with Result do begin
@@ -409,26 +402,6 @@ begin
 	Result := TFoldRegionItem(inherited Items[Index]);
 end;
 
-procedure TFoldRegionItem.SetClose(const Value: PChar);
-begin
-	if fClose <> nil then
-		FreeMem(fClose);
-
-	fCloseLength := StrLen(Value);
-	GetMem(fClose, fCloseLength + 1);
-	StrCopy(fClose, Value);
-end;
-
-procedure TFoldRegionItem.SetOpen(const Value: PChar);
-begin
-	if fOpen <> nil then
-		FreeMem(fOpen);
-
-	fOpenLength := StrLen(Value);
-	GetMem(fOpen, fOpenLength + 1);
-	StrCopy(fOpen, Value);
-end;
-
 constructor TSynCodeFolding.Create;
 begin
 	fIndentGuides := True;
@@ -440,7 +413,7 @@ begin
 	fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
 	with fFoldRegions do begin
 		Add(True, '{', '}','Symbol');
-		Add(True, 'BEGIN','END','Identifier');
+		//Add(True, 'BEGIN','END','Identifier'); // too slow :(
 	end;
 end;
 

@@ -13,6 +13,7 @@ object FindForm: TFindForm
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   FormStyle = fsStayOnTop
+  KeyPreview = True
   OldCreateOrder = False
   PopupMenu = FindPopup
   Position = poScreenCenter
@@ -25,7 +26,7 @@ object FindForm: TFindForm
     330)
   PixelsPerInch = 96
   TextHeight = 13
-  object btnFind: TButton
+  object btnExecute: TButton
     Left = 8
     Top = 300
     Width = 100
@@ -35,7 +36,7 @@ object FindForm: TFindForm
     Default = True
     ModalResult = 1
     TabOrder = 0
-    OnClick = btnFindClick
+    OnClick = btnExecuteClick
   end
   object btnCancel: TButton
     Left = 197
@@ -86,6 +87,7 @@ object FindForm: TFindForm
       Height = 21
       ItemHeight = 13
       TabOrder = 0
+      OnKeyUp = cboFindTextKeyUp
     end
     object grpOptions: TGroupBox
       Left = 8
@@ -238,6 +240,7 @@ object FindForm: TFindForm
       Height = 21
       ItemHeight = 13
       TabOrder = 1
+      OnKeyUp = cboReplaceTextKeyUp
     end
   end
   object FindPopup: TPopupMenu

@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 434
-  Top = 387
+  Left = 547
+  Top = 333
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 462
@@ -36,7 +36,7 @@ object EditorOptForm: TEditorOptForm
         Width = 201
         Height = 90
         Caption = '  Right Margin  '
-        TabOrder = 0
+        TabOrder = 2
         object lblMarginWidth: TLabel
           Left = 8
           Top = 43
@@ -86,14 +86,14 @@ object EditorOptForm: TEditorOptForm
         Width = 456
         Height = 190
         Caption = '  Editor Options  '
-        TabOrder = 2
+        TabOrder = 0
         object cbFunctionHint: TCheckBox
           Left = 241
           Top = 166
           Width = 208
           Height = 17
           Caption = 'Show function hints'
-          TabOrder = 0
+          TabOrder = 15
         end
         object cbTrimTrailingSpaces: TCheckBox
           Left = 8
@@ -101,7 +101,7 @@ object EditorOptForm: TEditorOptForm
           Width = 209
           Height = 17
           Caption = 'Trim Trailing Spaces'
-          TabOrder = 1
+          TabOrder = 7
         end
         object cbAutoIndent: TCheckBox
           Left = 8
@@ -109,15 +109,15 @@ object EditorOptForm: TEditorOptForm
           Width = 209
           Height = 17
           Caption = 'Auto Indent'
-          TabOrder = 2
+          TabOrder = 0
         end
-        object cbDoubleLine: TCheckBox
+        object cbAddIndent: TCheckBox
           Left = 8
-          Top = 66
+          Top = 46
           Width = 209
           Height = 17
-          Caption = 'Double Click Line'
-          TabOrder = 3
+          Caption = 'Add indent to {} and :'
+          TabOrder = 2
         end
         object cbDropFiles: TCheckBox
           Left = 8
@@ -125,7 +125,7 @@ object EditorOptForm: TEditorOptForm
           Width = 209
           Height = 17
           Caption = 'Insert Dropped Files'
-          TabOrder = 4
+          TabOrder = 5
         end
         object cbEHomeKey: TCheckBox
           Left = 241
@@ -133,15 +133,15 @@ object EditorOptForm: TEditorOptForm
           Width = 208
           Height = 17
           Caption = 'Enhance home key'
-          TabOrder = 5
+          TabOrder = 8
         end
         object cbInsertMode: TCheckBox
           Left = 8
-          Top = 46
+          Top = 66
           Width = 209
           Height = 17
           Caption = 'Insert Mode'
-          TabOrder = 6
+          TabOrder = 1
         end
         object cbParserHints: TCheckBox
           Left = 241
@@ -149,7 +149,7 @@ object EditorOptForm: TEditorOptForm
           Width = 208
           Height = 17
           Caption = 'Show editor hints'
-          TabOrder = 7
+          TabOrder = 14
         end
         object cbHalfPage: TCheckBox
           Left = 241
@@ -157,7 +157,7 @@ object EditorOptForm: TEditorOptForm
           Width = 208
           Height = 17
           Caption = 'Half Page Scrolling'
-          TabOrder = 8
+          TabOrder = 12
         end
         object cbGroupUndo: TCheckBox
           Left = 8
@@ -165,7 +165,7 @@ object EditorOptForm: TEditorOptForm
           Width = 209
           Height = 17
           Caption = 'Group Undo'
-          TabOrder = 9
+          TabOrder = 4
         end
         object cbFindText: TCheckBox
           Left = 8
@@ -173,7 +173,7 @@ object EditorOptForm: TEditorOptForm
           Width = 209
           Height = 17
           Caption = 'Find Text at Cursor'
-          TabOrder = 10
+          TabOrder = 3
         end
         object cbPastEOL: TCheckBox
           Left = 241
@@ -181,7 +181,7 @@ object EditorOptForm: TEditorOptForm
           Width = 208
           Height = 17
           Caption = 'Cursor Past EOL'
-          TabOrder = 11
+          TabOrder = 10
         end
         object cbPastEOF: TCheckBox
           Left = 241
@@ -189,7 +189,7 @@ object EditorOptForm: TEditorOptForm
           Width = 208
           Height = 17
           Caption = 'Cursor Past EOF'
-          TabOrder = 12
+          TabOrder = 9
         end
         object cbScrollHint: TCheckBox
           Left = 241
@@ -205,7 +205,7 @@ object EditorOptForm: TEditorOptForm
           Width = 208
           Height = 17
           Caption = 'Scollbars on need'
-          TabOrder = 14
+          TabOrder = 11
         end
         object cbSpecialChars: TCheckBox
           Left = 8
@@ -213,7 +213,7 @@ object EditorOptForm: TEditorOptForm
           Width = 209
           Height = 17
           Caption = 'Show Special Line Chars'
-          TabOrder = 15
+          TabOrder = 6
         end
       end
       object grpCaret: TGroupBox
@@ -274,13 +274,13 @@ object EditorOptForm: TEditorOptForm
           TabOrder = 2
         end
       end
-      object HighCurLineBox: TGroupBox
+      object grpHighCurLine: TGroupBox
         Left = 264
         Top = 308
         Width = 201
         Height = 84
         Caption = 'Highlight current line'
-        TabOrder = 3
+        TabOrder = 4
         object cbHighlightColor: TLabel
           Left = 99
           Top = 35
@@ -308,13 +308,13 @@ object EditorOptForm: TEditorOptForm
           TabOrder = 1
         end
       end
-      object GroupBox1: TGroupBox
+      object grpTabs: TGroupBox
         Left = 9
         Top = 308
         Width = 248
         Height = 84
         Caption = '  Tabs  '
-        TabOrder = 4
+        TabOrder = 3
         object lblTabSize: TLabel
           Left = 176
           Top = 32
@@ -329,7 +329,7 @@ object EditorOptForm: TEditorOptForm
           Height = 24
           MaxValue = 64
           MinValue = 0
-          TabOrder = 0
+          TabOrder = 2
           Value = 0
         end
         object cbUseTabs: TCheckBox
@@ -338,7 +338,7 @@ object EditorOptForm: TEditorOptForm
           Width = 169
           Height = 17
           Caption = 'Use Tab Character'
-          TabOrder = 1
+          TabOrder = 0
         end
         object cbSmartTabs: TCheckBox
           Left = 8
@@ -346,7 +346,7 @@ object EditorOptForm: TEditorOptForm
           Width = 161
           Height = 17
           Caption = 'Smart Tabs'
-          TabOrder = 2
+          TabOrder = 1
         end
       end
     end
@@ -555,11 +555,10 @@ object EditorOptForm: TEditorOptForm
       end
       object btnSaveSyntax: TSpeedButton
         Left = 8
-        Top = 359
-        Width = 21
-        Height = 21
-        Hint = 'Save custom syntax settings'
-        Flat = True
+        Top = 356
+        Width = 23
+        Height = 23
+        Hint = 'Save color theme'
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
           18000000000000030000CE0E0000D80E0000000000000000000000FF0000FF00
@@ -619,6 +618,23 @@ object EditorOptForm: TEditorOptForm
         HideSelection = True
         Highlighter = cpp
         UseCodeFolding = True
+        Lines.Strings = (
+          '#include <iostream>'
+          '#include <conio.h>'
+          ''
+          'int main(int argc, char **argv)'
+          '{'
+          #9'int numbers[20];'
+          #9'float average, total; //breakpoint'
+          #9'for (int i = 0; i <= 19; i++)'
+          #9'{ // active breakpoint'
+          #9#9'numbers[i] = i;'
+          #9#9'Total += i; // error line'
+          #9'}'
+          #9'average = total / 20; // comment'
+          #9'cout << "total: " << total << "\nAverage: " << average;'
+          #9'getch();'
+          '}')
         Options = [eoAutoIndent, eoDisableScrollArrows, eoHideShowScrollbars, eoNoCaret, eoNoSelection, eoSmartTabs, eoTrimTrailingSpaces]
         ReadOnly = True
         RightEdge = 0
@@ -852,14 +868,14 @@ object EditorOptForm: TEditorOptForm
             Width = 273
             Height = 153
             Caption = 'Specific completion options'
-            TabOrder = 0
+            TabOrder = 1
             object cbParenth: TCheckBox
               Left = 16
               Top = 48
               Width = 240
               Height = 17
               Caption = 'Complete parentheses '#39'()'#39
-              TabOrder = 0
+              TabOrder = 1
             end
             object cbBraces: TCheckBox
               Left = 16
@@ -867,7 +883,7 @@ object EditorOptForm: TEditorOptForm
               Width = 240
               Height = 17
               Caption = 'Complete braces '#39'{}'#39
-              TabOrder = 1
+              TabOrder = 0
             end
             object cbInclude: TCheckBox
               Left = 16
@@ -883,7 +899,7 @@ object EditorOptForm: TEditorOptForm
               Width = 240
               Height = 17
               Caption = 'Complete multiline comments '#39'/**/'#39
-              TabOrder = 3
+              TabOrder = 4
             end
             object cbArray: TCheckBox
               Left = 16
@@ -891,7 +907,7 @@ object EditorOptForm: TEditorOptForm
               Width = 240
               Height = 17
               Caption = 'Complete square braces '#39'[]'#39
-              TabOrder = 4
+              TabOrder = 3
             end
           end
           object cbSymbolComplete: TCheckBox
@@ -900,7 +916,7 @@ object EditorOptForm: TEditorOptForm
             Width = 241
             Height = 17
             Caption = 'Enable symbol completion'
-            TabOrder = 1
+            TabOrder = 0
             OnClick = cbSymbolCompleteClick
           end
         end
@@ -971,22 +987,6 @@ object EditorOptForm: TEditorOptForm
         Height = 15
         Caption = 'Background color:'
       end
-      object btnCCCnew: TSpeedButton
-        Left = 8
-        Top = 342
-        Width = 80
-        Height = 25
-        Caption = 'Add files'
-        OnClick = btnCCCnewClick
-      end
-      object btnCCCdelete: TSpeedButton
-        Left = 90
-        Top = 342
-        Width = 80
-        Height = 25
-        Caption = 'Clear'
-        OnClick = btnCCCdeleteClick
-      end
       object lblRefreshHint: TLabel
         Left = 264
         Top = 344
@@ -996,6 +996,24 @@ object EditorOptForm: TEditorOptForm
         AutoSize = False
         Caption = 'Please refresh the cache when updating Dev-C++'
         WordWrap = True
+      end
+      object btnCCCnew: TButton
+        Left = 8
+        Top = 342
+        Width = 80
+        Height = 25
+        Caption = 'Add files'
+        TabOrder = 6
+        OnClick = btnCCCnewClick
+      end
+      object btnCCCdelete: TButton
+        Left = 90
+        Top = 342
+        Width = 80
+        Height = 25
+        Caption = 'Clear'
+        TabOrder = 7
+        OnClick = btnCCCdeleteClick
       end
       object tbCompletionDelay: TTrackBar
         Left = 16
@@ -1008,7 +1026,7 @@ object EditorOptForm: TEditorOptForm
         Frequency = 100
         Position = 1000
         ShowHint = False
-        TabOrder = 1
+        TabOrder = 2
         TickMarks = tmBoth
         OnChange = tbCompletionDelayChange
       end
@@ -1027,7 +1045,7 @@ object EditorOptForm: TEditorOptForm
         Width = 457
         Height = 17
         Caption = 'Use code-completion cache'
-        TabOrder = 2
+        TabOrder = 4
         OnClick = chkCCCacheClick
       end
       object lbCCC: TListBox
@@ -1039,7 +1057,7 @@ object EditorOptForm: TEditorOptForm
         ParentShowHint = False
         ShowHint = True
         Sorted = True
-        TabOrder = 3
+        TabOrder = 5
       end
       object pbCCCache: TProgressBar
         Left = 8
@@ -1047,7 +1065,7 @@ object EditorOptForm: TEditorOptForm
         Width = 244
         Height = 20
         BorderWidth = 1
-        TabOrder = 4
+        TabOrder = 9
         Visible = False
       end
       object gbCBEngine: TGroupBox
@@ -1056,7 +1074,7 @@ object EditorOptForm: TEditorOptForm
         Width = 457
         Height = 65
         Caption = 'Engine behaviour'
-        TabOrder = 5
+        TabOrder = 1
         object chkCBParseGlobalH: TCheckBox
           Left = 8
           Top = 40
@@ -1080,7 +1098,7 @@ object EditorOptForm: TEditorOptForm
         Width = 80
         Height = 25
         Caption = 'Refresh'
-        TabOrder = 6
+        TabOrder = 8
         OnClick = btnCCCrefreshClick
       end
       object cpCompletionBackground: TColorBox
@@ -1091,7 +1109,7 @@ object EditorOptForm: TEditorOptForm
         DefaultColorColor = clWhite
         Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
         ItemHeight = 16
-        TabOrder = 7
+        TabOrder = 3
       end
     end
     object tabAutosave: TTabSheet

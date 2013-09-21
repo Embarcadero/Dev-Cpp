@@ -3,12 +3,11 @@
 
 !define COMPILERNAME "MinGW 4.7.2"
 !define COMPILERFOLDER "MinGW32"
-!define DEVCPP_VERSION "5.4.1"
+!define DEVCPP_VERSION "5.4.2"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 !include "MUI2.nsh"
-!include "logiclib.nsh" ; needed by ${switch}
 
 ####################################################################
 # Installer Attributes
@@ -90,6 +89,7 @@ InstType "Safe";3
 
 Section "Dev-C++ program files (required)" SectionMain
   SectionIn 1 2 3 RO
+  
   SetOutPath $INSTDIR
 
   ; Allways create an uninstaller
@@ -98,6 +98,7 @@ Section "Dev-C++ program files (required)" SectionMain
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayVersion" "${DEVCPP_VERSION}"
 
+  ; Write required files
   File "devcpp.exe"
   File "devcpp.map"
   File "packman.exe"
@@ -107,16 +108,18 @@ Section "Dev-C++ program files (required)" SectionMain
   File "copying.txt"
   File "NEWS.txt"
   
+  ; Write required paths
   SetOutPath $INSTDIR\Lang
-  File "Lang\English.*"
+  File /nonfatal /r "Lang\English.*"
   SetOutPath $INSTDIR\Templates
-  File "Templates\*"
+  File /nonfatal /r "Templates\*"
   SetOutPath $INSTDIR\Help
-  File /r "Help\*"
+  File /nonfatal /r "Help\*"
 SectionEnd
 
 Section "Icon files" SectionIcons
   SectionIn 1 3
+  
   SetOutPath $INSTDIR\Icons
   File /nonfatal /r "Icons\*.*"
 SectionEnd
@@ -130,6 +133,7 @@ SectionEnd
 
 Section "Language files" SectionLangs
   SectionIn 1 3
+  
   SetOutPath $INSTDIR\Lang
   File /nonfatal /r "Lang\*"
 SectionEnd
@@ -274,37 +278,20 @@ SubSection "Shortcuts" SectionShortcuts
 
 Section "Create Start Menu shortcuts" SectionMenuLaunch
   SectionIn 1 3
-
-  ;try to read from registry if last installation installed for All Users/Current User
-  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" \ 
-   "Shortcuts"
-  StrCmp $0 "" cont exists
-  cont:
-
-  SetShellVarContext all
-  MessageBox MB_YESNO "Do you want to install Dev-C++ for all users on this computer?" IDYES AllUsers
-  SetShellVarContext current
-AllUsers:
-  StrCpy $0 $SMPROGRAMS
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" \
-    "Shortcuts" "$0"
-
-exists:
+ 
+  ; always use all user start menu, normal users can delete these
+  SetShellVarContext all 
+  StrCpy $0 $SMPROGRAMS ; start menu Programs folder
   CreateDirectory "$0\Bloodshed Dev-C++"
-  SetOutPath $INSTDIR
   CreateShortCut "$0\Bloodshed Dev-C++\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
   CreateShortCut "$0\Bloodshed Dev-C++\License.lnk" "$INSTDIR\copying.txt"
   CreateShortCut "$0\Bloodshed Dev-C++\Uninstall Dev-C++.lnk" "$INSTDIR\uninstall.exe"
 SectionEnd
 
-Section "Create Quick Launch shortcut" SectionQuickLaunch
-  SectionIn 1 3
-  SetShellVarContext current
-  CreateShortCut "$QUICKLAUNCH\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
-SectionEnd
-
 Section "Create Desktop shortcut" SectionDesktopLaunch
   SectionIn 1 3
+  
+  ; always use current user desktop, normal users can't delete all users' shortcuts
   SetShellVarContext current
   CreateShortCut "$DESKTOP\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
 SectionEnd
@@ -313,6 +300,7 @@ SubSectionEnd
 
 Section "Remove old configuration files" SectionConfig
   SectionIn 3
+
   RMDir /r "$APPDATA\Dev-Cpp"
   
   Delete "$INSTDIR\devcpp.ini"
@@ -432,20 +420,22 @@ UninstallText "This program will uninstall Dev-C++, continue?"
 ShowUninstDetails show
 
 Section "Uninstall"
+
   ; Remove uninstaller
   Delete "$INSTDIR\uninstall.exe"
 
-  ; Remove icons
-  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" \
-    "Shortcuts"
-  Delete "$0\Bloodshed Dev-C++\Dev-C++.lnk"
-  Delete "$0\Bloodshed Dev-C++\License.lnk"
-  Delete "$0\Bloodshed Dev-C++\Uninstall Dev-C++.lnk"
-  RMDir  "$0\Bloodshed Dev-C++"
+  ; Remove start menu stuff, located in all users folder
+  SetShellVarContext all 
+  Delete "$SMPROGRAMS\Bloodshed Dev-C++\Dev-C++.lnk"
+  Delete "$SMPROGRAMS\Bloodshed Dev-C++\License.lnk"
+  Delete "$SMPROGRAMS\Bloodshed Dev-C++\Uninstall Dev-C++.lnk"
+  RMDir "$SMPROGRAMS\Bloodshed Dev-C++"
+  
+  ; Remove desktop stuff, located in current user folder
   SetShellVarContext current
   Delete "$QUICKLAUNCH\Dev-C++.lnk"
   Delete "$DESKTOP\Dev-C++.lnk"
-
+  
   ; Restore file associations
   StrCpy $0 ".dev"
   Call un.RestoreAssoc
@@ -499,6 +489,7 @@ Section "Uninstall"
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++"
 
+  IfSilent +2 ; Don't ask when running in silent mode
   MessageBox MB_YESNO "Do you want to remove all the remaining configuration files?" IDNO Done
 
   RMDir /r "$APPDATA\Dev-Cpp"

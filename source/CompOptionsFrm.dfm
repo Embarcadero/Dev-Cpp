@@ -32,7 +32,7 @@ object CompOptForm: TCompOptForm
     Caption = '&OK'
     Default = True
     ModalResult = 1
-    TabOrder = 0
+    TabOrder = 1
     OnClick = btnOkClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -62,7 +62,7 @@ object CompOptForm: TCompOptForm
     Cancel = True
     Caption = '&Cancel'
     ModalResult = 2
-    TabOrder = 1
+    TabOrder = 2
     OnClick = btnCancelClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -90,7 +90,7 @@ object CompOptForm: TCompOptForm
     Height = 25
     Anchors = [akLeft, akBottom]
     Enabled = False
-    TabOrder = 2
+    TabOrder = 3
     OnClick = btnHelpClick
     Kind = bkHelp
   end
@@ -101,7 +101,7 @@ object CompOptForm: TCompOptForm
     Width = 484
     Height = 425
     ActivePage = tabCompiler
-    TabOrder = 3
+    TabOrder = 0
     OnChange = MainPagesChange
     object tabCompiler: TTabSheet
       Caption = 'Compiler'
@@ -115,7 +115,7 @@ object CompOptForm: TCompOptForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Add the following commands when calling the compiler:'
-        TabOrder = 0
+        TabOrder = 1
         OnClick = cbCompAddClick
       end
       object Commands: TMemo
@@ -125,7 +125,7 @@ object CompOptForm: TCompOptForm
         Height = 75
         Anchors = []
         ScrollBars = ssVertical
-        TabOrder = 1
+        TabOrder = 2
         WantReturns = False
         OnChange = CommandsChange
       end
@@ -135,7 +135,7 @@ object CompOptForm: TCompOptForm
         Width = 457
         Height = 100
         Caption = '  Makefile generation:  '
-        TabOrder = 2
+        TabOrder = 5
         object lblDelay: TLabel
           Left = 16
           Top = 35
@@ -161,7 +161,7 @@ object CompOptForm: TCompOptForm
           Width = 431
           Height = 17
           Caption = 'Use fast but imperfect dependency generation'
-          TabOrder = 0
+          TabOrder = 1
           OnClick = cbFastDepClick
         end
         object seCompDelay: TSpinEdit
@@ -171,7 +171,7 @@ object CompOptForm: TCompOptForm
           Height = 24
           MaxValue = 0
           MinValue = 0
-          TabOrder = 1
+          TabOrder = 0
           Value = 650
           OnChange = seCompDelayChange
         end
@@ -203,7 +203,7 @@ object CompOptForm: TCompOptForm
         Width = 440
         Height = 53
         Caption = 'Compiler set to configure'
-        TabOrder = 5
+        TabOrder = 0
         object btnAddCompilerSet: TSpeedButton
           Left = 362
           Top = 20

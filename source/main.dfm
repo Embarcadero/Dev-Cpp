@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 312
-  Top = 263
+  Left = 479
+  Top = 343
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -17,7 +17,6 @@ object MainForm: TMainForm
   OldCreateOrder = False
   Position = poDefault
   ShowHint = True
-  OnActivate = FormActivate
   OnClose = FormClose
   OnContextPopup = FormContextPopup
   OnCreate = FormCreate
@@ -53,7 +52,7 @@ object MainForm: TMainForm
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
     PopupMenu = MessagePopup
-    TabOrder = 0
+    TabOrder = 3
     OnChange = MessageControlChange
     object CompSheet: TTabSheet
       Caption = 'Compiler'
@@ -537,7 +536,7 @@ object MainForm: TMainForm
     BevelOuter = bvNone
     BevelKind = bkNone
     RowSize = 28
-    TabOrder = 1
+    TabOrder = 0
     OnClick = ToolbarClick
     OnContextPopup = ToolbarContextPopup
     object tbMain: TToolBar
@@ -916,7 +915,7 @@ object MainForm: TMainForm
     HotTrack = True
     MultiLine = True
     PopupMenu = EditorPopupMenu
-    TabOrder = 3
+    TabOrder = 2
     Visible = False
     OnChange = PageControlChange
     OnDragDrop = PageControlDragDrop
@@ -934,7 +933,7 @@ object MainForm: TMainForm
     Caption = 
       'Dev-C++ Fullscreen. Press F10 to toggle this bar, F11 to toggle ' +
       'Toolbars or F12 to toggle Fullscreen.'
-    TabOrder = 4
+    TabOrder = 6
     Visible = False
     DesignSize = (
       896
@@ -975,10 +974,10 @@ object MainForm: TMainForm
     Top = 70
     Width = 193
     Height = 340
-    ActivePage = ProjectSheet
+    ActivePage = DebugLeftSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
-    TabOrder = 6
+    TabOrder = 1
     object ProjectSheet: TTabSheet
       Caption = 'Project'
       ImageIndex = -1
@@ -1324,6 +1323,9 @@ object MainForm: TMainForm
       end
       object actSearchAgain1: TMenuItem
         Action = actSearchAgain
+      end
+      object SearchAgainBackwards1: TMenuItem
+        Action = actRevSearchAgain
       end
       object N75: TMenuItem
         Caption = '-'
@@ -2579,14 +2581,14 @@ object MainForm: TMainForm
       Caption = 'Indent'
       ShortCut = 9
       OnExecute = actIndentExecute
-      OnUpdate = actUpdateEmptyEditor
+      OnUpdate = actUpdateIndent
     end
     object actUnindent: TAction
       Category = 'Edit'
       Caption = 'Unindent'
       ShortCut = 8201
       OnExecute = actUnindentExecute
-      OnUpdate = actUpdateEmptyEditor
+      OnUpdate = actUpdateIndent
     end
     object actGotoFunction: TAction
       Category = 'Search'
@@ -2944,6 +2946,20 @@ object MainForm: TMainForm
       ShortCut = 114
       OnExecute = actSearchAgainExecute
       OnUpdate = actUpdateEmptyEditorFindForm
+    end
+    object actRevSearchAgain: TAction
+      Category = 'Search'
+      Caption = 'Search Again Backwards'
+      ShortCut = 8306
+      OnExecute = actRevSearchAgainExecute
+      OnUpdate = actUpdateEmptyEditorFindForm
+    end
+    object actDeleteLine: TAction
+      Category = 'Edit'
+      Caption = 'Delete Line'
+      ShortCut = 16452
+      OnExecute = actDeleteLineExecute
+      OnUpdate = actUpdateEmptyEditor
     end
   end
   object MessagePopup: TPopupMenu

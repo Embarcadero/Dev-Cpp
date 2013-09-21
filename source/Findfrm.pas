@@ -34,7 +34,7 @@ uses
 type
   TFindAction = (faFind, faFindFiles, faReplace, faReplaceFiles);
   TFindForm = class(TForm)
-    btnFind: TButton;
+    btnExecute: TButton;
     btnCancel: TButton;
     FindTabs: TTabControl;
     lblFind: TLabel;
@@ -64,7 +64,7 @@ type
     N1: TMenuItem;
     FindSelAll: TMenuItem;
     rbCurFile: TRadioButton;
-    procedure btnFindClick(Sender: TObject);
+    procedure btnExecuteClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnCancelClick(Sender: TObject);
     procedure FindTabsChange(Sender: TObject);
@@ -75,6 +75,10 @@ type
     procedure FindPasteClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FindSelAllClick(Sender: TObject);
+    procedure cboFindTextKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure cboReplaceTextKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     fSearchOptions : TSynSearchOptions;
     fCurFile : AnsiString;
@@ -111,19 +115,27 @@ var
 	toplinebackup : integer;
 begin
 
-	// Don't affect global actions
-	if action in [faFind,faReplace] then begin
+	// Only modify the caret when using 'from cursor' and when the selection is ignored
+	if not (ssoEntireScope in fSearchOptions) and not (ssoSelectedOnly in fSearchOptions) then begin
 
-		// Only set the cursor to the end of the selection when not using the selection and when using from cursor
-		if not (ssoEntireScope in fSearchOptions) and not (ssoSelectedOnly in fSearchOptions) then begin
-
-			// Make sure we do not find the same word again and again when using From Cursor
+		// When using find, start at end of selection
+		if action = faFind then begin
 			if (ssoBackwards in fSearchOptions) then begin
 				if editor.SelAvail then
 					editor.CaretX := editor.BlockBegin.Char;
 			end else begin
 				if editor.SelAvail then
 					editor.CaretX := editor.BlockEnd.Char;
+			end;
+
+		// When using replace, start at begin of selection
+		end else if action = faReplace then begin
+			if (ssoBackwards in fSearchOptions) then begin
+				if editor.SelAvail then
+					editor.CaretX := editor.BlockEnd.Char;
+			end else begin
+				if editor.SelAvail then
+					editor.CaretX := editor.BlockBegin.Char;
 			end;
 		end;
 	end;
@@ -158,7 +170,7 @@ begin
 	editor.SearchEngine := enginebackup;
 end;
 
-procedure TFindForm.btnFindClick(Sender: TObject);
+procedure TFindForm.btnExecuteClick(Sender: TObject);
 var
 	I,findcount : integer;
 	e : TEditor;
@@ -186,6 +198,7 @@ begin
 			PAnsiChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),
 			PAnsiChar(Lang[ID_INFO]),
 			MB_ICONINFORMATION or MB_TOPMOST);
+		cboFindText.SetFocus;
 		Exit;
 	end;
 
@@ -236,10 +249,22 @@ begin
 	MainForm.FindOutput.Items.BeginUpdate;
 
 	// Find the first one, then quit
-	if actiontype in [faFind,faReplace] then begin
+	if actiontype = faFind then begin
+		e := MainForm.GetEditor;
+		if Assigned(e) then
+			Inc(findcount,Execute(e.Text,faFind));
+
+	// Replace first, find to next
+	end else if actiontype = faReplace then begin
 		e := MainForm.GetEditor;
 
-		Inc(findcount,Execute(e.Text,actiontype));
+		if Assigned(e) then begin
+			Inc(findcount,Execute(e.Text,faReplace));
+			if findcount > 0 then begin
+				Exclude(fSearchOptions,ssoReplace);
+				Inc(findcount,Execute(e.Text,faFind));
+			end;
+		end;
 
 	// Or find everything
 	end else begin
@@ -279,7 +304,7 @@ begin
 					Inc(findcount,Execute(e.Text,actiontype));
 
 				// not open? load from disk
-				end else begin
+				end else if FileExists(fCurFile) then begin
 
 					if (actiontype = faReplaceFiles) then begin
 
@@ -310,6 +335,8 @@ begin
 					end;
 				end;
 			end;
+
+		// Don't loop, only pass single file
 		end else if rbCurFile.Checked then begin
 			e := MainForm.GetEditor;
 
@@ -329,13 +356,13 @@ begin
 		if findcount > 0 then
 			MainForm.FindSheet.Caption := Lang[ID_SHEET_FIND] + ' (' + IntToStr(findcount) + ')';
 		MainForm.OpenCloseMessageSheet(TRUE);
-	end else begin
-		if findcount = 0 then
-			MessageBox(
-				Self.Handle,
-				PAnsiChar(Format(Lang[ID_MSG_TEXTNOTFOUND],[cboFindText.Text])),
-				PAnsiChar(Lang[ID_INFO]),
-				MB_ICONINFORMATION or MB_TOPMOST);
+	end else if findcount = 0 then begin
+		MessageBox(
+			Self.Handle,
+			PAnsiChar(Format(Lang[ID_MSG_TEXTNOTFOUND],[cboFindText.Text])),
+			PAnsiChar(Lang[ID_INFO]),
+			MB_ICONINFORMATION or MB_TOPMOST);
+		cboFindText.SetFocus;
 	end;
 end;
 
@@ -410,10 +437,10 @@ begin
 
 	if not isreplace and not isreplacefiles then begin
 		Caption := Lang[ID_FIND_FINDTAB];
-		btnFind.Caption := Lang[ID_BTN_FIND]
+		btnExecute.Caption := Lang[ID_BTN_FIND]
 	end else begin
 		Caption := Lang[ID_FIND_REPLACE];
-		btnFind.Caption := Lang[ID_BTN_REPLACE];
+		btnExecute.Caption := Lang[ID_BTN_REPLACE];
 	end;
 end;
 
@@ -458,7 +485,7 @@ begin
   rbBackward.Caption:=     Lang[ID_FIND_BACK];
 
   //buttons
-  btnFind.Caption:=        Lang[ID_BTN_FIND];
+  btnExecute.Caption:=        Lang[ID_BTN_FIND];
   btnCancel.Caption:=      Lang[ID_BTN_CANCEL];
 
 	FindCut.Caption := Lang[ID_ITEM_CUT];
@@ -545,4 +572,21 @@ begin
 	fTempSynEdit.Free;
 end;
 
+procedure TFindForm.cboFindTextKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
+begin
+	if Key = VK_TAB then begin
+		cboFindText.SelText := #9;
+		Key := 0; // prevent propagation
+	end;
+end;
+
+procedure TFindForm.cboReplaceTextKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
+begin
+	if Key = VK_TAB then begin
+		cboReplaceText.SelText := #9;
+		Key := 0; // prevent propagation
+	end;
+end;
+
 end.
+

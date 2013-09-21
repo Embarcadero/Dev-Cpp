@@ -1,6 +1,6 @@
 object FilePropertiesForm: TFilePropertiesForm
-  Left = 1130
-  Top = 319
+  Left = 446
+  Top = 320
   BorderStyle = bsDialog
   Caption = 'File properties'
   ClientHeight = 312
@@ -158,7 +158,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Width = 50
     Height = 23
     ReadOnly = True
-    TabOrder = 11
+    TabOrder = 8
   end
   object edTotalLines: TEdit
     Left = 144
@@ -166,7 +166,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Width = 50
     Height = 23
     ReadOnly = True
-    TabOrder = 5
+    TabOrder = 4
   end
   object edCodeLines: TEdit
     Left = 144
@@ -174,7 +174,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Width = 51
     Height = 23
     ReadOnly = True
-    TabOrder = 6
+    TabOrder = 5
   end
   object edCommentLines: TEdit
     Left = 144
@@ -182,7 +182,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Width = 51
     Height = 23
     ReadOnly = True
-    TabOrder = 7
+    TabOrder = 6
   end
   object edEmptyLines: TEdit
     Left = 336
@@ -190,7 +190,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Width = 51
     Height = 23
     ReadOnly = True
-    TabOrder = 8
+    TabOrder = 7
   end
   object edIncludes: TEdit
     Left = 336
@@ -215,7 +215,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Height = 23
     AutoSize = False
     ReadOnly = True
-    TabOrder = 4
+    TabOrder = 1
   end
   object edAbsolute: TEdit
     Left = 100
@@ -243,7 +243,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Cancel = True
     Caption = 'OK'
     Default = True
-    TabOrder = 1
+    TabOrder = 11
     OnClick = btnOKClick
   end
   object cmbFiles: TComboBox

@@ -71,6 +71,7 @@ constructor TCodeInsList.Create;
 begin
 	inherited Create;
 	fList := TList.Create;
+	fFile := devDirs.Config + DEV_CODEINS_FILE;
 end;
 
 destructor TCodeInsList.Destroy;
@@ -142,33 +143,7 @@ var
 	tmp: TStringList;
 	I: integer;
 begin
-	if not FileExists(fFile) then
-		fFile := devDirs.Config + DEV_CODEINS_FILE;
-
-	if FileExists(fFile) then begin
-		with TINIFile.Create(fFile) do try
-			tmp := TStringList.Create;
-			Clear;
-			try
-				ReadSections(tmp);
-				for I := 0 to tmp.Count -1 do begin
-					new(Item);
-					Item^.Caption:= StringReplace(tmp[I], '_', ' ', [rfReplaceAll]);
-					Item^.Desc:= ReadString(tmp[I], 'Desc', '');
-					Item^.Line:= StrtoCodeIns(ReadString(tmp[I], 'Line', ''));
-					Item^.Sep:= ReadInteger(tmp[I], 'Sep', 0);
-					AddItem(Item);
-				end;
-			finally
-				tmp.free;
-			end;
-		finally
-			free;
-		end;
-
-	// Only load defaults on first launch...
-	end else if devData.First then begin
-
+	if devData.First then begin
 		// Win32
 		AddItemByValues('MessageBox','Win32 MessageBox','MessageBox(*|*,"Hello","Caption",MB_OK);',1);
 		AddItemByValues('WinMain','Win32 Main Function',
@@ -272,6 +247,30 @@ begin
 		AddItemByValues('#ifndef','Preprocessor !if','#ifndef *|*'+#13#10#13#10+'#endif',3);
 		AddItemByValues('#ifdef/else','Preprocessor if-else','#ifdef *|*'+#13#10#13#10+'#elif'+#13#10#13#10+'#endif',3);
 		AddItemByValues('#ifndef/else','Preprocessor !if-else','#ifndef *|*'+#13#10#13#10+'#elif'+#13#10#13#10+'#endif',3);
+
+		// Save to disk as defaults
+		SaveCode;
+
+	end else if FileExists(fFile) then begin // no first time launch? load from disk
+		with TINIFile.Create(fFile) do try
+			tmp := TStringList.Create;
+			Clear;
+			try
+				ReadSections(tmp);
+				for I := 0 to tmp.Count -1 do begin
+					new(Item);
+					Item^.Caption:= StringReplace(tmp[I], '_', ' ', [rfReplaceAll]);
+					Item^.Desc:= ReadString(tmp[I], 'Desc', '');
+					Item^.Line:= StrtoCodeIns(ReadString(tmp[I], 'Line', ''));
+					Item^.Sep:= ReadInteger(tmp[I], 'Sep', 0);
+					AddItem(Item);
+				end;
+			finally
+				tmp.free;
+			end;
+		finally
+			free;
+		end;
 	end;
 end;
 

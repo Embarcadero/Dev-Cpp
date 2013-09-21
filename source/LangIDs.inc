@@ -321,6 +321,7 @@ const
   ID_EOPT_TAB2SPC                       = 25005;
   ID_EOPT_SMARTTABS                     = 25006;
   ID_EOPT_TRAILBLANKS                   = 25008;
+
   ID_EOPT_GROUPUNDO                     = 26001;
   ID_EOPT_EHOMEKEY                      = 26002;
   ID_EOPT_PASTEOF                       = 26003;
@@ -348,6 +349,8 @@ const
   ID_EOPT_TRIMTRAILINGSPACES            = 26025;
   ID_EOPT_GENERICENABLED                = 26026;
   ID_EOPT_GUTTERWIDTH                   = 26027;
+  ID_EOPT_AUTOINDENT2                   = 26028;
+  ID_EOPT_ADDINDENT                     = 26029;
 
   ID_EOPT_SPECIALCHARS                  = 27001;
   ID_EOPT_PARSERHINTS                   = 27002;

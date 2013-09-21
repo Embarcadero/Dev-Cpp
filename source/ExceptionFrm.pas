@@ -431,7 +431,7 @@ begin
           + 'Version     : ' + DEVCPP_VERSION + #13#10
           + 'Build Time  : ' + lblBuildTime.Caption + #13#10
           + 'Message     : ' + lblError.Caption + #13#10
-          + 'Address     : ' + lblAddress.Caption + #13#10;
+          + 'Address     : ' + lblAddress.Caption;
 end;
 
 function TExceptionFrm.GetMachineReport: AnsiString;

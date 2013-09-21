@@ -1065,7 +1065,7 @@ begin
 		sl.Free;
 	end;
 
-	if (Top> -1) and (fUnits.Count > 0) and (top<fUnits.Count) and Assigned(fUnits[top].Editor) then
+	if (Top <> -1) and (top < fUnits.Count) and Assigned(fUnits[top].Editor) then
 		fUnits[top].Editor.Activate;
 end;
 

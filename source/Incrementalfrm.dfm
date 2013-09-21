@@ -30,6 +30,7 @@ object IncrementalForm: TIncrementalForm
     Top = 0
     Width = 25
     Height = 25
+    Hint = 'Next (Enter)'
     Caption = '>'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -37,6 +38,8 @@ object IncrementalForm: TIncrementalForm
     Font.Name = 'Courier'
     Font.Style = [fsBold]
     ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 0
     OnClick = btnNextClick
   end
@@ -45,6 +48,7 @@ object IncrementalForm: TIncrementalForm
     Top = 0
     Width = 25
     Height = 25
+    Hint = 'Previous (Shift+Enter)'
     Caption = '<'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -52,6 +56,8 @@ object IncrementalForm: TIncrementalForm
     Font.Name = 'Courier'
     Font.Style = [fsBold]
     ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 1
     OnClick = btnPrevClick
   end
@@ -69,6 +75,7 @@ object IncrementalForm: TIncrementalForm
     ParentFont = False
     TabOrder = 2
     OnChange = EditChange
+    OnKeyPress = EditKeyPress
   end
   object IncrementalPop: TPopupMenu
     Left = 184

@@ -290,7 +290,7 @@ end;
 function TSynEditSearch.Replace(const aOccurrence, aReplacement: string): string;
 begin
   Result := aReplacement;
-end;                     
+end;
 
 function TSynEditSearch.FindFirst(const NewText: string): Integer;
 begin
@@ -309,12 +309,12 @@ end;
 
 function TSynEditSearch.GetLength(aIndex: integer): integer;
 begin
-  Result := PatLen;  
+  Result := PatLen;
 end;
 
 function TSynEditSearch.GetPattern: string;
 begin
-  Result := Pat; 
+  Result := Pat;
 end;
 
 procedure TSynEditSearch.SetOptions(const Value: TSynSearchOptions);

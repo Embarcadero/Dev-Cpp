@@ -12193,7 +12193,7 @@ object AboutForm: TAboutForm
     Width = 75
     Height = 25
     Caption = '&OK'
-    TabOrder = 0
+    TabOrder = 5
     Kind = bkOK
   end
   object GroupBox1: TGroupBox
@@ -13132,7 +13132,7 @@ object AboutForm: TAboutForm
     Width = 83
     Height = 25
     Caption = '&Authors'
-    TabOrder = 3
+    TabOrder = 4
     OnClick = btnAuthorsClick
     OnDragDrop = btnAuthorsDragDrop
     OnDragOver = btnAuthorsDragOver
@@ -13170,7 +13170,7 @@ object AboutForm: TAboutForm
     Width = 185
     Height = 25
     Caption = '&Check for updates'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = btnUpdateCheckClick
     Glyph.Data = {
       36030000424D3603000000000000360000002800000010000000100000000100
@@ -13206,7 +13206,7 @@ object AboutForm: TAboutForm
     Width = 57
     Height = 40
     BevelOuter = bvNone
-    TabOrder = 5
+    TabOrder = 0
     object FishImage: TImage
       Left = 0
       Top = 0

@@ -571,6 +571,9 @@ type
     N18: TMenuItem;
     ToolButton4: TToolButton;
     ToolButton5: TToolButton;
+    actRevSearchAgain: TAction;
+    SearchAgainBackwards1: TMenuItem;
+    actDeleteLine: TAction;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -690,8 +693,8 @@ type
     procedure actUncommentExecute(Sender: TObject);
     procedure actIndentExecute(Sender: TObject);
     procedure actUnindentExecute(Sender: TObject);
-    procedure PageControlDragOver(Sender, Source: TObject; X, Y: Integer;State: TDragState; var Accept: Boolean);
     procedure PageControlDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure PageControlDragOver(Sender, Source: TObject; X,Y: Integer; State: TDragState; var Accept: Boolean);
     procedure actGotoFunctionExecute(Sender: TObject);
     procedure actBrowserGotoDeclUpdate(Sender: TObject);
     procedure actBrowserGotoImplUpdate(Sender: TObject);
@@ -815,12 +818,14 @@ type
     procedure FindOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
     procedure CompilerOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
     procedure actMsgSelAllExecute(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
     procedure actSearchAgainExecute(Sender: TObject);
     procedure FindOutputDeletion(Sender: TObject; Item: TListItem);
     procedure CompilerOutputDeletion(Sender: TObject; Item: TListItem);
     procedure ResourceOutputDeletion(Sender: TObject; Item: TListItem);
     procedure actStopExecuteUpdate(Sender: TObject);
+    procedure actUpdateIndent(Sender: TObject);
+    procedure actRevSearchAgainExecute(Sender: TObject);
+    procedure actDeleteLineExecute(Sender: TObject);
   private
     fPreviousHeight : integer; // stores MessageControl height to be able to restore to previous height
     fTools : TToolController; // tool list controller
@@ -828,7 +833,6 @@ type
     fReportToolWindow : TForm; // floating bottom tab control
     WindowPlacement : TWindowPlacement; // idem
     fFirstShow : boolean; // true for first WM_SHOW, false for others
-    fFirstActivate : boolean; // see above
     fShowTips : boolean;
     fRemoveOptions : boolean;
     fOptionsDir : AnsiString;
@@ -870,6 +874,7 @@ type
     procedure OpenProject(const s: AnsiString);
     function FileIsOpen(const s: AnsiString; inprj: boolean = false): integer;
     function GetEditor(index: integer = -1): TEditor;
+    function GetEditorFromTag(Tag : integer) : TEditor;
     function GetEditorFromFileName(const ffile : AnsiString) : TEditor;
     procedure GotoBreakpoint(const bfile: AnsiString; bline: integer);
     procedure RemoveActiveBreakpoints;
@@ -891,7 +896,7 @@ uses
   ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
   datamod, NewProjectFrm, AboutFrm, PrintFrm,
   CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
-  SynEdit, Math, ImageTheme,
+  SynEdit, Math, ImageTheme, SynEditKeyCmds,
   Types, FindFrm, Prjtypes, devExec,
   NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
@@ -956,7 +961,7 @@ begin
 	end;
 
 	// Remember toolbar placement
-	devData.ClassView:=LeftPageControl.ActivePage=ClassSheet;
+	devData.LeftActivePage := LeftPageControl.ActivePageIndex;
 	devData.ToolbarMainX:=tbMain.Left;
 	devData.ToolbarMainY:=tbMain.Top;
 	devData.ToolbarEditX:=tbEdit.Left;
@@ -1425,7 +1430,7 @@ begin
 			if (not inprj) or e.InProject then
 				Exit;
 	end;
-	result:= -1;
+	result := -1;
 end;
 
 
@@ -1439,7 +1444,7 @@ begin
 	if assigned(e) then begin
 
 		// Ask user if he wants to save
-		if e.Text.Modified then begin
+		if e.Text.Modified and not IsEmpty(e.Text) then begin
 			case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [e.FileName]),mtConfirmation, mbYesNoCancel, 0) of
 				mrYes:
 					e.Save;
@@ -1448,10 +1453,8 @@ begin
 			end;
 		end;
 
+		// Using this thing, because WM_SETREDRAW doesn't work
 		LockWindowUpdate(PageControl.Handle);
-
-		// Closing a tab editor page causes a lot of flicker.
-		//SendMessage(Self.Handle,WM_SETREDRAW,0,0);
 
 		// We're allowed to close...
 		Result := True;
@@ -1464,19 +1467,13 @@ begin
 			FreeAndNil(e);
 		end;
 
+		// Repaint after messing with the pages (see TEditor.Destroy)
 		LockWindowUpdate(0);
-
-		// So, only repaint once after completely disabling updating
-		//SendMessage(Self.Handle,WM_SETREDRAW,1,0);
-
-		// Repaint here, so we don't get to see the first page
-		//RedrawWindow(PageControl.Handle, nil, 0, RDW_INVALIDATE or RDW_UPDATENOW or RDW_ALLCHILDREN);
-		//Self.Repaint;
 
 		SetStatusbarLineCol;
 		UpdateAppTitle;
 
-		e:=GetEditor;
+		e := GetEditor;
 		if Assigned(e) then begin
 			ClassBrowser.CurrentFile := e.FileName;
 			e.Text.SetFocus;
@@ -1484,6 +1481,11 @@ begin
 			CppParser.Reset;
 			ClassBrowser.Clear;
 		end;
+
+		// Hide incremental search if we run out of editors
+		if not Assigned(e) then
+			if Assigned(IncrementalForm) and IncrementalForm.Showing then
+				IncrementalForm.Close;
 	end;
 end;
 
@@ -1624,7 +1626,7 @@ begin
 		dmMain.RemoveFromHistory(s);
 
 		// if project manager isn't open then open it
-		if not devData.ProjectView then
+		if not devData.ShowLeftPages then
 			actProjectManager.Execute;
 
 		CheckForDLLProfiling;
@@ -2038,7 +2040,7 @@ begin
 					fCompiler.Project:= fProject;
 					fProject.SaveProjectFile; // don't save file list yet
 
-					if not devData.ProjectView then
+					if not devData.ShowLeftPages then
 						actProjectManager.Execute;
 				end;
 			finally
@@ -2384,8 +2386,8 @@ begin
 	SplitterLeft.Visible:= actProjectManager.Checked;
 	//if (MessageControl <> self) and assigned(ProjectToolWindow) then
 	//	ProjectToolWindow.Close;
-	LeftPageControl.Visible:= actProjectManager.Checked;
-	devData.ProjectView:= actProjectManager.Checked;
+	LeftPageControl.Visible := actProjectManager.Checked;
+	devData.ShowLeftPages := actProjectManager.Checked;
 end;
 
 procedure TMainForm.actStatusbarExecute(Sender: TObject);
@@ -2424,7 +2426,12 @@ begin
 end;
 
 procedure TMainForm.actFullScreenExecute(Sender: TObject);
+var
+	Active: TWinControl;
 begin
+	// Remember focus
+	Active := Screen.ActiveControl;
+
 	devData.FullScreen:= FullScreenModeItem.Checked;
 	if devData.FullScreen then begin
 
@@ -2441,10 +2448,10 @@ begin
 		// set size to hide form menu
 		// works with multi monitors now.
 		SetBounds(
-			(Left +Monitor.WorkAreaRect.Left) - ClientOrigin.X,
-			(Top+ Monitor.WorkAreaRect.Top) - ClientOrigin.Y,
+			(Left + Monitor.WorkAreaRect.Left) - ClientOrigin.X,
+			(Top + Monitor.WorkAreaRect.Top) - ClientOrigin.Y,
 			Monitor.Width + (Width - ClientWidth),
-			Monitor.Height+ (Height - ClientHeight));
+			Monitor.Height + (Height - ClientHeight));
 	end else begin
 
 		// Reset old window position
@@ -2457,6 +2464,10 @@ begin
 		Toolbar.Visible:= TRUE;
 		pnlFull.Visible:= FALSE;
 	end;
+
+	// Remember focus
+	if Active.CanFocus then
+		Active.SetFocus;
 end;
 
 procedure TMainForm.actNextExecute(Sender: TObject);
@@ -3441,11 +3452,11 @@ begin
 	e := GetEditor;
 	if Assigned(e) then begin
 
-		pt := ClienttoScreen(point(PageControl.Left, PageControl.Top));
-
 		// Only create the form when we need to do so
 		if not Assigned(IncrementalForm) then
 			IncrementalForm := TIncrementalForm.Create(self);
+
+		pt := ClienttoScreen(point(PageControl.Left + PageControl.Width - IncrementalForm.Width - 10,PageControl.Top));
 
 		IncrementalForm.Left:= pt.x;
 		IncrementalForm.Top:= pt.y;
@@ -3513,21 +3524,6 @@ begin
 	pt:= ClientToScreen(MousePos);
 	TrackPopupMenu(ViewMenu.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.x, pt.y, 0, Self.Handle, nil);
 	Handled:= TRUE;
-end;
-
-function TMainForm.GetEditor(index: integer): TEditor;
-var
-	i: integer;
-begin
-	if index = -1 then
-		i := PageControl.ActivePageIndex
-	else
-		i := index;
-
-	if (PageControl.PageCount <= 0) or (i < 0) then
-		result:= nil
-	else
-		result:= TEditor(PageControl.Pages[i].Tag);
 end;
 
 procedure TMainForm.actAddWatchExecute(Sender: TObject);
@@ -3707,6 +3703,34 @@ begin
 	end;
 end;
 
+function TMainForm.GetEditor(index: integer): TEditor;
+var
+	i: integer;
+begin
+	if index = -1 then
+		i := PageControl.ActivePageIndex
+	else
+		i := index;
+
+	if (PageControl.PageCount <= 0) or (i < 0) then
+		result:= nil
+	else
+		result:= TEditor(PageControl.Pages[i].Tag);
+end;
+
+function TMainForm.GetEditorFromTag(tag: integer) : TEditor; // returns argument if tab is still open...
+var
+	I: integer;
+begin
+	result := nil;
+	for I := 0 to PageControl.PageCount - 1 do begin
+		if PageControl.Pages[i].Tag = tag then begin
+			result := TEditor(PageControl.Pages[i].Tag);
+			break;
+		end;
+	end;
+end;
+
 function TMainForm.GetEditorFromFileName(const ffile: AnsiString) : TEditor;
 var
 	index, index2 : integer; //mandrav
@@ -3853,7 +3877,7 @@ begin
 
 	passedtime := (GetTickCount-starttime);
 
-	if passedtime > 5000 then // 5 sec
+	if passedtime > 3000 then // 3 sec
 		SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN],[passedtime/1000]) + ', ' + Lang[ID_DONEPARSINGHINT])
 	else
 		SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN],[passedtime/1000])); // divide later to preserve comma stuff
@@ -4031,33 +4055,31 @@ var
 	e: TEditor;
 	i, x, y : integer;
 begin
-	if PageControl.ActivePageIndex <> -1 then begin
-		e:=GetEditor(PageControl.ActivePageIndex);
-		if Assigned(e) then begin
-			e.Text.SetFocus;
+	e := GetEditor(PageControl.ActivePageIndex);
+	if Assigned(e) then begin
+		e.Text.SetFocus;
 
-			// Keep window title updated
-			UpdateAppTitle;
+		// Keep window title updated
+		UpdateAppTitle;
 
-			// keep Status bar updated
-			SetStatusbarLineCol;
+		// keep Status bar updated
+		SetStatusbarLineCol;
 
-			// keep Class browser updated
-			ClassBrowser.CurrentFile := e.FileName;
+		// keep Class browser updated
+		ClassBrowser.CurrentFile := e.FileName;
 
-			// When using incremental search, change focus of it
-			if Assigned(IncrementalForm) and IncrementalForm.Showing then
-				IncrementalForm.Editor := e.Text;
+		// When using incremental search, change focus of it
+		if Assigned(IncrementalForm) and IncrementalForm.Showing then
+			IncrementalForm.Editor := e.Text;
 
-			for i := 1 to 9 do
-				if e.Text.GetBookMark(i, x, y) then begin
-					TogglebookmarksPopItem.Items[i - 1].Checked := true;
-					TogglebookmarksItem.Items[i - 1].Checked := true;
-				end else begin
-					TogglebookmarksPopItem.Items[i - 1].Checked := false;
-					TogglebookmarksItem.Items[i - 1].Checked := false;
-				end;
-		end;
+		for i := 1 to 9 do
+			if e.Text.GetBookMark(i, x, y) then begin
+				TogglebookmarksPopItem.Items[i - 1].Checked := true;
+				TogglebookmarksItem.Items[i - 1].Checked := true;
+			end else begin
+				TogglebookmarksPopItem.Items[i - 1].Checked := false;
+				TogglebookmarksItem.Items[i - 1].Checked := false;
+			end;
 	end;
 end;
 
@@ -4103,24 +4125,18 @@ end;
 
 procedure TMainForm.PageControlMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-	thispage,curpage : integer;
+	thispage : integer;
 begin
-	thispage:=PageControl.IndexOfTabAt(X, Y);
 	if Button = mbRight then begin // select new tab even with right mouse button
+		thispage := PageControl.IndexOfTabAt(X, Y);
 		if thispage <> -1 then begin
 			PageControl.ActivePageIndex:=thispage;
 			PageControlChange(nil);
 		end;
 	end else if Button = mbMiddle then begin
-		if thispage <> -1 then begin
-
-			curpage := PageControl.ActivePageIndex;
+		thispage := PageControl.IndexOfTabAt(X, Y);
+		if thispage <> -1 then
 			CloseEditor(thispage);
-
-			// Retain active index!
-			if thispage > PageControl.ActivePageIndex + 1 then
-				PageControl.ActivePageIndex := curpage;
-		end;
 	end else // see if it's a drag operation
 		PageControl.Pages[PageControl.ActivePageIndex].BeginDrag(False);
 end;
@@ -4166,14 +4182,6 @@ begin
 		e.UnindentSelection;
 end;
 
-procedure TMainForm.PageControlDragOver(Sender, Source: TObject; X,Y: Integer; State: TDragState; var Accept: Boolean);
-var
-	I: integer;
-begin
-	I := PageControl.IndexOfTabAt(X, Y);
-	Accept := (Source is TTabSheet) and (I<>PageControl.ActivePageIndex);
-end;
-
 procedure TMainForm.PageControlDragDrop(Sender, Source: TObject; X,Y: Integer);
 var
 	I: integer;
@@ -4181,6 +4189,14 @@ begin
 	I := PageControl.IndexOfTabAt(X, Y);
 	if (Source is TTabSheet) and (I<>PageControl.ActivePageIndex) then
 		PageControl.Pages[PageControl.ActivePageIndex].PageIndex := I;
+end;
+
+procedure TMainForm.PageControlDragOver(Sender, Source: TObject; X,Y: Integer; State: TDragState; var Accept: Boolean);
+var
+	I: integer;
+begin
+	I := PageControl.IndexOfTabAt(X, Y);
+	Accept := (Source is TTabSheet) and (I <> PageControl.ActivePageIndex);
 end;
 
 procedure TMainForm.actGotoFunctionExecute(Sender: TObject);
@@ -5708,12 +5724,9 @@ begin
 			if Sender = e then begin // Ctrl+Click from current editor
 
 				// Switching between declaration and definition
-				if e.Text.CaretY = statement^._Line then begin // clicked on definition
-					filename:=statement^._DeclImplFileName;
-					line:=statement^._DeclImplLine;
-				end else if e.Text.CaretY = statement^._DeclImplLine then begin // clicked on implementation
-					filename:=statement^._FileName;
-					line:=statement^._Line;
+				if (e.Text.CaretY = statement^._DeclImplLine) and SameStr(e.FileName,statement^._DeclImplFileName) then begin // clicked on implementation
+					filename := statement^._FileName;
+					line := statement^._Line;
 				end else begin // clicked anywhere, go to implementation
 					filename:=statement^._DeclImplFileName;
 					line:=statement^._DeclImplLine;
@@ -5905,7 +5918,6 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
 	fFirstShow := true;
-	fFirstActivate := true;
 
 	UpdateSplash('Applying settings...');
 
@@ -5955,11 +5967,8 @@ begin
 	dmMain := TdmMain.Create(Self);
 
 	// Set left page control to previous state
-	actProjectManager.Checked:= devData.ProjectView;
-	if devData.ClassView then
-		LeftPageControl.ActivePage:=ClassSheet
-	else
-		LeftPageControl.ActivePage:=ProjectSheet;
+	actProjectManager.Checked := devData.ShowLeftPages;
+	LeftPageControl.ActivePageIndex := devData.LeftActivePage;
 	actProjectManagerExecute(nil);
 	LeftPageControl.Width := devData.ProjectWidth;
 	if devData.ProjectFloat then begin
@@ -6182,6 +6191,11 @@ begin
 			inc(i);
 		end;
 
+		// do not show tips if Dev-C++ is launched with a file and only slow
+		// when the form shows for the first time, not when going fullscreen too
+		if devData.ShowTipsOnStart and fShowTips then
+			actShowTips.Execute;
+
 		// Update after opening files
 		UpdateAppTitle;
 	end;
@@ -6313,20 +6327,14 @@ begin
 	SendMessage(CompilerOutput.Handle,WM_CHANGEUISTATE, MAKEWPARAM(UIS_SET,UISF_HIDEFOCUS), 0);
 end;
 
-procedure TMainForm.FormActivate(Sender: TObject);
-begin
-	if fFirstActivate then begin
-		fFirstActivate := false;
-
-		// do not show tips if Dev-C++ is launched with a file and only slow
-		// when the form shows for the first time, not when going fullscreen too
-		if devData.ShowTipsOnStart and fShowTips then
-			actShowTips.Execute;
-	end;
-end;
-
 procedure TMainForm.actSearchAgainExecute(Sender: TObject);
+var
+	e: TEditor;
 begin
+	e := GetEditor;
+	if not Assigned(e) then
+		Exit;
+
 	// Repeat action if it was a finding action
 	if Assigned(FindForm) then begin
 		with FindForm do begin
@@ -6336,11 +6344,40 @@ begin
 				if grpOrigin.Visible then
 					rbEntireScope.Checked := false;
 
-				// Always search forward
+				// Always search backwards
 				if grpDirection.Visible then
-					rbBackward.Checked := false;
+					rbForward.Checked := true;
 
-				btnFind.Click;
+				btnExecute.Click;
+				e.Text.SetFocus;
+			end;
+		end;
+	end;
+end;
+
+procedure TMainForm.actRevSearchAgainExecute(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e := GetEditor;
+	if not Assigned(e) then
+		Exit;
+
+	// Repeat action if it was a finding action
+	if Assigned(FindForm) then begin
+		with FindForm do begin
+			if FindTabs.TabIndex < 2 then begin // it's a find action
+
+				// Disable entire scope searching
+				if grpOrigin.Visible then
+					rbEntireScope.Checked := false;
+
+				// Always search backwards
+				if grpDirection.Visible then
+					rbBackward.Checked := true;
+
+				btnExecute.Click;
+				e.Text.SetFocus;
 			end;
 		end;
 	end;
@@ -6378,6 +6415,20 @@ begin
 		TCustomAction(Sender).Enabled := (not (fProject.Options.typ = dptStat) and devExecutor.Running) or fDebugger.Executing
 	else
 		TCustomAction(Sender).Enabled := ((PageControl.PageCount > 0) and devExecutor.Running) or fDebugger.Executing;
+end;
+
+procedure TMainForm.actUpdateIndent(Sender: TObject);
+begin // special action to prevent tabs from being processed when using the find form
+	TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and (not Assigned(FindForm) or not FindForm.Showing);
+end;
+
+procedure TMainForm.actDeleteLineExecute(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e := GetEditor;
+	if Assigned(e) then
+		e.Text.CommandProcessor(ecDeleteLine,#0,nil);
 end;
 
 end.

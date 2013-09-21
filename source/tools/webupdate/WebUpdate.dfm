@@ -366,7 +366,7 @@ object WebUpdateForm: TWebUpdateForm
         Width = 120
       end>
     ReadOnly = True
-    TabOrder = 0
+    TabOrder = 3
     ViewStyle = vsReport
     OnChange = lvChange
     OnClick = lvClick
@@ -381,7 +381,7 @@ object WebUpdateForm: TWebUpdateForm
     Height = 73
     ReadOnly = True
     ScrollBars = ssVertical
-    TabOrder = 1
+    TabOrder = 4
   end
   object cmbGroups: TComboBox
     Left = 8
@@ -391,7 +391,7 @@ object WebUpdateForm: TWebUpdateForm
     Style = csDropDownList
     ItemHeight = 13
     Sorted = True
-    TabOrder = 2
+    TabOrder = 1
     OnChange = cmbGroupsChange
   end
   object ProgressBar1: TProgressBar
@@ -399,7 +399,7 @@ object WebUpdateForm: TWebUpdateForm
     Top = 156
     Width = 417
     Height = 16
-    TabOrder = 3
+    TabOrder = 2
   end
   object cmbMirrors: TComboBox
     Left = 8
@@ -408,7 +408,7 @@ object WebUpdateForm: TWebUpdateForm
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 4
+    TabOrder = 0
     OnChange = cmbMirrorsChange
   end
   object btnCheck: TBitBtn

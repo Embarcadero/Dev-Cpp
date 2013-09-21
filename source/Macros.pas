@@ -38,78 +38,66 @@ uses
 
 procedure Replace(var Str: AnsiString; Old, New: AnsiString);
 begin
-  Str := StringReplace(Str, Old, New, [rfReplaceAll]);
+	Str := StringReplace(Str, Old, New, [rfReplaceAll]);
 end;
 
 function ParseMacros(Str: AnsiString): AnsiString;
 var
-  e: TEditor;
-  Dir: AnsiString;
+	e: TEditor;
 begin
-  Result := Str;
-  e := MainForm.GetEditor;
+	Result := Str;
+	e := MainForm.GetEditor;
 
-  Replace(Result, '<DEFAULT>', devDirs.Default);
-  Replace(Result, '<DEVCPP>', ExtractFileDir(ParamStr(0)));
-  Replace(Result, '<DEVCPPVERSION>', DEVCPP_VERSION);
-  Replace(Result, '<EXECPATH>', devDirs.Exec);
-  Replace(Result, '<DATE>', DateToStr(Now));
-  Replace(Result, '<DATETIME>', DateTimeToStr(Now));
+	Replace(Result, '<DEFAULT>', devDirs.Default);
+	Replace(Result, '<DEVCPP>', ExtractFileDir(ParamStr(0)));
+	Replace(Result, '<DEVCPPVERSION>', DEVCPP_VERSION);
+	Replace(Result, '<EXECPATH>', devDirs.Exec);
+	Replace(Result, '<DATE>', DateToStr(Now));
+	Replace(Result, '<DATETIME>', DateTimeToStr(Now));
 
 	// Only provide the first cpp dir
 	if devCompiler.CppDir.Count > 0 then
-		Dir := devCompiler.CppDir[0]
+		Replace(Result, '<INCLUDE>', devCompiler.CppDir[0])
 	else
-		Dir := ExtractFilePath(ParamStr(0)) + '\include';
-	Replace(Result, '<INCLUDE>', Dir);
+		Replace(Result, '<INCLUDE>', '');
 
 	// Only provide the first lib dir
 	if devCompiler.LibDir.Count > 0 then
-		Dir := devCompiler.LibDir[0]
+		Replace(Result, '<LIB>', devCompiler.LibDir[0])
 	else
-		Dir := ExtractFilePath(ParamStr(0)) + '\lib';
-	Replace(Result, '<LIB>', Dir);
+		Replace(Result, '<LIB>', '');
 
-  { Project-dependent macros }
-  if Assigned(MainForm.fProject) then
-  begin
-      Replace(Result, '<EXENAME>',       MainForm.fProject.Executable);
-      Replace(Result, '<PROJECTNAME>',   MainForm.fProject.Name);
-      Replace(Result, '<PROJECTFILE>',   MainForm.fProject.FileName);
-      Replace(Result, '<PROJECTPATH>',   MainForm.fProject.Directory);
-      Replace(Result, '<SOURCESPCLIST>', MainForm.fProject.ListUnitStr(' '));
-  end
-  { Non-project editor macros }
-  else if Assigned(e) then
-  begin
-      Replace(Result, '<EXENAME>',       '"' + ChangeFileExt(e.FileName, EXE_EXT) + '"');
-      Replace(Result, '<PROJECTNAME>',   e.FileName);
-      Replace(Result, '<PROJECTFILE>',   e.FileName);
-      Replace(Result, '<PROJECTPATH>',   ExtractFilePath(e.FileName));
+	// Project-dependent macros
+	if Assigned(MainForm.fProject) then begin
+		Replace(Result, '<EXENAME>',       MainForm.fProject.Executable);
+		Replace(Result, '<PROJECTNAME>',   MainForm.fProject.Name);
+		Replace(Result, '<PROJECTFILE>',   MainForm.fProject.FileName);
+		Replace(Result, '<PROJECTPATH>',   MainForm.fProject.Directory);
+		Replace(Result, '<SOURCESPCLIST>', MainForm.fProject.ListUnitStr(' '));
+	end else if Assigned(e) then begin // Non-project editor macros
+		Replace(Result, '<EXENAME>',       '"' + ChangeFileExt(e.FileName, EXE_EXT) + '"');
+		Replace(Result, '<PROJECTNAME>',   e.FileName);
+		Replace(Result, '<PROJECTFILE>',   e.FileName);
+		Replace(Result, '<PROJECTPATH>',   ExtractFilePath(e.FileName));
+		Replace(Result, '<SOURCESPCLIST>', ''); // clear unchanged macros
+	end else begin  // clear unchanged macros
+		Replace(Result, '<EXENAME>',       '');
+		Replace(Result, '<PROJECTNAME>',   '');
+		Replace(Result, '<PROJECTFILE>',   '');
+		Replace(Result, '<PROJECTPATH>',   '');
+		Replace(Result, '<SOURCESPCLIST>', '');
+	end;
 
-      // clear unchanged macros
-      Replace(Result, '<SOURCESPCLIST>', '');
-  end else
-  begin
-      // clear unchanged macros
-      Replace(Result, '<EXENAME>',       '');
-      Replace(Result, '<PROJECTNAME>',   '');
-      Replace(Result, '<PROJECTFILE>',   '');
-      Replace(Result, '<PROJECTPATH>',   '');
-      Replace(Result, '<SOURCESPCLIST>', '');
-  end;
-
-  { Editor macros }
-  if Assigned(e) then begin
-      Replace(Result, '<SOURCENAME>', e.FileName);
-      Replace(Result, '<SOURCENAME>', ExtractFilePath(e.FileName));
-      Replace(Result, '<WORDXY>', e.Text.WordAtCursor);
-  end else begin
-      // clear unchanged macros
-      Replace(Result, '<SOURCENAME>', '');
-      Replace(Result, '<SOURCENAME>', '');
-      Replace(Result, '<WORDXY>',     '');
-  end;
+	// Editor macros
+	if Assigned(e) then begin
+		Replace(Result, '<SOURCENAME>', e.FileName);
+		Replace(Result, '<SOURCENAME>', ExtractFilePath(e.FileName));
+		Replace(Result, '<WORDXY>', e.Text.WordAtCursor);
+	end else begin // clear unchanged macros
+		Replace(Result, '<SOURCENAME>', '');
+		Replace(Result, '<SOURCENAME>', '');
+		Replace(Result, '<WORDXY>',     '');
+	end;
 end;
 
 end.

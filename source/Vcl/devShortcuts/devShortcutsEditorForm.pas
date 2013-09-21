@@ -80,7 +80,12 @@ procedure TfrmShortcutsEditor.AddShortcut(Item : PShortcutItem);
 begin
 	with lvShortcuts.Items.Add do begin
 		Caption := Item^.ListEntry;
-		SubItems.Add(ShortCutToText(Item^.Current));
+		if Assigned(item^.MenuItem) then
+			SubItems.Add(ShortCutToText(Item^.MenuItem.ShortCut))
+		else if Assigned(item^.Action) then
+			SubItems.Add(ShortCutToText(Item^.Action.ShortCut))
+		else
+			SubItems.Add('');
 		Data := Item;
 	end;
 end;
