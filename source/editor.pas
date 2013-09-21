@@ -686,27 +686,27 @@ begin
 	if (scCaretX in Changes) or (scCaretY in Changes) then begin
 		if assigned(FCodeToolTip) and FCodeToolTip.Enabled then begin
 			// when the hint is already activated when call
-			// ShowHint again, because the current arugment could have
-			// been changed, so we need to make another arg in bold
+			// ShowHint again, because the current argument could have
+			// changed, which means we need to edit the boldface stuff
 			if FCodeToolTip.Activated then begin
 				FCodeToolTip.Show
 			end else begin
 				// it's not showing yet, so we check if the cursor
-				// is in a function parameter list, and then show
-				len := fText.DisplayToBufferPos(fText.DisplayXY).Char;
-				if assigned(FText) and (not FText.SelAvail) and (Length(Trim(fText.LineText)) > 0) then begin
+				// is in a function argument list, and then show
+				len := fText.DisplayToBufferPos(fText.DisplayXY).Char-1;
+				if Assigned(FText) and (not FText.SelAvail) then begin
 					allowshow := false;
-					repeat
-						if (FText.LineText[len-1] in [')']) then begin
+					while (len > 1) and (len < Length(fText.LineText)) do begin
+						if (fText.LineText[len] in [')']) then begin
 							allowshow := false;
 							break;
 						end;
-						if (FText.LineText[len-1] in ['(']) then begin
+						if (fText.LineText[len] in ['(']) then begin
 							allowshow := true;
 							break;
 						end;
 						Dec(len);
-					until len = 1;
+					end;
 					if allowshow then FCodeToolTip.Show;
 				end;
 			end;
@@ -1029,8 +1029,8 @@ procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftStat
 var
 	M: TMemoryStream;
 	counter : integer;
-	attr: TSynHighlighterAttributes;
-	s : string;
+//	attr: TSynHighlighterAttributes;
+//	s : string;
 begin
 	// Indent/Unindent selected text with TAB key, like Visual C++ ...
 {$IFDEF WIN32}
@@ -1050,16 +1050,16 @@ begin
 	end;
 
 	if devEditor.AutoCloseBrace then begin
-		fText.GetHighlighterAttriAtRowCol(fText.CaretXY, s, attr);
-		if Assigned(attr) then begin
-			if (attr <> fText.Highlighter.StringAttribute) and (attr <> fText.Highlighter.CommentAttribute) then begin
+	//	fText.GetHighlighterAttriAtRowCol(fText.CaretXY, s, attr);
+	//	if Assigned(attr) then begin
+	//		if (attr <> fText.Highlighter.StringAttribute) and (attr <> fText.Highlighter.CommentAttribute) then begin
 				if Key = 57 then begin // 9 key + shift = (
 					if (ssShift in Shift) then
 						InsertString(')',false);
 				end else if Key = 219 then begin // [ key on US standard layout according to MSDN
 					if (ssShift in Shift) then begin
 						counter:=0;
-						if Length(fText.LineText) > 0 then begin
+						if Length(fText.LineText) > 1 then begin
 							repeat
 								Inc(counter);
 							until not (fText.LineText[counter] in [#9,#32]);
@@ -1075,8 +1075,8 @@ begin
 		//				InsertString('""',false);
 		//			Abort;
 				end;
-			end;
-		end;
+	//		end;
+	//	end;
 	end;
 
 	if fCompletionBox.Enabled then begin

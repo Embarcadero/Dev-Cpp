@@ -187,6 +187,7 @@ type
    procedure CloseUnit(index: integer);
    procedure SaveUnitAs(i : integer; sFileName : string);
    procedure Save;
+   procedure SaveProjectFile;
    procedure LoadLayout;
    procedure LoadUnitLayout(e: TEditor; Index: integer);
    procedure SaveLayout;
@@ -880,7 +881,7 @@ begin
         fOptions.VersionInfo.LegalTrademarks:=  Read('LegalTrademarks',   '');
         fOptions.VersionInfo.OriginalFilename:= Read('OriginalFilename',  ExtractFilename(Executable));
         fOptions.VersionInfo.ProductName:=      Read('ProductName',       Name);
-        fOptions.VersionInfo.ProductVersion:=   Read('ProductVersion',    '0.1');
+        fOptions.VersionInfo.ProductVersion:=   Read('ProductVersion',    '0.1.1.1');
         fOptions.VersionInfo.AutoIncBuildNr:=   Read('AutoIncBuildNr',    False);
         fOptions.VersionInfo.SyncProduct:=      Read('SyncProduct',       False);
       end
@@ -1310,12 +1311,19 @@ begin
   end;
 end;
 
+procedure TProject.SaveProjectFile;
+begin
+	UpdateFile;  // so data is current before going to disk
+	if fModified then
+		finiFile.UpdateFile;
+end;
+
 procedure TProject.Save;
 begin
 	if not UpdateUnits then
 		Exit;
 	UpdateFile;  // so data is current before going to disk
-	SaveLayout; // save current opened files, and which is "active".
+	SaveLayout;  // save current opened files, and which is "active".
 	if fModified then
 		finiFile.UpdateFile;
 	setModified(FALSE);

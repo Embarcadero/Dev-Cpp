@@ -37,7 +37,6 @@ type
     Image: TImage;
     StatusBar: TStatusBar;
     procedure FormCreate(Sender: TObject);
-    procedure ImageClick(Sender: TObject);
   end;
 
 var
@@ -52,18 +51,12 @@ uses
 
 procedure TSplashForm.FormCreate(Sender: TObject);
 begin
-  if (devData.Splash <> '') and FileExists(devData.Splash) then
-   begin
-     Image.Picture.LoadFromFile(devData.Splash);
-     ClientWidth:= Image.Width;
-     ClientHeight:= Image.Height + StatusBar.Height;
-   end;
-  StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Loading...';
-end;
-
-procedure TSplashForm.ImageClick(Sender: TObject);
-begin
-  close;
+	if (devData.Splash <> '') and FileExists(devData.Splash) then begin
+		Image.Picture.LoadFromFile(devData.Splash);
+		ClientWidth:= Image.Width;
+		ClientHeight:= Image.Height + StatusBar.Height;
+	end;
+	StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Loading...';
 end;
 
 end.

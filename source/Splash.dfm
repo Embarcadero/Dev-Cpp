@@ -1,10 +1,10 @@
 object SplashForm: TSplashForm
-  Left = 372
-  Top = 338
+  Left = 462
+  Top = 370
   Cursor = crHandPoint
   BorderIcons = []
   BorderStyle = bsNone
-  ClientHeight = 293
+  ClientHeight = 290
   ClientWidth = 472
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,14 +22,16 @@ object SplashForm: TSplashForm
     Left = 0
     Top = 0
     Width = 472
-    Height = 293
+    Height = 290
     Align = alClient
+    BevelOuter = bvNone
+    BevelWidth = 5
     TabOrder = 0
     object Image: TImage
-      Left = 1
-      Top = 1
-      Width = 470
-      Height = 272
+      Left = 0
+      Top = 0
+      Width = 472
+      Height = 271
       Align = alClient
       AutoSize = True
       Picture.Data = {
@@ -12174,12 +12176,11 @@ object SplashForm: TSplashForm
         A76943A76943A76943A76943A76943A76943A76943A76943A76943A76943A769
         43A76942A76942A76943A76943A76942A76943A76942A76942A76942A7694237
         FE2D}
-      OnClick = ImageClick
     end
     object StatusBar: TStatusBar
-      Left = 1
-      Top = 273
-      Width = 470
+      Left = 0
+      Top = 271
+      Width = 472
       Height = 19
       Panels = <>
       SimplePanel = True

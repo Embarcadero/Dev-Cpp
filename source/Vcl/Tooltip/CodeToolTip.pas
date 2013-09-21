@@ -988,9 +988,9 @@ var
   end;
 begin
 
-  ASSERT(nil <> FToolTips, 'FToolTips must not be nil');
-  ASSERT(nil <> FEditor, 'FEditor must not be nil');
-  ASSERT(nil <> FEditor.Highlighter, 'FEditor.Highlighter must not be nil');
+ // ASSERT(nil <> FToolTips, 'FToolTips must not be nil');
+ // ASSERT(nil <> FEditor, 'FEditor must not be nil');
+ // ASSERT(nil <> FEditor.Highlighter, 'FEditor.Highlighter must not be nil');
 
   //get highlighter attribute and check if the cursor is not within
   //string or comment etc.

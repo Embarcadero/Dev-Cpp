@@ -197,8 +197,6 @@ type
 		StatusBar: TStatusBar;
 		ErrorLabel: TLabel;
 		SizeOfOutput: TLabel;
-		CompResGroupBox: TGroupBox;
-		LogOutput: TMemo;
 		FindSheet: TTabSheet;
 		FindOutput: TListView;
 		FindinallfilesItem: TMenuItem;
@@ -593,6 +591,8 @@ type
 		ToolButton2: TToolButton;
 		ProfileBtn: TToolButton;
 		ProfilingInforBtn: TToolButton;
+    CompResGroupBox: TGroupBox;
+    LogOutput: TMemo;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -2544,69 +2544,61 @@ end;
 
 procedure TMainForm.actNewProjectExecute(Sender: TObject);
 var
- s: string;
+	s: string;
 begin
-	 with TNewProjectForm.Create(Self) do
-	 try
+	with TNewProjectForm.Create(Self) do
+	try
 		rbCpp.Checked := devData.DefCpp;
 		rbC.Checked := not rbCpp.Checked;
-		if ShowModal = mrOk then
-		 begin
-			 if (cbDefault.Checked) then
-				 devData.DefCpp := rbCpp.Checked;
-			 if assigned(fProject) then
-			 begin
-					if fProject.Name = '' then
-						 s:= fProject.FileName
-					else
-						 s:= fProject.Name;
-					if MessageDlg(format(Lang[ID_MSG_CLOSECREATEPROJECT], [s]), mtConfirmation,
-						 [mbYes, mbNo], 0) = mrYes then
-						 actCloseProject.Execute
+		if ShowModal = mrOk then begin
+			if (cbDefault.Checked) then
+				devData.DefCpp := rbCpp.Checked;
+			if assigned(fProject) then begin
+				if fProject.Name = '' then
+					s:= fProject.FileName
+				else
+					s:= fProject.Name;
+					if MessageDlg(format(Lang[ID_MSG_CLOSECREATEPROJECT], [s]), mtConfirmation,[mbYes, mbNo], 0) = mrYes then
+						actCloseProject.Execute
 					else begin
-						 Dec(dmMain.fProjectCount);
-						 Exit;
+						Dec(dmMain.fProjectCount);
+						Exit;
 					end;
-			 end;
-			 s := edProjectName.Text + DEV_EXT;
-			 with dmMain.SaveDialog do
-					begin
-						 Filter:= FLT_PROJECTS;
-						 InitialDir:= devDirs.Default;
-						 FileName:= s;
-						 if not Execute then
-						 begin
-								 Dec(dmMain.fProjectCount);
-								 Exit;
-						 end;
-						 s:= FileName;
-						 if FileExists(s) then
-						 begin
-								 if MessageDlg(Lang[ID_MSG_FILEEXISTS],
-										mtWarning, [mbYes, mbNo], 0) = mrYes then
-								 begin
-										 DeleteFile(s);
-										 Dec(dmMain.fProjectCount);
-								 end else
-										 Exit;
-						 end;
-					end;
-
-			 fProject:= TProject.Create(s, edProjectName.Text);
-			 if not fProject.AssignTemplate(s, GetTemplate) then
-				begin
-					fProject.Free;
-					MessageBox(Self.Handle, PChar(Lang[ID_ERR_TEMPLATE]), PChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
+			end;
+			s := edProjectName.Text + DEV_EXT;
+			with dmMain.SaveDialog do begin
+				Filter:= FLT_PROJECTS;
+				InitialDir:= devDirs.Default;
+				FileName:= s;
+				if not Execute then begin
+					Dec(dmMain.fProjectCount);
 					Exit;
 				end;
-			 fCompiler.Project:= fProject;
+				s:= FileName;
+				if FileExists(s) then begin
+					if MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrYes then begin
+						DeleteFile(s);
+						Dec(dmMain.fProjectCount);
+					end else
+						Exit;
+				end;
+			end;
 
-			 if not devData.ProjectView then
+			fProject:= TProject.Create(s, edProjectName.Text);
+			if not fProject.AssignTemplate(s, GetTemplate) then begin
+				fProject.Free;
+				MessageBox(Self.Handle, PChar(Lang[ID_ERR_TEMPLATE]), PChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
+				Exit;
+			end;
+			fCompiler.Project:= fProject;
+			fProject.SaveProjectFile;
+
+			if not devData.ProjectView then
 				actProjectManager.Execute;
-		 end;
-	 finally
+		end;
+	finally
 		Free;
-	 end;
+	end;
 end;
 
 procedure TMainForm.actNewResExecute(Sender: TObject);
@@ -6412,7 +6404,6 @@ begin
 
 	if member <> '' then begin
 
-		SetDone('Scanning for ' + member + '...');
 		len:=0;
 		len2:=0;
 		classlinenr:=0;
