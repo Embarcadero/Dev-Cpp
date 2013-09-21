@@ -156,8 +156,7 @@ type
 		fFastDep : boolean;
 
 		// Debugger
-		fModified: boolean;         // has options been changed since last compile
-		fSaveLog: boolean;          // Save Compiler Output
+		fModified: boolean; // has options been changed since last compile
 
 		procedure SetCompilerSet(const Value: integer);
 		function GetOptions(Index: integer): TCompilerOption;
@@ -186,7 +185,6 @@ type
 	published
 		property RunParams: string read fRunParams write fRunParams;
 		property UseExecParams: boolean read fUseParams write fUseParams;
-		property SaveLog: boolean read fSaveLog write fSaveLog;
 		property Delay: integer read fDelay write fDelay;
 		property FastDep: boolean read fFastDep write fFastDep;
 
@@ -782,16 +780,18 @@ begin
   if not assigned(devExternalPrograms) then
     devExternalPrograms:= TdevExternalPrograms.Create;
 
-  // load the preferred compiler set
-  if devCompilerSet.Sets.Count=0 then begin
-    // init first-run
-    devCompilerSet.Sets.Add(DEFCOMPILERSET);
-    devCompilerSet.WriteSets;
-    devCompilerSet.SaveSet(0);
-  end;
-  devCompilerSet.LoadSet(devCompiler.CompilerSet);
-  devCompilerSet.AssignToCompiler;
-  devCompilerSet.SaveSet(devCompiler.CompilerSet);
+	// load the preferred compiler set on first run
+	if devCompilerSet.Sets.Count=0 then begin
+		devCompilerSet.Sets.Add(DEFCOMPILERSET32);
+	//	devCompilerSet.Sets.Add(DEFCOMPILERSET64);
+		devCompilerSet.WriteSets;
+		devCompilerSet.SaveSet(0);
+	//	devCompilerSet.SaveSet(1);
+	end;
+
+	// Load the default one
+	devCompilerSet.LoadSet(devCompiler.CompilerSet);
+	devCompilerSet.AssignToCompiler;
 end;
 
 procedure SaveOptions;
@@ -1111,7 +1111,7 @@ begin
 
 	// Optimization
 	sl := TStringList.Create;
-	sl.Add('None=0');
+	sl.Add('');
 	sl.Add('Low=1');
 	sl.Add('Med=2');
 	sl.Add('High=3');
@@ -1121,6 +1121,7 @@ begin
 
 	// 32bit/64bit
 	sl := TStringList.Create;
+	sl.Add('');
 	sl.Add('32bit=32');
 	sl.Add('64bit=64');
 	AddOption(Lang[ID_COPT_PTRWIDTH], False, True, True, True, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], [], sl);
@@ -1248,7 +1249,6 @@ begin
 		fLinkAdd:=        LoadSettingB(key, 'LinkAdd');
 		fCompOpt:=        LoadSettingS(key, 'CompOpt');
 		fLinkOpt:=        LoadSettingS(key, 'LinkOpt');
-		fSaveLog:=        LoadSettingB(key, 'Log');
 
 		fDelay:= strtointdef(LoadSettingS(key, 'Delay'),0);
 		fFastDep:=        LoadSettingB(key, 'FastDep','1');
@@ -1355,13 +1355,6 @@ begin
 	fRunParams:= '';
 	fUseParams:= FALSE;
 	fModified:= TRUE;
-	fSaveLog:= FALSE;
-
-	// Compile delay
-	fDelay:= 0;
-
-	// Makefile
-	fFastDep:= TRUE;
 
 	// Everything else gets loaded from this set
 	fCompilerSet:=0;
@@ -1914,7 +1907,7 @@ end;
 
 procedure TdevCompilerSet.LoadSettings;
 begin
-  LoadSet(0);
+	LoadSet(0);
 end;
 
 procedure TdevCompilerSet.SaveSet(Index: integer);
@@ -1923,6 +1916,7 @@ var
 begin
 	with devData do begin
 		key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
+
 		// Programs
 		SaveSettingS(key, GCC_PROGRAM,     fgccName);
 		SaveSettingS(key, GPP_PROGRAM,     fgppName);
@@ -1957,7 +1951,7 @@ begin
 	if (Index>=0) and (Index<devCompilerSet.Sets.Count) then
 		Result:=devCompilerSet.Sets[Index]
 	else
-		Result:=DEFCOMPILERSET;
+		Result:=DEFCOMPILERSET32;
 end;
 
 procedure TdevCompilerSet.SettoDefaults;
@@ -1970,13 +1964,16 @@ begin
   fwindresName := WINDRES_PROGRAM;
   fdllwrapName := DLLWRAP_PROGRAM;
   fgprofName := GPROF_PROGRAM;
+
+  // Command line text
   fCompAdd:= FALSE;
   fLinkAdd:= TRUE;
   fCompOpt:='';
+  fLinkOpt:='-static-libstdc++ -static-libgcc';
+
+  // Makefile
   fDelay:=0;
   fFastDep:=TRUE;
-
-  fLinkOpt:='-static-libstdc++ -static-libgcc';
 
   // dirs
   fBinDir := devDirs.Bins;
@@ -2008,17 +2005,17 @@ end;
 
 procedure TdevCompilerSet.WriteSets;
 var
-  Ini: TIniFile;
-  I: integer;
+	Ini: TIniFile;
+	I: integer;
 begin
-  Ini:=TIniFile.Create(devData.INIFile);
-  try
-    Ini.EraseSection(OPT_COMPILERSETS);
-    for I:=0 to fSets.Count-1 do
-      Ini.WriteString(OPT_COMPILERSETS, IntToStr(I), fSets[I]);
-  finally
-    Ini.Free;
-  end;
+	Ini:=TIniFile.Create(devData.INIFile);
+	try
+		Ini.EraseSection(OPT_COMPILERSETS);
+		for I:=0 to fSets.Count-1 do
+			Ini.WriteString(OPT_COMPILERSETS, IntToStr(I), fSets[I]);
+	finally
+		Ini.Free;
+	end;
 end;
 
 { TdevExternalPrograms }

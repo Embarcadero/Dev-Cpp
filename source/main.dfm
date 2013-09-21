@@ -69,7 +69,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1093
-        Height = 101
+        Height = 100
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -111,7 +111,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1093
-        Height = 101
+        Height = 100
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -591,7 +591,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 1085
-            Height = 70
+            Height = 69
             Align = alClient
             Columns = <
               item
@@ -1372,8 +1372,14 @@ object MainForm: TMainForm
       end
       object ImportItem: TMenuItem
         Caption = '&Import'
-        object ImportMSVisualCproject1: TMenuItem
+        object ImportMSVisualCproject: TMenuItem
           Action = actImportMSVC
+          Caption = 'MS Visual C++ project'
+        end
+        object ImportCBCproject: TMenuItem
+          Caption = 'Code::Blocks project'
+          Enabled = False
+          OnClick = ImportCBCprojectClick
         end
       end
       object ExportItem: TMenuItem

@@ -1,8 +1,8 @@
-object ImportMSVCForm: TImportMSVCForm
-  Left = 915
-  Top = 369
+object ImportCBForm: TImportCBForm
+  Left = 572
+  Top = 319
   BorderStyle = bsDialog
-  Caption = 'Import MS Visual C++(tm) project'
+  Caption = 'Import Code::Blocks project'
   ClientHeight = 221
   ClientWidth = 365
   Color = clBtnFace
@@ -22,9 +22,9 @@ object ImportMSVCForm: TImportMSVCForm
   object lbSelect: TLabel
     Left = 8
     Top = 8
-    Width = 137
+    Width = 150
     Height = 13
-    Caption = 'Select Visual C++ project file:'
+    Caption = 'Select Code::Blocks project file:'
   end
   object btnBrowse: TSpeedButton
     Left = 336
@@ -34,13 +34,13 @@ object ImportMSVCForm: TImportMSVCForm
     Caption = '...'
     OnClick = btnBrowseClick
   end
-  object txtVC: TEdit
+  object txtCB: TEdit
     Left = 8
     Top = 24
     Width = 328
     Height = 21
     TabOrder = 0
-    Text = 'txtVC'
+    Text = 'txtCB'
     OnChange = txtDevChange
   end
   object gbOptions: TGroupBox
@@ -112,7 +112,7 @@ object ImportMSVCForm: TImportMSVCForm
     TabOrder = 3
   end
   object OpenDialog1: TOpenDialog
-    Filter = 'MSVC++ files|*.dsp'
+    Filter = 'Code::Blocks project files|*.cbp'
     Left = 212
     Top = 48
   end

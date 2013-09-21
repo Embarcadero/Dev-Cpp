@@ -634,6 +634,7 @@ begin
   FreeAndNil(fErrorsList);
 
   FormInitialized := False;
+  inherited Destroy;
 end;
 
 procedure TWebUpdateForm.UpdateSelf;

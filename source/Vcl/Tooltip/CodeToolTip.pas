@@ -885,10 +885,9 @@ begin
 
 		// Ending brace, decreace count or success!
 		end else if P[CurPos] = ')' then begin
-			if nBraces = 0 then
+			Dec(nBraces);
+			if nBraces = -1 then
 				break
-			else
-				Dec(nBraces);
 
 		// Stopping characters...
 		end else if (P[CurPos] = #0) or (P[CurPos] = ';') then begin
@@ -911,14 +910,15 @@ begin
 	end;
 
 	// If we couldn't find the closing brace or reached the start
-	if (nBraces <> 0) then begin
+	if (nBraces <> -1) then begin // -1 means found it
 		ReleaseHandle;
 		Exit;
 	end;
 
-	// We've stopped at the ending ), start walking backwards )*here*
+	// We've stopped at the ending ), start walking backwards *here*)
 	for I := 1 to FMaxScanLength do begin
-		if CurPos = 0 then break;
+		Dec(CurPos);
+		if CurPos < 1 then break;
 		case P[CurPos] of
 			'/':
 				if P[CurPos-1] = '*' then
@@ -926,26 +926,25 @@ begin
 
 			')': begin
 				Inc(nBraces);
-				if nBraces = 0 then begin
-					ReleaseHandle;
-					Exit;
-				end;
+			//	if nBraces = -1 then begin
+			//		ReleaseHandle;
+			//		Exit;
+			//	end;
 			end;
 
 			'(': begin
 				Dec(nBraces);
-				if nBraces = 0 then begin // Found it!
+				if nBraces = -2 then begin // Found it!
 					Inc(CurPos);
 					Break;
 				end;
 			end;
 
 			',': begin
-				if nBraces = 1 then
+				if nBraces = -1 then
 					Inc(nCommas);
 			end;
 		end;
-		Dec(CurPos);
 	end;
 
 	// Get the name of the function we're about to show

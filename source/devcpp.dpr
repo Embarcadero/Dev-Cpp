@@ -92,6 +92,7 @@ uses
   AddToDoFm in 'AddToDoFm.pas' {AddToDoForm},
   ViewToDoFm in 'ViewToDoFm.pas' {ViewToDoForm},
   ImportMSVCFm in 'ImportMSVCFm.pas' {ImportMSVCForm},
+  ImportCBFm in 'ImportCBFm.pas' {ImportCBForm},
   CPUFrm in 'CPUFrm.pas' {CPUForm},
   FileAssocs in 'FileAssocs.pas',
   TipOfTheDayFm in 'TipOfTheDayFm.pas' {TipOfTheDayForm},
@@ -206,10 +207,8 @@ begin
 	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Applying settings...';
 	TMainFormHack(MainForm).DoCreateEverything;
 	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Creating extra dialogs...';
-	Application.CreateForm(TfrmIncremental, frmIncremental);
 	Application.CreateForm(TfrmFind, frmFind);
 	Application.CreateForm(TfrmReplace, frmReplace);
-	Application.CreateForm(TWebUpdateForm, WebUpdateForm);
 
 	if not devData.NoSplashScreen then
 		SplashForm.Free;

@@ -34,8 +34,8 @@ resourcestring
 	// misc strings
 	GCC_VERSION          = '4.6.1';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.0.0.9 RC2+';
-	DEVCPP_BUILDTIME     = 'Dec 4 2011 - 20:17';
+	DEVCPP_VERSION       = '5.0.0.9';
+	DEVCPP_BUILDTIME     = 'Dec 9 2011 - 22:28';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -56,14 +56,10 @@ resourcestring
 	DEV_INTERNAL_THEME   = 'New Look';
 
 	// default directories
-	BIN_DIR              = '%path%' + pd + 'bin';
-	LIB_DIR              = '%path%' + pd + 'lib;%path%' + pd + 'lib' + pd + 'gcc';
-	C_INCLUDE_DIR        = '%path%' + pd + 'include';
-	CPP_INCLUDE_DIR      = '%path%' + pd + 'include;';//' +
-                         //  '%path%' + pd + 'include' + pd + 'sys;' +
-                         //  '%path%' + pd + 'include' + pd + 'ddk;' +
-                         //  '%path%' + pd + 'include' + pd + 'gdiplus;' +
-                         //  '%path%' + pd + 'include' + pd + 'GL';
+	BIN_DIR              = '%path%' + pd + 'MinGW32' + pd + 'bin';
+	LIB_DIR              = '%path%' + pd + 'MinGW32' + pd + 'lib';
+	C_INCLUDE_DIR        = '%path%' + pd + 'MinGW32' + pd + 'include';
+	CPP_INCLUDE_DIR      = '%path%' + pd + 'MinGW32' + pd + 'include';
 	LANGUAGE_DIR         = 'Lang' + pd;
 	ICON_DIR             = 'Icons' + pd;
 	HELP_DIR             = ''; // exe folder
@@ -103,7 +99,8 @@ resourcestring
   OPT_COMPILERSETS     = 'CompilerSets';
   WEBUPDATE_SECTION    = 'WEBUPDATE';
 
-  DEFCOMPILERSET       = 'MinGW GCC 4.6.1 32-bit';
+  DEFCOMPILERSET32     = 'MinGW GCC 4.6.1 32-bit';
+//  DEFCOMPILERSET64     = 'MinGW GCC 4.6.1 64-bit';
 
   // Filters
   FLT_BASE             = 'All known Files||';
@@ -115,6 +112,7 @@ resourcestring
   FLT_RES              = 'Resource scripts (*.rc)|*.rc';
   FLT_HELPS            = 'Help files (*.hlp;*.chm;*.col)|*.hlp;*.chm;*.col|HTML files (*.htm;*.html)|*.htm;*.html|Text files (*.doc;*.rtf;*.txt)|*.doc;*.rtf;*.txt|All files (*.*)|*.*';
   FLT_MSVCPROJECTS     = 'MS Visual C++ projects (*.dsp)|*.dsp';
+  FLT_CBPROJECTS       = 'Code::Blocks projects (*.cbp)|*.cbp';
 
   cBP                  = 'Break points';
   cErr                 = 'Error Line';

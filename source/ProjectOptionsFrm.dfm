@@ -72,7 +72,7 @@ object frmProjectOptions: TfrmProjectOptions
     Top = 0
     Width = 484
     Height = 305
-    ActivePage = tabCompiler
+    ActivePage = tabOutputDir
     TabOrder = 3
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -428,18 +428,22 @@ object frmProjectOptions: TfrmProjectOptions
         WordWrap = True
       end
       object OptionsTip: TLabel
-        Left = 80
+        Left = 0
         Top = 240
-        Width = 294
-        Height = 13
-        Caption = 'For more information about GCC'#39's compiler options, please visit'
+        Width = 476
+        Height = 17
+        Alignment = taCenter
+        AutoSize = False
+        Caption = 'For more information about GCC'#39's options, please visit'
       end
       object OptionsLink: TLabel
-        Left = 88
-        Top = 258
-        Width = 271
-        Height = 13
+        Left = 0
+        Top = 256
+        Width = 476
+        Height = 21
         Cursor = crHandPoint
+        Alignment = taCenter
+        AutoSize = False
         Caption = 'http://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html'
         Color = clBtnFace
         Font.Charset = DEFAULT_CHARSET

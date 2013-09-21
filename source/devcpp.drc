@@ -8,38 +8,39 @@
   resources were bound to the produced executable.
 */
 
-#define main_cPrjPath 65088
-#define main_cCurSrc 65089
-#define main_cSrcPath 65090
-#define main_cDevVer 65091
-#define main_cDefault 65092
-#define main_cExecDir 65093
-#define main_cSrcList 65094
-#define main_cWordxy 65095
-#define compiler_cAppendStr 65096
-#define compiler_cCmdLine 65097
-#define compiler_cMakeLine 65098
-#define compiler_cSingleFileMakeLine 65099
-#define compiler_cMake 65100
-#define compiler_cDots 65101
-#define compiler_cAppendStr 65102
+#define compiler_cAppendStr 65072
+#define main_cPrjFile 65088
+#define main_cPrjPath 65089
+#define main_cCurSrc 65090
+#define main_cSrcPath 65091
+#define main_cDevVer 65092
+#define main_cDefault 65093
+#define main_cExecDir 65094
+#define main_cSrcList 65095
+#define main_cWordxy 65096
+#define compiler_cAppendStr 65097
+#define compiler_cCmdLine 65098
+#define compiler_cMakeLine 65099
+#define compiler_cSingleFileMakeLine 65100
+#define compiler_cMake 65101
+#define compiler_cDots 65102
 #define compiler_cAppendStr 65103
 #define version_FLT_CPPS 65104
 #define version_FLT_RES 65105
 #define version_FLT_HELPS 65106
 #define version_FLT_MSVCPROJECTS 65107
-#define version_cBP 65108
-#define version_cErr 65109
-#define version_cABP 65110
-#define version_cGut 65111
-#define version_cSel 65112
-#define CodeToolTip_SCodeToolTipIndexXOfX 65113
-#define Templates_cTemplate 65114
-#define Templates_cEditor 65115
-#define Templates_cProject 65116
-#define main_cEXEName 65117
-#define main_cPrjName 65118
-#define main_cPrjFile 65119
+#define version_FLT_CBPROJECTS 65108
+#define version_cBP 65109
+#define version_cErr 65110
+#define version_cABP 65111
+#define version_cGut 65112
+#define version_cSel 65113
+#define CodeToolTip_SCodeToolTipIndexXOfX 65114
+#define Templates_cTemplate 65115
+#define Templates_cEditor 65116
+#define Templates_cProject 65117
+#define main_cEXEName 65118
+#define main_cPrjName 65119
 #define version_GDB_PROGRAM 65120
 #define version_WINDRES_PROGRAM 65121
 #define version_DLLWRAP_PROGRAM 65122
@@ -50,7 +51,7 @@
 #define version_OPT_OPTIONS 65127
 #define version_OPT_COMPILERSETS 65128
 #define version_WEBUPDATE_SECTION 65129
-#define version_DEFCOMPILERSET 65130
+#define version_DEFCOMPILERSET32 65130
 #define version_FLT_BASE 65131
 #define version_FLT_ALLFILES 65132
 #define version_FLT_PROJECTS 65133
@@ -458,6 +459,8 @@
 #define SysConst_SDiskFull 65535
 STRINGTABLE
 BEGIN
+	compiler_cAppendStr,	"%s -I\"%s\" "
+	main_cPrjFile,	"<PROJECTFILE>"
 	main_cPrjPath,	"<PROJECTPATH>"
 	main_cCurSrc,	"<SOURCENAME>"
 	main_cSrcPath,	"<SOURCEPATH>"
@@ -473,11 +476,11 @@ BEGIN
 	compiler_cMake,	" make"
 	compiler_cDots,	"..."
 	compiler_cAppendStr,	"%s -L\"%s\""
-	compiler_cAppendStr,	"%s -I\"%s\" "
 	version_FLT_CPPS,	"C++ source files (*.cpp;*.cc;*.cxx;*.c++;*.cp)|*.cpp;*.cc;*.cxx;*.c++;*.cp"
 	version_FLT_RES,	"Resource scripts (*.rc)|*.rc"
 	version_FLT_HELPS,	"Help files (*.hlp;*.chm;*.col)|*.hlp;*.chm;*.col|HTML files (*.htm;*.html)|*.htm;*.html|Text files (*.doc;*.rtf;*.txt)|*.doc;*.rtf;*.txt|All files (*.*)|*.*"
 	version_FLT_MSVCPROJECTS,	"MS Visual C++ projects (*.dsp)|*.dsp"
+	version_FLT_CBPROJECTS,	"Code::Blocks projects (*.cbp)|*.cbp"
 	version_cBP,	"Break points"
 	version_cErr,	"Error Line"
 	version_cABP,	"Active Breakpoints"
@@ -489,7 +492,6 @@ BEGIN
 	Templates_cProject,	"Project"
 	main_cEXEName,	"<EXENAME>"
 	main_cPrjName,	"<PROJECTNAME>"
-	main_cPrjFile,	"<PROJECTFILE>"
 	version_GDB_PROGRAM,	"gdb.exe"
 	version_WINDRES_PROGRAM,	"windres.exe"
 	version_DLLWRAP_PROGRAM,	"dllwrap.exe"
@@ -500,7 +502,7 @@ BEGIN
 	version_OPT_OPTIONS,	"Options"
 	version_OPT_COMPILERSETS,	"CompilerSets"
 	version_WEBUPDATE_SECTION,	"WEBUPDATE"
-	version_DEFCOMPILERSET,	"MinGW GCC 4.6.1 32-bit"
+	version_DEFCOMPILERSET32,	"MinGW GCC 4.6.1 32-bit"
 	version_FLT_BASE,	"All known Files||"
 	version_FLT_ALLFILES,	"All files (*.*)|*.*|"
 	version_FLT_PROJECTS,	"Dev-C++ project (*.dev)|*.dev"
@@ -531,10 +533,10 @@ BEGIN
 	version_DEV_GNOME_THEME,	"Gnome"
 	version_DEV_NEWLOOK_THEME,	"New Look"
 	version_DEV_BLUE_THEME,	"Blue"
-	version_BIN_DIR,	"%path%\\bin"
-	version_LIB_DIR,	"%path%\\lib;%path%\\lib\\gcc"
-	version_C_INCLUDE_DIR,	"%path%\\include"
-	version_CPP_INCLUDE_DIR,	"%path%\\include;"
+	version_BIN_DIR,	"%path%\\MinGW32\\bin"
+	version_LIB_DIR,	"%path%\\MinGW32\\lib"
+	version_C_INCLUDE_DIR,	"%path%\\MinGW32\\include"
+	version_CPP_INCLUDE_DIR,	"%path%\\MinGW32\\include"
 	version_LANGUAGE_DIR,	"Lang\\"
 	version_ICON_DIR,	"Icons\\"
 	version_HELP_DIR,	""
@@ -547,8 +549,8 @@ BEGIN
 	SynEditTextBuffer_SListIndexOutOfBounds,	"Invalid stringlist index %d"
 	SynEditTextBuffer_SInvalidCapacity,	"Stringlist capacity cannot be smaller than count"
 	version_DEVCPP,	"Dev-C++"
-	version_DEVCPP_VERSION,	"5.0.0.9 RC2+"
-	version_DEVCPP_BUILDTIME,	"Dec 4 2011 - 20:17"
+	version_DEVCPP_VERSION,	"5.0.0.9"
+	version_DEVCPP_BUILDTIME,	"Dec 9 2011 - 22:28"
 	version_DEFAULT_LANG_FILE,	"English.lng"
 	version_DEV_INTERNAL_OPEN,	"$__DEV_INTERNAL_OPEN"
 	version_DEV_SEARCHLOOP,	"$__DEV_SEARCH_LOOP"

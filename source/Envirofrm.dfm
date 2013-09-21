@@ -1,6 +1,6 @@
 object EnviroForm: TEnviroForm
-  Left = 549
-  Top = 302
+  Left = 830
+  Top = 307
   BorderStyle = bsDialog
   Caption = 'Environment Options'
   ClientHeight = 432
@@ -317,13 +317,18 @@ object EnviroForm: TEnviroForm
         TabOrder = 14
       end
       object cbUIfont: TComboBox
-        Left = 312
+        Left = 256
         Top = 152
-        Width = 139
-        Height = 21
-        ItemHeight = 13
+        Width = 195
+        Height = 26
+        AutoComplete = False
+        Style = csOwnerDrawVariable
+        DropDownCount = 10
+        ItemHeight = 20
+        Sorted = True
         TabOrder = 15
-        OnChange = cbUIfontChange
+        OnDrawItem = cbUIfontDrawItem
+        OnSelect = cbUIfontSelect
       end
     end
     object tabPaths: TTabSheet

@@ -1,4 +1,4 @@
-Version 5.0.0.9 - *
+Version 5.0.0.9 - 10 December 2011
 
 - Fixed a minor settings detection bug in the profiler.
 - The code completion dialog now hides its tooltips when the user chooses so by unticking "Enable editor hints", preventing an access error.
@@ -9,6 +9,12 @@ Version 5.0.0.9 - *
 - The code tooltip is quite a bit faster now.
 - Fixed a bug in the brace completion code, reported by garywho.
 - (RC2+) The function tooltip now does not show up when no prototype could be found (making it a lot faster).
+- The Environment Options UI font selector now properly shows the available fonts in an MS Word like manner.
+- Updated the compilation progress window layout.
+- Added profiles for both x86 and x64 compilers.
+- Above profiles now properly update the makefile and other settings.
+- Generic gcc and g++ errors like unrecongised command line options are now properly displayed in the list box.
+- Slightly lowered the (first time) launch speeds.
 
 Version 5.0.0.8 - 20 November 2011
 

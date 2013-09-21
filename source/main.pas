@@ -426,7 +426,6 @@ type
 		Renamefolder1: TMenuItem;
 		actImportMSVC: TAction;
 		ImportItem: TMenuItem;
-		ImportMSVisualCproject1: TMenuItem;
 		N41: TMenuItem;
 		ToggleBreakpointPopupItem: TMenuItem;
 		AddWatchPopupItem: TMenuItem;
@@ -861,6 +860,7 @@ type
 		procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure PageControlChanging(Sender: TObject;
       var AllowChange: Boolean);
+    procedure ImportCBCprojectClick(Sender: TObject);
 
 	private
 		fTab				: integer;
@@ -962,7 +962,7 @@ uses
 	debugfrm, Types, Prjtypes, devExec,
 	NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
 	ProfileAnalysisFm, debugwait, FilePropertiesFm, AddToDoFm, ViewToDoFm,
-	ImportMSVCFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
+	ImportMSVCFm, ImportCBFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
 	WindowListFrm, ParamsFrm, WebUpdate, ProcessListFrm, ModifyVarFrm, SynEditHighlighter;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -3160,7 +3160,10 @@ begin
 end;
 
 procedure TMainForm.actUpdateCheckExecute(Sender: TObject);
+var
+	WebUpdateForm : TWebUpdateForm;
 begin
+	WebUpdateForm:=TWebUpdateForm.Create(self);
 	WebUpdateForm.Show;
 end;
 
@@ -3251,7 +3254,7 @@ end;
 
 procedure TMainForm.actFindExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	SearchCenter.Project:= fProject;
@@ -3818,14 +3821,21 @@ procedure TMainForm.actIncrementalExecute(Sender: TObject);
 var
 	pt: TPoint;
 begin
+
 	SearchCenter.Editor := GetEditor;
 	SearchCenter.AssignSearchEngine;
 
 	pt:= ClienttoScreen(point(PageControl.Left, PageControl.Top));
-	frmIncremental.Left:= pt.x;
-	frmIncremental.Top:= pt.y;
-	frmIncremental.Editor:= GetEditor.Text;
-	frmIncremental.ShowModal;
+
+	// Only create the form when we need to do so
+	FrmIncremental:=TFrmIncremental.Create(Self);
+	FrmIncremental.Left:= pt.x;
+	FrmIncremental.Top:= pt.y;
+	FrmIncremental.Editor:= GetEditor.Text;
+	FrmIncremental.ShowModal;
+
+	// After closing, destroy
+	FrmIncremental.Destroy;
 end;
 
 procedure TMainForm.CompilerOutputDblClick(Sender: TObject);
@@ -6839,6 +6849,14 @@ begin
 	end;
 end;
 
+
+procedure TMainForm.ImportCBCprojectClick(Sender: TObject);
+begin
+	with TImportCBForm.Create(Self) do begin
+		if ShowModal=mrOK then
+			OpenProject(GetFilename);
+	end;
+end;
 
 end.
 

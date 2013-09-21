@@ -776,6 +776,15 @@ const
   ID_MSVC_MSG_SUCCESS               = 52006;
   ID_MSVC_MSG_CANTLOCATETARGET      = 52007;
 
+  //Import CB form
+  ID_CB_MENUITEM                    = 52101;
+  ID_CB_SELECTCB                    = 52102;
+  ID_CB_OPTIONS                     = 52103;
+  ID_CB_CONFIGURATION               = 52104;
+  ID_CB_SELECTDEV                   = 52105;
+  ID_CB_MSG_SUCCESS                 = 52106;
+  ID_CB_MSG_CANTLOCATETARGET        = 52107;
+
   //Project Options
   ID_POPT                           = 53001;
   ID_POPT_GENTAB                    = 53002;

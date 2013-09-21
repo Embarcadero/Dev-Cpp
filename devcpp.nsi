@@ -1,7 +1,7 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "5.0.0.8"
+!define DEVCPP_VERSION "5.0.0.9"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 Var LOCAL_APPDATA
@@ -111,10 +111,6 @@ Section "Dev-C++ program files (required)" SectionMain
   File "Lang\English.*"
   SetOutPath $INSTDIR\Templates
   File "Templates\*"
-  SetOutPath $INSTDIR\bin
-  File "bin\rm.exe"
-  SetOutPath $INSTDIR\Packages
-  File "Packages\Dev-C++_Map.entry"
 SectionEnd
 
 Section "Example files" SectionExamples
@@ -142,24 +138,20 @@ SectionEnd
 Section "Icon files" SectionIcons
   SectionIn 1
   SetOutPath $INSTDIR\Icons
-  File "Icons\*.*"
+  File /nonfatal /r "Icons\*.*"
 SectionEnd
 
-Section "MinGW compiler system" SectionMingw
+Section "MinGW32 compiler" SectionMinGW32
   SectionIn 1 2
   SetOutPath $INSTDIR
 
-  File /r "bin"
-  File /r "include"
-  File /r "lib"
-  File /r "libexec"
-  File /r "mingw32"
+  File /nonfatal /r "MinGW32"
 SectionEnd
 
 Section "Language files" SectionLangs
   SectionIn 1
   SetOutPath $INSTDIR\Lang
-  File "Lang\*"
+  File /nonfatal /r "Lang\*"
 SectionEnd
 
 # [File association]
@@ -385,7 +377,7 @@ SectionEnd
 LangString DESC_SectionMain        ${LANG_ENGLISH} "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
 LangString DESC_SectionExamples    ${LANG_ENGLISH} "Example projects for simple console and GUI applications"
 LangString DESC_SectionIcons       ${LANG_ENGLISH} "Various icons that you can use in your programs"
-LangString DESC_SectionMingw       ${LANG_ENGLISH} "The MinGW gcc compiler and associated tools, headers and libraries"
+LangString DESC_SectionMinGW32     ${LANG_ENGLISH} "The MinGW GCC 32-bit compiler and associated tools, headers and libraries"
 LangString DESC_SectionLangs       ${LANG_ENGLISH} "The Dev-C++ interface translated to different languages (other than English which is built-in)"
 LangString DESC_SectionAssocs      ${LANG_ENGLISH} "Use Dev-C++ as the default application for opening these types of files"
 LangString DESC_SectionShortcuts   ${LANG_ENGLISH} "Create shortcuts to Dev-C++ in various folders"
@@ -395,7 +387,7 @@ LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configur
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        $(DESC_SectionMain)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionExamples}    $(DESC_SectionExamples)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       $(DESC_SectionIcons)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionMingw}       $(DESC_SectionMingw)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionMinGW32}     $(DESC_SectionMinGW32)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       $(DESC_SectionLangs)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      $(DESC_SectionAssocs)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   $(DESC_SectionShortcuts)
@@ -594,15 +586,11 @@ Section "Uninstall"
   Delete "$INSTDIR\copying.txt"
   Delete "$INSTDIR\devcpp.chm"
 
-  RMDir /r "$INSTDIR\bin"
+  RMDir /r "$INSTDIR\MinGW32"
+  RMDir /r "$INSTDIR\Lang"
   RMDir /r "$INSTDIR\Examples"
   RMDir /r "$INSTDIR\Help"
   RMDir /r "$INSTDIR\Icons"
-  RMDir /r "$INSTDIR\include"
-  RMDir /r "$INSTDIR\Lang"
-  RMDir /r "$INSTDIR\lib"
-  RMDir /r "$INSTDIR\libexec"
-  RMDir /r "$INSTDIR\mingw32"
   RMDir /r "$INSTDIR\Packages"
   RMDir /r "$INSTDIR\Templates"
 

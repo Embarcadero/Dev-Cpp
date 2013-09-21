@@ -116,8 +116,9 @@ type
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
-    procedure cbUIfontChange(Sender: TObject);
     procedure cvsdownloadlabelClick(Sender: TObject);
+    procedure cbUIfontSelect(Sender: TObject);
+    procedure cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
   private
     procedure LoadText;
   end;
@@ -212,7 +213,7 @@ end;
 procedure TEnviroForm.FormShow(Sender: TObject);
 var
 	idx: integer;
- 	DC: HDC;
+	DC: HDC;
 begin
 	with devData do begin
 		rgbAutoOpen.ItemIndex:= AutoOpen;
@@ -274,9 +275,11 @@ begin
 		DC:= GetDC(application.handle);
 		EnumFontFamilies(DC, nil, @EnumFontFamilyProc, integer(cbUIfont.Items));
 		ReleaseDC(0, DC);
-		cbUIfont.Sorted:= TRUE;
-		cbUIfont.Text:=InterfaceFont;
-		cbUIfont.Font.Name:=cbUIfont.Text;
+		for idx:=0 to pred(cbUIfont.Items.Count) do
+			if cbUIfont.Items.Strings[idx] = InterfaceFont then begin
+				cbUIfont.ItemIndex := idx;
+				break;
+			end;
 	end;
 end;
 
@@ -529,14 +532,23 @@ begin
   btnAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
 end;
 
-procedure TEnviroForm.cbUIfontChange(Sender: TObject);
+procedure TEnviroForm.cvsdownloadlabelClick(Sender: TObject);
+begin
+	ShellExecute(GetDesktopWindow(), 'open', PChar((Sender as TLabel).Caption), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TEnviroForm.cbUIfontSelect(Sender: TObject);
 begin
 	(Sender as TComboBox).Font.Name := (Sender as TComboBox).Text;
 end;
 
-procedure TEnviroForm.cvsdownloadlabelClick(Sender: TObject);
+procedure TEnviroForm.cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 begin
-	ShellExecute(GetDesktopWindow(), 'open', PChar((Sender as TLabel).Caption), nil, nil, SW_SHOWNORMAL);
+	with (Control as TComboBox) do begin
+		Canvas.Font.Name := Items.Strings[Index];
+		Canvas.FillRect(Rect);
+		Canvas.TextOut(Rect.Left, Rect.Top, Canvas.Font.Name);
+	end;
 end;
 
 end.

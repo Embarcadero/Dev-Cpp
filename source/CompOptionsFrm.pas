@@ -487,8 +487,10 @@ begin
     cbLinkerAdd.Checked:=AddtoLink;
     Commands.Lines.Text:=CompOpts;
     Linker.Lines.Text:=LinkOpts;
-
+    seCompDelay.Value:=Delay;
+    cbFastDep.Checked:=FastDep;
   end;
+
   DirTabsChange(DirTabs);
 
   with devCompilerSet do begin

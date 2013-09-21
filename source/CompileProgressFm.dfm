@@ -1,11 +1,11 @@
 object CompileProgressForm: TCompileProgressForm
-  Left = 501
-  Top = 393
+  Left = 856
+  Top = 454
   BorderIcons = []
   BorderStyle = bsToolWindow
   Caption = 'Compile Progress'
-  ClientHeight = 217
-  ClientWidth = 337
+  ClientHeight = 223
+  ClientWidth = 336
   Color = clBtnFace
   Constraints.MinHeight = 229
   Constraints.MinWidth = 284
@@ -20,13 +20,13 @@ object CompileProgressForm: TCompileProgressForm
   OnClose = FormClose
   OnShow = FormShow
   DesignSize = (
-    337
-    217)
+    336
+    223)
   PixelsPerInch = 96
   TextHeight = 13
   object btnClose: TButton
-    Left = 130
-    Top = 184
+    Left = 129
+    Top = 190
     Width = 80
     Height = 25
     Anchors = [akBottom]
@@ -38,8 +38,8 @@ object CompileProgressForm: TCompileProgressForm
   object PageControl1: TPageControl
     Left = 0
     Top = 4
-    Width = 336
-    Height = 145
+    Width = 335
+    Height = 151
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     Style = tsFlatButtons
@@ -47,46 +47,46 @@ object CompileProgressForm: TCompileProgressForm
     object TabSheet1: TTabSheet
       Caption = 'Progress'
       DesignSize = (
-        328
-        114)
+        327
+        120)
       object Bevel4: TBevel
         Left = 0
         Top = 0
-        Width = 328
-        Height = 114
+        Width = 327
+        Height = 120
         Align = alClient
         Style = bsRaised
       end
       object Bevel5: TBevel
         Left = 56
-        Top = 88
+        Top = 92
         Width = 69
         Height = 21
       end
       object Bevel6: TBevel
         Left = 252
-        Top = 88
+        Top = 92
         Width = 69
         Height = 21
       end
       object Bevel3: TBevel
         Left = 56
-        Top = 60
-        Width = 263
+        Top = 64
+        Width = 262
         Height = 21
         Anchors = [akLeft, akTop, akRight]
       end
       object Bevel2: TBevel
         Left = 56
         Top = 36
-        Width = 263
+        Width = 262
         Height = 21
         Anchors = [akLeft, akTop, akRight]
       end
       object Bevel1: TBevel
         Left = 56
         Top = 8
-        Width = 262
+        Width = 261
         Height = 21
         Anchors = [akLeft, akTop, akRight]
       end
@@ -132,14 +132,14 @@ object CompileProgressForm: TCompileProgressForm
       end
       object Label5: TLabel
         Left = 8
-        Top = 64
+        Top = 68
         Width = 19
         Height = 13
         Caption = 'File:'
       end
       object lblFile: TLabel
         Left = 60
-        Top = 64
+        Top = 68
         Width = 34
         Height = 13
         Caption = 'lblFile'
@@ -152,7 +152,7 @@ object CompileProgressForm: TCompileProgressForm
       end
       object Label2: TLabel
         Left = 8
-        Top = 92
+        Top = 96
         Width = 30
         Height = 13
         Caption = 'Errors:'
@@ -166,7 +166,7 @@ object CompileProgressForm: TCompileProgressForm
       end
       object lblErr: TLabel
         Left = 60
-        Top = 92
+        Top = 96
         Width = 60
         Height = 13
         Alignment = taRightJustify
@@ -181,7 +181,7 @@ object CompileProgressForm: TCompileProgressForm
       end
       object lblWarn: TLabel
         Left = 256
-        Top = 92
+        Top = 96
         Width = 60
         Height = 13
         Alignment = taRightJustify
@@ -201,8 +201,8 @@ object CompileProgressForm: TCompileProgressForm
       object Memo1: TMemo
         Left = 0
         Top = 0
-        Width = 328
-        Height = 114
+        Width = 327
+        Height = 120
         Align = alClient
         Color = clBtnFace
         Font.Charset = GREEK_CHARSET
@@ -223,8 +223,8 @@ object CompileProgressForm: TCompileProgressForm
   end
   object pb: TProgressBar
     Left = 4
-    Top = 151
-    Width = 329
+    Top = 157
+    Width = 328
     Height = 24
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 2

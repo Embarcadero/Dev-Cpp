@@ -278,7 +278,8 @@ begin
 		writeln(F, 'WINDRES  = ' + devCompiler.windresName)
 	else
 		writeln(F, 'WINDRES  = ' + WINDRES_PROGRAM);
-	writeln(F, 'RES      = ' + ObjResFile);
+	if(ObjResFile <> '') then
+		writeln(F, 'RES      = ' + ObjResFile);
 	writeln(F, 'OBJ      ='  + Objects     + ' $(RES)');
 	writeln(F, 'LINKOBJ  ='  + LinkObjects + ' $(RES)');
 	tmp:=StringReplace(fLibrariesParams, '\', '/', [rfReplaceAll]);
@@ -886,7 +887,7 @@ var
 	O_Col,		// offset in line
 	O_Msg,		// message for error
 	Line,LowerLine: string;
-	Messages, IMod: Integer;
+	Messages{, IMod}: Integer;
 	gcc, gpp : string;
 begin
 	Messages := 0;
@@ -904,25 +905,30 @@ begin
 
 	try
 		LOutput.Text:= fdevRun.Output;
-		IMod := CalcMod(pred(LOutput.Count));
+	//	IMod := CalcMod(pred(LOutput.Count));
 
 		for curLine := 0 to pred(LOutput.Count) do begin
-			if (IMod = 0) or (curLine mod IMod = 0) then
-				Application.ProcessMessages;
+		//	if (IMod = 0) or (curLine mod IMod = 0) then
+		//		Application.ProcessMessages;
 
 			Line := LOutput.Strings[curLine];
 			LowerLine := LowerCase(Line);
 
 			if Messages > 500 then begin
-				DoOutput('','','','[General Error] Too many messages; abort.');
+				DoOutput('','','','[General Error] Too many messages, aborting...');
 				DoOutput('','','','[General Error] There must be something terribly wrong with your code. Please fix it. ;)');
 				Break;
 			end;
 
+			// Defaults...
+			O_Line := '';
+			O_Col := '';
+			O_File := '';
+
 			{ Is this a compiler message? }
 			if (Pos(':', Line) <= 0) or
-				(CompareText(Copy(LowerLine, 1, 7), gpp) = 0) or
-				(CompareText(Copy(LowerLine, 1, 7), gcc) = 0) or
+				(CompareText(Copy(LowerLine, 1, 8), gpp + ' ') = 0) or
+				(CompareText(Copy(LowerLine, 1, 8), gcc + ' ') = 0) or
 				(CompareText(Copy(LowerLine, 1, 12), 'dllwrap.exe ') = 0) or
 				(Pos('make.exe: nothing to be done for ', LowerLine) > 0) or
 				(Pos('has modification time in the future', LowerLine) > 0) or
@@ -1278,13 +1284,17 @@ begin
 
 					// Get column number
 					cpos := GetLastPos(':', Line);
-					O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
-					Delete(Line, cpos, Length(Line) - cpos + 1);
+					if cpos > 0 then begin
+						O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
+						Delete(Line, cpos, Length(Line) - cpos + 1);
+					end;
 
 					// Get line number
 					cpos := GetLastPos(':', Line);
-					O_Line := Copy(Line, cpos + 1, Length(Line) - cpos + 1);
-					Delete(Line, cpos, Length(Line) - cpos + 1);
+					if cpos > 0 then begin
+						O_Line := Copy(Line, cpos + 1, Length(Line) - cpos + 1);
+						Delete(Line, cpos, Length(Line) - cpos + 1);
+					end;
 
 					O_Msg := '[Error] ' + O_Msg;
 					O_File := Line;
@@ -1326,19 +1336,11 @@ begin
 		end;
 	finally
 		Application.ProcessMessages;
-		if devCompiler.SaveLog then try
-			if (fTarget = ctProject) and assigned(fProject) then
-				LOutput.SavetoFile(ChangeFileExt(fProject.FileName, '.compiler.out'))
-			else
-				LOutput.SavetoFile(ChangeFileExt(fSourceFile, '.compiler.out'));
-		except
-			// take the beating
-		end;
 		LOutput.Free;
 	end;
 
 	// there are no compiler errors/warnings
-	if (Assigned(fOnSuccess)) then
+	if Assigned(fOnSuccess) then
 		fOnSuccess(Messages);
 end;
 

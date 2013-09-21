@@ -1,6 +1,6 @@
 object CompForm: TCompForm
-  Left = 669
-  Top = 474
+  Left = 758
+  Top = 364
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -123,7 +123,7 @@ object CompForm: TCompForm
     Top = 0
     Width = 464
     Height = 350
-    ActivePage = tabCodeGen
+    ActivePage = tabCompiler
     TabOrder = 4
     object tabCompiler: TTabSheet
       Caption = 'Compiler'
@@ -143,19 +143,17 @@ object CompForm: TCompForm
         Left = 28
         Top = 78
         Width = 401
-        Height = 43
+        Height = 57
         Anchors = [akLeft, akTop, akRight]
-        Ctl3D = True
-        ParentCtl3D = False
         ScrollBars = ssVertical
         TabOrder = 1
         WantReturns = False
       end
       object grpMakefileGen: TGroupBox
         Left = 24
-        Top = 216
+        Top = 224
         Width = 409
-        Height = 89
+        Height = 81
         Caption = '  Makefile generation:  '
         TabOrder = 2
         object lblDelay: TLabel
@@ -198,7 +196,7 @@ object CompForm: TCompForm
       end
       object cbLinkerAdd: TCheckBox
         Left = 16
-        Top = 131
+        Top = 138
         Width = 397
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -207,7 +205,7 @@ object CompForm: TCompForm
       end
       object Linker: TMemo
         Left = 28
-        Top = 152
+        Top = 159
         Width = 401
         Height = 57
         ScrollBars = ssVertical
@@ -343,20 +341,22 @@ object CompForm: TCompForm
     object tabCodeGen: TTabSheet
       Caption = 'Settings'
       object OptionsTip: TLabel
-        Left = 96
-        Top = 283
-        Width = 252
-        Height = 13
+        Left = 0
+        Top = 282
+        Width = 456
+        Height = 17
         Alignment = taCenter
+        AutoSize = False
         Caption = 'For more information about GCC'#39's options, please visit'
       end
       object OptionsLink: TLabel
-        Left = 88
-        Top = 300
-        Width = 271
-        Height = 13
+        Left = 0
+        Top = 304
+        Width = 456
+        Height = 18
         Cursor = crHandPoint
         Alignment = taCenter
+        AutoSize = False
         Caption = 'http://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html'
         Color = clBtnFace
         Font.Charset = DEFAULT_CHARSET
