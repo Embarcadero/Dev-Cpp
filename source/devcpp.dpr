@@ -154,8 +154,8 @@ begin
 	end;
 
 	// Create and fill settings structures
-	InitializeOptions;
 	devData.ReadConfigData; // fill devData ???
+	InitializeOptions;
 
 	// Display it as soon as possible, and only if its worth viewing...
 	if (not devData.NoSplashScreen and devCodeCompletion.UseCacheFiles) or devData.First then

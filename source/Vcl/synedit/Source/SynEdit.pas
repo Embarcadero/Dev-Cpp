@@ -3264,7 +3264,7 @@ var
     vEndRow: integer;
     //### Code Folding ###
     FoldRange: TSynEditFoldRange;
-    i,X,Y : integer;
+    i,X,Y,Yend : integer;
     //### End Code Folding ###
   begin
     // Initialize rcLine for drawing. Note that Top and Bottom are updated
@@ -3504,7 +3504,9 @@ var
 						if (ToLine > RowToLine(cRow)) and not Collapsed and not ParentCollapsed and (Indent > 0) then begin
 
 							X := Indent * CharWidth + fTextOffset - 2;
-							Y := rcLine.Top + rcLine.Top mod 2;
+							Y := rcLine.Top;
+							if (nLine mod 2) = 1 then
+								Inc(Y);
 
 							while Y < rcLine.Bottom do begin
 								Canvas.MoveTo(X, Y);

@@ -1,6 +1,6 @@
 object CompOptForm: TCompOptForm
-  Left = 1173
-  Top = 515
+  Left = 500
+  Top = 273
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -82,29 +82,6 @@ object CompOptForm: TCompOptForm
       0000}
     NumGlyphs = 2
   end
-  object btnDefault: TBitBtn
-    Left = 10
-    Top = 370
-    Width = 85
-    Height = 25
-    Caption = '&Default'
-    TabOrder = 2
-    OnClick = btnDefaultClick
-    Glyph.Data = {
-      76010000424D7601000000000000760000002800000020000000100000000100
-      04000000000000010000120B0000120B00001000000000000000000000000000
-      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
-      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
-      3333333333333333333333333333333333333333333333333333333333333333
-      3333333333333FF3333333333333003333333333333F77F33333333333009033
-      333333333F7737F333333333009990333333333F773337FFFFFF330099999000
-      00003F773333377777770099999999999990773FF33333FFFFF7330099999000
-      000033773FF33777777733330099903333333333773FF7F33333333333009033
-      33333333337737F3333333333333003333333333333377333333333333333333
-      3333333333333333333333333333333333333333333333333333333333333333
-      3333333333333333333333333333333333333333333333333333}
-    NumGlyphs = 2
-  end
   object btnHelp: TBitBtn
     Left = 390
     Top = 430
@@ -112,7 +89,7 @@ object CompOptForm: TCompOptForm
     Height = 25
     Anchors = [akLeft, akBottom]
     Enabled = False
-    TabOrder = 3
+    TabOrder = 2
     OnClick = btnHelpClick
     Kind = bkHelp
   end
@@ -123,7 +100,7 @@ object CompOptForm: TCompOptForm
     Width = 484
     Height = 425
     ActivePage = tabCompiler
-    TabOrder = 4
+    TabOrder = 3
     object tabCompiler: TTabSheet
       Caption = 'Compiler'
       DesignSize = (

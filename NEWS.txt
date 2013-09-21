@@ -1,9 +1,9 @@
 Version 5.3.0.0 - *
 
 - Completely rewritten the debugger.
-- Improved some internal (compiler) data structures, reducing memory usage.
-- Improved startup speed, splashscreen is hidden (not loaded) when startup times are low enough.
-- Fixed a lot of memory leaks.
+- Improved some internal (compiler) data structures, reducing memory usage and potentially improving stability by simplifying code.
+- Improved startup speed, splashscreen is hidden (not even loaded) when startup times are low enough.
+- Fixed nearly all of memory leaks.
 - Indent guides are now painted faster, reducing flicker.
 - Code completion is now more clear and pops up faster.
 - Color selectors in Editor Options now properly set their own defaults, not those of other controls.

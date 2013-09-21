@@ -179,7 +179,6 @@ function TCompiler.NewMakeFile(var F : TextFile) : boolean;
 var
 	ObjResFile, Objects, LinkObjects, Comp_ProgCpp, Comp_Prog, ofile, tfile, tmp: AnsiString;
 	i: integer;
-	opt: PCompilerOption;
 begin
 
 	// Create OBJ output directory
@@ -235,15 +234,14 @@ begin
 	else
 		Comp_Prog:= GCC_PROGRAM;
 
-	if devCompiler.FindOption('-g3', opt, i) then
-		if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[i+1]='1') then begin
-			Comp_ProgCpp:=Comp_ProgCpp+' -D__DEBUG__';
-			Comp_Prog:=Comp_Prog+' -D__DEBUG__';
-		end;
-
 	GetCompileParams;
 	GetLibrariesParams;
 	GetIncludesParams;
+
+	if (Pos(' -g3',fCompileParams) > 0) then begin
+		Comp_ProgCpp := Comp_ProgCpp+' -D__DEBUG__';
+		Comp_Prog := Comp_Prog+' -D__DEBUG__';
+	end;
 
 	fMakefile := fProject.Directory + 'Makefile.win';
 	DoLogEntry('Building Makefile "' + fMakefile + '"');

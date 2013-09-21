@@ -2588,7 +2588,7 @@ begin
 			ShowModal;
 			CheckForDLLProfiling;
 		finally
-			Free;
+			Close;
 		end;
 end;
 
@@ -4654,7 +4654,7 @@ begin
 	if (fProject.Options.typ in [dptDyn, dptStat]) and (opt.optValue > 0) then begin
 		// project is a lib or a dll, and profiling is enabled
 		// check for the existence of "-lgmon" in project's linker options
-		if Pos('-lgmon', fProject.Options.cmdLines.Linker)=0 then
+		if Pos('-lgmon', fProject.Options.cmdLines.Linker) = 0 then
 			// does not have -lgmon
 			// warn the user that we should update its project options and include
 			// -lgmon in linker options, or else the compilation will fail

@@ -79,9 +79,6 @@ type
 
 		fDelay : integer;
 		fFastDep : boolean;
-
-		procedure WriteSets;
-		procedure UpdateSets;
 	public
 
 		fOptionString : AnsiString; // options in INI format
@@ -89,12 +86,13 @@ type
 
 		constructor Create;
 		destructor Destroy; override;
-		procedure SettoDefaults;
-		procedure SaveSettings;
-		procedure LoadSettings;
+		procedure SettoDefaults(const setname : AnsiString);
 
 		procedure SaveSet(Index: integer);
 		procedure LoadSet(Index: integer);
+
+		procedure WriteSets;
+		procedure ReadSets;
 
 		// Set stuff
 		property Sets: TStrings read fSets write fSets;
@@ -570,7 +568,6 @@ function DevData: TdevData;
 procedure InitializeOptions;
 procedure SaveOptions;
 procedure FinalizeOptions;
-procedure ResettoDefaults;
 procedure CheckForAltConfigFile(const filename: AnsiString);
 procedure UpdateAltConfigFile;
 
@@ -612,6 +609,33 @@ begin
 	if not assigned(devCompiler) then
 		devCompiler:= TdevCompiler.Create;
 
+	// load available compiler sets on first run
+	if devData.First then begin
+
+		// Prefer MinGW64...
+		if DirectoryExists(devDirs.fExec + 'MinGW64') then begin
+
+			devCompiler.Sets.Add(DEFCOMPILERSET64);
+			devCompiler.SettoDefaults(DEFCOMPILERSET64);
+			devCompiler.SaveSet(devCompiler.Sets.Count-1);
+
+			devCompiler.Sets.Add(DEFCOMPILERSET64ALT);
+			devCompiler.SettoDefaults(DEFCOMPILERSET64ALT);
+			devCompiler.SaveSet(devCompiler.Sets.Count-1);
+		end;
+		if DirectoryExists(devDirs.fExec + 'MinGW32') then begin
+			devCompiler.Sets.Add(DEFCOMPILERSET32);
+			devCompiler.SettoDefaults(DEFCOMPILERSET32);
+			devCompiler.SaveSet(devCompiler.Sets.Count-1);
+		end;
+
+		// Write the compiler list
+		devCompiler.WriteSets;
+	end;
+
+	// Load the current compiler set
+	devCompiler.LoadSet(devCompiler.fCurrentSet);
+
 	if not assigned(devEditor) then
 		devEditor:= TdevEditor.Create;
 
@@ -626,63 +650,18 @@ begin
 
 	if not assigned(devExternalPrograms) then
 		devExternalPrograms:= TdevExternalPrograms.Create;
-
-	// load the preferred compiler set on first run
-	if devCompiler.Sets.Count = 0 then begin
-		if DirectoryExists(devDirs.fExec + 'MinGW32') then begin
-			devCompiler.Sets.Add(DEFCOMPILERSET32);
-
-			// Write the compiler list
-			devCompiler.WriteSets;
-
-			// Write the default compiler itself
-			devCompiler.SaveSet(0);
-		end else begin
-			devCompiler.Sets.Add(DEFCOMPILERSET64);
-			devCompiler.Sets.Add(DEFCOMPILERSET64ALT);
-
-			// Write the compiler list
-			devCompiler.WriteSets;
-
-			// Write the default compiler itself
-			devCompiler.SaveSet(0);
-
-			// Load the 32bit configuration - hacky fix
-			devCompiler.fLibDir := ReplaceFirstStr(LIB_DIR64ALT,'%path%\',devDirs.fExec);
-			devCompiler.fOptionString := '0000000100000000000000000';
-			devCompiler.gdbName := 'gdb32.exe';
-
-			// And write the 32bit one
-			devCompiler.SaveSet(1);
-		end;
-	end;
-
-	// Load the current compiler one
-	devCompiler.LoadSet(devCompiler.fCurrentSet);
 end;
 
 procedure SaveOptions;
 begin
   devData.SaveConfigData;
   devDirs.SaveSettings;
-  // devCompiler lets devData do the work
+  // devCompiler saving is done by CompOptForm
   devEditor.SaveSettings;
   devCodeCompletion.SaveSettings;
   devClassBrowsing.SaveSettings;
   devCVSHandler.SaveSettings;
   devExternalPrograms.SaveSettings;
-end;
-
-procedure ResettoDefaults;
-begin
-  devData.SettoDefaults;
-  devDirs.SettoDefaults;
-  devCompiler.SettoDefaults;
-  devEditor.SettoDefaults;
-  devCodeCompletion.SettoDefaults;
-  devClassBrowsing.SettoDefaults;
-  // CVS has no defaults
-  devExternalPrograms.SetToDefaults;
 end;
 
 procedure FinalizeOptions;
@@ -869,8 +848,8 @@ begin
 	inherited;
 	fSets := TStringList.Create;
 	fOptionList := TList.Create;
-	UpdateSets;
-	SettoDefaults;
+	AddDefaultOptions;
+	ReadSets;
 end;
 
 destructor TdevCompiler.Destroy;
@@ -891,7 +870,7 @@ procedure TdevCompiler.OptionListToString;
 var
 	I : integer;
 begin
-	fOptionString:='';
+	fOptionString := '';
 	for I := 0 to fOptionList.Count - 1 do
 		fOptionString := fOptionString + ValueToChar[PCompilerOption(fOptionList[I])^.optValue];
 end;
@@ -909,7 +888,7 @@ procedure TdevCompiler.SetOption(option : PCompilerOption;index : integer;newval
 begin
 	if Assigned(option) then
 		option^.optValue := CharToValue(newvalue);
-	fOptionString[index+1] := newvalue;
+	fOptionString[index+1] := newvalue; // string might not be built yet...
 end;
 
 procedure TdevCompiler.LoadSet(Index: integer);
@@ -1020,11 +999,6 @@ begin
 	SetPath(fBinDir);
 end;
 
-procedure TdevCompiler.LoadSettings;
-begin
-	LoadSet(0);
-end;
-
 procedure TdevCompiler.SaveSet(Index: integer);
 var
 	key: AnsiString;
@@ -1061,52 +1035,62 @@ begin
 	end;
 end;
 
-procedure TdevCompiler.SaveSettings;
+procedure TdevCompiler.SettoDefaults(const setname : AnsiString);
+var
+	optP : PCompilerOption;
+	idxP : integer;
 begin
-	WriteSets;
-end;
 
-procedure TdevCompiler.SettoDefaults;
-begin
-	// Programs
+	// Store program names
 	fgccName := GCC_PROGRAM;
 	fgppName := GPP_PROGRAM;
-	fgdbName := GDB_PROGRAM;
+	if SameStr(Setname,DEFCOMPILERSET64ALT) then
+		fgdbName := 'gdb32.exe'
+	else
+		fgdbName := GDB_PROGRAM;
 	fmakeName := MAKE_PROGRAM;
 	fwindresName := WINDRES_PROGRAM;
 	fdllwrapName := DLLWRAP_PROGRAM;
 	fgprofName := GPROF_PROGRAM;
 
 	// Command line text
-	fCompAdd:= FALSE;
-	fLinkAdd:= TRUE;
-	fCompOpt:='';
-	if DirectoryExists(devDirs.Exec + 'MinGW64') then
-		fLinkOpt:='-static-libgcc'
+	fCompAdd := FALSE;
+	fLinkAdd := TRUE;
+	fCompOpt :='';
+	if SameStr(setname,DEFCOMPILERSET32) then
+		fLinkOpt := '-static-libstdc++ -static-libgcc' // MinGW32 requires special treatment
 	else
-		fLinkOpt:='-static-libstdc++ -static-libgcc';
+		fLinkOpt := '-static-libgcc';
 
-	if DirectoryExists(devDirs.fExec + 'MinGW64') then begin
-		fBinDir:= ReplaceFirstStr(BIN_DIR64,        '%path%\',devDirs.fExec);
-		fLibDir:= ReplaceFirstStr(LIB_DIR64,        '%path%\',devDirs.fExec);
-		fCDir  := ReplaceFirstStr(C_INCLUDE_DIR64,  '%path%\',devDirs.fExec);
-		fCppDir:= ReplaceFirstStr(CPP_INCLUDE_DIR64,'%path%\',devDirs.fExec);
-	end else if DirectoryExists(devDirs.fExec + 'MinGW32') then begin
+	if SameStr(setname,DEFCOMPILERSET32) then begin
 		fBinDir:= ReplaceFirstStr(BIN_DIR32,        '%path%\',devDirs.fExec);
 		fLibDir:= ReplaceFirstStr(LIB_DIR32,        '%path%\',devDirs.fExec);
 		fCDir  := ReplaceFirstStr(C_INCLUDE_DIR32,  '%path%\',devDirs.fExec);
 		fCppDir:= ReplaceFirstStr(CPP_INCLUDE_DIR32,'%path%\',devDirs.fExec);
+	end else begin
+		fBinDir:= ReplaceFirstStr(BIN_DIR64,        '%path%\',devDirs.fExec);
+		if SameStr(setname,DEFCOMPILERSET64) then
+			fLibDir:= ReplaceFirstStr(LIB_DIR64,        '%path%\',devDirs.fExec)
+		else
+			fLibDir:= ReplaceFirstStr(LIB_DIR64ALT,     '%path%\',devDirs.fExec);
+		fCDir  := ReplaceFirstStr(C_INCLUDE_DIR64,  '%path%\',devDirs.fExec);
+		fCppDir:= ReplaceFirstStr(CPP_INCLUDE_DIR64,'%path%\',devDirs.fExec);
 	end;
 
 	// Makefile
 	fDelay:=0;
 	fFastDep:=TRUE;
 
-	// Fill option HWND's
-	AddDefaultOptions;
+	// Edit option string and list
+	if FindOption('-',optP,idxP) then begin // -m is used my -mINSTRUCTIONSET, so use - instead
+		if SameStr(setname,DEFCOMPILERSET64ALT) then
+			SetOption(optP,idxP,'1')
+		else
+			SetOption(optP,idxP,'0');
+	end;
 end;
 
-procedure TdevCompiler.UpdateSets;
+procedure TdevCompiler.ReadSets;
 var
 	Ini: TIniFile;
 	sl: TStringList;
@@ -1155,6 +1139,7 @@ procedure TdevCompiler.AddDefaultOptions;
 var
 	sl : TStringList;
 begin
+
 	// C options
 	AddOption(Lang[ID_COPT_ANSIC],       True,  True,  False, 0, '-ansi',                Lang[ID_COPT_GRP_C],       nil);
 	AddOption(Lang[ID_COPT_NOASM],       True,  True,  False, 0, '-fno-asm',             Lang[ID_COPT_GRP_C],       nil);
@@ -1254,9 +1239,9 @@ begin
 	// 32bit/64bit
 	sl := TStringList.Create;
 	sl.Add('');
-	sl.Add('32bit=32');
-	sl.Add('64bit=64');
-	AddOption(Lang[ID_COPT_PTRWIDTH], True, True, True, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], sl);
+	sl.Add('32bit=m32');
+	sl.Add('64bit=m64');
+	AddOption(Lang[ID_COPT_PTRWIDTH], True, True, True, 0, '-', Lang[ID_COPT_GRP_CODEGEN], sl);
 
 	// C++ Standards
 	sl := TStringList.Create;

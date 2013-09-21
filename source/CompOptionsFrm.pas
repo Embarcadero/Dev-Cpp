@@ -38,7 +38,6 @@ type
   TCompOptForm = class(TForm)
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
-    btnDefault: TBitBtn;
     btnHelp: TBitBtn;
     MainPages: TPageControl;
     tabDirectories: TTabSheet;
@@ -94,7 +93,6 @@ type
     btnBrowse8: TSpeedButton;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
-    procedure btnDefaultClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure DirTabsChange(Sender: TObject);
     procedure lstDirsClick(Sender: TObject);
@@ -179,7 +177,7 @@ begin
 
 	// write compiler list
 	devCompiler.Sets.Assign(cmbCompilerSetComp.Items);
-	devCompiler.SaveSettings;
+	devCompiler.WriteSets;
 
 	// rewrite current compiler options
 	devCompiler.SaveSet(CurrentSet);
@@ -231,12 +229,6 @@ begin
 	// fill tab controls
 	CompOptionsFrame1.FillOptions(nil);
 	DirTabsChange(Self);
-end;
-
-procedure TCompOptForm.btnDefaultClick(Sender: TObject);
-begin
-	devCompiler.SettoDefaults;
-	SetOptions(true);
 end;
 
 procedure TCompOptForm.btnHelpClick(Sender: TObject);
@@ -417,7 +409,6 @@ begin
 	btnAdd.Caption:=                     Lang[ID_BTN_ADD];
 	btnDelete.Caption:=                  Lang[ID_BTN_DELETE];
 	btnDelInval.Caption:=                Lang[ID_BTN_DELINVAL];
-	btnDefault.Caption:=                 Lang[ID_BTN_DEFAULT];
 	btnOk.Caption:=                      Lang[ID_BTN_OK];
 	btnCancel.Caption:=                  Lang[ID_BTN_CANCEL];
 	btnHelp.Caption:=                    Lang[ID_BTN_HELP];

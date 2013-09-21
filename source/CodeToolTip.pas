@@ -234,13 +234,13 @@ begin
 		// Skip blanks
 		repeat
 			Dec(WordEnd);
-		until not (S[WordEnd] in [#32,#9]);
+		until (WordEnd = 0) or not (S[WordEnd] in [#32,#9,#13,#10]);
 
 		// Then save the next word
 		WordStart := WordEnd;
 		repeat
 			Dec(WordStart);
-		until (WordStart = 1) or (S[WordStart] in [#0..#32]); // This fixes an unsigned 0 - 1 range error
+		until (WordStart = 0) or (S[WordStart] in [#0..#32]); // This fixes an unsigned 0 - 1 range error
 
 		Result := Copy(S, WordStart+1, WordEnd-WordStart);
 	end else
@@ -881,6 +881,10 @@ begin
 		ReleaseHandle;
 		Exit;
 	end;
+
+	// Skip blanks
+	while (CurPos > 1) and (P[CurPos-1] in [#32,#9,#13,#10]) do
+		Dec(CurPos);
 
 	// Get the name of the function we're about to show
 	S := FEditor.GetWordAtRowCol(FEditor.CharIndexToRowCol(CurPos-1));

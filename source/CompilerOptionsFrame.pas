@@ -65,9 +65,6 @@ begin
 		if tabs.Tabs.IndexOf(PCompilerOption(devCompiler.fOptionList[I])^.optSection) = -1 then
 			tabs.Tabs.Add(PCompilerOption(devCompiler.fOptionList[I])^.optSection);
 
-	//if tabs.Tabs.Count > 0 then
-	//	tabs.TabIndex := 0;
-
 	tabsChange(nil);
 end;
 

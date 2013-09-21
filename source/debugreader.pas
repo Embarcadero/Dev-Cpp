@@ -154,7 +154,6 @@ begin
 	//gdbout := StringReplace(gdbout,'->->prompt'#13#10,'',[rfReplaceAll]);
 	//gdbout := StringReplace(gdbout,'->->post-prompt'#13#10,'',[rfReplaceAll]);
 
-	MainForm.DebugOutput.Lines.Clear;
 	MainForm.DebugOutput.Lines.Add(gdbout);
 
 	//MainForm.DebugOutput.Lines.Add('---------------------------------------------------------');
