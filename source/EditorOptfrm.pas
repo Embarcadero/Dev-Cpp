@@ -771,6 +771,12 @@ begin
 
 		DefaultCode:=         cbDefaultCode.Checked;
 
+		// Autosave
+		EnableAutoSave:=      cbAutoSave.Checked;
+		Interval:=            MinutesDelay.Position;
+		AutoSaveFilter:=      FileOptions.ItemIndex;
+		AutoSaveMode:=        NameOptions.ItemIndex;
+
 		// load in attributes
 		for idx:= 0 to pred(cpp.AttrCount) do begin
 			aName:= cpp.Attribute[idx].Name;
@@ -844,12 +850,6 @@ begin
 	devCodeCompletion.UseCacheFiles:=chkCCCache.Checked;
 	devCodeCompletion.ParseLocalHeaders:=chkCBParseLocalH.Checked;
 	devCodeCompletion.ParseGlobalHeaders:=chkCBParseGlobalH.Checked;
-
-	// Autosave
-	devEditor.EnableAutoSave := cbAutoSave.Checked;
-	devEditor.Interval := MinutesDelay.Position;
-	devEditor.AutoSaveFilter := FileOptions.ItemIndex;
-	devEditor.AutoSaveMode := NameOptions.ItemIndex;
 
 	// Properly configure the timer object
 	if not devEditor.EnableAutoSave then begin

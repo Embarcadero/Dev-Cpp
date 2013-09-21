@@ -603,7 +603,7 @@ begin
 			else begin
 				if ExtractFilePath(CustomFileName)='' then // just filename, no path
 					// make it full path filename, so that the save dialog, starts at the right directory ;)
-					s:= Directory+ CustomFileName
+					s:= Directory + CustomFileName
 				else
 					s:= CustomFileName;
 			end;

@@ -252,10 +252,12 @@ type
     procedure SettoDefaults;
     procedure SaveSettings;
     procedure LoadSettings;
-    property OriginalPath: AnsiString read fOldPath write fOldPath; // don't bother to remember, read on startup
-  published
+
+    // don't bother to remember, read on startup
+    property OriginalPath: AnsiString read fOldPath write fOldPath;
     property Exec: AnsiString read fExec write fExec;
     property Config: AnsiString read fConfig write fConfig;
+  published
     property Default: AnsiString read fDefault write fDefault;
     property Help: AnsiString read fHelp write fHelp;
     property Icons: AnsiString read fIcons write fIcons;
@@ -411,7 +413,7 @@ type
     fBackup: boolean;                 // Create backup files
     fAutoOpen: integer;               // Auto Open Project Files Style
     fShowProject: boolean;            // Show the project explorer
-    fProjectWidth: integer;
+    fProjectWidth: integer;           // Width of project browser
     fClassView: boolean;              // if true, shows the class view, else shows the file view
     fOutput: boolean;                 // show compiler message window
     fOutputOnNeed: boolean;           // show compiler messages only when problem
@@ -422,7 +424,7 @@ type
     fMultiLineTab: boolean;           // Show multiline tabs
     fDefCpp: boolean;                 // Default to C++ project (compile with g++)
     fFirst: boolean;                  // first run of dev-c
-    fSplash: AnsiString;                  // user selected splash screen
+    fSplash: AnsiString;              // user selected splash screen
     fdblFiles: boolean;               // double click opens files out of project manager
     fLangChange: boolean;             // flag for language change
     fthemeChange: boolean;            // did the theme change?
@@ -430,6 +432,13 @@ type
     fInterfaceFont : AnsiString;
     fInterfaceFontSize : integer;
     fConsolePause : boolean;
+
+    // TWindowPlacement parts
+    fWindowLeft: integer;
+    fWindowTop: integer;
+    fWindowRight: integer;
+    fWindowBottom: integer;
+    fWindowState: integer;
 
     fToolbarMain: boolean;            // These ones follow the enable/x-offset/y-offset patern
     fToolbarMainX: integer;
@@ -453,46 +462,49 @@ type
     fToolbarClassesX: integer;
     fToolbarClassesY: integer;
 
-		// file associations (see FileAssocs.pas)
-		fAssociateCpp: boolean;
-		fAssociateC: boolean;
-		fAssociateHpp: boolean;
-		fAssociateH: boolean;
-		fAssociateDev: boolean;
-		fAssociateRc: boolean;
-		fAssociateTemplate: boolean;
-		fCheckAssocs : boolean;
-    
-		// More misc stuff
-		fShowTipsOnStart: boolean;
-		fLastTip: integer;
-		fShowProgress : boolean;          // Show progress window during compile
-		fAutoCloseProgress : boolean;     // Auto close progress bar window after compile
+    // file associations (see FileAssocs.pas)
+    fAssociateCpp: boolean;
+    fAssociateC: boolean;
+    fAssociateHpp: boolean;
+    fAssociateH: boolean;
+    fAssociateDev: boolean;
+    fAssociateRc: boolean;
+    fAssociateTemplate: boolean;
+    fCheckAssocs : boolean;
 
-		// Printer
-		fPrintColors : boolean;           // print colors
-		fPrintHighlight : boolean;
-		fPrintWordWrap : boolean;
-		fPrintLineNumbers : boolean;
-		fPrintLineNumbersMargins : boolean;
+    // More misc stuff
+    fShowTipsOnStart: boolean;
+    fLastTip: integer;
+    fShowProgress : boolean;           // Show progress window during compile
+    fAutoCloseProgress : boolean;      // Auto close progress bar window after compile
 
-		// Some debug options
-		fWatchHint : boolean;             // watch variable under mouse
-		fUseATTSyntax : boolean;
-		fShowCPUSignal : boolean; // show CPU window on signal
-		fCPURegisterCol1 : integer; // width of column 1
-		fCPURegisterCol2 : integer; // width of column 1
-		fCPURegisterCol3 : integer; // width of column 1
+    // Printer
+    fPrintColors : boolean;            // print colors
+    fPrintHighlight : boolean;
+    fPrintWordWrap : boolean;
+    fPrintLineNumbers : boolean;
+    fPrintLineNumbersMargins : boolean;
 
-		// Search preferences
-		fCaseSensitive : boolean;
-		fWholewords : boolean;
-		fPromptReplace : boolean;
-		fScopeIsSelected : boolean; // false == Global
-		fOriginEntireScope : boolean; // false == from cursor
-		fSearchWhere : integer; // 0 == project files, 1 == open files, 2 == current file
-		fDirBackward : boolean;
+    // Some debug options
+    fWatchHint : boolean;              // watch variable under mouse
+    fUseATTSyntax : boolean;
+    fShowCPUSignal : boolean;          // show CPU window on signal
+    fCPURegisterCol1 : integer;        // width of column 1
+    fCPURegisterCol2 : integer;        // width of column 1
+    fCPURegisterCol3 : integer;        // width of column 1
 
+    // Search preferences
+    fCaseSensitive : boolean;
+    fWholewords : boolean;
+    fPromptReplace : boolean;
+    fScopeIsSelected : boolean;        // false == Global
+    fOriginEntireScope : boolean;      // false == from cursor
+    fSearchWhere : integer;            // 0 == project files, 1 == open files, 2 == current file
+    fDirBackward : boolean;
+
+    // Floating windows
+    fProjectFloat : boolean;
+    fMessageFloat : boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -520,6 +532,13 @@ type
     property InterfaceFontSize: integer read fInterfaceFontSize write fInterfaceFontSize;
     property ShowBars: boolean read fShowbars write fShowbars;
     property MultiLineTab: boolean read fMultiLineTab write fMultiLineTab;
+
+    // TWindowPlacement parts
+    property WindowLeft : integer read fWindowLeft write fWindowLeft;
+    property WindowTop : integer read fWindowTop write fWindowTop;
+    property WindowRight : integer read fWindowRight write fWindowRight;
+    property WindowBottom : integer read fWindowBottom write fWindowBottom;
+    property WindowState : integer read fWindowState write fWindowState;
 
     //Running Status Options
     property DefCpp: boolean read fDefCpp write fDefCpp;
@@ -600,6 +619,8 @@ type
     property DirBackward : boolean read fDirBackward write fDirBackward;
 
     // Floating windows
+    property ProjectFloat : boolean read fProjectFloat write fProjectFloat;
+    property MessageFloat : boolean read fMessageFloat write fMessageFloat;
   end;
 
 function devData: TdevData;
@@ -632,7 +653,7 @@ implementation
 uses
 {$IFDEF WIN32}
   MultiLangSupport, datamod, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
-  FileAssocs;
+  FileAssocs, TypInfo;
 {$ENDIF}
 {$IFDEF LINUX}
   MultiLangSupport, SysUtils, StrUtils, QForms, QControls, version, utils, QSynEditMiscClasses,
@@ -885,6 +906,10 @@ begin
 	fOriginEntireScope := false;
 	fSearchWhere := 1;
 	fDirBackward := false;
+
+	// Floating windows
+	fMessageFloat := false;
+	fProjectFloat := false;
 end;
 
 { TdevCompiler }

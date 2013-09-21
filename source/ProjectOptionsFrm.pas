@@ -501,6 +501,8 @@ begin
 
 		// Compiler tab
 		devCompiler.LoadSet(CompilerSet);
+		devCompiler.fOptionString := fProjectCopy.Options.CompilerOptions; // temporarily apply project settings
+		devCompiler.OptionStringToList(devCompiler.fOptionString);
 		cmbCompiler.Items.Assign(devCompiler.Sets);
 		cmbCompiler.ItemIndex:=CompilerSet;
 		CompOptionsFrame1.FillOptions;

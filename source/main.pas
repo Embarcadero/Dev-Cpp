@@ -846,20 +846,16 @@ type
     procedure FormActivate(Sender: TObject);
     procedure actSearchAgainExecute(Sender: TObject);
   private
-    fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
-    fTools            : TToolController; // tool list controller
-    ProjectToolWindow : TForm; // floating left tab control
-    ReportToolWindow  : TForm; // floating bottom tab control
-    OldLeft           : integer; // stores position of window when going fullscreen
-    OldTop            : integer; // idem
-    OldWidth          : integer; // idem
-    OldHeight         : integer; // idem
-    WindowPlacement   : TWindowPlacement; // idem
-    fFirstShow        : boolean; // true for first WM_SHOW, false for others
-    fFirstActivate    : boolean; // see above
-    fShowTips         : boolean;
-    fRemoveOptions    : boolean;
-    fOptionsDir       : AnsiString;
+    fPreviousHeight : integer; // stores MessageControl height to be able to restore to previous height
+    fTools : TToolController; // tool list controller
+    fProjectToolWindow : TForm; // floating left tab control
+    fReportToolWindow : TForm; // floating bottom tab control
+    WindowPlacement : TWindowPlacement; // idem
+    fFirstShow : boolean; // true for first WM_SHOW, false for others
+    fFirstActivate : boolean; // see above
+    fShowTips : boolean;
+    fRemoveOptions : boolean;
+    fOptionsDir : AnsiString;
     function ParseParams(s : AnsiString) : AnsiString;
     procedure BuildBookMarkMenus;
     procedure SetHints;
@@ -966,6 +962,8 @@ begin
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+	fWindowPlacement : TWindowPlacement;
 begin
 	if assigned(fProject) then
 		actCloseProject.Execute;
@@ -981,6 +979,7 @@ begin
 		Exit;
 	end;
 
+	// Remember toolbar placement
 	devData.ClassView:=LeftPageControl.ActivePage=ClassSheet;
 	devData.ToolbarMainX:=tbMain.Left;
 	devData.ToolbarMainY:=tbMain.Top;
@@ -997,8 +996,20 @@ begin
 	devData.ToolbarClassesX:=tbClasses.Left;
 	devData.ToolbarClassesY:=tbClasses.Top;
 
-	devData.ProjectWidth:=LeftPageControl.Width;
-	devData.OutputHeight:=fPreviousHeight;
+	// Remember window placement
+	fWindowPlacement.length := sizeof(WINDOWPLACEMENT);
+	GetWindowPlacement(Self.Handle,@fWindowPlacement);
+	devData.WindowLeft := fWindowPlacement.rcNormalPosition.Left;
+	devData.WindowTop := fWindowPlacement.rcNormalPosition.Top;
+	devData.WindowRight := fWindowPlacement.rcNormalPosition.Right;
+	devData.WindowBottom := fWindowPlacement.rcNormalPosition.Bottom;
+	devData.WindowState := fWindowPlacement.showCmd;
+
+	// Save left page control states
+	devData.ProjectWidth := LeftPageControl.Width;
+	devData.OutputHeight := fPreviousHeight;
+	devData.ProjectFloat := Assigned(fProjectToolWindow) and fProjectToolWindow.Visible;
+	devData.MessageFloat := Assigned(fReportToolWindow) and fReportToolWindow.Visible;
 
 	// Save the options dir somewhere else cause we will need it after deleting devDirs
 	if fRemoveOptions then
@@ -1553,7 +1564,7 @@ end;
 
 procedure TMainForm.OpenCloseMessageSheet(Open: boolean);
 begin
-	if Assigned(ReportToolWindow) then
+	if Assigned(fReportToolWindow) then
 		exit;
 
 	// Switch between open and close
@@ -1572,8 +1583,8 @@ end;
 procedure TMainForm.MessageControlChange(Sender: TObject);
 begin
 	if MessageControl.ActivePage = CloseSheet then begin
-		if Assigned(ReportToolWindow) then begin
-			ReportToolWindow.Close;
+		if Assigned(fReportToolWindow) then begin
+			fReportToolWindow.Close;
 			MessageControl.ActivePageIndex := 0;
 		end else
 			OpenCloseMessageSheet(false);
@@ -2432,34 +2443,34 @@ procedure TMainForm.actFullScreenExecute(Sender: TObject);
 begin
 	devData.FullScreen:= FullScreenModeItem.Checked;
 	if devData.FullScreen then begin
-		OldLeft := Left;
-		OldTop := Top;
-		OldWidth := Width;
-		OldHeight := Height;
+
+		// Remember old window position
+		WindowPlacement.length := sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(Self.Handle, @WindowPlacement);
+
+		// Hide stuff the user has hidden
 		BorderStyle:= bsNone;
 		FullScreenModeItem.Caption:= Lang[ID_ITEM_FULLSCRBACK];
 		Toolbar.Visible:= devData.ShowBars;
 		pnlFull.Visible:= TRUE;
 
 		// set size to hide form menu
-		//works with multi monitors now.
+		// works with multi monitors now.
 		SetBounds(
 			(Left +Monitor.WorkAreaRect.Left) - ClientOrigin.X,
 			(Top+ Monitor.WorkAreaRect.Top) - ClientOrigin.Y,
 			Monitor.Width + (Width - ClientWidth),
 			Monitor.Height+ (Height - ClientHeight));
 	end else begin
-		Left := OldLeft;
-		Top := OldTop;
-		Width := OldWidth;
-		Height := OldHeight;
 
+		// Reset old window position
+		WindowPlacement.length := sizeof(WINDOWPLACEMENT);
 		SetWindowPlacement(Self.Handle, @WindowPlacement);
+
+		// Reset borders etc
 		BorderStyle:= bsSizeable;
 		FullScreenModeItem.Caption:= Lang[ID_ITEM_FULLSCRMODE];
 		Toolbar.Visible:= TRUE;
-
 		pnlFull.Visible:= FALSE;
 	end;
 end;
@@ -5166,8 +5177,8 @@ begin
 	LeftPageControl.Align := alLeft;
 	LeftPageControl.Visible := true;
 	InsertControl(LeftPageControl);
-	ProjectToolWindow.Free;
-	ProjectToolWindow := nil;
+	fProjectToolWindow.Free;
+	fProjectToolWindow := nil;
 
 	if assigned(fProject) then
 		fProject.SetNodeValue(ProjectView.TopItem); // nodes needs to be recreated
@@ -5185,18 +5196,18 @@ begin
 	MessageControl.Visible := true;
 	InsertControl(MessageControl);
 	Statusbar.Top := MessageControl.Top + MessageControl.Height;
-	ReportToolWindow.Free;
-	ReportToolWindow := nil;
+	fReportToolWindow.Free;
+	fReportToolWindow := nil;
 end;
 
 procedure TMainForm.FloatingPojectManagerItemClick(Sender: TObject);
 begin
 	FloatingPojectManagerItem.Checked := not FloatingPojectManagerItem.Checked;
-	if assigned(ProjectToolWindow) then
-		ProjectToolWindow.Close
+	if Assigned(fProjectToolWindow) then
+		fProjectToolWindow.Close
 	else begin
-		ProjectToolWindow := TForm.Create(self);
-		with ProjectToolWindow do begin
+		fProjectToolWindow := TForm.Create(self);
+		with fProjectToolWindow do begin
 			Caption := Lang[ID_TB_PROJECT];
 			Top := self.Top + LeftPageControl.Top;
 			Left := self.Left + LeftPageControl.Left;
@@ -5213,9 +5224,9 @@ begin
 			LeftPageControl.Top := 0;
 			LeftPageControl.Align := alClient;
 			LeftPageControl.Visible := true;
-			ProjectToolWindow.InsertControl(LeftPageControl);
+			fProjectToolWindow.InsertControl(LeftPageControl);
 
-			ProjectToolWindow.Show;
+			fProjectToolWindow.Show;
 			if assigned(fProject) then
 				fProject.SetNodeValue(ProjectView.TopItem); // nodes needs to be recreated
 		end;
@@ -5496,14 +5507,14 @@ end;
 procedure TMainForm.FloatingReportwindowItemClick(Sender: TObject);
 begin
 	FloatingReportWindowItem.Checked := not FloatingReportWindowItem.Checked;
-	if assigned(ReportToolWindow) then
-		ReportToolWindow.Close
+	if assigned(fReportToolWindow) then
+		fReportToolWindow.Close
 	else begin
 		OpenCloseMessageSheet(true);
 		if MessageControl.ActivePage = CloseSheet then
 			MessageControl.ActivePageIndex := 0;
-		ReportToolWindow := TForm.Create(self);
-		with ReportToolWindow do begin
+		fReportToolWindow := TForm.Create(self);
+		with fReportToolWindow do begin
 			Caption := Lang[ID_TB_REPORT];
 			Top := self.Top + MessageControl.Top;
 			Left := self.Left + MessageControl.Left;
@@ -5520,9 +5531,9 @@ begin
 			MessageControl.Top := 0;
 			MessageControl.Align := alClient;
 			MessageControl.Visible := true;
-			ReportToolWindow.InsertControl(MessageControl);
+			fReportToolWindow.InsertControl(MessageControl);
 
-			ReportToolWindow.Show;
+			fReportToolWindow.Show;
 		end;
 	end;
 end;
@@ -5873,6 +5884,8 @@ begin
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
+var
+	fWindowPlacement: TWindowPlacement;
 begin
 	fFirstShow := true;
 	fFirstActivate := true;
@@ -5904,7 +5917,9 @@ begin
 	else
 		LeftPageControl.ActivePage:=ProjectSheet;
 	actProjectManagerExecute(nil);
-	LeftPageControl.Width:=devData.ProjectWidth;
+	LeftPageControl.Width := devData.ProjectWidth;
+	if devData.ProjectFloat then
+		FloatingPojectManagerItem.Click;
 
 	// Set statusbar to previous state
 	actStatusbar.Checked:= devData.Statusbar;
@@ -5924,6 +5939,8 @@ begin
 	// Set bottom panel height
 	MessageControl.Height:=devData.OutputHeight;
 	fPreviousHeight:= MessageControl.Height;
+	if devData.MessageFloat then
+		FloatingReportwindowItem.Click;
 
 	// Custom tools
 	fTools:= TToolController.Create;
@@ -5993,10 +6010,27 @@ begin
 
 	// Set languages and other first time stuff
 	if devData.First or (devData.Language = '') then begin
-		Lang.SelectLanguage; // Open LangFrm, does much more than changing language
-		devData.First:= FALSE;
-	end else
+
+		// Showing for the first time? Maximize
+		WindowState := wsMaximized;
+
+		// Open LangFrm, does much more than changing language
+		Lang.SelectLanguage;
+		devData.First := FALSE;
+	end else begin
+
+		// Remember window placement
+		fWindowPlacement.length := sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(Self.Handle,@fWindowPlacement);
+		fWindowPlacement.rcNormalPosition.Left := devData.WindowLeft;
+		fWindowPlacement.rcNormalPosition.Top := devData.WindowTop;
+		fWindowPlacement.rcNormalPosition.Right := devData.WindowRight;
+		fWindowPlacement.rcNormalPosition.Bottom := devData.WindowBottom;
+		fWindowPlacement.showCmd := devData.WindowState;
+		SetWindowPlacement(Self.Handle,@fWindowPlacement);
+
 		Lang.Open(devData.Language);
+	end;
 
 	// Load bookmarks, captions and hints
 	LoadText;
@@ -6122,8 +6156,6 @@ begin
 
 		// Update after opening files
 		UpdateAppTitle;
-
-		// Set default dir for open dialogs?
 	end;
 end;
 

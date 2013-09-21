@@ -17,7 +17,6 @@ object MainForm: TMainForm
   OldCreateOrder = False
   Position = poDefault
   ShowHint = True
-  WindowState = wsMaximized
   OnActivate = FormActivate
   OnClose = FormClose
   OnContextPopup = FormContextPopup
