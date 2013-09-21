@@ -105,13 +105,13 @@ end;
 
 procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
 var
-	tmp : string;
+	tmp : AnsiString;
 begin
 	if key = #13 then begin
 		if (MainForm.fDebugger.Executing) then
 			CodeList.Lines.Clear;
 			tmp:=edFunc.Text;
-			if AnsiEndsStr('()',edFunc.Text) then begin
+			if EndsStr('()',edFunc.Text) then begin
 				Delete(tmp,length(tmp)-1,2);
 				edFunc.Text:=tmp;
 			end;
@@ -122,7 +122,7 @@ end;
 procedure TCPUForm.rbSyntaxClick(Sender: TObject);
 var
 	cb : TCheckBox;
-	tmp : string;
+	tmp : AnsiString;
 begin
   cb := TCheckBox(sender);
   while (MainForm.fDebugger.InAssembler) do
@@ -136,7 +136,7 @@ begin
 
     MainForm.fDebugger.Idle;
 
-    if AnsiEndsStr('()',edFunc.Text) then begin
+    if EndsStr('()',edFunc.Text) then begin
 		Delete(tmp,length(tmp)-1,2);
 		edFunc.Text:=tmp;
 	end;

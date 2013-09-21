@@ -30,8 +30,8 @@ uses
 {$ENDIF}
 
 const
-	BoolValYesNo: array[boolean] of string = ('No', 'Yes');
-	BoolVal10: array[0..27] of string = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+	BoolValYesNo: array[boolean] of AnsiString = ('No', 'Yes');
+	BoolVal10: array[0..27] of AnsiString = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
                                          'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
                                          's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
@@ -39,14 +39,14 @@ type
 	// the comments are an example of the record
 	PCompilerOption = ^TCompilerOption;
 	TCompilerOption = packed record
-		optName: string; // "Generate debugging info"
+		optName: AnsiString; // "Generate debugging info"
 		optIsGroup: boolean; // False
 		optIsC: boolean;
 		optIsCpp: boolean; // True (C++ option?) - can be both C and C++ option...
 		optIsLinker: boolean; // Is it a linker param
 		optValue: Integer; // True
-		optSetting: string; // "-g3"
-		optSection: string; // "Linker options"
+		optSetting: AnsiString; // "-g3"
+		optSection: AnsiString; // "Linker options"
 		optExcludeFromTypes: TProjTypeSet; // [dptGUI] (don't show option if project is of type dptGUI)
 		optChoices : TStringList; // replaces "Yes/No" standard choices (max 30 different choices)
 	end;
@@ -58,31 +58,31 @@ type
 		fSets: TStrings;
 
 		// Exe Directories
-		fgccName : string;
-		fgppName : string;
-		fmakeName : string;
-		fgdbName : string;
-		fwindresName : string;
-		fdllwrapName : string;
-		fgprofName : string;
+		fgccName : AnsiString;
+		fgppName : AnsiString;
+		fmakeName : AnsiString;
+		fgdbName : AnsiString;
+		fwindresName : AnsiString;
+		fdllwrapName : AnsiString;
+		fgprofName : AnsiString;
 
 		// Folders
-		fBinDir : string;
-		fCDir : string;
-		fCppDir : string;
-		fLibDir : string;
+		fBinDir : AnsiString;
+		fCDir : AnsiString;
+		fCppDir : AnsiString;
+		fLibDir : AnsiString;
 
 		// User Parameters
 		fCompAdd : boolean;
 		fLinkAdd : boolean;
-		fCompOpt : string;
-		flinkOpt : string;
+		fCompOpt : AnsiString;
+		flinkOpt : AnsiString;
 
 		fDelay : integer;
 		fFastDep : boolean;
 
 		// All options
-		fOptions : string;
+		fOptions : AnsiString;
 
 		procedure WriteSets;
 		procedure UpdateSets;
@@ -96,28 +96,28 @@ type
 		procedure LoadSet(Index: integer);
 		procedure AssignToCompiler;
 		property Name;
-		function SetName(Index: integer): string;
+		function SetName(Index: integer): AnsiString;
 		property Sets: TStrings read fSets write fSets;
 	published
-		property gccName: string read fgccName write fgccName;
-		property gppName: string read fgppName write fgppName;
-		property makeName: string read fmakeName write fmakeName;
-		property gdbName: string read fgdbName write fgdbName;
-		property windresName: string read fwindresName write fwindresName;
-		property dllwrapName: string read fdllwrapName write fdllwrapName;
-		property gprofName: string read fgprofName write fgprofName;
+		property gccName: AnsiString read fgccName write fgccName;
+		property gppName: AnsiString read fgppName write fgppName;
+		property makeName: AnsiString read fmakeName write fmakeName;
+		property gdbName: AnsiString read fgdbName write fgdbName;
+		property windresName: AnsiString read fwindresName write fwindresName;
+		property dllwrapName: AnsiString read fdllwrapName write fdllwrapName;
+		property gprofName: AnsiString read fgprofName write fgprofName;
 
-		property BinDir: string read fBinDir write fBinDir;
-		property CDir: string read fCDir write fCDir;
-		property CppDir: string read fCppDir write fCppDir;
-		property LibDir: string read fLibDir write fLibDir;
+		property BinDir: AnsiString read fBinDir write fBinDir;
+		property CDir: AnsiString read fCDir write fCDir;
+		property CppDir: AnsiString read fCppDir write fCppDir;
+		property LibDir: AnsiString read fLibDir write fLibDir;
 
-		property OptionsStr: string read fOptions write fOptions;
+		property OptionsStr: AnsiString read fOptions write fOptions;
 
 		property AddtoComp: boolean read fCompAdd write fCompAdd;
 		property AddtoLink: boolean read fLinkAdd write fLinkAdd;
-		property CompOpts: string read fCompOpt write fCompOpt;
-		property LinkOpts: string read fLinkOpt write fLinkOpt;
+		property CompOpts: AnsiString read fCompOpt write fCompOpt;
+		property LinkOpts: AnsiString read fLinkOpt write fLinkOpt;
 
 		property Delay: integer read fDelay write fDelay;
 		property FastDep: boolean read fFastDep write fFastDep;
@@ -131,24 +131,24 @@ type
 
 		// Non-set options
 		fUseParams: boolean;        // Use fparams when running prog
-		fIntermediate: string;      // directory for mid-compile files -- if needed
-		fOutputDir: string;         // directory to place compiled files
-		fRunParams: string;         // params to send on execution
+		fIntermediate: AnsiString;      // directory for mid-compile files -- if needed
+		fOutputDir: AnsiString;         // directory to place compiled files
+		fRunParams: AnsiString;         // params to send on execution
 
 		// Exe Directories
-		fgccName : string;
-		fgppName : string;
-		fmakeName : string;
-		fgdbName : string;
-		fwindresName : string;
-		fdllwrapName : string;
-		fgprofName : string;
+		fgccName : AnsiString;
+		fgppName : AnsiString;
+		fmakeName : AnsiString;
+		fgdbName : AnsiString;
+		fwindresName : AnsiString;
+		fdllwrapName : AnsiString;
+		fgprofName : AnsiString;
 
 		// User Parameters
 		fCompAdd : boolean;
 		fLinkAdd : boolean;
-		fCompOpt : string;
-		flinkOpt : string;
+		fCompOpt : AnsiString;
+		flinkOpt : AnsiString;
 
 		// All options
 		fOptions: TList;
@@ -161,8 +161,8 @@ type
 		procedure SetCompilerSet(const Value: integer);
 		function GetOptions(Index: integer): TCompilerOption;
 		procedure SetOptions(Index: integer; const Value: TCompilerOption);
-		function GetOptionStr: string;
-		procedure SetOptionStr(const Value: string);
+		function GetOptionStr: AnsiString;
+		procedure SetOptionStr(const Value: AnsiString);
 	protected
 		procedure AddDefaultOptions;
 	public
@@ -173,33 +173,33 @@ type
 		procedure LoadSettings; override;
 		property Name;
 		property Modified: boolean read fModified write fModified;
-		procedure AddOption(_Name: string; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer; _Setting, _Section: string; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);
+		procedure AddOption(_Name: AnsiString; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer; _Setting, _Section: AnsiString; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);
 		function OptionsCount: integer;
 		procedure ClearOptions;
 		procedure DeleteOption(Index: integer);
 		property Options[Index: integer]: TCompilerOption read GetOptions write SetOptions;
-		property OptionStr: string read GetOptionStr write SetOptionStr;
-		function FindOption(Setting: string; var opt: TCompilerOption; var Index: integer): boolean; // returns the option with setting=<Setting>
+		property OptionStr: AnsiString read GetOptionStr write SetOptionStr;
+		function FindOption(Setting: AnsiString; var opt: TCompilerOption; var Index: integer): boolean; // returns the option with setting=<Setting>
 		procedure ChangeOptionsLang;
 		function ConvertCharToValue(c : char) : integer;
 	published
-		property RunParams: string read fRunParams write fRunParams;
+		property RunParams: AnsiString read fRunParams write fRunParams;
 		property UseExecParams: boolean read fUseParams write fUseParams;
 		property Delay: integer read fDelay write fDelay;
 		property FastDep: boolean read fFastDep write fFastDep;
 
-		property gccName: string read fgccName write fgccName;
-		property gppName: string read fgppName write fgppName;
-		property gdbName: string read fgdbName write fgdbName;
-		property makeName: string read fmakeName write fmakeName;
-		property windresName: string read fwindresName write fwindresName;
-		property dllwrapName: string read fdllwrapName write fdllwrapName;
-		property gprofName: string read fgprofName write fgprofName;
+		property gccName: AnsiString read fgccName write fgccName;
+		property gppName: AnsiString read fgppName write fgppName;
+		property gdbName: AnsiString read fgdbName write fgdbName;
+		property makeName: AnsiString read fmakeName write fmakeName;
+		property windresName: AnsiString read fwindresName write fwindresName;
+		property dllwrapName: AnsiString read fdllwrapName write fdllwrapName;
+		property gprofName: AnsiString read fgprofName write fgprofName;
 
 		property AddtoComp: boolean read fCompAdd write fCompAdd;
 		property AddtoLink: boolean read fLinkAdd write fLinkAdd;
-		property CompOpts: string read fCompOpt write fCompOpt;
-		property LinkOpts: string read fLinkOpt write fLinkOpt;
+		property CompOpts: AnsiString read fCompOpt write fCompOpt;
+		property LinkOpts: AnsiString read fLinkOpt write fLinkOpt;
 
 		property CompilerSet: integer read fCompilerSet write SetCompilerSet;
 	end;
@@ -262,7 +262,7 @@ type
  TdevCVSHandler = class(TCFGOptions)
  private
    fRepositories: TStrings;
-   fExecutable: string;
+   fExecutable: AnsiString;
    fCompression: byte;
    fUseSSH: boolean;
  public
@@ -274,7 +274,7 @@ type
    property Name;
  published
    property Repositories: TStrings read fRepositories write fRepositories;
-   property Executable: string read fExecutable write fExecutable;
+   property Executable: AnsiString read fExecutable write fExecutable;
    property Compression: byte read fCompression write fCompression;
    property UseSSH: boolean read fUseSSH write fUseSSH;
  end;
@@ -283,7 +283,7 @@ type
  private
    fDummy: boolean;
    fPrograms: TStrings;
-   function GetProgramName(Index: integer): string;
+   function GetProgramName(Index: integer): AnsiString;
  public
    constructor Create;
    destructor Destroy; override;
@@ -291,9 +291,9 @@ type
    procedure LoadSettings; override;
    procedure SetToDefaults; override;
    property Name;
-   property ProgramName[Index: integer]: string read GetProgramName;
-   function AssignedProgram(ext: string): integer;
-   function AddProgram(ext, prog: string): integer;
+   property ProgramName[Index: integer]: AnsiString read GetProgramName;
+   function AssignedProgram(ext: AnsiString): integer;
+   function AddProgram(ext, prog: AnsiString): integer;
  published
    property Dummy: boolean read fDummy write fDummy;
    property Programs: TStrings read fPrograms write fPrograms;
@@ -302,46 +302,46 @@ type
  // global directories
  TdevDirs = class(TCFGOptions)
   private
-   fThemes: string;            // Themes Directory
-   fIcons: string;             // Icon Library
-   fHelp: string;              // Help
-   fLang: string;              // Language
-   fTemp: string;              // Templates
-   fDefault: string;           // user defined default
-   fExec: string;              // dev-c start
-   fConfig : string;           // config files directory
-   fBinDir: string;            // compiler location
-   fCDir: string;              // c includes
-   fCppDir: string;            // c++ includes
-   fLibDir: string;            // Libraries
-   fOldPath: string;           // Enviroment Path at program start
+   fThemes: AnsiString;            // Themes Directory
+   fIcons: AnsiString;             // Icon Library
+   fHelp: AnsiString;              // Help
+   fLang: AnsiString;              // Language
+   fTemp: AnsiString;              // Templates
+   fDefault: AnsiString;           // user defined default
+   fExec: AnsiString;              // dev-c start
+   fConfig : AnsiString;           // config files directory
+   fBinDir: AnsiString;            // compiler location
+   fCDir: AnsiString;              // c includes
+   fCppDir: AnsiString;            // c++ includes
+   fLibDir: AnsiString;            // Libraries
+   fOldPath: AnsiString;           // Enviroment Path at program start
   public
    constructor Create;
    procedure SettoDefaults; override;
    procedure SaveSettings; override;
    procedure LoadSettings; override;
    property Name;
-   property OriginalPath: string read fOldPath write fOldPath;
+   property OriginalPath: AnsiString read fOldPath write fOldPath;
   published
-   property Exec: string read fExec write fExec;
-   property Config: string read fConfig write fConfig;
-   property Bins: string read fBinDir write fBinDir;
-   property Default: string read fDefault write fDefault;
-   property C: string read fCDir write fCDir;
-   property Cpp: string read fCppDir write fCppDir;
-   property Help: string read fHelp write fHelp;
-   property Icons: string read fIcons write fIcons;
-   property Lang: string read fLang write fLang;
-   property Lib: string read fLibDir write fLibDir;
-   property Templates: string read fTemp write fTemp;
-   property Themes: string read fThemes write fThemes;
+   property Exec: AnsiString read fExec write fExec;
+   property Config: AnsiString read fConfig write fConfig;
+   property Bins: AnsiString read fBinDir write fBinDir;
+   property Default: AnsiString read fDefault write fDefault;
+   property C: AnsiString read fCDir write fCDir;
+   property Cpp: AnsiString read fCppDir write fCppDir;
+   property Help: AnsiString read fHelp write fHelp;
+   property Icons: AnsiString read fIcons write fIcons;
+   property Lang: AnsiString read fLang write fLang;
+   property Lib: AnsiString read fLibDir write fLibDir;
+   property Templates: AnsiString read fTemp write fTemp;
+   property Themes: AnsiString read fThemes write fThemes;
   end;
 
  // editor options -- syntax, synedit options, etc...
  TdevEditor = class(TCFGOptions)
   private
    fUseSyn: boolean;           // use syntax highlighting
-   fSynExt: string;            // semi-colon seperated list of highlight ext's
+   fSynExt: AnsiString;            // semi-colon seperated list of highlight ext's
    fFont: TFont;               // Editor Font
    fGutterFont: TFont;         // Gutter font
    fInsertCaret: integer;      // Editor insert caret
@@ -445,7 +445,7 @@ type
 
    // syntax
    property UseSyntax: boolean read fUseSyn write fUseSyn;
-   property SyntaxExt: string read fSynExt write fSynExt;
+   property SyntaxExt: AnsiString read fSynExt write fSynExt;
    property Syntax: TStrings read fSyntax write fSyntax;
 
    // other
@@ -472,10 +472,10 @@ type
  // master option object -- contains program globals
  TdevData = class(TConfigData)
   private
-   fLang: string;                    // Language file
-   fTheme: string;                   // Theme file
-   fFindCols: string;                // Find Column widths (comma sep)
-   fCompCols: string;                // Compiler Column Widths (comma sep)
+   fLang: AnsiString;                    // Language file
+   fTheme: AnsiString;                   // Theme file
+   fFindCols: AnsiString;                // Find Column widths (comma sep)
+   fCompCols: AnsiString;                // Compiler Column Widths (comma sep)
    fMsgTabs: integer;                // Editor Tabs
    fMinOnRun: boolean;               // Minimize IDE on run
    fMRUMax: integer;                 // Max number of files in history list
@@ -493,12 +493,12 @@ type
    fMultiLineTab: boolean;           // Show multiline tabs
    fDefCpp: boolean;                 // Default to C++ project (compile with g++)
    fFirst: boolean;                  // first run of dev-c
-   fSplash: string;                  // user selected splash screen
+   fSplash: AnsiString;                  // user selected splash screen
    fdblFiles: boolean;               // double click opens files out of project manager
    fLangChange: boolean;             // flag for language change
    fthemeChange: boolean;            // did the theme change?
    fNoSplashScreen : boolean;        // disable splash screen
-   fInterfaceFont : string;
+   fInterfaceFont : AnsiString;
    fInterfaceFontSize : integer;
    fConsolePause : boolean;
 
@@ -560,10 +560,10 @@ type
    property LangChange: boolean read fLangChange write fLangChange;
    property ThemeChange: boolean read fThemeChange write fThemeChange;
   published
-   property Language: string read fLang write fLang;
-   property Theme: string read fTheme write fTheme;
+   property Language: AnsiString read fLang write fLang;
+   property Theme: AnsiString read fTheme write fTheme;
    property First: boolean read fFirst write fFirst;
-   property Splash: string read fSplash write fSplash;
+   property Splash: AnsiString read fSplash write fSplash;
    property MRUMax: integer read fMRUMax write fMRUMax;
    property DblFiles: boolean read fDblFiles write fDblFiles;
    property NoSplashScreen: boolean read fNoSplashScreen write fNoSplashScreen;
@@ -578,7 +578,7 @@ type
 
    //Windows
    property MsgTabs: integer read fMsgTabs write fMsgTabs;
-   property InterfaceFont: string read fInterfaceFont write fInterfaceFont;
+   property InterfaceFont: AnsiString read fInterfaceFont write fInterfaceFont;
    property InterfaceFontSize: integer read fInterfaceFontSize write fInterfaceFontSize;
 
    property ShowBars: boolean read fShowbars write fShowbars;
@@ -594,8 +594,8 @@ type
    property ProjectWidth: integer read fProjectWidth write fProjectWidth;
    property Statusbar: boolean read fStatusbar write fStatusbar;
    property FullScreen: boolean read fFullScr write fFullScr;
-   property FindCols: string read fFindCols write fFindCols;
-   property CompCols: string read fCompCols write fCompCols;
+   property FindCols: AnsiString read fFindCols write fFindCols;
+   property CompCols: AnsiString read fCompCols write fCompCols;
 
    //Toolbars
    property ToolbarMain: boolean read fToolbarMain write fToolbarMain;
@@ -657,7 +657,7 @@ procedure InitializeOptions;
 procedure SaveOptions;
 procedure FinalizeOptions;
 procedure ResettoDefaults;
-procedure CheckForAltConfigFile(filename: string);
+procedure CheckForAltConfigFile(filename: AnsiString);
 procedure UpdateAltConfigFile;
 
 var
@@ -672,9 +672,9 @@ var
 
  // Permanent alternate config file (need to be global vars)
  ConfigMode             : (CFG_NORMAL, CFG_PARAM, CFG_USER) = CFG_NORMAL;
- StandardConfigFile     : string;
+ StandardConfigFile     : AnsiString;
  UseAltConfigFile       : boolean;
- AltConfigFile          : string;
+ AltConfigFile          : AnsiString;
  DontRecreateSingletons : boolean;
 
 implementation
@@ -689,7 +689,7 @@ uses
   FileAssocs, Types;
 {$ENDIF}
 
-function ValidatePaths(dirList: String; var badDirs: String): String;
+function ValidatePaths(dirList: AnsiString; var badDirs: AnsiString): AnsiString;
 //checks if directories in provided ; delimited list exist
 //returns filtered out dirList with only existing paths
 //badDirs returns ; delimited list of non existing dirs
@@ -697,9 +697,9 @@ function ValidatePaths(dirList: String; var badDirs: String): String;
 var
 	strs: TStrings;
 	i,j: Integer;
-	currdir: String;
+	currdir: AnsiString;
 
-	function makeFullPath(dir: String): String;
+	function makeFullPath(dir: AnsiString): AnsiString;
 	begin
 		Result := dir;
 		//check if it's a full path
@@ -866,7 +866,7 @@ begin
   devExternalPrograms.Free;
 end;
 
-procedure CheckForAltConfigFile(filename: string);
+procedure CheckForAltConfigFile(filename: AnsiString);
 var
     Ini: TIniFile;
 begin
@@ -1158,7 +1158,7 @@ begin
 	AddOption(Lang[ID_COPT_STD], False, True, True, True, 0, '-std=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 end;
 
-procedure TdevCompiler.AddOption(_Name: string; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer;_Setting, _Section: string; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);
+procedure TdevCompiler.AddOption(_Name: AnsiString; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer;_Setting, _Section: AnsiString; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);
 var
 	option: PCompilerOption;
 begin
@@ -1220,7 +1220,7 @@ begin
   inherited;
 end;
 
-function TdevCompiler.FindOption(Setting: string; var opt: TCompilerOption; var Index: integer): boolean;
+function TdevCompiler.FindOption(Setting: AnsiString; var opt: TCompilerOption; var Index: integer): boolean;
 var
 	I: integer;
 begin
@@ -1239,7 +1239,7 @@ begin
   Result := TCompilerOption(fOptions[Index]^);
 end;
 
-function TdevCompiler.GetOptionStr: string;
+function TdevCompiler.GetOptionStr: AnsiString;
 var
 	I: integer;
 begin
@@ -1250,7 +1250,7 @@ end;
 
 procedure TdevCompiler.LoadSettings;
 var
-	dummystring, key	: string;
+	dummystring, key	: AnsiString;
 	I,J					: integer;
 	opt					: TCompilerOption;
 begin
@@ -1348,7 +1348,7 @@ begin
 	end;
 end;
 
-procedure TdevCompiler.SetOptionStr(const Value: string);
+procedure TdevCompiler.SetOptionStr(const Value: AnsiString);
 var
 	I: integer;
 begin
@@ -1784,7 +1784,7 @@ end;
 
 procedure TdevCompilerSet.LoadSet(Index: integer);
 var
-	key, goodBinDir, goodCDir, goodCppDir, goodLibDir, msg, tempStr, makereply: string;
+	key, goodBinDir, goodCDir, goodCppDir, goodLibDir, msg, tempStr, makereply: AnsiString;
 	bindirs : TStringList;
 	i : integer;
 begin
@@ -1896,7 +1896,8 @@ begin
 		SetPath(bindirs.Strings[i]);
 		makereply := RunAndGetOutput(devCompilerSet.makeName + ' -v',bindirs.Strings[i], nil, nil, nil);
 
-		if AnsiStartsStr('GNU Make ', makereply) then begin
+		if StartsStr('GNU Make ', makereply) then begin
+			bindirs.Free;
 			Exit; // pass sanity check for the chosen processor
 		end else begin
 
@@ -1904,7 +1905,7 @@ begin
 			SetPath(bindirs.Strings[i]);
 			makereply := RunAndGetOutput('mingw32-make.exe -v',bindirs.Strings[i], nil, nil, nil);
 
-			if AnsiStartsStr('GNU Make ', makereply) then begin
+			if StartsStr('GNU Make ', makereply) then begin
 				msg := 'Dev-C++ was unable to find the current make processor ('
 				+ devCompilerSet.makeName  + ') in '
 				+ bindirs.Strings[i] + ' with current settings, '
@@ -1918,6 +1919,7 @@ begin
 					devCompilerSet.makeName := 'mingw32-make.exe';
 					devCompiler.makeName := 'mingw32-make.exe';
 				end;
+				bindirs.Free;
 				Exit; // pass sanity check for a different make proc
 			end else begin
 
@@ -1925,7 +1927,7 @@ begin
 				SetPath(bindirs.Strings[i]);
 				makereply := RunAndGetOutput('make.exe --v',bindirs.Strings[i], nil, nil, nil);
 
-				if AnsiStartsStr('GNU Make ', makereply) then begin
+				if StartsStr('GNU Make ', makereply) then begin
 					msg := 'Dev-C++ was unable to find the current make processor ('
 					+ devCompilerSet.makeName  + ') in '
 					+ bindirs.Strings[i] + ' with current settings, '
@@ -1939,18 +1941,16 @@ begin
 						devCompilerSet.makeName := 'make.exe';
 						devCompiler.makeName := 'make.exe';
 					end;
+					bindirs.Free;
 					Exit; // pass sanity check
 				end;
 			end;
 		end;
 	end;
 
-	msg := 'There doesn''t seem to be any Make file in Dev-C++''s Bin path ('
-		+ fBinDir + '). Please make sure that you have correctly set '
-		+ 'GNU Make and adjust the Bin settings environment '
-		+ 'variable and that the make setting in Compiler Options '
-		+ 'contains a correct filename, otherwise you will not '
-		+ 'be able to compile anything.';
+	msg := 'There doesn''t seem to be any Make file in any of Dev-C++''s Bin paths. '
+		+ 'Please make sure that you have correctly set bin paths in Compiler Options >> Directories '
+		+ ' and have correctly set your make''s name in Programs. Otherwise, you will not be able to compile anything.';
 	MessageDlg(msg, mtConfirmation, [mbOK], 0);
 end;
 
@@ -1961,7 +1961,7 @@ end;
 
 procedure TdevCompilerSet.SaveSet(Index: integer);
 var
-	key: string;
+	key: AnsiString;
 begin
 	with devData do begin
 		key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
@@ -1995,7 +1995,7 @@ begin
 	WriteSets;
 end;
 
-function TdevCompilerSet.SetName(Index: integer): string;
+function TdevCompilerSet.SetName(Index: integer): AnsiString;
 begin
 	if (Index>=0) and (Index<devCompilerSet.Sets.Count) then
 		Result:=devCompilerSet.Sets[Index]
@@ -2072,7 +2072,7 @@ end;
 
 { TdevExternalPrograms }
 
-function TdevExternalPrograms.AddProgram(ext, prog: string): integer;
+function TdevExternalPrograms.AddProgram(ext, prog: AnsiString): integer;
 var
   idx: integer;
 begin
@@ -2090,7 +2090,7 @@ begin
   end;
 end;
 
-function TdevExternalPrograms.AssignedProgram(ext: string): integer;
+function TdevExternalPrograms.AssignedProgram(ext: AnsiString): integer;
 var
   I: integer;
 begin
@@ -2116,7 +2116,7 @@ begin
   fPrograms.Free;
 end;
 
-function TdevExternalPrograms.GetProgramName(Index: integer): string;
+function TdevExternalPrograms.GetProgramName(Index: integer): AnsiString;
 begin
   Result:=fPrograms.Values[fPrograms.Names[Index]];
 end;

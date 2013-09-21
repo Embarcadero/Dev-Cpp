@@ -73,9 +73,9 @@ var
   I: integer;
   st: TBufferCoord;
   Line: integer;
-  LineText: string;
-  Hdr: string;
-  Prepend: string;
+  LineText: AnsiString;
+  Hdr: AnsiString;
+  Prepend: AnsiString;
 begin
   e := MainForm.GetEditor;
   if not Assigned(e) then begin
@@ -111,7 +111,7 @@ begin
     end;
   end;
   e.Text.UndoList.AddChange(crInsert, st, BufferCoord(st.Char, st.Line + memDescr.Lines.Count), '', smNormal);
-  e.Modified := True;
+  e.Text.Modified := True;
   Close;
 end;
 

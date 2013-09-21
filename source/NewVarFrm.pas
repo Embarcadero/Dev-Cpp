@@ -151,25 +151,25 @@ end;
 procedure TNewVarForm.btnCreateClick(Sender: TObject);
 var
   pID: integer;
-  fName: string;
-  CppFname: string;
+  fName: AnsiString;
+  CppFname: AnsiString;
   I: integer;
   Line: integer;
   PublicLine: integer;
   e: TEditor;
   AddScopeStr: boolean;
   fAddScopeStr: boolean;
-  VarName: string;
-  VarType: string;
+  VarName: AnsiString;
+  VarType: AnsiString;
   VarRead: boolean;
-  VarReadFunc: string;
+  VarReadFunc: AnsiString;
   VarWrite: boolean;
-  VarWriteFunc: string;
+  VarWriteFunc: AnsiString;
   VarScope: TStatementClassScope;
   St: PStatement;
-  ClsName: string;
+  ClsName: AnsiString;
   wa: boolean;
-  S: string;
+  S: AnsiString;
 begin
   if cmbClass.ItemIndex = -1 then begin
     MessageDlg(Lang[ID_NEWVAR_MSG_NOCLASS], mtError, [mbOk], 0);
@@ -218,7 +218,7 @@ begin
   if not Assigned(e) then
     Exit;
 
-    if e.Modified then
+    if e.Text.Modified then
       case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [fName]), mtConfirmation, [mbYes, mbCancel], 0) of
         mrYes: if FileExists(fName) then begin
             wa := MainForm.devFileMonitor.Active;
@@ -269,7 +269,7 @@ begin
     else if cmbComment.ItemIndex = 1 then // /* ... */
       e.Text.Lines.Insert(Line, #9#9'/*');
 
-	// insert, if needed, the scope string
+	// insert, if needed, the scope AnsiString
 	if AddScopeStr then
 		case VarScope of
 			scsPrivate: e.Text.Lines.Insert(Line, #9'private:');
@@ -279,7 +279,7 @@ begin
 		end;
 
 	e.GotoLineNr(Line + memDescr.Lines.Count);
-	e.Modified := True;
+	e.Text.Modified := True;
 
 	// if needed, insert a new member function for READ access to the new var
 	if VarRead then begin
@@ -329,7 +329,7 @@ begin
 		e.Text.Lines.Append('}');
 		e.Text.Lines.Append('');
 		e.GotoLineNr(e.Text.Lines.Count - 1);
-		e.Modified := True;
+		e.Text.Modified := True;
 	end;
 
 	// if needed, insert a new member function for WRITE access to the new var
@@ -342,7 +342,7 @@ begin
 		e.Text.Lines.Append('}');
 		e.Text.Lines.Append('');
 		e.GotoLineNr(e.Text.Lines.Count - 1);
-		e.Modified := True;
+		e.Text.Modified := True;
 	end;
 
 	e.Text.Lines.EndUpdate;

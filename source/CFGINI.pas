@@ -29,26 +29,26 @@ type
   private
    fOwner: TComponent;                 // assumes a TConfigData
    fini: Tinifile;
-    procedure ReadFrominifile(Obj: TPersistent; const Section: string);
-    procedure ReadObject(const Name: string; Obj: TPersistent);
-    procedure ReadStrings(const Name: string; value: TStrings);
-    procedure WriteObject(const Name: string; Obj: TPersistent);
-    procedure WriteStrings(const Name: string; value: TStrings);
-    procedure Writetoinifile(const Section: string; Obj: TPersistent);
-    procedure ClearSection(const Name: string);
+    procedure ReadFrominifile(Obj: TPersistent; const Section: AnsiString);
+    procedure ReadObject(const Name: AnsiString; Obj: TPersistent);
+    procedure ReadStrings(const Name: AnsiString; value: TStrings);
+    procedure WriteObject(const Name: AnsiString; Obj: TPersistent);
+    procedure WriteStrings(const Name: AnsiString; value: TStrings);
+    procedure Writetoinifile(const Section: AnsiString; Obj: TPersistent);
+    procedure ClearSection(const Name: AnsiString);
   public
    constructor Create(aOwner: TComponent);
    destructor Destroy; override;
 
-   procedure SetIniFile(s : string);
+   procedure SetIniFile(s : AnsiString);
    procedure ReadConfig;
    procedure SaveConfig;
 
    procedure LoadObject(var Obj: TCFGOptions);
    procedure SaveObject(var  Obj: TCFGOptions);
 
-   function LoadSetting(const key: string; const Entry: string): string;
-   procedure SaveSettingS(const key: string; const entry: string; const value: string);
+   function LoadSetting(const key: AnsiString; const Entry: AnsiString): AnsiString;
+   procedure SaveSettingS(const key: AnsiString; const entry: AnsiString; const value: AnsiString);
  end;
 
 
@@ -77,7 +77,7 @@ begin
   inherited;
 end;
 
-procedure TCFGIni.SetIniFile(s : string);
+procedure TCFGIni.SetIniFile(s : AnsiString);
 begin
   if (assigned(fIni)) then
     fini.free;
@@ -86,7 +86,7 @@ end;
 
 procedure TCFGINI.ReadConfig;
 var
- section: string;
+ section: AnsiString;
 begin
   if not assigned(fIni) then exit;
   section:= TConfigData(fOwner).INISection;
@@ -99,7 +99,7 @@ end;
 
 procedure TCFGINI.SaveConfig;
 var
- section: string;
+ section: AnsiString;
 begin
   if not assigned(fIni) then exit;
   section:= TConfigData(fOwner).INISection;
@@ -113,7 +113,7 @@ end;
 
 // Reading methods
 
-procedure TCFGINI.ReadStrings(const Name: string; value: TStrings);
+procedure TCFGINI.ReadStrings(const Name: AnsiString; value: TStrings);
 begin
   Value.BeginUpdate;
   try
@@ -125,16 +125,16 @@ begin
   end;
 end;
 
-procedure TCFGINI.ReadObject(const Name: string; Obj: TPersistent);
+procedure TCFGINI.ReadObject(const Name: AnsiString; Obj: TPersistent);
 begin
   if fini.SectionExists(Name) then
    ReadFromINIFile(Obj, Name);
 end;
 
-procedure TCFGINI.ReadFrominifile(Obj: TPersistent; const Section: string);
+procedure TCFGINI.ReadFrominifile(Obj: TPersistent; const Section: AnsiString);
 var
  idx, idx2: integer;
- PropName: string;
+ PropName: AnsiString;
  Cd: TConfigData;
 begin
   CD:= TConfigData(fOwner);
@@ -182,20 +182,20 @@ begin
    end;
 end;
 
-procedure TCFGINI.WriteStrings(const Name: string; value: TStrings);
+procedure TCFGINI.WriteStrings(const Name: AnsiString; value: TStrings);
 var
  idx: integer;
 begin
   ClearSection(Name);
   if value.count <= 0 then exit;
   for idx:= 0 to Pred(value.Count) do
-   if AnsiPos('=', value[idx]) <> 0 then
+   if Pos('=', value[idx]) <> 0 then
     fini.WriteString(Name, Value.Names[idx], value.Values[Value.Names[idx]])
    else
     fini.WriteString(Name, Value[idx], '');
 end;
 
-procedure TCFGINI.WriteObject(const Name: string; Obj: TPersistent);
+procedure TCFGINI.WriteObject(const Name: AnsiString; Obj: TPersistent);
 
   function WritetheObject(Obj: TPersistent): boolean;
    var
@@ -218,11 +218,11 @@ begin
   WritetoINIFile(Name, Obj);
 end;
 
-procedure TCFGINI.Writetoinifile(const Section: string; Obj: TPersistent);
+procedure TCFGINI.Writetoinifile(const Section: AnsiString; Obj: TPersistent);
 var
  idx,
  idx2: integer;
- PropName: string;
+ PropName: AnsiString;
  CD: TConfigData;
 begin
   CD:= TConfigData(fOwner);
@@ -247,7 +247,7 @@ begin
       tkLString,
       tkWString: fINI.WriteString(Section, PropName, '"'+GetStrProp(Obj, PropName)+'"');
       // 11 Jul 2002: mandrav: added double quotes around strings.
-      // fixes a bug with stringlists comma-text saved as string...
+      // fixes a bug with stringlists comma-text saved as AnsiString...
 
       tkChar,
       tkEnumeration,
@@ -276,7 +276,7 @@ begin
   except end;
 end;
 
-function TCFGINI.LoadSetting(const key, Entry: string): string;
+function TCFGINI.LoadSetting(const key, Entry: AnsiString): AnsiString;
 begin
   result:= fini.ReadString(Key, Entry, '');
 end;
@@ -287,12 +287,12 @@ begin
   WriteObject(Obj.Name, Obj);
 end;
 
-procedure TCFGINI.SaveSettingS(const key, entry, value: string);
+procedure TCFGINI.SaveSettingS(const key, entry, value: AnsiString);
 begin
   fini.WriteString(Key, Entry, Value);
 end;
 
-procedure TCFGINI.ClearSection(const Name: string);
+procedure TCFGINI.ClearSection(const Name: AnsiString);
 begin
 	if fini.SectionExists(Name) then
 		fini.EraseSection(Name);

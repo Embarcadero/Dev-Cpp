@@ -25,7 +25,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, SynEdit,
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, SynEdit, utils,
   SynEditTypes, FileCtrl;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -76,16 +76,16 @@ type
     procedure cmbFilesClick(Sender: TObject);
   private
     { Private declarations }
-    fFilename: string;
+    fFilename: AnsiString;
     fEdit: TSynEdit;
     procedure LoadText;
-    procedure CalculateFile(Filename: string);
-    procedure CalculateSize(Filename: string);
-    procedure ShowPropsFor(Filename: string);
+    procedure CalculateFile(Filename: AnsiString);
+    procedure CalculateSize(Filename: AnsiString);
+    procedure ShowPropsFor(Filename: AnsiString);
     procedure FillFiles;
   public
     { Public declarations }
-    procedure SetFile(Filename: string);
+    procedure SetFile(Filename: AnsiString);
   end;
 
 var
@@ -106,7 +106,7 @@ uses
 
 { TFilePropertiesForm }
 
-procedure TFilePropertiesForm.CalculateSize(Filename: string);
+procedure TFilePropertiesForm.CalculateSize(Filename: AnsiString);
 var
   hFile: integer;
 begin
@@ -122,10 +122,10 @@ begin
   end;
 end;
 
-procedure TFilePropertiesForm.CalculateFile(Filename: string);
+procedure TFilePropertiesForm.CalculateFile(Filename: AnsiString);
 var
   Attri: TSynHighlighterAttributes;
-  Current, Token: string;
+  Current, Token: AnsiString;
   I, C: integer;
 begin
   if not Assigned(fEdit) then
@@ -156,7 +156,7 @@ begin
       // if it is preprocessor...
       if Attri.Name = 'Preprocessor' then begin
         // check for includes
-        if AnsiStartsStr('#include', Token) or AnsiStartsStr('# include', Token) then
+        if StartsStr('#include', Token) or StartsStr('# include', Token) then
           Inc(Includes);
         // preprocessor directives are considered as code
         Inc(Code);
@@ -230,7 +230,7 @@ begin
   ShowPropsFor(fFilename);
 end;
 
-procedure TFilePropertiesForm.ShowPropsFor(Filename: string);
+procedure TFilePropertiesForm.ShowPropsFor(Filename: AnsiString);
 begin
   try
     fEdit.Lines.LoadFromFile(Filename);
@@ -303,7 +303,7 @@ begin
     ShowPropsFor(cmbFiles.Items[cmbFiles.ItemIndex]);
 end;
 
-procedure TFilePropertiesForm.SetFile(Filename: string);
+procedure TFilePropertiesForm.SetFile(Filename: AnsiString);
 begin
   fFilename := Filename;
 end;

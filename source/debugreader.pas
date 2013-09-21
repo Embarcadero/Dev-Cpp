@@ -34,7 +34,7 @@ type
   public
     hPipeRead  : THandle;
     EventReady : THandle;
-    Output     : string;
+    Output     : AnsiString;
     Idling    : boolean;
 
   protected
@@ -48,7 +48,7 @@ procedure TDebugReader.Execute;
 var
   lpBuffer : array [0..256] of char;
   nBytesRead : DWORD;
-  _output : string;
+  _output : AnsiString;
 begin
   _output := '';
   while true do begin
@@ -60,7 +60,7 @@ begin
       else
         break; // Something bad happened.
     end;
-    _output := _output + string(lpBuffer);
+    _output := _output + AnsiString(lpBuffer);
     if pos(GDB_PROMPT, _output) <> 0 then begin
       SetEvent(EventReady);
       Output := _output;

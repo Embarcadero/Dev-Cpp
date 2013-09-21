@@ -82,7 +82,7 @@ begin
   for i := 0 to SiteList.Items.Count-1 do
       if SiteList.Selected[i] then
          ShellExecute(GetDesktopWindow, 'open',
-                      pChar(SiteList.Items[i]),
+                      PAnsiChar(SiteList.Items[i]),
                       nil, nil, SW_SHOWNORMAL);
 end;
 

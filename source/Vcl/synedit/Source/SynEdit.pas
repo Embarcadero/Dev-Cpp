@@ -11226,27 +11226,23 @@ var
 	i, LastLine: Integer;
 begin
 	Result := nil;
-  LastLine := 0;
+	LastLine := 0;
 
-  if FoldCount <> nil then
-  	FoldCount^ := 1;
+	if FoldCount <> nil then
+		FoldCount^ := 1;
 
-  for i := 0 to fAllFoldRanges.AllCount - 1 do
-  	with fAllFoldRanges[i] do
-      if (not ParentCollapsed) and (FromLine = Line) and (Collapsable) then
-      begin
-      	Result := fAllFoldRanges[i];
-      	Break;
-      end
-      else
-      	if FoldCount <> nil then
-      		if LastLine = FromLine then
-          	Inc(FoldCount^)
-        	else
-          begin
-      			LastLine := FromLine;
-          	FoldCount^ := 1;
-          end;
+	for i := 0 to fAllFoldRanges.AllCount - 1 do
+		with fAllFoldRanges[i] do
+			if (not ParentCollapsed) and (FromLine = Line) and (Collapsable) then begin
+				Result := fAllFoldRanges[i];
+				Break;
+			end else if FoldCount <> nil then
+				if LastLine = FromLine then
+					Inc(FoldCount^)
+				else begin
+					LastLine := FromLine;
+					FoldCount^ := 1;
+				end;
 end;
 
 function TCustomSynEdit.GetRealLineNumber(aLine: Integer): Integer;

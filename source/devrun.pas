@@ -30,24 +30,24 @@ uses
 {$ENDIF}
 
 type
-  TLineOutputEvent = procedure(Sender: TObject; const Line: String) of Object;
+  TLineOutputEvent = procedure(Sender: TObject; const Line: AnsiString) of Object;
 
   TDevRun = class(TThread)
   private
-    TheMsg     : String;
-    CurrentLine: String;
+    TheMsg     : AnsiString;
+    CurrentLine: AnsiString;
     FLineOutput: TLineOutputEvent;
     fCheckAbort: TCheckAbortFunc;
   protected
     procedure CallLineOutputEvent;
     procedure Execute; override;
-    procedure LineOutput(const Line: string);
-    procedure ShowError(const Msg: string);
+    procedure LineOutput(const Line: AnsiString);
+    procedure ShowError(const Msg: AnsiString);
     procedure ShowMsg;
   public
-    Command   : string;
-    Directory : string;
-    Output    : string;
+    Command   : AnsiString;
+    Directory : AnsiString;
+    Output    : AnsiString;
     property OnLineOutput: TLineOutputEvent read FLineOutput write FLineOutput;
     property OnCheckAbort: TCheckAbortFunc read FCheckAbort write FCheckAbort;
   end;
@@ -59,7 +59,7 @@ begin
   MsgBox(TheMsg);
 end;
 
-procedure TDevRun.ShowError(const Msg: String);
+procedure TDevRun.ShowError(const Msg: AnsiString);
 begin
   TheMsg := Msg;
   Synchronize(ShowMsg);
@@ -70,7 +70,7 @@ begin
     FLineOutput(Self, CurrentLine);
 end;
 
-procedure TDevRun.LineOutput(const Line: string);
+procedure TDevRun.LineOutput(const Line: AnsiString);
 begin
   CurrentLine := Line;
   if Assigned(FLineOutput) then

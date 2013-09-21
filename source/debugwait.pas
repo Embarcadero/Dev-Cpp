@@ -45,20 +45,20 @@ type
 
   PCallStack = ^TCallStack;
   TCallStack = packed record
-    Filename: string;
+    Filename: AnsiString;
     Line: integer;
-    FuncName: string;
-    Args: string;
+    FuncName: AnsiString;
+    Args: AnsiString;
   end;
 
   type TRegister  = (EAX, EBX, ECX, EDX, ESI, EDI,
                      EBP, ESP, EIP, CS, DS, SS, ES, FS, GS);
-  type TRegisters = array [TRegister] of string;
+  type TRegisters = array [TRegister] of AnsiString;
 
   TDebugNode = class(TObject)
   public
-    Name  : string;
-    Value : string;
+    Name  : AnsiString;
+    Value : AnsiString;
     Next  : TList;
 
     constructor Create;
@@ -76,14 +76,14 @@ type
     Registers : ^TRegisters;
     CallStackList: TList;
     CurrentDisplay : integer;
-    tmpWatchVar: string;
-    tmpWatchValue: string;
+    tmpWatchVar: AnsiString;
+    tmpWatchValue: AnsiString;
     OnNoDebuggingSymbols : procedure of object;
     OnSourceMoreRecent : procedure of object;
     // RNC A procedure to see if debugging went into a DLL that we do not have debug info for.
     InaccessibleFunction : procedure of object;
-    OnAsmCode : procedure (s : string) of object;
-    OnAsmFunc : procedure (s : string) of object;
+    OnAsmCode : procedure (s : AnsiString) of object;
+    OnAsmFunc : procedure (s : AnsiString) of object;
     OnAsmCodeEnd : procedure of object;
     OnSegmentationFault: procedure of object;
 
@@ -92,11 +92,11 @@ type
     broken : boolean;
 
   protected
-    pos      : integer;
+    ipos     : integer;
     len      : integer;
     bline    : integer;
-    bfile    : string;
-    debugstr : string;
+    bfile    : AnsiString;
+    debugstr : AnsiString;
     CurNode  : TDebugNode;
     ExitCount : integer;
     FirstBreak : boolean;
@@ -111,16 +111,16 @@ type
     procedure SkipSpaces;
     procedure NextAnnotation;
     function  GetNextAnnotation : TAnnotateType;
-    function  GetNextString : string;
-    function  GetNextLine : string;
+    function  GetNextString : AnsiString;
+    function  GetNextLine : AnsiString;
     procedure CatchExpression;
-    procedure GetRegisters(name, value : string);
+    procedure GetRegisters(name, value : AnsiString);
     procedure GetAsmCode;
     function  GetNextField(Node : TDebugNode; ExtraClose : integer) : integer;
     procedure UpdateDebugTree;
     procedure CreateDebugNodes(ParentNode : TTreeNode; Node : TDebugNode);
     procedure UpdateDebugNodes(item : TTreeNode; Node : TDebugNode);
-    function  CreateClassNodes(node : TDebugNode; s : string; i : integer) : integer;
+    function  CreateClassNodes(node : TDebugNode; s : AnsiString; i : integer) : integer;
 
   end;
 
@@ -185,39 +185,39 @@ end;
 
 procedure TDebugWait.SkipSpaces;
 begin
-  while (pos < len) and (Reader.Output[pos] in SPACES) do
-    pos := pos + 1;
+  while (ipos < len) and (Reader.Output[ipos] in SPACES) do
+    ipos := ipos + 1;
 end;
 
 procedure TDebugWait.NextAnnotation;
 begin
-  while (pos < len) and (Reader.Output[pos] <> #26) do
-    pos := pos + 1;
+  while (ipos < len) and (Reader.Output[ipos] <> #26) do
+    ipos := ipos + 1;
 end;
 
-function TDebugWait.GetNextString : string;
+function TDebugWait.GetNextString : AnsiString;
 begin
   Result:='';
-  while (pos < len) and (not (Reader.Output[pos] in SPACES)) do begin
-    Result := Result + Reader.Output[pos];
-    pos := pos + 1;
+  while (ipos < len) and (not (Reader.Output[ipos] in SPACES)) do begin
+    Result := Result + Reader.Output[ipos];
+    ipos := ipos + 1;
   end;
 end;
 
-function TDebugWait.GetNextLine : string;
+function TDebugWait.GetNextLine : AnsiString;
 begin
   Result := '';
-  while (pos < len) and (not (Reader.Output[pos] in [#13, #10])) do begin
-    Result := Result + Reader.Output[pos];
-    pos := pos + 1;
+  while (ipos < len) and (not (Reader.Output[ipos] in [#13, #10])) do begin
+    Result := Result + Reader.Output[ipos];
+    ipos := ipos + 1;
   end;
 end;
 
 function TDebugWait.GetNextAnnotation : TAnnotateType;
-var s : string;
+var s : AnsiString;
 begin
-  while (pos < len) and (Reader.Output[pos] = #26) do
-    pos := pos + 1;
+  while (ipos < len) and (Reader.Output[ipos] = #26) do
+    ipos := ipos + 1;
   s := GetNextString;
   if s = T_PROMPT then
     result := TPrompt
@@ -272,7 +272,7 @@ begin
     result := TUnknown;
 end;
 
-procedure TDebugWait.GetRegisters(name, value : string);
+procedure TDebugWait.GetRegisters(name, value : AnsiString);
 begin
   if name = GDB_EAX then begin
     Registers[EAX] := value;
@@ -323,7 +323,7 @@ begin
   end;
 end;
 
-function CountChar(s : string; c : char) : integer;
+function CountChar(s : AnsiString; c : char) : integer;
 var i : integer;
 begin
   result := 0;
@@ -332,7 +332,7 @@ begin
       result := result + 1;
 end;
 
-function TDebugWait.CreateClassNodes(node : TDebugNode; s : string; i : integer) : integer;
+function TDebugWait.CreateClassNodes(node : TDebugNode; s : AnsiString; i : integer) : integer;
 var parent, newnode : TDebugNode;
     j{, count}     : integer;
     first : boolean;
@@ -402,7 +402,7 @@ end;
 function TDebugWait.GetNextField(Node : TDebugNode; ExtraClose : integer) : integer;
 var a : TAnnotateType;
     n : TDebugNode;
-    s : string;
+    s : AnsiString;
     Count, tmp : integer;
 begin
   result := 0;
@@ -410,7 +410,7 @@ begin
     repeat
       NextAnnotation;
       a := GetNextAnnotation;
-      if (pos >= len) then
+      if (ipos >= len) then
         exit;
       if a = TArraySectionBegin then begin // get array
         //Node.Value := ' = ';
@@ -447,7 +447,7 @@ begin
     repeat
       NextAnnotation;
       a := GetNextAnnotation;
-      if (pos >= len) then
+      if (ipos >= len) then
         exit;
     until (a = TPrompt) or (a = TFieldValue);
     SkipSpaces;
@@ -470,13 +470,13 @@ begin
       exit;
     end;
     repeat
-      tmp := pos;
+      tmp := ipos;
       NextAnnotation;
       a := GetNextAnnotation;
-      if (pos >= len) then
+      if (ipos >= len) then
         exit;
       if (a = TFieldName) then begin
-        pos := tmp;
+        ipos := tmp;
         GetNextField(n, Count - 1);
       end;
     until (a = TPrompt) or (a = TFieldEnd);
@@ -498,7 +498,7 @@ end;
 
 procedure TDebugWait.CatchExpression;
 var a : TAnnotateType;
-    name, value, tmp : string;
+    name, value, tmp : AnsiString;
     Node : TDebugNode;
     CountOpen, res : integer;
 begin
@@ -515,7 +515,7 @@ begin
   repeat
     NextAnnotation;
     a := GetNextAnnotation;
-    if (pos >= len) then
+    if (ipos >= len) then
       exit; // big error /!\
    until (a = TPrompt) or (a = TDisplayExpression);
 
@@ -530,7 +530,7 @@ begin
   Node := TDebugNode.Create;
   Node.Name := name;
 
-  if AnsiStartsStr(#26#26 + 'error', name) then begin // check if an error occured
+  if StartsStr(#26#26 + 'error', name) then begin // check if an error occured
       if not devData.WatchError then begin
         Node.Free;
         Node := nil;
@@ -539,7 +539,7 @@ begin
         Node.Name := 'Could not watch this variable';
       end;
   end
-  else if AnsiStartsStr(#26#26, name) then begin
+  else if StartsStr(#26#26, name) then begin
      Node.Free;
      Node := nil;
   end
@@ -557,7 +557,7 @@ begin
     else if CountOpen = 1 then begin // block of values (i.e. struct members following)
       GetNextField(Node, CountOpen - 1);
     end
-    else if AnsiStartsStr(#26#26 + 'error', value) then begin // check if an error occured
+    else if StartsStr(#26#26 + 'error', value) then begin // check if an error occured
       if not devData.WatchError then begin
         Node.Free;
         Node := nil;
@@ -566,14 +566,14 @@ begin
         Node.Name := Node.Name + ' = Could not watch this variable';
     end
     else begin
-      if AnsiStartsStr(#26#26, value) then
+      if StartsStr(#26#26, value) then
          value := '';
       repeat
         SkipSpaces;
         tmp := GetNextLine;
-        if AnsiStartsStr(#26#26 + T_DISPLAY_END, tmp) then
+        if StartsStr(#26#26 + T_DISPLAY_END, tmp) then
           break;
-        while AnsiStartsStr(#26#26, tmp) do begin
+        while StartsStr(#26#26, tmp) do begin
           SkipSpaces;
           tmp := GetNextLine();
         end;
@@ -582,7 +582,7 @@ begin
         SkipSpaces;
         a := GetNextAnnotation;
       until (a = TPrompt) or (a = TDisplayEnd) or (tmp = '');
-      if AnsiSameStr(Node.Name, value) then begin
+      if SameStr(Node.Name, value) then begin
         if not devData.WatchError then begin
           Node.Free;
           Node := nil;
@@ -607,7 +607,7 @@ procedure TDebugWait.Analyze;
 var an  : TAnnotateType;
     tmp : integer;
 
-  procedure get_source_info(s : string);
+  procedure get_source_info(s : AnsiString);
   const DELIM = ':';
   var CatchDriveDelim : boolean;
       i, j : integer;
@@ -645,11 +645,11 @@ var an  : TAnnotateType;
     pcs: PCallStack;
     Node: TDebugNode;
 begin
-  pos := 1;
+  ipos := 1;
   len := Length(Reader.Output);
-  while pos < len do begin
+  while ipos < len do begin
     SkipSpaces;
-    if Reader.Output[pos] = #26 then begin // Ctrl + Z char
+    if Reader.Output[ipos] = #26 then begin // Ctrl + Z char
       an := GetNextAnnotation;
       case an of
         TPrompt     : begin
@@ -668,7 +668,7 @@ begin
                         debugstr := GetNextString;
 
                         // handle spaces in filenames - mandrav 8 Jul 2002
-                        while (AnsiPos(':beg:', debugstr)=0) and (AnsiPos(':middle:', debugstr)=0) do begin
+                        while (Pos(':beg:', debugstr)=0) and (Pos(':middle:', debugstr)=0) do begin
                           SkipSpaces;
                           debugstr := debugstr+' '+GetNextString;
                         end;
@@ -720,9 +720,9 @@ begin
                           SkipSpaces;
                           debugstr := GetNextLine;
                           Synchronize(Debug);
-                          if (AnsiPos('in current context', debugstr) > 0) then begin
-                            Delete(debugstr, 1, AnsiPos('"', debugstr));
-                            tmp := AnsiPos('"', debugstr);
+                          if (Pos('in current context', debugstr) > 0) then begin
+                            Delete(debugstr, 1, Pos('"', debugstr));
+                            tmp := Pos('"', debugstr);
                             Delete(debugstr, tmp, length(debugstr) - tmp + 1);
                             Node := TDebugNode.Create;
                             Node.Name := debugstr;
@@ -737,7 +737,7 @@ begin
 
         TPostPrompt : begin // handle asm code
                         SkipSpaces;
-                        tmp := pos;
+                        tmp := ipos;
                         debugstr := GetNextString;
                         if debugstr = T_DUMP then begin
                           SkipSpaces;
@@ -748,12 +748,12 @@ begin
                             if (debugstr = T_ASM) then
                               GetAsmCode
                             else
-                              pos := tmp;
+                              ipos := tmp;
                           end
                           else
-                            pos := tmp;
+                            ipos := tmp;
                         end
-                        else pos := tmp;
+                        else ipos := tmp;
                       end;
         TSignalString : begin
                           SkipSpaces;
@@ -762,7 +762,7 @@ begin
                         end;
       end;
     end;
-    pos := pos + 1;
+    ipos := ipos + 1;
   end;
 end;
 
@@ -831,7 +831,7 @@ begin
 end;
 
 procedure TDebugWait.GetAsmCode;
-var s : string;
+var s : AnsiString;
 begin
   SkipSpaces;
   s := GetNextLine;
@@ -900,9 +900,9 @@ begin
     item := nil;
     for i := 0 to DebugTree.Items.Count - 1 do
       if (CurNode.Name = DebugTree.Items[i].Text) or
-         AnsiStartsStr(CurNode.Name + ' ', DebugTree.Items[i].Text) or
-         AnsiStartsStr('this->' + CurNode.Name + ' ', DebugTree.Items[i].Text) or
-         AnsiStartsStr('this.' + CurNode.Name + ' ', DebugTree.Items[i].Text) then begin
+         StartsStr(CurNode.Name + ' ', DebugTree.Items[i].Text) or
+         StartsStr('this->' + CurNode.Name + ' ', DebugTree.Items[i].Text) or
+         StartsStr('this.' + CurNode.Name + ' ', DebugTree.Items[i].Text) then begin
         item := DebugTree.Items[i];
         break;
       end;

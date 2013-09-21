@@ -56,20 +56,20 @@ type
   private
    fSingleFile: boolean;
    fReplace: boolean;
-   fFindText: string;
-   fReplaceText: string;
+   fFindText: AnsiString;
+   fReplaceText: AnsiString;
    fSearchProc: TdevSearchProc;
    fEditor: TEditor;
    fProject: TProject;
    fOptions: TSynSearchOptions;
    fSynEdit: TSynEdit;
-   fCurFile: string;
+   fCurFile: AnsiString;
    fPC: TPageControl;
    fSearchEngine: TSynEditSearch;
    function RunSingleFile: boolean;
    function RunAllFiles: boolean;
    procedure EditorReplaceText(Sender: TObject; const aSearch,
-     aReplace: string; Line, Column: integer; var Action: TSynReplaceAction);
+     aReplace: AnsiString; Line, Column: integer; var Action: TSynReplaceAction);
    function RunProject: boolean;
    function RunOpenFiles: boolean;
   public
@@ -77,8 +77,8 @@ type
    destructor Destroy; override;
    property SingleFile: boolean read fSingleFile write fSingleFile;
    property Replace: boolean read fReplace write fReplace;
-   property FindText: string read fFindText write fFindText;
-   property ReplaceText: string read fReplaceText write fReplaceText;
+   property FindText: AnsiString read fFindText write fFindText;
+   property ReplaceText: AnsiString read fReplaceText write fReplaceText;
    property SearchProc: TdevSearchProc read fSearchProc write fSearchProc;
    property Editor: TEditor read fEditor write fEditor;
    property Project: TProject read fProject write fProject;
@@ -202,7 +202,7 @@ begin
 end;
 
 procedure TdevSearchCenter.EditorReplaceText(Sender: TObject;
-  const aSearch, aReplace: string; Line, Column: integer;
+  const aSearch, aReplace: AnsiString; Line, Column: integer;
   var Action: TSynReplaceAction);
 var
  SR: TdevSearchResult;

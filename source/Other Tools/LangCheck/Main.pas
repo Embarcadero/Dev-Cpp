@@ -50,21 +50,21 @@ end;
 procedure TForm1.StartClick(Sender: TObject);
 begin
   if not FileExists(Edit1.Text) then
-      Application.MessageBox(PChar('File ''' + Edit1.Text +
+      Application.MessageBox(PAnsiChar('File ''' + Edit1.Text +
         ''' does not exists!'), 'Error',
         MB_ICONHAND)
   else if not FileExists(Edit2.Text) then
-      Application.MessageBox(PChar('File ''' + Edit2.Text +
+      Application.MessageBox(PAnsiChar('File ''' + Edit2.Text +
         ''' does not exists!'), 'Error',
         MB_ICONHAND)
   else
       StartCheck;
 end;
 
-procedure LoadList(var List: TStringList; FileName: String);
+procedure LoadList(var List: TStringList; FileName: string);
 var
   F: TextFile;
-  Line: String;
+  Line: string;
   i: Integer;
 begin
   AssignFile(F, FileName);
@@ -161,21 +161,21 @@ end;
 procedure TForm1.SpeedButton3Click(Sender: TObject);
 begin
   if not FileExists(Edit1.Text) then
-      Application.MessageBox(PChar('File ''' + Edit1.Text +
+      Application.MessageBox(PAnsiChar('File ''' + Edit1.Text +
         ''' does not exists!'), 'Error',
         MB_ICONHAND)
   else
-      ShellExecute(Handle, nil, 'notepad', PChar(Edit1.Text), nil, SW_MAXIMIZE);
+      ShellExecute(Handle, nil, 'notepad', PAnsiChar(Edit1.Text), nil, SW_MAXIMIZE);
 end;
 
 procedure TForm1.SpeedButton4Click(Sender: TObject);
 begin
   if not FileExists(Edit1.Text) then
-      Application.MessageBox(PChar('File ''' + Edit2.Text +
+      Application.MessageBox(PAnsiChar('File ''' + Edit2.Text +
         ''' does not exists!'), 'Error',
         MB_ICONHAND)
   else
-      ShellExecute(Handle, nil, 'notepad', PChar(Edit2.Text), nil, SW_MAXIMIZE);
+      ShellExecute(Handle, nil, 'notepad', PAnsiChar(Edit2.Text), nil, SW_MAXIMIZE);
 end;
 
 end.

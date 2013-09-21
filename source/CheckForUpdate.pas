@@ -40,7 +40,7 @@ type
     BytesRead: cardinal;
 
   public
-    UpdateFile, VersionName, Needed_package, Description : string;
+    UpdateFile, VersionName, Needed_package, Description : AnsiString;
 
     constructor Create;
     function  Connect: boolean;
@@ -86,7 +86,7 @@ begin
                             nil, nil, 0);
 
   if Assigned(NetHandle) then begin
-     UrlHandle := InternetOpenUrl(NetHandle, PChar(Url), nil, 0,
+     UrlHandle := InternetOpenUrl(NetHandle, PAnsiChar(Url), nil, 0,
                                   INTERNET_FLAG_RELOAD, 0);
      Result := True;
   end
@@ -131,7 +131,7 @@ end;
 procedure TCheckForUpdate.Check;
 var F : TextFile;
     c     : char;
-    tmp : string;
+    tmp : AnsiString;
     i   : integer;
 begin
   if not FileExists(LocalFileName) then begin

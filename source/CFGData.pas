@@ -34,12 +34,12 @@ type
 
  TConfigData = class(TComponent)
   private
-   finiFileName: string;               // ini filename
-   finiSection: string;                // default section of ini file
+   finiFileName: AnsiString;               // ini filename
+   finiSection: AnsiString;                // default section of ini file
    fIgnores: TStrings;                 // Ignored properties of objects
    GetINI: TCFGINI;
 
-   procedure SetIni(s : string);
+   procedure SetIni(s : AnsiString);
   public
    constructor Create(aOwner: TComponent); override;
    destructor Destroy; override;
@@ -49,23 +49,23 @@ type
    procedure ReadConfigData; virtual;
 
    // load/save functions
-   procedure SaveSettingB(const key: string; const entry: string; const value: boolean);
-   procedure SaveSettingS(const key: string; const Entry: string; const value: string);
+   procedure SaveSettingB(const key: AnsiString; const entry: AnsiString; const value: boolean);
+   procedure SaveSettingS(const key: AnsiString; const Entry: AnsiString; const value: AnsiString);
 
-   function LoadSettingB(const key,entry: string): boolean; overload;
-   function LoadSettingB(const key,entry,default: string): boolean; overload;
-   function LoadSettingS(const key: string; const entry: string): string;
+   function LoadSettingB(const key,entry: AnsiString): boolean; overload;
+   function LoadSettingB(const key,entry,default: AnsiString): boolean; overload;
+   function LoadSettingS(const key: AnsiString; const entry: AnsiString): AnsiString;
 
    // load/save TCFGOptions
    procedure SaveObject(obj: TCFGOptions); virtual;
    procedure LoadObject(obj: TCFGOptions); virtual;
 
-   property INIFile: string read fINIFileName write SetIni;
-   property INISection: string read finiSection write finiSection;
+   property INIFile: AnsiString read fINIFileName write SetIni;
+   property INISection: AnsiString read finiSection write finiSection;
    property IgnoreProperties: TStrings read fIgnores write fIgnores;
  end;
 
-function GetPropName(Instance: TPersistent; Index: Integer): String;
+function GetPropName(Instance: TPersistent; Index: Integer): AnsiString;
 function GetPropCount(Instance: TPersistent): Integer;
 
 implementation
@@ -80,7 +80,7 @@ begin
 end;
 
 //Returns the property name of an instance at a certain index
-function GetPropName(Instance: TPersistent; Index: Integer): String;
+function GetPropName(Instance: TPersistent; Index: Integer): AnsiString;
 var
 	PropList: PPropList;
 	PropInfo:PPropInfo;
@@ -120,7 +120,7 @@ begin
 	inherited Destroy;
 end;
 
-procedure TConfigData.SetIni(s : string);
+procedure TConfigData.SetIni(s : AnsiString);
 begin
 	fIniFileName := s;
 	GetINI.SetIniFile(s);
@@ -146,9 +146,9 @@ begin
 	GetINI.SaveObject(Obj);
 end;
 
-function TConfigData.LoadSettingB(const key, entry: string): boolean;
+function TConfigData.LoadSettingB(const key, entry: AnsiString): boolean;
 var
-	s: string;
+	s: AnsiString;
 begin
 	try
 		s:= GetINI.LoadSetting(key, Entry);
@@ -161,9 +161,9 @@ begin
 	end;
 end;
 
-function TConfigData.LoadSettingB(const key, entry, default: string): boolean;
+function TConfigData.LoadSettingB(const key, entry, default: AnsiString): boolean;
 var
-	s: string;
+	s: AnsiString;
 begin
 	try
 		s:= GetINI.LoadSetting(key, Entry);
@@ -176,17 +176,17 @@ begin
 	end;
 end;
 
-function TConfigData.LoadSettingS(const key, entry: string): string;
+function TConfigData.LoadSettingS(const key, entry: AnsiString): AnsiString;
 begin
 	result:= GetINI.LoadSetting(key, Entry);
 end;
 
-procedure TConfigData.SaveSettingS(const key: string; const Entry: string;const value: string);
+procedure TConfigData.SaveSettingS(const key: AnsiString; const Entry: AnsiString;const value: AnsiString);
 begin
 	GetINI.SaveSettingS(key, Entry, Value);
 end;
 
-procedure TConfigData.SaveSettingB(const key: string; const entry: string; const value: boolean);
+procedure TConfigData.SaveSettingB(const key: AnsiString; const entry: AnsiString; const value: boolean);
 begin
 	GetINI.SaveSettingS(key, Entry, inttostr(ord(value)));
 end;

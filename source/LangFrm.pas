@@ -79,7 +79,7 @@ type
     HasProgressStarted : boolean;
 
     function GetSelected: integer;
-    procedure CppParserTotalProgress(Sender: TObject; const FileName: String; Total, Current: Integer);
+    procedure CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
 
   public
     procedure UpdateList(const List: TStrings);
@@ -112,9 +112,9 @@ begin
   result:= ListBox.ItemIndex;
 end;
 
-procedure TLangForm.CppParserTotalProgress(Sender: TObject; const FileName: String; Total, Current: Integer);
+procedure TLangForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
 var
-	tmp : string;
+	tmp : AnsiString;
 begin
 	if not HasProgressStarted then begin
 		pbCCCache.Max := Total;
@@ -130,7 +130,7 @@ procedure TLangForm.OkBtnClick(Sender: TObject);
 var
 	s, f : TStringList;
 	i, j : integer;
-	fullpath : string;
+	fullpath : AnsiString;
 begin
 	if OkBtn.Tag = 0 then begin
 		OkBtn.Tag := 1;
@@ -264,7 +264,7 @@ end;
 
 procedure TLangForm.ThemeChange(Sender: TObject);
 var
-	finalname : string;
+	finalname : AnsiString;
 begin
 	finalname := '';
 	case ThemeBox.ItemIndex of
@@ -282,7 +282,7 @@ end;
 procedure TLangForm.ButtonAddFileClick(Sender: TObject);
 var
 	I: integer;
-	s: string;
+	s: AnsiString;
 begin
 	with dmMain.OpenDialog do begin
 		Filter:= FLT_HEADS;
@@ -311,10 +311,10 @@ end;
 
 procedure TLangForm.ButtonAddFolderClick(Sender: TObject);
 var
-	Dir : string;
+	Dir : AnsiString;
 	f : TStringList;
 	I : integer;
-	s : string;
+	s : AnsiString;
 begin
 	f := TStringList.Create;
 	if SelectDirectory('Select Folder', devDirs.Exec, Dir) then begin

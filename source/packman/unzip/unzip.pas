@@ -155,7 +155,7 @@ USES
 {**********************************************************************}
 
 FUNCTION FileUnzip
-( SourceZipFile, TargetDirectory, FileSpecs : pChar;
+( SourceZipFile, TargetDirectory, FileSpecs : PAnsiChar;
  Report : UnzipReportProc;Question : UnzipQuestionProc ) : integer;
 {$ifdef USE_STDCALL}STDCALL;{$else}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif} {USE_STDCALL}
 
@@ -177,7 +177,7 @@ e.g.,
 }
 
 FUNCTION FileUnzipEx
-( SourceZipFile, TargetDirectory, FileSpecs : pChar ) : integer;
+( SourceZipFile, TargetDirectory, FileSpecs : PAnsiChar ) : integer;
 {$ifdef USE_STDCALL}STDCALL;{$else USE_STDCALL}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif USE_STDCALL}
 {
 high level unzip with no callback parameters;
@@ -189,7 +189,7 @@ e.g.,
 }
 
 FUNCTION ViewZip
-( SourceZipFile, FileSpecs : pChar; Report : UnzipReportProc ) : integer;
+( SourceZipFile, FileSpecs : PAnsiChar; Report : UnzipReportProc ) : integer;
 {$ifdef USE_STDCALL}STDCALL;{$else USE_STDCALL}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif USE_STDCALL}
 {
 view contents of zip file
@@ -227,7 +227,7 @@ SetUnZipQuestionProc (QueryFileExistProc);
 }
 
 FUNCTION UnzipSize
-( SourceZipFile : pChar; VAR Compressed : Word64 ) : Word64;
+( SourceZipFile : PAnsiChar; VAR Compressed : Word64 ) : Word64;
 {$ifdef USE_STDCALL}STDCALL;{$else USE_STDCALL}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif USE_STDCALL}
 { uncompressed and compressed zip size
  usage:
@@ -258,7 +258,7 @@ the subdirectory structure;
  DontRecurse = FALSE : recurse (default)
 }
 
-FUNCTION RecursiveMkDir ( aPath :  pChar ) : Integer;
+FUNCTION RecursiveMkDir ( aPath :  PAnsiChar ) : Integer;
 {$ifdef USE_STDCALL}STDCALL;{$else USE_STDCALL}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif USE_STDCALL}
 {
 Iteratively create a directory path
@@ -268,7 +268,7 @@ Iteratively create a directory path
    if i = 0 then Writeln('Success!') else Writeln('Error!');
 }
 
-FUNCTION GetHeaderOffset ( FileName : pChar; pEndoffSet : pLongint ) : Longint;
+FUNCTION GetHeaderOffset ( FileName : PAnsiChar; pEndoffSet : pLongint ) : Longint;
 {$ifdef USE_STDCALL}STDCALL;{$else USE_STDCALL}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif USE_STDCALL}
 {
   return the offset to the PK signature; with normal zip files, this
@@ -294,7 +294,7 @@ FUNCTION GetSupportedMethods : longint;
 {bit 8=1 -> Format 8 supported, etc.}
 
 FUNCTION UnzipFile
-( in_name : pchar;out_name : pchar;offset : longint;hFileAction : word;cm_index : integer ) : integer;
+( in_name : PAnsiChar;out_name : PAnsiChar;offset : longint;hFileAction : word;cm_index : integer ) : integer;
 {$ifdef USE_STDCALL}STDCALL;{$else USE_STDCALL}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif USE_STDCALL}
 {usage:
  in_name:      name of zip file with full path
@@ -330,7 +330,7 @@ FUNCTION UnzipFile
  end;
 }
 
-FUNCTION  GetFirstInZip ( zipfilename : pchar;VAR zprec : tZipRec ) : integer;
+FUNCTION  GetFirstInZip ( zipfilename : PAnsiChar;VAR zprec : tZipRec ) : integer;
 {$ifdef USE_STDCALL}STDCALL;{$else USE_STDCALL}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif USE_STDCALL}
 {
  Get first entry from ZIP file
@@ -347,7 +347,7 @@ FUNCTION  GetNextInZip ( VAR Zprec : tZiprec ) : integer;
    rc := GetNextInZip (myZipRec);
 }
 
-FUNCTION  IsZip ( filename : pchar; pStartOffSet : pLongint ) : boolean;
+FUNCTION  IsZip ( filename : PAnsiChar; pStartOffSet : pLongint ) : boolean;
 {$ifdef USE_STDCALL}STDCALL;{$else USE_STDCALL}{$ifndef NO_EXPORTS}EXPORT;{$endif NO_EXPORTS}{$endif USE_STDCALL}
 {
   test for zip file
@@ -372,10 +372,10 @@ PROCEDURE CloseZipFile ( VAR Zprec : tZiprec );
   CloseZipFile (myZipRec);
 }
 
-FUNCTION FromOEM ( CONST s : String ) : String;
+FUNCTION FromOEM ( CONST s : AnsiString ) : AnsiString;
 { convert OEM chars to ANSI chars }
 
-FUNCTION FromOEMToDisplay ( CONST s : String ) : String;
+FUNCTION FromOEMToDisplay ( CONST s : AnsiString ) : AnsiString;
 { convert OEM chars to ANSI chars - for display purposes only }
 
 IMPLEMENTATION
@@ -418,7 +418,7 @@ END;
 
 {$ifndef MSWINDOWS}
 {$ifndef GPC_Win32}
-PROCEDURE OemToChar ( p1, p2 : pChar );
+PROCEDURE OemToChar ( p1, p2 : PAnsiChar );
 BEGIN
  { dummy }
 END;
@@ -426,7 +426,7 @@ END;
 {$endif}
 
 { convert from "oem" character sets to "ansi" }
-Function FromOEM ( Const s : String ) : String;
+Function FromOEM ( Const s : AnsiString ) : AnsiString;
 Var
 p : Array [0..{$ifdef __OS_DOS__}259{$else}2048{$endif}] of char;
 Begin
@@ -449,13 +449,13 @@ Begin
   {$endif} { CanUseWinApi }
 End;
 
-FUNCTION FromOemP ( p : pChar ) : pChar;
+FUNCTION FromOemP ( p : PAnsiChar ) : PAnsiChar;
 BEGIN
    Strpcopy (p, FromOEM (strpas (p)));
    FromOemP := p;
 END;
 
-FUNCTION FromOEMToDisplay ( CONST s : String ) : String;
+FUNCTION FromOEMToDisplay ( CONST s : AnsiString ) : AnsiString;
 Begin
    FromOEMToDisplay :=
    {$ifdef Win16}
@@ -468,15 +468,15 @@ End;
 { some utility functions }
 {$ifndef Delphi}
 {$ifdef __GPC__}
-FUNCTION ExtractFileDir ( CONST aName : String ) : TString;
+FUNCTION ExtractFileDir ( CONST aName : AnsiString ) : TString;
 BEGIN
   Result := DirFromPath  ( aName );
 END;
 {$else} {__GPC__}
-FUNCTION CurrentDirectory : String;
+FUNCTION CurrentDirectory : AnsiString;
 {$ifndef FPC}
 VAR
-Result : String;
+Result : AnsiString;
 {$endif}
 BEGIN
     GetDir ( 0, Result );
@@ -484,7 +484,7 @@ BEGIN
 END;
 
 { return file attributes }
-FUNCTION FileGetAttr ( CONST s : String ) : Word;
+FUNCTION FileGetAttr ( CONST s : AnsiString ) : Word;
 VAR
   f : FILE;
   Attr : Word;
@@ -496,7 +496,7 @@ BEGIN
 END;
 
 { return the pathname only - strip filename out }
-FUNCTION ExtractFileDir ( CONST aName : String ) : String;
+FUNCTION ExtractFileDir ( CONST aName : AnsiString ) : AnsiString;
 VAR
 i : Word;
 BEGIN
@@ -514,7 +514,7 @@ END;
 {$endif} {Delphi}
 
 {$ifndef __GPC__}{$ifndef kylix}
-FUNCTION DirectoryExists ( {$ifndef Win32}CONST{$endif}s : String ) : Boolean;
+FUNCTION DirectoryExists ( {$ifndef Win32}CONST{$endif}s : AnsiString ) : Boolean;
 {does a directory exist?}
 VAR
 {$ifdef Win32}
@@ -531,7 +531,7 @@ BEGIN
 {$ifdef Win32}
   {$ifndef FPC}
   s := s + #0;
-  Attr := GetFileAttributes ( PChar ( @s [1] ) );
+  Attr := GetFileAttributes ( PAnsiChar ( @s [1] ) );
   Result := ( Attr <> $FFFFFFFF ) AND                  // Success ...
             ( Attr AND FILE_ATTRIBUTE_DIRECTORY <> 0 ) // Directory...
   {$else FPC}
@@ -550,10 +550,10 @@ END;
 {$endif} {__GPC__} {$endif} { kylix }
 
 
-FUNCTION RecursiveMkDir {( aPath :  pChar ) : Integer};
+FUNCTION RecursiveMkDir {( aPath :  PAnsiChar ) : Integer};
 VAR
   i  : Word;
-  NewDir : String;
+  NewDir : AnsiString;
   Path   : ARRAY [0..255] OF Char;
 BEGIN
  RecursiveMkDir := - 1;
@@ -594,7 +594,7 @@ BEGIN
 END;
 {$endif}{Delphi}
 {/////////////////////////////////////////////////////////}
-PROCEDURE SetFileAttrs ( {$ifndef kylix}CONST {$endif}s : String; CONST l : longint );
+PROCEDURE SetFileAttrs ( {$ifndef kylix}CONST {$endif}s : AnsiString; CONST l : longint );
 {$ifndef Delphi}
 VAR
 f : FILE;
@@ -630,7 +630,7 @@ BEGIN
 END;
 
 {$ifdef __GPC__}
-PROCEDURE GetDir ( Drive : Byte; VAR s : String );
+PROCEDURE GetDir ( Drive : Byte; VAR s : AnsiString );
 BEGIN
   IF Drive = 0
     THEN s := FExpand ( DirSelf )
@@ -769,7 +769,7 @@ END;
 
 
 VAR
-    slide : pchar;            {Sliding dictionary for unzipping}
+    slide : PAnsiChar;            {Sliding dictionary for unzipping}
     inbuf : iobuf;            {input buffer}
     inpos, readpos : integer; {position in input buffer, position read from file}
     dlghandle : word;         {optional: handle of a cancel and "%-done"-dialog}
@@ -1153,13 +1153,13 @@ BEGIN
   flush := b;
 END;
 
-{******************************* Break string into tokens ****************************}
+{******************************* Break AnsiString into tokens ****************************}
 
 VAR
-  _Token : PChar;
+  _Token : PAnsiChar;
 
-FUNCTION StrTok ( Source : PChar; Token : CHAR ) : PChar;
-  VAR P : PChar;
+FUNCTION StrTok ( Source : PAnsiChar; Token : CHAR ) : PAnsiChar;
+  VAR P : PAnsiChar;
 BEGIN
   IF Source <> NIL THEN _Token := Source;
   IF _Token = NIL THEN BEGIN
@@ -2714,8 +2714,8 @@ END;
 {******************** main low level function: unzipfile ********************}
 {written and not copyrighted by Christian Ghisler}
 FUNCTION unzipfile
-{ ( in_name : pchar;
-   out_name : pchar;
+{ ( in_name : PAnsiChar;
+   out_name : PAnsiChar;
    offset : longint;
    hFileAction : word;
    cm_index : integer ) : integer};
@@ -2730,7 +2730,7 @@ VAR
     timedate : longint;
     originalcrc : longint;    {crc from zip-header}
     ziptype, aResult : integer;
-    p, p1 : pchar;
+    p, p1 : PAnsiChar;
     isadir : boolean;
     Tmp,
     oldcurdir : TString;
@@ -3045,7 +3045,7 @@ END; { unzipfile }
 {***************************************************************************}
 {***************************************************************************}
 { other functions; zipread.pas }
-CONST mainheader : pchar = 'PK'#5#6;
+CONST mainheader : PAnsiChar = 'PK'#5#6;
       maxbufsize = TFileBufferSize; { Can be as low as 500 Bytes; however, }
                                     { this would lead to extensive disk reading!}
                                     { If one entry (including Extra field) is bigger}
@@ -3312,11 +3312,11 @@ BEGIN
   old := buf^ [ offs ];
   buf^ [ offs ] := #0;  {Repair signature of next block!}
   {$ifdef __GPC__}
-  p := strpas ( pchar ( @buf^ [ localstart + sizeof ( header^ ) ] ) );
+  p := strpas ( PAnsiChar ( @buf^ [ localstart + sizeof ( header^ ) ] ) );
   Move ( p [1], Filename [0], length ( p ) );
   filename [length ( p ) ] := #0;
   {$else}
-  strlcopy ( filename, pchar ( @buf^ [ localstart + sizeof ( header^ ) ] ), sizeof ( filename ) - 1 );
+  strlcopy ( filename, PAnsiChar ( @buf^ [ localstart + sizeof ( header^ ) ] ), sizeof ( filename ) - 1 );
   {$endif}
   buf^ [ offs ] := old;
   ConvertPath ( filename );
@@ -3334,7 +3334,7 @@ END; { filloutRec }
 
 {**************** Get first entry from ZIP file ********************}
 FUNCTION GetFirstInZip
-{ ( zipfilename : pchar; VAR zprec : tZipRec ) : integer};
+{ ( zipfilename : PAnsiChar; VAR zprec : tZipRec ) : integer};
 VAR
     bufstart, headerstart, start : longint;
     err, i : nWord;
@@ -3549,7 +3549,7 @@ END; { CloseZipFile }
 
 {**************** test for zip file ********************}
 FUNCTION isZip
-{ ( filename : pchar; pStartOffSet : pLongint ) : boolean};
+{ ( filename : PAnsiChar; pStartOffSet : pLongint ) : boolean};
 VAR
     myname : tdirtype;
     l, err : integer;
@@ -3615,7 +3615,7 @@ END; { IsZip }
 {***************************************************************************}
 {***************************************************************************}
 FUNCTION GetHeaderOffset
- {( FileName : pChar; pEndoffSet : pLongint ) : Longint};
+ {( FileName : PAnsiChar; pEndoffSet : pLongint ) : Longint};
 
 CONST
 maxbuf = {$ifdef ver70}63{$else}256{$endif} * 1024;
@@ -3683,16 +3683,16 @@ BEGIN
 END;
 
 
-FUNCTION Matches ( CONST FileSpec, StringToSearch : String ) : Boolean;
+FUNCTION Matches ( CONST FileSpec, StringToSearch : AnsiString ) : Boolean;
 { does filename: StringtoSearch match the file specification: FileSpec? }
 VAR
 pStringToSearch,
-pFileSpec : pChar;
+pFileSpec : PAnsiChar;
 b1 : boolean;
 
-FUNCTION MatchPattern ( Element, FileSpec : PChar ) : Boolean;
+FUNCTION MatchPattern ( Element, FileSpec : PAnsiChar ) : Boolean;
 
-FUNCTION IsPatternWild ( FileSpec : PChar ) : Boolean;
+FUNCTION IsPatternWild ( FileSpec : PAnsiChar ) : Boolean;
 VAR
   b : Boolean;
 BEGIN
@@ -3750,7 +3750,7 @@ END; { Matches }
 
 {$ifndef Delphi}
 {$ifndef __GPC__}
-FUNCTION FileExists ( CONST fname : string ) : boolean; {simple fileexist function}
+FUNCTION FileExists ( CONST fname : AnsiString ) : boolean; {simple fileexist function}
 VAR
 f : FILE;
 i : byte;
@@ -3776,7 +3776,7 @@ BEGIN
 END;
 {****************************************************}
 FUNCTION FileUnzip
-{ ( SourceZipFile, TargetDirectory, FileSpecs : pChar;
+{ ( SourceZipFile, TargetDirectory, FileSpecs : PAnsiChar;
  Report : UnzipReportProc;Question : UnzipQuestionProc ) : integer};
 
 VAR
@@ -3943,14 +3943,14 @@ BEGIN
 END; { FileUnzip }
 {***************************************************************************}
 FUNCTION FileUnzipEx
-{( SourceZipFile, TargetDirectory, FileSpecs : pChar ) : integer};
+{( SourceZipFile, TargetDirectory, FileSpecs : PAnsiChar ) : integer};
 BEGIN
   FileUnzipEx :=
   FileUnzip ( SourceZipFile, TargetDirectory, FileSpecs, ZipReport, ZipQuestion );
 END; { FileUnzipEx }
 {***************************************************************************}
 FUNCTION Viewzip
-{( SourceZipFile, FileSpecs : pChar; Report : UnzipReportProc ) : integer};
+{( SourceZipFile, FileSpecs : PAnsiChar; Report : UnzipReportProc ) : integer};
 VAR
     rc : integer;
     r  : tziprec;
@@ -4021,7 +4021,7 @@ BEGIN
 END; { ViewZip }
 {***************************************************************************}
 FUNCTION UnZipSize
-{( SourceZipFile : pChar; VAR Compressed : Word64 ) : Word64};
+{( SourceZipFile : PAnsiChar; VAR Compressed : Word64 ) : Word64};
 VAR
     rc : integer;
     r  : tziprec;

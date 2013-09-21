@@ -124,10 +124,10 @@ type
     procedure cbLinkerAddClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
    private
-    fBins: string;
-    fLibs: string;
-    fC: string;
-    fCpp: string;
+    fBins: AnsiString;
+    fLibs: AnsiString;
+    fC: AnsiString;
+    fCpp: AnsiString;
     procedure SetOptions;
     procedure UpdateButtons;
     procedure LoadText;
@@ -277,7 +277,7 @@ end;
 procedure TCompOptForm.btnBrowseClick(Sender: TObject);
 var
 {$IFDEF WIN32}
-  NewItem: string;
+  NewItem: AnsiString;
 {$ENDIF}
 {$IFDEF LINUX}
   NewItem: WideString;
@@ -535,7 +535,7 @@ end;
 
 procedure TCompOptForm.btnAddCompilerSetClick(Sender: TObject);
 var
-  S: string;
+  S: AnsiString;
 begin
   S:='New compiler';
   if not InputQuery(Lang[ID_COPT_NEWCOMPSET], Lang[ID_COPT_PROMPTNEWCOMPSET], S) or (S='') then
@@ -564,7 +564,7 @@ end;
 
 procedure TCompOptForm.btnRenameCompilerSetClick(Sender: TObject);
 var
-  S: string;
+  S: AnsiString;
 begin
   S:=cmbCompilerSetComp.Text;
   if not InputQuery(Lang[ID_COPT_RENAMECOMPSET], Lang[ID_COPT_PROMPTRENAMECOMPSET], S) or (S='') or (S=cmbCompilerSetComp.Text) then
@@ -611,10 +611,10 @@ end;
 
 procedure TCompOptForm.OptionsLinkClick(Sender: TObject);
 var
-	s : string;
+	s : AnsiString;
 begin
 	s := (Sender as TLabel).Caption;
-	ShellExecute(GetDesktopWindow(), 'open', PChar(s), nil, nil, SW_SHOWNORMAL);
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(s), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TCompOptForm.cbCompAddClick(Sender: TObject);

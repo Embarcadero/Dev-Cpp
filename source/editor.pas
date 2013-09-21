@@ -51,7 +51,7 @@ type
   TEditor = class
    private
     fInProject: boolean;
-    fFileName: string;
+    fFileName: AnsiString;
     fNew: boolean;
     fRes: boolean;
     fText: TSynEdit;
@@ -61,7 +61,7 @@ type
     fErrSetting: boolean;
     fDebugGutter: TDebugGutter;
     fOnBreakPointToggle: TBreakpointToggleEvent;
-    fCurrentWord: string;
+    fCurrentWord: AnsiString;
     fCompletionEatSpace: boolean;
     fCompletionTimer: TTimer;
     fCompletionTimerKey: Char;
@@ -74,46 +74,41 @@ type
     HasCompletedParentheses : integer; // Set to 2 on completion during KeyPress, to 1 immediately after by KeyDown, and to 0 upon next key
     HasCompletedArray : integer; // ...
     HasCompletedCurly : integer; // ...
-    procedure CompletionTimer(Sender: TObject);
+
+
     procedure EditorKeyPress(Sender: TObject; var Key: Char);
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-
-    procedure SetEditorText(Key: Char);
-    procedure InitCompletion;
-    procedure DestroyCompletion;
-    function CurrentPhrase: string;
-    function CheckAttributes(P: TBufferCoord;const Phrase: string): boolean;
-
-    function GetModified: boolean;
-    procedure SetModified(value: boolean);
-
-    // RNC 07.02.2004 -- new methods, explaination at definition
-    procedure TurnOffBreakpoint(line: integer);
-    procedure TurnOnBreakpoint(line: integer);
-
     procedure EditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
     procedure EditorSpecialLineColors(Sender: TObject; Line: integer;var Special: boolean; var FG, BG: TColor);
     procedure EditorGutterClick(Sender: TObject; Button: TMouseButton;x, y, Line: integer; mark: TSynEditMark);
-    procedure EditorReplaceText(Sender: TObject;const aSearch, aReplace: string; Line, Column: integer;var Action: TSynReplaceAction);
+    procedure EditorReplaceText(Sender: TObject;const aSearch, aReplace: AnsiString; Line, Column: integer;var Action: TSynReplaceAction);
     procedure EditorDropFiles(Sender: TObject; x, y: integer;aFiles: TStrings);
     procedure EditorDblClick(Sender: TObject);
     procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure EditorExit(sender : TObject);
 
+    procedure SetEditorText(Key: Char);
+    procedure InitCompletion;
+    procedure DestroyCompletion;
+    function CurrentPhrase: AnsiString;
+    function CheckAttributes(P: TBufferCoord;const Phrase: AnsiString): boolean;
+    procedure CompletionTimer(Sender: TObject);
+
+    procedure TurnOffBreakpoint(line: integer);
+    procedure TurnOnBreakpoint(line: integer);
+
     procedure FunctionTipTimer(Sender : TObject);
 
-    procedure SetFileName(const value: string);
+    procedure SetFileName(const value: AnsiString);
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
    public
-    procedure Init(InProject : boolean;const Caption, Filename : string;DoOpen : boolean;IsRes: boolean = FALSE);
+    procedure Init(InProject : boolean;const Caption, Filename : AnsiString;DoOpen : boolean;IsRes: boolean = FALSE);
     destructor Destroy; override;
-    // RNC set the breakpoints for this file when it is opened
+
     procedure SetBreakPointsOnOpen;
-    // RNC 07-21-04
-    // Add remove a breakpoint without calling OnBreakpointToggle
     function HasBreakPoint(line_number: integer): integer;
     procedure InsertBreakpoint(line: integer);
     procedure RemoveBreakpoint(line: integer);
@@ -126,11 +121,11 @@ type
     function Search(isReplace: boolean): boolean;
     procedure SearchAgain;
     procedure Exportto(filetype: integer);
-    procedure InsertString(Value: string;MoveCursor: boolean);
+    procedure InsertString(Value: AnsiString;MoveCursor: boolean);
     procedure SetErrorFocus(Col, Line: integer);
     procedure SetActiveBreakpointFocus(Line: integer);
     procedure RemoveBreakpointFocus;
-    procedure UpdateCaption(const NewCaption: string);
+    procedure UpdateCaption(const NewCaption: AnsiString);
     procedure InsertDefaultText;
     procedure PaintMatchingBrackets(TransientType: TTransientType);
 
@@ -140,15 +135,12 @@ type
     procedure UnindentSelection;
 
     procedure UpdateParser; // Must be called after recreating the parser
-    //////// CODE-COMPLETION - mandrav /////////////
     procedure ReconfigCompletion;
-    //////// CODE-COMPLETION - mandrav /////////////
 
     property OnBreakpointToggle: TBreakpointToggleEvent read fOnBreakpointToggle write fOnBreakpointToggle;
-    property FileName: string read fFileName write SetFileName;
+    property FileName: AnsiString read fFileName write SetFileName;
     property InProject: boolean read fInProject write fInProject;
     property New: boolean read fNew write fNew;
-    property Modified: boolean read GetModified write SetModified;
     property IsRes: boolean read fRes write fRes;
     property Text: TSynEdit read fText write fText;
     property TabSheet: TTabSheet read fTabSheet write fTabSheet;
@@ -192,9 +184,9 @@ end;
 
 { TEditor }
 
-procedure TEditor.Init(InProject : boolean;const Caption, Filename : string;DoOpen : boolean;IsRes: boolean = FALSE);
+procedure TEditor.Init(InProject : boolean;const Caption, Filename : AnsiString;DoOpen : boolean;IsRes: boolean = FALSE);
 var
-	s: string;
+	s: AnsiString;
 	pt: TPoint;
 begin
 	// Set generic options
@@ -226,7 +218,7 @@ begin
 		fNew := False;
 		if devData.Backups then begin
 			s:= ExtractfileExt(FileName);
-			Insert('~', s, AnsiPos('.', s) + 1);
+			Insert('~', s, Pos('.', s) + 1);
 			Delete(s, Length(s) -1, 1);
 			fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
 		end;
@@ -362,16 +354,6 @@ begin
 		if MainForm.ClassBrowser1.Enabled then
 			MainForm.PageControlChange(MainForm.PageControl); // this makes sure that the classbrowser is consistent
 	end;
-end;
-
-function TEditor.GetModified: boolean;
-begin
-	result:= fText.Modified;
-end;
-
-procedure TEditor.SetModified(value: boolean);
-begin
-	fText.Modified:= Value;
 end;
 
 // RNC 07-21-04 These functions are used to turn off/on a breakpoint
@@ -579,7 +561,7 @@ begin
   ToggleBreakPoint(Line);
 end;
 
-procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch,aReplace: string; Line, Column: integer; var Action: TSynReplaceAction);
+procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch,aReplace: AnsiString; Line, Column: integer; var Action: TSynReplaceAction);
 var
 	pt	: TPoint;
 begin
@@ -616,7 +598,7 @@ end;
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
 	if scModified in Changes then begin // scModified is only fired when the modified state changes
-		if Modified then begin
+		if Text.Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
 			UpdateCaption('[*] '+ExtractfileName(fFileName));
 			if fText.UnCollapsedLines.Count = 0 then
@@ -627,7 +609,7 @@ begin
 		end;
 	end;
 
-	// Sluggish, but needed...
+	// Slow, but needed...
 	if (scSelection in Changes) then
 		MainForm.SetStatusbarLineCol;
 
@@ -721,22 +703,21 @@ begin
 
     if GotoForm.ShowModal = mrOK then
      FText.CaretXY:= BufferCoord(FText.CaretX, GotoForm.Line.Value);
-
     Activate;
   finally
     GotoForm.Free;
   end;
 end;
 
-procedure TEditor.InsertString(Value: string;MoveCursor: boolean);
+procedure TEditor.InsertString(Value: AnsiString;MoveCursor: boolean);
 var
 	NewCursorPos: TBufferCoord;
 	Char,Line,I : integer;
-	P : PChar;
+	P : PAnsiChar;
 begin
 	NewCursorPos := fText.CaretXY;
 	if MoveCursor then begin
-		P := PChar(value);
+		P := PAnsiChar(value);
 		Char := fText.CaretX;
 		Line := fText.CaretY;
 		I := 0;
@@ -767,7 +748,7 @@ end;
 
 function TEditor.Search(isReplace: boolean): boolean;
 var
-	s: string;
+	s: AnsiString;
 begin
 	if devEditor.FindText then
 		if (fText.SelText = '') then
@@ -853,13 +834,13 @@ begin
   fActiveLine:= -1;
 end;
 
-procedure TEditor.UpdateCaption(const NewCaption: string);
+procedure TEditor.UpdateCaption(const NewCaption: AnsiString);
 begin
   if assigned(fTabSheet) then
    fTabSheet.Caption:= NewCaption;
 end;
 
-procedure TEditor.SetFileName(const value: string);
+procedure TEditor.SetFileName(const value: AnsiString);
 begin
   if value <> fFileName then
    begin
@@ -920,9 +901,10 @@ procedure TEditor.EditorKeyPress(Sender: TObject; var Key: Char);
 var
 	P: TPoint;
 	allowcompletion : boolean;
-	cursorpos : integer;
+	cursorpos,indent : integer;
 	attr : TSynHighlighterAttributes;
-	s : string;
+	s : AnsiString;
+	Ptr : PAnsiChar;
 begin
 
 	// Doing this here instead of in EditorKeyDown to be able to delete some key messages
@@ -930,20 +912,22 @@ begin
 
 		// Allerhande voorwaarden
 		allowcompletion := true;
-		fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr);
-		if Assigned(attr) or (Length(fText.LineText) = 0) then
-			allowcompletion := true;
-		if Assigned(attr) then
+		if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr)) then
 			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
 				allowcompletion := false;
 
 		if allowcompletion then begin
-			cursorpos:=fText.CaretX;
+
+			Ptr := PAnsiChar(fText.Lines.Text);
+			cursorpos := fText.RowColToCharIndex(fText.CaretXY);
 
 			// Check if we typed anything completable...
 			if (Key = '(') and devEditor.ParentheseComplete then begin
 				InsertString(')',false);
 				HasCompletedParentheses := 2;
+
+				// immediately activate function hint
+				//fFunctionTip.Activated := true;
 			end else if (Key = ')') and (HasCompletedParentheses > 0) then begin
 				fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
 				HasCompletedParentheses := 0;
@@ -956,56 +940,56 @@ begin
 				HasCompletedArray := 0;
 				Key:=#0;
 			end else if (Key = '*') and devEditor.CommentComplete then begin
-				if (cursorpos > 1) and (fText.LineText[cursorpos-1] = '/') then
+				if (cursorpos > 0) and (Ptr[cursorpos-1] = '/') then
 					InsertString('*/',false);
 			end else if (Key = '{') and devEditor.BraceComplete then begin
 
 				// If there's any text before the cursor...
-				if (cursorpos > 1) then begin
+				if not (Ptr[cursorpos-1] in [#13,#10]) and not (cursorpos = 0) then begin
 
-					// See what the last nonwhite character before the cursor is
+					// See what the last nonblank character before the cursor is
 					repeat
 						Dec(cursorpos);
-					until (cursorpos=1) or not (fText.LineText[cursorpos] in [#0..#32]);
+					until (cursorpos = 0) or not (Ptr[cursorpos] in [#9,#32]);
 
-					// Complete curly braces in if blocks or function etc.
-					if (cursorpos > 0) and (fText.LineText[cursorpos] in [')']) or (Pos('else',fText.LineText)=(cursorpos-3)) then begin
+					// Complete curly braces of if blocks or function etc.
+					if (Ptr[cursorpos] in [')']) or (StrLComp(@Ptr[cursorpos-3],'else',4) = 0) then begin
 
 						// Check indentation
-						cursorpos:=0;
+						indent:=0;
 						repeat
-							Inc(cursorpos);
-						until not (fText.LineText[cursorpos] in [#9,#32]);
+							Inc(indent);
+						until not (fText.LineText[indent] in [#9,#32]);
 
-						// Enter + Indent + Ending
-						InsertString('{' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
+						// { + enter + Indent + }
+						InsertString('{' + #13#10 + Copy(fText.LineText,1,indent-1) + '}',false);
 						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
 						Key:=#0;
-					end else if AnsiStartsStr('struct',TrimLeft(fText.LineText)) or
-								AnsiStartsStr('union', TrimLeft(fText.LineText)) or
-								AnsiStartsStr('class', TrimLeft(fText.LineText)) or
-								AnsiStartsStr('enum',  TrimLeft(fText.LineText)) then begin
+					end else if StartsStr('struct',TrimLeft(fText.LineText)) or
+								StartsStr('union', TrimLeft(fText.LineText)) or
+								StartsStr('class', TrimLeft(fText.LineText)) or
+								StartsStr('enum',  TrimLeft(fText.LineText)) then begin
 
-						// Check indentation too
-						cursorpos:=0;
+						// Check indentation
+						indent:=0;
 						repeat
-							Inc(cursorpos);
-						until not (fText.LineText[cursorpos] in [#9,#32]);
+							Inc(indent);
+						until not (fText.LineText[indent] in [#9,#32]);
 
-						// Enter + Indent + Ending
-						InsertString('{' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '};',false);
+						// { + enter + indent + };
+						InsertString('{' + #13#10 + Copy(fText.LineText,1,indent-1) + '};',false);
 						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
 						Key:=#0;
-					end else if AnsiStartsStr('case',TrimLeft(fText.LineText)) then begin
+					end else if StartsStr('case',TrimLeft(fText.LineText)) then begin
 
-						// Check indentation too
-						cursorpos:=0;
+						// Check indentation
+						indent:=0;
 						repeat
-							Inc(cursorpos);
-						until not (fText.LineText[cursorpos] in [#9,#32]);
+							Inc(indent);
+						until not (fText.LineText[indent] in [#9,#32]);
 
-						// Enter + Indent + Extra Indent + Text + Enter + Indent + Ending
-						InsertString('{' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + #9 + 'break;' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
+						// { + enter + indent + tab + break; + enter + }
+						InsertString('{' + #13#10 + Copy(fText.LineText,1,indent-1) + #9 + 'break;' + #13#10 + Copy(fText.LineText,1,indent-1) + '}',false);
 						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
 						Key:=#0;
 					end else begin
@@ -1019,10 +1003,10 @@ begin
 				HasCompletedCurly := 0;
 				Key:=#0;
 			end else if (Key = '<') and devEditor.IncludeComplete then begin
-				if AnsiStartsStr('#include',fText.LineText) then
+				if StartsStr('#include',fText.LineText) then
 					InsertString('>',false);
 			end else if (Key = '"') and devEditor.IncludeComplete then begin
-				if AnsiStartsStr('#include',fText.LineText) then
+				if StartsStr('#include',fText.LineText) then
 					InsertString('"',false);
 			end;
 		end;
@@ -1030,12 +1014,14 @@ begin
 
 	if fCompletionBox.Enabled then begin
 		if not (Sender is TForm) then begin // TForm is the code-completion window
+			Ptr := PAnsiChar(fText.Lines.Text);
+			cursorpos := fText.RowColToCharIndex(fText.CaretXY);
 			fCompletionTimer.Enabled:=False;
 			fCompletionTimerKey:=Key;
 			case Key of
 				'.': fCompletionTimer.Enabled:=True;
-				'>': if (fText.CaretX > 1) and (Length(fText.LineText)>0) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
-				':': if (fText.CaretX > 1) and (Length(fText.LineText)>0) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
+				'>': if (Ptr[cursorpos-1]='-') then fCompletionTimer.Enabled:=True;
+				':': if (Ptr[cursorpos-1]=':') then fCompletionTimer.Enabled:=True;
 				' ': if fCompletionEatSpace then Key:=#0; // eat space if it was ctrl+space (code-completion)
 			end;
 			P := fText.RowColumnToPixels(fText.DisplayXY);
@@ -1129,7 +1115,7 @@ end;
 procedure TEditor.CompletionTimer(Sender: TObject);
 var
 	M: TMemoryStream;
-	curr: string;
+	curr: AnsiString;
 begin
 	fCompletionTimer.Enabled:=False;
 	curr:=CurrentPhrase;
@@ -1210,43 +1196,56 @@ begin
 	fCompletionEatSpace:=False;
 end;
 
-function TEditor.CurrentPhrase: string;
+function TEditor.CurrentPhrase: AnsiString;
 var
-  I: integer;
-  AllowPar: boolean;
-  NestedPar: integer;
+	wordend,wordstart,arrayend,arraystart : integer;
+	combiningcharfound : boolean;
+	text : PChar;
 begin
-  I := fText.CaretX;
-  Dec(I, 1);
-  NestedPar:=0;
-  AllowPar:=((Length(fText.LineText)>1) and (Copy(fText.LineText, I-1, 2) = ').')) or
-             (Length(fText.LineText)>2) and (Copy(fText.LineText, I-2, 3) = ')->');
-  while (I <> 0) and (fText.LineText <> '') and (fText.LineText[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_', '.', '-', '>', ':', '(', ')', {'[',} ']']) do begin
-    if (fText.LineText[I]=')') then begin
-      if not AllowPar then
-        Break
-      else
-        Inc(NestedPar);
-    end
-    else if fText.LineText[I]='(' then begin
-      if AllowPar then begin
-        if NestedPar>0 then
-          Dec(NestedPar)
-        else
-          AllowPar:=False;
-      end
-      else
-        Break;
-    end;
-    Dec(I, 1);
-  end;
-  Result := Copy(fText.LineText, I + 1, fText.CaretX - I - 1);
+	text := PChar(fText.Lines.Text);
+	wordend := fText.RowColToCharIndex(fText.CaretXY);
+	wordstart := wordend;
+	arraystart := 0;
+	arrayend := 0;
+	combiningcharfound := false;
+
+	// Walk back until we find the combining character
+	repeat
+		if (StrLComp(@text[wordstart],'::',2) = 0) or (StrLComp(@text[wordstart],'->',2) = 0) then begin
+			Dec(wordstart,2);
+			combiningcharfound := true;
+			break;
+		end else if (text[wordstart] = '.')  then begin
+			Dec(wordstart,1);
+			combiningcharfound := true;
+			break;
+		end;
+		Dec(wordstart);
+	until (wordstart = 0) or (not (text[wordstart] in fText.IdentChars) and not (text[wordstart] in [':','-','>','.']));
+
+	// Then, only allow fText.IdentChars, and skip array bits
+	if combiningcharfound then begin
+		repeat
+			if text[wordstart] = ']' then begin
+				arrayend := wordstart;
+				repeat
+					Dec(wordstart);
+				until (wordstart = 0) or (text[wordstart] = '[');
+				arraystart := wordstart;
+			end;
+			Dec(wordstart);
+		until (wordstart = 0) or (not (text[wordstart] in fText.IdentChars));
+	end;
+
+	Result := Copy(text,wordstart+2,wordend-wordstart-1);
+	if arrayend <> arraystart then
+		Delete(Result,arraystart-wordstart,arrayend-arraystart+1);
 end;
 
 procedure TEditor.SetEditorText(Key: Char);
 var
 	Statement: PStatement;
-	FuncAddOn: string;
+	FuncAddOn: AnsiString;
 begin
 	Statement:=fCompletionBox.SelectedStatement;
 	if fCompletionBox.SelectedIsFunction then begin
@@ -1295,22 +1294,22 @@ begin
 	end;
 end;
 
-function TEditor.CheckAttributes(P: TBufferCoord; const Phrase: string): boolean;
+function TEditor.CheckAttributes(P: TBufferCoord; const Phrase: AnsiString): boolean;
 var
-  token: string;
+  token: AnsiString;
   attri: TSynHighlighterAttributes;
 begin
   fText.GetHighlighterAttriAtRowCol(P, token, attri);
   Result:=not ((not Assigned(Attri)) or
-    AnsiStartsStr('.', Phrase) or
-    AnsiStartsStr('->', Phrase) or
-    AnsiStartsStr('::', Phrase) or
+    StartsStr('.', Phrase) or
+    StartsStr('->', Phrase) or
+    StartsStr('::', Phrase) or
     (
       Assigned(Attri) and
       (
         (Attri.Name = 'Preprocessor') or
         (Attri.Name = 'Comment') or
-        (Attri.Name = 'String')
+        (Attri.Name = 'AnsiString')
       )
     ));
 end;
@@ -1319,7 +1318,7 @@ end;
 
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
-	s,localfind : string;
+	s,localfind : AnsiString;
 	p : TBufferCoord;
 	attr : TSynHighlighterAttributes;
 	st: PStatement;
@@ -1332,7 +1331,7 @@ begin
 	else
 		Exit;
 
-	// Check if we're inside a comment or string by looking at text color. If we are, skip without showing a tooltip
+	// Check if we're inside a comment or AnsiString by looking at text color. If we are, skip without showing a tooltip
 	p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(X, Y));
 	if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
 		if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then begin
@@ -1341,8 +1340,7 @@ begin
 			Exit;
 		end;
 
-	if (s <> '') then begin
-
+	if (Trim(s) <> '') then begin
 		if ssCtrl in Shift then
 			fText.Cursor:=crHandPoint
 		else begin
@@ -1387,7 +1385,7 @@ end;
 
 procedure TEditor.CommentSelection;
 var
-	S: string;
+	S: AnsiString;
 	Offset: integer;
 	backup: TBufferCoord;
 begin
@@ -1436,8 +1434,8 @@ end;
 procedure TEditor.UncommentSelection;
 var
 	CurPos: Integer;
-	localcopy : string;
-	P : PChar;
+	localcopy : AnsiString;
+	P : PAnsiChar;
 begin
 	// has selection
 	if fText.SelAvail then begin
@@ -1446,7 +1444,7 @@ begin
 		FText.BeginUndoBlock;
 
 		localcopy := FText.SelText;
-		P := PChar(localcopy);
+		P := PAnsiChar(localcopy);
 		CurPos := 0;
 
 		while P[CurPos] <> #0 do begin
@@ -1478,7 +1476,7 @@ end;
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
 var
 	p: TDisplayCoord;
-	line,fname: string;
+	line,fname: AnsiString;
 	walker,start : integer;
 	e : TEditor;
 begin
@@ -1491,7 +1489,7 @@ begin
 		fText.Cursor:=crIBeam;
 
 		line:=fText.Lines[p.Row-1];
-		if AnsiStartsStr('#include',line) then begin
+		if StartsStr('#include',line) then begin
 
 			// We've clicked an #include...
 			walker := 0;
@@ -1533,7 +1531,7 @@ const
 var
 	P: TBufferCoord;
 	Pix: TPoint;
-	S: String;
+	S: AnsiString;
 	I: Integer;
 	Attri: TSynHighlighterAttributes;
 begin

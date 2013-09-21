@@ -56,7 +56,7 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
    private
-    procedure AddTemplate(FileName: string);
+    procedure AddTemplate(FileName: AnsiString);
     procedure ReadTemplateIndex;
    private
     fTemplates: TList;
@@ -96,7 +96,7 @@ begin
 	fTemplates.Free;
 end;
 
-procedure TNewProjectForm.AddTemplate(FileName: string);
+procedure TNewProjectForm.AddTemplate(FileName: AnsiString);
 var
 	Template: TTemplate;
 begin
@@ -110,7 +110,7 @@ procedure TNewProjectForm.ReadTemplateIndex;
 var
   i: Integer;
   LTemplates: TStringList;
-  sDir: string;
+  sDir: AnsiString;
 begin
   sDir:=devDirs.Templates;
   if not CheckChangeDir(sDir) then begin
@@ -190,13 +190,13 @@ begin
 end;
 
 procedure TNewProjectForm.UpdateView;
- function HasPage(const value: string): boolean;
+ function HasPage(const value: AnsiString): boolean;
   var
    idx: integer;
   begin
     result:= TRUE;
     for idx:= 0 to pred(TabsMain.Tabs.Count) do
-     if AnsiCompareText(TabsMain.Tabs[idx], Value) = 0 then exit;
+     if CompareText(TabsMain.Tabs[idx], Value) = 0 then exit;
     result:= FALSE;
   end;
 var
@@ -204,7 +204,7 @@ var
  LTemplate: TTemplate;
  Item: TListItem;
  LIcon: TIcon;
- fName: string;
+ fName: AnsiString;
 begin
 	for idx:= 0 to pred(fTemplates.Count) do begin
 		LTemplate:= TTemplate(fTemplates[idx]);
@@ -226,7 +226,7 @@ begin
 		LTemplate:= TTemplate(fTemplates[idx]);
 		if LTemplate.Catagory = '' then
 			LTemplate.Catagory:= Lang[ID_NP_PRJSHEET];
-		if AnsiCompareText(LTemplate.Catagory, TabsMain.Tabs[TabsMain.TabIndex]) = 0 then begin
+		if CompareText(LTemplate.Catagory, TabsMain.Tabs[TabsMain.TabIndex]) = 0 then begin
 			Item:= ProjView.Items.Add;
 			Item.Caption:= LTemplate.Name;
 			Item.Data:= pointer(idx);

@@ -26,29 +26,29 @@ uses
 
 type
  TTemplateUnit = record
-  CName: string;
-  CppName: string;
-  CText: string;
-  CppText: string;
+  CName: AnsiString;
+  CppName: AnsiString;
+  CText: AnsiString;
+  CppText: AnsiString;
  end;
 
  TTemplateRec = record
   CCaret: TPoint;
   CppCaret: TPoint;
   IsCPP: boolean;   // TRUE = C++ / FALSE = C
-  CText: string;
-  CppText: string;
+  CText: AnsiString;
+  CppText: AnsiString;
  end;
 
  TTemplate = class
   private
-   fFileName: string;
+   fFileName: AnsiString;
    fOptions: TProjOptions;
-   fName: string;
-   fDesc: string;
-   fCatagory: string;
-   fPrjName: string;
-   fProjectIcon: String;
+   fName: AnsiString;
+   fDesc: AnsiString;
+   fCatagory: AnsiString;
+   fPrjName: AnsiString;
+   fProjectIcon: AnsiString;
    fIconIndex: integer;
 
    fTemplate: TmeminiFile;
@@ -64,18 +64,18 @@ type
    constructor Create;
    destructor Destroy; override;
 
-   procedure ReadTemplateFile(const FileName: string);
+   procedure ReadTemplateFile(const FileName: AnsiString);
    function AddUnit: integer;
    procedure RemoveUnit(const index: integer);
    function Save: boolean;
 
-   property Catagory: string read fCatagory write fCatagory;
-   property Description: string read fDesc write fDesc;
-   property FileName: string read fFileName write fFileName;
-   property Name: string read fName write fName;
+   property Catagory: AnsiString read fCatagory write fCatagory;
+   property Description: AnsiString read fDesc write fDesc;
+   property FileName: AnsiString read fFileName write fFileName;
+   property Name: AnsiString read fName write fName;
    property OptionsRec: TProjOptions read fOptions write fOptions;
-   property ProjectName: string read fPrjName write fPrjName;
-   property ProjectIcon: string read fProjectIcon write fProjectIcon;
+   property ProjectName: AnsiString read fPrjName write fPrjName;
+   property ProjectIcon: AnsiString read fProjectIcon write fProjectIcon;
    property UnitCount: integer read GetUnitCount;
    property Units[index: integer]: TTemplateUnit read GetUnit write SetUnit;
    property OldData: TTemplateRec read GetOldData write SetOldData;
@@ -116,7 +116,7 @@ begin
   inherited;
 end;
 
-procedure TTemplate.ReadTemplateFile(const FileName: string);
+procedure TTemplate.ReadTemplateFile(const FileName: AnsiString);
 begin
   if assigned(fTemplate) then fTemplate.Free;
   if FileExists(FileName) then
@@ -127,8 +127,8 @@ begin
   else
    begin
      MessageBox(Application.mainform.handle,
-       PChar(Format(Lang[ID_ERR_TEMPFNF], [fFileName])),
-       PChar(Lang[ID_INFO]), MB_OK or MB_ICONINFORMATION);
+       PAnsiChar(Format(Lang[ID_ERR_TEMPFNF], [fFileName])),
+       PAnsiChar(Lang[ID_INFO]), MB_OK or MB_ICONINFORMATION);
      exit;
    end;
 
@@ -197,7 +197,7 @@ end;
 // need to actually save values. (basiclly TTemplate is readonly right now)
 function TTemplate.Save: boolean;
 var
- fName: string;
+ fName: AnsiString;
 begin
   result:= FALSE;
   try
@@ -218,7 +218,7 @@ end;
 
 function TTemplate.AddUnit: integer;
 var
- section: string;
+ section: AnsiString;
 begin
   if (fVersion> 0) and (assigned(fTemplate)) then
    begin
@@ -234,7 +234,7 @@ end;
 
 procedure TTemplate.RemoveUnit(const index: integer);
 var
- section: string;
+ section: AnsiString;
  count: integer;
 begin
   section:= 'Unit' +inttostr(index);
@@ -283,7 +283,7 @@ begin
   if not assigned(fTemplate) then
    begin
      MessageBox(Application.MainForm.Handle,
-      PChar(Lang[ID_ERR_NOTEMPLATE]), PChar(Lang[ID_INFO]), MB_OK or MB_ICONWARNING);
+      PAnsiChar(Lang[ID_ERR_NOTEMPLATE]), PAnsiChar(Lang[ID_INFO]), MB_OK or MB_ICONWARNING);
      exit;
    end;
 
@@ -303,7 +303,7 @@ end;
 
 function TTemplate.GetUnit(index: integer): TTemplateUnit;
 var
- section: string;
+ section: AnsiString;
 begin
   if not assigned(fTemplate) then
    begin
@@ -332,7 +332,7 @@ end;
 
 procedure TTemplate.SetUnit(index: integer; value: TTemplateUnit);
 var
-	section: string;
+	section: AnsiString;
 begin
 	if assigned(fTemplate) and (fVersion > 0) then begin
 		section:= 'Unit' +inttostr(index);

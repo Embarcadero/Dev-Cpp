@@ -35,12 +35,12 @@ type
 	PToDoRec = ^TToDoRec;
 	TToDoRec = packed record
 		TokenIndex		: integer;
-		Filename		: string;
+		Filename		: AnsiString;
 		Line			: integer;
 		ToLine			: integer;
-		User			: string;
+		User			: AnsiString;
 		Priority		: integer;
-		Description		: string;
+		Description		: AnsiString;
 		IsDone			: boolean;
 	end;
 
@@ -67,12 +67,12 @@ type
 	{ Private declarations }
 	fToDoList: TList;
 	fSortColumn: integer;
-	function MatchesMask(SearchStr, MaskStr: string): boolean;
+	function MatchesMask(SearchStr, MaskStr: AnsiString): boolean;
 	procedure LoadText;
 	procedure BuildList;
 	procedure AddFiles(Current, InProject, NotInProject, OpenOnly: boolean);
-	procedure AddToDo(Filename: string);
-	function BreakupToDo(Filename: string; sl: TStrings; Line: integer; Token: string; HasUser, HasPriority: boolean): integer;
+	procedure AddToDo(Filename: AnsiString);
+	function BreakupToDo(Filename: AnsiString; sl: TStrings; Line: integer; Token: AnsiString; HasUser, HasPriority: boolean): integer;
 	public
 	{ Public declarations }
 	end;
@@ -86,13 +86,13 @@ uses main, editor, project, StrUtils, MultiLangSupport, devcfg;
 
 {$R *.dfm}
 
-function TViewToDoForm.BreakupToDo(Filename: string; sl: TStrings; Line: integer; Token: string; HasUser,HasPriority: boolean): integer;
+function TViewToDoForm.BreakupToDo(Filename: AnsiString; sl: TStrings; Line: integer; Token: AnsiString; HasUser,HasPriority: boolean): integer;
 var
-	sUser: string;
+	sUser: AnsiString;
 	iPriority: integer;
-	sDescription: string;
+	sDescription: AnsiString;
 	Indent: integer;
-	S: string;
+	S: AnsiString;
 	X, Y: integer;
 	idx: integer;
 	Done: boolean;
@@ -108,8 +108,8 @@ begin
 	OrigLine := Line;
 	S := sl[Line];
 
-	MultiLine := AnsiPos('//', S) = 0;
-	idx := AnsiPos(Token, S);
+	MultiLine := Pos('//', S) = 0;
+	idx := Pos(Token, S);
 	TokenIndex := idx;
 	Inc(idx, 4); // skip "TODO"
 
@@ -118,13 +118,13 @@ begin
 
 	Delete(S, 1, idx - 1);
 	if HasUser or HasPriority then begin
-	idx := AnsiPos('#', S);
+	idx := Pos('#', S);
 	sUser := Copy(S, 1, idx - 1); // got user
 	iPriority := StrToIntDef(S[idx + 1], 1); // got priority
 	end;
 
-	Indent := AnsiPos(':', sl[Line]) + 1;
-	idx := AnsiPos(':', S);
+	Indent := Pos(':', sl[Line]) + 1;
+	idx := Pos(':', S);
 	Delete(S, 1, idx + 1);
 	Done := False;
 	Y := Line;
@@ -155,13 +155,13 @@ begin
 	td^.User := sUser;
 	td^.Priority := iPriority;
 	td^.Description := sDescription;
-	td^.IsDone := AnsiCompareText(Token, 'TODO') <> 0;
+	td^.IsDone := CompareText(Token, 'TODO') <> 0;
 	fToDoList.Add(td);
 
 	Result := Line;
 end;
 
-procedure TViewToDoForm.AddToDo(Filename: string);
+procedure TViewToDoForm.AddToDo(Filename: AnsiString);
 var
 	sl: TStrings;
 	I: integer;
@@ -353,7 +353,7 @@ begin
 	end
 	else
 		e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line] := StringReplace(e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line], 'DONE', 'TODO', []);
-	e.Modified := True;
+	e.Text.Modified := True;
 	lv.Refresh;
 	end;
 end;
@@ -380,7 +380,7 @@ begin
 	end
 	else begin
 	idx := fSortColumn - 1;
-	Compare := AnsiCompareText(Item1.SubItems[idx], Item2.SubItems[idx]);
+	Compare := CompareText(Item1.SubItems[idx], Item2.SubItems[idx]);
 	end;
 end;
 
@@ -409,7 +409,7 @@ procedure TViewToDoForm.BuildList;
 var
 	I: integer;
 	td: PToDoRec;
-	S: string;
+	S: AnsiString;
 begin
 	lv.Items.BeginUpdate;
 	lv.Items.Clear;
@@ -431,7 +431,7 @@ begin
 	lv.Items.EndUpdate;
 end;
 
-function TViewToDoForm.MatchesMask(SearchStr, MaskStr: string): boolean;
+function TViewToDoForm.MatchesMask(SearchStr, MaskStr: AnsiString): boolean;
 var
 	Matches: boolean;
 	MaskIndex: integer;
@@ -445,9 +445,9 @@ begin
 	if (MaskStr = '') or (SearchStr = '') then
 	Matches := False;
 
-	if AnsiPos('*?', MaskStr) > 0 then // illegal
+	if Pos('*?', MaskStr) > 0 then // illegal
 	Matches := False;
-	if AnsiPos('**', MaskStr) > 0 then // illegal
+	if Pos('**', MaskStr) > 0 then // illegal
 	Matches := False;
 
 	while Matches do begin

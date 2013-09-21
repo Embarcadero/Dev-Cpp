@@ -78,11 +78,11 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
-    FileName: String;
+    FileName: AnsiString;
     InstallInfo: TInstallInfo;
     Installer: TInstaller;
     IsCompressed: Boolean;
-    TempFilesDir: String;
+    TempFilesDir: AnsiString;
     TempFiles, TempDirs: TStringList;
     procedure ChangeLabels;
     procedure StartInstall;
@@ -92,7 +92,7 @@ type
     PMExitCode: TPackmanExitCode;
     Quiet: Boolean;
     constructor Create(AOwner: TComponent); override;
-    function SetFileName(AFileName: String): Boolean;
+    function SetFileName(AFileName: AnsiString): Boolean;
   end;
 
 var
@@ -107,7 +107,7 @@ const
   PageCount = 5;
 
 var
-  AppDir: String;
+  AppDir: AnsiString;
  //just referenceS for unzip callbacks
   bar: TProgressBar;
   app: TApplication;
@@ -132,7 +132,7 @@ begin
     + rec^.FileName + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes);
 end;
 
-procedure GetZipNameAndVersion( var zipname, zipversion: String);
+procedure GetZipNameAndVersion( var zipname, zipversion: AnsiString);
 //this proc gets a name of zip package i.e. glib-dev-2.4.7
 //(of file glib-dev-2.4.7.zip) and attempts to resolve the name
 //and the version of it: in this case 'glib-dev' and '2.4.7'
@@ -141,9 +141,9 @@ procedure GetZipNameAndVersion( var zipname, zipversion: String);
 //-doc, -lib or -src (gnuwin32.sf.net format)
 var
   tempStrs: TStrings;
-  suffix: String;
+  suffix: AnsiString;
 
-  function checkIfVersion( const str: String): Boolean;
+  function checkIfVersion( const str: AnsiString): Boolean;
   //check for only numbers or dots, at most one char could also be a letter
   var
     i: Integer;
@@ -205,7 +205,7 @@ begin
     zipname := zipname + '-' + suffix;
 end;
 
-procedure Mkdir(const DirName: String);
+procedure Mkdir(const DirName: AnsiString);
 var
   Dirs: TStringList;
   i: Integer;
@@ -218,11 +218,11 @@ begin
 
   for i := 0 to Dirs.Count - 1 do
       if not DirectoryExists(Dirs.Strings[i]) then
-          CreateDirectory(PChar(Dirs.Strings[i]), nil);
+          CreateDirectory(PAnsiChar(Dirs.Strings[i]), nil);
   Dirs.Free;
 end;
 
-function ConvertSlashes(Path: String): String;
+function ConvertSlashes(Path: AnsiString): AnsiString;
 var
   i: Integer;
 begin
@@ -232,7 +232,7 @@ begin
           Result[i] := '\';
 end;
 
-procedure CreateDevPackageFile(PackageFile, DevPakName, DevPakVer: String);
+procedure CreateDevPackageFile(PackageFile, DevPakName, DevPakVer: AnsiString);
 //this attempts to create a package description file (DevPackage)
 //for generic packages (*.zip, *.tar.bz2 etc)
 var
@@ -259,7 +259,7 @@ begin
   CloseFile(DevPak);
 end;
 
-function UnzipErrCodeToStr(errcode: Integer): String;
+function UnzipErrCodeToStr(errcode: Integer): AnsiString;
 begin
   case errcode of
     unzip_Ok             : Result := 'Ok';
@@ -284,7 +284,7 @@ begin
   end;
 end;
 
-function TInstallWizard.SetFileName(AFileName: String): Boolean;
+function TInstallWizard.SetFileName(AFileName: AnsiString): Boolean;
 const
   BufSize = 1024 * 64;
 var
@@ -298,19 +298,19 @@ var
   Bz2Buf: array[0..BufSize - 1] of Char;
   Tar: TTarArchive;
   DirRec: TTarDirRec;
-  TarFile: String;
+  TarFile: AnsiString;
   ExtractedFile: TFileStream;
 
-  FN, ExtractDir: String;
-  PackageFile: String;
+  FN, ExtractDir: AnsiString;
+  PackageFile: AnsiString;
 
   i: Integer;
-  EntryName: String;
+  EntryName: AnsiString;
   DepErrors: TStringList;
 
   IsZip: Boolean;
   ziprec: TZipRec;
-  DevPakName, DevPakVer: String; //for generic zip or tar.bz2 devpaks
+  DevPakName, DevPakVer: AnsiString; //for generic zip or tar.bz2 devpaks
   unziperrCode: Integer;
 
   procedure cleanup;
@@ -386,8 +386,8 @@ begin
         bar := ExtractionProgress.ProgressBar1;
         app := Application;
 
-        unziperrCode := FileUnzip(PChar(AFileName),
-          PChar(ExtractDir), '*.*', UnzipReport, UnzipQuestion);
+        unziperrCode := FileUnzip(PAnsiChar(AFileName),
+          PAnsiChar(ExtractDir), '*.*', UnzipReport, UnzipQuestion);
         if unziperrCode < 0 then
         begin
           MessageDlg('Unzip failed. Error ' + IntToStr(unziperrCode)
@@ -541,7 +541,7 @@ begin
 
   if InstallInfo.Version > SupportedVersion then
   begin
-    Application.MessageBox(PChar('This version of Package Manager only' +
+    Application.MessageBox(PAnsiChar('This version of Package Manager only' +
       ' supports packages up to version ' + IntToStr(SupportedVersion) +
       '.' + #13#10 + 'The package you selected has version number ' +
       IntToStr(InstallInfo.Version) + '.' + #13#10#13#10 +
@@ -567,7 +567,7 @@ begin
   end;
   if DepErrors.Count > 0 then
   begin
-    Application.MessageBox(PChar('This package depends on some ' +
+    Application.MessageBox(PAnsiChar('This package depends on some ' +
      'other packages, which are not installed on your system.' + #13#10 +
      'Please install them first. The required depencies are:' + #13#10 +
      DepErrors.Text), 'Dependency Error', MB_ICONERROR);
@@ -687,7 +687,7 @@ end;
 
 procedure TInstallWizard.ChangeLabels;
 const
-  Steps: array[0..PageCount - 1] of String = (
+  Steps: array[0..PageCount - 1] of AnsiString = (
     'Welcome',
     'Readme',
     'License',
@@ -780,21 +780,21 @@ end;
 
 procedure TInstallWizard.UrlLabelClick(Sender: TObject);
 begin
-  ShellExecute(GetDesktopWindow, nil, PChar(TLabel(Sender).Caption),
+  ShellExecute(GetDesktopWindow, nil, PAnsiChar(TLabel(Sender).Caption),
     nil, nil, 1);
 end;
 
 procedure TInstallWizard.Label22Click(Sender: TObject);
 begin
   ShellExecute(Handle, nil, 'notepad.exe',
-    PChar('"' + InstallInfo.ReadmeFile + '"'),
+    PAnsiChar('"' + InstallInfo.ReadmeFile + '"'),
     nil, SW_MAXIMIZE);
 end;
 
 procedure TInstallWizard.Label23Click(Sender: TObject);
 begin
   ShellExecute(Handle, nil, 'notepad.exe',
-    PChar('"' + InstallInfo.LicenseFile + '"'),
+    PAnsiChar('"' + InstallInfo.LicenseFile + '"'),
     nil, SW_MAXIMIZE);
 end;
 

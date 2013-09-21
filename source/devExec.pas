@@ -32,9 +32,9 @@ uses
 type
   TExecThread = class(TThread)
   private
-    fFile: string;
-    fPath: string;
-    fParams: string;
+    fFile: AnsiString;
+    fPath: AnsiString;
+    fParams: AnsiString;
     fTimeOut: Cardinal;
     fProcess: Cardinal;
     fVisible: boolean;
@@ -42,9 +42,9 @@ type
   public
     procedure Execute; override;
   published
-    property FileName: string read fFile write fFile;
-    property Path: string read fPath write fPath;
-    property Params: string read fParams write fParams;
+    property FileName: AnsiString read fFile write fFile;
+    property Path: AnsiString read fPath write fPath;
+    property Params: AnsiString read fParams write fParams;
     property TimeOut: Cardinal read fTimeOut write fTimeOut;
     property Visible: boolean read fVisible write fVisible;
     property Process: Cardinal read fProcess;
@@ -59,7 +59,7 @@ type
   public
     class function devExecutor: TdevExecutor;
     procedure Reset;
-    procedure ExecuteAndWatch(sFileName, sParams, sPath: string; bVisible: boolean; iTimeOut: Cardinal; OnTermEvent: TNotifyEvent);
+    procedure ExecuteAndWatch(sFileName, sParams, sPath: AnsiString; bVisible: boolean; iTimeOut: Cardinal; OnTermEvent: TNotifyEvent);
   published
     property Running: boolean read fIsRunning;
   end;
@@ -94,8 +94,8 @@ begin
     else
       wShowWindow := SW_HIDE;
   end;
-  if CreateProcess(nil, PChar(fFile + ' ' + fParams), nil, nil, False,
-    NORMAL_PRIORITY_CLASS, nil, PChar(fPath),
+  if CreateProcess(nil, PAnsiChar(fFile + ' ' + fParams), nil, nil, False,
+    NORMAL_PRIORITY_CLASS, nil, PAnsiChar(fPath),
     StartupInfo, ProcessInfo) then begin
     fProcess := ProcessInfo.hProcess;
     WaitForSingleObject(ProcessInfo.hProcess, fTimeOut);
@@ -125,7 +125,7 @@ begin
   Result := devExec.devExecutor;
 end;
 
-procedure TdevExecutor.ExecuteAndWatch(sFileName, sParams, sPath: string;
+procedure TdevExecutor.ExecuteAndWatch(sFileName, sParams, sPath: AnsiString;
   bVisible: boolean; iTimeOut: Cardinal; OnTermEvent: TNotifyEvent);
 begin
   fIsRunning := True;

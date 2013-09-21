@@ -35,13 +35,12 @@ type
 	PdevSearchResult = ^TdevSearchResult;
 	TdevSearchResult = record
 		pt: TPoint;
-		InFile: string;
-		msg: string;
+		InFile: AnsiString;
+		msg: AnsiString;
 	end;
 
 
 	{ File ID types }
-	TUnitType = (utSrc, utHead, utRes, utPrj, utOther);
 	TExUnitType = (
 		utcSrc,      // c source file (.c)
 		utcppSrc,    // c++ source file (.cpp)
@@ -50,79 +49,94 @@ type
 		utresHead,   // resouce header (.rh)
 		utresComp,   // resource compiled (.res)
 		utresSrc,    // resource source (.rc)
-		utxPrj,      // project file (.dev)
-		utxOther     // any others
-	);   
+		utPrj,       // project file (.dev)
+		utOther      // any others
+	);
 
 	TFilterSet = (ftOpen, ftHelp, ftPrj, ftSrc, ftAll);
 
-	TErrFunc = procedure(const Msg: String) of object;
-	TLineOutputFunc = procedure(const Line: String) of object;
+	TErrFunc = procedure(const Msg: AnsiString) of object;
+	TLineOutputFunc = procedure(const Line: AnsiString) of object;
 	TCheckAbortFunc = procedure(var AbortThread: boolean) of object;
 
-	procedure FilesFromWildcard(Directory : string;const Mask: string;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
+	procedure FilesFromWildcard(Directory : AnsiString;const Mask: AnsiString;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 	
-	function ExecuteFile(const FileName, Params, DefaultDir: string;ShowCmd: Integer): THandle;
-	function RunAndGetOutput(const Cmd, WorkDir: string;ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): string;
+	function ExecuteFile(const FileName, Params, DefaultDir: AnsiString;ShowCmd: Integer): THandle;
+	function RunAndGetOutput(const Cmd, WorkDir: AnsiString;ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): AnsiString;
 	
-	function GetShortName(const FileName: string): string;
+	function GetShortName(const FileName: AnsiString): AnsiString;
 
-	function CommaStrToStr(s : string; formatstr : string) : string;
-	function IncludeQuoteIfSpaces(s : string) : string;
-	function IncludeQuoteIfNeeded(s : string) : string;
+	function CommaStrToStr(s : AnsiString; formatstr : AnsiString) : AnsiString;
+	function IncludeQuoteIfSpaces(s : AnsiString) : AnsiString;
+	function IncludeQuoteIfNeeded(s : AnsiString) : AnsiString;
 
-	procedure MsgBox(const text:string;const caption:string = 'Message'); overload;
-	procedure MsgBox(textlist:TStrings;const caption:string = 'Message'); overload;
-	procedure MsgBox(text:integer;const caption:string = 'Message'); overload;
+	procedure MsgBox(const text:AnsiString;const caption:AnsiString = 'Message'); overload;
+	procedure MsgBox(textlist:TStrings;const caption:AnsiString = 'Message'); overload;
+	procedure MsgBox(text:integer;const caption:AnsiString = 'Message'); overload;
 
-	procedure LoadFilefromResource(const FileName: string; ms: TMemoryStream);
+	procedure LoadFilefromResource(const FileName: AnsiString; ms: TMemoryStream);
 
-	function ValidateFile(const FileName: string; const WorkPath: string;const CheckDirs: boolean = FALSE): string;
+	function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString;const CheckDirs: boolean = FALSE): AnsiString;
 
-	function BuildFilter(var value: string; const Filters: TFilterSet): boolean; overload;
-	function BuildFilter(var value: string; const Filters: array of string): boolean; overload;
+	function BuildFilter(var value: AnsiString; const Filters: TFilterSet): boolean; overload;
+	function BuildFilter(var value: AnsiString; const Filters: array of AnsiString): boolean; overload;
 
-	function CodeInstoStr(const s: string): string;
-	function StrtoCodeIns(const s: string): string;
+	function CodeInstoStr(const s: AnsiString): AnsiString;
+	function StrtoCodeIns(const s: AnsiString): AnsiString;
 
-	procedure StrtoAttr(var Attr: TSynHighlighterAttributes;const Value: string);
-	function AttrtoStr(Attr: TSynHighlighterAttributes): string;
+	procedure StrtoAttr(var Attr: TSynHighlighterAttributes;const Value: AnsiString);
+	function AttrtoStr(Attr: TSynHighlighterAttributes): AnsiString;
 
-	procedure StrtoPoint(var pt: TPoint;const value: string);
-	function PointtoStr(pt: TPoint): string;
+	procedure StrtoPoint(var pt: TPoint;const value: AnsiString);
+	function PointtoStr(pt: TPoint): AnsiString;
 
-	function ListtoStr(List: TStrings): string;
-	procedure StrtoList(s: string;List: TStrings; delimiter: char=';');
+	function ListtoStr(List: TStrings): AnsiString;
+	procedure StrtoList(s: AnsiString;List: TStrings; delimiter: char=';');
 
-	function GetFileTyp(const FileName: string): TUnitType;
-	function GetExTyp(const FileName: string): TExUnitType;
+	function GetFileTyp(const FileName: AnsiString): TExUnitType;
 
-	procedure SetPath(const Add: string;UseOriginal: boolean = TRUE);
-	function ExpandFileto(const FileName, BasePath: string): string;
-	function FileSamePath(const FileName, TestPath: string): boolean;
+	procedure SetPath(const Add: AnsiString;UseOriginal: boolean = TRUE);
+	function ExpandFileto(const FileName, BasePath: AnsiString): AnsiString;
+	function FileSamePath(const FileName, TestPath: AnsiString): boolean;
 	procedure CloneMenu(FromMenu, ToMenu: TMenuItem);
 
-	function GetLastPos(const SubStr, S: string): integer;
+	function GetLastPos(const SubStr, S: AnsiString): integer;
 
-	function GenMakePath1(const FileName: String): string;
-	function GenMakePath2(const FileName: String): string;
-	function GenMakePath(const FileName: String; EscapeSpaces,EncloseInQuotes: Boolean): string; overload;
+	function GenMakePath1(const FileName: AnsiString): AnsiString;
+	function GenMakePath2(const FileName: AnsiString): AnsiString;
+	function GenMakePath(const FileName: AnsiString; EscapeSpaces,EncloseInQuotes: Boolean): AnsiString; overload;
 
-	function GetRealPath(const BrokenFileName: string;const Directory: String = ''): String;
+	function GetRealPath(const BrokenFileName: AnsiString;const Directory: AnsiString = ''): AnsiString;
 
 	function CalcMod(Count: Integer): Integer;
 
-	function GetVersionString(const FileName: string): string;
+	function GetVersionString(const FileName: AnsiString): AnsiString;
 
-	function CheckChangeDir(var Dir: string): boolean;
+	function CheckChangeDir(var Dir: AnsiString): boolean;
 
-	function GetAssociatedProgram(const Extension: string; var Filename, Description: string): boolean;
+	function GetAssociatedProgram(const Extension: AnsiString; var Filename, Description: AnsiString): boolean;
 
-	function IsNumeric(const s : string) : boolean;
+	function IsNumeric(const s : AnsiString) : boolean;
 
 	procedure OpenHelpFile;
 
-	function ProgramHasConsole(const path : string) : boolean;
+	function ProgramHasConsole(const path : AnsiString) : boolean;
+
+// Fast replacements of Ansi functions
+function EndsStr(const subtext, text: AnsiString): boolean;
+function EndsText(const subtext, text: AnsiString): boolean;
+
+function ContainsStr(const text, subtext: AnsiString): boolean;
+function ContainsText(const text, subtext: AnsiString): boolean;
+
+function SameStr(const s1,s2 : AnsiString) : boolean;
+function SameText(const s1,s2 : AnsiString) : boolean;
+
+function NotSameStr(const s1,s2 : AnsiString) : boolean;
+function NotSameText(const s1,s2 : AnsiString) : boolean;
+
+function StartsStr(const subtext,text : AnsiString) : boolean;
+function StartsText(const subtext,text : AnsiString) : boolean;
 
 implementation
 
@@ -134,7 +148,69 @@ uses
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
 
-function ProgramHasConsole(const path : string) : boolean;
+function EndsStr(const subtext, text: AnsiString): boolean;
+var
+	SubTextLocation: Integer;
+begin
+	SubTextLocation := Length(text) - Length(subtext) + 1;
+	if (SubTextLocation > 0) and (subtext <> '') then
+		Result := StrComp(Pointer(subtext), Pointer(@text[SubTextLocation])) = 0
+	else
+		Result := False;
+end;
+
+function EndsText(const subtext, text: AnsiString): boolean;
+var
+	SubTextLocation: Integer;
+begin
+	SubTextLocation := Length(text) - Length(subtext) + 1;
+	if (SubTextLocation > 0) and (subtext <> '') then
+		Result := StrIComp(Pointer(subtext), Pointer(@text[SubTextLocation])) = 0
+	else
+		Result := False;
+end;
+
+function ContainsStr(const text, subtext: AnsiString): boolean;
+begin
+	Result := Pos(subtext, text) > 0;
+end;
+
+function ContainsText(const text, subtext: AnsiString): boolean;
+begin
+	Result := Pos(UpperCase(subtext), UpperCase(text)) > 0;
+end;
+
+function SameStr(const s1,s2 : AnsiString) : boolean;
+begin
+	Result := (CompareStr(s1,s2) = 0);
+end;
+
+function SameText(const s1,s2 : AnsiString) : boolean;
+begin
+	Result := (CompareText(s1,s2) = 0);
+end;
+
+function NotSameStr(const s1,s2 : AnsiString) : boolean;
+begin
+	Result := (CompareStr(s1,s2) <> 0);
+end;
+
+function NotSameText(const s1,s2 : AnsiString) : boolean;
+begin
+	Result := (CompareText(s1,s2) <> 0);
+end;
+
+function StartsStr(const subtext,text : AnsiString) : boolean;
+begin
+	Result := SameStr(subtext, Copy(text, 1, Length(subtext)));
+end;
+
+function StartsText(const subtext,text : AnsiString) : boolean;
+begin
+	Result := SameText(subtext, Copy(text, 1, Length(subtext)));
+end;
+
+function ProgramHasConsole(const path : AnsiString) : boolean;
 var
 	handle : Cardinal;
 	bytesread : DWORD;
@@ -143,7 +219,7 @@ var
 	pe_header  : _IMAGE_FILE_HEADER;
 	opt_header : _IMAGE_OPTIONAL_HEADER;
 begin
-	handle := CreateFile(PChar(path),GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
+	handle := CreateFile(PAnsiChar(path),GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
 	if handle <> INVALID_HANDLE_VALUE then begin
 		ReadFile(Handle, dos_header, sizeof(dos_header), bytesread, nil);
 		SetFilePointer(Handle, dos_header._lfanew, nil, 0);
@@ -158,35 +234,35 @@ begin
 	CloseHandle(handle);
 end;
 
-// got tired of typing application.handle,PChar,PChar MB_OK, etc ;)
-procedure MsgBox(const text:string;const caption:string);
+// got tired of typing application.handle,PAnsiChar,PAnsiChar MB_OK, etc ;)
+procedure MsgBox(const text:AnsiString;const caption:AnsiString);
 begin
-	MessageBox(application.handle,PChar(text),PChar(caption),MB_OK);
+	MessageBox(application.handle,PAnsiChar(text),PAnsiChar(caption),MB_OK);
 end;
-procedure MsgBox(textlist:TStrings;const caption:string);
+procedure MsgBox(textlist:TStrings;const caption:AnsiString);
 var
 	I : integer;
-	final : string;
+	final : AnsiString;
 begin
 	final := '';
 	for I := 0 to textList.Count - 1 do
 		final := final + inttostr(Succ(I)) + #9 + textList.Strings[i] + #13#10;
-	MessageBox(application.handle,PChar(final),PChar(caption),MB_OK);
+	MessageBox(application.handle,PAnsiChar(final),PAnsiChar(caption),MB_OK);
 end;
-procedure MsgBox(text:integer;const caption:string);
+procedure MsgBox(text:integer;const caption:AnsiString);
 begin
-	MessageBox(application.handle,PChar(inttostr(text)),PChar(caption),MB_OK);
+	MessageBox(application.handle,PAnsiChar(inttostr(text)),PAnsiChar(caption),MB_OK);
 end;
 
 procedure OpenHelpFile;
 var
-	abshelp : string;
+	abshelp : AnsiString;
 begin
 	abshelp := StringReplace(devDirs.Help,  '%path%\',devDirs.Exec,[rfReplaceAll]) + DEV_MAINHELP_FILE;
-	ShellExecute(GetDesktopWindow(), 'open', PChar(abshelp), nil, nil, SW_SHOWNORMAL);
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(abshelp), nil, nil, SW_SHOWNORMAL);
 end;
 
-procedure FilesFromWildcard(Directory:string;const Mask: string;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
+procedure FilesFromWildcard(Directory:AnsiString;const Mask: AnsiString;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 var
   SearchRec: TSearchRec;
   Attr, Error: Integer;
@@ -232,17 +308,17 @@ begin
   end;
 end;
 
-function ExecuteFile(const FileName, Params, DefaultDir: string;ShowCmd: Integer): THandle;
+function ExecuteFile(const FileName, Params, DefaultDir: AnsiString;ShowCmd: Integer): THandle;
 begin
   Result := ShellExecute(Application.MainForm.Handle, nil,
-    PChar(FileName), PChar(Params),
-    PChar(DefaultDir), ShowCmd);
+    PAnsiChar(FileName), PAnsiChar(Params),
+    PAnsiChar(DefaultDir), ShowCmd);
 end;
 
-function RunAndGetOutput(const Cmd, WorkDir: string;
+function RunAndGetOutput(const Cmd, WorkDir: AnsiString;
   ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;
   CheckAbortFunc: TCheckAbortFunc;
-  ShowReturnValue: Boolean): string;
+  ShowReturnValue: Boolean): AnsiString;
 var
   tsi: TStartupInfo;
   tpi: TProcessInformation;
@@ -251,8 +327,8 @@ var
   sa: TSecurityAttributes;
   hOutputReadTmp, hOutputRead, hOutputWrite, hInputWriteTmp, hInputRead,
   hInputWrite, hErrorWrite: THandle;
-  FOutput: string;
-  CurrentLine: String;
+  FOutput: AnsiString;
+  CurrentLine: AnsiString;
   bAbort: boolean;
 begin
   FOutput := '';
@@ -284,7 +360,7 @@ begin
   tsi.hStdOutput := hOutputWrite;
   tsi.hStdError := hErrorWrite;
 
-  if not CreateProcess(nil, PChar(Cmd), @sa, @sa, true, 0, nil, PChar(WorkDir),
+  if not CreateProcess(nil, PAnsiChar(Cmd), @sa, @sa, true, 0, nil, PAnsiChar(WorkDir),
                         tsi, tpi) then begin
     result := 'Unable to run "' + Cmd + '": ' + SysErrorMessage(GetLastError);
     exit;
@@ -309,11 +385,11 @@ begin
           ErrFunc('Pipe read error, could not execute file');
      end;
      aBuf[nRead] := #0;
-     FOutput := FOutput + PChar(@aBuf[0]);
+     FOutput := FOutput + PAnsiChar(@aBuf[0]);
 
      if Assigned(LineOutputFunc) then
      begin
-         CurrentLine := CurrentLine + PChar(@aBuf[0]);
+         CurrentLine := CurrentLine + PAnsiChar(@aBuf[0]);
          if CurrentLine[Length(CurrentLine)] = #10 then
          begin
              Delete(CurrentLine, Length(CurrentLine), 1);
@@ -335,10 +411,10 @@ begin
 
 end;
 
-procedure SetPath(const Add: string;UseOriginal: boolean = TRUE);
+procedure SetPath(const Add: AnsiString;UseOriginal: boolean = TRUE);
 var
 	OldPath: array[0..PATH_LEN] of char;
-	NewPath: string;
+	NewPath: AnsiString;
 begin
 	NewPath := Add;
 
@@ -354,17 +430,17 @@ begin
 	if UseOriginal then
 		NewPath:= NewPath + devDirs.OriginalPath
 	else begin
-		GetEnvironmentVariable(pchar('PATH'), @OldPath, PATH_LEN);
-		NewPath:= NewPath + string(OldPath);
+		GetEnvironmentVariable(PAnsiChar('PATH'), @OldPath, PATH_LEN);
+		NewPath:= NewPath + AnsiString(OldPath);
 	end;
 
-	SetEnvironmentVariable(pchar('PATH'), pchar(NewPath));
+	SetEnvironmentVariable(PAnsiChar('PATH'), PAnsiChar(NewPath));
 end;
 
-function ValidateFile(const FileName: string; const WorkPath: string;
-  const CheckDirs: boolean = FALSE): string;
+function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString;
+  const CheckDirs: boolean = FALSE): AnsiString;
 var
- fName: string;
+ fName: AnsiString;
  tmp: TStrings;
  idx: integer;
 begin
@@ -413,23 +489,23 @@ begin
      result:= '';
 end;
 
-procedure LoadFilefromResource(const FileName: string; ms: TMemoryStream);
+procedure LoadFilefromResource(const FileName: AnsiString; ms: TMemoryStream);
 var
  HResInfo: HRSRC;
  hRes: THandle;
- Buffer: PChar;
- aName, Ext: string;
+ Buffer: PAnsiChar;
+ aName, Ext: AnsiString;
 begin
   Ext:= ExtractFileExt(FileName);
   Ext:= copy(ext, 2, length(ext));
   aName:= ChangeFileExt(ExtractFileName(FileName), '');
-  HResInfo:= FindResource(HInstance, pchar(aName), pchar(Ext));
+  HResInfo:= FindResource(HInstance, PAnsiChar(aName), PAnsiChar(Ext));
   hres:= LoadResource(HInstance, HResInfo);
   if HRes = 0 then
    begin
      MessageBox(Application.MainForm.Handle,
-       PChar(Format(Lang[ID_ERR_RESOURCE], [FileName, aName, Ext])),
-       PChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
+       PAnsiChar(Format(Lang[ID_ERR_RESOURCE], [FileName, aName, Ext])),
+       PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
      exit;
    end;
 
@@ -441,27 +517,27 @@ begin
   FreeResource(HRes);
 end;
 
-function GetShortName(const FileName: string): string;
+function GetShortName(const FileName: AnsiString): AnsiString;
 var
 	pFileName: array[0..2048] of char;
 begin
-	GetShortPathName(pchar(FileName), pFileName, 2048);
+	GetShortPathName(PAnsiChar(FileName), pFileName, 2048);
 	result:= strpas(pFileName);
 end;
 
-function AddFilter(var value: string; const _Filter: string): boolean;
+function AddFilter(var value: AnsiString; const _Filter: AnsiString): boolean;
 var
 	idx: integer;
-	s,LFilter: string;
+	s,LFilter: AnsiString;
 begin
 	result:= TRUE;
 	try
 		LFilter:= value;
 		idx:= pos('|', LFilter);
 		if idx > 0 then begin
-			Insert(_Filter +'|', LFilter, AnsiPos(FLT_ALLFILES, LFIlter));
-			s:= Copy(_Filter, AnsiPos('|', _Filter) +1, length(_Filter)) +';';
-			Insert(s, LFilter, AnsiPos('|', LFilter) +1);
+			Insert(_Filter +'|', LFilter, Pos(FLT_ALLFILES, LFIlter));
+			s:= Copy(_Filter, Pos('|', _Filter) +1, length(_Filter)) +';';
+			Insert(s, LFilter, Pos('|', LFilter) +1);
 			if LFilter[Length(LFilter)] <> '|' then
 				LFilter:= LFilter +'|';
 		end;
@@ -471,7 +547,7 @@ begin
 	end;
 end;
 
-function BuildFilter(var value: string; const Filters: TFilterSet): boolean; overload;
+function BuildFilter(var value: AnsiString; const Filters: TFilterSet): boolean; overload;
 begin
 	value:= FLT_BASE + FLT_ALLFILES;
 	case Filters of
@@ -485,7 +561,7 @@ begin
 	end;
 end;
 
-function BuildFilter(var value: string; const Filters: array of string): boolean; overload;
+function BuildFilter(var value: AnsiString; const Filters: array of AnsiString): boolean; overload;
 var
 	I: integer;
 begin
@@ -497,17 +573,17 @@ begin
 	result:= TRUE;
 end;
 
-function CodeInstoStr(const s: string): string;
+function CodeInstoStr(const s: AnsiString): AnsiString;
 begin
   result:= StringReplace(s, #13#10, '$_', [rfReplaceAll]);
 end;
 
-function StrtoCodeIns(const s: string): string;
+function StrtoCodeIns(const s: AnsiString): AnsiString;
 begin
   result:= StringReplace(s, '$_', #13#10, [rfReplaceAll]);
 end;
 
-procedure StrtoPoint(var pt: TPoint;const value: string);
+procedure StrtoPoint(var pt: TPoint;const value: AnsiString);
 var
  tmp: TStringList;
 begin
@@ -526,12 +602,12 @@ begin
   end;
 end;
 
-function PointtoStr(pt: TPoint): string;
+function PointtoStr(pt: TPoint): AnsiString;
 begin
   result:= format('%d, %d', [pt.y, pt.x]);
 end;
 
-function AttrtoStr(Attr: TSynHighlighterAttributes): string;
+function AttrtoStr(Attr: TSynHighlighterAttributes): AnsiString;
 begin
   result:= format('%s, %s, %d, %d, %d',
            [ColortoString(Attr.Foreground),
@@ -541,7 +617,7 @@ begin
             ord(fsUnderline in Attr.Style)]);
 end;
 
-procedure StrtoAttr(var Attr: TSynHighlighterAttributes;const Value: string);
+procedure StrtoAttr(var Attr: TSynHighlighterAttributes;const Value: AnsiString);
 var
  tmp: TStringList;
 begin
@@ -572,9 +648,9 @@ begin
   end;
 end;
 
-function CommaStrToStr(s : string; formatstr : string) : string;
+function CommaStrToStr(s : AnsiString; formatstr : AnsiString) : AnsiString;
 var i : integer;
-    tmp : string;
+    tmp : AnsiString;
 begin
   result := '';
   while pos(';', s) > 0 do begin
@@ -587,9 +663,9 @@ begin
     result := format(formatstr, [result, s]);
 end;
 
-procedure StrtoList(s: string; List: TStrings; delimiter : char);
+procedure StrtoList(s: AnsiString; List: TStrings; delimiter : char);
 var
-	tmp : string;
+	tmp : AnsiString;
 	i   : integer;
 begin
 	List.BeginUpdate;
@@ -608,7 +684,7 @@ begin
 	end;
 end;
 
-function ListtoStr(List: TStrings): string;
+function ListtoStr(List: TStrings): AnsiString;
 var i : integer;
 begin
   result := '';
@@ -620,72 +696,34 @@ begin
   end;
 end;
 
-function GetFileTyp(const FileName: string): TUnitType;
+function GetFileTyp(const FileName: AnsiString): TExUnitType;
 var
- ext: string;
+	ext: AnsiString;
 begin
-  Ext:= ExtractfileExt(FileName);
-  if AnsiCompareText(Ext, DEV_EXT) = 0 then
-   result:= utPrj
-  else
-  if AnsiMatchText(ext, ['.c', '.cpp', '.cc', '.cxx', '.c++', '.cp']) then
-   result:= utsrc
-  else
-  if AnsiMatchText(ext, ['.h', '.hpp', '.rh', '.hh', '.hxx']) then
-   result:= utHead
-  else
-  if AnsiMatchText(ext, ['.res', '.rc']) then
-   result:= utRes
-  else
-   result:= utOther;
-end;
-
-// this function sucks -- need to replace
-function GetExTyp(const FileName: string): TExUnitType;
-var
- idx: integer;
- s: string;
-begin
-  s:= ExtractFileExt(FileName);
-  result:= utxother;
-  for idx:= 0 to high(ctypes) do
-   if AnsiCompareText(s, ctypes[idx]) = 0 then
-    begin
-      result:= utcsrc;
-      exit;
-    end;
-  for idx:= 0 to high(cpptypes) do
-   if AnsiCompareText(s, cpptypes[idx]) = 0 then
-    begin
-      result:= utcppsrc;
-      exit;
-    end;
-  for idx:= 0 to high(headtypes) do
-   if AnsiCompareText(s, headTypes[idx]) = 0 then
-    begin
-      case idx of
-       0: result:= utchead;
-       1: result:= utcppHead;
-       2: result:= utresHead;
-      end;
-      exit;
-    end;
-  for idx:= 0 to high(restypes) do
-   if AnsiCompareText(s, restypes[idx]) = 0 then
-    begin
-      case idx of
-       0: result:= utresComp;
-       1: result:= utresSrc;
-      end;
-      exit;
-    end;
+	Ext:= ExtractfileExt(FileName);
+	if AnsiMatchText(Ext, ['.dev']) then
+		result:= utPrj
+	else if AnsiMatchText(ext, ['.c']) then
+		result:= utcSrc
+	else if AnsiMatchText(ext, ['.cpp', '.cc', '.cxx', '.c++', '.cp']) then
+		result:= utcppSrc
+	else if AnsiMatchText(ext, ['.h']) then
+		result:= utcHead
+	else if AnsiMatchText(ext, ['.h', '.hpp', '.rh', '.hh', '.hxx']) then
+		result:= utcppHead
+	else if AnsiMatchText(ext, ['.res', '.rc']) then
+		result:= utresSrc
+	else if AnsiMatchText(ext, ['.rh']) then
+		result:= utresHead
+	else
+		result:= utOther;
 end;
 
 // seems stupid now but I want to expand to account for .. chars
 //in basepath and or filename
-function ExpandFileto(const FileName, BasePath: string): string;
+function ExpandFileto(const FileName, BasePath: AnsiString): AnsiString;
 var
- oldPath: string;
+ oldPath: AnsiString;
 begin
   oldPath:= GetCurrentDir;
   try
@@ -700,9 +738,9 @@ begin
   end;
 end;
 
-function FileSamePath(const FileName, TestPath: string): boolean;
+function FileSamePath(const FileName, TestPath: AnsiString): boolean;
 var
- s1, s2: string;
+ s1, s2: AnsiString;
 begin
   result:= FALSE;
   s1:= ExtractFilePath(FileName);
@@ -737,7 +775,7 @@ begin
   ToMenu.Visible:= FromMenu.Visible;
 end;
 
-function GetLastPos(const SubStr, s: string): integer;
+function GetLastPos(const SubStr, s: AnsiString): integer;
 var
   Last,
   Current: PAnsiChar;
@@ -759,17 +797,17 @@ begin
 end;
 
 { GenMakePath: convert a filename to a format that can be used by make }
-function GenMakePath1(const FileName: string): String;
+function GenMakePath1(const FileName: AnsiString): AnsiString;
 begin
   Result := GenMakePath(FileName, False, True);
 end;
 
-function GenMakePath2(const FileName: string): String;
+function GenMakePath2(const FileName: AnsiString): AnsiString;
 begin
   Result := GenMakePath(FileName, True, False);
 end;
 
-function GenMakePath(const FileName: String; EscapeSpaces,EncloseInQuotes: Boolean): String;
+function GenMakePath(const FileName: AnsiString; EscapeSpaces,EncloseInQuotes: Boolean): AnsiString;
 begin
   Result := FileName;
 
@@ -784,7 +822,7 @@ begin
       Result := '"' + Result + '"';
 end;
 
-function GetRealPath(const BrokenFileName, Directory: string): string;
+function GetRealPath(const BrokenFileName, Directory: AnsiString): AnsiString;
 var
   e: TEditor;
 begin
@@ -852,7 +890,7 @@ begin
       Result := 128;
 end;
 
-function IncludeQuoteIfSpaces(s : string) : string;
+function IncludeQuoteIfSpaces(s : AnsiString) : AnsiString;
 begin
   if pos(' ', s) > 0 then
     result := '"' + s + '"'
@@ -860,7 +898,7 @@ begin
     result := s;
 end;
 
-function IncludeQuoteIfNeeded(s : string) : string;
+function IncludeQuoteIfNeeded(s : AnsiString) : AnsiString;
 begin
   if pos('"', s) = 0 then
     result := '"' + s + '"'
@@ -871,7 +909,7 @@ end;
 // added by mandrav 13 Sep 2002
 // returns the file version of the .exe specified by filename
 // in the form x.x.x.x
-function GetVersionString(const FileName: string): string;
+function GetVersionString(const FileName: AnsiString): AnsiString;
 var
   Buf: Pointer;
   i: cardinal;
@@ -880,13 +918,13 @@ var
   ffi: TVSFixedFileInfo;
 begin
   Result := '';
-  i := GetFileVersionInfoSize(PChar(FileName), i);
+  i := GetFileVersionInfoSize(PAnsiChar(FileName), i);
   if i = 0 then
     Exit;
 
   Buf := AllocMem(i);
   try
-    if not GetFileVersionInfo(PChar(FileName), 0, i, Buf) then
+    if not GetFileVersionInfo(PAnsiChar(FileName), 0, i, Buf) then
       Exit;
 
     pSize := SizeOf(P);
@@ -906,9 +944,9 @@ end;
 // tries to change the current directory to Dir.
 // Returns True if succesfull, False otherwise.
 // If it succeeds, the Dir variable, holds the old dir.
-function CheckChangeDir(var Dir: string): boolean;
+function CheckChangeDir(var Dir: AnsiString): boolean;
 var
-  Old: string;
+  Old: AnsiString;
 begin
   Old:=GetCurrentDir;
   Result:=SetCurrentDir(Dir);
@@ -916,12 +954,12 @@ begin
     Dir:=Old;
 end;
 
-function GetAssociatedProgram(const Extension: string; var Filename, Description: string): boolean;
+function GetAssociatedProgram(const Extension: AnsiString; var Filename, Description: AnsiString): boolean;
 const
   NOVALUE = '$__NONE__$';
 var
   R: TRegIniFile;
-  Base, S: string;
+  Base, S: AnsiString;
 begin
   Result:=False;
   R:=TRegIniFile.Create;
@@ -949,7 +987,7 @@ begin
   end;
 end;
 
-function IsNumeric(const s : string) : boolean;
+function IsNumeric(const s : AnsiString) : boolean;
 var
 	i : integer;
 begin

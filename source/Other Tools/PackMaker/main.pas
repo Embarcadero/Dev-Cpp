@@ -146,7 +146,7 @@ type
 
     procedure WriteDevPackFile;
     procedure ReadDevPackFile;
-    procedure OpenDevPackFile(devpakfile: String);
+    procedure OpenDevPackFile(devpakfile: string);
     function CreateNewFile: Boolean;
     procedure Clear;
     procedure BuildPackage;
@@ -163,7 +163,7 @@ uses
 
 {$R *.dfm}
 
-procedure FilesFromWildcard(Directory, Mask: String;
+procedure FilesFromWildcard(Directory, Mask: string;
   var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 var
   SearchRec: TSearchRec;
@@ -698,7 +698,7 @@ begin
   end;
 end;
 
-procedure TMainForm.OpenDevPackFile(devpakfile: String);
+procedure TMainForm.OpenDevPackFile(devpakfile: string);
 begin
   IniFile := TIniFile.Create(devpakfile);
   if FileExists(devpakfile) then

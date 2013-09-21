@@ -33,8 +33,8 @@ type
  TdevTheme = class(TObject)
   private
    fThemes: ToysStringList;
-   fFile: string;
-   fName: string;
+   fFile: AnsiString;
+   fName: AnsiString;
    fMenus: TImageList;
    fHelp: TImageList;
    fProjects: TImageList;
@@ -43,23 +43,23 @@ type
    fImgfiles: TOysStringList;
    procedure ClearLists;
    function GetImage(const Index: Integer; var imglst: TImageList): boolean;
-   function GetPreview: string;
+   function GetPreview: AnsiString;
   public
    constructor Create;
    destructor Destroy; override;
 
    procedure ScanThemes;
    function ThemeList: TStrings;
-   function SetTheme(const theme: string): boolean;
-   function LoadTheme(const FileName: string): boolean;
+   function SetTheme(const theme: AnsiString): boolean;
+   function LoadTheme(const FileName: AnsiString): boolean;
 
-   property Name: string read fName;
+   property Name: AnsiString read fName;
    property Menus: TImageList read fMenus;
    property Help: TImageList read fHelp;
    property Projects: TImageList read fProjects;
    property Specials: TImageList read fSpecials;
    property Browser: TImageList read fBrowser;
-   property Preview: string read GetPreview;
+   property Preview: AnsiString read GetPreview;
  end;
 
 var
@@ -122,7 +122,7 @@ begin
   fBrowser.Clear;
 end;
 
-function GetPreview: string;
+function GetPreview: AnsiString;
 begin
 
 end;
@@ -130,7 +130,7 @@ end;
 function TdevTheme.GetImage(const Index: Integer; var imglst: TImageList): boolean;
 var
  idx: Integer;
- aFile: string;
+ aFile: AnsiString;
  img: TBitmap;
  clr: TColor;
 begin
@@ -159,7 +159,7 @@ begin
   end;
 end;
 
-function TdevTheme.SetTheme(const theme: string): boolean;
+function TdevTheme.SetTheme(const theme: AnsiString): boolean;
 var
  idx: Integer;
 begin
@@ -225,7 +225,7 @@ begin
      end;
 end;
 
-function TdevTheme.LoadTheme(const FileName: string): boolean;
+function TdevTheme.LoadTheme(const FileName: AnsiString): boolean;
 const
  MNU_CNT = 47;
  MNU_OFF = 1000;
@@ -239,7 +239,7 @@ const
  BRW_OFF = 1400;
 var
  idx: Integer;
- fName: string;
+ fName: AnsiString;
 begin
 //  Open file and load images into lists
 //  if image isn't found load "NOIMG" bitmap from resources
@@ -333,7 +333,7 @@ begin
 end;
 
 
-function TdevTheme.GetPreview: string;
+function TdevTheme.GetPreview: AnsiString;
 begin
 //
 end;

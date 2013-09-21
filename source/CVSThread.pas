@@ -30,27 +30,27 @@ uses
 {$ENDIF}
 
 type
-  TLineOutputEvent = procedure(Sender: TObject; const Line: string) of object;
-  TNeedPasswordEvent = procedure(var Passwd: string) of object;
+  TLineOutputEvent = procedure(Sender: TObject; const Line: AnsiString) of object;
+  TNeedPasswordEvent = procedure(var Passwd: AnsiString) of object;
 
   TCVSThread = class(TThread)
   private
-    CurrentLine: string;
-    fPasswd: string;
+    CurrentLine: AnsiString;
+    fPasswd: AnsiString;
     FLineOutput: TLineOutputEvent;
     fCheckAbort: TCheckAbortFunc;
     fNeedPassword: TNeedPasswordEvent;
-  //  procedure TypePassword(Pass: string);
+  //  procedure TypePassword(Pass: AnsiString);
   protected
     procedure Execute; override;
     procedure CallLineOutputEvent;
-    procedure LineOutput(Line: string);
+    procedure LineOutput(Line: AnsiString);
     procedure CallNeedPassword;
-    function RunCVSCommand(WindowTitle, Cmd, WorkingDir: string): string;
+    function RunCVSCommand(WindowTitle, Cmd, WorkingDir: AnsiString): AnsiString;
   public
-    Command: string;
-    Directory: string;
-    Output: string;
+    Command: AnsiString;
+    Directory: AnsiString;
+    Output: AnsiString;
     property OnLineOutput: TLineOutputEvent read FLineOutput write FLineOutput;
     property OnCheckAbort: TCheckAbortFunc read FCheckAbort write FCheckAbort;
     property OnNeedPassword: TNeedPasswordEvent read fNeedPassword write fNeedPassword;
@@ -70,7 +70,7 @@ begin
     fNeedPassword(fPasswd);
 end;
 
-procedure TCVSThread.LineOutput(Line: string);
+procedure TCVSThread.LineOutput(Line: AnsiString);
 begin
   CurrentLine := Line;
   if Assigned(FLineOutput) then
@@ -82,7 +82,7 @@ begin
   Output := RunCVSCommand('Dev-C++ CVS process', Command, Directory);
 end;
 
-function TCVSThread.RunCVSCommand(WindowTitle, Cmd, WorkingDir: string): string;
+function TCVSThread.RunCVSCommand(WindowTitle, Cmd, WorkingDir: AnsiString): AnsiString;
 var
   tsi: TStartupInfo;
   tpi: TProcessInformation;
@@ -92,8 +92,8 @@ var
   sa: TSecurityAttributes;
   hOutputReadTmp, hOutputRead, hOutputWrite, hErrorWrite: THandle;
 //  hInputWriteTmp, hInputRead, hInputWrite: THandle;
-  FOutput: string;
-  CurrentLine: string;
+  FOutput: AnsiString;
+  CurrentLine: AnsiString;
   bAbort: boolean;
   idx: integer;
 begin
@@ -123,14 +123,14 @@ begin
 
   FillChar(tsi, SizeOf(TStartupInfo), 0);
   tsi.cb := SizeOf(TStartupInfo);
-  tsi.lpTitle := PChar(WindowTitle);
+  tsi.lpTitle := PAnsiChar(WindowTitle);
   tsi.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
   //tsi.hStdInput := hInputRead;
   tsi.hStdOutput := hOutputWrite;
   tsi.hStdError := hOutputWrite;
   tsi.wShowWindow := SW_SHOW;//SW_HIDE;
 
-  if not CreateProcess(nil, PChar(Cmd), @sa, @sa, true, CREATE_NEW_CONSOLE, nil, PChar(WorkingDir),
+  if not CreateProcess(nil, PAnsiChar(Cmd), @sa, @sa, true, CREATE_NEW_CONSOLE, nil, PAnsiChar(WorkingDir),
     tsi, tpi) then begin
     LineOutput('unable to run program file: ' + SysErrorMessage(GetLastError));
     exit;
@@ -154,9 +154,9 @@ begin
         LineOutput('Pipe read error, could not execute command');
     end;
     aBuf[nRead] := #0;
-    FOutput := FOutput + PChar(@aBuf[0]);
+    FOutput := FOutput + PAnsiChar(@aBuf[0]);
 
-    CurrentLine := CurrentLine + PChar(@aBuf[0]);
+    CurrentLine := CurrentLine + PAnsiChar(@aBuf[0]);
     repeat
       idx := Pos(#10, CurrentLine);
       if idx > 0 then begin
@@ -165,11 +165,11 @@ begin
       end;
     until idx = 0;
 
-  {  if AnsiEndsText('password:', Trim(FOutput)) then begin
+  {  if EndsText('password:', Trim(FOutput)) then begin
       LineOutput(CurrentLine);
       CurrentLine := '';
       Synchronize(CallNeedPassword);
-      hWin := FindWindow(nil, PChar(WindowTitle));
+      hWin := FindWindow(nil, PAnsiChar(WindowTitle));
       if hWin > 0 then begin
         ShowWindow(hWin, SW_SHOW);
         SetForegroundWindow(hWin);
@@ -183,7 +183,7 @@ begin
       end;
     end;}
 //    else begin
-//      CurrentLine := CurrentLine + PChar(@aBuf[0]);
+//      CurrentLine := CurrentLine + PAnsiChar(@aBuf[0]);
 //      if CurrentLine[Length(CurrentLine)] = #10 then
 //      begin
 //        Delete(CurrentLine, Length(CurrentLine), 1);
@@ -198,7 +198,7 @@ begin
   Result := FOutput + ' ' + IntToStr(nRead);
 end;
 
-//procedure TCVSThread.TypePassword(Pass: string);
+//procedure TCVSThread.TypePassword(Pass: AnsiString);
 //var
 //  Key: Byte;
 //  I: integer;

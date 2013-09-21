@@ -10,12 +10,12 @@ uses
   Classes, SysUtils;
 {$ENDIF}
 
-procedure FilesFromWildcard(Directory, Mask: String; var Files : TStringList;
+procedure FilesFromWildcard(Directory, Mask: AnsiString; var Files : TStringList;
   Subdirs, ShowDirs: Boolean);
-function GetDevcppMenu: String;
-procedure CreateShortcut(FileName, Target: String; Icon: String = '');
+function GetDevcppMenu: AnsiString;
+procedure CreateShortcut(FileName, Target: AnsiString; Icon: AnsiString = '');
 function CalcMod(Count: Integer): Integer;
-function GetVersionString(FileName: string): string;
+function GetVersionString(FileName: AnsiString): AnsiString;
 
 implementation
 
@@ -26,7 +26,7 @@ uses
 {$IFDEF LINUX}
 {$ENDIF}
 
-procedure FilesFromWildcard(Directory, Mask: String; var Files : TStringList;
+procedure FilesFromWildcard(Directory, Mask: AnsiString; var Files : TStringList;
   Subdirs, ShowDirs: Boolean);
 var
   SearchRec: TSearchRec;
@@ -72,7 +72,7 @@ begin
   end;
 end;
 
-function GetDevcppMenu: String;
+function GetDevcppMenu: AnsiString;
 var
   PIDL       : PItemIDList;
   InFolder   : array[0..MAX_PATH] of Char;
@@ -82,7 +82,7 @@ begin
   Result := InFolder + '\Bloodshed Dev-C++';
 end;
 
-procedure CreateShortcut(FileName, Target: String; Icon: String);
+procedure CreateShortcut(FileName, Target: AnsiString; Icon: AnsiString);
 var
   IObject    : IUnknown;
   ISLink     : IShellLink;
@@ -109,10 +109,10 @@ begin
 
       with ISLink do
       begin
-          SetPath(PChar(Target));
-          SetWorkingDirectory(PChar(ExtractFilePath(Target)));
+          SetPath(PAnsiChar(Target));
+          SetWorkingDirectory(PAnsiChar(ExtractFilePath(Target)));
           if Length(Icon) > 0 then
-          SetIconLocation(PChar(Icon), 0);
+          SetIconLocation(PAnsiChar(Icon), 0);
       end;
 
       IPFile.Save(PWChar(WideString(FileName)), false);
@@ -136,7 +136,7 @@ end;
 // added by mandrav 13 Sep 2002
 // returns the file version of the .exe specified by filename
 // in the form x.x.x.x
-function GetVersionString(FileName: string): string;
+function GetVersionString(FileName: AnsiString): AnsiString;
 var
   Buf: Pointer;
   i: cardinal;
@@ -145,13 +145,13 @@ var
   ffi: TVSFixedFileInfo;
 begin
   Result := '';
-  i := GetFileVersionInfoSize(PChar(FileName), i);
+  i := GetFileVersionInfoSize(PAnsiChar(FileName), i);
   if i = 0 then
     Exit;
 
   Buf := AllocMem(i);
   try
-    if not GetFileVersionInfo(PChar(FileName), 0, i, Buf) then
+    if not GetFileVersionInfo(PAnsiChar(FileName), 0, i, Buf) then
       Exit;
 
     pSize := SizeOf(P);

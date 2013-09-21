@@ -29,11 +29,11 @@ type
 
   // Internal structure.  Ignore.
   TBZStreamRec = packed record
-    next_in: PChar; // next input byte
+    next_in: PAnsiChar; // next input byte
     avail_in: Integer; // number of bytes available at next_in
     total_in: Integer; // total nb of input bytes read so far
 
-    next_out: PChar; // next output byte should be put here
+    next_out: PAnsiChar; // next output byte should be put here
     avail_out: Integer; // remaining free space at next_out
     total_out: Integer; // total nb of bytes output so far
 
@@ -403,7 +403,7 @@ begin
         P := OutBuf;
         Inc(OutBytes, 256);
         ReallocMem(OutBuf, OutBytes);
-        strm.next_out := PChar(Integer(OutBuf) + (Integer(strm.next_out) - Integer(P)));
+        strm.next_out := PAnsiChar(Integer(OutBuf) + (Integer(strm.next_out) - Integer(P)));
         strm.avail_out := 256;
       end;
     finally
@@ -446,7 +446,7 @@ begin
         P := OutBuf;
         Inc(OutBytes, BufInc);
         ReallocMem(OutBuf, OutBytes);
-        strm.next_out := PChar(Integer(OutBuf) + (Integer(strm.next_out) - Integer(P)));
+        strm.next_out := PAnsiChar(Integer(OutBuf) + (Integer(strm.next_out) - Integer(P)));
         strm.avail_out := BufInc;
       end;
     finally

@@ -38,20 +38,20 @@ uses
 type
   PUnitEntry = ^TUnitEntry;
   TUnitEntry = packed record
-    Name: string;
+    Name: AnsiString;
     Start: dword;
     Len: integer;
   end;
 
   PFuncsEntry = ^TFuncsEntry;
   TFuncsEntry = packed record
-    Name: string;
+    Name: AnsiString;
     Address: dword;
   end;
 
   PLineEntry = ^TLineEntry;
   TLineEntry = packed record
-    Line: string;
+    Line: AnsiString;
     Address: dword;
     UnitIndex: dword;
   end;
@@ -150,8 +150,8 @@ const
 
 var
   frmExceptionsAnalyzer: TfrmExceptionsAnalyzer;
-  fEmail: string;
-  fSubject: string;
+  fEmail: AnsiString;
+  fSubject: AnsiString;
   fReportEXEversion: boolean;
   fReportComputerName: boolean;
   fReportMachine: boolean;
@@ -165,7 +165,7 @@ var
 { Exceptions code created by Yiannis Mandravellos (mandrav@supergoal.gr)
   Used various resources to gather information }
 
-procedure ReadMapFile(Fname: string);
+procedure ReadMapFile(Fname: AnsiString);
 var
   pUn: PUnitEntry;
   pFun: PFuncsEntry;
@@ -175,7 +175,7 @@ var
   I: integer;
   idx: integer;
   iStart, iLen: longint;
-  sUnitName: string;
+  sUnitName: AnsiString;
 begin
   if not FileExists(Fname) then
     Exit;
@@ -246,12 +246,12 @@ begin
       while I < sl.Count - 1 do begin
         // find "Line numbers for"
         while I < sl.Count - 1 do begin
-          if AnsiStartsStr('Line numbers for ', sl[I]) then begin
+          if StartsStr('Line numbers for ', sl[I]) then begin
             idx := Pos('(', sl[I]);
             if idx > 0 then begin
               sUnitName := Copy(sl[I], 18, idx - 18);
               for idx := 0 to fUnits.Count - 1 do
-                if AnsiCompareStr(sUnitName, PUnitEntry(fUnits[idx])^.Name) = 0 then begin
+                if CompareStr(sUnitName, PUnitEntry(fUnits[idx])^.Name) = 0 then begin
                   CurrUnit := idx;
                   Break;
                 end;
@@ -314,13 +314,13 @@ begin
   end;
 end;
 
-function AddressInfo(Address: dword): string;
+function AddressInfo(Address: dword): AnsiString;
 var
   I: integer;
   MapAddress: dword;
-  sUnitName: string;
-  sProcName: string;
-  sLineNum: string;
+  sUnitName: AnsiString;
+  sProcName: AnsiString;
+  sLineNum: AnsiString;
   UnitIdx: integer;
 begin
   sUnitName := '';
@@ -365,7 +365,7 @@ begin
   end;
 end;
 
-function GatherSystemInfo: string;
+function GatherSystemInfo: AnsiString;
 var
   ms: TMemoryStatus;
   vi: TOSVersionInfo;
@@ -373,7 +373,7 @@ var
   Tot, Avail: double;
   Buf: array[0..MAX_PATH] of Char;
   BufSize: cardinal;
-  sVer: string;
+  sVer: AnsiString;
 begin
   if fReportEXEversion then begin
     sVer := GetVersionString(ParamStr(0));
@@ -496,8 +496,8 @@ var
   p, stackstart: ^pointer;
   sl: TStringList;
   I: integer;
-  S: string;
-  si, Res: string;
+  S: AnsiString;
+  si, Res: AnsiString;
   max: dword;
 begin
   asm
@@ -588,7 +588,7 @@ end;
 
 procedure TfrmExceptionsAnalyzer.btnSendClick(Sender: TObject);
 var
-  Cmd: string;
+  Cmd: AnsiString;
   I: integer;
 begin
 {   ** removed vRoach support ** if UseRoach then begin
@@ -608,7 +608,7 @@ begin
         Cmd := Cmd + memBugReport.Lines[I] + '%0A';
     end;
     Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
-    ShellExecute(0, 'open', PChar(Cmd), nil, nil, SW_SHOWNORMAL);
+    ShellExecute(0, 'open', PAnsiChar(Cmd), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TfrmExceptionsAnalyzer.FormCreate(Sender: TObject);
@@ -638,7 +638,7 @@ end;
 
 procedure TfrmExceptionsAnalyzer.btnHelpClick(Sender: TObject);
 var
-  Msg: string;
+  Msg: AnsiString;
 begin
   Msg := 'An error has occured in the application and this window popped-up. ' +
     'Here is a description of the available options:'#10#10 +

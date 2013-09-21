@@ -40,16 +40,16 @@ type
   PFolders = ^TFolders;
   TFolders = record
     Index: Char;
-    Name: string[32];
-    Under: string[164];
+    Name: string;
+    Under: string;
     Node: TTreeNode;
   end;
 
   PFolderAssocs = ^TFolderAssocs;
   TFolderAssocs = record
     FolderID: integer;
-    Folder: string[32];
-    Command: string[164];
+    Folder: string;
+    Command: string;
   end;
 
   TImagesRecord = class(TPersistent)
@@ -93,14 +93,14 @@ type
     fOnSelect: TMemberSelectEvent;
     fImagesRecord: TImagesRecord;
     fShowFilter: TShowFilter;
-    fCurrentFile: string;
-    fCurrentFileHeader: string;
-    fCurrentFileImpl: string;
+    fCurrentFile: AnsiString;
+    fCurrentFileHeader: AnsiString;
+    fCurrentFileImpl: AnsiString;
     fProjectDir: TFileName;
     fClassFoldersFile: TFileName;
     fFolders: array of TFolders;
     fFolderAssocs: array of TFolderAssocs;
-    fLastSelection: string;
+    fLastSelection: AnsiString;
     fCnv: TControlCanvas;
     fUseColors: boolean;
     fParserBusy: boolean;
@@ -117,18 +117,18 @@ type
     procedure OnParserBusy(Sender: TObject);
     procedure SetNodeImages(Node: TTreeNode; Statement: PStatement);
     procedure Sort;
-    procedure SetCurrentFile(Value: string);
+    procedure SetCurrentFile(Value: AnsiString);
     procedure SetShowFilter(const Value: TShowFilter);
     procedure ReadClassFolders; // read folders from disk
     procedure WriteClassFolders; // write folders to disk
-    function HasSubFolder(Cmd: string): boolean; // if Command has subfolders, returns true
-    procedure CreateFolders(Cmd: string; Node: TTreeNode); // creates folders under Command
-    function BelongsToFolder(Cmd: string): integer; // returns the index to fFolders it belongs or -1 if does not
+    function HasSubFolder(Cmd: AnsiString): boolean; // if Command has subfolders, returns true
+    procedure CreateFolders(Cmd: AnsiString; Node: TTreeNode); // creates folders under Command
+    function BelongsToFolder(Cmd: AnsiString): integer; // returns the index to fFolders it belongs or -1 if does not
     function GetNodeOfFolder(Index: integer): TTreeNode; overload;
-    function GetNodeOfFolder(Folder: string): TTreeNode; overload;
-    procedure AddFolderAssociation(Fld, Cmd: string);
-    procedure RemoveFolderAssociation(Fld, Cmd: string);
-    function IndexOfFolder(Fld: string): integer;
+    function GetNodeOfFolder(Folder: AnsiString): TTreeNode; overload;
+    procedure AddFolderAssociation(Fld, Cmd: AnsiString);
+    procedure RemoveFolderAssociation(Fld, Cmd: AnsiString);
+    function IndexOfFolder(Fld: AnsiString): integer;
     procedure ReSelect;
     procedure SetUseColors(const Value: boolean);
     procedure SetShowInheritedMembers(const Value: boolean);
@@ -138,9 +138,9 @@ type
     procedure UpdateView;
     procedure ShowSampleData;
     procedure Clear;
-    procedure AddFolder(S: string; Node: TTreeNode);
-    procedure RemoveFolder(S: string);
-    procedure RenameFolder(Old, New: string);
+    procedure AddFolder(S: AnsiString; Node: TTreeNode);
+    procedure RemoveFolder(S: AnsiString);
+    procedure RenameFolder(Old, New: AnsiString);
     function FolderCount: integer;
     procedure SetUpdateOn;
     procedure SetUpdateOff;
@@ -160,7 +160,7 @@ type
     property OnSelect: TMemberSelectEvent read fOnSelect write fOnSelect;
     property Parser: TCppParser read fParser write SetParser;
     property ItemImages: TImagesRecord read fImagesRecord write fImagesRecord;
-    property CurrentFile: string read fCurrentFile write SetCurrentFile;
+    property CurrentFile: AnsiString read fCurrentFile write SetCurrentFile;
     property ProjectDir: TFileName read fProjectDir write fProjectDir;
     property ClassFoldersFile: TFileName read fClassFoldersFile write fClassFoldersFile;
     property UseColors: boolean read fUseColors write SetUseColors;
@@ -211,7 +211,7 @@ var
   ParNode, NewNode: TTreeNode;
   F: integer;
   Sl: TStringList;
-  tmpS: string;
+  tmpS: AnsiString;
   bInherited: boolean;
 begin
   if (not fShowInheritedMembers) and (ParentID >= 0) then
@@ -451,7 +451,7 @@ begin
 end;
 
 procedure TClassBrowser.ShowSampleData;
-  function CreateTempStatement(Full, Typ, Cmd, Args: string; K: TStatementKind; S: TStatementClassScope): PStatement;
+  function CreateTempStatement(Full, Typ, Cmd, Args: AnsiString; K: TStatementKind; S: TStatementClassScope): PStatement;
   begin
     Result := New(PStatement);
     with Result^ do begin
@@ -547,7 +547,7 @@ begin
   else
     Result := Ord(PStatement(Node1.Data)^._Kind) - Ord(PStatement(Node2.Data)^._Kind);
   if Result = 0 then
-    Result := AnsiStrIComp(PChar(Node1.Text), PChar(Node2.Text));
+    Result := StrIComp(PAnsiChar(Node1.Text), PAnsiChar(Node2.Text));
 end;
 
 procedure TClassBrowser.Sort;
@@ -555,7 +555,7 @@ begin
   CustomSort(@CustomSortProc, 0);
 end;
 
-procedure TClassBrowser.SetCurrentFile(Value: string);
+procedure TClassBrowser.SetCurrentFile(Value: AnsiString);
 begin
   if fShowFilter <> sfCurrent then
     Exit;
@@ -592,37 +592,37 @@ end;
 
 // returns the index to fFolders it belongs or -1 if does not
 
-function TClassBrowser.BelongsToFolder(Cmd: string): integer;
+function TClassBrowser.BelongsToFolder(Cmd: AnsiString): integer;
 var
   I: integer;
 begin
   Result := -1;
   for I := Low(fFolderAssocs) to High(fFolderAssocs) do
-    if AnsiCompareText(fFolderAssocs[I].Command, Cmd) = 0 then
+    if CompareText(fFolderAssocs[I].Command, Cmd) = 0 then
       Result := fFolderAssocs[I].FolderID;
 end;
 
 // creates folders under Command
 
-procedure TClassBrowser.CreateFolders(Cmd: string; Node: TTreeNode);
+procedure TClassBrowser.CreateFolders(Cmd: AnsiString; Node: TTreeNode);
 var
   I: integer;
 begin
   for I := Low(fFolders) to High(fFolders) do
-    if AnsiCompareText(fFolders[I].Under, Cmd) = 0 then begin
+    if CompareText(fFolders[I].Under, Cmd) = 0 then begin
       fFolders[I].Node := Items.AddChildObjectFirst(Node, fFolders[I].Name, @fFolders[I]);
-//      if AnsiCompareStr(fFolders[I].Under, #01#02+Char(I)) = 0 then
+//      if CompareStr(fFolders[I].Under, #01#02+Char(I)) = 0 then
       CreateFolders(#01#02 + Char(I), fFolders[I].Node);
     end;
 end;
 
-function TClassBrowser.HasSubFolder(Cmd: string): boolean;
+function TClassBrowser.HasSubFolder(Cmd: AnsiString): boolean;
 var
   I: integer;
 begin
   Result := False;
   for I := Low(fFolders) to High(fFolders) do
-    if AnsiCompareText(fFolders[I].Under, Cmd) = 0 then begin
+    if CompareText(fFolders[I].Under, Cmd) = 0 then begin
       Result := True;
       Break;
     end;
@@ -710,7 +710,7 @@ begin
   FileClose(hFile);
 end;
 
-procedure TClassBrowser.AddFolder(S: string; Node: TTreeNode);
+procedure TClassBrowser.AddFolder(S: AnsiString; Node: TTreeNode);
 begin
   if High(fFolders) >= MAX_CUSTOM_FOLDERS then
     Exit;
@@ -737,13 +737,13 @@ begin
   WriteClassFolders;
 end;
 
-procedure TClassBrowser.RemoveFolder(S: string);
+procedure TClassBrowser.RemoveFolder(S: AnsiString);
 var
   I: integer;
   C: integer;
 begin
   for I := Low(fFolders) to High(fFolders) do
-    if AnsiCompareText(fFolders[I].Name, S) = 0 then begin
+    if CompareText(fFolders[I].Name, S) = 0 then begin
       if Assigned(fFolders[I].Node) then begin
         while fFolders[I].Node.Count > 0 do
           fFolders[I].Node[0].MoveTo(fFolders[I].Node.Parent, naAddChild);
@@ -762,7 +762,7 @@ begin
   Refresh;
 end;
 
-procedure TClassBrowser.AddFolderAssociation(Fld, Cmd: string);
+procedure TClassBrowser.AddFolderAssociation(Fld, Cmd: AnsiString);
 var
   Index: integer;
 begin
@@ -783,7 +783,7 @@ begin
   end;
 end;
 
-procedure TClassBrowser.RemoveFolderAssociation(Fld, Cmd: string);
+procedure TClassBrowser.RemoveFolderAssociation(Fld, Cmd: AnsiString);
 var
   I: integer;
   C: integer;
@@ -794,7 +794,7 @@ begin
     I := Low(fFolderAssocs);
     while I <= High(fFolderAssocs) do
       if ((Fld = '') or (fFolderAssocs[I].FolderID = Index)) and
-        ((Cmd = '') or (AnsiCompareText(fFolderAssocs[I].Command, Cmd) = 0)) then begin
+        ((Cmd = '') or (CompareText(fFolderAssocs[I].Command, Cmd) = 0)) then begin
         for C := I + 1 to High(fFolderAssocs) do
           fFolderAssocs[C - 1] := fFolderAssocs[C];
         SetLength(fFolderAssocs, High(fFolderAssocs));
@@ -811,13 +811,13 @@ begin
     Result := fFolders[Index].Node;
 end;
 
-function TClassBrowser.GetNodeOfFolder(Folder: string): TTreeNode;
+function TClassBrowser.GetNodeOfFolder(Folder: AnsiString): TTreeNode;
 var
   I: integer;
 begin
   Result := nil;
   for I := Low(fFolders) to High(fFolders) do
-    if AnsiCompareText(fFolders[I].Name, Folder) = 0 then begin
+    if CompareText(fFolders[I].Name, Folder) = 0 then begin
       Result := fFolders[I].Node;
       Break;
     end;
@@ -907,7 +907,7 @@ begin
     Application.HideHint;
 end;
 
-procedure TClassBrowser.RenameFolder(Old, New: string);
+procedure TClassBrowser.RenameFolder(Old, New: AnsiString);
 var
   I: integer;
   Index: integer;
@@ -927,13 +927,13 @@ begin
   end;
 end;
 
-function TClassBrowser.IndexOfFolder(Fld: string): integer;
+function TClassBrowser.IndexOfFolder(Fld: AnsiString): integer;
 var
   I: integer;
 begin
   Result := -1;
   for I := Low(fFolders) to High(fFolders) do
-    if AnsiCompareText(Fld, fFolders[I].Name) = 0 then begin
+    if CompareText(Fld, fFolders[I].Name) = 0 then begin
       Result := I;
       Break;
     end;
@@ -943,7 +943,7 @@ procedure TClassBrowser.ReSelect;
   function DoSelect(Node: TTreeNode): boolean;
   var
     I: integer;
-    OldSelection: string;
+    OldSelection: AnsiString;
   begin
     Result := False;
     for I := 0 to Node.Count - 1 do begin
@@ -952,7 +952,7 @@ procedure TClassBrowser.ReSelect;
           OldSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText
       else
         OldSelection := PFolders(Node[I].Data)^.Under;
-      if AnsiCompareStr(OldSelection, fLastSelection) = 0 then begin
+      if CompareStr(OldSelection, fLastSelection) = 0 then begin
         Selected := Node[I];
         Result := True;
         Break;
@@ -967,7 +967,7 @@ procedure TClassBrowser.ReSelect;
   end;
 var
   I: integer;
-  OldSelection: string;
+  OldSelection: AnsiString;
 begin
   for I := 0 to Items.Count - 1 do begin
     if Items[I].ImageIndex <> fImagesRecord.fGlobalsImg then
@@ -975,7 +975,7 @@ begin
         OldSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText
     else
       OldSelection := PFolders(Items[I].Data)^.Under;
-    if AnsiCompareStr(OldSelection, fLastSelection) = 0 then begin
+    if CompareStr(OldSelection, fLastSelection) = 0 then begin
       Selected := Items[I];
       Break;
     end

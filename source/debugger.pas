@@ -37,7 +37,7 @@ type
     Index  : integer;
     Editor : TEditor;
     // RNC add the file that this breakpoint is in
-    filename : string;
+    filename : AnsiString;
     Line   : integer;
     // RNC 07.02.2004 -- A variable to hold GDB's index for this breakpoint
     BreakPointIndex : integer;
@@ -47,34 +47,34 @@ type
   constructor Create;
   destructor  Destroy; override;
   private
-    fIncDirs: string;
+    fIncDirs: AnsiString;
     // RNC 07.02.2004 -- Increments each time a breakpoint is added to GDB.  And is the id for the next breakpoint in gdb
     breakPointCount : integer;
 
     function GetCallStack: TList;
-    function GetWatchValue: string;
-    function GetWatchVar: string;
+    function GetWatchValue: AnsiString;
+    function GetWatchVar: AnsiString;
   published
     property CallStack : TList read GetCallStack;
-    property WatchVar: string read GetWatchVar;
-    property WatchValue: string read GetWatchValue;
+    property WatchVar: AnsiString read GetWatchVar;
+    property WatchValue: AnsiString read GetWatchValue;
 
   public
-    FileName  : string;
+    FileName  : AnsiString;
     Executing : boolean;
     DebugTree : TTreeView;
     InAssembler : boolean;
     Registers : TRegisters;
     OnRegistersReady : procedure of object;
     procedure Execute;
-    procedure SendCommand(command, params : string);
+    procedure SendCommand(command, params : AnsiString);
     //RNC Change Add/Remove Breakpoint to take an index into the 1 array of breakpoints
     function AddBreakpoint(i:integer):integer;
     procedure RemoveBreakpoint(i : integer);
     procedure RemoveAllBreakpoints;
     procedure RefreshContext(); // tries to display variable considered not in current context
     procedure CloseDebugger(Sender: TObject);
-    procedure AddIncludeDir(s: string);
+    procedure AddIncludeDir(s: AnsiString);
     procedure ClearIncludeDirs;
     function  Idle : boolean;
     function  IsIdling : boolean;
@@ -87,7 +87,7 @@ type
     // Check to see if the given line is already a breakpoint
     //RNC change to take a filename, not an editor.  an editor is destroyed when the
     // file is closed. however, the filename does not change.
-    function BreakpointExists(filename: string; line: integer):boolean;
+    function BreakpointExists(filename: AnsiString; line: integer):boolean;
 
   protected
     hInputWrite : THandle;
@@ -101,7 +101,7 @@ type
     Breakpoints : TList;
     GdbBreakCount : integer;
 
-    procedure DisplayError(s : string);
+    procedure DisplayError(s : AnsiString);
     procedure Launch(hChildStdOut, hChildStdIn,
                      hChildStdErr : THandle);
     procedure OnDebugFinish(Sender : TObject);
@@ -110,8 +110,8 @@ type
     // RNC a function to be called if we have a valid-frame but no source file
     // to open up
     procedure InaccessibleFunction;
-    procedure OnAsmCode(s : string);
-    procedure OnAsmFunc(s : string);
+    procedure OnAsmCode(s : AnsiString);
+    procedure OnAsmFunc(s : AnsiString);
     procedure OnAsmCodeEnd;
     procedure OnSegmentationFault;
 
@@ -277,7 +277,7 @@ begin
   breakPointCount := 0;
 end;
 
-procedure TDebugger.DisplayError(s : string);
+procedure TDebugger.DisplayError(s : AnsiString);
 begin
   MessageDlg('Error with debugging process : ' + s, mtError, [mbOK], 0);
 end;
@@ -288,8 +288,8 @@ var
   pi : TProcessInformation;
   si : TStartupInfo;
   // RNC send the include directories to GDB
-  inc : string;
-  gdb : string;
+  inc : AnsiString;
+  gdb : AnsiString;
 begin
   // Set up the start up info struct.
   FillChar(si, sizeof(TStartupInfo), 0);
@@ -310,7 +310,7 @@ begin
   inc := StringReplace(inc, '=', '="',[rfReplaceAll]);
   inc := inc + '"';
   if (not CreateProcess(nil,
-                        pchar(gdb + ' --annotate=2 --silent'), nil, nil, true,
+                        PAnsiChar(gdb + ' --annotate=2 --silent'), nil, nil, true,
                         CREATE_NEW_CONSOLE, nil, nil, si, pi)) then begin
     DisplayError('Could not find program file ' + gdb);
     exit;
@@ -346,7 +346,7 @@ begin
   end;
 end;
 
-procedure TDebugger.SendCommand(command, params : string);
+procedure TDebugger.SendCommand(command, params : AnsiString);
 var
   s : array [0..512] of char;
   nBytesWrote : DWORD;
@@ -414,7 +414,7 @@ begin
         if spos=0 then
           spos:=Pos('-s_@@_', opts.cmdLines.Linker); // end of line (dev 4.9.7.3+)
         if (spos=0) and
-           (Length(opts.cmdLines.Linker)>=2) and // end of string
+           (Length(opts.cmdLines.Linker)>=2) and // end of AnsiString
            (Copy(opts.cmdLines.Linker, Length(opts.cmdLines.Linker)-1, 2) = '-s') then
           spos := Length(opts.cmdLines.Linker)-1;
         // if found, delete it
@@ -473,7 +473,7 @@ end;
 // RNC changed to check if a breakpoint exists by checking a filename vs the global list, not an editor
 // editors change when a file is close, but the filename will not.  This makes sure that just becuse
 // you close a file, the breakpoint will not disappear
-function TDebugger.BreakpointExists(filename: string; line: integer):boolean;
+function TDebugger.BreakpointExists(filename: AnsiString; line: integer):boolean;
 var
   I: integer;
 begin
@@ -516,7 +516,7 @@ begin
     Result:=nil;
 end;
 
-procedure TDebugger.AddIncludeDir(s: string);
+procedure TDebugger.AddIncludeDir(s: AnsiString);
 begin
   if DirectoryExists(s) then
     fIncDirs:=fIncDirs+' --directory='+s+' ';
@@ -527,14 +527,14 @@ begin
   fIncDirs:='';
 end;
 
-procedure TDebugger.OnAsmCode(s : string);
+procedure TDebugger.OnAsmCode(s : AnsiString);
 begin
   if Assigned(CPUForm) then begin
     CPUForm.CodeList.Lines.Add(s);
   end;
 end;
 
-procedure TDebugger.OnAsmFunc(s : string);
+procedure TDebugger.OnAsmFunc(s : AnsiString);
 begin
   if Assigned(CPUForm) then begin
     CPUForm.CodeList.ClearAll;
@@ -548,7 +548,7 @@ begin
   InAssembler := false;
 end;
 
-function TDebugger.GetWatchValue: string;
+function TDebugger.GetWatchValue: AnsiString;
 begin
   if Assigned(Wait) then
     Result:=Wait.tmpWatchValue
@@ -556,7 +556,7 @@ begin
     Result:='';
 end;
 
-function TDebugger.GetWatchVar: string;
+function TDebugger.GetWatchVar: AnsiString;
 begin
   if Assigned(Wait) then
     Result:=Wait.tmpWatchVar
@@ -566,13 +566,13 @@ end;
 
 procedure TDebugger.RefreshContext;
 var i, k : integer;
-    s : string;
+    s : AnsiString;
 begin
   if not Executing then
     exit;
   if Assigned(MainForm.DebugTree) then
     for i := 0 to DebugTree.Items.Count - 1 do begin
-       k := AnsiPos(' = Not found in current context', DebugTree.Items[i].Text);
+       k := Pos(' = Not found in current context', DebugTree.Items[i].Text);
        if k > 0 then begin
          s := DebugTree.Items[i].Text;
          Delete(s, k, length(s) - k + 1);

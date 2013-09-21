@@ -43,14 +43,14 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure IconViewInfoTip(Sender: TObject; Item: TListItem;
-      var InfoTip: String);
+      var InfoTip: AnsiString);
     procedure IconViewDblClick(Sender: TObject);
    private
     procedure LoadText;
-    function AddItem(const FileName: string): TListItem;
-    function GetSelected: string;
+    function AddItem(const FileName: AnsiString): TListItem;
+    function GetSelected: AnsiString;
    public
-    property Selected: string read GetSelected;
+    property Selected: AnsiString read GetSelected;
   end;
 
 { ** modify with browse ablity - include options to copy ico to directory}
@@ -89,7 +89,7 @@ end;
 procedure TIconForm.FormCreate(Sender: TObject);
 var
   SRec: TSearchRec;
-  SFile: string;
+  SFile: AnsiString;
   tmp: TStrings;
   idx: integer;
 begin
@@ -125,7 +125,7 @@ begin
   ImageList.Clear;
 end;
 
-function TIconForm.GetSelected: string;
+function TIconForm.GetSelected: AnsiString;
 begin
   if assigned(IconView.Selected) then
    result:= IconView.Selected.SubItems[0]
@@ -133,11 +133,11 @@ begin
    result:= '';
 end;
 
-function TIconForm.AddItem(const FileName: string): TListItem;
+function TIconForm.AddItem(const FileName: AnsiString): TListItem;
 var
  icon: TIcon;
  Item: TListItem;
- fFile: string;
+ fFile: AnsiString;
 begin
   Item:= IconView.Items.Add;
   //full path is passed from FormCreate
@@ -154,7 +154,7 @@ begin
 end;
 
 procedure TIconForm.IconViewInfoTip(Sender: TObject; Item: TListItem;
-  var InfoTip: String);
+  var InfoTip: AnsiString);
 begin
   InfoTip:= Item.SubItems[0];
 end;

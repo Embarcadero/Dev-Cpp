@@ -34,15 +34,15 @@ uses
 type
  PCodeIns = ^TCodeIns;
  TCodeIns = record
-  Caption: string;
-  Line: string;
-  Desc: string;
+  Caption: AnsiString;
+  Line: AnsiString;
+  Desc: AnsiString;
   Sep: integer;
  end;
 
  TCodeInsList = class(TObject)
   private
-   fFile: string;
+   fFile: AnsiString;
    fList: TList;
    procedure SetItem(index: integer; Value: PCodeIns);
    function GetItem(index: integer): PCodeIns;
@@ -53,9 +53,9 @@ type
 
    procedure LoadCode;
    procedure SaveCode;
-   function Indexof(const Value: String): integer;
+   function Indexof(const Value: AnsiString): integer;
    function AddItem(Value: PCodeIns): integer;
-   procedure AddItemByValues(menutext, description, code : string; section : integer);
+   procedure AddItemByValues(menutext, description, code : AnsiString; section : integer);
    procedure Delete(index: integer);
    procedure Clear;
    property Items[index: integer]: PCodeins read GetItem write SetItem; default;
@@ -108,10 +108,10 @@ begin
   inherited Destroy;
 end;
 
-function TCodeInsList.Indexof(const Value: string): integer;
+function TCodeInsList.Indexof(const Value: AnsiString): integer;
 begin
   for result:= 0 to pred(fList.Count) do
-   if AnsiCompareText(PCodeIns(fList[result])^.Caption, Value) = 0 then exit;
+   if CompareText(PCodeIns(fList[result])^.Caption, Value) = 0 then exit;
   result:= -1;
 end;
 
@@ -120,7 +120,7 @@ begin
   result:= fList.Add(Value);
 end;
 
-procedure TCodeInsList.AddItemByValues(menutext, description, code : string; section : integer);
+procedure TCodeInsList.AddItemByValues(menutext, description, code : AnsiString; section : integer);
 var
 	assembleditem : PCodeIns;
 begin
@@ -309,7 +309,7 @@ end;
 procedure TCodeInsList.SaveCode;
 var
  idx: integer;
- section: string;
+ section: AnsiString;
  CI: TCodeIns;
 begin
   fList.Pack;

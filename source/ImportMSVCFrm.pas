@@ -57,14 +57,14 @@ type
   private
     { Private declarations }
     fSL: TStringList;
-    fFilename: string;
-    fInvalidFiles: string;
+    fFilename: AnsiString;
+    fInvalidFiles: AnsiString;
     procedure LoadText;
-    procedure WriteDev(Section, Key, Value: string);
-    procedure ImportFile(Filename: string);
+    procedure WriteDev(Section, Key, Value: AnsiString);
+    procedure ImportFile(Filename: AnsiString);
     procedure WriteDefaultEntries;
-    procedure SetFilename(Value: string);
-    procedure SetDevName(Value: string);
+    procedure SetFilename(Value: AnsiString);
+    procedure SetDevName(Value: AnsiString);
     function ReadTargets(Targets: TStringList): boolean;
     function LocateTarget(var StartAt, EndAt: integer): boolean;
     function LocateSourceTarget(var StartAt, EndAt: integer): boolean;
@@ -72,13 +72,13 @@ type
     function ReadLinkerOptions(StartAt, EndAt: integer): boolean;
     procedure ReadSourceFiles(StartAt, EndAt: integer);
     procedure ReadProjectType;
-    function GetLineValue(StartAt, EndAt: integer; StartsWith: string): string;
-    function StripQuotesIfNecessary(s: string): string;
+    function GetLineValue(StartAt, EndAt: integer; StartsWith: AnsiString): AnsiString;
+    function StripQuotesIfNecessary(s: AnsiString): AnsiString;
     procedure UpdateButtons;
     function CheckVersion: boolean;
   public
     { Public declarations }
-    function GetFilename: string;
+    function GetFilename: AnsiString;
   end;
 
 //var
@@ -120,7 +120,7 @@ begin
 end;
 
 function TImportMSVCForm.GetLineValue(StartAt, EndAt: integer;
-  StartsWith: string): string;
+  StartsWith: AnsiString): AnsiString;
 var
   I: integer;
 begin
@@ -129,7 +129,7 @@ begin
     EndAt := fSL.Count - 1;
   I := StartAt;
   while I <= EndAt do begin
-    if AnsiStartsText(StartsWith, fSL[I]) then begin
+    if StartsText(StartsWith, fSL[I]) then begin
       Result := StripQuotesIfNecessary(Trim(Copy(fSL[I], Length(StartsWith) + 1, Length(fSL[I]) - Length(StartsWith))));
       Break;
     end;
@@ -137,7 +137,7 @@ begin
   end;
 end;
 
-procedure TImportMSVCForm.ImportFile(Filename: string);
+procedure TImportMSVCForm.ImportFile(Filename: AnsiString);
 var
   Targets: TStringList;
 begin
@@ -171,10 +171,10 @@ begin
   Result := False;
   I := 0;
   while I < fSL.Count do begin
-    if (AnsiStartsStr('!IF ', fSL[I]) or AnsiStartsStr('!ELSEIF ', fSL[I])) and AnsiContainsStr(fSL[I], cmbConf.Text) then begin
+    if (StartsStr('!IF ', fSL[I]) or StartsStr('!ELSEIF ', fSL[I])) and ContainsStr(fSL[I], cmbConf.Text) then begin
       Inc(I);
       StartAt := I;
-      while not (AnsiStartsStr('!ENDIF', fSL[I]) or AnsiStartsStr('!ELSEIF', fSL[I])) and (I < fSL.Count) do
+      while not (StartsStr('!ENDIF', fSL[I]) or StartsStr('!ELSEIF', fSL[I])) and (I < fSL.Count) do
         Inc(I);
       EndAt := I - 1;
       Result := True;
@@ -192,10 +192,10 @@ begin
   Result := False;
   I := 0;
   while I < fSL.Count do begin
-    if (AnsiStartsStr('# Begin Target', fSL[I])) then begin
+    if (StartsStr('# Begin Target', fSL[I])) then begin
       Inc(I);
       StartAt := I;
-      while not (AnsiStartsStr('# End Target', fSL[I])) do
+      while not (StartsStr('# End Target', fSL[I])) do
         Inc(I);
       EndAt := I - 1;
       Result := True;
@@ -210,9 +210,9 @@ function TImportMSVCForm.ReadCompilerOptions(StartAt,
 var
   I: integer;
   Options: TStringList;
-  sCompiler: string;
-  sDirs: string;
-  S: string;
+  sCompiler: AnsiString;
+  sDirs: AnsiString;
+  S: AnsiString;
 begin
   Result := False;
   sCompiler := '-D__GNUWIN32__ ';
@@ -223,80 +223,80 @@ begin
     Options.DelimitedText := GetLineValue(StartAt, EndAt, '# ADD CPP');
     I := 0;
     while I < Options.Count do begin
-      if AnsiCompareText('/D', Options[I]) = 0 then begin
+      if CompareText('/D', Options[I]) = 0 then begin
         S := Format('-D%s ', [Options[I + 1]]);
         sCompiler := sCompiler + S;
         Inc(I);
       end
-      else if AnsiCompareText('/U', Options[I]) = 0 then begin
+      else if CompareText('/U', Options[I]) = 0 then begin
         S := Format('-U%s ', [Options[I + 1]]);
         sCompiler := sCompiler + S;
         Inc(I);
       end
-      else if AnsiCompareText('/I', Options[I]) = 0 then begin
+      else if CompareText('/I', Options[I]) = 0 then begin
         S := Options[I + 1];
         sDirs := sDirs + S + ';';
         Inc(I);
       end
-      else if (AnsiCompareText('/W1', Options[I]) = 0) or
-        (AnsiCompareText('/W2', Options[I]) = 0) or
-        (AnsiCompareText('/W3', Options[I]) = 0) then begin // warning messages
+      else if (CompareText('/W1', Options[I]) = 0) or
+        (CompareText('/W2', Options[I]) = 0) or
+        (CompareText('/W3', Options[I]) = 0) then begin // warning messages
         sCompiler := sCompiler + '-W ';
         Inc(I);
       end
-      else if AnsiCompareText('/W4', Options[I]) = 0 then begin // all warning messages
+      else if CompareText('/W4', Options[I]) = 0 then begin // all warning messages
         sCompiler := sCompiler + '-Wall ';
         Inc(I);
       end
-      else if AnsiCompareText('/WX', Options[I]) = 0 then begin // warnings as errors
+      else if CompareText('/WX', Options[I]) = 0 then begin // warnings as errors
         sCompiler := sCompiler + '-Werror ';
         Inc(I);
       end
-      else if AnsiCompareText('/GX', Options[I]) = 0 then begin // enable exception handling
+      else if CompareText('/GX', Options[I]) = 0 then begin // enable exception handling
         sCompiler := sCompiler + '-fexceptions ';
         Inc(I);
       end
-      else if AnsiCompareText('/Ob0', Options[I]) = 0 then begin // disable inline expansion
+      else if CompareText('/Ob0', Options[I]) = 0 then begin // disable inline expansion
         sCompiler := sCompiler + '-fno-inline ';
         Inc(I);
       end
-      else if AnsiCompareText('/Ob2', Options[I]) = 0 then begin // auto inline function expansion
+      else if CompareText('/Ob2', Options[I]) = 0 then begin // auto inline function expansion
         sCompiler := sCompiler + '-finline-functions ';
         Inc(I);
       end
-      else if AnsiCompareText('/Oy', Options[I]) = 0 then begin // frame pointer omission
+      else if CompareText('/Oy', Options[I]) = 0 then begin // frame pointer omission
         sCompiler := sCompiler + '-fomit-frame-pointer ';
         Inc(I);
       end
-      else if AnsiCompareText('/GB', Options[I]) = 0 then begin // blend optimization
+      else if CompareText('/GB', Options[I]) = 0 then begin // blend optimization
         sCompiler := sCompiler + '-mcpu=pentiumpro -D_M_IX86=500 ';
         Inc(I);
       end
-      else if AnsiCompareText('/G6', Options[I]) = 0 then begin // pentium pro optimization
+      else if CompareText('/G6', Options[I]) = 0 then begin // pentium pro optimization
         sCompiler := sCompiler + '-mcpu=pentiumpro -D_M_IX86=600 ';
         Inc(I);
       end
-      else if AnsiCompareText('/G5', Options[I]) = 0 then begin // pentium optimization
+      else if CompareText('/G5', Options[I]) = 0 then begin // pentium optimization
         sCompiler := sCompiler + '-mcpu=pentium -D_M_IX86=500 ';
         Inc(I);
       end
-      else if AnsiCompareText('/G4', Options[I]) = 0 then begin // 486 optimization
+      else if CompareText('/G4', Options[I]) = 0 then begin // 486 optimization
         sCompiler := sCompiler + '-mcpu=i486 -D_M_IX86=400 ';
         Inc(I);
       end
-      else if AnsiCompareText('/G3', Options[I]) = 0 then begin // 386 optimization
+      else if CompareText('/G3', Options[I]) = 0 then begin // 386 optimization
         sCompiler := sCompiler + '-mcpu=i386 -D_M_IX86=300 ';
         Inc(I);
       end
-      else if AnsiCompareText('/Za', Options[I]) = 0 then begin // disable language extensions
+      else if CompareText('/Za', Options[I]) = 0 then begin // disable language extensions
         sCompiler := sCompiler + '-ansi ';
         Inc(I);
       end
-      else if AnsiCompareText('/Zp1', Options[I]) = 0 then begin // pack structures
+      else if CompareText('/Zp1', Options[I]) = 0 then begin // pack structures
         sCompiler := sCompiler + '-fpack-struct ';
         Inc(I);
       end
-      else if AnsiCompareText('/W0', Options[I]) = 0 then begin // no warning messages
+      else if CompareText('/W0', Options[I]) = 0 then begin // no warning messages
         sCompiler := sCompiler + '-w ';
         Inc(I);
       end;
@@ -317,9 +317,9 @@ function TImportMSVCForm.ReadLinkerOptions(StartAt,
 var
   I: integer;
   Options: TStringList;
-  sLibs: string;
-  sDirs: string;
-  S: string;
+  sLibs: AnsiString;
+  sDirs: AnsiString;
+  S: AnsiString;
 begin
   Result := False;
   sLibs := '';
@@ -329,26 +329,26 @@ begin
     Options.Delimiter := ' ';
     Options.DelimitedText := GetLineValue(StartAt, EndAt, '# ADD LINK32');
     for I := 0 to Options.Count - 1 do
-      if (Options[I][1] <> '/') and AnsiEndsText('.lib', Options[I]) then begin
+      if (Options[I][1] <> '/') and EndsText('.lib', Options[I]) then begin
         S := Copy(Options[I], 1, Length(Options[I]) - 4);
         if ExtractFilePath(S) <> '' then
           sDirs := sDirs + ExtractFilePath(S) + ';';
         S := Format('-l%s ', [ExtractFileName(S)]);
         sLibs := sLibs + S;
       end
-      else if AnsiStartsText('/base:', Options[I]) then begin
+      else if StartsText('/base:', Options[I]) then begin
         S := Copy(Options[I], 7, MaxInt);
         sLibs := sLibs + '--image-base ' + S + ' ';
       end
-      else if AnsiStartsText('/implib:', Options[I]) then begin
+      else if StartsText('/implib:', Options[I]) then begin
         S := Copy(Options[I], 9, MaxInt);
         sLibs := sLibs + '--implib ' + S + ' ';
       end
-      else if AnsiStartsText('/map:', Options[I]) then begin
+      else if StartsText('/map:', Options[I]) then begin
         S := Copy(Options[I], 6, MaxInt);
         sLibs := sLibs + '-Map ' + S + '.map ';
       end
-      else if AnsiStartsText('/subsystem:', Options[I]) then begin
+      else if StartsText('/subsystem:', Options[I]) then begin
         S := Copy(Options[I], 12, MaxInt);
         if S = 'windows' then
           WriteDev('Project', 'Type', '0') // win32 gui
@@ -356,7 +356,7 @@ begin
           WriteDev('Project', 'Type', '1'); // console app
 //        sLibs := sLibs + '-Wl --subsystem ' + S + ' ';
       end
-      else if AnsiStartsText('/libpath:', Options[I]) then begin
+      else if StartsText('/libpath:', Options[I]) then begin
         S := Copy(Options[I], 10, MaxInt);
         sDirs := sDirs + S + ';';
       end;
@@ -374,9 +374,9 @@ procedure TImportMSVCForm.ReadSourceFiles(StartAt,
 var
   flds: TStringList;
   I, C: integer;
-  UnitName: string;
-  folder: string;
-  folders: string;
+  UnitName: AnsiString;
+  folder: AnsiString;
+  folders: AnsiString;
 begin
   fInvalidFiles := '';
   C := 0;
@@ -385,31 +385,31 @@ begin
   try
     flds.Delimiter := '/';
     for I := StartAt to EndAt do
-      if AnsiStartsText('# Begin Group ', fSL[I]) then begin
+      if StartsText('# Begin Group ', fSL[I]) then begin
         folder := StripQuotesIfNecessary(Copy(fSL[I], 15, MaxInt));
         flds.Add(folder);
         folders := folders + flds.DelimitedText + ',';
       end
-      else if AnsiStartsText('# End Group', fSL[I]) then begin
+      else if StartsText('# End Group', fSL[I]) then begin
         if flds.Count > 0 then
           flds.Delete(flds.Count - 1);
       end
-      else if AnsiStartsText('SOURCE=', fSL[I]) then begin
+      else if StartsText('SOURCE=', fSL[I]) then begin
         UnitName := Copy(fSL[I], 8, Length(fSL[I]) - 7);
         if FileExists(UnitName) then begin
           UnitName := StringReplace(UnitName, '\', '/', [rfReplaceAll]);
           WriteDev('Unit' + IntToStr(C + 1), 'FileName', UnitName);
           WriteDev('Unit' + IntToStr(C + 1), 'Folder', flds.DelimitedText);
           case GetFileTyp(UnitName) of
-            utSrc, utHead: begin
+            utcSrc, utcppSrc, utcHead, utcppHead: begin
                 WriteDev('Unit' + IntToStr(C + 1), 'Compile', '1');
-                if AnsiSameText(ExtractFileExt(UnitName), '.c') then
+                if SameText(ExtractFileExt(UnitName), '.c') then
                   WriteDev('Unit' + IntToStr(C + 1), 'CompileCpp', '0')
                 else
                   WriteDev('Unit' + IntToStr(C + 1), 'CompileCpp', '1');
                 WriteDev('Unit' + IntToStr(C + 1), 'Link', '1');
               end;
-            utRes: begin
+            utResSrc: begin
                 WriteDev('Unit' + IntToStr(C + 1), 'Compile', '1');
                 WriteDev('Unit' + IntToStr(C + 1), 'CompileCpp', '1');
                 WriteDev('Unit' + IntToStr(C + 1), 'Link', '0');
@@ -439,46 +439,46 @@ end;
 function TImportMSVCForm.ReadTargets(Targets: TStringList): boolean;
 var
   I: integer;
-  P: PChar;
+  P: PAnsiChar;
 begin
   Targets.Clear;
   Result := False;
   I := 0;
   while I < fSL.Count do begin
-    if AnsiStartsText('# Begin Target', fSL[I]) then begin
+    if StartsText('# Begin Target', fSL[I]) then begin
       // got it
       Inc(I);
       repeat
-        if AnsiStartsText('# Name', fSL[I]) then begin
-          P := PChar(Trim(Copy(fSL[I], 7, Length(fSL[I]) - 6)));
+        if StartsText('# Name', fSL[I]) then begin
+          P := PAnsiChar(Trim(Copy(fSL[I], 7, Length(fSL[I]) - 6)));
           Targets.Add(AnsiExtractQuotedStr(P, '"'));
           Result := True;
         end;
         Inc(I);
-      until (I = fSL.Count) or AnsiStartsText('# Begin Source File', fSL[I]);
+      until (I = fSL.Count) or StartsText('# Begin Source File', fSL[I]);
       Break;
     end;
     Inc(I);
   end;
 end;
 
-procedure TImportMSVCForm.SetDevName(Value: string);
+procedure TImportMSVCForm.SetDevName(Value: AnsiString);
 begin
   WriteDev('Project', 'Name', Value);
 end;
 
-procedure TImportMSVCForm.SetFilename(Value: string);
+procedure TImportMSVCForm.SetFilename(Value: AnsiString);
 begin
   WriteDev('Project', 'FileName', Value);
   fFilename := Value;
 end;
 
-function TImportMSVCForm.StripQuotesIfNecessary(s: string): string;
+function TImportMSVCForm.StripQuotesIfNecessary(s: AnsiString): AnsiString;
 var
-  P: PChar;
+  P: PAnsiChar;
 begin
-  if AnsiStartsText('"', s) and AnsiEndsText('"', s) then begin
-    P := PChar(S);
+  if StartsText('"', s) and EndsText('"', s) then begin
+    P := PAnsiChar(S);
     Result := AnsiExtractQuotedStr(P, '"');
   end
   else
@@ -491,7 +491,7 @@ begin
   WriteDev('Project', 'IsCpp', '1'); // all MSVC projects are C++ (correct me if I 'm wrong)
 end;
 
-procedure TImportMSVCForm.WriteDev(Section, Key, Value: string);
+procedure TImportMSVCForm.WriteDev(Section, Key, Value: AnsiString);
 var
   fIni: TIniFile;
 begin
@@ -507,7 +507,7 @@ procedure TImportMSVCForm.btnImportClick(Sender: TObject);
 var
   StartAt, EndAt: integer;
   SrcStartAt, SrcEndAt: integer;
-  sMsg: string;
+  sMsg: AnsiString;
 begin
   if FileExists(fFilename) then begin
     if MessageDlg(fFilename + ' exists. Are you sure you want to overwrite it?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
@@ -547,13 +547,13 @@ end;
 procedure TImportMSVCForm.ReadProjectType();
 var
   I: integer;
-  P: PChar;
+  P: PAnsiChar;
 begin
   I := 0;
   while I < fSL.Count do begin
-    if AnsiStartsText('# TARGTYPE', fSL[I]) then begin
+    if StartsText('# TARGTYPE', fSL[I]) then begin
       // got it
-      P := PChar(Copy(fSL[I], Length(fSL[I]) - 5, 7));
+      P := PAnsiChar(Copy(fSL[I], Length(fSL[I]) - 5, 7));
       if (P = '0x0102' ) then // "Win32 (x86) Dynamic-Link Library"
         WriteDev('Project', 'Type', '3')
       else if( P = '0x0103' ) then // "Win32 (x86) Console Application"
@@ -587,7 +587,7 @@ begin
   UpdateButtons;
 end;
 
-function TImportMSVCForm.GetFilename: string;
+function TImportMSVCForm.GetFilename: AnsiString;
 begin
   Result := fFilename;
 end;
@@ -622,7 +622,7 @@ var
 begin
   Result := False;
   for I := 0 to fSL.Count - 1 do
-    if AnsiContainsStr(fSL[I], 'Format Version 6.00') then begin
+    if ContainsStr(fSL[I], 'Format Version 6.00') then begin
       Result := True;
       Break;
     end;

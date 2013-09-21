@@ -156,15 +156,15 @@ type
     FCurParamIndex: Integer;
     FLookupEditor: TCustomSynEdit;
     FMaxScanLength: Integer;
-    FOldFunction : string;
+    FOldFunction : AnsiString;
     FCustomSelIndex: Boolean; // user clicked up/down
     procedure SetSelIndex(Value: Integer);
     procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
   protected
-    function GetCommaIndex(P: PChar; Start, CurPos: Integer):Integer;
+    function GetCommaIndex(P: PAnsiChar; Start, CurPos: Integer):Integer;
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    function FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
+    function FindClosestToolTip(ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     function DummyPaint : integer; // obtain tooltip width
     procedure Paint; override;
@@ -177,9 +177,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function Select(const ToolTip: string): Integer;
+    function Select(const ToolTip: AnsiString): Integer;
     procedure Show;
-    procedure ActivateHint(Rect: TRect; const AHint: string); override;
+    procedure ActivateHint(Rect: TRect; const AHint: AnsiString); override;
     procedure ReleaseHandle;
     property Parser: TCppParser read FParser write FParser;
     property Activated: Boolean read FActivated write FActivated;
@@ -222,11 +222,11 @@ begin
 end;
 
 // Returns name of function, so passing "foo(bar,bar,bar)" will return "foo"
-function GetPrototypeName(const S: string) : string;
+function GetPrototypeName(const S: AnsiString) : AnsiString;
 var
 	iStart, iLen: Integer;
 begin
-	iStart := AnsiPos('(', S);
+	iStart := Pos('(', S);
 
 	// If we found the starting ( of a function
 	if iStart > 0 then begin
@@ -245,7 +245,7 @@ begin
 end;
 
 // Count commas in the parameter list
-function CountCommas(const S: string): Integer;
+function CountCommas(const S: AnsiString): Integer;
 var
 	J: Integer;
 begin
@@ -349,7 +349,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TCodeToolTip.ActivateHint(Rect: TRect; const AHint: string);
+procedure TCodeToolTip.ActivateHint(Rect: TRect; const AHint: AnsiString);
 begin
 	inherited;
 	FActivated := True;
@@ -393,11 +393,11 @@ begin
 end;
 
 // Gaat de lijst met matchende tooltips langs, kijkt welke met beste past bij code
-function TCodeToolTip.FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
+function TCodeToolTip.FindClosestToolTip(ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
 var
 	I,K: Integer;
 	NewIndex: Integer;
-	Str: string;
+	Str: AnsiString;
 	LastCommaCnt: Integer;
 begin
 	// If we reached a comma index that does not exist, quit
@@ -427,7 +427,7 @@ begin
 end;
 
 // Return the comma count the cursor is placed *after*, so foo(aaa,bbb,ccc) with the cursor somewhere in b will return 1
-function TCodeToolTip.GetCommaIndex(P: PChar; Start, CurPos: Integer):Integer;
+function TCodeToolTip.GetCommaIndex(P: PAnsiChar; Start, CurPos: Integer):Integer;
 var
   I: Integer;
 
@@ -459,16 +459,16 @@ var
   end;
 
   // skip strings! since it not unusual to
-  // have commas in string we MUST ignore them!
+  // have commas in AnsiString we MUST ignore them!
   procedure SkipStrings;
   begin
     Inc(i);
 
     repeat
       case P[i] of
-        // make sure not to skip inline string "'s
-        // for example, a c string: "Hello \"Bond, James\"..."
-        // This is ONE string only and we dont want to count commas in it
+        // make sure not to skip inline AnsiString "'s
+        // for example, a c AnsiString: "Hello \"Bond, James\"..."
+        // This is ONE AnsiString only and we dont want to count commas in it
         '\':
           if P[i+1] = '"' then
             Inc(i);
@@ -543,7 +543,7 @@ function TCodeToolTip.DummyPaint : integer;
 var
 	ArgumentIndex,HighlightStart: Integer;
 	CurPos : integer;
-	s : string;
+	s : AnsiString;
 	InsideString : boolean;
 	HLAttr: TSynHighlighterAttributes;
 begin
@@ -609,7 +609,7 @@ end;
 procedure TCodeToolTip.Paint;
 var
 	ArgumentIndex,HighlightStart,WidthParam: Integer;
-	S: string;
+	S: AnsiString;
 	CurPos : integer;
 	InsideString : boolean;
 	HLAttr: TSynHighlighterAttributes;
@@ -733,7 +733,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function TCodeToolTip.Select(const ToolTip: string): Integer;
+function TCodeToolTip.Select(const ToolTip: AnsiString): Integer;
 
 //  selects the tooltip specified by ToolTip and returns
 //  the index from it, in the list.
@@ -796,10 +796,10 @@ end;
 procedure TCodeToolTip.Show;
 var
 	CurPos : Integer;
-	P : PChar;
+	P : PAnsiChar;
 	I : Integer;
 	nBraces : Integer;
-	S : string;
+	S : AnsiString;
 	Idx : Integer;
 	nCommas : Integer;
 begin
@@ -809,7 +809,7 @@ begin
 	CurPos := Idx;
 
 	// get a pointer to the collapsed text
-	P := PChar(FEditor.Lines.Text);
+	P := PAnsiChar(FEditor.Lines.Text);
 
 	nBraces := 0;
 	nCommas := 0;

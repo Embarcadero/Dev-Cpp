@@ -188,8 +188,8 @@ var
   idx: integer;
   I: integer;
   e: TEditor;
-  S: string;
-  hfName: string;
+  S: AnsiString;
+  hfName: AnsiString;
   hFile: integer;
   st: PStatement;
 begin
@@ -279,7 +279,7 @@ begin
 	e.Text.Lines.Append('');
 	e.Text.Lines.EndUpdate;
 
-	e.Modified := True;
+	e.Text.Modified := True;
 
 	// CPP FILE IMPLEMENTATION
 	if chkAddToProject.Checked then begin
@@ -329,8 +329,8 @@ begin
 
 	e.Text.Lines.Append('');
 	e.Text.Lines.EndUpdate;
-  
-	e.Modified := True;
+
+	e.Text.Modified := True;
 end;
 
 procedure TNewClassForm.cmbClassChange(Sender: TObject);

@@ -31,7 +31,7 @@ uses
 
 type
   TdevMonitorChangeType = (mctChanged, mctDeleted);
-  TdevMonitorChange = procedure(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: string) of object;
+  TdevMonitorChange = procedure(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: AnsiString) of object;
 
 implementation
 

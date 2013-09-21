@@ -107,7 +107,7 @@ uses
 procedure TMainForm.Label5Click(Sender: TObject);
 begin
   if Length(PackageURL.Text) > 0 then
-      ShellExecute(GetDesktopWindow, nil, PChar(PackageURL.Text), nil, nil, 0);
+      ShellExecute(GetDesktopWindow, nil, PAnsiChar(PackageURL.Text), nil, nil, 0);
 end;
 
 procedure TMainForm.Exit1Click(Sender: TObject);
@@ -163,11 +163,11 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
-  FileName: String;
+  FileName: AnsiString;
   OptionAuto: Boolean;
   OptionUninstall: Boolean;
   OptionQuiet: Boolean;
-  OptionReqVersion: String;
+  OptionReqVersion: AnsiString;
   i: Integer;
 begin
   Randomize;
@@ -264,7 +264,7 @@ procedure TMainForm.PackagesSelectItem(Sender: TObject; Item: TListItem;
   Selected: Boolean);
 var
   i: Integer;
-  FileName: PChar;
+  FileName: PAnsiChar;
   Ini: TIniFile;
   IniFile: TStringList;
 begin
@@ -317,7 +317,7 @@ var
   Ini: TIniFile;
   Item: TListItem;
   i: Integer;
-  FileName: PChar;
+  FileName: PAnsiChar;
 begin
   Packages.Items.BeginUpdate;
   while Packages.Items.Count > 0 do
@@ -374,7 +374,7 @@ begin
   RemoveForm := TRemoveForm.Create(Self);
   with RemoveForm do
   try
-     Entry := PChar(Packages.Selected.Data);
+     Entry := PAnsiChar(Packages.Selected.Data);
      ShowModal;
   finally
      Free;
@@ -392,7 +392,7 @@ begin
   VerifyForm := TVerifyForm.Create(Self);
   with VerifyForm do
   try
-     Entry := PChar(Packages.Selected.Data);
+     Entry := PAnsiChar(Packages.Selected.Data);
      ShowModal;
   finally
      Free;

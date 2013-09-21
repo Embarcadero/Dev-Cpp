@@ -36,9 +36,9 @@ uses
 {$ENDIF}
 
 type
-	TLogEntryEvent = procedure(const msg: string) of object;
-	TOutputEvent = procedure(const _Line, _Col, _Unit, _Message: string) of object;
-	TResOutputEvent = procedure(const _Line, _Unit, _Message: string) of object;
+	TLogEntryEvent = procedure(const msg: AnsiString) of object;
+	TOutputEvent = procedure(const _Line, _Col, _Unit, _Message: AnsiString) of object;
+	TResOutputEvent = procedure(const _Line, _Unit, _Message: AnsiString) of object;
 	TSuccessEvent = procedure of object;
 
 	TTarget = (ctNone, ctFile, ctProject);
@@ -51,35 +51,35 @@ type
 		fOnSuccess: TSuccessEvent;
 		fPerfectDepCheck: Boolean;
 		fProject: TProject;
-		fSourceFile: string;
-		fRunParams: string;
-		fMakefile : string;
+		fSourceFile: AnsiString;
+		fRunParams: AnsiString;
+		fMakefile : AnsiString;
 		fTarget: TTarget;
 		fErrCount: integer;
 		DoCheckSyntax: Boolean;
 		fWarnCount: integer;
 		fSingleFile: boolean;
 		fOriginalSet : integer;
-		procedure DoLogEntry(const msg: string);
-		procedure DoOutput(const s1, s2, s3, s4: string);
-		procedure DoResOutput(const s1, s2, s3: string);
-		function GetMakeFile: string;
+		procedure DoLogEntry(const msg: AnsiString);
+		procedure DoOutput(const s1, s2, s3, s4: AnsiString);
+		procedure DoResOutput(const s1, s2, s3: AnsiString);
+		function GetMakeFile: AnsiString;
 		function GetCompiling: Boolean;
 		procedure RunTerminate(Sender: TObject);
-		procedure InitProgressForm(const Status: string);
+		procedure InitProgressForm(const Status: AnsiString);
 		procedure EndProgressForm;
 		procedure ReleaseProgressForm;
-		procedure ProcessProgressForm(const Line: string);
+		procedure ProcessProgressForm(const Line: AnsiString);
 	public
 		procedure BuildMakeFile;
 		procedure CheckSyntax;
-		procedure Compile(const SingleFile: string = '');
+		procedure Compile(const SingleFile: AnsiString = '');
 		procedure Run;
 		procedure CompileAndRun;
 		procedure Debug;
 		function Clean: Boolean;
 		function RebuildAll: Boolean;
-		function FindDeps(const TheFile: string): string;
+		function FindDeps(const TheFile: AnsiString): AnsiString;
 		function SwitchToProjectCompilerSet: integer; // returns the original compiler set
 		procedure SwitchToOriginalCompilerSet(Index: integer); // switches the original compiler set to index
 
@@ -89,22 +89,22 @@ type
 		property OnOutput: TOutputEvent read fOnOutput write fOnOutput;
 		property OnResOutput: TResOutputEvent read fOnResOutput write fOnResOutput;
 		property OnSuccess: TSuccessEvent read fOnSuccess write fOnSuccess;
-		property SourceFile: string read fSourceFile write fSourceFile;
+		property SourceFile: AnsiString read fSourceFile write fSourceFile;
 		property PerfectDepCheck: Boolean read fPerfectDepCheck write fPerfectDepCheck;
-		property RunParams: string read fRunParams write fRunParams;
-		property MakeFile: string read GetMakeFile write fMakeFile;
+		property RunParams: AnsiString read fRunParams write fRunParams;
+		property MakeFile: AnsiString read GetMakeFile write fMakeFile;
 		property Target: TTarget read fTarget write fTarget;
 		property ErrorCount: integer read fErrCount;
 		procedure OnAbortCompile(Sender: TObject);
 		procedure AbortThread;
 	protected
-		fCompileParams			: string;
-		fCppCompileParams		: string;
-		fLibrariesParams		: string;
-		fIncludesParams			: string;
-		fCppIncludesParams		: string;
-		fBinDirs				: string;
-		fUserParams				: string;
+		fCompileParams			: AnsiString;
+		fCppCompileParams		: AnsiString;
+		fLibrariesParams		: AnsiString;
+		fIncludesParams			: AnsiString;
+		fCppIncludesParams		: AnsiString;
+		fBinDirs				: AnsiString;
+		fUserParams				: AnsiString;
 		fDevRun					: TDevRun;
 		fRunAfterCompileFinish	: boolean;
 		fAbortThread			: boolean;
@@ -115,11 +115,11 @@ type
 		procedure GetCompileParams;
 		procedure GetLibrariesParams;
 		procedure GetIncludesParams;
-		procedure LaunchThread(const s, dir : string);
+		procedure LaunchThread(const s, dir : AnsiString);
 		procedure ThreadCheckAbort(var AbortThread: boolean);
 		procedure OnCompilationTerminated(Sender: TObject);
-		procedure OnLineOutput(Sender: TObject; const Line: String);
-		procedure ParseSingleLine(Line : string);
+		procedure OnLineOutput(Sender: TObject; const Line: AnsiString);
+		procedure ParseSingleLine(Line : AnsiString);
 		function NewMakeFile(var F : TextFile) : boolean;
 		procedure WriteMakeClean(var F : TextFile);
 		procedure WriteMakeObjFilesRules(var F : TextFile);
@@ -130,25 +130,25 @@ implementation
 uses
 	MultiLangSupport, devcfg, Macros, devExec, CompileProgressFrm, StrUtils;
 
-procedure TCompiler.DoLogEntry(const msg: string);
+procedure TCompiler.DoLogEntry(const msg: AnsiString);
 begin
 	if assigned(fOnLogEntry) then
 		fOnLogEntry(msg);
 end;
 
-procedure TCompiler.DoOutput(const s1, s2, s3, s4: string);
+procedure TCompiler.DoOutput(const s1, s2, s3, s4: AnsiString);
 begin
 	if assigned(fOnOutput) then
 		fOnOutput(s1, s2, s3, s4);
 end;
 
-procedure TCompiler.DoResOutput(const s1, s2, s3: string);
+procedure TCompiler.DoResOutput(const s1, s2, s3: AnsiString);
 begin
 	if assigned(fOnResOutput) then
 		fOnResOutput(s1, s2, s3);
 end;
 
-function TCompiler.GetMakeFile: string;
+function TCompiler.GetMakeFile: AnsiString;
 begin
 	if not FileExists(fMakeFile) then
 		BuildMakeFile;
@@ -185,7 +185,7 @@ function TCompiler.NewMakeFile(var F : TextFile) : boolean;
 resourcestring
 	cAppendStr = '%s %s';
 var
-	ObjResFile, Objects, LinkObjects, Comp_ProgCpp, Comp_Prog, ofile, tfile, tmp: string;
+	ObjResFile, Objects, LinkObjects, Comp_ProgCpp, Comp_Prog, ofile, tfile, tmp: AnsiString;
 	i: integer;
 	opt: TCompilerOption;
 	idx: integer;
@@ -193,14 +193,14 @@ var
 begin
 	Objects := '';
 	for i:= 0 to Pred(fProject.Units.Count) do begin
-		if GetFileTyp(fProject.Units[i].FileName) = utRes then
+		if GetFileTyp(fProject.Units[i].FileName) = utResSrc then
 			Continue;
 
 		if (not fProject.Units[i].Compile) and (not fProject.Units[i].Link) then
 			Continue;
 
 		tfile := ExtractRelativePath(fProject.FileName,fProject.Units[i].FileName);
-		if GetFileTyp(tfile) <> utHead then begin
+		if not (GetFileTyp(tfile) in [utcHead,utcppHead]) then begin
 			if fProject.Options.ObjectOutput <> '' then begin
 				SetPath(fProject.Directory);
 				if not DirectoryExists(fProject.Options.ObjectOutput) then
@@ -310,9 +310,9 @@ begin
 	writeln(F);
 end;
 
-function TCompiler.FindDeps(const TheFile: string): string;
+function TCompiler.FindDeps(const TheFile: AnsiString): AnsiString;
 var
-	Output, Cmd, Includes, GppStr: string;
+	Output, Cmd, Includes, GppStr: AnsiString;
 	l : TStringList;
 	i : integer;
 begin
@@ -320,7 +320,7 @@ begin
 	OnLineOutput(nil, 'Finding dependencies for file: ' + TheFile);
 
 	if (Assigned(fProject) and fProject.Options.useGPP) or
-		(not Assigned(fProject) and (GetExTyp(TheFile)=utCppSrc)) then
+		(not Assigned(fProject) and (GetFileTyp(TheFile)=utCppSrc)) then
 			Includes := fCppIncludesParams + fCppCompileParams
 	else
 			Includes := fIncludesParams + fCompileParams;
@@ -355,17 +355,17 @@ end;
 procedure TCompiler.WriteMakeObjFilesRules(var F: TextFile);
 var
 	i : integer;
-	ShortPath: string;
-	ResIncludes: String;
-	tfile, ofile, ResFiles, tmp: string;
-	windresargs : string;
+	ShortPath: AnsiString;
+	ResIncludes: AnsiString;
+	tfile, ofile, ResFiles, tmp: AnsiString;
+	windresargs : AnsiString;
 begin
 	for i := 0 to pred(fProject.Units.Count) do begin
 		if not fProject.Units[i].Compile then
 			Continue;
 
 		// skip resource files
-		if GetFileTyp(fProject.Units[i].FileName) = utRes then
+		if GetFileTyp(fProject.Units[i].FileName) = utResSrc then
 			Continue;
 
 		tfile:= fProject.Units[i].FileName;
@@ -373,7 +373,7 @@ begin
 			tfile:= ExtractFileName(tFile)
 		else
 			tfile:= ExtractRelativePath(Makefile, tfile);
-		if GetFileTyp(tfile) <> utHead then begin
+		if not (GetFileTyp(tfile) in [utcHead,utcppHead]) then begin
 			writeln(F);
 			if fProject.Options.ObjectOutput<>'' then begin
 				SetPath(fProject.Directory);
@@ -425,7 +425,7 @@ begin
 		end;
 
 		for i := 0 to fProject.Units.Count - 1 do begin
-			if GetFileTyp(fProject.Units[i].FileName)<>utRes then
+			if GetFileTyp(fProject.Units[i].FileName) <> utResSrc then
 				Continue;
 			tfile := ExtractRelativePath(fProject.Executable,fProject.Units[i].FileName);
 			if FileExists(GetRealPath(tfile, fProject.Directory)) then
@@ -441,7 +441,7 @@ begin
 		ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ofile));
 		tfile := GenMakePath1(ExtractRelativePath(fProject.FileName, fProject.Options.PrivateResource));
 
-		if(AnsiContainsStr(fCompileParams,'-m32')) then
+		if(ContainsStr(fCompileParams,'-m32')) then
 			windresargs := ' -F pe-i386'
 		else
 			windresargs := '';
@@ -497,7 +497,7 @@ end;
 
 procedure TCompiler.CreateDynamicMakefile;
 var F : TextFile;
-	pfile,tfile: string;
+	pfile,tfile: AnsiString;
 begin
 	if not NewMakeFile(F) then
 		exit;
@@ -530,7 +530,7 @@ begin
 end;
 
 procedure TCompiler.GetCompileParams;
-	procedure AppendStr(var s: string; value: string);
+	procedure AppendStr(var s: AnsiString; value: AnsiString);
 	begin
 		s:= s + ' ' + value;
 	end;
@@ -595,7 +595,7 @@ begin
 	DoCheckSyntax := False;
 end;
 
-procedure TCompiler.Compile(const SingleFile: string);
+procedure TCompiler.Compile(const SingleFile: AnsiString);
 resourcestring
  cCmdLine = '%s "%s" -o "%s" %s %s %s';
  cMakeLine = '%s -f "%s" all';
@@ -603,9 +603,9 @@ resourcestring
  cMake = ' make';
  cDots = '...';
 var
- cmdline : string;
- s : string;
- ofile: string;
+ cmdline : AnsiString;
+ s : AnsiString;
+ ofile: AnsiString;
 begin
 	fSingleFile:=SingleFile<>'';
 	fRunAfterCompileFinish:= FALSE;
@@ -655,7 +655,7 @@ begin
 		if devCompiler.Delay > 0 then
 			Sleep(devCompiler.Delay);
 		LaunchThread(cmdline, ExtractFilePath(Project.FileName));
-	end else if (GetFileTyp(fSourceFile) = utRes) then begin
+	end else if (GetFileTyp(fSourceFile) = utResSrc) then begin
 		if (devCompiler.windresName <> '') then
 			s := devCompiler.windresName
 		else
@@ -664,7 +664,7 @@ begin
 		DoLogEntry(format(Lang[ID_EXECUTING], [' ' + s +cDots]));
 		DoLogEntry(cmdline);
 	end else begin
-		if (GetFileTyp(fSourceFile) = utSrc) and (GetExTyp(fSourceFile) = utCppSrc) then begin
+		if (GetFileTyp(fSourceFile) = utcppSrc) then begin
 			if (devCompiler.gppName <> '') then
 				s := devCompiler.gppName
 			else
@@ -698,8 +698,8 @@ end;
 
 procedure TCompiler.Run;
 var
-	FileToRun : string;
-	Parameters : string;
+	FileToRun : AnsiString;
+	Parameters : AnsiString;
 begin
 	if fTarget = ctNone then
 		exit;
@@ -767,8 +767,8 @@ const
 	cCleanLine = '%s clean -f "%s"';
 	cmsg = ' make clean';
 var
-	cmdLine	: string;
-	s 		: string;
+	cmdLine	: AnsiString;
+	s 		: AnsiString;
 	cs		: integer;
 begin
 	fSingleFile:=True; // fool clean; don't run deps checking since all we do is cleaning
@@ -783,7 +783,7 @@ begin
 			SwitchToOriginalCompilerSet(cs);
 			DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
 			DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
-			MessageBox(Application.MainForm.Handle,PChar(Lang[ID_ERR_NOMAKEFILE]),PChar(Lang[ID_ERROR]), MB_OK or MB_ICONHAND);
+			MessageBox(Application.MainForm.Handle,PAnsiChar(Lang[ID_ERR_NOMAKEFILE]),PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONHAND);
 			Result := False;
 			Exit;
 		end;
@@ -804,8 +804,8 @@ const
 	cCleanLine = '%s -f "%s" clean all';
 	cmsg = ' make clean';
 var
-	cmdLine	: string;
-	s		: string;
+	cmdLine	: AnsiString;
+	s		: AnsiString;
 	cs		: integer;
 begin
 	fSingleFile:=True; // fool rebuild; don't run deps checking since all files will be rebuilt
@@ -821,7 +821,7 @@ begin
 			SwitchToOriginalCompilerSet(cs);
 			DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
 			DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
-			MessageBox(Application.MainForm.Handle,PChar(Lang[ID_ERR_NOMAKEFILE]),PChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
+			MessageBox(Application.MainForm.Handle,PAnsiChar(Lang[ID_ERR_NOMAKEFILE]),PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
 			Result := False;
 			Exit;
 		end;
@@ -840,7 +840,7 @@ begin
 	end;
 end;
 
-procedure TCompiler.LaunchThread(const s, dir : string);
+procedure TCompiler.LaunchThread(const s, dir : AnsiString);
 begin
 	if Assigned(fDevRun) then
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0)
@@ -901,7 +901,7 @@ begin
 	Application.ProcessMessages;
 end;
 
-procedure TCompiler.OnLineOutput(Sender: TObject; const Line: String);
+procedure TCompiler.OnLineOutput(Sender: TObject; const Line: AnsiString);
 var
 	List : TStringList;
 	I : integer;
@@ -917,14 +917,14 @@ begin
 	List.Free;
 end;
 
-procedure TCompiler.ParseSingleLine(line : string);
+procedure TCompiler.ParseSingleLine(line : AnsiString);
 var
 	cpos : integer;
 	O_File,		// file error in
 	O_Line,		// line error on
 	O_Col,		// offset in line
 	O_Msg,		// message for error
-	LowerLine: string;
+	LowerLine: AnsiString;
 begin
 
 	// Defaults...
@@ -1457,7 +1457,7 @@ begin
 	devCompiler.CompilerSet:=fProject.Options.CompilerSet;
 end;
 
-procedure TCompiler.InitProgressForm(const Status: string);
+procedure TCompiler.InitProgressForm(const Status: AnsiString);
 var
 	numsourcefiles,I : integer;
 begin
@@ -1484,7 +1484,7 @@ begin
 		if Assigned(fProject) then begin
 			numsourcefiles := 0;
 			for I:=0 to fProject.Units.Count-1 do
-				if GetFileTyp(fProject.Units[I].FileName) = utSrc then
+				if GetFileTyp(fProject.Units[I].FileName) in [utcSrc,utcppSrc] then
 					Inc(numsourcefiles);
 
 			pb.Min:=0;
@@ -1501,9 +1501,9 @@ begin
 	fErrCount:=0;
 end;
 
-procedure TCompiler.ProcessProgressForm(const Line: string);
+procedure TCompiler.ProcessProgressForm(const Line: AnsiString);
 var
-	filename: string;
+	filename: AnsiString;
 	I : integer;
 	Done : boolean;
 begin
@@ -1515,7 +1515,7 @@ begin
 		lblWarn.Caption := IntToStr(fWarnCount);
 
 		// The compiler started to compile a new file
-		if AnsiStartsStr(devCompiler.gppName + ' ',Line) or AnsiStartsStr(devCompiler.gccName + ' ',Line) then begin
+		if StartsStr(devCompiler.gppName + ' ',Line) or StartsStr(devCompiler.gccName + ' ',Line) then begin
 
 			lblStatus.Caption := 'Compiling...';
 
@@ -1544,20 +1544,20 @@ begin
 				else
 					filename := fSourceFile;
 
-				if AnsiContainsStr(Line,filename) then begin
+				if ContainsStr(Line,filename) then begin
 					lblStatus.Caption := 'Linking...';
 					lblFile.Caption := filename;
 					pb.StepIt;
 					memoMiniLog.Lines.Add('Linking ' + filename + '...');
 				end;
 			end;
-		end else if AnsiStartsStr('rm -f ',Line) then begin // Cleaning obj files
+		end else if StartsStr('rm -f ',Line) then begin // Cleaning obj files
 			lblStatus.Caption := 'Cleaning...';
 			pb.StepIt;
 			memoMiniLog.Lines.Add('Cleaning...');
-		end else if AnsiStartsStr('windres.exe ',Line) and Assigned(fProject) then begin // Resource files
+		end else if StartsStr('windres.exe ',Line) and Assigned(fProject) then begin // Resource files
 			filename := ExtractFileName(fProject.Options.PrivateResource);
-			if AnsiContainsStr(Line,filename) then begin
+			if ContainsStr(Line,filename) then begin
 				lblStatus.Caption := 'Compiling...';
 				lblFile.Caption := filename;
 				pb.StepIt;
@@ -1569,7 +1569,7 @@ end;
 
 procedure TCompiler.EndProgressForm;
 var
-	sMsg: string;
+	sMsg: AnsiString;
 begin
 	if Assigned(CompileProgressForm) then begin
 		with CompileProgressForm do begin

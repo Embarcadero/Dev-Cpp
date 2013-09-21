@@ -34,12 +34,12 @@ uses
 type
  TCFGOptions = class(TPersistent)
   private
-   fName: string;
+   fName: AnsiString;
   public
    procedure SettoDefaults; virtual; abstract;
    procedure SaveSettings; virtual; abstract;
    procedure LoadSettings; virtual; abstract;
-   property Name: string read fName write fName;
+   property Name: AnsiString read fName write fName;
  end;
 
 

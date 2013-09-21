@@ -118,19 +118,19 @@ end;
 procedure TNewMemberForm.btnCreateClick(Sender: TObject);
 var
   pID: integer;
-  fName: string;
-  CppFname: string;
+  fName: AnsiString;
+  CppFname: AnsiString;
   I: integer;
   Line: integer;
   e: TEditor;
   AddScopeStr: boolean;
-  S: string;
-  VarName: string;
-  VarType: string;
-  VarArguments: string;
+  S: AnsiString;
+  VarName: AnsiString;
+  VarType: AnsiString;
+  VarArguments: AnsiString;
   VarScope: TStatementClassScope;
   St: PStatement;
-  ClsName: string;
+  ClsName: AnsiString;
   wa: boolean;
 begin
   if cmbClass.ItemIndex = -1 then begin
@@ -180,7 +180,7 @@ begin
     if not Assigned(e) then
       Exit;
 
-    if e.Modified then
+    if e.Text.Modified then
       case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [fName]), mtConfirmation, [mbYes, mbCancel], 0) of
         mrYes: if FileExists(fName) then begin
             wa := MainForm.devFileMonitor.Active;
@@ -241,7 +241,7 @@ begin
     else if cmbComment.ItemIndex = 1 then // /* ... */
       e.Text.Lines.Insert(Line, #9#9'/*');
 
-    // insert, if needed, the scope string
+    // insert, if needed, the scope AnsiString
     if AddScopeStr then
       case VarScope of
         scsPrivate: e.Text.Lines.Insert(Line, #9'private:');
@@ -251,7 +251,7 @@ begin
       end;
 
     e.GotoLineNr(Line + 1);
-    e.Modified := True;
+    e.Text.Modified := True;
 
     if chkInline.Checked or chkPure.Checked then
       Exit;
@@ -287,7 +287,7 @@ begin
     e.Text.Lines.Append('}');
     e.Text.Lines.Append('');
     e.GotoLineNr(e.Text.Lines.Count - 1);
-    e.Modified := True;
+    e.Text.Modified := True;
   end;
   Exit;
 end;

@@ -58,28 +58,28 @@ uses
 { TCompOptionsFrame }
 
 procedure TCompOptionsFrame.FillOptions(Proj: TProject);
-  function FindNode(ParentNode: TTreeNode; Text: string): TTreeNode;
+  function FindNode(ParentNode: TTreeNode; Text: AnsiString): TTreeNode;
   var
     I: integer;
   begin
     Result := nil;
     if not Assigned(ParentNode) then begin
       for I := 0 to tv.Items.Count - 1 do
-        if AnsiCompareText(tv.Items.Item[I].Text, Text) = 0 then begin
+        if CompareText(tv.Items.Item[I].Text, Text) = 0 then begin
           Result := tv.Items.Item[I];
           Break;
         end;
     end
     else
       for I := 0 to ParentNode.Count - 1 do
-        if AnsiCompareText(ParentNode.Item[I].Text, Text) = 0 then begin
+        if CompareText(ParentNode.Item[I].Text, Text) = 0 then begin
           Result := ParentNode.Item[I];
           Break;
         end;
   end;
-  procedure CreateSectionNode(CompilersNode: TTreeNode; NodePath: string);
+  procedure CreateSectionNode(CompilersNode: TTreeNode; NodePath: AnsiString);
   var
-    s, s1: string;
+    s, s1: AnsiString;
     idx: integer;
     tmpNode, Node: TTreeNode;
   begin
@@ -119,7 +119,7 @@ begin
 end;
 
 procedure TCompOptionsFrame.tvChange(Sender: TObject; Node: TTreeNode);
-  function SectionPath(childNode: TTreeNode): string;
+  function SectionPath(childNode: TTreeNode): AnsiString;
   begin
     Result := '';
     while Assigned(childNode) do begin
@@ -131,7 +131,7 @@ procedure TCompOptionsFrame.tvChange(Sender: TObject; Node: TTreeNode);
   end;
 var
   I, J, idx: integer;
-  NodePath: string;
+  NodePath: AnsiString;
   ShowOption: boolean;
 begin
   if not Assigned(Node) then
@@ -143,7 +143,7 @@ begin
   NodePath := SectionPath(Node);
   for I := 0 to devCompiler.OptionsCount - 1 do begin
     ShowOption := (not Assigned(fProject)) or (Assigned(fProject) and not (fProject.Options.typ in devCompiler.Options[I].optExcludeFromTypes));
-    if ShowOption and (AnsiCompareText(devCompiler.Options[I].optSection, NodePath) = 0) then begin
+    if ShowOption and (CompareText(devCompiler.Options[I].optSection, NodePath) = 0) then begin
       if Assigned(devCompiler.Options[I].optChoices) and (devCompiler.Options[I].optValue < devCompiler.Options[I].optChoices.Count) then
         idx := vle.InsertRow(devCompiler.Options[I].optName, devCompiler.Options[I].optChoices.Names[devCompiler.Options[I].optValue], True)
       else

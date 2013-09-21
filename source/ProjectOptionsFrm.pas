@@ -190,7 +190,7 @@ type
     procedure OptionsLinkClick(Sender: TObject);
   private
     fOptions: TProjOptions;
-    fIcon: string;
+    fIcon: AnsiString;
     fProject: TProject;
     procedure SetOptions(Value: TProjOptions);
     function GetOptions: TProjOptions;
@@ -198,7 +198,7 @@ type
     procedure UpdateMakButtons;
     procedure LoadText;
     procedure InitVersionInfo;
-    function DefaultBuildCommand(idx: integer): string;
+    function DefaultBuildCommand(idx: integer): AnsiString;
     procedure SaveDirSettings;
   public
     property Options: TProjOptions read GetOptions write SetOptions;
@@ -260,7 +260,7 @@ end;
 procedure TfrmProjectOptions.BrowseClick(Sender: TObject);
 var
 {$IFDEF WIN32}
-  NewItem: string;
+  NewItem: AnsiString;
 {$ENDIF}
 {$IFDEF LINUX}
   NewItem: WideString;
@@ -380,7 +380,7 @@ begin
 	with fOptions do begin
 		Icon:= fIcon;
      { I had to remove the delimiter text thing, since it causes the edit box to add
-       unwanted quotes around the string. We could remove them but that could conflict with user's own quotes,
+       unwanted quotes around the AnsiString. We could remove them but that could conflict with user's own quotes,
        for example when using filenames containing spaces }
      {
      *mandrav*:
@@ -389,12 +389,12 @@ begin
       it is easy to see and spot errors etc.
       Of course, you 've found a bug but I don't think that this is a good solution...
 
-      I will try something different now: I will create my own delimited string (delimited by "_@@_").
+      I will try something different now: I will create my own delimited AnsiString (delimited by "_@@_").
       Now it has nothing to do with quotes or spaces. If the user enters quotes, that's
       fine. If he doesn't but he should (like a filename with spaces), then it's
       his/her problem. Even if he did it at command line he still would have compile
       errors after all...
-      All I have to do when I want the actual string back, is call StringReplace() et voila :)
+      All I have to do when I want the actual AnsiString back, is call StringReplace() et voila :)
      }
 
 		// mandrav: start, Options Tab
@@ -513,9 +513,9 @@ begin
 	cntOther:=0;
 	for idx:=0 to fProject.Units.Count-1 do
 		case GetFileTyp(fProject.Units[idx].FileName)of
-			utSrc: Inc(cntSrc);
-			utHead: Inc(cntHdr);
-			utRes: Inc(cntRes);
+			utcSrc,utcppSrc: Inc(cntSrc);
+			utcHead,utcppHead: Inc(cntHdr);
+			utResSrc: Inc(cntRes);
 		else Inc(cntOther);
 	end;
 
@@ -753,7 +753,7 @@ end;
 procedure TfrmProjectOptions.BrowseExecutableOutDirClick(Sender: TObject);
 var
 {$IFDEF WIN32}
-  Dir: String;
+  Dir: AnsiString;
 {$ENDIF}
 {$IFDEF LINUX}
   Dir: WideString;
@@ -770,7 +770,7 @@ end;
 procedure TfrmProjectOptions.BrowseLogDirClick(Sender: TObject);
 var
 {$IFDEF WIN32}
-  Dir: String;
+  Dir: AnsiString;
 {$ENDIF}
 {$IFDEF LINUX}
   Dir: WideString;
@@ -787,7 +787,7 @@ end;
 procedure TfrmProjectOptions.btnLogOutputDirClick(Sender: TObject);
 var
 {$IFDEF WIN32}
-  Dir: String;
+  Dir: AnsiString;
 {$ENDIF}
 {$IFDEF LINUX}
   Dir: WideString;
@@ -958,15 +958,15 @@ begin
       txtOverrideBuildCmd.Text := DefaultBuildCommand(idx);
     chkOverrideBuildCmd.Checked:=fProject.Units[idx].OverrideBuildCmd;
 
-    chkCompile.Enabled:=GetFileTyp(fProject.Units[idx].FileName) <> utHead;
+    chkCompile.Enabled:=not (GetFileTyp(fProject.Units[idx].FileName) in [utcHead,utcppHead]);
     chkCompile.Checked:=fProject.Units[idx].Compile;
-    chkCompileCpp.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) in [utSrc]);
+    chkCompileCpp.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) in [utcSrc,utcppSrc]);
     chkCompileCpp.Checked:=fProject.Units[idx].CompileCpp;
-    chkLink.Enabled:=chkCompile.Enabled and (GetFileTyp(fProject.Units[idx].FileName) <> utRes);
+    chkLink.Enabled:=chkCompile.Enabled and (GetFileTyp(fProject.Units[idx].FileName) <> utResSrc);
     chkLink.Checked:=fProject.Units[idx].Link;
     spnPriority.Enabled:=chkCompile.Checked and chkCompile.Enabled;
     spnPriority.Value:=fProject.Units[idx].Priority;
-    chkOverrideBuildCmd.Enabled:=chkCompile.Checked and (lvFiles.SelectionCount=1) and not (GetFileTyp(fProject.Units[idx].FileName) in [utHead, utRes]);
+    chkOverrideBuildCmd.Enabled:=chkCompile.Checked and (lvFiles.SelectionCount=1) and not (GetFileTyp(fProject.Units[idx].FileName) in [utcHead, utcppHead, utResSrc]);
     txtOverrideBuildCmd.Enabled:=chkOverrideBuildCmd.Enabled and chkOverrideBuildCmd.Checked;
   end
   else begin
@@ -1020,7 +1020,7 @@ begin
         txtOverrideBuildCmd.Text:=StringReplace(txtOverrideBuildCmd.Text, '<CRTAB>', #13#10, [rfReplaceAll]);
 
         spnPriority.Enabled:=chkCompile.Checked;
-        chkOverrideBuildCmd.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) <> utRes);
+        chkOverrideBuildCmd.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) <> utResSrc);
         if chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName)=utOther) then begin
           // non-standard source files, *must* override the build command
           chkCompileCpp.Enabled:=False;
@@ -1030,7 +1030,7 @@ begin
             txtOverrideBuildCmd.Text:='<override this command>';
         end
         else begin
-          chkCompileCpp.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) <> utRes);
+          chkCompileCpp.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) <> utResSrc);
           if chkCompileCpp.Checked then begin
             txtOverrideBuildCmd.Text:=StringReplace(txtOverrideBuildCmd.Text, '$(CC)', '$(CPP)', [rfReplaceAll]);
             txtOverrideBuildCmd.Text:=StringReplace(txtOverrideBuildCmd.Text, '$(CFLAGS)', '$(CXXFLAGS)', [rfReplaceAll]);
@@ -1121,7 +1121,7 @@ end;
 
 procedure TfrmProjectOptions.AddLibBtnClick(Sender: TObject);
 var
-  s: string;
+  s: AnsiString;
   i: integer;
 begin
   if OpenLibDialog.Execute then begin
@@ -1133,12 +1133,12 @@ begin
   end;
 end;
 
-function TfrmProjectOptions.DefaultBuildCommand(idx: integer): string;
+function TfrmProjectOptions.DefaultBuildCommand(idx: integer): AnsiString;
 var
-  tfile, ofile: string;
+  tfile, ofile: AnsiString;
 begin
   Result:='';
-  if GetFileTyp(fProject.Units[idx].FileName)<>utSrc then
+  if not (GetFileTyp(fProject.Units[idx].FileName) in [utcSrc,utcppSrc]) then
     Exit;
 
   tfile:= ExtractFileName(fProject.Units[idx].FileName);
@@ -1230,10 +1230,10 @@ end;
 
 procedure TfrmProjectOptions.OptionsLinkClick(Sender: TObject);
 var
-	s : string;
+	s : AnsiString;
 begin
 	s := (Sender as TLabel).Caption;
-	ShellExecute(GetDesktopWindow(), 'open', PChar(s), nil, nil, SW_SHOWNORMAL);
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(s), nil, nil, SW_SHOWNORMAL);
 end;
 
 end.

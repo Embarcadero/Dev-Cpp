@@ -115,13 +115,13 @@ begin
 end;
 
 procedure TAboutForm.LabelClick(Sender: TObject);
-var s : string;
+var s : AnsiString;
 begin
   if pos('@',(Sender as TLabel).Caption)<> 0 then
     s := 'mailto:'+(Sender as TLabel).Caption
   else
     s := (Sender as TLabel).Caption;
-  ShellExecute(GetDesktopWindow(), 'open', PChar(s), nil, nil, SW_SHOWNORMAL);
+  ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(s), nil, nil, SW_SHOWNORMAL);
 end;
 
 
@@ -189,7 +189,7 @@ end;
 
 procedure TAboutForm.DonateClick(Sender: TObject);
 begin
-	ShellExecute(GetDesktopWindow(), 'open', PChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil, SW_SHOWNORMAL);
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);

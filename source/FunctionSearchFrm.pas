@@ -89,11 +89,11 @@ begin
   for I := 0 to fParser.Statements.Count - 1 do
     if PStatement(fParser.Statements[I])^._Kind = skFunction then
       if (PStatement(fParser.Statements[I])^._IsDeclaration and
-        (AnsiCompareText(PStatement(fParser.Statements[I])^._DeclImplFileName, fFilename) = 0)) or
+        (CompareText(PStatement(fParser.Statements[I])^._DeclImplFileName, fFilename) = 0)) or
         (not PStatement(fParser.Statements[I])^._IsDeclaration and
-        (AnsiCompareText(PStatement(fParser.Statements[I])^._FileName, fFilename) = 0)) then
+        (CompareText(PStatement(fParser.Statements[I])^._FileName, fFilename) = 0)) then
         if (txtSearch.Text = '') or
-          (AnsiPos(LowerCase(txtSearch.Text), LowerCase(PStatement(fParser.Statements[I])^._ScopelessCmd)) > 0) then begin
+          (Pos(LowerCase(txtSearch.Text), LowerCase(PStatement(fParser.Statements[I])^._ScopelessCmd)) > 0) then begin
           with lvEntries.Items.Add do begin
             ImageIndex := -1;
             case PStatement(fParser.Statements[I])^._ClassScope of
@@ -168,7 +168,7 @@ end;
 procedure TFunctionSearchForm.lvEntriesCompare(Sender: TObject; Item1,
   Item2: TListItem; Data: Integer; var Compare: Integer);
 begin
-  Compare := AnsiCompareText(Item1.SubItems[1], Item2.SubItems[1]);
+  Compare := CompareText(Item1.SubItems[1], Item2.SubItems[1]);
 end;
 
 procedure TFunctionSearchForm.LoadText;

@@ -43,7 +43,7 @@ type
   private
     { Private declarations }
   public
-    function Select(Resources: TStringList): String;
+    function Select(Resources: TStringList): AnsiString;
     function SelectIndex(Resources: TStringList): Integer;
   end;
 
@@ -54,7 +54,7 @@ implementation
 
 {$R *.dfm}
 
-function TSelectResource.Select(Resources: TStringList): String;
+function TSelectResource.Select(Resources: TStringList): AnsiString;
 var
   i: Integer;
 begin

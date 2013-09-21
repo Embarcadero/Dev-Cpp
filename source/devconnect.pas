@@ -37,7 +37,7 @@ type
     L     : TLabel;
 
   protected
-    msg   : string;
+    msg   : AnsiString;
 
     procedure Execute; override;
     procedure Sync;

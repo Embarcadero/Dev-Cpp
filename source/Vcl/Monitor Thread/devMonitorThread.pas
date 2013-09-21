@@ -66,13 +66,13 @@ uses devFileMonitor;
 
 var
   ChangeType: TdevMonitorChangeType;
-  Filename: string;
+  Filename: AnsiString;
 
 procedure TdevMonitorThread.BuildDirs;
 var
   I: integer;
   SR: TSearchRec;
-  tmp: string;
+  tmp: AnsiString;
 begin
   I := 0;
   fFileAttrs.Clear;
@@ -150,7 +150,7 @@ begin
   for I := 0 to fDirs.Count - 1 do
   begin
     hMonitors[nMonitors] := FindFirstChangeNotification(
-      PChar(fDirs[I]),
+      PAnsiChar(fDirs[I]),
       False,
       FILE_NOTIFY_CHANGE_LAST_WRITE or FILE_NOTIFY_CHANGE_FILE_NAME
       );
@@ -234,9 +234,9 @@ end;
 
 procedure TdevMonitorThread.Notify;
 var
-  P: PChar;
+  P: PAnsiChar;
 begin
-  P := StrNew(PChar(Filename));
+  P := StrNew(PAnsiChar(Filename));
   PostMessage(TdevFileMonitor(fOwner).Handle, APPMSG_NOTIFYFILECHANGED, integer(ChangeType), LPARAM(P));
   //  Notify(ChangeType, );
 end;

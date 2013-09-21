@@ -298,7 +298,7 @@ object LangForm: TLangForm
           'stdint.h'
           'stdio.h'
           'stdlib.h'
-          'string.h'
+          'AnsiString.h'
           'time.h'
           'wchar.h'
           'wctype.h'

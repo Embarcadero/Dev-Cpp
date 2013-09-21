@@ -109,7 +109,7 @@ uses
 
 var
 	// ConfigMode moved to devcfg, 'cause I need it in enviroform (for AltConfigFile)
-	UserHome, strLocalAppData, strAppData, strIniFile, exefolder: String;
+	UserHome, strLocalAppData, strAppData, strIniFile, exefolder: AnsiString;
 	tempc: array [0..MAX_PATH] of char;
 begin
 
@@ -129,11 +129,11 @@ begin
 		//default dir should be %APPDATA%\Dev-Cpp
 		strLocalAppData := '';
 		if SUCCEEDED(SHGetFolderPath(0, CSIDL_LOCAL_APPDATA, 0, 0, tempc)) then
-			strLocalAppData := IncludeTrailingBackslash(String(tempc));
+			strLocalAppData := IncludeTrailingBackslash(AnsiString(tempc));
 
 		strAppData := '';
 		if SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, tempc)) then
-			strAppData := IncludeTrailingBackslash(String(tempc));
+			strAppData := IncludeTrailingBackslash(AnsiString(tempc));
 
 		if (strLocalAppData <> '') and FileExists(strLocalAppData + strIniFile) then begin
 			UserHome := strLocalAppData;

@@ -94,7 +94,7 @@ begin
   end;
 end;
 
-function GetTopmostItemAncestor(Item: TMenuItem): string;
+function GetTopmostItemAncestor(Item: TMenuItem): AnsiString;
 var
   CurMenu: TMenu;
 begin
@@ -110,7 +110,7 @@ end;
 
 procedure TdevShortcuts.Load;
 type TMenuAndShortcut = record
-      Caption: string;
+      Caption: AnsiString;
       Shortcut: TShortCut;
 end;
 PMenuAndShortcut = ^TMenuAndShortcut;
@@ -120,7 +120,7 @@ var
   Entries: TList;
   ms: PMenuAndShortcut;
   sct: TShortCut;
-  SmenuOld, SmenuNew, Entry: string;
+  SmenuOld, SmenuNew, Entry: AnsiString;
   Found: boolean;
 begin
   if fOwner = nil then
@@ -223,8 +223,8 @@ procedure TdevShortcuts.Save;
 var
   I: integer;
   Fini: TIniFile;
-  Smenu: string;
-  Scut: string;
+  Smenu: AnsiString;
+  Scut: AnsiString;
 begin
 	if fFileName = '' then
 		Exit;

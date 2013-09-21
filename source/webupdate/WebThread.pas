@@ -151,7 +151,7 @@ begin
       fCurrentIndex := I;
   // Initiate transfer /////////////////////////////////////////////////////
       fFileHandle := InternetOpenUrl(fInternetHandle,
-        PChar(DownFile),
+        PAnsiChar(DownFile),
         nil,
         0,
         {INTERNET_FLAG_PRAGMA_NOCACHE or } INTERNET_FLAG_RELOAD,

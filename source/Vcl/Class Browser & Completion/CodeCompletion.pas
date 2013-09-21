@@ -32,7 +32,7 @@ interface
 uses 
 {$IFDEF WIN32}
   Windows, Classes, Forms, SysUtils, Controls, Graphics, StrUtils, CppParser,
-  ExtCtrls, U_IntList;
+  ExtCtrls, stringutils, U_IntList;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, Classes, QForms, SysUtils, QControls, QGraphics, StrUtils, CppParser,
@@ -64,30 +64,30 @@ type
     fIncludedFiles: TStringList;
     function GetOnCompletion: TCompletionEvent; {** Modified by Peter **}
     procedure SetOnCompletion(Value: TCompletionEvent); {** Modified by Peter **}
-//    procedure GetTypeOfVar(_Value: string; var List, InhList: TIntList);
-    function GetTypeID(_Value: string; il: TIntList): integer;
+//    procedure GetTypeOfVar(_Value: AnsiString; var List, InhList: TIntList);
+    function GetTypeID(_Value: AnsiString; il: TIntList): integer;
     function ApplyStandardFilter(Index: integer): boolean;
     function ApplyClassFilter(Index, ParentID: integer; InheritanceIDs: TIntList): boolean;
-    function ApplyMemberFilter(_Class: string; Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
-    procedure GetCompletionFor(_Class, _Value: string; HasDot: boolean = False);
-//    procedure GetCompletionFor1(_Class, _Value: string; HasDot: boolean = False);
-    procedure FilterList(_Class, _Value: string; HasDot: boolean = False);
-    function GetMember(Phrase: string): string;
-    function GetHasDot(Phrase: string): boolean;
+    function ApplyMemberFilter(_Class: AnsiString; Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
+    procedure GetCompletionFor(_Class, _Value: AnsiString; HasDot: boolean = False);
+//    procedure GetCompletionFor1(_Class, _Value: AnsiString; HasDot: boolean = False);
+    procedure FilterList(_Class, _Value: AnsiString; HasDot: boolean = False);
+    function GetMember(Phrase: AnsiString): AnsiString;
+    function GetHasDot(Phrase: AnsiString): boolean;
     procedure SetParser(Value: TCppParser);
     procedure SetPosition(Value: TPoint);
     procedure ComplKeyPress(Sender: TObject; var Key: Char);
     procedure OnFormResize(Sender: TObject);
     procedure SetColor(Value: TColor);
-    function IsIncluded(FileName: string): boolean;
+    function IsIncluded(FileName: AnsiString): boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Search(Sender: TWinControl; Phrase, Filename: string);
+    procedure Search(Sender: TWinControl; Phrase, Filename: AnsiString);
     procedure Hide;
     function SelectedStatement: PStatement;
     function SelectedIsFunction: boolean;
-    function GetClass(Phrase: string): string;
+    function GetClass(Phrase: AnsiString): AnsiString;
   published
     property Parser: TCppParser read fParser write SetParser;
     property Position: TPoint read fPos write SetPosition;
@@ -145,7 +145,7 @@ begin
   inherited Destroy;
 end;
 
-function TCodeCompletion.GetClass(Phrase: string): string;
+function TCodeCompletion.GetClass(Phrase: AnsiString): AnsiString;
 var
   I: integer;
 begin
@@ -189,11 +189,11 @@ begin
       Dec(I);
     end;
     // check if it is function; if yes, cut-off the arguments ;)
-    if AnsiPos('(', Result) > 0 then
-      Result := Copy(Result, 1, AnsiPos('(', Result) - 1);
+    if Pos('(', Result) > 0 then
+      Result := Copy(Result, 1, Pos('(', Result) - 1);
     // check if it is an array; if yes, cut-off the dimensions ;)
-    if AnsiPos('[', Result) > 0 then
-      Result := Copy(Result, 1, AnsiPos('[', Result) - 1);
+    if Pos('[', Result) > 0 then
+      Result := Copy(Result, 1, Pos('[', Result) - 1);
   end;
 end;
 
@@ -222,7 +222,7 @@ begin
     IsIncluded(PStatement(fParser.Statements[Index])^._DeclImplFileName));
 end;
 
-function TCodeCompletion.ApplyMemberFilter(_Class: string; Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
+function TCodeCompletion.ApplyMemberFilter(_Class: AnsiString; Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
 var
   cs: set of TStatementClassScope;
 begin
@@ -252,7 +252,7 @@ begin
     );
 end;
 
-procedure TCodeCompletion.GetCompletionFor(_Class, _Value: string; HasDot: boolean = False);
+procedure TCodeCompletion.GetCompletionFor(_Class, _Value: AnsiString; HasDot: boolean = False);
 var
   I, I1: integer;
   InheritanceIDs: TIntList;
@@ -341,7 +341,7 @@ begin
   end;
 end;
 
-procedure TCodeCompletion.FilterList(_Class, _Value: string;
+procedure TCodeCompletion.FilterList(_Class, _Value: AnsiString;
   HasDot: boolean);
 var
   I: integer;
@@ -353,7 +353,7 @@ begin
       fCompletionStatementList.Clear;
       for I := 0 to fFullCompletionStatementList.Count - 1 do
         if not HasDot then begin //class only
-          if Assigned(fFullCompletionStatementList[I]) and AnsiStartsText(_Class, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then begin
+          if Assigned(fFullCompletionStatementList[I]) and StartsText(_Class, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then begin
             fCompletionStatementList.Add(fFullCompletionStatementList[I]);
             CodeComplForm.lbCompletion.Items.Add('');
           end;
@@ -361,7 +361,7 @@ begin
         else begin //class and method
         // ignore "this" pointer as a member
           if Assigned(fFullCompletionStatementList[I]) and (I <> fParser.GetThisPointerID) then
-            if AnsiStartsText(_Value, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then begin
+            if StartsText(_Value, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then begin
               fCompletionStatementList.Add(fFullCompletionStatementList[I]);
               CodeComplForm.lbCompletion.Items.Add('');
             end;
@@ -378,7 +378,7 @@ begin
   CodeComplForm.lbCompletion.Items.EndUpdate;
 end;
 
-function TCodeCompletion.GetHasDot(Phrase: string): boolean;
+function TCodeCompletion.GetHasDot(Phrase: AnsiString): boolean;
 var
   I: integer;
 begin
@@ -395,7 +395,7 @@ begin
   end;
 end;
 
-function TCodeCompletion.GetMember(Phrase: string): string;
+function TCodeCompletion.GetMember(Phrase: AnsiString): AnsiString;
 var
   I: integer;
 begin
@@ -419,7 +419,7 @@ begin
     Result := Copy(Phrase, I + 1, Length(Phrase) - I + 2);
 end;
 
-function TCodeCompletion.GetTypeID(_Value: string; il: TIntList): integer;
+function TCodeCompletion.GetTypeID(_Value: AnsiString; il: TIntList): integer;
 var
   I: integer;
 begin
@@ -427,10 +427,10 @@ begin
   if (_Value <> '') and (_Value[Length(_Value)] = '>') then // template
     Delete(_Value, Pos('<', _Value), MaxInt);
   for I := 0 to fParser.Statements.Count - 1 do
-    if (AnsiCompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd) = 0) or
-      (AnsiCompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '*') = 0) or
-      (AnsiCompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '&') = 0) or
-      (AnsiCompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '**') = 0) then begin
+    if (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd) = 0) or
+      (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '*') = 0) or
+      (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '&') = 0) or
+      (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '**') = 0) then begin
       if (Result = -1) or ((Result <> -1) and (PStatement(fParser.Statements[I])^._ParentID <> Result) {and (PStatement(fParser.Statements[I])^._ParentID <> -1)}) then begin
         Result := I;
         if Assigned(il) then
@@ -473,16 +473,16 @@ begin
   else if not PStatement(Item1)^._Loaded and PStatement(Item2)^._Loaded then
     Result := -1;
 
-  // after that, consider string comparison
+  // after that, consider AnsiString comparison
   if Result = 0 then
-    Result := AnsiCompareText(PStatement(Item1)^._ScopelessCmd, PStatement(Item2)^._ScopelessCmd);
+    Result := CompareText(PStatement(Item1)^._ScopelessCmd, PStatement(Item2)^._ScopelessCmd);
 end;
 
-procedure TCodeCompletion.Search(Sender: TWinControl; Phrase, Filename: string);
+procedure TCodeCompletion.Search(Sender: TWinControl; Phrase, Filename: AnsiString);
 var
   P: TPoint;
-  C: string;
-  M: string;
+  C: AnsiString;
+  M: AnsiString;
   D: boolean;
 begin
   if fEnabled then begin
@@ -613,7 +613,7 @@ begin
   fColor := Value;
 end;
 
-function TCodeCompletion.IsIncluded(FileName: string): boolean;
+function TCodeCompletion.IsIncluded(FileName: AnsiString): boolean;
 begin
   Result := fIncludedFiles.IndexOf(Filename) <> -1;
 end;

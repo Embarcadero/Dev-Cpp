@@ -147,7 +147,7 @@ type
     procedure cmbReposChange(Sender: TObject);
     procedure btnCOBrwsClick(Sender: TObject);
     procedure chkCOModuleAsClick(Sender: TObject);
-    procedure vleGetPickList(Sender: TObject; const KeyName: string;
+    procedure vleGetPickList(Sender: TObject; const KeyName: AnsiString;
       Values: TStrings);
     procedure txtImpModuleChange(Sender: TObject);
     procedure txtCOmoduleChange(Sender: TObject);
@@ -171,16 +171,16 @@ type
     fRunner: TCVSThread;
     fTerminateRunner: boolean;
     procedure LoadText;
-    function CVSActionStr(CVSAct: TCVSAction): string;
-    function CVSActionTabStr(CVSAct: TCVSAction): string;
-    procedure UpdateVLE(Path: string);
+    function CVSActionStr(CVSAct: TCVSAction): AnsiString;
+    function CVSActionTabStr(CVSAct: TCVSAction): AnsiString;
+    procedure UpdateVLE(Path: AnsiString);
     procedure SetupDefaults;
     procedure BreakUpRepository;
     procedure UpdateRepositoryDisplay;
-    procedure CVSLineOutput(Sender: TObject; const Line: string);
+    procedure CVSLineOutput(Sender: TObject; const Line: AnsiString);
     procedure CVSCheckAbort(var AbortThread: boolean);
     procedure CVSTerminated(Sender: TObject);
-    procedure CVSNeedPassword(var Passwd: string);
+    procedure CVSNeedPassword(var Passwd: AnsiString);
     procedure FindModifiedFiles;
   public
     { Public declarations }
@@ -195,7 +195,7 @@ var
 implementation
 
 uses 
-  devcfg, utils, MultiLangSupport, CVSPasswdFrm;
+  devcfg, utils, stringutils,MultiLangSupport, CVSPasswdFrm;
 
 {$R *.dfm}
 
@@ -239,7 +239,7 @@ end;
 procedure TCVSForm.BreakUpRepository;
 var
   idx: integer;
-  S: string;
+  S: AnsiString;
 begin
   // take the repository (e.g. ":pserver:user@some.host.com:/remote/dir")
   // and break it up to fill in the respective edit boxes
@@ -404,7 +404,7 @@ begin
   Action := caFree;
 end;
 
-function TCVSForm.CVSActionStr(CVSAct: TCVSAction): string;
+function TCVSForm.CVSActionStr(CVSAct: TCVSAction): AnsiString;
 begin
   case CVSAct of
     caImport: Result := Lang[ID_CVS_IMPORT];
@@ -420,7 +420,7 @@ begin
   end;
 end;
 
-function TCVSForm.CVSActionTabStr(CVSAct: TCVSAction): string;
+function TCVSForm.CVSActionTabStr(CVSAct: TCVSAction): AnsiString;
 begin
   case CVSAct of
     caImport: Result := Lang[ID_CVS_IMPORTTAB];
@@ -445,9 +445,9 @@ end;
 
 procedure TCVSForm.btnOKClick(Sender: TObject);
 var
-  Cmd, sLog, Dir: string;
+  Cmd, sLog, Dir: AnsiString;
   I: integer;
-  PrettyCmd: string;
+  PrettyCmd: AnsiString;
 begin
   if Assigned(fRunner) then begin
     MessageDlg('Already running a command!', mtWarning, [mbOk], 0);
@@ -674,7 +674,7 @@ end;
 procedure TCVSForm.CVSTerminated(Sender: TObject);
 var
   RetValue: integer;
-  S: string;
+  S: AnsiString;
   I: integer;
 begin
   S := fRunner.Output;
@@ -694,7 +694,7 @@ begin
   AbortThread := fTerminateRunner;
 end;
 
-procedure TCVSForm.CVSNeedPassword(var Passwd: string);
+procedure TCVSForm.CVSNeedPassword(var Passwd: AnsiString);
 begin
   with TCVSPasswdForm.Create(nil) do begin
     ShowModal;
@@ -718,7 +718,7 @@ begin
     Close;
 end;
 
-procedure TCVSForm.CVSLineOutput(Sender: TObject; const Line: string);
+procedure TCVSForm.CVSLineOutput(Sender: TObject; const Line: AnsiString);
 type
   THighlightType = (htNone, htDevCpp, htServer, htUpdated, htModified, htConflict, htUnknown, htDiffIn, htDiffOut, htIgnored, htNew, htPatched);
 const
@@ -736,30 +736,30 @@ begin
     sl.Text := Line;
 
     for I := 0 to sl.Count - 1 do begin
-      if AnsiStartsStr('>> ', sl[I]) or
-        AnsiStartsStr('@@', sl[I]) then
+      if StartsStr('>> ', sl[I]) or
+        StartsStr('@@', sl[I]) then
         HiType := htDevCPP
-      else if AnsiStartsStr('? ', sl[I]) then
+      else if StartsStr('? ', sl[I]) then
         HiType := htUnknown
-      else if AnsiStartsStr('U ', sl[I]) then
+      else if StartsStr('U ', sl[I]) then
         HiType := htUpdated
-      else if AnsiStartsStr('M ', sl[I]) then
+      else if StartsStr('M ', sl[I]) then
         HiType := htModified
-      else if AnsiStartsStr('C ', sl[I]) then
+      else if StartsStr('C ', sl[I]) then
         HiType := htConflict
-      else if AnsiStartsStr('I ', sl[I]) then
+      else if StartsStr('I ', sl[I]) then
         HiType := htIgnored
-      else if AnsiStartsStr('N ', sl[I]) then
+      else if StartsStr('N ', sl[I]) then
         HiType := htNew
-      else if AnsiStartsStr('P ', sl[I]) then
+      else if StartsStr('P ', sl[I]) then
         HiType := htPatched
-      else if AnsiStartsStr('> ', sl[I]) or
-        AnsiStartsStr('+', sl[I]) then
+      else if StartsStr('> ', sl[I]) or
+        StartsStr('+', sl[I]) then
         HiType := htDiffIn
-      else if AnsiStartsStr('< ', sl[I]) or
-        AnsiStartsStr('-', sl[I]) then
+      else if StartsStr('< ', sl[I]) or
+        StartsStr('-', sl[I]) then
         HiType := htDiffOut
-      else if AnsiStartsStr('cvs server: ', sl[I]) then
+      else if StartsStr('cvs server: ', sl[I]) then
         HiType := htServer
       else
         HiType := htNone;
@@ -775,7 +775,7 @@ end;
 
 procedure TCVSForm.btnCVSImportBrwsClick(Sender: TObject);
 var
-  s: string;
+  s: AnsiString;
 begin
   s := txtCVSImportDir.Text;
   if SelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
@@ -792,7 +792,7 @@ end;
 
 procedure TCVSForm.btnCOBrwsClick(Sender: TObject);
 var
-  s: string;
+  s: AnsiString;
 begin
   s := txtCOdir.Text;
   if SelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
@@ -806,8 +806,8 @@ begin
     txtCOModuleAs.Text := txtCOmodule.Text;
 end;
 
-procedure TCVSForm.UpdateVLE(Path: string);
-  function IsTextOrBinary(Filename: string): integer; // 0:text, 1:binary, 2:ignore
+procedure TCVSForm.UpdateVLE(Path: AnsiString);
+  function IsTextOrBinary(Filename: AnsiString): integer; // 0:text, 1:binary, 2:ignore
   var
     hFile: integer;
     Buf: array[1..1024] of Char;
@@ -836,7 +836,7 @@ begin
       if (SR.Attr and faDirectory) = faDirectory then
         UpdateVLE(Path + SR.Name + '\')
       else begin
-        if (not AnsiStartsStr('.#', SR.Name)) and (ExtractFileExt(SR.Name) <> '') then
+        if (not StartsStr('.#', SR.Name)) and (ExtractFileExt(SR.Name) <> '') then
           if not vle.FindRow(ExtractFileExt(SR.Name), R) then begin
             case IsTextOrBinary(Path + SR.Name) of
               0: vle.InsertRow(ExtractFileExt(SR.Name), 'Text', True);
@@ -849,7 +849,7 @@ begin
     until FindNext(SR) <> 0;
 end;
 
-procedure TCVSForm.vleGetPickList(Sender: TObject; const KeyName: string;
+procedure TCVSForm.vleGetPickList(Sender: TObject; const KeyName: AnsiString;
   Values: TStrings);
 begin
   Values.Clear;
@@ -1004,7 +1004,7 @@ begin
 end;
 
 procedure TCVSForm.FindModifiedFiles;
-  function GetFileTimeStr(Filename: string): string;
+  function GetFileTimeStr(Filename: AnsiString): AnsiString;
   var
     d: TDateTime;
     hFile: THandle;
@@ -1032,7 +1032,7 @@ procedure TCVSForm.FindModifiedFiles;
 var
   I, idx: integer;
   sl: TStringList;
-  fname, dstr, S, prefix: string;
+  fname, dstr, S, prefix: AnsiString;
   modif: integer;
 begin
   { Not implemented yet }

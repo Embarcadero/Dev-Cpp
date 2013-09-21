@@ -111,7 +111,7 @@ type
     procedure btnHelpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure vleExternalEditButtonClick(Sender: TObject);
-    procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;const KeyName, KeyValue: String);
+    procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;const KeyName, KeyValue: AnsiString);
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
@@ -136,7 +136,7 @@ uses
 {$R *.dfm}
 
 const
- Help_Topics: array[0..5] of string =
+ Help_Topics: array[0..5] of AnsiString =
     ('EnviroOpt_General',
      'EnviroOpt_Interface',
      'EnviroOpt_FilesDirs',
@@ -146,7 +146,7 @@ const
 
 procedure TEnviroForm.BrowseClick(Sender: TObject);
 var
- s: string;
+ s: AnsiString;
 begin
   case (Sender as TComponent).Tag of
    1: // default dir browse
@@ -282,7 +282,7 @@ end;
 procedure TEnviroForm.btnOkClick(Sender: TObject);
 var
 	idx: integer;
-	s : string;
+	s : AnsiString;
 begin
 	if chkAltConfig.Enabled then begin
 		if UseAltConfigFile<>chkAltConfig.Checked then
@@ -303,7 +303,7 @@ begin
 		MRUMax:= seMRUMax.Value;
 		if not MultiLineTab then begin
 			if cboTabsTop.ItemIndex in [2,3] then begin
-				MessageBox(application.handle,PChar('Multiline tabs must be enabled when using vertical tabs.'+#13#10#13#10+'Reverting to Top Tabs...'),PChar('Error'),MB_OK);
+				MessageBox(application.handle,PAnsiChar('Multiline tabs must be enabled when using vertical tabs.'+#13#10#13#10+'Reverting to Top Tabs...'),PAnsiChar('Error'),MB_OK);
 				cboTabsTop.ItemIndex := 0;
 			end;
 		end;
@@ -354,7 +354,7 @@ begin
 			else
 				Unassociate(idx);
 	except
-		MessageBox(application.handle,PChar(Lang[ID_ENV_UACERROR]),PChar('Error'),MB_OK);
+		MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar('Error'),MB_OK);
 	end;
 
 	devCVSHandler.Executable:= edCVSExec.Text;
@@ -463,7 +463,7 @@ begin
 end;
 
 procedure TEnviroForm.vleExternalValidate(Sender: TObject; ACol,
-  ARow: Integer; const KeyName, KeyValue: String);
+  ARow: Integer; const KeyName, KeyValue: AnsiString);
 var
   idx: integer;
 begin
@@ -501,7 +501,7 @@ end;
 
 procedure TEnviroForm.cvsdownloadlabelClick(Sender: TObject);
 begin
-	ShellExecute(GetDesktopWindow(), 'open', PChar((Sender as TLabel).Caption), nil, nil, SW_SHOWNORMAL);
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar((Sender as TLabel).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TEnviroForm.cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);

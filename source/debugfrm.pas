@@ -37,7 +37,7 @@ type
     btnClose: TButton;
     procedure FormShow(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
-    procedure AddItem(const Text, Value: string);
+    procedure AddItem(const Text, Value: AnsiString);
   private
 
   public
@@ -54,7 +54,7 @@ uses
 
 {$R *.dfm}
 
-procedure TDebugForm.AddItem(const Text, Value: string);
+procedure TDebugForm.AddItem(const Text, Value: AnsiString);
 var
  Item: TListItem;
 begin

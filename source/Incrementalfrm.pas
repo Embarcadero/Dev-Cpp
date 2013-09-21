@@ -44,7 +44,7 @@ type
     procedure btnPrevClick(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
   public
-    SearchString : string;
+    SearchString : AnsiString;
     Editor       : TSynEdit;
     OrgPt        : TBufferCoord;
     lastcommand  : integer;

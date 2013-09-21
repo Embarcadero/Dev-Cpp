@@ -43,21 +43,21 @@ type
   TCustomImageTheme = class
   private
     FBitmap: TBitmap;
-    FFilename: string;
+    FFilename: AnsiString;
     FOnChange: TNotifyEvent;
-    FTitle: string;
+    FTitle: AnsiString;
     procedure SetBitmap(const Bmp: TBitmap);
     procedure OnChangeEvent(Sender: TObject);
   protected
     procedure Changed; virtual;
     property Bitmap: TBitmap read FBitmap write SetBitmap;
-    property Filename: string read FFilename;
-    property Title: string read FTitle;
+    property Filename: AnsiString read FFilename;
+    property Title: AnsiString read FTitle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: string); virtual;
+    procedure LoadFromFile(AFilename: AnsiString); virtual;
   end;
 
   TDevImageTheme = class(TCustomImageTheme)
@@ -75,8 +75,8 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: string); override;
-    procedure SaveToFile(AFilename: string);
+    procedure LoadFromFile(AFilename: AnsiString); override;
+    procedure SaveToFile(AFilename: AnsiString);
 
     property MenuImages: TImageList read FMenuImages write SetMenuImages;
     property HelpImages: TImageList read FHelpImages write SetHelpImages;
@@ -112,25 +112,25 @@ type
     FCurrentTheme: TCustomImageTheme;
     FThemes: TObjectList;
     function GetTheme(Index: Integer): TCustomImageTheme;
-    function GetThemeFilename(Index: Integer): string;
-    function GetThemeTitle(Index: Integer): string;
+    function GetThemeFilename(Index: Integer): AnsiString;
+    function GetThemeTitle(Index: Integer): AnsiString;
     procedure SetCurrentTheme(const ATheme: TCustomImageTheme);
   protected
-    procedure DoCreateThemeFromFile(AFilename: string); virtual;
+    procedure DoCreateThemeFromFile(AFilename: AnsiString); virtual;
     property CurrentTheme: TCustomImageTheme read FCurrentTheme write SetCurrentTheme;
     property Themes[Index: Integer]: TCustomImageTheme read GetTheme;
-    property ThemeFilename[Index: Integer]: string read GetThemeFilename;
-    property ThemeTitle[Index: Integer]: string read GetThemeTitle;
+    property ThemeFilename[Index: Integer]: AnsiString read GetThemeFilename;
+    property ThemeTitle[Index: Integer]: AnsiString read GetThemeTitle;
   public
     constructor Create; virtual;
     destructor Destroy; override;
     function ActivateTheme(ATheme: TCustomImageTheme): Boolean; overload;
-    function ActivateTheme(AThemeTitle: string): Boolean; overload;
+    function ActivateTheme(AThemeTitle: AnsiString): Boolean; overload;
     procedure AddTheme(const ATheme: TCustomImageTheme);
     function Count: Integer;
-    function IndexOf(const AThemeTitle: string): Integer;
+    function IndexOf(const AThemeTitle: AnsiString): Integer;
     procedure GetThemeTitles(ADest: TStrings);
-    procedure LoadFromDirectory(ADirectory: string);
+    procedure LoadFromDirectory(ADirectory: AnsiString);
     procedure RegisterTheme(const ThemeClass: TImageThemeClass);
   end;
 
@@ -143,7 +143,7 @@ type
     function GetCurrentTheme: TDevImageTheme;
     procedure SetCurrentTheme(const ATheme: TDevImageTheme);
   protected
-    procedure DoCreateThemeFromFile(AFilename: string); override;
+    procedure DoCreateThemeFromFile(AFilename: AnsiString); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -199,7 +199,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TCustomImageTheme.LoadFromFile(AFilename: string);
+procedure TCustomImageTheme.LoadFromFile(AFilename: AnsiString);
 begin
   FFilename := AFilename;
   FBitmap.LoadFromFile(AFilename);
@@ -251,7 +251,7 @@ const
   cTileW=16;
   cTileH=16;
   
-procedure TDevImageTheme.LoadFromFile(AFilename: string);
+procedure TDevImageTheme.LoadFromFile(AFilename: AnsiString);
 var
   Bmp: TBitmap;
 
@@ -294,7 +294,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TDevImageTheme.SaveToFile(AFilename: string);
+procedure TDevImageTheme.SaveToFile(AFilename: AnsiString);
 var
   I: Integer;
   X,Y: Integer;
@@ -460,7 +460,7 @@ begin
   Result := True;
 end;
 
-function TCustomImageThemeFactory.ActivateTheme(AThemeTitle: string): Boolean;
+function TCustomImageThemeFactory.ActivateTheme(AThemeTitle: AnsiString): Boolean;
 var
   I: Integer;
 begin
@@ -482,7 +482,7 @@ begin
   Result := FThemes.Count;
 end;
 
-procedure TCustomImageThemeFactory.DoCreateThemeFromFile(AFilename: string);
+procedure TCustomImageThemeFactory.DoCreateThemeFromFile(AFilename: AnsiString);
 begin
 end;
 
@@ -491,7 +491,7 @@ begin
   Result := FThemes[Index] as TCustomImageTheme;
 end;
 
-function TCustomImageThemeFactory.GetThemeFilename(Index: Integer): string;
+function TCustomImageThemeFactory.GetThemeFilename(Index: Integer): AnsiString;
 begin
   Result := (FThemes[Index] as TCustomImageTheme).Filename;
 end;
@@ -511,7 +511,7 @@ begin
   end;
 end;
 
-function TCustomImageThemeFactory.IndexOf(const AThemeTitle: string): Integer;
+function TCustomImageThemeFactory.IndexOf(const AThemeTitle: AnsiString): Integer;
 var
   I: Integer;
 begin
@@ -525,12 +525,12 @@ begin
     end;
 end;
 
-function TCustomImageThemeFactory.GetThemeTitle(Index: Integer): string;
+function TCustomImageThemeFactory.GetThemeTitle(Index: Integer): AnsiString;
 begin
   Result := (FThemes[Index] as TCustomImageTheme).Title;
 end; 
 
-procedure TCustomImageThemeFactory.LoadFromDirectory(ADirectory: string);
+procedure TCustomImageThemeFactory.LoadFromDirectory(ADirectory: AnsiString);
 var
   F: TSearchRec;
 begin
@@ -587,7 +587,7 @@ begin
 	inherited;
 end;
 
-procedure TDevImageThemeFactory.DoCreateThemeFromFile(AFilename: string);
+procedure TDevImageThemeFactory.DoCreateThemeFromFile(AFilename: AnsiString);
 var
 	NewTheme: TDevImageTheme;
 begin

@@ -47,7 +47,7 @@ type
   public
     { Public declarations }
     AltColor: TColor;
-    procedure AddShortcut(M: TMenuItem; MenuName:string);
+    procedure AddShortcut(M: TMenuItem; MenuName:AnsiString);
     procedure Clear;
     function Count: integer;
     property Items[Index: integer]: TMenuItem read GetItem;
@@ -64,7 +64,7 @@ uses
 
 {$R *.dfm}
 
-procedure TfrmShortcutsEditor.AddShortcut(M: TMenuItem; MenuName:string);
+procedure TfrmShortcutsEditor.AddShortcut(M: TMenuItem; MenuName:AnsiString);
 begin
   If (M.Action<>nil) and (LeftStr(M.Action.Name,6)='dynact') then
     Exit;
@@ -98,7 +98,7 @@ end;
 procedure TfrmShortcutsEditor.lvShortcutsKeyDown(Sender: TObject;var Key: Word; Shift: TShiftState);
 var
   I: integer;
-  sct: string;
+  sct: AnsiString;
 begin
   if lvShortcuts.Selected = nil then
     Exit;
@@ -164,7 +164,7 @@ end;
 procedure TfrmShortcutsEditor.lvShortcutsExit(Sender: TObject);
 var
 	I: integer;
-	sct: string;
+	sct: AnsiString;
 	shift : TShiftState;
 	State : TKeyboardState;
 begin

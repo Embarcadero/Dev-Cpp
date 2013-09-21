@@ -682,7 +682,7 @@ object EditorOptForm: TEditorOptForm
           'Keyword'
           'Number'
           'Background'
-          'String'
+          'AnsiString'
           'Symbol'
           'WhiteSpace'
           'Directives')

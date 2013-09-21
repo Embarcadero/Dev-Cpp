@@ -41,28 +41,28 @@ const
 type
   TSetOfChars = set of Char;
 
-  TLogTokenEvent = procedure(Sender: TObject; const Msg: string) of object;
-  TProgressEvent = procedure(Sender: TObject; const FileName: string; Total, Current: integer) of object;
+  TLogTokenEvent = procedure(Sender: TObject; const Msg: AnsiString) of object;
+  TProgressEvent = procedure(Sender: TObject; const FileName: AnsiString; Total, Current: integer) of object;
 
   PToken = ^TToken;
   TToken = record
-    Text: string[255];
+    Text: string;
     Line: integer;
   end;
 
   TCppTokenizer = class(TComponent)
   private
-    pStart: PChar;
-    pCurrent: PChar;
-    pLineCount: PChar;
+    pStart: PAnsiChar;
+    pCurrent: PAnsiChar;
+    pLineCount: PAnsiChar;
     fEnd: integer;
     fCurrLine: integer;
     fTokenList: TList;
     fLogTokens: boolean;
     fOnLogToken: TLogTokenEvent;
     fOnProgress: TProgressEvent;
-    fTmpOutput: PChar;
-    procedure AddToken(sText: string; iLine: integer);
+    fTmpOutput: PAnsiChar;
+    procedure AddToken(sText: AnsiString; iLine: integer);
     procedure CountLines;
     procedure MatchChar(C: Char);
     procedure SkipCStyleComment;
@@ -73,26 +73,26 @@ type
     procedure SkipSingleQuote;
     procedure SkipPair(cStart, cEnd: Char);
     procedure SkipAssignment;
-    function GetNumber: string;
-    function GetWord(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): string;
-    function GetPreprocessor: string;
-    function GetArguments: string;
+    function GetNumber: AnsiString;
+    function GetWord(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): AnsiString;
+    function GetPreprocessor: AnsiString;
+    function GetArguments: AnsiString;
     function IsWord: boolean;
     function IsNumber: boolean;
     function IsPreprocessor: boolean;
     function IsArguments: boolean;
-    function GetNextToken(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): string;
-    function Simplify(Str: string): string;
-    procedure PostProcessToken(var Str: string);
+    function GetNextToken(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): AnsiString;
+    function Simplify(Str: AnsiString): AnsiString;
+    procedure PostProcessToken(var Str: AnsiString);
     procedure Advance(bPerformChecks: boolean = True);
-    function OpenFile(FileName: string): boolean;
+    function OpenFile(FileName: AnsiString): boolean;
     function OpenStream(Stream: TStream): boolean;
     procedure ReleaseFileMemory;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Reset;
-    procedure Tokenize(StartAt: PChar); overload;
+    procedure Tokenize(StartAt: PAnsiChar); overload;
     procedure Tokenize(FileName: TFilename); overload;
     procedure Tokenize(Stream: TStream); overload;
   published
@@ -135,7 +135,7 @@ begin
   end;
 end;
 
-function TCppTokenizer.OpenFile(FileName: string): boolean;
+function TCppTokenizer.OpenFile(FileName: AnsiString): boolean;
 var
   hFile: integer;
   iLength, iRead: integer;
@@ -189,7 +189,7 @@ begin
   end;
 end;
 
-procedure TCppTokenizer.AddToken(sText: string; iLine: integer);
+procedure TCppTokenizer.AddToken(sText: AnsiString; iLine: integer);
 var
   Token: PToken;
 begin
@@ -293,7 +293,7 @@ begin
       Break;
     case pCurrent^ of
       '"': if cStart <> '''' then
-          SkipDoubleQuotes; // don't do it inside string!
+          SkipDoubleQuotes; // don't do it inside AnsiString!
       '''': SkipSingleQuote;
       '/': if (pCurrent + 1)^ = '/' then
           SkipToEOL
@@ -345,9 +345,9 @@ begin
     end;
 end;
 
-function TCppTokenizer.GetNumber: string;
+function TCppTokenizer.GetNumber: AnsiString;
 var
-  Offset: PChar;
+  Offset: PAnsiChar;
 begin
   fTmpOutput^ := #0;
   Offset := pCurrent;
@@ -366,14 +366,14 @@ begin
     Result := '';
 end;
 
-function TCppTokenizer.GetWord(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): string;
+function TCppTokenizer.GetWord(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): AnsiString;
 var
-  Offset: PChar;
-  Backup: PChar;
+  Offset: PAnsiChar;
+  Backup: PAnsiChar;
   tmp: integer;
   Done: boolean;
-  AssignPos: PChar;
-  localOutput: PChar;
+  AssignPos: PAnsiChar;
+  localOutput: PAnsiChar;
 begin
   localOutput := StrAlloc(MAX_TOKEN_SIZE);
   localOutput^ := #0;
@@ -470,7 +470,7 @@ begin
     else if (pCurrent^ = ':') and ((pCurrent + 1)^ = ':') then begin // keep '::'
       StrLCat(StrEnd(localOutput), pCurrent, 2);
       Inc(pCurrent, 2); // there are 2 ':'!
-      StrCat(localOutput, PChar(GetWord(bSkipParenthesis, bSkipArray, bSkipBlock)));
+      StrCat(localOutput, PAnsiChar(GetWord(bSkipParenthesis, bSkipArray, bSkipBlock)));
     end;
     Result := StrPas(localOutput);
   end
@@ -479,9 +479,9 @@ begin
   StrDispose(localOutput);
 end;
 
-function TCppTokenizer.GetPreprocessor: string;
+function TCppTokenizer.GetPreprocessor: AnsiString;
 var
-  Offset: PChar;
+  Offset: PAnsiChar;
 begin
   Offset := pCurrent;
   SkipToEOL;
@@ -490,9 +490,9 @@ begin
   Result := StrPas(fTmpOutput);
 end;
 
-function TCppTokenizer.GetArguments: string;
+function TCppTokenizer.GetArguments: AnsiString;
 var
-  Offset: PChar;
+  Offset: PAnsiChar;
 begin
   fTmpOutput^ := #0;
   Result := '';
@@ -528,7 +528,7 @@ begin
   Result := pCurrent^ = '(';
 end;
 
-function TCppTokenizer.GetNextToken(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): string;
+function TCppTokenizer.GetNextToken(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): AnsiString;
 var
   Done: boolean;
 begin
@@ -580,7 +580,7 @@ begin
   until Done;
 end;
 
-function TCppTokenizer.Simplify(Str: string): string;
+function TCppTokenizer.Simplify(Str: AnsiString): AnsiString;
 var
 	I: integer;
 	len: integer;
@@ -629,7 +629,7 @@ begin
   Result := StrPas(fTmpOutput);
 end;
 
-procedure TCppTokenizer.PostProcessToken(var Str: string);
+procedure TCppTokenizer.PostProcessToken(var Str: AnsiString);
 begin
   Str := StringReplace(Str, '\'#13, '', [rfReplaceAll]);
   Str := StringReplace(Str, '\'#10, '', [rfReplaceAll]);
@@ -638,11 +638,11 @@ begin
   Str := Simplify(Str);
 end;
 
-procedure TCppTokenizer.Tokenize(StartAt: PChar);
+procedure TCppTokenizer.Tokenize(StartAt: PAnsiChar);
 var
-  S: string;
-  LastToken: string;
-  Command: string;
+  S: AnsiString;
+  LastToken: AnsiString;
+  Command: AnsiString;
   bSkipBlocks: boolean;
   I: integer;
 begin

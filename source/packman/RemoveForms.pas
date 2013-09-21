@@ -34,9 +34,9 @@ type
     { Private declarations }
   public
     Abort: Boolean;
-    Entry: String;
+    Entry: AnsiString;
     CloseWhenDone: Boolean;
-    ReqVersion: String;
+    ReqVersion: AnsiString;
   end;
 
 var
@@ -49,12 +49,12 @@ uses
 
 {$R *.dfm}
 
-procedure RemoveDirsRec(dir: String);
+procedure RemoveDirsRec(dir: AnsiString);
 //this file removes all empty directories up to the root of dev-c++
 //for example if files are installed only in c:\dev-cpp\a\b\c\*.*
 //it will attempt to delete c, b, a if not empty
 var
-  strDevRoot: String;
+  strDevRoot: AnsiString;
   tempDirs: TStrings;
   i: Integer;
 begin
@@ -103,7 +103,7 @@ var
   Ini: TIniFile;
   Files, Dirs: TStringList;
   i, IMod: Integer;
-  currdir: String;
+  currdir: AnsiString;
 begin
   Timer1.Enabled := False;
   Abort := False;

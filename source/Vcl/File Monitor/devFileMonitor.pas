@@ -38,7 +38,6 @@ type
     fMonitor: TdevMonitorThread;
     fFiles: TStrings;
     fNotifyChange: TdevMonitorChange;
-  //  procedure MonitorTerminated(Sender: TObject);
     function GetActive: boolean;
     procedure SetActive(const Value: boolean);
     procedure SetFiles(const Value: TStrings);
@@ -52,7 +51,6 @@ type
     procedure Deactivate;
     procedure Refresh(ActivateIfNot: boolean);
     procedure SubClassWndProc(var Message: TMessage);
-//    procedure Notify(ChangeType: TdevMonitorChangeType; Filename: string);
   published
     { Published declarations }
     property Active: boolean read GetActive write SetActive;
@@ -71,8 +69,8 @@ begin
     if Assigned(fNotifyChange) then
     begin
       fNotifyChange(Self, TDevMonitorChangeType(Message.WParam),
-        PChar(Message.LParam));
-      StrDispose(PChar(Message.LParam));
+        PAnsiChar(Message.LParam));
+      StrDispose(PAnsiChar(Message.LParam));
     end;
   end
   else
@@ -83,7 +81,6 @@ procedure TdevFileMonitor.Activate;
 begin
   if not Active then begin
     fMonitor := TdevMonitorThread.Create(Self, fFiles);
-//    fMonitor.OnTerminate := MonitorTerminated;
     fMonitor.Resume;
   end;
 end;
@@ -117,20 +114,6 @@ function TdevFileMonitor.GetActive: boolean;
 begin
   Result := Assigned(fMonitor);
 end;
-
-//procedure TdevFileMonitor.MonitorTerminated(Sender: TObject);
-//begin
-//  fMonitor := nil;
-//end;
-
-{
-procedure TdevFileMonitor.Notify(ChangeType: TdevMonitorChangeType;
-  Filename: string);
-begin
-  if Assigned(fNotifyChange) then
-    fNotifyChange(Self, ChangeType, Filename);
-end;
-}
 
 procedure TdevFileMonitor.Refresh(ActivateIfNot: boolean);
 begin

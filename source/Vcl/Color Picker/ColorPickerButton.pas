@@ -56,7 +56,7 @@ type
 
   TIndicatorBorder = (ibNone, ibFlat, ibSunken, ibRaised);
 
-  THintEvent = procedure(Sender: TObject; Cell: Integer; var Hint: String) of object;
+  THintEvent = procedure(Sender: TObject; Cell: Integer; var Hint: AnsiString) of object;
   TDropChangingEvent = procedure(Sender: TObject; var Allowed: Boolean) of object;
 
   TColorPickerButton = class(TGraphicControl)
@@ -120,10 +120,10 @@ type
     procedure SetDroppedDown(const Value: Boolean);
     procedure SetSelectionColor(const Value: TColor);
     procedure PopupWndProc(var Msg: TMessage);
-    function GetCustomText: String;
-    procedure SetCustomText(const Value: String);
-    function GetDefaultText: String;
-    procedure SetDefaultText(const Value: String);
+    function GetCustomText: AnsiString;
+    procedure SetCustomText(const Value: AnsiString);
+    function GetDefaultText: AnsiString;
+    procedure SetDefaultText(const Value: AnsiString);
     procedure SetShowSystemColors(const Value: Boolean);
     function GetShowSystemColors: Boolean;
     procedure SetTransparent(const Value: Boolean);
@@ -153,8 +153,8 @@ type
     property BiDiMode;
     property Caption;
     property Constraints;
-    property CustomText: String read GetCustomText write SetCustomText;
-    property DefaultText: String read GetDefaultText write SetDefaultText;
+    property CustomText: AnsiString read GetCustomText write SetCustomText;
+    property DefaultText: AnsiString read GetDefaultText write SetDefaultText;
     property Down: Boolean read FDown write SetDown default False;
     property DropDownArrowColor: TColor read FDropDownArrowColor write SetDropDownArrowColor default clBlack;
     property DropDownWidth: integer read FDropDownWidth write SetDropDownWidth default 15;
@@ -207,7 +207,7 @@ const
 
 type
  TColorEntry = record
-  Name: PChar;
+  Name: PAnsiChar;
   case Boolean of
    True: (R, G, B, reserved: Byte);
    False: (Color: COLORREF);
@@ -333,10 +333,10 @@ type
     function CreateButtonGlyph(State: TButtonState): Integer;
     procedure DrawButtonGlyph(Canvas: TCanvas; const GlyphPos: TPoint;
       State: TButtonState; Transparent: Boolean);
-    procedure DrawButtonText(Canvas: TCanvas; const Caption: string;
+    procedure DrawButtonText(Canvas: TCanvas; const Caption: AnsiString;
       TextBounds: TRect; State: TButtonState; BiDiFlags: Longint);
     procedure CalcButtonLayout(Canvas: TCanvas; const Client: TRect;
-      const Offset: TPoint; const Caption: string; Layout: TButtonLayout;
+      const Offset: TPoint; const Caption: AnsiString; Layout: TButtonLayout;
       Margin, Spacing: Integer; var GlyphPos: TPoint; var TextBounds: TRect;
       const DropDownWidth: Integer; BiDiFlags: Longint);
   public
@@ -344,7 +344,7 @@ type
     destructor Destroy; override;
 
     function Draw(Canvas: TCanvas; const Client: TRect; const Offset: TPoint;
-      const Caption: string; Layout: TButtonLayout; Margin, Spacing: Integer;
+      const Caption: AnsiString; Layout: TButtonLayout; Margin, Spacing: Integer;
       State: TButtonState; Transparent: Boolean;
       const DropDownWidth: Integer; BiDiFlags: Longint): TRect;
 
@@ -373,7 +373,7 @@ type
   TColorPopup = class(TWinControl)
   private
     FDefaultText,
-    FCustomText: String;
+    FCustomText: AnsiString;
     FCurrentColor: TCOlor;
     FCanvas: TCanvas;
     FMargin,
@@ -439,7 +439,7 @@ type
     function HandleSlider(const Message: TWMMouse): Boolean;
     function PtInComb(Comb: TCombEntry; P: TPoint; Scale: Integer): Boolean;
     procedure HandleCustomColors(var Message: TWMMouse);
-    function GetHint(Cell: Integer): String;
+    function GetHint(Cell: Integer): AnsiString;
     function FindBWArea(X, Y: Integer): Integer;
     function FindColorArea(X, Y: Integer): Integer;
     procedure DrawSeparator(Left, Top, Right: Integer);
@@ -835,7 +835,7 @@ end;
 
 //-----------------------------------------------------------------------------
 
-procedure TButtonGlyph.DrawButtonText(Canvas: TCanvas; const Caption: string;
+procedure TButtonGlyph.DrawButtonText(Canvas: TCanvas; const Caption: AnsiString;
                                       TextBounds: TRect; State: TButtonState;
                                       BiDiFlags: Longint);
 
@@ -847,20 +847,20 @@ begin
     begin
       OffsetRect(TextBounds, 1, 1);
       Font.Color := clBtnHighlight;
-      DrawText(Handle, PChar(Caption), Length(Caption), TextBounds, DT_CENTER or DT_VCENTER or BiDiFlags);
+      DrawText(Handle, PAnsiChar(Caption), Length(Caption), TextBounds, DT_CENTER or DT_VCENTER or BiDiFlags);
       OffsetRect(TextBounds, -1, -1);
       Font.Color := clBtnShadow;
-      DrawText(Handle, PChar(Caption), Length(Caption), TextBounds, DT_CENTER or DT_VCENTER or BiDiFlags);
+      DrawText(Handle, PAnsiChar(Caption), Length(Caption), TextBounds, DT_CENTER or DT_VCENTER or BiDiFlags);
     end
     else
-      DrawText(Handle, PChar(Caption), Length(Caption), TextBounds, DT_CENTER or DT_VCENTER or BiDiFlags);
+      DrawText(Handle, PAnsiChar(Caption), Length(Caption), TextBounds, DT_CENTER or DT_VCENTER or BiDiFlags);
   end;
 end;
 
 //-----------------------------------------------------------------------------
 
 procedure TButtonGlyph.CalcButtonLayout(Canvas: TCanvas; const Client: TRect;
-            const Offset: TPoint; const Caption: string; Layout: TButtonLayout; Margin,
+            const Offset: TPoint; const Caption: AnsiString; Layout: TButtonLayout; Margin,
             Spacing: Integer; var GlyphPos: TPoint; var TextBounds: TRect;
             const DropDownWidth: Integer; BiDiFlags: Longint);
 
@@ -885,7 +885,7 @@ begin
   if Length(Caption) > 0 then
   begin
     TextBounds := Rect(0, 0, Client.Right - Client.Left, 0);
-    DrawText(Canvas.Handle, PChar(Caption), Length(Caption), TextBounds, DT_CALCRECT or BiDiFlags);
+    DrawText(Canvas.Handle, PAnsiChar(Caption), Length(Caption), TextBounds, DT_CALCRECT or BiDiFlags);
     TextSize := Point(TextBounds.Right - TextBounds.Left, TextBounds.Bottom - TextBounds.Top);
   end
   else
@@ -973,7 +973,7 @@ end;
 //-----------------------------------------------------------------------------
 
 function TButtonGlyph.Draw(Canvas: TCanvas; const Client: TRect;
-           const Offset: TPoint; const Caption: string; Layout: TButtonLayout;
+           const Offset: TPoint; const Caption: AnsiString; Layout: TButtonLayout;
            Margin, Spacing: Integer; State: TButtonState; Transparent: Boolean;
            const DropDownWidth: Integer; BiDiFlags: Longint): TRect;
 
@@ -1393,7 +1393,7 @@ begin
       if FHoverIndex = Index then DrawEdge(FCanvas.Handle, R, BDR_RAISEDINNER, BF_RECT);
 
     // draw custom text
-    DrawText(FCanvas.Handle, PChar(FCustomText), Length(FCustomText), R, DT_CENTER or DT_VCENTER or DT_SINGLELINE);
+    DrawText(FCanvas.Handle, PAnsiChar(FCustomText), Length(FCustomText), R, DT_CENTER or DT_VCENTER or DT_SINGLELINE);
 
     // draw preview color rectangle
     if FCustomIndex = 0 then
@@ -1444,7 +1444,7 @@ begin
 
       // draw default text
       SetBkMode(FCanvas.Handle, TRANSPARENT);
-      DrawText(FCanvas.Handle, PChar(FDefaultText), Length(FDefaultText), R, DT_CENTER or DT_VCENTER or DT_SINGLELINE);
+      DrawText(FCanvas.Handle, PAnsiChar(FDefaultText), Length(FDefaultText), R, DT_CENTER or DT_VCENTER or DT_SINGLELINE);
     end
     else
     begin
@@ -2645,7 +2645,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-function TColorPopup.GetHint(Cell: Integer): String;
+function TColorPopup.GetHint(Cell: Integer): AnsiString;
 
 begin
   Result := '';
@@ -2682,7 +2682,7 @@ begin
         end
         else
           // both special cells get their hint either from the application by
-          // means of the OnHint event or the hint string of the owner control
+          // means of the OnHint event or the hint AnsiString of the owner control
           if (FHoverIndex = DefaultCell) or
              (FHoverIndex = CustomCell) then
           begin
@@ -3561,7 +3561,7 @@ end;
 
 //-----------------------------------------------------------------------------
 
-function TColorPickerButton.GetCustomText: String;
+function TColorPickerButton.GetCustomText: AnsiString;
 
 begin
   Result := TColorPopup(FColorPopup).FCustomText;
@@ -3569,7 +3569,7 @@ end;
 
 //-----------------------------------------------------------------------------
 
-procedure TColorPickerButton.SetCustomText(const Value: String);
+procedure TColorPickerButton.SetCustomText(const Value: AnsiString);
 
 begin
   with TColorPopup(FColorPopup) do
@@ -3590,7 +3590,7 @@ end;
 
 //-----------------------------------------------------------------------------
 
-function TColorPickerButton.GetDefaultText: String;
+function TColorPickerButton.GetDefaultText: AnsiString;
 
 begin
   Result := TColorPopup(FColorPopup).FDefaultText;
@@ -3598,7 +3598,7 @@ end;
 
 //-----------------------------------------------------------------------------
 
-procedure TColorPickerButton.SetDefaultText(const Value: String);
+procedure TColorPickerButton.SetDefaultText(const Value: AnsiString);
 
 begin
   if TColorPopup(FColorPopup).FDefaultText <> Value then

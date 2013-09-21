@@ -31,7 +31,7 @@ type
     MissingFiles: TStringList;
     Abort: Boolean;
   public
-    Entry: String;
+    Entry: AnsiString;
   end;
 
 var

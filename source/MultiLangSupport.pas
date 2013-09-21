@@ -24,7 +24,7 @@
         through the Lang function the object is auto-created if need be
         and returned. works like devcfg.
  ToUse: The Strings prop is default so just call like Lang[ID_value];
-          - it works like a string list.
+          - it works like a AnsiString list.
 *)
 
 unit MultiLangSupport;
@@ -45,13 +45,13 @@ type
   TdevMultiLangSupport = class(TObject)
    private
     fLangList   : ToysStringList;
-    fLangFile   : string;
-    fCurLang    : string;
+    fLangFile   : AnsiString;
+    fCurLang    : AnsiString;
     fStrings    : TStringList;
     fDefaultLang: TStringList;
     fSelect     : boolean;
-    function GetString(ID: integer): string;
-    function GetLangName: string;
+    function GetString(ID: integer): AnsiString;
+    function GetLangName: AnsiString;
     constructor Create;
    public
     destructor Destroy; override;
@@ -60,13 +60,13 @@ type
     procedure CheckLanguageFiles;
     procedure SelectLanguage;
 
-    function Open(const FileName: string): boolean;
-    procedure SetLang(const Lang: string);
+    function Open(const FileName: AnsiString): boolean;
+    procedure SetLang(const Lang: AnsiString);
 
-    function FileFromDescription(Desc: string): string;
+    function FileFromDescription(Desc: AnsiString): AnsiString;
 
-    property Strings[index: integer]: string read GetString; default;//write SetString;
-    property CurrentLanguage: string read GetLangName;
+    property Strings[index: integer]: AnsiString read GetString; default;//write SetString;
+    property CurrentLanguage: AnsiString read GetLangName;
     property Langs: ToysStringList read fLangList write fLangList;
   end;
 
@@ -139,9 +139,9 @@ begin
   inherited;
 end;
 
-function TdevMultiLangSupport.Open(const Filename : string): boolean;
+function TdevMultiLangSupport.Open(const Filename : AnsiString): boolean;
 var
-	s,aFile: string;
+	s,aFile: AnsiString;
 	ver: Integer;
 	NewStrs: TStringList;
 begin
@@ -189,7 +189,7 @@ end;
 procedure TdevMultiLangSupport.CheckLanguageFiles;
 var
  idx: integer;
- s: string;
+ s: AnsiString;
  tmp: TStringList;
 begin
   fLangList.Clear;
@@ -223,7 +223,7 @@ begin
      fCurLang:=devData.Language;
 end;
 
-function TdevMultiLangSupport.GetString(ID : integer) : string;
+function TdevMultiLangSupport.GetString(ID : integer) : AnsiString;
 begin
 	result:= fStrings.Values[inttostr(ID)];
 	if Result = '' then begin
@@ -235,7 +235,7 @@ begin
 		result:=StringReplace(result, '<CR>', #13#10, [rfReplaceAll]);
 end;
 
-function TdevMultiLangSupport.GetLangName: string;
+function TdevMultiLangSupport.GetLangName: AnsiString;
 begin
   result:= fCurLang;
 end;
@@ -268,19 +268,19 @@ begin
    end;
 end;
 
-procedure TdevMultiLangSupport.SetLang(const Lang: string);
+procedure TdevMultiLangSupport.SetLang(const Lang: AnsiString);
 var
  idx: integer;
 begin
   if Lang = fCurLang then exit;
   for idx := 0 to fLangList.Count - 1 do
-    if AnsiSameText(ExtractFileName(fLangList.Names[idx]), Lang) then begin
+    if SameText(ExtractFileName(fLangList.Names[idx]), Lang) then begin
       Open(fLangList.Names[idx]);
       break;
     end;
 end;
 
-function TdevMultiLangSupport.FileFromDescription(Desc: string): string;
+function TdevMultiLangSupport.FileFromDescription(Desc: AnsiString): AnsiString;
 var
   idx: integer;
 begin

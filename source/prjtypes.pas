@@ -46,15 +46,15 @@ type
   Build: integer;
   LanguageID: integer;
   CharsetID: integer;
-  CompanyName: string;
-  FileVersion: string;
-  FileDescription: string;
-  InternalName: string;
-  LegalCopyright: string;
-  LegalTrademarks: string;
-  OriginalFilename: string;
-  ProductName: string;
-  ProductVersion: string;
+  CompanyName: AnsiString;
+  FileVersion: AnsiString;
+  FileDescription: AnsiString;
+  InternalName: AnsiString;
+  LegalCopyright: AnsiString;
+  LegalTrademarks: AnsiString;
+  OriginalFilename: AnsiString;
+  ProductName: AnsiString;
+  ProductVersion: AnsiString;
   AutoIncBuildNr: boolean;
   SyncProduct: boolean;
  end;
@@ -65,33 +65,33 @@ type
    Objfiles: TStrings;
 
    cmdLines: record
-     Compiler: string;
-     CppCompiler: string;
-     Linker: string;
+     Compiler: AnsiString;
+     CppCompiler: AnsiString;
+     Linker: AnsiString;
    end;
 
    Includes: TStrings;
    Libs: TStrings;
-   PrivateResource: String; // Dev-C++ will overwrite this file
+   PrivateResource: AnsiString; // Dev-C++ will overwrite this file
    ResourceIncludes: TStringList;
    MakeIncludes: TStringList;
    useGPP: boolean;
-   Icon: string;
+   Icon: AnsiString;
 
-   ExeOutput: String;
-   ObjectOutput: String;
-   LogOutput: String;
+   ExeOutput: AnsiString;
+   ObjectOutput: AnsiString;
+   LogOutput: AnsiString;
    LogOutputEnabled : boolean;
 
    OverrideOutput: boolean;
-   OverridenOutput: string;
+   OverridenOutput: AnsiString;
 
-   HostApplication : string;
+   HostApplication : AnsiString;
 
    IncludeVersionInfo: boolean;
    SupportXPThemes: boolean;
    CompilerSet: integer;
-   CompilerOptions: string;
+   CompilerOptions: AnsiString;
    VersionInfo: TProjVersionInfo;
  end;
 

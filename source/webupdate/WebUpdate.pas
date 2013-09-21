@@ -212,7 +212,7 @@ begin
         ForceDirectories(ExtractFilePath(Application.ExeName) + PACKAGES_DIR); // Create <devcpp>\Packages
         DeleteFile(PackFileName);
         //Win9x does not support MoveFileEx
-        if MoveFile(PChar(PUpdateRec(wThread.Files[I])^.TempFilename), PChar(PackFileName)) = BOOL(False) then
+        if MoveFile(PAnsiChar(PUpdateRec(wThread.Files[I])^.TempFilename), PAnsiChar(PackFileName)) = BOOL(False) then
         begin
           MessageDlg('Could not move file: ' + PUpdateRec(wThread.Files[I])^.TempFilename +
           ' to ' + PackFileName + #13#10 + SysErrorMessage(GetLastError), mtWarning, [mbOK], 0);
@@ -226,9 +226,9 @@ begin
             dwFlags := STARTF_USESHOWWINDOW;
             wShowWindow := SW_SHOW;
           end;
-          if CreateProcess(nil, PChar(ExtractFilePath(Application.ExeName) + PACKMAN_PROGRAM
+          if CreateProcess(nil, PAnsiChar(ExtractFilePath(Application.ExeName) + PACKMAN_PROGRAM
             + ' /auto "' + PackFileName + '"'), nil, nil, False, NORMAL_PRIORITY_CLASS,
-            nil, PChar(ExtractFilePath(Application.ExeName)),
+            nil, PAnsiChar(ExtractFilePath(Application.ExeName)),
             PackStartupInfo, PackProcessInfo) then begin
               PackProcess := PackProcessInfo.hProcess;
               while WaitforSingleObject(PackProcess, 250) <> WAIT_OBJECT_0 do
@@ -250,7 +250,7 @@ begin
       else begin
         Dest := {BasePath + } ReplaceMacros(PUpdateRec(wThread.Files[I])^.InstallPath + '\' + PUpdateRec(wThread.Files[I])^.LocalFilename);
         ForceDirectories(ExtractFilePath(Dest));
-        if CopyFile(PChar(PUpdateRec(wThread.Files[I])^.TempFilename), PChar(Dest), False) then begin
+        if CopyFile(PAnsiChar(PUpdateRec(wThread.Files[I])^.TempFilename), PAnsiChar(Dest), False) then begin
           DeleteFile(PUpdateRec(wThread.Files[I])^.TempFilename);
           WriteInstalled(I, False);
         end
@@ -308,7 +308,7 @@ var
   PackmanPacks: TStrings;
   P: PUpdateRec;
 
-  procedure AddGroups(text: String);
+  procedure AddGroups(text: string);
   //group text maybe one group or maybe groups separated by comma
   var
     tempSL: TStrings;
@@ -339,7 +339,7 @@ var
   var
     tempFiles: TStringList;
     tempIni: TIniFile;
-    packName, packVersion: String;
+    packName, packVersion: string;
     i: Integer;
   begin
     if List = nil then Exit;
@@ -369,7 +369,7 @@ var
     tempFiles.Free;
   end;
 
-  function GetPackmanPackVersion(List: TStrings; AppName: String): String;
+  function GetPackmanPackVersion(List: TStrings; AppName: string): string;
   //returns AppVersion string, based on given AppName and provided
   //list of Packages as returned by ReadPackmanPackages
   var
@@ -463,7 +463,7 @@ procedure TWebUpdateForm.FillList(Filter: string);
 var
   I: integer;
 
-  function isInGroup(group, filter: String): Boolean;
+  function isInGroup(group, filter: string): Boolean;
   //group may be actual list of groups separated by commas
   var
     j: Integer;
@@ -648,12 +648,12 @@ begin
   if fSelfUpdate = '' then
     Exit;
   try
-    CopyFile(PChar(Application.ExeName), PChar(ChangeFileExt(Application.ExeName, '.exe.BACKUP')), False);
+    CopyFile(PAnsiChar(Application.ExeName), PAnsiChar(ChangeFileExt(Application.ExeName, '.exe.BACKUP')), False);
   except
     MessageDlg('Could not make a backup of devcpp.exe, please verify from your system administrator that you have enough permissions to update Dev-C++.', mtWarning, [mbOK], 0);
     Exit;
   end;
-  CopyFile(PChar(fSelfUpdate), PChar(ChangeFileExt(Application.ExeName, '.Update')), False);
+  CopyFile(PAnsiChar(fSelfUpdate), PAnsiChar(ChangeFileExt(Application.ExeName, '.Update')), False);
   DeleteFile(fSelfUpdate);
   fSelfUpdate := ChangeFileExt(Application.ExeName, '.Update');
   ErrMsg := 'Update failed...'#10 +
@@ -667,8 +667,8 @@ begin
     Application.ProcessMessages;
     ShellExecute(0,
       'open',
-      PChar(TempFile),
-      PChar(fSelfUpdate + ' ' + Application.ExeName + ' "Self Updating" "Self-updated succesfully!" "' + ErrMsg + '"'),
+      PAnsiChar(TempFile),
+      PAnsiChar(fSelfUpdate + ' ' + Application.ExeName + ' "Self Updating" "Self-updated succesfully!" "' + ErrMsg + '"'),
       nil,
       SW_HIDE);
   finally
@@ -711,7 +711,7 @@ end;
 procedure TWebUpdateForm.cmbMirrorsChange(Sender: TObject);
 var
   lastSelMirror: Integer;
-  lastMirrorList: String;
+  lastMirrorList: string;
   tmpAction: TCloseAction;
 begin
   with cmbMirrors do
@@ -807,9 +807,9 @@ procedure TWebUpdateForm.lvCompare(Sender: TObject; Item1,
   Item2: TListItem; Data: Integer; var Compare: Integer);
 var
   i: Integer;
-  text1, text2, tempText: String;
+  text1, text2, tempText: string;
 
-  function getSizeInBytes(TheItem: TListItem): String;
+  function getSizeInBytes(TheItem: TListItem): string;
   var
     i: Integer;
   begin
@@ -902,7 +902,7 @@ var
   devcppversion,
   packmanversion,
   devcppversion2,
-  packmanversion2: String;
+  packmanversion2: string;
 begin
 //this procedure checks versions of installed components
 //that are not handled by packman:

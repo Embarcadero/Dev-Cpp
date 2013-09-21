@@ -13,40 +13,40 @@ uses
 type
   TIconFile = Class
   public
-    FileName: String;
-    Target: String;
-    Icon: String;
+    FileName: AnsiString;
+    Target: AnsiString;
+    Icon: AnsiString;
   end;
 
   TInstallFile = Class
   public
-    Source: String;
-    Dest: String;
+    Source: AnsiString;
+    Dest: AnsiString;
   end;
 
   TInstallFiles = class
   private
-    FAppDir: String;
+    FAppDir: AnsiString;
     FCount: Integer;
     FIconCount: Integer;
     List, IconList: TList;
-    FInfoFile: String;
-    FMenuName: String;
+    FInfoFile: AnsiString;
+    FMenuName: AnsiString;
     function GetFiles(IIndex: Integer): TInstallFile;
     function GetIcons(IIndex: Integer): TIconFile;
-    procedure SetAppDir(Dir: String);
+    procedure SetAppDir(Dir: AnsiString);
   protected
     procedure Clear;
-    procedure ApplyConstants(var Str: String);
-    function ParseLine(Line: String; var Src, Dest, Flags: String): Boolean;
+    procedure ApplyConstants(var Str: AnsiString);
+    function ParseLine(Line: AnsiString; var Src, Dest, Flags: AnsiString): Boolean;
   public
-    constructor Create(InfoFile: String; AppDir: String; MenuName: String);
+    constructor Create(InfoFile: AnsiString; AppDir: AnsiString; MenuName: AnsiString);
     destructor Destroy; override;
     procedure Parse;
 
-    property InfoFile: String read FInfoFile;
+    property InfoFile: AnsiString read FInfoFile;
 
-    property AppDir: String read FAppDir write SetAppDir;
+    property AppDir: AnsiString read FAppDir write SetAppDir;
     property Count: Integer read FCount;
     property IconCount: Integer read FIconCount;
     property Files[IIndex: Integer]: TInstallFile read GetFiles;
@@ -55,41 +55,41 @@ type
 
   TInstallInfo = Class
   private
-    FFileName: String;
-    FAppName: String;
-    FAppVerName: String;
-    FAppVersion: String;
+    FFileName: AnsiString;
+    FAppName: AnsiString;
+    FAppVerName: AnsiString;
+    FAppVersion: AnsiString;
     FDependencies: TStringList;
-    FDescription: String;
-    FLicense: String;
-    FLicenseFile: String;
-    FMenuName: String;
-    FReadme: String;
-    FReadmeFile: String;
+    FDescription: AnsiString;
+    FLicense: AnsiString;
+    FLicenseFile: AnsiString;
+    FMenuName: AnsiString;
+    FReadme: AnsiString;
+    FReadmeFile: AnsiString;
     FReboot: Boolean;
     FFiles: TInstallFiles;
-    FURL: String;
+    FURL: AnsiString;
     FVersion: Integer;
   public
-    constructor Create(AFileName: String);
+    constructor Create(AFileName: AnsiString);
     destructor Destroy; override;
     function Parse: Boolean;
 
-    function Files(AppDir: String): TInstallFiles;
-    property FileName: String read FFileName;
+    function Files(AppDir: AnsiString): TInstallFiles;
+    property FileName: AnsiString read FFileName;
 
-    property AppName: String read FAppName;
-    property AppVerName: String read FAppVerName;
-    property AppVersion: String read FAppVersion;
+    property AppName: AnsiString read FAppName;
+    property AppVerName: AnsiString read FAppVerName;
+    property AppVersion: AnsiString read FAppVersion;
     property Dependencies: TStringList read FDependencies;
-    property Description: String read FDescription;
-    property License: String read FLicense;
-    property LicenseFile: String read FLicenseFile;
-    property MenuName: String read FMenuName;
-    property Readme: String read FReadme;
-    property ReadmeFile: String read FReadmeFile;
+    property Description: AnsiString read FDescription;
+    property License: AnsiString read FLicense;
+    property LicenseFile: AnsiString read FLicenseFile;
+    property MenuName: AnsiString read FMenuName;
+    property Readme: AnsiString read FReadme;
+    property ReadmeFile: AnsiString read FReadmeFile;
     property Reboot: Boolean read FReboot;
-    property URL: String read FURL;
+    property URL: AnsiString read FURL;
     property Version: Integer read FVersion;
   end;
 
@@ -98,7 +98,7 @@ const
 
 implementation
 
-constructor TInstallInfo.Create(AFileName: String);
+constructor TInstallInfo.Create(AFileName: AnsiString);
 begin
   inherited Create;
   FFileName := AFileName;
@@ -119,17 +119,17 @@ function TInstallInfo.Parse: Boolean;
 var
   Ini: TIniFile;
   StrList: TStringList;
-  BaseName: String;
+  BaseName: AnsiString;
 begin
   Result := False;
 
   Ini := TIniFile.Create(FFileName);
   FAppName := Ini.ReadString('Setup', 'AppName', 'ThIsNaMeDoEsNoTeXiStS-6.1GoLd');
   // this may not be a ini file...
-  if AnsiCompareStr(FAppName, 'ThIsNaMeDoEsNoTeXiStS-6.1GoLd') = 0 then
+  if CompareStr(FAppName, 'ThIsNaMeDoEsNoTeXiStS-6.1GoLd') = 0 then
   begin
       FAppName := Ini.ReadString('Setup', 'AppName', 'ThIsIsNoTaNiNi');
-      if AnsiCompareStr(FAppName, 'ThIsIsNoTaNiNi') = 0 then
+      if CompareStr(FAppName, 'ThIsIsNoTaNiNi') = 0 then
           Exit;
   end;
 
@@ -171,7 +171,7 @@ begin
   Result := True;
 end;
 
-function TInstallInfo.Files(AppDir: String): TInstallFiles;
+function TInstallInfo.Files(AppDir: AnsiString): TInstallFiles;
 begin
   if not Assigned(FFiles) then
       FFiles := TInstallFiles.Create(FFileName, AppDir, MenuName)
@@ -181,7 +181,7 @@ begin
   Result := FFiles;
 end;
 
-constructor TInstallFiles.Create(InfoFile: String; AppDir: String; MenuName: String);
+constructor TInstallFiles.Create(InfoFile: AnsiString; AppDir: AnsiString; MenuName: AnsiString);
 begin
   inherited Create;
   List := TList.Create;
@@ -215,7 +215,7 @@ begin
   Result := TheIcon;
 end;
 
-procedure TInstallFiles.SetAppDir(Dir: String);
+procedure TInstallFiles.SetAppDir(Dir: AnsiString);
 begin
   FAppDir := Dir;
   Parse;
@@ -245,10 +245,10 @@ begin
   IconList.Clear;
 end;
 
-function TInstallFiles.ParseLine(Line: String; var Src, Dest,
-  Flags: String): Boolean;
+function TInstallFiles.ParseLine(Line: AnsiString; var Src, Dest,
+  Flags: AnsiString): Boolean;
 var
-  ALine: String;
+  ALine: AnsiString;
   Sep, Sep2: Integer;
 begin
   ALine := Line;
@@ -278,7 +278,7 @@ begin
   Result := True;
 end;
 
-procedure ReplaceAll(var Str: String; SFrom, STo: String);
+procedure ReplaceAll(var Str: AnsiString; SFrom, STo: AnsiString);
 var
   i: Integer;
 begin
@@ -292,7 +292,7 @@ begin
   end;
 end;
 
-procedure TInstallFiles.ApplyConstants(var Str: String);
+procedure TInstallFiles.ApplyConstants(var Str: AnsiString);
 var
   WinDir, SysDir: array[0..1024] of Char;
 begin
@@ -310,7 +310,7 @@ var
   FileSection, IconSection: TStringList;
   Icon: TIconFile;
   i, j: Integer;
-  OrgSrc, Src, Dest, Flags: String;
+  OrgSrc, Src, Dest, Flags: AnsiString;
   TheFile: TInstallFile;
   Files: TStringList;
 label

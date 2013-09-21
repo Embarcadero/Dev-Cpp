@@ -104,11 +104,11 @@ end;
 
 procedure TProfileAnalysisForm.DoFlat;
 var
-  Cmd: string;
-  Params: string;
-  Dir: string;
+  Cmd: AnsiString;
+  Params: AnsiString;
+  Dir: AnsiString;
   I,J: integer;
-  Line: string;
+  Line: AnsiString;
   Parsing: boolean;
   Done: boolean;
   BreakLine: integer;
@@ -166,8 +166,8 @@ begin
         Caption := Trim(Copy(Line, 55, Length(Line) - 54));
 
         // remove arguments - if exists
-        if AnsiPos('(', Caption) > 0 then
-          Data := MainForm.CppParser.Locate(Copy(Caption, 1, AnsiPos('(', Caption) - 1), True)
+        if Pos('(', Caption) > 0 then
+          Data := MainForm.CppParser.Locate(Copy(Caption, 1, Pos('(', Caption) - 1), True)
         else
           Data := MainForm.CppParser.Locate(Caption, True);
 
@@ -180,7 +180,7 @@ begin
         end;
       end;
     end else begin
-      Parsing := AnsiStartsText('%', Trim(Line));
+      Parsing := StartsText('%', Trim(Line));
       if Parsing then
         Inc(I); // skip over next line too
     end;
@@ -192,11 +192,11 @@ end;
 
 procedure TProfileAnalysisForm.DoGraph;
 var
-  Cmd: string;
-  Params: string;
-  Dir: string;
+  Cmd: AnsiString;
+  Params: AnsiString;
+  Dir: AnsiString;
   I,J: integer;
-  Line: string;
+  Line: AnsiString;
   Parsing: boolean;
   Done: boolean;
   BreakLine: integer;
@@ -250,13 +250,13 @@ begin
         Break;
       end;
 
-      if not AnsiStartsText('---', Line) then begin
+      if not StartsText('---', Line) then begin
         with lvGraph.Items.Add do begin
           Caption := Trim(Copy(Line, 46, Length(Line) - 45));
 
           // remove arguments - if exists
-          if AnsiPos('(', Caption) > 0 then
-            Data := MainForm.CppParser.Locate(Copy(Caption, 1, AnsiPos('(', Caption) - 1), True)
+          if Pos('(', Caption) > 0 then
+            Data := MainForm.CppParser.Locate(Copy(Caption, 1, Pos('(', Caption) - 1), True)
           else
             Data := MainForm.CppParser.Locate(Caption, True);
 
@@ -272,7 +272,7 @@ begin
         lvGraph.Items.Add;
     end
     else
-      Parsing := AnsiStartsText('index %', Trim(Line));
+      Parsing := StartsText('index %', Trim(Line));
     Inc(I);
   end;
   for I := 0 to BreakLine do
@@ -410,7 +410,7 @@ end;
 
 procedure TProfileAnalysisForm.commandUpdate(Sender: TObject);
 var
-	assembly : string;
+	assembly : AnsiString;
 begin
 	if not chkCustom.Checked then begin
 		if (devCompiler.gprofName <> '') then

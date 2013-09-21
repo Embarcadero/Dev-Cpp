@@ -84,8 +84,8 @@ procedure TfrmReplace.btnReplaceClick(Sender: TObject);
 begin
   if cboFindText.Text = '' then
    begin
-     {MessageBox(Application.MainForm.Handle, PChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),
-      PChar(Lang[ID_WARN]), MB_OK or MB_ICONWARNING);
+     {MessageBox(Application.MainForm.Handle, PAnsiChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),
+      PAnsiChar(Lang[ID_WARN]), MB_OK or MB_ICONWARNING);
      fClose:= False;}
    end
   else

@@ -127,7 +127,7 @@ end;
 procedure TToolEditForm.btnWorkDirClick(Sender: TObject);
 var
 {$IFDEF WIN32}
-  new: string;
+  new: AnsiString;
 {$ENDIF}
 {$IFDEF LINUX}
   new: WideString;
