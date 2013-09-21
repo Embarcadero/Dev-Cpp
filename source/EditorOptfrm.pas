@@ -156,6 +156,7 @@ type
     cbDoubleLine: TCheckBox;
     cbAutoIndent: TCheckBox;
     cbAppendNewline: TCheckBox;
+    cbCloseBrace: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -687,6 +688,7 @@ begin
      cbScrollHint.Checked:=          ScrollHint;
      cbSpecialChars.Checked:=        SpecialChars;
      cbAppendNewline.Checked:=       AppendNewline;
+     cbCloseBrace.Checked:=          AutoCloseBrace;
 
      cbMarginVis.Checked:=           MarginVis;
      edMarginWidth.Value:=           MarginSize;
@@ -830,6 +832,7 @@ begin
      ScrollHint:=          cbScrollHint.Checked;
      SpecialChars:=        cbSpecialChars.Checked;
      AppendNewline:=       cbAppendNewline.Checked;
+     AutoCloseBrace:=      cbCloseBrace.Checked;
 
      MarginVis:=           cbMarginVis.Checked;
      MarginSize:=          edMarginWidth.Value;

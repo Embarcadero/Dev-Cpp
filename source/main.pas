@@ -137,8 +137,6 @@ type
 		PreviousItem: TMenuItem;
 		N32: TMenuItem;
 		HelpMenu: TMenuItem;
-		HelpSep1: TMenuItem;
-		HelpSep2: TMenuItem;
 		AboutDevCppItem: TMenuItem;
 		MessageControl: TPageControl;
 		CompSheet: TTabSheet;
@@ -272,7 +270,6 @@ type
 		actUnitHeader: TAction;
 		actUnitOpen: TAction;
 		actUnitClose: TAction;
-		Customize1: TMenuItem;
 		EditorOptions1: TMenuItem;
 		tbEdit: TToolBar;
 		UndoBtn: TToolButton;
@@ -529,7 +526,6 @@ type
 		actBrowserShowInherited: TAction;
 		Showinheritedmembers1: TMenuItem;
 		HelponDevPopupItem: TMenuItem;
-		N64: TMenuItem;
 		actCVSLogin: TAction;
 		actCVSLogout: TAction;
 		N65: TMenuItem;
@@ -585,11 +581,20 @@ type
 		actModifyWatch: TAction;
 		ClearallWatchPop: TMenuItem;
 		CompilerOutput: TListView;
-    N5: TMenuItem;
-    Class1: TMenuItem;
+
+		// Orwell 2011
+		N5: TMenuItem;
+		Class1: TMenuItem;
+		DeleteProfilingInformation: TMenuItem;
+		actDeleteProfileProject: TAction;
+
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
 		procedure FormDestroy(Sender: TObject);
+
+		// Orwel 2011
+		procedure SetLineCol;
+		procedure SetDone(msg:string);
 		procedure ProjectViewChange(Sender: TObject; Node: TTreeNode);
 		procedure ToggleBookmarkClick(Sender: TObject);
 		procedure GotoBookmarkClick(Sender: TObject);
@@ -602,7 +607,6 @@ type
 		procedure ProjectViewContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
 		procedure ProjectViewDblClick(Sender: TObject);
 		procedure InsertBtnClick(Sender: TObject);
-		procedure Customize1Click(Sender: TObject);
 		procedure ToolbarClick(Sender: TObject);
 		procedure ControlBar1ContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
 		procedure SplitterBottomCanResize(Sender: TObject;var NewSize: Integer; var Accept: Boolean);
@@ -650,7 +654,6 @@ type
 		procedure actUnitCloseExecute(Sender: TObject);
 		procedure actUpdateCheckExecute(Sender: TObject);
 		procedure actAboutExecute(Sender: TObject);
-		procedure actHelpCustomizeExecute(Sender: TObject);
 		procedure actProjectNewExecute(Sender: TObject);
 		procedure actProjectAddExecute(Sender: TObject);
 		procedure actProjectRemoveExecute(Sender: TObject);
@@ -748,7 +751,7 @@ type
 		procedure actBrowserNewVarExecute(Sender: TObject);
 		procedure actBrowserViewAllExecute(Sender: TObject);
 		procedure actBrowserViewCurrentExecute(Sender: TObject);
-		procedure actProfileProjectExecute(Sender: TObject);
+        procedure actProfileProjectExecute(Sender: TObject);
 		procedure actBrowserAddFolderExecute(Sender: TObject);
 		procedure actBrowserRemoveFolderExecute(Sender: TObject);
 		procedure actBrowserAddFolderUpdate(Sender: TObject);
@@ -760,6 +763,10 @@ type
 		procedure lvBacktraceMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
 		procedure actDebugUpdate(Sender: TObject);
 		procedure actRunUpdate(Sender: TObject);
+
+		// Orwell 2011
+		procedure actDeleteProfRunUpdate(Sender: TObject);
+
 		procedure actCompileUpdate(Sender: TObject);
 		procedure devFileMonitor1NotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: String);
 		procedure actFilePropertiesExecute(Sender: TObject);
@@ -842,8 +849,7 @@ type
 		// Orwell 2011
 		procedure actMsgCopyAllExecute(Sender: TObject);
 		procedure actMsgSaveAllExecute(Sender: TObject);
-
-        procedure actNewClassExecute(Sender: TObject);
+		procedure actDeleteProfileProjectExecute(Sender: TObject);
 
 	private
 		fTab				: integer;
@@ -866,9 +872,7 @@ type
 		function  ParseParams(s : string) : string;
 		procedure ParseCmdLine;
 		procedure BuildBookMarkMenus;
-		procedure BuildHelpMenu;
 		procedure SetHints;
-		procedure HelpItemClick(Sender: TObject);
 		procedure MRUClick(Sender: TObject);
 		procedure CodeInsClick(Sender: TObjecT);
 		procedure ToolItemClick(Sender: TObject);
@@ -892,8 +896,6 @@ type
 		procedure CheckForDLLProfiling;
 		procedure UpdateAppTitle;
 		procedure DoCVSAction(Sender: TObject; whichAction: TCVSAction);
-		procedure WordToHelpKeyword;
-		procedure OnHelpSearchWord(sender : TObject);
 		procedure ProjectWindowClose(Sender: TObject; var Action: TCloseAction);
 		procedure SetupProjectView;
 		procedure BuildOpenWith;
@@ -1077,7 +1079,8 @@ begin
 	devShortcuts1.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
 	devShortcuts1.Load;
 
-	Application.HelpFile:= ValidateFile(DEV_MAINHELP_FILE, devDirs.Help, TRUE);
+	Application.HelpFile:= devDirs.Help + DEV_MAINHELP_FILE;
+
 	{ copied this part of code to 'DoApplyWindowPlacement' because it forces the form to show
 	
 	if devData.WindowPlacement.rcNormalPosition.Right <> 0 then
@@ -1280,7 +1283,6 @@ procedure TMainForm.FormShow(Sender: TObject);
 begin
 	if fFirstShow then begin
 		 LoadTheme;
-		 BuildHelpMenu;
 		 dmMain.MRUMenu:= ReOpenItem;
 		 dmMain.MRUOffset:= 2;
 		 dmMain.MRUMax:= devData.MRUMax;
@@ -1425,91 +1427,6 @@ begin
 
 	CloneMenu(ToggleBookmarksItem, TogglebookmarksPopItem);
 	CloneMenu(GotoBookmarksItem,	GotobookmarksPopItem);
-end;
-
-procedure TMainForm.BuildHelpMenu;
-var
- afile: string;
- ini: Tinifile;
- idx,
- idx2: integer;
- Item,
- Item2: TMenuItem;
-begin
-	aFile:= ValidateFile(DEV_HELP_INI, devDirs.Help, TRUE);
-	if aFile = '' then exit;
-
-	// delete between "Dev-C++ Help" and first separator
-	idx2:= HelpMenu.IndexOf(HelpSep1);
-	for idx:= pred(idx2) downto 1 do
-	 HelpMenu[idx].Free;
-
-	// delete between first and second separator
-	idx2:= HelpMenu.IndexOf(HelpSep2);
-	for idx:= pred(idx2) downto Succ(HelpMenu.IndexOf(HelpSep1)) do
-	 HelpMenu[idx].Free;
-
-	HelpMenu.SubMenuImages:= devImageThemes.CurrentTheme.HelpImages;//devTheme.Help;
-
-	// since 4.9.6.9, a standard menu entry appeared in HelpPop (Help On DevCpp)
-	// so items.clear is not good anymore...
-	while HelpPop.Items.Count>1 do
-		HelpPop.Items.Delete(HelpPop.Items.Count-1);
-
-	ini:= TiniFile.Create(aFile);
-	try
-	 if not assigned(fHelpFiles) then
-		fHelpFiles:= ToysStringList.Create
-	 else
-		fHelpFiles.Clear;
-
-	 ini.ReadSections(fHelpFiles);
-	 if fHelpFiles.Count = 0 then exit;
-
-	 for idx:= 0 to pred(fHelpFiles.Count) do
-		begin
-			afile:= ini.ReadString(fHelpFiles[idx], 'Path', '');
-			if (aFile = '') then continue;
-			if AnsiPos(HTTP, aFile) = 0 then
-			 aFile:= ExpandFileto(aFile, devDirs.Help);
-			if (aFile <> '') then
-			 begin
-				 fHelpFiles[idx]:= format('%s=%s', [fHelpFiles[idx], aFile]);
-				 if ini.ReadInteger(fHelpFiles.Names[idx], 'Menu', 1) = 1 then
-					idx2:= HelpMenu.IndexOf(HelpSep1)
-				 else
-					idx2:= HelpMenu.IndexOf(HelpSep2);
-
-				 Item:= TMenuItem.Create(HelpMenu);
-				 with Item do begin
-						Caption:= fHelpFiles.Names[idx];
-						if ini.ReadBool(fHelpFiles.Names[idx], 'SearchWord', false) then
-							OnClick := OnHelpSearchWord
-						else
-							OnClick := HelpItemClick;
-						if ini.ReadBool(fHelpFiles.Names[idx], 'AffectF1', false) then
-							ShortCut := TextToShortcut('F1');
-						Tag:= idx;
-						ImageIndex:= ini.ReadInteger(fHelpFiles.Names[idx], 'Icon', 0);
-				 end;
-				 HelpMenu.Insert(idx2, Item);
-				 if ini.ReadBool(fHelpFiles.Names[idx], 'Pop', false) then
-				 begin
-					 Item2:= TMenuItem.Create(HelpPop);
-					 with Item2 do
-					 begin
-						 Caption:= fHelpFiles.Names[idx];
-						 OnClick:= HelpItemClick;
-						 Tag:= idx;
-						 ImageIndex:= ini.ReadInteger(fHelpFiles.Names[idx], 'Icon', 0);
-					 end;
-					 HelpPop.Items.Add(Item2);
-				 end;
-			 end;
-		end;
-	finally
-	 ini.free;
-	end;
 end;
 
 procedure TMainForm.SetHints;
@@ -1688,6 +1605,7 @@ begin
 		actSyntaxCheck.Caption:=			Strings[ID_ITEM_SYNTAXCHECK];
 		actProgramReset.Caption:=			Strings[ID_ITEM_PROGRAMRESET];
 		actProfileProject.Caption:=			Strings[ID_ITEM_PROFILE];
+        actDeleteProfileProject.Caption:=	Strings[ID_ITEM_DELPROFILE];
 		actAbortCompilation.Caption:=		Strings[ID_ITEM_ABORTCOMP];
 		actExecParams.Caption:=				Strings[ID_ITEM_EXECPARAMS];
 
@@ -2122,6 +2040,24 @@ begin
 		ClassBrowser1.Clear;
 end;
 
+procedure TMainForm.SetLineCol;
+var
+	e: TEditor;
+begin
+	e:= GetEditor;
+	if Assigned(e) then begin
+		// keep statusbar updated
+		MainForm.Statusbar.Panels[0].Text:= format('%6d: %d', [e.Text.DisplayY, e.Text.DisplayX]);
+		MainForm.Statusbar.Panels[3].Text:= format(Lang[ID_LINECOUNT], [e.Text.Lines.Count]);
+	end;
+end;
+
+procedure TMainForm.SetDone(msg:string);
+begin
+	// keep statusbar updated
+	MainForm.Statusbar.Panels[3].Text:= msg;
+end;
+
 procedure TMainForm.ProjectViewChange(Sender: TObject; Node: TTreeNode);
 begin
 	{ begin XXXKF -- I'm not sure if it should be done SO often }
@@ -2454,26 +2390,6 @@ begin
 	Result := s;
 end;
 
-procedure TMainForm.HelpItemClick(Sender: TObject);
-var
- idx: integer;
- aFile: string;
-begin
-	idx:= (Sender as TMenuItem).Tag;
-	if idx>= fHelpFiles.Count then exit;
-	aFile:= fHelpFiles.Values[idx];
-
-	if AnsiPos(HTTP, aFile) = 1 then
-	 ExecuteFile(aFile, '', devDirs.Help, SW_SHOW)
-	else
-	 begin
-		 aFile:= ValidateFile(aFile, devDirs.Exec, TRUE);
-		 if AnsiPos(':\', aFile) = 0 then
-			aFile:= ExpandFileto(aFile, devDirs.Exec);
-			ExecuteFile(aFile, '', ExtractFilePath(aFile), SW_SHOW);
-	 end;
-end;
-
 procedure TMainForm.CompOutputProc(const _Line, _Col, _Unit, _Message: string);
 begin
 	with CompilerOutput.Items.Add do begin
@@ -2637,7 +2553,7 @@ end;
 
 procedure TMainForm.HelpBtnClick(Sender: TObject);
 var
- pt: TPoint;
+	pt: TPoint;
 begin
 	pt:= tbOptions.ClientToScreen(point(HelpBtn.Left, Helpbtn.Top +Helpbtn.Height));
 	HelpPop.Popup(pt.X, pt.Y);
@@ -2652,17 +2568,6 @@ begin
 		 pt:= tbSpecials.ClientToScreen(point(Insertbtn.Left, Insertbtn.Top +Insertbtn.Height));
 		 TrackPopupMenu(InsertItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,
 			 pt.X, pt.Y, 0, Self.Handle, nil);
-	 end;
-end;
-
-procedure TMainForm.Customize1Click(Sender: TObject);
-begin
-	with TfrmHelpEdit.Create(Self) do
-	 try
-		if Execute then
-		 BuildHelpMenu;
-	 finally
-		Free;
 	 end;
 end;
 
@@ -3141,50 +3046,47 @@ var
 	I: integer;
 begin
 	devData.FullScreen:= FullScreenModeItem.Checked;
-	if devData.FullScreen then
-	 begin
-		 OldLeft := Left;
-		 OldTop := Top;
-		 OldWidth := Width;
-		 OldHeight := Height;
-		 GetWindowPlacement(Self.Handle, @devData.WindowPlacement);
-		 BorderStyle:= bsNone;
-		 FullScreenModeItem.Caption:= Lang[ID_ITEM_FULLSCRBACK];
-		 ControlBar1.Visible:= devData.ShowBars;
-		 pnlFull.Visible:= TRUE;
+	if devData.FullScreen then begin
+		OldLeft := Left;
+		OldTop := Top;
+		OldWidth := Width;
+		OldHeight := Height;
+		GetWindowPlacement(Self.Handle, @devData.WindowPlacement);
+		BorderStyle:= bsNone;
+		FullScreenModeItem.Caption:= Lang[ID_ITEM_FULLSCRBACK];
+		ControlBar1.Visible:= devData.ShowBars;
+		pnlFull.Visible:= TRUE;
 
-		 Menu:=nil; // get rid of that annoying flickering effect
-		 // disable the top-level menus in MainMenu
-		 for I:=0 to MainMenu.Items.Count-1 do
-			 MainMenu.Items[I].Visible:=False;
-		 Menu:=MainMenu; // restore menu
+		Menu:=nil; // get rid of that annoying flickering effect
+		// disable the top-level menus in MainMenu
+		for I:=0 to MainMenu.Items.Count-1 do
+			MainMenu.Items[I].Visible:=False;
+		Menu:=MainMenu; // restore menu
 
-		 // set size to hide form menu
-		 //works with multi monitors now.
-		 SetBounds(
-			 (Left +Monitor.WorkAreaRect.Left) - ClientOrigin.X,
-			 (Top+ Monitor.WorkAreaRect.Top) - ClientOrigin.Y,
-			 Monitor.Width + (Width - ClientWidth),
-			 Monitor.Height+ (Height - ClientHeight));
-	 end
-	else
-	 begin
-		 Left := OldLeft;
-		 Top := OldTop;
-		 Width := OldWidth;
-		 Height := OldHeight;
-		 // enable the top-level menus in MainMenu
-		 // before shown on screen to avoid flickering
-		 for I:=0 to MainMenu.Items.Count-1 do
-			 MainMenu.Items[I].Visible:=True;
+		// set size to hide form menu
+		//works with multi monitors now.
+		SetBounds(
+			(Left +Monitor.WorkAreaRect.Left) - ClientOrigin.X,
+			(Top+ Monitor.WorkAreaRect.Top) - ClientOrigin.Y,
+			Monitor.Width + (Width - ClientWidth),
+			Monitor.Height+ (Height - ClientHeight));
+	end else begin
+		Left := OldLeft;
+		Top := OldTop;
+		Width := OldWidth;
+		Height := OldHeight;
+		// enable the top-level menus in MainMenu
+		// before shown on screen to avoid flickering
+		for I:=0 to MainMenu.Items.Count-1 do
+			MainMenu.Items[I].Visible:=True;
 
-		 SetWindowPlacement(Self.Handle, @devData.WindowPlacement);
-		 BorderStyle:= bsSizeable;
-		 FullScreenModeItem.Caption:= Lang[ID_ITEM_FULLSCRMODE];
-		 Controlbar1.Visible:= TRUE;
+		SetWindowPlacement(Self.Handle, @devData.WindowPlacement);
+		BorderStyle:= bsSizeable;
+		FullScreenModeItem.Caption:= Lang[ID_ITEM_FULLSCRMODE];
+		Controlbar1.Visible:= TRUE;
 
-		 pnlFull.Visible:= FALSE;
-	 end;
+		pnlFull.Visible:= FALSE;
+	end;
 end;
 
 procedure TMainForm.actNextExecute(Sender: TObject);
@@ -3346,17 +3248,6 @@ begin
 	 try
 		VersionLabel.Caption:= VersionLabel.Caption + DEVCPP_VERSION;
 		ShowModal;
-	 finally
-		Free;
-	 end;
-end;
-
-procedure TMainForm.actHelpCustomizeExecute(Sender: TObject);
-begin
-	with TfrmHelpEdit.Create(Self) do
-	 try
-		if Execute then
-		 BuildHelpMenu;
 	 finally
 		Free;
 	 end;
@@ -3563,7 +3454,7 @@ end;
 
 procedure TMainForm.actRunExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	fCompiler.Target:= ctNone;
@@ -3654,7 +3545,6 @@ var
 	i, j: integer;
 	s : string;
 begin
-
 	if not fDebugger.Executing then begin
 		PrepareDebugger;
 		if Assigned(fProject) then begin
@@ -4716,6 +4606,14 @@ begin
 		(Sender as TCustomAction).Enabled := (PageControl.PageCount > 0) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling;
 end;
 
+procedure TMainForm.actDeleteProfRunUpdate(Sender: TObject);
+begin
+	if Assigned(fProject) then
+		(Sender as TCustomAction).Enabled := not (fProject.Options.typ = dptStat) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling and FileExists(ExtractFilePath(fProject.Executable)+GPROF_CHECKFILE)
+	else
+		(Sender as TCustomAction).Enabled := (PageControl.PageCount > 0) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling and FileExists(ExtractFilePath(GetEditor.FileName)+GPROF_CHECKFILE);
+end;
+
 procedure TMainForm.PageControlChange(Sender: TObject);
 var
 	e: TEditor;
@@ -4727,7 +4625,8 @@ begin
 			e.Text.SetFocus;
 
 			// keep statusbar updated
-			e.SetLineCol;
+			MainForm.SetLineCol;
+
 			ClassBrowser1.CurrentFile:=e.FileName;
 			if ClassBrowser1.Enabled then begin
 				for i := 1 to 9 do
@@ -5034,11 +4933,11 @@ end;
 
 procedure TMainForm.actProfileProjectExecute(Sender: TObject);
 var
-	optP, optD: TCompilerOption;
-	idxP, idxD: integer;
-	prof, deb: boolean;
+	optP, optS: TCompilerOption;
+	idxP, idxS: integer;
+	prof, strp: boolean;
 begin
-	// see if profiling is enabled
+	// search for the item and let it supply the option index
 	prof:=devCompiler.FindOption('-pg', optP, idxP);
 	if prof then begin
 		if Assigned(fProject) then begin
@@ -5046,51 +4945,48 @@ begin
 				prof := true
 			else
 				prof := false;
-		end
-		else
+		end else
 			prof := optP.optValue > 0;
 	end;
-	// see if debugging is enabled
-	deb:=devCompiler.FindOption('-g3', optD, idxD);
-	if deb then begin
+	// see if exe stripping is enabled
+	strp:=devCompiler.FindOption('-s', optS, idxS);
+	if strp then begin
 		if Assigned(fProject) then begin
-			if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[idxD + 1]='1') then
-				deb := true
+			if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[idxS + 1]='1') then
+				strp := true
 			else
-				deb := false;
+				strp := false;
 			end
 		else
-			deb := optD.optValue > 0;
+			strp := optS.optValue > 0;
 	end;
 
-	if (not prof) or (not deb) then
+	if (not prof) or (strp) then
 		if MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
+
+			// ENABLE profiling
 			optP.optValue:=1;
 			if Assigned(fProject) then
 				SetProjCompOpt(idxP, True);
 			devCompiler.Options[idxP]:=optP;
-			optD.optValue:=1;
-			if Assigned(fProject) then
-				SetProjCompOpt(idxD, True);
-			devCompiler.Options[idxD]:=optD;
 
-			// Check for strip executable
-			if devCompiler.FindOption('-s', optD, idxD) then begin
-				optD.optValue := 0;
-				if not Assigned(MainForm.fProject) then
-					devCompiler.Options[idxD]:=optD; // set global debugging option only if not working with a project
-				MainForm.SetProjCompOpt(idxD, False); // set the project's correpsonding option too
-			end;
+			// DISABLE stripping
+			optS.optValue:=0;
+			if Assigned(fProject) then
+				SetProjCompOpt(idxS, False);
+			devCompiler.Options[idxS]:=optS;
 
 			actRebuildExecute(nil);
-			Exit;
-		end
-		else
+			Exit
+		end else
 			Exit;
 	if Assigned(fProject) then
 		if not FileExists(ExtractFilePath(fProject.Executable)+GPROF_CHECKFILE) then begin
-			MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtError, [mbOk], 0);
-			Exit;
+			if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtError, [mbYes, mbNo], 0)=mrYes then begin
+				actRunExecute(nil);
+				Exit;
+			end else
+				Exit;
 		end;
 	if not Assigned(ProfileAnalysisForm) then
 		ProfileAnalysisForm:=TProfileAnalysisForm.Create(Self);
@@ -5635,31 +5531,7 @@ end;
 procedure TMainForm.HelpMenuItemClick(Sender: TObject);
 begin
 	Application.HelpFile := IncludeTrailingBackslash(devDirs.Help) + DEV_MAINHELP_FILE;
-	Application.HelpCommand(HELP_FINDER, 0);
-	WordToHelpKeyword;
-end;
-
-procedure TMainForm.WordToHelpKeyword;
-var
-	s : pchar;
-	tmp : string;
-	e : TEditor;
-	OK: boolean;
-begin
-	OK:=False;
-	e := GetEditor;
-	if Assigned(e) then begin
-		tmp := e.GetWordAtCursor;
-		if (tmp <> '') then begin
-			GetMem(s, length(tmp) + 1);
-			StrCopy(s, pchar(tmp));
-			Application.HelpCommand(HELP_KEY, integer(s));
-			FreeMem(s);
-			OK:=True;
-		end;
-	end;
-	if not OK then
-		Application.HelpCommand(HELP_FINDER, 0);
+	Application.HelpJump(Application.HelpFile + '::' + '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Start Menu Items/File.htm');
 end;
 
 procedure TMainForm.CppParser1StartParsing(Sender: TObject);
@@ -5951,8 +5823,9 @@ begin
 end;
 
 procedure TMainForm.ListItemClick(Sender: TObject);
-var w : TWindowListForm;
-		i : integer;
+var
+	w : TWindowListForm;
+	i : integer;
 begin
 	w := TWindowListForm.Create(self);
 	try
@@ -6014,27 +5887,6 @@ begin
 	devClassBrowsing.ShowInheritedMembers:=actBrowserShowInherited.Checked;
 	ClassBrowser1.ShowInheritedMembers:=actBrowserShowInherited.Checked;
 	ClassBrowser1.Refresh;
-end;
-
-procedure TMainForm.OnHelpSearchWord(sender : TObject);
-var
- idx: integer;
- aFile: string;
-begin
-	idx := (Sender as TMenuItem).Tag;
-	if idx >= fHelpFiles.Count then
-		exit;
-	aFile:= fHelpFiles.Values[idx];
-	if AnsiCompareFileName(ExtractFileExt(aFile), '.chm') = 0 then begin
-		ExecuteFile(aFile, '', devDirs.Help, SW_SHOW);
-		exit;
-	end;
-	if AnsiPos(HTTP, aFile) = 1 then
-		ExecuteFile(aFile, '', devDirs.Help, SW_SHOW)
-	else begin
-		Application.HelpFile := aFile;
-		WordToHelpKeyword;
-	end;
 end;
 
 procedure TMainForm.ProjectWindowClose(Sender: TObject; var Action: TCloseAction);
@@ -6118,10 +5970,12 @@ begin
 	if Assigned(fProject) then begin
 		projOpt:=fProject.Options;
 		if idx<=Length(projOpt.CompilerOptions) then begin
-			if Value then
+		fProject.SetModified(TRUE);
+			if Value then begin
 				projOpt.CompilerOptions[idx+1]:='1'
-			else
+			end else begin
 				projOpt.CompilerOptions[idx+1]:='0';
+			end;
 			fProject.Options:=projOpt;
 		end;
 	end;
@@ -6574,9 +6428,17 @@ begin
 	mnuCVSCurrent.Enabled := PageControl.PageCount > 0;
 end;
 
-procedure TMainForm.actNewClassExecute(Sender: TObject);
+procedure TMainForm.actDeleteProfileProjectExecute(Sender: TObject);
+var
+	path : string;
 begin
-	MsgBox('hoi','hoi');
+	path := ExtractFilePath(fProject.Executable)+GPROF_CHECKFILE;
+	if Assigned(fProject) then
+		if FileExists(path) then
+			DeleteFile(path)
+		else
+			MessageBox(Application.handle,PChar('Could not find profiling file '+ path + '!'),PChar('Error'),MB_ICONERROR);
 end;
+
 end.
 

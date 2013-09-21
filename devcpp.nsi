@@ -1,7 +1,7 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "5.0.0.2"
+!define DEVCPP_VERSION "5.0.0.3"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 Var LOCAL_APPDATA
@@ -100,6 +100,8 @@ Section "Dev-C++ program files (required)" SectionMain
   File "devcpp.map"
   File "packman.exe"
   File "Packman.map"
+
+  File "devcpp.chm"
   
   File "devcpp.exe.manifest"
   File "copying.txt"
@@ -137,21 +139,13 @@ Section "Example files" SectionExamples
   File "Examples\WinTest\*"
 SectionEnd
 
-Section "Help files" SectionHelp
-  SectionIn 1
-  SetOutPath $INSTDIR\Help
-  File "Help\*.*"
-  SetOutPath $INSTDIR\Packages
-  File "Packages\DevCppHelp.entry"
-SectionEnd
-
 Section "Icon files" SectionIcons
   SectionIn 1
   SetOutPath $INSTDIR\Icons
   File "Icons\*.*"
 SectionEnd
 
-Section "MinGW compiler system (binaries, headers and libraries)" SectionMingw
+Section "MinGW compiler system" SectionMingw
   SectionIn 1 2
   SetOutPath $INSTDIR
 
@@ -301,8 +295,9 @@ SectionEnd
 
 SubSectionEnd
 
-# [Shortcuts]
-Section "Create shortcuts in Start Menu" SectionShortcuts
+SubSection "Shortcuts" SectionShortcuts
+
+Section "Create Start Menu shortcuts" SectionMenuLaunch
   SectionIn 1
 
   ;try to read from registry if last installation installed for All Users/Current User
@@ -333,7 +328,15 @@ Section "Create Quick Launch shortcut" SectionQuickLaunch
   CreateShortCut "$QUICKLAUNCH\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
 SectionEnd
 
-Section "Remove all previous configuration files" SectionConfig
+Section "Create Desktop shortcut" SectionDesktopLaunch
+  SectionIn 1
+  SetShellVarContext current
+  CreateShortCut "$DESKTOP\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
+SectionEnd
+
+SubSectionEnd
+
+Section "Remove old configuration files" SectionConfig
   Delete "$APPDATA\Dev-Cpp\devcpp.ini"
   Delete "$APPDATA\Dev-Cpp\devcpp.cfg"
   Delete "$APPDATA\Dev-Cpp\cache.ccc"
@@ -381,25 +384,21 @@ SectionEnd
 
 LangString DESC_SectionMain        ${LANG_ENGLISH} "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
 LangString DESC_SectionExamples    ${LANG_ENGLISH} "Example projects for simple console and GUI applications"
-LangString DESC_SectionHelp        ${LANG_ENGLISH} "Help on using Dev-C++ and programming in C"
 LangString DESC_SectionIcons       ${LANG_ENGLISH} "Various icons that you can use in your programs"
 LangString DESC_SectionMingw       ${LANG_ENGLISH} "The MinGW gcc compiler and associated tools, headers and libraries"
 LangString DESC_SectionLangs       ${LANG_ENGLISH} "The Dev-C++ interface translated to different languages (other than English which is built-in)"
 LangString DESC_SectionAssocs      ${LANG_ENGLISH} "Use Dev-C++ as the default application for opening these types of files"
-LangString DESC_SectionShortcuts   ${LANG_ENGLISH} "Create a 'Bloodshed Dev-C++' program group with shortcuts, in the start menu"
-LangString DESC_SectionQuickLaunch ${LANG_ENGLISH} "Create a shortcut to Dev-C++ in the QuickLaunch toolbar"
+LangString DESC_SectionShortcuts   ${LANG_ENGLISH} "Create shortcuts to Dev-C++ in various folders"
 LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configuration files from previous installs"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        $(DESC_SectionMain)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionExamples}    $(DESC_SectionExamples)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionHelp}        $(DESC_SectionHelp)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       $(DESC_SectionIcons)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionMingw}       $(DESC_SectionMingw)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       $(DESC_SectionLangs)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      $(DESC_SectionAssocs)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   $(DESC_SectionShortcuts)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionQuickLaunch} $(DESC_SectionQuickLaunch)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionConfig}      $(DESC_SectionConfig)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -539,6 +538,7 @@ Section "Uninstall"
   RMDir  "$0\Bloodshed Dev-C++"
   SetShellVarContext current
   Delete "$QUICKLAUNCH\Dev-C++.lnk"
+  Delete "$DESKTOP\Dev-C++.lnk"
 
   ; Restore file associations
   StrCpy $0 ".dev"

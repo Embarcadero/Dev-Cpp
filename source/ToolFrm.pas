@@ -72,7 +72,6 @@ type
 
   TToolForm = class(TForm)
     grpCurrent: TGroupBox;
-    btnClose: TBitBtn;
     ListBox: TListBox;
     btnUp: TSpeedButton;
     btnDown: TSpeedButton;
@@ -485,7 +484,6 @@ begin
   btnAdd.Caption:=        Lang[ID_BTN_ADD];
   btnDelete.Caption:=     Lang[ID_BTN_DELETE];
   btnEdit.Caption:=       Lang[ID_BTN_EDIT];
-  btnClose.Caption:=      Lang[ID_BTN_CLOSE];
   grpActions.Caption:=    '  '+Lang[ID_HE_GRP_ACTIONS]+'  ';
 end;
 

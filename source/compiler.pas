@@ -1347,51 +1347,43 @@ end;
 
 procedure TCompiler.GetLibrariesParams;
 resourcestring
- cAppendStr = '%s -L"%s"';
+	cAppendStr = '%s -L"%s"';
 var
- i, val : integer;
+	i, val : integer;
 begin
-  fLibrariesParams := '';
-  fLibrariesParams := CommaStrToStr(devDirs.lib, cAppendStr);
-//RNC
-  if (devCompilerSet.LinkOpts <> '') and devCompilerSet.AddtoLink then
-    fLibrariesParams := fLibrariesParams + ' ' + devCompilerSet.LinkOpts;
-  if (fTarget = ctProject) and assigned(fProject) then begin
-    for i := 0 to pred(fProject.Options.Libs.Count) do
-      fLibrariesParams := format(cAppendStr, [fLibrariesParams, fProject.Options.Libs[i]]);
-    // got sick of "symbol 'blah blah' is deprecated"
-    if fProject.Options.typ = dptGUI then
-      fLibrariesParams:= fLibrariesParams + ' -mwindows';
-    fLibrariesParams:= fLibrariesParams +' ' +StringReplace(fProject.Options.cmdLines.Linker, '_@@_', ' ', [rfReplaceAll]);
-  end;
-  if (pos(' -pg', fCompileParams) <>  0) and (pos('-lgmon', fLibrariesParams) = 0) then
-      fLibrariesParams := fLibrariesParams + ' -lgmon -pg ';
+	fLibrariesParams := '';
+	fLibrariesParams := CommaStrToStr(devDirs.lib, cAppendStr);
 
-  fLibrariesParams := fLibrariesParams + ' ';
-  for I := 0 to devCompiler.OptionsCount - 1 do
-    // consider project specific options for the compiler
-    if (
-          Assigned(fProject) and
-          (I<Length(fProject.Options.CompilerOptions)) and
-          not (fProject.Options.typ in devCompiler.Options[I].optExcludeFromTypes)
-         ) or
-         // else global compiler options
-         (not Assigned(fProject) and (devCompiler.Options[I].optValue > 0)) then begin
-        if devCompiler.Options[I].optIsLinker then
-          if Assigned(devCompiler.Options[I].optChoices) then begin
-            if Assigned(fProject) then
-              val := devCompiler.ConvertCharToValue(fProject.Options.CompilerOptions[I+1])
-            else
-              val := devCompiler.Options[I].optValue;
-            if (val > 0) and (val < devCompiler.Options[I].optChoices.Count) then
-              fLibrariesParams := fLibrariesParams
-                + devCompiler.Options[I].optSetting + devCompiler.Options[I].optChoices.Values[devCompiler.Options[I].optChoices.Names[val]] + ' ';
-          end
-          else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I+1], 0)=1)) or (not Assigned(fProject)) then
-            fLibrariesParams := fLibrariesParams
-              + devCompiler.Options[I].optSetting + ' ';
-      end;
+	//RNC
+	if (devCompilerSet.LinkOpts <> '') and devCompilerSet.AddtoLink then
+		fLibrariesParams := fLibrariesParams + ' ' + devCompilerSet.LinkOpts;
+	if (fTarget = ctProject) and assigned(fProject) then begin
+		for i := 0 to pred(fProject.Options.Libs.Count) do
+			fLibrariesParams := format(cAppendStr, [fLibrariesParams, fProject.Options.Libs[i]]);
 
+		// got sick of "symbol 'blah blah' is deprecated"
+		if fProject.Options.typ = dptGUI then
+			fLibrariesParams:= fLibrariesParams + ' -mwindows';
+		fLibrariesParams:= fLibrariesParams + ' ' +StringReplace(fProject.Options.cmdLines.Linker, '_@@_', ' ', [rfReplaceAll]);
+	end;
+
+	if (pos(' -pg', fCompileParams) <>  0){ and (pos('-lgmon', fLibrariesParams) = 0)} then
+		fLibrariesParams :=  ' -pg' + fLibrariesParams; // ' -lgmon -pg '
+
+	fLibrariesParams := fLibrariesParams + ' ';
+	for I := 0 to devCompiler.OptionsCount - 1 do
+		if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions)) and not (fProject.Options.typ in devCompiler.Options[I].optExcludeFromTypes)) or (not Assigned(fProject) and (devCompiler.Options[I].optValue > 0)) then begin
+			if devCompiler.Options[I].optIsLinker then
+				if Assigned(devCompiler.Options[I].optChoices) then begin
+					if Assigned(fProject) then
+						val := devCompiler.ConvertCharToValue(fProject.Options.CompilerOptions[I+1])
+					else
+						val := devCompiler.Options[I].optValue;
+					if (val > 0) and (val < devCompiler.Options[I].optChoices.Count) then
+						fLibrariesParams := fLibrariesParams + devCompiler.Options[I].optSetting + devCompiler.Options[I].optChoices.Values[devCompiler.Options[I].optChoices.Names[val]] + ' ';
+				end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I+1], 0)=1)) or (not Assigned(fProject)) then
+					fLibrariesParams := fLibrariesParams + devCompiler.Options[I].optSetting + ' ';
+		end;
 end;
 
 procedure TCompiler.GetIncludesParams;
@@ -1407,10 +1399,10 @@ begin
 	fCppIncludesParams := CommaStrToStr(devDirs.Cpp, cAppendStr);
 
 	if (fTarget = ctProject) and assigned(fProject) then
-	for i := 0 to pred(fProject.Options.Includes.Count) do
-		if directoryExists(fProject.Options.Includes[i]) then begin
-		fIncludesParams := format(cAppendStr, [fIncludesParams, fProject.Options.Includes[i]]);
-		fCppIncludesParams := format(cAppendStr, [fCppIncludesParams, fProject.Options.Includes[i]]);
+		for i := 0 to pred(fProject.Options.Includes.Count) do
+			if directoryExists(fProject.Options.Includes[i]) then begin
+			fIncludesParams := format(cAppendStr, [fIncludesParams, fProject.Options.Includes[i]]);
+			fCppIncludesParams := format(cAppendStr, [fCppIncludesParams, fProject.Options.Includes[i]]);
 		end;
 end;
 
@@ -1481,7 +1473,6 @@ end;
 procedure TCompiler.EndProgressForm;
 var
 	sMsg: string;
-    e : TEditor;
 begin
 	if Assigned(CompileProgressForm) then begin
 		with CompileProgressForm do begin
@@ -1505,10 +1496,6 @@ begin
 			lblStatus.Font.Style:=[fsBold];
 			lblFile.Caption:='';
 		end;
-
-		// Always update the statusbar
-		e:=TEditor.Create;
-		e.SetDone(sMsg);
 
 		Application.ProcessMessages;
 		if devData.AutoCloseProgress or (fErrCount>0) or (fWarnCount>0) then

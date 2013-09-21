@@ -34,7 +34,7 @@ resourcestring
 	// misc strings
 	GCC_VERSION          = '4.5.2';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.0.0.2';
+	DEVCPP_VERSION       = '5.0.0.3';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -48,7 +48,7 @@ resourcestring
 	DEV_TOOLS_FILE       = 'tools.ini';
 	DEV_HELP_INI         = 'devhelp.ini';
 	DEV_CODEINS_FILE     = 'devcpp.ci';
-	DEV_MAINHELP_FILE    = 'devcpp.hlp';
+	DEV_MAINHELP_FILE    = 'devcpp.chm';
 	DEV_GNOME_THEME      = 'Gnome';
 	DEV_NEWLOOK_THEME    = 'New Look';
 	DEV_BLUE_THEME       = 'Blue';
@@ -65,7 +65,7 @@ resourcestring
                            '%path%' + pd + 'include' + pd + 'GL';
 	LANGUAGE_DIR         = 'Lang' + pd;
 	ICON_DIR             = 'Icons' + pd;
-	HELP_DIR             = 'Help' + pd;
+	HELP_DIR             = ''; // exe folder
 	TEMPLATE_DIR         = 'Templates' + pd;
 	THEME_DIR            = 'Themes' + pd;
 	PACKAGES_DIR         = 'Packages' + pd;

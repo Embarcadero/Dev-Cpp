@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, Spin;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -33,9 +33,7 @@ uses
 
 type
   TProfileAnalysisForm = class(TForm)
-    Panel1: TPanel;
-    btnClose: TButton;
-    Panel2: TPanel;
+    MainPanel: TPanel;
     PageControl1: TPageControl;
     tabFlat: TTabSheet;
     Splitter2: TSplitter;
@@ -45,18 +43,28 @@ type
     Splitter1: TSplitter;
     memGraph: TMemo;
     lvGraph: TListView;
+    tabOpts: TTabSheet;
+    FuncHiding: TGroupBox;
+    chkHideNotCalled: TCheckBox;
+    chkSuppressStatic: TCheckBox;
+    Label1: TLabel;
+    spnMinCount: TSpinEdit;
+    Label2: TLabel;
+    btnApply: TButton;
+    CustomCommands: TGroupBox;
+    chkCustom: TCheckBox;
+    editCustom: TEdit;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure btnCloseClick(Sender: TObject);
     procedure FormPaint(Sender: TObject);
-    procedure lvGraphCustomDrawItem(Sender: TCustomListView;
-      Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
-    procedure lvFlatCustomDrawItem(Sender: TCustomListView;
-      Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
-    procedure lvFlatMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
+    procedure lvGraphCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure lvFlatCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure lvFlatMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
     procedure lvFlatClick(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
+    procedure btnApplyClick(Sender: TObject);
+    procedure chkCustomClick(Sender: TObject);
+    procedure commandUpdate(Sender: TObject);
   private
     { Private declarations }
     procedure LoadText;
@@ -89,16 +97,10 @@ begin
   PageControl1.Visible := False;
 end;
 
-procedure TProfileAnalysisForm.FormClose(Sender: TObject;
-  var Action: TCloseAction);
+procedure TProfileAnalysisForm.FormClose(Sender: TObject;var Action: TCloseAction);
 begin
   Action := caFree;
   ProfileAnalysisForm := nil;
-end;
-
-procedure TProfileAnalysisForm.btnCloseClick(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TProfileAnalysisForm.DoFlat;
@@ -106,26 +108,45 @@ var
   Cmd: string;
   Params: string;
   Dir: string;
-  I: integer;
+  I,J: integer;
   Line: string;
   Parsing: boolean;
   Done: boolean;
   BreakLine: integer;
+  spacepos : integer;
 begin
-  if (devCompiler.gprofName <> '') then
-    Cmd := devCompiler.gprofName
-  else
-    Cmd := GPROF_PROGRAM;
-  if Assigned(MainForm.fProject) then begin
-    Dir := ExtractFilePath(MainForm.fProject.Executable);
-    Params := GPROF_CMD_GENFLAT + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
-  end
-  else begin
-    Dir := ExtractFilePath(MainForm.GetEditor.FileName);
-    Params := GPROF_CMD_GENFLAT + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
-  end;
+	Cmd := '';
+	if not chkCustom.Checked then begin
+	if (devCompiler.gprofName <> '') then
+		Cmd := devCompiler.gprofName
+	else
+		Cmd := GPROF_PROGRAM;
 
-  memFlat.Lines.Text := RunAndGetOutput(Cmd + ' ' + Params, Dir, nil, nil, nil, False);
+	Params := ' ' + GPROF_CMD_GENFLAT;
+
+	// Checkbox options
+	if not chkHideNotCalled.checked then
+		Params := Params + ' -z';
+	if chkSuppressStatic.checked then
+		Params := Params + ' -a';
+	Params := Params + ' -m ' + spnMinCount.Text;
+
+	if Assigned(MainForm.fProject) then begin
+		Dir := ExtractFilePath(MainForm.fProject.Executable);
+		Params := Params + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
+	end else begin
+		Dir := ExtractFilePath(MainForm.GetEditor.FileName);
+		Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
+	end;
+	end else begin
+		Params := editCustom.Text + ' -p';
+		if Assigned(MainForm.fProject) then
+			Dir := ExtractFilePath(MainForm.fProject.Executable)
+		else
+			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
+	end;
+
+  memFlat.Lines.Text := RunAndGetOutput(Cmd + Params, Dir, nil, nil, nil, False);
   memFlat.SelStart := 0;
 
   BreakLine := -1;
@@ -151,15 +172,15 @@ begin
         else
           Data := MainForm.CppParser1.Locate(Caption, True);
 
-        SubItems.Add(Trim(Copy(Line, 1, 6)));
-        SubItems.Add(Trim(Copy(Line, 7, 12)));
-        SubItems.Add(Trim(Copy(Line, 19, 11)));
-        SubItems.Add(Trim(Copy(Line, 30, 7)));
-        SubItems.Add(Trim(Copy(Line, 37, 9)));
-        SubItems.Add(Trim(Copy(Line, 46, 9)));
+        // Once here, the function at the END is cut off
+        for J:=0 to 5 do begin
+        	Line := TrimLeft(Line);
+        	spacepos := Pos(' ',Line);
+        	SubItems.Add(Trim(Copy(Line, 1, spacepos)));
+        	System.Delete(Line,1,spacepos);
+        end;
       end;
-    end
-    else begin
+    end else begin
       Parsing := AnsiStartsText('%', Trim(Line));
       if Parsing then
         Inc(I); // skip over next line too
@@ -175,27 +196,45 @@ var
   Cmd: string;
   Params: string;
   Dir: string;
-  I: integer;
+  I,J: integer;
   Line: string;
   Parsing: boolean;
   Done: boolean;
   BreakLine: integer;
+  spacepos : integer;
 begin
-  if (devCompiler.gprofName <> '') then
-    Cmd := devCompiler.gprofName
-  else
-    Cmd := GPROF_PROGRAM;
+	Cmd := '';
+	if not chkCustom.Checked then begin
+	if (devCompiler.gprofName <> '') then
+		Cmd := devCompiler.gprofName
+	else
+		Cmd := GPROF_PROGRAM;
 
-  if Assigned(MainForm.fProject) then begin
-    Dir := ExtractFilePath(MainForm.fProject.Executable);
-    Params := GPROF_CMD_GENMAP + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
-  end
-  else begin
-    Dir := ExtractFilePath(MainForm.GetEditor.FileName);
-    Params := GPROF_CMD_GENMAP + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
-  end;
+	Params := GPROF_CMD_GENMAP;
 
-  memGraph.Lines.Text := RunAndGetOutput(Cmd + ' ' + Params, Dir, nil, nil, nil, False);
+	// Checkbox options
+	if not chkHideNotCalled.checked then
+		Params := Params + ' -z';
+	if chkSuppressStatic.checked then
+		Params := Params + ' -a';
+	Params := Params + ' -m ' + spnMinCount.Text;
+
+	if Assigned(MainForm.fProject) then begin
+		Dir := ExtractFilePath(MainForm.fProject.Executable);
+		Params := Params + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
+	end else begin
+		Dir := ExtractFilePath(MainForm.GetEditor.FileName);
+		Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
+	end;
+	end else begin
+		Params := editCustom.Text + ' -q';
+		if Assigned(MainForm.fProject) then
+			Dir := ExtractFilePath(MainForm.fProject.Executable)
+		else
+			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
+	end;
+
+  memGraph.Lines.Text := RunAndGetOutput(Cmd + Params, Dir, nil, nil, nil, False);
   memGraph.SelStart := 0;
 
   BreakLine := -1;
@@ -222,11 +261,12 @@ begin
           else
             Data := MainForm.CppParser1.Locate(Caption, True);
 
-          SubItems.Add(Trim(Copy(Line, 1, 5)));
-          SubItems.Add(Trim(Copy(Line, 6, 11)));
-          SubItems.Add(Trim(Copy(Line, 17, 6)));
-          SubItems.Add(Trim(Copy(Line, 23, 11)));
-          SubItems.Add(Trim(Copy(Line, 34, 12)));
+        for J:=0 to 5 do begin
+        	Line := TrimLeft(Line);
+        	spacepos := Pos(' ',Line);
+        	SubItems.Add(Trim(Copy(Line, 1, spacepos)));
+        	System.Delete(Line,1,spacepos);
+        end;
         end;
       end
       else
@@ -266,9 +306,7 @@ begin
   lvFlat.SetFocus;
 end;
 
-procedure TProfileAnalysisForm.lvFlatCustomDrawItem(
-  Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
-  var DefaultDraw: Boolean);
+procedure TProfileAnalysisForm.lvFlatCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;var DefaultDraw: Boolean);
 begin
   if not (cdsSelected in State) then begin
     if Assigned(Item.Data) then
@@ -278,9 +316,7 @@ begin
   end;
 end;
 
-procedure TProfileAnalysisForm.lvGraphCustomDrawItem(
-  Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
-  var DefaultDraw: Boolean);
+procedure TProfileAnalysisForm.lvGraphCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;var DefaultDraw: Boolean);
 begin
   if not (cdsSelected in State) then begin
     if (Item.SubItems.Count > 0) and (Item.SubItems[0] <> '') then begin
@@ -301,11 +337,10 @@ begin
   Caption := Lang[ID_PROF_CAPTION];
   tabFlat.Caption := Lang[ID_PROF_TABFLAT];
   tabGraph.Caption := Lang[ID_PROF_TABGRAPH];
-  btnClose.Caption := Lang[ID_BTN_CLOSE];
+  tabOpts.Caption := Lang[ID_PROF_TABOPTS];
 end;
 
-procedure TProfileAnalysisForm.lvFlatMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+procedure TProfileAnalysisForm.lvFlatMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
   It: TListItem;
 begin
@@ -337,10 +372,50 @@ end;
 
 procedure TProfileAnalysisForm.PageControl1Change(Sender: TObject);
 begin
-  if PageControl1.ActivePage = tabFlat then
-    lvFlat.SetFocus
-  else
-    lvGraph.SetFocus;
+	if PageControl1.ActivePage = tabFlat then
+		lvFlat.SetFocus
+	else if PageControl1.ActivePage = tabGraph then
+		lvGraph.SetFocus
+	else
+		commandUpdate(nil);
+end;
+
+procedure TProfileAnalysisForm.btnApplyClick(Sender: TObject);
+begin
+	PageControl1.ActivePage := tabFlat;
+	lvFlat.Clear;
+	DoFlat;
+end;
+
+procedure TProfileAnalysisForm.chkCustomClick(Sender: TObject);
+begin
+	chkHideNotCalled.Enabled := not chkCustom.Checked;
+	chkSuppressStatic.Enabled := not chkCustom.Checked;
+	spnMinCount.Enabled := not chkCustom.Checked;
+
+	editCustom.Enabled := chkCustom.Checked;
+end;
+
+procedure TProfileAnalysisForm.commandUpdate(Sender: TObject);
+var
+	assembly : string;
+begin
+	if not chkCustom.Checked then begin
+		if (devCompiler.gprofName <> '') then
+			assembly := devCompiler.gprofName
+		else
+			assembly := GPROF_PROGRAM;
+		if Assigned(MainForm.fProject) then
+			assembly := assembly + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"'
+		else
+			assembly := assembly + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
+		if not chkHideNotCalled.Checked then
+			assembly := assembly + ' -z';
+		if chkSuppressStatic.Checked then
+			assembly := assembly + ' -s';
+		assembly := assembly + ' -m ' + spnMinCount.Text;
+		editCustom.Text := assembly;
+	end;
 end;
 
 end.

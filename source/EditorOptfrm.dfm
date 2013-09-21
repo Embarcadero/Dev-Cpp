@@ -1,5 +1,5 @@
 object EditorOptForm: TEditorOptForm
-  Left = 729
+  Left = 566
   Top = 261
   HelpType = htKeyword
   BorderStyle = bsDialog
@@ -55,7 +55,7 @@ object EditorOptForm: TEditorOptForm
         Caption = 'Tab Size:'
       end
       object cpHighColor: TColorPickerButton
-        Left = 340
+        Left = 337
         Top = 284
         Width = 61
         Height = 22
@@ -148,7 +148,183 @@ object EditorOptForm: TEditorOptForm
         Width = 393
         Height = 193
         Caption = '  Editor Options  '
-        TabOrder = 25
+        TabOrder = 6
+        object cbCloseBrace: TCheckBox
+          Left = 201
+          Top = 172
+          Width = 184
+          Height = 17
+          Caption = 'Append closing braces'
+          TabOrder = 0
+        end
+        object cbAppendNewline: TCheckBox
+          Left = 8
+          Top = 172
+          Width = 177
+          Height = 17
+          Caption = 'Ensure that file ends with newline'
+          TabOrder = 1
+        end
+        object cbAutoIndent: TCheckBox
+          Left = 8
+          Top = 18
+          Width = 177
+          Height = 17
+          Hint = 'caret will position to first non-whitespace of preceeding line'
+          Caption = 'Auto Indent'
+          TabOrder = 2
+        end
+        object cbDoubleLine: TCheckBox
+          Left = 201
+          Top = 69
+          Width = 184
+          Height = 17
+          Hint = 'double clicking a line selects it'
+          Caption = 'Double Click Line'
+          TabOrder = 3
+        end
+        object cbDropFiles: TCheckBox
+          Left = 8
+          Top = 138
+          Width = 177
+          Height = 17
+          Caption = 'Insert Dropped Files'
+          TabOrder = 4
+        end
+        object cbEHomeKey: TCheckBox
+          Left = 201
+          Top = 18
+          Width = 184
+          Height = 17
+          Hint = 'enhances home key positioning, similar to visual studio'
+          Caption = 'Enhance home key'
+          TabOrder = 5
+        end
+        object cbInsertMode: TCheckBox
+          Left = 8
+          Top = 35
+          Width = 177
+          Height = 17
+          Hint = 'editor is in insert mode on start'
+          Caption = 'Insert Mode'
+          TabOrder = 6
+        end
+        object cbParserHints: TCheckBox
+          Left = 201
+          Top = 156
+          Width = 184
+          Height = 17
+          Caption = 'Show editor hints'
+          TabOrder = 7
+        end
+        object cbHalfPage: TCheckBox
+          Left = 201
+          Top = 121
+          Width = 184
+          Height = 17
+          Hint = 'page up/down will move text by half a page instead of full page'
+          Caption = 'Half Page Scrolling'
+          TabOrder = 8
+        end
+        object cbGroupUndo: TCheckBox
+          Left = 8
+          Top = 121
+          Width = 177
+          Height = 17
+          Hint = 'handle all changes of same type as single action'
+          Caption = 'Group Undo'
+          TabOrder = 9
+        end
+        object cbFindText: TCheckBox
+          Left = 201
+          Top = 87
+          Width = 184
+          Height = 17
+          Hint = 'inserts text at cursor into text to find of search dialog'
+          Caption = 'Find Text at Cursor'
+          TabOrder = 10
+        end
+        object cbPastEOL: TCheckBox
+          Left = 201
+          Top = 52
+          Width = 184
+          Height = 17
+          Hint = 'allows cursor position past end of line'
+          Caption = 'Cursor Past EOL'
+          TabOrder = 11
+        end
+        object cbPastEOF: TCheckBox
+          Left = 201
+          Top = 35
+          Width = 184
+          Height = 17
+          Hint = 'allow cursor position past end of file'
+          Caption = 'Cursor Past EOF'
+          TabOrder = 12
+        end
+        object cbScrollHint: TCheckBox
+          Left = 201
+          Top = 138
+          Width = 184
+          Height = 17
+          Hint = 'shows current line when scrolling'
+          Caption = 'Scroll Hint'
+          TabOrder = 13
+        end
+        object cbSmartScroll: TCheckBox
+          Left = 201
+          Top = 104
+          Width = 184
+          Height = 17
+          Hint = 'show scrollbars only when content is available'
+          Caption = 'Scollbars on need'
+          TabOrder = 14
+        end
+        object cbSpecialChars: TCheckBox
+          Left = 8
+          Top = 156
+          Width = 177
+          Height = 17
+          Caption = 'Show Special Line Chars'
+          TabOrder = 15
+        end
+        object cbTrailingBlanks: TCheckBox
+          Left = 8
+          Top = 87
+          Width = 177
+          Height = 17
+          Hint = 'Blanks at end of lines will be saved with file'
+          Caption = 'Keep Trailing Blanks'
+          TabOrder = 16
+        end
+        object cbTabtoSpaces: TCheckBox
+          Left = 8
+          Top = 52
+          Width = 177
+          Height = 17
+          Caption = 'Use Tab Character'
+          TabOrder = 17
+        end
+        object cbSmartTabs: TCheckBox
+          Left = 8
+          Top = 69
+          Width = 177
+          Height = 17
+          Hint = 
+            'on tab cursor is moved to first nonblank space of preceeding lin' +
+            'e'
+          Caption = 'Smart Tabs'
+          TabOrder = 18
+        end
+        object cbSmartUnIndent: TCheckBox
+          Left = 8
+          Top = 104
+          Width = 177
+          Height = 17
+          Hint = 'cursor is moved to nonblank space of previous line '
+          Caption = 'Backspace Unindents'
+          TabOrder = 19
+        end
       end
       object grpCaret: TGroupBox
         Left = 9
@@ -218,174 +394,6 @@ object EditorOptForm: TEditorOptForm
         Caption = 'Highlight current line'
         TabOrder = 5
         OnClick = cbHighCurrLineClick
-      end
-      object cbTrailingBlanks: TCheckBox
-        Left = 16
-        Top = 87
-        Width = 177
-        Height = 17
-        Hint = 'Blanks at end of lines will be saved with file'
-        Caption = 'Keep Trailing Blanks'
-        TabOrder = 6
-      end
-      object cbTabtoSpaces: TCheckBox
-        Left = 16
-        Top = 52
-        Width = 177
-        Height = 17
-        Caption = 'Use Tab Character'
-        TabOrder = 7
-      end
-      object cbSpecialChars: TCheckBox
-        Left = 16
-        Top = 156
-        Width = 177
-        Height = 17
-        Caption = 'Show Special Line Chars'
-        TabOrder = 8
-      end
-      object cbSmartUnIndent: TCheckBox
-        Left = 16
-        Top = 104
-        Width = 177
-        Height = 17
-        Hint = 'cursor is moved to nonblank space of previous line '
-        Caption = 'Backspace Unindents'
-        TabOrder = 9
-      end
-      object cbSmartTabs: TCheckBox
-        Left = 16
-        Top = 69
-        Width = 177
-        Height = 17
-        Hint = 
-          'on tab cursor is moved to first nonblank space of preceeding lin' +
-          'e'
-        Caption = 'Smart Tabs'
-        TabOrder = 10
-      end
-      object cbSmartScroll: TCheckBox
-        Left = 209
-        Top = 104
-        Width = 184
-        Height = 17
-        Hint = 'show scrollbars only when content is available'
-        Caption = 'Scollbars on need'
-        TabOrder = 11
-      end
-      object cbScrollHint: TCheckBox
-        Left = 209
-        Top = 138
-        Width = 184
-        Height = 17
-        Hint = 'shows current line when scrolling'
-        Caption = 'Scroll Hint'
-        TabOrder = 12
-      end
-      object cbPastEOL: TCheckBox
-        Left = 209
-        Top = 52
-        Width = 184
-        Height = 17
-        Hint = 'allows cursor position past end of line'
-        Caption = 'Cursor Past EOL'
-        TabOrder = 13
-      end
-      object cbPastEOF: TCheckBox
-        Left = 209
-        Top = 35
-        Width = 184
-        Height = 17
-        Hint = 'allow cursor position past end of file'
-        Caption = 'Cursor Past EOF'
-        TabOrder = 14
-      end
-      object cbParserHints: TCheckBox
-        Left = 209
-        Top = 156
-        Width = 184
-        Height = 17
-        Caption = 'Show editor hints'
-        TabOrder = 15
-      end
-      object cbInsertMode: TCheckBox
-        Left = 16
-        Top = 35
-        Width = 177
-        Height = 17
-        Hint = 'editor is in insert mode on start'
-        Caption = 'Insert Mode'
-        TabOrder = 16
-      end
-      object cbHalfPage: TCheckBox
-        Left = 209
-        Top = 121
-        Width = 184
-        Height = 17
-        Hint = 'page up/down will move text by half a page instead of full page'
-        Caption = 'Half Page Scrolling'
-        TabOrder = 17
-      end
-      object cbGroupUndo: TCheckBox
-        Left = 16
-        Top = 121
-        Width = 177
-        Height = 17
-        Hint = 'handle all changes of same type as single action'
-        Caption = 'Group Undo'
-        TabOrder = 18
-      end
-      object cbFindText: TCheckBox
-        Left = 209
-        Top = 87
-        Width = 184
-        Height = 17
-        Hint = 'inserts text at cursor into text to find of search dialog'
-        Caption = 'Find Text at Cursor'
-        TabOrder = 19
-      end
-      object cbEHomeKey: TCheckBox
-        Left = 209
-        Top = 18
-        Width = 184
-        Height = 17
-        Hint = 'enhances home key positioning, similar to visual studio'
-        Caption = 'Enhance home key'
-        TabOrder = 20
-      end
-      object cbDropFiles: TCheckBox
-        Left = 16
-        Top = 138
-        Width = 177
-        Height = 17
-        Caption = 'Insert Dropped Files'
-        TabOrder = 21
-      end
-      object cbDoubleLine: TCheckBox
-        Left = 209
-        Top = 69
-        Width = 184
-        Height = 17
-        Hint = 'double clicking a line selects it'
-        Caption = 'Double Click Line'
-        TabOrder = 22
-      end
-      object cbAutoIndent: TCheckBox
-        Left = 16
-        Top = 18
-        Width = 177
-        Height = 17
-        Hint = 'caret will position to first non-whitespace of preceeding line'
-        Caption = 'Auto Indent'
-        TabOrder = 23
-      end
-      object cbAppendNewline: TCheckBox
-        Left = 16
-        Top = 172
-        Width = 177
-        Height = 17
-        Caption = 'Ensure that file ends with newline'
-        TabOrder = 24
       end
     end
     object tabDisplay: TdevPage
@@ -862,7 +870,7 @@ object EditorOptForm: TEditorOptForm
           object lblCode: TLabel
             Left = 0
             Top = 107
-            Width = 28
+            Width = 401
             Height = 13
             Align = alBottom
             Caption = 'Code:'
@@ -1320,6 +1328,7 @@ object EditorOptForm: TEditorOptForm
     Width = 75
     Height = 24
     Anchors = [akRight, akBottom]
+    Enabled = False
     TabOrder = 3
     OnClick = btnHelpClick
     Kind = bkHelp

@@ -85,9 +85,9 @@ OutputObjs=0
 ConsoleApp=1
 DebugInfo=0
 RemoteSymbols=0
-MinStackSize=16384
-MaxStackSize=4194304
-ImageBase=524288
+MinStackSize=32768
+MaxStackSize=8388608
+ImageBase=1048576
 ExeDescription=
 [Directories]
 OutputDir=..
@@ -111,7 +111,7 @@ AutoIncBuild=0
 MajorVer=5
 MinorVer=0
 Release=0
-Build=2
+Build=3
 Debug=0
 PreRelease=0
 Special=0
@@ -122,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Bloodshed Software
 FileDescription=Dev-C++ IDE
-FileVersion=5.0.0.2
+FileVersion=5.0.0.3
 InternalName=devcpp.exe
 LegalCopyright=Copyright Bloodshed Software
 LegalTrademarks=
@@ -130,3 +130,15 @@ OriginalFilename=devcpp.exe
 ProductName=Dev-C++
 ProductVersion=5
 Comments=Under the GNU General Public License
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=C:\Program Files (x86)\Dev-Cpp\source\Vcl;C:\Program Files (x86)\Dev-Cpp\source\Vcl\Class Browser & Completion;C:\Program Files (x86)\Dev-Cpp\source\Vcl\Color Picker;C:\Program Files (x86)\Dev-Cpp\source\Vcl\Dev Reg;C:\Program Files (x86)\Dev-Cpp\source\Vcl\Dev Tabs;C:\Program Files (x86)\Dev-Cpp\source\Vcl\File Monitor;C:\Program Files (x86)\Dev-Cpp\source\Vcl\Monitor Thread;C:\Program Files (x86)\Dev-Cpp\source\Vcl\Shortcuts;C:\Program Files (x86)\Dev-Cpp\source\Vcl\SynEdit\Source;C:\Program Files (x86)\Dev-Cpp\source\Vcl\Tooltip
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=units
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=..

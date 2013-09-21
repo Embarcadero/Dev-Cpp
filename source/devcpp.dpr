@@ -116,7 +116,8 @@ uses
   ProcessListFrm in 'ProcessListFrm.pas' {ProcessListForm},
   ModifyVarFrm in 'ModifyVarFrm.pas' {ModifyVarForm},
   PackmanExitCodesU in 'packman\PackmanExitCodesU.pas',
-  ImageTheme in 'ImageTheme.pas';
+  ImageTheme in 'ImageTheme.pas',
+  StoHtmlHelp in 'StoHtmlHelp.pas';
 
 {$R *.res}
 

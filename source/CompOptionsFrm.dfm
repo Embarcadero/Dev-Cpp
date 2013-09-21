@@ -112,6 +112,7 @@ object CompForm: TCompForm
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
+    Enabled = False
     TabOrder = 3
     OnClick = btnHelpClick
     Kind = bkHelp

@@ -43,6 +43,7 @@ type
     lblTip: TLabel;
     Bevel1: TBevel;
     lblUrl: TLabel;
+    btnRandom: TButton;
     procedure FormShow(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -51,6 +52,7 @@ type
     procedure btnPrevClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lblUrlClick(Sender: TObject);
+    procedure btnRandomClick(Sender: TObject);
   private
     { Private declarations }
     sl: TStringList;
@@ -61,6 +63,7 @@ type
     function CurrentTip: string;
     function NextTip: string;
     function PreviousTip: string;
+    function RandomTip: string;
     procedure SetTipsCounter(const Value: integer);
     procedure LoadText;
   public
@@ -180,6 +183,19 @@ begin
   Result := ConvertMacros(sl[TipsCounter]);
 end;
 
+function TTipOfTheDayForm.RandomTip: string;
+var
+	newval : integer;
+begin
+	Randomize;
+	repeat
+		// Make sure the same tip is never shown twice in a row
+		newval := 1 + Random(sl.Count - 1);
+	until newval <> TipsCounter;
+	TipsCounter := newval;
+	Result := ConvertMacros(sl[TipsCounter]);
+end;
+
 procedure TTipOfTheDayForm.btnNextClick(Sender: TObject);
 begin
   lblTip.Caption := NextTip;
@@ -188,6 +204,11 @@ end;
 procedure TTipOfTheDayForm.btnPrevClick(Sender: TObject);
 begin
   lblTip.Caption := PreviousTip;
+end;
+
+procedure TTipOfTheDayForm.btnRandomClick(Sender: TObject);
+begin
+  lblTip.Caption := RandomTip;
 end;
 
 procedure TTipOfTheDayForm.LoadFromFile(Filename: string);

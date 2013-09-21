@@ -1470,7 +1470,7 @@ begin
 	fHalfPage:= FALSE;
 	fShowScrollHint:= TRUE;
 	fParserHints:= TRUE; // Editor hints
-	fAutoCloseBrace:= FALSE; // Buggy
+	fAutoCloseBrace:= TRUE;
 
 	// Caret
 	fInsertCaret:= 0;

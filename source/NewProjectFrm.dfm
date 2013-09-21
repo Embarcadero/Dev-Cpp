@@ -190,6 +190,7 @@ object NewProjectForm: TNewProjectForm
     Width = 75
     Height = 24
     Anchors = [akRight, akBottom]
+    Enabled = False
     TabOrder = 5
     OnClick = btnHelpClick
     Kind = bkHelp

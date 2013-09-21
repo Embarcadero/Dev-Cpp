@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 451
-  Top = 207
-  Width = 759
+  Left = 374
+  Top = 312
+  Width = 887
   Height = 685
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -34,7 +34,7 @@ object MainForm: TMainForm
   object SplitterBottom: TSplitter
     Left = 0
     Top = 494
-    Width = 743
+    Width = 871
     Height = 2
     Cursor = crVSplit
     Align = alBottom
@@ -44,9 +44,9 @@ object MainForm: TMainForm
   object MessageControl: TPageControl
     Left = 0
     Top = 496
-    Width = 743
+    Width = 871
     Height = 112
-    ActivePage = CompSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Constraints.MinHeight = 1
     Images = dmMain.MenuImages_NewLook
@@ -63,8 +63,8 @@ object MainForm: TMainForm
       object CompilerOutput: TListView
         Left = 0
         Top = 0
-        Width = 731
-        Height = 80
+        Width = 859
+        Height = 79
         Align = alClient
         BevelOuter = bvRaised
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
       object ResourceOutput: TListBox
         Left = 0
         Top = 0
-        Width = 731
+        Width = 859
         Height = 79
         Align = alClient
         BevelKind = bkSoft
@@ -178,7 +178,7 @@ object MainForm: TMainForm
       object CompResGroupBox: TGroupBox
         Left = 257
         Top = 0
-        Width = 474
+        Width = 602
         Height = 79
         Align = alClient
         Caption = 'Compile log :'
@@ -186,13 +186,13 @@ object MainForm: TMainForm
         ParentCtl3D = False
         TabOrder = 1
         DesignSize = (
-          474
-          79)
+          602
+          80)
         object LogOutput: TMemo
           Left = 7
           Top = 16
-          Width = 460
-          Height = 54
+          Width = 588
+          Height = 56
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelInner = bvSpace
           BevelKind = bkTile
@@ -210,8 +210,8 @@ object MainForm: TMainForm
       object DebugSubPages: TPageControl
         Left = 0
         Top = 0
-        Width = 731
-        Height = 79
+        Width = 859
+        Height = 80
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -223,7 +223,7 @@ object MainForm: TMainForm
             Left = 468
             Top = 0
             Width = 156
-            Height = 48
+            Height = 49
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 0
@@ -302,7 +302,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 156
-            Height = 48
+            Height = 49
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 1
@@ -397,7 +397,7 @@ object MainForm: TMainForm
             Left = 156
             Top = 0
             Width = 156
-            Height = 48
+            Height = 49
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 2
@@ -492,7 +492,7 @@ object MainForm: TMainForm
             Left = 312
             Top = 0
             Width = 156
-            Height = 48
+            Height = 49
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 3
@@ -590,7 +590,7 @@ object MainForm: TMainForm
           object lvBacktrace: TListView
             Left = 0
             Top = 0
-            Width = 723
+            Width = 851
             Height = 48
             Align = alClient
             Columns = <
@@ -624,8 +624,8 @@ object MainForm: TMainForm
           object DebugOutput: TMemo
             Left = 0
             Top = 22
-            Width = 723
-            Height = 26
+            Width = 851
+            Height = 27
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -636,7 +636,7 @@ object MainForm: TMainForm
           object GdbOutputPanel: TPanel
             Left = 0
             Top = 0
-            Width = 723
+            Width = 851
             Height = 22
             Align = alTop
             BevelOuter = bvNone
@@ -676,7 +676,7 @@ object MainForm: TMainForm
       object FindOutput: TListView
         Left = 0
         Top = 0
-        Width = 731
+        Width = 859
         Height = 79
         Align = alClient
         BevelOuter = bvNone
@@ -725,7 +725,7 @@ object MainForm: TMainForm
   object ControlBar1: TControlBar
     Left = 0
     Top = 16
-    Width = 743
+    Width = 871
     Height = 56
     Align = alTop
     AutoDock = False
@@ -742,6 +742,8 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Main'
+      Constraints.MaxWidth = 177
+      Constraints.MinWidth = 177
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -811,6 +813,8 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Compile and Run'
+      Constraints.MaxWidth = 119
+      Constraints.MinWidth = 119
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -854,6 +858,8 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Options and help'
+      Constraints.MaxWidth = 46
+      Constraints.MinWidth = 46
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -883,6 +889,8 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Project'
+      Constraints.MaxWidth = 78
+      Constraints.MinWidth = 78
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -924,6 +932,8 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Edit'
+      Constraints.MaxWidth = 47
+      Constraints.MinWidth = 47
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -952,6 +962,8 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Search'
+      Constraints.MaxWidth = 101
+      Constraints.MinWidth = 101
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -999,6 +1011,8 @@ object MainForm: TMainForm
       AutoSize = True
       ButtonWidth = 60
       Caption = 'Specials'
+      Constraints.MaxWidth = 243
+      Constraints.MinWidth = 243
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -1045,11 +1059,14 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'tbClasses'
+      Constraints.MaxWidth = 452
+      Constraints.MinWidth = 452
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
       TabOrder = 7
+      Wrapable = False
       object cmbClasses: TComboBox
         Left = 0
         Top = 0
@@ -1091,7 +1108,7 @@ object MainForm: TMainForm
   object StatusBar: TStatusBar
     Left = 0
     Top = 608
-    Width = 743
+    Width = 871
     Height = 19
     Panels = <
       item
@@ -1112,7 +1129,7 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 195
     Top = 72
-    Width = 548
+    Width = 676
     Height = 422
     Align = alClient
     PopupMenu = EditorPopupMenu
@@ -1126,20 +1143,20 @@ object MainForm: TMainForm
   object pnlFull: TPanel
     Left = 0
     Top = 0
-    Width = 743
+    Width = 871
     Height = 16
     Align = alTop
     BevelOuter = bvNone
     Caption = 
-      'Dev-C++ version 5.0 full screen press shift+F12 to toggle Toolba' +
-      'rs.'
+      'Dev-C++ version 5.0.0.3 Fullscreen. Press F11 to toggle Toolbars' +
+      ' or F12 to toggle Fullscreen.'
     TabOrder = 4
     Visible = False
     DesignSize = (
-      743
+      871
       16)
     object btnFullScrRevert: TSpeedButton
-      Left = 726
+      Left = 854
       Top = 0
       Width = 16
       Height = 16
@@ -1174,7 +1191,7 @@ object MainForm: TMainForm
     Top = 72
     Width = 193
     Height = 422
-    ActivePage = DebugLeftSheet
+    ActivePage = ProjectSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 6
@@ -1191,6 +1208,7 @@ object MainForm: TMainForm
         BevelInner = bvNone
         BevelOuter = bvNone
         BorderStyle = bsNone
+        ChangeDelay = 1
         DragMode = dmAutomatic
         HideSelection = False
         HotTrack = True
@@ -1274,7 +1292,7 @@ object MainForm: TMainForm
     end
   end
   object MainMenu: TMainMenu
-    Images = dmMain.MenuImages_Gnome
+    Images = dmMain.MenuImages_NewLook
     Left = 294
     Top = 79
     object FileMenu: TMenuItem
@@ -1687,6 +1705,10 @@ object MainForm: TMainForm
       object Profileanalysis1: TMenuItem
         Action = actProfileProject
       end
+      object DeleteProfilingInformation: TMenuItem
+        Action = actDeleteProfileProject
+        Caption = 'Delete Profiling Information'
+      end
       object N25: TMenuItem
         Caption = '-'
       end
@@ -1930,17 +1952,6 @@ object MainForm: TMainForm
         Caption = '&Help on Dev-C++'
         OnClick = HelpMenuItemClick
       end
-      object HelpSep1: TMenuItem
-        Caption = '-'
-        Enabled = False
-      end
-      object HelpSep2: TMenuItem
-        Caption = '-'
-        Enabled = False
-      end
-      object Customize1: TMenuItem
-        Action = actHelpCustomize
-      end
       object ips1: TMenuItem
         Action = actShowTips
       end
@@ -1955,7 +1966,6 @@ object MainForm: TMainForm
     Top = 212
     object Close1: TMenuItem
       Action = actClose
-      ShortCut = 16471
     end
     object CloseAll1: TMenuItem
       Action = actCloseAll
@@ -2316,7 +2326,7 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = '&Close'
       ImageIndex = 9
-      ShortCut = 16499
+      ShortCut = 16471
       OnExecute = actCloseExecute
       OnUpdate = actUpdatePageCount
     end
@@ -2680,7 +2690,6 @@ object MainForm: TMainForm
     object actHelpCustomize: TAction
       Category = 'Help'
       Caption = 'Customize...'
-      OnExecute = actHelpCustomizeExecute
     end
     object actUnitRemove: TAction
       Tag = 1
@@ -3111,6 +3120,16 @@ object MainForm: TMainForm
       OnExecute = actModifyWatchExecute
       OnUpdate = actModifyWatchUpdate
     end
+    object Action1: TAction
+      Category = 'Project'
+      Caption = 'Action1'
+    end
+    object actDeleteProfileProject: TAction
+      Category = 'Execute'
+      Caption = 'actDeleteProfileProject'
+      OnExecute = actDeleteProfileProjectExecute
+      OnUpdate = actDeleteProfRunUpdate
+    end
   end
   object ApplicationEvents1: TApplicationEvents
     OnDeactivate = ApplicationEvents1Deactivate
@@ -3285,9 +3304,6 @@ object MainForm: TMainForm
     object HelponDevPopupItem: TMenuItem
       Caption = '&Help on Dev-C++'
       OnClick = HelpMenuItemClick
-    end
-    object N64: TMenuItem
-      Caption = '-'
     end
   end
 end

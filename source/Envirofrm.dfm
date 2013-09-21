@@ -68,6 +68,7 @@ object EnviroForm: TEnviroForm
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
+    Enabled = False
     TabOrder = 0
     OnClick = btnHelpClick
     Kind = bkHelp
@@ -307,7 +308,7 @@ object EnviroForm: TEnviroForm
         Width = 147
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 13
       end
       object cboTheme: TComboBox
@@ -316,7 +317,7 @@ object EnviroForm: TEnviroForm
         Width = 147
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 14
       end
     end
@@ -677,8 +678,8 @@ object EnviroForm: TEnviroForm
         Caption = 'External programs associations:'
       end
       object btnExtAdd: TSpeedButton
-        Left = 99
-        Top = 281
+        Left = 98
+        Top = 277
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -686,8 +687,8 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtAddClick
       end
       object btnExtDel: TSpeedButton
-        Left = 201
-        Top = 281
+        Left = 199
+        Top = 277
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -697,8 +698,8 @@ object EnviroForm: TEnviroForm
       object vleExternal: TValueListEditor
         Left = 16
         Top = 24
-        Width = 369
-        Height = 252
+        Width = 365
+        Height = 248
         Anchors = [akLeft, akTop, akRight, akBottom]
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         Options = [goVertLine, goHorzLine, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -741,8 +742,8 @@ object EnviroForm: TEnviroForm
       end
       object lblAssocDesc: TLabel
         Left = 16
-        Top = 273
-        Width = 369
+        Top = 269
+        Width = 365
         Height = 35
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
@@ -754,8 +755,8 @@ object EnviroForm: TEnviroForm
       object lstAssocFileTypes: TCheckListBox
         Left = 16
         Top = 24
-        Width = 369
-        Height = 244
+        Width = 365
+        Height = 240
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0

@@ -870,6 +870,7 @@ const
   ID_PROF_CAPTION                  = 995;
   ID_PROF_TABFLAT                  = 996;
   ID_PROF_TABGRAPH                 = 997;
+  ID_PROF_TABOPTS                  = 998;
 
 { -- global strings  -- }
   //messages and prompts - 1000+
@@ -1005,6 +1006,7 @@ const
 { Execute menu }
   ID_ITEM_EXECPARAMS               = 2900;
   ID_ITEM_COMPCURRENT              = 2901;
+  ID_ITEM_DELPROFILE               = 2902;
 
 { Window list form }
   ID_WL                            = 2910;

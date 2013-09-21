@@ -148,13 +148,16 @@ type
    function GetExecutableName : string;
    procedure SetFileName(value: string);
    procedure SetNode(value: TTreeNode);
-   function GetModified: boolean;
-   procedure SetModified(value: boolean);
+
    procedure SortUnitsByPriority;
     procedure SetCmdLineArgs(const Value: string);
     procedure SetCustomMakefile(const Value: string);
     procedure SetUseCustomMakefile(const Value: boolean);
   public
+  // Orwell edit
+  function GetModified: boolean;
+   procedure SetModified(value: boolean);
+
    property Options: TProjOptions read fOptions write fOptions;
    property Name: string read fName write fName;
    property FileName: string read fFileName write SetFileName;
@@ -942,7 +945,7 @@ begin
 		Write('IncludeVersionInfo', fOptions.IncludeVersionInfo);
 		Write('SupportXPThemes', fOptions.SupportXPThemes);
 		Write('CompilerSet', fOptions.CompilerSet);
-		if(fOptions.CompilerOptions <> '') then
+		if(Length(fOptions.CompilerOptions) > 0) then
 			Write('CompilerSettings', fOptions.CompilerOptions)
 		else begin
 			Write('CompilerSettings', devCompiler.OptionStr);

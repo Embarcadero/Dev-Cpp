@@ -118,9 +118,6 @@ type
     destructor Destroy; override;
     // RNC set the breakpoints for this file when it is opened
     procedure SetBreakPointsOnOpen;
-    procedure SetLineCol;
-    procedure SetDone(msg:string);
-
     // RNC 07-21-04
     // Add remove a breakpoint without calling OnBreakpointToggle
     function HasBreakPoint(line_number: integer): integer;
@@ -649,19 +646,6 @@ begin
    end;
 end;
 
-procedure TEditor.SetLineCol;
-begin
-	// keep statusbar updated
-	MainForm.Statusbar.Panels[0].Text:= format('%6d: %d', [fText.DisplayY, fText.DisplayX]);
-	MainForm.Statusbar.Panels[3].Text:= format(Lang[ID_LINECOUNT], [fText.Lines.Count]);
-end;
-
-procedure TEditor.SetDone(msg:string);
-begin
-	// keep statusbar updated
-	MainForm.Statusbar.Panels[3].Text:= msg;
-end;
-
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
 	if scModified in Changes then begin
@@ -768,15 +752,14 @@ end;
 
 procedure TEditor.InsertString(const Value: string; const move: boolean);
 var
- Line: string;
- idx,
- idx2: integer;
- pt: TBufferCoord;
- tmp: TStringList;
+	Line: string;
+	idx,idx2: integer;
+	pt: TBufferCoord;
+	tmp: TStringList;
 begin
-  if not assigned(fText) then exit;
-  pt:= fText.CaretXY;
-  tmp:= TStringList.Create;
+	if not assigned(fText) then exit;
+	pt:= fText.CaretXY;
+	tmp:= TStringList.Create;
   try // move cursor to pipe '|', don't do that, might be used by code, use *|* instead
    tmp.Text:= Value;
    if Move then
@@ -1036,6 +1019,7 @@ end;
 procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 var
 	M: TMemoryStream;
+	counter : integer;
 begin
 	// Indent/Unindent selected text with TAB key, like Visual C++ ...
 {$IFDEF WIN32}
@@ -1050,9 +1034,27 @@ begin
 					FText.ExecuteCommand(ecBlockIndent, #0, nil)
 				else
 					FText.ExecuteCommand(ecBlockUnindent, #0, nil);
-				Abort;
 			end;
 		end;
+	end;
+
+	if devEditor.AutoCloseBrace then begin
+		if Key = 57 then // 9 key
+			if (ssShift in Shift) then
+				// Men typt (
+				InsertString(')',false);
+		if Key = 219 then // [ key on US standard layout according to MSDN
+			if (ssShift in Shift) then begin
+				// Men typt {
+				counter:=0;
+				if Length(FText.LineText) > 0 then begin
+					repeat
+						Inc(counter);
+					until not (FText.LineText[counter] in [#9,#32]);
+					FText.Lines.Insert(FText.CaretY,Copy(FText.LineText,1,counter-1) + '}');
+				end else
+					InsertString(#13#10 + '}',false);
+			end;
 	end;
 
 	if fCompletionBox.Enabled then begin
@@ -1431,21 +1433,19 @@ end;
 {** Modified by Peter **}
 procedure TEditor.IndentSelection;
 begin
-	if FText.SelAvail then begin
-		FText.ExecuteCommand(ecBlockIndent, #0, nil);
-	end else begin
+	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
+		FText.ExecuteCommand(ecBlockIndent, #0, nil)
+	else
 		FText.ExecuteCommand(ecTab,#0, nil);
-	end;
 end;
 
 {** Modified by Peter **}
 procedure TEditor.UnindentSelection;
 begin
-	if FText.SelAvail then begin
-		FText.ExecuteCommand(ecBlockUnIndent, #0, nil);
-	end else begin
+	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
+		FText.ExecuteCommand(ecBlockUnIndent, #0, nil)
+	else
 		FText.ExecuteCommand(ecShiftTab,#0, nil);
-	end;
 end;
 
 {** Modified by Peter **}

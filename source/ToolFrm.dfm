@@ -1,7 +1,7 @@
 object ToolForm: TToolForm
-  Left = 533
+  Left = 390
   Top = 297
-  Width = 300
+  Width = 335
   Height = 320
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
@@ -65,24 +65,24 @@ object ToolForm: TToolForm
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    284
+    319
     282)
   PixelsPerInch = 96
   TextHeight = 13
   object grpCurrent: TGroupBox
-    Left = 8
-    Top = 56
-    Width = 278
-    Height = 190
+    Left = 16
+    Top = 64
+    Width = 289
+    Height = 206
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Current tools :'
     TabOrder = 0
     DesignSize = (
-      278
-      190)
+      289
+      206)
     object btnUp: TSpeedButton
       Tag = 1
-      Left = 250
+      Left = 257
       Top = 64
       Width = 23
       Height = 22
@@ -106,8 +106,8 @@ object ToolForm: TToolForm
     end
     object btnDown: TSpeedButton
       Tag = 2
-      Left = 250
-      Top = 96
+      Left = 257
+      Top = 104
       Width = 23
       Height = 22
       Anchors = [akTop, akRight]
@@ -131,8 +131,8 @@ object ToolForm: TToolForm
     object ListBox: TListBox
       Left = 8
       Top = 16
-      Width = 238
-      Height = 164
+      Width = 242
+      Height = 180
       Anchors = [akLeft, akTop, akRight, akBottom]
       ItemHeight = 13
       TabOrder = 0
@@ -140,43 +140,15 @@ object ToolForm: TToolForm
       OnDblClick = btnEditClick
     end
   end
-  object btnClose: TBitBtn
-    Left = 101
-    Top = 258
-    Width = 89
-    Height = 25
-    Anchors = [akBottom]
-    Cancel = True
-    Caption = '&Close'
-    ModalResult = 1
-    TabOrder = 1
-    Glyph.Data = {
-      DE010000424DDE01000000000000760000002800000024000000120000000100
-      0400000000006801000000000000000000001000000000000000000000000000
-      80000080000000808000800000008000800080800000C0C0C000808080000000
-      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00388888888877
-      F7F787F8888888888333333F00004444400888FFF444448888888888F333FF8F
-      000033334D5007FFF4333388888888883338888F0000333345D50FFFF4333333
-      338F888F3338F33F000033334D5D0FFFF43333333388788F3338F33F00003333
-      45D50FEFE4333333338F878F3338F33F000033334D5D0FFFF43333333388788F
-      3338F33F0000333345D50FEFE4333333338F878F3338F33F000033334D5D0FFF
-      F43333333388788F3338F33F0000333345D50FEFE4333333338F878F3338F33F
-      000033334D5D0EFEF43333333388788F3338F33F0000333345D50FEFE4333333
-      338F878F3338F33F000033334D5D0EFEF43333333388788F3338F33F00003333
-      4444444444333333338F8F8FFFF8F33F00003333333333333333333333888888
-      8888333F00003333330000003333333333333FFFFFF3333F00003333330AAAA0
-      333333333333888888F3333F00003333330000003333333333338FFFF8F3333F
-      0000}
-    NumGlyphs = 2
-  end
   object grpActions: TGroupBox
-    Left = 8
-    Top = 4
-    Width = 278
+    Left = 16
+    Top = 8
+    Width = 289
     Height = 49
+    Align = alCustom
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Actions'
-    TabOrder = 2
+    TabOrder = 1
     object btnAdd: TSpeedButton
       Left = 8
       Top = 16

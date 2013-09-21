@@ -1,6 +1,6 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 1155
-  Top = 107
+  Left = 939
+  Top = 475
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -488,7 +488,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 373
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 1
       end
     end

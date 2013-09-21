@@ -28,7 +28,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
-  devTabs, prjtypes, Spin, Grids, ValEdit, CompilerOptionsFrame;
+  devTabs, prjtypes, Spin, Grids, ValEdit, CompilerOptionsFrame, ShellApi;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -477,7 +477,7 @@ end;
 
 procedure TfrmProjectOptions.SetOptions(Value: TProjOptions);
 var
-	idx, cntSrc, cntHdr, cntRes: integer;
+	idx, cntSrc, cntHdr, cntRes, cntOther: integer;
 begin
 	fOptions:= Value;
 	fIcon:= GetRealPath(fOptions.Icon, fProject.Directory);
@@ -499,13 +499,15 @@ begin
   cntSrc:=0;
   cntHdr:=0;
   cntRes:=0;
+  cntOther:=0;
   for idx:=0 to fProject.Units.Count-1 do
     case GetFileTyp(fProject.Units[idx].FileName)of
       utSrc: Inc(cntSrc);
       utHead: Inc(cntHdr);
       utRes: Inc(cntRes);
+      else Inc(cntOther);
     end;
-  lblPrjUnits.Caption:=Format(Lang[ID_POPT_UNITSFORMAT], [fProject.Units.Count, cntSrc, cntHdr, cntRes]);
+  lblPrjUnits.Caption:=Format(Lang[ID_POPT_UNITSFORMAT], [fProject.Units.Count, cntSrc, cntHdr, cntRes, cntOther]);
   chkSupportXP.Checked:=fOptions.SupportXPThemes;
 
   // Output tab
@@ -874,9 +876,27 @@ begin
 end;
 
 procedure TfrmProjectOptions.btnHelpClick(Sender: TObject);
+var
+	topic : string;
 begin
-  Application.HelpFile := IncludeTrailingBackslash(devDirs.Help) + DEV_MAINHELP_FILE;
-  Application.HelpJump('ID_MANAGEPROJECT');
+	if PageControl.ActivePageIndex = 0 then
+		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/General.htm'
+	else if PageControl.ActivePageIndex = 1 then
+		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Files.htm'
+	else if PageControl.ActivePageIndex = 2 then
+		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Compiler.htm'
+	else if PageControl.ActivePageIndex = 3 then
+		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Parameters.htm'
+	else if PageControl.ActivePageIndex = 4 then
+		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Directories.htm'
+	else if PageControl.ActivePageIndex = 5 then
+		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Build.htm'
+	else if PageControl.ActivePageIndex = 6 then
+		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Makefile.htm'
+	else if PageControl.ActivePageIndex = 7 then
+		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Version Info.htm';
+	Application.HelpFile := IncludeTrailingBackslash(devDirs.Help) + DEV_MAINHELP_FILE;
+	Application.HelpJump(Application.HelpFile + '::' + topic);
 end;
 
 procedure TfrmProjectOptions.chkOverrideOutputClick(Sender: TObject);

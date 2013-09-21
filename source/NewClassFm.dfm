@@ -1,9 +1,9 @@
 object NewClassForm: TNewClassForm
-  Left = 241
-  Top = 70
+  Left = 225
+  Top = 301
   BorderStyle = bsDialog
   Caption = 'New class'
-  ClientHeight = 470
+  ClientHeight = 500
   ClientWidth = 369
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -26,21 +26,21 @@ object NewClassForm: TNewClassForm
   end
   object Label4: TLabel
     Left = 8
-    Top = 188
+    Top = 228
     Width = 116
     Height = 13
     Caption = 'Implementation filename:'
   end
   object Label5: TLabel
     Left = 8
-    Top = 216
+    Top = 256
     Width = 80
     Height = 13
     Caption = 'Header filename:'
   end
   object btnBrowseCpp: TSpeedButton
     Left = 338
-    Top = 184
+    Top = 224
     Width = 23
     Height = 22
     Caption = '...'
@@ -48,7 +48,7 @@ object NewClassForm: TNewClassForm
   end
   object btnBrowseH: TSpeedButton
     Left = 338
-    Top = 212
+    Top = 252
     Width = 23
     Height = 22
     Caption = '...'
@@ -60,6 +60,13 @@ object NewClassForm: TNewClassForm
     Width = 53
     Height = 13
     Caption = 'Arguments:'
+  end
+  object Label10: TLabel
+    Left = 8
+    Top = 64
+    Width = 62
+    Height = 13
+    Caption = 'Construction:'
   end
   object txtName: TEdit
     Left = 88
@@ -73,7 +80,7 @@ object NewClassForm: TNewClassForm
   end
   object GroupBox1: TGroupBox
     Left = 8
-    Top = 84
+    Top = 116
     Width = 353
     Height = 93
     Caption = 'Inheritance'
@@ -136,7 +143,7 @@ object NewClassForm: TNewClassForm
   end
   object txtCppFile: TEdit
     Left = 132
-    Top = 184
+    Top = 224
     Width = 205
     Height = 21
     TabOrder = 4
@@ -145,7 +152,7 @@ object NewClassForm: TNewClassForm
   end
   object txtHFile: TEdit
     Left = 132
-    Top = 212
+    Top = 252
     Width = 205
     Height = 21
     TabOrder = 5
@@ -153,16 +160,17 @@ object NewClassForm: TNewClassForm
     OnChange = txtCppFileChange
   end
   object chkAddToProject: TCheckBox
-    Left = 8
-    Top = 244
-    Width = 353
+    Left = 232
+    Top = 284
+    Width = 129
     Height = 17
+    Alignment = taLeftJustify
     Caption = 'Add to current project'
     TabOrder = 6
   end
   object btnCreate: TButton
     Left = 105
-    Top = 436
+    Top = 468
     Width = 75
     Height = 25
     Caption = 'Create'
@@ -173,7 +181,7 @@ object NewClassForm: TNewClassForm
   end
   object btnCancel: TButton
     Left = 189
-    Top = 436
+    Top = 468
     Width = 75
     Height = 25
     Cancel = True
@@ -183,7 +191,7 @@ object NewClassForm: TNewClassForm
   end
   object chkInherit: TCheckBox
     Left = 8
-    Top = 60
+    Top = 92
     Width = 353
     Height = 17
     Caption = 'Inherit from another class'
@@ -192,7 +200,7 @@ object NewClassForm: TNewClassForm
   end
   object GroupBox2: TGroupBox
     Left = 8
-    Top = 272
+    Top = 304
     Width = 357
     Height = 153
     Caption = 'Comment'
@@ -220,7 +228,6 @@ object NewClassForm: TNewClassForm
         'memDescr')
       ScrollBars = ssBoth
       TabOrder = 0
-      OnChange = memDescrChange
     end
     object cmbComment: TComboBox
       Left = 40
@@ -246,8 +253,24 @@ object NewClassForm: TNewClassForm
     TabOrder = 1
     Text = 'txtArgs'
   end
+  object chkConstruct: TCheckBox
+    Left = 88
+    Top = 62
+    Width = 121
+    Height = 17
+    Caption = 'Create Constructor'
+    TabOrder = 10
+  end
+  object chkDestruct: TCheckBox
+    Left = 232
+    Top = 62
+    Width = 121
+    Height = 17
+    Caption = 'Create Destructor'
+    TabOrder = 11
+  end
   object SaveDialog1: TSaveDialog
-    Left = 300
-    Top = 184
+    Left = 332
+    Top = 464
   end
 end

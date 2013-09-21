@@ -1,9 +1,9 @@
 object TipOfTheDayForm: TTipOfTheDayForm
-  Left = 192
-  Top = 107
+  Left = 357
+  Top = 252
   BorderStyle = bsDialog
   Caption = 'Tip Of The Day'
-  ClientHeight = 236
+  ClientHeight = 237
   ClientWidth = 385
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -26,7 +26,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Height = 209
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    Color = clWindow
+    Color = clWhite
     TabOrder = 4
     object Image: TImage
       Left = 8
@@ -193,5 +193,14 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Height = 16
     Caption = 'Don'#39't display tips on startup'
     TabOrder = 3
+  end
+  object btnRandom: TButton
+    Left = 304
+    Top = 60
+    Width = 77
+    Height = 25
+    Caption = 'Random Tip'
+    TabOrder = 5
+    OnClick = btnRandomClick
   end
 end
