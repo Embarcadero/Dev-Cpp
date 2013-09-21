@@ -43,9 +43,9 @@ uses
 type
   TCustomToolTip = class(THintWindow)
   private
-    FActivated: Boolean;  
+    FActivated: Boolean;
   protected
-    property Activated: Boolean read FActivated;    
+    property Activated: Boolean read FActivated;
   public
     constructor Create(AOwner: TComponent); override;
 {$IFDEF WIN32}

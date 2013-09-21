@@ -75,7 +75,6 @@ type
     procedure GetCompletionFor(_Class, _Value: string; HasDot: boolean = False);
 //    procedure GetCompletionFor1(_Class, _Value: string; HasDot: boolean = False);
     procedure FilterList(_Class, _Value: string; HasDot: boolean = False);
-    function GetClass(Phrase: string): string;
     function GetMember(Phrase: string): string;
     function GetHasDot(Phrase: string): boolean;
     procedure SetParser(Value: TCppParser);
@@ -95,6 +94,7 @@ type
     function SelectedIsFunction: boolean;
     procedure ShowArgsHint(FuncName: string; Rect: TRect);
     procedure ShowMsgHint(Rect: TRect; HintText: string);
+    function GetClass(Phrase: string): string;
   published
     property Parser: TCppParser read fParser write SetParser;
     property Position: TPoint read fPos write SetPosition;

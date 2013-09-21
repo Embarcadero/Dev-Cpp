@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 821
-  Top = 332
+  Left = 495
+  Top = 205
   Width = 848
   Height = 685
   Color = clBtnFace
@@ -809,12 +809,12 @@ object MainForm: TMainForm
     object tbCompile: TToolBar
       Left = 469
       Top = 2
-      Width = 148
+      Width = 170
       Height = 22
       AutoSize = True
       Caption = 'Compile and Run'
-      Constraints.MaxWidth = 148
-      Constraints.MinWidth = 148
+      Constraints.MaxWidth = 170
+      Constraints.MinWidth = 170
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -862,6 +862,11 @@ object MainForm: TMainForm
         Left = 123
         Top = 0
         Action = actProfileProject
+      end
+      object ProfilingInforBtn: TToolButton
+        Left = 146
+        Top = 0
+        Action = actDeleteProfileProject
       end
     end
     object tbProject: TToolBar
@@ -1114,6 +1119,7 @@ object MainForm: TMainForm
     Width = 637
     Height = 422
     Align = alClient
+    HotTrack = True
     MultiLine = True
     PopupMenu = EditorPopupMenu
     TabOrder = 3
@@ -1195,7 +1201,7 @@ object MainForm: TMainForm
         DragMode = dmAutomatic
         HideSelection = False
         HotTrack = True
-        Images = dmMain.ProjectImage_Gnome
+        Images = dmMain.ProjectImage_NewLook
         Indent = 19
         MultiSelect = True
         MultiSelectStyle = [msControlSelect, msShiftSelect]
@@ -1229,6 +1235,8 @@ object MainForm: TMainForm
         TabOrder = 0
         PopupMenu = BrowserPopup
         BorderStyle = bsNone
+        MultiSelect = True
+        MultiSelectStyle = [msShiftSelect]
         ShowFilter = sfAll
         OnSelect = ClassBrowser1Select
         Parser = CppParser1
@@ -1472,7 +1480,7 @@ object MainForm: TMainForm
       end
       object Uncomment1: TMenuItem
         Action = actUncomment
-        ShortCut = 16556
+        ShortCut = 16461
       end
       object N27: TMenuItem
         Caption = '-'
@@ -1939,7 +1947,6 @@ object MainForm: TMainForm
     end
   end
   object EditorPopupMenu: TPopupMenu
-    OnPopup = EditorPopupMenuPopup
     Left = 403
     Top = 212
     object GotoDeclEditor: TMenuItem

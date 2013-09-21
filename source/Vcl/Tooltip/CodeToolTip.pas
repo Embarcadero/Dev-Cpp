@@ -113,8 +113,8 @@ type
     constructor Create; virtual;
     function ClientRect: TRect;
   end;
-  
-  
+
+
   TCodeToolTipUpButton = class(TCustomCodeToolTipButton)
   private
     FBitmap: TBitmap;
@@ -128,7 +128,7 @@ type
   
   TCodeToolTipDownButton = class(TCustomCodeToolTipButton)
   private
-    FBitmap: TBitmap;  
+    FBitmap: TBitmap;
   protected
     procedure Paint(const TargetCanvas: TCanvas); override;
   public
@@ -146,8 +146,8 @@ type
     ttoCurrentArgumentBlackOnly,  // force the current argument to be black only
     shoFindBestMatchingToolTip    // automatically find the best matching tooltip (for overloaded functions)
   );
-      
-      
+
+
 {$IFDEF USE_XPTOOLTIP}
   TBaseCodeToolTip = class(TXPToolTip)
 {$ELSE}
@@ -293,7 +293,7 @@ begin
 	// functie(args) moet 'functie' returnen
 	Result := '';
 	iStart := AnsiPos('(', S);
-	iLen := 1;
+	iLen := 0;
 
 	// Als we de ( van een functie gevonden hebben
 	if iStart > 0 then begin
@@ -306,7 +306,7 @@ begin
 			Inc(iLen);
 		until (S[iStart] in [#0..#32]) or (iStart = 1); // This fixes an unsigned 0 - 1 range error
 
-		Result := Copy(S, iStart, iLen);
+		Result := Copy(S, iStart+1, iLen);
 	end;
 end;
 
@@ -540,7 +540,7 @@ begin
   begin
     Str := GetPrototypeName(FToolTips.Strings[I]);
     if Str = ToolTip then
-    begin     
+    begin
       K := CountCommas(FToolTips.Strings[I]);
       if K >= CommaIndex then
       begin
@@ -828,7 +828,7 @@ begin
   Result := Assigned (aEditor);
 
   if Result then
-  begin         
+  begin
     aEditor.RemoveKeyDownHandler(fKeyDownProc);
     if aEditor = fEditor then
       fEditor := nil;
@@ -963,7 +963,7 @@ var
   ProtoFound: Boolean;
   attr: TSynHighlighterAttributes;
   attrstr: String; //dummy string
-      
+
   // skip c/c++ commentblocks 
   procedure SkipCommentBlock;
   begin
@@ -1112,10 +1112,10 @@ begin
     // tooltip anymore, we simply use the current selection index
     if (shoFindBestMatchingToolTip in FOptions) then
       if not FCustomSelIndex then
-        S := FindClosestToolTip(S, nCommas);   
+        S := FindClosestToolTip(S, nCommas);
 
     if (FToolTips.Count > 0) and (FSelIndex < FToolTips.Count) then
-      S := FToolTips.Strings[FSelIndex];  
+      S := FToolTips.Strings[FSelIndex];
   end;
 
       
@@ -1131,7 +1131,7 @@ begin
 
     // get the index of the current bracket where the cursor it
     FCurParamIndex := GetCommaIndex(P, CurPos, Idx-1);
-    RethinkCoordAndActivate;    
+    RethinkCoordAndActivate;
   end
   else
   if (AnsiPos(Chr(FCurCharW), FEndWhenChr) > 0) then

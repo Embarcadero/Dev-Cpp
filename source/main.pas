@@ -592,6 +592,7 @@ type
 		ToolButton1: TToolButton;
 		ToolButton2: TToolButton;
 		ProfileBtn: TToolButton;
+    ProfilingInforBtn: TToolButton;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -853,10 +854,8 @@ type
 		procedure actMsgCopyAllExecute(Sender: TObject);
 		procedure actMsgSaveAllExecute(Sender: TObject);
 		procedure actDeleteProfileProjectExecute(Sender: TObject);
-		procedure actGotoImplDeclEditorUpdate(Sender: TObject);
 		procedure actGotoImplDeclEditorExecute(Sender: TObject);
 		procedure actHideFSBarExecute(Sender: TObject);
-    procedure EditorPopupMenuPopup(Sender: TObject);
 
 	private
 		fTab				: integer;
@@ -6387,187 +6386,19 @@ begin
 			MessageBox(Application.handle,PChar('Could not find profiling file '+ path + '!'),PChar('Error'),MB_ICONERROR);
 end;
 
-procedure TMainForm.actGotoImplDeclEditorUpdate(Sender: TObject);
-var
-	e : TEditor;
-	I,J : integer;
-	member,parent : string;
-	// Class getten
-	len : integer;
-	cpos : integer;
-	ppos : integer;
-	apos : integer;
-	// Class getten 2
-	classpos : boolean;
-	classline : string;
-	// Compare
-	compareto : string;
-	comparewith : string;
-	// globals
-	isglobal : boolean;
-	classlinenr : integer;
-begin
-	(Sender as TMenuItem).Enabled:=false;
-
-	isglobal:=false;
-	classlinenr:=0;
-	len:=0;
-	e:=GetEditor;
-	if Assigned(e) then
-		member := e.GetWordAtCursor;
-
-	if member <> '' then begin
-
-		// Als we op een classmemberfunctie klikken, komt foo:: erbij, we willen het met scope doen
-		cpos := Pos('::' + member,e.Text.LineText);
-		ppos := Pos('.'  + member,e.Text.LineText);
-		apos := Pos('->' + member,e.Text.LineText);
-		if cpos > 0 then begin
-			repeat
-				Inc(len);
-			until e.Text.LineText[cpos-len] in [#9,#32];
-			parent := Copy(e.Text.LineText,cpos-len+1,len-1);
-		end else if ppos > 0 then begin
-			repeat
-				Inc(len);
-			until not (e.Text.LineText[ppos-len] in [#48..#57,#65..#122,#95]);
-			parent := Copy(e.Text.LineText,ppos-len+1,len-1);
-
-			// als deze class een global is, is het een class / struct
-			for I:=0 to MainForm.CppParser1.Statements.Count-1 do begin
-				if PStatement(CppParser1.Statements[I])^._ParentID = -1 then begin
-					if PStatement(CppParser1.Statements[I])^._ScopeCmd <> '' then
-						compareto := PStatement(CppParser1.Statements[I])^._ScopeCmd
-					else
-						compareto := PStatement(CppParser1.Statements[I])^._ScopelessCmd;
-					if AnsiCompareStr(compareto,parent)=0 then begin
-						parent := Copy(PStatement(CppParser1.Statements[I])^._FullText,1,Pos(' ',PStatement(CppParser1.Statements[I])^._FullText)-1);
-						Break;
-					end;
-				end;
-			end;
-		end else if apos > 0 then begin
-			repeat
-				Inc(len);
-			until not (e.Text.LineText[apos-len] in [#48..#57,#65..#122,#95]);
-			parent := Copy(e.Text.LineText,apos-len+1,len-1);
-
-			// als deze class een global is, is het een class / struct
-			for I:=0 to MainForm.CppParser1.Statements.Count-1 do begin
-				if PStatement(CppParser1.Statements[I])^._ParentID = -1 then begin
-					if PStatement(CppParser1.Statements[I])^._ScopeCmd <> '' then
-						compareto := PStatement(CppParser1.Statements[I])^._ScopeCmd
-					else
-						compareto := PStatement(CppParser1.Statements[I])^._ScopelessCmd;
-					if AnsiCompareStr(compareto,parent)=0 then begin
-						parent := Copy(PStatement(CppParser1.Statements[I])^._FullText,1,Pos(' ',PStatement(CppParser1.Statements[I])^._FullText)-1);
-						Break;
-					end;
-				end;
-			end;
-		end else begin
-			// We kunnen ook al IN een class zitten
-			for I:=e.Text.CaretY-1 downto 0 do begin
-				len:=2;
-				classpos := AnsiStartsStr('class ',TrimLeft(e.Text.Lines[I]));
-				if classpos then begin
-					classline := TrimLeft(e.Text.Lines[I]);
-					// we zitten wel degelijk in een class
-					repeat
-						Inc(len);
-					until (classline[length('class ')+len] in [#9,#32]);
-					parent := Copy(classline,Length('class ')+1,len-1);
-					break;
-				end;
-			end;
-		end;
-
-		cpos := 0;
-		len := 0;
-
-		// kijk of 'member' in globals staat.
-		for I:=0 to MainForm.CppParser1.Statements.Count-1 do begin
-			if PStatement(CppParser1.Statements[I])^._ParentID = -1 then begin
-				if AnsiCompareStr(PStatement(CppParser1.Statements[I])^._ScopelessCmd,member)=0 then begin
-					isglobal:=true;
-					Break;
-				end;
-			end;
-		end;
-
-		// Dit hieronder alleen doen als member geen class of global is
-		if (ppos = 0) and (apos = 0) then begin
-			for I:=e.Text.CaretY-1 downto 0 do begin
-				// We zitten in de class
-				for J:=Length(e.Text.Lines[I]) downto 1 do begin
-					cpos := Pos('::',e.Text.Lines[I]);// de class uit
-					if cpos > 0 then begin
-						repeat
-							Inc(len);
-						until e.Text.Lines[I][cpos-len] in [#9,#32];
-						if not isglobal then
-							parent := Copy(e.Text.Lines[I],cpos-len+1,len-1);
-						classline := e.Text.Lines[I];
-						classlinenr := I+1;
-						break;
-					end;
-				end;
-				if cpos > 0 then break;
-			end;
-		end;
-
-		// kijk of 'member' in argumenten staat
-		if (classline <> '') and (classlinenr <> 0) then
-			if (AnsiPos(' '+member,classline) > 0) or (AnsiPos('*'+member,classline) > 0) or (AnsiPos('&'+member,classline) > 0) then begin
-				(Sender as TMenuItem).Enabled:=true;
-				Exit;
-			end;
-
-		// Assembleer de uiteindelijke naam, volledig deze keer
-		if (parent <> '') and (parent <> member) then
-			comparewith := parent + '::' + member
-		else
-			comparewith := member;
-
-		// Nu gaan we de database doorlopen
-		for I:=0 to MainForm.CppParser1.Statements.Count-1 do begin
-
-			// Als we een global zien, niet class ervoor (zou '::global' geven)
-			if PStatement(CppParser1.Statements[I])^._ParentID = -1 then begin
-				compareto := PStatement(CppParser1.Statements[I])^._ScopelessCmd;
-			end else begin
-				if PStatement(CppParser1.Statements[I])^._ScopeCmd <> '' then
-					compareto := PStatement(CppParser1.Statements[PStatement(CppParser1.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser1.Statements[I])^._ScopeCmd
-				else
-					compareto := PStatement(CppParser1.Statements[PStatement(CppParser1.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser1.Statements[I])^._ScopelessCmd;
-				compareto := Copy(compareto,Pos(' ',compareto)+1,Length(compareto)-Pos(' ',compareto));
-				if Pos('::',compareto) <> GetLastPos('::',compareto) then
-					compareto := Copy(compareto,Pos('::',compareto)+2,Length(compareto)-Pos('::',compareto)-1);
-			end;
-			if AnsiCompareStr(compareto,comparewith)=0 then begin
-				(Sender as TMenuItem).Enabled:=true;
-				Break;
-			end;
-		end;
-	end;
-end;
-
 procedure TMainForm.actGotoImplDeclEditorExecute(Sender: TObject);
 var
 	e : TEditor;
-	I,J : integer;
+	I : integer;
 	member,parent : string;
-	statement : PStatement;
-	filename : string;
-	line : integer;
 	// Class getten
 	len : integer;
 	cpos : integer;
 	ppos : integer;
 	apos : integer;
 	// Class getten 2
-	classpos : boolean;
 	classline : string;
+	classdefline : string;
 	classlinenr : integer;
 	parampos : integer;
 	// Compare
@@ -6575,20 +6406,30 @@ var
 	comparewith : string;
 	// globals
 	isglobal : boolean;
+
+	// Voor navigeren
+	statement : PStatement;
+	filename : string;
+	line : integer;
+
+	// timing
+//	starttime : cardinal;
+//	found : boolean;
 begin
-	Statement:=nil;
-	Line:=0;
-	len:=0;
-	classlinenr:=0;
-	isglobal:=false;
+//	starttime := GetTickCount;
 
 	e:=GetEditor;
-	if Sender.ClassName <> 'TEditor' then
-		member := e.GetWordAtCursor
+	if Sender.ClassName = 'TEditor' then
+		member := e.Text.WordAtMouse
 	else
-		member := e.Text.WordAtMouse;
+		member := e.GetWordAtCursor;
 
 	if member <> '' then begin
+
+		len:=0;
+		classlinenr:=0;
+		isglobal:=true;
+	//	found:=false;
 
 		// Als we op een classmemberfunctie klikken, komt foo:: erbij, we willen het met scope doen
 		cpos := Pos('::' + member,e.Text.LineText);
@@ -6597,165 +6438,173 @@ begin
 		if cpos > 0 then begin
 			repeat
 				Inc(len);
-			until e.Text.LineText[cpos-len] in [#9,#32];
+			until not (e.Text.LineText[cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
 			parent := Copy(e.Text.LineText,cpos-len+1,len-1);
-		end else if ppos > 0 then begin
+			isglobal := false;
+
+			// Hier hoeven we NIET te scannen, want definitie staat er al
+
+		end else if (ppos > 0) or (apos > 0) then begin
+
+			// Hier vinden we een instance voor de cursor, dus wel gaan scannen naar definitie
+			if ppos > 0 then cpos := ppos else cpos := apos;
 			repeat
 				Inc(len);
-			until not (e.Text.LineText[ppos-len] in [#48..#57,#65..#122,#95]);
-			parent := Copy(e.Text.LineText,ppos-len+1,len-1);
+			until not (e.Text.LineText[cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
+			parent := Copy(e.Text.LineText,cpos-len+1,len-1);
 
-			// als deze class een global is, is het een class / struct
-			for I:=0 to MainForm.CppParser1.Statements.Count-1 do begin
+			// De bijbehorende definitie van instance opzoeken
+			for I:=0 to CppParser1.Statements.Count-1 do begin
 				if PStatement(CppParser1.Statements[I])^._ParentID = -1 then begin
 					if PStatement(CppParser1.Statements[I])^._ScopeCmd <> '' then
 						compareto := PStatement(CppParser1.Statements[I])^._ScopeCmd
 					else
 						compareto := PStatement(CppParser1.Statements[I])^._ScopelessCmd;
-					if AnsiCompareStr(compareto,parent)=0 then begin
-						parent := Copy(PStatement(CppParser1.Statements[I])^._FullText,1,Pos(' ',PStatement(CppParser1.Statements[I])^._FullText)-1);
-						Break;
-					end;
-				end;
-			end;
-		end else if apos > 0 then begin
-			repeat
-				Inc(len);
-			until not (e.Text.LineText[apos-len] in [#48..#57,#65..#122,#95]);
-			parent := Copy(e.Text.LineText,apos-len+1,len-1);
 
-			// als deze class een global is, is het een class / struct
-			for I:=0 to MainForm.CppParser1.Statements.Count-1 do begin
-				if PStatement(CppParser1.Statements[I])^._ParentID = -1 then begin
-					if PStatement(CppParser1.Statements[I])^._ScopeCmd <> '' then
-						compareto := PStatement(CppParser1.Statements[I])^._ScopeCmd
-					else
-						compareto := PStatement(CppParser1.Statements[I])^._ScopelessCmd;
 					if AnsiCompareStr(compareto,parent)=0 then begin
 						parent := Copy(PStatement(CppParser1.Statements[I])^._FullText,1,Pos(' ',PStatement(CppParser1.Statements[I])^._FullText)-1);
+						isglobal := false;
 						Break;
 					end;
 				end;
 			end;
 		end else begin
-			// We kunnen ook al IN een class zitten
+
+			// Als we een losse variabele aanklikken, kijken of we in clasbody zitten
 			for I:=e.Text.CaretY-1 downto 0 do begin
 				len:=2;
-				classpos := AnsiStartsStr('class ',TrimLeft(e.Text.Lines[I]));
-				if classpos then begin
-					classline := TrimLeft(e.Text.Lines[I]);
+				if AnsiStartsStr('class ',TrimLeft(e.Text.Lines[I])) then begin
+					classdefline := TrimLeft(e.Text.Lines[I]);
 					// we zitten wel degelijk in een class
 					repeat
 						Inc(len);
-					until (classline[length('class ')+len] in [#9,#32]);
-					parent := Copy(classline,Length('class ')+1,len-1);
+					until (classdefline[length('class ')+len] in [#9,#32]);
+					parent := Copy(classdefline,Length('class ')+1,len-1);
 					break;
 				end;
 			end;
 		end;
 
-		cpos := 0;
-		len := 0;
-
-		// kijk of 'member' in globals staat.
-		for I:=0 to MainForm.CppParser1.Statements.Count-1 do begin
-			if PStatement(CppParser1.Statements[I])^._ParentID = -1 then begin
-				if AnsiCompareStr(PStatement(CppParser1.Statements[I])^._ScopelessCmd,member)=0 then begin
-					isglobal:=true;
-					Break;
+		// Als we nog niet hebben uitgevonden waar 'ie bijhoort, kijken of hij in class staat
+		if isglobal then begin
+			for I:=e.Text.CaretY-2 downto 0 do begin
+				// We zitten in de class?
+				cpos := Pos('::',e.Text.Lines[I]);// de class uit
+				if cpos > 0 then begin
+					len := 0;
+					repeat
+						Inc(len);
+					until e.Text.Lines[I][cpos-len] in [#9,#32];
+					parent := Copy(e.Text.Lines[I],cpos-len+1,len-1);
+					classline := e.Text.Lines[I];
+					classlinenr := I+1;
+					break;
 				end;
 			end;
-		end;
 
-		// Dit hieronder alleen doen als member geen class of global is
-		if (ppos = 0) and (apos = 0) then begin
-			for I:=e.Text.CaretY-1 downto 0 do begin
-				// We zitten in de class
-				for J:=Length(e.Text.Lines[I]) downto 1 do begin
-					cpos := Pos('::',e.Text.Lines[I]);// de class uit
-					if cpos > 0 then begin
-						repeat
-							Inc(len);
-						until e.Text.Lines[I][cpos-len] in [#9,#32];
-						if not isglobal then
-							parent := Copy(e.Text.Lines[I],cpos-len+1,len-1);
-						classline := e.Text.Lines[I];
-						classlinenr := I+1;
-						break;
+			// Assembleer de uiteindelijke naam, volledig deze keer
+			if (parent <> '') and (parent <> member) then
+				comparewith := parent + '::' + member
+			else
+				comparewith := member;
+
+			// Nu dat we denken dat we 'em gevonden hebben, kijken of papa hem kent...
+			for I:=0 to CppParser1.Statements.Count-1 do begin
+
+				// Wandel langs alle classmembers...
+				if PStatement(CppParser1.Statements[I])^._ParentID <> -1 then begin
+					if PStatement(CppParser1.Statements[I])^._ScopeCmd <> '' then
+						compareto := PStatement(CppParser1.Statements[PStatement(CppParser1.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser1.Statements[I])^._ScopeCmd
+					else
+						compareto := PStatement(CppParser1.Statements[PStatement(CppParser1.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser1.Statements[I])^._ScopelessCmd;
+					if Pos(' ',compareto) > 0 then
+						compareto := Copy(compareto,Pos(' ',compareto)+1,Length(compareto)-Pos(' ',compareto));
+					if Pos('::',compareto) <> GetLastPos('::',compareto) then
+						compareto := Copy(compareto,Pos('::',compareto)+2,Length(compareto)-Pos('::',compareto)-1);
+
+					if AnsiCompareStr(compareto,comparewith)=0 then begin
+						parent := Copy(compareto,1,Pos('::',compareto)-1);
+						isglobal := false; // !!
+						Break;
 					end;
 				end;
-				if cpos > 0 then break;
 			end;
 		end;
 
 		// kijk of 'member' in argumenten staat
 		if (classline <> '') and (classlinenr <> 0) then begin
 			parampos := AnsiPos(' '+member,classline);
-			if parampos > 0 then parampos := parampos +1;
+			if parampos > AnsiPos('(',classline) then parampos := parampos + 1;
 			if parampos = 0 then
 				parampos := AnsiPos('*'+member,classline);
 			if parampos = 0 then
 				parampos := AnsiPos('&'+member,classline);
-			if parampos > 0 then begin
+			if parampos > AnsiPos('(',classline) then begin
 				e.Text.CaretXY:= BufferCoord(parampos, classlinenr);
 				Exit;
 			end;
 		end;
 
 		// Assembleer de uiteindelijke naam, volledig deze keer
-		if (parent <> '') and (parent <> member) then
+		if (parent <> '') and (parent <> member) and not isglobal then
 			comparewith := parent + '::' + member
 		else
 			comparewith := member;
 
 		// Nu gaan we de database doorlopen
-		for I:=0 to MainForm.CppParser1.Statements.Count-1 do begin
-
+		for I:=0 to CppParser1.Statements.Count-1 do begin
 			// Als we een global zien, niet class ervoor (zou '::global' geven)
-			if PStatement(CppParser1.Statements[I])^._ParentID = -1 then begin
+			if (PStatement(CppParser1.Statements[I])^._ParentID = -1) then begin
 				compareto := PStatement(CppParser1.Statements[I])^._ScopelessCmd;
+			end else if(PStatement(CppParser1.Statements[I])^._ParentID > CppParser1.Statements.Count-1) then begin
+				compareto := PStatement(CppParser1.Statements[I])^._ScopelessCmd;
+			//	MsgBox(inttostr(PStatement(CppParser1.Statements[I])^._ParentID) + ' does not exist!','Error');
 			end else begin
+
+				// Deze zitten in een class
 				if PStatement(CppParser1.Statements[I])^._ScopeCmd <> '' then
 					compareto := PStatement(CppParser1.Statements[PStatement(CppParser1.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser1.Statements[I])^._ScopeCmd
 				else
 					compareto := PStatement(CppParser1.Statements[PStatement(CppParser1.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser1.Statements[I])^._ScopelessCmd;
-				compareto := Copy(compareto,Pos(' ',compareto)+1,Length(compareto)-Pos(' ',compareto));
+				if Pos(' ',compareto) > 0 then
+					compareto := Copy(compareto,Pos(' ',compareto)+1,Length(compareto)-Pos(' ',compareto));
 				if Pos('::',compareto) <> GetLastPos('::',compareto) then
 					compareto := Copy(compareto,Pos('::',compareto)+2,Length(compareto)-Pos('::',compareto)-1);
 			end;
+
 			if AnsiCompareStr(compareto,comparewith)=0 then begin
 				statement:=PStatement(CppParser1.Statements[I]);
+				if Sender.ClassName = 'TEditor' then begin
+					if e.Text.CaretY <> statement^._Line then begin
+						filename:=statement^._FileName;
+						line:=statement^._Line;
+					end else begin
+						filename:=statement^._DeclImplFileName;
+						line:=statement^._DeclImplLine;
+					end;
+				end else begin
+					if Pos('Decl',(Sender as TCustomAction).Name) > 0 then begin
+						filename:=statement^._FileName;
+						line:=statement^._Line;
+					end else begin
+						filename:=statement^._DeclImplFileName;
+						line:=statement^._DeclImplLine;
+					end;
+				end;
+
+				e:=GetEditorFromFileName(filename);
+				if Assigned(e) then begin
+					e.GotoLineNr(line);
+					e.Text.CaretX:=AnsiPos(member, e.Text.LineText);
+					SetLineCol;
+				//	SetDone('Found ' + comparewith + ' in '+FormatFloat('#,###,##0.00', (GetTickCount-starttime)/1000)+' seconds');
+				//	found := true;
+				end;
 				Break;
 			end;
 		end;
-
-		// Kijken waar dit item staat
-		if Assigned(statement) then begin
-			if Sender.ClassName = 'TEditor' then begin
-				if e.Text.CaretY <> statement^._Line then begin
-					filename:=statement^._FileName;
-					line:=statement^._Line;
-				end else begin
-					filename:=statement^._DeclImplFileName;
-					line:=statement^._DeclImplLine;
-				end;
-			end else begin
-				if Pos('Decl',(Sender as TCustomAction).Name) > 0 then begin
-					filename:=statement^._FileName;
-					line:=statement^._Line;
-				end else begin
-					filename:=statement^._DeclImplFileName;
-					line:=statement^._DeclImplLine;
-				end;
-			end;
-		end;
-
-		e:=GetEditorFromFileName(filename);
-		if Assigned(e) then begin
-			e.GotoLineNr(line);
-			e.Text.CaretX:=AnsiPos(member, e.Text.LineText);
-			SetLineCol;
-		end;
+	//	if not found then
+	//		SetDone('Couldn''t find ' + comparewith + ' in '+FormatFloat('#,###,##0.00', (GetTickCount-starttime)/1000)+' seconds');
 	end;
 end;
 
@@ -6766,12 +6615,6 @@ begin
 			pnlFull.Height := 0
 		else
 			pnlFull.Height := 16;
-end;
-
-procedure TMainForm.EditorPopupMenuPopup(Sender: TObject);
-begin
-	actGotoImplDeclEditorUpdate(Self.GotoDefineEditor);
-	actGotoImplDeclEditorUpdate(Self.GotoDeclEditor);
 end;
 
 end.

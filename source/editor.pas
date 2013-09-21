@@ -1488,8 +1488,7 @@ begin
 
       if Strings.Count > 0 then
       begin
-        for I := 0 to Strings.Count-1 do
-        begin             
+        for I := 0 to Strings.Count-1 do begin
           S := Strings.Strings[I];
           Idx := FirstCharIndex(S);
 
@@ -1810,7 +1809,7 @@ procedure TEditor.DoOnCodeCompletion(Sender: TObject; const AStatement: TStateme
 //  this event is triggered whenever the codecompletion box is going to make its work,
 //  or in other words, when it did a codecompletion ...
 //
-begin     
+begin
   // disable the tooltip here, becasue we check against Enabled
   // in the 'EditorStatusChange' event to prevent it's redrawing there
   if FCodeToolTip <> nil then
