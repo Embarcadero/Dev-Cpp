@@ -263,7 +263,6 @@ begin
      Commands.Text:= devCompilerSet.CompOpts;
      cbLinkerAdd.Checked:= devCompilerSet.AddtoLink;
      Linker.Text:= devCompilerSet.LinkOpts;
-     // BEZIG
 
      cmbCompilerSetComp.Items.Clear;
      cmbCompilerSetComp.Items.Assign(devCompilerSet.Sets);

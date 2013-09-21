@@ -678,8 +678,8 @@ object EnviroForm: TEnviroForm
         Caption = 'External programs associations:'
       end
       object btnExtAdd: TSpeedButton
-        Left = 95
-        Top = 265
+        Left = 93
+        Top = 257
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -687,8 +687,8 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtAddClick
       end
       object btnExtDel: TSpeedButton
-        Left = 193
-        Top = 265
+        Left = 189
+        Top = 257
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -698,8 +698,8 @@ object EnviroForm: TEnviroForm
       object vleExternal: TValueListEditor
         Left = 16
         Top = 24
-        Width = 353
-        Height = 236
+        Width = 345
+        Height = 228
         Anchors = [akLeft, akTop, akRight, akBottom]
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         Options = [goVertLine, goHorzLine, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -742,8 +742,8 @@ object EnviroForm: TEnviroForm
       end
       object lblAssocDesc: TLabel
         Left = 16
-        Top = 257
-        Width = 353
+        Top = 249
+        Width = 345
         Height = 35
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
@@ -755,8 +755,8 @@ object EnviroForm: TEnviroForm
       object lstAssocFileTypes: TCheckListBox
         Left = 16
         Top = 24
-        Width = 353
-        Height = 228
+        Width = 345
+        Height = 220
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0

@@ -1664,7 +1664,7 @@ begin
   finally
     // remove last comma
     with PIncludesRec(fIncludesList[fIncludesList.Count - 1])^ do
-  	       Delete(IncludeFiles, Length(IncludeFiles), 1);
+    Delete(IncludeFiles, Length(IncludeFiles), 1);
     fSkipList.Clear;
     fCurrentClassLevel.Clear;
     FCurrentClass.Clear;

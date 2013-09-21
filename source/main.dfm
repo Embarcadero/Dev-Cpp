@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 648
-  Top = 243
+  Left = 330
+  Top = 236
   Width = 1024
   Height = 769
   HorzScrollBar.Visible = False
@@ -1139,7 +1139,7 @@ object MainForm: TMainForm
     Align = alTop
     BevelOuter = bvNone
     Caption = 
-      'Dev-C++ version 5.0.0.5 Fullscreen. Press F10 to toggle this bar' +
+      'Dev-C++ version 5.0.0.6 Fullscreen. Press F10 to toggle this bar' +
       ', F11 to toggle Toolbars or F12 to toggle Fullscreen.'
     TabOrder = 4
     Visible = False

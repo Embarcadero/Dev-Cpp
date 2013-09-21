@@ -173,6 +173,7 @@ const
   ID_ITEM_PROGRAMRESET             = 217;
   ID_ITEM_PROFILE                  = 218;
   ID_ITEM_ABORTCOMP                = 219;
+  ID_ITEM_DELPROFINFORMATION       = 225;
   //free to 219 for execute menu
   //more IDs at 2900
 
@@ -201,7 +202,7 @@ const
   ID_ITEM_ABOUT                    = 240;
   ID_ITEM_UPDATECHECK              = 241;
   ID_ITEM_CUSTOM                   = 242;
-  ID_ITEM_HELPDEVCPP               = 243;     
+  ID_ITEM_HELPDEVCPP               = 243;
 
   //rest dynamic from help.ini
 

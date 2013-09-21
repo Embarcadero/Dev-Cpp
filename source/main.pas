@@ -954,7 +954,7 @@ uses
 	ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
 	devcfg, datamod, helpfrm, NewProjectFrm, AboutFrm, PrintFrm,
 	CompOptionsFrm, EditorOptfrm, Incrementalfrm, Search_Center, Envirofrm,
-	SynEdit, SynEditTypes,
+	SynEdit, SynEditTypes, Math,
 	CheckForUpdate, debugfrm, Types, Prjtypes, devExec,
 	NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
 	ProfileAnalysisFm, debugwait, FilePropertiesFm, AddToDoFm, ViewToDoFm,
@@ -2020,17 +2020,16 @@ var
 begin
 	e:= GetEditor;
 	with Sender as TMenuItem do
-	 if assigned(e) then
-		begin
+		if assigned(e) then begin
 			Checked:= not Checked;
 			if (Parent = ToggleBookmarksItem) then
 				TogglebookmarksPopItem.Items[Tag - 1].Checked := Checked
 			else
 				TogglebookmarksItem.Items[Tag - 1].Checked := Checked;
 			if Checked then
-			 e.Text.SetBookMark(Tag, e.Text.CaretX, e.Text.CaretY)
+				e.Text.SetBookMark(Tag, e.Text.CaretX, e.Text.CaretY)
 			else
-			 e.Text.ClearBookMark(Tag);
+				e.Text.ClearBookMark(Tag);
 		end;
 end;
 
@@ -2040,7 +2039,7 @@ var
 begin
 	e:= GetEditor;
 	if assigned(e) then
-	 e.Text.GotoBookMark((Sender as TMenuItem).Tag);
+		e.Text.GotoBookMark((Sender as TMenuItem).Tag);
 end;
 
 procedure TMainForm.ToggleBtnClick(Sender: TObject);
@@ -2061,17 +2060,15 @@ procedure TMainForm.GotoBtnClick(Sender: TObject);
 var
  pt: TPoint;
 begin
-	if PageControl.ActivePageIndex> -1 then
-	 begin
-		 pt:= tbSpecials.ClientToScreen(point(Gotobtn.Left, Gotobtn.Top +Gotobtn.Height));
-		 TrackPopupMenu(GotoBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,
-			 pt.x, pt.y, 0, Self.Handle, nil);
-	 end;
+	if PageControl.ActivePageIndex> -1 then begin
+		pt:= tbSpecials.ClientToScreen(point(Gotobtn.Left, Gotobtn.Top +Gotobtn.Height));
+		TrackPopupMenu(GotoBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON, pt.x, pt.y, 0, Self.Handle, nil);
+	end;
 end;
 
 procedure TMainForm.NewAllBtnClick(Sender: TObject);
 var
- pt: TPoint;
+	pt: TPoint;
 begin
 	pt:= tbSpecials.ClientToScreen(point(NewAllBtn.Left, NewAllbtn.Top +NewAllbtn.Height));
 	TrackPopupMenu(mnuNew.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.X, pt.y, 0, Self.Handle, nil);
@@ -2140,7 +2137,7 @@ var
 begin
 	idx:= (Sender as TMenuItem).Tag;
 	with fTools.ToolList[idx]^ do
-	 ExecuteFile(ParseParams(Exec), ParseParams(Params), ParseParams(WorkDir), SW_SHOW);
+		ExecuteFile(ParseParams(Exec), ParseParams(Params), ParseParams(WorkDir), SW_SHOW);
 end;
 
 procedure TMainForm.OpenProject(s: string);
@@ -2503,7 +2500,7 @@ begin
 	if PageControl.ActivePageIndex > -1 then begin
 		pt:= tbSpecials.ClientToScreen(point(Insertbtn.Left, Insertbtn.Top +Insertbtn.Height));
 		TrackPopupMenu(InsertItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON, pt.X, pt.Y, 0, Self.Handle, nil);
-	 end;
+	end;
 end;
 
 procedure TMainForm.actNewSourceExecute(Sender: TObject);
@@ -3735,55 +3732,61 @@ var
 begin
 	temp := '';
 	savedialog := TSaveDialog.Create(self);
-	case MessageControl.ActivePageIndex of
-		cCompTab: begin
-			savedialog.FileName:= 'Formatted Compiler Output';
-			for i:=0 to pred(CompilerOutput.Items.Count) do begin
-				temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
-				temp2 := StringReplace(temp2,#10,#9,[]);
-				temp2 := StringReplace(temp2,#10,#9,[]);
-				temp2 := StringReplace(temp2,#10,#9,[]);
-				temp := temp + temp2;
+	try
+		case MessageControl.ActivePageIndex of
+			cCompTab: begin
+				savedialog.FileName:= 'Formatted Compiler Output';
+				for i:=0 to pred(CompilerOutput.Items.Count) do begin
+					temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
+					temp2 := StringReplace(temp2,#10,#9,[]);
+					temp2 := StringReplace(temp2,#10,#9,[]);
+					temp2 := StringReplace(temp2,#10,#9,[]);
+					temp := temp + temp2;
+				end;
+			end;
+			cResTab: begin
+				savedialog.FileName:= 'ResourceLog';
+				if Resourceoutput.ItemIndex <> -1 then
+					temp:= ResourceOutput.Items[ResourceOutput.ItemIndex];
+			end;
+			cLogTab: begin
+				savedialog.FileName:= 'RawBuildLog';
+				if LogOutput.Lines.Text <> '' then
+					if Length(LogOutput.SelText) > 0 then
+						temp:= LogOutput.SelText
+					else
+						temp:= LogOutput.Lines.Text;
+			end;
+			cFindTab: begin
+				savedialog.FileName:= 'FindResultsLog';
+				ClipBoard.AsText := '';
+				for i:=0 to pred(CompilerOutput.Items.Count) do
+					temp:= temp + StringReplace(StringReplace(FindOutput.Items[i].Caption +' ' +FindOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
 			end;
 		end;
-		cResTab: begin
-			savedialog.FileName:= 'ResourceLog';
-			if Resourceoutput.ItemIndex <> -1 then
-				temp:= ResourceOutput.Items[ResourceOutput.ItemIndex];
+
+		if Length(temp) > 0 then begin
+			savedialog.Title:= Lang[ID_NV_SAVEFILE];
+			savedialog.Filter:= 'Text file|*.txt';
+			savedialog.DefaultExt := 'txt';
+			savedialog.FilterIndex:=1;
+			savedialog.InitialDir:=fProject.Directory;
+
+			if savedialog.Execute then begin
+				if FileExists(savedialog.FileName) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrNo) then
+					exit;
+
+				Stream := TFileStream.Create(savedialog.FileName, fmCreate);
+				try
+					Stream.Write(temp[1], Length(temp));
+				finally
+					Stream.Free;
+				end;
+			end;
 		end;
-		cLogTab: begin
-			savedialog.FileName:= 'RawBuildLog';
-			if LogOutput.Lines.Text <> '' then
-				if Length(LogOutput.SelText) > 0 then
-					temp:= LogOutput.SelText
-				else
-					temp:= LogOutput.Lines.Text;
-		end;
-		cFindTab: begin
-			savedialog.FileName:= 'FindResultsLog';
-			ClipBoard.AsText := '';
-			for i:=0 to pred(CompilerOutput.Items.Count) do
-				temp:= temp + StringReplace(StringReplace(FindOutput.Items[i].Caption +' ' +FindOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
-		end;
+	finally
+		savedialog.Free;
 	end;
-
-	if Length(temp) > 0 then begin
-		savedialog.Title:= Lang[ID_NV_SAVEFILE];
-		savedialog.Filter:= 'Text file|*.txt';
-		savedialog.DefaultExt := 'txt';
-		savedialog.FilterIndex:=1;
-		savedialog.InitialDir:=fProject.Directory;
-
-		if savedialog.Execute then begin
-			if FileExists(savedialog.FileName) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrNo) then
-				exit;
-
-			Stream := TFileStream.Create(savedialog.FileName, fmCreate);
-			Stream.Write(temp[1], Length(temp));
-			Stream.Free;
-		end;
-	end;
-	savedialog.Free;
 end;
 
 procedure TMainForm.actMsgClearExecute(Sender: TObject);
@@ -6396,7 +6399,6 @@ var
 	// Class getten 2
 	classline : string;
 	classdefline : string;
-	classlinenr : integer;
 	parampos : integer;
 	// Compare
 	compareto : string;
@@ -6406,8 +6408,9 @@ var
 	text : string;
 	wantbrace : integer;
 	wantquote : boolean;
-//	Ptr : PChar;
 begin
+
+	Screen.Cursor := crHourglass;
 	Result := nil;
 
 	e:=GetEditor;
@@ -6427,22 +6430,19 @@ begin
 
 	if member <> '' then begin
 
-	//	Ptr := PChar(e.Text.Lines.Text);
-
 		len:=0;
 		len2:=0;
-		classlinenr:=0;
 		isglobal:=true;
 
 		// Als we op een classmemberfunctie klikken, komt foo:: erbij, we willen het met scope doen
-		cpos := Pos('::' + member,e.Text.LineText);
-		ppos := Pos('.'  + member,e.Text.LineText);
-		apos := Pos('->' + member,e.Text.LineText);
+		cpos := Pos('::' + member,e.Text.Lines[cursorpos.Line-1]);
+		ppos := Pos('.'  + member,e.Text.Lines[cursorpos.Line-1]);
+		apos := Pos('->' + member,e.Text.Lines[cursorpos.Line-1]);
 		if cpos > 0 then begin
 			repeat
 				Inc(len);
-			until not (e.Text.LineText[cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
-			parent := Copy(e.Text.LineText,cpos-len+1,len-1);
+			until not (e.Text.Lines[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
+			parent := Copy(e.Text.Lines[cursorpos.Line-1],cpos-len+1,len-1);
 			isglobal := false;
 
 			// Hier hoeven we NIET te scannen, want definitie staat er al
@@ -6453,14 +6453,14 @@ begin
 			if ppos > 0 then cpos := ppos else cpos := apos;
 			repeat
 				Inc(len);
-				if e.Text.LineText[cpos-len] = ']' then begin
+				if e.Text.Lines[cursorpos.Line-1][cpos-len] = ']' then begin
 					repeat
 						Inc(len2);
-					until (e.Text.LineText[cpos-len2+len] in ['[']);
+					until (e.Text.Lines[cursorpos.Line-1][cpos-len2+len] in ['[']);
 					cpos := cpos - len2 + len;
 				end;
-			until not (e.Text.LineText[cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
-			parent := Copy(e.Text.LineText,cpos-len+1,len-1);
+			until not (e.Text.Lines[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
+			parent := Copy(e.Text.Lines[cursorpos.Line-1],cpos-len+1,len-1);
 
 			// De bijbehorende definitie van instance opzoeken
 			for I:=0 to CppParser1.Statements.Count-1 do begin
@@ -6507,7 +6507,6 @@ begin
 					until e.Text.Lines[I][cpos-len] in [#9,#32];
 					parent := Copy(e.Text.Lines[I],cpos-len+1,len-1);
 					classline := e.Text.Lines[I];
-					classlinenr := I+1;
 					break;
 				end;
 			end;
@@ -6545,63 +6544,50 @@ begin
 			end;
 		end;
 
-		// kijk of 'member' in argumenten staat
-		if (classline <> '') and (classlinenr <> 0) then begin
-			parampos := AnsiPos(' '+member,classline);
-			if parampos = 0 then
-				parampos := AnsiPos('*'+member,classline);
-			if parampos = 0 then
-				parampos := AnsiPos('&'+member,classline);
-			if parampos > AnsiPos('(',classline) then begin
-				len:=0;
-				repeat
-					Inc(len);
-				until classline[parampos+Length(member)-len] in [',','('];
-				localfind := Copy(classline,parampos+Length(member)+1-len,len);
-				localfindpoint.x := parampos;
-				localfindpoint.y := classlinenr;
-				Exit;
-			end;
-		end;
-
 		// Als we uiteindelijk nog steeds niks hebben gevonden, scan de functie voor locals
-		if (classline <> '') and (classlinenr <> 0) and (isglobal) then begin
+		if (isglobal) then begin
 			cpos := e.Text.RowColToCharIndex(cursorpos);
-			apos := e.Text.RowColToCharIndex(BufferCoord(0,classlinenr+1));
-			text := Copy(e.Text.Lines.GetText,apos,cpos-apos);
+			text := Copy(e.Text.Text,cpos-512,512);
 			wantbrace := 0;
 			wantquote := false;
-			if Length(text) > 1 then begin
-				for I:=Length(text) downto 0 do begin
+			for I:=Length(text) downto 0 do begin
 
-					// Skip strings
-					if text[I] = '"' then begin
-						wantquote := not wantquote;
-					end;
-					if wantquote then continue;
+				// Skip strings
+				if text[I] = '"' then
+					wantquote := not wantquote;
+				if wantquote then continue;
 
-					// Skip forbidden scopes
-					if text[I] = '}' then begin
-						Inc(wantbrace);
-					end else if text[I] = '{' then begin
-						if wantbrace > 0 then
-							Dec(wantbrace);
-					end;
-					if not (wantbrace = 0) then continue;
+				// Skip forbidden scopes
+				if text[I] = '}' then
+					Inc(wantbrace);
+				if text[I] = '{' then
+					Dec(wantbrace);
+				if wantbrace > 0 then continue;
 
-					parampos := AnsiPos(#9 + member,text);
-					if parampos = 0 then parampos := AnsiPos(' ' + member,text);
-					if parampos = I then begin
-						len := 0;
-						repeat
-							Inc(len);
-						until not (text[I-len] in [#65..#90,#97..#122]);
-						if len > 2 then begin
-							localfind := Trim(Copy(text,parampos+1-len,Length(member)+len));
-							localfindpoint.x := e.Text.CharIndexToRowCol(I+apos).Char-1;
-							localfindpoint.y := e.Text.CharIndexToRowCol(I+apos).Line;
+				parampos := AnsiPos(' ' + member,text);
+				if parampos = 0 then parampos := AnsiPos(' *' + member,text);
+				if parampos = 0 then parampos := AnsiPos(' &' + member,text);
+				if parampos = 0 then parampos := AnsiPos('	' + member,text);
+				if parampos = 0 then parampos := AnsiPos('	*' + member,text);
+				if parampos = 0 then parampos := AnsiPos('	&' + member,text);
+				if parampos = I then begin
+
+					// Type bepalen...
+					len := 0;
+					repeat
+						Inc(len);
+					until not (text[I-len] in [#65..#90,#97..#122]);
+
+					// Als er wat zinnigs staat
+					if len > 2 then begin
+					//	localfind := Copy(text,parampos+1-len,len-1);
+					//	if (localfind <> 'new') and (localfind <> 'delete') then begin
+							localfind := Trim(Copy(text,parampos+1-len,Length(member)+len+1));
+							localfindpoint.x := e.Text.CharIndexToRowCol(cpos-(512-I)).Char-1;
+							localfindpoint.y := e.Text.CharIndexToRowCol(cpos-(512-I)).Line;
+							Screen.Cursor := crDefault;
 							Exit;
-						end;
+					//	end;
 					end;
 				end;
 			end;
@@ -6636,6 +6622,7 @@ begin
 
 			if AnsiCompareStr(compareto,comparewith)=0 then begin
 				Result := PStatement(CppParser1.Statements[I]);
+				Screen.Cursor := crDefault;
 				Break;
 			end;
 		end;

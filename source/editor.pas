@@ -70,6 +70,7 @@ type
     fOnBreakPointToggle: TBreakpointToggleEvent;
     fHintTimer: TTimer;
     fCurrentHint: string;
+    fCurrentHintFull: string;
     //////// CODE-COMPLETION - mandrav /////////////
     fCompletionEatSpace: boolean;
     fTimer: TTimer;
@@ -774,35 +775,32 @@ begin
 	if not assigned(fText) then exit;
 	pt:= fText.CaretXY;
 	tmp:= TStringList.Create;
-  try // move cursor to pipe '|', don't do that, might be used by code, use *|* instead
-   tmp.Text:= Value;
-   if Move then
-    for idx:= 0 to pred(tmp.Count) do
-     begin
-       Line:= tmp[idx];
-       idx2:= AnsiPos('*|*', Line);
-       if idx2> 0 then
-        begin
-          delete(Line, idx2, 3);
-          tmp[idx]:= Line;
+	try // move cursor to pipe '|', don't do that, might be used by code, use *|* instead
+		tmp.Text:= Value;
+		if Move then
+			for idx:= 0 to pred(tmp.Count) do begin
+				Line:= tmp[idx];
+				idx2:= AnsiPos('*|*', Line);
+				if idx2> 0 then begin
+					delete(Line, idx2, 3);
+					tmp[idx]:= Line;
+					inc(pt.Line, idx);
+					if idx = 0 then
+						inc(pt.Char, idx2 -1)
+					else
+						pt.Char:= idx2;
 
-          inc(pt.Line, idx);
-          if idx = 0 then
-           inc(pt.Char, idx2 -1)
-          else
-           pt.Char:= idx2;
-
-          break;
-        end;
-     end;
-   Line:= tmp.Text;
-   Delete(Line,Length(Line)-1,2);
-   fText.SelText:= Line;
-   fText.CaretXY:= pt;
-   fText.EnsureCursorPosVisible;
-  finally
-   tmp.Free;
-  end;
+					break;
+				end;
+			end;
+		Line:= tmp.Text;
+		Delete(Line,Length(Line)-1,2);
+		fText.SelText:= Line;
+		fText.CaretXY:= pt;
+		fText.EnsureCursorPosVisible;
+	finally
+		tmp.Free;
+	end;
 end;
 
 function TEditor.Search(const isReplace: boolean): boolean;
@@ -1055,11 +1053,9 @@ begin
 		fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr);
 		if Assigned(attr) or (Length(fText.LineText) = 0) then
 			allowcompletion := true;
-	//	if(Length(fText.LineText) > 1) then
-	//		if(fText.LineText[fText.CaretX-1] in [#9,#32]) then
-	//			allowcompletion := true;
-		if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
-			allowcompletion := false;
+		if Assigned(attr) then
+			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
+				allowcompletion := false;
 
 		if allowcompletion then begin
 			if Key = 57 then begin // 9 key + shift = (
@@ -1389,6 +1385,7 @@ var
 	st: PStatement;
 	localfind : string;
 	localfindpoint : TPoint;
+	thisword : string;
 //	M: TMemoryStream;
 begin
 	fHintTimer.Enabled := false;
@@ -1401,13 +1398,18 @@ begin
 
 		// If we're editting, show information of word
 		if not MainForm.fDebugger.Executing then begin
-			r.Left := Mouse.CursorPos.X;
-			r.Top := Mouse.CursorPos.Y + fText.LineHeight;
-			r.Bottom := Mouse.CursorPos.Y + 10 + fText.LineHeight;
-			r.Right := Mouse.CursorPos.X + 60;
 
+			// Skip if we're scanning for the second time...
+			thisword := fText.WordAtMouse;
+			if thisword = fCurrentHintFull then Exit;
+			fCurrentHintFull := thisword;
 
 			st:=MainForm.findstatement(localfind,localfindpoint,false); // BEZIG
+
+			r.Left := Mouse.CursorPos.X;
+			r.Top := Mouse.CursorPos.Y - 2*fText.LineHeight;
+			r.Bottom := Mouse.CursorPos.Y + 10 + fText.LineHeight;
+			r.Right := Mouse.CursorPos.X + 60;
 
 		//	M:=TMemoryStream.Create;
 		//	try
@@ -1439,35 +1441,34 @@ end;
 
 procedure TEditor.CommentSelection;
 var
-  S: string;
-  Offset: integer;
-  backup: TBufferCoord;
+	S: string;
+	Offset: integer;
+	backup: TBufferCoord;
 begin
-  if Text.SelAvail then begin // has selection
-    backup:=Text.CaretXY;
-    Text.BeginUpdate;
-    S:='//'+Text.SelText;
-    Offset:=0;
-    if S[Length(S)]=#10 then begin // if the selection ends with a newline, eliminate it
-      if S[Length(S)-1]=#13 then // do we ignore 1 or 2 chars?
-        Offset:=2
-      else
-        Offset:=1;
-      S:=Copy(S, 1, Length(S)-Offset);
-    end;
-    S:=StringReplace(S, #10, #10'//', [rfReplaceAll]);
-    if Offset=1 then
-      S:=S+#10
-    else if Offset=2 then
-      S:=S+#13#10;
-    Text.SelText:=S;
-    Text.EndUpdate;
-    Text.CaretXY:=backup;
-  end
-  else // no selection; easy stuff ;)
-    Text.LineText:='//'+Text.LineText;
-  Text.UpdateCaret;
-  Text.Modified:=True;
+	if Text.SelAvail then begin // has selection
+		backup:=FText.CaretXY;
+		Text.BeginUpdate;
+		S:='//'+FText.SelText;
+		Offset:=0;
+		if S[Length(S)]=#10 then begin // if the selection ends with a newline, eliminate it
+			if S[Length(S)-1]=#13 then // do we ignore 1 or 2 chars?
+				Offset:=2
+			else
+				Offset:=1;
+		end;
+		if Offset = 2 then
+			S:=StringReplace(S, #13#10, #13#10'//', [rfReplaceAll])
+		else
+			S:=StringReplace(S, #10, #10'//', [rfReplaceAll]);
+
+		Text.SelText:=S;
+		Text.EndUpdate;
+		Text.CaretXY:=backup;
+	end else // no selection; easy stuff ;)
+		Text.LineText:='//'+Text.LineText;
+
+	Text.UpdateCaret;
+	Text.Modified:=True;
 end;
 
 {** Modified by Peter **}
@@ -1491,67 +1492,60 @@ end;
 {** Modified by Peter **}
 procedure TEditor.UncommentSelection;
 
-  function FirstCharIndex(const S: string): Integer;
-  //  Get the index of the first non whitespace character in 
-  //  the string specified by S
-  //  On success it returns the index, otherwise it returns 0
-  var
-    I: Integer;
-  begin
-    Result := 0;
+	function FirstCharIndex(const S: string; const start : integer): Integer;
+	//  Get the index of the first non whitespace character in
+	//  the string specified by S
+	//  On success it returns the index, otherwise it returns 0
+	var
+		I: Integer;
+	begin
+		Result := 0;
 
-    if S <> '' then
-      for I := 1 to Length(S) do
-        if not (S[I] in [#0..#32]) then
-        begin
-          Result := I;
-          Break;
-        end;
-  end;
+		if S <> '' then
+			for I := start to Length(S) do
+				if not (S[I] in [#0..#32]) then begin
+					Result := I;
+					Break;
+				end;
+	end;
 
 var
-  S: string;
-  I: Integer;
-  Idx: Integer;
-  Strings: TStringList;
+	I: Integer;
+	Idx: Integer;
+	selection: string;
 begin
-  // has selection
-  if Text.SelAvail then 
-  begin
-     // start an undoblock, so we can undo
-     // it afterwards!
-     FText.BeginUndoBlock;
-    
-     Strings := TStringList.Create;
-     try
-      Strings.Text := FText.SelText;
+	// has selection
+	if FText.SelAvail then begin
 
-      if Strings.Count > 0 then
-      begin
-        for I := 0 to Strings.Count-1 do begin
-          S := Strings.Strings[I];
-          Idx := FirstCharIndex(S);
+		// start an undoblock, so we can undo it afterwards!
+		FText.BeginUndoBlock;
 
-          // check if the very first two letters in the string are '//'
-          // if they are, then delete them from the string and set the
-          // modified string to the stringlist ...
-          if (Length(S) > Idx) and (S[Idx]='/') and (S[Idx+1]='/') then
-          begin
-            Delete(S, Idx, 2);
-            Strings.Strings[I] := S;
-          end;
-        end;
-      end;
+		// Scan the first line too
+		selection := FText.SelText;
+		Idx := FirstCharIndex(selection,0);
+		if (selection[Idx]='/') and (selection[Idx+1]='/') then
+			Delete(selection, Idx, 2);
 
-      FText.SelText := Strings.Text;
-     finally
-      Strings.Free;
-     end;
+		for I := 0 to Length(selection) do begin
+			if selection[I] = #10 then begin
 
-     FText.EndUndoBlock;
-     FText.UpdateCaret;
-     FText.Modified:=True;
-  end;
+				// Now that we've found a newline, check for a comment
+				Idx := FirstCharIndex(selection,I);
+
+				// check if the very first two letters in the string are '//'
+				// if they are, then delete them from the string and set the
+				// modified string to the stringlist ...
+				if (selection[Idx]='/') and (selection[Idx+1]='/') then
+					Delete(selection, Idx, 2);
+			end;
+		end;
+
+		FText.SelText := selection;
+
+		FText.EndUndoBlock;
+		FText.UpdateCaret;
+		FText.Modified:=True;
+	end;
 end;
 
 procedure TEditor.EditorMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
@@ -1799,7 +1793,7 @@ end;
 // This code is executed whenever a function parameter suggestion balloon is shown
 procedure TEditor.DoOnCodeCompletion(Sender: TObject; const AStatement: TStatement; const AIndex: Integer);
 begin
-	// disable the tooltip here, becasue we check against Enabled
+	// disable the tooltip here, because we check against Enabled
 	// in the 'EditorStatusChange' event to prevent it's redrawing there
 	if Assigned(FCodeToolTip) then begin
 		FCodeToolTip.Enabled := False;
