@@ -856,6 +856,7 @@ type
 		procedure actGotoImplDeclEditorUpdate(Sender: TObject);
 		procedure actGotoImplDeclEditorExecute(Sender: TObject);
 		procedure actHideFSBarExecute(Sender: TObject);
+    procedure EditorPopupMenuPopup(Sender: TObject);
 
 	private
 		fTab				: integer;
@@ -6404,18 +6405,18 @@ var
 	comparewith : string;
 	// globals
 	isglobal : boolean;
+	classlinenr : integer;
 begin
-	(Sender as TCustomAction).Enabled:=false;
+	(Sender as TMenuItem).Enabled:=false;
 
 	isglobal:=false;
+	classlinenr:=0;
 	len:=0;
 	e:=GetEditor;
 	if Assigned(e) then
 		member := e.GetWordAtCursor;
 
 	if member <> '' then begin
-
-	//	MsgBox('scanning...','Browser'); // Deze verschijnt te vaak...
 
 		// Als we op een classmemberfunctie klikken, komt foo:: erbij, we willen het met scope doen
 		cpos := Pos('::' + member,e.Text.LineText);
@@ -6507,6 +6508,7 @@ begin
 						if not isglobal then
 							parent := Copy(e.Text.Lines[I],cpos-len+1,len-1);
 						classline := e.Text.Lines[I];
+						classlinenr := I+1;
 						break;
 					end;
 				end;
@@ -6515,9 +6517,9 @@ begin
 		end;
 
 		// kijk of 'member' in argumenten staat
-		if classline <> '' then
+		if (classline <> '') and (classlinenr <> 0) then
 			if (AnsiPos(' '+member,classline) > 0) or (AnsiPos('*'+member,classline) > 0) or (AnsiPos('&'+member,classline) > 0) then begin
-				(Sender as TCustomAction).Enabled:=true;
+				(Sender as TMenuItem).Enabled:=true;
 				Exit;
 			end;
 
@@ -6543,7 +6545,7 @@ begin
 					compareto := Copy(compareto,Pos('::',compareto)+2,Length(compareto)-Pos('::',compareto)-1);
 			end;
 			if AnsiCompareStr(compareto,comparewith)=0 then begin
-				(Sender as TCustomAction).Enabled:=true;
+				(Sender as TMenuItem).Enabled:=true;
 				Break;
 			end;
 		end;
@@ -6687,7 +6689,7 @@ begin
 		end;
 
 		// kijk of 'member' in argumenten staat
-		if classline <> '' then begin
+		if (classline <> '') and (classlinenr <> 0) then begin
 			parampos := AnsiPos(' '+member,classline);
 			if parampos > 0 then parampos := parampos +1;
 			if parampos = 0 then
@@ -6764,6 +6766,12 @@ begin
 			pnlFull.Height := 0
 		else
 			pnlFull.Height := 16;
+end;
+
+procedure TMainForm.EditorPopupMenuPopup(Sender: TObject);
+begin
+	actGotoImplDeclEditorUpdate(Self.GotoDefineEditor);
+	actGotoImplDeclEditorUpdate(Self.GotoDeclEditor);
 end;
 
 end.

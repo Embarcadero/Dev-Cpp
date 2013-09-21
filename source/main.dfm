@@ -1939,6 +1939,7 @@ object MainForm: TMainForm
     end
   end
   object EditorPopupMenu: TPopupMenu
+    OnPopup = EditorPopupMenuPopup
     Left = 403
     Top = 212
     object GotoDeclEditor: TMenuItem
@@ -3120,13 +3121,11 @@ object MainForm: TMainForm
       Category = 'ClassBrowser'
       Caption = 'actGotoDeclEditor'
       OnExecute = actGotoImplDeclEditorExecute
-      OnUpdate = actGotoImplDeclEditorUpdate
     end
     object actGotoImplEditor: TAction
       Category = 'ClassBrowser'
       Caption = 'actGotoImplEditor'
       OnExecute = actGotoImplDeclEditorExecute
-      OnUpdate = actGotoImplDeclEditorUpdate
     end
     object actHideFSBar: TAction
       Category = 'Window'
