@@ -1,11 +1,11 @@
 object LangForm: TLangForm
-  Left = 485
-  Top = 245
+  Left = 649
+  Top = 343
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Dev-C++ first time configuration'
   ClientHeight = 295
-  ClientWidth = 416
+  ClientWidth = 533
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,10 +17,17 @@ object LangForm: TLangForm
   OnActivate = FormActivate
   PixelsPerInch = 96
   TextHeight = 13
+  object ThemeImage: TImage
+    Left = 0
+    Top = 0
+    Width = 241
+    Height = 295
+    AutoSize = True
+  end
   object OkBtn: TBitBtn
-    Left = 144
+    Left = 248
     Top = 264
-    Width = 265
+    Width = 281
     Height = 25
     Caption = '&Next'
     Default = True
@@ -54,30 +61,13 @@ object LangForm: TLangForm
       BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BFBFBFBF
       BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
   end
-  object PicPanel: TPanel
-    Left = 8
-    Top = 8
-    Width = 128
-    Height = 281
-    BevelInner = bvLowered
-    BevelOuter = bvNone
-    TabOrder = 1
-    object Image2: TImage
-      Left = 1
-      Top = 1
-      Width = 126
-      Height = 279
-      Align = alClient
-      AutoSize = True
-    end
-  end
   object FirstPanel: TPanel
-    Left = 144
+    Left = 248
     Top = 8
-    Width = 266
+    Width = 281
     Height = 249
     BevelOuter = bvNone
-    TabOrder = 2
+    TabOrder = 1
     object Label1: TLabel
       Left = 0
       Top = 0
@@ -92,81 +82,85 @@ object LangForm: TLangForm
     object GroupBox1: TGroupBox
       Left = 0
       Top = 48
-      Width = 265
-      Height = 136
+      Width = 281
+      Height = 113
       Caption = 'Select your language:'
       TabOrder = 1
       object ListBox: TListBox
         Left = 8
         Top = 20
-        Width = 249
-        Height = 107
+        Width = 265
+        Height = 77
         ItemHeight = 13
         TabOrder = 0
       end
     end
     object ThemeGroupBox: TGroupBox
       Left = 0
-      Top = 190
-      Width = 265
-      Height = 59
+      Top = 168
+      Width = 281
+      Height = 81
       Caption = 'Select your Dev-C++ theme:'
       TabOrder = 0
+      object InterfaceLbl: TLabel
+        Left = 8
+        Top = 24
+        Width = 42
+        Height = 13
+        Caption = 'Interface'
+      end
+      object EditorLbl: TLabel
+        Left = 8
+        Top = 48
+        Width = 27
+        Height = 13
+        Caption = 'Editor'
+      end
       object ThemeBox: TComboBox
-        Left = 16
+        Left = 80
         Top = 22
-        Width = 153
+        Width = 185
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 0
-        OnChange = ThemeBoxChange
+        OnChange = ThemeChange
       end
-      object PreviewBtn: TBitBtn
-        Left = 178
-        Top = 22
-        Width = 75
-        Height = 22
-        Caption = '&Preview'
+      object EditorBox: TComboBox
+        Left = 80
+        Top = 46
+        Width = 185
+        Height = 21
+        Style = csDropDownList
+        ItemHeight = 13
         TabOrder = 1
-        OnClick = PreviewBtnClick
+        OnChange = ThemeChange
       end
     end
   end
   object FinishPanel: TPanel
-    Left = 144
+    Left = 248
     Top = 8
-    Width = 266
+    Width = 281
     Height = 249
     BevelOuter = bvNone
-    TabOrder = 5
+    TabOrder = 4
     Visible = False
-    object Label6: TLabel
-      Left = 4
-      Top = 0
-      Width = 250
-      Height = 26
-      Caption = 
-        'Dev-C++ has been configured successfully, you may now click OK t' +
-        'o proceed to its loading.'
-      WordWrap = True
-    end
     object Label4: TLabel
       Left = 5
-      Top = 40
-      Width = 251
+      Top = 48
+      Width = 266
       Height = 52
       Caption = 
         'If you need help using Dev-C++, please refer to the Dev-C++ help' +
         ' file in the Help menu. You will also find there a FAQ (which is' +
-        ' very important to read in case you have a problem) and a C tuto' +
-        'rial.'
+        ' very important to read in case you have a problem).'
       WordWrap = True
     end
     object Label7: TLabel
       Left = 4
-      Top = 104
-      Width = 251
+      Top = 120
+      Width = 266
       Height = 52
       Caption = 
         'You can also download packages (like libraries or tools) to use ' +
@@ -175,151 +169,166 @@ object LangForm: TLangForm
         's.'
       WordWrap = True
     end
+    object Label6: TLabel
+      Left = 5
+      Top = 0
+      Width = 250
+      Height = 26
+      Caption = 
+        'Dev-C++ has been configured successfully, you may now click OK t' +
+        'o proceed to its loading.'
+      WordWrap = True
+    end
   end
   object CachePanel: TPanel
-    Left = 144
+    Left = 248
     Top = 8
-    Width = 266
+    Width = 281
     Height = 249
     BevelOuter = bvNone
-    TabOrder = 3
+    TabOrder = 2
     Visible = False
     object Label2: TLabel
       Left = 4
       Top = 0
-      Width = 249
-      Height = 52
+      Width = 254
+      Height = 39
       Caption = 
-        'You decided to use the code completion feature. To optimize this' +
-        ' process, it is recommended to create a cache of the standard he' +
-        'aders files. This will allow you to browse these headers too.'
+        'To optimize code completion, it is recommended to create a cache' +
+        ' of the standard headers files. This will allow you to browse th' +
+        'ese headers too.'
       WordWrap = True
     end
     object Label3: TLabel
       Left = 4
-      Top = 64
-      Width = 245
-      Height = 52
+      Top = 48
+      Width = 252
+      Height = 39
       Caption = 
-        'Do you want to create the code completion cache now? This can ta' +
-        'ke several minutes. It is possible to create this cache later in' +
-        ' Editor Options, Class Browsing, Completion.'
+        'It is possible to cache headers later in Editor Options, Class B' +
+        'rowsing, Completion. Caching all headers can take several minute' +
+        's when using TDM-GCC.'
       WordWrap = True
     end
     object ProgressPanel: TPanel
       Left = 0
-      Top = 134
-      Width = 265
-      Height = 114
+      Top = 100
+      Width = 281
+      Height = 147
       BevelOuter = bvNone
       TabOrder = 1
       Visible = False
       object ParseLabel: TLabel
         Left = 4
-        Top = 24
-        Width = 65
-        Height = 13
+        Top = 80
+        Width = 260
+        Height = 28
+        AutoSize = False
         Caption = 'Parsing files...'
         WordWrap = True
       end
       object pbCCCache: TProgressBar
         Left = 4
-        Top = 70
-        Width = 255
-        Height = 20
+        Top = 112
+        Width = 269
+        Height = 22
+        Smooth = True
         TabOrder = 0
       end
     end
     object BuildPanel: TPanel
       Left = 0
-      Top = 134
-      Width = 265
-      Height = 114
+      Top = 100
+      Width = 280
+      Height = 147
       BevelOuter = bvNone
       TabOrder = 0
-      object LoadBtn: TSpeedButton
-        Left = 228
-        Top = 79
-        Width = 22
-        Height = 22
-        Glyph.Data = {
-          36030000424D3603000000000000360000002800000010000000100000000100
-          18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-          BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-          BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000000000
-          000000000000000000000000000000000000000000000000000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF00000000AEFF0096DB0096DB0096DB0096DB0096DB00
-          96DB0096DB0082BE000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-          00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF00AEFF00AEFF00AEFF00
-          AEFF00AEFF0096DB000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-          00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF5DCCFF5DCCFF5DCCFF5D
-          CCFF5DCCFF00AEFF000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF686868BDEBFF
-          5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
-        OnClick = LoadBtnClick
-      end
       object YesCache: TRadioButton
         Left = 8
-        Top = 12
-        Width = 241
+        Top = 4
+        Width = 257
         Height = 17
-        Caption = 'Yes, create the cache now'
+        Caption = 'Yes, cache the default include folder'
         Checked = True
         TabOrder = 0
         TabStop = True
       end
       object NoCache: TRadioButton
         Left = 8
-        Top = 30
-        Width = 233
+        Top = 128
+        Width = 257
         Height = 17
-        Caption = 'No, do not create the cache'
+        Caption = 'No, don'#39't cache anything'
         TabOrder = 1
       end
-      object DirCheckBox: TCheckBox
+      object AltCache: TRadioButton
         Left = 8
-        Top = 60
-        Width = 249
+        Top = 24
+        Width = 257
         Height = 17
-        Caption = 'Use this directory instead of the standard one:'
+        Caption = 'Only cache these files and their includes:'
         TabOrder = 2
-        OnClick = DirCheckBoxClick
       end
-      object DirEdit: TEdit
-        Left = 32
-        Top = 80
-        Width = 192
-        Height = 21
-        Color = clInactiveCaptionText
-        Enabled = False
+      object AltFileList: TListBox
+        Left = 4
+        Top = 48
+        Width = 197
+        Height = 73
+        Columns = 2
+        ItemHeight = 13
+        Items.Strings = (
+          'stdio.h'
+          'stdlib.h'
+          'math.h'
+          'string.h'
+          'time.h'
+          'windows.h'
+          'windowsx.h'
+          'd3d9.h'
+          'd3dx9.h'
+          'gdiplus.h')
         TabOrder = 3
+      end
+      object ButtonAddFile: TButton
+        Left = 204
+        Top = 48
+        Width = 75
+        Height = 23
+        Caption = 'Add file'
+        TabOrder = 4
+        OnClick = ButtonAddFileClick
+      end
+      object ButtonRemove: TButton
+        Left = 204
+        Top = 96
+        Width = 75
+        Height = 23
+        Caption = 'Remove'
+        TabOrder = 5
+        OnClick = ButtonRemoveClick
+      end
+      object ButtonAddFolder: TButton
+        Left = 204
+        Top = 72
+        Width = 75
+        Height = 23
+        Caption = 'Add folder'
+        TabOrder = 6
+        OnClick = ButtonAddFolderClick
       end
     end
   end
   object SecondPanel: TPanel
-    Left = 144
+    Left = 248
     Top = 8
-    Width = 266
+    Width = 281
     Height = 249
     BevelOuter = bvNone
-    TabOrder = 4
+    TabOrder = 3
     Visible = False
     object SecondLabel: TLabel
       Left = 4
-      Top = 0
+      Top = 8
       Width = 258
       Height = 39
       Caption = 
@@ -331,8 +340,8 @@ object LangForm: TLangForm
     object Label5: TLabel
       Left = 4
       Top = 72
-      Width = 229
-      Height = 52
+      Width = 266
+      Height = 39
       Caption = 
         'Although this feature is useful, it requires more CPU power and ' +
         'memory. Do you want to use it? You can enable or disable it late' +
@@ -340,9 +349,9 @@ object LangForm: TLangForm
       WordWrap = True
     end
     object YesClassBrowser: TRadioButton
-      Left = 20
+      Left = 36
       Top = 168
-      Width = 169
+      Width = 209
       Height = 17
       Caption = 'Yes, I want to use this feature'
       Checked = True
@@ -350,7 +359,7 @@ object LangForm: TLangForm
       TabStop = True
     end
     object NoClassBrowser: TRadioButton
-      Left = 20
+      Left = 36
       Top = 192
       Width = 209
       Height = 17

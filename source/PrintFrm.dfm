@@ -1,6 +1,6 @@
 object PrintForm: TPrintForm
-  Left = 283
-  Top = 193
+  Left = 705
+  Top = 627
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Print file'
@@ -64,20 +64,20 @@ object PrintForm: TPrintForm
     end
     object rbLN: TRadioButton
       Left = 180
-      Top = 32
+      Top = 16
       Width = 200
       Height = 17
       Caption = 'Print line numbers'
-      Enabled = False
+      Checked = True
       TabOrder = 2
+      TabStop = True
     end
     object rbLNMargin: TRadioButton
       Left = 180
-      Top = 48
+      Top = 32
       Width = 229
       Height = 17
       Caption = 'Print line numbers in margin'
-      Enabled = False
       TabOrder = 3
     end
     object cbWordWrap: TCheckBox
@@ -88,14 +88,13 @@ object PrintForm: TPrintForm
       Caption = '&Word wrap'
       TabOrder = 4
     end
-    object cbLineNum: TCheckBox
-      Left = 168
-      Top = 16
+    object rbNoLN: TRadioButton
+      Left = 180
+      Top = 48
       Width = 200
       Height = 17
-      Caption = 'Line Numbers'
+      Caption = 'Don'#39't print line numbers'
       TabOrder = 5
-      OnClick = cbLineNumClick
     end
   end
   object grpPages: TGroupBox

@@ -914,8 +914,6 @@ type
 	public
 		procedure DoCreateEverything;	// added by peter
 		function SaveFile(e : TEditor): Boolean;
-		procedure MsgBox(text,caption: string); overload;
-		procedure MsgBox(text : string); overload;
 		procedure OpenFile(s : string);
 		procedure OpenProject(s: string);
 		function FileIsOpen(const s: string; inprj: boolean = FALSE): integer;
@@ -1049,8 +1047,6 @@ begin
 
 	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Applying localisation...';
 	if devData.First or (devData.Language = '') then begin
-		if devData.First then
-			dmMain.InitHighlighterFirstTime;
 		Lang.SelectLanguage;
 		if devData.ThemeChange then
 			LoadTheme;
@@ -2806,7 +2802,7 @@ begin
 				 Colors:= cbColors.Checked;
 				 Highlight:= cbHighlight.Checked;
 				 Wrap:= cbWordWrap.Checked;
-				 LineNumbers:= cbLineNum.checked;
+				 LineNumbers:= not rbNoLN.checked;
 				 LineNumbersInMargin:= rbLNMargin.Checked;
 				 Copies:= seCopies.Value;
 				 SelectedOnly:= cbSelection.Checked;
@@ -3445,16 +3441,6 @@ begin
 	finally
 		sl.Free;
 	end;
-end;
-
-// got tired of typing application.handle,PChar,PChar MB_OK, etc ;)
-procedure TMainForm.MsgBox(text,caption:string);
-begin
-	MessageBox(application.handle,PChar(text),PChar(caption),MB_OK);
-end;
-procedure TMainForm.MsgBox(text:string);
-begin
-	MessageBox(application.handle,PChar(text),PChar('Message'),MB_OK);
 end;
 
 procedure TMainForm.actDebugExecute(Sender: TObject);
@@ -6791,18 +6777,17 @@ end;
 
 procedure TMainForm.CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 begin
-{
 	// Color...
 	if AnsiContainsStr(Item.SubItems[2],'[Warning]') then
-		Sender.Canvas.Font.Color := TColor($0077FF); // Orange
+		Sender.Canvas.Font.Color := TColor($0066FF); // Orange
 	if AnsiContainsStr(Item.SubItems[2],'[Error]') then
 		Sender.Canvas.Font.Color := clRed;
 	if AnsiContainsStr(Item.SubItems[2],'[Hint]') then
 		Sender.Canvas.Font.Color := clYellow;
 
+	// In function/member/etc
 	if AnsiStartsStr('in',LowerCase(Item.SubItems[2])) then
 		Sender.Canvas.Font.Style := [fsBold];
-}
 end;
 
 end.

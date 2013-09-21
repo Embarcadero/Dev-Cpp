@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 620
-  Top = 259
+  Left = 617
+  Top = 303
   Width = 1048
-  Height = 692
+  Height = 690
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   Caption = 'Dev-C++'
@@ -30,14 +30,14 @@ object MainForm: TMainForm
   object SplitterLeft: TSplitter
     Left = 193
     Top = 72
-    Height = 407
+    Height = 405
     AutoSnap = False
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 479
+    Top = 477
     Width = 1032
     Height = 3
     Cursor = crVSplit
@@ -47,7 +47,7 @@ object MainForm: TMainForm
   end
   object MessageControl: TPageControl
     Left = 0
-    Top = 482
+    Top = 480
     Width = 1032
     Height = 133
     ActivePage = CompSheet
@@ -1096,7 +1096,7 @@ object MainForm: TMainForm
   end
   object Statusbar: TStatusBar
     Left = 0
-    Top = 615
+    Top = 613
     Width = 1032
     Height = 19
     Panels = <
@@ -1119,7 +1119,7 @@ object MainForm: TMainForm
     Left = 196
     Top = 72
     Width = 836
-    Height = 407
+    Height = 405
     Align = alClient
     HotTrack = True
     MultiLine = True
@@ -1181,7 +1181,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 72
     Width = 193
-    Height = 407
+    Height = 405
     ActivePage = ClassSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
@@ -1193,7 +1193,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 379
+        Height = 377
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1229,7 +1229,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 379
+        Height = 377
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1265,7 +1265,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 379
+        Height = 377
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1283,6 +1283,7 @@ object MainForm: TMainForm
     end
   end
   object MainMenu: TMainMenu
+    AutoLineReduction = maManual
     Images = dmMain.MenuImages_NewLook
     Left = 294
     Top = 79
@@ -1381,6 +1382,7 @@ object MainForm: TMainForm
         object ImportCBCproject: TMenuItem
           Caption = 'Code::Blocks project'
           Enabled = False
+          Visible = False
           OnClick = ImportCBCprojectClick
         end
       end

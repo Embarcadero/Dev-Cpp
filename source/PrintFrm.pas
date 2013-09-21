@@ -45,9 +45,8 @@ type
     lblCopies: TLabel;
     seCopies: TSpinEdit;
     cbSelection: TCheckBox;
-    cbLineNum: TCheckBox;
+    rbNoLN: TRadioButton;
     procedure FormCreate(Sender: TObject);
-    procedure cbLineNumClick(Sender: TObject);
   public
     procedure LoadText;
   end;
@@ -70,9 +69,9 @@ begin
   cbColors.Caption:=        Lang[ID_PRT_COLORS];
   cbHighlight.Caption:=     Lang[ID_PRT_HIGHLIGHT];
   cbWordWrap.Caption:=      Lang[ID_PRT_WORDWRAP];
-  cbLineNum.Caption:=       Lang[ID_PRT_LINENUM];
   rbLN.Caption:=            Lang[ID_PRT_PRTLINENUM];
   rbLNMargin.Caption:=      Lang[ID_PRT_PRTLINENUMMAR];
+  rbNoLN.Caption:=          Lang[ID_PRT_NOPRTLINENUMMAR];
   lblCopies.Caption:=       Lang[ID_PRT_COPIES];
   cbSelection.Caption:=     Lang[ID_PRT_SELONLY];
 
@@ -86,18 +85,9 @@ begin
   cbColors.Checked := devData.PrintColors;
   cbHighlight.Checked := devData.PrintHighlight;
   cbWordWrap.Checked := devData.PrintWordWrap;
-  if devData.PrintLineNumbers or devData.PrintLineNumbersMargins then
-    cbLineNum.Checked := true
-  else
-    cbLineNum.Checked := false;
   rbLN.Checked := devData.PrintLineNumbers;
+  rbNoLN.Checked := not devData.PrintLineNumbers;
   rbLNMargin.Checked := devData.PrintLineNumbersMargins;
-end;
-
-procedure TPrintForm.cbLineNumClick(Sender: TObject);
-begin
-  rbLN.Enabled := cbLineNum.Checked;
-  rbLNMargin.Enabled := cbLineNum.Checked;
 end;
 
 end.

@@ -12177,7 +12177,7 @@ object SplashForm: TSplashForm
         43A76942A76942A76943A76943A76942A76943A76942A76942A76942A7694237
         FE2D}
     end
-    object Statusbar: TStatusbar
+    object Statusbar: TStatusBar
       Left = 0
       Top = 271
       Width = 472

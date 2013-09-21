@@ -34,7 +34,7 @@ resourcestring
 	// misc strings
 	DEVCPP               = 'Dev-C++';
 	DEVCPP_VERSION       = '5.1.0.0';
-	DEVCPP_BUILDTIME     = 'Dec 19 2011 - 23:10';
+	DEVCPP_BUILDTIME     = 'Dec 27 2011 - 15:17';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -104,8 +104,8 @@ resourcestring
   OPT_COMPILERSETS     = 'CompilerSets';
   WEBUPDATE_SECTION    = 'WEBUPDATE';
 
-  DEFCOMPILERSET32     = 'MinGW GCC 4.6.1 32-bit';
-  DEFCOMPILERSET64     = 'MinGW GCC 4.6.1 64-bit';
+  DEFCOMPILERSET32     = 'MinGW GCC 4.6.2 32-bit';
+  DEFCOMPILERSET64     = 'TDM-GCC 4.6.1 64-bit';
 
   // Filters
   FLT_BASE             = 'All known Files||';

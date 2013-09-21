@@ -126,7 +126,6 @@ type
     CppTokenizer: TCppTokenizer;
     CppParser: TCppParser;
     lbCCC: TListBox;
-    lblCCCache: TLabel;
     pbCCCache: TProgressBar;
     chkCBShowInherited: TCheckBox;
     cbMatch: TCheckBox;
@@ -188,7 +187,6 @@ type
     procedure lvCodeinsCompare(Sender: TObject; Item1, Item2: TListItem;Data: Integer; var Compare: Integer);
     procedure lvCodeinsSelectItem(Sender: TObject; Item: TListItem;Selected: Boolean);
     procedure CodeInsStatusChange(Sender: TObject;Changes: TSynStatusChanges);
-    function FormHelp(Command: Word; Data: Integer;var CallHelp: Boolean): Boolean;
     procedure cboDblClick(Sender: TObject);
     procedure cboQuickColorSelect(Sender: TObject);
     procedure CppEditSpecialLineColors(Sender: TObject; Line: Integer;var Special: Boolean; var FG, BG: TColor);
@@ -295,19 +293,11 @@ end;
 
 procedure TEditorOptForm.FormActivate(Sender: TObject);
 begin
-	// Lees inibestand of register
+	// Read ini file
 	GetOptions;
 
 	// Update code insertion
 	UpdateCIButtons;
-end;
-
-function TEditorOptForm.FormHelp(Command: Word; Data: Integer;
-  var CallHelp: Boolean): Boolean;
-begin
-  result:= false;
-  // another debug message
-  showmessage('Hello from FormHelp');
 end;
 
 { ---------- Font Methods ---------- }
@@ -581,7 +571,6 @@ begin
   chkCBParseGlobalH.Caption:=    Lang[ID_EOPT_BROWSERGLOBAL];
   chkCBUseColors.Caption:=       Lang[ID_POP_USECOLORS];
   chkCCCache.Caption:=           Lang[ID_EOPT_CCCACHECHECK];
-  lblCCCache.Caption:=           Lang[ID_EOPT_CCCACHELABEL];
   btnCCCnew.Caption:=            Lang[ID_BTN_ADD];
   btnCCCdelete.Caption:=         Lang[ID_BTN_CLEAR];
 
@@ -1250,7 +1239,7 @@ var
  i: integer;
  attr: TSynHighlighterAttributes;
 begin
-  if cboQuickColor.ItemIndex > 5 then begin
+  if cboQuickColor.ItemIndex > 6 then begin
     // custom style; load from disk
     LoadSyntax(cboQuickColor.Items[cboQuickColor.ItemIndex]);
     Exit;
@@ -1268,7 +1257,7 @@ begin
     end;
   end;
 
-  StrtoPoint(fBPColor, LoadStr(offset +17));  // breakpoints
+  StrtoPoint(fBPColor,  LoadStr(offset +17));  // breakpoints
   StrtoPoint(fErrColor, LoadStr(offset +18)); // error line
   StrtoPoint(fABPColor, LoadStr(offset +19)); // active breakpoint
   StrtoPoint(fgutColor, LoadStr(offset +20)); // gutter

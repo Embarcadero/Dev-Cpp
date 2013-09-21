@@ -140,7 +140,7 @@ begin
 // SynEdit highlighters
   RegisterComponents(SYNS_HighlightersPage, [
     //classic
-    TSynCppSyn, 
+    TSynCppSyn,
     // other
     TSynRCSyn
   ]);

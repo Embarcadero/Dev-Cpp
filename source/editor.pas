@@ -25,7 +25,7 @@ uses
 {$IFDEF WIN32}
   Windows, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser,
   Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
-  SynCompletionProposal, StrUtils, SynEditTypes, SynEditHighlighter, DevCodeToolTip, SynAutoIndent;
+  SynCompletionProposal, StrUtils, SynEditTypes, SynEditHighlighter, CodeToolTip, SynAutoIndent;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, Graphics, QControls, QForms, QDialogs, CodeCompletion, CppParser,
@@ -72,8 +72,8 @@ type
     fCompletionBox: TCodeCompletion;
     fRunToCursorLine: integer;
     fLastParamFunc : TList;
-    FCodeToolTip: TDevCodeToolTip;  {** Modified by Peter **}
-    FAutoIndent: TSynAutoIndent; {** Modified by Peter **}
+    FCodeToolTip: TCodeToolTip;//** Modified by Peter **}
+    FAutoIndent: TSynAutoIndent;
     procedure CompletionTimer( Sender: TObject );
     procedure EditorKeyPress( Sender: TObject; var Key: Char );
     procedure EditorKeyDown( Sender: TObject; var Key: Word; Shift: TShiftState );
@@ -104,8 +104,6 @@ type
     procedure SetFileName(value: string);
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
-   protected
-    procedure DoOnCodeCompletion(Sender: TObject; const AStatement: TStatement; const AIndex: Integer); {** Modified by Peter **}
    public
     procedure Init(In_Project : boolean; Caption_, File_name : string; DoOpen : boolean; const IsRes: boolean = FALSE);
     destructor Destroy; override;
@@ -153,7 +151,7 @@ type
     property IsRes: boolean read fRes write fRes;
     property Text: TSynEdit read fText write fText;
     property TabSheet: TTabSheet read fTabSheet write fTabSheet;
-    property CodeToolTip: TDevCodeToolTip read FCodeToolTip; // added on 23rd may 2004 by peter_
+    property CodeToolTip: TCodeToolTip read FCodeToolTip; // added on 23rd may 2004 by peter_
   end;
 
 implementation
@@ -291,7 +289,7 @@ begin
 	InitCompletion;
 
 	// Function parameter tips
-	FCodeToolTip := TDevCodeToolTip.Create(Application);
+	FCodeToolTip := TCodeToolTip.Create(Application);
 	FCodeToolTip.Editor := FText;
 	FCodeToolTip.Parser := MainForm.CppParser;
 
@@ -1176,7 +1174,6 @@ procedure TEditor.InitCompletion;
 begin
   fCompletionBox:=MainForm.CodeCompletion;
   fCompletionBox.Enabled:=devCodeCompletion.Enabled;
-  fCompletionBox.OnCompletion := DoOnCodeCompletion; {** Modified by Peter **}
 
   fText.OnKeyDown := EditorKeyDown; // This way tabs are also processed without Code Completion!
   if fCompletionBox.Enabled then begin
@@ -1707,20 +1704,6 @@ begin
 		PaintMatchingBrackets(TransientType);
 end;
 
-// This code is executed whenever a function parameter suggestion balloon is shown after selection some value in the completion list
-procedure TEditor.DoOnCodeCompletion(Sender: TObject; const AStatement: TStatement; const AIndex: Integer);
-begin
-	// disable the tooltip here, because we check against Enabled
-	// in the 'EditorStatusChange' event to prevent it's redrawing there
-	if Assigned(FCodeToolTip) and devEditor.ParserHints then begin
-		FCodeToolTip.Enabled := False;
-		FCodeToolTip.ReleaseHandle;
-		FCodeToolTip.Show;
-		FCodeToolTip.Select(AStatement._FullText);
-		FCodeToolTip.Enabled := True;
-		FCodeToolTip.Show;
-	end;
-end;
 // Editor needs to be told when class browser has been recreated otherwise AV !
 procedure TEditor.UpdateParser;
 begin

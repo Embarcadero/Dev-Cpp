@@ -68,6 +68,8 @@ function CommaStrToStr(s : string; formatstr : string) : string;
 function IncludeQuoteIfSpaces(s : string) : string;
 function IncludeQuoteIfNeeded(s : string) : string;
 
+procedure MsgBox(text,caption:string); overload;
+procedure MsgBox(text:string); overload;
 
 // Added by MikeB
 procedure LoadFilefromResource(const FileName: string; ms: TMemoryStream);
@@ -101,8 +103,7 @@ function GetLastPos(const SubStr: string; const S: string): integer;
 
 function GenMakePath(FileName: String): String; overload;
 function GenMakePath2(FileName: String): String;
-function GenMakePath(FileName: String; EscapeSpaces,
-                     EncloseInQuotes: Boolean): String; overload;
+function GenMakePath(FileName: String; EscapeSpaces,EncloseInQuotes: Boolean): String; overload;
 
 function GetRealPath(BrokenFileName: String; Directory: String = ''): String;
 
@@ -127,6 +128,16 @@ uses
 {$IFDEF LINUX}
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
+
+// got tired of typing application.handle,PChar,PChar MB_OK, etc ;)
+procedure MsgBox(text,caption:string);
+begin
+	MessageBox(application.handle,PChar(text),PChar(caption),MB_OK);
+end;
+procedure MsgBox(text:string);
+begin
+	MessageBox(application.handle,PChar(text),PChar('Message'),MB_OK);
+end;
 
 procedure OpenHelpFile;
 begin

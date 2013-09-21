@@ -784,12 +784,12 @@ var
   Dir: WideString;
 {$ENDIF}
 begin
-  if fProject.Options.LogOutput<>'' then
-    Dir:=ExpandFileto(fProject.Options.LogOutput, fProject.Directory)
-  else
-    Dir:=fProject.Directory;
-  SelectDirectory('Select Directory', '', Dir);
-  edLogOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
+	if fProject.Options.LogOutput<>'' then
+		Dir:=ExpandFileto(fProject.Options.LogOutput, fProject.Directory)
+	else
+		Dir:=fProject.Directory;
+	if SelectDirectory('Select Directory', '', Dir) then
+		edLogOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
 end;
 
 procedure TfrmProjectOptions.btnMakeBrowseClick(Sender: TObject);

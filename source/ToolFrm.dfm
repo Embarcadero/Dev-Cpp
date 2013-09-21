@@ -1,6 +1,6 @@
 object ToolForm: TToolForm
-  Left = 390
-  Top = 297
+  Left = 679
+  Top = 381
   Width = 325
   Height = 357
   BorderIcons = [biSystemMenu]

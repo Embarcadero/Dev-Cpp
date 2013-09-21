@@ -34,26 +34,20 @@ uses
 type
   TLangForm = class(TForm)
     OkBtn: TBitBtn;
-    PicPanel: TPanel;
     PopupMenu: TPopupMenu;
     N1: TMenuItem;
-    Image2: TImage;
+    ThemeImage: TImage;
     FirstPanel: TPanel;
     ListBox: TListBox;
     GroupBox1: TGroupBox;
     Label1: TLabel;
     ThemeGroupBox: TGroupBox;
     ThemeBox: TComboBox;
-    PreviewBtn: TBitBtn;
     CachePanel: TPanel;
     Label2: TLabel;
-    Label3: TLabel;
     BuildPanel: TPanel;
     YesCache: TRadioButton;
     NoCache: TRadioButton;
-    DirCheckBox: TCheckBox;
-    DirEdit: TEdit;
-    LoadBtn: TSpeedButton;
     ProgressPanel: TPanel;
     pbCCCache: TProgressBar;
     ParseLabel: TLabel;
@@ -63,15 +57,24 @@ type
     YesClassBrowser: TRadioButton;
     NoClassBrowser: TRadioButton;
     FinishPanel: TPanel;
-    Label6: TLabel;
     Label4: TLabel;
     Label7: TLabel;
-    procedure PreviewBtnClick(Sender: TObject);
+    AltCache: TRadioButton;
+    AltFileList: TListBox;
+    Label3: TLabel;
+    ButtonAddFile: TButton;
+    ButtonRemove: TButton;
+    ButtonAddFolder: TButton;
+    EditorBox: TComboBox;
+    InterfaceLbl: TLabel;
+    EditorLbl: TLabel;
+    Label6: TLabel;
     procedure FormActivate(Sender: TObject);
     procedure OkBtnClick(Sender: TObject);
-    procedure DirCheckBoxClick(Sender: TObject);
-    procedure LoadBtnClick(Sender: TObject);
-    procedure ThemeBoxChange(Sender: TObject);
+    procedure ThemeChange(Sender: TObject);
+    procedure ButtonAddFileClick(Sender: TObject);
+    procedure ButtonRemoveClick(Sender: TObject);
+    procedure ButtonAddFolderClick(Sender: TObject);
   private
     HasProgressStarted : boolean;
 
@@ -109,30 +112,26 @@ begin
   result:= ListBox.ItemIndex;
 end;
 
-procedure TLangForm.PreviewBtnClick(Sender: TObject);
-begin
-  if ThemeBox.ItemIndex =  1 then
-    PopupMenu.Images := dmMain.MenuImages_Gnome
-  else if ThemeBox.ItemIndex = 2 then
-    PopupMenu.Images := dmMain.MenuImages_Blue
-  else
-    PopupMenu.Images := dmMain.MenuImages_NewLook;
-  PopupMenu.Popup(Left + PreviewBtn.Left + ThemeGroupBox.Left +
-                  PreviewBtn.Width + 15, Top + PreviewBtn.Top + ThemeGroupBox.Top);
-end;
-
 procedure TLangForm.FormActivate(Sender: TObject);
 var s : array [0..255] of char;
     d : DWORD;
     sl : TStrings;
 begin
   HasProgressStarted := false;
-  sl := devTheme.ThemeList;
-  ThemeBox.Items.AddStrings(sl);
-  sl.Free;
-  ThemeBox.ItemIndex := 0;
-  Image2.Picture.Bitmap.LoadFromResourceName(HInstance, 'THEMENEWLOOK');
-  GetUserName(s, d);
+
+	// Themes
+	sl := devTheme.ThemeList;
+	ThemeBox.Items.AddStrings(sl);
+	ThemeBox.ItemIndex := 0;
+	sl.Free;
+
+	// Editor styles
+	EditorBox.Items.Add('Classic');
+	EditorBox.Items.Add('Classic Plus');
+	EditorBox.ItemIndex := 1;
+
+	ThemeImage.Picture.Bitmap.LoadFromResourceName(HInstance, 'NEWLOOKCLASSICPLUS');
+	GetUserName(s, d);
 end;
 
 procedure TLangForm.CppParserTotalProgress(Sender: TObject; FileName: String; Total, Current: Integer);
@@ -153,6 +152,7 @@ procedure TLangForm.OkBtnClick(Sender: TObject);
 var
 	s, f : TStringList;
 	i, j : integer;
+	fullpath : string;
 begin
 	if OkBtn.Tag = 0 then begin
 		OkBtn.Tag := 1;
@@ -160,6 +160,7 @@ begin
 		FirstPanel.Visible := false;
 		devData.ThemeChange := true;
 		devData.Theme := ThemeBox.Items[ThemeBox.ItemIndex];
+		dmMain.InitHighlighterFirstTime(EditorBox.ItemIndex);
 	end else if OkBtn.Tag = 1 then begin
 		if YesClassBrowser.Checked then begin
 			OkBtn.Tag := 2;
@@ -179,13 +180,12 @@ begin
 			SaveOptions;
 		end;
 	end else if OkBtn.Tag = 2 then begin
-		if YesCache.Checked then begin
+		if YesCache.Checked or AltCache.Checked then begin
 			YesCache.Enabled := false;
 			NoCache.Enabled := false;
+			AltCache.Enabled := false;
+			AltFileList.Enabled := false;
 			OkBtn.Enabled := false;
-			DirEdit.Enabled := false;
-			DirCheckBox.Enabled := false;
-			LoadBtn.Enabled := false;
 			BuildPanel.Visible := False;
 			ProgressPanel.Visible := True;
 			OkBtn.Caption := 'Please wait...';
@@ -209,9 +209,12 @@ begin
 			MainForm.ClassBrowser1.SetUpdateOff;
 
 			s := TStringList.Create;
-			if (DirCheckBox.Checked) then
-				StrToList(DirEdit.Text, s)
-			else
+			if (AltCache.Checked) then begin
+				devClassBrowsing.ParseGlobalHeaders := false; // Too slow
+				for I:=0 to AltFileList.Count-1 do begin
+					s.Add(AltFileList.Items[I]);
+				end;
+			end else
 				StrToList(devDirs.Cpp, s);
 
 			// Make it look busy
@@ -219,15 +222,32 @@ begin
 			Application.ProcessMessages;
 
 			f := TStringList.Create;
-			for i := 0 to pred(s.Count) do begin
-				// Relative paths make the recursive/loop searcher go nuts
-				s[i] := StringReplace(s[i],'%path%\',devDirs.exec,[rfReplaceAll]);
-				if DirectoryExists(s[i]) then begin
-					FilesFromWildcard(s[i], '*.*', f, false, false, false);
-					for j := 0 to f.Count - 1 do
-						MainForm.CppParser.AddFileToScan(f[j]);
-				end else
-					MessageDlg('Directory "' + s[i] + '" does not exist', mtWarning, [mbOK], 0);
+			if not AltCache.Checked then begin
+				for i := 0 to pred(s.Count) do begin
+					// Relative paths make the recursive/loop searcher go nuts
+					s[i] := StringReplace(s[i],'%path%\',devDirs.exec,[rfReplaceAll]);
+					if DirectoryExists(s[i]) then begin
+						FilesFromWildcard(s[i], '*.*', f, false, false, false);
+						for j := 0 to f.Count - 1 do
+							MainForm.CppParser.AddFileToScan(f[j]);
+					end else
+						MessageDlg('Directory "' + s[i] + '" does not exist', mtWarning, [mbOK], 0);
+				end;
+			end else begin
+				for i := 0 to pred(s.Count) do begin
+
+					// Assemble full path
+					if s[i][1] = ':' then
+						fullpath := s[i]
+					else
+						fullpath := devDirs.Cpp + '\' + s[i];
+
+					// Then check for existance
+					if FileExists(fullpath) then begin
+						MainForm.CppParser.AddFileToScan(fullpath);
+					end else
+						MessageDlg('File "' + fullpath + '" does not exist', mtWarning, [mbOK], 0);
+				end;
 			end;
 
 			// Deze regel duurt heel lang
@@ -262,38 +282,68 @@ begin
 	end
 end;
 
-procedure TLangForm.DirCheckBoxClick(Sender: TObject);
-begin
-  DirEdit.Enabled := DirCheckBox.Checked;
-  if DirEdit.Enabled then
-    DirEdit.Color := clCaptionText
-  else
-    DirEdit.Color := clInactiveCaptionText;
-end;
-
-procedure TLangForm.LoadBtnClick(Sender: TObject);
+procedure TLangForm.ThemeChange(Sender: TObject);
 var
-{$IFDEF WIN32}
-  s: string;
-{$ENDIF}
-{$IFDEF LINUX}
-  s: WideString;
-{$ENDIF}
+	finalname : string;
 begin
-  if SelectDirectory('Include Directory', '', s) then
-    DirEdit.Text := s;
+	finalname := '';
+	case ThemeBox.ItemIndex of
+		0: finalname := 'NEWLOOK';
+		1: finalname := 'GNOME';
+		2: finalname := 'BLUE';
+	end;
+	case EditorBox.ItemIndex of
+		0: finalname := finalname + 'CLASSIC';
+		1: finalname := finalname + 'CLASSICPLUS';
+	end;
+	ThemeImage.Picture.Bitmap.LoadFromResourceName(HInstance, finalname);
 end;
 
-procedure TLangForm.ThemeBoxChange(Sender: TObject);
+procedure TLangForm.ButtonAddFileClick(Sender: TObject);
+var
+	I: integer;
+	s: string;
 begin
-  case ThemeBox.ItemIndex of
-  1:
-    Image2.Picture.Bitmap.LoadFromResourceName(HInstance, 'THEMEGNOME');
-  2:
-    Image2.Picture.Bitmap.LoadFromResourceName(HInstance, 'THEMEBLUE');
-  else
-    Image2.Picture.Bitmap.LoadFromResourceName(HInstance, 'THEMENEWLOOK');
-  end;
+	with dmMain.OpenDialog do begin
+		Filter:= FLT_HEADS;
+		Title:= Lang[ID_NV_OPENFILE];
+		InitialDir := devDirs.Cpp;
+		if Execute then begin
+			for i:= 0 to pred(Files.Count) do begin
+				s := StringReplace(Files.Strings[i],devDirs.Cpp + '\','',[rfReplaceAll]);
+				AltFileList.Items.Add(s);
+			end;
+		end;
+	end;
+end;
+
+procedure TLangForm.ButtonRemoveClick(Sender: TObject);
+//var
+//	I : integer;
+begin
+	AltFileList.DeleteSelected;
+//	for I:= 0 to AltFileList.Count-1 do begin
+//		if AltFileList.Selected[I] then begin
+//			AltFileList.Items.Delete(i);
+//		end;
+//	end;
+end;
+
+procedure TLangForm.ButtonAddFolderClick(Sender: TObject);
+var
+	Dir : string;
+	f : TStringList;
+	I : integer;
+	s : string;
+begin
+	f := TStringList.Create;
+	if SelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
+		FilesFromWildcard(Dir, '*.*', f, false, false, false);
+		for i := 0 to f.Count-1 do begin
+			s := StringReplace(f[i],devDirs.Cpp + '\','',[rfReplaceAll]);
+			AltFileList.Items.Add(s);
+		end;
+	end;
 end;
 
 end.

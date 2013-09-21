@@ -56,7 +56,6 @@ begin
 		ClientWidth:= Image.Width;
 		ClientHeight:= Image.Height + Statusbar.Height;
 	end;
-	Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Loading...';
 end;
 
 end.

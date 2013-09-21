@@ -81,21 +81,15 @@
 
 unit CodeToolTip;
 
-// the xptooltip looks nicer than the original THintWindow
-// from delphi and yeah, it supports alphablending under win2k
-// and shadowing under win xp. it is is downwards compatible.
-// should run on win98 etc too!
-{$DEFINE USE_XPTOOLTIP}
-
 interface
 uses
 {$IFDEF WIN32}
   SysUtils, Dialogs, Classes, Windows, Messages, Graphics, Controls, Menus, Forms, StdCtrls,
-  SynEditKbdHandler, SynEdit, SynEditHighlighter,XPTooltip;
+  SynEditKbdHandler, SynEdit, SynEditHighlighter, CppParser, utils;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, QDialogs, Classes, Xlib, QGraphics, QControls, QMenus, QForms, QStdCtrls,
-  QSynEditKbdHandler, QSynEdit, QSynEditHighlighter, Types, XPToolTip;
+  QSynEditKbdHandler, QSynEdit, QSynEditHighlighter, Types;
 {$ENDIF}
 
 type
@@ -127,7 +121,6 @@ type
     destructor Destroy; override;
   end;
 
-
   TCodeToolTipDownButton = class(TCustomCodeToolTipButton)
   private
     FBitmap: TBitmap;
@@ -138,7 +131,6 @@ type
     destructor Destroy; override;
   end;
 
-
   { Options to customize the CodeToolTip behavior }
   TToolTipOptions = set of
   (
@@ -147,13 +139,11 @@ type
     shoFindBestMatchingToolTip    // automatically find the best matching tooltip (for overloaded functions)
   );
 
-
-{$IFDEF USE_XPTOOLTIP}
-  TBaseCodeToolTip = class(TXPToolTip)
-{$ELSE}
-  TBaseCodeToolTip = class(TToolTip)
-{$ENDIF}
+  TCodeToolTip = class(THintWindow)
   private
+    FActivated: Boolean;
+    FList: TList;
+    FParser: TCppParser;
     FTokenPos: Integer;
     FUpButton: TCustomCodeToolTipButton;
     FDownButton: TCustomCodeToolTipButton;
@@ -167,56 +157,47 @@ type
     FLookupEditor: TCustomSynEdit;
     FDelimiters: string;
     FMaxScanLength: Integer;
+    FOldFunction : string;
     FCustomSelIndex: Boolean; // user clicked up/down
     procedure SetSelIndex(Value: Integer);
     procedure SetToolTips(const Strings: TStringList);
     procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
   protected
-    procedure DoBeforeShow(const AToolTips: TStringList; const APrototypeName: string); virtual;
-    function GetCommaIndex(P: PChar; BraceStart, CurPos: Integer):Integer; virtual;
+    function GetCommaIndex(P: PChar; BraceStart, CurPos: Integer):Integer;
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    function FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string; virtual;
+    function FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;
-    function PaintToolTip: Integer; virtual;
-    function RemoveEditor(AEditor: TCustomSynEdit): boolean; virtual;
-    procedure RethinkCoordAndActivate; virtual;
-    procedure SetEditor(const Value: TCustomSynEdit); virtual;
-    property Editor: TCustomSynEdit read FEditor write SetEditor;
+    function PaintToolTip : integer;
+    function RemoveEditor(AEditor: TCustomSynEdit): boolean;
+    procedure RethinkCoordAndActivate;
+    procedure SetEditor(const Value: TCustomSynEdit);
     property Hints: TStringList read FToolTips write SetToolTips;
     property MaxScanLength: Integer read FMaxScanLength write FMaxScanLength;
     property Options: TToolTipOptions read FOptions write FOptions;
     property SelIndex: Integer read FSelIndex write SetSelIndex;
   public
-    OldFunction : string;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function Select(ToolTip: string): Integer; virtual;
-    procedure Show; virtual;
-  end;
-
-  TCodeToolTip = class(TBaseCodeToolTip)
-  public
-    property Activated;
-    property SelIndex;
-  published
-    property Color;
-    property Editor;
-    property Hints;
-    property MaxScanLength;
-    property Options;
+    function Select(ToolTip: string): Integer;
+    procedure Show;
+    procedure ActivateHint(Rect: TRect; const AHint: string); override;
+    procedure ReleaseHandle;
+    property Parser: TCppParser read FParser write FParser;
+    property Activated: Boolean read FActivated write FActivated;
+    property Editor: TCustomSynEdit read FEditor write SetEditor;
   end;
 
 implementation
 
 // contains the up/down buttons
-// i tried to draw them using DrawFrameControl first,
+// I tried to draw them using DrawFrameControl first,
 // but it looked very bad, so I use a bitmap instead.
 {$R CodeToolTip.res}
 
 resourcestring
-  SCodeToolTipIndexXOfX = '%d / %d';
+  SCodeToolTipIndexXOfX = '%2d/%2d';
 
 var
  Identifiers : array[#0..#255] of ByteBool;
@@ -240,33 +221,27 @@ begin
 	Identifiers['~'] := True;
 end;
 
-function PreviousWordString(S: string; Index: Integer):string;
+function PreviousWordString(S: string; Ending: Integer):string;
 var
-	I: Integer;
+	Walker: Integer;
 begin
 	Result := '';
 
-	if (Index <= 1) or (S = '') then
+	if (Ending < 2) or (S = '') then
 		Exit;
 
-	I := Index;
-
-	// Skip blanks and TAB's
-	repeat
-		Dec(Index);
-	until not (S[Index] in [#32,#9]);
-	Inc(Index);
+	Walker := Ending;
 
 	repeat
-		Dec(Index);
-		if Index < 2 then
+		if Walker < 2 then
 			Break;
-	until not Identifiers[S[Index]];
+		Dec(Walker);
+	until not Identifiers[S[Walker]];
 
-	if not Identifiers[S[Index]] then
-		Inc(Index);
+	if not Identifiers[S[Walker]] then
+		Inc(Walker);
 
-	Result := Copy(S, Index, I-Index);
+	Result := Copy(S, Walker, Ending-Walker);
 end;
 
 // Returns name of function, so passing foo(bar,bar,bar) will return foo
@@ -274,7 +249,6 @@ function GetPrototypeName(const S: string): string;
 var
 	iStart, iLen: Integer;
 begin
-	// passing 'foo(bar)' should return 'foo'
 	iStart := AnsiPos('(', S);
 	iLen := 0;
 
@@ -361,9 +335,9 @@ begin
 	StretchBlt(TargetCanvas.Handle, FLeft, FTop, FWidth, FHeight, FBitmap.Canvas.Handle, 0, 0, FBitmap.Width, FBitmap.Height, SRCCOPY);
 end;
 
-//----------------- TBaseCodeToolTip ---------------------------------------------------------------------------------------
+//----------------- TCodeToolTip ---------------------------------------------------------------------------------------
 
-constructor TBaseCodeToolTip.Create(AOwner: TComponent);
+constructor TCodeToolTip.Create(AOwner: TComponent);
 begin
 	inherited Create(AOwner);
 
@@ -383,6 +357,7 @@ begin
 		end;
 	end;
 
+	FList := TList.Create;
 	FToolTips := TStringList.Create;
 	with FToolTips do begin
 		//Sorted := True;
@@ -391,7 +366,7 @@ begin
 	end;
 
 	FDelimiters := ','; // This character is used to separate parameters...
-	FMaxScanLength := 128; // Number of character to walk through trying to find ( and )
+	FMaxScanLength := 192; // Number of character to walk through trying to find ( and )
 	FKeyDownProc  := EditorKeyDown;
 
 	FUpButton := TCodeToolTipUpButton.Create;
@@ -405,7 +380,19 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-destructor TBaseCodeToolTip.Destroy;
+procedure TCodeToolTip.ActivateHint(Rect: TRect; const AHint: string);
+begin
+	inherited;
+	FActivated := True;
+end;
+
+procedure TCodeToolTip.ReleaseHandle;
+begin
+	FActivated := False;
+	DestroyHandle;
+end;
+
+destructor TCodeToolTip.Destroy;
 begin
 	if Activated then ReleaseHandle;
 
@@ -416,6 +403,7 @@ begin
 	FreeAndNil(FUpButton);
 	FreeAndNil(FDownButton);
 
+	FList.Free;
 	FToolTips.Free;
 	FLookupEditor.Free;
 
@@ -424,14 +412,8 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseCodeToolTip.DoBeforeShow(const AToolTips: TStringList; const APrototypeName: string);
-begin
-  // descents override this function to be able to fill the FToolTips list with
-  // more tooltips ...
-end;
-
 // Handles input of the tooltip...
-procedure TBaseCodeToolTip.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TCodeToolTip.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
 	if Activated then begin
 		case Key of
@@ -448,7 +430,7 @@ begin
 end;
 
 // Gaat de lijst met matchende tooltips langs, kijkt welke met beste past bij code
-function TBaseCodeToolTip.FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
+function TCodeToolTip.FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
 var
 	I,K: Integer;
 	NewIndex: Integer;
@@ -481,16 +463,8 @@ begin
 	SelIndex := NewIndex;
 end;
 
-function TBaseCodeToolTip.GetCommaIndex(P: PChar; BraceStart, CurPos: Integer):Integer;
-//  to highlight the current prototype argument, we need
-//  to know where the cursor in the prototype is.
-//  this functions returns the count of commas from the beginning
-//  prototype.
-//  for example:
-//  definition is -> void foo(int a, int b, int c);
-//  we write this -> foo(1, 2|
-//  The '|' represents the cursor. In this example this function returns 1, since
-//  it progressed one comma.
+// Return the comma count the cursor is placed *after*, so foo(aaa,bbb,ccc) with the cursor somewhere in b will return 1
+function TCodeToolTip.GetCommaIndex(P: PChar; BraceStart, CurPos: Integer):Integer;
 var
   I: Integer;
 
@@ -564,7 +538,7 @@ begin
 	end;
 end;
 
-procedure TBaseCodeToolTip.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TCodeToolTip.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
 	Pt: TPoint;
 	NeedRefresh: Boolean;
@@ -576,39 +550,44 @@ begin
 		try
 			Pt := ScreenToClient(Mouse.CursorPos);
 
-      // check if we clicked in the UpButton
-      if PtInRect(FUpButton.ClientRect, Pt) then
-      begin
-        if FSelIndex < FToolTips.Count-1 then Inc(FSelIndex, 1)
-        else FSelIndex := 0;
-        NeedRefresh := True;
-        FCustomSelIndex := True;
-      end;
+			// check if we clicked in the UpButton
+			if PtInRect(FUpButton.ClientRect, Pt) then begin
+				if FSelIndex < FToolTips.Count-1 then
+					Inc(FSelIndex, 1)
+				else
+					FSelIndex := 0;
 
-      // check if we clicked in the DownButton
-      if PtInRect(FDownButton.ClientRect, Pt) then
-      begin
-        if FSelIndex > 0 then Dec(FSelIndex, 1)
-        else FSelIndex := FToolTips.Count-1;
-        NeedRefresh := True;
-        FCustomSelIndex := True;
-      end;
+				NeedRefresh := True;
+				FCustomSelIndex := True;
+			end;
 
-    finally
-      FEditor.SetFocus;
-      if NeedRefresh then Show;
-    end;
-  end;
+			// check if we clicked in the DownButton
+			if PtInRect(FDownButton.ClientRect, Pt) then begin
+				if FSelIndex > 0 then
+					Dec(FSelIndex, 1)
+				else
+					FSelIndex := FToolTips.Count-1;
+
+				NeedRefresh := True;
+				FCustomSelIndex := True;
+			end;
+
+		finally
+			FEditor.SetFocus;
+			if NeedRefresh then
+				Show;
+		end;
+	end;
 end;
 
 // This function paints the tooltip to FBmp and copies it to the tooltip client surface
-procedure TBaseCodeToolTip.Paint;
+procedure TCodeToolTip.Paint;
 begin
 	PaintToolTip;
 	Canvas.CopyRect(ClientRect, FBmp.Canvas, ClientRect);
 end;
 
-function TBaseCodeToolTip.PaintToolTip:Integer;
+function TCodeToolTip.PaintToolTip : Integer;
 const
 	cStipple : array [0..3] of Integer = (0,1,2,1);
 var
@@ -661,7 +640,7 @@ begin
 
 		// Clear the backbuffer and set options
 		with FBmp.Canvas do begin
-			Brush.Color := Self.Color;
+			Brush.Color := TColor($E1FFFF);
 			FillRect(ClientRect);
 			Font.Name := 'Courier New';
 			Font.Size := 10;
@@ -709,7 +688,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function TBaseCodeToolTip.RemoveEditor(aEditor: TCustomSynEdit): boolean;
+function TCodeToolTip.RemoveEditor(aEditor: TCustomSynEdit): boolean;
 begin
   Result := Assigned (aEditor);
 
@@ -726,41 +705,28 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseCodeToolTip.RethinkCoordAndActivate;
+procedure TCodeToolTip.RethinkCoordAndActivate;
 var
   Pt: TPoint;
-  NewWidth: Integer;
-  CaretXYPix: TPoint;
-  YPos: Integer;
+  Width : integer;
 begin
-  CaretXYPix := FEditor.RowColumnToPixels(FEditor.DisplayXY);
 
-  Pt := FEditor.ClientToScreen(Point(CaretXYPix.X, CaretXYPix.Y));
-  Dec(Pt.X, 30);
+	// Paint to obtain size
+	Width := PaintToolTip;
 
-  Dec(Pt.Y, FEditor.LineHeight);
+	// this displays the rect below the current line and at the same position where the token begins
+	Pt := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos))));
 
-  YPos := Pt.Y;
-  Inc(YPos, FEditor.LineHeight);
-
-  // draw the tooltop on the offscreen bitmap
-  // and return the length of the drawn text
-  NewWidth := PaintToolTip;
-
-  // this displays the rect below the current line and at the
-  // same position where the token begins
-  Pt := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos))));
-
-  ActivateHint(Rect(Pt.X,
-                    YPos+2+FEditor.LineHeight,
-                    Pt.X+NewWidth,
-                    YPos+4+Canvas.TextHeight('Wg')+FEditor.LineHeight),
+	ActivateHint(Rect(Pt.X,
+                    Pt.Y+FEditor.LineHeight+2,
+                    Pt.X+Width,
+                    Pt.Y+Canvas.TextHeight('Wg')+FEditor.LineHeight+4),
                     Caption);
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function TBaseCodeToolTip.Select(ToolTip: string): Integer;
+function TCodeToolTip.Select(ToolTip: string): Integer;
 
 //  selects the tooltip specified by ToolTip and returns
 //  the index from it, in the list.
@@ -791,7 +757,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseCodeToolTip.SetEditor(const Value: TCustomSynEdit);
+procedure TCodeToolTip.SetEditor(const Value: TCustomSynEdit);
 begin
   if (FEditor <> nil) then
     RemoveEditor (fEditor);
@@ -807,26 +773,21 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseCodeToolTip.SetSelIndex(Value: Integer);
+procedure TCodeToolTip.SetSelIndex(Value: Integer);
 // sets the selection index and repaints the hint when it is activated
 begin
-  if (Value < 0) or (Value > FToolTips.Count) then
-    raise Exception.Create('ToolTip selection index is out of list range!');
-
-  if Value <> FSelIndex then
-  begin
-    FSelIndex := Value;
-    if Activated then
-    begin
-      FCustomSelIndex := True;
-      Show;
-    end;
-  end;
+	if Value <> FSelIndex then begin
+		FSelIndex := Value;
+		if Activated then begin
+			FCustomSelIndex := True;
+			Show;
+		end;
+	end;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseCodeToolTip.SetToolTips(const Strings: TStringList);
+procedure TCodeToolTip.SetToolTips(const Strings: TStringList);
 begin
 	FToolTips.Clear;
 	FToolTips.Assign(Strings);
@@ -834,16 +795,17 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseCodeToolTip.Show;
+procedure TCodeToolTip.Show;
 var
-	CurPos: Integer;
+	CurPos : Integer;
 	P : PChar;
 	I : Integer;
 	nBraces : Integer;
 	S : string;
-	Idx: Integer;
-	nCommas: Integer;
-	ProtoFound: Boolean;
+	Idx : Integer;
+	nCommas : Integer;
+	ProtoFound : Boolean;
+	ProtoName : PChar;
 
 	// skip c/c++ commentblocks
 	procedure SkipCommentBlock;
@@ -926,10 +888,6 @@ begin
 
 			')': begin
 				Inc(nBraces);
-			//	if nBraces = -1 then begin
-			//		ReleaseHandle;
-			//		Exit;
-			//	end;
 			end;
 
 			'(': begin
@@ -957,12 +915,24 @@ begin
 	end;
 
 	// Only do the cumbersome list filling when showing a new tooltip...
-	if (S <> OldFunction) or not Activated then begin
+	if (S <> FOldFunction) or not Activated then begin
 		FSelIndex := 0;
 		FCustomSelIndex := False;
-		DoBeforeShow(FToolTips,S);
+
+		// Fill a cache of known functions...
+		FToolTips.Clear;
+		FParser.FillListOf(S, False, FList);
+		FToolTips.BeginUpdate;
+		try
+			for I := 0 to FList.Count-1 do begin
+				if PStatement(FList.Items[I])^._Kind = skFunction then
+					FToolTips.Add(PStatement(FList.Items[I])^._FullText);
+			end;
+		finally
+			FToolTips.EndUpdate;
+		end;
 	end;
-	OldFunction := S;
+	FOldFunction := S;
 
 	// get the current token position in the text
 	// this is where the prototype name usually starts
@@ -971,7 +941,13 @@ begin
 	// Check if this function is a known one...
 	ProtoFound := False;
 	for I := 0 to FToolTips.Count-1 do begin
-		if GetPrototypeName(FToolTips.Strings[I]) = S then begin
+
+		// Also accept if S does not have any pointer prefixes
+		ProtoName := PChar(GetPrototypeName(FToolTips.Strings[I]));
+		while (ProtoName^ in ['*','&']) do
+			Inc(ProtoName);
+
+		if ProtoName = S then begin
 			ProtoFound := True;
 
 			// And set the selection index if we're about to show up
@@ -992,6 +968,7 @@ begin
 			// Only do so when the user didn't select his own
 			if not FCustomSelIndex then
 				S := FindClosestToolTip(S, nCommas);
+
 		if (FToolTips.Count > 0) and (FSelIndex < FToolTips.Count) then
 			S := FToolTips.Strings[FSelIndex];
 
@@ -1011,23 +988,22 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseCodeToolTip.WMNCHitTest(var Message: TWMNCHitTest);
+procedure TCodeToolTip.WMNCHitTest(var Message: TWMNCHitTest);
 var
-  Pt: TPoint;
-begin    
-  Message.Result := HTTRANSPARENT;
-  Pt := ScreenToClient(Point(Message.XPos,Message.YPos));
+	Pt: TPoint;
+begin
+	Message.Result := HTTRANSPARENT;
+	Pt := ScreenToClient(Point(Message.XPos,Message.YPos));
 
-  // hitcheck against the position of our both buttons
-  if PtInRect(FUpButton.ClientRect, Pt) or PtInRect(FDownButton.ClientRect, Pt) then
-  begin
-    Message.Result := HTCLIENT;
-  end;
+	// hitcheck against the position of our both buttons
+	if PtInRect(FUpButton.ClientRect, Pt) or PtInRect(FDownButton.ClientRect, Pt) then begin
+		Message.Result := HTCLIENT;
+	end;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseCodeToolTip.WMEraseBkgnd(var Message: TWMEraseBkgnd);
+procedure TCodeToolTip.WMEraseBkgnd(var Message: TWMEraseBkgnd);
 // override WMEraseBkgnd to avoid flickering
 begin
   Message.Result := 1;

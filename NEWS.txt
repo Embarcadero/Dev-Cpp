@@ -1,4 +1,4 @@
-Version 5.1.0.0 - *
+Version 5.1.0.0 - 27 December 2011
 
 - This is the first version to fully support 64bit MinGW compilers! Just place one in a folder called 'MinGW64' next to devcpp.exe, Dev will automatically adapt itself to it!
 - When launching for the first time, Dev-C++ will set defaults based on available 32bit or 64bit compilers (favors 64bit). 
@@ -15,6 +15,12 @@ Version 5.1.0.0 - *
 - The code completer and code parser now use symmetric indices and _ID's, making them a lot faster.
 - Code completion cache is now created a bit faster and is smaller.
 - Updated the help file.
+- The tooltip now always shows up when it is supposed to, even the first time.
+- Added a new editor style called Classic Plus, which highlights symbols like { and (.
+- The Code Completion Cache creator can now also be told to cache a selection of files.
+- Updated MinGW32 to GCC 4.6.2. Added TDM-GCC 4.6.1 x64.
+- Added updated the Chinese translations by cin.getline.
+- More stuff I forgot about.
 
 Version 5.0.0.9 - 10 December 2011
 

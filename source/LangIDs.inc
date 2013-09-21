@@ -738,6 +738,7 @@ const
   ID_PRT_PRTLINENUMMAR              = 48009;
   ID_PRT_COPIES                     = 48010;
   ID_PRT_SELONLY                    = 48011;
+  ID_PRT_NOPRTLINENUMMAR            = 48012;
 
   //Check form
   ID_UCF                            = 49001;

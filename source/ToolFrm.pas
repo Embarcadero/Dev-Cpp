@@ -338,9 +338,6 @@ begin
 						// Add the icon to the image lists if it exists
 						if Icon.Handle <> 0 then begin
 
-							// Hier proberen te saven werkt gewoon...
-						//	Icon.savetofile('C:\Users\Johan Mes\Desktop\icon' + inttostr(I) + '.ico');
-
 							// Add it to every theme
 							fToolList.Items[I].IcoNumNewLook:=dmMain.MenuImages_NewLook.AddIcon(Icon);
 							fToolList.Items[I].IcoNumBlue:=dmMain.MenuImages_Blue.AddIcon(Icon);
@@ -354,11 +351,6 @@ begin
 								Item.ImageIndex:=fToolList.Items[I].IcoNumBlue
 							else
 								Item.ImageIndex:=fToolList.Items[I].IcoNumNewLook;
-
-						//	MainForm.FileMenu.ImageIndex := fToolList.Items[I].IcoNumNewLook;
-
-//MessageBox(application.Handle,PChar('Icon belonging to ' + S + ' exists. Added as index ' + inttostr(Item.ImageIndex) + '!'),PChar('bericht'),MB_OK);
-
 						end;
 					end;
 				finally

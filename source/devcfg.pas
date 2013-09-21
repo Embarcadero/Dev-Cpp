@@ -1013,7 +1013,7 @@ begin
   fPrintColors := TRUE;
   fPrintHighlight := TRUE;
   fPrintWordWrap := FALSE;
-  fPrintLineNumbers := FALSE;
+  fPrintLineNumbers := TRUE;
   fPrintLineNumbersMargins := FALSE;
   fWatchHint := TRUE;
   fWatchError := TRUE;

@@ -304,7 +304,7 @@ begin
 		MRUMax:= seMRUMax.Value;
 		if MultiLineTab = FALSE then begin
 			if cboTabsTop.ItemIndex in [2,3] then begin
-				MainForm.MsgBox('Multiline tabs must be enabled when using vertical tabs.'+#13#10#13#10+'Reverting to Top Tabs...','Error');
+				MessageBox(application.handle,PChar('Multiline tabs must be enabled when using vertical tabs.'+#13#10#13#10+'Reverting to Top Tabs...'),PChar('Error'),MB_OK);
 				cboTabsTop.ItemIndex := 0;
 			end;
 		end;
@@ -366,7 +366,7 @@ begin
 			else
 				Unassociate(idx);
 	except
-		MainForm.MsgBox(Lang[ID_ENV_UACERROR],'Error');
+		MessageBox(application.handle,PChar(Lang[ID_ENV_UACERROR]),PChar('Error'),MB_OK);
 	end;
 
 	devCVSHandler.Executable:= edCVSExec.Text;

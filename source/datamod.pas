@@ -109,7 +109,7 @@ type
     procedure LoadDataMod;
     function GetNumber: integer;
     function GetNum: integer;
-    procedure InitHighlighterFirstTime;
+    procedure InitHighlighterFirstTime(index : integer);
     procedure UpdateHighlighter;
     function GetHighlighter(const FileName: string): TSynCustomHighlighter;
 
@@ -142,7 +142,7 @@ begin
   fCodeList.Free;
 end;
 
-procedure TdmMain.InitHighlighterFirstTime;
+procedure TdmMain.InitHighlighterFirstTime(index : integer);
   procedure AddSpecial(AttrName: string; Offset: integer);
   var
     a: integer;
@@ -154,15 +154,15 @@ procedure TdmMain.InitHighlighterFirstTime;
       devEditor.Syntax.Values[AttrName]:= LoadStr(offset);
   end;
 var
-  i, a, offset: integer;
+  i, a, offset : integer;
   Attr: TSynHighlighterAttributes;
 begin
-  offset:= 0; // default to style-set '0'
+  offset := index * 1000;
   for i:= 0 to pred(cpp.AttrCount) do
   begin
     attr:= TSynHighlighterAttributes.Create(cpp.Attribute[i].Name);
     try
-      StrtoAttr(Attr, LoadStr(i +offset +1));
+      StrtoAttr(Attr, LoadStr(i + offset + 1));
       cpp.Attribute[i].Assign(Attr);
       a:= devEditor.Syntax.IndexOfName(cpp.Attribute[i].Name);
       if a = -1 then
@@ -173,7 +173,7 @@ begin
       Attr.Free;
     end;
   end;
-  AddSpecial(cBP, offset+17); // breakpoint
+  AddSpecial(cBP,  offset+17); // breakpoint
   AddSpecial(cErr, offset+18); // error line
   AddSpecial(cABP, offset+19); // active breakpoint
   AddSpecial(cGut, offset+20); // gutter
