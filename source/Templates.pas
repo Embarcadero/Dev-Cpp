@@ -134,7 +134,7 @@ begin
 
   with fTemplate do
    begin
-     fVersion:= ReadInteger(cTemplate, 'Ver', 0);
+     fVersion:= ReadInteger(cTemplate, 'Ver', 2);
      // read entries for both old and new
       // template info
      fName:= ReadString(cTemplate, 'Name', 'NoName');

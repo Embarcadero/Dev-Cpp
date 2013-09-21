@@ -33,7 +33,6 @@ uses
 
 type
   TSplashForm = class(TForm)
-    Panel: TPanel;
     Image: TImage;
     Statusbar: TStatusbar;
     procedure FormCreate(Sender: TObject);

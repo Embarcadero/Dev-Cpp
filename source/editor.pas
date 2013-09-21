@@ -101,6 +101,7 @@ type
     procedure TurnOffBreakpoint(line: integer);
     procedure TurnOnBreakpoint(line: integer);
 
+    function FunctionTipAllowed : boolean;
     procedure FunctionTipTimer(Sender : TObject);
 
     procedure SetFileName(const value: AnsiString);
@@ -631,7 +632,7 @@ begin
 			fText.InvalidateGutterLine(fErrorLine);
 		end;
 
-		if fFunctionTip.Activated and not fText.SelAvail and fText.Focused and Assigned(fText.Highlighter) then
+		if fFunctionTip.Activated and FunctionTipAllowed then
 			fFunctionTip.Show
 		else begin // Reset the timer
 			fFunctionTipTimer.Enabled := false;
@@ -652,9 +653,14 @@ begin
 	end;
 end;
 
+function TEditor.FunctionTipAllowed : boolean;
+begin
+	Result := not fText.IsScrolling and fText.Focused and not fText.SelAvail and devEditor.ShowFunctionTip and Assigned(fText.Highlighter);
+end;
+
 procedure TEditor.FunctionTipTimer(Sender : TObject);
 begin
-	if not fText.IsScrolling and fText.Focused and not fText.SelAvail and devEditor.ShowFunctionTip and Assigned(fText.Highlighter) then
+	if FunctionTipAllowed then
 		fFunctionTip.Show;
 end;
 
@@ -924,7 +930,8 @@ begin
 				HasCompletedParentheses := 2;
 
 				// immediately activate function hint
-				fFunctionTip.Activated := true;
+				if FunctionTipAllowed then
+					fFunctionTip.Activated := true;
 			end else if (Key = ')') and (HasCompletedParentheses > 0) then begin
 				fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
 				HasCompletedParentheses := 0;
@@ -1100,14 +1107,14 @@ procedure TEditor.CompletionTimer(Sender: TObject);
 var
 	M: TMemoryStream;
 	curr,s: AnsiString;
-	attri: TSynHighlighterAttributes;
+	attr: TSynHighlighterAttributes;
 begin
 	fCompletionTimer.Enabled:=False;
 	curr:=CurrentPhrase;
 
-	if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1, fText.CaretY), s, attri)) then begin
-		if (Attri = fText.Highlighter.StringAttribute) or
-		   (Attri = fText.Highlighter.CommentAttribute) then begin
+	if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1, fText.CaretY), s, attr)) then begin
+		if (attr = fText.Highlighter.StringAttribute) or
+		   (attr = fText.Highlighter.CommentAttribute) then begin
 
 			fCompletionTimerKey:=#0;
 			Exit;
@@ -1171,13 +1178,13 @@ begin
 		fFunctionTipTimer:=TTimer.Create(nil);
 	fFunctionTipTimer.Enabled:=devEditor.ShowFunctionTip;
 	fFunctionTipTimer.OnTimer:=FunctionTipTimer;
-	fFunctionTipTimer.Interval:=600;
+	fFunctionTipTimer.Interval:=2*GetCaretBlinkTime; // fancy
 
 	if not Assigned(fMouseOverTimer) then
 		fMouseOverTimer:=TTimer.Create(nil);
 	fMouseOverTimer.Enabled:=devEditor.ParserHints or devData.WatchHint;
 	fMouseOverTimer.OnTimer:=MouseOverTimer;
-	fMouseOverTimer.Interval:=600;
+	fMouseOverTimer.Interval:=500;
 
 	// The other stuff is fully completion dependant
 	if fCompletionBox.Enabled then begin
@@ -1295,7 +1302,8 @@ begin
 		// and function takes arguments...
 		if (not (Key in ['.', '>'])) and (FuncAddOn<>'') and ( (Length(Statement^._Args)>2) or (Statement^._Args='()') ) then begin
 			fText.CaretX:=fText.CaretX-Length(FuncAddOn)+1;
-			fFunctionTip.Show;
+			if FunctionTipAllowed then
+				fFunctionTip.Show;
 		end;
 	end;
 end;
@@ -1314,13 +1322,13 @@ begin
 
 		// Check if we're inside a comment or string by looking at text color. If we are, skip without showing a tooltip
 		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
-			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then begin
+			if not (attr = fText.Highlighter.IdentifierAttribute) then begin
 				Application.CancelHint;
 				fText.Hint := '';
 				Exit;
 			end;
 
-		s := TrimLeft(fText.GetWordAtRowCol(p));
+		s := fText.GetWordAtRowCol(p);
 
 		if(s <> '')then begin
 

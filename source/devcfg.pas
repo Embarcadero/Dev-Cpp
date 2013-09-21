@@ -737,7 +737,8 @@ begin
 
 			// Load the 32bit configuration - hacky fix
 			devCompilerSet.fLibDir := ReplaceFirstStr(LIB_DIR64ALT,'%path%\',devDirs.fExec);
-			devCompilerSet.fOptions := '000000000000000000000000010';
+			devCompilerSet.fOptions := '0000000100000000000000000';
+			devCompilerSet.gdbName := 'gdb32.exe';
 
 			// And write the 32bit on
 			devCompilerSet.SaveSet(1);
@@ -958,7 +959,6 @@ end;
 
 procedure TdevCompiler.AddDefaultOptions;
 var
-	i : integer;
 	sl : TStringList;
 begin
 	// WARNING: do *not* re-arrange the options. Their values are written to the ini file
@@ -968,37 +968,14 @@ begin
 	// anything here ;)
 
 	// NOTE: As you see, to indicate sub-groups use the "/" char...
-	for i := 0 to fOptions.Count - 1 do begin
-		if Assigned(PCompilerOption(fOptions.Items[i]).optChoices) then
-			PCompilerOption(fOptions.Items[i]).optChoices.Free;
-		Dispose(fOptions.Items[i]);
-	end;
-	fOptions.Clear;
+	ClearOptions;
 
-	AddOption(Lang[ID_COPT_ANSIC],       False, True,  True,  False, 0, '-ansi',                     Lang[ID_COPT_GRP_C],       [],       nil);
-	AddOption(Lang[ID_COPT_ERRORLINE],   False, True,  True,  True,  0, '-fmessage-length=0',        Lang[ID_COPT_GRP_C],       [],       nil);
-	AddOption(Lang[ID_COPT_TRADITIONAL], False, True,  True,  False, 0, '-traditional-cpp',          Lang[ID_COPT_GRP_C],       [],       nil);
-	AddOption(Lang[ID_COPT_ACCESS],      False, True,  True,  False, 0, '-fno-access-control',       Lang[ID_COPT_GRP_CPP],     [],       nil);
-	AddOption(Lang[ID_COPT_DOLLAR],      False, True,  True,  False, 0, '-fdollar-in-identifiers',   Lang[ID_COPT_GRP_CPP],     [],       nil);
-	AddOption(Lang[ID_COPT_HEURISTICS],  False, True,  True,  False, 0, '-fsave-memoized',           Lang[ID_COPT_GRP_CPP],     [],       nil);
-	AddOption(Lang[ID_COPT_EXCEPT],      False, True,  True,  False, 0, '-fexceptions',              Lang[ID_COPT_GRP_CODEGEN], [],       nil);
-	AddOption(Lang[ID_COPT_DBLFLOAT],    False, True,  True,  False, 0, '-fshort-double',            Lang[ID_COPT_GRP_CODEGEN], [],       nil);
-	AddOption(Lang[ID_COPT_MEM],         False, True,  True,  False, 0, '-fverbose-asm',             Lang[ID_COPT_GRP_CODEGEN], [],       nil);
-	AddOption(Lang[ID_COPT_WARNING],     False, True,  True,  False, 0, '-w',                        Lang[ID_COPT_GRP_WARN],    [],       nil);
-	AddOption(Lang[ID_COPT_WARNINGPLUS], False, True,  True,  False, 0, '-Wall',                     Lang[ID_COPT_GRP_WARN],    [],       nil);
-	AddOption(Lang[ID_COPT_WARNINGEX],   False, True,  True,  False, 0, '-Wextra',                   Lang[ID_COPT_GRP_WARN],    [],       nil);
-	AddOption(Lang[ID_COPT_ISOCONFORM],  False, True,  True,  False, 0, '-pedantic',                 Lang[ID_COPT_GRP_WARN],    [],       nil);
-	AddOption(Lang[ID_COPT_SYNTAXONLY],  False, True,  True,  False, 0, '-fsyntax-only',             Lang[ID_COPT_GRP_WARN],    [],       nil);
-	AddOption(Lang[ID_COPT_TREATASERROR],False, True,  True,  False, 0, '-Werror',                   Lang[ID_COPT_GRP_WARN],    [],       nil);
-	AddOption(Lang[ID_COPT_FAILONFIRST], False, True,  True,  False, 0, '-Wfatal-errors',            Lang[ID_COPT_GRP_WARN],    [],       nil);
-	AddOption(Lang[ID_COPT_PROFILE],     False, True,  True,  False, 0, '-pg',                       Lang[ID_COPT_PROFILING],   [],       nil);
-	AddOption(Lang[ID_COPT_OBJC],        False, False, False, True,  0, '-lobjc',                    Lang[ID_COPT_LINKERTAB],   [],       nil);
-	AddOption(Lang[ID_COPT_DEBUG],       False, True,  True,  True,  0, '-g3',                       Lang[ID_COPT_LINKERTAB],   [],       nil);
-	AddOption(Lang[ID_COPT_NOLIBS],      False, True,  True,  True,  0, '-nostdlib',                 Lang[ID_COPT_LINKERTAB],   [],       nil);
-	AddOption(Lang[ID_COPT_WIN32],       False, True,  True,  True,  0, '-mwindows',                 Lang[ID_COPT_LINKERTAB],   [dptGUI], nil);
-	AddOption(Lang[ID_COPT_STRIP],       False, False, False, True,  0, '-s',                        Lang[ID_COPT_LINKERTAB],   [],       nil);
+	// C options
+	AddOption(Lang[ID_COPT_ANSIC],       False, True,  True,  False, 0, '-ansi',                Lang[ID_COPT_GRP_C],       [],       nil);
+	AddOption(Lang[ID_COPT_NOASM],       False, True,  True,  False, 0, '-fno-asm',             Lang[ID_COPT_GRP_C],       [],       nil);
+	AddOption(Lang[ID_COPT_TRADITIONAL], False, True,  True,  False, 0, '-traditional-cpp',     Lang[ID_COPT_GRP_C],       [],       nil);
 
-	// Architecture params
+	// Optimization
 	sl := TStringList.Create;
 	sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
 	sl.Add('This CPU=native');
@@ -1028,6 +1005,37 @@ begin
 	sl.Add('K10=barcelona');
 	sl.Add('Bulldozer=bdver1');
 	AddOption(Lang[ID_COPT_ARCH], False, True, True, True, 0, '-march=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
+
+	// Optimization
+	sl := TStringList.Create;
+	sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
+	sl.Add('This CPU=native');
+	sl.Add('i386=i386');
+	sl.Add('i486=i486');
+	sl.Add('i586=i586');
+	sl.Add('i686=i686');
+	sl.Add('Pentium=pentium');
+	sl.Add('Pentium MMX=pentium-mmx');
+	sl.Add('Pentium Pro=pentiumpro');
+	sl.Add('Pentium 2=pentium2');
+	sl.Add('Pentium 3=pentium3');
+	sl.Add('Pentium 4=pentium4');
+	sl.Add('Conroe=core2');
+	sl.Add('Nehalem=corei7');
+	sl.Add('Sandy=corei7-avx');
+	sl.Add('K6=k6');
+	sl.Add('K6-2=k6-2');
+	sl.Add('K6-3=k6-3');
+	sl.Add('Athlon=athlon');
+	sl.Add('Athlon Tbird=athlon-tbird');
+	sl.Add('Athlon 4=athlon-4');
+	sl.Add('Athlon XP=athlon-xp');
+	sl.Add('Athlon MP=athlon-mp');
+	sl.Add('K8=k8');
+	sl.Add('K8 Rev.E=k8-sse3');
+	sl.Add('K10=barcelona');
+	sl.Add('Bulldozer=bdver1');
+	AddOption(Lang[ID_COPT_TUNE], False, True, True, True, 0, '-mtune=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 
 	// Built-in processor functions
 	sl := TStringList.Create;
@@ -1077,6 +1085,30 @@ begin
 	sl.Add('GNU C++=gnu++98');
 	sl.Add('GNU C++11=gnu++0x');
 	AddOption(Lang[ID_COPT_STD], False, True, True, True, 0, '-std=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
+
+	// Warnings
+	AddOption(Lang[ID_COPT_WARNING],     False, True,  True,  False, 0, '-w',                   Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_WARNINGPLUS], False, True,  True,  False, 0, '-Wall',                Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_WARNINGEX],   False, True,  True,  False, 0, '-Wextra',              Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_ISOCONFORM],  False, True,  True,  False, 0, '-pedantic',            Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_SYNTAXONLY],  False, True,  True,  False, 0, '-fsyntax-only',        Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_TREATASERROR],False, True,  True,  False, 0, '-Werror',              Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_FAILONFIRST], False, True,  True,  False, 0, '-Wfatal-errors',       Lang[ID_COPT_GRP_WARN],    [],       nil);
+
+	// Profiling
+	AddOption(Lang[ID_COPT_PROFILE],     False, True,  True,  False, 0, '-pg',                  Lang[ID_COPT_PROFILING],   [],       nil);
+
+	// Linker
+	AddOption(Lang[ID_COPT_OBJC],        False, False, False, True,  0, '-lobjc',               Lang[ID_COPT_LINKERTAB],   [],       nil);
+	AddOption(Lang[ID_COPT_DEBUG],       False, True,  True,  True,  0, '-g3',                  Lang[ID_COPT_LINKERTAB],   [],       nil);
+	AddOption(Lang[ID_COPT_NOLIBS],      False, True,  True,  True,  0, '-nostdlib',            Lang[ID_COPT_LINKERTAB],   [],       nil);
+	AddOption(Lang[ID_COPT_WIN32],       False, True,  True,  True,  0, '-mwindows',            Lang[ID_COPT_LINKERTAB],   [dptGUI], nil);
+	AddOption(Lang[ID_COPT_STRIP],       False, False, False, True,  0, '-s',                   Lang[ID_COPT_LINKERTAB],   [],       nil);
+
+	// Output
+	AddOption(Lang[ID_COPT_MEM],         False, True,  True,  False, 0, '-fverbose-asm',        Lang[ID_COPT_GRP_OUTPUT],  [],       nil);
+	AddOption(Lang[ID_COPT_ASSEMBLY],    False, True,  True,  False, 0, '-S',                   Lang[ID_COPT_GRP_OUTPUT],  [],       nil);
+	AddOption(Lang[ID_COPT_PIPES],       False, True,  True,  False, 0, '-pipe',                Lang[ID_COPT_GRP_OUTPUT],  [],       nil);
 end;
 
 procedure TdevCompiler.AddOption(_Name: AnsiString; _IsGroup, _IsC, _IsCpp, IsLinker: boolean; _Value: integer;_Setting, _Section: AnsiString; ExcludeFromTypes: TProjTypeSet; Choices: TStringList);

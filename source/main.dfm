@@ -17,11 +17,11 @@ object MainForm: TMainForm
   Menu = MainMenu
   OldCreateOrder = False
   Position = poDefault
-  Scaled = False
   ShowHint = True
   WindowState = wsMaximized
   OnClose = FormClose
   OnContextPopup = FormContextPopup
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnMouseWheel = FormMouseWheel
@@ -51,7 +51,7 @@ object MainForm: TMainForm
     Top = 372
     Width = 784
     Height = 100
-    ActivePage = FindSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -65,7 +65,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 72
+        Height = 71
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -202,7 +202,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 71
+        Height = 72
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -214,7 +214,7 @@ object MainForm: TMainForm
             Left = 468
             Top = 0
             Width = 156
-            Height = 73
+            Height = 41
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 0
@@ -293,7 +293,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 156
-            Height = 73
+            Height = 41
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 1
@@ -388,7 +388,7 @@ object MainForm: TMainForm
             Left = 156
             Top = 0
             Width = 156
-            Height = 73
+            Height = 41
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 2
@@ -483,7 +483,7 @@ object MainForm: TMainForm
             Left = 312
             Top = 0
             Width = 156
-            Height = 73
+            Height = 41
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 3
@@ -616,7 +616,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 22
             Width = 768
-            Height = 18
+            Height = 19
             Align = alClient
             Lines.Strings = (
               'Debugger output')

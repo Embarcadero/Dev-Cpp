@@ -375,21 +375,21 @@ object CompOptForm: TCompOptForm
         Top = 0
         Width = 457
         Height = 289
+        HorzScrollBar.Visible = False
+        VertScrollBar.Visible = False
         TabOrder = 0
-        inherited Splitter1: TSplitter
+        inherited tabs: TTabControl
+          Width = 457
           Height = 289
-        end
-        inherited tv: TTreeView
-          Height = 289
-        end
-        inherited vle: TValueListEditor
-          Width = 338
-          Height = 289
-          ParentShowHint = False
-          ShowHint = True
-          ColWidths = (
-            224
-            108)
+          inherited vle: TValueListEditor
+            Width = 449
+            Height = 279
+            ParentShowHint = False
+            ShowHint = True
+            ColWidths = (
+              224
+              108)
+          end
         end
       end
     end

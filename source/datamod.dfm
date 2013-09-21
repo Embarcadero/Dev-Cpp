@@ -9787,6 +9787,7 @@ object dmMain: TdmMain
       000000000000}
   end
   object SynExporterTeX: TSynExporterTeX
+    TabWidth = 4
     Color = clNone
     DefaultFilter = 'TeX Files (*.tex)|*.tex'
     Font.Charset = DEFAULT_CHARSET

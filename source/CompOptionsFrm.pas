@@ -92,8 +92,6 @@ type
     btnBrowse6: TSpeedButton;
     btnBrowse7: TSpeedButton;
     btnBrowse8: TSpeedButton;
-    OptionsTip: TLabel;
-    OptionsLink: TLabel;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnDefaultClick(Sender: TObject);
@@ -410,7 +408,7 @@ begin
 	tabPrograms.Caption:=                Lang[ID_COPT_PROGRAMSTAB];
 
 	// Settings tab
-	OptionsTip.Caption:=                 Lang[ID_COPT_COMPILERTIP];
+	//OptionsTip.Caption:=                 Lang[ID_COPT_COMPILERTIP];
 
 	// Directories, subtabs
 	DirTabs.Tabs.Clear;

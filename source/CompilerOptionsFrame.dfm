@@ -2,46 +2,39 @@ object CompOptionsFrame: TCompOptionsFrame
   Left = 0
   Top = 0
   Width = 573
-  Height = 420
+  Height = 520
+  HorzScrollBar.Visible = False
+  VertScrollBar.Visible = False
   TabOrder = 0
-  OnResize = FrameResize
-  object Splitter1: TSplitter
-    Left = 115
-    Top = 0
-    Width = 4
-    Height = 420
-    OnMoved = FrameResize
-  end
-  object tv: TTreeView
+  object tabs: TTabControl
     Left = 0
     Top = 0
-    Width = 115
-    Height = 420
-    Align = alLeft
-    HideSelection = False
-    Indent = 19
-    ReadOnly = True
-    RowSelect = True
-    TabOrder = 0
-    OnChange = tvChange
-  end
-  object vle: TValueListEditor
-    Left = 119
-    Top = 0
-    Width = 454
-    Height = 420
+    Width = 573
+    Height = 520
     Align = alClient
-    DisplayOptions = [doAutoColResize, doKeyColFixed]
-    DropDownRows = 40
-    FixedCols = 1
-    Options = [goEditing, goTabs, goAlwaysShowEditor]
-    TabOrder = 1
-    TitleCaptions.Strings = (
-      'Option'
-      'Value')
-    OnSetEditText = vleSetEditText
-    ColWidths = (
-      224
-      224)
+    TabOrder = 0
+    OnChange = tabsChange
+    object vle: TValueListEditor
+      Left = 4
+      Top = 6
+      Width = 565
+      Height = 510
+      Align = alClient
+      BorderStyle = bsNone
+      DefaultRowHeight = 22
+      DisplayOptions = []
+      DropDownRows = 40
+      FixedCols = 1
+      Options = [goEditing, goAlwaysShowEditor]
+      ScrollBars = ssNone
+      TabOrder = 0
+      TitleCaptions.Strings = (
+        'Option'
+        'Value')
+      OnSetEditText = vleSetEditText
+      ColWidths = (
+        199
+        364)
+    end
   end
 end

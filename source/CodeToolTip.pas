@@ -85,7 +85,7 @@ interface
 uses
 {$IFDEF WIN32}
   SysUtils, Dialogs, Classes, Windows, Messages, Graphics, Controls, Menus, Forms, StdCtrls,
-  SynEditKbdHandler, SynEdit, SynEditHighlighter, datamod, CppParser;
+  SynEditKbdHandler, SynEdit, SynEditHighlighter, datamod, utils, CppParser;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, QDialogs, Classes, Xlib, QGraphics, QControls, QMenus, QForms, QStdCtrls,
@@ -224,22 +224,25 @@ end;
 // Returns name of function, so passing "foo(bar,bar,bar)" will return "foo"
 function GetPrototypeName(const S: AnsiString) : AnsiString;
 var
-	iStart, iLen: Integer;
+	WordEnd, WordStart: Integer;
 begin
-	iStart := Pos('(', S);
+	WordEnd := Pos('(', S);
 
 	// If we found the starting ( of a function
-	if iStart > 0 then begin
-		iLen := 0;
-		repeat
-			Dec(iStart);
-		until not (S[iStart] in [#32,#9]);
-		repeat
-			Dec(iStart);
-			Inc(iLen);
-		until (iStart = 1) or (S[iStart] in [#0..#32]); // This fixes an unsigned 0 - 1 range error
+	if WordEnd > 0 then begin
 
-		Result := Copy(S, iStart+1, iLen);
+		// Skip blanks
+		repeat
+			Dec(WordEnd);
+		until not (S[WordEnd] in [#32,#9]);
+
+		// Then save the next word
+		WordStart := WordEnd;
+		repeat
+			Dec(WordStart);
+		until (WordStart = 1) or (S[WordStart] in [#0..#32]); // This fixes an unsigned 0 - 1 range error
+
+		Result := Copy(S, WordStart+1, WordEnd-WordStart);
 	end else
 		Result := '';
 end;
@@ -392,7 +395,6 @@ begin
 	end;
 end;
 
-// Gaat de lijst met matchende tooltips langs, kijkt welke met beste past bij code
 function TCodeToolTip.FindClosestToolTip(ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
 var
 	I,K: Integer;
@@ -400,18 +402,17 @@ var
 	Str: AnsiString;
 	LastCommaCnt: Integer;
 begin
-	// If we reached a comma index that does not exist, quit
+	// Don't change selection if the current tooltip is correct too
 	if ToolTip = FToolTips.Strings[FSelIndex] then
 		if CountCommas(FToolTips.Strings[FSelIndex]) <= CommaIndex then Exit;
 
 	LastCommaCnt := 9999;
 	NewIndex := 0;
 
-	// loop through the list and find the closest matching tooltip
-	// we compare the comma counts
+	// Pick the one with the count being as close as possible to the act
 	for I := 0 to FToolTips.Count-1 do begin
 		Str := GetPrototypeName(FToolTips.Strings[I]);
-		if Str = ToolTip then begin
+		if SameStr(Str,ToolTip) then begin
 			K := CountCommas(FToolTips.Strings[I]);
 			if K >= CommaIndex then begin
 				if K < LastCommaCnt then begin
@@ -891,13 +892,13 @@ begin
 	S := FEditor.GetWordAtRowCol(FEditor.CharIndexToRowCol(CurPos-1));
 
 	// Don't bother scanning the database when there's no word to scan for
-	if  (S = '') or
-		(S = 'if') or
-		(S = 'else') or
-		(S = 'case') or
-		(S = 'switch') or
-		(S = 'while') or
-		(S = 'for') then begin
+	if  SameStr(S,'') or
+		SameStr(S,'if') or
+		SameStr(S,'else') or
+		SameStr(S,'case') or
+		SameStr(S,'switch') or
+		SameStr(S,'while') or
+		SameStr(S,'for') then begin
 		ReleaseHandle;
 		Exit;
 	end;
@@ -924,7 +925,7 @@ begin
 
 	// get the current token position in the text
 	// this is where the prototype name usually starts
-	FTokenPos := CurPos - Length(S) - 1;
+	FTokenPos := CurPos - Length(S);
 
 	// Otherwise, search for the best possible overload match according to comma count
 	if (shoFindBestMatchingToolTip in FOptions) then

@@ -22,6 +22,7 @@ object LangForm: TLangForm
     Top = 0
     Width = 240
     Height = 320
+    Center = True
   end
   object OkBtn: TBitBtn
     Left = 250

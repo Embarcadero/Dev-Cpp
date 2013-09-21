@@ -527,6 +527,7 @@ begin
   if (not Assigned(FileLines)) or (FileLines.Count=0) or (ExportFilename='') then
     Exit;
 
+  SynExporterTex.TabWidth := devEditor.TabSize;
   SynExporterTex.ExportAll(FileLines);
   SynExporterTex.SaveToFile(ExportFileName);
 end;

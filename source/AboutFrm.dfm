@@ -13062,10 +13062,10 @@ object AboutForm: TAboutForm
     object BlogSite: TLabel
       Left = 184
       Top = 152
-      Width = 156
+      Width = 160
       Height = 13
       Cursor = crHandPoint
-      Caption = 'http://orwellengine.blogspot.com'
+      Caption = 'http://orwelldevcpp.blogspot.com'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
       Font.Height = 11

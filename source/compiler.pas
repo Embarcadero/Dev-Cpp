@@ -76,7 +76,6 @@ type
 		procedure Compile(const SingleFile: AnsiString = '');
 		procedure Run;
 		procedure CompileAndRun;
-		procedure Debug;
 		function Clean: Boolean;
 		function RebuildAll: Boolean;
 		function FindDeps(const TheFile: AnsiString): AnsiString;
@@ -756,10 +755,6 @@ procedure TCompiler.CompileAndRun;
 begin
 	Compile;
 	fRunAfterCompileFinish:= TRUE;
-end;
-
-procedure TCompiler.Debug;
-begin
 end;
 
 function TCompiler.Clean: Boolean;

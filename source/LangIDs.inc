@@ -677,6 +677,7 @@ const
   ID_COPT_GRP_C                         = 43001;
   ID_COPT_GRP_CPP                       = 43002;
   ID_COPT_GRP_COMP                      = 43003;
+  ID_COPT_GRP_OUTPUT                    = 43004;
 
   // free to 725 for new groups
   ID_COPT_ANSIC                         = 44001;
@@ -690,6 +691,9 @@ const
   ID_COPT_DELAY                         = 44009;
   ID_COPT_DELAYMSG                      = 44010;
   ID_COPT_ERRORLINE                     = 44011;
+  ID_COPT_NOASM                         = 44012;
+  ID_COPT_NULNEW                        = 44013;
+  ID_COPT_CSPACE                        = 44014;
 
   //CodeGen Tab
   ID_COPT_GRP_CODEGEN                   = 45001;
@@ -715,6 +719,8 @@ const
   //CodeGen Tab (again!)
   ID_COPT_NOOPT                         = 46016;
   ID_COPT_OPTMORE                       = 46017;
+  ID_COPT_ASSEMBLY                      = 46018;
+  ID_COPT_PIPES                         = 46019;
 
   // Programs Tab
   ID_COPT_PROGRAMS                      = 47001;
@@ -1179,6 +1185,7 @@ const
   ID_COPT_OPTIMIZE                      = 73004;
   ID_COPT_STD                           = 73005;
   ID_COPT_PTRWIDTH                      = 73006;
+  ID_COPT_TUNE                          = 73007;
 
   // Compile progress window
   ID_CMPRPG_COMPILER                    = 74001;

@@ -1,3 +1,13 @@
+Version 5.2.0.3 - 10 Juni 2012
+
+- Fixed the function argument tip not selecting the function with the right number of arguments first.
+- Fixed that tip showing in various wrong places.
+- Added x86 GDB executables to TDM-GCC x64.
+- Tooltip balloons are now only triggered by words with identifier colors, saving lots of CPU time.
+- Adding watch variables by hovering over words now only adds words with identifier colors.
+- Pressing Alt now does not cause static controls to vanish anymore.
+- This version should scale pictures better on high DPI settings.
+
 Version 5.2.0.2 - 31 Mei 2012
 
 - Added a default compiler profile to TDM-GCC downloads to create 32-bit executables.

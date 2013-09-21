@@ -30,7 +30,7 @@ uses
 	Project, editor, compiler, ActnList, oysUtils, ToolFrm, AppEvnts,
 	debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
 	StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan,
-	CVSFrm, devShortcuts;
+	CVSFrm, devShortcuts, VistaAltFixUnit;
 {$ENDIF}
 {$IFDEF LINUX}
 	SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -856,6 +856,7 @@ type
 		procedure actToggleExecute(Sender: TObject);
 		procedure actGotoExecute(Sender: TObject);
 		procedure actEditMenuUpdate(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
 
 	private
 		fmsgHeight			: integer;
@@ -3141,7 +3142,7 @@ end;
 procedure TMainForm.actProjectSourceExecute(Sender: TObject);
 begin
 	if assigned(fProject) then
-	 OpenFile(fProject.FileName);
+		OpenFile(fProject.FileName);
 end;
 
 procedure TMainForm.actFindExecute(Sender: TObject);
@@ -3942,7 +3943,6 @@ end;
 
 procedure TMainForm.actNextStepExecute(Sender: TObject);
 begin
-	//if fDebugger.Executing then begin
 	if fDebugger.isBroken and fDebugger.Executing then begin
 		fDebugger.RefreshContext();
 		fDebugger.SendCommand(GDB_NEXT, '');
@@ -3951,7 +3951,6 @@ end;
 
 procedure TMainForm.actStepSingleExecute(Sender: TObject);
 begin
-	//if fDebugger.Executing then begin
 	if fDebugger.isBroken and fDebugger.Executing then begin
 		fDebugger.RefreshContext();
 		fDebugger.SendCommand(GDB_STEP, '');
@@ -6290,7 +6289,7 @@ begin
 		// Then scan back trying to find the base function (or class)
 		cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
 		I := cursorindex;
-		while (I > max(0,cursorindex-1024)) do begin
+		while (I > max(0,cursorindex-2048)) do begin
 			if (text[I] = ':') and (text[I+1] = ':') then begin
 				// Then find the word itself
 				wordend := I;
@@ -6658,6 +6657,11 @@ begin
 	InsertItem.Enabled := PageControl.PageCount > 0;
 	ToggleBookmarksItem.Enabled := PageControl.PageCount > 0;
 	GotoBookmarksItem.Enabled := PageControl.PageCount > 0;
+end;
+
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+	TVistaAltFix.Create(Self);
 end;
 
 end.

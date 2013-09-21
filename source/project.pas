@@ -873,7 +873,14 @@ begin
 		Section:= 'Project';
 		fName:= Read('name', '');
 		fOptions.Icon:= Read('icon', '');
-		if (Read('Ver', 0)> 0) then begin //ver> 0 is at least a v5 project
+		fOptions.Ver := Read('Ver', 0);
+		if(fOptions.Ver > 0) then begin // ver > 0 is at least a v5 project
+
+			if(fOptions.Ver < 2) then begin
+				fOptions.Ver := 2;
+				MessageDlg('The compiler settings format of Orwell Dev-C++ has changed.' + #13#10#13#10 + 'Please update your settings at Project >> Project Options >> Compiler and save your project.', MtInformation, [MbOK], 0);
+			end;
+
 			fOptions.typ:= Read('type', 0);
 			fOptions.cmdLines.Compiler:= Read('Compiler', '');
 			fOptions.cmdLines.CppCompiler:= Read('CppCompiler', '');
@@ -909,48 +916,45 @@ begin
 			fOptions.CompilerOptions:=Read('CompilerSettings', devCompiler.OptionStr);
 
 			Section:= 'VersionInfo';
-			fOptions.VersionInfo.Major:=        Read('Major',             0);
-        fOptions.VersionInfo.Minor:=            Read('Minor',             1);
-        fOptions.VersionInfo.Release:=          Read('Release',           1);
-        fOptions.VersionInfo.Build:=            Read('Build',             1);
-        fOptions.VersionInfo.LanguageID:=       Read('LanguageID',        $0409);
-        fOptions.VersionInfo.CharsetID:=        Read('CharsetID',         $04E4);
-        fOptions.VersionInfo.CompanyName:=      Read('CompanyName',       '');
-        fOptions.VersionInfo.FileVersion:=      Read('FileVersion',       '0.1');
-        fOptions.VersionInfo.FileDescription:=  Read('FileDescription',   'Developed using the Dev-C++ IDE');
-        fOptions.VersionInfo.InternalName:=     Read('InternalName',      '');
-        fOptions.VersionInfo.LegalCopyright:=   Read('LegalCopyright',    '');
-        fOptions.VersionInfo.LegalTrademarks:=  Read('LegalTrademarks',   '');
-        fOptions.VersionInfo.OriginalFilename:= Read('OriginalFilename',  ExtractFilename(Executable));
-        fOptions.VersionInfo.ProductName:=      Read('ProductName',       Name);
-        fOptions.VersionInfo.ProductVersion:=   Read('ProductVersion',    '0.1.1.1');
-        fOptions.VersionInfo.AutoIncBuildNr:=   Read('AutoIncBuildNr',    False);
-        fOptions.VersionInfo.SyncProduct:=      Read('SyncProduct',       False);
-      end
-     else
-      begin // dev-c < 4
-        fOptions.Ver:= -1;
-        if not Read('NoConsole', TRUE) then
-         fOptions.typ:= dptCon
-        else
-         if Read('IsDLL', FALSE) then
-          fOptions.Typ:= dptDyn
-         else
-          fOptions.typ:= dptGUI;
+			fOptions.VersionInfo.Major:=            Read('Major',             0);
+			fOptions.VersionInfo.Minor:=            Read('Minor',             1);
+			fOptions.VersionInfo.Release:=          Read('Release',           1);
+			fOptions.VersionInfo.Build:=            Read('Build',             1);
+			fOptions.VersionInfo.LanguageID:=       Read('LanguageID',        $0409);
+			fOptions.VersionInfo.CharsetID:=        Read('CharsetID',         $04E4);
+			fOptions.VersionInfo.CompanyName:=      Read('CompanyName',       '');
+			fOptions.VersionInfo.FileVersion:=      Read('FileVersion',       '0.1');
+			fOptions.VersionInfo.FileDescription:=  Read('FileDescription',   'Developed using the Dev-C++ IDE');
+			fOptions.VersionInfo.InternalName:=     Read('InternalName',      '');
+			fOptions.VersionInfo.LegalCopyright:=   Read('LegalCopyright',    '');
+			fOptions.VersionInfo.LegalTrademarks:=  Read('LegalTrademarks',   '');
+			fOptions.VersionInfo.OriginalFilename:= Read('OriginalFilename',  ExtractFilename(Executable));
+			fOptions.VersionInfo.ProductName:=      Read('ProductName',       Name);
+			fOptions.VersionInfo.ProductVersion:=   Read('ProductVersion',    '0.1.1.1');
+			fOptions.VersionInfo.AutoIncBuildNr:=   Read('AutoIncBuildNr',    False);
+			fOptions.VersionInfo.SyncProduct:=      Read('SyncProduct',       False);
+		end else begin // dev-c < 4
+			fOptions.Ver:= -1;
+			if not Read('NoConsole', TRUE) then
+				fOptions.typ:= dptCon
+			else if Read('IsDLL', FALSE) then
+				fOptions.Typ:= dptDyn
+			else
+				fOptions.typ:= dptGUI;
 
-        fOptions.PrivateResource := Read('PrivateResource', '');
-        fOptions.ResourceIncludes.DelimitedText:= Read('ResourceIncludes', '');
-        fOptions.ObjFiles.Add(read('ObjFiles', ''));
-        fOptions.Includes.Add(Read('IncludeDirs', ''));
-        fOptions.cmdLines.Compiler:= Read('CompilerOptions', '');
-        fOptions.usegpp:= Read('Use_GPP', FALSE);
-        fOptions.ExeOutput := Read('ExeOutput', '');
-        fOptions.ObjectOutput := Read('ObjectOutput', '');
-        fOptions.OverrideOutput := Read('OverrideOutput', FALSE);
-        fOptions.OverridenOutput := Read('OverrideOutputName', '');
-        fOptions.HostApplication := Read('HostApplication', '');
-      end;
-   end;
+			fOptions.PrivateResource := Read('PrivateResource', '');
+			fOptions.ResourceIncludes.DelimitedText:= Read('ResourceIncludes', '');
+			fOptions.ObjFiles.Add(read('ObjFiles', ''));
+			fOptions.Includes.Add(Read('IncludeDirs', ''));
+			fOptions.cmdLines.Compiler:= Read('CompilerOptions', '');
+			fOptions.usegpp:= Read('Use_GPP', FALSE);
+			fOptions.ExeOutput := Read('ExeOutput', '');
+			fOptions.ObjectOutput := Read('ObjectOutput', '');
+			fOptions.OverrideOutput := Read('OverrideOutput', FALSE);
+			fOptions.OverridenOutput := Read('OverrideOutputName', '');
+			fOptions.HostApplication := Read('HostApplication', '');
+		end;
+	end;
 end;
 
 procedure TProject.UpdateFile;
@@ -961,7 +965,7 @@ begin
 		Write('FileName', ExtractRelativePath(Directory, fFileName));
 		Write('Name', fName);
 		Write('Type', fOptions.typ);
-		Write('Ver', 1);
+		Write('Ver', 2); // Is 2 as of Dev-C++ 5.2.0.3
 		Write('ObjFiles', fOptions.ObjFiles.DelimitedText);
 		Write('Includes', fOptions.Includes.DelimitedText);
 		Write('Libs', fOptions.Libs.DelimitedText);

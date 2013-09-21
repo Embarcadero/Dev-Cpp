@@ -1,6 +1,6 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 550
-  Top = 315
+  Left = 405
+  Top = 330
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -407,21 +407,19 @@ object frmProjectOptions: TfrmProjectOptions
     end
     object tabCompiler: TTabSheet
       Caption = 'Compiler'
-      DesignSize = (
-        526
-        312)
       object lblCompilerSet: TLabel
         Left = 8
-        Top = 36
+        Top = 28
         Width = 52
         Height = 15
         Caption = 'Compiler:'
       end
       object lblCompileInfo: TLabel
-        Left = 23
+        Left = 0
         Top = 0
-        Width = 441
-        Height = 25
+        Width = 526
+        Height = 22
+        Alignment = taCenter
         AutoSize = False
         Caption = 
           'NOTE: These settings will override the global Compiler Options a' +
@@ -437,7 +435,7 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object OptionsTip: TLabel
         Left = 0
-        Top = 272
+        Top = 268
         Width = 521
         Height = 17
         Alignment = taCenter
@@ -464,39 +462,35 @@ object frmProjectOptions: TfrmProjectOptions
         OnClick = OptionsLinkClick
       end
       inline CompOptionsFrame1: TCompOptionsFrame
-        Left = 9
-        Top = 60
-        Width = 514
-        Height = 203
-        Anchors = [akLeft, akTop, akRight, akBottom]
+        Left = 0
+        Top = 48
+        Width = 526
+        Height = 217
+        HorzScrollBar.Visible = False
+        VertScrollBar.Visible = False
         TabOrder = 0
-        inherited Splitter1: TSplitter
-          Left = 120
-          Height = 203
-        end
-        inherited tv: TTreeView
-          Width = 120
-          Height = 203
-        end
-        inherited vle: TValueListEditor
-          Left = 124
-          Width = 390
-          Height = 203
-          DefaultColWidth = 215
-          DisplayOptions = [doKeyColFixed]
-          ParentShowHint = False
-          ColWidths = (
-            215
-            215)
+        inherited tabs: TTabControl
+          Width = 526
+          Height = 217
+          inherited vle: TValueListEditor
+            Width = 518
+            Height = 207
+            DefaultColWidth = 215
+            DisplayOptions = [doKeyColFixed]
+            ParentShowHint = False
+            ColWidths = (
+              215
+              215)
+          end
         end
       end
       object cmbCompiler: TComboBox
         Left = 72
-        Top = 32
-        Width = 385
+        Top = 24
+        Width = 449
         Height = 23
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 1
       end
     end

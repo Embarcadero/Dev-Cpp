@@ -487,7 +487,7 @@ end;
 
 procedure TImportMSVCForm.WriteDefaultEntries;
 begin
-  WriteDev('Project', 'Ver', '1');
+  WriteDev('Project', 'Ver', '2');
   WriteDev('Project', 'IsCpp', '1'); // all MSVC projects are C++ (correct me if I 'm wrong)
 end;
 
