@@ -40,10 +40,6 @@ type
    Exec: AnsiString;
    WorkDir: AnsiString;
    Params: AnsiString;
-   IcoNumGnome: integer;
-   IcoNumBlue: integer;
-   IcoNumNewLook: integer;
-   HasIcon: boolean;
   end;
 
   TToolList = class
@@ -189,10 +185,6 @@ begin
 				value:= ParseString(value);
 				Item^.WorkDir:=  Value;
 				Item^.Params:= ReadString(section, 'Params', '');
-				Item^.IcoNumGnome:=-1;
-				Item^.IcoNumBlue:=-1;
-				Item^.IcoNumNewLook:=-1;
-				Item^.HasIcon:=False;
 				AddItem(Item);
 			end;
 		finally
@@ -281,9 +273,6 @@ procedure TToolController.BuildMenu;
 var
 	I: integer;
 	Item: TMenuItem;
-	Icon: TIcon;
-	s: AnsiString;
-	w: word;
 begin
 	if Assigned(fMenu) then
 		I:= fMenu.Count - 1 // Clear Tools menu
@@ -313,43 +302,6 @@ begin
 			Item.Caption:= fToolList.Items[I].Title;
 			Item.OnClick:= fOnClick;
 			Item.Tag:= I;
-
-			// If it doesn't have an icon already
-			if not fToolList.Items[I].HasIcon then begin
-				Icon:=TIcon.Create;
-				try
-
-					S:=StringReplace(fToolList.Items[I].Exec, '<DEFAULT>', devDirs.Default, [rfReplaceAll]);
-					S:=StringReplace(S, '<EXECPATH>', devDirs.Exec, [rfReplaceAll]);
-
-					if FileExists(S) then begin
-
-						// Er moet een variabele meegegeven worden
-						w:=0;
-						Icon.Handle:=ExtractAssociatedIcon(hInstance, PAnsiChar(S), w);
-
-						// Add the icon to the image lists if it exists
-						if Icon.Handle <> 0 then begin
-
-							// Add it to every theme
-							fToolList.Items[I].IcoNumNewLook:=dmMain.MenuImages_NewLook.AddIcon(Icon);
-							fToolList.Items[I].IcoNumBlue:=dmMain.MenuImages_Blue.AddIcon(Icon);
-							fToolList.Items[I].IcoNumGnome:=dmMain.MenuImages_Gnome.AddIcon(Icon);
-							fToolList.Items[I].HasIcon:=True;
-
-							// Setting the image index to 'not -1' should do the trick
-							if devData.Theme=DEV_GNOME_THEME then
-								Item.ImageIndex:=fToolList.Items[I].IcoNumGnome
-							else if devData.Theme=DEV_BLUE_THEME then
-								Item.ImageIndex:=fToolList.Items[I].IcoNumBlue
-							else
-								Item.ImageIndex:=fToolList.Items[I].IcoNumNewLook;
-						end;
-					end;
-				finally
-					Icon.Free;
-				end;
-			end;
 			fMenu.Add(Item);
 		end;
 	end;

@@ -292,7 +292,7 @@ begin
 								Inc(findcount,Execute(e.Text,actiontype));
 
 								// Save and close
-								MainForm.SaveFile(e);
+								e.Save;
 								MainForm.fProject.CloseUnit(MainForm.fProject.Units.Indexof(e));
 							end;
 						end else begin

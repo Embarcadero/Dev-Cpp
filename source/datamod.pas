@@ -23,10 +23,8 @@ interface
 
 uses
 {$IFDEF WIN32}
-  SysUtils, Classes, Menus, Dialogs, ImgList, Controls,
-  SynEditHighlighter, SynHighlighterCpp,
-  CodeInsList, SynHighlighterRC,
-  SynEditMiscClasses, SynEditSearch;
+  SysUtils, Classes, Menus, Controls, SynEditHighlighter, SynHighlighterCpp,
+  CodeInsList, SynHighlighterRC, ImgList;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QMenus, QDialogs, QImgList, QControls,
@@ -37,6 +35,12 @@ uses
 {$ENDIF}
 
 type
+  PMRUItem = ^TMRUItem;
+  TMRUItem = record
+    filename : AnsiString;
+    MenuItem : TMenuItem;
+  end;
+
   TdmMain = class(TDataModule)
     Cpp: TSynCppSyn;
     ProjectImage_Gnome: TImageList;
@@ -68,25 +72,19 @@ type
 
 { MRU List }
    private
-    fMRU: TStringList;
-    fMRUMenu: TMenuItem;
-    fMRUMax: byte;
-    fMRUOffset: integer;
+    fMRU: TList; // let them store their own location
+    fMRUMenu: TMenuItem; // start of list
     fMRUClick: TNotifyEvent;
     procedure LoadHistory;
     procedure SaveHistory;
+  public
     procedure RebuildMRU;
-    function GetMRU(index: integer): AnsiString;
-   public
-    procedure AddtoHistory(const s: AnsiString);
+    procedure AddtoHistory(const s: AnsiString;rebuildmenu : boolean);
     procedure RemoveFromHistory(const s: AnsiString);
     procedure ClearHistory;
-    property MRU[index: integer]: AnsiString read GetMRU;
     property MRUMenu: TMenuItem read fMRUMenu write fMRUMenu;
-    property MRUOffset: integer read fMRUOffset write fMRUOffset;
-    property MRUMax: byte read fMRUMax write fMRUMax;
     property MRUClick: TNotifyEvent read fMRUClick write fMRUClick;
-
+    property MRU: TList read fMRU;
   public
     procedure LoadDataMod;
     function GetNewProjectNumber: integer;
@@ -102,7 +100,7 @@ var
 implementation
 
 uses 
-  devcfg, IniFiles, utils, version, main, MultiLangSupport;
+  devcfg, utils, version, math, MultiLangSupport;
 
 {$R *.dfm}
 
@@ -110,13 +108,17 @@ uses
 
 procedure TdmMain.DataModuleCreate(Sender: TObject);
 begin
-	fMRU:= TStringList.Create;
+	fMRU:= TList.Create;
 	fCodeList:= TCodeInsList.Create;
 end;
 
 procedure TdmMain.DataModuleDestroy(Sender: TObject);
+var
+	I : integer;
 begin
 	SaveHistory;
+	for I := 0 to fMRU.Count - 1 do
+		Dispose(PMRUItem(fMRU[i]));
 	fMRU.Free;
 	fCodeList.Free;
 end;
@@ -252,21 +254,28 @@ end;
 
  { ---------- MRU ---------- }
 
-procedure TdmMain.AddtoHistory(const s: AnsiString);
+procedure TdmMain.AddtoHistory(const s: AnsiString;rebuildmenu : boolean);
 var
 	I: integer;
+	newitem : PMRUItem;
 begin
 	if (s = '') then
 		exit;
 
 	// Don't add duplicates!
 	for I := 0 to fMRU.Count - 1 do
-		if SameText(s,fMRU.ValueFromIndex[i]) then
+		if SameText(s,PMRUItem(fMRU[i])^.filename) then
 			Exit;
 
+	newitem := new(PMRUItem);
+	newitem^.filename := s;
+	newitem^.MenuItem := nil; // to be filled by RebuildMRU
+
 	// insert first
-	fMRU.Insert(0, Format('%d=%s', [fMRU.Count, s]));
-	RebuildMRU;
+	fMRU.Insert(0, newitem);
+
+	if rebuildmenu then
+		RebuildMRU;
 end;
 
 procedure TdmMain.RemoveFromHistory(const s: AnsiString);
@@ -276,144 +285,118 @@ begin
 
 	// Remove one, duplicates simply aren't present
 	for I := 0 to fMRU.Count - 1 do
-		if SameText(s,fMRU.ValueFromIndex[i]) then begin
+		if SameText(s,PMRUItem(fMRU[i])^.filename) then begin
+
+			// remove menu item now
+			PMRUItem(fMRU[i])^.MenuItem.Free;
+
+			// delete pointed memory
+			Dispose(PMRUItem(fMRU[i]));
 			fMRU.Delete(i);
+
+			// Rebuild whole list
 			RebuildMRU;
 			break;
 		end;
 end;
 
 procedure TdmMain.ClearHistory;
+var
+	I : integer;
 begin
+	for I := 0 to fMRU.Count - 1 do begin
+
+		// remove menu item now
+		PMRUItem(fMRU[i])^.MenuItem.Free;
+
+		// delete pointed memory
+		Dispose(PMRUItem(fMRU[i]));
+	end;
 	fMRU.Clear;
 	RebuildMRU;
-end;
-
-function TdmMain.GetMRU(index: integer): AnsiString;
-begin
-	result:= fMRU.ValueFromIndex[index];
 end;
 
 procedure TdmMain.LoadHistory;
 var
 	I: integer;
+	sl : TStringList;
 begin
 	ClearHistory;
 
-	// Use already open file handle
-	devData.ReadStrings('History',fMRU);
+	sl := TStringList.Create;
+	try
 
-	// Delete files that don't exist anymore
-	for I := fMRU.Count - 1 downto 0 do
-		if not FileExists(fMRU.ValueFromIndex[I]) then
-			fMRU.Delete(I);
+		// Use already open file handle
+		devData.ReadStrings('History',sl);
 
-	RebuildMRU;
+		// Delete files that don't exist anymore
+		for I := sl.Count - 1 downto 0 do
+			if not FileExists(sl.ValueFromIndex[I]) then
+				sl.Delete(I);
+
+		// Create struct list
+		for I := 0 to sl.Count - 1 do
+			AddtoHistory(sl.ValueFromIndex[i],false); // reuse
+
+	finally
+		sl.Free;
+	end;
+
+	RebuildMRU; // rebuild once
 end;
 
 procedure TdmMain.SaveHistory;
+var
+	I: integer;
+	sl : TStringList;
 begin
-	if not assigned(fMRU) then exit;
 
-	// Use already open file handle
-	devData.WriteStrings('History',fMRU);
+	sl := TStringList.Create;
+	try
+
+		// Read struct list
+		for I := 0 to fMRU.Count - 1 do
+			sl.Add(PMRUItem(fMRU[i])^.filename);
+
+		// Use already open file handle
+		devData.WriteStrings('History',sl);
+	finally
+		sl.Free;
+	end;
 end;
 
 procedure TdmMain.RebuildMRU;
-  // this function sorts the MRU by bringing the .dev files
-  // to the top of the list. It doesn't alter the order in
-  // other ways... The return value is the Index
-  // of the first non .dev file
-  function SortMRU: integer;
-  var
-    I, C: integer;
-    swp: AnsiString;
-    Done: boolean;
-  begin
-    C:=0;
-    repeat
-      Done:=True;
-      for I:=0 to fMRU.Count-2 do
-        if (LowerCase(ExtractFileExt(fMRU[I])) <> '.dev') and
-           (LowerCase(ExtractFileExt(fMRU[I+1])) = '.dev') then begin
-          swp:=fMRU[I];
-          fMRU[I]:=fMRU[I+1];
-          fMRU[I+1]:=swp;
-          Done:=False;
-        end;
-    until Done;
-    for I:=0 to fMRU.Count-1 do
-      if LowerCase(ExtractFileExt(fMRU[I])) <> '.dev' then begin
-        C:=I;
-        Break;
-      end;
-    Result:=C;
-  end;
 var
- Stop,
- Counter,
- idx: integer;
- Item: TMenuItem;
- NonDev: integer;
- UpdMRU: TStringList;
+	i,startidx: integer;
+	Parent,Item,TopSep,BottomSep: TMenuItem;
 begin
-  if not assigned(fMRUMenu) then exit;
-  for idx:= pred(fMRUMenu.Count) downto fMRUOffset do
-   fMRUMenu[idx].Free;
+	// Delete all menu items
+	for I:= 0 to fMRU.Count - 1 do
+		PMRUItem(fMRU[i])^.MenuItem.Free;
 
-  // Initialize a new MRU...
-  // We 'll be adding in this *only* the entries that
-  // are going to fMRUMenu.
-  // After that, we 'll replace the fMRU with UpdMRU.
-  // That way the MRU is always up to date and does not contain
-  // excess elements.
-  UpdMRU:=TStringList.Create;
+	Parent := fMRUMenu.Parent;
+	startidx := Parent.IndexOf(fMRUMenu) - 1; // start above
+	if startidx = -1 then Exit; // no menu item given?
 
-  Counter:=0;
+	TopSep := Parent[startidx-1];
+	BottomSep := Parent[startidx];
 
-  // Build the .dev recent files entries (*.dev)
-  NonDev:=SortMRU;
-  // 4 .devs max - make it configurable?
-  if NonDev>4 then
-    Stop:=4
-  else
-    Stop:=NonDev;
+	// Add menu items up to MRUmax
+	for I:= 0 to min(devData.MRUMax,fMRU.Count) - 1 do begin
+		Item := TMenuItem.Create(Parent);
+		Item.Caption:= format('&%1x %s', [I, PMRUITem(fMRU[I])^.filename]);
+		Item.OnClick:= fMRUClick;
+		Item.Tag:= I;
+		Parent.Insert(startidx + I,Item);
 
-  for idx:= 0 to pred(Stop) do
-   begin
-     UpdMRU.Add(Format('%d=%s', [UpdMRU.Count, fMRU.ValueFromIndex[idx]]));
-     Item:= TMenuItem.Create(fMRUMenu);
-     Item.Caption:= format('&%1x %s', [Counter, fMRU.ValueFromIndex[idx]]);
-     Item.OnClick:= fMRUClick;
-     Item.Tag:= UpdMRU.Count-1;
-     fMRUMenu.Add(Item);
-     Inc(Counter);
-   end;
-   if (fMRUMenu.Count - fMRUOffset) > 0 then
-     fMRUMenu.InsertNewLineAfter(fMRUMenu.Items[fMRUMenu.Count-1]);
+		// Hand a pointer to the MRU item, so it can remove it itself
+		PMRUITem(fMRU[I])^.MenuItem := Item;
+	end;
 
-
-  // Now build the other recent files entries (*.cpp, *.h, etc)
-  if (fMRU.Count-NonDev)> fMRUMax then
-   Stop:= NonDev+fMRUMax
-  else
-   Stop:= fMRU.Count;
-
-  for idx:= NonDev to pred(Stop) do
-   begin
-     UpdMRU.Add(Format('%d=%s', [UpdMRU.Count, fMRU.ValueFromIndex[idx]]));
-     Item:= TMenuItem.Create(fMRUMenu);
-     Item.Caption:= format('&%1x %s', [Counter, fMRU.ValueFromIndex[idx]]);
-     Item.OnClick:= fMRUClick;
-     Item.Tag:= UpdMRU.Count-1;
-     fMRUMenu.Add(Item);
-     Inc(Counter);
-   end;
-  fMRUMenu.Enabled:= (fMRUMenu.Count - fMRUOffset) > 0;
-
-  // update MRU
-  fMRU.Assign(UpdMRU);
-  UpdMRU.Free;
+	// Hide unneeded separators and clear history button
+	TopSep.Visible := (fMRU.Count > 0);
+	BottomSep.Visible := (fMRU.Count > 0);
+	fMRUMenu.Visible := (fMRU.Count > 0);
 end;
 
 { ---------- Code Insert Methods ---------- }

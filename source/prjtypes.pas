@@ -107,6 +107,7 @@ uses
 procedure InitOptionsRec(var Rec: TProjOptions);
 begin
 	with Rec do begin
+		Ver := 2;// 2 since 5.2.0.3
 		Includes:= TStringList.Create;
 		Libs:= TStringList.Create;
 		ResourceIncludes := TStringList.Create;

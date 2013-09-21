@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 465
-  Top = 309
+  Left = 1134
+  Top = 510
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 462
@@ -45,22 +45,11 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Width'
         end
         object lblMarginColor: TLabel
-          Left = 115
+          Left = 99
           Top = 43
           Width = 29
           Height = 15
           Caption = 'Color'
-        end
-        object cpMarginColor: TColorPickerButton
-          Left = 115
-          Top = 58
-          Width = 70
-          Height = 22
-          DefaultText = 'default'
-          PopupSpacing = 8
-          ShowSystemColors = False
-          OnDefaultSelect = cpMarginColorDefaultSelect
-          OnHint = cpMarginColorHint
         end
         object cbMarginVis: TCheckBox
           Left = 8
@@ -79,6 +68,16 @@ object EditorOptForm: TEditorOptForm
           MinValue = 0
           TabOrder = 1
           Value = 0
+        end
+        object cpMarginColor: TColorBox
+          Left = 96
+          Top = 58
+          Width = 97
+          Height = 22
+          DefaultColorColor = cl3DLight
+          Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
+          ItemHeight = 16
+          TabOrder = 2
         end
       end
       object grpEditorOpts: TGroupBox
@@ -282,19 +281,8 @@ object EditorOptForm: TEditorOptForm
         Height = 84
         Caption = 'Highlight current line'
         TabOrder = 3
-        object cpHighColor: TColorPickerButton
-          Left = 115
-          Top = 51
-          Width = 70
-          Height = 22
-          DefaultText = 'default'
-          PopupSpacing = 8
-          ShowSystemColors = False
-          OnDefaultSelect = cpHighColorDefaultSelect
-          OnHint = cpHighColorHint
-        end
         object cbHighlightColor: TLabel
-          Left = 115
+          Left = 99
           Top = 35
           Width = 29
           Height = 15
@@ -308,6 +296,16 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Enabled'
           TabOrder = 0
           OnClick = cbHighCurrLineClick
+        end
+        object cpHighColor: TColorBox
+          Left = 96
+          Top = 50
+          Width = 97
+          Height = 22
+          DefaultColorColor = 16777164
+          Style = [cbStandardColors, cbIncludeDefault, cbCustomColor, cbPrettyNames]
+          ItemHeight = 16
+          TabOrder = 1
         end
       end
       object GroupBox1: TGroupBox
@@ -534,32 +532,6 @@ object EditorOptForm: TEditorOptForm
     end
     object tabSyntax: TTabSheet
       Caption = 'Syntax'
-      object cpForeground: TColorPickerButton
-        Left = 17
-        Top = 167
-        Width = 110
-        Height = 22
-        CustomText = 'Custom'
-        DefaultText = 'Default'
-        PopupSpacing = 8
-        ShowSystemColors = True
-        OnChange = StyleChange
-        OnDefaultSelect = DefaultSelect
-        OnHint = PickerHint
-      end
-      object cpBackground: TColorPickerButton
-        Left = 17
-        Top = 212
-        Width = 110
-        Height = 22
-        CustomText = 'Custom'
-        DefaultText = 'Default'
-        PopupSpacing = 8
-        ShowSystemColors = True
-        OnChange = StyleChange
-        OnDefaultSelect = DefaultSelect
-        OnHint = PickerHint
-      end
       object lblForeground: TLabel
         Left = 9
         Top = 152
@@ -763,6 +735,26 @@ object EditorOptForm: TEditorOptForm
         Caption = 'Use Syntax Highlighting'
         TabOrder = 5
         OnClick = cbSyntaxHighlightClick
+      end
+      object cpForeground: TColorBox
+        Left = 17
+        Top = 168
+        Width = 110
+        Height = 22
+        Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
+        ItemHeight = 16
+        TabOrder = 6
+        OnChange = StyleChange
+      end
+      object cpBackground: TColorBox
+        Left = 17
+        Top = 212
+        Width = 110
+        Height = 22
+        Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
+        ItemHeight = 16
+        TabOrder = 7
+        OnChange = StyleChange
       end
     end
     object tabCode: TTabSheet
@@ -972,19 +964,6 @@ object EditorOptForm: TEditorOptForm
         Height = 15
         Caption = 'Delay (ms):'
       end
-      object cpCompletionBackground: TColorPickerButton
-        Left = 333
-        Top = 127
-        Width = 112
-        Height = 22
-        CustomText = 'Custom'
-        DefaultText = 'Default'
-        PopupSpacing = 8
-        ShowSystemColors = True
-        OnChange = StyleChange
-        OnDefaultSelect = DefaultSelect
-        OnHint = PickerHint
-      end
       object lblCompletionColor: TLabel
         Left = 328
         Top = 108
@@ -1102,6 +1081,16 @@ object EditorOptForm: TEditorOptForm
         Caption = 'Refresh'
         TabOrder = 6
         OnClick = btnCCCrefreshClick
+      end
+      object cpCompletionBackground: TColorBox
+        Left = 333
+        Top = 128
+        Width = 112
+        Height = 22
+        DefaultColorColor = clWhite
+        Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
+        ItemHeight = 16
+        TabOrder = 7
       end
     end
     object tabAutosave: TTabSheet

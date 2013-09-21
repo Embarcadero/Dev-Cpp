@@ -1,11 +1,11 @@
 object LangForm: TLangForm
-  Left = 434
-  Top = 310
+  Left = 534
+  Top = 420
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Dev-C++ first time configuration'
   ClientHeight = 320
-  ClientWidth = 540
+  ClientWidth = 560
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,15 +18,8 @@ object LangForm: TLangForm
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 15
-  object ThemeImage: TImage
-    Left = 0
-    Top = 0
-    Width = 240
-    Height = 320
-    Center = True
-  end
   object OkBtn: TBitBtn
-    Left = 250
+    Left = 270
     Top = 280
     Width = 280
     Height = 30
@@ -62,14 +55,14 @@ object LangForm: TLangForm
       BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BFBFBFBF
       BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
   end
-  object FirstPanel: TPanel
-    Left = 240
+  object LangPanel: TPanel
+    Left = 260
     Top = 0
     Width = 300
     Height = 275
     BevelOuter = bvNone
     TabOrder = 1
-    object LanguageInfo: TLabel
+    object lblLangInfo: TLabel
       Left = 8
       Top = 230
       Width = 284
@@ -77,71 +70,29 @@ object LangForm: TLangForm
       Alignment = taCenter
       AutoSize = False
       Caption = 
-        'You can change the interface language at Tools, Environment Opti' +
-        'ons and color styles at Tools, Editor Options, Colors.'
+        'You can later change the language at Tools >> Environment Option' +
+        's >> General.'
       WordWrap = True
     end
-    object GroupBox1: TGroupBox
+    object grpLanguages: TGroupBox
       Left = 16
       Top = 12
       Width = 268
-      Height = 122
+      Height = 213
       Caption = 'Select your language:'
-      TabOrder = 1
-      object ListBox: TListBox
+      TabOrder = 0
+      object lbLanguages: TListBox
         Left = 8
         Top = 20
         Width = 250
-        Height = 93
+        Height = 181
         ItemHeight = 15
         TabOrder = 0
-      end
-    end
-    object ThemeGroupBox: TGroupBox
-      Left = 16
-      Top = 144
-      Width = 268
-      Height = 81
-      Caption = 'Select your Dev-C++ theme:'
-      TabOrder = 0
-      object InterfaceLbl: TLabel
-        Left = 8
-        Top = 24
-        Width = 46
-        Height = 15
-        Caption = 'Interface'
-      end
-      object EditorLbl: TLabel
-        Left = 8
-        Top = 52
-        Width = 31
-        Height = 15
-        Caption = 'Editor'
-      end
-      object ThemeBox: TComboBox
-        Left = 80
-        Top = 22
-        Width = 177
-        Height = 23
-        Style = csDropDownList
-        ItemHeight = 15
-        TabOrder = 0
-        OnChange = ThemeChange
-      end
-      object EditorBox: TComboBox
-        Left = 80
-        Top = 50
-        Width = 177
-        Height = 23
-        Style = csDropDownList
-        ItemHeight = 15
-        TabOrder = 1
-        OnChange = ThemeChange
       end
     end
   end
   object FinishPanel: TPanel
-    Left = 240
+    Left = 260
     Top = 0
     Width = 300
     Height = 275
@@ -186,7 +137,7 @@ object LangForm: TLangForm
     end
   end
   object CachePanel: TPanel
-    Left = 240
+    Left = 260
     Top = 0
     Width = 300
     Height = 275
@@ -336,32 +287,242 @@ object LangForm: TLangForm
       end
     end
   end
-  object PopupMenu: TPopupMenu
-    Left = 96
-    Top = 136
-    object N1: TMenuItem
-      ImageIndex = 0
+  object synExample: TSynEdit
+    Left = 0
+    Top = 0
+    Width = 260
+    Height = 320
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Courier New'
+    Font.Style = []
+    TabOrder = 4
+    Gutter.Font.Charset = DEFAULT_CHARSET
+    Gutter.Font.Color = clWindowText
+    Gutter.Font.Height = -11
+    Gutter.Font.Name = 'Courier New'
+    Gutter.Font.Style = []
+    Gutter.RightOffset = 21
+    Lines.Strings = (
+      '#include <iostream>'
+      ''
+      'int main(int argc, char** argv) {'
+      #9'std::cout << "Hello world!\n";'
+      #9'return 0;'
+      '}')
+  end
+  object EditPanel: TPanel
+    Left = 260
+    Top = 0
+    Width = 300
+    Height = 275
+    BevelOuter = bvNone
+    TabOrder = 5
+    Visible = False
+    object lblEditInfo: TLabel
+      Left = 8
+      Top = 230
+      Width = 284
+      Height = 48
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 
+        'You can later change themes at Tools >> Editor Options >> Fonts/' +
+        'Colors.'
+      WordWrap = True
     end
-    object TMenuItem
-      ImageIndex = 1
-    end
-    object TMenuItem
-      ImageIndex = 2
-    end
-    object TMenuItem
-      ImageIndex = 3
-    end
-    object TMenuItem
-      ImageIndex = 4
-    end
-    object TMenuItem
-      ImageIndex = 5
-    end
-    object TMenuItem
-      ImageIndex = 6
-    end
-    object TMenuItem
-      ImageIndex = 7
+    object grpThemes: TGroupBox
+      Left = 16
+      Top = 12
+      Width = 268
+      Height = 205
+      Caption = 'Select your theme:'
+      TabOrder = 0
+      object lblIcons: TLabel
+        Left = 8
+        Top = 104
+        Width = 31
+        Height = 15
+        Caption = 'Icons:'
+      end
+      object lblColor: TLabel
+        Left = 8
+        Top = 72
+        Width = 32
+        Height = 15
+        Caption = 'Color:'
+      end
+      object lblFont: TLabel
+        Left = 8
+        Top = 32
+        Width = 27
+        Height = 15
+        Caption = 'Font:'
+      end
+      object cmbIcons: TComboBox
+        Left = 56
+        Top = 102
+        Width = 201
+        Height = 23
+        Style = csDropDownList
+        ItemHeight = 15
+        TabOrder = 0
+        OnChange = cmbIconsChange
+      end
+      object cmbColors: TComboBox
+        Left = 56
+        Top = 70
+        Width = 201
+        Height = 23
+        Style = csDropDownList
+        ItemHeight = 15
+        TabOrder = 1
+        OnChange = ColorChange
+        Items.Strings = (
+          'Classic'
+          'Classic Plus'
+          'Twilight'
+          'Ocean'
+          'Visual Studio'
+          'Borland'
+          'Matrix'
+          'Obsidian'
+          'GSS Hacker'
+          'Obvilion')
+      end
+      object cmbFont: TComboBox
+        Left = 56
+        Top = 22
+        Width = 201
+        Height = 36
+        AutoComplete = False
+        Style = csOwnerDrawVariable
+        ItemHeight = 30
+        Sorted = True
+        TabOrder = 2
+        OnChange = FontChange
+        OnDrawItem = cmbFontDrawItem
+      end
+      object tbExample: TToolBar
+        Left = 8
+        Top = 130
+        Width = 250
+        Height = 64
+        Align = alNone
+        AutoSize = True
+        BorderWidth = 5
+        Caption = 'Main'
+        DragKind = dkDock
+        EdgeBorders = []
+        Flat = True
+        Images = dmMain.MenuImages_NewLook
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 3
+        object NewFileBtn: TToolButton
+          Left = 0
+          Top = 0
+          Caption = '&Source File'
+          ImageIndex = 1
+        end
+        object OpenBtn: TToolButton
+          Left = 23
+          Top = 0
+          ImageIndex = 4
+        end
+        object SaveUnitBtn: TToolButton
+          Left = 46
+          Top = 0
+          ImageIndex = 6
+        end
+        object SaveAllBtn: TToolButton
+          Left = 69
+          Top = 0
+          ImageIndex = 8
+        end
+        object CloseBtn: TToolButton
+          Left = 92
+          Top = 0
+          ImageIndex = 9
+        end
+        object PrintBtn: TToolButton
+          Left = 115
+          Top = 0
+          ImageIndex = 10
+        end
+        object UndoBtn: TToolButton
+          Left = 138
+          Top = 0
+          ImageIndex = 13
+        end
+        object RedoBtn: TToolButton
+          Left = 161
+          Top = 0
+          ImageIndex = 14
+        end
+        object FindBtn: TToolButton
+          Left = 184
+          Top = 0
+          ImageIndex = 21
+        end
+        object ReplaceBtn: TToolButton
+          Left = 207
+          Top = 0
+          ImageIndex = 22
+          Wrap = True
+        end
+        object FindNextBtn: TToolButton
+          Left = 0
+          Top = 22
+          ImageIndex = 44
+        end
+        object GotoLineBtn: TToolButton
+          Left = 23
+          Top = 22
+          ImageIndex = 24
+        end
+        object CompileBtn: TToolButton
+          Left = 46
+          Top = 22
+          ImageIndex = 28
+        end
+        object RunBtn: TToolButton
+          Left = 69
+          Top = 22
+          ImageIndex = 31
+        end
+        object CompileAndRunBtn: TToolButton
+          Left = 92
+          Top = 22
+          ImageIndex = 33
+        end
+        object RebuildAllBtn: TToolButton
+          Left = 115
+          Top = 22
+          ImageIndex = 30
+        end
+        object DebugBtn: TToolButton
+          Left = 138
+          Top = 22
+          ImageIndex = 32
+        end
+        object ProfileBtn: TToolButton
+          Left = 161
+          Top = 22
+          ImageIndex = 43
+        end
+        object ProfilingInforBtn: TToolButton
+          Left = 184
+          Top = 22
+          ImageIndex = 47
+        end
+        object InsertBtn: TToolButton
+          Left = 207
+          Top = 22
+          ImageIndex = 18
+        end
+      end
     end
   end
 end

@@ -1020,8 +1020,10 @@ begin
 		chkSyncProduct.Checked := SyncProduct;
 
 		cmbLangID.Items.Clear;
+		cmbLangID.Items.BeginUpdate; // prevent redraws
 		for I:=0 to Languages.Count-1 do
 			cmbLangID.Items.Add(Languages.Name[I]);
+		cmbLangID.Items.EndUpdate;
 
 		cmbLangID.ItemIndex := cmbLangID.Items.IndexOf(Languages.NameFromLocaleID[LanguageID]);
 	end;
@@ -1068,7 +1070,11 @@ var
 	sl: TStringList;
 begin
 	with TOpenDialog.Create(Self) do try
-		Filter:=FLT_ALLFILES;
+		Filter := BuildFilter([FLT_LIBRARIES]);
+		Options := Options + [ofAllowMultiSelect];
+
+		// Pick the project compiler set
+		MainForm.fCompiler.SwitchToProjectCompilerSet;
 
 		// Start in the lib folder
 		sl := TStringList.Create;
@@ -1084,6 +1090,8 @@ begin
 				edLinker.Lines.Add(S);
 			end;
 		end;
+
+		MainForm.fCompiler.SwitchToOriginalCompilerSet;
 	finally
 		Free;
 	end;

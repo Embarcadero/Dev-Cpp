@@ -151,6 +151,7 @@ type
   function ReplaceLastStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
   function ReplaceLastText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 
+  function IsWindows64 : boolean;
 implementation
 
 uses
@@ -161,6 +162,15 @@ uses
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
 
+function IsWindows64 : boolean;
+var
+	buffer : array[0..1023] of char;
+begin
+	// IsWow64Process not available in Delphi 7, so using this instead
+	GetEnvironmentVariable('PROGRAMFILES',buffer,1024);
+	result := EndsStr(' (x86)',AnsiString(buffer));
+end;
+
 function GetInfoOfCompiler(const binfolder : AnsiString) : AnsiString;
 var
 	gccoutput,gccversion,gcctype : AnsiString;
@@ -168,38 +178,42 @@ var
 begin
 	result := '';
 
-	if FileExists(binfolder + 'gcc.exe') then begin
-		gccoutput := RunAndGetOutput(binfolder + 'gcc.exe -v',binfolder,nil,nil,nil,False);
+	// Try the x64 version of GCC too
+	if FileExists(binfolder + 'gcc.exe') then
+		gccoutput := RunAndGetOutput(binfolder + 'gcc.exe -v',binfolder,nil,nil,nil,False)
+	else if FileExists(binfolder + 'x86_64-w64-mingw32-gcc.exe') then
+		gccoutput := RunAndGetOutput(binfolder + 'x86_64-w64-mingw32-gcc.exe -v',binfolder,nil,nil,nil,False)
+	else
+		Exit;
 
-		// Obtain version number and compiler distro
-		start := Pos('gcc version ',gccoutput);
-		if start > 0 then begin
+	// Obtain version number and compiler distro
+	start := Pos('gcc version ',gccoutput);
+	if start > 0 then begin
 
-			// Find version number
-			Inc(start,Length('gcc version '));
-			stop := start;
-			while(not (gccoutput[stop] in [#0..#32])) do
-				Inc(stop);
+		// Find version number
+		Inc(start,Length('gcc version '));
+		stop := start;
+		while(not (gccoutput[stop] in [#0..#32])) do
+			Inc(stop);
 
-			gccversion := Copy(gccoutput,start,stop-start);
+		gccversion := Copy(gccoutput,start,stop-start);
 
-			// Find compiler builder
-			start := stop;
-			while(not (gccoutput[start] = '(')) do
-				Inc(start);
-			while(not (gccoutput[stop] = ')')) do
-				Inc(stop);
+		// Find compiler builder
+		start := stop;
+		while(not (gccoutput[start] = '(')) do
+			Inc(start);
+		while(not (gccoutput[stop] = ')')) do
+			Inc(stop);
 
-			gcctype := Copy(gccoutput,start,stop-start+1);
+		gcctype := Copy(gccoutput,start,stop-start+1);
 
-			// Assemble user friendly name
-			if ContainsStr(gcctype,'tdm64') then
-				result := 'TDM-GCC ' + gccversion
-			else if ContainsStr(gcctype,'tdm') then
-				result := 'TDM-GCC ' + gccversion
-			else if ContainsStr(gcctype,'GCC') then
-				result := 'MinGW GCC ' + gccversion;
-		end;
+		// Assemble user friendly name
+		if ContainsStr(gcctype,'tdm64') then
+			result := 'TDM-GCC ' + gccversion
+		else if ContainsStr(gcctype,'tdm') then
+			result := 'TDM-GCC ' + gccversion
+		else if ContainsStr(gcctype,'GCC') then
+			result := 'MinGW GCC ' + gccversion;
 	end;
 end;
 
@@ -619,12 +633,9 @@ begin
 	SetEnvironmentVariable(PAnsiChar('PATH'), PAnsiChar(NewPath));
 end;
 
-function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString;
-  const CheckDirs: boolean = FALSE): AnsiString;
+function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString;const CheckDirs: boolean = FALSE): AnsiString;
 var
  fName: AnsiString;
- tmp: TStrings;
- idx: integer;
 begin
 	fName:= ExtractFileName(FileName);
 	if FileExists(FileName) then
@@ -642,20 +653,10 @@ begin
 			result:= devDirs.Help + fName
 		else if (devDirs.Lang <> '') and FileExists(devDirs.Lang + fName) then
 			result:= devDirs.Lang +fName
-		else if (devDirs.Icons <> '') then begin
-			tmp:= TStringList.Create;
-			try
-				StrtoList(devDirs.Icons, tmp);
-				if tmp.Count> 0 then
-				for idx:= 0 to pred(tmp.Count) do
-					if FileExists(IncludeTrailingPathDelimiter(tmp[idx]) +fName) then begin
-						result:= IncludeTrailingPathDelimiter(tmp[idx]) +fName;
-						break;
-					end;
-			finally
-				tmp.Free;
-			end;
-		end;
+		else if (devDirs.Icons <> '') and FileExists(devDirs.Icons + fName) then
+			result:= devDirs.Icons +fName
+		else if (devDirs.Templates <> '') and FileExists(devDirs.Templates + fName) then
+			result:= devDirs.Templates +fName;
 	end else
 		result:= '';
 end;

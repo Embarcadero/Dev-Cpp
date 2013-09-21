@@ -58,9 +58,16 @@ type
     property OnNotifyChange: TdevMonitorChange read fNotifyChange write fNotifyChange;
   end;
 
+procedure Register;
+
 implementation
 
 { TdevFileMonitor }
+
+procedure Register;
+begin
+	RegisterComponents('Dev-C++', [TdevFileMonitor]);
+end;
 
 procedure TdevFileMonitor.SubClassWndProc(var Message: TMessage);
 begin

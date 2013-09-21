@@ -550,6 +550,7 @@ begin
 			cmbCompilerSetComp.ItemIndex := max(0,deleteindex - 1)
 		else
 			cmbCompilerSetComp.ItemIndex := -1;
+		cmbCompilerSetComp.Repaint;
 
 		LoadSet(cmbCompilerSetComp.ItemIndex);
 	end;
@@ -697,6 +698,7 @@ begin
 	fOldSelection := cmbCompilerSetComp.ItemIndex;
 end;
 
+// Unite into one function?
 procedure TCompOptForm.CommandsChange(Sender: TObject);
 begin
 	cmbCompilerSetComp.Tag := 1;

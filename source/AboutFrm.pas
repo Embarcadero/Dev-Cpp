@@ -80,7 +80,7 @@ implementation
 
 uses 
 {$IFDEF WIN32}
-  ShellAPI, devcfg, MultiLangSupport,  main, DateUtils;
+  ShellAPI, devcfg, MultiLangSupport,  main;
 {$ENDIF}
 {$IFDEF LINUX}
   devcfg, MultiLangSupport, CheckForUpdate, main;

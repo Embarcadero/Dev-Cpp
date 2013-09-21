@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 222
-  Top = 205
+  Left = 744
+  Top = 331
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -63,7 +63,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -106,7 +106,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -229,6 +229,12 @@ object MainForm: TMainForm
           Width = 655
           Height = 154
           Align = alClient
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'Courier New'
+          Font.Style = []
+          ParentFont = False
           ReadOnly = True
           ScrollBars = ssBoth
           TabOrder = 0
@@ -243,13 +249,13 @@ object MainForm: TMainForm
         Left = 471
         Top = 0
         Width = 417
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           417
-          154)
+          155)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -271,7 +277,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 410
-          Height = 108
+          Height = 107
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -283,7 +289,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 471
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -291,7 +297,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           471
-          154)
+          155)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -453,7 +459,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 9
+          Height = 8
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -493,7 +499,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -983,7 +989,7 @@ object MainForm: TMainForm
     Top = 70
     Width = 193
     Height = 340
-    ActivePage = ClassSheet
+    ActivePage = ProjectSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 6
@@ -1032,6 +1038,7 @@ object MainForm: TMainForm
         Width = 185
         Height = 312
         Align = alClient
+        Color = clWhite
         Images = dmMain.ClassImages
         ReadOnly = True
         Indent = 19
@@ -1121,22 +1128,6 @@ object MainForm: TMainForm
         Tag = 1
         Action = actOpen
       end
-      object ReOpenItem: TMenuItem
-        AutoHotkeys = maManual
-        Caption = '&Reopen'
-        ImageIndex = 39
-        object ClearhistoryItem: TMenuItem
-          Action = actHistoryClear
-        end
-        object N11: TMenuItem
-          Caption = '-'
-          Enabled = False
-        end
-      end
-      object N12: TMenuItem
-        Caption = '-'
-        Enabled = False
-      end
       object SaveUnitItem: TMenuItem
         Tag = 3
         Action = actSave
@@ -1212,10 +1203,25 @@ object MainForm: TMainForm
       end
       object PrinterSetupItem: TMenuItem
         Action = actPrintSU
+        GroupIndex = 9
+      end
+      object N76: TMenuItem
+        Caption = '-'
+        GroupIndex = 9
+      end
+      object N11: TMenuItem
+        Caption = '-'
+        Enabled = False
+        GroupIndex = 9
+      end
+      object ClearhistoryItem: TMenuItem
+        Action = actHistoryClear
+        GroupIndex = 9
       end
       object N3: TMenuItem
         Caption = '-'
         Enabled = False
+        GroupIndex = 9
       end
       object ExitItem: TMenuItem
         Action = actExit
@@ -1611,9 +1617,7 @@ object MainForm: TMainForm
       end
       object CheckforupdatesItem: TMenuItem
         Action = actUpdateCheck
-      end
-      object mnuToolSep1: TMenuItem
-        Caption = '-'
+        Caption = '&Check for Packages'
       end
       object PackageManagerItem: TMenuItem
         Bitmap.Data = {

@@ -23,7 +23,7 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Sysutils, Windows, Messages, Forms, Classes, ShellAPI, Dialogs, Controls,
+  Sysutils, Windows, Messages, Forms, Classes, Controls,
   debugreader, version, editor, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -94,7 +94,7 @@ type
 implementation
 
 uses 
-  main, devcfg, utils, MultiLangSupport, cpufrm, prjtypes, StrUtils;
+  main, devcfg, utils, cpufrm;
 
 constructor TDebugger.Create;
 begin

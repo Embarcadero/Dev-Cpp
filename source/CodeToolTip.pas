@@ -84,8 +84,8 @@ unit CodeToolTip;
 interface
 uses
 {$IFDEF WIN32}
-  SysUtils, Dialogs, Classes, Windows, Messages, Graphics, Controls, Menus, Forms, StdCtrls,
-  SynEditKbdHandler, SynEdit, SynEditHighlighter, datamod, utils, CppParser;
+  SysUtils, Classes, Windows, Messages, Graphics, Controls, Forms,
+  SynEdit, SynEditHighlighter, utils, CppParser;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, QDialogs, Classes, Xlib, QGraphics, QControls, QMenus, QForms, QStdCtrls,

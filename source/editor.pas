@@ -110,6 +110,9 @@ type
     // Debugger callback
     procedure OnMouseOverEvalReady(const evalvalue : AnsiString);
 
+    function Save : boolean;
+    function SaveAs : boolean;
+  
     procedure Activate;
     procedure GotoLine;
     procedure SetCaretPos(line,col : integer;settopline : boolean = true); // takes folds into account
@@ -311,13 +314,13 @@ begin
 	// Create a gutter
 	fDebugGutter := TDebugGutter.Create(self);
 
-	// Initialize code completion stuff
-	InitCompletion;
-
 	// Function parameter tips
 	fFunctionTip := TCodeToolTip.Create(Application);
 	fFunctionTip.Editor := FText;
 	fFunctionTip.Parser := MainForm.CppParser;
+
+	// Initialize code completion stuff
+	InitCompletion;
 
 	// Setup a monitor which keeps track of outside-of-editor changes
 	MainForm.devFileMonitor.Files.Add(fFileName);
@@ -1670,6 +1673,106 @@ begin
 			result := false;
 	end else
 		result := false;
+end;
+
+function TEditor.Save : boolean;
+var
+	wa: boolean;
+begin
+	Result := True;
+	if FileExists(fFileName) and (FileGetAttr(fFileName) and faReadOnly <> 0) then begin
+		// file is read-only
+		if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [fFileName]), mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+			Exit;
+		if FileSetAttr(fFileName, FileGetAttr(fFileName)-faReadOnly) <> 0 then begin
+			MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [fFileName]), mtError, [mbOk], 0);
+			Exit;
+		end;
+	end;
+
+	wa := MainForm.devFileMonitor.Active;
+	MainForm.devFileMonitor.Deactivate;
+
+	// Filename already present? Save without dialog
+	if (not fNew) and fText.Modified then begin
+
+		// Save contents directly
+		try
+			fText.UnCollapsedLines.SaveToFile(fFileName);
+			fText.Modified := false;
+		except
+			MessageDlg(Format(Lang[ID_ERR_SAVEFILE], [fFileName]), mtError, [mbOk], 0);
+			Result := False;
+		end;
+
+		// Reparse
+		MainForm.CppParser.ReParseFile(fFileName,InProject); // don't need to scan for the first time
+	end else if fNew then
+		Result := SaveAs; // we need a file name, use dialog
+
+	if wa then
+		MainForm.devFileMonitor.Activate;
+end;
+
+function TEditor.SaveAs : boolean;
+begin
+	Result := True;
+	with TSaveDialog.Create(Application) do try
+
+		Title := Lang[ID_NV_SAVEFILE];
+		Filter := BuildFilter([FLT_CS,FLT_CPPS,FLT_HEADS,FLT_RES]);
+		Options := Options + [ofOverwritePrompt];
+
+		// select appropriate filter
+		if GetFileTyp(fFileName) in [utcHead,utcppHead] then begin
+			FilterIndex := 4; // .h
+			DefaultExt := 'h';
+		end else begin
+			if Assigned(MainForm.fProject) then begin
+				if MainForm.fProject.Options.useGPP then begin
+					FilterIndex := 3; // .cpp
+					DefaultExt := 'cpp';
+				end else begin
+					FilterIndex := 2; // .c
+					DefaultExt := 'c';
+				end;
+			end else begin
+				FilterIndex := 3; // .cpp
+				DefaultExt := 'cpp';
+			end;
+		end;
+
+		FileName := fFileName;
+		if (fFileName <> '') then
+			InitialDir := ExtractFilePath(fFileName)
+		else if Assigned(MainForm.fProject) then
+			InitialDir := MainForm.fProject.Directory;
+
+		if Execute then begin
+			try
+				fText.UnCollapsedLines.SaveToFile(FileName);
+				fText.Modified := false;
+				fNew := false;
+			except
+				MessageDlg(Lang[ID_ERR_SAVEFILE] + '"' + FileName + '"', mtError, [mbOk], 0);
+				Result := False;
+			end;
+
+			if assigned(MainForm.fProject) then
+				MainForm.fProject.SaveUnitAs(MainForm.fProject.Units.IndexOf(fFileName), FileName) // index of old filename
+			else
+				fTabSheet.Caption:= ExtractFileName(FileName);
+
+			fFileName := FileName;
+
+			// We haven't scanned it yet...
+			MainForm.CppParser.AddFileToScan(FileName);
+			MainForm.CppParser.ParseList;
+		end else
+			Result := False;
+	finally
+		Free;
+	end;
 end;
 
 end.

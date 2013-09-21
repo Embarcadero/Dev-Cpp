@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, ExtCtrls, Spin, ColorPickerButton,
+  Dialogs, ComCtrls, StdCtrls, ExtCtrls, Spin,
   SynEdit, SynEditHighlighter, SynHighlighterCpp,
   Buttons, ClassBrowser, CppParser, CppTokenizer, StrUtils, Grids;
 {$ENDIF}
@@ -53,8 +53,6 @@ type
     edGutterSize: TSpinEdit;
     tabGeneral: TTabSheet;
     tabSyntax: TTabSheet;
-    cpForeground: TColorPickerButton;
-    cpBackground: TColorPickerButton;
     lblForeground: TLabel;
     lblBackground: TLabel;
     CppEdit: TSynEdit;
@@ -72,7 +70,6 @@ type
     grpMargin: TGroupBox;
     lblMarginWidth: TLabel;
     lblMarginColor: TLabel;
-    cpMarginColor: TColorPickerButton;
     cbMarginVis: TCheckBox;
     grpCaret: TGroupBox;
     lblInsertCaret: TLabel;
@@ -94,7 +91,6 @@ type
     btnSaveSyntax: TSpeedButton;
     tabCBCompletion: TTabSheet;
     lblCompletionDelay: TLabel;
-    cpCompletionBackground: TColorPickerButton;
     lblCompletionColor: TLabel;
     tbCompletionDelay: TTrackBar;
     chkEnableCompletion: TCheckBox;
@@ -109,7 +105,6 @@ type
     edMarginWidth: TSpinEdit;
     edGutterWidth: TSpinEdit;
     cbHighCurrLine: TCheckBox;
-    cpHighColor: TColorPickerButton;
     cbSpecialChars: TCheckBox;
     cbSmartScroll: TCheckBox;
     cbScrollHint: TCheckBox;
@@ -160,14 +155,15 @@ type
     lblTimeStampExample: TLabel;
     btnCCCrefresh: TButton;
     lblRefreshHint: TLabel;
+    cpMarginColor: TColorBox;
+    cpHighColor: TColorBox;
+    cpForeground: TColorBox;
+    cpBackground: TColorBox;
+    cpCompletionBackground: TColorBox;
     procedure FormCreate(Sender: TObject);
     procedure SetGutter;
     procedure ElementListClick(Sender: TObject);
-    procedure cpMarginColorHint(Sender: TObject; Cell: Integer;var Hint: string);
-    procedure cpMarginColorDefaultSelect(Sender: TObject);
     procedure cppEditStatusChange(Sender: TObject; Changes: TSynStatusChanges);
-    procedure DefaultSelect(Sender: TObject);
-    procedure PickerHint(Sender: TObject; Cell: integer; var Hint: string);
     procedure StyleChange(Sender: TObject);
     procedure cbLineNumClick(Sender: TObject);
     procedure cbSyntaxHighlightClick(Sender: TObject);
@@ -201,8 +197,6 @@ type
     procedure edEditorSizeChange(Sender: TObject);
     procedure edGutterSizeChange(Sender: TObject);
     procedure cboEditorFontChange(Sender: TObject);
-    procedure cpHighColorDefaultSelect(Sender: TObject);
-    procedure cpHighColorHint(Sender: TObject; Cell: Integer;var Hint: String);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lvCodeInsSelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
@@ -284,6 +278,11 @@ begin
 
 	// Update code insertion
 	UpdateCIButtons;
+
+	// Set defaults of color buttons, don't want all system colors too
+	cpMarginColor.Items.InsertObject(1,'Default',TObject(cpMarginColor.DefaultColorColor));
+	cpHighColor.Items.InsertObject(1,'Default',TObject(cpHighColor.DefaultColorColor));
+	cpCompletionBackground.Items.InsertObject(1,'Default',TObject(cpCompletionBackground.DefaultColorColor));
 end;
 
 procedure TEditorOptForm.cboEditorFontDrawItem(Control: TWinControl;Index: Integer; Rect: TRect; State: TOwnerDrawState);
@@ -578,7 +577,7 @@ begin
 
      cbMarginVis.Checked:=           MarginVis;
      edMarginWidth.Value:=           MarginSize;
-     cpMarginColor.SelectionColor:=  MarginColor;
+     cpMarginColor.Selected:=        MarginColor;
 
      seTabSize.Value:=               TabSize;
      cbSyntaxHighlight.Checked:=     UseSyntax;
@@ -592,7 +591,7 @@ begin
      cbDefaultCode.Checked :=        DefaultCode;
 
      cbHighCurrLine.Checked :=       HighCurrLine;
-     cpHighColor.SelectionColor :=   HighColor;
+     cpHighColor.Selected :=   HighColor;
      cpHighColor.Enabled :=          cbHighCurrLine.Checked;
 
 		StrtoPoint(fSelColor,  Syntax.Values[cSel]);
@@ -682,7 +681,7 @@ begin
 	chkEnableCompletion.Checked:=devCodeCompletion.Enabled;
 	chkEnableCompletion.OnClick:=chkEnableCompletionClick;
 	tbCompletionDelay.Position:=devCodeCompletion.Delay;
-	cpCompletionBackground.SelectionColor:=devCodeCompletion.BackColor;
+	cpCompletionBackground.Selected:=devCodeCompletion.BackColor;
 	tbCompletionDelay.Enabled:=chkEnableCompletion.Checked;
 	cpCompletionBackground.Enabled:=chkEnableCompletion.Checked;
 	chkCCCache.Checked:=devCodeCompletion.UseCacheFiles;
@@ -733,13 +732,13 @@ begin
 
 		MarginVis:=           cbMarginVis.Checked;
 		MarginSize:=          edMarginWidth.Value;
-		MarginColor:=         cpMarginColor.SelectionColor;
+		MarginColor:=         cpMarginColor.Selected;
 		InsertCaret:=         cboInsertCaret.ItemIndex;
 		OverwriteCaret:=      cboOverwriteCaret.ItemIndex;
 		Match:=               cbMatch.Checked;
 
 		HighCurrLine:=        cbHighCurrLine.Checked;
-		HighColor:=           cpHighColor.SelectionColor;
+		HighColor:=           cpHighColor.Selected;
 
 		UseSyntax:=           cbSyntaxHighlight.Checked;
 		SyntaxExt:=           edSyntaxExt.Text;
@@ -841,7 +840,7 @@ begin
 
 	devCodeCompletion.Enabled:=chkEnableCompletion.Checked;
 	devCodeCompletion.Delay:=tbCompletionDelay.Position;
-	devCodeCompletion.BackColor:=cpCompletionBackground.SelectionColor;
+	devCodeCompletion.BackColor:=cpCompletionBackground.Selected;
 	devCodeCompletion.UseCacheFiles:=chkCCCache.Checked;
 	devCodeCompletion.ParseLocalHeaders:=chkCBParseLocalH.Checked;
 	devCodeCompletion.ParseGlobalHeaders:=chkCBParseGlobalH.Checked;
@@ -883,7 +882,7 @@ begin
 
 		// Repaint highlighted line
 		if cbHighCurrLine.Checked then
-			e.Text.ActiveLineColor := cpHighColor.SelectionColor
+			e.Text.ActiveLineColor := cpHighColor.Selected
 		else
 			e.Text.ActiveLineColor := clNone;
 	end;
@@ -921,31 +920,31 @@ end;
 
 procedure TEditorOptForm.ElementListClick(Sender: TObject);
 var
- pt: TPoint;
+	pt: TPoint;
 begin
 	// Special additions not directly exposed by TSynHighlighter
-	if ElementList.ItemIndex> pred(cpp.AttrCount) then begin
+	if ElementList.ItemIndex > pred(cpp.AttrCount) then begin
 		fUpdate:= FALSE;
 
 		cpBackground.Enabled := True;
 
-		if CompareText(ElementList.Items[ElementList.ItemIndex], cSel) = 0 then
+		if SameText(ElementList.Items[ElementList.ItemIndex], cSel) then
 			pt:= fSelColor
-		else if CompareText(ElementList.Items[ElementList.ItemIndex], cBP) = 0 then
+		else if SameText(ElementList.Items[ElementList.ItemIndex], cBP) then
 			pt:= fBPColor
-		else if CompareText(ElementList.Items[ElementList.ItemIndex], cErr) = 0 then
+		else if SameText(ElementList.Items[ElementList.ItemIndex], cErr) then
 			pt:= fErrColor
-		else if CompareText(ElementList.Items[ElementList.ItemIndex], cABP) = 0 then
+		else if SameText(ElementList.Items[ElementList.ItemIndex], cABP) then
 			pt:= fABPColor
-		else if CompareText(ElementList.Items[ElementList.ItemIndex], cGut) = 0 then
+		else if SameText(ElementList.Items[ElementList.ItemIndex], cGut) then
 			pt:= fGutColor
-		else if CompareText(ElementList.Items[ElementList.ItemIndex], cFld) = 0 then begin
+		else if SameText(ElementList.Items[ElementList.ItemIndex], cFld) then begin
 			pt:= fFoldColor;
 			cpBackground.Enabled := false;
 		end;
 
-		cpBackground.SelectionColor:= pt.x;
-		cpForeground.SelectionColor:= pt.y;
+		cpBackground.Selected:= pt.x;
+		cpForeground.Selected:= pt.y;
 
 		cbBold.Checked:= False;
 		cbItalic.Checked:= False;
@@ -956,17 +955,18 @@ begin
 		cbUnderlined.Enabled:= False;
 
 		fUpdate:= TRUE;
-	end else if ElementList.ItemIndex > -1 then
+	end else if ElementList.ItemIndex <> -1 then begin // regular SynEdit attributes
 		with Cpp.Attribute[ElementList.ItemIndex] do begin
 			fUpdate:= FALSE;
+
 			if Foreground = clNone then
-				cpForeground.SelectionColor:= clWindowText //clNone
+				cpForeground.Selected:= ffgcolor //clNone
 			else
-				cpForeground.SelectionColor:= Foreground;
+				cpForeground.Selected:= Foreground;
 			if Background = clNone then
-				cpBackground.SelectionColor:= clWindow //clNone
+				cpBackground.Selected:= fbgcolor //clNone
 			else
-				cpBackground.SelectionColor:= Background;
+				cpBackground.Selected:= Background;
 
 			cpBackground.Enabled := True;
 
@@ -980,17 +980,11 @@ begin
 
 			fUpdate:= TRUE;
 		end;
-end;
+	end;
 
-procedure TEditorOptForm.DefaultSelect(Sender: TObject);
-begin
-	TColorPickerButton(Sender).SelectionColor:= clNone;
-end;
-
-procedure TEditorOptForm.PickerHint(Sender: TObject; Cell: integer; var Hint: AnsiString);
-begin
-	if Cell = DEFAULTCELL then
-		Hint:= Lang[ID_EOPT_HINTWHITESPACE];
+	// These two don't always update for some reason
+	cpBackground.Repaint;
+	cpForeground.Repaint;
 end;
 
 procedure TEditorOptForm.StyleChange(Sender: TObject);
@@ -1002,8 +996,8 @@ begin
 	if not fUpdate then exit;
 	if ElementList.ItemIndex < 0 then exit;
 	if ElementList.ItemIndex > pred(cpp.AttrCount) then begin
-		pt.x:= cpBackground.SelectionColor;
-		pt.y:= cpForeground.SelectionColor;
+		pt.x:= cpBackground.Selected;
+		pt.y:= cpForeground.Selected;
 
 		// use local AnsiString just to ease readability
 		s:= ElementList.Items[ElementList.ItemIndex];
@@ -1011,47 +1005,47 @@ begin
 		// if either value is clnone set to Whitespace color values
 		if pt.x = clNone then pt.x:= fbgColor;
 		if pt.y = clNone then pt.y:= ffgColor;
-		if CompareText(s, cSel) = 0 then
+
+		if SameText(s, cSel) then
 			fSelColor:= pt
-		else if CompareText(s, cBP) = 0 then
+		else if SameText(s, cBP) then
 			fBPColor:= pt
-		else if CompareText(s, cABP) = 0 then
+		else if SameText(s, cABP) then
 			fABPColor:= pt
-		else if CompareText(s, cerr) = 0 then
+		else if SameText(s, cerr) then
 			fErrColor:= pt
-		else if CompareText(s, cGut) = 0 then begin
+		else if SameText(s, cGut) then begin
 			fGutColor:= pt;
 			SetGutter;
-		end else if CompareText(s, cFld) = 0 then begin
+		end else if SameText(s, cFld) then begin
 			fFoldColor:= pt;
 			SetGutter;
 		end;
 	end else begin
-     Attr:= TSynHighlighterAttributes.Create(ElementList.Items[ElementList.ItemIndex]);
-     Attr.Assign(cpp.Attribute[ElementList.ItemIndex]);
-     with Attr do
-      try
-       Foreground:= cpForeground.SelectionColor;
-       if Sender = cpBackground then
-        Background:= cpBackground.SelectionColor;
-       if CompareText(Name, 'WhiteSpace') = 0 then
-        begin
-          ffgColor:= Foreground;
-          fbgColor:= Background;
-        end;
-       Style:= [];
-       if cbBold.checked then Style:= Style +[fsBold];
-       if cbItalic.Checked then Style:= Style +[fsItalic];
-       if cbUnderlined.Checked then Style:= Style +[fsUnderline];
-       cpp.Attribute[ElementList.ItemIndex].Assign(Attr);
-      finally
-       Free;
-      end;
-   end;
+		Attr:= TSynHighlighterAttributes.Create(ElementList.Items[ElementList.ItemIndex]);
+		Attr.Assign(cpp.Attribute[ElementList.ItemIndex]);
+		with Attr do try
+			Foreground:= cpForeground.Selected;
+			Background:= cpBackground.Selected;
 
-	// invalidate special lines
+			// Update default color
+			if SameText(Name, 'WhiteSpace') then begin
+				ffgColor:= Foreground;
+				fbgColor:= Background;
+			end;
+
+			Style:= [];
+			if cbBold.checked then Style:= Style + [fsBold];
+			if cbItalic.Checked then Style:= Style + [fsItalic];
+			if cbUnderlined.Checked then Style:= Style + [fsUnderline];
+
+			cpp.Attribute[ElementList.ItemIndex].Assign(Attr);
+		finally
+			Free;
+		end;
+	end;
+
 	cppEdit.Repaint;
-	cboQuickColor.ItemIndex:=-1;
 end;
 
 procedure TEditorOptForm.cppEditStatusChange(Sender: TObject;
@@ -1135,28 +1129,6 @@ begin
   end;
 end;
 
-procedure TEditorOptForm.cpMarginColorDefaultSelect(Sender: TObject);
-begin
-	cpMarginColor.SelectionColor:= cl3DLight;
-end;
-
-procedure TEditorOptForm.cpMarginColorHint(Sender: TObject; Cell: Integer;var Hint: AnsiString);
-begin
-	if Cell = DEFAULTCELL then
-		Hint:= Lang[ID_EOPT_HINTHIGHLIGHT];
-end;
-
-procedure TEditorOptForm.cpHighColorDefaultSelect(Sender: TObject);
-begin
-	cpHighColor.SelectionColor:= $FFFFCC;
-end;
-
-procedure TEditorOptForm.cpHighColorHint(Sender: TObject; Cell: Integer;var Hint: String);
-begin
-	if Cell = DEFAULTCELL then
-		Hint:= Lang[ID_EOPT_HINTWHITESPACE];
-end;
-
 procedure TEditorOptForm.cbLineNumClick(Sender: TObject);
 begin
 	cbLeadZero.Enabled:= cbLineNum.Checked;
@@ -1170,49 +1142,46 @@ end;
 
 procedure TEditorOptForm.cboQuickColorSelect(Sender: TObject);
 var
- offset: integer;
- i: integer;
- attr: TSynHighlighterAttributes;
+	offset: integer;
+	i: integer;
+	attr: TSynHighlighterAttributes;
 begin
 	if cboQuickColor.ItemIndex > 9 then begin
 		// custom style; load from disk
 		LoadSyntax(cboQuickColor.Items[cboQuickColor.ItemIndex]);
-		Exit;
-	end;
+	end else begin
 
-	offset:= cboQuickColor.ItemIndex * 1000;
-	for i:= 0 to pred(cpp.AttrCount) do begin
-		attr:= TSynHighlighterAttributes.Create(cpp.Attribute[i].Name);
-		try
-			StrtoAttr(Attr, LoadStr(i + offset + 1));
-			cpp.Attribute[i].Assign(Attr);
-		finally
-			Attr.Free;
+		offset:= cboQuickColor.ItemIndex * 1000;
+		for i:= 0 to pred(cpp.AttrCount) do begin
+			attr:= TSynHighlighterAttributes.Create(cpp.Attribute[i].Name);
+			try
+				StrtoAttr(Attr, LoadStr(i + offset + 1));
+				cpp.Attribute[i].Assign(Attr);
+			finally
+				Attr.Free;
+			end;
 		end;
+
+		StrtoPoint(fBPColor,   LoadStr(offset+17)); // breakpoints
+		StrtoPoint(fErrColor,  LoadStr(offset+18)); // error line
+		StrtoPoint(fABPColor,  LoadStr(offset+19)); // active breakpoint
+		StrtoPoint(fgutColor,  LoadStr(offset+20)); // gutter
+		StrtoPoint(fSelColor,  LoadStr(offset+21)); // selected text
+		StrtoPoint(fFoldColor, LoadStr(offset+22)); // folding bar lines
 	end;
-
-	StrtoPoint(fBPColor,   LoadStr(offset+17)); // breakpoints
-	StrtoPoint(fErrColor,  LoadStr(offset+18)); // error line
-	StrtoPoint(fABPColor,  LoadStr(offset+19)); // active breakpoint
-	StrtoPoint(fgutColor,  LoadStr(offset+20)); // gutter
-	StrtoPoint(fSelColor,  LoadStr(offset+21)); // selected text
-	StrtoPoint(fFoldColor, LoadStr(offset+22)); // folding bar lines
-
-	cppEdit.InvalidateLine(cSelection);
-	cppEdit.InvalidateLine(cBreakLine);
-	cppEdit.InvalidateLine(cABreakLine);
-	cppEdit.InvalidateLine(cErrorLine);
 
 	SetGutter;
+	cppEdit.Repaint;
+	ElementListClick(nil);
 end;
 
 { ---------- Code insert methods ---------- }
 
 procedure TEditorOptForm.btnAddClick(Sender: TObject);
 begin
-	CodeIns.ClearAll;
+	CodeIns.ClearAll; // clear example editor
 
-	lvCodeIns.RowCount := lvCodeIns.RowCount + 1; // add blank row
+	lvCodeIns.RowCount := lvCodeIns.RowCount + 1; // add blank row, assume fixedrows remains at 1
 
 	// Fill
 	lvCodeIns.Objects[0,lvCodeIns.RowCount-1] := TStringList.Create;
@@ -1232,7 +1201,7 @@ var
 	I : integer;
 	sl : TStringList;
 begin
-	if (lvCodeIns.Row > 0) then begin
+	if (lvCodeIns.Row >= lvCodeIns.FixedRows) then begin
 		if (lvCodeIns.RowCount > 2) then begin // remove completely
 			dmMain.CodeInserts.Delete(lvCodeIns.Row);
 
@@ -1243,14 +1212,15 @@ begin
 			for I := lvCodeIns.Row to lvCodeins.RowCount - 2 do
 				lvCodeIns.Rows[i].Assign(lvCodeIns.Rows[i + 1]); // moves objects too
 
-			lvCodeIns.RowCount := lvCodeIns.RowCount - 1
+			lvCodeIns.RowCount := lvCodeIns.RowCount - 1;
 		end else begin // leave blank row
-			sl := TStringList(lvCodeIns.Objects[0,lvCodeIns.Row]); // grid (TStrings) deletes pointer when clearing row
+			sl := TStringList(lvCodeIns.Objects[0,lvCodeIns.Row]); // leave blank data
 			sl.Clear;
-			lvCodeIns.Rows[lvCodeIns.RowCount-1].Text := '';
+			lvCodeIns.Rows[lvCodeIns.RowCount-1].Text := ''; // removes data pointer
 			lvCodeIns.Objects[0,lvCodeIns.Row] := sl;
 		end;
 
+		lvCodeIns.Repaint;
 		CodeIns.ClearAll;
 		UpdateCIButtons;
 	end;
@@ -1264,14 +1234,16 @@ end;
 
 procedure TEditorOptForm.lvCodeInsSelectCell(Sender: TObject; ACol,ARow: Integer; var CanSelect: Boolean);
 begin
-	Codeins.ClearAll;
-	CodeIns.Text:= StrToCodeIns(TStringList(lvCodeIns.Objects[0,ARow]).Text); // store code in first column object
-	UpdateCIButtons;
+	CodeIns.ClearAll;
+	if (lvCodeIns.Row >= lvCodeIns.FixedRows) then begin
+		CodeIns.Text:= StrToCodeIns(TStringList(lvCodeIns.Objects[0,ARow]).Text); // store code in first column object
+		UpdateCIButtons;
+	end;
 end;
 
 procedure TEditorOptForm.CodeInsStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
-	if (lvCodeIns.Row > 0) then begin
+	if (lvCodeIns.Row >= lvCodeIns.FixedRows) then begin
 		if (scModified in Changes) then begin
 			TStringList(lvCodeIns.Objects[0,lvCodeIns.Row]).Text := CodeInstoStr(CodeIns.Text); // store text in hidden field
 			CodeIns.Modified:= false;
@@ -1284,12 +1256,13 @@ var
 	ins: PCodeIns;
 	I : integer;
 	sl : TStringList;
-	select : boolean;
+	canselect : boolean;
 begin
-	lvCodeIns.RowCount := lvCodeIns.FixedRows;
+	lvCodeIns.FixedRows := 0;
+	lvCodeIns.RowCount := 1; // re-add fixed row later on
 
 	for I := 0 to dmMain.CodeInserts.Count - 1 do begin
-		lvCodeIns.RowCount := lvCodeIns.RowCount + 1; // add blank row
+		lvCodeIns.RowCount := lvCodeIns.RowCount + 1; // add new blank row
 
 		// Don't forget to delete!
 		sl := TStringList.Create;
@@ -1303,10 +1276,20 @@ begin
 		lvCodeIns.Cells[2,lvCodeIns.RowCount-1] := ins^.Desc;
 	end;
 
+	// Add empty, but configured row
+	if lvCodeIns.RowCount = 1 then begin
+		lvCodeIns.RowCount := lvCodeIns.RowCount + 1;
+
+		// Fill
+		lvCodeIns.Objects[0,lvCodeIns.RowCount-1] := TStringList.Create;
+		lvCodeIns.Cells[0,lvCodeIns.RowCount-1] := '';
+		lvCodeIns.Cells[1,lvCodeIns.RowCount-1] := '';
+		lvCodeIns.Cells[2,lvCodeIns.RowCount-1] := '';
+	end;
+
 	lvCodeIns.FixedRows := 1; // gets reset to 0 when removing all editable rows
 
-	// Select first
-	lvCodeInsSelectCell(nil,0,1,select);
+	lvCodeInsSelectCell(nil,0,1,canselect);
 end;
 
 procedure TEditorOptForm.SaveCodeIns;
@@ -1315,18 +1298,20 @@ var
 	Item: PCodeIns;
 begin
 	dmMain.CodeInserts.Clear;
-	for I := 1 to lvCodeIns.RowCount - 1 do begin // ignore fixed row
-		new(Item);
+	for I := lvCodeIns.FixedRows to lvCodeIns.RowCount - 1 do begin
+		if lvCodeIns.Cells[0,I] <> '' then begin
+			new(Item);
 
-		// Get snippet from attached object
-		Item.Caption := lvCodeIns.Cells[0,I];
-		Item.Sep := StrToIntDef(lvCodeIns.Cells[1,I],0);
-		Item.Desc := lvCodeIns.Cells[2,I];
-		Item.Line := TStringList(lvCodeIns.Objects[0,I]).Text;
+			// Get snippet from attached object
+			Item.Caption := lvCodeIns.Cells[0,I];
+			Item.Sep := StrToIntDef(lvCodeIns.Cells[1,I],0);
+			Item.Desc := lvCodeIns.Cells[2,I];
+			Item.Line := TStringList(lvCodeIns.Objects[0,I]).Text;
 
-		dmMain.CodeInserts.AddItem(Item);
+			dmMain.CodeInserts.AddItem(Item);
+		end;
 	end;
-	dmMain.Codeinserts.SaveCode;
+	dmMain.CodeInserts.SaveCode;
 end;
 
 procedure TEditorOptForm.ClearCodeIns;
@@ -1499,6 +1484,7 @@ begin
 	with TOpenDialog.Create(Self) do try
 
 		Filter := BuildFilter([FLT_HEADS]);
+		Options := Options + [ofAllowMultiSelect];
 
 		// Start in the include folder, if its set
 		sl := TStringList.Create;
@@ -1632,17 +1618,15 @@ begin
 	Application.ProcessMessages;
 end;
 
-procedure TEditorOptForm.OnGutterClick(Sender: TObject;
-  Button: TMouseButton; X, Y, Line: Integer; Mark: TSynEditMark);
+procedure TEditorOptForm.OnGutterClick(Sender: TObject;Button: TMouseButton; X, Y, Line: Integer; Mark: TSynEditMark);
 var
- idx: integer;
+	idx: integer;
 begin
-  idx:= ElementList.Items.IndexOf(cGut);
-  if idx <> -1 then
-   begin
-     ElementList.ItemIndex:= idx;
-     ElementListClick(Self);
-   end;
+	idx:= ElementList.Items.IndexOf(cGut);
+	if idx <> -1 then begin
+		ElementList.ItemIndex:= idx;
+		ElementListClick(Self);
+	end;
 end;
 
 procedure TEditorOptForm.cbHighCurrLineClick(Sender: TObject);

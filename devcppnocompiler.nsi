@@ -34,6 +34,7 @@ XPStyle on
 
 InstType "Full";1
 InstType "Minimal";2
+InstType "Safe";3
 
 ####################################################################
 # Pages
@@ -44,6 +45,7 @@ InstType "Minimal";2
 !define MUI_LANGDLL_ALLLANGUAGES
 !define MUI_FINISHPAGE_RUN "$INSTDIR\devcpp.exe"
 !define MUI_FINISHPAGE_NOREBOOTSUPPORT
+!define MUI_COMPONENTSPAGE_SMALLDESC
 
 !insertmacro MUI_PAGE_LICENSE "copying.txt"
 !insertmacro MUI_PAGE_COMPONENTS
@@ -87,7 +89,7 @@ InstType "Minimal";2
 # Files, by option section
 
 Section "Dev-C++ program files (required)" SectionMain
-  SectionIn 1 2 RO
+  SectionIn 1 2 3 RO
   SetOutPath $INSTDIR
 
   ; Allways create an uninstaller
@@ -113,36 +115,14 @@ Section "Dev-C++ program files (required)" SectionMain
   File /r "Help\*"
 SectionEnd
 
-Section "Example files" SectionExamples
-  SectionIn 1
-  SetOutPath $INSTDIR\Examples\FileEditor
-  File "Examples\FileEditor\*"
-  SetOutPath $INSTDIR\Examples\Hello
-  File "Examples\Hello\*"
-  SetOutPath $INSTDIR\Examples\Jackpot
-  File "Examples\Jackpot\*"
-  SetOutPath $INSTDIR\Examples\MDIApp
-  File "Examples\MDIApp\*"
-  SetOutPath $INSTDIR\Examples\OpenGL
-  File "Examples\OpenGL\*"
-  SetOutPath $INSTDIR\Examples\Simpwin
-  File "Examples\Simpwin\*"
-  SetOutPath $INSTDIR\Examples\WinAnim
-  File "Examples\WinAnim\*"
-  SetOutPath $INSTDIR\Examples\WinMenu
-  File "Examples\WinMenu\*"
-  SetOutPath $INSTDIR\Examples\WinTest
-  File "Examples\WinTest\*"
-SectionEnd
-
 Section "Icon files" SectionIcons
-  SectionIn 1
+  SectionIn 1 3
   SetOutPath $INSTDIR\Icons
   File /nonfatal /r "Icons\*.*"
 SectionEnd
 
 Section "Language files" SectionLangs
-  SectionIn 1
+  SectionIn 1 3
   SetOutPath $INSTDIR\Lang
   File /nonfatal /r "Lang\*"
 SectionEnd
@@ -152,7 +132,7 @@ SectionEnd
 SubSection "Associate C and C++ files to Dev-C++" SectionAssocs
 
 Section "Associate .dev files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".dev"
   Call BackupAssoc
@@ -166,7 +146,7 @@ Section "Associate .dev files to Dev-C++"
 SectionEnd
 
 Section "Associate .c files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".c"
   Call BackupAssoc
@@ -180,7 +160,7 @@ Section "Associate .c files to Dev-C++"
 SectionEnd
 
 Section "Associate .cpp files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".cpp"
   Call BackupAssoc
@@ -194,7 +174,7 @@ Section "Associate .cpp files to Dev-C++"
 SectionEnd
 
 Section "Associate .h files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".h"
   Call BackupAssoc
@@ -208,7 +188,7 @@ Section "Associate .h files to Dev-C++"
 SectionEnd
 
 Section "Associate .hpp files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".hpp"
   Call BackupAssoc
@@ -222,7 +202,7 @@ Section "Associate .hpp files to Dev-C++"
 SectionEnd
 
 Section "Associate .rc files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".rc"
   Call BackupAssoc
@@ -236,7 +216,7 @@ Section "Associate .rc files to Dev-C++"
 SectionEnd
 
 Section "Associate .devpak files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".devpak"
   Call BackupAssoc
@@ -251,7 +231,7 @@ Section "Associate .devpak files to Dev-C++"
 SectionEnd
 
 Section "Associate .devpackage files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".devpackage"
   Call BackupAssoc
@@ -266,7 +246,7 @@ Section "Associate .devpackage files to Dev-C++"
 SectionEnd
 
 Section "Associate .template files to Dev-C++"
-  SectionIn 1
+  SectionIn 1 3
 
   StrCpy $0 ".template"
   Call BackupAssoc
@@ -286,7 +266,7 @@ SubSectionEnd
 SubSection "Shortcuts" SectionShortcuts
 
 Section "Create Start Menu shortcuts" SectionMenuLaunch
-  SectionIn 1
+  SectionIn 1 3
 
   ;try to read from registry if last installation installed for All Users/Current User
   ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" \ 
@@ -311,13 +291,13 @@ exists:
 SectionEnd
 
 Section "Create Quick Launch shortcut" SectionQuickLaunch
-  SectionIn 1
+  SectionIn 1 3
   SetShellVarContext current
   CreateShortCut "$QUICKLAUNCH\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
 SectionEnd
 
 Section "Create Desktop shortcut" SectionDesktopLaunch
-  SectionIn 1
+  SectionIn 1 3
   SetShellVarContext current
   CreateShortCut "$DESKTOP\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
 SectionEnd
@@ -325,6 +305,7 @@ SectionEnd
 SubSectionEnd
 
 Section "Remove old configuration files" SectionConfig
+  SectionIn 3
   RMDir /r "$APPDATA\Dev-Cpp"
   
   Delete "$INSTDIR\devcpp.ini"
@@ -342,7 +323,6 @@ SectionEnd
 # Mouseovers
 
 LangString DESC_SectionMain        ${LANG_ENGLISH} "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
-LangString DESC_SectionExamples    ${LANG_ENGLISH} "Example projects for simple console and GUI applications"
 LangString DESC_SectionIcons       ${LANG_ENGLISH} "Various icons that you can use in your programs"
 LangString DESC_SectionLangs       ${LANG_ENGLISH} "The Dev-C++ interface translated to different languages (other than English which is built-in)"
 LangString DESC_SectionAssocs      ${LANG_ENGLISH} "Use Dev-C++ as the default application for opening these types of files"
@@ -351,7 +331,6 @@ LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configur
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        $(DESC_SectionMain)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionExamples}    $(DESC_SectionExamples)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       $(DESC_SectionIcons)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       $(DESC_SectionLangs)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      $(DESC_SectionAssocs)
@@ -420,46 +399,6 @@ Function un.RefreshShellIcons
   ; By jerome tremblay - april 2003
   System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v \
   (${SHCNE_ASSOCCHANGED}, ${SHCNF_IDLIST}, 0, 0)'
-FunctionEnd
-
-;http://nsis.sourceforge.net/archive/nsisweb.php?page=628&instances=0,11,122
-Function StrCSpnReverse
- Exch $R0 ; string to check
- Exch
- Exch $R1 ; string of chars
- Push $R2 ; current char
- Push $R3 ; current char
- Push $R4 ; char loop
- Push $R5 ; char loop
-
-  StrCpy $R4 -1
-
-  NextCharCheck:
-  StrCpy $R2 $R0 1 $R4
-  IntOp $R4 $R4 - 1
-   StrCmp $R2 "" StrOK
-
-   StrCpy $R5 -1
-
-   NextChar:
-   StrCpy $R3 $R1 1 $R5
-   IntOp $R5 $R5 - 1
-    StrCmp $R3 "" +2
-    StrCmp $R3 $R2 NextCharCheck NextChar
-     StrCpy $R0 $R2
-     Goto Done
-
- StrOK:
- StrCpy $R0 ""
-
- Done:
-
- Pop $R5
- Pop $R4
- Pop $R3
- Pop $R2
- Pop $R1
- Exch $R0
 FunctionEnd
 
 Function un.DeleteDirIfEmpty

@@ -1,6 +1,0 @@
-NEWLOOKCLASSIC BITMAP ".\images\examples\NewLookClassic.bmp"
-NEWLOOKCLASSICPLUS BITMAP ".\images\examples\NewLookClassicPlus.bmp"
-GNOMECLASSIC BITMAP ".\images\examples\GnomeClassic.bmp"
-GNOMECLASSICPLUS BITMAP ".\images\examples\GnomeClassicPlus.bmp"
-BLUECLASSIC BITMAP ".\images\examples\BlueClassic.bmp"
-BLUECLASSICPLUS BITMAP ".\images\examples\BlueClassicPlus.bmp"

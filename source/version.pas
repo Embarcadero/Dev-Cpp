@@ -97,6 +97,7 @@ const
 	// File dialog filters
 	FLT_ALLFILES          = 'All files (*.*)|*.*|';
 	FLT_TEXTS             = 'Text files (*.txt)|*.txt';
+	FLT_LIBRARIES         = 'Libraries (*.lib;*.a)|*.lib;*.a';
 	FLT_PROJECTS          = 'Dev-C++ project (*.dev)|*.dev';
 	FLT_HEADS             = 'Header files (*.h;*.hpp;*.rh;*.hh)|*.h;*.hpp;*.rh;*.hh';
 	FLT_CS                = 'C source files (*.c)|*.c';

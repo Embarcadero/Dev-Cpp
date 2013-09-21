@@ -172,7 +172,7 @@ Set the default options for FastMM here.
    allocated from the highest available address. If the process has a >2GB
    address space and contains bad pointer arithmetic code, this option should
    help to catch those errors sooner.}
-  {.$define AlwaysAllocateTopDown}
+  {$define AlwaysAllocateTopDown}
 
   {Disables the logging of memory dumps together with the other detail for
    memory errors.}
@@ -209,7 +209,7 @@ Set the default options for FastMM here.
   {Set this option to require the presence of the Delphi IDE to report memory
    leaks. This option has no effect if the option "EnableMemoryLeakReporting"
    is not also set.}
-  {.$define RequireIDEPresenceForLeakReporting}
+  {$define RequireIDEPresenceForLeakReporting}
 
   {Set this option to require the program to be run inside the IDE debugger to
    report memory leaks. This option has no effect if the option
@@ -424,4 +424,3 @@ Set the default options for FastMM here.
     {$endif}
   {$endif}
 {$endif}
-

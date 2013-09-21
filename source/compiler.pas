@@ -118,7 +118,7 @@ type
 		procedure ThreadCheckAbort(var AbortThread: boolean);
 		procedure OnCompilationTerminated(Sender: TObject);
 		procedure OnLineOutput(Sender: TObject; const Line: AnsiString);
-		procedure ParseSingleLine(const line : AnsiString);
+		procedure ProcessOutput(const line : AnsiString);
 		function NewMakeFile(var F : TextFile) : boolean;
 		procedure WriteMakeClean(var F : TextFile);
 		procedure WriteMakeObjFilesRules(var F : TextFile);
@@ -629,7 +629,7 @@ begin
 	end else if (GetFileTyp(fSourceFile) = utResSrc) then begin
 		s := devCompiler.windresName;
 		cmdline := s + ' --input-format=rc -i ' + fSourceFile + ' -o ' + ChangeFileExt(fSourceFile, OBJ_EXT);
-		DoLogEntry(format(Lang[ID_EXECUTING], [' ' + s +cDots]));
+		DoLogEntry(format(Lang[ID_EXECUTING], [s + cDots]));
 		DoLogEntry(cmdline);
 	end else begin
 		if (GetFileTyp(fSourceFile) = utcppSrc) then begin
@@ -638,7 +638,7 @@ begin
 				cmdline:= format(cCmdLine,[s, fSourceFile, 'nul', fCppCompileParams,fCppIncludesParams, fLibrariesParams])
 			else
 				cmdline:= format(cCmdLine, [s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT),fCppCompileParams, fCppIncludesParams, fLibrariesParams]);
-			DoLogEntry(format(Lang[ID_EXECUTING], [' ' +s +cDots]));
+			DoLogEntry(format(Lang[ID_EXECUTING], [s + cDots]));
 			DoLogEntry(cmdline);
 		end else begin
 			s := devCompiler.gccName;
@@ -646,7 +646,7 @@ begin
 				cmdline:= format(cCmdLine,[s, fSourceFile, 'nul', fCompileParams, fIncludesParams, fLibrariesParams])
 			else
 				cmdline:= format(cCmdLine,[s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT),fCompileParams, fIncludesParams, fLibrariesParams]);
-			DoLogEntry(format(Lang[ID_EXECUTING], [' ' + s + cDots]));
+			DoLogEntry(format(Lang[ID_EXECUTING], [s + cDots]));
 			DoLogEntry(cmdline);
 		end;
 		LaunchThread(cmdline, ExtractFilePath(fSourceFile));
@@ -670,8 +670,12 @@ begin
 		if fProject.Options.typ = dptStat then
 			MessageDlg(Lang[ID_ERR_NOTEXECUTABLE], mtError, [mbOK], 0)
 		else if not FileExists(fProject.Executable) then begin
-			if MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes,mbNo], 0) = mrYes then
-				CompileAndRun;
+			if devCompiler.Sets.Count > 0 then begin// suggest a compile
+				if MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes,mbNo], 0) = mrYes then begin
+					MainForm.actCompRunExecute(nil); // move this to mainform?
+				end;
+			end else
+				MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
 		end else if fProject.Options.typ = dptDyn then begin
 			if fProject.Options.HostApplication = '' then
 				MessageDlg(Lang[ID_ERR_HOSTMISSING], mtWarning, [mbOK], 0)
@@ -700,8 +704,12 @@ begin
 		end;
 	end else begin
 		if not FileExists(ChangeFileExt(fSourceFile, EXE_EXT)) then begin
-			if MessageDlg(Lang[ID_ERR_SRCNOTCOMPILEDSUGGEST], mtConfirmation, [mbOK], 0) = mrYes then
-				CompileAndRun;
+			if devCompiler.Sets.Count > 0 then begin// suggest a compile
+				if MessageDlg(Lang[ID_ERR_SRCNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes,mbNo], 0) = mrYes then begin
+					MainForm.actCompRunExecute(nil);
+				end;
+			end else
+				MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
 		end else begin
 
 			if devData.ConsolePause and ProgramHasConsole(ChangeFileExt(fSourceFile, EXE_EXT)) then begin
@@ -867,14 +875,14 @@ begin
 	List := TStringList.Create;
 	List.Text := Line;
 	for I := 0 to List.Count - 1 do begin
-		ParseSingleLine(List.Strings[I]);
+		ProcessOutput(List.Strings[I]);
 		if Assigned(CompileProgressForm) then
 			ProcessProgressForm(List.Strings[I]);
 	end;
 	List.Free;
 end;
 
-procedure TCompiler.ParseSingleLine(const line : AnsiString);
+procedure TCompiler.ProcessOutput(const line : AnsiString);
 var
 	OLine,OCol,OFile,OMsg,S : AnsiString;
 	delim : integer;
@@ -951,15 +959,20 @@ var
 	end;
 
 begin
+
+	// Ignore code snippets that GCC 4.8 produces
+	if (Length(line) > 0) and (Line[1] = ' ') then // they always start with a space
+		Exit;
+
 	OLine := '';
 	OCol := '';
 	OFile := '';
 	OMsg := Trim(Line);
 
 	// Ignore generic 'we are starting program x' messages
-	if (Pos(devCompiler.gccName,Line) = 1) or
-       (Pos(devCompiler.gppName,Line) = 1) or
-       (Pos(devCompiler.makeName,Line) = 1) or
+	if (Pos(devCompiler.gccName + ' ',Line) = 1) or
+       (Pos(devCompiler.gppName + ' ',Line) = 1) or
+       (Pos(devCompiler.makeName,Line) = 1) or // ignore all make errors for now
        (Pos(devCompiler.windresName + ' ',Line) = 1) or
        (Pos('rm ',Line) = 1) then Exit;
 

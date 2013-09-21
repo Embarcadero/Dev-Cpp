@@ -1,12 +1,22 @@
-Version 5.4.1 - *
+Version 5.4.1 - 17 Maart 2013
 
+- Fixed a startup crash when not using function tips.
 - When accidentally clearing the code completion list, one is now given a second wind before the list is hidden.
 - Fixed an out of bounds error in the code completion code.
 - Fixed an error that caused crashes in Compiler Options >> Settings under Windows 2000 (and older).
 - Typedef structs now get formatted as "struct Foo" instead of "structFoo" in mouseover hints.
 - The debugger now preserves the current working directory when running programs.
-- Redesigned the compiler output formatter code, which now uses half the amount of code.
+- Redesigned the compiler output formatter code, which now uses half the amount of code and plays nicely with GCC 4.8.
 - The mouseover tooltip now shows scope information too.
+- When trying to run uncompiled projects, Dev-C++ will now suggest to compile.
+- Resource errors now use the same formatting as generic errors.
+- Compiler, resource and find output line numbers will be synchronized when editing files.
+- Moved the MRU list to File >> *here* from File >> Reopen to reduce clicks needed by one.
+- Fixed OriginalPath spamming in devcpp.ini.
+- Dev-C++ will now prefer selecting 32bit compiler profiles by default on x86 OS's.
+- Merged Example projects into the new project templates.
+- Compiler settings are now validated again when loaded.
+- Upgraded to FastMM 4.991 for what it's worth.
 
 Version 5.4.0 - 14 Februari 2013
 

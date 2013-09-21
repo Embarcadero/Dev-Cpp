@@ -130,6 +130,3 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
-[Excluded Packages]
-c:\program files (x86)\delphi7se\Projects\Bpl\DevCpp.bpl=Dev-C++ Components
-c:\program files (x86)\delphi7se\Projects\Bpl\ClassBrowsing.bpl=ClassBrowsing components

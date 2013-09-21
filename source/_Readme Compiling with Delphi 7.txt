@@ -4,11 +4,7 @@
 .\VCL\SynEditPackages\SynEdit_D7.dpk
 .\VCL\ClassBrowsing\ClassBrowsing.dpk
 
-2) Compile resources: run .\CompileResources.bat to create binary .res files or run manually from cmd:
-
-brcc32 DefaultFiles.rc
-brcc32 LangFrm.rc
-brcc32 icons.rc
+2) Compile resources: run .\CompileResources.bat to create binary .res files.
 
 3) Opening and using the main project file 'devcpp.dpr' should not bring up any 'not found' errors now.
 

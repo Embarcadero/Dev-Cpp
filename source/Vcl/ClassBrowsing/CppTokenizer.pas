@@ -103,7 +103,14 @@ type
     property Tokens: TList read fTokenList;
   end;
 
+procedure Register;
+
 implementation
+
+procedure Register;
+begin
+  RegisterComponents('Dev-C++', [TCppTokenizer]);
+end;
 
 constructor TCppTokenizer.Create(AOwner: TComponent);
 begin

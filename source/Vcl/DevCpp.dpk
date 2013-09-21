@@ -1,7 +1,7 @@
 package DevCpp;
 
 {$R *.res}
-{$R 'devReg\devReg.dcr'}
+{$R 'devFileMonitor\devFileMonitor.dcr'}
 {$R 'devShortcuts\devShortcuts.dcr'}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -35,12 +35,10 @@ requires
   rtl;
 
 contains
-  ColorPickerButton in 'ColorPickerButton\ColorPickerButton.pas',
   CompOptionsList in 'CompOptionsList\CompOptionsList.pas',
   devFileMonitor in 'devFileMonitor\devFileMonitor.pas',
   devMonitorThread in 'devFileMonitor\devMonitorThread.pas',
   devMonitorTypes in 'devFileMonitor\devMonitorTypes.pas',
-  devReg in 'devReg\devReg.pas',
   devShortcuts in 'devShortcuts\devShortcuts.pas',
   devShortcutsEditorForm in 'devShortcuts\devShortcutsEditorForm.pas' {frmdevShortcutsEditor};
 end.

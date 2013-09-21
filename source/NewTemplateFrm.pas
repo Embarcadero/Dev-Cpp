@@ -41,10 +41,8 @@ type
     lblName: TLabel;
     lblDescr: TLabel;
     lblCateg: TLabel;
-    lblProjName: TLabel;
     txtDescr: TEdit;
     cmbCateg: TComboBox;
-    txtProjName: TEdit;
     lblFiles: TLabel;
     lstFiles: TCheckListBox;
     pgExtras: TTabSheet;
@@ -55,17 +53,17 @@ type
     btnCreate: TButton;
     btnCancel: TButton;
     dlgPic: TOpenPictureDialog;
-    lblIcons: TGroupBox;
-    lstIcons: TListBox;
-    btnLib: TBitBtn;
-    btnBrowse: TBitBtn;
-    btnRemove: TBitBtn;
     cmbName: TComboBox;
     memCppCompiler: TMemo;
     lblCppCompiler: TLabel;
     cbInclude: TCheckBox;
     cbLibrary: TCheckBox;
     cbRessource: TCheckBox;
+    lblIcons: TGroupBox;
+    lstIcons: TListBox;
+    btnLib: TBitBtn;
+    btnBrowse: TBitBtn;
+    btnRemove: TBitBtn;
     procedure FormShow(Sender: TObject);
     procedure btnLibClick(Sender: TObject);
     procedure btnRemoveClick(Sender: TObject);
@@ -92,13 +90,10 @@ type
     TempProject: TProject;
   end;
 
-//var
-//  NewTemplateForm: TNewTemplateForm;
-
 implementation
 
 uses
-  utils, IconFrm, devcfg, version, Templates, MultiLangSupport;
+  utils, IconFrm, devcfg, version, Templates, main, MultiLangSupport;
 
 {$R *.dfm}
 
@@ -106,9 +101,8 @@ procedure TNewTemplateForm.FormShow(Sender: TObject);
 begin
   LoadText;
 
-  cmbName.Text := 'Custom project 1';
+  cmbName.Text := MainForm.fProject.Name;
   txtDescr.Text := 'This is a custom project.';
-  txtProjName.Text := 'Custom project';
 
   ReadCategories;
   FillUnits;
@@ -344,13 +338,9 @@ begin
     if cbRessource.Checked then
       WriteString('Project', 'ResourceIncludes', TempProject.Options.ResourceIncludes.DelimitedText);
 
-    if txtProjName.Text = '' then
-      WriteString('Project', 'Name', cmbName.Text)
-    else
-      WriteString('Project', 'Name', txtProjName.Text);
     if IconFiles[1] <> '' then begin
       CopyFile(PAnsiChar(IconFiles[1]), PAnsiChar(devDirs.Templates + cmbName.Text + '.project.ico'), False);
-      WriteString('Project', 'ProjectIcon', cmbName.Text + '.project.ico');
+      WriteString('Project', 'Icon', cmbName.Text + '.project.ico');
     end;
     MessageDlg('The new template has been created!'#10#10 +
       'You can find it as "' + cmbName.Text + '" under the "' + cmbCateg.Text + '" tab in the "New project" dialog.',
@@ -362,31 +352,32 @@ end;
 
 procedure TNewTemplateForm.LoadText;
 begin
-  with Lang do begin
-    lblName.Caption := Strings[ID_NEWTPL_NAME];
-    lblDescr.Caption := Strings[ID_NEWTPL_DESCRIPTION];
-    lblCateg.Caption := Strings[ID_NEWTPL_CATEGORY];
-    lblProjName.Caption := Strings[ID_NEWTPL_PROJECTNAME];
-    lblFiles.Caption := Strings[ID_NEWTPL_FILES];
-    lblCompiler.Caption := Strings[ID_POPT_COMP];
-    lblCppCompiler.Caption := Strings[ID_COPT_GRP_CPP];
-    lblLinker.Caption := Strings[ID_COPT_LINKERTAB];
-    lblIcons.Caption := Strings[ID_NEWTPL_ICONS];
-    pgTemplate.Caption := Strings[ID_NEWTPL_PAGETEMPLATE];
-    pgFiles.Caption := Strings[ID_NEWTPL_PAGEFILES];
-    pgExtras.Caption := Strings[ID_NEWTPL_PAGEEXTRAS];
-    sIcon := Strings[ID_NEWTPL_TEMPLATEICON];
-    sProjIcon := Strings[ID_NEWTPL_PROJECTICON];
-    btnCreate.Caption := Strings[ID_NEWTPL_CREATE];
-    btnCancel.Caption := Strings[ID_BTN_CANCEL];
-    btnLib.Caption := Strings[ID_POPT_ICOLIB];
-    btnBrowse.Caption := Strings[ID_BTN_BROWSE];
-    btnRemove.Caption := Strings[ID_BTN_REMOVEICON];
-    Caption := Strings[ID_NEWTPL_CAPTION];
-    cbInclude.Caption := Strings[ID_NEWTPL_INCDIR];
-    cbLibrary.Caption := Strings[ID_NEWTPL_LIBDIR];
-    cbRessource.Caption := Strings[ID_NEWTPL_RESDIR];
-  end;
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
+	lblName.Caption := Lang[ID_NEWTPL_NAME];
+	lblDescr.Caption := Lang[ID_NEWTPL_DESCRIPTION];
+	lblCateg.Caption := Lang[ID_NEWTPL_CATEGORY];
+	lblFiles.Caption := Lang[ID_NEWTPL_FILES];
+	lblCompiler.Caption := Lang[ID_POPT_CCOMP];
+	lblCppCompiler.Caption := Lang[ID_COPT_GRP_CPP];
+	lblLinker.Caption := Lang[ID_COPT_LINKERTAB];
+	lblIcons.Caption := Lang[ID_NEWTPL_ICONS];
+	pgTemplate.Caption := Lang[ID_NEWTPL_PAGETEMPLATE];
+	pgFiles.Caption := Lang[ID_NEWTPL_PAGEFILES];
+	pgExtras.Caption := Lang[ID_NEWTPL_PAGEEXTRAS];
+	sIcon := Lang[ID_NEWTPL_TEMPLATEICON];
+	sProjIcon := Lang[ID_NEWTPL_PROJECTICON];
+	btnCreate.Caption := Lang[ID_NEWTPL_CREATE];
+	btnCancel.Caption := Lang[ID_BTN_CANCEL];
+	btnLib.Caption := Lang[ID_POPT_ICOLIB];
+	btnBrowse.Caption := Lang[ID_BTN_BROWSE];
+	btnRemove.Caption := Lang[ID_BTN_REMOVEICON];
+	Caption := Lang[ID_NEWTPL_CAPTION];
+	cbInclude.Caption := Lang[ID_NEWTPL_INCDIR];
+	cbLibrary.Caption := Lang[ID_NEWTPL_LIBDIR];
+	cbRessource.Caption := Lang[ID_NEWTPL_RESDIR];
 end;
 
 end.

@@ -70,7 +70,6 @@ type
    function GetDirty: boolean;
    procedure SetDirty(value: boolean);
    function Save : boolean;
-   function SaveAs: boolean;
   public
    constructor Create(aOwner: TProject);
    destructor Destroy; override;
@@ -140,8 +139,8 @@ type
     function OpenUnit(index : integer): TEditor;
     procedure CloseUnit(index: integer);
     procedure SaveUnitAs(i : integer; sFileName : AnsiString);
-    procedure Save;
     procedure SaveProjectFile;
+    procedure Save;
     procedure LoadLayout;
     procedure LoadUnitLayout(e: TEditor; Index: integer);
     procedure SaveLayout;
@@ -201,71 +200,23 @@ var
 	workeditor : TSynEdit;
 begin
 	try
-		if (fFileName = '') or fNew then
-			result:= SaveAs // only sets fFilename and new, doesn't actually write to disk
-		else begin
-			// if no editor created open one save file and close (create blank file)
-			if not assigned(fEditor) and not FileExists(fFileName) then begin
-				workeditor := TSynEdit.Create(nil);
-				workeditor.UnCollapsedLines.SavetoFile(fFileName); // create blank file
-				workeditor.Free;
-			end else if assigned(fEditor) and fEditor.Text.Modified then begin
-				fEditor.Text.UnCollapsedLines.SaveToFile(fEditor.FileName);
-				if FileExists(fEditor.FileName) then
-					FileSetDate(fEditor.FileName, DateTimeToFileDate(Now)); // fix the "Clock skew detected" warning ;)
-				fEditor.New := False;
-				fEditor.Text.Modified:= False;
-			end;
-
-			if assigned(fNode) then
-				fNode.Text:= ExtractfileName(fFileName);
-
-			result:= true; // yay!
+		result := true;
+		if not Assigned(fEditor) and not FileExists(fFileName) then begin  // create dummy editor
+			workeditor := TSynEdit.Create(nil); // does this even happen???
+			workeditor.UnCollapsedLines.SaveToFile(fFileName); // create blank file
+			workeditor.Free;
+		end else if assigned(fEditor) and fEditor.Text.Modified then begin
+			result := fEditor.Save;
+			if FileExists(fEditor.FileName) then
+				FileSetDate(fEditor.FileName, DateTimeToFileDate(Now));
 		end;
 	except
 		result := false;
 	end;
-end;
 
-function TProjUnit.SaveAs: boolean;
-begin
-	with TSaveDialog.Create(Application) do try
-
-		Title := Lang[ID_NV_SAVEFILE];
-		Filter := BuildFilter([FLT_CS,FLT_CPPS,FLT_HEADS,FLT_RES]);
-		Options := Options + [ofOverwritePrompt];
-
-		// select appropriate filter
-		if GetFileTyp(fFileName) in [utcHead,utcppHead] then begin
-			FilterIndex := 4; // .h
-			DefaultExt := 'h';
-		end else begin
-			if fParent.Options.useGPP then begin
-				FilterIndex := 3; // .cpp
-				DefaultExt := 'cpp';
-			end else begin
-				FilterIndex := 2; // .c
-				DefaultExt := 'c';
-			end;
-		end;
-
-		FileName := fFileName;
-		if (fFileName <> '') then
-			InitialDir := ExtractFilePath(fFileName)
-		else
-			InitialDir := fParent.Directory;
-
-		if Execute then begin
-			fNew := false;
-			fFileName := FileName;
-			if assigned(fEditor) then
-				fEditor.FileName:= fFileName;
-			result := Save;
-		end else
-			Result := false;
-	finally
-		Free;
-	end;
+	// Update node text
+	if assigned(fNode) then
+		fNode.Text:= ExtractfileName(fFileName);
 end;
 
 function TProjUnit.GetDirty: boolean;
@@ -766,7 +717,7 @@ end;
 
 procedure TProject.Update;
 begin
-	with finifile do begin
+	with finiFile do begin
 
 		fName := ReadString('Project','name', '');
 		fOptions.Icon := ReadString('Project','icon', '');
@@ -855,7 +806,7 @@ end;
 
 procedure TProject.UpdateFile;
 begin
-	with finifile do begin
+	with finiFile do begin
 		WriteString('Project','FileName', ExtractRelativePath(Directory, fFileName));
 		WriteString('Project','Name', fName);
 		WriteInteger('Project','Type', fOptions.typ);
@@ -923,6 +874,9 @@ begin
 			DeleteKey('Project','Use_GPP');
 		end;
 	end;
+
+	if fModified then
+		finiFile.UpdateFile; // save to disk
 end;
 
 function TProject.UpdateUnits: Boolean;
@@ -1228,20 +1182,18 @@ end;
 
 procedure TProject.SaveProjectFile;
 begin
-	UpdateFile;  // so data is current before going to disk
-	if fModified then
-		finiFile.UpdateFile;
+	UpdateFile; // update other data, and save to disk
 end;
 
 procedure TProject.Save;
 begin
-	if not UpdateUnits then
+	if not UpdateUnits then // update [Unitx] list
 		Exit;
-	UpdateFile;  // so data is current before going to disk
-	SaveLayout;  // save current opened files, and which is "active".
-	if fModified then
-		finiFile.UpdateFile;
-	SetModified(FALSE);
+	UpdateFile; // update other data, and save to disk
+	SaveLayout; // save current opened files, and which is "active".
+
+	// We have saved everything, so mark unmodified
+	SetModified(false);
 end;
 
 function TProject.Remove(index : integer; DoClose : boolean) : boolean;
@@ -1534,7 +1486,7 @@ begin
 		I.AddStrings(fOptions.Includes);
 		R.AddStrings(fOptions.ResourceIncludes);
 
-		btnRemoveIcon.Enabled := Length(Options.Icon) > 0;
+		btnRemoveIcon.Enabled := Length(fOptions.Icon) > 0;
 
 		if ShowModal = mrOk then begin
 
@@ -1608,7 +1560,7 @@ begin
 			exit;
 		end;
 
-		fName:= aTemplate.ProjectName;
+		fName:= aTemplate.Name;
 		if Assigned(finiFile) then
 			finiFile.Rename(aFileName,false)
 		else
@@ -1616,15 +1568,16 @@ begin
 		Options:= aTemplate.OptionsRec;
 		AssignOptionsRec(Options, fOptions);
 
-   if Length(aTemplate.ProjectIcon) > 0 then
-   begin
-       OriginalIcon := ExtractFilePath(aTemplate.FileName) +
-         aTemplate.ProjectIcon;
-       DestIcon := ExpandFileTo(ExtractFileName(ChangeFileExt(FileName,
-         '.ico')), Directory);
-       CopyFile(PAnsiChar(OriginalIcon), PAnsiChar(DestIcon), False);
-       fOptions.Icon := ExtractFileName(DestIcon);
-   end;
+		// Copy icon to project directory
+		if Length(fOptions.Icon) > 0 then begin
+			OriginalIcon := ValidateFile(fOptions.Icon,'',true);
+			if OriginalIcon <> '' then begin // file found!
+				DestIcon := ExpandFileTo(ExtractFileName(ChangeFileExt(FileName,'.ico')), Directory);
+				CopyFile(PAnsiChar(OriginalIcon), PAnsiChar(DestIcon), False);
+				fOptions.Icon := DestIcon;
+			end else
+				fOptions.Icon := '';
+		end;
 
    if aTemplate.Version> 0 then // new multi units
     for idx:= 0 to pred(aTemplate.UnitCount) do

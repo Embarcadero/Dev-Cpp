@@ -25,35 +25,31 @@ uses
   Classes, Types, IniFiles, prjtypes;
 
 type
- TTemplateUnit = record
-  CName: AnsiString;
-  CppName: AnsiString;
-  CText: AnsiString;
-  CppText: AnsiString;
- end;
+  TTemplateUnit = record
+    CName: AnsiString;
+    CppName: AnsiString;
+    CText: AnsiString;
+    CppText: AnsiString;
+  end;
 
- TTemplateRec = record
-  CCaret: TPoint;
-  CppCaret: TPoint;
-  IsCPP: boolean;   // TRUE = C++ / FALSE = C
-  CText: AnsiString;
-  CppText: AnsiString;
- end;
+  TTemplateRec = record
+    CCaret: TPoint;
+    CppCaret: TPoint;
+    IsCPP: boolean;   // TRUE = C++ / FALSE = C
+    CText: AnsiString;
+    CppText: AnsiString;
+  end;
 
- TTemplate = class
+  TTemplate = class
   private
    fFileName: AnsiString;
    fOptions: TProjOptions;
-   fName: AnsiString;
    fDesc: AnsiString;
    fCategory: AnsiString;
-   fPrjName: AnsiString;
-   fProjectIcon: AnsiString;
-   fIconIndex: integer;
-
-   fTemplate: TmeminiFile;
+   fName: AnsiString;
+   fIcon: AnsiString; // icon in project form
+   fTemplate: TMemIniFile;
    fVersion: integer;
-
    function GetUnitCount: integer;
    function GetOldData: TTemplateRec;
    function GetVersion: integer;
@@ -63,24 +59,20 @@ type
   public
    constructor Create;
    destructor Destroy; override;
-
    procedure ReadTemplateFile(const FileName: AnsiString);
    function AddUnit: integer;
    procedure RemoveUnit(const index: integer);
    function Save: boolean;
-
    property Category: AnsiString read fCategory write fCategory;
    property Description: AnsiString read fDesc write fDesc;
    property FileName: AnsiString read fFileName write fFileName;
    property Name: AnsiString read fName write fName;
    property OptionsRec: TProjOptions read fOptions write fOptions;
-   property ProjectName: AnsiString read fPrjName write fPrjName;
-   property ProjectIcon: AnsiString read fProjectIcon write fProjectIcon;
+   property Icon: AnsiString read fIcon write fIcon;
    property UnitCount: integer read GetUnitCount;
    property Units[index: integer]: TTemplateUnit read GetUnit write SetUnit;
    property OldData: TTemplateRec read GetOldData write SetOldData;
    property Version: integer read GetVersion write fVersion;
-   property IconIndex: integer read fIconIndex write fIconIndex;
   end;
 
 implementation
@@ -135,25 +127,19 @@ begin
   with fTemplate do
    begin
      fVersion:= ReadInteger(cTemplate, 'Ver', 2);
+
      // read entries for both old and new
-      // template info
-     fName:= ReadString(cTemplate, 'Name', 'NoName');
-     fDesc:= ReadString(cTemplate, 'Description', 'NoDesc');
+
+     // template info
+     fDesc:= ReadString(cTemplate, 'Description', '');
+     fIcon:= ReadString(cTemplate, 'Icon', '');
      fCategory:= ReadString(cTemplate, 'Category', '');
-     fIconIndex:= ReadInteger(cTemplate, 'IconIndex', 0);
-
-      // project info
-     fPrjName:= ReadString(cProject, 'Name', '');
-     if fPrjName = '' then
-      fPrjName:= fName;
-
-     if fName = '' then
-      fName:= fPrjName;
+     fName:= ReadString(cTemplate, 'Name', '');
 
      // read old style
      if (fVersion <= 0) then
       begin
-        fOptions.icon:= ReadString(cTemplate, 'Icon', '');
+        fOptions.Icon:= ReadString(cProject, 'Icon', '');
         if ReadBool(cProject, 'Console', FALSE) then
          fOptions.typ:= dptCon
         else
@@ -170,8 +156,7 @@ begin
       end
      else // read new style
       begin
-        fOptions.icon:= ReadString(cTemplate, 'Icon', '');
-        ProjectIcon:= ReadString(cProject, 'ProjectIcon', '');
+        fOptions.Icon:= ReadString(cProject, 'Icon', '');
         fOptions.typ:= ReadInteger(cProject, 'Type', 0); // default = gui
         fOptions.Objfiles.DelimitedText := ReadString(cProject, 'ObjFiles', '');
         fOptions.Includes.DelimitedText:= ReadString(cProject, 'Includes', '');
@@ -183,8 +168,6 @@ begin
         fOptions.useGPP:= ReadBool(cProject, 'IsCpp', FALSE);
         fOptions.IncludeVersionInfo:= ReadBool(cProject, 'IncludeVersionInfo', FALSE);
         fOptions.SupportXPThemes:= ReadBool(cProject, 'SupportXPThemes', FALSE);
-
-        // RNC -- 07-23-04 Added the ability to set an output dir in a template
         fOptions.ExeOutput:= ReadString(cProject, 'ExeOutput', '');
         fOptions.ObjectOutput:= ReadString(cProject, 'ObjectOutput', '');
         fOptions.LogOutput:= ReadString(cProject, 'LogOutput', '');
@@ -194,7 +177,7 @@ begin
    end;
 end;
 
-// need to actually save values. (basiclly TTemplate is readonly right now)
+// need to actually save values. (basically TTemplate is readonly right now)
 function TTemplate.Save: boolean;
 var
  fName: AnsiString;

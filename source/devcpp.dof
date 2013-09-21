@@ -94,7 +94,7 @@ OutputDir=..
 UnitOutputDir=units
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=VCL\ClassBrowsing;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
+SearchPath=VCL\ClassBrowsing;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
 Packages=vcl;rtl;vclactnband;vclx;vcldb;dbrtl;dbexpress;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;VclSmp;dbxcds;soaprtl;vclshlctrls;SynEdit_R7
 Conditionals=
 DebugSourceDirs=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\ClassBrowsing\
@@ -140,11 +140,12 @@ Item3=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=4
-Item0=VCL\ClassBrowsing;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
-Item1=VCL\Parser;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
-Item2=Vcl;VCL\Class Browser & Completion;VCL\Color Picker;VCL\Dev Reg;VCL\File Monitor;VCL\Shortcuts;VCL\Options List;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
-Item3=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;VCL\Options List;Vcl\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
+Count=5
+Item0=VCL\ClassBrowsing;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
+Item1=VCL\ClassBrowsing;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
+Item2=VCL\Parser;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
+Item3=Vcl;VCL\Class Browser & Completion;VCL\Color Picker;VCL\Dev Reg;VCL\File Monitor;VCL\Shortcuts;VCL\Options List;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
+Item4=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;VCL\Options List;Vcl\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
 [HistoryLists\hlUnitOutputDirectory]
 Count=1
 Item0=units

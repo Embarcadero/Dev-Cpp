@@ -258,7 +258,7 @@ object EnviroForm: TEnviroForm
         Width = 51
         Height = 24
         MaxLength = 2
-        MaxValue = 12
+        MaxValue = 0
         MinValue = 0
         TabOrder = 10
         Value = 0

@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Messages, Classes, SysUtils, U_IntList, Controls, ComCtrls, Forms, Graphics,
+  Windows, Classes, SysUtils, U_IntList, Controls, ComCtrls, Graphics,
   CppParser;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -163,7 +163,14 @@ type
 const
   CLASS_FOLDERS_MAGIC = 'DEVCF_1_0';
 
+procedure Register;
+
 implementation
+
+procedure Register;
+begin
+  RegisterComponents('Dev-C++', [TClassBrowser]);
+end;
 
 { TClassBrowser }
 

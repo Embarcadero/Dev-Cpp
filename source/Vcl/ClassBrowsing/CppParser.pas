@@ -262,7 +262,14 @@ type
     property FilesToScan: TStringList read fFilesToScan;
   end;
 
+procedure Register;
+
 implementation
+
+procedure Register;
+begin
+  RegisterComponents('Dev-C++', [TCppParser]);
+end;
 
 function GetSecsSince(lastTick: cardinal): integer;
 begin

@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, Menus, ComCtrls, FileCtrl;
+  StdCtrls, Buttons, ExtCtrls, Menus, FileCtrl, SynEdit, ToolWin, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -34,15 +34,12 @@ uses
 type
   TLangForm = class(TForm)
     OkBtn: TBitBtn;
-    PopupMenu: TPopupMenu;
-    N1: TMenuItem;
-    ThemeImage: TImage;
-    FirstPanel: TPanel;
-    ListBox: TListBox;
-    GroupBox1: TGroupBox;
-    LanguageInfo: TLabel;
-    ThemeGroupBox: TGroupBox;
-    ThemeBox: TComboBox;
+    LangPanel: TPanel;
+    lbLanguages: TListBox;
+    grpLanguages: TGroupBox;
+    lblLangInfo: TLabel;
+    grpThemes: TGroupBox;
+    cmbIcons: TComboBox;
     CachePanel: TPanel;
     CacheInfo1: TLabel;
     BuildPanel: TPanel;
@@ -60,17 +57,46 @@ type
     ButtonAddFile: TButton;
     ButtonRemove: TButton;
     ButtonAddFolder: TButton;
-    EditorBox: TComboBox;
-    InterfaceLbl: TLabel;
-    EditorLbl: TLabel;
+    cmbColors: TComboBox;
+    lblIcons: TLabel;
+    lblColor: TLabel;
     Finish1: TLabel;
+    synExample: TSynEdit;
+    EditPanel: TPanel;
+    lblEditInfo: TLabel;
+    lblFont: TLabel;
+    cmbFont: TComboBox;
+    tbExample: TToolBar;
+    NewFileBtn: TToolButton;
+    OpenBtn: TToolButton;
+    SaveUnitBtn: TToolButton;
+    SaveAllBtn: TToolButton;
+    CloseBtn: TToolButton;
+    PrintBtn: TToolButton;
+    UndoBtn: TToolButton;
+    RedoBtn: TToolButton;
+    FindBtn: TToolButton;
+    ReplaceBtn: TToolButton;
+    FindNextBtn: TToolButton;
+    GotoLineBtn: TToolButton;
+    CompileBtn: TToolButton;
+    RunBtn: TToolButton;
+    CompileAndRunBtn: TToolButton;
+    RebuildAllBtn: TToolButton;
+    DebugBtn: TToolButton;
+    ProfileBtn: TToolButton;
+    ProfilingInforBtn: TToolButton;
     procedure OkBtnClick(Sender: TObject);
-    procedure ThemeChange(Sender: TObject);
+    procedure ColorChange(Sender: TObject);
     procedure ButtonAddFileClick(Sender: TObject);
     procedure ButtonRemoveClick(Sender: TObject);
     procedure ButtonAddFolderClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FontChange(Sender: TObject);
+    procedure cmbIconsChange(Sender: TObject);
+    procedure cmbFontDrawItem(Control: TWinControl; Index: Integer;
+      Rect: TRect; State: TOwnerDrawState);
   private
     HasProgressStarted : boolean;
 
@@ -85,7 +111,7 @@ type
 implementation
 
 uses 
-  MultiLangSupport, datamod, devcfg, utils, main, version, ImageTheme;
+  MultiLangSupport, datamod, devcfg, utils, main, version, ImageTheme, SynEditTypes;
 
 {$R *.dfm}
 
@@ -93,19 +119,19 @@ procedure TLangForm.UpdateList(List: TStrings);
 var
 	I, sel: integer;
 begin
-	ListBox.Items.BeginUpdate;
-	ListBox.Clear;
+	lbLanguages.Items.BeginUpdate;
+	lbLanguages.Clear;
 	for I := 0 to List.Count - 1 do begin
-		sel := ListBox.Items.Add(List.ValueFromIndex[I]);
-		if StartsText('english', ListBox.Items[sel]) then
-			ListBox.Selected[sel] := True;
+		sel := lbLanguages.Items.Add(List.ValueFromIndex[I]);
+		if StartsText('english', lbLanguages.Items[sel]) then
+			lbLanguages.Selected[sel] := True;
 	end;
-	Listbox.Items.EndUpdate;
+	lbLanguages.Items.EndUpdate;
 end;
 
 function TLangForm.GetSelected: integer;
 begin
-	result:= ListBox.ItemIndex;
+	result := lbLanguages.ItemIndex;
 end;
 
 procedure TLangForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
@@ -125,14 +151,17 @@ var
 	i, j : integer;
 	fullpath : AnsiString;
 begin
-	if OkBtn.Tag = 0 then begin
-		OkBtn.Tag := 1; // goto cache page
+	if OkBtn.Tag = 0 then begin // goto edit page
+		OkBtn.Tag := 1;
+		LangPanel.Visible := false;
+		EditPanel.Visible := true;
+	end else if OkBtn.Tag = 1 then begin // goto cache page
+		OkBtn.Tag := 2;
+		EditPanel.Visible := false;
 		CachePanel.Visible := true;
-		FirstPanel.Visible := false;
 		devData.ThemeChange := true;
-		devData.Theme := ThemeBox.Items[ThemeBox.ItemIndex];
-		dmMain.InitHighlighterFirstTime(EditorBox.ItemIndex);
-	end else if OkBtn.Tag = 1 then begin
+		devData.Theme := cmbIcons.Items[cmbIcons.ItemIndex];
+	end else if OkBtn.Tag = 2 then begin // done, goto finish page
 		if YesCache.Checked or AltCache.Checked then begin
 			YesCache.Enabled := false;
 			NoCache.Enabled := false;
@@ -225,30 +254,13 @@ begin
 			devCodeCompletion.ParseGlobalHeaders := false; // can be slow without cache
 			devClassBrowsing.ShowInheritedMembers := false;
 		end;
-		OkBtn.Tag := 2;
+		OkBtn.Tag := 3;
 		OkBtn.Kind := bkOK;
 		OkBtn.ModalResult := mrOK;
 		OkBtn.Enabled := true;
 		FinishPanel.Visible := true;
 		CachePanel.Visible := false;
 	end;
-end;
-
-procedure TLangForm.ThemeChange(Sender: TObject);
-var
-	finalname : AnsiString;
-begin
-	finalname := '';
-	case ThemeBox.ItemIndex of
-		0: finalname := 'NEWLOOK';
-		1: finalname := 'GNOME';
-		2: finalname := 'BLUE';
-	end;
-	case EditorBox.ItemIndex of
-		0: finalname := finalname + 'CLASSIC';
-		1: finalname := finalname + 'CLASSICPLUS';
-	end;
-	ThemeImage.Picture.Bitmap.LoadFromResourceName(HInstance, finalname);
 end;
 
 procedure TLangForm.ButtonAddFileClick(Sender: TObject);
@@ -259,6 +271,7 @@ begin
 	with TOpenDialog.Create(self) do try
 		Filter:= FLT_HEADS;
 		Title:= Lang[ID_NV_OPENFILE];
+		Options := Options + [ofAllowMultiSelect];
 		InitialDir := devCompiler.CppDir;
 		if Execute then begin
 			for i:= 0 to pred(Files.Count) do begin
@@ -301,23 +314,81 @@ begin
 	Font.Size := devData.InterfaceFontSize;
 
 	HasProgressStarted := false;
+	synExample.CaretXY := BufferCoord(11,5);
 
-	// Obtain a list of themes
-	devImageThemes.GetThemeTitles(ThemeBox.Items);
+	// Interface themes
+	devImageThemes.GetThemeTitles(cmbIcons.Items);
+	cmbIcons.ItemIndex := 0; // new look
 
-	ThemeBox.ItemIndex := 0;
+	// Editor colors
+	cmbColors.ItemIndex := 1; // Classic Plus
+	dmMain.InitHighlighterFirstTime(cmbColors.ItemIndex);
+	devEditor.AssignEditor(synExample,'main.cpp');
 
-	// Editor styles
-	EditorBox.Items.Add('Classic');
-	EditorBox.Items.Add('Classic Plus');
-	EditorBox.ItemIndex := 1;
+	// Font options
+	cmbFont.Items.Assign(Screen.Fonts);
+	cmbFont.ItemIndex := cmbFont.Items.IndexOf('Courier New'); // suggest Consolas?
+	lbLanguages.SetFocus;
+end;
 
-	ThemeImage.Picture.Bitmap.LoadFromResourceName(HInstance, 'NEWLOOKCLASSICPLUS');
+procedure TLangForm.ColorChange(Sender: TObject);
+begin
+	dmMain.InitHighlighterFirstTime(cmbColors.ItemIndex);
+
+	// Pick a proper current line color (choice is up for debate...)
+	if cmbColors.Text = 'Obsidian' then
+		devEditor.HighColor := clBlack
+	else if cmbColors.Text = 'Twilight' then
+		devEditor.HighColor := $202020
+	else if cmbColors.Text = 'Borland' then
+		devEditor.HighColor := $202020
+	else if cmbColors.Text = 'Matrix' then
+		devEditor.HighColor := $202020 // dark brown
+	else if cmbColors.Text = 'GSS Hacker' then
+		devEditor.HighColor := clBlack // dark brown
+	else if cmbColors.Text = 'Obvilion' then
+		devEditor.HighColor := clBlack // dark brown
+	else
+		devEditor.HighColor := $FFFFCC; // Light Turquoise
+
+	devEditor.AssignEditor(synExample,'main.cpp');
+end;
+
+procedure TLangForm.FontChange(Sender: TObject);
+begin
+	devEditor.Font.Name := cmbFont.Text;
+	devEditor.Gutterfont.Name := cmbFont.Text;
+	devEditor.AssignEditor(synExample,'main.cpp');
 end;
 
 procedure TLangForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 	Action := caFree;
+end;
+
+procedure TLangForm.cmbIconsChange(Sender: TObject);
+begin
+	if cmbIcons.ItemIndex =  1 then
+		tbExample.Images := dmMain.MenuImages_Gnome
+	else if cmbIcons.ItemIndex = 2 then
+		tbExample.Images := dmMain.MenuImages_Blue
+	else
+		tbExample.Images := dmMain.MenuImages_NewLook;
+end;
+
+procedure TLangForm.cmbFontDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
+var
+	alignleft : integer;
+	aligntop : integer;
+begin
+	with TComboBox(Control) do begin
+		Canvas.Font.Name := Items.Strings[Index];
+		Canvas.Font.Size := devEditor.Font.Size;
+		Canvas.FillRect(Rect);
+		alignleft := (Rect.Right - Rect.Left) div 2 - Canvas.TextWidth(Canvas.Font.Name) div 2;
+		aligntop  := Rect.Top + (Rect.Bottom - Rect.Top) div 2 - Canvas.TextHeight(Canvas.Font.Name) div 2;
+		Canvas.TextOut(alignleft, aligntop,Canvas.Font.Name);
+	end;
 end;
 
 end.

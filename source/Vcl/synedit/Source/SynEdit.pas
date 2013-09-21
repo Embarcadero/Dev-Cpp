@@ -5336,7 +5336,7 @@ var
 begin
 	// ### Code Folding
 	if not fEditingFolds then
-		MoveCollapsedRangesFromBy(Index+1, aCount);
+		MoveCollapsedRangesFromBy(Index + 1, aCount);
 	// ### End Code Folding
 
   if Assigned(fHighlighter) and (Lines.Count > 0) then
@@ -6763,6 +6763,7 @@ var
   Temp2: string;
   Helper: string;
   TabBuffer: string;
+  SpaceBuffer: string;
   SpaceCount1: Integer;
   SpaceCount2: Integer;
   BackCounter: Integer;
@@ -7188,10 +7189,10 @@ begin
             Helper := Helper + #13#10;
             fUndoList.AddChange(crSilentDeleteAfterCursor, BufferCoord(1, CaretY),
               BufferCoord(1, CaretY + 1), Helper, smNormal);
-            DoLinesDeleted(CaretY - 1, 1);
+            DoLinesDeleted(CaretY, 1);
           end;
           InternalCaretXY := BufferCoord(1, CaretY); // like seen in the Delphi editor
-          DoOnPaintTransient(ttAfter);   
+          DoOnPaintTransient(ttAfter);
         end;
       ecClearAll:
         begin
@@ -7256,34 +7257,36 @@ begin
               end;
               Lines.Insert(CaretY, '');
               Caret := CaretXY;
+
+              fUndoList.AddChange(crLineBreak, Caret, Caret, '', smNormal);   //KV
               if Command = ecLineBreak then
               begin
+                InternalCaretXY := BufferCoord(1, CaretY +1);
                 if SpaceCount2 > 0 then
-                  Lines[CaretY] := Copy(Lines[BackCounter], 1, SpaceCount2);
-
-                // EDIT
-                if Lines[CaretY-1][Length(Lines[CaretY-1])] in ['{',':'] then begin
-                  if eoTabsToSpaces in Options then begin
-                    Lines[CaretY] := Lines[CaretY] + StringOfChar(#32,TabWidth);
-                    Inc(SpaceCount2,TabWidth);
-                  end else begin
-                    Lines[CaretY] := Lines[CaretY] + #9; // add one indent
-                    Inc(SpaceCount2,1); // update caret counter
+                begin
+                  SpaceBuffer := Copy(Lines[BackCounter], 1, SpaceCount2);
+                  for i := 1 to Length(SpaceBuffer) do
+                    if SpaceBuffer[i] = #9 then
+                      CommandProcessor(ecTab, #0, nil)
+                    else
+                      CommandProcessor(ecChar, SpaceBuffer[i], nil);
+                end;
+                if Temp[Length(Temp)] in ['{',':'] then begin // add more indent for these too
+                  if not (eoTabsToSpaces in Options) then
+                    CommandProcessor(ecTab, #0, nil)
+                  else begin
+                    for i := 1 to TabWidth do
+                      CommandProcessor(ecChar,' ',nil);
                   end;
                 end;
-                // EDIT
-
-                InternalCaretXY := BufferCoord(SpaceCount2 + 1, CaretY + 1);
               end;
-              fUndoList.AddChange(crLineBreak, Caret, Caret, '', smNormal);
             end;
           end
           else begin
             if fLines.Count = 0 then
               fLines.Add('');
 
-            // Why bother scanning empty lines?
-            {SpaceCount2 := 0;
+            SpaceCount2 := 0;
             if eoAutoIndent in Options then
             begin
               BackCounter := CaretY - 1;
@@ -7293,11 +7296,11 @@ begin
                 if Length(Lines[BackCounter]) > 0 then break;
                 dec(BackCounter);
               end;
-            end;}
+            end;
             Lines.Insert(CaretY - 1, '');
             fUndoList.AddChange(crLineBreak, CaretXY, CaretXY, '', smNormal);
             if Command = ecLineBreak then begin
-              InternalCaretXY := BufferCoord(1, CaretY + 1);
+              InternalCaretXY := BufferCoord(SpaceCount2 + 1, CaretY + 1);
             end;
           end;
           DoLinesInserted(CaretY - InsDelta, 1);
@@ -7328,16 +7331,16 @@ begin
           // EDIT
           if eoAutoIndent in Options then begin
 
-            // // Remove TabWidth of indent of the current line when typing a }
+            // Remove TabWidth of indent of the current line when typing a }
             if AChar in ['}'] then begin
 
               // and the first nonblank char is this new }
-              if  TrimLeft(Lines[CaretY-1]) = '' then begin
+              if TrimLeft(Lines[CaretY-1]) = '' then begin
 
                 i := CaretX - 1;
                 SpaceCount1 := 0; // buffer character count
                 SpaceCount2 := 0; // display character count
-                while (i > 0) and (SpaceCount2 < TabWidth) do begin
+                while (i > 0) and (i <= Length(Lines[CaretY-1])) and (SpaceCount2 < TabWidth) do begin
                   if Lines[CaretY-1][i] = #9 then begin
                     Inc(SpaceCount1);
                     Inc(SpaceCount2,TabWidth);

@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Classes, sysUtils, TypInfo, IniFiles, Graphics, version;
+  Windows, Classes, sysUtils, TypInfo, IniFiles, Graphics;
 {$ENDIF}
 {$IFDEF LINUX}
   Classes, sysUtils, TypInfo, cfgreg;

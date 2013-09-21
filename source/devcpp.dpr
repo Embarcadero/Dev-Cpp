@@ -20,7 +20,6 @@
 program devcpp;
 {$R 'icons.res' 'icons.rc'}
 {$R 'DefaultFiles.res' 'DefaultFiles.rc'}
-{$R 'LangFrm.res' 'LangFrm.rc'}
 {%File 'LangIDs.inc'}
 
 uses
@@ -63,9 +62,7 @@ uses
   debugreader in 'debugreader.pas',
   debugger in 'debugger.pas',
   CFGData in 'CFGData.pas',
-  CheckForUpdate in 'CheckForUpdate.pas',
   prjtypes in 'prjtypes.pas',
-  ResourceSelectorFrm in 'ResourceSelectorFrm.pas' {ResourceSelectorForm},
   Macros in 'Macros.pas',
   devExec in 'devExec.pas',
   NewTemplateFrm in 'NewTemplateFrm.pas' {NewTemplateForm},

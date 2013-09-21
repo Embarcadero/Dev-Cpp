@@ -31,12 +31,12 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Windows, Classes, Forms, SysUtils, Controls, Graphics, StrUtils, CppParser,
-  ExtCtrls, stringutils, U_IntList;
+  Windows, Classes, Forms, SysUtils, Controls, Graphics, CppParser,
+  stringutils, U_IntList;
 {$ENDIF}
 {$IFDEF LINUX}
-  Xlib, Classes, QForms, SysUtils, QControls, QGraphics, StrUtils, CppParser,
-  QExtCtrls, U_IntList, QDialogs, Types;
+  Xlib, Classes, QForms, SysUtils, QControls, QGraphics, CppParser,
+  U_IntList, QDialogs, Types;
 {$ENDIF}
 
 type
@@ -92,12 +92,19 @@ type
     property CurrentIndex: integer read fCurrentIndex write fCurrentIndex;
   end;
 
+procedure Register;
+
 implementation
 
 uses
   CodeCompletionForm, Math;
 
 { TCodeCompletion }
+
+procedure Register;
+begin
+  RegisterComponents('Dev-C++', [TCodeCompletion]);
+end;
 
 constructor TCodeCompletion.Create(AOwner: TComponent);
 begin

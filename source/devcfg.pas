@@ -102,6 +102,7 @@ type
 		procedure SaveSet(Index: integer);
 		procedure EraseSet(Index: integer);
 		procedure ClearSet;
+		procedure ValidateSet;
 
 		procedure ReadSets;
 		procedure WriteSets;
@@ -639,6 +640,7 @@ uses
 procedure InitializeOptions;
 var
 	compilername : AnsiString;
+	idx32,idx64 : integer;
 begin
 	if not assigned(devDirs) then
 		devDirs:= TdevDirs.Create;
@@ -651,6 +653,9 @@ begin
 
 		devCompiler.Sets.Clear;
 
+		idx64 := -1;
+		idx32 := -1;
+
 		// Assume 64bit compilers are put in the MinGW64 folder
 		if DirectoryExists(devDirs.Exec + 'MinGW64\') then begin
 
@@ -662,9 +667,13 @@ begin
 			devCompiler.SettoDefaults(compilername + ' 64-bit','MinGW64');
 			devCompiler.SaveSet(devCompiler.Sets.Count-1);
 
+			idx64 := devCompiler.Sets.Count-1;
+
 			devCompiler.Sets.Add(compilername + ' 32-bit');
 			devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW64');
 			devCompiler.SaveSet(devCompiler.Sets.Count-1);
+
+			idx32 := devCompiler.Sets.Count-1;
 		end;
 		if DirectoryExists(devDirs.Exec + 'MinGW32\') then begin
 
@@ -675,13 +684,24 @@ begin
 			devCompiler.Sets.Add(compilername + ' 32-bit');
 			devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW32');
 			devCompiler.SaveSet(devCompiler.Sets.Count-1);
+
+			if idx64 = -1 then // prefer MinGW64, 32bit mode
+				idx64 := devCompiler.Sets.Count-1;
+			if idx32 = -1 then // prefer MinGW64, 32bit mode
+				idx32 := devCompiler.Sets.Count-1;
 		end;
 
 		// Write the compiler list
 		devCompiler.WriteSets;
+
+		// Pick a proper default
+		if IsWindows64 then
+			devCompiler.CurrentSet := idx64
+		else
+			devCompiler.CurrentSet := idx32;
 	end;
 
-	// Load the current compiler set, if there is any
+	// Load the current compiler set
 	devCompiler.LoadSet(devCompiler.fCurrentSet);
 
 	if not assigned(devEditor) then
@@ -802,15 +822,17 @@ begin
 end;
 
 procedure TdevData.SettoDefaults;
+var
+	osinfo : TOSVersionInfo;
 
-  function getAssociation(I: integer): Boolean;
-  begin
-    Result := CheckFiletype('.' + Associations[I, 0],
-      'DevCpp.' + Associations[I, 0],
-      Associations[I, 1],
-      'open',
-      Application.Exename + ' "%1"');
-  end;
+	function getAssociation(I: integer): Boolean;
+	begin
+		Result := CheckFiletype('.' + Associations[I, 0],
+			'DevCpp.' + Associations[I, 0],
+			Associations[I, 1],
+			'open',
+			Application.Exename + ' "%1"');
+	end;
 
 begin
   fFirst:= TRUE;
@@ -858,7 +880,9 @@ begin
 	fToolbarClassesY:=30;
 
 	// Office 2007 / Vista support
-	if Screen.Fonts.IndexOf('Segoe UI') <> -1 then begin
+	osinfo.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
+	GetVersionEx(osinfo);
+	if (Screen.Fonts.IndexOf('Segoe UI') <> -1) and (osinfo.dwMajorVersion >= 6) then begin
 		fInterfaceFontSize := 9;
 		fInterfaceFont := 'Segoe UI';
 	end else begin
@@ -960,10 +984,188 @@ begin
 		// complete string?
 end;
 
+procedure TdevCompiler.ValidateSet;
+var
+	msg, goodbin, badbin, goodlib, badlib, goodinc, badinc, goodinccpp, badinccpp : AnsiString;
+
+	procedure CheckDirs(const dirlist : AnsiString;var gooddirs : AnsiString;var baddirs : AnsiString);
+	var
+		sl : TStringList;
+		i : integer;
+	begin
+		gooddirs := '';
+		baddirs := '';
+
+		sl := TStringList.Create;
+		try
+			StrToList(dirlist,sl); // remove dupes?
+			for I := 0 to sl.Count - 1 do begin
+				if not DirectoryExists(sl[i]) then begin
+					if Length(baddirs) > 0 then
+						baddirs := baddirs + ';' + sl[i]
+					else
+						baddirs := sl[i];
+				end else begin
+					if Length(gooddirs) > 0 then
+						gooddirs := gooddirs + ';' + sl[i]
+					else
+						gooddirs := sl[i];
+				end;
+			end;
+		finally
+			sl.Free;
+		end;
+	end;
+
+	function FindFile(const dirlist : AnsiString;const FileName : AnsiString) : boolean;
+	var
+		sl : TStringList;
+		i : integer;
+	begin
+		result := false;
+		sl := TStringList.Create;
+		try
+			StrToList(dirlist,sl); // remove dupes?
+			for I := 0 to sl.Count - 1 do begin
+				if FileExists(sl[i] + '\' + FileName) then begin
+					result := true;
+					Exit;
+				end;
+			end;
+		finally
+			sl.Free;
+		end;
+	end;
+begin
+
+	// Check if we can find the directories the user pointed to
+	msg := '';
+	if fBinDir <> '' then begin // we need some bin dir, so treat this as an error too
+		CheckDirs(fBinDir,goodbin,badbin);
+		if badbin <> '' then begin
+			msg := msg + 'The following bin directories don''t exist:' + #13#10;
+			msg := msg + StringReplace(badbin, ';', #13#10, [rfReplaceAll]);
+			msg := msg + #13#10 + #13#10;
+		end;
+	end else begin
+		msg := msg + 'No bin directories have been specified.';
+		msg := msg + #13#10 + #13#10;
+	end;
+
+	CheckDirs(fCDir,goodinc,badinc);
+	if badinc <> '' then  begin
+		msg := msg + 'The following C include directories don''t exist:' + #13#10;
+		msg := msg + StringReplace(badinc, ';', #13#10, [rfReplaceAll]);
+		msg := msg + #13#10 + #13#10;
+	end;
+	CheckDirs(fCppDir,goodinccpp,badinccpp);
+	if badinccpp <> '' then begin
+		msg := msg + 'The following C++ include directories don''t exist:' + #13#10;
+		msg := msg + StringReplace(badinccpp, ';', #13#10, [rfReplaceAll]);
+		msg := msg + #13#10 + #13#10;
+	end;
+	CheckDirs(fLibDir,goodlib,badlib);
+	if badlib <> '' then begin
+		msg := msg + 'The following lib directories don''t exist:' + #13#10;
+		msg := msg + StringReplace(badlib, ';', #13#10, [rfReplaceAll]);
+		msg := msg + #13#10 + #13#10;
+	end;
+	if msg <> '' then begin
+		msg := msg + 'Would you like Dev-C++ to remove them for you ';
+		msg := msg + 'and add the default paths to the remaining existing paths?' + #13#10;
+		msg := msg + 'Leaving those directories will lead to problems during compilation ';
+		msg := msg + 'of any projects created with Dev-C++.' + #13#10;
+		msg := msg + #13#10;
+		msg := msg + 'Unless you know exactly what you''re doing, it is recommended ';
+		msg := msg + 'that you click Yes.';
+
+		// If confirmed, insert working dirs into default path list
+		if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+
+			// Copy from SetToDefaults!
+			if ContainsStr(fSets[fCurrentSet],'MinGW') and ContainsStr(fSets[fCurrentSet],'32-bit') then begin
+
+				// Only fix if needed
+				if (badbin <> '') or (fBinDir = '') then
+					fBinDir := goodbin + ';' + devDirs.fExec + 'MinGW32\bin';
+				if badlib <> '' then
+					fLibDir := goodlib + ';' + devDirs.fExec + 'MinGW32\lib';
+				if badinc <> '' then
+					fCDir   := goodinc + ';' + devDirs.fExec + 'MinGW32\include';
+				if badinccpp <> '' then
+					fCppDir := goodinccpp + ';' + devDirs.fExec + 'MinGW32\include';
+
+			end else begin
+
+				// Same...
+				if (badbin <> '') or (fBinDir = '') then
+					fBinDir := goodbin + ';' + devDirs.fExec + 'MinGW64\bin';
+				if badlib <> '' then begin
+					if ContainsStr(fSets[fCurrentSet],'TDM-GCC') and ContainsStr(fSets[fCurrentSet],'32-bit') then
+						fLibDir := goodlib + ';' + devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\lib32'
+					else
+						fLibDir := goodlib + ';' + devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\lib';
+				end;
+				if badinc <> '' then
+					fCDir   := goodinc + ';' + devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\include';
+				if badinccpp <> '' then
+					fCppDir := goodinccpp + ';' + devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\include';
+
+			end;
+
+			// Remove ; from start
+			if (Length(fBinDir) >= 1) and (fBinDir[1] = ';') then
+				Delete(fBinDir,1,1);
+
+			// Immediately save to disk, don't keep bothering the user
+			SaveSet(fCurrentSet);
+		end;
+	end;
+
+	SetPath(fBinDir);
+
+	// now check some exes
+	msg := '';
+	if not FindFile(fBinDir,fgccName) then  begin
+		msg := msg + 'Cannot find the C compiler "' + fgccName + '".' + #13#10;
+	end;
+	if not FindFile(fBinDir,fgppName) then  begin
+		msg := msg + 'Cannot find the C++ compiler "' + fgppName + '".' + #13#10;
+	end;
+	if not FindFile(fBinDir,fgdbName) then  begin
+		msg := msg + 'Cannot find the debugger "' + fgdbName + '".' + #13#10;
+	end;
+	if not FindFile(fBinDir,fgprofName) then  begin
+		msg := msg + 'Cannot find the profiler "' + fgprofName + '".' + #13#10;
+	end;
+	if not FindFile(fBinDir,fmakeName) then  begin
+		msg := msg + 'Cannot find the makefile processor "' + fmakeName + '".' + #13#10;
+	end;
+	if not FindFile(fBinDir,fwindresName) then  begin
+		msg := msg + 'Cannot find the resource processor "' + fwindresName + '".' + #13#10;
+	end;
+	if not FindFile(fBinDir,fdllwrapName) then  begin
+		msg := msg + 'Cannot find the DLL wrapper "' + fdllwrapName + '".' + #13#10;
+	end;
+	if msg <> '' then begin
+		msg := msg + #13#10;
+		msg := msg + 'The following directories have been searched:' + #13#10;
+		msg := msg + StringReplace(fBinDir, ';', #13#10, [rfReplaceAll]) + #13#10 + #13#10;
+		msg := msg + 'Please check if your binary directory and the executable names are set correctly at Tools >> Compiler Options >> Directories/Programs.';
+		MessageDlg(msg, mtWarning, [mbOK], 0);
+	end;
+end;
+
 procedure TdevCompiler.LoadSet(Index: integer);
 var
 	key : AnsiString;
 begin
+	// Assume it doesn't exist
+	if Index = -1 then begin
+		ClearSet;
+		Exit;
+	end;
+
 	// Load the current index from disk
 	key := 'CompilerSets_' + IntToStr(Index);
 
@@ -1015,9 +1217,9 @@ begin
 
 	CurrentSet := Index;
 
-	SetPath(fBinDir);
+	ValidateSet; // check dirs and exes
 
-	// Perform some validation
+	SetPath(fBinDir);
 end;
 
 procedure TdevCompiler.SaveSet(Index: integer);
@@ -1172,10 +1374,9 @@ begin
 	devData.WriteStrings('CompilerSets',fSets);
 
 	// Then current index
-	if fCurrentSet < fSets.Count then
-		devData.Write('CompilerSets','Current',fCurrentSet)
-	else
-		devData.Write('CompilerSets','Current',-1);
+	if fCurrentSet >= fSets.Count then
+		fCurrentSet := -1;
+	devData.Write('CompilerSets','Current',fCurrentSet)
 end;
 
 function TdevCompiler.GetGCC : AnsiString;
@@ -1341,11 +1542,11 @@ begin
 	sl.Add('ISO C90=c90');
 	sl.Add('ISO C99=c99');
 	sl.Add('ISO C++=c++98');
-	sl.Add('ISO C++11=c++0x');
+	sl.Add('ISO C++11=c++11');
 	sl.Add('GNU C90=gnu90');
 	sl.Add('GNU C99=gnu99');
 	sl.Add('GNU C++=gnu++98');
-	sl.Add('GNU C++11=gnu++0x');
+	sl.Add('GNU C++11=gnu++11');
 	AddOption(ID_COPT_STD, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-std=', sl);
 
 	// Warnings

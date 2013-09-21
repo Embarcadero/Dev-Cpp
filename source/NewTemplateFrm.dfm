@@ -1,6 +1,6 @@
 object NewTemplateForm: TNewTemplateForm
-  Left = 744
-  Top = 358
+  Left = 635
+  Top = 385
   BorderStyle = bsDialog
   Caption = 'New Template'
   ClientHeight = 321
@@ -21,7 +21,7 @@ object NewTemplateForm: TNewTemplateForm
     Top = 0
     Width = 358
     Height = 281
-    ActivePage = pgExtras
+    ActivePage = pgTemplate
     Align = alTop
     TabOrder = 0
     object pgTemplate: TTabSheet
@@ -47,13 +47,6 @@ object NewTemplateForm: TNewTemplateForm
         Height = 13
         Caption = 'Category:'
       end
-      object lblProjName: TLabel
-        Left = 8
-        Top = 96
-        Width = 89
-        Height = 13
-        Caption = 'New project name:'
-      end
       object txtDescr: TEdit
         Left = 112
         Top = 36
@@ -68,27 +61,31 @@ object NewTemplateForm: TNewTemplateForm
         Width = 225
         Height = 21
         AutoDropDown = True
-        ItemHeight = 0
+        ItemHeight = 13
         Sorted = True
         TabOrder = 2
         Text = 'cmbCateg'
         OnChange = cmbNameChange
       end
-      object txtProjName: TEdit
+      object cmbName: TComboBox
         Left = 112
-        Top = 92
+        Top = 8
         Width = 225
         Height = 21
-        TabOrder = 3
-        Text = 'txtProjName'
+        AutoDropDown = True
+        ItemHeight = 13
+        Sorted = True
+        TabOrder = 0
+        Text = 'cmbName'
+        OnChange = cmbNameChange
       end
       object lblIcons: TGroupBox
         Left = 8
-        Top = 128
+        Top = 120
         Width = 329
         Height = 118
         Caption = 'Icons'
-        TabOrder = 4
+        TabOrder = 3
         object lstIcons: TListBox
           Left = 12
           Top = 20
@@ -188,18 +185,6 @@ object NewTemplateForm: TNewTemplateForm
             0000000000000000000000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA}
         end
       end
-      object cmbName: TComboBox
-        Left = 112
-        Top = 8
-        Width = 225
-        Height = 21
-        AutoDropDown = True
-        ItemHeight = 0
-        Sorted = True
-        TabOrder = 0
-        Text = 'cmbName'
-        OnChange = cmbNameChange
-      end
     end
     object pgFiles: TTabSheet
       Caption = 'Files'
@@ -251,17 +236,17 @@ object NewTemplateForm: TNewTemplateForm
         TabOrder = 0
       end
       object memLinker: TMemo
-        Left = 244
+        Left = 240
         Top = 29
-        Width = 101
+        Width = 105
         Height = 148
         ScrollBars = ssVertical
         TabOrder = 2
       end
       object memCppCompiler: TMemo
-        Left = 128
+        Left = 120
         Top = 28
-        Width = 101
+        Width = 109
         Height = 149
         ScrollBars = ssVertical
         TabOrder = 1
