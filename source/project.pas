@@ -145,7 +145,7 @@ type
     function GetUnitFromString(const s : AnsiString) : integer;
     procedure RebuildNodes;
     function ListUnitStr(sep: char): AnsiString;
-    procedure ExportAll;
+    procedure ExportToHTML;
     procedure ShowOptions;
     function AssignTemplate(const aFileName: AnsiString;aTemplate: TTemplate): boolean;
     procedure SetHostApplication(const s : AnsiString);
@@ -1355,27 +1355,27 @@ end;
 
 procedure TProject.SetNodeValue(value: TTreeNode);
 begin
-   fNode:= Value;
+  fNode:= Value;
 end;
 
-procedure TProject.ExportAll;
+procedure TProject.ExportToHTML;
 	function ConvertFilename(const Filename, FinalPath, Extension: AnsiString): AnsiString;
 	begin
 		Result:=ExtractRelativePath(Directory, Filename);
 		Result:=StringReplace(Result, '.', '_', [rfReplaceAll]);
 		Result:=StringReplace(Result, '\', '_', [rfReplaceAll]);
 		Result:=StringReplace(Result, '/', '_', [rfReplaceAll]);
-		Result:=IncludeTrailingPathDelimiter(FinalPath)+Result+Extension;
+		Result:=IncludeTrailingPathDelimiter(FinalPath) + Result + Extension;
 	end;
 var
-  I: integer;
-  sl: TStringList;
-  fname: AnsiString;
-  Size: integer;
-  SizeStr: AnsiString;
-  link: AnsiString;
-  BaseDir: AnsiString;
-  hFile: integer;
+	I: integer;
+	sl: TStringList;
+	fName,UnitName: AnsiString;
+	Size: integer;
+	SizeStr: AnsiString;
+	link: AnsiString;
+	BaseDir: AnsiString;
+	hFile: integer;
 	SynExporterHTML : TSynExporterHTML;
 begin
 	SynExporterHTML := TSynExporterHTML.Create(nil);
@@ -1392,27 +1392,35 @@ begin
 			Exit;
 		end;
 
-		fname:=FileName;
+		fName := FileName; // project html filename
 	finally
 		Free;
 	end;
 
-	BaseDir := ExtractFilePath(fname);
-	CreateDir(BaseDir + '\files');
-	sl:=TStringList.Create;
+	BaseDir := ExtractFilePath(fName);
+	CreateDir(BaseDir + pd + 'files');
+
+	sl := TStringList.Create;
 	try
 		sl.Add('<html>');
-		sl.Add('<head><title>Dev-C++ project: ' + Name + '</title></head>');
+		sl.Add('<head><title>Dev-C++ project: ' + Self.Name + '</title></head>');
 		sl.Add('<body bgcolor=#FFFFFF>');
-		sl.Add('<h2>Project: ' + Name + '</h2>');
+		sl.Add('<h2>Project: ' + Self.Name + '</h2>');
 		sl.Add('<b>Index of files:</b>');
 		sl.Add('<hr width="80%"/>');
-
 		sl.Add('<table align="center" cellspacing="20">');
 		sl.Add('<tr><td><b><u>Filename</u></b></td><td><b><u>Location</u></b></td><td><b><u>Size</u></b></td></tr>');
 
+		// Use this one to export files to HTML (copy from TEditor.ExportToHTML)
+		SynExporterHTML.CreateHTMLFragment := False;
+		SynExporterHTML.ExportAsText := True;
+		SynExporterHTML.UseBackground := True;
+		SynExporterHTML.Font := devEditor.Font;
+
 		for I := 0 to Units.Count-1 do begin
-			hFile := FileOpen(Units[I].FileName, fmOpenRead);
+			UnitName := Units[I].FileName;
+
+			hFile := FileOpen(UnitName, fmOpenRead);
 			if hFile > 0 then begin
 				Size := FileSeek(hFile, 0, 2);
 				if Size < 1024 then
@@ -1428,8 +1436,9 @@ begin
 			end else
 				SizeStr := 'Unknown';
 
-			link := ExtractFilename(ConvertFilename(ExtractRelativePath(Directory, Units[I].FileName), BaseDir, HTML_EXT));
-			sl.Add('<tr><td><a href="files/'+link+'">'+ExtractFilename(Units[I].FileName)+'</a></td><td>'+ExpandFilename(Units[I].FileName)+'</td><td>'+SizeStr+'</td></tr>');
+			// Add string to main overview
+			link := ExtractFilename(ConvertFilename(ExtractRelativePath(Directory, UnitName), BaseDir, HTML_EXT));
+			sl.Add(#9 + '<tr><td><a href="files' + pd+ link + '">' + ExtractFilename(UnitName) + '</a></td><td>' + ExpandFilename(UnitName) + '</td><td>' + SizeStr + '</td></tr>');
 		end;
 
 		sl.Add('</table>');
@@ -1437,14 +1446,22 @@ begin
 		sl.Add('<p align="center"><font size="1">Exported by <a href="http://www.bloodshed.net/dev">'+DEVCPP+'</a> v'+DEVCPP_VERSION+'</font></p>');
 		sl.Add('</body>');
 		sl.Add('</html>');
-		sl.SaveToFile(fname);
+		sl.SaveToFile(fName);
 
 		// export project files
-		for I:=0 to Units.Count-1 do begin
-			fname:=Units[I].FileName;
-			sl.LoadFromFile(fname);
-			fname:=ConvertFilename(ExtractRelativePath(Directory, Units[I].FileName), IncludeTrailingPathDelimiter(BaseDir)+'files', HTML_EXT);
-			Units[I].fEditor.ExportToHtml(fname);
+		for I := 0 to Units.Count-1 do begin
+			UnitName := Units[I].FileName;
+
+			// Load from disk
+			sl.LoadFromFile(UnitName);
+
+			// Save to disk as HTML
+			SynExporterHTML.Title := UnitName;
+			SynExporterHTML.Highlighter := dmMain.GetHighlighter(ExtractFilename(UnitName));
+			SynExporterHTML.ExportAll(sl);
+
+			UnitName := ConvertFilename(ExtractRelativePath(Directory, UnitName), BaseDir + pd + 'files', HTML_EXT);
+			SynExporterHTML.SaveToFile(UnitName);
 		end;
 	finally
 		sl.Free;

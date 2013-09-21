@@ -17,40 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-(*
- Changes: 12.2.1 - 12.5.1
- Programmer: Mike Berg
- Description:  Changed ids to cover all know strings from interface as of
-               cvs - 11.20.1. (including my changes :)
-               Rewrote to introduce numbering system.
-               Menu items:                    100
-               non-visual:                    300
-               Dialogs:                       400
-               Global messages/prompts:       1000
-               error messages                 1500
-               misc strings                   2000
-*)
-
-(*
- notes:
-  comp      = 0;
-  res  = 0;
-  sections are marked with { -- --} comments
-  "replaces" comment show ids that are
-    replaced by the ONE below it
-
-  comments at the EOL containing format
-  specifiers are what the programs expect
-  in the string.
-  e.g. // %s          -- program inserts a string
-       // %s %s       -- program inserts 2 strings
-       // %s %d       -- program inserts a string then a integer
-  see delphi help file (format string) for more info
-  on various types.
-*)
-
 const
-  { -- main form items -- }
   // menu captions
   ID_MNU_FILE                           = 1;
   ID_MNU_EDIT                           = 2;
@@ -62,9 +29,8 @@ const
   ID_MNU_WINDOW                         = 8;
   ID_MNU_HELP                           = 9;
   ID_MNU_DEBUG                          = 10;
-  //free to 119 for top level menus
 
-  //file menu
+  // file menu
   ID_SUB_NEW                            = 1001;
   ID_ITEM_NEWPROJECT                    = 1002;
   ID_ITEM_NEWSOURCE                     = 1003;
@@ -72,7 +38,6 @@ const
   ID_ITEM_NEWTEMPLATE                   = 1005;
   ID_ITEM_NEWCLASS                      = 1006;
   ID_HINT_NEW                           = 1007;
-  //free to 129 for sub new items
 
   ID_ITEM_OPEN                          = 2001;
   ID_SUB_REOPEN                         = 2002;
@@ -91,15 +56,13 @@ const
   ID_ITEM_EXPORTPROJECT                 = 2014;
   ID_ITEM_EXPORTTEX                     = 2015;
 
-  //free to 148 for export sub items
   ID_SUB_IMPORT                         = 3001;
 
   ID_ITEM_PRINT                         = 3002;
   ID_ITEM_PRINTSETUP                    = 3003;
   ID_ITEM_EXIT                          = 3004;
-  //free to 159 for file menu items
 
-  //edit menu
+  // edit menu
   ID_ITEM_DECL                          = 4001;
   ID_ITEM_DEFINE                        = 4002;
   ID_ITEM_UNDO                          = 4003;
@@ -110,7 +73,7 @@ const
   ID_ITEM_SELECTALL                     = 4008;
   ID_ITEM_DELETE                        = 4009;
   ID_SUB_INSERT                         = 4010;
-  //sub items are dynamic
+  // sub items are dynamic
 
   ID_SUB_TOGGLEMARKS                    = 4011;
   ID_SUB_GOTOMARKS                      = 4012;
@@ -120,7 +83,6 @@ const
   ID_ITEM_COPYALL                       = 4016;
   ID_ITEM_CLEAR                         = 4017;
 
-  //free to 174 for edit menu items
   ID_ITEM_COMMENTSELECTION              = 22001;
   ID_ITEM_UNCOMMENTSELECTION            = 22002;
   ID_ITEM_INDENTSELECTION               = 22003;
@@ -129,7 +91,7 @@ const
   ID_ITEM_COLLAPSEALL                   = 22006;
   ID_ITEM_UNCOLLAPSEALL                 = 22007;
 
-  //search menu
+  // search menu
   ID_ITEM_FIND                          = 5001;
   ID_ITEM_FINDINALL                     = 5002;
   ID_ITEM_REPLACE                       = 5003;
@@ -138,7 +100,7 @@ const
   ID_ITEM_INCREMENTAL                   = 5006;
   ID_ITEM_GOTOFUNCTION                  = 5007;
 
-  //view menu
+  // view menu
   ID_ITEM_FLOATWINDOW                   = 5008;
   ID_ITEM_GOTOPROJECTVIEW               = 5009;
   ID_ITEM_GOTOCLASSBROWSER              = 5010;
@@ -159,9 +121,8 @@ const
   ID_TOOLSEARCH                         = 5023;
   ID_ITEM_FLOATREPORT                   = 5024;
   ID_ITEM_REPLACEFILES                  = 5025;
-  //free to 199 for view menu
 
-  //project menu
+  // project menu
   ID_ITEM_NEWFILE                       = 6001;
   ID_ITEM_ADDFILE                       = 6002;
   ID_ITEM_REMOVEFILE                    = 6003;
@@ -170,9 +131,8 @@ const
   ID_ITEM_EDITMAKE                      = 6006;
   ID_ITEM_ADDRESOURCE                   = 6007;
   ID_ITEM_REMOVERESOURCE                = 6008;
-  //free to 209 for project menu items
 
-  //execute menu
+  // execute menu
   ID_ITEM_COMP                          = 7001;
   ID_ITEM_RUN                           = 7002;
   ID_ITEM_COMPRUN                       = 7003;
@@ -184,20 +144,16 @@ const
   ID_ITEM_PROFILE                       = 7009;
   ID_ITEM_ABORTCOMP                     = 7010;
   ID_ITEM_DELPROFINFORMATION            = 7016;
-  //free to 219 for execute menu
-  //more IDs at 2900
 
-  //options menu removed
-  //tools menu
+  // tools menu
   ID_ITEM_COMPOPTIONS                   = 7011;
   ID_ITEM_ENVIROOPTIONS                 = 7012;
   ID_ITEM_EDITOROPTIONS                 = 7013;
   ID_ITEM_TOOLCONFIG                    = 7014;
   ID_ITEM_SHORTCUTSCONFIG               = 7015;
   // tool items dynamic
-  //free to 229 for tool menu items
 
-  //window menu
+  // window menu
   ID_ITEM_FULLSCRMODE                   = 8001;
   ID_ITEM_FULLSCRBACK                   = 8002;
   ID_ITEM_NEXT                          = 8003;
@@ -206,15 +162,12 @@ const
   ID_FULLSCREEN_MSG                     = 8006;
   ID_ITEM_CLOSEALLBUTTHIS               = 8007;
   ID_ITEM_LIST                          = 8008;
-  //free to 239 for window items
 
-  //help menu
+  // help menu
   ID_ITEM_ABOUT                         = 9001;
   ID_ITEM_UPDATECHECK                   = 9002;
   ID_ITEM_CUSTOM                        = 9003;
   ID_ITEM_HELPDEVCPP                    = 9004;
-
-  //rest dynamic from help.ini
 
   //debug menu
   ID_ITEM_DEBUG                         = 10001;
@@ -233,9 +186,8 @@ const
   ID_ITEM_MODIFYVALUE                   = 10014;
   ID_ITEM_CLEARALL                      = 10015;
 
-  //free to 259 for menu items
-
   // context menus
+ 
   // project popup
   ID_POP_NEWFILE                        = 10016;
   ID_POP_ADDFILE                        = 10017;
@@ -245,25 +197,15 @@ const
   ID_ITEM_NEXTINS                       = 10021;
   ID_ITEM_STEPINS                       = 10022;
   ID_ITEM_SKIPFUNCTION                  = 10023;
-  //free to 269 for project popup
-
-  //unit popup
+ 
+  // unit popup
   ID_POP_REMOVE                         = 11001;
   ID_POP_RENAME                         = 11002;
   ID_POP_CLOSE                          = 11003;
   ID_POP_OPEN                           = 11004;
   ID_POP_OPEN2                          = 11005;
-  //free to 279 for unit popup
 
-  //editor popup
-    // close file from unitpop
-    // open header from unitpop
-    // edit menu items from edit menu
-
-  //toggle, goto, help created dynamically
-  //new pulled from file-new sub menu
-
-  //class browser popup
+  // class browser popup
   ID_POP_GOTODECL                       = 12001;
   ID_POP_GOTOIMPL                       = 12002;
   ID_POP_NEWCLASS                       = 12003;
@@ -280,26 +222,21 @@ const
   ID_POP_VIEWPROJECT                    = 12014;
   ID_POP_SHOWINHERITED                  = 12015;
   ID_POP_OPENWITH                       = 12016;
-  // free to 295 for class browser popup
 
-  // free to 299 for context menu items
-
-  //message control
-  //tab captions
+  // message control
   ID_SHEET_COMP                         = 13001;
   ID_SHEET_RES                          = 13002;
   ID_SHEET_COMPLOG                      = 13003;
   ID_SHEET_FIND                         = 13004;
   ID_SHEET_CLOSE                        = 13005;
   ID_SHEET_DEBUG                        = 13006;
-  // free to 310 for new sheets
 
   // pop menu
   ID_SHEET_POP_CLEAR                    = 14001;
   ID_SHEET_POP_COPY                     = 14002;
   ID_SHEET_POP_HIDE                     = 14003;
 
-  //column headers
+  // column headers
   ID_COL_LINE                           = 15001;
   ID_COL_COL                            = 16002;
   ID_COL_FILE                           = 15002;
@@ -312,16 +249,12 @@ const
   ID_COL_WATCHNAME                      = 16003;
   ID_COL_WATCHVAL                       = 16004;
 
-  // may want to remap id_col_f* to own values
-  // for true custom titles
-
-  //compile log sheet
+  // compile log sheet
   ID_GRP_INFO                           = 16005;
   ID_GRP_COMPRESULTS                    = 16006;
   ID_TOTALERRORS                        = 16007;
   ID_OUTPUTSIZE                         = 16008;
   ID_TOTALWARNINGS                      = 16009;
-  //free to 329 for compile log sheet
 
   ID_DEB_WATCHES                        = 17001;
   ID_DEB_BACKTRACE                      = 17002;
@@ -329,9 +262,8 @@ const
   ID_DEB_SENDGDBCOMMAND                 = 17004;
   ID_DEB_SEND                           = 17005;
   ID_DEB_EVALUATE                       = 17006;
-  //free to 339 for column titles
 
-  //specials toolbar
+  // specials toolbar
   ID_TB_NEW                             = 18001;
   ID_TB_INSERT                          = 18002;
   ID_TB_TOGGLE                          = 18003;
@@ -339,10 +271,10 @@ const
   ID_TB_PROJECT                         = 18005;
   ID_TB_DEBUG                           = 18006;
   ID_TB_REPORT                          = 18007;
-  //free to 349 for specials bar
 
-  //non-visual controls (save/load dialogs etc...)
-  //captions
+  // non-visual controls (save/load dialogs etc...)
+
+  // captions
   ID_NV_OPENFILE                        = 19001;
   ID_NV_OPENADD                         = 19002;
   ID_NV_EXPORT                          = 19003;
@@ -358,23 +290,14 @@ const
   ID_NV_VARNAME                         = 20006;
   ID_NV_VARVALUE                        = 20007;
 
-  //NOTE: need system for filters
-
   // Project Manager/Class Browser
   ID_LP_PROJECT                         = 21001;
   ID_LP_CLASSES                         = 21002;
 
-  //free to 399 for main form items
-
-{ -- end main form -- }
-
-
-{ -- forms -- }
-
-{  Editor options form }
-    // caption
+  // Editor options form
   ID_EOPT                               = 23001;
-    // Tab captions
+
+  // Tab captions
   ID_EOPT_GENTAB                        = 23002;
   ID_EOPT_DISPLAYTAB                    = 23003;
   ID_EOPT_SYNTAXTAB                     = 23004;
@@ -383,14 +306,14 @@ const
   ID_EOPT_BROWSERTAB                    = 23007;
   ID_EOPT_AUTOSAVETAB                   = 23008;
 
-    // sub-tab captions
+  // sub-tab captions
   ID_EOPT_CPINSERTS                     = 24001;
   ID_EOPT_CPDEFAULT                     = 24002;
   ID_EOPT_AUTOSAVEFILE                  = 24003;
   ID_EOPT_OPTIONS                       = 24004;
   ID_EOPT_CPSYMBOLS                     = 24005;
 
-    // General Tab Items
+  // General Tab Items
   ID_EOPT_SAVESYNTAXQUESTION            = 25001;
   ID_EOPT_EDOPTIONS                     = 25002;
   ID_EOPT_AUTOINDENT                    = 25003;
@@ -461,22 +384,21 @@ const
   ID_EOPT_SAVESYNTAX                    = 27029;
 
 
-    // Code Tab -- Inserts
+  // Code Tab -- Inserts
   ID_EOPT_CICODE                        = 27030;
   ID_EOPT_CIMENU                        = 27031;
   ID_EOPT_CISECTION                     = 27032;
   ID_EOPT_CIDESC                        = 27033;
   ID_EOPT_DEFCODE                       = 27034;
 
-    // Completion Tab
+  // Completion Tab
   ID_EOPT_CCCACHECHECK                  = 27035;
   ID_EOPT_CCCACHELABEL                  = 27036;
   ID_EOPT_COMPLETIONENABLE              = 27037;
   ID_EOPT_COMPLETIONDELAY               = 27038;
   ID_EOPT_COMPLETIONCOLOR               = 27039;
 
-    // Class browsing Tab
-  // 490 is empty now - you can use it ;)
+  // Class browsing Tab
   ID_EOPT_AUTOSAVEONLYOPENFILE          = 27040;
   ID_EOPT_BROWSERLOCAL                  = 27041;
   ID_EOPT_BROWSERSAMPLE                 = 27042;
@@ -516,22 +438,17 @@ const
   ID_NP_PRJSHEET                        = 28005;
   ID_NP_PRJOPTIONS                      = 28006;
   
-  // free to 519 for new project form
-
   //remove unit
   ID_RU                                 = 29001;
   ID_RU_TEXT                            = 29002;
-  //free to 524 for remove form
 
   // Goto line form
   ID_GOTO_CAPTION                       = 30001;
   ID_GOTO_TEXT                          = 30002;
-  //free to 529 for goto form
 
   // Tool config form
   ID_TF                                 = 31001;
   ID_TF_LABEL                           = 31002;
-  // free to 534 for tool config form
 
   // Tool edit form
   ID_TE                                 = 32001;
@@ -541,12 +458,10 @@ const
   ID_TE_PARAM                           = 32005;
   ID_TE_INSERT                          = 32006;
   ID_TE_AVAIL                           = 32007;
-  //free to 544 for tools edit form
 
   // Icon Lib Form
   ID_IF                                 = 33001;
   ID_IF_USEICO                          = 33002;
-  // free to 549 for icon library form
 
   // Configure devShortcuts component
   ID_SC_CAPTION                         = 34001;
@@ -554,12 +469,13 @@ const
   ID_SC_TIP                             = 34003;
   ID_SC_HDRENTRY                        = 34004;
   ID_SC_HDRSHORTCUT                     = 34005;
-
-  // free to 559 for more forms.
+  ID_SC_CANCEL                          = 34006;
+  ID_SC_OK                              = 34007;
+  ID_SC_REPLACEHINT                     = 34008;
+  ID_SC_BUTTON                          = 34009;
 
   // Tool edit form macros
   ID_ET_MACROS                          = 35001;
-  // free to 579 for macro desc (thats 19 max!)
 
   // About form
   ID_AB_CAPTION                         = 36001;
@@ -580,7 +496,7 @@ const
   ID_AB_LBLBLOG                         = 36016;
   ID_AB_BLOG                            = 36017;
 
-  //Code Inserts Edit
+  // Code Inserts Edit
   ID_CIE_EDCAPTION                      = 37001;
   ID_CIE_ADDCAPTION                     = 37002;
   ID_CIE_MENU                           = 37003;
@@ -622,7 +538,6 @@ const
   ID_ENV_SELLANGDIR                     = 38032;
   ID_ENV_THEME                          = 38033;
   ID_ENV_INTERFACETAB                   = 38034;
-  // more at 2800
 
   // Find Form
   ID_FIND                               = 38035;
@@ -647,7 +562,6 @@ const
 
   ID_ENV_PAUSECONSOLE                   = 38054;
   ID_ENV_AUTOREMEMBER                   = 38055;
-
 
   ID_FIND_REPLACE                       = 38056;
   ID_FIND_REPLACEFILES                  = 38057;
@@ -676,7 +590,6 @@ const
   ID_COPT_LINKERTAB                     = 41005;
   ID_COPT_PROGRAMSTAB                   = 41006;
   ID_COPT_COMPILERTIP                   = 41007;
-  // free to 709 for new tabs
 
   ID_COPT_BIN                           = 42001;
   ID_COPT_LIB                           = 42002;
@@ -696,7 +609,7 @@ const
   ID_COPT_ACCESS                        = 44004;
   ID_COPT_DOLLAR                        = 44005;
   ID_COPT_HEURISTICS                    = 44006;
-// not used anymore  ID_COPT_CYGWIN      = 44007;
+  ID_COPT_CYGWIN                        = 44007;
   ID_COPT_ADDCOMP                       = 44008;
   ID_COPT_DELAY                         = 44009;
   ID_COPT_DELAYMSG                      = 44010;
@@ -705,7 +618,7 @@ const
   ID_COPT_NULNEW                        = 44013;
   ID_COPT_CSPACE                        = 44014;
 
-  //CodeGen Tab
+  // CodeGen Tab
   ID_COPT_GRP_CODEGEN                   = 45001;
   ID_COPT_GRP_OPTIMIZE                  = 45002;
   ID_COPT_EXCEPT                        = 46001;
@@ -719,14 +632,14 @@ const
   ID_COPT_PROFILING                     = 46009;
   ID_COPT_PROFILE                       = 46010;
 
-  //Linker Tab
+  // Linker Tab
   ID_COPT_OBJC                          = 46011;
   ID_COPT_DEBUG                         = 46012;
   ID_COPT_NOLIBS                        = 46013;
   ID_COPT_WIN32                         = 46014;
   ID_COPT_LINKADD                       = 46015;
 
-  //CodeGen Tab (again!)
+  // CodeGen Tab (again!)
   ID_COPT_NOOPT                         = 46016;
   ID_COPT_OPTMORE                       = 46017;
   ID_COPT_ASSEMBLY                      = 46018;
@@ -784,7 +697,7 @@ const
   ID_PRT_SELONLY                        = 49011;
   ID_PRT_NOPRTLINENUMMAR                = 49012;
 
-  //Check form
+  // Check form
   ID_UCF                                = 50001;
   ID_UCF_GRP_TASK                       = 50002;
   ID_UCF_GRP_RESULTS                    = 50003;
@@ -793,13 +706,13 @@ const
   ID_UCF_DESC                           = 50006;
   ID_UCF_SITES                          = 50007;
 
-  //AddToDo form
+  // AddToDo form
   ID_ADDTODO_MENUITEM                   = 51001;
   ID_ADDTODO_DESCRIPTION                = 51002;
   ID_ADDTODO_PRIORITY                   = 51003;
   ID_ADDTODO_USER                       = 51004;
 
-  //ViewToDo form
+  // ViewToDo form
   ID_VIEWTODO_MENUITEM                  = 52001;
   ID_VIEWTODO_FILENAME                  = 52002;
   ID_VIEWTODO_DONE                      = 52003;
@@ -812,7 +725,7 @@ const
   ID_VIEWTODO_FILTERFIVE                = 52010;
   ID_VIEWTODO_FILTERSIX                 = 52011;
 
-  //Import MSVC++ form
+  // Import MSVC++ form
   ID_MSVC_MENUITEM                      = 53001;
   ID_MSVC_SELECTMSVC                    = 53002;
   ID_MSVC_OPTIONS                       = 53003;
@@ -821,7 +734,7 @@ const
   ID_MSVC_MSG_SUCCESS                   = 53006;
   ID_MSVC_MSG_CANTLOCATETARGET          = 53007;
 
-  //Import CB form
+  // Import CB form
   ID_CB_MENUITEM                        = 54001;
   ID_CB_SELECTCB                        = 54002;
   ID_CB_OPTIONS                         = 54003;
@@ -830,14 +743,15 @@ const
   ID_CB_MSG_SUCCESS                     = 54006;
   ID_CB_MSG_CANTLOCATETARGET            = 54007;
 
-  //Project Options
+  // Project Options
   ID_POPT                               = 55001;
   ID_POPT_GENTAB                        = 55002;
   ID_POPT_DIRTAB                        = 55003;
   ID_POPT_OUTTAB                        = 55023;
   ID_POPT_MAKTAB                        = 58010;
   ID_POPT_COMPTAB                       = 58013;
-  //general tab
+
+  // general tab
   ID_POPT_PRJNAME                       = 55004;
   ID_POPT_GRP_ICON                      = 55005;
   ID_POPT_ICOLIB                        = 55006;
@@ -868,7 +782,7 @@ const
   ID_POPT_UNITSFORMAT                   = 55029;
   ID_POPT_LOGAUTOSAVE                   = 55030;
 
-  //New template form
+  // New template form
   ID_NEWTPL_NAME                        = 56001;
   ID_NEWTPL_DESCRIPTION                 = 56002;
   ID_NEWTPL_CATEGORY                    = 56003;
@@ -888,7 +802,7 @@ const
   ID_NEWTPL_LIBDIR                      = 56017;
   ID_NEWTPL_RESDIR                      = 56018;
 
-  //New variable form
+  // New variable form
   ID_NEWVAR_VARTYPE                     = 57001;
   ID_NEWVAR_VARNAME                     = 57002;
   ID_NEWVAR_IMPLIN                      = 57003;
@@ -905,7 +819,7 @@ const
   ID_NEWVAR_MSG_NOIMPL                  = 57014;
   ID_NEWVAR_MSG_NOLINE                  = 57015;
 
-  //New class/member form
+  // New class/member form
   ID_NEWMEMB_MEMBNAME                   = 57016;
   ID_NEWMEMB_ARGS                       = 57017;
   ID_NEWCLASS_NAME                      = 57018;
@@ -920,7 +834,7 @@ const
   ID_NEWCLASS_CONSTRUCTOR               = 57027;
   ID_NEWCLASS_DESTRUCTOR                = 57028;
 
-  //File properties form
+  // File properties form
   ID_PROPS_FILENAME                     = 58001;
   ID_PROPS_INPROJECT                    = 58002;
   ID_PROPS_TOTAL                        = 58003;
@@ -930,12 +844,11 @@ const
   ID_PROPS_EMPTY                        = 58007;
   ID_PROPS_FILESIZE                     = 58008;
   ID_PROPS_ABSOLUTE                     = 58009;
-  // 989 is used elsewhere >:
+
   ID_PROPS_RELATIVE                     = 58011;
   ID_PROPS_TIMESTAMP                    = 58012;
-  // 992 is used elsewhere >:
 
-  //Profile analysis form
+  // Profile analysis form
   ID_PROF_CAPTION                       = 59001;
   ID_PROF_TABFLAT                       = 59002;
   ID_PROF_TABGRAPH                      = 59003;
@@ -948,9 +861,6 @@ const
   ID_PROF_APPLY                         = 59010;
   ID_PROF_CUSTOMCOMMANDS                = 59011;
   ID_PROF_CUSTOMUSE                     = 59012;
-
-{ -- global strings  -- }
-  //messages and prompts - 1000+
 
   ID_MSG_TEXTNOTFOUND                   = 60001;
   ID_MSG_COULDNOTOPENFILE               = 60002;
@@ -979,8 +889,6 @@ const
   ID_MSG_CORRESPONDINGSOURCE            = 60025;
   ID_MSG_CORRESPONDINGHEADER            = 60026;
 
-
-  //errors 1500+
   ID_ERR_OPENFILE                       = 61001;
   ID_ERR_SAVEFILE                       = 61002;
   ID_ERR_RENAMEFILE                     = 61003;
@@ -1001,7 +909,6 @@ const
   ID_ERR_PROJECTNOTCOMPILEDSUGGEST      = 61017;
   ID_ERR_SRCNOTCOMPILEDSUGGEST          = 61018;
 
-  //other 2000+
   ID_UNTITLED                           = 62001;
   ID_READONLY                           = 62002;
   ID_INSERT                             = 62003;
@@ -1025,8 +932,7 @@ const
   ID_SEARCHCOUNT                        = 62021;
   ID_DONEPARSINGIN                      = 62022;
   ID_DONEPARSINGHINT                    = 62023;
-  
-{ -- Button Captions -- }
+
   ID_BTN_OK                             = 63001;
   ID_BTN_CANCEL                         = 63002;
   ID_BTN_HELP                           = 63003;
@@ -1050,18 +956,13 @@ const
   ID_BTN_FLOATDEBUG                     = 63021;
   ID_BTN_CLEAR                          = 63022;
   ID_BTN_REFRESH                        = 63023;
-  // free to 2600
 
-{ -- end buttons -- }
-
-{ CPU Window }
   ID_CPU_CAPTION                        = 64001;
   ID_CPU_ASMCODE                        = 64002;
   ID_CPU_FUNC                           = 64003;
   ID_CPU_SYNTAX                         = 64004;
   ID_CPU_REGISTERS                      = 64005;
 
-{ Tip Of The Day }
   ID_TIPS_CAPTION                       = 65001;
   ID_TIPS_DIDYOUKNOW                    = 65002;
   ID_TIPS_NOTIPSTODISPLAY               = 65003;
@@ -1070,7 +971,6 @@ const
   ID_TIPS_PREVIOUSTIP                   = 65006;
   ID_TIPS_RANDOMTIP                     = 65007;
 
-{ Environment Options }
   ID_ENV_FASSTAB                        = 66001;
   ID_ENV_FASSTYPES                      = 66002;
   ID_ENV_FASSDESC                       = 66003;
@@ -1096,20 +996,20 @@ const
   ID_ENV_CACHEFAIL                      = 66023;
   ID_ENV_PRINTERFAIL                    = 66024;
 
-{ Execute menu }
+  // Execute menu
   ID_ITEM_EXECPARAMS                    = 67001;
   ID_ITEM_COMPCURRENT                   = 67002;
 
-{ Window list form }
+  // Window list form
   ID_WL                                 = 68001;
   ID_WL_SELECT                          = 68002;
 
-{ CVS Menu }
+  // CVS Menu
   ID_ITEM_CVSCURRENT                    = 69001;
   ID_ITEM_CVSWHOLE                      = 69002;
   ID_MSG_CVSNOTCONFIGED                 = 69003;
 
-{ CVS form }
+  // CVS form
   ID_CVS_IMPORTTAB                      = 70001;
   ID_CVS_REPOSITORYTAB                  = 70002;
   ID_CVS_GLOBALTAB                      = 70003;
@@ -1167,12 +1067,12 @@ const
   ID_CVS_REMOVETAB                      = 70055;
   ID_CVS_REMOVEFILE                     = 70056;
 
-{ Parameters form }
+  // Parameters form
   ID_PARAM_CAPTION                      = 71001;
   ID_PARAM_PARAMS                       = 71002;
   ID_PARAM_HOST                         = 71003;
 
-{ Project options form (continued) }
+  // Project options form (continued)
   ID_POPT_FILESTAB                      = 72001;
   ID_POPT_PROJFILES                     = 72002;
   ID_POPT_PROJOPTS                      = 72003;
@@ -1204,9 +1104,8 @@ const
   ID_POPT_DEFCPP                        = 72029;
   ID_POPT_RESETPROJECTCOMPILER          = 72030;
   ID_POPT_LANGUAGEDEP                   = 72031;
-  // free to 3400
 
-  // New compilter options
+  // New compiler options
   ID_COPT_STRIP                         = 73001;
   ID_COPT_ARCH                          = 73002;
   ID_COPT_BUILTINPROC                   = 73003;
@@ -1223,9 +1122,47 @@ const
   ID_CMPPRG_WARNINGS                    = 74005;
   ID_CMPPRG_CAPTION                     = 74006;
 
+  // compiler set validator
   ID_COMPVALID_DIRNOTFOUND              = 75001;
   ID_COMPVALID_DIRNOTSET                = 75002;
   ID_COMPVALID_DIRSEARCHED              = 75003;
   ID_COMPVALID_BINFIXSUGGESTION         = 75004;
   ID_COMPVALID_DIRFIXSUGGESTION         = 75005;
   ID_COMPVALID_BINNOTFOUND              = 75006;
+  ID_COMPVALID_BINARY                   = 75007;
+  ID_COMPVALID_CINCLUDE                 = 75008;
+  ID_COMPVALID_CPPINCLUDE               = 75009;
+  ID_COMPVALID_LIBRARY                  = 75010;
+  ID_COMPVALID_CCOMP                    = 75011;
+  ID_COMPVALID_CPPCOMP                  = 75012;
+  ID_COMPVALID_DEBUGGER                 = 75013;
+  ID_COMPVALID_PROFILER                 = 75014;
+  ID_COMPVALID_MAKE                     = 75015;
+  ID_COMPVALID_WINDRES                  = 75016;
+  ID_COMPVALID_DLLWRAP                  = 75017;
+
+  ID_LANGFORM_SELECTTHEME               = 76001;
+  ID_LANGFORM_FONT                      = 76002;
+  ID_LANGFORM_COLOR                     = 76003;
+  ID_LANGFORM_ICONS                     = 76004;
+  ID_LANGFORM_THEMCHANGEHINT            = 76005;
+  ID_LANGFORM_OPTCODECOMPL1             = 76006;
+  ID_LANGFORM_OPTCODECOMPL2             = 76007;
+  ID_LANGFORM_CACHEALL                  = 76008;
+  ID_LANGFORM_CACHESEL                  = 76009;
+  ID_LANGFORM_CACHENONE                 = 76010;
+  ID_LANGFORM_ADDFILE                   = 76011;
+  ID_LANGFORM_ADDFOLDER                 = 76012;
+  ID_LANGFORM_REMOVE                    = 76013;
+  ID_LANGFORM_PARSING                   = 76014;
+  ID_LANGFORM_FINISH1                   = 76015;
+  ID_LANGFORM_FINISH2                   = 76016;
+  ID_LANGFORM_FINISH3                   = 76017;
+  ID_LANGFORM_NEXT                      = 76018;
+  ID_LANGFORM_WAIT                      = 76019;
+  ID_LANGFORM_SAVING                    = 76020;
+  
+  ID_LOAD_COMPILERSET                   = 77001;
+  ID_LOAD_FILEASSOC                     = 77002;
+  ID_LOAD_INITCLASSBROWSER              = 77003;
+  ID_LOAD_RESTOREWINDOW                 = 77004;

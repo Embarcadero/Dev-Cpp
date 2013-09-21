@@ -41,14 +41,17 @@ type
     procedure lvShortcutsCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure lvShortcutsExit(Sender: TObject);
     procedure btnDefaultClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
+    fReplaceHint: AnsiString;
+    fButtonText: AnsiString;
     function GetShortCut(Index: integer): TShortCut;
   public
-    procedure AddShortcut(Item : PMenuShortcut;const MenuName : AnsiString);
+    procedure AddShortcut(Item : PShortcutItem);
     procedure Clear;
     function Count: integer;
     property ShortCuts[Index: integer]: TShortCut read GetShortCut;
-    procedure LoadText(const WindowCaption,Column1,Column2,OK,Cancel,Default : AnsiString);
+    procedure LoadText(const WindowCaption,Column1,Column2,OK,Cancel,Default,ReplaceHint,Button : AnsiString);
   end;
 
 var
@@ -61,7 +64,7 @@ uses
 
 {$R *.dfm}
 
-procedure TfrmShortcutsEditor.LoadText(const WindowCaption,Column1,Column2,OK,Cancel,Default : AnsiString);
+procedure TfrmShortcutsEditor.LoadText(const WindowCaption,Column1,Column2,OK,Cancel,Default,ReplaceHint,Button : AnsiString);
 begin
 	Caption := WindowCaption;
 	lvShortcuts.Columns[0].Caption := Column1;
@@ -69,21 +72,15 @@ begin
 	btnOk.Caption := OK;
 	btnCancel.Caption := Cancel;
 	btnDefault.Caption := Default;
+	fReplaceHint := ReplaceHint;
+	fButtonText := Button;
 end;
 
-procedure TfrmShortcutsEditor.AddShortcut(Item : PMenuShortcut;const MenuName : AnsiString);
-var
-	MenuItem: TMenuItem;
+procedure TfrmShortcutsEditor.AddShortcut(Item : PShortcutItem);
 begin
-	MenuItem := item^.MenuItem;
-
-	// ???
-	//if (M.Action<>nil) and (LeftStr(M.Action.Name,6)='dynact') then
-	//	Exit;
-
 	with lvShortcuts.Items.Add do begin
-		Caption := StripHotkey(MenuName + ' >> ' + MenuItem.Caption);
-		SubItems.Add(ShortCutToText(MenuItem.ShortCut));
+		Caption := Item^.ListEntry;
+		SubItems.Add(ShortCutToText(Item^.Current));
 		Data := Item;
 	end;
 end;
@@ -105,7 +102,7 @@ end;
 
 procedure TfrmShortcutsEditor.lvShortcutsKeyDown(Sender: TObject;var Key: Word; Shift: TShiftState);
 var
-  I: integer;
+  I, oldindex: integer;
   sct: AnsiString;
 begin
 	// Require a selection
@@ -131,13 +128,27 @@ begin
 		Exit;
 
 	sct := ShortCutToText(ShortCut(Key, Shift));
-	lvShortcuts.Selected.SubItems[0] := sct;
 
-	// search other entries using this shortcut, and clear them
+ 	oldindex := -1;
 	for I:=0 to lvShortcuts.Items.Count-1 do
-		if lvShortcuts.Items[I]<>lvShortcuts.Selected then
-			if lvShortcuts.Items[I].SubItems[0] = sct then
-				lvShortcuts.Items[I].SubItems[0] := '';
+
+		// Don't scan popups, they can contain duplicate shortcuts (they're picked based on focus)
+		if (lvShortcuts.Items[I] <> lvShortcuts.Selected) and (Pos('Popup',lvShortcuts.Items[I].Caption) = 0) then
+			if lvShortcuts.Items[I].SubItems[0] = sct then begin
+				oldindex := i;
+				break;
+			end;
+
+	// Can be written in a more compact form, but I prefer readability
+	if oldindex <> -1 then begin // already in use
+		if MessageDlg(Format(fReplaceHint,[lvShortcuts.Items[oldindex].Caption]),mtConfirmation,[mbYes,mbNo],0) = mrYes then begin // replace...
+			lvShortcuts.Items[oldindex].SubItems[0] := ''; // remove old
+			lvShortcuts.Selected.SubItems[0] := sct; // set new
+		end;
+	end else
+		lvShortcuts.Selected.SubItems[0] := sct;
+
+	// Set new one
 
 	// don't let the keystroke propagate...
 	Key := 0;
@@ -189,8 +200,13 @@ var
 begin
 	lvShortcuts.Items.BeginUpdate;
 	for I := 0 to lvShortcuts.Items.Count -1  do
-		lvShortcuts.Items[I].SubItems[0] := ShortCutToText(PMenuShortcut(lvShortcuts.Items[I].Data)^.Default);
+		lvShortcuts.Items[I].SubItems[0] := ShortCutToText(PShortcutItem(lvShortcuts.Items[I].Data)^.Default);
 	lvShortcuts.Items.EndUpdate;
+end;
+
+procedure TfrmShortcutsEditor.FormCreate(Sender: TObject);
+begin
+	lvShortcuts.DoubleBuffered := true; // performance hit, but it's worth it
 end;
 
 end.

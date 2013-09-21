@@ -1,20 +1,20 @@
 {
-	This file is part of Dev-C++
-	Copyright (c) 2004 Bloodshed Software
+    This file is part of Dev-C++
+    Copyright (c) 2004 Bloodshed Software
 
-	Dev-C++ is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+    Dev-C++ is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-	Dev-C++ is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    Dev-C++ is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with Dev-C++; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    You should have received a copy of the GNU General Public License
+    along with Dev-C++; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
 {$A+,B-,C+,D+,E-,F-,G+,H+,I+,J-,K-,L+,M-,N+,O+,P+,Q-,R-,S-,T-,U-,V+,W-,X+,Y+,Z1}
@@ -200,9 +200,9 @@ type
     actClose: TAction;
     actCloseAll: TAction;
     actCloseProject: TAction;
-    actXHTML: TAction;
-    actXRTF: TAction;
-    actXProject: TAction;
+    actExportHTML: TAction;
+    actExportRTF: TAction;
+    actExportProject: TAction;
     actPrint: TAction;
     actPrintSU: TAction;
     actExit: TAction;
@@ -286,16 +286,6 @@ type
     InsertBtn: TToolButton;
     ToggleBtn: TToolButton;
     GotoBtn: TToolButton;
-    actFileMenu: TAction;
-    actEditMenu: TAction;
-    actSearchMenu: TAction;
-    actViewMenu: TAction;
-    actProjectMenu: TAction;
-    actExecuteMenu: TAction;
-    actDebugMenu: TAction;
-    actToolsMenu: TAction;
-    actWindowMenu: TAction;
-    actHelpMenu: TAction;
     CppTokenizer: TCppTokenizer;
     CppParser: TCppParser;
     CodeCompletion: TCodeCompletion;
@@ -313,7 +303,6 @@ type
     actConfigdevShortcuts: TAction;
     ConfiguredevShortcuts1: TMenuItem;
     DateTimeMenuItem: TMenuItem;
-    actProgramReset: TAction;
     N25: TMenuItem;
     Programreset1: TMenuItem;
     CommentheaderMenuItem: TMenuItem;
@@ -534,7 +523,7 @@ type
     actToggle: TAction;
     actGoto: TAction;
     TEXItem: TMenuItem;
-    actXTex: TAction;
+    actExportTex: TAction;
     NextLineBtn: TButton;
     IntoLineBtn: TButton;
     lblSendCommandGdb: TLabel;
@@ -576,6 +565,12 @@ type
     ToolButton3: TToolButton;
     SplitterBottom: TSplitter;
     N76: TMenuItem;
+    N12: TMenuItem;
+    Abortcompilation1: TMenuItem;
+    oggleBreakpoint1: TMenuItem;
+    N18: TMenuItem;
+    ToolButton4: TToolButton;
+    ToolButton5: TToolButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -600,10 +595,10 @@ type
     procedure actCloseExecute(Sender: TObject);
     procedure actCloseAllExecute(Sender: TObject);
     procedure actCloseProjectExecute(Sender: TObject);
-    procedure actXHTMLExecute(Sender: TObject);
-    procedure actXRTFExecute(Sender: TObject);
-    procedure actXTexExecute(Sender: TObject);
-    procedure actXProjectExecute(Sender: TObject);
+    procedure actExportHTMLExecute(Sender: TObject);
+    procedure actExportRTFExecute(Sender: TObject);
+    procedure actExportTexExecute(Sender: TObject);
+    procedure actExportProjectExecute(Sender: TObject);
     procedure actPrintExecute(Sender: TObject);
     procedure actPrintSUExecute(Sender: TObject);
     procedure actExitExecute(Sender: TObject);
@@ -667,7 +662,7 @@ type
     procedure actNextLineExecute(Sender: TObject);
     procedure actRemoveWatchExecute(Sender: TObject);
     procedure actStepOverExecute(Sender: TObject);
-    procedure actForceStopExecuteExecute(Sender: TObject);
+    procedure actStopExecuteExecute(Sender: TObject);
     procedure actUndoUpdate(Sender: TObject);
     procedure actRedoUpdate(Sender: TObject);
     procedure actCutUpdate(Sender: TObject);
@@ -688,8 +683,6 @@ type
     procedure PageControlChange(Sender: TObject);
     procedure actConfigdevShortcutsExecute(Sender: TObject);
     procedure DateTimeMenuItemClick(Sender: TObject);
-    procedure actProgramResetExecute(Sender: TObject);
-    procedure actProgramResetUpdate(Sender: TObject);
     procedure CommentheaderMenuItemClick(Sender: TObject);
     procedure PageControlMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
     procedure actNewTemplateUpdate(Sender: TObject);
@@ -827,6 +820,7 @@ type
     procedure FindOutputDeletion(Sender: TObject; Item: TListItem);
     procedure CompilerOutputDeletion(Sender: TObject; Item: TListItem);
     procedure ResourceOutputDeletion(Sender: TObject; Item: TListItem);
+    procedure actStopExecuteUpdate(Sender: TObject);
   private
     fPreviousHeight : integer; // stores MessageControl height to be able to restore to previous height
     fTools : TToolController; // tool list controller
@@ -1188,10 +1182,10 @@ begin
 	actImportMSVC.Caption:=				Lang[ID_MSVC_MENUITEM];
 
 	ExportItem.Caption:=				Lang[ID_SUB_EXPORT];
-	actXHTML.Caption:=					Lang[ID_ITEM_EXPORTHTML];
-	actXRTF.Caption:=					Lang[ID_ITEM_EXPORTRTF];
-	actXTex.Caption:=					Lang[ID_ITEM_EXPORTTEX];
-	actXProject.Caption:=				Lang[ID_ITEM_EXPORTPROJECT];
+	actExportHTML.Caption:=				Lang[ID_ITEM_EXPORTHTML];
+	actExportRTF.Caption:=				Lang[ID_ITEM_EXPORTRTF];
+	actExportTex.Caption:=				Lang[ID_ITEM_EXPORTTEX];
+	actExportProject.Caption:=			Lang[ID_ITEM_EXPORTPROJECT];
 
 	actPrint.Caption:=					Lang[ID_ITEM_PRINT];
 	actPrintSU.Caption:=				Lang[ID_ITEM_PRINTSETUP];
@@ -1275,7 +1269,6 @@ begin
 	actRebuild.Caption:=				Lang[ID_ITEM_REBUILD];
 	actClean.Caption:=					Lang[ID_ITEM_CLEAN];
 	actSyntaxCheck.Caption:=			Lang[ID_ITEM_SYNTAXCHECK];
-	actProgramReset.Caption:=			Lang[ID_ITEM_PROGRAMRESET];
 	actProfileProject.Caption:=			Lang[ID_ITEM_PROFILE];
 	actDeleteProfileProject.Caption:=	Lang[ID_ITEM_DELPROFINFORMATION];
 	actAbortCompilation.Caption:=		Lang[ID_ITEM_ABORTCOMP];
@@ -2223,37 +2216,37 @@ begin
 		devFileMonitor.Activate;
 end;
 
-procedure TMainForm.actXHTMLExecute(Sender: TObject);
+procedure TMainForm.actExportHTMLExecute(Sender: TObject);
 var
 	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then
-		e.ExportToHTML('');
+		e.ExportToHTML;
 end;
 
-procedure TMainForm.actXRTFExecute(Sender: TObject);
+procedure TMainForm.actExportRTFExecute(Sender: TObject);
 var
 	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then
-		e.ExportToRTF('');
+		e.ExportToRTF;
 end;
 
-procedure TMainForm.actXTexExecute(Sender: TObject);
+procedure TMainForm.actExportTexExecute(Sender: TObject);
 var
 	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then
-		e.ExportToTEX('');
+		e.ExportToTEX;
 end;
 
-procedure TMainForm.actXProjectExecute(Sender: TObject);
+procedure TMainForm.actExportProjectExecute(Sender: TObject);
 begin
 	if assigned(fProject) then
-		fProject.ExportAll;
+		fProject.ExportToHTML;
 end;
 
 procedure TMainForm.actPrintExecute(Sender: TObject);
@@ -3618,9 +3611,12 @@ begin
 	end;
 end;
 
-procedure TMainForm.actForceStopExecuteExecute(Sender: TObject);
+procedure TMainForm.actStopExecuteExecute(Sender: TObject);
 begin
-	fDebugger.Stop;
+	if fDebugger.Executing then
+		fDebugger.Stop
+	else if devExecutor.Running then
+		devExecutor.Reset;
 end;
 
 procedure TMainForm.actUndoUpdate(Sender: TObject);
@@ -4075,7 +4071,9 @@ begin
       Lang[ID_SC_HDRSHORTCUT],
       Lang[ID_BTN_OK],
       Lang[ID_BTN_CANCEL],
-      Lang[ID_BTN_DEFAULT]);
+      Lang[ID_BTN_DEFAULT],
+      Lang[ID_SC_REPLACEHINT],
+      Lang[ID_SC_BUTTON]);
 end;
 
 procedure TMainForm.DateTimeMenuItemClick(Sender: TObject);
@@ -4085,19 +4083,6 @@ begin
 	e := GetEditor;
 	if Assigned(e) then
 		e.InsertString(FormatDateTime('dd/mm/yy hh:nn', Now), TRUE);
-end;
-
-procedure TMainForm.actProgramResetExecute(Sender: TObject);
-begin
-	devExecutor.Reset;
-end;
-
-procedure TMainForm.actProgramResetUpdate(Sender: TObject);
-begin
-	if Assigned(fProject) then
-		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and devExecutor.Running
-	else
-		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and devExecutor.Running;
 end;
 
 procedure TMainForm.CommentheaderMenuItemClick(Sender: TObject);
@@ -5959,7 +5944,7 @@ begin
 
 	// Apply shortcuts BEFORE TRANSLATING!!!
 	devShortcuts.Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
-	devShortcuts.Load;
+	devShortcuts.Load(ActionList);
 
 	UpdateSplash('Applying UI settings...');
 
@@ -6048,7 +6033,7 @@ begin
 	// Load bookmarks, captions and hints
 	LoadText;
 
-	UpdateSplash('Loading compiler set...');
+	UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
 
 	// Load the current compiler set (needs translations)
 	devCompiler.LoadSet(devCompiler.CurrentSet);
@@ -6057,7 +6042,7 @@ begin
 	DDETopic := DevCppDDEServer.Name;
 	if devData.CheckAssocs then begin
 		try
-			UpdateSplash('Checking file associations...');
+			UpdateSplash(Lang[ID_LOAD_FILEASSOC]);
 			CheckAssociations(true); // check and fix
 		except
 			MessageBox(Application.Handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
@@ -6065,11 +6050,11 @@ begin
 		end;
 	end;
 
-	UpdateSplash('Initializing class browser...');
+	UpdateSplash(Lang[ID_LOAD_INITCLASSBROWSER]);
 
 	InitClassBrowser(true);
 
-	UpdateSplash('Restoring window size...');
+	UpdateSplash(Lang[ID_LOAD_RESTOREWINDOW]);
 
 	// Showing for the first time? Maximize
 	if devData.First then
@@ -6385,6 +6370,14 @@ begin
 		ResSheet.Caption := Lang[ID_SHEET_RES] + ' (' + IntToStr(ResourceOutput.Items.Count - 1) + ')'
 	else
 		ResSheet.Caption := Lang[ID_SHEET_RES];
+end;
+
+procedure TMainForm.actStopExecuteUpdate(Sender: TObject);
+begin
+	if Assigned(fProject) then
+		TCustomAction(Sender).Enabled := (not (fProject.Options.typ = dptStat) and devExecutor.Running) or fDebugger.Executing
+	else
+		TCustomAction(Sender).Enabled := ((PageControl.PageCount > 0) and devExecutor.Running) or fDebugger.Executing;
 end;
 
 end.

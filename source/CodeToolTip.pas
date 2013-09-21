@@ -1,83 +1,21 @@
-{----------------------------------------------------------------------------------
+{
+    This file is part of Dev-C++
+    Copyright (c) 2004 Bloodshed Software
 
-  The contents of this file are subject to the GNU General Public License
-  Version 1.1 or later (the "License"); you may not use this file except in
-  compliance with the License. You may obtain a copy of the License at
-  http://www.gnu.org/copyleft/gpl.html
+    Dev-C++ is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-  Software distributed under the License is distributed on an "AS IS" basis,
-  WITHOUT WARRANTY OF ANY KIND, either expressed or implied. See the License for
-  the specific language governing rights and limitations under the License.
+    Dev-C++ is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  The Initial Developer of the Original Code is Peter Schraut.
-  http://www.console-dev.de
-
-  
-  Portions created by Peter Schraut are Copyright 
-  (C) 2002, 2003, 2004 by Peter Schraut (http://www.console-dev.de) 
-  All Rights Reserved.
-
-  
-----------------------------------------------------------------------------------}
-
-//
-//
-//  History:
-//
-//    xx/xx/2002
-//      Initial release
-//
-//    31/10/2003
-//      Complete rewrite of first version
-//
-//    01/11/2003
-//      Beautified code
-//
-//    02/11/2003
-//      Improved active parameter highlighting
-//      Added "SkipString" function
-//
-//    21/03/2004
-//      Added compatibility for latest synedit with wordwrap
-//
-//    22/03/2004
-//      Added 'overloaded' feature. when more than 1 prototype
-//      with the same name is in the list, the hintwindow displays
-//      two buttons (up/down) where the user can walk through
-//      all the same named functions. (like in VC++ .NET)
-//      
-//      added highlighting for hints. the hints use the same
-//      highlighter-attributes as the editor does :)
-//
-//      the codehint is now displayed below the currentline and at the
-//      same x position where the token starts. (like in VC++ .NET)
-//
-//      now looks the file very rubbish and needs some serious cleanup :P
-//
-//
-//    2004-12-05
-//      NEW_SYNEDIT is no longer need as we use "new' synedit
-//      and never going back to "old". removing all defines and ifdefs
-//
-//    24/03/2004
-//      Made more changes for downwards compatibility with old SynEdit.
-//      Check the 'NEW_SYNEDIT' define.
-//      Outsourced XPToolTip code to its own unit
-//      Sorted functions in alphabetical order
-//
-//    25/03/2004
-//      Some minor fixes regarding overloaded tooltips
-//      Turned of DropShadow by default, since it's a bit annoying for code tooltips
-//      Fixed 'Select' function. It now sets FCustomSelection to True
-//
-//    26/03/2004
-//      Fixed a bug where no hint appeared when the cursor was directly before a '('
-//
-//    2011/2012
-//      Rewritten the code that tries to find out which function needs to be displayed.
-//      Completely restyled the tooltip font. Now only highlights the currently needed argument.
-//      The tooltip now also shows when placing the cursor inside completed arglists between ().
-//      The tooltip now updates automatically when hopping from function to function.
+    You should have received a copy of the GNU General Public License
+    along with Dev-C++; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+}
 
 unit CodeToolTip;
 
@@ -157,23 +95,20 @@ type
     FCurParamIndex: Integer;
     FLookupEditor: TCustomSynEdit;
     FMaxScanLength: Integer;
-    FOldFunction : AnsiString;
+    FOldFunction: AnsiString;
+    FForceHide: boolean; // true if hidden by Esc
     FCustomSelIndex: Boolean; // user clicked up/down
     procedure SetSelIndex(Value: Integer);
     procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
   protected
     function GetCommaIndex(P: PAnsiChar; Start, CurPos: Integer):Integer;
-    procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     function FindClosestToolTip(const ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     function DummyPaint : integer; // obtain tooltip width
     procedure Paint; override;
-    procedure RemoveEditor(AEditor: TCustomSynEdit);
     procedure RethinkCoordAndActivate;
-    procedure SetEditor(Value: TCustomSynEdit);
     property MaxScanLength: Integer read FMaxScanLength write FMaxScanLength;
-    property Options: TToolTipOptions read FOptions write FOptions;
     property SelIndex: Integer read FSelIndex write SetSelIndex;
   public
     constructor Create(AOwner: TComponent); override;
@@ -181,9 +116,11 @@ type
     procedure Show;
     procedure ActivateHint(Rect: TRect; const AHint: AnsiString); override;
     procedure ReleaseHandle;
+    property ForceHide: boolean read FForceHide write FForceHide;
+    property Options: TToolTipOptions read FOptions write FOptions;
     property Parser: TCppParser read FParser write FParser;
     property Activated: Boolean read FActivated write FActivated;
-    property Editor: TCustomSynEdit read FEditor write SetEditor;
+    property Editor: TCustomSynEdit read FEditor write FEditor;
   end;
 
 implementation
@@ -245,16 +182,6 @@ begin
 		Result := Copy(S, WordStart+1, WordEnd-WordStart);
 	end else
 		Result := '';
-end;
-
-// Count commas in the parameter list
-function CountCommas(const S: AnsiString): Integer;
-var
-	J: Integer;
-begin
-	Result := 0;
-	for J := 1 to Length(S) do
-		if S[J] = ',' then Inc(Result);
 end;
 
 //----------------- TCustomCodeToolTipButton ---------------------------------------------------------------------------
@@ -339,7 +266,6 @@ begin
 	end;
 
 	FMaxScanLength := 256; // Number of character to walk through trying to find ( and )
-	FKeyDownProc  := EditorKeyDown;
 
 	FUpButton := TCodeToolTipUpButton.Create;
 	FUpButton.Left := 4;
@@ -383,18 +309,6 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-// Handles input of the tooltip...
-procedure TCodeToolTip.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-	if Activated then begin
-		case Key of
-			VK_ESCAPE: begin
-				if (ttoHideOnESC in FOptions) then ReleaseHandle;
-			end;
-		end;
-	end;
-end;
-
 function TCodeToolTip.FindClosestToolTip(const ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
 var
 	I,K: Integer;
@@ -405,7 +319,7 @@ begin
 
 	// Don't change selection if the current tooltip is correct too
 	if ToolTip = FToolTips.Strings[FSelIndex] then
-		if CountCommas(FToolTips.Strings[FSelIndex]) <= CommaIndex then Exit;
+		if CountChar(FToolTips.Strings[FSelIndex],',') <= CommaIndex then Exit;
 
 	LastCommaCnt := 9999;
 	NewIndex := 0;
@@ -414,7 +328,7 @@ begin
 	for I := 0 to FToolTips.Count-1 do begin
 		Str := GetPrototypeName(FToolTips.Strings[I]);
 		if SameStr(Str,ToolTip) then begin
-			K := CountCommas(FToolTips.Strings[I]);
+			K := CountChar(FToolTips.Strings[I],',');
 			if K >= CommaIndex then begin
 				if K < LastCommaCnt then begin
 					NewIndex := I;
@@ -685,20 +599,6 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TCodeToolTip.RemoveEditor(aEditor: TCustomSynEdit);
-begin
-	if Assigned(aEditor) then begin
-		aEditor.RemoveKeyDownHandler(fKeyDownProc);
-		if aEditor = fEditor then
-			fEditor := nil;
-		{$IFDEF SYN_COMPILER_5_UP}
-		RemoveFreeNotification(aEditor);
-		{$ENDIF}
-	end;
-end;
-
-//----------------------------------------------------------------------------------------------------------------------
-
 procedure TCodeToolTip.RethinkCoordAndActivate;
 var
 	Pt: TPoint;
@@ -726,21 +626,6 @@ begin
                     Pt.X+DummyPaint,
                     Pt.Y+FBmp.Canvas.TextHeight('Wg')+FEditor.LineHeight+4),
                     Caption);
-end;
-
-//----------------------------------------------------------------------------------------------------------------------
-
-procedure TCodeToolTip.SetEditor(Value: TCustomSynEdit);
-begin
-	if Assigned(FEditor) then
-		RemoveEditor(fEditor);
-
-	FEditor := Value;
-
-	if Assigned(FEditor) then begin
-		FEditor.AddKeyDownHandler(FKeyDownProc);
-		FEditor.FreeNotification(FEditor);
-	end;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -962,4 +847,3 @@ initialization
 	MakeIdentTable;
 
 end.
-

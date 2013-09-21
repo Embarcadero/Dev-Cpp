@@ -1,6 +1,6 @@
 object LangForm: TLangForm
-  Left = 534
-  Top = 420
+  Left = 462
+  Top = 171
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Dev-C++ first time configuration'

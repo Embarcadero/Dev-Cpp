@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 577
-  Top = 246
+  Left = 312
+  Top = 263
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -62,7 +62,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -106,7 +106,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -278,7 +278,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 292
-          Height = 112
+          Height = 111
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -444,7 +444,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 41
+          Height = 40
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -484,7 +484,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -538,6 +538,7 @@ object MainForm: TMainForm
     BevelKind = bkNone
     RowSize = 28
     TabOrder = 1
+    OnClick = ToolbarClick
     OnContextPopup = ToolbarContextPopup
     object tbMain: TToolBar
       Left = 11
@@ -546,8 +547,6 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Main'
-      Constraints.MaxWidth = 149
-      Constraints.MinWidth = 149
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -602,12 +601,10 @@ object MainForm: TMainForm
     object tbCompile: TToolBar
       Left = 441
       Top = 2
-      Width = 178
+      Width = 209
       Height = 22
       AutoSize = True
       Caption = 'Compile and Run'
-      Constraints.MaxWidth = 178
-      Constraints.MinWidth = 178
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -659,13 +656,26 @@ object MainForm: TMainForm
         ImageIndex = 49
         Style = tbsSeparator
       end
-      object ProfileBtn: TToolButton
+      object ToolButton4: TToolButton
         Left = 131
+        Top = 0
+        Action = actStopExecute
+      end
+      object ToolButton5: TToolButton
+        Left = 154
+        Top = 0
+        Width = 8
+        Caption = 'ToolButton5'
+        ImageIndex = 48
+        Style = tbsSeparator
+      end
+      object ProfileBtn: TToolButton
+        Left = 162
         Top = 0
         Action = actProfileProject
       end
       object ProfilingInforBtn: TToolButton
-        Left = 154
+        Left = 185
         Top = 0
         Action = actDeleteProfileProject
       end
@@ -677,8 +687,6 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Project'
-      Constraints.MaxWidth = 78
-      Constraints.MinWidth = 78
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -720,8 +728,6 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Edit'
-      Constraints.MaxWidth = 47
-      Constraints.MinWidth = 47
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -750,8 +756,6 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'Search'
-      Constraints.MaxWidth = 104
-      Constraints.MinWidth = 104
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -792,14 +796,12 @@ object MainForm: TMainForm
       end
     end
     object tbSpecials: TToolBar
-      Left = 632
+      Left = 663
       Top = 2
       Width = 71
       Height = 22
       AutoSize = True
       Caption = 'Specials'
-      Constraints.MaxWidth = 71
-      Constraints.MinWidth = 71
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -834,8 +836,6 @@ object MainForm: TMainForm
       Height = 22
       AutoSize = True
       Caption = 'tbClasses'
-      Constraints.MaxWidth = 700
-      Constraints.MinWidth = 700
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -1081,7 +1081,8 @@ object MainForm: TMainForm
     Left = 206
     Top = 79
     object FileMenu: TMenuItem
-      Action = actFileMenu
+      Caption = '&File'
+      OnClick = actFileMenuExecute
       object mnuNew: TMenuItem
         Caption = 'New'
         object NewSourceFileItem: TMenuItem
@@ -1165,19 +1166,19 @@ object MainForm: TMainForm
         Caption = '&Export'
         ImageIndex = 12
         object HTMLItem: TMenuItem
-          Action = actXHTML
+          Action = actExportHTML
         end
         object RTFItem: TMenuItem
-          Action = actXRTF
+          Action = actExportRTF
         end
         object TEXItem: TMenuItem
-          Action = actXTex
+          Action = actExportTex
         end
         object N19: TMenuItem
           Caption = '-'
         end
         object ProjecttoHTMLItem: TMenuItem
-          Action = actXProject
+          Action = actExportProject
         end
       end
       object N43: TMenuItem
@@ -1215,7 +1216,8 @@ object MainForm: TMainForm
       end
     end
     object EditMenu: TMenuItem
-      Action = actEditMenu
+      Caption = '&Edit'
+      OnClick = actFileMenuExecute
       object UndoItem: TMenuItem
         Tag = 6
         Action = actUndo
@@ -1302,7 +1304,8 @@ object MainForm: TMainForm
       end
     end
     object SearchMenu: TMenuItem
-      Action = actSearchMenu
+      Caption = '&Search'
+      OnClick = actFileMenuExecute
       object FindItem: TMenuItem
         Tag = 7
         Action = actFind
@@ -1340,7 +1343,8 @@ object MainForm: TMainForm
       end
     end
     object ViewMenu: TMenuItem
-      Action = actViewMenu
+      Caption = '&View'
+      OnClick = actFileMenuExecute
       object ProjectManagerItem: TMenuItem
         Action = actProjectManager
         AutoCheck = True
@@ -1450,7 +1454,8 @@ object MainForm: TMainForm
       end
     end
     object ProjectMenu: TMenuItem
-      Action = actProjectMenu
+      Caption = '&Project'
+      OnClick = actFileMenuExecute
       object NewunitinprojectItem: TMenuItem
         Tag = 2
         Action = actProjectNew
@@ -1469,7 +1474,8 @@ object MainForm: TMainForm
       end
     end
     object ExecuteMenu: TMenuItem
-      Action = actExecuteMenu
+      Caption = 'E&xecute'
+      OnClick = actFileMenuExecute
       object CompileItem: TMenuItem
         Tag = 8
         Action = actCompile
@@ -1481,17 +1487,20 @@ object MainForm: TMainForm
         Tag = 9
         Action = actRun
       end
-      object mnuExecParameters: TMenuItem
-        Action = actExecParams
-      end
-      object N10: TMenuItem
-        Caption = '-'
-      end
       object CompileandRunItem: TMenuItem
         Action = actCompRun
       end
       object RebuildallItem: TMenuItem
         Action = actRebuild
+      end
+      object N18: TMenuItem
+        Caption = '-'
+      end
+      object mnuExecParameters: TMenuItem
+        Action = actExecParams
+      end
+      object N10: TMenuItem
+        Caption = '-'
       end
       object SyntaxCheckItem: TMenuItem
         Action = actSyntaxCheck
@@ -1514,12 +1523,22 @@ object MainForm: TMainForm
       object N25: TMenuItem
         Caption = '-'
       end
+      object oggleBreakpoint1: TMenuItem
+        Action = actBreakPoint
+      end
+      object Abortcompilation1: TMenuItem
+        Action = actDebug
+      end
+      object N12: TMenuItem
+        Caption = '-'
+      end
       object Programreset1: TMenuItem
-        Action = actProgramReset
+        Action = actStopExecute
       end
     end
     object ToolsMenu: TMenuItem
-      Action = actToolsMenu
+      Caption = '&Tools'
+      OnClick = actToolsMenuExecute
       object CompileroptionsItem: TMenuItem
         Tag = 11
         Action = actCompOptions
@@ -1664,7 +1683,8 @@ object MainForm: TMainForm
       end
     end
     object WindowMenu: TMenuItem
-      Action = actWindowMenu
+      Caption = '&Window'
+      OnClick = actWindowMenuExecute
       object CloseAllItem: TMenuItem
         Action = actCloseAll
       end
@@ -1693,8 +1713,9 @@ object MainForm: TMainForm
       end
     end
     object HelpMenu: TMenuItem
-      Action = actHelpMenu
+      Caption = '&Help'
       GroupIndex = 9
+      OnClick = actFileMenuExecute
       object HelpMenuItem: TMenuItem
         Caption = '&Help on Dev-C++'
         ImageIndex = 46
@@ -2093,32 +2114,32 @@ object MainForm: TMainForm
       OnExecute = actCloseProjectExecute
       OnUpdate = actUpdateProject
     end
-    object actXHTML: TAction
+    object actExportHTML: TAction
       Tag = 1
       Category = 'File'
       Caption = 'to &HTML'
-      OnExecute = actXHTMLExecute
+      OnExecute = actExportHTMLExecute
       OnUpdate = actUpdatePageCount
     end
-    object actXRTF: TAction
+    object actExportRTF: TAction
       Tag = 2
       Category = 'File'
       Caption = 'to &RTF'
-      OnExecute = actXRTFExecute
+      OnExecute = actExportRTFExecute
       OnUpdate = actUpdatePageCount
     end
-    object actXTex: TAction
+    object actExportTex: TAction
       Tag = 3
       Category = 'File'
       Caption = 'to &Tex'
-      OnExecute = actXTexExecute
+      OnExecute = actExportTexExecute
       OnUpdate = actUpdatePageCount
     end
-    object actXProject: TAction
+    object actExportProject: TAction
       Tag = 3
       Category = 'File'
       Caption = '&Project to HTML'
-      OnExecute = actXProjectExecute
+      OnExecute = actExportProjectExecute
       OnUpdate = actUpdateProject
     end
     object actPrint: TAction
@@ -2517,49 +2538,8 @@ object MainForm: TMainForm
       Caption = 'Stop execution'
       ImageIndex = 11
       ShortCut = 117
-      OnExecute = actForceStopExecuteExecute
-      OnUpdate = actUpdateDebuggerRunning
-    end
-    object actFileMenu: TAction
-      Caption = '&File'
-      OnExecute = actFileMenuExecute
-    end
-    object actEditMenu: TAction
-      Caption = '&Edit'
-      OnExecute = actFileMenuExecute
-      OnUpdate = actEditMenuUpdate
-    end
-    object actSearchMenu: TAction
-      Caption = '&Search'
-      OnExecute = actFileMenuExecute
-    end
-    object actViewMenu: TAction
-      Caption = '&View'
-      OnExecute = actFileMenuExecute
-    end
-    object actProjectMenu: TAction
-      Caption = '&Project'
-      OnExecute = actFileMenuExecute
-    end
-    object actExecuteMenu: TAction
-      Caption = 'E&xecute'
-      OnExecute = actFileMenuExecute
-    end
-    object actDebugMenu: TAction
-      Caption = '&Debug'
-      OnExecute = actFileMenuExecute
-    end
-    object actToolsMenu: TAction
-      Caption = '&Tools'
-      OnExecute = actToolsMenuExecute
-    end
-    object actWindowMenu: TAction
-      Caption = '&Window'
-      OnExecute = actWindowMenuExecute
-    end
-    object actHelpMenu: TAction
-      Caption = '&Help'
-      OnExecute = actFileMenuExecute
+      OnExecute = actStopExecuteExecute
+      OnUpdate = actStopExecuteUpdate
     end
     object actSwapHeaderSource: TAction
       Category = 'Edit'
@@ -2579,13 +2559,6 @@ object MainForm: TMainForm
       Caption = 'Configure &Shortcuts'
       ImageIndex = 31
       OnExecute = actConfigdevShortcutsExecute
-    end
-    object actProgramReset: TAction
-      Category = 'Execute'
-      Caption = 'Program reset'
-      ShortCut = 16452
-      OnExecute = actProgramResetExecute
-      OnUpdate = actProgramResetUpdate
     end
     object actComment: TAction
       Category = 'Edit'
@@ -2876,7 +2849,7 @@ object MainForm: TMainForm
     end
     object actHideFSBar: TAction
       Category = 'Window'
-      Caption = 'actHideFSBar'
+      Caption = 'Hide fullscreen bar'
       ShortCut = 32889
       OnExecute = actHideFSBarExecute
     end

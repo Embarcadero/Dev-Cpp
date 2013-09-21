@@ -101,16 +101,39 @@ type
     function GetSelected: integer;
     procedure CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
   public
+    procedure LoadText; // call after selecting a language of course
     procedure UpdateList(List: TStrings);
     property Selected: integer read GetSelected;
   end;
 
 implementation
 
-uses 
+uses
   MultiLangSupport, datamod, devcfg, utils, main, version, ImageTheme, SynEditTypes;
 
 {$R *.dfm}
+
+procedure TLangForm.LoadText;
+begin
+	grpThemes.Caption := Lang[ID_LANGFORM_SELECTTHEME];
+	lblFont.Caption := Lang[ID_LANGFORM_FONT];
+	lblColor.Caption := Lang[ID_LANGFORM_COLOR];
+	lblIcons.Caption := Lang[ID_LANGFORM_ICONS];
+	lblEditInfo.Caption := Lang[ID_LANGFORM_THEMCHANGEHINT];
+	CacheInfo1.Caption := Lang[ID_LANGFORM_OPTCODECOMPL1];
+	CacheInfo2.Caption := Lang[ID_LANGFORM_OPTCODECOMPL2];
+	YesCache.Caption := Lang[ID_LANGFORM_CACHEALL];
+	AltCache.Caption := Lang[ID_LANGFORM_CACHESEL];
+	NoCache.Caption := Lang[ID_LANGFORM_CACHENONE];
+	ButtonAddFile.Caption := Lang[ID_LANGFORM_ADDFILE];
+	ButtonAddFolder.Caption := Lang[ID_LANGFORM_ADDFOLDER];
+	ButtonRemove.Caption := Lang[ID_LANGFORM_REMOVE];
+	ParseLabel.Caption := Lang[ID_LANGFORM_PARSING];
+	Finish1.Caption := Lang[ID_LANGFORM_FINISH1];
+	Finish2.Caption := Lang[ID_LANGFORM_FINISH2];
+	Finish3.Caption := Lang[ID_LANGFORM_FINISH3];
+	OkBtn.Caption := Lang[ID_LANGFORM_NEXT];
+end;
 
 procedure TLangForm.UpdateList(List: TStrings);
 var
@@ -138,7 +161,7 @@ begin
 		HasProgressStarted := true;
 	end;
 	pbCCCache.Position := pbCCCache.Position + Current;
-	ParseLabel.Caption := 'Parsing file:' + #13#10 + ReplaceFirstText(FileName,devDirs.Exec,'\');
+	ParseLabel.Caption := Lang[ID_LANGFORM_PARSING] + #13#10 + ReplaceFirstText(FileName,devDirs.Exec,'\');
 	Application.ProcessMessages;
 end;
 
@@ -151,6 +174,16 @@ begin
 	if OkBtn.Tag = 0 then begin // goto edit page
 		OkBtn.Tag := 1;
 		LangPanel.Visible := false;
+
+		// Update translation
+		if Selected <> -1 then begin
+			Lang.Open(Lang.Langs.Names[Selected]);
+			devData.Language := Lang.FileFromDescription(Lang.Langs.Names[Selected]);
+		end else begin
+			Lang.Open('English.lng'); // never happens...
+		end;
+		LoadText;
+
 		EditPanel.Visible := true;
 	end else if OkBtn.Tag = 1 then begin // goto cache page
 		OkBtn.Tag := 2;
@@ -167,7 +200,7 @@ begin
 			OkBtn.Enabled := false;
 			BuildPanel.Visible := False;
 			ProgressPanel.Visible := True;
-			OkBtn.Caption := 'Please wait...';
+			OkBtn.Caption := Lang[ID_LANGFORM_WAIT];
 			devCodeCompletion.Enabled := true;
 			devCodeCompletion.UseCacheFiles := true;
 			devCodeCompletion.Enabled := true;
@@ -205,8 +238,9 @@ begin
 						FilesFromWildcard(sl[i], '*.*', f, false, false, false);
 						for j := 0 to f.Count - 1 do
 							MainForm.CppParser.AddFileToScan(f[j]);
-					end else
-						MessageDlg('Directory "' + sl[i] + '" does not exist', mtWarning, [mbOK], 0);
+					end;
+					//end else
+					//	MessageDlg('Directory "' + sl[i] + '" does not exist', mtWarning, [mbOK], 0);
 				end;
 			end else begin
 				for i := 0 to sl.Count-1 do begin
@@ -232,7 +266,7 @@ begin
 
 			MainForm.CppParser.ParseList;
 
-			ParseLabel.Caption := 'Saving...';
+			ParseLabel.Caption := Lang[ID_LANGFORM_SAVING];
 			Application.ProcessMessages;
 
 			MainForm.CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);

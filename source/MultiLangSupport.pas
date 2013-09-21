@@ -49,7 +49,6 @@ type
     fCurLang : AnsiString;
     fStrings : TStringList;
     fDefaultLang: TStringList;
-    fSelect : boolean;
     function GetString(ID: integer): AnsiString;
     function GetLangName: AnsiString;
     constructor Create;
@@ -143,7 +142,7 @@ var
 begin
 	result:= false;
 	aFile:= ValidateFile(FileName, devDirs.Lang);
-	if (aFile = '') and fSelect then begin
+	if (aFile = '') then begin
 		MessageDlg('Could not open language file ' + filename, mtError, [mbOK], 0);
 		exit;
 	end;
@@ -237,25 +236,14 @@ end;
 
 procedure TdevMultiLangSupport.SelectLanguage;
 begin
-	fSelect:= TRUE;
-	if fLangList.Count> 0 then
-		with TLangForm.Create(Application.Mainform) do
-			try
-				UpdateList(fLangList);
-				if ShowModal = mrOK then
-					if Selected <> -1 then begin
-						Open(fLangList.Names[Selected]);
-						devData.Language:= FileFromDescription(fLangList.Names[Selected]);
-					end else begin
-						Open('English.lng');
-					end;
-			finally
-				Free;
-				fSelect:= FALSE;
-			end else begin
-				Open('English.lng');
-				fSelect:= FALSE;
-			end;
+	if fLangList.Count > 0 then begin
+		with TLangForm.Create(Application.Mainform) do try
+			UpdateList(fLangList);
+			ShowModal;
+		finally
+			Free;
+		end;
+	end;
 end;
 
 procedure TdevMultiLangSupport.SetLang(const Lang: AnsiString);

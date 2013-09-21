@@ -1,26 +1,22 @@
 {
-	This file is part of Dev-C++
-	Copyright (c) 2004 Bloodshed Software
+    This file is part of Dev-C++
+    Copyright (c) 2004 Bloodshed Software
 
-	Dev-C++ is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+    Dev-C++ is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-	Dev-C++ is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    Dev-C++ is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with Dev-C++; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    You should have received a copy of the GNU General Public License
+    along with Dev-C++; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-(*
- Need to add command-lines from devCompiler object to
- compiler and linker command lines
-*)
 unit compiler;
 
 interface
@@ -959,10 +955,6 @@ var
 
 begin
 
-	// Ignore code snippets that GCC 4.8 produces
-	if (Length(line) > 0) and (Line[1] = ' ') then // they always start with a space
-		Exit;
-
 	OLine := '';
 	OCol := '';
 	OFile := '';
@@ -997,6 +989,10 @@ begin
 		DoOutput(OLine, OCol, OFile, OMsg);
 		Exit;
 	end;
+
+	// Ignore code snippets that GCC 4.8 produces
+	if (Length(line) > 0) and (Line[1] = ' ') then // they always start with a space
+		Exit;
 
 	GetFileName; // assume regular main.cpp:line:col: message
 

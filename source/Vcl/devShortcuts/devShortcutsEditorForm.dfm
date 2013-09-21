@@ -13,6 +13,7 @@ object frmShortcutsEditor: TfrmShortcutsEditor
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object lvShortcuts: TListView

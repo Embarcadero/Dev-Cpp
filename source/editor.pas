@@ -1,20 +1,20 @@
 {
-	This file is part of Dev-C++
-	Copyright (c) 2004 Bloodshed Software
+    This file is part of Dev-C++
+    Copyright (c) 2004 Bloodshed Software
 
-	Dev-C++ is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+    Dev-C++ is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-	Dev-C++ is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    Dev-C++ is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with Dev-C++; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    You should have received a copy of the GNU General Public License
+    along with Dev-C++; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
 unit editor;
@@ -117,9 +117,9 @@ type
     procedure GotoLine;
     procedure SetCaretPos(line,col : integer;settopline : boolean = true); // takes folds into account
 
-    procedure ExportToHTML(const OverwriteFileName : AnsiString);
-    procedure ExportToRTF(const OverwriteFileName : AnsiString);
-    procedure ExportToTEX(const OverwriteFileName : AnsiString);
+    procedure ExportToHTML;
+    procedure ExportToRTF;
+    procedure ExportToTEX;
 
     procedure InsertString(Value: AnsiString;MoveCursor: boolean);
     procedure SetErrorFocus(Col, Line: integer);
@@ -559,6 +559,7 @@ begin
 		fAllowMouseOver := false;
 
 		// Update the function tip
+		fFunctionTip.ForceHide := false;
 		if Assigned(fFunctionTipTimer) then begin
 			if fFunctionTip.Activated and FunctionTipAllowed then
 				fFunctionTip.Show
@@ -594,7 +595,7 @@ end;
 
 function TEditor.FunctionTipAllowed : boolean;
 begin
-	Result := not fText.IsScrolling and fText.Focused and not fText.SelAvail and devEditor.ShowFunctionTip and Assigned(fText.Highlighter);
+	Result := not fText.IsScrolling and fText.Focused and not fText.SelAvail and devEditor.ShowFunctionTip and Assigned(fText.Highlighter) and not fFunctionTip.ForceHide;
 end;
 
 procedure TEditor.FunctionTipTimer(Sender : TObject);
@@ -603,31 +604,28 @@ begin
 		fFunctionTip.Show;
 end;
 
-procedure TEditor.ExportToHTML(const OverwriteFileName : AnsiString);
+procedure TEditor.ExportToHTML;
 var
 	SynExporterHTML : TSynExporterHTML;
 	SaveFileName : AnsiString;
 begin
 	SynExporterHTML := TSynExporterHTML.Create(nil);
 	try
-		if OverwriteFileName = '' then begin
-			with TSaveDialog.Create(Application) do try
+		with TSaveDialog.Create(Application) do try
 
-				Filter := SynExporterHTML.DefaultFilter;
-				Title := Lang[ID_NV_EXPORT];
-				DefaultExt := HTML_EXT;
-				FileName := ChangeFileExt(fFileName,HTML_EXT);
-				Options := Options + [ofOverwritePrompt];
+			Filter := SynExporterHTML.DefaultFilter;
+			Title := Lang[ID_NV_EXPORT];
+			DefaultExt := HTML_EXT;
+			FileName := ChangeFileExt(fFileName,HTML_EXT);
+			Options := Options + [ofOverwritePrompt];
 
-				if Execute then
-					SaveFileName := FileName
-				else
-					Exit; // automatically gotos finally
-			finally
-				Free;
-			end;
-		end else
-			SaveFileName := OverwriteFileName;
+			if Execute then
+				SaveFileName := FileName
+			else
+				Exit; // automatically gotos finally
+		finally
+			Free;
+		end;
 
 		SynExporterHTML.Title := ExtractFileName(SaveFileName);
 		SynExporterHTML.CreateHTMLFragment := False;
@@ -643,31 +641,28 @@ begin
 	end;
 end;
 
-procedure TEditor.ExportToRTF(const OverwriteFileName : AnsiString);
+procedure TEditor.ExportToRTF;
 var
 	SynExporterRTF : TSynExporterRTF;
 	SaveFileName : AnsiString;
 begin
 	SynExporterRTF := TSynExporterRTF.Create(nil);
 	try
-		if OverwriteFileName = '' then begin
-			with TSaveDialog.Create(Application) do try
+		with TSaveDialog.Create(Application) do try
 
-				Filter:= SynExporterRTF.DefaultFilter;
-				Title:= Lang[ID_NV_EXPORT];
-				DefaultExt := RTF_EXT;
-				FileName := ChangeFileExt(fFileName,RTF_EXT);
-				Options := Options + [ofOverwritePrompt];
+			Filter:= SynExporterRTF.DefaultFilter;
+			Title:= Lang[ID_NV_EXPORT];
+			DefaultExt := RTF_EXT;
+			FileName := ChangeFileExt(fFileName,RTF_EXT);
+			Options := Options + [ofOverwritePrompt];
 
-				if Execute then
-					SaveFileName := FileName
-				else
-					Exit;
-			finally
-				Free;
-			end;
-		end else
-			SaveFileName := OverwriteFileName;
+			if Execute then
+				SaveFileName := FileName
+			else
+				Exit;
+		finally
+			Free;
+		end;
 
 		SynExporterRTF.Title := ExtractFileName(SaveFileName);
 		SynExporterRTF.ExportAsText := True;
@@ -682,31 +677,28 @@ begin
 	end;
 end;
 
-procedure TEditor.ExportToTEX(const OverwriteFileName : AnsiString);
+procedure TEditor.ExportToTEX;
 var
 	SynExporterTEX : TSynExporterTEX;
 	SaveFileName : AnsiString;
 begin
 	SynExporterTEX := TSynExporterTEX.Create(nil);
 	try
-		if OverwriteFileName = '' then begin
-			with TSaveDialog.Create(Application) do try
+		with TSaveDialog.Create(Application) do try
 
-				Filter:= SynExporterTEX.DefaultFilter;
-				Title:= Lang[ID_NV_EXPORT];
-				DefaultExt := TEX_EXT;
-				FileName := ChangeFileExt(fFileName,TEX_EXT);
-				Options := Options + [ofOverwritePrompt];
+			Filter:= SynExporterTEX.DefaultFilter;
+			Title:= Lang[ID_NV_EXPORT];
+			DefaultExt := TEX_EXT;
+			FileName := ChangeFileExt(fFileName,TEX_EXT);
+			Options := Options + [ofOverwritePrompt];
 
-				if Execute then
-					SaveFileName := FileName
-				else
-					Exit;
-			finally
-				Free;
-			end;
-		end else
-			SaveFileName := OverwriteFileName;
+			if Execute then
+				SaveFileName := FileName
+			else
+				Exit;
+		finally
+			Free;
+		end;
 
 		SynExporterTex.Title := ExtractFileName(SaveFileName);
 		SynExporterTex.ExportAsText := True;
@@ -1072,11 +1064,20 @@ procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftStat
 var
 	p : TBufferCoord;
 begin
-	// Update the cursor if it is hovering above a keyword and ctrl is pressed
-	if (Key = VK_CONTROL) and HandpointAllowed(p) then
-		fText.Cursor:=crHandPoint
-	else
-		fText.Cursor:=crIBeam;
+	case(Key) of
+		VK_CONTROL: begin
+			if HandpointAllowed(p) then // Update the cursor if it is hovering above a keyword and ctrl is pressed
+				fText.Cursor:=crHandPoint
+			else
+				fText.Cursor:=crIBeam;
+		end;
+		VK_ESCAPE: begin // Update function tip
+			if ttoHideOnEsc in fFunctionTip.Options then begin
+				fFunctionTip.ReleaseHandle;
+				fFunctionTip.ForceHide := true;
+			end;
+		end;
+	end;
 end;
 
 procedure TEditor.EditorKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);

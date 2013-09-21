@@ -1,20 +1,20 @@
 {
-	This file is part of Dev-C++
-	Copyright (c) 2004 Bloodshed Software
+    This file is part of Dev-C++
+    Copyright (c) 2004 Bloodshed Software
 
-	Dev-C++ is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+    Dev-C++ is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-	Dev-C++ is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    Dev-C++ is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with Dev-C++; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    You should have received a copy of the GNU General Public License
+    along with Dev-C++; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
 unit devcfg;
@@ -94,6 +94,8 @@ type
     procedure EraseSet(Index: integer);
     procedure ClearSet;
     procedure ValidateSet;
+    procedure ValidateDirs;
+    procedure ValidateExes;
     procedure AddSet(const Name,Folder : AnsiString);
 
     procedure ReadSets;
@@ -1020,10 +1022,9 @@ begin
 	OptionStringToList(fOptionString);
 end;
 
-procedure TdevCompiler.ValidateSet;
+procedure TdevCompiler.ValidateDirs;
 var
 	msg, goodbin, badbin, goodlib, badlib, goodinc, badinc, goodinccpp, badinccpp : AnsiString;
-	I : integer;
 
 	procedure CheckDirs(dirlist : TStringList;var gooddirs : AnsiString;var baddirs : AnsiString);
 	var
@@ -1065,57 +1066,41 @@ var
 		end;
 	end;
 
-	function FindFile(dirlist : TStringList;const FileName : AnsiString) : boolean;
-	var
-		i : integer;
-	begin
-		result := false;
-
-		for I := 0 to dirlist.Count - 1 do begin
-			if FileExists(dirlist[i] + '\' + FileName) then begin
-				result := true;
-				Exit;
-			end;
-		end;
-	end;
-
 	procedure AddUnique(var list : TStringList;const entry : AnsiString);
 	begin
 		if list.IndexOf(entry) = -1 then
 			list.Add(entry);
 	end;
-
 begin
-
 	// Check if we can find the directories the user pointed to
 	msg := '';
 	if fBinDir.Count > 0 then begin // we need some bin dir, so treat count=0 as an error too
 		CheckDirs(fBinDir,goodbin,badbin);
 		if badbin <> '' then begin
-			msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],['binary']) + #13#10;
+			msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_BINARY]]) + #13#10;
 			msg := msg + StringReplace(badbin, ';', #13#10, [rfReplaceAll]);
 			msg := msg + #13#10 + #13#10;
 		end;
 	end else begin
-		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTSET],['binary']);
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTSET],[Lang[ID_COMPVALID_BINARY]]);
 		msg := msg + #13#10 + #13#10;
 	end;
 
 	CheckDirs(fCDir,goodinc,badinc);
 	if badinc <> '' then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],['C include']) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_CINCLUDE]]) + #13#10;
 		msg := msg + StringReplace(badinc, ';', #13#10, [rfReplaceAll]);
 		msg := msg + #13#10 + #13#10;
 	end;
 	CheckDirs(fCppDir,goodinccpp,badinccpp);
 	if badinccpp <> '' then begin
-		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],['C++ include']) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_CPPINCLUDE]]) + #13#10;
 		msg := msg + StringReplace(badinccpp, ';', #13#10, [rfReplaceAll]);
 		msg := msg + #13#10 + #13#10;
 	end;
 	CheckDirs(fLibDir,goodlib,badlib);
 	if badlib <> '' then begin
-		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],['library']) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_LIBRARY]]) + #13#10;
 		msg := msg + StringReplace(badlib, ';', #13#10, [rfReplaceAll]);
 		msg := msg + #13#10 + #13#10;
 	end;
@@ -1166,7 +1151,27 @@ begin
 			SaveSet(fCurrentSet);
 		end;
 	end;
+end;
 
+procedure TdevCompiler.ValidateExes;
+var
+	msg : AnsiString;
+	I : integer;
+
+	function FindFile(dirlist : TStringList;const FileName : AnsiString) : boolean;
+	var
+		i : integer;
+	begin
+		result := false;
+
+		for I := 0 to dirlist.Count - 1 do begin
+			if FileExists(dirlist[i] + '\' + FileName) then begin
+				result := true;
+				Exit;
+			end;
+		end;
+	end;
+begin
 	// Don't bother checking exes if the dir is not set
 	if fBinDir.Count = 0 then Exit;
 
@@ -1175,25 +1180,25 @@ begin
 	// now check some exes
 	msg := '';
 	if not FindFile(fBinDir,fgccName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['C compiler',fgccName]) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_CCOMP],fgccName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fgppName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['C++ compiler',fgppName]) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_CPPCOMP],fgppName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fgdbName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['debugger',fgdbName]) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_DEBUGGER],fgdbName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fgprofName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['profiler',fgprofName]) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_PROFILER],fgprofName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fmakeName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['makefile processor',fmakeName]) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_MAKE],fmakeName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fwindresName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['resource processor',fwindresName]) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_WINDRES],fwindresName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fdllwrapName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['DLL wrapper',fdllwrapName]) + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_DLLWRAP],fdllwrapName]) + #13#10;
 	end;
 	if msg <> '' then begin
 		msg := msg + #13#10 + Lang[ID_COMPVALID_DIRSEARCHED] + #13#10;
@@ -1202,6 +1207,12 @@ begin
 		msg := msg + #13#10 + Lang[ID_COMPVALID_BINFIXSUGGESTION];
 		MessageDlg(msg, mtWarning, [mbOK], 0);
 	end;
+end;
+
+procedure TdevCompiler.ValidateSet;
+begin
+	ValidateDirs;
+	ValidateExes;
 end;
 
 procedure TdevCompiler.LoadSet(Index: integer);
@@ -1811,7 +1822,7 @@ begin
 
 	// Margin
 	fMarginVis:= TRUE;
-	fMarginSize:= 80;
+	fMarginSize:= 0; // disable by default, receiving lots of complaints about it enabled
 	fMarginColor:= cl3DLight;
 
 	// Misc.
