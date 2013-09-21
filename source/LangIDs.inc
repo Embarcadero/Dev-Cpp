@@ -530,6 +530,8 @@ const
   ID_AB_MAILLIST                   = 592;
   ID_AB_AUTHOR                     = 593;
   ID_AB_UPDATE                     = 594;
+  ID_AB_LBLBLOG                    = 595;
+  ID_AB_BLOG                       = 596;
 
   //Code Inserts Edit
   ID_CIE_EDCAPTION                 = 600;

@@ -34,7 +34,7 @@ resourcestring
 	// misc strings
 	GCC_VERSION          = '4.5.2';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '4.9.9.3';
+	DEVCPP_VERSION       = '4.9.9.4';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -55,14 +55,14 @@ resourcestring
 	DEV_INTERNAL_THEME   = 'New Look';
 
 	// default directories
-	BIN_DIR              = 'bin;';
-	LIB_DIR              = 'lib;lib' + pd + 'gcc;';
-	C_INCLUDE_DIR        = 'include;';
-	CPP_INCLUDE_DIR      = 'include;' +
-                           'include' + pd + 'sys;' +
-                           'include' + pd + 'ddk;' +
-                           'include' + pd + 'gdiplus;' +
-                           'include' + pd + 'GL;';
+	BIN_DIR              = '%path%' + pd + 'bin';
+	LIB_DIR              = '%path%' + pd + 'lib;%path%' + pd + 'lib' + pd + 'gcc';
+	C_INCLUDE_DIR        = '%path%' + pd + 'include';
+	CPP_INCLUDE_DIR      = '%path%' + pd + 'include;' +
+                           '%path%' + pd + 'include' + pd + 'sys;' +
+                           '%path%' + pd + 'include' + pd + 'ddk;' +
+                           '%path%' + pd + 'include' + pd + 'gdiplus;' +
+                           '%path%' + pd + 'include' + pd + 'GL';
 	LANGUAGE_DIR         = 'Lang' + pd;
 	ICON_DIR             = 'Icons' + pd;
 	HELP_DIR             = 'Help' + pd;
@@ -143,7 +143,7 @@ const
   cppTypes:  array[0..4] of string[4] = (CPP_EXT, CC_EXT, CXX_EXT, CP2_EXT, CP_EXT);
   headTypes: array[0..2] of string[4] = (H_EXT, HPP_EXT, RH_EXT);
   resTypes:  array[0..2] of string[4] = (RES_EXT, RC_EXT, RH_EXT);
-  objTypes:  array[0..0] of string = (OBJ_EXT);
+  objTypes:  array[0..0] of string    = (OBJ_EXT);
 
   // GDB commands and Displays
   GDB_FILE             = 'file';
@@ -215,9 +215,6 @@ const
   GPROF_CHECKFILE      = 'gmon.out';
   GPROF_CMD_GENFLAT    = '-p';
   GPROF_CMD_GENMAP     = '-q';
-
-var
- DevCppDir: string;
 
 implementation
 

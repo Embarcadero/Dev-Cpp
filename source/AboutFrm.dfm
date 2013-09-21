@@ -32,7 +32,7 @@ object AboutForm: TAboutForm
     Caption = 'Copyright (c) Bloodshed Software'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = 11
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsBold]
     ParentFont = False
@@ -2967,7 +2967,7 @@ object AboutForm: TAboutForm
       Top = 24
       Width = 146
       Height = 13
-      Caption = 'Bloodshed Software web site : '
+      Caption = 'Bloodshed Software Website:'
     end
     object BloodSite: TLabel
       Left = 168
@@ -2978,7 +2978,7 @@ object AboutForm: TAboutForm
       Caption = 'http://www.bloodshed.net'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
-      Font.Height = -11
+      Font.Height = 11
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
@@ -3000,7 +3000,7 @@ object AboutForm: TAboutForm
       Caption = 'http://www.mingw.org'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
-      Font.Height = -11
+      Font.Height = 11
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
@@ -3022,7 +3022,7 @@ object AboutForm: TAboutForm
       Caption = 'http://www.bloodshed.net/forum'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
-      Font.Height = -11
+      Font.Height = 11
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
@@ -3044,7 +3044,7 @@ object AboutForm: TAboutForm
       Caption = 'http://www.bloodshed.net/devcpp-ml.html'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
-      Font.Height = -11
+      Font.Height = 11
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
@@ -3066,13 +3066,35 @@ object AboutForm: TAboutForm
       Caption = 'http://www.bloodshed.net/dev'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
-      Font.Height = -11
+      Font.Height = 11
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
       OnClick = LabelClick
     end
-    object DonateSite: TLabel
+    object BlogLabel: TLabel
+      Left = 16
+      Top = 104
+      Width = 118
+      Height = 13
+      Caption = 'Post-4.9.9.2 development:'
+    end
+    object BlogSite: TLabel
+      Left = 168
+      Top = 104
+      Width = 148
+      Height = 13
+      Cursor = crHandPoint
+      Caption = 'http://orwellengine.blogspot.com'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = 11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsUnderline]
+      ParentFont = False
+      OnClick = LabelClick
+    end
+   object DonateSite: TLabel
       Left = 168
       Top = 136
       Width = 185
@@ -3081,7 +3103,7 @@ object AboutForm: TAboutForm
       Caption = 'http://www.bloodshed.net/donate.html'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
-      Font.Height = -11
+      Font.Height = 11
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False

@@ -23,10 +23,10 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Dialogs, Windows, Classes, Graphics, SynEdit, CFGData, CFGTypes, IniFiles, prjtypes,EditorOptfrm;
+  Dialogs, Windows, Classes, Graphics, SynEdit, CFGData, CFGTypes, IniFiles, prjtypes, Math, EditorOptfrm;
 {$ENDIF}
 {$IFDEF LINUX}
-  QDialogs, Classes, QGraphics, QSynEdit, CFGData, CFGTypes, IniFiles, prjtypes,EditorOptfrm;
+  QDialogs, Classes, QGraphics, QSynEdit, CFGData, CFGTypes, IniFiles, Math, prjtypes, EditorOptfrm;
 {$ENDIF}
 
 const
@@ -92,11 +92,7 @@ type
 		procedure SaveSettings; override;
 		procedure LoadSettings; override;
 		procedure SaveSet(Index: integer);
-		procedure SaveSetDirs(Index: integer);
-		procedure SaveSetProgs(Index: integer);
 		procedure LoadSet(Index: integer);
-		procedure LoadSetDirs(Index: integer);
-		procedure LoadSetProgs(Index: integer);
 		procedure AssignToCompiler;
 		property Name;
 		function SetName(Index: integer): string;
@@ -189,8 +185,6 @@ type
 		property FastDep: Boolean read fFastDep write fFastDep;
 
 		property RunParams: string read fRunParams write fRunParams;
-		property OutputDir: string read fOutputDir write fOutputDir;          // ** unused
-		property Intermediate: string read fIntermediate write fIntermediate; // ** unused
 		property UseExecParams: boolean read fUseParams write fUseParams;
 		property SaveLog: boolean read fSaveLog write fSaveLog;
 		property Delay: integer read fDelay write fDelay;
@@ -408,7 +402,7 @@ type
    //Editor props
    property AutoIndent: boolean read fAutoIndent write fAutoIndent;
    property InsertMode: boolean read fInsertMode write fInsertMode;
-   property TabToSpaces: boolean read fTabToSpaces write fTabtoSpaces;
+   property TabToSpaces: boolean read fTabToSpaces write fTabToSpaces;
    property SmartTabs: boolean read fSmartTabs write fSmartTabs;
    property SmartUnindent: boolean read fSmartUnindent write fSmartUnindent;
    property TrailBlank: boolean read fTrailBlanks write fTrailBlanks;
@@ -451,7 +445,6 @@ type
 
    // other
    property DefaulttoPrj: boolean read fDefaultIntoPrj write fDefaultIntoPrj;
-
    property ParserHints: boolean read fParserHints write fParserHints;
    property Match: boolean read fMatch write fMatch;
    property HighCurrLine: boolean read fHighCurrLine write fHighCurrLine;
@@ -1232,7 +1225,7 @@ begin
 		fSaveLog:=      LoadSettingB(key, 'Log');
 
 		dummystring:=   LoadSettingS(key, 'Delay');
-		if dummystring <> '' then fDelay:= strtoint(dummystring);
+		fDelay:= StrToIntDef(dummystring,0);
 
 		dummystring := LoadSettingS(key, 'Options');
 		for I := 0 to fOptions.Count - 1 do begin
@@ -1314,12 +1307,11 @@ end;
 
 procedure TdevCompiler.SetOptionStr(const Value: string);
 var
-  I: integer;
+	I: integer;
 begin
-   for I := 0 to fOptions.Count - 1 do
-     if (I < Length(Value)) then begin
-       PCompilerOption(fOptions[I])^.optValue := ConvertCharToValue(Value[I + 1]);
-     end;
+	for I := 0 to fOptions.Count - 1 do
+		if (I < Length(Value)) then
+			PCompilerOption(fOptions[I])^.optValue := ConvertCharToValue(Value[I + 1]);
 end;
 
 function TdevCompiler.ConvertCharToValue(c : char) : integer;
@@ -1364,31 +1356,26 @@ begin
 end;
 
 procedure TdevDirs.SettoDefaults;
-var
-	tempstr: String;
 begin
 	fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 
-	fBinDir:= ValidatePaths(fExec + StringReplace(BIN_DIR, ';', ';' + fExec, [rfReplaceAll]), tempstr);
-	if(LIB_DIR <> '') then
-		fLibDir:= LIB_DIR;
-	if(C_INCLUDE_DIR <> '') then
-		fCDir:= C_INCLUDE_DIR;
-	if(CPP_INCLUDE_DIR <> '') then
-		fCppDir:= CPP_INCLUDE_DIR;
+	fBinDir:= StringReplace(BIN_DIR,        '%path%\',fExec,[rfReplaceAll]);
+	fLibDir:= StringReplace(LIB_DIR,        '%path%\',fExec,[rfReplaceAll]);
+	fCDir  := StringReplace(C_INCLUDE_DIR,  '%path%\',fExec,[rfReplaceAll]);
+	fCppDir:= StringReplace(CPP_INCLUDE_DIR,'%path%\',fExec,[rfReplaceAll]);
 
 	fConfig:= fExec;
-	fHelp:= fExec + HELP_DIR;
-	fIcons:= fExec + ICON_DIR;
-	fLang:= fExec + LANGUAGE_DIR;
-	fTemp:= fExec + TEMPLATE_DIR;
+	fHelp  := fExec + HELP_DIR;
+	fIcons := fExec + ICON_DIR;
+	fLang  := fExec + LANGUAGE_DIR;
+	fTemp  := fExec + TEMPLATE_DIR;
 	fThemes:= fExec + THEME_DIR;
 end;
 
 procedure TdevDirs.LoadSettings;
 begin
   devData.LoadObject(Self);
-  fExec:= ExtractFilePath(Application.ExeName);
+  fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
   if fHelp = ''   then  fHelp:=   fExec + HELP_DIR;
   if fIcons = ''  then  fIcons:=  fExec + ICON_DIR;
   if fLang = ''   then  fLang:=   fExec + LANGUAGE_DIR;
@@ -1633,10 +1620,7 @@ end;
 
 procedure TdevCodeCompletion.SetDelay(Value: integer);
 begin
-  if Value=0 then
-    fDelay:=1 // minimum 1 ms
-  else
-    fDelay:=Value;
+	fDelay:=Max(1,Value);
 end;
 
 procedure TdevCodeCompletion.SettoDefaults;
@@ -1749,194 +1733,12 @@ begin
 end;
 
 procedure TdevCompilerSet.LoadSet(Index: integer);
-begin
-  LoadSetProgs(Index);
-  LoadSetDirs(Index);
-end;
-
-procedure TdevCompilerSet.LoadSetDirs(Index: integer);
-var
-  key: string;
-  goodBinDir, goodCDir, goodCppDir, goodLibDir: String;
-  msg: String;
-  tempStr: String;
-  maindir: String;
-  makeSig, mingwmakeSig: String;
-
-begin
-  if Index<0 then Exit;
-  with devData do
-   begin
-     key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
-     // dirs
-     fBinDir := LoadSettingS(key, 'Bins');
-     if fBinDir='' then fBinDir:=devDirs.Bins;
-     fCDir := LoadSettingS(key, 'C');
-     if fCDir='' then fCDir:=devDirs.C;
-     fCppDir := LoadSettingS(key, 'Cpp');
-     if fCppDir='' then fCppDir:=devDirs.Cpp;
-     fLibDir := LoadSettingS(key, 'Lib');
-     if fLibDir='' then fLibDir:=devDirs.Lib;
-
-     //check for valid paths
-     msg := '';
-     goodBinDir := ValidatePaths(fBinDir, tempStr);
-     if tempStr <> '' then
-     begin
-       msg := msg + 'Following Bin directories don''t exist:' + #13#10;
-       msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
-       msg := msg + #13#10 + #13#10;
-     end;
-     goodCDir := ValidatePaths(fCDir, tempStr);
-     if tempStr <> '' then
-     begin
-       msg := msg + 'Following C Include directories don''t exist:' + #13#10;
-       msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
-       msg := msg + #13#10 + #13#10;
-     end;
-     goodCppDir := ValidatePaths(fCppDir, tempStr);
-     if tempStr <> '' then
-     begin
-       msg := msg + 'Following C++ Include directories don''t exist:' + #13#10;
-       msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
-       msg := msg + #13#10 + #13#10;
-     end;
-     goodLibDir := ValidatePaths(fLibDir, tempStr);
-     if tempStr <> '' then
-     begin
-       msg := msg + 'Following Libs directories don''t exist:' + #13#10;
-       msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
-       msg := msg + #13#10 + #13#10;
-     end;
-     if msg <> '' then
-     begin
-       msg := msg + 'Would you like Dev-C++ to remove them for you '
-         + 'and add the default paths to the remaining existing paths?' + #13#10
-         + 'Leaving those directories will lead to problems during compilation '
-         + 'of any projects created with Dev-C++' + #13#10
-         + #13#10
-         + 'Unless you know exactly what you''re doing, it is recommended '
-         + 'that you click Yes';
-
-       if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-       begin
-         fBinDir := goodBinDir;
-         fCDir := goodCDir;
-         fCppDir := goodCppDir;
-         fLibDir := goodLibDir;
-
-         //additionally insert default paths:
-         maindir := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
-         tempStr := '';
-         fBinDir := maindir + BIN_DIR + ';' + fBinDir;
-         fBinDir := ValidatePaths(fBinDir, tempStr);
-         devDirs.Bins := fBinDir;
-         fCDir := C_INCLUDE_DIR + ';' + fCDir;
-         fCDir := ValidatePaths(fCDir, tempStr);
-         devDirs.C := fCDir;
-         fCppDir := CPP_INCLUDE_DIR + ';' + fCppDir;
-         fCppDir := ValidatePaths(fCppDir, tempStr);
-         devDirs.Cpp := fCppDir;
-         fLibDir := LIB_DIR + ';' + fLibDir;
-         fLibDir := ValidatePaths(fLibDir, tempStr);
-         devDirs.Lib := fLibDir;
-       end;
-     end;
-   end;
-
-  //check if make is in path + bins directory
-  if devDirs.OriginalPath = '' then // first time only
-    devDirs.OriginalPath := GetEnvironmentVariable('PATH');
-  SetPath(devDirs.Bins);
-  makeSig := RunAndGetOutput(devCompilerSet.makeName + ' --v',
-    ExtractFileDir(Application.ExeName), nil, nil, nil);
-
-  if Pos('GNU Make', makeSig) = 0 then
-  begin
-    //check for mingw32-make first before adding the path to bin dir
-    //process it later
-    mingwmakeSig := RunAndGetOutput('mingw32-make --v',
-      ExtractFileDir(Application.ExeName), nil, nil, nil);
-
-    //check if make is found if Dev-C++'s bin directory is added to path
-    SetPath(IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName))
-     + BIN_DIR);
-    makeSig := RunAndGetOutput(devCompilerSet.makeName + ' --v',
-      ExtractFileDir(Application.ExeName), nil, nil, nil);
-    if Pos('GNU Make', makeSig) > 0 then
-    begin
-      msg := 'Dev-C++ was unable to find GNU Make with current settings '
-        + 'however there''s GNU Make in Dev-C++''s bin directory. '
-        + 'Would you like to add this path to current Bin path?'
-        + #13#10#13#10
-        + 'Unless you know exactly what you''re doing, it is recommended '
-        + 'that you click Yes';
-      if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-       fBinDir := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName))
-         + BIN_DIR + ';' + fBinDir;
-    end
-
-    //check if "mingw32-make" is available and is GNU Make
-    else if Pos('GNU Make', mingwmakeSig) > 0 then
-    begin
-      msg := 'Dev-C++ was unable to find GNU Make with current settings '
-        + 'however there''s mingw32-make that seems to be GNU Make. '
-        + 'Would you like Dev-C++ to adjust the settings for you to '
-        + 'use mingw32-make?'
-        + #13#10#13#10
-        + 'Unless you know exactly what you''re doing, it is recommended '
-        + 'that you click Yes';
-      if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-      begin
-        devCompilerSet.makeName := 'mingw32-make';
-        devCompiler.makeName := 'mingw32-make';
-      end;
-    end
-
-    //check if "mingw32-make" is available in bin directory
-    else
-    begin
-      mingwmakeSig := RunAndGetOutput('mingw32-make --v',
-        ExtractFileDir(Application.ExeName), nil, nil, nil);
-      if Pos('GNU Make', mingwmakeSig) > 0 then
-      begin
-        msg := 'Dev-C++ was unable to find GNU Make in PATH '
-          + 'or in Dev-C++''s bin directory'
-          + 'however there''s mingw32-make that seems to be GNU Make in bin directory. '
-          + 'Would you like Dev-C++ to adjust the settings for you to '
-          + 'use mingw32-make and adjust current Bin path?'
-          + #13#10#13#10
-          + 'Unless you know exactly what you''re doing, it is recommended '
-          + 'that you click Yes';
-        if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-        begin
-          fBinDir := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName))
-            + BIN_DIR + ';' + fBinDir;
-          devCompilerSet.makeName := 'mingw32-make';
-          devCompiler.makeName := 'mingw32-make';
-        end;
-      end;
-    end;
-
-    //if nothing's found just display the warning message
-    if (Pos('GNU Make', mingwmakeSig) = 0)
-      and (Pos('GNU Make', makeSig) = 0) then
-    begin
-      msg := 'There doesn''t seem to be GNU Make file in PATH '
-        + 'or in Dev-C++''s Bin path. Please make sure that you have '
-        + 'GNU Make and adjust Bin setting or system PATH environment '
-        + 'variable and that make setting in Compiler Option contains '
-        + 'correct filename, otherwise you will not be able to compile '
-        + 'anything.' ;
-      MessageDlg(msg, mtConfirmation, [mbOK], 0);
-    end;
-
-  end;
-end;
-
-procedure TdevCompilerSet.LoadSetProgs(Index: integer);
 var
 	key: string;
+	goodBinDir, goodCDir, goodCppDir, goodLibDir: String;
+	msg: String;
+	tempStr: String;
+	gnumakereply, mingwmakereply: String;
 begin
 	if Index<0 then Exit;
 	with devData do begin
@@ -1964,6 +1766,104 @@ begin
 		fLinkOpt:= LoadSettingS(key, 'LinkOpt');
 		fCompAdd:= LoadSettingB(key, 'CompAdd');
 		fLinkAdd:= LoadSettingB(key, 'LinkAdd');
+
+		// dirs
+		devDirs.Exec   := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
+		fBinDir := StringReplace(LoadSettingS(key, 'Bins'),'%path%\',devDirs.Exec,[rfReplaceAll]);
+		fCDir   := StringReplace(LoadSettingS(key, 'C'),   '%path%\',devDirs.Exec,[rfReplaceAll]);
+		fCppDir := StringReplace(LoadSettingS(key, 'Cpp'), '%path%\',devDirs.Exec,[rfReplaceAll]);
+		fLibDir := StringReplace(LoadSettingS(key, 'Lib'), '%path%\',devDirs.Exec,[rfReplaceAll]);
+
+		if fBinDir='' then fBinDir:=devDirs.Bins;
+		if fCDir=''   then fCDir:=devDirs.C;
+		if fCppDir='' then fCppDir:=devDirs.Cpp;
+		if fLibDir='' then fLibDir:=devDirs.Lib;
+
+		//check for valid paths
+		msg := '';
+		goodBinDir := ValidatePaths(fBinDir, tempStr);
+		if tempStr <> '' then begin
+			msg := msg + 'Following Bin directories don''t exist:' + #13#10;
+			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
+			msg := msg + #13#10 + #13#10;
+		end;
+		goodCDir := ValidatePaths(fCDir, tempStr);
+		if tempStr <> '' then  begin
+			msg := msg + 'Following C Include directories don''t exist:' + #13#10;
+			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
+			msg := msg + #13#10 + #13#10;
+		end;
+		goodCppDir := ValidatePaths(fCppDir, tempStr);
+		if tempStr <> '' then begin
+			msg := msg + 'Following C++ Include directories don''t exist:' + #13#10;
+			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
+			msg := msg + #13#10 + #13#10;
+		end;
+		goodLibDir := ValidatePaths(fLibDir, tempStr);
+		if tempStr <> '' then begin
+			msg := msg + 'Following Libs directories don''t exist:' + #13#10;
+			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
+			msg := msg + #13#10 + #13#10;
+		end;
+		if msg <> '' then begin
+			msg := msg + 'Would you like Dev-C++ to remove them for you ';
+			msg := msg + 'and add the default paths to the remaining existing paths?' + #13#10;
+			msg := msg + 'Leaving those directories will lead to problems during compilation ';
+			msg := msg + 'of any projects created with Dev-C++' + #13#10;
+			msg := msg + #13#10;
+			msg := msg + 'Unless you know exactly what you''re doing, it is recommended ';
+			msg := msg + 'that you click Yes';
+
+			// If confirmed, insert working dirs into default path list
+			if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+				fBinDir:= goodBinDir + ';' + StringReplace(BIN_DIR,        '%path%\',devDirs.fExec,[rfReplaceAll]);
+				fLibDir:= goodLibDir + ';' + StringReplace(LIB_DIR,        '%path%\',devDirs.fExec,[rfReplaceAll]);
+				fCDir  := goodCDir   + ';' + StringReplace(C_INCLUDE_DIR,  '%path%\',devDirs.fExec,[rfReplaceAll]);
+				fCppDir:= goodCppDir + ';' + StringReplace(CPP_INCLUDE_DIR,'%path%\',devDirs.fExec,[rfReplaceAll]);
+			end;
+		end;
+	end;
+
+	//check if make is in path + bins directory
+	if devDirs.OriginalPath = '' then // first time only
+		devDirs.OriginalPath := GetEnvironmentVariable('PATH');
+
+	// Hier wordt de oude bins nog gebruikt. Niet doen.
+	SetPath(fBinDir);
+	gnumakereply := RunAndGetOutput(devCompilerSet.makeName + ' --v',fBinDir, nil, nil, nil);
+
+	// If GNU does not reply
+	if Pos('GNU Make', gnumakereply) = 0 then begin
+
+		// Try MinGW
+		SetPath(fBinDir);
+		mingwmakereply := RunAndGetOutput('mingw32-make --v',fBinDir, nil, nil, nil);
+
+		if Pos('mingw32-make:', mingwmakereply) > 0 then begin
+			msg := 'Dev-C++ was unable to find GNU Make with current settings '
+			+ 'however there''s a mingw32-make that seems to be GNU Make. '
+			+ 'Would you like Dev-C++ to adjust the settings for you to '
+			+ 'use mingw32-make?'
+			+ #13#10#13#10
+			+ 'Unless you know exactly what you''re doing, it is recommended '
+			+ 'that you click Yes';
+
+			if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+				devCompilerSet.makeName := 'mingw32-make';
+				devCompiler.makeName := 'mingw32-make';
+			end;
+		end;
+
+		//if nothing's found just display the warning message
+		if (Pos('mingw32-make:', mingwmakereply) = 0) and (Pos('GNU Make', gnumakereply) = 0) then begin
+			msg := 'There doesn''t seem to be GNU Make file in Dev-C++''s Bin path. '
+			+ 'Please make sure that you have correctly set '
+			+ 'GNU Make and adjust Bin settings environment '
+			+ 'variable and that make setting in Compiler Option '
+			+ 'contains correct filename, otherwise you will not '
+			+ 'be able to compile anything.';
+			MessageDlg(msg, mtConfirmation, [mbOK], 0);
+		end;
 	end;
 end;
 
@@ -1973,49 +1873,30 @@ begin
 end;
 
 procedure TdevCompilerSet.SaveSet(Index: integer);
-begin
-  SaveSetProgs(Index);
-  SaveSetDirs(Index);
-end;
-
-procedure TdevCompilerSet.SaveSetDirs(Index: integer);
 var
- key: string;
+	key: string;
 begin
-  if Index<0 then Exit;
-  with devData do
-   begin
-     key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
-     // dirs
-     SaveSettingS(key, 'Bins', fBinDir);
-     SaveSettingS(key, 'C',    fCDir);
-     SaveSettingS(key, 'Cpp',  fCppDir);
-     SaveSettingS(key, 'Lib',  fLibDir);
-   end;
-end;
-
-procedure TdevCompilerSet.SaveSetProgs(Index: integer);
-var
- key: string;
-begin
-  if Index<0 then Exit;
-  with devData do
-   begin
-     key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
-     // Programs
-     SaveSettingS(key, GCC_PROGRAM,     fgccName);
-     SaveSettingS(key, GPP_PROGRAM,     fgppName);
-     SaveSettingS(key, GDB_PROGRAM,     fgdbName);
-     SaveSettingS(key, MAKE_PROGRAM,    fmakeName);
-     SaveSettingS(key, WINDRES_PROGRAM, fwindresName);
-     SaveSettingS(key, DLLWRAP_PROGRAM, fdllwrapName);
-     SaveSettingS(key, GPROF_PROGRAM,   fgprofName);
-     SaveSettingS(key, 'Options',       fOptions);
-     SaveSettingS(key, 'CompOpt',       fCompOpt);
-     SaveSettingS(key, 'LinkOpt',       fLinkOpt);
-     SaveSettingB(key, 'CompAdd',       fCompAdd);
-     SaveSettingB(key, 'LinkAdd',       fLinkAdd);
-   end;
+	with devData do begin
+		key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
+		// Programs
+		SaveSettingS(key, GCC_PROGRAM,     fgccName);
+		SaveSettingS(key, GPP_PROGRAM,     fgppName);
+		SaveSettingS(key, GDB_PROGRAM,     fgdbName);
+		SaveSettingS(key, MAKE_PROGRAM,    fmakeName);
+		SaveSettingS(key, WINDRES_PROGRAM, fwindresName);
+		SaveSettingS(key, DLLWRAP_PROGRAM, fdllwrapName);
+		SaveSettingS(key, GPROF_PROGRAM,   fgprofName);
+		SaveSettingS(key, 'Options',       fOptions);
+		SaveSettingS(key, 'CompOpt',       fCompOpt);
+		SaveSettingS(key, 'LinkOpt',       fLinkOpt);
+		SaveSettingB(key, 'CompAdd',       fCompAdd);
+		SaveSettingB(key, 'LinkAdd',       fLinkAdd);
+		// Paths
+		SaveSettingS(key, 'Bins',  StringReplace(fBinDir,devDirs.fExec,'%path%\',[rfReplaceAll]));
+		SaveSettingS(key, 'C',     StringReplace(fCDir,  devDirs.fExec,'%path%\',[rfReplaceAll]));
+		SaveSettingS(key, 'Cpp',   StringReplace(fCppDir,devDirs.fExec,'%path%\',[rfReplaceAll]));
+		SaveSettingS(key, 'Lib',   StringReplace(fLibDir,devDirs.fExec,'%path%\',[rfReplaceAll]));
+	end;
 end;
 
 procedure TdevCompilerSet.SaveSettings;
@@ -2048,7 +1929,7 @@ begin
 
   // dirs
   fBinDir := devDirs.Bins;
-  fCDir := devDirs.C;
+  fCDir   := devDirs.C;
   fCppDir := devDirs.Cpp;
   fLibDir := devDirs.Lib;
 

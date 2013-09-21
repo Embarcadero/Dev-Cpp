@@ -852,7 +852,7 @@ PBreakPointEntry = ^TBreakPointEntry;
 		bProjectLoading		: boolean;
 		OldLeft				: integer;
 		OldTop				: integer;
-		OldWidth 			: integer;
+		OldWidth			: integer;
 		OldHeight			: integer;
 		ReloadFilename		: string;
 
@@ -918,7 +918,6 @@ PBreakPointEntry = ^TBreakPointEntry;
 		procedure RemoveAllBreakPointFromList();
 		function GetBreakPointIndex(line_number: integer; e:TEditor) : integer;
 		procedure RemoveBreakPointAtIndex(index:integer);
-		//function BreakPointForFile(filename : string) : integer;
 	 public
 		fProject		: TProject;
 		fDebugger		: TDebugger;
@@ -1270,65 +1269,12 @@ begin
 		 CurrentTheme.MenuImages.GetBitmap(24, RuntocursorBtn.Glyph);
 		 CurrentTheme.MenuImages.GetBitmap(11, StopExecBtn.Glyph);
 
-		 AddWatchBtn.Glyph.TransparentColor := clWhite;		 
+		 AddWatchBtn.Glyph.TransparentColor := clWhite;
 		end;
 	end;
 
 	fTools.BuildMenu; // reapply icons to tools
 end;
-
-(*procedure TMainForm.LoadTheme;
-begin
-	if devData.XPTheme then
-		XPMenu.Active := true
-	else
-		XPMenu.Active := false;
-	if devData.Theme = '' then
-		devData.Theme := DEV_INTERNAL_THEME;
-	with devtheme do
-	 begin
-		 if not SetTheme(devData.Theme) then Exit;
-		 alMain.Images:= Menus;
-		 MainMenu.Images:= Menus;
-		 ProjectView.Images:= Projects;
-		 MessageControl.Images:= Menus;
-		 tbMain.Images:= Menus;
-		 tbCompile.Images:= Menus;
-		 tbOptions.Images:= Menus;
-		 tbProject.Images:= Menus;
-		 tbClasses.Images:= Menus;
-		 tbedit.Images:= Menus;
-		 tbSearch.Images:= Menus;
-		 tbSpecials.Images:= Specials;
-
-		 HelpMenu.SubMenuImages:= Help;
-		 HelpPop.Images:= Help;
-
-		 DebugVarsPopup.Images:=Menus;
-
-		 //this prevent a bug in the VCL
-		 DDebugBtn.Glyph := nil;
-		 NextStepBtn.Glyph := nil;
-		 StepOverBtn.Glyph := nil;
-		 StepIntoBtn.Glyph := nil;
-		 AddWatchBtn.Glyph := nil;
-		 RemoveWatchBtn.Glyph := nil;
-		 RuntocursorBtn.Glyph := nil;
-		 StopExecBtn.Glyph := nil;
-
-		 Menus.GetBitmap(32, DDebugBtn.Glyph);
-		 Menus.GetBitmap(18, NextStepBtn.Glyph);
-		 Menus.GetBitmap(14, StepOverBtn.Glyph);
-		 Menus.GetBitmap(14, StepIntoBtn.Glyph);
-		 Menus.GetBitmap(21, AddWatchBtn.Glyph);
-		 Menus.GetBitmap(5, RemoveWatchBtn.Glyph);
-		 Menus.GetBitmap(24, RuntocursorBtn.Glyph);
-		 Menus.GetBitmap(11, StopExecBtn.Glyph);
-
-		 AddWatchBtn.Glyph.TransparentColor := clWhite;
-	 end;
-	 fTools.BuildMenu; // reapply icons to tools
-end; *)
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin

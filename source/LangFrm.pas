@@ -152,17 +152,13 @@ end;
 
 procedure TLangForm.CppParserTotalProgress(Sender: TObject; FileName: String; Total, Current: Integer);
 begin
-  if not HasProgressStarted then begin
-    pbCCCache.Max := Total;
-    HasProgressStarted := true;
-  end;
-  pbCCCache.Position := pbCCCache.Position + Current;
-  if FileName <> '' then
-    ParseLabel.Caption :=  'Parsing file: ' + FileName
-  else
-    ParseLabel.Caption := 'Finalizing... Please wait';
-  ParseLabel.Width := 236;
-  Application.ProcessMessages;
+	if not HasProgressStarted then begin
+		pbCCCache.Max := Total;
+		HasProgressStarted := true;
+	end;
+	pbCCCache.Position := pbCCCache.Position + Current;
+	ParseLabel.Caption :=  'Parsing file:' + #13#10 + FileName;
+	Application.ProcessMessages;
 end;
 
 procedure TLangForm.OkBtnClick(Sender: TObject);
@@ -237,44 +233,45 @@ begin
 
 			f := TStringList.Create;
 			for i := 0 to s.Count - 1 do begin
+				// Relative paths make the recursive/loop searcher go nuts
+				s[i] := StringReplace(s[i],'%path%\',devDirs.exec,[rfReplaceAll]);
 				if DirectoryExists(s[i]) then begin
 					FilesFromWildcard(s[i], '*.*', f, false, false, false);
-					for j := 0 to f.Count - 1 do begin
+					for j := 0 to f.Count - 1 do
 						MainForm.CppParser1.AddFileToScan(f[j]);
-					end;
 				end else
-					MessageDlg('Directory "' + s[i] + '" does not exists', mtWarning, [mbOK], 0);
+					MessageDlg('Directory "' + s[i] + '" does not exist', mtWarning, [mbOK], 0);
 			end;
 
+			// Deze regel duurt heel lang
+			MainForm.CppParser1.ParseList;
 
-       MainForm.CppParser1.ParseList;
-       ParseLabel.Caption := 'Finalizing... Please wait';
-       Application.ProcessMessages;
-       MainForm.CppParser1.Save(devDirs.Config+DEV_COMPLETION_CACHE);
+			ParseLabel.Caption := 'Saving...';
+			Application.ProcessMessages;
+			MainForm.CppParser1.Save(devDirs.Config+DEV_COMPLETION_CACHE);
 
-       MainForm.CppParser1.OnStartParsing := MainForm.CppParser1StartParsing;;
-       MainForm.CppParser1.OnEndParsing := MainForm.CppParser1EndParsing;
-       MainForm.CppParser1.OnTotalProgress := MainForm.CppParser1TotalProgress;
+			MainForm.CppParser1.OnStartParsing := MainForm.CppParser1StartParsing;;
+			MainForm.CppParser1.OnEndParsing := MainForm.CppParser1EndParsing;
+			MainForm.CppParser1.OnTotalProgress := MainForm.CppParser1TotalProgress;
 
-       MainForm.ClassBrowser1.SetUpdateOn;
+			MainForm.ClassBrowser1.SetUpdateOn;
 
-       Application.ProcessMessages;
-       Screen.Cursor:=crDefault;
-       s.Free;
-       f.Free;
-    end
-    else begin
-      devClassBrowsing.Enabled := true;
-      devClassBrowsing.ParseLocalHeaders := true;
-      devClassBrowsing.ParseGlobalHeaders := false;
-    end;
-    OkBtn.Tag := 3;
-    OkBtn.Kind := bkOK;
-    OkBtn.ModalResult := mrOK;
-    OkBtn.Enabled := true;
-    FinishPanel.Visible := true;
-    CachePanel.Visible := false;
-  end
+			Application.ProcessMessages;
+			Screen.Cursor:=crDefault;
+			s.Free;
+			f.Free;
+		end else begin
+			devClassBrowsing.Enabled := true;
+			devClassBrowsing.ParseLocalHeaders := true;
+			devClassBrowsing.ParseGlobalHeaders := false;
+		end;
+		OkBtn.Tag := 3;
+		OkBtn.Kind := bkOK;
+		OkBtn.ModalResult := mrOK;
+		OkBtn.Enabled := true;
+		FinishPanel.Visible := true;
+		CachePanel.Visible := false;
+	end
 end;
 
 procedure TLangForm.XPCheckBoxClick(Sender: TObject);

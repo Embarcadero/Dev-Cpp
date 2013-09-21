@@ -1781,41 +1781,40 @@ end;
 
 procedure TCppParser.ParseList;
 var
-  sTime: myTickCount;
-  IsVisible: boolean;
-
+	sTime: myTickCount;
+	IsVisible: boolean;
 begin
-  if not fEnabled then
-    Exit;
-  if Assigned(fOnBusy) then
-    fOnBusy(Self);
-  if Assigned(fOnLogStatement) then
-    fOnLogStatement(Self, '[parser   ]: Starting.');
-  sTime := myGetTickCount;
-  if Assigned(fOnStartParsing) then
-    fOnStartParsing(Self);
-  try
-    while fFilesToScan.Count > 0 do begin
-      if Assigned(fOnTotalProgress) then
-        fOnTotalProgress(Self, fFilesToScan[0], fFilesToScan.Count, 1);
-      if fScannedFiles.IndexOf(fFilesToScan[0]) = -1 then begin
-        IsVisible := not IsGlobalFile(fFilesToScan[0]);
-        Parse(fFilesToScan[0], IsVisible, True, False);
-      end;
-      fFilesToScan.Delete(0);
-    end;
-    PostProcessInheritance;
-  finally
-    if Assigned(fOnEndParsing) then
-      fOnEndParsing(Self);
-  end;
-  fStatementList.Pack;
-  if Assigned(fOnTotalProgress) then
-    fOnTotalProgress(Self, '', 0, 0);
-  if Assigned(fOnLogStatement) then
-    fOnLogStatement(Self, Format('[parser   ]: Total parsing done in %2.3f seconds.', [myGetSecsSickTick(sTime)]));
-  if Assigned(fOnUpdate) then
-    fOnUpdate(Self);
+	if not fEnabled then
+		Exit;
+	if Assigned(fOnBusy) then
+		fOnBusy(Self);
+	if Assigned(fOnLogStatement) then
+		fOnLogStatement(Self, '[parser   ]: Starting.');
+	sTime := myGetTickCount;
+	if Assigned(fOnStartParsing) then
+		fOnStartParsing(Self);
+	try
+		while fFilesToScan.Count > 0 do begin
+			if Assigned(fOnTotalProgress) then
+				fOnTotalProgress(Self, fFilesToScan[0], fFilesToScan.Count, 1);
+			if fScannedFiles.IndexOf(fFilesToScan[0]) = -1 then begin
+				IsVisible := not IsGlobalFile(fFilesToScan[0]);
+				Parse(fFilesToScan[0], IsVisible, True, False);
+			end;
+			fFilesToScan.Delete(0);
+		end;
+		PostProcessInheritance;
+	finally
+		if Assigned(fOnEndParsing) then
+			fOnEndParsing(Self);
+	end;
+	fStatementList.Pack;
+	if Assigned(fOnTotalProgress) then
+		fOnTotalProgress(Self, '', 0, 0);
+	if Assigned(fOnLogStatement) then
+		fOnLogStatement(Self, Format('[parser   ]: Total parsing done in %2.3f seconds.', [myGetSecsSickTick(sTime)]));
+	if Assigned(fOnUpdate) then
+		fOnUpdate(Self);
 end;
 
 function TCppParser.GetFullFilename(Value: string): string;
@@ -1900,11 +1899,11 @@ end;
 
 procedure TCppParser.AddFileToScan(Value: string; InProject: boolean);
 var
-  FName: string;
-  CFile, HFile: string;
+	FName: string;
+	CFile, HFile: string;
 begin
-  FName := StringReplace(Value, '/', '\', [rfReplaceAll]);
-  FName := GetFullFilename(LowerCase(FName));
+	FName := StringReplace(Value, '/', '\', [rfReplaceAll]);
+	FName := GetFullFilename(LowerCase(FName));
 
   if InProject then
     fProjectFiles.Add(FName);

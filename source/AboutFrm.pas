@@ -49,6 +49,8 @@ type
     MailSite: TLabel;
     eMailLabel: TLabel;
     eMailSite: TLabel;
+    BlogLabel: TLabel;
+    BlogSite: TLabel;
     btnAuthors: TBitBtn;
     btnUpdateCheck: TBitBtn;
     Timer1: TTimer;
@@ -96,12 +98,14 @@ begin
   MingwLabel.Caption:=     Lang[ID_AB_LBLMINGWSITE];
   ForumLabel.Caption:=     Lang[ID_AB_LBLFORUM];
   MailLabel.Caption:=      Lang[ID_AB_LBLMAIL];
-  //EMailLabel.Caption:=     Lang[ID_AB_LBLEMAIL];
+  EMailLabel.Caption:=     Lang[ID_AB_LBLEMAIL];
+  BlogLabel.Caption:=      Lang[ID_AB_LBLBLOG];
   BloodSite.Caption:=      Lang[ID_AB_BLOODSITE];
   MingwSite.Caption:=      Lang[ID_AB_MINGWSITE];
   ForumSite.Caption:=      Lang[ID_AB_FORUMS];
   MailSite.Caption:=       Lang[ID_AB_MAILLIST];
-  //eMailSite.Caption:=      Lang[ID_AB_AUTHOR];
+  eMailSite.Caption:=      Lang[ID_AB_AUTHOR];
+  BlogSite.Caption:=       Lang[ID_AB_BLOG];
   btnOk.Caption:=          Lang[ID_BTN_OK];
   btnUpdateCheck.Caption:= Lang[ID_AB_UPDATE];
   btnAuthors.Caption:=     Lang[ID_BTN_AUTHOR];
@@ -134,7 +138,8 @@ const MessageText =
   '- Splash screen and association icons: Matthijs Crielaard: '#13#10 +
   '- New Look theme: Gerard Caulfield'#13#10 +
   '- Gnome icons: Gnome designers'#13#10 +
-  '- Blue theme: Thomas Thron'#13#10;
+  '- Blue theme: Thomas Thron'#13#10 +
+  '- Post-4.9.9.2 development: Johan Mes'#13#10;
 begin
   MessageBeep($F);
   MessageDlg(MessageText, MtInformation, [MbOK], 0);

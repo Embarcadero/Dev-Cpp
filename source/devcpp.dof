@@ -111,7 +111,7 @@ AutoIncBuild=0
 MajorVer=4
 MinorVer=9
 Release=9
-Build=3
+Build=4
 Debug=0
 PreRelease=0
 Special=0
@@ -122,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Bloodshed Software
 FileDescription=Dev-C++ IDE
-FileVersion=4.9.9.3
+FileVersion=4.9.9.4
 InternalName=devcpp.exe
 LegalCopyright=Copyright Bloodshed Software
 LegalTrademarks=

@@ -1,59 +1,54 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "4.9.9.3"
-!define DISPLAY_NAME "Dev-C++ 5 beta 9 release (${DEVCPP_VERSION})"
-!define HAVE_MINGW
-!define NEW_INTERFACE
+!define DEVCPP_VERSION "4.9.9.4"
+!define DISPLAY_NAME "Dev-C++ 5 beta 11 release (${DEVCPP_VERSION})"
 
 Var LOCAL_APPDATA
 
-!include "MUI.nsh"
+!include "MUI2.nsh"
 !include "logiclib.nsh" ; needed by ${switch}
 
 ############################################
 # Installer Attributes
 
 Name "${DISPLAY_NAME}"
-!ifdef HAVE_MINGW 
 OutFile "devcpp-${DEVCPP_VERSION}_setup.exe"
-!else
-OutFile "devcpp-${DEVCPP_VERSION}_nomingw_setup.exe"
-!endif
 Caption "${DISPLAY_NAME}"
 
 # [Licence Attributes]
-LicenseText "Dev-C++ is distributed under the GNU General Public License :"
+LicenseText "Dev-C++ is distributed under the GNU General Public License:"
 LicenseData "copying.txt"
 
 # [Directory Selection]
 InstallDir "C:\Dev-Cpp"
-DirText "Select the directory to install Dev-C++ to :"
-
-# [Additional Installer Settings ]
-SetCompress force
-SetCompressor lzma
+DirText "Select the directory to install Dev-C++ to:"
 
 ############################################
 # Interface Settings
 
 ShowInstDetails show
+ShowUnInstDetails show
 AutoCloseWindow false
 SilentInstall normal
 CRCCheck on
-SetCompress auto
+SetCompress force
+SetCompressor /SOLID lzma
 SetDatablockOptimize on
-;SetOverwrite ifnewer
+SetOverwrite try
 XPStyle on
 
-InstType "Full" ;1
-InstType "Typical" ;2
+InstType "Full";1
+InstType "Portable";2
+InstType "Minimal";3
 
 ComponentText "Choose components"
 
 ############################################
 # Pages
 
+!define MUI_ICON "devcpp.ico"
+!define MUI_UNICON "devcpp.ico"
 !define MUI_ABORTWARNING
 !define MUI_LANGDLL_ALLLANGUAGES
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE dirLeave
@@ -74,15 +69,12 @@ ComponentText "Choose components"
 !insertmacro MUI_LANGUAGE "English"
 !insertmacro MUI_LANGUAGE "Bulgarian"
 !insertmacro MUI_LANGUAGE "Catalan"
-;!insertmacro MUI_LANGUAGE "Chinese"
-;!insertmacro MUI_LANGUAGE "Chinese_TC"
 !insertmacro MUI_LANGUAGE "Croatian"
 !insertmacro MUI_LANGUAGE "Czech"
 !insertmacro MUI_LANGUAGE "Danish"
 !insertmacro MUI_LANGUAGE "Dutch"
 !insertmacro MUI_LANGUAGE "Estonian"
 !insertmacro MUI_LANGUAGE "French"
-;!insertmacro MUI_LANGUAGE "Galego"
 !insertmacro MUI_LANGUAGE "German"
 !insertmacro MUI_LANGUAGE "Greek"
 !insertmacro MUI_LANGUAGE "Hungarian"
@@ -97,7 +89,6 @@ ComponentText "Choose components"
 !insertmacro MUI_LANGUAGE "Slovak"
 !insertmacro MUI_LANGUAGE "Slovenian"
 !insertmacro MUI_LANGUAGE "Spanish"
-;!insertmacro MUI_LANGUAGE "SpanishCastellano"
 !insertmacro MUI_LANGUAGE "Swedish"
 !insertmacro MUI_LANGUAGE "Turkish"
 !insertmacro MUI_LANGUAGE "Ukrainian"
@@ -106,9 +97,11 @@ ComponentText "Choose components"
 # Files
 
 Section "Dev-C++ program files (required)" SectionMain
-  SectionIn 1 2 RO
+  SectionIn 1 2 3 RO
   SetOutPath $INSTDIR
- 
+
+  File "devcpp.map"
+  File "Packman.map"
   File "devcpp.exe"
   File "copying.txt"
   File "News.txt"
@@ -119,25 +112,15 @@ Section "Dev-C++ program files (required)" SectionMain
   File "Templates\*"
   SetOutPath $INSTDIR\bin
   File "bin\rm.exe"
+  SetOutPath $INSTDIR\Packages
+  File "Packages\Dev-C++_Map.entry"
 
-  ; Delete old devcpp.map to avoid confusion in bug reports
-  Delete "$INSTDIR\devcpp.map"
-
-  ; Write the installation path into the registry
-  WriteRegStr HKLM SOFTWARE\Dev-C++ "Install_Dir" "$INSTDIR"
-  
-  ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayName" "${DISPLAY_NAME}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "NoRepair" 1
+  ; Allways create an uninstaller
   WriteUninstaller "$INSTDIR\uninstall.exe"
-
 SectionEnd
 
 Section "Example files" SectionExamples
   SectionIn 1 2
-  SetOutPath $INSTDIR\Examples
   SetOutPath $INSTDIR\Examples\FileEditor
   File "Examples\FileEditor\*"
   SetOutPath $INSTDIR\Examples\Hello
@@ -161,8 +144,7 @@ SectionEnd
 Section "Help files" SectionHelp
   SectionIn 1 2
   SetOutPath $INSTDIR\Help
-  File "Help\DevCpp.hlp"
-  File "Help\DevCpp.cnt"
+  File "Help\*.*"
   SetOutPath $INSTDIR\Packages
   File "Packages\DevCppHelp.entry"
 SectionEnd
@@ -170,44 +152,22 @@ SectionEnd
 Section "Icon files" SectionIcons
   SectionIn 1 2
   SetOutPath $INSTDIR\Icons
-  File "Icons\*.ico"
-  #SetOutPath $INSTDIR\Themes
-  #File /r "Themes\*"
+  File "Icons\*.*"
 SectionEnd
 
-!ifdef HAVE_MINGW
-Section "Mingw compiler system (binaries, headers and libraries)" SectionMingw
-  SectionIn 1 2
+Section "MinGW compiler system (binaries, headers and libraries)" SectionMingw
+  SectionIn 1 2 3
   SetOutPath $INSTDIR
-  ; uninstall previous packages
-  ExecWait '"$INSTDIR\packman.exe" /auto /quiet /uninstall "$INSTDIR\Packages\binutils.entry"'
-  ExecWait '"$INSTDIR\packman.exe" /auto /quiet /uninstall "$INSTDIR\Packages\gcc-core.entry"'
-  ExecWait '"$INSTDIR\packman.exe" /auto /quiet /uninstall "$INSTDIR\Packages\gcc-g++.entry"'
-  ExecWait '"$INSTDIR\packman.exe" /auto /quiet /uninstall "$INSTDIR\Packages\gcc-objc.entry"'
-  ExecWait '"$INSTDIR\packman.exe" /auto /quiet /uninstall "$INSTDIR\Packages\gdb.entry"'
-  ExecWait '"$INSTDIR\packman.exe" /auto /quiet /uninstall "$INSTDIR\Packages\make.entry"'
-  ExecWait '"$INSTDIR\packman.exe" /auto /quiet /uninstall "$INSTDIR\Packages\mingw-runtime.entry"'
-  ExecWait '"$INSTDIR\packman.exe" /auto /quiet /uninstall "$INSTDIR\Packages\w32api.entry"'
 
   File /r "bin"
   File /r "include"
   File /r "lib"
   File /r "libexec"
   File /r "mingw32"
-  SetOutPath $INSTDIR\Packages
-  File "Packages\*.entry"
 SectionEnd
-!endif
-
-# Section "Updater and bug reporter (vUpdate/vRoach)"
-#   SectionIn 1 2
-#   SetOutPath $INSTDIR
-#   File "vUpdate.exe"
-#   File "vRoach.exe"
-# SectionEnd
 
 Section "Language files" SectionLangs
-  SectionIn 1
+  SectionIn 1 2
   SetOutPath $INSTDIR\Lang
   File "Lang\*"
 SectionEnd
@@ -216,7 +176,7 @@ SectionEnd
 SubSection "Associate C and C++ files to Dev-C++" SectionAssocs
 
 Section "Associate .dev files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".dev"
   Call BackupAssoc
@@ -230,7 +190,7 @@ Section "Associate .dev files to Dev-C++"
 SectionEnd
 
 Section "Associate .c files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".c"
   Call BackupAssoc
@@ -244,7 +204,7 @@ Section "Associate .c files to Dev-C++"
 SectionEnd
 
 Section "Associate .cpp files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".cpp"
   Call BackupAssoc
@@ -258,7 +218,7 @@ Section "Associate .cpp files to Dev-C++"
 SectionEnd
 
 Section "Associate .h files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".h"
   Call BackupAssoc
@@ -272,7 +232,7 @@ Section "Associate .h files to Dev-C++"
 SectionEnd
 
 Section "Associate .hpp files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".hpp"
   Call BackupAssoc
@@ -286,7 +246,7 @@ Section "Associate .hpp files to Dev-C++"
 SectionEnd
 
 Section "Associate .rc files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".rc"
   Call BackupAssoc
@@ -300,7 +260,7 @@ Section "Associate .rc files to Dev-C++"
 SectionEnd
 
 Section "Associate .devpak files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".devpak"
   Call BackupAssoc
@@ -315,7 +275,7 @@ Section "Associate .devpak files to Dev-C++"
 SectionEnd
 
 Section "Associate .devpackage files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".devpackage"
   Call BackupAssoc
@@ -330,7 +290,7 @@ Section "Associate .devpackage files to Dev-C++"
 SectionEnd
 
 Section "Associate .template files to Dev-C++"
-  SectionIn 1 2
+  SectionIn 1
 
   StrCpy $0 ".template"
   Call BackupAssoc
@@ -347,11 +307,11 @@ SubSectionEnd
 
 # [Shortcuts]
 Section "Create shortcuts in Start Menu" SectionShortcuts
-  SectionIn 1 2
+  SectionIn 1
 
   ;try to read from registry if last installation installed for All Users/Current User
-  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" \
-      "Shortcuts"
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" \ 
+   "Shortcuts"
   StrCmp $0 "" cont exists
   cont:
 
@@ -361,7 +321,7 @@ Section "Create shortcuts in Start Menu" SectionShortcuts
 AllUsers:
   StrCpy $0 $SMPROGRAMS
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" \
-      "Shortcuts" "$0"
+    "Shortcuts" "$0"
 
 exists:
   CreateDirectory "$0\Bloodshed Dev-C++"
@@ -372,18 +332,9 @@ exists:
 SectionEnd
 
 Section "Create Quick Launch shortcut" SectionQuickLaunch
-  SectionIn 1 2
+  SectionIn 1
   SetShellVarContext current
   CreateShortCut "$QUICKLAUNCH\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
-SectionEnd
-
-Section "Debug files" SectionDebug
-  SectionIn 1
-  SetOutPath $INSTDIR
-  File "devcpp.map"
-  File "Packman.map"
-  SetOutPath $INSTDIR\Packages
-  File "Packages\Dev-C++_Map.entry"
 SectionEnd
 
 Section "Remove all previous configuration files" SectionConfig
@@ -432,38 +383,28 @@ SectionEnd
 ############################################
 # Mouseovers
 
-LangString DESC_SectionMain ${LANG_ENGLISH} "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
-LangString DESC_SectionExamples ${LANG_ENGLISH} "Example projects for simple console and GUI applications"
-LangString DESC_SectionHelp ${LANG_ENGLISH} "Help on using Dev-C++ and programming in C"
-LangString DESC_SectionIcons ${LANG_ENGLISH} "Various icons that you can use in your programs"
-
-!ifdef HAVE_MINGW
-  LangString DESC_SectionMingw ${LANG_ENGLISH} "The MinGW gcc compiler and associated tools, headers and libraries"
-!endif
-
-LangString DESC_SectionLangs ${LANG_ENGLISH} "The Dev-C++ interface translated to different languages (other than English which is built-in)"
-LangString DESC_SectionAssocs ${LANG_ENGLISH} "Use Dev-C++ as the default application for opening these types of files"
-LangString DESC_SectionShortcuts ${LANG_ENGLISH} "Create a 'Bloodshed Dev-C++' program group with shortcuts, in the start menu"
+LangString DESC_SectionMain        ${LANG_ENGLISH} "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
+LangString DESC_SectionExamples    ${LANG_ENGLISH} "Example projects for simple console and GUI applications"
+LangString DESC_SectionHelp        ${LANG_ENGLISH} "Help on using Dev-C++ and programming in C"
+LangString DESC_SectionIcons       ${LANG_ENGLISH} "Various icons that you can use in your programs"
+LangString DESC_SectionMingw       ${LANG_ENGLISH} "The MinGW gcc compiler and associated tools, headers and libraries"
+LangString DESC_SectionLangs       ${LANG_ENGLISH} "The Dev-C++ interface translated to different languages (other than English which is built-in)"
+LangString DESC_SectionAssocs      ${LANG_ENGLISH} "Use Dev-C++ as the default application for opening these types of files"
+LangString DESC_SectionShortcuts   ${LANG_ENGLISH} "Create a 'Bloodshed Dev-C++' program group with shortcuts, in the start menu"
 LangString DESC_SectionQuickLaunch ${LANG_ENGLISH} "Create a shortcut to Dev-C++ in the QuickLaunch toolbar"
-LangString DESC_SectionDebug ${LANG_ENGLISH} "Debug file to help debugging Dev-C++"
-LangString DESC_SectionConfig ${LANG_ENGLISH} "Remove all previous configuration files"
+LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configuration files from previous installs"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionMain} $(DESC_SectionMain)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionExamples} $(DESC_SectionExamples)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionHelp} $(DESC_SectionHelp)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons} $(DESC_SectionIcons)
-
-!ifdef HAVE_MINGW
-    !insertmacro MUI_DESCRIPTION_TEXT ${SectionMingw} $(DESC_SectionMingw)
-!endif
-
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs} $(DESC_SectionLangs)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs} $(DESC_SectionAssocs)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts} $(DESC_SectionShortcuts)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        $(DESC_SectionMain)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionExamples}    $(DESC_SectionExamples)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionHelp}        $(DESC_SectionHelp)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       $(DESC_SectionIcons)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionMingw}       $(DESC_SectionMingw)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       $(DESC_SectionLangs)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      $(DESC_SectionAssocs)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   $(DESC_SectionShortcuts)
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionQuickLaunch} $(DESC_SectionQuickLaunch)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionDebug} $(DESC_SectionDebug)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionConfig} $(DESC_SectionConfig)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionConfig}      $(DESC_SectionConfig)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ############################################
@@ -471,16 +412,7 @@ LangString DESC_SectionConfig ${LANG_ENGLISH} "Remove all previous configuration
 
 Function .onInit
   MessageBox MB_OK "Welcome to Dev-C++ install program. Please do not install this version of Dev-C++ over an existing installation."
-
-  !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
-
-;called when the user hits the 'cancel' button
-;Function .onUserAbort
-;  MessageBox MB_YESNO "Abort install?" IDYES NoCancelAbort
-;  Abort
-;  NoCancelAbort:
-;FunctionEnd
 
 ;backup file association
 Function BackupAssoc
@@ -616,22 +548,20 @@ Function un.GetLocalAppData
   StrCpy $LOCAL_APPDATA $0
 FunctionEnd
 
-;--------------------------------
-
+#############################################################################
 # [UnInstallation]
 
-UninstallText "This program will uninstall Dev-C++, continue ?"
+UninstallText "This program will uninstall Dev-C++, continue?"
 ShowUninstDetails show
 
 Section "Uninstall"
 
-  ; Remove files and uninstaller
+  ; Remove uninstaller
   Delete "$INSTDIR\uninstall.exe"
-
 
   ; Remove icons
   ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" \
-      "Shortcuts"
+    "Shortcuts"
   Delete "$0\Bloodshed Dev-C++\Dev-C++.lnk"
   Delete "$0\Bloodshed Dev-C++\License.lnk"
   Delete "$0\Bloodshed Dev-C++\Uninstall Dev-C++.lnk"
@@ -656,7 +586,7 @@ Section "Uninstall"
   Call un.RestoreAssoc
   StrCpy $0 ".devpackage"
   Call un.RestoreAssoc
-  StrCpy $0 ".template" 
+  StrCpy $0 ".template"
   Call un.RestoreAssoc
  
   DeleteRegKey HKCR "DevCpp.dev"
@@ -671,7 +601,6 @@ Section "Uninstall"
 
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++"
-  DeleteRegKey HKLM SOFTWARE\Dev-C++
 
   MessageBox MB_YESNO "Do you want to remove all the remaining configuration files?" IDNO Done
 

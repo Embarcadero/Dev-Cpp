@@ -136,7 +136,7 @@ uses
 
 procedure FilesFromWildcard(Directory, Mask: String; var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 var
-	SearchRec: TSearchRec;
+	SearchResult: TSearchRec;
 	Attr, Error: Integer;
 begin
 	Directory := IncludeTrailingPathDelimiter(Directory);
@@ -147,28 +147,28 @@ begin
 		Attr := Attr - faDirectory;
 
 	// If a file is found...
-	if (FindFirst(Directory + Mask, Attr, SearchRec) = 0) then begin
+	if (FindFirst(Directory + Mask, Attr, SearchResult) = 0) then begin
 		// While files are being found...
-		while (FindNext(SearchRec) = 0) do begin
-			Files.Add(Directory + SearchRec.Name);
+		while (FindNext(SearchResult) = 0) do begin
+			Files.Add(Directory + SearchResult.Name);
 			if Multitasking then
 				Application.ProcessMessages;
 		end;
-		FindClose(SearchRec);
+		FindClose(SearchResult);
 	end;
 
 	// Scan folders if requested
 	if Subdirs then begin
-		Error := FindFirst(Directory + '*.*', faAnyFile, SearchRec);
-		if (FindFirst(Directory + '*.*', faAnyFile, SearchRec) = 0) then begin
+		Error := FindFirst(Directory + '*.*', faAnyFile, SearchResult);
+		if (FindFirst(Directory + '*.*', faAnyFile, SearchResult) = 0) then begin
 			while (Error = 0) do begin
 				{ Found one! }
-				if (SearchRec.Name[1] <> '.') and (SearchRec.Attr and faDirectory <> 0) then
+				if (SearchResult.Name[1] <> '.') and (SearchResult.Attr and faDirectory <> 0) then
 					{ We do this recursively! }
-					FilesFromWildcard(Directory + SearchRec.Name, Mask, Files, Subdirs, ShowDirs, Multitasking);
-				Error := FindNext(SearchRec);
+					FilesFromWildcard(Directory + SearchResult.Name, Mask, Files, Subdirs, ShowDirs, Multitasking);
+				Error := FindNext(SearchResult);
 			end;
-			FindClose(SearchRec);
+			FindClose(SearchResult);
 		end;
 	end;
 end;
@@ -248,7 +248,6 @@ begin
         if GetLastError = ERROR_BROKEN_PIPE then
           Break
         else
-          //MessageDlg('Pipe read error, could not execute file', mtError, [mbOK], 0);
           ErrFunc('Pipe read error, could not execute file');
      end;
      aBuf[nRead] := #0;
