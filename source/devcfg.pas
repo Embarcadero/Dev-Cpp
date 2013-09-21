@@ -474,7 +474,7 @@ type
    fStatusbar: boolean;              // Statusbar Visible
    fFullScr: boolean;                // IDE is Full screen
    fShowBars: boolean;               // Show toolbars in FullScreen mode
-   fShowMenu: boolean;               // Show Main Menu in Full Screen Mode
+   fMultiLineTab: boolean;           // Show multiline tabs
    fDefCpp: boolean;                 // Default to C++ project (compile with g++)
    fFirst: boolean;                  // first run of dev-c
    fSplash: string;                  // user selected splash screen
@@ -565,7 +565,7 @@ type
    property MsgTabs: boolean read fMsgTabs write fMsgTabs;
 
    property ShowBars: boolean read fShowbars write fShowbars;
-   property ShowMenu: boolean read fShowMenu write fShowMenu;
+   property MultiLineTab: boolean read fMultiLineTab write fMultiLineTab;
 
    //Running Status Options
    property DefCpp: boolean read fDefCpp write fDefCpp;
@@ -958,7 +958,7 @@ begin
   fOutputHeight:=120;
   fStatusbar:= TRUE;
   fShowBars:= FALSE;
-  fShowMenu:= TRUE;
+  fMultiLineTab:= TRUE;
   fDefCpp:= TRUE;
   fOpenStyle:= 0;
   fdblFiles:= FALSE;

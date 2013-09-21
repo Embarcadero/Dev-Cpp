@@ -1114,6 +1114,7 @@ object MainForm: TMainForm
     Width = 637
     Height = 422
     Align = alClient
+    MultiLine = True
     PopupMenu = EditorPopupMenu
     TabOrder = 3
     OnChange = PageControlChange

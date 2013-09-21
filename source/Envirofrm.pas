@@ -50,7 +50,7 @@ type
     cbMinOnRun: TCheckBox;
     cbDefCpp: TCheckBox;
     cbShowBars: TCheckBox;
-    cbShowMenu: TCheckBox;
+    cbMultiLineTab: TCheckBox;
     rgbAutoOpen: TRadioGroup;
     cbdblFiles: TCheckBox;
     gbDebugger: TGroupBox;
@@ -123,7 +123,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  Filectrl, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme;
+  Filectrl, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme, main;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme;
@@ -207,6 +207,7 @@ begin
 		rgbAutoOpen.ItemIndex:= AutoOpen;
 		cbDefCpp.Checked:= defCpp;
 		cbShowBars.Checked:= ShowBars;
+		cbMultiLineTab.Checked:= MultiLineTab;
 		cbBackups.Checked:= BackUps;
 		cbMinOnRun.Checked:= MinOnRun;
 		cbdblFiles.Checked:= DblFiles;
@@ -300,7 +301,7 @@ begin
 	with devData do begin
 		DefCpp:= cbDefCpp.Checked;
 		ShowBars:= cbShowBars.Checked;
-		ShowMenu:=  cbShowMenu.Checked;
+		MultiLineTab:=  cbMultiLineTab.Checked;
 		BackUps:=  cbBackups.Checked;
 		MinOnRun:= cbMinOnRun.Checked;
 		DblFiles:= cbdblFiles.Checked;
@@ -361,6 +362,8 @@ begin
 	devCVSHandler.Executable:= edCVSExec.Text;
 	devCVSHandler.Compression:= spnCVSCompression.Value;
 	devCVSHandler.UseSSH:= chkCVSUseSSH.Checked;
+
+	MainForm.PageControl.MultiLine:=devData.MultiLineTab;
 end;
 
 procedure TEnviroForm.LoadText;
@@ -382,7 +385,7 @@ begin
   //Controls
   cbDefCpp.Caption:=         Lang[ID_ENV_DEFCPP];
   cbShowBars.Caption:=       Lang[ID_ENV_SHOWBARS];
-  cbShowMenu.Caption:=       Lang[ID_ENV_SHOWMENU];
+  cbMultiLineTab.Caption:=   Lang[ID_ENV_MULTILINETABS];
   cbBackups.Caption:=        Lang[ID_ENV_BACKUPS];
   cbMinOnRun.Caption:=       Lang[ID_ENV_MINONRUN];
   cbdblFiles.Caption:=       Lang[ID_ENV_DBLFILES];

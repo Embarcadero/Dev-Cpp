@@ -572,7 +572,7 @@ const
   ID_ENV_AUTOALL                   = 632;
   ID_ENV_AUTOFIRST                 = 633;
   ID_ENV_AUTONONE                  = 634;
-  ID_ENV_SHOWMENU                  = 635;
+  ID_ENV_MULTILINETABS             = 635;
   ID_ENV_DBLFILES                  = 636;
   ID_ENV_SELLANGDIR                = 637;
   ID_ENV_THEME                     = 638;

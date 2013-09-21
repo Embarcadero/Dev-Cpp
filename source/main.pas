@@ -1099,6 +1099,8 @@ begin
 	tbClasses.Left:= devData.ToolbarClassesX;
 	tbClasses.Top:= devData.ToolbarClassesY;
 
+	PageControl.MultiLine:= devData.MultiLineTab;
+
 	MainForm.Constraints.MaxHeight:=Monitor.Height;
 	MainForm.Constraints.MaxWidth:=Monitor.Width;
 
@@ -3009,7 +3011,7 @@ begin
 		pnlFull.Visible:= TRUE;
 
 		Menu:=nil; // get rid of that annoying flickering effect
-		// disable the top-level menus in MainMenu
+	//	// disable the top-level menus in MainMenu
 		for I:=0 to MainMenu.Items.Count-1 do
 			MainMenu.Items[I].Visible:=False;
 		Menu:=MainMenu; // restore menu

@@ -78,7 +78,7 @@ object EnviroForm: TEnviroForm
     Top = 8
     Width = 400
     Height = 352
-    ActivePage = tabCVS
+    ActivePage = tabGeneral
     Anchors = [akLeft, akTop, akRight, akBottom]
     OnChange = PagesMainChange
     object tabGeneral: TdevPage
@@ -95,7 +95,6 @@ object EnviroForm: TEnviroForm
       ParentShowHint = False
       ShowHint = False
       TabOrder = 0
-      Visible = False
       Caption = 'General'
       DesignSize = (
         396
@@ -176,14 +175,13 @@ object EnviroForm: TEnviroForm
         ShowHint = True
         TabOrder = 3
       end
-      object cbShowMenu: TCheckBox
+      object cbMultiLineTab: TCheckBox
         Left = 8
         Top = 93
         Width = 169
         Height = 17
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Show Menu in Full Screen'
-        Enabled = False
+        Caption = 'Enable Editor Multiline Tabs'
         ParentShowHint = False
         ShowHint = True
         TabOrder = 4
@@ -308,7 +306,7 @@ object EnviroForm: TEnviroForm
         Width = 147
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 13
       end
       object cboTheme: TComboBox
@@ -317,7 +315,7 @@ object EnviroForm: TEnviroForm
         Width = 147
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 14
       end
     end
@@ -678,8 +676,8 @@ object EnviroForm: TEnviroForm
         Caption = 'External programs associations:'
       end
       object btnExtAdd: TSpeedButton
-        Left = 98
-        Top = 277
+        Left = 96
+        Top = 269
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -687,8 +685,8 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtAddClick
       end
       object btnExtDel: TSpeedButton
-        Left = 199
-        Top = 277
+        Left = 195
+        Top = 269
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -698,8 +696,8 @@ object EnviroForm: TEnviroForm
       object vleExternal: TValueListEditor
         Left = 16
         Top = 24
-        Width = 365
-        Height = 248
+        Width = 357
+        Height = 240
         Anchors = [akLeft, akTop, akRight, akBottom]
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         Options = [goVertLine, goHorzLine, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -742,8 +740,8 @@ object EnviroForm: TEnviroForm
       end
       object lblAssocDesc: TLabel
         Left = 16
-        Top = 269
-        Width = 365
+        Top = 261
+        Width = 357
         Height = 35
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
@@ -755,8 +753,8 @@ object EnviroForm: TEnviroForm
       object lstAssocFileTypes: TCheckListBox
         Left = 16
         Top = 24
-        Width = 365
-        Height = 240
+        Width = 357
+        Height = 232
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
@@ -776,6 +774,7 @@ object EnviroForm: TEnviroForm
       ParentShowHint = False
       ShowHint = False
       TabOrder = 3
+      Visible = False
       Caption = 'CVS Support'
       object lblCVSExec: TLabel
         Left = 8
