@@ -190,7 +190,6 @@ begin
 	// Pulling off the same trick as in TCppParser.FindStatementOf, but ignore everything after last operator
 	InheritanceIDs := TIntList.Create;
 	try
-
 		// ID of current class
 		if fCurrentIndex <> -1 then
 			fCurrentID := PStatement(fParser.Statements[fCurrentIndex])^._ID
@@ -203,7 +202,7 @@ begin
 			// only add globals and members of the current class
 
 			// Also consider classes the current class inherits from
-			fParser.GetInheritance(fCurrentIndex,InheritanceIDs);
+			fParser.GetInheritanceIDs(fCurrentIndex,InheritanceIDs);
 			for I := 0 to fParser.Statements.Count - 1 do
 				if ApplyClassFilter(I, fCurrentID, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
@@ -214,7 +213,7 @@ begin
 			Delete(Phrase,I,MaxInt);
 
 			// Add statements of all the text before the last operator
-			parent := fParser.FindStatementOf(Phrase,fCurrentID);
+			parent := fParser.FindStatementOf(Phrase,fCurrentIndex);
 			if not Assigned(parent) then
 				Exit;
 
@@ -226,7 +225,7 @@ begin
 			end;
 
 			fParentID := parent^._ID;
-			fParser.GetInheritance(fParentID,InheritanceIDs); // slow...
+			fParser.GetInheritanceIDs(parent,InheritanceIDs); // slow...
 
 			// Then add members of the ClassIDs and InheritanceIDs
 			for I := 0 to fParser.Statements.Count - 1 do

@@ -220,7 +220,7 @@ begin
 	try
 		// allow inheritance propagation, including MI
 		if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass) then begin
-			fParser.GetInheritance(ParentIndex,inheritanceids);
+			fParser.GetInheritanceIDs(ParentIndex,inheritanceids);
 		end;
 
 		bInherited := False;

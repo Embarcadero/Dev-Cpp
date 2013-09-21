@@ -238,8 +238,8 @@ type
     function GetMember(const Phrase : AnsiString) : AnsiString;
     function GetOperator(const Phrase : AnsiString) : AnsiString;
     function FindLastOperator(const Phrase : AnsiString) : integer;
-    procedure GetInheritance(st : PStatement; List : TIntList); overload;
-    procedure GetInheritance(index : Integer; List : TIntList); overload;
+    procedure GetInheritanceIDs(st : PStatement; List : TIntList); overload;
+    procedure GetInheritanceIDs(index : Integer; List : TIntList); overload;
     function GetThisPointerID: integer;
   published
     property BaseIndex: integer read fBaseIndex write fBaseIndex;
@@ -2773,7 +2773,7 @@ begin
 	Result := 0;
 end;
 
-procedure TCppParser.GetInheritance(st : PStatement; List : TIntList);
+procedure TCppParser.GetInheritanceIDs(st : PStatement; List : TIntList);
 var
 	sl : TStringList;
 	I, tmp, donecount : integer;
@@ -2790,12 +2790,13 @@ begin
 		// then process inheritance of new items
 		while donecount < List.Count do begin
 			tmp := IndexOfStatement(List[donecount]); // slooow
+			if tmp <> -1 then begin
 
-			// Add inheritance of inherited
-			sl.CommaText := PStatement(fStatementList[tmp])^._InheritsFromIDs;
-			for I := 0 to sl.Count - 1 do
-				List.Add(StrToIntDef(sl[i],-1));
-
+				// Add inheritance of inherited
+				sl.CommaText := PStatement(fStatementList[tmp])^._InheritsFromIDs;
+				for I := 0 to sl.Count - 1 do
+					List.Add(StrToIntDef(sl[i],-1));
+			end;
 			Inc(donecount);
 		end;
 	finally
@@ -2803,10 +2804,10 @@ begin
 	end;
 end;
 
-procedure TCppParser.GetInheritance(index : Integer; List : TIntList);
+procedure TCppParser.GetInheritanceIDs(index : Integer; List : TIntList);
 begin
 	if index <> -1 then
-		GetInheritance(PStatement(fStatementList[index]),List);
+		GetInheritanceIDs(PStatement(fStatementList[index]),List);
 end;
 
 procedure TCppParser.FillListOfFunctions(const Full: AnsiString; List: TStringList);
@@ -2862,7 +2863,7 @@ begin
 		inheritanceIDs := TIntList.Create;
 		try
 			// Accept inherited stuff from current class too
-			GetInheritance(fCurrentIndex,inheritanceIDs); // slow
+			GetInheritanceIDs(fCurrentIndex,inheritanceIDs); // slow
 
 			// Start scanning backwards, because owner data is found there
 			for I := fStatementList.Count - 1 downto 0 do begin
@@ -2897,17 +2898,23 @@ end;
 
 function TCppParser.FindTypeStatementOf(const aType : AnsiString) : PStatement;
 var
-	I,J : integer;
+	I,position : integer;
 	s : AnsiString;
 begin
 
+
 	// Remove pointer stuff from type
 	s := aType; // 'Type' is a keyword
-	J := Length(s);
-	while(J > 0) and (s[J] in ['*','&']) do
-		Dec(J);
-	if J <> Length(s) then
-		Delete(s,J+1,Length(s)-1);
+	position := Length(s);
+	while(position > 0) and (s[position] in ['*','&']) do
+		Dec(position);
+	if position <> Length(s) then
+		Delete(s,position + 1,Length(s) - 1);
+
+	// Use last word only (strip 'const', 'static', etc)
+	position := RPos(' ',s);
+	if position > 0 then
+		Delete(s,1,position);
 
 	for I := 0 to fStatementList.Count - 1 do begin
 		if PStatement(fStatementList[I])^._ParentID = -1 then begin // is this always true?
@@ -2966,7 +2973,7 @@ begin
 		while (memberword <> '') do begin
 
 			inheritanceIDs.Clear;
-			GetInheritance(parenttype,inheritanceIDs);
+			GetInheritanceIDs(parenttype,inheritanceIDs);
 
 			// Add members of this type
 			for I := 0 to fStatementList.Count - 1 do begin
