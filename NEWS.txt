@@ -1,5 +1,6 @@
-Version 5.3.1 - *
+Version 5.4.0 - 14 Februari 2013
 
+- The console pauser will now provide more detailed information when it decides not to work.
 - Startup time has been reduced by an order of magnitude.
 - The class browser now redraws at least numvisibleitems times faster.
 - "Search Again" (F3) is back from the dead.
@@ -14,7 +15,7 @@ Version 5.3.1 - *
 - Reduced memory usage.
 - Exporting editors to HTML now provides a perfect copy of the color scheme.
 - Fixed a memory leak in the Tools window.
-- Updated chinese (TW) translations.
+- Updated Chinese, Chinese (TW) and Japanese translations.
 - Added an example save file name to Editor Options >> Autosave.
 - More bug fixes and feature additions here and there.
 - One can now refresh the current cache contents.

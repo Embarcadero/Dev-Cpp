@@ -492,7 +492,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 449
         Height = 23
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 1
         OnChange = cmbCompilerChange
       end
@@ -1394,7 +1394,7 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 209
           Height = 23
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 15
           Sorted = True
           TabOrder = 4
         end
@@ -1439,18 +1439,10 @@ object frmProjectOptions: TfrmProjectOptions
     Left = 72
     Top = 344
   end
-  object OpenLibDialog: TOpenDialog
-    Filter = 
-      'Library (*.a;*.lib)|*.a;*.lib|Object (*.o;*.obj)|*.o;*.obj|All f' +
-      'iles (*.*)|*.*'
-    Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
-    Left = 112
-    Top = 344
-  end
   object dlgCustomMake: TOpenDialog
     Filter = 'All Files (*.*)|*.*'
     FilterIndex = 0
-    Left = 148
+    Left = 108
     Top = 344
   end
 end

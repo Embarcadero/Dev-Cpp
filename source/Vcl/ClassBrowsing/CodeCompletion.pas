@@ -254,10 +254,13 @@ var
 	I: integer;
 begin
 	fCompletionStatementList.Clear;
-	fCompletionStatementList.Capacity := fFullCompletionStatementList.Count;
-	for I := 0 to fFullCompletionStatementList.Count - 1 do
-		if StartsText(Member, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
-			fCompletionStatementList.Add(fFullCompletionStatementList[I]);
+	if Member <> '' then begin // filter, case insensitive
+		fCompletionStatementList.Capacity := fFullCompletionStatementList.Count;
+		for I := 0 to fFullCompletionStatementList.Count - 1 do
+			if StartsText(Member, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
+				fCompletionStatementList.Add(fFullCompletionStatementList[I]);
+	end else
+		fCompletionStatementList.Assign(fFullCompletionStatementList);
 	fCompletionStatementList.Sort(@ListSort);
 end;
 

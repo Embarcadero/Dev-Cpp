@@ -99,7 +99,7 @@ type
     procedure SetFileName(const value: AnsiString);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
   public
-    procedure Init(InProject : boolean;const Caption, Filename : AnsiString;DoOpen : boolean;IsRes: boolean = FALSE);
+    constructor Create(InProject : boolean;const Caption, Filename : AnsiString;DoOpen : boolean;IsRes: boolean = FALSE);
     destructor Destroy; override;
 
     // Recoded breakpoint stuff
@@ -203,7 +203,7 @@ end;
 
 { TEditor }
 
-procedure TEditor.Init(InProject : boolean;const Caption, Filename : AnsiString;DoOpen : boolean;IsRes: boolean = FALSE);
+constructor TEditor.Create(InProject : boolean;const Caption, Filename : AnsiString;DoOpen : boolean;IsRes: boolean = FALSE);
 var
 	s: AnsiString;
 begin
@@ -1333,8 +1333,10 @@ begin
 					fText.Hint := '';
 			end;
 		end;
-	end else
+	end else begin
+		fText.Cursor:=crIBeam;
 		CancelHint;
+	end;
 end;
 
 procedure TEditor.IndentSelection;

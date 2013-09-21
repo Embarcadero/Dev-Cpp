@@ -17,6 +17,7 @@ object CompOptForm: TCompOptForm
   ShowHint = True
   OnClose = FormClose
   OnCreate = FormCreate
+  OnShow = FormShow
   DesignSize = (
     484
     462)
@@ -101,6 +102,7 @@ object CompOptForm: TCompOptForm
     Height = 425
     ActivePage = tabCompiler
     TabOrder = 3
+    OnChange = MainPagesChange
     object tabCompiler: TTabSheet
       Caption = 'Compiler'
       DesignSize = (
@@ -125,6 +127,7 @@ object CompOptForm: TCompOptForm
         ScrollBars = ssVertical
         TabOrder = 1
         WantReturns = False
+        OnChange = CommandsChange
       end
       object grpMakefileGen: TGroupBox
         Left = 8
@@ -159,6 +162,7 @@ object CompOptForm: TCompOptForm
           Height = 17
           Caption = 'Use fast but imperfect dependency generation'
           TabOrder = 0
+          OnClick = cbFastDepClick
         end
         object seCompDelay: TSpinEdit
           Left = 111
@@ -169,6 +173,7 @@ object CompOptForm: TCompOptForm
           MinValue = 0
           TabOrder = 1
           Value = 650
+          OnChange = seCompDelayChange
         end
       end
       object cbLinkerAdd: TCheckBox
@@ -190,6 +195,7 @@ object CompOptForm: TCompOptForm
         ScrollBars = ssVertical
         TabOrder = 4
         WantReturns = False
+        OnChange = LinkerChange
       end
       object grpCompSet: TGroupBox
         Left = 20

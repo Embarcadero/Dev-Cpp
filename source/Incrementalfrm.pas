@@ -58,14 +58,15 @@ type
     procedure IncrementalUndoClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-  public
-    Editor : TSynEdit;
-    OrgPt : TBufferCoord;
   private
     fOptions : TSynSearchOptions;
     fSearchEngine : TSynEditSearch;
     fOriginalColor : TColor;
+    fEditor : TSynEdit;
     procedure DoSearch;
+    procedure SetEditor(value : TSynEdit);
+  public
+    property Editor : TSynEdit read fEditor write SetEditor;
   end;
 
 var
@@ -82,6 +83,19 @@ uses
 {$IFDEF LINUX}
   Xlib, main;
 {$ENDIF}
+
+procedure TIncrementalForm.SetEditor(value : TSynEdit);
+begin
+	if value <> fEditor then begin
+
+		// remove search engine of old editor
+		if Assigned(fEditor) then
+			fEditor.SearchEngine := nil;
+
+		fEditor := value;
+		fEditor.SearchEngine := fSearchEngine;
+	end;
+end;
 
 procedure TIncrementalForm.DoSearch;
 begin
@@ -164,7 +178,6 @@ end;
 
 procedure TIncrementalForm.FormShow(Sender: TObject);
 begin
-	editor.SearchEngine := fSearchEngine;
 	ActiveControl := Edit;
 	fOriginalColor := Edit.Color;
 end;

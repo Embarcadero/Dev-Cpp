@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 410
-          Height = 113
+          Height = 112
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -427,7 +427,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 14
+          Height = 13
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -584,12 +584,12 @@ object MainForm: TMainForm
     object tbCompile: TToolBar
       Left = 441
       Top = 2
-      Width = 170
+      Width = 178
       Height = 22
       AutoSize = True
       Caption = 'Compile and Run'
-      Constraints.MaxWidth = 170
-      Constraints.MinWidth = 170
+      Constraints.MaxWidth = 178
+      Constraints.MinWidth = 178
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -633,13 +633,21 @@ object MainForm: TMainForm
         Top = 0
         Action = actDebug
       end
-      object ProfileBtn: TToolButton
+      object ToolButton3: TToolButton
         Left = 123
+        Top = 0
+        Width = 8
+        Caption = 'ToolButton3'
+        ImageIndex = 49
+        Style = tbsSeparator
+      end
+      object ProfileBtn: TToolButton
+        Left = 131
         Top = 0
         Action = actProfileProject
       end
       object ProfilingInforBtn: TToolButton
-        Left = 146
+        Left = 154
         Top = 0
         Action = actDeleteProfileProject
       end
@@ -766,7 +774,7 @@ object MainForm: TMainForm
       end
     end
     object tbSpecials: TToolBar
-      Left = 624
+      Left = 632
       Top = 2
       Width = 71
       Height = 22
@@ -2895,7 +2903,7 @@ object MainForm: TMainForm
     object actDeleteProfileProject: TAction
       Category = 'Execute'
       Caption = 'Delete Profiling information'
-      ImageIndex = 11
+      ImageIndex = 47
       OnExecute = actDeleteProfileProjectExecute
       OnUpdate = actRunUpdate
     end

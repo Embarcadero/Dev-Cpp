@@ -123,6 +123,12 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnFindCompilersClick(Sender: TObject);
     procedure cmbCompilerSetCompEnter(Sender: TObject);
+    procedure CommandsChange(Sender: TObject);
+    procedure LinkerChange(Sender: TObject);
+    procedure seCompDelayChange(Sender: TObject);
+    procedure cbFastDepClick(Sender: TObject);
+    procedure MainPagesChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     fOldSelection: integer;
     fBins: AnsiString;
@@ -155,7 +161,7 @@ end;
 procedure TCompOptForm.btnOkClick(Sender: TObject);
 begin
 	// Save current compiler set
-	if cmbCompilerSetComp.ItemIndex > 0 then
+	if cmbCompilerSetComp.ItemIndex <> -1 then
 		SaveSet(cmbCompilerSetComp.ItemIndex);
 
 	// write full compiler list
@@ -198,6 +204,9 @@ begin
 	// fill tab controls
 	CompOptionsFrame1.FillOptions(nil);
 	DirTabsChange(Self);
+
+	// Mark unmodified
+	cmbCompilerSetComp.Tag := 0;
 end;
 
 procedure TCompOptForm.SaveSet(Index: integer);
@@ -215,6 +224,9 @@ begin
 	// other settings of a compiler profile are saved to devCompiler by the UI components!
 
 	devCompiler.SaveSet(Index);
+
+	// Mark unmodified
+	cmbCompilerSetComp.Tag := 0;
 end;
 
 procedure TCompOptForm.btnHelpClick(Sender: TObject);
@@ -437,8 +449,8 @@ end;
 procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);
 begin
 
-	// Save old
-	if MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[fOldSelection]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+	// Save old when modified
+	if (cmbCompilerSetComp.Tag = 1) and (MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[fOldSelection]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
 		SaveSet(fOldSelection);
 
 	fOldSelection := cmbCompilerSetComp.ItemIndex;
@@ -501,7 +513,7 @@ begin
 		Exit;
 
 	// Save old
-	if MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+	if (cmbCompilerSetComp.Tag = 1) and (MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
 		SaveSet(fOldSelection);
 
 	// Add blank compiler
@@ -602,11 +614,13 @@ end;
 procedure TCompOptForm.cbCompAddClick(Sender: TObject);
 begin
 	Commands.Enabled := TCheckBox(Sender).Checked;
+	cmbCompilerSetComp.Tag := 1;
 end;
 
 procedure TCompOptForm.cbLinkerAddClick(Sender: TObject);
 begin
 	Linker.Enabled := TCheckBox(Sender).Checked;
+	cmbCompilerSetComp.Tag := 1;
 end;
 
 procedure TCompOptForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -681,6 +695,36 @@ end;
 procedure TCompOptForm.cmbCompilerSetCompEnter(Sender: TObject);
 begin
 	fOldSelection := cmbCompilerSetComp.ItemIndex;
+end;
+
+procedure TCompOptForm.CommandsChange(Sender: TObject);
+begin
+	cmbCompilerSetComp.Tag := 1;
+end;
+
+procedure TCompOptForm.LinkerChange(Sender: TObject);
+begin
+	cmbCompilerSetComp.Tag := 1;
+end;
+
+procedure TCompOptForm.seCompDelayChange(Sender: TObject);
+begin
+	cmbCompilerSetComp.Tag := 1;
+end;
+
+procedure TCompOptForm.cbFastDepClick(Sender: TObject);
+begin
+	cmbCompilerSetComp.Tag := 1;
+end;
+
+procedure TCompOptForm.MainPagesChange(Sender: TObject);
+begin
+	cmbCompilerSetComp.Tag := 1;
+end;
+
+procedure TCompOptForm.FormShow(Sender: TObject);
+begin
+	cmbCompilerSetComp.Tag := 0;
 end;
 
 end.

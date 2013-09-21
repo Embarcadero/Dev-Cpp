@@ -2,7 +2,7 @@
 
 .\VCL\DevCpp.dpk
 .\VCL\SynEditPackages\SynEdit_D7.dpk
-.\VCL\Class Browser & Completion\ClassBrowsing.dpk
+.\VCL\ClassBrowsing\ClassBrowsing.dpk
 
 2) Compile resources: run .\CompileResources.bat to create binary .res files or run manually from cmd:
 

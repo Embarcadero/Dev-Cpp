@@ -598,6 +598,7 @@ type
     actSearchAgain: TAction;
     actSearchAgain1: TMenuItem;
     N75: TMenuItem;
+    ToolButton3: TToolButton;
 
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
@@ -1769,8 +1770,7 @@ begin
 		Exit;
 	end;
 
-	e := TEditor.Create;
-	e.Init(FALSE, ExtractFileName(s), s, TRUE);
+	e := TEditor.Create(false,ExtractFileName(s),s,true);
 	if Assigned(fProject) then begin
 		if (not SameFileName(fProject.FileName,s)) and (fProject.GetUnitFromString(s) = -1) then
 			dmMain.RemoveFromHistory(s);
@@ -2084,8 +2084,7 @@ begin
 		end;
 	end;
 
-	NewEditor:= TEditor.Create;
-	NewEditor.Init(FALSE, Lang[ID_UNTITLED] + inttostr(dmMain.GetNewFileNumber), '', FALSE);
+	NewEditor:= TEditor.Create(false,Lang[ID_UNTITLED] + IntToStr(dmMain.GetNewFileNumber),'',false);
 	NewEditor.InsertDefaultText;
 	NewEditor.Activate;
 end;
@@ -2160,9 +2159,8 @@ begin
 	else
 		InProject := False;
 
-	fname:=Lang[ID_UNTITLED] +inttostr(dmMain.GetNewFileNumber) + '.rc';
-	NewEditor := TEditor.Create;
-	NewEditor.Init(InProject, fname, '',FALSE, TRUE);
+	fname := Lang[ID_UNTITLED] +inttostr(dmMain.GetNewFileNumber) + '.rc';
+	NewEditor := TEditor.Create(InProject,fname,'',false,true);
 	NewEditor.Activate;
 
 	if InProject and Assigned(fProject) then begin
@@ -2970,12 +2968,20 @@ begin
 	fCompiler.Target:= ctNone;
 
 	if assigned(fProject) then begin
-		if assigned(e) and not e.InProject then
-			fCompiler.Target:= ctFile
-		else
-			fCompiler.Target:= ctProject;
-	end else if assigned(e) then
+		if assigned(e) and not e.InProject then begin
+
+			// There is an opened project, but this does file not belong to that project
+			if GetFileTyp(e.FileName) in [utCSrc,utCppSrc,utcHead,utCppHead,utresSrc,utresHead] then begin // it's a code file
+				fCompiler.Target := ctFile;
+			end else begin // this nonproject file isn't compilable, run the project anyway
+				fCompiler.Target := ctProject;
+			end;
+		end else begin
+			fCompiler.Target := ctProject;
+		end;
+	end else if assigned(e) then begin
 		fCompiler.Target:= ctFile;
+	end;
 
 	if fCompiler.Target = ctFile then
 		fCompiler.SourceFile:= e.FileName;
@@ -4119,6 +4125,10 @@ begin
 
 			// keep Class browser updated
 			ClassBrowser.CurrentFile := e.FileName;
+
+			// When using incremental search, change focus of it
+			if Assigned(IncrementalForm) and IncrementalForm.Showing then
+				IncrementalForm.Editor := e.Text;
 
 			for i := 1 to 9 do
 				if e.Text.GetBookMark(i, x, y) then begin

@@ -105,7 +105,6 @@ type
     cmbLangID: TComboBox;
     tabCompiler: TTabSheet;
     chkSupportXP: TCheckBox;
-    OpenLibDialog: TOpenDialog;
     chkOverrideBuildCmd: TCheckBox;
     txtOverrideBuildCmd: TMemo;
     lblFname: TLabel;
@@ -1064,16 +1063,30 @@ end;
 
 procedure TfrmProjectOptions.AddLibBtnClick(Sender: TObject);
 var
-  s: AnsiString;
-  i: integer;
+	s: AnsiString;
+	i: integer;
+	sl: TStringList;
 begin
-  if OpenLibDialog.Execute then begin
-    for i := 0 to OpenLibDialog.Files.Count - 1 do begin
-      S:=ExtractRelativePath(fProjectCopy.Directory, OpenLibDialog.Files[i]);
-      S:=GenMakePath1(S);
-      edLinker.Lines.Add(S);
-    end;
-  end;
+	with TOpenDialog.Create(Self) do try
+		Filter:=FLT_ALLFILES;
+
+		// Start in the lib folder
+		sl := TStringList.Create;
+		StrToList(devCompiler.LibDir,sl,';');
+		if sl.count > 0 then
+			InitialDir := sl[0];
+		sl.Free;
+
+		if Execute then begin
+			for i := 0 to Files.Count - 1 do begin
+				S:=ExtractRelativePath(fProjectCopy.Directory, Files[i]);
+				S:=GenMakePath1(S);
+				edLinker.Lines.Add(S);
+			end;
+		end;
+	finally
+		Free;
+	end;
 end;
 
 function TfrmProjectOptions.DefaultBuildCommand(idx: integer): AnsiString;

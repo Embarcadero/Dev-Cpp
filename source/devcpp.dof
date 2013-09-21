@@ -94,10 +94,10 @@ OutputDir=..
 UnitOutputDir=units
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=VCL\Parser;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
+SearchPath=VCL\ClassBrowsing;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
 Packages=vcl;rtl;vclactnband;vclx;vcldb;dbrtl;dbexpress;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;VclSmp;dbxcds;soaprtl;vclshlctrls;SynEdit_R7
 Conditionals=
-DebugSourceDirs=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\Parser\
+DebugSourceDirs=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\ClassBrowsing\
 UsePackages=0
 [Parameters]
 RunParams=C:\main.cpp
@@ -109,9 +109,9 @@ DebugCWD=
 IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=5
-MinorVer=3
+MinorVer=4
 Release=0
-Build=5
+Build=0
 Debug=0
 PreRelease=0
 Special=0
@@ -122,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Bloodshed Software
 FileDescription=Dev-C++ IDE
-FileVersion=5.3.0.5
+FileVersion=5.4.0.0
 InternalName=devcpp.exe
 LegalCopyright=Copyright Bloodshed Software
 LegalTrademarks=
@@ -131,18 +131,20 @@ ProductName=Dev-C++
 ProductVersion=5
 Comments=Under the GNU General Public License
 [HistoryLists\hlDebugSourcePath]
-Count=3
-Item0=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\Parser\
-Item1=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\
-Item2=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\
+Count=4
+Item0=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\ClassBrowsing\
+Item1=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\Parser\
+Item2=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\
+Item3=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=VCL\Parser;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
-Item1=Vcl;VCL\Class Browser & Completion;VCL\Color Picker;VCL\Dev Reg;VCL\File Monitor;VCL\Shortcuts;VCL\Options List;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
-Item2=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;VCL\Options List;Vcl\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
+Count=4
+Item0=VCL\ClassBrowsing;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
+Item1=VCL\Parser;VCL\ColorPickerButton;VCL\devReg;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
+Item2=Vcl;VCL\Class Browser & Completion;VCL\Color Picker;VCL\Dev Reg;VCL\File Monitor;VCL\Shortcuts;VCL\Options List;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
+Item3=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;VCL\Options List;Vcl\SynEdit\Source;Tools\webupdate;Tools\Packman;.\
 [HistoryLists\hlUnitOutputDirectory]
 Count=1
 Item0=units

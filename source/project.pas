@@ -1284,9 +1284,8 @@ begin
 	with fUnits[index] do begin
 		if FileName <> '' then begin
 			try
-				fEditor := TEditor.Create;
-				chdir(Directory);
-				fEditor.Init(TRUE, ExtractFileName(FileName), ExpandFileName(FileName), not New);
+				SetCurrentDir(Directory);
+				fEditor := TEditor.Create(true,ExtractFileName(FileName),ExpandFileName(FileName),not New);
 				if New then
 					fEditor.InsertDefaultText;
 				LoadUnitLayout(fEditor, index);
@@ -1602,8 +1601,7 @@ begin
 				fIniFile := TMemIniFile.Create(aFileName);
 			NewUnit(FALSE);
 			with fUnits[fUnits.Count - 1] do begin
-				Editor:= TEditor.Create;
-				Editor.init(TRUE, ExtractFileName(FileName), FileName, FALSE);
+				Editor:= TEditor.Create(true, ExtractFileName(FileName), FileName, false);
 				Editor.InsertDefaultText;
 				Editor.Activate;
 			end;
@@ -1643,9 +1641,8 @@ begin
 
        with fUnits[fUnits.Count -1] do
         begin
-          Editor:= TEditor.Create;
+          Editor:= TEditor.Create(TRUE, ExtractFileName(filename), FileName, FALSE);
           try
-           Editor.Init(TRUE, ExtractFileName(filename), FileName, FALSE);
            if (Length(aTemplate.Units[idx].CppName) > 0) and
               (aTemplate.OptionsRec.useGPP) then
            begin
@@ -1681,8 +1678,7 @@ begin
        NewUnit(FALSE);
        with fUnits[fUnits.Count -1] do
         begin
-          Editor:= TEditor.Create;
-          Editor.init(TRUE, FileName, FileName, FALSE);
+          Editor:= TEditor.Create(TRUE, FileName, FileName, FALSE);
           if fOptions.useGPP then
            s:= aTemplate.OldData.CppText
           else
