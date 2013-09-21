@@ -1096,41 +1096,35 @@ begin
 	if fBinDir.Count > 0 then begin // we need some bin dir, so treat count=0 as an error too
 		CheckDirs(fBinDir,goodbin,badbin);
 		if badbin <> '' then begin
-			msg := msg + 'The following bin directories don''t exist:' + #13#10;
+			msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],['binary']) + #13#10;
 			msg := msg + StringReplace(badbin, ';', #13#10, [rfReplaceAll]);
 			msg := msg + #13#10 + #13#10;
 		end;
 	end else begin
-		msg := msg + 'No bin directories have been specified.';
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTSET],['binary']);
 		msg := msg + #13#10 + #13#10;
 	end;
 
 	CheckDirs(fCDir,goodinc,badinc);
 	if badinc <> '' then  begin
-		msg := msg + 'The following C include directories don''t exist:' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],['C include']) + #13#10;
 		msg := msg + StringReplace(badinc, ';', #13#10, [rfReplaceAll]);
 		msg := msg + #13#10 + #13#10;
 	end;
 	CheckDirs(fCppDir,goodinccpp,badinccpp);
 	if badinccpp <> '' then begin
-		msg := msg + 'The following C++ include directories don''t exist:' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],['C++ include']) + #13#10;
 		msg := msg + StringReplace(badinccpp, ';', #13#10, [rfReplaceAll]);
 		msg := msg + #13#10 + #13#10;
 	end;
 	CheckDirs(fLibDir,goodlib,badlib);
 	if badlib <> '' then begin
-		msg := msg + 'The following lib directories don''t exist:' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],['library']) + #13#10;
 		msg := msg + StringReplace(badlib, ';', #13#10, [rfReplaceAll]);
 		msg := msg + #13#10 + #13#10;
 	end;
 	if msg <> '' then begin
-		msg := msg + 'Would you like Dev-C++ to remove them for you ';
-		msg := msg + 'and add the default paths to the remaining existing paths?' + #13#10;
-		msg := msg + 'Leaving those directories will lead to problems during compilation ';
-		msg := msg + 'of anything created with Dev-C++.' + #13#10;
-		msg := msg + #13#10;
-		msg := msg + 'Unless you know exactly what you''re doing, it is recommended ';
-		msg := msg + 'that you click Yes.';
+		msg := msg + Lang[ID_COMPVALID_DIRFIXSUGGESTION];
 
 		// If confirmed, insert working dirs into default path list
 		if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
@@ -1185,32 +1179,31 @@ begin
 	// now check some exes
 	msg := '';
 	if not FindFile(fBinDir,fgccName) then  begin
-		msg := msg + 'Cannot find the C compiler "' + fgccName + '".' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['C compiler',fgccName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fgppName) then  begin
-		msg := msg + 'Cannot find the C++ compiler "' + fgppName + '".' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['C++ compiler',fgppName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fgdbName) then  begin
-		msg := msg + 'Cannot find the debugger "' + fgdbName + '".' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['debugger',fgdbName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fgprofName) then  begin
-		msg := msg + 'Cannot find the profiler "' + fgprofName + '".' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['profiler',fgprofName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fmakeName) then  begin
-		msg := msg + 'Cannot find the makefile processor "' + fmakeName + '".' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['makefile processor',fmakeName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fwindresName) then  begin
-		msg := msg + 'Cannot find the resource processor "' + fwindresName + '".' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['resource processor',fwindresName]) + #13#10;
 	end;
 	if not FindFile(fBinDir,fdllwrapName) then  begin
-		msg := msg + 'Cannot find the DLL wrapper "' + fdllwrapName + '".' + #13#10;
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],['DLL wrapper',fdllwrapName]) + #13#10;
 	end;
 	if msg <> '' then begin
-		msg := msg + #13#10;
-		msg := msg + 'The following directories have been searched:' + #13#10;
+		msg := msg + #13#10 + Lang[ID_COMPVALID_DIRSEARCHED] + #13#10;
 		for I := 0 to fBinDir.Count - 1 do
 			msg := msg + fBinDir[i] + #13#10;
-		msg := msg + #13#10 + 'Please check if your binary directory and the executable names are set correctly at Tools >> Compiler Options >> Directories/Programs.';
+		msg := msg + #13#10 + Lang[ID_COMPVALID_BINFIXSUGGESTION];
 		MessageDlg(msg, mtWarning, [mbOK], 0);
 	end;
 end;

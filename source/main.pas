@@ -493,7 +493,6 @@ type
     ClassSheet: TTabSheet;
     ClassBrowser: TClassBrowser;
     AddWatchBtn: TButton;
-    RemoveWatchBtn: TButton;
     FloatingPojectManagerItem: TMenuItem;
     actCompileCurrentFile: TAction;
     Compilecurrentfile1: TMenuItem;
@@ -553,7 +552,6 @@ type
     DebugOutput: TMemo;
     DebugSendPanel: TPanel;
     ViewCPUBtn: TButton;
-    ModifyWatchBtn: TButton;
     N68: TMenuItem;
     Abortcompilation1: TMenuItem;
     Modifywatch1: TMenuItem;
@@ -897,6 +895,7 @@ type
     procedure GotoBreakpoint(const bfile: AnsiString; bline: integer);
     procedure RemoveActiveBreakpoints;
     procedure AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
+    procedure GetCompilerOption(const option : AnsiString;var value : char;var index : integer);
     procedure SetCompilerOption(index : integer; value : char);
     function CloseEditor(index : integer): Boolean;
     procedure EditorSaveTimer(sender : TObject);
@@ -2979,10 +2978,10 @@ procedure TMainForm.actDebugExecute(Sender: TObject);
 var
 	e: TEditor;
 	i: integer;
-	optD,optS : PCompilerOption;
 	idxD,idxS : integer;
 	filepath : AnsiString;
 	debug, strip : boolean;
+	value : char;
 begin
 
 	// Assume all is set up correctly
@@ -2990,10 +2989,13 @@ begin
 	strip := false;
 
 	// Check if we enabled proper options
-	if devCompiler.FindOption('-g3',optD,idxD) then
-		debug := optD^.Value > 0;
-	if devCompiler.FindOption('-s',optS,idxS) then
-		strip := optS^.Value > 0;
+	GetCompilerOption('-g3',value,idxD);
+	if idxD <> -1 then
+		debug := value <> '0';
+
+	GetCompilerOption('-s',value,idxS);
+	if idxS <> -1 then
+		strip := value <> '0';
 
 	// Ask the user if he wants to enable debugging...
 	if (not debug or strip) and (MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
@@ -4372,23 +4374,27 @@ end;
 
 procedure TMainForm.actProfileProjectExecute(Sender: TObject);
 var
-	optP, optS: PCompilerOption;
 	idxP, idxS: integer;
-	prof, strp: boolean;
+	prof, strip: boolean;
 	path : AnsiString;
 	e : TEditor;
+	value : char;
 begin
 
 	// Assume all is set up correctly
 	prof := true;
-	strp := false;
+	strip := false;
 
-	if devCompiler.FindOption('-pg',optP,idxP) then
-		prof := optP^.Value > 0;
-	if devCompiler.FindOption('-s',optS,idxS) then
-		strp := optS^.Value > 0;
+	// Check if we enabled proper options
+	GetCompilerOption('-g3',value,idxP);
+	if idxP <> -1 then
+		prof := value <> '0';
 
-	if (not prof or strp) and (MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
+	GetCompilerOption('-s',value,idxS);
+	if idxS <> -1 then
+		strip := value <> '0';
+
+	if (not prof or strip) and (MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
 
 		// Enable profiling, disable stripping
 		SetCompilerOption(idxP,'1');
@@ -5233,12 +5239,28 @@ begin
 	end;
 end;
 
+procedure TMainForm.GetCompilerOption(const option : AnsiString;var value : char;var index : integer);
+var
+	optionstruct : PCompilerOption;
+begin
+
+	// Try to find the value in the predefined list
+	if devCompiler.FindOption(option, optionstruct, index) then begin // the option exists...
+
+		// Search project options...
+		if Assigned(fProject) then
+			value := fProject.Options.CompilerOptions[index + 1]
+		else
+			value := ValueToChar[optionstruct^.Value];
+	end;
+end;
+
 procedure TMainForm.SetCompilerOption(index : integer; value : char);
 begin
 	if Assigned(fProject) then
-		fProject.SetCompilerOption(index, '1')
+		fProject.SetCompilerOption(index,value)
 	else
-		devCompiler.SetOption(index,'1');
+		devCompiler.SetOption(index,value);
 end;
 
 procedure TMainForm.SetupProjectView;
