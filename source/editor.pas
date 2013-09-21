@@ -281,15 +281,14 @@ begin
 
 		with FoldRegions do begin
 			Add(rtChar, False, False, False, '{', '}', nil);
-			Add(rtKeyword, True, False, False, '/*', '*/', nil);
-			Add(rtKeyword, False, False, True, 'BEGIN', 'END', nil);
+			//Add(rtKeyword, True, False, False, '/*', '*/', nil);
+			//Add(rtKeyword, False, False, True, 'BEGIN', 'END', nil);
 		end;
 	end;
 
 	// Apply folding for the first time
 	fText.InitCodeFolding;
-	fText.ReScanForFoldRanges;
-	fText.GetUncollapsedStrings;
+	fText.ReScan;
 
 	// Set the current editor and highlighter
 	devEditor.AssignEditor(fText);
@@ -640,8 +639,6 @@ begin
 		if Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
 			UpdateCaption('[*] '+ExtractfileName(fFileName));
-			fText.ReScanForFoldRanges;
-			fText.GetUncollapsedStrings;
 		end else begin
 			UpdateCaption(ExtractfileName(fFileName));
 			MainForm.SetStatusbarMessage('');
@@ -1256,76 +1253,73 @@ end;
 
 procedure TEditor.SetEditorText(Key: Char);
 var
-  Phrase: string;
-  I, CurrSel: integer;
-  ST: PStatement;
-  FuncAddOn: string;
+	Phrase: string;
+	I, CurrSel: integer;
+	ST: PStatement;
+	FuncAddOn: string;
 begin
-  ST:=fCompletionBox.SelectedStatement;
-  if fCompletionBox.SelectedIsFunction then begin
-    if Key=';' then
-      FuncAddOn := '();'
-    else if Key='.' then
-      FuncAddOn := '().'
-    else if Key='>' then
-      FuncAddOn := '()->'
-    else
-      FuncAddOn := '()';
-  end
-  else begin
+	ST:=fCompletionBox.SelectedStatement;
+	if fCompletionBox.SelectedIsFunction then begin
+		if Key=';' then
+			FuncAddOn := '();'
+		else if Key='.' then
+			FuncAddOn := '().'
+		else if Key='>' then
+			FuncAddOn := '()->'
+		else
+			FuncAddOn := '()';
+	end else begin
 {$IFDEF WIN32}
-    if Key=Char(vk_Return) then
+		if Key=Char(vk_Return) then
 {$ENDIF}
 {$IFDEF LINUX}
-    if Key=Char(Xk_Return) then
+		if Key=Char(Xk_Return) then
 {$ENDIF}
-      FuncAddOn := ''
-    else if Key='>' then
-      FuncAddOn := '->'
-    else if Key=':' then
-      FuncAddOn := '::'
-    else
-      FuncAddOn := Key;
-  end;
+			FuncAddOn := ''
+		else if Key='>' then
+			FuncAddOn := '->'
+		else if Key=':' then
+			FuncAddOn := '::'
+		else
+			FuncAddOn := Key;
+	end;
 
-  if ST <> nil then begin
-    Phrase := ST^._Command;
+	if ST <> nil then begin
+		Phrase := ST^._Command;
 
-    // if already has a selection, delete it
-    if fText.SelAvail then
-      fText.SelText:='';
+		// if already has a selection, delete it
+		if fText.SelAvail then
+			fText.SelText:='';
 
-    // find the end of the word and delete from caretx to end of word
-    CurrSel:=fText.SelEnd;
-    I:=CurrSel;
-    while (I<Length(fText.Text)) and (fText.Text[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_']) do
-      Inc(I);
-    fText.SelEnd:=I;
-    fText.SelText:='';
+		// find the end of the word and delete from caretx to end of word
+		CurrSel:=fText.SelEnd;
+		I:=CurrSel;
+		while (I<Length(fText.Text)) and (fText.Text[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_']) do
+			Inc(I);
+		fText.SelEnd:=I;
+		fText.SelText:='';
 
-    // find the start of the word
-    CurrSel:=fText.SelStart;
-    I:=CurrSel;
-    while (I<>0) and (fText.Text[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_']) do
-      Dec(I);
-    fText.SelStart:=I;
-    fText.SelEnd:=CurrSel;
+		// find the start of the word
+		CurrSel:=fText.SelStart;
+		I:=CurrSel;
+		while (I<>0) and (fText.Text[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_']) do
+			Dec(I);
+		fText.SelStart:=I;
+		fText.SelEnd:=CurrSel;
 
-    // don't add () if already there
-    if fText.Text[CurrSel]='(' then
-      FuncAddOn:='';
+		// don't add () if already there
+		if fText.Text[CurrSel]='(' then
+			FuncAddOn:='';
 
-    fText.SelText:=Phrase+FuncAddOn;
+		fText.SelText:=Phrase+FuncAddOn;
 
-    // if we added "()" move caret inside parenthesis
-    // only if Key<>'.' and Key<>'>'
-    // and function takes arguments...
-    if (not (Key in ['.', '>']))
-    and (FuncAddOn<>'')
-    and ( (Length(ST^._Args)>2) or (ST^._Args='()') ) then begin
-      fText.CaretX:=fText.CaretX-Length(FuncAddOn)+1;
-    end;
-  end;
+		// if we added "()" move caret inside parenthesis
+		// only if Key<>'.' and Key<>'>'
+		// and function takes arguments...
+		if (not (Key in ['.', '>'])) and (FuncAddOn<>'') and ( (Length(ST^._Args)>2) or (ST^._Args='()') ) then begin
+			fText.CaretX:=fText.CaretX-Length(FuncAddOn)+1;
+		end;
+	end;
 end;
 
 function TEditor.CheckAttributes(P: TBufferCoord; Phrase: string): boolean;

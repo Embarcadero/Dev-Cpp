@@ -85,7 +85,7 @@ interface
 uses
 {$IFDEF WIN32}
   SysUtils, Dialogs, Classes, Windows, Messages, Graphics, Controls, Menus, Forms, StdCtrls,
-  SynEditKbdHandler, SynEdit, SynEditHighlighter, CppParser, utils;
+  SynEditKbdHandler, SynEdit, SynEditHighlighter, CppParser;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, QDialogs, Classes, Xlib, QGraphics, QControls, QMenus, QForms, QStdCtrls,

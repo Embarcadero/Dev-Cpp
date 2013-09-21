@@ -173,7 +173,6 @@ type
 
 	TSynCodeFolding = class(TPersistent)
   private
-    fCollapsedCodeHint: Boolean;
     fIndentGuides: Boolean;
     fShowCollapsedLine: Boolean;
     fCollapsedLineColor: TColor;
@@ -189,7 +188,6 @@ type
     procedure SetFolderBarColor(const Value: TColor);
     procedure SetFolderBarLinesColor(const Value: TColor);
     procedure SetEnabled(const Value: Boolean);
-    procedure SetCollapsedCodeHint(const Value: Boolean);
     procedure SetCollapsedLineColor(const Value: TColor);
     procedure SetCollapsingMarkStyle(const Value: TSynCollapsingMarkStyle);
     procedure SetHighlightIndentGuides(const Value: Boolean);
@@ -203,8 +201,6 @@ type
     procedure Assign(Source: TPersistent); override;
 
     property CaseSensitive: Boolean read fCaseSensitive write SetCaseSensitive;
-    property CollapsedCodeHint: Boolean read fCollapsedCodeHint
-    	write SetCollapsedCodeHint default True;
     property CollapsedLineColor: TColor read fCollapsedLineColor
     	write SetCollapsedLineColor default clDefault;
     property CollapsingMarkStyle: TSynCollapsingMarkStyle
@@ -1522,13 +1518,6 @@ end;
 procedure TSynCodeFolding.SetFolderBarLinesColor(const Value: TColor);
 begin
 	fFolderBarLinesColor := Value;
-
-	if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetCollapsedCodeHint(const Value: Boolean);
-begin
-	fCollapsedCodeHint := Value;
 
 	if Assigned(fOnChange) then fOnChange(fcRefresh);
 end;

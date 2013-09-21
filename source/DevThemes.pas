@@ -63,7 +63,7 @@ type
  end;
 
 var
- devTheme: TdevTheme;
+ devTheme: TdevTheme = nil;
 
 implementation
 
@@ -97,13 +97,14 @@ end;
 
 destructor TdevTheme.Destroy;
 begin
+  fThemes.Free;
+
   fMenus.Clear;
   fHelp.Clear;
   fProjects.Clear;
   fSpecials.Clear;
   fBrowser.Clear;
 
-  fThemes.Free;
   fMenus.Free;
   fHelp.Free;
   fProjects.Free;

@@ -23,7 +23,7 @@ unit SynEditCodeFolding;
 interface
 
 uses
-	Graphics, Types, Classes, SysUtils, ContNrs;
+	Graphics, Types, Classes, SysUtils;
 
 type
 	TSynEditFoldRange = class;
@@ -32,7 +32,6 @@ type
 
 	TFoldRegionType = (rtChar, rtKeyWord);
 
-	// Fold item
 	TFoldRegionItem = class(TCollectionItem)
 	private
 		fType: TFoldRegionType;
@@ -61,7 +60,6 @@ type
 		property Name: String read fName write fName;
 	end;
 
-	// List of TSkipRegions
 	TFoldRegions = class(TCollection)
 	private
 		function GetItem(Index: Integer): TFoldRegionItem;
@@ -74,9 +72,9 @@ type
 	end;
 
 	// A parent fold which owns fold ranges
-	TSynEditFoldRanges = class(TPersistent)
+	TSynEditFoldRanges = class(TObject)
 	private
-		fRanges: TObjectList;
+		fRanges: TList;
 		function GetSynEditFoldRange(Index: Integer): TSynEditFoldRange;
 		function GetCount: Integer;
 	public
@@ -88,13 +86,13 @@ type
 
 		property Count: Integer read GetCount;
 		property FoldRanges[Index: Integer]: TSynEditFoldRange read GetSynEditFoldRange; default;
-		property Ranges: TObjectList read fRanges;
+		property Ranges: TList read fRanges;
 	end;
 
 	// Top-level folds
 	TSynEditAllFoldRanges = class(TSynEditFoldRanges)
 	private
-		fAllRanges: TObjectList;
+		fAllRanges: TList;
 		function GetAllCount: Integer;
 		function GetAllFoldRange(Index: Integer): TSynEditFoldRange;
 	public
@@ -105,7 +103,7 @@ type
 
 		property AllCount: Integer read GetAllCount;
 		property AllFoldRanges[Index: Integer]: TSynEditFoldRange read GetAllFoldRange; default;
-		property AllRanges: TObjectList read fAllRanges;
+		property AllRanges: TList read fAllRanges;
 	end;
 
 	// A single fold
@@ -157,17 +155,25 @@ implementation
 constructor TSynEditAllFoldRanges.Create;
 begin
 	inherited;
-	fAllRanges := TObjectList.Create(false);
+	fAllRanges := TList.Create;
 end;
 
 destructor TSynEditAllFoldRanges.Destroy;
+var
+	I : integer;
 begin
+	if not Assigned(fAllRanges) then Exit;
+	for I:=0 to fAllRanges.Count - 1 do begin
+		TObject(fAllRanges[i]).Free;
+		fAllRanges[i] := nil;
+	end;
 	fAllRanges.Free;
 	inherited;
 end;
 
 procedure TSynEditAllFoldRanges.Delete(Index: Integer);
 begin
+	TObject(fAllRanges[Index]).Free;
 	fAllRanges.Delete(Index);
 end;
 
@@ -178,7 +184,7 @@ end;
 
 function TSynEditAllFoldRanges.GetAllFoldRange(Index: Integer): TSynEditFoldRange;
 begin
-	Result := TSynEditFoldRange(fAllRanges[Index]);
+	Result := fAllRanges[Index];
 end;
 
 { TSynEditFoldRanges }
@@ -208,11 +214,12 @@ end;
 constructor TSynEditFoldRanges.Create;
 begin
 	inherited;
-	fRanges := TObjectList.Create(false);
+	fRanges := TList.Create;
 end;
 
 destructor TSynEditFoldRanges.Destroy;
 begin
+	if not Assigned(fRanges) then Exit;
 	fRanges.Free;
 	inherited;
 end;

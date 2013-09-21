@@ -1076,7 +1076,7 @@ begin
 	LoadText;
 
 	// Apply shortcuts
-	devShortcuts.Filename:=devDirs.Config + DEV_devShortcuts_FILE;
+	devShortcuts.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
 	devShortcuts.Load;
 
 	// Some more options
@@ -1353,25 +1353,29 @@ procedure TMainForm.FormDestroy(Sender: TObject);
 var
 	i: integer;
 begin
+	// Prevent singleton reinit
+	DontRecreateSingletons := true;
+
+	// Stop the debugger
 	if fDebugger.Executing then
 		fDebugger.CloseDebugger(Sender);
-	// Free everything nicely
-	fTools.Free;
-	fCompiler.Free;
-	fDebugger.Free;
-	dmMain.Free;
-	devImageThemes.Free;
-	devExecutor.Free;
-	Lang.Free;
-	devTheme.Free;
-	devData.Free;
 
 	// Remove the breakpoints
-	for i := BreakPointList.Count - 1 downto 0 do begin
-		dispose(BreakPointList.Items[i]);
-		BreakPointList.Delete(i);
-	end;
+	for i := 0 to BreakPointList.Count - 1 do
+		TObject(BreakPointList.Items[i]).Free;
 	BreakPointList.Free;
+
+	devTheme.Free;
+	devImageThemes.Free; // Deze laat de boel in de soep lopen?
+	fCompiler.Free;
+	fDebugger.Free;
+	//fTools.Free; // Deze laat de boel in de soep lopen?
+	devExecutor.Free;
+	dmMain.Free;
+
+	// Free these singletons on the very last
+	Lang.Free;
+	devData.Free;
 end;
 
 procedure TMainForm.ParseCmdLine;
@@ -2022,7 +2026,7 @@ begin
 		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[ e.Text.GetRealLineNumber(e.Text.DisplayY),
 																	e.Text.DisplayX,
 																	e.Text.SelLength,
-																	e.Text.UnCollapsedLinesCount,
+																	e.Text.UnCollapsedLines.Count,
 																	e.Text.UnCollapsedLinesLength]);
 end;
 
@@ -2114,7 +2118,7 @@ end;
 procedure TMainForm.MessageControlChanging(Sender: TObject;var AllowChange: Boolean);
 begin
 	if MessageControl.ActivePage <> CloseSheet then
-	 fTab:= MessageControl.ActivePageIndex;
+		fTab:= MessageControl.ActivePageIndex;
 end;
 
 procedure TMainForm.MRUClick(Sender: TObject);
@@ -2831,15 +2835,11 @@ end;
 
 procedure TMainForm.actUndoExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then begin
 		e.Text.Undo;
-
-		// Command messaging is broken, 'fix' it...
-		e.Text.ReScanForFoldRanges;
-		e.Text.GetUncollapsedStrings;
 	end;
 end;
 
@@ -2850,10 +2850,6 @@ begin
 	e:= GetEditor;
 	if assigned(e) then begin
 		e.Text.Redo;
-
-		// Command messaging is broken, 'fix' it...
-		e.Text.ReScanForFoldRanges;
-		e.Text.GetUncollapsedStrings;
 	end;
 end;
 
@@ -2884,11 +2880,6 @@ begin
 	e:= GetEditor;
 	if Assigned(e) then begin
 		e.Text.PasteFromClipboard;
-
-		// Command messaging is broken, 'fix' it...
-		e.Text.ReScanForFoldRanges;
-		e.Text.GetUncollapsedStrings;
-
 		//e.Text.Repaint;
 	end;
 end;
@@ -3545,7 +3536,7 @@ begin
 			end;
 			if devData.ThemeChange then
 				Loadtheme;
-			devShortcuts.Filename:=devDirs.Config + DEV_devShortcuts_FILE;
+			devShortcuts.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
 		end;
 	finally
 		Free;
@@ -3574,7 +3565,7 @@ end;
 
 procedure TMainForm.actUpdateProject(Sender: TObject);
 begin
-	(Sender as TCustomAction).Enabled:= assigned(fProject);
+	(Sender as TCustomAction).Enabled := assigned(fProject);
 end;
 
 procedure TMainForm.actUpdateEmptyEditor(Sender: TObject);
@@ -4204,8 +4195,9 @@ end;
 
 procedure TMainForm.FormResize(Sender: TObject);
 begin
-	if not devData.FullScreen then // only if not going full-screen
-		GetWindowPlacement(Self.Handle, @devData.WindowPlacement);
+	if not DontRecreateSingletons then
+		if not devData.FullScreen then // only if not going full-screen
+			GetWindowPlacement(Self.Handle, @devData.WindowPlacement);
 end;
 
 procedure TMainForm.UpdateSplash(text : string);
@@ -6302,13 +6294,8 @@ begin
 	DebugTree.Items.Clear;
 end;
 
-
-procedure TMainForm.HideCodeToolTip;
-//
-// added on 23rd may 2004 by peter_
-// belongs to this problem: 
 // https://sourceforge.net/tracker/?func=detail&atid=110639&aid=957025&group_id=10639
-//
+procedure TMainForm.HideCodeToolTip;
 var
 	e: TEditor;
 begin

@@ -660,10 +660,11 @@ var
  devExternalPrograms: TdevExternalPrograms = nil;
 
  // Permanent alternate config file (need to be global vars)
- ConfigMode          : (CFG_NORMAL, CFG_PARAM, CFG_USER) = CFG_NORMAL;
- StandardConfigFile  : string;
- UseAltConfigFile    : boolean;
- AltConfigFile       : string;
+ ConfigMode             : (CFG_NORMAL, CFG_PARAM, CFG_USER) = CFG_NORMAL;
+ StandardConfigFile     : string;
+ UseAltConfigFile       : boolean;
+ AltConfigFile          : string;
+ DontRecreateSingletons : boolean;
 
 implementation
 
@@ -874,18 +875,18 @@ var
  fdevData: TdevData = nil;
  fExternal: boolean = TRUE;
 
+
 function devData: TdevData;
 begin
-  if not assigned(fdevData) then
-   begin
-     fExternal:= FALSE;
-     try
-      fdevData:= TdevData.Create(nil);
-     finally
-      fExternal:= TRUE;
-     end;
-   end;
-  result:= fDevData;
+	if not assigned(fdevData) and not DontRecreateSingletons then begin
+		fExternal:= FALSE;
+		try
+			fdevData:= TdevData.Create(nil);
+		finally
+			fExternal:= TRUE;
+		end;
+	end;
+	result:= fDevData;
 end;
 
 class function TdevData.devData: TdevData;

@@ -124,14 +124,18 @@ uses ToolEditFrm, inifiles, devcfg, utils, MultiLangSupport, datamod,
 
 constructor TToolList.Create;
 begin
-  inherited Create;
+  inherited;
   fList:= TList.Create;
 end;
 
 destructor TToolList.Destroy;
+var
+	I : integer;
 begin
-  fList.Free;
-  inherited Destroy;
+	for I:=0 to fList.Count - 1 do
+		TObject(fList[i]).Free;
+	fList.Free;
+	inherited;
 end;
 
 procedure TToolList.Packit;

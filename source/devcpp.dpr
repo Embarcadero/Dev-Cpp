@@ -25,13 +25,15 @@ program devcpp;
 {%File 'LangIDs.inc'}
 
 uses
+  MemCheck in 'MemCheck.pas',
+
 {$IFDEF WIN32}
   Windows, Forms, sysUtils, SHFolder, Dialogs,
 {$ENDIF}
 {$IFDEF LINUX}
   QForms, sysUtils, QDialogs,
 {$ENDIF}
-  MemCheck in 'MemCheck.pas',
+
   main in 'main.pas' {MainForm},
   MultiLangSupport in 'MultiLangSupport.pas',
   Splash in 'Splash.pas' {SplashForm},

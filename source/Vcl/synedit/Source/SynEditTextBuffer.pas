@@ -175,10 +175,7 @@ type
     crNothing,
     crGroupBreak,
     crDeleteAll,
-    crWhiteSpaceAdd, //for undo/redo of adding a character past EOL and repositioning the caret
-    //### Code Folding ###
-    crDeleteCollapsedFold
-    //### End Code Folding ###
+    crWhiteSpaceAdd //for undo/redo of adding a character past EOL and repositioning the caret
     );
 
   TSynEditUndoItem = class(TPersistent)
@@ -189,10 +186,6 @@ type
     fChangeEndPos: TBufferCoord;
     fChangeStr: string;
     fChangeNumber: integer;
-    //### Code Folding ###
-    fChangeData: Pointer;
-    fChangeIndex: Integer;
-    //### End Code Folding ###
   public
     procedure Assign(Source: TPersistent); override;
     property ChangeReason: TSynChangeReason read fChangeReason;
@@ -201,10 +194,6 @@ type
     property ChangeEndPos: TBufferCoord read fChangeEndPos;
     property ChangeStr: string read fChangeStr;
     property ChangeNumber: integer read fChangeNumber;
-    //### Code Folding ###
-    property ChangeData: Pointer read fChangeData;
-    property ChangeIndex: Integer read fChangeIndex;
-    //### End Code Folding ###
   end;
 
   TSynEditUndoList = class(TPersistent)
@@ -229,13 +218,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    
-    //### Code Folding ###
-    procedure AddChange(AReason: TSynChangeReason; const AStart, AEnd: TBufferCoord;
-      const ChangeText: string; SelMode: TSynSelectionMode; Data: Pointer = nil;
-      Index: Integer = 0);
-    //### End Code Folding ###
 
+    procedure AddChange(AReason: TSynChangeReason; const AStart, AEnd: TBufferCoord;const ChangeText: string; SelMode: TSynSelectionMode);
     procedure BeginBlock;
     procedure Clear;
     procedure EndBlock;
@@ -1145,8 +1129,7 @@ begin
 end;
 
 procedure TSynEditUndoList.AddChange(AReason: TSynChangeReason; const AStart,
-  AEnd: TBufferCoord; const ChangeText: string; SelMode: TSynSelectionMode;
-  Data: Pointer = nil; Index: Integer = 0);
+  AEnd: TBufferCoord; const ChangeText: string; SelMode: TSynSelectionMode);
 var
   NewItem: TSynEditUndoItem;
 begin
@@ -1159,11 +1142,6 @@ begin
         fChangeStartPos := AStart;
         fChangeEndPos := AEnd;
         fChangeStr := ChangeText;
-        
-        //### Code Folding ###
-        fChangeData := Data;
-        fChangeIndex := Index;
-        //### End Code Folding ###
 
         if fBlockChangeNumber <> 0 then
           fChangeNumber := fBlockChangeNumber

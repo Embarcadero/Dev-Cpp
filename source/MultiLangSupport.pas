@@ -88,7 +88,7 @@ var
 
 function Lang: TdevMultiLangSupport;
 begin
-  if not assigned(fLang) then
+  if not assigned(fLang) and not DontRecreateSingletons then
    begin
      fExternal:= false;
      try
@@ -141,52 +141,50 @@ end;
 
 function TdevMultiLangSupport.Open(const Filename : string): boolean;
 var
- s,
- aFile: string;
- ver: Integer;
- NewStrs: TStringList;
+	s,aFile: string;
+	ver: Integer;
+	NewStrs: TStringList;
 begin
-  result:= false;
-  aFile:= ValidateFile(FileName, devDirs.Lang);
-  if aFile = '' then
-   begin
-     if fSelect then
-      MessageDlg('Could not open language file ' + filename, mtError, [mbOK], 0);
-     exit;
-   end;
+	result:= false;
+	aFile:= ValidateFile(FileName, devDirs.Lang);
+	if aFile = '' then begin
+		if fSelect then
+			MessageDlg('Could not open language file ' + filename, mtError, [mbOK], 0);
+		exit;
+	end;
 
-  try // handle overall errors
-   NewStrs:= TStringList.Create;
+	try // handle overall errors
+		NewStrs:= TStringList.Create;
 
-   try // handle newstr freeing
-    NewStrs.LoadFromFile(aFile);
-    s:= NewStrs.Values['Ver'];
+		try // handle newstr freeing
+			NewStrs.LoadFromFile(aFile);
+			s:= NewStrs.Values['Ver'];
 
-    try // handle invalid ver entry
-     ver:= strtoint(s);
-    except
-     if MessageDlg('The selected language file has an invalid, or is missing a version entry.'#13#10
-                  +'You may not have all the required strings for your current Dev-C++ interface.'#13#10
-                  +'Please check the Dev-C++ Update or Bloodshed.net for new language files, Continue Opening?',
-          mtWarning, [mbYes, mbNo], 0) = mrNo then Exit else ver:= 1;
-    end; // end invalid ver test
+			try // handle invalid ver entry
+				ver:= strtoint(s);
+			except
+				if MessageDlg('The selected language file has an invalid, or is missing a version entry.'#13#10
+						+'You may not have all the required strings for your current Dev-C++ interface.'#13#10
+						+'Please check the Dev-C++ Update or Bloodshed.net for new language files, Continue Opening?',
+						mtWarning, [mbYes, mbNo], 0) = mrNo then Exit else ver:= 1;
+			end; // end invalid ver test
 
-    fLangFile:= aFile;
-    fStrings.Clear;
-    fStrings.AddStrings(NewStrs);
-   finally
-    NewStrs.Free;
-   end; // need for NewStrs object
+			fLangFile:= aFile;
+			fStrings.Clear;
+			fStrings.AddStrings(NewStrs);
+		finally
+			NewStrs.Free;
+		end; // need for NewStrs object
 
-   if ver>=1 then result:= true;
+		if ver>=1 then result:= true;
 
-   fCurLang:= fStrings.Values['Lang'];
-   if fCurLang = '' then
-    fCurLang:= ChangeFileExt(ExtractFileName(aFile), '');
-   devData.Language:= ExtractFileName(aFile);
-  except
-   result:= false;
-  end;
+		fCurLang:= fStrings.Values['Lang'];
+		if fCurLang = '' then
+			fCurLang:= ChangeFileExt(ExtractFileName(aFile), '');
+		devData.Language:= ExtractFileName(aFile);
+	except
+		result:= false;
+	end;
 end;
 
 procedure TdevMultiLangSupport.CheckLanguageFiles;
