@@ -214,8 +214,5 @@ begin
 	if not devData.NoSplashScreen then
 		SplashForm.Free;
 
-	// apply the window placement. this method forces the form to show
-	TMainFormHack(MainForm).DoApplyWindowPlacement;
-
 	Application.Run;
 end.

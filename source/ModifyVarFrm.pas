@@ -59,11 +59,11 @@ uses
 
 procedure TModifyVarForm.LoadText;
 begin
-  Caption := Lang.Strings[ID_NV_MODIFYVALUE];
-  VarNameLabel.Caption := Lang.Strings[ID_NV_VARNAME];
-  ValueLabel.Caption := Lang.Strings[ID_NV_VARVALUE];
-  OkBtn.Caption := Lang.Strings[ID_BTN_OK];
-  CancelBtn.Caption := Lang.Strings[ID_BTN_CANCEL];
+  Caption := Lang[ID_NV_MODIFYVALUE];
+  VarNameLabel.Caption := Lang[ID_NV_VARNAME];
+  ValueLabel.Caption := Lang[ID_NV_VARVALUE];
+  OkBtn.Caption := Lang[ID_BTN_OK];
+  CancelBtn.Caption := Lang[ID_BTN_CANCEL];
 end;
 
 procedure TModifyVarForm.FormCreate(Sender: TObject);

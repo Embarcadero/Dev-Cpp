@@ -63,11 +63,11 @@ uses
 
 procedure TParamsForm.LoadText;
 begin
-  Caption := Lang.Strings[ID_PARAM_CAPTION];
-  grpParameters.Caption := Lang.Strings[ID_PARAM_PARAMS];
-  grpHost.Caption := Lang.Strings[ID_PARAM_HOST];
-  OkBtn.Caption := Lang.Strings[ID_BTN_OK];
-  CancelBtn.Caption := Lang.Strings[ID_BTN_CANCEL];
+  Caption := Lang[ID_PARAM_CAPTION];
+  grpParameters.Caption := Lang[ID_PARAM_PARAMS];
+  grpHost.Caption := Lang[ID_PARAM_HOST];
+  OkBtn.Caption := Lang[ID_BTN_OK];
+  CancelBtn.Caption := Lang[ID_BTN_CANCEL];
 end;
 
 procedure TParamsForm.LoadBtnClick(Sender: TObject);

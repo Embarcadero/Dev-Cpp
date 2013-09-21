@@ -103,6 +103,7 @@ type
     chkCVSUseSSH: TCheckBox;
     UIfontlabel: TLabel;
     cbUIfont: TComboBox;
+    cvsdownloadlabel: TLabel;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -116,6 +117,7 @@ type
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
     procedure cbUIfontChange(Sender: TObject);
+    procedure cvsdownloadlabelClick(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -124,7 +126,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  Filectrl, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme, main;
+  ShellAPI, Filectrl, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme, main;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme;
@@ -530,6 +532,11 @@ end;
 procedure TEnviroForm.cbUIfontChange(Sender: TObject);
 begin
 	(Sender as TComboBox).Font.Name := (Sender as TComboBox).Text;
+end;
+
+procedure TEnviroForm.cvsdownloadlabelClick(Sender: TObject);
+begin
+	ShellExecute(GetDesktopWindow(), 'open', PChar((Sender as TLabel).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
 end.

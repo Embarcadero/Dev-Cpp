@@ -525,7 +525,7 @@ end;
 procedure TCompiler.GetCompileParams;
 	procedure AppendStr(var s: string; value: string);
 	begin
-		s:= s +' ' +value;
+		s:= s + ' ' + value;
 	end;
 var
 	I, val: integer;
@@ -607,11 +607,7 @@ begin
 		Exit;
 	end;
 
-	if fTarget = ctNone then exit;
-
 	SwitchToProjectCompilerSet;
-
-	DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
 
 	InitProgressForm('Compiling...');
 
@@ -623,7 +619,7 @@ begin
 		BuildMakeFile;
 		Application.ProcessMessages;
 
-		if SingleFile<>'' then begin
+		if SingleFile <> '' then begin
 			if fProject.Options.ObjectOutput<>'' then begin
 				SetPath(fProject.Directory);
 				if not DirectoryExists(fProject.Options.ObjectOutput) then
@@ -645,8 +641,10 @@ begin
 
 		DoLogEntry(format(Lang[ID_EXECUTING], [cMake +cDots]));
 		DoLogEntry(cmdline);
-	//	DoLogEntry('Compiler Delay: '+inttostr(devCompiler.Delay));
-		Sleep(devCompiler.Delay);
+
+		// Sleep(0) allows other threads to proceed, but we don't want Dev to wait!
+		if devCompiler.Delay > 0 then
+			Sleep(devCompiler.Delay);
 		LaunchThread(cmdline, ExtractFilePath(Project.FileName));
 	end else if (GetFileTyp(fSourceFile) = utRes) then begin
 		if (devCompiler.windresName <> '') then
@@ -674,7 +672,7 @@ begin
 			else
 				s := GCC_PROGRAM;
 			if DoCheckSyntax then
-				cmdline:= format(cCmdLine,[s, fSourceFile, 'nul', fCompileParams,fIncludesParams, fLibrariesParams])
+				cmdline:= format(cCmdLine,[s, fSourceFile, 'nul', fCompileParams, fIncludesParams, fLibrariesParams])
 			else
 				cmdline:= format(cCmdLine,[s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT),fCompileParams, fIncludesParams, fLibrariesParams]);
 			DoLogEntry(format(Lang[ID_EXECUTING], [' ' + s + cDots]));
@@ -732,7 +730,6 @@ end;
 
 procedure TCompiler.Debug;
 begin
-
 end;
 
 function TCompiler.Clean: Boolean;
@@ -909,26 +906,12 @@ begin
 		LOutput.Text:= fdevRun.Output;
 		IMod := CalcMod(pred(LOutput.Count));
 
-		// Concatenate errors which are on multiple lines
-	//	for curLine := 0 to pred(LOutput.Count) do begin
-	//		if (curLine > 0) and (Pos('   ', LOutput[curLine]) > 0) then begin
-
-	//			cpos := Pos('   ', LOutput[curLine]);
-	//			O_Msg := Copy(LOutput[curLine],cpos+2,Length(LOutput[curLine]) - cpos - 1);
-	//			LOutput[curLine - 1] := LOutput[curLine - 1] + O_Msg;
-	//		end;
-	//	end;
-
 		for curLine := 0 to pred(LOutput.Count) do begin
 			if (IMod = 0) or (curLine mod IMod = 0) then
 				Application.ProcessMessages;
 
 			Line := LOutput.Strings[curLine];
 			LowerLine := LowerCase(Line);
-
-			// Skip errors alreay concatenated
-		//	if Pos('error:   ', Line) > 0 then
-		//		Continue;
 
 			if Messages > 500 then begin
 				DoOutput('','','','[General Error] Too many messages; abort.');
@@ -947,6 +930,36 @@ begin
 				(Pos('is up to date.', LowerLine) > 0)
 			then
 				Continue;
+
+			// File format errors
+			cpos := Pos('file not recognized: ', LowerLine);
+			if cpos > 0 then begin
+
+				// Extract message
+				O_Msg := Copy(Line,cpos,Length(line)-cpos+1) + ' (this usually means GCC does not like a file extension)';
+				Delete(Line,cpos,Length(line)-cpos+1);
+
+				// Extract file
+				O_File := Copy(Line,1,Length(line)-2);
+
+				DoOutput('','', O_File, O_Msg);
+
+				Inc(fErrCount);
+				Inc(Messages);
+				Continue;
+			end;
+			if Pos('collect2:', LowerLine) > 0 then begin
+
+				// Extract message
+				O_Msg := Line;
+				O_File := '';
+
+				DoOutput('','', '', O_Msg);
+
+				Inc(fErrCount);
+				Inc(Messages);
+				Continue;
+			end;
 
 			{ Make errors }
 			if (Pos(devCompilerSet.makeName + ': ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
@@ -967,7 +980,7 @@ begin
 				DoOutput('','', O_File, O_Msg);
 				Continue;
 			end;
-	
+
 			{ windres errors }
 			if Pos('windres.exe: ', LowerLine) > 0 then begin
 				{ Delete 'windres.exe:' }

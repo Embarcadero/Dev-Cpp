@@ -1,6 +1,6 @@
-Version 5.0.0.8 - *
+Version 5.0.0.8 - 20 November 2011
 
-- Remapped all language ID so that much more translations will fit nicely in the tables.
+- Remapped all language IDs so that much more translations will fit nicely in the tables.
 - Profiling can now also be properly used without a project.
 - The function scanner now ignores comments.
 - Added an option to change the UI font.
@@ -8,6 +8,11 @@ Version 5.0.0.8 - *
 - Again updated big parts of the local variable scanner.
 - Removed 'Backspace Unindents' and 'Keep trailing spaces'. These options were too buggy and/or useless.
 - Set the mouseover delay to 1500 by default now.
+- Dev-C++ now does not stall when GCC complains about incorrect filenames. Instead, it shows GCC's error in the formatted log.
+- Added a few more previously hardcoded text items to the translations.
+- Fixed a few out of bounds errors in code scanning code.
+- Updated the Chinese (TW) translations thanks to 'cin.getline'.
+- Updated the CVS page.
 
 Version 5.0.0.7 - 9 November 2011
 

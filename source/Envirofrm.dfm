@@ -77,7 +77,7 @@ object EnviroForm: TEnviroForm
     Top = 8
     Width = 400
     Height = 393
-    ActivePage = tabGeneral
+    ActivePage = tabCVS
     Anchors = [akLeft, akTop, akRight, akBottom]
     HotTrack = True
     TabOrder = 3
@@ -745,7 +745,7 @@ object EnviroForm: TEnviroForm
       end
       object lblCVSCompression: TLabel
         Left = 8
-        Top = 53
+        Top = 93
         Width = 89
         Height = 13
         Caption = 'Compression Level'
@@ -753,7 +753,7 @@ object EnviroForm: TEnviroForm
       object btnCVSExecBrws: TSpeedButton
         Tag = 6
         Left = 365
-        Top = 25
+        Top = 33
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -785,9 +785,26 @@ object EnviroForm: TEnviroForm
           BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
         OnClick = BrowseClick
       end
+      object cvsdownloadlabel: TLabel
+        Left = 16
+        Top = 64
+        Width = 348
+        Height = 13
+        Cursor = crHandPoint
+        Caption = 
+          'http://download.savannah.gnu.org/releases/cvs/binary/stable/x86-' +
+          'woe/'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlue
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsUnderline]
+        ParentFont = False
+        OnClick = cvsdownloadlabelClick
+      end
       object edCVSExec: TEdit
         Left = 16
-        Top = 25
+        Top = 33
         Width = 345
         Height = 21
         TabOrder = 0
@@ -795,7 +812,7 @@ object EnviroForm: TEnviroForm
       end
       object spnCVSCompression: TSpinEdit
         Left = 16
-        Top = 68
+        Top = 116
         Width = 53
         Height = 22
         MaxLength = 1
@@ -806,7 +823,7 @@ object EnviroForm: TEnviroForm
       end
       object chkCVSUseSSH: TCheckBox
         Left = 16
-        Top = 100
+        Top = 148
         Width = 373
         Height = 17
         Caption = 'Use SSH instead of RSH'

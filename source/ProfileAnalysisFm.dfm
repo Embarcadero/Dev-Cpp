@@ -1,6 +1,6 @@
 object ProfileAnalysisForm: TProfileAnalysisForm
-  Left = 990
-  Top = 156
+  Left = 490
+  Top = 298
   Width = 649
   Height = 531
   Caption = 'Profile analysis'

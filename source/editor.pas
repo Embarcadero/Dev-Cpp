@@ -1486,7 +1486,7 @@ procedure TEditor.UncommentSelection;
 	var
 		I: Integer;
 	begin
-		Result := 0;
+		Result := 1;
 
 		if S <> '' then
 			for I := start to Length(S) do
@@ -1509,12 +1509,14 @@ begin
 
 		// Scan the first line too
 		selection := FText.SelText;
-		Idx := FirstCharIndex(selection,0);
+		Idx := FirstCharIndex(selection,1);
 		if (selection[Idx]='/') and (selection[Idx+1]='/') then
 			Delete(selection, Idx, 2);
 
-		for I := 0 to Length(selection) do begin
-			if selection[I] = #10 then begin
+		for I := 1 to Length(selection) do begin
+
+			// selection might change during loop but Length(selection) in the for statement doesn't get updated
+			if (I < Length(selection)) and (selection[I] = #10) then begin
 
 				// Now that we've found a newline, check for a comment
 				Idx := FirstCharIndex(selection,I);
@@ -1695,7 +1697,7 @@ begin
 		PaintMatchingBrackets(TransientType);
 end;
 
-// This code is executed whenever a function parameter suggestion balloon is shown
+// This code is executed whenever a function parameter suggestion balloon is shown after selection some value in the completion list
 procedure TEditor.DoOnCodeCompletion(Sender: TObject; const AStatement: TStatement; const AIndex: Integer);
 begin
 	// disable the tooltip here, because we check against Enabled

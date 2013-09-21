@@ -205,27 +205,27 @@ var
 begin
 	Cmd := '';
 	if not chkCustom.Checked then begin
-	if (devCompiler.gprofName <> '') then
-		Cmd := devCompiler.gprofName
-	else
-		Cmd := GPROF_PROGRAM;
+		if (devCompiler.gprofName <> '') then
+			Cmd := devCompiler.gprofName
+		else
+			Cmd := GPROF_PROGRAM;
 
-	Params := ' ' + GPROF_CMD_GENMAP;
+		Params := ' ' + GPROF_CMD_GENMAP;
 
-	// Checkbox options
-	if not chkHideNotCalled.checked then
-		Params := Params + ' -z';
-	if chkSuppressStatic.checked then
-		Params := Params + ' -a';
-	Params := Params + ' -m ' + spnMinCount.Text;
+		// Checkbox options
+		if not chkHideNotCalled.checked then
+			Params := Params + ' -z';
+		if chkSuppressStatic.checked then
+			Params := Params + ' -a';
+		Params := Params + ' -m ' + spnMinCount.Text;
 
-	if Assigned(MainForm.fProject) then begin
-		Dir := ExtractFilePath(MainForm.fProject.Executable);
-		Params := Params + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
-	end else begin
-		Dir := ExtractFilePath(MainForm.GetEditor.FileName);
-		Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
-	end;
+		if Assigned(MainForm.fProject) then begin
+			Dir := ExtractFilePath(MainForm.fProject.Executable);
+			Params := Params + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
+		end else begin
+			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
+			Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
+		end;
 	end else begin
 		Params := editCustom.Text + ' -q';
 		if Assigned(MainForm.fProject) then
@@ -334,19 +334,19 @@ end;
 
 procedure TProfileAnalysisForm.LoadText;
 begin
-  Caption := Lang[ID_PROF_CAPTION];
-  tabFlat.Caption := Lang[ID_PROF_TABFLAT];
-  tabGraph.Caption := Lang[ID_PROF_TABGRAPH];
-  tabOpts.Caption := Lang[ID_PROF_TABOPTS];
+	Caption := Lang[ID_PROF_CAPTION];
+	tabFlat.Caption := Lang[ID_PROF_TABFLAT];
+	tabGraph.Caption := Lang[ID_PROF_TABGRAPH];
+	tabOpts.Caption := Lang[ID_PROF_TABOPTS];
 
-  FuncHiding.Caption := Lang[ID_PROF_FUNCHIDING];
-  chkHideNotCalled.Caption := Lang[ID_PROF_HIDENOTLONG];
-  chkSuppressStatic.Caption := Lang[ID_PROF_SUPPRESSTATIC];
-  PrevText.Caption := Lang[ID_PROF_PREVTEXT];
-  PostText.Caption := Lang[ID_PROF_POSTTEXT];
-  btnApply.Caption := Lang[ID_PROF_APPLY];
-  CustomCommands.Caption := Lang[ID_PROF_CUSTOMCOMMANDS];
-  chkCustom.Caption := Lang[ID_PROF_CUSTOMUSE];
+	FuncHiding.Caption := Lang[ID_PROF_FUNCHIDING];
+	chkHideNotCalled.Caption := Lang[ID_PROF_HIDENOTLONG];
+	chkSuppressStatic.Caption := Lang[ID_PROF_SUPPRESSTATIC];
+	PrevText.Caption := Lang[ID_PROF_PREVTEXT];
+	PostText.Caption := Lang[ID_PROF_POSTTEXT];
+	btnApply.Caption := Lang[ID_PROF_APPLY];
+	CustomCommands.Caption := Lang[ID_PROF_CUSTOMCOMMANDS];
+	chkCustom.Caption := Lang[ID_PROF_CUSTOMUSE];
 end;
 
 procedure TProfileAnalysisForm.lvFlatMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -421,7 +421,7 @@ begin
 		if not chkHideNotCalled.Checked then
 			assembly := assembly + ' -z';
 		if chkSuppressStatic.Checked then
-			assembly := assembly + ' -s';
+			assembly := assembly + ' -a';
 		assembly := assembly + ' -m ' + spnMinCount.Text;
 		editCustom.Text := assembly;
 	end;

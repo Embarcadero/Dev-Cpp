@@ -914,7 +914,6 @@ type
 		procedure HideCodeToolTip;	// added on 23rd may 2004 by peter_
 	protected
 		procedure DoCreateEverything;	// added by peter
-		procedure DoApplyWindowPlacement; // added by peter
 	public
 		function SaveFile(e : TEditor): Boolean;
 		procedure MsgBox(text,caption: string);
@@ -1062,7 +1061,6 @@ begin
 		Lang.Open(devData.Language);
 	end;
 	devData.Version := DEVCPP_VERSION;
-	LoadText(FALSE);
 
 	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Loading tools...';
 	with fTools do begin
@@ -1071,6 +1069,8 @@ begin
 		ToolClick:= ToolItemClick;
 		BuildMenu;
 	end;
+
+	LoadText(FALSE);
 
 	devShortcuts1.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
 	devShortcuts1.Load;
@@ -1211,21 +1211,6 @@ begin
 			end;
 	end;
 end;	 }
-
-{*** modified by peter ***}
-procedure TMainForm.DoApplyWindowPlacement;
-//
-// This method is called from devcpp.dpr !
-// It's called at the very last, because it forces the form to show and
-// we only want to display the form when it's ready and fully inited/created
-//
-begin
-	if devData.WindowPlacement.rcNormalPosition.Right <> 0 then
-		SetWindowPlacement(Self.Handle, @devData.WindowPlacement)
-	else if not CacheCreated then // this is so weird, but the following call seems to take a lot of time to execute
-		Self.Position:= poScreenCenter;
-	Show;
-end;
 
 procedure TMainForm.LoadTheme;
 var
@@ -1486,278 +1471,278 @@ end;
 
 procedure TMainForm.LoadText(force : boolean);
 begin
-	with Lang do begin
-		// Menus
-		FileMenu.Caption :=					Strings[ID_MNU_FILE];
-		EditMenu.Caption :=					Strings[ID_MNU_EDIT];
-		SearchMenu.Caption:=				Strings[ID_MNU_SEARCH];
-		ViewMenu.Caption:=					Strings[ID_MNU_VIEW];
-		ProjectMenu.Caption:=				Strings[ID_MNU_PROJECT];
-		ExecuteMenu.Caption:=				Strings[ID_MNU_EXECUTE];
-		DebugMenu.Caption:=					Strings[ID_MNU_DEBUG];
-		ToolsMenu.Caption:=					Strings[ID_MNU_TOOLS];
-		WindowMenu.Caption:=				Strings[ID_MNU_WINDOW];
-		HelpMenu.Caption:=					Strings[ID_MNU_HELP];
 
-		// file menu
-		mnuNew.Caption:=					Strings[ID_SUB_NEW];
-		actNewSource.Caption:=				Strings[ID_ITEM_NEWSOURCE];
-		actNewProject.Caption:=				Strings[ID_ITEM_NEWPROJECT];
-		actNewTemplate.Caption:=			Strings[ID_ITEM_NEWTEMPLATE];
-		actNewRes.Caption:=					Strings[ID_ITEM_NEWRESOURCE];
+	// Menus
+	FileMenu.Caption :=					Lang[ID_MNU_FILE];
+	EditMenu.Caption :=					Lang[ID_MNU_EDIT];
+	SearchMenu.Caption:=				Lang[ID_MNU_SEARCH];
+	ViewMenu.Caption:=					Lang[ID_MNU_VIEW];
+	ProjectMenu.Caption:=				Lang[ID_MNU_PROJECT];
+	ExecuteMenu.Caption:=				Lang[ID_MNU_EXECUTE];
+	DebugMenu.Caption:=					Lang[ID_MNU_DEBUG];
+	ToolsMenu.Caption:=					Lang[ID_MNU_TOOLS];
+	WindowMenu.Caption:=				Lang[ID_MNU_WINDOW];
+	HelpMenu.Caption:=					Lang[ID_MNU_HELP];
 
-		actOpen.Caption:=					Strings[ID_ITEM_OPEN];
-		ReOpenItem.Caption:=				Strings[ID_SUB_REOPEN];
-		actHistoryClear.Caption:=			Strings[ID_ITEM_CLEARHISTORY];
-		actSave.Caption:=					Strings[ID_ITEM_SAVEFILE];
-		actSaveAs.Caption:=					Strings[ID_ITEM_SAVEAS];
-		SaveProjectAsItem.Caption :=		Strings[ID_ITEM_SAVEASPROJECT];
-		actSaveAll.Caption:=				Strings[ID_ITEM_SAVEALL];
-		actClose.Caption:=					Strings[ID_ITEM_CLOSEFILE];
-		actCloseAll.Caption:=				Strings[ID_ITEM_CLOSEALL];
-		actCloseProject.Caption:=			Strings[ID_ITEM_CLOSEPROJECT];
+	// file menu
+	mnuNew.Caption:=					Lang[ID_SUB_NEW];
+	actNewSource.Caption:=				Lang[ID_ITEM_NEWSOURCE];
+	actNewProject.Caption:=				Lang[ID_ITEM_NEWPROJECT];
+	actNewTemplate.Caption:=			Lang[ID_ITEM_NEWTEMPLATE];
+	actNewRes.Caption:=					Lang[ID_ITEM_NEWRESOURCE];
 
-		actFileProperties.Caption:=			Strings[ID_ITEM_PROPERTIES];
+	actOpen.Caption:=					Lang[ID_ITEM_OPEN];
+	ReOpenItem.Caption:=				Lang[ID_SUB_REOPEN];
+	actHistoryClear.Caption:=			Lang[ID_ITEM_CLEARHISTORY];
+	actSave.Caption:=					Lang[ID_ITEM_SAVEFILE];
+	actSaveAs.Caption:=					Lang[ID_ITEM_SAVEAS];
+	SaveProjectAsItem.Caption :=		Lang[ID_ITEM_SAVEASPROJECT];
+	actSaveAll.Caption:=				Lang[ID_ITEM_SAVEALL];
+	actClose.Caption:=					Lang[ID_ITEM_CLOSEFILE];
+	actCloseAll.Caption:=				Lang[ID_ITEM_CLOSEALL];
+	actCloseProject.Caption:=			Lang[ID_ITEM_CLOSEPROJECT];
 
-		ImportItem.Caption:=				Strings[ID_SUB_IMPORT];
-		actImportMSVC.Caption:=				Strings[ID_MSVC_MENUITEM];
+	actFileProperties.Caption:=			Lang[ID_ITEM_PROPERTIES];
 
-		ExportItem.Caption:=				Strings[ID_SUB_EXPORT];
-		actXHTML.Caption:=					Strings[ID_ITEM_EXPORTHTML];
-		actXRTF.Caption:=					Strings[ID_ITEM_EXPORTRTF];
-		actXProject.Caption:=				Strings[ID_ITEM_EXPORTPROJECT];
+	ImportItem.Caption:=				Lang[ID_SUB_IMPORT];
+	actImportMSVC.Caption:=				Lang[ID_MSVC_MENUITEM];
 
-		actPrint.Caption:=					Strings[ID_ITEM_PRINT];
-		actPrintSU.Caption:=				Strings[ID_ITEM_PRINTSETUP];
-		actExit.Caption:=					Strings[ID_ITEM_EXIT];
+	ExportItem.Caption:=				Lang[ID_SUB_EXPORT];
+	actXHTML.Caption:=					Lang[ID_ITEM_EXPORTHTML];
+	actXRTF.Caption:=					Lang[ID_ITEM_EXPORTRTF];
+	actXProject.Caption:=				Lang[ID_ITEM_EXPORTPROJECT];
 
-		// Edit menu
-		actUndo.Caption:=					Strings[ID_ITEM_UNDO];
-		actRedo.Caption:=					Strings[ID_ITEM_REDO];
-		actCut.Caption:=					Strings[ID_ITEM_CUT];
-		actCopy.Caption:=					Strings[ID_ITEM_COPY];
-		actPaste.Caption:=					Strings[ID_ITEM_PASTE];
-		actSelectAll.Caption:=				Strings[ID_ITEM_SELECTALL];
-		InsertItem.Caption:=				Strings[ID_SUB_INSERT];
-		ToggleBookmarksItem.Caption:=		Strings[ID_SUB_TOGGLEMARKS];
-		GotoBookMarksItem.Caption:=			Strings[ID_SUB_GOTOMARKS];
-		DateTimeMenuItem.Caption:=			Strings[ID_ITEM_DATETIME];
-		CommentHeaderMenuItem.Caption:=		Strings[ID_ITEM_COMMENTHEADER];
-		actComment.Caption:=				Strings[ID_ITEM_COMMENTSELECTION];
-		actUncomment.Caption:=				Strings[ID_ITEM_UNCOMMENTSELECTION];
-		actIndent.Caption:=					Strings[ID_ITEM_INDENTSELECTION];
-		actUnindent.Caption:=				Strings[ID_ITEM_UNINDENTSELECTION];
-		actSwapHeaderSource.Caption:=		Strings[ID_ITEM_SWAPHEADERSOURCE];
+	actPrint.Caption:=					Lang[ID_ITEM_PRINT];
+	actPrintSU.Caption:=				Lang[ID_ITEM_PRINTSETUP];
+	actExit.Caption:=					Lang[ID_ITEM_EXIT];
 
-		// Search Menu
-		actFind.Caption:=					Strings[ID_ITEM_FIND];
-		actFindAll.Caption:=				Strings[ID_ITEM_FINDINALL];
-		actReplace.Caption:=				Strings[ID_ITEM_REPLACE];
-		actFindNext.Caption:=				Strings[ID_ITEM_FINDNEXT];
-		actGoto.Caption:=					Strings[ID_ITEM_GOTO];
-		actIncremental.Caption:=			Strings[ID_ITEM_INCREMENTAL];
-		actGotoFunction.Caption:=			Strings[ID_ITEM_GOTOFUNCTION];
+	// Edit menu
+	actUndo.Caption:=					Lang[ID_ITEM_UNDO];
+	actRedo.Caption:=					Lang[ID_ITEM_REDO];
+	actCut.Caption:=					Lang[ID_ITEM_CUT];
+	actCopy.Caption:=					Lang[ID_ITEM_COPY];
+	actPaste.Caption:=					Lang[ID_ITEM_PASTE];
+	actSelectAll.Caption:=				Lang[ID_ITEM_SELECTALL];
+	InsertItem.Caption:=				Lang[ID_SUB_INSERT];
+	ToggleBookmarksItem.Caption:=		Lang[ID_SUB_TOGGLEMARKS];
+	GotoBookMarksItem.Caption:=			Lang[ID_SUB_GOTOMARKS];
+	DateTimeMenuItem.Caption:=			Lang[ID_ITEM_DATETIME];
+	CommentHeaderMenuItem.Caption:=		Lang[ID_ITEM_COMMENTHEADER];
+	actComment.Caption:=				Lang[ID_ITEM_COMMENTSELECTION];
+	actUncomment.Caption:=				Lang[ID_ITEM_UNCOMMENTSELECTION];
+	actIndent.Caption:=					Lang[ID_ITEM_INDENTSELECTION];
+	actUnindent.Caption:=				Lang[ID_ITEM_UNINDENTSELECTION];
+	actSwapHeaderSource.Caption:=		Lang[ID_ITEM_SWAPHEADERSOURCE];
 
-		// View Menu
-		actProjectManager.Caption:=			Strings[ID_ITEM_PROJECTVIEW];
-		actStatusbar.Caption:=				Strings[ID_ITEM_STATUSBAR];
-		CompilerOutputItem.Caption:=		Strings[ID_SUB_COMPOUTPUT];
-		ToolBarsItem.Caption:=				Strings[ID_SUB_TOOLBARS];
-		actCompOutput.Caption:=				Strings[ID_ITEM_COMPOUTALWAYS];
-		actCompOnNeed.Caption:=				Strings[ID_ITEM_COMPOUTONNEED];
+	// Search Menu
+	actFind.Caption:=					Lang[ID_ITEM_FIND];
+	actFindAll.Caption:=				Lang[ID_ITEM_FINDINALL];
+	actReplace.Caption:=				Lang[ID_ITEM_REPLACE];
+	actFindNext.Caption:=				Lang[ID_ITEM_FINDNEXT];
+	actGoto.Caption:=					Lang[ID_ITEM_GOTO];
+	actIncremental.Caption:=			Lang[ID_ITEM_INCREMENTAL];
+	actGotoFunction.Caption:=			Lang[ID_ITEM_GOTOFUNCTION];
 
-		ToolMainItem.Caption:=				Strings[ID_TOOLMAIN];
-		ToolEditItem.Caption:=				Strings[ID_TOOLEDIT];
-		ToolSearchItem.Caption:=			Strings[ID_TOOLSEARCH];
-		ToolCompileAndRunItem.Caption:=		Strings[ID_TOOLCOMPRUN];
-		ToolProjectItem.Caption:=			Strings[ID_TOOLPROJECT];
-		ToolSpecialsItem.Caption:=			Strings[ID_TOOLSPECIAL];
-		ToolClassesItem.Caption:=			Strings[ID_LP_CLASSES];
+	// View Menu
+	actProjectManager.Caption:=			Lang[ID_ITEM_PROJECTVIEW];
+	actStatusbar.Caption:=				Lang[ID_ITEM_STATUSBAR];
+	CompilerOutputItem.Caption:=		Lang[ID_SUB_COMPOUTPUT];
+	ToolBarsItem.Caption:=				Lang[ID_SUB_TOOLBARS];
+	actCompOutput.Caption:=				Lang[ID_ITEM_COMPOUTALWAYS];
+	actCompOnNeed.Caption:=				Lang[ID_ITEM_COMPOUTONNEED];
 
-		tbMain.Caption:=					Strings[ID_TOOLMAIN];
-		tbEdit.Caption:=					Strings[ID_TOOLEDIT];
-		tbSearch.Caption:=					Strings[ID_TOOLSEARCH];
-		tbCompile.Caption:=					Strings[ID_TOOLCOMPRUN];
-		tbProject.Caption:=					Strings[ID_TOOLPROJECT];
-		tbSpecials.Caption:=				Strings[ID_TOOLSPECIAL];
-		actViewToDoList.Caption:=			Strings[ID_VIEWTODO_MENUITEM];
-		FloatingPojectManagerItem.Caption:=	Strings[ID_ITEM_FLOATWINDOW];
-		FloatingReportWindowItem.Caption:=	Strings[ID_ITEM_FLOATREPORT];
-		GotoprojectmanagerItem.Caption :=	Strings[ID_ITEM_GOTOPROJECTVIEW];
-		GoToClassBrowserItem.Caption :=		Strings[ID_ITEM_GOTOCLASSBROWSER];
+	ToolMainItem.Caption:=				Lang[ID_TOOLMAIN];
+	ToolEditItem.Caption:=				Lang[ID_TOOLEDIT];
+	ToolSearchItem.Caption:=			Lang[ID_TOOLSEARCH];
+	ToolCompileAndRunItem.Caption:=		Lang[ID_TOOLCOMPRUN];
+	ToolProjectItem.Caption:=			Lang[ID_TOOLPROJECT];
+	ToolSpecialsItem.Caption:=			Lang[ID_TOOLSPECIAL];
+	ToolClassesItem.Caption:=			Lang[ID_LP_CLASSES];
 
-		// Project menu
-		actProjectNew.Caption:=				Strings[ID_ITEM_NEWFILE];
-		actProjectAdd.Caption:=				Strings[ID_ITEM_ADDFILE];
-		actProjectRemove.Caption:=			Strings[ID_ITEM_REMOVEFILE];
-		actProjectOptions.Caption:=			Strings[ID_ITEM_PROJECTOPTIONS];
-		actProjectMakeFile.Caption:=		Strings[ID_ITEM_EDITMAKE];
+	tbMain.Caption:=					Lang[ID_TOOLMAIN];
+	tbEdit.Caption:=					Lang[ID_TOOLEDIT];
+	tbSearch.Caption:=					Lang[ID_TOOLSEARCH];
+	tbCompile.Caption:=					Lang[ID_TOOLCOMPRUN];
+	tbProject.Caption:=					Lang[ID_TOOLPROJECT];
+	tbSpecials.Caption:=				Lang[ID_TOOLSPECIAL];
+	actViewToDoList.Caption:=			Lang[ID_VIEWTODO_MENUITEM];
+	FloatingPojectManagerItem.Caption:=	Lang[ID_ITEM_FLOATWINDOW];
+	FloatingReportWindowItem.Caption:=	Lang[ID_ITEM_FLOATREPORT];
+	GotoprojectmanagerItem.Caption :=	Lang[ID_ITEM_GOTOPROJECTVIEW];
+	GoToClassBrowserItem.Caption :=		Lang[ID_ITEM_GOTOCLASSBROWSER];
 
-		// Execute menu
-		actCompile.Caption:=				Strings[ID_ITEM_COMP];
-		actCompileCurrentFile.Caption:=		Strings[ID_ITEM_COMPCURRENT];
-		actRun.Caption:=					Strings[ID_ITEM_RUN];
-		actCompRun.Caption:=				Strings[ID_ITEM_COMPRUN];
-		actRebuild.Caption:=				Strings[ID_ITEM_REBUILD];
-		actClean.Caption:=					Strings[ID_ITEM_CLEAN];
-		actSyntaxCheck.Caption:=			Strings[ID_ITEM_SYNTAXCHECK];
-		actProgramReset.Caption:=			Strings[ID_ITEM_PROGRAMRESET];
-		actProfileProject.Caption:=			Strings[ID_ITEM_PROFILE];
-		actDeleteProfileProject.Caption:=	Strings[ID_ITEM_DELPROFINFORMATION];
-		actAbortCompilation.Caption:=		Strings[ID_ITEM_ABORTCOMP];
-		actExecParams.Caption:=				Strings[ID_ITEM_EXECPARAMS];
+	// Project menu
+	actProjectNew.Caption:=				Lang[ID_ITEM_NEWFILE];
+	actProjectAdd.Caption:=				Lang[ID_ITEM_ADDFILE];
+	actProjectRemove.Caption:=			Lang[ID_ITEM_REMOVEFILE];
+	actProjectOptions.Caption:=			Lang[ID_ITEM_PROJECTOPTIONS];
+	actProjectMakeFile.Caption:=		Lang[ID_ITEM_EDITMAKE];
 
-		// Debug menu
-		actDebug.Caption:=					Strings[ID_ITEM_DEBUG];
-		actBreakPoint.Caption:=				Strings[ID_ITEM_TOGGLEBREAK];
-		actAddWatch.Caption:=				Strings[ID_ITEM_WATCHADD];
-		actEditWatch.Caption:=				Strings[ID_ITEM_WATCHEDIT];
-		actModifyWatch.Caption :=			Strings[ID_ITEM_MODIFYVALUE];
-		actRemoveWatch.Caption:=			Strings[ID_ITEM_WATCHREMOVE];
-		actNextStep.Caption:=				Strings[ID_ITEM_STEPNEXT];
-		actStepSingle.Caption:=				Strings[ID_ITEM_STEPINTO];
-		actStepOver.Caption:=				Strings[ID_ITEM_STEPOVER];
-		actWatchItem.Caption:=				Strings[ID_ITEM_WATCHITEMS];
-		actStopExecute.Caption:=			Strings[ID_ITEM_STOPEXECUTION];
-		actRunToCursor.Caption:=			Strings[ID_ITEM_RUNTOCURSOR];
-		actViewCPU.Caption:=				Strings[ID_ITEM_CPUWINDOW];
-		ClearallWatchPop.Caption :=			Strings[ID_ITEM_CLEARALL];
+	// Execute menu
+	actCompile.Caption:=				Lang[ID_ITEM_COMP];
+	actCompileCurrentFile.Caption:=		Lang[ID_ITEM_COMPCURRENT];
+	actRun.Caption:=					Lang[ID_ITEM_RUN];
+	actCompRun.Caption:=				Lang[ID_ITEM_COMPRUN];
+	actRebuild.Caption:=				Lang[ID_ITEM_REBUILD];
+	actClean.Caption:=					Lang[ID_ITEM_CLEAN];
+	actSyntaxCheck.Caption:=			Lang[ID_ITEM_SYNTAXCHECK];
+	actProgramReset.Caption:=			Lang[ID_ITEM_PROGRAMRESET];
+	actProfileProject.Caption:=			Lang[ID_ITEM_PROFILE];
+	actDeleteProfileProject.Caption:=	Lang[ID_ITEM_DELPROFINFORMATION];
+	actAbortCompilation.Caption:=		Lang[ID_ITEM_ABORTCOMP];
+	actExecParams.Caption:=				Lang[ID_ITEM_EXECPARAMS];
 
-		// Tools menu
-		actCompOptions.Caption:=			Strings[ID_ITEM_COMPOPTIONS];
-		actEnviroOptions.Caption:=			Strings[ID_ITEM_ENVIROOPTIONS];
-		actEditorOptions.Caption:=			Strings[ID_ITEM_EDITOROPTIONS];
-		actConfigTools.Caption:=			Strings[ID_ITEM_TOOLCONFIG];
-		actConfigShortcuts.Caption:=		Strings[ID_ITEM_SHORTCUTSCONFIG];
+	// Debug menu
+	actDebug.Caption:=					Lang[ID_ITEM_DEBUG];
+	actBreakPoint.Caption:=				Lang[ID_ITEM_TOGGLEBREAK];
+	actAddWatch.Caption:=				Lang[ID_ITEM_WATCHADD];
+	actEditWatch.Caption:=				Lang[ID_ITEM_WATCHEDIT];
+	actModifyWatch.Caption :=			Lang[ID_ITEM_MODIFYVALUE];
+	actRemoveWatch.Caption:=			Lang[ID_ITEM_WATCHREMOVE];
+	actNextStep.Caption:=				Lang[ID_ITEM_STEPNEXT];
+	actStepSingle.Caption:=				Lang[ID_ITEM_STEPINTO];
+	actStepOver.Caption:=				Lang[ID_ITEM_STEPOVER];
+	actWatchItem.Caption:=				Lang[ID_ITEM_WATCHITEMS];
+	actStopExecute.Caption:=			Lang[ID_ITEM_STOPEXECUTION];
+	actRunToCursor.Caption:=			Lang[ID_ITEM_RUNTOCURSOR];
+	actViewCPU.Caption:=				Lang[ID_ITEM_CPUWINDOW];
+	ClearallWatchPop.Caption :=			Lang[ID_ITEM_CLEARALL];
 
-		// CVS menu
-		mnuCVSCurrent.Caption:=				Strings[ID_ITEM_CVSCURRENT];
-		mnuCVSWhole.Caption:=				Strings[ID_ITEM_CVSWHOLE];
-		actCVSImport.Caption:=				Strings[ID_CVS_IMPORT];
-		actCVSCheckout.Caption:=			Strings[ID_CVS_CHECKOUT];
-		actCVSUpdate.Caption:=				Strings[ID_CVS_UPDATE];
-		actCVSCommit.Caption:=				Strings[ID_CVS_COMMIT];
-		actCVSDiff.Caption:=				Strings[ID_CVS_DIFF];
-		actCVSLog.Caption:=					Strings[ID_CVS_LOG];
-		actCVSAdd.Caption:=					Strings[ID_CVS_ADD];
-		actCVSRemove.Caption:=				Strings[ID_CVS_REMOVE];
+	// Tools menu
+	actCompOptions.Caption:=			Lang[ID_ITEM_COMPOPTIONS];
+	actEnviroOptions.Caption:=			Lang[ID_ITEM_ENVIROOPTIONS];
+	actEditorOptions.Caption:=			Lang[ID_ITEM_EDITOROPTIONS];
+	actConfigTools.Caption:=			Lang[ID_ITEM_TOOLCONFIG];
+	actConfigShortcuts.Caption:=		Lang[ID_ITEM_SHORTCUTSCONFIG];
 
-		// Window menu
-		if devData.fullScreen then
-			actFullScreen.Caption:=			Strings[ID_ITEM_FULLSCRBACK]
-		else
-			actFullScreen.Caption:=			Strings[ID_ITEM_FULLSCRMODE];
-		actNext.Caption:=					Strings[ID_ITEM_NEXT];
-		actPrev.Caption:=					Strings[ID_ITEM_PREV];
-		ListItem.Caption :=					Strings[ID_ITEM_LIST];
+	// CVS menu
+	mnuCVSCurrent.Caption:=				Lang[ID_ITEM_CVSCURRENT];
+	mnuCVSWhole.Caption:=				Lang[ID_ITEM_CVSWHOLE];
+	actCVSImport.Caption:=				Lang[ID_CVS_IMPORT];
+	actCVSCheckout.Caption:=			Lang[ID_CVS_CHECKOUT];
+	actCVSUpdate.Caption:=				Lang[ID_CVS_UPDATE];
+	actCVSCommit.Caption:=				Lang[ID_CVS_COMMIT];
+	actCVSDiff.Caption:=				Lang[ID_CVS_DIFF];
+	actCVSLog.Caption:=					Lang[ID_CVS_LOG];
+	actCVSAdd.Caption:=					Lang[ID_CVS_ADD];
+	actCVSRemove.Caption:=				Lang[ID_CVS_REMOVE];
 
-		// Help menu
-		HelpMenuItem.Caption:=				Strings[ID_ITEM_HELPDEVCPP];
-		actUpdateCheck.Caption:=			Strings[ID_ITEM_UPDATECHECK];
-		actAbout.Caption:=					Strings[ID_ITEM_ABOUT];
-		actHelpCustomize.Caption:=			Strings[ID_ITEM_CUSTOM];
-		actShowTips.Caption:=				Strings[ID_TIPS_CAPTION];
+	// Window menu
+	if devData.fullScreen then
+		actFullScreen.Caption:=			Lang[ID_ITEM_FULLSCRBACK]
+	else
+		actFullScreen.Caption:=			Lang[ID_ITEM_FULLSCRMODE];
+	actNext.Caption:=					Lang[ID_ITEM_NEXT];
+	actPrev.Caption:=					Lang[ID_ITEM_PREV];
+	ListItem.Caption :=					Lang[ID_ITEM_LIST];
 
-		//pop menus
-		HelponDevPopupItem.Caption:=		Strings[ID_ITEM_HELPDEVCPP];
+	// Help menu
+	HelpMenuItem.Caption:=				Lang[ID_ITEM_HELPDEVCPP];
+	actUpdateCheck.Caption:=			Lang[ID_ITEM_UPDATECHECK];
+	actAbout.Caption:=					Lang[ID_ITEM_ABOUT];
+	actHelpCustomize.Caption:=			Lang[ID_ITEM_CUSTOM];
+	actShowTips.Caption:=				Lang[ID_TIPS_CAPTION];
 
-		// units pop
-		actUnitRemove.Caption:=				Strings[ID_POP_REMOVE];
-		actUnitRename.Caption:=				Strings[ID_POP_RENAME];
-		actUnitOpen.Caption:=				Strings[ID_POP_OPEN];
-		actUnitClose.Caption:=				Strings[ID_POP_CLOSE];
-		actProjectNewFolder.Caption:=		Strings[ID_POP_ADDFOLDER];
-		actProjectRemoveFolder.Caption:=	Strings[ID_POP_REMOVEFOLDER];
-		actProjectRenameFolder.Caption:=	Strings[ID_POP_RENAMEFOLDER];
-		mnuOpenWith.Caption:=				Strings[ID_POP_OPENWITH];
+	//pop menus
+	HelponDevPopupItem.Caption:=		Lang[ID_ITEM_HELPDEVCPP];
 
-		// editor pop
-		UndoPopItem.Caption:=				Strings[ID_ITEM_UNDO];
-		RedoPopItem.Caption:=				Strings[ID_ITEM_REDO];
-		CutPopItem.Caption:=				Strings[ID_ITEM_CUT];
-		CopyPopItem.Caption:=				Strings[ID_ITEM_COPY];
-		PastePopItem.Caption:=				Strings[ID_ITEM_PASTE];
-		SelectAllPopItem.Caption:=			Strings[ID_ITEM_SELECTALL];
-		DeletePopItem.Caption:=				Strings[ID_ITEM_DELETE];
-		InsertPopItem.Caption:=				Strings[ID_SUB_INSERT];
-		TogglebookmarksPopItem.Caption:=	Strings[ID_SUB_TOGGLEMARKS];
-		GotobookmarksPopItem.Caption:=		Strings[ID_SUB_GOTOMARKS];
-		actCloseAllButThis.Caption:=		Strings[ID_ITEM_CLOSEALLBUTTHIS];
-		actAddToDo.Caption:=				Strings[ID_ADDTODO_MENUITEM];
+	// units pop
+	actUnitRemove.Caption:=				Lang[ID_POP_REMOVE];
+	actUnitRename.Caption:=				Lang[ID_POP_RENAME];
+	actUnitOpen.Caption:=				Lang[ID_POP_OPEN];
+	actUnitClose.Caption:=				Lang[ID_POP_CLOSE];
+	actProjectNewFolder.Caption:=		Lang[ID_POP_ADDFOLDER];
+	actProjectRemoveFolder.Caption:=	Lang[ID_POP_REMOVEFOLDER];
+	actProjectRenameFolder.Caption:=	Lang[ID_POP_RENAMEFOLDER];
+	mnuOpenWith.Caption:=				Lang[ID_POP_OPENWITH];
 
-		// class browser popup
-		actBrowserGotoDecl.Caption:=		Strings[ID_POP_GOTODECL];
-		actBrowserGotoImpl.Caption:=		Strings[ID_POP_GOTOIMPL];
-		actBrowserNewClass.Caption:=		Strings[ID_POP_NEWCLASS];
-		actBrowserNewMember.Caption:=		Strings[ID_POP_NEWMEMBER];
-		actBrowserNewVar.Caption:=			Strings[ID_POP_NEWVAR];
-		mnuBrowserViewMode.Caption:=		Strings[ID_POP_VIEWMODE];
-		actBrowserViewAll.Caption:=			Strings[ID_POP_VIEWALLFILES];
-		actBrowserViewProject.Caption:=		Strings[ID_POP_VIEWPROJECT];
-		actBrowserViewCurrent.Caption:=		Strings[ID_POP_VIEWCURRENT];
-		actBrowserAddFolder.Caption:=		Strings[ID_POP_ADDFOLDER];
-		actBrowserRemoveFolder.Caption:=	Strings[ID_POP_REMOVEFOLDER];
-		actBrowserRenameFolder.Caption:=	Strings[ID_POP_RENAMEFOLDER];
-		actBrowserUseColors.Caption:=		Strings[ID_POP_USECOLORS];
-		actBrowserShowInherited.Caption:=	Strings[ID_POP_SHOWINHERITED];
+	// editor pop
+	UndoPopItem.Caption:=				Lang[ID_ITEM_UNDO];
+	RedoPopItem.Caption:=				Lang[ID_ITEM_REDO];
+	CutPopItem.Caption:=				Lang[ID_ITEM_CUT];
+	CopyPopItem.Caption:=				Lang[ID_ITEM_COPY];
+	PastePopItem.Caption:=				Lang[ID_ITEM_PASTE];
+	SelectAllPopItem.Caption:=			Lang[ID_ITEM_SELECTALL];
+	DeletePopItem.Caption:=				Lang[ID_ITEM_DELETE];
+	InsertPopItem.Caption:=				Lang[ID_SUB_INSERT];
+	TogglebookmarksPopItem.Caption:=	Lang[ID_SUB_TOGGLEMARKS];
+	GotobookmarksPopItem.Caption:=		Lang[ID_SUB_GOTOMARKS];
+	actCloseAllButThis.Caption:=		Lang[ID_ITEM_CLOSEALLBUTTHIS];
+	actAddToDo.Caption:=				Lang[ID_ADDTODO_MENUITEM];
 
-		// Message Control tabs
-		CompSheet.Caption :=				Strings[ID_SHEET_COMP];
-		CloseSheet.Caption :=				Strings[ID_SHEET_CLOSE];
-		ResSheet.Caption :=					Strings[ID_SHEET_RES];
-		LogSheet.Caption :=					Strings[ID_SHEET_COMPLOG];
-		FindSheet.Caption :=				Strings[ID_SHEET_FIND];
-		DebugSheet.Caption:=				Strings[ID_SHEET_DEBUG];
-		DebugLeftSheet.Caption:=			Strings[ID_SHEET_DEBUG];
+	// class browser popup
+	actBrowserGotoDecl.Caption:=		Lang[ID_POP_GOTODECL];
+	actBrowserGotoImpl.Caption:=		Lang[ID_POP_GOTOIMPL];
+	actBrowserNewClass.Caption:=		Lang[ID_POP_NEWCLASS];
+	actBrowserNewMember.Caption:=		Lang[ID_POP_NEWMEMBER];
+	actBrowserNewVar.Caption:=			Lang[ID_POP_NEWVAR];
+	mnuBrowserViewMode.Caption:=		Lang[ID_POP_VIEWMODE];
+	actBrowserViewAll.Caption:=			Lang[ID_POP_VIEWALLFILES];
+	actBrowserViewProject.Caption:=		Lang[ID_POP_VIEWPROJECT];
+	actBrowserViewCurrent.Caption:=		Lang[ID_POP_VIEWCURRENT];
+	actBrowserAddFolder.Caption:=		Lang[ID_POP_ADDFOLDER];
+	actBrowserRemoveFolder.Caption:=	Lang[ID_POP_REMOVEFOLDER];
+	actBrowserRenameFolder.Caption:=	Lang[ID_POP_RENAMEFOLDER];
+	actBrowserUseColors.Caption:=		Lang[ID_POP_USECOLORS];
+	actBrowserShowInherited.Caption:=	Lang[ID_POP_SHOWINHERITED];
 
-		// controls
-		CompilerOutput.Columns[0].Caption:=	Strings[ID_COL_LINE];
-		CompilerOutput.Columns[1].Caption:=	Strings[ID_COL_COL];
-		CompilerOutput.Columns[2].Caption:=	Strings[ID_COL_FILE];
-		CompilerOutput.Columns[3].Caption:=	Strings[ID_COL_MSG];
-		FindOutput.Columns[0].Caption :=	Strings[ID_COL_FLINE];
-		FindOutput.Columns[1].Caption :=	Strings[ID_COL_FCOL];
-		FindOutput.Columns[2].Caption :=	Strings[ID_COL_FFILE];
-		FindOutput.Columns[3].Caption :=	Strings[ID_COL_FMSG];
-		ErrorLabel.Caption :=				Strings[ID_TOTALERRORS];
-		SizeOfOutput.Caption :=				Strings[ID_OUTPUTSIZE];
-		InfoGroupBox.Caption :=				Strings[ID_GRP_INFO];
-		CompResGroupBox.Caption :=			Strings[ID_GRP_COMPRESULTS];
-		ProjectSheet.Caption :=				Strings[ID_LP_PROJECT];
-		ClassSheet.Caption :=				Strings[ID_LP_CLASSES];
+	// Message Control tabs
+	CompSheet.Caption :=				Lang[ID_SHEET_COMP];
+	CloseSheet.Caption :=				Lang[ID_SHEET_CLOSE];
+	ResSheet.Caption :=					Lang[ID_SHEET_RES];
+	LogSheet.Caption :=					Lang[ID_SHEET_COMPLOG];
+	FindSheet.Caption :=				Lang[ID_SHEET_FIND];
+	DebugSheet.Caption:=				Lang[ID_SHEET_DEBUG];
+	DebugLeftSheet.Caption:=			Lang[ID_SHEET_DEBUG];
 
-		lvBacktrace.Column[0].Caption:=		Strings[ID_GF_FUNCTION];
-		lvBacktrace.Column[1].Caption:=		Strings[ID_COL_ARGS];
-		lvBacktrace.Column[2].Caption:=		Strings[ID_COL_FILE];
-		lvBacktrace.Column[3].Caption:=		Strings[ID_COL_FLINE];
+	// controls
+	CompilerOutput.Columns[0].Caption:=	Lang[ID_COL_LINE];
+	CompilerOutput.Columns[1].Caption:=	Lang[ID_COL_COL];
+	CompilerOutput.Columns[2].Caption:=	Lang[ID_COL_FILE];
+	CompilerOutput.Columns[3].Caption:=	Lang[ID_COL_MSG];
+	FindOutput.Columns[0].Caption :=	Lang[ID_COL_FLINE];
+	FindOutput.Columns[1].Caption :=	Lang[ID_COL_FCOL];
+	FindOutput.Columns[2].Caption :=	Lang[ID_COL_FFILE];
+	FindOutput.Columns[3].Caption :=	Lang[ID_COL_FMSG];
+	ErrorLabel.Caption :=				Lang[ID_TOTALERRORS];
+	SizeOfOutput.Caption :=				Lang[ID_OUTPUTSIZE];
+	InfoGroupBox.Caption :=				Lang[ID_GRP_INFO];
+	CompResGroupBox.Caption :=			Lang[ID_GRP_COMPRESULTS];
+	ProjectSheet.Caption :=				Lang[ID_LP_PROJECT];
+	ClassSheet.Caption :=				Lang[ID_LP_CLASSES];
 
-		lblSendCommandGdb.Caption:=			Strings[ID_DEB_SENDGDBCOMMAND];
-		GdbCommandBtn.Caption :=			Strings[ID_DEB_SEND];
+	lvBacktrace.Column[0].Caption:=		Lang[ID_GF_FUNCTION];
+	lvBacktrace.Column[1].Caption:=		Lang[ID_COL_ARGS];
+	lvBacktrace.Column[2].Caption:=		Lang[ID_COL_FILE];
+	lvBacktrace.Column[3].Caption:=		Lang[ID_COL_FLINE];
 
-		tabVars.Caption:=					Strings[ID_SHEET_DEBUG];
-		tabBacktrace.Caption:=				Strings[ID_DEB_BACKTRACE];
-		tabDebugOutput.Caption:=			Strings[ID_DEB_OUTPUT];
+	lblSendCommandGdb.Caption:=			Lang[ID_DEB_SENDGDBCOMMAND];
+	GdbCommandBtn.Caption :=			Lang[ID_DEB_SEND];
 
-		with devShortcuts1.MultiLangStrings do begin
-			Caption:=						Strings[ID_SC_CAPTION];
-			Title:=							Strings[ID_SC_TITLE];
-			Tip:=							Strings[ID_SC_TIP];
-			HeaderEntry:=					Strings[ID_SC_HDRENTRY];
-			HeaderShortcut:=				Strings[ID_SC_HDRSHORTCUT];
-			Cancel:=						Strings[ID_SC_CANCEL];
-			OK:=							Strings[ID_SC_OK];
-		end;
+	tabVars.Caption:=					Lang[ID_SHEET_DEBUG];
+	tabBacktrace.Caption:=				Lang[ID_DEB_BACKTRACE];
+	tabDebugOutput.Caption:=			Lang[ID_DEB_OUTPUT];
 
-		pnlFull.Caption:=					Format(Strings[ID_FULLSCREEN_MSG], [DEVCPP, DEVCPP_VERSION]);
-
-		// Mainform toolbar buttons
-		NewAllBtn.Caption :=				Strings[ID_TB_NEW];
-		InsertBtn.Caption :=				Strings[ID_TB_INSERT];
-		ToggleBtn.Caption :=				Strings[ID_TB_TOGGLE];
-		GotoBtn.Caption :=					Strings[ID_TB_GOTO];
-
-		tbSpecials.Width := NewAllBtn.Width + InsertBtn.Width + ToggleBtn.Width + GotoBtn.Width;
+	with devShortcuts1.MultiLangStrings do begin
+		Caption:=						Lang[ID_SC_CAPTION];
+		Title:=							Lang[ID_SC_TITLE];
+		Tip:=							Lang[ID_SC_TIP];
+		HeaderEntry:=					Lang[ID_SC_HDRENTRY];
+		HeaderShortcut:=				Lang[ID_SC_HDRSHORTCUT];
+		Cancel:=						Lang[ID_SC_CANCEL];
+		OK:=							Lang[ID_SC_OK];
 	end;
+
+	pnlFull.Caption:=					Format(Lang[ID_FULLSCREEN_MSG], [DEVCPP, DEVCPP_VERSION]);
+
+	// Mainform toolbar buttons
+	NewAllBtn.Caption :=				Lang[ID_TB_NEW];
+	InsertBtn.Caption :=				Lang[ID_TB_INSERT];
+	ToggleBtn.Caption :=				Lang[ID_TB_TOGGLE];
+	GotoBtn.Caption :=					Lang[ID_TB_GOTO];
+
+	tbSpecials.Width := NewAllBtn.Width + InsertBtn.Width + ToggleBtn.Width + GotoBtn.Width;
+
 	BuildBookMarkMenus;
 	SetHints;
 	devCompiler.ChangeOptionsLang;
@@ -2392,7 +2377,7 @@ begin
 			HasSize := FileExists(ChangeFileExt(GetEditor.FileName, EXE_EXT));
 		end;
 		if HasSize then begin
-			SizeFile.Text := IntToStr(F.Size) + ' ' + Lang.Strings[ID_BYTES];
+			SizeFile.Text := IntToStr(F.Size) + ' ' + Lang[ID_BYTES];
 			if F.Size > 1024 then
 				SizeFile.Text := SizeFile.Text + ' (' + IntToStr(F.Size div 1024) + ' KB)';
 		end else
@@ -3341,16 +3326,16 @@ begin
 	e:= GetEditor;
 	fCompiler.Target:= ctNone;
 
-	if assigned(fProject) then
+	if Assigned(fProject) then
 		// no matter if the editor file is not in project,
 		// the target is ctProject since we have a project open...
 		fCompiler.Target:= ctProject
-	else if assigned(e) and (GetFiletyp(e.Filename) in [utSrc, utRes]) or e.new then
+	else if Assigned(e) and (GetFiletyp(e.Filename) in [utSrc, utRes]) or e.new then
 		fCompiler.Target:= ctFile;
 
-	if fCompiler.Target = ctFile then begin
+	if fCompiler.Target in [ctFile,ctNone] then begin
 		if not SaveFile(e) then
-				Exit;
+			Exit;
 		fCompiler.SourceFile:= e.FileName;
 	end else if fCompiler.Target = ctProject then begin
 		actSaveAllExecute(Self);
@@ -5068,7 +5053,7 @@ begin
 		 try
 			 f := TForm.Create(self);
 			 with f do begin
-				 Caption := Lang.Strings[ID_TB_DEBUG];
+				 Caption := Strings[ID_TB_DEBUG];
 				 Top := self.Top + MessageControl.Top + DebugSubPages.Top;
 				 Left := self.Left + DebugSubPages.Left;
 				 Height := DebugSubPages.Height + 40;
@@ -5916,7 +5901,7 @@ begin
 	else begin
 		ProjectToolWindow := TForm.Create(self);
 		with ProjectToolWindow do begin
-			Caption := Lang.Strings[ID_TB_PROJECT];
+			Caption := Lang[ID_TB_PROJECT];
 			Top := self.Top + LeftPageControl.Top;
 			Left := self.Left + LeftPageControl.Left;
 			Height := LeftPageControl.Height;
@@ -6217,7 +6202,7 @@ begin
 			MessageControl.ActivePageIndex := 0;
 		ReportToolWindow := TForm.Create(self);
 		with ReportToolWindow do begin
-			Caption := Lang.Strings[ID_TB_REPORT];
+			Caption := Lang[ID_TB_REPORT];
 			Top := self.Top + MessageControl.Top;
 			Left := self.Left + MessageControl.Left;
 			Height := MessageControl.Height;
@@ -6595,6 +6580,8 @@ begin
 			wantquote := false;
 			wantcomment := 0;
 			for I:=cpos downto (cpos-1024) do begin
+
+				if I = 0 then break;
 
 				// if we're entering a new line backwards...
 				if text[I] = #10 then begin

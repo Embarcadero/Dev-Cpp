@@ -1,10 +1,11 @@
 object MainForm: TMainForm
-  Left = 347
-  Top = 236
+  Left = 685
+  Top = 323
   Width = 968
-  Height = 698
+  Height = 692
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
+  Caption = 'Dev-C++'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -30,14 +31,14 @@ object MainForm: TMainForm
   object SplitterLeft: TSplitter
     Left = 193
     Top = 72
-    Height = 413
+    Height = 407
     AutoSnap = False
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 485
+    Top = 479
     Width = 952
     Height = 3
     Cursor = crVSplit
@@ -47,7 +48,7 @@ object MainForm: TMainForm
   end
   object MessageControl: TPageControl
     Left = 0
-    Top = 488
+    Top = 482
     Width = 952
     Height = 133
     ActivePage = FindSheet
@@ -1099,7 +1100,7 @@ object MainForm: TMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 621
+    Top = 615
     Width = 952
     Height = 19
     Panels = <
@@ -1122,7 +1123,7 @@ object MainForm: TMainForm
     Left = 196
     Top = 72
     Width = 756
-    Height = 413
+    Height = 407
     Align = alClient
     HotTrack = True
     MultiLine = True
@@ -1184,7 +1185,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 72
     Width = 193
-    Height = 413
+    Height = 407
     ActivePage = ClassSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
@@ -1196,7 +1197,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 385
+        Height = 379
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1232,7 +1233,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 385
+        Height = 379
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1268,7 +1269,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 385
+        Height = 379
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1695,7 +1696,6 @@ object MainForm: TMainForm
       end
       object DeleteProfilingInformation: TMenuItem
         Action = actDeleteProfileProject
-        Caption = 'Delete Profiling Information'
       end
       object N25: TMenuItem
         Caption = '-'
@@ -3118,7 +3118,7 @@ object MainForm: TMainForm
     end
     object actDeleteProfileProject: TAction
       Category = 'Execute'
-      Caption = 'actDeleteProfileProject'
+      Caption = 'Delete Profiling information'
       ImageIndex = 11
       OnExecute = actDeleteProfileProjectExecute
       OnUpdate = actDeleteProfRunUpdate
