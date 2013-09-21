@@ -1156,10 +1156,11 @@ begin
 end;
 
 procedure TProject.UpdateNodeIndexes;
-var idx: integer;
+var
+	idx: integer;
 begin
-  for idx:= 0 to pred(fUnits.Count) do
-    fUnits[idx].Node.Data:=pointer(idx);
+	for idx:= 0 to pred(fUnits.Count) do
+		fUnits[idx].Node.Data:=pointer(idx);
 end;
 
 { end XXXKF }

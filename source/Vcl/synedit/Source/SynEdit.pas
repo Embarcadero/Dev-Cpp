@@ -327,6 +327,22 @@ type
     destructor Destroy; override;
   end;
 
+  //### Code Folding ###
+  TSynEditCodeFoldingPlugin = class(TSynEditPlugin)
+  private
+    fOwner: TCustomSynEdit;
+  protected
+    procedure AfterPaint(ACanvas: TCanvas; const AClip: TRect;
+      FirstLine, LastLine: integer); override;
+    procedure LinesInserted(FirstLine, Count: integer); override;
+    procedure LinesDeleted(FirstLine, Count: integer); override;
+  protected
+    property Editor: TCustomSynEdit read fOwner;
+  public
+    constructor Create(AOwner: TCustomSynEdit);
+  end;
+  //### End Code Folding ###
+
   TCustomSynEdit = class(TCustomControl)
   private
 {$IFDEF SYN_CLX}
@@ -359,11 +375,16 @@ type
 {$ENDIF}
   private
     //### Code Folding ###
-    fNeedToReScan:         Boolean;
     fAllFoldRanges:        TSynEditAllFoldRanges;
     fHighlightedFoldRange: TSynEditFoldRange;
     fCodeFolding:          TSynCodeFolding;
+    fCodeFoldingPlugin:    TSynEditCodeFoldingPlugin;
+
+    // Cache with cached properties
     fActualLines:          TStrings;
+    fActualLinesLength:    Integer;
+    fActualLinesCount:     Integer;
+    fDelPressed:           Boolean;
     //### End Code Folding ###
 
     fAlwaysShowCaret: Boolean;
@@ -486,7 +507,6 @@ type
     //### Code Folding ###
 	function FoldRangeForLine(Line: Integer): TSynEditFoldRange;
 	function CollapsableFoldRangeForLine(Line: Integer;FoldCount: PInteger = nil): TSynEditFoldRange;
-	function FoldRangeForLineTo(Line: Integer): TSynEditFoldRange;
 	function GetLineIndent(Strings: TStrings; ALine: Integer): Integer;
 	function TreeEndForLine(Line: Integer): Boolean;
 	function TreeLineForLine(Line: Integer): Boolean;
@@ -494,15 +514,10 @@ type
 	procedure MoveFoldRangesAfter(FoldRange: TSynEditFoldRange;LineCount: Integer);
 	procedure ScanForFoldRanges(var TopFoldRanges: TSynEditAllFoldRanges;Strings: TStrings);
 	procedure Uncollapse(FoldRange: TSynEditFoldRange);
-	procedure UpdateFoldRangesEx(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
+	procedure MoveRangesBy(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
 	procedure UpdateFoldRangeParents;
-    procedure CheckIfAtMatchingKeywords;
-    function IsKeywordAtCursorPos(OpenKeyWord: PBoolean = nil): Boolean;
     function GetAutoSizeDigitCount: Integer;
-    function CanExecuteInLine(aLine: Integer; aKey: Word = 0): Boolean;
     function GetCollapseMarkRect(FoldRange: TSynEditFoldRange;Row: Integer): TRect;
-    procedure CodeFoldingOnChange(Event: TSynCodeFoldingChanges);
-    // Orwell Mod: UpdateBmps used to be here, but never used
     //### End Code Folding ###
 
     procedure BookMarkOptionsChanged(Sender: TObject);
@@ -853,7 +868,7 @@ type
 		procedure CollapseLevel(ALevel: Integer);
 		procedure InitCodeFolding;
 		procedure ReScanForFoldRanges;
-		procedure UpdateFoldRanges(CurrentLine, LineCount: Integer);
+		procedure MoveRangesFromBy(CurrentLine, LineCount: Integer);
 		procedure UncollapseAll;
 		function GetUncollapsedStrings : TStrings;
 		procedure UncollapseLevel(ALevel: Integer; NeedInvalidate: Boolean = True);
@@ -862,6 +877,8 @@ type
 	public
 		//### Code Folding ###
 		property UnCollapsedLines: TStrings read fActualLines;
+		property UnCollapsedLinesCount: Integer read fActualLinesCount;
+		property UnCollapsedLinesLength: Integer read fActualLinesLength;
 		property CodeFolding: TSynCodeFolding read fCodeFolding;
 		//### End Code Folding ###
 
@@ -1108,6 +1125,7 @@ uses
   {$ENDIF}
   Clipbrd,
   ShellAPI,
+  StrUtils,
   SynEditWordWrap,
   SynEditStrConst;
 {$ENDIF}
@@ -1360,14 +1378,7 @@ begin
 
   fLines := TSynEditStringList.Create;
   fOrigLines := fLines;
-
-  //### Code Folding ###
-  fAllFoldRanges := TSynEditAllFoldRanges.Create;
   fPlugins := TList.Create;
-  fCodeFolding := TSynCodeFolding.Create;
-  fCodeFolding.OnChange := CodeFoldingOnChange;
-  fActualLines := TStringList.Create;
-  //### End Code Folding ###
 
   with TSynEditStringList(fLines) do
   begin
@@ -1384,7 +1395,7 @@ begin
   fOrigUndoList := fUndoList;
   fRedoList := TSynEditUndoList.Create;
   fRedoList.OnAddedUndo := UndoRedoAdded;
-  fOrigRedoList := fRedoList;          
+  fOrigRedoList := fRedoList;
 
 {$IFDEF SYN_COMPILER_4_UP}
 {$IFDEF SYN_CLX}
@@ -1497,6 +1508,15 @@ begin
   fScrollHintFormat := shfTopLineOnly;
 
   SynFontChanged(nil);
+
+  //### Code Folding ###
+  fAllFoldRanges := TSynEditAllFoldRanges.Create;
+  fCodeFoldingPlugin := TSynEditCodeFoldingPlugin.Create(Self);
+  fPlugins.Add(fCodeFoldingPlugin);
+  fCodeFolding := TSynCodeFolding.Create;
+  fActualLines := TStringList.Create;
+  fGutter.RightOffset := 21;
+  //### End Code Folding ###
 end;
 
 {$IFDEF SYN_CLX}
@@ -1558,8 +1578,6 @@ begin
 end;
 
 destructor TCustomSynEdit.Destroy;
-var
-  i: integer;
 begin
   Highlighter := nil;
   if (fChainedEditor <> nil) or (fLines <> fOrigLines) then
@@ -1567,19 +1585,15 @@ begin
 
   inherited Destroy;
 
-  // free listeners while other fields are still valid
-  if Assigned(fHookedCommandHandlers) then
-  begin
-    for i := 0 to fHookedCommandHandlers.Count - 1 do
-      THookedCommandHandlerEntry(fHookedCommandHandlers[i]).Free;
-    FreeAndNil(fHookedCommandHandlers);
-  end;
-  if fPlugins <> nil then
-  begin
-    for i := fPlugins.Count - 1 downto 0 do
-      TSynEditPlugin(fPlugins[i]).Free;
-    fPlugins.Free;
-  end;
+  // do not use FreeAndNil, it first nils and then freey causing problems with
+  // code accessing fHookedCommandHandlers while destruction
+  fHookedCommandHandlers.Free;
+  fHookedCommandHandlers := nil;
+  // do not use FreeAndNil, it first nils and then frees causing problems with
+  // code accessing fPlugins while destruction
+  fPlugins.Free;
+  fPlugins := nil;
+
   fMarkList.Free;
   fBookMarkOpt.Free;
   fKeyStrokes.Free;
@@ -1594,6 +1608,11 @@ begin
   fInternalImage.Free;
   fFontDummy.Free;
   fOrigLines.Free;
+
+  //### Code Folding ###
+  fAllFoldRanges.Free;
+  fActualLines.Free;
+  //### End Code Folding ###
 end;
 
 function TCustomSynEdit.GetBlockBegin: TBufferCoord;
@@ -1736,8 +1755,6 @@ begin
 		ColTo := BlockEnd.Char;
 		Last := BlockEnd.Line;
 		Last := GetRealLineNumber(Last)-1;
-
-//		MsgBox('from ' + inttostr(First) + ' to ' + inttostr(Last) + #13#10 + 'text = ' + uncollapsedtext.GetText);
 
     TotalLen := 0;
     case SelectionMode of
@@ -2055,10 +2072,6 @@ begin
   {$ENDIF}
   inherited;
 
-  //### Code Folding ###
-  CheckIfAtMatchingKeywords;
-  //### End Code Folding ###
-
   fKbdHandler.ExecuteKeyUp( Self, Key, Shift );
 end;
 
@@ -2072,14 +2085,7 @@ var
   {$ENDIF}
 begin
 	//### Code Folding ###
-	if not CanExecuteInLine(CaretY,Key) then
-		Exit;
-	if Key = VK_RETURN then
-		UpdateFoldRanges(CaretY, 1);
-	if (Key = VK_BACK) and (CaretX = 1) then
-		UpdateFoldRanges(CaretY, -1);
-	if (Key = VK_DELETE) and (CaretX = 1) then
-		UpdateFoldRanges(CaretY+1, -1);
+	fDelPressed := (Key = VK_DELETE);
 	//### End Code Folding ###
 
   {$IFDEF LINUX}
@@ -2175,20 +2181,13 @@ end;
 
 procedure TCustomSynEdit.LinesChanging(Sender: TObject);
 begin
-  Include(fStateFlags, sfLinesChanging);
+	Include(fStateFlags, sfLinesChanging);
 end;
 
 procedure TCustomSynEdit.LinesChanged(Sender: TObject);
 begin
 	Exclude(fStateFlags, sfLinesChanging);
 	if HandleAllocated then begin
-
-		// Reposition the unfolded ranges and scan for new ones
-		ReScanForFoldRanges;
-
-		// Update the double buffer
-		GetUnCollapsedStrings;
-
 		UpdateScrollBars;
 		SetBlockBegin(CaretXY);
 		InvalidateRect(fInvalidateRect, False);
@@ -2404,10 +2403,6 @@ procedure TCustomSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState;
 begin
   inherited MouseUp(Button, Shift, X, Y);
   fKbdHandler.ExecuteMouseUp( Self, Button, Shift, X, Y );
-
-  //### Code Folding ###
-  CheckIfAtMatchingKeywords;
-  //### End Code Folding ###
 
   fScrollTimer.Enabled := False;
   if (Button = mbRight) and (Shift = [ssRight]) and Assigned(PopupMenu) then
@@ -3428,27 +3423,6 @@ var
     //### Code Folding ###
     // Calculate indent guides positions
     ScrolledXBy := (LeftChar - 1) * CharWidth;
-    {SetLength(IndentGuides, Lines.Count);
-
-    with fAllFoldRanges do
-			for i := 0 to AllCount - 1 do
-    		with AllFoldRanges[i] do
-        	if (not Collapsed) and (not ParentCollapsed) then
-          begin
-          	X := Level * CharWidth * TabWidth;
-
-            if X - ScrolledXBy > 0 then
-            begin
-            	X := Gutter.RealGutterWidth(CharWidth) + X - ScrolledXBy;
-
-          		for j := FromLine to ToLine do
-            	begin
-            		SetLength(IndentGuides[Pred(j)],
-              		Succ( Length(IndentGuides[Pred(j)]) ));
-								IndentGuides[Pred(j)][High(IndentGuides[Pred(j)])] := X;
-            	end;
-            end;
-          end;}
     //### End Code Folding ###
 
     // Now loop through all the lines. The indices are valid for Lines.
@@ -3668,7 +3642,7 @@ var
             if rcCollapseMark.Right - ScrolledXBy > 0 then
             begin
             	OffsetRect(rcCollapseMark, -ScrolledXBy, 0);
-						// End Fix              
+						// End Fix
       				Canvas.FrameRect(rcCollapseMark);
       				Canvas.Brush.Color := clWhite;
         			Y := rcCollapseMark.Top + ( ( (rcCollapseMark.Bottom - rcCollapseMark.Top) div 5 ) * 3 );
@@ -3732,40 +3706,6 @@ var
 
               Canvas.Pen.Color := OldColor;
       			end;
-					{if Length(IndentGuides[nLine - 1]) > 0 then
-          begin
-          	Y := rcLine.Top;
-
-          	for i := 0 to High(IndentGuides[Pred(nLine)]) do
-            begin
-            	X := IndentGuides[Pred(nLine)][i];
-
-							if fHighlightedFoldRange <> fAllFoldRanges[i] then
-							begin
-								if LineHeight mod 2 = 0 then
-									Canvas.Draw(X, Y, fIndGuidBmp)
-								else
-								begin
-									if nLine mod 2 = 1 then
-										Canvas.Draw(X, Y, fIndGuidBmp)
-									else
-										Canvas.Draw(X, Y, fIndGuidOddBmp);
-								end;
-							end
-							else
-							begin
-								if LineHeight mod 2 = 0 then
-									Canvas.Draw(X, Y, fHIndGuidBmp)
-								else
-								begin
-									if nLine mod 2 = 1 then
-										Canvas.Draw(X, Y, fHIndGuidBmp)
-									else
-										Canvas.Draw(X, Y, fHIndGuidOddBmp);
-								end;
-							end;
-            end;
-          end;}
 
         if (CodeFolding.Enabled) and (CodeFolding.ShowCollapsedLine)
         and (FoldRange <> nil) and (FoldRange.Collapsed)
@@ -3792,8 +3732,8 @@ var
     end; //endfor cLine
 
     //### Code Folding ###
-    {if CodeFolding.Enabled then
-    	FreeMem(IndentGuides);}
+	if CodeFolding.Enabled then
+    	IndentGuides := nil;
     //### End Code Folding ###
   end;
 
@@ -3959,7 +3899,7 @@ begin
     end else if Clipboard.HasFormat(CF_TEXT) then begin
 {$ENDIF}
       fUndoList.AddChange(crPasteBegin, BlockBegin, BlockEnd, '', smNormal);
-      AddPasteEndMarker := True;                                               
+      AddPasteEndMarker := True;
       if SelAvail then
       begin
         fUndoList.AddChange(crDelete, fBlockBegin, fBlockEnd,
@@ -3999,7 +3939,7 @@ begin
   EnsureCursorPosVisible;
   // Selection should have changed...
   StatusChanged([scSelection]);
-  DoOnPaintTransient(ttAfter);                                                
+  DoOnPaintTransient(ttAfter);
 end;
 
 procedure TCustomSynEdit.SelectAll;
@@ -5218,9 +5158,9 @@ end;
 
 procedure TCustomSynEdit.WMDestroy(var Message: TWMDestroy);
 begin
-	// assign WindowText here, otherwise the VCL will call GetText twice
-	if WindowText = nil then
-		WindowText := Lines.GetText;
+//	// assign WindowText here, otherwise the VCL will call GetText twice
+//	if WindowText = nil then
+//		WindowText := Lines.GetText;
 	inherited;
 end;
 
@@ -7046,14 +6986,6 @@ begin
     // the class
     NotifyHookedCommandHandlers(FALSE, Command, AChar, Data);
 
-    //### Code Folding ###
-    // if something is going near keyword
-    if (IsKeywordAtCursorPos)
-    and ((Command = ecChar) or (Command = ecDeleteLastChar)
-    or (Command = ecDeleteChar) or (Command = ecLineBreak)) then
-    	fNeedToRescan := True;
-    //### End Code Folding ###
-
     // internal command handler
     if (Command <> ecNone) and (Command < ecUserFirst) then
       ExecuteCommand(Command, AChar, Data);
@@ -7977,6 +7909,14 @@ end;
 
 procedure TCustomSynEdit.DoOnCommandProcessed(Command: TSynEditorCommand;AChar: char; Data: pointer);
 begin
+	//### Code Folding ###
+	if CodeFolding.Enabled then
+		if (Command >= ecDeleteLastChar) and (Command <= ecPaste) then begin
+			ReScanForFoldRanges;
+			GetUnCollapsedStrings;
+		end;
+	//### End Code Folding ###
+
 	if Assigned(fOnCommandProcessed) then
 		fOnCommandProcessed(Self, Command, AChar, Data);
 end;
@@ -10942,7 +10882,6 @@ begin
     MoveFoldRangesAfter(AFoldRange, 0 - LinesCollapsed - 1);
   end;
 
-  CheckIfAtMatchingKeywords;
   Lines.EndUpdate;
 end;
 
@@ -10953,8 +10892,8 @@ begin
 	Lines.BeginUpdate;
 
 	for i := 9 downto 0 do
-  	CollapseLevel(i);
-    
+		CollapseLevel(i);
+
 	Lines.EndUpdate;
 end;
 
@@ -11026,7 +10965,7 @@ var
 	begin
 		for j := fAllFoldRanges.AllCount - 1 downto 0 do
 			with fAllFoldRanges[j] do begin
-				if (RealLevel = ALevel){ and (Collapsed) and (not ParentCollapsed)} then begin
+				if (RealLevel = ALevel) and (Collapsed){ and (not ParentCollapsed)} then begin
 					for k := 0 to CollapsedLines.Count - 1 do
 						fActualLines.Insert(FromLine, CollapsedLines[k]);
 					if FoldRegion.AddEnding then
@@ -11038,6 +10977,7 @@ var
 			end;
 	end;
 begin
+
 	// Back up the FromLine and ToLine values
 	SetLength(fromtolinebackup,fAllFoldRanges.AllCount*2);
 	for i:=0 to fAllFoldRanges.AllCount - 1 do begin
@@ -11053,6 +10993,10 @@ begin
 	for i := 0 to 9 do
 		SpecialUncollapseLevel(i);
 	fActualLines.EndUpdate;
+
+	// Cache properties
+	fActualLinesLength := Length(fActualLines.GetText);
+	fActualLinesCount := fActualLines.Count;
 
 	// Create result pointer too, same as UnCollapsedLines
 	Result := fActualLines;
@@ -11087,181 +11031,136 @@ end;
 
 procedure TCustomSynEdit.ReScanForFoldRanges;
 var
-  i, j, Count, LinesWithFoldsCount: Integer;
-  FoldRangeLookup: array of Boolean;
-  RealLineNumbersLookup: array of Integer;
-  TemporaryLines: TStringList;
-  TemporaryAllFoldRanges: TSynEditAllFoldRanges;
+	i, j, Count, LinesWithFoldsCount: Integer;
+	FoldRangeLookup: array of Boolean;
+	RealLineNumbersLookup: array of Integer;
+	TemporaryLines: TStringList;
+	TemporaryAllFoldRanges: TSynEditAllFoldRanges;
 begin
-  fNeedToRescan := False; // Set rescan flag to false
+	// Delete all uncollapsed folds
+	for i := fAllFoldRanges.AllCount - 1 downto 0 do
+		with fAllFoldRanges[i] do
+			if (not Collapsed) and (not ParentCollapsed) then
+				fAllFoldRanges.Delete(i);
 
-  // Delete all uncollapsed folds
-  for i := fAllFoldRanges.AllCount - 1 downto 0 do
-  	with fAllFoldRanges[i] do
-  		if (not Collapsed) and (not ParentCollapsed) then
-  			fAllFoldRanges.Delete(i);
-
-  { Create a lookup table with information which lines have folds and
-  which doesn't }
-  SetLength(FoldRangeLookup, Lines.Count + 1);
+	// Create a lookup table with information which lines have folds and which don't
+	SetLength(FoldRangeLookup, Lines.Count + 1);
 	Count := fAllFoldRanges.AllCount - 1;
 	LinesWithFoldsCount := 0;
 
-  for i := 0 to Count do
-  	with fAllFoldRanges[i] do
-    	{ Only visible lines are important to us, so we skip folds that are
-      collapsed within their parents }
-  		if not ParentCollapsed then
-  		begin
-        FoldRangeLookup[FromLine] := True;
-        { We will need this variable to allocate mememory for
-        RealLineNumbersLookup efficently }
-  			Inc(LinesWithFoldsCount);
-  		end;
-
-  { Add lines to a temporary lines list and create a lookup table so we can
-  know later what's the real number of certain line in a temporary lines list }
-	TemporaryLines := TStringList.Create;
-	SetLength(RealLineNumbersLookup, (Lines.Count - LinesWithFoldsCount) + 1);
-	Count := Lines.Count - 1;
-
-	for i := 0 to Count do
-		if not FoldRangeLookup[Succ(i)] then
-    begin
-    	TemporaryLines.Add(Lines[i]);
-			RealLineNumbersLookup[TemporaryLines.Count] := Succ(i); // What's the real number of that temporary line
-    end;
-
-	{ Information about collapsed folds will be stored in TemporaryAllFoldRanges.
-  We will scan the temporary lines looking for folds, and later will combine
-  this two lists }
-	TemporaryAllFoldRanges := fAllFoldRanges;
-  TemporaryAllFoldRanges.Clear;
-	fAllFoldRanges := TSynEditAllFoldRanges.Create;
-	ScanForFoldRanges(fAllFoldRanges, TemporaryLines);
-  TemporaryAllFoldRanges.Ranges.Assign(fAllFoldRanges.Ranges);
-
-	{ Now we need to correct the FromLine and ToLine properites of newly created
-  folds becouse they don't encapsulate the real line numbers }
-	Count := fAllFoldRanges.AllCount - 1;
-
 	for i := 0 to Count do
 		with fAllFoldRanges[i] do
-    begin
-    	FromLine := RealLineNumbersLookup[FromLine];
-    	ToLine := RealLineNumbersLookup[ToLine];
-    end;
+			// Only visible lines are important to us, so we skip folds that are collapsed within their parents
+			if not ParentCollapsed then begin
+				FoldRangeLookup[FromLine] := True;
+				// We will need this variable to allocate mememory for RealLineNumbersLookup efficently
+				Inc(LinesWithFoldsCount);
+			end;
 
-	// Now we need to combine collapsed items with new one's
-	{i := 0; // Uncollapsed fold index
-	j := 0; // Collapsed fold index
+	// Add lines to a temporary lines list and create a lookup table so we can
+	// know later what's the real number of certain line in a temporary lines list
+	TemporaryLines := TStringList.Create;
+	Count := Lines.Count - 1;
+	SetLength(RealLineNumbersLookup, Count - LinesWithFoldsCount + 2);
+
+	for i := 0 to Count do
+		if not FoldRangeLookup[Succ(i)] then begin
+			TemporaryLines.Add(Lines[i]);
+			RealLineNumbersLookup[TemporaryLines.Count] := Succ(i); // What's the real number of that temporary line
+		end;
+
+	// Information about collapsed folds will be stored in TemporaryAllFoldRanges.
+	// We will scan the temporary lines looking for folds, and later will combine
+	// this two lists
+	TemporaryAllFoldRanges := fAllFoldRanges;
+	TemporaryAllFoldRanges.Clear;
+	fAllFoldRanges := TSynEditAllFoldRanges.Create;
+	ScanForFoldRanges(fAllFoldRanges, TemporaryLines);
+	TemporaryAllFoldRanges.Ranges.Assign(fAllFoldRanges.Ranges);
+
+	// Now we need to correct the FromLine and ToLine properites of newly created folds
 	Count := fAllFoldRanges.AllCount - 1;
 
-	if TemporaryAllFoldRanges.AllCount > 0 then
-  begin
-		while (i <= Count) do
-			if (TemporaryAllFoldRanges[j].ParentCollapsed) or
-			(fAllFoldRanges[i].FromLine > TemporaryAllFoldRanges[j].FromLine) then
-			begin
-				if j = Pred(TemporaryAllFoldRanges.AllCount) then
-				begin // If it's a last collapsed fold, add uncollapsed fold at the end of the list
-					TemporaryAllFoldRanges.AllRanges.Add(fAllFoldRanges[i]);
-					Inc(i);
-				end
-				else // Otherwise skip to the next collapsed fold to check it
-					Inc(j);
-			end
-			else if fAllFoldRanges[i].FromLine < TemporaryAllFoldRanges[j].FromLine then // This uncollapsed fold should be inserted before current collapsed fold
-			begin
-				TemporaryAllFoldRanges.AllRanges.Insert(j, fAllFoldRanges[i]);
-				Inc(j);
-				Inc(i);
-			end
-  end
-  else // There are no collapsed folds
-  	TemporaryAllFoldRanges.Assign(fAllFoldRanges);}
+	for i := 0 to Count do
+		with fAllFoldRanges[i] do begin
+			FromLine := RealLineNumbersLookup[FromLine];
+			ToLine := RealLineNumbersLookup[ToLine];
+		end;
 
-  if TemporaryAllFoldRanges.AllCount > 0 then
-  begin
-  	for i := 0 to fAllFoldRanges.AllCount - 1 do
-  		for j := 0 to TemporaryAllFoldRanges.AllCount - 1 do
-      begin
-    		if fAllFoldRanges[i].FromLine < TemporaryAllFoldRanges[j].FromLine then
-      	begin
-      		TemporaryAllFoldRanges.AllRanges.Insert(j, fAllFoldRanges[i]);
-        	Break;
-      	end;
-
-        if j = TemporaryAllFoldRanges.AllCount - 1 then
-        	TemporaryAllFoldRanges.AddFold(fAllFoldRanges[i]);
-      end;
-  end
-  else
-  	TemporaryAllFoldRanges.Assign(fAllFoldRanges);
+	// Now we need to combine collapsed items with new one's
+	if TemporaryAllFoldRanges.AllCount > 0 then begin
+		for i := 0 to fAllFoldRanges.AllCount - 1 do
+			for j := 0 to TemporaryAllFoldRanges.AllCount - 1 do begin
+				if fAllFoldRanges[i].FromLine < TemporaryAllFoldRanges[j].FromLine then begin
+					TemporaryAllFoldRanges.AllRanges.Insert(j, fAllFoldRanges[i]);
+					Break;
+				end;
+				if j = TemporaryAllFoldRanges.AllCount - 1 then
+					TemporaryAllFoldRanges.AddFold(fAllFoldRanges[i]);
+			end;
+	end else
+		TemporaryAllFoldRanges.Assign(fAllFoldRanges);
 
 	// And finally we have to free memory and repaint the control
-  fAllFoldRanges.Free;
-  fAllFoldRanges := TemporaryAllFoldRanges;
-  UpdateFoldRangeParents;
-  InvalidateGutter;
-	Finalize(FoldRangeLookup);
-	Finalize(RealLineNumbersLookup);
+	fAllFoldRanges.Free;
+	fAllFoldRanges := TemporaryAllFoldRanges;
+	UpdateFoldRangeParents;
+	InvalidateGutter;
+	FoldRangeLookup := nil;
+	RealLineNumbersLookup := nil;
+	TemporaryLines.Free;
 end;
 
-procedure TCustomSynEdit.ScanForFoldRanges(
-	var TopFoldRanges: TSynEditAllFoldRanges; Strings: TStrings);
+procedure TCustomSynEdit.ScanForFoldRanges(var TopFoldRanges: TSynEditAllFoldRanges; Strings: TStrings);
 var
 	Line, FoldCount: Integer;
-  Parents: TList;
-  Ptr, TmpPtr, KeyWordPtr: PChar;
+	Parents: TList;
+	Ptr, TmpPtr, KeyWordPtr: PChar;
 
-	procedure ScanUsingFoldRegions(FoldRegions: TFoldRegions;
-  	ParentRegion: TFoldRegionItem);
-  var
-  	i, j: Integer;
-    FoldRanges: TSynEditFoldRanges;
-    FoldRange: TSynEditFoldRange;
-    ParentClosed, FoundParent: Boolean;
+	procedure ScanUsingFoldRegions(FoldRegions: TFoldRegions;ParentRegion: TFoldRegionItem);
+	var
+		i, j: Integer;
+		FoldRanges: TSynEditFoldRanges;
+		FoldRange: TSynEditFoldRange;
+		ParentClosed, FoundParent: Boolean;
 
-    function IsWholeWord(FirstChar, LastChar: PChar): Boolean;
-    begin
-    	Result := (not (FirstChar^ in TSynValidStringChars))
-      	and (not (LastChar^ in TSynValidStringChars));
-    end;
+		function IsWholeWord(FirstChar, LastChar: PChar): Boolean;
+		begin
+			Result := (not (FirstChar^ in TSynValidStringChars)) and (not (LastChar^ in TSynValidStringChars));
+		end;
 
-    function SkipCrLf(var Ptr: PChar; var Line: Integer): Boolean;
-    begin
+		function SkipCrLf(var Ptr: PChar; var Line: Integer): Boolean;
+		begin
 			Result := False;
-		  
 			repeat
-		  	// Win
+				// Win
 				if ((Ptr^ = #13) and ((Ptr+1)^ = #10)) or ((Ptr^ = #10) and ((Ptr+1)^ = #13)) then
-		  		repeat
-		  			Inc(Ptr, 2);
-		  			Inc(Line);
-		        Result := True;
-		  		until not (((Ptr^ = #13) and ((Ptr+1)^ = #10)) or ((Ptr^ = #10) and ((Ptr+1)^ = #13)));
+					repeat
+						Inc(Ptr, 2);
+						Inc(Line);
+						Result := True;
+					until not (((Ptr^ = #13) and ((Ptr+1)^ = #10)) or ((Ptr^ = #10) and ((Ptr+1)^ = #13)));
 
-		    // Unix
-		  	if Ptr^ = #13 then
-		  		repeat
-		  			Inc(Ptr);
-		        Inc(Line);
-		        Result := True;
-		  		until Ptr^ <> #13;
-          
-		    // Mac
-		  	if Ptr^ = #10 then
-		  		repeat
-		  			Inc(Ptr);
-		      	Inc(Line);
-		        Result := True;
-		  		until Ptr^ <> #10;
-		  until (Ptr^ <> #10) and (Ptr^ <> #13);
-    end;
-  begin
-  	while Ptr^ <> #0 do
-  	begin
+				// Unix
+				if Ptr^ = #13 then
+					repeat
+						Inc(Ptr);
+						Inc(Line);
+						Result := True;
+					until Ptr^ <> #13;
+
+				// Mac
+				if Ptr^ = #10 then
+					repeat
+						Inc(Ptr);
+						Inc(Line);
+						Result := True;
+					until Ptr^ <> #10;
+			until (Ptr^ <> #10) and (Ptr^ <> #13);
+		end;
+
+	begin
+		while Ptr^ <> #0 do begin
       SkipCrLf(Ptr, Line);
 
       for i := 0 to FoldRegions.SkipRegions.Count - 1 do
@@ -11542,19 +11441,18 @@ var
 		end;
   end;
 begin
-  if not CodeFolding.CaseSensitive then
-  	Ptr := PChar(UpperCase(Strings.Text))
-  else
-  	Ptr := PChar(Strings.Text);
+	if not CodeFolding.CaseSensitive then
+		Ptr := PChar(UpperCase(Strings.Text))
+	else
+		Ptr := PChar(Strings.Text);
 
-  Line := 1;
-  FoldCount := 0;
-  Parents := TList.Create;
+	Line := 1;
+	FoldCount := 0;
+	Parents := TList.Create;
 
-  if (CodeFolding.HighlighterFoldRegions) and (Assigned(Highlighter)) then
-    ScanUsingFoldRegions(Highlighter.FoldRegions, nil)
-  else
-		ScanUsingFoldRegions(CodeFolding.FoldRegions, nil);
+	ScanUsingFoldRegions(CodeFolding.FoldRegions, nil);
+
+	Parents.Free;
 end;
 
 function TCustomSynEdit.TreeEndForLine(Line: Integer): Boolean;
@@ -11563,14 +11461,12 @@ var
 begin
 	Result := False;
 
-  for i := 0 to fAllFoldRanges.AllCount - 1 do
-  	with fAllFoldRanges[i] do
-    	if (not ParentCollapsed) and (not Collapsed) and (ToLine = Line)
-      and (Collapsable) then
-      begin
-      	Result := True;
-      	Break;
-      end;
+	for i := 0 to fAllFoldRanges.AllCount - 1 do
+		with fAllFoldRanges[i] do
+			if (not ParentCollapsed) and (not Collapsed) and (ToLine = Line) and (Collapsable) then begin
+				Result := True;
+				Break;
+			end;
 end;
 
 function TCustomSynEdit.TreeLineForLine(Line: Integer): Boolean;
@@ -11579,14 +11475,12 @@ var
 begin
 	Result := False;
 
-  for i := 0 to fAllFoldRanges.AllCount - 1 do
+	for i := 0 to fAllFoldRanges.AllCount - 1 do
 		with fAllFoldRanges[i] do
-  		if (not ParentCollapsed) and (not Collapsed) and (Collapsable)
-      and ((FromLine + 1) <= Line) and (ToLine > Line) then
-  		begin
-  			Result := True;
-  			Break;
-  		end;
+			if (not ParentCollapsed) and (not Collapsed) and (Collapsable) and ((FromLine + 1) <= Line) and (ToLine > Line) then begin
+				Result := True;
+				Break;
+			end;
 end;
 
 procedure TCustomSynEdit.Uncollapse(FoldRange: TSynEditFoldRange);
@@ -11607,7 +11501,6 @@ begin
 		SetPCOfSubFoldRanges(False, RealLevel);
 		CollapsedLines.Clear;
 	end;
-	CheckIfAtMatchingKeywords;
 
 	Lines.EndUpdate;
 end;
@@ -11622,6 +11515,10 @@ begin
 		UncollapseLevel(i, False);
 
 	Lines.EndUpdate;
+
+	// This one isn't repainted for some reason
+	InvalidateLine(fAllFoldRanges[0].FromLine);
+	InvalidateGutterLine(fAllFoldRanges[0].FromLine);
 end;
 
 procedure TCustomSynEdit.UncollapseLevel(ALevel: Integer; NeedInvalidate: Boolean);
@@ -11629,9 +11526,9 @@ var
 	i: Integer;
 begin
 	for i := fAllFoldRanges.AllCount - 1 downto 0 do
-	with fAllFoldRanges[i] do
-		if (RealLevel = ALevel) and (Collapsed) and (not ParentCollapsed) then
-			Uncollapse(fAllFoldRanges[i]);
+		with fAllFoldRanges[i] do
+			if (RealLevel = ALevel) and (Collapsed) and (not ParentCollapsed) then
+				Uncollapse(fAllFoldRanges[i]);
 
 	if NeedInvalidate then
 		InvalidateGutter;
@@ -11677,71 +11574,43 @@ begin
             	end;
 
               Inc(j);
-          	until j >= Count - 1 // Orwell Mod: extra > prevents out of bounds when closing last range in SynEdit
+          	until j = Count // Orwell Mod: last fold range error fix
           else
           	Ranges.Add(fAllFoldRanges[i]);
       end; // end else
     end;
 end;
 
-procedure TCustomSynEdit.UpdateFoldRanges(CurrentLine, LineCount: Integer);
+procedure TCustomSynEdit.MoveRangesFromBy(CurrentLine, LineCount: Integer);
 var
-	i, p: Integer;
-	Line: String;
-begin // Fixes of 0.3.1
+	i: Integer;
+begin
 	for i := 0 to fAllFoldRanges.AllCount - 1 do
 		with fAllFoldRanges[i] do
 			if not ParentCollapsed then begin
-				if FromLine > CurrentLine then begin
+				if FromLine >= CurrentLine then begin
 					MoveBy(LineCount);
 					if Collapsed then
-						UpdateFoldRangesEx(SubFoldRanges, LineCount);
-
-					Continue;
-				end else if FromLine = CurrentLine then begin
-					if not CodeFolding.CaseSensitive then
-						Line := UpperCase(Copy(Lines[FromLine-1], CaretX, MaxInt))
-					else
-						Line := Copy(Lines[FromLine-1], CaretX, MaxInt);
-					p := Pos(FoldRegion.Open, Line);
-					if p > 0 then begin
-						MoveBy(LineCount);
-						Continue;
-					end;
-				end;
-				if not Collapsed then begin
-					if ToLine > CurrentLine then
-						Widen(LineCount)
-					else if ToLine = CurrentLine then begin
-						if not CodeFolding.CaseSensitive then
-							Line := UpperCase(Copy(Lines[ToLine-1], CaretX, MaxInt))
-						else
-							Line := Copy(Lines[ToLine-1], CaretX, MaxInt);
-						p := Pos(FoldRegion.Close, Line);
-						if p > 0 then
-							Widen(LineCount);
-					end;
+						MoveRangesBy(SubFoldRanges, LineCount);
+				end else if not Collapsed then begin
+					if ToLine >= CurrentLine then
+						Widen(LineCount);
 				end;
 			end;
 end;
 
-procedure TCustomSynEdit.UpdateFoldRangesEx(FoldRanges: TSynEditFoldRanges;
-  LineCount: Integer);
+procedure TCustomSynEdit.MoveRangesBy(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
 var
 	i: Integer;
 begin
-  for i := 0 to FoldRanges.Count - 1 do
-  	with FoldRanges[i] do
-    begin
-    	UpdateFoldRangesEx(SubFoldRanges, LineCount);
-      MoveBy(LineCount);
-  	end;
+	for i := 0 to FoldRanges.Count - 1 do
+		with FoldRanges[i] do begin
+			MoveRangesBy(SubFoldRanges, LineCount);
+			MoveBy(LineCount);
+		end;
 end;
 
 procedure TCustomSynEdit.InitCodeFolding;
-var
-  fr: TFoldRegions;
-
   procedure MakeFRCaseInsensitive(aFoldRegions: TFoldRegions);
   var
     i: Integer;
@@ -11762,161 +11631,12 @@ begin
 	fAllFoldRanges.Clear;
 	fAllFoldRanges.ClearAll;
 
-  if not CodeFolding.CaseSensitive then
-  begin
-    if (CodeFolding.HighlighterFoldRegions) and (Highlighter <> nil) then
-      fr := Highlighter.FoldRegions
-    else
-      fr := CodeFolding.FoldRegions;
+	// Make the keywords like for example 'begin' case insensitive
+	if not CodeFolding.CaseSensitive then
+		MakeFRCaseInsensitive(CodeFolding.FoldRegions);
 
-    MakeFRCaseInsensitive(fr);
-  end;
-
+	// And scan for them!
 	ScanForFoldRanges(fAllFoldRanges, Lines);
-end;
-
-procedure TCustomSynEdit.CheckIfAtMatchingKeywords;
-var
-  NewFoldRange: TSynEditFoldRange;
-  IsKeyWord, OpenKeyWord: Boolean;
-
-  function HighlightIndentGuide: Boolean;
-  begin
-  	Result := False;
-
-		if (IsKeyWord) and (OpenKeyWord) then // Is there a keyword to highlight at the cursor position
-      fHighlightedFoldRange := FoldRangeForLine(CaretY)
-    else if (IsKeyWord) and (not OpenKeyWord) then // Is there a keyword to highlight at the cursor position
-    	fHighlightedFoldRange := FoldRangeForLineTo(CaretY);
-
-    if fHighlightedFoldRange <> nil then
-    begin
-    	Result := True;
-    	Exit;
-    end;
-  end;
-begin
-	IsKeyWord := IsKeywordAtCursorPos(@OpenKeyWord);
-
-	if fHighlightedFoldRange = nil then
-  begin // If no indent guide is highlighted, maybe it should be
-  	if HighlightIndentGuide then
-    	with fHighlightedFoldRange do
-      	InvalidateLines(FromLine, ToLine);
-  end
-  else
-  begin // There is a highlighted indent guide, but maybe it shouldn't be
-  	NewFoldRange := nil;
-
-		if (IsKeyWord) and (OpenKeyWord) then
-    	NewFoldRange := FoldRangeForLine(CaretY)
-    else if (IsKeyWord) and (not OpenKeyWord) then
-    	NewFoldRange := FoldRangeForLineTo(CaretY);
-      
-    // Everything's O.K., this indent guide should be highlighted
-    // This indent guide no longer need to be highlighted
-    if NewFoldRange <> fHighlightedFoldRange then
-    begin
-    	with fHighlightedFoldRange do
-      	InvalidateLines(FromLine, ToLine);
-        
-    	fHighlightedFoldRange := nil;
-      HighlightIndentGuide;
-
-      if fHighlightedFoldRange <> nil then
-      	with fHighlightedFoldRange do
-					InvalidateLines(FromLine, ToLine);
-    end;
-  end;
-end;
-
-function TCustomSynEdit.IsKeywordAtCursorPos(OpenKeyWord: PBoolean): Boolean;
-  function IsKeywordAtCursorPosForFoldRegions(OpenKeyWord: PBoolean;
-  	FoldRegions: TFoldRegions): Boolean;
-  var
-		P, i: Integer;
-  	Keyword: PChar;
-  	Line: String;
-	begin
-		Result := False;
-
-		for i := 0 to FoldRegions.Count - 1 do
-    begin
-    	if IsKeywordAtCursorPosForFoldRegions(OpenKeyWord, FoldRegions[i].SubFoldRegions) then
-      begin
-      	Result := True;
-        Exit;
-      end;
-
-      if not CodeFolding.CaseSensitive then
-			  Line := UpperCase(LineText);
-
-			Keyword := FoldRegions[i].Open;
-
-			repeat
-				P := Pos(Keyword, Line);
-
-				if (P > 0) and ((CaretX >= P)
-        and (CaretX <= P + Integer( StrLen(Keyword) ))) then // Cast to Integer type to shut up the compiler
-				begin
-					Result := True;
-
-          if OpenKeyWord <> nil then
-						OpenKeyWord^ := True;
-            
-					Exit;
-				end
-        else
-        	Delete( Line, 1, P + Integer( StrLen(Keyword) ) );
-			until P = 0;
-
-			Line := UpperCase(LineText);
-			Keyword := FoldRegions[i].Close;
-
-			repeat
-				P := Pos(Keyword, Line);
-        
-				if (P > 0) and ( (CaretX >= P)
-        and (CaretX <= P + Integer( StrLen(Keyword) )) ) then
-				begin
-					Result := True;
-          
-          if OpenKeyWord <> nil then
-						OpenKeyWord^ := False;
-
-					Exit;
-				end
-        else
-        	Delete(Line, 1, P + Integer( StrLen(Keyword) ));
-			until P = 0;
-		end;
-	end;
-begin
-	Result := False;
-  
-	if (fHighlighter <> nil) and (fHighlighter.FoldRegions.Count = 0) then
-  begin
-  	Result := False;
-  	Exit;
-  end
-  else if (fHighlighter <> nil) then
-  	Result := IsKeywordAtCursorPosForFoldRegions(OpenKeyWord,
-    	fHighlighter.FoldRegions);
-end;
-
-function TCustomSynEdit.FoldRangeForLineTo(
-  Line: Integer): TSynEditFoldRange;
-var
-	i: Integer;
-begin
-	Result := nil;
-  for i := 0 to fAllFoldRanges.AllCount - 1 do
-  	with fAllFoldRanges[i] do
-      if (not ParentCollapsed) and (ToLine = Line) then
-      begin
-      	Result := fAllFoldRanges[i];
-        Break;
-      end;
 end;
 
 function TCustomSynEdit.CollapsableFoldRangeForLine(Line: Integer; FoldCount:
@@ -11956,49 +11676,6 @@ begin
 		Result := 2;
 end;
 
-function TCustomSynEdit.CanExecuteInLine(aLine: Integer; aKey: Word): Boolean;
-var
-	FoldRange1, FoldRange2: TSynEditFoldRange;
-begin
-	Result := True;
-
-	if CodeFolding.Enabled or CodeFolding.IndentGuides then begin
-		FoldRange1 := CollapsableFoldRangeForLine(CaretY);
-
-		// if there is a collapsed fold range in current line then deny executing
-		if (FoldRange1 <> nil) and (not FoldRange1.ParentCollapsed) and (FoldRange1.Collapsed) then begin
-			// if selection is avaible
-			if SelAvail then begin
-				FoldRange1 := CollapsableFoldRangeForLine(BlockBegin.Line);
-				FoldRange2 := CollapsableFoldRangeForLine(BlockEnd.Line);
-
-				// only allow when selection begins at first char and ends at last char or vice versa in lines with collapsed folds }
-				if (FoldRange1 <> nil) and (FoldRange1.Collapsed) and (not FoldRange1.ParentCollapsed) then
-					if ((BlockBegin.Char = 1) and (BlockEnd.Char = Length(Lines[BlockEnd.Line - 1]) + 1))
-					or ((BlockEnd.Char = 1) and (BlockBegin.Char = Length(Lines[BlockBegin.Line - 1]) + 1)) then begin
-						if (aKey = VK_BACK) or (aKey = VK_DELETE) then
-							UpdateFoldRanges(CaretY,-1);
-						Result := True;
-					end;
-
-				if (FoldRange2 <> nil) and (FoldRange2.Collapsed) and (not FoldRange2.ParentCollapsed) then
-					if ((BlockBegin.Char = 1) and (BlockEnd.Char = Length(Lines[BlockEnd.Line - 1]) + 1))
-					or ((BlockEnd.Char = 1) and (BlockBegin.Char = Length(Lines[BlockBegin.Line - 1]) + 1)) then begin
-						if (aKey = VK_BACK) or (aKey = VK_DELETE) then
-							UpdateFoldRanges(CaretY,-1);
-						Result := True;
-					end;
-			end else begin
-				// Prevent key character and in-fold edits
-				if (aKey = VK_DELETE) and (CaretX >= Length(Lines[CaretY-1])) then
-					Result := False;
-				if (aKey = VK_BACK) and (CaretX = Length(Lines[CaretY-1])+1) then
-					Result := False;
-			end;
-		end;
-	end;
-end;
-
 procedure TCustomSynEdit.CollapseCurrent;
 var
 	Nearest, i: Integer;
@@ -12023,32 +11700,15 @@ begin
   end;
 end;
 
-function TCustomSynEdit.GetCollapseMarkRect(
-  FoldRange: TSynEditFoldRange; Row: Integer): TRect;
+function TCustomSynEdit.GetCollapseMarkRect(FoldRange: TSynEditFoldRange; Row: Integer): TRect;
 begin
 	Result.Top := (Row - TopLine) * LineHeight;
 	Result.Bottom := Result.Top + LineHeight;
-  Result.Left := FoldRange.HintMarkLeft;
+	Result.Left := FoldRange.HintMarkLeft;
 	Result.Right := Result.Left + CharWidth * 5;
 	InflateRect(Result, -CharWidth, 0);
 	Dec(Result.Bottom, 2);
 end;
-
-procedure TCustomSynEdit.CodeFoldingOnChange(Event: TSynCodeFoldingChanges);
-begin
-	if Event = fcEnabled then begin
-		if CodeFolding.Enabled then
-			Gutter.RightOffset := 21
-		else
-			Gutter.RightOffset := 2;
-	end else if Event = fcRescan then
-		InitCodeFolding;
-
-	Invalidate;
-end;
-//### End Code Folding ###
-
-// Orwell Mod: UpdateBmps used to be here, but never used
 
 function TCustomSynEdit.GetRealLineNumber(aLine: Integer): Integer;
 var
@@ -12070,6 +11730,8 @@ begin
 
 	Inc(Result, Diff);
 end;
+
+//### End Code Folding ###
 
 { TSynEditMark }
 
@@ -12263,6 +11925,56 @@ begin
     fOwner.fPlugins.Remove(Self);
   inherited Destroy;
 end;
+
+//### Code Folding ###
+{ TSynEditCodeFoldingPlugin }
+
+procedure TSynEditCodeFoldingPlugin.AfterPaint(ACanvas: TCanvas;const AClip: TRect; FirstLine, LastLine: integer);
+begin
+  inherited;
+end;
+
+constructor TSynEditCodeFoldingPlugin.Create(AOwner: TCustomSynEdit);
+begin
+	fOwner := AOwner;
+end;
+
+// Warning: Lines is under construction at this stage, please do not rely on it!
+procedure TSynEditCodeFoldingPlugin.LinesDeleted(FirstLine, Count: integer);
+var
+	i,RealFirstLine: Integer;
+	StartBC, EndBC: TBufferCoord;
+begin
+	// Del needs an offset to FirstLine
+	RealFirstLine := FirstLine;
+	if fOwner.fDelPressed then
+		Dec(RealFirstLine);
+
+	for i := fOwner.fAllFoldRanges.AllCount - 1 downto 0 do
+		with fOwner.fAllFoldRanges[i] do
+			if (Collapsed) and (not ParentCollapsed) and fOwner.SelAvail then
+				if ((Count = 1) and (FromLine = RealFirstLine)) or ((Count > 1) and (FromLine >= RealFirstLine) and (FromLine <= Pred(RealFirstLine + Count))) then begin
+					StartBC.Line := FromLine;
+					StartBC.Char := 1;
+					EndBC.Line := FromLine;
+					EndBC.Char := Length(fOwner.Lines[FromLine - 1]);
+					fOwner.fUndoList.AddChange(crDeleteCollapsedFold, StartBC, EndBC, '', fOwner.SelectionMode, fOwner.fAllFoldRanges[i], i);
+					fOwner.fAllFoldRanges.Delete(i);
+				end;
+
+	// Move it!
+	fOwner.MoveRangesFromBy(RealFirstLine, -Count);
+	inherited;
+end;
+
+// This is the perfect place to move ranges which is much faster than a rescan
+procedure TSynEditCodeFoldingPlugin.LinesInserted(FirstLine,Count: integer);
+begin
+	// Move it!
+	fOwner.MoveRangesFromBy(FirstLine, Count);
+	inherited;
+end;
+//### End Code Folding ###
 
 initialization
 {$IFNDEF SYN_CLX}

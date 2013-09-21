@@ -2012,7 +2012,11 @@ var
 begin
 	e:= GetEditor;
 	if Assigned(e) then
-		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[e.Text.GetRealLineNumber(e.Text.DisplayY), e.Text.DisplayX, e.Text.SelLength, e.Text.UnCollapsedLines.Count, Length(e.Text.UnCollapsedLines.Text)]);
+		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[ e.Text.GetRealLineNumber(e.Text.DisplayY),
+																	e.Text.DisplayX,
+																	e.Text.SelLength,
+																	e.Text.UnCollapsedLinesCount,
+																	e.Text.UnCollapsedLinesLength]);
 end;
 
 procedure TMainForm.SetStatusbarMessage(msg:string);
@@ -2054,12 +2058,10 @@ var
  pt: TPoint;
 begin
 	e:= GetEditor;
-	if assigned(e) then
-	 begin
-		 pt:= tbSpecials.ClientToScreen(point(Togglebtn.Left, Togglebtn.Top +togglebtn.Height));
-		 TrackPopupMenu(ToggleBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,
-			 pt.x, pt.y, 0, Self.Handle, nil);
-	 end;
+	if assigned(e) then begin
+		pt:= tbSpecials.ClientToScreen(point(Togglebtn.Left, Togglebtn.Top +togglebtn.Height));
+		TrackPopupMenu(ToggleBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.x, pt.y, 0, Self.Handle, nil);
+	end;
 end;
 
 procedure TMainForm.GotoBtnClick(Sender: TObject);
@@ -2825,8 +2827,13 @@ var
  e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then
+	if assigned(e) then begin
 		e.Text.Undo;
+
+		// Command messaging is broken, 'fix' it...
+		e.Text.ReScanForFoldRanges;
+		e.Text.GetUncollapsedStrings;
+	end;
 end;
 
 procedure TMainForm.actRedoExecute(Sender: TObject);
@@ -2834,8 +2841,13 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then
+	if assigned(e) then begin
 		e.Text.Redo;
+
+		// Command messaging is broken, 'fix' it...
+		e.Text.ReScanForFoldRanges;
+		e.Text.GetUncollapsedStrings;
+	end;
 end;
 
 procedure TMainForm.actCutExecute(Sender: TObject);
@@ -2845,7 +2857,7 @@ begin
 	e:= GetEditor;
 	if assigned(e) then begin
 		e.Text.CutToClipboard;
-		e.Text.Repaint;
+		//e.Text.Repaint;
 	end;
 end;
 
@@ -2865,7 +2877,12 @@ begin
 	e:= GetEditor;
 	if Assigned(e) then begin
 		e.Text.PasteFromClipboard;
-		e.Text.Repaint;
+
+		// Command messaging is broken, 'fix' it...
+		e.Text.ReScanForFoldRanges;
+		e.Text.GetUncollapsedStrings;
+
+		//e.Text.Repaint;
 	end;
 end;
 
@@ -6804,7 +6821,7 @@ end;
 
 procedure TMainForm.cmbMembersDropDown(Sender: TObject);
 var
-	widestwidth, curwidth, I : integer;
+	widestwidth, I : integer;
 begin
 	// Set to default width first...
 	SendMessage(cmbMembers.Handle, CB_SETDROPPEDWIDTH, 0, 0);
@@ -6815,13 +6832,13 @@ begin
 	cmbMembers.Canvas.Font.Name := 'Courier New';
 
 	// get the max needed with of the items in dropdown state
-	for I := 0 to cmbMembers.Items.Count-1 do begin
-		curwidth := cmbMembers.Canvas.TextWidth(cmbMembers.Items[I]) + 8; // padding
-		widestwidth := Max(widestwidth,curwidth);
-	end;
+	for I := 0 to cmbMembers.Items.Count-1 do
+		widestwidth := Max(widestwidth,cmbMembers.Canvas.TextWidth(cmbMembers.Items[I]) + 8); // padding
 
 	// set the width of drop down if needed
 	if(widestwidth > cmbMembers.Width) then begin
+
+		// Add scrollbar width
 		if cmbMembers.DropDownCount < cmbMembers.Items.Count then
 			widestwidth := widestwidth + GetSystemMetrics(SM_CXVSCROLL);
 

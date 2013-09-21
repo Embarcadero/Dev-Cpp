@@ -173,7 +173,6 @@ type
 
 	TSynCodeFolding = class(TPersistent)
   private
-    fHighlighterFoldRegions: Boolean;
     fCollapsedCodeHint: Boolean;
     fIndentGuides: Boolean;
     fShowCollapsedLine: Boolean;
@@ -193,7 +192,6 @@ type
     procedure SetCollapsedCodeHint(const Value: Boolean);
     procedure SetCollapsedLineColor(const Value: TColor);
     procedure SetCollapsingMarkStyle(const Value: TSynCollapsingMarkStyle);
-    procedure SetHighlighterFoldRegions(const Value: Boolean);
     procedure SetHighlightIndentGuides(const Value: Boolean);
     procedure SetIndentGuides(const Value: Boolean);
     procedure SetShowCollapsedLine(const Value: Boolean);
@@ -217,8 +215,6 @@ type
     	write SetFolderBarColor default clDefault;
     property FolderBarLinesColor: TColor read fFolderBarLinesColor
     	write SetFolderBarLinesColor default clDefault;
-    property HighlighterFoldRegions: Boolean read fHighlighterFoldRegions
-    	write SetHighlighterFoldRegions default True;
     property HighlightIndentGuides: Boolean read fHighlightIndentGuides
     	write SetHighlightIndentGuides default True;
     property IndentGuides: Boolean read fIndentGuides write SetIndentGuides
@@ -1498,7 +1494,6 @@ end;
 
 constructor TSynCodeFolding.Create;
 begin
-	fHighlighterFoldRegions := True;
   fCollapsingMarkStyle := msSquare;
   fShowCollapsedLine := True;
   fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
@@ -1568,13 +1563,6 @@ begin
 	fCollapsingMarkStyle := Value;
   
   if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetHighlighterFoldRegions(const Value: Boolean);
-begin
-	fHighlighterFoldRegions := Value;
-  
-  if Assigned(fOnChange) then fOnChange(fcRescan);
 end;
 
 procedure TSynCodeFolding.SetHighlightIndentGuides(const Value: Boolean);

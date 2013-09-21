@@ -33,8 +33,8 @@ const
 resourcestring
 	// misc strings
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.1.1.0 RC2';
-	DEVCPP_BUILDTIME     = 'Jan 7 2012 - 14:46';
+	DEVCPP_VERSION       = '5.1.1.0 RC3';
+	DEVCPP_BUILDTIME     = 'Jan 16 2012 - 21:38';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';

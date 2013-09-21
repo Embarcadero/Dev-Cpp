@@ -275,17 +275,18 @@ begin
 	with fText.CodeFolding do begin
 		Enabled := True;
 		IndentGuides := True;
-		CaseSensitive := False;
-		HighlighterFoldRegions := False;
+		CaseSensitive := True;
 		FolderBarColor := clBtnFace;
 		FolderBarLinesColor := clBlack;
 		CollapsingMarkStyle := TSynCollapsingMarkStyle(0);
 
 		with FoldRegions do begin
 			Add(rtChar, False, False, False, '{', '}', nil);
-			Add(rtKeyword, True, True, False, '/*', '*/', nil);
+			Add(rtKeyword, True, False, False, '/*', '*/', nil);
 		end;
 	end;
+
+	// Apply folding
 	fText.ReScanForFoldRanges;
 	fText.GetUncollapsedStrings;
 
@@ -653,8 +654,8 @@ begin
 		end;
 	end;
 
-	// Only update info when needed
-	if scSelection in Changes then
+	// Sluggish, but needed...
+	if (scSelection in Changes) then
 		MainForm.SetStatusbarLineCol;
 
 	if Changes * [scCaretX, scCaretY] <> [] then begin
@@ -1047,6 +1048,7 @@ begin
 				allowcompletion := false;
 
 		if allowcompletion then begin
+			cursorpos:=fText.CaretX;
 
 			// Kijken waar we op klikten
 			GetKeyboardState(keystate);
@@ -1067,10 +1069,12 @@ begin
 				InsertString(')',false);
 			end else if localizedkey = '[' then begin
 				InsertString(']',false);
+			end else if localizedkey = '*' then begin
+				if (cursorpos > 1) and (fText.LineText[cursorpos-1] = '/') then
+					InsertString('*/',false);
 			end else if localizedkey = '{' then begin
 
 				// If there's any text before the cursor...
-				cursorpos:=fText.CaretX;
 				if (cursorpos > 1) then begin
 
 					// See what the last nonwhite character before the cursor is
