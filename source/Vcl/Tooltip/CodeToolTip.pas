@@ -28,7 +28,7 @@
 //      Initial release
 //
 //    31/10/2003
-//      Complete rewrote of first version
+//      Complete rewrite of first version
 //
 //    01/11/2003
 //      Beautified code
@@ -70,7 +70,7 @@
 //      Turned of DropShadow by default, since it's a bit annoying for code tooltips
 //      Fixed 'Select' function. It now sets FCustomSelection to True
 //
-//    26/03/2204
+//    26/03/2004
 //      Fixed a bug where no hint appeared when the cursor was directly before a '('
 //
 //
@@ -80,9 +80,8 @@ unit CodeToolTip;
 // the xptooltip looks nicer than the original THintWindow
 // from delphi and yeah, it supports alphablending under win2k
 // and shadowing under win xp. it is is downwards compatible.
-// ttould run on win98 etc too!
+// should run on win98 etc too!
 {$DEFINE USE_XPTOOLTIP}
-
 
 interface
 uses
@@ -94,7 +93,6 @@ uses
   SysUtils, QDialogs, Classes, Xlib, QGraphics, QControls, QMenus, QForms, QStdCtrls,
   QSynEditKbdHandler, QSynEdit, QSynEditHighlighter, Types, XPToolTip;
 {$ENDIF}
-
 
 type
   TCustomCodeToolTipButton = class(TPersistent)
@@ -138,11 +136,10 @@ type
 
 
   { Options to customize the CodeToolTip behavior }
-  TToolTipOptions = set of 
+  TToolTipOptions = set of
   (
     ttoHideOnEnter,               // hides the tooltip when Return has been pressed
     ttoHideOnEsc,                 // hides the tooltip when ESC has been pressed
-    ttoPaintStipples,             // paints stippled under the current highlighted argument 
     ttoCurrentArgumentBlackOnly,  // force the current argument to be black only
     shoFindBestMatchingToolTip    // automatically find the best matching tooltip (for overloaded functions)
   );
@@ -203,7 +200,6 @@ type
     procedure Show; virtual;
   end;
 
-  
   TCodeToolTip = class(TBaseCodeToolTip)
   public
     property Activated;
@@ -219,9 +215,9 @@ type
     property StartWhenChr;
   end;
 
-  
 implementation
-
+uses
+	main;
 // contains the up/down buttons
 // i tried to draw them using DrawFrameControl first,
 // but it looked very bad, so I use a bitmap instead.
@@ -233,29 +229,24 @@ resourcestring
 var
  Identifiers : array[#0..#255] of ByteBool;
 
-  
-//----------------------------------------------------------------------------------------------------------------------
+procedure MakeIdentTable;
+var
+	c: char;
+begin
+	FillChar(Identifiers, SizeOf(Identifiers), 0);
 
-  procedure MakeIdentTable;
-  var
-    c: char;
-  begin
-    FillChar(Identifiers, SizeOf(Identifiers), 0);
+	for c := 'a' to 'z' do
+		Identifiers[c] := True;
 
-    for c := 'a' to 'z' do
-      Identifiers[c] := True;
+	for c := 'A' to 'Z' do
+		Identifiers[c] := True;
 
-    for c := 'A' to 'Z' do
-      Identifiers[c] := True;
+	for c := '0' to '9' do
+		Identifiers[c] := True;
 
-    for c := '0' to '9' do
-      Identifiers[c] := True;
+	Identifiers['_'] := True;
+end;
 
-    Identifiers['_'] := True;
-  end;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  
   function PreviousWordString(S: string; Index: Integer):string;
   var
     I: Integer;
@@ -286,12 +277,12 @@ var
     Result := Copy(S, Index, I-Index);
   end;
 
+// Returns name of function, so passing foo(bar) will return foo
 function GetPrototypeName(const S: string): string;
 var
 	iStart, iLen: Integer;
 begin
 	// functie(args) moet 'functie' returnen
-	Result := '';
 	iStart := AnsiPos('(', S);
 	iLen := 0;
 
@@ -307,9 +298,11 @@ begin
 		until (S[iStart] in [#0..#32]) or (iStart = 1); // This fixes an unsigned 0 - 1 range error
 
 		Result := Copy(S, iStart+1, iLen);
-	end;
+	end else
+		Result := '';
 end;
 
+// Count commas in the parameter list
 function CountCommas(const S: string): Integer;
 var
 	J: Integer;
@@ -323,130 +316,110 @@ end;
 
 constructor TCustomCodeToolTipButton.Create;
 begin
-  FLeft := 0;
-  FTop := 0;
-  FWidth := 9;
-  FHeight := 11;
+	FLeft := 0;
+	FTop := 0;
+	FWidth := 9;
+	FHeight := 11;
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 function TCustomCodeToolTipButton.ClientRect: TRect;
 begin
-  Result := Rect(FLeft, FTop, FLeft+FWidth, FTop+FHeight);
+	Result := Rect(FLeft, FTop, FLeft+FWidth, FTop+FHeight);
 end;
 
 //----------------- TCodeToolTipUpButton -------------------------------------------------------------------------------
 
 constructor TCodeToolTipUpButton.Create;
 begin
-  inherited;
+	inherited;
 
-  FBitmap := TBitmap.Create;
-  FBitmap.LoadFromResourceName(HInstance, 'UPBUTTON');
+	FBitmap := TBitmap.Create;
+	FBitmap.LoadFromResourceName(HInstance, 'UPBUTTON');
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 destructor TCodeToolTipUpButton.Destroy;
 begin
-  FBitmap.Free;
-  inherited;
+	FBitmap.Free;
+	inherited;
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 procedure TCodeToolTipUpButton.Paint(const TargetCanvas: TCanvas);
 begin
-  StretchBlt(TargetCanvas.Handle, FLeft, FTop, FWidth, FHeight, 
-    FBitmap.Canvas.Handle, 0, 0, FBitmap.Width, FBitmap.Height, SRCCOPY);
+	StretchBlt(TargetCanvas.Handle, FLeft, FTop, FWidth, FHeight, FBitmap.Canvas.Handle, 0, 0, FBitmap.Width, FBitmap.Height, SRCCOPY);
 end;
 
 //----------------- TCodeToolTipDownButton -----------------------------------------------------------------------------
 
 constructor TCodeToolTipDownButton.Create;
 begin
-  inherited;
+	inherited;
 
-  FBitmap := TBitmap.Create;
-  FBitmap.LoadFromResourceName(HInstance, 'DOWNBUTTON');
+	FBitmap := TBitmap.Create;
+	FBitmap.LoadFromResourceName(HInstance, 'DOWNBUTTON');
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 destructor TCodeToolTipDownButton.Destroy;
 begin
-  FBitmap.Free;
-  inherited;
+	FBitmap.Free;
+	inherited;
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 procedure TCodeToolTipDownButton.Paint(const TargetCanvas: TCanvas);
 begin
-  StretchBlt(TargetCanvas.Handle, FLeft, FTop, FWidth, FHeight, 
-    FBitmap.Canvas.Handle, 0, 0, FBitmap.Width, FBitmap.Height, SRCCOPY);
+	StretchBlt(TargetCanvas.Handle, FLeft, FTop, FWidth, FHeight, FBitmap.Canvas.Handle, 0, 0, FBitmap.Width, FBitmap.Height, SRCCOPY);
 end;
 
 //----------------- TBaseCodeToolTip ---------------------------------------------------------------------------------------
 
 constructor TBaseCodeToolTip.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+	inherited Create(AOwner);
 
 {$IFDEF USE_XPTOOLTIP}
-  DropShadow := False;
+	DropShadow := False;
 {$ENDIF}
-  
-  FLookupEditor := TSynEdit.Create(Self);
 
-  FOptions := [ttoHideOnEsc,ttoCurrentArgumentBlackOnly,shoFindBestMatchingToolTip];
-  
-  FBmp := TBitmap.Create;
-  with FBmp do
-  begin
-    PixelFormat := pf24Bit;
-    Width := Screen.Width; // worst case hintwidth
-    Height := 32;
-    Canvas.Font := Screen.HintFont;
-  end;
+	FLookupEditor := TSynEdit.Create(Self);
 
-  FToolTips := TStringList.Create;
-  with FToolTips do
-  begin
-    //Sorted := True;
-    CaseSensitive := True;
-    //Duplicates := dupIgnore;
-  end;
+	FOptions := [ttoHideOnEsc,ttoCurrentArgumentBlackOnly,shoFindBestMatchingToolTip];
 
-  // FDelimiters is used for the prototype-scanning.
-  // for example when your prototypes look like this:
-  //  procedure foo(a: Integer; b: Byte);
-  // then use FDelimiters := ';'
-  // If they are C stylish like
-  // void foo(int a, unsigned char b);
-  // then use FDelimiters := ',' 
-  FDelimiters := ',';
-  
-  FStartWhenChr := '('; // Start to check, when one of this char is pressed
-  EndWhenChr := ';\';
-  FActivateKey := ShortCut(Ord(#32), [ssCtrl,ssShift]);
-  FCurCharW := 0;
-  FCurShift := [];
+	FBmp := TBitmap.Create;
+	with FBmp do begin
+		PixelFormat := pf24Bit;
+		Width := Screen.Width; // worst case hintwidth
+		Height := 32;
+		Canvas.Font := Screen.HintFont;
+	end;
 
-  // since we supports scanning over multiple lines,
-  // we have a limit of how many chars we scan maximal...
-  FMaxScanLength := 1024;
+	FToolTips := TStringList.Create;
+	with FToolTips do begin
+		//Sorted := True;
+		CaseSensitive := True;
+		//Duplicates := dupIgnore;
+	end;
 
-  FKeyDownProc  := EditorKeyDown;
+	// This character is used to separate parameters...
+	FDelimiters := ',';
 
-  FUpButton := TCodeToolTipUpButton.Create;
-  FUpButton.Left := 4;
-  FUpButton.Top := 3;
+	FStartWhenChr := '('; // Start to check, when one of this char is pressed
+	EndWhenChr := ';\';
+	FActivateKey := ShortCut(Ord(#32), [ssCtrl,ssShift]);
+	FCurCharW := 0;
+	FCurShift := [];
 
-  FDownButton := TCodeToolTipDownButton.Create;
-  FDownButton.Left := 20; // unknown, it's calculated at runtime
-  FDownButton.Top := 3;
+	// since we support scanning over multiple lines,
+	// we have a limit of how many chars we scan maximal...
+	FMaxScanLength := 1024;
+
+	FKeyDownProc  := EditorKeyDown;
+
+	FUpButton := TCodeToolTipUpButton.Create;
+	FUpButton.Left := 4;
+	FUpButton.Top := 3;
+
+	FDownButton := TCodeToolTipDownButton.Create;
+	FDownButton.Left := 20; // unknown, it's calculated at runtime
+	FDownButton.Top := 3;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -476,85 +449,68 @@ begin
   // more tooltips ...
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-
+// Handles input of the tooltip...
 procedure TBaseCodeToolTip.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  FCurCharW := Key;
-  FCurShift := Shift;
+	FCurCharW := Key;
+	FCurShift := Shift;
 
-  if FActivateKey = Shortcut(Key, Shift) then Show;
-  
-  if Activated then
-  begin
-    case Key of
+	if FActivateKey = Shortcut(Key, Shift) then Show;
+
+	if Activated then begin
+		case Key of
 {$IFDEF WIN32}
-      VK_ESCAPE:
-        begin
-          if (ttoHideOnESC in FOptions) then ReleaseHandle;
-        end;
-        
-      VK_RETURN:
-        begin
-          if (ttoHideOnEnter in FOptions) then ReleaseHandle
-          else Show;
-        end; 
+			VK_ESCAPE: begin
 {$ENDIF}
 {$IFDEF LINUX}
-      XK_ESCAPE:
-        begin
-          if (ttoHideOnESC in FOptions) then ReleaseHandle;
-        end;
-        
-      XK_RETURN:
-        begin
-          if (ttoHideOnEnter in FOptions) then ReleaseHandle
-          else Show;
-        end; 
+			XK_ESCAPE: begin
 {$ENDIF}
-    end;
-  end;
+				if (ttoHideOnESC in FOptions) then ReleaseHandle;
+			end;
+{$IFDEF WIN32}
+			VK_RETURN: begin
+{$ENDIF}
+{$IFDEF LINUX}
+			XK_RETURN: begin
+{$ENDIF}
+				if (ttoHideOnEnter in FOptions) then ReleaseHandle else Show;
+			end;
+		end;
+	end;
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-
+// Blabla.
 function TBaseCodeToolTip.FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
 var
-  I,K: Integer;
-  NewIndex: Integer;
-  Str: string;
-  LastCommaCnt: Integer;
+	I,K: Integer;
+	NewIndex: Integer;
+	Str: string;
+	LastCommaCnt: Integer;
 begin
-  LastCommaCnt := 4096;
-  NewIndex := 0;
-  Result := GetPrototypeName(FToolTips.Strings[FSelIndex]);
-         
-  // current commacount fits still in the selected tooltip and just do nothing
-  if ToolTip = FToolTips.Strings[FSelIndex] then
-    if CountCommas(FToolTips.Strings[FSelIndex]) <= CommaIndex then Exit;
+	// If we reached a comma index that does not exist, quit
+	if ToolTip = FToolTips.Strings[FSelIndex] then
+		if CountCommas(FToolTips.Strings[FSelIndex]) <= CommaIndex then Exit;
 
+	LastCommaCnt := 9999;
+	NewIndex := 0;
 
-  // loop through the list and find the closest matching tooltip
-  // we compare the comma counts
-  for I := 0 to FToolTips.Count-1 do
-  begin
-    Str := GetPrototypeName(FToolTips.Strings[I]);
-    if Str = ToolTip then
-    begin
-      K := CountCommas(FToolTips.Strings[I]);
-      if K >= CommaIndex then
-      begin
-        if K < LastCommaCnt then
-        begin
-          NewIndex := I;
-          LastCommaCnt := K;
-        end;
-      end; 
-    end;
-  end;
-  
-  Result := FToolTips.Strings[NewIndex];
-  SelIndex := NewIndex;
+	// loop through the list and find the closest matching tooltip
+	// we compare the comma counts
+	for I := 0 to FToolTips.Count-1 do begin
+		Str := GetPrototypeName(FToolTips.Strings[I]);
+		if Str = ToolTip then begin
+			K := CountCommas(FToolTips.Strings[I]);
+			if K >= CommaIndex then begin
+				if K < LastCommaCnt then begin
+					NewIndex := I;
+					LastCommaCnt := K;
+				end;
+			end;
+		end;
+	end;
+
+	Result := FToolTips.Strings[NewIndex];
+	SelIndex := NewIndex;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -624,31 +580,22 @@ var
 
 begin
 
-  Result := 0;
-  I := BraceStart;
+	Result := 0;
+	I := BraceStart;
 
-  while I < CurPos do
-  begin
-    case P[i] of
-      // strings
-      '"': 
-        SkipStrings;
+	while I <= CurPos do begin
+		if P[i] = '"' then begin
+			SkipStrings;
+		end else if P[i] = '/' then begin
+			if P[i+1] = '/' then
+				SkipLine
+			else if P[i+1] = '*' then
+				SkipCommentBlock;
+		end else if P[i] = ',' then
+			Inc(Result);
 
-      // comments
-      '/':
-        if P[i+1] = '/' then
-          SkipLine
-        else
-        if P[i+1] = '*' then
-          SkipCommentBlock;
-
-      // commas
-      ',':
-        Inc(Result);
-    end;
-
-    Inc(i);
-  end;
+		Inc(i);
+	end;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -657,7 +604,7 @@ procedure TBaseCodeToolTip.MouseDown(Button: TMouseButton; Shift: TShiftState; X
 var
   Pt: TPoint;
   NeedRefresh: Boolean;
-begin  
+begin
   inherited;
   
   if mbLeft = Button then
@@ -692,77 +639,59 @@ begin
   end;
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-
+// This function paints the tooltip to FBmp and copies it to the tooltip client surface
 procedure TBaseCodeToolTip.Paint;
 begin
-  PaintToolTip;
-  Canvas.CopyRect(ClientRect, FBmp.Canvas, ClientRect);
+	PaintToolTip;
+	Canvas.CopyRect(ClientRect, FBmp.Canvas, ClientRect);
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 function TBaseCodeToolTip.PaintToolTip:Integer;
 const
-  cStipple : array [0..3] of Integer = (0,1,2,1);
+	cStipple : array [0..3] of Integer = (0,1,2,1);
 var
- BracePos: Integer;
- WidthParam: Integer;
- I: Integer;
- CurParam: Integer;
- StrToken,S: string;
+	BracePos: Integer;
+	WidthParam: Integer;
+	I: Integer;
+	CurParam: Integer;
+	StrToken,S: string;
 {$IFDEF WIN32}
- CurChar: Char;
+	CurChar: Char;
 {$ENDIF}
 {$IFDEF LINUX}
- CurChar: WideChar;
+	CurChar: WideChar;
 {$ENDIF}
 
-  procedure DrawParamLetterEx(Index: Integer; CurrentParam: Boolean=False);
-  var
-    J: Integer;
-    CharW: Integer;
-    CharH: Integer;
-    HLAttr: TSynHighlighterAttributes;
-  begin
-    // we use a lookup editor to get the syntax coloring
-    // for our tooltips :)
-    FLookupEditor.CaretX := Index;
-    FLookupEditor.GetHighlighterAttriAtRowCol(FLookupEditor.CaretXY, StrToken, HLAttr);
-    
-    with FBmp.Canvas do
-    begin
-      Brush.Style := bsClear;
-      if HLAttr <> nil then
-        Font.Color := HLAttr.Foreground;
+	procedure DrawParamLetterEx(Index: Integer; CurrentParam: Boolean=False);
+	var
+		HLAttr: TSynHighlighterAttributes;
+	begin
+		// we use a lookup editor to get the syntax coloring
+		// for our tooltips :)
+		FLookupEditor.CaretX := Index;
+		FLookupEditor.GetHighlighterAttriAtRowCol(FLookupEditor.CaretXY, StrToken, HLAttr);
 
-      // if it is the word where the cursor currently is
-      // we draw it in bold and also check for further drawing options
-      if CurrentParam then
-      begin
-        Font.Style := [fsBold];
-        if (ttoCurrentArgumentBlackOnly in FOptions) then
-          Font.Color := clBlack;
-      end
-      else if HLAttr <> nil then
-        Font.Style := HLAttr.Style;
-      
-      CharH := TextHeight('Wg');
-      CharW := TextWidth(FLookupEditor.Text[Index]);
+		with FBmp.Canvas do begin
+			Brush.Style := bsClear;
+			Font.Color := clCaptionText;
 
-      // draw the stipple line under the current param-char
-      if CurrentParam and (ttoPaintStipples in FOptions) then
-      begin
-        for J := 0 to CharW do
-          Pixels[WidthParam+J, CharH-cStipple[J and 3]] := clRed;
-      end;
+			// if it is the word where the cursor currently is
+			// we draw it in bold and also check for further drawing options
+			if CurrentParam then begin
+				Font.Style := [fsBold];
+				if (ttoCurrentArgumentBlackOnly in FOptions) then
+					Font.Color := clBlack;
+			end else if AnsiPos('(',FLookupEditor.Text) > Index then
+				Font.Style := HLAttr.Style
+			else
+				Font.Style := []; // Don't highlight
 
-      // draw the char and then increase the current width by the
-      // width of the just drawn char ...
-      TextOut(WidthParam, 1, FLookupEditor.Text[Index]);
-      Inc(WidthParam, CharW);
-    end;
-  end;
+			// draw the char and then increase the current width by the
+			// width of the just drawn char ...
+			TextOut(WidthParam, 1, FLookupEditor.Text[Index]);
+			Inc(WidthParam, TextWidth(FLookupEditor.Text[Index]));
+		end;
+	end;
 begin
 
   BracePos := AnsiPos('(', Caption);

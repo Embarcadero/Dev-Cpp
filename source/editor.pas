@@ -1759,7 +1759,7 @@ begin
 						if Assigned(fLastParamFunc) then begin
 							if (fLastParamFunc.Count > 0) then
 								if (PStatement(fLastParamFunc.Items[0])^._Command = lookup) then // this avoid too much calls to CppParser.FillListOf
- 									sl := fLastParamFunc;
+									sl := fLastParamFunc;
 						end;
 						if not Assigned(sl) then begin
 							//P:=MainForm.CppParser1.Locate(lookup, False);  // we should really avoid a Locate for each char typed, this call takes a long time to execute when the cache is huge
@@ -1795,24 +1795,18 @@ procedure TEditor.DoOnCodeCompletion(Sender: TObject; const AStatement: TStateme
 //  or in other words, when it did a codecompletion ...
 //
 begin
-  // disable the tooltip here, becasue we check against Enabled
-  // in the 'EditorStatusChange' event to prevent it's redrawing there
-  if FCodeToolTip <> nil then
-  begin
-    //FCodeToolTip may not be initialized under some
-    //circumstances when create TEditor
-    //I suspect it's in TProject.OpenUnit --specu
-    FCodeToolTip.Enabled := False;
-    FCodeToolTip.ReleaseHandle;
-    FCodeToolTip.Show;
-    FCodeToolTip.Select(AStatement._FullText);
-    FCodeToolTip.Enabled := True;
-  end;
-
-  // ???: when we don't invalidate the SynEditor here, it occurs sometimes
-  //      that fragments of the codecompletion listbox are stuff displayed
-  //      on the SynEdit. - strange :)
-  fText.Invalidate;
+	// disable the tooltip here, becasue we check against Enabled
+	// in the 'EditorStatusChange' event to prevent it's redrawing there
+	if FCodeToolTip <> nil then begin
+		//FCodeToolTip may not be initialized under some
+		//circumstances when create TEditor
+		//I suspect it's in TProject.OpenUnit --specu
+		FCodeToolTip.Enabled := False;
+		FCodeToolTip.ReleaseHandle;
+		FCodeToolTip.Show;
+		FCodeToolTip.Select(AStatement._FullText);
+		FCodeToolTip.Enabled := True;
+	end;
 end;
 
 // Editor needs to be told when class browser has been recreated otherwise AV !

@@ -8,21 +8,21 @@
   resources were bound to the produced executable.
 */
 
-#define main_cCurSrc 65088
-#define main_cSrcPath 65089
-#define main_cDevVer 65090
-#define main_cDefault 65091
-#define main_cExecDir 65092
-#define main_cSrcList 65093
-#define main_cWordxy 65094
-#define compiler_cAppendStr 65095
-#define compiler_cCmdLine 65096
-#define compiler_cMakeLine 65097
-#define compiler_cSingleFileMakeLine 65098
-#define compiler_cMake 65099
-#define compiler_cDots 65100
+#define main_cSrcPath 65088
+#define main_cDevVer 65089
+#define main_cDefault 65090
+#define main_cExecDir 65091
+#define main_cSrcList 65092
+#define main_cWordxy 65093
+#define compiler_cAppendStr 65094
+#define compiler_cCmdLine 65095
+#define compiler_cMakeLine 65096
+#define compiler_cSingleFileMakeLine 65097
+#define compiler_cMake 65098
+#define compiler_cDots 65099
+#define compiler_cAppendStr 65100
 #define compiler_cAppendStr 65101
-#define compiler_cAppendStr 65102
+#define CodeToolTip_SCodeToolTipIndexXOfX 65102
 #define version_FLT_RES 65104
 #define version_FLT_HELPS 65105
 #define version_FLT_MSVCPROJECTS 65106
@@ -31,14 +31,14 @@
 #define version_cABP 65109
 #define version_cGut 65110
 #define version_cSel 65111
-#define CodeToolTip_SCodeToolTipIndexXOfX 65112
-#define Templates_cTemplate 65113
-#define Templates_cEditor 65114
-#define Templates_cProject 65115
-#define main_cEXEName 65116
-#define main_cPrjName 65117
-#define main_cPrjFile 65118
-#define main_cPrjPath 65119
+#define Templates_cTemplate 65112
+#define Templates_cEditor 65113
+#define Templates_cProject 65114
+#define main_cEXEName 65115
+#define main_cPrjName 65116
+#define main_cPrjFile 65117
+#define main_cPrjPath 65118
+#define main_cCurSrc 65119
 #define version_WINDRES_PROGRAM 65120
 #define version_DLLWRAP_PROGRAM 65121
 #define version_GPROF_PROGRAM 65122
@@ -457,7 +457,6 @@
 #define SysConst_SDiskFull 65535
 STRINGTABLE
 BEGIN
-	main_cCurSrc,	"<SOURCENAME>"
 	main_cSrcPath,	"<SOURCEPATH>"
 	main_cDevVer,	"<DEVCPPVERSION>"
 	main_cDefault,	"<DEFAULT>"
@@ -472,6 +471,7 @@ BEGIN
 	compiler_cDots,	"..."
 	compiler_cAppendStr,	"%s -L\"%s\""
 	compiler_cAppendStr,	"%s -I\"%s\" "
+	CodeToolTip_SCodeToolTipIndexXOfX,	"%d / %d"
 	version_FLT_RES,	"Resource scripts (*.rc)|*.rc"
 	version_FLT_HELPS,	"Help files (*.hlp;*.chm;*.col)|*.hlp;*.chm;*.col|HTML files (*.htm;*.html)|*.htm;*.html|Text files (*.doc;*.rtf;*.txt)|*.doc;*.rtf;*.txt|All files (*.*)|*.*"
 	version_FLT_MSVCPROJECTS,	"MS Visual C++ projects (*.dsp)|*.dsp"
@@ -480,7 +480,6 @@ BEGIN
 	version_cABP,	"Active Breakpoints"
 	version_cGut,	"Gutter"
 	version_cSel,	"Selected text"
-	CodeToolTip_SCodeToolTipIndexXOfX,	"%d / %d"
 	Templates_cTemplate,	"Template"
 	Templates_cEditor,	"Editor"
 	Templates_cProject,	"Project"
@@ -488,6 +487,7 @@ BEGIN
 	main_cPrjName,	"<PROJECTNAME>"
 	main_cPrjFile,	"<PROJECTFILE>"
 	main_cPrjPath,	"<PROJECTPATH>"
+	main_cCurSrc,	"<SOURCENAME>"
 	version_WINDRES_PROGRAM,	"windres.exe"
 	version_DLLWRAP_PROGRAM,	"dllwrap.exe"
 	version_GPROF_PROGRAM,	"gprof.exe"
@@ -545,7 +545,7 @@ BEGIN
 	SynEditTextBuffer_SListIndexOutOfBounds,	"Invalid stringlist index %d"
 	SynEditTextBuffer_SInvalidCapacity,	"Stringlist capacity cannot be smaller than count"
 	version_DEVCPP,	"Dev-C++"
-	version_DEVCPP_VERSION,	"5.0.0.5"
+	version_DEVCPP_VERSION,	"5.0.0.5 Beta 5"
 	version_DEFAULT_LANG_FILE,	"English.lng"
 	version_DEV_INTERNAL_OPEN,	"$__DEV_INTERNAL_OPEN"
 	version_DEV_SEARCHLOOP,	"$__DEV_SEARCH_LOOP"
