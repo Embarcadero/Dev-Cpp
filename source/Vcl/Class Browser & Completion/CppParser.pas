@@ -189,6 +189,7 @@ type
     procedure DeleteTemporaries;
     function FindIncludeRec(Filename: string; DeleteIt: boolean = False): PIncludesRec;
   public
+    procedure FixIndices;
     function GetFileIncludes(Filename: string): string;
     function IsCfile(Filename: string): boolean;
     function IsHfile(Filename: string): boolean;
@@ -220,7 +221,6 @@ type
     procedure ScanAndSaveGlobals(FileName: TFileName);
     procedure PostProcessInheritance;
     procedure ReProcessInheritance;
-    function IndexOfStatement(ID: integer): integer;
     function Locate(Full: string; WithScope: boolean): PStatement;
     function FillListOf(Full: string; WithScope: boolean; List: TList): boolean;
     function FindAndScanBlockAt(Filename: string; Row: integer; Stream: TStream = nil): integer;
@@ -492,82 +492,80 @@ var
   ExistingID: integer;
   NewKind: TStatementKind;
 begin
-  // move '*', '&' to type rather than cmd (it's in the way for code-completion)
-  while (Length(StCommand) > 0) and
-    (stCommand[1] in ['*', '&']) do begin
-    StType := StType + StCommand[1];
-    StCommand := Copy(StCommand, 2, Length(StCommand) - 1);
-  end;
+	// move '*', '&' to type rather than cmd (it's in the way for code-completion)
+	while (Length(StCommand) > 0) and (stCommand[1] in ['*', '&']) do begin
+		StType := StType + StCommand[1];
+		StCommand := Copy(StCommand, 2, Length(StCommand) - 1);
+	end;
 
-  NewKind := Kind;
+	NewKind := Kind;
 
-  // strip class prefix (e.g. MyClass::SomeFunc() = SomeFunc() )
-  if Kind = skFunction then begin
-    if AnsiPos('::', StCommand) > 0 then begin
-      StScopeless := Copy(StCommand, AnsiPos('::', StCommand) + 2, Length(StCommand) - AnsiPos('::', StCommand) + 3);
-      if AnsiCompareStr(Copy(StCommand, 1, AnsiPos('::', StCommand) - 1), StScopeless) = 0 then
-        NewKind := skConstructor
-      else if AnsiCompareStr('~' + Copy(StCommand, 1, AnsiPos('::', StCommand) - 1), StScopeless) = 0 then
-        NewKind := skDestructor;
-    end
-    else
-      StScopeless := StCommand;
-  end
-  else
-    StScopeless := StCommand;
+	// strip class prefix (e.g. MyClass::SomeFunc() = SomeFunc() )
+	if Kind = skFunction then begin
+		if AnsiPos('::', StCommand) > 0 then begin
+			StScopeless := Copy(StCommand, AnsiPos('::', StCommand) + 2, Length(StCommand) - AnsiPos('::', StCommand) + 3);
+			if AnsiCompareStr(Copy(StCommand, 1, AnsiPos('::', StCommand) - 1), StScopeless) = 0 then
+				NewKind := skConstructor
+			else if AnsiCompareStr('~' + Copy(StCommand, 1, AnsiPos('::', StCommand) - 1), StScopeless) = 0 then
+				NewKind := skDestructor;
+		end else
+			StScopeless := StCommand;
+	end else
+		StScopeless := StCommand;
 
-  //only search for certain kinds of statements
-  if not AllowDuplicate {and not fIsHeader} then
-    ExistingID := CheckIfCommandExists(StScopeless, Kind) //, True, ParentID)
-  else
-    ExistingID := -1;
+	//only search for certain kinds of statements
+	if not AllowDuplicate {and not fIsHeader} then
+		ExistingID := CheckIfCommandExists(StScopeless, Kind) //, True, ParentID)
+	else
+		ExistingID := -1;
 
-  if (ExistingID <> -1) and (IsDeclaration <> PStatement(fStatementList[ExistingID])^._IsDeclaration) then begin // if it existed before, set the decl_impl index
-    PStatement(fStatementList[ExistingID])^._DeclImplLine := Line;
-    PStatement(fStatementList[ExistingID])^._DeclImplFileName := FileName;
-    if (NewKind in [skConstructor, skDestructor]) and (PStatement(fStatementList[ExistingID])^._Kind = skFunction) then
-      PStatement(fStatementList[ExistingID])^._Kind := NewKind;
-    if (Kind = skFunction) and (AnsiPos('::', StCommand) > 0) then
-      PStatement(fStatementList[ExistingID])^._ScopeCmd := StCommand;
-    Result := ExistingID;
-  end
-  else begin // or else...
-    Statement := New(PStatement);
-    with Statement^ do begin
-      if ID = -1 then
-        _ID := fNextID //fStatementList.Count
-      else
-        _ID := ID;
-      Result := _ID;
-      _ParentID := ParentID;
-      _FileName := FileName;
-      _FullText := FullText;
-      _ScopelessCmd := StScopeless;
-      _ScopeCmd := StCommand;
-      _Type := StType;
-      _Command := StCommand;
-      _Args := StArgs;
+	if (ExistingID <> -1) and (IsDeclaration <> PStatement(fStatementList[ExistingID])^._IsDeclaration) then begin // if it existed before, set the decl_impl index
+		PStatement(fStatementList[ExistingID])^._DeclImplLine := Line;
+		PStatement(fStatementList[ExistingID])^._DeclImplFileName := FileName;
+		if (NewKind in [skConstructor, skDestructor]) and (PStatement(fStatementList[ExistingID])^._Kind = skFunction) then
+			PStatement(fStatementList[ExistingID])^._Kind := NewKind;
+		if (Kind = skFunction) and (AnsiPos('::', StCommand) > 0) then
+			PStatement(fStatementList[ExistingID])^._ScopeCmd := StCommand;
+		Result := ExistingID;
+	end else begin
+		Statement := New(PStatement);
+		with Statement^ do begin
+
+			if ID = -1 then
+				_ID := fNextID //fStatementList.Count
+			else
+				_ID := ID;
+			Result := _ID;
+
+			_ParentID := ParentID;
+			_FileName := FileName;
+			_FullText := FullText;
+			_ScopelessCmd := StScopeless;
+			_ScopeCmd := StCommand;
+			_Type := StType;
+			_Command := StCommand;
+			_Args := StArgs;
 //      if Kind = skFunction then
 //        _MethodArgs := ScanMethodArgs(StArgs, fLaterScanning, fCurrentFile, Line, ParentID)
 //      else
-      _MethodArgs := StArgs;
-      _Line := Line;
-      _Kind := NewKind;
-      _Scope := Scope;
-      _ClassScope := ClassScope;
-      _IsDeclaration := IsDeclaration;
-      _DeclImplLine := Line;
-      _DeclImplFileName := FileName;
-      _Visible := fVisible and VisibleStatement;
-      _Valid := IsValid;
-      _Loaded := False;
-      _Temporary := fLaterScanning;
-      _NoCompletion := (NewKind = skFunction) and AnsiStartsStr('operator', StScopeless);
-      _InProject := fIsProjectFile;
-    end;
-    fStatementList.Add(Statement);
-    Inc(fNextID);
-  end;
+			_MethodArgs := StArgs;
+			_Line := Line;
+			_Kind := NewKind;
+			_Scope := Scope;
+			_ClassScope := ClassScope;
+			_IsDeclaration := IsDeclaration;
+			_DeclImplLine := Line;
+			_DeclImplFileName := FileName;
+			_Visible := fVisible and VisibleStatement;
+			_Valid := IsValid;
+			_Loaded := False;
+			_Temporary := fLaterScanning;
+			_NoCompletion := (NewKind = skFunction) and AnsiStartsStr('operator', StScopeless);
+			_InProject := fIsProjectFile;
+		end;
+		fStatementList.Add(Statement);
+		Inc(fNextID);
+	end;
 end;
 
 function TCppParser.GetCurrentClass: integer;
@@ -1815,6 +1813,7 @@ begin
 			fOnEndParsing(Self);
 	end;
 	fStatementList.Pack;
+
 	if Assigned(fOnTotalProgress) then
 		fOnTotalProgress(Self, '', 0, 0);
 	if Assigned(fOnLogStatement) then
@@ -1973,12 +1972,27 @@ begin
     end;
 end;
 
+procedure TCppParser.FixIndices;
+var
+	I,J: integer;
+begin
+	// Fix the 'actual index' <> ID unhandiness, thanks to this we don't need the slow getID function anymore!
+	for I:= fBaseIndex to Statements.Count-1 do begin
+
+		for J:= fBaseIndex to Statements.Count-1 do begin
+			if PStatement(Statements[J])^._ParentID = PStatement(Statements[I])^._ID then
+				PStatement(Statements[J])^._ParentID := I;
+		end;
+		PStatement(Statements[I])^._ID := I;
+	end;
+end;
+
 procedure TCppParser.ReParseFile(FileName: TFileName; InProject: boolean; OnlyIfNotParsed: boolean; UpdateView: boolean);
 var
   FName: string;
   CFile, HFile: string;
   IsVisible: boolean;
-  I: integer;
+  I : integer;
 begin
   if not fEnabled then
     Exit;
@@ -2003,8 +2017,7 @@ begin
       fProjectFiles.Add(CFile);
     if (HFile <> '') and (fProjectFiles.IndexOf(HFile) = -1) then
       fProjectFiles.Add(HFile);
-  end
-  else begin
+  end else begin
     I := fProjectFiles.IndexOf(CFile);
     if I <> -1 then
       fProjectFiles.Delete(I);
@@ -2012,6 +2025,7 @@ begin
     if I <> -1 then
       fProjectFiles.Delete(I);
   end;
+
   fFilesToScan.Clear;
   fReparsing := True;
   Parse(HFile, not IsGlobalFile(HFile), True);
@@ -2037,7 +2051,6 @@ begin
     if Assigned(fOnEndParsing) then
       fOnEndParsing(Self);
   end;
-
   fReparsing := False;
   if UpdateView then
     if Assigned(fOnUpdate) then
@@ -2046,39 +2059,42 @@ end;
 
 procedure TCppParser.InvalidateFile(FileName: TFileName);
 var
-  I: integer;
-  I1: integer;
-  P: PIncludesRec;
+	I: integer;
+	I1: integer;
+	P: PIncludesRec;
 begin
-  if Filename = '' then
-    Exit;
+	if Filename = '' then
+		Exit;
 
-  // POSSIBLE PROBLEM:
-  // here we delete all the statements that belong to the specified file.
-  // what happens with the statements that have _ParentID on one of these???
-  // what happens with the statements that inherit from one of these???
-  // POSSIBLE WORKAROUND 1: invalidate the other file too (don't like it much...)
-  I := 0;
-  // delete statements from file
-  while I < fStatementList.Count do
-    if (AnsiCompareStr(PStatement(fStatementList[I])^._FileName, FileName) = 0) or
-      (AnsiCompareStr(PStatement(fStatementList[I])^._DeclImplFileName, FileName) = 0) then begin
-      if PStatement(fStatementList[I])^._Kind = skClass then // only classes have inheritance
-        fInvalidatedIDs.Add(PStatement(fStatementList[I])^._ID);
-      Dispose(PStatement(fStatementList[I]));
-      fStatementList.Delete(I);
-    end
-    else
-      Inc(I);
-  fStatementList.Pack;
-  // delete it from scannedfiles
-  I1 := fScannedFiles.IndexOf(FileName);
-  if I1 <> -1 then
-    fScannedFiles.Delete(I1);
-  // remove its include files list
-  P := FindIncludeRec(FileName, True);
-  if Assigned(P) then
-    Dispose(P);
+	// POSSIBLE PROBLEM:
+	// here we delete all the statements that belong to the specified file.
+	// what happens with the statements that have _ParentID on one of these???
+	// what happens with the statements that inherit from one of these???
+	// POSSIBLE WORKAROUND 1: invalidate the other file too (don't like it much...)
+
+	// delete statements from file
+	I := 0;
+	while I < fStatementList.Count do
+		if (AnsiCompareStr(PStatement(fStatementList[I])^._FileName, FileName) = 0) or (AnsiCompareStr(PStatement(fStatementList[I])^._DeclImplFileName, FileName) = 0) then begin
+			if PStatement(fStatementList[I])^._Kind = skClass then // only classes have inheritance
+				fInvalidatedIDs.Add(I);
+
+			Dispose(PStatement(fStatementList[I]));
+			fStatementList.Delete(I);
+		end else
+			Inc(I);
+
+	fStatementList.Pack;
+
+	// delete it from scannedfiles
+	I1 := fScannedFiles.IndexOf(FileName);
+	if I1 <> -1 then
+		fScannedFiles.Delete(I1);
+
+	// remove its include files list
+	P := FindIncludeRec(FileName, True);
+	if Assigned(P) then
+		Dispose(P);
 end;
 
 procedure TCppParser.ScanAndSaveGlobals(FileName: TFileName);
@@ -2111,225 +2127,233 @@ end;
 
 procedure TCppParser.Save(FileName: TFileName);
 var
-  hFile: integer;
-  I, I2, HowMany: integer;
-  MAGIC: array[0..7] of Char;
-  P: array[0..8191] of Char;
+	hFile: integer;
+	I, I2, HowMany: integer;
+	MAGIC: array[0..7] of Char;
+	P: array[0..8191] of Char;
 begin
-  MAGIC := 'CPPP 0.1';
-  fCacheContents.Assign(fScannedFiles);
-  if FileExists(FileName) then
-    DeleteFile(FileName);
-  hFile := FileCreate(FileName);
-  if hFile > 0 then begin
-    FileWrite(hFile, MAGIC, SizeOf(MAGIC));
+	MAGIC := 'CPPP 0.1';
+	fCacheContents.Assign(fScannedFiles);
+	if FileExists(FileName) then
+		DeleteFile(FileName);
+	hFile := FileCreate(FileName);
+	if hFile > 0 then begin
+		FileWrite(hFile, MAGIC, SizeOf(MAGIC));
 
-    // write statements
-    HowMany := fStatementList.Count - 1;
-    FileWrite(hFile, HowMany, SizeOf(Integer));
-    for I := 0 to fStatementList.Count - 1 do begin
-      with PStatement(fStatementList[I])^ do begin
-       { if Length(_FullText) > SizeOf(P) then begin
-          tmp := FileSeek(hFile, 0, 1);  // retrieve currrent pos
-          FileSeek(hFile, SizeOf(Magic), 0); // seek to the number of statements
-          HowMany := HowMany - 1;
-          FileWrite(hFile, HowMany, SizeOf(Integer)); // write new number of statements
-          FileSeek(hFile, tmp, 0); // seek to original offset
-          Continue;
-        end;   }
-        FileWrite(hFile, _ID, SizeOf(integer));
-        FileWrite(hFile, _ParentID, SizeOf(integer));
-        FileWrite(hFile, _Kind, SizeOf(byte));
-        FileWrite(hFile, _Scope, SizeOf(integer));
-        FileWrite(hFile, _ClassScope, SizeOf(integer));
-        FileWrite(hFile, _IsDeclaration, SizeOf(boolean));
-        FileWrite(hFile, _DeclImplLine, SizeOf(integer));
-        FileWrite(hFile, _Line, SizeOf(integer));
-        I2 := Length(_FullText);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _FullText);
-        FileWrite(hFile, P, I2);
-        I2 := Length(_Type);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _Type);
-        FileWrite(hFile, P, I2);
-        I2 := Length(_Command);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _Command);
-        FileWrite(hFile, P, I2);
-        I2 := Length(_Args);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _Args);
-        FileWrite(hFile, P, I2);
-        I2 := Length(_ScopelessCmd);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _ScopelessCmd);
-        FileWrite(hFile, P, I2);
-        I2 := Length(_DeclImplFileName);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _DeclImplFileName);
-        FileWrite(hFile, P, I2);
-        I2 := Length(_FileName);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _FileName);
-        FileWrite(hFile, P, I2);
-        I2 := Length(_InheritsFromIDs);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _InheritsFromIDs);
-        FileWrite(hFile, P, I2);
-        I2 := Length(_InheritsFromClasses);
-        FileWrite(hFile, I2, SizeOf(Integer));
-        StrPCopy(P, _InheritsFromClasses);
-        FileWrite(hFile, P, I2);
-      end;
-    end;
+		// write statements
+		HowMany := fStatementList.Count - 1;
+		FileWrite(hFile, HowMany, SizeOf(Integer));
+		for I := 0 to HowMany do begin
+			with PStatement(fStatementList[I])^ do begin
 
-    // write scanned files (cache contents)
-    I := fScannedFiles.Count - 1;
-    FileWrite(hFile, I, SizeOf(Integer));
-    for I := 0 to fScannedFiles.Count - 1 do begin
-      I2 := Length(fScannedFiles[I]);
-      FileWrite(hFile, I2, SizeOf(Integer));
-      StrPCopy(P, fScannedFiles[I]);
-      FileWrite(hFile, P, I2);
-    end;
+				// Write integer data...
+				FileWrite(hFile, _ParentID,      SizeOf(integer));
+				FileWrite(hFile, _Kind,          SizeOf(byte));
+				FileWrite(hFile, _Scope,         SizeOf(integer));
+				FileWrite(hFile, _ClassScope,    SizeOf(integer));
+				FileWrite(hFile, _IsDeclaration, SizeOf(boolean));
+				FileWrite(hFile, _DeclImplLine,  SizeOf(integer));
+				FileWrite(hFile, _Line,          SizeOf(integer));
 
-    // write file includes list for each file scanned
-    I := fIncludesList.Count - 1;
-    FileWrite(hFile, I, SizeOf(Integer));
-    for I := 0 to fIncludesList.Count - 1 do begin
-      I2 := Length(PIncludesRec(fIncludesList[I])^.BaseFile);
-      FileWrite(hFile, I2, SizeOf(Integer));
-      StrPCopy(P, PIncludesRec(fIncludesList[I])^.BaseFile);
-      FileWrite(hFile, P, I2);
-      I2 := Length(PIncludesRec(fIncludesList[I])^.IncludeFiles);
-      FileWrite(hFile, I2, SizeOf(Integer));
-      StrPCopy(P, PIncludesRec(fIncludesList[I])^.IncludeFiles);
-      FileWrite(hFile, P, I2);
-    end;
-    FileClose(hFile);
-  end;
-  fBaseIndex := fNextID;
+				// Write data, including length
+				I2 := Length(_FullText);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _FullText);
+				FileWrite(hFile, P, I2);
+
+				I2 := Length(_Type);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _Type);
+				FileWrite(hFile, P, I2);
+
+				I2 := Length(_Command);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _Command);
+				FileWrite(hFile, P, I2);
+
+				I2 := Length(_Args);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _Args);
+				FileWrite(hFile, P, I2);
+
+				I2 := Length(_ScopelessCmd);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _ScopelessCmd);
+				FileWrite(hFile, P, I2);
+
+				I2 := Length(_DeclImplFileName);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _DeclImplFileName);
+				FileWrite(hFile, P, I2);
+
+				I2 := Length(_FileName);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _FileName);
+				FileWrite(hFile, P, I2);
+
+				I2 := Length(_InheritsFromIDs);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _InheritsFromIDs);
+				FileWrite(hFile, P, I2);
+
+				I2 := Length(_InheritsFromClasses);
+				FileWrite(hFile, I2, SizeOf(Integer));
+				StrPCopy(P, _InheritsFromClasses);
+				FileWrite(hFile, P, I2);
+			end;
+		end;
+
+		// write scanned files (cache contents)
+		HowMany := fScannedFiles.Count - 1;
+		FileWrite(hFile, HowMany, SizeOf(Integer));
+		for I := 0 to HowMany do begin
+			I2 := Length(fScannedFiles[I]);
+			FileWrite(hFile, I2, SizeOf(Integer));
+			StrPCopy(P, fScannedFiles[I]);
+			FileWrite(hFile, P, I2);
+		end;
+
+		// write file includes list for each file scanned
+		HowMany := fIncludesList.Count - 1;
+		FileWrite(hFile, HowMany, SizeOf(Integer));
+		for I := 0 to HowMany do begin
+			I2 := Length(PIncludesRec(fIncludesList[I])^.BaseFile);
+			FileWrite(hFile, I2, SizeOf(Integer));
+			StrPCopy(P, PIncludesRec(fIncludesList[I])^.BaseFile);
+			FileWrite(hFile, P, I2);
+
+			I2 := Length(PIncludesRec(fIncludesList[I])^.IncludeFiles);
+			FileWrite(hFile, I2, SizeOf(Integer));
+			StrPCopy(P, PIncludesRec(fIncludesList[I])^.IncludeFiles);
+			FileWrite(hFile, P, I2);
+		end;
+		FileClose(hFile);
+	end;
+	fBaseIndex := fNextID;
 end;
 
 procedure TCppParser.Load(FileName: TFileName);
 var
-  hFile: integer;
-  HowMany: integer;
-  I, I2: integer;
-  MAGIC: array[0..7] of Char;
-  Statement: PStatement;
-  Buf: array[0..4095] of Char;
-  ID_offset, ID_last: integer;
-  P: PIncludesRec;
+	hFile: integer;
+	HowMany: integer;
+	I, I2: integer;
+	MAGIC: array[0..7] of Char;
+	Statement: PStatement;
+	Buf: array[0..8191] of Char;
+	P: PIncludesRec;
 begin
-  Reset;
-  ID_Offset := fNextID;
-  ID_Last := ID_Offset;
-  hFile := FileOpen(FileName, fmOpenRead);
-  if hFile > 0 then begin
-    FileRead(hFile, MAGIC, SizeOf(MAGIC));
-    if MAGIC = 'CPPP 0.1' then begin
-      // read statements
-      FileRead(hFile, HowMany, SizeOf(Integer));
-      for I := 0 to HowMany do begin
-        Statement := New(PStatement);
-        with Statement^ do begin
-          FileRead(hFile, _ID, SizeOf(integer));
-          FileRead(hFile, _ParentID, SizeOf(integer));
-          FileRead(hFile, _Kind, SizeOf(byte));
-          FileRead(hFile, _Scope, SizeOf(integer));
-          FileRead(hFile, _ClassScope, SizeOf(integer));
-          FileRead(hFile, _IsDeclaration, SizeOf(boolean));
-          FileRead(hFile, _DeclImplLine, SizeOf(integer));
-          FileRead(hFile, _Line, SizeOf(integer));
+	Reset;
 
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _FullText := Buf;
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _Type := Buf;
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _Command := Buf;
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _Args := Buf;
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _ScopelessCmd := Buf;
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _DeclImplFileName := Buf;
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _FileName := Buf;
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _InheritsFromIDs := Buf;
-          FileRead(hFile, I2, SizeOf(Integer));
-          FillChar(Buf, SizeOf(Buf), 0);
-          FileRead(hFile, Buf, I2);
-          _InheritsFromClasses := Buf;
-          _Loaded := True;
-          _NoCompletion := False;
-          _Temporary := False;
-          _Visible := False;
-          _Valid := True;
-          _InProject := False;
+	// File and file type check
+	hFile := FileOpen(FileName, fmOpenRead);
+	if hFile > 0 then begin
+		FileRead(hFile, MAGIC, SizeOf(MAGIC));
+		if MAGIC = 'CPPP 0.1' then begin
+			FileRead(hFile, HowMany, SizeOf(Integer));
+			for I := 0 to HowMany do begin
+				Statement := New(PStatement);
+				with Statement^ do begin
 
-          // adjust IDs
-          if _ID <> -1 then begin
-            _ID := _ID + ID_Offset;
-            ID_Last := _ID;
-          end;
-          if _ParentID <> -1 then
-            _ParentID := _ParentID + ID_Offset;
-        end;
-        fStatementList.Add(Statement);
-      end;
+					// Read the actual statement
+					FileRead(hFile, _ParentID, SizeOf(integer));
+					FileRead(hFile, _Kind, SizeOf(byte));
+					FileRead(hFile, _Scope, SizeOf(integer));
+					FileRead(hFile, _ClassScope, SizeOf(integer));
+					FileRead(hFile, _IsDeclaration, SizeOf(boolean));
+					FileRead(hFile, _DeclImplLine, SizeOf(integer));
+					FileRead(hFile, _Line, SizeOf(integer));
 
-      // read scanned files - cache contents
-      FileRead(hFile, HowMany, SizeOf(Integer));
-      for I := 0 to HowMany do begin
-        FileRead(hFile, I2, SizeOf(Integer));
-        FillChar(Buf, SizeOf(Buf), 0);
-        FileRead(hFile, Buf, I2);
-        if fScannedFiles.IndexOf(Buf) = -1 then
-          fScannedFiles.Add(Buf);
-        if fCacheContents.IndexOf(Buf) = -1 then
-          fCacheContents.Add(Buf);
-      end;
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_FullText := Buf;
 
-      // read includes info for each scanned file
-      FileRead(hFile, HowMany, SizeOf(Integer));
-      for I := 0 to HowMany do begin
-        P := New(PIncludesRec);
-        FileRead(hFile, I2, SizeOf(Integer));
-        FillChar(Buf, SizeOf(Buf), 0);
-        FileRead(hFile, Buf, I2);
-        P^.BaseFile := Buf;
-        FileRead(hFile, I2, SizeOf(Integer));
-        FillChar(Buf, SizeOf(Buf), 0);
-        FileRead(hFile, Buf, I2);
-        P^.IncludeFiles := Buf;
-        fIncludesList.Add(P);
-      end;
-    end;
-    FileClose(hFile);
-  end;
-  fNextID := ID_Last + 1;
-  fBaseIndex := fStatementList.Count;
-  PostProcessInheritance;
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_Type := Buf;
+
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_Command := Buf;
+
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_Args := Buf;
+
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_ScopelessCmd := Buf;
+
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_DeclImplFileName := Buf;
+
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_FileName := Buf;
+
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_InheritsFromIDs := Buf;
+
+					FileRead(hFile, I2, SizeOf(Integer));
+					FillChar(Buf, SizeOf(Buf), 0);
+					FileRead(hFile, Buf, I2);
+					_InheritsFromClasses := Buf;
+
+					_Loaded := True;
+					_NoCompletion := False;
+					_Temporary := False;
+					_Visible := False;
+					_Valid := True;
+					_InProject := False;
+
+					// Set ID
+					_ID := fNextID;
+					Inc(fNextID);
+				end;
+				fStatementList.Add(Statement);
+			end;
+
+			// read scanned files - cache contents
+			FileRead(hFile, HowMany, SizeOf(Integer));
+			for I := 0 to HowMany do begin
+				FileRead(hFile, I2, SizeOf(Integer));
+				FillChar(Buf, SizeOf(Buf), 0);
+				FileRead(hFile, Buf, I2);
+				if fScannedFiles.IndexOf(Buf) = -1 then
+					fScannedFiles.Add(Buf);
+				if fCacheContents.IndexOf(Buf) = -1 then
+					fCacheContents.Add(Buf);
+			end;
+
+			// read includes info for each scanned file
+			FileRead(hFile, HowMany, SizeOf(Integer));
+			for I := 0 to HowMany do begin
+				P := New(PIncludesRec);
+				FileRead(hFile, I2, SizeOf(Integer));
+				FillChar(Buf, SizeOf(Buf), 0);
+				FileRead(hFile, Buf, I2);
+				P^.BaseFile := Buf;
+				FileRead(hFile, I2, SizeOf(Integer));
+				FillChar(Buf, SizeOf(Buf), 0);
+				FileRead(hFile, Buf, I2);
+				P^.IncludeFiles := Buf;
+				fIncludesList.Add(P);
+			end;
+		end;
+		FileClose(hFile);
+	end;
+	//Inc(fNextID);
+	fBaseIndex := fNextID;//fStatementList.Count;
+	PostProcessInheritance;
 end;
 
 procedure TCppParser.PostProcessInheritance;
@@ -2350,7 +2374,7 @@ begin
             for I2 := 0 to sl.Count - 1 do
               if PStatement(fStatementList[I1])^._Kind = skClass then
                 if AnsiCompareText(sl[I2], PStatement(fStatementList[I1])^._ScopelessCmd) = 0 then begin
-                  S := S + IntToStr(PStatement(fStatementList[I1])^._ID) + ',';
+                  S := S + IntToStr(I1) + ',';
                   Inc(C, 1);
                   if C = sl.Count then // found all classes?
                     Break;
@@ -2373,10 +2397,12 @@ var
   I, I1: integer;
   sl: TStringList;
 begin
+
   // after reparsing a file, we have to reprocess inheritance,
   // because by invalidating the file, we might have deleted
   // some IDs that were inherited by other, valid, statements.
   // we need to re-adjust the IDs now...
+
   if fInvalidatedIDs.Count = 0 then
     Exit;
   sl := TStringList.Create;
@@ -2480,18 +2506,6 @@ begin
   for I := 0 to Statements.Count - 1 do
     if PStatement(Statements[I])^._Kind = skClass then
       List.AddObject(PStatement(Statements[I])^._Command, Pointer(Statements[I]));
-end;
-
-function TCppParser.IndexOfStatement(ID: integer): integer;
-var
-  I: integer;
-begin
-  Result := -1;
-  for I := 0 to Statements.Count - 1 do
-    if PStatement(Statements[I])^._ID = ID then begin
-      Result := I;
-      Break;
-    end;
 end;
 
 function TCppParser.Locate(Full: string; WithScope: boolean): PStatement;
@@ -2611,7 +2625,7 @@ begin
 
   if (ClosestStatement <> -1) then begin
     // found!
-    Result := IndexOfStatement(PStatement(fStatementList[ClosestStatement])^._ParentID);
+    Result := PStatement(fStatementList[ClosestStatement])^._ParentID;//IndexOfStatement(PStatement(fStatementList[ClosestStatement])^._ParentID);
     fTokenizer.Reset;
     if Assigned(Stream) then
       fTokenizer.Tokenize(Stream)

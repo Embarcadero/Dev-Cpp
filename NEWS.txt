@@ -1,3 +1,21 @@
+Version 5.1.0.0 - *
+
+- This is the first version to fully support 64bit MinGW compilers! Just place one in a folder called 'MinGW64' next to devcpp.exe, Dev will automatically adapt itself to it!
+- When launching for the first time, Dev-C++ will set defaults based on available 32bit or 64bit compilers (favors 64bit). 
+- The XP style manifest creator now also supports 64bit.
+- The "Delete Profiling Information" button now does not check for the gmon.out file 60 times a second to keep itself updated.
+- Compiler information in the log now does not show up twice when rebuilding a single file.
+- Project files with dots in their names now do not confuse the executable namer anymore.
+- One more update to the compiler progress window: the warning counter was positioned a bit too much to the right.
+- Added formatting support for 'Sorry Unimplemented' and fixed up 'Unknown escape sequence'.
+- The main form now properly maximises when not starting for the first time.
+- The main form child windows now properly scale themselves when the 'Tip of the Day' window is shown.
+- Slightly lowered startup times again.
+- The code browser toolbar now also shows types and struct members.
+- The code completer and code parser now use symmetric indices and _ID's, making them a lot faster.
+- Code completion cache is now created a bit faster and is smaller.
+- Updated the help file.
+
 Version 5.0.0.9 - 10 December 2011
 
 - Fixed a minor settings detection bug in the profiler.

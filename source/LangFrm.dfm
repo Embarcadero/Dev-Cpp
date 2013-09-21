@@ -217,7 +217,7 @@ object LangForm: TLangForm
       object ParseLabel: TLabel
         Left = 4
         Top = 24
-        Width = 229
+        Width = 65
         Height = 13
         Caption = 'Parsing files...'
         WordWrap = True
@@ -228,7 +228,6 @@ object LangForm: TLangForm
         Width = 255
         Height = 20
         TabOrder = 0
-        Visible = False
       end
     end
     object BuildPanel: TPanel

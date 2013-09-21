@@ -150,14 +150,16 @@ end;
 
 procedure TWebUpdateForm.wCheckTerminate(Sender: TObject);
 var
-	tmp: string;
+  tmp: string;
 begin
-	if fErrorsList.Count > 0 then
+  if fErrorsList.Count > 0 then
 {$IFDEF WIN32}
-    MessageBox(application.Handle, 'Could not connect to remote site. The remote site might be down, or your internet connection might not be working...'#13#10#13#10'Please try another mirror site...', '', MB_ICONERROR or MB_OK)
+    MessageBox(Self.Handle, 'Could not connect to remote site. The remote site might be down, or your connection ' +
+      'to the Internet might not be working...'#13#10#13#10'Please try another mirror site...', '', MB_ICONERROR or MB_OK)
 {$ENDIF}
 {$IFDEF LINUX}
-	MessageDlg('Could not connect to remote site. The remote site might be down, or your internet connection might not be working...'#13#10#13#10'Please try another mirror site...', mtError, [mbOk], 0)
+    MessageDlg('Could not connect to remote site. The remote site might be down, or your connection ' +
+      'to the Internet might not be working...'#13#10#13#10'Please try another mirror site...', mtError, [mbOk], 0)
 {$ENDIF}
   else begin
     if (wThread.LastMessage = wumrDisconnect) and
@@ -634,7 +636,6 @@ begin
   FreeAndNil(fErrorsList);
 
   FormInitialized := False;
-  inherited Destroy;
 end;
 
 procedure TWebUpdateForm.UpdateSelf;

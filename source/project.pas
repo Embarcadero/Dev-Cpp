@@ -155,8 +155,8 @@ type
     procedure SetUseCustomMakefile(const Value: boolean);
   public
   // Orwell edit
-  function GetModified: boolean;
-   procedure SetModified(value: boolean);
+	function GetModified: boolean;
+	procedure SetModified(value: boolean);
 
    property Options: TProjOptions read fOptions write fOptions;
    property Name: string read fName write fName;
@@ -712,7 +712,7 @@ begin
     ResFile.Add('  manifestVersion="1.0">');
     ResFile.Add('<assemblyIdentity');
     ResFile.Add('    name="DevCpp.Apps.'+StringReplace(Name, ' ', '_', [rfReplaceAll])+'"');
-    ResFile.Add('    processorArchitecture="x86"');
+    ResFile.Add('    processorArchitecture="*"');
     ResFile.Add('    version="1.0.0.0"');
     ResFile.Add('    type="win32"/>');
     ResFile.Add('<description>'+Name+'</description>');
@@ -722,7 +722,7 @@ begin
     ResFile.Add('            type="win32"');
     ResFile.Add('            name="Microsoft.Windows.Common-Controls"');
     ResFile.Add('            version="6.0.0.0"');
-    ResFile.Add('            processorArchitecture="x86"');
+    ResFile.Add('            processorArchitecture="*"');
     ResFile.Add('            publicKeyToken="6595b64144ccf1df"');
     ResFile.Add('            language="*"');
     ResFile.Add('        />');
@@ -1517,28 +1517,21 @@ begin
 end;
 
 function TProject.GetExecutableName : string;
-var
-	Base: string;
 begin
-	if fOptions.OverrideOutput and (fOptions.OverridenOutput<>'') then
-		Base:=ExtractFilePath(Filename)+fOptions.OverridenOutput
-	else
-		Base:=ChangeFileExt(Filename, '');
-
-	// only mess with file extension if not supplied by the user
-	// if he supplied one, then we assume he knows what he's doing...
-	if ExtractFileExt(Base)='' then begin
+	// Add the proper extension
+	if fOptions.OverrideOutput and (fOptions.OverridenOutput<>'') then begin
+		result := ExtractFilePath(Filename) + fOptions.OverridenOutput;
+	end else begin
 		if fOptions.typ = dptStat then
-			result := ChangeFileExt(Base, LIB_EXT)
+			result := ChangeFileExt(Filename, LIB_EXT)
 		else if fOptions.typ = dptDyn then
-			result := ChangeFileExt(Base, DLL_EXT)
+			result := ChangeFileExt(Filename, DLL_EXT)
 		else
- 			result := ChangeFileExt(Base, EXE_EXT);
-	end else
-		result := Base;
+			result := ChangeFileExt(Filename, EXE_EXT);
+	end;
 
+	// Create alternative directory if possible
 	if Length(Options.ExeOutput) > 0 then begin
-		// MAAK HIER VOLLEDIG PAD
 		if not DirectoryExists(Directory + Options.ExeOutput) then
 			try
 				SysUtils.ForceDirectories(Directory + Options.ExeOutput);

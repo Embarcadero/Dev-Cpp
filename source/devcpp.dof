@@ -94,8 +94,8 @@ OutputDir=..
 UnitOutputDir=units
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\Dev Tabs;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
-Packages=vcl;rtl;vclx;VclSmp;vclshlctrls;SynEdit_D6_PE
+SearchPath=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
+Packages=vcl;rtl;vclactnband;vclx;vcldb;dbrtl;dbexpress;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;VclSmp;dbxcds;soaprtl;vclshlctrls;ClassBrowsing
 Conditionals=
 DebugSourceDirs=
 UsePackages=0
@@ -109,9 +109,9 @@ DebugCWD=
 IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=5
-MinorVer=0
+MinorVer=1
 Release=0
-Build=7
+Build=0
 Debug=0
 PreRelease=0
 Special=0
@@ -122,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Bloodshed Software
 FileDescription=Dev-C++ IDE
-FileVersion=5.0.0.7
+FileVersion=5.1.0.0
 InternalName=devcpp.exe
 LegalCopyright=Copyright Bloodshed Software
 LegalTrademarks=
@@ -134,8 +134,9 @@ Comments=Under the GNU General Public License
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=1
-Item0=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\Dev Tabs;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
+Count=2
+Item0=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
+Item1=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\Dev Tabs;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\devShortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
 [HistoryLists\hlUnitOutputDirectory]
 Count=1
 Item0=units

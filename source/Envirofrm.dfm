@@ -15,7 +15,6 @@ object EnviroForm: TEnviroForm
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
-  OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
     464
@@ -80,7 +79,6 @@ object EnviroForm: TEnviroForm
     ActivePage = tabGeneral
     HotTrack = True
     TabOrder = 3
-    OnChange = PagesMainChange
     object tabGeneral: TTabSheet
       Caption = 'General'
       ParentShowHint = False

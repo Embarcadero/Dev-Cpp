@@ -27,7 +27,7 @@ type
     DetailsPanel: TPanel;
     Splitter1: TSplitter;
     Packages: TListView;
-    StatusBar1: TStatusBar;
+    Statusbar1: TStatusbar;
     Panel2: TPanel;
     Label1: TLabel;
     SpeedButton1: TSpeedButton;
@@ -156,9 +156,9 @@ end;
 procedure TMainForm.AppHint(Sender: TObject);
 begin
   if Length(Application.Hint) > 0 then
-      StatusBar1.Panels.Items[0].Text := Application.Hint
+      Statusbar1.Panels.Items[0].Text := Application.Hint
   else
-      StatusBar1.Panels.Items[0].Text := 'Ready.';
+      Statusbar1.Panels.Items[0].Text := 'Ready.';
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);

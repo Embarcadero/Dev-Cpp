@@ -485,7 +485,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 385
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 1
       end
     end

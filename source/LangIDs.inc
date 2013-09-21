@@ -134,7 +134,7 @@ const
   ID_ITEM_GOTOPROJECTVIEW           = 5009;
   ID_ITEM_GOTOCLASSBROWSER          = 5010;
   ID_ITEM_PROJECTVIEW               = 5011;
-  ID_ITEM_STATUSBAR                 = 5012;
+  ID_ITEM_Statusbar                 = 5012;
   ID_SUB_COMPOUTPUT                 = 5013;
   ID_ITEM_COMPOUTALWAYS             = 5014;
   ID_ITEM_COMPOUTONNEED             = 5015;
@@ -183,7 +183,7 @@ const
   ID_ITEM_ENVIROOPTIONS             = 7012;
   ID_ITEM_EDITOROPTIONS             = 7013;
   ID_ITEM_TOOLCONFIG                = 7014;
-  ID_ITEM_SHORTCUTSCONFIG           = 7015;
+  ID_ITEM_devShortcutsCONFIG           = 7015;
   // tool items dynamic
   //free to 229 for tool menu items
 
@@ -512,7 +512,7 @@ const
   ID_IF_USEICO                      = 32002;
   // free to 549 for icon library form
 
-  // Configure Shortcuts component
+  // Configure devShortcuts component
   ID_SC_CAPTION                     = 33001;
   ID_SC_TITLE                       = 33002;
   ID_SC_TIP                         = 33003;

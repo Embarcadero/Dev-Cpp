@@ -346,7 +346,6 @@ begin
   if Updating then Changing else Changed;
 end;
 
-
 function IntListCompare(List: TIntList; Index1, Index2: Integer): Integer;
 begin
   IF List.FList^[Index1].FInt>List.FList^[Index2].FInt then result:=+1

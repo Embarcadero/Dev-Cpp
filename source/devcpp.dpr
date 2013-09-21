@@ -18,20 +18,11 @@
 }
 
 program devcpp;
-
 {$R 'icons.res' 'icons.rc'}
-{%File 'LangIDs.inc'}
 {$R 'DefaultFiles.res' 'DefaultFiles.rc'}
-
-{$IFDEF WIN32}
-{$R 'webupdate\selfupdater.res' 'webupdate\selfupdater.rc'}
-{$ENDIF}
-{$IFDEF LINUX}
-{$R 'webupdate/selfupdater.res' 'webupdate/selfupdater.rc'}
-{$ENDIF}
-
 {$R 'LangFrm.res' 'LangFrm.rc'}
-{$WARN SYMBOL_PLATFORM OFF}
+
+{%File 'LangIDs.inc'}
 
 uses
 {$IFDEF WIN32}
@@ -105,24 +96,14 @@ uses
   ParamsFrm in 'ParamsFrm.pas' {ParamsForm},
   CompilerOptionsFrame in 'CompilerOptionsFrame.pas' {CompOptionsFrame: TFrame},
   CompileProgressFm in 'CompileProgressFm.pas' {CompileProgressForm},
-{$IFDEF WIN32}
   WebThread in 'webupdate\WebThread.pas',
   WebUpdate in 'webupdate\WebUpdate.pas' {WebUpdateForm},
-{$ENDIF}
-{$IFDEF LINUX}
-  WebThread in 'webupdate/WebThread.pas',
-  WebUpdate in 'webupdate/WebUpdate.pas' {WebUpdateForm},
-{$ENDIF}
   ProcessListFrm in 'ProcessListFrm.pas' {ProcessListForm},
   ModifyVarFrm in 'ModifyVarFrm.pas' {ModifyVarForm},
   PackmanExitCodesU in 'packman\PackmanExitCodesU.pas',
-  ImageTheme in 'ImageTheme.pas',
-  StoHtmlHelp in 'StoHtmlHelp.pas';
+  ImageTheme in 'ImageTheme.pas';
 
 {$R *.res}
-
-type
-	TMainFormHack = class(TMainForm);
 
 var
 	// ConfigMode moved to devcfg, 'cause I need it in enviroform (for AltConfigFile)
@@ -141,7 +122,7 @@ begin
 		else
 			devData.INIFile := IncludeTrailingBackslash(ParamStr(2)) + strIniFile;
 		ConfigMode := CFG_PARAM;
-	end else if IsWinNT then begin
+	end else begin
 		//default dir should be %APPDATA%\Dev-Cpp
 		strLocalAppData := '';
 		if SUCCEEDED(SHGetFolderPath(0, CSIDL_LOCAL_APPDATA, 0, 0, tempc)) then
@@ -165,8 +146,7 @@ begin
 			ConfigMode := CFG_USER;
 		end else
 			devData.INIFile:= ChangeFileExt(Application.EXEName, INI_EXT);
-	end else
-		devData.INIFile:= ChangeFileExt(Application.EXEName, INI_EXT);
+	end;
 
 	devData.UseRegistry:= FALSE;
 	devData.BoolAsWords:= FALSE;
@@ -197,16 +177,16 @@ begin
 		SplashForm.Update;
 	end;
 
-	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Creating main window...';
+	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Creating main window...';
 	devTheme:= TdevTheme.Create;
 	Application.Initialize;
 	Application.Title := 'Dev-C++';
 	Application.CreateForm(TMainForm, MainForm);
 
 	// do the creation stuff when the splashscreen is displayed because it takes quite a while ...
-	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Applying settings...';
-	TMainFormHack(MainForm).DoCreateEverything;
-	if not devData.NoSplashScreen then SplashForm.StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Creating extra dialogs...';
+	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Applying settings...';
+	MainForm.DoCreateEverything;
+	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Creating extra dialogs...';
 	Application.CreateForm(TfrmFind, frmFind);
 	Application.CreateForm(TfrmReplace, frmReplace);
 

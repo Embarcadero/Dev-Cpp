@@ -35,7 +35,7 @@ type
   TSplashForm = class(TForm)
     Panel: TPanel;
     Image: TImage;
-    StatusBar: TStatusBar;
+    Statusbar: TStatusbar;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -54,9 +54,9 @@ begin
 	if (devData.Splash <> '') and FileExists(devData.Splash) then begin
 		Image.Picture.LoadFromFile(devData.Splash);
 		ClientWidth:= Image.Width;
-		ClientHeight:= Image.Height + StatusBar.Height;
+		ClientHeight:= Image.Height + Statusbar.Height;
 	end;
-	StatusBar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Loading...';
+	Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Loading...';
 end;
 
 end.

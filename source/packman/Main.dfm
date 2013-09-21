@@ -318,7 +318,7 @@ object MainForm: TMainForm
     TabOrder = 2
     OnSelectItem = PackagesSelectItem
   end
-  object StatusBar1: TStatusBar
+  object Statusbar1: TStatusbar
     Left = 0
     Top = 353
     Width = 480

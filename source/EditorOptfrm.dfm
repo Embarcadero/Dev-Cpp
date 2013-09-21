@@ -18,7 +18,6 @@ object EditorOptForm: TEditorOptForm
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnHelp = FormHelp
-  OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
     464
@@ -30,9 +29,8 @@ object EditorOptForm: TEditorOptForm
     Top = 0
     Width = 464
     Height = 375
-    ActivePage = tabGeneral
+    ActivePage = tabClassBrowsing
     TabOrder = 0
-    OnChange = PagesMainChange
     object tabGeneral: TTabSheet
       Caption = 'General'
       object cbSyntaxHighlight: TCheckBox
@@ -1296,15 +1294,15 @@ object EditorOptForm: TEditorOptForm
     Left = 5
     Top = 378
   end
-  object CppTokenizer1: TCppTokenizer
+  object CppTokenizer: TCppTokenizer
     LogTokens = False
     Left = 40
     Top = 376
   end
-  object CppParser1: TCppParser
+  object CppParser: TCppParser
     Enabled = True
     OnTotalProgress = CppParser1TotalProgress
-    Tokenizer = CppTokenizer1
+    Tokenizer = CppTokenizer
     ParseLocalHeaders = True
     ParseGlobalHeaders = True
     LogStatements = False

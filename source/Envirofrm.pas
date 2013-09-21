@@ -108,8 +108,6 @@ type
     procedure btnOkClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
-    procedure PagesMainChange(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure vleExternalEditButtonClick(Sender: TObject);
     procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;const KeyName, KeyValue: String);
@@ -453,26 +451,7 @@ end;
 
 procedure TEnviroForm.btnHelpClick(Sender: TObject);
 begin
-  HelpFile:= devDirs.Help +DEV_MAINHELP_FILE;
-  // **temporary removal** Application.HelpJump(HelpKeyword);
-  Application.HelpJump('ID_ENVIRONMENT');
-end;
-
-procedure TEnviroForm.PagesMainChange(Sender: TObject);
-begin
-  HelpKeyword:= Help_Topics[PagesMain.ActivePageIndex];
-end;
-
-procedure TEnviroForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-{$IFDEF WIN32}
-  if key = vk_F1 then
-{$ENDIF}
-{$IFDEF LINUX}
-  if key = XK_F1 then
-{$ENDIF}
-   Application.HelpJump(HelpKeyword);
+	OpenHelpFile;
 end;
 
 procedure TEnviroForm.FormCreate(Sender: TObject);

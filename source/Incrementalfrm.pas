@@ -52,9 +52,6 @@ type
     rOptions : TSynSearchOptions;
   end;
 
-var
-  frmIncremental: TfrmIncremental;
-
 implementation
 
 {$R *.dfm}

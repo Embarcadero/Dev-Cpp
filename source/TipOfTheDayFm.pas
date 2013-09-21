@@ -239,7 +239,9 @@ end;
 procedure TTipOfTheDayForm.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-  Action := caFree;
+	devData.LastTip:=Current+1;
+	devData.ShowTipsOnStart:=not chkNotAgain.Checked;
+	Action := caFree;
 end;
 
 procedure TTipOfTheDayForm.lblUrlClick(Sender: TObject);

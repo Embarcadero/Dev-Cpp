@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  Windows, SysUtils, Classes, version, Graphics, Controls, Forms, Dialogs,
   StdCtrls, Buttons, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -59,6 +59,9 @@ type
     Image1: TImage;
     DonateSite: TLabel;
     DonateLabel: TLabel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Bevel1: TBevel;
     procedure LabelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAuthorsClick(Sender: TObject);
@@ -68,6 +71,8 @@ type
     procedure btnAuthorsDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure Timer1Timer(Sender: TObject);
     procedure FishImageClick(Sender: TObject);
+    procedure DonateClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     procedure LoadText;
   end;
@@ -120,6 +125,7 @@ end;
 procedure TAboutForm.FormCreate(Sender: TObject);
 begin
   LoadText;
+  VersionLabel.Caption:= VersionLabel.Caption + DEVCPP_VERSION + #13#10 + 'Build time: ' + DEVCPP_BUILDTIME;
   if FileExists(devData.Splash) then
    Image1.Picture.LoadFromFile(devData.Splash);
 end;
@@ -177,6 +183,16 @@ end;
 procedure TAboutForm.FishImageClick(Sender: TObject);
 begin
   Fish.Tag := not Fish.Tag;
+end;
+
+procedure TAboutForm.DonateClick(Sender: TObject);
+begin
+	ShellExecute(GetDesktopWindow(), 'open', PChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+	action := caFree;
 end;
 
 end.

@@ -885,27 +885,8 @@ begin
 end;
 
 procedure TfrmProjectOptions.btnHelpClick(Sender: TObject);
-var
-	topic : string;
 begin
-	if PageControl.ActivePageIndex = 0 then
-		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/General.htm'
-	else if PageControl.ActivePageIndex = 1 then
-		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Files.htm'
-	else if PageControl.ActivePageIndex = 2 then
-		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Compiler.htm'
-	else if PageControl.ActivePageIndex = 3 then
-		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Parameters.htm'
-	else if PageControl.ActivePageIndex = 4 then
-		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Directories.htm'
-	else if PageControl.ActivePageIndex = 5 then
-		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Build.htm'
-	else if PageControl.ActivePageIndex = 6 then
-		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Makefile.htm'
-	else if PageControl.ActivePageIndex = 7 then
-		topic := '/C/Users/Johan Mes/Desktop/Dev-C++ Help/Help on Dev-C++/Dialog Windows/Project Options/Version Info.htm';
-	Application.HelpFile := IncludeTrailingBackslash(devDirs.Help) + DEV_MAINHELP_FILE;
-	Application.HelpJump(Application.HelpFile + '::' + topic);
+	OpenHelpFile;
 end;
 
 procedure TfrmProjectOptions.chkOverrideOutputClick(Sender: TObject);

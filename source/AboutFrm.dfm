@@ -1,10 +1,10 @@
 object AboutForm: TAboutForm
-  Left = 1045
-  Top = 416
+  Left = 575
+  Top = 296
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'About Dev-C++ :-)'
-  ClientHeight = 436
+  ClientHeight = 469
   ClientWidth = 393
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,6 +14,7 @@ object AboutForm: TAboutForm
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -2202,7 +2203,7 @@ object AboutForm: TAboutForm
   end
   object btnOk: TBitBtn
     Left = 310
-    Top = 402
+    Top = 434
     Width = 75
     Height = 25
     Caption = '&OK'
@@ -2958,7 +2959,7 @@ object AboutForm: TAboutForm
     Left = 8
     Top = 232
     Width = 378
-    Height = 161
+    Height = 193
     Caption = 'Web sites / email : '
     TabOrder = 2
     object BloodLabel: TLabel
@@ -3073,14 +3074,14 @@ object AboutForm: TAboutForm
     end
     object BlogLabel: TLabel
       Left = 16
-      Top = 104
+      Top = 152
       Width = 124
       Height = 13
       Caption = 'Post-4.9.9.2 development:'
     end
     object BlogSite: TLabel
       Left = 168
-      Top = 104
+      Top = 152
       Width = 156
       Height = 13
       Cursor = crHandPoint
@@ -3095,7 +3096,7 @@ object AboutForm: TAboutForm
     end
     object DonateSite: TLabel
       Left = 168
-      Top = 136
+      Top = 120
       Width = 185
       Height = 13
       Cursor = crHandPoint
@@ -3110,15 +3111,44 @@ object AboutForm: TAboutForm
     end
     object DonateLabel: TLabel
       Left = 16
-      Top = 120
+      Top = 104
       Width = 222
       Height = 13
       Caption = 'Please support Dev-C++ by making a donation:'
     end
+    object Label1: TLabel
+      Left = 16
+      Top = 168
+      Width = 254
+      Height = 13
+      Caption = 'Please support Orwell Dev-C++ by making a donation:'
+    end
+    object Label2: TLabel
+      Left = 275
+      Top = 168
+      Width = 38
+      Height = 13
+      Cursor = crHandPoint
+      Caption = 'Donate!'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = 11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsUnderline]
+      ParentFont = False
+      OnClick = DonateClick
+    end
+    object Bevel1: TBevel
+      Left = 16
+      Top = 144
+      Width = 350
+      Height = 2
+      Shape = bsBottomLine
+    end
   end
   object btnAuthors: TBitBtn
     Left = 227
-    Top = 402
+    Top = 434
     Width = 83
     Height = 25
     Caption = '&Authors'
@@ -3156,7 +3186,7 @@ object AboutForm: TAboutForm
   end
   object btnUpdateCheck: TBitBtn
     Left = 8
-    Top = 402
+    Top = 434
     Width = 185
     Height = 25
     Caption = '&Check for updates'

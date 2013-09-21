@@ -168,9 +168,9 @@ begin
 
         // remove arguments - if exists
         if AnsiPos('(', Caption) > 0 then
-          Data := MainForm.CppParser1.Locate(Copy(Caption, 1, AnsiPos('(', Caption) - 1), True)
+          Data := MainForm.CppParser.Locate(Copy(Caption, 1, AnsiPos('(', Caption) - 1), True)
         else
-          Data := MainForm.CppParser1.Locate(Caption, True);
+          Data := MainForm.CppParser.Locate(Caption, True);
 
         // Once here, the function at the END is cut off
         for J:=0 to 5 do begin
@@ -257,9 +257,9 @@ begin
 
           // remove arguments - if exists
           if AnsiPos('(', Caption) > 0 then
-            Data := MainForm.CppParser1.Locate(Copy(Caption, 1, AnsiPos('(', Caption) - 1), True)
+            Data := MainForm.CppParser.Locate(Copy(Caption, 1, AnsiPos('(', Caption) - 1), True)
           else
-            Data := MainForm.CppParser1.Locate(Caption, True);
+            Data := MainForm.CppParser.Locate(Caption, True);
 
         for J:=0 to 4 do begin
         	Line := TrimLeft(Line);
@@ -371,9 +371,9 @@ begin
   P := TListView(Sender).ScreenToClient(Mouse.CursorPos);
   It := TListView(Sender).GetItemAt(P.X, P.Y);
   if Assigned(It) and Assigned(It.Data) then begin
-    e := MainForm.GetEditorFromFileName(MainForm.CppParser1.GetImplementationFileName(PStatement(It.Data)));
+    e := MainForm.GetEditorFromFileName(MainForm.CppParser.GetImplementationFileName(PStatement(It.Data)));
     if Assigned(e) then begin
-      e.GotoLineNr(MainForm.CppParser1.GetImplementationLine(PStatement(It.Data)));
+      e.GotoLineNr(MainForm.CppParser.GetImplementationLine(PStatement(It.Data)));
       e.Activate;
     end;
   end;

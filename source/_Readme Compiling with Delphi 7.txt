@@ -7,7 +7,6 @@
 2) Compile resources: run .\CompileResources.bat to create binary .res files or run manually from cmd:
 
 brcc32 DefaultFiles.rc
-brcc32 webupdate\selfupdater.rc
 brcc32 LangFrm.rc
 brcc32 icons.rc
 

@@ -612,6 +612,8 @@ begin
 
 	InitProgressForm('Compiling...');
 
+	DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
+
 	GetCompileParams;
 	GetLibrariesParams;
 	GetIncludesParams;
@@ -640,7 +642,7 @@ begin
 				cmdline:= format(cMakeLine, [MAKE_PROGRAM, fMakeFile]);
 		end;
 
-		DoLogEntry(format(Lang[ID_EXECUTING], [cMake +cDots]));
+		DoLogEntry(format(Lang[ID_EXECUTING], [cMake + cDots]));
 		DoLogEntry(cmdline);
 
 		// Sleep(0) allows other threads to proceed, but we don't want Dev to wait!
@@ -743,7 +745,8 @@ var
 	cs		: integer;
 begin
 	fSingleFile:=True; // fool clean; don't run deps checking since all we do is cleaning
-	if Project <> nil then 	begin
+	
+	if Project <> nil then begin
 		cs:=SwitchToProjectCompilerSet;
 		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
 		Result := True;
@@ -781,9 +784,11 @@ begin
 	fSingleFile:=True; // fool rebuild; don't run deps checking since all files will be rebuilt
 	Result := True;
 	cs:=SwitchToProjectCompilerSet;
-	DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
+
 	InitProgressForm('Rebuilding...');
 	if Project <> nil then begin
+
+		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
 		BuildMakeFile;
 		if not FileExists(fMakefile) then begin
 			SwitchToOriginalCompilerSet(cs);
@@ -843,8 +848,7 @@ procedure TCompiler.OnAbortCompile(Sender: TObject);
 begin
 	if Assigned(fDevRun) then begin
 		fAbortThread:=True;
-	end
-	else
+	end else
 		ReleaseProgressForm;
 end;
 
@@ -858,15 +862,12 @@ begin
 
 	if (fErrCount = 0) and not fAbortThread then begin
 		DoLogEntry(Lang[ID_COMPILESUCCESS]);
-		if (fRunAfterCompileFinish) then
-		begin
+		if (fRunAfterCompileFinish) then begin
 			fRunAfterCompileFinish:= FALSE;
 			ReleaseProgressForm;
 			Run;
 		end;
-	end
-	else
-		if fAbortThread then
+	end else if fAbortThread then
 			DoLogEntry(Lang[ID_COMPILEABORT]);
 	SwitchToOriginalCompilerSet(fOriginalSet);
 	Application.ProcessMessages;
@@ -887,7 +888,7 @@ var
 	O_Col,		// offset in line
 	O_Msg,		// message for error
 	Line,LowerLine: string;
-	Messages{, IMod}: Integer;
+	Messages : Integer;
 	gcc, gpp : string;
 begin
 	Messages := 0;
@@ -905,11 +906,8 @@ begin
 
 	try
 		LOutput.Text:= fdevRun.Output;
-	//	IMod := CalcMod(pred(LOutput.Count));
 
 		for curLine := 0 to pred(LOutput.Count) do begin
-		//	if (IMod = 0) or (curLine mod IMod = 0) then
-		//		Application.ProcessMessages;
 
 			Line := LOutput.Strings[curLine];
 			LowerLine := LowerCase(Line);
@@ -970,7 +968,7 @@ begin
 			{ Make errors }
 			if (Pos(devCompilerSet.makeName + ': ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
 				cpos := Length(devCompilerSet.makeName + ': ***');
-				O_Msg := '[Build Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
+				O_Msg := '[Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 				if Assigned(fProject) then
 					O_File := Makefile
 				else
@@ -1180,6 +1178,7 @@ begin
 			// foo.cpp:1:2: warning: unknown escape sequence: '\040'
 			cpos := GetLastPos(': unknown escape sequence:',Line);
 			if cpos > 0 then begin
+
 				O_Msg := '[Warning] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 
 				cpos := GetLastPos(': warning',Line);
@@ -1195,6 +1194,35 @@ begin
 				O_line := Copy(Line, cpos+1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
+				// Get filename
+				O_File := Line;
+
+				Inc(fWarnCount);
+				Inc(Messages);
+				DoOutput(O_Line, O_Col, O_File, O_Msg);
+				Continue;
+			end;
+
+			// foo.cpp:1:2: sorry, unimplemented: bar
+			cpos := GetLastPos(': sorry, unimplemented:',Line);
+			if cpos > 0 then begin
+
+				O_Msg := '[Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
+				Delete(Line, cpos, Length(Line) - cpos + 1);
+
+				// Get column number
+				cpos := GetLastPos(':', Line);
+				O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
+				Delete(Line, cpos, Length(Line) - cpos + 1);
+
+				// Get line number
+				cpos := GetLastPos(':', Line);
+				O_line := Copy(Line, cpos+1, Length(Line) - cpos);
+				Delete(Line, cpos, Length(Line) - cpos + 1);
+
+				// Get filename
+				O_File := Line;
+
 				Inc(fWarnCount);
 				Inc(Messages);
 				DoOutput(O_Line, O_Col, O_File, O_Msg);
@@ -1206,7 +1234,7 @@ begin
 			if cpos > 0 then begin
 				// candidates are (...) is message
 				cpos := GetLastPos(': candidate', Line);
-				O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
+				O_Msg := '[Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 
 				// 'note'/'error' is removed
 				cpos := GetLastPos(': note', Line);
@@ -1329,7 +1357,7 @@ begin
 				// This is an error in the Makefile
 				if (MakeFile <> '') and SameFileName(Makefile, GetRealPath(O_File)) then
 					if Pos('[Warning] ', O_Msg) <> 1 then
-						O_Msg := '[Build Error] ' + O_Msg;
+						O_Msg := '[Error] ' + O_Msg;
 
 				DoOutput(O_Line, O_Col, O_File, O_Msg);
 			end;

@@ -106,7 +106,6 @@ type
     procedure btnBrowseClick(Sender: TObject);
     procedure ButtonClick(Sender: TObject);
     procedure UpDownClick(Sender: TObject);
-    procedure PageControlChange(Sender: TObject);
     procedure edEntryKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure btnBrws1Click(Sender: TObject);
@@ -157,8 +156,8 @@ const
 
 procedure TCompForm.btnCancelClick(Sender: TObject);
 begin
-     devCompiler.CompilerSet:=cmbCompilerSetComp.ItemIndex;
-     Close;
+	devCompiler.CompilerSet:=cmbCompilerSetComp.ItemIndex;
+	Close;
 end;
 
 procedure TCompForm.btnOkClick(Sender: TObject);
@@ -207,18 +206,18 @@ begin
 		gprofName:=devCompilerSet.gprofName;
 	end;
 
-  with devDirs do
-   begin
-     Bins:= fBins;
-     C:= fC;
-     Cpp:= fCpp;
-     Lib:= fLibs;
-   end;
-  // Set Path with New Bins
-  SetPath(fBins);
+	with devDirs do begin
+		Bins:= fBins;
+		C:= fC;
+		Cpp:= fCpp;
+		Lib:= fLibs;
+	end;
 
-  devDirs.SaveSettings;
-  devCompiler.SaveSettings;
+	// Set Path with New Bins
+	SetPath(fBins);
+
+	devDirs.SaveSettings;
+	devCompiler.SaveSettings;
 end;
 
 procedure TCompForm.FormActivate(Sender: TObject);
@@ -229,27 +228,27 @@ end;
 
 procedure TCompForm.SetOptions;
 begin
-  with devCompiler do
-   begin
-     seCompDelay.Value:= Delay;
-     cbFastDep.Checked:= FastDep;
+	with devCompiler do begin
+		seCompDelay.Value:= Delay;
+		cbFastDep.Checked:= FastDep;
 
-     cbCompAdd.Checked:= devCompilerSet.AddtoComp;
-     Commands.Text:= devCompilerSet.CompOpts;
-     cbLinkerAdd.Checked:= devCompilerSet.AddtoLink;
-     Linker.Text:= devCompilerSet.LinkOpts;
+		cbCompAdd.Checked:= devCompilerSet.AddtoComp;
+		Commands.Text:= devCompilerSet.CompOpts;
+		cbLinkerAdd.Checked:= devCompilerSet.AddtoLink;
+		Linker.Text:= devCompilerSet.LinkOpts;
 
-     cmbCompilerSetComp.Items.Clear;
-     cmbCompilerSetComp.Items.Assign(devCompilerSet.Sets);
+		cmbCompilerSetComp.Items.Clear;
+		cmbCompilerSetComp.Items.Assign(devCompilerSet.Sets);
 
-     if CompilerSet < cmbCompilerSetComp.Items.Count then
-       cmbCompilerSetComp.ItemIndex:=CompilerSet
-     else if cmbCompilerSetComp.Items.Count>0 then
-      cmbCompilerSetComp.ItemIndex:=0;
-     currentSet:=cmbCompilerSetComp.ItemIndex;
-     devCompilerSet.LoadSet(CompilerSet);
-     cmbCompilerSetCompChange(nil);
-   end;
+		if CompilerSet < cmbCompilerSetComp.Items.Count then
+			cmbCompilerSetComp.ItemIndex:=CompilerSet
+		else if cmbCompilerSetComp.Items.Count>0 then
+			cmbCompilerSetComp.ItemIndex:=0;
+
+		currentSet:=cmbCompilerSetComp.ItemIndex;
+		devCompilerSet.LoadSet(CompilerSet);
+		cmbCompilerSetCompChange(nil);
+	end;
 end;
 
 procedure TCompForm.btnDefaultClick(Sender: TObject);
@@ -260,9 +259,7 @@ end;
 
 procedure TCompForm.btnHelpClick(Sender: TObject);
 begin
-  HelpFile:= devDirs.Help +DEV_MAINHELP_FILE;
-  // ** temporary removal ** Application.HelpJump(HelpKeyword);
-  Application.HelpJump('ID_COMPILEROPTIONS');
+	OpenHelpFile;
 end;
 
 procedure TCompForm.DirTabsChange(Sender: TObject);
@@ -390,11 +387,6 @@ begin
      btnDown.Enabled:= FALSE;
    end;
   btnDelInval.Enabled:= lstDirs.Items.Count> 0;
-end;
-
-procedure TCompForm.PageControlChange(Sender: TObject);
-begin
-  HelpKeyword:= Help_Topics[MainPages.ActivePageIndex];
 end;
 
 procedure TCompForm.edEntryKeyUp(Sender: TObject; var Key: Word;

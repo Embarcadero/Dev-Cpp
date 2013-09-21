@@ -102,7 +102,7 @@ begin
 
   sl := TStringList.Create;
   try
-    MainForm.CppParser1.GetClassesList(sl);
+    MainForm.CppParser.GetClassesList(sl);
     cmbClass.Items.Assign(sl);
   finally
     sl.Free;
@@ -206,7 +206,7 @@ begin
     if Trim(memDescr.Text) = '' then
       memDescr.Text := 'No description';
 
-    CppParser1.GetSourcePair(CppParser1.GetDeclarationFileName(St), CppFname, fName);
+    CppParser.GetSourcePair(CppParser.GetDeclarationFileName(St), CppFname, fName);
 
     if not FileExists(CppFname) then begin
       MessageDlg(Lang[ID_NEWVAR_MSG_NOIMPL], mtError, [mbOk], 0);
@@ -222,8 +222,8 @@ begin
     if e.Modified then
       case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [fName]), mtConfirmation, [mbYes, mbCancel], 0) of
         mrYes: if FileExists(fName) then begin
-            wa := MainForm.devFileMonitor1.Active;
-            MainForm.devFileMonitor1.Deactivate;
+            wa := MainForm.devFileMonitor.Active;
+            MainForm.devFileMonitor.Deactivate;
             if devEditor.AppendNewline then
               with e.Text do
                 if Lines.Count > 0 then
@@ -231,7 +231,7 @@ begin
                     Lines.Add('');
             e.Text.Lines.SaveToFile(fName);
             if wa then
-              MainForm.devFileMonitor1.Activate;
+              MainForm.devFileMonitor.Activate;
           end
           else
             Exit;
@@ -239,9 +239,9 @@ begin
       end;
 
     // Ask CppParser for insertion line suggestion ;)
-    Line := CppParser1.SuggestMemberInsertionLine(pID, VarScope, AddScopeStr);
+    Line := CppParser.SuggestMemberInsertionLine(pID, VarScope, AddScopeStr);
     if VarScope <> scsPublic then
-      PublicLine := CppParser1.SuggestMemberInsertionLine(pID, scsPublic, fAddScopeStr)
+      PublicLine := CppParser.SuggestMemberInsertionLine(pID, scsPublic, fAddScopeStr)
     else begin
       fAddScopeStr := AddScopeStr;
       PublicLine := Line;

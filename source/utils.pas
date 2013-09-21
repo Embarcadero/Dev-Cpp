@@ -58,16 +58,9 @@ type
  TLineOutputFunc = procedure(Line: String) of Object;
  TCheckAbortFunc = procedure(var AbortThread: boolean) of object;
 
-function IsWinNT : boolean;
-
-procedure FilesFromWildcard(Directory, Mask: string;
-  var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
-function ExecuteFile(const FileName, Params, DefaultDir: string;
-  ShowCmd: Integer): THandle;
-function RunAndGetOutput(Cmd, WorkDir: string;
-  ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;
-  CheckAbortFunc: TCheckAbortFunc;
-  ShowReturnValue: Boolean = True): string;
+procedure FilesFromWildcard(Directory, Mask: string;var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
+function ExecuteFile(const FileName, Params, DefaultDir: string;ShowCmd: Integer): THandle;
+function RunAndGetOutput(Cmd, WorkDir: string;ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): string;
 function GetShortName(FileName: string): string;
 procedure ShowError(Msg: String);
 
@@ -79,8 +72,7 @@ function IncludeQuoteIfNeeded(s : string) : string;
 // Added by MikeB
 procedure LoadFilefromResource(const FileName: string; ms: TMemoryStream);
 
-function ValidateFile(const FileName: string; const WorkPath: string;
-  const CheckDirs: boolean = FALSE): string;
+function ValidateFile(const FileName: string; const WorkPath: string;const CheckDirs: boolean = FALSE): string;
 
 function BuildFilter(var value: string; const FLTStyle: TFILTERSET): boolean; overload;
 function BuildFilter(var value: string; const _filters: array of string): boolean; overload;
@@ -124,6 +116,8 @@ function GetAssociatedProgram(const Extension: string; var Filename, Description
 
 function IsNumeric(s : string) : boolean;
 
+procedure OpenHelpFile;
+
 implementation
 
 uses 
@@ -134,7 +128,12 @@ uses
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
 
-   procedure FilesFromWildcard(Directory, Mask: String;var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
+procedure OpenHelpFile;
+begin
+	ShellExecute(GetDesktopWindow(), 'open', PChar(devDirs.Help + DEV_MAINHELP_FILE), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure FilesFromWildcard(Directory, Mask: String;var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 var
   SearchRec: TSearchRec;
   Attr, Error: Integer;
@@ -877,17 +876,6 @@ begin
   finally
     FreeMem(Buf);
   end;
-end;
-
-function IsWinNT : boolean;
-var ver : TOSVersionInfo;
-begin
-  ver.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
-  result := false;
-  if GetVersionEx(ver) then begin
-    if (ver.dwPlatformId = VER_PLATFORM_WIN32_NT) {and (ver.dwMajorVersion > 4) }then
-      result := true;
-  end
 end;
 
 // tries to change the current directory to Dir.

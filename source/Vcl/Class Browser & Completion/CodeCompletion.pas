@@ -288,7 +288,7 @@ var
     iST: integer;
   begin
     if ClassIndex <> -1 then begin
-      ParID := PStatement(fParser.Statements[ClassIndex])^._ID;
+      ParID := ClassIndex;
       isID := ClassIndex;
       repeat
         sl.CommaText := PStatement(fParser.Statements[isID])^._InheritsFromIDs;
@@ -299,7 +299,7 @@ var
           if iID = -1 then
             Continue;
           InheritanceIDs.Add(iID);
-          iST := fParser.IndexOfStatement(iID);
+          iST := iID;//fParser.IndexOfStatement(iID);
           if iST = -1 then
             Continue;
           pST := PStatement(fParser.Statements[iST]);
@@ -331,7 +331,7 @@ begin
           if PStatement(fParser.Statements[I1])^._Kind = skClass then begin
             // added for the case "Class::Member", where "Class" is the actual class
             ClassIDs.Clear;
-            ClassIDs.Add(PStatement(fParser.Statements[I1])^._ID);
+            ClassIDs.Add(I1);
             bOnlyLocal := True;
           end
           else
@@ -340,10 +340,10 @@ begin
 
       if not bOnlyLocal then
         for I1 := 0 to ClassIDs.Count - 1 do
-          GetInheritance(fParser.IndexOfStatement(ClassIDs[I1]));
+          GetInheritance(ClassIDs[I1]);//fParser.IndexOfStatement(ClassIDs[I1]));
 
       if fCurrClassID <> -1 then
-        CurrentID := PStatement(fParser.Statements[fCurrClassID])^._ID
+        CurrentID := fCurrClassID
       else
         CurrentID := -1;
       for I := 0 to fParser.Statements.Count - 1 do begin
@@ -378,7 +378,7 @@ begin
         end
         else begin //class and method
         // ignore "this" pointer as a member
-          if Assigned(fFullCompletionStatementList[I]) and (PStatement(fFullCompletionStatementList[I])^._ID <> fParser.GetThisPointerID) then
+          if Assigned(fFullCompletionStatementList[I]) and (I <> fParser.GetThisPointerID) then
             if AnsiStartsText(_Value, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then begin
               fCompletionStatementList.Add(fFullCompletionStatementList[I]);
               CodeComplForm.lbCompletion.Items.Add('');
@@ -450,7 +450,7 @@ begin
       (AnsiCompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '&') = 0) or
       (AnsiCompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '**') = 0) then begin
       if (Result = -1) or ((Result <> -1) and (PStatement(fParser.Statements[I])^._ParentID <> Result) {and (PStatement(fParser.Statements[I])^._ParentID <> -1)}) then begin
-        Result := PStatement(fParser.Statements[I])^._ID;
+        Result := I;
         if Assigned(il) then
           il.Add(Result)
         else

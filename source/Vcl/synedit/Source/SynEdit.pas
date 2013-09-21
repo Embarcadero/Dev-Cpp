@@ -212,7 +212,7 @@ const
     eoSmartTabDelete, eoGroupUndo];
 
 type
-// use scAll to update a statusbar when another TCustomSynEdit got the focus
+// use scAll to update a Statusbar when another TCustomSynEdit got the focus
   TSynStatusChange = (scAll, scCaretX, scCaretY, scLeftChar, scTopLine,
     scInsertMode, scModified, scSelection, scReadOnly);
   TSynStatusChanges = set of TSynStatusChange;

@@ -90,10 +90,6 @@ end;
 
 procedure TToolEditForm.HelpClick(Sender: TObject);
 begin
-{  if Application.HelpFile <> '' then
-   Application.HelpJump('ToolEditForm')
-}
-
   Application.MessageBox(
     'You can use macros when calling a tool, how it can acts depending on what your doing'+#10#13+
     'in Dev-C++. For example, if you are willing to add a tool to Dev-C++ that can compress'+#10#13+

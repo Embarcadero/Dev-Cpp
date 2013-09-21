@@ -314,7 +314,6 @@ type
    fCDir: string;              // c includes
    fCppDir: string;            // c++ includes
    fLibDir: string;            // Libraries
-   fMingw: string;             // Mingw root -- should be set in installer if mingw included
    fOldPath: string;           // Enviroment Path at program start
   public
    constructor Create;
@@ -756,37 +755,42 @@ end;
 
 procedure InitializeOptions;
 begin
-  if not assigned(devDirs) then
-  devDirs:= TdevDirs.Create;
+	if not assigned(devDirs) then
+		devDirs:= TdevDirs.Create;
 
-  if not assigned(devCompilerSet) then
-  devCompilerSet:= TdevCompilerSet.Create;
+	if not assigned(devCompilerSet) then
+		devCompilerSet:= TdevCompilerSet.Create;
 
-  if not assigned(devCompiler) then
-  devCompiler:= TdevCompiler.Create;
+	if not assigned(devCompiler) then
+		devCompiler:= TdevCompiler.Create;
 
-  if not assigned(devEditor) then
-  devEditor:= TdevEditor.Create;
+	if not assigned(devEditor) then
+		devEditor:= TdevEditor.Create;
 
-  if not assigned(devCodeCompletion) then
-    devCodeCompletion:= TdevCodeCompletion.Create;
+	if not assigned(devCodeCompletion) then
+		devCodeCompletion:= TdevCodeCompletion.Create;
 
-  if not assigned(devClassBrowsing) then
-    devClassBrowsing:= TdevClassBrowsing.Create;
+	if not assigned(devClassBrowsing) then
+		devClassBrowsing:= TdevClassBrowsing.Create;
 
-  if not assigned(devCVSHandler) then
-    devCVSHandler:= TdevCVSHandler.Create;
+	if not assigned(devCVSHandler) then
+		devCVSHandler:= TdevCVSHandler.Create;
 
-  if not assigned(devExternalPrograms) then
-    devExternalPrograms:= TdevExternalPrograms.Create;
+	if not assigned(devExternalPrograms) then
+		devExternalPrograms:= TdevExternalPrograms.Create;
 
 	// load the preferred compiler set on first run
 	if devCompilerSet.Sets.Count=0 then begin
-		devCompilerSet.Sets.Add(DEFCOMPILERSET32);
-	//	devCompilerSet.Sets.Add(DEFCOMPILERSET64);
+		if AnsiContainsStr(devDirs.Bins,'MinGW32') then
+			devCompilerSet.Sets.Add(DEFCOMPILERSET32)
+		else
+			devCompilerSet.Sets.Add(DEFCOMPILERSET64);
+
+		// Write the compiler list
 		devCompilerSet.WriteSets;
+
+		// Write the compiler itself
 		devCompilerSet.SaveSet(0);
-	//	devCompilerSet.SaveSet(1);
 	end;
 
 	// Load the default one
@@ -1000,7 +1004,7 @@ begin
   fAssociateDev := getAssociation(4);
   fAssociateRc := getAssociation(5);
   fAssociateTemplate := getAssociation(6);
-  
+
   fShowTipsOnStart:=TRUE;
   fLastTip:=0;
   fFileDate := 0;
@@ -1377,10 +1381,17 @@ procedure TdevDirs.SettoDefaults;
 begin
 	fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 
-	fBinDir:= StringReplace(BIN_DIR,        '%path%\',fExec,[rfReplaceAll]);
-	fLibDir:= StringReplace(LIB_DIR,        '%path%\',fExec,[rfReplaceAll]);
-	fCDir  := StringReplace(C_INCLUDE_DIR,  '%path%\',fExec,[rfReplaceAll]);
-	fCppDir:= StringReplace(CPP_INCLUDE_DIR,'%path%\',fExec,[rfReplaceAll]);
+	if DirectoryExists('MinGW64') then begin
+		fBinDir:= StringReplace(BIN_DIR64,        '%path%\',fExec,[rfReplaceAll]);
+		fLibDir:= StringReplace(LIB_DIR64,        '%path%\',fExec,[rfReplaceAll]);
+		fCDir  := StringReplace(C_INCLUDE_DIR64,  '%path%\',fExec,[rfReplaceAll]);
+		fCppDir:= StringReplace(CPP_INCLUDE_DIR64,'%path%\',fExec,[rfReplaceAll]);
+	end else if DirectoryExists('MinGW32') then begin
+		fBinDir:= StringReplace(BIN_DIR32,        '%path%\',fExec,[rfReplaceAll]);
+		fLibDir:= StringReplace(LIB_DIR32,        '%path%\',fExec,[rfReplaceAll]);
+		fCDir  := StringReplace(C_INCLUDE_DIR32,  '%path%\',fExec,[rfReplaceAll]);
+		fCppDir:= StringReplace(CPP_INCLUDE_DIR32,'%path%\',fExec,[rfReplaceAll]);
+	end;
 
 	fConfig:= fExec;
 	fHelp  := fExec + HELP_DIR;
@@ -1407,7 +1418,6 @@ begin
   fIcons:=  StringReplace(fIcons,fExec,'%path%\',[rfReplaceAll]);
   fLang:=   StringReplace(fLang,fExec,'%path%\',[rfReplaceAll]);
   fTemp:=   StringReplace(fTemp,fExec,'%path%\',[rfReplaceAll]);
-  fMingw:=  StringReplace(fMingw,fExec,'%path%\',[rfReplaceAll]);
   fThemes:= StringReplace(fThemes,fExec,'%path%\',[rfReplaceAll]);
   fLibDir:= StringReplace(fLibDir,fExec,'%path%\',[rfReplaceAll]);
   fBinDir:= StringReplace(fBinDir,fExec,'%path%\',[rfReplaceAll]);
@@ -1420,7 +1430,6 @@ begin
   fIcons:=  StringReplace(fIcons,'%path%\',fExec,[rfReplaceAll]);
   fLang:=   StringReplace(fLang,'%path%\',fExec,[rfReplaceAll]);
   fTemp:=   StringReplace(fTemp,'%path%\',fExec,[rfReplaceAll]);
-  fMingw:=  StringReplace(fMingw,'%path%\',fExec,[rfReplaceAll]);
   fThemes:= StringReplace(fThemes,'%path%\',fExec,[rfReplaceAll]);
   fLibDir:= StringReplace(fLibDir,'%path%\',fExec,[rfReplaceAll]);
   fBinDir:= StringReplace(fBinDir,'%path%\',fExec,[rfReplaceAll]);
@@ -1498,7 +1507,7 @@ begin
 	fUseSyn:= TRUE;
 	//last ; is for files with no extension
 	//which should be treated as cpp header files
-	fSynExt:= 'c;cpp;h;hpp;cc;cxx;cp;hp;rh;fx;;';
+	fSynExt:= 'c;cpp;h;hpp;cc;cxx;cp;hp;rh;fx;inl;;';
 	fHighCurrLine:= TRUE;
 	fHighColor:= $FFFFCC; // Light Turquoise
 	fTabSize:= 4;
@@ -1509,8 +1518,8 @@ begin
 
 	// Display #2
 	fShowGutter:= TRUE;
-	fGutterAuto:= FALSE;
-	fCustomGutter:= TRUE;
+	fGutterAuto:= TRUE;
+	fCustomGutter:= FALSE;
 	fLineNumbers:= TRUE;
 	fFirstisZero:= FALSE;
 	fLeadZero:= FALSE;
@@ -1637,7 +1646,7 @@ end;
 
 procedure TdevCodeCompletion.SetDelay(Value: integer);
 begin
-	fDelay:=Max(1,Value);
+	fDelay:=Value;
 end;
 
 procedure TdevCodeCompletion.SettoDefaults;
@@ -1738,10 +1747,10 @@ end;
 
 constructor TdevCompilerSet.Create;
 begin
-  inherited;
-  fSets:=TStringList.Create;
-  UpdateSets;
-  SettoDefaults;
+	inherited;
+	fSets:=TStringList.Create;
+	UpdateSets;
+	SettoDefaults;
 end;
 
 destructor TdevCompilerSet.Destroy;
@@ -1833,10 +1842,10 @@ begin
 
 			// If confirmed, insert working dirs into default path list
 			if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-				fBinDir:= goodBinDir + ';' + StringReplace(BIN_DIR,        '%path%\',devDirs.fExec,[rfReplaceAll]);
-				fLibDir:= goodLibDir + ';' + StringReplace(LIB_DIR,        '%path%\',devDirs.fExec,[rfReplaceAll]);
-				fCDir  := goodCDir   + ';' + StringReplace(C_INCLUDE_DIR,  '%path%\',devDirs.fExec,[rfReplaceAll]);
-				fCppDir:= goodCppDir + ';' + StringReplace(CPP_INCLUDE_DIR,'%path%\',devDirs.fExec,[rfReplaceAll]);
+				fBinDir:= goodBinDir + ';' + StringReplace(BIN_DIR32,        '%path%\',devDirs.fExec,[rfReplaceAll]);
+				fLibDir:= goodLibDir + ';' + StringReplace(LIB_DIR32,        '%path%\',devDirs.fExec,[rfReplaceAll]);
+				fCDir  := goodCDir   + ';' + StringReplace(C_INCLUDE_DIR32,  '%path%\',devDirs.fExec,[rfReplaceAll]);
+				fCppDir:= goodCppDir + ';' + StringReplace(CPP_INCLUDE_DIR32,'%path%\',devDirs.fExec,[rfReplaceAll]);
 			end;
 		end;
 	end;
@@ -1956,32 +1965,35 @@ end;
 
 procedure TdevCompilerSet.SettoDefaults;
 begin
-  // Programs
-  fgccName := GCC_PROGRAM;
-  fgppName := GPP_PROGRAM;
-  fgdbName := GDB_PROGRAM;
-  fmakeName := MAKE_PROGRAM;
-  fwindresName := WINDRES_PROGRAM;
-  fdllwrapName := DLLWRAP_PROGRAM;
-  fgprofName := GPROF_PROGRAM;
+	// Programs
+ 	fgccName := GCC_PROGRAM;
+	fgppName := GPP_PROGRAM;
+	fgdbName := GDB_PROGRAM;
+	fmakeName := MAKE_PROGRAM;
+	fwindresName := WINDRES_PROGRAM;
+	fdllwrapName := DLLWRAP_PROGRAM;
+	fgprofName := GPROF_PROGRAM;
 
-  // Command line text
-  fCompAdd:= FALSE;
-  fLinkAdd:= TRUE;
-  fCompOpt:='';
-  fLinkOpt:='-static-libstdc++ -static-libgcc';
+	// Command line text
+	fCompAdd:= FALSE;
+	fLinkAdd:= TRUE;
+	fCompOpt:='';
+	if DirectoryExists('MinGW64') then
+		fLinkOpt:='-static-libgcc'
+	else
+		fLinkOpt:='-static-libstdc++ -static-libgcc';
 
-  // Makefile
-  fDelay:=0;
-  fFastDep:=TRUE;
+	// Makefile
+	fDelay:=0;
+	fFastDep:=TRUE;
 
-  // dirs
-  fBinDir := devDirs.Bins;
-  fCDir   := devDirs.C;
-  fCppDir := devDirs.Cpp;
-  fLibDir := devDirs.Lib;
+	// dirs
+	fBinDir := devDirs.Bins;
+	fCDir   := devDirs.C;
+	fCppDir := devDirs.Cpp;
+	fLibDir := devDirs.Lib;
 
-  fOptions:='';
+	fOptions:='';
 end;
 
 procedure TdevCompilerSet.UpdateSets;

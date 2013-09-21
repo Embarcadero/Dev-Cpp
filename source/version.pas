@@ -32,37 +32,42 @@ const
 
 resourcestring
 	// misc strings
-	GCC_VERSION          = '4.6.1';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.0.0.9';
-	DEVCPP_BUILDTIME     = 'Dec 9 2011 - 22:28';
+	DEVCPP_VERSION       = '5.1.0.0';
+	DEVCPP_BUILDTIME     = 'Dec 19 2011 - 23:10';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
 	DEV_SEARCHLOOP       = '$__DEV_SEARCH_LOOP';
 	DEV_COMPLETION_CACHE = 'cache.ccc';
 	DEV_DEFAULTCODE_FILE = 'defaultcode.cfg';
-	DEV_SHORTCUTS_FILE   = 'devshortcuts.cfg';
+	DEV_DEVSHORTCUTS_FILE= 'devShortcuts.cfg';
 	DEV_CLASSFOLDERS_FILE= 'classfolders.dcf';
 	DEV_WEBMIRRORS_FILE  = 'mirrors.cfg';
 	DEV_MAKE_FILE        = 'Makefile.win';
 	DEV_TOOLS_FILE       = 'tools.ini';
 	DEV_HELP_INI         = 'devhelp.ini';
 	DEV_CODEINS_FILE     = 'devcpp.ci';
-	DEV_MAINHELP_FILE    = 'devcpp.chm';
+	DEV_MAINHELP_FILE    = 'devcpp.htm';
 	DEV_GNOME_THEME      = 'Gnome';
 	DEV_NEWLOOK_THEME    = 'New Look';
 	DEV_BLUE_THEME       = 'Blue';
 	DEV_INTERNAL_THEME   = 'New Look';
 
 	// default directories
-	BIN_DIR              = '%path%' + pd + 'MinGW32' + pd + 'bin';
-	LIB_DIR              = '%path%' + pd + 'MinGW32' + pd + 'lib';
-	C_INCLUDE_DIR        = '%path%' + pd + 'MinGW32' + pd + 'include';
-	CPP_INCLUDE_DIR      = '%path%' + pd + 'MinGW32' + pd + 'include';
+	BIN_DIR32            = '%path%' + pd + 'MinGW32' + pd + 'bin';
+	LIB_DIR32            = '%path%' + pd + 'MinGW32' + pd + 'lib';
+	C_INCLUDE_DIR32      = '%path%' + pd + 'MinGW32' + pd + 'include';
+	CPP_INCLUDE_DIR32    = '%path%' + pd + 'MinGW32' + pd + 'include';
+
+	BIN_DIR64            = '%path%' + pd + 'MinGW64' + pd + 'bin';
+	LIB_DIR64            = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'lib';
+	C_INCLUDE_DIR64      = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'include';
+	CPP_INCLUDE_DIR64    = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'include';
+
 	LANGUAGE_DIR         = 'Lang' + pd;
 	ICON_DIR             = 'Icons' + pd;
-	HELP_DIR             = ''; // exe folder
+	HELP_DIR             = 'Help' + pd;
 	TEMPLATE_DIR         = 'Templates' + pd;
 	THEME_DIR            = 'Themes' + pd;
 	PACKAGES_DIR         = 'Packages' + pd;
@@ -100,7 +105,7 @@ resourcestring
   WEBUPDATE_SECTION    = 'WEBUPDATE';
 
   DEFCOMPILERSET32     = 'MinGW GCC 4.6.1 32-bit';
-//  DEFCOMPILERSET64     = 'MinGW GCC 4.6.1 64-bit';
+  DEFCOMPILERSET64     = 'MinGW GCC 4.6.1 64-bit';
 
   // Filters
   FLT_BASE             = 'All known Files||';

@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 538
-  Top = 304
-  Width = 1121
+  Left = 620
+  Top = 259
+  Width = 1048
   Height = 692
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
@@ -15,7 +15,7 @@ object MainForm: TMainForm
   KeyPreview = True
   Menu = MainMenu
   OldCreateOrder = False
-  Position = poDefault
+  Position = poScreenCenter
   Scaled = False
   WindowState = wsMaximized
   OnClose = FormClose
@@ -23,7 +23,6 @@ object MainForm: TMainForm
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnMouseWheel = FormMouseWheel
-  OnPaint = FormPaint
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
@@ -39,7 +38,7 @@ object MainForm: TMainForm
   object SplitterBottom: TSplitter
     Left = 0
     Top = 479
-    Width = 1105
+    Width = 1032
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -49,9 +48,9 @@ object MainForm: TMainForm
   object MessageControl: TPageControl
     Left = 0
     Top = 482
-    Width = 1105
+    Width = 1032
     Height = 133
-    ActivePage = FindSheet
+    ActivePage = CompSheet
     Align = alBottom
     Constraints.MinHeight = 1
     Images = dmMain.MenuImages_NewLook
@@ -68,8 +67,8 @@ object MainForm: TMainForm
       object CompilerOutput: TListView
         Left = 0
         Top = 0
-        Width = 1093
-        Height = 100
+        Width = 1020
+        Height = 101
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -99,6 +98,7 @@ object MainForm: TMainForm
         ShowHint = True
         TabOrder = 0
         ViewStyle = vsReport
+        OnAdvancedCustomDrawItem = CompilerOutputAdvancedCustomDrawItem
         OnDblClick = CompilerOutputDblClick
         OnKeyDown = CompilerOutputKeyDown
       end
@@ -110,7 +110,7 @@ object MainForm: TMainForm
       object ResourceOutput: TListBox
         Left = 0
         Top = 0
-        Width = 1093
+        Width = 1020
         Height = 100
         Align = alClient
         BevelInner = bvNone
@@ -182,7 +182,7 @@ object MainForm: TMainForm
       object CompResGroupBox: TGroupBox
         Left = 233
         Top = 0
-        Width = 663
+        Width = 860
         Height = 100
         Align = alClient
         Caption = 'Compile log:'
@@ -192,7 +192,7 @@ object MainForm: TMainForm
         object LogOutput: TMemo
           Left = 2
           Top = 15
-          Width = 659
+          Width = 856
           Height = 83
           Align = alClient
           BevelInner = bvNone
@@ -210,8 +210,8 @@ object MainForm: TMainForm
       object DebugSubPages: TPageControl
         Left = 0
         Top = 0
-        Width = 1093
-        Height = 101
+        Width = 1020
+        Height = 100
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -590,7 +590,7 @@ object MainForm: TMainForm
           object lvBacktrace: TListView
             Left = 0
             Top = 0
-            Width = 1085
+            Width = 1012
             Height = 69
             Align = alClient
             Columns = <
@@ -624,8 +624,8 @@ object MainForm: TMainForm
           object DebugOutput: TMemo
             Left = 0
             Top = 22
-            Width = 1085
-            Height = 48
+            Width = 1012
+            Height = 47
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -636,7 +636,7 @@ object MainForm: TMainForm
           object GdbOutputPanel: TPanel
             Left = 0
             Top = 0
-            Width = 1085
+            Width = 1012
             Height = 22
             Align = alTop
             BevelOuter = bvNone
@@ -676,8 +676,8 @@ object MainForm: TMainForm
       object FindOutput: TListView
         Left = 0
         Top = 0
-        Width = 1093
-        Height = 101
+        Width = 1020
+        Height = 100
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -716,10 +716,10 @@ object MainForm: TMainForm
       ImageIndex = 9
     end
   end
-  object ControlBar1: TControlBar
+  object Toolbar: TControlBar
     Left = 0
     Top = 16
-    Width = 1105
+    Width = 1032
     Height = 56
     Align = alTop
     AutoDock = False
@@ -728,7 +728,7 @@ object MainForm: TMainForm
     BevelKind = bkSoft
     RowSize = 28
     TabOrder = 1
-    OnContextPopup = ControlBar1ContextPopup
+    OnContextPopup = ToolbarContextPopup
     object tbMain: TToolBar
       Left = 11
       Top = 2
@@ -1042,12 +1042,12 @@ object MainForm: TMainForm
     object tbClasses: TToolBar
       Left = 255
       Top = 30
-      Width = 452
+      Width = 600
       Height = 22
       AutoSize = True
       Caption = 'tbClasses'
-      Constraints.MaxWidth = 452
-      Constraints.MinWidth = 452
+      Constraints.MaxWidth = 600
+      Constraints.MinWidth = 600
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -1057,9 +1057,10 @@ object MainForm: TMainForm
       object cmbClasses: TComboBox
         Left = 0
         Top = 0
-        Width = 232
+        Width = 300
         Height = 22
         Style = csDropDownList
+        Ctl3D = True
         DropDownCount = 16
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -1067,15 +1068,16 @@ object MainForm: TMainForm
         Font.Name = 'Courier New'
         Font.Style = []
         ItemHeight = 14
+        ParentCtl3D = False
         ParentFont = False
         Sorted = True
         TabOrder = 0
         OnChange = cmbClassesChange
       end
       object cmbMembers: TComboBox
-        Left = 232
+        Left = 300
         Top = 0
-        Width = 219
+        Width = 300
         Height = 22
         Style = csDropDownList
         DropDownCount = 16
@@ -1092,10 +1094,10 @@ object MainForm: TMainForm
       end
     end
   end
-  object StatusBar: TStatusBar
+  object Statusbar: TStatusBar
     Left = 0
     Top = 615
-    Width = 1105
+    Width = 1032
     Height = 19
     Panels = <
       item
@@ -1116,7 +1118,7 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 196
     Top = 72
-    Width = 909
+    Width = 836
     Height = 407
     Align = alClient
     HotTrack = True
@@ -1132,7 +1134,7 @@ object MainForm: TMainForm
   object pnlFull: TPanel
     Left = 0
     Top = 0
-    Width = 1105
+    Width = 1032
     Height = 16
     Align = alTop
     BevelOuter = bvNone
@@ -1142,10 +1144,10 @@ object MainForm: TMainForm
     TabOrder = 4
     Visible = False
     DesignSize = (
-      1105
+      1032
       16)
     object btnFullScrRevert: TSpeedButton
-      Left = 1088
+      Left = 1015
       Top = 0
       Width = 16
       Height = 16
@@ -1167,13 +1169,13 @@ object MainForm: TMainForm
       OnClick = btnFullScrRevertClick
     end
   end
-  object devFileMonitor1: TdevFileMonitor
+  object devFileMonitor: TdevFileMonitor
     Left = 112
     Top = 152
     Width = 0
     Height = 0
     Active = False
-    OnNotifyChange = devFileMonitor1NotifyChange
+    OnNotifyChange = devFileMonitorNotifyChange
   end
   object LeftPageControl: TPageControl
     Left = 0
@@ -1237,7 +1239,7 @@ object MainForm: TMainForm
         BorderStyle = bsNone
         ShowFilter = sfAll
         OnSelect = ClassBrowser1Select
-        Parser = CppParser1
+        Parser = CppParser
         ItemImages.Globals = 0
         ItemImages.Classes = 1
         ItemImages.VariablePrivate = 2
@@ -1769,8 +1771,8 @@ object MainForm: TMainForm
       object N20: TMenuItem
         Caption = '-'
       end
-      object Configureshortcuts1: TMenuItem
-        Action = actConfigShortcuts
+      object ConfiguredevShortcuts1: TMenuItem
+        Action = actConfigdevShortcuts
       end
       object ConfiguretoolsItem: TMenuItem
         Action = actConfigTools
@@ -2224,7 +2226,7 @@ object MainForm: TMainForm
       end
     end
   end
-  object alMain: TActionList
+  object ActionList: TActionList
     Images = dmMain.MenuImages_NewLook
     Left = 624
     Top = 164
@@ -2617,7 +2619,7 @@ object MainForm: TMainForm
       ImageIndex = 32
       ShortCut = 119
       OnExecute = actDebugExecute
-      OnUpdate = actDebugUpdate
+      OnUpdate = actCompileUpdate
     end
     object actCompOptions: TAction
       Tag = 1
@@ -2838,11 +2840,11 @@ object MainForm: TMainForm
       OnExecute = actSyntaxCheckExecute
       OnUpdate = actCompileUpdate
     end
-    object actConfigShortcuts: TAction
+    object actConfigdevShortcuts: TAction
       Category = 'Tools'
-      Caption = 'Configure &shortcuts'
+      Caption = 'Configure &devShortcuts'
       ImageIndex = 31
-      OnExecute = actConfigShortcutsExecute
+      OnExecute = actConfigdevShortcutsExecute
     end
     object actProgramReset: TAction
       Category = 'Execute'
@@ -3015,7 +3017,6 @@ object MainForm: TMainForm
       Category = 'Execute'
       Caption = 'Parameters...'
       OnExecute = actExecParamsExecute
-      OnUpdate = actDebugUpdate
     end
     object actShowTips: TAction
       Category = 'Help'
@@ -3140,9 +3141,9 @@ object MainForm: TMainForm
       OnExecute = actHideFSBarExecute
     end
   end
-  object ApplicationEvents1: TApplicationEvents
-    OnDeactivate = ApplicationEvents1Deactivate
-    OnIdle = ApplicationEvents1Idle
+  object ApplicationEvents: TApplicationEvents
+    OnDeactivate = ApplicationEventsDeactivate
+    OnIdle = ApplicationEventsIdle
     Left = 626
     Top = 202
   end
@@ -3170,25 +3171,25 @@ object MainForm: TMainForm
       OnClick = actMsgClearExecute
     end
   end
-  object CppTokenizer1: TCppTokenizer
+  object CppTokenizer: TCppTokenizer
     LogTokens = False
     Left = 60
     Top = 132
   end
-  object CppParser1: TCppParser
+  object CppParser: TCppParser
     Enabled = True
-    OnTotalProgress = CppParser1TotalProgress
-    Tokenizer = CppTokenizer1
+    OnTotalProgress = CppParserTotalProgress
+    Tokenizer = CppTokenizer
     ParseLocalHeaders = False
     ParseGlobalHeaders = False
     LogStatements = False
-    OnStartParsing = CppParser1StartParsing
-    OnEndParsing = CppParser1EndParsing
+    OnStartParsing = CppParserStartParsing
+    OnEndParsing = CppParserEndParsing
     Left = 60
     Top = 196
   end
-  object CodeCompletion1: TCodeCompletion
-    Parser = CppParser1
+  object CodeCompletion: TCodeCompletion
+    Parser = CppParser
     Color = clWhite
     Width = 320
     Height = 240
@@ -3198,16 +3199,16 @@ object MainForm: TMainForm
     MinHeight = 128
     MaxWidth = 640
     MaxHeight = 480
-    OnResize = CodeCompletion1Resize
+    OnResize = CodeCompletionResize
     OnlyGlobals = False
     CurrentClass = 0
     Left = 60
     Top = 164
   end
-  object devShortcuts1: TdevShortcuts
-    Filename = 'devshortcuts.cfg'
+  object devShortcuts: TdevShortcuts
+    Filename = 'devShortcuts.cfg'
     AlternateColor = 14737632
-    MultiLangStrings.Caption = 'Configure Shortcuts'
+    MultiLangStrings.Caption = 'Configure devShortcuts'
     MultiLangStrings.Title = ' Click on an item and press the shortcut you desire!'
     MultiLangStrings.Tip = 'Tip: press "Escape" to clear a shortcut...'
     MultiLangStrings.HeaderEntry = 'Menu entry'

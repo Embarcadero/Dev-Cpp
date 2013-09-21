@@ -3024,12 +3024,12 @@ procedure TSynCompletionProposal.EditorKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 var
   ShortCutKey   : Word;
-  ShortCutShift : TShiftState;
+  devShortcutshift : TShiftState;
 begin
-  ShortCutToKey (fShortCut,ShortCutKey,ShortCutShift);
+  ShortCutToKey (fShortCut,ShortCutKey,devShortcutshift);
   with Sender as TCustomSynEdit do
   begin
-    if ((DefaultType <> ctCode) or not(ReadOnly)) and (Shift = ShortCutShift) and (Key = ShortCutKey) then
+    if ((DefaultType <> ctCode) or not(ReadOnly)) and (Shift = devShortcutshift) and (Key = ShortCutKey) then
     begin
       Form.CurrentEditor := Sender as TCustomSynEdit;
       Key := 0;
@@ -3453,11 +3453,11 @@ procedure TSynAutoComplete.EditorKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var
   ShortCutKey   : Word;
-  ShortCutShift : TShiftState;
+  devShortcutshift : TShiftState;
 begin
-  ShortCutToKey (fShortCut,ShortCutKey,ShortCutShift);
+  ShortCutToKey (fShortCut,ShortCutKey,devShortcutshift);
   if not (Sender as TCustomSynEdit).ReadOnly and
-    (Shift = ShortCutShift) and (Key = ShortCutKey) then
+    (Shift = devShortcutshift) and (Key = ShortCutKey) then
   begin
     Execute(GetPreviousToken(Sender as TCustomSynEdit), Sender as TCustomSynEdit);
     fNoNextKey := true;

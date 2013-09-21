@@ -64,7 +64,7 @@ object CompileProgressForm: TCompileProgressForm
         Height = 21
       end
       object Bevel6: TBevel
-        Left = 252
+        Left = 249
         Top = 92
         Width = 69
         Height = 21
@@ -158,8 +158,8 @@ object CompileProgressForm: TCompileProgressForm
         Caption = 'Errors:'
       end
       object Label4: TLabel
-        Left = 200
-        Top = 92
+        Left = 190
+        Top = 96
         Width = 48
         Height = 13
         Caption = 'Warnings:'
@@ -180,7 +180,7 @@ object CompileProgressForm: TCompileProgressForm
         ParentFont = False
       end
       object lblWarn: TLabel
-        Left = 256
+        Left = 253
         Top = 96
         Width = 60
         Height = 13

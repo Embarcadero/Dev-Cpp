@@ -77,8 +77,6 @@ type
 
     function GetSelected: integer;
     procedure CppParserTotalProgress(Sender: TObject; FileName: String; Total, Current: Integer);
-    procedure CppParserStartParsing(Sender: TObject);
-    procedure CppParserEndParsing(Sender: TObject);
 
   public
     procedure UpdateList(const List: TStrings);
@@ -137,24 +135,17 @@ begin
   GetUserName(s, d);
 end;
 
-procedure TLangForm.CppParserStartParsing(Sender: TObject);
-begin
-  pbCCCache.Visible := True;
-end;
-
-procedure TLangForm.CppParserEndParsing(Sender: TObject);
-begin
-  pbCCCache.Visible := False;
-end;
-
 procedure TLangForm.CppParserTotalProgress(Sender: TObject; FileName: String; Total, Current: Integer);
+var
+	tmp : string;
 begin
 	if not HasProgressStarted then begin
 		pbCCCache.Max := Total;
 		HasProgressStarted := true;
 	end;
 	pbCCCache.Position := pbCCCache.Position + Current;
-	ParseLabel.Caption :=  'Parsing file:' + #13#10 + FileName;
+	tmp := 'Parsing file:' + #13#10 + FileName;
+	ParseLabel.Caption := StringReplace(tmp,devDirs.Exec,'\',[rfReplaceAll, rfIgnoreCase]);
 	Application.ProcessMessages;
 end;
 
@@ -207,13 +198,13 @@ begin
 			devClassBrowsing.ParseGlobalHeaders := true;
 			SaveOptions;
 
-			MainForm.CppParser1.ParseLocalHeaders := True;
-			MainForm.CppParser1.ParseGlobalHeaders := True;
-			MainForm.CppParser1.OnStartParsing := CppParserStartParsing;
-			MainForm.CppParser1.OnEndParsing := CppParserEndParsing;
-			MainForm.CppParser1.OnTotalProgress := CppParserTotalProgress;
-			MainForm.CppParser1.Tokenizer:= MainForm.CppTokenizer1;
-			MainForm.CppParser1.Enabled := true;
+			MainForm.CppParser.ParseLocalHeaders := True;
+			MainForm.CppParser.ParseGlobalHeaders := True;
+			MainForm.CppParser.OnTotalProgress := CppParserTotalProgress;
+			MainForm.CppParser.OnStartParsing := nil;
+			MainForm.CppParser.OnEndParsing := nil;
+			MainForm.CppParser.Tokenizer:= MainForm.CppTokenizer;
+			MainForm.CppParser.Enabled := true;
 
 			MainForm.ClassBrowser1.SetUpdateOff;
 
@@ -234,21 +225,21 @@ begin
 				if DirectoryExists(s[i]) then begin
 					FilesFromWildcard(s[i], '*.*', f, false, false, false);
 					for j := 0 to f.Count - 1 do
-						MainForm.CppParser1.AddFileToScan(f[j]);
+						MainForm.CppParser.AddFileToScan(f[j]);
 				end else
 					MessageDlg('Directory "' + s[i] + '" does not exist', mtWarning, [mbOK], 0);
 			end;
 
 			// Deze regel duurt heel lang
-			MainForm.CppParser1.ParseList;
+			MainForm.CppParser.ParseList;
 
 			ParseLabel.Caption := 'Saving...';
 			Application.ProcessMessages;
-			MainForm.CppParser1.Save(devDirs.Config+DEV_COMPLETION_CACHE);
+			MainForm.CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE);
 
-			MainForm.CppParser1.OnStartParsing := MainForm.CppParser1StartParsing;;
-			MainForm.CppParser1.OnEndParsing := MainForm.CppParser1EndParsing;
-			MainForm.CppParser1.OnTotalProgress := MainForm.CppParser1TotalProgress;
+			MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;;
+			MainForm.CppParser.OnEndParsing := MainForm.CppParserEndParsing;
+			MainForm.CppParser.OnTotalProgress := MainForm.CppParserTotalProgress;
 
 			MainForm.ClassBrowser1.SetUpdateOn;
 

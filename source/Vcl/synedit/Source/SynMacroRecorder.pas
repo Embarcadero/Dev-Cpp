@@ -187,7 +187,7 @@ type
 
   TCustomSynMacroRecorder = class(TAbstractSynHookerPlugin)
   private
-    fShortCuts: array [TSynMacroCommand] of TShortCut;
+    fdevShortcuts: array [TSynMacroCommand] of TShortCut;
     fOnStateChange: TNotifyEvent;
     fOnUserCommand: TSynUserCommandEvent;
     fMacroName: string;
@@ -241,9 +241,9 @@ type
     property EventCount: integer read GetEventCount;
     property Events[aIndex: integer]: TSynMacroEvent read GetEvent;
     property RecordShortCut: TShortCut index Ord(mcRecord)
-      read fShortCuts[mcRecord] write SetShortCut;
+      read fdevShortcuts[mcRecord] write SetShortCut;
     property PlaybackShortCut: TShortCut index Ord(mcPlayback)
-      read fShortCuts[mcPlayback] write SetShortCut;
+      read fdevShortcuts[mcPlayback] write SetShortCut;
     property SaveMarkerPos: boolean read fSaveMarkerPos
       write fSaveMarkerPos default False;
     property AsString : string read GetAsString write SetAsString;
@@ -345,11 +345,11 @@ begin
   fCommandIDs[mcRecord] := NewPluginCommand;
   fCommandIDs[mcPlayback] := NewPluginCommand;
   {$IFDEF SYN_CLX}
-  fShortCuts[mcRecord] := QMenus.ShortCut( Ord('R'), [ssCtrl, ssShift] );
-  fShortCuts[mcPlayback] := QMenus.ShortCut( Ord('P'), [ssCtrl, ssShift] );
+  fdevShortcuts[mcRecord] := QMenus.ShortCut( Ord('R'), [ssCtrl, ssShift] );
+  fdevShortcuts[mcPlayback] := QMenus.ShortCut( Ord('P'), [ssCtrl, ssShift] );
   {$ELSE}
-  fShortCuts[mcRecord] := Menus.ShortCut( Ord('R'), [ssCtrl, ssShift] );
-  fShortCuts[mcPlayback] := Menus.ShortCut( Ord('P'), [ssCtrl, ssShift] );
+  fdevShortcuts[mcRecord] := Menus.ShortCut( Ord('R'), [ssCtrl, ssShift] );
+  fdevShortcuts[mcPlayback] := Menus.ShortCut( Ord('P'), [ssCtrl, ssShift] );
   {$ENDIF}
 end;
 
@@ -619,21 +619,21 @@ procedure TCustomSynMacroRecorder.SetShortCut(const Index: Integer;
 var
   cEditor: integer;
 begin
-  if fShortCuts[TSynMacroCommand(Index)] <> Value then
+  if fdevShortcuts[TSynMacroCommand(Index)] <> Value then
   begin
     if Assigned(fEditors) then
       if Value <> 0 then
       begin
         for cEditor := 0 to fEditors.Count -1 do
           HookEditor( Editors[cEditor], fCommandIDs[TSynMacroCommand(Index)],
-            fShortCuts[TSynMacroCommand(Index)], Value );
+            fdevShortcuts[TSynMacroCommand(Index)], Value );
       end else
       begin
         for cEditor := 0 to fEditors.Count -1 do
           UnHookEditor( Editors[cEditor], fCommandIDs[TSynMacroCommand(Index)],
-            fShortCuts[TSynMacroCommand(Index)] );
+            fdevShortcuts[TSynMacroCommand(Index)] );
       end;
-    fShortCuts[TSynMacroCommand(Index)] := Value;
+    fdevShortcuts[TSynMacroCommand(Index)] := Value;
   end;
 end;
 

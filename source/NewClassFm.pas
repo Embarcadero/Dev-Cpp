@@ -105,7 +105,7 @@ begin
   cmbScope.ItemIndex := 2;
   sl := TStringList.Create;
   try
-    MainForm.CppParser1.GetClassesList(sl);
+    MainForm.CppParser.GetClassesList(sl);
     cmbClass.Items.Assign(sl);
   finally
     sl.Free;
@@ -230,9 +230,9 @@ begin
   e.Text.Lines.Append('');
   if chkInherit.Checked and (txtIncFile.Text <> '') then begin
     st := nil;
-    for idx := 0 to MainForm.CppParser1.Statements.Count - 1 do begin
-      st := MainForm.CppParser1.Statements[idx];
-      if (st^._Kind = skClass) and (st^._ScopelessCmd = cmbClass.Text) and (MainForm.fProject.Units.Indexof(MainForm.CppParser1.GetDeclarationFileName(st)) <> -1) then
+    for idx := 0 to MainForm.CppParser.Statements.Count - 1 do begin
+      st := MainForm.CppParser.Statements[idx];
+      if (st^._Kind = skClass) and (st^._ScopelessCmd = cmbClass.Text) and (MainForm.fProject.Units.Indexof(MainForm.CppParser.GetDeclarationFileName(st)) <> -1) then
         Break;
       st:=nil;
     end;
@@ -344,7 +344,7 @@ begin
   if cmbClass.Items.IndexOf(cmbClass.Text) <> -1 then begin
     st := PStatement(cmbClass.Items.Objects[cmbClass.Items.IndexOf(cmbClass.Text)]);
     if Assigned(st) then
-      txtIncFile.Text := ExtractFileName(MainForm.CppParser1.GetDeclarationFileName(st))
+      txtIncFile.Text := ExtractFileName(MainForm.CppParser.GetDeclarationFileName(st))
     else
       txtIncFile.Text := LowerCase(cmbClass.Text) + '.h';
   end

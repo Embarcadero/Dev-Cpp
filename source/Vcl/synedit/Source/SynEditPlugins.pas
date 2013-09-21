@@ -96,7 +96,7 @@ type
   TAbstractSynSingleHookPlugin = class(TAbstractSynHookerPlugin)
   private
     fCommandID: TSynEditorCommand;
-    function IsShortCutStored: Boolean;
+    function IsdevShortcutstored: Boolean;
     procedure SetShortCut(const Value: TShortCut);
   protected
     fState: TPluginState;
@@ -121,7 +121,7 @@ type
     procedure Cancel;
   published
     property ShortCut: TShortCut read fShortCut write SetShortCut
-      stored IsShortCutStored;
+      stored IsdevShortcutstored;
   end;
 
   { use TAbstractSynCompletion for non-visual completion }
@@ -413,7 +413,7 @@ begin
   Result := fState = psExecuting;
 end;
 
-function TAbstractSynSingleHookPlugin.IsShortCutStored: Boolean;
+function TAbstractSynSingleHookPlugin.IsdevShortcutstored: Boolean;
 begin
   Result := fShortCut <> DefaultShortCut;
 end;

@@ -107,7 +107,7 @@ type
     fShowInheritedMembers: boolean;
     procedure CustomPaintMe(var Msg: TMessage); message WM_PAINT;
     procedure SetParser(Value: TCppParser);
-    procedure AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
+    procedure AddMembers(Node: TTreeNode; ParentID: integer);
     procedure OnNodeChange(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure OnNodeChanging(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure myDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
@@ -205,7 +205,7 @@ begin
   Node.StateIndex := Node.ImageIndex;
 end;
 
-procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
+procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentID: integer);
 var
   I, iFrom, tmp, tmpI: integer;
   ParNode, NewNode: TTreeNode;
@@ -214,13 +214,13 @@ var
   tmpS: string;
   bInherited: boolean;
 begin
-  if (not fShowInheritedMembers) and (ParentIndex >= 0) then
-    iFrom := ParentIndex // amazing speed-up
+  if (not fShowInheritedMembers) and (ParentID >= 0) then
+    iFrom := ParentID // amazing speed-up
   else
     iFrom := 0; // if showing inheritance, a big speed penalty
 
   // create folders that have this branch as parent
-  if ParentIndex <> -1 then with PStatement(fParser.Statements[ParentIndex])^ do begin
+  if ParentID <> -1 then with PStatement(fParser.Statements[ParentID])^ do begin
       if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
         CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
     end
@@ -233,17 +233,17 @@ begin
   try
 
     // allow inheritance propagation
-    if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass) then begin
+    if fShowInheritedMembers and (ParentID <> -1) and (PStatement(fParser.Statements[ParentID])^._Kind = skClass) then begin
       // follow the inheritance tree all the way up.
       // this code does not work for C++ polymorphic classes
-      tmp := ParentIndex;
+      tmp := ParentID;
       tmpI := tmp;
       tmpS := '';
       sl.Clear;
       while (tmp <> -1) do begin
         tmpS := PStatement(fParser.Statements[tmpI])^._InheritsFromIDs;
         tmp := StrToIntDef(tmpS, -1);
-        tmpI := fParser.IndexOfStatement(tmp);
+        tmpI := tmp;//fParser.IndexOfStatement(tmp);
         if sl.IndexOf(tmpS) <> -1 then
           tmp := -1;
         if (tmp <> -1) then
@@ -280,8 +280,8 @@ begin
           else
             NewNode := Items.AddChildObject(ParNode, _Command, PStatement(fParser.Statements[I]));
           SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
-          if (PStatement(fParser.Statements[I])^._Kind = skClass) and (I <> ParentIndex) then  // CL: fixed potential infinite loop bug
-            AddMembers(NewNode, I, _ID);
+          if (PStatement(fParser.Statements[I])^._Kind = skClass) and (I <> ParentID) then  // CL: fixed potential infinite loop bug
+            AddMembers(NewNode, I);
         end;
       end;
     end;
@@ -336,7 +336,7 @@ begin
   Items.BeginUpdate;
   Clear;
   ReadClassFolders;
-  AddMembers(nil, -1, -1);
+  AddMembers(nil, -1);
   Sort;
   if fLastSelection <> '' then
     ReSelect;

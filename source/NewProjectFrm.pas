@@ -262,8 +262,7 @@ end;
 
 procedure TNewProjectForm.btnHelpClick(Sender: TObject);
 begin
-  HelpFile:= devDirs.Help +DEV_MAINHELP_FILE;
-  Application.HelpJump('ID_CREATEPROJECT');
+	OpenHelpFile;
 end;
 
 end.

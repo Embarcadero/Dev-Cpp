@@ -11,6 +11,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
+  FormStyle = fsStayOnTop
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
