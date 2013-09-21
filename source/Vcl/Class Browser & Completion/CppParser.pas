@@ -2210,11 +2210,11 @@ var
 	I, ItemLength: integer;
 	MAGIC: array[0..7] of Char;
 	Statement: PStatement;
-	Buf: array[0..8191] of Char;
 	P: PIncludesRec;
 	bytes : DWORD;
-	relative : string;
+	relative : AnsiString;
 begin
+
 	// File and file type check
 	hFile := CreateFile(PAnsiChar(FileName),GENERIC_READ,0,nil,OPEN_EXISTING,FILE_FLAG_SEQUENTIAL_SCAN,0);
 	if hFile > 0 then begin
@@ -2234,52 +2234,45 @@ begin
 					ReadFile(hFile, _DeclImplLine, SizeOf(integer),bytes,nil);
 					ReadFile(hFile, _Line, SizeOf(integer),bytes,nil);
 
-					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil); // Read next item length
-					FillChar(Buf, ItemLength+1, 0);                         // Clear item length of the buffer, add \0
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);             // And store the actual item in the buffer
-					_FullText := Buf;
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					SetLength(_FullText,ItemLength);
+					ReadFile(hFile, _FullText[1], ItemLength, bytes, nil);
 
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-					FillChar(Buf, ItemLength+1, 0);
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_Type := Buf;
+					SetLength(_Type,ItemLength);
+					ReadFile(hFile, _Type[1], ItemLength, bytes, nil);
 
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-					FillChar(Buf, ItemLength+1, 0);
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_ScopeCmd := Buf;
+					SetLength(_ScopeCmd,ItemLength);
+					ReadFile(hFile, _ScopeCmd[1], ItemLength, bytes, nil);
 
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-					FillChar(Buf, ItemLength+1, 0);
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_Args := Buf;
+					SetLength(_Args,ItemLength);
+					ReadFile(hFile, _Args[1], ItemLength, bytes, nil);
 
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-					FillChar(Buf, ItemLength+1, 0);
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_ScopelessCmd := Buf;
+					SetLength(_ScopelessCmd,ItemLength);
+					ReadFile(hFile, _ScopelessCmd[1], ItemLength, bytes, nil);
 
 					// Load RELATIVE filenames
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-					FillChar(Buf, ItemLength+1, 0);
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_DeclImplFileName := ReplaceFirstStr(Buf,'%path%\',relativeto);
+					SetLength(_DeclImplFileName,ItemLength);
+					ReadFile(hFile, _DeclImplFileName[1], ItemLength, bytes, nil);
+					_DeclImplFileName := ReplaceFirstStr(_DeclImplFileName,'%path%\',relativeto);
 
 					// Load RELATIVE filenames
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-					FillChar(Buf, ItemLength+1, 0);
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_FileName := ReplaceFirstStr(Buf,'%path%\',relativeto);
+					SetLength(_FileName,ItemLength);
+					ReadFile(hFile, _FileName[1], ItemLength, bytes, nil);
+					_FileName := ReplaceFirstStr(_FileName,'%path%\',relativeto);
 
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-					FillChar(Buf, ItemLength+1, 0);
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_InheritsFromIDs := Buf;
+					SetLength(_InheritsFromIDs,ItemLength);
+					ReadFile(hFile, _InheritsFromIDs[1], ItemLength, bytes, nil);
 
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-					FillChar(Buf, ItemLength+1, 0);
-					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_InheritsFromClasses := Buf;
+					SetLength(_InheritsFromClasses,ItemLength);
+					ReadFile(hFile, _InheritsFromClasses[1], ItemLength, bytes, nil);
 
 					_Loaded := True;
 					_Temporary := False;
@@ -2300,9 +2293,10 @@ begin
 
 				// Load RELATIVE filenames
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-				FillChar(Buf, ItemLength+1, 0);
-				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				relative := ReplaceFirstStr(Buf,'%path%\',relativeto);
+				SetLength(relative,ItemLength);
+				ReadFile(hFile, relative[1], ItemLength, bytes, nil);
+				relative := ReplaceFirstStr(relative,'%path%\',relativeto);
+
 				fScannedFiles.Add(relative);
 				fCacheContents.Add(relative);
 			end;
@@ -2314,16 +2308,16 @@ begin
 
 				// Load RELATIVE filenames
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-				FillChar(Buf, ItemLength+1, 0);
-				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				relative := ReplaceFirstStr(Buf,'%path%\',relativeto);
+				SetLength(relative,ItemLength);
+				ReadFile(hFile, relative[1], ItemLength, bytes, nil);
+				relative := ReplaceFirstStr(relative,'%path%\',relativeto);
 				P^.BaseFile := relative;
 
 				// Load RELATIVE filenames
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
-				FillChar(Buf, ItemLength+1, 0);
-				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				relative := ReplaceFirstStr(Buf,'%path%\',relativeto);
+				SetLength(relative,ItemLength);
+				ReadFile(hFile, relative[1], ItemLength, bytes, nil);
+				relative := ReplaceFirstStr(relative,'%path%\',relativeto);
 				P^.IncludeFiles := relative;
 
 				fIncludesList.Add(P);

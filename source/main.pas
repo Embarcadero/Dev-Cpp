@@ -1370,7 +1370,6 @@ begin
 	SetHints;
 end;
 
-
 function TMainForm.FileIsOpen(const s: AnsiString; inPrj: boolean = FALSE): integer;
 var
 	e: TEditor;
@@ -3001,7 +3000,7 @@ resourcestring
 var
 	e: TEditor;
 	i: integer;
-	libdirs : TStringList;
+	dirs : TStringList;
 	optD,optS : PCompilerOption;
 	debug,strip : boolean;
 	idxD,idxS : integer;
@@ -3053,10 +3052,10 @@ begin
 			PrepareDebugger;
 
 			fDebugger.Start;
-			fDebugger.SendCommand('file', '"' + StringReplace(fProject.Executable, '\', '\\', [rfReplaceAll]) + '"');
+			fDebugger.SendCommand('file', '"' + StringReplace(fProject.Executable, '\', '/', [rfReplaceAll]) + '"');
 
 			if fProject.Options.typ = dptDyn then
-				fDebugger.SendCommand('exec-file', '"' + StringReplace(fProject.Options.HostApplication, '\', '\\', [rfReplaceAll]) +'"');
+				fDebugger.SendCommand('exec-file', '"' + StringReplace(fProject.Options.HostApplication, '\', '/', [rfReplaceAll]) +'"');
 		end else begin
 			e:= GetEditor;
 			if assigned(e) then begin
@@ -3072,9 +3071,29 @@ begin
 				PrepareDebugger;
 
 				fDebugger.Start;
-				fDebugger.SendCommand('file', '"' + StringReplace(ChangeFileExt(ExtractFileName(e.FileName), EXE_EXT), '\', '\\', [rfReplaceAll]) + '"');
+				fDebugger.SendCommand('file', '"' + StringReplace(ChangeFileExt(e.FileName,EXE_EXT), '\', '/', [rfReplaceAll]) + '"');
 			end;
 		end;
+
+		dirs := TStringList.Create;
+
+		// hack fix due to:
+		// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
+		ExtractStrings([';'],[],PChar(devCompiler.LibDir),dirs);
+		for I := 0 to dirs.Count - 1 do
+			fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
+
+		// Add include folders
+		ExtractStrings([';'],[],PChar(devCompiler.CDir),dirs);
+		for I := 0 to dirs.Count - 1 do
+			fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
+
+		// Add more include folders, duplicates will be added/moved to front of list
+		ExtractStrings([';'],[],PChar(devCompiler.CppDir),dirs);
+		for I := 0 to dirs.Count - 1 do
+			fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
+
+		dirs.Free;
 
 		// Add breakpoints and watch vars
 		for i := 0 to fDebugger.WatchVarList.Count - 1 do
@@ -3082,16 +3101,6 @@ begin
 
 		for i := 0 to fDebugger.BreakPointList.Count - 1 do
 			fDebugger.AddBreakpoint(i);
-
-		libdirs := TStringList.Create;
-
-		// hack fix due to:
-		// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
-		ExtractStrings([';'],[],PChar(devCompiler.LibDir),libdirs);
-		for I := 0 to libdirs.Count - 1 do
-			fDebugger.SendCommand('dir','"' + StringReplace(libdirs[i],'\','/',[rfReplaceAll]) + '"'); // ???
-
-		libdirs.Free;
 
 		// Run the debugger
 		fDebugger.SendCommand('set','new-console on');
@@ -3433,22 +3442,23 @@ end;
 procedure TMainForm.CompilerOutputDblClick(Sender: TObject);
 var
 	Col, Line: integer;
+	selection : TListItem;
 	errorfiletab: TEditor;
 begin
-	with CompilerOutput.Selected do
-		if Assigned(CompilerOutput.Selected) then begin
-			Line := StrToIntDef(Caption,-1);
-			Col := StrToIntDef(SubItems[0],-1);
-			errorfiletab := GetEditorFromFileName(SubItems[1]);
+	selection := CompilerOutput.Selected;
+	if Assigned(selection) then begin
+		Line := StrToIntDef(selection.Caption,-1);
+		Col := StrToIntDef(selection.SubItems[0],-1);
+		errorfiletab := GetEditorFromFileName(selection.SubItems[1]);
 
-			if Assigned(errorfiletab) and (Line <> -1) then begin
-				errorfiletab.Activate;
-				if Col <> -1 then
-					errorfiletab.SetErrorFocus(Col, Line)
-				else
-					errorfiletab.SetErrorFocus(1, Line);
-			end;
+		if Assigned(errorfiletab) then begin
+			errorfiletab.Activate;
+			if Col <> -1 then
+				errorfiletab.SetErrorFocus(Col, Line)
+			else
+				errorfiletab.SetErrorFocus(1, Line);
 		end;
+	end;
 end;
 
 procedure TMainForm.FindOutputDblClick(Sender: TObject);
@@ -5479,18 +5489,24 @@ end;
 
 procedure TMainForm.actModifyWatchExecute(Sender: TObject);
 var
-	node : TTreeNode;
-	parentname,membername : AnsiString;
+	curnode : TTreeNode;
+	fullname: AnsiString;
 	value : AnsiString;
 begin
-	node := DebugTree.Selected;
-	if Assigned(node) and Assigned(node.Parent) then begin // only edit members
+	curnode := DebugTree.Selected;
+	if Assigned(curnode) then begin // only edit members
 
-		parentname := PWatchParent(node.Parent.Data)^.name;
-		membername := PWatchMember(node.Data)^.name;
+		fullname := PWatchMember(curnode.Data)^.name;
 
-		if InputQuery(Lang[ID_NV_MODIFYVALUE],parentname + '.' + membername,value) then
-			fDebugger.SendCommand('set variable',parentname + '.' + membername + ' = ' + value);
+		// Assemble full name including parents
+		while Assigned(curnode.Parent) do begin
+			if not StartsStr('{',PWatchMember(curnode.Parent.Data)^.name) then
+				fullname := PWatchMember(curnode.Parent.Data)^.name + '.' + fullname;
+			curnode := curnode.Parent;
+		end;
+
+		if InputQuery(Lang[ID_NV_MODIFYVALUE],fullname,value) then
+			fDebugger.SendCommand('set variable',fullname + ' = ' + value);
 	end;
 end;
 
@@ -6334,7 +6350,7 @@ begin
 		Sender.Canvas.Font.Style := [];
 		Sender.Canvas.Refresh;
 
-		// Draw bold highlight
+		// Draw part after bold highlight
 		Draw(Copy(Item.SubItems[2],boldstart+boldlen,Length(Item.SubItems[2])-boldstart-boldlen+1));
 
 		DefaultDraw := false;

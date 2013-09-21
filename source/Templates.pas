@@ -46,7 +46,7 @@ type
    fOptions: TProjOptions;
    fName: AnsiString;
    fDesc: AnsiString;
-   fCatagory: AnsiString;
+   fCategory: AnsiString;
    fPrjName: AnsiString;
    fProjectIcon: AnsiString;
    fIconIndex: integer;
@@ -69,7 +69,7 @@ type
    procedure RemoveUnit(const index: integer);
    function Save: boolean;
 
-   property Catagory: AnsiString read fCatagory write fCatagory;
+   property Category: AnsiString read fCategory write fCategory;
    property Description: AnsiString read fDesc write fDesc;
    property FileName: AnsiString read fFileName write fFileName;
    property Name: AnsiString read fName write fName;
@@ -139,7 +139,7 @@ begin
       // template info
      fName:= ReadString(cTemplate, 'Name', 'NoName');
      fDesc:= ReadString(cTemplate, 'Description', 'NoDesc');
-     fCatagory:= ReadString(cTemplate, 'Catagory', '');
+     fCategory:= ReadString(cTemplate, 'Category', '');
      fIconIndex:= ReadInteger(cTemplate, 'IconIndex', 0);
 
       // project info

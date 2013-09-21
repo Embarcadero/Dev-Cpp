@@ -182,9 +182,10 @@ begin
 	else
 		gdb := GDB_PROGRAM;
 
-	if not CreateProcess(nil,PAnsiChar(gdb + ' --annotate=2 --silent'), nil, nil, true,CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
-		MsgErr('Error launching ' + gdb);
-		exit;
+	if not CreateProcess(nil, PAnsiChar('"' + devCompiler.BinDir + pd + gdb + '"' + ' --annotate=2 --silent'), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
+		MsgErr('Error launching ' + gdb + ':' + #13#10#13#10 + SysErrorMessage(GetLastError));
+		Executing := false;
+		Exit;
 	end;
 
 	fProcessID := pi.hProcess;
@@ -199,7 +200,7 @@ begin
 	Reader.Resume;
 end;
 
-procedure TDebugger.Stop;
+procedure TDebugger.Stop(Sender : TObject);
 begin
 	if Executing then begin
 		Executing := false;
@@ -252,7 +253,7 @@ var
 	arguments : AnsiString;
 begin
 	// "filename":linenum
-	arguments := '"' + PBreakPoint(BreakPointList.Items[i])^.editor.FileName + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line);
+	arguments := '"' + StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName,'\','/',[rfReplaceAll]) + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line);
 	SendCommand('break',arguments);
 end;
 
@@ -261,7 +262,7 @@ var
 	arguments : AnsiString;
 begin
 	// "filename":linenum
-	arguments := '"' + PBreakPoint(BreakPointList.Items[i])^.editor.FileName + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line);
+	arguments := '"' + StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName,'\','/',[rfReplaceAll]) + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line);
 	SendCommand('clear',arguments);
 end;
 

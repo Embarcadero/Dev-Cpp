@@ -39,13 +39,13 @@ type
 	// the comments are an example of the record
 	PCompilerOption = ^TCompilerOption;
 	TCompilerOption = record
-		optName: AnsiString; // "Generate debugging info"
+		optName: integer; // language table index of "Generate debugging info"
+		optSection: integer; // language table index of "C options"
 		optIsC: boolean;
 		optIsCpp: boolean; // True (C++ option?) - can be both C and C++ option...
 		optIsLinker: boolean; // Is it a linker param
 		optValue: Integer; // True
 		optSetting: AnsiString; // "-g3"
-		optSection: AnsiString; // "C options"
 		optChoices : TStringList; // replaces "Yes/No" standard choices (max 30 different choices)
 	end;
 
@@ -86,21 +86,21 @@ type
 
 		constructor Create;
 		destructor Destroy; override;
-		procedure SettoDefaults(const setname : AnsiString);
-
-		procedure SaveSet(Index: integer);
-		procedure LoadSet(Index: integer);
-
-		procedure WriteSets;
-		procedure ReadSets;
+		procedure SettoDefaults(const setname,dir : AnsiString);
 
 		// Set stuff
+		procedure LoadSet(Index: integer);
+		procedure SaveSet(Index: integer);
+
+		procedure ReadSets;
+		procedure WriteSets;
+
 		property Sets: TStrings read fSets write fSets;
 		property CurrentIndex: integer read fCurrentSet write fCurrentSet;
 
 		// Option utils
 		procedure AddDefaultOptions;
-		procedure AddOption(const _Name: AnsiString; _IsC, _IsCpp, IsLinker: boolean; _Value: integer;const _Setting, _Section: AnsiString; Choices: TStringList);
+		procedure AddOption(nameindex,sectionindex: integer; IsC, IsCpp, IsLinker: boolean; Value: integer;const Setting : AnsiString; Choices: TStringList);
 		function FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
 		procedure SetOption(option : PCompilerOption;index : integer;newvalue : char);
 
@@ -622,6 +622,51 @@ uses
 {$ENDIF}
 
 procedure InitializeOptions;
+var
+	compilername : AnsiString;
+
+	function GetInfoOf(const binfolder : AnsiString) : AnsiString;
+	var
+		gccoutput,gccversion,gcctype : AnsiString;
+		start,stop : integer;
+	begin
+
+		result := '';
+
+		if FileExists(binfolder + 'gcc.exe') then begin
+			gccoutput := RunAndGetOutput(binfolder + 'gcc.exe -v',binfolder,nil,nil,nil,False);
+
+			// Obtain version number and compiler distro
+			start := Pos('gcc version ',gccoutput);
+			if start > 0 then begin
+
+				// Find version number
+				Inc(start,Length('gcc version '));
+				stop := start;
+				while(not (gccoutput[stop] in [#0..#32])) do
+					Inc(stop);
+
+				gccversion := Copy(gccoutput,start,stop-start);
+
+				// Find compiler builder
+				start := stop;
+				while(not (gccoutput[start] = '(')) do
+					Inc(start);
+				while(not (gccoutput[stop] = ')')) do
+					Inc(stop);
+
+				gcctype := Copy(gccoutput,start,stop-start+1);
+
+				// Assemble user friendly name
+				if ContainsStr(gcctype,'tdm64') then
+					result := 'TDM-GCC ' + gccversion
+				else if ContainsStr(gcctype,'tdm') then
+					result := 'TDM-GCC ' + gccversion
+				else if ContainsStr(gcctype,'GCC') then
+					result := 'MinGW GCC ' + gccversion;
+			end;
+		end;
+	end;
 begin
 	if not assigned(devDirs) then
 		devDirs:= TdevDirs.Create;
@@ -634,20 +679,29 @@ begin
 
 		devCompiler.Sets.Clear;
 
-		// Prefer MinGW64...
-		if DirectoryExists(devDirs.fExec + 'MinGW64') then begin
+		// Assum
+		if DirectoryExists(devDirs.fExec + 'MinGW64\') then begin
 
-			devCompiler.Sets.Add(DEFCOMPILERSET64);
-			devCompiler.SettoDefaults(DEFCOMPILERSET64);
+			compilername := GetInfoOf(devDirs.fExec + 'MinGW64\bin\');
+			if compilername = '' then
+				compilername := 'MinGW64';
+
+			devCompiler.Sets.Add(compilername + ' 64-bit');
+			devCompiler.SettoDefaults(compilername + ' 64-bit','MinGW64');
 			devCompiler.SaveSet(devCompiler.Sets.Count-1);
 
-			devCompiler.Sets.Add(DEFCOMPILERSET64ALT);
-			devCompiler.SettoDefaults(DEFCOMPILERSET64ALT);
+			devCompiler.Sets.Add(compilername + ' 32-bit');
+			devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW64');
 			devCompiler.SaveSet(devCompiler.Sets.Count-1);
 		end;
-		if DirectoryExists(devDirs.fExec + 'MinGW32') then begin
-			devCompiler.Sets.Add(DEFCOMPILERSET32);
-			devCompiler.SettoDefaults(DEFCOMPILERSET32);
+		if DirectoryExists(devDirs.fExec + 'MinGW32\') then begin
+
+			compilername := GetInfoOf(devDirs.fExec + 'MinGW32\bin\');
+			if compilername = '' then
+				compilername := 'MinGW32';
+
+			devCompiler.Sets.Add(compilername + ' 32-bit');
+			devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW32');
 			devCompiler.SaveSet(devCompiler.Sets.Count-1);
 		end;
 
@@ -883,6 +937,7 @@ begin
 	fSets := TStringList.Create;
 	fOptionList := TList.Create;
 	AddDefaultOptions;
+	OptionListToString;
 	ReadSets;
 end;
 
@@ -922,12 +977,12 @@ procedure TdevCompiler.SetOption(option : PCompilerOption;index : integer;newval
 begin
 	if Assigned(option) then
 		option^.optValue := CharToValue(newvalue);
-	fOptionString[index+1] := newvalue; // string might not be built yet...
+	fOptionString[index+1] := newvalue;
 end;
 
 procedure TdevCompiler.LoadSet(Index: integer);
 var
-	key : AnsiString;
+	key,msg : AnsiString;
 	I,J : integer;
 begin
 	// Load the current index from disk
@@ -997,27 +1052,26 @@ begin
 	devCompiler.CurrentIndex := Index;
 
 	// Then do some basic sanity checking
-	{msg := '';
+	msg := '';
 	if not FileExists(fBinDir + pd + fgccname) then begin
-		msg := msg + 'The C compiler of compiler set ' + devCompiler.fSets[Index] + ' doesn''t exist:' + #13#10;
-		msg := msg + fgccname;
+		msg := msg + 'Cannot find the C compiler of compiler set ' + devCompiler.fSets[Index] + ':' + #13#10;
+		msg := msg + fBinDir + pd + fgccname;
 		msg := msg + #13#10 + #13#10;
 	end;
 	if not FileExists(fBinDir + pd + fgppname) then begin
-		msg := msg + 'The C++ compiler of compiler set ' + devCompiler.fSets[Index] + ' doesn''t exist:' + #13#10;
-		msg := msg + fgppname;
+		msg := msg + 'Cannot find the C++ compiler of compiler set ' + devCompiler.fSets[Index] + ':' + #13#10;
+		msg := msg + fBinDir + pd + fgppname;
 		msg := msg + #13#10 + #13#10;
 	end;
 	if not FileExists(fBinDir + pd + fmakeName) then begin
-		msg := msg + 'The makefile processor of compiler set ' + devCompiler.fSets[Index] + ' doesn''t exist:' + #13#10;
-		msg := msg + fmakeName;
+		msg := msg + 'Cannot find the makefile processor of compiler set ' + devCompiler.fSets[Index] + ':' + #13#10;
+		msg := msg + fBinDir + pd + fmakeName;
 		msg := msg + #13#10 + #13#10;
 	end;
-	if msg <> '' then begin
-		msg := msg + 'Would you like Dev-C++ to insert defaults instead?' + #13#10;
+	{if msg <> '' then begin
+		msg := msg + 'Would you like Dev-C++ to insert defaults?' + #13#10;
 		msg := msg + #13#10;
-		msg := msg + 'Unless you know exactly what you''re doing, it is recommended ';
-		msg := msg + 'that you click Yes';
+		msg := msg + 'Unless you know exactly what you''re doing, it is recommended that you click Yes';
 
 		// If confirmed, insert working(?) ones into default path list
 		if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
@@ -1069,7 +1123,7 @@ begin
 	end;
 end;
 
-procedure TdevCompiler.SettoDefaults(const setname : AnsiString);
+procedure TdevCompiler.SettoDefaults(const setname,dir : AnsiString);
 var
 	optP : PCompilerOption;
 	idxP : integer;
@@ -1078,10 +1132,13 @@ begin
 	// Store program names
 	fgccName := GCC_PROGRAM;
 	fgppName := GPP_PROGRAM;
-	if SameStr(Setname,DEFCOMPILERSET64ALT) then
-		fgdbName := 'gdb32.exe'
+
+	// Assume a special gdb32 is provided for 32bit users
+	if ContainsStr(setname,'TDM-GCC') and ContainsStr(setname,'32-bit') then
+		fgdbName := GDB32_PROGRAM
 	else
 		fgdbName := GDB_PROGRAM;
+
 	fmakeName := MAKE_PROGRAM;
 	fwindresName := WINDRES_PROGRAM;
 	fdllwrapName := DLLWRAP_PROGRAM;
@@ -1091,33 +1148,35 @@ begin
 	fCompAdd := FALSE;
 	fLinkAdd := TRUE;
 	fCompOpt :='';
-	if SameStr(setname,DEFCOMPILERSET32) then
-		fLinkOpt := '-static-libstdc++ -static-libgcc' // MinGW32 requires special treatment
+
+	// MinGW32 requires special treatment
+	if ContainsStr(setname,'MinGW') then
+		fLinkOpt := '-static-libstdc++ -static-libgcc'
 	else
 		fLinkOpt := '-static-libgcc';
 
-	if SameStr(setname,DEFCOMPILERSET32) then begin
-		fBinDir:= ReplaceFirstStr(BIN_DIR32,        '%path%\',devDirs.fExec);
-		fLibDir:= ReplaceFirstStr(LIB_DIR32,        '%path%\',devDirs.fExec);
-		fCDir  := ReplaceFirstStr(C_INCLUDE_DIR32,  '%path%\',devDirs.fExec);
-		fCppDir:= ReplaceFirstStr(CPP_INCLUDE_DIR32,'%path%\',devDirs.fExec);
+	if ContainsStr(setname,'MinGW') and ContainsStr(setname,'32-bit') then begin
+		fBinDir:= devDirs.fExec + dir + '\bin';
+		fLibDir:= devDirs.fExec + dir + '\lib';
+		fCDir  := devDirs.fExec + dir + '\include';
+		fCppDir:= devDirs.fExec + dir + '\include';
 	end else begin
-		fBinDir:= ReplaceFirstStr(BIN_DIR64,        '%path%\',devDirs.fExec);
-		if SameStr(setname,DEFCOMPILERSET64) then
-			fLibDir:= ReplaceFirstStr(LIB_DIR64,        '%path%\',devDirs.fExec)
+		fBinDir:= devDirs.fExec + dir + '\bin';
+		if ContainsStr(setname,'TDM-GCC') and ContainsStr(setname,'32-bit') then
+			fLibDir:= devDirs.fExec + dir + '\x86_64-w64-mingw32\lib32'
 		else
-			fLibDir:= ReplaceFirstStr(LIB_DIR64ALT,     '%path%\',devDirs.fExec);
-		fCDir  := ReplaceFirstStr(C_INCLUDE_DIR64,  '%path%\',devDirs.fExec);
-		fCppDir:= ReplaceFirstStr(CPP_INCLUDE_DIR64,'%path%\',devDirs.fExec);
+			fLibDir:= devDirs.fExec + dir + '\x86_64-w64-mingw32\lib';
+		fCDir  := devDirs.fExec + dir + '\x86_64-w64-mingw32\include';
+		fCppDir:= devDirs.fExec + dir + '\x86_64-w64-mingw32\include';
 	end;
 
 	// Makefile
-	fDelay:=0;
-	fFastDep:=TRUE;
+	fDelay := 0;
+	fFastDep := TRUE;
 
 	// Edit option string and list
 	if FindOption('-',optP,idxP) then begin // -m is used my -mINSTRUCTIONSET, so use - instead
-		if SameStr(setname,DEFCOMPILERSET64ALT) then
+		if ContainsStr(setname,'TDM-GCC') and ContainsStr(setname,'32-bit') then
 			SetOption(optP,idxP,'1')
 		else
 			SetOption(optP,idxP,'0');
@@ -1175,9 +1234,9 @@ var
 begin
 
 	// C options
-	AddOption(Lang[ID_COPT_ANSIC],       True,  True,  False, 0, '-ansi',                Lang[ID_COPT_GRP_C],       nil);
-	AddOption(Lang[ID_COPT_NOASM],       True,  True,  False, 0, '-fno-asm',             Lang[ID_COPT_GRP_C],       nil);
-	AddOption(Lang[ID_COPT_TRADITIONAL], True,  True,  False, 0, '-traditional-cpp',     Lang[ID_COPT_GRP_C],       nil);
+	AddOption(ID_COPT_ANSIC,       ID_COPT_GRP_C, True,  True,  False, 0, '-ansi', nil);
+	AddOption(ID_COPT_NOASM,       ID_COPT_GRP_C, True,  True,  False, 0, '-fno-asm', nil);
+	AddOption(ID_COPT_TRADITIONAL, ID_COPT_GRP_C, True,  True,  False, 0, '-traditional-cpp', nil);
 
 	// Optimization
 	sl := TStringList.Create;
@@ -1208,7 +1267,7 @@ begin
 	sl.Add('K8 Rev.E=k8-sse3');
 	sl.Add('K10=barcelona');
 	sl.Add('Bulldozer=bdver1');
-	AddOption(Lang[ID_COPT_ARCH], True, True, False, 0, '-march=', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(ID_COPT_ARCH, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-march=', sl);
 
 	// Optimization
 	sl := TStringList.Create;
@@ -1239,7 +1298,7 @@ begin
 	sl.Add('K8 Rev.E=k8-sse3');
 	sl.Add('K10=barcelona');
 	sl.Add('Bulldozer=bdver1');
-	AddOption(Lang[ID_COPT_TUNE], True, True, False, 0, '-mtune=', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(ID_COPT_TUNE, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-mtune=', sl);
 
 	// Built-in processor functions
 	sl := TStringList.Create;
@@ -1258,7 +1317,7 @@ begin
 	sl.Add('FMA4=fma4');
 	sl.Add('XOP=xop');
 	sl.Add('AES=aes');
-	AddOption(Lang[ID_COPT_BUILTINPROC], True, True, False, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(ID_COPT_BUILTINPROC, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-m', sl);
 
 	// Optimization
 	sl := TStringList.Create;
@@ -1268,14 +1327,14 @@ begin
 	sl.Add('High=3');
 	sl.Add('Highest (fast)=fast');
 	sl.Add('Size (s)=s');
-	AddOption(Lang[ID_COPT_OPTIMIZE], True, True, False, 0, '-O', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(ID_COPT_OPTIMIZE, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-O', sl);
 
 	// 32bit/64bit
 	sl := TStringList.Create;
 	sl.Add('');
 	sl.Add('32bit=m32');
 	sl.Add('64bit=m64');
-	AddOption(Lang[ID_COPT_PTRWIDTH], True, True, True, 0, '-', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(ID_COPT_PTRWIDTH, ID_COPT_GRP_CODEGEN, True, True, True, 0, '-', sl);
 
 	// C++ Standards
 	sl := TStringList.Create;
@@ -1288,49 +1347,46 @@ begin
 	sl.Add('GNU C99=gnu99');
 	sl.Add('GNU C++=gnu++98');
 	sl.Add('GNU C++11=gnu++0x');
-	AddOption(Lang[ID_COPT_STD], True, True, False, 0, '-std=', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(ID_COPT_STD, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-std=', sl);
 
 	// Warnings
-	AddOption(Lang[ID_COPT_WARNING],     True,  True,  False, 0, '-w',                   Lang[ID_COPT_GRP_WARN],    nil);
-	AddOption(Lang[ID_COPT_WARNINGPLUS], True,  True,  False, 0, '-Wall',                Lang[ID_COPT_GRP_WARN],    nil);
-	AddOption(Lang[ID_COPT_WARNINGEX],   True,  True,  False, 0, '-Wextra',              Lang[ID_COPT_GRP_WARN],    nil);
-	AddOption(Lang[ID_COPT_ISOCONFORM],  True,  True,  False, 0, '-pedantic',            Lang[ID_COPT_GRP_WARN],    nil);
-	AddOption(Lang[ID_COPT_SYNTAXONLY],  True,  True,  False, 0, '-fsyntax-only',        Lang[ID_COPT_GRP_WARN],    nil);
-	AddOption(Lang[ID_COPT_TREATASERROR],True,  True,  False, 0, '-Werror',              Lang[ID_COPT_GRP_WARN],    nil);
-	AddOption(Lang[ID_COPT_FAILONFIRST], True,  True,  False, 0, '-Wfatal-errors',       Lang[ID_COPT_GRP_WARN],    nil);
+	AddOption(ID_COPT_WARNING,      ID_COPT_GRP_WARN, True,  True,  False, 0, '-w', nil);
+	AddOption(ID_COPT_WARNINGPLUS,  ID_COPT_GRP_WARN, True,  True,  False, 0, '-Wall', nil);
+	AddOption(ID_COPT_WARNINGEX,    ID_COPT_GRP_WARN, True,  True,  False, 0, '-Wextra', nil);
+	AddOption(ID_COPT_ISOCONFORM,   ID_COPT_GRP_WARN, True,  True,  False, 0, '-pedantic', nil);
+	AddOption(ID_COPT_SYNTAXONLY,   ID_COPT_GRP_WARN, True,  True,  False, 0, '-fsyntax-only', nil);
+	AddOption(ID_COPT_TREATASERROR, ID_COPT_GRP_WARN, True,  True,  False, 0, '-Werror', nil);
+	AddOption(ID_COPT_FAILONFIRST,  ID_COPT_GRP_WARN, True,  True,  False, 0, '-Wfatal-errors', nil);
 
 	// Profiling
-	AddOption(Lang[ID_COPT_PROFILE],     True,  True,  True,  0, '-pg',                  Lang[ID_COPT_PROFILING],   nil);
+	AddOption(ID_COPT_PROFILE, ID_COPT_PROFILING, True,  True,  True,  0, '-pg', nil);
 
 	// Linker
-	AddOption(Lang[ID_COPT_OBJC],        False, False, True,  0, '-lobjc',               Lang[ID_COPT_LINKERTAB],   nil);
-	AddOption(Lang[ID_COPT_DEBUG],       True,  True,  True,  0, '-g3',                  Lang[ID_COPT_LINKERTAB],   nil);
-	AddOption(Lang[ID_COPT_NOLIBS],      True,  True,  True,  0, '-nostdlib',            Lang[ID_COPT_LINKERTAB],   nil);
-	AddOption(Lang[ID_COPT_WIN32],       True,  True,  True,  0, '-mwindows',            Lang[ID_COPT_LINKERTAB],   nil);
-	AddOption(Lang[ID_COPT_STRIP],       False, False, True,  0, '-s',                   Lang[ID_COPT_LINKERTAB],   nil);
+	AddOption(ID_COPT_OBJC,   ID_COPT_LINKERTAB, False, False, True,  0, '-lobjc', nil);
+	AddOption(ID_COPT_DEBUG,  ID_COPT_LINKERTAB, True,  True,  True,  0, '-g3', nil);
+	AddOption(ID_COPT_NOLIBS, ID_COPT_LINKERTAB, True,  True,  True,  0, '-nostdlib', nil);
+	AddOption(ID_COPT_WIN32,  ID_COPT_LINKERTAB, True,  True,  True,  0, '-mwindows', nil);
+	AddOption(ID_COPT_STRIP,  ID_COPT_LINKERTAB, False, False, True,  0, '-s', nil);
 
 	// Output
-	AddOption(Lang[ID_COPT_MEM],         True,  True,  False, 0, '-fverbose-asm',        Lang[ID_COPT_GRP_OUTPUT],  nil);
-	AddOption(Lang[ID_COPT_ASSEMBLY],    True,  True,  False, 0, '-S',                   Lang[ID_COPT_GRP_OUTPUT],  nil);
-	AddOption(Lang[ID_COPT_PIPES],       True,  True,  False, 0, '-pipe',                Lang[ID_COPT_GRP_OUTPUT],  nil);
-
-	// Update option string
-	OptionListToString;
+	AddOption(ID_COPT_MEM,      ID_COPT_GRP_OUTPUT, True,  True,  False, 0, '-fverbose-asm', nil);
+	AddOption(ID_COPT_ASSEMBLY, ID_COPT_GRP_OUTPUT, True,  True,  False, 0, '-S', nil);
+	AddOption(ID_COPT_PIPES,    ID_COPT_GRP_OUTPUT, True,  True,  False, 0, '-pipe', nil);
 end;
 
-procedure TdevCompiler.AddOption(const _Name: AnsiString; _IsC, _IsCpp, IsLinker: boolean; _Value: integer;const _Setting, _Section: AnsiString; Choices: TStringList);
+procedure TdevCompiler.AddOption(nameindex,sectionindex: integer; IsC, IsCpp, IsLinker: boolean; Value: integer;const Setting : AnsiString; Choices: TStringList);
 var
 	option: PCompilerOption;
 begin
 	option := New(PCompilerOption);
 	with option^ do begin
-		optName := _Name;
-		optIsC := _IsC;
-		optIsCpp := _IsCpp;
+		optName := nameindex;
+		optSection := sectionindex;
+		optIsC := IsC;
+		optIsCpp := IsCpp;
 		optIsLinker := IsLinker;
-		optValue := _Value;
-		optSetting := _Setting;
-		optSection := _Section;
+		optValue := Value;
+		optSetting := Setting;
 		optChoices := Choices;
 	end;
 	fOptionList.Add(option);

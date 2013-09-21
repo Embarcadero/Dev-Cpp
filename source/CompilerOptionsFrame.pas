@@ -49,7 +49,7 @@ type
 implementation
 
 uses 
-  devcfg;
+  devcfg, multilangsupport;
 
 {$R *.dfm}
 
@@ -62,8 +62,8 @@ begin
 	fProject := Proj;
 
 	for I := 0 to devCompiler.fOptionList.Count - 1 do
-		if tabs.Tabs.IndexOf(PCompilerOption(devCompiler.fOptionList[I])^.optSection) = -1 then
-			tabs.Tabs.Add(PCompilerOption(devCompiler.fOptionList[I])^.optSection);
+		if tabs.Tabs.IndexOf(Lang[PCompilerOption(devCompiler.fOptionList[I])^.optSection]) = -1 then
+			tabs.Tabs.Add(Lang[PCompilerOption(devCompiler.fOptionList[I])^.optSection]);
 
 	tabsChange(nil);
 end;
@@ -81,11 +81,11 @@ begin
 
 	for I := 0 to devCompiler.fOptionList.Count - 1 do begin
 		option := PCompilerOption(devCompiler.fOptionList[I])^;
-		if SameStr(option.optSection, currenttab) then begin
+		if SameStr(Lang[option.optSection], currenttab) then begin
 			if Assigned(option.optChoices) and (option.optValue < option.optChoices.Count) then
-				idx := vle.InsertRow(option.optName, option.optChoices.Names[option.optValue], True) // a,b,c,d
+				idx := vle.InsertRow(Lang[option.optName], option.optChoices.Names[option.optValue], True) // a,b,c,d
 			else
-				idx := vle.InsertRow(option.optName, BoolValYesNo[option.optValue > 0], True); // No Yes
+				idx := vle.InsertRow(Lang[option.optName], BoolValYesNo[option.optValue > 0], True); // No Yes
 
 			vle.Strings.Objects[idx] := Pointer(I);
 			vle.ItemProps[idx].EditStyle := esPickList;

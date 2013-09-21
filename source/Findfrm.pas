@@ -383,7 +383,6 @@ end;
 procedure TfrmFind.FormShow(Sender: TObject);
 begin
 	FindTabs.TabIndex := fTabIndex;
-	FindTabsChange(nil);
 
 	// read devData
 	cbMatchCase.Checked := devData.CaseSensitive;
@@ -394,6 +393,8 @@ begin
 	rbBackward.Checked := devData.DirBackward;
 	rbOpenFiles.Checked := devData.WhereOpenFiles;
 	rbEntireScope.Checked := devData.OriginEntireScope;
+
+	FindTabsChange(nil);
 end;
 
 end.

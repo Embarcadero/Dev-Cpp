@@ -1,7 +1,6 @@
 object SplashForm: TSplashForm
   Left = 665
   Top = 443
-  Cursor = crHandPoint
   BorderIcons = []
   BorderStyle = bsNone
   ClientHeight = 290

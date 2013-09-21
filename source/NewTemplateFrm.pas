@@ -208,8 +208,8 @@ procedure TNewTemplateForm.ReadCategories;
       Exit;
     Temp := TTemplate.Create;
     Temp.ReadTemplateFile(FileName);
-    if cmbCateg.Items.IndexOf(Temp.Catagory) = -1 then
-      cmbCateg.Items.Add(Temp.Catagory);
+    if cmbCateg.Items.IndexOf(Temp.Category) = -1 then
+      cmbCateg.Items.Add(Temp.Category);
     cmbName.Items.Add(Temp.Name);
   end;
 var
@@ -314,7 +314,7 @@ begin
       WriteString('Template', 'Icon', cmbName.Text + '.ico');
     end;
     WriteString('Template', 'Description', txtDescr.Text);
-    WriteString('Template', 'Catagory', cmbCateg.Text); // 'catagory' is not a typo...
+    WriteString('Template', 'Category', cmbCateg.Text);
 
     C := 0;
     for I := 0 to lstFiles.Items.Count - 1 do

@@ -12,8 +12,7 @@ Version 5.3.0.0 - *
 - Code folding is updated much faster now.
 - The code parser now understands multiple definitions after the } symbol of structs.
 - Much more performance enhancements in the typing/editing department.
-- TODO: test MinGW 4.7.
-- TODO: still needs much more unit testing.
+- TODO: add/test MinGW 4.7.
 
 Version 5.2.0.3 - 25 Juni 2012
 

@@ -392,23 +392,17 @@ end;
 procedure TEditor.DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 var
 	X, Y, I: integer;
-	ImgIndex: integer;
 begin
-	X := fText.Gutter.RealGutterWidth(fText.CharWidth) - fText.Gutter.RightOffset + 3;//AClip.Left;
+	X := fText.Gutter.RealGutterWidth(fText.CharWidth) - fText.Gutter.RightOffset + 3;
 	Y := (fText.LineHeight - dmMain.GutterImages.Height) div 2 + fText.LineHeight * (FirstLine - fText.TopLine);
 
 	for I := FirstLine to LastLine do begin
 		if fActiveLine = I then // prefer active line over breakpoints
-			ImgIndex := 1
+			dmMain.GutterImages.Draw(ACanvas, X, Y, 1)
 		else if HasBreakpoint(I) <> -1 then
-			ImgIndex := 0
+			dmMain.GutterImages.Draw(ACanvas, X, Y, 0)
 		else if fErrorLine = I then
-			ImgIndex := 2
-		else
-			ImgIndex := -1;
-
-		if ImgIndex <> -1 then
-			dmMain.GutterImages.Draw(ACanvas, X, Y, ImgIndex);
+			dmMain.GutterImages.Draw(ACanvas, X, Y, 2);
 
 		Inc(Y, fText.LineHeight);
 	end;
@@ -462,11 +456,11 @@ var
 begin
 	pt:= fText.ClienttoScreen(fText.RowColumnToPixels(DisplayCoord(Column, Line +1)));
 	MessageBeep(MB_ICONQUESTION);
-	case MessageDlgPos(format(Lang[ID_MSG_SEARCHREPLACEPROMPT], [aSearch]),mtConfirmation, [mbYes, mbNo, mbCancel, mbAll], 0, pt.x, pt.y) of
-		mrYes: action := raReplace;
-		mrNo: action := raSkip;
-		mrCancel: action := raCancel;
-		mrAll: action := raReplaceAll;
+	case MessageDlgPos(format(Lang[ID_MSG_SEARCHREPLACEPROMPT], [aSearch]), mtConfirmation, [mbYes, mbNo, mbCancel, mbAll], 0, pt.x, pt.y+fText.LineHeight) of
+		mrYes: Action := raReplace;
+		mrNo: Action := raSkip;
+		mrCancel: Action := raCancel;
+		mrAll: Action := raReplaceAll;
 	end;
 end;
 
@@ -482,10 +476,10 @@ begin
 	if scModified in Changes then begin // scModified is only fired when the modified state changes
 		if Text.Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
-			UpdateCaption('[*] '+ExtractfileName(fFileName));
+			UpdateCaption('[*] ' + ExtractfileName(fFileName));
 		end else begin
-			UpdateCaption(ExtractfileName(fFileName));
 			MainForm.SetStatusbarMessage('');
+			UpdateCaption(ExtractfileName(fFileName));
 		end;
 	end;
 
@@ -639,16 +633,21 @@ end;
 
 procedure TEditor.SetErrorFocus(Col, Line: integer);
 begin
-	// Fool EditorStatusChange
-	fErrorLine := -1;
+	// Disable previous error focus
+	if fErrorLine <> -1 then begin
+		fText.InvalidateLine(fErrorLine);
+		fText.InvalidateGutterLine(fErrorLine);
+		fActiveLine:= -1;
+	end;
 
+	// Set new error focus
 	fText.CaretXY := BufferCoord(Col, Line);
 	fText.EnsureCursorPosVisible;
 
-	// EnsureCursorPosVisible doesn't invalidate gutters
+	// Redraw new error line
 	fText.InvalidateGutterLine(Line);
+	fText.InvalidateLine(Line);
 
-	// Fool EditorStatusChange
 	fErrorLine := Line;
 end;
 
@@ -1030,15 +1029,29 @@ begin
 		len := Length(s);
 		if len = 0 then Exit;
 
-		// Copy forward until end of identifier
-		phraseend := p.Char;
-		while((phraseend <= len) and (s[phraseend] in fText.IdentChars)) do
-			Inc(phraseend);
-
-		// Copy backward until some delimiters
 		phrasebegin := p.Char;
-		while((phrasebegin > 1) and ((s[phrasebegin-1] in fText.IdentChars) or (s[phrasebegin-1] in ['*','&',':','[',']']))) do
-		Dec(phrasebegin);
+		phraseend := p.Char;
+
+		// Special case #1: hovering above ]?, scan back until [ and proceed as usual
+		{if s[phraseend] = ']' then begin
+			while((phrasebegin > 1) and not (s[phrasebegin] = '[')) do
+				Dec(phrasebegin);
+
+			Dec(phrasebegin);
+		end else begin}
+
+			// Copy forward until end of identifier
+			while((phraseend <= len) and (s[phraseend] in fText.IdentChars)) do
+				Inc(phraseend);
+
+		//end;
+
+		// Copy backward until some chars
+		while(
+			   (phrasebegin > 1) and ((s[phrasebegin-1] in fText.IdentChars) or (s[phrasebegin-1] in ['.','*','&',':','[',']']))
+			or (phrasebegin > 2) and (s[phrasebegin-2] = '-') and (s[phrasebegin-1] = '>')
+			) do
+			Dec(phrasebegin);
 
 		if phraseend > phrasebegin then
 			result := Copy(s,phrasebegin,phraseend-phrasebegin);
@@ -1150,6 +1163,14 @@ var
 	p : TBufferCoord;
 	attr : TSynHighlighterAttributes;
 	st: PStatement;
+	procedure CancelHint;
+	begin
+		MainForm.fDebugger.OnEvalReady := nil;
+		fCurrentWord := '';
+		fText.Cursor := crIBeam;
+		Application.CancelHint;
+		fText.Hint := '';
+	end;
 begin
 
 	TabSheet.PageControl.Hint := '';
@@ -1160,27 +1181,23 @@ begin
 		// Only show info about variables and preprocessor stuff
 		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
 			if not (attr = fText.Highlighter.IdentifierAttribute) or SameStr(attr.Name,'Preprocessor') then begin
-				Application.CancelHint;
-				fText.Hint := '';
+				CancelHint;
 				Exit;
 			end;
 
 		s := fText.GetWordAtRowCol(p);
 
-		if (Length(s) = 0) then begin
-			fText.Cursor:=crIBeam;
+		if Length(s) = 0 then begin
+			CancelHint;
 			Exit;
 		end;
 
 		// Don't rescan the same stuff over and over again (that's slow)
 		if (s <> fCurrentWord) then begin
 
-			// Cancel evaluation
-			MainForm.fDebugger.OnEvalReady := nil;
-
 			// Different word? Cancel old now incorrect hint
+			CancelHint;
 			fCurrentWord := s;
-			Application.CancelHint;
 
 			// Cursor hovering above an identifier? Allow handpoint cursor
 			if (ssCtrl in Shift) then
@@ -1215,8 +1232,6 @@ begin
 					fText.Hint := '';
 			end;
 		end;
-
-		fCurrentWord := s;
 	end;
 end;
 

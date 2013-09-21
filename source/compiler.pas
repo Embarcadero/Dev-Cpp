@@ -757,7 +757,7 @@ var
 begin
 	fSingleFile:=True; // fool clean; don't run deps checking since all we do is cleaning
 	
-	if Project <> nil then begin
+	if Assigned(fProject) then begin
 		SwitchToProjectCompilerSet;
 		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
 		Result := True;
@@ -788,15 +788,15 @@ const
 	cCleanLine = '%s -f "%s" clean all';
 	cmsg = ' make clean';
 var
-	cmdLine	: AnsiString;
-	s		: AnsiString;
+	cmdLine,s : AnsiString;
 begin
 	fSingleFile := True; // fool rebuild; don't run deps checking since all files will be rebuilt
 	Result := True;
-	SwitchToProjectCompilerSet;
 
-	InitProgressForm('Rebuilding...');
 	if Assigned(Project) then begin
+
+		SwitchToProjectCompilerSet;
+		InitProgressForm('Rebuilding...');
 
 		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
 		BuildMakeFile;
@@ -817,10 +817,8 @@ begin
 			s := MAKE_PROGRAM;
 		cmdLine:= Format(cCleanLine, [s, fMakeFile]);
 		LaunchThread(cmdLine, fProject.Directory);
-	end else begin
+	end else
 		Compile;
-		Result := True;
-	end;
 end;
 
 procedure TCompiler.LaunchThread(const s, dir : AnsiString);

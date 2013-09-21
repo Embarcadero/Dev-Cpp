@@ -62,6 +62,7 @@ type
     procedure MenuCopyAllClick(Sender: TObject);
     procedure MenuPasteClick(Sender: TObject);
     procedure MenuCutClick(Sender: TObject);
+    procedure StackTraceClick(Sender: TObject);
   private
     fRegisters : TList;
     fAssembler : TStringList;
@@ -81,7 +82,7 @@ implementation
 
 uses
   main, version, MultiLangSupport, debugger, debugreader, datamod, utils,
-  devcfg, Types;
+  devcfg, editor, Types;
 
 {$R *.dfm}
 
@@ -293,6 +294,19 @@ procedure TCPUForm.MenuCutClick(Sender: TObject);
 begin
 	if edFunc.Focused then
 		edFunc.CutToClipboard;
+end;
+
+procedure TCPUForm.StackTraceClick(Sender: TObject);
+var
+	sel : TListItem;
+	e : TEditor;
+begin
+	sel := StackTrace.Selected;
+	if Assigned(sel) then begin
+		e := MainForm.GetEditorFromFileName(sel.SubItems[0]);
+		if Assigned(e) then
+			e.GotoLineNr(StrToIntDef(sel.SubItems[1],1));
+	end;
 end;
 
 end.

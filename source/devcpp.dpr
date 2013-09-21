@@ -59,8 +59,6 @@ uses
   EditorOptFrm in 'EditorOptFrm.pas' {EditorOptForm},
   CodeInsFrm in 'CodeInsFrm.pas' {CodeInsForm},
   IncrementalFrm in 'IncrementalFrm.pas' {IncrementalForm},
-  //Search_Center in 'Search_Center.pas',
-  //ReplaceFrm in 'ReplaceFrm.pas' {ReplaceForm},
   FindFrm in 'FindFrm.pas' {FindForm},
   editor in 'editor.pas',
   EnviroFrm in 'EnviroFrm.pas' {EnviroForm},
@@ -154,7 +152,7 @@ begin
 	end;
 
 	// Create and fill settings structures
-	devData.ReadConfigData; // fill devData ???
+	devData.ReadConfigData; // fill devData
 	InitializeOptions;
 
 	// Display it as soon as possible, and only if its worth viewing...

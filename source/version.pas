@@ -32,8 +32,8 @@ const
 
 	// exe properties
 	DEVCPP                = 'Dev-C++';
-	DEVCPP_VERSION        = '5.3.0.0 RC8';
-	DEVCPP_BUILDTIME      = 'September 15 2012 - 14:53';
+	DEVCPP_VERSION        = '5.3.0.0 RC9';
+	DEVCPP_BUILDTIME      = 'September 20 2012 - 23:13';
 
 	// delimiters
 	DEV_INTERNAL_OPEN     = '$__DEV_INTERNAL_OPEN';
@@ -52,19 +52,6 @@ const
 	DEV_NEWLOOK_THEME     = 'New Look';
 	DEV_BLUE_THEME        = 'Blue';
 	DEV_INTERNAL_THEME    = 'New Look';
-
-	// directory defaults
-	BIN_DIR32             = '%path%' + pd + 'MinGW32' + pd + 'bin';
-	LIB_DIR32             = '%path%' + pd + 'MinGW32' + pd + 'lib';
-	C_INCLUDE_DIR32       = '%path%' + pd + 'MinGW32' + pd + 'include';
-	CPP_INCLUDE_DIR32     = '%path%' + pd + 'MinGW32' + pd + 'include';
-
-	BIN_DIR64             = '%path%' + pd + 'MinGW64' + pd + 'bin';
-	LIB_DIR64             = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'lib';
-	C_INCLUDE_DIR64       = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'include';
-	CPP_INCLUDE_DIR64     = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'include';
-
-	LIB_DIR64ALT          = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'lib32';
 
 	LANGUAGE_DIR          = 'Lang' + pd;
 	ICON_DIR              = 'Icons' + pd;
@@ -102,15 +89,11 @@ const
 	GCC_PROGRAM           = 'gcc.exe';
 	GPP_PROGRAM           = 'g++.exe';
 	GDB_PROGRAM           = 'gdb.exe';
+	GDB32_PROGRAM         = 'gdb32.exe';
 	WINDRES_PROGRAM       = 'windres.exe';
 	DLLWRAP_PROGRAM       = 'dllwrap.exe';
 	GPROF_PROGRAM         = 'gprof.exe';
 	PACKMAN_PROGRAM       = 'packman.exe';
-
-	// List of default compilers
-	DEFCOMPILERSET32      = 'MinGW GCC 4.6.2 32-bit';
-	DEFCOMPILERSET64      = 'TDM-GCC 4.6.1 64-bit';
-	DEFCOMPILERSET64ALT   = 'TDM-GCC 4.6.1 32-bit';
 
 	// File dialog filters
 	FLT_BASE              = 'All known Files||';

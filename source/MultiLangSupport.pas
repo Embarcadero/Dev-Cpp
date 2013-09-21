@@ -43,7 +43,7 @@ uses
 
 type
   TdevMultiLangSupport = class(TObject)
-   private
+  private
     fLangList : TStringList;
     fLangFile : AnsiString;
     fCurLang : AnsiString;
@@ -53,7 +53,7 @@ type
     function GetString(ID: integer): AnsiString;
     function GetLangName: AnsiString;
     constructor Create;
-   public
+  public
     destructor Destroy; override;
     class function Lang: TdevMultiLangSupport;
 

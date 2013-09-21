@@ -375,46 +375,70 @@ end;
 
 procedure TDebugReader.ProcessWatchStruct(parentnode : TTreeNode);
 var
+	s : AnsiString;
 	newnode : TTreeNode;
 	wmember : PWatchMember;
 begin
-	while (PeekAnnotation = TFieldBegin) do begin
+	wmember := nil;
+	newnode := nil;
 
-		wmember := new(PWatchMember);
+	while curpos < len do begin
+		case GetNextAnnotation of
 
-		// field name
-		if not FindAnnotation(TFieldBegin) then begin
-			Dispose(PWatchMember(wmember));
-			Exit;
-		end;
+			TFieldBegin : begin
 
-		wmember^.name := GetNextFilledLine;
+				// Add to current parent
+				wmember := new(PWatchMember);
 
-		// =
-		if not FindAnnotation(TFieldNameEnd) then begin
-			Dispose(PWatchMember(wmember));
-			Exit;
-		end;
+				// Field name
+				wmember^.name := GetNextLine;
 
-		// field value
-		if not FindAnnotation(TFieldValue) then begin
-			Dispose(PWatchMember(wmember));
-			Exit;
-		end;
+				// =
+				if not FindAnnotation(TFieldNameEnd) then begin
+					Dispose(PWatchMember(wmember));
+					Exit;
+				end;
 
-		wmember^.value := GetNextFilledLine;
+				// field value
+				if not FindAnnotation(TFieldValue) then begin
+					Dispose(PWatchMember(wmember));
+					Exit;
+				end;
 
-		// TODO: unsafe to already add it here
-		newnode := DebugTree.Items.AddChildObject(parentnode,wmember^.name + ' = ' + wmember^.value,wmember);
+				wmember^.value := GetNextLine;
 
-		// This might be a struct too...
-		if wmember^.value = '{' then
-			ProcessWatchStruct(newnode);
+				// Add node to debug tree
+				newnode := DebugTree.Items.AddChildObject(parentnode,wmember^.name + ' = ' + wmember^.value,wmember);
 
-		// End of current argument
-		if not FindAnnotation(TFieldEnd) then begin
-			Dispose(PWatchMember(wmember));
-			Exit;
+				// This might be a struct too...
+				if EndsStr('{',wmember^.value) then begin
+					case PeekAnnotation of
+						TFieldBegin:
+							ProcessWatchStruct(newnode);
+					end;
+				end;
+			end;
+
+			// Add value to current indent
+			TArrayBegin,TArrayEnd,TElt,TEltRep : begin
+
+				s := GetNextLine;
+
+				if Assigned(wmember) then // update current value
+					wmember^.value := wmember^.value + s;
+
+				if Assigned(newnode) then
+					newnode.Text := wmember^.name + ' = ' + wmember^.value;
+			end;
+
+			// Add, complete current indent
+			TFieldEnd : begin
+				s := GetNextLine;
+
+				// End of structure, return to parent
+				if EndsStr('}',s) then
+					break;
+			end;
 		end;
 	end;
 end;
@@ -448,25 +472,24 @@ begin
 				result := result + s;
 
 				// This might be a struct too...
-				if EndsStr('{',s) then
-					result := result + #13#10 + ProcessEvalStruct(indent+1);
-
+				if EndsStr('{',s) then begin
+					case PeekAnnotation of
+						TArrayBegin:
+							result := result + ProcessEvalStruct(indent+1);
+						TFieldBegin:
+							result := result + #13#10 + ProcessEvalStruct(indent+1);
+					end;
+				end;
 			end;
 
 			// Add value to current indent
-			TArrayBegin : begin
+			TArrayBegin,TArrayEnd,TElt,TEltRep : begin
 				s := GetNextLine;
 				result := result + s;
 				if EndsStr('{',s) then
-					result := result + ProcessEvalStruct(indent+1);
-			end;
-
-			// Add value to current indent
-			TElt,TEltRep : begin
-				s := GetNextLine;
-				result := result + s;
-				if EndsStr('{',s) then
-					result := result + ProcessEvalStruct(indent+1);
+					result := result + ProcessEvalStruct(indent+1)
+				else if EndsStr('}',s) then
+					break;
 			end;
 
 			// Add, complete current indent
@@ -483,13 +506,6 @@ begin
 					result := result + s;
 					break;
 				end;
-			end;
-
-			// Add, exit current indent
-			TArrayEnd : begin
-				s := GetNextLine;
-				result := result + s;
-				break;
 			end;
 		end;
 	end;
@@ -523,9 +539,14 @@ begin
 				evalvalue := GetNextLine; // value, might be empty
 				if SameStr(evalvalue,'') then
 					evalvalue := 'Error evaluating input'
-				else if EndsStr('{',evalvalue) then
-					evalvalue := evalvalue + #13#10 + ProcessEvalStruct(1);
-
+				else if EndsStr('{',evalvalue) then begin
+					case PeekAnnotation of
+						TFieldBegin:
+							evalvalue := evalvalue + #13#10 + ProcessEvalStruct(1);
+						TArrayBegin:
+							evalvalue := evalvalue + ProcessEvalStruct(1);
+					end;
+				end;
 				doevalready := true;
 			end;
 			TExit : begin
@@ -691,10 +712,11 @@ begin
 
 							// Delete now invalid children
 							while wparent^.node.HasChildren do begin
-								node := wparent^.node.getNextSibling;
+								node := wparent^.node.GetLastChild;
 								Dispose(PWatchMember(node.Data));
 								node.Delete;
 							end;
+
 							break;
 						end;
 					end;
@@ -716,12 +738,14 @@ begin
 				for I := 0 to WatchVarList.Count - 1 do begin
 					wparent := PWatchParent(WatchVarList.Items[I]);
 					if SameStr(wparent^.name,t) then begin
+
 						// Delete now invalid children
 						while wparent^.node.HasChildren do begin
-							node := wparent^.node.getNextSibling;
+							node := wparent^.node.GetLastChild;
 							Dispose(PWatchMember(node.Data));
 							node.Delete;
 						end;
+
 						break;
 					end;
 				end;

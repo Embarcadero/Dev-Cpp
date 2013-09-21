@@ -207,8 +207,8 @@ var
 begin
 	for idx:= 0 to pred(fTemplates.Count) do begin
 		LTemplate:= TTemplate(fTemplates[idx]);
-		if not HasPage(LTemplate.Catagory) then
-			TabsMain.Tabs.Append(LTemplate.Catagory);
+		if not HasPage(LTemplate.Category) then
+			TabsMain.Tabs.Append(LTemplate.Category);
 	end;
 
 	// create current page
@@ -223,9 +223,9 @@ begin
 
 	for idx:= 0 to pred(fTemplates.Count) do begin
 		LTemplate:= TTemplate(fTemplates[idx]);
-		if LTemplate.Catagory = '' then
-			LTemplate.Catagory:= Lang[ID_NP_PRJSHEET];
-		if CompareText(LTemplate.Catagory, TabsMain.Tabs[TabsMain.TabIndex]) = 0 then begin
+		if LTemplate.Category = '' then
+			LTemplate.Category:= Lang[ID_NP_PRJSHEET];
+		if CompareText(LTemplate.Category, TabsMain.Tabs[TabsMain.TabIndex]) = 0 then begin
 			Item:= ProjView.Items.Add;
 			Item.Caption:= LTemplate.Name;
 			Item.Data:= pointer(idx);
