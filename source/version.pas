@@ -33,8 +33,8 @@ const
 resourcestring
 	// misc strings
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.2.0.1';
-	DEVCPP_BUILDTIME     = 'April 28 2012 - 10:09';
+	DEVCPP_VERSION       = '5.2.0.2 RC1';
+	DEVCPP_BUILDTIME     = 'May 13 2012 - 14:46';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -65,6 +65,8 @@ resourcestring
 	C_INCLUDE_DIR64      = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'include';
 	CPP_INCLUDE_DIR64    = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'include';
 
+	LIB_DIR64ALT         = '%path%' + pd + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'lib32';
+
 	LANGUAGE_DIR         = 'Lang' + pd;
 	ICON_DIR             = 'Icons' + pd;
 	HELP_DIR             = 'Help' + pd;
@@ -80,6 +82,7 @@ resourcestring
 	DEV_EXT              = '.dev';
 	HTML_EXT             = '.html';
 	RTF_EXT              = '.rtf';
+	TEX_EXT              = '.tex';
 	INI_EXT              = '.ini';
 	TEMPLATE_EXT         = '.template';
 	SYNTAX_EXT           = '.syntax';
@@ -106,6 +109,7 @@ resourcestring
 
   DEFCOMPILERSET32     = 'MinGW GCC 4.6.2 32-bit';
   DEFCOMPILERSET64     = 'TDM-GCC 4.6.1 64-bit';
+  DEFCOMPILERSET64ALT  = 'TDM-GCC 4.6.1 32-bit';
 
   // Filters
   FLT_BASE             = 'All known Files||';

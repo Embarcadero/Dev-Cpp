@@ -720,7 +720,7 @@ type
       var TokenType, Start: Integer;
       var Attri: TSynHighlighterAttributes): boolean;
     function GetPositionOfMouse(out aPos: TBufferCoord): Boolean;
-    function GetWordAtRowCol(const XY: TBufferCoord): string;
+    function GetWordAtRowCol(XY: TBufferCoord): string;
     procedure GotoBookMark(BookMark: Integer);
     procedure GotoLineAndCenter(ALine: Integer);
     function IdentChars: TSynIdentChars;
@@ -9872,15 +9872,29 @@ begin
     DoChange;
 end;
 
-function TCustomSynEdit.GetWordAtRowCol(const XY: TBufferCoord): string;
+function TCustomSynEdit.GetWordAtRowCol(XY: TBufferCoord): string;
 var
-  v_WordStart: TBufferCoord;
-  v_WordEnd: TBufferCoord;
+  Line: string;
+  Len, Stop: Integer;
 begin
-  v_WordStart := WordStartEx(XY);
-  v_WordEnd := WordEndEx(XY);
-  if (v_WordStart.Line = v_WordEnd.Line) and (v_WordStart.Char < v_WordEnd.Char) then
-    Result := Copy(Lines[XY.Line -1] , v_WordStart.Char, v_WordEnd.Char - v_WordStart.Char);
+  Result := '';
+  if (XY.Line >= 1) and (XY.Line <= Lines.Count) then
+  begin
+    Line := Lines[XY.Line - 1];
+    Len := Length(Line);
+    if Len = 0 then Exit;
+
+    if (XY.Char >= 1) and (XY.Char <= Len + 1) and (Line[XY.Char] in Highlighter.IdentChars) then
+    begin
+      Stop := XY.Char;
+      while (Stop <= Len) and (Line[Stop] in Highlighter.IdentChars) do
+        Inc(Stop);
+      while (XY.Char > 1) and (Line[XY.Char - 1] in Highlighter.IdentChars) do
+        Dec(XY.Char);
+      if Stop > XY.Char then
+        Result := Copy(Line, XY.Char, Stop - XY.Char);
+    end;
+  end;
 end;
 
 function TCustomSynEdit.BufferToDisplayPos(const p: TBufferCoord): TDisplayCoord;
@@ -10047,7 +10061,7 @@ begin
   fFocusList.Remove(aControl);
 end;
 
-function TCustomSynEdit.IdentChars: TSynIdentChars;                        
+function TCustomSynEdit.IdentChars: TSynIdentChars;
 begin
   if Highlighter <> nil then
     Result := Highlighter.IdentChars

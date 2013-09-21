@@ -224,9 +224,9 @@ object LangForm: TLangForm
       Visible = False
       object ParseLabel: TLabel
         Left = 8
-        Top = 104
+        Top = 100
         Width = 284
-        Height = 28
+        Height = 32
         AutoSize = False
         Caption = 'Parsing files...'
         WordWrap = True

@@ -795,16 +795,31 @@ begin
 
 	// load the preferred compiler set on first run
 	if devCompilerSet.Sets.Count=0 then begin
-		if AnsiContainsStr(devDirs.Bins,'MinGW32') then
-			devCompilerSet.Sets.Add(DEFCOMPILERSET32)
-		else
+		if DirectoryExists(devDirs.fExec + 'MinGW32') then begin
+			devCompilerSet.Sets.Add(DEFCOMPILERSET32);
+
+			// Write the compiler list
+			devCompilerSet.WriteSets;
+
+			// Write the default compiler itself
+			devCompilerSet.SaveSet(0);
+		end else begin
 			devCompilerSet.Sets.Add(DEFCOMPILERSET64);
+			devCompilerSet.Sets.Add(DEFCOMPILERSET64ALT);
 
-		// Write the compiler list
-		devCompilerSet.WriteSets;
+			// Write the compiler list
+			devCompilerSet.WriteSets;
 
-		// Write the compiler itself
-		devCompilerSet.SaveSet(0);
+			// Write the default compiler itself
+			devCompilerSet.SaveSet(0);
+
+			// Load the 32bit configuration - hacky fix
+			devCompilerSet.fLibDir := StringReplace(LIB_DIR64ALT,'%path%\',devDirs.fExec,[rfReplaceAll]);
+			devCompilerSet.fOptions := '000000000000000000000000010';
+
+			// And write the 32bit on
+			devCompilerSet.SaveSet(1);
+		end;
 	end;
 
 	// Load the default one
@@ -1974,7 +1989,7 @@ end;
 procedure TdevCompilerSet.SettoDefaults;
 begin
 	// Programs
- 	fgccName := GCC_PROGRAM;
+	fgccName := GCC_PROGRAM;
 	fgppName := GPP_PROGRAM;
 	fgdbName := GDB_PROGRAM;
 	fmakeName := MAKE_PROGRAM;

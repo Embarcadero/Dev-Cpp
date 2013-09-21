@@ -117,7 +117,7 @@ begin
       else
           Replace(Result, '<SOURCENAME>', ExtractFilePath(e.FileName));
 
-      Replace(Result, '<WORDXY>', e.GetWordAtCursor);
+      Replace(Result, '<WORDXY>', e.Text.WordAtCursor);
   end else
   begin
       // clear unchanged macros

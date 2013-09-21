@@ -27,7 +27,7 @@ uses
   SynEditExport, SynExportHTML, SynExportRTF,
   SynEditHighlighter, SynHighlighterCpp, SynEditPrint,
   oysUtils, CodeInsFrm, SynHighlighterRC, SynCompletionProposal,
-  SynEditMiscClasses, SynEditSearch;
+  SynEditMiscClasses, SynEditSearch, SynExportTeX;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QMenus, QDialogs, QImgList, QControls,
@@ -42,6 +42,7 @@ type
     Cpp: TSynCppSyn;
     SynExporterRTF: TSynExporterRTF;
     SynExporterHTML: TSynExporterHTML;
+    SynExporterTeX: TSynExporterTeX;
     PrinterSetupDialog: TPrinterSetupDialog;
     SynEditPrint: TSynEditPrint;
     OpenDialog: TOpenDialog;
@@ -115,6 +116,7 @@ type
 
     procedure ExportToHtml(FileLines: TStrings; ExportFilename: string);
     procedure ExportToRtf(FileLines: TStrings; ExportFilename: string);
+    procedure ExportToTex(FileLines: TStrings; ExportFilename: string);
   end;
 
 var
@@ -469,9 +471,6 @@ var
  idx: integer;
  Item: TMenuItem;
 begin
-
-
-
   if not assigned(fCodeMenu) then exit;
   fCodeList.LoadCode;
 
@@ -508,10 +507,12 @@ procedure TdmMain.ExportToHtml(FileLines: TStrings; ExportFilename: string);
 begin
   if (not Assigned(FileLines)) or (FileLines.Count=0) or (ExportFilename='') then
     Exit;
+
   SynExporterHTML.Title := ExtractFileName(ExportFileName);
   SynExporterHTML.CreateHTMLFragment := False;
   SynExporterHTML.ExportAsText := True;
   SynExporterHTML.Color:=Cpp.SpaceAttri.Background;
+
   SynExporterHTML.ExportAll(FileLines);
   SynExporterHTML.SavetoFile(ExportFileName);
 end;
@@ -523,6 +524,15 @@ begin
 
   SynExporterRTF.ExportAll(FileLines);
   SynExporterRTF.SavetoFile(ExportFileName);
+end;
+
+procedure TdmMain.ExportToTex(FileLines: TStrings; ExportFilename: string);
+begin
+  if (not Assigned(FileLines)) or (FileLines.Count=0) or (ExportFilename='') then
+    Exit;
+
+  SynExporterTex.ExportAll(FileLines);
+  SynExporterTex.SaveToFile(ExportFileName);
 end;
 
 end.

@@ -147,6 +147,7 @@ type
     Label1: TLabel;
     OptionsTip: TLabel;
     OptionsLink: TLabel;
+    chkDefCpp: TCheckBox;
     procedure ListClick(Sender: TObject);
     procedure EditChange(SEnder: TObject);
     procedure ButtonClick(Sender: TObject);
@@ -432,6 +433,7 @@ begin
 		// General
 		fOptions.SupportXPThemes:=chkSupportXP.Checked;
 		fOptions.CompilerSet:=cmbCompiler.ItemIndex;
+		fOptions.useGPP:=chkDefCpp.Checked;
 
 		// Version info
 		fOptions.IncludeVersionInfo:=chkVersionInfo.Checked;
@@ -501,21 +503,25 @@ begin
 	edCppCompiler.Lines.Text:= StringReplace(fOptions.cmdlines.CppCompiler, '_@@_', #13#10, [rfReplaceAll]);
 	edLinker.Lines.Text:= StringReplace(fOptions.cmdlines.Linker, '_@@_', #13#10, [rfReplaceAll]);
 	edProjectName.Text:= fProject.Name;
-  lblPrjFname.Caption:=fProject.FileName;
-  lblPrjOutputFname.Caption:=fProject.Executable;
-  cntSrc:=0;
-  cntHdr:=0;
-  cntRes:=0;
-  cntOther:=0;
-  for idx:=0 to fProject.Units.Count-1 do
-    case GetFileTyp(fProject.Units[idx].FileName)of
-      utSrc: Inc(cntSrc);
-      utHead: Inc(cntHdr);
-      utRes: Inc(cntRes);
-      else Inc(cntOther);
-    end;
-  lblPrjUnits.Caption:=Format(Lang[ID_POPT_UNITSFORMAT], [fProject.Units.Count, cntSrc, cntHdr, cntRes, cntOther]);
-  chkSupportXP.Checked:=fOptions.SupportXPThemes;
+	lblPrjFname.Caption:=fProject.FileName;
+	lblPrjOutputFname.Caption:=fProject.Executable;
+
+	// Count file types
+	cntSrc:=0;
+	cntHdr:=0;
+	cntRes:=0;
+	cntOther:=0;
+	for idx:=0 to fProject.Units.Count-1 do
+		case GetFileTyp(fProject.Units[idx].FileName)of
+			utSrc: Inc(cntSrc);
+			utHead: Inc(cntHdr);
+			utRes: Inc(cntRes);
+		else Inc(cntOther);
+	end;
+
+	lblPrjUnits.Caption:=Format(Lang[ID_POPT_UNITSFORMAT], [fProject.Units.Count, cntSrc, cntHdr, cntRes, cntOther]);
+	chkSupportXP.Checked:=fOptions.SupportXPThemes;
+	chkDefCpp.Checked:=fOptions.useGPP;
 
   // Output tab
   edExeOutput.Text := fOptions.ExeOutput;
@@ -632,8 +638,8 @@ end;
 
 procedure TfrmProjectOptions.FormCreate(Sender: TObject);
 begin
-  cmbLangID.Sorted := True;
-  LoadText;
+	cmbLangID.Sorted := True;
+	LoadText;
 end;
 
 procedure TfrmProjectOptions.LoadText;
@@ -664,6 +670,7 @@ begin
   lstType.Items.Append(Lang[ID_POPT_TYPE3]);
   lstType.Items.Append(Lang[ID_POPT_TYPE4]);
   chkSupportXP.Caption:=      Lang[ID_POPT_SUPPORTXP];
+  chkDefCpp.Caption:=         Lang[ID_POPT_DEFCPP];
 
   // compiler tab
   //tabCompSet.Caption:=     Lang[ID_POPT_COMPTAB];

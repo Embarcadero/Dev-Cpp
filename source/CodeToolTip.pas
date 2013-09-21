@@ -888,7 +888,7 @@ begin
 	end;
 
 	// Get the name of the function we're about to show
-	S := FEditor.GetWordAtRowCol(FEditor.CharIndexToRowCol(CurPos));
+	S := FEditor.GetWordAtRowCol(FEditor.CharIndexToRowCol(CurPos-1));
 
 	// Don't bother scanning the database when there's no word to scan for
 	if  (S = '') or
@@ -977,3 +977,4 @@ initialization
 	MakeIdentTable;
 
 end.
+

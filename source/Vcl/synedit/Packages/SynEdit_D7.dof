@@ -106,7 +106,7 @@ Launcher=
 UseLauncher=0
 DebugCWD=
 [Version Info]
-IncludeVerInfo=0
+IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=1
 MinorVer=0

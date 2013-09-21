@@ -546,9 +546,6 @@ begin
 			_Type := StType;
 			_Command := StCommand;
 			_Args := StArgs;
-//      if Kind = skFunction then
-//        _MethodArgs := ScanMethodArgs(StArgs, fLaterScanning, fCurrentFile, Line, ParentID)
-//      else
 			_MethodArgs := StArgs;
 			_Line := Line;
 			_Kind := NewKind;

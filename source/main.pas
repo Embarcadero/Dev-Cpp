@@ -593,6 +593,8 @@ type
 		actInsert: TAction;
 		actToggle: TAction;
 		actGoto: TAction;
+    TEXItem: TMenuItem;
+    actXTex: TAction;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -627,6 +629,7 @@ type
 		procedure actCloseProjectExecute(Sender: TObject);
 		procedure actXHTMLExecute(Sender: TObject);
 		procedure actXRTFExecute(Sender: TObject);
+		procedure actXTexExecute(Sender: TObject);
 		procedure actXProjectExecute(Sender: TObject);
 		procedure actPrintExecute(Sender: TObject);
 		procedure actPrintSUExecute(Sender: TObject);
@@ -852,7 +855,7 @@ type
 		procedure actInsertExecute(Sender: TObject);
 		procedure actToggleExecute(Sender: TObject);
 		procedure actGotoExecute(Sender: TObject);
-    procedure actEditMenuUpdate(Sender: TObject);
+		procedure actEditMenuUpdate(Sender: TObject);
 
 	private
 		fmsgHeight			: integer;
@@ -1097,8 +1100,8 @@ begin
 	// Multiline tab
 	PageControl.MultiLine:= devData.MultiLineTab;
 
-	// Mouseover time
-	Application.HintHidePause:=5000;
+	Application.HintPause := 500;
+	Application.HintHidePause := 5000;
 
 	// Some more compiler settings
 	fCompiler.RunParams:='';
@@ -1514,6 +1517,7 @@ begin
 	ExportItem.Caption:=				Lang[ID_SUB_EXPORT];
 	actXHTML.Caption:=					Lang[ID_ITEM_EXPORTHTML];
 	actXRTF.Caption:=					Lang[ID_ITEM_EXPORTRTF];
+	actXTex.Caption:=					Lang[ID_ITEM_EXPORTTEX];
 	actXProject.Caption:=				Lang[ID_ITEM_EXPORTPROJECT];
 
 	actPrint.Caption:=					Lang[ID_ITEM_PRINT];
@@ -2255,7 +2259,7 @@ begin
 			s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
 
 			// <WORDXY>
-			s:= StringReplace(s, cWordXY, e.GetWordAtCursor, [rfReplaceAll]);
+			s:= StringReplace(s, cWordXY, e.Text.WordAtCursor, [rfReplaceAll]);
 		end;
 
 	// clear unchanged macros
@@ -2694,16 +2698,25 @@ var
 begin
 	e:= GetEditor;
 	if assigned(e) then
-		e.Exportto(TRUE);
+		e.Exportto(0);
 end;
 
 procedure TMainForm.actXRTFExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then
-		e.Exportto(FALSE);
+		e.Exportto(1);
+end;
+
+procedure TMainForm.actXTexExecute(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e:= GetEditor;
+	if assigned(e) then
+		e.Exportto(2);
 end;
 
 procedure TMainForm.actXProjectExecute(Sender: TObject);
@@ -3888,7 +3901,7 @@ begin
 		if e.Text.SelAvail then
 			s:=e.Text.SelText
 		else begin
-			s:=e.GetWordAtCursor;
+			s:=e.Text.WordAtCursor;
 			InputQuery(Lang[ID_NV_ADDWATCH], Lang[ID_NV_ENTERVAR], s);
 		end;
 		if s<>'' then
@@ -3932,13 +3945,11 @@ begin
 end;
 
 procedure TMainForm.actRemoveWatchExecute(Sender: TObject);
-var node : TTreeNode;
+var
+	node : TTreeNode;
 begin
 	node := DebugTree.Selected;
-	while Assigned(Node) and (Assigned(node.Parent)) do begin
-		node := node.Parent;
-	end;
-	if (Assigned(node)) then begin
+	if Assigned(node) then begin
 		try
 			fDebugger.SendCommand(GDB_UNDISPLAY, IntToStr(integer(node.Data)));
 		except
@@ -5417,13 +5428,12 @@ end;
 
 procedure TMainForm.RemoveItem(Node: TTreeNode);
 begin
-	if Assigned(Node) and (Node.Level >= 1) then
-	begin
+	if Assigned(Node) and (Node.Level >= 1) then begin
 		if Node.Data=Pointer(-1) then
 			actProjectRemoveFolderExecute(nil)
 		else
 			fProject.Remove(integer(Node.Data), true);
-	end
+	end;
 end;
 
 procedure TMainForm.ProjectViewKeyDown(Sender: TObject; var Key: Word;
@@ -5431,22 +5441,16 @@ procedure TMainForm.ProjectViewKeyDown(Sender: TObject; var Key: Word;
 begin
 	if (Key=VK_DELETE) and Assigned(ProjectView.Selected) then
 		RemoveItem(ProjectView.Selected)
-	else if (Key=VK_ESCAPE) and (Shift=[]) then
-	begin
+	else if (Key=VK_ESCAPE) and (Shift=[]) then begin
 		if PageControl.Visible And PageControl.Enabled And (PageControl.ActivePage<>nil) then
 			 GetEditor(-1).Activate;
-	end
-	else if (Key=VK_ESCAPE) and (Shift=[ssShift]) then
-	begin
+	end else if (Key=VK_ESCAPE) and (Shift=[ssShift]) then begin
 		actProjectManager.Checked:=False;
 		actProjectManagerExecute(nil);
 		if PageControl.Visible And PageControl.Enabled And (PageControl.ActivePage<>nil) then
 			 GetEditor(-1).Activate;
-	end
-	else if (Key=VK_RETURN) and Assigned(ProjectView.Selected) then
-	begin
-		if ProjectView.Selected.Data<>Pointer(-1) then { if not a directory }
-		begin
+	end else if (Key=VK_RETURN) and Assigned(ProjectView.Selected) then begin
+		if ProjectView.Selected.Data<>Pointer(-1) then begin{ if not a directory }
 			OpenUnit;
 			if Shift=[ssShift] then begin
 				{
@@ -6080,10 +6084,10 @@ var
 begin
 	PrepareDebugger;
 	if assigned(fProject) then begin
-		 if not FileExists(fProject.Executable) then begin
-			 MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
-			 exit;
-		 end;
+		if not FileExists(fProject.Executable) then begin
+			MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
+			exit;
+		end;
 
 		 {if InputQuery(Lang[ID_ITEM_ATTACHPROCESS], Lang[ID_MSG_ATTACH], s) then begin
 			 try
@@ -6092,31 +6096,30 @@ begin
 				 MessageDlg('Invalid PID !', mtWarning, [mbOK], 0);
 				 exit;
 			 end;}
-		 try
-			 ProcessListForm := TProcessListForm.Create(self);
-		 if (ProcessListForm.ShowModal = mrOK) and (ProcessListForm.ProcessCombo.ItemIndex > -1) then begin
-			 s := IntToStr(integer(ProcessListForm.ProcessList[ProcessListForm.ProcessCombo.ItemIndex]));
-			 fDebugger.FileName:= '"' +StringReplace(fProject.Executable, '\', '\\', [rfReplaceAll]) +'"';
+		try
+			ProcessListForm := TProcessListForm.Create(self);
+			if (ProcessListForm.ShowModal = mrOK) and (ProcessListForm.ProcessCombo.ItemIndex > -1) then begin
+				s := IntToStr(integer(ProcessListForm.ProcessList[ProcessListForm.ProcessCombo.ItemIndex]));
+				fDebugger.FileName:= '"' +StringReplace(fProject.Executable, '\', '\\', [rfReplaceAll]) +'"';
 
-			 // add to the debugger the project include dirs
-			 for idx:=0 to fProject.Options.Includes.Count-1 do
-				 fDebugger.AddIncludeDir(fProject.Options.Includes[idx]);
+				// add to the debugger the project include dirs
+				for idx:=0 to fProject.Options.Includes.Count-1 do
+					fDebugger.AddIncludeDir(fProject.Options.Includes[idx]);
 
-			 fDebugger.Execute;
-			 fDebugger.SendCommand(GDB_FILE, fDebugger.FileName);
+				fDebugger.Execute;
+				fDebugger.SendCommand(GDB_FILE, fDebugger.FileName);
 
-			 fDebugger.SendCommand(GDB_ATTACH, s);
+				fDebugger.SendCommand(GDB_ATTACH, s);
 
-			 for idx:=0 to BreakPointList.Count -1 do begin
-					 PBreakPointEntry(BreakPointList.Items[idx])^.breakPointIndex := fDebugger.AddBreakpoint(idx);
-			 end;
+				for idx:=0 to BreakPointList.Count -1 do
+					PBreakPointEntry(BreakPointList.Items[idx])^.breakPointIndex := fDebugger.AddBreakpoint(idx);
 
-			 DebugTree.Items.Clear;
-		 end
-		 finally
-			 ProcessListForm.Free;
-		 end;
-	 end;
+				DebugTree.Items.Clear;
+			end
+		finally
+			ProcessListForm.Free;
+		end;
+	end;
 end;
 
 procedure TMainForm.actModifyWatchExecute(Sender: TObject);
@@ -6222,91 +6225,87 @@ end;
 function TMainForm.FindStatement(const statement : string;cursorpos : TBufferCoord;var localfind : string;var localfindpoint : TPoint) : PStatement;
 var
 	e : TEditor;
-	I : integer;
-	parent : string;
-	// Class getten
-	len,len2 : integer;
-	cpos : integer;
-	ppos : integer;
-	apos : integer;
-	// Class getten 2
-	classline : string;
-	classdefline : string;
-	parampos : integer;
-	// Compare
-	compareto : string;
-	comparewith : string;
-	// globals
-	isglobal : boolean;
 	text : PChar;
+	ParentType : string;
+	FoundParentType : boolean;
+	compare1,compare2 : string;
 	wantbrace : integer;
-	wantcomment : integer;
-	wantquote : boolean;
-	found : boolean;
-	curtext : string;
-	actualtext : TStrings;
+	cursorindex : integer;
+	I, wordstart, wordend : integer;
+	token : string;
+	HLAttr: TSynHighlighterAttributes;
 begin
-
-	Screen.Cursor := crHourglass;
 	Result := nil;
+
+	// Assume e isn't nil, because if so, this function wouldn't even be called
 	e:=GetEditor;
-	actualtext := e.Text.Lines;
-	len:=0;
-	len2:=0;
-	isglobal:=true;
+	text := PChar(e.Text.Text);
+	cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
 
-	// See if we clicked on / hovered above something with a parent before it
-	cpos := Pos('::' + statement,actualtext[cursorpos.Line-1]);
-	ppos := Pos('.'  + statement,actualtext[cursorpos.Line-1]);
-	apos := Pos('->' + statement,actualtext[cursorpos.Line-1]);
+	FoundParentType := false;
 
-	// We found something belonging to a class or namespace
-	if cpos > 0 then begin
+	// Try to find the word before :: or -> or .
+	if ((text[cursorindex-2] = ':') and (text[cursorindex-1] = ':')) or
+       ((text[cursorindex-2] = '-') and (text[cursorindex-1] = '>')) or
+        (text[cursorindex-1] = '.') then begin
 
-		// Find the namespace or class, don't check for the type of the class, it's already there
+		if (text[cursorindex-1] = '.') then
+			wordend := cursorindex-2 // Start before the .
+		else
+			wordend := cursorindex-3; // Start before the -> or ::
+
+		// Find the word before the array stuff
+		if text[wordend] = ']' then begin
+			repeat
+				Dec(wordend);
+			until (text[wordend+1] = '[');
+		end;
+
+		// Then find the word itself
+		wordstart := wordend;
 		repeat
-			Inc(len);
-		until not (actualtext[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
-		parent := Copy(actualtext[cursorpos.Line-1],cpos-len+1,len-1);
-		isglobal := false;
+			Dec(wordstart);
+		until not (text[wordstart] in e.Text.IdentChars);
+		compare1 := Copy(text,wordstart+2,wordend-wordstart);
 
-	end else if (ppos > 0) or (apos > 0) then begin
+		// Don't bother looking for a match...
+		if compare1 <> '' then begin
 
-		// We've found an instance before the word...
-		if ppos > 0 then cpos := ppos else cpos := apos;
-		repeat
-			Inc(len);
-			if actualtext[cursorpos.Line-1][cpos-len] = ']' then begin
-				repeat
-					Inc(len2);
-				until (actualtext[cursorpos.Line-1][cpos-len2+len] in ['[']);
-				cpos := cpos - len2 + len;
-			end;
-		until not (actualtext[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
-		parent := Copy(actualtext[cursorpos.Line-1],cpos-len+1,len-1);
+			// Don't look for the types of classes, because we'll just find 'class', which is useless
+			if not ((text[cursorindex-2] = ':') and (text[cursorindex-1] = ':')) then begin
 
-		// So do scan for the type of the instance we've found
-		for I:=0 to CppParser.Statements.Count-1 do begin
-			if PStatement(CppParser.Statements[I])^._ParentID = -1 then begin
-				if PStatement(CppParser.Statements[I])^._ScopeCmd <> '' then
-					compareto := PStatement(CppParser.Statements[I])^._ScopeCmd
-				else
-					compareto := PStatement(CppParser.Statements[I])^._ScopelessCmd;
+				// if we previously found an instance, look for its type
+				for I:=0 to CppParser.Statements.Count-1 do begin
+					if PStatement(CppParser.Statements[I])^._ParentID = -1 then begin
 
-				if AnsiCompareStr(compareto,parent)=0 then begin
-					parent := Copy(PStatement(CppParser.Statements[I])^._FullText,1,Pos(' ',PStatement(CppParser.Statements[I])^._FullText)-1);
-					isglobal := false;
-					Break;
+						// Try to find the place where this instance name first showed up
+						if PStatement(CppParser.Statements[I])^._ScopeCmd <> '' then
+							compare2 := PStatement(CppParser.Statements[I])^._ScopeCmd
+						else
+							compare2 := PStatement(CppParser.Statements[I])^._ScopelessCmd;
+
+						if CompareStr(compare1,compare2) = 0 then begin
+
+							// We only need the type of the parent we've found!
+							ParentType := PStatement(CppParser.Statements[I])^._Type;
+							FoundParentType := true;
+							Break;
+						end;
+					end;
 				end;
+			end else begin
+				ParentType := compare1;
+				FoundParentType := true;
 			end;
 		end;
-	end else begin
 
-		// otherwise, we clicked an 'unattached' variable. First check if we're inside a class body
+	// otherwise, we clicked an 'unattached' variable. First check if we're inside a class header body
+	{end else begin
+
 		for I:=cursorpos.Line-1 downto 0 do begin
 
 			// We're inside a class definition, save the name of the parent class...
-			if AnsiStartsStr('class ',TrimLeft(actualtext[I])) then begin
+			if CompareStr('class ',TrimLeft(actualtext[I])) = 0 then begin
 				classdefline := TrimLeft(actualtext[I]);
 
 				len:=7;
@@ -6316,92 +6315,70 @@ begin
 				parent := Copy(classdefline,7,len-7);
 				break;
 			end;
-		end;
+		end;}
 	end;
 
-	// If we haven't found out its class, assume it belongs to the namespace or function we're currently in
-	if isglobal then begin
-		for I:=cursorpos.Line downto 0 do begin
-			cpos := AnsiPos('::',actualtext[I]);
-			if cpos > 0 then begin
+	// If we couldn't directly find its parent, assume it belongs to the class function we're in
+	if not FoundParentType then begin
 
-				// We zitten in een functie
-				len := 0;
+		// Then scan back trying to find the base function (or class)
+		for cursorindex := e.Text.RowColToCharIndex(cursorpos,true) downto 0 do begin
+			if (text[cursorindex] = ':') and (text[cursorindex+1] = ':') then begin
+				// Then find the word itself
+				wordstart := cursorindex;
 				repeat
-					Inc(len);
-				until actualtext[I][cpos-len] in [#9,#32];
-				parent := Copy(actualtext[I],cpos-len+1,len-1);
-				classline := actualtext[I];
-				break;
+					Inc(wordstart);
+				until not (text[wordstart] in e.Text.IdentChars);
+				ParentType := Copy(text,wordstart,cursorindex-wordstart);
 			end;
 		end;
 
-		// Assemble the name to compare with
-		if (parent <> '') and (parent <> statement) then
-			comparewith := parent + '::' + statement
-		else
-			comparewith := statement;
+		if ParentType <> '' then begin
+			compare1 := ParentType + '::' + statement;
 
-		// Check if the found class instance contains the variable...
-		for I:=0 to CppParser.Statements.Count-1 do begin
-			if PStatement(CppParser.Statements[I])^._ParentID <> -1 then begin
-				if PStatement(CppParser.Statements[I])^._ScopeCmd <> '' then
-					compareto := PStatement(CppParser.Statements[PStatement(CppParser.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser.Statements[I])^._ScopeCmd
-				else
-					compareto := PStatement(CppParser.Statements[PStatement(CppParser.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser.Statements[I])^._ScopelessCmd;
-				if Pos(' ',compareto) > 0 then
-					compareto := Copy(compareto,Pos(' ',compareto)+1,Length(compareto)-Pos(' ',compareto));
-				if Pos('::',compareto) <> GetLastPos('::',compareto) then
-					compareto := Copy(compareto,Pos('::',compareto)+2,Length(compareto)-Pos('::',compareto)-1);
+			// Check if the found class instance actually contains the variable...
+			for I:=0 to CppParser.Statements.Count-1 do begin
+				with PStatement(CppParser.Statements[I])^ do begin
+					if _ParentID <> -1 then begin
+						if _Kind = skFunction then begin
+							if _ScopeCmd <> '' then
+								compare2 := _ScopeCmd
+							else
+								compare2 := _ScopelessCmd;
+						end else begin
+							if _ScopeCmd <> '' then
+								compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopeCmd
+							else
+								compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopelessCmd;
+						end;
 
-				if AnsiCompareStr(compareto,comparewith)=0 then begin
-					parent := Copy(compareto,1,Pos('::',compareto)-1);
-					isglobal := false; // !!
-					Break;
-				end;
-			end;
-		end;
-	end;
-
-	// Als we uiteindelijk nog steeds niks hebben gevonden, scan de functie voor locals
-	if isglobal then begin
-
-		cpos := e.Text.RowColToCharIndex(cursorpos)-Length(statement)-3;
-		wantbrace := 0;
-		wantquote := false;
-		wantcomment := 0;
-		text := PChar(actualtext.Text);
-		for I:=cpos downto Max(0,(cpos-1024)) do begin
-
-			if I = 0 then break;
-
-			// if we're entering a new line backwards...
-			if text[I] = #10 then begin
-				len := 0;
-
-				// Then check if that line contains a newline
-				while not (I-len = 1) and not (text[I-len] in [#10]) do begin
-					Inc(len);
-
-					// if the current line is a comment, skip by 'len' steps
-					if (text[I-len] = '/') and (text[I-len+1] = '/') then begin
-						Inc(wantcomment);
-						break;
+						if CompareStr(compare1,compare2) = 0 then begin
+							ParentType := Copy(compare1,1,Pos('::',compare1)-1);
+							FoundParentType := true;
+							Break;
+						end;
 					end;
 				end;
 			end;
+		end;
+	end;
 
-			// Skip multi-line comments
-			if (text[I] = '*') and (text[I+1] = '/') then
-				Inc(wantcomment);
-			if ((text[I] = '/') and (text[I+1] = '*')) or ((text[I] = '/') and (text[I+1] = '/')) then
-				Dec(wantcomment);
-			if wantcomment > 0 then continue;
+	// Found nothing belonging to any parents? Assume a local variable
+	if not FoundParentType then begin
 
-			// Skip strings
-			if text[I] = '"' then
-				wantquote := not wantquote;
-			if wantquote then continue;
+		compare1 := StringReplace(statement,'*','',[rfReplaceAll]);
+		compare1 := StringReplace(statement,'&','',[rfReplaceAll]);
+
+		wantbrace := 0;
+		cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
+		I := cursorindex;
+		while I > cursorindex-1024 do begin
+			Dec(I);
+
+			e.Text.GetHighlighterAttriAtRowCol(e.Text.CharIndexToRowCol(I),token,HLAttr);
+			if Assigned(HLAttr) then
+				if (HLAttr = e.Text.Highlighter.StringAttribute) or (HLAttr = e.Text.Highlighter.CommentAttribute) then
+					continue;
 
 			// Skip forbidden scopes
 			if text[I] = '}' then
@@ -6410,111 +6387,78 @@ begin
 				Dec(wantbrace);
 			if wantbrace > 0 then continue;
 
-			curtext := Copy(text,I,length(statement)+2);
-			found := AnsiStartsStr(' '    + statement,curtext);
-			if not found then found := AnsiStartsStr(' *'  + statement,curtext);
-			if not found then found := AnsiStartsStr(' &'  + statement,curtext);
-			if not found then found := AnsiStartsStr('	'  + statement,curtext);
-			if not found then found := AnsiStartsStr('	*' + statement,curtext);
-			if not found then found := AnsiStartsStr('	&' + statement,curtext);
-			if found then begin
+			// Wwe've found a word that matches what we were looking for...
+			compare2 := e.Text.GetWordAtRowCol(e.Text.CharIndexToRowCol(I));
+			if (CompareStr(compare1,compare2) = 0) then begin
 
-				// Add starting offset
-				parampos := I;
+				wordstart := e.Text.RowColToCharIndex(e.Text.WordStartEx(e.Text.CharIndexToRowCol(I)),true);
+				wordend := e.Text.RowColToCharIndex(e.Text.WordEndEx(e.Text.CharIndexToRowCol(I)),true);
 
-				// First, starting at the found point, scan backwards until we find a stopping character
-				len := 0;
-				len2 := 0;
+				// First, starting at the found point, scan backwards until we find an invalid character
 				repeat
-					Inc(len);
+					Dec(wordstart);
+				until (wordstart = 0) or not ((text[wordstart] in e.Text.IdentChars) or (text[wordstart] in [#0..#32]));
 
-					// Skip single-line comments
-					if text[parampos-len] = #10 then begin
-						repeat
-							Inc(len2);
-							if (text[I-len-len2] = '/') and (text[I-len-len2+1] = '/') then begin
-								len2 := 9999;
-								break;
-							end;
-						until text[I-len-len2] in [#10];
-					end;
+				// Trim whitespace
+				repeat
+					Inc(wordstart);
+				until not (text[wordstart] in [#0..#32]);
 
-				until (len2 = 9999) or (text[parampos-len] in ['>','<','+','-','/','=','(',')',':',';','#','{','}',',']);
-
-				// If we encountered a #define, continue at the end until a newline
-				if AnsiStartsStr('#',text[parampos-len]) then begin
-
-					// Define gevonden
-					len2 := 0;
-					repeat
-						Inc(len2);
-					until (text[parampos+len2] in [#13,#10,'#']);
-
-				// Otherwise, demand a [,=,( or ; after the member...
-				end else begin
-
-					// Whitespace ervoor trimmen
-					repeat
-						Dec(len);
-					until not (text[parampos-len] in [';',#9,#32,#13,#10]);
-
-					// See if we found a correct character, first walk up to the end of the name
-					len2 := Length(statement);
-					if text[parampos] in ['*','&'] then Inc(len2);
-
-					while (text[parampos+len2] in [#9,#32,#10,#13]) do
-						Inc(len2);
-
-					// At this point, we NEED a specific character
-					if not (text[parampos+len2] in ['=',')',';','(','[','(',',']) then
-						len := 0;
-
-					// If we found a correct character, keep going until our useful information stops...
-					while not (text[parampos+len2] in ['=','{',';','=','(',')',',']) do
-						Inc(len2);
-				end;
-
-				// Als er wat zinnigs staat
-				if (len > 2) then begin
-					localfind := Copy(text,parampos-len+1,len+len2);
-					localfindpoint.x := e.Text.CharIndexToRowCol(I).Char-1;
-					localfindpoint.y := e.Text.CharIndexToRowCol(I).Line;
-					Screen.Cursor := crDefault;
+				if (wordend - wordstart > Length(compare1)) then begin
+					localfind := Copy(text,wordstart,wordend - wordstart + 1);
+					localfindpoint.x := e.Text.CharIndexToRowCol(wordstart).Char;
+					localfindpoint.y := e.Text.CharIndexToRowCol(wordstart).Line;
 					Exit;
-				end;
+				end else
+					// Too bad, couldn't find anything, skip rest of word
+					I := wordstart;
 			end;
 		end;
 	end;
 
-	// Assembleer de uiteindelijke naam, volledig deze keer
-	if (parent <> '') and (parent <> statement) and not isglobal then
-		comparewith := parent + '::' + statement
+	// Use to Parent::Member notation for structs too
+	if FoundParentType then
+		compare1 := ParentType + '::' + statement
 	else
-		comparewith := statement;
+		compare1 := statement;
 
-	// Nu gaan we de database doorlopen (omdat er local niks gevonden is)
+	compare1 := StringReplace(compare1,'*','',[rfReplaceAll]);
+	compare1 := StringReplace(compare1,'&','',[rfReplaceAll]);
+
+	// For every item, try to assemble ParentType :: WordToFind or simply WordToFind
 	for I:=0 to CppParser.Statements.Count-1 do begin
-		// Als we een global zien, niet class ervoor (zou '::global' geven)
-		if (PStatement(CppParser.Statements[I])^._ParentID = -1) then begin
-			compareto := PStatement(CppParser.Statements[I])^._ScopelessCmd;
-		end else begin
-			// Deze zitten in een class
-			if PStatement(CppParser.Statements[I])^._ScopeCmd <> '' then
-				compareto := PStatement(CppParser.Statements[PStatement(CppParser.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser.Statements[I])^._ScopeCmd
-			else
-				compareto := PStatement(CppParser.Statements[PStatement(CppParser.Statements[I])^._ParentID])^._FullText + '::' + PStatement(CppParser.Statements[I])^._ScopelessCmd;
-			if Pos(' ',compareto) > 0 then
-				compareto := Copy(compareto,Pos(' ',compareto)+1,Length(compareto)-Pos(' ',compareto));
-			if Pos('::',compareto) <> GetLastPos('::',compareto) then
-				compareto := Copy(compareto,Pos('::',compareto)+2,Length(compareto)-Pos('::',compareto)-1);
+		with PStatement(CppParser.Statements[I])^ do begin
+
+			// If parentid = -1, then it does NOT have a parent class
+			if _ParentID = -1 then begin
+				compare2 := _ScopelessCmd;
+			end else begin
+				if _Kind = skFunction then begin
+					if _ScopeCmd <> '' then
+						compare2 := _ScopeCmd
+					else
+						compare2 := _ScopelessCmd;
+				end else begin
+					if PStatement(CppParser.Statements[I])^._ScopeCmd <> '' then
+						compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopeCmd
+					else
+						compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopelessCmd;
+				end;
+			end;
 		end;
 
-		if AnsiCompareStr(compareto,comparewith)=0 then begin
+		if CompareStr(compare1,compare2) = 0 then begin
 			Result := PStatement(CppParser.Statements[I]);
-			Break;
+			Exit;
 		end;
 	end;
-	Screen.Cursor := crDefault;
+
+	// if we couldn't find anything, just display what we've been able to gather
+	if FoundParentType then begin
+		localfind := compare1;
+		localfindpoint.x := 12345; // magic number
+		localfindpoint.y := 12345;
+	end;
 end;
 
 procedure TMainForm.actGotoImplDeclEditorExecute(Sender: TObject);
@@ -6550,9 +6494,11 @@ begin
 	end else begin
 
 		// Menu shortcut
-		wordtofind := e.GetWordAtCursor;
-		atposition := e.Text.CaretXY;
+		wordtofind := e.Text.WordAtCursor;
 	end;
+	atposition := e.Text.WordStart;
+
+	//SetStatusBarMessage(wordtofind + inttostr(RandomRange(0,1000)));
 	statement:=FindStatement(wordtofind,atposition,localfind,localfindpoint);
 
 	// If we found it locally (not present in the class browser)

@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 873
-  Top = 464
+  Left = 500
+  Top = 427
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -18,6 +18,7 @@ object MainForm: TMainForm
   OldCreateOrder = False
   Position = poDefault
   Scaled = False
+  ShowHint = True
   WindowState = wsMaximized
   OnClose = FormClose
   OnContextPopup = FormContextPopup
@@ -1360,6 +1361,9 @@ object MainForm: TMainForm
         object RTFItem: TMenuItem
           Action = actXRTF
         end
+        object TEXItem: TMenuItem
+          Action = actXTex
+        end
         object N19: TMenuItem
           Caption = '-'
         end
@@ -1470,9 +1474,11 @@ object MainForm: TMainForm
       end
       object CollapseAll: TMenuItem
         Action = actCollapse
+        Caption = 'Collapse All'
       end
       object UncollapseAll: TMenuItem
         Action = actUnCollapse
+        Caption = 'Uncollapse All'
       end
     end
     object SearchMenu: TMenuItem
@@ -2331,6 +2337,13 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = 'to &RTF'
       OnExecute = actXRTFExecute
+      OnUpdate = actUpdatePageCount
+    end
+    object actXTex: TAction
+      Tag = 3
+      Category = 'File'
+      Caption = 'to &Tex'
+      OnExecute = actXTexExecute
       OnUpdate = actUpdatePageCount
     end
     object actXProject: TAction
@@ -3199,7 +3212,6 @@ object MainForm: TMainForm
     Width = 320
     Height = 240
     Enabled = True
-    HintTimeout = 4000
     MinWidth = 128
     MinHeight = 128
     MaxWidth = 640

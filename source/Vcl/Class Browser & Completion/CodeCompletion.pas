@@ -57,9 +57,6 @@ type
     fWidth: integer;
     fHeight: integer;
     fEnabled: boolean;
-    fHintWindow: THintWindow;
-    fHintTimer: TTimer;
-    fHintTimeout: cardinal;
     fOnKeyPress: TKeyPressEvent;
     fOnResize: TNotifyEvent;
     fOnlyGlobals: boolean;
@@ -79,8 +76,6 @@ type
     function GetHasDot(Phrase: string): boolean;
     procedure SetParser(Value: TCppParser);
     procedure SetPosition(Value: TPoint);
-    procedure SetHintTimeout(Value: cardinal);
-    procedure HintTimer(Sender: TObject);
     procedure ComplKeyPress(Sender: TObject; var Key: Char);
     procedure OnFormResize(Sender: TObject);
     procedure SetColor(Value: TColor);
@@ -92,8 +87,6 @@ type
     procedure Hide;
     function SelectedStatement: PStatement;
     function SelectedIsFunction: boolean;
-    procedure ShowArgsHint(FuncName: string; Rect: TRect);
-    procedure ShowMsgHint(Rect: TRect; HintText: string);
     function GetClass(Phrase: string): string;
   published
     property Parser: TCppParser read fParser write SetParser;
@@ -102,7 +95,6 @@ type
     property Width: integer read fWidth write fWidth;
     property Height: integer read fHeight write fHeight;
     property Enabled: boolean read fEnabled write fEnabled;
-    property HintTimeout: cardinal read fHintTimeout write SetHintTimeout;
     property MinWidth: integer read fMinWidth write fMinWidth;
     property MinHeight: integer read fMinHeight write fMinHeight;
     property MaxWidth: integer read fMaxWidth write fMaxWidth;
@@ -123,14 +115,6 @@ uses CodeCompletionForm;
 constructor TCodeCompletion.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-
-  fHintWindow := THintWindow.Create(Self);
-  fHintWindow.Color := clInfoBk;
-  fHintTimer := TTimer.Create(Self);
-  fHintTimeout := 4000;
-  fHintTimer.Interval := fHintTimeout;
-  fHintTimer.OnTimer := HintTimer;
-  fHintTimer.Enabled := False;
 
   fIncludedFiles := TStringList.Create;
   fIncludedFiles.Sorted := True;
@@ -157,8 +141,6 @@ begin
   FreeAndNil(CodeComplForm);
   FreeAndNil(fCompletionStatementList);
   FreeAndNil(fFullCompletionStatementList);
-  FreeAndNil(fHintWindow);
-  FreeAndNil(fHintTimer);
   FreeAndNil(fIncludedFiles);
   inherited Destroy;
 end;
@@ -624,70 +606,6 @@ begin
     if Assigned(fOnResize) then
       fOnResize(Self);
   end;
-end;
-
-procedure TCodeCompletion.ShowArgsHint(FuncName: string; Rect: TRect);
-var
-  HintText: string;
-  I: integer;
-  S: string;
-begin
-  HintText := '';
-  fCompletionStatementList.Clear;
-
-  for I := 0 to fParser.Statements.Count - 1 do
-    if AnsiCompareStr(PStatement(fParser.Statements[I])^._ScopelessCmd, FuncName) = 0 then begin
-      S := Trim(PStatement(fParser.Statements[I])^._Args);
-      if S <> '' then begin
-        if HintText <> '' then
-          HintText := HintText + #10;
-        HintText := HintText + S;
-      end;
-    end;
-  if HintText = '' then
-    HintText := '* No parameters known *';
-  ShowMsgHint(Rect, HintText);
-end;
-
-procedure TCodeCompletion.ShowMsgHint(Rect: TRect; HintText: string);
-var
-  P, MaxX, Lines: integer;
-  s, s1: string;
-begin
-  MaxX := 0;
-  Lines := 1;
-  S := HintText;
-
-  repeat
-    P := Pos(#10, S);
-    if P > 0 then begin
-      S1 := Copy(S, 1, P - 1);
-      S := Copy(S, P + 1, MaxInt);
-      if fHintWindow.Canvas.TextWidth(S1) > MaxX then
-        MaxX := fHintWindow.Canvas.TextWidth(S1) + 8;
-      Inc(Lines);
-    end
-    else begin
-      if fHintWindow.Canvas.TextWidth(S) > MaxX then
-        MaxX := fHintWindow.Canvas.TextWidth(S) + 8;
-    end;
-  until P = 0;
-
-  Rect.Right := Rect.Left + MaxX;
-  Rect.Bottom := Rect.Top + fHintWindow.Canvas.TextHeight(HintText) * Lines;
-  fHintWindow.ActivateHint(Rect, HintText);
-  fHintTimer.Enabled := true;
-end;
-
-procedure TCodeCompletion.HintTimer(Sender: TObject);
-begin
-  fHintWindow.ReleaseHandle;
-end;
-
-procedure TCodeCompletion.SetHintTimeout(Value: cardinal);
-begin
-  if Value <> fHintTimer.Interval then
-    fHintTimer.Interval := fHintTimeout;
 end;
 
 procedure TCodeCompletion.SetColor(Value: TColor);

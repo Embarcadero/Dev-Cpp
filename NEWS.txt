@@ -1,3 +1,13 @@
+Version 5.2.0.2 - *
+
+- Added a default compiler profile to TDM-GCC downloads to create 32-bit executables.
+- Ctrl+Click code browsing is more accurate now.
+- Added a function to projects which can change the C++/C default choice made when creating the project.
+- Fixed the comment/uncomment function not properly uncommenting single lines(?)
+- Watched variable deleting now does not delete wrong variables anymore.
+- Added TeX formatted code exporting.
+- Updated the Chinese (TC) translations (by cin.getline).
+
 Version 5.2.0.1 - 28 April 2012
 
 - Function tooltips now properly hide when switching tabs again (regression).

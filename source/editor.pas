@@ -61,8 +61,6 @@ type
     fErrSetting: boolean;
     fDebugGutter: TDebugGutter;
     fOnBreakPointToggle: TBreakpointToggleEvent;
-    fHintTimer: TTimer;
-    fCurrentHint: string;
     fCurrentWord: string;
     //////// CODE-COMPLETION - mandrav /////////////
     fCompletionEatSpace: boolean;
@@ -80,7 +78,7 @@ type
     procedure EditorKeyPress(Sender: TObject; var Key: Char);
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure EditorMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure EditorMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 
     procedure SetEditorText(Key: Char);
     procedure InitCompletion;
@@ -102,7 +100,6 @@ type
     procedure EditorDropFiles(Sender: TObject; x, y: integer;aFiles: TStrings);
     procedure EditorDblClick(Sender: TObject);
     procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure EditorHintTimer(sender : TObject);
     procedure EditorExit(sender : TObject);
 
     procedure SetFileName(const value: string);
@@ -126,9 +123,8 @@ type
     procedure GotoLineNr(Nr: integer);
     function Search(isReplace: boolean): boolean;
     procedure SearchAgain;
-    procedure Exportto(isHTML: boolean);
+    procedure Exportto(filetype: integer);
     procedure InsertString(Value: string;MoveCursor: boolean);
-    function GetWordAtCursor: string;
     procedure SetErrorFocus(Col, Line: integer);
     procedure SetActiveBreakpointFocus(Line: integer);
     procedure RemoveBreakpointFocus;
@@ -237,25 +233,20 @@ begin
 	end else
 		fNew := True;
 
-	// Create a tooltip timer
-	fHintTimer := TTimer.Create(Application);
-	fHintTimer.Interval := 500;
-	fHintTimer.OnTimer := EditorHintTimer;
-	fHintTimer.Enabled := false;
-
 	// Set a whole lot of data
 	fText.Parent := fTabSheet;
 	fText.Align := alClient;
 	fText.Visible := True;
 	fText.PopupMenu := MainForm.EditorPopupMenu;
 	fText.WantTabs := True;
+	fText.ShowHint := True;
 	fText.OnStatusChange:= EditorStatusChange;
 	fText.OnSpecialLineColors:= EditorSpecialLineColors;
 	fText.OnGutterClick:= EditorGutterClick;
 	fText.OnReplaceText:= EditorReplaceText;
 	fText.OnDropFiles:= EditorDropFiles;
 	fText.OnDblClick:= EditorDblClick;
-	fText.OnMouseDown := EditorMouseDown;
+	fText.OnMouseUp := EditorMouseUp;
 	fText.OnMouseMove := EditorMouseMove;
 	fText.OnExit := EditorExit;
 	fText.OnPaintTransient := EditorPaintTransient;
@@ -340,7 +331,6 @@ begin
 	fDebugGutter.Free;
 	fCodeTooltip.Free;
 	fAutoIndent.Free;
-	fHintTimer.Free;
 	fText.Free;
 
 	// Activates previous tab instead of first one when closing
@@ -671,39 +661,39 @@ begin
 	end;
 end;
 
-procedure TEditor.ExportTo(isHTML: boolean);
+procedure TEditor.Exportto(filetype: integer);
 begin
-  if IsHTML then
-   begin
-     with dmMain.SaveDialog do
-      begin
-        Filter:= dmMain.SynExporterHTML.DefaultFilter;
-        DefaultExt := HTML_EXT;
-        Title:= Lang[ID_NV_EXPORT];
-        if Execute then
-         begin
-           dmMain.ExportToHtml(fText.UnCollapsedLines, dmMain.SaveDialog.FileName);
-           fText.BlockEnd:= fText.BlockBegin;
-         end;
-      end;
-   end
-  else
-   with dmMain.SaveDialog do
-    begin
-      Filter:= dmMain.SynExporterRTF.DefaultFilter;
-      Title:= Lang[ID_NV_EXPORT];
-      DefaultExt := RTF_EXT;
-      if Execute then
-       begin
-         dmMain.ExportToRtf(fText.UnCollapsedLines, dmMain.SaveDialog.FileName);
-         fText.BlockEnd:= fText.BlockBegin;
-       end;
-    end;
-end;
-
-function TEditor.GetWordAtCursor: string;
-begin
-  result:= fText.GetWordAtRowCol(fText.CaretXY);
+	if filetype = 0 then begin
+		with dmMain.SaveDialog do begin
+			Filter:= dmMain.SynExporterHTML.DefaultFilter;
+			Title:= Lang[ID_NV_EXPORT];
+			DefaultExt := HTML_EXT;
+			if Execute then begin
+				dmMain.ExportToHtml(fText.UnCollapsedLines, dmMain.SaveDialog.FileName);
+				fText.BlockEnd:= fText.BlockBegin;
+			end;
+		end;
+	end else if filetype = 1 then begin
+		with dmMain.SaveDialog do begin
+			Filter:= dmMain.SynExporterRTF.DefaultFilter;
+			Title:= Lang[ID_NV_EXPORT];
+			DefaultExt := RTF_EXT;
+			if Execute then begin
+				dmMain.ExportToRtf(fText.UnCollapsedLines, dmMain.SaveDialog.FileName);
+				fText.BlockEnd:= fText.BlockBegin;
+			end;
+		end;
+	end else begin
+		with dmMain.SaveDialog do begin
+			Filter:= dmMain.SynExporterTex.DefaultFilter;
+			Title:= Lang[ID_NV_EXPORT];
+			DefaultExt := TEX_EXT;
+			if Execute then begin
+				dmMain.ExportToTex(fText.UnCollapsedLines, dmMain.SaveDialog.FileName);
+				fText.BlockEnd:= fText.BlockBegin;
+			end;
+		end;
+	end;
 end;
 
 {** Modified by Peter **}
@@ -763,24 +753,23 @@ end;
 
 function TEditor.Search(isReplace: boolean): boolean;
 var
- s: string;
+	s: string;
 begin
-  if devEditor.FindText then
-   if (fText.SelText = '') then
-    s:= GetWordAtCursor
-   else
-    s:= fText.SelText;
+	if devEditor.FindText then
+		if (fText.SelText = '') then
+			s:= fText.WordAtCursor
+		else
+			s:= fText.SelText;
 
-  with SearchCenter do
-   begin
-     FindText:= s;
-     Replace:= IsReplace;
-     ReplaceText:= '';
-     SingleFile:=  TRUE;
-     Editor:= Self;
-     Result:=ExecuteSearch and not SingleFile; // if changed to "find in all files", open find results
-   end;
-  Activate;
+	with SearchCenter do begin
+		FindText:= s;
+		Replace:= IsReplace;
+		ReplaceText:= '';
+		SingleFile:=  TRUE;
+		Editor:= Self;
+		Result:=ExecuteSearch and not SingleFile; // if changed to "find in all files", open find results
+	end;
+	Activate;
 end;
 
 procedure TEditor.SearchAgain;
@@ -1307,97 +1296,65 @@ end;
 
 //////// CODE-COMPLETION - mandrav - END ///////
 
-// variable info
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
-	s : string;
+	s,localfind : string;
 	p : TBufferCoord;
 	attr : TSynHighlighterAttributes;
+	st: PStatement;
+	localfindpoint : TPoint;
 begin
-	fHintTimer.Enabled := false;
-
-	// If the rightclick menu is open, don't show up
-//	if MainForm.EditorPopupMenu.PopupPoint.x = -1 then Exit;
-
 	// Check if we're inside a comment or string by looking at text color. If we are, skip without showing a tooltip
 	p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(X, Y));
 	if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
 		if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then begin
-			fText.Hint:='';
+			Application.CancelHint;
+			fText.Hint := '';
 			Exit;
 		end;
 
-	if devEditor.ParserHints and not MainForm.fDebugger.Executing then begin
-		p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(X, Y));
-		s := fText.GetWordAtRowCol(p);
-	end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
-		p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(X, Y));
-		s := fText.GetWordAtRowCol(p);
-	end;
+	if (devEditor.ParserHints and not MainForm.fDebugger.Executing) or (devData.WatchHint and MainForm.fDebugger.Executing) then
+		s := fText.WordAtMouse;
 
-	if (s <> '') and not fHintTimer.Enabled then begin
-		fHintTimer.Enabled := true;
-		fCurrentHint := s;
-	end else if s = '' then
-		fText.Hint:='';
+	if (s <> '') then begin
 
-	if s <> '' then begin
 		if ssCtrl in Shift then
 			fText.Cursor:=crHandPoint
-		else
+		else begin
 			fText.Cursor:=crIBeam;
-	end else
-		fText.Cursor:=crIBeam;
-end;
 
-procedure TEditor.EditorHintTimer(Sender : TObject);
-var
-	r : TRect;
-	p: TPoint;
-	st: PStatement;
-	localfind : string;
-	localfindpoint : TPoint;
-	thisword : string;
-begin
-	fHintTimer.Enabled := false;
-	p:=fText.ScreenToClient(Mouse.CursorPos);
+			if(s <> fCurrentWord) then begin
 
-	// If the mouse is outside of the editor, hide balloon
-	if (p.X<=0) or (p.X>=fText.Width) or (p.Y<=0) or (p.Y>=fText.Height) then Exit;
+				fCurrentWord := s;
 
-	if (fCurrentHint <> '') and devEditor.ParserHints then begin
+				if devEditor.ParserHints and not MainForm.fDebugger.Executing then begin
+					st:=MainForm.FindStatement(s,fText.WordStartEx(p),localfind,localfindpoint);
+					if localfind <> '' then begin
+						Application.CancelHint;
+						if (localfindpoint.X <> 12345) and (localfindpoint.Y <> 12345) then
+							fText.Hint:=localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(localfindpoint.y) + ') - Ctrl+Click to follow'
+						else
+							fText.Hint:=localfind;
+					end else if Assigned(st) then begin
+						Application.CancelHint;
+						fText.Hint:=Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
+					end else begin
+						Application.CancelHint;
+						fText.Hint := '';
+					end;
+				end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
+					MainForm.fDebugger.SendCommand(GDB_DISPLAY, fCurrentWord);
 
-		// If we're editting, show information of word
-		if not MainForm.fDebugger.Executing then begin
-
-			// Skip if we're scanning for the second time...
-			thisword := fText.WordAtMouse;
-			if thisword = fCurrentWord then Exit;
-			fCurrentWord := thisword;
-
-			st:=MainForm.FindStatement(fCurrentWord,fText.CaretXY,localfind,localfindpoint);
-
-			r.Left := Mouse.CursorPos.X;
-			r.Top := Mouse.CursorPos.Y - 2*fText.LineHeight;
-			r.Bottom := Mouse.CursorPos.Y + 10 + fText.LineHeight;
-			r.Right := Mouse.CursorPos.X + 60;
-
-			if localfind <> '' then begin
-				fCurrentHint:=localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(localfindpoint.y) + ') - Ctrl+Click to follow';
-				fCompletionBox.ShowMsgHint(r, fCurrentHint);
-			end else if Assigned(st) then begin
-				fCurrentHint:=Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
-				fCompletionBox.ShowMsgHint(r, fCurrentHint);
+					Application.CancelHint;
+					fText.Hint:=MainForm.fDebugger.WatchVar+': '+MainForm.fDebugger.WatchValue;
+				end;
 			end;
-
-		// debugging - evaluate var under cursor and show value in a hint
-		end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
-			MainForm.fDebugger.SendCommand(GDB_DISPLAY, fCurrentHint);
-		//	Sleep(25);
-		//	fText.Hint:=MainForm.fDebugger.WatchVar+': '+MainForm.fDebugger.WatchValue;
-		//	fText.ShowHint:=True;
-		//	Application.ActivateHint(Mouse.CursorPos);
 		end;
+	end else begin
+		fCurrentWord := s;
+		fText.Cursor:=crIBeam;
+		Application.CancelHint;
+		fText.Hint := '';
 	end;
 end;
 
@@ -1444,7 +1401,7 @@ end;
 procedure TEditor.UnindentSelection;
 begin
 	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
-		FText.ExecuteCommand(ecBlockUnIndent, #0, nil)
+		FText.ExecuteCommand(ecBlockUnIndent,#0, nil)
 	else
 		FText.ExecuteCommand(ecShiftTab,#0, nil);
 end;
@@ -1468,7 +1425,9 @@ begin
 		while P[CurPos] <> #0 do begin
 
 			// We've found an enter, look for next nonblank
-			if (P[CurPos] = #13) or (P[CurPos] = #10) or ((CurPos = 0) and (P[CurPos] in [#0..#32])) then begin
+			if (P[CurPos] = #13) or (P[CurPos] = #10) or
+				((CurPos = 0) and (P[CurPos] = '/') and (P[CurPos+1] = '/')) or
+				((CurPos = 0) and (P[CurPos] in [#0..#32])) then begin
 				repeat
 					Inc(CurPos);
 				until not (P[CurPos] in [#0..#32]);
@@ -1476,7 +1435,7 @@ begin
 
 			// We've found the first nonblank, is it a // ?
 			if (P[CurPos] = '/') and (P[CurPos+1] = '/') then
-				Delete(localcopy,CurPos+1,2); // one based >.>
+				Delete(localcopy,CurPos+1,2); // one based...
 
 			Inc(CurPos);
 		end;
@@ -1489,7 +1448,7 @@ begin
 	end;
 end;
 
-procedure TEditor.EditorMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
+procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
 	procedure DoOpen(Fname: string; Line: integer);
 	var
 		e: TEditor;
@@ -1505,7 +1464,7 @@ procedure TEditor.EditorMouseDown(Sender: TObject; Button: TMouseButton;Shift: T
 var
 	p: TPoint;
 	line: string;
-	f1, f2: integer;
+	walker,start : integer;
 begin
 	p.X := X;
 	p.Y := Y;
@@ -1514,53 +1473,30 @@ begin
 	p.Y := fText.PixelsToRowColumn(p.X, p.Y).Row;
 
 	// if ctrl+clicked
-	if (ssCtrl in Shift) and (Button = mbLeft) and (p.Y <= fText.UnCollapsedLines.Count) then begin
+	if (ssCtrl in Shift) and (Button = mbLeft) and (p.Y <= fText.UnCollapsedLines.Count) and not fText.SelAvail then begin
 
 		// reset the cursor
 		fText.Cursor:=crIBeam;
 
 		// see if it's #include
 		line:=fText.UnCollapsedLines[p.Y-1];
-		line:=StringReplace(line,' ', '', [rfReplaceAll]);
 		if AnsiStartsStr('#include',line) then begin
 
-			// We've clicked an #include <>
-			f1:=AnsiPos('<', line);
-			if f1>0 then begin
-				Inc(f1);
-				f2:=f1;
-				while (f2<Length(line)) and (line[f2]<>'>') do
-					Inc(f2);
-				if line[f2]<>'>' then
-					Abort;
-				f2:=f2-f1;
-				DoOpen(MainForm.CppParser.GetFullFileName(Copy(line, f1, f2)), 1);
+			// We've clicked an #include...
+			walker := 0;
+			repeat
+				Inc(walker);
+			until line[walker] in ['<','"'];
+			start := walker + 1;
 
-				// the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
-				Abort;
-			end;
+			repeat
+				Inc(walker);
+			until line[walker] in ['>','"'];
 
-			// We've clicked an #include ""
-			f1:=AnsiPos('"', line);
-			if f1>0 then begin
-				Inc(f1);
-				f2:=f1;
-				while (f2<Length(line)) and (line[f2]<>'"') do
-					Inc(f2);
-				if line[f2]<>'"' then
-					Abort;
-				f2:=f2-f1;
-				DoOpen(MainForm.CppParser.GetFullFileName(Copy(line, f1, f2)), 1);
-
-				// the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
-				Abort;
-			end;
+			DoOpen(MainForm.CppParser.GetFullFileName(Copy(line, start, walker-start)), 1);
 		end;
 
 		MainForm.actGotoImplDeclEditorExecute(self);
-
-		// the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
-		Abort;
 	end;
 end;
 

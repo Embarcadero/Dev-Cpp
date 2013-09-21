@@ -10,6 +10,6 @@ brcc32 DefaultFiles.rc
 brcc32 LangFrm.rc
 brcc32 icons.rc
 
-3) Opening and using the main project file 'devcpp.dpr' should not bring up any 'not found' erros now.
+3) Opening and using the main project file 'devcpp.dpr' should not bring up any 'not found' errors now.
 
 4) Other versions of Delphi should work, but I've only tested Delphi 7.

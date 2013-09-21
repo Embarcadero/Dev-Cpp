@@ -130,16 +130,16 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object grpIcon: TGroupBox
         Left = 12
-        Top = 176
+        Top = 166
         Width = 245
-        Height = 128
+        Height = 138
         Caption = '  Icon:  '
         TabOrder = 0
         object btnIconBrwse: TBitBtn
-          Left = 120
-          Top = 56
+          Left = 128
+          Top = 60
           Width = 105
-          Height = 22
+          Height = 30
           Hint = 'Select a custom icon'
           Caption = 'Browse...'
           TabOrder = 0
@@ -173,10 +173,10 @@ object frmProjectOptions: TfrmProjectOptions
             BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
         end
         object btnIconLib: TBitBtn
-          Left = 120
+          Left = 128
           Top = 21
           Width = 105
-          Height = 24
+          Height = 30
           Hint = 'Select a icon from Dev-C++'#39's icon collection'
           Caption = 'Library'
           TabOrder = 1
@@ -210,10 +210,10 @@ object frmProjectOptions: TfrmProjectOptions
             0000000000000000000000000000000000000000000000000000}
         end
         object btnRemoveIcon: TBitBtn
-          Left = 120
-          Top = 89
+          Left = 128
+          Top = 97
           Width = 105
-          Height = 22
+          Height = 30
           Hint = 'Do not use an icon for this project'
           Caption = 'Remove'
           Enabled = False
@@ -249,7 +249,7 @@ object frmProjectOptions: TfrmProjectOptions
         end
         object Panel1: TPanel
           Left = 38
-          Top = 45
+          Top = 50
           Width = 44
           Height = 44
           BevelOuter = bvLowered
@@ -266,9 +266,9 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object grpType: TGroupBox
         Left = 272
-        Top = 176
+        Top = 166
         Width = 245
-        Height = 128
+        Height = 138
         Caption = '  Type:  '
         TabOrder = 1
         object lstType: TListBox
@@ -288,11 +288,19 @@ object frmProjectOptions: TfrmProjectOptions
         end
         object chkSupportXP: TCheckBox
           Left = 7
-          Top = 99
-          Width = 202
+          Top = 115
+          Width = 230
           Height = 17
           Caption = 'Support Windows XP Themes'
           TabOrder = 1
+        end
+        object chkDefCpp: TCheckBox
+          Left = 7
+          Top = 92
+          Width = 230
+          Height = 17
+          Caption = 'Default to C++ when creating new files'
+          TabOrder = 2
         end
       end
       object edProjectName: TEdit

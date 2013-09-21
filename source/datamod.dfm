@@ -2,8 +2,8 @@ object dmMain: TdmMain
   OldCreateOrder = False
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
-  Left = 760
-  Top = 370
+  Left = 974
+  Top = 504
   Height = 354
   Width = 494
   object Cpp: TSynCppSyn
@@ -31,8 +31,8 @@ object dmMain: TdmMain
     Highlighter = Cpp
     Title = 'Untitled'
     UseBackground = True
-    Left = 188
-    Top = 74
+    Left = 212
+    Top = 58
   end
   object SynExporterHTML: TSynExporterHTML
     Color = clNone
@@ -9785,5 +9785,19 @@ object dmMain: TdmMain
       8001E0177FF77FF78003F01F1B771BBB801FF01F6B776B5BC03FF83F6B6B6B5B
       FE7FFC7F6B6B6B5BFFFFFEFF196B19B100000000000000000000000000000000
       000000000000}
+  end
+  object SynExporterTeX: TSynExporterTeX
+    Color = clNone
+    DefaultFilter = 'TeX Files (*.tex)|*.tex'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Courier New'
+    Font.Style = []
+    Highlighter = Cpp
+    Title = 'Untitled'
+    UseBackground = True
+    Left = 152
+    Top = 56
   end
 end
