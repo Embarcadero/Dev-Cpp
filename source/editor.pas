@@ -1407,7 +1407,7 @@ begin
 			if thisword = fCurrentHintFull then Exit;
 			fCurrentHintFull := thisword;
 
-			st:=MainForm.findstatement(localfind,localfindpoint,false); // BEZIG
+			st:=MainForm.findstatement(localfind,localfindpoint,false);
 
 			r.Left := Mouse.CursorPos.X;
 			r.Top := Mouse.CursorPos.Y - 2*fText.LineHeight;

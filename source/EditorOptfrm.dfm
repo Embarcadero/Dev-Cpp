@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 566
-  Top = 261
+  Left = 902
+  Top = 333
   HelpType = htKeyword
   BorderStyle = bsDialog
   Caption = 'Editor Options'
@@ -30,7 +30,7 @@ object EditorOptForm: TEditorOptForm
     Top = 8
     Width = 415
     Height = 365
-    ActivePage = tabGeneral
+    ActivePage = tabDisplay
     Anchors = [akLeft, akTop, akRight, akBottom]
     OnChange = PagesMainChange
     OnKeyDown = FormKeyDown
@@ -46,6 +46,7 @@ object EditorOptForm: TEditorOptForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 0
+      Visible = False
       Caption = 'General'
       object lblTabSize: TLabel
         Left = 215
@@ -408,11 +409,27 @@ object EditorOptForm: TEditorOptForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 1
-      Visible = False
       Caption = 'Display'
+      object ScrollHint: TLabel
+        Left = 0
+        Top = 304
+        Width = 409
+        Height = 13
+        Alignment = taCenter
+        AutoSize = False
+        Caption = 
+          'It is also possible to edit text size by using Control+Scroll, j' +
+          'ust like in browsers!'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
       object grpGutter: TGroupBox
         Left = 6
-        Top = 168
+        Top = 128
         Width = 398
         Height = 159
         Caption = '  Gutter  '
@@ -517,7 +534,7 @@ object EditorOptForm: TEditorOptForm
           Width = 180
           Height = 21
           Anchors = [akLeft, akRight, akBottom]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 6
           OnChange = FontChange
           OnDblClick = cboDblClick
@@ -528,7 +545,7 @@ object EditorOptForm: TEditorOptForm
           Width = 86
           Height = 21
           Anchors = [akLeft, akRight, akBottom]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 7
           OnChange = FontSizeChange
           OnDblClick = cboDblClick
@@ -573,7 +590,7 @@ object EditorOptForm: TEditorOptForm
           Top = 32
           Width = 180
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnDblClick = cboDblClick
           OnSelect = FontChange
@@ -583,7 +600,7 @@ object EditorOptForm: TEditorOptForm
           Top = 32
           Width = 80
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
           OnChange = FontSizeChange
           OnDblClick = cboDblClick
@@ -870,7 +887,7 @@ object EditorOptForm: TEditorOptForm
           object lblCode: TLabel
             Left = 0
             Top = 107
-            Width = 28
+            Width = 401
             Height = 13
             Align = alBottom
             Caption = 'Code:'

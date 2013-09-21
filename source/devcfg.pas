@@ -1633,7 +1633,7 @@ procedure TdevCodeCompletion.SettoDefaults;
 begin
   fWidth:=320;
   fHeight:=240;
-  fDelay:=5000;
+  fDelay:=1000;
   fBackColor:=clWindow;
   fEnabled:=True;
   fUseCacheFiles:=False;

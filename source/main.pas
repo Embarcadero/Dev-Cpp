@@ -1068,6 +1068,8 @@ begin
 		BuildMenu;
 	end;
 
+//	MsgBox(inttostr(fTools.Menu.Items[11].ImageIndex),fTools.Menu.Items[11].Caption);
+
 	LoadText(FALSE);
 
 	devShortcuts1.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
@@ -1239,7 +1241,6 @@ begin
 			DebugVarsPopup.Images	:= CurrentTheme.MenuImages;
 			ClassBrowser1.Images	:= CurrentTheme.BrowserImages;
 
-
 			//this prevent a bug in the VCL
 		 	DDebugBtn.Glyph := nil;
 			NextStepBtn.Glyph := nil;
@@ -1283,7 +1284,6 @@ begin
 		if ParamCount> 0 then ParseCmdLine;
 
 		MessageControl.ActivePageIndex:= 0;
-		PageControl.MultiLine:=devData.MultiLineTab;
 		OpenCloseMessageSheet(devData.ShowOutput);
 
 		if devData.MsgTabs = 0 then
@@ -1309,9 +1309,9 @@ begin
 		Exit;
 	end;
 
-	if PageControl.PageCount> 0 then
+	if PageControl.PageCount > 0 then
 		actCloseAll.execute;
-	if PageControl.PageCount> 0 then begin
+	if PageControl.PageCount > 0 then begin
 		Action := caNone;
 		Exit;
 	end;
@@ -2135,11 +2135,13 @@ end;
 
 procedure TMainForm.ToolItemClick(Sender: TObject);
 var
- idx: integer;
+	idx: integer;
 begin
 	idx:= (Sender as TMenuItem).Tag;
+//	MsgBox('icon index:' + inttostr((Sender as TMenuItem).ImageIndex),(Sender as TMenuItem).Caption);
 	with fTools.ToolList[idx]^ do
 		ExecuteFile(ParseParams(Exec), ParseParams(Params), ParseParams(WorkDir), SW_SHOW);
+//	(Sender as TMenuItem).ImageIndex := 48;
 end;
 
 procedure TMainForm.OpenProject(s: string);
@@ -6548,10 +6550,11 @@ begin
 		// Als we uiteindelijk nog steeds niks hebben gevonden, scan de functie voor locals
 		if (isglobal) then begin
 			cpos := e.Text.RowColToCharIndex(cursorpos);
-			text := Copy(e.Text.Text,cpos-1024-Length(member),min(cpos,1024));
+			text := Copy(e.Text.Text,max(1,cpos-1024),min(cpos,1024));
+			apos := Length(text); // Variable recycling
 			wantbrace := 0;
 			wantquote := false;
-			for I:=Length(text) downto 1 do begin
+			for I:=apos downto 1 do begin
 
 				// Skip strings
 				if text[I] = '"' then
@@ -6565,13 +6568,16 @@ begin
 					Dec(wantbrace);
 				if wantbrace > 0 then continue;
 
-				parampos := AnsiPos(' ' + member,text);
-				if parampos = 0 then parampos := AnsiPos(' *' + member,text);
-				if parampos = 0 then parampos := AnsiPos(' &' + member,text);
-				if parampos = 0 then parampos := AnsiPos('	' + member,text);
-				if parampos = 0 then parampos := AnsiPos('	*' + member,text);
-				if parampos = 0 then parampos := AnsiPos('	&' + member,text);
-				if (parampos = I) then begin
+				parampos := AnsiPos(' ' + member,Copy(text,I,apos-I));
+				if parampos = 0 then parampos := AnsiPos(' *'  + member,Copy(text,I,apos-I));
+				if parampos = 0 then parampos := AnsiPos(' &'  + member,Copy(text,I,apos-I));
+				if parampos = 0 then parampos := AnsiPos('	'  + member,Copy(text,I,apos-I));
+				if parampos = 0 then parampos := AnsiPos('	*' + member,Copy(text,I,apos-I));
+				if parampos = 0 then parampos := AnsiPos('	&' + member,Copy(text,I,apos-I));
+				if (parampos = 1) then begin
+
+					// Offset toevoegen
+					parampos := parampos + I - 1;
 
 					// Type bepalen, doorgaan tot blank
 					len := 0;
@@ -6586,20 +6592,20 @@ begin
 						// Define gevonden
 						repeat
 							Inc(len2);
-						until (text[parampos+len2] in [#10,'#']);
+						until (parampos+len2 = apos) or (text[parampos+len2] in [#13,#10,'#']);
 					end else begin
 
 						// Daarna vooruit door tot = of [ of ;
 						repeat
 							Inc(len2);
-						until (text[parampos+len2] in ['#','{',';','=',')',',']);
+						until (parampos+len2 = apos) or (text[parampos+len2] in ['#','{',';','=',')',',']);
 					end;
 
 					// Als er wat zinnigs staat
 					if len > 2 then begin
-						localfind := Trim(Copy(text,parampos-len+1,len+len2-1));
-						localfindpoint.x := e.Text.CharIndexToRowCol(cpos-1024+I).Char-1;
-						localfindpoint.y := e.Text.CharIndexToRowCol(cpos-1024+I).Line;
+						localfind := Copy(text,parampos-len+1,len+len2-1);
+						localfindpoint.x := e.Text.CharIndexToRowCol(cpos-min(cpos,1024)+I).Char-1;
+						localfindpoint.y := e.Text.CharIndexToRowCol(cpos-min(cpos,1024)+I).Line;
 						Screen.Cursor := crDefault;
 						Exit;
 					end;

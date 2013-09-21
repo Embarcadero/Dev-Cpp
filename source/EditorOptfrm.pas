@@ -157,6 +157,7 @@ type
     cbAutoIndent: TCheckBox;
     cbAppendNewline: TCheckBox;
     cbCloseBrace: TCheckBox;
+    ScrollHint: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -305,6 +306,9 @@ begin
     btnCCCnew.Refresh;
     btnCCCdelete.Refresh;
     pbCCCache.Refresh;
+
+	// Font size
+	ScrollHint.Refresh;
 end;
 
 procedure TEditorOptForm.FormActivate(Sender: TObject);

@@ -545,7 +545,7 @@ BEGIN
 	SynEditTextBuffer_SListIndexOutOfBounds,	"Invalid stringlist index %d"
 	SynEditTextBuffer_SInvalidCapacity,	"Stringlist capacity cannot be smaller than count"
 	version_DEVCPP,	"Dev-C++"
-	version_DEVCPP_VERSION,	"5.0.0.6 RC2"
+	version_DEVCPP_VERSION,	"5.0.0.6 RC3"
 	version_DEFAULT_LANG_FILE,	"English.lng"
 	version_DEV_INTERNAL_OPEN,	"$__DEV_INTERNAL_OPEN"
 	version_DEV_SEARCHLOOP,	"$__DEV_SEARCH_LOOP"

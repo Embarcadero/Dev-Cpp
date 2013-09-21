@@ -116,10 +116,9 @@ type
 implementation
 
 uses ToolEditFrm, inifiles, devcfg, utils, MultiLangSupport, datamod,
-  version;
+  version, main;
 
 {$R *.dfm}
-
 
  { TToolList }
 
@@ -264,7 +263,6 @@ begin
   result:= StringReplace(Result, devDirs.Default, '<DEFAULT>', [rfReplaceAll]);
 end;
 
-
  { TToolController }
 
 constructor TToolController.Create;
@@ -288,77 +286,123 @@ end;
 { ** enable/disable if not executable }
 procedure TToolController.BuildMenu;
 var
- idx: integer;
- Item: TMenuItem;
- Icon: TIcon;
- P: PChar;
- w: word;
- s: string;
+	I: integer;
+	Item: TMenuItem;
+	Icon: TIcon;
+	s: string;
+
+	// Icon stuff
+	numicons : integer;
+	SmallIcons : ^HICON;
+	LargeIcons : ^HICON;
 begin
-  if Assigned(fMenu) then
-   idx:= fMenu.Count -1  //Clear Tools
-  else
-   idx:= -1;
+	if Assigned(fMenu) then
+		I:= fMenu.Count - 1 // Clear Tools menu
+	else
+		I:= -1;
 
-  if idx> fOffset then
-   repeat
-    fMenu.Delete(idx);
-    dec(idx);
-   until idx = fOffset;
+	if I > fOffset then
+		repeat
+			fMenu.Delete(I);
+			Dec(I);
+		until I = fOffset;
 
-  if not Assigned(fMenu) then
-    Exit;
+	if not Assigned(fMenu) then
+		Exit;
 
-  if fToolList.Count> 0 then
-  //Rebuild menu
-  for idx:= 0 to pred(fToolList.Count) do
-   begin
-     Item:= TMenuItem.Create(fMenu);
-     Item.Caption:= fToolList.Items[idx].Title;
-     Item.OnClick:= fOnClick;
-     Item.Tag:= idx;
-     if not fToolList.Items[idx].HasIcon then begin
-       Icon:=TIcon.Create;
-       try
-         S:=StringReplace(fToolList.Items[idx].Exec, '<DEFAULT>', devDirs.Default, [rfReplaceAll]);
-         S:=StringReplace(S, '<EXECPATH>', devDirs.Exec, [rfReplaceAll]);
-         if FileExists(S) then begin
-           P:=PChar(S);
-           w:=0;
-           Icon.Handle:=ExtractAssociatedIcon(hInstance, P, w);
-           if Icon.Handle>0 then begin
-             fToolList.Items[idx].IcoNumNewLook:=dmMain.MenuImages_NewLook.AddIcon(Icon);
-             fToolList.Items[idx].IcoNumBlue:=dmMain.MenuImages_Blue.AddIcon(Icon);
-             fToolList.Items[idx].IcoNumGnome:=dmMain.MenuImages_Gnome.AddIcon(Icon);
-             fToolList.Items[idx].HasIcon:=True;
-           end;
-         end;
-       finally
-         Icon.Free;
-       end;
-     end;
-     if devData.Theme=DEV_GNOME_THEME then
-       Item.ImageIndex:=fToolList.Items[idx].IcoNumGnome
-     else if devData.Theme=DEV_BLUE_THEME then
-       Item.ImageIndex:=fToolList.Items[idx].IcoNumBlue
-     else
-       Item.ImageIndex:=fToolList.Items[idx].IcoNumNewLook;
-     fMenu.Add(Item);
-   end;
-  fMenu.Visible:= fMenu.Count> 0;
+	// Rebuild menu
+	if fToolList.Count > 0 then begin
+
+		// Create a separator
+		Item:= TMenuItem.Create(fMenu);
+		Item.Caption:= '-';
+		fMenu.Add(Item);
+
+		// Pass all menu items
+		for I:=0 to pred(fToolList.Count) do begin
+			Item:= TMenuItem.Create(fMenu);
+			Item.Caption:= fToolList.Items[I].Title;
+			Item.OnClick:= fOnClick;
+			Item.Tag:= I;
+
+
+			// If it doesn't have an icon already
+			if not fToolList.Items[I].HasIcon then begin
+				Icon:=TIcon.Create;
+				try
+
+					S:=StringReplace(fToolList.Items[I].Exec, '<DEFAULT>', devDirs.Default, [rfReplaceAll]);
+					S:=StringReplace(S, '<EXECPATH>', devDirs.Exec, [rfReplaceAll]);
+
+					if FileExists(S) then begin
+
+						// Er moet een variabele meegegeven worden
+						LargeIcons := nil;
+						SmallIcons := nil;
+
+						// Lijst opbouwen die alle icons bevat
+						numicons:=ExtractIconEx(PChar(S),-1,LargeIcons^,SmallIcons^,0);
+
+						if numicons > 0 then begin
+
+							// Pluk de kleinste eruit
+							GetMem(SmallIcons,sizeof(HICON)*numicons);
+							ExtractIconEx(PChar(S),0,LargeIcons^,SmallIcons^,numicons);
+							Icon.Handle:=SmallIcons^;
+
+						//	Icon.savetofile('C:\Users\Johan Mes\Desktop\icon' + inttostr(I) + '.ico');
+
+							// Add the icon to the image lists if it exists
+							if Icon.Handle <> 0 then begin
+
+								// Add it to every theme
+								fToolList.Items[I].IcoNumNewLook:=dmMain.MenuImages_NewLook.AddIcon(Icon);
+								fToolList.Items[I].IcoNumBlue:=dmMain.MenuImages_Blue.AddIcon(Icon);
+								fToolList.Items[I].IcoNumGnome:=dmMain.MenuImages_Gnome.AddIcon(Icon);
+								fToolList.Items[I].HasIcon:=True;
+                            //    Item.ImageIndex := fToolList.Items[I].IcoNumNewLook;
+                            //    MainForm.ToolsMenu.Find('Configure Tools...').ImageIndex := fToolList.Items[I].IcoNumNewLook;
+
+                            //    dmMain.MenuImages_NewLook.GetIcon(1,Icon);
+
+                            //    Icon.savetofile('C:\Users\Johan Mes\Desktop\testiconfromlib' + inttostr(1) + '.ico');
+
+								// Setting the image index to 'not -1' should do the trick
+								if devData.Theme=DEV_GNOME_THEME then
+									Item.ImageIndex:=fToolList.Items[I].IcoNumGnome
+								else if devData.Theme=DEV_BLUE_THEME then
+									Item.ImageIndex:=fToolList.Items[I].IcoNumBlue
+								else
+									Item.ImageIndex:=fToolList.Items[I].IcoNumNewLook;
+
+//MessageBox(application.Handle,PChar('Icon belonging to ' + S + ' exists. Added as index ' + inttostr(Item.ImageIndex) + '!'),PChar('bericht'),MB_OK);
+
+							end;
+						end;
+						FreeMem(SmallIcons,sizeof(HICON)*numicons); // gevaarlijk, maar van later zorg
+					end;
+				finally
+					Icon.Free;
+				end;
+			end;
+			fMenu.Add(Item);
+		end;
+	end;
+
+	fMenu.Visible:= fMenu.Count > 0;
 end;
 
 procedure TToolController.Edit;
 begin
-  with TToolForm.Create(nil) do
-   try
-     Controller:= Self;
-     ShowModal;
-     fToolList.SaveTools;
-     BuildMenu;
-   finally
-    Free;
-   end;
+	with TToolForm.Create(nil) do
+		try
+			Controller:= Self;
+			ShowModal;
+			fToolList.SaveTools;
+			BuildMenu;
+		finally
+			Free;
+		end;
 end;
 
   { TToolForm }

@@ -1,8 +1,8 @@
 object ToolForm: TToolForm
   Left = 390
   Top = 297
-  Width = 335
-  Height = 320
+  Width = 325
+  Height = 357
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
   Caption = 'Tools configuration'
@@ -65,29 +65,28 @@ object ToolForm: TToolForm
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    319
-    282)
+    309
+    319)
   PixelsPerInch = 96
   TextHeight = 13
   object grpCurrent: TGroupBox
     Left = 16
-    Top = 64
-    Width = 289
-    Height = 206
+    Top = 72
+    Width = 279
+    Height = 231
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Current tools :'
     TabOrder = 0
     DesignSize = (
-      289
-      206)
+      279
+      231)
     object btnUp: TSpeedButton
       Tag = 1
-      Left = 257
-      Top = 64
-      Width = 23
-      Height = 22
+      Left = 245
+      Top = 72
+      Width = 26
+      Height = 26
       Anchors = [akTop, akRight]
-      Flat = True
       Glyph.Data = {
         76010000424D7601000000000000760000002800000020000000100000000100
         04000000000000010000120B0000120B00001000000000000000000000000000
@@ -106,12 +105,11 @@ object ToolForm: TToolForm
     end
     object btnDown: TSpeedButton
       Tag = 2
-      Left = 257
-      Top = 104
-      Width = 23
-      Height = 22
+      Left = 245
+      Top = 120
+      Width = 26
+      Height = 26
       Anchors = [akTop, akRight]
-      Flat = True
       Glyph.Data = {
         76010000424D7601000000000000760000002800000020000000100000000100
         04000000000000010000120B0000120B00001000000000000000000000000000
@@ -131,10 +129,18 @@ object ToolForm: TToolForm
     object ListBox: TListBox
       Left = 8
       Top = 16
-      Width = 242
-      Height = 180
+      Width = 232
+      Height = 199
       Anchors = [akLeft, akTop, akRight, akBottom]
+      Ctl3D = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
       ItemHeight = 13
+      ParentCtl3D = False
+      ParentFont = False
       TabOrder = 0
       OnClick = ListBoxClick
       OnDblClick = btnEditClick
@@ -143,8 +149,8 @@ object ToolForm: TToolForm
   object grpActions: TGroupBox
     Left = 16
     Top = 8
-    Width = 289
-    Height = 49
+    Width = 279
+    Height = 59
     Align = alCustom
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Actions'
@@ -153,9 +159,8 @@ object ToolForm: TToolForm
       Left = 8
       Top = 16
       Width = 84
-      Height = 22
+      Height = 33
       Caption = 'Add'
-      Flat = True
       Glyph.Data = {
         36030000424D3603000000000000360000002800000010000000100000000100
         18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -189,9 +194,8 @@ object ToolForm: TToolForm
       Left = 186
       Top = 16
       Width = 84
-      Height = 22
+      Height = 33
       Caption = 'Delete'
-      Flat = True
       Glyph.Data = {
         36030000424D3603000000000000360000002800000010000000100000000100
         18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -225,9 +229,8 @@ object ToolForm: TToolForm
       Left = 97
       Top = 16
       Width = 84
-      Height = 22
+      Height = 33
       Caption = 'Edit'
-      Flat = True
       Glyph.Data = {
         36030000424D3603000000000000360000002800000010000000100000000100
         18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
