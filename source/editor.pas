@@ -756,7 +756,7 @@ begin
 		// Don't complete symbols inside strings or comments
 		allowcompletion := true;
 		if fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s1, attr) then
-			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
+			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) or SameStr(attr.Name,'Character') then
 				allowcompletion := false;
 
 		if allowcompletion then begin
@@ -786,7 +786,7 @@ begin
 			end else if (Key = '{') and devEditor.BraceComplete then begin
 
 				s1 := fText.LineText;
-				s2 := Trim(fText.LineText);
+				s2 := Trim(s1);
 
 				if EndsStr(')',s2) or
 					EndsStr('else',s2) or
@@ -794,7 +794,7 @@ begin
 					EndsStr('catch',s2) or
 					EndsStr('default',s2) or
 					EndsStr('do',s2) or
-					SameStr('',s1) then begin
+					SameStr('',s2) then begin
 
 					// Copy indentation
 					indent := 0;
@@ -876,6 +876,7 @@ begin
 
 					// Force show
 					fCompletionTimer.OnTimer(nil);
+					fCompletionTimer.Enabled := false;
 					Key := #0;
 				end;
 			end;

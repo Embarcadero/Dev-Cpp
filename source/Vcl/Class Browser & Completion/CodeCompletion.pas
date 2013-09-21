@@ -406,6 +406,7 @@ end;
 
 procedure TCodeCompletion.Hide;
 begin
+    OnKeyPress := nil;
 	CodeComplForm.Hide;
 end;
 
