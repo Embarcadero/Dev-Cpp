@@ -909,8 +909,9 @@ var
 	gcc, gpp : string;
 begin
 	Messages := 0;
-	LOutput := TStringList.Create;
 	fErrCount := 0;
+	LOutput := TStringList.Create;
+
 	if (devCompiler.gccName <> '') then
 		gcc := devCompiler.gccName
 	else
@@ -919,15 +920,17 @@ begin
 		gpp := devCompiler.gppName
 	else
 		gpp := GPP_PROGRAM;
+
 	try
 		LOutput.Text:= fdevRun.Output;
 		IMod := CalcMod(pred(LOutput.Count));
 
 		// Concatenate errors which are on multiple lines
 		for curLine := 0 to pred(LOutput.Count) do begin
-			if (curLine > 0) and AnsiStartsStr('	', LOutput[curLine]) then begin
-				O_Msg := LOutput[curLine];
-				Delete(O_Msg, 1, 2);
+			if (curLine > 0) and (Pos('   ', LOutput[curLine]) > 0) then begin
+
+				cpos := Pos('   ', LOutput[curLine]);
+				O_Msg := Copy(LOutput[curLine],cpos+2,Length(LOutput[curLine]) - cpos - 1);
 				LOutput[curLine - 1] := LOutput[curLine - 1] + O_Msg;
 			end;
 		end;
@@ -936,14 +939,18 @@ begin
 			if (IMod = 0) or (curLine mod IMod = 0) then
 				Application.ProcessMessages;
 
-			if Messages > 500 then begin
-				DoOutput('','', '', '[General Error] Too many messages; abort.');
-				DoOutput('','', '', 'There must be something terribly wrong with your code. Please fix it.');
-				Break;
-			end;
-
 			Line := LOutput.Strings[curLine];
 			LowerLine := LowerCase(Line);
+
+			// Skip errors alreay concatenated
+			if Pos('error:   ', Line) > 0 then
+				Continue;
+
+			if Messages > 500 then begin
+				DoOutput('','','','[General Error] Too many messages; abort.');
+				DoOutput('','','','[General Error] There must be something terribly wrong with your code. Please fix it.');
+				Break;
+			end;
 
 			{ Is this a compiler message? }
 			if (Pos(':', Line) <= 0) or
@@ -957,71 +964,71 @@ begin
 			then
 				Continue;
 
-				{ Make errors }
-				if (Pos('make.exe: ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
-					cpos := Length('make.exe: ***');
-					O_Msg := '[Build Error] ' + Copy(Line, cpos + 1, Length(Line) - cpos);
+			{ Make errors }
+			if (Pos('make.exe: ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
+				cpos := Length('make.exe: ***');
+				O_Msg := '[Build Error] ' + Copy(Line, cpos + 1, Length(Line) - cpos);
 
-					if Assigned(fProject) then
-						O_File := Makefile
-					else
-						O_File := '';
+				if Assigned(fProject) then
+					O_File := Makefile
+				else
+					O_File := '';
 
-					if Messages = 0 then
-						Messages := 1;
-					if fErrCount = 0 then
-						fErrCount := 1;
+				if Messages = 0 then
+					Messages := 1;
+				if fErrCount = 0 then
+					fErrCount := 1;
 
-					DoOutput('','', O_File, O_Msg);
-					Continue;
-				end;
+				DoOutput('','', O_File, O_Msg);
+				Continue;
+			end;
 	
-				{ windres errors }
-				if Pos('windres.exe: ', LowerLine) > 0 then begin
-					{ Delete 'windres.exe :' }
-					Delete(Line, 1, 13);
+			{ windres errors }
+			if Pos('windres.exe: ', LowerLine) > 0 then begin
+				{ Delete 'windres.exe:' }
+				Delete(Line, 1, 13);
 
-					cpos := GetLastPos('warning: ', Line);
-					if cpos > 0 then begin
-						{ Delete 'warning: ' }
-						Delete(Line, 1, 9);
-						cpos := Pos(':', Line);
+				cpos := GetLastPos('warning: ', Line);
+				if cpos > 0 then begin
+					{ Delete 'warning: ' }
+					Delete(Line, 1, 9);
+					cpos := Pos(':', Line);
 
-						O_Line := Copy(Line, 1, cpos -1);
-						Delete(Line, 1, cpos);
+					O_Line := Copy(Line, 1, cpos -1);
+					Delete(Line, 1, cpos);
 
-						O_File := '';
-						O_Msg := Line;
+					O_File := '';
+					O_Msg := Line;
 
-						Inc(Messages);
-						Inc(fWarnCount);
-						DoResOutput(O_Line, O_File, O_Msg);
-						Continue;
-					end else begin
-						{ Does it contain a filename and line number? }
+					Inc(Messages);
+					Inc(fWarnCount);
+					DoResOutput(O_Line, O_File, O_Msg);
+					Continue;
+				end else begin
+					{ Does it contain a filename and line number? }
+					cpos := GetLastPos(':', Line);
+					if (cpos > 0) and (Pos(':', Line) <> cpos) then begin
+						O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
+						Delete(Line, cpos, Length(Line) - cpos + 1);
+
 						cpos := GetLastPos(':', Line);
-						if (cpos > 0) and (Pos(':', Line) <> cpos) then begin
-							O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
-							Delete(Line, cpos, Length(Line) - cpos + 1);
+						O_Line := Copy(Line, cpos + 1, Length(Line) - 2);
+						Delete(Line, cpos, Length(Line) - 1);
 
-							cpos := GetLastPos(':', Line);
-							O_Line := Copy(Line, cpos + 1, Length(Line) - 2);
-							Delete(Line, cpos, Length(Line) - 1);
+						O_File := Line;
 
-							O_File := Line;
-
-							{ It doesn't contain a filename and line number after all }
-							if StrToIntDef(O_Line, -1) = -1 then begin
-								O_Msg := LOutput.Strings[curLine];
-								Delete(O_Msg, 1, 13);
-								O_Line := '';
-								O_File := '';
-							end;
-						end else begin
+						{ It doesn't contain a filename and line number after all }
+						if StrToIntDef(O_Line, -1) = -1 then begin
+							O_Msg := LOutput.Strings[curLine];
+							Delete(O_Msg, 1, 13);
 							O_Line := '';
 							O_File := '';
-							O_Msg := Line;
 						end;
+					end else begin
+						O_Line := '';
+						O_File := '';
+						O_Msg := Line;
+					end;
 
 					Inc(Messages);
 					Inc(fErrCount);
@@ -1031,63 +1038,69 @@ begin
 				end;
 			end;
 
-
-			{ foo.c: In function 'bar': }
-			if Pos('In function', Line) > 0 then begin
-				{ Get message }
+			// foo.c: In function 'bar':
+			if Pos(' In function ', Line) > 0 then begin
+				// Message
 				cpos := GetLastPos(': ', Line);
-				O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 2);
+				O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
-				{ Get file }
+				// Remaing part contains file
 				O_File := Line;
 
 				Inc(fWarnCount);
-				DoOutput('','', O_File, O_Msg + ':');
+				DoOutput('','', O_File, O_Msg);
 				Continue;
 			end;
 
-				{ In file included from C:/foo.h:1:0, }
+			// In file included from foo.c:1:0,
 			if Pos('In file included from ', Line) > 0 then begin
 
-				{ Remove first : }
+				// Remove last ,
 				Delete(Line, Length(Line), 1);
 
-				{ Delete column number }
+				// Get column number
 				cpos := GetLastPos(':', Line);
+				O_Col := Copy(Line, cpos+1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
-				{ Save line number }
+				// Get line number
 				cpos := GetLastPos(':', Line);
 				O_Line := Copy(Line, cpos+1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
-				{ Remaining message becomes the message }
+				// Remaining line becomes the message
 				O_Msg := Line;
 
-				{ Strip text }
+				// Strip text
 				cpos := Length('In file included from ');
 				O_File := Copy(Line, cpos + 1, Length(Line) - cpos);
 
-				DoOutput(O_Line, '1', O_File, O_Msg);
+				DoOutput(O_Line, O_Col, O_File, O_Msg);
 				Continue;
 			end;
 
-			{ from blabla.c:1: }
-			if Pos('                                from ', Line) > 0 then begin
+			// from blabla.c:1:
+			if Pos('                 from ', Line) > 0 then begin
+
+				// Remove last :
 				Delete(Line, Length(Line), 1);
+
+				// Get line number
 				cpos := GetLastPos(':', Line);
 				O_Line := Copy(Line, cpos + 1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
+
+				// Remaining line becomes the message
 				O_Msg := Line;
 
-				cpos := Length('                                from ');
+				// Strip text
+				cpos := Length('                 from ');
 				O_File := Copy(Line, cpos + 1, Length(Line) - cpos);
 
 				DoOutput(O_Line, '', O_File, O_Msg);
 				Continue;
 			end;
-
 
 			{ foo.cpp: In method `bool MyApp::Bar()': }
 			cpos := GetLastPos('In method `', Line);
@@ -1097,7 +1110,7 @@ begin
 				cpos := GetLastPos('In member function `', Line);
 			if cpos <= 0 then
 				{ foo.cpp: In constructor `MyApp::MyApp()': }
-					cpos := GetLastPos('In constructor `', Line);
+				cpos := GetLastPos('In constructor `', Line);
 			if cpos <= 0 then
 				{ foo.cpp: In destructor `MyApp::MyApp()': }
 				cpos := GetLastPos('In destructor `', Line);
@@ -1114,7 +1127,6 @@ begin
 			cpos := Pos('undefined reference to ', Line);
 			if cpos > 0 then begin
 				O_Msg := Line;
-				Delete(O_Msg, 1, cpos - 1);
 
 				Inc(fErrCount);
 				Inc(Messages);
@@ -1122,31 +1134,30 @@ begin
 				Continue;
 			end;
 
-
-			{ foo.cpp:1:[2:] bar.h: No such file or directory }
+			// foo.cpp:1:1: fatal error: bar.h: No such file or directory
 			cpos := GetLastPos('No such file or directory', Line);
 			if cpos > 0 then begin
-				{ Get missing file name }
+				// Get missing file name
 				Delete(Line, cpos - 2, Length(Line) - cpos + 3);
 				cpos := GetLastPos(': ', Line);
 				O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1) + ': No such file or directory.';
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
-				{ remove 'fatal error:'}
+				// remove 'fatal error:'
 				cpos := GetLastPos(':', Line);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
-				{ Get column number }
+				// Get column number
 				cpos := GetLastPos(':', Line);
-				O_Col := Copy(Line, cpos+1, Length(Line) - cpos);
+				O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
-				{ Get line number }
+				// Get line number
 				cpos := GetLastPos(':', Line);
 				O_line := Copy(Line, cpos+1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
-				{ Get referring file name }
+				// Get referring file name
 				O_File := Line;
 
 				Inc(fErrCount);
@@ -1155,12 +1166,12 @@ begin
 				Continue;
 			end;
 
-			{ foo.cpp: At global scope: }
+			// foo.cpp: At global scope:
 			cpos := GetLastPos('At global scope:', Line);
 			if cpos > 0  then begin
 				cpos := Pos(':',Line);
 
-				{ copy 'at global scope'}
+				// copy 'at global scope'
 				O_Msg := Copy(Line, cpos+2, Length(Line) - cpos - 1);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
@@ -1188,26 +1199,16 @@ begin
 				Continue;
 			end;
 
-			{ windres.exe ... } //normal command, *not* an error
+			// windres.exe (normal command, *not* an error)
 			cpos := GetLastPos('windres.exe ', Line);
 			if cpos > 0 then begin
 				Line:='';
 				Continue;
 			end;
 
-			{ Other messages }
+			// foo.cpp:0:1: error/warning/hint: text (generic errors)
 			cpos := GetLastPos(': ', Line);
-
-			// there is no reason to run the following block if cpos=0.
-			// the bug appeared when added an "all-after" Makefile rule
-			// with the following contents:
-			//
-			// all-after:
-			//		copy $(BIN) c:\$(BIN)
-			//
-			// the following block of code freaked-out with the ":"!
-			if cpos>0 then begin // mandrav fix
-
+			if cpos > 0 then begin // mandrav fix
 				O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 				Delete(Line, cpos + 2, Length(Line) - cpos - 1);
 
@@ -1215,57 +1216,53 @@ begin
 				if cpos > 0 then begin
 					Inc(fWarnCount);
 					if Pos('warning: ignoring pragma: ', Line) > 0 then
-						O_Msg := 'ignoring pragma: ' + O_Msg;
-					if Pos('#warning ', O_Msg) <= 0 then
+						O_Msg := '[Warning] ignoring pragma: ' + O_Msg
+					else if Pos('warning: ', O_Msg) <= 0 then
 						O_Msg := '[Warning] ' + O_Msg;
 
-					{ Delete 'warning: ' }
-					Delete(Line, cpos - 2, Length(Line) - cpos + 2);
+					// Delete ': warning: '
+					Delete(Line, cpos - 2, Length(Line) - cpos + 3);
 
-					// MOVE COLUMN NUMBER
+					// Get column number
 					cpos := GetLastPos(':', Line);
-					if cpos > 0 then begin
-						O_Col := Copy(Line, cpos+1, Length(Line) - cpos - 1);
-						Delete(Line, cpos, Length(Line) - cpos + 1);
-					end;
-					// MOVE COLUMN NUMBER
-
+					O_Col := Copy(Line, cpos+1, Length(Line) - cpos);
+					Delete(Line, cpos, Length(Line) - cpos + 1);
 				end else if Pos('Info: ', Line) = 1 then begin
 					O_Line := '';
 					O_File := '';
 					Delete(Line, 1, 6);
 					O_Msg := '[Info] ' + Line;
 				end else begin
-					Delete(Line, Length(Line) - 1, 1);
 					Inc(fErrCount);
 				end;
 				Inc(Messages);
 
-				// GCC >= 3.2. support
-				if Pos(': error', Line) > 0 then begin
-					Delete(Line, Pos(': error', Line), Length(Line) - cpos + 1);
+				cpos := Pos('error: ', Line);
+				if cpos > 0 then begin
+					Delete(Line, cpos - 2, Length(Line) - cpos + 3);
 
-					// MOVE COLUMN NUMBER
+					// Get column number
 					cpos := GetLastPos(':', Line);
-					if cpos > 0 then begin
-						O_Col := Copy(Line, cpos+1, Length(Line) - cpos);
-						Delete(Line, cpos, Length(Line) - cpos + 1);
-					end;
-					// MOVE COLUMN NUMBER
-
-					cpos := GetLastPos(':', Line);
-					O_Line := Copy(Line, cpos + 1 , Length(Line) - cpos + 1);
-
+					O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
 					Delete(Line, cpos, Length(Line) - cpos + 1);
+
+					// Get line number
+					cpos := GetLastPos(':', Line);
+					O_Line := Copy(Line, cpos + 1, Length(Line) - cpos + 1);
+					Delete(Line, cpos, Length(Line) - cpos + 1);
+
+					O_Msg := '[Error] ' + O_Msg;
 					O_File := Line;
 				end else begin
+
+					// Process generic parts of info/warning messages
 					cpos := GetLastPos(':', Line);
 					if StrToIntDef(Copy(Line, cpos + 1, Length(Line) - cpos - 1), -1) <> -1 then begin
 						O_Line := Copy(Line, cpos + 1, Length(Line) - cpos);
 						Delete(Line, cpos, Length(Line) - cpos + 1);
 						O_File := Line;
 
-						//filename may also contain column as "filename:line:col"
+						// filename may also contain column as "filename:line:col"
 						cpos := GetLastPos(':', Line);
 						if StrToIntDef(Copy(Line, cpos + 1, Length(Line) - cpos), -1) <> -1 then begin
 							O_Line := Copy(Line, cpos + 1, Length(Line) - cpos) + ':' + O_Line;
@@ -1277,21 +1274,21 @@ begin
 
 				cpos := Pos('parse error before ', O_Msg);
 				if (cpos > 0) and (StrToIntDef(O_Line, 0) > 0) then
-					O_Line := IntToStr(StrToInt(O_Line));// - 1); *mandrav*: why -1 ???
+					O_Line := IntToStr(StrToInt(O_Line));
 
 				if (Pos('(Each undeclared identifier is reported only once',O_Msg) > 0) or (Pos('for each function it appears in.)',O_Msg) > 0) or (Pos('At top level:', O_Msg) > 0) then begin
 					O_Line := '';
 					O_File := '';
-						Dec(Messages);
+					Dec(Messages);
 				end;
 
-				{ This is an error in the Makefile }
+				// This is an error in the Makefile
 				if (MakeFile <> '') and SameFileName(Makefile, GetRealPath(O_File)) then
 					if Pos('[Warning] ', O_Msg) <> 1 then
 						O_Msg := '[Build Error] ' + O_Msg;
 
 				DoOutput(O_Line, O_Col, O_File, O_Msg);
-			end; // mandrav fix
+			end;
 		end;
 	finally
 		Application.ProcessMessages;
@@ -1454,13 +1451,13 @@ begin
 			lblErr.Caption:=IntToStr(fErrCount);
 			lblWarn.Caption:=IntToStr(fWarnCount);
 			if fAbortThread then
-				sMsg:='Aborted'
+				sMsg := 'Aborted'
 			else
-				sMsg:='Done';
+				sMsg := 'Done';
 			if fErrCount>0 then
-				sMsg:=sMsg+' with errors.'
+				sMsg := sMsg+' with errors.'
 			else if fWarnCount>0 then
-				sMsg:=sMsg+' with warnings.'
+				sMsg := sMsg+' with warnings.'
 			else
 				sMsg:=sMsg+'.';
 			Memo1.Lines.Add(sMsg);

@@ -1,8 +1,8 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "4.9.9.4"
-!define DISPLAY_NAME "Dev-C++ 5 beta 11 release (${DEVCPP_VERSION})"
+!define DEVCPP_VERSION "4.9.9.5"
+!define DISPLAY_NAME "Dev-C++ 5 beta 12 release (${DEVCPP_VERSION})"
 
 Var LOCAL_APPDATA
 
@@ -28,7 +28,6 @@ DirText "Select the directory to install Dev-C++ to:"
 # Interface Settings
 
 ShowInstDetails show
-ShowUnInstDetails show
 AutoCloseWindow false
 SilentInstall normal
 CRCCheck on
@@ -39,8 +38,7 @@ SetOverwrite try
 XPStyle on
 
 InstType "Full";1
-InstType "Portable";2
-InstType "Minimal";3
+InstType "Minimal";2
 
 ComponentText "Choose components"
 
@@ -97,7 +95,7 @@ ComponentText "Choose components"
 # Files
 
 Section "Dev-C++ program files (required)" SectionMain
-  SectionIn 1 2 3 RO
+  SectionIn 1 2 RO
   SetOutPath $INSTDIR
 
   File "devcpp.map"
@@ -117,10 +115,14 @@ Section "Dev-C++ program files (required)" SectionMain
 
   ; Allways create an uninstaller
   WriteUninstaller "$INSTDIR\uninstall.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayName" "Dev-C++ 4.9.9.5"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayVersion" "${DEVCPP_VERSION}"
+
 SectionEnd
 
 Section "Example files" SectionExamples
-  SectionIn 1 2
+  SectionIn 1
   SetOutPath $INSTDIR\Examples\FileEditor
   File "Examples\FileEditor\*"
   SetOutPath $INSTDIR\Examples\Hello
@@ -142,7 +144,7 @@ Section "Example files" SectionExamples
 SectionEnd
 
 Section "Help files" SectionHelp
-  SectionIn 1 2
+  SectionIn 1
   SetOutPath $INSTDIR\Help
   File "Help\*.*"
   SetOutPath $INSTDIR\Packages
@@ -150,13 +152,13 @@ Section "Help files" SectionHelp
 SectionEnd
 
 Section "Icon files" SectionIcons
-  SectionIn 1 2
+  SectionIn 1
   SetOutPath $INSTDIR\Icons
   File "Icons\*.*"
 SectionEnd
 
 Section "MinGW compiler system (binaries, headers and libraries)" SectionMingw
-  SectionIn 1 2 3
+  SectionIn 1 2
   SetOutPath $INSTDIR
 
   File /r "bin"
@@ -167,7 +169,7 @@ Section "MinGW compiler system (binaries, headers and libraries)" SectionMingw
 SectionEnd
 
 Section "Language files" SectionLangs
-  SectionIn 1 2
+  SectionIn 1
   SetOutPath $INSTDIR\Lang
   File "Lang\*"
 SectionEnd
@@ -555,7 +557,6 @@ UninstallText "This program will uninstall Dev-C++, continue?"
 ShowUninstDetails show
 
 Section "Uninstall"
-
   ; Remove uninstaller
   Delete "$INSTDIR\uninstall.exe"
 
