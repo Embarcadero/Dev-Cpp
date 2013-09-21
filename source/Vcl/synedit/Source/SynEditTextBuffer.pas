@@ -516,9 +516,9 @@ begin
 	Result := 0;
 	for i := 0 to Count - 1 do begin
 		Inc(Result,Length(Strings[i]));
-		if fFileFormat = sffDos then
+		if fFileFormat = sffDos then // CRLF
 			Inc(Result,2)
-		else
+		else // CR, LF
 			Inc(Result);
 	end;
 end;

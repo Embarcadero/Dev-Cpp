@@ -861,6 +861,7 @@ type
     procedure BuildOpenWith;
     procedure RebuildClassesToolbar;
     procedure PrepareDebugger;
+    procedure ClearCompileMessages;
     procedure ClearMessageControl;
   public
     AutoSaveTimer : TTimer;
@@ -2332,13 +2333,13 @@ end;
 procedure TMainForm.actCutExecute(Sender: TObject);
 var
 	e: TEditor;
-	oldtopline : integer;
+	oldbottomline : integer;
 begin
 	e:= GetEditor;
 	if Assigned(e) then begin
-		oldtopline := e.Text.TopLine;
+		oldbottomline := e.Text.TopLine + e.Text.LinesInWindow;
 		e.Text.CutToClipboard;
-		if e.Text.TopLine <> oldtopline then
+		if (e.Text.TopLine + e.Text.LinesInWindow) <> oldbottomline then
 			e.Text.Repaint; // fix for repaint fail
 	end;
 end;
@@ -2355,13 +2356,13 @@ end;
 procedure TMainForm.actPasteExecute(Sender: TObject);
 var
 	e: TEditor;
-	oldtopline : integer;
+	oldbottomline : integer;
 begin
 	e:= GetEditor;
 	if Assigned(e) then begin
-		oldtopline := e.Text.TopLine;
+		oldbottomline := e.Text.TopLine + e.Text.LinesInWindow;
 		e.Text.PasteFromClipboard;
-		if e.Text.TopLine <> oldtopline then
+		if (e.Text.TopLine + e.Text.LinesInWindow) <> oldbottomline then
 			e.Text.Repaint; // fix for repaint fail
 	end;
 end;
@@ -2829,13 +2830,13 @@ begin
 		Exit;
 	end;
 
-	ClearMessageControl;
+	ClearCompileMessages;
 	SizeFile.Text := '0';
 	TotalErrors.Text := '0';
 	TotalWarnings.Text := '0';
 
+	// if no compile progress window, open the compiler output
 	if not devData.ShowProgress then begin
-		// if no compile progress window, open the compiler output
 		OpenCloseMessageSheet(True);
 		MessageControl.ActivePage:= LogSheet;
 	end;
@@ -2941,7 +2942,7 @@ end;
 
 procedure TMainForm.actCleanExecute(Sender: TObject);
 begin
-	ClearMessageControl;
+	ClearCompileMessages;
 	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
@@ -3115,7 +3116,7 @@ begin
 			end;
 			if devData.ThemeChange then
 				Loadtheme;
-			devShortcuts.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
+			devShortcuts.Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
 			dmMain.RebuildMRU;
 		end;
 	finally
@@ -3678,13 +3679,19 @@ begin
 	actSaveAs.Enabled:= assigned(e);
 end;
 
-procedure TMainForm.ClearMessageControl;
+procedure TMainForm.ClearCompileMessages;
 begin
 	CompilerOutput.Items.Clear;
-	FindOutput.Items.Clear;
+
 	ResourceOutput.Clear;
 	LogOutput.Clear;
 	DebugOutput.Clear;
+end;
+
+procedure TMainForm.ClearMessageControl;
+begin
+	FindOutput.Items.Clear; // don't clear this when compiling...
+	ClearCompileMessages;
 end;
 
 procedure TMainForm.actFileMenuExecute(Sender: TObject);
@@ -4060,9 +4067,15 @@ end;
 
 procedure TMainForm.actConfigdevShortcutsExecute(Sender: TObject);
 begin
-	if(devShortcuts.FileName[2] <> ':') then // if relative
-		devShortcuts.FileName := devdirs.Exec + devShortcuts.FileName;
-	devShortcuts.Edit;
+//	if(devShortcuts.FileName[2] <> ':') then // if relative
+//		devShortcuts.FileName := devdirs.Exec + devShortcuts.FileName;
+	devShortcuts.Edit(
+      Lang[ID_SC_CAPTION],
+      Lang[ID_SC_HDRENTRY],
+      Lang[ID_SC_HDRSHORTCUT],
+      Lang[ID_BTN_OK],
+      Lang[ID_BTN_CANCEL],
+      Lang[ID_BTN_DEFAULT]);
 end;
 
 procedure TMainForm.DateTimeMenuItemClick(Sender: TObject);
@@ -5710,10 +5723,13 @@ begin
 			if Sender = e then begin // Ctrl+Click from current editor
 
 				// Switching between declaration and definition
-				if e.Text.CaretY <> statement^._Line then begin
+				if e.Text.CaretY = statement^._Line then begin // clicked on definition
+					filename:=statement^._DeclImplFileName;
+					line:=statement^._DeclImplLine;
+				end else if e.Text.CaretY = statement^._DeclImplLine then begin // clicked on implementation
 					filename:=statement^._FileName;
 					line:=statement^._Line;
-				end else begin
+				end else begin // clicked anywhere, go to implementation
 					filename:=statement^._DeclImplFileName;
 					line:=statement^._DeclImplLine;
 				end;

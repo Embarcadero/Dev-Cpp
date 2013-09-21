@@ -48,6 +48,7 @@ type
     procedure Clear;
     function Count: integer;
     property ShortCuts[Index: integer]: TShortCut read GetShortCut;
+    procedure LoadText(const WindowCaption,Column1,Column2,OK,Cancel,Default : AnsiString);
   end;
 
 var
@@ -59,6 +60,16 @@ uses
 	StrUtils;
 
 {$R *.dfm}
+
+procedure TfrmShortcutsEditor.LoadText(const WindowCaption,Column1,Column2,OK,Cancel,Default : AnsiString);
+begin
+	Caption := WindowCaption;
+	lvShortcuts.Columns[0].Caption := Column1;
+	lvShortcuts.Columns[1].Caption := Column2;
+	btnOk.Caption := OK;
+	btnCancel.Caption := Cancel;
+	btnDefault.Caption := Default;
+end;
 
 procedure TfrmShortcutsEditor.AddShortcut(Item : PMenuShortcut;const MenuName : AnsiString);
 var
@@ -101,16 +112,22 @@ begin
 	if lvShortcuts.Selected = nil then
 		Exit;
 
-	// clear shortcut if Escape or Del is pressed
+	// clear shortcut if ONLY Escape or Del is pressed
 	if (Key in [VK_ESCAPE,VK_DELETE]) and (Shift = []) then begin
 		lvShortcuts.Selected.SubItems[0] := '';
 		Exit;
 	end;
 
-	// if "normal" key, require a shiftstate
-	if (Key>27) and (Key<=90) and (Shift=[]) then
+	// Don't accept alt shiftstate (messes up menu interaction)
+	if (Shift = [ssAlt]) then
 		Exit;
-	if (Key < 27) then // control key by itself, but accept Tab
+
+	// Require a key combination when using 'normal' keys
+	if (Shift = []) and ((Key < VK_F1) or (Key > VK_F24)) then
+		Exit; // ... but allow F keys
+
+	// Don't accept shift state keys as main keys
+	if (Key in [VK_SHIFT,VK_CONTROL,VK_MENU]) then // VK_MENU is the alt key
 		Exit;
 
 	sct := ShortCutToText(ShortCut(Key, Shift));
@@ -124,7 +141,6 @@ begin
 
 	// don't let the keystroke propagate...
 	Key := 0;
-	Shift := [];
 end;
 
 procedure TfrmShortcutsEditor.lvShortcutsCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;var DefaultDraw: Boolean);
@@ -139,42 +155,32 @@ begin
 	end;
 end;
 
-// Don't let a tab keystroke make us lose focus, instead, assign tab to the selected item
 procedure TfrmShortcutsEditor.lvShortcutsExit(Sender: TObject);
 var
-	I: integer;
-	sct: AnsiString;
+	key : word;
 	shift : TShiftState;
 	State : TKeyboardState;
 begin
-	// Handle tabs only
+	// Don't let Tab and Alt combinations escape
+	if (GetKeyState(VK_TAB) < 0) then
+		key := VK_TAB
+	//else if (GetKeyState(VK_MENU) < 0) then
+	//	key := VK_MENU
+	else
+		Exit;
+
+	// Get shift state
 	GetKeyboardState(State);
-	if ((State[vk_Tab] and 128) <> 0) then begin
+	if ((State[vk_Control] and 128) <> 0) then
+		shift := shift + [ssCtrl];
+	if ((State[vk_Menu] and 128) <> 0) then
+		shift := shift + [ssAlt];
+	if ((State[vk_Shift] and 128) <> 0) then
+		shift := shift + [ssShift];
 
-		// Control / Alt / Shift on the manual
-		if ((State[vk_Control] and 128) <> 0) then
-			shift := shift + [ssCtrl];
-		if ((State[vk_Menu] and 128) <> 0) then
-			shift := shift + [ssAlt];
-		if ((State[vk_Shift] and 128) <> 0) then
-			shift := shift + [ssShift];
+	lvShortcutsKeyDown(Self,key,Shift);
 
-		// We know we pressed 9 (TAB), but get ctrl/alt/shift manually
-		sct := ShortCutToText(ShortCut(9, shift));
-		lvShortcuts.Selected.SubItems[0] := sct;
-
-		// we do no more check for other entries by the same name, as we used to,
-		// because we 've prepended the menu name so it should be unique...
-
-		// search other entries using this shortcut, and clear them
-		for I := 0 to lvShortcuts.Items.Count-1 do
-			if lvShortcuts.Items[I] <> lvShortcuts.Selected then
-				if lvShortcuts.Items[I].SubItems[0] = sct then
-					lvShortcuts.Items[I].SubItems[0] := '';
-
-		// No focus changes bitte
-		Abort;
-	end;
+	lvShortcuts.SetFocus; // retain focus!
 end;
 
 procedure TfrmShortcutsEditor.btnDefaultClick(Sender: TObject);

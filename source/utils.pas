@@ -120,9 +120,9 @@ type
 
   function IsEmpty(editor : TSynEdit) : boolean;
 
-  function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
+  function IsKeyDown(key : integer) : boolean;
 
-  function CtrlDown : Boolean;
+  function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
 
   function GetInfoOfCompiler(const binfolder : AnsiString) : AnsiString;
 
@@ -158,6 +158,11 @@ uses
 {$IFDEF LINUX}
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
+
+function IsKeyDown(key : integer) : boolean;
+begin
+	result := (GetKeyState(key) < 0);
+end;
 
 function IsWindows64 : boolean;
 var
@@ -212,14 +217,6 @@ begin
 		else if ContainsStr(gcctype,'GCC') then
 			result := 'MinGW GCC ' + gccversion;
 	end;
-end;
-
-function CtrlDown : Boolean;
-var
-	State : TKeyboardState;
-begin
-	GetKeyboardState(State);
-	Result := ((State[VK_CONTROL] and 128) <> 0);
 end;
 
 function IsEmpty(editor : TSynEdit) : boolean;

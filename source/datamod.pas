@@ -75,6 +75,7 @@ type
     fMRU: TList; // let them store their own location
     fMRUMenu: TMenuItem; // start of list
     fMRUClick: TNotifyEvent;
+    procedure FilterHistory; // remove deleted
     procedure LoadHistory;
     procedure SaveHistory;
   public
@@ -259,7 +260,7 @@ var
 	I: integer;
 	newitem : PMRUItem;
 begin
-	if (s = '') then
+	if (s = '') or not FileExists(s) then
 		exit;
 
 	// Don't add duplicates!
@@ -316,6 +317,17 @@ begin
 	RebuildMRU;
 end;
 
+procedure TdmMain.FilterHistory; // remove deleted files
+var
+	I: integer;
+begin
+	for I := MRU.Count - 1 downto 0 do
+		if not FileExists(PMRUItem(fMRU[i])^.filename) then begin
+			Dispose(PMRUItem(fMRU[i]));
+			fMRU.Delete(i);
+		end;
+end;
+
 procedure TdmMain.LoadHistory;
 var
 	I: integer;
@@ -348,7 +360,6 @@ var
 	I: integer;
 	sl : TStringList;
 begin
-
 	sl := TStringList.Create;
 	try
 
@@ -365,12 +376,15 @@ end;
 
 procedure TdmMain.RebuildMRU;
 var
-	i,startidx: integer;
+	i,startidx,count: integer;
 	Parent,Item,TopSep,BottomSep: TMenuItem;
 begin
 	// Delete all menu items
 	for I:= 0 to fMRU.Count - 1 do
 		FreeAndNil(PMRUItem(fMRU[i])^.MenuItem);
+
+	// Remove deleted files
+	FilterHistory;
 
 	Parent := fMRUMenu.Parent;
 	startidx := Parent.IndexOf(fMRUMenu) - 1; // start above
@@ -380,21 +394,50 @@ begin
 	BottomSep := Parent[startidx];
 
 	// Add menu items up to MRUmax
-	for I := 0 to min(devData.MRUMax,fMRU.Count) - 1 do begin
-		Item := TMenuItem.Create(Parent);
-		Item.Caption:= format('&%1x %s', [I, PMRUItem(fMRU[I])^.filename]);
-		Item.OnClick:= fMRUClick;
-		Item.Tag:= I;
-		Parent.Insert(startidx + I,Item);
+	count := 0;
 
-		// Hand a pointer to the MRU item, so it can remove it itself
-		PMRUItem(fMRU[I])^.MenuItem := Item;
+	// First add projects
+	for I := 0 to fMRU.Count - 1 do begin
+		if GetFileTyp(PMRUItem(fMRU[I])^.filename) = utPrj then begin
+			Item := TMenuItem.Create(Parent);
+			Item.Caption:= Format('&%1x %s', [count, PMRUItem(fMRU[I])^.filename]);
+			Item.OnClick:= fMRUClick;
+			Item.Tag:= I;
+			Parent.Insert(startidx + count,Item);
+
+			// Hand a pointer to the MRU item, so it can remove it itself
+			PMRUItem(fMRU[I])^.MenuItem := Item;
+
+			Inc(count);
+			if count = devData.MRUMax then
+				break;
+		end;
+	end;
+
+	// Then add other stuff
+	if count <> devData.MRUMax then begin
+		for I := 0 to min(devData.MRUMax,fMRU.Count) - 1 do begin
+			if GetFileTyp(PMRUItem(fMRU[I])^.filename) <> utPrj then begin
+				Item := TMenuItem.Create(Parent);
+				Item.Caption:= Format('&%1x %s', [count, PMRUItem(fMRU[I])^.filename]);
+				Item.OnClick:= fMRUClick;
+				Item.Tag:= count;
+				Parent.Insert(startidx + count,Item);
+
+				// Hand a pointer to the MRU item, so it can remove it itself
+				PMRUItem(fMRU[I])^.MenuItem := Item;
+
+				Inc(count);
+				if count = devData.MRUMax then
+					break;
+			end;
+		end;
 	end;
 
 	// Hide unneeded separators and clear history button
-	TopSep.Visible := (fMRU.Count > 0);
-	BottomSep.Visible := (fMRU.Count > 0);
-	fMRUMenu.Visible := (fMRU.Count > 0);
+	TopSep.Visible := (count > 0);
+	BottomSep.Visible := (count > 0);
+	fMRUMenu.Visible := (count > 0);
 end;
 
 { ---------- Code Insert Methods ---------- }

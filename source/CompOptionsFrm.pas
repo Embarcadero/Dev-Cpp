@@ -222,6 +222,11 @@ begin
 	devCompiler.FastDep := cbFastDep.Checked;
 	devCompiler.Delay := seCompDelay.Value;
 
+	devCompiler.BinDir.Assign(fBinDirCopy);
+	devCompiler.LibDir.Assign(fLibDirCopy);
+	devCompiler.CDir.Assign(fCDirCopy);
+	devCompiler.CppDir.Assign(fCppDirCopy);
+
 	// other settings of a compiler profile are saved to devCompiler by the UI components!
 
 	devCompiler.SaveSet(Index);
@@ -444,6 +449,7 @@ end;
 
 procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);
 begin
+	if fOldSelection = cmbCompilerSetComp.ItemIndex then Exit; // why the hell is this event firing anyway?
 
 	// Save old when modified
 	if (cmbCompilerSetComp.Tag = 1) and (MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[fOldSelection]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
@@ -643,7 +649,7 @@ begin
 
 	// Dialog asked to clear the current compiler list...
 	if dlgresult = mrYes then
-		cmbCompilerSetComp.Clear;
+		devCompiler.Sets.Clear;
 
 	// Find and write to disk...
 	devCompiler.FindSets;

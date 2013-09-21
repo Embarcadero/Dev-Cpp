@@ -180,7 +180,7 @@ begin
 	''+#13#10+
 	'	memset(&wc,0,sizeof(wc));'+#13#10+
 	'	wc.cbSize		 = sizeof(WNDCLASSEX);'+#13#10+
-	'	wc.lpfnWndProc	 = *|*; /* insert window procedure function here */;'+#13#10+
+	'	wc.lpfnWndProc	 = *|*; /* insert window procedure function here */'+#13#10+
 	'	wc.hInstance	 = hInstance;'+#13#10+
 	'	wc.hCursor		 = LoadCursor(NULL, IDC_ARROW);'+#13#10+
 	'	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);'+#13#10+

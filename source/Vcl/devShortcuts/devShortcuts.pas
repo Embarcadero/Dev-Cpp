@@ -47,7 +47,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Load;
-    procedure Edit;
+    procedure Edit(const WindowCaption,Column1,Column2,OK,Cancel,Default : AnsiString);
     procedure Save;
   published
     property Filename: TFilename read fFilename write fFilename;
@@ -176,7 +176,7 @@ begin
 	end;
 end;
 
-procedure TdevShortcuts.Edit;
+procedure TdevShortcuts.Edit(const WindowCaption,Column1,Column2,OK,Cancel,Default : AnsiString);
 var
 	I : integer;
 	item: PMenuShortcut;
@@ -185,6 +185,7 @@ begin
 	frmShortcutsEditor := TfrmShortcutsEditor.Create(Self);
 	with frmShortcutsEditor do try
 		Clear;
+		LoadText(WindowCaption,Column1,Column2,OK,Cancel,Default); // translate on the fly, can't use devMultilanguage here...
 
 		// Use the preloaded list, do not walk the Components list again
 		for I := 0 to fShortcuts.Count - 1 do begin

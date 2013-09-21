@@ -2112,9 +2112,12 @@ var
   vOldMode: TSynSelectionMode;
 begin
   Exclude(fStateFlags, sfLinesChanging);
+
+  if not fEditingFolds then
+    ReScan; // doesn't need Handle?
+
   if HandleAllocated then
   begin
-    ReScan;
     UpdateScrollBars;
     vOldMode := fActiveSelectionMode;
     SetBlockBegin(CaretXY);
@@ -4939,7 +4942,7 @@ var
   iWheelClicks: integer;
   iLinesToScroll: integer;
 begin
-  // Use control for text resizing, so don't handle the message here
+  // Use control for text resizing in Dev-C++, so don't handle the message here
   if ssCtrl in Shift then begin
     Result := false;
     exit;
@@ -7266,7 +7269,7 @@ begin
                 begin
                   Lines[CaretY] := Copy(Lines[BackCounter], 1, SpaceCount2); // copy previous indent
                 end;
-                if GetHighlighterAttriAtRowCol(BufferCoord(Length(Temp),CaretY),Temp,Attr) then begin // only add indent to source files
+                if (eoAutoIndent in Options) and GetHighlighterAttriAtRowCol(BufferCoord(Length(Temp),CaretY),Temp,Attr) then begin // only add indent to source files
                   if Attr <> Highlighter.CommentAttribute then begin // and outside of comments
                     if Temp[Length(Temp)] in ['{',':'] then begin // add more indent for these too
                       if not (eoTabsToSpaces in Options) then begin
@@ -8021,7 +8024,7 @@ begin
   inherited;
 {$ENDIF}
 
-  if GetKeyState(VK_CONTROL) >= 0 then
+  if GetKeyState(VK_MENU) >= 0 then // use alt for fast scrolling, control for font resizing
   begin
 {$IFDEF SYN_COMPILER_4_UP}
     nDelta := Mouse.WheelScrollLines

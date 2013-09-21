@@ -10,6 +10,7 @@ Version 5.4.2 - *
 - Hopefully fixed a rather common bug in the MRU list ("Invalid Pointer Operation").
 - Compiler Options now does not permanently change directories before hitting OK.
 - Fixed a crash in the parser, which didn't like "#include" without any followup.
+- Fixed a whole lot of other bugs.
 
 Version 5.4.1 - 17 Maart 2013
 

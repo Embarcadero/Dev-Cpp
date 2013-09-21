@@ -554,8 +554,6 @@ const
   ID_SC_TIP                             = 34003;
   ID_SC_HDRENTRY                        = 34004;
   ID_SC_HDRSHORTCUT                     = 34005;
-  ID_SC_CANCEL                          = 34006;
-  ID_SC_OK                              = 34007;
 
   // free to 559 for more forms.
 
@@ -649,13 +647,20 @@ const
 
   ID_ENV_PAUSECONSOLE                   = 38054;
   ID_ENV_AUTOREMEMBER                   = 38055;
-  ID_ENV_CHECKASSOCS                    = 38061;
+
 
   ID_FIND_REPLACE                       = 38056;
   ID_FIND_REPLACEFILES                  = 38057;
   ID_FIND_REPLACEWITH                   = 38058;
   ID_FIND_PROMPTREPLACE                 = 38059;
   ID_FIND_CURRENTFILE                   = 38060;
+
+  // And back to Environment Options
+  ID_ENV_CHECKASSOCS                    = 38061;
+  ID_ENV_TOP                            = 38062;
+  ID_ENV_BOTTOM                         = 38063;
+  ID_ENV_LEFT                           = 38064;
+  ID_ENV_RIGHT                          = 38065;
 
   // Goto function form
   ID_GF_TEXT                            = 40001;

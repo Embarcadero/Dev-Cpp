@@ -182,7 +182,7 @@ begin
 			cboFindText.AddItem(cboFindText.Text,nil);
 	end else begin
 		MessageBox(
-			Application.Handle,
+			Self.Handle,
 			PAnsiChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),
 			PAnsiChar(Lang[ID_INFO]),
 			MB_ICONINFORMATION or MB_TOPMOST);
@@ -332,7 +332,7 @@ begin
 	end else begin
 		if findcount = 0 then
 			MessageBox(
-				Application.Handle,
+				Self.Handle,
 				PAnsiChar(Format(Lang[ID_MSG_TEXTNOTFOUND],[cboFindText.Text])),
 				PAnsiChar(Lang[ID_INFO]),
 				MB_ICONINFORMATION or MB_TOPMOST);

@@ -764,7 +764,7 @@ begin
 			end;
 		end;
 	end;
-	fText.SelText:= value;
+	fText.SelText := value;
 
 	// Update the cursor
 	fText.CaretXY := NewCursorPos;
@@ -848,7 +848,7 @@ begin
 		tmp:= TStringList.Create;
 		try
 			tmp.LoadFromFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
-			InsertString(ParseMacros(tmp.Text), FALSE);
+			InsertString(ParseMacros(tmp.Text), false);
 		finally
 			tmp.Free;
 		end;
@@ -1044,7 +1044,7 @@ begin
 			' ': begin
 
 				// If Ctrl is down, immediately show completionbox when space is hit
-				if CtrlDown then begin
+				if IsKeyDown(VK_CONTROL) then begin
 
 					// Delete space keypress
 					Key := #0;

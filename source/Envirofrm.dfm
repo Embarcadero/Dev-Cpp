@@ -214,7 +214,7 @@ object EnviroForm: TEnviroForm
         object cbWatchHint: TCheckBox
           Left = 14
           Top = 22
-          Width = 170
+          Width = 195
           Height = 17
           Caption = 'Watch variable under mouse'
           TabOrder = 0
@@ -238,7 +238,7 @@ object EnviroForm: TEnviroForm
         object cbShowProgress: TCheckBox
           Left = 14
           Top = 22
-          Width = 163
+          Width = 195
           Height = 17
           Caption = '&Show during compilation'
           TabOrder = 0
@@ -246,7 +246,7 @@ object EnviroForm: TEnviroForm
         object cbAutoCloseProgress: TCheckBox
           Left = 14
           Top = 43
-          Width = 163
+          Width = 195
           Height = 17
           Caption = '&Auto close after compile'
           TabOrder = 1

@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 1134
-  Top = 510
+  Left = 434
+  Top = 387
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 462
@@ -54,7 +54,7 @@ object EditorOptForm: TEditorOptForm
         object cbMarginVis: TCheckBox
           Left = 8
           Top = 20
-          Width = 75
+          Width = 185
           Height = 17
           Caption = 'Visible'
           TabOrder = 0
@@ -90,7 +90,7 @@ object EditorOptForm: TEditorOptForm
         object cbFunctionHint: TCheckBox
           Left = 241
           Top = 166
-          Width = 200
+          Width = 208
           Height = 17
           Caption = 'Show function hints'
           TabOrder = 0
@@ -114,7 +114,7 @@ object EditorOptForm: TEditorOptForm
         object cbDoubleLine: TCheckBox
           Left = 8
           Top = 66
-          Width = 184
+          Width = 209
           Height = 17
           Caption = 'Double Click Line'
           TabOrder = 3
@@ -130,7 +130,7 @@ object EditorOptForm: TEditorOptForm
         object cbEHomeKey: TCheckBox
           Left = 241
           Top = 26
-          Width = 200
+          Width = 208
           Height = 17
           Caption = 'Enhance home key'
           TabOrder = 5
@@ -138,7 +138,7 @@ object EditorOptForm: TEditorOptForm
         object cbInsertMode: TCheckBox
           Left = 8
           Top = 46
-          Width = 145
+          Width = 209
           Height = 17
           Caption = 'Insert Mode'
           TabOrder = 6
@@ -146,7 +146,7 @@ object EditorOptForm: TEditorOptForm
         object cbParserHints: TCheckBox
           Left = 241
           Top = 146
-          Width = 200
+          Width = 208
           Height = 17
           Caption = 'Show editor hints'
           TabOrder = 7
@@ -154,7 +154,7 @@ object EditorOptForm: TEditorOptForm
         object cbHalfPage: TCheckBox
           Left = 241
           Top = 106
-          Width = 200
+          Width = 208
           Height = 17
           Caption = 'Half Page Scrolling'
           TabOrder = 8
@@ -178,7 +178,7 @@ object EditorOptForm: TEditorOptForm
         object cbPastEOL: TCheckBox
           Left = 241
           Top = 66
-          Width = 200
+          Width = 208
           Height = 17
           Caption = 'Cursor Past EOL'
           TabOrder = 11
@@ -186,7 +186,7 @@ object EditorOptForm: TEditorOptForm
         object cbPastEOF: TCheckBox
           Left = 241
           Top = 46
-          Width = 200
+          Width = 208
           Height = 17
           Caption = 'Cursor Past EOF'
           TabOrder = 12
@@ -194,7 +194,7 @@ object EditorOptForm: TEditorOptForm
         object cbScrollHint: TCheckBox
           Left = 241
           Top = 126
-          Width = 200
+          Width = 208
           Height = 17
           Caption = 'Scroll Hint'
           TabOrder = 13
@@ -202,7 +202,7 @@ object EditorOptForm: TEditorOptForm
         object cbSmartScroll: TCheckBox
           Left = 241
           Top = 86
-          Width = 200
+          Width = 208
           Height = 17
           Caption = 'Scollbars on need'
           TabOrder = 14
@@ -268,7 +268,7 @@ object EditorOptForm: TEditorOptForm
         object cbMatch: TCheckBox
           Left = 8
           Top = 63
-          Width = 225
+          Width = 233
           Height = 17
           Caption = 'Highlight matching symbols'
           TabOrder = 2
@@ -291,7 +291,7 @@ object EditorOptForm: TEditorOptForm
         object cbHighCurrLine: TCheckBox
           Left = 8
           Top = 20
-          Width = 73
+          Width = 185
           Height = 17
           Caption = 'Enabled'
           TabOrder = 0
@@ -335,7 +335,7 @@ object EditorOptForm: TEditorOptForm
         object cbUseTabs: TCheckBox
           Left = 8
           Top = 20
-          Width = 161
+          Width = 169
           Height = 17
           Caption = 'Use Tab Character'
           TabOrder = 1
@@ -988,11 +988,12 @@ object EditorOptForm: TEditorOptForm
         OnClick = btnCCCdeleteClick
       end
       object lblRefreshHint: TLabel
-        Left = 288
-        Top = 352
-        Width = 158
-        Height = 30
+        Left = 264
+        Top = 344
+        Width = 201
+        Height = 49
         Alignment = taCenter
+        AutoSize = False
         Caption = 'Please refresh the cache when updating Dev-C++'
         WordWrap = True
       end
