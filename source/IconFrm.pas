@@ -43,7 +43,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure IconViewInfoTip(Sender: TObject; Item: TListItem;
-      var InfoTip: AnsiString);
+      var InfoTip: string);
     procedure IconViewDblClick(Sender: TObject);
    private
     procedure LoadText;
@@ -88,36 +88,25 @@ end;
 // modifed to work with multiple directories.
 procedure TIconForm.FormCreate(Sender: TObject);
 var
-  SRec: TSearchRec;
-  SFile: AnsiString;
-  tmp: TStrings;
-  idx: integer;
+	SRec: TSearchRec;
+	SFile: AnsiString;
 begin
-  LoadText;
-  with IconView do
-   try
-    ImageList.Clear;
-    Items.BeginUpdate;
-    Items.Clear;
-    tmp:= TStringList.Create;
-    try
-     StrtoList(devDirs.Icons, tmp);
-     if tmp.Count> 0 then
-      for idx:= 0 to pred(tmp.Count) do
-       begin
-         sFile:= ExpandFileto(tmp[idx], devDirs.Exec) +'*.ico';
-         if FindFirst(sFile, faAnyFile, SRec) = 0 then
-          repeat
-            // pase filename with full path
-            Self.AddItem(IncludeTrailingPathDelimiter(tmp[idx])+ srec.Name);
-          until FindNext(SRec) <> 0;
-       end;
-    finally
-     tmp.Free;
-    end;
-   finally
-    Items.EndUpdate;
-   end;
+	LoadText;
+	with IconView do try
+		ImageList.Clear;
+		Items.BeginUpdate;
+		Items.Clear;
+
+		sFile:= ExpandFileto(devDirs.Icons, devDirs.Exec) +'*.ico';
+		if FindFirst(sFile, faAnyFile, SRec) = 0 then begin
+			repeat
+				// pase filename with full path
+				Self.AddItem(IncludeTrailingPathDelimiter(devDirs.Icons)+ srec.Name);
+			until FindNext(SRec) <> 0;
+		end;
+	finally
+		Items.EndUpdate;
+	end;
 end;
 
 procedure TIconForm.FormDestroy(Sender: TObject);

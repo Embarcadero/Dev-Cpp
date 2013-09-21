@@ -144,62 +144,65 @@ var
 	gdb : AnsiString;
 begin
 	Executing := true;
-
-	// Set up the security attributes struct.
-	sa.nLength := sizeof(TSecurityAttributes);
-	sa.lpSecurityDescriptor := nil;
-	sa.bInheritHandle := true;
-
-	// Create the child output pipe.
-	if not CreatePipe(fOutputread, fOutputwrite, @sa, 0) then
-		MsgErr('CreatePipe output');
-
-	if not SetHandleInformation(fOutputread,HANDLE_FLAG_INHERIT,0) then
-		MsgErr('SetHandleInformation outputread');
-
-	// Create the child input pipe.
-	if not CreatePipe(fInputread, fInputwrite, @sa, 0) then
-		MsgErr('CreatePipe input');
-
-	if not SetHandleInformation(fInputwrite,HANDLE_FLAG_INHERIT,0) then
-		MsgErr('SetHandleInformation inputwrite');
-
-	// Set up the start up info struct.
-	FillChar(si, sizeof(TStartupInfo), 0);
-	si.cb := sizeof(TStartupInfo);
-	si.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW or STARTF_USESHOWWINDOW;
-	si.hStdInput := fInputread;
-	si.hStdOutput := fOutputwrite;
-	si.hStdError := fOutputwrite;
-	si.wShowWindow := SW_HIDE;
-
-	// Load GDB exe used by project set
 	MainForm.fCompiler.SwitchToProjectCompilerSet;
-	gdb := devCompiler.gdbName;
+	try
 
-	if not CreateProcess(nil, PAnsiChar('"' + devCompiler.BinDir + pd + gdb + '"' + ' --annotate=2 --silent'), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
-		MsgErr('Error launching:' + #13#10#13#10 + devCompiler.BinDir + pd + gdb + #13#10#13#10 + SysErrorMessage(GetLastError));
-		Executing := false;
+		// Set up the security attributes struct.
+		sa.nLength := sizeof(TSecurityAttributes);
+		sa.lpSecurityDescriptor := nil;
+		sa.bInheritHandle := true;
+
+		// Create the child output pipe.
+		if not CreatePipe(fOutputread, fOutputwrite, @sa, 0) then
+			MsgErr('CreatePipe output');
+
+		if not SetHandleInformation(fOutputread,HANDLE_FLAG_INHERIT,0) then
+			MsgErr('SetHandleInformation outputread');
+
+		// Create the child input pipe.
+		if not CreatePipe(fInputread, fInputwrite, @sa, 0) then
+			MsgErr('CreatePipe input');
+
+		if not SetHandleInformation(fInputwrite,HANDLE_FLAG_INHERIT,0) then
+			MsgErr('SetHandleInformation inputwrite');
+
+		// Set up the start up info struct.
+		FillChar(si, sizeof(TStartupInfo), 0);
+		si.cb := sizeof(TStartupInfo);
+		si.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW or STARTF_USESHOWWINDOW;
+		si.hStdInput := fInputread;
+		si.hStdOutput := fOutputwrite;
+		si.hStdError := fOutputwrite;
+		si.wShowWindow := SW_HIDE;
+
+		// Assume it's present in the first bin dir
+		if devCompiler.BinDir.Count > 0 then begin
+			gdb := devCompiler.BinDir[0] + pd + devCompiler.gdbName;
+			if not CreateProcess(nil, PAnsiChar('"' + gdb + '"' + ' --annotate=2 --silent'), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
+				MsgErr('Error launching:' + #13#10#13#10 + gdb + #13#10#13#10 + SysErrorMessage(GetLastError));
+				Executing := false;
+				Exit;
+			end;
+		end else
+			MsgErr('Error launching debugger: no executable directory provided!');
+
+		fProcessID := pi.hProcess;
+
+		// Create a thread that will read GDB output.
+		Reader := TDebugReader.Create(true);
+		Reader.hPipeRead := fOutputread;
+		Reader.FreeOnTerminate := true;
+		Reader.BreakpointList := BreakPointList;
+		Reader.WatchVarList := WatchVarList;
+		Reader.DebugTree := DebugTree;
+		Reader.Resume;
+
+		MainForm.UpdateAppTitle;
+
+		Application.HintHidePause := 5000;
+	finally
 		MainForm.fCompiler.SwitchToOriginalCompilerSet;
-		Exit;
 	end;
-
-	MainForm.fCompiler.SwitchToOriginalCompilerSet;
-
-	fProcessID := pi.hProcess;
-
-	// Create a thread that will read GDB output.
-	Reader := TDebugReader.Create(true);
-	Reader.hPipeRead := fOutputread;
-	Reader.FreeOnTerminate := true;
-	Reader.BreakpointList := BreakPointList;
-	Reader.WatchVarList := WatchVarList;
-	Reader.DebugTree := DebugTree;
-	Reader.Resume;
-
-	MainForm.UpdateAppTitle;
-
-	Application.HintHidePause := 5000;
 end;
 
 procedure TDebugger.Stop;

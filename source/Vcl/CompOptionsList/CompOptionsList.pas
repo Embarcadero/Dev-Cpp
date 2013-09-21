@@ -91,7 +91,7 @@ begin
 		Result := (UseRightToLeftAlignment and (X < EditList.ButtonWidth)) or
 				  (not UseRightToLeftAlignment and (X > ClientWidth - EditList.ButtonWidth))
 	else
-		Result := false; // TODO: make one if?
+		Result := false;
 end;
 
 end.

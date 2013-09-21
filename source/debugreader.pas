@@ -1038,7 +1038,7 @@ begin
 
 			// Assume fragments don't end nicely with TErrorBegin or TPrompt
 			if GetLastAnnotation(tmp,totalbytesread,1 + totalbytesread + chunklen) in [TErrorBegin,TPrompt] then begin
-				gdbout := tmp; // todo: I sure hope this is a deep copy...
+				gdbout := tmp;
 				Analyze;
 
 				// Reset storage

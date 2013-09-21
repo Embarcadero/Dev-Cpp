@@ -131,10 +131,10 @@ type
     procedure FormShow(Sender: TObject);
   private
     fOldSelection: integer;
-    fBins: AnsiString;
-    fLibs: AnsiString;
-    fC: AnsiString;
-    fCpp: AnsiString;
+    fBinDirCopy: TStringList;
+    fLibDirCopy: TStringList;
+    fCDirCopy: TStringList;
+    fCppDirCopy: TStringList;
     procedure LoadSet(Index : integer);
     procedure SaveSet(Index : integer);
     procedure UpdateButtons;
@@ -180,10 +180,10 @@ begin
 
 	// Apply the new set to the UI
 	with devCompiler do begin
-		fBins := BinDir;
-		fC := CDir;
-		fCpp := CppDir;
-		fLibs := LibDir;
+		fBinDirCopy.Assign(BinDir); // use copies
+		fCDirCopy.Assign(CDir);
+		fCppDirCopy.Assign(CppDir);
+		fLibDirCopy.Assign(LibDir);
 		Commands.Lines.Text := CompOpts;
 		Linker.Lines.Text := LinkOpts;
 		cbCompAdd.Checked := AddtoComp;
@@ -202,7 +202,7 @@ begin
 	end;
 
 	// fill tab controls
-	CompOptionsFrame1.FillOptions(nil);
+	CompOptionsFrame1.FillOptions;
 	DirTabsChange(Self);
 
 	// Mark unmodified
@@ -236,14 +236,14 @@ end;
 
 procedure TCompOptForm.DirTabsChange(Sender: TObject);
 begin
-  case DirTabs.TabIndex of
-   0: StrtoList(fBins, TStrings(lstDirs.Items));
-   1: StrtoList(fLibs, TStrings(lstDirs.Items));
-   2: StrtoList(fC,    TStrings(lstDirs.Items));
-   3: StrtoList(fCpp,  TStrings(lstDirs.Items));
-  end;
-  edEntry.Clear;
-  UpdateButtons;
+	case DirTabs.TabIndex of
+		0: lstDirs.Items.Assign(fBinDirCopy);
+		1: lstDirs.Items.Assign(fLibDirCopy);
+		2: lstDirs.Items.Assign(fCDirCopy);
+		3: lstDirs.Items.Assign(fCppDirCopy);
+	end;
+	edEntry.Clear;
+	UpdateButtons;
 end;
 
 procedure TCompOptForm.lstDirsClick(Sender: TObject);
@@ -294,18 +294,13 @@ begin
   end; { case }
   edEntry.Clear;
 
-  case DirTabs.TabIndex of
-   0: fBins:= ListtoStr(lstDirs.Items);
-   1: fLibs:= ListtoStr(lstDirs.Items);
-   2: fC:=    ListtoStr(lstDIrs.Items);
-   3: fCpp:=  ListtoStr(lstDirs.Items);
-  end;
-  edEntry.SetFocus;
-
-  devCompiler.BinDir:=fBins;
-  devCompiler.CDir:=fC;
-  devCompiler.CppDir:=fCpp;
-  devCompiler.LibDir:=fLibs;
+	case DirTabs.TabIndex of
+		0: fBinDirCopy.Assign(lstDirs.Items);
+		1: fLibDirCopy.Assign(lstDirs.Items);
+		2: fCDirCopy.Assign(lstDIrs.Items);
+		3: fCppDirCopy.Assign(lstDirs.Items);
+	end;
+	edEntry.SetFocus;
 end;
 
 procedure TCompOptForm.UpDownClick(Sender: TObject);
@@ -327,19 +322,13 @@ begin
       end;
    end;
 
-  case DirTabs.TabIndex of
-   0: fBins:= ListtoStr(lstDirs.Items);
-   1: fLibs:= ListtoStr(lstDirs.Items);
-   2: fC:=    ListtoStr(lstDIrs.Items);
-   3: fCpp:=  ListtoStr(lstDirs.Items);
-  end;
-
-  devCompiler.BinDir:=fBins;
-  devCompiler.CDir:=fC;
-  devCompiler.CppDir:=fCpp;
-  devCompiler.LibDir:=fLibs;
-
-  UpdateButtons;
+	case DirTabs.TabIndex of
+		0: fBinDirCopy.Assign(lstDirs.Items);
+		1: fLibDirCopy.Assign(lstDirs.Items);
+		2: fCDirCopy.Assign(lstDIrs.Items);
+		3: fCppDirCopy.Assign(lstDirs.Items);
+	end;
+	UpdateButtons;
 end;
 
 procedure TCompOptForm.UpdateButtons;
@@ -376,6 +365,12 @@ end;
 procedure TCompOptForm.FormCreate(Sender: TObject);
 begin
 	LoadText;
+
+	// Create local copies we can modify
+	fBinDirCopy := TStringList.Create;
+	fLibDirCopy := TStringList.Create;
+	fCDirCopy := TStringList.Create;
+	fCppDirCopy := TStringList.Create;
 
 	// fill compiler lists
 	cmbCompilerSetComp.Items.Assign(devCompiler.Sets);
@@ -461,7 +456,6 @@ end;
 
 procedure TCompOptForm.btnBrws1Click(Sender: TObject);
 var
-  sl: TStringList;
   Obj: TEdit;
 begin
   Obj:=nil;
@@ -482,11 +476,10 @@ begin
 		Filter:=FLT_ALLFILES;
 
 		// Start in the bin folder
-		sl := TStringList.Create;
-		StrToList(devCompiler.BinDir,sl,';');
-		if sl.count > 0 then
-			InitialDir := sl[0];
-		sl.Free;
+		if fBinDirCopy.Count > 0 then
+			InitialDir := fBinDirCopy[0]
+		else if devCompiler.BinDir.Count > 0 then
+			InitialDir := devCompiler.BinDir[0];
 
 		FileName := IncludeTrailingPathDelimiter(InitialDir) + Obj.Text;
 		if Execute then begin
@@ -629,12 +622,17 @@ begin
 	// Fix bug in VCL (http://qc.embarcadero.com/wc/qcmain.aspx?d=5265)
 	CompOptionsFrame1.vle.Strings.Clear;
 
+	// Destroy local copies we can modify
+	fBinDirCopy.Free;
+	fLibDirCopy.Free;
+	fCDirCopy.Free;
+	fCppDirCopy.Free;
+
 	Action := caFree;
 end;
 
 procedure TCompOptForm.btnFindCompilersClick(Sender: TObject);
 var
-	compilername : AnsiString;
 	dlgresult : integer;
 begin
 	dlgresult := MessageDlg(
@@ -642,46 +640,13 @@ begin
 
 	if dlgresult = mrCancel then Exit;
 
-	cmbCompilerSetComp.Items.BeginUpdate;
-
 	// Dialog asked to clear the current compiler list...
 	if dlgresult = mrYes then
 		cmbCompilerSetComp.Clear;
 
-	// copy from InitializeOptions
-
-	// Assume 64bit compilers are put in the MinGW64 folder
-	if DirectoryExists(devDirs.Exec + 'MinGW64\') then begin
-
-		compilername := GetInfoOfCompiler(devDirs.Exec + 'MinGW64\bin\');
-		if compilername = '' then
-			compilername := 'MinGW64';
-
-		// Add to UI only
-		cmbCompilerSetComp.Items.Add(compilername + ' 64-bit');
-
-		// Save defaults to disk :(
-		devCompiler.SettoDefaults(compilername + ' 64-bit','MinGW64');
-		devCompiler.SaveSet(cmbCompilerSetComp.Items.Count-1);
-
-		cmbCompilerSetComp.Items.Add(compilername + ' 32-bit');
-
-		devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW64');
-		devCompiler.SaveSet(cmbCompilerSetComp.Items.Count-1);
-	end;
-	if DirectoryExists(devDirs.Exec + 'MinGW32\') then begin
-
-		compilername := GetInfoOfCompiler(devDirs.Exec + 'MinGW32\bin\');
-		if compilername = '' then
-			compilername := 'MinGW32';
-
-		// Add to UI only
-		cmbCompilerSetComp.Items.Add(compilername + ' 32-bit');
-
-		devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW32');
-		devCompiler.SaveSet(cmbCompilerSetComp.Items.Count-1);
-	end;
-
+	// Find and write to disk...
+	devCompiler.FindSets;
+	cmbCompilerSetComp.Items.Assign(devCompiler.Sets);
 	if cmbCompilerSetComp.Items.Count > 0 then
 		cmbCompilerSetComp.ItemIndex := 0
 	else
@@ -689,8 +654,6 @@ begin
 
 	// Load the default one
 	LoadSet(cmbCompilerSetComp.ItemIndex);
-
-	cmbCompilerSetComp.Items.EndUpdate;
 end;
 
 procedure TCompOptForm.cmbCompilerSetCompEnter(Sender: TObject);
@@ -730,3 +693,4 @@ begin
 end;
 
 end.
+

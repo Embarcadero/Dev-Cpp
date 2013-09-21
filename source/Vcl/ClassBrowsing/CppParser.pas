@@ -1161,7 +1161,7 @@ begin
 			else
 				Index := -1;
 
-			if Index <> -1 then begin
+			if (Index <> -1) and (sl.Count > Index) then begin
 				FName := StringReplace(sl[Index], '<', '', [rfReplaceAll]);
 				FName := StringReplace(FName, '>', '', [rfReplaceAll]);
 				FName := StringReplace(FName, '"', '', [rfReplaceAll]);
@@ -1192,14 +1192,12 @@ begin
 
 			// Defines
 			end else begin
-				if sl[0] = '#define' then begin
+				if sl[0] = '#define' then
 					Index := 1
-				end else begin
-					if (sl.Count > 1) and (sl[0] = '#') and (sl[1] = 'define') then
-						Index := 2
-					else
-						Index := -1
-				end;
+				else if (sl.Count > 1) and (sl[0] = '#') and (sl[1] = 'define') then
+					Index := 2
+				else
+					Index := -1;
 
 				// Functions
 				if (Index <> -1) and (sl.Count > Index + 1) then begin
@@ -2047,6 +2045,9 @@ begin
 	if FileExists(FileName) then
 		DeleteFile(FileName);
 
+	if fStatementList.Count = 0 then
+		Exit; // don't bother
+
 	// Try writing the whole file in one go
 	with TMemoryStream.Create do try
 
@@ -2144,6 +2145,10 @@ begin
 			Write(I2,SizeOf(Integer));
 			Write(relative[1],I2);
 		end;
+
+		// Shrink to fit
+		SetSize(Position);
+
 		SaveToFile(FileName);
 	finally
 		Free;

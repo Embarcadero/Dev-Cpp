@@ -37,12 +37,8 @@ type
     vle: TCompOptionsList;
     procedure tabsChange(Sender: TObject);
     procedure vleSetEditText(Sender: TObject; ACol, ARow: Integer;const Value: String);
-  private
-    { Private declarations }
-    fProject: TProject;
   public
-    { Public declarations }
-    procedure FillOptions(Proj: TProject);
+    procedure FillOptions;
   end;
 
 implementation
@@ -54,15 +50,13 @@ uses
 
 { TCompOptionsFrame }
 
-procedure TCompOptionsFrame.FillOptions(Proj: TProject);
+procedure TCompOptionsFrame.FillOptions;
 var
 	I : integer;
 begin
-	fProject := Proj;
-
 	for I := 0 to devCompiler.fOptionList.Count - 1 do
-		if tabs.Tabs.IndexOf(Lang[PCompilerOption(devCompiler.fOptionList[I])^.optSection]) = -1 then
-			tabs.Tabs.Add(Lang[PCompilerOption(devCompiler.fOptionList[I])^.optSection]);
+		if tabs.Tabs.IndexOf(Lang[PCompilerOption(devCompiler.fOptionList[I])^.Section]) = -1 then
+			tabs.Tabs.Add(Lang[PCompilerOption(devCompiler.fOptionList[I])^.Section]);
 
 	tabsChange(nil);
 end;
@@ -82,18 +76,18 @@ begin
 
 	for I := 0 to devCompiler.fOptionList.Count - 1 do begin
 		option := PCompilerOption(devCompiler.fOptionList[I])^;
-		if SameStr(Lang[option.optSection], currenttab) then begin
-			if Assigned(option.optChoices) and (option.optValue < option.optChoices.Count) then
-				idx := vle.InsertRow(Lang[option.optName], option.optChoices.Names[option.optValue], True) // a,b,c,d
+		if SameStr(Lang[option.Section], currenttab) then begin
+			if Assigned(option.Choices) and (option.Value < option.Choices.Count) then
+				idx := vle.InsertRow(Lang[option.Name], option.Choices.Names[option.Value], True) // a,b,c,d
 			else
-				idx := vle.InsertRow(Lang[option.optName], BoolValYesNo[option.optValue > 0], True); // No Yes
+				idx := vle.InsertRow(Lang[option.Name], BoolValYesNo[option.Value > 0], True); // No Yes
 
 			vle.Strings.Objects[idx] := Pointer(I);
 			vle.ItemProps[idx].EditStyle := esPickList;
 			vle.ItemProps[idx].ReadOnly := true;
-			if Assigned(option.optChoices) then begin
-				for j := 0 to option.optChoices.Count - 1 do
-					vle.ItemProps[idx].PickList.Add(option.optChoices.Names[J]);
+			if Assigned(option.Choices) then begin
+				for j := 0 to option.Choices.Count - 1 do
+					vle.ItemProps[idx].PickList.Add(option.Choices.Names[J]);
 			end else begin
 				vle.ItemProps[idx].PickList.Add(BoolValYesNo[False]);
 				vle.ItemProps[idx].PickList.Add(BoolValYesNo[True]);
@@ -115,19 +109,19 @@ begin
 	option := PCompilerOption(devCompiler.fOptionList[Integer(vle.Strings.Objects[ARow])]);
 
 	if SameStr(Value,'Yes') then
-		option^.optValue := 1
+		option^.Value := 1
 	else if SameStr(Value,'No') then
-		option^.optValue := 0
-	else if Assigned(option^.optChoices) then begin
-		for i := 0 to option^.optChoices.Count - 1 do
-			if SameStr(Value,option^.optChoices.Names[i]) then begin
-				option^.optValue := i;
+		option^.Value := 0
+	else if Assigned(option^.Choices) then begin
+		for i := 0 to option^.Choices.Count - 1 do
+			if SameStr(Value,option^.Choices.Names[i]) then begin
+				option^.Value := i;
 				break;
 			end;
 	end;
 
 	// update string too
-	devCompiler.SetOption(option,Integer(vle.Strings.Objects[ARow]),ValueToChar[option^.optValue]);
+	devCompiler.SetOption(option,ValueToChar[option^.Value]);
 end;
 
 end.

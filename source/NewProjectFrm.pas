@@ -130,20 +130,13 @@ begin
 end;
 
 function TNewProjectForm.GetTemplate: TTemplate;
-var
-	Opts: TProjOptions;
 begin
-	InitOptionsRec(Opts);
 	if assigned(ProjView.Selected) then begin
-		result:= TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
-		Opts:= result.OptionsRec;
-	end else begin
-		result:= TTemplate.Create;
-		result.Version:= -1;
-	end;
-	result.Name:= edProjectName.Text;
-	Opts.useGPP:= rbCpp.Checked;
-	result.OptionsRec:= Opts;
+		result := TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
+		result.Options.useGPP := rbCpp.Checked;
+		result.Name := edProjectName.Text;
+	end else
+		result := nil;
 end;
 
 procedure TNewProjectForm.ProjViewChange(Sender: TObject; Item: TListItem;Change: TItemChange);
@@ -159,7 +152,7 @@ begin
 		//if edProjectName.Text = '' then // suggest a name?
 		//	edProjectName.Text := LTemplate.Name;
 
-		if LTemplate.OptionsRec.useGPP then begin
+		if LTemplate.Options.useGPP then begin
 			rbC.Enabled := False;
 			rbCpp.Checked := True;
 		end else

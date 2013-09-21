@@ -80,7 +80,7 @@ implementation
 
 uses 
 {$IFDEF WIN32}
-  ShellAPI, devcfg, MultiLangSupport,  main;
+  ShellAPI, devcfg, utils, MultiLangSupport,  main;
 {$ENDIF}
 {$IFDEF LINUX}
   devcfg, MultiLangSupport, CheckForUpdate, main;
@@ -128,24 +128,15 @@ end;
 
 procedure TAboutForm.FormCreate(Sender: TObject);
 var
-	datestring : AnsiString;
-	datedouble : TDateTime;
-	dateinteger : integer;
+	datestring: AnsiString;
 begin
 	LoadText;
 
-	// Delphi 7 doesn't write the PE header correctly, so we can't use GetBuildTime to create the timestamp...
-
-	// So, we use the modified date
-
-	// int -> double -> string
-	dateinteger := FileAge(devDirs.Exec + 'devcpp.exe');
-	datedouble := FileDateToDateTime(dateinteger);
-	DateTimeToString(datestring,'mmmm d yyyy - hh:nn',datedouble);
-
+	// Use modified time, not the PE headers
+	datestring := GetBuildTime(ParamStr(0));
 	VersionLabel.Caption := VersionLabel.Caption + DEVCPP_VERSION + #13#10 + 'Build time: ' + datestring;
 
-	if FileExists(devData.Splash) then
+	if FileExists(devData.Splash) then // TODO: check all folders?
 		Image1.Picture.LoadFromFile(devData.Splash);
 end;
 

@@ -62,8 +62,13 @@ type
     procedure ReadObject(const Section: AnsiString; Obj: TPersistent);
     procedure WriteObject(const Section: AnsiString; Obj: TPersistent);
 
+    // Used for reading/writing each item as a separate entry
     procedure ReadStrings(const key: AnsiString; value: TStrings);
     procedure WriteStrings(const key: AnsiString; value: TStrings);
+
+    // Used for reading/writing string lists as a single string entry
+    procedure ReadDelimitedString(const key: AnsiString; const entry: AnsiString;value: TStringList);
+    procedure WriteDelimitedString(const key: AnsiString; const entry: AnsiString;value: TStringList);
 
     property INIFileName: AnsiString read GetIniFileName write SetIniFileName;
   end;
@@ -286,6 +291,29 @@ begin
 			fIni.WriteString(key, IntToStr(I), value[I])
 		else
 			fIni.WriteString(key, Value.Names[I], value.Values[Value.Names[I]]);
+end;
+
+// fix without using StringList.DelimitedText:
+// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
+procedure TConfigData.ReadDelimitedString(const key: AnsiString; const entry: AnsiString;value: TStringList);
+var
+	S : AnsiString;
+begin
+	S := ReadS(key, entry);
+
+	// Convert string to string list
+	value.Clear;
+	ExtractStrings([';'],[],PAnsiChar(S),value);
+end;
+
+procedure TConfigData.WriteDelimitedString(const key: AnsiString; const entry: AnsiString;value: TStringList);
+var
+	S : AnsiString;
+begin
+	// Convert stringlist to string
+	value.Delimiter := ';';
+	S := value.DelimitedText;
+	Write(key,entry,S);
 end;
 
 function TConfigData.ReadI(const key, entry: AnsiString): integer;

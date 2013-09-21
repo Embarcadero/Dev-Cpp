@@ -52,7 +52,6 @@ type
    fVersion: integer;
    function GetUnitCount: integer;
    function GetOldData: TTemplateRec;
-   function GetVersion: integer;
    function GetUnit(index: integer): TTemplateUnit;
    procedure SetUnit(index: integer; value: TTemplateUnit);
    procedure SetOldData(value: TTemplateRec);
@@ -67,12 +66,12 @@ type
    property Description: AnsiString read fDesc write fDesc;
    property FileName: AnsiString read fFileName write fFileName;
    property Name: AnsiString read fName write fName;
-   property OptionsRec: TProjOptions read fOptions write fOptions;
+   property Options: TProjOptions read fOptions write fOptions;
    property Icon: AnsiString read fIcon write fIcon;
    property UnitCount: integer read GetUnitCount;
    property Units[index: integer]: TTemplateUnit read GetUnit write SetUnit;
    property OldData: TTemplateRec read GetOldData write SetOldData;
-   property Version: integer read GetVersion write fVersion;
+   property Version: integer read fVersion write fVersion;
   end;
 
 implementation
@@ -94,18 +93,14 @@ resourcestring
 
 constructor TTemplate.Create;
 begin
-  InitOptionsRec(fOptions);
+	fOptions := TProjOptions.Create;
 end;
 
 destructor TTemplate.Destroy;
 begin
-  fOptions.Includes.Free;
-  fOptions.Libs.Free;
-  fOptions.ResourceIncludes.Free;
-  fOptions.MakeIncludes.Free;
-  fOptions.ObjFiles.Free;
-  fTemplate.Free;
-  inherited;
+	fOptions.Free;
+	fTemplate.Free;
+	inherited;
 end;
 
 procedure TTemplate.ReadTemplateFile(const FileName: AnsiString);
@@ -152,7 +147,7 @@ begin
         fOptions.Includes.Append(ReadString(cProject, 'Includes', ''));
 
         fOptions.useGPP:= ReadBool(cProject, 'Cpp', TRUE);
-        fOptions.cmdLines.Compiler:= ReadString(cProject, 'CompilerOptions', '');
+        fOptions.CompilerCmd:= ReadString(cProject, 'CompilerOptions', '');
       end
      else // read new style
       begin
@@ -162,9 +157,9 @@ begin
         fOptions.Includes.DelimitedText:= ReadString(cProject, 'Includes', '');
         fOptions.Libs.DelimitedText:= ReadString(cProject, 'Libs', '');
         fOptions.ResourceIncludes.DelimitedText := ReadString(cProject, 'ResourceIncludes', '');
-        fOptions.cmdLines.Compiler:= ReadString(cProject, 'Compiler', '');
-        fOptions.cmdLines.CppCompiler:= ReadString(cProject, 'CppCompiler', '');
-        fOptions.cmdLines.Linker:= ReadString(cProject, 'Linker', '');
+        fOptions.CompilerCmd:= ReadString(cProject, 'Compiler', '');
+        fOptions.CppCompilerCmd:= ReadString(cProject, 'CppCompiler', '');
+        fOptions.LinkerCmd:= ReadString(cProject, 'Linker', '');
         fOptions.useGPP:= ReadBool(cProject, 'IsCpp', FALSE);
         fOptions.IncludeVersionInfo:= ReadBool(cProject, 'IncludeVersionInfo', FALSE);
         fOptions.SupportXPThemes:= ReadBool(cProject, 'SupportXPThemes', FALSE);
@@ -337,11 +332,6 @@ begin
     result:= 0
    else
     result:= fTemplate.ReadInteger(cProject, 'UnitCount', 0);
-end;
-
-function TTemplate.GetVersion: integer;
-begin
-  result:= fVersion;
 end;
 
 end.

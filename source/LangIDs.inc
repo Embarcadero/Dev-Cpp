@@ -1196,6 +1196,8 @@ const
   ID_POPT_INCFILEMAKEFILE               = 72027;
   ID_POPT_SYNCPRODUCT                   = 72028;
   ID_POPT_DEFCPP                        = 72029;
+  ID_POPT_RESETPROJECTCOMPILER          = 72030;
+  ID_POPT_LANGUAGEDEP                   = 72031;
   // free to 3400
 
   // New compilter options

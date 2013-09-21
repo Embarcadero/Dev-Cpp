@@ -321,8 +321,6 @@ var
 	I: integer;
 	sl : TStringList;
 begin
-	ClearHistory;
-
 	sl := TStringList.Create;
 	try
 
@@ -372,7 +370,7 @@ var
 begin
 	// Delete all menu items
 	for I:= 0 to fMRU.Count - 1 do
-		PMRUItem(fMRU[i])^.MenuItem.Free;
+		FreeAndNil(PMRUItem(fMRU[i])^.MenuItem);
 
 	Parent := fMRUMenu.Parent;
 	startidx := Parent.IndexOf(fMRUMenu) - 1; // start above
@@ -382,15 +380,15 @@ begin
 	BottomSep := Parent[startidx];
 
 	// Add menu items up to MRUmax
-	for I:= 0 to min(devData.MRUMax,fMRU.Count) - 1 do begin
+	for I := 0 to min(devData.MRUMax,fMRU.Count) - 1 do begin
 		Item := TMenuItem.Create(Parent);
-		Item.Caption:= format('&%1x %s', [I, PMRUITem(fMRU[I])^.filename]);
+		Item.Caption:= format('&%1x %s', [I, PMRUItem(fMRU[I])^.filename]);
 		Item.OnClick:= fMRUClick;
 		Item.Tag:= I;
 		Parent.Insert(startidx + I,Item);
 
 		// Hand a pointer to the MRU item, so it can remove it itself
-		PMRUITem(fMRU[I])^.MenuItem := Item;
+		PMRUItem(fMRU[I])^.MenuItem := Item;
 	end;
 
 	// Hide unneeded separators and clear history button

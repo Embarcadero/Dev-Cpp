@@ -95,14 +95,11 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FontChange(Sender: TObject);
     procedure cmbIconsChange(Sender: TObject);
-    procedure cmbFontDrawItem(Control: TWinControl; Index: Integer;
-      Rect: TRect; State: TOwnerDrawState);
+    procedure cmbFontDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
   private
     HasProgressStarted : boolean;
-
     function GetSelected: integer;
     procedure CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
-
   public
     procedure UpdateList(List: TStrings);
     property Selected: integer read GetSelected;
@@ -147,7 +144,7 @@ end;
 
 procedure TLangForm.OkBtnClick(Sender: TObject);
 var
-	s, f : TStringList;
+	sl, f : TStringList;
 	i, j : integer;
 	fullpath : AnsiString;
 begin
@@ -188,37 +185,39 @@ begin
 
 			MainForm.ClassBrowser.SetUpdateOff;
 
-			s := TStringList.Create;
+			sl := TStringList.Create;
 			if AltCache.Checked then begin
 				for I := 0 to AltFileList.Count - 1 do
-					s.Add(AltFileList.Items[I]);
+					sl.Add(AltFileList.Items[I]);
 			end else
-				StrToList(devCompiler.CppDir, s);
+				sl.Assign(devCompiler.CppDir);
 
 			// Make it look busy
 			Screen.Cursor:=crHourglass;
 
 			f := TStringList.Create;
 			if not AltCache.Checked then begin
-				for i := 0 to pred(s.Count) do begin
+				for i := 0 to sl.Count-1 do begin
 
 					// Relative paths make the recursive/loop searcher go nuts
-					s[i] := ReplaceFirstStr(s[i],'%path%\',devDirs.exec);
-					if DirectoryExists(s[i]) then begin
-						FilesFromWildcard(s[i], '*.*', f, false, false, false);
+					sl[i] := ReplaceFirstStr(sl[i],'%path%\',devDirs.exec);
+					if DirectoryExists(sl[i]) then begin
+						FilesFromWildcard(sl[i], '*.*', f, false, false, false);
 						for j := 0 to f.Count - 1 do
 							MainForm.CppParser.AddFileToScan(f[j]);
 					end else
-						MessageDlg('Directory "' + s[i] + '" does not exist', mtWarning, [mbOK], 0);
+						MessageDlg('Directory "' + sl[i] + '" does not exist', mtWarning, [mbOK], 0);
 				end;
 			end else begin
-				for i := 0 to pred(s.Count) do begin
+				for i := 0 to sl.Count-1 do begin
 
 					// Assemble full path
-					if s[i][1] = ':' then
-						fullpath := s[i]
+					if (Length(sl[i]) > 0) and (sl[i][1] = ':') then
+						fullpath := sl[i]
+					else if devCompiler.CppDir.Count > 0 then
+						fullpath := devCompiler.CppDir[0] + pd + sl[i]
 					else
-						fullpath := devCompiler.CppDir + pd + s[i];
+						fullpath := sl[i];
 
 					// Then check for existance
 					if FileExists(fullpath) then begin
@@ -228,7 +227,7 @@ begin
 					//	MessageDlg('File "' + fullpath + '" does not exist', mtWarning, [mbOK], 0);
 				end;
 			end;
-			s.Free;
+			sl.Free;
 			f.Free;
 
 			MainForm.CppParser.ParseList;
@@ -272,10 +271,17 @@ begin
 		Filter:= FLT_HEADS;
 		Title:= Lang[ID_NV_OPENFILE];
 		Options := Options + [ofAllowMultiSelect];
-		InitialDir := devCompiler.CppDir;
+
+		// Start in the include folder
+		if devCompiler.CppDir.Count > 0 then
+			InitialDir := devCompiler.CppDir[0];
+
 		if Execute then begin
-			for i:= 0 to pred(Files.Count) do begin
-				s := StringReplace(Files.Strings[i],devCompiler.CppDir + '\','',[rfReplaceAll]);
+			for i:= 0 to Files.Count-1 do begin
+				if devCompiler.CppDir.Count > 0 then
+					s := StringReplace(Files.Strings[i],devCompiler.CppDir[0] + pd,'',[rfReplaceAll])
+				else
+					s := Files.Strings[i];
 				AltFileList.Items.Add(s);
 			end;
 		end;
@@ -297,14 +303,20 @@ var
 	s : AnsiString;
 begin
 	f := TStringList.Create;
-	if SelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
-		FilesFromWildcard(Dir, '*.*', f, false, false, false);
-		for i := 0 to f.Count-1 do begin
-			s := StringReplace(f[i],devCompiler.CppDir + '\','',[rfReplaceAll]);
-			AltFileList.Items.Add(s);
+	try
+		if SelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
+			FilesFromWildcard(Dir, '*.*', f, false, false, false);
+			for i := 0 to f.Count-1 do begin
+				if devCompiler.CppDir.Count > 0 then
+					s := StringReplace(f[i],devCompiler.CppDir[0] + pd,'',[rfReplaceAll])
+				else
+					s := f[i];
+				AltFileList.Items.Add(s);
+			end;
 		end;
+	finally
+		f.Free;
 	end;
-	f.Free;
 end;
 
 procedure TLangForm.FormShow(Sender: TObject);

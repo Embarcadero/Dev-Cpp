@@ -1,6 +1,6 @@
-object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
-  Left = 711
-  Top = 387
+object ExceptionFrm: TExceptionFrm
+  Left = 379
+  Top = 374
   BorderStyle = bsDialog
   Caption = 'Oops!'
   ClientHeight = 360
@@ -33,6 +33,12 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Height = 53
     AutoSize = False
     Caption = 'lblError'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
     WordWrap = True
   end
   object lblTitle: TLabel
@@ -75,6 +81,9 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Top = 130
     Width = 92
     Height = 25
+    Hint = 
+      'Sends a bug report to the application support team describing th' +
+      'e error'
     Caption = '&Send bug report'
     ParentShowHint = False
     ShowHint = True
@@ -85,6 +94,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Top = 130
     Width = 92
     Height = 25
+    Hint = 'View details of the system at the time of the error'
     AllowAllUp = True
     GroupIndex = 1
     Caption = '&View bug report'
@@ -191,6 +201,9 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Top = 130
     Width = 92
     Height = 25
+    Hint = 
+      'Closes this window and attempts to continue the application exec' +
+      'ution'
     Cancel = True
     Caption = '&Continue'
     Default = True
@@ -204,6 +217,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Top = 130
     Width = 92
     Height = 25
+    Hint = 'Closes this window and terminates the application execution'
     Caption = '&Terminate'
     ModalResult = 3
     ParentShowHint = False
@@ -249,6 +263,20 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         Width = 84
         Height = 13
         Caption = 'lblProgramVersion'
+      end
+      object Label13: TLabel
+        Left = 12
+        Top = 56
+        Width = 48
+        Height = 13
+        Caption = 'Build time:'
+      end
+      object lblBuildTime: TLabel
+        Left = 120
+        Top = 56
+        Width = 56
+        Height = 13
+        Caption = 'lblBuildTime'
       end
     end
     object tabMachine: TTabSheet

@@ -79,7 +79,7 @@ uses
   CPUFrm in 'CPUFrm.pas' {CPUForm},
   FileAssocs in 'FileAssocs.pas',
   TipOfTheDayFrm in 'TipOfTheDayFrm.pas' {TipOfTheDayForm},
-  ExceptionsAnalyzerFrm in 'ExceptionsAnalyzerFrm.pas' {ExceptionsAnalyzerForm},
+  ExceptionFrm in 'ExceptionFrm.pas' {ExceptionFrm},
   CVSFrm in 'CVSFrm.pas' {CVSForm},
   WindowListFrm in 'WindowListFrm.pas' {WindowListForm},
   CVSThread in 'CVSThread.pas',
@@ -145,6 +145,10 @@ begin
 			devData.INIFileName:=AltConfigFile;
 	end;
 
+	// Make the caption look nice
+	Application.Initialize;
+	Application.Title := 'Dev-C++';
+
 	// Create and fill settings structures
 	devData.ReadSelf;
 	InitializeOptions;
@@ -153,10 +157,7 @@ begin
 	if (not devData.NoSplashScreen and devCodeCompletion.UseCacheFiles) or devData.First then
 		SplashForm := TSplashForm.Create(nil);
 
-	Application.Initialize;
-	Application.Title := 'Dev-C++';
 	Application.CreateForm(TMainForm, MainForm);
-
 	if Assigned(SplashForm) then
 		SplashForm.Close;
 

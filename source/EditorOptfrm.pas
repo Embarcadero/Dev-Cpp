@@ -1440,58 +1440,16 @@ end;
 
 procedure TEditorOptForm.btnCCCnewClick(Sender: TObject);
 var
-  I, I1: integer;
-  Hits: integer;
-  MaxHits, MaxIndex: integer;
-  sl: TStrings;
+	I: integer;
 begin
-  // the following piece of code is a quick'n'dirty way to find the base
-  // compiler's include dir (if we 're lucky).
-  // we search through devDirs.C and try to locate the base dir that is
-  // most common between the others(!).
-  // if no most-common dir is found, we select the first in list.
-  // for a default installation, it should work.
-  //
-  // will be replaced by a dialog ( when it's ready ;) to let the user
-  // select, so that he gets the blame if the thing does not work ;)))
-  //
-  // PS: is there a better way to do it???
-  sl:=TStringList.Create;
-  try
-    sl.Delimiter:=';';
-    sl.DelimitedText:=devCompiler.CppDir;
-    if sl.Count>1 then begin
-      MaxHits:=0;
-      MaxIndex:=0;
-      for I1:=0 to sl.Count-1 do begin
-        Hits:=0;
-        for I:=0 to sl.Count-1 do
-          if StartsText(sl[I1], sl[I]) then
-            Inc(Hits);
-        if Hits>MaxHits then begin
-          MaxHits:=Hits;
-          MaxIndex:=I1;
-        end;
-      end;
-      CppParser.ProjectDir:=IncludeTrailingPathDelimiter(sl[MaxIndex]);
-    end
-    else
-      CppParser.ProjectDir:=IncludeTrailingPathDelimiter(devCompiler.CppDir);
-  finally
-    sl.Free;
-  end;
-
 	with TOpenDialog.Create(Self) do try
 
 		Filter := BuildFilter([FLT_HEADS]);
 		Options := Options + [ofAllowMultiSelect];
 
-		// Start in the include folder, if its set
-		sl := TStringList.Create;
-		StrToList(devCompiler.CppDir,sl,';');
-		if sl.count > 0 then
-			InitialDir := sl[0];
-		sl.Free;
+		// Start in the include folder, if it's set
+		if devCompiler.CppDir.Count > 0 then
+			InitialDir := devCompiler.CppDir[0];
 
 		if Execute then begin
 			Screen.Cursor:=crHourglass;

@@ -48,7 +48,7 @@ type
     tabFilesDir: TTabSheet;
     lblPrjName: TLabel;
     grpIcon: TGroupBox;
-    btnIconBrwse: TBitBtn;
+    btnIconBrowse: TBitBtn;
     btnIconLib: TBitBtn;
     grpType: TGroupBox;
     lstType: TListBox;
@@ -155,7 +155,7 @@ type
     procedure SubTabsChange(Sender: TObject);
     procedure SubTabsChanging(Sender: TObject; NewIndex: Integer;var AllowChange: Boolean);
     procedure btnIconLibClick(Sender: TObject);
-    procedure btnIconBrwseClick(Sender: TObject);
+    procedure btnIconBrowseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnRemoveIconClick(Sender: TObject);
     procedure BrowseExecutableOutDirClick(Sender: TObject);
@@ -187,7 +187,6 @@ type
     procedure OptionsLinkClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
-    fIcon: AnsiString;
     procedure UpdateDirButtons;
     procedure UpdateMakButtons;
     procedure LoadText;
@@ -195,8 +194,7 @@ type
     function DefaultBuildCommand(idx: integer): AnsiString;
     procedure SaveDirSettings;
   public
-    // do work on this copy and assign it to the original when the user presses OK
-    fProjectCopy : TProject;
+    fProjectCopy : TProject; // do work on this copy and assign it to the original when the user presses OK
     procedure SetInterface(Source : TProject); // fProjectCopy -> UI
     procedure GetInterface(Destination : TProject); // UI -> fProjectCopy
   end;
@@ -365,26 +363,36 @@ var
 	I: integer;
 begin
 	with Destination.Options do begin
-		Icon := fIcon;
 
-		cmdLines.Compiler:='';
-		for I:=0 to edCompiler.Lines.Count-1 do
-			cmdLines.Compiler := cmdLines.Compiler + edCompiler.Lines[I] + '_@@_';
-
-		cmdLines.CppCompiler:='';
-		for I:=0 to edCppCompiler.Lines.Count-1 do
-			cmdLines.CppCompiler := cmdLines.CppCompiler + edCppCompiler.Lines[I] + '_@@_';
-
-		cmdLines.Linker:='';
-		for I:=0 to edLinker.Lines.Count-1 do
-			cmdLines.Linker := cmdLines.Linker + edLinker.Lines[I] + '_@@_';
-
+		// General tab
+		SupportXPThemes:=chkSupportXP.Checked;
+		CompilerSet:=cmbCompiler.ItemIndex;
+		useGPP:=chkDefCpp.Checked;
+		Icon := fProjectCopy.Options.Icon;
 		typ := lstType.ItemIndex;
 
-		// Update directories
+		// Files tab
+
+		// Compiler tab
+		CompilerOptions := devCompiler.fOptionString;
+
+		// Options tab
+		CompilerCmd:='';
+		for I:=0 to edCompiler.Lines.Count-1 do
+			CompilerCmd := CompilerCmd + edCompiler.Lines[I] + '_@@_';
+
+		CppCompilerCmd:='';
+		for I:=0 to edCppCompiler.Lines.Count-1 do
+			CppCompilerCmd := CppCompilerCmd + edCppCompiler.Lines[I] + '_@@_';
+
+		LinkerCmd:='';
+		for I:=0 to edLinker.Lines.Count-1 do
+			LinkerCmd := LinkerCmd + edLinker.Lines[I] + '_@@_';
+
+		// Directories tab
 		SaveDirSettings;
 
-		// Build Options
+		// Build tab
 		ExeOutput := edExeOutput.Text;
 		ObjectOutput := edObjOutput.Text;
 		LogOutput := edLogOutput.Text;
@@ -392,27 +400,16 @@ begin
 		OverrideOutput := chkOverrideOutput.Checked;
 		OverridenOutput := edOverridenOutput.Text;
 
-		// Makefile
-		// TODO: move to TProjOptions
+		// Makefile tab
 		if cbUseCustomMakefile.Checked and FileExists(edCustomMakefile.Text) then
-			fProjectCopy.UseCustomMakefile := true
+			UseCustomMakefile := true
 		else
-			fProjectCopy.UseCustomMakefile := false;
-		fProjectCopy.CustomMakefile:=edCustomMakefile.Text;
-
+			UseCustomMakefile := false;
+		CustomMakefile:=edCustomMakefile.Text;
 		MakeIncludes.Clear;
 		MakeIncludes.AddStrings(lbMakeIncludes.Items);
 
-		// Compiler
-		CompilerOptions := devCompiler.fOptionString;
-		devCompiler.LoadSet(devCompiler.CurrentSet);
-
-		// General
-		SupportXPThemes:=chkSupportXP.Checked;
-		CompilerSet:=cmbCompiler.ItemIndex;
-		useGPP:=chkDefCpp.Checked;
-
-		// Version info
+		// Version tab
 		IncludeVersionInfo:=chkVersionInfo.Checked;
 
 		VersionInfo.Major := spnMajor.Value;
@@ -433,10 +430,15 @@ begin
 		VersionInfo.LegalTrademarks:=  vleVersion.Cells[1, 8];
 
 		// Get international language ID (1026 ...)
-		for I := 0 to Languages.Count-1 do begin
-			if SameText(Languages.Name[I], cmbLangID.Text) then begin
-				VersionInfo.LanguageID := Languages.LocaleID[I];
-				Break;
+		if cmbLangID.Visible then begin // no exception has occurred on show...
+			try
+				for I := 0 to Languages.Count-1 do begin
+					if SameText(Languages.Name[I], cmbLangID.Text) then begin
+						VersionInfo.LanguageID := Languages.LocaleID[I];
+						Break;
+					end;
+				end;
+			except // no messageboxes this time, the user has received the message already
 			end;
 		end;
 	end;
@@ -457,29 +459,31 @@ end;
 procedure TfrmProjectOptions.SetInterface(Source : TProject);
 var
 	I, cntSrc, cntHdr, cntRes, cntOther: integer;
+	IconTmp : AnsiString;
 begin
-	// this is actually a reference...
-	fProjectCopy := Source; // TODO: make copy
+	fProjectCopy := Source;
 
 	with fProjectCopy.Options do begin
-		fIcon:= GetRealPath(Icon, fProjectCopy.Directory);
-		if (fIcon <> '') and FileExists(fIcon) then
-			try
-				IconPreview.Picture.LoadFromFile(fIcon);
-			except
-				fIcon:= '';
-			end;
 
 		// General Tab
 		lstType.ItemIndex := typ;
-		edCompiler.Lines.Text := StringReplace(cmdlines.Compiler, '_@@_', #13#10, [rfReplaceAll]);
-		edCppCompiler.Lines.Text := StringReplace(cmdlines.CppCompiler, '_@@_', #13#10, [rfReplaceAll]);
-		edLinker.Lines.Text := StringReplace(cmdlines.Linker, '_@@_', #13#10, [rfReplaceAll]);
 		edProjectName.Text := fProjectCopy.Name;
 		lblPrjFname.Caption := fProjectCopy.FileName;
 		lblPrjOutputFname.Caption := fProjectCopy.Executable;
+		chkSupportXP.Checked:=SupportXPThemes;
+		chkDefCpp.Checked:=useGPP;
 
-		// Count file types
+		// Load icon if possible
+		IconTmp := GetRealPath(fProjectCopy.Options.Icon, fProjectCopy.Directory);
+		if (IconTmp <> '') and FileExists(IconTmp) then
+			try
+				IconPreview.Picture.LoadFromFile(fProjectCopy.Options.Icon);
+				Icon := IconTmp;
+			except
+				Icon := '';
+			end;
+		btnRemoveIcon.Enabled := Length(Icon) > 0;
+
 		cntSrc:=0;
 		cntHdr:=0;
 		cntRes:=0;
@@ -491,12 +495,25 @@ begin
 				utResSrc: Inc(cntRes);
 			else Inc(cntOther);
 		end;
-
 		lblPrjUnits.Caption:=Format(Lang[ID_POPT_UNITSFORMAT], [fProjectCopy.Units.Count, cntSrc, cntHdr, cntRes, cntOther]);
-		chkSupportXP.Checked:=SupportXPThemes;
-		chkDefCpp.Checked:=useGPP;
 
-		// Output tab
+		// Files tab
+
+		// Compiler tab
+		devCompiler.LoadSet(CompilerSet);
+		cmbCompiler.Items.Assign(devCompiler.Sets);
+		cmbCompiler.ItemIndex:=CompilerSet;
+		CompOptionsFrame1.FillOptions;
+
+		// Options tab
+		edCompiler.Lines.Text := StringReplace(CompilerCmd, '_@@_', #13#10, [rfReplaceAll]);
+		edCppCompiler.Lines.Text := StringReplace(CppCompilerCmd, '_@@_', #13#10, [rfReplaceAll]);
+		edLinker.Lines.Text := StringReplace(LinkerCmd, '_@@_', #13#10, [rfReplaceAll]);
+
+		// Directories tab
+		SubTabsChange(Self);
+
+		// Build tab
 		edExeOutput.Text := ExeOutput;
 		edObjOutput.Text := ObjectOutput;
 		edLogOutput.Text := LogOutput;
@@ -512,25 +529,13 @@ begin
 
 		// Makefile tab
 		UpdateMakButtons;
-		cbUseCustomMakefile.Checked:=fProjectCopy.UseCustomMakefile;
-		edCustomMakefile.Text:=fProjectCopy.CustomMakefile;
+		cbUseCustomMakefile.Checked:=fProjectCopy.Options.UseCustomMakefile;
+		edCustomMakefile.Text:=fProjectCopy.Options.CustomMakefile;
 		cbUseCustomMakefileClick(nil);
 		lbMakeIncludes.Items.AddStrings(MakeIncludes);
 
-		// temporarily apply project settings
-		devCompiler.fOptionString := fProjectCopy.Options.CompilerOptions;
-		devCompiler.OptionStringToList(devCompiler.fOptionString);
-
-		// Compiler tab
-		cmbCompiler.Items.Assign(devCompiler.Sets);
-		cmbCompiler.ItemIndex:=CompilerSet;
-		CompOptionsFrame1.FillOptions(fProjectCopy);
-
 		// Version tab
 		InitVersionInfo;
-
-		// Directories tab
-		SubTabsChange(Self);
 	end;
 end;
 
@@ -567,33 +572,28 @@ end;
 
 procedure TfrmProjectOptions.btnIconLibClick(Sender: TObject);
 begin
-  with TIconForm.Create(Self) do
-   try
-    if ShowModal = mrOk then
-     if Selected <> '' then
-      fIcon:= Selected;
-   finally
-    Free;
-   end;
-  if fIcon <> '' then
-  begin
-   IconPreview.Picture.LoadFromFile(fIcon);
-   btnRemoveIcon.Enabled := Length(fIcon) > 0;
-  end;
+	with TIconForm.Create(Self) do try
+		if ShowModal = mrOk then
+			if Selected <> '' then begin
+				fProjectCopy.Options.Icon := Selected;
+				IconPreview.Picture.LoadFromFile(Selected);
+				btnRemoveIcon.Enabled := Length(Selected) > 0;
+			end;
+	finally
+		Free;
+	end;
 end;
 
-procedure TfrmProjectOptions.btnIconBrwseClick(Sender: TObject);
+procedure TfrmProjectOptions.btnIconBrowseClick(Sender: TObject);
 begin
-  if dlgPic.Execute then
-   begin
-     if FileExists(dlgPic.FileName) then begin
-       fIcon:= dlgPic.FileName;
-       IconPreview.Picture.LoadFromFile(fIcon);
-       btnRemoveIcon.Enabled := Length(fIcon) > 0;
-     end
-     else
-       MessageDlg(format(Lang[ID_MSG_COULDNOTOPENFILE], [dlgPic.FileName]), mtError, [mbOK], 0);
-   end;
+	if dlgPic.Execute then begin
+		if FileExists(dlgPic.FileName) then begin
+			fProjectCopy.Options.Icon := dlgPic.FileName;
+			IconPreview.Picture.LoadFromFile(dlgPic.FileName);
+			btnRemoveIcon.Enabled := Length(dlgPic.FileName) > 0;
+		end else
+			MessageDlg(format(Lang[ID_MSG_COULDNOTOPENFILE], [dlgPic.FileName]), mtError, [mbOK], 0);
+	end;
 end;
 
 procedure TfrmProjectOptions.FormCreate(Sender: TObject);
@@ -672,7 +672,7 @@ begin
   btnOk.Caption:=         Lang[ID_BTN_OK];
   btnCancel.Caption:=     Lang[ID_BTN_CANCEL];
   btnHelp.Caption:=       Lang[ID_BTN_HELP];
-  btnIconBrwse.Caption:=  Lang[ID_BTN_BROWSE];
+  btnIconBrowse.Caption:=  Lang[ID_BTN_BROWSE];
   btnRemoveIcon.Caption:= Lang[ID_BTN_REMOVEICON];
 
   cbUseCustomMakefile.Caption := Lang[ID_POPT_USECUSTOMMAKEFILE];
@@ -711,7 +711,7 @@ end;
 procedure TfrmProjectOptions.btnRemoveIconClick(Sender: TObject);
 begin
   btnRemoveIcon.Enabled := False;
-  fIcon := '';
+  fProjectCopy.Options.Icon := '';
   IconPreview.Picture.Graphic := nil;
 end;
 
@@ -741,7 +741,7 @@ var
   Dir: WideString;
 {$ENDIF}
 begin
-	if fProjectCopy.Options.ObjectOutput<>'' then
+	if fProjectCopy.Options.ObjectOutput <> '' then
 		Dir := ExpandFileto(fProjectCopy.Options.ObjectOutput, fProjectCopy.Directory)
 	else
 		Dir := fProjectCopy.Directory;
@@ -1021,11 +1021,16 @@ begin
 
 		cmbLangID.Items.Clear;
 		cmbLangID.Items.BeginUpdate; // prevent redraws
-		for I:=0 to Languages.Count-1 do
-			cmbLangID.Items.Add(Languages.Name[I]);
+		try
+			for I := 0 to Languages.Count-1 do
+				cmbLangID.Items.Add(Languages.Name[i]);
+			cmbLangID.ItemIndex := cmbLangID.Items.IndexOf(Languages.NameFromLocaleID[LanguageID]);
+		except
+			MessageDlg(Lang[ID_POPT_LANGUAGEDEP],mtInformation,[mbOK],0);
+			cmbLangID.Visible := false;
+			lblVerLang.Visible := false;
+		end;
 		cmbLangID.Items.EndUpdate;
-
-		cmbLangID.ItemIndex := cmbLangID.Items.IndexOf(Languages.NameFromLocaleID[LanguageID]);
 	end;
 end;
 
@@ -1044,8 +1049,12 @@ end;
 procedure TfrmProjectOptions.cmbCompilerChange(Sender: TObject);
 begin
 	// When we change compiler sets, load defaults of selected compiler
-//	devCompiler.LoadSet(cmbCompiler.ItemIndex);
-//	CompOptionsFrame1.FillOptions(fProjectCopy); // todo: make up mind about discarding user settings this way
+	if MessageDlg(Lang[ID_POPT_RESETPROJECTCOMPILER],mtConfirmation,[mbYes,mbNo],0) = mrYes then begin // replace settings by defaults
+		devCompiler.LoadSet(cmbCompiler.ItemIndex);
+		devCompiler.OptionStringToList(devCompiler.fOptionString);
+		fProjectCopy.Options.CompilerCmd := devCompiler.fOptionString;
+		CompOptionsFrame1.FillOptions;
+	end;
 end;
 
 procedure TfrmProjectOptions.btnCancelClick(Sender: TObject);
@@ -1067,7 +1076,6 @@ procedure TfrmProjectOptions.AddLibBtnClick(Sender: TObject);
 var
 	s: AnsiString;
 	i: integer;
-	sl: TStringList;
 begin
 	with TOpenDialog.Create(Self) do try
 		Filter := BuildFilter([FLT_LIBRARIES]);
@@ -1077,11 +1085,8 @@ begin
 		MainForm.fCompiler.SwitchToProjectCompilerSet;
 
 		// Start in the lib folder
-		sl := TStringList.Create;
-		StrToList(devCompiler.LibDir,sl,';');
-		if sl.count > 0 then
-			InitialDir := sl[0];
-		sl.Free;
+		if devCompiler.LibDir.Count > 0 then
+			InitialDir := devCompiler.LibDir[0];
 
 		if Execute then begin
 			for i := 0 to Files.Count - 1 do begin

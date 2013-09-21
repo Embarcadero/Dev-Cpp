@@ -134,7 +134,7 @@ object frmProjectOptions: TfrmProjectOptions
         Height = 138
         Caption = '  Icon:  '
         TabOrder = 0
-        object btnIconBrwse: TBitBtn
+        object btnIconBrowse: TBitBtn
           Left = 128
           Top = 60
           Width = 105
@@ -142,7 +142,7 @@ object frmProjectOptions: TfrmProjectOptions
           Hint = 'Select a custom icon'
           Caption = 'Browse...'
           TabOrder = 0
-          OnClick = btnIconBrwseClick
+          OnClick = btnIconBrowseClick
           Glyph.Data = {
             36030000424D3603000000000000360000002800000010000000100000000100
             18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -492,7 +492,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 449
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
+        ItemHeight = 0
         TabOrder = 1
         OnChange = cmbCompilerChange
       end
@@ -1280,7 +1280,7 @@ object frmProjectOptions: TfrmProjectOptions
       object chkVersionInfo: TCheckBox
         Left = 12
         Top = 8
-        Width = 433
+        Width = 509
         Height = 17
         Caption = 'Include version info in project'
         TabOrder = 0
@@ -1391,7 +1391,7 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 209
           Height = 23
           Style = csDropDownList
-          ItemHeight = 15
+          ItemHeight = 0
           Sorted = True
           TabOrder = 4
         end

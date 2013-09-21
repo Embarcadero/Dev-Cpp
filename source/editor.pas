@@ -1764,6 +1764,7 @@ begin
 				fTabSheet.Caption:= ExtractFileName(FileName);
 
 			fFileName := FileName;
+			MainForm.UpdateAppTitle;
 
 			// We haven't scanned it yet...
 			MainForm.CppParser.AddFileToScan(FileName);

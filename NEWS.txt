@@ -1,3 +1,14 @@
+Version 5.4.2 - *
+
+- Fixed compiler default selection not being saved on first startup.
+- Dev-C++ will now suggest to disable DEP instead of crash when trying to execute data.
+- The compiler set validator will now not add any duplicate paths anymore.
+- After saving as, the window caption will now update too.
+- Fixed a few out of bounds errors.
+- Hopefully fixed a rather common bug in the MRU list ("Invalid Pointer Operation").
+- Compiler Options now does not permanently change directories before hitting OK.
+- Fixed a crash in the parser, which didn't like "#include" without any followup.
+
 Version 5.4.1 - 17 Maart 2013
 
 - Fixed a startup crash when not using function tips.

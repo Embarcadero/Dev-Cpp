@@ -58,7 +58,7 @@ type
 
   function GetShortName(const FileName: AnsiString): AnsiString;
 
-  function CommaStrToStr(s : AnsiString; formatstr : AnsiString) : AnsiString;
+  function FormatList(const sl : TStrings; formatstr : AnsiString) : AnsiString;
   function IncludeQuoteIfSpaces(const s : AnsiString) : AnsiString;
   function IncludeQuoteIfNeeded(const s : AnsiString) : AnsiString;
 
@@ -81,9 +81,6 @@ type
 
   procedure StrtoPoint(var pt: TPoint;const value: AnsiString);
   function PointtoStr(pt: TPoint): AnsiString;
-
-  function ListToStr(List: TStrings): AnsiString;
-  procedure StrToList(const s: AnsiString;List: TStrings; delimiter: char=';');
 
   function GetFileTyp(const FileName: AnsiString): TExUnitType;
 
@@ -117,9 +114,9 @@ type
 
   procedure OpenHelpFile;
 
-  function ProgramHasConsole(const path : AnsiString) : boolean;
+  function ProgramHasConsole(const Path : AnsiString) : boolean;
 
-  function GetBuildTime(const path : AnsiString) : TDateTime;
+  function GetBuildTime(const Path: AnsiString) : AnsiString;
 
   function IsEmpty(editor : TSynEdit) : boolean;
 
@@ -403,27 +400,33 @@ begin
 	CloseHandle(handle);
 end;
 
-// Delphi 7 doesn't write the PE header correctly, so we can't use this to create the timestamp...
-function GetBuildTime(const path : AnsiString) : TDateTime;
+function GetBuildTime(const Path: AnsiString) : AnsiString;
 var
-	handle : Cardinal;
-	bytesread : DWORD;
-	signature : DWORD;
-	dos_header : _IMAGE_DOS_HEADER;
-	pe_header  : _IMAGE_FILE_HEADER;
+	dateinteger : integer;
+	datedouble: TDateTime;
+//	handle : Cardinal;
+//	bytesread : DWORD;
+//	signature : DWORD;
+//	dos_header : _IMAGE_DOS_HEADER;
+//	pe_header  : _IMAGE_FILE_HEADER;
 begin
-	handle := CreateFile(PAnsiChar(path),GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
-	if handle <> INVALID_HANDLE_VALUE then begin
-		ReadFile(Handle, dos_header, sizeof(dos_header), bytesread, nil);
-		SetFilePointer(Handle, dos_header._lfanew, nil, 0);
-		ReadFile(Handle, signature,  sizeof(signature),  bytesread, nil);
-		ReadFile(Handle, pe_header,  sizeof(pe_header),  bytesread, nil);
+	dateinteger := FileAge(path);
+	datedouble := FileDateToDateTime(dateinteger);
 
-		Result := UnixToDateTime(pe_header.TimeDateStamp);
-	end else
-		Result := 0;
+//	handle := CreateFile(PAnsiChar(path),GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
+//	if handle <> INVALID_HANDLE_VALUE then begin
+//		ReadFile(Handle, dos_header, sizeof(dos_header), bytesread, nil);
+//		SetFilePointer(Handle, dos_header._lfanew, nil, 0);
+//		ReadFile(Handle, signature,  sizeof(signature),  bytesread, nil);
+//		ReadFile(Handle, pe_header,  sizeof(pe_header),  bytesread, nil);
 
-	CloseHandle(handle);
+//		Result := UnixToDateTime(pe_header.TimeDateStamp);
+//	end else
+//		Result := 0;
+
+//	CloseHandle(handle);
+
+	DateTimeToString(Result,'mmmm d yyyy - hh:nn',datedouble);
 end;
 
 // got tired of typing application.handle,PAnsiChar,PAnsiChar MB_OK, etc ;)
@@ -788,41 +791,13 @@ begin
   end;
 end;
 
-function CommaStrToStr(s : AnsiString; formatstr : AnsiString) : AnsiString;
-var
-	i : integer;
-	tmp : AnsiString;
-begin
-	result := '';
-	while pos(';', s) > 0 do begin
-		i := pos(';', s);
-		tmp := Copy(s, 1, i - 1);
-		Delete(s, 1, i);
-		result := format(formatstr, [result, tmp]);
-	end;
-	if s <> '' then
-		result := format(formatstr, [result, s]);
-end;
-
-// fix without using StringList.DelimitedText:
-// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
-procedure StrToList(const s : AnsiString; List: TStrings; delimiter : char);
-begin
-	List.Clear;
-	ExtractStrings([delimiter],[],PChar(S),List);
-end;
-
-function ListtoStr(List: TStrings): AnsiString;
+function FormatList(const sl : TStrings; formatstr : AnsiString) : AnsiString;
 var
 	i : integer;
 begin
-	result := '';
-	for i := 0 to List.Count - 1 do begin
-		if i = 0 then
-			result := List.Strings[0]
-		else
-			result := result + ';' + List.Strings[i];
-	end;
+	// Append by using formatstr
+	for I := 0 to sl.Count - 1 do
+		result := format(formatstr, [result, sl[i]]);
 end;
 
 function GetFileTyp(const FileName: AnsiString): TExUnitType;

@@ -30,7 +30,7 @@ uses
   Project, editor, DateUtils, compiler, ActnList, ToolFrm, AppEvnts,
   debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan,
-  CVSFrm, devShortcuts, debugreader, CommCtrl, devcfg;
+  CVSFrm, devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -901,8 +901,7 @@ type
     procedure GotoBreakpoint(const bfile: AnsiString; bline: integer);
     procedure RemoveActiveBreakpoints;
     procedure AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
-    procedure SetProjCompOpt(idx: integer; Value: char);
-    function CheckCompileOption(const option : AnsiString;var optionstructout : PCompilerOption;var optionindexout : integer) : boolean;
+    procedure SetCompilerOption(index : integer; value : char);
     function CloseEditor(index : integer): Boolean;
     procedure EditorSaveTimer(sender : TObject);
     procedure OnInputEvalReady(const evalvalue : AnsiString);
@@ -1631,7 +1630,7 @@ begin
 	fProject := TProject.Create(s, DEV_INTERNAL_OPEN);
 	if fProject.FileName <> '' then begin
 		fCompiler.Project:= fProject;
-		fCompiler.RunParams:=fProject.CmdLineArgs;
+		fCompiler.RunParams:=fProject.Options.CmdLineArgs;
 		fCompiler.Target:=ctProject;
 
 		dmMain.RemoveFromHistory(s);
@@ -2036,7 +2035,7 @@ begin
 
 					fProject:= TProject.Create(s, edProjectName.Text);
 					if not fProject.AssignTemplate(s, GetTemplate) then begin
-						fProject.Free;
+						FreeAndNil(fProject);
 						MessageBox(Application.Handle, PAnsiChar(Lang[ID_ERR_TEMPLATE]), PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
 						Exit;
 					end;
@@ -2189,7 +2188,7 @@ begin
 	devFileMonitor.Deactivate;
 
 	// save project layout anyway ;)
-	fProject.CmdLineArgs:=fCompiler.RunParams;
+	fProject.Options.CmdLineArgs:=fCompiler.RunParams;
 	fProject.SaveLayout;
 
 	// TODO: should we save watches?
@@ -2316,7 +2315,7 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then
+	if Assigned(e) then
 		e.Text.Undo;
 end;
 
@@ -2325,20 +2324,20 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then
+	if Assigned(e) then
 		e.Text.Redo;
 end;
 
 procedure TMainForm.actCutExecute(Sender: TObject);
 var
 	e: TEditor;
-	oldbottomline : integer;
+	oldtopline : integer;
 begin
 	e:= GetEditor;
 	if Assigned(e) then begin
-		oldbottomline := e.Text.TopLine + e.Text.LinesInWindow;
+		oldtopline := e.Text.TopLine;
 		e.Text.CutToClipboard;
-		if (e.Text.TopLine + e.Text.LinesInWindow) <> oldbottomline then
+		if e.Text.TopLine <> oldtopline then
 			e.Text.Repaint; // fix for repaint fail
 	end;
 end;
@@ -2696,7 +2695,7 @@ begin
 
 		// Add list of project files
 		for i := 0 to fProject.Units.Count - 1 do
-			UnitList.Items.Append(fProject.Units[i].FileName);
+			UnitList.Items.Add(fProject.Units[i].FileName);
 
 		ShowModal;
 	end;
@@ -2968,38 +2967,34 @@ procedure TMainForm.actDebugExecute(Sender: TObject);
 var
 	e: TEditor;
 	i: integer;
-	dirs : TStringList;
 	optD,optS : PCompilerOption;
-	debug,strip : boolean;
 	idxD,idxS : integer;
 	filepath : AnsiString;
+	debug, strip : boolean;
 begin
 
+	// Assume all is set up correctly
+	debug := true;
+	strip := false;
+
 	// Check if we enabled proper options
-	debug := CheckCompileOption('-g3',optD,idxD);
-	strip := CheckCompileOption('-s',optS,idxS);
+	if devCompiler.FindOption('-g3',optD,idxD) then
+		debug := optD^.Value > 0;
+	if devCompiler.FindOption('-s',optS,idxS) then
+		strip := optS^.Value > 0;
 
-	if not debug or strip then begin
-		if MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+	// Ask the user if he wants to enable debugging...
+	if (not debug or strip) and (MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
 
-			// ENABLE debugging
-			if Assigned(fProject) then
-				SetProjCompOpt(idxD, '1')
-			else
-				devCompiler.SetOption(optD,idxD,'1');
+		// Enable debugging, disable stripping
+		SetCompilerOption(idxD,'1');
+		SetCompilerOption(idxS,'0');
 
-			// DISABLE stripping
-			if Assigned(fProject) then
-				SetProjCompOpt(idxS, '0')
-			else
-				devCompiler.SetOption(optS,idxS,'0');
+		if not Assigned(fProject) then
+			devCompiler.SaveSet(devCompiler.CurrentSet);
 
-			if not Assigned(fProject) then
-				devCompiler.SaveSet(devCompiler.CurrentSet);
-
-			actRebuildExecute(nil);
-			Exit;
-		end;
+		actRebuildExecute(nil);
+		Exit;
 	end;
 
 	if Assigned(fProject) then begin
@@ -3059,24 +3054,17 @@ begin
 		end;
 	end;
 
-	dirs := TStringList.Create;
-
 	// Add library folders
-	StrtoList(devCompiler.LibDir,dirs,';');
-	for I := 0 to dirs.Count - 1 do
-		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
+	for I := 0 to devCompiler.LibDir.Count - 1 do
+		fDebugger.SendCommand('dir','"' + StringReplace(devCompiler.LibDir[i],'\','/',[rfReplaceAll]) + '"');
 
 	// Add include folders
-	StrtoList(devCompiler.CDir,dirs,';');
-	for I := 0 to dirs.Count - 1 do
-		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
+	for I := 0 to devCompiler.CDir.Count - 1 do
+		fDebugger.SendCommand('dir','"' + StringReplace(devCompiler.CDir[i],'\','/',[rfReplaceAll]) + '"');
 
 	// Add more include folders, duplicates will be added/moved to front of list
-	StrtoList(devCompiler.CppDir,dirs,';');
-	for I := 0 to dirs.Count - 1 do
-		fDebugger.SendCommand('dir','"' + StringReplace(dirs[i],'\','/',[rfReplaceAll]) + '"');
-
-	dirs.Free;
+	for I := 0 to devCompiler.CppDir.Count - 1 do
+		fDebugger.SendCommand('dir','"' + StringReplace(devCompiler.CppDir[i],'\','/',[rfReplaceAll]) + '"');
 
 	// Add breakpoints and watch vars
 	for i := 0 to fDebugger.WatchVarList.Count - 1 do
@@ -3759,7 +3747,6 @@ end;
 
 procedure TMainForm.InitClassBrowser(ReloadCache: boolean);
 var
-	sl: TStringList;
 	I: integer;
 begin
 	CppParser.Enabled := devCodeCompletion.Enabled;
@@ -3771,17 +3758,10 @@ begin
 	CppParser.OnTotalProgress := CppParserTotalProgress;
 
 	// Add the include dirs to the parser
-	sl := TStringList.Create;
-
-	StrToList(devCompiler.CDir,sl,';');
-	for I := 0 to sl.Count - 1 do
-		CppParser.AddIncludePath(sl[I]);
-
-	StrToList(devCompiler.CppDir,sl,';');
-	for I := 0 to sl.Count - 1 do
-		CppParser.AddIncludePath(sl[I]);
-
-	sl.Free;
+	for I := 0 to devCompiler.CDir.Count - 1 do
+		CppParser.AddIncludePath(devCompiler.CDir[I]);
+	for I := 0 to devCompiler.CppDir.Count - 1 do
+		CppParser.AddIncludePath(devCompiler.CppDir[I]);
 
 	// This takes up about 99% of our time
 	if devCodeCompletion.UseCacheFiles and ReloadCache then begin
@@ -4091,7 +4071,7 @@ end;
 
 procedure TMainForm.actProgramResetUpdate(Sender: TObject);
 begin
-	if Assigned(fProject) then // TODO: make one boolean statement
+	if Assigned(fProject) then
 		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and devExecutor.Running
 	else
 		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and devExecutor.Running;
@@ -4387,30 +4367,26 @@ var
 	e : TEditor;
 begin
 
-	prof := CheckCompileOption('-pg',optP,idxP);
-	strp := CheckCompileOption('-s',optS,idxS);
+	// Assume all is set up correctly
+	prof := true;
+	strp := false;
 
-	if not prof or strp then begin
-		if MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+	if devCompiler.FindOption('-pg',optP,idxP) then
+		prof := optP^.Value > 0;
+	if devCompiler.FindOption('-s',optS,idxS) then
+		strp := optS^.Value > 0;
 
-			// ENABLE profiling
-			if Assigned(fProject) then
-				SetProjCompOpt(idxP,'1')
-			else
-				devCompiler.SetOption(optP,idxP,'1');
+	if (not prof or strp) and (MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
 
-			// DISABLE stripping
-			if Assigned(fProject) then
-				SetProjCompOpt(idxS,'0')
-			else
-				devCompiler.SetOption(optS,idxS,'0');
+		// Enable profiling, disable stripping
+		SetCompilerOption(idxP,'1');
+		SetCompilerOption(idxS,'0');
 
-			if not Assigned(fProject) then
-				devCompiler.SaveSet(devCompiler.CurrentSet);
+		if not Assigned(fProject) then
+			devCompiler.SaveSet(devCompiler.CurrentSet);
 
-			actRebuildExecute(nil);
-			Exit;
-		end;
+		actRebuildExecute(nil);
+		Exit;
 	end;
 
 	// If we're done setting up options, check if there's profiling data already
@@ -4707,7 +4683,6 @@ end;
 
 procedure TMainForm.CheckForDLLProfiling;
 var
-	opts: TProjOptions;
 	opt: PCompilerOption;
 	idx: integer;
 begin
@@ -4718,24 +4693,23 @@ begin
 	if not devCompiler.FindOption('-pg', opt, idx) then
 		Exit;
 
-	if (fProject.Options.typ in [dptDyn, dptStat]) and (opt.optValue > 0) then begin
+	if (fProject.Options.typ in [dptDyn, dptStat]) and (opt.Value > 0) then begin
 		// project is a lib or a dll, and profiling is enabled
 		// check for the existence of "-lgmon" in project's linker options
-		if Pos('-lgmon', fProject.Options.cmdLines.Linker) = 0 then
+		if Pos('-lgmon', fProject.Options.LinkerCmd) = 0 then begin
 			// does not have -lgmon
 			// warn the user that we should update its project options and include
 			// -lgmon in linker options, or else the compilation will fail
 			if MessageDlg('You have profiling enabled in Compiler Options and you are '+
-			'working on a dynamic or static library. Do you want to add a special '+
-			'linker option in your project to allow compilation with profiling enabled? '+
-			'If you choose No, and you do not disable profiling from the Compiler Options '+
-			'chances are that your library''s compilation will fail...', mtConfirmation,
-			[mbYes, mbNo], 0)=mrYes then begin
-				opts:=fProject.Options;
-				opts.cmdLines.Linker:=fProject.Options.cmdLines.Linker+' -lgmon';
-				fProject.Options:=opts;
+			    'working on a dynamic or static library. Do you want to add a special '+
+			    'linker option in your project to allow compilation with profiling enabled? '+
+			    'If you choose No, and you do not disable profiling from the Compiler Options '+
+			    'chances are that your library''s compilation will fail...', mtConfirmation,[mbYes, mbNo], 0) = mrYes
+			then begin
+				fProject.Options.LinkerCmd := fProject.Options.LinkerCmd + ' -lgmon';
 				fProject.Modified:=True;
 			end;
+		end;
 	end;
 end;
 
@@ -4756,8 +4730,7 @@ begin
 	end;
 end;
 
-procedure TMainForm.DevCppDDEServerExecuteMacro(Sender: TObject;
-	Msg: TStrings);
+procedure TMainForm.DevCppDDEServerExecuteMacro(Sender: TObject;Msg: TStrings);
 var
 	filename: AnsiString;
 	i, n: Integer;
@@ -4922,8 +4895,7 @@ begin
 	end;
 end;
 
-procedure TMainForm.ProjectViewKeyDown(Sender: TObject; var Key: Word;
-	Shift: TShiftState);
+procedure TMainForm.ProjectViewKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 begin
 	if (Key=VK_DELETE) and Assigned(ProjectView.Selected) then
 		RemoveItem(ProjectView.Selected)
@@ -5250,38 +5222,12 @@ begin
 	end;
 end;
 
-function TMainForm.CheckCompileOption(const option : AnsiString;var optionstructout : PCompilerOption;var optionindexout : integer) : boolean;
+procedure TMainForm.SetCompilerOption(index : integer; value : char);
 begin
-	Result := false;
-
-	// Try to find the value in the predefined list
-	if devCompiler.FindOption(option, optionstructout, optionindexout) then begin // the option exists...
-
-		// Search project options...
-		if Assigned(fProject) then begin
-			if fProject.Options.CompilerOptions[optionindexout + 1] <> '0' then
-				Result := true;
-		end else begin
-			Result := optionstructout^.optValue > 0;
-		end;
-	end;
-end;
-
-procedure TMainForm.SetProjCompOpt(idx: integer; Value: char);
-var
-	OptionsCopy : TProjOptions;
-begin
-	if Assigned(fProject) then begin
-
-		// todo: obtain pointer instead of copy
-		OptionsCopy := fProject.Options;
-
-		if OptionsCopy.CompilerOptions[idx+1] <> Value then begin
-			OptionsCopy.CompilerOptions[idx+1] := Value;
-			fProject.Modified := true;
-			fProject.Options := OptionsCopy;
-		end;
-	end;
+	if Assigned(fProject) then
+		fProject.SetCompilerOption(index, '1')
+	else
+		devCompiler.SetOption(index,'1');
 end;
 
 procedure TMainForm.SetupProjectView;
@@ -5979,11 +5925,6 @@ begin
 	MessageControl.Height:=devData.OutputHeight;
 	fPreviousHeight:= MessageControl.Height;
 
-	// Create icon themes
-	devImageThemes := TDevImageThemeFactory.Create;
-	devImageThemes.LoadFromDirectory(devDirs.Themes);
-	LoadTheme;
-
 	// Custom tools
 	fTools:= TToolController.Create;
 	with fTools do begin
@@ -6041,6 +5982,15 @@ begin
 
 	SetupProjectView;
 
+	UpdateSplash('Loading icons...');
+
+	// Create icon themes
+	devImageThemes := TDevImageThemeFactory.Create;
+	devImageThemes.LoadFromDirectory(devDirs.Themes);
+	LoadTheme;
+
+	UpdateSplash('Loading translation...');
+
 	// Set languages and other first time stuff
 	if devData.First or (devData.Language = '') then begin
 		Lang.SelectLanguage; // Open LangFrm, does much more than changing language
@@ -6051,7 +6001,6 @@ begin
 	// Load bookmarks, captions and hints
 	LoadText;
 
-	// Initialize class browser (takes much longer than all the other stuff above)
 	UpdateSplash('Initializing class browser...');
 
 	InitClassBrowser(true);

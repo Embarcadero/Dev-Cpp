@@ -45,7 +45,6 @@ function ParseMacros(Str: AnsiString): AnsiString;
 var
   e: TEditor;
   Dir: AnsiString;
-  StrList: TStringList;
 begin
   Result := Str;
   e := MainForm.GetEditor;
@@ -57,26 +56,19 @@ begin
   Replace(Result, '<DATE>', DateToStr(Now));
   Replace(Result, '<DATETIME>', DateTimeToStr(Now));
 
-  Dir := ExtractFilePath(ParamStr(0)) + '\include';
-  if (not DirectoryExists(Dir)) and (devCompiler.CppDir <> '') then
-  begin
-      StrList := TStringList.Create;
-      StrToList(devCompiler.CppDir, StrList);
-      Dir := StrList.Strings[0];
-      StrList.Free;
-  end;
-  Replace(Result, '<INCLUDE>', Dir);
+	// Only provide the first cpp dir
+	if devCompiler.CppDir.Count > 0 then
+		Dir := devCompiler.CppDir[0]
+	else
+		Dir := ExtractFilePath(ParamStr(0)) + '\include';
+	Replace(Result, '<INCLUDE>', Dir);
 
-  Dir := ExtractFilePath(ParamStr(0)) + '\lib';
-  if (not DirectoryExists(Dir)) and (devCompiler.LibDir <> '') then
-  begin
-      StrList := TStringList.Create;
-      StrToList(devCompiler.LibDir, StrList);
-      Dir := StrList.Strings[0];
-      StrList.Free;
-  end;
-  Replace(Result, '<LIB>', Dir);
-
+	// Only provide the first lib dir
+	if devCompiler.LibDir.Count > 0 then
+		Dir := devCompiler.LibDir[0]
+	else
+		Dir := ExtractFilePath(ParamStr(0)) + '\lib';
+	Replace(Result, '<LIB>', Dir);
 
   { Project-dependent macros }
   if Assigned(MainForm.fProject) then
