@@ -387,7 +387,6 @@ begin
 		PixelFormat := pf24Bit;
 		Width := Screen.Width; // worst case hintwidth
 		Height := 32;
-		Canvas.Font := Screen.HintFont;
 	end;
 
 	FToolTips := TStringList.Create;
@@ -667,6 +666,8 @@ var
 		FLookupEditor.GetHighlighterAttriAtRowCol(FLookupEditor.CaretXY, StrToken, HLAttr);
 
 		with FBmp.Canvas do begin
+			Font.Name := 'Courier New';
+			Font.Size := 10;
 			Brush.Style := bsClear;
 			Font.Color := clCaptionText;
 
@@ -675,7 +676,7 @@ var
 			if CurrentParam then begin
 				Font.Style := [fsBold];
 				if (ttoCurrentArgumentBlackOnly in FOptions) then
-					Font.Color := clBlack;
+					Font.Color := clRed;
 			end else if AnsiPos('(',FLookupEditor.Text) > Index then
 				Font.Style := HLAttr.Style
 			else
@@ -689,60 +690,55 @@ var
 	end;
 begin
 
-  BracePos := AnsiPos('(', Caption);
-  if BracePos > 0 then
-  begin
+	BracePos := AnsiPos('(', Caption);
+	if BracePos > 0 then begin
 
-    CurParam := 0;  
-    WidthParam := 4; // left start position in pixels
-      
-    // clear the backbuffer
-    with FBmp.Canvas do
-    begin    
-      Brush.Color := Self.Color; 
-      FillRect(ClientRect); 
-    end;
+		CurParam := 0;
+		WidthParam := 4; // left start position in pixels
 
-    // when more than one tooltip is in the list
-    // we must draw the buttons as well ...
-    if FToolTips.Count > 1 then
-    begin
-      // paint the UP button
-      FUpButton.Paint(FBmp.Canvas);
-      Inc(WidthParam, FUpButton.Left + FUpButton.Width);
+		// clear the backbuffer
+		with FBmp.Canvas do begin
+			Brush.Color := Self.Color;
+			FillRect(ClientRect);
+		end;
 
-      // output text between the buttons
-      FBmp.Canvas.Font.Style := [];
-      S := Format(SCodeToolTipIndexXOfX, [FSelIndex+1, FToolTips.Count]);
-      FBmp.Canvas.TextOut(WidthParam, 1, S);
-      Inc(WidthParam, FBmp.Canvas.TextWidth(S)+3);
+		// when more than one tooltip is in the list
+		// we must draw the buttons as well ...
+		if FToolTips.Count > 1 then begin
+			// paint the UP button
+			FUpButton.Paint(FBmp.Canvas);
+			Inc(WidthParam, FUpButton.Left + FUpButton.Width);
 
-      // paint the DOWN button
-      FDownButton.Paint(FBmp.Canvas);
-      FDownButton.Left := WidthParam;
-      Inc(WidthParam, 3 + FDownButton.Width+FUpButton.Left);
-    end;
-  
+			// output text between the buttons
+			FBmp.Canvas.Font.Style := [];
+			S := Format(SCodeToolTipIndexXOfX, [FSelIndex+1, FToolTips.Count]);
+			FBmp.Canvas.TextOut(WidthParam, 1, S);
+			Inc(WidthParam, FBmp.Canvas.TextWidth(S)+3);
 
-    // now loop through the hint and draw each letter
-    for i := 1 to Length(Caption) do
-    begin
-      CurChar := Caption[I];
-      
-      // if the current char is one of our delimiters
-      // we must increase the CurParam variable which indicates
-      // at which comma index our cursor is.
-      if AnsiPos(CurChar, FDelimiters) > 0 then
-        Inc(CurParam);
+			// paint the DOWN button
+			FDownButton.Paint(FBmp.Canvas);
+			FDownButton.Left := WidthParam;
+			Inc(WidthParam, 3 + FDownButton.Width+FUpButton.Left);
+		end;
 
-      if (CurParam = FCurParamIndex) and (AnsiPos(CurChar, FDelimiters)=0) and (I > BracePos) and (CurChar <> ')') and (CurChar <> ' ') then
-        DrawParamLetterEx(I, True) // at current comma index
-      else
-        DrawParamLetterEx(I); // normal
-    end;
-  end;
+		// now loop through the hint and draw each letter
+		for i := 1 to Length(Caption)-1 do begin
+			CurChar := Caption[I];
 
-  Result := WidthParam+6;
+			// if the current char is one of our delimiters
+			// we must increase the CurParam variable which indicates
+			// at which comma index our cursor is.
+			if AnsiPos(CurChar, FDelimiters) > 0 then
+				Inc(CurParam);
+
+			if (CurParam = FCurParamIndex) and (AnsiPos(CurChar, FDelimiters)=0) and (I > BracePos) and (CurChar <> ')') and (CurChar <> ' ') then
+				DrawParamLetterEx(I, True) // at current comma index
+			else
+				DrawParamLetterEx(I); // normal
+		end;
+	end;
+
+	Result := WidthParam+4;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------

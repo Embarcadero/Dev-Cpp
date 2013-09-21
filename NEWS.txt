@@ -16,6 +16,8 @@ Version 5.0.0.5 - * Oktober 2011
 - Dev can now automatically log compiler messages to disk (the option can be found in Project Options >> Build Options).
 - The obj output directory now does not get created in the wrong 'current directory' in rare cases.
 - Dependency checking and compile delays are now saved, and on a per-compiler basis.
+- Restyled the editor tooltip balloon.
+- The editor hints option now properly disables hints.
 
 Version 5.0.0.4 - 25 September 2011
 
@@ -170,7 +172,7 @@ Version 4.9.9.3 - 24 Juni 2011
 - Removed the [Compiler] section from the ini file. Instead of saving the current Compiler Set twice, it saves a Compiler index to refer to.
 - And some more stuff I forgot about.
 
-#########################################################################################
+#########################################################################################################################################################
 
 Version 4.9.9.2
 * Changes unknown to mankind

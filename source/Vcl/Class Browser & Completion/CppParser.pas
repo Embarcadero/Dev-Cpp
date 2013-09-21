@@ -1682,64 +1682,63 @@ end;
 
 procedure TCppParser.Reset(KeepLoaded: boolean = True);
 var
-  I: integer;
-  I1: integer;
-  s : PStatement;
-  p: Pointer;
+	I: integer;
+	I1: integer;
+	s : PStatement;
+	p: Pointer;
 begin
-  if Assigned(fOnBusy) then
-    fOnBusy(Self);
-  ClearOutstandingTypedefs;
-  fFilesToScan.Clear;
-  if Assigned(fTokenizer) then
-    fTokenizer.Reset;
+	if Assigned(fOnBusy) then
+		fOnBusy(Self);
+	ClearOutstandingTypedefs;
+	fFilesToScan.Clear;
+	if Assigned(fTokenizer) then
+		fTokenizer.Reset;
 
-  if Assigned(fOnStartParsing) then
-    fOnStartParsing(Self);
+	if Assigned(fOnStartParsing) then
+		fOnStartParsing(Self);
 
-  if KeepLoaded then
-    I := fBaseIndex
-  else
-    I := 0;
-  while I < fStatementList.Count do begin
-    s := PStatement(fStatementList[I]);
-    if not KeepLoaded or (KeepLoaded and not s^._Loaded) then begin
-      I1 := fScannedFiles.IndexOf(s^._Filename);
-      if I1 = -1 then
-        I1 := fScannedFiles.IndexOf(s^._DeclImplFileName);
-      if I1 <> -1 then
-        fScannedFiles.Delete(I1);
-      I1 := fCacheContents.IndexOf(s^._Filename);
-      if I1 = -1 then
-        I1 := fCacheContents.IndexOf(s^._DeclImplFileName);
-      if I1 <> -1 then
-        fCacheContents.Delete(I1);
-      Dispose(s);
-      fStatementList.Delete(I);
-    end
+	if KeepLoaded then
+		I := fBaseIndex
 	else
-      Inc(I);
-  end;
-  fStatementList.Pack;
+		I := 0;
+	while I < fStatementList.Count do begin
+		s := PStatement(fStatementList[I]);
+		if not KeepLoaded or (KeepLoaded and not s^._Loaded) then begin
+			I1 := fScannedFiles.IndexOf(s^._Filename);
+			if I1 = -1 then
+				I1 := fScannedFiles.IndexOf(s^._DeclImplFileName);
+			if I1 <> -1 then
+				fScannedFiles.Delete(I1);
+			I1 := fCacheContents.IndexOf(s^._Filename);
+			if I1 = -1 then
+				I1 := fCacheContents.IndexOf(s^._DeclImplFileName);
+			if I1 <> -1 then
+				fCacheContents.Delete(I1);
+			Dispose(s);
+			fStatementList.Delete(I);
+		end else
+			Inc(I);
+	end;
+	fStatementList.Pack;
 
-  if not KeepLoaded then begin
-    while fIncludesList.Count > 0 do begin
-	  p := fIncludesList[fIncludesList.Count - 1];
-      if p <> nil then
-        Dispose(PIncludesRec(p));
-      fIncludesList.Delete(fIncludesList.Count - 1);
-    end;
-    fNextID := 0;
-    fBaseIndex := 0;
-  end;
+	if not KeepLoaded then begin
+		while fIncludesList.Count > 0 do begin
+			p := fIncludesList[fIncludesList.Count - 1];
+			if p <> nil then
+				Dispose(PIncludesRec(p));
+			fIncludesList.Delete(fIncludesList.Count - 1);
+		end;
+		fNextID := 0;
+		fBaseIndex := 0;
+	end;
 
-  fProjectFiles.Clear;
+	fProjectFiles.Clear;
 
-  if Assigned(fOnEndParsing) then
-    fOnEndParsing(Self);
+	if Assigned(fOnEndParsing) then
+		fOnEndParsing(Self);
 
-  if Assigned(fOnUpdate) then
-    fOnUpdate(Self);
+	if Assigned(fOnUpdate) then
+		fOnUpdate(Self);
 end;
 
 procedure TCppParser.Parse(FileName: TFileName);
@@ -2115,7 +2114,7 @@ var
   hFile: integer;
   I, I2, HowMany: integer;
   MAGIC: array[0..7] of Char;
-  P: array[0..4095] of Char;
+  P: array[0..8191] of Char;
 begin
   MAGIC := 'CPPP 0.1';
   fCacheContents.Assign(fScannedFiles);
@@ -2130,14 +2129,14 @@ begin
     FileWrite(hFile, HowMany, SizeOf(Integer));
     for I := 0 to fStatementList.Count - 1 do begin
       with PStatement(fStatementList[I])^ do begin
-        {if Length(_FullText) > SizeOf(P) then begin
+       { if Length(_FullText) > SizeOf(P) then begin
           tmp := FileSeek(hFile, 0, 1);  // retrieve currrent pos
           FileSeek(hFile, SizeOf(Magic), 0); // seek to the number of statements
           HowMany := HowMany - 1;
           FileWrite(hFile, HowMany, SizeOf(Integer)); // write new number of statements
           FileSeek(hFile, tmp, 0); // seek to original offset
           Continue;
-        end;}
+        end;   }
         FileWrite(hFile, _ID, SizeOf(integer));
         FileWrite(hFile, _ParentID, SizeOf(integer));
         FileWrite(hFile, _Kind, SizeOf(byte));

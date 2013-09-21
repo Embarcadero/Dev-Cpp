@@ -959,7 +959,7 @@ uses
 	NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
 	ProfileAnalysisFm, debugwait, FilePropertiesFm, AddToDoFm, ViewToDoFm,
 	ImportMSVCFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
-	WindowListFrm, ParamsFrm, WebUpdate, ProcessListFrm, ModifyVarFrm;
+	WindowListFrm, ParamsFrm, WebUpdate, ProcessListFrm, ModifyVarFrm, SynEditHighlighter;
 {$ENDIF}
 {$IFDEF LINUX}
 	Xlib, IniFiles, QClipbrd, MultiLangSupport, version,
@@ -1773,108 +1773,97 @@ var
 begin
 	Result := True;
 	idx:= -1;
-	if assigned(fProject) then
-	 begin
-		 if e.FileName = '' then
+	if assigned(fProject) then begin
+		if e.FileName = '' then
 			idx:= fProject.GetUnitFromString(e.TabSheet.Caption)
-		 else
+		else
 			idx:= fProject.Units.Indexof(e.FileName);
-		 if fProject.Options.UseGPP then
-			begin
-				BuildFilter(flt, [FLT_CPPS, FLT_CS, FLT_HEADS]);
-				dext:= CPP_EXT;
-				CFilter := 3;
-				CppFilter := 2;
-				HFilter := 4;
-			end
-		 else
-			begin
-				BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_HEADS]);
-				dext:= C_EXT;
-				CFilter := 2;
-				CppFilter := 3;
-				HFilter := 4;
-			end;
-		 if e.IsRes then
-			begin
-				BuildFilter(flt, [FLT_RES]);
-				dext:= RC_EXT;
-				CFilter := 2;
-				CppFilter := 2;
-				HFilter := 2;
-			end;
-	 end
-	else
-	 begin
-		 BuildFilter(flt, ftAll);
-		 if e.IsRes then
-			dext:= RC_EXT
-		 else
+		if fProject.Options.UseGPP then begin
+			BuildFilter(flt, [FLT_CPPS, FLT_CS, FLT_HEADS]);
 			dext:= CPP_EXT;
-		 CFilter := 5;
-		 CppFilter := 6;
-		 HFilter := 3;
-	 end;
+			CFilter := 3;
+			CppFilter := 2;
+			HFilter := 4;
+		end else begin
+			BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_HEADS]);
+			dext:= C_EXT;
+			CFilter := 2;
+			CppFilter := 3;
+			HFilter := 4;
+		end;
+		if e.IsRes then begin
+			BuildFilter(flt, [FLT_RES]);
+			dext:= RC_EXT;
+			CFilter := 2;
+			CppFilter := 2;
+			HFilter := 2;
+		end;
+	end else begin
+		BuildFilter(flt, ftAll);
+		if e.IsRes then
+			dext:= RC_EXT
+		else
+			dext:= CPP_EXT;
+		CFilter := 5;
+		CppFilter := 6;
+		HFilter := 3;
+	end;
 
 	if e.FileName = '' then
-	 s:= e.TabSheet.Caption
+		s:= e.TabSheet.Caption
 	else
-	 s:= e.FileName;
+		s:= e.FileName;
 
-	with dmMain.SaveDialog do
-	 begin
-		 Title:= Lang[ID_NV_SAVEFILE];
-		 Filter:= flt;
+	with dmMain.SaveDialog do begin
+		Title:= Lang[ID_NV_SAVEFILE];
+		Filter:= flt;
 
-		 // select appropriate filter
-		 if (CompareText(ExtractFileExt(s), '.h') = 0) or
-			 (CompareText(ExtractFileExt(s), '.hpp') = 0) or
-			 (CompareText(ExtractFileExt(s), '.hh') = 0) then
-		 begin
-				 FilterIndex := HFilter;
-		 end else
-		 begin
-				 if Assigned(fProject) then
-						 if fProject.Options.useGPP then
-								 FilterIndex := CppFilter
-						 else
-								 FilterIndex := CFilter
-				 else
-						 FilterIndex := CppFilter;
-		 end;
+		// select appropriate filter
+		if (CompareText(ExtractFileExt(s), '.h')   = 0) or
+		   (CompareText(ExtractFileExt(s), '.hpp') = 0) or
+		   (CompareText(ExtractFileExt(s), '.hh')  = 0) then begin
+			 FilterIndex := HFilter;
+		end else begin
+			if Assigned(fProject) then
+				if fProject.Options.useGPP then
+					FilterIndex := CppFilter
+				else
+					FilterIndex := CFilter
+			else
+				FilterIndex := CppFilter;
+		end;
 
-		 FileName:= s;
-		 s:= ExtractFilePath(s);
-		 if (s <> '') or not Assigned(fProject) then
+		FileName:= s;
+		s:= ExtractFilePath(s);
+		if (s <> '') or not Assigned(fProject) then
 			InitialDir:= s
-		 else
-			 InitialDir:=fProject.Directory;
-		 if Execute then
-		 begin
-				s:= FileName;
-				if FileExists(s) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrNo) then
-					exit;
+		else
+			InitialDir:=fProject.Directory;
+		if Execute then begin
+			s:= FileName;
+			if FileExists(s) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrNo) then
+				exit;
 
 				e.FileName := s;
 
 				try
-					 if devEditor.AppendNewline then
-						 with e.Text do
-							 if Lines.Count > 0 then
-								 if Lines[Lines.Count -1] <> '' then
-									 Lines.Add('');
-					 e.Text.Lines.SaveToFile(s);
-					 e.Modified := FALSE;
-					 e.New:= FALSE;
+					if devEditor.AppendNewline then
+						with e.Text do
+							if Lines.Count > 0 then
+								if Lines[Lines.Count -1] <> '' then
+									Lines.Add('');
+					e.Text.Lines.SaveToFile(s);
+					e.Modified := FALSE;
+					e.New:= FALSE;
 				except
-					 MessageDlg(Lang[ID_ERR_SAVEFILE] +' "' +s +'"', mtError, [mbOk], 0);
-					 Result := False;
+					MessageDlg(Lang[ID_ERR_SAVEFILE] +' "' +s +'"', mtError, [mbOk], 0);
+					Result := False;
 				end;
 
 				if assigned(fProject) then
-				 fProject.SaveUnitAs(idx, e.FileName)
+					fProject.SaveUnitAs(idx, e.FileName)
 				else
-				 e.TabSheet.Caption:= ExtractFileName(e.FileName);
+					e.TabSheet.Caption:= ExtractFileName(e.FileName);
 
 				if ClassBrowser1.Enabled then begin
 					CppParser1.AddFileToScan(e.FileName); //new cc
@@ -1905,7 +1894,7 @@ begin
 	wa:=devFileMonitor1.Active;
 	devFileMonitor1.Deactivate;
 
-	if (not e.new) and e.Modified then begin // not new but in project (relative path in e.filename)
+	if {(not e.new) and }e.Modified then begin // not new but in project (relative path in e.filename)
 		if Assigned(fProject) and (e.InProject) then begin
 			try
 				idx:= fProject.GetUnitFromEditor(e);
@@ -1919,12 +1908,11 @@ begin
 				Exit;
 			end;
 			try
-				if idx <> -1 then
-					if ClassBrowser1.Enabled then begin
-						CppParser1.ReParseFile(fProject.units[idx].FileName, True); //new cc
-						if e.TabSheet=PageControl.ActivePage then
-							ClassBrowser1.CurrentFile:=fProject.units[idx].FileName;
-					end;
+				if (idx <> -1) and ClassBrowser1.Enabled then begin
+					CppParser1.ReParseFile(fProject.units[idx].FileName, True); //new cc
+				//	if e.TabSheet=PageControl.ActivePage then
+				//		ClassBrowser1.CurrentFile:=fProject.units[idx].FileName;
+				end;
 			except
 				MessageDlg(Format('Error reparsing file %s', [e.FileName]), mtError, [mbOk], 0);
 				Result := False;
@@ -1940,8 +1928,8 @@ begin
 				e.Modified := false;
 				if ClassBrowser1.Enabled then begin
 					CppParser1.ReParseFile(e.FileName, False); //new cc
-					if e.TabSheet=PageControl.ActivePage then
-						ClassBrowser1.CurrentFile:=e.FileName;
+				//	if e.TabSheet=PageControl.ActivePage then
+				//		ClassBrowser1.CurrentFile:=e.FileName;
 				end;
 //				CppParser1.AddFileToScan(e.FileName);
 //				CppParser1.ParseList;
@@ -5117,8 +5105,7 @@ begin
 	end;
 end;
 
-procedure TMainForm.devFileMonitor1NotifyChange(Sender: TObject;
-	ChangeType: TdevMonitorChangeType; Filename: String);
+procedure TMainForm.devFileMonitor1NotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: String);
 var
 	e: TEditor;
 	p : TBufferCoord;
@@ -6359,9 +6346,7 @@ begin
 	CurrentEditor := GetEditor(PageControl.ActivePageIndex);
 
 	if Assigned(CurrentEditor) and Assigned(CurrentEditor.CodeToolTip) then
-	begin
 		CurrentEditor.CodeToolTip.ReleaseHandle;
-	end;
 end;
 
 
@@ -6395,7 +6380,7 @@ begin
 		if FileExists(path) then
 			DeleteFile(path)
 		else
-			MessageBox(Application.handle,PChar('Could not find profiling file '+ path + '!'),PChar('Error'),MB_ICONERROR);
+			MessageBox(Application.handle,PChar('Could not find profiling file ' + path + '!'),PChar('Error'),MB_ICONERROR);
 end;
 
 function TMainForm.findstatement(var localfind : string; var localfindpoint : TPoint;mousecursor : boolean) : PStatement;
@@ -6403,6 +6388,8 @@ var
 	e : TEditor;
 	I : integer;
 	member,parent : string;
+	cursorpos : TBufferCoord;
+	P : TPoint;
 	// Class getten
 	len,len2 : integer;
 	cpos : integer;
@@ -6418,16 +6405,26 @@ var
 	comparewith : string;
 	// globals
 	isglobal : boolean;
+	text : string;
+	wantbrace : integer;
+	wantquote : boolean;
 begin
 	Result := nil;
 
 	e:=GetEditor;
 
-	// False == mouse, rue == cursor
-	if mousecursor = false then
-		member := e.Text.WordAtMouse
-	else
+	// False == mouse, true == cursor
+	if mousecursor = false then begin
+		member := e.Text.WordAtMouse;
+
+		GetCursorPos(P);
+		P:=e.Text.ScreenToClient(P);
+		cursorpos.Char := e.Text.PixelsToRowColumn(P.X,P.Y).Column;
+		cursorpos.Line := e.Text.PixelsToRowColumn(P.X,P.Y).Row;
+	end else begin
 		member := e.GetWordAtCursor;
+		cursorpos := e.Text.CaretXY;
+	end;
 
 	if member <> '' then begin
 
@@ -6482,7 +6479,7 @@ begin
 		end else begin
 
 			// Als we een losse variabele aanklikken, kijken of we in clasbody zitten
-			for I:=e.Text.CaretY-1 downto 0 do begin
+			for I:=cursorpos.Line-1 downto 0 do begin
 				len:=2;
 				if AnsiStartsStr('class ',TrimLeft(e.Text.Lines[I])) then begin
 					classdefline := TrimLeft(e.Text.Lines[I]);
@@ -6496,12 +6493,13 @@ begin
 			end;
 		end;
 
-		// Als we nog niet hebben uitgevonden waar 'ie bijhoort, kijken of hij in class staat
+		// Als we nog niet hebben uitgevonden waar 'ie bijhoort, bekijk waar de functie waar we inzitten bijhoort
 		if isglobal then begin
-			for I:=e.Text.CaretY-2 downto 0 do begin
-				// We zitten in de class of functie BEZIG
-				cpos := Pos('::',e.Text.Lines[I]);// de class uit
+			for I:=cursorpos.Line downto 0 do begin
+				cpos := AnsiPos('::',e.Text.Lines[I]); // de functiebody uit
 				if cpos > 0 then begin
+
+					// We zitten in een functie
 					len := 0;
 					repeat
 						Inc(len);
@@ -6565,13 +6563,56 @@ begin
 			end;
 		end;
 
+		// Als we uiteindelijk nog steeds niks hebben gevonden, scan de functie voor locals
+		if (classline <> '') and (classlinenr <> 0) and (isglobal) then begin
+			cpos := e.Text.RowColToCharIndex(cursorpos);
+			apos := e.Text.RowColToCharIndex(BufferCoord(0,classlinenr+1));
+			text := Copy(e.Text.Lines.GetText,apos,cpos-apos);
+			wantbrace := 0;
+			wantquote := false;
+			if Length(text) > 1 then begin
+				for I:=Length(text) downto 0 do begin
+
+					// Skip strings
+					if text[I] = '"' then begin
+						wantquote := not wantquote;
+					end;
+					if wantquote then continue;
+
+					// Skip forbidden scopes
+					if text[I] = '}' then begin
+						Inc(wantbrace);
+					end else if text[I] = '{' then begin
+						if wantbrace > 0 then
+							Dec(wantbrace);
+					end;
+					if not (wantbrace = 0) then continue;
+
+					parampos := AnsiPos(#9 + member,text);
+					if parampos = 0 then parampos := AnsiPos(' ' + member,text);
+					if parampos = I then begin
+						len := 0;
+						repeat
+							Inc(len);
+						until not (text[I-len] in [#65..#90,#97..#122]);
+						if len > 2 then begin
+							localfind := Trim(Copy(text,parampos+1-len,Length(member)+len));
+							localfindpoint.x := e.Text.CharIndexToRowCol(I+apos).Char-1;
+							localfindpoint.y := e.Text.CharIndexToRowCol(I+apos).Line;
+							Exit;
+						end;
+					end;
+				end;
+			end;
+		end;
+
 		// Assembleer de uiteindelijke naam, volledig deze keer
 		if (parent <> '') and (parent <> member) and not isglobal then
 			comparewith := parent + '::' + member
 		else
 			comparewith := member;
 
-		// Nu gaan we de database doorlopen
+		// Nu gaan we de database doorlopen (omdat er local niks gevonden is)
 		for I:=0 to CppParser1.Statements.Count-1 do begin
 			// Als we een global zien, niet class ervoor (zou '::global' geven)
 			if (PStatement(CppParser1.Statements[I])^._ParentID = -1) then begin
@@ -6594,7 +6635,7 @@ begin
 
 			if AnsiCompareStr(compareto,comparewith)=0 then begin
 				Result := PStatement(CppParser1.Statements[I]);
-				break;
+				Break;
 			end;
 		end;
 	end;
@@ -6611,13 +6652,19 @@ var
 	line : integer;
 
 	e : TEditor;
+	s : string;
+	attr : TSynHighlighterAttributes;
 begin
+	e:=GetEditor;
+	if e.Text.GetHighlighterAttriAtRowCol(e.Text.CaretXY, s, attr) then
+		if (attr = e.Text.Highlighter.StringAttribute) or (attr = e.Text.Highlighter.CommentAttribute) then
+			Exit;
+
 	if Sender.ClassName = 'TEditor' then
 		statement:=findstatement(localfind,localfindpoint,false)
 	else
 		statement:=findstatement(localfind,localfindpoint,true);
 
-	e:=GetEditor;
 	if localfind <> '' then begin
 		e.Text.CaretXY:=BufferCoord(localfindpoint.x,localfindpoint.y);
 	end else if Assigned(statement) then begin
@@ -6647,6 +6694,9 @@ begin
 		end;
 	end else
 		SetDone('Could not find declaration...');
+
+	e.Text.BlockBegin := e.Text.CaretXY;
+	e.Text.BlockEnd   := e.Text.BlockBegin;
 end;
 
 procedure TMainForm.actHideFSBarExecute(Sender: TObject);

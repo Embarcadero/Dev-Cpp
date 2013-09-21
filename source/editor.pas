@@ -1321,7 +1321,7 @@ begin
 	fHintTimer.Enabled := false;
 
 	// If the rightclick menu is open, don't show up
-	if MainForm.EditorPopupMenu.PopupPoint.x = -1 then Exit;
+//	if MainForm.EditorPopupMenu.PopupPoint.x = -1 then Exit;
 
 	// Check if we're inside a comment or string by looking at text color. If we are, skip without showing a tooltip
 	p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(X, Y));
@@ -1387,7 +1387,7 @@ begin
 	// If the mouse is outside of the editor, hide balloon
 	if (p.X<=0) or (p.X>=fText.Width) or (p.Y<=0) or (p.Y>=fText.Height) then Exit;
 
-	if fCurrentHint <> '' then begin
+	if (fCurrentHint <> '') and devEditor.ParserHints then begin
 
 		// If we're editting, show information of word
 		if not MainForm.fDebugger.Executing then begin
@@ -1395,6 +1395,7 @@ begin
 			r.Top := Mouse.CursorPos.Y + fText.LineHeight;
 			r.Bottom := Mouse.CursorPos.Y + 10 + fText.LineHeight;
 			r.Right := Mouse.CursorPos.X + 60;
+
 
 			st:=MainForm.findstatement(localfind,localfindpoint,false); // BEZIG
 
@@ -1408,10 +1409,9 @@ begin
 		//	st:=PStatement(MainForm.CppParser1.Locate(fCurrentHint, False));
 
 			if localfind <> '' then begin
-				fCurrentHint:=localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(localfindpoint.y) + ')';
+				fCurrentHint:=localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(localfindpoint.y) + ') - Ctrl+Click to follow';
 				fCompletionBox.ShowMsgHint(r, fCurrentHint);
 			end else if Assigned(st) then begin
-
 				fCurrentHint:=Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
 				fCompletionBox.ShowMsgHint(r, fCurrentHint);
 			end;

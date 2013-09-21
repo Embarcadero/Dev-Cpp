@@ -1052,7 +1052,6 @@ begin
 	// Architecture params
 	sl := TStringList.Create;
 	sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
-	sl.Add('Generic=generic');
 	sl.Add('This CPU=native');
 	sl.Add('i386=i386');
 	sl.Add('i486=i486');
@@ -1065,6 +1064,8 @@ begin
 	sl.Add('Pentium 3=pentium3');
 	sl.Add('Pentium 4=pentium4');
 	sl.Add('Conroe=core2');
+	sl.Add('Nehalem=corei7');
+	sl.Add('Sandy=corei7-avx');
 	sl.Add('K6=k6');
 	sl.Add('K6-2=k6-2');
 	sl.Add('K6-3=k6-3');
@@ -1082,14 +1083,19 @@ begin
 	sl := TStringList.Create;
 	sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
 	sl.Add('MMX=mmx');
+	sl.Add('3D Now=3dnow');
 	sl.Add('SSE=sse');
 	sl.Add('SSE2=sse2');
 	sl.Add('SSE3=sse3');
 	sl.Add('SSSE3=ssse3');
+	sl.Add('SSE4=sse4');
 	sl.Add('SSE4A=sse4a');
 	sl.Add('SSE4.1=sse4.1');
 	sl.Add('SSE4.2=sse4.2');
-	sl.Add('3D Now=3dnow');
+	sl.Add('AVX=avx');
+	sl.Add('FMA4=fma4');
+	sl.Add('XOP=xop');
+	sl.Add('AES=aes');
 	AddOption(Lang[ID_COPT_BUILTINPROC], False, True, True, True, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 
 	// Optimization
@@ -1098,6 +1104,7 @@ begin
 	sl.Add('Low=1');
 	sl.Add('Med=2');
 	sl.Add('High=3');
+	sl.Add('Highest (fast)=fast');
 	AddOption(Lang[ID_COPT_OPTIMIZE], False, True, True, True, 0, '-O', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 
 	// C++ Standards
