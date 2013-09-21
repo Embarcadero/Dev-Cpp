@@ -1,4 +1,4 @@
-object frmFind: TfrmFind
+object FindForm: TFindForm
   Left = 662
   Top = 433
   BorderIcons = [biSystemMenu]

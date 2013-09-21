@@ -1,10 +1,10 @@
 object NewVarForm: TNewVarForm
-  Left = 1182
-  Top = 264
+  Left = 1171
+  Top = 586
   BorderStyle = bsDialog
   Caption = 'New variable'
-  ClientHeight = 449
-  ClientWidth = 349
+  ClientHeight = 374
+  ClientWidth = 444
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,150 +17,87 @@ object NewVarForm: TNewVarForm
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object lblType: TLabel
     Left = 8
     Top = 12
     Width = 58
     Height = 13
     Caption = 'Return type:'
   end
-  object Label2: TLabel
+  object lblName: TLabel
     Left = 8
     Top = 36
     Width = 70
     Height = 13
     Caption = 'Variable name:'
   end
-  object Label3: TLabel
-    Left = 76
-    Top = 172
-    Width = 31
-    Height = 13
-    Alignment = taRightJustify
-    Caption = 'Name:'
-  end
-  object Label4: TLabel
-    Left = 76
-    Top = 224
-    Width = 31
-    Height = 13
-    Alignment = taRightJustify
-    Caption = 'Name:'
-  end
-  object Label6: TLabel
+  object lblImplementIn: TLabel
     Left = 8
-    Top = 68
+    Top = 60
     Width = 62
     Height = 13
     Caption = 'Implement in:'
   end
   object rgScope: TRadioGroup
     Left = 8
-    Top = 96
-    Width = 333
+    Top = 88
+    Width = 425
     Height = 41
     Caption = 'Access scope'
-    Columns = 4
+    Columns = 3
+    ItemIndex = 0
     Items.Strings = (
       'Private'
       'Protected'
-      'Public'
-      'Published')
+      'Public')
     TabOrder = 3
   end
-  object cmbType: TComboBox
+  object txtType: TEdit
     Left = 88
     Top = 8
-    Width = 253
+    Width = 348
     Height = 21
-    AutoDropDown = True
-    ItemHeight = 13
-    Sorted = True
     TabOrder = 0
-    Text = 'cmbType'
-    OnChange = cmbTypeChange
-    Items.Strings = (
-      'bool'
-      'double'
-      'float'
-      'int')
+    OnChange = txtTypeChange
   end
   object txtName: TEdit
     Left = 88
     Top = 32
-    Width = 253
+    Width = 348
     Height = 21
     TabOrder = 1
-    Text = 'txtName'
-    OnChange = cmbTypeChange
-  end
-  object chkReadFunc: TCheckBox
-    Left = 8
-    Top = 148
-    Width = 333
-    Height = 17
-    Caption = 'Create member function to read from this variable'
-    TabOrder = 4
-    OnClick = chkReadFuncClick
-  end
-  object chkWriteFunc: TCheckBox
-    Left = 8
-    Top = 200
-    Width = 333
-    Height = 17
-    Caption = 'Create member function to write to this variable'
-    TabOrder = 7
-    OnClick = chkWriteFuncClick
-  end
-  object txtReadFunc: TEdit
-    Left = 112
-    Top = 168
-    Width = 229
-    Height = 21
-    TabOrder = 6
-    Text = 'txtReadFunc'
-    OnChange = cmbTypeChange
-  end
-  object txtWriteFunc: TEdit
-    Left = 112
-    Top = 220
-    Width = 229
-    Height = 21
-    TabOrder = 9
-    Text = 'txtWriteFunc'
-    OnChange = cmbTypeChange
+    OnChange = txtTypeChange
   end
   object btnCreate: TButton
-    Left = 95
-    Top = 416
+    Left = 142
+    Top = 344
     Width = 75
     Height = 25
     Caption = 'Create'
     Default = True
     ModalResult = 1
-    TabOrder = 11
+    TabOrder = 4
     OnClick = btnCreateClick
   end
   object btnCancel: TButton
-    Left = 179
-    Top = 416
+    Left = 227
+    Top = 344
     Width = 75
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 12
+    TabOrder = 5
   end
   object cmbClass: TComboBox
     Left = 88
-    Top = 64
-    Width = 253
+    Top = 56
+    Width = 348
     Height = 21
     AutoDropDown = True
     ItemHeight = 13
     Sorted = True
     TabOrder = 2
-    Text = 'cmbClass'
     Items.Strings = (
       'bool'
       'double'
@@ -168,70 +105,88 @@ object NewVarForm: TNewVarForm
       'int'
       'void')
   end
-  object GroupBox1: TGroupBox
+  object grpReadFunc: TGroupBox
     Left = 8
-    Top = 252
-    Width = 333
-    Height = 153
-    Caption = 'Comment'
-    TabOrder = 10
-    object Label5: TLabel
+    Top = 160
+    Width = 425
+    Height = 70
+    TabOrder = 6
+    object Label3: TLabel
       Left = 8
       Top = 20
-      Width = 56
+      Width = 31
       Height = 13
-      Caption = 'Description:'
+      Alignment = taRightJustify
+      Caption = 'Name:'
     end
-    object Label7: TLabel
+    object chkInlineR: TCheckBox
       Left = 8
-      Top = 128
-      Width = 26
-      Height = 13
-      Caption = 'Style:'
-    end
-    object memDescr: TMemo
-      Left = 16
-      Top = 36
-      Width = 309
-      Height = 81
-      Lines.Strings = (
-        'memDescr')
-      ScrollBars = ssBoth
+      Top = 44
+      Width = 53
+      Height = 17
+      Caption = 'Inline'
+      Enabled = False
       TabOrder = 0
-      OnChange = memDescrChange
     end
-    object cmbComment: TComboBox
-      Left = 40
-      Top = 124
-      Width = 205
+    object txtReadFunc: TEdit
+      Left = 84
+      Top = 16
+      Width = 333
       Height = 21
-      Style = csDropDownList
-      ItemHeight = 13
-      ItemIndex = 0
       TabOrder = 1
-      Text = '/** doxygen style comment */'
-      Items.Strings = (
-        '/** doxygen style comment */'
-        '/* C style comment */'
-        '// C++ style comment')
+      OnChange = txtTypeChange
+      OnKeyUp = txtReadFuncKeyUp
     end
   end
-  object chkInlineR: TCheckBox
+  object grpWriteFunc: TGroupBox
     Left = 8
-    Top = 172
-    Width = 53
-    Height = 17
-    Caption = 'Inline'
-    Enabled = False
-    TabOrder = 5
+    Top = 260
+    Width = 425
+    Height = 70
+    TabOrder = 7
+    object Label4: TLabel
+      Left = 8
+      Top = 20
+      Width = 31
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Name:'
+    end
+    object chkInlineW: TCheckBox
+      Left = 8
+      Top = 44
+      Width = 53
+      Height = 17
+      Caption = 'Inline'
+      Enabled = False
+      TabOrder = 0
+    end
+    object txtWriteFunc: TEdit
+      Left = 84
+      Top = 16
+      Width = 333
+      Height = 21
+      TabOrder = 1
+      OnChange = txtTypeChange
+      OnKeyUp = txtWriteFuncKeyUp
+    end
   end
-  object chkInlineW: TCheckBox
-    Left = 8
-    Top = 224
-    Width = 53
+  object chkReadFunc: TCheckBox
+    Left = 12
+    Top = 140
+    Width = 333
     Height = 17
-    Caption = 'Inline'
-    Enabled = False
+    Caption = 'Create member function to read from this variable'
     TabOrder = 8
+    OnClick = chkReadFuncClick
+  end
+  object chkWriteFunc: TCheckBox
+    Left = 12
+    Top = 240
+    Width = 333
+    Height = 17
+    Caption = 'Create member function to write to this variable'
+    TabOrder = 9
+    OnClick = chkWriteFuncClick
   end
 end

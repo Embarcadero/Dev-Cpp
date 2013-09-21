@@ -23,7 +23,7 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Windows, Messages, Classes, SysUtils, Controls, ComCtrls, Forms, Graphics,
+  Windows, Messages, Classes, SysUtils, U_IntList, Controls, ComCtrls, Forms, Graphics,
   CppParser;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -59,11 +59,9 @@ type
     fVariablePrivateImg: integer;
     fVariableProtectedImg: integer;
     fVariablePublicImg: integer;
-    fVariablePublishedImg: integer;
     fMethodPrivateImg: integer;
     fMethodProtectedImg: integer;
     fMethodPublicImg: integer;
-    fMethodPublishedImg: integer;
     fInhMethodProtectedImg: integer;
     fInhMethodPublicImg: integer;
     fInhVariableProtectedImg: integer;
@@ -74,11 +72,9 @@ type
     property VariablePrivate: integer read fVariablePrivateImg write fVariablePrivateImg;
     property VariableProtected: integer read fVariableProtectedImg write fVariableProtectedImg;
     property VariablePublic: integer read fVariablePublicImg write fVariablePublicImg;
-    property VariablePublished: integer read fVariablePublishedImg write fVariablePublishedImg;
     property MethodPrivate: integer read fMethodPrivateImg write fMethodPrivateImg;
     property MethodProtected: integer read fMethodProtectedImg write fMethodProtectedImg;
     property MethodPublic: integer read fMethodPublicImg write fMethodPublicImg;
-    property MethodPublished: integer read fMethodPublishedImg write fMethodPublishedImg;
     property InheritedMethodProtected: integer read fInhMethodProtectedImg write fInhMethodProtectedImg;
     property InheritedMethodPublic: integer read fInhMethodPublicImg write fInhMethodPublicImg;
     property InheritedVariableProtected: integer read fInhVariableProtectedImg write fInhVariableProtectedImg;
@@ -185,17 +181,13 @@ begin
         scsPrivate: Node.ImageIndex := fImagesRecord.VariablePrivate;
         scsProtected: if not bInherited then Node.ImageIndex := fImagesRecord.VariableProtected else Node.ImageIndex := fImagesRecord.InheritedVariableProtected;
         scsPublic: if not bInherited then Node.ImageIndex := fImagesRecord.VariablePublic else Node.ImageIndex := fImagesRecord.InheritedVariablePublic;
-        scsPublished: if not bInherited then Node.ImageIndex := fImagesRecord.VariablePublished else Node.ImageIndex := fImagesRecord.InheritedVariablePublic;
-      else
-        Node.ImageIndex := fImagesRecord.VariablePublished;
+        scsNone: Node.ImageIndex := fImagesRecord.VariablePublic;
       end;
     skFunction, skConstructor, skDestructor: case Statement^._ClassScope of
         scsPrivate: Node.ImageIndex := fImagesRecord.MethodPrivate;
         scsProtected: if not bInherited then Node.ImageIndex := fImagesRecord.MethodProtected else Node.ImageIndex := fImagesRecord.InheritedMethodProtected;
         scsPublic: if not bInherited then Node.ImageIndex := fImagesRecord.MethodPublic else Node.ImageIndex := fImagesRecord.InheritedMethodPublic;
-        scsPublished: if not bInherited then Node.ImageIndex := fImagesRecord.MethodPublished else Node.ImageIndex := fImagesRecord.InheritedMethodPublic;
-      else
-        Node.ImageIndex := fImagesRecord.MethodPublished;
+        scsNone: Node.ImageIndex := fImagesRecord.MethodPublic;
       end;
   end;
   Node.SelectedIndex := Node.ImageIndex;
@@ -204,12 +196,10 @@ end;
 
 procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
 var
-  I, iFrom, tmp, tmpI: integer;
+  I, iFrom, tmp, donecount: integer;
   ParNode, NewNode: TTreeNode;
-  F: integer;
-  Sl: TStringList;
-  tmpS: string;
   bInherited: boolean;
+  inheritanceids : TIntList;
 begin
   if (not fShowInheritedMembers) and (ParentIndex >= 0) then
     iFrom := ParentIndex // amazing speed-up
@@ -226,25 +216,20 @@ begin
       CreateFolders('', Node);
   end;
 
-	sl := TStringList.Create;
+	inheritanceids := TIntList.Create;
 	try
 		// allow inheritance propagation
 		if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass) then begin
 
-			// follow the inheritance tree all the way up.
-			// this code does not work for C++ polymorphic classes
-			tmp := ParentIndex;
-			tmpI := tmp;
-			tmpS := '';
-			sl.Clear;
-			while (tmp <> -1) do begin
-				tmpS := PStatement(fParser.Statements[tmpI])^._InheritsFromIDs;
-				tmp := StrToIntDef(tmpS, -1);
-				tmpI := fParser.IndexOfStatement(tmp);
-				if sl.IndexOf(tmpS) <> -1 then
-					tmp := -1;
-				if (tmp <> -1) then
-					sl.CommaText := sl.CommaText + tmpS + ',';
+			// Add inheritance of current node
+			fParser.AddInheritance(PStatement(fParser.Statements[ParentIndex])^._InheritsFromIDs,inheritanceids);
+			donecount := 0; // done means found last base class
+
+			// then process inheritance of new items
+			while donecount < inheritanceids.Count do begin
+				tmp := fParser.IndexOfStatement(inheritanceids[donecount]); // slooow
+				fParser.AddInheritance(PStatement(fParser.Statements[tmp])^._InheritsFromIDs,inheritanceids);
+				Inc(donecount);
 			end;
 		end;
 
@@ -254,7 +239,7 @@ begin
 				if not _Visible then
 					Continue;
 				if _ParentID <> ParentID then begin
-					bInherited := fShowInheritedMembers and (sl.IndexOf(IntToStr(_ParentID)) > -1);
+					bInherited := fShowInheritedMembers and (inheritanceids.IndexOf(_ParentID) <> -1);
 					if not bInherited then
 						Continue;
 				end;
@@ -264,9 +249,9 @@ begin
 				((fShowFilter = sfCurrent) and (SameText(_Filename,fCurrentFileHeader) or SameText(_Filename,fCurrentFileImpl) or bInherited)) then begin
 
 					// check if belongs to folder
-					F := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
-					if F <> -1 then
-						ParNode := GetNodeOfFolder(F)
+					tmp := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
+					if tmp <> -1 then
+						ParNode := GetNodeOfFolder(tmp)
 					else
 						ParNode := Node;
 
@@ -278,7 +263,7 @@ begin
 			end;
 		end;
 	finally
-		sl.Free;
+		inheritanceids.Free;
 	end;
 end;
 
@@ -876,53 +861,51 @@ begin
   Result := High(fFolders) + 1;
 end;
 
-procedure TClassBrowser.AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
-  State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,
-  DefaultDraw: Boolean);
+procedure TClassBrowser.AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,DefaultDraw: Boolean);
 var
-  NodeRect: TRect;
-  st: PStatement;
-  bInherited: boolean;
+	NodeRect: TRect;
+	st: PStatement;
+	bInherited: boolean;
+	typetext : AnsiString;
 begin
 	if fParserBusy then
 		Exit;
 
+	// Assume the node image is correct
+	bInherited := fShowInheritedMembers and (Node.ImageIndex in [
+		fImagesRecord.fInhMethodProtectedImg,
+		fImagesRecord.fInhMethodPublicImg,
+		fImagesRecord.fInhVariableProtectedImg,
+		fImagesRecord.fInhVariablePublicImg]);
+
 	if Stage = cdPrePaint then begin
 		Sender.Canvas.Font.Style := [fsBold];
+		if bInherited then
+			Sender.Canvas.Font.Color := clGray;
 	end else if Stage = cdPostPaint then begin
-		if Assigned(fParser) then begin
-			st := Node.Data;
-			if Assigned(st) then begin
-				NodeRect := Node.DisplayRect(true);
+		st := Node.Data;
+		if Assigned(st) then begin // useless check really
+			if bInherited then
+				fCnv.Font.Color := clGray
+			else
+				fCnv.Font.Color := clMaroon;
 
-				bInherited := fShowInheritedMembers and
-					Assigned(Node.Parent) and
-					(Node.Parent.ImageIndex <> fImagesRecord.Globals) and
-					Assigned(Node.Parent.Data) and
-					(fParser.Statements.IndexOf(Node.Parent.Data) <> -1) and
-					(PStatement(Node.Parent.Data)^._ID <> st^._ParentID);
+			// draw function arguments to the right of the already drawn text
+			NodeRect := Node.DisplayRect(true);
+			NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._ScopelessCmd) + 2;
+			fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
 
-				// draw function arguments
-				NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._ScopelessCmd) + 2;
+			fCnv.Font.Color := clGray;
+			if st^._Type <> '' then
+				typetext := st^._Type
+			else if st^._Kind in [skConstructor, skDestructor] then
+				typetext := fParser.StatementKindStr(st^._Kind)
+			else
+				Exit; // done
 
-				if bInherited then
-					fCnv.Font.Color := clGray
-				else
-					fCnv.Font.Color := clMaroon;
-
-				fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
-
-				// Draw type
-				if st^._Type <> '' then begin
-					fCnv.Font.Color := clGray;
-					NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
-					fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, ': ' + st^._Type);
-				end else if st^._Kind in [skConstructor, skDestructor] then begin
-					fCnv.Font.Color := clGray;
-					NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
-					fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, ': ' + fParser.StatementKindStr(st^._Kind));
-				end;
-			end;
+			// Then draw node type to the right of the arguments
+			NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
+			fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, ': ' + typetext);
 		end;
 	end;
 end;

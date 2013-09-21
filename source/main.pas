@@ -926,7 +926,7 @@ uses
   CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
   SynEdit, Math, ImageTheme,
   Types, FindFrm, Prjtypes, devExec,
-  NewTemplateFrm, FunctionSearchFrm, NewMemberFrm, NewVarFrm, NewClassFrm,
+  NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
   ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
   WindowListFrm, RemoveUnitFrm, ParamsFrm, WebUpdate, ProcessListFrm, SynEditHighlighter;
@@ -957,7 +957,6 @@ begin
 		with devImageThemes do begin
 			ActionList.Images      := CurrentTheme.MenuImages;
 			MainMenu.Images        := CurrentTheme.MenuImages;
-			ProjectView.Images     := CurrentTheme.ProjectImages;
 			MessageControl.Images  := CurrentTheme.MenuImages;
 			tbMain.Images          := CurrentTheme.MenuImages;
 			tbCompile.Images       := CurrentTheme.MenuImages;
@@ -965,8 +964,9 @@ begin
 			tbClasses.Images       := CurrentTheme.MenuImages;
 			tbedit.Images          := CurrentTheme.MenuImages;
 			tbSearch.Images        := CurrentTheme.MenuImages;
-			tbSpecials.Images      := CurrentTheme.SpecialImages;
+			tbSpecials.Images      := CurrentTheme.MenuImages;
 			DebugVarsPopup.Images  := CurrentTheme.MenuImages;
+			ProjectView.Images     := CurrentTheme.ProjectImages;
 			ClassBrowser.Images    := CurrentTheme.BrowserImages;
 		end;
 	end;
@@ -1541,7 +1541,7 @@ begin
 		end;
 
 		// Reparse
-		CppParser.ReParseFile(e.FileName,false); // don't need to scan for the first time
+		CppParser.ReParseFile(e.FileName,e.InProject); // don't need to scan for the first time
 	end else if e.New then
 		Result := SaveFileAs(e); // we need a file name, use dialog
 
@@ -1552,7 +1552,6 @@ end;
 function TMainForm.CloseEditor(index: integer): Boolean;
 var
 	e: TEditor;
-	s : AnsiString;
 	projindex : integer;
 begin
 	Result := False;
@@ -1561,10 +1560,7 @@ begin
 
 		// Ask user if he wants to save
 		if e.Text.Modified then begin
-
-			s:= e.FileName;
-
-			case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [s]),mtConfirmation, mbYesNoCancel, 0) of
+			case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [e.FileName]),mtConfirmation, mbYesNoCancel, 0) of
 				mrYes:
 					SaveFile(e);
 				mrCancel:
@@ -1572,27 +1568,32 @@ begin
 			end;
 		end;
 
-		// We're allowed to close stuff...
+		// Closing a tab editor page causes a lot of flicker.
+		SendMessage(Self.Handle,WM_SETREDRAW,0,0);
+
+		// We're allowed to close...
 		Result := True;
-		if not e.InProject then begin
+		if e.InProject and assigned(fProject) then begin
+			projindex := fProject.Units.IndexOf(e);
+			if projindex <> -1 then
+				fProject.CloseUnit(projindex);
+		end else begin
 			dmMain.AddtoHistory(e.FileName);
 			FreeAndNil(e);
-		end else begin
-			if e.IsRes and not Assigned(fProject) then
-				FreeAndNil(e)
-			else if assigned(fProject) then begin
-				projindex := fProject.Units.IndexOf(e);
-				if projindex <> -1 then
-					fProject.CloseUnit(projindex);
-			end;
 		end;
+
+		// So, only repaint once after completely disabling updating
+		SendMessage(Self.Handle,WM_SETREDRAW,1,0);
+
+		// Repaint here, so we don't get to see the first page
+		RedrawWindow(PageControl.Handle, nil, 0, RDW_INVALIDATE or RDW_UPDATENOW or RDW_ALLCHILDREN);
 
 		SetStatusbarLineCol;
 		UpdateAppTitle;
 
 		e:=GetEditor;
 		if Assigned(e) then begin
-			ClassBrowser.CurrentFile:=e.FileName;
+			ClassBrowser.CurrentFile := e.FileName;
 			e.Text.SetFocus;
 		end else if (ClassBrowser.ShowFilter=sfCurrent) or not Assigned(fProject) then begin
 			CppParser.Reset;
@@ -2804,16 +2805,16 @@ begin
 	if Assigned(e) then begin
 
 		// Create it when needed!
-		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Self);
+		if not Assigned(FindForm) then
+			FindForm := TFindForm.Create(Self);
 
 		s := e.Text.SelText;
 		if s = '' then
 			s := e.Text.WordAtCursor;
 
-		frmFind.TabIndex := 0;
-		frmFind.cboFindText.Text := s;
-		frmFind.Show;
+		FindForm.TabIndex := 0;
+		FindForm.cboFindText.Text := s;
+		FindForm.Show;
 	end;
 end;
 
@@ -2825,17 +2826,17 @@ begin
 	e := GetEditor;
 	if Assigned(e) then begin
 
-		// Create it only when needed!
-		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Self);
+		// Create it when needed!
+		if not Assigned(FindForm) then
+			FindForm := TFindForm.Create(Self);
 
 		s := e.Text.SelText;
 		if s = '' then
 			s := e.Text.WordAtCursor;
 
-		frmFind.TabIndex := 1;
-		frmFind.cboFindText.Text := s;
-		frmFind.Show;
+		FindForm.TabIndex := 1;
+		FindForm.cboFindText.Text := s;
+		FindForm.Show;
 	end;
 end;
 
@@ -2848,16 +2849,16 @@ begin
 	if Assigned(e) then begin
 
 		// Create it when needed!
-		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Self);
+		if not Assigned(FindForm) then
+			FindForm := TFindForm.Create(Self);
 
 		s := e.Text.SelText;
 		if s = '' then
 			s := e.Text.WordAtCursor;
 
-		frmFind.TabIndex := 2;
-		frmFind.cboFindText.Text := s;
-		frmFind.Show;
+		FindForm.TabIndex := 2;
+		FindForm.cboFindText.Text := s;
+		FindForm.Show;
 	end;
 end;
 
@@ -2870,16 +2871,16 @@ begin
 	if Assigned(e) then begin
 
 		// Create it when needed!
-		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Self);
+		if not Assigned(FindForm) then
+			FindForm := TFindForm.Create(Self);
 
 		s := e.Text.SelText;
 		if s = '' then
 			s := e.Text.WordAtCursor;
 
-		frmFind.TabIndex := 3;
-		frmFind.cboFindText.Text := s;
-		frmFind.Show;
+		FindForm.TabIndex := 3;
+		FindForm.cboFindText.Text := s;
+		FindForm.Show;
 	end;
 end;
 
@@ -3242,7 +3243,7 @@ var
 	e: TEditor;
 begin
 	e := GetEditor;
-	TCustomAction(Sender).Enabled := Assigned(e) and (not Assigned(frmFind) or not frmFind.Showing);
+	TCustomAction(Sender).Enabled := Assigned(e) and (not Assigned(FindForm) or not FindForm.Showing);
 end;
 
 procedure TMainForm.ToolbarClick(Sender: TObject);
@@ -3525,13 +3526,13 @@ begin
 		pt := ClienttoScreen(point(PageControl.Left, PageControl.Top));
 
 		// Only create the form when we need to do so
-		if not Assigned(frmIncremental) then
-			frmIncremental := TfrmIncremental.Create(self);
+		if not Assigned(IncrementalForm) then
+			IncrementalForm := TIncrementalForm.Create(self);
 
-		frmIncremental.Left:= pt.x;
-		frmIncremental.Top:= pt.y;
-		frmIncremental.editor:= e.Text;
-		frmIncremental.Show;
+		IncrementalForm.Left:= pt.x;
+		IncrementalForm.Top:= pt.y;
+		IncrementalForm.editor:= e.Text;
+		IncrementalForm.Show;
 	end;
 end;
 
@@ -4382,17 +4383,29 @@ end;
 
 procedure TMainForm.actBrowserNewClassExecute(Sender: TObject);
 begin
-	TNewClassForm.Create(Self).ShowModal;
+	with TNewClassForm.Create(Self) do try
+		ShowModal;
+	finally
+		Close;
+	end;
 end;
 
 procedure TMainForm.actBrowserNewMemberExecute(Sender: TObject);
 begin
-	TNewMemberForm.Create(Self).ShowModal;
+	with TNewFunctionForm.Create(Self) do try
+		ShowModal;
+	finally
+		Close;
+	end;
 end;
 
 procedure TMainForm.actBrowserNewVarExecute(Sender: TObject);
 begin
-	TNewVarForm.Create(Self).ShowModal;
+	with TNewVarForm.Create(Self) do try
+		ShowModal;
+	finally
+		Close;
+	end;
 end;
 
 procedure TMainForm.actBrowserViewAllExecute(Sender: TObject);
@@ -5769,7 +5782,8 @@ begin
 
 		// Exit early, don't bother creating a stream (which is slow)
 		phrase := e.CompletionPhrase(e.Text.CaretXY);
-		if Phrase = '' then Exit;
+		if Phrase = '' then
+			Exit;
 
 		// When searching using menu shortcuts, the caret is set to the proper place
 		// When searching using ctrl+click, the cursor is set properly too, so do NOT use WordAtMouse
@@ -5986,25 +6000,25 @@ begin
 	// Create all data structures
 	UpdateSplash('Applying settings...');
 
+	// Backup PATH variable
+	devDirs.OriginalPath := GetEnvironmentVariable('PATH');
+
 	// Fix Alt key painting problems
 	//TVistaAltFix.Create(Self); // causes too much flicker :(
 
-	// Writing to the registry causes exceptions, so offer a way to disable and catch exceptions
-	DDETopic:=DevCppDDEServer.Name;
+	// Try to fix the file associations. Needs write access to registry, which might cause exceptions to be thrown
+	DDETopic := DevCppDDEServer.Name;
 	if devData.CheckAssocs then begin
 		try
-			CheckAssociations;
+			CheckAssociations(true); // check and fix
 		except
 			MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
 			devData.CheckAssocs := false; // don't bother again
 		end;
 	end;
 
-	DragAcceptFiles(Self.Handle, TRUE);
-	dmMain:= TdmMain.Create(Self);
-
-	// Backup PATH variable
-	devDirs.OriginalPath := GetEnvironmentVariable('PATH');
+	DragAcceptFiles(Self.Handle, true);
+	dmMain := TdmMain.Create(Self);
 
 	// Set left panel to previous state
 	actProjectManager.Checked:= devData.ProjectView;
@@ -6375,18 +6389,20 @@ end;
 procedure TMainForm.actSearchAgainExecute(Sender: TObject);
 begin
 	// Repeat action if it was a finding action
-	if Assigned(frmFind) then begin
-		if frmFind.FindTabs.TabIndex < 2 then begin // it's a find action
+	if Assigned(FindForm) then begin
+		with FindForm do begin
+			if FindTabs.TabIndex < 2 then begin // it's a find action
 
-			// Disable entire scope searching
-			if frmFind.grpOrigin.Visible then
-				frmFind.rbEntireScope.Checked := false;
+				// Disable entire scope searching
+				if grpOrigin.Visible then
+					rbEntireScope.Checked := false;
 
-			// Always search forward
-			if frmFind.grpDirection.Visible then
-				frmFind.rbBackward.Checked := false;
+				// Always search forward
+				if grpDirection.Visible then
+					rbBackward.Checked := false;
 
-			frmFind.btnFind.Click;
+				btnFind.Click;
+			end;
 		end;
 	end;
 end;

@@ -1,4 +1,4 @@
-Version 5.3.0.5 - *
+Version 5.3.1 - *
 
 - Startup time has been reduced by an order of magnitude.
 - The class browser now redraws at least numvisibleitems times faster.

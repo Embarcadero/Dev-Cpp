@@ -950,7 +950,7 @@ begin
 		{ Delete 'windres.exe:' }
 		Delete(Line, 1, 13);
 
-		cpos := GetLastPos('warning: ', Line);
+		cpos := RPos('warning: ', Line);
 		if cpos > 0 then begin
 			{ Delete 'warning: ' }
 			Delete(Line, 1, 9);
@@ -967,12 +967,12 @@ begin
 			Exit;
 		end else begin
 			{ Does it contain a filename and line number? }
-			cpos := GetLastPos(':', Line);
+			cpos := RPos(':', Line);
 			if (cpos > 0) and (Pos(':', Line) <> cpos) then begin
 				O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
-				cpos := GetLastPos(':', Line);
+				cpos := RPos(':', Line);
 				O_Line := Copy(Line, cpos + 1, Length(Line) - 2);
 				Delete(Line, cpos, Length(Line) - 1);
 
@@ -1005,12 +1005,12 @@ begin
 		Delete(Line, Length(Line), 1);
 
 		// Get column number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_Col := Copy(Line, cpos+1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get line number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_Line := Copy(Line, cpos+1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
@@ -1032,7 +1032,7 @@ begin
 		Delete(Line, Length(Line), 1);
 
 		// Get line number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_Line := Copy(Line, cpos + 1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
@@ -1048,22 +1048,22 @@ begin
 	end;
 
 	{ foo.cpp: In method `bool MyApp::Bar()': }
-	cpos := GetLastPos('In method ''', Line);
+	cpos := RPos('In method ''', Line);
 	if cpos <= 0 then
 		{ foo.cpp: In function `bar': }
-		cpos := GetLastPos('In function ''', Line);
+		cpos := RPos('In function ''', Line);
 	if cpos <= 0 then
 		{ foo.cpp: In member function `bool MyApp::Bar()': }
-		cpos := GetLastPos('In member function ''', Line);
+		cpos := RPos('In member function ''', Line);
 	if cpos <= 0 then
 		{ foo.cpp: In static member function `bool MyApp::Bar()': }
-		cpos := GetLastPos('In static member function ''', Line);
+		cpos := RPos('In static member function ''', Line);
 	if cpos <= 0 then
 		{ foo.cpp: In constructor `MyApp::MyApp()': }
-		cpos := GetLastPos('In constructor ''', Line);
+		cpos := RPos('In constructor ''', Line);
 	if cpos <= 0 then
 		{ foo.cpp: In destructor `MyApp::MyApp()': }
-		cpos := GetLastPos('In destructor ''', Line);
+		cpos := RPos('In destructor ''', Line);
 	if cpos > 0 then begin
 		O_Msg := Copy(Line, cpos, Length(Line) - cpos + 1);
 		Delete(Line, cpos - 2, Length(Line) - cpos + 3);
@@ -1084,26 +1084,26 @@ begin
 	end;
 
 	// foo.cpp:1:1: fatal error: bar.h: No such file or directory
-	cpos := GetLastPos('No such file or directory', Line);
+	cpos := RPos('No such file or directory', Line);
 	if cpos > 0 then begin
 
 		// Get missing file name
 		Delete(Line, cpos - 2, Length(Line) - cpos + 3);
-		cpos := GetLastPos(': ', Line);
+		cpos := RPos(': ', Line);
 		O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1) + ': No such file or directory.';
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// remove 'fatal error:'
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get column number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get line number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_line := Copy(Line, cpos+1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
@@ -1116,7 +1116,7 @@ begin
 	end;
 
 	// foo.cpp: At global scope:
-	cpos := GetLastPos('At global scope:', Line);
+	cpos := RPos('At global scope:', Line);
 	if cpos > 0  then begin
 		cpos := Pos(':',Line);
 
@@ -1131,21 +1131,21 @@ begin
 	end;
 
 	// foo.cpp:1:2: warning: unknown escape sequence: '\040'
-	cpos := GetLastPos(': unknown escape sequence:',Line);
+	cpos := RPos(': unknown escape sequence:',Line);
 	if cpos > 0 then begin
 
 		O_Msg := '[Warning] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 
-		cpos := GetLastPos(': warning',Line);
+		cpos := RPos(': warning',Line);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get column number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get line number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_line := Copy(Line, cpos+1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
@@ -1158,19 +1158,19 @@ begin
 	end;
 
 	// foo.cpp:1:2: sorry, unimplemented: bar
-	cpos := GetLastPos(': sorry, unimplemented:',Line);
+	cpos := RPos(': sorry, unimplemented:',Line);
 	if cpos > 0 then begin
 
 		O_Msg := '[Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get column number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get line number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_line := Copy(Line, cpos+1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
@@ -1183,25 +1183,25 @@ begin
 	end;
 
 	// foo.cpp:1: note:/error candidates are/candidate is: FooClass::Bar(void)
-	cpos := GetLastPos(': candidate', Line);
+	cpos := RPos(': candidate', Line);
 	if cpos > 0 then begin
 		// candidates are (...) is message
-		cpos := GetLastPos(': candidate', Line);
+		cpos := RPos(': candidate', Line);
 		O_Msg := '[Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 
 		// 'note'/'error' is removed
-		cpos := GetLastPos(': note', Line);
+		cpos := RPos(': note', Line);
 		if(cpos <=0) then
-			cpos := GetLastPos(': error', Line);
+			cpos := RPos(': error', Line);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get column number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
 		// Get line number
-		cpos := GetLastPos(':', Line);
+		cpos := RPos(':', Line);
 		O_line := Copy(Line, cpos+1, Length(Line) - cpos);
 		Delete(Line, cpos, Length(Line) - cpos + 1);
 
@@ -1213,14 +1213,14 @@ begin
 	end;
 
 	// windres.exe (normal command, *not* an error)
-	cpos := GetLastPos('windres.exe ', Line);
+	cpos := RPos('windres.exe ', Line);
 	if cpos > 0 then begin
 		Line:='';
 		Exit;
 	end;
 
 	// foo.cpp:0:1: error/warning/hint: text (generic errors)
-	cpos := GetLastPos(': ', Line);
+	cpos := RPos(': ', Line);
 	if cpos > 0 then begin // mandrav fix
 		O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 		Delete(Line, cpos + 2, Length(Line) - cpos - 1);
@@ -1237,7 +1237,7 @@ begin
 			Delete(Line, cpos - 2, Length(Line) - cpos + 3);
 
 			// Get column number
-			cpos := GetLastPos(':', Line);
+			cpos := RPos(':', Line);
 			O_Col := Copy(Line, cpos+1, Length(Line) - cpos);
 			Delete(Line, cpos, Length(Line) - cpos + 1);
 		end else if Pos('Info: ', Line) = 1 then begin
@@ -1250,7 +1250,7 @@ begin
 			Delete(Line, cpos - 2, Length(Line) - cpos + 3);
 
 			// Get column number
-			cpos := GetLastPos(':', Line);
+			cpos := RPos(':', Line);
 			O_Col := Copy(Line, cpos+1, Length(Line) - cpos);
 			Delete(Line, cpos, Length(Line) - cpos + 1);
 		end else begin
@@ -1262,14 +1262,14 @@ begin
 			Delete(Line, cpos - 2, Length(Line) - cpos + 3);
 
 			// Get column number
-			cpos := GetLastPos(':', Line);
+			cpos := RPos(':', Line);
 			if cpos > 0 then begin
 				O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 			end;
 
 			// Get line number
-			cpos := GetLastPos(':', Line);
+			cpos := RPos(':', Line);
 			if cpos > 0 then begin
 				O_Line := Copy(Line, cpos + 1, Length(Line) - cpos + 1);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
@@ -1279,14 +1279,14 @@ begin
 			O_File := Line;
 		end else begin
 			// foo.bar:1
-			cpos := GetLastPos(':', Line);
+			cpos := RPos(':', Line);
 			if StrToIntDef(Copy(Line, cpos + 1, Length(Line) - cpos), -1) <> -1 then begin
 				O_Line := Copy(Line, cpos + 1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 				O_File := Line;
 
 				// foo.bar:1:2
-				cpos := GetLastPos(':', Line);
+				cpos := RPos(':', Line);
 				if StrToIntDef(Copy(Line, cpos + 1, Length(Line) - cpos), -1) <> -1 then begin
 					O_Line := Copy(Line, cpos + 1, Length(Line) - cpos) + ':' + O_Line;
 					Delete(Line, cpos, Length(Line) - cpos + 1);

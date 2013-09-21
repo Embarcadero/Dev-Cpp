@@ -874,7 +874,7 @@ begin
   fAssociateDev := getAssociation(4);
   fAssociateRc := getAssociation(5);
   fAssociateTemplate := getAssociation(6);
-  fCheckAssocs  := true; // will disable on first hickup
+  fCheckAssocs := false;
 
   fShowTipsOnStart := TRUE;
   fLastTip := 0;
@@ -1703,7 +1703,7 @@ procedure TdevCodeCompletion.SettoDefaults;
 begin
 	fWidth:=320;
 	fHeight:=240;
-	fDelay:=400;
+	fDelay:=300;
 	fBackColor:=clWindow;
 	fEnabled:=True;
 	fUseCacheFiles:=False;

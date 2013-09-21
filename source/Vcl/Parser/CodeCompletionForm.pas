@@ -122,7 +122,7 @@ begin
 			end;
 		end;
 		Canvas.TextOut(Offset, Rect.Top, fOwner.Parser.StatementKindStr(statement^._Kind));
-		Offset := Offset + Canvas.TextWidth('Preprocessor '); // worst case width + spacing
+		Offset := Offset + Canvas.TextWidth('preprocessor '); // worst case width + spacing
 		if not (odSelected in State) then
 			Canvas.Font.Color := clWindowText;
 

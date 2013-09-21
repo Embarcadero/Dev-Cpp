@@ -25,7 +25,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX, SynEditExport, SynExportRTF,
   Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version, SynEditCodeFolding, SynExportHTML,
-  SynCompletionProposal, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils, CodeToolTip;
+  SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils, CodeToolTip;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, Graphics, QControls, QForms, QDialogs, CodeCompletion, CppParser,
@@ -126,7 +126,6 @@ type
     procedure InsertDefaultText;
     procedure PaintMatchingBrackets(TransientType: TTransientType);
 
-    function FindComplement(const s : AnsiString; fromtoken,totoken: char;var curpos : integer; increment : integer) : boolean;
     function EvaluationPhrase(p : TBufferCoord): AnsiString;
     function CompletionPhrase(p : TBufferCoord): AnsiString;
 
@@ -297,7 +296,7 @@ end;
 
 destructor TEditor.Destroy;
 var
-	I,curactive: integer;
+	I, curactive: integer;
 begin
 	// Deactivate the file change monitor
 	I := MainForm.devFileMonitor.Files.IndexOf(fFileName);
@@ -316,19 +315,12 @@ begin
 	// Delete breakpoints in this editor
 	MainForm.fDebugger.DeleteBreakPointsOf(self);
 
-	SendMessage(MainForm.Handle,WM_SETREDRAW,0,0);
-
 	// Open up the previous tab, not the first one...
 	with fTabSheet.PageControl do begin
 		curactive := ActivePageIndex;
 		fTabSheet.Free; // sets activepageindex to 0, causes lots of flicker...
 		ActivePageIndex := max(0,curactive - 1);
 	end;
-
-	SendMessage(MainForm.Handle,WM_SETREDRAW,1,0);
-
-	// Repaint here, so we don't get to see the first page
-	RedrawWindow(MainForm.PageControl.Handle, nil, 0, RDW_INTERNALPAINT or RDW_INVALIDATE or RDW_ALLCHILDREN);
 
 	inherited;
 end;
@@ -854,7 +846,7 @@ begin
 					fText.SelStart := fText.SelStart - 1;
 					fText.SelEnd := fText.SelStart + 1;
 					fText.SelText := '';
-					fCompletionBox.Search(nil, CompletionPhrase(fText.CaretXY), fFileName);
+					fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
 				end;
 			end;
 
@@ -872,7 +864,7 @@ begin
 			// Continue filtering
 			else begin
 				fText.SelText := Key;
-				fCompletionBox.Search(nil, CompletionPhrase(fText.CaretXY), fFileName);
+				fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
 			end;
 		end;
 	end;
@@ -1071,21 +1063,17 @@ begin
 
 	fCompletionBox.OnKeyPress := CompletionKeyPress;
 
-	M:=TMemoryStream.Create;
+	M := TMemoryStream.Create;
 	try
-
-		// Scan the file and corresponding header, ignore function bodies
-		//if fText.Modified then
-		//	MainForm.CppParser.ReParseFile(fFileName,InProject);
 
 		// Scan the current function
 		fText.UnCollapsedLines.SaveToStream(M);
-		fCompletionBox.CurrentClass:=MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M);
+		fCompletionBox.CurrentClass := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M)
 	finally
 		M.Free;
 	end;
 
-	fCompletionBox.Search(nil, CompletionPhrase(fText.CaretXY), fFileName);
+	fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
 end;
 
 procedure TEditor.DestroyCompletion;
@@ -1145,29 +1133,6 @@ begin
 		fAllowMouseOver := true;
 end;
 
-// Walk to either the closing A or B, starting at curpos, walking with increment steps
-function TEditor.FindComplement(const s : AnsiString; fromtoken,totoken: char;var curpos : integer; increment : integer) : boolean;
-var
-	level,curposbackup : integer;
-begin
-	curposbackup := curpos;
-	level := 0;
-	while(curpos <= Length(s)) and (curpos > 0) do begin
-		if(s[curpos] = fromtoken) then begin
-			Inc(level);
-		end else if(s[curpos] = totoken) then begin
-			Dec(level);
-			if level = 0 then begin
-				Result := true;
-				Exit;
-			end;
-		end;
-		Inc(curpos,increment);
-	end;
-	curpos := curposbackup;
-	Result := false;
-end; // move to utils?
-
 function TEditor.EvaluationPhrase(p : TBufferCoord): AnsiString;
 var
 	phrasebegin,phraseend,len : integer;
@@ -1202,7 +1167,7 @@ begin
 				else
 					break;
 			end else if s[phrasebegin] = ')' then begin
-				if FindComplement(s,')','[',phrasebegin,-1) then
+				if FindComplement(s,')','(',phrasebegin,-1) then
 					Dec(phrasebegin)
 				else
 					break;
@@ -1236,7 +1201,7 @@ begin
 			stripbeg := curpos;
 			if FindComplement(Result,'[',']',curpos,1) then
 				Delete(Result,stripbeg,curpos - stripbeg + 1);
-		end else if result[curpos] = '[' then begin
+		end else if result[curpos] = '(' then begin
 			stripbeg := curpos;
 			if FindComplement(Result,'(',')',curpos,1) then
 				Delete(Result,stripbeg,curpos - stripbeg + 1);
@@ -1246,7 +1211,7 @@ begin
 
 	// strip pointer bits
 	curpos := 1;
-	while (curpos <= len) and (result[curpos] = '&') do
+	while (curpos <= len) and (result[curpos] in ['*','&']) do
 		Inc(curpos);
 	Delete(Result,1,curpos-1);
 end;

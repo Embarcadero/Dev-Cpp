@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 430
-  Top = 198
+  Left = 481
+  Top = 256
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -779,7 +779,7 @@ object MainForm: TMainForm
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
-      Images = dmMain.SpecialImages_NewLook
+      Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
       TabOrder = 5
@@ -789,19 +789,16 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Action = actInsert
-        ImageIndex = 1
       end
       object ToggleBtn: TToolButton
         Left = 23
         Top = 0
         Action = actToggle
-        ImageIndex = 2
       end
       object GotoBtn: TToolButton
         Left = 46
         Top = 0
         Action = actGoto
-        ImageIndex = 3
       end
     end
     object tbClasses: TToolBar
@@ -1016,11 +1013,9 @@ object MainForm: TMainForm
         ItemImages.VariablePrivate = 2
         ItemImages.VariableProtected = 3
         ItemImages.VariablePublic = 4
-        ItemImages.VariablePublished = 4
         ItemImages.MethodPrivate = 5
         ItemImages.MethodProtected = 6
         ItemImages.MethodPublic = 7
-        ItemImages.MethodPublished = 7
         ItemImages.InheritedMethodProtected = 8
         ItemImages.InheritedMethodPublic = 10
         ItemImages.InheritedVariableProtected = 9

@@ -1,6 +1,6 @@
 object NewClassForm: TNewClassForm
-  Left = 789
-  Top = 485
+  Left = 1000
+  Top = 72
   BorderStyle = bsDialog
   Caption = 'New class'
   ClientHeight = 338
@@ -20,9 +20,9 @@ object NewClassForm: TNewClassForm
   object lblClassName: TLabel
     Left = 8
     Top = 12
-    Width = 57
+    Width = 31
     Height = 13
-    Caption = 'Class name:'
+    Caption = 'Name:'
   end
   object lblCppFile: TLabel
     Left = 8
@@ -64,7 +64,7 @@ object NewClassForm: TNewClassForm
   object txtName: TEdit
     Left = 88
     Top = 8
-    Width = 345
+    Width = 348
     Height = 21
     TabOrder = 0
     OnChange = txtNameChange
@@ -158,7 +158,7 @@ object NewClassForm: TNewClassForm
     TabOrder = 8
   end
   object btnCreate: TButton
-    Left = 145
+    Left = 142
     Top = 308
     Width = 75
     Height = 25
@@ -169,7 +169,7 @@ object NewClassForm: TNewClassForm
     OnClick = btnCreateClick
   end
   object btnCancel: TButton
-    Left = 221
+    Left = 227
     Top = 308
     Width = 75
     Height = 25
@@ -190,7 +190,7 @@ object NewClassForm: TNewClassForm
   object txtArgs: TEdit
     Left = 88
     Top = 32
-    Width = 345
+    Width = 348
     Height = 21
     TabOrder = 1
   end

@@ -68,7 +68,7 @@ Project:
 1 = classes
 2 = private vars
 3 = protected vars
-4 = public/published vars
+4 = public vars
 5 = private methods
 6 = protected methods
-7 = public/published methods
+7 = public methods

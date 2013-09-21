@@ -33,7 +33,7 @@ uses
 
 type
   TFindAction = (faFind, faFindFiles, faReplace, faReplaceFiles);
-  TfrmFind = class(TForm)
+  TFindForm = class(TForm)
     btnFind: TButton;
     btnCancel: TButton;
     FindTabs: TTabControl;
@@ -89,7 +89,7 @@ type
   end;
 
 var
- frmFind: TfrmFind = nil;
+  FindForm: TFindForm = nil;
 
 implementation
 
@@ -103,7 +103,7 @@ uses
 
 {$R *.dfm}
 
-function TfrmFind.Execute(editor : TSynEdit;action : TFindAction) : integer;
+function TFindForm.Execute(editor : TSynEdit;action : TFindAction) : integer;
 var
 	caretbackup,blockbeginbackup,blockendbackup : TBufferCoord;
 	onreplacebackup : TReplaceTextEvent;
@@ -158,7 +158,7 @@ begin
 	editor.SearchEngine := enginebackup;
 end;
 
-procedure TfrmFind.btnFindClick(Sender: TObject);
+procedure TFindForm.btnFindClick(Sender: TObject);
 var
 	I,findcount : integer;
 	e : TEditor;
@@ -338,7 +338,7 @@ begin
 	end;
 end;
 
-procedure TfrmFind.FindAllAction(Sender: TObject;const aSearch, aReplace: AnsiString; Line, Column: integer;var Action: TSynReplaceAction);
+procedure TFindForm.FindAllAction(Sender: TObject;const aSearch, aReplace: AnsiString; Line, Column: integer;var Action: TSynReplaceAction);
 var
 	p : TBufferCoord;
 	q : TDisplayCoord;
@@ -352,7 +352,7 @@ begin
 	action := raSkip;
 end;
 
-procedure TfrmFind.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFindForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 	// update devData
 	devData.CaseSensitive := cbMatchCase.Checked;
@@ -376,12 +376,12 @@ begin
 	Action := caHide;
 end;
 
-procedure TfrmFind.btnCancelClick(Sender: TObject);
+procedure TFindForm.btnCancelClick(Sender: TObject);
 begin
 	Close;
 end;
 
-procedure TfrmFind.FindTabsChange(Sender: TObject);
+procedure TFindForm.FindTabsChange(Sender: TObject);
 var
 	isfind,isfindfiles,isreplace,isreplacefiles : boolean;
 begin
@@ -416,7 +416,7 @@ begin
 	end;
 end;
 
-procedure TfrmFind.LoadText;
+procedure TFindForm.LoadText;
 begin
 	// Set interface font
 	Font.Name := devData.InterfaceFont;
@@ -466,7 +466,7 @@ begin
 	FindSelAll.Caption := Lang[ID_ITEM_SELECTALL];
 end;
 
-procedure TfrmFind.FormCreate(Sender: TObject);
+procedure TFindForm.FormCreate(Sender: TObject);
 begin
 	LoadText;
 
@@ -479,7 +479,7 @@ begin
 	fTempSynEdit.TabWidth := devEditor.TabSize;
 end;
 
-procedure TfrmFind.FormShow(Sender: TObject);
+procedure TFindForm.FormShow(Sender: TObject);
 begin
 	FindTabs.TabIndex := fTabIndex;
 
@@ -503,7 +503,7 @@ begin
 	FindTabsChange(nil);
 end;
 
-procedure TfrmFind.FindCutClick(Sender: TObject);
+procedure TFindForm.FindCutClick(Sender: TObject);
 begin
 	if cboFindText.Focused then begin
 		Clipboard.AsText := cboFindText.SelText;
@@ -514,7 +514,7 @@ begin
 	end;
 end;
 
-procedure TfrmFind.FindCopyClick(Sender: TObject);
+procedure TFindForm.FindCopyClick(Sender: TObject);
 begin
 	if cboFindText.Focused then
 		Clipboard.AsText := cboFindText.SelText
@@ -522,7 +522,7 @@ begin
 		Clipboard.AsText := cboReplaceText.SelText;
 end;
 
-procedure TfrmFind.FindPasteClick(Sender: TObject);
+procedure TFindForm.FindPasteClick(Sender: TObject);
 begin
 	if cboFindText.Focused then
 		cboFindText.SelText := Clipboard.AsText
@@ -530,7 +530,7 @@ begin
 		cboReplaceText.SelText := Clipboard.AsText;
 end;
 
-procedure TfrmFind.FindSelAllClick(Sender: TObject);
+procedure TFindForm.FindSelAllClick(Sender: TObject);
 begin
 	if cboFindText.Focused then
 		cboFindText.SelectAll
@@ -538,7 +538,7 @@ begin
 		cboReplaceText.SelectAll;
 end;
 
-procedure TfrmFind.FormDestroy(Sender: TObject);
+procedure TFindForm.FormDestroy(Sender: TObject);
 begin
 	fSearchEngine.Free;
 	fTempSynEdit.Free;

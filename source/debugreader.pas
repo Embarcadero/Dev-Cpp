@@ -32,23 +32,24 @@ uses
 {$ENDIF}
 
 type
-  TAnnotateType = (TPrePrompt, TPrompt, TPostPrompt,
-                   TSource,
-                   TDisplayBegin, TDisplayEnd,
-                   TDisplayExpression,
-                   TFrameSourceFile, TFrameSourceBegin, TFrameSourceLine, TFrameFunctionName, TFrameWhere,
-                   TFrameArgs,
-                   TFrameBegin, TFrameEnd,
-                   TErrorBegin, TErrorEnd,
-                   TArrayBegin, TArrayEnd,
-                   TElt,TEltRep, TEltRepEnd,
-                   TExit,
-                   TSignal,TSignalName,TSignalNameEnd,TSignalString,TSignalStringEnd,
-                   TValueHistoryValue, TValueHistoryBegin, TValueHistoryEnd,
-                   TArgBegin, TArgEnd, TArgValue, TArgNameEnd,
-                   TFieldBegin, TFieldEnd, TFieldValue, TFieldNameEnd,
-                   TInfoReg, TInfoAsm,
-                   TUnknown,TEOF);
+  TAnnotateType = (
+    TPrePrompt, TPrompt, TPostPrompt,
+    TSource,
+    TDisplayBegin, TDisplayEnd,
+    TDisplayExpression,
+    TFrameSourceFile, TFrameSourceBegin, TFrameSourceLine, TFrameFunctionName, TFrameWhere,
+    TFrameArgs,
+    TFrameBegin, TFrameEnd,
+    TErrorBegin, TErrorEnd,
+    TArrayBegin, TArrayEnd,
+    TElt,TEltRep, TEltRepEnd,
+    TExit,
+    TSignal,TSignalName,TSignalNameEnd,TSignalString,TSignalStringEnd,
+    TValueHistoryValue, TValueHistoryBegin, TValueHistoryEnd,
+    TArgBegin, TArgEnd, TArgValue, TArgNameEnd,
+    TFieldBegin, TFieldEnd, TFieldValue, TFieldNameEnd,
+    TInfoReg, TInfoAsm,
+    TUnknown,TEOF);
 
   PWatchVar = ^TWatchVar;
   TWatchVar = record
@@ -226,18 +227,18 @@ end;
 
 procedure TDebugReader.SkipSpaces;
 begin
-	while (curpos < len) and (gdbout[curpos] in [#9,#32]) do
+	while (curpos <= len) and (gdbout[curpos] in [#9,#32]) do
 		Inc(curpos);
 end;
 
 procedure TDebugReader.SkipToAnnotation;
 begin
 	// Walk up to the next annotation
-	while (curpos < len) and not (gdbout[curpos] in [#26]) do
+	while (curpos <= len) and not (gdbout[curpos] in [#26]) do
 		Inc(curpos);
 
 	// Crawl through the remaining ->'s
-	while (curpos < len) and (gdbout[curpos] in [#26]) do
+	while (curpos <= len) and (gdbout[curpos] in [#26]) do
 		Inc(curpos);
 end;
 
@@ -263,7 +264,7 @@ begin
 	// Called when at a space? Skip over
 	SkipSpaces;
 
-	while (curpos < len) and not (gdbout[curpos] in [#0..#32]) do begin
+	while (curpos <= len) and not (gdbout[curpos] in [#0..#32]) do begin
 		Result := Result + gdbout[curpos];
 		Inc(curpos);
 	end;
@@ -274,7 +275,7 @@ begin
 	Result := '';
 
 	// Return part of line still ahead of us
-	while (curpos < len) and not (gdbout[curpos] in [#13, #10]) do begin
+	while (curpos <= len) and not (gdbout[curpos] in [#13, #10]) do begin
 		Result := Result + gdbout[curpos];
 		Inc(curpos);
 	end;
@@ -285,15 +286,15 @@ begin
 	Result := '';
 
 	// Walk up to an enter sequence
-	while (curpos < len) and not (gdbout[curpos] in [#13, #10]) do
+	while (curpos <= len) and not (gdbout[curpos] in [#13, #10]) do
 		Inc(curpos);
 
 	// Skip ONE enter sequence (CRLF, CR, LF, etc.)
-	if (curpos+1 < len) and (gdbout[curpos] = #13) and (gdbout[curpos+1] = #10) then // DOS
+	if (curpos+1 <= len) and (gdbout[curpos] = #13) and (gdbout[curpos+1] = #10) then // DOS
 		Inc(curpos,2)
-	else if (curpos < len) and (gdbout[curpos] = #13) then // UNIX
+	else if (curpos <= len) and (gdbout[curpos] = #13) then // UNIX
 		Inc(curpos)
-	else if (curpos < len) and (gdbout[curpos] = #10) then // MAC
+	else if (curpos <= len) and (gdbout[curpos] = #10) then // MAC
 		Inc(curpos);
 
 	// Return next line
@@ -305,11 +306,11 @@ begin
 	Result := '';
 
 	// Walk up to an enter sequence
-	while (curpos < len) and not (gdbout[curpos] in [#13, #10]) do
+	while (curpos <= len) and not (gdbout[curpos] in [#13, #10]) do
 		Inc(curpos);
 
 	// Skip enter sequences (CRLF, CR, LF, etc.)
-	while (curpos < len) and (gdbout[curpos] in [#13, #10]) do
+	while (curpos <= len) and (gdbout[curpos] in [#13, #10]) do
 		Inc(curpos);
 
 	// Return next line
@@ -364,7 +365,7 @@ begin
 
 	// Tiny rewrite of GetNextWord for special purposes
 	s := '';
-	while (curpos < len) and not (text[curpos] in [#0..#32]) do begin
+	while (curpos <= len) and not (text[curpos] in [#0..#32]) do begin
 		s := s + text[curpos];
 		Inc(curpos);
 	end;
@@ -487,8 +488,8 @@ end;
 
 procedure TDebugReader.ProcessWatchStruct(parentnode : TTreeNode);
 var
-	evalout : AnsiString;
-	parent : TTreeNode;
+	evalout,s : AnsiString;
+	parent, prevparent : TTreeNode;
 	curpos, len, indent, previndent : integer;
 
 	// Similar to TDebugReader.GetRemainingLine, but skips enters too
@@ -497,17 +498,17 @@ var
 		Result := '';
 
 		// Return part of line still ahead of us
-		while (curpos < len) and not (evalout[curpos] in [#13, #10]) do begin
+		while (curpos <= len) and not (evalout[curpos] in [#13, #10]) do begin
 			Result := Result + evalout[curpos];
 			Inc(curpos);
 		end;
 
 		// Walk up to an enter sequence
-		while (curpos < len) and not (evalout[curpos] in [#13, #10]) do
+		while (curpos <= len) and not (evalout[curpos] in [#13, #10]) do
 			Inc(curpos);
 
 		// Skip enter sequences (CRLF, CR, LF, etc.)
-		while (curpos < len) and (evalout[curpos] in [#13, #10]) do
+		while (curpos <= len) and (evalout[curpos] in [#13, #10]) do
 			Inc(curpos);
 	end;
 
@@ -516,7 +517,7 @@ var
 		Result := 0;
 
 		// Return part of line still ahead of us
-		while (curpos < len) and (evalout[curpos] = #32) do begin
+		while (curpos <= len) and (evalout[curpos] = #32) do begin
 			Inc(result);
 			Inc(curpos);
 		end;
@@ -530,18 +531,37 @@ begin
 	parent := parentnode;
 	curpos := 1;
 	len := Length(evalout);
-	previndent := 4; // starting node has already been added
+	previndent := -1; // first indent should always be more
 
-	while curpos < len do begin
+	while curpos <= len do begin
 		indent := GetLineIndent;
 
 		if indent > previndent then begin // set new parent
+			prevparent := parent;
 			parent := parent.GetLastChild;
-			DebugTree.Items.AddChild(parent,GetRemainingLine);
+			if not Assigned(parent) then begin// there is no indent on the first line, expect array output
+				prevparent.Text := prevparent.Text + GetRemainingLine;
+				parent := prevparent;
+			end else // struct output on first line, proceed as usual
+				DebugTree.Items.AddChild(parent,GetRemainingLine)
 		end else if indent < previndent then begin // return to old parent
-			parent := parent.Parent;
-		end else
-			DebugTree.Items.AddChild(parent,GetRemainingLine);
+			prevparent := parent;
+			if Assigned(parent) then
+				parent := parent.Parent;
+			if not Assigned(parent) then
+				parent := prevparent;
+
+			// Eat line
+			GetRemainingLine;
+		end else begin // indent is equal, add to current
+			s := GetRemainingLine;
+			if not StartsStr('}',s) then begin
+				if Assigned(parent) then
+					DebugTree.Items.AddChild(parent,s)
+				else
+					DebugTree.Items.AddChild(DebugTree.TopItem,s);
+			end;
+		end;
 
 		previndent := indent;
 	end;
@@ -904,7 +924,7 @@ begin
 				s := GetNextLine; // error text
 				if StartsStr('No symbol "',s) then begin
 					x := Pos('"',s);
-					y := GetLastPos('"',s);
+					y := RPos('"',s);
 					t := Copy(s,x+1,y-x-1);
 
 					// Update current...
@@ -966,7 +986,7 @@ begin
 				// remove offset, beg/middle/end, address
 				for I := 1 to 3 do begin
 					x := Length(s);
-					y := GetLastPos(':',s);
+					y := RPos(':',s);
 					if y > 0 then begin
 						Delete(s,y,x-y+1);
 					end;
@@ -974,7 +994,7 @@ begin
 
 				// get line
 				x := Length(s);
-				y := GetLastPos(':',s);
+				y := RPos(':',s);
 				if y > 0 then begin
 					bline := StrToInt(Copy(s,y+1,x-y));
 					Delete(s,y,x-y+1);

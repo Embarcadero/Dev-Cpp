@@ -90,9 +90,6 @@ var
 begin
 	LoadText;
 
-	// public is used most of the time?
-	cmbScope.ItemIndex := cmbScope.Items.IndexOf('public');
-
 	sl := TStringList.Create;
 	try
 		MainForm.CppParser.GetClassesList(sl);
@@ -100,6 +97,9 @@ begin
 	finally
 		sl.Free;
 	end;
+
+	// public is used most of the time?
+	cmbScope.ItemIndex := cmbScope.Items.IndexOf('public');
 
 	// Drastic measures are needed to banish random bug reports of AVs here
 	if Assigned(MainForm.ClassBrowser.Selected) and
@@ -287,24 +287,22 @@ begin
 
 	e.Text.Lines.BeginUpdate;
 	e.Text.Lines.Add('#include "' + ExtractFileName(txtHFile.Text) + '"');
-	e.Text.Lines.Add('');
 
 	if chkConstruct.Checked then begin
+		e.Text.Lines.Add('');
 		e.Text.Lines.Add(txtName.Text + '::' + txtName.Text + '(' + txtArgs.Text + ')');
 		e.Text.Lines.Add('{');
 		e.Text.Lines.Add('}');
-		e.Text.Lines.Add('');
 	end;
 
 	if chkDestruct.Checked then begin
+		e.Text.Lines.Add('');
 		e.Text.Lines.Add(txtName.Text + '::~' + txtName.Text + '()');
 		e.Text.Lines.Add('{');
 		e.Text.Lines.Add('}');
-		e.Text.Lines.Add('');
 	end;
 
 	e.Text.Lines.EndUpdate;
-
 	e.Text.Modified := True;
 
 	// Open CPP file by default

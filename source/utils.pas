@@ -32,119 +32,124 @@ uses
 {$ENDIF}
 
 type
-	{ File ID types }
-	TExUnitType = (
-		utcSrc,      // c source file (.c)
-		utcppSrc,    // c++ source file (.cpp)
-		utcHead,     // c header (.h)
-		utcppHead,   // c++ header (.hpp)
-		utresHead,   // resouce header (.rh)
-		utresComp,   // resource compiled (.res)
-		utresSrc,    // resource source (.rc)
-		utPrj,       // project file (.dev)
-		utOther      // any others
-	);
+  { File ID types }
+  TExUnitType = (
+    utcSrc,      // c source file (.c)
+    utcppSrc,    // c++ source file (.cpp)
+    utcHead,     // c header (.h)
+    utcppHead,   // c++ header (.hpp)
+    utresHead,   // resouce header (.rh)
+    utresComp,   // resource compiled (.res)
+    utresSrc,    // resource source (.rc)
+    utPrj,       // project file (.dev)
+    utOther      // any others
+  );
 
-	TFilterSet = (ftOpen, ftPrj, ftSrc, ftAll);
+  TFilterSet = (ftOpen, ftPrj, ftSrc, ftAll);
 
-	TErrFunc = procedure(const Msg: AnsiString) of object;
-	TLineOutputFunc = procedure(const Line: AnsiString) of object;
-	TCheckAbortFunc = procedure(var AbortThread: boolean) of object;
+  TErrFunc = procedure(const Msg: AnsiString) of object;
+  TLineOutputFunc = procedure(const Line: AnsiString) of object;
+  TCheckAbortFunc = procedure(var AbortThread: boolean) of object;
 
-	procedure FilesFromWildcard(Directory : AnsiString;const Mask: AnsiString;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
-	
-	function ExecuteFile(const FileName, Params, DefaultDir: AnsiString;ShowCmd: Integer): THandle;
-	function RunAndGetOutput(const Cmd, WorkDir: AnsiString;ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): AnsiString;
-	
-	function GetShortName(const FileName: AnsiString): AnsiString;
+  procedure FilesFromWildcard(Directory : AnsiString;const Mask: AnsiString;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 
-	function CommaStrToStr(s : AnsiString; formatstr : AnsiString) : AnsiString;
-	function IncludeQuoteIfSpaces(const s : AnsiString) : AnsiString;
-	function IncludeQuoteIfNeeded(const s : AnsiString) : AnsiString;
+  function ExecuteFile(const FileName, Params, DefaultDir: AnsiString;ShowCmd: Integer): THandle;
+  function RunAndGetOutput(const Cmd, WorkDir: AnsiString;ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): AnsiString;
 
-	procedure MsgErr(const text:AnsiString;const caption:AnsiString = 'Error');
-	procedure MsgBox(const text:AnsiString;const caption:AnsiString = 'Message'); overload;
-	procedure MsgBox(textlist:TStrings;const caption:AnsiString = 'Message'); overload;
-	procedure MsgBox(text:integer;const caption:AnsiString = 'Message'); overload;
+  function GetShortName(const FileName: AnsiString): AnsiString;
 
-	procedure LoadFilefromResource(const FileName: AnsiString; ms: TMemoryStream);
+  function CommaStrToStr(s : AnsiString; formatstr : AnsiString) : AnsiString;
+  function IncludeQuoteIfSpaces(const s : AnsiString) : AnsiString;
+  function IncludeQuoteIfNeeded(const s : AnsiString) : AnsiString;
 
-	function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString;const CheckDirs: boolean = FALSE): AnsiString;
+  procedure MsgErr(const text:AnsiString;const caption:AnsiString = 'Error');
+  procedure MsgBox(const text:AnsiString;const caption:AnsiString = 'Message'); overload;
+  procedure MsgBox(textlist:TStrings;const caption:AnsiString = 'Message'); overload;
+  procedure MsgBox(text:integer;const caption:AnsiString = 'Message'); overload;
 
-	function BuildFilter(const Filters: array of AnsiString): AnsiString;
+  procedure LoadFilefromResource(const FileName: AnsiString; ms: TMemoryStream);
 
-	function CodeInstoStr(const s: AnsiString): AnsiString;
-	function StrtoCodeIns(const s: AnsiString): AnsiString;
+  function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString;const CheckDirs: boolean = FALSE): AnsiString;
 
-	procedure StrtoAttr(var Attr: TSynHighlighterAttributes;const Value: AnsiString);
-	function AttrtoStr(Attr: TSynHighlighterAttributes): AnsiString;
+  function BuildFilter(const Filters: array of AnsiString): AnsiString;
 
-	procedure StrtoPoint(var pt: TPoint;const value: AnsiString);
-	function PointtoStr(pt: TPoint): AnsiString;
+  function CodeInstoStr(const s: AnsiString): AnsiString;
+  function StrtoCodeIns(const s: AnsiString): AnsiString;
 
-	function ListToStr(List: TStrings): AnsiString;
-	procedure StrToList(const s: AnsiString;List: TStrings; delimiter: char=';');
+  procedure StrtoAttr(var Attr: TSynHighlighterAttributes;const Value: AnsiString);
+  function AttrtoStr(Attr: TSynHighlighterAttributes): AnsiString;
 
-	function GetFileTyp(const FileName: AnsiString): TExUnitType;
+  procedure StrtoPoint(var pt: TPoint;const value: AnsiString);
+  function PointtoStr(pt: TPoint): AnsiString;
 
-	procedure SetPath(const Add: AnsiString;UseOriginal: boolean = TRUE);
-	function ExpandFileto(const FileName, BasePath: AnsiString): AnsiString;
-	function FileSamePath(const FileName, TestPath: AnsiString): boolean;
-	procedure CloneMenu(FromMenu, ToMenu: TMenuItem);
+  function ListToStr(List: TStrings): AnsiString;
+  procedure StrToList(const s: AnsiString;List: TStrings; delimiter: char=';');
 
-	function GetLastPos(const SubStr, S: AnsiString): integer;
+  function GetFileTyp(const FileName: AnsiString): TExUnitType;
 
-	function GenMakePath1(const FileName: AnsiString): AnsiString;
-	function GenMakePath2(const FileName: AnsiString): AnsiString;
-	function GenMakePath(const FileName: AnsiString; EscapeSpaces,EncloseInQuotes: Boolean): AnsiString; overload;
+  procedure SetPath(const Add: AnsiString;UseOriginal: boolean = TRUE);
+  function ExpandFileto(const FileName, BasePath: AnsiString): AnsiString;
+  function FileSamePath(const FileName, TestPath: AnsiString): boolean;
+  procedure CloneMenu(FromMenu, ToMenu: TMenuItem);
 
-	function GetRealPath(const BrokenFileName: AnsiString;const Directory: AnsiString = ''): AnsiString;
+  function FindComplement(const s : AnsiString; fromtoken,totoken: char;var curpos : integer; increment : integer) : boolean;
 
-	function GetVersionString(const FileName: AnsiString): AnsiString;
+  function FPos(const SubStr, S: AnsiString; start : integer): integer;
 
-	function CheckChangeDir(var Dir: AnsiString): boolean;
+  function RPos(const SubStr, S: AnsiString): integer; overload;
+  function RPos(const SubStr, S: AnsiString; start : integer): integer; overload;
 
-	function GetAssociatedProgram(const Extension: AnsiString; var Filename, Description: AnsiString): boolean;
+  function GenMakePath1(const FileName: AnsiString): AnsiString;
+  function GenMakePath2(const FileName: AnsiString): AnsiString;
+  function GenMakePath(const FileName: AnsiString; EscapeSpaces,EncloseInQuotes: Boolean): AnsiString; overload;
 
-	function IsNumeric(const s : AnsiString) : boolean;
+  function GetRealPath(const BrokenFileName: AnsiString;const Directory: AnsiString = ''): AnsiString;
 
-	function CountChar(const s : AnsiString;c : Char) : integer;
+  function GetVersionString(const FileName: AnsiString): AnsiString;
 
-	procedure OpenHelpFile;
+  function CheckChangeDir(var Dir: AnsiString): boolean;
 
-	function ProgramHasConsole(const path : AnsiString) : boolean;
+  function GetAssociatedProgram(const Extension: AnsiString; var Filename, Description: AnsiString): boolean;
 
-	function GetBuildTime(const path : AnsiString) : TDateTime;
+  function IsNumeric(const s : AnsiString) : boolean;
 
-	function IsEmpty(editor : TSynEdit) : boolean;
+  function CountChar(const s : AnsiString;c : Char) : integer;
 
-	function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
+  procedure OpenHelpFile;
 
-	function CtrlDown : Boolean;
+  function ProgramHasConsole(const path : AnsiString) : boolean;
 
-	function GetInfoOfCompiler(const binfolder : AnsiString) : AnsiString;
+  function GetBuildTime(const path : AnsiString) : TDateTime;
 
-// Fast replacements of localized functions
-function EndsStr(const subtext, text: AnsiString): boolean;
-function EndsText(const subtext, text: AnsiString): boolean;
+  function IsEmpty(editor : TSynEdit) : boolean;
 
-function ContainsStr(const text, subtext: AnsiString): boolean;
-function ContainsText(const text, subtext: AnsiString): boolean;
+  function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
 
-function SameStr(const s1,s2 : AnsiString) : boolean;
-function SameText(const s1,s2 : AnsiString) : boolean;
+  function CtrlDown : Boolean;
 
-function NotSameStr(const s1,s2 : AnsiString) : boolean;
-function NotSameText(const s1,s2 : AnsiString) : boolean;
+  function GetInfoOfCompiler(const binfolder : AnsiString) : AnsiString;
 
-function StartsStr(const subtext,text : AnsiString) : boolean;
-function StartsText(const subtext,text : AnsiString) : boolean;
+  // Fast replacements of localized functions
+  function EndsStr(const subtext, text: AnsiString): boolean;
+  function EndsText(const subtext, text: AnsiString): boolean;
 
-function ReplaceFirstStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
-function ReplaceFirstText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+  function ContainsStr(const text, subtext: AnsiString): boolean;
+  function ContainsText(const text, subtext: AnsiString): boolean;
 
-function ReplaceLastStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
-function ReplaceLastText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+  function SameStr(const s1,s2 : AnsiString) : boolean;
+  function SameText(const s1,s2 : AnsiString) : boolean;
+
+  function NotSameStr(const s1,s2 : AnsiString) : boolean;
+  function NotSameText(const s1,s2 : AnsiString) : boolean;
+
+  function StartsStr(const subtext,text : AnsiString) : boolean;
+  function StartsText(const subtext,text : AnsiString) : boolean;
+
+  function ReplaceFirstStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+  function ReplaceFirstText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+
+  function ReplaceLastStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+  function ReplaceLastText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 
 implementation
 
@@ -334,7 +339,7 @@ var
 	Offset: Integer;
 begin
 
-	Offset := GetLastPos(OldPattern, S);
+	Offset := RPos(OldPattern, S);
 	if Offset = 0 then begin
 		Result := S;
 	end else begin
@@ -352,7 +357,7 @@ begin
 	UpperS := UpperCase(S);
 	UpperOldPattern := UpperCase(OldPattern);
 
-	Offset := GetLastPos(UpperOldPattern, UpperS);
+	Offset := RPos(UpperOldPattern, UpperS);
 	if Offset = 0 then begin
 		Result := S;
 	end else begin
@@ -900,25 +905,73 @@ begin
   ToMenu.Visible:= FromMenu.Visible;
 end;
 
-function GetLastPos(const SubStr, s: AnsiString): integer;
+function FPos(const SubStr, S: AnsiString; start : integer): integer;
 var
-  Last,
-  Current: PAnsiChar;
+	i: Integer;
+	pStr: PChar;
+	pSub: PChar;
 begin
-  result:= 0;
-  Last:= nil;
-  Current:= PAnsiChar(s);
-  while (Current <> nil) and (Current^ <> #0) do
-  begin
-    Current:= AnsiStrPos(PAnsiChar(Current), PAnsiChar(SubStr));
-    if Current <> nil then
-    begin
-      Last:= Current;
-      inc(Current, length(SubStr));
-    end;
-  end;
-  if Last <> nil then
-   result:= abs((longint(PAnsiChar(s)) -longint(Last)) div sizeof(AnsiChar)) +1;
+	pSub := Pointer(SubStr);
+
+	for i := start to Length(s) do begin
+		pStr := @(s[i]);
+		if (pStr^ = pSub^) then begin // compare char
+			if CompareMem(pSub, pStr, Length(SubStr)) then begin // then compare whole string
+				result := i;
+				exit;
+			end;
+		end;
+	end;
+
+	result := 0;
+end;
+
+function RPos(const SubStr, s: AnsiString): integer;
+begin
+	result := RPos(SubStr,s,Length(s) - Length(SubStr) + 1);
+end;
+
+function RPos(const SubStr, S: AnsiString; start : integer): integer;
+var
+	i: Integer;
+	pStr: PChar;
+	pSub: PChar;
+begin
+	pSub := Pointer(SubStr);
+
+	for i := start downto 1 do begin
+		pStr := @(s[i]);
+		if (pStr^ = pSub^) then begin // compare char
+			if CompareMem(pSub, pStr, Length(SubStr)) then begin // then compare whole string
+				result := i;
+				exit;
+			end;
+		end;
+	end;
+
+	result := 0;
+end;
+
+function FindComplement(const s : AnsiString; fromtoken,totoken: char;var curpos : integer; increment : integer) : boolean;
+var
+	level,curposbackup : integer;
+begin
+	curposbackup := curpos;
+	level := 0;
+	while(curpos <= Length(s)) and (curpos > 0) do begin
+		if(s[curpos] = fromtoken) then begin
+			Inc(level);
+		end else if(s[curpos] = totoken) then begin
+			Dec(level);
+			if level = 0 then begin
+				Result := true;
+				Exit;
+			end;
+		end;
+		Inc(curpos,increment);
+	end;
+	curpos := curposbackup;
+	Result := false;
 end;
 
 { GenMakePath: convert a filename to a format that can be used by make }

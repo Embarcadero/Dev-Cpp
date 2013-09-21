@@ -894,7 +894,7 @@ begin
 		// Fill a cache of known functions...
 		FToolTips.BeginUpdate;
 		FToolTips.Clear;
-		FParser.FillListOf(S, FToolTips, [skFunction,skConstructor,skDestructor]);
+		FParser.FillListOfFunctions(S, FToolTips);
 		FToolTips.EndUpdate;
 	end;
 

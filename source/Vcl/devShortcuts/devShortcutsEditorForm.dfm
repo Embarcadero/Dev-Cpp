@@ -37,7 +37,6 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     TabOrder = 0
     ViewStyle = vsReport
     OnCustomDrawItem = lvShortcutsCustomDrawItem
-    OnCustomDrawSubItem = lvShortcutsCustomDrawSubItem
     OnExit = lvShortcutsExit
     OnKeyDown = lvShortcutsKeyDown
   end

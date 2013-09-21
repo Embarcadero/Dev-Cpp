@@ -38,7 +38,6 @@ type
     btnCancel: TButton;
     procedure lvShortcutsKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure lvShortcutsCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
-    procedure lvShortcutsCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;var DefaultDraw: Boolean);
     procedure lvShortcutsExit(Sender: TObject);
   private
     { Private declarations }
@@ -132,7 +131,7 @@ procedure TfrmShortcutsEditor.lvShortcutsCustomDrawItem(
   Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 begin
-  with TCustomListView(Sender).Canvas do begin
+  with Sender.Canvas do begin
     if not (cdsSelected in State) then begin
       if Item.Index mod 2 = 0 then
         Brush.Color := clWhite
@@ -141,23 +140,6 @@ begin
       Pen.Color := clBlack;
     end;
   end;
-  DefaultDraw := True;
-end;
-
-procedure TfrmShortcutsEditor.lvShortcutsCustomDrawSubItem(
-  Sender: TCustomListView; Item: TListItem; SubItem: Integer;
-  State: TCustomDrawState; var DefaultDraw: Boolean);
-begin
-  with TCustomListView(Sender).Canvas do begin
-    if not (cdsSelected in State) then begin
-      if Item.Index mod 2 = 0 then
-        Brush.Color := clWhite
-      else
-        Brush.Color := AltColor;
-      Pen.Color := clBlack;
-    end;
-  end;
-  DefaultDraw := True;
 end;
 
 // Don't let a tab keystroke make us lose focus, instead, assign tab to the selected item

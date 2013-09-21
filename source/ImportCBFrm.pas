@@ -214,7 +214,7 @@ begin
 
 		// We've encountered: <Unit filename="foo.cpp" />
 		if filepos > 0 then begin
-			ending:=GetLastPos('"',fSL.Strings[i]);
+			ending:=RPos('"',fSL.Strings[i]);
 			filestring:=Copy(fSL.Strings[i],19,ending-19);
             WriteDev('[Aap]','hoi',filestring);
 		end;

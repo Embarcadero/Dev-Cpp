@@ -58,26 +58,22 @@ type
     fOnKeyPress: TKeyPressEvent;
     fOnResize: TNotifyEvent;
     fOnlyGlobals: boolean;
-    fCurrClassID: integer;
+    fCurrentClass: integer;
     fIncludedFiles: TStringList;
-    function GetTypeID(_Value: AnsiString; il: TIntList): integer;
     function ApplyClassFilter(Index, ParentID: integer; InheritanceIDs: TIntList): boolean;
-    function ApplyMemberFilter(const _Class: AnsiString; Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
-    procedure GetCompletionFor(const _Class, _Value: AnsiString; HasDot: boolean);
-    procedure FilterList(const _Class, _Value: AnsiString; HasDot: boolean);
-    function GetMember(const Phrase: AnsiString): AnsiString;
-    function GetHasDot(const Phrase: AnsiString): boolean;
+    function ApplyMemberFilter(Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
+    procedure GetCompletionFor(Phrase : AnsiString);
+    procedure FilterList(const Member : AnsiString);
     procedure SetPosition(Value: TPoint);
     procedure OnFormResize(Sender: TObject);
     function IsIncluded(const FileName: AnsiString): boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Search(Sender: TWinControl;const Phrase, Filename: AnsiString);
+    procedure Search(const Phrase, Filename: AnsiString);
     procedure Hide;
     function SelectedStatement: PStatement;
     function SelectedIsFunction: boolean;
-    function GetClass(const Phrase: AnsiString): AnsiString;
   published
     property ShowCount : integer read fShowCount write fShowCount;
     property Parser: TCppParser read fParser write fParser;
@@ -93,7 +89,7 @@ type
     property OnKeyPress: TKeyPressEvent read fOnKeyPress write fOnKeyPress;
     property OnResize: TNotifyEvent read fOnResize write fOnResize;
     property OnlyGlobals: boolean read fOnlyGlobals write fOnlyGlobals;
-    property CurrentClass: integer read fCurrClassID write fCurrClassID;
+    property CurrentClass: integer read fCurrentClass write fCurrentClass;
   end;
 
 implementation
@@ -134,58 +130,6 @@ begin
   inherited Destroy;
 end;
 
-function TCodeCompletion.GetClass(const Phrase: AnsiString): AnsiString;
-var
-  I: integer;
-begin
-  I := LastDelimiter('.', Phrase) - 1;
-  if I = -1 then begin
-    I := LastDelimiter('>', Phrase);
-    if I > 1 then begin
-      if Phrase[I - 1] <> '-' then
-        I := -1
-      else
-        Dec(I, 2);
-    end
-    else begin
-      I := LastDelimiter(':', Phrase);
-      if I > 1 then begin
-        if Phrase[I - 1] <> ':' then
-          I := -1
-        else
-          Dec(I, 2);
-      end
-      else
-        I := -1;
-    end;
-  end;
-  if I = -1 then begin
-    Result := '';
-    I := Length(Phrase);
-    while (I > 0) and (Phrase[I] in ['A'..'Z', 'a'..'z', '_', '0'..'9']) do begin
-      Result := Phrase[I] + Result;
-      Dec(I);
-    end;
-  end
-  else begin
-    Result := '';
-    while (I > 0) and (Phrase[I] in ['A'..'Z', 'a'..'z', '_', '0'..'9', '(', ')', '[', ']']) do begin
-      if (Phrase[I] = '.') or
-        ((I > 1) and (Phrase[I] = '>') and (Phrase[I - 1] = '-')) or
-        ((I > 1) and (Phrase[I] = ':') and (Phrase[I - 1] = ':')) then
-        Break;
-      Result := Phrase[I] + Result;
-      Dec(I);
-    end;
-    // check if it is function; if yes, cut-off the arguments ;)
-    if Pos('(', Result) > 0 then
-      Result := Copy(Result, 1, Pos('(', Result) - 1);
-    // check if it is an array; if yes, cut-off the dimensions ;)
-    if Pos('[', Result) > 0 then
-      Result := Copy(Result, 1, Pos('[', Result) - 1);
-  end;
-end;
-
 function TCodeCompletion.ApplyClassFilter(Index, ParentID: integer; InheritanceIDs: TIntList): boolean;
 begin
   Result :=
@@ -206,7 +150,7 @@ begin
     IsIncluded(PStatement(fParser.Statements[Index])^._DeclImplFileName));
 end;
 
-function TCodeCompletion.ApplyMemberFilter(const _Class: AnsiString; Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
+function TCodeCompletion.ApplyMemberFilter(Index, CurrentID: integer; ClassIDs, InheritanceIDs: TIntList): boolean;
 var
   cs: set of TStatementClassScope;
 begin
@@ -223,7 +167,7 @@ begin
     (not (PStatement(fParser.Statements[Index])^._ClassScope in [scsProtected, scsPrivate])) // or member of an inherited class
     );
 
-  if (CurrentID = -1) or (PStatement(fParser.Statements[Index])^._ParentID = fCurrClassID) then
+  if (CurrentID = -1) or (PStatement(fParser.Statements[Index])^._ParentID = fCurrentClass) then
     cs := [scsPrivate, scsProtected]
   else
     cs := [scsPrivate];
@@ -236,93 +180,75 @@ begin
     );
 end;
 
-procedure TCodeCompletion.GetCompletionFor(const _Class, _Value: AnsiString; HasDot: boolean);
+procedure TCodeCompletion.GetCompletionFor(Phrase : AnsiString);
 var
-  I: integer;
-  InheritanceIDs: TIntList;
-  ClassIDs: TIntList;
-  sl: TStringList;
-  ParID: integer;
-  iID: integer;
-  pST: PStatement;
-  CurrentID: integer;
-  bOnlyLocal: boolean;
-  procedure GetInheritance(ClassIndex: integer);
-  var
-    I: integer;
-    isID: integer;
-    iST: integer;
-  begin
-    if ClassIndex <> -1 then begin
-      ParID := PStatement(fParser.Statements[ClassIndex])^._ID;
-      isID := ClassIndex;
-      repeat
-        sl.CommaText := PStatement(fParser.Statements[isID])^._InheritsFromIDs;
-        iST := -1;
-        for I := 0 to sl.Count - 1 do begin
-          iST := -1;
-          iID := StrToIntDef(sl[I], -1);
-          if iID = -1 then
-            Continue;
-          InheritanceIDs.Add(iID);
-          iST := fParser.IndexOfStatement(iID);
-          if iST = -1 then
-            Continue;
-          pST := PStatement(fParser.Statements[iST]);
-          fIncludedFiles.Add(pST^._Filename);
-          fIncludedFiles.Add(pST^._DeclImplFilename);
-        end;
-        isID := iST;
-      until isID = -1;
-    end;
-  end;
+	I: integer;
+	InheritanceIDs: TIntList;
+	ClassIDs: TIntList;
+	fCurrentID: integer;
+	parent : PStatement;
+
+	procedure AddInheritanceOf(Index: integer);
+	begin
+		if index <> -1 then begin
+
+			// obtain a list of IDs to inherit from
+			fParser.AddInheritance(PStatement(fParser.Statements[Index])^._InheritsFromIDs,InheritanceIDs);
+
+			// also include these files
+			fIncludedFiles.Add(PStatement(fParser.Statements[Index])^._Filename);
+			fIncludedFiles.Add(PStatement(fParser.Statements[Index])^._DeclImplFilename);
+		end;
+	end;
+
 begin
-	bOnlyLocal := False;
-	ParID := -1;
+	// Pulling off the same trick as in TCppParser.FindStatementOf, but ignore everything after last operator
 	ClassIDs := TIntList.Create;
 	InheritanceIDs := TIntList.Create;
-	sl := TStringList.Create;
 	try
 
-		if not HasDot then begin // only add globals and members of the current class
-			GetInheritance(fCurrClassID);
+		// ID of current class
+		if fCurrentClass <> -1 then
+			fCurrentID := PStatement(fParser.Statements[fCurrentClass])^._ID
+		else
+			fCurrentID := -1;
 
-			// Then add globals...
+		I := fParser.FindLastOperator(Phrase);
+		if I = 0 then begin
+
+			// only add globals and members of the current class
+
+			// Also consider classes the current class inherits from
+			AddInheritanceOf(fCurrentClass);
+
 			for I := 0 to fParser.Statements.Count - 1 do
-				if ApplyClassFilter(I, ParID, InheritanceIDs) then
+				if ApplyClassFilter(I, fCurrentID, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
 
 		end else begin
 
-			// Look for the parent class before the operator. Don't scan the headers?
+			// Find last operator
+			Delete(Phrase,I,MaxInt);
+
+			// Add statements of all the text before the last operator
+			parent := fParser.FindStatementOf(Phrase,fCurrentID);
+			if not Assigned(parent) then
+				Exit;
+
+			// Obtain type declaration of parent
+			parent := fParser.FindTypeStatementOf(parent^._Type);
+			if not Assigned(parent) then
+				Exit;
+
+			ClassIDs.Add(parent^._ID); // we need types!
+			AddInheritanceOf(fParser.IndexOfStatement(parent^._ID)); // slow...
+
+			// Then add members of the ClassIDs and InheritanceIDs
 			for I := 0 to fParser.Statements.Count - 1 do
-				if SameStr(PStatement(fParser.Statements[I])^._ScopelessCmd,_Class) then begin
-					if PStatement(fParser.Statements[I])^._Kind = skClass then begin
-
-						// added for the case "Class::Member", where "Class" is the actual class
-						ClassIDs.Clear;
-						ClassIDs.Add(PStatement(fParser.Statements[I])^._ID);
-						bOnlyLocal := True;
-					end else
-						GetTypeID(PStatement(fParser.Statements[I])^._Type, ClassIDs);
-				end;
-
-			if not bOnlyLocal then
-				for I := 0 to ClassIDs.Count - 1 do
-					GetInheritance(fParser.IndexOfStatement(ClassIDs[I]));
-
-			if fCurrClassID <> -1 then
-				CurrentID := PStatement(fParser.Statements[fCurrClassID])^._ID
-			else
-				CurrentID := -1;
-
-			// Then look for members...
-			for I := 0 to fParser.Statements.Count - 1 do
-				if ApplyMemberFilter(_Class, I, CurrentID, ClassIDs, InheritanceIDs) then
+				if ApplyMemberFilter(I, fCurrentID, ClassIDs, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
 		end;
 	finally
-		sl.Free;
 		InheritanceIDs.Free;
 		ClassIDs.Free;
 	end;
@@ -340,90 +266,15 @@ begin
 		Result := CompareText(PStatement(Item1)^._ScopelessCmd, PStatement(Item2)^._ScopelessCmd);
 end;
 
-procedure TCodeCompletion.FilterList(const _Class, _Value: AnsiString;HasDot: boolean);
+procedure TCodeCompletion.FilterList(const Member : AnsiString);
 var
 	I: integer;
 begin
 	fCompletionStatementList.Clear;
-	if _Class <> '' then begin
-		if not HasDot then begin // class only
-			for I := 0 to fFullCompletionStatementList.Count - 1 do
-				if StartsText(_Class, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
-					fCompletionStatementList.Add(fFullCompletionStatementList[I]);
-		end else begin // class and method
-			for I := 0 to fFullCompletionStatementList.Count - 1 do
-				// ignore "this" pointer as a member
-				if (I <> fParser.GetThisPointerID) and StartsText(_Value, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
-					fCompletionStatementList.Add(fFullCompletionStatementList[I]);
-		end;
-	end else begin
-		for I := 0 to fFullCompletionStatementList.Count - 1 do
+	for I := 0 to fFullCompletionStatementList.Count - 1 do
+		if StartsText(Member, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
 			fCompletionStatementList.Add(fFullCompletionStatementList[I]);
-	end;
 	fCompletionStatementList.Sort(@ListSort);
-end;
-
-function TCodeCompletion.GetHasDot(const Phrase: AnsiString): boolean;
-var
-  I: integer;
-begin
-  Result := LastDelimiter('.', Phrase) > 0;
-  if not Result then begin
-    I := LastDelimiter('>', Phrase);
-    if I > 1 then
-      Result := Phrase[I - 1] = '-';
-  end;
-  if not Result then begin
-    I := LastDelimiter(':', Phrase);
-    if I > 1 then
-      Result := Phrase[I - 1] = ':';
-  end;
-end;
-
-function TCodeCompletion.GetMember(const Phrase: AnsiString): AnsiString;
-var
-  I: integer;
-begin
-  I := LastDelimiter('.', Phrase);
-  if I = 0 then begin
-    I := LastDelimiter('>', Phrase);
-    if I <> 0 then begin
-      if (I > 1) and (Phrase[I - 1] <> '-') then
-        I := 0;
-    end
-    else begin
-      I := LastDelimiter(':', Phrase);
-      if I <> 0 then
-        if (I > 1) and (Phrase[I - 1] <> ':') then
-          I := 0;
-    end;
-  end;
-  if I = 0 then
-    Result := ''
-  else
-    Result := Copy(Phrase, I + 1, Length(Phrase) - I + 2);
-end;
-
-function TCodeCompletion.GetTypeID(_Value: AnsiString; il: TIntList): integer;
-var
-	I: integer;
-begin
-	Result := -1;
-	if (_Value <> '') and (_Value[Length(_Value)] = '>') then // template
-		Delete(_Value, Pos('<', _Value), MaxInt);
-	for I := 0 to fParser.Statements.Count - 1 do
-		if (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd) = 0) or
-		   (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '*') = 0) or
-		   (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '&') = 0) or
-		   (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '**') = 0) then begin
-			if (Result = -1) or ((Result <> -1) and (PStatement(fParser.Statements[I])^._ParentID <> Result)) then begin
-				Result := PStatement(fParser.Statements[I])^._ID;
-				if Assigned(il) then
-					il.Add(Result)
-				else
-					Break;
-			end;
-		end;
 end;
 
 procedure TCodeCompletion.Hide;
@@ -440,33 +291,29 @@ begin
 	fIncludedFiles.Clear; // is recreated anyway on reshow, so save some memory when hiding
 end;
 
-procedure TCodeCompletion.Search(Sender: TWinControl;const Phrase, Filename: AnsiString);
+procedure TCodeCompletion.Search(const Phrase, Filename: AnsiString);
 var
-	C: AnsiString;
-	M: AnsiString;
-	D: boolean;
 	I : integer;
 begin
 	if fEnabled then begin
 
-		C := GetClass(Phrase);
-		M := GetMember(Phrase);
-		D := GetHasDot(Phrase);
+		Screen.Cursor := crHourglass;
 
-		if not D or (C <> '') then begin
-
-			Screen.Cursor := crHourglass;
-
-			// only perform full new search if just invoked
-			if not CodeComplForm.Showing then begin
-				fIncludedFiles.CommaText := fParser.GetFileIncludes(Filename);
-				GetCompletionFor(C, M, D);
-			end;
-
-			// filter fFullCompletionStatementList to fCompletionStatementList
-			FilterList(C, M, D); // and sort here too
-			Screen.Cursor := crDefault;
+		// only perform full new search if just invoked
+		if not CodeComplForm.Showing then begin
+			fIncludedFiles.CommaText := fParser.GetFileIncludes(Filename);
+			GetCompletionFor(Phrase);
 		end;
+
+		// Sort here by member
+		I := fParser.FindLastOperator(Phrase);
+		while (I > 0) and (I <= Length(Phrase)) and (Phrase[i] in ['.',':','-','>']) do
+			Inc(I);
+
+		// filter fFullCompletionStatementList to fCompletionStatementList
+		FilterList(Copy(Phrase,I,MaxInt));
+
+		Screen.Cursor := crDefault;
 
 		if fCompletionStatementList.Count > 0 then begin
 			CodeComplForm.lbCompletion.Items.BeginUpdate;
@@ -547,4 +394,3 @@ begin
 end;
 
 end.
-

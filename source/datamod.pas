@@ -25,7 +25,7 @@ uses
 {$IFDEF WIN32}
   SysUtils, Classes, Menus, Dialogs, ImgList, Controls,
   SynEditHighlighter, SynHighlighterCpp,
-  CodeInsList, SynHighlighterRC, SynCompletionProposal,
+  CodeInsList, SynHighlighterRC,
   SynEditMiscClasses, SynEditSearch;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -44,12 +44,9 @@ type
     Res: TSynRCSyn;
     MenuImages_NewLook: TImageList;
     ProjectImage_NewLook: TImageList;
-    SpecialImages_Gnome: TImageList;
-    SpecialImages_NewLook: TImageList;
     GutterImages: TImageList;
     MenuImages_Blue: TImageList;
     ProjectImage_Blue: TImageList;
-    Specialimages_Blue: TImageList;
     ClassImages: TImageList;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);

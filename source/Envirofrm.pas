@@ -282,7 +282,7 @@ end;
 
 procedure TEnviroForm.btnOkClick(Sender: TObject);
 var
-	idx: integer;
+	I : integer;
 	s : AnsiString;
 begin
 	if chkAltConfig.Enabled then begin
@@ -330,14 +330,16 @@ begin
 	MainForm.Font.Size := devData.InterfaceFontSize;
 
 	try
-		for idx:=0 to AssociationsCount - 1 do
-			if lstAssocFileTypes.Checked[idx] then
-				Associate(idx)
+
+		// Force update
+		for I := 0 to AssociationsCount - 1 do
+			if lstAssocFileTypes.Checked[I] then
+				Associate(I)
 			else
-				Unassociate(idx);
+				Unassociate(I);
 	except
 		MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
-		devData.CheckAssocs := false; // don't bother the user again
+		devData.CheckAssocs := false; // don't bother the user again on next startup
 	end;
 
 	devDirs.Icons:= IncludeTrailingPathDelimiter(ExpandFileto(edIcoLib.Text, devDirs.Exec));
@@ -440,6 +442,8 @@ end;
 procedure TEnviroForm.FormCreate(Sender: TObject);
 begin
 	LoadText;
+
+	CheckAssociations(false); // read only, don't try to fix them
 end;
 
 procedure TEnviroForm.vleExternalEditButtonClick(Sender: TObject);

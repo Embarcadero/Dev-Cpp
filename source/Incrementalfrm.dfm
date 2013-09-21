@@ -1,4 +1,4 @@
-object frmIncremental: TfrmIncremental
+object IncrementalForm: TIncrementalForm
   Left = 861
   Top = 494
   Anchors = []

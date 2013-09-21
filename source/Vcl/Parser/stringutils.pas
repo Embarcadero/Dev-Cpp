@@ -31,7 +31,6 @@ uses
  Sysutils;
 {$ENDIF}
 
-// Fast replacements of Ansi functions
 function EndsStr(const subtext, text: AnsiString): boolean;
 function EndsText(const subtext, text: AnsiString): boolean;
 
@@ -49,6 +48,11 @@ function StartsText(const subtext,text : AnsiString) : boolean;
 
 function ReplaceFirstStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 function ReplaceFirstText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+
+function FPos(const SubStr, S: AnsiString; start : integer): integer;
+
+function RPos(const SubStr, S: AnsiString): integer; overload;
+function RPos(const SubStr, S: AnsiString; start : integer): integer; overload;
 
 implementation
 
@@ -145,6 +149,53 @@ begin
 		// Copy the preceding stuff, append the new part, append old stuff after old pattern
 		Result := Copy(S, 1, Offset - 1) + NewPattern + Copy(S, Offset + Length(UpperOldPattern), MaxInt);
 	end;
+end;
+
+function FPos(const SubStr, S: AnsiString; start : integer): integer;
+var
+	i: Integer;
+	pStr: PChar;
+	pSub: PChar;
+begin
+	pSub := Pointer(SubStr);
+
+	for i := start to Length(s) do begin
+		pStr := @(s[i]);
+		if (pStr^ = pSub^) then begin // compare char
+			if CompareMem(pSub, pStr, Length(SubStr)) then begin // then compare whole string
+				result := i;
+				exit;
+			end;
+		end;
+	end;
+
+	result := 0;
+end;
+
+function RPos(const SubStr, s: AnsiString): integer;
+begin
+	result := RPos(SubStr,s,Length(s) - Length(SubStr) + 1);
+end;
+
+function RPos(const SubStr, S: AnsiString; start : integer): integer;
+var
+	i: Integer;
+	pStr: PChar;
+	pSub: PChar;
+begin
+	pSub := Pointer(SubStr);
+
+	for i := start downto 1 do begin
+		pStr := @(s[i]);
+		if (pStr^ = pSub^) then begin // compare char
+			if CompareMem(pSub, pStr, Length(SubStr)) then begin // then compare whole string
+				result := i;
+				exit;
+			end;
+		end;
+	end;
+
+	result := 0;
 end;
 
 end.

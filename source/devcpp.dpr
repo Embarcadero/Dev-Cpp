@@ -71,7 +71,7 @@ uses
   NewTemplateFrm in 'NewTemplateFrm.pas' {NewTemplateForm},
   FunctionSearchFrm in 'FunctionSearchFrm.pas' {FunctionSearchForm},
   NewVarFrm in 'NewVarFrm.pas' {NewVarForm},
-  NewMemberFrm in 'NewMemberFrm.pas' {NewMemberForm},
+  NewFunctionFrm in 'NewFunctionFrm.pas' {NewFunctionForm},
   NewClassFrm in 'NewClassFrm.pas' {NewClassForm},
   ProfileAnalysisFrm in 'ProfileAnalysisFrm.pas' {ProfileAnalysisForm},
   FilePropertiesFrm in 'FilePropertiesFrm.pas' {FilePropertiesForm},

@@ -92,7 +92,6 @@ begin
 							scsPrivate: StateIndex := 5;
 							scsProtected: StateIndex := 6;
 							scsPublic: StateIndex := 7;
-							scsPublished: StateIndex := 7;
 						end;
 						SubItems.Add(st^._Type);
 						SubItems.Add(st^._ScopeCmd);
