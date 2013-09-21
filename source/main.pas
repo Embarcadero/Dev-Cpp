@@ -5536,8 +5536,11 @@ var
 	e: TEditor;
 	fname: AnsiString;
 begin
-	I:=Integer(cmbMembers.Items.Objects[cmbMembers.ItemIndex]);
-	st:=PStatement(CppParser.Statements[I]);
+	if cmbMembers.ItemIndex = -1 then // sometimes happens too?
+		Exit;
+
+	I := Integer(cmbMembers.Items.Objects[cmbMembers.ItemIndex]);
+	st := PStatement(CppParser.Statements[I]);
 	if not Assigned(st) then
 		Exit;
 
@@ -5762,7 +5765,7 @@ begin
 
 		// When searching using menu shortcuts, the caret is set to the proper place
 		// When searching using ctrl+click, the cursor is set properly too, so do NOT use WordAtMouse
-		M:=TMemoryStream.Create;
+		M := TMemoryStream.Create;
 		try
 			e.Text.UnCollapsedLines.SaveToStream(M);
 			statement := CppParser.FindStatementOf(
@@ -5975,14 +5978,6 @@ begin
 	// Create all data structures
 	UpdateSplash('Applying settings...');
 
-	// Reduce flickering by not using erase
-	//ClassBrowser.DoubleBuffered := true;
-	PageControl.DoubleBuffered := true;
-	ProjectView.DoubleBuffered := true;
-	LeftPageControl.DoubleBuffered :=true;
-	DebugTree.DoubleBuffered := true;
-	MessageControl.DoubleBuffered := true;
-
 	// Fix Alt key painting problems
 	//TVistaAltFix.Create(Self); // causes too much flicker :(
 
@@ -6025,6 +6020,7 @@ begin
 	// Create icon themes
 	devImageThemes := TDevImageThemeFactory.Create;
 	devImageThemes.LoadFromDirectory(devDirs.Themes);
+	LoadTheme;
 
 	// Custom tools
 	fTools:= TToolController.Create;
@@ -6082,8 +6078,7 @@ begin
 		AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
 	end;
 
-	// Create some more things?
-	LoadTheme;
+	// Create some more things...
 	dmMain.MRUMenu:= ReOpenItem;
 	dmMain.MRUOffset:= 2;
 	dmMain.MRUMax:= devData.MRUMax;
@@ -6380,5 +6375,3 @@ begin
 end;
 
 end.
-
-

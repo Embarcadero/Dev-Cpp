@@ -2166,7 +2166,12 @@ begin
 
 	// Try reading the whole file in one go
 	with TMemoryStream.Create do try
+
+		if not FileExists(FileName) then
+			Exit;
+
 		LoadFromFile(FileName);
+
 		if Size = 0 then
 			Exit;
 

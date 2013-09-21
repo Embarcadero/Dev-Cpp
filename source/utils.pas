@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
  Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
- Menus, Registry, ComCtrls;
+ Menus, Registry, Controls, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
  Classes, Sysutils, QForms, QDialogs, QSynEditHighlighter,
@@ -834,7 +834,7 @@ begin
 		result:= utcppSrc
 	else if AnsiMatchText(ext, ['.h']) then
 		result:= utcHead
-	else if AnsiMatchText(ext, ['.hpp', '.rh', '.hh', '.hxx']) then
+	else if AnsiMatchText(ext, ['.hpp', '.rh', '.hh', '.hxx', '.inl']) then
 		result:= utcppHead
 	else if AnsiMatchText(ext, ['.res', '.rc']) then
 		result:= utresSrc

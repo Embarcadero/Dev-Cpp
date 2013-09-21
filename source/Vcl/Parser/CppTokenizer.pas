@@ -35,6 +35,7 @@ const
   HexChars: set of Char = ['A'..'F', 'a'..'f', 'x', 'L'];
   SpaceChars: set of Char = [' ', #9];
   LineChars: set of Char = [#13, #10];
+  OperatorChars: set of Char = ['+', '-', '/', '*', '[', '=', '%', '!', '&', '|', '>', '<', '^'];
 
   MAX_TOKEN_SIZE = 32768;
 
@@ -312,7 +313,7 @@ begin
       '(': SkipPair('(', ')');
       '"': SkipDoubleQuotes;
       '''': SkipSingleQuote;
-      '{': SkipPair('{','}'); // init list
+      '{': SkipPair('{', '}'); // support struct initializers
       '/': if (pCurrent + 1)^ = '/' then
           SkipToEOL
         else if (pCurrent + 1)^ = '*' then
@@ -320,7 +321,7 @@ begin
     end;
 //    if pCurrent^ = '(' then
 //      SkipPair('(', ')');
-  until pCurrent^ in [',', ';', ')', '{', '}', #0]; // + LineChars;
+  until pCurrent^ in [',', ';', ')', '}', #0]; // + LineChars;
 end;
 
 procedure TCppTokenizer.Advance(bPerformChecks: boolean = True);
@@ -386,10 +387,16 @@ begin
       Advance;
     // check for operator functions (look below too)
     if (pCurrent - Offset >= 8) and (StrLComp('operator', Offset, pCurrent - Offset) = 0) then begin
-      if pCurrent^ in ['+', '-', '/', '*', '['] then begin
+      while pCurrent^ in SpaceChars do
+        Inc(pCurrent); // it is allowed to have spaces between 'operator' and the operator
+      if pCurrent^ in OperatorChars then begin
+        while pCurrent^ in OperatorChars do // Find end of operator
+          Inc(pCurrent);
         Inc(pCurrent);
+        while pCurrent^ in SpaceChars do
+          Inc(pCurrent);
         if pCurrent^ = '(' then
-          SkipPair('(', ')');
+          SkipPair('(', ')'); // skip function args
       end;
       Advance;
       Done := False;
@@ -398,8 +405,8 @@ begin
       Done := True;
   until Done;
 
-  // check for '<<' or '>>' operator
-  Backup := pCurrent;
+  // check for '<<' or '>>' operator (SHOULD BE HANDLED BY FIXED LOOP ABOVE NOW!)
+  {Backup := pCurrent;
   while Backup^ in SpaceChars do
     Inc(Backup);
   if ((Backup^ = '<') and ((Backup + 1)^ = '<')) or
@@ -409,10 +416,10 @@ begin
       Inc(Backup);
     until Backup^ in [';', #0];
     pCurrent := Backup;
-  end
+  end}
 
   // check for <xxx> values (templates, lists etc)
-  else if pCurrent^ = '<' then begin
+  if pCurrent^ = '<' then begin
     Backup := pCurrent;
     repeat
       Inc(Backup);
