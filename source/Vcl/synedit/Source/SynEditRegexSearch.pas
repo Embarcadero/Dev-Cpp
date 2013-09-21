@@ -88,7 +88,6 @@ constructor TSynEditRegexSearch.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   fRegex := TRegExpr.Create;
-  fRegex.ModifierM := True;
   fPositions := TList.Create;
   fLengths := TList.Create;
 end;

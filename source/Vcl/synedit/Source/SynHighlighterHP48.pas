@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterHP48.pas,v 1.10 2004/07/13 00:00:31 markonjezic Exp $
+$Id: SynHighlighterHP48.pas,v 1.11.2.1 2007/04/19 06:49:20 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -77,14 +77,14 @@ type
     procedure SetName(const Value: string); virtual;
   public
     property Name: string read FName write SetName;
-    constructor create(name: string);
-    destructor destroy; override;
+    constructor Create(name: string);
+    destructor Destroy; override;
     property SpeedList: TSpeedStringList read FSpeedList write FSpeedList;
     property pointer: tobject read fobject write fobject;
   end;
 
   PSpeedListObjects = ^TSpeedListObjects;
-  TSpeedListObjects = array[0..0] of TSpeedListObject;
+  TSpeedListObjects = array[0..MaxListSize] of TSpeedListObject;
 
   TSpeedStringList = class
   private
@@ -465,7 +465,7 @@ begin
   for i := 0 to DatasUsed[crc] - 1 do
     if Datas[crc][i] = Obj then begin
       for j := i + 1 to DatasUsed[crc] - 1 do
-        Datas[i - 1] := Datas[i];
+        Datas[j - 1] := Datas[j];
       for j := crc + 1 to High(Datas) do
         dec(SumOfUsed[j]);
       Obj.FSpeedList := nil;

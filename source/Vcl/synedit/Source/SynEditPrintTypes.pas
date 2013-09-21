@@ -26,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditPrintTypes.pas,v 1.4 2004/07/24 05:57:12 markonjezic Exp $
+$Id: SynEditPrintTypes.pas,v 1.5 2004/10/09 12:54:58 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -127,7 +127,7 @@ begin
     Pos := Pos + 1;
   end;
 
-  if AList.Last <> WrapPos then
+  if (AList.Count = 0) or (AList.Last <> WrapPos) then
     WrapPos.Free;
 end;
 

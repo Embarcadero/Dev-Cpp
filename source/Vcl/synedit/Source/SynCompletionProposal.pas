@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynCompletionProposal.pas,v 1.73 2004/05/06 19:16:43 markonjezic Exp $
+$Id: SynCompletionProposal.pas,v 1.76 2006/01/25 13:16:23 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -80,7 +80,8 @@ uses
   Classes;
 
 type
-  SynCompletionType = (ctCode, ctHint, ctParams);
+  TSynCompletionType = (ctCode, ctHint, ctParams);
+  SynCompletionType = TSynCompletionType; // Keep an alias to old name for now. 
 
   TSynForm = {$IFDEF SYN_COMPILER_3_UP}TCustomForm{$ELSE}TForm{$ENDIF};
 
@@ -1840,7 +1841,14 @@ begin
     RecalcList;
     AdjustScrollBarPosition;
     Position := 0;
-  end else
+    
+    if Visible and Assigned(FOnChangePosition) and (DisplayType = ctCode) then
+      FOnChangePosition(Owner as TSynBaseCompletionProposal,
+        LogicalToPhysicalIndex(FPosition));
+        
+    Repaint;
+  end
+  else
   begin
     i := 0;
     while (i < ItemList.Count) and (not MatchItem(i, True)) do
@@ -2351,7 +2359,7 @@ procedure TSynBaseCompletionProposal.ExecuteEx(s: string; x, y: integer; Kind : 
         tmpX := 0;
     end;
 
-    if (tmpY + tmpHeight > GetWorkAreaHeight) and (Assigned(Form.CurrentEditor)) then
+    if tmpY + tmpHeight > GetWorkAreaHeight then
     begin
       tmpY := tmpY - tmpHeight - (Form.CurrentEditor  as TCustomSynEdit).LineHeight -2;
       if tmpY < 0 then
@@ -2409,7 +2417,8 @@ begin
         Form.AdjustScrollBarPosition;
         Form.FScrollbar.Position := Form.Position;
       end;
-      Form.Show;
+      if Form.AssignedList.Count > 0 then
+        Form.Show
     end;
   ctParams, ctHint:
     begin
@@ -2946,7 +2955,7 @@ begin
     //GBN 22/11/2001
     //Daisy chain completions
     Application.ProcessMessages;
-    if (System.Pos(Key, TriggerChars) > 0) and (not F.Visible) then
+    if (System.Pos(Key, TriggerChars) > 0) and not F.Visible then
       begin
       //GBN 18/02/2002
         if (Sender is TCustomSynEdit) then
@@ -3295,7 +3304,7 @@ begin
 
         FPreviousToken := GetPreviousToken(Form.CurrentEditor as TCustomSynEdit);
         ExecuteEx(GetCurrentInput(AEditor), p.x, p.y, DefaultType);
-        FNoNextKey := (DefaultType = ctCode) and FCanExecute;
+        FNoNextKey := (DefaultType = ctCode) and FCanExecute and Form.Visible;
       end;
     end;
 end;

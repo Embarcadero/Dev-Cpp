@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterGeneral.pas,v 1.15 2004/07/13 00:00:31 markonjezic Exp $
+$Id: SynHighlighterGeneral.pas,v 1.16 2005/01/28 16:53:22 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -579,8 +579,13 @@ end;
 
 procedure TSynGeneralSyn.UnknownProc;
 begin
+{$IFDEF SYN_MBCSSUPPORT}
+  if FLine[Run] in LeadBytes then
+    Inc(Run, 2)
+  else
+{$ENDIF}
   inc(Run);
-  fTokenID := tkUnKnown;
+  fTokenID := tkUnknown;
 end;
 
 procedure TSynGeneralSyn.Next;

@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterPas.pas,v 1.27 2004/07/23 06:34:50 plpolak Exp $
+$Id: SynHighlighterPas.pas,v 1.30 2005/01/28 16:53:24 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -41,9 +41,7 @@ Known Issues:
 @created(1998, converted to SynEdit 2000-04-07)
 @lastmod(2001-11-21)
 The SynHighlighterPas unit provides SynEdit with a Object Pascal syntax highlighter.
-An extra boolean property "D4Syntax" is included to enable the recognition of the
-advanced features found in Object Pascal in Delphi 4.
-Three extra properties included (DelphiVersion, PackageSource):
+Two extra properties included (DelphiVersion, PackageSource):
   DelphiVersion - Allows you to enable/disable the highlighting of various
                   language enhancements added in the different Delphi versions.
   PackageSource - Allows you to enable/disable the highlighting of package keywords
@@ -69,15 +67,14 @@ uses
   SynEditHighlighter,
 {$ENDIF}
   SysUtils,
-  Classes,
-  SynEditCodeFolding;
+  Classes;
 
 type
   TtkTokenKind = (tkAsm, tkComment, tkIdentifier, tkKey, tkNull, tkNumber,
     tkSpace, tkString, tkSymbol, tkUnknown, tkFloat, tkHex, tkDirec, tkChar);
 
   TRangeState = (rsANil, rsAnsi, rsAnsiAsm, rsAsm, rsBor, rsBorAsm, rsProperty,
-    rsExports, rsUnKnown);
+    rsExports, rsDirective, rsDirectiveAsm, rsUnKnown);
 
   TProcTableProc = procedure of object;
 
@@ -85,10 +82,10 @@ type
   TIdentFuncTableFunc = function: TtkTokenKind of object;
 
   TDelphiVersion = (dvDelphi1, dvDelphi2, dvDelphi3, dvDelphi4, dvDelphi5,
-    dvDelphi6, dvDelphi7);
+    dvDelphi6, dvDelphi7, dvDelphi8, dvDelphi2005);
 
 const
-  LastDelphiVersion = dvDelphi7;
+  LastDelphiVersion = dvDelphi2005;
 
 type
   TSynPasSyn = class(TSynCustomHighlighter)
@@ -118,11 +115,6 @@ type
     fSpaceAttri: TSynHighlighterAttributes;
     fDelphiVersion: TDelphiVersion;
     fPackageSource: Boolean;
-
-    // pjura
-		function SkipString1(var Ptr: PChar; var Line: Integer): Boolean;
-		function SkipComment1(var Ptr: PChar; var Line: Integer): Boolean;
-
     function KeyHash(ToHash: PChar): Integer;
     function KeyComp(const aKey: string): Boolean;
     function Func15: TtkTokenKind;
@@ -142,8 +134,10 @@ type
     function Func39: TtkTokenKind;
     function Func40: TtkTokenKind;
     function Func41: TtkTokenKind;
+    function Func42: TtkTokenKind;
     function Func44: TtkTokenKind;
     function Func45: TtkTokenKind;
+    function Func46: TtkTokenKind;
     function Func47: TtkTokenKind;
     function Func49: TtkTokenKind;
     function Func52: TtkTokenKind;
@@ -183,6 +177,7 @@ type
     function Func103: TtkTokenKind;
     function Func105: TtkTokenKind;
     function Func106: TtkTokenKind;
+    function Func108: TtkTokenKind;
     function Func112: TtkTokenKind;
     function Func117: TtkTokenKind;
     function Func126: TtkTokenKind;
@@ -333,8 +328,10 @@ begin
   fIdentFuncTable[39] := Func39;
   fIdentFuncTable[40] := Func40;
   fIdentFuncTable[41] := Func41;
+  fIdentFuncTable[42] := Func42;
   fIdentFuncTable[44] := Func44;
   fIdentFuncTable[45] := Func45;
+  fIdentFuncTable[46] := Func46;
   fIdentFuncTable[47] := Func47;
   fIdentFuncTable[49] := Func49;
   fIdentFuncTable[52] := Func52;
@@ -374,6 +371,7 @@ begin
   fIdentFuncTable[103] := Func103;
   fIdentFuncTable[105] := Func105;
   fIdentFuncTable[106] := Func106;
+  fIdentFuncTable[108] := Func108;
   fIdentFuncTable[112] := Func112;
   fIdentFuncTable[117] := Func117;
   fIdentFuncTable[126] := Func126;
@@ -575,6 +573,14 @@ begin
     Result := tkIdentifier;
 end;
 
+function TSynPasSyn.Func42: TtkTokenKind;
+begin
+  if (DelphiVersion >= dvDelphi8) and KeyComp('Final') then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
 function TSynPasSyn.Func44: TtkTokenKind;
 begin
   if KeyComp('Set') then
@@ -588,6 +594,14 @@ end;
 function TSynPasSyn.Func45: TtkTokenKind;
 begin
   if KeyComp('Shr') then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynPasSyn.Func46: TtkTokenKind;
+begin
+  if (DelphiVersion >= dvDelphi8) and KeyComp('Sealed') then
     Result := tkKey
   else
     Result := tkIdentifier;
@@ -703,6 +717,8 @@ begin
   if KeyComp('Unit') then
     Result := tkKey
   else if KeyComp('Uses') then
+    Result := tkKey
+  else if (DelphiVersion >= dvDelphi8) and KeyComp('Helper') then
     Result := tkKey
   else
     Result := tkIdentifier;
@@ -950,6 +966,14 @@ begin
     Result := tkIdentifier;
 end;
 
+function TSynPasSyn.Func108: TtkTokenKind;
+begin
+  if (DelphiVersion >= dvDelphi8) and KeyComp('Operator') then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
 function TSynPasSyn.Func112: TtkTokenKind;
 begin
   if PackageSource and KeyComp('requires') then
@@ -1149,11 +1173,6 @@ begin
   fRange := rsUnknown;
   fAsmStart := False;
   fDefaultFilter := SYNS_FilterPascal;
-
-  // Dodajemy funkcje pomijaj¹ce duperele
-  SetLength(SkipFunctions, 2);
-  SkipFunctions[0] := SkipString1;
-  SkipFunctions[1] := SkipComment1;
 end; { Create }
 
 procedure TSynPasSyn.SetLine(NewValue: string; LineNumber:Integer);
@@ -1187,7 +1206,7 @@ begin
     #13: CRProc;
   else
     begin
-      if fLine[Succ(Run)] = '$' then
+      if fRange in [rsDirective, rsDirectiveAsm] then
         fTokenID := tkDirec
       else
         fTokenID := tkComment;
@@ -1195,7 +1214,7 @@ begin
         if fLine[Run] = '}' then
         begin
           Inc(Run);
-          if fRange = rsBorAsm then
+          if fRange in [rsBorAsm, rsDirectiveAsm] then
             fRange := rsAsm
           else
             fRange := rsUnKnown;
@@ -1209,10 +1228,20 @@ end;
 
 procedure TSynPasSyn.BraceOpenProc;
 begin
-  if fRange = rsAsm then
-    fRange := rsBorAsm
+  if (fLine[Run + 1] = '$') then
+  begin
+    if fRange = rsAsm then
+      fRange := rsDirectiveAsm
+    else
+      fRange := rsDirective;
+  end
   else
-    fRange := rsBor;
+  begin
+    if fRange = rsAsm then
+      fRange := rsBorAsm
+    else
+      fRange := rsBor;
+  end;
   BorProc;
 end;
 
@@ -1326,7 +1355,6 @@ begin
   end;
 end;
 
-
 procedure TSynPasSyn.RoundOpenProc;
 begin
   Inc(Run);
@@ -1405,7 +1433,7 @@ procedure TSynPasSyn.UnknownProc;
 begin
 {$IFDEF SYN_MBCSSUPPORT}
   if FLine[Run] in LeadBytes then
-    Inc(Run,2)
+    Inc(Run, 2)
   else
 {$ENDIF}
   inc(Run);
@@ -1419,7 +1447,7 @@ begin
   case fRange of
     rsAnsi, rsAnsiAsm:
       AnsiProc;
-    rsBor, rsBorAsm:
+    rsBor, rsBorAsm, rsDirective, rsDirectiveAsm:
       BorProc;
   else
     fProcTable[fLine[Run]];
@@ -1457,7 +1485,7 @@ end;
 function TSynPasSyn.GetTokenID: TtkTokenKind;
 begin
   if not fAsmStart and (fRange = rsAsm)
-    and not (fTokenId in [tkNull, tkComment, tkSpace])
+    and not (fTokenId in [tkNull, tkComment, tkDirec, tkSpace])
   then
     Result := tkAsm
   else
@@ -1718,51 +1746,6 @@ begin
   end;
 end;
 
-function TSynPasSyn.SkipComment1(var Ptr: PChar;
-  var Line: Integer): Boolean;
-var
-	TmpPtr: PChar;
-begin
-	Result := False;
-  
-	if Ptr^ = #47 then
-  begin
-  	TmpPtr := Ptr;
-    Inc(Ptr);
-
-    if Ptr^ = #47 then
-    begin
-    	Inc(Ptr);
-
-    	repeat
-      	Inc(Ptr)
-      until (Ptr^ = #0) or (Ptr^ = #10) or (Ptr^ = #13);
-
-      SkipCrLf(Ptr, Line);
-      Result := True;
-    end
-    else
-    	Ptr := TmpPtr;
-  end;
-end;
-
-function TSynPasSyn.SkipString1(var Ptr: PChar;
-  var Line: Integer): Boolean;
-begin
-	Result := False;
-  
-	if Ptr^ = #39 then
-  begin
-  	Result := True;
-    Inc(Ptr);
-
-    while (Ptr^ <> #0) and (Ptr^ <> #39) do
-    	if not SkipCrLf(Ptr, Line) then
-    		Inc(Ptr);
-
-    Inc(Ptr);
-  end
-end;
 
 initialization
   MakeIdentTable;

@@ -1,6 +1,6 @@
 object CVSForm: TCVSForm
-  Left = 238
-  Top = 155
+  Left = 589
+  Top = 224
   Width = 562
   Height = 474
   BorderIcons = [biSystemMenu]
@@ -29,7 +29,7 @@ object CVSForm: TCVSForm
     Top = 8
     Width = 538
     Height = 393
-    ActivePage = tabUpdate
+    ActivePage = tabCommit
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object tabImport: TTabSheet
@@ -631,7 +631,7 @@ object CVSForm: TCVSForm
           Width = 201
           Height = 21
           Enabled = False
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 3
           Text = 'cmbLogFbyDate'
         end
@@ -851,7 +851,7 @@ object CVSForm: TCVSForm
         Height = 21
         AutoDropDown = True
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 1
         Text = 'cmbRepos'
         OnChange = cmbReposChange

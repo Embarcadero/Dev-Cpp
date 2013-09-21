@@ -30,7 +30,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterSQL.pas,v 1.39 2004/07/30 19:41:49 maelh Exp $
+$Id: SynHighlighterSQL.pas,v 1.41 2005/01/07 12:11:55 markonjezic Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -74,9 +74,10 @@ uses
 type
   TtkTokenKind = (tkComment, tkDatatype, tkDefaultPackage, tkException,
     tkFunction, tkIdentifier, tkKey, tkNull, tkNumber, tkSpace, tkPLSQL,
-    tkSQLPlus, tkString, tkSymbol, tkTableName, tkUnknown, tkVariable);
+    tkSQLPlus, tkString, tkSymbol, tkTableName, tkUnknown, tkVariable,
+    tkConditionalComment, tkDelimitedIdentifier);
 
-  TRangeState = (rsUnknown, rsComment, rsString);
+  TRangeState = (rsUnknown, rsComment, rsString, rsConditionalComment);
 
   TProcTableProc = procedure of object;
 
@@ -106,8 +107,10 @@ type
     fTableNames: TStrings;
     fDialect: TSQLDialect;
     fCommentAttri: TSynHighlighterAttributes;
+    fConditionalCommentAttri: TSynHighlighterAttributes;
     fDataTypeAttri: TSynHighlighterAttributes;
     fDefaultPackageAttri: TSynHighlighterAttributes;
+    fDelimitedIdentifierAttri: TSynHighlighterAttributes;
     fExceptionAttri: TSynHighlighterAttributes;
     fFunctionAttri: TSynHighlighterAttributes;
     fIdentifierAttri: TSynHighlighterAttributes;
@@ -140,7 +143,9 @@ type
     procedure PlusProc;
     procedure SlashProc;
     procedure SpaceProc;
-    procedure StringProc;
+    procedure QuoteProc;
+    procedure BacktickProc;
+    procedure BracketProc;
     procedure SymbolProc;
     procedure SymbolAssignProc;
     procedure VariableProc;
@@ -181,10 +186,14 @@ type
   published
     property CommentAttri: TSynHighlighterAttributes read fCommentAttri
       write fCommentAttri;
+    property ConditionalCommentAttri: TSynHighlighterAttributes
+      read fConditionalCommentAttri write fConditionalCommentAttri;
     property DataTypeAttri: TSynHighlighterAttributes read fDataTypeAttri
       write fDataTypeAttri;
     property DefaultPackageAttri: TSynHighlighterAttributes
       read fDefaultPackageAttri write fDefaultPackageAttri;
+    property DelimitedIdentifierAttri: TSynHighlighterAttributes
+      read fDelimitedIdentifierAttri write fDelimitedIdentifierAttri;
     property ExceptionAttri: TSynHighlighterAttributes read fExceptionAttri
       write fExceptionAttri;
     property FunctionAttri: TSynHighlighterAttributes read fFunctionAttri
@@ -209,7 +218,8 @@ type
     property TableNames: TStrings read fTableNames write SetTableNames;
     property VariableAttri: TSynHighlighterAttributes read fVariableAttri
       write fVariableAttri;
-    property SQLDialect: TSQLDialect read fDialect write SetDialect;
+    property SQLDialect: TSQLDialect read fDialect write SetDialect
+      default sqlStandard;
   end;
 
 implementation
@@ -229,7 +239,7 @@ var
   mHashTableMSSQL7: THashTable;
 
 const
-//---"Standard" (ANSI SQL keywords (Version 1, 2 and 3) (www.sql.org)---------
+//---"Standard" (ANSI SQL keywords (Version 1, 2 and 3) (www.sql.org)-----------
   StandardKW: string =
     'absolute,action,active,actor,add,after,alias,all,allocate,alter,' +
     'and,any,are,as,asc,ascending,assertion,async,at,attributes,auto,' +
@@ -1000,7 +1010,9 @@ begin
       '+': fProcTable[I] := PlusProc;
       '/': fProcTable[I] := SlashProc;
       '&': fProcTable[I] := AndSymbolProc;
-      #34: fProcTable[I] := StringProc;
+      #34: fProcTable[I] := QuoteProc;
+      '`': fProcTable[I] := BacktickProc;
+      '[': fProcTable[I] := BracketProc;
       ':', '@':
         fProcTable[I] := VariableProc;
       'A'..'Z', 'a'..'z', '_':
@@ -1011,7 +1023,7 @@ begin
         fProcTable[I] := SpaceProc;
       '^', '%', '*', '!':
         fProcTable[I] := SymbolAssignProc;
-      '{', '}', '.', ',', ';', '?', '(', ')', '[', ']', '~':
+      '{', '}', '.', ',', ';', '?', '(', ')', ']', '~':
         fProcTable[I] := SymbolProc;
       else
         fProcTable[I] := UnknownProc;
@@ -1027,13 +1039,17 @@ begin
   fCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrComment);
   fCommentAttri.Style := [fsItalic];
   AddAttribute(fCommentAttri);
+  fConditionalCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrConditionalComment);
+  fConditionalCommentAttri.Style := [fsItalic];
+  AddAttribute(fConditionalCommentAttri);
   fDataTypeAttri := TSynHighlighterAttributes.Create(SYNS_AttrDataType);
   fDataTypeAttri.Style := [fsBold];
   AddAttribute(fDataTypeAttri);
-  fDefaultPackageAttri :=
-    TSynHighlighterAttributes.Create(SYNS_AttrDefaultPackage);
+  fDefaultPackageAttri := TSynHighlighterAttributes.Create(SYNS_AttrDefaultPackage);
   fDefaultPackageAttri.Style := [fsBold];
   AddAttribute(fDefaultPackageAttri);
+  fDelimitedIdentifierAttri := TSynHighlighterAttributes.Create(SYNS_AttrDelimitedIdentifier);
+  AddAttribute(fDelimitedIdentifierAttri);
   fExceptionAttri := TSynHighlighterAttributes.Create(SYNS_AttrException);
   fExceptionAttri.Style := [fsItalic];
   AddAttribute(fExceptionAttri);
@@ -1204,7 +1220,7 @@ end;
 
 procedure TSynSQLSyn.HashProc;
 begin
-  if (SQLDialect = sqlMySql) then
+  if SQLDialect = sqlMySql then
   begin
     fTokenID := tkComment;
     repeat
@@ -1256,8 +1272,16 @@ begin
   case fLine[Run] of
     '*':
       begin
-        fRange := rsComment;
-        fTokenID := tkComment;
+        if (SQLDialect = sqlMySql) and (fLine[Run + 1] = '!') then
+        begin
+          fRange := rsConditionalComment;
+          fTokenID := tkConditionalComment;
+        end
+        else
+        begin
+          fRange := rsComment;
+          fTokenID := tkComment;
+        end;
         repeat
           Inc(Run);
           if (fLine[Run] = '*') and (fLine[Run + 1] = '/') then begin
@@ -1285,21 +1309,67 @@ begin
   until (fLine[Run] > #32) or (fLine[Run] in [#0, #10, #13]);
 end;
 
-procedure TSynSQLSyn.StringProc;
+procedure TSynSQLSyn.QuoteProc;
 begin
-  fTokenID := tkString;
+  fTokenID := tkDelimitedIdentifier;
   Inc(Run);
-  while not (fLine[Run] in [#0, #10, #13]) do begin
-    case fLine[Run] of
-      '\': if fLine[Run + 1] = #34 then
-             Inc(Run);
-      #34: if fLine[Run + 1] <> #34 then
-           begin
-             Inc(Run);
-             break;
-           end;
+  while not (fLine[Run] in [#0, #10, #13]) do
+  begin
+    if fLine[Run] = #34 then
+    begin
+      Inc(Run);
+      if fLine[Run] <> #34 then
+        Break;
     end;
     Inc(Run);
+  end;
+end;
+
+procedure TSynSQLSyn.BacktickProc;
+begin
+  if SQLDialect = sqlMySql then
+  begin
+    fTokenID := tkDelimitedIdentifier;
+    Inc(Run);
+    while not (fLine[Run] in [#0, #10, #13]) do
+    begin
+      if fLine[Run] = '`' then
+      begin
+        Inc(Run);
+        if fLine[Run] <> '`' then
+          Break;
+      end;
+      Inc(Run);
+    end;
+  end
+  else
+  begin
+    Inc(Run);
+    fTokenID := tkUnknown;
+  end;
+end;
+
+procedure TSynSQLSyn.BracketProc;
+begin
+  if SQLDialect in [sqlMSSQL7, sqlMSSQL2K] then
+  begin
+    fTokenID := tkDelimitedIdentifier;
+    Inc(Run);
+    while not (fLine[Run] in [#0, #10, #13]) do
+    begin
+      if fLine[Run] = ']' then
+      begin
+        Inc(Run);
+        if fLine[Run] <> ']' then
+          Break;
+      end;
+      Inc(Run);
+    end;
+  end
+  else
+  begin
+    Inc(Run);
+    fTokenID := tkSymbol;
   end;
 end;
 
@@ -1357,8 +1427,12 @@ begin
      #0: NullProc;
     #10: LFProc;
     #13: CRProc;
-    else begin
-      fTokenID := tkComment;
+    else
+    begin
+      if fRange = rsConditionalComment then
+        fTokenID := tkConditionalComment
+      else
+        fTokenID := tkComment;
       repeat
         if (fLine[Run] = '*') and (fLine[Run + 1] = '/') then
         begin
@@ -1385,7 +1459,7 @@ procedure TSynSQLSyn.Next;
 begin
   fTokenPos := Run;
   case fRange of
-    rsComment:
+    rsComment, rsConditionalComment:
       AnsiCProc;
     rsString:
       AsciiCharProc;
@@ -1436,8 +1510,10 @@ function TSynSQLSyn.GetTokenAttribute: TSynHighlighterAttributes;
 begin
   case GetTokenID of
     tkComment: Result := fCommentAttri;
+    tkConditionalComment: Result := fConditionalCommentAttri;
     tkDatatype: Result := fDataTypeAttri;
     tkDefaultPackage: Result := fDefaultPackageAttri;
+    tkDelimitedIdentifier: Result := fDelimitedIdentifierAttri;
     tkException: Result := fExceptionAttri;
     tkFunction: Result := fFunctionAttri;
     tkIdentifier: Result := fIdentifierAttri;
@@ -1627,10 +1703,10 @@ begin
   case fDialect of
     sqlStandard:
       Result := '-- ANSI SQL sample source'#13#10 +
-        'select name, region'#13#10 +
-        'from cia'#13#10 +
-        'where area < 2000'#13#10 +
-        '  and name <> ''Spain''';
+        'SELECT *'#13#10 +
+        'FROM planets'#13#10 +
+        'WHERE diameter < 13000'#13#10 +
+        '  AND name <> ''Earth''';
     sqlInterbase6:
       Result := '/* Interbase sample source */'#13#10 +
         'SET TERM !! ;'#13#10 +
@@ -1643,7 +1719,9 @@ begin
         'SET TERM ; !!';
     sqlMySQL:
       Result := '/* MySQL sample source*/'#13#10 +
-        'SET @variable= { 1 }'#13#10 +
+        'SET @variable = 1;'#13#10 +
+        #13#10 +
+        'CREATE /*!32302 TEMPORARY */ TABLE t (a INT);'#13#10 +
         #13#10 +
         'CREATE TABLE sample ('#13#10 +
         '        id INT NOT NULL,'#13#10 +
@@ -1651,7 +1729,7 @@ begin
         '        PRIMARY KEY (id),'#13#10 +
         '        INDEX name (first_name));'#13#10 +
         #13#10 +
-        'SELECT DATE_ADD("1997-12-31 23:59:59",'#13#10 +
+        'SELECT DATE_ADD(''1997-12-31 23:59:59'','#13#10 +
         '        INTERVAL 1 SECOND);'#13#10 +
         #13#10 +
         '# End of sample';
@@ -1706,7 +1784,7 @@ begin
         't1.column2 = t2.column2)';
     sqlMSSQL7:
       Result := '/* SQL Server 7 example source */'#13#10 +
-        'SET QUOTED_IDENTIFIER OFF'#13#10 +
+        'SET QUOTED_IDENTIFIER ON'#13#10 +
         'GO'#13#10 +
         'SET ANSI_NULLS OFF'#13#10 +
         'GO'#13#10 +
@@ -1716,7 +1794,7 @@ begin
         '  @Name    varchar(25),'#13#10 +
         '  @Address varchar(255),'#13#10 +
         '  @ZipCode varchar(15)'#13#10 +
-        'As'#13#10 +
+        'AS'#13#10 +
         '  INSERT INTO PPQOrders(Name, Address, ZipCode, OrderDate)'#13#10 +
         '  VALUES (@Name, @Address, @ZipCode, GetDate())'#13#10 +
         #13#10 +
@@ -1724,7 +1802,7 @@ begin
         'GO';
     sqlMSSQL2K:
       Result := '/* SQL Server2000 example source */'#13#10 +
-        'SET QUOTED_IDENTIFIER OFF'#13#10 +
+        'SET QUOTED_IDENTIFIER ON'#13#10 +
         'GO'#13#10 +
         'SET ANSI_NULLS OFF'#13#10 +
         'GO'#13#10 +
@@ -1734,7 +1812,7 @@ begin
         '  @Name    varchar(25),'#13#10 +
         '  @Address varchar(255),'#13#10 +
         '  @ZipCode varchar(15)'#13#10 +
-        'As'#13#10 +
+        'AS'#13#10 +
         '  INSERT INTO PPQOrders(Name, Address, ZipCode, OrderDate)'#13#10 +
         '  VALUES (@Name, @Address, @ZipCode, GetDate())'#13#10 +
         #13#10 +

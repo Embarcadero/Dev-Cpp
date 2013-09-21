@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterVBScript.pas,v 1.14 2004/07/13 00:00:32 markonjezic Exp $
+$Id: SynHighlighterVBScript.pas,v 1.15.2.2 2007/05/24 11:17:58 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -63,8 +63,7 @@ uses
   SynEditTypes,
 {$ENDIF}
   SysUtils,
-  Classes,
-  SynEditCodeFolding;
+  Classes;
 
 type
   TtkTokenKind = (tkComment, tkIdentifier, tkKey, tkNull, tkNumber, tkSpace,
@@ -133,6 +132,7 @@ type
     function Func63: TtkTokenKind;
     function Func64: TtkTokenKind;
     function Func66: TtkTokenKind;
+    function Func69: TtkTokenKind;
     function Func70: TtkTokenKind;
     function Func71: TtkTokenKind;
     function Func72: TtkTokenKind;
@@ -283,6 +283,7 @@ begin
   fIdentFuncTable[63] := Func63;
   fIdentFuncTable[64] := Func64;
   fIdentFuncTable[66] := Func66;
+  fIdentFuncTable[69] := Func69;
   fIdentFuncTable[70] := Func70;
   fIdentFuncTable[71] := Func71;
   fIdentFuncTable[72] := Func72;
@@ -414,7 +415,14 @@ end;
 
 function TSynVBScriptSyn.Func36: TtkTokenKind;
 begin
-  if KeyComp('Rem') then Result := tkKey else Result := tkIdentifier;
+  if KeyComp('Rem') then
+  begin
+    Result := tkComment;
+    fStringLen := 0;
+    ApostropheProc;
+  end
+  else
+    Result := tkIdentifier;
 end;
 
 function TSynVBScriptSyn.Func37: TtkTokenKind;
@@ -576,6 +584,14 @@ begin
      Result := tkKey
   else if KeyComp('Type') then
      Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynVBScriptSyn.Func69: TtkTokenKind;
+begin
+  if KeyComp('default') then
+    Result := tkKey
   else
     Result := tkIdentifier;
 end;
@@ -897,7 +913,7 @@ procedure TSynVBScriptSyn.UnknownProc;
 begin
 {$IFDEF SYN_MBCSSUPPORT}
   if FLine[Run] in LeadBytes then
-    Inc(Run,2)
+    Inc(Run, 2)
   else
 {$ENDIF}
   inc(Run);

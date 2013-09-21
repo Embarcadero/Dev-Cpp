@@ -26,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynMacroRecorder.pas,v 1.30 2004/07/10 21:38:30 markonjezic Exp $
+$Id: SynMacroRecorder.pas,v 1.31 2004/08/31 04:50:26 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -74,8 +74,8 @@ resourcestring
 {$ELSE}
 const
 {$ENDIF}
-  sCannotRecord = 'Cannot record macro when recording';
-  sCannotPlay = 'Cannot playback macro when recording';
+  sCannotRecord = 'Cannot record macro; already recording or playing';
+  sCannotPlay = 'Cannot playback macro; already playing or recording';
   sCannotPause = 'Can only pause when recording';
   sCannotResume = 'Can only resume when paused';
 

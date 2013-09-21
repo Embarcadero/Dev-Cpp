@@ -134,8 +134,8 @@ procedure TAboutForm.btnAuthorsClick(Sender: TObject);
 const MessageText =
   'Authors:'#13#10#13#10+
   '- Development: Colin Laplace, Mike Berg, Hongli Lai, Yiannis Mandravellos'#13#10 +
-  '- Contributors: Peter Schraut, Marek Januszewski'#13#10 +
-  '- Mingw compiler system: Mumit Khan, J.J. Var Der Heidjen, Colin Hendrix and GNU developers'#13#10+
+  '- Contributors: Peter Schraut, Marek Januszewski, Anonymous'#13#10 +
+  '- MinGW compiler system: Mumit Khan, J.J. Var Der Heidjen, Colin Hendrix and GNU developers'#13#10+
   '- Splash screen and association icons: Matthijs Crielaard: '#13#10 +
   '- New Look theme: Gerard Caulfield'#13#10 +
   '- Gnome icons: Gnome designers'#13#10 +

@@ -30,7 +30,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynExportHTML.pas,v 1.19 2004/07/29 19:33:58 maelh Exp $
+$Id: SynExportHTML.pas,v 1.21 2005/12/02 18:50:01 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -332,8 +332,10 @@ function TSynExporterHTML.GetFooter: string;
 begin
   Result := '';
   if fExportAsText then
-    Result := '</span>'#13#10'</code></pre>'#13#10;
-  if not fCreateHTMLFragment and fExportAsText then
+    Result := '</span>'#13#10'</code></pre>'#13#10
+  else
+    Result := '</code></pre><!--EndFragment-->';
+  if not(fCreateHTMLFragment and fExportAsText) then
     Result := Result + '</body>'#13#10'</html>';
 end;
 
@@ -345,9 +347,8 @@ end;
 function TSynExporterHTML.GetHeader: string;
 const
   DescriptionSize = 105;
-  HeaderSize = 47;
-  FooterSize1 = 58;
-  FooterSize2 = 24;
+  FooterSize1 = 47;
+  FooterSize2 = 31;
   NativeHeader = 'Version:0.9'#13#10 +
                  'StartHTML:%.10d'#13#10 +
                  'EndHTML:%.10d'#13#10 +
@@ -368,9 +369,8 @@ const
                      '</style>'#13#10 +
                      '</head>'#13#10 +
                      '<body>'#13#10;
-
 var
-  Styles, Header: string;
+  Styles, Header, Header2: string;
 begin
   EnumHighlighterAttris(Highlighter, True, AttriToCSSCallback, [@Styles]);
 
@@ -389,14 +389,12 @@ begin
   else
   begin
     // Described in http://msdn.microsoft.com/library/sdkdoc/htmlclip/htmlclipboard.htm
+    Header2 := '<!--StartFragment--><pre><code>';
     Result := Format(NativeHeader, [DescriptionSize,
-      DescriptionSize + Length(Header) + GetBufferSize + FooterSize1,
+      DescriptionSize + Length(Header) + Length(Header2) + GetBufferSize + FooterSize1,
       DescriptionSize + Length(Header),
-      DescriptionSize + Length(Header) + GetBufferSize + FooterSize2]);
-      Result := Result + Header;
-
-    Result := Result + '<!--StartFragment--><pre><code>';
-    AddData('</code></pre><!--EndFragment-->');
+      DescriptionSize + Length(Header) + Length(Header2) + GetBufferSize + FooterSize2]);
+    Result := Result + Header + Header2;
   end;
 end;
 

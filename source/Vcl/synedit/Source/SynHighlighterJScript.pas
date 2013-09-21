@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterJScript.pas,v 1.21 2004/07/13 00:00:31 markonjezic Exp $
+$Id: SynHighlighterJScript.pas,v 1.22.2.1 2007/04/19 07:09:38 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -1711,7 +1711,7 @@ begin
       #0, #10, #13: break;
     end;
     inc(Run);
-  until (FLine[Run] = l_strChar) and (FLine[Pred(Run)] <> '\');
+  until (FLine[Run] = l_strChar) and ((FLine[Pred(Run)] <> '\') or ((Run > 2) and (FLine[Run - 2] = '\'))); // No longer counts \\" as \ then \"
   if FLine[Run] <> #0 then
     Inc(Run);
 end;
@@ -1726,7 +1726,7 @@ procedure TSynJScriptSyn.UnknownProc;
 begin
 {$IFDEF SYN_MBCSSUPPORT}
   if FLine[Run] in LeadBytes then
-    Inc(Run,2)
+    Inc(Run, 2)
   else
 {$ENDIF}
   inc(Run);

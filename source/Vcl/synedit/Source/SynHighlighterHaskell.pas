@@ -1024,6 +1024,11 @@ end;
 
 procedure TSynHaskellSyn.UnknownProc;
 begin
+{$IFDEF SYN_MBCSSUPPORT}
+  if FLine[Run] in LeadBytes then
+    Inc(Run, 2)
+  else
+{$ENDIF}
   inc(Run);
   fTokenID := tkUnknown;
 end;

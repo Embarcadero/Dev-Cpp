@@ -48,7 +48,7 @@ unit SynURIOpener;
 interface
 
 uses
-  {$IFDEF LINUX}
+  {$IFDEF SYN_LINUX}
   Xlib,
   {$ELSE}
   Windows,
@@ -79,7 +79,7 @@ type
 
     FURIHighlighter: TSynURISyn;
     FVisitedURIs: TStringList;
-    {$IFDEF LINUX}
+    {$IFDEF SYN_LINUX}
     FFtpClientCmd: string;
     FGopherClientCmd: string;
     FMailClientCmd: string;
@@ -115,7 +115,7 @@ type
     property Editor: TCustomSynEdit read FEditor write SetEditor;
     property URIHighlighter: TSynURISyn read FURIHighlighter 
       write SetURIHighlighter;
-    {$IFDEF LINUX}
+    {$IFDEF SYN_LINUX}
     // examples how to set WebBrowserCmd; %s is the placeholder for the URI
     // 'kfmclient openURL %s'
     // 'mozilla %s'
@@ -141,7 +141,7 @@ type
 implementation
 
 uses
-  {$IFDEF LINUX}
+  {$IFDEF SYN_LINUX}
   Libc,
   {$ELSE}
   ShellAPI,
@@ -204,12 +204,12 @@ begin
 end;
 
 function IsControlPressed: Boolean;
-{$IFDEF LINUX}
+{$IFDEF SYN_LINUX}
 var
   keymap: TXQueryKeyMap;
 {$ENDIF}
 begin
-{$IFDEF LINUX}
+{$IFDEF SYN_LINUX}
   XQueryKeymap(Xlib.PDisplay(QtDisplay), keymap);
   Result := (Byte(keymap[4]) and $20 = $20);
 {$ELSE}
@@ -294,7 +294,7 @@ begin
 end;
 
 procedure TSynURIOpener.OpenLink(URI: string; LinkType: Integer);
-{$IFDEF LINUX}
+{$IFDEF SYN_LINUX}
 var
   CmdLine: string;
 {$ENDIF}
@@ -307,7 +307,7 @@ begin
     tkWebLink:
        URI := 'http://' + URI;
   end;
-  {$IFDEF LINUX}
+  {$IFDEF SYN_LINUX}
   case TtkTokenKind(LinkType) of
     tkFtpLink:
       CmdLine := Format(FFtpClientCmd, [URI]);

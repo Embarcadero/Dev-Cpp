@@ -151,7 +151,6 @@ type
     cbDoubleLine: TCheckBox;
     cbAutoIndent: TCheckBox;
     cbAppendNewline: TCheckBox;
-    cbCloseBrace: TCheckBox;
     ScrollHint: TLabel;
     tabAutosave: TTabSheet;
     EnableDisableAutosave: TCheckBox;
@@ -162,6 +161,15 @@ type
     FileOptions: TRadioGroup;
     HighCurLineBox: TGroupBox;
     HighCurLineLabel: TLabel;
+    tabSymbols: TTabSheet;
+    cbBraces: TCheckBox;
+    cbParenth: TCheckBox;
+    cbInclude: TCheckBox;
+    cbComments: TCheckBox;
+    cbArray: TCheckBox;
+    cbFunctionHint: TCheckBox;
+    grpSpecific: TGroupBox;
+    cbSymbolComplete: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -207,6 +215,7 @@ type
     procedure cbHighCurrLineClick(Sender: TObject);
     procedure EnableDisableAutosaveClick(Sender: TObject);
     procedure MinutesDelayChange(Sender: TObject);
+    procedure cbSymbolCompleteClick(Sender: TObject);
   private
     ffgColor: TColor;
     fbgColor: TColor;
@@ -413,6 +422,7 @@ begin
   // sub tabs
   tabCPInserts.Caption:=         Lang[ID_EOPT_CPINSERTS];
   tabCPDefault.Caption:=         Lang[ID_EOPT_CPDEFAULT];
+  tabSymbols.Caption:=           Lang[ID_EOPT_CPSYMBOLS];
 
 // General Tab
   grpEditorOpts.Caption:=        '  ' +Lang[ID_EOPT_EDOPTIONS] +'  ';
@@ -433,7 +443,7 @@ begin
   cbHalfPage.Caption:=           Lang[ID_EOPT_HALFPAGE];
   cbScrollHint.Caption:=         Lang[ID_EOPT_SCROLLHINT];
   cbParserHints.Caption:=        Lang[ID_EOPT_PARSERHINTS];
-  cbCloseBrace.Caption:=         Lang[ID_EOPT_CLOSEBRACE];
+  cbFunctionHint.Caption:=       Lang[ID_EOPT_CLOSEBRACE];
 
   cbSyntaxHighlight.Caption:=    Lang[ID_EOPT_USESYNTAX];
   lblTabSize.Caption:=           Lang[ID_EOPT_TABSIZE];
@@ -498,6 +508,14 @@ begin
   lvCodeIns.Columns[1].Caption:= Lang[ID_EOPT_CISECTION];
   lvCodeIns.Columns[2].Caption:= Lang[ID_EOPT_CIDESC];
   cbDefaultintoprj.Caption:=     Lang[ID_EOPT_DEFCODEPRJ];
+
+  cbSymbolComplete.Caption:=     Lang[ID_EOPT_SYMBOLCOMPLETE];
+  grpSpecific.Caption:=          Lang[ID_EOPT_SYMBOLGROUP];
+  cbBraces.Caption:=             Lang[ID_EOPT_SYMBOLBRACES];
+  cbParenth.Caption:=            Lang[ID_EOPT_SYMBOLPARENT];
+  cbInclude.Caption:=            Lang[ID_EOPT_SYMBOLINCLUDE];
+  cbArray.Caption:=              Lang[ID_EOPT_SYMBOLSQUARE];
+  cbComments.Caption:=           Lang[ID_EOPT_SYMBOLCOMMENT];
 
 // Completion Tab
   chkEnableCompletion.Caption:=  Lang[ID_EOPT_COMPLETIONENABLE];
@@ -597,7 +615,7 @@ begin
      cbHalfPage.Checked:=            HalfPageScroll;
      cbScrollHint.Checked:=          ScrollHint;
      cbSpecialChars.Checked:=        SpecialChars;
-     cbCloseBrace.Checked:=          AutoCloseBrace;
+     cbFunctionHint.Checked:=        ShowFunctionTip;
 
      cbMarginVis.Checked:=           MarginVis;
      edMarginWidth.Value:=           MarginSize;
@@ -623,6 +641,20 @@ begin
 		StrtoPoint(fErrColor, Syntax.Values[cErr]);
 		StrtoPoint(fABPColor, Syntax.Values[cABP]);
 		StrtoPoint(fSelColor, Syntax.Values[cSel]);
+
+		// Completion
+		cbArray.Checked := ArrayComplete;
+		cbBraces.Checked := BraceComplete;
+		cbComments.Checked := CommentComplete;
+		cbInclude.Checked := IncludeComplete;
+		cbParenth.Checked := ParentheseComplete;
+		cbSymbolComplete.Checked := CompleteSymbols;
+
+		cbArray.Enabled := cbSymbolComplete.Checked;
+		cbBraces.Enabled := cbSymbolComplete.Checked;
+		cbComments.Enabled := cbSymbolComplete.Checked;
+		cbInclude.Enabled := cbSymbolComplete.Checked;
+		cbParenth.Enabled := cbSymbolComplete.Checked;
 	end;
 
 	for idx:= 0 to pred(cpp.AttrCount) do begin
@@ -750,7 +782,7 @@ begin
 		HalfPageScroll:=      cbHalfPage.Checked;
 		ScrollHint:=          cbScrollHint.Checked;
 		SpecialChars:=        cbSpecialChars.Checked;
-		AutoCloseBrace:=      cbCloseBrace.Checked;
+		ShowFunctionTip:=     cbFunctionHint.Checked;
 
 		MarginVis:=           cbMarginVis.Checked;
 		MarginSize:=          edMarginWidth.Value;
@@ -782,6 +814,14 @@ begin
 		InsDropFiles:=        cbDropFiles.Checked;
 
 		ParserHints:=         cbParserHints.Checked;
+
+		// Completion
+		ArrayComplete:=       cbArray.Checked;
+		BraceComplete:=       cbBraces.Checked;
+		CommentComplete:=     cbComments.Checked;
+		IncludeComplete:=     cbInclude.Checked;
+		ParentheseComplete:=  cbParenth.Checked;
+		CompleteSymbols:=     cbSymbolComplete.Checked;
 
 		// load in attributes
 		for idx:= 0 to pred(cpp.AttrCount) do begin
@@ -1638,6 +1678,15 @@ begin
 		SaveInterval.Caption := Lang[ID_EOPT_AUTOSAVEINTERNAL] + ' ' + IntToStr(MinutesDelay.Position) + ' minute'
 	else
 		SaveInterval.Caption := Lang[ID_EOPT_AUTOSAVEINTERNAL] + ' ' + IntToStr(MinutesDelay.Position) + ' minutes';
+end;
+
+procedure TEditorOptForm.cbSymbolCompleteClick(Sender: TObject);
+begin
+	cbArray.Enabled := cbSymbolComplete.Checked;
+	cbBraces.Enabled := cbSymbolComplete.Checked;
+	cbComments.Enabled := cbSymbolComplete.Checked;
+	cbInclude.Enabled := cbSymbolComplete.Checked;
+	cbParenth.Enabled := cbSymbolComplete.Checked;
 end;
 
 end.

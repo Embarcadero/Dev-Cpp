@@ -691,6 +691,9 @@ begin
 end;
 
 procedure TCompiler.Run;
+var
+	FileToRun : string;
+	Parameters : string;
 begin
 	if fTarget = ctNone then
 		exit;
@@ -710,17 +713,35 @@ begin
 				devExecutor.ExecuteAndWatch(fProject.Options.HostApplication, fRunParams, ExtractFileDir(fProject.Options.HostApplication), True, INFINITE, RunTerminate);
 			end;
 		end else begin // execute normally
+
+			if devData.ConsolePause and (fProject.Options.typ = dptCon) then begin
+				Parameters := '"' + fProject.Executable + '" ' + fRunParams;
+				FileToRun := devDirs.Exec + 'ConsolePauser.exe';
+			end else begin
+				Parameters := fRunParams;
+				FileToRun := fProject.Executable;
+			end;
+
 			if devData.MinOnRun then
 				Application.Minimize;
-			devExecutor.ExecuteAndWatch(fProject.Executable, fRunParams,ExtractFileDir(fProject.Executable), True, INFINITE, RunTerminate);
+			devExecutor.ExecuteAndWatch(FileToRun, Parameters, ExtractFileDir(fProject.Executable), True, INFINITE, RunTerminate);
 		end;
 	end else begin
 		if not FileExists(ChangeFileExt(fSourceFile, EXE_EXT)) then
 			MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0)
 		else begin
+
+			if devData.ConsolePause then begin
+				Parameters := '"' + ChangeFileExt(fSourceFile, EXE_EXT) + '" ' + fRunParams;
+				FileToRun := devDirs.Exec + 'ConsolePauser.exe'
+			end else begin
+				Parameters := fRunParams;
+				FileToRun := ChangeFileExt(fSourceFile, EXE_EXT);
+			end;
+
 			if devData.MinOnRun then
 				Application.Minimize;
-			devExecutor.ExecuteAndWatch(ChangeFileExt(fSourceFile, EXE_EXT), fRunParams,ExtractFilePath(fSourceFile), True, INFINITE, RunTerminate);
+			devExecutor.ExecuteAndWatch(FileToRun, Parameters, ExtractFilePath(fSourceFile), True, INFINITE, RunTerminate);
 		end;
 	end;
 end;

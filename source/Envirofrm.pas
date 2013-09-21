@@ -57,7 +57,6 @@ type
     cbWatchHint: TCheckBox;
     cbWatchError: TCheckBox;
     cbNoSplashScreen: TCheckBox;
-    rgbOpenStyle: TRadioGroup;
     gbProgress: TGroupBox;
     cbShowProgress: TCheckBox;
     cbAutoCloseProgress: TCheckBox;
@@ -105,6 +104,7 @@ type
     cbUIfont: TComboBox;
     cvsdownloadlabel: TLabel;
     cbUIfontsize: TComboBox;
+    cbPauseConsole: TCheckBox;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -216,6 +216,7 @@ begin
 		cbMinOnRun.Checked:= MinOnRun;
 		cbdblFiles.Checked:= DblFiles;
 		cbNoSplashScreen.Checked:= NoSplashScreen;
+		cbPauseConsole.Checked:=ConsolePause;
 		seMRUMax.Value:= MRUMax;
 
 		// List the languages
@@ -223,7 +224,6 @@ begin
 		for idx:= 0 to pred(Lang.Langs.Count) do
 			cboLang.Items.append(Lang.Langs.Values[idx]);
 		cboLang.ItemIndex:= cboLang.Items.Indexof(Lang.CurrentLanguage);
-		rgbOpenStyle.ItemIndex:= OpenStyle;
 
 		// List the themes
 		cboTheme.Items.Clear;
@@ -297,15 +297,15 @@ begin
 		BackUps:=  cbBackups.Checked;
 		MinOnRun:= cbMinOnRun.Checked;
 		DblFiles:= cbdblFiles.Checked;
+		ConsolePause:= cbPauseConsole.Checked;
 		MRUMax:= seMRUMax.Value;
-		if MultiLineTab = FALSE then begin
+		if not MultiLineTab then begin
 			if cboTabsTop.ItemIndex in [2,3] then begin
 				MessageBox(application.handle,PChar('Multiline tabs must be enabled when using vertical tabs.'+#13#10#13#10+'Reverting to Top Tabs...'),PChar('Error'),MB_OK);
 				cboTabsTop.ItemIndex := 0;
 			end;
 		end;
 		MsgTabs:= cboTabsTop.ItemIndex;
-		OpenStyle:= rgbOpenStyle.ItemIndex;
 		AutoOpen:= rgbAutoOpen.ItemIndex;
 		Splash:= edSplash.Text;
 
@@ -335,20 +335,9 @@ begin
 		Lang.CheckLanguageFiles;
 	end;
 
-	with dmMain.OpenDialog do
-		case devData.OpenStyle of
-			0: begin // Sidebar Win2000/XP
-				OptionsEx:= [];
-				Options:= Options - [ofOldStyleDialog, ofNoLongNames];
-			end;
-			1: begin // Win98
-				OptionsEx:= [ofExNoPlacesBar];
-				Options:= Options - [ofOldStyleDialog, ofNoLongNames];
-			end;
-			2: begin // Win31
-				OptionsEx:= [ofExNoPlacesBar]; // basically ignored anyway
-				Options:= Options +[ofOldStyleDialog, ofNoLongNames];
-			end;
+	with dmMain.OpenDialog do begin
+		OptionsEx:= [];
+		Options:= Options - [ofOldStyleDialog, ofNoLongNames];
 	end;
 
 	dmMain.SaveDialog.OptionsEx:= dmMain.OpenDialog.OptionsEx;
@@ -403,11 +392,6 @@ begin
   cbWatchHint.Caption := Lang[ID_ENV_WATCHHINT];
   cbWatchError.Caption := Lang[ID_ENV_WATCHERROR];
   gbDebugger.Caption := Lang[ID_ENV_DEBUGGER];
-
-  rgbOpenStyle.Caption:=     '  '+Lang[ID_ENV_OPENSTYLE]+'  ';
-  rgbOpenStyle.Items[0]:=    Lang[ID_ENV_OPEN2k];
-  rgbOpenStyle.Items[1]:=    Lang[ID_ENV_OPEN9x];
-  rgbOpenStyle.Items[2]:=    Lang[ID_ENV_OPEN31];
 
   rgbAutoOpen.Caption:=      '  '+Lang[ID_ENV_AUTOOPEN]+'  ';
   rgbAutoOpen.Items[0]:=     Lang[ID_ENV_AUTOALL];

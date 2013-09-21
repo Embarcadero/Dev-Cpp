@@ -375,6 +375,9 @@ const
     // sub-tab captions
   ID_EOPT_CPINSERTS                 = 24001;
   ID_EOPT_CPDEFAULT                 = 24002;
+  ID_EOPT_AUTOSAVEFILE              = 24003;
+  ID_EOPT_OPTIONS                   = 24004;
+  ID_EOPT_CPSYMBOLS                 = 24005;
 
     // General Tab Items
   ID_EOPT_EDOPTIONS                 = 25002;
@@ -472,8 +475,14 @@ const
   ID_EOPT_AUTOSAVEINTERNAL          = 26048;
   ID_EOPT_SAVEALLFILES              = 26049;
   ID_EOPT_SAVEONLYOPENFILE          = 26040;
-  ID_EOPT_AUTOSAVEFILE              = 24003;
-  ID_EOPT_OPTIONS                   = 24004;
+
+  ID_EOPT_SYMBOLCOMPLETE            = 26052;
+  ID_EOPT_SYMBOLGROUP               = 26053;
+  ID_EOPT_SYMBOLBRACES              = 26054;
+  ID_EOPT_SYMBOLPARENT              = 26055;
+  ID_EOPT_SYMBOLINCLUDE             = 26056;
+  ID_EOPT_SYMBOLSQUARE              = 26057;
+  ID_EOPT_SYMBOLCOMMENT             = 26058;
 
   // new project
   ID_NP                             = 26050;

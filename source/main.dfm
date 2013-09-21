@@ -1,11 +1,12 @@
 object MainForm: TMainForm
-  Left = 648
-  Top = 415
-  Width = 1000
-  Height = 600
+  Left = 593
+  Top = 438
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
+  AutoScroll = False
   Caption = 'Dev-C++'
+  ClientHeight = 492
+  ClientWidth = 784
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,7 +16,7 @@ object MainForm: TMainForm
   KeyPreview = True
   Menu = MainMenu
   OldCreateOrder = False
-  Position = poScreenCenter
+  Position = poDefault
   Scaled = False
   WindowState = wsMaximized
   OnClose = FormClose
@@ -30,15 +31,15 @@ object MainForm: TMainForm
   object SplitterLeft: TSplitter
     Left = 193
     Top = 70
-    Height = 316
+    Height = 299
     AutoSnap = False
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 386
-    Width = 984
+    Top = 369
+    Width = 784
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -47,9 +48,9 @@ object MainForm: TMainForm
   end
   object MessageControl: TPageControl
     Left = 0
-    Top = 389
-    Width = 984
-    Height = 133
+    Top = 372
+    Width = 784
+    Height = 100
     ActivePage = CloseSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
@@ -57,16 +58,14 @@ object MainForm: TMainForm
     PopupMenu = MessagePopup
     TabOrder = 0
     OnChange = MessageControlChange
-    OnChanging = MessageControlChanging
-    OnContextPopup = MessageControlContextPopup
     object CompSheet: TTabSheet
       Caption = 'Compiler'
       ImageIndex = 28
       object CompilerOutput: TListView
         Left = 0
         Top = 0
-        Width = 976
-        Height = 105
+        Width = 776
+        Height = 72
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -107,8 +106,8 @@ object MainForm: TMainForm
       object ResourceOutput: TListBox
         Left = 0
         Top = 0
-        Width = 976
-        Height = 105
+        Width = 776
+        Height = 72
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -202,8 +201,8 @@ object MainForm: TMainForm
       object DebugSubPages: TPageControl
         Left = 0
         Top = 0
-        Width = 976
-        Height = 105
+        Width = 776
+        Height = 72
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -582,8 +581,8 @@ object MainForm: TMainForm
           object lvBacktrace: TListView
             Left = 0
             Top = 0
-            Width = 968
-            Height = 74
+            Width = 768
+            Height = 41
             Align = alClient
             Columns = <
               item
@@ -616,8 +615,8 @@ object MainForm: TMainForm
           object DebugOutput: TMemo
             Left = 0
             Top = 22
-            Width = 968
-            Height = 52
+            Width = 768
+            Height = 19
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -628,7 +627,7 @@ object MainForm: TMainForm
           object GdbOutputPanel: TPanel
             Left = 0
             Top = 0
-            Width = 968
+            Width = 768
             Height = 22
             Align = alTop
             BevelOuter = bvNone
@@ -667,8 +666,8 @@ object MainForm: TMainForm
       object FindOutput: TListView
         Left = 0
         Top = 0
-        Width = 976
-        Height = 105
+        Width = 776
+        Height = 72
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -710,7 +709,7 @@ object MainForm: TMainForm
   object Toolbar: TControlBar
     Left = 0
     Top = 16
-    Width = 984
+    Width = 784
     Height = 54
     Align = alTop
     AutoDock = False
@@ -1068,12 +1067,12 @@ object MainForm: TMainForm
   end
   object Statusbar: TStatusBar
     Left = 0
-    Top = 522
-    Width = 984
+    Top = 472
+    Width = 784
     Height = 20
     Panels = <
       item
-        Width = 520
+        Width = 480
       end
       item
         Width = 80
@@ -1087,8 +1086,8 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 196
     Top = 70
-    Width = 788
-    Height = 316
+    Width = 588
+    Height = 299
     Align = alClient
     HotTrack = True
     MultiLine = True
@@ -1103,7 +1102,7 @@ object MainForm: TMainForm
   object pnlFull: TPanel
     Left = 0
     Top = 0
-    Width = 984
+    Width = 784
     Height = 16
     Align = alTop
     BevelOuter = bvNone
@@ -1113,10 +1112,10 @@ object MainForm: TMainForm
     TabOrder = 4
     Visible = False
     DesignSize = (
-      984
+      784
       16)
     object btnFullScrRevert: TSpeedButton
-      Left = 967
+      Left = 767
       Top = 0
       Width = 16
       Height = 16
@@ -1150,7 +1149,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 70
     Width = 193
-    Height = 316
+    Height = 299
     ActivePage = ClassSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
@@ -1162,7 +1161,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 288
+        Height = 271
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1198,7 +1197,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 288
+        Height = 271
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1234,7 +1233,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 288
+        Height = 271
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -3298,13 +3297,5 @@ object MainForm: TMainForm
     OnExecuteMacro = DevCppDDEServerExecuteMacro
     Left = 628
     Top = 240
-  end
-  object HelpPop: TPopupMenu
-    Left = 422
-    Top = 84
-    object HelponDevPopupItem: TMenuItem
-      Caption = '&Help on Dev-C++'
-      OnClick = HelpMenuItemClick
-    end
   end
 end

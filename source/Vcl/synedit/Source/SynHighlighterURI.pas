@@ -24,7 +24,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterURI.pas,v 1.16 2004/07/31 16:20:08 markonjezic Exp $
+$Id: SynHighlighterURI.pas,v 1.17 2004/09/03 10:52:41 maelh Exp $
 
 You may retrieve the latest version of SynEdit from the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -35,7 +35,7 @@ located at http://SynEdit.SourceForge.net
 @author(Maël Hörz)
 @created(2003)
 @lastmod(2003-10-21)
-http://www.mh-net.de.vu
+http://www.mh-nexus.de
 
 The SynHighlighterURI unit implements an URI syntax highlighter for SynEdit.
 
@@ -336,7 +336,7 @@ end;
 destructor TSynURISyn.Destroy; 
 begin
   inherited;
-  //the other highlighters are automatically freed because of AddAttribute()
+  // the other attributes are automatically freed because of AddAttribute()
   fSpaceAttri.Free;
   fIdentifierAttri.Free;
 end;

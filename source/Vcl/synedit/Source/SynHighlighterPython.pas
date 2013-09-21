@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterPython.pas,v 1.18 2004/07/13 00:00:31 markonjezic Exp $
+$Id: SynHighlighterPython.pas,v 1.19 2005/01/28 16:53:24 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -1100,7 +1100,7 @@ begin
            while ((Run > fBackslashCount) and (FLine[Run - fBackslashCount] = '\')) do
              fBackslashCount := fBackslashCount + 1;
 
-           if (fBackslashCount mod 2 = 1) then inc(Run,2);
+           if (fBackslashCount mod 2 = 1) then inc(Run, 2);
        end;
      end;// if FLine[Run]...
     if (FLine[Run]=EndChar) and (FLine[Run+1]=EndChar) and (FLine[Run+2]=EndChar) then begin
@@ -1114,6 +1114,11 @@ end;
 
 procedure TSynPythonSyn.UnknownProc;
 begin
+{$IFDEF SYN_MBCSSUPPORT}
+  if FLine[Run] in LeadBytes then
+    Inc(Run, 2)
+  else
+{$ENDIF}
   inc(Run);
   fTokenID := tkUnknown;
 end;

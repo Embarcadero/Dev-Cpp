@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterRuby.pas,v 1.10 2004/08/01 23:17:38 markonjezic Exp $
+$Id: SynHighlighterRuby.pas,v 1.11 2005/01/28 16:53:25 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -541,8 +541,13 @@ end;
 
 procedure TSynRubySyn.UnknownProc;
 begin
+{$IFDEF SYN_MBCSSUPPORT}
+  if FLine[Run] in LeadBytes then
+    Inc(Run, 2)
+  else
+{$ENDIF}
   inc(Run);
-  fTokenID := tkUnKnown;
+  fTokenID := tkUnknown;
 end;
 
 {$IFDEF SYN_HEREDOC}

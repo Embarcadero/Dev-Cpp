@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterKix.pas,v 1.12 2004/07/09 13:03:55 markonjezic Exp $
+$Id: SynHighlighterKix.pas,v 1.13 2005/01/28 16:53:24 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -1257,7 +1257,7 @@ procedure TSynKixSyn.UnknownProc;
 begin
 {$IFDEF SYN_MBCSSUPPORT}
   if FLine[Run] in LeadBytes then
-    Inc(Run,2)
+    Inc(Run, 2)
   else
 {$ENDIF}
   inc(Run);

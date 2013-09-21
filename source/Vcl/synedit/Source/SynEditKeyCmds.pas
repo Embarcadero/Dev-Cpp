@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditKeyCmds.pas,v 1.23 2004/06/12 01:33:00 maelh Exp $
+$Id: SynEditKeyCmds.pas,v 1.26 2007/01/23 07:19:38 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -118,6 +118,7 @@ const
   ecSelEditorBottom = ecEditorBottom + ecSelection;
   ecSelGotoXY       = ecGotoXY + ecSelection;  // Data = PPoint
 
+	ecSelWord         = 198;
   ecSelectAll       = 199;  // Select entire contents of editor, cursor to end
 
   ecCopy            = 201;  // Copy selection to clipboard
@@ -326,7 +327,7 @@ type
 {$ENDIF}
 
 const
-  EditorCommandStrs: array[0..99] of TIdentMapEntry = (
+  EditorCommandStrs: array[0..100] of TIdentMapEntry = (
     (Value: ecNone; Name: 'ecNone'),
     (Value: ecLeft; Name: 'ecLeft'),
     (Value: ecRight; Name: 'ecRight'),
@@ -362,6 +363,7 @@ const
     (Value: ecSelEditorTop; Name: 'ecSelEditorTop'),
     (Value: ecSelEditorBottom; Name: 'ecSelEditorBottom'),
     (Value: ecSelGotoXY; Name: 'ecSelGotoXY'),
+    (Value: ecSelWord; Name: 'ecSelWord'),
     (Value: ecSelectAll; Name: 'ecSelectAll'),
     (Value: ecDeleteLastChar; Name: 'ecDeleteLastChar'),
     (Value: ecDeleteChar; Name: 'ecDeleteChar'),
@@ -559,8 +561,8 @@ begin
   if Value <> 0 then
   begin
     // Check for duplicate shortcut in the collection and disallow if there is.
-    Dup := TSynEditKeyStrokes(Collection).FindShortcut2(Value, Key2);
-    if (Dup <> -1) and (Dup <> Self.Index) then
+    Dup := TSynEditKeyStrokes(Collection).FindShortcut2(Value, ShortCut2);
+    if (Dup <> -1) and (Collection.Items[Dup] <> Self) then
       begin
       raise ESynKeyError.Create(SYNS_EDuplicateShortCut);
       end;
@@ -601,8 +603,8 @@ begin
   if Value <> 0 then
   begin
     // Check for duplicate shortcut in the collection and disallow if there is.
-    Dup := TSynEditKeyStrokes(Collection).FindShortcut2(Key, Value);
-    if (Dup <> -1) and (Dup <> Self.Index) then
+    Dup := TSynEditKeyStrokes(Collection).FindShortcut2(ShortCut, Value);
+    if (Dup <> -1) and (Collection.Items[Dup] <> Self) then
       raise ESynKeyError.Create(SYNS_EDuplicateShortCut);
   end;
 

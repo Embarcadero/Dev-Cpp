@@ -27,13 +27,14 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditTextBuffer.pas,v 1.63 2004/07/29 19:24:40 maelh Exp $
+$Id: SynEditTextBuffer.pas,v 1.70 2007/03/14 03:06:26 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
 
 Known Issues:
 -------------------------------------------------------------------------------}
+//todo: Avoid calculating expanded string unncessarily (just calculate expandedLength instead).
 
 {$IFNDEF QSYNEDITTEXTBUFFER}
 unit SynEditTextBuffer;
@@ -112,7 +113,6 @@ type
     procedure InsertItem(Index: integer; const S: string);
     procedure PutRange(Index: integer; ARange: TSynEditRange);
   protected
-    fLongestLineIndex: integer;
     function Get(Index: integer): string; override;
     function GetCapacity: integer;
       {$IFDEF SYN_COMPILER_3_UP} override; {$ENDIF}
@@ -174,8 +174,7 @@ type
     crSelection,  //restore Selection
     crNothing,
     crGroupBreak,
-    crDeleteAll,
-    crWhiteSpaceAdd //for undo/redo of adding a character past EOL and repositioning the caret
+    crDeleteAll
     );
 
   TSynEditUndoItem = class(TPersistent)
@@ -206,6 +205,7 @@ type
     fMaxUndoActions: integer;
     fNextChangeNumber: integer;
     fInitialChangeNumber: integer;
+    fInsideRedo: boolean;
     fOnAddedUndo: TNotifyEvent;
     procedure EnsureMaxEntries;
     function GetCanUndo: boolean;
@@ -218,8 +218,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-
-    procedure AddChange(AReason: TSynChangeReason; const AStart, AEnd: TBufferCoord;const ChangeText: string; SelMode: TSynSelectionMode);
+    procedure AddChange(AReason: TSynChangeReason; const AStart, AEnd: TBufferCoord;
+      const ChangeText: string; SelMode: TSynSelectionMode);
     procedure BeginBlock;
     procedure Clear;
     procedure EndBlock;
@@ -243,6 +243,7 @@ type
     property BlockCount: integer read fBlockCount;
     property MaxUndoActions: integer read fMaxUndoActions
       write SetMaxUndoActions;
+    property InsideRedo: boolean read fInsideRedo write fInsideRedo;
     property OnAddedUndo: TNotifyEvent read fOnAddedUndo write fOnAddedUndo;
   end;
 
@@ -487,7 +488,6 @@ end;
 constructor TSynEditStringList.Create;
 begin
   inherited Create;
-  fAppendNewLineAtEOF := True; //Retain current behavior
   fFileFormat := sffDos;
   fIndexOfLongestLine := -1;
   TabWidth := 8;
@@ -733,7 +733,7 @@ end;
 function TSynEditStringList.GetTextStr: string;
 begin
   Result := inherited GetTextStr;
-  System.Delete(Result, Length(Result) - Length(SLineBreak) + 1, Length(SLineBreak));
+  System.Delete(Result, Length(Result) - Length(SLineBreak) + 1, MaxInt);
 end;
 
 procedure TSynEditStringList.Grow;
@@ -781,6 +781,8 @@ begin
 end;
 
 procedure TSynEditStringList.InsertLines(Index, NumLines: integer);
+var
+	c_Line: Integer;
 begin
   if (Index < 0) or (Index > fCount) then
     ListIndexOutOfBounds(Index);
@@ -792,7 +794,15 @@ begin
         System.Move(fList^[Index], fList^[Index + NumLines],
           (fCount - Index) * SynEditStringRecSize);
       end;
-      FillChar(fList^[Index], NumLines * SynEditStringRecSize, 0);
+      for c_Line := Index to Index + NumLines -1 do
+			  with fList^[c_Line] do 
+				begin
+			    Pointer(fString) := nil;
+			    fObject := nil;
+			    fRange := NullRange;
+			    fExpandedLength := -1;
+			    fFlags := [sfExpandedLengthUnknown];
+			  end;
       Inc(fCount, NumLines);
       if Assigned(OnInserted) then
         OnInserted( Self, Index, NumLines );
@@ -1094,6 +1104,7 @@ begin
   fItems := TList.Create;
   fMaxUndoActions := 1024;
   fNextChangeNumber := 1;
+  fInsideRedo := False;
 end;
 
 destructor TSynEditUndoList.Destroy;
@@ -1123,6 +1134,7 @@ begin
     fLockCount:=TSynEditUndoList(Source).fLockCount;
     fMaxUndoActions:=TSynEditUndoList(Source).fMaxUndoActions;
     fNextChangeNumber:=TSynEditUndoList(Source).fNextChangeNumber;
+    fInsideRedo:=TSynEditUndoList(Source).fInsideRedo;
   end
   else
     inherited Assign(Source);
@@ -1142,7 +1154,6 @@ begin
         fChangeStartPos := AStart;
         fChangeEndPos := AEnd;
         fChangeStr := ChangeText;
-
         if fBlockChangeNumber <> 0 then
           fChangeNumber := fBlockChangeNumber
         else begin
@@ -1283,7 +1294,6 @@ begin
   else
     result := TSynEditUndoItem(fItems[fItems.Count - 1]).fChangeReason;
 end;
-
 
 procedure TSynEditUndoList.AddGroupBreak;
 var

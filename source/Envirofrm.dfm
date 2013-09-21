@@ -120,7 +120,7 @@ object EnviroForm: TEnviroForm
       end
       object UIfontlabel: TLabel
         Left = 256
-        Top = 136
+        Top = 144
         Width = 35
         Height = 13
         Caption = 'UI font:'
@@ -181,9 +181,9 @@ object EnviroForm: TEnviroForm
         TabOrder = 4
       end
       object rgbAutoOpen: TRadioGroup
-        Left = 8
-        Top = 189
-        Width = 217
+        Left = 230
+        Top = 267
+        Width = 215
         Height = 90
         Caption = '   Auto Open  '
         Items.Strings = (
@@ -204,9 +204,9 @@ object EnviroForm: TEnviroForm
         TabOrder = 6
       end
       object gbDebugger: TGroupBox
-        Left = 240
-        Top = 189
-        Width = 205
+        Left = 230
+        Top = 197
+        Width = 215
         Height = 68
         Caption = '  Debug Variable Browser  '
         TabOrder = 7
@@ -235,25 +235,13 @@ object EnviroForm: TEnviroForm
         Caption = 'No Splash Screen on startup'
         TabOrder = 8
       end
-      object rgbOpenStyle: TRadioGroup
-        Left = 240
-        Top = 267
-        Width = 205
-        Height = 90
-        Caption = '  Open/Save Dialog Style  '
-        Items.Strings = (
-          'Windows 2k (sidebar)'
-          'Windows 9x'
-          'Windows 3.1')
-        TabOrder = 9
-      end
       object gbProgress: TGroupBox
         Left = 8
         Top = 288
-        Width = 217
+        Width = 210
         Height = 69
         Caption = 'Compilation Progress Window '
-        TabOrder = 10
+        TabOrder = 9
         object cbShowProgress: TCheckBox
           Left = 14
           Top = 22
@@ -279,7 +267,7 @@ object EnviroForm: TEnviroForm
         MaxLength = 2
         MaxValue = 12
         MinValue = 0
-        TabOrder = 11
+        TabOrder = 10
         Value = 0
       end
       object cboTabsTop: TComboBox
@@ -289,7 +277,7 @@ object EnviroForm: TEnviroForm
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
-        TabOrder = 12
+        TabOrder = 11
         Items.Strings = (
           'Top'
           'Bottom'
@@ -303,7 +291,7 @@ object EnviroForm: TEnviroForm
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
-        TabOrder = 13
+        TabOrder = 12
       end
       object cboTheme: TComboBox
         Left = 312
@@ -312,11 +300,11 @@ object EnviroForm: TEnviroForm
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
-        TabOrder = 14
+        TabOrder = 13
       end
       object cbUIfont: TComboBox
         Left = 256
-        Top = 152
+        Top = 160
         Width = 145
         Height = 26
         AutoComplete = False
@@ -324,20 +312,20 @@ object EnviroForm: TEnviroForm
         DropDownCount = 10
         ItemHeight = 20
         Sorted = True
-        TabOrder = 15
+        TabOrder = 14
         OnDrawItem = cbUIfontDrawItem
         OnSelect = cbUIfontSelect
       end
       object cbUIfontsize: TComboBox
         Left = 402
-        Top = 152
+        Top = 160
         Width = 47
         Height = 26
         AutoComplete = False
         Style = csOwnerDrawVariable
         DropDownCount = 10
         ItemHeight = 20
-        TabOrder = 16
+        TabOrder = 15
         OnDrawItem = cbUIfontsizeDrawItem
         OnSelect = cbUIfontSelect
         Items.Strings = (
@@ -351,6 +339,14 @@ object EnviroForm: TEnviroForm
           '14'
           '15'
           '16')
+      end
+      object cbPauseConsole: TCheckBox
+        Left = 16
+        Top = 166
+        Width = 209
+        Height = 17
+        Caption = 'Pause console programs after return'
+        TabOrder = 16
       end
     end
     object tabPaths: TTabSheet

@@ -23,7 +23,7 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Windows, Classes;
+  Windows, Classes, devcfg,utils;
 {$ENDIF}
 {$IFDEF LINUX}
   Classes;
@@ -109,7 +109,7 @@ var
 
 function devExecutor: TdevExecutor;
 begin
-  if not Assigned(fDevExecutor) then begin
+  if not Assigned(fDevExecutor) and not DontRecreateSingletons then begin
     try
       fDevExecutor := TdevExecutor.Create;
     finally

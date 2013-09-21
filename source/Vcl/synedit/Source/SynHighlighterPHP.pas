@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterPHP.pas,v 1.22 2004/07/31 23:41:55 markonjezic Exp $
+$Id: SynHighlighterPHP.pas,v 1.23 2005/01/28 16:53:24 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -64,8 +64,7 @@ uses
   SynEditHighlighter,
 {$ENDIF}
   SysUtils,
-  Classes,
-  SynEditCodeFolding;
+  Classes;
 
 type
   TtkTokenKind = (tkComment, tkIdentifier, tkKey, tkNull,
@@ -114,13 +113,6 @@ type
     fStringAttri: TSynHighlighterAttributes;
     fSymbolAttri: TSynHighlighterAttributes;
     fVariableAttri: TSynHighlighterAttributes;
-
-    // pjura
-		function SkipString1(var Ptr: PChar; var Line: Integer): Boolean;
-		function SkipString2(var Ptr: PChar; var Line: Integer): Boolean;
-		function SkipComment1(var Ptr: PChar; var Line: Integer): Boolean;
-		function SkipComment2(var Ptr: PChar; var Line: Integer): Boolean;
-
     function KeyHash(ToHash: PChar): Integer;
     function KeyComp(const aKey: String): Boolean;
     function Func15: TtkTokenKind;
@@ -702,12 +694,6 @@ begin
   MakeMethodTables;
   fDefaultFilter := SYNS_FilterPHP;
   fRange := rsUnknown;
-  // Dodajemy funkcje pomijaj¹ce duperele
-  SetLength(SkipFunctions, 4);
-  SkipFunctions[0] := SkipString1;
-  SkipFunctions[1] := SkipString2;
-  SkipFunctions[2] := SkipComment1;
-  SkipFunctions[3] := SkipComment2;
 end;
 
 procedure TSynPHPSyn.SetLine(NewValue: String; LineNumber: Integer);
@@ -1310,6 +1296,11 @@ end;
 
 procedure TSynPHPSyn.UnknownProc;
 begin
+{$IFDEF SYN_MBCSSUPPORT}
+  if FLine[Run] in LeadBytes then
+    Inc(Run, 2)
+  else
+{$ENDIF}
   inc(Run);
   fTokenID := tkUnknown;
 end;
@@ -1579,96 +1570,6 @@ begin
             '  }'#13#10+
             '}';
 
-end;
-
-function TSynPHPSyn.SkipComment1(var Ptr: PChar;
-  var Line: Integer): Boolean;
-var
-	TmpPtr: PChar;
-begin
-	Result := False;
-  
-	if Ptr^ = #47 then
-  begin
-  	TmpPtr := Ptr;
-    Inc(Ptr);
-
-    if Ptr^ = #47 then
-    begin
-    	Inc(Ptr);
-
-    	repeat
-      	Inc(Ptr)
-      until (Ptr^ = #0) or (Ptr^ = #10) or (Ptr^ = #13);
-
-      SkipCrLf(Ptr, Line);
-      Result := True;
-    end
-    else
-    	Ptr := TmpPtr;
-  end;
-end;
-
-function TSynPHPSyn.SkipComment2(var Ptr: PChar;
-  var Line: Integer): Boolean;
-var
-	TmpPtr: PChar;
-begin
-	Result := False;
-  
-	if Ptr^ = #35 then
-  begin
-    Inc(Ptr);
-
-    repeat
-    	Inc(Ptr)
-    until (Ptr^ = #0) or (Ptr^ = #10) or (Ptr^ = #13);
-
-    SkipCrLf(Ptr, Line);
-    Result := True;
-  end;
-end;
-
-function TSynPHPSyn.SkipString1(var Ptr: PChar;
-  var Line: Integer): Boolean;
-begin
-	Result := False;
-  
-	if Ptr^ = #34 then
-  begin
-  	Result := True;
-
-    repeat
-    	Inc(Ptr);
-
-  		while (Ptr^ <> #0) and (Ptr^ <> #34) do
-    		if not SkipCrLf(Ptr, Line) then
-  				Inc(Ptr);
-    until ((Ptr-1)^ <> #92) or ((Ptr-2)^ = #92);
-
-    Inc(Ptr);
-  end
-end;
-
-function TSynPHPSyn.SkipString2(var Ptr: PChar;
-  var Line: Integer): Boolean;
-begin
-	Result := False;
-  
-	if Ptr^ = #39 then
-  begin
-  	Result := True;
-
-  	repeat
-    	Inc(Ptr);
-
-  		while (Ptr^ <> #0) and (Ptr^ <> #39) do
-    		if not SkipCrLf(Ptr, Line) then
-  				Inc(Ptr);
-    until ((Ptr-1)^ <> #92) or ((Ptr-2)^ = #92);
-
-    Inc(Ptr);
-  end
 end;
 
 initialization

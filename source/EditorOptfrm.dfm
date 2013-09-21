@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 624
-  Top = 268
+  Left = 934
+  Top = 558
   HelpType = htKeyword
   BorderStyle = bsDialog
   Caption = 'Editor Options'
@@ -28,7 +28,7 @@ object EditorOptForm: TEditorOptForm
     Top = 0
     Width = 464
     Height = 375
-    ActivePage = tabSyntax
+    ActivePage = tabCode
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -113,17 +113,17 @@ object EditorOptForm: TEditorOptForm
           Height = 13
           Caption = 'Tab Size:'
         end
-        object cbCloseBrace: TCheckBox
+        object cbFunctionHint: TCheckBox
           Left = 241
-          Top = 156
+          Top = 154
           Width = 184
           Height = 17
-          Caption = 'Append closing braces'
+          Caption = 'Show function hints'
           TabOrder = 0
         end
         object cbAppendNewline: TCheckBox
           Left = 8
-          Top = 156
+          Top = 154
           Width = 177
           Height = 17
           Caption = 'Ensure that file ends with newline'
@@ -149,7 +149,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbDropFiles: TCheckBox
           Left = 8
-          Top = 122
+          Top = 120
           Width = 177
           Height = 17
           Caption = 'Insert Dropped Files'
@@ -175,7 +175,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbParserHints: TCheckBox
           Left = 241
-          Top = 140
+          Top = 137
           Width = 184
           Height = 17
           Caption = 'Show editor hints'
@@ -183,7 +183,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbHalfPage: TCheckBox
           Left = 241
-          Top = 105
+          Top = 103
           Width = 184
           Height = 17
           Hint = 'page up/down will move text by half a page instead of full page'
@@ -192,7 +192,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbGroupUndo: TCheckBox
           Left = 8
-          Top = 105
+          Top = 103
           Width = 177
           Height = 17
           Hint = 'handle all changes of same type as single action'
@@ -200,8 +200,8 @@ object EditorOptForm: TEditorOptForm
           TabOrder = 9
         end
         object cbFindText: TCheckBox
-          Left = 9
-          Top = 87
+          Left = 8
+          Top = 86
           Width = 184
           Height = 17
           Hint = 'inserts text at cursor into text to find of search dialog'
@@ -228,7 +228,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbScrollHint: TCheckBox
           Left = 241
-          Top = 122
+          Top = 120
           Width = 184
           Height = 17
           Hint = 'shows current line when scrolling'
@@ -237,7 +237,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbSmartScroll: TCheckBox
           Left = 241
-          Top = 88
+          Top = 86
           Width = 184
           Height = 17
           Hint = 'show scrollbars only when content is available'
@@ -246,7 +246,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbSpecialChars: TCheckBox
           Left = 8
-          Top = 140
+          Top = 137
           Width = 177
           Height = 17
           Caption = 'Show Special Line Chars'
@@ -708,6 +708,7 @@ object EditorOptForm: TEditorOptForm
         Gutter.Font.Height = -11
         Gutter.Font.Name = 'Courier New'
         Gutter.Font.Style = []
+        Gutter.RightOffset = 21
         Gutter.ShowLineNumbers = True
         Gutter.UseFontStyle = False
         HideSelection = True
@@ -818,11 +819,11 @@ object EditorOptForm: TEditorOptForm
         Top = 0
         Width = 456
         Height = 347
-        ActivePage = tabCPDefault
+        ActivePage = tabSymbols
         Align = alClient
         TabOrder = 0
         object tabCPInserts: TTabSheet
-          Caption = 'Inserts'
+          Caption = 'Snippets'
           object btnAdd: TButton
             Left = 350
             Top = 13
@@ -899,6 +900,7 @@ object EditorOptForm: TEditorOptForm
             Gutter.Font.Height = -11
             Gutter.Font.Name = 'Courier New'
             Gutter.Font.Style = []
+            Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
             Gutter.UseFontStyle = False
             Highlighter = cpp
@@ -916,6 +918,67 @@ object EditorOptForm: TEditorOptForm
                 Command = ecContextHelp
                 ShortCut = 16496
               end>
+          end
+        end
+        object tabSymbols: TTabSheet
+          Caption = 'Symbol completion'
+          ImageIndex = 2
+          object grpSpecific: TGroupBox
+            Left = 16
+            Top = 40
+            Width = 257
+            Height = 153
+            Caption = 'Specific completion options'
+            TabOrder = 0
+            object cbParenth: TCheckBox
+              Left = 16
+              Top = 48
+              Width = 193
+              Height = 17
+              Caption = 'Complete parentheses '#39'()'#39
+              TabOrder = 0
+            end
+            object cbBraces: TCheckBox
+              Left = 16
+              Top = 24
+              Width = 193
+              Height = 17
+              Caption = 'Complete braces '#39'{}'#39
+              TabOrder = 1
+            end
+            object cbInclude: TCheckBox
+              Left = 16
+              Top = 72
+              Width = 193
+              Height = 17
+              Caption = 'Complete includes '#39'<>'#39' ;  ""'
+              TabOrder = 2
+            end
+            object cbComments: TCheckBox
+              Left = 16
+              Top = 120
+              Width = 193
+              Height = 17
+              Caption = 'Complete multiline comments '#39'/**/'#39
+              TabOrder = 3
+            end
+            object cbArray: TCheckBox
+              Left = 16
+              Top = 96
+              Width = 193
+              Height = 17
+              Caption = 'Complete square braces '#39'[]'#39
+              TabOrder = 4
+            end
+          end
+          object cbSymbolComplete: TCheckBox
+            Left = 8
+            Top = 8
+            Width = 241
+            Height = 17
+            Caption = 'Enable symbol completion'
+            TabOrder = 1
+            OnClick = cbSymbolCompleteClick
           end
         end
         object tabCPDefault: TTabSheet
@@ -939,6 +1002,7 @@ object EditorOptForm: TEditorOptForm
             Gutter.Font.Height = -11
             Gutter.Font.Name = 'Courier New'
             Gutter.Font.Style = []
+            Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
             Gutter.UseFontStyle = False
             Highlighter = cpp

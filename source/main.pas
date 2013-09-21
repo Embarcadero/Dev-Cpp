@@ -198,7 +198,6 @@ type
 		FindSheet: TTabSheet;
 		FindOutput: TListView;
 		FindinallfilesItem: TMenuItem;
-		HelpPop: TPopupMenu;
 		N20: TMenuItem;
 		mnuNew: TMenuItem;
 		N13: TMenuItem;
@@ -516,7 +515,6 @@ type
 		GoToClassBrowserItem: TMenuItem;
 		actBrowserShowInherited: TAction;
 		Showinheritedmembers1: TMenuItem;
-		HelponDevPopupItem: TMenuItem;
 		actCVSLogin: TAction;
 		actCVSLogout: TAction;
 		N65: TMenuItem;
@@ -591,11 +589,11 @@ type
 		ProfilingInforBtn: TToolButton;
 		CompResGroupBox: TGroupBox;
 		LogOutput: TMemo;
-    N64: TMenuItem;
-    CollapseAll: TMenuItem;
-    UncollapseAll: TMenuItem;
-    actCollapse: TAction;
-    actUnCollapse: TAction;
+		N64: TMenuItem;
+		CollapseAll: TMenuItem;
+		UncollapseAll: TMenuItem;
+		actCollapse: TAction;
+		actUnCollapse: TAction;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -610,7 +608,6 @@ type
 		procedure ToggleBtnClick(Sender: TObject);
 		procedure GotoBtnClick(Sender: TObject);
 		procedure MessageControlChange(Sender: TObject);
-		procedure MessageControlChanging(Sender: TObject;var AllowChange: Boolean);
 		procedure ProjectViewContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
 		procedure ProjectViewDblClick(Sender: TObject);
 		procedure InsertBtnClick(Sender: TObject);
@@ -713,7 +710,6 @@ type
 		procedure actSaveUpdate(Sender: TObject);
 		procedure actSaveAsUpdate(Sender: TObject);
 		procedure actFindNextUpdate(Sender: TObject);
-		procedure MessageControlContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
 		procedure actFileMenuExecute(Sender: TObject);
 		procedure actToolsMenuExecute(Sender: TObject);
 		procedure actDeleteExecute(Sender: TObject);
@@ -868,7 +864,6 @@ type
 		procedure actCollapseExecute(Sender: TObject);
 
 	private
-		fTab				: integer;
 		fmsgHeight			: integer;
 		fTools				: TToolController;
 		fProjectCount		: integer;
@@ -1230,7 +1225,6 @@ begin
 			tbSearch.Images			:= CurrentTheme.MenuImages;
 			tbSpecials.Images		:= CurrentTheme.SpecialImages;
 			HelpMenu.SubMenuImages	:= CurrentTheme.HelpImages;
-			HelpPop.Images			:= CurrentTheme.HelpImages;
 			DebugVarsPopup.Images	:= CurrentTheme.MenuImages;
 			ClassBrowser1.Images	:= CurrentTheme.BrowserImages;
 
@@ -1293,17 +1287,18 @@ begin
 		SetupProjectView;
 
 		fFirstShow:= FALSE;
-	end;
 
-	// do not show tips if dev-c++ is launched with a file
-	if devData.ShowTipsOnStart then begin
+		// do not show tips if dev-c++ is launched with a file and only slow
+		// when the form shows for the first time, not when going fullscreen too
+		if devData.ShowTipsOnStart then begin
 
-		showtips := true;
-		for i := 1 to ParamCount do
-			if (ParamStr(i)[2] = ':') or (ParamStr(i)[1] = '/') then
-				showtips := false;
-		if showtips then
-			actShowTips.Execute;
+			showtips := true;
+			for i := 1 to ParamCount do
+				if (ParamStr(i)[2] = ':') or (ParamStr(i)[1] = '/') then
+					showtips := false;
+			if showtips then
+				actShowTips.Execute;
+		end;
 	end;
 end;
 
@@ -1401,27 +1396,28 @@ end;
 procedure TMainForm.BuildBookMarkMenus;
 var
 	idx: integer;
-	s, Text: string;
-	GItem,
-	TItem: TMenuItem;
+	Text: string;
+	Shortcutnumber : Word;
+	GItem,TItem: TMenuItem;
 begin
 	Text:= Lang[ID_MARKTEXT];
 	ToggleBookMarksItem.Clear;
 	GotoBookmarksItem.Clear;
 	for idx:= 1 to 9 do begin
-		s := inttostr(idx);
+		Shortcutnumber := Ord(inttostr(idx)[1]);
+
 		TItem:= TMenuItem.Create(ToggleBookmarksItem);
 		TItem.Caption:= format('%s &%d', [Text, idx]);
 		TItem.OnClick:= ToggleBookmarkClick;
 		TItem.Tag:= idx;
-		TItem.ShortCut:= ShortCut(ord(s[1]), [ssCTRL]);
+		TItem.ShortCut:= ShortCut(Shortcutnumber,[ssCtrl]);
 		ToggleBookmarksItem.Add(TItem);
 
 		GItem:= TMenuItem.Create(GotoBookmarksItem);
 		GItem.Caption:= TItem.Caption;
 		GItem.OnClick:= GotoBookmarkClick;
 		GItem.Tag:= idx;
-		GItem.ShortCut:= ShortCut(ord(s[1]), [ssAlt]);
+		GItem.ShortCut:= ShortCut(Shortcutnumber,[ssAlt]);
 		GotoBookmarksItem.Add(GItem);
 	end;
 
@@ -1664,9 +1660,6 @@ begin
 	actAbout.Caption:=					Lang[ID_ITEM_ABOUT];
 	actHelpCustomize.Caption:=			Lang[ID_ITEM_CUSTOM];
 	actShowTips.Caption:=				Lang[ID_TIPS_CAPTION];
-
-	//pop menus
-	HelponDevPopupItem.Caption:=		Lang[ID_ITEM_HELPDEVCPP];
 
 	// units pop
 	actUnitRemove.Caption:=				Lang[ID_POP_REMOVE];
@@ -2089,27 +2082,20 @@ begin
 			ActivePageIndex:= -1;
 		end;
 	CloseSheet.TabVisible:= _Show;
+	SplitterBottom.Visible := _Show;
 	Statusbar.Top:= Self.ClientHeight;
 end;
 
 procedure TMainForm.MessageControlChange(Sender: TObject);
 begin
-	if MessageControl.ActivePage = ResSheet then
-		ResSheet.Highlighted := false;
 	if MessageControl.ActivePage = CloseSheet then begin
 		if Assigned(ReportToolWindow) then begin
 			ReportToolWindow.Close;
 			MessageControl.ActivePageIndex := 0;
 		end else
-			OpenCloseMessageSheet(false);//MessageControl.Height <> fmsgHeight)
+			OpenCloseMessageSheet(false);
 	end else
-		OpenCloseMessageSheet(TRUE);
-end;
-
-procedure TMainForm.MessageControlChanging(Sender: TObject;var AllowChange: Boolean);
-begin
-	if MessageControl.ActivePage <> CloseSheet then
-		fTab:= MessageControl.ActivePageIndex;
+		OpenCloseMessageSheet(true);
 end;
 
 procedure TMainForm.MRUClick(Sender: TObject);
@@ -2138,6 +2124,7 @@ var
 begin
 	idx:= (Sender as TMenuItem).Tag;
 //	MsgBox('icon index:' + inttostr((Sender as TMenuItem).ImageIndex),(Sender as TMenuItem).Caption);
+
 	with fTools.ToolList[idx]^ do
 		ExecuteFile(ParseParams(Exec), ParseParams(Params), ParseParams(WorkDir), SW_SHOW);
 end;
@@ -2146,7 +2133,7 @@ procedure TMainForm.OpenProject(s: string);
 var
 	s2: string;
 begin
-	if assigned(fProject) then begin
+	if Assigned(fProject) then begin
 		if fProject.Name = '' then
 			s2:= fProject.FileName
 		else
@@ -2232,19 +2219,20 @@ resourcestring
  cPrjName = '<PROJECTNAME>';
  cPrjFile = '<PROJECTFILE>';
  cPrjPath = '<PROJECTPATH>';
- cCurSrc	= '<SOURCENAME>';
+ cCurSrc  = '<SOURCENAME>';
  cSrcPath = '<SOURCEPATH>';
- cDevVer	= '<DEVCPPVERSION>';
+ cDevVer  = '<DEVCPPVERSION>';
 
  cDefault = '<DEFAULT>';
  cExecDir = '<EXECPATH>';
  cSrcList = '<SOURCESPCLIST>';
- cWordxy	= '<WORDXY>';
+ cWordxy  = '<WORDXY>';
 
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
+
 	// <DEFAULT>
 	s:= StringReplace(s, cDefault, devDirs.Default, [rfReplaceAll]);
 
@@ -2254,57 +2242,54 @@ begin
 	// <DEVCPPVERISON>
 	s:= StringReplace(s, cDevVer, DEVCPP_VERSION, [rfReplaceAll]);
 
-	if assigned(fProject) then
-	 begin
-		 // <EXENAME>
-		 s:= StringReplace(s, cEXEName, fProject.Executable, [rfReplaceAll]);
+	if assigned(fProject) then begin
+		// <EXENAME>
+		s:= StringReplace(s, cEXEName, '"' + fProject.Executable + '"', [rfReplaceAll]);
 
-		 // <PROJECTNAME>
-		 s:= StringReplace(s, cPrjName, fProject.Name, [rfReplaceAll]);
+		// <PROJECTNAME>
+		s:= StringReplace(s, cPrjName, fProject.Name, [rfReplaceAll]);
 
-		 // <PROJECTFILE>
-		 s:= StringReplace(s, cPrjFile, fProject.FileName, [rfReplaceAll]);
+		// <PROJECTFILE>
+		s:= StringReplace(s, cPrjFile, fProject.FileName, [rfReplaceAll]);
 
-		 // <PROJECTPATH>
-		 s:= StringReplace(s, cPrjPath, fProject.Directory, [rfReplaceAll]);
+		// <PROJECTPATH>
+		s:= StringReplace(s, cPrjPath, fProject.Directory, [rfReplaceAll]);
 
-		 if Assigned(e) then begin
-			 // <SOURCENAME>
-			 s:= StringReplace(s, cCurSrc, e.FileName, [rfReplaceAll]);
-			 // <SOURCEPATH>
-			if e.FileName = '' then
-			 s:= StringReplace(s, cSrcPath, devDirs.Default, [rfReplaceAll])
-			else
-			 s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
-		 end;
-
-		 // <SOURCESPCLIST>
-		 s:= StringReplace(s, cSrcList, fProject.ListUnitStr(' '), [rfReplaceAll]);
-	 end
-	else
-	 if assigned(e) then
-		begin
-			// <EXENAME>
-			s:= StringReplace(s, cEXEName, ChangeFileExt(e.FileName, EXE_EXT), [rfReplaceAll]);
-
-			// <PROJECTNAME>
-			s:= StringReplace(s, cPrjName, e.FileName, [rfReplaceAll]);
-
-			// <PRJECTFILE>
-			s:= StringReplace(s, cPrjFile, e.FileName, [rfReplaceAll]);
-
-			// <PROJECTPATH>
-			s:= StringReplace(s, cPrjPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
-
+		if Assigned(e) then begin
 			// <SOURCENAME>
 			s:= StringReplace(s, cCurSrc, e.FileName, [rfReplaceAll]);
 
 			// <SOURCEPATH>
-			// if fActiveEditor is "untitled"/new file return users default directory
 			if e.FileName = '' then
-			 s:= StringReplace(s, cSrcPath, devDirs.Default, [rfReplaceAll])
+				s:= StringReplace(s, cSrcPath, devDirs.Default, [rfReplaceAll])
 			else
-			 s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
+				s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
+		end;
+
+		// <SOURCESPCLIST>
+		s:= StringReplace(s, cSrcList, fProject.ListUnitStr(' '), [rfReplaceAll]);
+	end else if assigned(e) then begin
+		// <EXENAME>
+		s:= StringReplace(s, cEXEName, '"' + ChangeFileExt(e.FileName, EXE_EXT) + '"', [rfReplaceAll]);
+
+		// <PROJECTNAME>
+		s:= StringReplace(s, cPrjName, e.FileName, [rfReplaceAll]);
+
+		// <PRJECTFILE>
+		s:= StringReplace(s, cPrjFile, e.FileName, [rfReplaceAll]);
+
+		// <PROJECTPATH>
+		s:= StringReplace(s, cPrjPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
+
+		// <SOURCENAME>
+		s:= StringReplace(s, cCurSrc, e.FileName, [rfReplaceAll]);
+
+		// <SOURCEPATH>
+		// if fActiveEditor is "untitled"/new file return users default directory
+		if e.FileName = '' then
+			s:= StringReplace(s, cSrcPath, devDirs.Default, [rfReplaceAll])
+		else
+			s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
 
 			// <WORDXY>
 			s:= StringReplace(s, cWordXY, e.GetWordAtCursor, [rfReplaceAll]);
@@ -2313,23 +2298,21 @@ begin
 	// clear unchanged macros
 
 	if not assigned(fProject) then
-	 s:= StringReplace(s, cSrcList, '', [rfReplaceAll]);
+		s:= StringReplace(s, cSrcList, '', [rfReplaceAll]);
 
-	if not assigned(e) then
-	 begin
-		 s:= StringReplace(s, cCurSrc, '', [rfReplaceAll]);
-		 s:= StringReplace(s, cWordXY, '', [rfReplaceAll]);
-		 // if no editor assigned return users default directory
-		 s:= StringReplace(s, cSrcPath, devDirs.Default, [rfReplaceAll]);
-	 end;
+	if not assigned(e) then begin
+		s:= StringReplace(s, cCurSrc, '', [rfReplaceAll]);
+		s:= StringReplace(s, cWordXY, '', [rfReplaceAll]);
+		// if no editor assigned return users default directory
+		s:= StringReplace(s, cSrcPath, devDirs.Default, [rfReplaceAll]);
+	end;
 
-	if not assigned(fProject) and not assigned(e) then
-	 begin
-		 s:= StringReplace(s, cEXEName, '', [rfReplaceAll]);
-		 s:= StringReplace(s, cPrjName, '', [rfReplaceAll]);
-		 s:= StringReplace(s, cPrjFile, '', [rfReplaceAll]);
-		 s:= StringReplace(s, cPrjPath, '', [rfReplaceAll]);
-	 end;
+	if not assigned(fProject) and not assigned(e) then begin
+		s:= StringReplace(s, cEXEName, '', [rfReplaceAll]);
+		s:= StringReplace(s, cPrjName, '', [rfReplaceAll]);
+		s:= StringReplace(s, cPrjFile, '', [rfReplaceAll]);
+		s:= StringReplace(s, cPrjPath, '', [rfReplaceAll]);
+	end;
 
 	Result := s;
 end;
@@ -2509,18 +2492,15 @@ procedure TMainForm.actNewSourceExecute(Sender: TObject);
 var
 	NewEditor: TEditor;
 begin
-	if assigned(fProject) then begin
+	if Assigned(fProject) then begin
 		if MessageDlg(Lang[ID_MSG_NEWFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 			actProjectNewExecute(Sender);
 			exit;
 		end;
 	end;
-//	else
-//	 // no open project, but open source file close project manager
-//	 if actProjectManager.Checked then
-//		actProjectManager.Execute;
+
 	NewEditor:= TEditor.Create;
-	NewEditor.init(FALSE, Lang[ID_UNTITLED] +inttostr(dmMain.GetNum), '', FALSE);
+	NewEditor.Init(FALSE, Lang[ID_UNTITLED] + inttostr(dmMain.GetNum), '', FALSE);
 	NewEditor.InsertDefaultText;
 	NewEditor.Activate;
 end;
@@ -2612,7 +2592,7 @@ end;
 
 procedure TMainForm.actNewTemplateExecute(Sender: TObject);
 begin
-// change to save cur project as template maybe?
+	// change to save cur project as template maybe?
 	NewTemplateForm:=TNewTemplateForm.Create(Self);
 	with NewTemplateForm do begin
 		TempProject:=fProject;
@@ -2902,6 +2882,7 @@ begin
 	if (DebugSubPages.Parent <> self) and assigned(ProjectToolWindow) then
 		ProjectToolWindow.Close;
 	LeftPageControl.Visible:= actProjectManager.Checked;
+	SplitterLeft.Visible:= actProjectManager.Checked;
 	devData.ProjectView:= actProjectManager.Checked;
 end;
 
@@ -2914,8 +2895,6 @@ end;
 
 procedure TMainForm.actCompOutputExecute(Sender: TObject);
 begin
-	// sudo radio with actCompOnNeed
-	MessageControl.TabIndex:= fTab;
 	if AlwaysShowItem.Checked then
 		OpenCloseMessageSheet(TRUE)
 	else if not actCompOnNeed.Checked then
@@ -3254,7 +3233,8 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then e.Search(TRUE);
+	if assigned(e) then
+		e.Search(TRUE);
 end;
 
 procedure TMainForm.actFindNextExecute(Sender: TObject);
@@ -3402,8 +3382,8 @@ end;
 
 procedure TMainForm.PrepareDebugger;
 var
- idx: integer;
- sl: TStringList;
+	idx: integer;
+	sl: TStringList;
 begin
 
 	DebugOutput.Clear;
@@ -4095,13 +4075,6 @@ begin
 	actFindNext.Enabled:= assigned(e) and (e.Text.Text <> '');
 end;
 
-procedure TMainForm.MessageControlContextPopup(Sender: TObject;
-	MousePos: TPoint; var Handled: Boolean);
-begin
-	if MessageControl.Height <> fmsgHeight then
-	 Handled:= TRUE;
-end;
-
 procedure TMainForm.ClearMessageControl;
 begin
 	CompilerOutput.Items.Clear;
@@ -4243,17 +4216,16 @@ begin
 			OnStartParsing:=CppParserStartParsing;
 			OnEndParsing:=CppParserEndParsing;
 			OnTotalProgress:=CppParserTotalProgress;
+
+			// Add the include dirs to the parser
 			sl:=TStringList.Create;
-			try
-				ExtractStrings([';'], [' '], PChar(devDirs.C), sl);
-				for I:=0 to sl.Count-1 do
-					AddIncludePath(sl[I]);
-				ExtractStrings([';'], [' '], PChar(devDirs.Cpp), sl);
-				for I:=0 to sl.Count-1 do
-					AddIncludePath(sl[I]);
-			finally
-				sl.Free;
-			end;
+			ExtractStrings([';'], [' '], PChar(devDirs.C), sl);
+			for I:=0 to sl.Count-1 do
+				AddIncludePath(sl[I]);
+			ExtractStrings([';'], [' '], PChar(devDirs.Cpp), sl);
+			for I:=0 to sl.Count-1 do
+				AddIncludePath(sl[I]);
+			sl.Free;
 
 			// update parser reference in editors
 			for I := 0 to PageControl.PageCount - 1 do
@@ -4318,7 +4290,7 @@ var
 begin
 	// mandrav
 	E := GetEditorFromFilename(FileName);
-	if Assigned( E ) then
+	if Assigned(E) then
 		E.GotoLineNr(Line);
 end;
 
@@ -5409,27 +5381,48 @@ end;
 
 procedure TMainForm.CppParserStartParsing(Sender: TObject);
 begin
-	SetStatusBarMessage('Please wait: Parsing in progress...');
 	Screen.Cursor:=crHourglass;
 	if not bProjectLoading then
 		ActionList.State:=asSuspended;
 end;
 
 procedure TMainForm.CppParserEndParsing(Sender: TObject);
+{var
+	I : integer;
+	msg : string;
+	Stream : TFileStream;}
 begin
+	Screen.Cursor:=crDefault;
 	if not bProjectLoading then
 		ActionList.State:=asNormal;
-	Screen.Cursor:=crDefault;
 
-	// rebuild classes toolbar only if this was the last file scanned
-	if (CppParser.FilesToScan.Count = 0){ and Assigned(fProject)} then begin
+	// do this work only if this was the last file scanned
+	if (CppParser.FilesToScan.Count = 0) and (PageControl.PageCount > 0) then begin
 
-		// Fix indices first
+		// Fix indices
 		CppParser.FixIndices;
-		RebuildClassesToolbar;
-	end;
 
-	SetStatusBarMessage(Lang[ID_DONEPARSING]);
+		{msg := '';
+		for I := 0 to CppParser.Statements.Count - 1 do begin
+			msg := msg + inttostr(PStatement(CppParser.Statements[i])^._ID);
+			msg := msg + #9#9 + inttostr(PStatement(CppParser.Statements[i])^._ParentID);
+			msg := msg + #9#9 + PStatement(CppParser.Statements[i])^._FullText;
+			msg := msg + #9#9 + PStatement(CppParser.Statements[i])^._FileName;
+			msg := msg + #9#9 + PStatement(CppParser.Statements[i])^._FileName;
+			msg := msg + #13#10;
+		end;
+
+		Stream := TFileStream.Create('C:\log.txt', fmCreate);
+		try
+			Stream.Write(msg[1], Length(msg));
+		finally
+			Stream.Free;
+		end;}
+
+		RebuildClassesToolbar;
+
+		SetStatusBarMessage(Lang[ID_DONEPARSING]);
+	end;
 end;
 
 procedure TMainForm.UpdateAppTitle;
@@ -6327,7 +6320,7 @@ begin
 			DeleteFile(path);
 			SetStatusbarMessage('Deleted profiling data file "' + path + '"');
 		end else
-			SetStatusbarMessage('Could not find profiling file "' + path + '!"');
+			SetStatusbarMessage('Could not find profiling file "' + path + '"!');
 	end;
 end;
 

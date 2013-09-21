@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterPerl.pas,v 1.14 2004/07/13 00:00:31 markonjezic Exp $
+$Id: SynHighlighterPerl.pas,v 1.15 2005/01/28 16:53:24 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -64,8 +64,7 @@ uses
   SynEditHighlighter,
 {$ENDIF}
   SysUtils,
-  Classes,
-  SynEditCodeFolding;
+  Classes;
 
 type
   TtkTokenKind = (tkComment, tkIdentifier, tkKey, tkNull, tkNumber, tkOperator,
@@ -2514,7 +2513,7 @@ procedure TSynPerlSyn.UnknownProc;
 begin
 {$IFDEF SYN_MBCSSUPPORT}
   if FLine[Run] in LeadBytes then
-    Inc(Run,2)
+    Inc(Run, 2)
   else
 {$ENDIF}
   inc(Run);

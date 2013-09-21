@@ -71,10 +71,11 @@ type
     fTimerKey: Char;
     fCompletionBox: TCodeCompletion;
     fRunToCursorLine: integer;
-    fLastParamFunc : TList;
     FCodeToolTip: TCodeToolTip;//** Modified by Peter **}
     FLastPos : TBufferCoord;
     FAutoIndent: TSynAutoIndent;
+    HasCompletedParentheses : boolean;
+    HasCompletedArray : boolean;
     procedure CompletionTimer( Sender: TObject );
     procedure EditorKeyPress( Sender: TObject; var Key: Char );
     procedure EditorKeyDown( Sender: TObject; var Key: Word; Shift: TShiftState );
@@ -204,7 +205,6 @@ begin
 	fRunToCursorLine := -1;
 	fRes:= IsRes;
 	fInProject := In_Project;
-	fLastParamFunc := nil;
 	if File_name = '' then
 		fFileName := Caption_
 	else
@@ -310,8 +310,7 @@ begin
 	FCodeToolTip.Editor := FText;
 	FCodeToolTip.Parser := MainForm.CppParser;
 
-	// The Editor must have 'Auto Indent' activated  to use FAutoIndent.
-	// It's under Tools >> Editor Options and then the General tab
+	// Auto indent synedit plugin
 	FAutoIndent := TSynAutoIndent.Create(Application);
 	FAutoIndent.Editor := FText;
 	FAutoIndent.IndentChars := '{:';
@@ -665,7 +664,7 @@ begin
 			fText.InvalidateGutterLine(fErrorLine);
 		end;
 
-		if FCodeToolTip.Activated or (not fText.SelAvail) and fText.Focused then
+		if FCodeToolTip.Activated or (not fText.SelAvail) and fText.Focused and devEditor.ShowFunctionTip then
 			FCodeToolTip.Show;
 	end;
 
@@ -906,34 +905,127 @@ end;
 
 procedure TEditor.InsertDefaultText;
 var
- tmp: TStrings;
+	tmp: TStrings;
 begin
-  if FileExists(devDirs.Config + DEV_DEFAULTCODE_FILE) then
-   begin
-     tmp:= TStringList.Create;
-     try
-      tmp.LoadFromFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
-      InsertString(ParseMacros(tmp.Text), FALSE);
-     finally
-      tmp.Free;
-     end;
-   end;
+	if FileExists(devDirs.Config + DEV_DEFAULTCODE_FILE) then begin
+		tmp:= TStringList.Create;
+		try
+			tmp.LoadFromFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
+			InsertString(ParseMacros(tmp.Text), FALSE);
+		finally
+			tmp.Free;
+		end;
+	end;
 end;
 
 procedure TEditor.GotoLineNr(Nr: integer);
 begin
-  fText.CaretXY:= BufferCoord(1, Nr);
-  fText.TopLine:=Nr;
-  Activate;
+	fText.CaretXY:= BufferCoord(1, Nr);
+	fText.TopLine:=Nr;
+	Activate;
 end;
 
-//////// CODE-COMPLETION - mandrav /////////////
 procedure TEditor.EditorKeyPress(Sender: TObject; var Key: Char);
 var
 	P: TPoint;
+	allowcompletion : boolean;
+	cursorpos : integer;
+	attr : TSynHighlighterAttributes;
+	s : string;
 begin
-	if Key = char($7F) then // happens when doing ctrl+backspace with completion on
-		exit;
+	// Doing this here instead of in EditorKeyDown to be able to delete some key messages
+	if devEditor.CompleteSymbols then begin
+
+		// Allerhande voorwaarden
+		allowcompletion := true;
+		fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr);
+		if Assigned(attr) or (Length(fText.LineText) = 0) then
+			allowcompletion := true;
+		if Assigned(attr) then
+			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
+				allowcompletion := false;
+
+		if allowcompletion then begin
+			cursorpos:=fText.CaretX;
+
+			// Check if we typed anything completable...
+			if (Key = '(') and devEditor.ParentheseComplete then begin
+				InsertString(')',false);
+				HasCompletedParentheses := true;
+			end else if (Key = ')') and HasCompletedParentheses then begin
+				fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+				HasCompletedParentheses := false;
+				Abort;
+			end else if (Key = '[') and devEditor.ArrayComplete then begin
+				InsertString(']',false);
+				HasCompletedArray := true;
+			end else if (Key = ']') and HasCompletedArray then begin
+				fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+				HasCompletedArray := false;
+				Abort;
+			end else if (Key = '*') and devEditor.CommentComplete then begin
+				if (cursorpos > 1) and (fText.LineText[cursorpos-1] = '/') then
+					InsertString('*/',false);
+			end else if (Key = '{') and devEditor.BraceComplete then begin
+
+				// If there's any text before the cursor...
+				if (cursorpos > 1) then begin
+
+					// See what the last nonwhite character before the cursor is
+					repeat
+						Dec(cursorpos);
+					until (cursorpos=1) or not (fText.LineText[cursorpos] in [#9,#32]);
+
+					// First check if the user is opening a function
+					if (cursorpos > 0) and (fText.LineText[cursorpos] in [')']) or (Pos('else',fText.LineText)=(cursorpos-3)) then begin
+
+						// Check indentation
+						cursorpos:=0;
+						repeat
+							Inc(cursorpos);
+						until not (fText.LineText[cursorpos] in [#9,#32]);
+
+						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
+					end else if AnsiStartsStr('struct',TrimLeft(fText.LineText)) or
+								AnsiStartsStr('union', TrimLeft(fText.LineText)) or
+								AnsiStartsStr('class', TrimLeft(fText.LineText)) or
+								AnsiStartsStr('enum',  TrimLeft(fText.LineText)) then begin
+
+						// Check indentation too
+						cursorpos:=0;
+						repeat
+							Inc(cursorpos);
+						until not (fText.LineText[cursorpos] in [#9,#32]);
+
+						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + '};',false);
+					end else if AnsiStartsStr('case',TrimLeft(fText.LineText)) then begin
+
+						// Check indentation too
+						cursorpos:=0;
+						repeat
+							Inc(cursorpos);
+						until not (fText.LineText[cursorpos] in [#9,#32]);
+
+						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + #9 + 'break;' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
+					end else
+						InsertString('}',false);
+				end else
+					InsertString(#13#10 + '}',false);
+			end else if (Key = '<') and devEditor.IncludeComplete then begin
+				if AnsiStartsStr('#include',fText.LineText) then
+					InsertString('>',false);
+			end else if (Key = '"') and devEditor.IncludeComplete then begin
+				if AnsiStartsStr('#include',fText.LineText) then
+					InsertString('"',false);
+			end;
+
+			if (key <> '(') then
+				HasCompletedParentheses := false;
+			if (key <> '[') then
+				HasCompletedArray := false;
+		end;
+	end;
+
 	if fCompletionBox.Enabled then begin
 		if not (Sender is TForm) then begin // TForm is the code-completion window
 			fTimer.Enabled:=False;
@@ -990,26 +1082,16 @@ begin
 	end;
 end;
 
-// Looks like the completion stuff doesn't like eoTrimTrailingSpaces at all...
 procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 var
 	M: TMemoryStream;
-	attr: TSynHighlighterAttributes;
-	s : string;
-	allowcompletion : boolean;
-	cursorpos : integer;
-
-	// Key localisation
-	keystate: TKeyboardState;
-	localizedkey : string;
-	charlen : integer;
 begin
-	// Indent/Unindent selected text with TAB key, like Visual C++ ...
+	// Indent/Unindent selected text with tab
 {$IFDEF WIN32}
 	if Key = VK_TAB then begin
 {$ENDIF}
 {$IFDEF LINUX}
-	if Key = XK_TAB then begin
+		if Key = XK_TAB then begin
 {$ENDIF}
 		if FText.SelText <> '' then begin
 			if FText.BlockBegin.Line <> FText.BlockEnd.Line then begin
@@ -1021,100 +1103,8 @@ begin
 		end;
 	end;
 
-	// Code wordt niet toegevoegd in string, comment en onbekend bestandsformaat...
-	if devEditor.AutoCloseBrace then begin
-
-		// Allerhande voorwaarden
-		allowcompletion := true;
-		fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr);
-		if Assigned(attr) or (Length(fText.LineText) = 0) then
-			allowcompletion := true;
-		if Assigned(attr) then
-			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
-				allowcompletion := false;
-
-		if allowcompletion then begin
-			cursorpos:=fText.CaretX;
-
-			// Kijken waar we op klikten
-			GetKeyboardState(keystate);
-			SetLength(localizedkey,2);
-
-			// yes, you saw that right. I'm calling it twice. Have a look at this for an explanation
-			// http://stackoverflow.com/questions/1964614/toascii-tounicode-in-a-keyboard-hook-destroys-dead-keys
-			ToAscii(Key,MapVirtualKey(Key,0),keystate,@localizedkey[1],0);
-			charlen := ToAscii(Key,MapVirtualKey(Key,0),keystate,@localizedkey[1],0);
-
-			// Skip key combinations
-			if charlen = 1 then
-				SetLength(localizedkey,1);
-			if charlen = 0 then Exit;
-
-			// Check if we typed anything completable...
-			if localizedkey = '(' then begin
-				InsertString(')',false);
-			end else if localizedkey = '[' then begin
-				InsertString(']',false);
-			end else if localizedkey = '*' then begin
-				if (cursorpos > 1) and (fText.LineText[cursorpos-1] = '/') then
-					InsertString('*/',false);
-			end else if localizedkey = '{' then begin
-
-				// If there's any text before the cursor...
-				if (cursorpos > 1) then begin
-
-					// See what the last nonwhite character before the cursor is
-					repeat
-						Dec(cursorpos);
-					until (cursorpos=1) or not (fText.LineText[cursorpos] in [#9,#32]);
-
-					// First check if the user is opening a function
-					if (cursorpos > 0) and (fText.LineText[cursorpos] in [')']) or (Pos('else',fText.LineText)=(cursorpos-3)) then begin
-
-						// Check indentation
-						cursorpos:=0;
-						repeat
-							Inc(cursorpos);
-						until not (fText.LineText[cursorpos] in [#9,#32]);
-
-						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
-					end else if AnsiStartsStr('struct',TrimLeft(fText.LineText)) or
-								AnsiStartsStr('union', TrimLeft(fText.LineText)) or
-								AnsiStartsStr('class', TrimLeft(fText.LineText)) or
-								AnsiStartsStr('enum',  TrimLeft(fText.LineText)) then begin
-
-						// Check indentation too
-						cursorpos:=0;
-						repeat
-							Inc(cursorpos);
-						until not (fText.LineText[cursorpos] in [#9,#32]);
-
-						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + '};',false);
-					end else if AnsiStartsStr('case',TrimLeft(fText.LineText)) then begin
-
-						// Check indentation too
-						cursorpos:=0;
-						repeat
-							Inc(cursorpos);
-						until not (fText.LineText[cursorpos] in [#9,#32]);
-
-						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + #9 + 'break;' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
-					end else
-						InsertString('}',false);
-				end else
-					InsertString(#13#10 + '}',false);
-			end else if localizedkey = '<' then begin
-				if AnsiStartsStr('#include',fText.LineText) then
-					InsertString('>',false);
-			end else if localizedkey = '"' then begin
-				if AnsiStartsStr('#include',fText.LineText) then
-					InsertString('"',false);
-			end;
-		end;
-	end;
-
+	// Show the completion box. This needs to be done after the key is inserted!
 	if fCompletionBox.Enabled then begin
-		fCompletionBox.OnKeyPress:=EditorKeyPress;
 		if ssCtrl in Shift then
 {$IFDEF WIN32}
 			if Key=VK_SPACE then begin
@@ -1196,24 +1186,28 @@ end;
 
 procedure TEditor.InitCompletion;
 begin
-  fCompletionBox:=MainForm.CodeCompletion;
-  fCompletionBox.Enabled:=devCodeCompletion.Enabled;
+	fCompletionBox:=MainForm.CodeCompletion;
+	fCompletionBox.Enabled:=devCodeCompletion.Enabled;
 
-  fText.OnKeyDown := EditorKeyDown; // This way tabs are also processed without Code Completion!
-  if fCompletionBox.Enabled then begin
-    fText.OnKeyPress := EditorKeyPress;
-    fText.OnKeyUp := EditorKeyUp;
-    fCompletionBox.OnKeyPress:=EditorKeyPress;
-    fCompletionBox.Width:=devCodeCompletion.Width;
-    fCompletionBox.Height:=devCodeCompletion.Height;
+	// This way symbols and tabs are also completed without code completion
+	fText.OnKeyDown := EditorKeyDown;
+	fText.OnKeyPress := EditorKeyPress;
 
-    if fTimer=nil then
-      fTimer:=TTimer.Create(nil);
-    fTimer.Enabled:=False;
-    fTimer.OnTimer:=CompletionTimer;
-    fTimer.Interval:=devCodeCompletion.Delay;
-  end;
-  fCompletionEatSpace:=False;
+	// The other stuff is fully completion dependant
+	if fCompletionBox.Enabled then begin
+		fText.OnKeyUp := EditorKeyUp;
+		fCompletionBox.OnKeyPress:=EditorKeyPress;
+		fCompletionBox.Width:=devCodeCompletion.Width;
+		fCompletionBox.Height:=devCodeCompletion.Height;
+
+		if not Assigned(fTimer) then
+			fTimer:=TTimer.Create(nil);
+
+		fTimer.Enabled:=False;
+		fTimer.OnTimer:=CompletionTimer;
+		fTimer.Interval:=devCodeCompletion.Delay;
+	end;
+	fCompletionEatSpace:=False;
 end;
 
 function TEditor.CurrentPhrase: string;
@@ -1607,7 +1601,7 @@ begin
 	s := fText.GetWordAtRowCol(BufferCoord(p.X, p.Y));
 
 	// if ctrl+clicked
-	if (ssCtrl in Shift) and (Button=mbLeft) then begin
+	if (ssCtrl in Shift) and (Button=mbLeft) and (p.Y <= fText.UnCollapsedLines.Count) then begin
 
 		// reset the cursor
 		fText.Cursor:=crIBeam;

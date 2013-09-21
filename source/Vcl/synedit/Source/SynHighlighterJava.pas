@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterJava.pas,v 1.18 2004/07/13 00:00:31 markonjezic Exp $
+$Id: SynHighlighterJava.pas,v 1.21 2007/01/24 02:44:06 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -60,7 +60,7 @@ uses
   SynEditTypes,
   SynEditHighlighter,
 {$ENDIF}
-  SysUtils, Classes, SynEditCodeFolding;
+  SysUtils, Classes;
 
 type
   TtkTokenKind = (tkComment, tkDocument, tkIdentifier, tkInvalid, tkKey,
@@ -1136,7 +1136,7 @@ begin
       end;
     '*':
       begin
-        if fLine[Run+2] = '*' then     {documentation comment}
+        if (fLine[Run+2] = '*') and (fLine[Run+3] <> '/') then     {documentation comment}
         begin
           fRange := rsDocument;
           fTokenID := tkDocument;
@@ -1148,7 +1148,7 @@ begin
           fTokenID := tkComment;
         end;
 
-        inc(Run,2);
+        inc(Run, 2);
         while fLine[Run] <> #0 do
           case fLine[Run] of
             '*':
@@ -1245,7 +1245,7 @@ procedure TSynJavaSyn.UnknownProc;
 begin
 {$IFDEF SYN_MBCSSUPPORT}
   if FLine[Run] in LeadBytes then
-    Inc(Run,2)
+    Inc(Run, 2)
   else
 {$ENDIF}
   inc(Run);

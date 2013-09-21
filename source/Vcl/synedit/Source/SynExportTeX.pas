@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynExportTeX.pas,v 1.8 2004/07/31 16:20:08 markonjezic Exp $
+$Id: SynExportTeX.pas,v 1.9 2004/11/19 14:22:11 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -325,7 +325,7 @@ const
                 '\usepackage[ansinew]{inputenc}' + SLineBreak +
 {$ELSE}
                 // and Latin1 on UNIX Systems, see also DE FAQ 8.5.3
-                '\usepackage[latin1]{inputenc}' + NewLine +
+                '\usepackage[latin1]{inputenc}' + SLineBreak +
 {$ENDIF}
                 '%s' + SLineBreak + // New Commands
                 '\title{%s}' + SLineBreak +

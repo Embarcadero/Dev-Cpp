@@ -375,7 +375,7 @@ type
    fSmartTabs: boolean;        // Tab to next no whitespace char
    fSpecialChar: boolean;      // special line characters visible
    fTabtoSpaces: boolean;      // convert tabs to spaces
-   fAutoCloseBrace: boolean;   // insert closing braces
+   fShowFunctionTip: boolean;  // show function tip
    fMarginColor: TColor;       // Color of right margin
    fSyntax: TStrings;          // Holds attributes settings
    fDefaultIntoPrj: boolean;   // Insert Default Source Code into "empty" project
@@ -384,10 +384,18 @@ type
    fHighCurrLine: boolean;     // Highlight current line
    fHighColor: TColor;         // Color of current line when highlighted
 
-      // Autosave
+   // Autosave
    fEnableAutoSave : boolean;
    fInterval : integer;
    fSaveType : integer;
+
+   // Symbol completion
+   fBraceComplete : boolean;
+   fParentheseComplete : boolean;
+   fIncludeComplete : boolean;
+   fCommentComplete : boolean;
+   fArrayComplete : boolean;
+   fCompleteSymbols : boolean;
   public
    constructor Create;
    destructor Destroy; override;
@@ -412,7 +420,7 @@ type
    property HalfPageScroll: boolean read fHalfPage write fHalfPage;
    property ScrollHint: boolean read fShowScrollHint write fShowScrollHint;
    property SpecialChars: boolean read fSpecialChar write fSpecialChar;
-   property AutoCloseBrace: boolean read fAutoCloseBrace write fAutoCloseBrace;
+   property ShowFunctionTip: boolean read fShowFunctionTip write fShowFunctionTip;
 
    property TabSize: integer read fTabSize write fTabSize;
    property MarginVis: boolean read fMarginVis write fMarginVis;
@@ -449,6 +457,14 @@ type
    property EnableAutoSave: boolean read fEnableAutoSave write fEnableAutoSave;
    property Interval: integer read fInterval write fInterval;
    property SaveType: integer read fSaveType write fSaveType;
+
+   // Brace completion
+   property BraceComplete: boolean read fBraceComplete write fBraceComplete;
+   property ParentheseComplete: boolean read fParentheseComplete write fParentheseComplete;
+   property IncludeComplete: boolean read fIncludeComplete write fIncludeComplete;
+   property CommentComplete: boolean read fCommentComplete write fCommentComplete;
+   property ArrayComplete: boolean read fArrayComplete write fArrayComplete;
+   property CompleteSymbols: boolean read fCompleteSymbols write fCompleteSymbols;
  end;
 
  // master option object -- contains program globals
@@ -461,7 +477,6 @@ type
    fCompCols: string;                // Compiler Column Widths (comma sep)
    fMsgTabs: integer;                // Editor Tabs
    fMinOnRun: boolean;               // Minimize IDE on run
-   fOpenStyle: integer;              // Open Dialog Style
    fMRUMax: integer;                 // Max number of files in history list
    fBackup: boolean;                 // Create backup files
    fAutoOpen: integer;               // Auto Open Project Files Style
@@ -481,10 +496,11 @@ type
    fWinPlace: TWindowPlacement;      // Main forms size, state and position.
    fdblFiles: boolean;               // double click opens files out of project manager
    fLangChange: boolean;             // flag for language change
-   fthemeChange: boolean;            // did the theme changed
+   fthemeChange: boolean;            // did the theme change?
    fNoSplashScreen : boolean;        // disable splash screen
    fInterfaceFont : string;
    fInterfaceFontSize : integer;
+   fConsolePause : boolean;
 
    fToolbarMain: boolean;            // These ones follow the enable/x-offset/y-offset patern
    fToolbarMainX: integer;
@@ -558,7 +574,8 @@ type
 
    //Execution
    property MinOnRun: boolean read fMinOnRun write fMinOnRun;
-   property OpenStyle: integer read fOpenStyle write fOpenStyle;
+   property ConsolePause: boolean read fConsolePause write fConsolePause;
+
 
    property BackUps: boolean read fBackup write fBackup;
    property AutoOpen: integer read fAutoOpen write fAutoOpen;
@@ -961,8 +978,8 @@ begin
   fShowBars:= FALSE;
   fMultiLineTab:= TRUE;
   fDefCpp:= TRUE;
-  fOpenStyle:= 0;
   fdblFiles:= FALSE;
+  fConsolePause:=TRUE;
 
 	fToolbarMain:=TRUE;
 	fToolbarMainX:=11;
@@ -1454,7 +1471,7 @@ destructor TdevEditor.Destroy;
 begin
 	fFont.Free;
 	fGutterfont.Free;
-	fSynTax.Free;
+	fSyntax.Free;
 	inherited;
 end;
 
@@ -1489,7 +1506,7 @@ begin
 	fHalfPage:= FALSE;
 	fShowScrollHint:= TRUE;
 	fParserHints:= TRUE; // Editor hints
-	fAutoCloseBrace:= TRUE;
+	fShowFunctionTip:= TRUE;
 
 	// Caret
 	fInsertCaret:= 0;
@@ -1529,6 +1546,14 @@ begin
 	fEnableAutoSave := FALSE;
 	Interval := 10;
 	fSaveType := 0;
+
+	// Symbol completion
+	fBraceComplete := TRUE;
+	fParentheseComplete := TRUE;
+	fIncludeComplete := TRUE;
+	fCommentComplete := FALSE;
+	fArrayComplete := TRUE;
+	fCompleteSymbols := TRUE;
 end;
 
 procedure TdevEditor.AssignEditor(Editor: TSynEdit);
@@ -1649,12 +1674,12 @@ end;
 
 procedure TdevCodeCompletion.SettoDefaults;
 begin
-  fWidth:=320;
-  fHeight:=240;
-  fDelay:=1000;
-  fBackColor:=clWindow;
-  fEnabled:=True;
-  fUseCacheFiles:=False;
+	fWidth:=320;
+	fHeight:=240;
+	fDelay:=1000;
+	fBackColor:=clWindow;
+	fEnabled:=True;
+	fUseCacheFiles:=False;
 end;
 
 { TdevClassBrowsing }

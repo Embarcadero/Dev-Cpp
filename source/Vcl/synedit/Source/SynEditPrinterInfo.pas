@@ -26,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditPrinterInfo.pas,v 1.4 2003/04/30 12:59:49 etrusco Exp $
+$Id: SynEditPrinterInfo.pas,v 1.5.2.1 2007/06/22 04:24:04 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -244,6 +244,9 @@ end;
 procedure TSynEditPrinterInfo.UpdatePrinter;
 begin
   FIsUpdated := True;
+{$IFNDEF SYN_CLX}
+  Printer.Refresh;
+{$ENDIF}
   if Printer.Printers.Count <= 0 then
   begin
     FillDefault;

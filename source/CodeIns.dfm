@@ -3,8 +3,8 @@ object frmCodeEdit: TfrmCodeEdit
   Top = 126
   BorderStyle = bsToolWindow
   Caption = '<> Code Insert Entry'
-  ClientHeight = 153
-  ClientWidth = 302
+  ClientHeight = 152
+  ClientWidth = 354
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +19,7 @@ object frmCodeEdit: TfrmCodeEdit
   object Bevel1: TBevel
     Left = 8
     Top = 8
-    Width = 285
+    Width = 337
     Height = 106
     Shape = bsFrame
   end
@@ -38,7 +38,7 @@ object frmCodeEdit: TfrmCodeEdit
     Caption = 'Section:'
   end
   object lblDesc: TLabel
-    Left = 150
+    Left = 110
     Top = 56
     Width = 53
     Height = 13
@@ -47,7 +47,7 @@ object frmCodeEdit: TfrmCodeEdit
   object edMenuText: TEdit
     Left = 24
     Top = 32
-    Width = 262
+    Width = 305
     Height = 21
     TabOrder = 0
     OnChange = edMenuTextChange
@@ -63,7 +63,7 @@ object frmCodeEdit: TfrmCodeEdit
     Value = 0
   end
   object btnOk: TBitBtn
-    Left = 129
+    Left = 185
     Top = 121
     Width = 75
     Height = 25
@@ -73,7 +73,7 @@ object frmCodeEdit: TfrmCodeEdit
     Kind = bkOK
   end
   object btnCancel: TBitBtn
-    Left = 215
+    Left = 271
     Top = 121
     Width = 75
     Height = 25
@@ -81,9 +81,9 @@ object frmCodeEdit: TfrmCodeEdit
     Kind = bkCancel
   end
   object edDesc: TEdit
-    Left = 160
+    Left = 112
     Top = 74
-    Width = 124
+    Width = 217
     Height = 21
     TabOrder = 2
   end

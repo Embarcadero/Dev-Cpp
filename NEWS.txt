@@ -1,3 +1,17 @@
+Version 5.1.1.1 - *
+
+- Fixed maximize not covering the whole screen correctly on netbook screens.
+- Fixed some crashes regarding code folding.
+- Code folding is a bit faster now.
+- Opening files is a bit faster now.
+- The tip of the day form now does not show up when going fullscreen.
+- Panel resizers now hide when there's nothing to resize.
+- Fixed a mulitple struct definition after ; detection bug.
+- Tidied up editor options.
+- Moved to a more recent SynEdit component.
+- Symbol completion is faster and has more options now.
+- Added a console pausing option to Environment options.
+
 Version 5.1.1.0 - 16 Februari 2012
 
 - Added code folding.

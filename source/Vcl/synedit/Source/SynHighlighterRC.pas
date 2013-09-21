@@ -24,7 +24,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterRC.pas,v 1.6 2004/07/13 00:00:31 markonjezic Exp $
+$Id: SynHighlighterRC.pas,v 1.9 2005/12/31 07:34:36 skyweb Exp $
 
 You may retrieve the latest version of SynEdit from the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -177,7 +177,7 @@ type
    constructor Create(aOwner: TComponent); override;
    destructor Destroy; override;
    function GetDefaultAttribute(index: integer): TSynHighlighterAttributes; override;
-   function GetEOL: boolean; override;
+   function GetEol: boolean; override;
    function GetRange: pointer; override;
    function GetTokenID: TtkTokenKind;
    procedure SetLine(NewValue: string; LineNumber: integer); override;
@@ -204,7 +204,11 @@ type
 implementation
 
 uses
- SynEditStrConst;
+{$IFDEF SYN_CLX}
+  QSynEditStrConst;
+{$ELSE}
+  SynEditStrConst;
+{$ENDIF}
 
 const
  MAXNumFunc = 199; // ** don't forget to change
@@ -1026,8 +1030,13 @@ end;
 
 procedure TSynRCSyn.UnknownProc;
 begin
+{$IFDEF SYN_MBCSSUPPORT}
+  if FLine[Run] in LeadBytes then
+    Inc(Run, 2)
+  else
+{$ENDIF}
   inc(Run);
-  fTokenID:= tkSymbol;
+  fTokenID := tkUnknown;
 end;
 
 procedure TSynRCSyn.Next;

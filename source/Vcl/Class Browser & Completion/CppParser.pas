@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Dialogs, Windows, Classes, SysUtils, StrUtils, ComCtrls, U_IntList, CppTokenizer;
+  Dialogs, Windows, Classes, SysUtils, StrUtils, ComCtrls, U_IntList, CppTokenizer,utils;
 {$ENDIF}
 {$IFDEF LINUX}
   QDialogs, Classes, SysUtils, StrUtils, QComCtrls, U_IntList, CppTokenizer;
@@ -513,7 +513,7 @@ begin
 	end else
 		StScopeless := StCommand;
 
-	//only search for certain kinds of statements
+	// only search for certain kinds of statements
 	if not AllowDuplicate {and not fIsHeader} then
 		ExistingID := CheckIfCommandExists(StScopeless, Kind) //, True, ParentID)
 	else
@@ -532,9 +532,10 @@ begin
 		with Statement^ do begin
 
 			if ID = -1 then
-				_ID := fNextID //fStatementList.Count
+				_ID := fNextID // TODO: Should reset this on a rescan?
 			else
 				_ID := ID;
+
 			Result := _ID;
 
 			_ParentID := ParentID;
@@ -654,9 +655,7 @@ end;
 function TCppParser.CheckForKeyword: boolean;
 begin
   Result := (PToken(fTokenizer.Tokens[fIndex])^.Text = 'static') or
-    (PToken(fTokenizer.Tokens[fIndex])^.Text = 'STATIC') or
     (PToken(fTokenizer.Tokens[fIndex])^.Text = 'const') or
-    (PToken(fTokenizer.Tokens[fIndex])^.Text = 'CONST') or
     (PToken(fTokenizer.Tokens[fIndex])^.Text = 'extern') or
     (PToken(fTokenizer.Tokens[fIndex])^.Text = 'virtual') or
     (PToken(fTokenizer.Tokens[fIndex])^.Text = 'if') or
@@ -700,7 +699,7 @@ begin
   Result := (fIndex < fTokenizer.Tokens.Count - 1) and
     (PToken(fTokenizer.Tokens[fIndex + 1])^.Text = 'struct') or
     (PToken(fTokenizer.Tokens[fIndex + 1])^.Text = 'class');
-//    (PToken(fTokenizer.Tokens[fIndex + 1])^.Text = 'union');
+//  (PToken(fTokenizer.Tokens[fIndex + 1])^.Text = 'union');
 end;
 
 function TCppParser.CheckForStructs: boolean;
@@ -916,7 +915,6 @@ var
   S, S1, S2, Prefix, StructName: string;
   I, I1, cID: integer;
   IsStruct: boolean;
-  UseID: integer;
   NameVisible: boolean;
 begin
   NameVisible := True;
@@ -926,13 +924,14 @@ begin
   Prefix := S;
   Inc(fIndex); //skip 'struct'
   I := fIndex;
-  UseID := -1;
+
   while (I < fTokenizer.Tokens.Count) and not (PToken(fTokenizer.Tokens[I])^.Text[1] in [';', '{']) do
     Inc(I);
 
   // forward class/struct decl *or* typedef, e.g. typedef struct some_struct synonym1, synonym2;
   if (I < fTokenizer.Tokens.Count) and (PToken(fTokenizer.Tokens[I])^.Text[1] = ';') then begin
     StructName := PToken(fTokenizer.Tokens[fIndex])^.Text;
+
     if IsTypedef then begin
       repeat
         if (fIndex + 1 < fTokenizer.Tokens.Count) and (PToken(fTokenizer.Tokens[fIndex + 1])^.Text[1] in [',', ';']) then begin
@@ -946,6 +945,7 @@ begin
           // if it is included in it. In that case, we use
           // the ID of the TList for the new struct and then remove
           // the arg1 from the TList...
+
 
           // DECISION: should the TList, be emptied at the end of file,
           // or remain? Maybe it is declared in another file...
@@ -963,7 +963,6 @@ begin
             fClassScope,
             NameVisible,
             False);
-          NameVisible := False;
           if cID = -1 then
             AddToOutstandingTypedefs(StructName, fLastID);
         end;
@@ -975,6 +974,7 @@ begin
 
   // normal class/struct decl
   else begin
+
     Inc(fInClass);
     if PToken(fTokenizer.Tokens[fIndex])^.Text[1] <> '{' then begin
       S1 := '';
@@ -992,7 +992,8 @@ begin
             cID := GetClassID(Trim(S1), skClass);
             if cID = -1 then
               cID := CheckForOutstandingTypedef(Trim(S1));
-            fLastID := AddStatement(cID, //UseID,
+
+            fLastID := AddStatement(cID,
               GetCurrentClass,
               fCurrentFile,
               Prefix + Trim(S1),
@@ -1005,13 +1006,11 @@ begin
               fClassScope,
               NameVisible,
               False);
-            NameVisible := False;
           end;
           S1 := '';
         end;
         Inc(fIndex);
       until (fIndex >= fTokenizer.Tokens.Count) or (PToken(fTokenizer.Tokens[fIndex])^.Text[1] in [':', '{', ';']);
-      UseID := fLastID;
     end;
 
     if (fIndex < fTokenizer.Tokens.Count) and (PToken(fTokenizer.Tokens[fIndex])^.Text[1] = ':') then begin
@@ -1022,6 +1021,7 @@ begin
 
     // check for struct names after '}'
     if IsStruct then begin
+
       I := SkipBraces(fIndex);
 
       S1 := '';
@@ -1054,11 +1054,13 @@ begin
         end
         else begin
           if Trim(S1) <> '' then begin
-            if UseID <> -1 then
-              cID := UseID
-            else
-              cID := CheckForOutstandingTypedef(Trim(S1));
-            fLastID := AddStatement(cID,
+            //if UseID <> -1 then
+            //  cID := UseID
+            //else
+            //  cID := CheckForOutstandingTypedef(Trim(S1));
+
+            //  cID := -1;
+            fLastID := AddStatement(-1,
               GetCurrentClass,
               fCurrentFile,
               Prefix + Trim(S1),
@@ -1071,9 +1073,7 @@ begin
               fClassScope,
               NameVisible,
               True);
-            NameVisible := False;
           end;
-          UseID := fLastID;
           S1 := '';
         end;
 
@@ -1410,8 +1410,8 @@ begin
     if (fIndex < fTokenizer.Tokens.Count - 1) and (PToken(fTokenizer.Tokens[fIndex + 1])^.Text[1] in [',', ';', ':', '}']) then
       Break;
     if (PToken(fTokenizer.Tokens[fIndex])^.Text <> 'struct') and
-      (PToken(fTokenizer.Tokens[fIndex])^.Text <> 'class') then
-//      (PToken(fTokenizer.Tokens[fIndex])^.Text <> 'union') then
+       (PToken(fTokenizer.Tokens[fIndex])^.Text <> 'class') then
+//     (PToken(fTokenizer.Tokens[fIndex])^.Text <> 'union') then
       LastType := Trim(LastType + ' ' + PToken(fTokenizer.Tokens[fIndex])^.Text);
     Inc(fIndex);
   until fIndex = fTokenizer.Tokens.Count;

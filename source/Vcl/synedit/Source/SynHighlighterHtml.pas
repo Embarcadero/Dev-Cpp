@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterHtml.pas,v 1.24 2004/07/13 00:00:31 markonjezic Exp $
+$Id: SynHighlighterHtml.pas,v 1.25 2005/01/28 16:53:23 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -2222,7 +2222,7 @@ begin
       if (fLine[Run+1]='#') then begin
         fAndCode:=-1;
         i:=Run;
-        inc(Run,2);
+        inc(Run, 2);
         if fLine[Run] in ['X', 'x'] then
         begin
           inc(Run);
@@ -2280,7 +2280,7 @@ begin
     else begin
       if (fLine[Run+1]='#') then begin
         fAndCode:=-1;
-        inc(Run,2);
+        inc(Run, 2);
         if fLine[Run] in ['X', 'x'] then
         begin
           inc(Run);

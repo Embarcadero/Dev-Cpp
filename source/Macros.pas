@@ -90,7 +90,7 @@ begin
   { Non-project editor macros }
   else if Assigned(e) then
   begin
-      Replace(Result, '<EXENAME>',       ChangeFileExt(e.FileName, EXE_EXT));
+      Replace(Result, '<EXENAME>',       '"' + ChangeFileExt(e.FileName, EXE_EXT) + '"');
       Replace(Result, '<PROJECTNAME>',   e.FileName);
       Replace(Result, '<PROJECTFILE>',   e.FileName);
       Replace(Result, '<PROJECTPATH>',   ExtractFilePath(e.FileName));
