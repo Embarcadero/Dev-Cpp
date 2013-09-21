@@ -202,36 +202,35 @@ begin
 			end;
 	end else begin
 		// Win32
-		AddItemByValues('MessageBox','Win32 MessageBox','MessageBox(*|*,,,);',1);
+		AddItemByValues('MessageBox','Win32 MessageBox','MessageBox(*|*,"Hello","Caption",MB_OK);',1);
 		AddItemByValues('WinMain','Win32 Main Function',
 
-	'int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow) {'+#13#10+
+	'int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {'+#13#10+
 	'	WNDCLASSEX wc;'+#13#10+
 	'	HWND hwnd;'+#13#10+
-	'	MSG Msg;'+#13#10+#13#10+
-	'	wc.cbSize        = sizeof(WNDCLASSEX);'+#13#10+
-	'	wc.style         = 0;'+#13#10+
-	'	wc.lpfnWndProc   = WndProc;'+#13#10+
-	'	wc.cbClsExtra    = 0;'+#13#10+
-	'	wc.cbWndExtra    = 0;'+#13#10+
-	'	wc.hInstance     = hInstance;'+#13#10+
-	'	wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);'+#13#10+
-	'	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);'+#13#10+
+	'	MSG Msg;'+#13#10+
+	''+#13#10+
+	'	memset(&wc,0,sizeof(wc));'+#13#10+
+	'	wc.cbSize		 = sizeof(WNDCLASSEX);'+#13#10+
+	'	wc.lpfnWndProc	 = *|* /* insert window procedure function here */;'+#13#10+
+	'	wc.hInstance	 = hInstance;'+#13#10+
+	'	wc.hCursor		 = LoadCursor(NULL, IDC_ARROW);'+#13#10+
 	'	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);'+#13#10+
-	'	wc.lpszMenuName  = NULL;'+#13#10+
 	'	wc.lpszClassName = "WindowClass";'+#13#10+
-	'	wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);'+#13#10+#13#10+
+	'	wc.hIcon		 = LoadIcon(NULL, IDI_APPLICATION);'+#13#10+
+	'	wc.hIconSm		 = LoadIcon(NULL, IDI_APPLICATION);'+#13#10+
+	''+#13#10+
 	'	if(!RegisterClassEx(&wc)) {'+#13#10+
-	'		MessageBox(NULL, "Window Registration Failed!", "Error!",MB_ICONEXCLAMATION|MB_OK);'+#13#10+
+	'		MessageBox(NULL, "Window Registration Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);'+#13#10+
 	'		return 0;'+#13#10+
-	'	}'+#13#10+#13#10+
-	'	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass",*|*,WS_OVERLAPPEDWINDOW,CW_USEDEFAULT,CW_USEDEFAULT,640,480,NULL,NULL,hInstance,NULL);'+#13#10+#13#10+
+	'	}'+#13#10+
+	''+#13#10+
+	'	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","Caption",WS_VISIBLE|WS_OVERLAPPEDWINDOW,CW_USEDEFAULT,CW_USEDEFAULT,640,480,NULL,NULL,hInstance,NULL);'+#13#10+
 	'	if(hwnd == NULL) {'+#13#10+
-	'		MessageBox(NULL, "Window Creation Failed!", "Error!",MB_ICONEXCLAMATION|MB_OK);'+#13#10+
+	'		MessageBox(NULL, "Window Creation Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);'+#13#10+
 	'		return 0;'+#13#10+
-	'	}'+#13#10+#13#10+
-	'	ShowWindow(hwnd, 1);'+#13#10+
-	'	UpdateWindow(hwnd);'+#13#10+#13#10+
+	'	}'+#13#10+
+	''+#13#10+
 	'	while(GetMessage(&Msg, NULL, 0, 0) > 0) {'+#13#10+
 	'		TranslateMessage(&Msg);'+#13#10+
 	'		DispatchMessage(&Msg);'+#13#10+

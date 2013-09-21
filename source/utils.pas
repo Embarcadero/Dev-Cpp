@@ -120,6 +120,8 @@ function IsNumeric(s : string) : boolean;
 
 procedure OpenHelpFile;
 
+function ProgramHasConsole(const path : string) : boolean;
+
 implementation
 
 uses 
@@ -129,6 +131,28 @@ uses
 {$IFDEF LINUX}
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
+
+function ProgramHasConsole(const path : string) : boolean;
+var
+	handle : Cardinal;
+	bytesread : DWORD;
+	signature : DWORD;
+	dos_header : _IMAGE_DOS_HEADER;
+	pe_header  : _IMAGE_FILE_HEADER;
+	opt_header : _IMAGE_OPTIONAL_HEADER;
+begin
+	handle := CreateFile(PChar(path),GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
+
+	ReadFile(Handle, dos_header, sizeof(dos_header), bytesread, nil);
+	SetFilePointer(Handle, dos_header._lfanew, nil, 0);
+	ReadFile(Handle, signature,  sizeof(signature),  bytesread, nil);
+	ReadFile(Handle, pe_header,  sizeof(pe_header),  bytesread, nil);
+	ReadFile(Handle, opt_header, sizeof(opt_header), bytesread, nil);
+
+	Result := (opt_header.Subsystem = IMAGE_SUBSYSTEM_WINDOWS_CUI);
+
+	CloseHandle(handle);
+end;
 
 // got tired of typing application.handle,PChar,PChar MB_OK, etc ;)
 procedure MsgBox(text,caption:string);

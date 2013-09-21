@@ -18,37 +18,6 @@ int main(int argc, char** argv) {
 		MessageBox(NULL,"Usage:\n\nConsolePauser.exe <filename> <parameters>\n","Info",MB_ICONINFORMATION);
 		return 0;
 	}
-	
-	// Then check if we are even running a console program by reading the exe header
-	bool HasConsole;
-	HANDLE hImage;
-	DWORD  MoreDosHeader[16];
-	DWORD bytes;
-	ULONG  ntSignature;
-	IMAGE_DOS_HEADER      image_dos_header;
-	IMAGE_FILE_HEADER     image_file_header;
-	IMAGE_OPTIONAL_HEADER image_optional_header;
-
-	// Open the reference file
-	hImage = CreateFile(&argv[1][0],GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-
-	// Read the MS-DOS image header.
-	ReadFile(hImage,&image_dos_header, sizeof(IMAGE_DOS_HEADER),&bytes,NULL);
-
-	// Read more MS-DOS header.
-	ReadFile(hImage,MoreDosHeader,sizeof(MoreDosHeader),&bytes,NULL);
-
-	// Get actual COFF header.
-	ReadFile(hImage, &ntSignature, sizeof(ULONG),&bytes,NULL);
-
-	// Read more
-	ReadFile(hImage,&image_file_header,IMAGE_SIZEOF_FILE_HEADER,&bytes,NULL);
-
-	// Read optional header.
-	ReadFile(hImage,&image_optional_header,IMAGE_SIZEOF_NT_OPTIONAL_HEADER,&bytes,NULL);
-
-	// Results!
-	HasConsole = (image_optional_header.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI);
 
 	// Then build the to-run application command
 	char cmd[MAX_PATH] = "";
@@ -70,19 +39,16 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 	
-	// GUI program? skip the waiting and pausing stuff
-	if(HasConsole) {
-		WaitForSingleObject(pi.hProcess, INFINITE); // Wait for it to finish
+	WaitForSingleObject(pi.hProcess, INFINITE); // Wait for it to finish
 	
-		DWORD retval;
-		GetExitCodeProcess(pi.hProcess, &retval);
-		if(retval == 0) {
-			printf("\n\nProcess exited normally.\n");
-		} else {
-			printf("\n\nProcess exited with return value %lu\n",retval);
-		}
-	
-		pause();		
+	DWORD retval;
+	GetExitCodeProcess(pi.hProcess, &retval);
+	if(retval == 0) {
+		printf("\n\nProcess exited normally.\n");
+	} else {
+		printf("\n\nProcess exited with return value %lu\n",retval);
 	}
+	
+	pause();
 	return 0;
 }

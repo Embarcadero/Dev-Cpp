@@ -134,7 +134,7 @@ type
     edGutterWidth: TSpinEdit;
     cbHighCurrLine: TCheckBox;
     cpHighColor: TColorPickerButton;
-    cbTabtoSpaces: TCheckBox;
+    cbUseTabs: TCheckBox;
     cbSpecialChars: TCheckBox;
     cbSmartTabs: TCheckBox;
     cbSmartScroll: TCheckBox;
@@ -150,7 +150,7 @@ type
     cbDropFiles: TCheckBox;
     cbDoubleLine: TCheckBox;
     cbAutoIndent: TCheckBox;
-    cbAppendNewline: TCheckBox;
+    cbTrimTrailingSpaces: TCheckBox;
     ScrollHint: TLabel;
     tabAutosave: TTabSheet;
     EnableDisableAutosave: TCheckBox;
@@ -428,12 +428,12 @@ begin
   grpEditorOpts.Caption:=        '  ' +Lang[ID_EOPT_EDOPTIONS] +'  ';
   cbAutoIndent.Caption:=         Lang[ID_EOPT_AUTOINDENT];
   cbInsertMode.Caption:=         Lang[ID_EOPT_INSERTMODE];
-  cbTabtoSpaces.Caption:=        Lang[ID_EOPT_TAB2SPC];
+  cbUseTabs.Caption:=            Lang[ID_EOPT_TAB2SPC];
   cbSmartTabs.Caption:=          Lang[ID_EOPT_SMARTTABS];
   cbGroupUndo.Caption:=          Lang[ID_EOPT_GROUPUNDO];
   cbDropFiles.Caption:=          Lang[ID_EOPT_DROPFILES];
   cbSpecialChars.Caption:=       Lang[ID_EOPT_SPECIALCHARS];
-  cbAppendNewline.Caption :=     Lang[ID_EOPT_APPENDNEWLINE];
+  cbTrimTrailingSpaces.Caption:= Lang[ID_EOPT_TRIMTRAILINGSPACES];
   cbEHomeKey.Caption:=           Lang[ID_EOPT_EHOMEKEY];
   cbPastEOF.Caption:=            Lang[ID_EOPT_PASTEOF];
   cbPastEOL.Caption:=            Lang[ID_EOPT_PASTEOL];
@@ -603,7 +603,7 @@ begin
 
      cbAutoIndent.Checked:=          AutoIndent;
      cbInsertMode.Checked:=          InsertMode;
-     cbTabtoSpaces.Checked:=         not TabToSpaces;
+     cbUseTabs.Checked:=             UseTabs;
      cbSmartTabs.Checked:=           SmartTabs;
      cbGroupUndo.Checked:=           GroupUndo;
      cbEHomeKey.Checked:=            EHomeKey;
@@ -616,6 +616,7 @@ begin
      cbScrollHint.Checked:=          ScrollHint;
      cbSpecialChars.Checked:=        SpecialChars;
      cbFunctionHint.Checked:=        ShowFunctionTip;
+     cbTrimTrailingSpaces.Checked:=  TrimTrailingSpaces;
 
      cbMarginVis.Checked:=           MarginVis;
      edMarginWidth.Value:=           MarginSize;
@@ -630,7 +631,7 @@ begin
 
      cbParserHints.Checked:=         ParserHints;
      cbMatch.Checked :=              Match;
-     cbDefaultintoprj.Checked := DefaulttoPrj;
+     cbDefaultintoprj.Checked :=     DefaulttoPrj;
 
      cbHighCurrLine.Checked :=       HighCurrLine;
      cpHighColor.SelectionColor :=   HighColor;
@@ -770,7 +771,7 @@ begin
 	with devEditor do begin
 		AutoIndent:=          cbAutoIndent.Checked;
 		InsertMode:=          cbInsertMode.Checked;
-		TabToSpaces:=         not cbTabtoSpaces.Checked;
+		UseTabs:=             cbUseTabs.Checked;
 		SmartTabs:=           cbSmartTabs.Checked;
 		GroupUndo:=           cbGroupUndo.Checked;
 		EHomeKey:=            cbEHomeKey.Checked;
@@ -783,6 +784,7 @@ begin
 		ScrollHint:=          cbScrollHint.Checked;
 		SpecialChars:=        cbSpecialChars.Checked;
 		ShowFunctionTip:=     cbFunctionHint.Checked;
+		TrimTrailingSpaces:=  cbTrimTrailingSpaces.Checked;
 
 		MarginVis:=           cbMarginVis.Checked;
 		MarginSize:=          edMarginWidth.Value;

@@ -358,6 +358,7 @@ var
 	ShortPath: string;
 	ResIncludes: String;
 	tfile, ofile, ResFiles, tmp: string;
+	windresargs : string;
 begin
 	for i := 0 to pred(fProject.Units.Count) do begin
 		if not fProject.Units[i].Compile then
@@ -439,12 +440,17 @@ begin
 			ofile := ChangeFileExt(fProject.Options.PrivateResource, RES_EXT);
 		ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ofile));//GenMakePath(ExtractRelativePath(Makefile, ChangeFileExt(fProject.Options.PrivateResource, RES_EXT)));
 		tfile := GenMakePath(ExtractRelativePath(fProject.FileName, fProject.Options.PrivateResource));
+
+		if(AnsiContainsStr(fCompileParams,'-m32')) then
+			windresargs := ' -F pe-i386'
+		else
+			windresargs := '';
 		if DoCheckSyntax then begin
 			writeln(F, ofile + ':');
-			writeln(F, #9 + '$(WINDRES) -i ' + tfile + ' --input-format=rc -o nul -O coff' + ResIncludes)
+			writeln(F, #9 + '$(WINDRES) -i ' + tfile + windresargs + ' --input-format=rc -o nul -O coff' + ResIncludes)
 		end else begin
 			writeln(F, ofile + ': ' + tfile + ' ' + ResFiles);
-			writeln(F, #9 + '$(WINDRES) -i ' + tfile + ' --input-format=rc -o ' + ofile + ' -O coff' + ResIncludes);
+			writeln(F, #9 + '$(WINDRES) -i ' + tfile + windresargs + ' --input-format=rc -o ' + ofile + ' -O coff' + ResIncludes);
 		end;
 	end;
 end;
@@ -690,6 +696,7 @@ begin
 	Application.Restore;
 end;
 
+
 procedure TCompiler.Run;
 var
 	FileToRun : string;
@@ -714,7 +721,7 @@ begin
 			end;
 		end else begin // execute normally
 
-			if devData.ConsolePause and (fProject.Options.typ = dptCon) then begin
+			if devData.ConsolePause and ProgramHasConsole(fProject.Executable) then begin
 				Parameters := '"' + fProject.Executable + '" ' + fRunParams;
 				FileToRun := devDirs.Exec + 'ConsolePauser.exe';
 			end else begin
@@ -731,9 +738,9 @@ begin
 			MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0)
 		else begin
 
-			if devData.ConsolePause then begin
+			if devData.ConsolePause and ProgramHasConsole(ChangeFileExt(fSourceFile, EXE_EXT)) then begin
 				Parameters := '"' + ChangeFileExt(fSourceFile, EXE_EXT) + '" ' + fRunParams;
-				FileToRun := devDirs.Exec + 'ConsolePauser.exe'
+				FileToRun := devDirs.Exec + 'ConsolePauser.exe';
 			end else begin
 				Parameters := fRunParams;
 				FileToRun := ChangeFileExt(fSourceFile, EXE_EXT);

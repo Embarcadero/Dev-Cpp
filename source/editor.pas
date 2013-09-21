@@ -74,8 +74,8 @@ type
     FCodeToolTip: TCodeToolTip;//** Modified by Peter **}
     FLastPos : TBufferCoord;
     FAutoIndent: TSynAutoIndent;
-    HasCompletedParentheses : boolean;
-    HasCompletedArray : boolean;
+    HasCompletedParentheses : integer; // Set to 2 on completion during KeyPress, to 1 immediately after by KeyDown, and to 0 upon next key
+    HasCompletedArray : integer; // idem
     procedure CompletionTimer( Sender: TObject );
     procedure EditorKeyPress( Sender: TObject; var Key: Char );
     procedure EditorKeyDown( Sender: TObject; var Key: Word; Shift: TShiftState );
@@ -933,8 +933,9 @@ var
 	attr : TSynHighlighterAttributes;
 	s : string;
 begin
+
 	// Doing this here instead of in EditorKeyDown to be able to delete some key messages
-	if devEditor.CompleteSymbols then begin
+	if devEditor.CompleteSymbols and not (Sender is TForm) then begin
 
 		// Allerhande voorwaarden
 		allowcompletion := true;
@@ -951,18 +952,18 @@ begin
 			// Check if we typed anything completable...
 			if (Key = '(') and devEditor.ParentheseComplete then begin
 				InsertString(')',false);
-				HasCompletedParentheses := true;
-			end else if (Key = ')') and HasCompletedParentheses then begin
+				HasCompletedParentheses := 2;
+			end else if (Key = ')') and (HasCompletedParentheses > 0) then begin
 				fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
-				HasCompletedParentheses := false;
-				Abort;
+				HasCompletedParentheses := 0;
+				Key:=#0;
 			end else if (Key = '[') and devEditor.ArrayComplete then begin
 				InsertString(']',false);
-				HasCompletedArray := true;
-			end else if (Key = ']') and HasCompletedArray then begin
+				HasCompletedArray := 2;
+			end else if (Key = ']') and (HasCompletedArray > 0) then begin
 				fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
-				HasCompletedArray := false;
-				Abort;
+				HasCompletedArray := 0;
+				Key:=#0;
 			end else if (Key = '*') and devEditor.CommentComplete then begin
 				if (cursorpos > 1) and (fText.LineText[cursorpos-1] = '/') then
 					InsertString('*/',false);
@@ -974,9 +975,9 @@ begin
 					// See what the last nonwhite character before the cursor is
 					repeat
 						Dec(cursorpos);
-					until (cursorpos=1) or not (fText.LineText[cursorpos] in [#9,#32]);
+					until (cursorpos=1) or not (fText.LineText[cursorpos] in [#0..#32]);
 
-					// First check if the user is opening a function
+					// Complete curly braces in if blocks or function etc.
 					if (cursorpos > 0) and (fText.LineText[cursorpos] in [')']) or (Pos('else',fText.LineText)=(cursorpos-3)) then begin
 
 						// Check indentation
@@ -985,7 +986,10 @@ begin
 							Inc(cursorpos);
 						until not (fText.LineText[cursorpos] in [#9,#32]);
 
-						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
+						// Enter + Indent + Ending
+						InsertString('{' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
+						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+						Key:=#0;
 					end else if AnsiStartsStr('struct',TrimLeft(fText.LineText)) or
 								AnsiStartsStr('union', TrimLeft(fText.LineText)) or
 								AnsiStartsStr('class', TrimLeft(fText.LineText)) or
@@ -997,7 +1001,10 @@ begin
 							Inc(cursorpos);
 						until not (fText.LineText[cursorpos] in [#9,#32]);
 
-						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + '};',false);
+						// Enter + Indent + Ending
+						InsertString('{' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '};',false);
+						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+						Key:=#0;
 					end else if AnsiStartsStr('case',TrimLeft(fText.LineText)) then begin
 
 						// Check indentation too
@@ -1006,7 +1013,10 @@ begin
 							Inc(cursorpos);
 						until not (fText.LineText[cursorpos] in [#9,#32]);
 
-						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + #9 + 'break;' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
+						// Enter + Indent + Extra Indent + Text + Enter + Indent + Ending
+						InsertString('{' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + #9 + 'break;' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
+						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+						Key:=#0;
 					end else
 						InsertString('}',false);
 				end else
@@ -1018,11 +1028,6 @@ begin
 				if AnsiStartsStr('#include',fText.LineText) then
 					InsertString('"',false);
 			end;
-
-			if (key <> '(') then
-				HasCompletedParentheses := false;
-			if (key <> '[') then
-				HasCompletedArray := false;
 		end;
 	end;
 
@@ -1086,25 +1091,14 @@ procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftStat
 var
 	M: TMemoryStream;
 begin
-	// Indent/Unindent selected text with tab
-{$IFDEF WIN32}
-	if Key = VK_TAB then begin
-{$ENDIF}
-{$IFDEF LINUX}
-		if Key = XK_TAB then begin
-{$ENDIF}
-		if FText.SelText <> '' then begin
-			if FText.BlockBegin.Line <> FText.BlockEnd.Line then begin
-				if not (ssShift in Shift) then
-					FText.ExecuteCommand(ecBlockIndent, #0, nil)
-				else
-					FText.ExecuteCommand(ecBlockUnindent, #0, nil);
-			end;
-		end;
+	if devEditor.CompleteSymbols then begin
+		Dec(HasCompletedParentheses);
+		Dec(HasCompletedArray);
 	end;
 
 	// Show the completion box. This needs to be done after the key is inserted!
 	if fCompletionBox.Enabled then begin
+		fCompletionBox.OnKeyPress:=EditorKeyPress;
 		if ssCtrl in Shift then
 {$IFDEF WIN32}
 			if Key=VK_SPACE then begin

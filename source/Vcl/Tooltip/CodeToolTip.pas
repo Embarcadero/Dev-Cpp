@@ -610,7 +610,7 @@ var
 		FLookupEditor.GetHighlighterAttriAtRowCol(FLookupEditor.CaretXY, StrToken, HLAttr);
 
 		with FBmp.Canvas do begin
-			Font.Color := clCaptionText;
+			Font.Color := clBlack;//don't use clCaptionText can be white too, making stuff unreadable
 
 			// The current argument should be drawing extra attention
 			if CurrentParam then begin

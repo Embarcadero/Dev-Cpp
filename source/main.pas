@@ -910,9 +910,9 @@ type
 		procedure RebuildClassesToolbar;
 		procedure PrepareDebugger;
 		procedure ClearMessageControl;
-		procedure HideCodeToolTip;	// added on 23rd may 2004 by peter_
+		procedure HideCodeToolTip; // added on 23rd may 2004 by peter_
 	public
-		procedure DoCreateEverything;	// added by peter
+		procedure DoCreateEverything; // added by peter
 		function SaveFile(e : TEditor): Boolean;
 		procedure OpenFile(s : string);
 		procedure OpenProject(s: string);
@@ -3860,10 +3860,10 @@ procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftStat
 begin
 	case key of
 {$IFDEF WIN32}
-	 vk_F6:
+		vk_F6:
 {$ENDIF}
 {$IFDEF LINUX}
-	 XK_F6:
+		XK_F6:
 {$ENDIF}
 		if ssCtrl in Shift then ShowDebug;
 	end;

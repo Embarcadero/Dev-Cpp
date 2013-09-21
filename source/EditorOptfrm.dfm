@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 934
-  Top = 558
+  Left = 758
+  Top = 442
   HelpType = htKeyword
   BorderStyle = bsDialog
   Caption = 'Editor Options'
@@ -28,7 +28,7 @@ object EditorOptForm: TEditorOptForm
     Top = 0
     Width = 464
     Height = 375
-    ActivePage = tabCode
+    ActivePage = tabGeneral
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -121,12 +121,12 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Show function hints'
           TabOrder = 0
         end
-        object cbAppendNewline: TCheckBox
+        object cbTrimTrailingSpaces: TCheckBox
           Left = 8
           Top = 154
           Width = 177
           Height = 17
-          Caption = 'Ensure that file ends with newline'
+          Caption = 'Trim Trailing Spaces'
           TabOrder = 1
         end
         object cbAutoIndent: TCheckBox
@@ -252,7 +252,7 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Show Special Line Chars'
           TabOrder = 15
         end
-        object cbTabtoSpaces: TCheckBox
+        object cbUseTabs: TCheckBox
           Left = 8
           Top = 52
           Width = 137

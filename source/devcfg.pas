@@ -374,7 +374,7 @@ type
    fAutoIndent: boolean;       // Auto-indent code lines
    fSmartTabs: boolean;        // Tab to next no whitespace char
    fSpecialChar: boolean;      // special line characters visible
-   fTabtoSpaces: boolean;      // convert tabs to spaces
+   fUseTabs: boolean;          // convert tabs to spaces
    fShowFunctionTip: boolean;  // show function tip
    fMarginColor: TColor;       // Color of right margin
    fSyntax: TStrings;          // Holds attributes settings
@@ -383,7 +383,8 @@ type
    fMatch : boolean;           // Highlight matching parenthesis
    fHighCurrLine: boolean;     // Highlight current line
    fHighColor: TColor;         // Color of current line when highlighted
-
+   fTrimTrailingSpaces : boolean;
+  
    // Autosave
    fEnableAutoSave : boolean;
    fInterval : integer;
@@ -408,7 +409,7 @@ type
    //Editor props
    property AutoIndent: boolean read fAutoIndent write fAutoIndent;
    property InsertMode: boolean read fInsertMode write fInsertMode;
-   property TabToSpaces: boolean read fTabToSpaces write fTabToSpaces;
+   property UseTabs: boolean read fUseTabs write fUseTabs;
    property SmartTabs: boolean read fSmartTabs write fSmartTabs;
    property GroupUndo: boolean read fGroupUndo write fGroupUndo;
    property EHomeKey: boolean read fEHomeKey write fEHomeKey;
@@ -421,6 +422,7 @@ type
    property ScrollHint: boolean read fShowScrollHint write fShowScrollHint;
    property SpecialChars: boolean read fSpecialChar write fSpecialChar;
    property ShowFunctionTip: boolean read fShowFunctionTip write fShowFunctionTip;
+   property TrimTrailingSpaces: boolean read fTrimTrailingSpaces write fTrimTrailingSpaces;
 
    property TabSize: integer read fTabSize write fTabSize;
    property MarginVis: boolean read fMarginVis write fMarginVis;
@@ -1490,7 +1492,7 @@ begin
 	// General
 	fAutoIndent:= TRUE;
 	fInsertMode:= TRUE;
-	fTabtoSpaces:= FALSE; // Use Tab Character (inverse)
+	fUseTabs:= TRUE;
 	fSmartTabs:= FALSE;
 	fGroupUndo:= TRUE;
 	fInsDropFiles:= FALSE;
@@ -1507,6 +1509,7 @@ begin
 	fShowScrollHint:= TRUE;
 	fParserHints:= TRUE; // Editor hints
 	fShowFunctionTip:= TRUE;
+	fTrimTrailingSpaces:= FALSE;
 
 	// Caret
 	fInsertCaret:= 0;
@@ -1607,7 +1610,7 @@ begin
 
 		Options := [
 			eoAltSetsColumnMode, eoDisableScrollArrows,
-			eoDragDropEditing, eoDropFiles, eoKeepCaretX,
+			eoDragDropEditing, eoDropFiles, eoKeepCaretX, eoTabsToSpaces,
 			eoRightMouseMovesCursor, eoScrollByOneLess, eoAutoSizeMaxScrollWidth
 		];
 
@@ -1632,11 +1635,12 @@ begin
 			Options := Options + [eoSmartTabs];
 		if fSmartTabs then
 			Options := Options + [eoSmartTabDelete];
-		if fTabtoSpaces then
-			Options := Options + [eoTabsToSpaces];
+		if fUseTabs then
+			Options := Options - [eoTabsToSpaces];
 		if fSpecialChar then
 			Options := Options + [eoShowSpecialChars];
-
+		if fTrimTrailingSpaces then
+			Options := Options + [eoTrimTrailingSpaces];
 		finally
 			EndUpdate;
 		end;

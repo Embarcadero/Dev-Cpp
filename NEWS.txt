@@ -11,6 +11,10 @@ Version 5.1.1.1 - *
 - Moved to a more recent SynEdit component.
 - Symbol completion is faster and has more options now.
 - Added a console pausing option to Environment options.
+- Fixed a font color issue in the function argument tooltip.
+- Added back trim trailing spaces.
+- Symbols are now skipped more smartly.
+- Windres is now, by default, forced to output i386 res files when compiling 32bit executables.
 
 Version 5.1.1.0 - 16 Februari 2012
 

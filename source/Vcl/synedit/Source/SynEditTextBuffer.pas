@@ -488,6 +488,7 @@ end;
 constructor TSynEditStringList.Create;
 begin
   inherited Create;
+  fAppendNewLineAtEOF := True;
   fFileFormat := sffDos;
   fIndexOfLongestLine := -1;
   TabWidth := 8;
