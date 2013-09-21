@@ -276,7 +276,7 @@ begin
 		fMRU.Insert(0, newitem);// insert first
 	end else begin // find last project
 		I := 0;
-		while GetFileTyp(PMRUItem(fMRU[I])^.filename) = utPrj do
+		while (i < fMRU.Count) and (GetFileTyp(PMRUItem(fMRU[I])^.filename) = utPrj) do
 			Inc(I);
 		fMRU.Insert(I, newitem);// insert after last project
 	end;

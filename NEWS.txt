@@ -16,6 +16,8 @@ Version 5.4.3 - *
 - Triple clicks now don't happen anymore when the mouse moves between clicks.
 - Updated Catalan translation.
 - The console pauser now does not show a "loading" cursor anymore.
+- Updated Japanese translation.
+- Added a toggle comment function (listens to Ctrl+/ by default).
 
 Version 5.4.2 - 24 Mei 2013
 

@@ -680,12 +680,12 @@ object MainForm: TMainForm
       object ProfileBtn: TToolButton
         Left = 162
         Top = 0
-        Action = actProfileProject
+        Action = actProfile
       end
       object ProfilingInforBtn: TToolButton
         Left = 185
         Top = 0
-        Action = actDeleteProfileProject
+        Action = actDeleteProfile
       end
     end
     object tbProject: TToolBar
@@ -1295,6 +1295,9 @@ object MainForm: TMainForm
       object Uncomment1: TMenuItem
         Action = actUncomment
       end
+      object ToggleComment1: TMenuItem
+        Action = actToggleComment
+      end
       object N27: TMenuItem
         Caption = '-'
       end
@@ -1512,10 +1515,10 @@ object MainForm: TMainForm
         Caption = '-'
       end
       object Profileanalysis1: TMenuItem
-        Action = actProfileProject
+        Action = actProfile
       end
       object DeleteProfilingInformation: TMenuItem
-        Action = actDeleteProfileProject
+        Action = actDeleteProfile
       end
       object N25: TMenuItem
         Caption = '-'
@@ -2557,6 +2560,13 @@ object MainForm: TMainForm
       OnExecute = actUncommentExecute
       OnUpdate = actUpdateEmptyEditor
     end
+    object actToggleComment: TAction
+      Category = 'Edit'
+      Caption = 'Toggle Comment'
+      ShortCut = 16575
+      OnExecute = actToggleCommentExecute
+      OnUpdate = actUpdateEmptyEditor
+    end
     object actIndent: TAction
       Category = 'Edit'
       Caption = 'Indent'
@@ -2628,11 +2638,11 @@ object MainForm: TMainForm
       OnExecute = actBrowserViewCurrentExecute
       OnUpdate = actBrowserViewAllUpdate
     end
-    object actProfileProject: TAction
+    object actProfile: TAction
       Category = 'Execute'
       Caption = 'Profile analysis'
       ImageIndex = 43
-      OnExecute = actProfileProjectExecute
+      OnExecute = actProfileExecute
       OnUpdate = actCompileRunUpdate
     end
     object actBrowserAddFolder: TAction
@@ -2813,11 +2823,11 @@ object MainForm: TMainForm
       OnExecute = actStepLineExecute
       OnUpdate = actUpdateDebuggerRunning
     end
-    object actDeleteProfileProject: TAction
+    object actDeleteProfile: TAction
       Category = 'Execute'
       Caption = 'Delete Profiling information'
       ImageIndex = 47
-      OnExecute = actDeleteProfileProjectExecute
+      OnExecute = actDeleteProfileExecute
       OnUpdate = actRunUpdate
     end
     object actGotoDeclEditor: TAction

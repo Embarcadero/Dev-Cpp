@@ -102,14 +102,18 @@ end;
 
 function TfrmShortcutsEditor.GetShortCut(Index: integer): TShortCut;
 begin
-	Result := TextToShortCut(lvShortcuts.Items[Index].SubItems[0]);
+	Result := TShortCut(lvShortcuts.Items[Index].Data);
 end;
 
 procedure TfrmShortcutsEditor.lvShortcutsKeyDown(Sender: TObject;var Key: Word; Shift: TShiftState);
 var
-  I, oldindex: integer;
-  sct: AnsiString;
+	I, oldindex: integer;
+	TextShortCut: AnsiString;
+	IntShortCut: TShortCut;
 begin
+	// don't let the keystroke propagate...
+	Key := 0;
+
 	// Require a selection
 	if lvShortcuts.Selected = nil then
 		Exit;
@@ -132,14 +136,15 @@ begin
 	if (Key in [VK_SHIFT,VK_CONTROL,VK_MENU]) then // VK_MENU is the alt key
 		Exit;
 
-	sct := ShortCutToText(ShortCut(Key, Shift));
+	IntShortCut := ShortCut(Key, Shift);
+	TextShortCut := ShortCutToText(IntShortCut);
 
- 	oldindex := -1;
+	oldindex := -1;
 	for I:=0 to lvShortcuts.Items.Count-1 do
 
 		// Don't scan popups, they can contain duplicate shortcuts (they're picked based on focus)
 		if (lvShortcuts.Items[I] <> lvShortcuts.Selected) and (Pos('Popup',lvShortcuts.Items[I].Caption) = 0) then
-			if lvShortcuts.Items[I].SubItems[0] = sct then begin
+			if TShortCut(lvShortcuts.Items[I].Data) = IntShortCut then begin
 				oldindex := i;
 				break;
 			end;
@@ -148,15 +153,12 @@ begin
 	if oldindex <> -1 then begin // already in use
 		if MessageDlg(Format(fReplaceHint,[lvShortcuts.Items[oldindex].Caption]),mtConfirmation,[mbYes,mbNo],0) = mrYes then begin // replace...
 			lvShortcuts.Items[oldindex].SubItems[0] := ''; // remove old
-			lvShortcuts.Selected.SubItems[0] := sct; // set new
+			lvShortcuts.Items[oldindex].Data := Pointer(0);
 		end;
-	end else
-		lvShortcuts.Selected.SubItems[0] := sct;
+	end;
 
-	// Set new one
-
-	// don't let the keystroke propagate...
-	Key := 0;
+	lvShortcuts.Selected.SubItems[0] := TextShortCut; // set new
+	lvShortcuts.Selected.Data := Pointer(IntShortCut);
 end;
 
 procedure TfrmShortcutsEditor.lvShortcutsCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;var DefaultDraw: Boolean);
@@ -202,10 +204,14 @@ end;
 procedure TfrmShortcutsEditor.btnDefaultClick(Sender: TObject);
 var
 	I : integer;
+	ShortCut: TShortCut;
 begin
 	lvShortcuts.Items.BeginUpdate;
-	for I := 0 to lvShortcuts.Items.Count -1  do
-		lvShortcuts.Items[I].SubItems[0] := ShortCutToText(PShortcutItem(lvShortcuts.Items[I].Data)^.Default);
+	for I := 0 to lvShortcuts.Items.Count - 1 do begin
+		ShortCut := PShortcutItem(lvShortcuts.Items[I].Data)^.Default;
+		lvShortcuts.Items[I].Data := Pointer(ShortCut);
+		lvShortcuts.Items[I].SubItems[0] := ShortCutToText(ShortCut);
+	end;
 	lvShortcuts.Items.EndUpdate;
 end;
 

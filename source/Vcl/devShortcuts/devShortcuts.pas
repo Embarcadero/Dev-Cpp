@@ -30,14 +30,14 @@ uses
 {$ENDIF}
 
 type
-  TShortcutItem = record
+  TShortCutItem = record
     Default: TShortCut;
     IniEntry: AnsiString; // name in ini file, use untranslated MenuItem.Caption
     ListEntry: AnsiString; // name in editor form
     MenuItem: TMenuItem; // apply Current to this
     Action: TAction; // OR this
   end;
-  PShortcutItem = ^TShortcutItem;
+  PShortCutItem = ^TShortCutItem;
 
   TdevShortcuts = class(TComponent)
   private
@@ -109,7 +109,7 @@ end;
 
 procedure TdevShortcuts.Load(List: TActionList);
 var
-	I: integer;
+	I,intvalue: integer;
 	Fini: TIniFile;
 	value: AnsiString;
 	ShortCut: TShortCut;
@@ -175,12 +175,18 @@ begin
 	Fini := TIniFile.Create(fFileName);
 	try
 		for I := 0 to fShortcuts.Count - 1 do begin
-			item := PShortcutItem(fShortcuts[i]);
+			item := PShortCutItem(fShortcuts[i]);
 
 			// Read shortcut, assume ini file is untranslated
 			value := Fini.ReadString('Shortcuts', item^.IniEntry, '');
 			if (value <> 'none') and (value <> '') then begin // only apply when found in file
-				shortcut := TextToShortCut(value);
+
+				// New format: unsigned int value
+				intvalue := StrToIntDef(value,High(ShortCut)+1);
+				if intvalue = High(ShortCut)+1 then // old format...
+					shortcut := TextToShortCut(value)
+				else // new format
+					shortcut := intvalue;
 
 				// Apply to Menu
 				if Assigned(item^.MenuItem) then
@@ -253,7 +259,7 @@ begin
 
 				// Save untranslated
 				entry := item^.IniEntry;
-				value := ShortCutToText(ShortCuts[I]);
+				value := IntToStr(ShortCuts[I]); // save in new format
 				Fini.WriteString('Shortcuts', entry, value);
 			end;
 		end;

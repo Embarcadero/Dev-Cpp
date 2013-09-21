@@ -593,6 +593,7 @@ const
   ID_COPT_LINKERTAB                     = 41005;
   ID_COPT_PROGRAMSTAB                   = 41006;
   ID_COPT_COMPILERTIP                   = 41007;
+  ID_COPT_MAKEFILETAB                   = 41008;
 
   ID_COPT_BIN                           = 42001;
   ID_COPT_LIB                           = 42002;

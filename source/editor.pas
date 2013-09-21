@@ -138,6 +138,7 @@ type
   
     procedure CommentSelection;
     procedure UncommentSelection;
+    procedure ToggleCommentSelection;
     procedure IndentSelection;
     procedure UnindentSelection;
 
@@ -1502,8 +1503,7 @@ end;
 procedure TEditor.CommentSelection;
 var
 	oldbbegin,oldbend,oldcaret : TBufferCoord;
-	localcopy : string;
-	CurPos,len : integer;
+	I,EndLine : integer;
 begin
 	oldbbegin := fText.BlockBegin;
 	oldbend := fText.BlockEnd;
@@ -1511,42 +1511,24 @@ begin
 
 	// Prevent repaints while we're busy
 	fText.BeginUpdate;
+	fText.BeginUndoBlock;
 
-	if fText.BlockBegin.Line <> fText.BlockEnd.Line then begin
+	// Ignore the last line the cursor is placed on
+	if oldbend.Char = 1 then
+		EndLine := oldbend.Line-2
+	else
+		EndLine := oldbend.Line-1;
 
-		// Comment the first one
-		localcopy := '//' + fText.SelText;
-		CurPos := 1;
-		len := Length(localcopy);
-		while CurPos <= len do begin
-
-			// find any enter sequence...
-			if(localcopy[CurPos] in [#13,#10]) then begin
-				repeat
-					Inc(CurPos);
-				until (CurPos = len + 1) or not (localcopy[CurPos] in [#13,#10]);
-
-				// and comment only when this enter isn't trailing
-				if (CurPos <= len) then begin
-					Inc(len,2);
-					Insert('//',localcopy,CurPos); // 1 based
-				end;
-			end;
-			Inc(CurPos);
-		end;
-		fText.SelText := localcopy;
-	end else begin
-		fText.BeginUndoBlock;
-
-		fText.LineText := '//' + fText.LineText;
-
+	for I := oldbbegin.Line-1 to EndLine do begin
+		fText.Lines[i] := '//' + fText.Lines[i];
 		fText.UndoList.AddChange(crInsert,
-			BufferCoord(1,fText.CaretY),
-			BufferCoord(3,fText.CaretY),
+			BufferCoord(1,i+1),
+			BufferCoord(3,i+1),
 			'',smNormal);
-
-		fText.EndUndoBlock;
 	end;
+
+	// When grouping similar commands, process one comment action per undo/redo
+	fText.UndoList.AddChange(crNothing,BufferCoord(0,0),BufferCoord(0,0),'',smNormal);
 
 	// Move begin of selection
 	if oldbbegin.Char > 1 then
@@ -1565,6 +1547,7 @@ begin
 	fText.BlockEnd := oldbend;
 
 	// Prevent repaints while we're busy
+	fText.EndUndoBlock;
 	fText.EndUpdate;
 
 	fText.UpdateCaret;
@@ -1574,8 +1557,8 @@ end;
 procedure TEditor.UncommentSelection;
 var
 	oldbbegin,oldbend,oldcaret : TBufferCoord;
-	localcopy : AnsiString;
-	CurPos : integer;
+	editcopy : AnsiString;
+	I,J,EndLine : integer;
 begin
 	oldbbegin := fText.BlockBegin;
 	oldbend := fText.BlockEnd;
@@ -1583,77 +1566,81 @@ begin
 
 	// Prevent repaints while we're busy
 	fText.BeginUpdate;
+	fText.BeginUndoBlock;
 
-	if fText.BlockBegin.Line <> fText.BlockEnd.Line then begin
-		localcopy := fText.SelText;
-		CurPos := 1;
-		while(CurPos <= Length(localcopy)) do begin
+	// Ignore the last line the cursor is placed on
+	if oldbend.Char = 1 then
+		EndLine := oldbend.Line-2
+	else
+		EndLine := oldbend.Line-1;
 
-			// find any enter sequence, and skip all blanks after that...
-			if (localcopy[CurPos] in [#13,#10]) or (CurPos = 1) then begin
-				while (CurPos <= Length(localcopy)) and (localcopy[CurPos] in [#0..#32]) do
-					Inc(CurPos);
+	for I := oldbbegin.Line-1 to EndLine do begin
+		editcopy := fText.Lines[i];
 
-				// Is the first nonblank text equal to '//' ?
-				if (CurPos + 1 <= Length(localcopy)) and (StrLComp(@localcopy[CurPos],'//',2) = 0) then
-					Delete(localcopy,CurPos,2);
-			end;
-			Inc(CurPos);
-		end;
-		fText.SelText := localcopy;
-	end else begin
+		// Find // after blanks only
+		J := 1;
+		while (J+1 <= length(editcopy)) and (editcopy[j] in [#0..#32]) do
+			Inc(J);
+		if (editcopy[j] = '/') and (editcopy[j+1] = '/') then begin
+			Delete(EditCopy,J,2);
+			fText.Lines[i] := editcopy;
 
-		localcopy := fText.LineText;
-		CurPos := 1;
-
-		// Skip spaces
-		while(CurPos <= Length(localcopy)) and (localcopy[CurPos] in [#0..#32]) do
-			Inc(CurPos);
-
-		// First nonblank is comment? Remove
-		if (CurPos+1 <= Length(localcopy)) and (StrLComp(@localcopy[CurPos],'//',2) = 0) then begin
-			fText.BeginUndoBlock;
-
-			Delete(localcopy,CurPos,2);
+			fText.UndoList.AddChange(crDelete,
+				BufferCoord(J,i+1),
+				BufferCoord(J+2,i+1),
+				'//',smNormal);
 
 			// Move begin of selection
-			if oldbbegin.Char = 2 then
-				Dec(oldbbegin.Char,1)
-			else if oldbbegin.Char > 2 then
+			if (I = oldbbegin.Line-1) and (oldbbegin.Char > 1) then
 				Dec(oldbbegin.Char,2);
 
 			// Move end of selection
-			if oldbend.Char = 2 then
-				Dec(oldbend.Char,1)
-			else if oldbend.Char > 2 then
+			if (I = oldbend.Line-1) and (oldbend.Char > 1) then
 				Dec(oldbend.Char,2);
 
 			// Move caret
-			if oldcaret.Char = 2 then
-				Dec(oldcaret.Char,1)
-			else if oldcaret.Char > 2 then
+			if (I = oldcaret.Line-1) and (oldcaret.Char > 1) then
 				Dec(oldcaret.Char,2);
-
-			fText.LineText := localcopy;
-
-			fText.UndoList.AddChange(crDelete,
-				BufferCoord(CurPos,fText.CaretY),
-				BufferCoord(CurPos,fText.CaretY),
-				'//',smNormal);
-
-			fText.EndUndoBlock;
 		end;
 	end;
 
-	// Prevent repaints while we're busy
-	fText.EndUpdate;
+	// When grouping similar commands, process one uncomment action per undo/redo
+	fText.UndoList.AddChange(crNothing,BufferCoord(0,0),BufferCoord(0,0),'',smNormal);
 
 	fText.CaretXY := oldcaret;
 	fText.BlockBegin := oldbbegin;
 	fText.BlockEnd := oldbend;
 
+	// Prevent repaints while we're busy
+	fText.EndUndoBlock;
+	fText.EndUpdate;
+
 	fText.UpdateCaret;
 	fText.Modified := true;
+end;
+
+procedure TEditor.ToggleCommentSelection;
+var
+	caretbegin, caretend : TBufferCoord;
+	I,EndLine : integer;
+begin
+	caretbegin := fText.BlockBegin;
+	caretend := fText.BlockEnd;
+
+	// Ignore the last line the cursor is placed on
+	if caretend.Char = 1 then
+		EndLine := caretend.Line-2
+	else
+		EndLine := caretend.Line-1;
+
+	// if everything is commented, then uncomment
+	for I := caretbegin.Line-1 to EndLine do begin
+		if not StartsStr('//',Trimleft(fText.Lines[i])) then begin
+			CommentSelection;
+			Exit;
+		end;
+	end;
+	UncommentSelection;
 end;
 
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);

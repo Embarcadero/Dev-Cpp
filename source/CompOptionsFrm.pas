@@ -70,19 +70,9 @@ type
     GprofEdit: TEdit;
     cbCompAdd: TCheckBox;
     Commands: TMemo;
-    lblDelay: TLabel;
-    seCompDelay: TSpinEdit;
-    lblDelayMsg: TLabel;
-    grpMakefileGen: TGroupBox;
-    cbFastDep: TCheckBox;
     cbLinkerAdd: TCheckBox;
     Linker: TMemo;
-    grpCompSet: TGroupBox;
     OptionsTip: TLabel;
-    cmbCompilerSetComp: TComboBox;
-    btnAddCompilerSet: TSpeedButton;
-    btnDelCompilerSet: TSpeedButton;
-    btnRenameCompilerSet: TSpeedButton;
     btnBrowse: TSpeedButton;
     btnBrowse2: TSpeedButton;
     btnBrowse3: TSpeedButton;
@@ -92,7 +82,18 @@ type
     btnBrowse7: TSpeedButton;
     btnBrowse8: TSpeedButton;
     CompOptionsFrame1: TCompOptionsFrame;
+    grpCompSet: TGroupBox;
+    btnAddCompilerSet: TSpeedButton;
+    btnDelCompilerSet: TSpeedButton;
+    btnRenameCompilerSet: TSpeedButton;
     btnFindCompilers: TSpeedButton;
+    cmbCompilerSetComp: TComboBox;
+    tabMakefile: TTabSheet;
+    grpMakefileGen: TGroupBox;
+    lblDelay: TLabel;
+    lblDelayMsg: TLabel;
+    cbFastDep: TCheckBox;
+    seCompDelay: TSpinEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -405,6 +406,7 @@ begin
 	tabCodeGen.Caption:=                 Lang[ID_COPT_CODEGENTAB];
 	tabDirectories.Caption:=             Lang[ID_COPT_DIRTAB];
 	tabPrograms.Caption:=                Lang[ID_COPT_PROGRAMSTAB];
+	tabMakefile.Caption:=                Lang[ID_COPT_MAKEFILETAB];
 
 	// Directories, subtabs
 	DirTabs.Tabs.Clear;

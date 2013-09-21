@@ -35,8 +35,10 @@ type
   TLogEntryEvent = procedure(const msg: AnsiString) of object;
   TOutputEvent = procedure(const _Line, _Col, _Unit, _Message: AnsiString) of object;
   TResOutputEvent = procedure(const _Line, _Col, _Unit, _Message: AnsiString) of object;
-  TSuccessEvent = procedure of object;
-
+  TCompEndEvent = procedure of object;
+  TCompSuccessEvent = procedure of object;
+  TRunEndEvent = procedure of object;
+  
   TTarget = (ctNone, ctFile, ctProject);
 
   TCompiler = class
@@ -44,7 +46,9 @@ type
     fOnLogEntry: TLogEntryEvent;
     fOnOutput: TOutputEvent;
     fOnResOutput: TResOutputEvent;
-    fOnSuccess: TSuccessEvent;
+    fOnCompEnd: TCompEndEvent;
+    fOnCompSuccess: TCompSuccessEvent;
+    fOnRunEnd: TRunEndEvent;
     fPerfectDepCheck: Boolean;
     fProject: TProject;
     fSourceFile: AnsiString;
@@ -71,7 +75,6 @@ type
     procedure CheckSyntax;
     procedure Compile(const SingleFile: AnsiString = '');
     procedure Run;
-    procedure CompileAndRun;
     procedure Clean;
     procedure RebuildAll;
     function FindDeps(const TheFile: AnsiString): AnsiString;
@@ -83,7 +86,9 @@ type
     property OnLogEntry: TLogEntryEvent read fOnLogEntry write fOnLogEntry;
     property OnOutput: TOutputEvent read fOnOutput write fOnOutput;
     property OnResOutput: TResOutputEvent read fOnResOutput write fOnResOutput;
-    property OnSuccess: TSuccessEvent read fOnSuccess write fOnSuccess;
+    property OnCompEnd: TCompEndEvent read fOnCompEnd write fOnCompEnd;
+    property OnCompSuccess: TCompSuccessEvent read fOnCompSuccess write fOnCompSuccess;
+    property OnRunEnd: TRunEndEvent read fOnRunEnd write fOnRunEnd;
     property SourceFile: AnsiString read fSourceFile write fSourceFile;
     property PerfectDepCheck: Boolean read fPerfectDepCheck write fPerfectDepCheck;
     property RunParams: AnsiString read fRunParams write fRunParams;
@@ -101,7 +106,6 @@ type
     fCppIncludesParams : AnsiString;
     fBinDirs : AnsiString;
     fDevRun : TDevRun;
-    fRunAfterCompileFinish : boolean;
     fAbortThread : boolean;
 
     procedure CreateMakefile;
@@ -586,8 +590,7 @@ var
  s : AnsiString;
  ofile: AnsiString;
 begin
-	fSingleFile:=SingleFile<>'';
-	fRunAfterCompileFinish:= FALSE;
+	fSingleFile := SingleFile<>'';
 	if Assigned(fDevRun) then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
@@ -657,6 +660,9 @@ end;
 procedure TCompiler.RunTerminate(Sender: TObject);
 begin
 	Application.Restore;
+
+	OnRunEnd;
+
 	MainForm.UpdateAppTitle;
 end;
 
@@ -727,12 +733,6 @@ begin
 			MainForm.UpdateAppTitle;
 		end;
 	end;
-end;
-
-procedure TCompiler.CompileAndRun;
-begin
-	Compile;
-	fRunAfterCompileFinish:= TRUE;
 end;
 
 procedure TCompiler.Clean;
@@ -841,7 +841,7 @@ end;
 
 procedure TCompiler.OnCompilationTerminated(Sender: TObject);
 begin
-	OnSuccess;
+	OnCompEnd;
 
 	fDevRun := nil;
 
@@ -849,13 +849,10 @@ begin
 
 	EndProgressForm;
 
-	if (fErrCount = 0) and not fAbortThread then begin
-		if fRunAfterCompileFinish then begin
-			fRunAfterCompileFinish:= FALSE;
-			Run;
-		end;
-	end;
 	SwitchToOriginalCompilerSet;
+
+	if (fErrCount = 0) and not fAbortThread then
+		OnCompSuccess;
 end;
 
 procedure TCompiler.OnLineOutput(Sender: TObject; const Line: AnsiString);

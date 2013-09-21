@@ -27,7 +27,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, StdCtrls, Buttons, ExtCtrls, ShellAPI, ComCtrls;
+  Dialogs, StrUtils, StdCtrls, Buttons, ScktComp, ExtCtrls, ShellAPI, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -69,65 +69,34 @@ type
     lblErrorTitle: TLabel;
     btnTerminate: TButton;
     btnSend: TSpeedButton;
-    btnView: TSpeedButton;
     Shape1: TShape;
     Bevel2: TBevel;
     Image1: TImage;
-    PageControl1: TPageControl;
-    tabStackTrace: TTabSheet;
-    memStackTrace: TMemo;
-    tabProgram: TTabSheet;
-    tabMachine: TTabSheet;
-    tabMemory: TTabSheet;
-    tabFullReport: TTabSheet;
-    Label1: TLabel;
-    lblProgramPath: TLabel;
-    Label3: TLabel;
-    lblProgramVersion: TLabel;
-    Label2: TLabel;
-    lblPlatform: TLabel;
-    Label5: TLabel;
-    lblOSversion: TLabel;
-    Label7: TLabel;
-    lblAdditionalInfo: TLabel;
-    Label9: TLabel;
-    lblComputerName: TLabel;
-    GroupBox1: TGroupBox;
-    Label4: TLabel;
-    lblTotalPhys: TLabel;
-    Label8: TLabel;
-    lblUsedPhys: TLabel;
-    Label11: TLabel;
-    lblFreePhys: TLabel;
-    GroupBox2: TGroupBox;
-    Label6: TLabel;
-    lblTotalVirt: TLabel;
-    Label12: TLabel;
-    lblUsedVirt: TLabel;
-    Label14: TLabel;
-    lblFreeVirt: TLabel;
-    GroupBox3: TGroupBox;
-    Label16: TLabel;
-    lblTotalCache: TLabel;
-    Label18: TLabel;
-    lblUsedCache: TLabel;
-    Label20: TLabel;
-    lblFreeCache: TLabel;
-    Label10: TLabel;
-    lblMemoryLoad: TLabel;
     memBugReport: TMemo;
-    btnHelp: TSpeedButton;
-    Label13: TLabel;
-    lblBuildTime: TLabel;
-    procedure FormShow(Sender: TObject);
-    procedure btnViewClick(Sender: TObject);
+    memUserReport: TMemo;
     procedure btnSendClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure btnHelpClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure btnTerminateClick(Sender: TObject);
+    procedure btnCloseClick(Sender: TObject);
   public
-    fEmail: AnsiString;
-    fSubject: AnsiString;
+    fPlatform: AnsiString;
+    fBuildTime: AnsiString;
+    fOSVersion: AnsiString;
+    fAdditionalInfo: AnsiString;
+    fProgramPath: AnsiString;
+    fComputerName: AnsiString;
+    fProgramVersion: AnsiString;
+    fTotalPhys: AnsiString;
+    fUsedPhys: AnsiString;
+    fFreePhys: AnsiString;
+    fTotalCache: AnsiString;
+    fUsedCache: AnsiString;
+    fFreeCache: AnsiString;
+    fTotalVirt: AnsiString;
+    fUsedVirt: AnsiString;
+    fFreeVirt: AnsiString;
+    fMemoryLoad:  AnsiString;
     fLines: TList;
     fUnits: TList;
     fFuncs: TList;
@@ -150,12 +119,8 @@ implementation
 
 {$R *.dfm}
 
-uses 
-  utils, devcfg, version;
-
-const
-  CLOSED_HEIGHT = 160;
-  OPENED_HEIGHT = 360;
+uses
+  utils, devcfg, version, DateUtils;
 
 class procedure TEAnalyzer.EHandler(Sender: TObject; E: Exception);
 begin
@@ -164,15 +129,16 @@ begin
 		lblAddress.Caption := Format('0x%8.8x', [dword(ExceptAddr)]);
 		lblError.Caption := E.Message;
 
-		// Don't use GetMemoryReport, we can only use 1280 chars
+		// Can't make this much more clear
+		memUserReport.Text := 'Please include a description of what you were doing before the error occurred...';
+
+		// Include memory report too?
 		memBugReport.Text :=
           GetErrorReport + #13#10#13#10#13#10 +
           GetMachineReport + #13#10#13#10#13#10 +
           GetStackReport;
 
-		if ShowModal = mrAbort then
-			if MessageDlg('Are you sure you want to terminate the application?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-				TerminateProcess(GetCurrentProcess, 0);
+		ShowModal;
 	finally
 		Free;
 	end;
@@ -421,7 +387,6 @@ begin
 
 	// Remove leftover enters
 	result := Trim(result);
-	memStackTrace.Text := result;
 end;
 
 function TExceptionFrm.GetErrorReport: AnsiString;
@@ -429,7 +394,7 @@ begin
   result := 'Error info' + #13#10
           + '----------' + #13#10
           + 'Version     : ' + DEVCPP_VERSION + #13#10
-          + 'Build Time  : ' + lblBuildTime.Caption + #13#10
+          + 'Build Time  : ' + fBuildTime + #13#10
           + 'Message     : ' + lblError.Caption + #13#10
           + 'Address     : ' + lblAddress.Caption;
 end;
@@ -438,30 +403,30 @@ function TExceptionFrm.GetMachineReport: AnsiString;
 begin
   Result := 'Machine info' + #13#10
           + '------------' + #13#10
-          + 'Platform      : ' + lblPlatform.Caption + #13#10
-          + 'OS version    : ' + lblOSversion.Caption + #13#10;
+          + 'Platform      : ' + fPlatform + #13#10
+          + 'OS version    : ' + fOSVersion + #13#10;
 
   // Don't waste our precious 1280 bytes!
-  if lblAdditionalInfo.Caption <> '' then
-    Result := Result + 'Service Pack  : ' + lblAdditionalInfo.Caption + #13#10;
+  if fAdditionalInfo <> '' then
+    Result := Result + 'Service Pack  : ' + fAdditionalInfo + #13#10;
 
-  // TODO: remove this useles info?
-  Result := Result + 'Computer Name : ' + lblComputerName.Caption;
+  // TODO: remove this useless info?
+  Result := Result + 'Computer Name : ' + fComputerName;
 end;
 
 function TExceptionFrm.GetMemoryReport: AnsiString;
 begin
   Result := 'Memory Status'#13#10
           + '-------------'#13#10
-          + 'Physical memory, total : ' + lblTotalPhys.Caption + #13#10
-          + 'Physical memory, free  : ' + lblUsedPhys.Caption + #13#10
-          + 'Physical memory, used  : ' + lblFreePhys.Caption + #13#10
-          + 'Pagefile, total        : ' + lblTotalCache.Caption + #13#10
-          + 'Pagefile, free         : ' + lblUsedCache.Caption + #13#10
-          + 'Pagefile, used         : ' + lblFreeCache.Caption + #13#10
-          + 'Virtual memory, total  : ' + lblTotalVirt.Caption + #13#10
-          + 'Virtual memory, free   : ' + lblUsedVirt.Caption + #13#10
-          + 'Virtual memory, used   : ' + lblFreeVirt.Caption;
+          + 'Physical memory, total : ' + fTotalPhys + #13#10
+          + 'Physical memory, free  : ' + fUsedPhys + #13#10
+          + 'Physical memory, used  : ' + fFreePhys + #13#10
+          + 'Pagefile, total        : ' + fTotalCache + #13#10
+          + 'Pagefile, free         : ' + fUsedCache + #13#10
+          + 'Pagefile, used         : ' + fFreeCache + #13#10
+          + 'Virtual memory, total  : ' + fTotalVirt + #13#10
+          + 'Virtual memory, free   : ' + fUsedVirt + #13#10
+          + 'Virtual memory, used   : ' + fFreeVirt;
 end;
 
 procedure TExceptionFrm.GatherSystemInfo;
@@ -474,30 +439,30 @@ var
   BufSize: cardinal;
 begin
 	// Set Program tab
-	lblProgramVersion.Caption := DEVCPP_VERSION;//GetVersionString(ParamStr(0));
-	lblProgramPath.Caption := ParamStr(0);
-	lblBuildTime.Caption := GetBuildTime(ParamStr(0));
+	fProgramVersion := DEVCPP_VERSION;//GetVersionString(ParamStr(0));
+	fProgramPath := ParamStr(0);
+	fBuildTime := GetBuildTime(ParamStr(0));
 
 	// Set Machine tab
 	vi.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
 	GetVersionEx(vi);
 	case vi.dwPlatformId of
 		VER_PLATFORM_WIN32s:
-			lblPlatform.Caption := 'Win3.1 with Win32s';
+			fPlatform := 'Win3.1 with Win32s';
 		VER_PLATFORM_WIN32_WINDOWS:
-			lblPlatform.Caption := 'Windows 95 and later';
+			fPlatform := 'Windows 95 and later';
 		VER_PLATFORM_WIN32_NT:
-			lblPlatform.Caption := 'Windows NT';
+			fPlatform := 'Windows NT';
 		else
-			lblPlatform.Caption := 'Unknown';
+			fPlatform := 'Unknown';
 	end;
 
-	lblOSversion.Caption := Format('%d.%d (build %d)', [vi.dwMajorVersion, vi.dwMinorVersion, vi.dwBuildNumber]);
-	lblAdditionalInfo.Caption := vi.szCSDVersion;
+	fOSversion := Format('%d.%d (build %d)', [vi.dwMajorVersion, vi.dwMinorVersion, vi.dwBuildNumber]);
+	fAdditionalInfo := vi.szCSDVersion;
 
 	BufSize := MAX_PATH;
 	GetComputerName(Buf, BufSize);
-	lblComputerName.Caption := StrPas(Buf);
+	fComputerName := StrPas(Buf);
 
 	// Set Memory tab
 	ms.dwLength := SizeOf(TMemoryStatus);
@@ -507,52 +472,74 @@ begin
 	Avail := ms.dwAvailPhys;
 	FreeP := (Avail * 100) / Tot;
 	UsedP := 100 - FreeP;
-	lblTotalPhys.Caption := Format('%0.0n', [Tot]);
-	lblUsedPhys.Caption := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
-	lblFreePhys.Caption := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
+	fTotalPhys := Format('%0.0n', [Tot]);
+	fUsedPhys := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
+	fFreePhys := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
 
 	Tot := ms.dwTotalPageFile;
 	Avail := ms.dwAvailPageFile;
 	FreeP := (Avail * 100) / Tot;
 	UsedP := 100 - FreeP;
-	lblTotalCache.Caption := Format('%0.0n', [Tot]);
-	lblUsedCache.Caption := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
-	lblFreeCache.Caption := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
+	fTotalCache := Format('%0.0n', [Tot]);
+	fUsedCache := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
+	fFreeCache := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
 
 	Tot := ms.dwTotalVirtual;
 	Avail := ms.dwAvailVirtual;
 	FreeP := (Avail * 100) / Tot;
 	UsedP := 100 - FreeP;
-	lblTotalVirt.Caption := Format('%0.0n', [Tot]);
-	lblUsedVirt.Caption := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
-	lblFreeVirt.Caption := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
-	lblMemoryLoad.Caption := Format('%d%%', [ms.dwMemoryLoad]);
-end;
-
-procedure TExceptionFrm.FormShow(Sender: TObject);
-begin
-  ClientHeight := CLOSED_HEIGHT;
-end;
-
-procedure TExceptionFrm.btnViewClick(Sender: TObject);
-begin
-  if btnView.Down then
-    ClientHeight := OPENED_HEIGHT
-  else
-    ClientHeight := CLOSED_HEIGHT;
+	fTotalVirt := Format('%0.0n', [Tot]);
+	fUsedVirt := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
+	fFreeVirt := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
+	fMemoryLoad := Format('%d%%', [ms.dwMemoryLoad]);
 end;
 
 procedure TExceptionFrm.btnSendClick(Sender: TObject);
 var
-	Cmd: AnsiString;
+	Socket: TClientSocket;
 	I: integer;
+//	SocketResult: integer;
+//	Buffer: array[0..1024] of Char;
+	Cmd, EmailBody, EmailSubject : AnsiString;
 begin
-	Cmd := 'mailto:' + fEmail + '?Subject=' + fSubject + '&Body=';
-	Cmd := Cmd + '<Please include a description of what you were doing before the error occurred>%0A%0A';
-	for I := 0 to memBugReport.Lines.Count - 1 do
-		Cmd := Cmd + memBugReport.Lines[I] + '%0A';
-	Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
-	ShellExecute(0, 'open', PAnsiChar(Cmd), nil, nil, SW_SHOWNORMAL);
+	// use a blocking WinSock to send mail via PHP
+	Socket := TClientSocket.Create(self);
+	Socket.Port := 80;
+	Socket.Host := 'www.wilcobrouwer.nl';
+	Socket.ClientType := ctBlocking;
+	Socket.Open;
+
+	// Send both messages in fully encoded form
+	EmailBody := memUserReport.Text + #13#10#13#10 + memBugReport.Text;
+	EmailSubject := 'Orwell Dev-C++ ' + DEVCPP_VERSION + ' bug report (' + IntToStr(DateTimeToUnix(Now)) + ')';
+	for I := 0 to 255 do
+		if not (Chr(I) in ['a'..'z','A'..'Z','0'..'9','%']) then begin
+			EmailBody := StringReplace(EmailBody,Chr(I),'%' + IntToHex(I,2),[rfReplaceAll]);
+			EmailSubject := StringReplace(EmailSubject,Chr(I),'%' + IntToHex(I,2),[rfReplaceAll]);
+		end;
+
+	// Combine and send the really safe message
+	Cmd := '/bugreporter.php?message=' + EmailBody + '&subject=' + EmailSubject;
+
+	// Let PHP do the TLS/SMTP work
+	try
+		Socket.Socket.SendText('POST ' + Cmd + ' HTTP/1.1' + #13#10 + 'Host: www.wilcobrouwer.nl:80' + #13#10#13#10);
+		//if SocketResult > 0 then begin
+		//	while SocketResult > 0 do begin
+		//		FillChar(Buffer,SizeOf(Buffer),0);
+		//		SocketResult := Socket.Socket.ReceiveBuf(Buffer,SizeOf(Buffer));
+		//		if SocketResult > 0 then
+		//			memBugReport.Text := Buffer;
+		//	end;
+		//end;
+		Socket.Close;
+	except
+		btnSend.Caption := 'Error sending bug report. Lol.';
+		Exit;
+	end;
+
+	btnSend.Caption := 'Thank you!';
+	btnSend.Enabled := false;
 end;
 
 procedure TExceptionFrm.FormCreate(Sender: TObject);
@@ -561,35 +548,11 @@ begin
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
-	fEmail := 'johanmes93@gmail.com';
-	fSubject := 'Orwell Dev-C++ ' + DEVCPP_VERSION + ' bug report';
-
 	fLines := TList.Create;
 	fFuncs := TList.Create;
 	fUnits := TList.Create;
 	ReadMapFile(ChangeFileExt(ParamStr(0), '.map'));
 	GatherSystemInfo;
-end;
-
-procedure TExceptionFrm.btnHelpClick(Sender: TObject);
-var
-  Msg: AnsiString;
-begin
-  Msg := 'An error has occurred in the application and this window popped-up. ' +
-         'Here is a description of the available options:'#10#10 +
-         'Continue:'#10'Closes this window and attempts to continue the application execution.'#10#10 +
-         'Terminate:'#10'Closes this window and terminates the application execution.'#10#10 +
-         'View bug report:'#10'View details of the system at the time of the error.'#10#10 +
-         'Send bug report:'#10'Sends a bug report to the application support team describing the error. ' +
-         'You can see what''s in the bug report by clicking on "View bug report" and looking ' +
-         'at the "Bug report" sheet. ' +
-         'When you press Send, your default mail client will be launched and an e-mail with ' +
-         'the bug report''s contents will be created, but will *not* be sent automatically. ' +
-         'You will have to send it yourself...'#10 +
-         'In the newly created e-mail, fill in any info you can, like what you were doing in the ' +
-         'application when the error ocurred...'#10#10 +
-         'Help:'#10'Displays this window.';
-  ShowMessage(Msg);
 end;
 
 procedure TExceptionFrm.FormDestroy(Sender: TObject);
@@ -607,6 +570,17 @@ begin
 	for I := 0 to fUnits.Count - 1 do
 		Dispose(PUnitEntry(fUnits[i]));
 	fUnits.Free;
+end;
+
+procedure TExceptionFrm.btnTerminateClick(Sender: TObject);
+begin
+	if MessageDlg('Are you sure you want to terminate the application?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+		TerminateProcess(GetCurrentProcess, 0);
+end;
+
+procedure TExceptionFrm.btnCloseClick(Sender: TObject);
+begin
+	Close;
 end;
 
 initialization

@@ -42,6 +42,9 @@ uses
 {$ENDIF}
 
 type
+  TRunEndAction = (reaNone, reaProfile);
+  TCompSuccessAction = (csaNone, csaRun, csaDebug, csaProfile);
+
   TMainForm = class(TForm)
     MainMenu: TMainMenu;
     FileMenu: TMenuItem;
@@ -330,7 +333,7 @@ type
     actBrowserNewVar: TAction;
     actBrowserViewAll: TAction;
     actBrowserViewCurrent: TAction;
-    actProfileProject: TAction;
+    actProfile: TAction;
     N29: TMenuItem;
     Profileanalysis1: TMenuItem;
     N24: TMenuItem;
@@ -495,7 +498,7 @@ type
     N5: TMenuItem;
     Class1: TMenuItem;
     DeleteProfilingInformation: TMenuItem;
-    actDeleteProfileProject: TAction;
+    actDeleteProfile: TAction;
     GotoDefineEditor: TMenuItem;
     GotoDeclEditor: TMenuItem;
     N15: TMenuItem;
@@ -570,6 +573,8 @@ type
     actDeleteLine: TAction;
     pbCompilation: TProgressBar;
     N21: TMenuItem;
+    actToggleComment: TAction;
+    ToggleComment1: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -703,7 +708,7 @@ type
     procedure actBrowserNewVarExecute(Sender: TObject);
     procedure actBrowserViewAllExecute(Sender: TObject);
     procedure actBrowserViewCurrentExecute(Sender: TObject);
-    procedure actProfileProjectExecute(Sender: TObject);
+    procedure actProfileExecute(Sender: TObject);
     procedure actBrowserAddFolderExecute(Sender: TObject);
     procedure actBrowserRemoveFolderExecute(Sender: TObject);
     procedure actBrowserAddFolderUpdate(Sender: TObject);
@@ -779,7 +784,7 @@ type
     procedure mnuCVSClick(Sender: TObject);
     procedure actMsgCopyAllExecute(Sender: TObject);
     procedure actMsgSaveAllExecute(Sender: TObject);
-    procedure actDeleteProfileProjectExecute(Sender: TObject);
+    procedure actDeleteProfileExecute(Sender: TObject);
     procedure actGotoImplDeclEditorExecute(Sender: TObject);
     procedure actHideFSBarExecute(Sender: TObject);
     procedure UpdateSplash(const text : AnsiString);
@@ -820,6 +825,7 @@ type
     procedure actUpdateIndent(Sender: TObject);
     procedure actRevSearchAgainExecute(Sender: TObject);
     procedure actDeleteLineExecute(Sender: TObject);
+    procedure actToggleCommentExecute(Sender: TObject);
   private
     fPreviousHeight : integer; // stores MessageControl height to be able to restore to previous height
     fTools : TToolController; // tool list controller
@@ -830,6 +836,8 @@ type
     fShowTips : boolean;
     fRemoveOptions : boolean;
     fOptionsDir : AnsiString;
+    fRunEndAction: TRunEndAction;
+    fCompSuccessAction: TCompSuccessAction;
     function ParseParams(s : AnsiString) : AnsiString;
     procedure BuildBookMarkMenus;
     procedure SetHints;
@@ -840,7 +848,9 @@ type
     procedure LogEntryProc(const msg: AnsiString);
     procedure CompOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
     procedure CompResOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
+    procedure CompEndProc;
     procedure CompSuccessProc;
+    procedure RunEndProc;
     procedure LoadText;
     procedure OpenUnit;
     function PrepareForCompile: Boolean;
@@ -1265,8 +1275,8 @@ begin
 	actRebuild.Caption:=				Lang[ID_ITEM_REBUILD];
 	actClean.Caption:=					Lang[ID_ITEM_CLEAN];
 	actSyntaxCheck.Caption:=			Lang[ID_ITEM_SYNTAXCHECK];
-	actProfileProject.Caption:=			Lang[ID_ITEM_PROFILE];
-	actDeleteProfileProject.Caption:=	Lang[ID_ITEM_DELPROFINFORMATION];
+	actProfile.Caption:=				Lang[ID_ITEM_PROFILE];
+	actDeleteProfile.Caption:=			Lang[ID_ITEM_DELPROFINFORMATION];
 	actAbortCompilation.Caption:=		Lang[ID_ITEM_ABORTCOMP];
 	actExecParams.Caption:=				Lang[ID_ITEM_EXECPARAMS];
 
@@ -1794,7 +1804,7 @@ begin
 	ResSheet.Caption := Lang[ID_SHEET_RES] + ' (' + IntToStr(ResourceOutput.Items.Count) + ')'
 end;
 
-procedure TMainForm.CompSuccessProc;
+procedure TMainForm.CompEndProc;
 var
 	F: TSearchRec;
 	HasSize : boolean;
@@ -1884,6 +1894,34 @@ begin
 			CompilerOutputDblClick(ResourceOutput);
 		end;
 	end;
+end;
+
+procedure TMainForm.CompSuccessProc;
+begin
+	case fCompSuccessAction of
+		csaRun : begin
+			fCompiler.Run;
+		end;
+		csaDebug : begin
+			actDebug.Execute;
+		end;
+		csaProfile : begin
+			actProfile.Execute
+		end;
+	end;
+	fCompSuccessAction := csaNone;
+end;
+
+procedure TMainForm.RunEndProc;
+begin
+	case fRunEndAction of
+		reaProfile : begin
+			if not Assigned(ProfileAnalysisForm) then
+				ProfileAnalysisForm := TProfileAnalysisForm.Create(Self);
+			ProfileAnalysisForm.Show;
+		end;
+	end;
+	fRunEndAction := reaNone;
 end;
 
 procedure TMainForm.LogEntryProc(const msg: AnsiString);
@@ -2900,7 +2938,8 @@ begin
 	if not PrepareForCompile then
 		Exit;
 
-	fCompiler.CompileAndRun;
+	fCompSuccessAction := csaRun;
+	fCompiler.Compile;
 end;
 
 procedure TMainForm.actRebuildExecute(Sender: TObject);
@@ -2977,6 +3016,7 @@ begin
 		if not Assigned(fProject) then
 			devCompiler.SaveSet(devCompiler.CurrentSet);
 
+		fCompSuccessAction := csaDebug;
 		actRebuildExecute(nil);
 		Exit;
 	end;
@@ -4125,6 +4165,15 @@ begin
 		e.CommentSelection;
 end;
 
+procedure TMainForm.actToggleCommentExecute(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e:=GetEditor;
+	if Assigned(e) then
+		e.ToggleCommentSelection;
+end;
+
 procedure TMainForm.actUncommentExecute(Sender: TObject);
 var
 	e: TEditor;
@@ -4352,7 +4401,7 @@ begin
 	devClassBrowsing.ShowFilter:=Ord(sfCurrent);
 end;
 
-procedure TMainForm.actProfileProjectExecute(Sender: TObject);
+procedure TMainForm.actProfileExecute(Sender: TObject);
 var
 	idxP, idxS: integer;
 	prof, strip: boolean;
@@ -4383,6 +4432,7 @@ begin
 		if not Assigned(fProject) then
 			devCompiler.SaveSet(devCompiler.CurrentSet);
 
+		fCompSuccessAction := csaProfile;
 		actRebuildExecute(nil);
 		Exit;
 	end;
@@ -4397,19 +4447,16 @@ begin
 			path := ExtractFilePath(ChangeFileExt(e.FileName, EXE_EXT)) + GPROF_CHECKFILE;
 	end;
 
-	// Ask the user if he wants to generate data...
+	//Gather data by running our project...
+	fRunEndAction := reaProfile;
 	if not FileExists(path) then begin
-		if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+		//if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+			fRunEndAction := reaProfile;
 			actRunExecute(nil);
-		end;
-		Exit;
+		//end;
+	end else begin // If the data is there, open up the form
+		RunEndProc;
 	end;
-
-	// If the data is there, open up the form
-	if not Assigned(ProfileAnalysisForm) then
-		ProfileAnalysisForm := TProfileAnalysisForm.Create(Self);
-
-	ProfileAnalysisForm.Show;
 end;
 
 procedure TMainForm.actBrowserAddFolderExecute(Sender: TObject);
@@ -5636,7 +5683,7 @@ begin
 	mnuCVSCurrent.Enabled := PageControl.PageCount > 0;
 end;
 
-procedure TMainForm.actDeleteProfileProjectExecute(Sender: TObject);
+procedure TMainForm.actDeleteProfileExecute(Sender: TObject);
 var
 	path : AnsiString;
 	e : TEditor;
@@ -5899,7 +5946,9 @@ begin
 	fCompiler.OnLogEntry := LogEntryProc;
 	fCompiler.OnOutput := CompOutputProc;
 	fCompiler.OnResOutput := CompResOutputProc;
-	fCompiler.OnSuccess:= CompSuccessProc;
+	fCompiler.OnCompEnd := CompEndProc;
+	fCompiler.OnCompSuccess := CompSuccessProc;
+	fCompiler.OnRunEnd := RunEndProc;
 
 	// Create a debugger
 	fDebugger := TDebugger.Create;

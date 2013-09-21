@@ -886,7 +886,7 @@ begin
   fShowTipsOnStart := TRUE;
   fLastTip := 0;
   fShowProgress := TRUE;
-  fAutoCloseProgress := FALSE;
+  fAutoCloseProgress := TRUE;
   fPrintColors := TRUE;
   fPrintHighlight := TRUE;
   fPrintWordWrap := FALSE;

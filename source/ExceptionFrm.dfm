@@ -1,9 +1,9 @@
 object ExceptionFrm: TExceptionFrm
-  Left = 379
-  Top = 374
+  Left = 996
+  Top = 586
   BorderStyle = bsDialog
   Caption = 'Oops!'
-  ClientHeight = 360
+  ClientHeight = 416
   ClientWidth = 500
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,7 +15,6 @@ object ExceptionFrm: TExceptionFrm
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Shape1: TShape
@@ -77,30 +76,23 @@ object ExceptionFrm: TExceptionFrm
     Caption = 'Error message:'
   end
   object btnSend: TSpeedButton
-    Left = 104
+    Left = 8
     Top = 130
-    Width = 92
+    Width = 180
     Height = 25
     Hint = 
       'Sends a bug report to the application support team describing th' +
       'e error'
-    Caption = '&Send bug report'
+    Caption = '&Send anonymous bug report'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
     ParentShowHint = False
     ShowHint = True
     OnClick = btnSendClick
-  end
-  object btnView: TSpeedButton
-    Left = 4
-    Top = 130
-    Width = 92
-    Height = 25
-    Hint = 'View details of the system at the time of the error'
-    AllowAllUp = True
-    GroupIndex = 1
-    Caption = '&View bug report'
-    ParentShowHint = False
-    ShowHint = True
-    OnClick = btnViewClick
   end
   object Bevel2: TBevel
     Left = 0
@@ -188,16 +180,8 @@ object ExceptionFrm: TExceptionFrm
       FFFFFE03FFFFFF07FFFFFF07FFFFFF87FFFFFF8FFFFFFF8FFFFFFFDFFFFFFFDF
       FFFFFFFF0000000000000000}
   end
-  object btnHelp: TSpeedButton
-    Left = 404
-    Top = 130
-    Width = 92
-    Height = 25
-    Caption = '&Help'
-    OnClick = btnHelpClick
-  end
   object btnClose: TButton
-    Left = 204
+    Left = 300
     Top = 130
     Width = 92
     Height = 25
@@ -211,370 +195,51 @@ object ExceptionFrm: TExceptionFrm
     ParentShowHint = False
     ShowHint = True
     TabOrder = 0
+    OnClick = btnCloseClick
   end
   object btnTerminate: TButton
-    Left = 304
+    Left = 400
     Top = 130
     Width = 92
     Height = 25
     Hint = 'Closes this window and terminates the application execution'
     Caption = '&Terminate'
-    ModalResult = 3
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
+    OnClick = btnTerminateClick
   end
-  object PageControl1: TPageControl
-    Left = 0
-    Top = 160
-    Width = 500
-    Height = 200
-    ActivePage = tabFullReport
-    Style = tsFlatButtons
+  object memBugReport: TMemo
+    Left = 8
+    Top = 224
+    Width = 484
+    Height = 185
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    Font.Style = []
+    Lines.Strings = (
+      'memBugReport')
+    ParentFont = False
+    ReadOnly = True
+    ScrollBars = ssBoth
     TabOrder = 2
-    TabStop = False
-    object tabProgram: TTabSheet
-      Caption = 'Program'
-      ImageIndex = 1
-      object Label1: TLabel
-        Left = 12
-        Top = 16
-        Width = 66
-        Height = 13
-        Caption = 'Program path:'
-      end
-      object lblProgramPath: TLabel
-        Left = 120
-        Top = 16
-        Width = 71
-        Height = 13
-        Caption = 'lblProgramPath'
-      end
-      object Label3: TLabel
-        Left = 12
-        Top = 36
-        Width = 79
-        Height = 13
-        Caption = 'Program version:'
-      end
-      object lblProgramVersion: TLabel
-        Left = 120
-        Top = 36
-        Width = 84
-        Height = 13
-        Caption = 'lblProgramVersion'
-      end
-      object Label13: TLabel
-        Left = 12
-        Top = 56
-        Width = 48
-        Height = 13
-        Caption = 'Build time:'
-      end
-      object lblBuildTime: TLabel
-        Left = 120
-        Top = 56
-        Width = 56
-        Height = 13
-        Caption = 'lblBuildTime'
-      end
-    end
-    object tabMachine: TTabSheet
-      Caption = 'Machine'
-      ImageIndex = 2
-      object Label2: TLabel
-        Left = 12
-        Top = 16
-        Width = 41
-        Height = 13
-        Caption = 'Platform:'
-      end
-      object lblPlatform: TLabel
-        Left = 120
-        Top = 16
-        Width = 48
-        Height = 13
-        Caption = 'lblPlatform'
-      end
-      object Label5: TLabel
-        Left = 12
-        Top = 36
-        Width = 55
-        Height = 13
-        Caption = 'OS version:'
-      end
-      object lblOSversion: TLabel
-        Left = 120
-        Top = 36
-        Width = 59
-        Height = 13
-        Caption = 'lblOSversion'
-      end
-      object Label7: TLabel
-        Left = 12
-        Top = 56
-        Width = 69
-        Height = 13
-        Caption = 'Additional info:'
-      end
-      object lblAdditionalInfo: TLabel
-        Left = 120
-        Top = 56
-        Width = 74
-        Height = 13
-        Caption = 'lblAdditionalInfo'
-      end
-      object Label9: TLabel
-        Left = 12
-        Top = 76
-        Width = 77
-        Height = 13
-        Caption = 'Computer name:'
-      end
-      object lblComputerName: TLabel
-        Left = 120
-        Top = 76
-        Width = 83
-        Height = 13
-        Caption = 'lblComputerName'
-      end
-    end
-    object tabMemory: TTabSheet
-      Caption = 'Memory'
-      ImageIndex = 3
-      object Label10: TLabel
-        Left = 150
-        Top = 144
-        Width = 63
-        Height = 13
-        Caption = 'Memory load:'
-      end
-      object lblMemoryLoad: TLabel
-        Left = 240
-        Top = 144
-        Width = 71
-        Height = 13
-        Caption = 'lblMemoryLoad'
-      end
-      object GroupBox1: TGroupBox
-        Left = 12
-        Top = 8
-        Width = 150
-        Height = 117
-        Caption = 'Physical memory'
-        TabOrder = 0
-        object Label4: TLabel
-          Left = 12
-          Top = 24
-          Width = 27
-          Height = 13
-          Caption = 'Total:'
-        end
-        object lblTotalPhys: TLabel
-          Left = 52
-          Top = 24
-          Width = 73
-          Height = 13
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblTotalPhys'
-          WordWrap = True
-        end
-        object Label8: TLabel
-          Left = 12
-          Top = 44
-          Width = 32
-          Height = 13
-          Caption = 'In use:'
-        end
-        object lblUsedPhys: TLabel
-          Left = 52
-          Top = 44
-          Width = 73
-          Height = 29
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblUsedPhys'
-          WordWrap = True
-        end
-        object Label11: TLabel
-          Left = 12
-          Top = 80
-          Width = 24
-          Height = 13
-          Caption = 'Free:'
-        end
-        object lblFreePhys: TLabel
-          Left = 52
-          Top = 80
-          Width = 73
-          Height = 29
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblFreePhys'
-          WordWrap = True
-        end
-      end
-      object GroupBox2: TGroupBox
-        Left = 172
-        Top = 8
-        Width = 150
-        Height = 117
-        Caption = 'Virtual memory'
-        TabOrder = 1
-        object Label6: TLabel
-          Left = 12
-          Top = 24
-          Width = 27
-          Height = 13
-          Caption = 'Total:'
-        end
-        object lblTotalVirt: TLabel
-          Left = 52
-          Top = 24
-          Width = 73
-          Height = 13
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblTotalVirt'
-          WordWrap = True
-        end
-        object Label12: TLabel
-          Left = 12
-          Top = 44
-          Width = 32
-          Height = 13
-          Caption = 'In use:'
-        end
-        object lblUsedVirt: TLabel
-          Left = 52
-          Top = 44
-          Width = 73
-          Height = 29
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblUsedVirt'
-          WordWrap = True
-        end
-        object Label14: TLabel
-          Left = 12
-          Top = 80
-          Width = 24
-          Height = 13
-          Caption = 'Free:'
-        end
-        object lblFreeVirt: TLabel
-          Left = 52
-          Top = 80
-          Width = 73
-          Height = 29
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblFreeVirt'
-          WordWrap = True
-        end
-      end
-      object GroupBox3: TGroupBox
-        Left = 332
-        Top = 8
-        Width = 150
-        Height = 117
-        Caption = 'Cache memory'
-        TabOrder = 2
-        object Label16: TLabel
-          Left = 12
-          Top = 24
-          Width = 27
-          Height = 13
-          Caption = 'Total:'
-        end
-        object lblTotalCache: TLabel
-          Left = 52
-          Top = 24
-          Width = 73
-          Height = 13
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblTotalCache'
-          WordWrap = True
-        end
-        object Label18: TLabel
-          Left = 12
-          Top = 44
-          Width = 32
-          Height = 13
-          Caption = 'In use:'
-        end
-        object lblUsedCache: TLabel
-          Left = 52
-          Top = 44
-          Width = 73
-          Height = 29
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblUsedCache'
-          WordWrap = True
-        end
-        object Label20: TLabel
-          Left = 12
-          Top = 80
-          Width = 24
-          Height = 13
-          Caption = 'Free:'
-        end
-        object lblFreeCache: TLabel
-          Left = 52
-          Top = 80
-          Width = 73
-          Height = 29
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'lblFreeCache'
-          WordWrap = True
-        end
-      end
-    end
-    object tabStackTrace: TTabSheet
-      Caption = 'StackTrace'
-      object memStackTrace: TMemo
-        Left = 0
-        Top = 0
-        Width = 492
-        Height = 169
-        Font.Charset = GREEK_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
-        Lines.Strings = (
-          'StackTrace')
-        ParentFont = False
-        ReadOnly = True
-        ScrollBars = ssBoth
-        TabOrder = 0
-      end
-    end
-    object tabFullReport: TTabSheet
-      Caption = 'Bug report'
-      ImageIndex = 4
-      object memBugReport: TMemo
-        Left = 0
-        Top = 0
-        Width = 492
-        Height = 169
-        Align = alClient
-        Font.Charset = GREEK_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
-        Lines.Strings = (
-          'BugReport')
-        ParentFont = False
-        ReadOnly = True
-        ScrollBars = ssBoth
-        TabOrder = 0
-      end
-    end
+  end
+  object memUserReport: TMemo
+    Left = 8
+    Top = 160
+    Width = 484
+    Height = 57
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    Font.Style = []
+    Lines.Strings = (
+      'memUserReport')
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 3
   end
 end
