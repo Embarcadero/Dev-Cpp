@@ -856,7 +856,6 @@ end;
 
 procedure TEditor.SetErrorFocus(const Col, Line: integer);
 begin
-	MainForm.MsgBox(inttostr(col),'col');
 	fErrSetting:= TRUE;
 	Application.ProcessMessages;
 	if fErrorLine <> Line then begin
@@ -1052,30 +1051,30 @@ begin
 
 	if devEditor.AutoCloseBrace then begin
 		fText.GetHighlighterAttriAtRowCol(fText.CaretXY, s, attr);
-		if (attr <> fText.Highlighter.StringAttribute) and (attr <> fText.Highlighter.CommentAttribute) then begin
-			if Key = 57 then begin // 9 key + shift = (
-				if (ssShift in Shift) then
-					// Men typt (
-					InsertString(')',false);
-			end else if Key = 219 then begin // [ key on US standard layout according to MSDN
-				if (ssShift in Shift) then begin
-					// Men typt {
-					counter:=0;
-					if Length(fText.LineText) > 0 then begin
-						repeat
-							Inc(counter);
-						until not (fText.LineText[counter] in [#9,#32]);
-						fText.Lines.Insert(FText.CaretY,Copy(FText.LineText,1,counter-1) + '}');
-					end else
-						InsertString(#13#10 + '}',false);
+		if Assigned(attr) then begin
+			if (attr <> fText.Highlighter.StringAttribute) and (attr <> fText.Highlighter.CommentAttribute) then begin
+				if Key = 57 then begin // 9 key + shift = (
+					if (ssShift in Shift) then
+						InsertString(')',false);
+				end else if Key = 219 then begin // [ key on US standard layout according to MSDN
+					if (ssShift in Shift) then begin
+						counter:=0;
+						if Length(fText.LineText) > 0 then begin
+							repeat
+								Inc(counter);
+							until not (fText.LineText[counter] in [#9,#32]);
+							fText.Lines.Insert(FText.CaretY,Copy(FText.LineText,1,counter-1) + '}');
+						end else
+							InsertString(#13#10 + '}',false);
+					end;
+				end else if Key = 188 then begin // , key + shift = <
+					if (ssShift in Shift) and (AnsiStartsStr('#include',TrimLeft(fText.LineText))) then
+						InsertString('>',false);
+		//		end else if Key = 222 then begin // ' key + shift = "
+		//			if (ssShift in Shift) then
+		//				InsertString('""',false);
+		//			Abort;
 				end;
-			end else if Key = 188 then begin // , key + shift = <
-				if (ssShift in Shift) then
-					InsertString('>',false);
-		//	end else if Key = 222 then begin // ' key + shift = "
-		//		if (ssShift in Shift) then
-		//			InsertString('""',false);
-		//		Abort;
 			end;
 		end;
 	end;

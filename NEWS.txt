@@ -5,6 +5,8 @@ Version 5.0.0.5 - * Oktober 2011
 - The tooltip now also works when typing foo[bar].member and hovering above member.
 - The empty project now contains an empty Untitled unsaved file. Why would anyone NOT want or need that?
 - The function tooltip now also displays tips for completed and empty function parameter bodies.
+- The < character is now only inserted in lines starting with '#include'.
+- Highlighting checks in plain files now do not cause Dev to crash.
 - Some more minor fixups.
 
 Version 5.0.0.4 - 25 September 2011
