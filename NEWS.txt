@@ -11,6 +11,10 @@ Version 5.1.1.0 - *
 - Updated the statusbar and the toolbars.
 - Fixed a class browsing crash when not using a project.
 - And more minor things.
+- Fixed a crash when saving logs when no project is opened.
+- Fixed a lot of memory leaks.
+- Inserting classes and variables is faster now.
+- Code folding now automatically updates when creating new files from templates.
 
 Version 5.1.0.0 - 27 December 2011
 

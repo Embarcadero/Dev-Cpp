@@ -1494,68 +1494,50 @@ end;
 
 constructor TSynCodeFolding.Create;
 begin
-  fCollapsingMarkStyle := msSquare;
-  fShowCollapsedLine := True;
-  fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
+	fCollapsingMarkStyle := msSquare;
+	fShowCollapsedLine := True;
+	fFoldRegions := TFoldRegions.Create(TFoldRegionItem); // Leaky
 end;
 
 destructor TSynCodeFolding.Destroy;
 begin
-  fFoldRegions.Free;
-  inherited;
+	fFoldRegions.Free;
+	inherited;
 end;
 
 procedure TSynCodeFolding.SetEnabled(const Value: Boolean);
 begin
 	fEnabled := Value;
 
-  if Assigned(fOnChange) then fOnChange(fcEnabled);
+	if Assigned(fOnChange) then fOnChange(fcEnabled);
 end;
 
 procedure TSynCodeFolding.SetFolderBarColor(const Value: TColor);
-var
-	HSLColor: THSLColor;
 begin
-  if Value = clDefault then
-  begin
-		HSLColor := RGB2HSL(clBtnFace);
-  	Inc(HSLColor.Luminace, 5);
-		fFolderBarColor := HSL2RGB(HSLColor);
-  end
-  else
-  	fFolderBarColor := Value;
+	fFolderBarColor := Value;
 
-  if Assigned(fOnChange) then fOnChange(fcRefresh);
+	if Assigned(fOnChange) then fOnChange(fcRefresh);
 end;
 
 procedure TSynCodeFolding.SetFolderBarLinesColor(const Value: TColor);
-var
-	HSLColor: THSLColor;
 begin
-	if Value = clDefault then
-  begin
-  	HSLColor := RGB2HSL(clBtnFace);
-  	Dec(HSLColor.Luminace, 20);
-  	fFolderBarLinesColor := HSL2RGB(HSLColor);
-  end
-  else
-  	fFolderBarLinesColor := Value;
+	fFolderBarLinesColor := Value;
 
-  if Assigned(fOnChange) then fOnChange(fcRefresh);
+	if Assigned(fOnChange) then fOnChange(fcRefresh);
 end;
 
 procedure TSynCodeFolding.SetCollapsedCodeHint(const Value: Boolean);
 begin
 	fCollapsedCodeHint := Value;
 
-  if Assigned(fOnChange) then fOnChange(fcRefresh);
+	if Assigned(fOnChange) then fOnChange(fcRefresh);
 end;
 
 procedure TSynCodeFolding.SetCollapsedLineColor(const Value: TColor);
 begin
 	fCollapsedLineColor := Value;
 
-  if Assigned(fOnChange) then fOnChange(fcRefresh);
+	if Assigned(fOnChange) then fOnChange(fcRefresh);
 end;
 
 procedure TSynCodeFolding.SetCollapsingMarkStyle(const Value: TSynCollapsingMarkStyle);

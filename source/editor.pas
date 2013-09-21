@@ -271,7 +271,6 @@ begin
 	fText.BorderStyle:=bsNone;
 
 	// Initialise code folding
-	fText.InitCodeFolding;
 	with fText.CodeFolding do begin
 		Enabled := True;
 		IndentGuides := True;
@@ -283,10 +282,12 @@ begin
 		with FoldRegions do begin
 			Add(rtChar, False, False, False, '{', '}', nil);
 			Add(rtKeyword, True, False, False, '/*', '*/', nil);
+			Add(rtKeyword, False, False, True, 'BEGIN', 'END', nil);
 		end;
 	end;
 
-	// Apply folding
+	// Apply folding for the first time
+	fText.InitCodeFolding;
 	fText.ReScanForFoldRanges;
 	fText.GetUncollapsedStrings;
 
@@ -343,45 +344,38 @@ end;
 
 destructor TEditor.Destroy;
 var
-  idx: integer;
-  lastActPage: Integer;
+	idx: integer;
+	lastActPage: Integer;
 begin
-  idx:=MainForm.devFileMonitor.Files.IndexOf(fFileName);
-  if idx<>-1 then begin
-    // do not monitor this file for outside changes anymore
-    MainForm.devFileMonitor.Files.Delete(idx);
-    MainForm.devFileMonitor.Refresh(False);
-  end;
+	// Deactivate the file change monitor
+	idx:=MainForm.devFileMonitor.Files.IndexOf(fFileName);
+	if idx<>-1 then begin
+		MainForm.devFileMonitor.Files.Delete(idx);
+		MainForm.devFileMonitor.Refresh(False);
+	end;
 
-  if Assigned(fHintTimer) then begin
-    fHintTimer.Enabled:=False;
-    FreeAndNil(fHintTimer);
-  end;
+	// Destroy any completion stuff
+	DestroyCompletion;
 
-  DestroyCompletion;
-  FreeAndNil(fText);
+	// Free everything
+	fDebugGutter.Free;
+	fCodeTooltip.Free;
+	fAutoIndent.Free;
+	fHintTimer.Free;
+	fText.Free;
 
-  //this activates the previous tab if the last one was
-  //closed, instead of moving to the first one
-  with fTabSheet.PageControl do
-  begin
-    lastActPage := ActivePageIndex;
-    FreeAndNil(fTabSheet);
-    if lastActPage >= PageCount then
-    begin
-      Dec(lastActPage);
-      if (lastActPage > 0) and (lastActPage < PageCount) then
-        ActivePageIndex := lastActPage;
-    end;
-  end;
+	// Activates previous tab instead of first one when closing
+	with fTabSheet.PageControl do begin
+		lastActPage := ActivePageIndex;
+		FreeAndNil(fTabSheet);
+		if lastActPage >= PageCount then begin
+			Dec(lastActPage);
+			if (lastActPage > 0) and (lastActPage < PageCount) then
+				ActivePageIndex := lastActPage;
+		end;
+	end;
 
-  {** Modified by Peter **}
-  if Assigned(FCodeToolTip) then FreeAndNil(FCodeToolTip);
-
-  {** Modified by Peter **}
-  if Assigned(FAutoIndent) then FreeAndNil(FAutoIndent);
-
-  inherited;
+	inherited;
 end;
 
 procedure TEditor.Activate;
@@ -646,6 +640,8 @@ begin
 		if Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
 			UpdateCaption('[*] '+ExtractfileName(fFileName));
+			fText.ReScanForFoldRanges;
+			fText.GetUncollapsedStrings;
 		end else begin
 			UpdateCaption(ExtractfileName(fFileName));
 			MainForm.SetStatusbarMessage('');
@@ -673,7 +669,6 @@ begin
 			fErrorLine:= -1;
 			fText.InvalidateLine(fErrorLine);
 			fText.InvalidateGutterLine(fErrorLine);
-			Application.ProcessMessages;
 		end;
 
 		if FCodeToolTip.Activated or (not fText.SelAvail) and fText.Focused then
@@ -833,7 +828,6 @@ end;
 procedure TEditor.SetErrorFocus(const Col, Line: integer);
 begin
 	fErrSetting:= TRUE;
-	Application.ProcessMessages;
 	if fErrorLine <> Line then begin
 		if fErrorLine <> -1 then
 			fText.InvalidateLine(fErrorLine);
@@ -1316,6 +1310,7 @@ begin
       Dec(I);
     fText.SelStart:=I;
     fText.SelEnd:=CurrSel;
+
     // don't add () if already there
     if fText.Text[CurrSel]='(' then
       FuncAddOn:='';

@@ -130,3 +130,15 @@ OriginalFilename=devcpp.exe
 ProductName=Dev-C++
 ProductVersion=5
 Comments=Under the GNU General Public License
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=units
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=..

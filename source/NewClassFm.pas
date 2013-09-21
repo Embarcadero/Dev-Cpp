@@ -223,6 +223,7 @@ begin
   hfName := StringReplace(hfName, '.', '_', [rfReplaceAll]);
   hfName := StringReplace(hfName, ' ', '_', [rfReplaceAll]);
 
+  e.Text.Lines.BeginUpdate;
   e.Text.Lines.Append('#ifndef ' + hfName);
   e.Text.Lines.Append('#define ' + hfName);
   e.Text.Lines.Append('');
@@ -259,10 +260,10 @@ begin
   if cmbComment.ItemIndex in [0, 1] then // /** ... */ or /* ... */
     e.Text.Lines.Append(' */');
 
-  e.Text.Lines.Append(S);
-  e.Text.Lines.Append('{');
-  e.Text.Lines.Append(#9'// private section');
-  e.Text.Lines.Append(#9'public:');
+	e.Text.Lines.Append(S);
+	e.Text.Lines.Append('{');
+	e.Text.Lines.Append(#9'// private section');
+	e.Text.Lines.Append(#9'public:');
 	if chkConstruct.Checked then begin
 		e.Text.Lines.Append(#9#9'// class constructor');
 		e.Text.Lines.Append(#9#9 + txtName.Text + '(' + txtArgs.Text + ');');
@@ -271,42 +272,42 @@ begin
 		e.Text.Lines.Append(#9#9'// class destructor');
 		e.Text.Lines.Append(#9#9'~' + txtName.Text + '();');
 	end;
-  e.Text.Lines.Append(#9'protected:');
-  e.Text.Lines.Append('};');
-  e.Text.Lines.Append('');
-  e.Text.Lines.Append('#endif // ' + hfName);
-  e.Text.Lines.Append('');
+	e.Text.Lines.Append(#9'protected:');
+	e.Text.Lines.Append('};');
+	e.Text.Lines.Append('');
+	e.Text.Lines.Append('#endif // ' + hfName);
+	e.Text.Lines.Append('');
+	e.Text.Lines.EndUpdate;
 
-  e.Modified := True;
+	e.Modified := True;
 
-  // CPP FILE IMPLEMENTATION
-  if chkAddToProject.Checked then begin
-    idx := MainForm.fProject.NewUnit(False, txtCppFile.Text);
-    e := MainForm.fProject.OpenUnit(idx);
-    if idx = -1 then begin
-      MessageDlg('Cannot add implementation file to project...', mtError, [mbOk], 0);
-      Exit;
-    end;
-  end
-  else begin
-    hFile := FileCreate(txtCppFile.Text);
-    if hFile > 0 then begin
-      FileClose(hFile);
-      e := MainForm.GetEditorFromFileName(txtCppFile.Text);
-    end
-    else begin
-      MessageDlg('Cannot create implementation file...', mtError, [mbOk], 0);
-      Exit;
-    end;
-  end;
+	// CPP FILE IMPLEMENTATION
+	if chkAddToProject.Checked then begin
+		idx := MainForm.fProject.NewUnit(False, txtCppFile.Text);
+		e := MainForm.fProject.OpenUnit(idx);
+		if idx = -1 then begin
+			MessageDlg('Cannot add implementation file to project...', mtError, [mbOk], 0);
+			Exit;
+		end;
+	end else begin
+		hFile := FileCreate(txtCppFile.Text);
+		if hFile > 0 then begin
+			FileClose(hFile);
+			e := MainForm.GetEditorFromFileName(txtCppFile.Text);
+		end else begin
+			MessageDlg('Cannot create implementation file...', mtError, [mbOk], 0);
+			Exit;
+		end;
+	end;
 
-  if not Assigned(e) then begin
-    MessageDlg('Cannot open implementation file in editor...', mtError, [mbOk], 0);
-    Exit;
-  end;
+	if not Assigned(e) then begin
+		MessageDlg('Cannot open implementation file in editor...', mtError, [mbOk], 0);
+		Exit;
+	end;
 
-  e.Text.Lines.Append('#include "' + ExtractFileName(txtHFile.Text) + '" // class''s header file');
-  e.Text.Lines.Append('');
+	e.Text.Lines.BeginUpdate;
+	e.Text.Lines.Append('#include "' + ExtractFileName(txtHFile.Text) + '" // class''s header file');
+	e.Text.Lines.Append('');
 
 	if chkConstruct.Checked then begin
 		e.Text.Lines.Append('// class constructor');
@@ -318,18 +319,17 @@ begin
 
 	e.Text.Lines.Append('');
 
-
 	if chkDestruct.Checked then begin
 		e.Text.Lines.Append('// class destructor');
 		e.Text.Lines.Append(txtName.Text + '::~' + txtName.Text + '()');
 		e.Text.Lines.Append('{');
 		e.Text.Lines.Append(#9'// insert your code here');
 		e.Text.Lines.Append('}');
-
 	end;
 
 	e.Text.Lines.Append('');
-
+	e.Text.Lines.EndUpdate;
+  
 	e.Modified := True;
 end;
 

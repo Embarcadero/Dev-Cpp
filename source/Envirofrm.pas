@@ -217,19 +217,18 @@ begin
 		cbdblFiles.Checked:= DblFiles;
 		cbNoSplashScreen.Checked:= NoSplashScreen;
 		seMRUMax.Value:= MRUMax;
+
+		// List the languages
 		cboLang.Clear;
 		for idx:= 0 to pred(Lang.Langs.Count) do
-		 cboLang.Items.append(Lang.Langs.Values[idx]);
+			cboLang.Items.append(Lang.Langs.Values[idx]);
 		cboLang.ItemIndex:= cboLang.Items.Indexof(Lang.CurrentLanguage);
 		rgbOpenStyle.ItemIndex:= OpenStyle;
 
-		{*** Modified by Peter ***}
+		// List the themes
 		cboTheme.Items.Clear;
 		devImageThemes.GetThemeTitles(cboTheme.Items);
 		cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
-		//cboTheme.Text := devImageThemes.CurrentTheme.Title;
-		//cboTheme.Items.AddStrings(devTheme.ThemeList);
-		//cboTheme.ItemIndex := cboTheme.Items.IndexOf(devData.Theme);
 
 		cbShowProgress.Checked := ShowProgress;
 		cbAutoCloseProgress.Checked := AutoCloseProgress;

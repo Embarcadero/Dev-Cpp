@@ -186,38 +186,37 @@ begin
     Exit;
   end;
 
-  with MainForm do begin
-    pID := St^._ID;
+  pID := St^._ID;
 
-    VarName := txtName.Text;
-    VarType := cmbType.Text;
-    case rgScope.ItemIndex of
-      0: VarScope := scsPrivate;
-      1: VarScope := scsProtected;
-      2: VarScope := scsPublic;
-      3: VarScope := scsPublished;
-    else
-      VarScope := scsPublic;
-    end;
-    VarRead := chkReadFunc.Checked;
-    VarReadFunc := txtReadFunc.Text;
-    VarWrite := chkWriteFunc.Checked;
-    VarWriteFunc := txtWriteFunc.Text;
-    if Trim(memDescr.Text) = '' then
-      memDescr.Text := 'No description';
+  VarName := txtName.Text;
+  VarType := cmbType.Text;
+  case rgScope.ItemIndex of
+    0: VarScope := scsPrivate;
+    1: VarScope := scsProtected;
+    2: VarScope := scsPublic;
+    3: VarScope := scsPublished;
+  else
+    VarScope := scsPublic;
+  end;
+  VarRead := chkReadFunc.Checked;
+  VarReadFunc := txtReadFunc.Text;
+  VarWrite := chkWriteFunc.Checked;
+  VarWriteFunc := txtWriteFunc.Text;
+  if Trim(memDescr.Text) = '' then
+    memDescr.Text := 'No description';
 
-    CppParser.GetSourcePair(CppParser.GetDeclarationFileName(St), CppFname, fName);
+  MainForm.CppParser.GetSourcePair(MainForm.CppParser.GetDeclarationFileName(St), CppFname, fName);
 
-    if not FileExists(CppFname) then begin
-      MessageDlg(Lang[ID_NEWVAR_MSG_NOIMPL], mtError, [mbOk], 0);
-      Exit;
-    end;
+  if not FileExists(CppFname) then begin
+    MessageDlg(Lang[ID_NEWVAR_MSG_NOIMPL], mtError, [mbOk], 0);
+    Exit;
+  end;
 
-    // if the file is modified, ask to save
-    e := GetEditorFromFileName(fName);
+  // if the file is modified, ask to save
+  e := MainForm.GetEditorFromFileName(fName);
 
-    if not Assigned(e) then
-      Exit;
+  if not Assigned(e) then
+    Exit;
 
     if e.Modified then
       case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [fName]), mtConfirmation, [mbYes, mbCancel], 0) of
@@ -239,9 +238,9 @@ begin
       end;
 
     // Ask CppParser for insertion line suggestion ;)
-    Line := CppParser.SuggestMemberInsertionLine(pID, VarScope, AddScopeStr);
+    Line := MainForm.CppParser.SuggestMemberInsertionLine(pID, VarScope, AddScopeStr);
     if VarScope <> scsPublic then
-      PublicLine := CppParser.SuggestMemberInsertionLine(pID, scsPublic, fAddScopeStr)
+      PublicLine := MainForm.CppParser.SuggestMemberInsertionLine(pID, scsPublic, fAddScopeStr)
     else begin
       fAddScopeStr := AddScopeStr;
       PublicLine := Line;
@@ -255,6 +254,9 @@ begin
 
     if not Assigned(e) then
       Exit;
+
+    e.Text.UncollapseAll;
+    e.Text.BeginUpdate;
 
     // insert the actual var
     e.Text.Lines.Insert(Line, #9#9 + VarType + ' ' + VarName + ';');
@@ -272,86 +274,83 @@ begin
     else if cmbComment.ItemIndex = 1 then // /* ... */
       e.Text.Lines.Insert(Line, #9#9'/*');
 
-    // insert, if needed, the scope string
-    if AddScopeStr then
-      case VarScope of
-        scsPrivate: e.Text.Lines.Insert(Line, #9'private:');
-        scsProtected: e.Text.Lines.Insert(Line, #9'protected:');
-        scsPublic: e.Text.Lines.Insert(Line, #9'public:');
-        scsPublished: e.Text.Lines.Insert(Line, #9'published:');
-      end;
+	// insert, if needed, the scope string
+	if AddScopeStr then
+		case VarScope of
+			scsPrivate: e.Text.Lines.Insert(Line, #9'private:');
+			scsProtected: e.Text.Lines.Insert(Line, #9'protected:');
+			scsPublic: e.Text.Lines.Insert(Line, #9'public:');
+			scsPublished: e.Text.Lines.Insert(Line, #9'published:');
+		end;
 
-    e.GotoLineNr(Line + memDescr.Lines.Count);
-    e.Modified := True;
+	e.GotoLineNr(Line + memDescr.Lines.Count);
+	e.Modified := True;
 
-    // if needed, insert a new member function for READ access to the new var
-    if VarRead then begin
-      S := #9#9 + VarType + ' ' + VarReadFunc + '()';
-      if chkInlineR.Checked then begin
-        e.Text.Lines.Insert(PublicLine, #9#9'}');
-        e.Text.Lines.Insert(PublicLine, #9#9#9'return ' + VarName + ';');
-        e.Text.Lines.Insert(PublicLine, #9#9'{');
-      end
-      else
-        S := S + '; // returns the value of ' + VarName;
-      e.Text.Lines.Insert(PublicLine, S);
-      if fAddScopeStr then
-        e.Text.Lines.Insert(PublicLine, #9'public:');
-    end;
+	// if needed, insert a new member function for READ access to the new var
+	if VarRead then begin
+		S := #9#9 + VarType + ' ' + VarReadFunc + '()';
+		if chkInlineR.Checked then begin
+			e.Text.Lines.Insert(PublicLine, #9#9'}');
+			e.Text.Lines.Insert(PublicLine, #9#9#9'return ' + VarName + ';');
+			e.Text.Lines.Insert(PublicLine, #9#9'{');
+		end else
+			S := S + '; // returns the value of ' + VarName;
+		e.Text.Lines.Insert(PublicLine, S);
+		if fAddScopeStr then
+			e.Text.Lines.Insert(PublicLine, #9'public:');
+	end;
 
-    // if needed, insert a new member function for WRITE access to the new var
-    if VarWrite then begin
-      S := #9#9'void ' + VarWriteFunc + '(' + VarType + ' x)';
-      if chkInlineW.Checked then begin
-        e.Text.Lines.Insert(PublicLine, #9#9'}');
-        e.Text.Lines.Insert(PublicLine, #9#9#9 + VarName + ' = x;');
-        e.Text.Lines.Insert(PublicLine, #9#9'{');
-      end
-      else
-        S := S + '; // sets the value of ' + VarName;
-      e.Text.Lines.Insert(PublicLine, S);
-      if fAddScopeStr then
-        e.Text.Lines.Insert(PublicLine, #9'public:');
-    end;
+	// if needed, insert a new member function for WRITE access to the new var
+	if VarWrite then begin
+		S := #9#9'void ' + VarWriteFunc + '(' + VarType + ' x)';
+		if chkInlineW.Checked then begin
+			e.Text.Lines.Insert(PublicLine, #9#9'}');
+			e.Text.Lines.Insert(PublicLine, #9#9#9 + VarName + ' = x;');
+			e.Text.Lines.Insert(PublicLine, #9#9'{');
+		end else
+			S := S + '; // sets the value of ' + VarName;
+		e.Text.Lines.Insert(PublicLine, S);
+		if fAddScopeStr then
+			e.Text.Lines.Insert(PublicLine, #9'public:');
+	end;
 
-    // set the parent class's name
-    ClsName := cmbClass.Text;
+	// set the parent class's name
+	ClsName := cmbClass.Text;
 
-    if ((not VarRead) or (VarRead and chkInlineR.Checked)) and
-      ((not VarWrite) or (VarWrite and chkInlineW.Checked)) then
-      Exit;
+	if ((not VarRead) or (VarRead and chkInlineR.Checked)) and ((not VarWrite) or (VarWrite and chkInlineW.Checked)) then
+		Exit;
 
-    e := GetEditorFromFileName(CppFname);
-    if not Assigned(e) then
-      Exit;
+	e := MainForm.GetEditorFromFileName(CppFname);
+	if not Assigned(e) then
+		Exit;
 
-    // if needed, insert a new member function for READ access to the new var
-    if VarRead and not chkInlineR.Checked then begin
-      e.Text.Lines.Append('');
-      e.Text.Lines.Append('// returns the value of ' + VarName);
-      e.Text.Lines.Append(VarType + ' ' + ClsName + '::' + VarReadFunc + '()');
-      e.Text.Lines.Append('{');
-      e.Text.Lines.Append(#9'return ' + VarName + ';');
-      e.Text.Lines.Append('}');
-      e.Text.Lines.Append('');
-      e.GotoLineNr(e.Text.Lines.Count - 1);
-      e.Modified := True;
-    end;
+	// if needed, insert a new member function for READ access to the new var
+	if VarRead and not chkInlineR.Checked then begin
+		e.Text.Lines.Append('');
+		e.Text.Lines.Append('// returns the value of ' + VarName);
+		e.Text.Lines.Append(VarType + ' ' + ClsName + '::' + VarReadFunc + '()');
+		e.Text.Lines.Append('{');
+		e.Text.Lines.Append(#9'return ' + VarName + ';');
+		e.Text.Lines.Append('}');
+		e.Text.Lines.Append('');
+		e.GotoLineNr(e.Text.Lines.Count - 1);
+		e.Modified := True;
+	end;
 
-    // if needed, insert a new member function for WRITE access to the new var
-    if VarWrite and not chkInlineW.Checked then begin
-      e.Text.Lines.Append('');
-      e.Text.Lines.Append('// sets the value of ' + VarName);
-      e.Text.Lines.Append('void ' + ClsName + '::' + VarWriteFunc + '(' + VarType + ' x)');
-      e.Text.Lines.Append('{');
-      e.Text.Lines.Append(#9 + VarName + ' = x;');
-      e.Text.Lines.Append('}');
-      e.Text.Lines.Append('');
-      e.GotoLineNr(e.Text.Lines.Count - 1);
-      e.Modified := True;
-    end;
-  end;
-  Exit;
+	// if needed, insert a new member function for WRITE access to the new var
+	if VarWrite and not chkInlineW.Checked then begin
+		e.Text.Lines.Append('');
+		e.Text.Lines.Append('// sets the value of ' + VarName);
+		e.Text.Lines.Append('void ' + ClsName + '::' + VarWriteFunc + '(' + VarType + ' x)');
+		e.Text.Lines.Append('{');
+		e.Text.Lines.Append(#9 + VarName + ' = x;');
+		e.Text.Lines.Append('}');
+		e.Text.Lines.Append('');
+		e.GotoLineNr(e.Text.Lines.Count - 1);
+		e.Modified := True;
+	end;
+
+	e.Text.Lines.EndUpdate;
 end;
 
 procedure TNewVarForm.memDescrChange(Sender: TObject);

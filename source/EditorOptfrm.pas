@@ -700,12 +700,12 @@ begin
 	btnCCCnew.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
 	btnCCCdelete.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
 
-	// CLASS_BROWSING
+	// Class browsing
 	chkEnableClassBrowser.Checked:=devClassBrowsing.Enabled;
 	ClassBrowser1.Enabled:=chkEnableClassBrowser.Checked;
 	ClassBrowser1.UseColors:=devClassBrowsing.UseColors;
 	ClassBrowser1.ShowInheritedMembers:=devClassBrowsing.ShowInheritedMembers;
-	ClassBrowser1.ShowSampleData;
+	ClassBrowser1.ShowSampleData; // Class browsing page preview
 	chkCBParseLocalH.Checked:= devClassBrowsing.ParseLocalHeaders;
 	chkCBParseGlobalH.Checked:= devClassBrowsing.ParseGlobalHeaders;
 	chkCBParseLocalH.Enabled:= chkEnableClassBrowser.Checked;

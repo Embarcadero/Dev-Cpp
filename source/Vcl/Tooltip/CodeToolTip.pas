@@ -170,7 +170,7 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;
     procedure PaintToolTip;
-    function RemoveEditor(AEditor: TCustomSynEdit): boolean;
+    procedure RemoveEditor(AEditor: TCustomSynEdit);
     procedure RethinkCoordAndActivate;
     procedure SetEditor(const Value: TCustomSynEdit);
     property Hints: TStringList read FToolTips write SetToolTips;
@@ -397,12 +397,12 @@ begin
 	if Activated then ReleaseHandle;
 
 	FKeyDownProc := nil;
-
 	FEditor := nil;
 
 	FreeAndNil(FUpButton);
 	FreeAndNil(FDownButton);
 
+	FBmp.Free;
 	FList.Free;
 	FToolTips.Free;
 	FLookupEditor.Free;
@@ -682,19 +682,16 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function TCodeToolTip.RemoveEditor(aEditor: TCustomSynEdit): boolean;
+procedure TCodeToolTip.RemoveEditor(aEditor: TCustomSynEdit);
 begin
-  Result := Assigned (aEditor);
-
-  if Result then
-  begin
-    aEditor.RemoveKeyDownHandler(fKeyDownProc);
-    if aEditor = fEditor then
-      fEditor := nil;
-  {$IFDEF SYN_COMPILER_5_UP}
-    RemoveFreeNotification(aEditor);
-  {$ENDIF}
-  end;
+	if Assigned(aEditor) then begin
+		aEditor.RemoveKeyDownHandler(fKeyDownProc);
+		if aEditor = fEditor then
+			fEditor := nil;
+		{$IFDEF SYN_COMPILER_5_UP}
+		RemoveFreeNotification(aEditor);
+		{$ENDIF}
+	end;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -755,16 +752,15 @@ end;
 
 procedure TCodeToolTip.SetEditor(const Value: TCustomSynEdit);
 begin
-  if (FEditor <> nil) then
-    RemoveEditor (fEditor);
+	if Assigned(FEditor) then
+		RemoveEditor(fEditor);
 
-  FEditor := Value;
+	FEditor := Value;
 
-  if (FEditor <> nil) then
-  begin
-    FEditor.AddKeyDownHandler(FKeyDownProc);
-    FEditor.FreeNotification(FEditor);
-  end;
+	if Assigned(FEditor) then begin
+		FEditor.AddKeyDownHandler(FKeyDownProc);
+		FEditor.FreeNotification(FEditor);
+	end;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------

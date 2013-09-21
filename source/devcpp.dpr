@@ -31,6 +31,7 @@ uses
 {$IFDEF LINUX}
   QForms, sysUtils, QDialogs,
 {$ENDIF}
+  MemCheck in 'MemCheck.pas',
   main in 'main.pas' {MainForm},
   MultiLangSupport in 'MultiLangSupport.pas',
   Splash in 'Splash.pas' {SplashForm},
@@ -110,6 +111,8 @@ var
 	UserHome, strLocalAppData, strAppData, strIniFile, exefolder: String;
 	tempc: array [0..MAX_PATH] of char;
 begin
+	//MemChk;
+
 	strIniFile := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
 	exefolder := StringReplace(Application.ExeName,ExtractFileName(Application.ExeName),'',[rfReplaceAll]);
 

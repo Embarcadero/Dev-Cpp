@@ -963,7 +963,7 @@ uses
 	NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
 	ProfileAnalysisFm, debugwait, FilePropertiesFm, AddToDoFm, ViewToDoFm,
 	ImportMSVCFm, ImportCBFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
-	WindowListFrm, ParamsFrm, WebUpdate, ProcessListFrm, ModifyVarFrm, SynEditHighlighter;
+	WindowListFrm, devThemes, ParamsFrm, WebUpdate, ProcessListFrm, ModifyVarFrm, SynEditHighlighter;
 {$ENDIF}
 {$IFDEF LINUX}
 	Xlib, IniFiles, QClipbrd, MultiLangSupport, version,
@@ -1344,7 +1344,9 @@ begin
 	devData.ProjectWidth:=LeftPageControl.Width;
 	devData.OutputHeight:=fmsgHeight;
 
+	// Save and free options
 	SaveOptions;
+	FinalizeOptions;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1353,11 +1355,16 @@ var
 begin
 	if fDebugger.Executing then
 		fDebugger.CloseDebugger(Sender);
+	// Free everything nicely
 	fTools.Free;
 	fCompiler.Free;
 	fDebugger.Free;
 	dmMain.Free;
 	devImageThemes.Free;
+	devExecutor.Free;
+	Lang.Free;
+	devTheme.Free;
+	devData.Free;
 
 	// Remove the breakpoints
 	for i := BreakPointList.Count - 1 downto 0 do begin
@@ -3187,33 +3194,30 @@ var
 begin
 	if not assigned(fProject) then exit;
 
-	if not BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]) then
-	 BuildFilter(flt, ftAll);
+	if not BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]) then BuildFilter(flt, ftAll);
 
-	with dmMain.OpenDialog do
-	 begin
-		 Title:= Lang[ID_NV_OPENADD];
-		 Filter:= flt;
-		 if Execute then
-			begin
-			 if Assigned(ProjectView.Selected) and (ProjectView.Selected.Data=Pointer(-1)) then
-					 FolderNode := ProjectView.Selected
-			 else
-					 FolderNode := fProject.Node;
-				 try
-					 for idx:= 0 to pred(Files.Count) do
-					 begin
-						 fProject.AddUnit(Files[idx], FolderNode, false); // add under folder
-						CppParser.AddFileToScan(Files[idx]);
-					 end;
-					 fProject.RebuildNodes;
-					 CppParser.ParseList;
-				 except;
-					 fProject.RebuildNodes;
-					 CppParser.ParseList;
-				 end;
+	with dmMain.OpenDialog do begin
+		Title:= Lang[ID_NV_OPENADD];
+		Filter:= flt;
+		if Execute then begin
+			if Assigned(ProjectView.Selected) and (ProjectView.Selected.Data=Pointer(-1)) then
+				FolderNode := ProjectView.Selected
+			else
+				FolderNode := fProject.Node;
+
+			try
+				for idx:= 0 to pred(Files.Count) do begin
+					fProject.AddUnit(Files[idx], FolderNode, false); // add under folder
+					CppParser.AddFileToScan(Files[idx]);
+				end;
+				fProject.RebuildNodes;
+				CppParser.ParseList;
+			except;
+				fProject.RebuildNodes;
+				CppParser.ParseList;
 			end;
 		end;
+	end;
 end;
 
 { end XXXKF changed }
@@ -3697,6 +3701,7 @@ var
 	temp,temp2:string;
 	Stream: TFileStream;
 	savedialog : TSaveDialog;
+	e : TEditor;
 begin
 	temp := '';
 	savedialog := TSaveDialog.Create(self);
@@ -3743,12 +3748,19 @@ begin
 			savedialog.Filter:= 'Text file|*.txt';
 			savedialog.DefaultExt := 'txt';
 			savedialog.FilterIndex:=1;
-			savedialog.InitialDir:=fProject.Directory;
+			saveDialog.Options := saveDialog.Options + [ofOverwritePrompt];
+
+			if Assigned(fProject) then begin
+				savedialog.InitialDir:=fProject.Directory;
+			end else begin
+				e:=GetEditor;
+				if Assigned(e) then
+					savedialog.InitialDir:=ExtractFilePath(e.FileName)
+				else
+					saveDialog.InitialDir:='C:\';
+			end;
 
 			if savedialog.Execute then begin
-				if FileExists(savedialog.FileName) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrNo) then
-					exit;
-
 				Stream := TFileStream.Create(savedialog.FileName, fmCreate);
 				try
 					Stream.Write(temp[1], Length(temp));

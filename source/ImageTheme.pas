@@ -163,6 +163,7 @@ type
     procedure DoCreateThemeFromFile(AFilename: string); override;   
   public
     constructor Create; override;
+    destructor Destroy; override;
     property CurrentTheme: TDevImageTheme read GetCurrentTheme write SetCurrentTheme;
     property Themes[Index: Integer]: TDevImageTheme read GetTheme;
     property ThemeFilename;
@@ -624,6 +625,16 @@ begin
   RegisterTheme(TBlueImageTheme);
 
   FCurrentTheme := Themes[0];
+end;
+
+destructor TDevImageThemeFactory.Destroy;
+var
+	I : integer;
+begin
+	FOnThemeChanged := nil;
+	for I := 0 to FThemes.Count - 1 do
+		FThemes[i].Free;
+	inherited;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------

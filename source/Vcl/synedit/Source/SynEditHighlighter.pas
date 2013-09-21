@@ -49,11 +49,7 @@ uses
   SynEditMiscClasses,
 {$ENDIF}
   SysUtils,
-  Classes,
-  //### Code Folding ###
-  SynEditCodeFolding;
-  //### End Code Folding ###
-
+  Classes;
 {$IFNDEF SYN_CLX}
 type
   TBetterRegistry = SynEditMiscClasses.TBetterRegistry;
@@ -131,9 +127,6 @@ type
     fUpdateCount: integer;
     fEnabled: Boolean;
     fWordBreakChars: TSynIdentChars;
-    //### Code Folding ###
-    fFoldRegions: TFoldRegions;
-    //### End Code Folding ###
     procedure SetEnabled(const Value: boolean);
   protected
     fDefaultFilter: string;
@@ -212,10 +205,6 @@ type
       index SYN_ATTR_SYMBOL read GetDefaultAttribute;
     property WhitespaceAttribute: TSynHighlighterAttributes
       index SYN_ATTR_WHITESPACE read GetDefaultAttribute;
-
-    //### Code Folding ###
-    property FoldRegions: TFoldRegions read fFoldRegions;
-    //### End Code Folding ###
   published
     property DefaultFilter: string read GetDefaultFilter write SetDefaultFilter
       stored IsFilterStored;
@@ -669,10 +658,6 @@ begin
   fAttrChangeHooks := TSynNotifyEventChain.CreateEx(Self);
   fDefaultFilter := '';
   fEnabled := True;
-  
-  //### Code Folding ###
-  fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
-  //### End Code Folding ###
 end;
 
 destructor TSynCustomHighlighter.Destroy;
@@ -681,10 +666,6 @@ begin
   FreeHighlighterAttributes;
   fAttributes.Free;
   fAttrChangeHooks.Free;
-  
-  //### Code Folding ###
-  fFoldRegions.Free;
-  //### End Code Folding ###
 end;
 
 procedure TSynCustomHighlighter.BeginUpdate;

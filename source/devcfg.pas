@@ -805,6 +805,7 @@ begin
   devData.SaveConfigData;
   devDirs.SaveSettings;
   devCompiler.SaveSettings;
+  // devCompilerSet lets devData do the work
   devEditor.SaveSettings;
   devCodeCompletion.SaveSettings;
   devClassBrowsing.SaveSettings;
@@ -815,38 +816,26 @@ end;
 procedure ResettoDefaults;
 begin
   devData.SettoDefaults;
+  devDirs.SettoDefaults;
   devCompiler.SettoDefaults;
   devCompilerSet.SettoDefaults;
-  devDirs.SettoDefaults;
   devEditor.SettoDefaults;
   devCodeCompletion.SettoDefaults;
   devClassBrowsing.SettoDefaults;
+  // CVS has no defaults
   devExternalPrograms.SetToDefaults;
 end;
 
 procedure FinalizeOptions;
 begin
-  devCompiler.SaveSettings;
-  devCompiler.Free;
-
-  if Assigned(devCompiler) then
-    devCompilerSet.Free;
-
-  devDirs.SaveSettings;
+  //devData.Free
   devDirs.Free;
-
-  devEditor.SaveSettings;
+  devCompiler.Free;
+  devCompilerSet.Free;
   devEditor.Free;
-  devCodeCompletion.SaveSettings;
   devCodeCompletion.Free;
-
-  devClassBrowsing.SaveSettings;
   devClassBrowsing.Free;
-
-  devCVSHandler.SaveSettings;
   devCVSHandler.Free;
-
-  devExternalPrograms.SaveSettings;
   devExternalPrograms.Free;
 end;
 
