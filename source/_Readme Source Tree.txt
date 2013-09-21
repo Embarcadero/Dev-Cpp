@@ -1,6 +1,6 @@
-** This file contains information on Dev-C++ source files **
+Here's a listing of what all the files in the source directory do, and what kind of functionality you will find there:
 
--- in "source" directory:
+--------------------------------------------------------------------
 
 AboutFrm: the about box window
 AddToDoFrm: window for adding a ToDo

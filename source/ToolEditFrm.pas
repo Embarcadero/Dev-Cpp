@@ -25,7 +25,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Buttons, XPMenu, Macros;
+  Dialogs, StdCtrls, ExtCtrls, Buttons, Macros;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms,
@@ -53,7 +53,6 @@ type
     Bevel1: TBevel;
     lblDesc: TLabel;
     Bevel2: TBevel;
-    XPMenu: TXPMenu;
     ParamText: TEdit;
     btnProg: TSpeedButton;
     btnWorkDir: TSpeedButton;
@@ -161,10 +160,6 @@ end;
 
 procedure TToolEditForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=              Lang[ID_TE];
   lblTitle.Caption:=     Lang[ID_TE_TITLE];
   lblProg.Caption:=      Lang[ID_TE_PROG];

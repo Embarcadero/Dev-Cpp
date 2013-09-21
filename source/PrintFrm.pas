@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, MultiLangSupport, Spin, datamod, XPMenu;
+  StdCtrls, Buttons, MultiLangSupport, Spin, datamod;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -46,7 +46,6 @@ type
     seCopies: TSpinEdit;
     cbSelection: TCheckBox;
     cbLineNum: TCheckBox;
-    XPMenu: TXPMenu;
     procedure FormCreate(Sender: TObject);
     procedure cbLineNumClick(Sender: TObject);
   public
@@ -65,10 +64,6 @@ uses
 
 procedure TPrintForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=                 Lang[ID_PRT];
   grpParams.Caption:=       '  '+Lang[ID_PRT_GRP_PARAMS] +'  ';
   grpPages.Caption:=        '  '+Lang[ID_PRT_GRP_PAGES]+'  ';

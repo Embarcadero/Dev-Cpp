@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  SynEdit, StdCtrls, SynEditTypes, XPMenu;
+  SynEdit, StdCtrls, SynEditTypes;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms,
@@ -53,7 +53,6 @@ type
     cboReplaceText: TComboBox;
     cbPrompt: TCheckBox;
     btnReplaceAll: TButton;
-    XPMenu: TXPMenu;
     procedure btnReplaceClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -152,10 +151,6 @@ procedure TfrmReplace.LoadText;
 var
  x: Integer;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=                  Lang[ID_RPLC];
   lblFind.Caption:=          Lang[ID_RPLC_FINDTEXT];
   lblReplace.Caption:=       Lang[ID_RPLC_REPLACETEXT];

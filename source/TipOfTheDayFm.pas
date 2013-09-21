@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, ShellAPI, XPMenu;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, ShellAPI;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -43,7 +43,6 @@ type
     lblTip: TLabel;
     Bevel1: TBevel;
     lblUrl: TLabel;
-    XPMenu: TXPMenu;
     procedure FormShow(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -229,10 +228,6 @@ end;
 
 procedure TTipOfTheDayForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := Lang[ID_TIPS_CAPTION];
   lblTitle.Caption := Lang[ID_TIPS_DIDYOUKNOW];
   lblTip.Caption := Lang[ID_TIPS_NOTIPSTODISPLAY];

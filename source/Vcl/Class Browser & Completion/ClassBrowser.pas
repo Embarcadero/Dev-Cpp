@@ -153,6 +153,7 @@ type
     property Indent;
     property TabOrder;
     property PopupMenu;
+    property BorderStyle;
     property ShowFilter: TShowFilter read fShowFilter write SetShowFilter;
     property OnSelect: TMemberSelectEvent read fOnSelect write fOnSelect;
     property Parser: TCppParser read fParser write SetParser;

@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, XPMenu;
+  StdCtrls, Buttons, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -57,7 +57,6 @@ type
     Fish: TPanel;
     FishImage: TImage;
     Image1: TImage;
-    XPMenu: TXPMenu;
     DonateSite: TLabel;
     DonateLabel: TLabel;
     procedure LabelClick(Sender: TObject);
@@ -87,10 +86,6 @@ uses
 
 procedure TAboutForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=                Lang[ID_AB_CAPTION];
   GroupBox1.Caption:=      Lang[ID_AB_LICENSE];
   GroupBox2.Caption:=      Lang[ID_AB_WEBCAP];

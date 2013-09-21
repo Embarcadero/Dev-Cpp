@@ -6,11 +6,10 @@ object CompOptionsFrame: TCompOptionsFrame
   TabOrder = 0
   OnResize = FrameResize
   object Splitter1: TSplitter
-    Left = 121
+    Left = 115
     Top = 0
     Width = 4
     Height = 420
-    Cursor = crHSplit
     OnMoved = FrameResize
   end
   object tv: TTreeView
@@ -27,7 +26,7 @@ object CompOptionsFrame: TCompOptionsFrame
     OnChange = tvChange
   end
   object vle: TValueListEditor
-    Left = 125
+    Left = 119
     Top = 0
     Width = 454
     Height = 420

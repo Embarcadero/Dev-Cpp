@@ -26,7 +26,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, devTabs, StdCtrls, ExtCtrls, Spin, ColorPickerButton,
   SynEdit, SynEditHighlighter, SynHighlighterCpp, CheckLst, SynMemo,
-  Buttons, ClassBrowser, CppParser, CppTokenizer, StrUtils, XPMenu;
+  Buttons, ClassBrowser, CppParser, CppTokenizer, StrUtils;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -53,21 +53,6 @@ type
     lblGutterFontSize: TLabel;
     cboGutterSize: TComboBox;
     tabGeneral: TdevPage;
-    bvlEditor: TBevel;
-    lblEditorOpts: TLabel;
-    cbEHomeKey: TCheckBox;
-    cbSmartScroll: TCheckBox;
-    cbAutoIndent: TCheckBox;
-    cbInsertMode: TCheckBox;
-    cbTabtoSpaces: TCheckBox;
-    cbSmartTabs: TCheckBox;
-    cbHalfPage: TCheckBox;
-    cbPastEOF: TCheckBox;
-    cbPastEOL: TCheckBox;
-    cbFindText: TCheckBox;
-    cbTrailingBlanks: TCheckBox;
-    cbScrollHint: TCheckBox;
-    cbDoubleLine: TCheckBox;
     tabSyntax: TdevPage;
     cpForeground: TColorPickerButton;
     cpBackground: TColorPickerButton;
@@ -90,9 +75,6 @@ type
     pnlEditorPreview: TPanel;
     lblTabSize: TLabel;
     seTabSize: TSpinEdit;
-    Bevel1: TBevel;
-    cbSmartUnIndent: TCheckBox;
-    cbGroupUndo: TCheckBox;
     grpMargin: TGroupBox;
     lblMarginWidth: TLabel;
     lblMarginColor: TLabel;
@@ -116,21 +98,16 @@ type
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     btnHelp: TBitBtn;
-    cbDropFiles: TCheckBox;
-    cbSpecialChars: TCheckBox;
     cboQuickColor: TComboBox;
     lblElements: TLabel;
     lblSpeed: TLabel;
-    Bevel2: TBevel;
     CodeIns: TSynEdit;
-    Bevel3: TBevel;
-    Bevel4: TBevel;
     Panel1: TPanel;
     cbDefaultintoprj: TCheckBox;
     tabClassBrowsing: TdevPage;
     chkEnableClassBrowser: TCheckBox;
     btnSaveSyntax: TSpeedButton;
-    devPages1: TdevPages;
+    ClassCodePage: TdevPages;
     tabCBBrowser: TdevPage;
     tabCBCompletion: TdevPage;
     lblClassBrowserSample: TLabel;
@@ -148,19 +125,36 @@ type
     chkCCCache: TCheckBox;
     btnCCCnew: TSpeedButton;
     btnCCCdelete: TSpeedButton;
-    cbParserHints: TCheckBox;
     CppTokenizer1: TCppTokenizer;
     CppParser1: TCppParser;
     lbCCC: TListBox;
     lblCCCache: TLabel;
     pbCCCache: TProgressBar;
-    XPMenu: TXPMenu;
     chkCBShowInherited: TCheckBox;
     cbMatch: TCheckBox;
+    grpEditorOpts: TGroupBox;
     edMarginWidth: TSpinEdit;
     edGutterWidth: TSpinEdit;
     cbHighCurrLine: TCheckBox;
     cpHighColor: TColorPickerButton;
+    cbTrailingBlanks: TCheckBox;
+    cbTabtoSpaces: TCheckBox;
+    cbSpecialChars: TCheckBox;
+    cbSmartUnIndent: TCheckBox;
+    cbSmartTabs: TCheckBox;
+    cbSmartScroll: TCheckBox;
+    cbScrollHint: TCheckBox;
+    cbPastEOL: TCheckBox;
+    cbPastEOF: TCheckBox;
+    cbParserHints: TCheckBox;
+    cbInsertMode: TCheckBox;
+    cbHalfPage: TCheckBox;
+    cbGroupUndo: TCheckBox;
+    cbFindText: TCheckBox;
+    cbEHomeKey: TCheckBox;
+    cbDropFiles: TCheckBox;
+    cbDoubleLine: TCheckBox;
+    cbAutoIndent: TCheckBox;
     cbAppendNewline: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -204,7 +198,7 @@ type
     procedure CppParser1StartParsing(Sender: TObject);
     procedure CppParser1EndParsing(Sender: TObject);
     procedure CppParser1TotalProgress(Sender: TObject; FileName: String;Total, Current: Integer);
-    procedure devPages1Change(Sender: TObject);
+    procedure ClassCodePageChange(Sender: TObject);
     procedure chkCBShowInheritedClick(Sender: TObject);
     procedure OnGutterClick(Sender: TObject; Button: TMouseButton; X, Y,Line: Integer; Mark: TSynEditMark);
     procedure cbHighCurrLineClick(Sender: TObject);
@@ -231,6 +225,7 @@ type
     procedure LoadSyntax(Value: string);
     procedure FillSyntaxSets;
     procedure FillCCC;
+    procedure StyleFix;
   end;
 
 var
@@ -283,13 +278,43 @@ procedure TEditorOptForm.FormShow(Sender: TObject);
 begin
   PagesMain.ActivePageIndex:= 0;
   CodePages.ActivePageIndex:= 0;
+  ClassCodePage.ActivePageIndex:= 0;
 end;
 
+procedure TEditorOptForm.StyleFix;
+begin
+    // General
+	lblTabSize.Refresh;
+    cpHighColor.Refresh;
+
+    // Syntax
+	lblElements.Refresh;
+	lblForeGround.Refresh;
+    cpForeGround.Refresh;
+    lblBackGround.Refresh;
+    cpBackGround.Refresh;
+    btnSaveSyntax.Refresh;
+    lblSpeed.Refresh;
+
+    // Browsing
+    lblCompletionDelay.Refresh;
+    lblCCCache.Refresh;
+    lblCompletionColor.Refresh;
+    cpCompletionBackground.Refresh;
+    btnCCCnew.Refresh;
+    btnCCCdelete.Refresh;
+    pbCCCache.Refresh;
+end;
 
 procedure TEditorOptForm.FormActivate(Sender: TObject);
 begin
-  GetOptions;
-  UpdateCIButtons;
+	// Lees inibestand of register
+	GetOptions;
+
+	// Update code insertion
+	UpdateCIButtons;
+
+	StyleFix;
 end;
 
 function TEditorOptForm.FormHelp(Command: Word; Data: Integer;
@@ -320,26 +345,25 @@ end;
    adds a font to the list if it is of the Modern font family
    i.e. any font that is monospaced (same as delphi)
 *)
-function EnumFontFamilyProc(LogFont: PEnumLogFont; var TextMetric: PNewTextMetric;
-    FontType: integer; LParam: integer): integer; stdcall;
+function EnumFontFamilyProc(LogFont: PEnumLogFont; var TextMetric: PNewTextMetric;FontType: integer; LParam: integer): integer; stdcall;
 begin
-  if LogFont.elfLogFont.lfPitchAndFamily and FF_MODERN = FF_MODERN then
-   TStrings(LParam).Add(LogFont.elfLogFont.lfFaceName);
-  result:= -1;
+	// if LogFont.elfLogFont.lfPitchAndFamily and FF_MODERN = FF_MODERN then
+	TStrings(LParam).Add(LogFont.elfLogFont.lfFaceName); // Just add all fonts, SynEdit will monospace them
+	result:= -1;
 end;
 
 // Fills combobox with font names.
 // editor and gutter both use same fonts
 procedure TEditorOptForm.LoadFontNames;
 var
- DC: HDC;
+	DC: HDC;
 begin
-  DC:= GetDC(0);
-  EnumFontFamilies(DC, nil, @EnumFontFamilyProc, integer(cboEditorFont.Items));
-  ReleaseDC(0, DC);
-  cboEditorFont.Sorted:= TRUE;
-  cboGutterFont.Items:= cboEditorFont.Items;
-  cboGutterFont.Sorted:= TRUE;
+	DC:= GetDC(application.handle);
+	EnumFontFamilies(DC, nil, @EnumFontFamilyProc, integer(cboEditorFont.Items));
+	ReleaseDC(0, DC);
+	cboEditorFont.Sorted:= TRUE;
+	cboGutterFont.Items:= cboEditorFont.Items;
+	cboGutterFont.Sorted:= TRUE;
 end;
 
 (*
@@ -469,10 +493,6 @@ end;
 
 procedure TEditorOptForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   btnOk.Caption:=                Lang[ID_BTN_OK];
   btnCancel.Caption:=            Lang[ID_BTN_CANCEL];
   btnHelp.Caption:=              Lang[ID_BTN_HELP];
@@ -491,7 +511,7 @@ begin
   tabCPDefault.Caption:=         Lang[ID_EOPT_CPDEFAULT];
 
 // General Tab
-  lblEditorOpts.Caption:=        '  ' +Lang[ID_EOPT_EDOPTIONS] +'  ';
+  grpEditorOpts.Caption:=        '  ' +Lang[ID_EOPT_EDOPTIONS] +'  ';
   cbAutoIndent.Caption:=         Lang[ID_EOPT_AUTOINDENT];
   cbInsertMode.Caption:=         Lang[ID_EOPT_INSERTMODE];
   cbTabtoSpaces.Caption:=        Lang[ID_EOPT_TAB2SPC];
@@ -609,18 +629,18 @@ begin
      append('');
      append('int main(int argc, char **argv)');
      append('{');
-     append(' int numbers[20];');
-     append(' float average, total; //breakpoint');
-     append(' for (int i = 0; i <= 19; i++)');
-     append(' { // active breakpoint');
-     append('  numbers[i] = i;');
-     append('  Total += i; // error line');
-     append(' }');
-     append(' average = total / 20;');
-     append(' cout << numbers[0] << "\n" << numbers[19] << "\n";');
-     append(' cout << "total: " << total << "\nAverage: " << average;');
-     append(' printf("\n\nPress any key...");');
-     append(' getch();');
+     append('	int numbers[20];');
+     append('	float average, total; //breakpoint');
+     append('	for (int i = 0; i <= 19; i++)');
+     append('	{ // active breakpoint');
+     append('		numbers[i] = i;');
+     append('		Total += i; // error line');
+     append('	}');
+     append('	average = total / 20;');
+     append('	cout << numbers[0] << "\n" << numbers[19] << "\n";');
+     append('	cout << "total: " << total << "\nAverage: " << average;');
+     append('	printf("\n\nPress any key...");');
+     append('	getch();');
      append('}');
    end;
 end;
@@ -943,7 +963,9 @@ end;
 
 procedure TEditorOptForm.PagesMainChange(Sender: TObject);
 begin
-  HelpKeyword:= Help_Topic[PagesMain.ActivePageIndex];
+	HelpKeyword:= Help_Topic[PagesMain.ActivePageIndex];
+
+	StyleFix;
 end;
 
 procedure TEditorOptForm.btnCancelClick(Sender: TObject);
@@ -1271,34 +1293,31 @@ begin
 end;
 
 { ---------- Code insert's methods ---------- }
-
 procedure TEditorOptForm.btnAddClick(Sender: TObject);
 var
- NewItem: PCodeIns;
- Item: TListItem;
+	NewItem: PCodeIns;
+	Item: TListItem;
 begin
-  with TfrmCodeEdit.Create(Self) do
-   try
-    CodeIns.ClearAll;
-    Edit:= FALSE;
-    New(NewItem);
-    NewItem^.Sep:= 0;
-    Entry:= NewItem;
-    if ShowModal = mrOk then
-     begin
-       Item:= lvCodeIns.Items.Add;
-       Item.Caption:= edMenuText.Text;
-       Item.SubItems.Add(inttostr(seSection.Value));
-       Item.SubItems.Add(edDesc.Text);
-       Item.SubItems.Add('');
-       lvCodeIns.Selected:=Item;
-     end
-    else
-     dispose(NewItem);
-   finally
-    Free;
-    UpdateCIButtons;
-   end;
+	with TfrmCodeEdit.Create(Self) do
+		try
+			CodeIns.ClearAll;
+			Edit:= FALSE;
+			New(NewItem);
+			NewItem^.Sep:= 0;
+			Entry:= NewItem;
+			if ShowModal = mrOk then begin
+				Item:= lvCodeIns.Items.Add;
+				Item.Caption:= edMenuText.Text;
+				Item.SubItems.Add(inttostr(seSection.Value));
+				Item.SubItems.Add(edDesc.Text);
+				Item.SubItems.Add('');
+				lvCodeIns.Selected:=Item;
+			end else
+				dispose(NewItem);
+		finally
+			Free;
+			UpdateCIButtons;
+		end;
 end;
 
 procedure TEditorOptForm.btnEditClick(Sender: TObject);
@@ -1381,17 +1400,16 @@ var
  Item: TListItem;
  Ins: PCodeIns;
 begin
-  for idx:= 0 to pred(dmMain.CodeInserts.Count) do
-   begin
-     Item:= lvCodeIns.Items.Add;
-     ins:= dmMain.CodeInserts[idx];
-     Item.Caption:= ins.Caption;
-     Item.SubItems.Add(inttostr(ins.Sep));
-     Item.SubItems.Add(ins.Desc);
-     Item.SubItems.Add(ins.Line);
-   end;
-  if lvCodeIns.Items.Count> 0 then
-   lvCodeIns.ItemIndex:= 0;
+	for idx:= 0 to pred(dmMain.CodeInserts.Count) do begin
+		Item:= lvCodeIns.Items.Add;
+		ins:= dmMain.CodeInserts[idx];
+		Item.Caption:= ins.Caption;
+		Item.SubItems.Add(inttostr(ins.Sep));
+		Item.SubItems.Add(ins.Desc);
+		Item.SubItems.Add(ins.Line);
+	end;
+	if lvCodeIns.Items.Count> 0 then
+		lvCodeIns.ItemIndex:= 0;
 end;
 
 procedure TEditorOptForm.SaveCodeIns;
@@ -1655,10 +1673,12 @@ begin
   Application.ProcessMessages;
 end;
 
-procedure TEditorOptForm.devPages1Change(Sender: TObject);
+procedure TEditorOptForm.ClassCodePageChange(Sender: TObject);
 begin
-  if (devPages1.ActivePage=tabCBCompletion) and (CppParser1.Statements.Count=0) then
-    FillCCC;
+	if (ClassCodePage.ActivePage=tabCBCompletion) and (CppParser1.Statements.Count=0) then
+		FillCCC;
+
+	StyleFix;
 end;
 
 procedure TEditorOptForm.chkCBShowInheritedClick(Sender: TObject);

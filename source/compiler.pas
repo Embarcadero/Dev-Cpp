@@ -978,6 +978,8 @@ begin
 				if fErrCount = 0 then
 					fErrCount := 1;
 
+				if Pos('Error 1',O_Msg) > 0 then
+					O_Msg := O_Msg + ' (if this is the only error: please check your library includes)';
 				DoOutput('','', O_File, O_Msg);
 				Continue;
 			end;

@@ -1,6 +1,6 @@
 object NewProjectForm: TNewProjectForm
-  Left = 349
-  Top = 264
+  Left = 535
+  Top = 410
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'New Project'
@@ -21,39 +21,15 @@ object NewProjectForm: TNewProjectForm
     267)
   PixelsPerInch = 96
   TextHeight = 13
-  object lblPrjName: TLabel
-    Left = 8
-    Top = 185
-    Width = 34
-    Height = 13
-    Anchors = [akLeft, akRight, akBottom]
-    Caption = 'Name: '
-  end
-  object Bevel1: TBevel
-    Left = 6
-    Top = 171
-    Width = 496
-    Height = 3
-    Anchors = [akLeft, akRight, akBottom]
-    Shape = bsTopLine
-  end
-  object Label2: TLabel
-    Left = 16
-    Top = 165
-    Width = 87
-    Height = 13
-    Anchors = [akLeft, akBottom]
-    Caption = '  Project Options:  '
-  end
   object pnlDesc: TPanel
     Left = 8
-    Top = 113
+    Top = 112
     Width = 495
-    Height = 42
+    Height = 51
     Anchors = [akLeft, akRight, akBottom]
     BevelInner = bvRaised
     Color = clWindow
-    TabOrder = 5
+    TabOrder = 4
     object lblDesc: TLabel
       Left = 4
       Top = 4
@@ -116,26 +92,36 @@ object NewProjectForm: TNewProjectForm
     OnClick = btnCancelClick
     Kind = bkCancel
   end
-  object Panel1: TPanel
-    Left = 284
-    Top = 183
-    Width = 216
-    Height = 42
+  object grpPrjOpts: TGroupBox
+    Left = 8
+    Top = 168
+    Width = 492
+    Height = 65
     Anchors = [akRight, akBottom]
-    BevelInner = bvRaised
-    BevelOuter = bvLowered
+    Caption = 'Project Options'
     TabOrder = 2
-    object rbC: TRadioButton
+    DesignSize = (
+      492
+      65)
+    object lblPrjName: TLabel
       Left = 8
-      Top = 3
+      Top = 15
+      Width = 34
+      Height = 13
+      Anchors = [akLeft, akRight, akBottom]
+      Caption = 'Name: '
+    end
+    object rbC: TRadioButton
+      Left = 280
+      Top = 11
       Width = 65
       Height = 17
       Caption = '&C project'
       TabOrder = 0
     end
     object rbCpp: TRadioButton
-      Left = 112
-      Top = 3
+      Left = 392
+      Top = 11
       Width = 73
       Height = 17
       Caption = 'C&++ project'
@@ -144,21 +130,21 @@ object NewProjectForm: TNewProjectForm
       TabStop = True
     end
     object cbDefault: TCheckBox
-      Left = 8
-      Top = 21
+      Left = 280
+      Top = 37
       Width = 201
       Height = 17
       Caption = '&Make default language'
       TabOrder = 2
     end
-  end
-  object edProjectName: TEdit
-    Left = 16
-    Top = 204
-    Width = 258
-    Height = 21
-    Anchors = [akLeft, akRight, akBottom]
-    TabOrder = 3
+    object edProjectName: TEdit
+      Left = 8
+      Top = 36
+      Width = 258
+      Height = 21
+      Anchors = [akLeft, akRight, akBottom]
+      TabOrder = 3
+    end
   end
   object TabsMain: TdevTabs
     Left = 8
@@ -204,7 +190,7 @@ object NewProjectForm: TNewProjectForm
     Width = 75
     Height = 24
     Anchors = [akRight, akBottom]
-    TabOrder = 6
+    TabOrder = 5
     OnClick = btnHelpClick
     Kind = bkHelp
   end
@@ -2345,35 +2331,5 @@ object NewProjectForm: TNewProjectForm
       C000000F80000003AFFFFE07FFFF001FFFFFFFFFFFFFFFFF8FFFFE0FFFFFC03F
       FFFFFFFFFFFFFFFF8000003FFFFFF03F00000000000000000000000000000000
       000000000000}
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 136
-    Top = 56
   end
 end

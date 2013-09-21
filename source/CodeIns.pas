@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, Variants, Classes, Graphics, Controls, Forms,
-  Spin, ExtCtrls, Buttons, StdCtrls, XPMenu;
+  Spin, ExtCtrls, Buttons, StdCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   Variants, Classes, QGraphics, QControls, QForms,
@@ -55,6 +55,7 @@ type
    procedure SaveCode;
    function Indexof(const Value: String): integer;
    function AddItem(Value: PCodeIns): integer;
+   procedure AddItemByValues(menutext, description, code : string; section : integer);
    procedure Delete(index: integer);
    procedure Clear;
    property Items[index: integer]: PCodeins read GetItem write SetItem; default;
@@ -71,7 +72,6 @@ type
     btnCancel: TBitBtn;
     lblDesc: TLabel;
     edDesc: TEdit;
-    XPMenu: TXPMenu;
     procedure FormCreate(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure edMenuTextChange(Sender: TObject);
@@ -89,7 +89,7 @@ type
 implementation
 
 uses
- SysUtils, IniFiles, devCFG, Utils, version, MultiLangSupport;
+ SysUtils, IniFiles, devCFG, Utils, version, MultiLangSupport, main;
 
 {$R *.dfm}
  { TCodeInsList }
@@ -119,6 +119,18 @@ end;
 function TCodeInsList.AddItem(Value: PCodeIns): integer;
 begin
   result:= fList.Add(Value);
+end;
+
+procedure TCodeInsList.AddItemByValues(menutext, description, code : string; section : integer);
+var
+	assembleditem : PCodeIns;
+begin
+	new(assembleditem);
+	assembleditem^.Caption:=menutext;
+	assembleditem^.Line:=code;
+	assembleditem^.Desc:=description;
+	assembleditem^.Sep:=section;
+	fList.Add(assembleditem);
 end;
 
 procedure TCodeInsList.Clear;
@@ -161,32 +173,123 @@ var
  tmp: TStringList;
  idx: integer;
 begin
-  if not FileExists(fFile) then
-    fFile:=devDirs.Config + DEV_CODEINS_FILE;
+	if not FileExists(fFile) then
+		fFile:=devDirs.Config + DEV_CODEINS_FILE;
 
-  if FileExists(fFile) then
-  with TINIFile.Create(fFile) do
-   try
-    tmp:= TStringList.Create;
-    Clear;
-    try
-     ReadSections(tmp);
-     if tmp.Count = 0 then exit;
-     for idx:= 0 to pred(tmp.Count) do
-      begin
-        new(Item);
-        Item^.Caption:= StringReplace(tmp[idx], '_', ' ', [rfReplaceAll]);
-        Item^.Desc:= ReadString(tmp[idx], 'Desc', '');
-        Item^.Line:= StrtoCodeIns(ReadString(tmp[idx], 'Line', ''));
-        Item^.Sep:= ReadInteger(tmp[idx], 'Sep', 0);
-        AddItem(Item);
-      end;
-    finally
-     tmp.free;
-    end;
-   finally
-    free;
-   end;
+	if FileExists(fFile) then begin
+		with TINIFile.Create(fFile) do
+			try
+				tmp:= TStringList.Create;
+				Clear;
+				try
+					ReadSections(tmp);
+					if tmp.Count = 0 then
+						exit;
+
+						for idx:= 0 to pred(tmp.Count) do begin
+							new(Item);
+							Item^.Caption:= StringReplace(tmp[idx], '_', ' ', [rfReplaceAll]);
+							Item^.Desc:= ReadString(tmp[idx], 'Desc', '');
+							Item^.Line:= StrtoCodeIns(ReadString(tmp[idx], 'Line', ''));
+							Item^.Sep:= ReadInteger(tmp[idx], 'Sep', 0);
+							AddItem(Item);
+						end;
+				finally
+					tmp.free;
+				end;
+			finally
+				free;
+			end;
+	end else begin
+		// Win32
+		AddItemByValues('MessageBox','Win32 MessageBox','MessageBox(*|*,,,);',1);
+		AddItemByValues('WinMain','Win32 Main Function',
+
+	'int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow) {'+#13#10+
+	'	WNDCLASSEX wc;'+#13#10+
+	'	HWND hwnd;'+#13#10+
+	'	MSG Msg;'+#13#10+#13#10+
+	'	wc.cbSize        = sizeof(WNDCLASSEX);'+#13#10+
+	'	wc.style         = 0;'+#13#10+
+	'	wc.lpfnWndProc   = WndProc;'+#13#10+
+	'	wc.cbClsExtra    = 0;'+#13#10+
+	'	wc.cbWndExtra    = 0;'+#13#10+
+	'	wc.hInstance     = hInstance;'+#13#10+
+	'	wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);'+#13#10+
+	'	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);'+#13#10+
+	'	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);'+#13#10+
+	'	wc.lpszMenuName  = NULL;'+#13#10+
+	'	wc.lpszClassName = "WindowClass";'+#13#10+
+	'	wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);'+#13#10+#13#10+
+	'	if(!RegisterClassEx(&wc)) {'+#13#10+
+	'		MessageBox(NULL, "Window Registration Failed!", "Error!",MB_ICONEXCLAMATION|MB_OK);'+#13#10+
+	'		return 0;'+#13#10+
+	'	}'+#13#10+#13#10+
+	'	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass",*|*,WS_OVERLAPPEDWINDOW,CW_USEDEFAULT,CW_USEDEFAULT,640,480,NULL,NULL,hInstance,NULL);'+#13#10+#13#10+
+	'	if(hwnd == NULL) {'+#13#10+
+	'		MessageBox(NULL, "Window Creation Failed!", "Error!",MB_ICONEXCLAMATION|MB_OK);'+#13#10+
+	'		return 0;'+#13#10+
+	'	}'+#13#10+#13#10+
+	'	ShowWindow(hwnd, 1);'+#13#10+
+	'	UpdateWindow(hwnd);'+#13#10+#13#10+
+	'	while(GetMessage(&Msg, NULL, 0, 0) > 0) {'+#13#10+
+	'		TranslateMessage(&Msg);'+#13#10+
+	'		DispatchMessage(&Msg);'+#13#10+
+	'	}'+#13#10+
+	'	return Msg.wParam;'+#13#10+
+	'}',1);
+
+		AddItemByValues('Main Window Proc','Win32 Main Proc Function',
+
+	'LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {'+#13#10+
+	'	switch(Message) {'+#13#10+
+	'		case *|*: {'+#13#10+
+	'			break;'+#13#10+
+	'		}'+#13#10+
+	'		case WM_CLOSE: {'+#13#10+
+	'			DestroyWindow(hwnd);'+#13#10+
+	'			break;'+#13#10+
+	'		}'+#13#10+
+	'		case WM_DESTROY: {'+#13#10+
+	'			PostQuitMessage(0);'+#13#10+
+	'			break;'+#13#10+
+	'		}'+#13#10+
+	'		default:'+#13#10+
+	'			return DefWindowProc(hwnd, Message, wParam, lParam);;'+#13#10+
+	'	}'+#13#10+
+	'	return 0;'+#13#10+
+	'}',1);
+
+		AddItemByValues('Child Window Proc','Win32 Child Proc Function',
+
+	'BOOL CALLBACK ChildProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {'+#13#10+
+	'	switch(Message) {'+#13#10+
+	'		case *|*: {'+#13#10+
+	'			break;'+#13#10+
+	'		}'+#13#10+
+	'		default:'+#13#10+
+	'			return false;'+#13#10+
+	'	}'+#13#10+
+	'	return true;'+#13#10+
+	'}',1);
+
+		// Generic C
+		AddItemByValues('for()','for loop','for(*|*,,) {'+#13#10+'}',2);
+		AddItemByValues('while()','while loop','while(*|*) {'+#13#10+'}',2);
+		AddItemByValues('do-while()','do-while loop','do {'+#13#10+'} while(*|*);',2);
+		AddItemByValues('if()','if statement','if(*|*) {'+#13#10+'}',2);
+		AddItemByValues('switch()','switch statement','switch(*|*) {'+#13#10+'	default:'+#13#10+'}',2);
+
+		// C++
+		AddItemByValues('Class','Class','class *|* {'+#13#10+'	public:'+#13#10+'		// Public Declarations'+#13#10+'}',2);
+		AddItemByValues('Class Header Template','Class','#ifndef SOMETHING_INCLUDED'+#13#10+'#define SOMETHING_INCLUDED'+#13#10#13#10+'class *|* {'+#13#10+'	public:'+#13#10+'		// Public Declarations'+#13#10+'}'+#13#10+'#endif',2);
+
+		// Preprocessor
+		AddItemByValues('#ifdef','Preprocessor if','#ifdef *|*'+#13#10#13#10+'#endif',3);
+		AddItemByValues('#ifndef','Preprocessor !if','#ifndef *|*'+#13#10#13#10+'#endif',3);
+		AddItemByValues('#ifdef/else','Preprocessor if-else','#ifdef *|*'+#13#10#13#10+'#elif'+#13#10#13#10+'#endif',3);
+		AddItemByValues('#ifndef/else','Preprocessor !if-else','#ifndef *|*'+#13#10#13#10+'#elif'+#13#10#13#10+'#endif',3);
+	end;
 end;
 
 procedure TCodeInsList.SaveCode;
@@ -205,7 +308,7 @@ begin
      begin
        CI:= PCodeIns(fList[idx])^;
        section:= StringReplace(CI.Caption, ' ', '_', [rfReplaceAll]);
-       EraseSection(section);  // may be redundent
+       EraseSection(section);  // may be redundant
        WriteString(section, 'Desc', CI.Desc);
        WriteString(section, 'Line', CodeInstoStr(CI.Line));
        WriteInteger(section, 'Sep', CI.Sep);
@@ -232,10 +335,6 @@ end;
 
 procedure TfrmCodeEdit.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   if Edit then
    Caption:= Lang[ID_CIE_EDCAPTION]
   else

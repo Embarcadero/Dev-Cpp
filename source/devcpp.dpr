@@ -191,19 +191,17 @@ begin
   devData.ReadConfigData;
   devTheme:= TdevTheme.Create;
 
-  
-  Application.Initialize;
-  Application.Title := 'Dev-C++';
-  Application.CreateForm(TMainForm, MainForm);
-  MainForm.Hide; // hide it
-  
-  
   if not devData.NoSplashScreen then 
   begin
     SplashForm := TSplashForm.Create(Application);
     SplashForm.Show;
     SplashForm.Update;
   end;
+  
+  Application.Initialize;
+  Application.Title := 'Dev-C++';
+  Application.CreateForm(TMainForm, MainForm);
+  MainForm.Hide; // hide it
   
   {*** modified by peter ***}
   // make the creation when the splashscreen is displayed
@@ -215,14 +213,14 @@ begin
   Application.CreateForm(TfrmFind, frmFind);
   Application.CreateForm(TfrmReplace, frmReplace);
   Application.CreateForm(TWebUpdateForm, WebUpdateForm);
-  
-  {*** modified by peter ***}
-  // apply the window placement. this method forced
-  // the form to show,
-  TMainFormHack(MainForm).DoApplyWindowPlacement;
-  
+
   if not devData.NoSplashScreen then
     SplashForm.Free;
+  
+  {*** modified by peter ***}
+  // apply the window placement. this method forces
+  // the form to show,
+  TMainFormHack(MainForm).DoApplyWindowPlacement;
   
   Application.Run;
 end.

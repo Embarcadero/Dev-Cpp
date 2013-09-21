@@ -25,7 +25,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, devTabs, Spin, XPMenu,
+  Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, devTabs, Spin,
   CompilerOptionsFrame;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -69,7 +69,6 @@ type
     DllwrapEdit: TEdit;
     lblgprof: TLabel;
     GprofEdit: TEdit;
-    XPMenu: TXPMenu;
     cbCompAdd: TCheckBox;
     Commands: TMemo;
     lblDelay: TLabel;
@@ -86,7 +85,7 @@ type
     btnDelCompilerSet: TSpeedButton;
     btnRenameCompilerSet: TSpeedButton;
     btnBrowse: TSpeedButton;
-    btnBrws2: TSpeedButton;
+    btnBrowse2: TSpeedButton;
     btnBrowse3: TSpeedButton;
     btnBrowse4: TSpeedButton;
     btnBrowse5: TSpeedButton;
@@ -121,6 +120,7 @@ type
     procedure WindresEditChange(Sender: TObject);
     procedure DllwrapEditChange(Sender: TObject);
     procedure GprofEditChange(Sender: TObject);
+    procedure MainPagesChange(Sender: TObject);
    private
     fBins: string;
     fLibs: string;
@@ -129,6 +129,7 @@ type
     procedure SetOptions;
     procedure UpdateButtons;
     procedure LoadText;
+    procedure StyleFix;
   end;
 
 var
@@ -223,6 +224,30 @@ procedure TCompForm.FormActivate(Sender: TObject);
 begin
   SetOptions;
   DirTabsChange(Self);
+  StyleFix;
+end;
+
+procedure TCompForm.StyleFix;
+begin
+    lblDelay.Refresh;
+    lblDelayMsg.Refresh;
+
+    lblProgramsText.Refresh;
+    lblgcc.Refresh;
+    lblgpp.Refresh;
+    lblmake.Refresh;
+    lblgdb.Refresh;
+    lblwindres.Refresh;
+    lbldllwrap.Refresh;
+    lblgprof.Refresh;
+
+    btnbrowse2.Refresh;
+    btnbrowse3.Refresh;
+    btnbrowse4.Refresh;
+    btnbrowse5.Refresh;
+    btnbrowse6.Refresh;
+    btnbrowse7.Refresh;
+    btnbrowse8.Refresh;
 end;
 
 procedure TCompForm.SetOptions;
@@ -422,8 +447,6 @@ end;
 
 procedure TCompForm.LoadText;
 begin
-	XPMenu.Active := devData.XPTheme;
-
 	Caption:=                            Lang[ID_COPT];
 
 	// Tabs
@@ -625,6 +648,11 @@ end;
 procedure TCompForm.GprofEditChange(Sender: TObject);
 begin
   devCompilerSet.gprofName := GprofEdit.Text;
+end;
+
+procedure TCompForm.MainPagesChange(Sender: TObject);
+begin
+	StyleFix;
 end;
 
 end.

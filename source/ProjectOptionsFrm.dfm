@@ -1,10 +1,10 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 1189
-  Top = 667
+  Left = 1155
+  Top = 107
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
-  ClientHeight = 315
+  ClientHeight = 317
   ClientWidth = 471
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,6 +14,7 @@ object frmProjectOptions: TfrmProjectOptions
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnActivate = FormActivate
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow
@@ -73,6 +74,7 @@ object frmProjectOptions: TfrmProjectOptions
     Width = 458
     Height = 265
     ActivePage = tabVersion
+    OnChange = PageControlChange
     object tabGeneral: TdevPage
       Left = 0
       Top = 23
@@ -331,18 +333,11 @@ object frmProjectOptions: TfrmProjectOptions
       TabOrder = 4
       Visible = False
       Caption = 'Files'
-      object lblProjectFiles: TLabel
-        Left = 8
-        Top = 4
-        Width = 57
-        Height = 13
-        Caption = 'Project files:'
-      end
       object lvFiles: TTreeView
         Left = 8
-        Top = 20
+        Top = 8
         Width = 200
-        Height = 210
+        Height = 222
         HideSelection = False
         Indent = 19
         MultiSelect = True
@@ -353,9 +348,9 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object grpUnitOptions: TGroupBox
         Left = 216
-        Top = 16
+        Top = 8
         Width = 229
-        Height = 216
+        Height = 224
         Caption = 'Unit Options'
         TabOrder = 1
         object lblPriority: TLabel
@@ -394,10 +389,10 @@ object frmProjectOptions: TfrmProjectOptions
           OnClick = chkCompileClick
         end
         object txtOverrideBuildCmd: TMemo
-          Left = 28
+          Left = 8
           Top = 122
-          Width = 189
-          Height = 81
+          Width = 209
+          Height = 95
           Lines.Strings = (
             'txtOverrideBuildCmd')
           ScrollBars = ssBoth
@@ -493,7 +488,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 373
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 1
       end
     end
@@ -1293,7 +1288,7 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Version Info'
       object chkVersionInfo: TCheckBox
         Left = 12
-        Top = 16
+        Top = 8
         Width = 433
         Height = 17
         Caption = 'Include version info in project'
@@ -1302,9 +1297,9 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object grpVersion: TGroupBox
         Left = 8
-        Top = 40
+        Top = 27
         Width = 437
-        Height = 189
+        Height = 202
         Caption = 'Version details'
         TabOrder = 1
         object lblVerMajor: TLabel
@@ -1334,13 +1329,6 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 26
           Height = 13
           Caption = 'Build:'
-        end
-        object lblVerAdditional: TLabel
-          Left = 12
-          Top = 80
-          Width = 69
-          Height = 13
-          Caption = 'Additional info:'
         end
         object lblVerLang: TLabel
           Left = 272
@@ -1395,9 +1383,9 @@ object frmProjectOptions: TfrmProjectOptions
         end
         object vleVersion: TValueListEditor
           Left = 12
-          Top = 96
+          Top = 80
           Width = 413
-          Height = 81
+          Height = 109
           DisplayOptions = [doAutoColResize, doKeyColFixed]
           FixedCols = 1
           Options = [goVertLine, goHorzLine, goColSizing, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -1455,36 +1443,6 @@ object frmProjectOptions: TfrmProjectOptions
     Filter = 'Makefile Addons (*.mak)|*.mak|All Files (*.*)|*.*'
     Left = 72
     Top = 288
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 388
-    Top = 24
   end
   object OpenLibDialog: TOpenDialog
     Filter = 

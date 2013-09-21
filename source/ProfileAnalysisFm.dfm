@@ -55,7 +55,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
       Top = 0
       Width = 633
       Height = 401
-      ActivePage = tabFlat
+      ActivePage = tabGraph
       Align = alClient
       TabOrder = 0
       OnChange = PageControl1Change
@@ -139,16 +139,16 @@ object ProfileAnalysisForm: TProfileAnalysisForm
         ImageIndex = 1
         object Splitter1: TSplitter
           Left = 0
-          Top = 244
-          Width = 633
+          Top = 233
+          Width = 625
           Height = 8
           Cursor = crVSplit
           Align = alBottom
         end
         object memGraph: TMemo
           Left = 0
-          Top = 252
-          Width = 633
+          Top = 241
+          Width = 625
           Height = 132
           Align = alBottom
           Color = clBtnFace
@@ -165,8 +165,8 @@ object ProfileAnalysisForm: TProfileAnalysisForm
         object lvGraph: TListView
           Left = 0
           Top = 0
-          Width = 633
-          Height = 244
+          Width = 625
+          Height = 233
           Align = alClient
           Columns = <
             item
@@ -206,35 +206,5 @@ object ProfileAnalysisForm: TProfileAnalysisForm
         end
       end
     end
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 136
-    Top = 56
   end
 end

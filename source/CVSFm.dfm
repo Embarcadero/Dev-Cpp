@@ -20,8 +20,8 @@ object CVSForm: TCVSForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    554
-    433)
+    546
+    422)
   PixelsPerInch = 96
   TextHeight = 13
   object devPages1: TdevPages
@@ -29,7 +29,7 @@ object CVSForm: TCVSForm
     Top = 8
     Width = 538
     Height = 382
-    ActivePage = tabFiles
+    ActivePage = tabUpdate
     Anchors = [akLeft, akTop, akRight, akBottom]
     object tabImport: TdevPage
       Left = 0
@@ -212,7 +212,7 @@ object CVSForm: TCVSForm
       object txtCOdir: TEdit
         Left = 116
         Top = 100
-        Width = 340
+        Width = 332
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         ReadOnly = True
@@ -222,7 +222,7 @@ object CVSForm: TCVSForm
       end
       object btnCOBrws: TButton
         Tag = 6
-        Left = 457
+        Left = 449
         Top = 100
         Width = 20
         Height = 21
@@ -234,7 +234,7 @@ object CVSForm: TCVSForm
       object chkCOrecurse: TCheckBox
         Left = 12
         Top = 136
-        Width = 464
+        Width = 456
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recurse into sub-directories'
@@ -332,8 +332,8 @@ object CVSForm: TCVSForm
       object memCommitMsg: TMemo
         Left = 116
         Top = 12
-        Width = 360
-        Height = 285
+        Width = 352
+        Height = 277
         Anchors = [akLeft, akTop, akRight, akBottom]
         ScrollBars = ssBoth
         TabOrder = 0
@@ -353,7 +353,6 @@ object CVSForm: TCVSForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 5
-      Visible = False
       Caption = 'Update'
       DesignSize = (
         534
@@ -361,7 +360,7 @@ object CVSForm: TCVSForm
       object chkUpdRecurse: TCheckBox
         Left = 12
         Top = 16
-        Width = 440
+        Width = 432
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recurse into sub-directories'
@@ -372,7 +371,7 @@ object CVSForm: TCVSForm
       object chkUpdResetSticky: TCheckBox
         Left = 12
         Top = 44
-        Width = 440
+        Width = 432
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Reset any sticky options'
@@ -381,7 +380,7 @@ object CVSForm: TCVSForm
       object chkUpdCreateDirs: TCheckBox
         Left = 12
         Top = 72
-        Width = 440
+        Width = 432
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Create missing directories'
@@ -392,7 +391,7 @@ object CVSForm: TCVSForm
       object chkUpdCleanCopy: TCheckBox
         Left = 12
         Top = 128
-        Width = 440
+        Width = 432
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Drop changes made locally'
@@ -401,7 +400,7 @@ object CVSForm: TCVSForm
       object grpUpdRevisions: TGroupBox
         Left = 12
         Top = 184
-        Width = 468
+        Width = 460
         Height = 113
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Other revisions:'
@@ -437,7 +436,7 @@ object CVSForm: TCVSForm
           Top = 20
           Width = 165
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 3
           Text = 'cmbBeforeDate'
         end
@@ -446,7 +445,7 @@ object CVSForm: TCVSForm
           Top = 44
           Width = 165
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 4
           Text = 'cmbRevision'
         end
@@ -454,7 +453,7 @@ object CVSForm: TCVSForm
       object chkUpdPrune: TCheckBox
         Left = 12
         Top = 100
-        Width = 440
+        Width = 432
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Remove empty directories'
@@ -483,7 +482,7 @@ object CVSForm: TCVSForm
       object chkDiffRecurse: TCheckBox
         Left = 12
         Top = 16
-        Width = 440
+        Width = 432
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recurse into sub-directories'
@@ -494,7 +493,7 @@ object CVSForm: TCVSForm
       object chkDiffUnified: TCheckBox
         Left = 12
         Top = 44
-        Width = 440
+        Width = 432
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Perform a unified diff'
@@ -503,7 +502,7 @@ object CVSForm: TCVSForm
       object grpDiff: TGroupBox
         Left = 12
         Top = 76
-        Width = 468
+        Width = 460
         Height = 157
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Diff revisions'
@@ -749,8 +748,8 @@ object CVSForm: TCVSForm
       object memAddMsg: TMemo
         Left = 116
         Top = 12
-        Width = 360
-        Height = 285
+        Width = 352
+        Height = 277
         Anchors = [akLeft, akTop, akRight, akBottom]
         ScrollBars = ssBoth
         TabOrder = 0
@@ -778,7 +777,7 @@ object CVSForm: TCVSForm
       object chkRemove: TCheckBox
         Left = 12
         Top = 16
-        Width = 440
+        Width = 432
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Remove the file from disk also...'
@@ -797,7 +796,7 @@ object CVSForm: TCVSForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 11
-	  Visible = False
+      Visible = False
       Caption = 'Files'
       DesignSize = (
         534
@@ -840,7 +839,7 @@ object CVSForm: TCVSForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 1
-	  Visible = False
+      Visible = False
       Caption = 'Repository'
       DesignSize = (
         534
@@ -1014,7 +1013,7 @@ object CVSForm: TCVSForm
       object chkUseSSH: TCheckBox
         Left = 12
         Top = 44
-        Width = 464
+        Width = 456
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Use SSH instead of RSH'
@@ -1083,35 +1082,5 @@ object CVSForm: TCVSForm
     Caption = 'Cancel'
     TabOrder = 2
     OnClick = btnCancelClick
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 168
-    Top = 288
   end
 end

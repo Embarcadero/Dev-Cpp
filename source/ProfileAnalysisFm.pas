@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, XPMenu;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -45,7 +45,6 @@ type
     Splitter1: TSplitter;
     memGraph: TMemo;
     lvGraph: TListView;
-    XPMenu: TXPMenu;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnCloseClick(Sender: TObject);
@@ -299,10 +298,6 @@ end;
 
 procedure TProfileAnalysisForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := Lang[ID_PROF_CAPTION];
   tabFlat.Caption := Lang[ID_PROF_TABFLAT];
   tabGraph.Caption := Lang[ID_PROF_TABGRAPH];

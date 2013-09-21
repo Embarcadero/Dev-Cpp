@@ -770,16 +770,16 @@ begin
   if not assigned(fText) then exit;
   pt:= fText.CaretXY;
   tmp:= TStringList.Create;
-  try // move cursor to pipe '|'
+  try // move cursor to pipe '|', don't do that, might be used by code, use *|* instead
    tmp.Text:= Value;
    if Move then
     for idx:= 0 to pred(tmp.Count) do
      begin
        Line:= tmp[idx];
-       idx2:= AnsiPos('|', Line);
+       idx2:= AnsiPos('*|*', Line);
        if idx2> 0 then
         begin
-          delete(Line, idx2, 1);
+          delete(Line, idx2, 3);
           tmp[idx]:= Line;
 
           inc(pt.Line, idx);
@@ -792,6 +792,7 @@ begin
         end;
      end;
    Line:= tmp.Text;
+   Delete(Line,Length(Line)-1,2);
    fText.SelText:= Line;
    fText.CaretXY:= pt;
    fText.EnsureCursorPosVisible;

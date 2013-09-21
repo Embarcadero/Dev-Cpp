@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 1057
-  Top = 408
-  Width = 587
-  Height = 587
+  Left = 324
+  Top = 184
+  Width = 759
+  Height = 685
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -23,19 +23,19 @@ object MainForm: TMainForm
   PixelsPerInch = 96
   TextHeight = 13
   object SplitterLeft: TSplitter
-    Left = 169
-    Top = 100
-    Width = 4
-    Height = 293
+    Left = 193
+    Top = 72
+    Width = 2
+    Height = 422
     AutoSnap = False
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 393
-    Width = 571
-    Height = 4
+    Top = 494
+    Width = 743
+    Height = 2
     Cursor = crVSplit
     Align = alBottom
     OnCanResize = SplitterBottomCanResize
@@ -43,13 +43,13 @@ object MainForm: TMainForm
   end
   object MessageControl: TPageControl
     Left = 0
-    Top = 397
-    Width = 571
-    Height = 113
-    ActivePage = FindSheet
+    Top = 496
+    Width = 743
+    Height = 112
+    ActivePage = DebugSheet
     Align = alBottom
     Constraints.MinHeight = 1
-    Images = dmMain.MenuImages_Gnome
+    Images = dmMain.MenuImages_NewLook
     MultiLine = True
     PopupMenu = MessagePopup
     TabOrder = 0
@@ -63,11 +63,10 @@ object MainForm: TMainForm
       object CompilerOutput: TListView
         Left = 0
         Top = 0
-        Width = 559
-        Height = 80
+        Width = 731
+        Height = 79
         Align = alClient
         BevelOuter = bvRaised
-        BevelKind = bkSoft
         BorderStyle = bsNone
         Columns = <
           item
@@ -106,8 +105,8 @@ object MainForm: TMainForm
       object ResourceOutput: TListBox
         Left = 0
         Top = 0
-        Width = 559
-        Height = 80
+        Width = 731
+        Height = 79
         Align = alClient
         BevelKind = bkSoft
         BorderStyle = bsNone
@@ -124,8 +123,8 @@ object MainForm: TMainForm
       object InfoGroupBox: TGroupBox
         Left = 0
         Top = 0
-        Width = 225
-        Height = 80
+        Width = 257
+        Height = 79
         Align = alLeft
         Caption = 'Information :'
         TabOrder = 0
@@ -146,7 +145,7 @@ object MainForm: TMainForm
         object btnAbortCompilation: TSpeedButton
           Left = 8
           Top = 64
-          Width = 209
+          Width = 241
           Height = 20
           Action = actAbortCompilation
           Flat = True
@@ -160,7 +159,7 @@ object MainForm: TMainForm
         object SizeFile: TEdit
           Left = 96
           Top = 40
-          Width = 121
+          Width = 153
           Height = 21
           ReadOnly = True
           TabOrder = 1
@@ -169,7 +168,7 @@ object MainForm: TMainForm
         object TotalErrors: TEdit
           Left = 96
           Top = 16
-          Width = 121
+          Width = 153
           Height = 21
           ReadOnly = True
           TabOrder = 0
@@ -177,23 +176,25 @@ object MainForm: TMainForm
         end
       end
       object CompResGroupBox: TGroupBox
-        Left = 225
+        Left = 257
         Top = 0
-        Width = 334
-        Height = 80
+        Width = 474
+        Height = 79
         Align = alClient
         Caption = 'Compile log :'
+        Ctl3D = True
+        ParentCtl3D = False
         TabOrder = 1
         DesignSize = (
-          334
-          80)
+          474
+          79)
         object LogOutput: TMemo
           Left = 7
           Top = 16
-          Width = 1477
-          Height = 70
+          Width = 460
+          Height = 54
           Anchors = [akLeft, akTop, akRight, akBottom]
-          BevelInner = bvNone
+          BevelInner = bvSpace
           BevelKind = bkTile
           BorderStyle = bsNone
           ReadOnly = True
@@ -209,9 +210,9 @@ object MainForm: TMainForm
       object DebugSubPages: TPageControl
         Left = 0
         Top = 0
-        Width = 559
-        Height = 80
-        ActivePage = tabDebugOutput
+        Width = 731
+        Height = 79
+        ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -222,7 +223,7 @@ object MainForm: TMainForm
             Left = 468
             Top = 0
             Width = 156
-            Height = 50
+            Height = 48
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 0
@@ -301,7 +302,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 156
-            Height = 50
+            Height = 48
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 1
@@ -396,7 +397,7 @@ object MainForm: TMainForm
             Left = 156
             Top = 0
             Width = 156
-            Height = 50
+            Height = 48
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 2
@@ -491,7 +492,7 @@ object MainForm: TMainForm
             Left = 312
             Top = 0
             Width = 156
-            Height = 50
+            Height = 48
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 3
@@ -589,8 +590,8 @@ object MainForm: TMainForm
           object lvBacktrace: TListView
             Left = 0
             Top = 0
-            Width = 551
-            Height = 49
+            Width = 723
+            Height = 48
             Align = alClient
             Columns = <
               item
@@ -623,8 +624,8 @@ object MainForm: TMainForm
           object DebugOutput: TMemo
             Left = 0
             Top = 22
-            Width = 551
-            Height = 27
+            Width = 723
+            Height = 26
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -635,7 +636,7 @@ object MainForm: TMainForm
           object GdbOutputPanel: TPanel
             Left = 0
             Top = 0
-            Width = 551
+            Width = 723
             Height = 22
             Align = alTop
             BevelOuter = bvNone
@@ -675,11 +676,10 @@ object MainForm: TMainForm
       object FindOutput: TListView
         Left = 0
         Top = 0
-        Width = 559
-        Height = 80
+        Width = 731
+        Height = 79
         Align = alClient
-        BevelOuter = bvRaised
-        BevelKind = bkSoft
+        BevelOuter = bvNone
         BorderStyle = bsNone
         Columns = <
           item
@@ -696,7 +696,7 @@ object MainForm: TMainForm
           end
           item
             Caption = 'Message'
-            Width = 450
+            Width = 480
           end>
         ColumnClick = False
         Font.Charset = DEFAULT_CHARSET
@@ -725,8 +725,8 @@ object MainForm: TMainForm
   object ControlBar1: TControlBar
     Left = 0
     Top = 16
-    Width = 571
-    Height = 84
+    Width = 743
+    Height = 56
     Align = alTop
     AutoDock = False
     AutoSize = True
@@ -747,7 +747,7 @@ object MainForm: TMainForm
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
-      Images = dmMain.MenuImages_Gnome
+      Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
@@ -805,8 +805,8 @@ object MainForm: TMainForm
       end
     end
     object tbCompile: TToolBar
-      Left = 11
-      Top = 30
+      Left = 466
+      Top = 2
       Width = 119
       Height = 22
       AutoSize = True
@@ -816,7 +816,7 @@ object MainForm: TMainForm
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
-      Images = dmMain.MenuImages_Gnome
+      Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
@@ -848,8 +848,8 @@ object MainForm: TMainForm
       end
     end
     object tbOptions: TToolBar
-      Left = 143
-      Top = 30
+      Left = 598
+      Top = 2
       Width = 46
       Height = 22
       AutoSize = True
@@ -859,7 +859,7 @@ object MainForm: TMainForm
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
-      Images = dmMain.MenuImages_Gnome
+      Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
       TabOrder = 2
@@ -888,7 +888,7 @@ object MainForm: TMainForm
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
-      Images = dmMain.MenuImages_Gnome
+      Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
       TabOrder = 3
@@ -929,7 +929,7 @@ object MainForm: TMainForm
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
-      Images = dmMain.MenuImages_Gnome
+      Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
       TabOrder = 4
@@ -957,7 +957,7 @@ object MainForm: TMainForm
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
-      Images = dmMain.MenuImages_Gnome
+      Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
       TabOrder = 5
@@ -992,7 +992,7 @@ object MainForm: TMainForm
       end
     end
     object tbSpecials: TToolBar
-      Left = 202
+      Left = 11
       Top = 30
       Width = 243
       Height = 22
@@ -1004,7 +1004,7 @@ object MainForm: TMainForm
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
-      Images = dmMain.SpecialImages_Gnome
+      Images = dmMain.SpecialImages_NewLook
       List = True
       ShowCaptions = True
       TabOrder = 6
@@ -1039,9 +1039,9 @@ object MainForm: TMainForm
       end
     end
     object tbClasses: TToolBar
-      Left = 11
-      Top = 58
-      Width = 466
+      Left = 267
+      Top = 30
+      Width = 452
       Height = 22
       AutoSize = True
       Caption = 'tbClasses'
@@ -1071,7 +1071,7 @@ object MainForm: TMainForm
       object cmbMembers: TComboBox
         Left = 232
         Top = 0
-        Width = 232
+        Width = 219
         Height = 22
         Style = csDropDownList
         DropDownCount = 16
@@ -1090,8 +1090,8 @@ object MainForm: TMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 510
-    Width = 571
+    Top = 608
+    Width = 743
     Height = 19
     Panels = <
       item
@@ -1110,10 +1110,10 @@ object MainForm: TMainForm
     UseSystemFont = False
   end
   object PageControl: TPageControl
-    Left = 173
-    Top = 100
-    Width = 398
-    Height = 293
+    Left = 195
+    Top = 72
+    Width = 548
+    Height = 422
     Align = alClient
     PopupMenu = EditorPopupMenu
     TabOrder = 3
@@ -1126,23 +1126,23 @@ object MainForm: TMainForm
   object pnlFull: TPanel
     Left = 0
     Top = 0
-    Width = 571
+    Width = 743
     Height = 16
     Align = alTop
     BevelOuter = bvNone
     Caption = 
       'Dev-C++ version 5.0 full screen press shift+F12 to toggle Toolba' +
-      'rs or F12 to go to normal mode.'
+      'rs.'
     TabOrder = 4
     Visible = False
     DesignSize = (
-      571
+      743
       16)
     object btnFullScrRevert: TSpeedButton
-      Left = 568
+      Left = 726
       Top = 0
-      Width = 14
-      Height = 14
+      Width = 16
+      Height = 16
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -1171,9 +1171,9 @@ object MainForm: TMainForm
   end
   object LeftPageControl: TPageControl
     Left = 0
-    Top = 100
-    Width = 169
-    Height = 293
+    Top = 72
+    Width = 193
+    Height = 422
     ActivePage = DebugLeftSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
@@ -1184,10 +1184,13 @@ object MainForm: TMainForm
       object ProjectView: TTreeView
         Left = 0
         Top = 0
-        Width = 161
-        Height = 265
+        Width = 185
+        Height = 393
         Align = alClient
-        ChangeDelay = 1
+        Anchors = [akLeft, akTop, akBottom]
+        BevelInner = bvNone
+        BevelOuter = bvNone
+        BorderStyle = bsNone
         DragMode = dmAutomatic
         HideSelection = False
         HotTrack = True
@@ -1216,14 +1219,15 @@ object MainForm: TMainForm
       object ClassBrowser1: TClassBrowser
         Left = 0
         Top = 0
-        Width = 161
-        Height = 265
+        Width = 185
+        Height = 393
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
         Indent = 19
         TabOrder = 0
         PopupMenu = BrowserPopup
+        BorderStyle = bsNone
         ShowFilter = sfAll
         OnSelect = ClassBrowser1Select
         Parser = CppParser1
@@ -1251,9 +1255,13 @@ object MainForm: TMainForm
       object DebugTree: TTreeView
         Left = 0
         Top = 0
-        Width = 161
-        Height = 265
+        Width = 185
+        Height = 393
         Align = alClient
+        BevelInner = bvNone
+        BevelOuter = bvNone
+        BorderStyle = bsNone
+        ChangeDelay = 1
         Images = dmMain.MenuImages_NewLook
         Indent = 19
         MultiSelectStyle = []
@@ -1267,7 +1275,7 @@ object MainForm: TMainForm
   end
   object MainMenu: TMainMenu
     Images = dmMain.MenuImages_Gnome
-    Left = 350
+    Left = 294
     Top = 79
     object FileMenu: TMenuItem
       Action = actFileMenu
@@ -1413,6 +1421,9 @@ object MainForm: TMainForm
       object PasteItem: TMenuItem
         Action = actPaste
       end
+      object SelectallItem: TMenuItem
+        Action = actSelectAll
+      end
       object N23: TMenuItem
         Caption = '-'
       end
@@ -1432,6 +1443,9 @@ object MainForm: TMainForm
           Caption = '&Comment header'
           OnClick = CommentheaderMenuItemClick
         end
+        object N999: TMenuItem
+          Caption = '-'
+        end
       end
       object ToggleBookmarksItem: TMenuItem
         Caption = 'Toggle &Bookmarks'
@@ -1440,13 +1454,6 @@ object MainForm: TMainForm
       object GotoBookmarksItem: TMenuItem
         Caption = '&Goto Bookmarks'
         ImageIndex = 20
-      end
-      object N5: TMenuItem
-        Caption = '-'
-        Enabled = False
-      end
-      object SelectallItem: TMenuItem
-        Action = actSelectAll
       end
       object N26: TMenuItem
         Caption = '-'
@@ -1920,6 +1927,7 @@ object MainForm: TMainForm
       end
       object HelpSep2: TMenuItem
         Caption = '-'
+        Enabled = False
       end
       object Customize1: TMenuItem
         Action = actHelpCustomize
@@ -1934,8 +1942,8 @@ object MainForm: TMainForm
     end
   end
   object EditorPopupMenu: TPopupMenu
-    Left = 275
-    Top = 172
+    Left = 403
+    Top = 212
     object Close1: TMenuItem
       Action = actClose
     end
@@ -1992,45 +2000,6 @@ object MainForm: TMainForm
       end
       object MenuItem3: TMenuItem
         Caption = '-'
-      end
-      object MainfunctionPopItem: TMenuItem
-        Caption = 'Main function'
-      end
-      object WinMainfunctionPopItem: TMenuItem
-        Caption = 'WinMain function'
-      end
-      object MenuItem4: TMenuItem
-        Caption = '-'
-      end
-      object ifdefPopItem: TMenuItem
-        Caption = '#ifdef'
-      end
-      object ifndefPopItem: TMenuItem
-        Caption = '#ifndef'
-      end
-      object includePopItem: TMenuItem
-        Caption = '#include'
-      end
-      object MenuItem5: TMenuItem
-        Caption = '-'
-      end
-      object ifPopItem: TMenuItem
-        Caption = 'if ()'
-      end
-      object whilePopItem: TMenuItem
-        Caption = 'while ()'
-      end
-      object dowhilePopItem: TMenuItem
-        Caption = 'do..while ()'
-      end
-      object forPopItem: TMenuItem
-        Caption = 'for ()'
-      end
-      object MenuItem6: TMenuItem
-        Caption = '-'
-      end
-      object MessageBoxPopItem: TMenuItem
-        Caption = 'MessageBox'
       end
     end
     object TogglebookmarksPopItem: TMenuItem
@@ -2096,13 +2065,15 @@ object MainForm: TMainForm
   end
   object UnitPopup: TPopupMenu
     MenuAnimation = [maBottomToTop]
-    Left = 275
-    Top = 127
+    Left = 11
+    Top = 135
     object RemoveFilefromprojectPopItem: TMenuItem
       Action = actUnitRemove
+      ShortCut = 46
     end
     object RenamefilePopItem: TMenuItem
       Action = actUnitRename
+      ShortCut = 113
     end
     object N30: TMenuItem
       Caption = '-'
@@ -2183,8 +2154,8 @@ object MainForm: TMainForm
   end
   object ProjectPopup: TPopupMenu
     MenuAnimation = [maBottomToTop]
-    Left = 275
-    Top = 83
+    Left = 11
+    Top = 99
     object NewunitinprojectPopItem: TMenuItem
       Tag = 2
       Action = actProjectNew
@@ -2236,21 +2207,10 @@ object MainForm: TMainForm
       end
     end
   end
-  object HelpPop: TPopupMenu
-    Left = 350
-    Top = 124
-    object HelponDevPopupItem: TMenuItem
-      Caption = '&Help on Dev-C++'
-      OnClick = HelpMenuItemClick
-    end
-    object N64: TMenuItem
-      Caption = '-'
-    end
-  end
   object alMain: TActionList
     Images = dmMain.MenuImages_Gnome
-    Left = 192
-    Top = 84
+    Left = 624
+    Top = 164
     object actViewCPU: TAction
       Category = 'Debug'
       Caption = '&View CPU Window'
@@ -2748,19 +2708,9 @@ object MainForm: TMainForm
       OnExecute = actUnitCloseExecute
       OnUpdate = actUpdateProject
     end
-    object actMsgCopy: TAction
-      Category = 'MessageControl'
-      Caption = '&Copy'
-      OnExecute = actMsgCopyExecute
-    end
-    object actMsgClear: TAction
-      Category = 'MessageControl'
-      Caption = 'C&lear'
-      OnExecute = actMsgClearExecute
-    end
     object actShowBars: TAction
       Caption = 'Show Toolbars'
-      ShortCut = 8315
+      ShortCut = 122
       OnExecute = actShowBarsExecute
     end
     object actBreakPoint: TAction
@@ -2817,7 +2767,7 @@ object MainForm: TMainForm
       Caption = 'Stop Execution'
       ImageIndex = 11
       ShortCut = 32881
-      OnExecute = actStopExecuteExecute
+      OnExecute = actForceStopExecuteExecute
       OnUpdate = actUpdateDebuggerRunning
     end
     object actFileMenu: TAction
@@ -2902,14 +2852,14 @@ object MainForm: TMainForm
     object actIndent: TAction
       Category = 'Edit'
       Caption = 'Indent'
-      ShortCut = 24649
+      ShortCut = 9
       OnExecute = actIndentExecute
       OnUpdate = actUpdateEmptyEditor
     end
     object actUnindent: TAction
       Category = 'Edit'
       Caption = 'Unindent'
-      ShortCut = 24661
+      ShortCut = 8201
       OnExecute = actUnindentExecute
       OnUpdate = actUpdateEmptyEditor
     end
@@ -3157,27 +3107,38 @@ object MainForm: TMainForm
   object ApplicationEvents1: TApplicationEvents
     OnDeactivate = ApplicationEvents1Deactivate
     OnIdle = ApplicationEvents1Idle
-    Left = 194
-    Top = 130
+    Left = 626
+    Top = 202
   end
   object MessagePopup: TPopupMenu
     OnPopup = MessagePopupPopup
-    Left = 275
-    Top = 219
+    Left = 203
+    Top = 387
     object MsgCopyItem: TMenuItem
-      Action = actMsgCopy
+      Caption = '&Copy'
+      ShortCut = 16451
+      OnClick = actMsgCopyExecute
     end
-    object MsgClearitem: TMenuItem
-      Action = actMsgClear
+    object MsgCopyAllItem: TMenuItem
+      Caption = 'Copy &All'
+      ShortCut = 24643
+      OnClick = actMsgCopyAllExecute
     end
-    object N15: TMenuItem
-      Caption = '-'
+    object MsgSaveAllItem: TMenuItem
+      Caption = 'Save All'
+      ShortCut = 16467
+      OnClick = actMsgSaveAllExecute
+    end
+    object MsgClearItem: TMenuItem
+      Caption = 'C&lear'
+      ShortCut = 46
+      OnClick = actMsgClearExecute
     end
   end
   object CppTokenizer1: TCppTokenizer
     LogTokens = False
-    Left = 12
-    Top = 124
+    Left = 60
+    Top = 132
   end
   object CppParser1: TCppParser
     Enabled = True
@@ -3188,8 +3149,8 @@ object MainForm: TMainForm
     LogStatements = False
     OnStartParsing = CppParser1StartParsing
     OnEndParsing = CppParser1EndParsing
-    Left = 44
-    Top = 124
+    Left = 60
+    Top = 196
   end
   object CodeCompletion1: TCodeCompletion
     Parser = CppParser1
@@ -3205,8 +3166,8 @@ object MainForm: TMainForm
     OnResize = CodeCompletion1Resize
     OnlyGlobals = False
     CurrentClass = 0
-    Left = 76
-    Top = 124
+    Left = 60
+    Top = 164
   end
   object devShortcuts1: TdevShortcuts
     Filename = 'devshortcuts.cfg'
@@ -3218,12 +3179,12 @@ object MainForm: TMainForm
     MultiLangStrings.HeaderShortcut = 'Shortcut assigned'
     MultiLangStrings.OK = 'OK'
     MultiLangStrings.Cancel = 'Cancel'
-    Left = 76
-    Top = 160
+    Left = 628
+    Top = 280
   end
   object BrowserPopup: TPopupMenu
-    Left = 112
-    Top = 132
+    Left = 56
+    Top = 100
     object mnuBrowserGotoDecl: TMenuItem
       Action = actBrowserGotoDecl
     end
@@ -3287,8 +3248,8 @@ object MainForm: TMainForm
   end
   object DebugVarsPopup: TPopupMenu
     OnPopup = DebugVarsPopupPopup
-    Left = 352
-    Top = 172
+    Left = 104
+    Top = 100
     object AddwatchPop: TMenuItem
       Action = actAddWatch
     end
@@ -3308,37 +3269,18 @@ object MainForm: TMainForm
   end
   object DevCppDDEServer: TDdeServerConv
     OnExecuteMacro = DevCppDDEServerExecuteMacro
-    Left = 588
-    Top = 80
+    Left = 628
+    Top = 240
   end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 200
-    Top = 184
+  object HelpPop: TPopupMenu
+    Left = 422
+    Top = 84
+    object HelponDevPopupItem: TMenuItem
+      Caption = '&Help on Dev-C++'
+      OnClick = HelpMenuItemClick
+    end
+    object N64: TMenuItem
+      Caption = '-'
+    end
   end
 end

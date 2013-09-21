@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, XPMenu;
+  Dialogs, StdCtrls, Buttons;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -60,7 +60,6 @@ type
     cmbComment: TComboBox;
     Label9: TLabel;
     txtArgs: TEdit;
-    XPMenu: TXPMenu;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure chkInheritClick(Sender: TObject);
@@ -359,10 +358,6 @@ end;
 
 procedure TNewClassForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := Lang[ID_POP_NEWCLASS];
   Label1.Caption := Lang[ID_NEWCLASS_NAME];
   Label9.Caption := Lang[ID_NEWMEMB_ARGS];

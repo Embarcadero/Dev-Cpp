@@ -28,7 +28,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
-  devTabs, prjtypes, XPMenu, Spin, Grids, ValEdit, CompilerOptionsFrame;
+  devTabs, prjtypes, Spin, Grids, ValEdit, CompilerOptionsFrame;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -86,10 +86,8 @@ type
     InfoMakeBtn: TSpeedButton;
     edOverridenOutput: TEdit;
     chkOverrideOutput: TCheckBox;
-    XPMenu: TXPMenu;
     tabFiles: TdevPage;
     lvFiles: TTreeView;
-    lblProjectFiles: TLabel;
     grpUnitOptions: TGroupBox;
     chkCompile: TCheckBox;
     chkCompileCpp: TCheckBox;
@@ -100,7 +98,6 @@ type
     lblVerMinor: TLabel;
     lblVerRel: TLabel;
     lblVerBuild: TLabel;
-    lblVerAdditional: TLabel;
     lblVerLang: TLabel;
     spnMajor: TSpinEdit;
     spnMinor: TSpinEdit;
@@ -182,6 +179,8 @@ type
     procedure cbUseCustomMakefileClick(Sender: TObject);
     procedure MakeIncludesDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
     procedure SetFileVersion(Sender: TObject);
+    procedure PageControlChange(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
     fOptions: TProjOptions;
     fIcon: string;
@@ -194,6 +193,7 @@ type
     procedure InitVersionInfo;
     function DefaultBuildCommand(idx: integer): string;
     procedure SaveDirSettings;
+    procedure StyleFix;
   public
     property Options: TProjOptions read GetOptions write SetOptions;
     property Project: TProject read fProject write fProject;
@@ -568,7 +568,6 @@ end;
 procedure TfrmProjectOptions.FormShow(Sender: TObject);
 begin
   PageControl.ActivePageIndex:= 0;
-  //CompPages.ActivePageIndex:= 0;
   SubTabs.TabIndex:= 0;
   lvFiles.Images:=MainForm.ProjectView.Images;
   lvFiles.Items.Assign(MainForm.ProjectView.Items);
@@ -585,6 +584,29 @@ begin
   CompOptionsFrame1.FillOptions(fProject);
   SubTabsChange(Self);
   UpdateMakButtons();
+end;
+
+procedure TfrmProjectOptions.StyleFix;
+begin
+	lblPrjName.Refresh;
+    lblFname.Refresh;
+    lblPrjOutput.Refresh;
+    lblUnits.Refresh;
+    lblPrjFname.Refresh;
+    lblPrjOutPutFname.Refresh;
+    lblPrjUnits.Refresh;
+
+    lblCompileInfo.Refresh;
+    lblCompilerSet.Refresh;
+
+    lblAdditions.Refresh;
+    lblCompiler.Refresh;
+    lblCppCompiler.Refresh;
+    lblLinker.Refresh;
+
+    btnUp.Refresh;
+    btnDown.Refresh;
+    btnBrowse.Refresh;
 end;
 
 procedure TfrmProjectOptions.btnIconLibClick(Sender: TObject);
@@ -626,10 +648,6 @@ end;
 
 procedure TfrmProjectOptions.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:= Lang[ID_POPT];
   //tabs
   tabGeneral.Caption:=   Lang[ID_POPT_GENTAB];
@@ -700,7 +718,6 @@ begin
 
   // files tab
   tabFiles.Caption:=           Lang[ID_POPT_FILESTAB];
-  lblProjectFiles.Caption:=    Lang[ID_POPT_PROJFILES];
   lblCompilerSet.Caption:=     Lang[ID_POPT_COMP];
   lblCompileInfo.Caption:=     Lang[ID_POPT_COMPINFO];
   grpUnitOptions.Caption:=     '  '+Lang[ID_POPT_UNITOPTS]+'  ';
@@ -719,7 +736,6 @@ begin
   lblVerRel.Caption:=          Lang[ID_POPT_VRELEASE];
   lblVerBuild.Caption:=        Lang[ID_POPT_VBUILD];
   lblVerLang.Caption:=         Lang[ID_POPT_VLANG];
-  lblVerAdditional.Caption:=   Lang[ID_POPT_VADDITIONAL];
   chkAutoIncBuild.Caption:=    Lang[ID_POPT_VAUTOINCBUILDNR];
   chkSyncProduct.Caption:=     Lang[ID_POPT_SYNCPRODUCT];
 end;
@@ -1187,6 +1203,16 @@ procedure TfrmProjectOptions.MakeIncludesDrawItem(Control: TWinControl;
 begin
   btnMakUp.Enabled := MakeIncludes.Items.Count > 0;
   btnMakDown.Enabled := MakeIncludes.Items.Count > 0;
+end;
+
+procedure TfrmProjectOptions.PageControlChange(Sender: TObject);
+begin
+	StyleFix;
+end;
+
+procedure TfrmProjectOptions.FormActivate(Sender: TObject);
+begin
+	StyleFix;
 end;
 
 end.

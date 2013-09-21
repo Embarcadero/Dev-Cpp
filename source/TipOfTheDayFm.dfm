@@ -115,7 +115,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     object lblTitle: TLabel
       Left = 52
       Top = 28
-      Width = 117
+      Width = 116
       Height = 19
       Caption = 'Did you know...'
       Font.Charset = DEFAULT_CHARSET
@@ -193,35 +193,5 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Height = 16
     Caption = 'Don'#39't display tips on startup'
     TabOrder = 3
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 136
-    Top = 56
   end
 end

@@ -25,7 +25,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, devTabs, ExtCtrls, Buttons, ComCtrls,
-  project, ImgList, ExtDlgs, IniFiles, XPMenu;
+  project, ImgList, ExtDlgs, IniFiles;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -61,7 +61,6 @@ type
     btnBrowse: TBitBtn;
     btnRemove: TBitBtn;
     cmbName: TComboBox;
-    XPMenu: TXPMenu;
     memCppCompiler: TMemo;
     lblCppCompiler: TLabel;
     cbInclude: TCheckBox;
@@ -362,10 +361,6 @@ end;
 
 procedure TNewTemplateForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   with Lang do begin
     lblName.Caption := Strings[ID_NEWTPL_NAME];
     lblDescr.Caption := Strings[ID_NEWTPL_DESCRIPTION];

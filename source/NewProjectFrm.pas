@@ -26,7 +26,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, ImgList, Buttons, ComCtrls, Templates, Inifiles,
-  devTabs, XPMenu;
+  devTabs;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -39,7 +39,7 @@ type
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     ImageList1: TImageList;
-    Panel1: TPanel;
+    grpPrjOpts: TGroupBox;
     rbC: TRadioButton;
     rbCpp: TRadioButton;
     cbDefault: TCheckBox;
@@ -51,10 +51,7 @@ type
     pnlDesc: TPanel;
     lblDesc: TLabel;
     TemplateLabel: TLabel;
-    Bevel1: TBevel;
-    Label2: TLabel;
     btnHelp: TBitBtn;
-    XPMenu: TXPMenu;
     procedure ProjViewChange(Sender: TObject; Item: TListItem;Change: TItemChange);
     procedure FormCreate(Sender: TObject);
     procedure LoadText;
@@ -178,18 +175,14 @@ end;
 
 procedure TNewProjectForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption :=              Lang[ID_NP];
   lblDesc.Caption :=      Lang[ID_NP_DESC];
   lblPrjName.Caption:=    Lang[ID_NP_PRJNAME];
   rbC.Caption :=          Lang[ID_NP_DEFAULTC];
   rbCpp.Caption :=        Lang[ID_NP_DEFAULTCPP];
   cbDefault.Caption :=    Lang[ID_NP_MAKEDEFAULT];
-  Label2.Caption :=       '  '+Lang[ID_NP_PRJOPTIONS]+'  ';
 
+  grpPrjOpts.Caption :=   '  '+Lang[ID_NP_PRJOPTIONS]+'  ';
   btnOk.Caption :=        Lang[ID_BTN_OK];
   btnCancel.Caption :=    Lang[ID_BTN_CANCEL];
   btnHelp.Caption:=       Lang[ID_BTN_HELP];

@@ -1,8 +1,8 @@
 object IconForm: TIconForm
   Left = 251
   Top = 52
-  Width = 343
-  Height = 342
+  Width = 456
+  Height = 394
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
   Caption = 'Icon library'
@@ -18,14 +18,14 @@ object IconForm: TIconForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    335
-    315)
+    440
+    356)
   PixelsPerInch = 96
   TextHeight = 13
   object btnOk: TBitBtn
-    Left = 40
-    Top = 284
-    Width = 193
+    Left = 192
+    Top = 328
+    Width = 153
     Height = 24
     Anchors = [akLeft, akBottom]
     Caption = '&Use selected icon'
@@ -34,8 +34,8 @@ object IconForm: TIconForm
     Kind = bkOK
   end
   object btnCancel: TBitBtn
-    Left = 240
-    Top = 284
+    Left = 344
+    Top = 328
     Width = 87
     Height = 24
     Anchors = [akLeft, akBottom]
@@ -46,8 +46,8 @@ object IconForm: TIconForm
   object IconView: TListView
     Left = 8
     Top = 8
-    Width = 318
-    Height = 266
+    Width = 425
+    Height = 297
     Anchors = [akLeft, akTop, akRight, akBottom]
     BevelInner = bvLowered
     BevelKind = bkSoft
@@ -2738,35 +2738,5 @@ object IconForm: TIconForm
     Title = 'Open icon'
     Left = 289
     Top = 183
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 136
-    Top = 56
   end
 end

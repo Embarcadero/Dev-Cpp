@@ -1,6 +1,6 @@
 object frmShortcutsEditor: TfrmShortcutsEditor
-  Left = 192
-  Top = 107
+  Left = 1286
+  Top = 69
   BorderStyle = bsDialog
   Caption = 'Configure Shortcuts'
   ClientHeight = 362
@@ -23,9 +23,9 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     Align = alTop
     AutoSize = False
     Caption = ' Click on an item and press the shortcut you desire!'
-    Color = clGray
+    Color = clWindow
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clCream
+    Font.Color = clBlack
     Font.Height = -13
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsBold]
@@ -38,11 +38,13 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     Width = 192
     Height = 13
     Caption = 'Tip: press "Escape" to clear a shortcut...'
+    Color = clBlack
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clSilver
+    Font.Color = clBlack
     Font.Height = -11
     Font.Name = 'MS Sans Serif'
     Font.Style = []
+    ParentColor = False
     ParentFont = False
     Transparent = True
   end
@@ -61,7 +63,7 @@ object frmShortcutsEditor: TfrmShortcutsEditor
       end
       item
         Caption = 'Shortcut assigned'
-        Width = 106
+        Width = 108
       end>
     ColumnClick = False
     ReadOnly = True
@@ -70,6 +72,7 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     ViewStyle = vsReport
     OnCustomDrawItem = lvShortcutsCustomDrawItem
     OnCustomDrawSubItem = lvShortcutsCustomDrawSubItem
+    OnExit = lvShortcutsExit
     OnKeyDown = lvShortcutsKeyDown
   end
   object Panel1: TPanel

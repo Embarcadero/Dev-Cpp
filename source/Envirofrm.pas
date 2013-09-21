@@ -26,7 +26,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, ExtCtrls, devTabs, ExtDlgs, Buttons, DevThemes,
-  CheckLst, XPMenu, Grids, ValEdit;
+  CheckLst, Grids, ValEdit;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -36,74 +36,71 @@ uses
 
 type
   TEnviroForm = class(TForm)
-    PagesMain: TdevPages;
-    tabGeneral: TdevPage;
-    tabPaths: TdevPage;
-    cbBackups: TCheckBox;
-    cbMinOnRun: TCheckBox;
-    cbDefCpp: TCheckBox;
-    cbShowBars: TCheckBox;
-    lblUserDir: TLabel;
-    edUserDir: TEdit;
-    lblTemplatesDir: TLabel;
-    edTemplatesDir: TEdit;
-    lblSplash: TLabel;
-    edSplash: TEdit;
-    lblIcoLib: TLabel;
-    edIcoLib: TEdit;
     dlgPic: TOpenPictureDialog;
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     btnHelp: TBitBtn;
+    PagesMain: TdevPages;
+    tabGeneral: TdevPage;
+    lblMRU: TLabel;
+    lblMsgTabs: TLabel;
+    lblLang: TLabel;
+    lblTheme: TLabel;
+    cbBackups: TCheckBox;
+    cbMinOnRun: TCheckBox;
+    cbDefCpp: TCheckBox;
+    cbShowBars: TCheckBox;
     cbShowMenu: TCheckBox;
     rgbAutoOpen: TRadioGroup;
     cbdblFiles: TCheckBox;
-    lblLangPath: TLabel;
-    edLang: TEdit;
-    tabInterface: TdevPage;
-    lblLang: TLabel;
-    cboLang: TComboBox;
-    lblTheme: TLabel;
-    cboTheme: TComboBox;
-    lblmsgTabs: TLabel;
-    cboTabsTop: TComboBox;
-    lblMRU: TLabel;
-    seMRUMax: TSpinEdit;
-    rgbOpenStyle: TRadioGroup;
-    cbNoSplashScreen: TCheckBox;
-    tabAssocs: TdevPage;
-    lblAssocFileTypes: TLabel;
-    lstAssocFileTypes: TCheckListBox;
-    lblAssocDesc: TLabel;
-    tabCVS: TdevPage;
-    lblCVSExec: TLabel;
-    edCVSExec: TEdit;
-    lblCVSCompression: TLabel;
-    spnCVSCompression: TSpinEdit;
-    chkCVSUseSSH: TCheckBox;
-    XPMenu: TXPMenu;
-    cbXPTheme: TCheckBox;
-    gbProgress: TGroupBox;
-    cbShowProgress: TCheckBox;
-    cbAutoCloseProgress: TCheckBox;
-    tabExternal: TdevPage;
-    lblExternal: TLabel;
-    vleExternal: TValueListEditor;
-    btnExtAdd: TSpeedButton;
-    btnExtDel: TSpeedButton;
     gbDebugger: TGroupBox;
     cbWatchHint: TCheckBox;
     cbWatchError: TCheckBox;
-    gbAltConfig: TGroupBox;
-    chkAltConfig: TCheckBox;
-    edAltConfig: TEdit;
-    btnAltConfig: TSpeedButton;
+    cbNoSplashScreen: TCheckBox;
+    rgbOpenStyle: TRadioGroup;
+    gbProgress: TGroupBox;
+    cbShowProgress: TCheckBox;
+    cbAutoCloseProgress: TCheckBox;
+    seMRUMax: TSpinEdit;
+    cboTabsTop: TComboBox;
+    cboLang: TComboBox;
+    cboTheme: TComboBox;
+    tabPaths: TdevPage;
+    lblUserDir: TLabel;
+    lblTemplatesDir: TLabel;
+    lblSplash: TLabel;
+    lblIcoLib: TLabel;
+    lblLangPath: TLabel;
     btnDefBrws: TSpeedButton;
     btnOutputbrws: TSpeedButton;
     btnBrwIcon: TSpeedButton;
     btnBrwLang: TSpeedButton;
     btnBrwSplash: TSpeedButton;
+    edUserDir: TEdit;
+    edTemplatesDir: TEdit;
+    edSplash: TEdit;
+    edIcoLib: TEdit;
+    edLang: TEdit;
+    gbAltConfig: TGroupBox;
+    btnAltConfig: TSpeedButton;
+    chkAltConfig: TCheckBox;
+    edAltConfig: TEdit;
+    tabExternal: TdevPage;
+    lblExternal: TLabel;
+    btnExtAdd: TSpeedButton;
+    btnExtDel: TSpeedButton;
+    vleExternal: TValueListEditor;
+    tabAssocs: TdevPage;
+    lblAssocFileTypes: TLabel;
+    lblAssocDesc: TLabel;
+    lstAssocFileTypes: TCheckListBox;
+    tabCVS: TdevPage;
+    lblCVSExec: TLabel;
+    lblCVSCompression: TLabel;
     btnCVSExecBrws: TSpeedButton;
+    edCVSExec: TEdit;
+    spnCVSCompression: TSpinEdit;
+    chkCVSUseSSH: TCheckBox;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -116,8 +113,10 @@ type
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
     procedure LoadText;
+	procedure StyleFix;
   end;
 
 implementation
@@ -227,8 +226,6 @@ begin
 		//cboTheme.Items.AddStrings(devTheme.ThemeList);
 		//cboTheme.ItemIndex := cboTheme.Items.IndexOf(devData.Theme);
 
-		cbXPTheme.Checked := XPTheme;
-
 		cbShowProgress.Checked := ShowProgress;
 		cbAutoCloseProgress.Checked := AutoCloseProgress;
 
@@ -263,6 +260,30 @@ begin
 	end;
 end;
 
+procedure TEnviroForm.StyleFix;
+begin
+	lblMru.Refresh;
+    lblMsgTabs.Refresh;
+    lblLang.Refresh;
+    lblTheme.Refresh;
+
+    lblUserDir.Refresh;
+    lblTemplatesDir.Refresh;
+    Lblicolib.Refresh;
+    lblLangPath.Refresh;
+    lblSplash.Refresh;
+
+    btnDefBrws.Refresh;
+    btnOutPutBrws.Refresh;
+    btnBrwIcon.Refresh;
+    btnBrwLang.Refresh;
+    btnBrwSplash.Refresh;
+
+    lblCVSExec.Refresh;
+    lblCVSCompression.Refresh;
+    btnCVSExecbrws.Refresh;
+end;
+
 procedure TEnviroForm.btnOkClick(Sender: TObject);
 var
 	idx: integer;
@@ -295,9 +316,6 @@ begin
 		ThemeChange := cboTheme.Text <> devData.Theme;
 		Theme := cboTheme.Text;
 		NoSplashScreen := cbNoSplashScreen.Checked;
-		if not ThemeChange then
-			ThemeChange := XPTheme <> cbXPTheme.Checked;
-		XPTheme := cbXPTheme.Checked;
 		ShowProgress := cbShowProgress.Checked;
 		AutoCloseProgress := cbAutoCloseProgress.Checked;
 		WatchHint := cbWatchHint.Checked;
@@ -347,15 +365,10 @@ end;
 
 procedure TEnviroForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=                  Lang[ID_ENV];
 
   //Tabs
   tabGeneral.Caption:=       Lang[ID_ENV_GENTAB];
-  tabInterface.Caption:=     Lang[ID_ENV_INTERFACETAB];
   tabPaths.Caption:=         Lang[ID_ENV_PATHTAB];
   tabAssocs.Caption:=        Lang[ID_ENV_FASSTAB];
   tabCVS.Caption:=           Lang[ID_ENV_CVSTAB];
@@ -374,7 +387,6 @@ begin
   cbMinOnRun.Caption:=       Lang[ID_ENV_MINONRUN];
   cbdblFiles.Caption:=       Lang[ID_ENV_DBLFILES];
   cbNoSplashScreen.Caption:= Lang[ID_ENV_NOSPLASH];
-  cbXPTheme.Caption :=       Lang[ID_ENV_XPTHEME];
 
   gbProgress.Caption :=      '  '+Lang[ID_ENV_COMPPROGRESSWINDOW]+'  ';
   cbShowProgress.Caption :=  Lang[ID_ENV_SHOWPROGRESS];
@@ -435,6 +447,7 @@ end;
 procedure TEnviroForm.PagesMainChange(Sender: TObject);
 begin
   HelpKeyword:= Help_Topics[PagesMain.ActivePageIndex];
+  StyleFix;
 end;
 
 procedure TEnviroForm.FormKeyDown(Sender: TObject; var Key: Word;
@@ -504,6 +517,11 @@ begin
   chkAltConfig.Enabled:=ConfigMode <> CFG_PARAM;
   edAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
   btnAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
+end;
+
+procedure TEnviroForm.FormActivate(Sender: TObject);
+begin
+	StyleFix;
 end;
 
 end.

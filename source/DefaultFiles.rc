@@ -1,3 +1,5 @@
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "..\devcpp.exe.manifest"
+
 English lng ..\lang\English.lng
 
 NOIMG BITMAP ".\images\noimg.bmp"
@@ -167,4 +169,3 @@ STRINGTABLE
  5020, "clLime, clBlack"
  5021, "clWhite, clNavy"
 }
-

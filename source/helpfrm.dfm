@@ -18,8 +18,8 @@ object frmHelpEdit: TfrmHelpEdit
   OnClose = FormClose
   OnCreate = FormCreate
   DesignSize = (
-    342
-    367)
+    334
+    356)
   PixelsPerInch = 96
   TextHeight = 13
   object btnOk: TBitBtn
@@ -88,8 +88,6 @@ object frmHelpEdit: TfrmHelpEdit
       Top = 31
       Width = 90
       Height = 22
-      ItemsEx.CaseSensitive = False
-      ItemsEx.SortType = stNone
       ItemsEx = <
         item
           Caption = 'None'
@@ -123,7 +121,6 @@ object frmHelpEdit: TfrmHelpEdit
           SelectedImageIndex = 6
         end>
       Style = csExDropDownList
-      StyleEx = []
       ItemHeight = 16
       TabOrder = 0
       OnSelect = cboIconSelect
@@ -357,35 +354,5 @@ object frmHelpEdit: TfrmHelpEdit
         0000686868BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
       OnClick = btnDeleteClick
     end
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 216
-    Top = 296
   end
 end

@@ -2355,9 +2355,8 @@ object AboutForm: TAboutForm
         
           'under the terms of this General Public License.  The "Program", ' +
           'below,'
-        
-          'refers to any such program or work, and a "work based on the Pro' +
-          'gram"'
+        'refers to any such program or work, and a "work based on the '
+        'Program"'
         
           'means either the Program or any derivative work under copyright ' +
           'law:'
@@ -2496,9 +2495,8 @@ object AboutForm: TAboutForm
         'exercise the right to control the distribution of derivative or'
         'collective works based on the Program.'
         ''
-        
-          'In addition, mere aggregation of another work not based on the P' +
-          'rogram'
+        'In addition, mere aggregation of another work not based on the '
+        'Program'
         
           'with the Program (or with a work based on the Program) on a volu' +
           'me of'
@@ -2802,7 +2800,8 @@ object AboutForm: TAboutForm
         'AS'
         'TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS '
         'WITH '
-        'YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME '
+        'YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU '
+        'ASSUME '
         'THE COST OF ALL NECESSARY SERVICING, REPAIR OR '
         'CORRECTION.'
         ''
@@ -2965,7 +2964,7 @@ object AboutForm: TAboutForm
     object BloodLabel: TLabel
       Left = 16
       Top = 24
-      Width = 146
+      Width = 140
       Height = 13
       Caption = 'Bloodshed Software Website:'
     end
@@ -3075,14 +3074,14 @@ object AboutForm: TAboutForm
     object BlogLabel: TLabel
       Left = 16
       Top = 104
-      Width = 118
+      Width = 124
       Height = 13
       Caption = 'Post-4.9.9.2 development:'
     end
     object BlogSite: TLabel
       Left = 168
       Top = 104
-      Width = 148
+      Width = 156
       Height = 13
       Cursor = crHandPoint
       Caption = 'http://orwellengine.blogspot.com'
@@ -3094,7 +3093,7 @@ object AboutForm: TAboutForm
       ParentFont = False
       OnClick = LabelClick
     end
-   object DonateSite: TLabel
+    object DonateSite: TLabel
       Left = 168
       Top = 136
       Width = 185
@@ -3433,35 +3432,5 @@ object AboutForm: TAboutForm
     OnTimer = Timer1Timer
     Left = 65512
     Top = 65512
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 200
-    Top = 184
   end
 end

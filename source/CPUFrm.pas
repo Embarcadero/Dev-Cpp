@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, SynEdit, XPMenu, StrUtils;
+  Dialogs, StdCtrls, Buttons, SynEdit, StrUtils;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -71,7 +71,6 @@ type
     FSText: TEdit;
     lblGS: TLabel;
     GSText: TEdit;
-    XPMenu: TXPMenu;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edFuncKeyPress(Sender: TObject; var Key: Char);
     procedure rbSyntaxClick(Sender: TObject);
@@ -148,10 +147,6 @@ end;
 
 procedure TCPUForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   with Lang do begin
     Caption := Strings[ID_CPU_CAPTION];
     gbAsm.Caption := '  '+Strings[ID_CPU_ASMCODE]+'  ';

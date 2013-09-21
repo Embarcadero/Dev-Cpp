@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, XPMenu;
+  StdCtrls, Buttons, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -45,7 +45,6 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
-    XPMenu: TXPMenu;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -58,10 +57,6 @@ uses
 
 procedure TRemoveUnitForm.FormCreate(Sender: TObject);
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=           Lang[ID_RU];
   GroupBox.Caption:=  Lang[ID_RU_TEXT];
   OkBtn.Caption :=    Lang[ID_BTN_OK];

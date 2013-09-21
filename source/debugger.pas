@@ -23,7 +23,7 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Sysutils, Windows, Classes, ShellAPI, Dialogs, Controls,
+  Sysutils, Windows, Messages, Classes, ShellAPI, Dialogs, Controls,
   debugreader, debugwait, version, editor, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}

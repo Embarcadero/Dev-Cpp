@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, CppParser, ComCtrls, XPMenu;
+  Dialogs, StdCtrls, ExtCtrls, CppParser, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -37,7 +37,6 @@ type
     Label1: TLabel;
     txtSearch: TEdit;
     lvEntries: TListView;
-    XPMenu: TXPMenu;
     procedure FormShow(Sender: TObject);
     procedure txtSearchChange(Sender: TObject);
     procedure txtSearchExit(Sender: TObject);
@@ -174,10 +173,6 @@ end;
 
 procedure TFunctionSearchForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := StringReplace(Lang[ID_ITEM_GOTOFUNCTION], '&', '', []);
   Label1.Caption := Lang[ID_GF_TEXT];
   lvEntries.Column[1].Caption := Lang[ID_GF_TYPE];

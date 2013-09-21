@@ -93,20 +93,28 @@ object LangForm: TLangForm
       Left = 0
       Top = 48
       Width = 265
-      Height = 121
+      Height = 136
       Caption = 'Select your language:'
       TabOrder = 1
+      object ListBox: TListBox
+        Left = 8
+        Top = 20
+        Width = 249
+        Height = 107
+        ItemHeight = 13
+        TabOrder = 0
+      end
     end
     object ThemeGroupBox: TGroupBox
       Left = 0
-      Top = 176
+      Top = 190
       Width = 265
-      Height = 73
+      Height = 59
       Caption = 'Select your Dev-C++ theme:'
       TabOrder = 2
       object ThemeBox: TComboBox
         Left = 16
-        Top = 24
+        Top = 22
         Width = 153
         Height = 21
         Style = csDropDownList
@@ -116,30 +124,13 @@ object LangForm: TLangForm
       end
       object PreviewBtn: TBitBtn
         Left = 178
-        Top = 24
+        Top = 22
         Width = 75
         Height = 22
         Caption = '&Preview'
         TabOrder = 1
         OnClick = PreviewBtnClick
       end
-      object XPCheckBox: TCheckBox
-        Left = 16
-        Top = 50
-        Width = 97
-        Height = 17
-        Caption = '&Use XP Theme'
-        TabOrder = 2
-        OnClick = XPCheckBoxClick
-      end
-    end
-    object ListBox: TListBox
-      Left = 8
-      Top = 64
-      Width = 249
-      Height = 97
-      ItemHeight = 13
-      TabOrder = 0
     end
   end
   object FinishPanel: TPanel
@@ -226,7 +217,7 @@ object LangForm: TLangForm
       object ParseLabel: TLabel
         Left = 4
         Top = 24
-        Width = 245
+        Width = 65
         Height = 13
         Caption = 'Parsing files...'
         WordWrap = True
@@ -396,35 +387,5 @@ object LangForm: TLangForm
     object TMenuItem
       ImageIndex = 7
     end
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 64
-    Top = 136
   end
 end

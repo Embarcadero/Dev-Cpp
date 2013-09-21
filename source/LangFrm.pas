@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, Menus, XPMenu, ComCtrls, FileCtrl;
+  StdCtrls, Buttons, ExtCtrls, Menus, ComCtrls, FileCtrl;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -38,7 +38,6 @@ type
     PopupMenu: TPopupMenu;
     N1: TMenuItem;
     Image2: TImage;
-    XPMenu: TXPMenu;
     FirstPanel: TPanel;
     ListBox: TListBox;
     GroupBox1: TGroupBox;
@@ -46,7 +45,6 @@ type
     ThemeGroupBox: TGroupBox;
     ThemeBox: TComboBox;
     PreviewBtn: TBitBtn;
-    XPCheckBox: TCheckBox;
     CachePanel: TPanel;
     Label2: TLabel;
     Label3: TLabel;
@@ -71,7 +69,6 @@ type
     procedure PreviewBtnClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure OkBtnClick(Sender: TObject);
-    procedure XPCheckBoxClick(Sender: TObject);
     procedure DirCheckBoxClick(Sender: TObject);
     procedure LoadBtnClick(Sender: TObject);
     procedure ThemeBoxChange(Sender: TObject);
@@ -172,7 +169,6 @@ begin
 		FirstPanel.Visible := false;
 		devData.ThemeChange := true;
 		devData.Theme := ThemeBox.Items[ThemeBox.ItemIndex];
-		devData.XPTheme := XPCheckBox.Checked;
 	end else if OkBtn.Tag = 1 then begin
 		if YesClassBrowser.Checked then begin
 			OkBtn.Tag := 2;
@@ -273,14 +269,6 @@ begin
 		FinishPanel.Visible := true;
 		CachePanel.Visible := false;
 	end
-end;
-
-procedure TLangForm.XPCheckBoxClick(Sender: TObject);
-begin
-  if XPCheckBox.Checked then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
 end;
 
 procedure TLangForm.DirCheckBoxClick(Sender: TObject);

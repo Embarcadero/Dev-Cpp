@@ -39,13 +39,10 @@ type
     btnOk: TButton;
     btnCancel: TButton;
     lblTip: TLabel;
-    procedure lvShortcutsKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
-    procedure lvShortcutsCustomDrawItem(Sender: TCustomListView;
-      Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
-    procedure lvShortcutsCustomDrawSubItem(Sender: TCustomListView;
-      Item: TListItem; SubItem: Integer; State: TCustomDrawState;
-      var DefaultDraw: Boolean);
+    procedure lvShortcutsKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+    procedure lvShortcutsCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure lvShortcutsCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;var DefaultDraw: Boolean);
+    procedure lvShortcutsExit(Sender: TObject);
   private
     { Private declarations }
     function GetItem(Index: integer): TMenuItem;
@@ -100,21 +97,20 @@ begin
   Result := TextToShortCut(lvShortcuts.Items[Index].SubItems[0]);
 end;
 
-procedure TfrmShortcutsEditor.lvShortcutsKeyDown(Sender: TObject;
-  var Key: Word; Shift: TShiftState);
+procedure TfrmShortcutsEditor.lvShortcutsKeyDown(Sender: TObject;var Key: Word; Shift: TShiftState);
 var
   I: integer;
   sct: string;
 begin
   if lvShortcuts.Selected = nil then
     Exit;
-  if (Key = 27) and (Shift = []) then begin // clear shortcut
+  if (Key = 27) and (Shift = []) then begin // clear shortcut if Escape is pressed
     lvShortcuts.Selected.SubItems[0] := '';
     Exit;
   end;
   if (Key>27) and (Key<=90) and (Shift=[]) then // if "normal" key, expect a shiftstate
     Exit;
-  if (Key < 27) then // control key by itself
+  if (Key < 27) then // control key by itself, but accept Tab
     Exit;
 
   sct:=ShortCutToText(ShortCut(Key, Shift));
@@ -164,6 +160,43 @@ begin
     end;
   end;
   DefaultDraw := True;
+end;
+
+// Don't let a tab keystroke make us lose focus, instead, assign tab to the selected item
+procedure TfrmShortcutsEditor.lvShortcutsExit(Sender: TObject);
+var
+	I: integer;
+	sct: string;
+	shift : TShiftState;
+	State : TKeyboardState;
+begin
+	// Handle tabs only
+	GetKeyboardState(State);
+	if ((State[vk_Tab] and 128) <> 0) then begin
+		// Control / Alt / Shift on the manual
+		if ((State[vk_Control] and 128) <> 0) then
+			shift := shift + [ssCtrl];
+		if ((State[vk_Menu] and 128) <> 0) then
+			shift := shift + [ssAlt];
+		if ((State[vk_Shift] and 128) <> 0) then
+			shift := shift + [ssShift];
+
+		// We know we pressed 9 (TAB), but get ctrl/alt/shift manually
+		sct:=ShortCutToText(ShortCut(9, shift));
+		lvShortcuts.Selected.SubItems[0] := sct;
+
+		// we do no more check for other entries by the same name, as we used to,
+		// because we 've prepended the menu name so it should be unique...
+
+		// search other entries using this shortcut, and clear them
+		for I:=0 to lvShortcuts.Items.Count-1 do
+			if lvShortcuts.Items[I]<>lvShortcuts.Selected then
+				if lvShortcuts.Items[I].SubItems[0]=sct then
+					lvShortcuts.Items[I].SubItems[0] := '';
+
+		// No focus changes bitte
+		Abort;
+	end;
 end;
 
 end.

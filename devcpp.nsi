@@ -1,8 +1,8 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "4.9.9.9"
-!define DISPLAY_NAME "Dev-C++ 5 beta 16 release (${DEVCPP_VERSION})"
+!define DEVCPP_VERSION "5.0.0.0"
+!define DISPLAY_NAME "Dev-C++ (${DEVCPP_VERSION})"
 
 Var LOCAL_APPDATA
 
@@ -90,12 +90,21 @@ Section "Dev-C++ program files (required)" SectionMain
   SectionIn 1 2 RO
   SetOutPath $INSTDIR
 
-  File "devcpp.map"
-  File "Packman.map"
+  ; Allways create an uninstaller
+  WriteUninstaller "$INSTDIR\uninstall.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayName" "Dev-C++"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayVersion" "${DEVCPP_VERSION}"
+
   File "devcpp.exe"
-  File "copying.txt"
-  File "News.txt"
+  File "devcpp.map"
   File "packman.exe"
+  File "Packman.map"
+  
+  File "devcpp.exe.manifest"
+  File "copying.txt"
+  File "NEWS.txt"
+  
   SetOutPath $INSTDIR\Lang
   File "Lang\English.*"
   SetOutPath $INSTDIR\Templates
@@ -104,13 +113,6 @@ Section "Dev-C++ program files (required)" SectionMain
   File "bin\rm.exe"
   SetOutPath $INSTDIR\Packages
   File "Packages\Dev-C++_Map.entry"
-
-  ; Allways create an uninstaller
-  WriteUninstaller "$INSTDIR\uninstall.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayName" "Dev-C++"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "UninstallString" "$INSTDIR\uninstall.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayVersion" "${DEVCPP_VERSION}"
-
 SectionEnd
 
 Section "Example files" SectionExamples

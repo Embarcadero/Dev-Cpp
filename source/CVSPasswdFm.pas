@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, XPMenu;
+  Dialogs, StdCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -37,7 +37,6 @@ type
     txtPass: TEdit;
     btnOK: TButton;
     Label2: TLabel;
-    XPMenu: TXPMenu;
     procedure FormShow(Sender: TObject);
   private
     { Private declarations }
@@ -57,10 +56,6 @@ uses
 
 procedure TCVSPasswdForm.FormShow(Sender: TObject);
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   txtPass.Text := '';
   txtPass.SetFocus;
 end;

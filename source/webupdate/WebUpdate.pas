@@ -25,7 +25,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, WebThread, CheckLst, ExtCtrls, IniFiles,
-  ShellApi, TypInfo, Buttons, XPMenu;
+  ShellApi, TypInfo, Buttons;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -59,7 +59,6 @@ type
     Image5: TImage;
     btnCheck: TBitBtn;
     btnClose: TBitBtn;
-    XPMenu: TXPMenu;
     procedure FormCreate(Sender: TObject);
     procedure lvClick(Sender: TObject);
     procedure lvChange(Sender: TObject; Item: TListItem;

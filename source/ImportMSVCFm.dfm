@@ -28,16 +28,16 @@ object ImportMSVCForm: TImportMSVCForm
   end
   object btnBrowse: TSpeedButton
     Left = 336
-    Top = 24
+    Top = 23
     Width = 23
-    Height = 22
+    Height = 23
     Caption = '...'
     OnClick = btnBrowseClick
   end
   object txtVC: TEdit
     Left = 8
     Top = 24
-    Width = 329
+    Width = 328
     Height = 21
     TabOrder = 0
     Text = 'txtVC'
@@ -66,9 +66,9 @@ object ImportMSVCForm: TImportMSVCForm
     end
     object btnBrowseDev: TSpeedButton
       Left = 314
-      Top = 84
+      Top = 83
       Width = 23
-      Height = 22
+      Height = 23
       Caption = '...'
       OnClick = btnBrowseDevClick
     end
@@ -119,35 +119,5 @@ object ImportMSVCForm: TImportMSVCForm
   object SaveDialog1: TSaveDialog
     Left = 268
     Top = 124
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 136
-    Top = 56
   end
 end

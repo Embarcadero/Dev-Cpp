@@ -1322,37 +1322,37 @@ function TProject.Remove(index : integer; DoClose : boolean) : boolean;
 var
  i: integer;
 begin
-  result := false;
-  if index > -1 then
-   begin
-     // if a resource was removed, force (re)creation of private resource...
-     if GetFileTyp(fUnits.GetItem(index).FileName)=utRes then
-       BuildPrivateResource(True);
-     if DoClose and Assigned(fUnits.GetItem(index).fEditor) then begin
-       if not MainForm.CloseEditor(fUnits.GetItem(index).fEditor.TabSheet.PageIndex, False) then
-         exit;
-     end;
-     result := true;
-    { this causes problems if the project isn't saved after this, since the erase happens phisically at this moment }
-    //if not fUnits.GetItem(index).fNew then
-     finifile.EraseUnit(index);
+	result := false;
+	if index > -1 then begin
+		// if a resource was removed, force (re)creation of private resource...
+		if GetFileTyp(fUnits.GetItem(index).FileName)=utRes then
+			BuildPrivateResource(True);
+		if DoClose and Assigned(fUnits.GetItem(index).fEditor) then begin
+			if not MainForm.CloseEditor(fUnits.GetItem(index).fEditor.TabSheet.PageIndex, False) then
+				exit;
+		end;
 
-     fUnits.GetItem(index).fNode.Delete;
-     fUnits.Remove(index);
+		result := true;
 
-     UpdateNodeIndexes();
-     SetModified(TRUE);
-   end
-  else // pick from list
-   with TRemoveUnitForm.Create(MainForm) do
-    try
-     for i:= 0 to pred(fUnits.Count) do
-      UnitList.Items.Append(fUnits[i].FileName);
-     if (ShowModal = mrOk) and (UnitList.ItemIndex <> -1) then
-      Remove(UnitList.ItemIndex, true);
-    finally
-     Free;
-    end;
+		{ this causes problems if the project isn't saved after this, since the erase happens phisically at this moment }
+		//if not fUnits.GetItem(index).fNew then
+		finifile.EraseUnit(index);
+
+		fUnits.GetItem(index).fNode.Delete;
+		fUnits.Remove(index);
+
+		UpdateNodeIndexes();
+		SetModified(TRUE);
+	end else
+		with TRemoveUnitForm.Create(MainForm) do
+			try
+				for i:= 0 to pred(fUnits.Count) do
+					UnitList.Items.Append(fUnits[i].FileName);
+				if (ShowModal = mrOk) and (UnitList.ItemIndex <> -1) then
+					Remove(UnitList.ItemIndex, true);
+			finally
+				Free;
+			end;
 end;
 
 function TProject.FileAlreadyExists(s : string) : boolean;

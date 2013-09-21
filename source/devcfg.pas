@@ -521,7 +521,6 @@ type
 		// More misc stuff
 		fShowTipsOnStart: boolean;
 		fLastTip: integer;
-		fXPTheme : boolean;               // Use XP theme
 		fFileDate : integer;              // Dev-C++ File Date for checking old configurations
 		fShowProgress : boolean;          // Show progress window during compile
 		fAutoCloseProgress : boolean;     // Auto close progress bar window after compile
@@ -623,7 +622,6 @@ type
    property ShowTipsOnStart: boolean read fShowTipsOnStart write fShowTipsOnStart;
    property LastTip: integer read fLastTip write fLastTip;
 
-   property XPTheme: boolean read fXPTheme write fXPTheme;
    property FileDate: integer read fFileDate write fFileDate;
 
    // progress window
@@ -977,23 +975,23 @@ begin
   fToolbarEditX:=201;
   fToolbarEditY:=2;
   fToolbarCompile:=TRUE;
-  fToolbarCompileX:=11;
-  fToolbarCompileY:=30;
+  fToolbarCompileX:=466;
+  fToolbarCompileY:=2;
   fToolbarProject:=TRUE;
   fToolbarProjectX:=375;
   fToolbarProjectY:=2;
   fToolbarOptions:=TRUE;
-  fToolbarOptionsX:=143;
-  fToolbarOptionsY:=30;
+  fToolbarOptionsX:=598;
+  fToolbarOptionsY:=2;
   fToolbarSpecials:=TRUE;
-  fToolbarSpecialsX:=202;
+  fToolbarSpecialsX:=11;
   fToolbarSpecialsY:=30;
   fToolbarSearch:=TRUE;
   fToolbarSearchX:=261;
   fToolbarSearchY:=2;
   fToolbarClasses:=TRUE;
-  fToolbarClassesX:=11;
-  fToolbarClassesY:=58;
+  fToolbarClassesX:=267;
+  fToolbarClassesY:=30;
 
   //read associations set by installer as defaults
   fAssociateC := getAssociation(0);
@@ -1006,7 +1004,6 @@ begin
   
   fShowTipsOnStart:=TRUE;
   fLastTip:=0;
-  fXPTheme := FALSE;
   fFileDate := 0;
   fShowProgress := TRUE;
   fAutoCloseProgress := FALSE;

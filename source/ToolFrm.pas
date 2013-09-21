@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Menus, Graphics, Controls, Forms,
-  StdCtrls, Buttons, ShellAPI, XPMenu;
+  StdCtrls, Buttons, ShellAPI;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QMenus, QGraphics, QControls, QForms,
@@ -76,7 +76,6 @@ type
     ListBox: TListBox;
     btnUp: TSpeedButton;
     btnDown: TSpeedButton;
-    XPMenu: TXPMenu;
     grpActions: TGroupBox;
     btnAdd: TSpeedButton;
     btnDelete: TSpeedButton;
@@ -480,10 +479,6 @@ end;
 
 procedure TToolForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=               Lang[ID_TF];
   grpCurrent.Caption:=    '  '+Lang[ID_TF_LABEL] +'  ';
 

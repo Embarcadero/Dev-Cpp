@@ -1,6 +1,6 @@
 object CompForm: TCompForm
-  Left = 459
-  Top = 322
+  Left = 980
+  Top = 518
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -121,7 +121,8 @@ object CompForm: TCompForm
     Top = 10
     Width = 440
     Height = 337
-    ActivePage = tabCompiler
+    ActivePage = tabDirectories
+    OnChange = MainPagesChange
     object tabCompiler: TdevPage
       Left = 0
       Top = 23
@@ -134,6 +135,7 @@ object CompForm: TCompForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 1
+      Visible = False
       Caption = 'Compiler'
       DesignSize = (
         436
@@ -394,7 +396,6 @@ object CompForm: TCompForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 0
-      Visible = False
       Caption = 'Directories'
       object DirTabs: TdevTabs
         Left = 11
@@ -693,7 +694,7 @@ object CompForm: TCompForm
         Height = 13
         Caption = 'gprof : '
       end
-      object btnBrws2: TSpeedButton
+      object btnBrowse2: TSpeedButton
         Tag = 2
         Left = 403
         Top = 59
@@ -995,35 +996,5 @@ object CompForm: TCompForm
         OnChange = GprofEditChange
       end
     end
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 256
-    Top = 280
   end
 end

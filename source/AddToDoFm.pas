@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Spin, SynEditTextBuffer, SynEditTypes, XPMenu;
+  Dialogs, StdCtrls, Spin, SynEditTextBuffer, SynEditTypes;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -41,7 +41,6 @@ type
     btnOK: TButton;
     btnCancel: TButton;
     txtUser: TEdit;
-    XPMenu: TXPMenu;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -135,10 +134,6 @@ end;
 
 procedure TAddToDoForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := Lang[ID_ADDTODO_MENUITEM];
   Label1.Caption := Lang[ID_ADDTODO_DESCRIPTION] + ':';
   Label2.Caption := Lang[ID_ADDTODO_PRIORITY] + ':';

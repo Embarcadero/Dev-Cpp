@@ -29,7 +29,7 @@ uses
 	Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils,
 	Project, editor, compiler, ActnList, oysUtils, Toolfrm, AppEvnts, Grids,
 	debugger, ClassBrowser, DevThemes, CodeCompletion, CppParser, CppTokenizer,
-	devShortcuts, StrUtils, devFileMonitor, devMonitorTypes, DdeMan, XPMenu,
+	devShortcuts, StrUtils, devFileMonitor, devMonitorTypes, DdeMan,
 	CVSFm, ImageTheme;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -49,7 +49,8 @@ type
 		editor			: TEditor;
 		breakPointIndex	:integer;
 	end;
-PBreakPointEntry = ^TBreakPointEntry;
+	PBreakPointEntry = ^TBreakPointEntry;
+
 	TMainForm = class(TForm)
 		MainMenu: TMainMenu;
 		FileMenu: TMenuItem;
@@ -88,7 +89,6 @@ PBreakPointEntry = ^TBreakPointEntry;
 		N14: TMenuItem;
 		ToggleBookmarksItem: TMenuItem;
 		GotoBookmarksItem: TMenuItem;
-		N5: TMenuItem;
 		SelectallItem: TMenuItem;
 		SearchMenu: TMenuItem;
 		FindItem: TMenuItem;
@@ -185,19 +185,6 @@ PBreakPointEntry = ^TBreakPointEntry;
 		CommentheaderPopItem: TMenuItem;
 		DateandtimePopItem: TMenuItem;
 		MenuItem3: TMenuItem;
-		MainfunctionPopItem: TMenuItem;
-		WinMainfunctionPopItem: TMenuItem;
-		MenuItem4: TMenuItem;
-		ifdefPopItem: TMenuItem;
-		ifndefPopItem: TMenuItem;
-		includePopItem: TMenuItem;
-		MenuItem5: TMenuItem;
-		ifPopItem: TMenuItem;
-		whilePopItem: TMenuItem;
-		dowhilePopItem: TMenuItem;
-		forPopItem: TMenuItem;
-		MenuItem6: TMenuItem;
-		MessageBoxPopItem: TMenuItem;
 		TogglebookmarksPopItem: TMenuItem;
 		GotobookmarksPopItem: TMenuItem;
 		SelectAllPopItem: TMenuItem;
@@ -305,11 +292,13 @@ PBreakPointEntry = ^TBreakPointEntry;
 		ApplicationEvents1: TApplicationEvents;
 		actProjectMakeFile: TAction;
 		MessagePopup: TPopupMenu;
-		actMsgCopy: TAction;
-		actMsgClear: TAction;
+
+        // 2011 edits
 		MsgCopyItem: TMenuItem;
-		MsgClearitem: TMenuItem;
-		N15: TMenuItem;
+        MsgCopyAllItem: TMenuItem;
+        MsgSaveAllItem: TMenuItem;
+		MsgClearItem: TMenuItem;
+
 		actBreakPoint: TAction;
 		actIncremental: TAction;
 		IncrementalSearch1: TMenuItem;
@@ -537,7 +526,6 @@ PBreakPointEntry = ^TBreakPointEntry;
 		mnuCVSRemove2: TMenuItem;
 		N63: TMenuItem;
 		GoToClassBrowserItem: TMenuItem;
-		XPMenu: TXPMenu;
 		actBrowserShowInherited: TAction;
 		Showinheritedmembers1: TMenuItem;
 		HelponDevPopupItem: TMenuItem;
@@ -704,7 +692,7 @@ PBreakPointEntry = ^TBreakPointEntry;
 		procedure actWatchItemExecute(Sender: TObject);
 		procedure actRemoveWatchExecute(Sender: TObject);
 		procedure actStepOverExecute(Sender: TObject);
-		procedure actStopExecuteExecute(Sender: TObject);
+		procedure actForceStopExecuteExecute(Sender: TObject);
 		procedure actUndoUpdate(Sender: TObject);
 		procedure actRedoUpdate(Sender: TObject);
 		procedure actCutUpdate(Sender: TObject);
@@ -785,6 +773,7 @@ PBreakPointEntry = ^TBreakPointEntry;
 		procedure actRunToCursorExecute(Sender: TObject);
 		procedure GdbCommandBtnClick(Sender: TObject);
 
+        // Orwell 2011
         procedure SendCommand(cmd,args:string);
 
 		procedure ViewCPUItemClick(Sender: TObject);
@@ -847,6 +836,10 @@ PBreakPointEntry = ^TBreakPointEntry;
 		procedure ApplicationEvents1Deactivate(Sender: TObject);
 		procedure PageControlChanging(Sender: TObject;var AllowChange: Boolean);
 		procedure mnuCVSClick(Sender: TObject);
+
+        // Orwell 2011
+		procedure actMsgCopyAllExecute(Sender: TObject);
+		procedure actMsgSaveAllExecute(Sender: TObject);
 
 	private
 		fTab				: integer;
@@ -969,6 +962,7 @@ uses
 var
 	fFirstShow: boolean;
 
+// MessagePopup enums
 const
 	cCompTab	= 0;
 	cResTab		= 1;
@@ -1214,8 +1208,7 @@ procedure TMainForm.DoApplyWindowPlacement;
 begin
 	if devData.WindowPlacement.rcNormalPosition.Right <> 0 then
 		SetWindowPlacement(Self.Handle, @devData.WindowPlacement)
-	else
-	if not CacheCreated then // this is so weird, but the following call seems to take a lot of time to execute
+	else if not CacheCreated then // this is so weird, but the following call seems to take a lot of time to execute
 		Self.Position:= poScreenCenter;
 	Show;
 end;
@@ -1225,60 +1218,54 @@ procedure TMainForm.LoadTheme;
 var
 	Idx: Integer;
 begin
-	XPMenu.Active := devData.XPTheme;
-	if WebUpdateForm <> nil then
-		WebUpdateForm.XPMenu.Active := devData.XPTheme;
-
 	//if devData.Theme = '' then
 	if devImageThemes.IndexOf(devData.Theme) < 0 then
 		devData.Theme := devImageThemes.Themes[0].Title; // 0 = New look (see ImageTheme.pas)
 
 	// make sure the theme in question is in the list
 	Idx := devImageThemes.IndexOf(devData.Theme);
-	if Idx > -1 then
-	begin
+	if Idx > -1 then begin
 		devImageThemes.ActivateTheme(devData.Theme);
 
-		with devImageThemes do
-		begin
-		 alMain.Images					:= CurrentTheme.MenuImages;
-		 MainMenu.Images				:= CurrentTheme.MenuImages;
-		 ProjectView.Images		 := CurrentTheme.ProjectImages;
-		 MessageControl.Images	:= CurrentTheme.MenuImages;
-		 tbMain.Images					:= CurrentTheme.MenuImages;
-		 tbCompile.Images			 := CurrentTheme.MenuImages;
-		 tbOptions.Images			 := CurrentTheme.MenuImages;
-		 tbProject.Images			 := CurrentTheme.MenuImages;
-		 tbClasses.Images			 := CurrentTheme.MenuImages;
-		 tbedit.Images					:= CurrentTheme.MenuImages;
-		 tbSearch.Images				:= CurrentTheme.MenuImages;
-		 tbSpecials.Images			:= CurrentTheme.SpecialImages;
-		 HelpMenu.SubMenuImages := CurrentTheme.HelpImages;
-		 HelpPop.Images				 := CurrentTheme.HelpImages;
-		 DebugVarsPopup.Images	:= CurrentTheme.MenuImages;
-		 ClassBrowser1.Images	 := CurrentTheme.BrowserImages;
+		with devImageThemes do begin
+			alMain.Images			:= CurrentTheme.MenuImages;
+			MainMenu.Images			:= CurrentTheme.MenuImages;
+			ProjectView.Images		:= CurrentTheme.ProjectImages;
+			MessageControl.Images	:= CurrentTheme.MenuImages;
+			tbMain.Images			:= CurrentTheme.MenuImages;
+			tbCompile.Images		:= CurrentTheme.MenuImages;
+			tbOptions.Images		:= CurrentTheme.MenuImages;
+			tbProject.Images		:= CurrentTheme.MenuImages;
+			tbClasses.Images		:= CurrentTheme.MenuImages;
+			tbedit.Images			:= CurrentTheme.MenuImages;
+			tbSearch.Images			:= CurrentTheme.MenuImages;
+			tbSpecials.Images		:= CurrentTheme.SpecialImages;
+			HelpMenu.SubMenuImages	:= CurrentTheme.HelpImages;
+			HelpPop.Images			:= CurrentTheme.HelpImages;
+			DebugVarsPopup.Images	:= CurrentTheme.MenuImages;
+			ClassBrowser1.Images	:= CurrentTheme.BrowserImages;
 
 
-		 //this prevent a bug in the VCL
-		 DDebugBtn.Glyph := nil;
-		 NextStepBtn.Glyph := nil;
-		 StepOverBtn.Glyph := nil;
-		 StepIntoBtn.Glyph := nil;
-		 AddWatchBtn.Glyph := nil;
-		 RemoveWatchBtn.Glyph := nil;
-		 RuntocursorBtn.Glyph := nil;
-		 StopExecBtn.Glyph := nil;
+			//this prevent a bug in the VCL
+			DDebugBtn.Glyph := nil;
+			NextStepBtn.Glyph := nil;
+			StepOverBtn.Glyph := nil;
+			StepIntoBtn.Glyph := nil;
+			AddWatchBtn.Glyph := nil;
+			RemoveWatchBtn.Glyph := nil;
+			RuntocursorBtn.Glyph := nil;
+			StopExecBtn.Glyph := nil;
 
-		 CurrentTheme.MenuImages.GetBitmap(32, DDebugBtn.Glyph);
-		 CurrentTheme.MenuImages.GetBitmap(18, NextStepBtn.Glyph);
-		 CurrentTheme.MenuImages.GetBitmap(14, StepOverBtn.Glyph);
-		 CurrentTheme.MenuImages.GetBitmap(14, StepIntoBtn.Glyph);
-		 CurrentTheme.MenuImages.GetBitmap(21, AddWatchBtn.Glyph);
-		 CurrentTheme.MenuImages.GetBitmap(5,	RemoveWatchBtn.Glyph);
-		 CurrentTheme.MenuImages.GetBitmap(24, RuntocursorBtn.Glyph);
-		 CurrentTheme.MenuImages.GetBitmap(11, StopExecBtn.Glyph);
+			CurrentTheme.MenuImages.GetBitmap(32, DDebugBtn.Glyph);
+			CurrentTheme.MenuImages.GetBitmap(18, NextStepBtn.Glyph);
+			CurrentTheme.MenuImages.GetBitmap(14, StepOverBtn.Glyph);
+			CurrentTheme.MenuImages.GetBitmap(14, StepIntoBtn.Glyph);
+			CurrentTheme.MenuImages.GetBitmap(21, AddWatchBtn.Glyph);
+			CurrentTheme.MenuImages.GetBitmap(5,  RemoveWatchBtn.Glyph);
+			CurrentTheme.MenuImages.GetBitmap(24, RuntocursorBtn.Glyph);
+			CurrentTheme.MenuImages.GetBitmap(11, StopExecBtn.Glyph);
 
-		 AddWatchBtn.Glyph.TransparentColor := clWhite;
+			AddWatchBtn.Glyph.TransparentColor := clWhite;
 		end;
 	end;
 
@@ -1287,8 +1274,7 @@ end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
-	if fFirstShow then
-	 begin
+	if fFirstShow then begin
 		 LoadTheme;
 		 BuildHelpMenu;
 		 dmMain.MRUMenu:= ReOpenItem;
@@ -1806,10 +1792,6 @@ begin
 		DebugSheet.Caption:=				Strings[ID_SHEET_DEBUG];
 		DebugLeftSheet.Caption:=			Strings[ID_SHEET_DEBUG];
 
-		// popup menu
-		actMsgCopy.Caption:=				Strings[ID_SHEET_POP_COPY];
-		actMsgClear.Caption:=				Strings[ID_SHEET_POP_CLEAR];
-
 		// controls
 		CompilerOutput.Columns[0].Caption:=	Strings[ID_COL_LINE];
 		CompilerOutput.Columns[1].Caption:=	Strings[ID_COL_COL];
@@ -2204,8 +2186,7 @@ var
  pt: TPoint;
 begin
 	pt:= tbSpecials.ClientToScreen(point(NewAllBtn.Left, NewAllbtn.Top +NewAllbtn.Height));
-	TrackPopupMenu(mnuNew.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,
-		pt.X, pt.y, 0, Self.Handle, nil);
+	TrackPopupMenu(mnuNew.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.X, pt.y, 0, Self.Handle, nil);
 end;
 
 procedure TMainForm.OpenCloseMessageSheet;
@@ -2214,13 +2195,12 @@ begin
 	if Assigned(ReportToolWindow) then
 		exit;
 	with MessageControl do
-	 if _Show then
-		Height:= fmsgHeight
-	 else
-		begin
-			Height:= Height - CompSheet.Height;
-			ActivePageIndex:= -1;
-		end;
+		if _Show then
+			Height:= fmsgHeight
+	else begin
+		Height:= Height - CompSheet.Height;
+		ActivePageIndex:= -1;
+	end;
 	CloseSheet.TabVisible:= _Show;
 	Statusbar.Top:= Self.ClientHeight;
 end;
@@ -2230,15 +2210,13 @@ begin
 	if MessageControl.ActivePage = ResSheet then
 		ResSheet.Highlighted := false;
 	if MessageControl.ActivePage = CloseSheet then begin
-		 if Assigned(ReportToolWindow) then begin
-			 ReportToolWindow.Close;
-			 MessageControl.ActivePageIndex := 0;
-		 end
-		 else
-			 OpenCloseMessageSheet(false);//MessageControl.Height <> fmsgHeight)
-	end
-	else
-	 OpenCloseMessageSheet(TRUE);
+		if Assigned(ReportToolWindow) then begin
+			ReportToolWindow.Close;
+			MessageControl.ActivePageIndex := 0;
+		end else
+			OpenCloseMessageSheet(false);//MessageControl.Height <> fmsgHeight)
+	end else
+		OpenCloseMessageSheet(TRUE);
 end;
 
 procedure TMainForm.MessageControlChanging(Sender: TObject;
@@ -3267,11 +3245,10 @@ end;
 
 procedure TMainForm.actUnitRemoveExecute(Sender: TObject);
 var
- idx: integer;
- node: TTreeNode;
+	idx: integer;
+	node: TTreeNode;
 begin
 	if not assigned(fProject) then exit;
-
 {$IFDEF WIN32}
 	while ProjectView.SelectionCount>0 do begin
 		node:=ProjectView.Selections[0];
@@ -3280,8 +3257,7 @@ begin
 	while ProjectView.SelCount>0 do begin
 		node:=ProjectView.Selected[0];
 {$ENDIF}
-		if not assigned(node) or
-			(node.Level < 1) then
+		if not assigned(node) or (node.Level < 1) then
 			Continue;
 		if node.Data=Pointer(-1) then
 			Continue;
@@ -3905,6 +3881,89 @@ begin
 	end;
 end;
 
+
+procedure TMainForm.actMsgCopyAllExecute(Sender: TObject);
+var
+	i:integer;
+begin
+	case MessageControl.ActivePageIndex of
+		cCompTab: begin
+			ClipBoard.AsText := '';
+			for i:=0 to pred(CompilerOutput.Items.Count) do
+				Clipboard.AsText:= Clipboard.AsText + StringReplace(StringReplace(CompilerOutput.Items[i].Caption +' ' +CompilerOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
+		end;
+	 	cResTab:
+			if Resourceoutput.ItemIndex <> -1 then
+		 		Clipboard.AsText:= ResourceOutput.Items[ResourceOutput.ItemIndex];
+		cLogTab:
+			if LogOutput.Lines.Text <> '' then
+				if Length(LogOutput.SelText) > 0 then
+					Clipboard.AsText:= LogOutput.SelText
+				else
+					Clipboard.AsText:= LogOutput.Lines.Text;
+		cFindTab: begin
+			ClipBoard.AsText := '';
+			for i:=0 to pred(CompilerOutput.Items.Count) do
+				Clipboard.AsText:= Clipboard.AsText + StringReplace(StringReplace(FindOutput.Items[i].Caption +' ' +FindOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
+		end;
+	end;
+end;
+
+procedure TMainForm.actMsgSaveAllExecute(Sender: TObject);
+var
+	i:integer;
+	temp:string;
+	Stream: TFileStream;
+	savedialog : TSaveDialog;
+begin
+	temp := '';
+	savedialog := TSaveDialog.Create(self);
+	case MessageControl.ActivePageIndex of
+		cCompTab: begin
+			savedialog.FileName:= 'FormattedCompileLog';
+			for i:=0 to pred(CompilerOutput.Items.Count) do
+				temp:= temp + StringReplace(StringReplace(CompilerOutput.Items[i].Caption +' ' +CompilerOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
+		end;
+		cResTab: begin
+			savedialog.FileName:= 'ResourceLog';
+			if Resourceoutput.ItemIndex <> -1 then
+				temp:= ResourceOutput.Items[ResourceOutput.ItemIndex];
+		end;
+		cLogTab: begin
+			savedialog.FileName:= 'RawBuildLog';
+			if LogOutput.Lines.Text <> '' then
+				if Length(LogOutput.SelText) > 0 then
+					temp:= LogOutput.SelText
+				else
+					temp:= LogOutput.Lines.Text;
+		end;
+		cFindTab: begin
+			savedialog.FileName:= 'FindResultsLog';
+			ClipBoard.AsText := '';
+			for i:=0 to pred(CompilerOutput.Items.Count) do
+				temp:= temp + StringReplace(StringReplace(FindOutput.Items[i].Caption +' ' +FindOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
+		end;
+	end;
+
+	if Length(temp) > 0 then begin
+		savedialog.Title:= Lang[ID_NV_SAVEFILE];
+		savedialog.Filter:= 'Text file|*.txt';
+		savedialog.DefaultExt := 'txt';
+		savedialog.FilterIndex:=1;
+		savedialog.InitialDir:=fProject.Directory;
+
+		if savedialog.Execute then begin
+			if FileExists(savedialog.FileName) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrNo) then
+				exit;
+
+			Stream := TFileStream.Create(savedialog.FileName, fmCreate);
+			Stream.Write(temp[1], Length(temp));
+			Stream.Free;
+		end;
+	end;
+	savedialog.Free;
+end;
+
 procedure TMainForm.actMsgClearExecute(Sender: TObject);
 begin
 	case MessageControl.ActivePageIndex of
@@ -4056,10 +4115,13 @@ procedure TMainForm.MessagePopupPopup(Sender: TObject);
 begin
 	if MessageControl.ActivePage = DebugSheet then begin
 		MsgCopyItem.Enabled := false;
+		MsgCopyAllItem.Enabled := false;
+		MsgSaveAllItem.Enabled := false;
 		MsgClearItem.Enabled := false;
-	end
-	else begin
+	end else begin
 		MsgCopyItem.Enabled := true;
+		MsgCopyAllItem.Enabled := true;
+		MsgSaveAllItem.Enabled := true;
 		MsgClearItem.Enabled := true;
 	end;
 end;
@@ -4168,7 +4230,7 @@ begin
 	end;
 end;
 
-procedure TMainForm.actStopExecuteExecute(Sender: TObject);
+procedure TMainForm.actForceStopExecuteExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
 		fDebugger.CloseDebugger(sender);
@@ -5528,12 +5590,23 @@ begin
 end;
 
 procedure TMainForm.FormPaint(Sender: TObject);
+var
+	i : Integer;
+	showtips : boolean;
 begin
+	showtips := true;
 	OnPaint:=nil; // don't re-enter here ;)
 	inherited;
 
-	if devData.ShowTipsOnStart and (ParamCount = 0) then // do not show tips if dev-c++ is launched with a file
-		actShowTips.Execute;
+	// do not show tips if dev-c++ is launched with a file
+	if devData.ShowTipsOnStart then begin
+		for i := 0 to ParamCount do
+			if (ParamStr(i)[2] = ':') or (ParamStr(i)[1] = '/') then
+				showtips := false;
+
+		if showtips then
+			actShowTips.Execute;
+	end;
 end;
 
 procedure TMainForm.actShowTipsExecute(Sender: TObject);

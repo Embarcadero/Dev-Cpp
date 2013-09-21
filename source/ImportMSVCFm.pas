@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Buttons, StdCtrls, XPMenu;
+  Dialogs, Buttons, StdCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -46,7 +46,6 @@ type
     btnCancel: TButton;
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
-    XPMenu: TXPMenu;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -608,10 +607,6 @@ end;
 
 procedure TImportMSVCForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := Lang[ID_MSVC_MENUITEM];
   lbSelect.Caption := Lang[ID_MSVC_SELECTMSVC] + ':';
   lbConf.Caption := Lang[ID_MSVC_CONFIGURATION] + ':';

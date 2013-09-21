@@ -24,8 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, Buttons, StdCtrls, Grids, ValEdit, IniFiles, ExtCtrls,
-  XPMenu;
+  Dialogs, ComCtrls, Buttons, StdCtrls, Grids, ValEdit, IniFiles, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -49,7 +48,6 @@ type
     btnRename: TSpeedButton;
     btnBrowse: TSpeedButton;
     btnDelete: TSpeedButton;
-    XPMenu: TXPMenu;
     cbSearchWord: TCheckBox;
     cbAffectF1: TCheckBox;
     procedure cboIconSelect(Sender: TObject);
@@ -294,10 +292,6 @@ end;
 
 procedure TfrmHelpEdit.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=                    Lang[ID_HE];
   lvFiles.Columns[0].Caption:= Lang[ID_HE_COL1];
   lvFiles.Columns[1].Caption:= Lang[ID_HE_COL2];

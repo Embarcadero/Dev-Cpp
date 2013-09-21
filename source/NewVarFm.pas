@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, XPMenu;
+  Dialogs, StdCtrls, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -53,7 +53,6 @@ type
     memDescr: TMemo;
     Label7: TLabel;
     cmbComment: TComboBox;
-    XPMenu: TXPMenu;
     chkInlineR: TCheckBox;
     chkInlineW: TCheckBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -365,10 +364,6 @@ end;
 
 procedure TNewVarForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := Lang[ID_POP_NEWVAR];
   Label1.Caption := Lang[ID_NEWVAR_VARTYPE];
   Label2.Caption := Lang[ID_NEWVAR_VARNAME];

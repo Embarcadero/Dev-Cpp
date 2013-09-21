@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
 	Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-	Dialogs, StdCtrls, ComCtrls, Menus, XPMenu;
+	Dialogs, StdCtrls, ComCtrls, Menus;
 {$ENDIF}
 {$IFDEF LINUX}
 	SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -50,7 +50,6 @@ type
 	chkNoDone: TCheckBox;
 	cmbFilter: TComboBox;
 	lblFilter: TLabel;
-	XPMenu: TXPMenu;
 	procedure FormShow(Sender: TObject);
 	procedure btnCloseClick(Sender: TObject);
 	procedure FormCreate(Sender: TObject);
@@ -296,10 +295,6 @@ end;
 
 procedure TViewToDoForm.LoadText;
 begin
-	if devData.XPTheme then
-	XPMenu.Active := true
-	else
-	XPMenu.Active := false;
 	Caption := Lang[ID_VIEWTODO_MENUITEM];
 
 {$IFDEF WIN32}

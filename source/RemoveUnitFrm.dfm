@@ -1,6 +1,6 @@
 object RemoveUnitForm: TRemoveUnitForm
-  Left = 239
-  Top = 116
+  Left = 403
+  Top = 343
   Width = 354
   Height = 317
   BorderIcons = [biSystemMenu, biMaximize]
@@ -18,7 +18,7 @@ object RemoveUnitForm: TRemoveUnitForm
   object Label1: TLabel
     Left = 0
     Top = 0
-    Width = 346
+    Width = 338
     Height = 6
     Align = alTop
     AutoSize = False
@@ -27,22 +27,22 @@ object RemoveUnitForm: TRemoveUnitForm
     Left = 0
     Top = 6
     Width = 6
-    Height = 243
+    Height = 232
     Align = alLeft
     AutoSize = False
   end
   object Label3: TLabel
-    Left = 340
+    Left = 332
     Top = 6
     Width = 6
-    Height = 243
+    Height = 232
     Align = alRight
     AutoSize = False
   end
   object Panel: TPanel
     Left = 0
-    Top = 249
-    Width = 346
+    Top = 238
+    Width = 338
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
@@ -88,15 +88,15 @@ object RemoveUnitForm: TRemoveUnitForm
   object GroupBox: TGroupBox
     Left = 6
     Top = 6
-    Width = 334
-    Height = 243
+    Width = 326
+    Height = 232
     Align = alClient
     Caption = 'Select the file to remove from the project :'
     TabOrder = 1
     object Label4: TLabel
       Left = 2
       Top = 15
-      Width = 330
+      Width = 322
       Height = 3
       Align = alTop
       AutoSize = False
@@ -105,22 +105,22 @@ object RemoveUnitForm: TRemoveUnitForm
       Left = 2
       Top = 18
       Width = 6
-      Height = 217
+      Height = 206
       Align = alLeft
       AutoSize = False
     end
     object Label6: TLabel
-      Left = 326
+      Left = 318
       Top = 18
       Width = 6
-      Height = 217
+      Height = 206
       Align = alRight
       AutoSize = False
     end
     object Label7: TLabel
       Left = 2
-      Top = 235
-      Width = 330
+      Top = 224
+      Width = 322
       Height = 6
       Align = alBottom
       AutoSize = False
@@ -128,42 +128,13 @@ object RemoveUnitForm: TRemoveUnitForm
     object UnitList: TListBox
       Left = 8
       Top = 18
-      Width = 318
-      Height = 212
+      Width = 310
+      Height = 199
       Align = alClient
       IntegralHeight = True
       ItemHeight = 13
+      MultiSelect = True
       TabOrder = 0
     end
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 136
-    Top = 56
   end
 end

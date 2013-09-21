@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 1223
-  Top = 543
+  Left = 729
+  Top = 261
   HelpType = htKeyword
   BorderStyle = bsDialog
   Caption = 'Editor Options'
@@ -30,7 +30,7 @@ object EditorOptForm: TEditorOptForm
     Top = 8
     Width = 415
     Height = 365
-    ActivePage = tabClassBrowsing
+    ActivePage = tabGeneral
     Anchors = [akLeft, akTop, akRight, akBottom]
     OnChange = PagesMainChange
     OnKeyDown = FormKeyDown
@@ -46,35 +46,13 @@ object EditorOptForm: TEditorOptForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 0
-      Visible = False
       Caption = 'General'
-      object bvlEditor: TBevel
-        Left = 10
-        Top = 9
-        Width = 390
-        Height = 3
-        Shape = bsTopLine
-      end
-      object lblEditorOpts: TLabel
-        Left = 20
-        Top = 2
-        Width = 81
-        Height = 13
-        Caption = '  Editor Options:  '
-      end
       object lblTabSize: TLabel
         Left = 215
         Top = 312
         Width = 45
         Height = 13
         Caption = 'Tab Size:'
-      end
-      object Bevel1: TBevel
-        Left = 7
-        Top = 192
-        Width = 396
-        Height = 2
-        Shape = bsTopLine
       end
       object cpHighColor: TColorPickerButton
         Left = 340
@@ -87,131 +65,13 @@ object EditorOptForm: TEditorOptForm
         OnDefaultSelect = cpMarginColorDefaultSelect
         OnHint = cpMarginColorHint
       end
-      object cbEHomeKey: TCheckBox
-        Left = 209
-        Top = 18
-        Width = 200
-        Height = 17
-        Hint = 'enhances home key positioning, similar to visual studio'
-        Caption = 'Enhance home key'
-        TabOrder = 9
-      end
-      object cbSmartScroll: TCheckBox
-        Left = 209
-        Top = 104
-        Width = 200
-        Height = 17
-        Hint = 'show scrollbars only when content is available'
-        Caption = 'Scollbars on need'
-        TabOrder = 14
-      end
-      object cbAutoIndent: TCheckBox
-        Left = 8
-        Top = 18
-        Width = 200
-        Height = 17
-        Hint = 'caret will position to first non-whitespace of preceeding line'
-        Caption = 'Auto Indent'
-        TabOrder = 0
-      end
-      object cbInsertMode: TCheckBox
-        Left = 8
-        Top = 35
-        Width = 200
-        Height = 17
-        Hint = 'editor is in insert mode on start'
-        Caption = 'Insert Mode'
-        TabOrder = 1
-      end
-      object cbTabtoSpaces: TCheckBox
-        Left = 8
-        Top = 52
-        Width = 200
-        Height = 17
-        Caption = 'Use Tab Character'
-        TabOrder = 2
-      end
-      object cbSmartTabs: TCheckBox
-        Left = 8
-        Top = 69
-        Width = 200
-        Height = 17
-        Hint = 
-          'on tab cursor is moved to first nonblank space of preceeding lin' +
-          'e'
-        Caption = 'Smart Tabs'
-        TabOrder = 3
-      end
-      object cbHalfPage: TCheckBox
-        Left = 209
-        Top = 121
-        Width = 200
-        Height = 17
-        Hint = 'page up/down will move text by half a page instead of full page'
-        Caption = 'Half Page Scrolling'
-        TabOrder = 15
-      end
-      object cbPastEOF: TCheckBox
-        Left = 209
-        Top = 35
-        Width = 200
-        Height = 17
-        Hint = 'allow cursor position past end of file'
-        Caption = 'Cursor Past EOF'
-        TabOrder = 10
-      end
-      object cbPastEOL: TCheckBox
-        Left = 209
-        Top = 52
-        Width = 200
-        Height = 17
-        Hint = 'allows cursor position past end of line'
-        Caption = 'Cursor Past EOL'
-        TabOrder = 11
-      end
-      object cbFindText: TCheckBox
-        Left = 209
-        Top = 87
-        Width = 200
-        Height = 17
-        Hint = 'inserts text at cursor into text to find of search dialog'
-        Caption = 'Find Text at Cursor'
-        TabOrder = 13
-      end
-      object cbTrailingBlanks: TCheckBox
-        Left = 8
-        Top = 87
-        Width = 200
-        Height = 17
-        Hint = 'Blanks at end of lines will be saved with file'
-        Caption = 'Keep Trailing Blanks'
-        TabOrder = 4
-      end
-      object cbScrollHint: TCheckBox
-        Left = 209
-        Top = 138
-        Width = 200
-        Height = 17
-        Hint = 'shows current line when scrolling'
-        Caption = 'Scroll Hint'
-        TabOrder = 16
-      end
-      object cbDoubleLine: TCheckBox
-        Left = 209
-        Top = 69
-        Width = 200
-        Height = 17
-        Hint = 'double clicking a line selects it'
-        Caption = 'Double Click Line'
-        TabOrder = 12
-      end
       object cbSyntaxHighlight: TCheckBox
         Left = 16
         Top = 288
         Width = 180
         Height = 17
         Caption = 'Use Syntax Highlight'
-        TabOrder = 18
+        TabOrder = 0
         OnClick = cbSyntaxHighlightClick
       end
       object edSyntaxExt: TEdit
@@ -219,7 +79,7 @@ object EditorOptForm: TEditorOptForm
         Top = 308
         Width = 189
         Height = 21
-        TabOrder = 19
+        TabOrder = 1
       end
       object seTabSize: TSpinEdit
         Left = 340
@@ -228,26 +88,8 @@ object EditorOptForm: TEditorOptForm
         Height = 22
         MaxValue = 0
         MinValue = 0
-        TabOrder = 20
+        TabOrder = 2
         Value = 0
-      end
-      object cbSmartUnIndent: TCheckBox
-        Left = 8
-        Top = 104
-        Width = 200
-        Height = 17
-        Hint = 'cursor is moved to nonblank space of previous line '
-        Caption = 'Backspace Unindents'
-        TabOrder = 5
-      end
-      object cbGroupUndo: TCheckBox
-        Left = 8
-        Top = 121
-        Width = 200
-        Height = 17
-        Hint = 'handle all changes of same type as single action'
-        Caption = 'Group Undo'
-        TabOrder = 6
       end
       object grpMargin: TGroupBox
         Left = 248
@@ -255,7 +97,7 @@ object EditorOptForm: TEditorOptForm
         Width = 154
         Height = 84
         Caption = '  Right Margin  '
-        TabOrder = 21
+        TabOrder = 3
         object lblMarginWidth: TLabel
           Left = 8
           Top = 35
@@ -300,13 +142,21 @@ object EditorOptForm: TEditorOptForm
           Value = 0
         end
       end
+      object grpEditorOpts: TGroupBox
+        Left = 9
+        Top = 3
+        Width = 393
+        Height = 193
+        Caption = '  Editor Options  '
+        TabOrder = 25
+      end
       object grpCaret: TGroupBox
         Left = 9
         Top = 196
         Width = 235
         Height = 84
         Caption = '  Caret  '
-        TabOrder = 22
+        TabOrder = 4
         object lblInsertCaret: TLabel
           Left = 8
           Top = 16
@@ -360,43 +210,179 @@ object EditorOptForm: TEditorOptForm
           TabOrder = 2
         end
       end
-      object cbDropFiles: TCheckBox
-        Left = 8
-        Top = 138
-        Width = 200
-        Height = 17
-        Caption = 'Insert Dropped Files'
-        TabOrder = 7
-      end
-      object cbSpecialChars: TCheckBox
-        Left = 8
-        Top = 156
-        Width = 200
-        Height = 17
-        Caption = 'Show Special Line Chars'
-        TabOrder = 8
-      end
-      object cbParserHints: TCheckBox
-        Left = 209
-        Top = 156
-        Width = 200
-        Height = 17
-        Caption = 'Show editor hints'
-        TabOrder = 17
-      end
       object cbHighCurrLine: TCheckBox
         Left = 216
         Top = 288
         Width = 121
         Height = 17
         Caption = 'Highlight current line'
-        TabOrder = 23
+        TabOrder = 5
         OnClick = cbHighCurrLineClick
       end
+      object cbTrailingBlanks: TCheckBox
+        Left = 16
+        Top = 87
+        Width = 177
+        Height = 17
+        Hint = 'Blanks at end of lines will be saved with file'
+        Caption = 'Keep Trailing Blanks'
+        TabOrder = 6
+      end
+      object cbTabtoSpaces: TCheckBox
+        Left = 16
+        Top = 52
+        Width = 177
+        Height = 17
+        Caption = 'Use Tab Character'
+        TabOrder = 7
+      end
+      object cbSpecialChars: TCheckBox
+        Left = 16
+        Top = 156
+        Width = 177
+        Height = 17
+        Caption = 'Show Special Line Chars'
+        TabOrder = 8
+      end
+      object cbSmartUnIndent: TCheckBox
+        Left = 16
+        Top = 104
+        Width = 177
+        Height = 17
+        Hint = 'cursor is moved to nonblank space of previous line '
+        Caption = 'Backspace Unindents'
+        TabOrder = 9
+      end
+      object cbSmartTabs: TCheckBox
+        Left = 16
+        Top = 69
+        Width = 177
+        Height = 17
+        Hint = 
+          'on tab cursor is moved to first nonblank space of preceeding lin' +
+          'e'
+        Caption = 'Smart Tabs'
+        TabOrder = 10
+      end
+      object cbSmartScroll: TCheckBox
+        Left = 209
+        Top = 104
+        Width = 184
+        Height = 17
+        Hint = 'show scrollbars only when content is available'
+        Caption = 'Scollbars on need'
+        TabOrder = 11
+      end
+      object cbScrollHint: TCheckBox
+        Left = 209
+        Top = 138
+        Width = 184
+        Height = 17
+        Hint = 'shows current line when scrolling'
+        Caption = 'Scroll Hint'
+        TabOrder = 12
+      end
+      object cbPastEOL: TCheckBox
+        Left = 209
+        Top = 52
+        Width = 184
+        Height = 17
+        Hint = 'allows cursor position past end of line'
+        Caption = 'Cursor Past EOL'
+        TabOrder = 13
+      end
+      object cbPastEOF: TCheckBox
+        Left = 209
+        Top = 35
+        Width = 184
+        Height = 17
+        Hint = 'allow cursor position past end of file'
+        Caption = 'Cursor Past EOF'
+        TabOrder = 14
+      end
+      object cbParserHints: TCheckBox
+        Left = 209
+        Top = 156
+        Width = 184
+        Height = 17
+        Caption = 'Show editor hints'
+        TabOrder = 15
+      end
+      object cbInsertMode: TCheckBox
+        Left = 16
+        Top = 35
+        Width = 177
+        Height = 17
+        Hint = 'editor is in insert mode on start'
+        Caption = 'Insert Mode'
+        TabOrder = 16
+      end
+      object cbHalfPage: TCheckBox
+        Left = 209
+        Top = 121
+        Width = 184
+        Height = 17
+        Hint = 'page up/down will move text by half a page instead of full page'
+        Caption = 'Half Page Scrolling'
+        TabOrder = 17
+      end
+      object cbGroupUndo: TCheckBox
+        Left = 16
+        Top = 121
+        Width = 177
+        Height = 17
+        Hint = 'handle all changes of same type as single action'
+        Caption = 'Group Undo'
+        TabOrder = 18
+      end
+      object cbFindText: TCheckBox
+        Left = 209
+        Top = 87
+        Width = 184
+        Height = 17
+        Hint = 'inserts text at cursor into text to find of search dialog'
+        Caption = 'Find Text at Cursor'
+        TabOrder = 19
+      end
+      object cbEHomeKey: TCheckBox
+        Left = 209
+        Top = 18
+        Width = 184
+        Height = 17
+        Hint = 'enhances home key positioning, similar to visual studio'
+        Caption = 'Enhance home key'
+        TabOrder = 20
+      end
+      object cbDropFiles: TCheckBox
+        Left = 16
+        Top = 138
+        Width = 177
+        Height = 17
+        Caption = 'Insert Dropped Files'
+        TabOrder = 21
+      end
+      object cbDoubleLine: TCheckBox
+        Left = 209
+        Top = 69
+        Width = 184
+        Height = 17
+        Hint = 'double clicking a line selects it'
+        Caption = 'Double Click Line'
+        TabOrder = 22
+      end
+      object cbAutoIndent: TCheckBox
+        Left = 16
+        Top = 18
+        Width = 177
+        Height = 17
+        Hint = 'caret will position to first non-whitespace of preceeding line'
+        Caption = 'Auto Indent'
+        TabOrder = 23
+      end
       object cbAppendNewline: TCheckBox
-        Left = 8
+        Left = 16
         Top = 172
-        Width = 200
+        Width = 177
         Height = 17
         Caption = 'Ensure that file ends with newline'
         TabOrder = 24
@@ -418,17 +404,17 @@ object EditorOptForm: TEditorOptForm
       Caption = 'Display'
       object grpGutter: TGroupBox
         Left = 6
-        Top = 138
+        Top = 168
         Width = 398
-        Height = 165
+        Height = 159
         Caption = '  Gutter  '
         TabOrder = 1
         DesignSize = (
           398
-          165)
+          159)
         object lblGutterFont: TLabel
           Left = 8
-          Top = 71
+          Top = 65
           Width = 21
           Height = 13
           Anchors = [akLeft, akRight, akBottom]
@@ -436,7 +422,7 @@ object EditorOptForm: TEditorOptForm
         end
         object lblGutterWidth: TLabel
           Left = 321
-          Top = 71
+          Top = 65
           Width = 28
           Height = 13
           Anchors = [akLeft, akRight, akBottom]
@@ -445,7 +431,7 @@ object EditorOptForm: TEditorOptForm
         end
         object lblGutterFontSize: TLabel
           Left = 200
-          Top = 71
+          Top = 65
           Width = 20
           Height = 13
           Anchors = [akLeft, akRight, akBottom]
@@ -503,7 +489,7 @@ object EditorOptForm: TEditorOptForm
         end
         object pnlGutterPreview: TPanel
           Left = 12
-          Top = 114
+          Top = 108
           Width = 373
           Height = 40
           Anchors = [akLeft, akRight, akBottom]
@@ -519,29 +505,29 @@ object EditorOptForm: TEditorOptForm
         end
         object cboGutterFont: TComboBox
           Left = 12
-          Top = 87
+          Top = 81
           Width = 180
           Height = 21
           Anchors = [akLeft, akRight, akBottom]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 6
           OnChange = FontChange
           OnDblClick = cboDblClick
         end
         object cboGutterSize: TComboBox
           Left = 208
-          Top = 87
+          Top = 81
           Width = 86
           Height = 21
           Anchors = [akLeft, akRight, akBottom]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 7
           OnChange = FontSizeChange
           OnDblClick = cboDblClick
         end
         object edGutterWidth: TSpinEdit
           Left = 328
-          Top = 87
+          Top = 81
           Width = 57
           Height = 22
           MaxValue = 0
@@ -579,7 +565,7 @@ object EditorOptForm: TEditorOptForm
           Top = 32
           Width = 180
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnDblClick = cboDblClick
           OnSelect = FontChange
@@ -589,7 +575,7 @@ object EditorOptForm: TEditorOptForm
           Top = 32
           Width = 80
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
           OnChange = FontSizeChange
           OnDblClick = cboDblClick
@@ -680,13 +666,6 @@ object EditorOptForm: TEditorOptForm
         Height = 13
         Caption = 'Color Speed Setting:'
       end
-      object Bevel3: TBevel
-        Left = 0
-        Top = 184
-        Width = 411
-        Height = 3
-        Align = alBottom
-      end
       object btnSaveSyntax: TSpeedButton
         Left = 280
         Top = 23
@@ -726,18 +705,17 @@ object EditorOptForm: TEditorOptForm
         OnClick = btnSaveSyntaxClick
       end
       object CppEdit: TSynEdit
-        Left = 0
-        Top = 187
-        Width = 411
-        Height = 151
-        Align = alBottom
+        Left = 7
+        Top = 152
+        Width = 398
+        Height = 180
+        Align = alCustom
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
         TabOrder = 3
-        BorderStyle = bsNone
         Gutter.DigitCount = 2
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
@@ -749,9 +727,10 @@ object EditorOptForm: TEditorOptForm
         Gutter.ShowLineNumbers = True
         HideSelection = True
         Highlighter = cpp
-        Options = [eoAutoIndent, eoDisableScrollArrows, eoDragDropEditing, eoHideShowScrollbars, eoNoCaret, eoNoSelection, eoScrollPastEol, eoShowScrollHint, eoSmartTabs, eoTrimTrailingSpaces]
+        Options = [eoAutoIndent, eoDisableScrollArrows, eoDragDropEditing, eoHideShowScrollbars, eoNoCaret, eoNoSelection, eoShowScrollHint, eoSmartTabs, eoTrimTrailingSpaces]
         ReadOnly = True
         ScrollHintFormat = shfTopToBottom
+        TabWidth = 4
         WantTabs = True
         OnGutterClick = OnGutterClick
         OnSpecialLineColors = CppEditSpecialLineColors
@@ -855,7 +834,7 @@ object EditorOptForm: TEditorOptForm
       VertScrollBar.Smooth = True
       VertScrollBar.Tracking = True
       Align = alClient
-      BevelKind = bkSoft
+      BevelKind = bkTile
       TabOrder = 3
       Visible = False
       Caption = 'Code'
@@ -863,7 +842,7 @@ object EditorOptForm: TEditorOptForm
         Left = 5
         Top = 0
         Width = 401
-        Height = 304
+        Height = 331
         ActivePage = tabCPInserts
         BackTextColor = clInactiveCaptionText
         BackColor = clInactiveCaption
@@ -872,7 +851,7 @@ object EditorOptForm: TEditorOptForm
           Left = 0
           Top = 0
           Width = 401
-          Height = 281
+          Height = 308
           HorzScrollBar.Smooth = True
           HorzScrollBar.Tracking = True
           VertScrollBar.Smooth = True
@@ -882,59 +861,43 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Inserts'
           object lblCode: TLabel
             Left = 0
-            Top = 114
+            Top = 107
             Width = 28
             Height = 13
             Align = alBottom
             Caption = 'Code:'
           end
-          object Bevel2: TBevel
-            Left = 0
-            Top = 278
-            Width = 401
-            Height = 3
-            Align = alBottom
-            Shape = bsTopLine
-          end
-          object Bevel4: TBevel
-            Left = 0
-            Top = 127
-            Width = 401
-            Height = 3
-            Align = alBottom
-            Shape = bsTopLine
-          end
           object btnAdd: TButton
-            Left = 326
+            Left = 336
             Top = 8
-            Width = 70
+            Width = 60
             Height = 23
             Caption = 'Add'
             TabOrder = 1
             OnClick = btnAddClick
           end
           object btnEdit: TButton
-            Left = 326
+            Left = 336
             Top = 41
-            Width = 70
+            Width = 60
             Height = 23
             Caption = 'Edit'
             TabOrder = 2
             OnClick = btnEditClick
           end
           object btnRemove: TButton
-            Left = 326
+            Left = 336
             Top = 75
-            Width = 70
+            Width = 60
             Height = 23
             Caption = 'Remove'
             TabOrder = 3
             OnClick = btnRemoveClick
           end
           object lvCodeins: TListView
-            Left = 6
+            Left = 2
             Top = 8
-            Width = 311
+            Width = 327
             Height = 91
             BevelOuter = bvRaised
             BevelKind = bkSoft
@@ -949,12 +912,9 @@ object EditorOptForm: TEditorOptForm
               end
               item
                 Caption = 'Description'
-                Width = -2
-                WidthType = (
-                  -2)
+                Width = 157
               end>
             ColumnClick = False
-            FlatScrollBars = True
             GridLines = True
             HideSelection = False
             RowSelect = True
@@ -966,9 +926,9 @@ object EditorOptForm: TEditorOptForm
           end
           object CodeIns: TSynEdit
             Left = 0
-            Top = 130
+            Top = 120
             Width = 401
-            Height = 148
+            Height = 188
             Align = alBottom
             Ctl3D = True
             ParentCtl3D = False
@@ -978,7 +938,6 @@ object EditorOptForm: TEditorOptForm
             Font.Name = 'Courier New'
             Font.Style = []
             TabOrder = 4
-            BorderStyle = bsNone
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
             Gutter.Font.Height = -11
@@ -986,7 +945,8 @@ object EditorOptForm: TEditorOptForm
             Gutter.Font.Style = []
             Gutter.Width = 10
             Highlighter = cpp
-            Options = [eoAutoIndent, eoDisableScrollArrows, eoDragDropEditing, eoEnhanceHomeKey, eoGroupUndo, eoHideShowScrollbars, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces, eoTrimTrailingSpaces]
+            Options = [eoAutoIndent, eoDisableScrollArrows, eoDragDropEditing, eoEnhanceHomeKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces, eoTrimTrailingSpaces]
+            TabWidth = 4
             WantTabs = True
             OnStatusChange = CodeInsStatusChange
             RemovedKeystrokes = <
@@ -1005,7 +965,7 @@ object EditorOptForm: TEditorOptForm
           Left = 0
           Top = 0
           Width = 401
-          Height = 281
+          Height = 308
           HorzScrollBar.Smooth = True
           HorzScrollBar.Tracking = True
           VertScrollBar.Smooth = True
@@ -1018,7 +978,7 @@ object EditorOptForm: TEditorOptForm
             Left = 0
             Top = 0
             Width = 401
-            Height = 261
+            Height = 288
             Align = alClient
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
@@ -1048,7 +1008,7 @@ object EditorOptForm: TEditorOptForm
           end
           object Panel1: TPanel
             Left = 0
-            Top = 261
+            Top = 288
             Width = 401
             Height = 20
             Align = alBottom
@@ -1079,6 +1039,7 @@ object EditorOptForm: TEditorOptForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 4
+      Visible = False
       Caption = 'Class browsing'
       object chkEnableClassBrowser: TCheckBox
         Left = 8
@@ -1089,19 +1050,19 @@ object EditorOptForm: TEditorOptForm
         TabOrder = 0
         OnClick = chkEnableClassBrowserClick
       end
-      object devPages1: TdevPages
+      object ClassCodePage: TdevPages
         Left = 8
         Top = 32
         Width = 393
-        Height = 265
+        Height = 297
         ActivePage = tabCBBrowser
         Orientation = toBottom
-        OnChange = devPages1Change
+        OnChange = ClassCodePageChange
         object tabCBBrowser: TdevPage
           Left = 0
           Top = 0
           Width = 393
-          Height = 242
+          Height = 274
           HorzScrollBar.Smooth = True
           HorzScrollBar.Tracking = True
           VertScrollBar.Smooth = True
@@ -1121,7 +1082,7 @@ object EditorOptForm: TEditorOptForm
             Left = 52
             Top = 156
             Width = 317
-            Height = 73
+            Height = 109
             Images = dmMain.ClassImages
             ReadOnly = True
             Indent = 19
@@ -1199,7 +1160,7 @@ object EditorOptForm: TEditorOptForm
           Left = 0
           Top = 0
           Width = 393
-          Height = 242
+          Height = 274
           HorzScrollBar.Smooth = True
           HorzScrollBar.Tracking = True
           VertScrollBar.Smooth = True
@@ -1237,17 +1198,17 @@ object EditorOptForm: TEditorOptForm
             Caption = 'Background color:'
           end
           object btnCCCnew: TSpeedButton
-            Left = 292
+            Left = 280
             Top = 136
-            Width = 89
+            Width = 101
             Height = 22
             Caption = 'Add files'
             OnClick = btnCCCnewClick
           end
           object btnCCCdelete: TSpeedButton
-            Left = 292
+            Left = 280
             Top = 160
-            Width = 89
+            Width = 101
             Height = 22
             Caption = 'Clear'
             OnClick = btnCCCdeleteClick
@@ -1293,19 +1254,20 @@ object EditorOptForm: TEditorOptForm
             OnClick = chkCCCacheClick
           end
           object lbCCC: TListBox
-            Left = 24
+            Left = 8
             Top = 136
-            Width = 261
-            Height = 96
+            Width = 265
+            Height = 121
             ItemHeight = 13
             Sorted = True
             TabOrder = 3
           end
           object pbCCCache: TProgressBar
-            Left = 292
+            Left = 280
             Top = 184
-            Width = 89
-            Height = 16
+            Width = 101
+            Height = 20
+            BorderWidth = 1
             TabOrder = 4
             Visible = False
           end
@@ -1314,7 +1276,7 @@ object EditorOptForm: TEditorOptForm
     end
   end
   object btnOk: TBitBtn
-    Left = 163
+    Left = 169
     Top = 379
     Width = 84
     Height = 24
@@ -1343,7 +1305,7 @@ object EditorOptForm: TEditorOptForm
     NumGlyphs = 2
   end
   object btnCancel: TBitBtn
-    Left = 248
+    Left = 254
     Top = 379
     Width = 84
     Height = 24
@@ -1353,7 +1315,7 @@ object EditorOptForm: TEditorOptForm
     Kind = bkCancel
   end
   object btnHelp: TBitBtn
-    Left = 345
+    Left = 346
     Top = 379
     Width = 75
     Height = 24
@@ -1383,35 +1345,5 @@ object EditorOptForm: TEditorOptForm
     OnEndParsing = CppParser1EndParsing
     Left = 80
     Top = 376
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 136
-    Top = 56
   end
 end

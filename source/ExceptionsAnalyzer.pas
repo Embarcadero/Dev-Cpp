@@ -27,8 +27,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, StdCtrls, Buttons, ExtCtrls, ShellAPI, ComCtrls,
-  XPMenu;
+  Dialogs, StrUtils, StdCtrls, Buttons, ExtCtrls, ShellAPI, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -125,7 +124,6 @@ type
     lblMemoryLoad: TLabel;
     memBugReport: TMemo;
     btnHelp: TSpeedButton;
-    XPMenu: TXPMenu;
     procedure FormShow(Sender: TObject);
     procedure btnViewClick(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
@@ -615,10 +613,6 @@ end;
 
 procedure TfrmExceptionsAnalyzer.FormCreate(Sender: TObject);
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   lblProgramPath.Caption := '';
   lblProgramVersion.Caption := '';
   lblPlatform.Caption := '';

@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Forms, 
-  ImgList, ComCtrls, Buttons, StdCtrls, Controls, Dialogs, ExtDlgs, XPMenu;
+  ImgList, ComCtrls, Buttons, StdCtrls, Controls, Dialogs, ExtDlgs;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QForms, 
@@ -38,7 +38,6 @@ type
     ImageList: TImageList;
     dlgPic: TOpenPictureDialog;
     IconView: TListView;
-    XPMenu: TXPMenu;
     procedure btnOkClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -64,10 +63,6 @@ uses Version, MultiLangSupport, devcfg, utils;
 
 procedure TIconForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=             Lang[ID_IF];
   btnOk.Caption:=       Lang[ID_IF_USEICO];
   btnCancel.Caption:=   Lang[ID_BTN_CANCEL];

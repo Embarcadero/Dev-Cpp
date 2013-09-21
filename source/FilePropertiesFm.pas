@@ -26,7 +26,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StrUtils, ExtCtrls, StdCtrls, SynEdit,
-  SynEditTypes, FileCtrl, XPMenu;
+  SynEditTypes, FileCtrl;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -69,7 +69,6 @@ type
     Bevel9: TBevel;
     Label11: TLabel;
     lblTimestamp: TLabel;
-    XPMenu: TXPMenu;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnOKClick(Sender: TObject);
@@ -200,10 +199,6 @@ end;
 
 procedure TFilePropertiesForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := Lang[ID_ITEM_PROPERTIES];
   btnOK.Caption := Lang[ID_BTN_OK];
   Label1.Caption := Lang[ID_PROPS_FILENAME] + ':';

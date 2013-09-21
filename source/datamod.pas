@@ -157,7 +157,7 @@ var
   i, a, offset: integer;
   Attr: TSynHighlighterAttributes;
 begin
-  offset:= 0 * 1000; // default to style-set '0'
+  offset:= 0; // default to style-set '0'
   for i:= 0 to pred(cpp.AttrCount) do
   begin
     attr:= TSynHighlighterAttributes.Create(cpp.Attribute[i].Name);
@@ -468,6 +468,9 @@ var
  idx: integer;
  Item: TMenuItem;
 begin
+
+
+
   if not assigned(fCodeMenu) then exit;
   fCodeList.LoadCode;
 
@@ -497,6 +500,8 @@ begin
   if assigned(fCodePop) then
    CloneMenu(fCodeMenu, fCodePop);
 end;
+
+{ ---------- Exports ---------- }
 
 procedure TdmMain.ExportToHtml(FileLines: TStrings; ExportFilename: string);
 begin

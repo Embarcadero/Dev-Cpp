@@ -167,7 +167,7 @@ begin
     except
      if MessageDlg('The selected language file has an invalid, or is missing a version entry.'#13#10
                   +'You may not have all the required strings for your current Dev-C++ interface.'#13#10
-                  +'Please check the Dev-C++ Update or Bloadshed.net for new language files, Continue Opening?',
+                  +'Please check the Dev-C++ Update or Bloodshed.net for new language files, Continue Opening?',
           mtWarning, [mbYes, mbNo], 0) = mrNo then Exit else ver:= 1;
     end; // end invalid ver test
 

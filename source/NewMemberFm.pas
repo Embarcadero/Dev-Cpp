@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, CppParser, XPMenu;
+  Dialogs, StdCtrls, ExtCtrls, CppParser;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -50,7 +50,6 @@ type
     memDescr: TMemo;
     cmbComment: TComboBox;
     chkToDo: TCheckBox;
-    XPMenu: TXPMenu;
     grpAttr: TGroupBox;
     chkStatic: TCheckBox;
     chkVirtual: TCheckBox;
@@ -308,10 +307,6 @@ end;
 
 procedure TNewMemberForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption := Lang[ID_POP_NEWMEMBER];
   Label1.Caption := Lang[ID_NEWVAR_VARTYPE];
   Label2.Caption := Lang[ID_NEWMEMB_MEMBNAME];

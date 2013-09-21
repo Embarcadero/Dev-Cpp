@@ -26,7 +26,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, devTabs, StdCtrls, Spin, devRun, ComCtrls, StrUtils, FileCtrl,
-  Grids, ValEdit, CVSThread, XPMenu, Menus, CheckLst, DateUtils;
+  Grids, ValEdit, CVSThread, Menus, CheckLst, DateUtils;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -128,7 +128,6 @@ type
     lblAddMsg: TLabel;
     memAddMsg: TMemo;
     chkRemove: TCheckBox;
-    XPMenu: TXPMenu;
     tabFiles: TdevPage;
     lblFiles: TLabel;
     lstFiles: TCheckListBox;
@@ -912,10 +911,6 @@ end;
 
 procedure TCVSForm.LoadText;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   tabImport.Caption := Lang[ID_CVS_IMPORTTAB];
   tabRepos.Caption := Lang[ID_CVS_REPOSITORYTAB];
   tabGlobal.Caption := Lang[ID_CVS_GLOBALTAB];

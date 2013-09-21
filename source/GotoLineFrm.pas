@@ -31,7 +31,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ExtCtrls, Spin, XPMenu, SynEdit;
+  Buttons, ExtCtrls, Spin, SynEdit;
 {$ENDIF}
 {$IFDEF LINUX}
   Classes, QGraphics, QForms, QControls, QStdCtrls, 
@@ -42,15 +42,12 @@ type
   TGotoLineForm = class(TForm)
     GotoLabel: TLabel;
     Line: TSpinEdit;
-    XPMenu: TXPMenu;
     BtnOK: TButton;
     BtnCancel: TButton;
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyUp(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure FormKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure FormShow(Sender: TObject);
-    procedure LineKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure LineKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
   private
     FEditor: TCustomSynEdit;
     procedure SetEditor(AEditor: TCustomSynEdit);
@@ -94,15 +91,13 @@ end;
 
 procedure TGotoLineForm.LoadTexts;
 begin
-  XPMenu.Active := devData.XPTheme;
   Caption := Lang[ID_GOTO_CAPTION];
   GotoLabel.Caption := Lang[ID_GOTO_TEXT];
   BtnOk.Caption := Lang[ID_BTN_OK];
   BtnCancel.Caption := Lang[ID_BTN_CANCEL];
 end;
 
-procedure TGotoLineForm.FormKeyUp(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TGotoLineForm.FormKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
 begin
 {$IFDEF WIN32}
   if Key = VK_ESCAPE then Close;
@@ -121,7 +116,5 @@ begin
     Line.Value := FEditor.CaretY;
   end;
 end;
-
-
 
 end.

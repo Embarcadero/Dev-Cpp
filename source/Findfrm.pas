@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  SynEdit, StdCtrls, devTabs, SynEditTypes, XPMenu;
+  SynEdit, StdCtrls, devTabs, SynEditTypes;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms,
@@ -53,7 +53,6 @@ type
     grpWhere: TGroupBox;
     rbProjectFiles: TRadioButton;
     rbOpenFIles: TRadioButton;
-    XPMenu: TXPMenu;
     procedure btnFindClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -181,10 +180,6 @@ procedure TfrmFind.LoadText;
 var
  x: Integer;
 begin
-  if devData.XPTheme then
-    XPMenu.Active := true
-  else
-    XPMenu.Active := false;
   Caption:=                 Lang[ID_FIND];
 
   //tabs

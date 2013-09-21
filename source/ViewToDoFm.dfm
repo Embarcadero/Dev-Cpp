@@ -20,8 +20,8 @@ object ViewToDoForm: TViewToDoForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    580
-    199)
+    556
+    209)
   PixelsPerInch = 96
   TextHeight = 13
   object lblFilter: TLabel
@@ -89,7 +89,7 @@ object ViewToDoForm: TViewToDoForm
     Width = 289
     Height = 13
     Anchors = [akLeft, akBottom]
-    Caption = 'Don''t show items marked as done'
+    Caption = 'Don'#39't show items marked as done'
     TabOrder = 2
     OnClick = chkNoDoneClick
   end
@@ -110,35 +110,5 @@ object ViewToDoForm: TViewToDoForm
       'Open project files only'
       'Non-project open files'
       'Current file only')
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 136
-    Top = 56
   end
 end
