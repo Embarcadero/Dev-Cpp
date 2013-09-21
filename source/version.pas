@@ -32,12 +32,11 @@ const
 
 	// exe properties
 	DEVCPP                = 'Dev-C++';
-	DEVCPP_VERSION        = '5.3.0.0 RC6';
-	DEVCPP_BUILDTIME      = 'September 4 2012 - 23:07';
+	DEVCPP_VERSION        = '5.3.0.0 RC7';
+	DEVCPP_BUILDTIME      = 'September 8 2012 - 16:50';
 
 	// delimiters
 	DEV_INTERNAL_OPEN     = '$__DEV_INTERNAL_OPEN';
-	DEV_SEARCHLOOP        = '$__DEV_SEARCH_LOOP';
 
 	// config file names
 	DEV_COMPLETION_CACHE  = 'cache.ccc';

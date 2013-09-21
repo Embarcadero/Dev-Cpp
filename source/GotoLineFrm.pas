@@ -47,6 +47,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure LineKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   public
     procedure LoadText;
   end;
@@ -99,6 +100,11 @@ begin
 {$IFDEF LINUX}
   if Key = XK_ESCAPE then Close;
 {$ENDIF}
+end;
+
+procedure TGotoLineForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+	Action := caFree;
 end;
 
 end.

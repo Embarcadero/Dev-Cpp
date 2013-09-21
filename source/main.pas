@@ -42,12 +42,6 @@ uses
 {$ENDIF}
 
 type
-	PBreakPoint = ^TBreakPoint;
-	TBreakPoint = record
-		line : integer;
-		editor : TEditor;
-	end;
-
 	TMainForm = class(TForm)
 		MainMenu: TMainMenu;
 		FileMenu: TMenuItem;
@@ -89,7 +83,6 @@ type
 		SelectallItem: TMenuItem;
 		SearchMenu: TMenuItem;
 		FindItem: TMenuItem;
-		FindnextItem: TMenuItem;
 		ReplaceItem: TMenuItem;
 		N7: TMenuItem;
 		GotolineItem: TMenuItem;
@@ -226,7 +219,6 @@ type
 		actFind: TAction;
 		actFindAll: TAction;
 		actReplace: TAction;
-		actFindNext: TAction;
 		actGotoLine: TAction;
 		actProjectManager: TAction;
 		actStatusbar: TAction;
@@ -263,7 +255,7 @@ type
 		RedoBtn: TToolButton;
 		tbSearch: TToolBar;
 		FindBtn: TToolButton;
-		Replacebtn: TToolButton;
+    ReplaceBtn: TToolButton;
 		FindNextBtn: TToolButton;
 		GotoLineBtn: TToolButton;
 		OpenPopItem: TMenuItem;
@@ -383,7 +375,7 @@ type
 		CloseAll1: TMenuItem;
 		Closeallexceptthis1: TMenuItem;
 		CloseAll2: TMenuItem;
-    actStepLine: TAction;
+		actStepLine: TAction;
 		DbgSingleStep: TMenuItem;
 		DebugVarsPopup: TPopupMenu;
 		AddwatchPop: TMenuItem;
@@ -561,8 +553,8 @@ type
 		actGoto: TAction;
 		TEXItem: TMenuItem;
 		actXTex: TAction;
-    NextLineBtn: TButton;
-    IntoLineBtn: TButton;
+		NextLineBtn: TButton;
+		IntoLineBtn: TButton;
 		lblSendCommandGdb: TLabel;
 		edGdbCommand: TEdit;
 		DebugOutput: TMemo;
@@ -576,23 +568,26 @@ type
 		EvaluateInput: TEdit;
 		lblEvaluate: TLabel;
 		EvalOutput: TMemo;
-    SkipFuncBtn: TButton;
-    actSkipFunction: TAction;
-    IntoInsBtn: TButton;
-    actNextIns: TAction;
-    NextInsBtn: TButton;
-    actStepIns: TAction;
-    MsgPasteItem: TMenuItem;
-    actMsgCopy: TAction;
-    actMsgCopyAll: TAction;
-    actMsgPaste: TAction;
-    actMsgClear: TAction;
-    actMsgSaveAll: TAction;
-    Skipfunction1: TMenuItem;
-    N69: TMenuItem;
-    actNextIns1: TMenuItem;
-    Intoinstruction1: TMenuItem;
-    N70: TMenuItem;
+		SkipFuncBtn: TButton;
+		actSkipFunction: TAction;
+		IntoInsBtn: TButton;
+		actNextIns: TAction;
+		NextInsBtn: TButton;
+		actStepIns: TAction;
+		MsgPasteItem: TMenuItem;
+		actMsgCopy: TAction;
+		actMsgCopyAll: TAction;
+		actMsgPaste: TAction;
+		actMsgClear: TAction;
+		actMsgSaveAll: TAction;
+		Skipfunction1: TMenuItem;
+		N69: TMenuItem;
+		actNextIns1: TMenuItem;
+		Intoinstruction1: TMenuItem;
+		N70: TMenuItem;
+		actReplaceAll: TAction;
+		ReplaceAll1: TMenuItem;
+		N72: TMenuItem;
 
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
 		procedure FormDestroy(Sender: TObject);
@@ -655,7 +650,6 @@ type
 		procedure actFindExecute(Sender: TObject);
 		procedure actFindAllExecute(Sender: TObject);
 		procedure actReplaceExecute(Sender: TObject);
-		procedure actFindNextExecute(Sender: TObject);
 		procedure actGotoLineExecute(Sender: TObject);
 		procedure actCompileExecute(Sender: TObject);
 		procedure actRunExecute(Sender: TObject);
@@ -753,8 +747,6 @@ type
 		procedure ProjectViewDragOver(Sender, Source: TObject; X, Y: Integer;State: TDragState; var Accept: Boolean);
 		procedure ProjectViewDragDrop(Sender, Source: TObject; X, Y: Integer);
 		procedure actImportMSVCExecute(Sender: TObject);
-		procedure AddWatchPopupItemClick(Sender: TObject);
-		procedure AddWatchVariable(const namein : AnsiString);
 		procedure ViewCPUItemClick(Sender: TObject);
 		procedure edGdbCommandKeyPress(Sender: TObject; var Key: Char);
 		procedure actExecParamsExecute(Sender: TObject);
@@ -790,7 +782,6 @@ type
 		procedure actBrowserShowInheritedExecute(Sender: TObject);
 		procedure actCVSLoginExecute(Sender: TObject);
 		procedure actCVSLogoutExecute(Sender: TObject);
-		procedure AddWatchBtnClick(Sender: TObject);
 		procedure ReportWindowClose(Sender: TObject; var Action: TCloseAction);
 		procedure FloatingPojectManagerItemClick(Sender: TObject);
 		procedure actCompileCurrentFileExecute(Sender: TObject);
@@ -834,10 +825,13 @@ type
 		procedure EvaluateInputKeyPress(Sender: TObject; var Key: Char);
 		procedure FormShow(Sender: TObject);
 		procedure actSkipFunctionExecute(Sender: TObject);
-    procedure actNextInsExecute(Sender: TObject);
-    procedure actStepInsExecute(Sender: TObject);
-    procedure actMsgPasteExecute(Sender: TObject);
-    procedure actUpdateDebuggerRunningCPU(Sender: TObject);
+		procedure actNextInsExecute(Sender: TObject);
+		procedure actStepInsExecute(Sender: TObject);
+		procedure actMsgPasteExecute(Sender: TObject);
+		procedure actUpdateDebuggerRunningCPU(Sender: TObject);
+		procedure actUpdateEmptyEditorFindForm(Sender: TObject);
+		procedure actReplaceAllExecute(Sender: TObject);
+		procedure DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView;Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;var PaintImages, DefaultDraw: Boolean);
 	private
 		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
 		fTools            : TToolController; // tool list controller
@@ -852,7 +846,6 @@ type
 		fFirstShow        : boolean; // true for first WM_SHOW, false for others
 
 		function AskBeforeClose(e : TEditor; Rem : boolean) : boolean;
-		procedure AddFindOutputItem(const line, col, filename, msg: AnsiString);
 		function ParseParams(s : AnsiString) : AnsiString;
 		procedure BuildBookMarkMenus;
 		procedure SetHints;
@@ -864,10 +857,8 @@ type
 		procedure CompOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
 		procedure CompResOutputProc(const _Line, _Unit, _Message: AnsiString);
 		procedure CompSuccessProc;
-		procedure MainSearchProc(const SR: TdevSearchResult);
 		procedure LoadText;
 		function SaveFileAs(e : TEditor): Boolean;
-		procedure OpenCloseMessageSheet(_Show: boolean);
 		procedure OpenUnit;
 		function PrepareForCompile: Boolean;
 		procedure LoadTheme;
@@ -883,6 +874,11 @@ type
 		procedure PrepareDebugger;
 		procedure ClearMessageControl;
 	public
+		AutoSaveTimer : TTimer;
+		fProject : TProject;
+		fDebugger : TDebugger;
+
+		procedure OpenCloseMessageSheet(_Show: boolean);
 		function SaveFile(e : TEditor): Boolean;
 		procedure OpenFile(const s : AnsiString);
 		procedure OpenProject(const s: AnsiString);
@@ -891,22 +887,15 @@ type
 		function GetEditorFromFileName(const ffile : AnsiString) : TEditor;
 		procedure GotoBreakpoint(const bfile: AnsiString; bline: integer);
 		procedure RemoveActiveBreakpoints;
+		procedure AddFindOutputItem(const line, col, filename, msg: AnsiString);
 		procedure SetProjCompOpt(idx: integer; Value: char);
 		function CheckCompileOption(const option : AnsiString;var optionstructout : PCompilerOption;var optionindexout : integer) : boolean;
 		function CloseEditor(index : integer; Rem : boolean): Boolean;
 		procedure EditorSaveTimer(sender : TObject);
-		procedure AddBreakPoint(Linein : integer;e : TEditor);
-		procedure RemoveBreakPoint(Line : integer;e : TEditor); overload;
-		procedure RemoveBreakPoint(index : integer); overload;
-	public
-		AutoSaveTimer : TTimer;
-		fProject : TProject;
-		fDebugger : TDebugger;
 end;
 
 var
 	MainForm : TMainForm;
-	BreakPointList : TList;
 
 implementation
 
@@ -914,9 +903,9 @@ uses
 {$IFDEF WIN32}
 	ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
 	datamod, NewProjectFrm, AboutFrm, PrintFrm,
-	CompOptionsFrm, EditorOptFrm, IncrementalFrm, Search_Center, EnviroFrm,
+	CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
 	SynEdit, Math, ImageTheme,
-	Types, FindFrm, ReplaceFrm, Prjtypes, devExec,
+	Types, FindFrm, Prjtypes, devExec,
 	NewTemplateFrm, FunctionSearchFrm, NewMemberFrm, NewVarFrm, NewClassFrm,
 	ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
 	ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
@@ -935,44 +924,6 @@ uses
 {$ENDIF}
 
 {$R *.dfm}
-
-procedure TMainForm.AddBreakPoint(Linein : integer;e : TEditor);
-var
-	APBreakPoint : PBreakPoint;
-begin
-	APBreakPoint := new(PBreakPoint);
-	with APBreakPoint^ do begin
-		line := Linein;
-		editor := e;
-	end;
-	BreakPointList.Add(APBreakPoint);
-
-	// Debugger already running? Add it to GDB
-	if fDebugger.Executing then
-		fDebugger.AddBreakPoint(BreakPointList.Count-1);
-end;
-
-procedure TMainForm.RemoveBreakPoint(Line : integer;e : TEditor);
-var
-	i : integer;
-begin
-	for i := 0 to BreakPointList.Count -1 do begin
-		if (PBreakPoint(BreakPointList.Items[i])^.line = Line) and (PBreakPoint(BreakPointList.Items[i])^.editor = e) then begin
-			RemoveBreakPoint(i);
-			break;
-		end;
-	end;
-end;
-
-procedure TMainForm.RemoveBreakPoint(index : integer);
-begin
-	// Debugger already running? remove it from GDB
-	if fDebugger.Executing then
-		fDebugger.RemoveBreakpoint(index);
-
-	Dispose(PBreakPoint(BreakPointList.Items[index]));
-	BreakPointList.Delete(index);
-end;
 
 procedure TMainForm.LoadTheme;
 var
@@ -1051,24 +1002,9 @@ begin
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
-var
-	i: integer;
 begin
 	// Prevent singleton reinit
 	DontRecreateSingletons := true;
-
-	// Stop the debugger
-	if fDebugger.Executing then
-		fDebugger.Stop(nil);
-
-	// Remove watch vars (list is contained in UI component)
-	for i := 0 to DebugTree.Items.Count - 1 do
-		Dispose(PWatchVar(DebugTree.Items[i].Data));
-
-	// Remove the breakpoints
-	for i := 0 to BreakPointList.Count - 1 do
-		Dispose(PBreakPoint(BreakPointList.Items[i]));
-	BreakPointList.Free;
 
 	// Free non-singletons
 	devImageThemes.Free;
@@ -1254,7 +1190,7 @@ begin
 	actFind.Caption:=					Lang[ID_ITEM_FIND];
 	actFindAll.Caption:=				Lang[ID_ITEM_FINDINALL];
 	actReplace.Caption:=				Lang[ID_ITEM_REPLACE];
-	actFindNext.Caption:=				Lang[ID_ITEM_FINDNEXT];
+	actReplaceAll.Caption:=				Lang[ID_ITEM_REPLACEFILES];
 	actGotoLine.Caption:=				Lang[ID_ITEM_GOTO];
 	actIncremental.Caption:=			Lang[ID_ITEM_INCREMENTAL];
 	actGotoFunction.Caption:=			Lang[ID_ITEM_GOTOFUNCTION];
@@ -2045,19 +1981,6 @@ begin
 	LogOutput.Lines.Add(msg);
 end;
 
-procedure TMainform.MainSearchProc(const SR: TdevSearchResult);
-var
-	s: AnsiString;
-	I: integer;
-begin
-	// change all chars below #32 to #32 (non-printable to printable)
-	S:=SR.msg;
-	for I:=1 to Length(S) do
-		if S[I]<#32 then S[I]:=#32;
-
-	AddFindOutputItem(inttostr(SR.pt.X), inttostr(SR.pt.y), SR.InFile, S);
-end;
-
 procedure TMainForm.ProjectViewContextPopup(Sender: TObject;MousePos: TPoint; var Handled: Boolean);
 var
 	pt: TPoint;
@@ -2106,10 +2029,8 @@ begin
 				e:= GetEditor(idx)
 			else
 				e:= fProject.OpenUnit(i);
-			if assigned(e) then begin
+			if assigned(e) then
 				e.Activate;
-//				ClassBrowser.CurrentFile:=e.FileName;
-			end;
 		end;
 end;
 
@@ -2829,68 +2750,89 @@ end;
 
 procedure TMainForm.actFindExecute(Sender: TObject);
 var
-	e: TEditor;
-begin
-	e:= GetEditor;
-	SearchCenter.Project:= fProject;
-	if assigned(e) then begin
-
-		// Create it when needed!
-		if not Assigned(frmFind) then
-			frmFind := TfrmFind.Create(Application);
-
-		if e.Search(FALSE) then begin
-			OpenCloseMessageSheet(TRUE);
-			MessageControl.ActivePage:= FindSheet;
-		end;
-	end;
-	SearchCenter.Project:= nil;
-end;
-
-procedure TMainForm.actFindAllExecute(Sender: TObject);
-begin
-	// Create it when needed!
-	if not Assigned(frmFind) then
-		frmFind := TfrmFind.Create(Application);
-
-	SearchCenter.SingleFile:= FALSE;
-	SearchCenter.Project:= fProject;
-	SearchCenter.Replace := false;
-	SearchCenter.Editor := GetEditor;
-	if SearchCenter.ExecuteSearch then begin
-		OpenCloseMessageSheet(TRUE);
-		MessageControl.ActivePage:= FindSheet;
-	end;
-	SearchCenter.Project:= nil;
-end;
-
-procedure TMainForm.actReplaceExecute(Sender: TObject);
-var
-	e: TEditor;
-begin
-	e:= GetEditor;
-	if assigned(e) then begin
-
-		// Create it when needed!
-		if not Assigned(frmReplace) then
-			frmReplace := TfrmReplace.Create(Application);
-
-		e.Search(TRUE);
-	end;
-end;
-
-procedure TMainForm.actFindNextExecute(Sender: TObject);
-var
 	e : TEditor;
+	s : AnsiString;
 begin
-	e:= GetEditor;
+	e := GetEditor;
 	if Assigned(e) then begin
 
 		// Create it when needed!
 		if not Assigned(frmFind) then
 			frmFind := TfrmFind.Create(Application);
 
-		e.SearchAgain;
+		s := e.Text.SelText;
+		if s = '' then
+			s := e.Text.WordAtCursor;
+
+		frmFind.TabIndex := 0;
+		frmFind.cboFindText.Text := s;
+		frmFind.Show;
+	end;
+end;
+
+procedure TMainForm.actFindAllExecute(Sender: TObject);
+var
+	e : TEditor;
+	s : AnsiString;
+begin
+	e := GetEditor;
+	if Assigned(e) then begin
+
+		// Create it when needed!
+		if not Assigned(frmFind) then
+			frmFind := TfrmFind.Create(Application);
+
+		s := e.Text.SelText;
+		if s = '' then
+			s := e.Text.WordAtCursor;
+
+		frmFind.TabIndex := 1;
+		frmFind.cboFindText.Text := s;
+		frmFind.Show;
+	end;
+end;
+
+procedure TMainForm.actReplaceExecute(Sender: TObject);
+var
+	e : TEditor;
+	s : AnsiString;
+begin
+	e := GetEditor;
+	if Assigned(e) then begin
+
+		// Create it when needed!
+		if not Assigned(frmFind) then
+			frmFind := TfrmFind.Create(Application);
+
+		s := e.Text.SelText;
+		if s = '' then
+			s := e.Text.WordAtCursor;
+
+		frmFind.TabIndex := 2;
+		frmFind.cboFindText.Text := s;
+		frmFind.Show;
+	end;
+end;
+
+procedure TMainForm.actReplaceAllExecute(Sender: TObject);
+var
+	e : TEditor;
+	s : AnsiString;
+begin
+	e := GetEditor;
+	if Assigned(e) then begin
+
+		// Create it when needed!
+		if not Assigned(frmFind) then
+			frmFind := TfrmFind.Create(Application);
+
+		s := e.Text.SelText;
+		if s = '' then
+			s := e.Text.WordAtCursor;
+
+		frmFind.TabIndex := 3;
+		frmFind.cboFindText.Text := s;
+		frmFind.Show;
 	end;
 end;
 
@@ -3041,18 +2983,21 @@ begin
 	OpenCloseMessageSheet(True);
 
 	// Reset watch vars
-	for I := 0 to DebugTree.Items.Count - 1 do begin
-		wvar := PWatchVar(DebugTree.Items[i].Data);
-		wvar^.value := '?';
-		wvar^.gdbindex := I+1;
-		DebugTree.Items[i].Text := wvar^.name + ' = ' + wvar^.value;
+	for I := 0 to fDebugger.WatchVarList.Count - 1 do begin
+		wvar := PWatchVar(fDebugger.WatchVarList.Items[I]);
+		wvar^.value := 'Execute to evaluate';
+		wvar^.gdbindex := -1;
+		wvar^.node.Text := wvar^.name + ' = ' + wvar^.value;
 	end;
 end;
 
 procedure TMainForm.actDebugExecute(Sender: TObject);
+resourcestring
+	LibAppend = '%s -I"%s"';
 var
 	e: TEditor;
 	i: integer;
+	libdirs : TStringList;
 	optD,optS : PCompilerOption;
 	debug,strip : boolean;
 	idxD,idxS : integer;
@@ -3086,8 +3031,6 @@ begin
 			end;
 		end;
 
-		PrepareDebugger;
-
 		if Assigned(fProject) then begin
 			if not FileExists(fProject.Executable) then begin
 				MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
@@ -3103,8 +3046,10 @@ begin
 				end;
 			end;
 
+			PrepareDebugger;
+
 			fDebugger.Start;
-			fDebugger.SendCommand('file', '"' + StringReplace(fProject.Executable, '\', '\\', [rfReplaceAll]) +'"');
+			fDebugger.SendCommand('file', '"' + StringReplace(fProject.Executable, '\', '\\', [rfReplaceAll]) + '"');
 
 			if fProject.Options.typ = dptDyn then
 				fDebugger.SendCommand('exec-file', '"' + StringReplace(fProject.Options.HostApplication, '\', '\\', [rfReplaceAll]) +'"');
@@ -3120,22 +3065,31 @@ begin
 						Abort; // if it's not saved, abort
 				chdir(ExtractFilePath(e.FileName));
 
-				fDebugger.Start;
-				fDebugger.SendCommand('file', '"' + StringReplace(ChangeFileExt(ExtractFileName(e.FileName), EXE_EXT), '\', '\\', [rfReplaceAll]) +'"');
+				PrepareDebugger;
 
+				fDebugger.Start;
+				fDebugger.SendCommand('file', '"' + StringReplace(ChangeFileExt(ExtractFileName(e.FileName), EXE_EXT), '\', '\\', [rfReplaceAll]) + '"');
 			end;
 		end;
 
-		for i := 0 to DebugTree.Items.Count - 1 do
+		// Add breakpoints and watch vars
+		for i := 0 to fDebugger.WatchVarList.Count - 1 do
 			fDebugger.AddWatchVar(i);
 
-		for i := 0 to BreakPointList.Count - 1 do
+		for i := 0 to fDebugger.BreakPointList.Count - 1 do
 			fDebugger.AddBreakpoint(i);
+
+		libdirs := TStringList.Create;
+		libdirs.Delimiter := ';';
+		libdirs.CommaText := StringReplace(devCompiler.LibDir, '\', '\\', [rfReplaceAll]);
+		for I := 0 to libdirs.Count - 1 do
+			fDebugger.SendCommand('dir','"' + libdirs[i] + '"'); // ???
+
+		libdirs.Free;
 
 		// Run the debugger
 		fDebugger.SendCommand('set','new-console on');
 		fDebugger.SendCommand('set','confirm off');
-		fDebugger.SendCommand('dir',devCompiler.LibDir); // ???
 		fDebugger.SendCommand('run',fCompiler.RunParams);
 	end;
 end;
@@ -3218,6 +3172,14 @@ end;
 procedure TMainForm.actUpdateDebuggerRunningCPU(Sender: TObject);
 begin
 	TCustomAction(Sender).Enabled := fDebugger.Executing and not Assigned(CPUForm);
+end;
+
+procedure TMainForm.actUpdateEmptyEditorFindForm(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e := GetEditor;
+	TCustomAction(Sender).Enabled := Assigned(e) and not IsEmpty(e.Text) and not Assigned(frmFind);
 end;
 
 procedure TMainForm.ToolbarClick(Sender: TObject);
@@ -3448,8 +3410,8 @@ var
 begin
 	e := GetEditor;
 	if Assigned(e) then begin
-		SearchCenter.Editor := e;
-		SearchCenter.AssignSearchEngine;
+		//SearchCenter.Editor := e;
+		//SearchCenter.AssignSearchEngine;
 
 		pt := ClienttoScreen(point(PageControl.Left, PageControl.Top));
 
@@ -3554,33 +3516,8 @@ begin
 				Exit;
 		end;
 		if s <> '' then
-			AddWatchVariable(s);
+			fDebugger.AddWatchVar(s);
 	end;
-end;
-
-procedure TMainForm.AddWatchVariable(const namein : AnsiString);
-var
-	I : integer;
-	wvar : PWatchVar;
-	node : TTreeNode;
-begin
-	for I := 0 to DebugTree.Items.Count - 1 do
-		if SameStr(PWatchVar(DebugTree.Items[i].Data)^.name,namein) then
-			Exit;
-
-	wvar := New(PWatchVar);
-	with wvar^ do begin
-		name := namein;
-		value := '?';
-		gdbindex := DebugTree.Items.Count+1;
-	end;
-	node := DebugTree.Items.AddObject(nil,wvar^.name + ' = ' + wvar^.value,wvar);
-	node.ImageIndex := 21;
-	node.SelectedIndex := 21;
-
-	// Already going? Add it to GDB
-	if fDebugger.Executing then
-		fDebugger.AddWatchVar(DebugTree.Items.Count-1);
 end;
 
 procedure TMainForm.actNextLineExecute(Sender: TObject);
@@ -3603,13 +3540,7 @@ var
 begin
 	node := DebugTree.Selected;
 	if Assigned(node) then begin
-
-		// Already going? Remove it from GDB
-		if fDebugger.Executing then
-			fDebugger.DeleteWatchVar(PWatchVar(node.Data).gdbindex);
-
-		Dispose(PWatchVar(node.Data));
-		DebugTree.Items.Delete(node);
+		fDebugger.RemoveWatchVar(node);
 	end;
 end;
 
@@ -4657,17 +4588,6 @@ begin
 	end;
 end;
 
-procedure TMainForm.AddWatchPopupItemClick(Sender: TObject);
-var
-	s : AnsiString;
-	e: TEditor;
-begin
-	e:= GetEditor;
-	s := e.Text.GetWordAtRowCol(e.Text.CaretXY);
-	if s <> '' then
-		AddWatchVariable(s);
-end;
-
 procedure TMainForm.ViewCPUItemClick(Sender: TObject);
 begin
 	if not Assigned(CPUForm) then begin
@@ -5162,14 +5082,6 @@ begin
 	ReportToolWindow := nil;
 end;
 
-procedure TMainForm.AddWatchBtnClick(Sender: TObject);
-var
-	s : AnsiString;
-begin
-	if InputQuery(Lang[ID_NV_ADDWATCH], Lang[ID_NV_ENTERVAR], s) then
-		AddWatchVariable(s);
-end;
-
 procedure TMainForm.FloatingPojectManagerItemClick(Sender: TObject);
 begin
 	FloatingPojectManagerItem.Checked := not FloatingPojectManagerItem.Checked;
@@ -5538,7 +5450,6 @@ end;
 
 procedure TMainForm.actAttachProcessExecute(Sender: TObject);
 var
-	i : integer;
 	s : AnsiString;
 begin
 	PrepareDebugger;
@@ -5553,18 +5464,9 @@ begin
 			if (ProcessListForm.ShowModal = mrOK) and (ProcessListForm.ProcessCombo.ItemIndex > -1) then begin
 				s := IntToStr(integer(ProcessListForm.ProcessList[ProcessListForm.ProcessCombo.ItemIndex]));
 
-				// add to the debugger the project include dirs
-				//for idx:=0 to fProject.Options.Includes.Count-1 do
-				//	fDebugger.AddIncludeDir(fProject.Options.Includes[idx]);
-
 				fDebugger.Start;
 				fDebugger.SendCommand('file', '"' +StringReplace(fProject.Executable, '\', '\\', [rfReplaceAll]) +'"');
 				fDebugger.SendCommand('attach', s);
-
-				for i := 0 to BreakPointList.Count - 1 do
-					fDebugger.AddBreakpoint(i);
-
-				DebugTree.Items.Clear;
 			end
 		finally
 			ProcessListForm.Free;
@@ -5595,18 +5497,9 @@ end;
 procedure TMainForm.ClearallWatchPopClick(Sender: TObject);
 var
 	I : integer;
-	node : TTreeNode;
 begin
 	for I := DebugTree.Items.Count - 1 downto 0 do begin
-
-		node := DebugTree.Items[I];
-
-		// remove from GDB
-		if fDebugger.Executing then
-			fDebugger.DeleteWatchVar(PWatchVar(node.Data).gdbindex);
-
-		Dispose(PWatchVar(node.Data));
-		DebugTree.Items.Delete(node);
+		fDebugger.RemoveWatchVar(DebugTree.Items[i]);
 	end;
 end;
 
@@ -6172,9 +6065,10 @@ begin
 	fDebugger := TDebugger.Create;
 	fDebugger.DebugTree := DebugTree;
 
-	// Set the SynEdit search engine
-	SearchCenter.SearchProc:= MainSearchProc;
-	SearchCenter.PageControl:= PageControl;
+	// TODO: reduce flicker? Might increase MEM usage
+	DebugTree.DoubleBuffered := true;
+	ClassBrowser.DoubleBuffered := true;
+	ProjectView.DoubleBuffered := true;
 
 	// Set bottom panel height
 	MessageControl.Height:=devData.OutputHeight;
@@ -6254,9 +6148,6 @@ begin
 	else if devData.MsgTabs = 3 then
 		PageControl.TabPosition:= tpRight;
 	PageControl.MultiLine:= devData.MultiLineTab;
-
-	// Create breakpoints
-	BreakPointList := TList.create;
 
 	// Create an autosave timer
 	AutoSaveTimer := TTimer.Create(Application);
@@ -6374,6 +6265,16 @@ procedure TMainForm.actStepInsExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
 		fDebugger.SendCommand('stepi','');
+	end;
+end;
+
+procedure TMainForm.DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;Stage: TCustomDrawStage; var PaintImages, DefaultDraw: Boolean);
+begin
+	if PWatchVar(Node.Data)^.gdbindex <> -1 then begin
+		// found!
+		Sender.Canvas.Font.Color := clGreen;
+	end else begin
+		Sender.Canvas.Font.Color := clRed;
 	end;
 end;
 

@@ -9,8 +9,8 @@ Libs=
 PrivateResource=
 ResourceIncludes=
 MakeIncludes=
-Compiler=
-CppCompiler=
+Compiler=-mwindows_@@_
+CppCompiler=-mwindows_@@_
 Linker=
 IsCpp=1
 Icon=
@@ -28,7 +28,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=1
-CompilerSettings=00000001f0111000000001000
+CompilerSettings=00000001b0010000000000000
 UnitCount=3
 
 [VersionInfo]
@@ -58,7 +58,7 @@ Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=
+BuildCmd=$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
 
 [Unit2]
 FileName=translation.h

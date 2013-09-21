@@ -32,13 +32,6 @@ uses
 {$ENDIF}
 
 type
-	PdevSearchResult = ^TdevSearchResult;
-	TdevSearchResult = record
-		pt: TPoint;
-		InFile: AnsiString;
-		msg: AnsiString;
-	end;
-
 	{ File ID types }
 	TExUnitType = (
 		utcSrc,      // c source file (.c)

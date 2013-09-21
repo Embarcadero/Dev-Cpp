@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 616
-  Top = 239
+  Left = 634
+  Top = 290
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -65,7 +65,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -107,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 155
+        Height = 154
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -202,13 +202,13 @@ object MainForm: TMainForm
         Left = 471
         Top = 0
         Width = 357
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           357
-          155)
+          154)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -229,7 +229,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 350
-          Height = 116
+          Height = 112
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -241,7 +241,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 471
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -249,7 +249,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           471
-          155)
+          154)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -410,7 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 19
+          Height = 15
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -449,7 +449,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -722,23 +722,23 @@ object MainForm: TMainForm
         Top = 0
         Action = actFind
       end
-      object Replacebtn: TToolButton
+      object ReplaceBtn: TToolButton
         Left = 23
         Top = 0
         Action = actReplace
       end
-      object FindNextBtn: TToolButton
-        Left = 46
-        Top = 0
-        Action = actFindNext
-      end
       object ToolButton1: TToolButton
-        Left = 69
+        Left = 46
         Top = 0
         Width = 8
         Caption = 'ToolButton1'
         ImageIndex = 25
         Style = tbsSeparator
+      end
+      object FindNextBtn: TToolButton
+        Left = 54
+        Top = 0
+        Action = actGotoFunction
       end
       object GotoLineBtn: TToolButton
         Left = 77
@@ -931,7 +931,7 @@ object MainForm: TMainForm
     Top = 70
     Width = 193
     Height = 340
-    ActivePage = ProjectSheet
+    ActivePage = DebugLeftSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 6
@@ -942,7 +942,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 312
+        Height = 311
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -978,7 +978,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 312
+        Height = 311
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1014,7 +1014,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 312
+        Height = 311
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1027,6 +1027,7 @@ object MainForm: TMainForm
         ReadOnly = True
         RightClickSelect = True
         TabOrder = 0
+        OnAdvancedCustomDrawItem = DebugTreeAdvancedCustomDrawItem
         OnKeyDown = DebugTreeKeyDown
       end
     end
@@ -1271,11 +1272,14 @@ object MainForm: TMainForm
       object FindinallfilesItem: TMenuItem
         Action = actFindAll
       end
-      object FindnextItem: TMenuItem
-        Action = actFindNext
-      end
       object ReplaceItem: TMenuItem
         Action = actReplace
+      end
+      object ReplaceAll1: TMenuItem
+        Action = actReplaceAll
+      end
+      object N72: TMenuItem
+        Caption = '-'
       end
       object IncrementalSearch1: TMenuItem
         Action = actIncremental
@@ -2211,7 +2215,7 @@ object MainForm: TMainForm
       ImageIndex = 21
       ShortCut = 16454
       OnExecute = actFindExecute
-      OnUpdate = actUpdateEmptyEditor
+      OnUpdate = actUpdateEmptyEditorFindForm
     end
     object actFindAll: TAction
       Tag = 2
@@ -2219,7 +2223,7 @@ object MainForm: TMainForm
       Caption = 'Fin&d in all Files'
       ShortCut = 24646
       OnExecute = actFindAllExecute
-      OnUpdate = actUpdatePageorProject
+      OnUpdate = actUpdateEmptyEditorFindForm
     end
     object actReplace: TAction
       Tag = 3
@@ -2228,16 +2232,14 @@ object MainForm: TMainForm
       ImageIndex = 22
       ShortCut = 16466
       OnExecute = actReplaceExecute
-      OnUpdate = actUpdateEmptyEditor
+      OnUpdate = actUpdateEmptyEditorFindForm
     end
-    object actFindNext: TAction
-      Tag = 4
+    object actReplaceAll: TAction
       Category = 'Search'
-      Caption = '&Search Again'
-      ImageIndex = 23
-      ShortCut = 114
-      OnExecute = actFindNextExecute
-      OnUpdate = actUpdateEmptyEditor
+      Caption = 'Replace All'
+      ShortCut = 24658
+      OnExecute = actReplaceAllExecute
+      OnUpdate = actUpdateEmptyEditorFindForm
     end
     object actIncremental: TAction
       Category = 'Search'
@@ -2585,7 +2587,7 @@ object MainForm: TMainForm
     end
     object actConfigdevShortcuts: TAction
       Category = 'Tools'
-      Caption = 'Configure &devShortcuts'
+      Caption = 'Configure &Shortcuts'
       ImageIndex = 31
       OnExecute = actConfigdevShortcutsExecute
     end
@@ -2967,7 +2969,6 @@ object MainForm: TMainForm
     end
     object actMsgClear: TAction
       Caption = 'actMsgClear'
-      ShortCut = 46
       OnExecute = actMsgClearExecute
     end
   end

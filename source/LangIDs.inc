@@ -158,6 +158,7 @@ const
   ID_TOOLEDIT                           = 5022;
   ID_TOOLSEARCH                         = 5023;
   ID_ITEM_FLOATREPORT                   = 5024;
+  ID_ITEM_REPLACEFILES                  = 5025;
   //free to 199 for view menu
 
   //project menu
@@ -639,23 +640,10 @@ const
   ID_ENV_PAUSECONSOLE                   = 38054;
   ID_ENV_AUTOREMEMBER                   = 38055;
 
-  // Replace form
-  ID_RPLC                               = 39001;
-  ID_RPLC_FINDTEXT                      = 39002;
-  ID_RPLC_REPLACETEXT                   = 39003;
-  ID_RPLC_GRP_OPTIONS                   = 39004;
-  ID_RPLC_CASE                          = 39005;
-  ID_RPLC_WHOLEWORD                     = 39006;
-  ID_RPLC_PROMPT                        = 39007;
-  ID_RPLC_GRP_DIRECTION                 = 39008;
-  ID_RPLC_FORWARD                       = 39009;
-  ID_RPLC_BACKWARD                      = 39010;
-  ID_RPLC_GRP_SCOPE                     = 39011;
-  ID_RPLC_GLOBAL                        = 39012;
-  ID_RPLC_SELONLY                       = 39013;
-  ID_RPLC_GRP_ORIGIN                    = 39014;
-  ID_RPLC_CURSOR                        = 39015;
-  ID_RPLC_ENTIRE                        = 39016;
+  ID_FIND_REPLACE                       = 38056;
+  ID_FIND_REPLACEFILES                  = 38057;
+  ID_FIND_REPLACEWITH                   = 38058;
+  ID_FIND_PROMPTREPLACE                 = 38059;
 
   // Goto function form
   ID_GF_TEXT                            = 40001;

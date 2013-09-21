@@ -16,6 +16,7 @@ object GotoLineForm: TGotoLineForm
   KeyPreview = True
   OldCreateOrder = True
   Position = poMainFormCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   OnKeyUp = FormKeyUp
   PixelsPerInch = 96

@@ -33,6 +33,8 @@ uses
 
 type
 
+  TEvalReadyEvent = procedure(const evalvalue : AnsiString) of object;
+
   TDebugger = class(TObject)
   private
 
@@ -48,12 +50,12 @@ type
 
   public
     Executing : boolean;
-    DebugTree : TTreeView;
 
-    // CPU form variables
-    Registers : TList;
-    Disassembly : TStringList;
-    Backtrace : TList;
+    DebugTree : TTreeView;
+    BreakPointList : TList;
+    WatchVarList : TList;
+
+    OnEvalReady : TEvalReadyEvent;
 
     constructor Create;
     destructor  Destroy; override;
@@ -67,14 +69,23 @@ type
     procedure SetDisassembly(StringListin : TStringList);
     procedure SetBacktrace(Listin : TList);
 
+    // Watch var tooltip
+    procedure SetHintedWatchVar(const namein : AnsiString);
+
     // breakpoints
-    procedure AddBreakPoint(i : integer);
-    procedure RemoveBreakPoint(i : integer);
-    procedure RemoveBreakpoints;
+    procedure AddBreakPoint(i : integer); overload;
+    procedure RemoveBreakPoint(i : integer); overload;
+
+    procedure AddBreakPoint(Linein : integer;e : TEditor); overload;
+    procedure RemoveBreakPoint(Linein : integer;e : TEditor); overload;
 
     // watch var
-    procedure AddWatchVar(i : integer);
-    procedure DeleteWatchVar(i : integer);
+    procedure AddWatchVar(i : integer); overload;
+    procedure RemoveWatchVar(i : integer); overload;
+
+    function AddWatchVar(const namein : AnsiString) : PWatchVar; overload;
+    procedure RemoveWatchVar(nodein : TTreeNode); overload;
+
     procedure RefreshWatchVars;
   end;
 
@@ -85,30 +96,47 @@ uses
 
 constructor TDebugger.Create;
 begin
+	BreakPointList := TList.Create;
+	WatchVarList := TList.Create;
 	inherited;
 end;
 
 destructor TDebugger.Destroy;
+var
+	I : integer;
 begin
 	Stop(nil);
+
+	// Remove watch vars (list is contained in UI component)
+	for i := 0 to WatchVarList.Count - 1 do
+		Dispose(PWatchVar(WatchVarList.Items[i]));
+	WatchVarList.Free;
+
+	// Remove the breakpoints
+	for i := 0 to BreakPointList.Count - 1 do
+		Dispose(PBreakPoint(BreakPointList.Items[i]));
+	BreakPointList.Free;
+
 	inherited;
+end;
+
+procedure TDebugger.SetHintedWatchVar(const namein : AnsiString);
+begin
+	Reader.hintedvar := namein;
 end;
 
 procedure TDebugger.SetRegisters(Listin : TList);
 begin
-	Registers := Listin;
 	Reader.Registers := Listin;
 end;
 
 procedure TDebugger.SetDisassembly(StringListin : TStringList);
 begin
-	Disassembly := StringListin;
 	Reader.Disassembly := StringListin;
 end;
 
 procedure TDebugger.SetBacktrace(Listin : TList);
 begin
-	Backtrace := Listin;
 	Reader.Backtrace := Listin;
 end;
 
@@ -119,9 +147,6 @@ var
 	sa : TSecurityAttributes;
 	gdb : AnsiString;
 begin
-	Registers := nil;
-	Disassembly := nil;
-	Backtrace := nil;
 	Executing := true;
 
 	// Set up the security attributes struct.
@@ -138,7 +163,7 @@ begin
 
 	// Create the child input pipe.
 	if not CreatePipe(fInputread, fInputwrite, @sa, 0) then
-		MsgErr('CreatePipeinput');
+		MsgErr('CreatePipe input');
 
 	if not SetHandleInformation(fInputwrite,HANDLE_FLAG_INHERIT,0) then
 		MsgErr('SetHandleInformation inputwrite');
@@ -146,7 +171,7 @@ begin
 	// Set up the start up info struct.
 	FillChar(si, sizeof(TStartupInfo), 0);
 	si.cb := sizeof(TStartupInfo);
-	si.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
+	si.dwFlags := STARTF_USESTDHANDLES;
 	si.hStdInput := fInputread;
 	si.hStdOutput := fOutputwrite;
 	si.hStdError := fOutputwrite;
@@ -167,8 +192,10 @@ begin
 	// Create a thread that will read GDB output.
 	Reader := TDebugReader.Create(true);
 	Reader.hPipeRead := fOutputread;
-	Reader.DebugTree := DebugTree;
 	Reader.FreeOnTerminate := true;
+	Reader.BreakpointList := BreakPointList;
+	Reader.WatchVarList := WatchVarList;
+	Reader.DebugTree := DebugTree;
 	Reader.Resume;
 end;
 
@@ -186,10 +213,6 @@ begin
 		Reader.Terminate;
 		Reader := nil;
 
-		Registers := nil;
-		Disassembly := nil;
-		Backtrace := nil;
-
 		// Free resources
 		if not CloseHandle(fProcessID) then
 			MsgErr('CloseHandle - gdb process');
@@ -201,6 +224,7 @@ begin
 			MsgErr('CloseHandle - input read');
 		//if not CloseHandle(inputwrite) then
 		//	DisplayError('CloseHandle - input write');
+
 		MainForm.RemoveActiveBreakpoints;
 	end;
 end;
@@ -217,9 +241,6 @@ begin
 			StrPCopy(P, command + ' ' + params + #10)
 		else
 			StrPCopy(P, command + #10);
-
-		//while not Reader.Idling do
-		//	Sleep(1);
 
 		if not WriteFile(fInputwrite, P, strlen(P), nBytesWrote, nil) then
 			MsgErr('Error writing to GDB');
@@ -244,19 +265,112 @@ begin
 	SendCommand('clear',arguments);
 end;
 
-procedure TDebugger.RemoveBreakpoints;
+procedure TDebugger.AddBreakPoint(linein : integer;e : TEditor);
+var
+	APBreakPoint : PBreakPoint;
 begin
-	SendCommand('delete','');
+	APBreakPoint := new(PBreakPoint);
+	with APBreakPoint^ do begin
+		line := Linein;
+		editor := e;
+	end;
+	BreakPointList.Add(APBreakPoint);
+
+	// Debugger already running? Add it to GDB
+	if Executing then
+		AddBreakPoint(BreakPointList.Count-1);
+end;
+
+procedure TDebugger.RemoveBreakPoint(Linein : integer;e : TEditor);
+var
+	i : integer;
+begin
+	for i := 0 to BreakPointList.Count - 1 do begin
+		if (PBreakPoint(BreakPointList.Items[i])^.line = Linein) and (PBreakPoint(BreakPointList.Items[i])^.editor = e) then begin
+
+			// Debugger already running? Remove it from GDB
+			if Executing then
+				RemoveBreakPoint(i);
+
+			// Remove from list
+			Dispose(PBreakPoint(BreakPointList.Items[i]));
+			BreakPointList.Delete(i);
+			break;
+		end;
+	end;
 end;
 
 procedure TDebugger.AddWatchVar(i : integer);
 begin
-	SendCommand('display',PWatchVar(MainForm.DebugTree.Items[i].Data)^.name);
+	SendCommand('display',PWatchVar(WatchVarList.Items[i])^.name);
 end;
 
-procedure TDebugger.DeleteWatchVar(i : integer);
+procedure TDebugger.RemoveWatchVar(i : integer);
 begin
-	SendCommand('undisplay',IntToStr(I));
+	SendCommand('undisplay',IntToStr(PWatchVar(WatchVarList.Items[i])^.gdbindex));
+end;
+
+function TDebugger.AddWatchVar(const namein : AnsiString) : PWatchVar;
+var
+	newnode : TTreeNode;
+	I : integer;
+	wvar : PWatchVar;
+begin
+
+	// Don't allow duplicates...
+	for I := 0 to WatchVarList.Count - 1 do
+		if SameStr(PWatchVar(WatchVarList.Items[i])^.name,namein) then begin
+			result := WatchVarList.Items[i];
+			Exit;
+		end;
+
+	// Add to list
+	wvar := New(PWatchVar);
+	with wvar^ do begin
+		name := namein;
+		value := 'Execute to evaluate';
+		gdbindex := -1; // filled by GDB
+	end;
+	WatchVarList.Add(wvar);
+
+	result := wvar;
+
+	// Add to GUI
+	newnode := DebugTree.Items.AddObject(nil,wvar^.name + ' = ' + wvar^.value,wvar);
+	newnode.ImageIndex := 21;
+	newnode.SelectedIndex := 21;
+
+	// Refer to list from GUI
+	with wvar^ do begin
+		node := newnode;
+	end;
+
+	// Debugger already running? Add it to GDB
+	if Executing then
+		AddWatchVar(WatchVarList.Count-1);
+end;
+
+procedure TDebugger.RemoveWatchVar(nodein : TTreeNode);
+var
+	I : integer;
+begin
+	for i := 0 to WatchVarList.Count - 1 do begin
+		if SameStr(PWatchVar(WatchVarList.Items[i])^.name,PWatchVar(nodein.Data)^.name) then begin
+
+			// Debugger already running and GDB scanned this one? Remove it from GDB
+			if Executing and (PWatchVar(WatchVarList.Items[i])^.gdbindex <> -1) then
+				RemoveWatchVar(i);
+
+			// Remove from list
+			Dispose(PWatchVar(WatchVarList.Items[i]));
+			WatchVarList.Delete(i);
+
+			// Remove from UI
+			DebugTree.Items.Delete(nodein);
+
+			break;
+		end;
+	end;
 end;
 
 procedure TDebugger.RefreshWatchVars;
@@ -264,8 +378,8 @@ var
 	I : integer;
 begin
 	// Variables that aren't found need to be re-displayed!
-	for i := 0 to DebugTree.Items.Count - 1 do
-		if SameStr(PWatchVar(DebugTree.Items[i].Data)^.value,'Not found in current context') then
+	for i := 0 to WatchVarList.Count - 1 do
+		if SameStr(PWatchVar(WatchVarList.Items[i])^.value,'Not found in current context') then
 			AddWatchVar(i);
 end;
 

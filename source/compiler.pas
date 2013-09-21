@@ -103,7 +103,6 @@ type
 		fIncludesParams			: AnsiString;
 		fCppIncludesParams		: AnsiString;
 		fBinDirs				: AnsiString;
-		fUserParams				: AnsiString;
 		fDevRun					: TDevRun;
 		fRunAfterCompileFinish	: boolean;
 		fAbortThread			: boolean;
@@ -204,6 +203,7 @@ begin
 				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(fProject.Units[i].FileName);
 				ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)), True, True);
 				Objects := Objects + ' ' + ofile;
+
 				if fProject.Units[i].Link then
 					LinkObjects := LinkObjects + ' ' + ofile;
 			end else begin
@@ -238,6 +238,7 @@ begin
 	GetLibrariesParams;
 	GetIncludesParams;
 
+	// Include special debugging definition
 	if (Pos(' -g3',fCompileParams) > 0) then begin
 		Comp_ProgCpp := Comp_ProgCpp+' -D__DEBUG__';
 		Comp_Prog := Comp_Prog+' -D__DEBUG__';
@@ -280,7 +281,7 @@ begin
 	writeln(F, 'INCS     =' + tmp);
 	tmp := StringReplace(fCppIncludesParams, '\', '/', [rfReplaceAll]);
 	writeln(F, 'CXXINCS  =' + tmp);
-	writeln(F, 'BIN      =' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)));
+	writeln(F, 'BIN      = ' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)));
 
 	writeln(F, 'CXXFLAGS = $(CXXINCS) ' + fCppCompileParams);
 	writeln(F, 'CFLAGS   = $(INCS) ' + fCompileParams);
@@ -530,18 +531,16 @@ begin
 	with devCompiler do begin
 		fCompileParams := '';
 		fCppCompileParams := '';
-		fUserParams := '';
 
-		if Assigned(fProject) then begin
-			fCppCompileParams := StringReplace(fProject.Options.cmdlines.CppCompiler, '_@@_', ' ', [rfReplaceAll]);
-			fCompileParams := StringReplace(fProject.Options.cmdlines.Compiler, '_@@_', ' ', [rfReplaceAll]);
+		if Assigned(fProject) and (fTarget = ctProject) and (Length(fProject.Options.cmdlines.Compiler) > 0) then begin
+			fCppCompileParams := TrimRight(StringReplace(fProject.Options.cmdlines.CppCompiler, '_@@_', ' ', [rfReplaceAll]));
+			fCompileParams := TrimRight(StringReplace(fProject.Options.cmdlines.Compiler, '_@@_', ' ', [rfReplaceAll]));
 		end;
 
-		if (devCompiler.CompOpts <> '') and devCompiler.AddtoComp then
-			fUserParams := fUserParams + ' ' + devCompiler.CompOpts;
-
-		fCompileParams := fCompileParams + ' ' + fUserParams;
-		fCppCompileParams := fCppCompileParams + ' ' + fUserParams;
+		if (Length(devCompiler.CompOpts) > 0) and devCompiler.AddtoComp then begin
+			fCompileParams := fCompileParams + ' ' + devCompiler.CompOpts;
+			fCppCompileParams := fCppCompileParams + ' ' + devCompiler.CompOpts;
+		end;
 
 		for I := 0 to devCompiler.fOptionList.Count - 1 do begin
 
@@ -1351,10 +1350,14 @@ var
 	i, val : integer;
 	option : TCompilerOption;
 begin
+	// Add libraries
 	fLibrariesParams := CommaStrToStr(devCompiler.LibDir, cAppendStr);
 
-	if (devCompiler.LinkOpts <> '') and devCompiler.AddtoLink then
+	// Add global compiler linker extras
+	if devCompiler.AddtoLink and (Length(devCompiler.LinkOpts) > 0) then
 		fLibrariesParams := fLibrariesParams + ' ' + devCompiler.LinkOpts;
+
+	// Add libs added via project
 	if (fTarget = ctProject) and assigned(fProject) then begin
 		for i := 0 to pred(fProject.Options.Libs.Count) do
 			fLibrariesParams := format(cAppendStr, [fLibrariesParams, fProject.Options.Libs[i]]);
@@ -1362,9 +1365,13 @@ begin
 		// got sick of "symbol 'blah blah' is deprecated"
 		if fProject.Options.typ = dptGUI then
 			fLibrariesParams:= fLibrariesParams + ' -mwindows';
-		fLibrariesParams := fLibrariesParams + ' ' + StringReplace(fProject.Options.cmdLines.Linker, '_@@_', ' ', [rfReplaceAll])
+
+		// Add project compiler linker extras
+		if Length(fProject.Options.cmdLines.Linker) > 0 then
+			fLibrariesParams := fLibrariesParams + ' ' + StringReplace(fProject.Options.cmdLines.Linker, '_@@_', ' ', [rfReplaceAll])
 	end;
 
+	// Add project settings that need to be passed to the linker
 	for I := 0 to devCompiler.fOptionList.Count - 1 do begin
 		option := PCompilerOption(devCompiler.fOptionList[I])^;
 		if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and (option.optValue > 0)) then begin

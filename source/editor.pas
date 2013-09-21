@@ -57,6 +57,7 @@ type
     fActiveLine: integer;
     fDebugGutter: TDebugGutter;
     fCurrentWord: AnsiString;
+    fCurrentEvalWord : AnsiString;
     fCompletionEatSpace: boolean;
     fCompletionTimer: TTimer;
     fCompletionTimerKey: Char;
@@ -106,11 +107,12 @@ type
     procedure ToggleBreakPoint(Line : integer);
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 
+    // Debugger callback
+    procedure OnWatchVarReady(const evalvalue : AnsiString);
+
     procedure Activate;
     procedure GotoLine;
     procedure GotoLineNr(Nr: integer);
-    function Search(isReplace: boolean): boolean;
-    procedure SearchAgain;
     procedure Exportto(filetype: integer);
     procedure InsertString(Value: AnsiString;MoveCursor: boolean);
     procedure SetErrorFocus(Col, Line: integer);
@@ -142,8 +144,8 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  main, project, MultiLangSupport, devcfg, Search_Center, utils,
-  datamod, GotoLineFrm, Macros, SynEditMiscClasses;
+  main, project, MultiLangSupport, devcfg, utils,
+  datamod, GotoLineFrm, Macros, debugreader, SynEditMiscClasses;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, main, project, MultiLangSupport, devcfg, Search_Center, utils,
@@ -314,6 +316,12 @@ begin
 	inherited;
 end;
 
+procedure TEditor.OnWatchVarReady(const evalvalue : AnsiString);
+begin
+	fText.Hint := fCurrentEvalWord + ' = ' + evalvalue;
+	MainForm.fDebugger.OnEvalReady := nil;
+end;
+
 procedure TEditor.Activate;
 begin
 	fTabSheet.PageControl.Show;
@@ -336,10 +344,11 @@ var
 	thisbreakpoint : integer;
 begin
 	thisbreakpoint := HasBreakPoint(Line);
+
 	if thisbreakpoint <> -1 then
-		MainForm.RemoveBreakPoint(thisbreakpoint)
+		MainForm.fDebugger.RemoveBreakPoint(Line,self)
 	else
-		MainForm.AddBreakPoint(Line,self);
+		MainForm.fDebugger.AddBreakPoint(Line,self);
 
 	fText.InvalidateGutterLine(line);
 	fText.InvalidateLine(line);
@@ -350,9 +359,9 @@ var
 	I : integer;
 begin
 	result:= -1;
-	for I := 0 to BreakPointList.Count - 1 do
-		if PBreakPoint(BreakPointList.Items[I])^.editor = self then
-			if PBreakPoint(BreakPointList.Items[I])^.line = Line then begin
+	for I := 0 to MainForm.fDebugger.BreakPointList.Count - 1 do
+		if PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I])^.editor = self then
+			if PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I])^.line = Line then begin
 				Result := I;
  				break;
 			end;
@@ -449,29 +458,16 @@ end;
 
 procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch,aReplace: AnsiString; Line, Column: integer; var Action: TSynReplaceAction);
 var
-	pt	: TPoint;
+	pt : TPoint;
 begin
-  if SearchCenter.SingleFile then
-   begin
-     if aSearch = aReplace then
-      begin
-        fText.CaretXY:= BufferCoord(Column, Line +1);
-        action:= raSkip;
-      end
-     else
-      begin
-        pt:= fText.ClienttoScreen(fText.RowColumnToPixels(DisplayCoord(Column, Line +1)));
-
-        MessageBeep(MB_ICONQUESTION);
-        case MessageDlgPos(format(Lang[ID_MSG_SEARCHREPLACEPROMPT], [aSearch]),
-               mtConfirmation, [mbYes, mbNo, mbCancel, mbAll], 0, pt.x, pt.y) of
-         mrYes: action:= raReplace;
-         mrNo: action:= raSkip;
-         mrCancel: action:= raCancel;
-         mrAll: action:= raReplaceAll;
-        end;
-      end;
-   end;
+	pt:= fText.ClienttoScreen(fText.RowColumnToPixels(DisplayCoord(Column, Line +1)));
+	MessageBeep(MB_ICONQUESTION);
+	case MessageDlgPos(format(Lang[ID_MSG_SEARCHREPLACEPROMPT], [aSearch]),mtConfirmation, [mbYes, mbNo, mbCancel, mbAll], 0, pt.x, pt.y) of
+		mrYes: action := raReplace;
+		mrNo: action := raSkip;
+		mrCancel: action := raCancel;
+		mrAll: action := raReplaceAll;
+	end;
 end;
 
 // Handle WM_KILLFOCUS instead of all the special cases to hide the code tooltip
@@ -589,7 +585,6 @@ begin
 	end;
 end;
 
-{** Modified by Peter **}
 procedure TEditor.GotoLine;
 var
 	GotoForm: TGotoLineForm;
@@ -601,7 +596,7 @@ begin
 
 		Activate;
 	finally
-		GotoForm.Free;
+		GotoForm.Close;
 	end;
 end;
 
@@ -640,51 +635,6 @@ begin
 	// Update the cursor
 	fText.CaretXY := NewCursorPos;
 	fText.EnsureCursorPosVisible; // not needed?
-end;
-
-function TEditor.Search(isReplace: boolean): boolean;
-var
-	s: AnsiString;
-begin
-	if devEditor.FindText then
-		if (fText.SelText = '') then
-			s:= fText.WordAtCursor
-		else
-			s:= fText.SelText;
-
-	with SearchCenter do begin
-		FindText:= s;
-		Replace:= IsReplace;
-		ReplaceText:= '';
-		SingleFile:=  TRUE;
-		Editor:= Self;
-		Result:=ExecuteSearch and not SingleFile; // if changed to "find in all files", open find results
-	end;
-	Activate;
-end;
-
-procedure TEditor.SearchAgain;
-var
-	Options : TSynSearchOptions;
-	return : integer;
-begin
-	SearchCenter.Editor := Self;
-	SearchCenter.AssignSearchEngine;
-
-	if not SearchCenter.SingleFile then
-		exit;
-	if SearchCenter.FindText = '' then begin
-		Search(false);
-		exit;
-	end;
-	Options:= SearchCenter.Options;
-	Exclude(Options, ssoEntireScope);
-
-	return:= fText.SearchReplace( SearchCenter.FindText,SearchCenter.ReplaceText,Options);
-	if return <> 0 then
-		Activate
-	else
-		MessageDlg(format(Lang[ID_MSG_TEXTNOTFOUND], [SearchCenter.FindText]),mtInformation, [mbOk], 0);
 end;
 
 procedure TEditor.SetErrorFocus(Col, Line: integer);
@@ -730,8 +680,8 @@ end;
 
 procedure TEditor.UpdateCaption(const NewCaption: AnsiString);
 begin
-  if assigned(fTabSheet) then
-   fTabSheet.Caption:= NewCaption;
+	if assigned(fTabSheet) then
+		fTabSheet.Caption:= NewCaption;
 end;
 
 procedure TEditor.SetFileName(const value: AnsiString);
@@ -1201,7 +1151,7 @@ end;
 
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
-	s,localfind : string;
+	s,localfind : AnsiString;
 	p : TBufferCoord;
 	attr : TSynHighlighterAttributes;
 	st: PStatement;
@@ -1212,9 +1162,9 @@ begin
 	// If the mouse can be found INSIDE the window
 	if fText.GetPositionOfMouse(p) and fAllowMouseOver then begin
 
-		// Only show info about variables or includes
+		// Only show info about variables
 		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
-			if not (attr = fText.Highlighter.IdentifierAttribute) and not (SameStr(attr.Name,'Preprocessor')) then begin
+			if not (attr = fText.Highlighter.IdentifierAttribute) then begin
 				Application.CancelHint;
 				fText.Hint := '';
 				Exit;
@@ -1247,9 +1197,16 @@ begin
 					end else
 						// couldn't find anything? disable hint
 						fText.Hint := '';
-				end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
-					MainForm.AddWatchVariable(s);
-					//fText.Hint := MainForm.fDebugger.WatchVar + ' = ' + MainForm.fDebugger.WatchValue;
+				end else if MainForm.fDebugger.Executing then begin
+
+					// Add to list
+					if devData.WatchHint then
+						MainForm.fDebugger.AddWatchVar(s);
+
+					// Evaluate s
+					fCurrentEvalWord := s;
+					MainForm.fDebugger.OnEvalReady := OnWatchVarReady;
+					MainForm.fDebugger.SendCommand('print',s);
 				end;
 			end;
 		end else begin
