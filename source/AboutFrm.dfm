@@ -19,7 +19,7 @@ object AboutForm: TAboutForm
   PixelsPerInch = 96
   TextHeight = 15
   object VersionLabel: TLabel
-    Left = 225
+    Left = 215
     Top = 116
     Width = 42
     Height = 15

@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
  Windows, Classes, Sysutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
- Menus, Registry;
+ Menus, Registry, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
  Classes, Sysutils, QForms, QDialogs, QSynEditHighlighter,
@@ -140,13 +140,15 @@ function NotSameText(const s1,s2 : AnsiString) : boolean;
 function StartsStr(const subtext,text : AnsiString) : boolean;
 function StartsText(const subtext,text : AnsiString) : boolean;
 
-function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
-function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
+function ReplaceFirstStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+function ReplaceFirstText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 
-function ReplaceLastStr(const S, OldPattern, NewPattern : string) : string;
-function ReplaceLastText(const S, OldPattern, NewPattern : string) : string;
+function ReplaceLastStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+function ReplaceLastText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 
 function IsEmpty(editor : TSynEdit) : boolean;
+
+function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
 
 implementation
 
@@ -168,6 +170,21 @@ begin
 			Result := false;
 			break;
 		end;
+	end;
+end;
+
+function GetPrettyLine(hwnd : TListView;i : integer) : AnsiString;
+begin
+	if (i = -1) then begin // selection
+		if (hwnd.itemindex <> -1) then
+			result := StringReplace(StringReplace(hwnd.Items[hwnd.itemindex].Caption + ' ' + hwnd.Items[hwnd.itemindex].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll])
+		else
+			result := '';
+	end else begin
+		result := hwnd.Items[i].Caption + #10 + hwnd.Items[i].SubItems.Text;
+		result := StringReplace(result,#10,#9,[]);
+		result := StringReplace(result,#13#10,#9,[]);
+		result := StringReplace(result,#13#10,#9,[]);
 	end;
 end;
 

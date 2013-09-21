@@ -3505,7 +3505,7 @@ var
 
 							X := Indent * CharWidth + fTextOffset - 2;
 							Y := rcLine.Top;
-							if (nLine mod 2) = 1 then
+							if (LineHeight mod 2 = 1) and (nLine mod 2 = 1) then
 								Inc(Y);
 
 							while Y < rcLine.Bottom do begin

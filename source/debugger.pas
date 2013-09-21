@@ -177,6 +177,10 @@ begin
 	if Executing then begin
 		Executing := false;
 
+		// Close CPU window
+		if Assigned(CPUForm) then
+			CPUForm.Close;
+
 		TerminateProcess(fProcessID, 0); // stop gdb
 
 		Reader.Terminate;

@@ -117,6 +117,8 @@ const
   ID_MARKTEXT                           = 4013;
   ID_ITEM_DATETIME                      = 4014;
   ID_ITEM_COMMENTHEADER                 = 4015;
+  ID_ITEM_COPYALL                       = 4016;
+  ID_ITEM_CLEAR                         = 4017;
 
   //free to 174 for edit menu items
   ID_ITEM_COMMENTSELECTION              = 22001;
@@ -190,7 +192,7 @@ const
   ID_ITEM_ENVIROOPTIONS                 = 7012;
   ID_ITEM_EDITOROPTIONS                 = 7013;
   ID_ITEM_TOOLCONFIG                    = 7014;
-  ID_ITEM_devShortcutsCONFIG               = 7015;
+  ID_ITEM_SHORTCUTSCONFIG               = 7015;
   // tool items dynamic
   //free to 229 for tool menu items
 
@@ -239,6 +241,9 @@ const
   ID_POP_REMOVEFILE                     = 10018;
   ID_POP_PRJOPTIONS                     = 10019;
   ID_POP_EDITRES                        = 10020;
+  ID_ITEM_NEXTINS                       = 10021;
+  ID_ITEM_STEPINS                       = 10022;
+  ID_ITEM_SKIPFUNCTION                  = 10023;
   //free to 269 for project popup
 
   //unit popup

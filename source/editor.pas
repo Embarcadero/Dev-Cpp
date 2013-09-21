@@ -1239,11 +1239,11 @@ begin
 					st := MainForm.FindStatement(s,fText.WordStartEx(p),localfind,p);
 					if localfind <> '' then begin
 						if (p.Char <> 12345) and (p.Line <> 12345) then
-							fText.Hint := localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(p.Line) + ') - Ctrl+Click to follow'
+							fText.Hint := Trim(localfind) + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(p.Line) + ') - Ctrl+Click to follow'
 						else
-							fText.Hint := localfind;
+							fText.Hint := Trim(localfind);
 					end else if Assigned(st) then begin
-						fText.Hint := st^._FullText + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
+						fText.Hint := Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
 					end else
 						// couldn't find anything? disable hint
 						fText.Hint := '';

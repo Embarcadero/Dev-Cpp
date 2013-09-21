@@ -1,6 +1,6 @@
 object LangForm: TLangForm
-  Left = 649
-  Top = 343
+  Left = 650
+  Top = 146
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Dev-C++ first time configuration'
@@ -71,35 +71,35 @@ object LangForm: TLangForm
     TabOrder = 1
     object LanguageInfo: TLabel
       Left = 8
-      Top = 244
+      Top = 230
       Width = 284
-      Height = 30
+      Height = 48
       Alignment = taCenter
       AutoSize = False
       Caption = 
-        'You can later change these options from the Environment options ' +
-        'in the Tools menu.'
+        'You can change the interface language at Tools, Environment Opti' +
+        'ons and color styles at Tools, Editor Options, Colors.'
       WordWrap = True
     end
     object GroupBox1: TGroupBox
       Left = 16
-      Top = 16
+      Top = 12
       Width = 268
-      Height = 129
+      Height = 122
       Caption = 'Select your language:'
       TabOrder = 1
       object ListBox: TListBox
         Left = 8
         Top = 20
         Width = 250
-        Height = 101
+        Height = 93
         ItemHeight = 15
         TabOrder = 0
       end
     end
     object ThemeGroupBox: TGroupBox
       Left = 16
-      Top = 156
+      Top = 144
       Width = 268
       Height = 81
       Caption = 'Select your Dev-C++ theme:'
@@ -197,23 +197,22 @@ object LangForm: TLangForm
       Left = 8
       Top = 8
       Width = 284
-      Height = 30
+      Height = 49
       AutoSize = False
       Caption = 
         'To optimize code completion, it is recommended to create a cache' +
-        ' of the standard headers files.'
+        ' of frequently used headers.'
       WordWrap = True
     end
     object CacheInfo2: TLabel
       Left = 8
-      Top = 44
+      Top = 52
       Width = 284
-      Height = 52
+      Height = 45
       AutoSize = False
       Caption = 
-        'It is possible to cache headers later in Editor Options, Class B' +
-        'rowsing, Completion. Caching all headers can take several minute' +
-        's when using TDM-GCC.'
+        'It is possible add headers to cache later at Tools, Editor Optio' +
+        'ns, Class Browsing, Completion.'
       WordWrap = True
     end
     object ProgressPanel: TPanel
@@ -254,7 +253,7 @@ object LangForm: TLangForm
         Top = 8
         Width = 268
         Height = 17
-        Caption = 'Cache the default include folder'
+        Caption = 'Cache all headers (please be patient)'
         TabOrder = 0
       end
       object NoCache: TRadioButton
@@ -354,9 +353,9 @@ object LangForm: TLangForm
       Height = 60
       AutoSize = False
       Caption = 
-        'Dev-C++ can retrieve information from headers files, to help you' +
-        ' find functions, classes and variables easily, through a class b' +
-        'rowser and a code completion list.'
+        'Dev-C++ can retrieve information from header files to help you f' +
+        'ind functions, classes and variables easily, through a class bro' +
+        'wser and a code completion list.'
       WordWrap = True
     end
     object ClassBrowserInfo2: TLabel
@@ -368,7 +367,7 @@ object LangForm: TLangForm
       Caption = 
         'Although this feature is useful, it requires more CPU power and ' +
         'memory. Do you want to use it? You can enable or disable it late' +
-        'r in Editor Options, Class Browser.'
+        'r in Tools, Editor Options, Class Browser.'
       WordWrap = True
     end
     object YesClassBrowser: TRadioButton

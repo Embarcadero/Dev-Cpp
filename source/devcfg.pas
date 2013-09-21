@@ -465,8 +465,9 @@ type
 		fPrintLineNumbers : boolean;
 		fPrintLineNumbersMargins : boolean;
 
-		// Debug variable browser
+		// General debug options
 		fWatchHint : boolean;             // watch variable under mouse
+		fUseATTSyntax : boolean;
 
   public
     constructor Create(aOwner: TComponent); override;
@@ -559,8 +560,9 @@ type
     property PrintLineNumbers : boolean read fPrintLineNumbers write fPrintLineNumbers;
     property PrintLineNumbersMargins : boolean read fPrintLineNumbersMargins write fPrintLineNumbersMargins;
 
-    // Variable debug browser
+    // General debugging options
     property WatchHint : boolean read fWatchHint write fWatchHint;
+    property UseATTSyntax : boolean read fUseATTSyntax write fUseATTSyntax;
   end;
 
 function DevData: TdevData;
@@ -611,6 +613,8 @@ begin
 
 	// load available compiler sets on first run
 	if devData.First then begin
+
+		devCompiler.Sets.Clear;
 
 		// Prefer MinGW64...
 		if DirectoryExists(devDirs.fExec + 'MinGW64') then begin
@@ -828,8 +832,8 @@ begin
   fAssociateRc := getAssociation(5);
   fAssociateTemplate := getAssociation(6);
 
-  fShowTipsOnStart:=TRUE;
-  fLastTip:=0;
+  fShowTipsOnStart := TRUE;
+  fLastTip := 0;
   fFileDate := 0;
   fShowProgress := TRUE;
   fAutoCloseProgress := FALSE;
@@ -839,6 +843,7 @@ begin
   fPrintLineNumbers := TRUE;
   fPrintLineNumbersMargins := FALSE;
   fWatchHint := TRUE;
+  fUseATTSyntax := TRUE;
 end;
 
 { TdevCompiler }

@@ -295,7 +295,7 @@ type
 		actEditWatch: TAction;
 		pnlFull: TPanel;
 		btnFullScrRevert: TSpeedButton;
-		actNextSingle: TAction;
+		actNextLine: TAction;
 		actStepOver: TAction;
 		actWatchItem: TAction;
 		actRemoveWatch: TAction;
@@ -383,7 +383,7 @@ type
 		CloseAll1: TMenuItem;
 		Closeallexceptthis1: TMenuItem;
 		CloseAll2: TMenuItem;
-		actStepSingle: TAction;
+    actStepLine: TAction;
 		DbgSingleStep: TMenuItem;
 		DebugVarsPopup: TPopupMenu;
 		AddwatchPop: TMenuItem;
@@ -561,8 +561,8 @@ type
 		actGoto: TAction;
 		TEXItem: TMenuItem;
 		actXTex: TAction;
-		NextStepBtn: TButton;
-		StepIntoBtn: TButton;
+    NextLineBtn: TButton;
+    IntoLineBtn: TButton;
 		lblSendCommandGdb: TLabel;
 		edGdbCommand: TEdit;
 		DebugOutput: TMemo;
@@ -576,6 +576,23 @@ type
 		EvaluateInput: TEdit;
 		lblEvaluate: TLabel;
 		EvalOutput: TMemo;
+    SkipFuncBtn: TButton;
+    actSkipFunction: TAction;
+    IntoInsBtn: TButton;
+    actNextIns: TAction;
+    NextInsBtn: TButton;
+    actStepIns: TAction;
+    MsgPasteItem: TMenuItem;
+    actMsgCopy: TAction;
+    actMsgCopyAll: TAction;
+    actMsgPaste: TAction;
+    actMsgClear: TAction;
+    actMsgSaveAll: TAction;
+    Skipfunction1: TMenuItem;
+    N69: TMenuItem;
+    actNextIns1: TMenuItem;
+    Intoinstruction1: TMenuItem;
+    N70: TMenuItem;
 
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
 		procedure FormDestroy(Sender: TObject);
@@ -664,10 +681,9 @@ type
 		procedure actShowBarsExecute(Sender: TObject);
 		procedure btnFullScrRevertClick(Sender: TObject);
 		procedure FormContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
-		procedure MessagePopupPopup(Sender: TObject);
 		procedure actAddWatchExecute(Sender: TObject);
 		procedure ProjectViewClick(Sender: TObject);
-		procedure actNextSingleExecute(Sender: TObject);
+		procedure actNextLineExecute(Sender: TObject);
 		procedure actRemoveWatchExecute(Sender: TObject);
 		procedure actStepOverExecute(Sender: TObject);
 		procedure actForceStopExecuteExecute(Sender: TObject);
@@ -722,7 +738,7 @@ type
 		procedure actBrowserAddFolderUpdate(Sender: TObject);
 		procedure actBrowserRenameFolderExecute(Sender: TObject);
 		procedure actCloseAllButThisExecute(Sender: TObject);
-		procedure actStepSingleExecute(Sender: TObject);
+		procedure actStepLineExecute(Sender: TObject);
 		procedure lvBacktraceCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
 		procedure lvBacktraceMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
 		procedure actRunUpdate(Sender: TObject);
@@ -817,6 +833,11 @@ type
 		procedure actBreakPointExecute(Sender: TObject);
 		procedure EvaluateInputKeyPress(Sender: TObject; var Key: Char);
 		procedure FormShow(Sender: TObject);
+		procedure actSkipFunctionExecute(Sender: TObject);
+    procedure actNextInsExecute(Sender: TObject);
+    procedure actStepInsExecute(Sender: TObject);
+    procedure actMsgPasteExecute(Sender: TObject);
+    procedure actUpdateDebuggerRunningCPU(Sender: TObject);
 	private
 		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
 		fTools            : TToolController; // tool list controller
@@ -828,6 +849,7 @@ type
 		OldWidth          : integer; // idem
 		OldHeight         : integer; // idem
 		WindowPlacement   : TWindowPlacement; // idem
+		fFirstShow        : boolean; // true for first WM_SHOW, false for others
 
 		function AskBeforeClose(e : TEditor; Rem : boolean) : boolean;
 		procedure AddFindOutputItem(const line, col, filename, msg: AnsiString);
@@ -946,7 +968,7 @@ procedure TMainForm.RemoveBreakPoint(index : integer);
 begin
 	// Debugger already running? remove it from GDB
 	if fDebugger.Executing then
-		fDebugger.AddBreakPoint(index);
+		fDebugger.RemoveBreakpoint(index);
 
 	Dispose(PBreakPoint(BreakPointList.Items[index]));
 	BreakPointList.Delete(index);
@@ -1182,6 +1204,12 @@ begin
 	actCloseAll.Caption:=				Lang[ID_ITEM_CLOSEALL];
 	actCloseProject.Caption:=			Lang[ID_ITEM_CLOSEPROJECT];
 
+	actMsgCopy.Caption :=				Lang[ID_ITEM_COPY];
+	actMsgCopyAll.Caption :=			Lang[ID_ITEM_COPYALL];
+	actMsgPaste.Caption :=				Lang[ID_ITEM_PASTE];
+	actMsgClear.Caption :=				Lang[ID_ITEM_CLEAR];
+	actMsgSaveAll.Caption :=			Lang[ID_ITEM_SAVEALL];
+
 	actFileProperties.Caption:=			Lang[ID_ITEM_PROPERTIES];
 
 	ImportItem.Caption:=				Lang[ID_SUB_IMPORT];
@@ -1287,20 +1315,23 @@ begin
 	actEditWatch.Caption:=				Lang[ID_ITEM_WATCHEDIT];
 	actModifyWatch.Caption :=			Lang[ID_ITEM_MODIFYVALUE];
 	actRemoveWatch.Caption:=			Lang[ID_ITEM_WATCHREMOVE];
-	actNextSingle.Caption:=				Lang[ID_ITEM_STEPNEXT];
-	actStepSingle.Caption:=				Lang[ID_ITEM_STEPINTO];
+	actNextLine.Caption:=				Lang[ID_ITEM_STEPNEXT];
+	actStepLine.Caption:=				Lang[ID_ITEM_STEPINTO];
 	actStepOver.Caption:=				Lang[ID_ITEM_STEPOVER];
 	actWatchItem.Caption:=				Lang[ID_ITEM_WATCHITEMS];
 	actStopExecute.Caption:=			Lang[ID_ITEM_STOPEXECUTION];
 	actViewCPU.Caption:=				Lang[ID_ITEM_CPUWINDOW];
 	ClearallWatchPop.Caption :=			Lang[ID_ITEM_CLEARALL];
+	actNextIns.Caption:=				Lang[ID_ITEM_NEXTINS];
+	actStepIns.Caption:=				Lang[ID_ITEM_STEPINS];
+	actSkipFunction.Caption:=			Lang[ID_ITEM_SKIPFUNCTION];
 
 	// Tools menu
 	actCompOptions.Caption:=			Lang[ID_ITEM_COMPOPTIONS];
 	actEnviroOptions.Caption:=			Lang[ID_ITEM_ENVIROOPTIONS];
 	actEditorOptions.Caption:=			Lang[ID_ITEM_EDITOROPTIONS];
 	actConfigTools.Caption:=			Lang[ID_ITEM_TOOLCONFIG];
-	actConfigdevShortcuts.Caption:=		Lang[ID_ITEM_devShortcutsCONFIG];
+	actConfigdevShortcuts.Caption:=		Lang[ID_ITEM_SHORTCUTSCONFIG];
 
 	// CVS menu
 	mnuCVSCurrent.Caption:=				Lang[ID_ITEM_CVSCURRENT];
@@ -1402,6 +1433,7 @@ begin
 	SetHints;
 end;
 
+
 function TMainForm.FileIsOpen(const s: AnsiString; inPrj: boolean = FALSE): integer;
 var
 	e: TEditor;
@@ -1409,11 +1441,11 @@ begin
 	for result:= 0 to pred(PageControl.PageCount) do begin
 		e:= GetEditor(result);
 		if e.filename <> '' then begin
-			if (CompareText(e.FileName, s) = 0) then
+			if SameText(e.FileName, s) then
 				if (not inprj) or (e.InProject) then exit;
 			end
 		else
-			if CompareText(e.TabSheet.Caption, ExtractfileName(s)) = 0 then
+			if SameText(e.TabSheet.Caption, ExtractfileName(s)) then
 				if (not inprj) or (e.InProject) then exit;
 	end;
 	result:= -1;
@@ -3103,7 +3135,7 @@ begin
 		// Run the debugger
 		fDebugger.SendCommand('set','new-console on');
 		fDebugger.SendCommand('set','confirm off');
-
+		fDebugger.SendCommand('dir',devCompiler.LibDir); // ???
 		fDebugger.SendCommand('run',fCompiler.RunParams);
 	end;
 end;
@@ -3112,7 +3144,6 @@ procedure TMainForm.actEnviroOptionsExecute(Sender: TObject);
 begin
 	with TEnviroForm.Create(Self) do try
 		if ShowModal = mrOk then begin
-			SetupProjectView;
 			if devData.MsgTabs = 0 then
 				PageControl.TabPosition:= tpTop
 			else if devData.MsgTabs = 1 then
@@ -3121,11 +3152,14 @@ begin
 				PageControl.TabPosition:= tpLeft
 			else if devData.MsgTabs = 3 then
 				PageControl.TabPosition:= tpRight;
+			SetupProjectView;
+
 			PageControl.MultiLine:=devData.MultiLineTab;
+
 			if devData.FullScreen then
 				Toolbar.Visible:= devData.ShowBars;
 
-			if devData.LangChange = TRUE then begin
+			if devData.LangChange then begin
 				Lang.SetLang(devData.Language);
 				LoadText;
 			end;
@@ -3181,6 +3215,11 @@ begin
 	TCustomAction(Sender).Enabled := fDebugger.Executing;
 end;
 
+procedure TMainForm.actUpdateDebuggerRunningCPU(Sender: TObject);
+begin
+	TCustomAction(Sender).Enabled := fDebugger.Executing and not Assigned(CPUForm);
+end;
+
 procedure TMainForm.ToolbarClick(Sender: TObject);
 begin
 	tbMain.Visible:= ToolMainItem.Checked;
@@ -3226,26 +3265,24 @@ procedure TMainForm.actMsgCopyExecute(Sender: TObject);
 begin
 	case MessageControl.ActivePageIndex of
 		0:
-			if assigned(CompilerOutput.Selected) then
-				Clipboard.AsText:= StringReplace(StringReplace(CompilerOutput.Selected.Caption +' ' +CompilerOutput.Selected.SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]);
+			Clipboard.AsText := GetPrettyLine(CompilerOutput);
 		1:
 			if Resourceoutput.ItemIndex <> -1 then
-				Clipboard.AsText:= ResourceOutput.Items[ResourceOutput.ItemIndex];
+				Clipboard.AsText := ResourceOutput.Items[ResourceOutput.ItemIndex];
 		2:
-			if Length(LogOutput.Text) > 0 then
-				if Length(LogOutput.SelText) > 0 then
-					Clipboard.AsText:= LogOutput.SelText
-				else
-					Clipboard.AsText:= LogOutput.Text;
-		3:
-			if Length(DebugOutput.Text) > 0 then
-				if Length(DebugOutput.SelText) > 0 then
-					Clipboard.AsText := DebugOutput.SelText
-				else
-					Clipboard.AsText := DebugOutput.Text;
+			LogOutput.CopyToClipboard;
+		3: begin
+			if EvaluateInput.Focused then
+				EvaluateInput.CopyToClipboard
+			else if EvalOutput.Focused then
+				EvalOutput.CopyToClipboard
+			else if edGDBcommand.Focused then
+				edGDBcommand.CopyToClipboard
+			else if DebugOutput.Focused then
+				DebugOutput.CopyToClipboard;
+		end;
 		4:
-			if assigned(FindOutput.Selected) then
-				Clipboard.AsText:= FindOutput.Selected.Caption +' ' + FindOutput.Selected.SubItems.Text;
+			Clipboard.AsText := GetPrettyLine(FindOutput);
 	end;
 end;
 
@@ -3257,21 +3294,39 @@ begin
 		0: begin
 			ClipBoard.AsText := '';
 			for i:=0 to pred(CompilerOutput.Items.Count) do
-				Clipboard.AsText:= Clipboard.AsText + StringReplace(StringReplace(CompilerOutput.Items[i].Caption +' ' +CompilerOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
+				Clipboard.AsText := Clipboard.AsText + GetPrettyLine(CompilerOutput,i);
 		end;
 		1:
 			for i:=0 to pred(ResourceOutput.Items.Count) do
 				Clipboard.AsText:= Clipboard.AsText + ResourceOutput.Items[I] + #13#10;
 		2:
-			if Length(LogOutput.Text) > 0 then
-				Clipboard.AsText:= LogOutput.Text;
-		3:
-			if Length(DebugOutput.Text) > 0 then
-				Clipboard.AsText:= DebugOutput.Text;
+			LogOutput.CopyToClipboard;
+		3: begin
+			if EvaluateInput.Focused then
+				EvaluateInput.CopyToClipboard
+			else if EvalOutput.Focused then
+				EvalOutput.CopyToClipboard
+			else if edGDBcommand.Focused then
+				edGDBcommand.CopyToClipboard
+			else if DebugOutput.Focused then
+				DebugOutput.CopyToClipboard;
+		end;
 		4: begin
 			ClipBoard.AsText := '';
-			for i:=0 to pred(CompilerOutput.Items.Count) do
-				Clipboard.AsText:= Clipboard.AsText + StringReplace(StringReplace(FindOutput.Items[i].Caption +' ' +FindOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
+			for i:=0 to pred(FindOutput.Items.Count) do
+				Clipboard.AsText := Clipboard.AsText + GetPrettyLine(FindOutput,i);
+		end;
+	end;
+end;
+
+procedure TMainForm.actMsgPasteExecute(Sender: TObject);
+begin
+	case MessageControl.ActivePageIndex of
+		3: begin
+			if EvaluateInput.Focused then
+				EvaluateInput.PasteFromClipboard
+			else if edGDBcommand.Focused then
+				edGDBcommand.PasteFromClipboard;
 		end;
 	end;
 end;
@@ -3366,8 +3421,16 @@ begin
 			ResourceOutput.Items.Clear;
 		2:
 			LogOutput.Clear;
-		3:
-			DebugOutput.Clear;
+		3: begin
+			if EvaluateInput.Focused then
+				EvaluateInput.Clear
+			else if EvalOutput.Focused then
+				EvalOutput.Clear
+			else if edGDBcommand.Focused then
+				edGDBcommand.Clear
+			else if DebugOutput.Focused then
+				DebugOutput.Clear;
+		end;
 		4:
 			FindOutput.Items.Clear;
 	end;
@@ -3475,21 +3538,6 @@ begin
 		result:= TEditor(PageControl.Pages[i].Tag);
 end;
 
-procedure TMainForm.MessagePopupPopup(Sender: TObject);
-begin
-	if MessageControl.ActivePage = DebugSheet then begin
-		MsgCopyItem.Enabled := true;
-		MsgCopyAllItem.Enabled := true;
-		MsgSaveAllItem.Enabled := true;
-		MsgClearItem.Enabled := true;
-	end else begin
-		MsgCopyItem.Enabled := true;
-		MsgCopyAllItem.Enabled := true;
-		MsgSaveAllItem.Enabled := true;
-		MsgClearItem.Enabled := true;
-	end;
-end;
-
 procedure TMainForm.actAddWatchExecute(Sender: TObject);
 var
 	s: AnsiString;
@@ -3535,14 +3583,14 @@ begin
 		fDebugger.AddWatchVar(DebugTree.Items.Count-1);
 end;
 
-procedure TMainForm.actNextSingleExecute(Sender: TObject);
+procedure TMainForm.actNextLineExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
 		fDebugger.SendCommand('next', '');
 	end;
 end;
 
-procedure TMainForm.actStepSingleExecute(Sender: TObject);
+procedure TMainForm.actStepLineExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
 		fDebugger.SendCommand('step', '');
@@ -6083,6 +6131,8 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+	fFirstShow := true;
+
 	// Create all data structures
 	UpdateSplash('Applying settings...');
 
@@ -6194,7 +6244,15 @@ begin
 	tbClasses.Left:= devData.ToolbarClassesX;
 	tbClasses.Top:= devData.ToolbarClassesY;
 
-	// Multiline tab
+	// PageControl settings
+	if devData.MsgTabs = 0 then
+		PageControl.TabPosition:= tpTop
+	else if devData.MsgTabs = 1 then
+		PageControl.TabPosition:= tpBottom
+	else if devData.MsgTabs = 2 then
+		PageControl.TabPosition:= tpLeft
+	else if devData.MsgTabs = 3 then
+		PageControl.TabPosition:= tpRight;
 	PageControl.MultiLine:= devData.MultiLineTab;
 
 	// Create breakpoints
@@ -6223,17 +6281,6 @@ begin
 	dmMain.CodeOffset:= 2;
 	dmMain.LoadDataMod;
 
-	// TODO: causes TMemo's to lose proper alignment
-	OpenCloseMessageSheet(devData.ShowOutput);
-
-	if devData.MsgTabs = 0 then
-		PageControl.TabPosition:= tpTop
-	else if devData.MsgTabs = 1 then
-		PageControl.TabPosition:= tpBottom
-	else if devData.MsgTabs = 2 then
-		PageControl.TabPosition:= tpLeft
-	else if devData.MsgTabs = 3 then
-		PageControl.TabPosition:= tpRight;
 	SetupProjectView;
 end;
 
@@ -6275,31 +6322,59 @@ var
 	i : Integer;
 	showtips : boolean;
 begin
-	// Open files passed to us (HAS to be done at FormShow)
-	i := 1;
-	showtips := true;
-	while I <= ParamCount do begin
+	if fFirstShow then begin
+		fFirstShow := false;
 
-		// Skip the config stuff
-		if (ParamStr(i) = '-c') then // -c
-			i := i + 2;
+		MessageControl.ActivePageIndex:= 0;
+		OpenCloseMessageSheet(devData.ShowOutput);
 
-		// Open the files passed to Dev-C++
-		if FileExists(ParamStr(i)) then begin
-			if GetFileTyp(ParamStr(i)) = utPrj then begin
-				OpenProject(ParamStr(i));
-				break; // only open 1 project
-			end else
-				OpenFile(ParamStr(i));
-			showtips := false;
+		// Open files passed to us (HAS to be done at FormShow)
+		i := 1;
+		showtips := true;
+		while I <= ParamCount do begin
+
+				// Skip the config stuff
+			if (ParamStr(i) = '-c') then // -c
+				i := i + 2;
+
+			// Open the files passed to Dev-C++
+			if FileExists(ParamStr(i)) then begin
+				if GetFileTyp(ParamStr(i)) = utPrj then begin
+					OpenProject(ParamStr(i));
+					break; // only open 1 project
+				end else
+					OpenFile(ParamStr(i));
+				showtips := false;
+			end;
+			inc(i);
 		end;
-		inc(i);
-	end;
 
-	// do not show tips if dev-c++ is launched with a file and only slow
-	// when the form shows for the first time, not when going fullscreen too
-	if devData.ShowTipsOnStart and showtips then
-		actShowTips.Execute;
+		// do not show tips if Dev-C++ is launched with a file and only slow
+		// when the form shows for the first time, not when going fullscreen too
+		if devData.ShowTipsOnStart and showtips then
+			actShowTips.Execute;
+	end;
+end;
+
+procedure TMainForm.actSkipFunctionExecute(Sender: TObject);
+begin
+	if fDebugger.Executing then begin
+		fDebugger.SendCommand('finish','');
+	end;
+end;
+
+procedure TMainForm.actNextInsExecute(Sender: TObject);
+begin
+	if fDebugger.Executing then begin
+		fDebugger.SendCommand('nexti','');
+	end;
+end;
+
+procedure TMainForm.actStepInsExecute(Sender: TObject);
+begin
+	if fDebugger.Executing then begin
+		fDebugger.SendCommand('stepi','');
+	end;
 end;
 
 end.

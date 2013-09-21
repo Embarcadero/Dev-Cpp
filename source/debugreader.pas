@@ -81,27 +81,29 @@ type
     gdbout : AnsiString;
     evalvalue : AnsiString;
 
+	// attempt to cut down on Synchronize calls
+	dobacktraceready : boolean;
+	dodisassemblerready : boolean;
+	doregistersready : boolean;
+	dorescanwatches : boolean;
+
     // main thread functions
     procedure Execute; override;
     procedure Analyze;
 
     // synching with GUI
-    procedure SyncGotoBreakpoint;
-    procedure SyncRefreshWatchVars;
-    procedure SyncExited;
-    procedure SyncRegistersReady;
-    procedure SyncDisassemblerReady;
-    procedure SyncBacktraceReady;
-    procedure SyncEvaluate;
-    procedure SyncOutput;
+    procedure SyncExited; // process exit notify
+    procedure SyncEvaluate; // evaluate ready notify
+    procedure SyncFinishedParsing; // macro for CPU window and GDB output stuff
+    procedure SyncUpdateExecution; // keeps stuff depending on scope updated
 
     // parsing
     procedure SkipSpaces; // skips space and tab
     procedure SkipToAnnotation; // skips until it finds #26#26 (GDB annotation for interfaces)
-    function FindAnnotation(an : TAnnotateType) : boolean; // Finds the next annotation, returns false on EOF
+    function FindAnnotation(an : TAnnotateType) : boolean; // Finds the given annotation, returns false on EOF
     function GetNextAnnotation : TAnnotateType; // Returns the next annotation
-    function PeekAnnotation : TAnnotateType; // Finds the next annotation, but does not modify current scanning positions
-    function GetNextWord : AnsiString; // copies the next word, stops when it finds 0..32
+    function PeekAnnotation : TAnnotateType; // Returns the next annotation, but does not modify current scanning positions
+    function GetNextWord : AnsiString; // copies the next word, stops when it finds chars 0..32
     function GetNextLine : AnsiString; // skips until enter sequence, copies until next enter sequence
     function GetRemainingLine : AnsiString; // copies until enter sequence
   end;
@@ -111,34 +113,9 @@ implementation
 uses
   main, devcfg, CPUFrm, debugger, utils;
 
-procedure TDebugReader.SyncGotoBreakpoint;
-begin
-	MainForm.GotoBreakpoint(bfile, bline);
-end;
-
-procedure TDebugReader.SyncRefreshWatchVars;
-begin
-	MainForm.fDebugger.RefreshWatchVars;
-end;
-
 procedure TDebugReader.SyncExited;
 begin
 	MainForm.fDebugger.Stop(nil);
-end;
-
-procedure TDebugReader.SyncRegistersReady;
-begin
-	CPUForm.OnRegistersReady;
-end;
-
-procedure TDebugReader.SyncDisassemblerReady;
-begin
-	CPUForm.OnAssemblerReady;
-end;
-
-procedure TDebugReader.SyncBacktraceReady;
-begin
-	CPUForm.OnBacktraceReady;
 end;
 
 procedure TDebugReader.SyncEvaluate;
@@ -146,17 +123,38 @@ begin
 	MainForm.EvalOutput.Text := evalvalue;
 end;
 
-procedure TDebugReader.SyncOutput;
+// macro for all the things that need to be done when ->->source is found
+procedure TDebugReader.SyncUpdateExecution;
+begin
+	MainForm.GotoBreakpoint(bfile, bline); // set active line
+	MainForm.fDebugger.RefreshWatchVars; // update variable information
+
+	if Assigned(CPUForm) then begin
+		MainForm.fDebugger.SendCommand('disas','');
+		MainForm.fDebugger.SendCommand('info','registers');
+		MainForm.fDebugger.SendCommand('backtrace','');
+	end;
+end;
+
+// macro for all the things that need to be done when we are finished parsing the current block
+procedure TDebugReader.SyncFinishedParsing;
 begin
 	// Delete unimportant stuff to reduce clutter
 	gdbout := StringReplace(gdbout,#26,'->',[rfReplaceAll]);
 	//gdbout := StringReplace(gdbout,'->->pre-prompt'#13#10,'',[rfReplaceAll]);
 	//gdbout := StringReplace(gdbout,'->->prompt'#13#10,'',[rfReplaceAll]);
 	//gdbout := StringReplace(gdbout,'->->post-prompt'#13#10,'',[rfReplaceAll]);
-
 	MainForm.DebugOutput.Lines.Add(gdbout);
+	//MainForm.DebugOutput.Lines.Add('-----------------------------');
 
-	//MainForm.DebugOutput.Lines.Add('---------------------------------------------------------');
+	if doregistersready then
+		CPUForm.OnRegistersReady;
+
+	if dodisassemblerready then
+		CPUForm.OnAssemblerReady;
+
+	if dobacktraceready then
+		CPUForm.OnBacktraceReady;
 end;
 
 procedure TDebugReader.SkipSpaces;
@@ -264,7 +262,7 @@ begin
 
 		// Hack fix to catch register dump
 		if Assigned(Registers) then
-			if StartsStr('rax ',s) or StartsStr('eax',s) then
+			if StartsStr('rax ',s) or StartsStr('eax ',s) then
 				result := TInfoReg;
 
 		// Another hack to catch assembler
@@ -316,6 +314,11 @@ begin
 	len := Length(gdbout);
 	curpos := 1;
 
+	dobacktraceready := false;
+	dodisassemblerready := false;
+	doregistersready := false;
+	dorescanwatches := false;
+
 	while curpos < len do begin
 		case GetNextAnnotation of
 			TValueHistory : begin
@@ -331,25 +334,37 @@ begin
 
 					trace := new(PTrace);
 
-					if not FindAnnotation(TFrameFunctionName) then Exit;
+					if not FindAnnotation(TFrameFunctionName) then begin
+						Dispose(PTrace(trace));
+						Exit;
+					end;
 
 					trace^.funcname := GetNextLine;
 
-					if not FindAnnotation(TFrameSourceFile) then Exit;
+					if not FindAnnotation(TFrameSourceFile) then begin
+						Dispose(PTrace(trace));
+						Exit;
+					end;
 
 					trace^.filename := GetNextLine;
 
-					if not FindAnnotation(TFrameSourceLine) then Exit;
+					if not FindAnnotation(TFrameSourceLine) then begin
+						Dispose(PTrace(trace));
+						Exit;
+					end;
 
 					trace^.line := GetNextLine;
 
 					Backtrace.Add(trace);
 
+					// Skip over the remaining frame part...
 					if not FindAnnotation(TFrameEnd) then Exit;
 
+					// Not another one coming? Done!
 					if PeekAnnotation <> TFrameBegin then begin
+
 						// End of stack trace dump!
-						Synchronize(SyncBacktraceReady);
+						dobacktraceready := true;
 					end;
 				end;
 			end;
@@ -363,16 +378,17 @@ begin
 
 				s := GetNextLine;
 
-				repeat
+				// Add lines of disassembly
+				while not SameStr('End of assembler dump.',s) do begin
 					Disassembly.Add(s);
 					s := GetNextLine;
-				until SameStr('End of assembler dump.',s);
+				end;
 
 				// Is Disassembly assigned? Assume CPU window called for this
-				Synchronize(SyncDisassemblerReady);
+				dodisassemblerready := true;
 			end;
 			TInfoReg : begin
-				// Scan all registers until end of gdbout
+				// Scan all registers until end of gdb output
 
 				s := GetNextLine;
 
@@ -395,7 +411,7 @@ begin
 				until StartsStr(#26#26,s);
 
 				// Is Registers assigned? Assume CPU window called for this
-				Synchronize(SyncRegistersReady);
+				doregistersready := true;
 			end;
 			TErrorBegin : begin
 				s := GetNextLine; // error text
@@ -415,7 +431,7 @@ begin
 						end;
 					end;
 
-					Synchronize(SyncRefreshWatchVars);
+					dorescanwatches := true;
 				end;
 			end;
 			TDisplayBegin : begin
@@ -440,20 +456,6 @@ begin
 					end;
 				end;
 			end;
-			{TFrameSourceFile : begin // Current file is on the next line
-				bfile := GetNextLine;
-			end;
-			TFrameSourceLine : begin // Current line is on the next line
-				bline := StrToInt(GetNextLine);
-
-				Synchronize(SyncGotoBreakpoint);
-
-				// Update vars when scope changes!
-				Synchronize(SyncRefreshWatchVars);
-			end;
-			TFrameFunctionName : begin // Current function is on the next line
-				bfunc := GetNextLine;
-			end;}
 			TSource: begin // source filename:line:offset:beg/middle/end:addr
 				s := TrimLeft(GetRemainingLine);
 
@@ -477,32 +479,30 @@ begin
 				// get file
 				bfile := s;
 
-				Synchronize(SyncGotoBreakpoint);
-
-				// Update vars when scope changes
-				Synchronize(SyncRefreshWatchVars);
+				Synchronize(SyncUpdateExecution);
 			end;
 		end;
 	end;
 
-	Synchronize(SyncOutput);
+	Synchronize(SyncFinishedParsing);
 end;
 
 procedure TDebugReader.Execute;
 var
-	tmp : array [0..4096] of char;
+	tmp : array [0..8192] of char; // 1 extra
 	bytesread : DWORD;
 begin
+	bytesread := 0;
 	while not Terminated do begin
 
-		FillChar(tmp,4096,0);
+		FillChar(tmp,bytesread+1,0);
 
-		// ReadFile returns when there's something to read (GDB does NOT always prompt when ready?)
-		if not ReadFile(hPipeRead, tmp, 4096, bytesread, nil) or (bytesread = 0) then break;
+		// ReadFile returns when there's something to read
+		if not ReadFile(hPipeRead, tmp, 8192, bytesread, nil) or (bytesread = 0) then break;
 
 		gdbout := gdbout + tmp;
 
-		if not Terminated and (Pos('(gdb) ',gdbout) > 0) then begin
+		if not Terminated and (Pos('(gdb)',gdbout) > 0) then begin //(GDB does NOT always prompt when ready?)
 			Analyze;
 			gdbout := '';
 		end;

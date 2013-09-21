@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, SynEdit, StrUtils, ComCtrls, ExtCtrls;
+  Dialogs, StdCtrls, Buttons, SynEdit, SynEditTypes, ClipBrd, StrUtils, ComCtrls, ExtCtrls, Menus;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -49,12 +49,20 @@ type
     RadioATT: TRadioButton;
     RadioIntel: TRadioButton;
     lblBacktrace: TLabel;
+    CPUPopup: TPopupMenu;
+    MenuCopy: TMenuItem;
+    MenuCopyAll: TMenuItem;
+    MenuPaste: TMenuItem;
+    MenuCut: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edFuncKeyPress(Sender: TObject; var Key: Char);
     procedure FormCreate(Sender: TObject);
     procedure gbSyntaxClick(Sender: TObject);
+    procedure MenuCopyClick(Sender: TObject);
+    procedure MenuCopyAllClick(Sender: TObject);
+    procedure MenuPasteClick(Sender: TObject);
+    procedure MenuCutClick(Sender: TObject);
   private
-    fActiveLine : integer;
     fRegisters : TList;
     fAssembler : TStringList;
     fBacktrace : TList;
@@ -91,6 +99,10 @@ begin
 		Dispose(PTrace(fBacktrace.Items[I]));
 	fBackTrace.Free;
 
+	MainForm.fDebugger.SetRegisters(nil);
+	MainForm.fDebugger.SetDisassembly(nil);
+	MainForm.fDebugger.SetBacktrace(nil);
+
 	action := caFree;
 	CPUForm := nil;
 end;
@@ -104,10 +116,10 @@ begin
 			Key := #0;
 
 			// Although GDB omits void the C++ way in its own output, it only accepts C style empty parameter lists for input...
-			propercmd := TEdit(Sender).Text;
+			propercmd := TEdit(edFunc).Text;
 			if EndsStr('()',propercmd) then
 				propercmd := ReplaceLastStr(propercmd,'()','(void)');
-			MainForm.fDebugger.SendCommand('disassemble',propercmd);
+			MainForm.fDebugger.SendCommand('disas',propercmd);
 		end;
 	end;
 end;
@@ -121,6 +133,11 @@ begin
 	Caption := Lang[ID_CPU_CAPTION];
 	lblFunc.Caption := Lang[ID_CPU_FUNC];
 	lblBacktrace.Caption := Lang[ID_DEB_BACKTRACE];
+
+	MenuCut.Caption := Lang[ID_ITEM_CUT];
+	MenuCopy.Caption := Lang[ID_ITEM_COPY];
+	MenuCopyAll.Caption := Lang[ID_ITEM_COPYALL];
+	MenuPaste.Caption := Lang[ID_ITEM_PASTE];
 end;
 
 procedure TCPUForm.OnBacktraceReady;
@@ -146,18 +163,25 @@ end;
 
 procedure TCPUForm.OnAssemblerReady;
 var
-	I : integer;
+	I,activeline : integer;
 begin
+	activeline := -1;
 	edFunc.Text := fAssembler.Strings[0];
 
 	CodeList.BeginUpdate;
 	CodeList.Clear;
-	for I := 1 to fAssembler.Count - 1 do
+	for I := 1 to fAssembler.Count - 1 do begin
 		CodeList.Lines.Add(fAssembler.Strings[i]);
+		if StartsStr('=>',fAssembler.Strings[i]) then
+			activeline := i + 1;
+	end;
 	CodeList.EndUpdate;
 
 	// Free list for reuse
 	fAssembler.Clear;
+
+	if activeline <> -1 then
+		CodeList.CaretXY := BufferCoord(1,activeline);
 end;
 
 procedure TCPUForm.OnRegistersReady;
@@ -182,8 +206,10 @@ end;
 
 procedure TCPUForm.FormCreate(Sender: TObject);
 begin
-	fActiveLine := -1;
 	LoadText;
+
+	RadioATT.Checked := devData.UseATTSyntax;
+	RadioIntel.Checked := not devData.UseATTSyntax;
 
 	fRegisters := TList.Create;
 	fAssembler := TStringList.Create;
@@ -197,7 +223,8 @@ begin
 
 		// Set disassembly flavor and load the current function
 		MainForm.fDebugger.SetDisassembly(fAssembler);
-		gbSyntaxClick(nil);
+		if devData.UseATTSyntax then // gbSyntaxClick has NOT been called yet...
+			gbSyntaxClick(nil);
 
 		// Obtain stack trace too
 		MainForm.fDebugger.SetBacktrace(fBacktrace);
@@ -213,14 +240,59 @@ begin
 	if RadioAtt.Checked then begin
 		MainForm.fDebugger.SendCommand('set disassembly-flavor','att');
 		RadioIntel.Checked := false;
+		devData.UseATTSyntax := true;
 	end else if RadioIntel.Checked then begin
 		MainForm.fDebugger.SendCommand('set disassembly-flavor','intel');
 		RadioAtt.Checked := false;
+		devData.UseATTSyntax := false;
 	end;
 
-	// Reload the current function
+	// load the current function
 	key := Chr(VK_RETURN);
 	edFuncKeyPress(nil,key);
+end;
+
+procedure TCPUForm.MenuCopyClick(Sender: TObject);
+begin
+	if edFunc.Focused then
+		edFunc.CopyToClipboard
+	else if CodeList.Focused then
+		CodeList.CopyToClipboard
+	else if StackTrace.Focused then
+		Clipboard.AsText := GetPrettyLine(StackTrace)
+	else if RegisterListbox.Focused then
+		Clipboard.AsText := GetPrettyLine(RegisterListbox);
+end;
+
+procedure TCPUForm.MenuCopyAllClick(Sender: TObject);
+var
+	i:integer;
+begin
+	if edFunc.Focused then
+		edFunc.CopyToClipboard
+	else if CodeList.Focused then
+		CodeList.CopyToClipboard
+	else if StackTrace.Focused then begin
+		ClipBoard.AsText := '';
+		for i:=0 to pred(StackTrace.Items.Count) do
+			Clipboard.AsText := Clipboard.AsText + GetPrettyLine(StackTrace,i) + #13#10;
+	end else if RegisterListbox.Focused then begin
+		ClipBoard.AsText := '';
+		for i:=0 to pred(RegisterListbox.Items.Count) do
+			Clipboard.AsText := Clipboard.AsText + GetPrettyLine(RegisterListbox,i) + #13#10;
+	end;
+end;
+
+procedure TCPUForm.MenuPasteClick(Sender: TObject);
+begin
+	if edFunc.Focused then
+		edFunc.PasteFromClipboard;
+end;
+
+procedure TCPUForm.MenuCutClick(Sender: TObject);
+begin
+	if edFunc.Focused then
+		edFunc.CutToClipboard;
 end;
 
 end.

@@ -142,6 +142,9 @@ begin
 	fFindInFiles := FindTabs.TabIndex = 1;
 
 	grpWhere.Visible:= fFindInFiles;
+	rbProjectFiles.Enabled := Assigned(MainForm.fProject);
+	if not Assigned(MainForm.fProject) then
+		rbOpenFiles.Checked := true; // only apply when branch is taken!
 	grpDirection.Visible:= not fFindInFiles;
 	grpScope.Visible:= not fFindInFiles;
 	grpOrigin.Visible:= not fFindInFiles;
