@@ -235,7 +235,7 @@ begin
 
 			Application.ProcessMessages;
 
-			MainForm.CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE);
+			MainForm.CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
 
 			MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;
 			MainForm.CppParser.OnEndParsing := MainForm.CppParserEndParsing;

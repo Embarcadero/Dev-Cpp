@@ -25,7 +25,7 @@ uses
 {$IFDEF WIN32}
   Windows, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser,
   Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version, SynEditCodeFolding,
-  SynCompletionProposal, StrUtils, SynEditTypes, SynEditHighlighter, CodeToolTip, SynAutoIndent;
+  SynCompletionProposal, SynEditTextBuffer, StrUtils, SynEditTypes, SynEditHighlighter, CodeToolTip, SynAutoIndent;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, Graphics, QControls, QForms, QDialogs, CodeCompletion, CppParser,
@@ -1411,66 +1411,154 @@ end;
 
 procedure TEditor.CommentSelection;
 var
-	pre,post,I : integer;
+	oldbbegin,oldbend : TBufferCoord;
+	localcopy : string;
+	CurPos : integer;
 begin
-	// start an undoblock, so we can undo it afterwards!
-	fText.BeginUndoBlock;
+	oldbbegin := fText.BlockBegin;
+	oldbend := fText.BlockEnd;
+
+	// Prevent repaints while we're busy
 	fText.BeginUpdate;
 
-	pre := fText.BlockBegin.Line;
-	post := fText.BlockEnd.Line;
+	if fText.SelAvail then begin
+		localcopy := '//' + fText.SelText;
+		CurPos := 1;
+		while(localcopy[CurPos] <> #0) do begin
 
-	for I := pre - 1 to post - 1 do
-		fText.Lines[I] := '//' + fText.Lines[I];
+			// find any enter sequence...
+			if(localcopy[CurPos] in [#13,#10]) then begin
+				repeat
+					Inc(CurPos);
+				until not (localcopy[CurPos] in [#13,#10]);
 
+				// and comment...
+				if localcopy[CurPos] <> #0 then
+					Insert('//',localcopy,CurPos); // 1 based
+			end;
+			Inc(CurPos);
+		end;
+		fText.SelText := localcopy;
+	end else begin
+		fText.BeginUndoBlock;
+
+		fText.LineText := '//' + fText.LineText;
+
+		fText.UndoList.AddChange(crInsert,
+			BufferCoord(1,fText.CaretY),
+			BufferCoord(3,fText.CaretY),
+			'',smNormal);
+
+		fText.EndUndoBlock;
+	end;
+
+	// Prevent repaints while we're busy
 	fText.EndUpdate;
-	fText.EndUndoBlock;
+
+	if oldbbegin.Char = 1 then // move due to comment chars
+		fText.BlockBegin := oldbbegin
+	else
+		fText.BlockBegin := BufferCoord(oldbbegin.Char + 2,oldbbegin.line);
+	if oldbend.Char = 1 then // move due to comment chars
+		fText.BlockEnd := oldbend
+	else
+		fText.BlockEnd := BufferCoord(oldbend.Char + 2,oldbend.line);
+
 	fText.UpdateCaret;
+	fText.Modified := true;
 end;
 
 procedure TEditor.IndentSelection;
 begin
 	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
-		FText.ExecuteCommand(ecBlockIndent, #0, nil)
+		fText.ExecuteCommand(ecBlockIndent, #0, nil)
 	else
-		FText.ExecuteCommand(ecTab,#0, nil);
+		fText.ExecuteCommand(ecTab,#0, nil);
 end;
 
 procedure TEditor.UnindentSelection;
 begin
-	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
-		FText.ExecuteCommand(ecBlockUnIndent,#0, nil)
+	if fText.BlockBegin.Line <> fText.BlockEnd.Line then
+		fText.ExecuteCommand(ecBlockUnIndent,#0, nil)
 	else
-		FText.ExecuteCommand(ecShiftTab,#0, nil);
+		fText.ExecuteCommand(ecShiftTab,#0, nil);
 end;
 
 procedure TEditor.UncommentSelection;
 var
-	pre,post,I,J : integer;
-	line : string;
+	oldbbegin,oldbend : TBufferCoord;
+	localcopy : string;
+	CurPos : integer;
 begin
-	// start an undoblock, so we can undo it afterwards!
-	fText.BeginUndoBlock;
+	oldbbegin := fText.BlockBegin;
+	oldbend := fText.BlockEnd;
+
+	// Prevent repaints while we're busy
 	fText.BeginUpdate;
 
-	pre := fText.BlockBegin.Line;
-	post := fText.BlockEnd.Line;
+	if fText.SelAvail then begin
+		localcopy := fText.SelText;
+		CurPos := 1;
 
-	for I := pre - 1 to post - 1 do begin
-		line := fText.Lines[I];
-		for J := 1 to Length(line) - 1 do begin
-			if (line[J] = '/') and (line[J+1] = '/') then begin
-				Delete(line,J,2);
-				fText.Lines[I] := line;
+		// Delete the first one
+		if StrLComp(@localcopy[CurPos],'//',2) = 0 then
+			Delete(localcopy,CurPos,2);
+
+		while(localcopy[CurPos] <> #0) do begin
+
+			// find any enter sequence...
+			if(localcopy[CurPos] in [#13,#10]) then begin
+				repeat
+					Inc(CurPos);
+				until not (localcopy[CurPos] in [#0..#32]);
+
+				if StrLComp(@localcopy[CurPos],'//',2) = 0 then
+					Delete(localcopy,CurPos,2);
+			end;
+			Inc(CurPos);
+		end;
+		fText.SelText := localcopy;
+	end else begin
+		fText.BeginUndoBlock;
+
+		localcopy := fText.LineText;
+		CurPos := 1;
+		while(localcopy[CurPos] <> #0) do begin
+
+			// find any enter sequence...
+			if StrLComp(@localcopy[CurPos],'//',2) = 0 then begin
+				Delete(localcopy,CurPos,2);
 				break;
 			end;
-			if not (line[J] in [#0..#32]) then break;
+			if not (localcopy[CurPos] in [#0..#32]) then
+				break;
+			Inc(CurPos);
 		end;
+
+		fText.LineText := localcopy;
+
+		fText.UndoList.AddChange(crDelete,
+			BufferCoord(CurPos,fText.CaretY),
+			BufferCoord(CurPos,fText.CaretY),
+			'//',smNormal);
+
+		fText.EndUndoBlock;
 	end;
 
+	// Prevent repaints while we're busy
 	fText.EndUpdate;
-	fText.EndUndoBlock;
+
+	if oldbbegin.Char < 3 then // move due to deleted comment chars
+		fText.BlockBegin := oldbbegin
+	else
+		fText.BlockBegin := BufferCoord(oldbbegin.Char - 2,oldbbegin.line);
+	if oldbend.Char < 3 then // move due to comment chars
+		fText.BlockEnd := oldbend
+	else
+		fText.BlockEnd := BufferCoord(oldbend.Char - 2,oldbend.line);
+
 	fText.UpdateCaret;
+	fText.Modified := true;
 end;
 
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);

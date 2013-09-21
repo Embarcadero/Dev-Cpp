@@ -5487,7 +5487,7 @@ var
   Item: TSynEditUndoItem;
   OldChangeNumber: integer;
   SaveChangeNumber: integer;
-  FLastChange : TSynChangeReason;                                          
+  FLastChange : TSynChangeReason;
   FAutoComplete: Boolean;
   FPasteAction: Boolean;
   FSpecial1: Boolean;

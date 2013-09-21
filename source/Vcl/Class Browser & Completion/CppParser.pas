@@ -201,7 +201,7 @@ type
     procedure GetClassesList(var List: TStrings);
     function SuggestMemberInsertionLine(ParentID: integer; Scope: TStatementClassScope; var AddScopeStr: boolean): integer;
     function GetFullFilename(const Value: AnsiString): AnsiString;
-    procedure Load(const FileName: AnsiString);
+    procedure Load(const FileName: AnsiString;const relativeto : AnsiString);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Parse(FileName: TFileName); overload;
@@ -217,8 +217,7 @@ type
     procedure AddIncludePath(Value: AnsiString);
     procedure AddProjectIncludePath(Value: AnsiString);
     procedure AddFileToScan(Value: AnsiString; InProject: boolean = False);
-    procedure Save(FileName: TFileName);
-    procedure ScanAndSaveGlobals(FileName: TFileName);
+    procedure Save(const FileName: AnsiString;const relativeto : AnsiString);
     procedure PostProcessInheritance;
     procedure ReProcessInheritance;
     function Locate(Full: AnsiString; WithScope: boolean): PStatement;
@@ -2095,48 +2094,22 @@ begin
 		Dispose(P);
 end;
 
-procedure TCppParser.ScanAndSaveGlobals(FileName: TFileName);
-var
-  I: Integer;
-  SR: TSearchRec;
-  Path: AnsiString;
-begin
-  Reset;
-  for I := 0 to fIncludePaths.Count - 1 do begin
-    Path := StringReplace(fIncludePaths[I] + '\', '"', '', [rfReplaceAll]);
-    if FindFirst(Path + '*.h', faAnyFile, SR) = 0 then begin
-      repeat
-        AddFileToScan(Path + SR.Name);
-      until FindNext(SR) <> 0;
-      FindClose(SR);
-    end;
-    if FindFirst(Path + '*.hpp', faAnyFile, SR) = 0 then begin
-      repeat
-        AddFileToScan(Path + SR.Name);
-      until FindNext(SR) <> 0;
-      FindClose(SR);
-    end;
-  end;
-  ParseLocalHeaders := False;
-  ParseGlobalHeaders := False;
-  ParseList;
-  Save(FileName);
-end;
-
-procedure TCppParser.Save(FileName: TFileName);
+procedure TCppParser.Save(const FileName: AnsiString;const relativeto : AnsiString);
 var
 	hFile: integer;
 	I, I2, HowMany: integer;
 	MAGIC: array[0..7] of Char;
 	P: array[0..8191] of Char;
+	bytes : DWORD;
+	relative : string;
 begin
 	MAGIC := 'CPPP 0.1';
 	fCacheContents.Assign(fScannedFiles);
-	if FileExists(FileName) then
-		DeleteFile(FileName);
-	hFile := FileCreate(FileName);
+
+	// File and file type check
+	hFile := CreateFile(PAnsiChar(FileName),GENERIC_WRITE,0,nil,CREATE_ALWAYS,FILE_FLAG_SEQUENTIAL_SCAN,0);
 	if hFile > 0 then begin
-		FileWrite(hFile, MAGIC, SizeOf(MAGIC));
+		WriteFile(hFile, MAGIC, sizeof(MAGIC), bytes, nil);
 
 		// write statements
 		HowMany := fStatementList.Count - 1;
@@ -2145,92 +2118,104 @@ begin
 			with PStatement(fStatementList[I])^ do begin
 
 				// Write integer data...
-				FileWrite(hFile, _ParentID,      SizeOf(integer));
-				FileWrite(hFile, _Kind,          SizeOf(byte));
-				FileWrite(hFile, _Scope,         SizeOf(integer));
-				FileWrite(hFile, _ClassScope,    SizeOf(integer));
-				FileWrite(hFile, _IsDeclaration, SizeOf(boolean));
-				FileWrite(hFile, _DeclImplLine,  SizeOf(integer));
-				FileWrite(hFile, _Line,          SizeOf(integer));
+				WriteFile(hFile, _ParentID,      SizeOf(integer), bytes, nil);
+				WriteFile(hFile, _Kind,          SizeOf(byte),    bytes, nil);
+				WriteFile(hFile, _Scope,         SizeOf(integer), bytes, nil);
+				WriteFile(hFile, _ClassScope,    SizeOf(integer), bytes, nil);
+				WriteFile(hFile, _IsDeclaration, SizeOf(boolean), bytes, nil);
+				WriteFile(hFile, _DeclImplLine,  SizeOf(integer), bytes, nil);
+				WriteFile(hFile, _Line,          SizeOf(integer), bytes, nil);
 
 				// Write data, including length
 				I2 := Length(_FullText);
-				FileWrite(hFile, I2, SizeOf(Integer));
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, _FullText);
-				FileWrite(hFile, P, I2);
+				WriteFile(hFile, P, I2, bytes, nil);
 
 				I2 := Length(_Type);
-				FileWrite(hFile, I2, SizeOf(Integer));
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, _Type);
-				FileWrite(hFile, P, I2);
+				WriteFile(hFile, P, I2, bytes, nil);
 
 				I2 := Length(_Command);
-				FileWrite(hFile, I2, SizeOf(Integer));
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, _Command);
-				FileWrite(hFile, P, I2);
+				WriteFile(hFile, P, I2, bytes, nil);
 
 				I2 := Length(_Args);
-				FileWrite(hFile, I2, SizeOf(Integer));
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, _Args);
-				FileWrite(hFile, P, I2);
+				WriteFile(hFile, P, I2, bytes, nil);
 
 				I2 := Length(_ScopelessCmd);
-				FileWrite(hFile, I2, SizeOf(Integer));
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, _ScopelessCmd);
-				FileWrite(hFile, P, I2);
+				WriteFile(hFile, P, I2, bytes, nil);
 
-				I2 := Length(_DeclImplFileName);
-				FileWrite(hFile, I2, SizeOf(Integer));
-				StrPCopy(P, _DeclImplFileName);
-				FileWrite(hFile, P, I2);
+				// Save RELATIVE filenames
+				relative := StringReplace(_DeclImplFileName,relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+				I2 := Length(relative);
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
+				StrPCopy(P, relative);
+				WriteFile(hFile, P, I2, bytes, nil);
 
-				I2 := Length(_FileName);
-				FileWrite(hFile, I2, SizeOf(Integer));
-				StrPCopy(P, _FileName);
-				FileWrite(hFile, P, I2);
+				// Save RELATIVE filenames
+				relative := StringReplace(_FileName,relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+				I2 := Length(relative);
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
+				StrPCopy(P, relative);
+				WriteFile(hFile, P, I2, bytes, nil);
 
 				I2 := Length(_InheritsFromIDs);
-				FileWrite(hFile, I2, SizeOf(Integer));
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, _InheritsFromIDs);
-				FileWrite(hFile, P, I2);
+				WriteFile(hFile, P, I2, bytes, nil);
 
 				I2 := Length(_InheritsFromClasses);
-				FileWrite(hFile, I2, SizeOf(Integer));
+				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, _InheritsFromClasses);
-				FileWrite(hFile, P, I2);
+				WriteFile(hFile, P, I2, bytes, nil);
 			end;
 		end;
 
 		// write scanned files (cache contents)
 		HowMany := fScannedFiles.Count - 1;
-		FileWrite(hFile, HowMany, SizeOf(Integer));
+		WriteFile(hFile, HowMany, SizeOf(Integer), bytes, nil);
 		for I := 0 to HowMany do begin
-			I2 := Length(fScannedFiles[I]);
-			FileWrite(hFile, I2, SizeOf(Integer));
-			StrPCopy(P, fScannedFiles[I]);
-			FileWrite(hFile, P, I2);
+
+			// Save RELATIVE filenames
+			relative := StringReplace(fScannedFiles[I],relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+			I2 := Length(relative);
+			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
+			StrPCopy(P, relative);
+			WriteFile(hFile, P, I2, bytes, nil);
 		end;
 
 		// write file includes list for each file scanned
 		HowMany := fIncludesList.Count - 1;
-		FileWrite(hFile, HowMany, SizeOf(Integer));
+		WriteFile(hFile, HowMany, SizeOf(Integer), bytes, nil);
 		for I := 0 to HowMany do begin
-			I2 := Length(PIncludesRec(fIncludesList[I])^.BaseFile);
-			FileWrite(hFile, I2, SizeOf(Integer));
-			StrPCopy(P, PIncludesRec(fIncludesList[I])^.BaseFile);
-			FileWrite(hFile, P, I2);
 
-			I2 := Length(PIncludesRec(fIncludesList[I])^.IncludeFiles);
-			FileWrite(hFile, I2, SizeOf(Integer));
-			StrPCopy(P, PIncludesRec(fIncludesList[I])^.IncludeFiles);
-			FileWrite(hFile, P, I2);
+			// Save RELATIVE filenames
+			relative := StringReplace(PIncludesRec(fIncludesList[I])^.BaseFile,relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+			I2 := Length(relative);
+			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
+			StrPCopy(P, relative);
+			WriteFile(hFile, P, I2, bytes, nil);
+
+			// Save RELATIVE filenames
+			relative := StringReplace(PIncludesRec(fIncludesList[I])^.IncludeFiles,relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+			I2 := Length(relative);
+			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
+			StrPCopy(P, relative);
+			WriteFile(hFile, P, I2, bytes, nil);
 		end;
-		FileClose(hFile);
 	end;
+	CloseHandle(hFile);
 	fBaseIndex := fNextID;
 end;
 
-procedure TCppParser.Load(const FileName: AnsiString);
+procedure TCppParser.Load(const FileName: AnsiString;const relativeto : AnsiString);
 var
 	hFile: integer;
 	HowMany: integer;
@@ -2240,6 +2225,7 @@ var
 	Buf: array[0..8191] of Char;
 	P: PIncludesRec;
 	bytes : DWORD;
+	relative : string;
 begin
 	// File and file type check
 	hFile := CreateFile(PAnsiChar(FileName),GENERIC_READ,0,nil,OPEN_EXISTING,FILE_FLAG_SEQUENTIAL_SCAN,0);
@@ -2285,15 +2271,17 @@ begin
 					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_ScopelessCmd := Buf;
 
+					// Load RELATIVE filenames
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 					FillChar(Buf, ItemLength+1, 0);
 					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_DeclImplFileName := Buf;
+					_DeclImplFileName := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);
 
+					// Load RELATIVE filenames
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 					FillChar(Buf, ItemLength+1, 0);
 					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_FileName := Buf;
+					_FileName := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);;
 
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 					FillChar(Buf, ItemLength+1, 0);
@@ -2322,13 +2310,14 @@ begin
 			// read scanned files - cache contents
 			ReadFile(hFile, HowMany, SizeOf(Integer),bytes,nil);
 			for I := 0 to HowMany do begin
+
+				// Load RELATIVE filenames
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 				FillChar(Buf, ItemLength+1, 0);
 				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				if fScannedFiles.IndexOf(Buf) = -1 then
-					fScannedFiles.Add(Buf);
-				if fCacheContents.IndexOf(Buf) = -1 then
-					fCacheContents.Add(Buf);
+				relative := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);
+				fScannedFiles.Add(relative);
+				fCacheContents.Add(relative);
 			end;
 
 			// read includes info for each scanned file
@@ -2336,15 +2325,19 @@ begin
 			for I := 0 to HowMany do begin
 				P := New(PIncludesRec);
 
+				// Load RELATIVE filenames
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 				FillChar(Buf, ItemLength+1, 0);
 				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				P^.BaseFile := Buf;
+				relative := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);
+				P^.BaseFile := relative;
 
+				// Load RELATIVE filenames
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 				FillChar(Buf, ItemLength+1, 0);
 				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				P^.IncludeFiles := Buf;
+				relative := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);
+				P^.IncludeFiles := relative;
 
 				fIncludesList.Add(P);
 			end;

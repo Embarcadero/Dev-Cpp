@@ -4197,7 +4197,7 @@ begin
 			for I := 0 to PageControl.PageCount - 1 do
 				GetEditor(I).UpdateParser;
 			if devCodeCompletion.UseCacheFiles then
-				Load(devDirs.Config+DEV_COMPLETION_CACHE);
+				Load(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
 			if Assigned(fProject) then
 				ScanActiveProject;
 		end;

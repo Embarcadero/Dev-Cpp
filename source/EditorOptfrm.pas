@@ -1528,7 +1528,7 @@ begin
       for I:=0 to OpenDialog.Files.Count-1 do
         CppParser.AddFileToScan(OpenDialog.Files[I]);
       CppParser.ParseList;
-      CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE);
+      CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
       lbCCC.Items.Assign(CppParser.CacheContents);
       Screen.Cursor:=crDefault;
       chkCCCache.Tag:=1; // mark modified
@@ -1559,7 +1559,7 @@ procedure TEditorOptForm.FillCCC;
 begin
   Screen.Cursor:=crHourglass;
   Application.ProcessMessages;
-  CppParser.Load(devDirs.Config+DEV_COMPLETION_CACHE);
+  CppParser.Load(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
   lbCCC.Items.Assign(CppParser.CacheContents);
   Screen.Cursor:=crDefault;
 end;
