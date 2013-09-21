@@ -4577,6 +4577,8 @@ end;
 
 procedure TMainForm.actConfigShortcutsExecute(Sender: TObject);
 begin
+	if(devShortcuts1.FileName[2] <> ':') then // if relative
+		devShortcuts1.FileName := devdirs.Exec+devShortcuts1.FileName;
 	devShortcuts1.Edit;
 end;
 
@@ -4584,7 +4586,7 @@ procedure TMainForm.DateTimeMenuItemClick(Sender: TObject);
 var e : TEditor;
 begin
 	e := GetEditor;
-	if assigned(e) then
+	if Assigned(e) then
 		e.InsertString(FormatDateTime('dd/mm/yy hh:nn', Now), TRUE);
 end;
 
@@ -4596,9 +4598,9 @@ end;
 procedure TMainForm.actProgramResetUpdate(Sender: TObject);
 begin
 	if Assigned(fProject) then
-			(Sender as TCustomAction).Enabled := not (fProject.Options.typ = dptStat) and devExecutor.Running
+		(Sender as TCustomAction).Enabled := not (fProject.Options.typ = dptStat) and devExecutor.Running
 	else
-			(Sender as TCustomAction).Enabled := (PageControl.PageCount > 0)	and devExecutor.Running;
+		(Sender as TCustomAction).Enabled := (PageControl.PageCount > 0) and devExecutor.Running;
 end;
 
 procedure TMainForm.CommentheaderMenuItemClick(Sender: TObject);
@@ -4626,8 +4628,7 @@ begin
 			PageControl.ActivePageIndex:=I;
 			PageControlChange(nil);
 		end;
-	end
-	else // see if it's a drag operation
+	end else // see if it's a drag operation
 		PageControl.Pages[PageControl.ActivePageIndex].BeginDrag(False);
 end;
 

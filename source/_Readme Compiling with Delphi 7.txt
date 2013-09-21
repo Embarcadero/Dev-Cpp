@@ -1,20 +1,16 @@
-to compile with Delphi 7:
+1) Install the following packages by double clicking them and clicking on compile and/or install:
 
-1) Add the following packages to Delphi:
-DevCpp.dpk
-SynEdit_D7.dpk
-ClassBrowsing.dpk
+.\Vcl\DevCpp.dpk
+.\Vcl\SynEditPackages\SynEdit_D7.dpk
+.\Vcl\Class Browser & Completion\ClassBrowsing.dpk
 
-2) Compile resources: run CompileResources.bat or run manually from cmd:
+2) Compile resources: run .\CompileResources.bat to create binary .res files (or run manually from cmd):
+
 brcc32 DefaultFiles.rc
 brcc32 webupdate\selfupdater.rc
 brcc32 LangFrm.rc
 brcc32 icons.rc
 
-otherwise you'll get the following errors:
-[Error] File not found: 'DefaultFiles.res'
-[Error] File not found: 'webupdate\selfupdater.res'
-[Error] File not found: 'LangFrm.res'
-[Error] File not found: 'Icons.res'
-
 3) Opening and using the main project file devcpp.dpr should not bring up any 'not found' erros now.
+
+4) Other versions of Delphi might work, but I've only tested Delphi 7.
