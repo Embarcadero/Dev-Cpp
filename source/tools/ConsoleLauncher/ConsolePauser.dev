@@ -2,7 +2,7 @@
 FileName=ConsolePauser.dev
 Name=ConsolePauser
 Type=1
-Ver=1
+Ver=2
 ObjFiles=
 Includes=
 Libs=
@@ -27,8 +27,8 @@ UseCustomMakefile=0
 CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
-CompilerSet=0
-CompilerSettings=000000000011000000000100000
+CompilerSet=1
+CompilerSettings=000000010011000000000100000
 UnitCount=1
 
 [VersionInfo]

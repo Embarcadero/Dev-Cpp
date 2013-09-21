@@ -115,15 +115,16 @@ begin
 		option^.optValue := 1
 	else if SameStr(Value,'No') then
 		option^.optValue := 0
-	else if option^.optChoices = nil then
-		Exit
-	else begin
+	else if Assigned(option^.optChoices) then begin
 		for i := 0 to option^.optChoices.Count - 1 do
 			if SameStr(Value,option^.optChoices.Names[i]) then begin
 				option^.optValue := i;
 				break;
 			end;
 	end;
+
+	// update string too
+	devCompiler.SetOption(nil,Integer(vle.Strings.Objects[ARow]),ValueToChar[option^.optValue]);
 end;
 
 end.

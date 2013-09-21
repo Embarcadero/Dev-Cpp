@@ -37,13 +37,12 @@ type
                    TDisplayBegin, TDisplayEnd,
                    TDisplayExpression,
                    TFrameSourceFile, TFrameSourceLine, TFrameFunctionName,
+                   TFrameBegin,TFrameEnd,
                    TErrorBegin, TErrorEnd,
                    TExit,
-                   TError,
-                   TWarning,
                    TValueHistory,
                    TInfoReg, TInfoAsm,
-                   TUnknown);
+                   TUnknown,TEOF);
 
   PWatchVar = ^TWatchVar;
   TWatchVar = record
@@ -52,11 +51,19 @@ type
     gdbindex : integer;
   end;
 
+  {PInstruction = ^TInstruction;
+  TInstruction = record
+    address : AnsiString;
+    offset : AnsiString;
+    opcode : AnsiString;
+    operands : AnsiString;
+  end;}
+
   PTrace = ^TTrace;
   TTrace = record
     funcname : AnsiString;
     filename : AnsiString;
-    line : integer;
+    line : AnsiString;
   end;
 
   TDebugReader = class(TThread)
@@ -71,7 +78,6 @@ type
     len : integer;
     bline : integer;
     bfile : AnsiString;
-    bfunc : AnsiString;
     gdbout : AnsiString;
     evalvalue : AnsiString;
 
@@ -90,12 +96,14 @@ type
     procedure SyncOutput;
 
     // parsing
-    procedure SkipSpaces;
-    procedure SkipToAnnotation;
-    function GetNextAnnotation : TAnnotateType;
-    function GetNextWord : AnsiString;
-    function GetNextLine : AnsiString;
-    function GetRemainingLine : AnsiString;
+    procedure SkipSpaces; // skips space and tab
+    procedure SkipToAnnotation; // skips until it finds #26#26 (GDB annotation for interfaces)
+    function FindAnnotation(an : TAnnotateType) : boolean; // Finds the next annotation, returns false on EOF
+    function GetNextAnnotation : TAnnotateType; // Returns the next annotation
+    function PeekAnnotation : TAnnotateType; // Finds the next annotation, but does not modify current scanning positions
+    function GetNextWord : AnsiString; // copies the next word, stops when it finds 0..32
+    function GetNextLine : AnsiString; // skips until enter sequence, copies until next enter sequence
+    function GetRemainingLine : AnsiString; // copies until enter sequence
   end;
 
 implementation
@@ -105,9 +113,6 @@ uses
 
 procedure TDebugReader.SyncGotoBreakpoint;
 begin
-	MainForm.fDebugger.CurrentLine := bline;
-	MainForm.fDebugger.CurrentFile := bfile;
-	MainForm.fDebugger.CurrentFunc := bfunc;
 	MainForm.GotoBreakpoint(bfile, bline);
 end;
 
@@ -172,6 +177,21 @@ begin
 		Inc(curpos);
 end;
 
+function TDebugReader.FindAnnotation(an : TAnnotateType) : boolean;
+var
+	curran : TAnnotateType;
+begin
+	result := false;
+
+	repeat
+		curran := GetNextAnnotation;
+		if curran = TEOF then
+			Exit;
+	until curran = an;
+
+	result := true;
+end;
+
 function TDebugReader.GetNextWord : AnsiString;
 begin
 	Result:='';
@@ -210,6 +230,15 @@ begin
 
 	// Return next line
 	Result := GetRemainingLine;
+end;
+
+function TDebugReader.PeekAnnotation : TAnnotateType;
+var
+	oldpos : integer;
+begin
+	oldpos := curpos;
+	Result := GetNextAnnotation;
+	curpos := oldpos;
 end;
 
 function TDebugReader.GetNextAnnotation : TAnnotateType;
@@ -258,18 +287,20 @@ begin
 		result := TFrameSourceFile
 	else if SameStr(s,'frame-source-line') then
 		result := TFrameSourceLine
-	else if SameStr(s,'source') then
-		result := TSource
 	else if SameStr(s,'frame-function-name') then
 		result := TFrameFunctionName
-	else if SameStr(s,'error') then
-		result := TError
-	else if SameStr(s,'warning') then
-		result := TWarning
+	else if SameStr(s,'frame-begin') then
+		result := TFrameBegin
+	else if SameStr(s,'frame-end') then
+		result := TFrameEnd
+	else if SameStr(s,'source') then
+		result := TSource
 	else if SameStr(s,'exited') then
 		result := TExit
 	else if SameStr(s,'value-history-value') then
 		result := TValueHistory
+	else if (curpos = len) then
+		result := TEOF
 	else
 		result := TUnknown;
 end;
@@ -280,6 +311,7 @@ var
 	i,x,y : integer; // dump
 	wvar : PWatchVar;
 	reg : PRegister;
+	trace : PTrace;
 begin
 	evalvalue := '';
 	len := Length(gdbout);
@@ -293,6 +325,34 @@ begin
 			end;
 			TExit : begin
 				Synchronize(SyncExited);
+			end;
+			TFrameBegin : begin
+				s := GetNextLine;
+				if StartsStr('#',s) and Assigned(Backtrace) then begin
+
+					trace := new(PTrace);
+
+					if not FindAnnotation(TFrameFunctionName) then Exit;
+
+					trace^.funcname := GetNextLine;
+
+					if not FindAnnotation(TFrameSourceFile) then Exit;
+
+					trace^.filename := GetNextLine;
+
+					if not FindAnnotation(TFrameSourceLine) then Exit;
+
+					trace^.line := GetNextLine;
+
+					Backtrace.Add(trace);
+
+					if not FindAnnotation(TFrameEnd) then Exit;
+
+					if PeekAnnotation <> TFrameBegin then begin
+						// End of stack trace dump!
+						Synchronize(SyncBacktraceReady);
+					end;
+				end;
 			end;
 			TInfoAsm : begin
 
@@ -363,11 +423,11 @@ begin
 
 				GetNextLine; // watch index
 
-				repeat until GetNextAnnotation = TDisplayExpression;
+				if not FindAnnotation(TDisplayExpression) then Exit;
 
 				s := GetNextLine; // variable name
 
-				repeat until GetNextAnnotation = TDisplayExpression;
+				if not FindAnnotation(TDisplayExpression) then Exit;
 
 				t := GetNextLine; // variable value
 
@@ -381,7 +441,7 @@ begin
 					end;
 				end;
 			end;
-			TFrameSourceFile : begin // Current file is on the next line
+			{TFrameSourceFile : begin // Current file is on the next line
 				bfile := GetNextLine;
 			end;
 			TFrameSourceLine : begin // Current line is on the next line
@@ -394,7 +454,7 @@ begin
 			end;
 			TFrameFunctionName : begin // Current function is on the next line
 				bfunc := GetNextLine;
-			end;
+			end;}
 			TSource: begin // source filename:line:offset:beg/middle/end:addr
 				s := TrimLeft(GetRemainingLine);
 

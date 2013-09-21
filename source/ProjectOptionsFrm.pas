@@ -53,18 +53,18 @@ type
     grpType: TGroupBox;
     lstType: TListBox;
     edProjectName: TEdit;
-    btnUp: TSpeedButton;
-    btnDown: TSpeedButton;
+    btnDirUp: TSpeedButton;
+    btnDirDown: TSpeedButton;
     SubTabs: TTabControl;
-    lstList: TListBox;
-    btnAdd: TButton;
-    btnDelete: TButton;
-    btnReplace: TButton;
-    edEntry: TEdit;
-    btnDelInval: TButton;
+    lstDirList: TListBox;
+    btnDirAdd: TButton;
+    btnDirDelete: TButton;
+    btnDirReplace: TButton;
+    edDirEntry: TEdit;
+    btnDirDelInval: TButton;
     btnRemoveIcon: TBitBtn;
     Panel1: TPanel;
-    Icon: TImage;
+    IconPreview: TImage;
     tabOutputDir: TTabSheet;
     lblExeOutput: TLabel;
     lblObjOutput: TLabel;
@@ -72,7 +72,7 @@ type
     edObjOutput: TEdit;
     tabMakefile: TTabSheet;
     IncMakeLabel: TLabel;
-    MakeIncludes: TListBox;
+    lbMakeIncludes: TListBox;
     btnMakUp: TSpeedButton;
     btnMakDown: TSpeedButton;
     edMakeInclude: TEdit;
@@ -143,7 +143,7 @@ type
     edLogOutput: TEdit;
     lblLogOutput: TLabel;
     btnLogOutputDir: TSpeedButton;
-    CheckBox1: TCheckBox;
+    chkLogOutput: TCheckBox;
     Label1: TLabel;
     OptionsTip: TLabel;
     OptionsLink: TLabel;
@@ -155,7 +155,6 @@ type
     procedure BrowseClick(Sender: TObject);
     procedure SubTabsChange(Sender: TObject);
     procedure SubTabsChanging(Sender: TObject; NewIndex: Integer;var AllowChange: Boolean);
-    procedure FormShow(Sender: TObject);
     procedure btnIconLibClick(Sender: TObject);
     procedure btnIconBrwseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -166,11 +165,10 @@ type
     procedure btnMakClick(Sender: TObject);
     procedure MakButtonClick(Sender: TObject);
     procedure edMakeIncludeChange(Sender: TObject);
-    procedure MakeIncludesClick(Sender: TObject);
+    procedure lbMakeIncludesClick(Sender: TObject);
     procedure InfoMakeBtnClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure chkOverrideOutputClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure chkCompileClick(Sender: TObject);
     procedure chkVersionInfoClick(Sender: TObject);
     procedure lvFilesChange(Sender: TObject; Node: TTreeNode);
@@ -183,33 +181,32 @@ type
     procedure spnPriorityChange(Sender: TObject);
     procedure btnCustomMakeBrowseClick(Sender: TObject);
     procedure cbUseCustomMakefileClick(Sender: TObject);
-    procedure MakeIncludesDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
+    procedure lbMakeIncludesDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
     procedure SetFileVersion(Sender: TObject);
     procedure btnLogOutputDirClick(Sender: TObject);
-    procedure CheckBox1Click(Sender: TObject);
+    procedure chkLogOutputClick(Sender: TObject);
     procedure OptionsLinkClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
-    fOptions: TProjOptions;
     fIcon: AnsiString;
-    fProject: TProject;
-    procedure SetOptions(Value: TProjOptions);
-    function GetOptions: TProjOptions;
-    procedure UpdateButtons;
+    procedure UpdateDirButtons;
     procedure UpdateMakButtons;
     procedure LoadText;
     procedure InitVersionInfo;
     function DefaultBuildCommand(idx: integer): AnsiString;
     procedure SaveDirSettings;
   public
-    property Options: TProjOptions read GetOptions write SetOptions;
-    property Project: TProject read fProject write fProject;
+    // do work on this copy and assign it to the original when the user presses OK
+    fProjectCopy : TProject;
+    procedure SetInterface(Source : TProject); // fProjectCopy -> UI
+    procedure GetInterface(Destination : TProject); // UI -> fProjectCopy
   end;
 
 implementation
 
 uses
 {$IFDEF WIN32}
-  FileCtrl, devcfg, IconFrm, utils, MultiLangSupport, version;
+  FileCtrl, devcfg, IconFrm, utils, MultiLangSupport, version, Math;
 {$ENDIF}
 {$IFDEF LINUX}
   devcfg, IconFrm, utils, MultiLangSupport, version;
@@ -217,44 +214,44 @@ uses
 
 {$R *.dfm}
 
-procedure TfrmProjectOptions.UpdateButtons;
+procedure TfrmProjectOptions.UpdateDirButtons;
 begin
-  btnAdd.Enabled:= edEntry.Text <> '';
-  if lstList.ItemIndex>= 0 then
+  btnDirAdd.Enabled:= edDirEntry.Text <> '';
+  if lstDirList.ItemIndex>= 0 then
    begin
-     btnDelete.Enabled:= TRUE;
-     btnReplace.Enabled:= btnAdd.Enabled;
-     btnUp.Enabled:= lstList.ItemIndex> 0;
-     btnDown.Enabled:= lstList.ItemIndex < (lstList.Items.Count -1);
+     btnDirDelete.Enabled:= true;
+     btnDirReplace.Enabled:= btnDirAdd.Enabled;
+     btnDirUp.Enabled:= lstDirList.ItemIndex> 0;
+     btnDirDown.Enabled:= lstDirList.ItemIndex < (lstDirList.Items.Count -1);
    end
   else
    begin
-     btnDelete.Enabled:= FALSE;
-     btnReplace.Enabled:= FALSE;
-     btnUp.Enabled:= FALSE;
-     btnDown.Enabled:= FALSE;
+     btnDirDelete.Enabled:= false;
+     btnDirReplace.Enabled:= false;
+     btnDirUp.Enabled:= false;
+     btnDirDown.Enabled:= false;
    end;
-  btnDelInval.Enabled:= lstList.Items.Count> 0;
+  btnDirDelInval.Enabled:= lstDirList.Items.Count> 0;
 end;
 
 procedure TfrmProjectOptions.UpdateMakButtons;
 begin
   btnMakAdd.Enabled:= edMakeInclude.Text <> '';
-  if MakeIncludes.ItemIndex>= 0 then
+  if lbMakeIncludes.ItemIndex>= 0 then
    begin
-     btnMakDelete.Enabled:= TRUE;
+     btnMakDelete.Enabled:= true;
      btnMakReplace.Enabled:= btnMakAdd.Enabled;
-     btnMakUp.Enabled:= MakeIncludes.ItemIndex> 0;
-     btnMakDown.Enabled:= MakeIncludes.ItemIndex < (MakeIncludes.Items.Count -1);
+     btnMakUp.Enabled:= lbMakeIncludes.ItemIndex> 0;
+     btnMakDown.Enabled:= lbMakeIncludes.ItemIndex < (lbMakeIncludes.Items.Count -1);
    end
   else
    begin
-     btnMakDelete.Enabled:= FALSE;
-     btnMakReplace.Enabled:= FALSE;
-     btnMakUp.Enabled:= FALSE;
-     btnMakDown.Enabled:= FALSE;
+     btnMakDelete.Enabled:= false;
+     btnMakReplace.Enabled:= false;
+     btnMakUp.Enabled:= false;
+     btnMakDown.Enabled:= false;
    end;
-  btnMakDelInval.Enabled:= MakeIncludes.Items.Count> 0;
+  btnMakDelInval.Enabled:= lbMakeIncludes.Items.Count> 0;
 end;
 
 procedure TfrmProjectOptions.BrowseClick(Sender: TObject);
@@ -266,138 +263,110 @@ var
   NewItem: WideString;
 {$ENDIF}
 begin
-  if (Trim(edEntry.Text)<>'') and DirectoryExists(Trim(edEntry.Text)) then
-    newitem:=edEntry.Text
-  else
-    newitem:=devDirs.Default;
-  case SubTabs.TabIndex of
-   0: // Lib tab
-    begin
-      if SelectDirectory('Library Directory', '', newitem) then
-       edEntry.Text:=  NewItem;
-    end;
-   1: // Include tab
-    begin
-      if SelectDirectory('Include Directory', '', newitem) then
-       edEntry.Text:=  NewItem;
-    end;
-   2: // Resource dir Tab
-    begin
-      if SelectDirectory('Resource Directory', '', newitem) then
-       edEntry.Text:=  NewItem;
-    end;
-  end;
-  edEntry.SetFocus;
+	NewItem := Trim(edDirEntry.Text);
+	if (NewItem <> '') and DirectoryExists(NewItem) then
+		newitem := edDirEntry.Text
+	else
+		newitem := devDirs.Default;
+
+	case SubTabs.TabIndex of
+		0: begin // Lib tab
+			if SelectDirectory('Library Directory', '', newitem) then
+				edDirEntry.Text := NewItem;
+		end;
+		1: begin // Include tab
+			if SelectDirectory('Include Directory', '', newitem) then
+				edDirEntry.Text:= NewItem;
+		end;
+		2: begin // Resource dir Tab
+			if SelectDirectory('Resource Directory', '', newitem) then
+				edDirEntry.Text:= NewItem;
+		end;
+	end;
+	edDirEntry.SetFocus;
 end;
 
 procedure TfrmProjectOptions.ButtonClick(Sender: TObject);
 var
- idx: integer;
+	idx: integer;
+	item : AnsiString;
 begin
-  case (Sender as TComponent).Tag of
-   1: begin
-        lstList.Items[lstList.ItemIndex] := TrimRight(edEntry.Text);
-        case SubTabs.TabIndex of
-          0 : fOptions.Libs[lstList.ItemIndex] := TrimRight(edEntry.Text);
-          1 : fOptions.Includes[lstList.ItemIndex] := TrimRight(edEntry.Text);
-          2 : fOptions.ResourceIncludes[lstList.ItemIndex] := TrimRight(edEntry.Text);
-        end;
-      end;
-   2: begin
-        lstList.Items.Add(TrimRight(edEntry.Text));
-        case SubTabs.TabIndex of
-          0 : fOptions.Libs.Add(TrimRight(edEntry.Text));
-          1 : fOptions.Includes.Add(TrimRight(edEntry.Text));
-          2 : fOptions.ResourceIncludes.Add(TrimRight(edEntry.Text));
-        end;
-      end;
-   3: begin
-        case SubTabs.TabIndex of
-          0 : fOptions.Libs.Delete(lstList.ItemIndex);
-          1 : fOptions.Includes.Delete(lstList.ItemIndex);
-          2 : fOptions.ResourceIncludes.Delete(lstList.ItemIndex);
-        end;
-        lstList.DeleteSelected;
-       end;
-   4:
-    begin
-      if lstList.Items.Count> 0 then
-       for idx:= pred(lstList.Items.Count) downto 0 do
-        case SubTabs.TabIndex of
-         0: if not DirectoryExists(lstList.Items[idx]) then begin
-                fOptions.Libs.Delete(idx);
-                lstList.Items.Delete(idx);
-            end;
-         1: if not DirectoryExists(lstList.Items[idx]) then begin
-                fOptions.Includes.Delete(idx);
-                lstList.Items.Delete(idx);
-            end;
-         2: if not DirectoryExists(lstList.Items[idx]) then begin
-                fOptions.ResourceIncludes.Delete(idx);
-                lstList.Items.Delete(idx);
-            end;
-        end;
-    end;
-  end;
-  edEntry.Clear;
-  UpdateButtons;
+	item := TrimRight(edDirEntry.Text);
+	case TComponent(Sender).Tag of
+		1: begin
+			lstDirList.Items[lstDirList.ItemIndex] := item;
+			case SubTabs.TabIndex of
+				0 : fProjectCopy.Options.Libs[lstDirList.ItemIndex] := item;
+				1 : fProjectCopy.Options.Includes[lstDirList.ItemIndex] := item;
+				2 : fProjectCopy.Options.ResourceIncludes[lstDirList.ItemIndex] := item;
+			end;
+		end;
+		2: begin
+			lstDirList.Items.Add(item);
+			case SubTabs.TabIndex of
+				0 : fProjectCopy.Options.Libs.Add(item);
+				1 : fProjectCopy.Options.Includes.Add(item);
+				2 : fProjectCopy.Options.ResourceIncludes.Add(item);
+			end;
+		end;
+		3: begin
+			case SubTabs.TabIndex of
+				0 : fProjectCopy.Options.Libs.Delete(lstDirList.ItemIndex);
+				1 : fProjectCopy.Options.Includes.Delete(lstDirList.ItemIndex);
+				2 : fProjectCopy.Options.ResourceIncludes.Delete(lstDirList.ItemIndex);
+			end;
+			lstDirList.DeleteSelected;
+		end;
+		4: begin
+			if lstDirList.Items.Count> 0 then
+				for idx := lstDirList.Items.Count - 1 downto 0 do
+					if not DirectoryExists(lstDirList.Items[idx]) then begin
+						case SubTabs.TabIndex of
+							0: fProjectCopy.Options.Libs.Delete(idx);
+							1: fProjectCopy.Options.Includes.Delete(idx);
+							2: fProjectCopy.Options.ResourceIncludes.Delete(idx);
+						end;
+						lstDirList.Items.Delete(idx);
+					end;
+		end;
+	end;
+	edDirEntry.Clear;
+	UpdateDirButtons;
 end;
 
-procedure TfrmProjectOptions.EditChange(SEnder: TObject);
+procedure TfrmProjectOptions.EditChange(Sender: TObject);
 begin
-  UpdateButtons;
+	UpdateDirButtons;
 end;
 
 procedure TfrmProjectOptions.ListClick(Sender: TObject);
 begin
-  UpdateButtons;
-  edEntry.Text:= lstList.Items[lstList.Itemindex];
+	UpdateDirButtons;
+	edDirEntry.Text:= lstDirList.Items[lstDirList.Itemindex];
 end;
 
 procedure TfrmProjectOptions.UpDownClick(Sender: TObject);
 var
- idx: integer;
+	idx: integer;
 begin
-  idx:= lstList.ItemIndex;
-  if Sender = btnUp then
-   begin
-     lstList.Items.Exchange(lstList.ItemIndex, lstList.ItemIndex -1);
-     lstList.ItemIndex:= idx -1;
-   end
-  else
-   if Sender = btnDown then
-    begin
-      lstList.Items.Exchange(lstList.ItemIndex, lstList.ItemIndex +1);
-      lstList.ItemIndex:= idx +1;
-    end;
-  UpdateButtons;
+	idx:= lstDirList.ItemIndex;
+	if Sender = btnDirUp then begin
+		lstDirList.Items.Exchange(lstDirList.ItemIndex, lstDirList.ItemIndex -1);
+		lstDirList.ItemIndex:= idx - 1;
+	end else if Sender = btnDirDown then begin
+		lstDirList.Items.Exchange(lstDirList.ItemIndex, lstDirList.ItemIndex +1);
+		lstDirList.ItemIndex:= idx + 1;
+	end;
+	UpdateDirButtons;
 end;
 
-function TfrmProjectOptions.GetOptions: TProjOptions;
+procedure TfrmProjectOptions.GetInterface(Destination : TProject);
 var
 	I: integer;
 begin
-	with fOptions do begin
-		Icon:= fIcon;
-     { I had to remove the delimiter text thing, since it causes the edit box to add
-       unwanted quotes around the AnsiString. We could remove them but that could conflict with user's own quotes,
-       for example when using filenames containing spaces }
-     {
-     *mandrav*:
+	with Destination.Options do begin
+		Icon := fIcon;
 
-      Colin, when I did it this way, I wanted to have one option per-line so that
-      it is easy to see and spot errors etc.
-      Of course, you 've found a bug but I don't think that this is a good solution...
-
-      I will try something different now: I will create my own delimited AnsiString (delimited by "_@@_").
-      Now it has nothing to do with quotes or spaces. If the user enters quotes, that's
-      fine. If he doesn't but he should (like a filename with spaces), then it's
-      his/her problem. Even if he did it at command line he still would have compile
-      errors after all...
-      All I have to do when I want the actual AnsiString back, is call StringReplace() et voila :)
-     }
-
-		// mandrav: start, Options Tab
 		cmdLines.Compiler:='';
 		for I:=0 to edCompiler.Lines.Count-1 do
 			cmdLines.Compiler := cmdLines.Compiler + edCompiler.Lines[I] + '_@@_';
@@ -409,200 +378,199 @@ begin
 		cmdLines.Linker:='';
 		for I:=0 to edLinker.Lines.Count-1 do
 			cmdLines.Linker := cmdLines.Linker + edLinker.Lines[I] + '_@@_';
-		// mandrav: end
 
-		typ:= lstType.ItemIndex;
+		typ := lstType.ItemIndex;
+
+		// Update directories
+		SaveDirSettings;
 
 		// Build Options
 		ExeOutput := edExeOutput.Text;
 		ObjectOutput := edObjOutput.Text;
 		LogOutput := edLogOutput.Text;
-		LogOutputEnabled := CheckBox1.Checked;
+		LogOutputEnabled := chkLogOutput.Checked;
 		OverrideOutput := chkOverrideOutput.Checked;
 		OverridenOutput := edOverridenOutput.Text;
 
 		// Makefile
+		// TODO: move to TProjOptions
 		if cbUseCustomMakefile.Checked and FileExists(edCustomMakefile.Text) then
-			fProject.UseCustomMakefile := true
+			fProjectCopy.UseCustomMakefile := true
 		else
-			fProject.UseCustomMakefile := false;
-		fProject.CustomMakefile:=edCustomMakefile.Text;
+			fProjectCopy.UseCustomMakefile := false;
+		fProjectCopy.CustomMakefile:=edCustomMakefile.Text;
+
 		MakeIncludes.Clear;
-		MakeIncludes.AddStrings(Self.MakeIncludes.Items);
+		MakeIncludes.AddStrings(lbMakeIncludes.Items);
+
+		// Compiler
+		CompilerOptions := devCompiler.fOptionString;
+		devCompiler.LoadSet(devCompiler.CurrentIndex);
 
 		// General
-		fOptions.SupportXPThemes:=chkSupportXP.Checked;
-		fOptions.CompilerSet:=cmbCompiler.ItemIndex;
-		fOptions.useGPP:=chkDefCpp.Checked;
+		SupportXPThemes:=chkSupportXP.Checked;
+		CompilerSet:=cmbCompiler.ItemIndex;
+		useGPP:=chkDefCpp.Checked;
 
 		// Version info
-		fOptions.IncludeVersionInfo:=chkVersionInfo.Checked;
+		IncludeVersionInfo:=chkVersionInfo.Checked;
 
-		fOptions.VersionInfo.Major:=spnMajor.Value;
-		fOptions.VersionInfo.Minor:=spnMinor.Value;
-		fOptions.VersionInfo.Release:=spnRelease.Value;
-		fOptions.VersionInfo.Build:=spnBuild.Value;
-		fOptions.VersionInfo.AutoIncBuildNr:=chkAutoIncBuild.Checked;
-		fOptions.VersionInfo.SyncProduct:=chkSyncProduct.Checked;
+		VersionInfo.Major := spnMajor.Value;
+		VersionInfo.Minor := spnMinor.Value;
+		VersionInfo.Release := spnRelease.Value;
+		VersionInfo.Build := spnBuild.Value;
+		VersionInfo.AutoIncBuildNr := chkAutoIncBuild.Checked;
+		VersionInfo.SyncProduct := chkSyncProduct.Checked;
 
-		fOptions.VersionInfo.FileDescription:=   vleVersion.Cells[1, 0];
-		fOptions.VersionInfo.FileVersion:=       vleVersion.Cells[1, 1];
-		fOptions.VersionInfo.ProductName:=       vleVersion.Cells[1, 2];
-		fOptions.VersionInfo.ProductVersion:=    vleVersion.Cells[1, 3];
-		fOptions.VersionInfo.OriginalFilename:=  vleVersion.Cells[1, 4];
-		fOptions.VersionInfo.InternalName:=      vleVersion.Cells[1, 5];
-		fOptions.VersionInfo.CompanyName:=       vleVersion.Cells[1, 6];
-		fOptions.VersionInfo.LegalCopyright:=    vleVersion.Cells[1, 7];
-		fOptions.VersionInfo.LegalTrademarks:=   vleVersion.Cells[1, 8];
+		VersionInfo.FileDescription:=  vleVersion.Cells[1, 0];
+		VersionInfo.FileVersion:=      vleVersion.Cells[1, 1];
+		VersionInfo.ProductName:=      vleVersion.Cells[1, 2];
+		VersionInfo.ProductVersion:=   vleVersion.Cells[1, 3];
+		VersionInfo.OriginalFilename:= vleVersion.Cells[1, 4];
+		VersionInfo.InternalName:=     vleVersion.Cells[1, 5];
+		VersionInfo.CompanyName:=      vleVersion.Cells[1, 6];
+		VersionInfo.LegalCopyright:=   vleVersion.Cells[1, 7];
+		VersionInfo.LegalTrademarks:=  vleVersion.Cells[1, 8];
 
 		// Get international language ID (1026 ...)
 		for I := 0 to Languages.Count-1 do begin
 			if SameText(Languages.Name[I], cmbLangID.Text) then begin
-				fOptions.VersionInfo.LanguageID := Languages.LocaleID[I];
+				VersionInfo.LanguageID := Languages.LocaleID[I];
 				Break;
 			end;
 		end;
-
 	end;
-	result:= fOptions;
 end;
 
 procedure TfrmProjectOptions.SetFileVersion(Sender: TObject);
 begin
-	fOptions.VersionInfo.FileVersion := Format('%d.%d.%d.%d', [spnMajor.Value,spnMinor.Value,spnRelease.Value,spnBuild.Value]);
-	if(chkSyncProduct.Checked) then
-		fOptions.VersionInfo.ProductVersion := Format('%d.%d.%d.%d', [spnMajor.Value,spnMinor.Value,spnRelease.Value,spnBuild.Value]);
-	vleVersion.Strings.Clear;
-	vleVersion.InsertRow('File Description',  fOptions.VersionInfo.FileDescription,   True);
-	vleVersion.InsertRow('File Version',      fOptions.VersionInfo.FileVersion,       True);
-	vleVersion.InsertRow('Product Name',      fOptions.VersionInfo.ProductName,       True);
-	vleVersion.InsertRow('Product Version',   fOptions.VersionInfo.ProductVersion,    True);
-	vleVersion.InsertRow('Original Filename', fOptions.VersionInfo.OriginalFilename,  True);
-	vleVersion.InsertRow('Internal Name',     fOptions.VersionInfo.InternalName,      True);
-	vleVersion.InsertRow('Company Name',      fOptions.VersionInfo.CompanyName,       True);
-	vleVersion.InsertRow('Legal Copyright',   fOptions.VersionInfo.LegalCopyright,    True);
-	vleVersion.InsertRow('Legal Trademarks',  fOptions.VersionInfo.LegalTrademarks,   True);
+	with fProjectCopy.Options do begin
+		VersionInfo.FileVersion := Format('%d.%d.%d.%d', [spnMajor.Value,spnMinor.Value,spnRelease.Value,spnBuild.Value]);
+		if chkSyncProduct.Checked then
+			VersionInfo.ProductVersion := Format('%d.%d.%d.%d', [spnMajor.Value,spnMinor.Value,spnRelease.Value,spnBuild.Value]);
+
+		vleVersion.Strings.Clear;
+		vleVersion.InsertRow('File Description',  VersionInfo.FileDescription,  True);
+		vleVersion.InsertRow('File Version',      VersionInfo.FileVersion,      True);
+		vleVersion.InsertRow('Product Name',      VersionInfo.ProductName,      True);
+		vleVersion.InsertRow('Product Version',   VersionInfo.ProductVersion,   True);
+		vleVersion.InsertRow('Original Filename', VersionInfo.OriginalFilename, True);
+		vleVersion.InsertRow('Internal Name',     VersionInfo.InternalName,     True);
+		vleVersion.InsertRow('Company Name',      VersionInfo.CompanyName,      True);
+		vleVersion.InsertRow('Legal Copyright',   VersionInfo.LegalCopyright,   True);
+		vleVersion.InsertRow('Legal Trademarks',  VersionInfo.LegalTrademarks,  True);
+	end;
 end;
 
-procedure TfrmProjectOptions.SetOptions(Value: TProjOptions);
+procedure TfrmProjectOptions.SetInterface(Source : TProject);
 var
-	idx, cntSrc, cntHdr, cntRes, cntOther: integer;
+	I, cntSrc, cntHdr, cntRes, cntOther: integer;
 begin
-	fOptions:= Value;
-	fIcon:= GetRealPath(fOptions.Icon, fProject.Directory);
-	if (fIcon <> '') and (FileExists(fIcon)) then
-		try
-			Icon.Picture.LoadFromFile(fIcon);
-		except
-			fIcon:= '';
+	// this is actually a reference...
+	fProjectCopy := Source; // TODO: make copy
+
+	with fProjectCopy.Options do begin
+		fIcon:= GetRealPath(Icon, fProjectCopy.Directory);
+		if (fIcon <> '') and FileExists(fIcon) then
+			try
+				IconPreview.Picture.LoadFromFile(fIcon);
+			except
+				fIcon:= '';
+			end;
+
+		// General Tab
+		lstType.ItemIndex := typ;
+		edCompiler.Lines.Text := StringReplace(cmdlines.Compiler, '_@@_', #13#10, [rfReplaceAll]);
+		edCppCompiler.Lines.Text := StringReplace(cmdlines.CppCompiler, '_@@_', #13#10, [rfReplaceAll]);
+		edLinker.Lines.Text := StringReplace(cmdlines.Linker, '_@@_', #13#10, [rfReplaceAll]);
+		edProjectName.Text := fProjectCopy.Name;
+		lblPrjFname.Caption := fProjectCopy.FileName;
+		lblPrjOutputFname.Caption := fProjectCopy.Executable;
+
+		// Count file types
+		cntSrc:=0;
+		cntHdr:=0;
+		cntRes:=0;
+		cntOther:=0;
+		for I := 0 to fProjectCopy.Units.Count-1 do
+			case GetFileTyp(fProjectCopy.Units[I].FileName)of
+				utcSrc,utcppSrc: Inc(cntSrc);
+				utcHead,utcppHead: Inc(cntHdr);
+				utResSrc: Inc(cntRes);
+			else Inc(cntOther);
 		end;
 
-	// General Tab
-	lstType.ItemIndex:= fOptions.typ;
-	edCompiler.Lines.Text:= StringReplace(fOptions.cmdlines.Compiler, '_@@_', #13#10, [rfReplaceAll]);
-	edCppCompiler.Lines.Text:= StringReplace(fOptions.cmdlines.CppCompiler, '_@@_', #13#10, [rfReplaceAll]);
-	edLinker.Lines.Text:= StringReplace(fOptions.cmdlines.Linker, '_@@_', #13#10, [rfReplaceAll]);
-	edProjectName.Text:= fProject.Name;
-	lblPrjFname.Caption:=fProject.FileName;
-	lblPrjOutputFname.Caption:=fProject.Executable;
+		lblPrjUnits.Caption:=Format(Lang[ID_POPT_UNITSFORMAT], [fProjectCopy.Units.Count, cntSrc, cntHdr, cntRes, cntOther]);
+		chkSupportXP.Checked:=SupportXPThemes;
+		chkDefCpp.Checked:=useGPP;
 
-	// Count file types
-	cntSrc:=0;
-	cntHdr:=0;
-	cntRes:=0;
-	cntOther:=0;
-	for idx:=0 to fProject.Units.Count-1 do
-		case GetFileTyp(fProject.Units[idx].FileName)of
-			utcSrc,utcppSrc: Inc(cntSrc);
-			utcHead,utcppHead: Inc(cntHdr);
-			utResSrc: Inc(cntRes);
-		else Inc(cntOther);
+		// Output tab
+		edExeOutput.Text := ExeOutput;
+		edObjOutput.Text := ObjectOutput;
+		edLogOutput.Text := LogOutput;
+		chkLogOutput.Checked := LogOutputEnabled;
+		chkOverrideOutput.Checked := OverrideOutput;
+		if not chkLogOutput.Checked then
+			edLogOutput.Enabled := false;
+		if OverridenOutput<>'' then
+			edOverridenOutput.Text := ExtractFilename(OverridenOutput)
+		else
+			edOverridenOutput.Text := ExtractFilename(fProjectCopy.Executable);
+		edOverridenOutput.Enabled:=OverrideOutput;
+
+		// Makefile tab
+		UpdateMakButtons;
+		cbUseCustomMakefile.Checked:=fProjectCopy.UseCustomMakefile;
+		edCustomMakefile.Text:=fProjectCopy.CustomMakefile;
+		cbUseCustomMakefileClick(nil);
+		lbMakeIncludes.Items.AddStrings(MakeIncludes);
+
+		// Compiler tab
+		cmbCompiler.Items.Assign(devCompiler.Sets);
+		cmbCompiler.ItemIndex:=CompilerSet;
+		CompOptionsFrame1.FillOptions(fProjectCopy);
+
+		// temporarily apply project settings
+		devCompiler.fOptionString := fProjectCopy.Options.CompilerOptions;
+		devCompiler.OptionStringToList(devCompiler.fOptionString);
+
+		// Version tab
+		InitVersionInfo;
+
+		// Directories tab
+		SubTabsChange(Self);
 	end;
-
-	lblPrjUnits.Caption:=Format(Lang[ID_POPT_UNITSFORMAT], [fProject.Units.Count, cntSrc, cntHdr, cntRes, cntOther]);
-	chkSupportXP.Checked:=fOptions.SupportXPThemes;
-	chkDefCpp.Checked:=fOptions.useGPP;
-
-  // Output tab
-  edExeOutput.Text := fOptions.ExeOutput;
-  edObjOutput.Text := fOptions.ObjectOutput;
-  edLogOutput.Text := fOptions.LogOutput;
-  CheckBox1.Checked := fOptions.LogOutputEnabled;
-  chkOverrideOutput.Checked := fOptions.OverrideOutput;
-  if not CheckBox1.Checked then
-	edLogOutput.Enabled := false;
-  if fOptions.OverridenOutput<>'' then
-    edOverridenOutput.Text := ExtractFilename(fOptions.OverridenOutput)
-  else
-    edOverridenOutput.Text := ExtractFilename(fProject.Executable);
-  edOverridenOutput.Enabled:=fOptions.OverrideOutput;
-
-  // Makefile tab
-  cbUseCustomMakefile.Checked:=fProject.UseCustomMakefile;
-  edCustomMakefile.Text:=fProject.CustomMakefile;
-  cbUseCustomMakefileClick(nil);
-  MakeIncludes.Items.AddStrings(fOptions.MakeIncludes);
-
-  // Files tab
-  cmbCompiler.Items.Assign(devCompiler.Sets);
-  cmbCompiler.ItemIndex:=fOptions.CompilerSet;
-
-  // Version tab
-  InitVersionInfo;
 end;
 
 procedure TfrmProjectOptions.SaveDirSettings;
 var
- sl: TStrings;
+	sl: TStrings;
 begin
-  sl := nil;
-  case SubTabs.TabIndex of
-   0: sl:= fOptions.Libs;
-   1: sl:= fOptions.Includes;
-   2: sl:= fOptions.ResourceIncludes;
-  end;
-  if assigned(sl) then
-   begin
-     sl.Clear;
-     sl.AddStrings(lstList.Items);
-   end;
+	sl := nil;
+	case SubTabs.TabIndex of
+		0: sl:= fProjectCopy.Options.Libs;
+		1: sl:= fProjectCopy.Options.Includes;
+		2: sl:= fProjectCopy.Options.ResourceIncludes;
+	end;
+	if assigned(sl) then begin
+		sl.Clear;
+		sl.AddStrings(lstDirList.Items);
+	end;
 end;
 
-procedure TfrmProjectOptions.SubTabsChanging(Sender: TObject;
-  NewIndex: Integer; var AllowChange: Boolean);
+procedure TfrmProjectOptions.SubTabsChanging(Sender: TObject;NewIndex: Integer; var AllowChange: Boolean);
 begin
-  SaveDirSettings;
+	SaveDirSettings;
 end;
 
 procedure TfrmProjectOptions.SubTabsChange(Sender: TObject);
 begin
   case SubTabs.TabIndex of
-   0: lstList.Items:= fOptions.Libs;
-   1: lstList.Items:= fOptions.Includes;
-   2: lstList.Items:= fOptions.ResourceIncludes;
+   0: lstDirList.Items:= fProjectCopy.Options.Libs;
+   1: lstDirList.Items:= fProjectCopy.Options.Includes;
+   2: lstDirList.Items:= fProjectCopy.Options.ResourceIncludes;
   end;
-  UpdateButtons;
-end;
-
-procedure TfrmProjectOptions.FormShow(Sender: TObject);
-begin
-  PageControl.ActivePageIndex:= 0;
-  SubTabs.TabIndex:= 0;
-  lvFiles.Images:=MainForm.ProjectView.Images;
-  lvFiles.Items.Assign(MainForm.ProjectView.Items);
-  lvFiles.Items[0].Expand(False);
-  chkCompile.Enabled:=False;
-  chkLink.Enabled:=False;
-  spnPriority.Enabled:=False;
-  chkCompileCpp.Enabled:=False;
-  chkOverrideBuildCmd.Enabled:=False;
-  txtOverrideBuildCmd.Enabled:=False;
-  txtOverrideBuildCmd.Text:='';
-  chkSupportXP.Enabled:=fOptions.typ=dptGUI;
-  devCompiler.fOptionString:=fOptions.CompilerOptions;
-  CompOptionsFrame1.FillOptions(fProject);
-  SubTabsChange(Self);
-  UpdateMakButtons();
+  UpdateDirButtons;
 end;
 
 procedure TfrmProjectOptions.btnIconLibClick(Sender: TObject);
@@ -617,7 +585,7 @@ begin
    end;
   if fIcon <> '' then
   begin
-   Icon.Picture.LoadFromFile(fIcon);
+   IconPreview.Picture.LoadFromFile(fIcon);
    btnRemoveIcon.Enabled := Length(fIcon) > 0;
   end;
 end;
@@ -628,7 +596,7 @@ begin
    begin
      if FileExists(dlgPic.FileName) then begin
        fIcon:= dlgPic.FileName;
-       Icon.Picture.LoadFromFile(fIcon);
+       IconPreview.Picture.LoadFromFile(fIcon);
        btnRemoveIcon.Enabled := Length(fIcon) > 0;
      end
      else
@@ -638,8 +606,12 @@ end;
 
 procedure TfrmProjectOptions.FormCreate(Sender: TObject);
 begin
-	cmbLangID.Sorted := True;
 	LoadText;
+
+	// Create file tree
+	lvFiles.Images:=MainForm.ProjectView.Images;
+	lvFiles.Items.Assign(MainForm.ProjectView.Items);
+	lvFiles.Items[0].Expand(False);
 end;
 
 procedure TfrmProjectOptions.LoadText;
@@ -649,6 +621,7 @@ begin
 	Font.Size := devData.InterfaceFontSize;
 
   Caption:= Lang[ID_POPT];
+
   //tabs
   tabGeneral.Caption:=   Lang[ID_POPT_GENTAB];
   tabFilesDir.Caption:=  Lang[ID_POPT_DIRTAB];
@@ -673,7 +646,6 @@ begin
   chkDefCpp.Caption:=         Lang[ID_POPT_DEFCPP];
 
   // compiler tab
-  //tabCompSet.Caption:=     Lang[ID_POPT_COMPTAB];
   tabCompOpts.Caption:=    Lang[ID_PARAM_CAPTION];
   lblAdditions.Caption:=   '  '+Lang[ID_POPT_ADDITIONAL]+'  ';
   lblCompiler.Caption:=    Lang[ID_POPT_COMP];
@@ -700,10 +672,10 @@ begin
   dlgOpen.Title:=       Lang[ID_POPT_OPENOBJ];
 
   //buttons
-  btnReplace.Caption:=    Lang[ID_BTN_REPLACE];
-  btnAdd.Caption:=        Lang[ID_BTN_ADD];
-  btnDelete.Caption:=     Lang[ID_BTN_DELETE];
-  btnDelInval.Caption:=   Lang[ID_BTN_DELINVAL];
+  btnDirReplace.Caption:=    Lang[ID_BTN_REPLACE];
+  btnDirAdd.Caption:=        Lang[ID_BTN_ADD];
+  btnDirDelete.Caption:=     Lang[ID_BTN_DELETE];
+  btnDirDelInval.Caption:=   Lang[ID_BTN_DELINVAL];
   btnOk.Caption:=         Lang[ID_BTN_OK];
   btnCancel.Caption:=     Lang[ID_BTN_CANCEL];
   btnHelp.Caption:=       Lang[ID_BTN_HELP];
@@ -747,7 +719,7 @@ procedure TfrmProjectOptions.btnRemoveIconClick(Sender: TObject);
 begin
   btnRemoveIcon.Enabled := False;
   fIcon := '';
-  Icon.Picture.Graphic := nil;
+  IconPreview.Picture.Graphic := nil;
 end;
 
 procedure TfrmProjectOptions.BrowseExecutableOutDirClick(Sender: TObject);
@@ -759,12 +731,12 @@ var
   Dir: WideString;
 {$ENDIF}
 begin
-	if fProject.Options.ExeOutput<>'' then
-		Dir:=ExpandFileto(fProject.Options.ExeOutput, fProject.Directory)
+	if fProjectCopy.Options.ExeOutput<>'' then
+		Dir := ExpandFileto(fProjectCopy.Options.ExeOutput, fProjectCopy.Directory)
 	else
-		Dir:=fProject.Directory;
-	SelectDirectory('Select Directory', '', Dir);
-	edExeOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
+		Dir := fProjectCopy.Directory;
+	if SelectDirectory('Select Directory', '', Dir) then
+		edExeOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 
 procedure TfrmProjectOptions.BrowseLogDirClick(Sender: TObject);
@@ -776,12 +748,12 @@ var
   Dir: WideString;
 {$ENDIF}
 begin
-  if fProject.Options.ObjectOutput<>'' then
-    Dir:=ExpandFileto(fProject.Options.ObjectOutput, fProject.Directory)
-  else
-    Dir:=fProject.Directory;
-  SelectDirectory('Select Directory', '', Dir);
-  edObjOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
+	if fProjectCopy.Options.ObjectOutput<>'' then
+		Dir := ExpandFileto(fProjectCopy.Options.ObjectOutput, fProjectCopy.Directory)
+	else
+		Dir := fProjectCopy.Directory;
+	if SelectDirectory('Select Directory', '', Dir) then
+		edObjOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 
 procedure TfrmProjectOptions.btnLogOutputDirClick(Sender: TObject);
@@ -793,39 +765,38 @@ var
   Dir: WideString;
 {$ENDIF}
 begin
-	if fProject.Options.LogOutput<>'' then
-		Dir:=ExpandFileto(fProject.Options.LogOutput, fProject.Directory)
+	if fProjectCopy.Options.LogOutput<>'' then
+		Dir:=ExpandFileto(fProjectCopy.Options.LogOutput, fProjectCopy.Directory)
 	else
-		Dir:=fProject.Directory;
+		Dir:=fProjectCopy.Directory;
 	if SelectDirectory('Select Directory', '', Dir) then
-		edLogOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
+		edLogOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 
 procedure TfrmProjectOptions.btnMakeBrowseClick(Sender: TObject);
 begin
-  if dlgMakeInclude.Execute then
-      edMakeInclude.Text := ExtractRelativePath(fProject.FileName,
-        dlgMakeInclude.FileName);
-  edMakeInclude.SetFocus;
+	if dlgMakeInclude.Execute then
+		edMakeInclude.Text := ExtractRelativePath(fProjectCopy.FileName,dlgMakeInclude.FileName);
+	edMakeInclude.SetFocus;
 end;
 
 procedure TfrmProjectOptions.btnMakClick(Sender: TObject);
 var
   i: Integer;
 begin
-  i := MakeIncludes.ItemIndex;
+  i := lbMakeIncludes.ItemIndex;
   if i < 0 then
     exit;
   if Sender = btnMakUp then
    begin
-     MakeIncludes.Items.Exchange(MakeIncludes.ItemIndex, MakeIncludes.ItemIndex -1);
-     MakeIncludes.ItemIndex:= i -1;
+     lbMakeIncludes.Items.Exchange(lbMakeIncludes.ItemIndex, lbMakeIncludes.ItemIndex -1);
+     lbMakeIncludes.ItemIndex:= i -1;
    end
   else
    if Sender = btnMakDown then
     begin
-      MakeIncludes.Items.Exchange(MakeIncludes.ItemIndex, MakeIncludes.ItemIndex +1);
-      MakeIncludes.ItemIndex:= i+1;
+      lbMakeIncludes.Items.Exchange(lbMakeIncludes.ItemIndex, lbMakeIncludes.ItemIndex +1);
+      lbMakeIncludes.ItemIndex:= i+1;
     end;
 
   UpdateMakButtons;
@@ -837,20 +808,20 @@ var
 begin
   case (Sender as TComponent).Tag of
    1: begin
-        MakeIncludes.Items[MakeIncludes.ItemIndex] := (edMakeInclude.Text);
+        lbMakeIncludes.Items[lbMakeIncludes.ItemIndex] := (edMakeInclude.Text);
       end;
    2: begin
-        MakeIncludes.Items.Add(edMakeInclude.Text);
+        lbMakeIncludes.Items.Add(edMakeInclude.Text);
       end;
    3: begin
-        MakeIncludes.DeleteSelected;
+        lbMakeIncludes.DeleteSelected;
        end;
    4: begin
           i := 0;
-          while i < MakeIncludes.Items.Count do begin
-             if not FileExists(MakeIncludes.Items[i]) then
+          while i < lbMakeIncludes.Items.Count do begin
+             if not FileExists(lbMakeIncludes.Items[i]) then
              begin
-                    MakeIncludes.Items.Delete(i);
+                    lbMakeIncludes.Items.Delete(i);
                     i := -1;
              end;
              i := i + 1;
@@ -863,18 +834,18 @@ end;
 
 procedure TfrmProjectOptions.edMakeIncludeChange(Sender: TObject);
 begin
-  UpdateMakButtons;
+	UpdateMakButtons;
 end;
 
-procedure TfrmProjectOptions.MakeIncludesClick(Sender: TObject);
+procedure TfrmProjectOptions.lbMakeIncludesClick(Sender: TObject);
 begin
-  UpdateMakButtons;
-  edMakeInclude.Text := MakeIncludes.Items[MakeIncludes.Itemindex];
+	UpdateMakButtons;
+	edMakeInclude.Text := lbMakeIncludes.Items[lbMakeIncludes.Itemindex];
 end;
 
 procedure TfrmProjectOptions.InfoMakeBtnClick(Sender: TObject);
 begin
-    Application.MessageBox(
+  Application.MessageBox(
       'Dev-C++''s Makefile has two important targets:' + #13#10 +
       '- all (which builds the executable)' + #13#10 +
       '- clean (which cleans up object files)' + #13#10 + #13#10 +
@@ -903,88 +874,67 @@ begin
   edOverridenOutput.Enabled:=chkOverrideOutput.Checked;
 end;
 
-procedure TfrmProjectOptions.FormCloseQuery(Sender: TObject;var CanClose: Boolean);
-begin
-  // check for disallowed characters in filename
-  {if (Pos('/', edOverridenOutput.Text)>0) or
-     (Pos('\', edOverridenOutput.Text)>0) or
-     (Pos(':', edOverridenOutput.Text)>0) or
-     (Pos('*', edOverridenOutput.Text)>0) or
-     (Pos('?', edOverridenOutput.Text)>0) or
-     (Pos('"', edOverridenOutput.Text)>0) or
-     (Pos('<', edOverridenOutput.Text)>0) or
-     (Pos('>', edOverridenOutput.Text)>0) or
-     (Pos('|', edOverridenOutput.Text)>0) then begin
-     MessageDlg('The output filename you have defined, contains at least one of the following illegal characters:'#10#10+
-       '\ / : * ? " > < |'#10#10+
-       'Please correct this...', mtError, [mbOk], 0);
-     CanClose:=False;
-  end;
-  if CanClose then begin
-    fOptions.CompilerOptions:=devCompiler.OptionString;
-    devCompiler.LoadSet(devCompiler.CompilerSet);
-    devCompiler.AssignToCompiler;
-  end;}
-end;
-
-procedure TfrmProjectOptions.lvFilesChange(Sender: TObject;
-  Node: TTreeNode);
+procedure TfrmProjectOptions.lvFilesChange(Sender: TObject;Node: TTreeNode);
 var
-  idx: integer;
+	idx: integer;
+	filetype : TExUnitType;
 begin
-  if not Assigned(Node) then begin
-    chkCompile.Enabled:=False;
-    chkCompileCpp.Enabled:=False;
-    chkLink.Enabled:=False;
-    chkOverrideBuildCmd.Enabled:=False;
-    txtOverrideBuildCmd.Enabled:=False;
-    spnPriority.Enabled:=False;
-    Exit;
-  end;
+	if not Assigned(Node) then begin
+		chkCompile.Enabled:=False;
+		chkCompileCpp.Enabled:=False;
+		chkLink.Enabled:=False;
+		chkOverrideBuildCmd.Enabled:=False;
+		txtOverrideBuildCmd.Enabled:=False;
+		spnPriority.Enabled:=False;
+		Exit;
+	end;
 
-  // disable events
-  chkCompile.OnClick:=nil;
-  chkCompileCpp.OnClick:=nil;
-  chkLink.OnClick:=nil;
-  chkOverrideBuildCmd.OnClick:=nil;
-  txtOverrideBuildCmd.OnChange:=nil;
-  spnPriority.OnChange:=nil;
+	// disable events
+	chkCompile.OnClick:=nil;
+	chkCompileCpp.OnClick:=nil;
+	chkLink.OnClick:=nil;
+	chkOverrideBuildCmd.OnClick:=nil;
+	txtOverrideBuildCmd.OnChange:=nil;
+	spnPriority.OnChange:=nil;
 
-  idx:=Integer(Node.Data);
-  if (Node.Level>0) and (idx<>-1) then begin // unit
-    if fProject.Units[idx].OverrideBuildCmd then
-      txtOverrideBuildCmd.Text:=StringReplace(fProject.Units[idx].BuildCmd, '<CRTAB>', #13#10, [rfReplaceAll])
-    else
-      txtOverrideBuildCmd.Text := DefaultBuildCommand(idx);
-    chkOverrideBuildCmd.Checked:=fProject.Units[idx].OverrideBuildCmd;
+	idx:=Integer(Node.Data);
+	if (Node.Level > 0) and (idx<>-1) then begin // unit
 
-    chkCompile.Enabled:=not (GetFileTyp(fProject.Units[idx].FileName) in [utcHead,utcppHead]);
-    chkCompile.Checked:=fProject.Units[idx].Compile;
-    chkCompileCpp.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) in [utcSrc,utcppSrc]);
-    chkCompileCpp.Checked:=fProject.Units[idx].CompileCpp;
-    chkLink.Enabled:=chkCompile.Enabled and (GetFileTyp(fProject.Units[idx].FileName) <> utResSrc);
-    chkLink.Checked:=fProject.Units[idx].Link;
-    spnPriority.Enabled:=chkCompile.Checked and chkCompile.Enabled;
-    spnPriority.Value:=fProject.Units[idx].Priority;
-    chkOverrideBuildCmd.Enabled:=chkCompile.Checked and (lvFiles.SelectionCount=1) and not (GetFileTyp(fProject.Units[idx].FileName) in [utcHead, utcppHead, utResSrc]);
-    txtOverrideBuildCmd.Enabled:=chkOverrideBuildCmd.Enabled and chkOverrideBuildCmd.Checked;
-  end
-  else begin
-    chkCompile.Enabled:=False;
-    chkCompileCpp.Enabled:=False;
-    chkLink.Enabled:=False;
-    chkOverrideBuildCmd.Enabled:=False;
-    txtOverrideBuildCmd.Enabled:=False;
-    spnPriority.Enabled:=False;
-  end;
+		// Check once instead of a lot of times...
+		filetype := GetFileTyp(fProjectCopy.Units[idx].FileName);
 
-  // enable events
-  chkCompile.OnClick:=chkCompileClick;
-  chkCompileCpp.OnClick:=chkCompileClick;
-  chkLink.OnClick:=chkCompileClick;
-  chkOverrideBuildCmd.OnClick:=chkCompileClick;
-  txtOverrideBuildCmd.OnChange:=txtOverrideBuildCmdChange;
-  spnPriority.OnChange:=spnPriorityChange;
+		if fProjectCopy.Units[idx].OverrideBuildCmd then
+			txtOverrideBuildCmd.Text:=StringReplace(fProjectCopy.Units[idx].BuildCmd, '<CRTAB>', #13#10, [rfReplaceAll])
+		else
+			txtOverrideBuildCmd.Text := DefaultBuildCommand(idx);
+		chkOverrideBuildCmd.Checked:=fProjectCopy.Units[idx].OverrideBuildCmd;
+
+		chkCompile.Enabled := not (filetype in [utcHead,utcppHead]);
+		chkCompile.Checked := fProjectCopy.Units[idx].Compile;
+		chkCompileCpp.Enabled := chkCompile.Checked and (filetype in [utcSrc,utcppSrc]);
+		chkCompileCpp.Checked := fProjectCopy.Units[idx].CompileCpp;
+		chkLink.Enabled := chkCompile.Enabled and (filetype <> utResSrc);
+		chkLink.Checked := fProjectCopy.Units[idx].Link;
+		spnPriority.Enabled := chkCompile.Checked and chkCompile.Enabled;
+		spnPriority.Value := fProjectCopy.Units[idx].Priority;
+		chkOverrideBuildCmd.Enabled := chkCompile.Checked and (lvFiles.SelectionCount=1) and not (filetype in [utcHead, utcppHead, utResSrc]);
+		txtOverrideBuildCmd.Enabled := chkOverrideBuildCmd.Enabled and chkOverrideBuildCmd.Checked;
+	end else begin // project parent node
+		chkCompile.Enabled:=False;
+		chkCompileCpp.Enabled:=False;
+		chkLink.Enabled:=False;
+		chkOverrideBuildCmd.Enabled:=False;
+		txtOverrideBuildCmd.Enabled:=False;
+		spnPriority.Enabled:=False;
+	end;
+
+	// enable events
+	chkCompile.OnClick:=chkCompileClick;
+	chkCompileCpp.OnClick:=chkCompileClick;
+	chkLink.OnClick:=chkCompileClick;
+	chkOverrideBuildCmd.OnClick:=chkCompileClick;
+	txtOverrideBuildCmd.OnChange:=txtOverrideBuildCmdChange;
+	spnPriority.OnChange:=spnPriorityChange;
 end;
 
 procedure TfrmProjectOptions.chkCompileClick(Sender: TObject);
@@ -996,8 +946,8 @@ procedure TfrmProjectOptions.chkCompileClick(Sender: TObject);
     for I:=0 to Node.Count-1 do begin
       idx:=Integer(Node[I].Data);
       if idx<>-1 then begin // unit
-        fProject.Units[idx].Compile:=chkCompile.Checked;
-        fProject.Units[idx].CompileCpp:=chkCompileCpp.Checked;
+        fProjectCopy.Units[idx].Compile:=chkCompile.Checked;
+        fProjectCopy.Units[idx].CompileCpp:=chkCompileCpp.Checked;
       end
       else if Node[I].HasChildren then
         DoNode(Node[I]);
@@ -1010,18 +960,18 @@ begin
   for I:=0 to lvFiles.SelectionCount-1 do begin
     idx:=Integer(lvFiles.Selections[I].Data);
     if idx<>-1 then begin // unit
-      fProject.Units[idx].Compile:=chkCompile.Checked;
-      fProject.Units[idx].CompileCpp:=chkCompileCpp.Checked;
-      fProject.Units[idx].Link:=chkLink.Checked;
+      fProjectCopy.Units[idx].Compile:=chkCompile.Checked;
+      fProjectCopy.Units[idx].CompileCpp:=chkCompileCpp.Checked;
+      fProjectCopy.Units[idx].Link:=chkLink.Checked;
       if lvFiles.SelectionCount=1 then begin
-        fProject.Units[idx].OverrideBuildCmd:=chkOverrideBuildCmd.Checked;
+        fProjectCopy.Units[idx].OverrideBuildCmd:=chkOverrideBuildCmd.Checked;
 
         txtOverrideBuildCmd.OnChange:=nil;
         txtOverrideBuildCmd.Text:=StringReplace(txtOverrideBuildCmd.Text, '<CRTAB>', #13#10, [rfReplaceAll]);
 
         spnPriority.Enabled:=chkCompile.Checked;
-        chkOverrideBuildCmd.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) <> utResSrc);
-        if chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName)=utOther) then begin
+        chkOverrideBuildCmd.Enabled:=chkCompile.Checked and (GetFileTyp(fProjectCopy.Units[idx].FileName) <> utResSrc);
+        if chkCompile.Checked and (GetFileTyp(fProjectCopy.Units[idx].FileName)=utOther) then begin
           // non-standard source files, *must* override the build command
           chkCompileCpp.Enabled:=False;
           txtOverrideBuildCmd.Enabled:=True;
@@ -1030,7 +980,7 @@ begin
             txtOverrideBuildCmd.Text:='<override this command>';
         end
         else begin
-          chkCompileCpp.Enabled:=chkCompile.Checked and (GetFileTyp(fProject.Units[idx].FileName) <> utResSrc);
+          chkCompileCpp.Enabled:=chkCompile.Checked and (GetFileTyp(fProjectCopy.Units[idx].FileName) <> utResSrc);
           if chkCompileCpp.Checked then begin
             txtOverrideBuildCmd.Text:=StringReplace(txtOverrideBuildCmd.Text, '$(CC)', '$(CPP)', [rfReplaceAll]);
             txtOverrideBuildCmd.Text:=StringReplace(txtOverrideBuildCmd.Text, '$(CFLAGS)', '$(CXXFLAGS)', [rfReplaceAll]);
@@ -1041,7 +991,7 @@ begin
           end;
           txtOverrideBuildCmd.Enabled:=chkOverrideBuildCmd.Enabled and chkOverrideBuildCmd.Checked;
         end;
-        fProject.Units[idx].BuildCmd:=txtOverrideBuildCmd.Text;
+        fProjectCopy.Units[idx].BuildCmd:=txtOverrideBuildCmd.Text;
         txtOverrideBuildCmd.OnChange:=txtOverrideBuildCmdChange;
       end;
     end
@@ -1054,33 +1004,34 @@ procedure TfrmProjectOptions.InitVersionInfo;
 var
 	I: integer;
 begin
-	chkVersionInfo.Checked:=fOptions.IncludeVersionInfo;
-	chkVersionInfoClick(nil);
+	with fProjectCopy.Options.VersionInfo do begin
+		chkVersionInfo.Checked:=fProjectCopy.Options.IncludeVersionInfo;
+		chkVersionInfoClick(nil);
 
-	spnMajor.Value:=fOptions.VersionInfo.Major;
-	spnMinor.Value:=fOptions.VersionInfo.Minor;
-	spnRelease.Value:=fOptions.VersionInfo.Release;
-	spnBuild.Value:=fOptions.VersionInfo.Build;
-	chkAutoIncBuild.Checked:=fOptions.VersionInfo.AutoIncBuildNr;
-	chkSyncProduct.Checked:=fOptions.VersionInfo.SyncProduct;
+		spnMajor.Value:=Major;
+		spnMinor.Value:=Minor;
+		spnRelease.Value:=Release;
+		spnBuild.Value:=Build;
+		chkAutoIncBuild.Checked:=AutoIncBuildNr;
+		chkSyncProduct.Checked:=SyncProduct;
 
-	vleVersion.Strings.Clear;
-	vleVersion.InsertRow('File Description',  fOptions.VersionInfo.FileDescription,   True);
-	vleVersion.InsertRow('File Version',      fOptions.VersionInfo.FileVersion,       True);
-	vleVersion.InsertRow('Product Name',      fOptions.VersionInfo.ProductName,       True);
-	vleVersion.InsertRow('Product Version',   fOptions.VersionInfo.ProductVersion,    True);
-	vleVersion.InsertRow('Original Filename', fOptions.VersionInfo.OriginalFilename,  True);
-	vleVersion.InsertRow('Internal Name',     fOptions.VersionInfo.InternalName,      True);
-	vleVersion.InsertRow('Company Name',      fOptions.VersionInfo.CompanyName,       True);
-	vleVersion.InsertRow('Legal Copyright',   fOptions.VersionInfo.LegalCopyright,    True);
-	vleVersion.InsertRow('Legal Trademarks',  fOptions.VersionInfo.LegalTrademarks,   True);
+		vleVersion.Strings.Clear;
+		vleVersion.InsertRow('File Description',  FileDescription,   True);
+		vleVersion.InsertRow('File Version',      FileVersion,       True);
+		vleVersion.InsertRow('Product Name',      ProductName,       True);
+		vleVersion.InsertRow('Product Version',   ProductVersion,    True);
+		vleVersion.InsertRow('Original Filename', OriginalFilename,  True);
+		vleVersion.InsertRow('Internal Name',     InternalName,      True);
+		vleVersion.InsertRow('Company Name',      CompanyName,       True);
+		vleVersion.InsertRow('Legal Copyright',   LegalCopyright,    True);
+		vleVersion.InsertRow('Legal Trademarks',  LegalTrademarks,   True);
 
-	cmbLangID.Items.Clear;
-	for I:=0 to Languages.Count-1 do
-		cmbLangID.Items.Add(Languages.Name[I]);
+		cmbLangID.Items.Clear;
+		for I:=0 to Languages.Count-1 do
+			cmbLangID.Items.Add(Languages.Name[I]);
 
-	// Zoek item met naam van internationale index op
-	cmbLangID.ItemIndex := cmbLangID.Items.IndexOf(Languages.NameFromLocaleID[fOptions.VersionInfo.LanguageID]);
+		cmbLangID.ItemIndex := cmbLangID.Items.IndexOf(Languages.NameFromLocaleID[LanguageID]);
+	end;
 end;
 
 procedure TfrmProjectOptions.chkVersionInfoClick(Sender: TObject);
@@ -1097,24 +1048,24 @@ end;
 
 procedure TfrmProjectOptions.cmbCompilerChange(Sender: TObject);
 begin
-  devCompiler.LoadSet(cmbCompiler.ItemIndex);
-  CompOptionsFrame1.FillOptions(fProject);
+	// When we change compiler sets, load defaults of selected compiler
+//	devCompiler.LoadSet(cmbCompiler.ItemIndex);
+//	CompOptionsFrame1.FillOptions(fProjectCopy); // todo: make up mind about discarding user settings this way
 end;
 
 procedure TfrmProjectOptions.btnCancelClick(Sender: TObject);
 begin
-  devCompiler.LoadSet(fOptions.CompilerSet);
-end;
-
-procedure TfrmProjectOptions.lstTypeClick(Sender: TObject);
-begin
-  chkSupportXP.Enabled:=lstType.ItemIndex=0;
+	ModalResult := mrCancel;
 end;
 
 procedure TfrmProjectOptions.btnOkClick(Sender: TObject);
 begin
-  SaveDirSettings;
-  fOptions.CompilerOptions:=devCompiler.fOptionString;
+	ModalResult := mrOk;
+end;
+
+procedure TfrmProjectOptions.lstTypeClick(Sender: TObject);
+begin
+	chkSupportXP.Enabled := (lstType.ItemIndex = 0);
 end;
 
 procedure TfrmProjectOptions.AddLibBtnClick(Sender: TObject);
@@ -1124,7 +1075,7 @@ var
 begin
   if OpenLibDialog.Execute then begin
     for i := 0 to OpenLibDialog.Files.Count - 1 do begin
-      S:=ExtractRelativePath(fProject.Directory, OpenLibDialog.Files[i]);
+      S:=ExtractRelativePath(fProjectCopy.Directory, OpenLibDialog.Files[i]);
       S:=GenMakePath1(S);
       edLinker.Lines.Add(S);
     end;
@@ -1136,18 +1087,18 @@ var
   tfile, ofile: AnsiString;
 begin
   Result:='';
-  if not (GetFileTyp(fProject.Units[idx].FileName) in [utcSrc,utcppSrc]) then
+  if not (GetFileTyp(fProjectCopy.Units[idx].FileName) in [utcSrc,utcppSrc]) then
     Exit;
 
-  tfile:= ExtractFileName(fProject.Units[idx].FileName);
-  if fProject.Options.ObjectOutput<>'' then
+  tfile:= ExtractFileName(fProjectCopy.Units[idx].FileName);
+  if fProjectCopy.Options.ObjectOutput<>'' then
   begin
-    ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(tfile);
-    ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
+    ofile := IncludeTrailingPathDelimiter(fProjectCopy.Options.ObjectOutput)+ExtractFileName(tfile);
+    ofile := GenMakePath1(ExtractRelativePath(fProjectCopy.FileName, ChangeFileExt(ofile, OBJ_EXT)));
   end
   else
     ofile := GenMakePath1(ChangeFileExt(tfile, OBJ_EXT));
-  if fProject.Units[idx].CompileCpp then
+  if fProjectCopy.Units[idx].CompileCpp then
     Result := '$(CPP) -c '+GenMakePath1(tfile)+' -o '+ ofile+' $(CXXFLAGS)'
   else
     Result := '$(CC) -c '+GenMakePath1(tfile)+' -o '+ ofile+' $(CFLAGS)';
@@ -1161,7 +1112,7 @@ begin
     Exit;
   idx:=Integer(lvFiles.Selected.Data);
   if (lvFiles.Selected.Level>0) and (idx<>-1) then // unit
-    fProject.Units[idx].BuildCmd:=StringReplace(txtOverrideBuildCmd.Text, #13#10, '<CRTAB>', [rfReplaceAll]);
+    fProjectCopy.Units[idx].BuildCmd:=StringReplace(txtOverrideBuildCmd.Text, #13#10, '<CRTAB>', [rfReplaceAll]);
 end;
 
 procedure TfrmProjectOptions.spnPriorityChange(Sender: TObject);
@@ -1173,14 +1124,14 @@ begin
   for I:=0 to lvFiles.SelectionCount-1 do begin
     idx:=Integer(lvFiles.Selections[I].Data);
     if (lvFiles.Selections[I].Level>0) and (idx<>-1) then // unit
-      fProject.Units[idx].Priority:=spnPriority.Value;
+      fProjectCopy.Units[idx].Priority:=spnPriority.Value;
   end;
 end;
 
 procedure TfrmProjectOptions.btnCustomMakeBrowseClick(Sender: TObject);
 begin
   if dlgCustomMake.Execute then
-      edCustomMakefile.Text := ExtractRelativePath(fProject.FileName, dlgCustomMake.FileName);
+      edCustomMakefile.Text := ExtractRelativePath(fProjectCopy.FileName, dlgCustomMake.FileName);
   edCustomMakefile.SetFocus;
 end;
 
@@ -1197,7 +1148,7 @@ begin
   edCustomMakefile.Enabled:=cbUseCustomMakefile.Checked;
   btnCustomMakeBrowse.Enabled:=cbUseCustomMakefile.Checked;
   InfoMakeBtn.Enabled:=not cbUseCustomMakefile.Checked;
-  MakeIncludes.Enabled:=not cbUseCustomMakefile.Checked;
+  lbMakeIncludes.Enabled:=not cbUseCustomMakefile.Checked;
   edMakeInclude.Enabled:=not cbUseCustomMakefile.Checked;
   btnMakUp.Enabled:=not cbUseCustomMakefile.Checked;
   btnMakDown.Enabled:=not cbUseCustomMakefile.Checked;
@@ -1210,28 +1161,33 @@ begin
   // I want the disabled controls to be *shown* as disabled...
   ColorDisabled(edCustomMakefile);
   ColorDisabled(edMakeInclude);
-  ColorDisabled(MakeIncludes);
+  ColorDisabled(lbMakeIncludes);
 
-  UpdateMakButtons();
+  UpdateMakButtons;
 end;
 
-procedure TfrmProjectOptions.MakeIncludesDrawItem(Control: TWinControl;Index: Integer; Rect: TRect; State: TOwnerDrawState);
+procedure TfrmProjectOptions.lbMakeIncludesDrawItem(Control: TWinControl;Index: Integer; Rect: TRect; State: TOwnerDrawState);
 begin
-  btnMakUp.Enabled := MakeIncludes.Items.Count > 0;
-  btnMakDown.Enabled := MakeIncludes.Items.Count > 0;
+	btnMakUp.Enabled := lbMakeIncludes.Items.Count > 0;
+	btnMakDown.Enabled := lbMakeIncludes.Items.Count > 0;
 end;
 
-procedure TfrmProjectOptions.CheckBox1Click(Sender: TObject);
+procedure TfrmProjectOptions.chkLogOutputClick(Sender: TObject);
 begin
-	edLogOutput.Enabled := CheckBox1.Checked;
+	edLogOutput.Enabled := chkLogOutput.Checked;
 end;
 
 procedure TfrmProjectOptions.OptionsLinkClick(Sender: TObject);
-var
-	s : AnsiString;
 begin
-	s := (Sender as TLabel).Caption;
-	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(s), nil, nil, SW_SHOWNORMAL);
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TfrmProjectOptions.FormClose(Sender: TObject;var Action: TCloseAction);
+begin
+	// Correct memory leak in VCL
+	CompOptionsFrame1.vle.Strings.Clear;
+
+	action := caFree;
 end;
 
 end.

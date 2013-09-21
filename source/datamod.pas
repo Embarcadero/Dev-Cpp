@@ -26,14 +26,14 @@ uses
   SysUtils, Classes, Menus, Dialogs, ImgList, Controls,
   SynEditExport, SynExportHTML, SynExportRTF,
   SynEditHighlighter, SynHighlighterCpp, SynEditPrint,
-  oysUtils, CodeInsFrm, SynHighlighterRC, SynCompletionProposal,
+  CodeInsFrm, SynHighlighterRC, SynCompletionProposal,
   SynEditMiscClasses, SynEditSearch, SynExportTeX;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QMenus, QDialogs, QImgList, QControls,
   QSynEditExport, QSynExportHTML, QSynExportRTF,
   QSynEditHighlighter, QSynHighlighterCpp, QSynEditPrint,
-  oysUtils, CodeIns, QSynHighlighterRC, QSynCompletionProposal,
+  CodeIns, QSynHighlighterRC, QSynCompletionProposal,
   QSynEditMiscClasses, QSynEditSearch;
 {$ENDIF}
 
@@ -68,15 +68,14 @@ type
     procedure DataModuleDestroy(Sender: TObject);
   private
     fUnitCount: integer;
-{ Code Inserts }
-   private
+    fProjectCount: integer;
     fCodeList: TCodeInsList;
     fCodeMenu: TMenuItem;
     fCodePop: TMenuItem;
     fCodeEvent: TNotifyEvent;
     fCodeOffset: byte;
     procedure LoadCodeIns;
-   public
+  public
     function InsertList: TStrings;
     property CodeMenu: TMenuItem read fCodeMenu write fCodeMenu;
     property CodePop: TMenuItem read fCodePop write fCodePop;
@@ -86,7 +85,7 @@ type
 
 { MRU List }
    private
-    fMRU: ToysStringList;
+    fMRU: TStringList;
     fMRUMenu: TMenuItem;
     fMRUMax: byte;
     fMRUOffset: integer;
@@ -96,9 +95,8 @@ type
     procedure RebuildMRU;
     function GetMRU(index: integer): AnsiString;
    public
-    fProjectCount: integer;
-    procedure AddtoHistory(s: AnsiString);
-    procedure RemoveFromHistory(s: AnsiString);
+    procedure AddtoHistory(const s: AnsiString);
+    procedure RemoveFromHistory(const s: AnsiString);
     procedure ClearHistory;
     property MRU[index: integer]: AnsiString read GetMRU;
     property MRUMenu: TMenuItem read fMRUMenu write fMRUMenu;
@@ -108,15 +106,15 @@ type
 
   public
     procedure LoadDataMod;
-    function GetNumber: integer;
-    function GetNum: integer;
+    function GetNewProjectNumber: integer;
+    function GetNewFileNumber: integer;
     procedure InitHighlighterFirstTime(index : integer);
     procedure UpdateHighlighter;
     function GetHighlighter(const FileName: AnsiString): TSynCustomHighlighter;
 
-    procedure ExportToHtml(FileLines: TStrings; ExportFilename: AnsiString);
-    procedure ExportToRtf(FileLines: TStrings; ExportFilename: AnsiString);
-    procedure ExportToTex(FileLines: TStrings; ExportFilename: AnsiString);
+    procedure ExportToHtml(FileLines: TStrings;const ExportFilename: AnsiString);
+    procedure ExportToRtf(FileLines: TStrings;const ExportFilename: AnsiString);
+    procedure ExportToTex(FileLines: TStrings;const ExportFilename: AnsiString);
   end;
 
 var
@@ -133,15 +131,15 @@ uses
 
 procedure TdmMain.DataModuleCreate(Sender: TObject);
 begin
-  fMRU:= ToysStringList.Create;
-  fCodeList:= TCodeInsList.Create;
+	fMRU:= TStringList.Create;
+	fCodeList:= TCodeInsList.Create;
 end;
 
 procedure TdmMain.DataModuleDestroy(Sender: TObject);
 begin
-  SaveHistory;
-  fMRU.Free;
-  fCodeList.Free;
+	SaveHistory;
+	fMRU.Free;
+	fCodeList.Free;
 end;
 
 procedure TdmMain.InitHighlighterFirstTime(index : integer);
@@ -254,16 +252,16 @@ begin
 	end;
 end;
 
-function TdmMain.GetNum: integer;
+function TdmMain.GetNewFileNumber: integer;
 begin
-  inc(fUnitCount);
-  result:= fUnitCount;
+	Inc(fUnitCount);
+	result := fUnitCount;
 end;
 
-function TdmMain.GetNumber: integer;
+function TdmMain.GetNewProjectNumber: integer;
 begin
-  inc(fProjectCount);
-  result:= fProjectCount;
+	Inc(fProjectCount);
+	result := fProjectCount;
 end;
 
 procedure TdmMain.LoadDataMod;
@@ -275,76 +273,87 @@ end;
 
  { ---------- MRU ---------- }
 
-procedure TdmMain.AddtoHistory(s: AnsiString);
+procedure TdmMain.AddtoHistory(const s: AnsiString);
 var
- idx: integer;
+	I: integer;
 begin
-  if (s = '') then exit;
-  idx:= fMRU.IndexofValue(s);
-  if idx = -1 then
-   // insert always first
-   fMRU.Insert(0, Format('%d=%s', [fMRU.Count, s]));
-  RebuildMRU;
+	if (s = '') then
+		exit;
+
+	// Don't add duplicates!
+	for I := 0 to fMRU.Count - 1 do
+		if SameText(s,fMRU.ValueFromIndex[i]) then
+			Exit;
+
+	// insert first
+	fMRU.Insert(0, Format('%d=%s', [fMRU.Count, s]));
+	RebuildMRU;
 end;
 
-procedure TdmMain.RemoveFromHistory(s: AnsiString);
+procedure TdmMain.RemoveFromHistory(const s: AnsiString);
 var
- idx: integer;
+	I : integer;
 begin
-  idx:= fMRU.IndexofValue(s);
-  if idx > -1 then fMRU.Delete(idx);
-  RebuildMRU;
+
+	// Remove one, duplicates simply aren't present
+	for I := 0 to fMRU.Count - 1 do
+		if SameText(s,fMRU.ValueFromIndex[i]) then begin
+			fMRU.Delete(i);
+			RebuildMRU;
+			break;
+		end;
 end;
 
 procedure TdmMain.ClearHistory;
 begin
-  fMRU.Clear;
-  RebuildMRU;
+	fMRU.Clear;
+	RebuildMRU;
 end;
 
 function TdmMain.GetMRU(index: integer): AnsiString;
 begin
-  result:= fMRU.Values[index];
+	result:= fMRU.ValueFromIndex[index];
 end;
 
 procedure TdmMain.LoadHistory;
 var
- ini: TINIFile;
- idx: integer;
+	ini: TINIFile;
+	I: integer;
 begin
-  ClearHistory;
-  ini:= TiniFile.Create(devData.iniFile);
-  with ini do
-   try
-    if not SectionExists('History') then exit;
-    ReadSectionValues('History', fMRU);
-    if fMRU.Count = 0 then exit;
-    for idx:= pred(fMRU.Count) downto 0 do
-     if not FileExists(fMRU.Values[idx]) then
-      fMRU.Delete(idx);
-   finally
-    Free;
-   end;
-  RebuildMRU;
+	ClearHistory;
+	ini:= TiniFile.Create(devData.iniFile);
+	with ini do
+		try
+			if not SectionExists('History') then exit;
+			ReadSectionValues('History', fMRU);
+			if fMRU.Count = 0 then exit;
+
+			// Delete files that don't exist anymore
+			for I := fMRU.Count - 1 downto 0 do
+				if not FileExists(fMRU.ValueFromIndex[I]) then
+					fMRU.Delete(I);
+		finally
+			Free;
+		end;
+	RebuildMRU;
 end;
 
 procedure TdmMain.SaveHistory;
 var
- ini: TINIFile;
- idx: integer;
+	ini: TINIFile;
+	idx: integer;
 begin
-  if not assigned(fMRU) then exit;
+	if not assigned(fMRU) then exit;
 
-  ini:= TINIFile.Create(devData.INIFile);
-  with ini do
-   try
-    EraseSection('History');
-    if fMRU.Count = 0 then exit;
-    for idx:= 0 to pred(fMRU.Count) do
-     WriteString('History', inttostr(idx), fMRU.Values[idx]);
-   finally
-    Free;
-   end;
+	ini:= TINIFile.Create(devData.INIFile);
+	with ini do
+		try
+			EraseSection('History');
+			for idx:= 0 to pred(fMRU.Count) do
+				WriteString('History', inttostr(idx), fMRU.ValueFromIndex[idx]);
+		finally
+			Free;
+		end;
 end;
 
 procedure TdmMain.RebuildMRU;
@@ -383,7 +392,7 @@ var
  idx: integer;
  Item: TMenuItem;
  NonDev: integer;
- UpdMRU: ToysStringList;
+ UpdMRU: TStringList;
 begin
   if not assigned(fMRUMenu) then exit;
   for idx:= pred(fMRUMenu.Count) downto fMRUOffset do
@@ -395,7 +404,7 @@ begin
   // After that, we 'll replace the fMRU with UpdMRU.
   // That way the MRU is always up to date and does not contain
   // excess elements.
-  UpdMRU:=ToysStringList.Create;
+  UpdMRU:=TStringList.Create;
 
   Counter:=0;
 
@@ -409,9 +418,9 @@ begin
 
   for idx:= 0 to pred(Stop) do
    begin
-     UpdMRU.Add(Format('%d=%s', [UpdMRU.Count, fMRU.Values[idx]]));
+     UpdMRU.Add(Format('%d=%s', [UpdMRU.Count, fMRU.ValueFromIndex[idx]]));
      Item:= TMenuItem.Create(fMRUMenu);
-     Item.Caption:= format('&%1x %s', [Counter, fMRU.Values[idx]]);
+     Item.Caption:= format('&%1x %s', [Counter, fMRU.ValueFromIndex[idx]]);
      Item.OnClick:= fMRUClick;
      Item.Tag:= UpdMRU.Count-1;
      fMRUMenu.Add(Item);
@@ -429,9 +438,9 @@ begin
 
   for idx:= NonDev to pred(Stop) do
    begin
-     UpdMRU.Add(Format('%d=%s', [UpdMRU.Count, fMRU.Values[idx]]));
+     UpdMRU.Add(Format('%d=%s', [UpdMRU.Count, fMRU.ValueFromIndex[idx]]));
      Item:= TMenuItem.Create(fMRUMenu);
-     Item.Caption:= format('&%1x %s', [Counter, fMRU.Values[idx]]);
+     Item.Caption:= format('&%1x %s', [Counter, fMRU.ValueFromIndex[idx]]);
      Item.OnClick:= fMRUClick;
      Item.Tag:= UpdMRU.Count-1;
      fMRUMenu.Add(Item);
@@ -499,7 +508,7 @@ end;
 
 { ---------- Exports ---------- }
 
-procedure TdmMain.ExportToHtml(FileLines: TStrings; ExportFilename: AnsiString);
+procedure TdmMain.ExportToHtml(FileLines: TStrings;const  ExportFilename: AnsiString);
 begin
   if (not Assigned(FileLines)) or (FileLines.Count=0) or (ExportFilename='') then
     Exit;
@@ -513,7 +522,7 @@ begin
   SynExporterHTML.SavetoFile(ExportFileName);
 end;
 
-procedure TdmMain.ExportToRtf(FileLines: TStrings; ExportFilename: AnsiString);
+procedure TdmMain.ExportToRtf(FileLines: TStrings;const  ExportFilename: AnsiString);
 begin
   if (not Assigned(FileLines)) or (FileLines.Count=0) or (ExportFilename='') then
     Exit;
@@ -522,7 +531,7 @@ begin
   SynExporterRTF.SavetoFile(ExportFileName);
 end;
 
-procedure TdmMain.ExportToTex(FileLines: TStrings; ExportFilename: AnsiString);
+procedure TdmMain.ExportToTex(FileLines: TStrings;const ExportFilename: AnsiString);
 begin
   if (not Assigned(FileLines)) or (FileLines.Count=0) or (ExportFilename='') then
     Exit;

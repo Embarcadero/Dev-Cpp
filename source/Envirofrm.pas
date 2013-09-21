@@ -55,7 +55,6 @@ type
     cbdblFiles: TCheckBox;
     gbDebugger: TGroupBox;
     cbWatchHint: TCheckBox;
-    cbWatchError: TCheckBox;
     cbNoSplashScreen: TCheckBox;
     gbProgress: TGroupBox;
     cbShowProgress: TCheckBox;
@@ -197,7 +196,7 @@ end;
 
 procedure TEnviroForm.FormShow(Sender: TObject);
 var
-	idx: integer;
+	idx,sel: integer;
 begin
 	with devData do begin
 		rgbAutoOpen.ItemIndex:= AutoOpen;
@@ -212,10 +211,14 @@ begin
 		seMRUMax.Value:= MRUMax;
 
 		// List the languages
+		cboLang.Items.BeginUpdate;
 		cboLang.Clear;
-		for idx:= 0 to pred(Lang.Langs.Count) do
-			cboLang.Items.append(Lang.Langs.Values[idx]);
-		cboLang.ItemIndex:= cboLang.Items.Indexof(Lang.CurrentLanguage);
+		for idx := 0 to Lang.Langs.Count - 1 do begin
+			sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[idx]);
+			if SameText(Lang.CurrentLanguage,cboLang.Items[sel]) then
+				cboLang.ItemIndex := idx;
+		end;
+		cboLang.Items.EndUpdate;
 
 		// List the themes
 		cboTheme.Items.Clear;
@@ -226,7 +229,6 @@ begin
 		cbAutoCloseProgress.Checked := AutoCloseProgress;
 
 		cbWatchHint.Checked := WatchHint;
-		cbWatchError.Checked := WatchError;
 
 		cboTabsTop.ItemIndex:= msgTabs;
 
@@ -312,7 +314,6 @@ begin
 		ShowProgress := cbShowProgress.Checked;
 		AutoCloseProgress := cbAutoCloseProgress.Checked;
 		WatchHint := cbWatchHint.Checked;
-		WatchError := cbWatchError.Checked;
 		InterfaceFont := cbUIFont.Text;
 		InterfaceFontSize := strtoint(cbUIfontsize.Text);
 
@@ -389,7 +390,6 @@ begin
   cbAutoCloseProgress.Caption:=  Lang[ID_ENV_AUTOCLOSEPROGRESS];
 
   cbWatchHint.Caption :=         Lang[ID_ENV_WATCHHINT];
-  cbWatchError.Caption :=        Lang[ID_ENV_WATCHERROR];
   gbDebugger.Caption :=          ' '+Lang[ID_ENV_DEBUGGER]+' ';
 
   rgbAutoOpen.Caption:=          ' '+Lang[ID_ENV_AUTOOPEN]+' ';

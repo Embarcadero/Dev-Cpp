@@ -39,8 +39,8 @@ type
     fFiles: TStrings;
     fNotifyChange: TdevMonitorChange;
     function GetActive: boolean;
-    procedure SetActive(const Value: boolean);
-    procedure SetFiles(const Value: TStrings);
+    procedure SetActive(Value: boolean);
+    procedure SetFiles(Value: TStrings);
   protected
     { Protected declarations }
   public
@@ -123,7 +123,7 @@ begin
     fMonitor.ReloadList(fFiles);
 end;
 
-procedure TdevFileMonitor.SetActive(const Value: boolean);
+procedure TdevFileMonitor.SetActive(Value: boolean);
 begin
   if Value and not Active then
     Activate
@@ -131,7 +131,7 @@ begin
     Deactivate;
 end;
 
-procedure TdevFileMonitor.SetFiles(const Value: TStrings);
+procedure TdevFileMonitor.SetFiles(Value: TStrings);
 begin
   fFiles.Assign(Value);
 end;

@@ -157,19 +157,16 @@ begin
 	InitializeOptions;
 	devData.ReadConfigData; // fill devData ???
 
+	// Display it as soon as possible, and only if its worth viewing...
+	if (not devData.NoSplashScreen and devCodeCompletion.UseCacheFiles) or devData.First then
+		SplashForm := TSplashForm.Create(nil);
+
 	Application.Initialize;
 	Application.Title := 'Dev-C++';
 	Application.CreateForm(TMainForm, MainForm);
 
-	// Display it a bit later, and only if its worth viewing...
-	if (not devData.NoSplashScreen and devCodeCompletion.UseCacheFiles) or devData.First then
-		SplashForm := TSplashForm.Create(Application);
-
-	// do the creation stuff when the splashscreen is displayed because it takes quite a while ...
-	MainForm.DoCreateEverything;
-
 	if Assigned(SplashForm) then
-		SplashForm.Free;
+		SplashForm.Close;
 
 	Application.Run;
 end.

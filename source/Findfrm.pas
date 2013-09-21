@@ -54,21 +54,21 @@ type
     rbProjectFiles: TRadioButton;
     rbOpenFIles: TRadioButton;
     procedure btnFindClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnCancelClick(Sender: TObject);
     procedure FindTabsChange(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     fSearchOptions: TSynSearchOptions;
     fClose: boolean;
-    fFindAll: boolean;
+    fFindInFiles: boolean;
     procedure LoadText;
    public
-    procedure SetFind;
     property SearchOptions: TSynSearchOptions read fSearchOptions;
-    property FindAll: boolean read fFindAll write fFindAll;
+    property FindInFiles: boolean read fFindInFiles write fFindInFiles;
   end;
 
 var
@@ -88,14 +88,7 @@ uses
 
 procedure TfrmFind.btnFindClick(Sender: TObject);
 begin
-  if cboFindText.Text = '' then
-   begin
-     {MessageBox(Application.MainForm.Handle, PAnsiChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),
-       PAnsiChar(Lang[ID_WARN]), MB_OK or MB_ICONWARNING);
-     fClose:= True;}
-   end
-  else
-   begin
+  if cboFindText.Text <> '' then begin
      if cboFindText.Items.IndexOf(cboFindText.Text) = -1 then
       cboFindText.Items.Add(cboFindText.Text);
 
@@ -107,7 +100,7 @@ begin
      if cbWholeWord.Checked then
       include(fSearchOptions, ssoWholeWord);
 
-     if not fFindAll then
+     if not fFindInFiles then
       begin
         if rbBackward.checked then
          include(fSearchOptions, ssoBackwards);
@@ -127,21 +120,6 @@ begin
    end;
 end;
 
-procedure TfrmFind.FormShow(Sender: TObject);
-begin
-  LoadText;
-  ActiveControl:= cboFindText;
-  FindTabs.Tabs.Clear;
-  if fFindAll then
-   FindTabs.Tabs.Append(lang[ID_FIND_FINDALLTAB])
-  else
-   begin
-     FindTabs.Tabs.Append(Lang[ID_FIND_FINDTAB]);
-     FindTabs.Tabs.Append(Lang[ID_FIND_FINDALLTAB]);
-   end;
-  FindTabs.TabIndex:= 0;
-end;
-
 procedure TfrmFind.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if fClose then
@@ -155,31 +133,26 @@ end;
 
 procedure TfrmFind.btnCancelClick(Sender: TObject);
 begin
-  fClose:= true;
-  Close;
+	fClose:= true;
+	Close;
 end;
 
 procedure TfrmFind.FindTabsChange(Sender: TObject);
 begin
-  if FindTabs.Tabs.Count> 1 then
-   fFindAll:= FindTabs.TabIndex = 1
-  else
-   fFindAll:= TRUE;
-  SetFind;
-end;
+	fFindInFiles := FindTabs.TabIndex = 1;
 
-procedure TfrmFind.SetFind;
-begin
-  grpWhere.Visible:= fFindAll;
-  grpDirection.Visible:= not fFindAll;
-  grpScope.Visible:= not fFindAll;
-  grpOrigin.Visible:= not fFindAll;
+	grpWhere.Visible:= fFindInFiles;
+	grpDirection.Visible:= not fFindInFiles;
+	grpScope.Visible:= not fFindInFiles;
+	grpOrigin.Visible:= not fFindInFiles;
 end;
 
 procedure TfrmFind.LoadText;
-var
- x: Integer;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption:=                 Lang[ID_FIND];
 
   //tabs
@@ -212,32 +185,33 @@ begin
   //buttons
   btnFind.Caption:=        Lang[ID_BTN_FIND];
   btnCancel.Caption:=      Lang[ID_BTN_CANCEL];
-
-  x:= Self.Canvas.TextWidth(btnFind.Caption) +5;
-  if x> btnFind.Width then
-   btnFind.Width:= x;
-
-  x:= Self.Canvas.TextWidth(btnCancel.Caption);
-  if x> btnCancel.Width then
-   btnCancel.Width:= x;
 end;
 
-procedure TfrmFind.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TfrmFind.FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 begin
 {$IFDEF WIN32}
-  if (Key=VK_TAB) and (Shift=[ssCtrl]) then
+	if (Key=VK_TAB) and (Shift=[ssCtrl]) then
 {$ENDIF}
 {$IFDEF LINUX}
-  if (Key=XK_TAB) and (Shift=[ssCtrl]) then
+	if (Key=XK_TAB) and (Shift=[ssCtrl]) then
 {$ENDIF}
-    // switch tabs
-    if FindTabs.Tabs.Count> 1 then begin
-      if FindTabs.TabIndex=0 then
-        FindTabs.TabIndex:=1
-      else
-        FindTabs.TabIndex:=0;
-    end;
+		// eliminated a branch! :D
+		FindTabs.TabIndex := (FindTabs.TabIndex+1) mod 2;
+end;
+
+procedure TfrmFind.FormCreate(Sender: TObject);
+begin
+	LoadText;
+	ActiveControl := cboFindText;
+end;
+
+procedure TfrmFind.FormShow(Sender: TObject);
+begin
+	if fFindInFiles then
+		FindTabs.TabIndex:= 1
+	else
+		FindTabs.TabIndex:= 0;
+	FindTabsChange(nil);
 end;
 
 end.

@@ -31,7 +31,7 @@ uses
 
 const
 	BoolValYesNo: array[boolean] of AnsiString = ('No', 'Yes');
-	ValueArray: array[0..27] of char = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+	ValueToChar: array[0..27] of char = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
                                          'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
                                          's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
@@ -84,9 +84,8 @@ type
 		procedure UpdateSets;
 	public
 
-		// All options (IMPORTANT part)
-		fOptionString : AnsiString;
-		fOptionList: TList;
+		fOptionString : AnsiString; // options in INI format
+		fOptionList: TList; // options in usable memory format
 
 		constructor Create;
 		destructor Destroy; override;
@@ -105,7 +104,14 @@ type
 		procedure AddDefaultOptions;
 		procedure AddOption(const _Name: AnsiString; _IsC, _IsCpp, IsLinker: boolean; _Value: integer;const _Setting, _Section: AnsiString; Choices: TStringList);
 		function FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
-		function ConvertCharToValue(c : char) : integer;
+		procedure SetOption(option : PCompilerOption;index : integer;newvalue : char);
+
+		// converts
+		procedure OptionStringToList(const input : AnsiString);
+		procedure OptionListToString;
+
+		// utils
+		function CharToValue(c : char) : integer;
 
 		property Delay: integer read fDelay write fDelay;
 		property FastDep: boolean read fFastDep write fFastDep;
@@ -463,7 +469,6 @@ type
 
 		// Debug variable browser
 		fWatchHint : boolean;             // watch variable under mouse
-		fWatchError : boolean;            // report watch errors
 
   public
     constructor Create(aOwner: TComponent); override;
@@ -558,7 +563,6 @@ type
 
     // Variable debug browser
     property WatchHint : boolean read fWatchHint write fWatchHint;
-    property WatchError : boolean read fWatchError write fWatchError;
   end;
 
 function DevData: TdevData;
@@ -856,7 +860,6 @@ begin
   fPrintLineNumbers := TRUE;
   fPrintLineNumbersMargins := FALSE;
   fWatchHint := TRUE;
-  fWatchError := TRUE;
 end;
 
 { TdevCompiler }
@@ -882,6 +885,31 @@ begin
 	fOptionList.Free;
 	fSets.Free;
 	inherited;
+end;
+
+procedure TdevCompiler.OptionListToString;
+var
+	I : integer;
+begin
+	fOptionString:='';
+	for I := 0 to fOptionList.Count - 1 do
+		fOptionString := fOptionString + ValueToChar[PCompilerOption(fOptionList[I])^.optValue];
+end;
+
+procedure TdevCompiler.OptionStringToList(const input : AnsiString);
+var
+	I: integer;
+begin
+	for I := 0 to fOptionList.Count - 1 do
+		if I < Length(input) then
+			PCompilerOption(fOptionList[I])^.optValue := CharToValue(input[I+1]);
+end;
+
+procedure TdevCompiler.SetOption(option : PCompilerOption;index : integer;newvalue : char);
+begin
+	if Assigned(option) then
+		option^.optValue := CharToValue(newvalue);
+	fOptionString[index+1] := newvalue;
 end;
 
 procedure TdevCompiler.LoadSet(Index: integer);
@@ -920,9 +948,9 @@ begin
 		if I >= Length(fOptionString) then
 			PCompilerOption(fOptionList[I])^.optValue := 0
 		else
-			// Else, scan boolval
-			for J := 0 to 28 do begin
-				if fOptionString[I+1] = ValueArray[J] then begin
+			// Else, scan valuearray
+			for J := 0 to 27 do begin
+				if fOptionString[I+1] = ValueToChar[J] then begin
 					PCompilerOption(fOptionList[I])^.optValue := J;
 					Break;
 				end;
@@ -1161,7 +1189,7 @@ begin
 	sl.Add('K8 Rev.E=k8-sse3');
 	sl.Add('K10=barcelona');
 	sl.Add('Bulldozer=bdver1');
-	AddOption(Lang[ID_COPT_ARCH], True, True, True, 0, '-march=', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(Lang[ID_COPT_ARCH], True, True, False, 0, '-march=', Lang[ID_COPT_GRP_CODEGEN], sl);
 
 	// Optimization
 	sl := TStringList.Create;
@@ -1192,7 +1220,7 @@ begin
 	sl.Add('K8 Rev.E=k8-sse3');
 	sl.Add('K10=barcelona');
 	sl.Add('Bulldozer=bdver1');
-	AddOption(Lang[ID_COPT_TUNE], True, True, True, 0, '-mtune=', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(Lang[ID_COPT_TUNE], True, True, False, 0, '-mtune=', Lang[ID_COPT_GRP_CODEGEN], sl);
 
 	// Built-in processor functions
 	sl := TStringList.Create;
@@ -1211,7 +1239,7 @@ begin
 	sl.Add('FMA4=fma4');
 	sl.Add('XOP=xop');
 	sl.Add('AES=aes');
-	AddOption(Lang[ID_COPT_BUILTINPROC], True, True, True, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(Lang[ID_COPT_BUILTINPROC], True, True, False, 0, '-m', Lang[ID_COPT_GRP_CODEGEN], sl);
 
 	// Optimization
 	sl := TStringList.Create;
@@ -1221,7 +1249,7 @@ begin
 	sl.Add('High=3');
 	sl.Add('Highest (fast)=fast');
 	sl.Add('Size (s)=s');
-	AddOption(Lang[ID_COPT_OPTIMIZE], True, True, True, 0, '-O', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(Lang[ID_COPT_OPTIMIZE], True, True, False, 0, '-O', Lang[ID_COPT_GRP_CODEGEN], sl);
 
 	// 32bit/64bit
 	sl := TStringList.Create;
@@ -1241,7 +1269,7 @@ begin
 	sl.Add('GNU C99=gnu99');
 	sl.Add('GNU C++=gnu++98');
 	sl.Add('GNU C++11=gnu++0x');
-	AddOption(Lang[ID_COPT_STD], True, True, True, 0, '-std=', Lang[ID_COPT_GRP_CODEGEN], sl);
+	AddOption(Lang[ID_COPT_STD], True, True, False, 0, '-std=', Lang[ID_COPT_GRP_CODEGEN], sl);
 
 	// Warnings
 	AddOption(Lang[ID_COPT_WARNING],     True,  True,  False, 0, '-w',                   Lang[ID_COPT_GRP_WARN],    nil);
@@ -1253,7 +1281,7 @@ begin
 	AddOption(Lang[ID_COPT_FAILONFIRST], True,  True,  False, 0, '-Wfatal-errors',       Lang[ID_COPT_GRP_WARN],    nil);
 
 	// Profiling
-	AddOption(Lang[ID_COPT_PROFILE],     True,  True,  False, 0, '-pg',                  Lang[ID_COPT_PROFILING],   nil);
+	AddOption(Lang[ID_COPT_PROFILE],     True,  True,  True,  0, '-pg',                  Lang[ID_COPT_PROFILING],   nil);
 
 	// Linker
 	AddOption(Lang[ID_COPT_OBJC],        False, False, True,  0, '-lobjc',               Lang[ID_COPT_LINKERTAB],   nil);
@@ -1266,12 +1294,14 @@ begin
 	AddOption(Lang[ID_COPT_MEM],         True,  True,  False, 0, '-fverbose-asm',        Lang[ID_COPT_GRP_OUTPUT],  nil);
 	AddOption(Lang[ID_COPT_ASSEMBLY],    True,  True,  False, 0, '-S',                   Lang[ID_COPT_GRP_OUTPUT],  nil);
 	AddOption(Lang[ID_COPT_PIPES],       True,  True,  False, 0, '-pipe',                Lang[ID_COPT_GRP_OUTPUT],  nil);
+
+	// Update option string
+	OptionListToString;
 end;
 
 procedure TdevCompiler.AddOption(const _Name: AnsiString; _IsC, _IsCpp, IsLinker: boolean; _Value: integer;const _Setting, _Section: AnsiString; Choices: TStringList);
 var
 	option: PCompilerOption;
-	I : integer;
 begin
 	option := New(PCompilerOption);
 	with option^ do begin
@@ -1285,11 +1315,6 @@ begin
 		optChoices := Choices;
 	end;
 	fOptionList.Add(option);
-
-	// Update option string
-	fOptionString:='';
-	for I := 0 to fOptionList.Count - 1 do
-		fOptionString := fOptionString + ValueArray[PCompilerOption(fOptionList[I])^.optValue];
 end;
 
 function TdevCompiler.FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
@@ -1306,7 +1331,7 @@ begin
 		end;
 end;
 
-function TdevCompiler.ConvertCharToValue(c : char) : integer;
+function TdevCompiler.CharToValue(c : char) : integer;
 begin
 	if c in ['a'..'z'] then
 		result := integer(c) - integer('a') + 2

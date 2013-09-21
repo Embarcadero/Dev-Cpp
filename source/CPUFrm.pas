@@ -44,8 +44,10 @@ type
     lblFunc: TLabel;
     CodeList: TSynEdit;
     RegisterListbox: TListView;
-    gbSyntax: TRadioGroup;
     DisasPanel: TPanel;
+    StackTrace: TListView;
+    RadioATT: TRadioButton;
+    RadioIntel: TRadioButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edFuncKeyPress(Sender: TObject; var Key: Char);
     procedure FormCreate(Sender: TObject);
@@ -54,6 +56,7 @@ type
     fActiveLine : integer;
     fRegisters : TList;
     fAssembler : TStringList;
+    fBacktrace : TList;
 
     procedure LoadText;
   public
@@ -68,7 +71,7 @@ var
 implementation
 
 uses
-  main, version, MultiLangSupport, debugger, datamod, utils,
+  main, version, MultiLangSupport, debugger, debugreader, datamod, utils,
   devcfg, Types;
 
 {$R *.dfm}
@@ -80,8 +83,15 @@ begin
 	for I := 0 to fRegisters.Count - 1 do
 		Dispose(PRegister(fRegisters.Items[I]));
 	fRegisters.Free;
+
 	fAssembler.Free;
+
+	for I := 0 to fBacktrace.Count - 1 do
+		Dispose(PTrace(fBacktrace.Items[I]));
+	fBackTrace.Free;
+
 	action := caFree;
+	CPUForm := nil;
 end;
 
 procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
@@ -101,13 +111,28 @@ begin
 	Font.Size := devData.InterfaceFontSize;
 
 	Caption := Lang[ID_CPU_CAPTION];
-	gbSyntax.Caption := '  ' + Lang[ID_CPU_SYNTAX] +'  ';
 	lblFunc.Caption := Lang[ID_CPU_FUNC];
 end;
 
 procedure TCPUForm.OnBacktraceReady;
+var
+	I : integer;
+	item : TListItem;
 begin
-	// ...
+	StackTrace.Items.BeginUpdate;
+	StackTrace.Clear;
+	for I := 0 to fBacktrace.Count - 1 do begin
+		item := StackTrace.Items.Add;
+		item.Caption := PTrace(fBacktrace.Items[I])^.funcname;
+		item.SubItems.Add(PTrace(fBacktrace.Items[I])^.filename);
+		item.SubItems.Add(PTrace(fBacktrace.Items[I])^.line);
+	end;
+	StackTrace.Items.EndUpdate;
+
+	// Free list for reuse
+	for I := 0 to fBacktrace.Count - 1 do
+		Dispose(PTrace(fBacktrace.Items[I]));
+	fBacktrace.Clear;
 end;
 
 procedure TCPUForm.OnAssemblerReady;
@@ -122,7 +147,7 @@ begin
 		CodeList.Lines.Add(fAssembler.Strings[i]);
 	CodeList.EndUpdate;
 
-	// Free list
+	// Free list for reuse
 	fAssembler.Clear;
 end;
 
@@ -132,6 +157,7 @@ var
 	I : integer;
 begin
 	RegisterListbox.Items.BeginUpdate;
+	RegisterListBox.Clear;
 	for I := 0 to fRegisters.Count - 1 do begin
 		item := RegisterListbox.Items.Add;
 		item.Caption := UpperCase(PRegister(fRegisters.Items[I])^.name);
@@ -139,7 +165,7 @@ begin
 	end;
 	RegisterListBox.Items.EndUpdate;
 
-	// Free list
+	// Free list for reuse
 	for I := 0 to fRegisters.Count - 1 do
 		Dispose(PRegister(fRegisters.Items[I]));
 	fRegisters.Clear;
@@ -152,6 +178,7 @@ begin
 
 	fRegisters := TList.Create;
 	fAssembler := TStringList.Create;
+	fBacktrace := TList.Create;
 
 	if MainForm.fDebugger.Executing then begin
 
@@ -162,16 +189,23 @@ begin
 		// Set disassembly flavor and load the current function
 		MainForm.fDebugger.SetDisassembly(fAssembler);
 		gbSyntaxClick(nil);
+
+		// Obtain stack trace too
+		MainForm.fDebugger.SetBacktrace(fBacktrace);
+		MainForm.fDebugger.SendCommand('backtrace','');
 	end;
 end;
 
 procedure TCPUForm.gbSyntaxClick(Sender: TObject);
 begin
 	// Set disassembly flavor
-	if gbSyntax.ItemIndex = 0 then
-		MainForm.fDebugger.SendCommand('set disassembly-flavor','att')
-	else
+	if RadioAtt.Checked then begin
+		MainForm.fDebugger.SendCommand('set disassembly-flavor','att');
+		RadioIntel.Checked := false;
+	end else if RadioIntel.Checked then begin
 		MainForm.fDebugger.SendCommand('set disassembly-flavor','intel');
+		RadioAtt.Checked := false;
+	end;
 
 	// Reload the current function
 	MainForm.fDebugger.SendCommand('disassemble',edFunc.Text);

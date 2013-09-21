@@ -170,7 +170,7 @@ type
     procedure CheckProjectFileForUpdate;
     procedure IncrementBuildNumber;
     procedure SaveToLog;
- end;
+  end;
 
 implementation
 
@@ -182,6 +182,7 @@ uses
 
 constructor TProjUnit.Create(aOwner: TProject);
 begin
+	inherited Create;
 	fEditor:= nil;
 	fNode:= nil;
 	fParent:= aOwner;
@@ -685,7 +686,7 @@ begin
 	with NewUnit do
 		try
 			if Length(CustomFileName) = 0 then
-				s:= Directory +Lang[ID_Untitled] +inttostr(dmMain.GetNum)
+				s:= Directory +Lang[ID_Untitled] +inttostr(dmMain.GetNewFileNumber)
 			else begin
 				if ExtractFilePath(CustomFileName)='' then // just filename, no path
 					// make it full path filename, so that the save dialog, starts at the right directory ;)
@@ -696,7 +697,7 @@ begin
 
 			if FileAlreadyExists(s) then
 				repeat
-					s:= Directory + Lang[ID_Untitled] + inttostr(dmMain.GetNum);
+					s:= Directory + Lang[ID_Untitled] + inttostr(dmMain.GetNewFileNumber);
 				until not FileAlreadyExists(s);
 
 		Filename := s;
@@ -1112,10 +1113,12 @@ begin
 		0: begin
 			for i:= 0 to pred(fUnits.Count) do
 				OpenUnit(i); // Open all
-			fUnits[0].Editor.Activate; // Show first
+			if fUnits.Count > 0 then
+				fUnits[0].Editor.Activate; // Show first
 		end;
 		1:
-			OpenUnit(0).Activate; // Open and show first
+			if fUnits.Count > 0 then
+				OpenUnit(0).Activate; // Open and show first
 		2:
 			LoadLayout; // Open previous selection
 	end;
@@ -1181,8 +1184,6 @@ var
  S: AnsiString;
 begin
 	s := ChangeFileExt(Filename, '.layout');
-	if FileIsReadOnly(s) then
-		exit;
 	layIni:=TIniFile.Create(s);
 	try
 		sl:=TStringList.Create;
@@ -1541,69 +1542,63 @@ end;
 
 procedure TProject.ShowOptions;
 var
-  IconFileName: AnsiString;
-  L, I : TStrings;
-  R : TStringList;
+	IconFileName: AnsiString;
+	L, I, R : TStringList;
 begin
-  L := TStringList.Create;
-  I := TStringList.Create;
-  R := TStringList.Create;
-  with TfrmProjectOptions.Create(MainForm) do
-   try
-    Project:= Self;
+	L := TStringList.Create;
+	I := TStringList.Create;
+	R := TStringList.Create;
+	with TfrmProjectOptions.Create(MainForm) do try
 
-    L.AddStrings(fOptions.Libs);
-    I.AddStrings(fOptions.Includes);
-    R.AddStrings(fOptions.ResourceIncludes);
+		// Apply current settings
+		SetInterface(Self); // TODO: make real COPY
 
-    Options:= fOptions;
-    btnRemoveIcon.Enabled := Length(Options.Icon) > 0;
-    if ShowModal = mrOk then
-     begin
-       SetModified(TRUE);
-       SortUnitsByPriority;
-       RebuildNodes;
+		L.AddStrings(fOptions.Libs);
+		I.AddStrings(fOptions.Includes);
+		R.AddStrings(fOptions.ResourceIncludes);
 
-       fOptions:= Options;
+		btnRemoveIcon.Enabled := Length(Options.Icon) > 0;
 
-       IconFileName := ChangeFileExt(ExtractFileName(FileName), '.ico');
-       {** why deleting the icon ? *
-       if Length(fOptions.Icon) = 0 then
-       begin
-           DeleteFile(PAnsiChar(IconFileName));
-       end else}
-       if (CompareText(IconFileName, fOptions.Icon) <> 0) and (fOptions.Icon <> '') then
-       begin
-           CopyFile(PAnsiChar(fOptions.Icon), PAnsiChar(ExpandFileto(IconFileName,
-             Directory)), False);
-           fOptions.Icon := IconFileName;
-           // force save of private resource to force rebuild, since icon has changed...
-           BuildPrivateResource(True);
-       end
-       else
-         BuildPrivateResource;
+		if ShowModal = mrOk then begin
 
-       // update the projects main node caption
-       if edProjectName.Text <> '' then
-        begin
-          fName:= edProjectName.Text;
-          fNode.Text:= fName;
-        end;
-    end
-    else begin
-       fOptions.Libs.Clear;
-       fOptions.Libs.AddStrings(L);
-       fOptions.Includes.Clear;
-       fOptions.Includes.AddStrings(I);
-       fOptions.ResourceIncludes.Clear;
-       fOptions.ResourceIncludes.AddStrings(R);
-    end;
-  finally
-    L.Free;
-    I.Free;
-    R.Free;
-    Free;
-  end;
+			GetInterface(Self);
+
+			SetModified(TRUE);
+			SortUnitsByPriority;
+			RebuildNodes;
+
+			IconFileName := ChangeFileExt(ExtractFileName(FileName), '.ico');
+			if not SameText(IconFileName, fOptions.Icon) and (fOptions.Icon <> '') then begin
+				CopyFile(PAnsiChar(fOptions.Icon), PAnsiChar(ExpandFileto(IconFileName,Directory)), False);
+				fOptions.Icon := IconFileName;
+
+				// force save of private resource to force rebuild, since icon has changed...
+				BuildPrivateResource(True);
+			end else
+				BuildPrivateResource;
+
+			// update the projects main node caption
+			if edProjectName.Text <> '' then begin
+				fName:= edProjectName.Text;
+				fNode.Text:= fName;
+			end;
+		end else begin
+			fOptions.Libs.Clear;
+			fOptions.Libs.AddStrings(L);
+			fOptions.Includes.Clear;
+			fOptions.Includes.AddStrings(I);
+			fOptions.ResourceIncludes.Clear;
+			fOptions.ResourceIncludes.AddStrings(R);
+		end;
+
+		// discard changes made to scratch profile
+		devCompiler.LoadSet(devCompiler.CurrentIndex);
+	finally
+		L.Free;
+		I.Free;
+		R.Free;
+		Close;
+	end;
 end;
 
 procedure TProject.SetHostApplication(const s : AnsiString);
@@ -1621,7 +1616,7 @@ begin
 	result:= TRUE;
 	try
 		if aTemplate.Version = -1 then begin
-			fName:= format(Lang[ID_NEWPROJECT], [dmmain.GetNumber]);
+			fName:= format(Lang[ID_NEWPROJECT], [dmmain.GetNewProjectNumber]);
 			fNode.Text:= fName;
 			if Assigned(finiFile) then
 				finiFile.Rename(aFileName,false)

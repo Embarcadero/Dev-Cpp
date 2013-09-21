@@ -16,6 +16,7 @@ object SplashForm: TSplashForm
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13

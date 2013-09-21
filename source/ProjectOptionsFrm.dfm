@@ -1,6 +1,6 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 897
-  Top = 75
+  Left = 1048
+  Top = 246
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -14,9 +14,8 @@ object frmProjectOptions: TfrmProjectOptions
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  OnCloseQuery = FormCloseQuery
+  OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 15
   object btnOk: TBitBtn
@@ -254,7 +253,7 @@ object frmProjectOptions: TfrmProjectOptions
           Height = 44
           BevelOuter = bvLowered
           TabOrder = 3
-          object Icon: TImage
+          object IconPreview: TImage
             Left = 6
             Top = 6
             Width = 32
@@ -350,6 +349,7 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 217
           Height = 17
           Caption = 'Include in compilation process'
+          Enabled = False
           TabOrder = 0
           OnClick = chkCompileClick
         end
@@ -359,6 +359,7 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 217
           Height = 17
           Caption = 'Compile unit as C++'
+          Enabled = False
           TabOrder = 1
           OnClick = chkCompileClick
         end
@@ -368,6 +369,7 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 217
           Height = 17
           Caption = 'Override build command'
+          Enabled = False
           TabOrder = 2
           OnClick = chkCompileClick
         end
@@ -376,8 +378,7 @@ object frmProjectOptions: TfrmProjectOptions
           Top = 122
           Width = 281
           Height = 167
-          Lines.Strings = (
-            'txtOverrideBuildCmd')
+          Enabled = False
           ScrollBars = ssBoth
           TabOrder = 3
           WordWrap = False
@@ -389,6 +390,7 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 217
           Height = 17
           Caption = 'Include in linking process'
+          Enabled = False
           TabOrder = 4
           OnClick = chkCompileClick
         end
@@ -397,6 +399,7 @@ object frmProjectOptions: TfrmProjectOptions
           Top = 16
           Width = 105
           Height = 24
+          Enabled = False
           MaxValue = 0
           MinValue = 0
           TabOrder = 5
@@ -490,8 +493,9 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 449
         Height = 23
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 1
+        OnChange = cmbCompilerChange
       end
     end
     object tabCompOpts: TTabSheet
@@ -610,7 +614,7 @@ object frmProjectOptions: TfrmProjectOptions
           'Resource Directories')
         TabIndex = 0
         OnChange = SubTabsChange
-        object btnDown: TSpeedButton
+        object btnDirDown: TSpeedButton
           Left = 495
           Top = 160
           Width = 23
@@ -661,7 +665,7 @@ object frmProjectOptions: TfrmProjectOptions
             0D0D0D0D0D0D0D0D0D000D0D0D0D0D0D0D0D0D0D0D0D0D0D0D00}
           OnClick = UpDownClick
         end
-        object btnUp: TSpeedButton
+        object btnDirUp: TSpeedButton
           Left = 495
           Top = 130
           Width = 23
@@ -746,7 +750,7 @@ object frmProjectOptions: TfrmProjectOptions
             BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
           OnClick = BrowseClick
         end
-        object lstList: TListBox
+        object lstDirList: TListBox
           Left = 4
           Top = 26
           Width = 485
@@ -755,7 +759,7 @@ object frmProjectOptions: TfrmProjectOptions
           TabOrder = 0
           OnClick = ListClick
         end
-        object btnDelInval: TButton
+        object btnDirDelInval: TButton
           Tag = 4
           Left = 384
           Top = 281
@@ -765,7 +769,7 @@ object frmProjectOptions: TfrmProjectOptions
           TabOrder = 1
           OnClick = ButtonClick
         end
-        object edEntry: TEdit
+        object edDirEntry: TEdit
           Left = 4
           Top = 250
           Width = 485
@@ -773,7 +777,7 @@ object frmProjectOptions: TfrmProjectOptions
           TabOrder = 2
           OnChange = EditChange
         end
-        object btnReplace: TButton
+        object btnDirReplace: TButton
           Tag = 1
           Left = 54
           Top = 281
@@ -784,7 +788,7 @@ object frmProjectOptions: TfrmProjectOptions
           TabOrder = 3
           OnClick = ButtonClick
         end
-        object btnDelete: TButton
+        object btnDirDelete: TButton
           Tag = 3
           Left = 274
           Top = 281
@@ -795,7 +799,7 @@ object frmProjectOptions: TfrmProjectOptions
           TabOrder = 4
           OnClick = ButtonClick
         end
-        object btnAdd: TButton
+        object btnDirAdd: TButton
           Tag = 2
           Left = 164
           Top = 281
@@ -958,13 +962,13 @@ object frmProjectOptions: TfrmProjectOptions
         TabOrder = 1
         OnClick = chkOverrideOutputClick
       end
-      object CheckBox1: TCheckBox
+      object chkLogOutput: TCheckBox
         Left = 8
         Top = 196
         Width = 17
         Height = 17
         TabOrder = 2
-        OnClick = CheckBox1Click
+        OnClick = chkLogOutputClick
       end
       object edExeOutput: TEdit
         Left = 32
@@ -1264,15 +1268,15 @@ object frmProjectOptions: TfrmProjectOptions
         TabOrder = 6
         OnChange = edMakeIncludeChange
       end
-      object MakeIncludes: TListBox
+      object lbMakeIncludes: TListBox
         Left = 4
         Top = 140
         Width = 485
         Height = 113
         ItemHeight = 15
         TabOrder = 7
-        OnClick = MakeIncludesClick
-        OnDrawItem = MakeIncludesDrawItem
+        OnClick = lbMakeIncludesClick
+        OnDrawItem = lbMakeIncludesDrawItem
       end
     end
     object tabVersion: TTabSheet
@@ -1392,6 +1396,7 @@ object frmProjectOptions: TfrmProjectOptions
           Height = 23
           Style = csDropDownList
           ItemHeight = 0
+          Sorted = True
           TabOrder = 4
         end
         object chkAutoIncBuild: TCheckBox

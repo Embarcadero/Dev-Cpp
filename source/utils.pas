@@ -537,49 +537,38 @@ var
  tmp: TStrings;
  idx: integer;
 begin
-  fName:= ExtractFileName(FileName);
-  if FileExists(FileName) then
-   result:= FileName
-  else
-   if FileExists(WorkPath +fName) then
-    result:= WorkPath +fName
-  else
-   if FileExists(WorkPath +FileName) then
-    result:= FileName
-   else
-    if CheckDirs then
-     begin
-       if (devDirs.Default <> '') and (FileExists(devDirs.Default +fName)) then
-        result:= devDirs.Default +fName
-       else
-       if (devDirs.Exec <> '') and (FileExists(devDirs.Exec +fName)) then
-        result:= devDirs.Exec +fName
-       else
-       if (devDirs.Help <> '') and (FileExists(devDirs.Help +fName)) then
-        result:= devDirs.Help +fName
-       else
-       if (devDirs.Lang <> '') and (FileExists(devDirs.Lang +fName)) then
-        result:= devDirs.Lang +fName
-       else
-       if (devDirs.Icons <> '') then
-        begin
-          tmp:= TStringList.Create;
-          try
-           StrtoList(devDirs.Icons, tmp);
-           if tmp.Count> 0 then
-            for idx:= 0 to pred(tmp.Count) do
-             if FileExists(IncludeTrailingPathDelimiter(tmp[idx]) +fName) then
-              begin
-                result:= IncludeTrailingPathDelimiter(tmp[idx]) +fName;
-                break;
-              end;
-          finally
-           tmp.Free;
-          end;
-        end;
-     end
-    else
-     result:= '';
+	fName:= ExtractFileName(FileName);
+	if FileExists(FileName) then
+		result:= FileName
+	else if FileExists(WorkPath + fName) then
+		result:= WorkPath + fName
+	else if FileExists(WorkPath + FileName) then
+		result:= FileName
+	else if CheckDirs then begin
+		if (devDirs.Default <> '') and FileExists(devDirs.Default + fName) then
+			result:= devDirs.Default + fName
+		else if (devDirs.Exec <> '') and FileExists(devDirs.Exec + fName) then
+			result:= devDirs.Exec + fName
+		else if (devDirs.Help <> '') and FileExists(devDirs.Help + fName) then
+			result:= devDirs.Help + fName
+		else if (devDirs.Lang <> '') and FileExists(devDirs.Lang + fName) then
+			result:= devDirs.Lang +fName
+		else if (devDirs.Icons <> '') then begin
+			tmp:= TStringList.Create;
+			try
+				StrtoList(devDirs.Icons, tmp);
+				if tmp.Count> 0 then
+				for idx:= 0 to pred(tmp.Count) do
+					if FileExists(IncludeTrailingPathDelimiter(tmp[idx]) +fName) then begin
+						result:= IncludeTrailingPathDelimiter(tmp[idx]) +fName;
+						break;
+					end;
+			finally
+				tmp.Free;
+			end;
+		end;
+	end else
+		result:= '';
 end;
 
 procedure LoadFilefromResource(const FileName: AnsiString; ms: TMemoryStream);
@@ -742,18 +731,19 @@ begin
 end;
 
 function CommaStrToStr(s : AnsiString; formatstr : AnsiString) : AnsiString;
-var i : integer;
-    tmp : AnsiString;
+var
+	i : integer;
+	tmp : AnsiString;
 begin
-  result := '';
-  while pos(';', s) > 0 do begin
-    i := pos(';', s);
-    tmp := Copy(s, 1, i - 1);
-    Delete(s, 1, i);
-    result := format(formatstr, [result, tmp]);
-  end;
-  if s <> '' then
-    result := format(formatstr, [result, s]);
+	result := '';
+	while pos(';', s) > 0 do begin
+		i := pos(';', s);
+		tmp := Copy(s, 1, i - 1);
+		Delete(s, 1, i);
+		result := format(formatstr, [result, tmp]);
+	end;
+	if s <> '' then
+		result := format(formatstr, [result, s]);
 end;
 
 procedure StrtoList(s: AnsiString; List: TStrings; delimiter : char);

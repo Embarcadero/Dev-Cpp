@@ -1,6 +1,6 @@
 object EnviroForm: TEnviroForm
-  Left = 1045
-  Top = 298
+  Left = 528
+  Top = 317
   BorderStyle = bsDialog
   Caption = 'Environment Options'
   ClientHeight = 462
@@ -206,9 +206,9 @@ object EnviroForm: TEnviroForm
       end
       object gbDebugger: TGroupBox
         Left = 15
-        Top = 223
+        Top = 240
         Width = 215
-        Height = 70
+        Height = 53
         Caption = '  Debug Variable Browser  '
         TabOrder = 7
         object cbWatchHint: TCheckBox
@@ -218,14 +218,6 @@ object EnviroForm: TEnviroForm
           Height = 17
           Caption = 'Watch variable under mouse'
           TabOrder = 0
-        end
-        object cbWatchError: TCheckBox
-          Left = 14
-          Top = 43
-          Width = 170
-          Height = 17
-          Caption = 'Report watch errors'
-          TabOrder = 1
         end
       end
       object cbNoSplashScreen: TCheckBox

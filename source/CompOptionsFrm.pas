@@ -171,14 +171,18 @@ begin
 	devCompiler.Delay := seCompDelay.Value;
 	devCompiler.FastDep := cbFastDep.Checked;
 
+	// directories are saved by the UI components
+
+	// compiler/linker flags are applied by the UI components
+
+	// program names are applied by the UI components
+
 	// write compiler list
 	devCompiler.Sets.Assign(cmbCompilerSetComp.Items);
 	devCompiler.SaveSettings;
 
 	// rewrite current compiler options
 	devCompiler.SaveSet(CurrentSet);
-
-	// do not save option of the Settings tab, they're saving when they change
 
 	// Set Path with New Bins
 	SetPath(fBins);

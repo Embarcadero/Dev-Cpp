@@ -389,10 +389,10 @@ begin
 	Y := (fText.LineHeight - dmMain.GutterImages.Height) div 2 + fText.LineHeight * (FirstLine - fText.TopLine);
 
 	for I := FirstLine to LastLine do begin
-		if HasBreakpoint(I) <> -1 then
-			ImgIndex := 0
-		else if fActiveLine = I then
+		if fActiveLine = I then // prefer active line over breakpoints
 			ImgIndex := 1
+		else if HasBreakpoint(I) <> -1 then
+			ImgIndex := 0
 		else if fErrorLine = I then
 			ImgIndex := 2
 		else
@@ -695,6 +695,9 @@ begin
 	fText.CaretXY := BufferCoord(Col, Line);
 	fText.EnsureCursorPosVisible;
 
+	// EnsureCursorPosVisible doesn't invalidate gutters
+	fText.InvalidateGutterLine(Line);
+
 	// Fool EditorStatusChange
 	fErrorLine := Line;
 end;
@@ -704,10 +707,16 @@ begin
 	fText.CaretXY := BufferCoord(1, Line);
 	fText.EnsureCursorPosVisible;
 
-	if fActiveLine <> -1 then
+	// Invalidate old active line
+	if fActiveLine <> -1 then begin
 		fText.InvalidateGutterLine(fActiveLine);
+		fText.InvalidateLine(fActiveLine);
+	end;
 	fActiveLine := Line;
+
+	// Invalidate new active line
 	fText.InvalidateGutterLine(fActiveLine);
+	fText.InvalidateLine(fActiveLine);
 end;
 
 procedure TEditor.RemoveBreakpointFocus;
@@ -1235,7 +1244,9 @@ begin
 							fText.Hint := localfind;
 					end else if Assigned(st) then begin
 						fText.Hint := st^._FullText + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
-					end;
+					end else
+						// couldn't find anything? disable hint
+						fText.Hint := '';
 				end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
 					MainForm.AddWatchVariable(s);
 					//fText.Hint := MainForm.fDebugger.WatchVar + ' = ' + MainForm.fDebugger.WatchValue;

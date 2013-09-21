@@ -53,7 +53,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure TabsMainChange(Sender: TObject);
     procedure ProjViewDblClick(Sender: TObject);
-    procedure btnCancelClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
    private
     procedure AddTemplate(FileName: AnsiString);
@@ -84,7 +83,7 @@ begin
 	fTemplates:= TList.Create;
 	LoadText;
 	ReadTemplateIndex;
-	edProjectName.Text:= format(Lang[ID_NEWPROJECT], [dmMain.GetNumber]);
+	edProjectName.Text:= format(Lang[ID_NEWPROJECT], [dmMain.GetNewFileNumber]);
 end;
 
 procedure TNewProjectForm.FormDestroy(Sender: TObject);
@@ -256,11 +255,6 @@ end;
 procedure TNewProjectForm.ProjViewDblClick(Sender: TObject);
 begin
   ModalResult:= mrOk;
-end;
-
-procedure TNewProjectForm.btnCancelClick(Sender: TObject);
-begin
-  Dec(dmMain.fProjectCount);
 end;
 
 procedure TNewProjectForm.btnHelpClick(Sender: TObject);

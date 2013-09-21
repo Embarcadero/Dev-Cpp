@@ -6,11 +6,6 @@
 #include <conio.h>
 #include <winnt.h>
 
-inline void pause() {
-	printf("Press any key to continue . . . ");
-	_getch();
-}
-
 int main(int argc, char** argv) {
 
 	// First make sure we aren't going to read nonexistent arrays
@@ -21,7 +16,7 @@ int main(int argc, char** argv) {
 
 	// Then build the to-run application command
 	char cmd[MAX_PATH] = "";
-	for (int i = 1;i < argc;i++) {
+	for(int i = 1;i < argc;i++) {
 		strcat(cmd,&argv[i][0]);
 		if(i != (argc-1)) { // Leave out the last space
 			strcat(cmd," ");
@@ -41,14 +36,14 @@ int main(int argc, char** argv) {
 	
 	WaitForSingleObject(pi.hProcess, INFINITE); // Wait for it to finish
 	
-	DWORD retval;
+	//SetCursor(LoadCursor(GetModuleHandle(0),IDC_ARROW));
+
+	DWORD retval = 0;
 	GetExitCodeProcess(pi.hProcess, &retval);
-	if(retval == 0) {
-		printf("\n\nProcess exited normally.\n");
-	} else {
-		printf("\n\nProcess exited with return value %lu\n",retval);
-	}
-	
-	pause();
+	printf("\n--------------------------------");
+	printf("\nProcess exited with return value %lu",retval);
+	printf("\nPress any key to continue . . . ");
+	_getch();
+
 	return 0;
 }

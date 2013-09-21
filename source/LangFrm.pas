@@ -83,7 +83,7 @@ type
     procedure CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
 
   public
-    procedure UpdateList(const List: TStrings);
+    procedure UpdateList(List: TStrings);
     property Selected: integer read GetSelected;
   end;
 
@@ -94,16 +94,18 @@ uses
 
 {$R *.dfm}
 
-procedure TLangForm.UpdateList;
+procedure TLangForm.UpdateList(List: TStrings);
 var
 	I, sel: integer;
 begin
+	ListBox.Items.BeginUpdate;
 	ListBox.Clear;
 	for I := 0 to List.Count - 1 do begin
-		sel := ListBox.Items.Add(List.Values[List.Names[I]]);
-		if Pos('english', LowerCase(ListBox.Items[sel])) > 0 then
+		sel := ListBox.Items.Add(List.ValueFromIndex[I]);
+		if StartsText('english', ListBox.Items[sel]) then
 			ListBox.Selected[sel] := True;
 	end;
+	Listbox.Items.EndUpdate;
 end;
 
 function TLangForm.GetSelected: integer;
@@ -163,7 +165,6 @@ begin
 			BuildPanel.Visible := False;
 			ProgressPanel.Visible := True;
 			OkBtn.Caption := 'Please wait...';
-			MainForm.CacheCreated := true;
 			devCodeCompletion.Enabled := true;
 			devCodeCompletion.UseCacheFiles := true;
 			devClassBrowsing.Enabled := true;

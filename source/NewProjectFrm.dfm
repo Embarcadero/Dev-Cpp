@@ -81,7 +81,6 @@ object NewProjectForm: TNewProjectForm
     Anchors = [akRight, akBottom]
     Caption = '&Cancel'
     TabOrder = 1
-    OnClick = btnCancelClick
     Kind = bkCancel
   end
   object TabsMain: TTabControl

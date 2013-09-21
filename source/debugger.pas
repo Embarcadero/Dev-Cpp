@@ -52,18 +52,8 @@ type
 
     // CPU form variables
     Registers : TList;
-    RegistersReady : boolean;
-
     Disassembly : TStringList;
-    DisassemblyReady : boolean;
-
     Backtrace : TList;
-    BacktraceReady : boolean;
-
-    // GDB stepping information
-    CurrentLine : integer;
-    CurrentFile : AnsiString;
-    CurrentFunc : AnsiString;
 
     constructor Create;
     destructor  Destroy; override;
@@ -79,6 +69,7 @@ type
 
     // breakpoints
     procedure AddBreakPoint(i : integer);
+    procedure RemoveBreakPoint(i : integer);
     procedure RemoveBreakpoints;
 
     // watch var
@@ -107,21 +98,18 @@ procedure TDebugger.SetRegisters(Listin : TList);
 begin
 	Registers := Listin;
 	Reader.Registers := Listin;
-	RegistersReady := false;
 end;
 
 procedure TDebugger.SetDisassembly(StringListin : TStringList);
 begin
 	Disassembly := StringListin;
 	Reader.Disassembly := StringListin;
-	DisassemblyReady := false;
 end;
 
 procedure TDebugger.SetBacktrace(Listin : TList);
 begin
 	Backtrace := Listin;
 	Reader.Backtrace := Listin;
-	BacktraceReady := false;
 end;
 
 procedure TDebugger.Start;
@@ -241,6 +229,15 @@ begin
 	// "filename":linenum
 	arguments := '"' + PBreakPoint(BreakPointList.Items[i])^.editor.FileName + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line);
 	SendCommand('break',arguments);
+end;
+
+procedure TDebugger.RemoveBreakpoint(i : integer);
+var
+	arguments : AnsiString;
+begin
+	// "filename":linenum
+	arguments := '"' + PBreakPoint(BreakPointList.Items[i])^.editor.FileName + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line);
+	SendCommand('clear',arguments);
 end;
 
 procedure TDebugger.RemoveBreakpoints;

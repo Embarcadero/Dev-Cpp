@@ -5269,10 +5269,10 @@ begin
 		for i := fAllFoldRanges.Count - 1 downto 0 do
 			with fAllFoldRanges[i] do
 				if Collapsed and not ParentCollapsed then
-					if(FromLine >= aIndex) and (FromLine < aIndex + aCount) then
+					if(FromLine >= aIndex + 1) and (FromLine < aIndex + 1 + aCount) then
 						fAllFoldRanges.Delete(i);
 
-		MoveCollapsedRangesFromBy(aIndex, -aCount);
+		MoveCollapsedRangesFromBy(aIndex + 1, -aCount);
 	end;
 	// ### End Code Folding
 
@@ -5294,7 +5294,7 @@ var
 begin
 	// ### Code Folding
 	if not fEditingFolds then
-		MoveCollapsedRangesFromBy(Index, aCount);
+		MoveCollapsedRangesFromBy(Index+1, aCount);
 	// ### End Code Folding
 
   if Assigned(fHighlighter) and (Lines.Count > 0) then

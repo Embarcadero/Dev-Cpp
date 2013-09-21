@@ -125,10 +125,10 @@ begin
    end
   else
    begin
-     frmFind.FindAll:= not fSingleFile;
+     frmFind.FindInFiles:= not fSingleFile;
      frmFind.cboFindText.Text:= fFindText;
      return:= frmFind.ShowModal;
-     fSingleFile:=not frmFind.FindAll;
+     fSingleFile:=not frmFind.FindInFiles;
      if (return = mrOk) then
       begin
         fFindText:= frmFind.cboFindText.Text;
@@ -139,7 +139,7 @@ begin
   if not (return in [mrOk, mrAll]) then
    result:= FALSE
   else
-   if fReplace or (not frmFind.FindAll) then
+   if fReplace or (not frmFind.FindInFiles) then
     result:= RunSingleFile
    else
     result:= RunAllFiles;
