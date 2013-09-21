@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 525
-  Top = 251
+  Left = 676
+  Top = 339
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -2712,7 +2712,7 @@ object MainForm: TMainForm
     end
     object actCloseAllButThis: TAction
       Category = 'File'
-      Caption = 'Close all except this'
+      Caption = 'Close All Except This'
       OnExecute = actCloseAllButThisExecute
     end
     object actFileProperties: TAction
@@ -2885,12 +2885,12 @@ object MainForm: TMainForm
     end
     object actGotoDeclEditor: TAction
       Category = 'ClassBrowser'
-      Caption = 'actGotoDeclEditor'
+      Caption = 'Goto Declaration'
       OnExecute = actGotoImplDeclEditorExecute
     end
     object actGotoImplEditor: TAction
       Category = 'ClassBrowser'
-      Caption = 'actGotoImplEditor'
+      Caption = 'Goto Implementation'
       OnExecute = actGotoImplDeclEditorExecute
     end
     object actHideFSBar: TAction

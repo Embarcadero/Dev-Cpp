@@ -1,6 +1,6 @@
 object ProfileAnalysisForm: TProfileAnalysisForm
-  Left = 490
-  Top = 298
+  Left = 992
+  Top = 474
   Width = 649
   Height = 531
   Caption = 'Profile analysis'
@@ -14,6 +14,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnClose = FormClose
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -26,7 +27,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
     BevelOuter = bvNone
     Caption = 'Parsing profiling results - Please wait...'
     TabOrder = 0
-    object PageControl1: TPageControl
+    object ProfilePageControl: TPageControl
       Left = 0
       Top = 0
       Width = 633
@@ -40,7 +41,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      OnChange = PageControl1Change
+      OnChange = ProfilePageControlChange
       object tabFlat: TTabSheet
         Caption = 'Flat output'
         object Splitter2: TSplitter
@@ -108,9 +109,14 @@ object ProfileAnalysisForm: TProfileAnalysisForm
               Caption = 'Total ts/call'
               Width = 75
             end>
+          GridLines = True
           ReadOnly = True
+          RowSelect = True
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 1
           ViewStyle = vsReport
+          OnAdvancedCustomDraw = lvFlatAdvancedCustomDraw
           OnClick = lvFlatClick
           OnCustomDrawItem = lvFlatCustomDrawItem
           OnMouseMove = lvFlatMouseMove
@@ -179,9 +185,14 @@ object ProfileAnalysisForm: TProfileAnalysisForm
               Caption = 'Called'
               Width = 75
             end>
+          GridLines = True
           ReadOnly = True
+          RowSelect = True
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 1
           ViewStyle = vsReport
+          OnAdvancedCustomDraw = lvGraphAdvancedCustomDraw
           OnClick = lvFlatClick
           OnCustomDrawItem = lvGraphCustomDrawItem
           OnMouseMove = lvFlatMouseMove

@@ -224,15 +224,8 @@ begin
 			ObjResFile := GenMakePath1(ChangeFileExt(fProject.Options.PrivateResource, RES_EXT));
 	end;
 
-	if (devCompiler.gppName <> '') then
-		Comp_ProgCpp := devCompiler.gppName
-	else
-		Comp_ProgCpp:= GPP_PROGRAM;
-
-	if (devCompiler.gccName <> '') then
-		Comp_Prog := devCompiler.gccName
-	else
-		Comp_Prog:= GCC_PROGRAM;
+	Comp_Prog:= devCompiler.gccName;
+	Comp_ProgCpp := devCompiler.gppName;
 
 	GetCompileParams;
 	GetLibrariesParams;
@@ -267,10 +260,7 @@ begin
 	end;
 	writeln(F, 'CPP      = ' + Comp_ProgCpp);
 	writeln(F, 'CC       = ' + Comp_Prog);
-	if (devCompiler.windresName <> '') then
-		writeln(F, 'WINDRES  = ' + devCompiler.windresName)
-	else
-		writeln(F, 'WINDRES  = ' + WINDRES_PROGRAM);
+	writeln(F, 'WINDRES  = ' + devCompiler.windresName);
 	if(ObjResFile <> '') then
 		writeln(F, 'RES      = ' + ObjResFile);
 	writeln(F, 'OBJ      =' + Objects     + ' $(RES)');
@@ -318,10 +308,7 @@ begin
 	else
 			Includes := fIncludesParams + fCompileParams;
 
-	if (devCompiler.gppName <> '') then
-		GppStr := devCompiler.gppName
-	else
-		GppStr := GPP_PROGRAM;
+	GppStr := devCompiler.gppName;
 
 	Includes:=StringReplace(Includes, '\', '/', [rfReplaceAll]);
 	Cmd := GppStr + ' -MM ' + Includes +' '+ GenMakePath2(ExtractRelativePath(Makefile, TheFile));
@@ -495,10 +482,7 @@ var
 begin
 	if not NewMakeFile(F) then
 		exit;
-	if (devCompiler.dllwrapName <> '') then
-		writeln(F, 'DLLWRAP=' + devCompiler.dllwrapName)
-	else
-		writeln(F, 'DLLWRAP=' + DLLWRAP_PROGRAM);
+	writeln(F, 'DLLWRAP=' + devCompiler.dllwrapName);
 
 	pfile:= ExtractFilePath(Project.Executable);
 	tfile:= pfile+'lib' + ExtractFileName(Project.Executable);
@@ -506,6 +490,7 @@ begin
 		tfile:= ExtractFileName(tFile)
 	else
 		tfile:= ExtractRelativePath(Makefile, tfile);
+
 	writeln(F, 'DEFFILE=' + GenMakePath1(ChangeFileExt(tfile, '.def')));
 	writeln(F, 'STATICLIB=' + GenMakePath1(ChangeFileExt(tfile, LIB_EXT)));
 	writeln(F);
@@ -627,15 +612,9 @@ begin
 				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
 			end else
 				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(SingleFile, OBJ_EXT)));
-			if (devCompiler.makeName <> '') then
-				cmdline:= format(cSingleFileMakeLine, [devCompiler.makeName, fMakeFile, ofile])
-			else
-				cmdline:= format(cSingleFileMakeLine, [MAKE_PROGRAM, fMakeFile, ofile]);
+			cmdline:= format(cSingleFileMakeLine, [devCompiler.makeName, fMakeFile, ofile])
 		end else begin
-			if (devCompiler.makeName <> '') then
-				cmdline:= format(cMakeLine, [devCompiler.makeName, fMakeFile])
-			else
-				cmdline:= format(cMakeLine, [MAKE_PROGRAM, fMakeFile]);
+			cmdline:= format(cMakeLine, [devCompiler.makeName, fMakeFile])
 		end;
 
 		DoLogEntry(format(Lang[ID_EXECUTING], [cMake + cDots]));
@@ -646,19 +625,13 @@ begin
 			Sleep(devCompiler.Delay);
 		LaunchThread(cmdline, ExtractFilePath(Project.FileName));
 	end else if (GetFileTyp(fSourceFile) = utResSrc) then begin
-		if (devCompiler.windresName <> '') then
-			s := devCompiler.windresName
-		else
-			s := WINDRES_PROGRAM;
+		s := devCompiler.windresName;
 		cmdline := s + ' --input-format=rc -i ' + fSourceFile + ' -o ' + ChangeFileExt(fSourceFile, OBJ_EXT);
 		DoLogEntry(format(Lang[ID_EXECUTING], [' ' + s +cDots]));
 		DoLogEntry(cmdline);
 	end else begin
 		if (GetFileTyp(fSourceFile) = utcppSrc) then begin
-			if (devCompiler.gppName <> '') then
-				s := devCompiler.gppName
-			else
-				s := GPP_PROGRAM;
+			s := devCompiler.gppName;
 			if DoCheckSyntax then
 				cmdline:= format(cCmdLine,[s, fSourceFile, 'nul', fCppCompileParams,fCppIncludesParams, fLibrariesParams])
 			else
@@ -666,10 +639,7 @@ begin
 			DoLogEntry(format(Lang[ID_EXECUTING], [' ' +s +cDots]));
 			DoLogEntry(cmdline);
 		end else begin
-			if (devCompiler.gccName <> '') then
-				s := devCompiler.gccName
-			else
-				s := GCC_PROGRAM;
+			s := devCompiler.gccName;
 			if DoCheckSyntax then
 				cmdline:= format(cCmdLine,[s, fSourceFile, 'nul', fCompileParams, fIncludesParams, fLibrariesParams])
 			else
@@ -753,7 +723,7 @@ const
 	cCleanLine = '%s clean -f "%s"';
 	cmsg = ' make clean';
 var
-	cmdLine,s : AnsiString;
+	cmdLine : AnsiString;
 begin
 	fSingleFile:=True; // fool clean; don't run deps checking since all we do is cleaning
 	
@@ -764,20 +734,17 @@ begin
 		InitProgressForm('Cleaning...');
 		BuildMakeFile;
 		if not FileExists(fMakefile) then begin
-			SwitchToOriginalCompilerSet;
 			DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
 			DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
 			MessageBox(Application.MainForm.Handle,PAnsiChar(Lang[ID_ERR_NOMAKEFILE]),PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONHAND);
 			Result := False;
+
+			SwitchToOriginalCompilerSet;
 			Exit;
 		end;
 
 		DoLogEntry(Format(Lang[ID_EXECUTING], [cmsg]));
-		if (devCompiler.makeName <> '') then
-			s := devCompiler.makeName
-		else
-			s := MAKE_PROGRAM;
-		cmdLine:= Format(cCleanLine, [s, fMakeFile]);
+		cmdLine:= Format(cCleanLine, [devCompiler.makeName, fMakeFile]);
 		LaunchThread(cmdLine, fProject.Directory);
 	end else
 		Result := False;
@@ -788,7 +755,7 @@ const
 	cCleanLine = '%s -f "%s" clean all';
 	cmsg = ' make clean';
 var
-	cmdLine,s : AnsiString;
+	cmdLine : AnsiString;
 begin
 	fSingleFile := True; // fool rebuild; don't run deps checking since all files will be rebuilt
 	Result := True;
@@ -796,26 +763,24 @@ begin
 	if Assigned(Project) then begin
 
 		SwitchToProjectCompilerSet;
+
 		InitProgressForm('Rebuilding...');
 
 		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
 		BuildMakeFile;
 		if not FileExists(fMakefile) then begin
-			SwitchToOriginalCompilerSet;
+
 			DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
 			DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
 			MessageBox(Application.Handle,PAnsiChar(Lang[ID_ERR_NOMAKEFILE]),PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
 			Result := False;
+
+			SwitchToOriginalCompilerSet;
 			Exit;
 		end;
 
 		DoLogEntry(Format(Lang[ID_EXECUTING], [cmsg]));
-
-		if (devCompiler.makeName <> '') then
-			s := devCompiler.makeName
-		else
-			s := MAKE_PROGRAM;
-		cmdLine:= Format(cCleanLine, [s, fMakeFile]);
+		cmdLine:= Format(cCleanLine, [devCompiler.makeName, fMakeFile]);
 		LaunchThread(cmdLine, fProject.Directory);
 	end else
 		Compile;

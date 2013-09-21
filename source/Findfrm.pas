@@ -70,6 +70,7 @@ type
     procedure FindCutClick(Sender: TObject);
     procedure FindCopyClick(Sender: TObject);
     procedure FindPasteClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     fSearchOptions : TSynSearchOptions;
     fCurFile : AnsiString;
@@ -276,10 +277,7 @@ begin
 	devData.WhereOpenFiles := rbOpenFiles.Checked;
 	devData.OriginEntireScope := rbEntireScope.Checked;
 
-	fSearchEngine.Free;
-	fTempSynEdit.Free;
-	Action := caFree;
-	frmFind := nil;
+	Action := caHide;
 end;
 
 procedure TfrmFind.btnCancelClick(Sender: TObject);
@@ -438,6 +436,12 @@ begin
 		cboFindText.SelText := Clipboard.AsText
 	else if cboReplaceText.Focused then
 		cboReplaceText.SelText := Clipboard.AsText;
+end;
+
+procedure TfrmFind.FormDestroy(Sender: TObject);
+begin
+	fSearchEngine.Free;
+	fTempSynEdit.Free;
 end;
 
 end.

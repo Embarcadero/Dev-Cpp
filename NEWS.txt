@@ -1,3 +1,13 @@
+Version 5.3.0.1 - 2 Oktober 2012
+
+- Searching is now done forward instead of backward by default
+- Search history is remembered while Dev-C++ is opened instead of while the find window is opened
+- Fixed a bug in CPU window that causes Dev-C++ to consume an infinite amount of memory
+- Dev-C++ now checks if there are any compilers installed before attempting to use them, avoiding crashes.
+- One can now view project information like total lines in the File Properties window.
+- Rewritten the code that reads profiling output, drastically reducing flicker.
+- One can now use copy in the file properties form.
+
 Version 5.3.0.0 - 30 September 2012
 
 - Completely rewritten the debugger interface.
@@ -44,7 +54,7 @@ Version 5.2.0.2 - 31 Mei 2012
 - Added a default compiler profile to TDM-GCC downloads to create 32-bit executables.
 - Ctrl+Click code browsing is more accurate now.
 - Added a function to projects which can change the C++/C default choice made when creating the project.
-- Fixed the comment/uncomment function not properly uncommenting single lines(?)
+- Fixed the comment/uncomment function not properly uncommenting single lines.
 - Watched variable deleting now does not delete wrong variables anymore.
 - Added TeX formatted code exporting.
 - Updated the Chinese (TC) translations (by cin.getline).

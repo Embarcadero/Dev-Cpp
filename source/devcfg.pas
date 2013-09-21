@@ -79,6 +79,15 @@ type
 
 		fDelay : integer;
 		fFastDep : boolean;
+
+		function GetGCC : AnsiString;
+		function GetGPP : AnsiString;
+		function GetMake : AnsiString;
+		function GetGDB : AnsiString;
+		function GetWindres : AnsiString;
+		function GetDllWrap : AnsiString;
+		function GetGPROF : AnsiString;
+
 	public
 
 		fOptionString : AnsiString; // options in INI format
@@ -114,13 +123,13 @@ type
 		property Delay: integer read fDelay write fDelay;
 		property FastDep: boolean read fFastDep write fFastDep;
 
-		property gccName: AnsiString read fgccName write fgccName;
-		property gppName: AnsiString read fgppName write fgppName;
-		property makeName: AnsiString read fmakeName write fmakeName;
-		property gdbName: AnsiString read fgdbName write fgdbName;
-		property windresName: AnsiString read fwindresName write fwindresName;
-		property dllwrapName: AnsiString read fdllwrapName write fdllwrapName;
-		property gprofName: AnsiString read fgprofName write fgprofName;
+		property gccName: AnsiString read GetGCC write fgccName;
+		property gppName: AnsiString read GetGPP write fgppName;
+		property makeName: AnsiString read GetMake write fmakeName;
+		property gdbName: AnsiString read GetGDB write fgdbName;
+		property windresName: AnsiString read GetWindres write fwindresName;
+		property dllwrapName: AnsiString read GetDllWrap write fdllwrapName;
+		property gprofName: AnsiString read GetGPROF write fgprofName;
 
 		property BinDir: AnsiString read fBinDir write fBinDir;
 		property CDir: AnsiString read fCDir write fCDir;
@@ -613,7 +622,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  MultiLangSupport, SysUtils, StrUtils, Forms, Controls, version, utils, SynEditMiscClasses,
+  MultiLangSupport, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
   FileAssocs;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -709,7 +718,7 @@ begin
 		devCompiler.WriteSets;
 	end;
 
-	// Load the current compiler set
+	// Load the current compiler set, if there is any
 	devCompiler.LoadSet(devCompiler.fCurrentSet);
 
 	if not assigned(devEditor) then
@@ -926,7 +935,7 @@ begin
 	fScopeIsSelected := false;
 	fOriginEntireScope := false;
 	fWhereOpenFiles := false;
-	fDirBackward := true;
+	fDirBackward := false;
 end;
 
 { TdevCompiler }
@@ -987,7 +996,7 @@ end;
 
 procedure TdevCompiler.LoadSet(Index: integer);
 var
-	key,msg : AnsiString;
+	key{, msg} : AnsiString;
 begin
 	// Load the current index from disk
 	key := 'CompilerSets_' + IntToStr(Index);
@@ -1041,7 +1050,7 @@ begin
 	devCompiler.CurrentIndex := Index;
 
 	// Then do some basic sanity checking
-	msg := '';
+	{msg := '';
 	if not FileExists(fBinDir + pd + fgccname) then begin
 		msg := msg + 'Cannot find the C compiler of compiler set ' + devCompiler.fSets[Index] + ':' + #13#10;
 		msg := msg + fBinDir + pd + fgccname;
@@ -1057,7 +1066,7 @@ begin
 		msg := msg + fBinDir + pd + fmakeName;
 		msg := msg + #13#10 + #13#10;
 	end;
-	{if msg <> '' then begin
+	if msg <> '' then begin
 		msg := msg + 'Would you like Dev-C++ to insert defaults?' + #13#10;
 		msg := msg + #13#10;
 		msg := msg + 'Unless you know exactly what you''re doing, it is recommended that you click Yes';
@@ -1215,6 +1224,55 @@ begin
 	finally
 		Ini.Free;
 	end;
+end;
+
+function TdevCompiler.GetGCC : AnsiString;
+begin
+	result := fgccName;
+	if SameStr(result,'') then
+		result := GCC_PROGRAM;
+end;
+
+function TdevCompiler.GetGPP : AnsiString;
+begin
+	result := fgppName;
+	if SameStr(result,'') then
+		result := GPP_PROGRAM;
+end;
+
+function TdevCompiler.GetMake : AnsiString;
+begin
+	result := fmakeName;
+	if SameStr(result,'') then
+		result := MAKE_PROGRAM;
+end;
+
+function TdevCompiler.GetGDB : AnsiString;
+begin
+	result := fgdbname;
+	if SameStr(result,'') then
+		result := GDB_PROGRAM;
+end;
+
+function TdevCompiler.GetWindres : AnsiString;
+begin
+	result := fwindresname;
+	if SameStr(result,'') then
+		result := WINDRES_PROGRAM;
+end;
+
+function TdevCompiler.GetDllWrap : AnsiString;
+begin
+	result := fdllwrapname;
+	if SameStr(result,'') then
+		result := DLLWRAP_PROGRAM;
+end;
+
+function TdevCompiler.GetGPROF : AnsiString;
+begin
+	result := fgprofname;
+	if SameStr(result,'') then
+		result := GPROF_PROGRAM;
 end;
 
 procedure TdevCompiler.AddDefaultOptions;

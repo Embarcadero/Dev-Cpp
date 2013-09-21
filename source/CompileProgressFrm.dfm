@@ -90,12 +90,6 @@ object CompileProgressForm: TCompileProgressForm
     Height = 15
     Anchors = []
     Caption = 'lblStatus'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object infoFile: TLabel
     Left = 8

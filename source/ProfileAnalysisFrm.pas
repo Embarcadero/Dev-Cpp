@@ -34,7 +34,7 @@ uses
 type
   TProfileAnalysisForm = class(TForm)
     MainPanel: TPanel;
-    PageControl1: TPageControl;
+    ProfilePageControl: TPageControl;
     tabFlat: TTabSheet;
     Splitter2: TSplitter;
     memFlat: TMemo;
@@ -60,23 +60,28 @@ type
     procedure lvFlatCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure lvFlatMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
     procedure lvFlatClick(Sender: TObject);
-    procedure PageControl1Change(Sender: TObject);
+    procedure ProfilePageControlChange(Sender: TObject);
     procedure btnApplyClick(Sender: TObject);
     procedure chkCustomClick(Sender: TObject);
     procedure commandUpdate(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure lvFlatAdvancedCustomDraw(Sender: TCustomListView;
+      const ARect: TRect; Stage: TCustomDrawStage;
+      var DefaultDraw: Boolean);
+    procedure lvGraphAdvancedCustomDraw(Sender: TCustomListView;
+      const ARect: TRect; Stage: TCustomDrawStage;
+      var DefaultDraw: Boolean);
   private
-    FlatLoaded : boolean;
-    GraphLoaded : boolean;
-    { Private declarations }
+    gprofname : AnsiString;
+    flatloaded : boolean;
+    graphloaded : boolean;
     procedure LoadText;
     procedure DoFlat;
     procedure DoGraph;
-  public
-    { Public declarations }
   end;
 
 var
-  ProfileAnalysisForm: TProfileAnalysisForm;
+  ProfileAnalysisForm: TProfileAnalysisForm = nil;
 
 implementation
 
@@ -96,8 +101,8 @@ procedure TProfileAnalysisForm.FormShow(Sender: TObject);
 begin
 	LoadText;
 
+	// Spawn DoFlat
 	DoFlat;
-	lvFlat.SetFocus;
 end;
 
 procedure TProfileAnalysisForm.FormClose(Sender: TObject;var Action: TCloseAction);
@@ -108,22 +113,17 @@ end;
 
 procedure TProfileAnalysisForm.DoFlat;
 var
-  Cmd: AnsiString;
-  Params: AnsiString;
-  Dir: AnsiString;
-  I,J: integer;
-  Line: AnsiString;
-  Parsing: boolean;
-  Done: boolean;
-  BreakLine: integer;
-  spacepos : integer;
+	Params : AnsiString;
+	Dir : AnsiString;
+	I,J : integer;
+	Line : AnsiString;
+	spacepos : integer;
+	buffer : TStringList;
+	addeditem : TListItem;
 begin
-	Cmd := '';
+
+	// Set up GPROF execution...
 	if not chkCustom.Checked then begin
-		if (devCompiler.gprofName <> '') then
-			Cmd := devCompiler.gprofName
-		else
-			Cmd := GPROF_PROGRAM;
 
 		Params := ' ' + GPROF_CMD_GENFLAT;
 
@@ -142,78 +142,81 @@ begin
 			Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
 		end;
 	end else begin
-		Params := editCustom.Text + ' -p';
+		Params := editCustom.Text + ' ' + GPROF_CMD_GENFLAT;
 		if Assigned(MainForm.fProject) then
 			Dir := ExtractFilePath(MainForm.fProject.Executable)
 		else
 			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
 	end;
 
-  memFlat.Lines.Text := RunAndGetOutput(Cmd + Params, Dir, nil, nil, nil, False);
-  memFlat.SelStart := 0;
+	// Run a flat output
+	buffer := TStringList.Create;
+	buffer.Text := RunAndGetOutput(gprofname + Params, Dir, nil, nil, nil, False);
 
-  BreakLine := -1;
-  I := 0;
-  Parsing := False;
-  Done := False;
-  while (I < memFlat.Lines.Count) and not Done do begin
-    Line := memFlat.Lines[I];
+	i := 0;
 
-    // parse
-    if Parsing then begin
-      if Trim(Line) = '' then begin
-        BreakLine := I;
-        Break;
-      end;
+	// Find and skip headers
+	while (i < buffer.Count) and not ContainsStr(buffer[i],'Ts/call') do
+		Inc(i);
 
-      with lvFlat.Items.Add do begin
-        Caption := Trim(Copy(Line, 55, Length(Line) - 54));
+	Inc(i);
 
-        // remove arguments - if exists
-        if Pos('(', Caption) > 0 then
-          Data := MainForm.CppParser.Locate(Copy(Caption, 1, Pos('(', Caption) - 1), True)
-        else
-          Data := MainForm.CppParser.Locate(Caption, True);
+	// Process regular output
+	lvFlat.Items.BeginUpdate;
+	while (i < buffer.Count) and not SameStr(buffer[i],'') do begin
 
-        // Once here, the function at the END is cut off
-        for J:=0 to 5 do begin
-        	Line := TrimLeft(Line);
-        	spacepos := Pos(' ',Line);
-        	SubItems.Add(Trim(Copy(Line, 1, spacepos)));
-        	System.Delete(Line,1,spacepos);
-        end;
-      end;
-    end else begin
-      Parsing := StartsText('%', Trim(Line));
-      if Parsing then
-        Inc(I); // skip over next line too
-    end;
-    Inc(I);
-  end;
-  for I := 0 to BreakLine do
-    TStringList(memFlat.Lines).Delete(0);
+		addeditem := lvFlat.Items.Add;
+		addeditem.Caption := Copy(buffer[i], 55, Length(buffer[i]) - 54); // function name
 
-	FlatLoaded := true;
+		// Store info of function in Data pointer
+		if Pos('(', addeditem.Caption) > 0 then
+			addeditem.Data := MainForm.CppParser.Locate(Copy(addeditem.Caption, 1, Pos('(', addeditem.Caption) - 1), True)
+		else
+			addeditem.Data := MainForm.CppParser.Locate(addeditem.Caption, True);
+
+		// Dive remaining part based on spaces
+		Line := TrimLeft(buffer[i]);
+		for J := 1 to 6 do begin
+
+			// Copy until next space
+			Line := TrimLeft(Line);
+			spacepos := Pos(' ',Line);
+			addeditem.SubItems.Add(Copy(Line, 1, spacepos));
+			Delete(Line,1,spacepos);
+		end;
+
+		Inc(i);
+	end;
+	lvFlat.Items.EndUpdate;
+
+	Inc(i);
+
+	// Print output help
+	memFlat.Lines.BeginUpdate;
+	while (i < buffer.Count) do begin
+		memFlat.Lines.Add(buffer[i]);
+		Inc(i);
+	end;
+	memFlat.Lines.EndUpdate;
+
+	buffer.Free;
+
+	flatloaded := true;
 end;
 
 procedure TProfileAnalysisForm.DoGraph;
 var
-  Cmd: AnsiString;
-  Params: AnsiString;
-  Dir: AnsiString;
-  I,J: integer;
-  Line: AnsiString;
-  Parsing: boolean;
-  Done: boolean;
-  BreakLine: integer;
-  spacepos : integer;
+	Params : AnsiString;
+	Dir : AnsiString;
+	I,J,startcol : integer;
+	Line : AnsiString;
+	spacepos : integer;
+	buffer : TStringList;
+	addeditem : TListItem;
 begin
-	Cmd := '';
+
+	// Set up GPROF execution...
 	if not chkCustom.Checked then begin
-		if (devCompiler.gprofName <> '') then
-			Cmd := devCompiler.gprofName
-		else
-			Cmd := GPROF_PROGRAM;
 
 		Params := ' ' + GPROF_CMD_GENMAP;
 
@@ -239,78 +242,99 @@ begin
 			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
 	end;
 
-  memGraph.Lines.Text := RunAndGetOutput(Cmd + Params, Dir, nil, nil, nil, False);
-  memGraph.SelStart := 0;
+	// Run a graph output
+	buffer := TStringList.Create;
+	buffer.Text := RunAndGetOutput(gprofname + Params, Dir, nil, nil, nil, False);
 
-  BreakLine := -1;
-  I := 0;
-  Parsing := False;
-  Done := False;
-  while (I < memGraph.Lines.Count) and not Done do begin
-    Line := memGraph.Lines[I];
+	i := 0;
 
-    // parse
-    if Parsing then begin
-      if Trim(Line) = '' then begin
-        BreakLine := I;
-        Break;
-      end;
+	// Find and skip headers
+	while (i < buffer.Count) and not ContainsStr(buffer[i],'% time') do
+		Inc(i);
 
-      if not StartsText('---', Line) then begin
-        with lvGraph.Items.Add do begin
-          Caption := Trim(Copy(Line, 46, Length(Line) - 45));
+	Inc(i);
 
-          // remove arguments - if exists
-          if Pos('(', Caption) > 0 then
-            Data := MainForm.CppParser.Locate(Copy(Caption, 1, Pos('(', Caption) - 1), True)
-          else
-            Data := MainForm.CppParser.Locate(Caption, True);
+	// Process regular output
+	lvGraph.Items.BeginUpdate;
+	while (i < buffer.Count) and not SameStr(buffer[i],'') do begin
 
-        for J:=0 to 4 do begin
-        	Line := TrimLeft(Line);
-        	spacepos := Pos('  ',Line);
-        	SubItems.Add(Trim(Copy(Line, 1, spacepos)));
-        	System.Delete(Line,1,spacepos);
-        end;
-        end;
-      end
-      else
-        lvGraph.Items.Add;
-    end
-    else
-      Parsing := StartsText('index %', Trim(Line));
-    Inc(I);
-  end;
-  for I := 0 to BreakLine do
-    TStringList(memGraph.Lines).Delete(0);
+		addeditem := lvGraph.Items.Add;
 
-  GraphLoaded := true;
+		if StartsStr('---',buffer[i]) then begin
+			addeditem.Caption := '';
+		end else begin
+
+			// Divide remaining part based on spaces
+			if StartsStr('[',buffer[i]) then
+				addeditem.Caption := Copy(buffer[i], 46, Length(buffer[i]) - 45)
+			else
+				addeditem.Caption := Copy(buffer[i], 50, Length(buffer[i]) - 49);
+
+			// Store info of function in Data pointer
+			if Pos('(', addeditem.Caption) > 0 then
+				addeditem.Data := MainForm.CppParser.Locate(Copy(addeditem.Caption, 1, Pos('(', addeditem.Caption) - 1), True)
+			else
+				addeditem.Data := MainForm.CppParser.Locate(addeditem.Caption, True);
+
+			// Divide remaining part based on spaces
+			Line := TrimLeft(buffer[i]);
+
+			// Add empty columns
+			if not StartsStr('[',line) then begin
+				addeditem.SubItems.Add('');
+				addeditem.SubItems.Add('');
+				startcol := 3;
+			end else
+				startcol := 1;
+
+			for J := startcol to 5 do begin
+
+				// Copy until next space
+				Line := TrimLeft(Line);
+				spacepos := Pos(' ',Line);
+				addeditem.SubItems.Add(Copy(Line, 1, spacepos));
+				Delete(Line,1,spacepos);
+			end;
+		end;
+		Inc(i);
+	end;
+	lvGraph.Items.EndUpdate;
+
+	Inc(i);
+
+	// Print output help
+	memGraph.Lines.BeginUpdate;
+	while (i < buffer.Count) do begin
+		memGraph.Lines.Add(buffer[i]);
+		Inc(i);
+	end;
+	memGraph.Lines.EndUpdate;
+
+	buffer.Free;
+
+	graphloaded := true;
 end;
 
 procedure TProfileAnalysisForm.lvFlatCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;var DefaultDraw: Boolean);
 begin
-  if not (cdsSelected in State) then begin
-    if Assigned(Item.Data) then
-      Sender.Canvas.Font.Color := clBlue
-    else
-      Sender.Canvas.Font.Color := clWindowText;
-  end;
+	if not (cdsSelected in State) then begin
+		if Assigned(Item.Data) then
+			Sender.Canvas.Font.Color := clBlue
+		else
+			Sender.Canvas.Font.Color := clWindowText;
+	end;
 end;
 
 procedure TProfileAnalysisForm.lvGraphCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;var DefaultDraw: Boolean);
 begin
-  if not (cdsSelected in State) then begin
-    if (Item.SubItems.Count > 0) and (Item.SubItems[0] <> '') then begin
-      if Assigned(Item.Data) then
-        Sender.Canvas.Font.Color := clBlue
-      else
-        Sender.Canvas.Font.Color := clWindowText;
-    end
-    else
-      Sender.Canvas.Font.Color := clGray;
-  end;
-
-  DefaultDraw := True;
+	if not (cdsSelected in State) then begin
+		if not StartsStr('---',Item.Caption) then begin
+			if Assigned(Item.Data) then
+				Sender.Canvas.Font.Color := clBlue
+			else
+				Sender.Canvas.Font.Color := clWindowText;
+		end;
+	end;
 end;
 
 procedure TProfileAnalysisForm.LoadText;
@@ -364,29 +388,34 @@ begin
   end;
 end;
 
-procedure TProfileAnalysisForm.PageControl1Change(Sender: TObject);
+procedure TProfileAnalysisForm.ProfilePageControlChange(Sender: TObject);
 begin
-	if PageControl1.ActivePage = tabFlat then begin
-		if not FlatLoaded then begin
-			DoFlat;
-			lvFlat.SetFocus;
+	case ProfilePageControl.ActivePageIndex of
+		0 : begin
+			if not flatloaded then begin
+				DoFlat;
+				lvFlat.SetFocus;
+			end;
 		end;
-	end else if PageControl1.ActivePage = tabGraph then begin
-		if not GraphLoaded then begin
-			DoGraph;
-			lvGraph.SetFocus;
+		1 : begin
+			if not graphloaded then begin
+				DoGraph;
+				lvGraph.SetFocus;
+			end;
 		end;
-	end else
-		commandUpdate(nil);
+		2 : begin
+			commandUpdate(nil);
+		end;
+	end;
 end;
 
 procedure TProfileAnalysisForm.btnApplyClick(Sender: TObject);
 begin
-	FlatLoaded := false;
-	GraphLoaded := false;
+	flatloaded := false;
+	graphloaded := false;
 
 	// Respawn DoFlat
-	PageControl1.ActivePage := tabFlat;
+	ProfilePageControl.ActivePage := tabFlat;
 end;
 
 procedure TProfileAnalysisForm.chkCustomClick(Sender: TObject);
@@ -398,15 +427,12 @@ begin
 	editCustom.Enabled := chkCustom.Checked;
 end;
 
-procedure TProfileAnalysisForm.commandUpdate(Sender: TObject);
+procedure TProfileAnalysisForm.CommandUpdate(Sender: TObject);
 var
 	assembly : AnsiString;
 begin
 	if not chkCustom.Checked then begin
-		if (devCompiler.gprofName <> '') then
-			assembly := devCompiler.gprofName
-		else
-			assembly := GPROF_PROGRAM;
+		assembly := gprofname;
 		if Assigned(MainForm.fProject) then
 			assembly := assembly + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"'
 		else
@@ -418,6 +444,28 @@ begin
 		assembly := assembly + ' -m ' + spnMinCount.Text;
 		editCustom.Text := assembly;
 	end;
+end;
+
+procedure TProfileAnalysisForm.FormCreate(Sender: TObject);
+begin
+	// Load the proper gprof exe
+	MainForm.fCompiler.SwitchToProjectCompilerSet;
+	gprofname := devCompiler.gprofName;
+	MainForm.fCompiler.SwitchToOriginalCompilerSet;
+end;
+
+procedure TProfileAnalysisForm.lvFlatAdvancedCustomDraw(
+  Sender: TCustomListView; const ARect: TRect; Stage: TCustomDrawStage;
+  var DefaultDraw: Boolean);
+begin
+	SendMessage(lvFlat.Handle,WM_CHANGEUISTATE, MAKEWPARAM(UIS_SET,UISF_HIDEFOCUS), 0);
+end;
+
+procedure TProfileAnalysisForm.lvGraphAdvancedCustomDraw(
+  Sender: TCustomListView; const ARect: TRect; Stage: TCustomDrawStage;
+  var DefaultDraw: Boolean);
+begin
+	SendMessage(lvFlat.Handle,WM_CHANGEUISTATE, MAKEWPARAM(UIS_SET,UISF_HIDEFOCUS), 0);
 end;
 
 end.

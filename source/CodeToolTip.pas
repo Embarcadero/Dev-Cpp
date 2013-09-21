@@ -812,8 +812,13 @@ begin
 	// Find out where the function ends...
 	for I := 1 to FMaxScanLength do begin
 
+		// Stopping characters...
+		if (P[CurPos] = #0) or (P[CurPos] = ';') then begin
+			ReleaseHandle;
+			Exit;
+
 		// Opening brace, increase count
-		if (P[CurPos] = '(') then begin
+		end else if (P[CurPos] = '(') then begin
 			Inc(nBraces);
 
 		// Ending brace, decrease count or success (found ending)!
@@ -822,22 +827,30 @@ begin
 			if nBraces = -1 then
 				break
 
-		// Stopping characters...
-		end else if (P[CurPos] = #0) or (P[CurPos] = ';') then begin
-			ReleaseHandle;
-			Exit;
-
 		// Single line comments
 		end else if (P[CurPos] = '/') and (P[CurPos+1] = '/') then begin
-			repeat
-				Inc(CurPos);
-			until (CurPos > FMaxScanLength) or (P[CurPos] = #0);
+
+			// Walk up to an enter sequence
+			while (P[CurPos] <> #0) and not (P[CurPos] in [#13, #10]) do
+				Inc(curpos);
+
+			// Skip ONE enter sequence (CRLF, CR, LF, etc.)
+			if (P[CurPos] = #13) and (P[CurPos+1] <> #0) and (P[CurPos+1] = #13) then // DOS
+				Inc(curpos,2)
+			else if (P[CurPos] = #13) then // UNIX
+				Inc(curpos)
+			else if (P[CurPos] = #10) then // MAC
+				Inc(curpos);
 
 		// Multiline comments
-		end else if (P[CurPos] = '/') and (P[CurPos+1] = '*') then begin
-			repeat
-				Inc(CurPos);
-			until (CurPos > FMaxScanLength) or (P[CurPos] = #0) or ((P[CurPos] = '*') and (P[CurPos+1] = '/'));
+		end else if (P[CurPos] = '/') and (P[CurPos+1] <> #0) and (P[CurPos+1] = '*') then begin
+
+			// Walk up to an */
+			while (P[CurPos] <> #0) and (P[CurPos+1] <> #0) and not ((P[CurPos] = '*') and (P[CurPos+1] = '/')) do
+				Inc(curpos);
+
+			// Step over
+			Inc(curpos);
 		end;
 
 		Inc(CurPos);

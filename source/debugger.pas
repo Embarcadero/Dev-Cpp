@@ -183,10 +183,10 @@ begin
 	si.hStdError := fOutputwrite;
 	si.wShowWindow := SW_HIDE;
 
-	if (devCompiler.gdbName <> '') then
-		gdb := devCompiler.gdbName
-	else
-		gdb := GDB_PROGRAM;
+	// Load GDB exe used by project set
+	MainForm.fCompiler.SwitchToProjectCompilerSet;
+	gdb := devCompiler.gdbName;
+	MainForm.fCompiler.SwitchToOriginalCompilerSet;
 
 	if not CreateProcess(nil, PAnsiChar('"' + devCompiler.BinDir + pd + gdb + '"' + ' --annotate=2 --silent'), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
 		MsgErr('Error launching ' + gdb + ':' + #13#10#13#10 + SysErrorMessage(GetLastError));

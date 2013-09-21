@@ -246,7 +246,7 @@ begin
 		Inc(curpos);
 
 	// Skip ONE enter sequence (CRLF, CR, LF, etc.)
-	if (curpos+1 < len) and (gdbout[curpos] = #13) and (gdbout[curpos] = #13) then // DOS
+	if (curpos+1 < len) and (gdbout[curpos] = #13) and (gdbout[curpos+1] = #10) then // DOS
 		Inc(curpos,2)
 	else if (curpos < len) and (gdbout[curpos] = #13) then // UNIX
 		Inc(curpos)
@@ -706,7 +706,7 @@ begin
 					s := GetNextLine;
 
 					// Add lines of disassembly
-					while not SameStr('End of assembler dump.',s) do begin
+					while not SameStr('End of assembler dump.',s) and not SameStr(s,'') do begin
 						Disassembly.Add(s);
 						s := GetNextLine;
 					end;
@@ -844,6 +844,7 @@ procedure TDebugReader.Execute;
 var
 	tmp : array [0..20000] of char; // should be enough for anything
 	bytesread : DWORD;
+	containsdisasstart, containsdisasend : boolean;
 begin
 	bytesread := 0;
 	while not Terminated do begin
@@ -855,9 +856,16 @@ begin
 
 		gdbout := gdbout + tmp;
 
-		if not Terminated and (Pos('(gdb)',gdbout) > 0) then begin //(GDB does NOT always prompt when ready?)
-			Analyze;
-			gdbout := '';
+		if not Terminated and ContainsStr(gdbout,'(gdb)') then begin
+
+			containsdisasstart := ContainsStr(gdbout,'Dump of assembler code for function ',);
+			containsdisasend := ContainsStr(gdbout,'End of assembler dump.',);
+
+			// Avoid fragmentation...
+			if (containsdisasstart and containsdisasend) or (not containsdisasstart and not containsdisasend) then begin
+				Analyze;
+				gdbout := '';
+			end;
 		end;
 	end;
 end;

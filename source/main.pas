@@ -847,7 +847,6 @@ type
 	private
 		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
 		fTools            : TToolController; // tool list controller
-		fCompiler         : TCompiler; // compiler class pointer
 		ProjectToolWindow : TForm; // floating left tab control
 		ReportToolWindow  : TForm; // floating bottom tab control
 		OldLeft           : integer; // stores position of window when going fullscreen
@@ -888,6 +887,7 @@ type
 		AutoSaveTimer : TTimer;
 		fProject : TProject;
 		fDebugger : TDebugger;
+		fCompiler : TCompiler;
 
 		procedure OpenCloseMessageSheet(_Show: boolean);
 		function SaveFile(e : TEditor): Boolean;
@@ -3038,12 +3038,10 @@ var
 	idxD,idxS : integer;
 begin
 
-	// Run the GDB file used by the project compiler set if a project is opened
-	fCompiler.SwitchToProjectCompilerSet;
-
 	// Check if we enabled proper options
 	debug := CheckCompileOption('-g3',optD,idxD);
 	strip := CheckCompileOption('-s',optS,idxS);
+
 	if not debug or strip then begin
 		if MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 
@@ -3063,9 +3061,6 @@ begin
 				devCompiler.SaveSet(devCompiler.CurrentIndex);
 
 			actRebuildExecute(nil);
-
-			// TODO: Try to continue after rebuilding?
-			fCompiler.SwitchToOriginalCompilerSet;
 			Exit;
 		end;
 	end;
@@ -3075,7 +3070,6 @@ begin
 		// Did we compile?
 		if not FileExists(fProject.Executable) then begin
 			MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
-			fCompiler.SwitchToOriginalCompilerSet; // reset compiler choices
 			exit;
 		end;
 
@@ -3083,11 +3077,9 @@ begin
 		if fProject.Options.typ = dptDyn then begin
 			if fProject.Options.HostApplication = '' then begin
 				MessageDlg(Lang[ID_ERR_HOSTMISSING], mtWarning, [mbOK], 0);
-				fCompiler.SwitchToOriginalCompilerSet;
 				exit;
 			end else if not FileExists(fProject.Options.HostApplication) then begin
 				MessageDlg(Lang[ID_ERR_HOSTNOTEXIST], mtWarning, [mbOK], 0);
-				fCompiler.SwitchToOriginalCompilerSet;
 				exit;
 			end;
 		end;
@@ -3107,18 +3099,13 @@ begin
 			// Did we compile?
 			if not FileExists(ChangeFileExt(e.FileName, EXE_EXT)) then begin
 				MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
-				fCompiler.SwitchToOriginalCompilerSet;
 				Exit;
 			end;
 
 			// Did we save?
 			if e.Text.Modified then // if file is modified
-				if not SaveFile(e) then begin// save it first
-					fCompiler.SwitchToOriginalCompilerSet;
+				if not SaveFile(e) then // save it first
 					Exit;
-				end;
-
-			//chdir(ExtractFilePath(e.FileName));
 
 			PrepareDebugger;
 
@@ -3158,9 +3145,6 @@ begin
 	fDebugger.SendCommand('set','new-console on');
 	fDebugger.SendCommand('set','confirm off');
 	fDebugger.SendCommand('run',fCompiler.RunParams);
-
-	// And reset compiler choices
-	fCompiler.SwitchToOriginalCompilerSet;
 end;
 
 procedure TMainForm.actEnviroOptionsExecute(Sender: TObject);
@@ -3248,7 +3232,7 @@ var
 	e: TEditor;
 begin
 	e := GetEditor;
-	TCustomAction(Sender).Enabled := Assigned(e) and not IsEmpty(e.Text) and not Assigned(frmFind);
+	TCustomAction(Sender).Enabled := Assigned(e) and not IsEmpty(e.Text) and (not Assigned(frmFind) or not frmFind.Showing);
 end;
 
 procedure TMainForm.ToolbarClick(Sender: TObject);
@@ -4384,6 +4368,7 @@ var
 	path : AnsiString;
 	e : TEditor;
 begin
+
 	prof := CheckCompileOption('-pg',optP,idxP);
 	strp := CheckCompileOption('-s',optS,idxS);
 
@@ -4406,24 +4391,23 @@ begin
 				devCompiler.SaveSet(devCompiler.CurrentIndex);
 
 			actRebuildExecute(nil);
-
 			Exit;
 		end;
 	end;
 
-	// If we're done setting up options, check if there's data already
+	// If we're done setting up options, check if there's profiling data already
 	path := '';
 	if Assigned(fProject) then begin
-		path := ExtractFilePath(fProject.Executable)+GPROF_CHECKFILE;
+		path := ExtractFilePath(fProject.Executable) + GPROF_CHECKFILE;
 	end else begin
 		e:=GetEditor;
 		if Assigned(e) then
-			path := ExtractFilePath(ChangeFileExt(e.FileName, EXE_EXT))+GPROF_CHECKFILE;
+			path := ExtractFilePath(ChangeFileExt(e.FileName, EXE_EXT)) + GPROF_CHECKFILE;
 	end;
 
 	// Ask the user if he wants to generate data...
 	if not FileExists(path) then begin
-		if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtInformation, [mbYes, mbNo], 0)=mrYes then begin
+		if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtInformation, [mbYes, mbNo], 0) = mrYes then begin
 			actRunExecute(nil);
 		end;
 		Exit;
@@ -4431,7 +4415,7 @@ begin
 
 	// If the data is there, open up the form
 	if not Assigned(ProfileAnalysisForm) then
-		ProfileAnalysisForm:=TProfileAnalysisForm.Create(Self);
+		ProfileAnalysisForm := TProfileAnalysisForm.Create(Self);
 
 	ProfileAnalysisForm.Show;
 end;
@@ -5210,6 +5194,8 @@ begin
 
 	// Try to find the value in the predefined list
 	if devCompiler.FindOption(option, optionstructout, optionindexout) then begin // the option exists...
+
+		// Search project options...
 		if Assigned(fProject) then begin
 			if fProject.Options.CompilerOptions[optionindexout + 1] <> '0' then
 				Result := true;
@@ -5217,11 +5203,6 @@ begin
 			Result := optionstructout^.optValue > 0;
 		end;
 	end;
-
-	// Check user params too if we couldn't find it yet
-	{if (not Result) and (devCompiler.CompOpts <> '') and devCompiler.AddtoComp then
-		if Pos(' ' + option,devCompiler.CompOpts) > 0 then
-			Result := true;}
 end;
 
 procedure TMainForm.SetProjCompOpt(idx: integer; Value: char);
@@ -6400,11 +6381,11 @@ var
 	var
 		sizerect : TRect;
 	begin
-		DrawText(Sender.Canvas.Handle,PAnsiChar(s),Length(s),rect,DT_EXPANDTABS or DT_NOCLIP or DT_HIDEPREFIX);
+		DrawText(Sender.Canvas.Handle,PAnsiChar(s),Length(s),rect,DT_EXPANDTABS or DT_NOCLIP or DT_NOPREFIX);
 
 		// Get text extent
 		FillChar(sizerect,sizeof(sizerect),0);
-		DrawText(Sender.Canvas.Handle,PAnsiChar(s),Length(s),sizerect,DT_CALCRECT or DT_EXPANDTABS or DT_NOCLIP or DT_HIDEPREFIX);
+		DrawText(Sender.Canvas.Handle,PAnsiChar(s),Length(s),sizerect,DT_CALCRECT or DT_EXPANDTABS or DT_NOCLIP or DT_NOPREFIX);
 		Inc(rect.Left,sizerect.Right-sizerect.Left+1); // 1 extra pixel for extra width caused by bold
 	end;
 begin

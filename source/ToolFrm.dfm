@@ -132,15 +132,7 @@ object ToolForm: TToolForm
       Width = 232
       Height = 199
       Anchors = [akLeft, akTop, akRight, akBottom]
-      Ctl3D = True
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ItemHeight = 13
-      ParentCtl3D = False
-      ParentFont = False
+      ItemHeight = 15
       TabOrder = 0
       OnClick = ListBoxClick
       OnDblClick = btnEditClick
