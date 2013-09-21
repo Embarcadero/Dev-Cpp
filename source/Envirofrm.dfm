@@ -113,7 +113,7 @@ object EnviroForm: TEnviroForm
         Width = 145
         Height = 17
         AutoSize = False
-        Caption = 'Message Window Tabs:'
+        Caption = 'Editor Tab Location:'
       end
       object lblLang: TLabel
         Left = 192
@@ -289,30 +289,32 @@ object EnviroForm: TEnviroForm
         Value = 0
       end
       object cboTabsTop: TComboBox
-        Left = 320
+        Left = 248
         Top = 56
-        Width = 67
+        Width = 139
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 12
         Items.Strings = (
+          'Top'
           'Bottom'
-          'Top')
+          'Left'
+          'Right')
       end
       object cboLang: TComboBox
-        Left = 240
+        Left = 248
         Top = 89
-        Width = 147
+        Width = 139
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 13
       end
       object cboTheme: TComboBox
-        Left = 240
+        Left = 248
         Top = 128
-        Width = 147
+        Width = 139
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
@@ -676,8 +678,8 @@ object EnviroForm: TEnviroForm
         Caption = 'External programs associations:'
       end
       object btnExtAdd: TSpeedButton
-        Left = 96
-        Top = 269
+        Left = 95
+        Top = 265
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -685,8 +687,8 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtAddClick
       end
       object btnExtDel: TSpeedButton
-        Left = 195
-        Top = 269
+        Left = 193
+        Top = 265
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -696,8 +698,8 @@ object EnviroForm: TEnviroForm
       object vleExternal: TValueListEditor
         Left = 16
         Top = 24
-        Width = 357
-        Height = 240
+        Width = 353
+        Height = 236
         Anchors = [akLeft, akTop, akRight, akBottom]
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         Options = [goVertLine, goHorzLine, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -740,8 +742,8 @@ object EnviroForm: TEnviroForm
       end
       object lblAssocDesc: TLabel
         Left = 16
-        Top = 261
-        Width = 357
+        Top = 257
+        Width = 353
         Height = 35
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
@@ -753,8 +755,8 @@ object EnviroForm: TEnviroForm
       object lstAssocFileTypes: TCheckListBox
         Left = 16
         Top = 24
-        Width = 357
-        Height = 232
+        Width = 353
+        Height = 228
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0

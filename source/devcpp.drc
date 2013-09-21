@@ -516,7 +516,7 @@ BEGIN
 	version_INI_EXT,	".ini"
 	version_TEMPLATE_EXT,	".template"
 	version_SYNTAX_EXT,	".syntax"
-	version_MAKE_PROGRAM,	"make.exe"
+	version_MAKE_PROGRAM,	"mingw32-make.exe"
 	version_GCC_PROGRAM,	"gcc.exe"
 	version_GPP_PROGRAM,	"g++.exe"
 	version_GDB_PROGRAM,	"gdb.exe"

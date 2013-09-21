@@ -965,8 +965,8 @@ begin
 				Continue;
 
 			{ Make errors }
-			if (Pos('make.exe: ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
-				cpos := Length('make.exe: ***');
+			if (Pos(devCompilerSet.makeName + ': ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
+				cpos := Length(devCompilerSet.makeName + ': ***');
 				O_Msg := '[Build Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 				if Assigned(fProject) then
 					O_File := Makefile

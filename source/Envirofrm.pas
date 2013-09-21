@@ -233,7 +233,7 @@ begin
 		cbWatchHint.Checked := WatchHint;
 		cbWatchError.Checked := WatchError;
 
-		cboTabsTop.ItemIndex:= ord(msgTabs);
+		cboTabsTop.ItemIndex:= msgTabs;
 
 		chkAltConfig.Checked:= UseAltConfigFile;
 		edAltConfig.Text:= AltConfigFile;
@@ -306,7 +306,13 @@ begin
 		MinOnRun:= cbMinOnRun.Checked;
 		DblFiles:= cbdblFiles.Checked;
 		MRUMax:= seMRUMax.Value;
-		MsgTabs:= boolean(cboTabsTop.ItemIndex);
+		if MultiLineTab = FALSE then begin
+			if cboTabsTop.ItemIndex in [2,3] then begin
+				MainForm.MsgBox('Multiline tabs must be enabled when using vertical tabs.'+#13#10#13#10+'Reverting to Top Tabs...','Error');
+				cboTabsTop.ItemIndex := 0;
+			end;
+		end;
+		MsgTabs:= cboTabsTop.ItemIndex;
 		OpenStyle:= rgbOpenStyle.ItemIndex;
 		AutoOpen:= rgbAutoOpen.ItemIndex;
 		Splash:= edSplash.Text;
@@ -362,8 +368,6 @@ begin
 	devCVSHandler.Executable:= edCVSExec.Text;
 	devCVSHandler.Compression:= spnCVSCompression.Value;
 	devCVSHandler.UseSSH:= chkCVSUseSSH.Checked;
-
-	MainForm.PageControl.MultiLine:=devData.MultiLineTab;
 end;
 
 procedure TEnviroForm.LoadText;

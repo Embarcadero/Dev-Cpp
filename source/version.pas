@@ -32,7 +32,7 @@ const
 
 resourcestring
 	// misc strings
-	GCC_VERSION          = '4.5.2';
+	GCC_VERSION          = '4.6.1';
 	DEVCPP               = 'Dev-C++';
 	DEVCPP_VERSION       = '5.0.0.5';
 	DEFAULT_LANG_FILE    = 'English.lng';
@@ -83,7 +83,7 @@ resourcestring
 	SYNTAX_EXT           = '.syntax';
 
   // programs
-  MAKE_PROGRAM         = 'make.exe';
+  MAKE_PROGRAM         = 'mingw32-make.exe';
   GCC_PROGRAM          = 'gcc.exe';
   GPP_PROGRAM          = 'g++.exe';
   GDB_PROGRAM          = 'gdb.exe';

@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 532
-  Top = 210
+  Left = 814
+  Top = 189
   Width = 848
   Height = 685
   Color = clBtnFace
@@ -45,7 +45,7 @@ object MainForm: TMainForm
     Top = 496
     Width = 832
     Height = 112
-    ActivePage = CompSheet
+    ActivePage = LogSheet
     Align = alBottom
     Constraints.MinHeight = 1
     Images = dmMain.MenuImages_NewLook
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 820
-        Height = 80
+        Height = 79
         Align = alClient
         BevelKind = bkSoft
         BorderStyle = bsNone
@@ -123,7 +123,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 257
-        Height = 80
+        Height = 79
         Align = alLeft
         Caption = 'Information :'
         TabOrder = 0
@@ -178,7 +178,7 @@ object MainForm: TMainForm
         Left = 257
         Top = 0
         Width = 563
-        Height = 80
+        Height = 79
         Align = alClient
         Caption = 'Compile log :'
         Ctl3D = True
@@ -190,8 +190,8 @@ object MainForm: TMainForm
         object LogOutput: TMemo
           Left = 7
           Top = 16
-          Width = -1423
-          Height = 60
+          Width = 0
+          Height = 59
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelInner = bvSpace
           BevelKind = bkTile
@@ -590,7 +590,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 812
-            Height = 49
+            Height = 48
             Align = alClient
             Columns = <
               item
@@ -676,7 +676,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 820
-        Height = 80
+        Height = 79
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone

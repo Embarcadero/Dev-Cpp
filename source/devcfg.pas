@@ -459,7 +459,7 @@ type
    fTheme: string;                   // Theme file
    fFindCols: string;                // Find Column widths (comma sep)
    fCompCols: string;                // Compiler Column Widths (comma sep)
-   fMsgTabs: boolean;                // Message Control Tabs (Top/Bottom)
+   fMsgTabs: integer;                // Editor Tabs
    fMinOnRun: boolean;               // Minimize IDE on run
    fOpenStyle: integer;              // Open Dialog Style
    fMRUMax: integer;                 // Max number of files in history list
@@ -562,7 +562,7 @@ type
    property AutoOpen: integer read fAutoOpen write fAutoOpen;
 
    //Windows
-   property MsgTabs: boolean read fMsgTabs write fMsgTabs;
+   property MsgTabs: integer read fMsgTabs write fMsgTabs;
 
    property ShowBars: boolean read fShowbars write fShowbars;
    property MultiLineTab: boolean read fMultiLineTab write fMultiLineTab;
@@ -663,11 +663,11 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  MultiLangSupport, SysUtils, Forms, Controls, version, utils, SynEditMiscClasses,
+  MultiLangSupport, SysUtils, StrUtils, Forms, Controls, version, utils, SynEditMiscClasses,
   datamod, FileAssocs;
 {$ENDIF}
 {$IFDEF LINUX}
-  MultiLangSupport, SysUtils, QForms, QControls, version, utils, QSynEditMiscClasses,
+  MultiLangSupport, SysUtils, StrUtils, QForms, QControls, version, utils, QSynEditMiscClasses,
   datamod, FileAssocs, Types;
 {$ENDIF}
 
@@ -945,7 +945,7 @@ begin
   fLang:= DEFAULT_LANG_FILE;
   fFindCols:= '75, 75, 120, 150';
   fCompCols:= '75, 75, 120, 150';
-  fMsgTabs:= TRUE; // Top
+  fMsgTabs:= 0; // Top
   fMRUMax:= 10;
   fMinOnRun:= FALSE;
   fBackup:= FALSE;
@@ -1101,10 +1101,12 @@ begin
 
 	// C++ Standards
 	sl := TStringList.Create;
-	sl.Add('GNU C++=gnu++98');
+	sl.Add('ISO C99=c99');
 	sl.Add('ISO C++=c++98');
-	sl.Add('GNU C++0x=gnu++0x');
 	sl.Add('ISO C++0x=c++0x');
+	sl.Add('GNU C99=gnu99');
+	sl.Add('GNU C++=gnu++98');
+	sl.Add('GNU C++0x=gnu++0x');
 	AddOption(Lang[ID_COPT_STD], False, True, True, True, 0, '-std=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 end;
 
@@ -1814,43 +1816,41 @@ begin
 		end;
 	end;
 
-	//check if make is in path + bins directory
+	// The code below checks for makefile processors...
 	if devDirs.OriginalPath = '' then // first time only
 		devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 
-	// Hier wordt de oude bins nog gebruikt. Niet doen.
+	// First check if MinGW exists (it's newer)
 	SetPath(fBinDir);
-	gnumakereply := RunAndGetOutput(devCompilerSet.makeName + ' --v',fBinDir, nil, nil, nil);
+	mingwmakereply := RunAndGetOutput(devCompilerSet.makeName + ' -v',fBinDir, nil, nil, nil);
 
-	// If GNU does not reply
-	if Pos('GNU Make', gnumakereply) = 0 then begin
+	// If MinGW does not reply
+	if not AnsiStartsStr('GNU Make ', mingwmakereply) then begin
 
-		// Try MinGW
+		// Try the old GNU one
 		SetPath(fBinDir);
-		mingwmakereply := RunAndGetOutput('mingw32-make --v',fBinDir, nil, nil, nil);
+		gnumakereply := RunAndGetOutput('make.exe --v',fBinDir, nil, nil, nil);
 
-		if Pos('mingw32-make:', mingwmakereply) > 0 then begin
-			msg := 'Dev-C++ was unable to find GNU Make with current settings '
-			+ 'however there''s a mingw32-make that seems to be GNU Make. '
+		// Yay, there's an old make.exe in the bin directory!
+		if AnsiStartsStr('GNU Make ', gnumakereply) then begin
+			msg := 'Dev-C++ was unable to find MinGW Make with current settings '
+			+ 'however a (probably older) GNU Make has been found. '
 			+ 'Would you like Dev-C++ to adjust the settings for you to '
-			+ 'use mingw32-make?'
+			+ 'use GNU Make?'
 			+ #13#10#13#10
 			+ 'Unless you know exactly what you''re doing, it is recommended '
 			+ 'that you click Yes';
 
 			if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-				devCompilerSet.makeName := 'mingw32-make';
-				devCompiler.makeName := 'mingw32-make';
+				devCompilerSet.makeName := 'make.exe';
+				devCompiler.makeName := 'make.exe';
 			end;
-		end;
-
-		//if nothing's found just display the warning message
-		if (Pos('mingw32-make:', mingwmakereply) = 0) and (Pos('GNU Make', gnumakereply) = 0) then begin
-			msg := 'There doesn''t seem to be GNU Make file in Dev-C++''s Bin path. '
+		end else begin
+			msg := 'There doesn''t seem to be any Make file in Dev-C++''s Bin path. '
 			+ 'Please make sure that you have correctly set '
-			+ 'GNU Make and adjust Bin settings environment '
-			+ 'variable and that make setting in Compiler Option '
-			+ 'contains correct filename, otherwise you will not '
+			+ 'GNU Make and adjust the Bin settings environment '
+			+ 'variable and that the make setting in Compiler Option '
+			+ 'contains a correct filename, otherwise you will not '
 			+ 'be able to compile anything.';
 			MessageDlg(msg, mtConfirmation, [mbOK], 0);
 		end;

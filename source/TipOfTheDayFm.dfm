@@ -1,6 +1,6 @@
 object TipOfTheDayForm: TTipOfTheDayForm
-  Left = 357
-  Top = 252
+  Left = 462
+  Top = 348
   BorderStyle = bsDialog
   Caption = 'Tip Of The Day'
   ClientHeight = 237

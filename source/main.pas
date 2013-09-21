@@ -592,7 +592,7 @@ type
 		ToolButton1: TToolButton;
 		ToolButton2: TToolButton;
 		ProfileBtn: TToolButton;
-    ProfilingInforBtn: TToolButton;
+		ProfilingInforBtn: TToolButton;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -755,7 +755,7 @@ type
 		procedure actBrowserNewVarExecute(Sender: TObject);
 		procedure actBrowserViewAllExecute(Sender: TObject);
 		procedure actBrowserViewCurrentExecute(Sender: TObject);
-        procedure actProfileProjectExecute(Sender: TObject);
+		procedure actProfileProjectExecute(Sender: TObject);
 		procedure actBrowserAddFolderExecute(Sender: TObject);
 		procedure actBrowserRemoveFolderExecute(Sender: TObject);
 		procedure actBrowserAddFolderUpdate(Sender: TObject);
@@ -994,17 +994,18 @@ procedure TMainForm.DoCreateEverything;
 //
 begin
 	fFirstShow:= TRUE;
+	Caption := DEVCPP + ' ' + DEVCPP_VERSION;
 	DDETopic:=DevCppDDEServer.Name;
 	CheckAssociations; // register file associations and DDE services <-- !!!
 	DragAcceptFiles(Self.Handle, TRUE);
 	dmMain:= TdmMain.Create(Self);
+
 	// Set Path
 	devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 	SetPath(devDirs.Bins);
 
 	fHelpfiles:= ToysStringList.Create;
 	fTools:= TToolController.Create;
-	Caption := DEVCPP + ' ' + DEVCPP_VERSION;
 
 	// set visiblity to previous sessions state
 	actProjectManager.Checked:= devData.ProjectView;
@@ -1265,31 +1266,35 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 begin
 	if fFirstShow then begin
-		 LoadTheme;
-		 dmMain.MRUMenu:= ReOpenItem;
-		 dmMain.MRUOffset:= 2;
-		 dmMain.MRUMax:= devData.MRUMax;
-		 dmMain.MRUClick:= MRUClick;
-		 dmMain.CodeMenu:= InsertItem;
-		 dmMain.CodePop:= InsertPopItem;
-		 dmMain.CodeClick:= CodeInsClick;
-		 dmMain.CodeOffset:= 2;
-		 dmMain.LoadDataMod;
+		LoadTheme;
+		dmMain.MRUMenu:= ReOpenItem;
+		dmMain.MRUOffset:= 2;
+		dmMain.MRUMax:= devData.MRUMax;
+		dmMain.MRUClick:= MRUClick;
+		dmMain.CodeMenu:= InsertItem;
+		dmMain.CodePop:= InsertPopItem;
+		dmMain.CodeClick:= CodeInsClick;
+		dmMain.CodeOffset:= 2;
+		dmMain.LoadDataMod;
 
-		 if ParamCount> 0 then ParseCmdLine;
+		if ParamCount> 0 then ParseCmdLine;
 
-		 MessageControl.ActivePageIndex:= 0;
-		 OpenCloseMessageSheet(devData.ShowOutput);
+		MessageControl.ActivePageIndex:= 0;
+		PageControl.MultiLine:=devData.MultiLineTab;
+		OpenCloseMessageSheet(devData.ShowOutput);
 
-		 if devData.MsgTabs then
-			MessageControl.TabPosition:= tpTop
-		 else
-			MessageControl.TabPosition:= tpBottom;
+		if devData.MsgTabs = 0 then
+			PageControl.TabPosition:= tpTop
+		else if devData.MsgTabs = 1 then
+			PageControl.TabPosition:= tpBottom
+		else if devData.MsgTabs = 2 then
+			PageControl.TabPosition:= tpLeft
+		else if devData.MsgTabs = 3 then
+			PageControl.TabPosition:= tpRight;
+		SetupProjectView;
 
-		 SetupProjectView;
-
-		 fFirstShow:= FALSE;
-	 end;
+		fFirstShow:= FALSE;
+	end;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -3555,29 +3560,32 @@ end;
 procedure TMainForm.actEnviroOptionsExecute(Sender: TObject);
 begin
 	with TEnviroForm.Create(Self) do
-	 try
-		if ShowModal = mrok then
-		 begin
-			 SetupProjectView;
-			 if devData.MsgTabs then
-				MessageControl.TabPosition:= tpTop
-			 else
-				MessageControl.TabPosition:= tpBottom;
-			 if devData.FullScreen then
+	try
+		if ShowModal = mrok then begin
+			SetupProjectView;
+			if devData.MsgTabs = 0 then
+				PageControl.TabPosition:= tpTop
+			else if devData.MsgTabs = 1 then
+				PageControl.TabPosition:= tpBottom
+			else if devData.MsgTabs = 2 then
+				PageControl.TabPosition:= tpLeft
+			else if devData.MsgTabs = 3 then
+				PageControl.TabPosition:= tpRight;
+			PageControl.MultiLine:=devData.MultiLineTab;
+			if devData.FullScreen then
 				ControlBar1.Visible:= devData.ShowBars;
 
-			 if devData.LangChange = TRUE then
-				begin
-					Lang.SetLang(devData.Language);
-					LoadText(TRUE);
-				end;
-			 if devData.ThemeChange then
-				 Loadtheme;
-			 devShortcuts1.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
-		 end;
-	 finally
+			if devData.LangChange = TRUE then begin
+				Lang.SetLang(devData.Language);
+				LoadText(TRUE);
+			end;
+			if devData.ThemeChange then
+				Loadtheme;
+			devShortcuts1.Filename:=devDirs.Config + DEV_SHORTCUTS_FILE;
+		end;
+	finally
 		Free;
-	 end;
+	end;
 end;
 
 procedure TMainForm.actUpdatePageCount(Sender: TObject);
@@ -5433,10 +5441,10 @@ begin
 
 	// do not show tips if dev-c++ is launched with a file
 	if devData.ShowTipsOnStart then begin
-		for i := 0 to ParamCount do
+
+		for i := 1 to ParamCount do
 			if (ParamStr(i)[2] = ':') or (ParamStr(i)[1] = '/') then
 				showtips := false;
-
 		if showtips then
 			actShowTips.Execute;
 	end;
@@ -5605,11 +5613,11 @@ end;
 
 procedure TMainForm.dynactOpenEditorByTagExecute(Sender: TObject);
 var
-	E:TEditor;
+	e:TEditor;
 begin
-	E:=GetEditor(TAction(Sender).Tag);
-	if E<>nil then
-		 E.Activate;
+	e:=GetEditor(TAction(Sender).Tag);
+	if Assigned(e) then
+		e.Activate;
 end;
 
 { end XXXKF }
