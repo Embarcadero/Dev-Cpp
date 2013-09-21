@@ -1,4 +1,4 @@
-Version 5.1.1.0 - *
+Version 5.1.1.0 - 16 Februari 2012
 
 - Added code folding.
 - A few directory checks now use absolute paths instead of relative ones.
@@ -15,6 +15,7 @@ Version 5.1.1.0 - *
 - Fixed a lot of memory leaks.
 - Inserting classes and variables is faster now.
 - Code folding now automatically updates when creating new files from templates.
+- Fixed some more memory leaks. Folding doesn't leak anymore now.
 
 Version 5.1.0.0 - 27 December 2011
 

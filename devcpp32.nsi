@@ -2,7 +2,7 @@
 # Startup
 
 !define COMPILERNAME "MinGW32"
-!define DEVCPP_VERSION "5.1.0.0"
+!define DEVCPP_VERSION "5.1.1.0"
 !define FINALNAME "devcpp-${DEVCPP_VERSION}_32bit_setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 

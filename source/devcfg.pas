@@ -374,7 +374,6 @@ type
    fAutoIndent: boolean;       // Auto-indent code lines
    fSmartTabs: boolean;        // Tab to next no whitespace char
    fSpecialChar: boolean;      // special line characters visible
-   fAppendNewline: boolean;    // append newline character to the end of line
    fTabtoSpaces: boolean;      // convert tabs to spaces
    fAutoCloseBrace: boolean;   // insert closing braces
    fMarginColor: TColor;       // Color of right margin
@@ -413,7 +412,6 @@ type
    property HalfPageScroll: boolean read fHalfPage write fHalfPage;
    property ScrollHint: boolean read fShowScrollHint write fShowScrollHint;
    property SpecialChars: boolean read fSpecialChar write fSpecialChar;
-   property AppendNewline: boolean read fAppendNewline write fAppendNewline;
    property AutoCloseBrace: boolean read fAutoCloseBrace write fAutoCloseBrace;
 
    property TabSize: integer read fTabSize write fTabSize;
@@ -1480,7 +1478,6 @@ begin
 	fGroupUndo:= TRUE;
 	fInsDropFiles:= FALSE;
 	fSpecialChar:= FALSE;
-	fAppendNewline := TRUE; // Newline at end of file
 
 	// General #2
 	fEHomeKey:= TRUE;

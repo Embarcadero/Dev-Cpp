@@ -185,11 +185,6 @@ begin
         mrYes: if FileExists(fName) then begin
             wa := MainForm.devFileMonitor.Active;
             MainForm.devFileMonitor.Deactivate;
-            if devEditor.AppendNewline then
-              with e.Text do
-                if Lines.Count > 0 then
-                  if Lines[Lines.Count -1] <> '' then
-                    Lines.Add('');
             e.Text.Lines.SaveToFile(fName);
             if wa then
               MainForm.devFileMonitor.Activate;

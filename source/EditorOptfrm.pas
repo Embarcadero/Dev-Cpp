@@ -597,7 +597,6 @@ begin
      cbHalfPage.Checked:=            HalfPageScroll;
      cbScrollHint.Checked:=          ScrollHint;
      cbSpecialChars.Checked:=        SpecialChars;
-     cbAppendNewline.Checked:=       AppendNewline;
      cbCloseBrace.Checked:=          AutoCloseBrace;
 
      cbMarginVis.Checked:=           MarginVis;
@@ -751,7 +750,6 @@ begin
 		HalfPageScroll:=      cbHalfPage.Checked;
 		ScrollHint:=          cbScrollHint.Checked;
 		SpecialChars:=        cbSpecialChars.Checked;
-		AppendNewline:=       cbAppendNewline.Checked;
 		AutoCloseBrace:=      cbCloseBrace.Checked;
 
 		MarginVis:=           cbMarginVis.Checked;

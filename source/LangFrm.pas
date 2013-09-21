@@ -211,9 +211,8 @@ begin
 			s := TStringList.Create;
 			if (AltCache.Checked) then begin
 				devClassBrowsing.ParseGlobalHeaders := false; // Too slow
-				for I:=0 to AltFileList.Count-1 do begin
+				for I:=0 to AltFileList.Count-1 do
 					s.Add(AltFileList.Items[I]);
-				end;
 			end else
 				StrToList(devDirs.Cpp, s);
 
@@ -245,8 +244,9 @@ begin
 					// Then check for existance
 					if FileExists(fullpath) then begin
 						MainForm.CppParser.AddFileToScan(fullpath);
-					end else
-						MessageDlg('File "' + fullpath + '" does not exist', mtWarning, [mbOK], 0);
+					end;
+					//end else
+					//	MessageDlg('File "' + fullpath + '" does not exist', mtWarning, [mbOK], 0);
 				end;
 			end;
 
@@ -254,7 +254,9 @@ begin
 			MainForm.CppParser.ParseList;
 
 			ParseLabel.Caption := 'Saving...';
+
 			Application.ProcessMessages;
+
 			MainForm.CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE);
 
 			MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;;

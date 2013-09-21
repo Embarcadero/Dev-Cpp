@@ -91,7 +91,11 @@ begin
 end;
 
 procedure TNewProjectForm.FormDestroy(Sender: TObject);
+var
+	I : integer;
 begin
+	for I := 0 to fTemplates.Count - 1 do
+		TTemplate(fTemplates[i]).Free;
 	fTemplates.Free;
 end;
 

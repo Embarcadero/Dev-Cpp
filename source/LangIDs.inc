@@ -978,6 +978,7 @@ const
   ID_COMPILESUCCESS                 = 60017;
   ID_COMPILEABORT                   = 60018;
   ID_STATUSBARPLUS                  = 60019;
+  ID_DONEPARSING                    = 60020;
 
 { -- Button Captions -- }
   ID_BTN_OK                         = 61001;

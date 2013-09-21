@@ -230,13 +230,8 @@ begin
 			fNew := False;
 			if devData.Backups then begin
 				s:= ExtractfileExt(FileName);
-				Insert('~', s, AnsiPos('.', s) +1);
+				Insert('~', s, AnsiPos('.', s) + 1);
 				Delete(s, Length(s) -1, 1);
-				if devEditor.AppendNewline then
-					with fText do
-						if Lines.Count > 0 then
-							if Lines[Lines.Count -1] <> '' then
-								Lines.Add('');
 				fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
 			end;
 		except
@@ -392,13 +387,15 @@ end;
 
 function TEditor.GetModified: boolean;
 begin
-  result:= fModified or fText.Modified;
+	result:= fModified or fText.Modified;
 end;
 
 procedure TEditor.SetModified(value: boolean);
 begin
-  fModified:= value;
-  fText.Modified:= Value;
+	fModified:= value;
+	fText.Modified:= Value;
+	if Value and (fText.UnCollapsedLines.Count = 0) then
+		fText.ReScan;
 end;
 
 // RNC 07-21-04 These functions are used to turn off/on a breakpoint
@@ -728,15 +725,16 @@ begin
   GotoForm := TGotoLineForm.Create(FText);
   try
     GotoForm.Editor := FText;
-    
+
     if GotoForm.ShowModal = mrOK then
      FText.CaretXY:= BufferCoord(FText.CaretX, GotoForm.Line.Value);
-     
+
     Activate;
   finally
     GotoForm.Free;
   end;
 end;
+
 
 procedure TEditor.InsertString(const Value: string; const move: boolean);
 var
@@ -1255,10 +1253,10 @@ procedure TEditor.SetEditorText(Key: Char);
 var
 	Phrase: string;
 	I, CurrSel: integer;
-	ST: PStatement;
+	Statement: PStatement;
 	FuncAddOn: string;
 begin
-	ST:=fCompletionBox.SelectedStatement;
+	Statement:=fCompletionBox.SelectedStatement;
 	if fCompletionBox.SelectedIsFunction then begin
 		if Key=';' then
 			FuncAddOn := '();'
@@ -1270,10 +1268,10 @@ begin
 			FuncAddOn := '()';
 	end else begin
 {$IFDEF WIN32}
-		if Key=Char(vk_Return) then
+		if Key=Char(VK_RETURN) then
 {$ENDIF}
 {$IFDEF LINUX}
-		if Key=Char(Xk_Return) then
+		if Key=Char(XK_RETURN) then
 {$ENDIF}
 			FuncAddOn := ''
 		else if Key='>' then
@@ -1284,8 +1282,8 @@ begin
 			FuncAddOn := Key;
 	end;
 
-	if ST <> nil then begin
-		Phrase := ST^._Command;
+	if Assigned(Statement) then begin
+		Phrase := Statement^._Command;
 
 		// if already has a selection, delete it
 		if fText.SelAvail then
@@ -1316,7 +1314,7 @@ begin
 		// if we added "()" move caret inside parenthesis
 		// only if Key<>'.' and Key<>'>'
 		// and function takes arguments...
-		if (not (Key in ['.', '>'])) and (FuncAddOn<>'') and ( (Length(ST^._Args)>2) or (ST^._Args='()') ) then begin
+		if (not (Key in ['.', '>'])) and (FuncAddOn<>'') and ( (Length(Statement^._Args)>2) or (Statement^._Args='()') ) then begin
 			fText.CaretX:=fText.CaretX-Length(FuncAddOn)+1;
 		end;
 	end;

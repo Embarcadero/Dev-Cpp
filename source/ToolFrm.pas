@@ -46,13 +46,12 @@ type
    HasIcon: boolean;
   end;
 
-  TToolList = class(TObject)
+  TToolList = class
    private
     fList: TList;
     function GetItem(index: integer): PToolItem;
     procedure SetItem(index: integer; Value: PToolItem);
     function GetCount: integer;
-    procedure Packit;
    public
     constructor Create;
     destructor Destroy; override;
@@ -67,8 +66,22 @@ type
     property Count: integer read GetCount;
   end;
 
-{ Tool Edit Form }
-  TToolController = class;
+  TToolController = class
+   private
+    fToolList: TToolList;
+    fMenu: TMenuItem;
+    fOnClick: TNotifyEvent;
+    fOffset: integer;
+   public
+    constructor Create;
+    destructor Destroy; override;
+    procedure BuildMenu;
+    procedure Edit;
+    property Menu: TMenuItem read fMenu write fMenu;
+    property Offset: integer read fOffset write fOffset;
+    property ToolClick: TNotifyEvent read fOnClick write fOnClick;
+    property ToolList: TToolList read fToolList write fToolList;
+  end;
 
   TToolForm = class(TForm)
     grpCurrent: TGroupBox;
@@ -96,23 +109,6 @@ type
     property Controller: TToolController read fController write fController;
   end;
 
-  TToolController = class(TObject)
-   private
-    fToolList: TToolList;
-    fMenu: TMenuItem;
-    fOnClick: TNotifyEvent;
-    fOffset: integer;
-   public
-    constructor Create;
-    destructor Destroy; override;
-    procedure BuildMenu;
-    procedure Edit;
-    property Menu: TMenuItem read fMenu write fMenu;
-    property Offset: integer read fOffset write fOffset;
-    property ToolClick: TNotifyEvent read fOnClick write fOnClick;
-    property ToolList: TToolList read fToolList write fToolList;
-  end;
-
 implementation
 
 uses ToolEditFrm, inifiles, devcfg, utils, MultiLangSupport, datamod,
@@ -124,8 +120,8 @@ uses ToolEditFrm, inifiles, devcfg, utils, MultiLangSupport, datamod,
 
 constructor TToolList.Create;
 begin
-  inherited;
-  fList:= TList.Create;
+	inherited;
+	fList:= TList.Create;
 end;
 
 destructor TToolList.Destroy;
@@ -133,15 +129,9 @@ var
 	I : integer;
 begin
 	for I:=0 to fList.Count - 1 do
-		TObject(fList[i]).Free;
+		FreeMem(fList[i]);
 	fList.Free;
 	inherited;
-end;
-
-procedure TToolList.Packit;
-begin
-  fList.Pack;
-  fList.Capacity:= fList.Count;
 end;
 
 function TToolList.GetItem(index: integer): PToolItem;
@@ -156,7 +146,6 @@ end;
 
 function TToolList.GetCount: integer;
 begin
-  Packit;
   result:= fList.Count;
 end;
 
@@ -173,7 +162,6 @@ end;
 procedure TToolList.RemoveItem(index: integer);
 begin
   fList.Delete(index);
-  Packit;
 end;
 
 procedure TToolList.LoadTools;
@@ -184,33 +172,31 @@ var
  Value,
  section: string;
 begin
-  if not FileExists(devDirs.Config + 'devcpp.cfg') then exit;
-  with TINIFile.Create(devDirs.Config + 'devcpp.cfg') do
-   try
-    Count:= Readinteger('Tools', 'Count', 0);
-    if Count <= 0 then exit;
-    for idx:= 0 to pred(Count) do
-     begin
-       new(Item);
-       Value:= '';
-       section:= 'Tool'+inttostr(idx);
-       Item^.Title:= ReadString(section, 'Title', '');
-       Value:= ReadString(section, 'Program', '');
-       value:= ParseString(value);
-       Item^.Exec:= Value;
-       Value:= ReadString(section, 'WorkDir', '');
-       value:= ParseString(value);
-       Item^.WorkDir:=  Value;
-       Item^.Params:= ReadString(section, 'Params', '');
-       Item^.IcoNumGnome:=-1;
-       Item^.IcoNumBlue:=-1;
-       Item^.IcoNumNewLook:=-1;
-       Item^.HasIcon:=False;
-       AddItem(Item);
-     end;
-   finally
-    Free;
-   end;
+	if not FileExists(devDirs.Config + 'devcpp.cfg') then exit;
+	with TINIFile.Create(devDirs.Config + 'devcpp.cfg') do
+		try
+			Count:= Readinteger('Tools', 'Count', 0);
+			for idx:= 0 to pred(Count) do begin
+				new(Item);
+				Value:= '';
+				section:= 'Tool'+inttostr(idx);
+				Item^.Title:= ReadString(section, 'Title', '');
+				Value:= ReadString(section, 'Program', '');
+				value:= ParseString(value);
+				Item^.Exec:= Value;
+				Value:= ReadString(section, 'WorkDir', '');
+				value:= ParseString(value);
+				Item^.WorkDir:=  Value;
+				Item^.Params:= ReadString(section, 'Params', '');
+				Item^.IcoNumGnome:=-1;
+				Item^.IcoNumBlue:=-1;
+				Item^.IcoNumNewLook:=-1;
+				Item^.HasIcon:=False;
+				AddItem(Item);
+			end;
+		finally
+			Free;
+		end;
 end;
 
 procedure TToolList.SaveTools;
@@ -281,10 +267,10 @@ end;
 
 destructor TToolController.Destroy;
 begin
-  if assigned(fMenu) then fMenu.Clear;
-  fToolList.SaveTools;
-  fToolList.Free;
-  inherited;
+	if assigned(fMenu) then fMenu.Clear;
+	fToolList.SaveTools;
+	fToolList.Free;
+	inherited;
 end;
 
 { ** enable/disable if not executable }

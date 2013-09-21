@@ -40,7 +40,7 @@ uses
 type
   TImageThemeClass = class of TCustomImageTheme;
 
-  TCustomImageTheme = class(TPersistent)
+  TCustomImageTheme = class
   private
     FBitmap: TBitmap;
     FFilename: string;
@@ -107,7 +107,7 @@ type
   end;
 
 
-  TCustomImageThemeFactory = class(TPersistent)
+  TCustomImageThemeFactory = class
   private
     FCurrentTheme: TCustomImageTheme;
     FThemes: TObjectList;
@@ -123,7 +123,7 @@ type
     property ThemeTitle[Index: Integer]: string read GetThemeTitle;
   public
     constructor Create; virtual;
-    destructor Destroy; virtual;
+    destructor Destroy; override;
     function ActivateTheme(ATheme: TCustomImageTheme): Boolean; overload;
     function ActivateTheme(AThemeTitle: string): Boolean; overload;
     procedure AddTheme(const ATheme: TCustomImageTheme);
@@ -143,7 +143,7 @@ type
     function GetCurrentTheme: TDevImageTheme;
     procedure SetCurrentTheme(const ATheme: TDevImageTheme);
   protected
-    procedure DoCreateThemeFromFile(AFilename: string); override;   
+    procedure DoCreateThemeFromFile(AFilename: string); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -160,15 +160,7 @@ var
 implementation
 
 uses
-  DataMod,utils;
-  
-  // local helper only
-  function DataModule: TdmMain;
-  begin
-    Assert(Assigned(DataMod.dmMain), 'DataMod.dmMain must not be nil');
-    
-    Result := DataMod.dmMain;  // there are the imagelists for the default themes
-  end;
+  DataMod;
   
 //----------------- TCustomImageTheme ----------------------------------------------------------------------------------
 
@@ -409,11 +401,11 @@ constructor TGnomeImageTheme.Create;
 begin
   inherited;
 
-  MenuImages := DataModule.MenuImages_Gnome;
-  HelpImages := DataModule.HelpImages_Gnome;
-  ProjectImages := DataModule.ProjectImage_Gnome;
-  SpecialImages := DataModule.SpecialImages_Gnome;
-  BrowserImages := DataModule.ClassImages;
+  MenuImages    := dmMain.MenuImages_Gnome;
+  HelpImages    := dmMain.HelpImages_Gnome;
+  ProjectImages := dmMain.ProjectImage_Gnome;
+  SpecialImages := dmMain.SpecialImages_Gnome;
+  BrowserImages := dmMain.ClassImages;
 
   FTitle := 'Gnome';
 end;
@@ -424,11 +416,11 @@ constructor TNewLookImageTheme.Create;
 begin
   inherited;
 
-  MenuImages := DataModule.MenuImages_NewLook;
-  HelpImages := DataModule.HelpImages_NewLook;
-  ProjectImages := DataModule.ProjectImage_NewLook;
-  SpecialImages := DataModule.SpecialImages_NewLook;
-  BrowserImages := DataModule.ClassImages;
+  MenuImages    := dmMain.MenuImages_NewLook;
+  HelpImages    := dmMain.HelpImages_NewLook;
+  ProjectImages := dmMain.ProjectImage_NewLook;
+  SpecialImages := dmMain.SpecialImages_NewLook;
+  BrowserImages := dmMain.ClassImages;
 
   FTitle := 'New Look';
 end;
@@ -439,11 +431,11 @@ constructor TBlueImageTheme.Create;
 begin
   inherited;
 
-  MenuImages := DataModule.MenuImages_Blue;
-  HelpImages := DataModule.HelpImages_Blue;
-  ProjectImages := DataModule.ProjectImage_Blue;
-  SpecialImages := DataModule.SpecialImages_Blue;
-  BrowserImages := DataModule.ClassImages;
+  MenuImages    := dmMain.MenuImages_Blue;
+  HelpImages    := dmMain.HelpImages_Blue;
+  ProjectImages := dmMain.ProjectImage_Blue;
+  SpecialImages := dmMain.SpecialImages_Blue;
+  BrowserImages := dmMain.ClassImages;
 
   FTitle := 'Blue';
 end;
@@ -453,21 +445,16 @@ end;
 constructor TCustomImageThemeFactory.Create;
 begin
 	inherited;
-	FThemes := TObjectList.Create;
+	FThemes := TObjectList.Create(True);
 end;
 
 destructor TCustomImageThemeFactory.Destroy;
-var
-	I : integer;
 begin
-	for I := 0 to FThemes.Count - 1 do
-		FThemes[i].Free;
 	FThemes.Free;
-
 	inherited;
 end;
 
-function TCustomImageThemeFactory.ActivateTheme(ATheme: TCustomImageTheme): Boolean; 
+function TCustomImageThemeFactory.ActivateTheme(ATheme: TCustomImageTheme): Boolean;
 begin
   CurrentTheme := ATheme;
   Result := True;
@@ -602,38 +589,37 @@ end;
 
 procedure TDevImageThemeFactory.DoCreateThemeFromFile(AFilename: string);
 var
-  NewTheme: TDevImageTheme;
+	NewTheme: TDevImageTheme;
 begin
-  if FileExists(AFilename) then
-  begin
-    NewTheme := TDevImageTheme.Create;
-    NewTheme.LoadFromFile(AFilename);
-    NewTheme.FTitle := ChangeFileExt(ExtractFileName(AFilename), '');
-    
-    AddTheme(NewTheme);
-  end;
+	if FileExists(AFilename) then begin
+		NewTheme := TDevImageTheme.Create;
+		NewTheme.LoadFromFile(AFilename);
+		NewTheme.FTitle := ChangeFileExt(ExtractFileName(AFilename), '');
+
+	AddTheme(NewTheme);
+	end;
 end;
 
 function TDevImageThemeFactory.GetCurrentTheme: TDevImageTheme;
 begin
-  Result := inherited CurrentTheme as TDevImageTheme;
+	Result := inherited CurrentTheme as TDevImageTheme;
 end;
 
 procedure TDevImageThemeFactory.SetCurrentTheme(const ATheme: TDevImageTheme);
 var
-  OldTheme: TDevImageTheme;
+	OldTheme: TDevImageTheme;
 begin
-  OldTheme := CurrentTheme;
-  
-  inherited CurrentTheme := ATheme;
+	OldTheme := CurrentTheme;
 
-  if Assigned(FOnThemeChanged) then
-    FOnThemeChanged(Self, OldTheme, ATheme);
+	inherited CurrentTheme := ATheme;
+
+	if Assigned(FOnThemeChanged) then
+		FOnThemeChanged(Self, OldTheme, ATheme);
 end;
 
 function TDevImageThemeFactory.GetTheme(Index: Integer): TDevImageTheme;
 begin
-  Result := inherited Themes[Index] as TDevImageTheme;
+	Result := inherited Themes[Index] as TDevImageTheme;
 end;
 
 end.

@@ -108,6 +108,11 @@ end;
 
 destructor TTemplate.Destroy;
 begin
+  fOptions.Includes.Free;
+  fOptions.Libs.Free;
+  fOptions.ResourceIncludes.Free;
+  fOptions.MakeIncludes.Free;
+  fOptions.ObjFiles.Free;
   fTemplate.Free;
   inherited;
 end;

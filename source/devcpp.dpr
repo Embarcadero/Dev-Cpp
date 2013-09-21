@@ -25,7 +25,7 @@ program devcpp;
 {%File 'LangIDs.inc'}
 
 uses
-  MemCheck in 'MemCheck.pas',
+  //MemCheck in 'MemCheck.pas',
 
 {$IFDEF WIN32}
   Windows, Forms, sysUtils, SHFolder, Dialogs,

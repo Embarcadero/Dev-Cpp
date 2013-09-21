@@ -324,11 +324,6 @@ begin
      begin
        fEditor:= TEditor.Create;
        fEditor.Init(TRUE, ExtractFileName(fFileName), fFileName, FALSE);
-       if devEditor.AppendNewline then
-         with fEditor.Text do
-           if Lines.Count > 0 then
-             if Lines[Lines.Count -1] <> '' then
-               Lines.Add('');
        fEditor.Text.UnCollapsedLines.SavetoFile(fFileName);
        fEditor.New := False;
        fEditor.Modified := False;
@@ -337,11 +332,6 @@ begin
     else
     if assigned(fEditor) and fEditor.Modified then
      begin
-       if devEditor.AppendNewline then
-         with fEditor.Text do
-           if Lines.Count > 0 then
-             if Lines[Lines.Count -1] <> '' then
-               Lines.Add('');
        fEditor.Text.UnCollapsedLines.SaveToFile(fEditor.FileName);
        if FileExists(fEditor.FileName) then
          FileSetDate(fEditor.FileName, DateTimeToFileDate(Now)); // fix the "Clock skew detected" warning ;)
@@ -459,37 +449,35 @@ end;
 
 constructor TProject.Create(nFileName, nName: string);
 begin
-  inherited Create;
-  fNode := nil;
-  fFolders:=TStringList.Create;
-  fFolders.Duplicates:=dupIgnore;
-  fFolders.Sorted:=True;
-  { begin XXXKF }
-  fFolderNodes:=TObjectList.Create;
-  fFolderNodes.OwnsObjects:=false;
-  { end XXXKF }
-  fUnits:= TUnitList.Create;
-  fFileName := nFileName;
-  finiFile:= TdevINI.Create;
-  try
-    finiFile.FileName:= fFileName;
-  except
-    fFileName := '';
-    MessageDlg('Could not read project file, make sure you have the correct permissions to read it.', mtError, [mbOK], 0);
-    exit;
-  end;
-  finiFile.Section:= 'Project';
+	inherited Create;
+	fNode := nil;
+	fFolders:=TStringList.Create;
+	fFolders.Duplicates:=dupIgnore;
+	fFolders.Sorted:=True;
 
-  InitOptionsRec(fOptions);
-  if nName = DEV_INTERNAL_OPEN then
-    Open
-  else
-   begin
-     fName := nName;
-     fIniFile.Write('filename', nFileName);
-     fIniFile.Write('name', nName);
-     fNode := MakeProjectNode;
-   end;
+	fFolderNodes:=TObjectList.Create(false);
+
+	fUnits:= TUnitList.Create;
+	fFileName := nFileName;
+	finiFile:= TdevINI.Create;
+	try
+		finiFile.FileName:= fFileName;
+	except
+		fFileName := '';
+		MessageDlg('Could not read project file, make sure you have the correct permissions to read it.', mtError, [mbOK], 0);
+		exit;
+	end;
+	finiFile.Section:= 'Project';
+
+	InitOptionsRec(fOptions);
+	if nName = DEV_INTERNAL_OPEN then
+		Open
+	else begin
+		fName := nName;
+		fIniFile.Write('filename', nFileName);
+		fIniFile.Write('name', nName);
+		fNode := MakeProjectNode;
+	end;
 end;
 
 destructor TProject.Destroy;
@@ -673,20 +661,12 @@ begin
           Original.LoadFromFile(Res);
           if CompareStr(Original.Text, ResFile.Text) <> 0 then
           begin
-            if devEditor.AppendNewline then
-              if ResFile.Count > 0 then
-                if ResFile[ResFile.Count -1] <> '' then
-                  ResFile.Add('');
             ResFile.SaveToFile(Res);
           end;
           Original.Free;
       end
       else
       begin
-        if devEditor.AppendNewline then
-          if ResFile.Count > 0 then
-            if ResFile[ResFile.Count -1] <> '' then
-              ResFile.Add('');
         ResFile.SaveToFile(Res);
       end;
       fOptions.PrivateResource := ExtractRelativePath(Directory, Res);
@@ -1787,28 +1767,26 @@ end;
 
 function TProject.AssignTemplate(const aFileName: string; const aTemplate: TTemplate): boolean;
 var
- Options: TProjOptions;
- idx: integer;
- s, s2: string;
- OriginalIcon, DestIcon: String;
+	Options: TProjOptions;
+	idx: integer;
+	s, s2: string;
+	OriginalIcon, DestIcon: String;
 begin
-  result:= TRUE;
-  try
-   if aTemplate.Version = -1 then
-    begin
-      fName:= format(Lang[ID_NEWPROJECT], [dmmain.GetNumber]);
-      fNode.Text:= fName;
-      finiFile.FileName:= aFileName;
-      NewUnit(FALSE);
-      with fUnits[fUnits.Count -1] do
-       begin
-         Editor:= TEditor.Create;
-         Editor.init(TRUE, ExtractFileName(FileName), FileName, FALSE);
-         Editor.InsertDefaultText;
-         Editor.Activate;
-       end;
-      exit;
-    end;
+	result:= TRUE;
+	try
+		if aTemplate.Version = -1 then begin
+			fName:= format(Lang[ID_NEWPROJECT], [dmmain.GetNumber]);
+			fNode.Text:= fName;
+			finiFile.FileName:= aFileName;
+			NewUnit(FALSE);
+			with fUnits[fUnits.Count - 1] do begin
+				Editor:= TEditor.Create;
+				Editor.init(TRUE, ExtractFileName(FileName), FileName, FALSE);
+				Editor.InsertDefaultText;
+				Editor.Activate;
+			end;
+			exit;
+		end;
 
    fName:= aTemplate.ProjectName;
    finifile.FileName:= aFileName;

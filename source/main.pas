@@ -1365,11 +1365,12 @@ begin
 		TObject(BreakPointList.Items[i]).Free;
 	BreakPointList.Free;
 
+	// Free non-singletons
+	devImageThemes.Free;
 	devTheme.Free;
-	devImageThemes.Free; // Deze laat de boel in de soep lopen?
 	fCompiler.Free;
 	fDebugger.Free;
-	//fTools.Free; // Deze laat de boel in de soep lopen?
+	fTools.Free;
 	devExecutor.Free;
 	dmMain.Free;
 
@@ -1394,7 +1395,7 @@ begin
 				OpenFile(ParamStr(idx));
 		end;
 		inc(idx);
-	 end;
+	end;
 end;
 
 procedure TMainForm.BuildBookMarkMenus;
@@ -1867,11 +1868,6 @@ begin
 				e.FileName := s;
 
 				try
-					if devEditor.AppendNewline then
-						with e.Text do
-							if Lines.Count > 0 then
-								if Lines[Lines.Count -1] <> '' then
-									Lines.Add('');
 					e.Text.UnCollapsedLines.SaveToFile(s);
 					e.Modified := FALSE;
 					e.New:= FALSE;
@@ -1939,11 +1935,6 @@ begin
 			end;
 		end else // stand alone file (should have fullpath in e.filename)
 			try
-				if devEditor.AppendNewline then
-					with e.Text do
-						if Lines.Count > 0 then
-							if Lines[Lines.Count -1] <> '' then
-								Lines.Add('');
 				e.Text.UnCollapsedLines.SaveToFile(e.FileName);
 				e.Modified := false;
 				if ClassBrowser1.Enabled then begin
@@ -2602,11 +2593,9 @@ var
 	NewUnit : TProjUnit;
 begin
 	if Assigned(fProject) then
-			InProject := Application.MessageBox(PChar(
-				Lang[ID_MSG_NEWRES]), 'New Resource', MB_ICONQUESTION +
-				MB_YESNO) = mrYes
+		InProject := Application.MessageBox(PChar(Lang[ID_MSG_NEWRES]), 'New Resource', MB_ICONQUESTION + MB_YESNO) = mrYes
 	else
-			InProject := False;
+		InProject := False;
 
 	fname:=Lang[ID_UNTITLED] +inttostr(dmMain.GetNum) + '.rc';
 	NewEditor := TEditor.Create;
@@ -4319,7 +4308,7 @@ begin
 				ClassBrowser1.CurrentFile:=e.FileName;
 		end;
 	end;
-	SetStatusbarMessage('Done parsing in '+FormatFloat('#,###,##0.00', (GetTickCount-I1)/1000)+' seconds');
+	SetStatusbarMessage(Lang[ID_DONEPARSING] + ' in ' + FormatFloat('#,###,##0.00', (GetTickCount-I1)/1000)+' seconds');
 end;
 
 procedure TMainForm.ClassBrowser1Select(Sender: TObject;
@@ -4338,7 +4327,7 @@ begin
 	if FileName<>'' then
 		SetStatusBarMessage('Parsing '+ Filename)
 	else
-		SetStatusBarMessage('Done parsing.');
+		SetStatusBarMessage(Lang[ID_DONEPARSING]);
 	//Statusbar.Refresh;
 end;
 
@@ -5440,7 +5429,7 @@ begin
 		RebuildClassesToolbar;
 	end;
 
-	SetStatusBarMessage('Done parsing.');
+	SetStatusBarMessage(Lang[ID_DONEPARSING]);
 end;
 
 procedure TMainForm.UpdateAppTitle;
