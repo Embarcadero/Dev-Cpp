@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Classes, editor, ComCtrls, datamod;
+  Classes, editor, ComCtrls, datamod, Windows;
 {$ENDIF}
 {$IFDEF LINUX}
   Classes, editor, QComCtrls, datamod;
@@ -122,7 +122,7 @@ begin
      HostApplication := '';
      SupportXPThemes:=False;
      CompilerSet:=0;
-     CompilerOptions:=  devCompiler.OptionStr;
+     CompilerOptions:=devCompiler.OptionStr;
 
      IncludeVersionInfo:=False;
      VersionInfo.Major:=1;

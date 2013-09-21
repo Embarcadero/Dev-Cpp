@@ -899,6 +899,7 @@ PBreakPointEntry = ^TBreakPointEntry;
 		procedure DoCreateEverything;	// added by peter
 		procedure DoApplyWindowPlacement; // added by peter
 	public
+		procedure MsgBox(text,caption: string);
 		procedure OpenFile(s : string);
 		procedure OpenProject(s: string);
 		function FileIsOpen(const s: string; inprj: boolean = FALSE): integer;
@@ -1570,8 +1571,7 @@ end;
 
 procedure TMainForm.LoadText(force : boolean);
 begin
-	with Lang do
-	 begin
+	with Lang do begin
 		// Menus
 		FileMenu.Caption :=					Strings[ID_MNU_FILE];
 		EditMenu.Caption :=					Strings[ID_MNU_EDIT];
@@ -1846,7 +1846,7 @@ begin
 		GotoBtn.Caption :=					Strings[ID_TB_GOTO];
 
 		tbSpecials.Width := NewAllBtn.Width + InsertBtn.Width + ToggleBtn.Width + GotoBtn.Width;
-	 end;
+	end;
 	BuildBookMarkMenus;
 	SetHints;
 	devCompiler.ChangeOptionsLang;
@@ -2086,6 +2086,7 @@ begin
 		mtConfirmation, mbYesNoCancel, 0) of
 	 mrYes:
 			Result := SaveFile(e);
+
 	 mrNo:
 		begin
 			result:= TRUE;
@@ -2106,27 +2107,22 @@ begin
 	if not AskBeforeClose(e, Rem) then Exit;
 
 	Result := True;
-	if not e.InProject then
-	begin
-		 dmMain.AddtoHistory(e.FileName);
-		 FreeAndNil(e);
-	end
-	else
-	begin
-		 if e.IsRes and (not Assigned(fProject)) then
+	if not e.InProject then begin
+		dmMain.AddtoHistory(e.FileName);
+		FreeAndNil(e);
+	end else begin
+		if e.IsRes and (not Assigned(fProject)) then
 			FreeAndNil(e)
-		 else
+		else
 			if assigned(fProject) then
-			 fProject.CloseUnit(fProject.Units.Indexof(e));
+				fProject.CloseUnit(fProject.Units.Indexof(e));
 	end;
 	e:=GetEditor;
 	if Assigned(e) then begin
 		ClassBrowser1.CurrentFile:=e.FileName;
 		e.Text.SetFocus;
-	end
-	else
-		if (ClassBrowser1.ShowFilter=sfCurrent) or not Assigned(fProject) then
-			ClassBrowser1.Clear;
+	end else if (ClassBrowser1.ShowFilter=sfCurrent) or not Assigned(fProject) then
+		ClassBrowser1.Clear;
 end;
 
 procedure TMainForm.ProjectViewChange(Sender: TObject; Node: TTreeNode);
@@ -2320,7 +2316,7 @@ var
  e: TEditor;
  idx : integer;
 begin
-	if s[length(s)] = '.' then		 // correct filename if the user gives an alone dot to force the no extension
+	if s[length(s)] = '.' then // correct filename if the user gives an alone dot to force the no extension
 		s[length(s)] := #0;
 	idx := FileIsOpen(s);
 	if (idx <> -1) then begin
@@ -2328,32 +2324,22 @@ begin
 		exit;
 	end;
 
-	if not FileExists(s) then
-	begin
-			Application.MessageBox(PChar(Format(Lang[ID_ERR_FILENOTFOUND],
-				[s])), 'Error', MB_ICONHAND);
-			Exit;
+	if not FileExists(s) then begin
+		Application.MessageBox(PChar(Format(Lang[ID_ERR_FILENOTFOUND],[s])), 'Error', MB_ICONHAND);
+		Exit;
 	end;
 
 	e:= TEditor.Create;
 	e.Init(FALSE, ExtractFileName(s), s, TRUE);
-	if assigned(fProject) then
-	 begin
-		 if (fProject.FileName <> s) and
-				(fProject.GetUnitFromString(s) = -1) then
+	if assigned(fProject) then begin
+		if (fProject.FileName <> s) and (fProject.GetUnitFromString(s) = -1) then
 			dmMain.RemoveFromHistory(s);
-	 end
-	else
-	 begin
-		 dmMain.RemoveFromHistory(s);
-		 // mandrav: why hide the class browser? (even if no project open - just a source file)
-//		 if devData.ProjectView then
-//			actProjectManager.Execute;
-	 end;
+	end else begin
+		dmMain.RemoveFromHistory(s);
+	end;
 	e.activate;
 	if not assigned(fProject) then
 		CppParser1.ReParseFile(e.FileName, e.InProject, True);
-//	ClassBrowser1.CurrentFile:=e.FileName;
 end;
 
 procedure TMainForm.AddFindOutputItem(line, col, unit_, message: string);
@@ -2872,10 +2858,10 @@ begin
 	wa:=devFileMonitor1.Active;
 	devFileMonitor1.Deactivate;
 	if assigned(fProject) then begin
-	 fProject.Save;
-	 UpdateAppTitle;
-	 if CppParser1.Statements.Count=0 then // only scan entire project if it has not already been scanned...
-		 ScanActiveProject;
+		fProject.Save;
+		UpdateAppTitle;
+		if CppParser1.Statements.Count=0 then // only scan entire project if it has not already been scanned...
+			ScanActiveProject;
 	end;
 
 	for idx:= 0 to pred(PageControl.PageCount) do begin
@@ -3662,80 +3648,65 @@ begin
 	end;
 end;
 
+procedure TMainForm.MsgBox(text,caption:string);
+begin
+	MessageBox(application.handle,PChar(text),PChar(caption),MB_OK);
+end;
+
 procedure TMainForm.actDebugExecute(Sender: TObject);
 var
- e: TEditor;
- idx, idx2: integer;
- s : string;
+	e: TEditor;
+	idx, idx2: integer;
+	s : string;
 begin
 	PrepareDebugger;
-	if assigned(fProject) then
-	 begin
-		 if not FileExists(fProject.Executable) then begin
-			 MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
-			 exit;
-		 end;
-		 if fProject.Options.typ = dptDyn then begin
-			 if fProject.Options.HostApplication = '' then begin
-				 MessageDlg(Lang[ID_ERR_HOSTMISSING], mtWarning, [mbOK], 0);
-				 exit;
-			 end
-			 else if not FileExists(fProject.Options.HostApplication) then begin
-				 MessageDlg(Lang[ID_ERR_HOSTNOTEXIST], mtWarning, [mbOK], 0);
-				 exit;
-			 end;
-		 end;
+	if assigned(fProject) then begin
+		if not FileExists(fProject.Executable) then begin
+			MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
+			exit;
+		end;
+		if fProject.Options.typ = dptDyn then begin
+			if fProject.Options.HostApplication = '' then begin
+				MessageDlg(Lang[ID_ERR_HOSTMISSING], mtWarning, [mbOK], 0);
+				exit;
+			end else if not FileExists(fProject.Options.HostApplication) then begin
+				MessageDlg(Lang[ID_ERR_HOSTNOTEXIST], mtWarning, [mbOK], 0);
+				exit;
+			end;
+		end;
 
-		 fDebugger.FileName:= '"' +StringReplace(fProject.Executable, '\', '\\', [rfReplaceAll]) +'"';
+		fDebugger.FileName:= '"' + StringReplace(fProject.Executable, '\', '\\', [rfReplaceAll]) +'"';
 
-		 // add to the debugger the project include dirs
-		 for idx:=0 to fProject.Options.Includes.Count-1 do
+		// add to the debugger the project include dirs
+		for idx:=0 to fProject.Options.Includes.Count-1 do
 			 fDebugger.AddIncludeDir(fProject.Options.Includes[idx]);
 
-		 fDebugger.Execute;
-		 fDebugger.SendCommand(GDB_FILE, fDebugger.FileName);
-		 fDebugger.SendCommand(GDB_SETARGS, fCompiler.RunParams);
-		 {for idx:= 0 to pred(PageControl.PageCount) do begin
-				e:= GetEditor(idx);
-				// why used to enter breakpoints only in project files?
-				// did it have something to do with the debugger's include dirs? ;)
-				if e.Breakpoints.Count> 0 then
-				 for idx2:= 0 to pred(e.Breakpoints.Count) do
-					fDebugger.AddBreakPoint(e, integer(e.Breakpoints[idx2]));
-		 end;}
-		 for idx:=0 to BreakPointList.Count -1 do begin
-				PBreakPointEntry(BreakPointList.Items[idx])^.breakPointIndex := fDebugger.AddBreakpoint(idx);
-		 end;
-		 if fProject.Options.typ = dptDyn then begin
-			 fDebugger.SendCommand(GDB_EXECFILE, '"' + StringReplace(fProject.Options.HostApplication, '\', '\\', [rfReplaceAll]) +'"');
-		 end
-	 end
-	else
-	 begin
-		 e:= GetEditor;
-		 if assigned(e) then
-			begin
-				if not FileExists(ChangeFileExt(e.FileName, EXE_EXT)) then begin
-					MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
-					exit;
-				end;
-				if e.Modified then // if file is modified
-					if not SaveFile(e) then // save it first
-						Abort; // if it's not saved, abort
-				chdir(ExtractFilePath(e.FileName));
-				fDebugger.FileName := '"' +
-					StringReplace(ChangeFileExt(ExtractFileName(e.FileName), EXE_EXT), '\', '\\', [rfReplaceAll]) +'"';
-				fDebugger.Execute;
-				fDebugger.SendCommand(GDB_FILE, fDebugger.FileName);
-				fDebugger.SendCommand(GDB_SETARGS, fCompiler.RunParams);
-				for idx2:=0 to BreakPointList.Count -1 do begin
-					 PBreakPointEntry(BreakPointList.Items[idx2])^.breakPointIndex := fDebugger.AddBreakpoint(idx2);
-				end;
-				{if (e.Breakpoints.Count > 0) then
-					for idx2:= 0 to pred(e.Breakpoints.Count) do
-						fDebugger.AddBreakPoint(e, integer(e.Breakpoints[idx2]));}
+		fDebugger.Execute;
+		fDebugger.SendCommand(GDB_FILE, fDebugger.FileName);
+		fDebugger.SendCommand(GDB_SETARGS, fCompiler.RunParams);
+		for idx:=0 to BreakPointList.Count -1 do
+			PBreakPointEntry(BreakPointList.Items[idx])^.breakPointIndex := fDebugger.AddBreakpoint(idx);
+		if fProject.Options.typ = dptDyn then
+			fDebugger.SendCommand(GDB_EXECFILE, '"' + StringReplace(fProject.Options.HostApplication, '\', '\\', [rfReplaceAll]) +'"');
+	end else begin
+		e:= GetEditor;
+		if assigned(e) then begin
+			if not FileExists(ChangeFileExt(e.FileName, EXE_EXT)) then begin
+				MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
+				exit;
 			end;
-	 end;
+			if e.Modified then // if file is modified
+				if not SaveFile(e) then // save it first
+					Abort; // if it's not saved, abort
+			chdir(ExtractFilePath(e.FileName));
+			fDebugger.FileName := '"' + StringReplace(ChangeFileExt(ExtractFileName(e.FileName), EXE_EXT), '\', '\\', [rfReplaceAll]) +'"';
+			fDebugger.Execute;
+			fDebugger.SendCommand(GDB_FILE, fDebugger.FileName);
+			fDebugger.SendCommand(GDB_SETARGS, fCompiler.RunParams);
+			for idx2:=0 to BreakPointList.Count -1 do
+				PBreakPointEntry(BreakPointList.Items[idx2])^.breakPointIndex := fDebugger.AddBreakpoint(idx2);
+		end;
+	end;
 
 	//DebugTree.Items.Clear;
 
@@ -6499,7 +6470,7 @@ begin
 end;
 
 
-procedure TMainForm.HideCodeToolTip;	
+procedure TMainForm.HideCodeToolTip;
 //
 // added on 23rd may 2004 by peter_
 // belongs to this problem: 
@@ -6525,8 +6496,7 @@ begin
 	HideCodeToolTip; 
 end;
 
-procedure TMainForm.PageControlChanging(Sender: TObject;
-	var AllowChange: Boolean);
+procedure TMainForm.PageControlChanging(Sender: TObject;var AllowChange: Boolean);
 //
 // added on 23rd may 2004 by peter_
 //

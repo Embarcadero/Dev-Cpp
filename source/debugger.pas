@@ -393,45 +393,47 @@ var
   spos: integer;
   opts: TProjOptions;
 begin
-  CloseDebugger(nil);
-  if (MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
-    if devCompiler.FindOption('-g3', opt, idx) then begin
-      opt.optValue:=1;
-      if not Assigned(MainForm.fProject) then
-        devCompiler.Options[idx]:=opt; // set global debugging option only if not working with a project
+	CloseDebugger(nil);
+	if (MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
+		if devCompiler.FindOption('-g3', opt, idx) then begin
+			opt.optValue:=1;
+			if not Assigned(MainForm.fProject) then
+				devCompiler.Options[idx]:=opt; // set global debugging option only if not working with a project
 
-      MainForm.SetProjCompOpt(idx, True); // set the project's correpsonding option too
+			MainForm.SetProjCompOpt(idx, True); // set the project's correpsonding option too
 
-      // remove "-s" from the linker''s command line
-      if Assigned(MainForm.fProject) then begin
-        opts:=MainForm.fProject.Options;
-        // look for "-s" in all the possible ways
-        // NOTE: can't just search for "-s" because we might get confused with
-        //       some other option starting with "-s...."
-        spos:=Pos('-s ', opts.cmdLines.Linker); // following more opts
-        if spos=0 then
-          spos:=Pos('-s'#13, opts.cmdLines.Linker); // end of line
-        if spos=0 then
-          spos:=Pos('-s_@@_', opts.cmdLines.Linker); // end of line (dev 4.9.7.3+)
-        if (spos=0) and
-           (Length(opts.cmdLines.Linker)>=2) and // end of string
-           (Copy(opts.cmdLines.Linker, Length(opts.cmdLines.Linker)-1, 2) = '-s') then
-          spos := Length(opts.cmdLines.Linker)-1;
-        // if found, delete it
-        if spos>0 then begin
-          Delete(opts.cmdLines.Linker, spos, 2);
-          MainForm.fProject.Options:=opts;
-        end;
-      end;
-      if devCompiler.FindOption('-s', opt, idx) then begin
-        opt.optValue := 0;
-        if not Assigned(MainForm.fProject) then
-          devCompiler.Options[idx]:=opt; // set global debugging option only if not working with a project
-        MainForm.SetProjCompOpt(idx, False); // set the project's correpsonding option too
-      end;
-      MainForm.actRebuildExecute(nil);
-    end;
-  end;
+			// remove "-s" from the linker's command line
+			if Assigned(MainForm.fProject) then begin
+				opts:=MainForm.fProject.Options;
+
+				// look for "-s" in all the possible ways
+				// NOTE: can't just search for "-s" because we might get confused with
+				// some other option starting with "-s...."
+				spos:=Pos('-s ', opts.cmdLines.Linker); // following more opts
+				if spos=0 then
+					spos:=Pos('-s'#13, opts.cmdLines.Linker); // end of line
+				if spos=0 then
+					spos:=Pos('-s_@@_', opts.cmdLines.Linker); // end of line (dev 4.9.7.3+)
+				if (spos=0) and
+				(Length(opts.cmdLines.Linker)>=2) and // end of string
+				(Copy(opts.cmdLines.Linker, Length(opts.cmdLines.Linker)-1, 2) = '-s') then
+					spos := Length(opts.cmdLines.Linker)-1;
+
+				// if found, delete it
+				if spos>0 then begin
+					Delete(opts.cmdLines.Linker, spos, 2);
+					MainForm.fProject.Options:=opts;
+				end;
+			end;
+			if devCompiler.FindOption('-s', opt, idx) then begin
+				opt.optValue := 0;
+				if not Assigned(MainForm.fProject) then
+					devCompiler.Options[idx]:=opt; // set global debugging option only if not working with a project
+				MainForm.SetProjCompOpt(idx, False); // set the project's correpsonding option too
+			end;
+			MainForm.actRebuildExecute(nil);
+		end;
+	end;
 end;
 
 // RNC function to continue if we are stuck debugging places we can't see 

@@ -640,6 +640,7 @@ const
   ID_COPT_GRP_C                    = 720;
   ID_COPT_GRP_CPP                  = 721;
   ID_COPT_GRP_COMP                 = 722;
+
   // free to 725 for new groups
   ID_COPT_ANSIC                    = 725;
   ID_COPT_TRADITIONAL              = 726;

@@ -837,33 +837,33 @@ begin
 			fOptions.ObjFiles.DelimitedText:= Read('ObjFiles', '');
 			fOptions.Libs.DelimitedText:= Read('Libs', '');
 			fOptions.Includes.DelimitedText:= Read('Includes', '');
-        fOptions.PrivateResource := Read('PrivateResource', '');
-        fOptions.ResourceIncludes.DelimitedText:= Read('ResourceIncludes', '');
-        fOptions.MakeIncludes.DelimitedText:= Read('MakeIncludes', '');
-        fOptions.UseGpp:= Read('IsCpp', FALSE);
-        fOptions.ExeOutput := Read('ExeOutput', '');
-        fOptions.ObjectOutput := Read('ObjectOutput', '');
-        fOptions.OverrideOutput := Read('OverrideOutput', FALSE);
-        fOptions.OverridenOutput := Read('OverrideOutputName', '');
-        fOptions.HostApplication := Read('HostApplication', '');
+			fOptions.PrivateResource := Read('PrivateResource', '');
+			fOptions.ResourceIncludes.DelimitedText:= Read('ResourceIncludes', '');
+			fOptions.MakeIncludes.DelimitedText:= Read('MakeIncludes', '');
+			fOptions.UseGpp:= Read('IsCpp', FALSE);
+			fOptions.ExeOutput := Read('ExeOutput', '');
+			fOptions.ObjectOutput := Read('ObjectOutput', '');
+			fOptions.OverrideOutput := Read('OverrideOutput', FALSE);
+			fOptions.OverridenOutput := Read('OverrideOutputName', '');
+			fOptions.HostApplication := Read('HostApplication', '');
 
-        fFolders.CommaText := Read('Folders', '');
-        fCmdLineArgs:=Read('CommandLine', '');
+			fFolders.CommaText := Read('Folders', '');
+			fCmdLineArgs:=Read('CommandLine', '');
 
-        fUseCustomMakefile := Read('UseCustomMakefile', FALSE);
-        fCustomMakefile := Read('CustomMakefile', '');
+			fUseCustomMakefile := Read('UseCustomMakefile', FALSE);
+			fCustomMakefile := Read('CustomMakefile', '');
 
-        fOptions.IncludeVersionInfo:=Read('IncludeVersionInfo', False);
-        fOptions.SupportXPThemes:=Read('SupportXPThemes', False);
-        fOptions.CompilerSet:=Read('CompilerSet', devCompiler.CompilerSet);
-        fOptions.CompilerOptions:=Read('CompilerSettings', devCompiler.OptionStr);
-        if fOptions.CompilerSet>devCompilerSet.Sets.Count-1 then begin
-          fOptions.CompilerSet:=devCompiler.CompilerSet;
-          MessageDlg('The compiler set you have selected for this project, no longer exists.'#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
-        end;
+			fOptions.IncludeVersionInfo:=Read('IncludeVersionInfo', False);
+			fOptions.SupportXPThemes:=Read('SupportXPThemes', False);
+			fOptions.CompilerSet:=Read('CompilerSet', devCompiler.CompilerSet);
+			if fOptions.CompilerSet>devCompilerSet.Sets.Count-1 then begin
+				MessageDlg('The compiler set you have selected for this project, no longer exists.'#13#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
+				fOptions.CompilerSet:=devCompiler.CompilerSet;
+			end;
+			fOptions.CompilerOptions:=Read('CompilerSettings', devCompiler.OptionStr);
 
-        Section:= 'VersionInfo';
-        fOptions.VersionInfo.Major:=            Read('Major',             0);
+			Section:= 'VersionInfo';
+			fOptions.VersionInfo.Major:=        Read('Major',             0);
         fOptions.VersionInfo.Minor:=            Read('Minor',             1);
         fOptions.VersionInfo.Release:=          Read('Release',           1);
         fOptions.VersionInfo.Build:=            Read('Build',             1);
@@ -879,7 +879,7 @@ begin
         fOptions.VersionInfo.ProductName:=      Read('ProductName',       Name);
         fOptions.VersionInfo.ProductVersion:=   Read('ProductVersion',    '0.1');
         fOptions.VersionInfo.AutoIncBuildNr:=   Read('AutoIncBuildNr',    False);
-        fOptions.VersionInfo.SyncProduct:=      Read('SyncProduct',    False);
+        fOptions.VersionInfo.SyncProduct:=      Read('SyncProduct',       False);
       end
      else
       begin // dev-c < 4
@@ -896,7 +896,7 @@ begin
         fOptions.ResourceIncludes.DelimitedText:= Read('ResourceIncludes', '');
         fOptions.ObjFiles.Add(read('ObjFiles', ''));
         fOptions.Includes.Add(Read('IncludeDirs', ''));
-        fOPtions.cmdLines.Compiler:= Read('CompilerOptions', '');
+        fOptions.cmdLines.Compiler:= Read('CompilerOptions', '');
         fOptions.usegpp:= Read('Use_GPP', FALSE);
         fOptions.ExeOutput := Read('ExeOutput', '');
         fOptions.ObjectOutput := Read('ObjectOutput', '');
@@ -909,74 +909,77 @@ end;
 
 procedure TProject.UpdateFile;
 begin
-  with finifile do
-   begin
-     Section:= 'Project';
+	with finifile do begin
+		Section:= 'Project';
 
-     Write('FileName', ExtractRelativePath(Directory, fFileName));
-     Write('Name', fName);
-     Write('Type', fOptions.typ);
-     Write('Ver', 1);
-     Write('ObjFiles', fOptions.ObjFiles.DelimitedText);
-     Write('Includes', fOptions.Includes.DelimitedText);
-     Write('Libs', fOptions.Libs.DelimitedText);
-     Write('PrivateResource', fOptions.PrivateResource);
-     Write('ResourceIncludes', fOptions.ResourceIncludes.DelimitedText);
-     Write('MakeIncludes', fOptions.MakeIncludes.DelimitedText);
-     Write('Compiler', fOptions.cmdLines.Compiler);
-     Write('CppCompiler', fOptions.cmdLines.CppCompiler);
-     Write('Linker', fOptions.cmdLines.Linker);
-     Write('IsCpp', fOptions.UseGpp);
-     Write('Icon', ExtractRelativePath(Directory, fOptions.Icon));
-     Write('ExeOutput', fOptions.ExeOutput);
-     Write('ObjectOutput', fOptions.ObjectOutput);
-     Write('OverrideOutput', fOptions.OverrideOutput);
-     Write('OverrideOutputName', fOptions.OverridenOutput);
-     Write('HostApplication', fOptions.HostApplication);
+		Write('FileName', ExtractRelativePath(Directory, fFileName));
+		Write('Name', fName);
+		Write('Type', fOptions.typ);
+		Write('Ver', 1);
+		Write('ObjFiles', fOptions.ObjFiles.DelimitedText);
+		Write('Includes', fOptions.Includes.DelimitedText);
+		Write('Libs', fOptions.Libs.DelimitedText);
+		Write('PrivateResource', fOptions.PrivateResource);
+		Write('ResourceIncludes', fOptions.ResourceIncludes.DelimitedText);
+		Write('MakeIncludes', fOptions.MakeIncludes.DelimitedText);
+		Write('Compiler', fOptions.cmdLines.Compiler);
+		Write('CppCompiler', fOptions.cmdLines.CppCompiler);
+		Write('Linker', fOptions.cmdLines.Linker);
+		Write('IsCpp', fOptions.UseGpp);
+		Write('Icon', ExtractRelativePath(Directory, fOptions.Icon));
+		Write('ExeOutput', fOptions.ExeOutput);
+		Write('ObjectOutput', fOptions.ObjectOutput);
+		Write('OverrideOutput', fOptions.OverrideOutput);
+		Write('OverrideOutputName', fOptions.OverridenOutput);
+		Write('HostApplication', fOptions.HostApplication);
 
-     Write('Folders', fFolders.CommaText);
-     Write('CommandLine', fCmdLineArgs);
+		Write('Folders', fFolders.CommaText);
+		Write('CommandLine', fCmdLineArgs);
 
-     Write('UseCustomMakefile', fUseCustomMakefile);
-     Write('CustomMakefile', fCustomMakefile);
+		Write('UseCustomMakefile', fUseCustomMakefile);
+		Write('CustomMakefile', fCustomMakefile);
 
-     Write('IncludeVersionInfo', fOptions.IncludeVersionInfo);
-     Write('SupportXPThemes', fOptions.SupportXPThemes);
-     Write('CompilerSet', fOptions.CompilerSet);
-     Write('CompilerSettings', fOptions.CompilerOptions);
+		Write('IncludeVersionInfo', fOptions.IncludeVersionInfo);
+		Write('SupportXPThemes', fOptions.SupportXPThemes);
+		Write('CompilerSet', fOptions.CompilerSet);
+		if(fOptions.CompilerOptions <> '') then
+			Write('CompilerSettings', fOptions.CompilerOptions)
+		else begin
+			Write('CompilerSettings', devCompiler.OptionStr);
+			fOptions.CompilerOptions := devCompiler.OptionStr;
+		end;
 
-     Section:= 'VersionInfo';
-     Write('Major',             fOptions.VersionInfo.Major);
-     Write('Minor',             fOptions.VersionInfo.Minor);
-     Write('Release',           fOptions.VersionInfo.Release);
-     Write('Build',             fOptions.VersionInfo.Build);
-     Write('LanguageID',        fOptions.VersionInfo.LanguageID);
-     Write('CharsetID',         fOptions.VersionInfo.CharsetID);
-     Write('CompanyName',       fOptions.VersionInfo.CompanyName);
-     Write('FileVersion',       fOptions.VersionInfo.FileVersion);
-     Write('FileDescription',   fOptions.VersionInfo.FileDescription);
-     Write('InternalName',      fOptions.VersionInfo.InternalName);
-     Write('LegalCopyright',    fOptions.VersionInfo.LegalCopyright);
-     Write('LegalTrademarks',   fOptions.VersionInfo.LegalTrademarks);
-     Write('OriginalFilename',  fOptions.VersionInfo.OriginalFilename);
-     Write('ProductName',       fOptions.VersionInfo.ProductName);
-     Write('ProductVersion',    fOptions.VersionInfo.ProductVersion);
-     Write('AutoIncBuildNr',    fOptions.VersionInfo.AutoIncBuildNr);
-     Write('SyncProduct',       fOptions.VersionInfo.SyncProduct);
+		Section:= 'VersionInfo';
+		Write('Major',            fOptions.VersionInfo.Major);
+		Write('Minor',            fOptions.VersionInfo.Minor);
+		Write('Release',          fOptions.VersionInfo.Release);
+		Write('Build',            fOptions.VersionInfo.Build);
+		Write('LanguageID',       fOptions.VersionInfo.LanguageID);
+		Write('CharsetID',        fOptions.VersionInfo.CharsetID);
+		Write('CompanyName',      fOptions.VersionInfo.CompanyName);
+		Write('FileVersion',      fOptions.VersionInfo.FileVersion);
+		Write('FileDescription',  fOptions.VersionInfo.FileDescription);
+		Write('InternalName',     fOptions.VersionInfo.InternalName);
+		Write('LegalCopyright',   fOptions.VersionInfo.LegalCopyright);
+		Write('LegalTrademarks',  fOptions.VersionInfo.LegalTrademarks);
+		Write('OriginalFilename', fOptions.VersionInfo.OriginalFilename);
+		Write('ProductName',      fOptions.VersionInfo.ProductName);
+		Write('ProductVersion',   fOptions.VersionInfo.ProductVersion);
+		Write('AutoIncBuildNr',   fOptions.VersionInfo.AutoIncBuildNr);
+		Write('SyncProduct',      fOptions.VersionInfo.SyncProduct);
 
-     Section:= 'Project';
+		Section:= 'Project';
 
-     if fOptions.Ver <= 0 then
-      begin
-        //delete outdated dev4 project options
-        DeleteKey('NoConsole');
-        DeleteKey('IsDLL');
-        DeleteKey('ResFiles');
-        DeleteKey('IncludeDirs');
-        DeleteKey('CompilerOptions');
-        DeleteKey('Use_GPP');
-      end;
-   end;
+		if fOptions.Ver <= 0 then begin
+			//delete outdated dev4 project options
+			DeleteKey('NoConsole');
+			DeleteKey('IsDLL');
+			DeleteKey('ResFiles');
+			DeleteKey('IncludeDirs');
+			DeleteKey('CompilerOptions');
+			DeleteKey('Use_GPP');
+		end;
+	end;
 end;
 
 function TProject.UpdateUnits: Boolean;
@@ -991,7 +994,7 @@ begin
   rd_only := false;
   while idx <= pred(fUnits.Count) do
   begin
-     with fUnits[idx] do
+		with fUnits[idx] do
      begin
         {$WARN SYMBOL_PLATFORM OFF}
          if fUnits[idx].Dirty and FileExists(fUnits[idx].FileName) and (FileGetAttr(fUnits[idx].FileName) and faReadOnly <> 0) then begin
@@ -1306,13 +1309,13 @@ end;
 
 procedure TProject.Save;
 begin
-  if not UpdateUnits then
-      Exit;
-  UpdateFile;  // so data is current before going to disk
-  SaveLayout; // save current opened files, and which is "active".
-  if fModified then
-    finiFile.UpdateFile;
-  SetModified(FALSE);
+	if not UpdateUnits then
+		Exit;
+	UpdateFile;  // so data is current before going to disk
+	SaveLayout; // save current opened files, and which is "active".
+	if fModified then
+		finiFile.UpdateFile;
+	setModified(FALSE);
 end;
 
 function TProject.Remove(index : integer; DoClose : boolean) : boolean;
@@ -2110,7 +2113,6 @@ begin
 			exit;
 	result:= -1;
 end;
-
 
 { TdevINI }
 

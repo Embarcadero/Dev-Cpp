@@ -868,8 +868,7 @@ begin
   edOverridenOutput.Enabled:=chkOverrideOutput.Checked;
 end;
 
-procedure TfrmProjectOptions.FormCloseQuery(Sender: TObject;
-  var CanClose: Boolean);
+procedure TfrmProjectOptions.FormCloseQuery(Sender: TObject;var CanClose: Boolean);
 begin
   // check for disallowed characters in filename
   if (Pos('/', edOverridenOutput.Text)>0) or
@@ -881,8 +880,7 @@ begin
      (Pos('<', edOverridenOutput.Text)>0) or
      (Pos('>', edOverridenOutput.Text)>0) or
      (Pos('|', edOverridenOutput.Text)>0) then begin
-     MessageDlg('The output filename you have defined, contains at least one '+
-       'of the following illegal characters:'#10#10+
+     MessageDlg('The output filename you have defined, contains at least one of the following illegal characters:'#10#10+
        '\ / : * ? " > < |'#10#10+
        'Please correct this...', mtError, [mbOk], 0);
      CanClose:=False;

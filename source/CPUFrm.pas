@@ -37,7 +37,6 @@ type
     gbSyntax: TGroupBox;
     rbIntel: TRadioButton;
     rbATT: TRadioButton;
-    CloseBtn: TBitBtn;
     edFunc: TEdit;
     lblFunc: TLabel;
     CodeList: TSynEdit;
@@ -142,7 +141,6 @@ begin
     gbSyntax.Caption := Strings[ID_CPU_SYNTAX];
     gbRegisters.Caption := Strings[ID_CPU_REGISTERS];
     lblFunc.Caption := Strings[ID_CPU_FUNC];
-    CloseBtn.Caption := Strings[ID_BTN_CLOSE];
   end;
 end;
 

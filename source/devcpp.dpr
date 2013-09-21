@@ -129,18 +129,15 @@ var
     tempc: array [0..MAX_PATH] of char;
 
 begin
-  strIniFile := ChangeFileExt(ExtractFileName(Application.EXEName), INI_EXT);
+	strIniFile := ChangeFileExt(ExtractFileName(Application.EXEName), INI_EXT);
 
-  if (ParamCount > 0) and (ParamStr(1) = CONFIG_PARAM) then begin
-    if not DirectoryExists(ParamStr(2)) then begin
-      MessageDlg('The directory "' + ParamStr(2) + '" doesn''t exist. Dev-C++ will now quit, please create the directory first.', mtError, [mbOK], 0);
-      Application.Terminate;
-      exit;
-    end;
-    devData.INIFile := IncludeTrailingBackslash(ParamStr(2)) + strIniFile;
-    ConfigMode := CFG_PARAM;
-  end
-  else if IsWinNT then begin
+	if (ParamCount > 0) and (ParamStr(1) = CONFIG_PARAM) then begin
+		if not DirectoryExists(ParamStr(2)) then begin
+			CreateDir(ParamStr(2));
+		end;
+		devData.INIFile := IncludeTrailingBackslash(ParamStr(2)) + strIniFile;
+		ConfigMode := CFG_PARAM;
+	end else if IsWinNT then begin
      //default dir should be %APPDATA%\Dev-Cpp
      strLocalAppData := '';
      if SUCCEEDED(SHGetFolderPath(0, CSIDL_LOCAL_APPDATA, 0, 0, tempc)) then

@@ -1,8 +1,8 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "4.9.9.7"
-!define DISPLAY_NAME "Dev-C++ 5 beta 14 release (${DEVCPP_VERSION})"
+!define DEVCPP_VERSION "4.9.9.8"
+!define DISPLAY_NAME "Dev-C++ 5 beta 15 release (${DEVCPP_VERSION})"
 
 Var LOCAL_APPDATA
 
@@ -107,7 +107,7 @@ Section "Dev-C++ program files (required)" SectionMain
 
   ; Allways create an uninstaller
   WriteUninstaller "$INSTDIR\uninstall.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayName" "Dev-C++ 4.9.9.5"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayName" "Dev-C++"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayVersion" "${DEVCPP_VERSION}"
 

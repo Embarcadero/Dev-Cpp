@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 930
-  Top = 355
+  Left = 1056
+  Top = 424
   Width = 587
   Height = 587
   Color = clBtnFace
@@ -46,7 +46,7 @@ object MainForm: TMainForm
     Top = 397
     Width = 571
     Height = 113
-    ActivePage = LogSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Constraints.MinHeight = 1
     Images = dmMain.MenuImages_Gnome
@@ -125,7 +125,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 225
-        Height = 81
+        Height = 80
         Align = alLeft
         Caption = 'Information :'
         TabOrder = 0
@@ -180,7 +180,7 @@ object MainForm: TMainForm
         Left = 225
         Top = 0
         Width = 334
-        Height = 81
+        Height = 80
         Align = alClient
         Caption = 'Compile log :'
         TabOrder = 1
@@ -191,7 +191,7 @@ object MainForm: TMainForm
           Left = 7
           Top = 16
           Width = 1477
-          Height = 59
+          Height = 62
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelInner = bvNone
           BevelKind = bkTile
@@ -222,7 +222,7 @@ object MainForm: TMainForm
             Left = 468
             Top = 0
             Width = 156
-            Height = 49
+            Height = 50
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 0
@@ -301,7 +301,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 156
-            Height = 49
+            Height = 50
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 1
@@ -396,7 +396,7 @@ object MainForm: TMainForm
             Left = 156
             Top = 0
             Width = 156
-            Height = 49
+            Height = 50
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 2
@@ -491,7 +491,7 @@ object MainForm: TMainForm
             Left = 312
             Top = 0
             Width = 156
-            Height = 49
+            Height = 50
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 3

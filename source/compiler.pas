@@ -1172,6 +1172,30 @@ begin
 				Continue;
 			end;
 
+			// foo.cpp:1:2: warning: unknown escape sequence: '\040'
+			cpos := GetLastPos(': unknown escape sequence:',Line);
+			if cpos > 0 then begin
+				O_Msg := '[Warning] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
+
+				cpos := GetLastPos(': warning',Line);
+				Delete(Line, cpos, Length(Line) - cpos + 1);
+
+				// Get column number
+				cpos := GetLastPos(':', Line);
+				O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
+				Delete(Line, cpos, Length(Line) - cpos + 1);
+
+				// Get line number
+				cpos := GetLastPos(':', Line);
+				O_line := Copy(Line, cpos+1, Length(Line) - cpos);
+				Delete(Line, cpos, Length(Line) - cpos + 1);
+
+				Inc(fWarnCount);
+				Inc(Messages);
+				DoOutput(O_Line, O_Col, O_File, O_Msg);
+				Continue;
+			end;
+
 			// foo.cpp:1: note:/error candidates are/candidate is: FooClass::Bar(void)
 			cpos := GetLastPos(': candidate', Line);
 			if cpos > 0 then begin
