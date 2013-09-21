@@ -51,11 +51,6 @@ type
     ProgressPanel: TPanel;
     pbCCCache: TProgressBar;
     ParseLabel: TLabel;
-    SecondPanel: TPanel;
-    ClassBrowserInfo1: TLabel;
-    ClassBrowserInfo2: TLabel;
-    YesClassBrowser: TRadioButton;
-    NoClassBrowser: TRadioButton;
     FinishPanel: TPanel;
     Finish2: TLabel;
     Finish3: TLabel;
@@ -131,31 +126,13 @@ var
 	fullpath : AnsiString;
 begin
 	if OkBtn.Tag = 0 then begin
-		OkBtn.Tag := 1;
-		SecondPanel.Visible := true;
+		OkBtn.Tag := 1; // goto cache page
+		CachePanel.Visible := true;
 		FirstPanel.Visible := false;
 		devData.ThemeChange := true;
 		devData.Theme := ThemeBox.Items[ThemeBox.ItemIndex];
 		dmMain.InitHighlighterFirstTime(EditorBox.ItemIndex);
 	end else if OkBtn.Tag = 1 then begin
-		if YesClassBrowser.Checked then begin
-			OkBtn.Tag := 2;
-			CachePanel.Visible := true;
-			SecondPanel.Visible := false;
-		end else begin
-			OkBtn.Tag := 3;
-			OkBtn.Kind := bkOK;
-			OkBtn.ModalResult := mrOK;
-			FinishPanel.Visible := true;
-			SecondPanel.Visible := false;
-			devCodeCompletion.Enabled := false;
-			devCodeCompletion.UseCacheFiles := false;
-			devClassBrowsing.Enabled := false;
-			devClassBrowsing.ParseLocalHeaders := false;
-			devClassBrowsing.ParseGlobalHeaders := false;
-			SaveOptions;
-		end;
-	end else if OkBtn.Tag = 2 then begin
 		if YesCache.Checked or AltCache.Checked then begin
 			YesCache.Enabled := false;
 			NoCache.Enabled := false;
@@ -167,9 +144,9 @@ begin
 			OkBtn.Caption := 'Please wait...';
 			devCodeCompletion.Enabled := true;
 			devCodeCompletion.UseCacheFiles := true;
-			devClassBrowsing.Enabled := true;
-			devClassBrowsing.ParseLocalHeaders := true;
-			devClassBrowsing.ParseGlobalHeaders := true;
+			devCodeCompletion.Enabled := true;
+			devCodeCompletion.ParseLocalHeaders := true;
+			devCodeCompletion.ParseGlobalHeaders := true;
 			SaveOptions;
 
 			MainForm.CppParser.ParseLocalHeaders := True;
@@ -243,12 +220,12 @@ begin
 
 			Screen.Cursor:=crDefault;
 		end else begin
-			devClassBrowsing.Enabled := true;
-			devClassBrowsing.ParseLocalHeaders := true;
-			devClassBrowsing.ParseGlobalHeaders := false;
+			devCodeCompletion.Enabled := true;
+			devCodeCompletion.ParseLocalHeaders := true;
+			devCodeCompletion.ParseGlobalHeaders := false; // can be slow without cache
 			devClassBrowsing.ShowInheritedMembers := false;
 		end;
-		OkBtn.Tag := 3;
+		OkBtn.Tag := 2;
 		OkBtn.Kind := bkOK;
 		OkBtn.ModalResult := mrOK;
 		OkBtn.Enabled := true;

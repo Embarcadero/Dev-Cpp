@@ -55,7 +55,7 @@ uses
   devcfg in 'devcfg.pas',
   datamod in 'datamod.pas' {dmMain: TDataModule},
   EditorOptFrm in 'EditorOptFrm.pas' {EditorOptForm},
-  CodeInsFrm in 'CodeInsFrm.pas' {CodeInsForm},
+  CodeInsList in 'CodeInsList.pas',
   IncrementalFrm in 'IncrementalFrm.pas' {IncrementalForm},
   FindFrm in 'FindFrm.pas' {FindForm},
   editor in 'editor.pas',

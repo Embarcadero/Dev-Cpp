@@ -1194,7 +1194,7 @@ begin
 				end;
 
 			// Defines
-			end else  begin
+			end else begin
 				if sl[0] = '#define' then begin
 					Index := 1
 				end else begin
@@ -2039,12 +2039,9 @@ end;
 
 procedure TCppParser.Save(const FileName: AnsiString;const relativeto : AnsiString);
 var
-	hFile: integer;
 	I, I2, HowMany: integer;
 	MAGIC: array[0..7] of Char;
-	P: array[0..8191] of Char;
-	bytes : DWORD;
-	relative : string;
+	relative : AnsiString;
 begin
 	MAGIC := 'CPPP 0.1';
 	fCacheContents.Assign(fScannedFiles);
@@ -2053,194 +2050,185 @@ begin
 	if FileExists(FileName) then
 		DeleteFile(FileName);
 
-	// File and file type check
-	hFile := CreateFile(PAnsiChar(FileName),GENERIC_WRITE,0,nil,CREATE_ALWAYS,FILE_FLAG_SEQUENTIAL_SCAN,0);
-	if hFile = 0 then Exit; // don't need a CloseHandle
+	// Try writing the whole file in one go
+	with TMemoryStream.Create do try
 
-	WriteFile(hFile, MAGIC, sizeof(MAGIC), bytes, nil);
+		// At least reserve for all statements
+		SetSize(16 * 1024 * 1024); // this covers the need for the default config
 
-	// write statements
-	HowMany := fStatementList.Count - 1;
-	WriteFile(hFile, HowMany, SizeOf(Integer), bytes, nil);
-	for I := 0 to HowMany do begin
-		with PStatement(fStatementList[I])^ do begin
+		// Use the memory buffer from here on
+		Write(MAGIC,sizeof(MAGIC));
 
-			// Write integer data...
-			WriteFile(hFile, _ID,            SizeOf(integer), bytes, nil);
-			WriteFile(hFile, _ParentID,      SizeOf(integer), bytes, nil);
-			WriteFile(hFile, _Kind,          SizeOf(byte),    bytes, nil);
-			WriteFile(hFile, _Scope,         SizeOf(integer), bytes, nil);
-			WriteFile(hFile, _ClassScope,    SizeOf(integer), bytes, nil);
-			WriteFile(hFile, _IsDeclaration, SizeOf(boolean), bytes, nil);
-			WriteFile(hFile, _DeclImplLine,  SizeOf(integer), bytes, nil);
-			WriteFile(hFile, _Line,          SizeOf(integer), bytes, nil);
+		// write statements
+		HowMany := fStatementList.Count - 1;
+		Write(HowMany,SizeOf(Integer));
+		for I := 0 to HowMany do begin
+			with PStatement(fStatementList[I])^ do begin
 
-			// Write data, including length
-			I2 := Length(_FullText);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, _FullText);
-			WriteFile(hFile, P, I2, bytes, nil);
+				// Write integer data...
+				Write(_ID,SizeOf(integer));
+				Write(_ParentID,SizeOf(integer));
+				Write(_Kind,SizeOf(byte));
+				Write(_Scope,SizeOf(integer));
+				Write(_ClassScope,SizeOf(integer));
+				Write(_IsDeclaration,SizeOf(boolean));
+				Write(_DeclImplLine,SizeOf(integer));
+				Write(_Line,SizeOf(integer));
 
-			I2 := Length(_Type);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, _Type);
-			WriteFile(hFile, P, I2, bytes, nil);
+				// Write data, including length
+				I2 := Length(_FullText);
+				Write(I2,SizeOf(Integer));
+				Write(_FullText[1],I2); // can't write length and data in one call, not allowed to read [0] :(
 
-			I2 := Length(_ScopeCmd);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, _ScopeCmd);
-			WriteFile(hFile, P, I2, bytes, nil);
+				I2 := Length(_Type);
+				Write(I2,SizeOf(Integer));
+				Write(_Type[1],I2);
 
-			I2 := Length(_Args);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, _Args);
-			WriteFile(hFile, P, I2, bytes, nil);
+				I2 := Length(_ScopeCmd);
+				Write(I2, SizeOf(Integer));
+				Write(_ScopeCmd[1],I2);
 
-			I2 := Length(_ScopelessCmd);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, _ScopelessCmd);
-			WriteFile(hFile, P, I2, bytes, nil);
+				I2 := Length(_Args);
+				Write(I2,SizeOf(Integer));
+				Write(_Args[1],I2);
 
-			// Save RELATIVE filenames
-			relative := ReplaceFirstText(_DeclImplFileName,relativeto,'%path%\');
-			I2 := Length(relative);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, relative);
-			WriteFile(hFile, P, I2, bytes, nil);
+				I2 := Length(_ScopelessCmd);
+				Write(I2,SizeOf(Integer));
+				Write(_ScopelessCmd[1],I2);
 
-			// Save RELATIVE filenames
-			relative := ReplaceFirstText(_FileName,relativeto,'%path%\');
-			I2 := Length(relative);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, relative);
-			WriteFile(hFile, P, I2, bytes, nil);
+				// Save RELATIVE filenames
+				relative := ReplaceFirstText(_DeclImplFileName,relativeto,'%path%\');
+				I2 := Length(relative);
+				Write(I2,SizeOf(Integer));
+				Write(relative[1],I2);
 
-			I2 := Length(_InheritsFromIDs);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, _InheritsFromIDs);
-			WriteFile(hFile, P, I2, bytes, nil);
+				// Save RELATIVE filenames
+				relative := ReplaceFirstText(_FileName,relativeto,'%path%\');
+				I2 := Length(relative);
+				Write(I2,SizeOf(Integer));
+				Write(relative[1],I2);
 
-			I2 := Length(_InheritsFromClasses);
-			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-			StrPCopy(P, _InheritsFromClasses);
-			WriteFile(hFile, P, I2, bytes, nil);
+				I2 := Length(_InheritsFromIDs);
+				Write(I2,SizeOf(Integer));
+				Write(_InheritsFromIDs[1],I2);
+
+				I2 := Length(_InheritsFromClasses);
+				Write(I2, SizeOf(Integer));
+				Write(_InheritsFromClasses[1],I2);
+			end;
 		end;
+
+		// write scanned files (cache contents)
+		HowMany := fScannedFiles.Count - 1;
+		Write(HowMany,SizeOf(Integer));
+		for I := 0 to HowMany do begin
+
+			// Save RELATIVE filenames
+			relative := ReplaceFirstText(fScannedFiles[I],relativeto,'%path%\');
+			I2 := Length(relative);
+			Write(I2,SizeOf(Integer));
+			Write(relative[1],I2);
+		end;
+
+		// write file includes list for each file scanned
+		HowMany := fIncludesList.Count - 1;
+		Write(HowMany,SizeOf(Integer));
+		for I := 0 to HowMany do begin
+
+			// Save RELATIVE filenames
+			relative := ReplaceFirstText(PIncludesRec(fIncludesList[I])^.BaseFile,relativeto,'%path%\');
+			I2 := Length(relative);
+			Write(I2, SizeOf(Integer));
+			Write(relative[1], I2);
+
+			// Save RELATIVE filenames
+			relative := ReplaceFirstText(PIncludesRec(fIncludesList[I])^.IncludeFiles,relativeto,'%path%\');
+			I2 := Length(relative);
+			Write(I2,SizeOf(Integer));
+			Write(relative[1],I2);
+		end;
+		SaveToFile(FileName);
+	finally
+		Free;
+		fBaseIndex := fNextID;
 	end;
-
-	// write scanned files (cache contents)
-	HowMany := fScannedFiles.Count - 1;
-	WriteFile(hFile, HowMany, SizeOf(Integer), bytes, nil);
-	for I := 0 to HowMany do begin
-
-		// Save RELATIVE filenames
-		relative := ReplaceFirstText(fScannedFiles[I],relativeto,'%path%\');
-		I2 := Length(relative);
-		WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-		StrPCopy(P, relative);
-		WriteFile(hFile, P, I2, bytes, nil);
-	end;
-
-	// write file includes list for each file scanned
-	HowMany := fIncludesList.Count - 1;
-	WriteFile(hFile, HowMany, SizeOf(Integer), bytes, nil);
-	for I := 0 to HowMany do begin
-
-		// Save RELATIVE filenames
-		relative := ReplaceFirstText(PIncludesRec(fIncludesList[I])^.BaseFile,relativeto,'%path%\');
-		I2 := Length(relative);
-		WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-		StrPCopy(P, relative);
-		WriteFile(hFile, P, I2, bytes, nil);
-
-		// Save RELATIVE filenames
-		relative := ReplaceFirstText(PIncludesRec(fIncludesList[I])^.IncludeFiles,relativeto,'%path%\');
-		I2 := Length(relative);
-		WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
-		StrPCopy(P, relative);
-		WriteFile(hFile, P, I2, bytes, nil);
-	end;
-
-	CloseHandle(hFile);
-	fBaseIndex := fNextID;
 end;
 
 procedure TCppParser.Load(const FileName: AnsiString;const relativeto : AnsiString);
 var
-	hFile: integer;
 	HowMany: integer;
 	I, ItemLength: integer;
 	MAGIC: array[0..7] of Char;
 	Statement: PStatement;
 	P: PIncludesRec;
-	bytes : DWORD;
 	relative : AnsiString;
 begin
 
-	// File and file type check
-	hFile := CreateFile(PAnsiChar(FileName),GENERIC_READ,0,nil,OPEN_EXISTING,FILE_FLAG_SEQUENTIAL_SCAN,0);
-	if hFile = 0 then Exit; // don't need a CloseHandle
+	// Try reading the whole file in one go
+	with TMemoryStream.Create do try
+		LoadFromFile(FileName);
+		if Size = 0 then
+			Exit;
 
-	ReadFile(hFile,MAGIC,sizeof(MAGIC),bytes,nil);
-	if MAGIC <> 'CPPP 0.1' then begin
-		CloseHandle(hFile);
-		Exit;
-	end;
+		// Use the memory buffer from here on
+		Read(MAGIC,sizeof(MAGIC));
+		if MAGIC <> 'CPPP 0.1' then
+			Exit;
 
-	try
-		ReadFile(hFile, HowMany, SizeOf(Integer),bytes,nil);
+		Read(HowMany,sizeof(Integer));
 		for I := 0 to HowMany do begin
 			Statement := New(PStatement);
 			with Statement^ do begin
 
 				// Read the actual statement
-				ReadFile(hFile, _ID,            SizeOf(integer),bytes,nil);
-				ReadFile(hFile, _ParentID,      SizeOf(integer),bytes,nil);
-				ReadFile(hFile, _Kind,          SizeOf(byte),   bytes,nil);
-				ReadFile(hFile, _Scope,         SizeOf(integer),bytes,nil);
-				ReadFile(hFile, _ClassScope,    SizeOf(integer),bytes,nil);
-				ReadFile(hFile, _IsDeclaration, SizeOf(boolean),bytes,nil);
-				ReadFile(hFile, _DeclImplLine,  SizeOf(integer),bytes,nil);
-				ReadFile(hFile, _Line,          SizeOf(integer),bytes,nil);
+				Read(_ID,SizeOf(integer));
+				Read(_ParentID,SizeOf(integer));
+				Read(_Kind,SizeOf(byte));
+				Read(_Scope,SizeOf(integer));
+				Read(_ClassScope,SizeOf(integer));
+				Read(_IsDeclaration,SizeOf(boolean));
+				Read(_DeclImplLine,SizeOf(integer));
+				Read(_Line,SizeOf(integer));
 
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_FullText,ItemLength);
-				ReadFile(hFile, _FullText[1], ItemLength, bytes, nil);
+				Read(_FullText[1],ItemLength);
 
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_Type,ItemLength);
-				ReadFile(hFile, _Type[1], ItemLength, bytes, nil);
+				Read(_Type[1],ItemLength);
 
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_ScopeCmd,ItemLength);
-				ReadFile(hFile, _ScopeCmd[1], ItemLength, bytes, nil);
+				Read(_ScopeCmd[1],ItemLength);
 
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_Args,ItemLength);
-				ReadFile(hFile, _Args[1], ItemLength, bytes, nil);
+				Read(_Args[1],ItemLength);
 
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_ScopelessCmd,ItemLength);
-				ReadFile(hFile, _ScopelessCmd[1], ItemLength, bytes, nil);
+				Read(_ScopelessCmd[1],ItemLength);
 
 				// Load RELATIVE filenames
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_DeclImplFileName,ItemLength);
-				ReadFile(hFile, _DeclImplFileName[1], ItemLength, bytes, nil);
+				Read(_DeclImplFileName[1],ItemLength);
 				_DeclImplFileName := ReplaceFirstStr(_DeclImplFileName,'%path%\',relativeto);
 
 				// Load RELATIVE filenames
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_FileName,ItemLength);
-				ReadFile(hFile, _FileName[1], ItemLength, bytes, nil);
+				Read(_FileName[1],ItemLength);
 				_FileName := ReplaceFirstStr(_FileName,'%path%\',relativeto);
 
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_InheritsFromIDs,ItemLength);
-				ReadFile(hFile, _InheritsFromIDs[1], ItemLength, bytes, nil);
+				Read(_InheritsFromIDs[1],ItemLength);
 
-				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				Read(ItemLength,SizeOf(Integer));
 				SetLength(_InheritsFromClasses,ItemLength);
-				ReadFile(hFile, _InheritsFromClasses[1], ItemLength, bytes, nil);
+				Read(_InheritsFromClasses[1],ItemLength);
 
 				_Loaded := True;
 				_Temporary := False;
@@ -2251,13 +2239,13 @@ begin
 		end;
 
 		// read scanned files - cache contents
-		ReadFile(hFile, HowMany, SizeOf(Integer),bytes,nil);
+		Read(HowMany,SizeOf(Integer));
 		for I := 0 to HowMany do begin
 
 			// Load RELATIVE filenames
-			ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+			Read(ItemLength,SizeOf(Integer));
 			SetLength(relative,ItemLength);
-			ReadFile(hFile, relative[1], ItemLength, bytes, nil);
+			Read(relative[1],ItemLength);
 			relative := ReplaceFirstStr(relative,'%path%\',relativeto);
 
 			fScannedFiles.Add(relative);
@@ -2265,31 +2253,32 @@ begin
 		end;
 
 		// read includes info for each scanned file
-		ReadFile(hFile, HowMany, SizeOf(Integer),bytes,nil);
+		Read(HowMany,SizeOf(Integer));
 		for I := 0 to HowMany do begin
 			P := New(PIncludesRec);
 
 			// Load RELATIVE filenames
-			ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+			Read(ItemLength,SizeOf(Integer));
 			SetLength(relative,ItemLength);
-			ReadFile(hFile, relative[1], ItemLength, bytes, nil);
+			Read(relative[1],ItemLength);
 			relative := ReplaceFirstStr(relative,'%path%\',relativeto);
 			P^.BaseFile := relative;
 
 			// Load RELATIVE filenames
-			ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+			Read(ItemLength,SizeOf(Integer));
 			SetLength(relative,ItemLength);
-			ReadFile(hFile, relative[1], ItemLength, bytes, nil);
+			Read(relative[1],ItemLength);
 			relative := ReplaceFirstStr(relative,'%path%\',relativeto);
 			P^.IncludeFiles := relative;
 
 			fIncludesList.Add(P);
 		end;
 	finally
-		CloseHandle(hFile);
+		Free; // cache file
 		fNextID := fStatementList.Count;
 		fBaseIndex := fStatementList.Count;
 		fScannedBaseIndex := fCacheContents.Count;
+		PostProcessInheritance;
 	end;
 end;
 

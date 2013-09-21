@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit CodeInsFrm;
+unit CodeInsList;
 
 interface
 
@@ -53,7 +53,6 @@ type
 
    procedure LoadCode;
    procedure SaveCode;
-   function Indexof(const Value: AnsiString): integer;
    function AddItem(Value: PCodeIns): integer;
    procedure AddItemByValues(const menutext, description, code : AnsiString; section : integer);
    procedure Delete(index: integer);
@@ -62,35 +61,11 @@ type
    property Count: integer read GetCount;
  end;
 
-  TfrmCodeEdit = class(TForm)
-    Bevel1: TBevel;
-    lblMenu: TLabel;
-    lblSec: TLabel;
-    edMenuText: TEdit;
-    seSection: TSpinEdit;
-    btnOk: TBitBtn;
-    btnCancel: TBitBtn;
-    lblDesc: TLabel;
-    edDesc: TEdit;
-    procedure FormCreate(Sender: TObject);
-    procedure btnOkClick(Sender: TObject);
-    procedure edMenuTextChange(Sender: TObject);
-  private
-    fEdit: boolean;
-    fEntry: PCodeIns;
-    procedure SetEntry(Value: PCodeIns);
-    procedure LoadText;
-  public
-    property Edit: boolean read fEdit write fEdit;
-    property Entry: PCodeIns read fEntry write SetEntry;
-  end;
-
 implementation
 
 uses
  SysUtils, IniFiles, devCFG, Utils, version, MultiLangSupport;
 
-{$R *.dfm}
  { TCodeInsList }
 
 constructor TCodeInsList.Create;
@@ -107,13 +82,6 @@ begin
 		Dispose(PCodeIns(fList[I]));
 	fList.Free;
 	inherited Destroy;
-end;
-
-function TCodeInsList.Indexof(const Value: AnsiString): integer;
-begin
-  for result:= 0 to pred(fList.Count) do
-   if CompareText(PCodeIns(fList[result])^.Caption, Value) = 0 then exit;
-  result:= -1;
 end;
 
 function TCodeInsList.AddItem(Value: PCodeIns): integer;
@@ -134,19 +102,21 @@ begin
 end;
 
 procedure TCodeInsList.Clear;
+var
+	I: integer;
 begin
-  fList.Clear;
-  fList.Pack;
-  fList.Capacity:= fList.Count;
+	for I := 0 to fList.Count - 1 do
+		Dispose(PCodeIns(fList[I])); // Free pointed memory first!
+	fList.Clear;
 end;
 
 procedure TCodeInsList.Delete(index: integer);
 begin
-  if (index <0) or (index > fList.Count -1) then exit;
+	if (index <0) or (index > fList.Count -1) then exit;
 
-  fList.Delete(index);
-  fList.Pack;
-  fList.Capacity:= fList.Count;
+	// Free pointed memory first!
+	Dispose(PCodeIns(fList[index]));
+	fList.Delete(index);
 end;
 
 function TCodeInsList.GetCount: integer;
@@ -177,29 +147,28 @@ begin
 		fFile:=devDirs.Config + DEV_CODEINS_FILE;
 
 	if FileExists(fFile) then begin
-		with TINIFile.Create(fFile) do
+		with TINIFile.Create(fFile) do try
+			tmp:= TStringList.Create;
+			Clear;
 			try
-				tmp:= TStringList.Create;
-				Clear;
-				try
-					ReadSections(tmp);
-					if tmp.Count = 0 then
-						exit;
+				ReadSections(tmp);
+				if tmp.Count = 0 then
+					exit;
 
-						for idx:= 0 to pred(tmp.Count) do begin
-							new(Item);
-							Item^.Caption:= StringReplace(tmp[idx], '_', ' ', [rfReplaceAll]);
-							Item^.Desc:= ReadString(tmp[idx], 'Desc', '');
-							Item^.Line:= StrtoCodeIns(ReadString(tmp[idx], 'Line', ''));
-							Item^.Sep:= ReadInteger(tmp[idx], 'Sep', 0);
-							AddItem(Item);
-						end;
-				finally
-					tmp.free;
-				end;
+					for idx:= 0 to pred(tmp.Count) do begin
+						new(Item);
+						Item^.Caption:= StringReplace(tmp[idx], '_', ' ', [rfReplaceAll]);
+						Item^.Desc:= ReadString(tmp[idx], 'Desc', '');
+						Item^.Line:= StrtoCodeIns(ReadString(tmp[idx], 'Line', ''));
+						Item^.Sep:= ReadInteger(tmp[idx], 'Sep', 0);
+						AddItem(Item);
+					end;
 			finally
-				free;
+				tmp.free;
 			end;
+		finally
+			free;
+		end;
 	end else begin
 		// Win32
 		AddItemByValues('MessageBox','Win32 MessageBox','MessageBox(*|*,"Hello","Caption",MB_OK);',1);
@@ -244,6 +213,7 @@ begin
 	'	switch(Message) {'+#13#10+
 	'		case *|*: {'+#13#10+
 	'			break;'+#13#10+
+	'		}'+#13#10+
 	'		case WM_DESTROY: {'+#13#10+
 	'			PostQuitMessage(0);'+#13#10+
 	'			break;'+#13#10+
@@ -312,68 +282,20 @@ var
 	section: AnsiString;
 	CI: TCodeIns;
 begin
-	fList.Pack;
-	fList.Capacity := fList.Count;
 	DeleteFile(fFile);
 	if fList.Count = 0 then exit;
-	with TINIFile.Create(fFile) do
-		try
-			for idx:= 0 to pred(fList.Count) do begin
-				CI:= PCodeIns(fList[idx])^;
-				section:= StringReplace(CI.Caption, ' ', '_', [rfReplaceAll]);
-				EraseSection(section);  // may be redundant
-				WriteString(section, 'Desc', CI.Desc);
-				WriteString(section, 'Line', CodeInstoStr(CI.Line));
-				WriteInteger(section, 'Sep', CI.Sep);
-			end;
-		finally
-			Free;
+	with TINIFile.Create(fFile) do try
+		for idx:= 0 to pred(fList.Count) do begin
+			CI:= PCodeIns(fList[idx])^;
+			section:= StringReplace(CI.Caption, ' ', '_', [rfReplaceAll]);
+			EraseSection(section);  // may be redundant
+			WriteString(section, 'Desc', CI.Desc);
+			WriteString(section, 'Line', CodeInstoStr(CI.Line));
+			WriteInteger(section, 'Sep', CI.Sep);
 		end;
-end;
-
-
- { TfrmCodeEdit }
-
-procedure TfrmCodeEdit.SetEntry(Value: PCodeIns);
-begin
-  edMenuText.Text:= Value^.Caption;
-  edDesc.Text:= Value^.Desc;
-  seSection.Value:= Value^.Sep;
-end;
-
-procedure TfrmCodeEdit.FormCreate(Sender: TObject);
-begin
-  LoadText;
-end;
-
-procedure TfrmCodeEdit.LoadText;
-begin
-	// Set interface font
-	Font.Name := devData.InterfaceFont;
-	Font.Size := devData.InterfaceFontSize;
-
-  if Edit then
-   Caption:= Lang[ID_CIE_EDCAPTION]
-  else
-   Caption:= Lang[ID_CIE_ADDCAPTION];
-
-  lblMenu.Caption:= Lang[ID_CIE_MENU];
-  lblDesc.Caption:= Lang[ID_CIE_DESC];
-  lblSec.Caption:=  Lang[ID_CIE_SEC];
-  btnOk.Caption:= Lang[ID_BTN_OK];
-  btnCancel.Caption:= Lang[ID_BTN_CANCEL];
-end;
-
-procedure TfrmCodeEdit.btnOkClick(Sender: TObject);
-begin
-  if edMenuText.Text = '' then begin
-    ModalResult := mrNone;
-  end;
-end;
-
-procedure TfrmCodeEdit.edMenuTextChange(Sender: TObject);
-begin
-  btnOK.Enabled := edMenuText.Text <> '';
+	finally
+		Free;
+	end;
 end;
 
 end.

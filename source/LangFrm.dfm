@@ -1,6 +1,6 @@
 object LangForm: TLangForm
-  Left = 650
-  Top = 146
+  Left = 434
+  Top = 310
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Dev-C++ first time configuration'
@@ -146,7 +146,7 @@ object LangForm: TLangForm
     Width = 300
     Height = 275
     BevelOuter = bvNone
-    TabOrder = 4
+    TabOrder = 3
     Visible = False
     object Finish2: TLabel
       Left = 8
@@ -334,57 +334,6 @@ object LangForm: TLangForm
         TabOrder = 6
         OnClick = ButtonAddFolderClick
       end
-    end
-  end
-  object SecondPanel: TPanel
-    Left = 240
-    Top = 0
-    Width = 300
-    Height = 275
-    BevelOuter = bvNone
-    TabOrder = 3
-    Visible = False
-    object ClassBrowserInfo1: TLabel
-      Left = 8
-      Top = 8
-      Width = 284
-      Height = 60
-      AutoSize = False
-      Caption = 
-        'Dev-C++ can retrieve information from header files to help you f' +
-        'ind functions, classes and variables easily, through a class bro' +
-        'wser and a code completion list.'
-      WordWrap = True
-    end
-    object ClassBrowserInfo2: TLabel
-      Left = 8
-      Top = 88
-      Width = 284
-      Height = 60
-      AutoSize = False
-      Caption = 
-        'Although this feature is useful, it requires more CPU power and ' +
-        'memory. Do you want to use it? You can enable or disable it late' +
-        'r in Tools, Editor Options, Class Browser.'
-      WordWrap = True
-    end
-    object YesClassBrowser: TRadioButton
-      Left = 16
-      Top = 184
-      Width = 268
-      Height = 17
-      Caption = 'Yes, I want to use this feature'
-      Checked = True
-      TabOrder = 0
-      TabStop = True
-    end
-    object NoClassBrowser: TRadioButton
-      Left = 16
-      Top = 208
-      Width = 268
-      Height = 17
-      Caption = 'No, I prefer to use Dev-C++ without it'
-      TabOrder = 1
     end
   end
   object PopupMenu: TPopupMenu

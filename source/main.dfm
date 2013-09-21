@@ -63,7 +63,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -106,7 +106,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 410
-          Height = 118
+          Height = 114
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -427,7 +427,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 19
+          Height = 15
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -467,7 +467,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -1025,7 +1025,6 @@ object MainForm: TMainForm
         ItemImages.InheritedMethodPublic = 10
         ItemImages.InheritedVariableProtected = 9
         ItemImages.InheritedVariablePublic = 11
-        UseColors = True
         ShowInheritedMembers = False
       end
     end
@@ -1297,6 +1296,12 @@ object MainForm: TMainForm
         Action = actReplaceAll
       end
       object N72: TMenuItem
+        Caption = '-'
+      end
+      object actSearchAgain1: TMenuItem
+        Action = actSearchAgain
+      end
+      object N75: TMenuItem
         Caption = '-'
       end
       object IncrementalSearch1: TMenuItem
@@ -2789,12 +2794,6 @@ object MainForm: TMainForm
       Caption = 'Tips'
       OnExecute = actShowTipsExecute
     end
-    object actBrowserUseColors: TAction
-      Category = 'ClassBrowser'
-      Caption = 'Use colors'
-      Checked = True
-      OnExecute = actBrowserUseColorsExecute
-    end
     object actAbortCompilation: TAction
       Category = 'Execute'
       Caption = 'Abort compilation'
@@ -3006,6 +3005,13 @@ object MainForm: TMainForm
       Caption = 'Clear'
       OnExecute = actMsgClearExecute
     end
+    object actSearchAgain: TAction
+      Category = 'Search'
+      Caption = 'Search Again'
+      ShortCut = 114
+      OnExecute = actSearchAgainExecute
+      OnUpdate = actUpdateEmptyEditorFindForm
+    end
   end
   object MessagePopup: TPopupMenu
     Left = 203
@@ -3047,6 +3053,7 @@ object MainForm: TMainForm
     Top = 132
   end
   object CppParser: TCppParser
+    BaseIndex = 0
     Enabled = True
     OnTotalProgress = CppParserTotalProgress
     Tokenizer = CppTokenizer
@@ -3059,6 +3066,7 @@ object MainForm: TMainForm
     Top = 196
   end
   object CodeCompletion: TCodeCompletion
+    ShowCount = 100
     Parser = CppParser
     Color = clWhite
     Width = 320
@@ -3132,9 +3140,6 @@ object MainForm: TMainForm
       end
       object N42: TMenuItem
         Caption = '-'
-      end
-      object Usecolors1: TMenuItem
-        Action = actBrowserUseColors
       end
       object Showinheritedmembers1: TMenuItem
         Action = actBrowserShowInherited

@@ -102,17 +102,17 @@ type
     fFolderAssocs: array of TFolderAssocs;
     fLastSelection: AnsiString;
     fCnv: TControlCanvas;
-    fUseColors: boolean;
     fParserBusy: boolean;
     fShowInheritedMembers: boolean;
-    procedure CustomPaintMe(var Msg: TMessage); message WM_PAINT;
     procedure SetParser(Value: TCppParser);
     procedure AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
+    procedure AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
+      State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,
+      DefaultDraw: Boolean);
     procedure OnNodeChange(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure OnNodeChanging(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure myDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
     procedure myDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure myMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure OnParserUpdate(Sender: TObject);
     procedure OnParserBusy(Sender: TObject);
     procedure SetNodeImages(Node: TTreeNode; Statement: PStatement);
@@ -130,13 +130,11 @@ type
     procedure RemoveFolderAssociation(Fld, Cmd: AnsiString);
     function IndexOfFolder(const Fld: AnsiString): integer;
     procedure ReSelect;
-    procedure SetUseColors(const Value: boolean);
     procedure SetShowInheritedMembers(const Value: boolean);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure UpdateView;
-    procedure ShowSampleData;
     procedure Clear;
     procedure AddFolder(S: AnsiString; Node: TTreeNode);
     procedure RemoveFolder(S: AnsiString);
@@ -163,7 +161,6 @@ type
     property CurrentFile: AnsiString read fCurrentFile write SetCurrentFile;
     property ProjectDir: AnsiString read fProjectDir write fProjectDir;
     property ClassFoldersFile: AnsiString read fClassFoldersFile write fClassFoldersFile;
-    property UseColors: boolean read fUseColors write SetUseColors;
     property ShowInheritedMembers: boolean read fShowInheritedMembers write SetShowInheritedMembers;
   end;
 
@@ -229,65 +226,60 @@ begin
       CreateFolders('', Node);
   end;
 
-  sl := TStringList.Create;
-  try
+	sl := TStringList.Create;
+	try
+		// allow inheritance propagation
+		if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass) then begin
 
-    // allow inheritance propagation
-    if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass) then begin
-      // follow the inheritance tree all the way up.
-      // this code does not work for C++ polymorphic classes
-      tmp := ParentIndex;
-      tmpI := tmp;
-      tmpS := '';
-      sl.Clear;
-      while (tmp <> -1) do begin
-        tmpS := PStatement(fParser.Statements[tmpI])^._InheritsFromIDs;
-        tmp := StrToIntDef(tmpS, -1);
-        tmpI := fParser.IndexOfStatement(tmp);
-        if sl.IndexOf(tmpS) <> -1 then
-          tmp := -1;
-        if (tmp <> -1) then
-          sl.CommaText := sl.CommaText + tmpS + ',';
-      end;
-    end
-    else
-      sl.Clear;
+			// follow the inheritance tree all the way up.
+			// this code does not work for C++ polymorphic classes
+			tmp := ParentIndex;
+			tmpI := tmp;
+			tmpS := '';
+			sl.Clear;
+			while (tmp <> -1) do begin
+				tmpS := PStatement(fParser.Statements[tmpI])^._InheritsFromIDs;
+				tmp := StrToIntDef(tmpS, -1);
+				tmpI := fParser.IndexOfStatement(tmp);
+				if sl.IndexOf(tmpS) <> -1 then
+					tmp := -1;
+				if (tmp <> -1) then
+					sl.CommaText := sl.CommaText + tmpS + ',';
+			end;
+		end;
 
-    bInherited := False;
-    for I := iFrom to fParser.Statements.Count - 1 do begin
-      with PStatement(fParser.Statements[I])^ do begin
-        if not _Visible then
-          Continue;
-        if _ParentID <> ParentID then begin
-          bInherited := fShowInheritedMembers and (sl.IndexOf(IntToStr(_ParentID)) > -1);
-          if not bInherited then
-            Continue;
-        end;
+		bInherited := False;
+		for I := iFrom to fParser.Statements.Count - 1 do begin
+			with PStatement(fParser.Statements[I])^ do begin
+				if not _Visible then
+					Continue;
+				if _ParentID <> ParentID then begin
+					bInherited := fShowInheritedMembers and (sl.IndexOf(IntToStr(_ParentID)) > -1);
+					if not bInherited then
+						Continue;
+				end;
 
-        if (fShowFilter = sfAll) or
-          ((fShowFilter = sfProject) and (_InProject or bInherited)) or
-          ((fShowFilter = sfCurrent) and (SameText(_Filename,fCurrentFileHeader) or SameText(_Filename,fCurrentFileImpl) or bInherited)) then begin
+				if (fShowFilter = sfAll) or
+				((fShowFilter = sfProject) and (_InProject or bInherited)) or
+				((fShowFilter = sfCurrent) and (SameText(_Filename,fCurrentFileHeader) or SameText(_Filename,fCurrentFileImpl) or bInherited)) then begin
 
-          // check if belongs to folder
-          F := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
-          if F <> -1 then
-            ParNode := GetNodeOfFolder(F)
-          else
-            ParNode := Node;
+					// check if belongs to folder
+					F := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
+					if F <> -1 then
+						ParNode := GetNodeOfFolder(F)
+					else
+						ParNode := Node;
 
-          if fUseColors then
-            NewNode := Items.AddChildObject(ParNode, '  ' + _FullText + '  ', PStatement(fParser.Statements[I]))
-          else
-            NewNode := Items.AddChildObject(ParNode, _ScopeCmd, PStatement(fParser.Statements[I]));
-          SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
-          if (PStatement(fParser.Statements[I])^._Kind = skClass) and (I <> ParentIndex) then  // CL: fixed potential infinite loop bug
-            AddMembers(NewNode, I, _ID);
-        end;
-      end;
-    end;
-  finally
-    sl.Free;
-  end;
+					NewNode := Items.AddChildObject(ParNode, _ScopelessCmd, PStatement(fParser.Statements[I]));
+					SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
+					if (PStatement(fParser.Statements[I])^._Kind = skClass) and (I <> ParentIndex) then  // CL: fixed potential infinite loop bug
+						AddMembers(NewNode, I, _ID);
+				end;
+			end;
+		end;
+	finally
+		sl.Free;
+	end;
 end;
 
 constructor TClassBrowser.Create(AOwner: TComponent);
@@ -312,7 +304,10 @@ begin
   HideSelection := False;
   RightClickSelect := True;
   fShowInheritedMembers := False;
-  SetUseColors(True);
+  fCnv := TControlCanvas.Create;
+  fCnv.Control := Self;
+  fCnv.Font.Assign(Self.Font);
+  OnAdvancedCustomDrawItem := AdvancedCustomDrawItem;
 end;
 
 destructor TClassBrowser.Destroy;
@@ -320,10 +315,7 @@ begin
   SetLength(fFolderAssocs, 0);
   SetLength(fFolders, 0);
   FreeAndNil(fImagesRecord);
-
-  if fUseColors then
-    SetUseColors(False);
-
+  FreeAndNil(fCnv);
   inherited Destroy;
 end;
 
@@ -448,95 +440,6 @@ end;
 procedure TClassBrowser.OnParserBusy(Sender: TObject);
 begin
   fParserBusy := True;
-end;
-
-procedure TClassBrowser.ShowSampleData;
-  function CreateTempStatement(Full, Typ, Cmd, Args: AnsiString; K: TStatementKind; S: TStatementClassScope): PStatement;
-  begin
-    Result := New(PStatement);
-    with Result^ do begin
-      _FullText := Full;
-      _Type := Typ;
-      _ScopelessCmd := Cmd;
-      _ScopeCmd := Cmd;
-      _Args := Args;
-      _Visible := True;
-      _Kind := K;
-      _ClassScope := S;
-    end;
-  end;
-var
-  Node, SubNode: TTreeNode;
-  Statement: PStatement;
-begin
-  Items.Clear;
-  with Items do begin
-    Statement := CreateTempStatement('class Class1', 'class', 'Class1', '', skClass, scsNone);
-    Node := AddChildObject(nil, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(Node, Statement);
-
-    Statement := CreateTempStatement('Class1()', '', 'Class1', '', skConstructor, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('~Class1()', '', '~Class1', '', skDestructor, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('int private_Var1', 'int', 'private_Var1', '', skVariable, scsPrivate);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('int private_Var2', 'int', 'private_Var2', '', skVariable, scsPrivate);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('void protected_Func1(int x, int y)', 'void', 'protected_Func1', '(int x, int y)', skFunction, scsProtected);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('double public_Var1', 'double', 'public_Var1', '', skVariable, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('bool published_Func1(char* temp)', 'bool', 'published_Func1', '(char* temp)', skFunction, scsPublished);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-    Expand(Node);
-
-    Statement := CreateTempStatement('class Class2', 'class', 'Class2', '', skClass, scsNone);
-    Node := AddChildObject(nil, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(Node, Statement);
-
-    Statement := CreateTempStatement('Class2()', '', 'Class2', '', skConstructor, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('~Class2()', '', '~Class2', '', skDestructor, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('int private_Var1', 'int', 'private_Var1', '', skVariable, scsPrivate);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('int private_Var2', 'int', 'private_Var2', '', skVariable, scsPrivate);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('void protected_Func1(int x, int y)', 'void', 'protected_Func1', '(int x, int y)', skFunction, scsProtected);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('double public_Var1', 'double', 'public_Var1', '', skVariable, scsPublic);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-
-    Statement := CreateTempStatement('bool published_Func1(char* temp)', 'bool', 'published_Func1', '(char* temp)', skFunction, scsPublished);
-    SubNode := AddChildObject(Node, '  ' + Statement^._ScopeCmd + '  ', Statement);
-    SetNodeImages(SubNode, Statement);
-    Expand(Node);
-  end;
 end;
 
 function CustomSortProc(Node1, Node2: TTreeNode; Data: Integer): Integer; stdcall;
@@ -889,21 +792,6 @@ begin
     (Node <> Selected);
 end;
 
-procedure TClassBrowser.myMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
-var
-	Node: TTreeNode;
-begin
-	if fParserBusy then
-		Exit;
-
-	Node := GetNodeAt(X,Y);
-	if Assigned(Node) and Assigned(Node.Data) and (Node.ImageIndex <> fImagesRecord.fGlobalsImg) then begin
-		Hint := PStatement(Node.Data)^._FullText;
-		Application.ActivateHint(ClientToScreen(Point(X, Y)));
-	end else
-		Application.HideHint;
-end;
-
 procedure TClassBrowser.RenameFolder(Old, New: AnsiString);
 var
   I: integer;
@@ -988,125 +876,55 @@ begin
   Result := High(fFolders) + 1;
 end;
 
-procedure TClassBrowser.CustomPaintMe(var Msg: TMessage);
+procedure TClassBrowser.AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
+  State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,
+  DefaultDraw: Boolean);
 var
-  I: integer;
-  NodeRect, tmp: TRect;
+  NodeRect: TRect;
   st: PStatement;
   bInherited: boolean;
-  currItem: TTreeNode;
 begin
-  inherited;
+	if fParserBusy then
+		Exit;
 
-  if fParserBusy then
-    Exit;
+	if Stage = cdPrePaint then begin
+		Sender.Canvas.Font.Style := [fsBold];
+	end else if Stage = cdPostPaint then begin
+		if Assigned(fParser) then begin
+			st := Node.Data;
+			if Assigned(st) then begin
+				NodeRect := Node.DisplayRect(true);
 
-  if not Assigned(fCnv) or not fUseColors then
-    Exit;
+				bInherited := fShowInheritedMembers and
+					Assigned(Node.Parent) and
+					(Node.Parent.ImageIndex <> fImagesRecord.Globals) and
+					Assigned(Node.Parent.Data) and
+					(fParser.Statements.IndexOf(Node.Parent.Data) <> -1) and
+					(PStatement(Node.Parent.Data)^._ID <> st^._ParentID);
 
-  for I := 0 to Items.Count - 1 do begin
-    currItem := Items[I];
+				// draw function arguments
+				NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._ScopelessCmd) + 2;
 
-    if currItem.IsVisible then begin
-      NodeRect := currItem.DisplayRect(true);
+				if bInherited then
+					fCnv.Font.Color := clGray
+				else
+					fCnv.Font.Color := clMaroon;
 
-      if currItem.ImageIndex <> fImagesRecord.fGlobalsImg then begin
-        fCnv.Font.Color := Self.Font.Color;
-        fCnv.Brush.Color := Color;
-        fCnv.FillRect(NodeRect);
-        st := currItem.Data;
-        if Assigned(fParser) then
-          if Assigned(st) then
-            if (fParser.Statements.IndexOf(st) <> -1) then begin
-              fCnv.Font.Style := [fsBold];
-              if Selected = currItem then begin
-                fCnv.Font.Color := clHighlightText;
-                fCnv.Brush.Color := clHighlight;
-                tmp := NodeRect;
-                tmp.Right := tmp.Left + fCnv.TextWidth(st^._ScopelessCmd) + 4;
-                fCnv.FillRect(tmp);
-              end;
+				fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
 
-              bInherited := fShowInheritedMembers and
-                Assigned(currItem.Parent) and
-                (currItem.Parent.ImageIndex <> fImagesRecord.Globals) and
-                Assigned(currItem.Parent.Data) and
-                (fParser.Statements.IndexOf(currItem.Parent.Data) <> -1) and
-                (PStatement(currItem.Parent.Data)^._ID <> st^._ParentID);
-
-              if bInherited then
-                fCnv.Font.Color := clGray;
-
-              fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, st^._ScopelessCmd);
-              if bInherited then
-                fCnv.Font.Color := clGray
-              else
-                fCnv.Font.Color := Self.Font.Color;
-              fCnv.Brush.Color := Color;
-
-              NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._ScopelessCmd) + 2;
-              fCnv.Font.Style := [];
-              if bInherited then
-                fCnv.Font.Color := clGray
-              else
-                fCnv.Font.Color := clMaroon;
-              fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, st^._Args);
-
-              if st^._Type <> '' then begin
-                fCnv.Font.Color := clGray;
-                NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
-                fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, ': ' + st^._Type);
-              end
-              else begin
-                if st^._Kind in [skConstructor, skDestructor] then begin
-                  fCnv.Font.Color := clGray;
-                  NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
-                  fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, ': ' + fParser.StatementKindStr(st^._Kind));
-                end;
-              end;
-            end
-            else
-              currItem.Data := nil;
-      end
-      else begin
-        fCnv.Font.Style := [fsBold];
-        if Selected = currItem then begin
-          fCnv.Font.Color := clHighlightText;
-          fCnv.Brush.Color := clHighlight;
-          tmp := NodeRect;
-          tmp.Right := tmp.Left + fCnv.TextWidth(currItem.Text) + 4;
-          fCnv.FillRect(tmp);
-        end
-        else begin
-          fCnv.Font.Color := clNavy;
-          fCnv.Brush.Color := Color;
-        end;
-        fCnv.FillRect(NodeRect);
-        fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, currItem.Text);
-      end;
-    end;
-  end;
-end;
-
-procedure TClassBrowser.SetUseColors(const Value: boolean);
-begin
-  fUseColors := Value;
-  if not fUseColors then begin
-    OnMouseMove := myMouseMove;
-    if Assigned(fCnv) then begin
-      fCnv.Free;
-      fCnv := nil;
-    end;
-  end
-  else begin
-    OnMouseMove := nil;
-    if not Assigned(fCnv) then begin
-      fCnv := TControlCanvas.Create;
-      fCnv.Control := Self;
-      fCnv.Font.Assign(Self.Font);
-      fCnv.Brush.Style := bsClear;
-    end;
-  end;
+				// Draw type
+				if st^._Type <> '' then begin
+					fCnv.Font.Color := clGray;
+					NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
+					fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, ': ' + st^._Type);
+				end else if st^._Kind in [skConstructor, skDestructor] then begin
+					fCnv.Font.Color := clGray;
+					NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
+					fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 1, ': ' + fParser.StatementKindStr(st^._Kind));
+				end;
+			end;
+		end;
+	end;
 end;
 
 procedure TClassBrowser.SetShowInheritedMembers(const Value: boolean);

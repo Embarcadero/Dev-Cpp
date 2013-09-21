@@ -345,8 +345,9 @@ begin
 
 	if fText.Visible then
 		fText.SetFocus;
-	if MainForm.ClassBrowser.Enabled then
-		MainForm.PageControlChange(MainForm.PageControl); // this makes sure that the classbrowser is consistent
+
+	// this makes sure that the classbrowser is consistent
+	MainForm.PageControlChange(MainForm.PageControl);
 end;
 
 procedure TEditor.EditorGutterClick(Sender: TObject; Button: TMouseButton;x, y, Line: integer; mark: TSynEditMark);
@@ -1099,7 +1100,7 @@ end;
 procedure TEditor.InitCompletion;
 begin
 	fCompletionBox := MainForm.CodeCompletion;
-	fCompletionBox.Enabled := devClassBrowsing.Enabled and devCodeCompletion.Enabled;
+	fCompletionBox.Enabled := devCodeCompletion.Enabled;
 
 	// This way symbols and tabs are also completed without code completion
 	fText.OnKeyPress := EditorKeyPress;

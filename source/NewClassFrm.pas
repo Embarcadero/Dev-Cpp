@@ -33,15 +33,15 @@ uses
 
 type
   TNewClassForm = class(TForm)
-    Label1: TLabel;
+    lblClassName: TLabel;
     txtName: TEdit;
-    GroupBox1: TGroupBox;
-    Label2: TLabel;
-    Label3: TLabel;
+    grpInheritance: TGroupBox;
+    lblAccess: TLabel;
+    lblInherit: TLabel;
     cmbClass: TComboBox;
-    Label4: TLabel;
+    lblCppFile: TLabel;
     txtCppFile: TEdit;
-    Label5: TLabel;
+    lblHFile: TLabel;
     txtHFile: TEdit;
     btnBrowseCpp: TSpeedButton;
     btnBrowseH: TSpeedButton;
@@ -49,20 +49,13 @@ type
     btnCreate: TButton;
     btnCancel: TButton;
     cmbScope: TComboBox;
-    SaveDialog1: TSaveDialog;
     chkInherit: TCheckBox;
-    Label6: TLabel;
+    lblHeaderFile: TLabel;
     txtIncFile: TEdit;
-    GroupBox2: TGroupBox;
-    Label7: TLabel;
-    Label8: TLabel;
-    memDescr: TMemo;
-    cmbComment: TComboBox;
-    Label9: TLabel;
+    lblArguments: TLabel;
     txtArgs: TEdit;
     chkConstruct: TCheckBox;
     chkDestruct: TCheckBox;
-    Label10: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure chkInheritClick(Sender: TObject);
@@ -95,60 +88,57 @@ procedure TNewClassForm.FormShow(Sender: TObject);
 var
 	sl: TStrings;
 begin
-  LoadText;
-  txtName.Text := '';
-  txtArgs.Text := '';
+	LoadText;
 
-  cmbScope.ItemIndex := 2;
-  sl := TStringList.Create;
-  try
-    MainForm.CppParser.GetClassesList(sl);
-    cmbClass.Items.Assign(sl);
-  finally
-    sl.Free;
-  end;
-  if Assigned(MainForm.ClassBrowser.Selected) and (PStatement(MainForm.ClassBrowser.Selected.Data)^._Kind = skClass) then begin
-    cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser.Selected.Data)^._ScopeCmd);
-    chkInherit.Checked := True;
-  end
-  else begin
-    cmbClass.Text := '';
-    chkInherit.Checked := False;
-  end;
+	// public is used most of the time?
+	cmbScope.ItemIndex := cmbScope.Items.IndexOf('public');
 
-  txtIncFile.Text := '';
-  txtCppFile.Text := '';
-  txtHFile.Text := '';
-  chkAddToProject.Checked := True;
+	sl := TStringList.Create;
+	try
+		MainForm.CppParser.GetClassesList(sl);
+		cmbClass.Items.Assign(sl);
+	finally
+		sl.Free;
+	end;
 
-  memDescr.Lines.Clear;
-  cmbComment.ItemIndex := 1;
+	// Drastic measures are needed to banish random bug reports of AVs here
+	if Assigned(MainForm.ClassBrowser.Selected) and
+	   Assigned(MainForm.ClassBrowser.Selected.Data) and
+	   (PStatement(MainForm.ClassBrowser.Selected.Data)^._Kind = skClass) then begin
 
-  chkInheritClick(nil);
-  txtNameChange(nil);
-  cmbClassChange(nil);
-  txtName.SetFocus;
+		// If we are spawned from the class browser, set inheritcance to selected class
+		cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser.Selected.Data)^._ScopeCmd);
+		if cmbClass.ItemIndex <> -1 then
+			chkInherit.Checked := True;
+	end else begin
+		cmbClass.Text := '';
+		chkInherit.Checked := False;
+	end;
+
+	txtName.SetFocus;
 end;
 
 procedure TNewClassForm.chkInheritClick(Sender: TObject);
 begin
-  cmbScope.Enabled := chkInherit.Checked;
-  cmbClass.Enabled := chkInherit.Checked;
+	cmbScope.Enabled := chkInherit.Checked;
+	cmbClass.Enabled := chkInherit.Checked;
+	txtIncFile.Enabled := chkInherit.Checked;
 end;
 
 procedure TNewClassForm.txtNameChange(Sender: TObject);
 begin
-  if txtName.Text <> '' then begin
-    txtCppFile.Text := MainForm.fProject.Directory + LowerCase(txtName.Text) + '.cpp';
-    txtHFile.Text := MainForm.fProject.Directory + LowerCase(txtName.Text) + '.h';
-  end
-  else begin
-    txtCppFile.Text := '';
-    txtHFile.Text := '';
-  end;
-  btnCreate.Enabled := (txtName.Text <> '') and
-    (txtCppFile.Text <> '') and
-    (txtHFile.Text <> '');
+	if txtName.Text <> '' then begin
+		txtCppFile.Text := MainForm.fProject.Directory + LowerCase(txtName.Text) + '.cpp';
+		txtHFile.Text := MainForm.fProject.Directory + LowerCase(txtName.Text) + '.h';
+
+		// Make sure one can actually see what is going on
+		txtCppFile.SelStart := Length(txtCppFile.Text)-1;
+		txtHFile.SelStart := Length(txtHFile.Text)-1;
+	end else begin
+		txtCppFile.Text := '';
+		txtHFile.Text := '';
+	end;
+	btnCreate.Enabled := (txtName.Text <> '') and (txtCppFile.Text <> '') and (txtHFile.Text <> '');
 end;
 
 procedure TNewClassForm.txtCppFileChange(Sender: TObject);
@@ -160,123 +150,116 @@ end;
 
 procedure TNewClassForm.btnBrowseCppClick(Sender: TObject);
 begin
-  if Sender = btnBrowseCpp then begin
-    SaveDialog1.FileName := ExtractFileName(txtCppFile.Text);
-    SaveDialog1.InitialDir := ExtractFilePath(txtCppFile.Text);
-    SaveDialog1.Filter := FLT_CPPS;
-    SaveDialog1.DefaultExt := 'cpp';
-  end
-  else begin
-    SaveDialog1.FileName := ExtractFileName(txtHFile.Text);
-    SaveDialog1.InitialDir := ExtractFilePath(txtHFile.Text);
-    SaveDialog1.Filter := FLT_HEADS;
-    SaveDialog1.DefaultExt := 'h';
-  end;
-  if SaveDialog1.Execute then begin
-    if Sender = btnBrowseCpp then
-      txtCppFile.Text := SaveDialog1.FileName
-    else
-      txtHFile.Text := SaveDialog1.FileName;
-  end;
+	with TOpenDialog.Create(self) do try
+		if Sender = btnBrowseCpp then begin
+			FileName := ExtractFileName(txtCppFile.Text);
+			InitialDir := ExtractFilePath(txtCppFile.Text);
+			Filter := FLT_CPPS;
+			DefaultExt := 'cpp';
+		end else begin
+			FileName := ExtractFileName(txtHFile.Text);
+			InitialDir := ExtractFilePath(txtHFile.Text);
+			Filter := FLT_HEADS;
+			DefaultExt := 'h';
+		end;
+		if Execute then begin
+			if Sender = btnBrowseCpp then
+				txtCppFile.Text := FileName
+			else
+				txtHFile.Text := FileName;
+		end;
+	finally
+		Free;
+	end;
 end;
 
 procedure TNewClassForm.btnCreateClick(Sender: TObject);
 var
   idx: integer;
-  I: integer;
-  e: TEditor;
-  S: AnsiString;
+  e,headere: TEditor;
   hfName: AnsiString;
   hFile: integer;
   st: PStatement;
 begin
-  // HEADER FILE IMPLEMENTATION
-  if chkAddToProject.Checked then begin
-    idx := MainForm.fProject.NewUnit(False, txtHFile.Text);
-    e := MainForm.fProject.OpenUnit(idx);
-    if idx = -1 then begin
-      MessageDlg('Cannot add header file to project...', mtError, [mbOk], 0);
-      Exit;
-    end;
-  end
-  else begin
-    hFile := FileCreate(txtHFile.Text);
-    if hFile > 0 then begin
-      FileClose(hFile);
-      e := MainForm.GetEditorFromFileName(txtHFile.Text);
-    end
-    else begin
-      MessageDlg('Cannot create header file...', mtError, [mbOk], 0);
-      Exit;
-    end;
-  end;
-
-  if not Assigned(e) then begin
-    MessageDlg('Cannot open header file in editor...', mtError, [mbOk], 0);
-    Exit;
-  end;
-
-  hfName := UpperCase(ExtractFileName(txtHFile.Text));
-  hfName := StringReplace(hfName, '.', '_', [rfReplaceAll]);
-  hfName := StringReplace(hfName, ' ', '_', [rfReplaceAll]);
-
-  e.Text.Lines.BeginUpdate;
-  e.Text.Lines.Append('#ifndef ' + hfName);
-  e.Text.Lines.Append('#define ' + hfName);
-  e.Text.Lines.Append('');
-  if chkInherit.Checked and (txtIncFile.Text <> '') then begin
-    st := nil;
-    for idx := 0 to MainForm.CppParser.Statements.Count - 1 do begin
-      st := MainForm.CppParser.Statements[idx];
-      if (st^._Kind = skClass) and (st^._ScopelessCmd = cmbClass.Text) and (MainForm.fProject.Units.Indexof(MainForm.CppParser.GetDeclarationFileName(st)) <> -1) then
-        Break;
-      st:=nil;
-    end;
-    if Assigned(st) then
-      e.Text.Lines.Append('#include "' + txtIncFile.Text + '" // inheriting class''s header file')
-    else
-      e.Text.Lines.Append('#include <' + txtIncFile.Text + '> // inheriting class''s header file');
-    e.Text.Lines.Append('');
-  end;
-  S := 'class ' + txtName.Text;
-  if chkInherit.Checked and (cmbClass.Text <> '') then
-    S := S + ' : ' + cmbScope.Text + ' ' + cmbClass.Text;
-
-  // insert the comment
-  if Trim(memDescr.Text) = '' then
-    memDescr.Text := 'No description';
-  if cmbComment.ItemIndex = 0 then // /** ... */
-    e.Text.Lines.Append('/**')
-  else if cmbComment.ItemIndex = 1 then // /* ... */
-    e.Text.Lines.Append('/*');
-  for I := 0 to memDescr.Lines.Count - 1 do
-    if cmbComment.ItemIndex in [0, 1] then // /** ... */ or /* ... */
-      e.Text.Lines.Append(' * ' + memDescr.Lines[I])
-    else
-      e.Text.Lines.Append('// ' + memDescr.Lines[I]);
-  if cmbComment.ItemIndex in [0, 1] then // /** ... */ or /* ... */
-    e.Text.Lines.Append(' */');
-
-	e.Text.Lines.Append(S);
-	e.Text.Lines.Append('{');
-	e.Text.Lines.Append(#9'// private section');
-	e.Text.Lines.Append(#9'public:');
-	if chkConstruct.Checked then begin
-		e.Text.Lines.Append(#9#9'// class constructor');
-		e.Text.Lines.Append(#9#9 + txtName.Text + '(' + txtArgs.Text + ');');
+	// HEADER FILE IMPLEMENTATION
+	if chkAddToProject.Checked then begin
+		idx := MainForm.fProject.NewUnit(False, txtHFile.Text);
+		e := MainForm.fProject.OpenUnit(idx);
+		if idx = -1 then begin
+			MessageDlg('Cannot add header file to project...', mtError, [mbOk], 0);
+			Exit;
+		end;
+	end else begin
+		hFile := FileCreate(txtHFile.Text);
+		if hFile > 0 then begin
+			FileClose(hFile);
+			e := MainForm.GetEditorFromFileName(txtHFile.Text);
+		end else begin
+			MessageDlg('Cannot create header file...', mtError, [mbOk], 0);
+			Exit;
+		end;
 	end;
-	if chkDestruct.Checked then begin
-		e.Text.Lines.Append(#9#9'// class destructor');
-		e.Text.Lines.Append(#9#9'~' + txtName.Text + '();');
+
+	if not Assigned(e) then begin
+		MessageDlg('Cannot open header file in editor...', mtError, [mbOk], 0);
+		Exit;
 	end;
-	e.Text.Lines.Append(#9'protected:');
-	e.Text.Lines.Append('};');
-	e.Text.Lines.Append('');
-	e.Text.Lines.Append('#endif // ' + hfName);
-	e.Text.Lines.Append('');
+
+	hfName := UpperCase(ExtractFileName(txtHFile.Text));
+	hfName := StringReplace(hfName, '.', '_', [rfReplaceAll]);
+	hfName := StringReplace(hfName, ' ', '_', [rfReplaceAll]);
+
+	e.Text.Lines.BeginUpdate;
+
+	// Add header guard
+	e.Text.Lines.Add('#ifndef ' + hfName);
+	e.Text.Lines.Add('#define ' + hfName);
+	e.Text.Lines.Add('');
+
+	// Add inherited piece ": public foo"
+	if chkInherit.Checked and (txtIncFile.Text <> '') then begin
+
+		// Find class we inherit from
+		st := nil;
+		for idx := 0 to MainForm.CppParser.Statements.Count - 1 do begin
+			st := MainForm.CppParser.Statements[idx];
+			if (st^._Kind = skClass) and (st^._ScopelessCmd = cmbClass.Text) and (MainForm.fProject.Units.Indexof(MainForm.CppParser.GetDeclarationFileName(st)) <> -1) then
+				Break;
+			st:=nil;
+		end;
+
+		if Assigned(st) then
+			e.Text.Lines.Add('#include "' + txtIncFile.Text + '"')
+		else
+			e.Text.Lines.Add('#include <' + txtIncFile.Text + '>');
+		e.Text.Lines.Add('');
+	end;
+
+	// Include inheritance or not, assume it's valid code
+	if chkInherit.Checked and (cmbClass.Text <> '') then
+		e.Text.Lines.Add('class ' + txtName.Text + ' : ' + cmbScope.Text + ' ' + cmbClass.Text)
+	else
+		e.Text.Lines.Add('class ' + txtName.Text);
+
+	e.Text.Lines.Add('{');
+	e.Text.Lines.Add(#9'public:');
+
+	// Create one optional constructor with args
+	if chkConstruct.Checked then
+		e.Text.Lines.Add(#9#9 + txtName.Text + '(' + txtArgs.Text + ');');
+
+	// Create one optional destructor
+	if chkDestruct.Checked then
+		e.Text.Lines.Add(#9#9'~' + txtName.Text + '();');
+
+	e.Text.Lines.Add(#9'protected:');
+	e.Text.Lines.Add('};');
+	e.Text.Lines.Add('');
+	e.Text.Lines.Add('#endif');
 	e.Text.Lines.EndUpdate;
 
 	e.Text.Modified := True;
+	headere := e; // keep pointer so we can activate
 
 	// CPP FILE IMPLEMENTATION
 	if chkAddToProject.Checked then begin
@@ -303,50 +286,47 @@ begin
 	end;
 
 	e.Text.Lines.BeginUpdate;
-	e.Text.Lines.Append('#include "' + ExtractFileName(txtHFile.Text) + '" // class''s header file');
-	e.Text.Lines.Append('');
+	e.Text.Lines.Add('#include "' + ExtractFileName(txtHFile.Text) + '"');
+	e.Text.Lines.Add('');
 
 	if chkConstruct.Checked then begin
-		e.Text.Lines.Append('// class constructor');
-		e.Text.Lines.Append(txtName.Text + '::' + txtName.Text + '(' + txtArgs.Text + ')');
-		e.Text.Lines.Append('{');
-		e.Text.Lines.Append(#9'// insert your code here');
-		e.Text.Lines.Append('}');
+		e.Text.Lines.Add(txtName.Text + '::' + txtName.Text + '(' + txtArgs.Text + ')');
+		e.Text.Lines.Add('{');
+		e.Text.Lines.Add('}');
+		e.Text.Lines.Add('');
 	end;
-
-	e.Text.Lines.Append('');
 
 	if chkDestruct.Checked then begin
-		e.Text.Lines.Append('// class destructor');
-		e.Text.Lines.Append(txtName.Text + '::~' + txtName.Text + '()');
-		e.Text.Lines.Append('{');
-		e.Text.Lines.Append(#9'// insert your code here');
-		e.Text.Lines.Append('}');
+		e.Text.Lines.Add(txtName.Text + '::~' + txtName.Text + '()');
+		e.Text.Lines.Add('{');
+		e.Text.Lines.Add('}');
+		e.Text.Lines.Add('');
 	end;
 
-	e.Text.Lines.Append('');
 	e.Text.Lines.EndUpdate;
 
 	e.Text.Modified := True;
+
+	// Open CPP file by default
+	headere.Activate;
 end;
 
 procedure TNewClassForm.cmbClassChange(Sender: TObject);
 var
-  st: PStatement;
+	st: PStatement;
 begin
-  if cmbClass.Items.IndexOf(cmbClass.Text) <> -1 then begin
-    st := PStatement(cmbClass.Items.Objects[cmbClass.Items.IndexOf(cmbClass.Text)]);
-    if Assigned(st) then
-      txtIncFile.Text := ExtractFileName(MainForm.CppParser.GetDeclarationFileName(st))
-    else
-      txtIncFile.Text := LowerCase(cmbClass.Text) + '.h';
-  end
-  else begin
-    if cmbClass.Text <> '' then
-      txtIncFile.Text := LowerCase(cmbClass.Text) + '.h'
-    else
-      txtIncFile.Text := '';
-  end;
+	if cmbClass.Items.IndexOf(cmbClass.Text) <> -1 then begin
+		st := PStatement(cmbClass.Items.Objects[cmbClass.Items.IndexOf(cmbClass.Text)]);
+		if Assigned(st) then
+			txtIncFile.Text := ExtractFileName(MainForm.CppParser.GetDeclarationFileName(st))
+		else
+			txtIncFile.Text := LowerCase(cmbClass.Text) + '.h';
+	end else begin
+		if cmbClass.Text <> '' then
+			txtIncFile.Text := LowerCase(cmbClass.Text) + '.h'
+		else
+			txtIncFile.Text := '';
+	end;
 end;
 
 procedure TNewClassForm.txtNameKeyPress(Sender: TObject; var Key: Char);
@@ -363,25 +343,23 @@ begin
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
-  Caption := Lang[ID_POP_NEWCLASS];
-  Label1.Caption := Lang[ID_NEWCLASS_NAME];
-  Label9.Caption := Lang[ID_NEWMEMB_ARGS];
-  chkInherit.Caption := Lang[ID_NEWCLASS_INHERIT];
-  GroupBox1.Caption := Lang[ID_NEWCLASS_INHERITANCE];
-  Label2.Caption := Lang[ID_NEWVAR_SCOPE] + ':';
-  Label3.Caption := Lang[ID_NEWCLASS_INHERIT_FROM];
-  Label6.Caption := Lang[ID_NEWCLASS_INHERIT_HDR];
-  Label4.Caption := Lang[ID_NEWCLASS_CPPFILE];
-  Label5.Caption := Lang[ID_NEWCLASS_HFILE];
-  chkAddToProject.Caption := Lang[ID_NEWCLASS_ADDTOPROJ];
-  GroupBox2.Caption := Lang[ID_NEWVAR_COMMENTS];
-  Label7.Caption := Lang[ID_NEWVAR_COMMENTSDESCR];
-  Label8.Caption := Lang[ID_NEWVAR_COMMENTSSTYLE];
-  btnCreate.Caption := Lang[ID_NEWVAR_BTN_CREATE];
-  btnCancel.Caption := Lang[ID_NEWVAR_BTN_CANCEL];
-
+	Caption := Lang[ID_POP_NEWCLASS];
+	lblClassName.Caption := Lang[ID_NEWCLASS_NAME];
+	lblArguments.Caption := Lang[ID_NEWMEMB_ARGS];
 	chkConstruct.Caption := Lang[ID_NEWCLASS_CONSTRUCTOR];
 	chkDestruct.Caption := Lang[ID_NEWCLASS_DESTRUCTOR];
+
+	chkInherit.Caption := Lang[ID_NEWCLASS_INHERIT];
+	grpInheritance.Caption := Lang[ID_NEWCLASS_INHERITANCE];
+	lblAccess.Caption := Lang[ID_NEWVAR_SCOPE] + ':';
+	lblInherit.Caption := Lang[ID_NEWCLASS_INHERIT_FROM];
+	lblHeaderFile.Caption := Lang[ID_NEWCLASS_INHERIT_HDR];
+
+	lblCppFile.Caption := Lang[ID_NEWCLASS_CPPFILE];
+	lblHFile.Caption := Lang[ID_NEWCLASS_HFILE];
+	chkAddToProject.Caption := Lang[ID_NEWCLASS_ADDTOPROJ];
+	btnCreate.Caption := Lang[ID_NEWVAR_BTN_CREATE];
+	btnCancel.Caption := Lang[ID_NEWVAR_BTN_CANCEL];
 end;
 
 end.

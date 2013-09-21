@@ -406,10 +406,6 @@ begin
 	with TToolEditForm.Create(Self) do try
 		if ShowModal = mrOK then begin
 			new(NewItem);
-			edTitle.Text := '';
-			edProgram.Text := '';
-			edWorkDir.Text := '';
-			edParams.Text := '';
 	
 			NewItem.Title:= edTitle.Text;
 			NewItem.Exec:= edProgram.Text;

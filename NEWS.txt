@@ -1,5 +1,8 @@
 Version 5.3.0.5 - *
 
+- Startup time has been reduced by an order of magnitude.
+- The class browser now redraws at least numvisibleitems times faster.
+- "Search Again" (F3) is back from the dead.
 - The toolbars now do not get cut off on restart after about the 800th horizontal pixel.
 - The tip of the day form now does not show up anymore when opening files (again).
 - Gutter auto sizing now takes folding into account.
@@ -11,6 +14,9 @@ Version 5.3.0.5 - *
 - Reduced memory usage.
 - Exporting editors to HTML now provides a perfect copy of the color scheme.
 - Fixed a memory leak in the Tools window.
+- Updated chinese (TW) translations.
+- Added an example save file name to Editor Options >> Autosave.
+- More bug fixes and feature additions here and there.
 
 Version 5.3.0.4 - 31 December 2012
 

@@ -53,6 +53,7 @@ type
     GDBcommandchanged : boolean;
 
     DebugTree : TTreeView;
+    LeftPageIndexBackup : integer;
     BreakPointList : TList;
     WatchVarList : TList;
 
@@ -205,6 +206,9 @@ procedure TDebugger.Stop;
 begin
 	if Executing then begin
 		Executing := false;
+
+		if WatchVarList.Count = 0 then // nothing worth showing, restore view
+			MainForm.LeftPageControl.ActivePageIndex := LeftPageIndexBackup;
 
 		// Close CPU window
 		if Assigned(CPUForm) then

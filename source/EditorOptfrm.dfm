@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 300
-  Top = 265
+  Left = 465
+  Top = 309
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 462
@@ -13,6 +13,7 @@ object EditorOptForm: TEditorOptForm
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   DesignSize = (
     484
@@ -22,10 +23,11 @@ object EditorOptForm: TEditorOptForm
   object PagesMain: TPageControl
     Left = 0
     Top = 0
-    Width = 484
+    Width = 485
     Height = 425
     ActivePage = tabGeneral
     TabOrder = 0
+    OnChange = PagesMainChange
     object tabGeneral: TTabSheet
       Caption = 'General'
       object grpMargin: TGroupBox
@@ -768,7 +770,7 @@ object EditorOptForm: TEditorOptForm
       object codepages: TPageControl
         Left = 0
         Top = 0
-        Width = 476
+        Width = 477
         Height = 395
         ActivePage = tabCPInserts
         Align = alClient
@@ -776,66 +778,27 @@ object EditorOptForm: TEditorOptForm
         object tabCPInserts: TTabSheet
           Caption = 'Snippets'
           object btnAdd: TButton
-            Left = 374
-            Top = 21
-            Width = 80
+            Left = 384
+            Top = 45
+            Width = 78
             Height = 24
             Caption = 'Add'
-            TabOrder = 1
+            TabOrder = 0
             OnClick = btnAddClick
           end
-          object btnEdit: TButton
-            Left = 374
-            Top = 61
-            Width = 80
-            Height = 24
-            Caption = 'Edit'
-            TabOrder = 2
-            OnClick = btnEditClick
-          end
           object btnRemove: TButton
-            Left = 374
-            Top = 101
+            Left = 382
+            Top = 77
             Width = 80
             Height = 24
             Caption = 'Remove'
-            TabOrder = 3
+            TabOrder = 1
             OnClick = btnRemoveClick
-          end
-          object lvCodeins: TListView
-            Left = 2
-            Top = 8
-            Width = 351
-            Height = 129
-            BevelOuter = bvRaised
-            BevelKind = bkSoft
-            BorderStyle = bsNone
-            Columns = <
-              item
-                Caption = 'Menu text'
-                Width = 125
-              end
-              item
-                Caption = 'Section'
-              end
-              item
-                Caption = 'Description'
-                Width = 157
-              end>
-            ColumnClick = False
-            GridLines = True
-            HideSelection = False
-            RowSelect = True
-            TabOrder = 0
-            ViewStyle = vsReport
-            OnColumnClick = lvCodeinsColumnClick
-            OnCompare = lvCodeinsCompare
-            OnSelectItem = lvCodeinsSelectItem
           end
           object CodeIns: TSynEdit
             Left = 0
             Top = 154
-            Width = 468
+            Width = 469
             Height = 211
             Align = alBottom
             Font.Charset = DEFAULT_CHARSET
@@ -843,7 +806,7 @@ object EditorOptForm: TEditorOptForm
             Font.Height = -13
             Font.Name = 'Courier New'
             Font.Style = []
-            TabOrder = 4
+            TabOrder = 2
             TabStop = False
             Gutter.AutoSize = True
             Gutter.BorderStyle = gbsNone
@@ -871,6 +834,21 @@ object EditorOptForm: TEditorOptForm
                 Command = ecContextHelp
                 ShortCut = 16496
               end>
+          end
+          object lvCodeIns: TStringGrid
+            Left = 8
+            Top = 8
+            Width = 369
+            Height = 137
+            ColCount = 3
+            DefaultColWidth = 115
+            DefaultRowHeight = 18
+            FixedCols = 0
+            RowCount = 2
+            Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goTabs, goAlwaysShowEditor]
+            ScrollBars = ssVertical
+            TabOrder = 3
+            OnSelectCell = lvCodeInsSelectCell
           end
         end
         object tabSymbols: TTabSheet
@@ -985,210 +963,126 @@ object EditorOptForm: TEditorOptForm
         end
       end
     end
-    object tabClassBrowsing: TTabSheet
-      Caption = 'Class browsing'
-      object chkEnableClassBrowser: TCheckBox
+    object tabCBCompletion: TTabSheet
+      Caption = 'Code completion'
+      object lblCompletionDelay: TLabel
+        Left = 8
+        Top = 108
+        Width = 59
+        Height = 15
+        Caption = 'Delay (ms):'
+      end
+      object cpCompletionBackground: TColorPickerButton
+        Left = 333
+        Top = 127
+        Width = 112
+        Height = 22
+        CustomText = 'Custom'
+        DefaultText = 'Default'
+        PopupSpacing = 8
+        ShowSystemColors = True
+        OnChange = StyleChange
+        OnDefaultSelect = DefaultSelect
+        OnHint = PickerHint
+      end
+      object lblCompletionColor: TLabel
+        Left = 328
+        Top = 108
+        Width = 97
+        Height = 15
+        Caption = 'Background color:'
+      end
+      object btnCCCnew: TSpeedButton
+        Left = 8
+        Top = 360
+        Width = 101
+        Height = 25
+        Caption = 'Add files'
+        OnClick = btnCCCnewClick
+      end
+      object btnCCCdelete: TSpeedButton
+        Left = 112
+        Top = 360
+        Width = 101
+        Height = 25
+        Caption = 'Clear'
+        OnClick = btnCCCdeleteClick
+      end
+      object tbCompletionDelay: TTrackBar
+        Left = 16
+        Top = 132
+        Width = 297
+        Height = 37
+        Max = 10000
+        Min = 1
+        ParentShowHint = False
+        Frequency = 500
+        Position = 1000
+        ShowHint = False
+        TabOrder = 1
+        TickMarks = tmBoth
+        OnChange = tbCompletionDelayChange
+      end
+      object chkEnableCompletion: TCheckBox
         Left = 8
         Top = 8
-        Width = 361
+        Width = 457
         Height = 17
-        Caption = 'Enable class browser'
+        Caption = 'Enable code-completion'
         TabOrder = 0
-        OnClick = chkEnableClassBrowserClick
+        OnClick = chkEnableCompletionClick
       end
-      object ClassCodePage: TPageControl
-        Left = 0
-        Top = 30
-        Width = 476
-        Height = 365
-        ActivePage = tabCBBrowser
-        TabOrder = 1
-        OnChange = ClassCodePageChange
-        object tabCBBrowser: TTabSheet
-          Caption = 'Class browsing'
-          object lblClassBrowserSample: TLabel
-            Left = 32
-            Top = 156
-            Width = 42
-            Height = 15
-            Caption = 'Sample:'
-          end
-          object ClassBrowser: TClassBrowser
-            Left = 84
-            Top = 156
-            Width = 333
-            Height = 173
-            Images = dmMain.ClassImages
-            ReadOnly = True
-            Indent = 19
-            TabOrder = 2
-            ShowFilter = sfAll
-            ItemImages.Globals = -1
-            ItemImages.Classes = 1
-            ItemImages.VariablePrivate = 2
-            ItemImages.VariableProtected = 3
-            ItemImages.VariablePublic = 4
-            ItemImages.VariablePublished = 4
-            ItemImages.MethodPrivate = 5
-            ItemImages.MethodProtected = 6
-            ItemImages.MethodPublic = 7
-            ItemImages.MethodPublished = 7
-            ItemImages.InheritedMethodProtected = 0
-            ItemImages.InheritedMethodPublic = 0
-            ItemImages.InheritedVariableProtected = 0
-            ItemImages.InheritedVariablePublic = 0
-            UseColors = True
-            ShowInheritedMembers = False
-          end
-          object gbCBEngine: TGroupBox
-            Left = 8
-            Top = 12
-            Width = 457
-            Height = 65
-            Caption = 'Engine behaviour'
-            TabOrder = 0
-            object chkCBParseGlobalH: TCheckBox
-              Left = 8
-              Top = 40
-              Width = 345
-              Height = 17
-              Caption = 'Scan global files referenced in #include'#39's'
-              TabOrder = 1
-            end
-            object chkCBParseLocalH: TCheckBox
-              Left = 8
-              Top = 20
-              Width = 345
-              Height = 17
-              Caption = 'Scan local files referenced in #include'#39's'
-              TabOrder = 0
-            end
-          end
-          object gbCBView: TGroupBox
-            Left = 8
-            Top = 84
-            Width = 457
-            Height = 65
-            Caption = 'View options'
-            TabOrder = 1
-            object chkCBUseColors: TCheckBox
-              Left = 8
-              Top = 20
-              Width = 345
-              Height = 17
-              Caption = 'Use colors'
-              TabOrder = 0
-              OnClick = chkCBUseColorsClick
-            end
-            object chkCBShowInherited: TCheckBox
-              Left = 8
-              Top = 40
-              Width = 345
-              Height = 17
-              Caption = 'Show inherited members'
-              TabOrder = 1
-              OnClick = chkCBShowInheritedClick
-            end
-          end
+      object chkCCCache: TCheckBox
+        Left = 8
+        Top = 176
+        Width = 457
+        Height = 17
+        Caption = 'Use code-completion cache'
+        TabOrder = 2
+        OnClick = chkCCCacheClick
+      end
+      object lbCCC: TListBox
+        Left = 8
+        Top = 200
+        Width = 457
+        Height = 153
+        ItemHeight = 15
+        ParentShowHint = False
+        ShowHint = True
+        Sorted = True
+        TabOrder = 3
+      end
+      object pbCCCache: TProgressBar
+        Left = 216
+        Top = 360
+        Width = 249
+        Height = 25
+        BorderWidth = 1
+        TabOrder = 4
+        Visible = False
+      end
+      object gbCBEngine: TGroupBox
+        Left = 8
+        Top = 36
+        Width = 457
+        Height = 65
+        Caption = 'Engine behaviour'
+        TabOrder = 5
+        object chkCBParseGlobalH: TCheckBox
+          Left = 8
+          Top = 40
+          Width = 345
+          Height = 17
+          Caption = 'Scan global files referenced in #include'#39's'
+          TabOrder = 1
         end
-        object tabCBCompletion: TTabSheet
-          Caption = 'Code completion'
-          object lblCompletionDelay: TLabel
-            Left = 8
-            Top = 36
-            Width = 59
-            Height = 15
-            Caption = 'Delay (ms):'
-          end
-          object cpCompletionBackground: TColorPickerButton
-            Left = 341
-            Top = 55
-            Width = 112
-            Height = 22
-            CustomText = 'Custom'
-            DefaultText = 'Default'
-            PopupSpacing = 8
-            ShowSystemColors = True
-            OnChange = StyleChange
-            OnDefaultSelect = DefaultSelect
-            OnHint = PickerHint
-          end
-          object lblCompletionColor: TLabel
-            Left = 328
-            Top = 36
-            Width = 97
-            Height = 15
-            Caption = 'Background color:'
-          end
-          object btnCCCnew: TSpeedButton
-            Left = 8
-            Top = 304
-            Width = 101
-            Height = 25
-            Caption = 'Add files'
-            OnClick = btnCCCnewClick
-          end
-          object btnCCCdelete: TSpeedButton
-            Left = 112
-            Top = 304
-            Width = 101
-            Height = 25
-            Caption = 'Clear'
-            OnClick = btnCCCdeleteClick
-          end
-          object tbCompletionDelay: TTrackBar
-            Left = 16
-            Top = 52
-            Width = 297
-            Height = 37
-            Max = 10000
-            Min = 1
-            ParentShowHint = False
-            Frequency = 500
-            Position = 1000
-            ShowHint = False
-            TabOrder = 1
-            TickMarks = tmBoth
-            OnChange = tbCompletionDelayChange
-          end
-          object chkEnableCompletion: TCheckBox
-            Left = 8
-            Top = 12
-            Width = 361
-            Height = 17
-            Caption = 'Enable code-completion'
-            TabOrder = 0
-            OnClick = chkEnableCompletionClick
-          end
-          object chkCCCache: TCheckBox
-            Left = 8
-            Top = 104
-            Width = 433
-            Height = 17
-            Caption = 'Use code-completion cache'
-            TabOrder = 2
-            OnClick = chkCCCacheClick
-          end
-          object lbCCC: TListBox
-            Left = 8
-            Top = 124
-            Width = 457
-            Height = 173
-            ItemHeight = 15
-            ParentShowHint = False
-            ShowHint = True
-            Sorted = True
-            TabOrder = 3
-          end
-          object pbCCCache: TProgressBar
-            Left = 216
-            Top = 304
-            Width = 249
-            Height = 25
-            BorderWidth = 1
-            TabOrder = 4
-            Visible = False
-          end
+        object chkCBParseLocalH: TCheckBox
+          Left = 8
+          Top = 20
+          Width = 345
+          Height = 17
+          Caption = 'Scan local files referenced in #include'#39's'
+          TabOrder = 0
         end
       end
     end
@@ -1217,6 +1111,13 @@ object EditorOptForm: TEditorOptForm
           Width = 42
           Height = 15
           Caption = 'Interval:'
+        end
+        object lblTimeStampExample: TLabel
+          Left = 24
+          Top = 296
+          Width = 47
+          Height = 15
+          Caption = 'Example:'
         end
         object MinutesDelay: TTrackBar
           Left = 144
@@ -1254,6 +1155,7 @@ object EditorOptForm: TEditorOptForm
             'Append UNIX timestamp'
             'Append formatted timestamp')
           TabOrder = 2
+          OnClick = NameOptionsClick
         end
       end
     end
@@ -1313,21 +1215,17 @@ object EditorOptForm: TEditorOptForm
     Left = 5
     Top = 426
   end
-  object CppTokenizer: TCppTokenizer
-    LogTokens = False
-    Left = 40
-    Top = 424
-  end
   object CppParser: TCppParser
+    BaseIndex = 0
     Enabled = True
     OnTotalProgress = CppParser1TotalProgress
-    Tokenizer = CppTokenizer
+    Tokenizer = MainForm.CppTokenizer
     ParseLocalHeaders = True
     ParseGlobalHeaders = True
     LogStatements = False
     OnStartParsing = CppParser1StartParsing
     OnEndParsing = CppParser1EndParsing
-    Left = 80
-    Top = 424
+    Left = 40
+    Top = 426
   end
 end

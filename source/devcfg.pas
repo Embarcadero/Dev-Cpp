@@ -154,6 +154,8 @@ type
     fEnabled: boolean;
     fUseCacheFiles: boolean;
     fCacheFiles: TStrings;
+    fParseLocalHeaders: boolean;
+    fParseGlobalHeaders: boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -168,17 +170,15 @@ type
     property Enabled: boolean read fEnabled write fEnabled;
     property UseCacheFiles: boolean read fUseCacheFiles write fUseCacheFiles;
     property CacheFiles: TStrings read fCacheFiles write fCacheFiles;
+    property ParseLocalHeaders: boolean read fParseLocalHeaders write fParseLocalHeaders;
+    property ParseGlobalHeaders: boolean read fParseGlobalHeaders write fParseGlobalHeaders;
   end;
 
   // class-browsing view style
   TdevClassBrowsing = class(TPersistent)
   private
     fCBViewStyle: integer;
-    fEnabled: boolean;
-    fParseLocalHeaders: boolean;
-    fParseGlobalHeaders: boolean;
     fShowFilter: integer; // 0 - show all, 1 - show project, 2 - show current
-    fUseColors: boolean;
     fShowInheritedMembers: boolean;
   public
     constructor Create;
@@ -186,12 +186,8 @@ type
     procedure SaveSettings;
     procedure LoadSettings;
   published
-    property Enabled: boolean read fEnabled write fEnabled;
     property ViewStyle: integer read fCBViewStyle write fCBViewStyle;
-    property ParseLocalHeaders: boolean read fParseLocalHeaders write fParseLocalHeaders;
-    property ParseGlobalHeaders: boolean read fParseGlobalHeaders write fParseGlobalHeaders;
     property ShowFilter: integer read fShowFilter write fShowFilter;
-    property UseColors: boolean read fUseColors write fUseColors;
     property ShowInheritedMembers: boolean read fShowInheritedMembers write fShowInheritedMembers;
   end;
 
@@ -1731,13 +1727,8 @@ end;
 
 procedure TdevClassBrowsing.SettoDefaults;
 begin
-	fEnabled:=True;
 	fCBViewStyle:=0;
-
-	fParseLocalHeaders:=False;
-	fParseGlobalHeaders:=False;
 	fShowFilter:=0;
-	fUseColors:=True;
 	fShowInheritedMembers:=False;
 end;
 

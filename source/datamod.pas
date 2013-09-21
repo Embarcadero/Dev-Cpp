@@ -25,7 +25,7 @@ uses
 {$IFDEF WIN32}
   SysUtils, Classes, Menus, Dialogs, ImgList, Controls,
   SynEditHighlighter, SynHighlighterCpp,
-  CodeInsFrm, SynHighlighterRC, SynCompletionProposal,
+  CodeInsList, SynHighlighterRC, SynCompletionProposal,
   SynEditMiscClasses, SynEditSearch;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -63,7 +63,6 @@ type
     fCodeOffset: byte;
     procedure LoadCodeIns;
   public
-    function InsertList: TStrings;
     property CodeMenu: TMenuItem read fCodeMenu write fCodeMenu;
     property CodePop: TMenuItem read fCodePop write fCodePop;
     property CodeClick: TNotifyEvent read fCodeEvent write fCodeEvent;
@@ -421,19 +420,6 @@ begin
 end;
 
 { ---------- Code Insert Methods ---------- }
-
-function TdmMain.InsertList: TStrings;
-var
- idx: integer;
-begin
-  result:= TStringList.Create;
-  try
-   for idx:= 0 to pred(fCodeList.Count) do
-    result.Append(fCodeList[idx].Caption);
-  except
-   FreeandNIL(Result);
-  end;
-end;
 
 // Loads code inserts, when sep value changes a separator is
 // insert only if sep is a higher value then previous sep value.

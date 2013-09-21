@@ -411,8 +411,6 @@ type
     actShowTips: TAction;
     ShowTipsItem: TMenuItem;
     N42: TMenuItem;
-    Usecolors1: TMenuItem;
-    actBrowserUseColors: TAction;
     HelpMenuItem: TMenuItem;
     actBrowserViewProject: TAction;
     mnuBrowserViewProject: TMenuItem;
@@ -597,6 +595,9 @@ type
     WarningLabel: TLabel;
     TotalWarnings: TEdit;
     actNewClass: TAction;
+    actSearchAgain: TAction;
+    actSearchAgain1: TMenuItem;
+    N75: TMenuItem;
 
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
@@ -762,7 +763,6 @@ type
     procedure actExecParamsExecute(Sender: TObject);
     procedure DevCppDDEServerExecuteMacro(Sender: TObject; Msg: TStrings);
     procedure actShowTipsExecute(Sender: TObject);
-    procedure actBrowserUseColorsExecute(Sender: TObject);
     procedure HelpMenuItemClick(Sender: TObject);
     procedure CppParserStartParsing(Sender: TObject);
     procedure CppParserEndParsing(Sender: TObject);
@@ -847,6 +847,7 @@ type
     procedure CompilerOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
     procedure actMsgSelAllExecute(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure actSearchAgainExecute(Sender: TObject);
   private
     fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
     fTools            : TToolController; // tool list controller
@@ -1247,6 +1248,7 @@ begin
 	actGotoLine.Caption:=				Lang[ID_ITEM_GOTO];
 	actIncremental.Caption:=			Lang[ID_ITEM_INCREMENTAL];
 	actGotoFunction.Caption:=			Lang[ID_ITEM_GOTOFUNCTION];
+	actSearchAgain.Caption:=			Lang[ID_ITEM_FINDNEXT];
 
 	// View Menu
 	actProjectManager.Caption:=			Lang[ID_ITEM_PROJECTVIEW];
@@ -1385,7 +1387,6 @@ begin
 	actBrowserAddFolder.Caption:=		Lang[ID_POP_ADDFOLDER];
 	actBrowserRemoveFolder.Caption:=	Lang[ID_POP_REMOVEFOLDER];
 	actBrowserRenameFolder.Caption:=	Lang[ID_POP_RENAMEFOLDER];
-	actBrowserUseColors.Caption:=		Lang[ID_POP_USECOLORS];
 	actBrowserShowInherited.Caption:=	Lang[ID_POP_SHOWINHERITED];
 
 	actGotoDeclEditor.Caption:=			Lang[ID_POP_GOTODECL];
@@ -1499,12 +1500,9 @@ begin
 
 			e.FileName := FileName;
 
-			if ClassBrowser.Enabled then begin
-
-				// We haven't scanned it yet...
-				CppParser.AddFileToScan(FileName);
-				CppParser.ParseList;
-			end;
+			// We haven't scanned it yet...
+			CppParser.AddFileToScan(FileName);
+			CppParser.ParseList;
 		end else
 			Result := False;
 	finally
@@ -1543,8 +1541,7 @@ begin
 		end;
 
 		// Reparse
-		if ClassBrowser.Enabled then
-			CppParser.ReParseFile(e.FileName,false); // don't need to scan for the first time
+		CppParser.ReParseFile(e.FileName,false); // don't need to scan for the first time
 	end else if e.New then
 		Result := SaveFileAs(e); // we need a file name, use dialog
 
@@ -2564,7 +2561,7 @@ begin
 		if ShowModal = mrOk then
 			CheckForDLLProfiling;
 	finally
-		Close;
+		Free;
 	end;
 end;
 
@@ -2595,14 +2592,13 @@ begin
 				ScanActiveProject;
 			end;
 
-			// if class-browsing is disabled, clear the class-browser
 			// if there is no active editor, clear the class-browser
 			e := GetEditor;
-			if not ClassBrowser.Enabled or (not Assigned(e) and (ClassBrowser.ShowFilter = sfCurrent)) then
+			if not Assigned(e) and (ClassBrowser.ShowFilter = sfCurrent) then
 				ClassBrowser.Clear;
 		end;
 	finally
-		Close;
+		Free;
 	end;
 end;
 
@@ -3027,6 +3023,9 @@ begin
 	DebugOutput.Clear;
 	EvalOutput.Clear;
 
+	// Restore when no watch vars are shown
+	fDebugger.LeftPageIndexBackup := MainForm.LeftPageControl.ActivePageIndex;
+
 	// Focus on the debugging buttons
 	LeftPageControl.ActivePage := DebugLeftSheet;
 	MessageControl.ActivePage := DebugSheet;
@@ -3037,8 +3036,6 @@ begin
 end;
 
 procedure TMainForm.actDebugExecute(Sender: TObject);
-resourcestring
-	LibAppend = '%s -I"%s"';
 var
 	e: TEditor;
 	i: integer;
@@ -3838,9 +3835,9 @@ var
 	sl: TStringList;
 	I: integer;
 begin
-	CppParser.Enabled := devClassBrowsing.Enabled;
-	CppParser.ParseLocalHeaders := devClassBrowsing.ParseLocalHeaders;
-	CppParser.ParseGlobalHeaders := devClassBrowsing.ParseGlobalHeaders;
+	CppParser.Enabled := devCodeCompletion.Enabled;
+	CppParser.ParseLocalHeaders := devCodeCompletion.ParseLocalHeaders;
+	CppParser.ParseGlobalHeaders := devCodeCompletion.ParseGlobalHeaders;
 	CppParser.Tokenizer := CppTokenizer;
 	CppParser.OnStartParsing := CppParserStartParsing;
 	CppParser.OnEndParsing := CppParserEndParsing;
@@ -3881,16 +3878,13 @@ begin
 	CodeCompletion.Width := devCodeCompletion.Width;
 	CodeCompletion.Height := devCodeCompletion.Height;
 
-	ClassBrowser.Enabled := devClassBrowsing.Enabled;
 	ClassBrowser.ShowFilter := TShowFilter(devClassBrowsing.ShowFilter);
 	ClassBrowser.ShowInheritedMembers := devClassBrowsing.ShowInheritedMembers;
-	ClassBrowser.UseColors := devClassBrowsing.UseColors;
 	ClassBrowser.ClassFoldersFile := DEV_CLASSFOLDERS_FILE;
 
 	actBrowserViewAll.Checked := ClassBrowser.ShowFilter=sfAll;
 	actBrowserViewProject.Checked := ClassBrowser.ShowFilter=sfProject;
 	actBrowserViewCurrent.Checked := ClassBrowser.ShowFilter=sfCurrent;
-	actBrowserUseColors.Checked := ClassBrowser.UseColors;
 	actBrowserShowInherited.Checked := ClassBrowser.ShowInheritedMembers;
 end;
 
@@ -3901,9 +3895,6 @@ var
  e: TEditor;
 begin
 	Application.ProcessMessages;
-
-	if not ClassBrowser.Enabled then
-		Exit;
 	if Assigned(fProject) then
 		ClassBrowser.ProjectDir:=fProject.Directory
 	else begin
@@ -4083,13 +4074,13 @@ begin
 				if e.Text.Modified and SaveFile(e) then
 					SetStatusbarMessage('Autosaved file "' + e.FileName + '"');
 			end;
-			1: begin // append UNIX timestamp
+			1: begin // append UNIX timestamp (backup copy, don't update class browser)
 				newfilename := ChangeFileExt(e.FileName,'.' + IntToStr(DateTimeToUnix(Now)) + ExtractFileExt(e.FileName));
 				e.Text.UnCollapsedLines.SaveToFile(newfilename);
 
 				SetStatusbarMessage('Autosaved file "' + e.FileName + '" as "' + newfilename + '"');
 			end;
-			2: begin // append formatted timestamp
+			2: begin // append formatted timestamp (backup copy, don't update class browser)
 				newfilename := ChangeFileExt(e.FileName,'.' + FormatDateTime('yyyy mm dd hh mm ss',Now) + ExtractFileExt(e.FileName));
 				e.Text.UnCollapsedLines.SaveToFile(newfilename);
 
@@ -4117,8 +4108,8 @@ begin
 			// keep Status bar updated
 			SetStatusbarLineCol;
 
-			if ClassBrowser.Enabled then
-				ClassBrowser.CurrentFile := e.FileName;
+			// keep Class browser updated
+			ClassBrowser.CurrentFile := e.FileName;
 
 			for i := 1 to 9 do
 				if e.Text.GetBookMark(i, x, y) then begin
@@ -4297,7 +4288,7 @@ end;
 
 procedure TMainForm.actBrowserGotoImplUpdate(Sender: TObject);
 begin
-	if Assigned(ClassBrowser) and ClassBrowser.Enabled and Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then
+	if Assigned(ClassBrowser) and Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then
 
 		//check if node.data still in statements
 		if CppParser.Statements.IndexOf(ClassBrowser.Selected.Data) >=0 then
@@ -4311,7 +4302,7 @@ end;
 
 procedure TMainForm.actBrowserNewClassUpdate(Sender: TObject);
 begin
-	TAction(Sender).Enabled := ClassBrowser.Enabled and Assigned(fProject);
+	TAction(Sender).Enabled := Assigned(fProject);
 end;
 
 procedure TMainForm.actBrowserNewMemberUpdate(Sender: TObject);
@@ -4343,7 +4334,7 @@ end;
 
 procedure TMainForm.actBrowserAddFolderUpdate(Sender: TObject);
 begin
-	TCustomAction(Sender).Enabled := ClassBrowser.Enabled and Assigned(fProject);
+	TCustomAction(Sender).Enabled := Assigned(fProject);
 end;
 
 procedure TMainForm.actBrowserViewAllUpdate(Sender: TObject);
@@ -4841,14 +4832,6 @@ begin
 		Show;
 end;
 
-procedure TMainForm.actBrowserUseColorsExecute(Sender: TObject);
-begin
-	actBrowserUseColors.Checked:=not actBrowserUseColors.Checked;
-	devClassBrowsing.UseColors:=actBrowserUseColors.Checked;
-	ClassBrowser.UseColors:=actBrowserUseColors.Checked;
-	ClassBrowser.Refresh;
-end;
-
 procedure TMainForm.HelpMenuItemClick(Sender: TObject);
 begin
 	OpenHelpFile;
@@ -5231,7 +5214,7 @@ begin
 		actProjectManagerExecute(nil);
 	end;
 	LeftPageControl.ActivePageIndex := 1;
-	if ClassBrowser.Visible And ClassBrowser.Enabled then
+	if ClassBrowser.Visible then
 		ClassBrowser.SetFocus;
 end;
 
@@ -5992,6 +5975,14 @@ begin
 	// Create all data structures
 	UpdateSplash('Applying settings...');
 
+	// Reduce flickering by not using erase
+	//ClassBrowser.DoubleBuffered := true;
+	PageControl.DoubleBuffered := true;
+	ProjectView.DoubleBuffered := true;
+	LeftPageControl.DoubleBuffered :=true;
+	DebugTree.DoubleBuffered := true;
+	MessageControl.DoubleBuffered := true;
+
 	// Fix Alt key painting problems
 	//TVistaAltFix.Create(Self); // causes too much flicker :(
 
@@ -6366,6 +6357,25 @@ begin
 		// when the form shows for the first time, not when going fullscreen too
 		if devData.ShowTipsOnStart and fShowTips then
 			actShowTips.Execute;
+	end;
+end;
+
+procedure TMainForm.actSearchAgainExecute(Sender: TObject);
+begin
+	// Repeat action if it was a finding action
+	if Assigned(frmFind) then begin
+		if frmFind.FindTabs.TabIndex < 2 then begin // it's a find action
+
+			// Disable entire scope searching
+			if frmFind.grpOrigin.Visible then
+				frmFind.rbEntireScope.Checked := false;
+
+			// Always search forward
+			if frmFind.grpDirection.Visible then
+				frmFind.rbBackward.Checked := false;
+
+			frmFind.btnFind.Click;
+		end;
 	end;
 end;
 

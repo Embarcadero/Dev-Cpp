@@ -504,7 +504,8 @@ const
   ID_EOPT_AUTOSAVEUNIX                  = 27061;
   ID_EOPT_AUTOSAVETIME                  = 27062;
   ID_EOPT_AUTOSAVEMODE                  = 27063;
-
+  ID_EOPT_AUTOSAVEEXAMPLE               = 27064;
+  
   // new project
   ID_NP_PRJNAME                         = 28001;
   ID_NP_DEFAULTC                        = 28002;
