@@ -2,7 +2,7 @@
 # Startup
 
 !define COMPILERNAME "MinGW64"
-!define DEVCPP_VERSION "5.2.0.2"
+!define DEVCPP_VERSION "5.2.0.3"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} TDM-GCC x64 Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 

@@ -111,7 +111,7 @@ type
     procedure btnHelpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure vleExternalEditButtonClick(Sender: TObject);
-    procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;const KeyName, KeyValue: AnsiString);
+    procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;const KeyName, KeyValue: string);
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
@@ -463,7 +463,7 @@ begin
 end;
 
 procedure TEnviroForm.vleExternalValidate(Sender: TObject; ACol,
-  ARow: Integer; const KeyName, KeyValue: AnsiString);
+  ARow: Integer; const KeyName, KeyValue: string);
 var
   idx: integer;
 begin

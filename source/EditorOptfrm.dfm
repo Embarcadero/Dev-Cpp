@@ -1,9 +1,9 @@
 object EditorOptForm: TEditorOptForm
-  Left = 541
-  Top = 315
+  Left = 863
+  Top = 503
   BorderStyle = bsDialog
   Caption = 'Editor Options'
-  ClientHeight = 452
+  ClientHeight = 462
   ClientWidth = 484
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,21 +16,21 @@ object EditorOptForm: TEditorOptForm
   OnCreate = FormCreate
   DesignSize = (
     484
-    452)
+    462)
   PixelsPerInch = 96
   TextHeight = 15
   object PagesMain: TPageControl
     Left = 0
     Top = 0
     Width = 484
-    Height = 415
+    Height = 425
     ActivePage = tabGeneral
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
       object grpMargin: TGroupBox
         Left = 264
-        Top = 200
+        Top = 204
         Width = 201
         Height = 90
         Caption = '  Right Margin  '
@@ -217,7 +217,7 @@ object EditorOptForm: TEditorOptForm
       end
       object grpCaret: TGroupBox
         Left = 9
-        Top = 200
+        Top = 204
         Width = 248
         Height = 90
         Caption = '  Caret  '
@@ -275,7 +275,7 @@ object EditorOptForm: TEditorOptForm
       end
       object HighCurLineBox: TGroupBox
         Left = 264
-        Top = 292
+        Top = 308
         Width = 201
         Height = 84
         Caption = 'Highlight current line'
@@ -310,7 +310,7 @@ object EditorOptForm: TEditorOptForm
       end
       object GroupBox1: TGroupBox
         Left = 9
-        Top = 292
+        Top = 308
         Width = 248
         Height = 84
         Caption = '  Tabs  '
@@ -765,7 +765,7 @@ object EditorOptForm: TEditorOptForm
         Left = 0
         Top = 0
         Width = 476
-        Height = 385
+        Height = 395
         ActivePage = tabCPInserts
         Align = alClient
         TabOrder = 0
@@ -830,7 +830,7 @@ object EditorOptForm: TEditorOptForm
           end
           object CodeIns: TSynEdit
             Left = 0
-            Top = 144
+            Top = 154
             Width = 468
             Height = 211
             Align = alBottom
@@ -995,7 +995,7 @@ object EditorOptForm: TEditorOptForm
         Left = 0
         Top = 30
         Width = 476
-        Height = 355
+        Height = 365
         ActivePage = tabCBBrowser
         TabOrder = 1
         OnChange = ClassCodePageChange
@@ -1012,7 +1012,7 @@ object EditorOptForm: TEditorOptForm
             Left = 84
             Top = 156
             Width = 333
-            Height = 165
+            Height = 173
             Images = dmMain.ClassImages
             ReadOnly = True
             Indent = 19
@@ -1117,7 +1117,7 @@ object EditorOptForm: TEditorOptForm
           end
           object btnCCCnew: TSpeedButton
             Left = 8
-            Top = 296
+            Top = 304
             Width = 101
             Height = 25
             Caption = 'Add files'
@@ -1125,7 +1125,7 @@ object EditorOptForm: TEditorOptForm
           end
           object btnCCCdelete: TSpeedButton
             Left = 112
-            Top = 296
+            Top = 304
             Width = 101
             Height = 25
             Caption = 'Clear'
@@ -1157,7 +1157,7 @@ object EditorOptForm: TEditorOptForm
           end
           object chkCCCache: TCheckBox
             Left = 8
-            Top = 96
+            Top = 104
             Width = 433
             Height = 17
             Caption = 'Use code-completion cache'
@@ -1166,7 +1166,7 @@ object EditorOptForm: TEditorOptForm
           end
           object lbCCC: TListBox
             Left = 8
-            Top = 116
+            Top = 124
             Width = 457
             Height = 173
             ItemHeight = 15
@@ -1177,7 +1177,7 @@ object EditorOptForm: TEditorOptForm
           end
           object pbCCCache: TProgressBar
             Left = 216
-            Top = 296
+            Top = 304
             Width = 249
             Height = 25
             BorderWidth = 1
@@ -1241,9 +1241,9 @@ object EditorOptForm: TEditorOptForm
     end
   end
   object btnOk: TBitBtn
-    Left = 220
-    Top = 420
-    Width = 80
+    Left = 210
+    Top = 430
+    Width = 85
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'OK'
@@ -1270,9 +1270,9 @@ object EditorOptForm: TEditorOptForm
     NumGlyphs = 2
   end
   object btnCancel: TBitBtn
-    Left = 310
-    Top = 420
-    Width = 80
+    Left = 300
+    Top = 430
+    Width = 85
     Height = 25
     Anchors = [akRight, akBottom]
     TabOrder = 2
@@ -1280,9 +1280,9 @@ object EditorOptForm: TEditorOptForm
     Kind = bkCancel
   end
   object btnHelp: TBitBtn
-    Left = 400
-    Top = 420
-    Width = 80
+    Left = 390
+    Top = 430
+    Width = 85
     Height = 25
     Anchors = [akRight, akBottom]
     Enabled = False
@@ -1293,12 +1293,12 @@ object EditorOptForm: TEditorOptForm
   object cpp: TSynCppSyn
     DefaultFilter = 'C++ Files (*.c,*.cpp,*.h,*.hpp)|*.c;*.cpp;*.h;*.hpp'
     Left = 5
-    Top = 418
+    Top = 426
   end
   object CppTokenizer: TCppTokenizer
     LogTokens = False
     Left = 40
-    Top = 416
+    Top = 424
   end
   object CppParser: TCppParser
     Enabled = True
@@ -1310,6 +1310,6 @@ object EditorOptForm: TEditorOptForm
     OnStartParsing = CppParser1StartParsing
     OnEndParsing = CppParser1EndParsing
     Left = 80
-    Top = 416
+    Top = 424
   end
 end

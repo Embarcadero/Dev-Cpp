@@ -1,4 +1,4 @@
-Version 5.2.0.3 - 10 Juni 2012
+Version 5.2.0.3 - 15 Juni 2012
 
 - Fixed the function argument tip not selecting the function with the right number of arguments first.
 - Fixed that tip showing in various wrong places.
@@ -7,6 +7,14 @@ Version 5.2.0.3 - 10 Juni 2012
 - Adding watch variables by hovering over words now only adds words with identifier colors.
 - Pressing Alt now does not cause static controls to vanish anymore.
 - This version should scale pictures better on high DPI settings.
+- Moved to a new selection of built in compiler options.
+- Added filename tooltips when hovering above tabs.
+- Closing using the middle mouse button is now only triggered when the mouse is hovering above a tab.
+- Moved to a new selection of built in compiler options.
+- Updated the chinese (TC) translations (by cin.getline).
+- Fixed editor options not applying function tip timer settings properly, causing crashes when typing.
+- Updated the greek translations (by migf1).
+- Various dialogs and buttons are now more spacious, allowing longer translations.
 
 Version 5.2.0.2 - 31 Mei 2012
 

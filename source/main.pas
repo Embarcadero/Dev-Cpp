@@ -857,6 +857,8 @@ type
 		procedure actGotoExecute(Sender: TObject);
 		procedure actEditMenuUpdate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
 
 	private
 		fmsgHeight			: integer;
@@ -2955,7 +2957,7 @@ begin
 					with TEditor(PageControl.Pages[I].Tag) do begin
 						devEditor.AssignEditor(Text);
 						Text.Highlighter:= dmMain.GetHighlighter(FileName);
-						ReconfigCompletion;
+						InitCompletion;
 					end;
 
 				InitClassBrowser(chkCCCache.Tag=1);
@@ -4484,14 +4486,16 @@ end;
 
 procedure TMainForm.PageControlMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-	I	: integer;
+	thispage : integer;
 begin
-	I:=PageControl.IndexOfTabAt(X, Y);
+	thispage:=PageControl.IndexOfTabAt(X, Y);
 	if Button = mbRight then begin // select new tab even with right mouse button
-		if I>-1 then begin
-			PageControl.ActivePageIndex:=I;
+		if thispage>-1 then begin
+			PageControl.ActivePageIndex:=thispage;
 			PageControlChange(nil);
 		end;
+	end else if Button = mbMiddle then begin
+		MainForm.actCloseExecute(nil);
 	end else // see if it's a drag operation
 		PageControl.Pages[PageControl.ActivePageIndex].BeginDrag(False);
 end;
@@ -6662,6 +6666,20 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
 	TVistaAltFix.Create(Self);
+end;
+
+procedure TMainForm.PageControlMouseMove(Sender: TObject;Shift: TShiftState; X, Y: Integer);
+var
+	thispage : integer;
+	e : TEditor;
+begin
+	thispage:=PageControl.IndexOfTabAt(X, Y);
+	if thispage>-1 then begin
+		e:=GetEditor(thispage);
+		if Assigned(e) then
+			PageControl.Hint:=e.FileName;
+	end else
+		PageControl.Hint := '';
 end;
 
 end.

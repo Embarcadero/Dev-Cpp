@@ -93,8 +93,6 @@ type
     procedure MouseOverTimer(Sender : TObject);
 
     procedure SetEditorText(Key: Char);
-    procedure InitCompletion;
-    procedure DestroyCompletion;
     function CurrentPhrase: AnsiString;
     procedure CompletionTimer(Sender: TObject);
 
@@ -138,7 +136,8 @@ type
     procedure UnindentSelection;
 
     procedure UpdateParser; // Must be called after recreating the parser
-    procedure ReconfigCompletion;
+    procedure InitCompletion;
+    procedure DestroyCompletion;
 
     property OnBreakpointToggle: TBreakpointToggleEvent read fOnBreakpointToggle write fOnBreakpointToggle;
     property FileName: AnsiString read fFileName write SetFileName;
@@ -632,11 +631,13 @@ begin
 			fText.InvalidateGutterLine(fErrorLine);
 		end;
 
-		if fFunctionTip.Activated and FunctionTipAllowed then
-			fFunctionTip.Show
-		else begin // Reset the timer
-			fFunctionTipTimer.Enabled := false;
-			fFunctionTipTimer.Enabled := true;
+		if Assigned(fFunctionTipTimer) then begin
+			if fFunctionTip.Activated and FunctionTipAllowed then
+				fFunctionTip.Show
+			else begin // Reset the timer
+				fFunctionTipTimer.Enabled := false;
+				fFunctionTipTimer.Enabled := true;
+			end;
 		end;
 	end;
 
@@ -1144,16 +1145,6 @@ begin
 	fCompletionTimerKey:=#0;
 end;
 
-procedure TEditor.ReconfigCompletion;
-begin
-	// re-read completion options
-	fCompletionBox.Enabled:=devClassBrowsing.Enabled and devCodeCompletion.Enabled;
-	if fCompletionBox.Enabled then
-		InitCompletion
-	else
-		DestroyCompletion;
-end;
-
 procedure TEditor.DestroyCompletion;
 begin
 	if Assigned(fCompletionTimer) then
@@ -1167,24 +1158,28 @@ end;
 procedure TEditor.InitCompletion;
 begin
 	fCompletionBox:=MainForm.CodeCompletion;
-	fCompletionBox.Enabled:=devCodeCompletion.Enabled;
+	fCompletionBox.Enabled:=devClassBrowsing.Enabled and devCodeCompletion.Enabled;
 
 	// This way symbols and tabs are also completed without code completion
 	fText.OnKeyPress := EditorKeyPress;
 	fText.OnKeyDown := EditorKeyDown;
 	fText.OnKeyUp := EditorKeyUp;
 
-	if not Assigned(fFunctionTipTimer) then
-		fFunctionTipTimer:=TTimer.Create(nil);
-	fFunctionTipTimer.Enabled:=devEditor.ShowFunctionTip;
-	fFunctionTipTimer.OnTimer:=FunctionTipTimer;
-	fFunctionTipTimer.Interval:=2*GetCaretBlinkTime; // fancy
+	if devEditor.ShowFunctionTip then begin
+		if not Assigned(fFunctionTipTimer) then
+			fFunctionTipTimer:=TTimer.Create(nil);
+		fFunctionTipTimer.Enabled:=True;
+		fFunctionTipTimer.OnTimer:=FunctionTipTimer;
+		fFunctionTipTimer.Interval:=2*GetCaretBlinkTime; // fancy
+	end;
 
-	if not Assigned(fMouseOverTimer) then
-		fMouseOverTimer:=TTimer.Create(nil);
-	fMouseOverTimer.Enabled:=devEditor.ParserHints or devData.WatchHint;
-	fMouseOverTimer.OnTimer:=MouseOverTimer;
-	fMouseOverTimer.Interval:=500;
+	if devEditor.ParserHints or devData.WatchHint then begin
+		if not Assigned(fMouseOverTimer) then
+			fMouseOverTimer:=TTimer.Create(nil);
+		fMouseOverTimer.Enabled:=True;
+		fMouseOverTimer.OnTimer:=MouseOverTimer;
+		fMouseOverTimer.Interval:=500;
+	end;
 
 	// The other stuff is fully completion dependant
 	if fCompletionBox.Enabled then begin
@@ -1319,6 +1314,9 @@ var
 begin
 	// If the mouse van be found INSIDE the window
 	if fText.GetPositionOfMouse(p) and fAllowMouseOver then begin
+
+		// Remove leftover filename hint which is shown if fText.Hint is ''
+		TabSheet.PageControl.Hint := '';
 
 		// Check if we're inside a comment or string by looking at text color. If we are, skip without showing a tooltip
 		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
@@ -1535,11 +1533,6 @@ var
 	walker,start : integer;
 	e : TEditor;
 begin
-	if (Button = mbMiddle) then begin
-		MainForm.actCloseExecute(nil);
-		Exit;
-	end;
-
 	p := fText.PixelsToRowColumn(X,Y);
 
 	// if ctrl+clicked

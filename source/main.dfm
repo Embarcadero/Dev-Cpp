@@ -65,7 +65,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 71
+        Height = 72
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -107,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 71
+        Height = 72
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -582,7 +582,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 768
-            Height = 40
+            Height = 41
             Align = alClient
             Columns = <
               item
@@ -1096,6 +1096,7 @@ object MainForm: TMainForm
     OnDragDrop = PageControlDragDrop
     OnDragOver = PageControlDragOver
     OnMouseDown = PageControlMouseDown
+    OnMouseMove = PageControlMouseMove
   end
   object pnlFull: TPanel
     Left = 0
