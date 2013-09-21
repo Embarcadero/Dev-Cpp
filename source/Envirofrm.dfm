@@ -1,6 +1,6 @@
 object EnviroForm: TEnviroForm
-  Left = 900
-  Top = 417
+  Left = 1161
+  Top = 450
   BorderStyle = bsDialog
   Caption = 'Environment Options'
   ClientHeight = 432
@@ -88,31 +88,31 @@ object EnviroForm: TEnviroForm
       object lblMRU: TLabel
         Left = 256
         Top = 8
-        Width = 137
-        Height = 13
+        Width = 126
+        Height = 15
         AutoSize = False
         Caption = 'Max Files in History List:'
       end
       object lblMsgTabs: TLabel
         Left = 256
-        Top = 40
-        Width = 145
-        Height = 17
+        Top = 38
+        Width = 180
+        Height = 15
         AutoSize = False
         Caption = 'Editor Tab Location:'
       end
       object lblLang: TLabel
         Left = 256
-        Top = 88
-        Width = 170
-        Height = 13
+        Top = 86
+        Width = 180
+        Height = 15
         AutoSize = False
         Caption = 'Language'
       end
       object lblTheme: TLabel
         Left = 256
-        Top = 136
-        Width = 41
+        Top = 134
+        Width = 180
         Height = 13
         AutoSize = False
         Caption = 'Theme'
@@ -181,13 +181,14 @@ object EnviroForm: TEnviroForm
       end
       object rgbAutoOpen: TRadioGroup
         Left = 230
-        Top = 267
+        Top = 248
         Width = 215
-        Height = 90
+        Height = 109
         Caption = '   Auto Open  '
         Items.Strings = (
-          'All Project Files'
-          'Only First Project File'
+          'Al project files'
+          'Only first project file'
+          'Opened files at previous closing'
           'None')
         TabOrder = 5
       end
@@ -204,22 +205,22 @@ object EnviroForm: TEnviroForm
       end
       object gbDebugger: TGroupBox
         Left = 7
-        Top = 221
+        Top = 207
         Width = 215
-        Height = 68
+        Height = 70
         Caption = '  Debug Variable Browser  '
         TabOrder = 7
         object cbWatchHint: TCheckBox
           Left = 14
-          Top = 14
+          Top = 22
           Width = 170
-          Height = 27
+          Height = 17
           Caption = 'Watch variable under mouse'
           TabOrder = 0
         end
         object cbWatchError: TCheckBox
           Left = 14
-          Top = 40
+          Top = 43
           Width = 170
           Height = 17
           Caption = 'Report watch errors'
@@ -236,9 +237,9 @@ object EnviroForm: TEnviroForm
       end
       object gbProgress: TGroupBox
         Left = 7
-        Top = 288
+        Top = 287
         Width = 215
-        Height = 69
+        Height = 70
         Caption = 'Compilation Progress Window '
         TabOrder = 9
         object cbShowProgress: TCheckBox

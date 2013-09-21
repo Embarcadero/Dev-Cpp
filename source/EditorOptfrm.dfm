@@ -362,12 +362,6 @@ object EditorOptForm: TEditorOptForm
         Caption = 
           'It is also possible to edit text size by using Control+Scroll, j' +
           'ust like in browsers!'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentFont = False
       end
       object grpGutter: TGroupBox
         Left = 9

@@ -118,7 +118,7 @@ const
   ecSelEditorBottom = ecEditorBottom + ecSelection;
   ecSelGotoXY       = ecGotoXY + ecSelection;  // Data = PPoint
 
-	ecSelWord         = 198;
+  ecSelWord         = 198;
   ecSelectAll       = 199;  // Select entire contents of editor, cursor to end
 
   ecCopy            = 201;  // Copy selection to clipboard

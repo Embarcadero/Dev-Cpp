@@ -1215,7 +1215,7 @@ begin
 		1:
 			OpenUnit(0).Activate; // Open first
 		2:
-			LoadLayout; // Open nothing
+			LoadLayout; // Open previous selection
 	end;
 	RebuildNodes;
 end;

@@ -127,7 +127,7 @@ type
     function Search(isReplace: boolean): boolean;
     procedure SearchAgain;
     procedure Exportto(isHTML: boolean);
-    procedure InsertString(const Value: string;MoveCursor: boolean);
+    procedure InsertString(Value: string;MoveCursor: boolean);
     function GetWordAtCursor: string;
     procedure SetErrorFocus(Col, Line: integer);
     procedure SetActiveBreakpointFocus(Line: integer);
@@ -654,7 +654,7 @@ begin
 			fText.InvalidateGutterLine(fErrorLine);
 		end;
 
-		if FCodeToolTip.Activated or (not fText.SelAvail) and devEditor.ShowFunctionTip then
+		if FCodeToolTip.Activated or not fText.SelAvail and FText.Focused and devEditor.ShowFunctionTip then
 			FCodeToolTip.Show;
 	end;
 
@@ -724,39 +724,37 @@ begin
   end;
 end;
 
-procedure TEditor.InsertString(const Value: string;MoveCursor: boolean);
+procedure TEditor.InsertString(Value: string;MoveCursor: boolean);
 var
 	NewCursorPos: TBufferCoord;
-	LocalCopy: TStringList;
-	idx,idx2 : integer;
-	Line : string;
+	Char,Line,I : integer;
+	P : PChar;
 begin
 	NewCursorPos := fText.CaretXY;
-
-	LocalCopy := TStringList.Create;
-	LocalCopy.Text := Value;
-
 	if MoveCursor then begin
-		for idx := 0 to LocalCopy.Count-1 do begin
-			Line:= LocalCopy[idx];
-			idx2:= AnsiPos('*|*', Line);
-			if idx2 > 0 then begin
-				Delete(Line, idx2, 3);
-				LocalCopy[idx]:= Line;
-				inc(NewCursorPos.Line, idx);
-				if idx = 0 then
-					inc(NewCursorPos.Char, idx2 - 1)
-				else
-					NewCursorPos.Char:= idx2;
+		P := PChar(value);
+		Char := 1;
+		Line := 1;
+		I := 0;
+		while P[I] <> #0 do begin
 
+			// Assume DOS newlines
+			if(P[I] = #13) and (P[I+1] = #10) then begin
+				Inc(I,2);
+				Inc(Line);
+				Char := 1;
+			end else if (P[I] = '*') and (P[I+1] = '|') and (P[I+2] = '*') then begin
+				NewCursorPos.Char := Char;
+				NewCursorPos.Line := Line;
+				Delete(value,I+1,3);
 				break;
+			end else begin
+				Inc(Char);
+				Inc(I);
 			end;
 		end;
 	end;
-
-	fText.SelText:= Copy(LocalCopy.Text,0,Length(LocalCopy.Text)-2);
-
-	LocalCopy.Free;
+	fText.SelText:= value;
 
 	// Update the cursor
 	fText.CaretXY:= NewCursorPos;
@@ -1237,8 +1235,6 @@ end;
 
 procedure TEditor.SetEditorText(Key: Char);
 var
-	Phrase: string;
-	I, CurrSel: integer;
 	Statement: PStatement;
 	FuncAddOn: string;
 begin
@@ -1269,39 +1265,22 @@ begin
 	end;
 
 	if Assigned(Statement) then begin
-		Phrase := Statement^._Command;
-
-		// if already has a selection, delete it
-		if fText.SelAvail then
-			fText.SelText:='';
-
-		// find the end of the word and delete from caretx to end of word
-		CurrSel:=fText.SelEnd;
-		I:=CurrSel;
-		while (I<Length(fText.Text)) and (fText.Text[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_']) do
-			Inc(I);
-		fText.SelEnd:=I;
+		// delete selections made
 		fText.SelText:='';
 
-		// find the start of the word
-		CurrSel:=fText.SelStart;
-		I:=CurrSel;
-		while (I<>0) and (fText.Text[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_']) do
-			Dec(I);
-		fText.SelStart:=I;
-		fText.SelEnd:=CurrSel;
+		// delete the part of the word that's already been typed
+		fText.SelStart := fText.RowColToCharIndex(fText.WordStart);
+		fText.SelEnd := fText.RowColToCharIndex(fText.WordEnd);
 
-		// don't add () if already there
-		if fText.Text[CurrSel]='(' then
-			FuncAddOn:='';
-
-		fText.SelText:=Phrase+FuncAddOn;
+		// replae the selection
+		fText.SelText:=Statement^._Command + FuncAddOn;
 
 		// if we added "()" move caret inside parenthesis
 		// only if Key<>'.' and Key<>'>'
 		// and function takes arguments...
 		if (not (Key in ['.', '>'])) and (FuncAddOn<>'') and ( (Length(Statement^._Args)>2) or (Statement^._Args='()') ) then begin
 			fText.CaretX:=fText.CaretX-Length(FuncAddOn)+1;
+			FCodeToolTip.Show;
 		end;
 	end;
 end;
@@ -1331,9 +1310,8 @@ end;
 // variable info
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
-	s, s1 : string;
+	s : string;
 	p : TBufferCoord;
-	I, j : integer;
 	attr : TSynHighlighterAttributes;
 begin
 	fHintTimer.Enabled := false;
@@ -1349,33 +1327,15 @@ begin
 			Exit;
 		end;
 
-	if devEditor.ParserHints and (not MainForm.fDebugger.Executing) then begin // editing - show declaration of word under cursor in a hint
-		p.Char := X;
-		p.Line := Y;
-		p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(p.Char, p.Line));
-		s := fText.GetWordAtRowCol(p);
-	end else if devData.WatchHint and MainForm.fDebugger.Executing then begin // debugging - evaluate var under cursor and show value in a hint
+	if devEditor.ParserHints and not MainForm.fDebugger.Executing then begin
 		p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(X, Y));
-		I:=P.Char;
-		s1:=fText.UnCollapsedLines[p.Line-1];
-		if (I <> 0) and (s1 <> '') then begin
-			j := Length(s1);
-			while (I < j) and (s1[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_']) do
-				Inc(I);
-		end;
-		P.Char:=I;
-		Dec(I);
-		if (s1 <> '') then
-			while (I <> 0) and (s1[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_', '.', '-', '>', '&', '*']) do
-				Dec(I, 1);
-		s := Copy(s1, I + 1, p.Char - I - 1);
-	//	if s<>MainForm.fDebugger.WatchVar then begin
-	//		Application.HideHint;
-	//		fCurrentHint := s;
-	//	end;
+		s := fText.GetWordAtRowCol(p);
+	end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
+		p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(X, Y));
+		s := fText.GetWordAtRowCol(p);
 	end;
 
-	if (s <> '') and (not fHintTimer.Enabled) then begin
+	if (s <> '') and not fHintTimer.Enabled then begin
 		fHintTimer.Enabled := true;
 		fCurrentHint := s;
 	end else if s = '' then
@@ -1489,30 +1449,11 @@ begin
 		FText.ExecuteCommand(ecShiftTab,#0, nil);
 end;
 
-{** Modified by Peter **}
 procedure TEditor.UncommentSelection;
-
-	function FirstCharIndex(const S: string; const start : integer): Integer;
-	//  Get the index of the first non whitespace character in
-	//  the string specified by S
-	//  On success it returns the index, otherwise it returns 0
-	var
-		I: Integer;
-	begin
-		Result := 1;
-
-		if S <> '' then
-			for I := start to Length(S) do
-				if not (S[I] in [#0..#32]) then begin
-					Result := I;
-					Break;
-				end;
-	end;
-
 var
-	I: Integer;
-	Idx: Integer;
-	selection: string;
+	CurPos: Integer;
+	localcopy : string;
+	P : PChar;
 begin
 	// has selection
 	if fText.SelAvail then begin
@@ -1520,29 +1461,27 @@ begin
 		// start an undoblock, so we can undo it afterwards!
 		FText.BeginUndoBlock;
 
-		// Scan the first line too
-		selection := FText.SelText;
-		Idx := FirstCharIndex(selection,1);
-		if (selection[Idx]='/') and (selection[Idx+1]='/') then
-			Delete(selection, Idx, 2);
+		localcopy := FText.SelText;
+		P := PChar(localcopy);
+		CurPos := 0;
 
-		for I := 1 to Length(selection) do begin
+		while P[CurPos] <> #0 do begin
 
-			// selection might change during loop but Length(selection) in the for statement doesn't get updated
-			if (I < Length(selection)) and (selection[I] = #10) then begin
-
-				// Now that we've found a newline, check for a comment
-				Idx := FirstCharIndex(selection,I);
-
-				// check if the very first two letters in the string are '//'
-				// if they are, then delete them from the string and set the
-				// modified string to the stringlist ...
-				if (selection[Idx]='/') and (selection[Idx+1]='/') then
-					Delete(selection, Idx, 2);
+			// We've found an enter, look for next nonblank
+			if (P[CurPos] = #13) or (P[CurPos] = #10) or ((CurPos = 0) and (P[CurPos] in [#0..#32])) then begin
+				repeat
+					Inc(CurPos);
+				until not (P[CurPos] in [#0..#32]);
 			end;
+
+			// We've found the first nonblank, is it a // ?
+			if (P[CurPos] = '/') and (P[CurPos+1] = '/') then
+				Delete(localcopy,CurPos+1,2); // one based >.>
+
+			Inc(CurPos);
 		end;
 
-		FText.SelText := selection;
+		FText.SelText := localcopy;
 
 		FText.EndUndoBlock;
 		FText.UpdateCaret;

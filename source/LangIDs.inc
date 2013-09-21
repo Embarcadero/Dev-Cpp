@@ -630,6 +630,7 @@ const
   ID_FIND_BACK                      = 37053;
 
   ID_ENV_PAUSECONSOLE               = 37054;
+  ID_ENV_AUTOREMEMBER               = 37055;
 
   // Replace form
   ID_RPLC                           = 38001;

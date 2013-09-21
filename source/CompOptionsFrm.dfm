@@ -1,6 +1,6 @@
-object CompForm: TCompOptForm
-  Left = 652
-  Top = 290
+object CompOptForm: TCompOptForm
+  Left = 1180
+  Top = 559
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -141,19 +141,19 @@ object CompForm: TCompOptForm
       end
       object Commands: TMemo
         Left = 28
-        Top = 78
+        Top = 80
         Width = 401
         Height = 65
-        Anchors = [akLeft, akTop, akRight]
+        Anchors = []
         ScrollBars = ssVertical
         TabOrder = 1
         WantReturns = False
       end
       object grpMakefileGen: TGroupBox
         Left = 8
-        Top = 232
+        Top = 240
         Width = 441
-        Height = 97
+        Height = 90
         Caption = '  Makefile generation:  '
         TabOrder = 2
         object lblDelay: TLabel
@@ -177,8 +177,8 @@ object CompForm: TCompOptForm
         end
         object cbFastDep: TCheckBox
           Left = 10
-          Top = 68
-          Width = 385
+          Top = 63
+          Width = 423
           Height = 17
           Caption = 'Use fast but imperfect dependency generation'
           TabOrder = 0
@@ -196,7 +196,7 @@ object CompForm: TCompOptForm
       end
       object cbLinkerAdd: TCheckBox
         Left = 16
-        Top = 144
+        Top = 148
         Width = 397
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -206,9 +206,10 @@ object CompForm: TCompOptForm
       end
       object Linker: TMemo
         Left = 28
-        Top = 165
+        Top = 168
         Width = 401
         Height = 65
+        Anchors = []
         ScrollBars = ssVertical
         TabOrder = 4
         WantReturns = False

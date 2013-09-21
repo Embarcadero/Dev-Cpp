@@ -147,9 +147,8 @@ var
 begin
 	result:= false;
 	aFile:= ValidateFile(FileName, devDirs.Lang);
-	if aFile = '' then begin
-		if fSelect then
-			MessageDlg('Could not open language file ' + filename, mtError, [mbOK], 0);
+	if (aFile = '') and fSelect then begin
+		MessageDlg('Could not open language file ' + filename, mtError, [mbOK], 0);
 		exit;
 	end;
 

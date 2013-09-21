@@ -14,7 +14,7 @@ object LangForm: TLangForm
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  OnActivate = FormActivate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 15
   object ThemeImage: TImage

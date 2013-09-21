@@ -2,8 +2,8 @@
 # Startup
 
 !define COMPILERNAME "MinGW32"
-!define DEVCPP_VERSION "5.2.0.0"
-!define FINALNAME "devcpp-${DEVCPP_VERSION}_32bit_setup.exe"
+!define DEVCPP_VERSION "5.2.0.1"
+!define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} MinGW32 Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 Var LOCAL_APPDATA

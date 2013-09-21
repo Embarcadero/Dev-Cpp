@@ -69,12 +69,12 @@ type
     InterfaceLbl: TLabel;
     EditorLbl: TLabel;
     Finish1: TLabel;
-    procedure FormActivate(Sender: TObject);
     procedure OkBtnClick(Sender: TObject);
     procedure ThemeChange(Sender: TObject);
     procedure ButtonAddFileClick(Sender: TObject);
     procedure ButtonRemoveClick(Sender: TObject);
     procedure ButtonAddFolderClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     HasProgressStarted : boolean;
 
@@ -110,26 +110,6 @@ end;
 function TLangForm.GetSelected: integer;
 begin
   result:= ListBox.ItemIndex;
-end;
-
-procedure TLangForm.FormActivate(Sender: TObject);
-begin
-	// Set interface font
-	Font.Name := devData.InterfaceFont;
-	Font.Size := devData.InterfaceFontSize;
-
-	HasProgressStarted := false;
-
-	// Themes
-	ThemeBox.Items.AddStrings(devTheme.ThemeList);
-	ThemeBox.ItemIndex := 0;
-
-	// Editor styles
-	EditorBox.Items.Add('Classic');
-	EditorBox.Items.Add('Classic Plus');
-	EditorBox.ItemIndex := 1;
-
-	ThemeImage.Picture.Bitmap.LoadFromResourceName(HInstance, 'NEWLOOKCLASSICPLUS');
 end;
 
 procedure TLangForm.CppParserTotalProgress(Sender: TObject; const FileName: String; Total, Current: Integer);
@@ -344,6 +324,26 @@ begin
 			AltFileList.Items.Add(s);
 		end;
 	end;
+end;
+
+procedure TLangForm.FormShow(Sender: TObject);
+begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
+	HasProgressStarted := false;
+
+	// Themes
+	ThemeBox.Items.AddStrings(devTheme.ThemeList);
+	ThemeBox.ItemIndex := 0;
+
+	// Editor styles
+	EditorBox.Items.Add('Classic');
+	EditorBox.Items.Add('Classic Plus');
+	EditorBox.ItemIndex := 1;
+
+	ThemeImage.Picture.Bitmap.LoadFromResourceName(HInstance, 'NEWLOOKCLASSICPLUS');
 end;
 
 end.

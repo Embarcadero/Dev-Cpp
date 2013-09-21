@@ -1960,7 +1960,6 @@ begin
 	Result := False;
 	e:= GetEditor(index);
 	if assigned(e) and AskBeforeClose(e, Rem) then begin
-
 		Result := True;
 		if not e.InProject then begin
 			dmMain.AddtoHistory(e.FileName);
@@ -2098,8 +2097,9 @@ var
 begin
 	e:= GetEditor;
 	if assigned(e) then begin
+		e.Text.BeginUpdate;
 		e.InsertString(dmMain.CodeInserts[(Sender as TMenuItem).Tag].Line, TRUE);
-		e.Text.ReScan;
+		e.Text.EndUpdate;
 	end;
 end;
 
@@ -2628,9 +2628,9 @@ end;
 
 procedure TMainForm.actSaveAllExecute(Sender: TObject);
 var
- idx: integer;
- wa: boolean;
- e : TEditor;
+	idx: integer;
+	wa: boolean;
+	e : TEditor;
 begin
 	wa:=devFileMonitor.Active;
 	devFileMonitor.Deactivate;
@@ -2674,8 +2674,8 @@ end;
 
 procedure TMainForm.actCloseProjectExecute(Sender: TObject);
 var
- s: string;
- wa: boolean;
+	s: string;
+	wa: boolean;
 begin
 	actStopExecute.Execute;
 	wa:=devFileMonitor.Active;
@@ -2718,11 +2718,11 @@ end;
 
 procedure TMainForm.actXHTMLExecute(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	if assigned(e) then
-	 e.Exportto(TRUE);
+		e.Exportto(TRUE);
 end;
 
 procedure TMainForm.actXRTFExecute(Sender: TObject);
@@ -2731,13 +2731,13 @@ var
 begin
 	e:= GetEditor;
 	if assigned(e) then
-	 e.Exportto(FALSE);
+		e.Exportto(FALSE);
 end;
 
 procedure TMainForm.actXProjectExecute(Sender: TObject);
 begin
 	if assigned(fProject) then
-	 fProject.Exportto(TRUE);
+		fProject.Exportto(TRUE);
 end;
 
 procedure TMainForm.actPrintExecute(Sender: TObject);
@@ -2860,10 +2860,11 @@ end;
 
 procedure TMainForm.actProjectManagerExecute(Sender: TObject);
 begin
+	// Hide/show this first, or otherwhise it'll show up to the left of ProjectToolWindow
+	SplitterLeft.Visible:= actProjectManager.Checked;
 	if (DebugSubPages.Parent <> self) and assigned(ProjectToolWindow) then
 		ProjectToolWindow.Close;
 	LeftPageControl.Visible:= actProjectManager.Checked;
-	SplitterLeft.Visible:= actProjectManager.Checked;
 	devData.ProjectView:= actProjectManager.Checked;
 end;
 
@@ -3372,9 +3373,61 @@ var
 	e: TEditor;
 	i, j: integer;
 	s : string;
+	optD,optS : TCompilerOption;
+	debug,strip : boolean;
+	idxD,idxS : integer;
 begin
 	if not fDebugger.Executing then begin
 		PrepareDebugger;
+
+		// Do a quick check here for -g flag settings
+		debug:=devCompiler.FindOption('-g3', optD, idxD);
+		if debug then begin
+			if Assigned(fProject) then begin
+				if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[idxD + 1]='1') then begin
+					debug := true
+				end else begin
+					debug := false;
+				end;
+			end else
+				debug := optD.optValue > 0;
+		end;
+
+		// see if exe stripping is enabled
+		strip:=devCompiler.FindOption('-s', optS, idxS);
+		if strip then begin
+			if Assigned(fProject) then begin
+				if (fProject.Options.CompilerOptions <> '') and (fProject.Options.CompilerOptions[idxS + 1]='1') then begin
+					strip := true
+				end else begin
+					strip := false;
+				end;
+			end else
+				strip := optS.optValue > 0;
+		end;
+
+		if not debug or strip then
+			if MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
+
+				// ENABLE debugging
+				optD.optValue:=1;
+				if Assigned(fProject) then
+					SetProjCompOpt(idxD, True)
+				else
+					devCompiler.Options[idxD]:=optD;
+
+				// DISABLE stripping
+				optS.optValue:=0;
+				if Assigned(fProject) then
+					SetProjCompOpt(idxS, False)
+				else
+					devCompiler.Options[idxS]:=optS;
+
+				actRebuildExecute(nil);
+				Exit
+			end else
+				Exit;
+
 		if Assigned(fProject) then begin
 			if not FileExists(fProject.Executable) then begin
 				MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
@@ -3581,7 +3634,6 @@ begin
 	end;
 end;
 
-
 procedure TMainForm.actMsgCopyAllExecute(Sender: TObject);
 var
 	i:integer;
@@ -3592,9 +3644,9 @@ begin
 			for i:=0 to pred(CompilerOutput.Items.Count) do
 				Clipboard.AsText:= Clipboard.AsText + StringReplace(StringReplace(CompilerOutput.Items[i].Caption +' ' +CompilerOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
 		end;
-	 	cResTab:
+		cResTab:
 			if Resourceoutput.ItemIndex <> -1 then
-		 		Clipboard.AsText:= ResourceOutput.Items[ResourceOutput.ItemIndex];
+				Clipboard.AsText:= ResourceOutput.Items[ResourceOutput.ItemIndex];
 		cLogTab:
 			if LogOutput.Lines.Text <> '' then
 				if Length(LogOutput.SelText) > 0 then

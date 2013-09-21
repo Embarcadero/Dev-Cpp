@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 608
-  Top = 439
+  Left = 323
+  Top = 405
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -64,7 +64,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 71
+        Height = 72
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -106,7 +106,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 71
+        Height = 72
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -581,7 +581,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 768
-            Height = 40
+            Height = 41
             Align = alClient
             Columns = <
               item
@@ -666,7 +666,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 71
+        Height = 72
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone

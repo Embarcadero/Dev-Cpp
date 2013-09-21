@@ -253,7 +253,7 @@ begin
 	'			break;'+#13#10+
 	'		}'+#13#10+
 	'		default:'+#13#10+
-	'			return DefWindowProc(hwnd, Message, wParam, lParam);;'+#13#10+
+	'			return DefWindowProc(hwnd, Message, wParam, lParam);'+#13#10+
 	'	}'+#13#10+
 	'	return 0;'+#13#10+
 	'}',1);

@@ -448,7 +448,6 @@ type
 	procedure Uncollapse(FoldRange: TSynEditFoldRange);
 	procedure MoveRangesBy(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
 	procedure UpdateFoldRangeParents;
-	function GetAutoSizeDigitCount: Integer;
 	procedure InitCodeFolding;
 	procedure CollapseLevel(ALevel: Integer);
 	procedure UncollapseLevel(ALevel: Integer);
@@ -2320,7 +2319,7 @@ begin
     Y := TopLine;
     if fScrollDeltaY > 0 then  // scrolling down?
       Inc(Y, LinesInWindow - 1);
-    C.Row := MinMax(Y, 1, DisplayLineCount);;
+    C.Row := MinMax(Y, 1, DisplayLineCount);
   end;
   vCaret := DisplayToBufferPos( C );
   if (CaretX <> vCaret.Char) or (CaretY <> vCaret.Line) then
@@ -2418,11 +2417,6 @@ var
   iClientRegion: QRegionH;
   iClip: QRegionH;
 {$ENDIF}
-	//### Code Folding ###
-	cLine, xpos, X, H : Integer;
-	rect: TRect;
-	FoldRange: TSynEditFoldRange;
-	//### End Code Folding ###
 begin
 {$IFDEF SYN_CLX}
   { draws the lower-right corner of the scrollbars }
@@ -2478,70 +2472,6 @@ begin
 		rcDraw.Right := fGutterWidth;
 		PaintGutter(rcDraw, nL1, nL2);
 	end;
-
-	//### Code Folding ###
-	if (Gutter.Visible) then
-		for cLine := fTopLine to (fTopLine + fLinesInWindow) do begin
-			if Gutter.ShowLineNumbers then
-				xpos := Gutter.LeftOffset + Max(GetAutoSizeDigitCount, Gutter.DigitCount) * CharWidth + 4
-			else
-				xpos := Gutter.Width - Gutter.RightOffset + 4;
-			rect.Top := (cLine - fTopLine) * LineHeight;
-			rect.Bottom := rect.Top + LineHeight;
-			rect.Left := xpos;
-			rect.Right := xpos + Gutter.RightOffset - 4;
-			Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
-
-			// Need to paint a line?
-			if TreeLineForLine(RowToLine(cLine)) then begin
-				x := rect.Left + ((rect.Right - rect.Left) div 2);
-				Canvas.MoveTo(x, rect.Top);
-				Canvas.LineTo(x, rect.Bottom);
-			end;
-
-			// Need to paint a line end?
-			if TreeEndForLine(RowToLine(cLine)) then begin
-				x := rect.Left + ((rect.Right - rect.Left) div 2);
-				Canvas.MoveTo(x, rect.Top);
-				Canvas.LineTo(x, rect.Top + ((rect.Bottom - rect.Top) div 2));
-				Canvas.LineTo(rect.Right - 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
-			end;
-
-			if (cLine = 1) or (RowToLine(cLine) <> RowToLine(cLine - 1)) then begin
-				FoldRange := CollapsableFoldRangeForLine(RowToLine(cLine));
-
-				// Any fold range begins on this line?
-				if (FoldRange <> nil) and (FoldRange.Collapsable) then begin
-					InflateRect(rect, -3, 0);
-					H := (rect.Right - rect.Left);
-					rect.Top := rect.Top + ((LineHeight - H) div 2);
-					rect.Bottom := rect.Top + H;
-
-					if CodeFolding.CollapsingMarkStyle = msSquare then begin
-						Canvas.Brush.Color := clWindow;
-						Canvas.FillRect(rect);
-						Canvas.Brush.Color := CodeFolding.FolderBarLinesColor;
-						Canvas.FrameRect(rect);
-					end else if CodeFolding.CollapsingMarkStyle = msEllipse then begin
-						Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
-						Canvas.Brush.Color := clWindow;
-						Canvas.Ellipse(rect);
-					end;
-
-					// Paint minus sign
-					Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
-					Canvas.MoveTo(rect.Left + 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
-					Canvas.LineTo(rect.Right - 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
-
-					if FoldRange.Collapsed then begin
-						// Paint plus sign
-						Canvas.MoveTo(rect.Left + ((rect.Right - rect.Left) div 2), rect.Top + 2);
-						Canvas.LineTo(rect.Left + ((rect.Right - rect.Left) div 2), rect.Bottom - 2);
-					end;
-				end;
-			end;
-		end;
-	//### End Code Folding ###
 
 	// Then paint the text area if it was (partly) invalidated.
 	if (rcClip.Right > fGutterWidth) then begin
@@ -2618,6 +2548,11 @@ var
   dc: HDC;
   TextSize: TSize;
 {$ENDIF}
+	//### Code Folding ###
+	leftpos, X, H : Integer;
+	rect: TRect;
+	FoldRange: TSynEditFoldRange;
+	//### End Code Folding ###
 begin
 	vFirstLine := RowToLine( aFirstRow );
 	vLastLine := RowToLine( aLastRow );
@@ -2672,12 +2607,11 @@ begin
 				rcLine.Bottom := rcLine.Top + fTextHeight;
 
 				//### Code Folding ###
-				// Calculate the number to show on gutter
 				s := fGutter.FormatLineNumber(GetRealLineNumber(cLine));
 				//### End Code Folding ###
 
 				if Assigned(OnGutterGetText) then
-					OnGutterGetText( Self, cLine, s );
+					OnGutterGetText(Self,cLine,s);
 
 {$IFDEF SYN_CLX}
 				if fGutter.Gradient then
@@ -2686,71 +2620,128 @@ begin
 					Canvas.Brush.Style := bsSolid;
 
 				Canvas.FillRect(rcLine);
-        Canvas.TextRect(rcLine, fGutter.LeftOffset, rcLine.Top, s);
-        // restore brush
-        if fGutter.Gradient then
-          Canvas.Brush.Style := bsSolid;
+				Canvas.TextRect(rcLine, fGutter.LeftOffset, rcLine.Top, s);
+
+				// restore brush
+				if fGutter.Gradient then
+					Canvas.Brush.Style := bsSolid;
 {$ELSE}
-        GetTextExtentPoint32(DC, PChar(s), Length(s), TextSize);
+				GetTextExtentPoint32(DC, PChar(s), Length(s), TextSize);
 
-        if fGutter.Gradient then
-        begin
-          SetBkMode(DC, TRANSPARENT);
-          Windows.ExtTextOut(DC, (fGutterWidth - fGutter.RightOffset - 2) - TextSize.cx,
-            rcLine.Top + ((fTextHeight - Integer(TextSize.cy)) div 2), 0,
-            @rcLine, PChar(s), Length(s), nil);
-          SetBkMode(DC, OPAQUE);
-        end
-        else
-          Windows.ExtTextOut(DC, (fGutterWidth - fGutter.RightOffset - 2) - TextSize.cx,
-            rcLine.Top + ((fTextHeight - integer(TextSize.cy)) div 2), ETO_OPAQUE, 
-            @rcLine, PChar(s), Length(s), nil);
+				if fGutter.Gradient then begin
+					SetBkMode(DC, TRANSPARENT);
+					Windows.ExtTextOut(DC, (fGutterWidth - fGutter.RightOffset - 2) - TextSize.cx,
+										rcLine.Top + ((fTextHeight - Integer(TextSize.cy)) div 2), 0,
+										@rcLine, PChar(s), Length(s), nil);
+					SetBkMode(DC, OPAQUE);
+				end else
+					Windows.ExtTextOut(DC, (fGutterWidth - fGutter.RightOffset - 2) - TextSize.cx,
+										rcLine.Top + ((fTextHeight - integer(TextSize.cy)) div 2), ETO_OPAQUE,
+										@rcLine, PChar(s), Length(s), nil);
 {$ENDIF}
-      end;
-      // now erase the remaining area if any
-      if (AClip.Bottom > rcLine.Bottom) and not fGutter.Gradient then
-      begin
-        rcLine.Top := rcLine.Bottom;
-        rcLine.Bottom := AClip.Bottom;
-        with rcLine do
-          fTextDrawer.ExtTextOut(Left, Top, ETO_OPAQUE, rcLine, nil, 0);
-      end;
-    finally
-      fTextDrawer.EndDrawing;
-      if fGutter.UseFontStyle then
-        fTextDrawer.SetBaseFont(Self.Font);
-    end;
-  end
-  else
-  if not fGutter.Gradient then
+			end;
 
-    Canvas.FillRect(AClip);
+			// now erase the remaining area if any
+			if (AClip.Bottom > rcLine.Bottom) and not fGutter.Gradient then begin
+				rcLine.Top := rcLine.Bottom;
+				rcLine.Bottom := AClip.Bottom;
+				with rcLine do
+					fTextDrawer.ExtTextOut(Left, Top, ETO_OPAQUE, rcLine, nil, 0);
+			end;
+		finally
+			fTextDrawer.EndDrawing;
+			if fGutter.UseFontStyle then
+				fTextDrawer.SetBaseFont(Self.Font);
+		end;
+	end else if not fGutter.Gradient then
+		Canvas.FillRect(AClip);
 
 {$IFDEF SYN_WIN32}
-  // draw word wrap glyphs transparently over gradient
-  if fGutter.Gradient then
-    Canvas.Brush.Style := bsClear;
+	// draw word wrap glyphs transparently over gradient
+	if fGutter.Gradient then
+		Canvas.Brush.Style := bsClear;
 {$ENDIF}
 
-  // paint wrapped line glyphs
-  if WordWrap and fWordWrapGlyph.Visible then
-    for cLine := aFirstRow to aLastRow do
-      if LineToRow( RowToLine(cLine) ) <> cLine then
-        fWordWrapGlyph.Draw(Canvas,
-                            (fGutterWidth - fGutter.RightOffset - 2) - fWordWrapGlyph.Width,
-                            (cLine - TopLine) * fTextHeight, fTextHeight);
+	// paint wrapped line glyphs
+	if WordWrap and fWordWrapGlyph.Visible then
+		for cLine := aFirstRow to aLastRow do
+			if LineToRow( RowToLine(cLine) ) <> cLine then
+				fWordWrapGlyph.Draw(Canvas,
+									(fGutterWidth - fGutter.RightOffset - 2) - fWordWrapGlyph.Width,
+									(cLine - TopLine) * fTextHeight, fTextHeight);
 {$IFDEF SYN_WIN32}
-  // restore brush
-  if fGutter.Gradient then
-    Canvas.Brush.Style := bsSolid;
+	// restore brush
+	if fGutter.Gradient then
+		Canvas.Brush.Style := bsSolid;
 {$ENDIF}
 
-  // now the gutter marks
-  if BookMarkOptions.GlyphsVisible and (Marks.Count > 0)
-    and (vLastLine >= vFirstLine) then
-  begin
-    aGutterOffs := AllocMem((aLastRow - aFirstRow + 1) * SizeOf(integer));
-    try
+	//### Code Folding ###
+	if Gutter.Visible then
+		for cLine := fTopLine to (fTopLine + fLinesInWindow) do begin
+
+			leftpos := Gutter.RealGutterWidth(CharWidth) - Gutter.RightOffset;
+			rect.Top := (cLine - fTopLine) * LineHeight;
+			rect.Bottom := rect.Top + LineHeight;
+			rect.Left := leftpos;
+			rect.Right := leftpos + Gutter.RightOffset - 4;
+
+			Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
+
+			// Need to paint a line?
+			if TreeLineForLine(RowToLine(cLine)) then begin
+				x := rect.Left + ((rect.Right - rect.Left) div 2);
+				Canvas.MoveTo(x, rect.Top);
+				Canvas.LineTo(x, rect.Bottom);
+			end;
+
+			// Need to paint a line end?
+			if TreeEndForLine(RowToLine(cLine)) then begin
+				x := rect.Left + ((rect.Right - rect.Left) div 2);
+				Canvas.MoveTo(x, rect.Top);
+				Canvas.LineTo(x, rect.Top + ((rect.Bottom - rect.Top) div 2));
+				Canvas.LineTo(rect.Right - 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
+			end;
+
+			if (cLine = 1) or (RowToLine(cLine) <> RowToLine(cLine - 1)) then begin
+				FoldRange := CollapsableFoldRangeForLine(RowToLine(cLine));
+
+				// Any fold range begins on this line?
+				if (FoldRange <> nil) and (FoldRange.Collapsable) then begin
+					InflateRect(rect, -3, 0);
+					H := (rect.Right - rect.Left);
+					rect.Top := rect.Top + ((LineHeight - H) div 2);
+					rect.Bottom := rect.Top + H;
+
+					if CodeFolding.CollapsingMarkStyle = msSquare then begin
+						Canvas.Brush.Color := clWindow;
+						Canvas.FillRect(rect);
+						Canvas.Brush.Color := CodeFolding.FolderBarLinesColor;
+						Canvas.FrameRect(rect);
+					end else if CodeFolding.CollapsingMarkStyle = msEllipse then begin
+						Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
+						Canvas.Brush.Color := clWindow;
+						Canvas.Ellipse(rect);
+					end;
+
+					// Paint minus sign
+					Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
+					Canvas.MoveTo(rect.Left + 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
+					Canvas.LineTo(rect.Right - 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
+
+					if FoldRange.Collapsed then begin
+						// Paint plus sign
+						Canvas.MoveTo(rect.Left + ((rect.Right - rect.Left) div 2), rect.Top + 2);
+						Canvas.LineTo(rect.Left + ((rect.Right - rect.Left) div 2), rect.Bottom - 2);
+					end;
+				end;
+			end;
+		end;
+	//### End Code Folding ###
+
+	// now the gutter marks
+	if BookMarkOptions.GlyphsVisible and (Marks.Count > 0) and (vLastLine >= vFirstLine) then begin
+		aGutterOffs := AllocMem((aLastRow - aFirstRow + 1) * SizeOf(integer));
+		try
       // Instead of making a two pass loop we look while drawing the bookmarks
       // whether there is any other mark to be drawn
       bHasOtherMarks := FALSE;
@@ -11232,14 +11223,6 @@ begin
       			LastLine := FromLine;
           	FoldCount^ := 1;
           end;
-end;
-
-function TCustomSynEdit.GetAutoSizeDigitCount: Integer;
-begin
-	Result := Length(IntToStr(Lines.Count));
-
-	if Result < 2 then
-		Result := 2;
 end;
 
 function TCustomSynEdit.GetRealLineNumber(aLine: Integer): Integer;
