@@ -1042,6 +1042,9 @@ begin
 	AddOption(Lang[ID_COPT_WARNINGPLUS], False, True,  True,  False, 0, '-Wall',                     Lang[ID_COPT_GRP_WARN],    [],       nil);
 	AddOption(Lang[ID_COPT_WARNINGEX],   False, True,  True,  False, 0, '-Wextra',                   Lang[ID_COPT_GRP_WARN],    [],       nil);
 	AddOption(Lang[ID_COPT_ISOCONFORM],  False, True,  True,  False, 0, '-pedantic',                 Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_SYNTAXONLY],  False, True,  True,  False, 0, '-fsyntax-only',             Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_TREATASERROR],False, True,  True,  False, 0, '-Werror',                   Lang[ID_COPT_GRP_WARN],    [],       nil);
+	AddOption(Lang[ID_COPT_FAILONFIRST], False, True,  True,  False, 0, '-Wfatal-errors',            Lang[ID_COPT_GRP_WARN],    [],       nil);
 	AddOption(Lang[ID_COPT_PROFILE],     False, True,  True,  False, 0, '-pg',                       Lang[ID_COPT_PROFILING],   [],       nil);
 	AddOption(Lang[ID_COPT_OBJC],        False, False, False, True,  0, '-lobjc',                    Lang[ID_COPT_LINKERTAB],   [],       nil);
 	AddOption(Lang[ID_COPT_DEBUG],       False, True,  True,  True,  0, '-g3',                       Lang[ID_COPT_LINKERTAB],   [],       nil);

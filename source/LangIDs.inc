@@ -710,6 +710,9 @@ const
   ID_COPT_WARNINGEX                = 793;
   ID_COPT_ISOCONFORM               = 794;
   ID_COPT_GRP_WARN                 = 795;
+  ID_COPT_SYNTAXONLY               = 796;
+  ID_COPT_TREATASERROR             = 797;
+  ID_COPT_FAILONFIRST              = 798;
 
   // Print form
   ID_PRT                           = 800;

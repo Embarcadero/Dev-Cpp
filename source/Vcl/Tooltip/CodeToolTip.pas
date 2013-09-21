@@ -904,25 +904,23 @@ begin
 	// get a pointer to the text
 	P := PChar(FEditor.Lines.Text);
 
-	// set the brace count to its initial value
-	// when a closing brace is right behind the cursor
-	// we increase it by 1
-	nBraces := -1;
-	if P[CurPos] = ')' then Inc(nBraces,1);
-	if P[CurPos+1] = ')' then Inc(nBraces,1);
-	nCommas := 0;
-
-	// Start at the end of the loop
-	repeat
-		if P[CurPos+1] = '(' then break;
+	// Start at the end of the loop + 1
+	while P[CurPos] <> ')' do begin
+		if P[CurPos] = '(' then begin
+			ReleaseHandle;
+			Exit;
+		end;
 		Inc(CurPos);
-	until P[CurPos+1] in [')'];
+	end;
+	Inc(CurPos);
+	nBraces := 0;
+	nCommas := 0;
 
 	// Then walk back and analyse everything
 	for I:=1 to FMaxScanLength do begin
 		case P[CurPos] of
 			'/':
-				if P[CurPos+1] = '*' then
+				if P[CurPos-1] = '*' then
 					SkipCommentBlock;
 
 			')': begin
@@ -949,15 +947,16 @@ begin
 		end;
 
 		Dec(CurPos);
-		if CurPos <= 1 then begin
+	{	if CurPos <= 1 then begin
 			CurPos := FEditor.SelStart;
 			Inc(CurPos);
 			Break;
-		end;
+		end;  }
 	end;
 
 	// Get the name of the function we're about to show
 	S := PreviousWordString(P, CurPos);
+//	MessageBox(application.handle,PChar(S),PChar('func'),MB_OK);
 	if (S <> OldFunction) or not Activated then begin
 		FSelIndex := 0;
 		FCustomSelIndex := False;
@@ -1004,11 +1003,11 @@ begin
 		// get the index of the current bracket where the cursor it
 		FCurParamIndex := GetCommaIndex(P, CurPos, Idx-1);
 		RethinkCoordAndActivate;
-	end else if (AnsiPos(Chr(FCurCharW), FEndWhenChr) > 0) then begin
+	end else {if (AnsiPos(Chr(FCurCharW), FEndWhenChr) > 0) then} begin
 		ReleaseHandle;
-	end else begin
-		if nBraces <> 0 then // Braces dont match? Then hide ..
-			ReleaseHandle;
+//	end else begin
+	//	if nBraces <> 0 then // Braces dont match? Then hide ..
+//			ReleaseHandle;
 	end;
 end;
 

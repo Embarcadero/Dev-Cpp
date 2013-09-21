@@ -1054,7 +1054,7 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object chkOverrideOutput: TCheckBox
         Left = 4
-        Top = 212
+        Top = 209
         Width = 13
         Height = 17
         TabOrder = 2

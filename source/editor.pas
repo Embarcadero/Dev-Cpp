@@ -704,7 +704,8 @@ begin
 						end;
 						Dec(len);
 					end;
-					if allowshow then FCodeToolTip.Show;
+					if allowshow then begin
+                       {	MainForm.MsgBox('allow','Hoi'); }FCodeToolTip.Show; end;
 				end;
 			end;
 		end;
@@ -1657,61 +1658,60 @@ end;
 
 procedure TEditor.PaintMatchingBrackets(TransientType: TTransientType);
 const
-  BracketSet = ['{','[','(','}',']',')'];
-  OpenChars:array[0..2] of Char=('{','[','(');
-  CloseChars:array[0..2] of Char=('}',']',')');
-
-  function CharToPixels(P: TBufferCoord): TPoint;
-  begin
-    Result:= fText.RowColumnToPixels(fText.BufferToDisplayPos(p));
-  end;
-
+	BracketSet = ['{','[','(','}',']',')'];
+	OpenChars:array[0..2] of Char=('{','[','(');
+	CloseChars:array[0..2] of Char=('}',']',')');
 var
-    P: TBufferCoord;
-    Pix: TPoint;
-    S: String;
-    I: Integer;
-    Attri: TSynHighlighterAttributes;
+	P: TBufferCoord;
+	Pix: TPoint;
+	S: String;
+	I: Integer;
+	Attri: TSynHighlighterAttributes;
 begin
-  P := fText.CaretXY;
-  fText.GetHighlighterAttriAtRowCol(P, S, Attri);
-  if Assigned(Attri) and (fText.Highlighter.SymbolAttribute = Attri) and
-      (fText.CaretX<=length(fText.LineText) + 1) then begin
-    for i := 0 to 2 do begin
-      if (S = OpenChars[i]) or (S = CloseChars[i]) then begin
-        Pix := CharToPixels(P);
-        fText.Canvas.Brush.Style := bsSolid;
-        fText.Canvas.Font.Assign(fText.Font);
-        fText.Canvas.Font.Style := Attri.Style;
+	P := fText.CaretXY;
+	fText.GetHighlighterAttriAtRowCol(P, S, Attri);
+	if Assigned(Attri) and (fText.Highlighter.SymbolAttribute = Attri) and (fText.CaretX<=length(fText.LineText) + 1) then begin
+		for i := 0 to 2 do begin
+			if (S = OpenChars[i]) or (S = CloseChars[i]) then begin
+				Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(p));
+				fText.Canvas.Brush.Style := bsSolid;
+				fText.Canvas.Font.Assign(fText.Font);
+				Text.Canvas.Font.Style := Attri.Style;
 
-        if (TransientType = ttAfter) then begin
-          fText.Canvas.Font.Color:= fText.Highlighter.WhitespaceAttribute.Background;
-          fText.Canvas.Brush.Color := Attri.Foreground;
-        end
-        else begin
-          fText.Canvas.Font.Color:= Attri.Foreground;
-          fText.Canvas.Brush.Color:= fText.Highlighter.WhitespaceAttribute.Background;
-        end;
+				if (TransientType = ttAfter) then begin
+					fText.Canvas.Font.Color:= fText.Highlighter.WhitespaceAttribute.Background;
+					fText.Canvas.Brush.Color := Attri.Foreground;
+				end else begin
+					fText.Canvas.Font.Color:= Attri.Foreground;
+					if not devEditor.HighCurrLine then
+						fText.Canvas.Brush.Color:= fText.Highlighter.WhitespaceAttribute.Background
+					else
+						fText.Canvas.Brush.Color:= devEditor.HighColor;
+				end;
 
-        fText.Canvas.TextOut(Pix.X, Pix.Y, S);
-        P := fText.GetMatchingBracketEx(P);
+				fText.Canvas.TextOut(Pix.X, Pix.Y, S);
+				P := fText.GetMatchingBracketEx(P);
 
-        if (P.Char > 0) and (P.Line > 0) then begin
-          Pix := CharToPixels(P);
-          if S = OpenChars[i] then
-            fText.Canvas.TextOut(Pix.X, Pix.Y, CloseChars[i])
-          else
-            fText.Canvas.TextOut(Pix.X, Pix.Y, OpenChars[i]);
-        end;
-      end;
-    end;
-    fText.Canvas.Brush.Style := bsSolid;
-  end;
+				if not(TransientType = ttAfter) then
+					fText.Canvas.Brush.Color:= fText.Highlighter.WhitespaceAttribute.Background;
+
+				if (P.Char > 0) and (P.Line > 0) then begin
+					Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(p));
+
+					if S = OpenChars[i] then
+						fText.Canvas.TextOut(Pix.X, Pix.Y, CloseChars[i])
+					else
+						fText.Canvas.TextOut(Pix.X, Pix.Y, OpenChars[i]);
+				end;
+			end;
+		end;
+		fText.Canvas.Brush.Style := bsSolid;
+	end;
 end;
 
 procedure TEditor.EditorPaintTransient(Sender: TObject; Canvas: TCanvas;TransientType: TTransientType);
 begin
-	if (Assigned(fText.Highlighter)) and (devEditor.Match = true) then
+	if (Assigned(fText.Highlighter)) and devEditor.Match then
 		PaintMatchingBrackets(TransientType);
 end;
 

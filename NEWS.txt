@@ -19,6 +19,8 @@ Version 5.0.0.5 - * Oktober 2011
 - Restyled the editor tooltip balloon.
 - The function tooltip balloon now updates on the fly.
 - The editor hints option now properly disables hints.
+- Fixed a coloring bug when highlighting matching braces on the currently highlighted line.
+- Added a few more GUI togglable warning options.
 
 Version 5.0.0.4 - 25 September 2011
 
