@@ -1014,7 +1014,7 @@ begin
 	fCppDir := ReplaceFirstStr(fCppDir, '%path%\',devDirs.Exec);
 	fLibDir := ReplaceFirstStr(fLibDir, '%path%\',devDirs.Exec);
 
-	devCompiler.CurrentSet := Index;
+	CurrentSet := Index;
 
 	SetPath(fBinDir);
 end;
@@ -1171,7 +1171,7 @@ begin
 	devData.WriteStrings('CompilerSets',fSets);
 
 	// Then current index
-	if fCurrentSet < fSets.Count-1 then
+	if fCurrentSet < fSets.Count then
 		devData.Write('CompilerSets','Current',fCurrentSet)
 	else
 		devData.Write('CompilerSets','Current',-1);

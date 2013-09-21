@@ -95,14 +95,13 @@ const
 	PACKMAN_PROGRAM       = 'packman.exe';
 
 	// File dialog filters
-	FLT_BASE              = 'All known Files||';
 	FLT_ALLFILES          = 'All files (*.*)|*.*|';
+	FLT_TEXTS             = 'Text files (*.txt)|*.txt';
 	FLT_PROJECTS          = 'Dev-C++ project (*.dev)|*.dev';
 	FLT_HEADS             = 'Header files (*.h;*.hpp;*.rh;*.hh)|*.h;*.hpp;*.rh;*.hh';
 	FLT_CS                = 'C source files (*.c)|*.c';
 	FLT_CPPS              = 'C++ source files (*.cpp;*.cc;*.cxx;*.c++;*.cp)|*.cpp;*.cc;*.cxx;*.c++;*.cp';
 	FLT_RES               = 'Resource scripts (*.rc)|*.rc';
-	FLT_HELPS             = 'Help files (*.hlp;*.chm;*.col)|*.hlp;*.chm;*.col|HTML files (*.htm;*.html)|*.htm;*.html|Text files (*.doc;*.rtf;*.txt)|*.doc;*.rtf;*.txt|All files (*.*)|*.*';
 	FLT_MSVCPROJECTS      = 'MS Visual C++ projects (*.dsp)|*.dsp';
 	FLT_CBPROJECTS        = 'Code::Blocks projects (*.cbp)|*.cbp';
 

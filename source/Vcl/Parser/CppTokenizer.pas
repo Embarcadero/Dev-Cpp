@@ -312,6 +312,7 @@ begin
       '(': SkipPair('(', ')');
       '"': SkipDoubleQuotes;
       '''': SkipSingleQuote;
+      '{': SkipPair('{','}'); // init list
       '/': if (pCurrent + 1)^ = '/' then
           SkipToEOL
         else if (pCurrent + 1)^ = '*' then

@@ -182,7 +182,7 @@ var
 begin
 
 	// Create OBJ output directory
-	SetPath(fProject.Directory);
+	SetCurrentDir(fProject.Directory);
 	if fProject.Options.ObjectOutput <> '' then
 		if not DirectoryExists(fProject.Options.ObjectOutput) then
 			CreateDir(fProject.Options.ObjectOutput);

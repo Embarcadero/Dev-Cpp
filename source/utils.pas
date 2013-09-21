@@ -45,7 +45,7 @@ type
 		utOther      // any others
 	);
 
-	TFilterSet = (ftOpen, ftHelp, ftPrj, ftSrc, ftAll);
+	TFilterSet = (ftOpen, ftPrj, ftSrc, ftAll);
 
 	TErrFunc = procedure(const Msg: AnsiString) of object;
 	TLineOutputFunc = procedure(const Line: AnsiString) of object;
@@ -71,8 +71,7 @@ type
 
 	function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString;const CheckDirs: boolean = FALSE): AnsiString;
 
-	function BuildFilter(var value: AnsiString; const Filters: TFilterSet): boolean; overload;
-	function BuildFilter(var value: AnsiString; const Filters: array of AnsiString): boolean; overload;
+	function BuildFilter(const Filters: array of AnsiString): AnsiString;
 
 	function CodeInstoStr(const s: AnsiString): AnsiString;
 	function StrtoCodeIns(const s: AnsiString): AnsiString;
@@ -100,8 +99,6 @@ type
 	function GenMakePath(const FileName: AnsiString; EscapeSpaces,EncloseInQuotes: Boolean): AnsiString; overload;
 
 	function GetRealPath(const BrokenFileName: AnsiString;const Directory: AnsiString = ''): AnsiString;
-
-	function CalcMod(Count: Integer): Integer;
 
 	function GetVersionString(const FileName: AnsiString): AnsiString;
 
@@ -696,62 +693,30 @@ begin
 	result:= strpas(pFileName);
 end;
 
-function AddFilter(var value: AnsiString; const _Filter: AnsiString): boolean;
-var
-	idx: integer;
-	s,LFilter: AnsiString;
-begin
-	result:= TRUE;
-	try
-		LFilter:= value;
-		idx:= pos('|', LFilter);
-		if idx > 0 then begin
-			Insert(_Filter +'|', LFilter, Pos(FLT_ALLFILES, LFIlter));
-			s:= Copy(_Filter, Pos('|', _Filter) +1, length(_Filter)) +';';
-			Insert(s, LFilter, Pos('|', LFilter) +1);
-			if LFilter[Length(LFilter)] <> '|' then
-				LFilter:= LFilter +'|';
-		end;
-		value:= LFilter;
-	except
-		result:= FALSE;
-	end;
-end;
-
-function BuildFilter(var value: AnsiString; const Filters: TFilterSet): boolean; overload;
-begin
-	value:= FLT_BASE + FLT_ALLFILES;
-	case Filters of
-		ftOpen: result:= BuildFilter(value, [FLT_PROJECTS, FLT_HEADS, FLT_CS, FLT_CPPS, FLT_RES]);
-		ftHelp: result:= BuildFilter(value, [FLT_HELPS]);
-		ftPrj:  result:= BuildFilter(value, [FLT_PROJECTS]);
-		ftSrc:  result:= BuildFilter(value, [FLT_HEADS, FLT_RES, FLT_CS, FLT_CPPS]);
-		ftAll:  result:= BuildFilter(value, [FLT_PROJECTS, FLT_HEADS, FLT_RES, FLT_CS,FLT_CPPS]);
-	else
-		result:= TRUE;
-	end;
-end;
-
-function BuildFilter(var value: AnsiString; const Filters: array of AnsiString): boolean; overload;
+function BuildFilter(const Filters: array of AnsiString): AnsiString;
 var
 	I: integer;
 begin
-	result:= FALSE;
-	value:= FLT_BASE + FLT_ALLFILES;
-	for I:= 0 to high(Filters) do
-		if not AddFilter(value, Filters[I]) then
-			exit;
-	result:= TRUE;
+	result := FLT_ALLFILES;
+	for I := 0 to high(Filters) do begin
+
+		// Check a few things:
+		// 1) result must end with | before appending
+		if result[Length(result)] <> '|' then
+			result := result + '|';
+
+		result := result + Filters[I];
+	end;
 end;
 
 function CodeInstoStr(const s: AnsiString): AnsiString;
 begin
-  result:= StringReplace(s, #13#10, '$_', [rfReplaceAll]);
+	result:= StringReplace(s, #13#10, '$_', [rfReplaceAll]);
 end;
 
 function StrtoCodeIns(const s: AnsiString): AnsiString;
 begin
-  result:= StringReplace(s, '$_', #13#10, [rfReplaceAll]);
+	result:= StringReplace(s, '$_', #13#10, [rfReplaceAll]);
 end;
 
 procedure StrtoPoint(var pt: TPoint;const value: AnsiString);
@@ -835,9 +800,9 @@ begin
 		result := format(formatstr, [result, s]);
 end;
 
-// hack fix due to:
+// fix without using StringList.DelimitedText:
 // http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
-procedure StrtoList(const s : AnsiString; List: TStrings; delimiter : char);
+procedure StrToList(const s : AnsiString; List: TStrings; delimiter : char);
 begin
 	List.Clear;
 	ExtractStrings([delimiter],[],PChar(S),List);
@@ -1026,28 +991,6 @@ begin
 {$IFDEF WIN32}
   StringReplace(Result, '/', '\', [rfReplaceAll]);
 {$ENDIF}
-end;
-
-function CalcMod(Count: Integer): Integer;
-begin
-  if Count <= 15 then
-      Result := 0
-  else if Count <= 30 then
-      Result := 2
-  else if Count <= 65 then
-      Result := 4
-  else if Count <= 150 then
-      Result := 8
-  else if Count <= 300 then
-      Result := 16
-  else if Count <= 500 then
-      Result := 32
-  else if Count <= 750 then
-      Result := 64
-  else if Count <= 1500 then
-      Result := 96
-  else
-      Result := 128;
 end;
 
 function IncludeQuoteIfSpaces(const s : AnsiString) : AnsiString;

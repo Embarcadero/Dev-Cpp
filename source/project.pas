@@ -34,6 +34,7 @@ uses
 
 type
   TProjUnit = class;
+  TProject = class;
 
   TUnitList = class
   private
@@ -52,7 +53,6 @@ type
     property Count: integer read GetCount;
   end;
 
- TProject = class;
  TProjUnit = class
   private
    fParent   : TProject;
@@ -69,11 +69,11 @@ type
    fPriority: integer;
    function GetDirty: boolean;
    procedure SetDirty(value: boolean);
+   function Save : boolean;
+   function SaveAs: boolean;
   public
    constructor Create(aOwner: TProject);
    destructor Destroy; override;
-   function Save: boolean;
-   function SaveAs: boolean;
    property Editor: TEditor read fEditor write fEditor;
    property FileName: AnsiString read fFileName write fFileName;
    property New: boolean read fNew write fNew;
@@ -176,7 +176,7 @@ implementation
 
 uses
   main, MultiLangSupport, devcfg, ProjectOptionsFrm, datamod, utils,
-  RemoveUnitFrm;
+  RemoveUnitFrm, SynEdit;
 
 { TProjUnit }
 
@@ -197,20 +197,18 @@ begin
 end;
 
 function TProjUnit.Save: boolean;
+var
+	workeditor : TSynEdit;
 begin
-	if (fFileName = '') or (fNew) then
-		result:= SaveAs
-	else
-		try
-			// if no editor created open one save file and close
-			// creates a blank file.
+	try
+		if (fFileName = '') or fNew then
+			result:= SaveAs // only sets fFilename and new, doesn't actually write to disk
+		else begin
+			// if no editor created open one save file and close (create blank file)
 			if not assigned(fEditor) and not FileExists(fFileName) then begin
-				fEditor:= TEditor.Create;
-				fEditor.Init(TRUE, ExtractFileName(fFileName), fFileName, FALSE);
-				fEditor.Text.UnCollapsedLines.SavetoFile(fFileName);
-				fEditor.New := False;
-				fEditor.Text.Modified := False;
-				FreeAndNil(fEditor);
+				workeditor := TSynEdit.Create(nil);
+				workeditor.UnCollapsedLines.SavetoFile(fFileName); // create blank file
+				workeditor.Free;
 			end else if assigned(fEditor) and fEditor.Text.Modified then begin
 				fEditor.Text.UnCollapsedLines.SaveToFile(fEditor.FileName);
 				if FileExists(fEditor.FileName) then
@@ -218,65 +216,53 @@ begin
 				fEditor.New := False;
 				fEditor.Text.Modified:= False;
 			end;
+
 			if assigned(fNode) then
 				fNode.Text:= ExtractfileName(fFileName);
-			result:= TRUE;
-		except
-			result:= FALSE;
+
+			result:= true; // yay!
 		end;
+	except
+		result := false;
+	end;
 end;
 
 function TProjUnit.SaveAs: boolean;
-var
-	flt: AnsiString;
-	CFilter, CppFilter, HFilter: Integer;
 begin
-	with TSaveDialog.Create(nil) do try
-		if fFileName = '' then
-			FileName:= fEditor.TabSheet.Caption
-		else
-			FileName:= ExtractFileName(fFileName);
+	with TSaveDialog.Create(Application) do try
 
-		if fParent.Options.useGPP then begin
-			BuildFilter(flt, [FLT_CPPS, FLT_CS, FLT_HEADS]);
-			DefaultExt:= CPP_EXT;
-			CFilter := 3;
-			CppFilter := 2;
-			HFilter := 4;
-		end else begin
-			BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_HEADS]);
-			DefaultExt:= C_EXT;
-			CFilter := 2;
-			CppFilter := 3;
-			HFilter := 4;
-		end;
-
-		Filter:= flt;
-
-		if GetFileTyp(ExtractFileExt(FileName)) in [utcHead,utcppHead] then begin
-			FilterIndex := HFilter;
-		end else if fParent.Options.useGPP then begin
-			FilterIndex := CppFilter;
-		end else begin
-			FilterIndex := CFilter;
-		end;
-
-		InitialDir:= ExtractFilePath(fFileName);
-		Title:= Lang[ID_NV_SAVEFILE];
+		Title := Lang[ID_NV_SAVEFILE];
+		Filter := BuildFilter([FLT_CS,FLT_CPPS,FLT_HEADS,FLT_RES]);
 		Options := Options + [ofOverwritePrompt];
 
-		if Execute then begin
-			try
-				fNew:= FALSE;
-				fFileName:= FileName;
-				if assigned(fEditor) then
-					fEditor.FileName:= fFileName;
-				result:= Save;
-			except
-				result:= FALSE;
+		// select appropriate filter
+		if GetFileTyp(fFileName) in [utcHead,utcppHead] then begin
+			FilterIndex := 4; // .h
+			DefaultExt := 'h';
+		end else begin
+			if fParent.Options.useGPP then begin
+				FilterIndex := 3; // .cpp
+				DefaultExt := 'cpp';
+			end else begin
+				FilterIndex := 2; // .c
+				DefaultExt := 'c';
 			end;
+		end;
+
+		FileName := fFileName;
+		if (fFileName <> '') then
+			InitialDir := ExtractFilePath(fFileName)
+		else
+			InitialDir := fParent.Directory;
+
+		if Execute then begin
+			fNew := false;
+			fFileName := FileName;
+			if assigned(fEditor) then
+				fEditor.FileName:= fFileName;
+			result := Save;
 		end else
-			result:= FALSE;
+			Result := false;
 	finally
 		Free;
 	end;
@@ -1255,7 +1241,7 @@ begin
 	SaveLayout;  // save current opened files, and which is "active".
 	if fModified then
 		finiFile.UpdateFile;
-	setModified(FALSE);
+	SetModified(FALSE);
 end;
 
 function TProject.Remove(index : integer; DoClose : boolean) : boolean;

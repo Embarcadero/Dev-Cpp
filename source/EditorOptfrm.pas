@@ -1525,7 +1525,6 @@ var
   Hits: integer;
   MaxHits, MaxIndex: integer;
   sl: TStrings;
-  flt: AnsiString;
 begin
   // the following piece of code is a quick'n'dirty way to find the base
   // compiler's include dir (if we 're lucky).
@@ -1565,10 +1564,9 @@ begin
 
 	with TOpenDialog.Create(Self) do try
 
-		BuildFilter(flt, [FLT_HEADS]);
-		Filter:=flt;
+		Filter := BuildFilter([FLT_HEADS]);
 
-		// Start in the include folder
+		// Start in the include folder, if its set
 		sl := TStringList.Create;
 		StrToList(devCompiler.CppDir,sl,';');
 		if sl.count > 0 then

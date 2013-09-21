@@ -161,9 +161,6 @@ begin
 	// write full compiler list
 	devCompiler.Sets.Assign(cmbCompilerSetComp.Items);
 	devCompiler.WriteSets;
-
-	// Set Path with New Bins
-	SetPath(fBins);
 end;
 
 procedure TCompOptForm.LoadSet(Index : integer);

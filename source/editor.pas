@@ -315,12 +315,19 @@ begin
 	// Delete breakpoints in this editor
 	MainForm.fDebugger.DeleteBreakPointsOf(self);
 
+	SendMessage(MainForm.Handle,WM_SETREDRAW,0,0);
+
 	// Open up the previous tab, not the first one...
 	with fTabSheet.PageControl do begin
 		curactive := ActivePageIndex;
-		fTabSheet.Free; // sets activepageindex to 0, causes lots of flicker???
+		fTabSheet.Free; // sets activepageindex to 0, causes lots of flicker...
 		ActivePageIndex := max(0,curactive - 1);
 	end;
+
+	SendMessage(MainForm.Handle,WM_SETREDRAW,1,0);
+
+	// Repaint here, so we don't get to see the first page
+	RedrawWindow(MainForm.PageControl.Handle, nil, 0, RDW_INTERNALPAINT or RDW_INVALIDATE or RDW_ALLCHILDREN);
 
 	inherited;
 end;
@@ -567,7 +574,7 @@ begin
 	SynExporterHTML := TSynExporterHTML.Create(nil);
 	try
 		if OverwriteFileName = '' then begin
-			with TSaveDialog.Create(nil) do try
+			with TSaveDialog.Create(Application) do try
 
 				Filter := SynExporterHTML.DefaultFilter;
 				Title := Lang[ID_NV_EXPORT];
@@ -607,7 +614,7 @@ begin
 	SynExporterRTF := TSynExporterRTF.Create(nil);
 	try
 		if OverwriteFileName = '' then begin
-			with TSaveDialog.Create(nil) do try
+			with TSaveDialog.Create(Application) do try
 
 				Filter:= SynExporterRTF.DefaultFilter;
 				Title:= Lang[ID_NV_EXPORT];
@@ -646,7 +653,7 @@ begin
 	SynExporterTEX := TSynExporterTEX.Create(nil);
 	try
 		if OverwriteFileName = '' then begin
-			with TSaveDialog.Create(nil) do try
+			with TSaveDialog.Create(Application) do try
 
 				Filter:= SynExporterTEX.DefaultFilter;
 				Title:= Lang[ID_NV_EXPORT];

@@ -787,7 +787,7 @@ begin
 	if fIndex < fTokenizer.Tokens.Count - 1 then
 		for I := 0 to 1 do // check the current and the next token
 			if CheckForKeyword or
-				(PToken(fTokenizer.Tokens[fIndex + I])^.Text[1] in [',', ';', ':', '{', '}', '!', '/', '+', '-']) or // { can be used for identifier lists
+				(PToken(fTokenizer.Tokens[fIndex + I])^.Text[1] in [',', ';', ':', '{', '}', '!', '/', '+', '-']) or
 				(PToken(fTokenizer.Tokens[fIndex + I])^.Text[Length(PToken(fTokenizer.Tokens[fIndex + I])^.Text)] = '.') or
 				((Length(PToken(fTokenizer.Tokens[fIndex + I])^.Text) > 1) and
 				(PToken(fTokenizer.Tokens[fIndex + I])^.Text[Length(PToken(fTokenizer.Tokens[fIndex + I])^.Text) - 1] = '-') and
@@ -1473,7 +1473,7 @@ end;
 
 function TCppParser.HandleStatement: boolean;
 begin
-  if PToken(fTokenizer.Tokens[fIndex])^.Text[1] = '{' then begin
+  if PToken(fTokenizer.Tokens[fIndex])^.Text = '{' then begin
     Inc(fLevel, 2);
     Inc(fIndex);
     if fInClass > 0 then

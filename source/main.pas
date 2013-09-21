@@ -1449,101 +1449,60 @@ begin
 end;
 
 function TMainForm.SaveFileAs(e : TEditor): Boolean;
-var
- dext,
- flt,
- s: AnsiString;
- idx: integer;
- CFilter, CppFilter, HFilter: Integer;
 begin
 	Result := True;
-	idx:= -1;
-	if assigned(fProject) then begin
-		idx:= fProject.Units.Indexof(e.FileName);
-		if fProject.Options.UseGPP then begin
-			BuildFilter(flt, [FLT_CPPS, FLT_CS, FLT_HEADS]);
-			dext:= CPP_EXT;
-			CFilter := 3;
-			CppFilter := 2;
-			HFilter := 4;
-		end else begin
-			BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_HEADS]);
-			dext:= C_EXT;
-			CFilter := 2;
-			CppFilter := 3;
-			HFilter := 4;
-		end;
-		if e.IsRes then begin
-			BuildFilter(flt, [FLT_RES]);
-			dext:= RC_EXT;
-			CFilter := 2;
-			CppFilter := 2;
-			HFilter := 2;
-		end;
-	end else begin
-		BuildFilter(flt, ftAll);
-		if e.IsRes then
-			dext:= RC_EXT
-		else
-			dext:= CPP_EXT;
-		CFilter := 5;
-		CppFilter := 6;
-		HFilter := 3;
-	end;
+	with TSaveDialog.Create(Application) do try
 
-	s := e.FileName;
-
-	with TSaveDialog.Create(nil) do try
-
-		Title:= Lang[ID_NV_SAVEFILE];
-		Filter:= flt;
+		Title := Lang[ID_NV_SAVEFILE];
+		Filter := BuildFilter([FLT_CS,FLT_CPPS,FLT_HEADS,FLT_RES]);
 		Options := Options + [ofOverwritePrompt];
 
 		// select appropriate filter
-		if GetFileTyp(s) in [utcHead,utcppHead] then begin
-			 FilterIndex := HFilter;
+		if GetFileTyp(e.FileName) in [utcHead,utcppHead] then begin
+			FilterIndex := 4; // .h
+			DefaultExt := 'h';
 		end else begin
-			if Assigned(fProject) then
-				if fProject.Options.useGPP then
-					FilterIndex := CppFilter
-				else
-					FilterIndex := CFilter
-			else
-				FilterIndex := CppFilter;
+			if Assigned(fProject) then begin
+				if fProject.Options.useGPP then begin
+					FilterIndex := 3; // .cpp
+					DefaultExt := 'cpp';
+				end else begin
+					FilterIndex := 2; // .c
+					DefaultExt := 'c';
+				end;
+			end else begin
+				FilterIndex := 3; // .cpp
+				DefaultExt := 'cpp';
+			end;
 		end;
 
-		FileName:= s;
-		s:= ExtractFilePath(s);
-		if (s <> '') or not Assigned(fProject) then
-			InitialDir:= s
-		else
-			InitialDir:=fProject.Directory;
+		FileName := e.FileName;
+		if (e.FileName <> '') then
+			InitialDir := ExtractFilePath(e.FileName)
+		else if Assigned(fProject) then
+			InitialDir := fProject.Directory;
 
 		if Execute then begin
-			s:= FileName;
-			if FileExists(s) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrNo) then
-				exit;
-
-			e.FileName := s;
-
 			try
-				e.Text.UnCollapsedLines.SaveToFile(s);
-				e.Text.Modified := FALSE;
-				e.New:= FALSE;
+				e.Text.UnCollapsedLines.SaveToFile(FileName);
+				e.Text.Modified := false;
+				e.New := false;
 			except
-				MessageDlg(Lang[ID_ERR_SAVEFILE] +' "' +s +'"', mtError, [mbOk], 0);
+				MessageDlg(Lang[ID_ERR_SAVEFILE] + '"' + FileName + '"', mtError, [mbOk], 0);
 				Result := False;
 			end;
 
 			if assigned(fProject) then
-				fProject.SaveUnitAs(idx, e.FileName)
+				fProject.SaveUnitAs(fProject.Units.IndexOf(e.FileName), FileName) // index of old filename
 			else
-				e.TabSheet.Caption:= ExtractFileName(e.FileName);
+				e.TabSheet.Caption:= ExtractFileName(FileName);
+
+			e.FileName := FileName;
 
 			if ClassBrowser.Enabled then begin
 
 				// We haven't scanned it yet...
-				CppParser.AddFileToScan(e.FileName);
+				CppParser.AddFileToScan(FileName);
 				CppParser.ParseList;
 			end;
 		end else
@@ -1555,7 +1514,6 @@ end;
 
 function TMainForm.SaveFile(e : TEditor): Boolean;
 var
-	idx: Integer;
 	wa: boolean;
 begin
 	Result := True;
@@ -1569,44 +1527,27 @@ begin
 		end;
 	end;
 
-	wa:=devFileMonitor.Active;
+	wa := devFileMonitor.Active;
 	devFileMonitor.Deactivate;
 
+	// Filename already present? Save without dialog
 	if (not e.new) and e.Text.Modified then begin
-		if Assigned(fProject) and e.InProject then begin
-			try
-				idx:= fProject.GetUnitFromEditor(e);
-				if idx = -1 then
-					MessageDlg(Format(Lang[ID_ERR_SAVEFILE], [e.FileName]), mtError, [mbOk], 0)
-				else
-					fProject.units[idx].Save;
-			except
-				MessageDlg(Format(Lang[ID_ERR_SAVEFILE], [e.FileName]), mtError, [mbOk], 0);
-				Result := False;
-				Exit;
-			end;
-			try
-				if (idx <> -1) and ClassBrowser.Enabled then begin
-					CppParser.ReParseFile(e.FileName,false); // don't need to scan for the first time
-				end;
-			except
-				MessageDlg(Format('Error reparsing file %s', [e.FileName]), mtError, [mbOk], 0);
-				Result := False;
-			end;
-		end else // stand alone file (should have fullpath in e.filename)
-			try
-				e.Text.UnCollapsedLines.SaveToFile(e.FileName);
-				e.Text.Modified := false;
 
-				if ClassBrowser.Enabled then begin
-					CppParser.ReParseFile(e.FileName,false); // don't need to scan for the first time
-				end;
-			except
-				MessageDlg(Format(Lang[ID_ERR_SAVEFILE], [e.FileName]), mtError, [mbOk], 0);
-				Result := False;
-			end
+		// Save contents directly
+		try
+			e.Text.UnCollapsedLines.SaveToFile(e.FileName);
+			e.Text.Modified := false;
+		except
+			MessageDlg(Format(Lang[ID_ERR_SAVEFILE], [e.FileName]), mtError, [mbOk], 0);
+			Result := False;
+		end;
+
+		// Reparse
+		if ClassBrowser.Enabled then
+			CppParser.ReParseFile(e.FileName,false); // don't need to scan for the first time
 	end else if e.New then
-		Result := SaveFileAs(e);
+		Result := SaveFileAs(e); // we need a file name, use dialog
+
 	if wa then
 		devFileMonitor.Activate;
 end;
@@ -1615,6 +1556,7 @@ function TMainForm.CloseEditor(index: integer): Boolean;
 var
 	e: TEditor;
 	s : AnsiString;
+	projindex : integer;
 begin
 	Result := False;
 	e := GetEditor(index);
@@ -1641,8 +1583,11 @@ begin
 		end else begin
 			if e.IsRes and not Assigned(fProject) then
 				FreeAndNil(e)
-			else if assigned(fProject) then
-				fProject.CloseUnit(fProject.Units.Indexof(e));
+			else if assigned(fProject) then begin
+				projindex := fProject.Units.IndexOf(e);
+				if projindex <> -1 then
+					fProject.CloseUnit(projindex);
+			end;
 		end;
 
 		SetStatusbarLineCol;
@@ -2171,37 +2116,33 @@ begin
 
 			s := edProjectName.Text + DEV_EXT;
 
-			with TSaveDialog.Create(nil) do try
+			with TSaveDialog.Create(Application) do try
+
 				Filter:= FLT_PROJECTS;
 				InitialDir:= devDirs.Default;
 				FileName:= s;
 				Options := Options + [ofOverwritePrompt];
+				DefaultExt := 'dev';
 
-				if not Execute then
-					Exit;
-				s:= FileName;
-				if FileExists(s) then begin
-					if MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrYes then
-						DeleteFile(s)
-					else
+				if Execute then begin
+					s:= FileName;
+
+					fProject:= TProject.Create(s, edProjectName.Text);
+					if not fProject.AssignTemplate(s, GetTemplate) then begin
+						fProject.Free;
+						MessageBox(Application.Handle, PAnsiChar(Lang[ID_ERR_TEMPLATE]), PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
 						Exit;
+					end;
+
+					fCompiler.Project:= fProject;
+					fProject.SaveProjectFile;
+
+					if not devData.ProjectView then
+						actProjectManager.Execute;
 				end;
 			finally
 				Free;
 			end;
-
-			fProject:= TProject.Create(s, edProjectName.Text);
-			if not fProject.AssignTemplate(s, GetTemplate) then begin
-				fProject.Free;
-				MessageBox(Application.Handle, PAnsiChar(Lang[ID_ERR_TEMPLATE]), PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
-				Exit;
-			end;
-
-			fCompiler.Project:= fProject;
-			fProject.SaveProjectFile;
-
-			if not devData.ProjectView then
-				actProjectManager.Execute;
 		end;
 	finally
 		Free;
@@ -2788,7 +2729,7 @@ begin
 	idx:= -1;
 	if assigned(fProject) then
 		idx:= fProject.NewUnit(FALSE);
-	if idx > -1 then
+	if idx <> -1 then
 		with fProject.OpenUnit(idx) do begin
 			Activate;
 			Text.Modified:=True;
@@ -2799,17 +2740,16 @@ end;
 
 procedure TMainForm.actProjectAddExecute(Sender: TObject);
 var
- flt: AnsiString;
  idx: integer;
  FolderNode : TTreeNode;
 begin
 	if not assigned(fProject) then exit;
 
-	if not BuildFilter(flt, [FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]) then BuildFilter(flt, ftAll);
-
 	with TOpenDialog.Create(Self) do try
-		Title:= Lang[ID_NV_OPENADD];
-		Filter:= flt;
+
+		Title := Lang[ID_NV_OPENADD];
+		Filter := BuildFilter([FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]);
+
 		if Execute then begin
 			if Assigned(ProjectView.Selected) and (ProjectView.Selected.Data=Pointer(-1)) then
 				FolderNode := ProjectView.Selected
@@ -3517,8 +3457,9 @@ begin
 		end;
 
 		if Length(fulloutput) > 0 then begin
-			Title:= Lang[ID_NV_SAVEFILE];
-			Filter:= 'Text file|*.txt';
+
+			Title := Lang[ID_NV_SAVEFILE];
+			Filter := BuildFilter([FLT_TEXTS]);
 			DefaultExt := 'txt';
 			FilterIndex := 1;
 			Options := Options + [ofOverwritePrompt];
