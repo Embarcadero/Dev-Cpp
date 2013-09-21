@@ -1,8 +1,8 @@
 object ViewToDoForm: TViewToDoForm
-  Left = 192
-  Top = 107
-  Width = 572
-  Height = 247
+  Left = 486
+  Top = 308
+  Width = 604
+  Height = 282
   BorderStyle = bsSizeToolWin
   Caption = 'To-Do list'
   Color = clBtnFace
@@ -10,8 +10,8 @@ object ViewToDoForm: TViewToDoForm
   Constraints.MinWidth = 394
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
@@ -20,23 +20,23 @@ object ViewToDoForm: TViewToDoForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    556
-    209)
+    588
+    244)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object lblFilter: TLabel
     Left = 8
-    Top = 172
-    Width = 25
-    Height = 13
+    Top = 199
+    Width = 29
+    Height = 15
     Anchors = [akLeft, akBottom]
     Caption = 'Filter:'
   end
   object lv: TListView
     Left = 0
     Top = 0
-    Width = 557
-    Height = 161
+    Width = 589
+    Height = 180
     Anchors = [akLeft, akTop, akRight, akBottom]
     Checkboxes = True
     Columns = <
@@ -50,7 +50,7 @@ object ViewToDoForm: TViewToDoForm
       end
       item
         Caption = 'Description'
-        Width = 231
+        Width = 263
       end
       item
         Caption = 'Filename'
@@ -73,8 +73,8 @@ object ViewToDoForm: TViewToDoForm
     OnMouseDown = lvMouseDown
   end
   object btnClose: TButton
-    Left = 470
-    Top = 176
+    Left = 502
+    Top = 211
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -85,7 +85,7 @@ object ViewToDoForm: TViewToDoForm
   end
   object chkNoDone: TCheckBox
     Left = 8
-    Top = 192
+    Top = 227
     Width = 289
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -95,12 +95,12 @@ object ViewToDoForm: TViewToDoForm
   end
   object cmbFilter: TComboBox
     Left = 52
-    Top = 168
+    Top = 195
     Width = 245
-    Height = 21
+    Height = 23
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
-    ItemHeight = 13
+    ItemHeight = 15
     TabOrder = 3
     OnChange = cmbFilterChange
     Items.Strings = (

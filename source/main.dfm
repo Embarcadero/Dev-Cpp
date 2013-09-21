@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 323
-  Top = 405
+  Left = 873
+  Top = 464
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -960,7 +960,7 @@ object MainForm: TMainForm
       object GotoLineBtn: TToolButton
         Left = 77
         Top = 0
-        Action = actGoto
+        Action = actGotoLine
       end
     end
     object tbSpecials: TToolBar
@@ -986,26 +986,20 @@ object MainForm: TMainForm
       object InsertBtn: TToolButton
         Left = 0
         Top = 0
-        Hint = 'Insert'
-        Caption = 'Insert'
+        Action = actInsert
         ImageIndex = 1
-        OnClick = InsertBtnClick
       end
       object ToggleBtn: TToolButton
         Left = 23
         Top = 0
-        Hint = 'Toggle'
-        Caption = 'Toggle'
+        Action = actToggle
         ImageIndex = 2
-        OnClick = ToggleBtnClick
       end
       object GotoBtn: TToolButton
         Left = 46
         Top = 0
-        Hint = 'Goto'
-        Caption = 'Goto'
+        Action = actGoto
         ImageIndex = 3
-        OnClick = GotoBtnClick
       end
     end
     object tbClasses: TToolBar
@@ -1035,11 +1029,15 @@ object MainForm: TMainForm
         Font.Name = 'Courier New'
         Font.Style = []
         ItemHeight = 14
+        ItemIndex = 0
         ParentCtl3D = False
         ParentFont = False
         Sorted = True
         TabOrder = 0
+        Text = '(globals)'
         OnChange = cmbClassesChange
+        Items.Strings = (
+          '(globals)')
       end
       object cmbMembers: TComboBox
         Left = 350
@@ -1426,6 +1424,7 @@ object MainForm: TMainForm
       end
       object InsertItem: TMenuItem
         Caption = '&Insert'
+        ImageIndex = 18
         object DateTimeMenuItem: TMenuItem
           Caption = '&Date/Time'
           OnClick = DateTimeMenuItemClick
@@ -1443,7 +1442,7 @@ object MainForm: TMainForm
         ImageIndex = 19
       end
       object GotoBookmarksItem: TMenuItem
-        Caption = '&Goto Bookmarks'
+        Caption = 'Goto Bookmark'
         ImageIndex = 20
       end
       object N26: TMenuItem
@@ -1502,7 +1501,7 @@ object MainForm: TMainForm
         Action = actGotoFunction
       end
       object GotolineItem: TMenuItem
-        Action = actGoto
+        Action = actGotoLine
       end
     end
     object ViewMenu: TMenuItem
@@ -1696,9 +1695,6 @@ object MainForm: TMainForm
       object StopExecution1: TMenuItem
         Action = actStopExecute
         ShortCut = 49265
-      end
-      object mnuDebugParameters: TMenuItem
-        Action = actExecParams
       end
       object N18: TMenuItem
         Caption = '-'
@@ -2457,7 +2453,7 @@ object MainForm: TMainForm
       ImageIndex = 23
       ShortCut = 114
       OnExecute = actFindNextExecute
-      OnUpdate = actFindNextUpdate
+      OnUpdate = actUpdateEmptyEditor
     end
     object actIncremental: TAction
       Category = 'Search'
@@ -2466,13 +2462,13 @@ object MainForm: TMainForm
       OnExecute = actIncrementalExecute
       OnUpdate = actUpdateEmptyEditor
     end
-    object actGoto: TAction
+    object actGotoLine: TAction
       Tag = 5
       Category = 'Search'
       Caption = '&Go to line...'
       ImageIndex = 24
       ShortCut = 16455
-      OnExecute = actGotoExecute
+      OnExecute = actGotoLineExecute
       OnUpdate = actUpdateEmptyEditor
     end
     object actProjectManager: TAction
@@ -2773,6 +2769,7 @@ object MainForm: TMainForm
     object actEditMenu: TAction
       Caption = '&Edit'
       OnExecute = actFileMenuExecute
+      OnUpdate = actEditMenuUpdate
     end
     object actSearchMenu: TAction
       Caption = '&Search'
@@ -2836,24 +2833,28 @@ object MainForm: TMainForm
       Caption = 'Comment'
       ShortCut = 49342
       OnExecute = actCommentExecute
+      OnUpdate = actUpdateEmptyEditor
     end
     object actUncomment: TAction
       Category = 'Edit'
       Caption = 'Uncomment'
       ShortCut = 49340
       OnExecute = actUncommentExecute
+      OnUpdate = actUpdateEmptyEditor
     end
     object actIndent: TAction
       Category = 'Edit'
       Caption = 'Indent'
       ShortCut = 9
       OnExecute = actIndentExecute
+      OnUpdate = actUpdateEmptyEditor
     end
     object actUnindent: TAction
       Category = 'Edit'
       Caption = 'Unindent'
       ShortCut = 8201
       OnExecute = actUnindentExecute
+      OnUpdate = actUpdateEmptyEditor
     end
     object actGotoFunction: TAction
       Category = 'Search'
@@ -3100,7 +3101,7 @@ object MainForm: TMainForm
       Caption = 'Delete Profiling information'
       ImageIndex = 11
       OnExecute = actDeleteProfileProjectExecute
-      OnUpdate = actDeleteProfRunUpdate
+      OnUpdate = actRunUpdate
     end
     object actGotoDeclEditor: TAction
       Category = 'ClassBrowser'
@@ -3122,11 +3123,33 @@ object MainForm: TMainForm
       Category = 'Edit'
       Caption = 'actCollapse'
       OnExecute = actCollapseExecute
+      OnUpdate = actUpdateEmptyEditor
     end
     object actUnCollapse: TAction
       Category = 'Edit'
       Caption = 'actUnCollapse'
       OnExecute = actUnCollapseExecute
+      OnUpdate = actUpdateEmptyEditor
+    end
+    object actInsert: TAction
+      Category = 'Edit'
+      Caption = 'Insert'
+      ImageIndex = 18
+      OnExecute = actInsertExecute
+      OnUpdate = actUpdatePageCount
+    end
+    object actToggle: TAction
+      Category = 'Edit'
+      Caption = 'Toggle Bookmarks'
+      ImageIndex = 19
+      OnExecute = actToggleExecute
+      OnUpdate = actUpdatePageCount
+    end
+    object actGoto: TAction
+      Category = 'Edit'
+      Caption = 'Goto Bookmark'
+      ImageIndex = 20
+      OnUpdate = actUpdatePageCount
     end
   end
   object MessagePopup: TPopupMenu

@@ -1544,7 +1544,6 @@ procedure TdevEditor.AssignEditor(Editor: TSynEdit);
 var
 	pt: TPoint;
 begin
-	if (not assigned(Editor)) or (not (Editor is TCustomSynEdit)) then exit;
 	with Editor do begin
 		BeginUpdate;
 		try

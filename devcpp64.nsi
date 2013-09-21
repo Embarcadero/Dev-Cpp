@@ -3,7 +3,7 @@
 
 !define COMPILERNAME "MinGW64"
 !define DEVCPP_VERSION "5.2.0.1"
-!define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} TDM-GCC Setup.exe"
+!define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} TDM-GCC x64 Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
 Var LOCAL_APPDATA

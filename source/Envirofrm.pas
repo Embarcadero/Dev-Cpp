@@ -407,7 +407,6 @@ begin
   rgbAutoOpen.Items[3]:=     Lang[ID_ENV_AUTONONE];
 
   gbAltConfig.Caption:=      Lang[ID_ENV_GBALTCONFIG];
-  chkAltConfig.Caption:=     Lang[ID_ENV_USEALTCONFIG];
   lblLang.Caption:=          Lang[ID_ENV_LANGUAGE];
   lblTheme.Caption:=         Lang[ID_ENV_THEME];
   lblmsgTabs.Caption:=       Lang[ID_ENV_MSGTABS];

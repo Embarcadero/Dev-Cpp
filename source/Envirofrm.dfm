@@ -1,6 +1,6 @@
 object EnviroForm: TEnviroForm
-  Left = 1161
-  Top = 450
+  Left = 622
+  Top = 282
   BorderStyle = bsDialog
   Caption = 'Environment Options'
   ClientHeight = 432
@@ -425,7 +425,7 @@ object EnviroForm: TEnviroForm
       object btnOutputbrws: TSpeedButton
         Tag = 2
         Left = 413
-        Top = 173
+        Top = 165
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -611,13 +611,13 @@ object EnviroForm: TEnviroForm
         Left = 8
         Top = 12
         Width = 433
-        Height = 73
+        Height = 61
         Caption = ' Alternate Configuration File '
         TabOrder = 0
         object btnAltConfig: TSpeedButton
           Tag = 7
-          Left = 358
-          Top = 42
+          Left = 398
+          Top = 26
           Width = 23
           Height = 22
           Glyph.Data = {
@@ -651,17 +651,16 @@ object EnviroForm: TEnviroForm
         end
         object chkAltConfig: TCheckBox
           Left = 12
-          Top = 20
-          Width = 361
+          Top = 28
+          Width = 13
           Height = 17
-          Caption = 'Use this alternate configuration file'
           TabOrder = 0
           OnClick = chkAltConfigClick
         end
         object edAltConfig: TEdit
           Left = 32
-          Top = 42
-          Width = 313
+          Top = 26
+          Width = 361
           Height = 23
           TabOrder = 1
           Text = 'edAltConfig'

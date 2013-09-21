@@ -230,7 +230,7 @@ type
 		actFindAll: TAction;
 		actReplace: TAction;
 		actFindNext: TAction;
-		actGoto: TAction;
+		actGotoLine: TAction;
 		actProjectManager: TAction;
 		actStatusbar: TAction;
 		actCompOutput: TAction;
@@ -431,7 +431,6 @@ type
 		actViewCPU: TAction;
 		actExecParams: TAction;
 		mnuExecParameters: TMenuItem;
-		mnuDebugParameters: TMenuItem;
 		DevCppDDEServer: TDdeServerConv;
 		actShowTips: TAction;
 		ips1: TMenuItem;
@@ -591,6 +590,9 @@ type
 		UncollapseAll: TMenuItem;
 		actCollapse: TAction;
 		actUnCollapse: TAction;
+		actInsert: TAction;
+		actToggle: TAction;
+		actGoto: TAction;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -602,12 +604,9 @@ type
 
 		procedure ToggleBookmarkClick(Sender: TObject);
 		procedure GotoBookmarkClick(Sender: TObject);
-		procedure ToggleBtnClick(Sender: TObject);
-		procedure GotoBtnClick(Sender: TObject);
 		procedure MessageControlChange(Sender: TObject);
 		procedure ProjectViewContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
 		procedure ProjectViewDblClick(Sender: TObject);
-		procedure InsertBtnClick(Sender: TObject);
 		procedure ToolbarClick(Sender: TObject);
 		procedure ToolbarContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
 		procedure SplitterBottomCanResize(Sender: TObject;var NewSize: Integer; var Accept: Boolean);
@@ -663,7 +662,7 @@ type
 		procedure actFindAllExecute(Sender: TObject);
 		procedure actReplaceExecute(Sender: TObject);
 		procedure actFindNextExecute(Sender: TObject);
-		procedure actGotoExecute(Sender: TObject);
+		procedure actGotoLineExecute(Sender: TObject);
 		procedure actCompileExecute(Sender: TObject);
 		procedure actRunExecute(Sender: TObject);
 		procedure actCompRunExecute(Sender: TObject);
@@ -705,7 +704,6 @@ type
 		procedure actPasteUpdate(Sender: TObject);
 		procedure actSaveUpdate(Sender: TObject);
 		procedure actSaveAsUpdate(Sender: TObject);
-		procedure actFindNextUpdate(Sender: TObject);
 		procedure actFileMenuExecute(Sender: TObject);
 		procedure actToolsMenuExecute(Sender: TObject);
 		procedure actDeleteExecute(Sender: TObject);
@@ -760,10 +758,6 @@ type
 		procedure lvBacktraceCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
 		procedure lvBacktraceMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
 		procedure actRunUpdate(Sender: TObject);
-
-		// Orwell 2011
-		procedure actDeleteProfRunUpdate(Sender: TObject);
-
 		procedure actCompileUpdate(Sender: TObject);
 		procedure devFileMonitorNotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: String);
 		procedure actFilePropertiesExecute(Sender: TObject);
@@ -855,6 +849,10 @@ type
 		procedure NewFileBtnClick(Sender: TObject);
 		procedure actUnCollapseExecute(Sender: TObject);
 		procedure actCollapseExecute(Sender: TObject);
+		procedure actInsertExecute(Sender: TObject);
+		procedure actToggleExecute(Sender: TObject);
+		procedure actGotoExecute(Sender: TObject);
+    procedure actEditMenuUpdate(Sender: TObject);
 
 	private
 		fmsgHeight			: integer;
@@ -1542,12 +1540,17 @@ begin
 	actCollapse.Caption:=				Lang[ID_ITEM_COLLAPSEALL];
 	actUnCollapse.Caption:=				Lang[ID_ITEM_UNCOLLAPSEALL];
 
+	// Mainform toolbar buttons
+	actInsert.Caption:=					Lang[ID_TB_INSERT];
+	actToggle.Caption:=					Lang[ID_TB_TOGGLE];
+	actGoto.Caption:=					Lang[ID_TB_GOTO];
+
 	// Search Menu
 	actFind.Caption:=					Lang[ID_ITEM_FIND];
 	actFindAll.Caption:=				Lang[ID_ITEM_FINDINALL];
 	actReplace.Caption:=				Lang[ID_ITEM_REPLACE];
 	actFindNext.Caption:=				Lang[ID_ITEM_FINDNEXT];
-	actGoto.Caption:=					Lang[ID_ITEM_GOTO];
+	actGotoLine.Caption:=				Lang[ID_ITEM_GOTO];
 	actIncremental.Caption:=			Lang[ID_ITEM_INCREMENTAL];
 	actGotoFunction.Caption:=			Lang[ID_ITEM_GOTOFUNCTION];
 
@@ -1729,11 +1732,6 @@ begin
 	tabDebugOutput.Caption:=			Lang[ID_DEB_OUTPUT];
 
 	pnlFull.Caption:=					Format(Lang[ID_FULLSCREEN_MSG], [DEVCPP, DEVCPP_VERSION]);
-
-	// Mainform toolbar buttons
-	InsertBtn.Caption :=				Lang[ID_TB_INSERT];
-	ToggleBtn.Caption :=				Lang[ID_TB_TOGGLE];
-	GotoBtn.Caption :=					Lang[ID_TB_GOTO];
 
 	BuildBookMarkMenus;
 	SetHints;
@@ -1971,8 +1969,12 @@ begin
 				fProject.CloseUnit(fProject.Units.Indexof(e));
 		end;
 
-		if PageControl.PageCount = 0 then
+		if PageControl.PageCount = 0 then begin
 			PageControl.Visible := false;
+			Statusbar.Panels[0].Text := '';
+			Statusbar.Panels[1].Text := '';
+			StatusBar.Panels[2].Text := '';
+		end;
 
 		e:=GetEditor;
 		if Assigned(e) then begin
@@ -2027,28 +2029,6 @@ begin
 	e:=GetEditor;
 	if assigned(e) then
 		e.Text.GotoBookMark((Sender as TMenuItem).Tag);
-end;
-
-procedure TMainForm.ToggleBtnClick(Sender: TObject);
-var
- e: TEditor;
- pt: TPoint;
-begin
-	e:= GetEditor;
-	if assigned(e) then begin
-		pt:= tbSpecials.ClientToScreen(point(Togglebtn.Left, Togglebtn.Top +togglebtn.Height));
-		TrackPopupMenu(ToggleBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.x, pt.y, 0, Self.Handle, nil);
-	end;
-end;
-
-procedure TMainForm.GotoBtnClick(Sender: TObject);
-var
- pt: TPoint;
-begin
-	if PageControl.ActivePageIndex> -1 then begin
-		pt:= tbSpecials.ClientToScreen(point(Gotobtn.Left, Gotobtn.Top +Gotobtn.Height));
-		TrackPopupMenu(GotoBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON, pt.x, pt.y, 0, Self.Handle, nil);
-	end;
 end;
 
 procedure TMainForm.OpenCloseMessageSheet(_Show: boolean);
@@ -2161,8 +2141,6 @@ var
 	e: TEditor;
 	idx : integer;
 begin
-//	if s[length(s)] = '.' then // correct filename if the user gives an alone dot to force the no extension
-//		s[length(s)] := #0;
 	idx := FileIsOpen(s);
 	if (idx <> -1) then begin
 		GetEditor(idx).Activate;
@@ -2462,16 +2440,6 @@ begin
 	OpenUnit;
 end;
 
-procedure TMainForm.InsertBtnClick(Sender: TObject);
-var
-	pt: TPoint;
-begin
-	if PageControl.ActivePageIndex > -1 then begin
-		pt:= tbSpecials.ClientToScreen(point(Insertbtn.Left, Insertbtn.Top +Insertbtn.Height));
-		TrackPopupMenu(InsertItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON, pt.X, pt.Y, 0, Self.Handle, nil);
-	end;
-end;
-
 procedure TMainForm.actNewSourceExecute(Sender: TObject);
 var
 	NewEditor: TEditor;
@@ -2643,7 +2611,7 @@ begin
 
 	for idx:= 0 to pred(PageControl.PageCount) do begin
 		e := GetEditor(idx);
-		if (e.Modified) and ((not e.InProject) or e.IsRes) then
+		if e.Modified and ((not e.InProject) or e.IsRes) then
 			if not SaveFile(GetEditor(idx)) then
 				Break;
 	end;
@@ -2709,8 +2677,12 @@ begin
 	ClassBrowser1.ProjectDir:='';
 	CppParser.Reset;
 
-	if PageControl.PageCount = 0 then
+	if PageControl.PageCount = 0 then begin
 		PageControl.Visible := false;
+		Statusbar.Panels[0].Text := '';
+		Statusbar.Panels[1].Text := '';
+		StatusBar.Panels[2].Text := '';
+	end;
 
 	if wa then
 		devFileMonitor.Activate;
@@ -3206,7 +3178,7 @@ begin
 	if Assigned(e) then e.SearchAgain;
 end;
 
-procedure TMainForm.actGotoExecute(Sender: TObject);
+procedure TMainForm.actGotoLineExecute(Sender: TObject);
 var
  e: TEditor;
 begin
@@ -3554,8 +3526,8 @@ procedure TMainForm.actUpdateEmptyEditor(Sender: TObject);
 var
 	e: TEditor;
 begin
-	e:= GetEditor;
-	(Sender as TAction).Enabled:= assigned(e) and (e.Text.Text <> '')
+	e := GetEditor;
+	(Sender as TAction).Enabled:= Assigned(e) and (e.Text.Text <> '');
 end;
 
 procedure TMainForm.actUpdateDebuggerRunning(Sender: TObject);
@@ -3835,13 +3807,12 @@ begin
 	// replaced redundant code...
 	e:=GetEditorFromFileName(FindOutput.Selected.SubItems[1]);
 
-	if assigned(e) then
-	 begin
-		 e.Text.CaretXY:= BufferCoord(col, line);
-		 e.Text.SetSelWord;
-		 e.Text.CaretXY:= e.Text.BlockBegin;
-		 e.Activate;
-	 end;
+	if assigned(e) then begin
+		e.Text.CaretXY:= BufferCoord(col, line);
+		e.Text.SetSelWord;
+		e.Text.CaretXY:= e.Text.BlockBegin;
+		e.Activate;
+	end;
 end;
 
 procedure TMainForm.actShowBarsExecute(Sender: TObject);
@@ -4071,15 +4042,6 @@ var
 begin
 	e:= GetEditor;
 	actSaveAs.Enabled:= assigned(e);
-end;
-
-procedure TMainForm.actFindNextUpdate(Sender: TObject);
-var
- e: TEditor;
-begin
-	e:= GetEditor;
-	// ** need to also check if a search has already happened
-	actFindNext.Enabled:= assigned(e) and (e.Text.Text <> '');
 end;
 
 procedure TMainForm.ClearMessageControl;
@@ -4450,14 +4412,6 @@ begin
 end;
 
 procedure TMainForm.actRunUpdate(Sender: TObject);
-begin
-	if Assigned(fProject) then
-		(Sender as TCustomAction).Enabled := not (fProject.Options.typ = dptStat) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling
-	else
-		(Sender as TCustomAction).Enabled := (PageControl.PageCount > 0) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling;
-end;
-
-procedure TMainForm.actDeleteProfRunUpdate(Sender: TObject);
 begin
 	if Assigned(fProject) then
 		(Sender as TCustomAction).Enabled := not (fProject.Options.typ = dptStat) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling
@@ -5312,20 +5266,18 @@ end;
 
 procedure TMainForm.actExecParamsExecute(Sender: TObject);
 begin
-	ParamsForm := TParamsForm.Create(self);
-	try
-		ParamsForm.ParamEdit.Text := fCompiler.RunParams;
+	with TParamsForm.Create(self) do begin
+		ParamEdit.Text := fCompiler.RunParams;
 		if Assigned(fProject) then
-			ParamsForm.HostEdit.Text := fProject.Options.HostApplication;
+			HostEdit.Text := fProject.Options.HostApplication;
 		if (not Assigned(fProject)) or (fProject.Options.typ <> dptDyn) then
-			ParamsForm.DisableHost;
-		if (ParamsForm.ShowModal = mrOk) then begin
-			fCompiler.RunParams := ParamsForm.ParamEdit.Text;
-			if (ParamsForm.HostEdit.Enabled) then
-				fProject.SetHostApplication(ParamsForm.HostEdit.Text);
+			DisableHost;
+		if (ShowModal = mrOk) then begin
+			fCompiler.RunParams := ParamEdit.Text;
+			if (HostEdit.Enabled) then
+				fProject.SetHostApplication(HostEdit.Text);
 		end;
-	finally
-		ParamsForm.Free;
+		Free;
 	end;
 end;
 
@@ -5358,9 +5310,8 @@ end;
 
 procedure TMainForm.actShowTipsExecute(Sender: TObject);
 begin
-	with TTipOfTheDayForm.Create(Self) do begin
+	with TTipOfTheDayForm.Create(Self) do
 		Show;
-	end;
 end;
 
 procedure TMainForm.actBrowserUseColorsExecute(Sender: TObject);
@@ -5413,7 +5364,8 @@ begin
 end;
 
 procedure TMainForm.PackageManagerItemClick(Sender: TObject);
-var s : string;
+var
+	s : string;
 begin
 	s := IncludeTrailingBackslash(devDirs.Exec) + PACKMAN_PROGRAM;
 	ExecuteFile(s, '', IncludeTrailingBackslash(devDirs.Exec), SW_SHOW)
@@ -5509,9 +5461,7 @@ begin
 	end;
 end;
 
-procedure TMainForm.ProjectViewChanging(Sender: TObject; Node: TTreeNode;
-var
-	AllowChange: Boolean);
+procedure TMainForm.ProjectViewChanging(Sender: TObject; Node: TTreeNode;var AllowChange: Boolean);
 begin
 	Node.MakeVisible;
 end;
@@ -5703,7 +5653,7 @@ procedure TMainForm.ProjectViewKeyPress(Sender: TObject; var Key: Char);
 begin
 	// fixs an annoying bug/behavior of the tree ctrl (a beep on enter key)
 	if Key = #13 then
-			Key := #0;
+		Key := #0;
 end;
 
 procedure TMainForm.ProjectViewMouseDown(Sender: TObject;
@@ -6786,6 +6736,37 @@ begin
 	e:=GetEditor;
 	if Assigned(e) then
 		e.Text.CollapseAll;
+end;
+
+procedure TMainForm.actInsertExecute(Sender: TObject);
+var
+	pt: TPoint;
+begin
+	pt:= tbSpecials.ClientToScreen(point(Insertbtn.Left, Insertbtn.Top +Insertbtn.Height));
+	TrackPopupMenu(InsertItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON, pt.X, pt.Y, 0, Self.Handle, nil);
+end;
+
+procedure TMainForm.actToggleExecute(Sender: TObject);
+var
+	pt: TPoint;
+begin
+	pt:= tbSpecials.ClientToScreen(point(Togglebtn.Left, Togglebtn.Top +togglebtn.Height));
+	TrackPopupMenu(ToggleBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.x, pt.y, 0, Self.Handle, nil);
+end;
+
+procedure TMainForm.actGotoExecute(Sender: TObject);
+var
+	pt: TPoint;
+begin
+	pt:= tbSpecials.ClientToScreen(point(Gotobtn.Left, Gotobtn.Top +Gotobtn.Height));
+	TrackPopupMenu(GotoBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON, pt.x, pt.y, 0, Self.Handle, nil);
+end;
+
+procedure TMainForm.actEditMenuUpdate(Sender: TObject);
+begin
+	InsertItem.Enabled := PageControl.PageCount > 0;
+	ToggleBookmarksItem.Enabled := PageControl.PageCount > 0;
+	GotoBookmarksItem.Enabled := PageControl.PageCount > 0;
 end;
 
 end.

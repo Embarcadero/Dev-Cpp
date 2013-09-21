@@ -1,87 +1,62 @@
 object ToolEditForm: TToolEditForm
-  Left = 782
-  Top = 351
+  Left = 778
+  Top = 377
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Edit tool'
   ClientHeight = 304
-  ClientWidth = 357
+  ClientWidth = 484
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
-    357
+    484
     304)
   PixelsPerInch = 96
-  TextHeight = 13
-  object Bevel2: TBevel
-    Left = 186
-    Top = 180
-    Width = 160
-    Height = 45
-  end
-  object lblDesc: TLabel
-    Left = 188
-    Top = 182
-    Width = 156
-    Height = 41
-    AutoSize = False
-    Caption = '<NONE>'
-    Color = 14548990
-    ParentColor = False
-    ShowAccelChar = False
-    WordWrap = True
-  end
+  TextHeight = 15
   object lblTitle: TLabel
     Left = 8
     Top = 12
-    Width = 20
-    Height = 13
+    Width = 23
+    Height = 15
     Caption = 'Title'
   end
   object lblProg: TLabel
     Left = 8
     Top = 40
-    Width = 39
-    Height = 13
+    Width = 46
+    Height = 15
     Caption = 'Program'
   end
   object lblWorkDir: TLabel
     Left = 8
     Top = 69
-    Width = 85
-    Height = 13
+    Width = 96
+    Height = 15
     Caption = 'Working Directory'
   end
   object lblParam: TLabel
     Left = 8
     Top = 98
-    Width = 53
-    Height = 13
+    Width = 59
+    Height = 15
     Caption = 'Parameters'
   end
   object lblMacros: TLabel
     Left = 7
-    Top = 165
-    Width = 84
-    Height = 13
+    Top = 157
+    Width = 93
+    Height = 15
     Caption = 'Available Macros:'
   end
-  object Bevel1: TBevel
-    Left = 4
-    Top = 155
-    Width = 345
-    Height = 2
-    Shape = bsTopLine
-  end
   object btnProg: TSpeedButton
-    Left = 323
+    Left = 451
     Top = 36
     Width = 23
     Height = 22
@@ -115,7 +90,7 @@ object ToolEditForm: TToolEditForm
     OnClick = btnProgClick
   end
   object btnWorkDir: TSpeedButton
-    Left = 323
+    Left = 451
     Top = 65
     Width = 23
     Height = 22
@@ -148,77 +123,78 @@ object ToolEditForm: TToolEditForm
       BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
     OnClick = btnWorkDirClick
   end
+  object lblDesc: TMemo
+    Left = 168
+    Top = 180
+    Width = 305
+    Height = 51
+    Color = clBtnFace
+    Enabled = False
+    ReadOnly = True
+    TabOrder = 10
+  end
   object edTitle: TEdit
-    Left = 96
+    Left = 120
     Top = 8
-    Width = 251
-    Height = 21
+    Width = 353
+    Height = 23
     TabOrder = 0
   end
   object edProgram: TEdit
-    Left = 96
+    Left = 120
     Top = 36
-    Width = 219
-    Height = 21
+    Width = 321
+    Height = 23
     TabOrder = 1
     OnChange = edProgramChange
     OnEnter = EditEnter
   end
   object edWorkDir: TEdit
-    Left = 96
+    Left = 120
     Top = 65
-    Width = 219
-    Height = 21
+    Width = 321
+    Height = 23
     TabOrder = 2
     OnEnter = EditEnter
   end
   object edParams: TEdit
-    Left = 96
+    Left = 120
     Top = 94
-    Width = 251
-    Height = 21
+    Width = 353
+    Height = 23
     TabOrder = 3
     OnChange = edParamsChange
     OnEnter = EditEnter
   end
   object btnCancel: TBitBtn
-    Left = 176
+    Left = 304
     Top = 272
     Width = 85
     Height = 24
     Anchors = [akLeft, akBottom]
     Caption = '&Cancel'
-    TabOrder = 9
+    TabOrder = 8
     OnClick = btnCancelClick
     Kind = bkCancel
   end
   object btnOk: TBitBtn
-    Left = 94
+    Left = 214
     Top = 272
     Width = 81
     Height = 24
     Anchors = [akLeft, akBottom]
     Caption = '&OK'
-    TabOrder = 8
+    TabOrder = 7
     Kind = bkOK
-  end
-  object Panel1: TPanel
-    Left = 4
-    Top = 262
-    Width = 345
-    Height = 2
-    Anchors = [akLeft, akBottom]
-    BevelOuter = bvLowered
-    TabOrder = 4
   end
   object lstMacro: TListBox
     Left = 8
     Top = 180
-    Width = 168
-    Height = 69
+    Width = 153
+    Height = 79
     Color = 14548990
     IntegralHeight = True
-    ItemHeight = 13
+    ItemHeight = 15
     Items.Strings = (
       '<DEFAULT>'
       '<EXECPATH>'
@@ -231,17 +207,17 @@ object ToolEditForm: TToolEditForm
       '<SOURCESPCLIST>'
       '<WORDXY>'
       '<DEVCPPVERSION>')
-    TabOrder = 5
+    TabOrder = 4
     OnClick = lstMacroClick
     OnDblClick = btnInsertClick
   end
   object btnInsert: TBitBtn
-    Left = 186
-    Top = 228
+    Left = 170
+    Top = 236
     Width = 103
     Height = 24
     Caption = '&Insert Macro'
-    TabOrder = 6
+    TabOrder = 5
     OnClick = btnInsertClick
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -259,27 +235,29 @@ object ToolEditForm: TToolEditForm
     NumGlyphs = 2
   end
   object btnHelp: TBitBtn
-    Left = 271
+    Left = 399
     Top = 272
     Width = 75
     Height = 24
     Anchors = [akLeft, akBottom]
-    TabOrder = 7
+    TabOrder = 6
     OnClick = HelpClick
     Kind = bkHelp
   end
   object ParamText: TEdit
     Left = 8
-    Top = 124
-    Width = 337
-    Height = 21
-    Color = clInactiveCaptionText
+    Top = 128
+    Width = 465
+    Height = 23
+    AutoSize = False
+    Color = clBtnFace
+    Enabled = False
     ReadOnly = True
-    TabOrder = 10
+    TabOrder = 9
   end
   object OpenDialog: TOpenDialog
     Filter = 'Applications (*.exe)|*.exe|All files (*.*)|*.*'
     Left = 4
-    Top = 244
+    Top = 268
   end
 end

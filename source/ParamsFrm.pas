@@ -51,9 +51,6 @@ type
     { Public declarations }
   end;
 
-var
-  ParamsForm: TParamsForm;
-
 implementation
 
 uses
@@ -82,13 +79,13 @@ end;
 
 procedure TParamsForm.DisableHost;
 begin
-  HostEdit.Enabled := false;
-  LoadBtn.Enabled := false;
+	HostEdit.Enabled := false;
+	LoadBtn.Enabled := false;
 end;
 
 procedure TParamsForm.FormCreate(Sender: TObject);
 begin
-  LoadText;
+	LoadText;
 end;
 
 end.

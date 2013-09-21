@@ -44,7 +44,6 @@ type
     Bevel1: TBevel;
     lblUrl: TLabel;
     btnRandom: TButton;
-    procedure FormShow(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -58,17 +57,14 @@ type
     sl: TStringList;
     TipsCounter: integer;
     HiddenUrl: string;
-    function ConvertMacros(Str: string): string;
-    procedure LoadFromFile(Filename: string);
+    function ConvertMacros(const Str: string): string;
+    procedure LoadFromFile(const Filename: string);
     function CurrentTip: string;
     function NextTip: string;
     function PreviousTip: string;
     function RandomTip: string;
     procedure LoadText;
   end;
-
-//var
-//  TipOfTheDayForm: TTipOfTheDayForm;
 
 implementation
 
@@ -77,42 +73,12 @@ uses
 
 {$R *.dfm}
 
-procedure TTipOfTheDayForm.FormShow(Sender: TObject);
-var
-  S: string;
-  LangNoExt: string;
-  ExtPos: integer;
-begin
-  lblUrl.Visible := False;
-  LangNoExt := Lang.FileFromDescription(devData.Language);
-  ExtPos := Pos(ExtractFileExt(LangNoExt), LangNoExt);
-  Delete(LangNoExt, ExtPos, MaxInt);
-  S := devDirs.Lang + ExtractFileName(LangNoExt) + '.tips';
-  if not FileExists(S) then
-    S := devDirs.Lang + 'English.tips';
-  if not FileExists(S) then begin
-    btnNext.Enabled := False;
-    btnPrev.Enabled := False;
-  end
-  else begin
-    LoadFromFile(S);
-    if (TipsCounter < 0) or (TipsCounter >= sl.Count) then
-      TipsCounter := 0;
-    if sl.Count > 0 then
-      lblTip.Caption := CurrentTip
-    else begin
-      btnNext.Enabled := False;
-      btnPrev.Enabled := False;
-    end;
-  end;
-end;
-
 procedure TTipOfTheDayForm.btnCloseClick(Sender: TObject);
 begin
 	Close;
 end;
 
-function TTipOfTheDayForm.ConvertMacros(Str: string): string;
+function TTipOfTheDayForm.ConvertMacros(const Str: string): string;
 var
   idx: integer;
   url: string;
@@ -145,11 +111,37 @@ begin
 end;
 
 procedure TTipOfTheDayForm.FormCreate(Sender: TObject);
+var
+  S: string;
+  LangNoExt: string;
+  ExtPos: integer;
 begin
 	LoadText;
 	chkNotAgain.Checked:=not devData.ShowTipsOnStart;
 	TipsCounter := devData.LastTip;
 	sl := TStringList.Create;
+
+	lblUrl.Visible := False;
+	LangNoExt := Lang.FileFromDescription(devData.Language);
+	ExtPos := Pos(ExtractFileExt(LangNoExt), LangNoExt);
+	Delete(LangNoExt, ExtPos, MaxInt);
+	S := devDirs.Lang + ExtractFileName(LangNoExt) + '.tips';
+	if not FileExists(S) then
+		S := devDirs.Lang + 'English.tips';
+	if not FileExists(S) then begin
+		btnNext.Enabled := False;
+		btnPrev.Enabled := False;
+	end else begin
+		LoadFromFile(S);
+		if (TipsCounter < 0) or (TipsCounter >= sl.Count) then
+			TipsCounter := 0;
+		if sl.Count > 0 then
+			lblTip.Caption := CurrentTip
+		else begin
+			btnNext.Enabled := False;
+			btnPrev.Enabled := False;
+		end;
+	end;
 end;
 
 procedure TTipOfTheDayForm.FormDestroy(Sender: TObject);
@@ -208,7 +200,7 @@ begin
   lblTip.Caption := RandomTip;
 end;
 
-procedure TTipOfTheDayForm.LoadFromFile(Filename: string);
+procedure TTipOfTheDayForm.LoadFromFile(const Filename: string);
 var
   I: integer;
 begin

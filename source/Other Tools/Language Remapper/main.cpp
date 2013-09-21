@@ -331,7 +331,7 @@ void OpenFixSaveIDFile(const char *path,const char *pathnew) {
 /*
 	Pretty much all the code the 'end user' needs to use can be found here... 
 */
-int main(int argc, char *argv[]) {
+int main() {
 	
 	// Cache the reference language
 	CacheReferenceLanguage("C:\\Program Files (x86)\\Dev-Cpp\\Lang\\English.lng");

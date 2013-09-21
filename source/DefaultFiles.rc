@@ -184,7 +184,7 @@ STRINGTABLE
  6007, "clRed, clMaroon, 0, 0, 0"
  6008, "clBlue, clNone, 0, 0, 0"
  6009, "clFuchsia, clNone, 0, 0, 0"
- 6010, "clLime, clNone, 0, 0, 0"
+ 6010, "$00CCCC33, clNone, 0, 0, 0"
  6011, "clGreen, clNone, 0, 0, 0"
  6012, "clWhite, clBlack, 0, 0, 0"
  6013, "$00C3C3C3, clNone, 0, 0, 0"
@@ -196,5 +196,5 @@ STRINGTABLE
  6019, "clWhite, 16711680"
  6020, "clLime, clBlack"
  6021, "clWhite, clNavy"
- 6022, "clLime, clBtnFace"
+ 6022, "clRed, clBtnFace"
 }

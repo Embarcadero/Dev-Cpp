@@ -94,36 +94,36 @@ object frmProjectOptions: TfrmProjectOptions
         Left = 88
         Top = 48
         Width = 425
-        Height = 13
+        Height = 33
         AutoSize = False
         Caption = 'lblPrjFname'
       end
       object lblUnits: TLabel
         Left = 8
-        Top = 104
+        Top = 120
         Width = 30
         Height = 15
         Caption = 'Units:'
       end
       object lblPrjUnits: TLabel
         Left = 88
-        Top = 104
+        Top = 120
         Width = 425
-        Height = 13
+        Height = 33
         AutoSize = False
         Caption = 'lblPrjUnits'
       end
       object lblPrjOutputFname: TLabel
         Left = 88
-        Top = 76
+        Top = 84
         Width = 425
-        Height = 13
+        Height = 33
         AutoSize = False
         Caption = 'lblPrjOutputFname'
       end
       object lblPrjOutput: TLabel
         Left = 8
-        Top = 76
+        Top = 84
         Width = 41
         Height = 15
         Caption = 'Output:'
@@ -488,7 +488,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 385
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
+        ItemHeight = 0
         TabOrder = 1
       end
     end

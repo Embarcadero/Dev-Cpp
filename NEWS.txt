@@ -1,13 +1,17 @@
-Version 5.2.0.1 - *
+Version 5.2.0.1 - 28 April 2012
 
 - Function tooltips now properly hide when switching tabs again (regression).
-- One can now select to open nothing and the previous selection on project reopen.
+- One can now select to open nothing and the previously left open files on project reopen.
 - Folds are now only repainted when the gutter is invalidated, reducing flicker.
 - Updated the uncomment function: it now supports any newline standard.
 - Code completion now does not remove too much characters when completing by accident.
 - The debugger now wants you to add debugging symbols instead of ingoring it alltogether.
 - Updated the project templates.
-- The first time config window now loads its stuff before showing up.
+- The first time configuration window now loads its stuff before showing up.
+- Updated the chinese (Traditional) translations.
+- Tidied up a few other dialogs.
+- Insert, Goto bookmark and Insert bookmark are now disabled when no editor is visible.
+- The status bar is now cleared when no editors are open.
 
 Version 5.2.0.0 - 17 April 2012
 

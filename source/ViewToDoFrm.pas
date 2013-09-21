@@ -295,6 +295,11 @@ end;
 
 procedure TViewToDoForm.LoadText;
 begin
+
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
 	Caption := Lang[ID_VIEWTODO_MENUITEM];
 
 {$IFDEF WIN32}

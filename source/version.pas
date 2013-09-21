@@ -33,8 +33,8 @@ const
 resourcestring
 	// misc strings
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.2.0.1 RC1';
-	DEVCPP_BUILDTIME     = 'April 22 2012 - 12:22';
+	DEVCPP_VERSION       = '5.2.0.1';
+	DEVCPP_BUILDTIME     = 'April 28 2012 - 10:09';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -119,12 +119,12 @@ resourcestring
   FLT_MSVCPROJECTS     = 'MS Visual C++ projects (*.dsp)|*.dsp';
   FLT_CBPROJECTS       = 'Code::Blocks projects (*.cbp)|*.cbp';
 
-  cBP                  = 'Break points';
-  cErr                 = 'Error Line';
-  cABP                 = 'Active Breakpoints';
+  cBP                  = 'Breakpoints';
+  cErr                 = 'Error line';
+  cABP                 = 'Active breakpoints';
   cGut                 = 'Gutter';
   cSel                 = 'Selected text';
-  cFld                 = 'Fold bar lines';
+  cFld                 = 'Folding lines';
 
 const
   // source file extensions

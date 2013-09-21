@@ -485,6 +485,10 @@ end;
 
 procedure TToolForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption:=               Lang[ID_TF];
   grpCurrent.Caption:=    '  '+Lang[ID_TF_LABEL] +'  ';
 

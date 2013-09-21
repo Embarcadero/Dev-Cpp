@@ -45,14 +45,11 @@ type
     edParams: TEdit;
     btnCancel: TBitBtn;
     btnOk: TBitBtn;
-    Panel1: TPanel;
     lblMacros: TLabel;
     lstMacro: TListBox;
     btnInsert: TBitBtn;
     btnHelp: TBitBtn;
-    Bevel1: TBevel;
-    lblDesc: TLabel;
-    Bevel2: TBevel;
+    lblDesc: TMemo;
     ParamText: TEdit;
     btnProg: TSpeedButton;
     btnWorkDir: TSpeedButton;
@@ -114,7 +111,7 @@ end;
 
 procedure TToolEditForm.lstMacroClick(Sender: TObject);
 begin
-  lblDesc.Caption:= Lang[lstMacro.ItemIndex +ID_ET_MACROS];
+  lblDesc.Text:= Lang[lstMacro.ItemIndex +ID_ET_MACROS];
 end;
 
 procedure TToolEditForm.btnProgClick(Sender: TObject);
@@ -157,6 +154,10 @@ end;
 
 procedure TToolEditForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption:=              Lang[ID_TE];
   lblTitle.Caption:=     Lang[ID_TE_TITLE];
   lblProg.Caption:=      Lang[ID_TE_PROG];

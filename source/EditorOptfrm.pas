@@ -83,7 +83,6 @@ type
     codepages: TPageControl;
     tabCPInserts: TTabSheet;
     tabCPDefault: TTabSheet;
-    seDefault: TSynEdit;
     btnAdd: TButton;
     btnEdit: TButton;
     btnRemove: TButton;
@@ -167,6 +166,7 @@ type
     cbSmartTabs: TCheckBox;
     cbHighlightColor: TLabel;
     cbDefaultCode: TCheckBox;
+    seDefault: TSynEdit;
     procedure FormCreate(Sender: TObject);
     procedure SetGutter;
     procedure ElementListClick(Sender: TObject);
@@ -915,8 +915,17 @@ begin
 	// update preview
 	cppedit.Gutter.Color:= fgutColor.x;
 	cppedit.Gutter.Font.Color:= fgutColor.y;
-
 	cppedit.CodeFolding.FolderBarLinesColor := fFoldColor.y;
+
+	// update snippet edit
+	CodeIns.Gutter.Color:= fgutColor.x;
+	CodeIns.Gutter.Font.Color:= fgutColor.y;
+	CodeIns.CodeFolding.FolderBarLinesColor := fFoldColor.y;
+
+	// update default source edit
+	seDefault.Gutter.Color:= fgutColor.x;
+	seDefault.Gutter.Font.Color:= fgutColor.y;
+	seDefault.CodeFolding.FolderBarLinesColor := fFoldColor.y;
 end;
 
 procedure TEditorOptForm.ElementListClick(Sender: TObject);
@@ -996,13 +1005,13 @@ end;
 
 procedure TEditorOptForm.StyleChange(Sender: TObject);
 var
- attr: TSynHighlighterAttributes;
- pt: TPoint;
- s: string;
+	attr: TSynHighlighterAttributes;
+	pt: TPoint;
+	s: string;
 begin
 	if not fUpdate then exit;
-	if ElementList.ItemIndex <0 then exit;
-	if ElementList.ItemIndex> pred(cpp.AttrCount) then begin
+	if ElementList.ItemIndex < 0 then exit;
+	if ElementList.ItemIndex > pred(cpp.AttrCount) then begin
 		pt.x:= cpBackground.SelectionColor;
 		pt.y:= cpForeground.SelectionColor;
 
@@ -1182,17 +1191,17 @@ begin
 		end;
 	end;
 
-  StrtoPoint(fBPColor,   LoadStr(offset+17)); // breakpoints
-  StrtoPoint(fErrColor,  LoadStr(offset+18)); // error line
-  StrtoPoint(fABPColor,  LoadStr(offset+19)); // active breakpoint
-  StrtoPoint(fgutColor,  LoadStr(offset+20)); // gutter
-  StrtoPoint(fSelColor,  LoadStr(offset+21)); // selected text
-  StrtoPoint(fFoldColor, LoadStr(offset+22)); // selected text
+	StrtoPoint(fBPColor,   LoadStr(offset+17)); // breakpoints
+	StrtoPoint(fErrColor,  LoadStr(offset+18)); // error line
+	StrtoPoint(fABPColor,  LoadStr(offset+19)); // active breakpoint
+	StrtoPoint(fgutColor,  LoadStr(offset+20)); // gutter
+	StrtoPoint(fSelColor,  LoadStr(offset+21)); // selected text
+	StrtoPoint(fFoldColor, LoadStr(offset+22)); // selected text
 
-  cppEdit.InvalidateLine(cSelection);
-  cppEdit.InvalidateLine(cBreakLine);
-  cppEdit.InvalidateLine(cABreakLine);
-  cppEdit.InvalidateLine(cErrorLine);
+	cppEdit.InvalidateLine(cSelection);
+	cppEdit.InvalidateLine(cBreakLine);
+	cppEdit.InvalidateLine(cABreakLine);
+	cppEdit.InvalidateLine(cErrorLine);
 
 	SetGutter;
 end;

@@ -1,6 +1,6 @@
 object ToolForm: TToolForm
-  Left = 679
-  Top = 381
+  Left = 1293
+  Top = 415
   Width = 325
   Height = 357
   BorderIcons = [biSystemMenu]
@@ -11,8 +11,8 @@ object ToolForm: TToolForm
   Constraints.MinWidth = 300
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   Icon.Data = {
     0000010001001010FF0000000000680500001600000028000000100000002000
@@ -68,7 +68,7 @@ object ToolForm: TToolForm
     309
     319)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object grpCurrent: TGroupBox
     Left = 16
     Top = 72

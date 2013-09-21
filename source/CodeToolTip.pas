@@ -144,6 +144,7 @@ type
     FActivated: Boolean;
     FParser: TCppParser;
     FTokenPos: Integer;
+    FFunctionEnd : Integer;
     FUpButton: TCustomCodeToolTipButton;
     FDownButton: TCustomCodeToolTipButton;
     FSelIndex: Integer;
@@ -165,6 +166,7 @@ type
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     function FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    function DummyPaint : integer; // obtain tooltip width
     procedure Paint; override;
     procedure RemoveEditor(AEditor: TCustomSynEdit);
     procedure RethinkCoordAndActivate;
@@ -537,20 +539,83 @@ begin
 	end;
 end;
 
+function TCodeToolTip.DummyPaint : integer;
+var
+	ArgumentIndex,HighlightStart: Integer;
+	CurPos : integer;
+	s : string;
+	InsideString : boolean;
+	HLAttr: TSynHighlighterAttributes;
+begin
+	Result := 4; // left offset in pixels
+
+	// when more than one tooltip is in the list
+	// we must draw the buttons as well ...
+	if FToolTips.Count > 1 then begin
+
+		// paint the UP button
+		Inc(Result, FUpButton.Left + FUpButton.Width);
+
+		// output text between the buttons
+		Inc(Result, FBmp.Canvas.TextWidth(Format(SCodeToolTipIndexXOfX, [FSelIndex+1, FToolTips.Count])) + 3);
+
+		// paint the DOWN button
+		Inc(Result, 3 + FDownButton.Width + FUpButton.Left);
+	end;
+
+	CurPos := 1;
+	ArgumentIndex := -1;
+	HighlightStart := 0;
+
+	// now loop through the hint and draw each letter
+	while Caption[CurPos] <> #0 do begin
+
+		// we use a lookup editor to get the syntax coloring for our tooltips and check for strings
+		FLookupEditor.CaretX := CurPos;
+		FLookupEditor.GetHighlighterAttriAtRowCol(FLookupEditor.CaretXY, S, HLAttr);
+		InsideString := (HLAttr = FLookupEditor.Highlighter.StringAttribute);
+
+		// Argument delimiters
+		if not InsideString then begin
+			if (Caption[CurPos] = ',') or (Caption[CurPos] = '(') then begin
+				Inc(ArgumentIndex);
+
+				// Don't draw this one red yet, but start at the next char...
+				HighlightStart := CurPos + 1;
+			end else if (Caption[CurPos] = ')') then begin
+
+				// Stop highlighting
+				Inc(ArgumentIndex,999);
+			end;
+		end;
+
+		with FBmp.Canvas do begin
+			Font.Color := clBlack; //don't use clCaptionText can be white too, making stuff unreadable
+			if (ArgumentIndex = FCurParamIndex) and (CurPos >= HighlightStart) then begin
+				Font.Style := [fsBold];
+				if (ttoCurrentArgumentExtra in FOptions) then
+					Font.Color := clRed;
+			end else
+				Font.Style := HLAttr.Style;
+
+			Inc(Result, TextWidth(Caption[CurPos]));
+		end;
+
+		Inc(CurPos);
+	end;
+end;
+
 // This function paints the tooltip to FBmp and copies it to the tooltip client surface
 procedure TCodeToolTip.Paint;
 var
-	WidthParam: Integer;
-	ArgumentIndex,HighlightStart: Integer;
+	ArgumentIndex,HighlightStart,WidthParam: Integer;
 	S: string;
-	CurPos, BraceCount : integer;
+	CurPos : integer;
 	InsideString : boolean;
 	HLAttr: TSynHighlighterAttributes;
 begin
 	// Clear the backbuffer and set options
 	with FBmp.Canvas do begin
-
-		// Paint the bg
 		Brush.Color := TColor($E1FFFF);
 		FillRect(ClientRect);
 		Brush.Style := bsClear;
@@ -580,7 +645,6 @@ begin
 	CurPos := 1;
 	ArgumentIndex := -1;
 	HighlightStart := 0;
-	BraceCount := 0;
 
 	// now loop through the hint and draw each letter
 	while Caption[CurPos] <> #0 do begin
@@ -591,25 +655,17 @@ begin
 		InsideString := (HLAttr = FLookupEditor.Highlighter.StringAttribute);
 
 		// Argument delimiters
-		if (Caption[CurPos] = ',')then begin
-			if not InsideString then begin
+		if not InsideString then begin
+			if (Caption[CurPos] = ',') or (Caption[CurPos] = '(') then begin
 				Inc(ArgumentIndex);
 
 				// Don't draw this one red yet, but start at the next char...
 				HighlightStart := CurPos + 1;
+			end else if (Caption[CurPos] = ')') then begin
+
+				// Stop highlighting
+				Inc(ArgumentIndex,999);
 			end;
-		end else if (Caption[CurPos] = '(') then begin
-			if BraceCount = 0 then begin
-				Inc(ArgumentIndex);
-				HighlightStart := CurPos + 1;
-			end;
-			Inc(BraceCount);
-		end else if (Caption[CurPos] = ')') then begin
-			if BraceCount = 1 then begin
-				Inc(ArgumentIndex);
-				HighlightStart := CurPos + 1;
-			end;
-			Dec(BraceCount);
 		end;
 
 		with FBmp.Canvas do begin
@@ -649,7 +705,6 @@ end;
 procedure TCodeToolTip.RethinkCoordAndActivate;
 var
 	Pt: TPoint;
-	Width : integer;
 begin
 	// Clear the backbuffer and set options
 	with FBmp.Canvas do begin
@@ -665,17 +720,13 @@ begin
 		Font.Style := [];
 	end;
 
-	// Simulate size to prevent drawing twice...
-	Width := FBmp.Canvas.TextWidth(Caption);
-	if FToolTips.Count > 1 then
-		Width := Width + 72; // Button stuff
-
 	// this displays the rect below the current line and at the same position where the token begins
-	Pt := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos,true))));
+	Pt.X := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos,true)))).X;
+	Pt.Y := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FFunctionEnd,true)))).Y;
 
 	ActivateHint(Rect(Pt.X,
                     Pt.Y+FEditor.LineHeight+2,
-                    Pt.X+Width,
+                    Pt.X+DummyPaint,
                     Pt.Y+FBmp.Canvas.TextHeight('Wg')+FEditor.LineHeight+4),
                     Caption);
 end;
@@ -802,6 +853,8 @@ begin
 		ReleaseHandle;
 		Exit;
 	end;
+
+	FFunctionEnd := CurPos;
 
 	// We've stopped at the ending ), start walking backwards )*here* with nBraces = -1
 	for I := 1 to FMaxScanLength do begin

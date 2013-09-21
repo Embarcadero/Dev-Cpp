@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 701
-  Top = 320
+  Left = 1156
+  Top = 504
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 452
@@ -845,13 +845,12 @@ object EditorOptForm: TEditorOptForm
             Gutter.BorderStyle = gbsNone
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
-            Gutter.Font.Height = -11
+            Gutter.Font.Height = -12
             Gutter.Font.Name = 'Courier New'
             Gutter.Font.Style = []
             Gutter.LeftOffset = 4
             Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
-            Gutter.UseFontStyle = False
             Highlighter = cpp
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4
@@ -932,34 +931,41 @@ object EditorOptForm: TEditorOptForm
         end
         object tabCPDefault: TTabSheet
           Caption = 'Default Source'
+          object cbDefaultCode: TCheckBox
+            Left = 4
+            Top = 2
+            Width = 461
+            Height = 17
+            Caption = 'Insert Default Code into Empty Projects'
+            TabOrder = 0
+          end
           object seDefault: TSynEdit
             Left = 0
             Top = 24
             Width = 468
-            Height = 330
+            Height = 331
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -13
             Font.Name = 'Courier New'
             Font.Style = []
-            TabOrder = 0
+            TabOrder = 1
             TabStop = False
+            Gutter.AutoSize = True
             Gutter.BorderStyle = gbsNone
-            Gutter.DigitCount = 2
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
-            Gutter.Font.Height = -11
+            Gutter.Font.Height = -12
             Gutter.Font.Name = 'Courier New'
             Gutter.Font.Style = []
             Gutter.LeftOffset = 4
             Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
-            Gutter.UseFontStyle = False
-            Gutter.Width = 0
             Highlighter = cpp
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4
             WantTabs = True
+            OnStatusChange = CodeInsStatusChange
             RemovedKeystrokes = <
               item
                 Command = ecContextHelp
@@ -970,14 +976,6 @@ object EditorOptForm: TEditorOptForm
                 Command = ecContextHelp
                 ShortCut = 16496
               end>
-          end
-          object cbDefaultCode: TCheckBox
-            Left = 4
-            Top = 2
-            Width = 461
-            Height = 17
-            Caption = 'Insert Default Code into Empty Projects'
-            TabOrder = 1
           end
         end
       end
