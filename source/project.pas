@@ -154,7 +154,6 @@ type
     procedure SetCustomMakefile(const Value: AnsiString);
     procedure SetUseCustomMakefile(const Value: boolean);
   public
-  // Orwell edit
 	function GetModified: boolean;
 	procedure SetModified(value: boolean);
 
@@ -2096,16 +2095,16 @@ end;
 
 constructor TUnitList.Create;
 begin
-  inherited Create;
-  fList:= TObjectList.Create;
+	inherited Create;
+	fList:= TObjectList.Create;
 end;
 
 destructor TUnitList.Destroy;
 var
 	I: integer;
 begin
-	for I:= pred(fList.Count) downto 0 do
-		Remove(0);
+	for I := fList.Count - 1 downto 0 do
+		Remove(I);
 	fList.Free;
 	inherited;
 end;
@@ -2117,29 +2116,29 @@ end;
 
 procedure TUnitList.Remove(index: integer);
 begin
-  fList.Delete(index);
-  fList.Pack;
-  fList.Capacity:= fList.Count;
+	fList.Delete(index);
+	fList.Pack;
+	fList.Capacity:= fList.Count;
 end;
 
 function TUnitList.GetCount: integer;
 begin
-  result:= fList.Count;
+	result:= fList.Count;
 end;
 
 function TUnitList.GetItem(index: integer): TProjUnit;
 begin
-  result:= TProjUnit(fList[index]);
+	result:= TProjUnit(fList[index]);
 end;
 
 procedure TUnitList.SetItem(index: integer; value: TProjUnit);
 begin
-  fList[index]:= value;
+	fList[index]:= value;
 end;
 
 function TUnitList.Indexof(Editor: TEditor): integer;
 begin
-  result:= Indexof(editor.FileName);
+	result:= Indexof(editor.FileName);
 end;
 
 function TUnitList.Indexof(FileName: AnsiString): integer;
@@ -2167,9 +2166,9 @@ end;
 
 destructor TdevINI.Destroy;
 begin
-  if assigned(fIniFile) then
-    fIniFile.Free;
-  inherited;
+	if assigned(fIniFile) then
+		fIniFile.Free;
+	inherited;
 end;
 
 procedure TdevINI.SetFileName(const Value: AnsiString);

@@ -17,6 +17,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
+// This is part of the utils library that I needed in some files  of this VCl package
+
 unit stringutils;
 
 interface
@@ -44,6 +46,9 @@ function NotSameText(const s1,s2 : AnsiString) : boolean;
 
 function StartsStr(const subtext,text : AnsiString) : boolean;
 function StartsText(const subtext,text : AnsiString) : boolean;
+
+function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
+function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
 
 implementation
 
@@ -107,6 +112,39 @@ end;
 function StartsText(const subtext,text : AnsiString) : boolean;
 begin
 	Result := SameText(subtext, Copy(text, 1, Length(subtext)));
+end;
+
+function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
+var
+	Offset: Integer;
+begin
+
+	Offset := Pos(OldPattern, S);
+	if Offset = 0 then begin
+		Result := S;
+	end else begin
+
+		// Copy the preceding stuff, append the new part, append old stuff after old pattern
+		Result := Copy(S, 1, Offset - 1) + NewPattern + Copy(S, Offset + Length(OldPattern), MaxInt);
+	end;
+end;
+
+function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
+var
+	Offset: Integer;
+	UpperS,UpperOldPattern : string;
+begin
+	UpperS := UpperCase(S);
+	UpperOldPattern := UpperCase(OldPattern);
+
+	Offset := Pos(UpperOldPattern, UpperS);
+	if Offset = 0 then begin
+		Result := S;
+	end else begin
+
+		// Copy the preceding stuff, append the new part, append old stuff after old pattern
+		Result := Copy(S, 1, Offset - 1) + NewPattern + Copy(S, Offset + Length(UpperOldPattern), MaxInt);
+	end;
 end;
 
 end.

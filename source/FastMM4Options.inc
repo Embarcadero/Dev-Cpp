@@ -241,7 +241,7 @@ Set the default options for FastMM here.
  AMD K5, Pentium I and earlier CPUs. MMX is currently only used in the variable
  size move routines, so if UseCustomVariableSizeMoveRoutines is not set then
  this option has no effect.}
-{.$define EnableMMX}
+{$define EnableMMX}
 
   {Set this option to force the use of MMX instructions without checking
    whether the CPU supports it. If this option is disabled then the CPU will be

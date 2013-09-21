@@ -191,8 +191,8 @@ type
   public
     procedure FixIndices;
     function GetFileIncludes(Filename: AnsiString): AnsiString;
-    function IsCfile(Filename: AnsiString): boolean;
-    function IsHfile(Filename: AnsiString): boolean;
+    function IsCfile(const Filename: AnsiString): boolean;
+    function IsHfile(const Filename: AnsiString): boolean;
     procedure GetSourcePair(FName: AnsiString; var CFile, HFile: AnsiString);
     function GetImplementationLine(Statement: PStatement): integer;
     function GetImplementationFileName(Statement: PStatement): AnsiString;
@@ -204,7 +204,7 @@ type
     procedure Load(const FileName: AnsiString;const relativeto : AnsiString);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Parse(FileName: TFileName); overload;
+    procedure Parse(const FileName: AnsiString); overload;
     procedure ParseList;
     procedure ReParseFile(const FileName: AnsiString; InProject: boolean; OnlyIfNotParsed: boolean = False; UpdateView: boolean = True);
     function StatementKindStr(Value: TStatementKind): AnsiString;
@@ -220,9 +220,9 @@ type
     procedure Save(const FileName: AnsiString;const relativeto : AnsiString);
     procedure PostProcessInheritance;
     procedure ReProcessInheritance;
-    function Locate(Full: AnsiString; WithScope: boolean): PStatement;
-    procedure FillListOf(Full: AnsiString; List: TStringList;Kind : TStatementKind);
-    function FindAndScanBlockAt(Filename: AnsiString; Row: integer; Stream: TStream = nil): integer;
+    function Locate(const Full: AnsiString; WithScope: boolean): PStatement;
+    procedure FillListOf(const Full: AnsiString; List: TStringList;Kind : TStatementKind);
+    function FindAndScanBlockAt(const Filename: AnsiString; Row: integer; Stream: TStream = nil): integer;
     function GetThisPointerID: integer;
   published
     property Enabled: boolean read fEnabled write fEnabled;
@@ -1736,7 +1736,7 @@ begin
 		fOnUpdate(Self);
 end;
 
-procedure TCppParser.Parse(FileName: TFileName);
+procedure TCppParser.Parse(const FileName: AnsiString);
 var
   sTime: myTickCount;
   IsVisible: boolean;
@@ -1853,7 +1853,7 @@ begin
   Result := StringReplace(Result, '/', '\', [rfReplaceAll]);
 end;
 
-function TCppParser.IsCfile(Filename: AnsiString): boolean;
+function TCppParser.IsCfile(const Filename: AnsiString): boolean;
 var
   ext: AnsiString;
 begin
@@ -1861,7 +1861,7 @@ begin
   Result := (ext = '.cpp') or (ext = '.c') or (ext = '.cc');
 end;
 
-function TCppParser.IsHfile(Filename: AnsiString): boolean;
+function TCppParser.IsHfile(const Filename: AnsiString): boolean;
 var
   ext: AnsiString;
 begin
@@ -1901,22 +1901,21 @@ end;
 
 procedure TCppParser.AddFileToScan(Value: AnsiString; InProject: boolean);
 var
-	FName: AnsiString;
 	CFile, HFile: AnsiString;
 begin
-	FName := StringReplace(Value, '/', '\', [rfReplaceAll]);
-	FName := GetFullFilename(LowerCase(FName));
+	Value := StringReplace(Value, '/', '\', [rfReplaceAll]);
+	Value := GetFullFilename(LowerCase(Value));
 
   if InProject then
-    fProjectFiles.Add(FName);
+    fProjectFiles.Add(Value);
 
   // automatically add header and impl file
   CFile := '';
   HFile := '';
-  if IsCfile(FName) then
-    GetSourcePair(FName, CFile, HFile)
-  else if IsHfile(FName) then
-    HFile := FName;
+  if IsCfile(Value) then
+    GetSourcePair(Value, CFile, HFile)
+  else if IsHfile(Value) then
+    HFile := Value;
 
   if HFile <> '' then
     if fFilesToScan.IndexOf(HFile) = -1 then // check scheduled files
@@ -2153,14 +2152,14 @@ begin
 				WriteFile(hFile, P, I2, bytes, nil);
 
 				// Save RELATIVE filenames
-				relative := StringReplace(_DeclImplFileName,relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+				relative := ReplaceFirstText(_DeclImplFileName,relativeto,'%path%\');
 				I2 := Length(relative);
 				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, relative);
 				WriteFile(hFile, P, I2, bytes, nil);
 
 				// Save RELATIVE filenames
-				relative := StringReplace(_FileName,relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+				relative := ReplaceFirstText(_FileName,relativeto,'%path%\');
 				I2 := Length(relative);
 				WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 				StrPCopy(P, relative);
@@ -2184,7 +2183,7 @@ begin
 		for I := 0 to HowMany do begin
 
 			// Save RELATIVE filenames
-			relative := StringReplace(fScannedFiles[I],relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+			relative := ReplaceFirstText(fScannedFiles[I],relativeto,'%path%\');
 			I2 := Length(relative);
 			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 			StrPCopy(P, relative);
@@ -2197,14 +2196,14 @@ begin
 		for I := 0 to HowMany do begin
 
 			// Save RELATIVE filenames
-			relative := StringReplace(PIncludesRec(fIncludesList[I])^.BaseFile,relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+			relative := ReplaceFirstText(PIncludesRec(fIncludesList[I])^.BaseFile,relativeto,'%path%\');
 			I2 := Length(relative);
 			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 			StrPCopy(P, relative);
 			WriteFile(hFile, P, I2, bytes, nil);
 
 			// Save RELATIVE filenames
-			relative := StringReplace(PIncludesRec(fIncludesList[I])^.IncludeFiles,relativeto,'%path%\',[rfReplaceAll,rfIgnoreCase]);
+			relative := ReplaceFirstText(PIncludesRec(fIncludesList[I])^.IncludeFiles,relativeto,'%path%\');
 			I2 := Length(relative);
 			WriteFile(hFile, I2, SizeOf(Integer), bytes, nil);
 			StrPCopy(P, relative);
@@ -2275,13 +2274,13 @@ begin
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 					FillChar(Buf, ItemLength+1, 0);
 					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_DeclImplFileName := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);
+					_DeclImplFileName := ReplaceFirstStr(Buf,'%path%\',relativeto);
 
 					// Load RELATIVE filenames
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 					FillChar(Buf, ItemLength+1, 0);
 					ReadFile(hFile, Buf, ItemLength,bytes,nil);
-					_FileName := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);;
+					_FileName := ReplaceFirstStr(Buf,'%path%\',relativeto);
 
 					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 					FillChar(Buf, ItemLength+1, 0);
@@ -2315,7 +2314,7 @@ begin
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 				FillChar(Buf, ItemLength+1, 0);
 				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				relative := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);
+				relative := ReplaceFirstStr(Buf,'%path%\',relativeto);
 				fScannedFiles.Add(relative);
 				fCacheContents.Add(relative);
 			end;
@@ -2329,14 +2328,14 @@ begin
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 				FillChar(Buf, ItemLength+1, 0);
 				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				relative := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);
+				relative := ReplaceFirstStr(Buf,'%path%\',relativeto);
 				P^.BaseFile := relative;
 
 				// Load RELATIVE filenames
 				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
 				FillChar(Buf, ItemLength+1, 0);
 				ReadFile(hFile, Buf, ItemLength,bytes,nil);
-				relative := StringReplace(Buf,'%path%\',relativeto,[rfReplaceAll]);
+				relative := ReplaceFirstStr(Buf,'%path%\',relativeto);
 				P^.IncludeFiles := relative;
 
 				fIncludesList.Add(P);
@@ -2500,7 +2499,7 @@ begin
       List.AddObject(PStatement(Statements[I])^._Command, Pointer(Statements[I]));
 end;
 
-function TCppParser.Locate(Full: AnsiString; WithScope: boolean): PStatement;
+function TCppParser.Locate(const Full: AnsiString; WithScope: boolean): PStatement;
 var
   I: integer;
 begin
@@ -2521,7 +2520,7 @@ begin
   end;
 end;
 
-procedure TCppParser.FillListOf(Full: AnsiString; List: TStringList; Kind : TStatementKind);
+procedure TCppParser.FillListOf(const Full: AnsiString; List: TStringList; Kind : TStatementKind);
 var
 	I: integer;
 begin
@@ -2539,7 +2538,7 @@ begin
 	end;
 end;
 
-function TCppParser.FindAndScanBlockAt(Filename: AnsiString; Row: integer; Stream: TStream): integer;
+function TCppParser.FindAndScanBlockAt(const Filename: AnsiString; Row: integer; Stream: TStream): integer;
   function GetFuncStartLine(const Index, StartLine: integer): integer;
   var
     idx: integer;

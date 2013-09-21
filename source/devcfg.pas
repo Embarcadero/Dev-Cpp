@@ -689,84 +689,6 @@ uses
   FileAssocs, Types;
 {$ENDIF}
 
-function ValidatePaths(dirList: AnsiString; var badDirs: AnsiString): AnsiString;
-//checks if directories in provided ; delimited list exist
-//returns filtered out dirList with only existing paths
-//badDirs returns ; delimited list of non existing dirs
-//also remove duplicates and empty entries
-var
-	strs: TStrings;
-	i,j: Integer;
-	currdir: AnsiString;
-
-	function makeFullPath(dir: AnsiString): AnsiString;
-	begin
-		Result := dir;
-		//check if it's a full path
-{$IFDEF WIN32}
-		if Length(dir) > 1 then
-			if dir[2] = ':' then
-				Exit;
-		if Length(dir) > 0 then
-			if dir[1] = '\' then
-				Exit;
-{$ENDIF}
-{$IFDEF LINUX}
-		if Length(dir) > 0 then
-			if dir[1] = '/' then
-				Exit;
-{$ENDIF}
-		//otherwise just add path
-		Result := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) + Result;
-	end;
-
-begin
-  Result := '';
-  badDirs := '';
-
-  //needed to confirm relative paths
-  currdir := GetCurrentDir;
-  SetCurrentDir(ExtractFilePath(Application.ExeName));
-
-  strs := TStringList.Create;
-  repeat
-    if Pos(';', dirList) = 0 then
-      strs.Add(dirList)
-    else
-    begin
-      strs.Add(Copy(dirList, 1, Pos(';', dirList) -1));
-      Delete(dirList, 1, Pos(';', dirList));
-    end;
-  until Pos(';', dirList) = 0;
-
-  //eliminate duplicates
-  for i := strs.Count -2 downto 0 do
-    for j := strs.Count -1 downto i + 1 do
-      if (Trim(strs[j]) = '') or
-        ( makeFullPath(Trim(strs[i])) = makeFullPath(Trim(strs[j])) ) then
-          strs.Delete(j);
-
-  //check the directories
-  for i := strs.Count -1 downto 0 do
-  begin
-    if DirectoryExists(strs[i]) then
-      Result := Result + ';' + strs[i]
-    else
-      badDirs := badDirs + ';' + strs[i];
-  end;
-
-  if Length(Result) > 0 then
-    if Result[1] = ';' then
-      Delete(Result, 1, 1);
-  if Length(badDirs) > 0 then
-    if badDirs[1] = ';' then
-      Delete(badDirs, 1, 1);
-
-  FreeAndNil(strs);
-
-  SetCurrentDir(currdir);
-end;
-
 procedure InitializeOptions;
 begin
 	if not assigned(devDirs) then
@@ -814,7 +736,7 @@ begin
 			devCompilerSet.SaveSet(0);
 
 			// Load the 32bit configuration - hacky fix
-			devCompilerSet.fLibDir := StringReplace(LIB_DIR64ALT,'%path%\',devDirs.fExec,[rfReplaceAll]);
+			devCompilerSet.fLibDir := ReplaceFirstStr(LIB_DIR64ALT,'%path%\',devDirs.fExec);
 			devCompilerSet.fOptions := '000000000000000000000000010';
 
 			// And write the 32bit on
@@ -900,7 +822,6 @@ end;
 var
  fdevData: TdevData = nil;
  fExternal: boolean = TRUE;
-
 
 function devData: TdevData;
 begin
@@ -1186,38 +1107,45 @@ begin
 end;
 
 procedure TdevCompiler.ClearOptions;
+var
+	I : integer;
 begin
-	while fOptions.Count > 0 do begin
-		if Assigned(PCompilerOption(fOptions[0]).optChoices) then
-			PCompilerOption(fOptions[0]).optChoices.Free;
-		if Assigned(fOptions[0]) then
-			Dispose(fOptions[0]);
-		fOptions.Delete(0);
+	for I := 0 to fOptions.Count - 1 do begin
+		if Assigned(PCompilerOption(fOptions[I]).optChoices) then
+			PCompilerOption(fOptions[I]).optChoices.Free;
+		Dispose(PCompilerOption(fOptions[I]));
 	end;
+	fOptions.Clear;
 end;
 
 constructor TdevCompiler.Create;
 begin
-  inherited;
-  fOptions := TList.Create;
-  SettoDefaults;
-  LoadSettings;
+	inherited;
+	fOptions := TList.Create;
+	SettoDefaults;
+	LoadSettings;
+end;
+
+destructor TdevCompiler.Destroy;
+var
+	I : integer;
+begin
+	for I := 0 to fOptions.Count - 1 do begin
+		if Assigned(PCompilerOption(fOptions[I]).optChoices) then
+			PCompilerOption(fOptions[I]).optChoices.Free;
+		Dispose(PCompilerOption(fOptions[I]));
+	end;
+	fOptions.Free;
+	inherited;
 end;
 
 procedure TdevCompiler.DeleteOption(Index: integer);
 begin
-  if Assigned(PCompilerOption(fOptions[Index]).optChoices) then
-    PCompilerOption(fOptions[Index]).optChoices.Free;
-  if Assigned(fOptions[Index]) then
-    Dispose(fOptions[Index]);
-  fOptions.Delete(Index);
-end;
-
-destructor TdevCompiler.Destroy;
-begin
-  ClearOptions;
-  fOptions.Free;
-  inherited;
+	if Assigned(PCompilerOption(fOptions[Index]).optChoices) then
+		PCompilerOption(fOptions[Index]).optChoices.Free;
+	if Assigned(fOptions[Index]) then
+		Dispose(fOptions[Index]);
+	fOptions.Delete(Index);
 end;
 
 function TdevCompiler.FindOption(Setting: AnsiString; var opt: TCompilerOption; var Index: integer): boolean;
@@ -1396,15 +1324,15 @@ begin
 	fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 
 	if DirectoryExists(fExec + 'MinGW64') then begin
-		fBinDir:= StringReplace(BIN_DIR64,        '%path%\',fExec,[rfReplaceAll]);
-		fLibDir:= StringReplace(LIB_DIR64,        '%path%\',fExec,[rfReplaceAll]);
-		fCDir  := StringReplace(C_INCLUDE_DIR64,  '%path%\',fExec,[rfReplaceAll]);
-		fCppDir:= StringReplace(CPP_INCLUDE_DIR64,'%path%\',fExec,[rfReplaceAll]);
+		fBinDir:= ReplaceFirstStr(BIN_DIR64,        '%path%\',fExec);
+		fLibDir:= ReplaceFirstStr(LIB_DIR64,        '%path%\',fExec);
+		fCDir  := ReplaceFirstStr(C_INCLUDE_DIR64,  '%path%\',fExec);
+		fCppDir:= ReplaceFirstStr(CPP_INCLUDE_DIR64,'%path%\',fExec);
 	end else if DirectoryExists(fExec + 'MinGW32') then begin
-		fBinDir:= StringReplace(BIN_DIR32,        '%path%\',fExec,[rfReplaceAll]);
-		fLibDir:= StringReplace(LIB_DIR32,        '%path%\',fExec,[rfReplaceAll]);
-		fCDir  := StringReplace(C_INCLUDE_DIR32,  '%path%\',fExec,[rfReplaceAll]);
-		fCppDir:= StringReplace(CPP_INCLUDE_DIR32,'%path%\',fExec,[rfReplaceAll]);
+		fBinDir:= ReplaceFirstStr(BIN_DIR32,        '%path%\',fExec);
+		fLibDir:= ReplaceFirstStr(LIB_DIR32,        '%path%\',fExec);
+		fCDir  := ReplaceFirstStr(C_INCLUDE_DIR32,  '%path%\',fExec);
+		fCppDir:= ReplaceFirstStr(CPP_INCLUDE_DIR32,'%path%\',fExec);
 	end;
 
 	fConfig := fExec;
@@ -1419,36 +1347,36 @@ procedure TdevDirs.LoadSettings;
 begin
   devData.LoadObject(Self);
   fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
-  fHelp:=   StringReplace(fHelp,'  %path%\',fExec,[rfReplaceAll]);
-  fIcons:=  StringReplace(fIcons, '%path%\',fExec,[rfReplaceAll]);
-  fLang:=   StringReplace(fLang,  '%path%\',fExec,[rfReplaceAll]);
-  fTemp:=   StringReplace(fTemp,  '%path%\',fExec,[rfReplaceAll]);
-  fThemes:= StringReplace(fThemes,'%path%\',fExec,[rfReplaceAll]);
+  fHelp:=   ReplaceFirstStr(fHelp,'  %path%\',fExec);
+  fIcons:=  ReplaceFirstStr(fIcons, '%path%\',fExec);
+  fLang:=   ReplaceFirstStr(fLang,  '%path%\',fExec);
+  fTemp:=   ReplaceFirstStr(fTemp,  '%path%\',fExec);
+  fThemes:= ReplaceFirstStr(fThemes,'%path%\',fExec);
 end;
 
 procedure TdevDirs.SaveSettings;
 begin
-  fHelp :=  StringReplace(fHelp,fExec,  '%path%\',[rfReplaceAll]);
-  fIcons:=  StringReplace(fIcons,fExec, '%path%\',[rfReplaceAll]);
-  fLang:=   StringReplace(fLang,fExec,  '%path%\',[rfReplaceAll]);
-  fTemp:=   StringReplace(fTemp,fExec,  '%path%\',[rfReplaceAll]);
-  fThemes:= StringReplace(fThemes,fExec,'%path%\',[rfReplaceAll]);
-  fLibDir:= StringReplace(fLibDir,fExec,'%path%\',[rfReplaceAll]);
-  fBinDir:= StringReplace(fBinDir,fExec,'%path%\',[rfReplaceAll]);
-  fCDir:=   StringReplace(fCDir,fExec,  '%path%\',[rfReplaceAll]);
-  fCppDir:= StringReplace(fCppDir,fExec,'%path%\',[rfReplaceAll]);
+  fHelp :=  ReplaceFirstStr(fHelp,fExec,  '%path%\');
+  fIcons:=  ReplaceFirstStr(fIcons,fExec, '%path%\');
+  fLang:=   ReplaceFirstStr(fLang,fExec,  '%path%\');
+  fTemp:=   ReplaceFirstStr(fTemp,fExec,  '%path%\');
+  fThemes:= ReplaceFirstStr(fThemes,fExec,'%path%\');
+  fLibDir:= ReplaceFirstStr(fLibDir,fExec,'%path%\');
+  fBinDir:= ReplaceFirstStr(fBinDir,fExec,'%path%\');
+  fCDir:=   ReplaceFirstStr(fCDir,fExec,  '%path%\');
+  fCppDir:= ReplaceFirstStr(fCppDir,fExec,'%path%\');
 
   devData.SaveObject(Self);
 
-  fHelp :=  StringReplace(fHelp,  '%path%\',fExec,[rfReplaceAll]);
-  fIcons:=  StringReplace(fIcons, '%path%\',fExec,[rfReplaceAll]);
-  fLang:=   StringReplace(fLang,  '%path%\',fExec,[rfReplaceAll]);
-  fTemp:=   StringReplace(fTemp,  '%path%\',fExec,[rfReplaceAll]);
-  fThemes:= StringReplace(fThemes,'%path%\',fExec,[rfReplaceAll]);
-  fLibDir:= StringReplace(fLibDir,'%path%\',fExec,[rfReplaceAll]);
-  fBinDir:= StringReplace(fBinDir,'%path%\',fExec,[rfReplaceAll]);
-  fCDir:=   StringReplace(fCDir,  '%path%\',fExec,[rfReplaceAll]);
-  fCppDir:= StringReplace(fCppDir,'%path%\',fExec,[rfReplaceAll]);
+  fHelp :=  ReplaceFirstStr(fHelp,  '%path%\',fExec);
+  fIcons:=  ReplaceFirstStr(fIcons, '%path%\',fExec);
+  fLang:=   ReplaceFirstStr(fLang,  '%path%\',fExec);
+  fTemp:=   ReplaceFirstStr(fTemp,  '%path%\',fExec);
+  fThemes:= ReplaceFirstStr(fThemes,'%path%\',fExec);
+  fLibDir:= ReplaceFirstStr(fLibDir,'%path%\',fExec);
+  fBinDir:= ReplaceFirstStr(fBinDir,'%path%\',fExec);
+  fCDir:=   ReplaceFirstStr(fCDir,  '%path%\',fExec);
+  fCppDir:= ReplaceFirstStr(fCppDir,'%path%\',fExec);
 end;
 
 constructor TdevEditor.Create;
@@ -1784,10 +1712,9 @@ end;
 
 procedure TdevCompilerSet.LoadSet(Index: integer);
 var
-	key, goodBinDir, goodCDir, goodCppDir, goodLibDir, msg, tempStr: AnsiString;
+	key{,msg} : AnsiString;
 begin
-	if Index < 0 then Exit; // Removing breaks the compile process, but why???
-
+	// First load stuff from disk
 	with devData do begin
 		key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
 
@@ -1823,86 +1750,48 @@ begin
 		fFastDep:=        LoadSettingB(key, 'FastDep','1');
 
 		// Directories
-		fBinDir := StringReplace(LoadSettingS(key, 'Bins'),'%path%\',devDirs.Exec,[rfReplaceAll]);
-		fCDir   := StringReplace(LoadSettingS(key, 'C'),   '%path%\',devDirs.Exec,[rfReplaceAll]);
-		fCppDir := StringReplace(LoadSettingS(key, 'Cpp'), '%path%\',devDirs.Exec,[rfReplaceAll]);
-		fLibDir := StringReplace(LoadSettingS(key, 'Lib'), '%path%\',devDirs.Exec,[rfReplaceAll]);
+		fBinDir := ReplaceFirstStr(LoadSettingS(key, 'Bins'),'%path%\',devDirs.Exec);
+		fCDir   := ReplaceFirstStr(LoadSettingS(key, 'C'),   '%path%\',devDirs.Exec);
+		fCppDir := ReplaceFirstStr(LoadSettingS(key, 'Cpp'), '%path%\',devDirs.Exec);
+		fLibDir := ReplaceFirstStr(LoadSettingS(key, 'Lib'), '%path%\',devDirs.Exec);
 
-		// Again, if nothing was found, select defaults
+		// Again, if nothing was found, select some defaults
 		if fBinDir='' then fBinDir:=devDirs.Bins;
 		if fCDir=''   then fCDir:=devDirs.C;
 		if fCppDir='' then fCppDir:=devDirs.Cpp;
 		if fLibDir='' then fLibDir:=devDirs.Lib;
-
-		//check for valid paths
-		msg := '';
-		goodBinDir := ValidatePaths(fBinDir, tempStr);
-		if tempStr <> '' then begin
-			msg := msg + 'Following Bin directories of compiler ' + devCompilerSet.fSets[Index] + ' don''t exist:' + #13#10;
-			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
-			msg := msg + #13#10 + #13#10;
-		end;
-		goodCDir := ValidatePaths(fCDir, tempStr);
-		if tempStr <> '' then  begin
-			msg := msg + 'Following C Include directories of compiler ' + devCompilerSet.fSets[Index] + ' don''t exist:' + #13#10;
-			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
-			msg := msg + #13#10 + #13#10;
-		end;
-		goodCppDir := ValidatePaths(fCppDir, tempStr);
-		if tempStr <> '' then begin
-			msg := msg + 'Following C++ Include directories of compiler ' + devCompilerSet.fSets[Index] + ' don''t exist:' + #13#10;
-			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
-			msg := msg + #13#10 + #13#10;
-		end;
-		goodLibDir := ValidatePaths(fLibDir, tempStr);
-		if tempStr <> '' then begin
-			msg := msg + 'Following Libs directories of compiler ' + devCompilerSet.fSets[Index] + ' don''t exist:' + #13#10;
-			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
-			msg := msg + #13#10 + #13#10;
-		end;
-		if msg <> '' then begin
-			msg := msg + 'Would you like Dev-C++ to remove them for you ';
-			msg := msg + 'and add the default paths to the remaining existing paths?' + #13#10;
-			msg := msg + 'Leaving those directories will lead to problems during compilation ';
-			msg := msg + 'of any projects created with Dev-C++' + #13#10;
-			msg := msg + #13#10;
-			msg := msg + 'Unless you know exactly what you''re doing, it is recommended ';
-			msg := msg + 'that you click Yes';
-
-			// If confirmed, insert working dirs into default path list
-			if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-				if DirectoryExists(devDirs.fExec + 'MinGW32') then begin
-					fBinDir:= goodBinDir + ';' + StringReplace(BIN_DIR32,        '%path%\',devDirs.fExec,[rfReplaceAll]);
-					fLibDir:= goodLibDir + ';' + StringReplace(LIB_DIR32,        '%path%\',devDirs.fExec,[rfReplaceAll]);
-					fCDir  := goodCDir   + ';' + StringReplace(C_INCLUDE_DIR32,  '%path%\',devDirs.fExec,[rfReplaceAll]);
-					fCppDir:= goodCppDir + ';' + StringReplace(CPP_INCLUDE_DIR32,'%path%\',devDirs.fExec,[rfReplaceAll]);
-				end else if DirectoryExists(devDirs.fExec + 'MinGW64') then begin
-					fBinDir:= goodBinDir + ';' + StringReplace(BIN_DIR64,        '%path%\',devDirs.fExec,[rfReplaceAll]);
-					fLibDir:= goodLibDir + ';' + StringReplace(LIB_DIR64,        '%path%\',devDirs.fExec,[rfReplaceAll]);
-					fCDir  := goodCDir   + ';' + StringReplace(C_INCLUDE_DIR64,  '%path%\',devDirs.fExec,[rfReplaceAll]);
-					fCppDir:= goodCppDir + ';' + StringReplace(CPP_INCLUDE_DIR64,'%path%\',devDirs.fExec,[rfReplaceAll]);
-				end;
-			end;
-		end;
-
-		// Check if the really needed programs even exist
-		msg := '';
-		if not FileExists(fBinDir + fgccname) then begin
-			msg := msg + 'Following programs don''t exist:' + #13#10;
-			msg := msg + fgccname;
-			msg := msg + #13#10 + #13#10;
-		end;
-		if not FileExists(fBinDir + fgppname) then begin
-			msg := msg + 'Following programs don''t exist:' + #13#10;
-			msg := msg + fgppname;
-			msg := msg + #13#10 + #13#10;
-		end;
-		if not FileExists(fBinDir + fmakeName) then begin
-			msg := msg + 'Following programs don''t exist:' + #13#10;
-			msg := msg + fmakeName;
-			msg := msg + #13#10 + #13#10;
-		end;
 	end;
+
+	// Then do some BASIC sanity checking
+	{msg := '';
+	if not FileExists(fBinDir + pd + fgccname) then begin
+		msg := msg + 'The C compiler of compiler set ' + devCompilerSet.fSets[Index] + ' doesn''t exist:' + #13#10;
+		msg := msg + fgccname;
+		msg := msg + #13#10 + #13#10;
+	end;
+	if not FileExists(fBinDir + pd + fgppname) then begin
+		msg := msg + 'The C++ compiler of compiler set ' + devCompilerSet.fSets[Index] + ' doesn''t exist:' + #13#10;
+		msg := msg + fgppname;
+		msg := msg + #13#10 + #13#10;
+	end;
+	if not FileExists(fBinDir + pd + fmakeName) then begin
+		msg := msg + 'The makefile processor of compiler set ' + devCompilerSet.fSets[Index] + ' doesn''t exist:' + #13#10;
+		msg := msg + fmakeName;
+		msg := msg + #13#10 + #13#10;
+	end;
+	if msg <> '' then begin
+		msg := msg + 'Would you like Dev-C++ to insert defaults instead?' + #13#10;
+		msg := msg + #13#10;
+		msg := msg + 'Unless you know exactly what you''re doing, it is recommended ';
+		msg := msg + 'that you click Yes';
+
+		// If confirmed, insert working(?) ones into default path list
+		if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+			fgccName:=     GCC_PROGRAM;
+			fgppName:=     GPP_PROGRAM;
+			fmakeName:=    MAKE_PROGRAM;
+		end;
+	end;}
 
 	// The code below checks for makefile processors...
 	if devDirs.OriginalPath = '' then // first time only
@@ -1940,10 +1829,10 @@ begin
 		SaveSettingB(key, 'FastDep',       fFastDep);
 
 		// Paths
-		SaveSettingS(key, 'Bins',  StringReplace(fBinDir,devDirs.fExec,'%path%\',[rfReplaceAll]));
-		SaveSettingS(key, 'C',     StringReplace(fCDir,  devDirs.fExec,'%path%\',[rfReplaceAll]));
-		SaveSettingS(key, 'Cpp',   StringReplace(fCppDir,devDirs.fExec,'%path%\',[rfReplaceAll]));
-		SaveSettingS(key, 'Lib',   StringReplace(fLibDir,devDirs.fExec,'%path%\',[rfReplaceAll]));
+		SaveSettingS(key, 'Bins',  ReplaceFirstStr(fBinDir,devDirs.fExec,'%path%\'));
+		SaveSettingS(key, 'C',     ReplaceFirstStr(fCDir,  devDirs.fExec,'%path%\'));
+		SaveSettingS(key, 'Cpp',   ReplaceFirstStr(fCppDir,devDirs.fExec,'%path%\'));
+		SaveSettingS(key, 'Lib',   ReplaceFirstStr(fLibDir,devDirs.fExec,'%path%\'));
 	end;
 end;
 

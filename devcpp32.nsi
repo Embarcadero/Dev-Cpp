@@ -1,8 +1,8 @@
-############################################
+####################################################################
 # Startup
 
 !define COMPILERNAME "MinGW32"
-!define DEVCPP_VERSION "5.2.0.1"
+!define DEVCPP_VERSION "5.2.0.2"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} MinGW32 Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
@@ -11,7 +11,7 @@ Var LOCAL_APPDATA
 !include "MUI2.nsh"
 !include "logiclib.nsh" ; needed by ${switch}
 
-############################################
+####################################################################
 # Installer Attributes
 
 Name "${DISPLAY_NAME}"
@@ -21,7 +21,7 @@ Caption "${DISPLAY_NAME}"
 LicenseData "copying.txt"
 InstallDir $PROGRAMFILES\Dev-Cpp
 
-############################################
+####################################################################
 # Interface Settings
 
 ShowInstDetails show
@@ -36,7 +36,7 @@ XPStyle on
 InstType "Full";1
 InstType "Minimal";2
 
-############################################
+####################################################################
 # Pages
 
 !define MUI_ICON "devcpp.ico"
@@ -54,7 +54,7 @@ InstType "Minimal";2
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
-############################################
+####################################################################
 # Languages
 
 !insertmacro MUI_LANGUAGE "English"
@@ -84,8 +84,8 @@ InstType "Minimal";2
 !insertmacro MUI_LANGUAGE "Turkish"
 !insertmacro MUI_LANGUAGE "Ukrainian"
 
-############################################
-# Files
+####################################################################
+# Files, by option section
 
 Section "Dev-C++ program files (required)" SectionMain
   SectionIn 1 2 RO
@@ -142,7 +142,6 @@ Section "Icon files" SectionIcons
   File /nonfatal /r "Icons\*.*"
 SectionEnd
 
-#
 Section "${COMPILERNAME} compiler" SectionMinGW
   SectionIn 1 2
   SetOutPath $INSTDIR
@@ -156,7 +155,8 @@ Section "Language files" SectionLangs
   File /nonfatal /r "Lang\*"
 SectionEnd
 
-# [File association]
+####################################################################
+# File association
 SubSection "Associate C and C++ files to Dev-C++" SectionAssocs
 
 Section "Associate .dev files to Dev-C++"
@@ -289,6 +289,8 @@ SectionEnd
 
 SubSectionEnd
 
+####################################################################
+# Shortcuts
 SubSection "Shortcuts" SectionShortcuts
 
 Section "Create Start Menu shortcuts" SectionMenuLaunch
@@ -373,7 +375,7 @@ Section "Remove old configuration files" SectionConfig
   Delete "$INSTDIR\devcpp.ci"
 SectionEnd
 
-############################################
+####################################################################
 # Mouseovers
 
 LangString DESC_SectionMain        ${LANG_ENGLISH} "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
@@ -396,8 +398,8 @@ LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configur
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionConfig}      $(DESC_SectionConfig)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
-############################################
-# Functions
+####################################################################
+# Functions, utilities
 
 Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
@@ -528,8 +530,8 @@ Function un.DeleteDirIfEmpty
    FindClose $R0
 FunctionEnd
 
-#############################################################################
-# [UnInstallation]
+####################################################################
+# uninstall
 
 UninstallText "This program will uninstall Dev-C++, continue?"
 ShowUninstDetails show

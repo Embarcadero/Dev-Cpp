@@ -56,7 +56,6 @@ type
     editCustom: TEdit;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormPaint(Sender: TObject);
     procedure lvGraphCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure lvFlatCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure lvFlatMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
@@ -66,6 +65,8 @@ type
     procedure chkCustomClick(Sender: TObject);
     procedure commandUpdate(Sender: TObject);
   private
+    FlatLoaded : boolean;
+    GraphLoaded : boolean;
     { Private declarations }
     procedure LoadText;
     procedure DoFlat;
@@ -93,13 +94,16 @@ uses
 
 procedure TProfileAnalysisForm.FormShow(Sender: TObject);
 begin
-  LoadText;
-  PageControl1.Visible := False;
+	LoadText;
+
+	DoFlat;
+	lvFlat.SetFocus;
 end;
 
 procedure TProfileAnalysisForm.FormClose(Sender: TObject;var Action: TCloseAction);
 begin
-  Action := caFree;
+	Action := caFree;
+	ProfileAnalysisForm := nil;
 end;
 
 procedure TProfileAnalysisForm.DoFlat;
@@ -188,6 +192,8 @@ begin
   end;
   for I := 0 to BreakLine do
     TStringList(memFlat.Lines).Delete(0);
+
+	FlatLoaded := true;
 end;
 
 procedure TProfileAnalysisForm.DoGraph;
@@ -277,32 +283,8 @@ begin
   end;
   for I := 0 to BreakLine do
     TStringList(memGraph.Lines).Delete(0);
-end;
 
-procedure TProfileAnalysisForm.FormPaint(Sender: TObject);
-begin
-  inherited;
-  OnPaint := nil;
-
-  Screen.Cursor := crHourglass;
-  Application.ProcessMessages;
-  try
-    DoFlat;
-  except
-    lvFlat.Items.Add.Caption := '<Error parsing output>';
-  end;
-
-  Application.ProcessMessages;
-  try
-    DoGraph;
-  except
-    lvGraph.Items.Add.Caption := '<Error parsing output>';
-  end;
-
-  Screen.Cursor := crDefault;
-  PageControl1.ActivePage := tabFlat;
-  PageControl1.Visible := True;
-  lvFlat.SetFocus;
+  GraphLoaded := true;
 end;
 
 procedure TProfileAnalysisForm.lvFlatCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;var DefaultDraw: Boolean);
@@ -384,19 +366,27 @@ end;
 
 procedure TProfileAnalysisForm.PageControl1Change(Sender: TObject);
 begin
-	if PageControl1.ActivePage = tabFlat then
-		lvFlat.SetFocus
-	else if PageControl1.ActivePage = tabGraph then
-		lvGraph.SetFocus
-	else
+	if PageControl1.ActivePage = tabFlat then begin
+		if not FlatLoaded then begin
+			DoFlat;
+			lvFlat.SetFocus;
+		end;
+	end else if PageControl1.ActivePage = tabGraph then begin
+		if not GraphLoaded then begin
+			DoGraph;
+			lvGraph.SetFocus;
+		end;
+	end else
 		commandUpdate(nil);
 end;
 
 procedure TProfileAnalysisForm.btnApplyClick(Sender: TObject);
 begin
+	FlatLoaded := false;
+	GraphLoaded := false;
+
+	// Respawn DoFlat
 	PageControl1.ActivePage := tabFlat;
-	lvFlat.Clear;
-	DoFlat;
 end;
 
 procedure TProfileAnalysisForm.chkCustomClick(Sender: TObject);

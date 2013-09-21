@@ -1,4 +1,4 @@
-Version 5.2.0.2 - *
+Version 5.2.0.2 - 31 Mei 2012
 
 - Added a default compiler profile to TDM-GCC downloads to create 32-bit executables.
 - Ctrl+Click code browsing is more accurate now.
@@ -16,7 +16,11 @@ Version 5.2.0.2 - *
 - The function tooltip now waits 500ms after the last keystroke before parsing the code instead of parsing on each keystroke.
 - Projects with a lot of files to be opened now open a lot faster.
 - Code completion is even more accurate now, and it can now complete array items.
-- Switched to, on average, three to four times (up to 40x) faster locale variant string comparison as a test.
+- Switched to, on average, three to four times (up to 40x) faster locale variant string comparison.
+- Dev-C++'s memory manager now uses MMX instructions, making it incompatible with ancient processors.
+- Code completion cache is portable now.
+- Sped up the startup process by a few percents.
+- Typing is faster now.
 - More bug fixes.
 
 Version 5.2.0.1 - 28 April 2012

@@ -18,7 +18,6 @@ object GotoLineForm: TGotoLineForm
   Position = poMainFormCenter
   OnCreate = FormCreate
   OnKeyUp = FormKeyUp
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 15
   object GotoLabel: TLabel

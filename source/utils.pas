@@ -39,7 +39,6 @@ type
 		msg: AnsiString;
 	end;
 
-
 	{ File ID types }
 	TExUnitType = (
 		utcSrc,      // c source file (.c)
@@ -138,6 +137,9 @@ function NotSameText(const s1,s2 : AnsiString) : boolean;
 function StartsStr(const subtext,text : AnsiString) : boolean;
 function StartsText(const subtext,text : AnsiString) : boolean;
 
+function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
+function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
+
 implementation
 
 uses
@@ -210,6 +212,39 @@ begin
 	Result := SameText(subtext, Copy(text, 1, Length(subtext)));
 end;
 
+function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
+var
+	Offset: Integer;
+begin
+
+	Offset := Pos(OldPattern, S);
+	if Offset = 0 then begin
+		Result := S;
+	end else begin
+
+		// Copy the preceding stuff, append the new part, append old stuff after old pattern
+		Result := Copy(S, 1, Offset - 1) + NewPattern + Copy(S, Offset + Length(OldPattern), MaxInt);
+	end;
+end;
+
+function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
+var
+	Offset: Integer;
+	UpperS,UpperOldPattern : string;
+begin
+	UpperS := UpperCase(S);
+	UpperOldPattern := UpperCase(OldPattern);
+
+	Offset := Pos(UpperOldPattern, UpperS);
+	if Offset = 0 then begin
+		Result := S;
+	end else begin
+
+		// Copy the preceding stuff, append the new part, append old stuff after old pattern
+		Result := Copy(S, 1, Offset - 1) + NewPattern + Copy(S, Offset + Length(UpperOldPattern), MaxInt);
+	end;
+end;
+
 function ProgramHasConsole(const path : AnsiString) : boolean;
 var
 	handle : Cardinal;
@@ -258,7 +293,7 @@ procedure OpenHelpFile;
 var
 	abshelp : AnsiString;
 begin
-	abshelp := StringReplace(devDirs.Help,  '%path%\',devDirs.Exec,[rfReplaceAll]) + DEV_MAINHELP_FILE;
+	abshelp := ReplaceFirstStr(devDirs.Help,  '%path%\',devDirs.Exec) + DEV_MAINHELP_FILE;
 	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(abshelp), nil, nil, SW_SHOWNORMAL);
 end;
 

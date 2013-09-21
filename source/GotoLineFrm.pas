@@ -46,14 +46,9 @@ type
     BtnCancel: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
-    procedure FormShow(Sender: TObject);
     procedure LineKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
-  private
-    FEditor: TCustomSynEdit;
-    procedure SetEditor(AEditor: TCustomSynEdit);
   public
     procedure LoadText;
-    property Editor: TCustomSynEdit read FEditor write SetEditor;
   end;
 
 implementation
@@ -70,12 +65,7 @@ uses
 
 procedure TGotoLineForm.FormCreate(Sender: TObject);
 begin
-  LoadText;
-end;
-
-procedure TGotoLineForm.FormShow(Sender: TObject);
-begin
-  Line.Value := 1;
+	LoadText;
 end;
 
 procedure TGotoLineForm.LineKeyDown(Sender: TObject; var Key: Word;
@@ -109,16 +99,6 @@ begin
 {$IFDEF LINUX}
   if Key = XK_ESCAPE then Close;
 {$ENDIF}
-end;
-
-procedure TGotoLineForm.SetEditor(AEditor: TCustomSynEdit);
-begin
-  FEditor := AEditor;
-  if Assigned(FEditor) then
-  begin
-    Line.MaxValue := FEditor.Lines.Count;
-    Line.Value := FEditor.CaretY;
-  end;
 end;
 
 end.

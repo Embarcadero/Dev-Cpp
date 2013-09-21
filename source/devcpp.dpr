@@ -114,7 +114,7 @@ var
 begin
 
 	strIniFile := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
-	exefolder := StringReplace(Application.ExeName,ExtractFileName(Application.ExeName),'',[rfReplaceAll]);
+	exefolder := ReplaceFirstStr(Application.ExeName,ExtractFileName(Application.ExeName),'');
 
 	if (ParamCount > 0) and (ParamStr(1) = CONFIG_PARAM) then begin
 		if not DirectoryExists(ParamStr(2)) then
@@ -180,10 +180,6 @@ begin
 
 	// do the creation stuff when the splashscreen is displayed because it takes quite a while ...
 	MainForm.DoCreateEverything;
-
-	MainForm.UpdateSplash('Creating extra dialogs...');
-	Application.CreateForm(TfrmFind, frmFind);
-	Application.CreateForm(TfrmReplace, frmReplace);
 
 	if not devData.NoSplashScreen then
 		SplashForm.Free;

@@ -948,7 +948,7 @@ uses
 	devcfg, datamod, NewProjectFrm, AboutFrm, PrintFrm,
 	CompOptionsFrm, EditorOptFrm, IncrementalFrm, Search_Center, EnviroFrm,
 	SynEdit, Math, ImageTheme,
-	DebugFrm, Types, Prjtypes, devExec,
+	DebugFrm, Types, FindFrm, ReplaceFrm, Prjtypes, devExec,
 	NewTemplateFrm, FunctionSearchFrm, NewMemberFrm, NewVarFrm, NewClassFrm,
 	ProfileAnalysisFrm, debugwait, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
 	ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
@@ -988,7 +988,8 @@ procedure TMainForm.DoCreateEverything;
 // without 'lag' and it's immediately ready to use ...
 //
 begin
-	UpdateSplash('Applying Settings...');
+	if not devData.NoSplashScreen then
+		UpdateSplash('Applying Settings...');
 	Caption := DEVCPP + ' ' + DEVCPP_VERSION;
 	fFirstShow:= TRUE;
 	DDETopic:=DevCppDDEServer.Name;
@@ -1114,7 +1115,8 @@ begin
 	AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
 
 	// Initialize class browser (takes much longer than all the other stuff above)
-	UpdateSplash('Initializing class browser...');
+	if not devData.NoSplashScreen then
+		UpdateSplash('Initializing class browser...');
 	InitClassBrowser(true);
 end;
 
@@ -1329,7 +1331,10 @@ begin
 
 	// Save and free options
 	SaveOptions;
+	fTools.Free; // This one needs devDirs!
 	FinalizeOptions;
+
+	Action := caFree;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1353,7 +1358,6 @@ begin
 	devTheme.Free;
 	fCompiler.Free;
 	fDebugger.Free;
-	fTools.Free;
 	devExecutor.Free;
 	dmMain.Free;
 
@@ -1470,7 +1474,6 @@ end;
 
 procedure TMainForm.LoadText;
 begin
-
 	// Set interface font
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
@@ -1868,13 +1871,13 @@ end;
 
 function TMainForm.SaveFile(e : TEditor): Boolean;
 var
- idx: Integer;
- wa: boolean;
+	idx: Integer;
+	wa: boolean;
 begin
 	Result := True;
 	if FileExists(e.FileName) and (FileGetAttr(e.FileName) and faReadOnly <> 0) then begin
 		// file is read-only
-		if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [e.FileName]), mtConfirmation, [mbYes, mbNo], 0)=mrNo then
+		if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [e.FileName]), mtConfirmation, [mbYes, mbNo], 0) = mrNo then
 			Exit;
 		if FileSetAttr(e.FileName, FileGetAttr(e.FileName)-faReadOnly) <> 0 then begin
 			MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [e.FileName]), mtError, [mbOk], 0);
@@ -3129,7 +3132,7 @@ end;
 procedure TMainForm.actProjectOptionsExecute(Sender: TObject);
 begin
 	if assigned(fProject) then
-	 fProject.ShowOptions;
+		fProject.ShowOptions;
 	// set again the window's and application's captions
 	// in case they have been changed...
 	UpdateAppTitle;
@@ -3147,16 +3150,26 @@ var
 begin
 	e:= GetEditor;
 	SearchCenter.Project:= fProject;
-	if assigned(e) then
+	if assigned(e) then begin
+
+		// Create it when needed!
+		if not Assigned(frmFind) then
+			frmFind := TfrmFind.Create(Application);
+
 		if e.Search(FALSE) then begin
 			OpenCloseMessageSheet(TRUE);
 			MessageControl.ActivePage:= FindSheet;
 		end;
+	end;
 	SearchCenter.Project:= nil;
 end;
 
 procedure TMainForm.actFindAllExecute(Sender: TObject);
 begin
+	// Create it when needed!
+	if not Assigned(frmFind) then
+		frmFind := TfrmFind.Create(Application);
+
 	SearchCenter.SingleFile:= FALSE;
 	SearchCenter.Project:= fProject;
 	SearchCenter.Replace := false;
@@ -3173,16 +3186,29 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then
+	if assigned(e) then begin
+
+		// Create it when needed!
+		if not Assigned(frmReplace) then
+			frmReplace := TfrmReplace.Create(Application);
+
 		e.Search(TRUE);
+	end;
 end;
 
 procedure TMainForm.actFindNextExecute(Sender: TObject);
 var
- e: TEditor;
+	e : TEditor;
 begin
 	e:= GetEditor;
-	if Assigned(e) then e.SearchAgain;
+	if Assigned(e) then begin
+
+		// Create it when needed!
+		if not Assigned(frmFind) then
+			frmFind := TfrmFind.Create(Application);
+
+		e.SearchAgain;
+	end;
 end;
 
 procedure TMainForm.actGotoLineExecute(Sender: TObject);
@@ -3262,7 +3288,7 @@ begin
 	if fCompiler.Target = ctProject then
 		DeleteFile(fProject.Executable);
 	fCompiler.Compile;
-	Application.ProcessMessages;
+	//Application.ProcessMessages;
 end;
 
 procedure TMainForm.actRunExecute(Sender: TObject);
@@ -3306,7 +3332,7 @@ begin
 	if not PrepareForCompile then
 		Exit;
 	fCompiler.RebuildAll;
-	Application.ProcessMessages;
+	//Application.ProcessMessages;
 end;
 
 procedure TMainForm.actCleanExecute(Sender: TObject);
@@ -3317,7 +3343,7 @@ begin
 		Exit;
 	end;
 	fCompiler.Clean;
-	Application.ProcessMessages;
+	//Application.ProcessMessages;
 end;
 
 procedure TMainForm.PrepareDebugger;
@@ -3656,9 +3682,9 @@ begin
 				savedialog.FileName:= 'Formatted Compiler Output';
 				for i:=0 to pred(CompilerOutput.Items.Count) do begin
 					temp2 := CompilerOutput.Items[i].Caption + #10 + CompilerOutput.Items[i].SubItems.Text;
-					temp2 := StringReplace(temp2,#10,#9,[]);
-					temp2 := StringReplace(temp2,#13#10,#9,[]);
-					temp2 := StringReplace(temp2,#13#10,#9,[]);
+					temp2 := ReplaceFirstStr(temp2,#10,#9);
+					temp2 := ReplaceFirstStr(temp2,#13#10,#9);
+					temp2 := ReplaceFirstStr(temp2,#13#10,#9);
 					temp := temp + temp2;
 				end;
 			end;
@@ -3680,9 +3706,9 @@ begin
 				ClipBoard.AsText := '';
 				for i:=0 to pred(FindOutput.Items.Count) do begin
 					temp2 := FindOutput.Items[i].Caption + #10 + FindOutput.Items[i].SubItems.Text;
-					temp2 := StringReplace(temp2,#10,#9,[]);
-					temp2 := StringReplace(temp2,#13#10,#9,[]);
-					temp2 := StringReplace(temp2,#13#10,#9,[]);
+					temp2 := ReplaceFirstStr(temp2,#10,#9);
+					temp2 := ReplaceFirstStr(temp2,#13#10,#9);
+					temp2 := ReplaceFirstStr(temp2,#13#10,#9);
 					temp := temp + temp2;
 				end;
 			end;
@@ -3794,7 +3820,7 @@ begin
 		errorfile:= SubItems[1];
 		errorfiletab := GetEditorFromFileName(errorfile);
 	end;
-	Application.ProcessMessages;
+	//Application.ProcessMessages;
 	if assigned(errorfiletab) then begin
 		errorfiletab.SetErrorFocus(Col, Line);
 		errorfiletab.Activate;
@@ -3967,7 +3993,7 @@ begin
 	bfile:= StringReplace(bfile, '/', '\', [rfReplaceAll]);
 
 	e := GetEditorFromFileName(bfile);
-	Application.ProcessMessages;
+	//Application.ProcessMessages;
 	if assigned(e) then begin
 		e.SetActiveBreakpointFocus(bline);
 		e.Activate;
@@ -4131,8 +4157,7 @@ end;
 
 procedure TMainForm.UpdateSplash(const text : AnsiString);
 begin
-	if not devData.NoSplashScreen then
-		SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') ' + text;
+	SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') ' + text;
 end;
 
 procedure TMainForm.InitClassBrowser(Full: boolean);
@@ -4265,7 +4290,7 @@ begin
 		SetStatusBarMessage('Parsing '+ Filename)
 	else
 		SetStatusBarMessage(Lang[ID_DONEPARSING]);
-	//Statusbar.Refresh;
+	Statusbar.Repaint;
 end;
 
 procedure TMainForm.CodeCompletionResize(Sender: TObject);
@@ -4281,118 +4306,65 @@ end;
 
 procedure TMainForm.actSwapHeaderSourceExecute(Sender: TObject);
 var
- e: TEditor;
- Ext: AnsiString;
- FileName: AnsiString;
- i : integer;
+	e: TEditor;
+	FromFile,ToFile: AnsiString;
+	i : integer;
+	toheader,tosource : boolean;
 begin
 	e:= GetEditor;
 	if not Assigned(e) then
 		Exit;
 
-	Ext := ExtractFileExt(e.FileName);
-	FileName := '';
+	FromFile := e.FileName;
+
+	if GetFileTyp(FromFile) in [utcSrc,utcppSrc] then begin
+		toheader := true;
+		tosource := false;
+	end else if GetFileTyp(e.FileName) in [utcHead,utcppHead] then begin
+		tosource := true;
+		toheader := false;
+	end else
+		Exit;
 
 	if Assigned(fProject) then begin
-		FileName := e.FileName;
-		if GetFileTyp(e.FileName) in [utcSrc,utcppSrc] then
-			for i := 0 to fProject.Units.Count - 1 do begin
-				FileName := ChangeFileExt(e.FileName, HPP_EXT);
-				if AnsiCompareFileName(ExtractFileName(FileName), ExtractFileName(fProject.Units[i].FileName)) = 0 then begin
-					FileName := fProject.Units[i].FileName;
+
+		// Check project list
+		for i := 0 to fProject.Units.Count - 1 do begin
+			if ((GetFileTyp(fProject.Units[i].FileName) in [utcHead,utcppHead]) and toheader) or
+               ((GetFileTyp(fProject.Units[i].FileName) in [utcSrc,utcppSrc])   and tosource) then begin
+
+				// Compare name without extension...
+				if AnsiCompareFileName(ChangeFileExt(ExtractFileName(FromFile),''),ChangeFileExt(ExtractFileName(fProject.Units[i].FileName),'')) = 0 then begin
+					ToFile := fProject.Units[i].FileName;
 					break;
 				end;
-				FileName := ChangeFileExt(e.FileName, H_EXT);
-				if AnsiCompareFileName(ExtractFileName(FileName), ExtractFileName(fProject.Units[i].FileName)) = 0 then begin
-					FileName := fProject.Units[i].FileName;
-					break;
-				end;
-			end
-		else if GetFileTyp(e.FileName) in [utcHead,utcppHead] then
-			for i := 0 to fProject.Units.Count - 1 do begin
-				FileName := ChangeFileExt(e.FileName, CPP_EXT);
-				if AnsiCompareFileName(ExtractFileName(FileName), ExtractFileName(fProject.Units[i].FileName)) = 0 then begin
-					FileName := fProject.Units[i].FileName;
-					break;
-				end;
-				FileName := ChangeFileExt(e.FileName, C_EXT);
-				if AnsiCompareFileName(ExtractFileName(FileName), ExtractFileName(fProject.Units[i].FileName)) = 0 then begin
-					FileName := fProject.Units[i].FileName;
-					break;
-				end;
-				FileName := ChangeFileExt(e.FileName, CC_EXT);
-				if AnsiCompareFileName(ExtractFileName(FileName), ExtractFileName(fProject.Units[i].FileName)) = 0 then begin
-					FileName := fProject.Units[i].FileName;
-					break;
-				end;
-				FileName := ChangeFileExt(e.FileName, CXX_EXT);
-				if AnsiCompareFileName(ExtractFileName(FileName), ExtractFileName(fProject.Units[i].FileName)) = 0 then begin
-					FileName := fProject.Units[i].FileName;
-					break;
-				end;
-				FileName := ChangeFileExt(e.FileName, CP2_EXT);
-				if AnsiCompareFileName(ExtractFileName(FileName), ExtractFileName(fProject.Units[i].FileName)) = 0 then begin
-					FileName := fProject.Units[i].FileName;
-					break;
-				end;
-				FileName := ChangeFileExt(e.FileName, CP_EXT);
-				if AnsiCompareFileName(ExtractFileName(FileName), ExtractFileName(fProject.Units[i].FileName)) = 0 then begin
-					FileName := fProject.Units[i].FileName;
-					break;
-				end;
-			end
-	end;
-	if not FileExists(FileName) then begin
-		if GetFileTyp(e.FileName) in [utcSrc,utcppSrc] then
-		begin
-				if (CompareText(Ext, CPP_EXT) = 0) or (CompareText(Ext, CC_EXT) = 0) or
-					 (CompareText(Ext, CXX_EXT) = 0) or (CompareText(Ext, CP2_EXT) = 0) or
-					 (CompareText(Ext, CP_EXT) = 0) then
-				begin
-						FileName := ChangeFileExt(e.FileName, HPP_EXT);
-						if not FileExists(FileName) then
-								FileName := ChangeFileExt(e.FileName, H_EXT);
-				end else
-						FileName := ChangeFileExt(e.FileName, H_EXT);
-		end else if GetFileTyp(e.FileName) in [utcHead,utcppHead] then
-		begin
-				FileName := ChangeFileExt(e.FileName, CPP_EXT);
-				if not FileExists(FileName) then
-				begin
-						FileName := ChangeFileExt(e.FileName, CC_EXT);
-						if not FileExists(FileName) then
-						begin
-								FileName := ChangeFileExt(e.FileName, CXX_EXT);
-								if not FileExists(FileName) then
-								begin
-										FileName := ChangeFileExt(e.FileName, CP2_EXT);
-										if not FileExists(FileName) then
-										begin
-												FileName := ChangeFileExt(e.FileName, CP_EXT);
-												if not FileExists(FileName) then
-													FileName := ChangeFileExt(e.FileName, C_EXT);
-										end;
-								end;
-						end;
 			end;
 		end;
-	end; //else
+	end else begin
 
-	if not FileExists(FileName) then begin
-		Application.MessageBox('No corresponding header or source file found.',
-{$IFDEF WIN32}
-				'Error', MB_ICONINFORMATION);
-{$ENDIF}
-{$IFDEF LINUX}
-				'Error', [smbOK], smsInformation);
-{$ENDIF}
-		exit;
+		// Check opened files
+		for i := 0 to PageControl.PageCount - 1 do begin
+			e := GetEditor(i);
+			if Assigned(e) then begin
+
+				if ((GetFileTyp(e.FileName) in [utcHead,utcppHead]) and toheader) or
+                   ((GetFileTyp(e.FileName) in [utcSrc,utcppSrc])   and tosource) then begin
+
+					// Compare name without extension...
+					if AnsiCompareFileName(ChangeFileExt(ExtractFileName(FromFile),''),ChangeFileExt(ExtractFileName(e.FileName),'')) = 0 then begin
+						ToFile := e.FileName;
+						break;
+					end;
+				end;
+			end;
+		end;
 	end;
-	e := GetEditorFromFileName(FileName);
+
+	e := GetEditorFromFileName(ToFile);
 	if Assigned(e) then
 		e.Activate
 	else
-		OpenFile(FileName);
+		SetStatusBarMessage('Could not find corresponding header/source file!');
 end;
 
 procedure TMainForm.actSyntaxCheckExecute(Sender: TObject);
@@ -4784,8 +4756,8 @@ begin
 			strp := optS.optValue > 0;
 	end;
 
-	if (not prof) or (strp) then
-		if MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
+	if not prof or strp then begin
+		if MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 
 			// ENABLE profiling
 			optP.optValue:=1;
@@ -4802,9 +4774,9 @@ begin
 				devCompiler.Options[idxS]:=optS;
 
 			actRebuildExecute(nil);
-			Exit
-		end else
-			Exit;
+		end;
+		Exit;
+	end;
 
 	// If we're done setting up options, check if there's data already
 	path := '';
@@ -4820,14 +4792,14 @@ begin
 	if not FileExists(path) then begin
 		if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtInformation, [mbYes, mbNo], 0)=mrYes then begin
 			actRunExecute(nil);
-			Exit;
-		end else
-			Exit;
+		end;
+		Exit;
 	end;
 
 	// If the data is there, open up the form
 	if not Assigned(ProfileAnalysisForm) then
 		ProfileAnalysisForm:=TProfileAnalysisForm.Create(Self);
+
 	ProfileAnalysisForm.Show;
 end;
 
@@ -5797,7 +5769,7 @@ begin
 	if not PrepareForCompile then
 		Exit;
 	fCompiler.Compile(e.FileName);
-	Application.ProcessMessages;
+	//Application.ProcessMessages;
 end;
 
 procedure TMainForm.actCompileCurrentFileUpdate(Sender: TObject);

@@ -51,7 +51,7 @@ object MainForm: TMainForm
     Top = 372
     Width = 784
     Height = 100
-    ActivePage = CompSheet
+    ActivePage = FindSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -667,7 +667,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 71
+        Height = 72
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone

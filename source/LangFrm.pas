@@ -113,16 +113,13 @@ begin
 end;
 
 procedure TLangForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
-var
-	tmp : AnsiString;
 begin
 	if not HasProgressStarted then begin
 		pbCCCache.Max := Total;
 		HasProgressStarted := true;
 	end;
 	pbCCCache.Position := pbCCCache.Position + Current;
-	tmp := 'Parsing file:' + #13#10 + FileName;
-	ParseLabel.Caption := StringReplace(tmp,devDirs.Exec,'\',[rfReplaceAll, rfIgnoreCase]);
+	ParseLabel.Caption := 'Parsing file:' + #13#10 + ReplaceFirstText(FileName,devDirs.Exec,'\');
 	Application.ProcessMessages;
 end;
 
@@ -168,7 +165,7 @@ begin
 			ProgressPanel.Visible := True;
 			OkBtn.Caption := 'Please wait...';
 			MainForm.CacheCreated := true;
-			Application.ProcessMessages;
+			//Application.ProcessMessages;
 			devCodeCompletion.Enabled := true;
 			devCodeCompletion.UseCacheFiles := true;
 			devClassBrowsing.Enabled := true;
@@ -196,13 +193,13 @@ begin
 
 			// Make it look busy
 			Screen.Cursor:=crHourglass;
-			Application.ProcessMessages;
+			//Application.ProcessMessages;
 
 			f := TStringList.Create;
 			if not AltCache.Checked then begin
 				for i := 0 to pred(s.Count) do begin
 					// Relative paths make the recursive/loop searcher go nuts
-					s[i] := StringReplace(s[i],'%path%\',devDirs.exec,[rfReplaceAll]);
+					s[i] := StringReplace(s[i],'%path%\',devDirs.exec,[]);
 					if DirectoryExists(s[i]) then begin
 						FilesFromWildcard(s[i], '*.*', f, false, false, false);
 						for j := 0 to f.Count - 1 do
@@ -232,7 +229,6 @@ begin
 			MainForm.CppParser.ParseList;
 
 			ParseLabel.Caption := 'Saving...';
-
 			Application.ProcessMessages;
 
 			MainForm.CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
@@ -243,7 +239,6 @@ begin
 
 			MainForm.ClassBrowser1.SetUpdateOn;
 
-			Application.ProcessMessages;
 			Screen.Cursor:=crDefault;
 			s.Free;
 			f.Free;

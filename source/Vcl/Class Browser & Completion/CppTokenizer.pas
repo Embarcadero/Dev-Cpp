@@ -46,7 +46,7 @@ type
 
   PToken = ^TToken;
   TToken = record
-    Text: string;
+    Text: string[255];
     Line: integer;
   end;
 
@@ -85,7 +85,7 @@ type
     function Simplify(Str: AnsiString): AnsiString;
     procedure PostProcessToken(var Str: AnsiString);
     procedure Advance(bPerformChecks: boolean = True);
-    function OpenFile(FileName: AnsiString): boolean;
+    function OpenFile(const FileName: AnsiString): boolean;
     function OpenStream(Stream: TStream): boolean;
     procedure ReleaseFileMemory;
   public
@@ -135,7 +135,7 @@ begin
   end;
 end;
 
-function TCppTokenizer.OpenFile(FileName: AnsiString): boolean;
+function TCppTokenizer.OpenFile(const FileName: AnsiString): boolean;
 var
   hFile: integer;
   iLength, iRead: integer;
