@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynMemo.pas,v 1.6 2005/01/08 17:04:29 specu Exp $
+$Id: SynMemo.pas,v 1.15 2004/01/04 21:49:04 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net

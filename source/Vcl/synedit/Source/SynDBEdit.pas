@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynDBEdit.pas,v 1.6 2005/01/08 17:04:27 specu Exp $
+$Id: SynDBEdit.pas,v 1.11 2004/03/28 18:37:27 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net

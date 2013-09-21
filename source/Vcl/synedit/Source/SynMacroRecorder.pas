@@ -26,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynMacroRecorder.pas,v 1.6 2005/01/08 17:04:29 specu Exp $
+$Id: SynMacroRecorder.pas,v 1.30 2004/07/10 21:38:30 markonjezic Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -74,8 +74,8 @@ resourcestring
 {$ELSE}
 const
 {$ENDIF}
-  sCannotRecord = 'Cannot record macro; already recording or playing';
-  sCannotPlay = 'Cannot playback macro; already playing or recording';
+  sCannotRecord = 'Cannot record macro when recording';
+  sCannotPlay = 'Cannot playback macro when recording';
   sCannotPause = 'Can only pause when recording';
   sCannotResume = 'Can only resume when paused';
 
@@ -187,7 +187,7 @@ type
 
   TCustomSynMacroRecorder = class(TAbstractSynHookerPlugin)
   private
-    fdevShortcuts: array [TSynMacroCommand] of TShortCut;
+    fShortCuts: array [TSynMacroCommand] of TShortCut;
     fOnStateChange: TNotifyEvent;
     fOnUserCommand: TSynUserCommandEvent;
     fMacroName: string;
@@ -241,9 +241,9 @@ type
     property EventCount: integer read GetEventCount;
     property Events[aIndex: integer]: TSynMacroEvent read GetEvent;
     property RecordShortCut: TShortCut index Ord(mcRecord)
-      read fdevShortcuts[mcRecord] write SetShortCut;
+      read fShortCuts[mcRecord] write SetShortCut;
     property PlaybackShortCut: TShortCut index Ord(mcPlayback)
-      read fdevShortcuts[mcPlayback] write SetShortCut;
+      read fShortCuts[mcPlayback] write SetShortCut;
     property SaveMarkerPos: boolean read fSaveMarkerPos
       write fSaveMarkerPos default False;
     property AsString : string read GetAsString write SetAsString;
@@ -345,11 +345,11 @@ begin
   fCommandIDs[mcRecord] := NewPluginCommand;
   fCommandIDs[mcPlayback] := NewPluginCommand;
   {$IFDEF SYN_CLX}
-  fdevShortcuts[mcRecord] := QMenus.ShortCut( Ord('R'), [ssCtrl, ssShift] );
-  fdevShortcuts[mcPlayback] := QMenus.ShortCut( Ord('P'), [ssCtrl, ssShift] );
+  fShortCuts[mcRecord] := QMenus.ShortCut( Ord('R'), [ssCtrl, ssShift] );
+  fShortCuts[mcPlayback] := QMenus.ShortCut( Ord('P'), [ssCtrl, ssShift] );
   {$ELSE}
-  fdevShortcuts[mcRecord] := Menus.ShortCut( Ord('R'), [ssCtrl, ssShift] );
-  fdevShortcuts[mcPlayback] := Menus.ShortCut( Ord('P'), [ssCtrl, ssShift] );
+  fShortCuts[mcRecord] := Menus.ShortCut( Ord('R'), [ssCtrl, ssShift] );
+  fShortCuts[mcPlayback] := Menus.ShortCut( Ord('P'), [ssCtrl, ssShift] );
   {$ENDIF}
 end;
 
@@ -619,21 +619,21 @@ procedure TCustomSynMacroRecorder.SetShortCut(const Index: Integer;
 var
   cEditor: integer;
 begin
-  if fdevShortcuts[TSynMacroCommand(Index)] <> Value then
+  if fShortCuts[TSynMacroCommand(Index)] <> Value then
   begin
     if Assigned(fEditors) then
       if Value <> 0 then
       begin
         for cEditor := 0 to fEditors.Count -1 do
           HookEditor( Editors[cEditor], fCommandIDs[TSynMacroCommand(Index)],
-            fdevShortcuts[TSynMacroCommand(Index)], Value );
+            fShortCuts[TSynMacroCommand(Index)], Value );
       end else
       begin
         for cEditor := 0 to fEditors.Count -1 do
           UnHookEditor( Editors[cEditor], fCommandIDs[TSynMacroCommand(Index)],
-            fdevShortcuts[TSynMacroCommand(Index)] );
+            fShortCuts[TSynMacroCommand(Index)] );
       end;
-    fdevShortcuts[TSynMacroCommand(Index)] := Value;
+    fShortCuts[TSynMacroCommand(Index)] := Value;
   end;
 end;
 

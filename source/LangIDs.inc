@@ -70,6 +70,8 @@ const
   ID_ITEM_NEWSOURCE                 = 1003;
   ID_ITEM_NEWRESOURCE               = 1004;
   ID_ITEM_NEWTEMPLATE               = 1005;
+  ID_ITEM_NEWCLASS                  = 1006;
+  ID_HINT_NEW                       = 1007;
   //free to 129 for sub new items
 
   ID_ITEM_OPEN                      = 2001;
@@ -113,12 +115,15 @@ const
   ID_MARKTEXT                       = 4013;
   ID_ITEM_DATETIME                  = 4014;
   ID_ITEM_COMMENTHEADER             = 4015;
+
   //free to 174 for edit menu items
   ID_ITEM_COMMENTSELECTION          = 22001;
   ID_ITEM_UNCOMMENTSELECTION        = 22002;
   ID_ITEM_INDENTSELECTION           = 22003;
   ID_ITEM_UNINDENTSELECTION         = 22004;
   ID_ITEM_SWAPHEADERSOURCE          = 22005;
+  ID_ITEM_COLLAPSEALL               = 22006;
+  ID_ITEM_UNCOLLAPSEALL             = 22007;
 
   //search menu
   ID_ITEM_FIND                      = 5001;
@@ -972,6 +977,7 @@ const
   ID_QUESTION                       = 60016;
   ID_COMPILESUCCESS                 = 60017;
   ID_COMPILEABORT                   = 60018;
+  ID_STATUSBARPLUS                  = 60019;
 
 { -- Button Captions -- }
   ID_BTN_OK                         = 61001;

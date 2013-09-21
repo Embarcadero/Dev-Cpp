@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynCompletionProposal.pas,v 1.7 2005/01/08 17:04:26 specu Exp $
+$Id: SynCompletionProposal.pas,v 1.73 2004/05/06 19:16:43 markonjezic Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -1840,14 +1840,7 @@ begin
     RecalcList;
     AdjustScrollBarPosition;
     Position := 0;
-    
-    if Visible and Assigned(FOnChangePosition) and (DisplayType = ctCode) then
-      FOnChangePosition(Owner as TSynBaseCompletionProposal,
-        LogicalToPhysicalIndex(FPosition));
-        
-    Repaint;
-  end
-  else
+  end else
   begin
     i := 0;
     while (i < ItemList.Count) and (not MatchItem(i, True)) do
@@ -2358,7 +2351,7 @@ procedure TSynBaseCompletionProposal.ExecuteEx(s: string; x, y: integer; Kind : 
         tmpX := 0;
     end;
 
-    if tmpY + tmpHeight > GetWorkAreaHeight then
+    if (tmpY + tmpHeight > GetWorkAreaHeight) and (Assigned(Form.CurrentEditor)) then
     begin
       tmpY := tmpY - tmpHeight - (Form.CurrentEditor  as TCustomSynEdit).LineHeight -2;
       if tmpY < 0 then
@@ -2416,8 +2409,7 @@ begin
         Form.AdjustScrollBarPosition;
         Form.FScrollbar.Position := Form.Position;
       end;
-      if Form.AssignedList.Count > 0 then
-        Form.Show
+      Form.Show;
     end;
   ctParams, ctHint:
     begin
@@ -2954,7 +2946,7 @@ begin
     //GBN 22/11/2001
     //Daisy chain completions
     Application.ProcessMessages;
-    if (System.Pos(Key, TriggerChars) > 0) and not F.Visible then
+    if (System.Pos(Key, TriggerChars) > 0) and (not F.Visible) then
       begin
       //GBN 18/02/2002
         if (Sender is TCustomSynEdit) then
@@ -3024,12 +3016,12 @@ procedure TSynCompletionProposal.EditorKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 var
   ShortCutKey   : Word;
-  devShortcutshift : TShiftState;
+  ShortCutShift : TShiftState;
 begin
-  ShortCutToKey (fShortCut,ShortCutKey,devShortcutshift);
+  ShortCutToKey (fShortCut,ShortCutKey,ShortCutShift);
   with Sender as TCustomSynEdit do
   begin
-    if ((DefaultType <> ctCode) or not(ReadOnly)) and (Shift = devShortcutshift) and (Key = ShortCutKey) then
+    if ((DefaultType <> ctCode) or not(ReadOnly)) and (Shift = ShortCutShift) and (Key = ShortCutKey) then
     begin
       Form.CurrentEditor := Sender as TCustomSynEdit;
       Key := 0;
@@ -3303,7 +3295,7 @@ begin
 
         FPreviousToken := GetPreviousToken(Form.CurrentEditor as TCustomSynEdit);
         ExecuteEx(GetCurrentInput(AEditor), p.x, p.y, DefaultType);
-        FNoNextKey := (DefaultType = ctCode) and FCanExecute and Form.Visible;
+        FNoNextKey := (DefaultType = ctCode) and FCanExecute;
       end;
     end;
 end;
@@ -3453,11 +3445,11 @@ procedure TSynAutoComplete.EditorKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var
   ShortCutKey   : Word;
-  devShortcutshift : TShiftState;
+  ShortCutShift : TShiftState;
 begin
-  ShortCutToKey (fShortCut,ShortCutKey,devShortcutshift);
+  ShortCutToKey (fShortCut,ShortCutKey,ShortCutShift);
   if not (Sender as TCustomSynEdit).ReadOnly and
-    (Shift = devShortcutshift) and (Key = ShortCutKey) then
+    (Shift = ShortCutShift) and (Key = ShortCutKey) then
   begin
     Execute(GetPreviousToken(Sender as TCustomSynEdit), Sender as TCustomSynEdit);
     fNoNextKey := true;

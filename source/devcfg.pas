@@ -486,6 +486,7 @@ type
    fthemeChange: boolean;            // did the theme changed
    fNoSplashScreen : boolean;        // disable splash screen
    fInterfaceFont : string;
+   fInterfaceFontSize : integer;
 
    fToolbarMain: boolean;            // These ones follow the enable/x-offset/y-offset patern
    fToolbarMainX: integer;
@@ -567,6 +568,7 @@ type
    //Windows
    property MsgTabs: integer read fMsgTabs write fMsgTabs;
    property InterfaceFont: string read fInterfaceFont write fInterfaceFont;
+   property InterfaceFontSize: integer read fInterfaceFontSize write fInterfaceFontSize;
 
    property ShowBars: boolean read fShowbars write fShowbars;
    property MultiLineTab: boolean read fMultiLineTab write fMultiLineTab;
@@ -973,28 +975,37 @@ begin
   fDefCpp:= TRUE;
   fOpenStyle:= 0;
   fdblFiles:= FALSE;
-  fToolbarMain:=TRUE;
-  fToolbarMainX:=11;
-  fToolbarMainY:=2;
-  fToolbarEdit:=TRUE;
-  fToolbarEditX:=201;
-  fToolbarEditY:=2;
-  fToolbarCompile:=TRUE;
-  fToolbarCompileX:=466;
-  fToolbarCompileY:=2;
-  fToolbarProject:=TRUE;
-  fToolbarProjectX:=375;
-  fToolbarProjectY:=2;
-  fToolbarSpecials:=TRUE;
-  fToolbarSpecialsX:=11;
-  fToolbarSpecialsY:=30;
-  fToolbarSearch:=TRUE;
-  fToolbarSearchX:=261;
-  fToolbarSearchY:=2;
-  fToolbarClasses:=TRUE;
-  fToolbarClassesX:=255;
-  fToolbarClassesY:=30;
-  fInterfaceFont:='MS Sans Serif';
+
+	fToolbarMain:=TRUE;
+	fToolbarMainX:=11;
+	fToolbarMainY:=2;
+	fToolbarEdit:=TRUE;
+	fToolbarEditX:=173;
+	fToolbarEditY:=2;
+	fToolbarCompile:=TRUE;
+	fToolbarCompileX:=441;
+	fToolbarCompileY:=2;
+	fToolbarProject:=TRUE;
+	fToolbarProjectX:=350;
+	fToolbarProjectY:=2;
+	fToolbarSpecials:=TRUE;
+	fToolbarSpecialsX:=624;
+	fToolbarSpecialsY:=2;
+	fToolbarSearch:=TRUE;
+	fToolbarSearchX:=233;
+	fToolbarSearchY:=2;
+	fToolbarClasses:=TRUE;
+	fToolbarClassesX:=11;
+	fToolbarClassesY:=30;
+
+	// Office 2007 / Vista support
+	if Screen.Fonts.IndexOf('Segoe UI') <> -1 then begin
+		fInterfaceFontSize := 9;
+		fInterfaceFont := 'Segoe UI';
+	end else begin
+		fInterfaceFontSize := 8;
+		fInterfaceFont := 'MS Sans Serif';
+	end;
 
   //read associations set by installer as defaults
   fAssociateC := getAssociation(0);
@@ -1381,59 +1392,59 @@ procedure TdevDirs.SettoDefaults;
 begin
 	fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 
-	if DirectoryExists('MinGW64') then begin
+	if DirectoryExists(fExec + 'MinGW64') then begin
 		fBinDir:= StringReplace(BIN_DIR64,        '%path%\',fExec,[rfReplaceAll]);
 		fLibDir:= StringReplace(LIB_DIR64,        '%path%\',fExec,[rfReplaceAll]);
 		fCDir  := StringReplace(C_INCLUDE_DIR64,  '%path%\',fExec,[rfReplaceAll]);
 		fCppDir:= StringReplace(CPP_INCLUDE_DIR64,'%path%\',fExec,[rfReplaceAll]);
-	end else if DirectoryExists('MinGW32') then begin
+	end else if DirectoryExists(fExec + 'MinGW32') then begin
 		fBinDir:= StringReplace(BIN_DIR32,        '%path%\',fExec,[rfReplaceAll]);
 		fLibDir:= StringReplace(LIB_DIR32,        '%path%\',fExec,[rfReplaceAll]);
 		fCDir  := StringReplace(C_INCLUDE_DIR32,  '%path%\',fExec,[rfReplaceAll]);
 		fCppDir:= StringReplace(CPP_INCLUDE_DIR32,'%path%\',fExec,[rfReplaceAll]);
 	end;
 
-	fConfig:= fExec;
-	fHelp  := fExec + HELP_DIR;
-	fIcons := fExec + ICON_DIR;
-	fLang  := fExec + LANGUAGE_DIR;
-	fTemp  := fExec + TEMPLATE_DIR;
-	fThemes:= fExec + THEME_DIR;
+	fConfig := fExec;
+	fHelp   := fExec + HELP_DIR;
+	fIcons  := fExec + ICON_DIR;
+	fLang   := fExec + LANGUAGE_DIR;
+	fTemp   := fExec + TEMPLATE_DIR;
+	fThemes := fExec + THEME_DIR;
 end;
 
 procedure TdevDirs.LoadSettings;
 begin
   devData.LoadObject(Self);
   fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
-  fHelp:=   StringReplace(fHelp,'%path%\',fExec,[rfReplaceAll]);
-  fIcons:=  StringReplace(fIcons,'%path%\',fExec,[rfReplaceAll]);
-  fLang:=   StringReplace(fLang,'%path%\',fExec,[rfReplaceAll]);
-  fTemp:=   StringReplace(fTemp,'%path%\',fExec,[rfReplaceAll]);
+  fHelp:=   StringReplace(fHelp,'  %path%\',fExec,[rfReplaceAll]);
+  fIcons:=  StringReplace(fIcons, '%path%\',fExec,[rfReplaceAll]);
+  fLang:=   StringReplace(fLang,  '%path%\',fExec,[rfReplaceAll]);
+  fTemp:=   StringReplace(fTemp,  '%path%\',fExec,[rfReplaceAll]);
   fThemes:= StringReplace(fThemes,'%path%\',fExec,[rfReplaceAll]);
 end;
 
 procedure TdevDirs.SaveSettings;
 begin
-  fHelp :=  StringReplace(fHelp,fExec,'%path%\',[rfReplaceAll]);
-  fIcons:=  StringReplace(fIcons,fExec,'%path%\',[rfReplaceAll]);
-  fLang:=   StringReplace(fLang,fExec,'%path%\',[rfReplaceAll]);
-  fTemp:=   StringReplace(fTemp,fExec,'%path%\',[rfReplaceAll]);
+  fHelp :=  StringReplace(fHelp,fExec,  '%path%\',[rfReplaceAll]);
+  fIcons:=  StringReplace(fIcons,fExec, '%path%\',[rfReplaceAll]);
+  fLang:=   StringReplace(fLang,fExec,  '%path%\',[rfReplaceAll]);
+  fTemp:=   StringReplace(fTemp,fExec,  '%path%\',[rfReplaceAll]);
   fThemes:= StringReplace(fThemes,fExec,'%path%\',[rfReplaceAll]);
   fLibDir:= StringReplace(fLibDir,fExec,'%path%\',[rfReplaceAll]);
   fBinDir:= StringReplace(fBinDir,fExec,'%path%\',[rfReplaceAll]);
-  fCDir:=   StringReplace(fCDir,fExec,'%path%\',[rfReplaceAll]);
+  fCDir:=   StringReplace(fCDir,fExec,  '%path%\',[rfReplaceAll]);
   fCppDir:= StringReplace(fCppDir,fExec,'%path%\',[rfReplaceAll]);
 
   devData.SaveObject(Self);
 
-  fHelp :=  StringReplace(fHelp,'%path%\',fExec,[rfReplaceAll]);
-  fIcons:=  StringReplace(fIcons,'%path%\',fExec,[rfReplaceAll]);
-  fLang:=   StringReplace(fLang,'%path%\',fExec,[rfReplaceAll]);
-  fTemp:=   StringReplace(fTemp,'%path%\',fExec,[rfReplaceAll]);
+  fHelp :=  StringReplace(fHelp,  '%path%\',fExec,[rfReplaceAll]);
+  fIcons:=  StringReplace(fIcons, '%path%\',fExec,[rfReplaceAll]);
+  fLang:=   StringReplace(fLang,  '%path%\',fExec,[rfReplaceAll]);
+  fTemp:=   StringReplace(fTemp,  '%path%\',fExec,[rfReplaceAll]);
   fThemes:= StringReplace(fThemes,'%path%\',fExec,[rfReplaceAll]);
   fLibDir:= StringReplace(fLibDir,'%path%\',fExec,[rfReplaceAll]);
   fBinDir:= StringReplace(fBinDir,'%path%\',fExec,[rfReplaceAll]);
-  fCDir:=   StringReplace(fCDir,'%path%\',fExec,[rfReplaceAll]);
+  fCDir:=   StringReplace(fCDir,  '%path%\',fExec,[rfReplaceAll]);
   fCppDir:= StringReplace(fCppDir,'%path%\',fExec,[rfReplaceAll]);
 end;
 
@@ -1978,7 +1989,7 @@ begin
 	fCompAdd:= FALSE;
 	fLinkAdd:= TRUE;
 	fCompOpt:='';
-	if DirectoryExists('MinGW64') then
+	if DirectoryExists(devDirs.Exec + 'MinGW64') then
 		fLinkOpt:='-static-libgcc'
 	else
 		fLinkOpt:='-static-libstdc++ -static-libgcc';

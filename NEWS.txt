@@ -1,3 +1,17 @@
+Version 5.1.1.0 - *
+
+- Added code folding.
+- A few directory checks now use absolute paths instead of relative ones.
+- Added a few 32bit/64bit items to the FAQ.
+- Fixed the Help Menu Item not always working.
+- Added a few translations (translated by cin.getline).
+- Merged all new toolbar buttons to one 'master' button.
+- The class browser toolbar now sizes its dropdown menu to make its content fit.
+- Dev-C++ now uses Segoe UI 9pt as a default when it's installed.
+- Updated the statusbar and the toolbars.
+- Fixed a class browsing crash when not using a project.
+- And more minor things.
+
 Version 5.1.0.0 - 27 December 2011
 
 - This is the first version to fully support 64bit MinGW compilers! Just place one in a folder called 'MinGW64' next to devcpp.exe, Dev will automatically adapt itself to it!

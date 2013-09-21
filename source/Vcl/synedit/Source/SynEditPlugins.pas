@@ -26,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditPlugins.pas,v 1.6 2005/01/08 17:04:28 specu Exp $
+$Id: SynEditPlugins.pas,v 1.8 2003/04/30 12:59:47 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -96,7 +96,7 @@ type
   TAbstractSynSingleHookPlugin = class(TAbstractSynHookerPlugin)
   private
     fCommandID: TSynEditorCommand;
-    function IsdevShortcutstored: Boolean;
+    function IsShortCutStored: Boolean;
     procedure SetShortCut(const Value: TShortCut);
   protected
     fState: TPluginState;
@@ -121,7 +121,7 @@ type
     procedure Cancel;
   published
     property ShortCut: TShortCut read fShortCut write SetShortCut
-      stored IsdevShortcutstored;
+      stored IsShortCutStored;
   end;
 
   { use TAbstractSynCompletion for non-visual completion }
@@ -413,7 +413,7 @@ begin
   Result := fState = psExecuting;
 end;
 
-function TAbstractSynSingleHookPlugin.IsdevShortcutstored: Boolean;
+function TAbstractSynSingleHookPlugin.IsShortCutStored: Boolean;
 begin
   Result := fShortCut <> DefaultShortCut;
 end;

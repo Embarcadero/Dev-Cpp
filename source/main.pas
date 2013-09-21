@@ -144,11 +144,9 @@ type
 		LogSheet: TTabSheet;
 		Toolbar: TControlBar;
 		tbMain: TToolBar;
-		NewProjectBtn: TToolButton;
 		OpenBtn: TToolButton;
 		tbCompile: TToolBar;
 		CleanItem: TMenuItem;
-		ToolButton3: TToolButton;
 		NewFileBtn: TToolButton;
 		SaveUnitBtn: TToolButton;
 		CloseBtn: TToolButton;
@@ -289,6 +287,8 @@ type
 		MsgSaveAllItem: TMenuItem;
 		MsgClearItem: TMenuItem;
 
+
+
 		actBreakPoint: TAction;
 		actIncremental: TAction;
 		IncrementalSearch1: TMenuItem;
@@ -315,7 +315,6 @@ type
 		actRemoveWatch: TAction;
 		actStopExecute: TAction;
 		StopExecution1: TMenuItem;
-		NewAllBtn: TToolButton;
 		InsertBtn: TToolButton;
 		ToggleBtn: TToolButton;
 		GotoBtn: TToolButton;
@@ -592,6 +591,11 @@ type
 		ProfilingInforBtn: TToolButton;
 		CompResGroupBox: TGroupBox;
 		LogOutput: TMemo;
+    N64: TMenuItem;
+    CollapseAll: TMenuItem;
+    UncollapseAll: TMenuItem;
+    actCollapse: TAction;
+    actUnCollapse: TAction;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -605,7 +609,6 @@ type
 		procedure GotoBookmarkClick(Sender: TObject);
 		procedure ToggleBtnClick(Sender: TObject);
 		procedure GotoBtnClick(Sender: TObject);
-		procedure NewAllBtnClick(Sender: TObject);
 		procedure MessageControlChange(Sender: TObject);
 		procedure MessageControlChanging(Sender: TObject;var AllowChange: Boolean);
 		procedure ProjectViewContextPopup(Sender: TObject; MousePos: TPoint;var Handled: Boolean);
@@ -643,7 +646,7 @@ type
 		procedure actPasteExecute(Sender: TObject);
 		procedure actSelectAllExecute(Sender: TObject);
 		procedure actProjectManagerExecute(Sender: TObject);
-		procedure actStatusbarExecute(Sender: TObject);
+		procedure actStatusBarExecute(Sender: TObject);
 		procedure actCompOutputExecute(Sender: TObject);
 		procedure actCompOnNeedExecute(Sender: TObject);
 		procedure actFullScreenExecute(Sender: TObject);
@@ -853,6 +856,7 @@ type
 		procedure actDeleteProfileProjectExecute(Sender: TObject);
 		procedure actGotoImplDeclEditorExecute(Sender: TObject);
 		procedure actHideFSBarExecute(Sender: TObject);
+		procedure UpdateSplash(text : string);
 
 		function findstatement(var localfind : string; var localfindpoint : TPoint;mousecursor : boolean) : PStatement;
 		procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
@@ -861,6 +865,10 @@ type
     procedure CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView;
       Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;
       var DefaultDraw: Boolean);
+    procedure cmbMembersDropDown(Sender: TObject);
+    procedure NewFileBtnClick(Sender: TObject);
+    procedure actUnCollapseExecute(Sender: TObject);
+    procedure actCollapseExecute(Sender: TObject);
 
 	private
 		fTab				: integer;
@@ -892,7 +900,7 @@ type
 		procedure CompResOutputProc(const _Line, _Unit, _Message: string);
 		procedure CompSuccessProc(const messages : integer);
 		procedure MainSearchProc(const SR: TdevSearchResult);
-		procedure LoadText(force : boolean);
+		procedure LoadText;
 		function SaveFileAs(e : TEditor): Boolean;
 		procedure OpenCloseMessageSheet(const _Show: boolean);
 		procedure OpenUnit;
@@ -926,7 +934,6 @@ type
 		procedure SetProjCompOpt(idx: integer; Value: boolean); // set project's compiler option indexed 'idx' to value 'Value'
 		function CloseEditor(index : integer; Rem : boolean): Boolean;
 		procedure RefreshContext;
-		procedure UpdateFont;
 
 		{ *** RNC Global Breakpoint Declarations *** }
 		procedure AddBreakPointToList(line_number: integer; e : TEditor; filename:string);
@@ -990,12 +997,12 @@ procedure TMainForm.DoCreateEverything;
 //
 // This method is called from devcpp.dpr !
 // I removed it from OnCreate, because all this stuff
-// take pretty much time and it makes the application like it hangs.
+// take pretty much time and it makes the application look like it hangs.
 // So while 'Creating' the form is hidden and when it's done, it's displayed
 // without 'lag' and it's immediately ready to use ...
 //
 begin
-	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Creating objects...';
+	UpdateSplash('Applying Settings...');
 	Caption := DEVCPP + ' ' + DEVCPP_VERSION;
 	fFirstShow:= TRUE;
 	DDETopic:=DevCppDDEServer.Name;
@@ -1007,45 +1014,56 @@ begin
 	devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 	SetPath(devDirs.Bins);
 
-	// Macros
-	fTools:= TToolController.Create;
-
-	// set visiblity to previous sessions state
+	// Set left panel to previous state
 	actProjectManager.Checked:= devData.ProjectView;
-	{ begin XXXKF changed}
 	if devData.ClassView then
 		LeftPageControl.ActivePage:=ClassSheet
 	else
 		LeftPageControl.ActivePage:=ProjectSheet;
 	actProjectManagerExecute(nil);
-	{ end XXXKF changed}
 	LeftPageControl.Width:=devData.ProjectWidth;
+
+	// Set statusbar to previous state
 	actStatusbar.Checked:= devData.Statusbar;
 	actStatusbarExecute(nil);
 
+	// Intialize project
 	fProjectCount := 0;
 	fProject := nil;
+
+	// Add compiler events
 	fCompiler:= TCompiler.Create;
 	fCompiler.OnLogEntry := LogEntryProc;
 	fCompiler.OnOutput := CompOutputProc;
 	fCompiler.OnResOutput := CompResOutputProc;
 	fCompiler.OnSuccess:= CompSuccessProc;
 
+	// Create a debugger
 	fDebugger := TDebugger.Create;
-
 	fDebugger.DebugTree := DebugTree;
 
+	// Set the SynEdit search engine
 	SearchCenter.SearchProc:= MainSearchProc;
 	SearchCenter.PageControl:= PageControl;
 
+	// Set bottom panel height
 	MessageControl.Height:=devData.OutputHeight;
 	fmsgHeight:= MessageControl.Height;
 
-	{*** Modified by Peter ***}
+	// Custom tools
+	fTools:= TToolController.Create;
+	with fTools do begin
+		Menu:= ToolsMenu;
+		Offset:= ToolsMenu.Indexof(PackageManagerItem);
+		ToolClick:= ToolItemClick;
+	//	BuildMenu; // Done by themes
+	end;
+
+	// Create icon themes
 	devImageThemes := TDevImageThemeFactory.Create;
 	devImageThemes.LoadFromDirectory(devDirs.Themes);
 
-	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Applying localisation...';
+	// Set languages and other first time stuff
 	if devData.First or (devData.Language = '') then begin
 		Lang.SelectLanguage;
 		if devData.ThemeChange then
@@ -1057,29 +1075,18 @@ begin
 	end;
 	devData.Version := DEVCPP_VERSION;
 
-	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Loading tools...';
-	with fTools do begin
-		Menu:= ToolsMenu;
-		Offset:= ToolsMenu.Indexof(PackageManagerItem);
-		ToolClick:= ToolItemClick;
-		BuildMenu;
-	end;
+	// Load bookmarks, captions and hints
+	LoadText;
 
-	LoadText(FALSE);
-
+	// Apply shortcuts
 	devShortcuts.Filename:=devDirs.Config + DEV_devShortcuts_FILE;
 	devShortcuts.Load;
 
-	// Set fonts
-	UpdateFont;
-
-	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Setting layout options...';
-	if not DevData.ShowOutput then
-		OpenCloseMessageSheet(FALSE);
-
+	// Some more options
 	actCompOnNeed.Checked:=devData.OutputOnNeed;
 	actCompOutput.Checked:=devData.ShowOutput;
 
+	// Toolbar visibility
 	ToolMainItem.checked:= devData.ToolbarMain;
 	ToolEditItem.Checked:= devData.ToolbarEdit;
 	ToolCompileandRunItem.Checked:= devData.ToolbarCompile;
@@ -1089,6 +1096,7 @@ begin
 	ToolClassesItem.Checked:= devData.ToolbarClasses;
 	ToolbarClick(nil);
 
+	// Toolbar positions
 	tbMain.Left:= devData.ToolbarMainX;
 	tbMain.Top:= devData.ToolbarMainY;
 	tbEdit.Left:= devData.ToolbarEditX;
@@ -1104,34 +1112,28 @@ begin
 	tbClasses.Left:= devData.ToolbarClassesX;
 	tbClasses.Top:= devData.ToolbarClassesY;
 
+	// Multiline tab
 	PageControl.MultiLine:= devData.MultiLineTab;
 
-	MainForm.Constraints.MaxHeight:=Monitor.Height;
-	MainForm.Constraints.MaxWidth:=Monitor.Width;
-
+	// Mouseover time
 	Application.HintHidePause:=5000;
 
+	// Some more compiler settings
 	fCompiler.RunParams:='';
 	devCompiler.UseExecParams:=True;
 
-	{ *** RNC Create breakpoint list *** }
+	// Create breakpoints
 	BreakPointList := TList.create;
 
 	// Create an autosave timer
 	AutoSaveTimer := TTimer.Create(Application);
-	AutoSaveTimer.Interval := devEditor.Interval*60*1000;
+	AutoSaveTimer.Interval := devEditor.Interval*60*1000; // ms to minutes of course
 	AutoSaveTimer.OnTimer := EditorSaveTimer;
 	AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
 
-	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Initializing class browser...';
-	InitClassBrowser(true{not CacheCreated});
-end;
-
-procedure TMainForm.UpdateFont;
-begin
-	Screen.MenuFont.Name := devData.InterfaceFont;
-	MainForm.Font.Name := devData.InterfaceFont;
-//	fEnviroFrm.
+	// Initialize class browser (takes much longer than all the other stuff above)
+	UpdateSplash('Initializing class browser...');
+	InitClassBrowser(true);
 end;
 
 { *** RNC add global breakpoint *** }
@@ -1165,8 +1167,8 @@ end;
 
 procedure TMainForm.RemoveBreakPointAtIndex(index:integer);
 begin
-	 dispose(BreakPointList.Items[index]);
-	 BreakPointList.Delete(index);
+	dispose(BreakPointList.Items[index]);
+	BreakPointList.Delete(index);
 end;
 
 function TMainForm.GetBreakPointIndex(line_number: integer; e:TEditor) : integer;
@@ -1219,7 +1221,7 @@ begin
 		devImageThemes.ActivateTheme(devData.Theme);
 
 		with devImageThemes do begin
-			ActionList.Images			:= CurrentTheme.MenuImages;
+			ActionList.Images		:= CurrentTheme.MenuImages;
 			MainMenu.Images			:= CurrentTheme.MenuImages;
 			ProjectView.Images		:= CurrentTheme.ProjectImages;
 			MessageControl.Images	:= CurrentTheme.MenuImages;
@@ -1258,7 +1260,7 @@ begin
 		end;
 	end;
 
-//	fTools.BuildMenu; // reapply icons to tools
+	fTools.BuildMenu; // reapply icons to tools
 end;
 
 procedure TMainForm.FormShow(Sender: TObject);
@@ -1351,19 +1353,17 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 var
 	i: integer;
-	tmpcount: integer;
 begin
 	if fDebugger.Executing then
-	 fDebugger.CloseDebugger(Sender);
+		fDebugger.CloseDebugger(Sender);
 	fTools.Free;
 	fCompiler.Free;
 	fDebugger.Free;
 	dmMain.Free;
 	devImageThemes.Free;
-	tmpcount := BreakPointList.Count - 1;
-{** RNC Clean up the global breakpoint list *** }
-	for i := tmpcount downto 0 do
-	begin
+
+	// Remove the breakpoints
+	for i := BreakPointList.Count - 1 downto 0 do begin
 		dispose(BreakPointList.Items[i]);
 		BreakPointList.Delete(i);
 	end;
@@ -1475,8 +1475,12 @@ begin
 	end;
 end;
 
-procedure TMainForm.LoadText(force : boolean);
+procedure TMainForm.LoadText;
 begin
+
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
 
 	// Menus
 	FileMenu.Caption :=					Lang[ID_MNU_FILE];
@@ -1492,6 +1496,7 @@ begin
 
 	// file menu
 	mnuNew.Caption:=					Lang[ID_SUB_NEW];
+	NewFileBtn.Hint:=					Lang[ID_HINT_NEW];
 	actNewSource.Caption:=				Lang[ID_ITEM_NEWSOURCE];
 	actNewProject.Caption:=				Lang[ID_ITEM_NEWPROJECT];
 	actNewTemplate.Caption:=			Lang[ID_ITEM_NEWTEMPLATE];
@@ -1539,6 +1544,8 @@ begin
 	actIndent.Caption:=					Lang[ID_ITEM_INDENTSELECTION];
 	actUnindent.Caption:=				Lang[ID_ITEM_UNINDENTSELECTION];
 	actSwapHeaderSource.Caption:=		Lang[ID_ITEM_SWAPHEADERSOURCE];
+	actCollapse.Caption:=				Lang[ID_ITEM_COLLAPSEALL];
+	actUnCollapse.Caption:=				Lang[ID_ITEM_UNCOLLAPSEALL];
 
 	// Search Menu
 	actFind.Caption:=					Lang[ID_ITEM_FIND];
@@ -1742,12 +1749,9 @@ begin
 	pnlFull.Caption:=					Format(Lang[ID_FULLSCREEN_MSG], [DEVCPP, DEVCPP_VERSION]);
 
 	// Mainform toolbar buttons
-	NewAllBtn.Caption :=				Lang[ID_TB_NEW];
 	InsertBtn.Caption :=				Lang[ID_TB_INSERT];
 	ToggleBtn.Caption :=				Lang[ID_TB_TOGGLE];
 	GotoBtn.Caption :=					Lang[ID_TB_GOTO];
-
-	tbSpecials.Width := NewAllBtn.Width + InsertBtn.Width + ToggleBtn.Width + GotoBtn.Width;
 
 	BuildBookMarkMenus;
 	SetHints;
@@ -1860,7 +1864,7 @@ begin
 							if Lines.Count > 0 then
 								if Lines[Lines.Count -1] <> '' then
 									Lines.Add('');
-					e.Text.Lines.SaveToFile(s);
+					e.Text.UnCollapsedLines.SaveToFile(s);
 					e.Modified := FALSE;
 					e.New:= FALSE;
 				except
@@ -1932,7 +1936,7 @@ begin
 						if Lines.Count > 0 then
 							if Lines[Lines.Count -1] <> '' then
 								Lines.Add('');
-				e.Text.Lines.SaveToFile(e.FileName);
+				e.Text.UnCollapsedLines.SaveToFile(e.FileName);
 				e.Modified := false;
 				if ClassBrowser1.Enabled then begin
 					CppParser.ReParseFile(e.FileName, False); //new cc
@@ -2010,17 +2014,13 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if Assigned(e) then begin
-		// keep Statusbar updated
-		MainForm.Statusbar.Panels[0].Text:= format('%6d: %d', [e.Text.DisplayY, e.Text.DisplayX]);
-		MainForm.Statusbar.Panels[3].Text:= format(Lang[ID_LINECOUNT], [e.Text.Lines.Count]);
-	end;
+	if Assigned(e) then
+		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[e.Text.GetRealLineNumber(e.Text.DisplayY), e.Text.DisplayX, e.Text.SelLength, e.Text.GetTextLen, e.Text.UnCollapsedLines.Count]);
 end;
 
 procedure TMainForm.SetStatusbarMessage(msg:string);
 begin
-	// keep Statusbar updated
-	MainForm.Statusbar.Panels[3].Text:= msg;
+	Statusbar.Panels[2].Text:= msg;
 end;
 
 procedure TMainForm.ToggleBookmarkClick(Sender: TObject);
@@ -2075,25 +2075,18 @@ begin
 	end;
 end;
 
-procedure TMainForm.NewAllBtnClick(Sender: TObject);
-var
-	pt: TPoint;
-begin
-	pt:= tbSpecials.ClientToScreen(point(NewAllBtn.Left, NewAllbtn.Top +NewAllbtn.Height));
-	TrackPopupMenu(mnuNew.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.X, pt.y, 0, Self.Handle, nil);
-end;
-
 procedure TMainForm.OpenCloseMessageSheet(const _Show: boolean);
 begin
 	if Assigned(ReportToolWindow) then
 		exit;
+
 	with MessageControl do
 		if _Show then
 			Height:= fmsgHeight
-	else begin
-		Height:= Height - CompSheet.Height;
-		ActivePageIndex:= -1;
-	end;
+		else begin
+			Height:= Height - CompSheet.Height;
+			ActivePageIndex:= -1;
+		end;
 	CloseSheet.TabVisible:= _Show;
 	Statusbar.Top:= Self.ClientHeight;
 end;
@@ -2513,16 +2506,14 @@ end;
 
 procedure TMainForm.actNewSourceExecute(Sender: TObject);
 var
- NewEditor: TEditor;
+	NewEditor: TEditor;
 begin
-	if assigned(fProject) then
-	 begin
-		 if MessageDlg(Lang[ID_MSG_NEWFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-			begin
-				actProjectNewExecute(Sender);
-				exit;
-			end;
-	 end;
+	if assigned(fProject) then begin
+		if MessageDlg(Lang[ID_MSG_NEWFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+			actProjectNewExecute(Sender);
+			exit;
+		end;
+	end;
 //	else
 //	 // no open project, but open source file close project manager
 //	 if actProjectManager.Checked then
@@ -2609,8 +2600,7 @@ begin
 
 	fname:=Lang[ID_UNTITLED] +inttostr(dmMain.GetNum) + '.rc';
 	NewEditor := TEditor.Create;
-	NewEditor.init(InProject, fname, '',
-		FALSE, TRUE);
+	NewEditor.init(InProject, fname, '',FALSE, TRUE);
 	NewEditor.Activate;
 
 	if InProject and Assigned(fProject) then begin
@@ -2838,8 +2828,10 @@ var
  e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then
+	if assigned(e) then begin
 		e.Text.Undo;
+		e.Text.ReScanForFoldRanges; // SynEdit itself doesn't process the message properly itself in TCustomSynEdit.DoOnCommandProcessed
+	end;
 end;
 
 procedure TMainForm.actRedoExecute(Sender: TObject);
@@ -2847,8 +2839,10 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then
+	if assigned(e) then begin
 		e.Text.Redo;
+		e.Text.ReScanForFoldRanges; // SynEdit itself doesn't process the message properly itself in TCustomSynEdit.DoOnCommandProcessed
+	end;
 end;
 
 procedure TMainForm.actCutExecute(Sender: TObject);
@@ -2878,6 +2872,7 @@ begin
 	e:= GetEditor;
 	if Assigned(e) then begin
 		e.Text.PasteFromClipboard;
+		e.Text.ReScanForFoldRanges; // SynEdit itself doesn't process the message properly itself in TCustomSynEdit.DoOnCommandProcessed
 		e.Text.Repaint;
 	end;
 end;
@@ -3029,32 +3024,31 @@ var
  pt: TPoint;
 begin
 	with TEditorOptForm.Create(Self) do
-	 try
-		if ShowModal = mrOk then
-		 begin
-			 dmMain.UpdateHighlighter;
-			 for idx:= 0 to pred(PageControl.PageCount) do
-				with TEditor(PageControl.Pages[idx].Tag) do
-				 begin
-					 // update the selected text color
-					 StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
-					 Text.SelectedColor.Background:= pt.X;
-					 Text.SelectedColor.Foreground:= pt.Y;
+		try
+			if ShowModal = mrOk then begin
+				dmMain.UpdateHighlighter;
+				for idx:= 0 to pred(PageControl.PageCount) do
+					with TEditor(PageControl.Pages[idx].Tag) do begin
+						// update the selected text color
+						StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
+						Text.SelectedColor.Background:= pt.X;
+						Text.SelectedColor.Foreground:= pt.Y;
 
-					 devEditor.AssignEditor(Text);
-					 Text.Highlighter:= dmMain.GetHighlighter(FileName);
-					 ReconfigCompletion;
-				 end;
-				 InitClassBrowser(chkCCCache.Tag=1);
-				 if CppParser.Statements.Count=0 then
-					 ScanActiveProject;
-			 if GetEditor <> nil then begin
-				 GetEditor.Activate;
-			 end;
-		 end;
-	 finally
-		Free;
-	 end;
+						devEditor.AssignEditor(Text);
+						Text.Highlighter:= dmMain.GetHighlighter(FileName);
+						ReconfigCompletion;
+					end;
+
+				InitClassBrowser(chkCCCache.Tag=1);
+				if CppParser.Statements.Count=0 then
+					ScanActiveProject;
+
+				if GetEditor <> nil then
+					GetEditor.Activate;
+			end;
+		finally
+			Free;
+		end;
 end;
 
 procedure TMainForm.actConfigToolsExecute(Sender: TObject);
@@ -3537,7 +3531,7 @@ begin
 
 			if devData.LangChange = TRUE then begin
 				Lang.SetLang(devData.Language);
-				LoadText(TRUE);
+				LoadText;
 			end;
 			if devData.ThemeChange then
 				Loadtheme;
@@ -3704,8 +3698,8 @@ begin
 		case MessageControl.ActivePageIndex of
 			cCompTab: begin
 				savedialog.FileName:= 'Formatted Compiler Output';
-				for i:=0 to pred(MainForm.CompilerOutput.Items.Count) do begin
-					temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
+				for i:=0 to pred(CompilerOutput.Items.Count) do begin
+					temp2 := CompilerOutput.Items[i].Caption + #10 + CompilerOutput.Items[i].SubItems.Text;
 					temp2 := StringReplace(temp2,#10,#9,[]);
 					temp2 := StringReplace(temp2,#13#10,#9,[]);
 					temp2 := StringReplace(temp2,#13#10,#9,[]);
@@ -3729,7 +3723,7 @@ begin
 				savedialog.FileName:= 'Find Results';
 				ClipBoard.AsText := '';
 				for i:=0 to pred(FindOutput.Items.Count) do begin
-					temp2 := MainForm.FindOutput.Items[i].Caption + #10 + MainForm.FindOutput.Items[i].SubItems.Text;
+					temp2 := FindOutput.Items[i].Caption + #10 + FindOutput.Items[i].SubItems.Text;
 					temp2 := StringReplace(temp2,#10,#9,[]);
 					temp2 := StringReplace(temp2,#13#10,#9,[]);
 					temp2 := StringReplace(temp2,#13#10,#9,[]);
@@ -4196,6 +4190,12 @@ begin
 		GetWindowPlacement(Self.Handle, @devData.WindowPlacement);
 end;
 
+procedure TMainForm.UpdateSplash(text : string);
+begin
+	if not devData.NoSplashScreen then
+		SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') ' + text;
+end;
+
 procedure TMainForm.InitClassBrowser(Full: boolean);
 var
 	e: TEditor;
@@ -4309,7 +4309,7 @@ begin
 				ClassBrowser1.CurrentFile:=e.FileName;
 		end;
 	end;
-	MainForm.SetStatusbarMessage('Done parsing in '+FormatFloat('#,###,##0.00', (GetTickCount-I1)/1000)+' seconds');
+	SetStatusbarMessage('Done parsing in '+FormatFloat('#,###,##0.00', (GetTickCount-I1)/1000)+' seconds');
 end;
 
 procedure TMainForm.ClassBrowser1Select(Sender: TObject;
@@ -4326,10 +4326,10 @@ end;
 procedure TMainForm.CppParserTotalProgress(Sender: TObject;FileName: String; Total, Current: Integer);
 begin
 	if FileName<>'' then
-		Statusbar.Panels[3].Text:='Parsing '+ Filename
+		SetStatusBarMessage('Parsing '+ Filename)
 	else
-		Statusbar.Panels[3].Text:='Done parsing.';
-	Statusbar.Refresh;
+		SetStatusBarMessage('Done parsing.');
+	//Statusbar.Refresh;
 end;
 
 procedure TMainForm.CodeCompletionResize(Sender: TObject);
@@ -5410,7 +5410,7 @@ end;
 
 procedure TMainForm.CppParserStartParsing(Sender: TObject);
 begin
-	Statusbar.Panels[3].Text:='Please wait: Parsing in progress...';
+	SetStatusBarMessage('Please wait: Parsing in progress...');
 	Screen.Cursor:=crHourglass;
 	if not bProjectLoading then
 		ActionList.State:=asSuspended;
@@ -5423,14 +5423,14 @@ begin
 	Screen.Cursor:=crDefault;
 
 	// rebuild classes toolbar only if this was the last file scanned
-	if (CppParser.FilesToScan.Count = 0) and Assigned(fProject) then begin
+	if (CppParser.FilesToScan.Count = 0){ and Assigned(fProject)} then begin
 
 		// Fix indices first
 		CppParser.FixIndices;
 		RebuildClassesToolbar;
 	end;
 
-	Statusbar.Panels[3].Text:='Ready.';
+	SetStatusBarMessage('Done parsing.');
 end;
 
 procedure TMainForm.UpdateAppTitle;
@@ -5735,7 +5735,7 @@ procedure TMainForm.ProjectViewKeyPress(Sender: TObject; var Key: Char);
 begin
 	// fixs an annoying bug/behavior of the tree ctrl (a beep on enter key)
 	if Key = #13 then
-		Key := #0;
+			Key := #0;
 end;
 
 procedure TMainForm.ProjectViewMouseDown(Sender: TObject;
@@ -6047,10 +6047,10 @@ begin
 		st:=PStatement(CppParser.Statements[I]);
 		if not usestructeval then begin
 			if (st^._ParentID = idx) and st^._InProject and (st^._Kind in [skConstructor, skDestructor, skFunction]) then
-				cmbMembers.Items.AddObject(st^._Type + ' ' + st^._ScopelessCmd+st^._Args, Pointer(I));
+				cmbMembers.Items.AddObject(st^._ScopelessCmd+st^._Args + ' : ' + st^._Type, Pointer(I));
 		end else begin
 			if (st^._ParentID = idx) and st^._InProject then
-				cmbMembers.Items.AddObject(st^._Type + ' ' + st^._ScopelessCmd+st^._Args, Pointer(I));
+				cmbMembers.Items.AddObject(st^._ScopelessCmd+st^._Args + ' : ' + st^._Type, Pointer(I));
 		end;
 	end;
 end;
@@ -6252,8 +6252,9 @@ begin
 end;
 
 procedure TMainForm.RefreshContext;
-var idx, idx2 : integer;
-		s : string;
+var
+	idx, idx2 : integer;
+	s : string;
 begin
 	// I'm not sure we should send again debug variables, GDB sends weird results for uninitialized objects (which is quite always the case)
 	for idx := 0 to DebugTree.Items.Count - 1 do begin
@@ -6366,6 +6367,7 @@ var
 	wantquote : boolean;
 	found : boolean;
 	curtext : string;
+	actualtext : TStrings;
 begin
 
 	Screen.Cursor := crHourglass;
@@ -6387,14 +6389,16 @@ begin
 
 	if member <> '' then begin
 
+		actualtext := e.Text.Lines;
+
 		len:=0;
 		len2:=0;
 		isglobal:=true;
 
 		// See if we clicked on / hovered above something with a parent before it
-		cpos := Pos('::' + member,e.Text.Lines[cursorpos.Line-1]);
-		ppos := Pos('.'  + member,e.Text.Lines[cursorpos.Line-1]);
-		apos := Pos('->' + member,e.Text.Lines[cursorpos.Line-1]);
+		cpos := Pos('::' + member,actualtext[cursorpos.Line-1]);
+		ppos := Pos('.'  + member,actualtext[cursorpos.Line-1]);
+		apos := Pos('->' + member,actualtext[cursorpos.Line-1]);
 
 		// We found something belonging to a class or namespace
 		if cpos > 0 then begin
@@ -6402,8 +6406,8 @@ begin
 			// Find the namespace or class, don't check for the type of the class, it's already there
 			repeat
 				Inc(len);
-			until not (e.Text.Lines[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
-			parent := Copy(e.Text.Lines[cursorpos.Line-1],cpos-len+1,len-1);
+			until not (actualtext[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
+			parent := Copy(actualtext[cursorpos.Line-1],cpos-len+1,len-1);
 			isglobal := false;
 
 		end else if (ppos > 0) or (apos > 0) then begin
@@ -6412,14 +6416,14 @@ begin
 			if ppos > 0 then cpos := ppos else cpos := apos;
 			repeat
 				Inc(len);
-				if e.Text.Lines[cursorpos.Line-1][cpos-len] = ']' then begin
+				if actualtext[cursorpos.Line-1][cpos-len] = ']' then begin
 					repeat
 						Inc(len2);
-					until (e.Text.Lines[cursorpos.Line-1][cpos-len2+len] in ['[']);
+					until (actualtext[cursorpos.Line-1][cpos-len2+len] in ['[']);
 					cpos := cpos - len2 + len;
 				end;
-			until not (e.Text.Lines[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
-			parent := Copy(e.Text.Lines[cursorpos.Line-1],cpos-len+1,len-1);
+			until not (actualtext[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
+			parent := Copy(actualtext[cursorpos.Line-1],cpos-len+1,len-1);
 
 			// So do scan for the type of the instance we've found
 			for I:=0 to CppParser.Statements.Count-1 do begin
@@ -6438,17 +6442,18 @@ begin
 			end;
 		end else begin
 
-			// otherwise, we clicked an 'unattached' variable,
+			// otherwise, we clicked an 'unattached' variable. First check if we're inside a class body
 			for I:=cursorpos.Line-1 downto 0 do begin
 
-				// We're inside a class definition
-				if AnsiStartsStr('class ',TrimLeft(e.Text.Lines[I])) then begin
-					classdefline := TrimLeft(e.Text.Lines[I]);
-					len:=2;
-					repeat
+				// We're inside a class definition, save the name of the parent class...
+				if AnsiStartsStr('class ',TrimLeft(actualtext[I])) then begin
+					classdefline := TrimLeft(actualtext[I]);
+
+					len:=7;
+					while (len <= Length(classdefline)) and not (classdefline[len] in ['{',#9,#32]) do
 						Inc(len);
-					until (classdefline[length('class ')+len] in [#9,#32]);
-					parent := Copy(classdefline,Length('class ')+1,len-1);
+
+					parent := Copy(classdefline,7,len-7);
 					break;
 				end;
 			end;
@@ -6457,16 +6462,16 @@ begin
 		// If we haven't found out its class, assume it belongs to the namespace or function we're currently in
 		if isglobal then begin
 			for I:=cursorpos.Line downto 0 do begin
-				cpos := AnsiPos('::',e.Text.Lines[I]);
+				cpos := AnsiPos('::',actualtext[I]);
 				if cpos > 0 then begin
 
 					// We zitten in een functie
 					len := 0;
 					repeat
 						Inc(len);
-					until e.Text.Lines[I][cpos-len] in [#9,#32];
-					parent := Copy(e.Text.Lines[I],cpos-len+1,len-1);
-					classline := e.Text.Lines[I];
+					until actualtext[I][cpos-len] in [#9,#32];
+					parent := Copy(actualtext[I],cpos-len+1,len-1);
+					classline := actualtext[I];
 					break;
 				end;
 			end;
@@ -6505,8 +6510,8 @@ begin
 			wantbrace := 0;
 			wantquote := false;
 			wantcomment := 0;
-			text := PChar(e.Text.Lines.Text);
-			for I:=cpos downto (cpos-1024) do begin
+			text := PChar(actualtext.Text);
+			for I:=cpos downto Max(0,(cpos-1024)) do begin
 
 				if I = 0 then break;
 
@@ -6574,7 +6579,7 @@ begin
 							until text[I-len-len2] in [#10];
 						end;
 
-					until (len2 = 9999) or (text[parampos-len] in ['>','<','+','-','/','=','(',')',';','#','{','}',',']);
+					until (len2 = 9999) or (text[parampos-len] in ['>','<','+','-','/','=','(',')',':',';','#','{','}',',']);
 
 					// If we encountered a #define, continue at the end until a newline
 					if AnsiStartsStr('#',text[parampos-len]) then begin
@@ -6706,10 +6711,9 @@ begin
 
 		// Go to the location
 		e:=GetEditorFromFileName(filename);
-		if Assigned(e) then begin
+		if Assigned(e) then
 			e.GotoLineNr(line);
-			SetStatusbarLineCol;
-		end;
+
 	end else
 		SetStatusbarMessage('Could not find declaration...');
 
@@ -6786,8 +6790,80 @@ begin
 		Sender.Canvas.Font.Color := clYellow;
 
 	// In function/member/etc
-	if AnsiStartsStr('in',LowerCase(Item.SubItems[2])) then
+	if AnsiStartsStr('in ',LowerCase(Item.SubItems[2])) or AnsiStartsStr('at ',LowerCase(Item.SubItems[2])) then
 		Sender.Canvas.Font.Style := [fsBold];
+end;
+
+// Full file path when hovering above tabs...
+{
+procedure TMainForm.PageControlMouseMove(Sender: TObject;Shift: TShiftState; X, Y: Integer);
+var
+	e : TEditor;
+	tabindex : integer;
+begin
+	PageControl.ShowHint := false;
+	tabindex := PageControl.IndexOfTabAt(X,Y);
+	if tabindex >= 0 then begin
+		e:=GetEditor(tabindex);
+		if Assigned(e) then begin
+			PageControl.Hint:=e.FileName;
+			PageControl.ShowHint := true;
+		end;
+	end;
+end;
+}
+
+procedure TMainForm.cmbMembersDropDown(Sender: TObject);
+var
+	widestwidth, curwidth, I : integer;
+begin
+	// Set to default width first...
+	SendMessage(cmbMembers.Handle, CB_SETDROPPEDWIDTH, 0, 0);
+
+	widestwidth := 0;
+
+	// Fix, cmbMembers.Canvas.Font was set to Tahoma for some reason?
+	cmbMembers.Canvas.Font.Name := 'Courier New';
+
+	// get the max needed with of the items in dropdown state
+	for I := 0 to cmbMembers.Items.Count-1 do begin
+		curwidth := cmbMembers.Canvas.TextWidth(cmbMembers.Items[I]) + 8; // padding
+		widestwidth := Max(widestwidth,curwidth);
+	end;
+
+	// set the width of drop down if needed
+	if(widestwidth > cmbMembers.Width) then begin
+		if cmbMembers.DropDownCount < cmbMembers.Items.Count then
+			widestwidth := widestwidth + GetSystemMetrics(SM_CXVSCROLL);
+
+		SendMessage(cmbMembers.Handle, CB_SETDROPPEDWIDTH, widestwidth, 0);
+	end;
+end;
+
+procedure TMainForm.NewFileBtnClick(Sender: TObject);
+var
+	pt: TPoint;
+begin
+	pt:= tbMain.ClientToScreen(point(NewFileBtn.Left, NewFileBtn.Top + NewFileBtn.Height));
+	TrackPopupMenu(mnuNew.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.X, pt.y, 0, Self.Handle, nil);
+end;
+
+procedure TMainForm.actUnCollapseExecute(Sender: TObject);
+var
+	e : TEditor;
+begin
+	e:=GetEditor;
+	if Assigned(e) then
+		e.Text.UncollapseAll;
+end;
+
+procedure TMainForm.actCollapseExecute(Sender: TObject);
+var
+	e : TEditor;
+begin
+	e:=GetEditor;
+	if Assigned(e) then
+		e.Text.CollapseAll;
 end;
 
 end.

@@ -187,7 +187,7 @@ begin
       fCurFile:= ExpandFileto(fCurFile, fProject.Directory);
 
      if assigned(fProject.Units[idx].Editor) then
-      fSynEdit.Lines:= fProject.Units[idx].Editor.Text.Lines
+      fSynEdit.Lines:= fProject.Units[idx].Editor.Text.UnCollapsedLines
      else
       fSynEdit.Lines.LoadFromfile(fCurFile);
 
@@ -203,7 +203,7 @@ begin
   for idx:= 0 to pred(fPC.PageCount) do
    begin
      fCurFile:= TEditor(fPC.Pages[idx].Tag).FileName;
-     fSynEdit.Lines:= TEditor(fPC.Pages[idx].Tag).Text.Lines;
+     fSynEdit.Lines:= TEditor(fPC.Pages[idx].Tag).Text.UnCollapsedLines;
      fSynEdit.SearchReplace(fFindText, fReplaceText, fOptions);
    end;
   result:= TRUE;

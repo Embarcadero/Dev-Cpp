@@ -9,7 +9,7 @@ E=0
 F=0
 G=1
 H=1
-I=0
+I=1
 J=1
 K=0
 L=1
@@ -106,7 +106,7 @@ Launcher=
 UseLauncher=0
 DebugCWD=
 [Version Info]
-IncludeVerInfo=1
+IncludeVerInfo=0
 AutoIncBuild=0
 MajorVer=1
 MinorVer=0

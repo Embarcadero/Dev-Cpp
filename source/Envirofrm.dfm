@@ -1,6 +1,6 @@
 object EnviroForm: TEnviroForm
-  Left = 830
-  Top = 307
+  Left = 741
+  Top = 353
   BorderStyle = bsDialog
   Caption = 'Environment Options'
   ClientHeight = 432
@@ -317,7 +317,7 @@ object EnviroForm: TEnviroForm
       object cbUIfont: TComboBox
         Left = 256
         Top = 152
-        Width = 195
+        Width = 145
         Height = 26
         AutoComplete = False
         Style = csOwnerDrawVariable
@@ -327,6 +327,30 @@ object EnviroForm: TEnviroForm
         TabOrder = 15
         OnDrawItem = cbUIfontDrawItem
         OnSelect = cbUIfontSelect
+      end
+      object cbUIfontsize: TComboBox
+        Left = 402
+        Top = 152
+        Width = 47
+        Height = 26
+        AutoComplete = False
+        Style = csOwnerDrawVariable
+        DropDownCount = 10
+        ItemHeight = 20
+        TabOrder = 16
+        OnDrawItem = cbUIfontsizeDrawItem
+        OnSelect = cbUIfontSelect
+        Items.Strings = (
+          '7'
+          '8'
+          '9'
+          '10'
+          '11'
+          '12'
+          '13'
+          '14'
+          '15'
+          '16')
       end
     end
     object tabPaths: TTabSheet
@@ -837,6 +861,6 @@ object EnviroForm: TEnviroForm
   end
   object dlgPic: TOpenPictureDialog
     Left = 14
-    Top = 410
+    Top = 402
   end
 end

@@ -25,7 +25,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditStrConst.pas,v 1.6 2005/01/08 17:04:29 specu Exp $
+$Id: SynEditStrConst.pas,v 1.41 2004/07/31 16:20:08 markonjezic Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -74,11 +74,9 @@ const
   SYNS_AttrColor                =  'Color Value';
   SYNS_AttrComment              =  'Comment';
   SYNS_AttrCondition            =  'Condition';
-  SYNS_AttrConditionalComment   =  'Conditional Comment';
   SYNS_AttrDataType             =  'Data Type';
   SYNS_AttrDebugLines           =  'Debugging Lines';
   SYNS_AttrDefaultPackage       =  'Default Packages';
-  SYNS_AttrDelimitedIdentifier  =  'Delimited Identifier';
   SYNS_AttrDir                  =  'Direction';
   SYNS_AttrDirections           =  'Directions';
   SYNS_AttrDirective            =  'Directive';
@@ -271,7 +269,7 @@ const
   SYNS_LangHP48                 =  'HP48';
   SYNS_LangCAClipper            =  'CA-Clipper';
   SYNS_LangCPM                  =  'COAS Product Manager Report';
-  SYNS_LangCPP                  =  'C/C++';
+  SYNS_LangCPP                  =  'C++';
   SYNS_LangCS                   =  'C#';
   SYNS_LangJava                 =  'Java';
   SYNS_LangPerl                 =  'Perl';

@@ -26,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditPrint.pas,v 1.7 2005/01/08 17:04:28 specu Exp $
+$Id: SynEditPrint.pas,v 1.34 2004/06/27 22:08:59 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -196,7 +196,6 @@ type
     procedure SetFooter(const Value: TFooter);
     procedure SetHeader(const Value: THeader);
     procedure SetMargins(const Value: TSynEditPrintMargins);
-    function ClipLineToRect(S: string; R: TRect): string;
   protected
     property MaxLeftChar: Integer read FMaxLeftChar write SetMaxLeftChar;
     property CharWidth: Integer read FCharWidth write SetCharWidth;
@@ -620,14 +619,6 @@ begin
   FCanvas.Font.Assign(FOldFont);
 end;
 
-function TSynEditPrint.ClipLineToRect(S: string; R: TRect): string;
-begin
- while FCanvas.TextWidth(S) > FMaxWidth do
-    SetLength(S, Length(S) - 1);  
-
-  Result := S;
-end;
-
 procedure TSynEditPrint.TextOut(Text: string; AList: TList);
 //Does the actual printing
 var
@@ -641,17 +632,6 @@ var
   aStr: string;
   i, WrapPos, OldWrapPos: Integer;
   Lines: TStringList;
-  ClipRect: TRect;
-
-  procedure ClippedTextOut(X, Y: Integer; Text: string);
-  begin
-    Text := ClipLineToRect(Text, ClipRect);
-    {$IFDEF SYN_CLX}
-    FCanvas.TextOut(X, Y, Text);
-    {$ELSE}
-    ExtTextOut(FCanvas.Handle, X, Y, 0, nil, PChar(Text), Length(Text), @FETODist[0]);
-    {$ENDIF}
-  end;
 
   procedure SplitToken;
   var
@@ -667,21 +647,26 @@ var
       AStr := Copy(Text, Last + 1, TWrapPos(AList[LCount]).Index - Last);       //DDH 10/16/01 added fix from Oliver Grahl
       Last := TWrapPos(AList[LCount]).Index;                                    //DDH 10/16/01 added fix from Oliver Grahl
       {************}
-      ClippedTextOut(FMargins.PLeft + FirstPos * FCharWidth, FYPos, AStr);
+      {$IFDEF SYN_CLX}
+      FCanvas.TextOut(FMargins.PLeft + FirstPos * FCharWidth, FYPos, AStr);
+      {$ELSE}
+      ExtTextOut(FCanvas.Handle, FMargins.PLeft + FirstPos * FCharWidth, FYPos, 0, nil, PChar(AStr), Length(AStr), @FETODist[0]);
+      {$ENDIF}
       FirstPos := 0;
       LCount := LCount + 1;
       FYPos := FYPos + FLineHeight;
     end;
     AStr := Copy(Text, Last + 1, TokenEnd - Last);                              //DDH 10/16/01 added fix from Oliver Grahl
     {************}
-    ClippedTextOut(FMargins.PLeft + FirstPos * FCharWidth, FYPos, AStr);
+    {$IFDEF SYN_CLX}
+    FCanvas.TextOut(FMargins.PLeft + FirstPos * FCharWidth, FYPos, AStr);
+    {$ELSE}
+    ExtTextOut(FCanvas.Handle, FMargins.PLeft + FirstPos * FCharWidth, FYPos, 0, nil, PChar(AStr), Length(AStr), @FETODist[0]);
+    {$ENDIF}
     //Ready for next token:
     TokenStart := TokenPos + Length(Token) - Length(AStr);
   end;
 begin
-  with FMargins do
-    ClipRect := Rect(PLeft, PTop, PRight, PBottom);
-
   if FSynOK then
   begin
     SaveCurrentFont;
@@ -742,9 +727,9 @@ begin
           end;
         end;
       end;
-      {$IFNDEF SYN_CLX}
+      {$IFDEF SYN_WIN32}
       if not Handled then
-        ClippedTextOut(FMargins.PLeft + (TokenPos - TokenStart) * FCharWidth, FYPos, Token);
+        ExtTextOut(FCanvas.Handle, FMargins.PLeft + (TokenPos - TokenStart) * FCharWidth, FYPos, 0, nil, PChar(Token), Length(Token), @FETODist[0]);
       {$ENDIF}
       FHighLighter.Next;
     end;
@@ -771,7 +756,12 @@ begin
 
       for i := 0 to Lines.Count - 1 do
       begin
-        ClippedTextOut(FMargins.PLeft, FYPos, Lines[i]);
+        {$IFDEF SYN_CLX}
+        FCanvas.TextOut(FMargins.PLeft, FYPos, Lines[i]);
+        {$ELSE}
+        ExtTextOut(FCanvas.Handle, FMargins.PLeft, FYPos, 0, nil,
+          PChar(Lines[i]), Length(Lines[i]), @FETODist[0]);
+        {$ENDIF}
         if i < Lines.Count - 1 then
           FYPos := FYPos + FLineHeight;
       end;

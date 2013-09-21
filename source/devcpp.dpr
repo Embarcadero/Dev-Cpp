@@ -170,23 +170,22 @@ begin
 		devDirs.Config := UserHome;
 	devData.ReadConfigData;
 
-	// Display it a bit earlier
+	devTheme:= TdevTheme.Create;
+	Application.Initialize;
+	Application.Title := 'Dev-C++';
+	Application.CreateForm(TMainForm, MainForm);
+
+	// Display it a bit later
 	if not devData.NoSplashScreen then begin
 		SplashForm := TSplashForm.Create(Application);
 		SplashForm.Show;
 		SplashForm.Update;
 	end;
 
-	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Creating main window...';
-	devTheme:= TdevTheme.Create;
-	Application.Initialize;
-	Application.Title := 'Dev-C++';
-	Application.CreateForm(TMainForm, MainForm);
-
 	// do the creation stuff when the splashscreen is displayed because it takes quite a while ...
-	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Applying settings...';
 	MainForm.DoCreateEverything;
-	if not devData.NoSplashScreen then SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') Creating extra dialogs...';
+
+	MainForm.UpdateSplash('Creating extra dialogs...');
 	Application.CreateForm(TfrmFind, frmFind);
 	Application.CreateForm(TfrmReplace, frmReplace);
 

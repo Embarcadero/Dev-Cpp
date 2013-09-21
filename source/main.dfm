@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 617
-  Top = 303
-  Width = 1048
-  Height = 690
+  Left = 607
+  Top = 259
+  Width = 1073
+  Height = 761
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   Caption = 'Dev-C++'
@@ -29,16 +29,16 @@ object MainForm: TMainForm
   TextHeight = 13
   object SplitterLeft: TSplitter
     Left = 193
-    Top = 72
-    Height = 405
+    Top = 70
+    Height = 477
     AutoSnap = False
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 477
-    Width = 1032
+    Top = 547
+    Width = 1057
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -47,12 +47,11 @@ object MainForm: TMainForm
   end
   object MessageControl: TPageControl
     Left = 0
-    Top = 480
-    Width = 1032
+    Top = 550
+    Width = 1057
     Height = 133
     ActivePage = CompSheet
     Align = alBottom
-    Constraints.MinHeight = 1
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
     PopupMenu = MessagePopup
@@ -67,7 +66,7 @@ object MainForm: TMainForm
       object CompilerOutput: TListView
         Left = 0
         Top = 0
-        Width = 1020
+        Width = 1045
         Height = 101
         Align = alClient
         BevelOuter = bvNone
@@ -110,8 +109,8 @@ object MainForm: TMainForm
       object ResourceOutput: TListBox
         Left = 0
         Top = 0
-        Width = 1020
-        Height = 100
+        Width = 1045
+        Height = 101
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -182,7 +181,7 @@ object MainForm: TMainForm
       object CompResGroupBox: TGroupBox
         Left = 233
         Top = 0
-        Width = 860
+        Width = 819
         Height = 100
         Align = alClient
         Caption = 'Compile log:'
@@ -192,7 +191,7 @@ object MainForm: TMainForm
         object LogOutput: TMemo
           Left = 2
           Top = 15
-          Width = 856
+          Width = 815
           Height = 83
           Align = alClient
           BevelInner = bvNone
@@ -210,8 +209,8 @@ object MainForm: TMainForm
       object DebugSubPages: TPageControl
         Left = 0
         Top = 0
-        Width = 1020
-        Height = 100
+        Width = 1045
+        Height = 101
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -590,8 +589,8 @@ object MainForm: TMainForm
           object lvBacktrace: TListView
             Left = 0
             Top = 0
-            Width = 1012
-            Height = 69
+            Width = 1037
+            Height = 70
             Align = alClient
             Columns = <
               item
@@ -624,8 +623,8 @@ object MainForm: TMainForm
           object DebugOutput: TMemo
             Left = 0
             Top = 22
-            Width = 1012
-            Height = 47
+            Width = 1037
+            Height = 48
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -636,7 +635,7 @@ object MainForm: TMainForm
           object GdbOutputPanel: TPanel
             Left = 0
             Top = 0
-            Width = 1012
+            Width = 1037
             Height = 22
             Align = alTop
             BevelOuter = bvNone
@@ -676,8 +675,8 @@ object MainForm: TMainForm
       object FindOutput: TListView
         Left = 0
         Top = 0
-        Width = 1020
-        Height = 100
+        Width = 1045
+        Height = 101
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -719,25 +718,26 @@ object MainForm: TMainForm
   object Toolbar: TControlBar
     Left = 0
     Top = 16
-    Width = 1032
-    Height = 56
+    Width = 1057
+    Height = 54
     Align = alTop
     AutoDock = False
     AutoSize = True
     BevelInner = bvNone
-    BevelKind = bkSoft
+    BevelOuter = bvNone
+    BevelKind = bkNone
     RowSize = 28
     TabOrder = 1
     OnContextPopup = ToolbarContextPopup
     object tbMain: TToolBar
       Left = 11
       Top = 2
-      Width = 177
+      Width = 149
       Height = 22
       AutoSize = True
       Caption = 'Main'
-      Constraints.MaxWidth = 177
-      Constraints.MinWidth = 177
+      Constraints.MaxWidth = 149
+      Constraints.MinWidth = 149
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
@@ -748,46 +748,35 @@ object MainForm: TMainForm
       ShowHint = True
       TabOrder = 0
       Wrapable = False
-      object NewProjectBtn: TToolButton
+      object NewFileBtn: TToolButton
         Left = 0
         Top = 0
-        Action = actNewProject
+        Caption = '&Source File'
+        ImageIndex = 1
+        OnClick = NewFileBtnClick
       end
       object OpenBtn: TToolButton
         Left = 23
         Top = 0
         Action = actOpen
       end
-      object ToolButton3: TToolButton
-        Left = 46
-        Top = 0
-        Width = 8
-        Caption = 'ToolButton3'
-        ImageIndex = 2
-        Style = tbsSeparator
-      end
-      object NewFileBtn: TToolButton
-        Left = 54
-        Top = 0
-        Action = actNewSource
-      end
       object SaveUnitBtn: TToolButton
-        Left = 77
+        Left = 46
         Top = 0
         Action = actSave
       end
       object SaveAllBtn: TToolButton
-        Left = 100
+        Left = 69
         Top = 0
         Action = actSaveAll
       end
       object CloseBtn: TToolButton
-        Left = 123
+        Left = 92
         Top = 0
         Action = actClose
       end
       object ToolButton7: TToolButton
-        Left = 146
+        Left = 115
         Top = 0
         Width = 8
         Caption = 'ToolButton7'
@@ -795,13 +784,13 @@ object MainForm: TMainForm
         Style = tbsSeparator
       end
       object PrintBtn: TToolButton
-        Left = 154
+        Left = 123
         Top = 0
         Action = actPrint
       end
     end
     object tbCompile: TToolBar
-      Left = 469
+      Left = 441
       Top = 2
       Width = 170
       Height = 22
@@ -864,7 +853,7 @@ object MainForm: TMainForm
       end
     end
     object tbProject: TToolBar
-      Left = 378
+      Left = 350
       Top = 2
       Width = 78
       Height = 22
@@ -907,7 +896,7 @@ object MainForm: TMainForm
       end
     end
     object tbEdit: TToolBar
-      Left = 201
+      Left = 173
       Top = 2
       Width = 47
       Height = 22
@@ -937,7 +926,7 @@ object MainForm: TMainForm
       end
     end
     object tbSearch: TToolBar
-      Left = 261
+      Left = 233
       Top = 2
       Width = 104
       Height = 22
@@ -985,69 +974,57 @@ object MainForm: TMainForm
       end
     end
     object tbSpecials: TToolBar
-      Left = 11
-      Top = 30
-      Width = 231
+      Left = 624
+      Top = 2
+      Width = 71
       Height = 22
       AutoSize = True
-      ButtonWidth = 60
       Caption = 'Specials'
-      Constraints.MinWidth = 231
+      Constraints.MaxWidth = 71
+      Constraints.MinWidth = 71
       DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
       Flat = True
       Images = dmMain.SpecialImages_NewLook
-      List = True
       ParentShowHint = False
-      ShowCaptions = True
-      ShowHint = False
+      ShowHint = True
       TabOrder = 5
       Transparent = False
       Wrapable = False
-      object NewAllBtn: TToolButton
+      object InsertBtn: TToolButton
         Left = 0
         Top = 0
-        AutoSize = True
-        Caption = 'New'
-        ImageIndex = 0
-        OnClick = NewAllBtnClick
-      end
-      object InsertBtn: TToolButton
-        Left = 53
-        Top = 0
-        AutoSize = True
+        Hint = 'Insert'
         Caption = 'Insert'
         ImageIndex = 1
         OnClick = InsertBtnClick
       end
       object ToggleBtn: TToolButton
-        Left = 110
+        Left = 23
         Top = 0
-        AutoSize = True
+        Hint = 'Toggle'
         Caption = 'Toggle'
         ImageIndex = 2
         OnClick = ToggleBtnClick
       end
       object GotoBtn: TToolButton
-        Left = 174
+        Left = 46
         Top = 0
-        AutoSize = True
+        Hint = 'Goto'
         Caption = 'Goto'
         ImageIndex = 3
         OnClick = GotoBtnClick
       end
     end
     object tbClasses: TToolBar
-      Left = 255
+      Left = 11
       Top = 30
-      Width = 600
+      Width = 700
       Height = 22
       AutoSize = True
       Caption = 'tbClasses'
-      Constraints.MaxWidth = 600
-      Constraints.MinWidth = 600
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -1057,7 +1034,7 @@ object MainForm: TMainForm
       object cmbClasses: TComboBox
         Left = 0
         Top = 0
-        Width = 300
+        Width = 350
         Height = 22
         Style = csDropDownList
         Ctl3D = True
@@ -1075,11 +1052,12 @@ object MainForm: TMainForm
         OnChange = cmbClassesChange
       end
       object cmbMembers: TComboBox
-        Left = 300
+        Left = 350
         Top = 0
-        Width = 300
+        Width = 350
         Height = 22
         Style = csDropDownList
+        Ctl3D = True
         DropDownCount = 16
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -1087,39 +1065,38 @@ object MainForm: TMainForm
         Font.Name = 'Courier New'
         Font.Style = []
         ItemHeight = 14
+        ParentCtl3D = False
         ParentFont = False
         Sorted = True
         TabOrder = 1
         OnChange = cmbMembersChange
+        OnDropDown = cmbMembersDropDown
       end
     end
   end
   object Statusbar: TStatusBar
     Left = 0
-    Top = 613
-    Width = 1032
-    Height = 19
+    Top = 683
+    Width = 1057
+    Height = 20
     Panels = <
       item
-        Width = 80
+        Width = 480
       end
       item
         Width = 80
       end
       item
         Width = 80
-      end
-      item
-        Width = 50
       end>
     ParentFont = True
     UseSystemFont = False
   end
   object PageControl: TPageControl
     Left = 196
-    Top = 72
-    Width = 836
-    Height = 405
+    Top = 70
+    Width = 861
+    Height = 477
     Align = alClient
     HotTrack = True
     MultiLine = True
@@ -1134,7 +1111,7 @@ object MainForm: TMainForm
   object pnlFull: TPanel
     Left = 0
     Top = 0
-    Width = 1032
+    Width = 1057
     Height = 16
     Align = alTop
     BevelOuter = bvNone
@@ -1144,10 +1121,10 @@ object MainForm: TMainForm
     TabOrder = 4
     Visible = False
     DesignSize = (
-      1032
+      1057
       16)
     object btnFullScrRevert: TSpeedButton
-      Left = 1015
+      Left = 1040
       Top = 0
       Width = 16
       Height = 16
@@ -1179,9 +1156,9 @@ object MainForm: TMainForm
   end
   object LeftPageControl: TPageControl
     Left = 0
-    Top = 72
+    Top = 70
     Width = 193
-    Height = 405
+    Height = 477
     ActivePage = ClassSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
@@ -1193,7 +1170,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 377
+        Height = 449
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1229,7 +1206,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 377
+        Height = 449
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1265,7 +1242,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 377
+        Height = 449
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1498,6 +1475,15 @@ object MainForm: TMainForm
       end
       object Unindent1: TMenuItem
         Action = actUnindent
+      end
+      object N64: TMenuItem
+        Caption = '-'
+      end
+      object CollapseAll: TMenuItem
+        Action = actCollapse
+      end
+      object UncollapseAll: TMenuItem
+        Action = actUnCollapse
       end
     end
     object SearchMenu: TMenuItem
@@ -3142,6 +3128,16 @@ object MainForm: TMainForm
       ShortCut = 121
       OnExecute = actHideFSBarExecute
     end
+    object actCollapse: TAction
+      Category = 'Edit'
+      Caption = 'actCollapse'
+      OnExecute = actCollapseExecute
+    end
+    object actUnCollapse: TAction
+      Category = 'Edit'
+      Caption = 'actUnCollapse'
+      OnExecute = actUnCollapseExecute
+    end
   end
   object ApplicationEvents: TApplicationEvents
     OnDeactivate = ApplicationEventsDeactivate
@@ -3197,7 +3193,7 @@ object MainForm: TMainForm
     Height = 240
     Enabled = True
     HintTimeout = 4000
-    MinWidth = 256
+    MinWidth = 128
     MinHeight = 128
     MaxWidth = 640
     MaxHeight = 480

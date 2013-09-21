@@ -43,8 +43,7 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
-    lblFilename: TLabel;
-    lblProject: TLabel;
+    lblProject: TEdit;
     lblSize: TLabel;
     lblTotal: TLabel;
     lblCode: TLabel;
@@ -242,13 +241,12 @@ begin
     Includes := 0;
     Comments := 0;
   end;
-  lblFilename.Caption := MinimizeName(FileName, lblFilename.Canvas, 285);
   if Assigned(MainForm.fProject) then begin
-    lblProject.Caption := MainForm.fProject.Name;
+    lblProject.Text := MainForm.fProject.Name;
     lblRelative.Text := ExtractRelativePath(MainForm.fProject.Directory, Filename)
   end
   else begin
-    lblProject.Caption := '-';
+    lblProject.Text := '-';
     lblRelative.Text := '-';
   end;
   lblAbsolute.Text := Filename;

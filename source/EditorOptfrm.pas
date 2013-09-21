@@ -262,7 +262,6 @@ const
  cErrorLine  = 13;
  cSelection  = 19;
 var
- fUseDefaults: boolean;   // use default array of font sizes
  fGutter: boolean;        // user is editing gutter font
 
 { ---------- Form Events ---------- }
@@ -300,99 +299,42 @@ begin
 	UpdateCIButtons;
 end;
 
-{ ---------- Font Methods ---------- }
-
-(*
-  enum font families callback function
-   adds a font to the list if it is of the Modern font family
-   i.e. any font that is monospaced (same as delphi)
-*)
-function EnumFontFamilyProc(LogFont: PEnumLogFont; var TextMetric: PNewTextMetric;FontType: integer; LParam: integer): integer; stdcall;
-begin
-	// if LogFont.elfLogFont.lfPitchAndFamily and FF_MODERN = FF_MODERN then
-	TStrings(LParam).Add(LogFont.elfLogFont.lfFaceName); // Just add all fonts, SynEdit will monospace them
-	result:= -1;
-end;
-
-// Fills combobox with font names.
-// editor and gutter both use same fonts
+// Fill listboxes with available fonts
 procedure TEditorOptForm.LoadFontNames;
-var
-	DC: HDC;
 begin
-	DC:= GetDC(application.handle);
-	EnumFontFamilies(DC, nil, @EnumFontFamilyProc, integer(cboEditorFont.Items));
-	ReleaseDC(0, DC);
+	cboEditorFont.Items.Assign(Screen.Fonts);
 	cboEditorFont.Sorted:= TRUE;
 	cboGutterFont.Items:= cboEditorFont.Items;
 	cboGutterFont.Sorted:= TRUE;
 end;
 
-(*
-  enum font families callback function for font sizes
-  adds font sizes to list.  if font is not a RASTER then
-  uses default font sizes (7..30)
-*)
-function EnumFontSizeProc(LogFont: PEnumLogFont; var TextMetric: PNewTextMetric;
-    FontType: integer; LParam: integer): integer; stdcall;
-var
- size: string;
-begin
-  result:= 1;
-  if FontType and RASTER_FONTTYPE = RASTER_FONTTYPE then
-   begin
-     Size:= inttostr(LogFont.elfLogFont.lfHeight *72 div LOGPIXELSY);
-     if TStrings(LParam).IndexOf(Size) = -1 then
-      TStrings(LParam).Add(Size);
-   end
-  else
-   begin
-     fUseDefaults:= TRUE;
-     result:= 0;
-   end;
-end;
-
 procedure TEditorOptForm.LoadFontSize;
 var
- idx, idx2: integer;
- DC: HDC;
- Items: TStrings;
- FontName: string;
+	idx: integer;
+	Items: TStrings;
+	FontName: string;
 begin
-  fUseDefaults:= FALSE;
-  DC:= GetDC(0);
-  Items:= TStringList.Create;
-  try
-   if fGutter then
-    FontName:= cboGutterFont.Text
-   else
-    FontName:= cboEditorFont.Text;
+	Items:= TStringList.Create;
+	try
+		if fGutter then
+			FontName:= cboGutterFont.Text
+		else
+			FontName:= cboEditorFont.Text;
 
-   EnumFontFamilies(DC, PChar(FontName), @EnumFontSizeProc, integer(Items));
-   if fUseDefaults then
-    begin
-      Items.Clear;
-      for idx:= 7 to 30 do Items.Append(inttostr(idx));
-    end
-   else // sort the returned sizes
-    for idx:= 1 to 3 do
-     for idx2:= pred(Items.Count) downto 1 do
-      if strtoint(Items[idx2])< strtoint(Items[idx2 -1]) then
-       Items.Exchange(idx2, idx2 -1);
-   if fGutter then
-    begin
-      cboGutterSize.Clear;
-      cboGutterSize.Items.AddStrings(Items);
-    end
-   else
-    begin
-      cboEditorSize.Clear;
-      cboEditorSize.Items.AddStrings(Items);
-    end;
-  finally
-   Items.Free;
-   ReleaseDC(0, DC);
-  end;
+		Items.Clear;
+		for idx:= 7 to 30 do
+			Items.Append(inttostr(idx));
+
+		if fGutter then begin
+			cboGutterSize.Clear;
+			cboGutterSize.Items.AddStrings(Items);
+		end else begin
+			cboEditorSize.Clear;
+			cboEditorSize.Items.AddStrings(Items);
+		end;
+	finally
+		Items.Free;
+	end;
 end;
 
 procedure TEditorOptForm.FontSizeChange(Sender: TObject);
@@ -423,7 +365,7 @@ procedure TEditorOptForm.FontChange(Sender: TObject);
 var
  Size: string;
 begin
-  fGutter:= Sender = cboGutterFont;
+  fGutter := (Sender = cboGutterFont);
   if fGutter then
    begin
      pnlGutterPreview.Font.Name:= cboGutterFont.Text;
@@ -806,31 +748,31 @@ begin
 		DblClkLine:=          cbDoubleLine.Checked;
 		FindText:=            cbFindText.Checked;
 		Scrollbars:=          cbSmartScroll.Checked;
-     HalfPageScroll:=      cbHalfPage.Checked;
-     ScrollHint:=          cbScrollHint.Checked;
-     SpecialChars:=        cbSpecialChars.Checked;
-     AppendNewline:=       cbAppendNewline.Checked;
-     AutoCloseBrace:=      cbCloseBrace.Checked;
+		HalfPageScroll:=      cbHalfPage.Checked;
+		ScrollHint:=          cbScrollHint.Checked;
+		SpecialChars:=        cbSpecialChars.Checked;
+		AppendNewline:=       cbAppendNewline.Checked;
+		AutoCloseBrace:=      cbCloseBrace.Checked;
 
-     MarginVis:=           cbMarginVis.Checked;
-     MarginSize:=          edMarginWidth.Value;
-     MarginColor:=         cpMarginColor.SelectionColor;
-     InsertCaret:=         cboInsertCaret.ItemIndex;
-     OverwriteCaret:=      cboOverwriteCaret.ItemIndex;
-     Match :=              cbMatch.Checked;
+		MarginVis:=           cbMarginVis.Checked;
+		MarginSize:=          edMarginWidth.Value;
+		MarginColor:=         cpMarginColor.SelectionColor;
+		InsertCaret:=         cboInsertCaret.ItemIndex;
+		OverwriteCaret:=      cboOverwriteCaret.ItemIndex;
+		Match :=              cbMatch.Checked;
 
-     HighCurrLine :=       cbHighCurrLine.Checked;
-     HighColor :=          cpHighColor.SelectionColor;
+		HighCurrLine :=       cbHighCurrLine.Checked;
+		HighColor :=          cpHighColor.SelectionColor;
 
-     UseSyntax:=           cbSyntaxHighlight.Checked;
-     SyntaxExt:=           edSyntaxExt.Text;
-     TabSize:=             seTabSize.Value;
+		UseSyntax:=           cbSyntaxHighlight.Checked;
+		SyntaxExt:=           edSyntaxExt.Text;
+		TabSize:=             seTabSize.Value;
 
-     Font.Name:=           cboEditorFont.Text;
-     Font.Size:=           strtoint(cboEditorSize.Text);
+		Font.Name:=           cboEditorFont.Text;
+		Font.Size:=           strtoint(cboEditorSize.Text);
 
-     Gutterfont.Name:=     cboGutterFont.Text;
-     GutterFont.Size:=     strtoint(cboGutterSize.Text);
+		Gutterfont.Name:=     cboGutterFont.Text;
+		GutterFont.Size:=     strtoint(cboGutterSize.Text);
 
 		Gutterfnt:=           cbGutterFnt.Checked;
 		GutterAuto:=          cbGutterAuto.Checked;

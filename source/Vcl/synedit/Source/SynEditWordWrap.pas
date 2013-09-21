@@ -24,7 +24,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditWordWrap.pas,v 1.3 2005/01/08 17:04:29 specu Exp $
+$Id: SynEditWordWrap.pas,v 1.9 2004/10/10 03:45:19 etrusco Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -204,32 +204,38 @@ var
 begin
   Assert( aPos.Column > 0 );
   Assert( aPos.Row > 0 );
-  if aPos.Row > RowCount then
-  begin
+
+  if aPos.Row > RowCount then begin
     // beyond EOF
     Result.Char := aPos.Column;
     Result.Line := aPos.Row - RowCount + LineCount;
     Exit;
   end;
+
   //todo: use a binary search or something smarter
   for cLine := LineCount -2 downto 0 do
-    if aPos.Row > fLineOffsets[cLine] then
-    begin
+    if aPos.Row > fLineOffsets[cLine] then begin
       Result.Line := cLine +2;
+
       if aPos.Row = fLineOffsets[cLine + 1] then //last row of line
         Result.Char := Min(aPos.Column, fMaxRowLength + 1)
       else
         Result.Char := Min(aPos.Column, fRowLengths[aPos.Row - 1] + 1);
+
       for cRow := fLineOffsets[cLine] to aPos.Row -2 do
         Inc(Result.Char, fRowLengths[cRow]);
+
       Exit;
     end;
+
   // first line
   Result.Line := 1;
+
   if aPos.Row = fLineOffsets[0] then //last row of line
     Result.Char := Min(aPos.Column, fMaxRowLength + 1)
   else
     Result.Char := Min(aPos.Column, fRowLengths[aPos.Row - 1] + 1);
+    
   for cRow := 0 to aPos.Row - 2 do
     Inc(Result.Char, fRowLengths[cRow]);
 end;
@@ -247,8 +253,8 @@ const
   vStepSize = 256;
 begin
   Assert( aMinSize > 0 );
-  if aMinSize > fLineCapacity then
-  begin
+
+  if aMinSize > fLineCapacity then begin
     aMinSize := aMinSize + vStepSize - (aMinSize mod vStepSize);
     ReallocMem( fLineOffsets, aMinSize * SizeOf(TRowIndex) );
     fLineCapacity := aMinSize;
@@ -260,8 +266,8 @@ const
   vStepSize = 512;
 begin
   Assert( aMinSize > 0 );
-  if aMinSize > fRowCapacity then
-  begin
+
+  if aMinSize > fRowCapacity then begin
     aMinSize := aMinSize + vStepSize - (aMinSize mod vStepSize);
     ReallocMem( fRowLengths, aMinSize * SizeOf(TRowLength) );
     fRowCapacity := aMinSize;
@@ -361,8 +367,7 @@ begin
   Assert( aStart + aMoveBy >= 0 );
   Assert( aStart + aMoveBy < LineCount );
   vMoveCount := LineCount - aStart;
-  if aMoveBy > 0 then
-    Dec( vMoveCount, aMoveBy );
+  if aMoveBy > 0 then Dec( vMoveCount, aMoveBy );
   Move( fLineOffsets[aStart], fLineOffsets[aStart + aMoveBy],
     vMoveCount * SizeOf(TRowIndex) );
 end;
@@ -375,8 +380,7 @@ begin
   Assert( aStart + aMoveBy >= 0 );
   Assert( aStart + aMoveBy < RowCount );
   vMoveCount := RowCount - aStart;
-  if aMoveBy > 0 then
-    Dec( vMoveCount, aMoveBy );
+  if aMoveBy > 0 then Dec( vMoveCount, aMoveBy );
   Move( fRowLengths[aStart], fRowLengths[aStart + aMoveBy],
     vMoveCount * SizeOf(TRowLength) );
 end;
@@ -414,57 +418,56 @@ var
 begin
   // ****** First parse the new string using an auxiliar array *****
   vLine := TSynEditStringList(Editor.Lines).ExpandedStrings[aIndex];
+
   // Pre-allocate a buffer for rowlengths
   vMaxNewRows := ((Length(vLine) - 1) div fMinRowLength) + 1;
   vTempRowLengths := AllocMem(vMaxNewRows);
+
   try
     vLineRowCount := 0;
     vRowBegin := PChar(vLine);
     vRowEnd := vRowBegin + fMaxRowLength;
     vLineEnd := vRowBegin + Length(vLine);
-    while vRowEnd < vLineEnd do
-    begin
-      //
-      if vRowEnd^ in [#32, #9] then
-      begin
+
+    while vRowEnd < vLineEnd do begin
+      if vRowEnd^ in [#32, #9] then begin
         repeat
           Inc(vRowEnd);
         until not(vRowEnd^ in [#32, #9]);
-      end
-      else begin
+      end else begin
         vRowMinEnd := vRowBegin + fMinRowLength;
         vRunner := vRowEnd - 1;
-        while vRunner > vRowMinEnd do
-        begin
-          if vRunner^ in fBreakChars then
-          begin
+
+        while vRunner > vRowMinEnd do begin
+          if vRunner^ in fBreakChars then begin
             vRowEnd := vRunner + 1;
             break;
           end;
+
           Dec(vRunner);
         end;
       end;
+
       // Check TRowLength overflow
-      if vRowEnd - vRowBegin > High(TRowLength) then
-      begin
+      if vRowEnd - vRowBegin > High(TRowLength) then begin
         vRowEnd := vRowBegin + High(TRowLength);
         vRowMinEnd := vRowEnd - (High(TRowLength) mod Editor.TabWidth);
-        while (vRowEnd^ = #9) and (vRowEnd > vRowMinEnd) do
-          Dec(vRowEnd);
+        while (vRowEnd^ = #9) and (vRowEnd > vRowMinEnd) do Dec(vRowEnd);
       end;
+
 {$IFDEF SYN_MBCSSUPPORT}
       if StrByteType(vRowBegin, vRowEnd - vRowBegin) = mbTrailByte then
         Dec(vRowEnd);
 {$ENDIF}
+
       // Finally store the rowlength
       vTempRowLengths[vLineRowCount] := vRowEnd - vRowBegin;
-      //
       Inc(vLineRowCount);
       vRowBegin := vRowEnd;
       Inc(vRowEnd, fMaxRowLength);
     end;
-    if (vLineEnd > vRowBegin) or (Length(vLine) = 0) then
-    begin
+
+    if (vLineEnd > vRowBegin) or (Length(vLine) = 0) then begin
       vTempRowLengths[vLineRowCount] := vLineEnd - vRowBegin;
       Inc(vLineRowCount);
     end;
@@ -474,28 +477,31 @@ begin
       vStartRow := 0
     else
       vStartRow := fLineOffsets[aIndex - 1];
+
     vOldNextRow := fLineOffsets[aIndex];
     Result := vLineRowCount - (vOldNextRow - vStartRow);
-    if Result <> 0 then
-    begin
+
+    if Result <> 0 then begin
       // MoveRows depends on RowCount, so we need some special processing...
-      if Result > 0 then
-      begin
+      if Result > 0 then begin
         // ...if growing, update offsets (and thus RowCount) before rowlengths
         GrowRows(RowCount + Result);
+
         for cLine := aIndex to LineCount - 1 do
           Inc(fLineOffsets[cLine], Result);
+          
         if vOldNextRow < RowCount - Result then
           MoveRows(vOldNextRow, Result);
-      end
-      else begin
+      end else begin
         // ...if shrinking, update offsets after rowlengths
         if vOldNextRow < RowCount then
           MoveRows(vOldNextRow, Result);
+
         for cLine := aIndex to LineCount - 1 do
           Inc(fLineOffsets[cLine], Result);
       end;
     end;
+    
     Move(vTempRowLengths[0], fRowLengths[vStartRow], vLineRowCount * SizeOf(TRowLength));
   finally
     FreeMem(vTempRowLengths);
@@ -514,73 +520,70 @@ var
   vRunner: PChar;
   vRowMinEnd: PChar;
 begin
-  if (Editor.Lines.Count = 0) or (fMaxRowLength <= 0) then
-  begin
+  if (Editor.Lines.Count = 0) or (fMaxRowLength <= 0) then begin
     SetEmpty;
     Exit;
   end;
 
   GrowLines(Editor.Lines.Count);
   GrowRows(Editor.Lines.Count);
-  //
+
   cRow := 0;
-  for cLine := 0 to Editor.Lines.Count -1 do
-  begin
+
+  for cLine := 0 to Editor.Lines.Count -1 do begin
     vLine := TSynEditStringList(Editor.Lines).ExpandedStrings[cLine];
-    //
+
     vMaxNewRows := ((Length(vLine) - 1) div fMinRowLength) + 1;
     GrowRows(cRow + vMaxNewRows);
-    //
+
     vRowBegin := PChar(vLine);
     vRowEnd := vRowBegin + fMaxRowLength;
     vLineEnd := vRowBegin + Length(vLine);
-    while vRowEnd < vLineEnd do
-    begin
-      //
-      if vRowEnd^ in [#32, #9] then
-      begin
+
+    while vRowEnd < vLineEnd do begin
+      if vRowEnd^ in [#32, #9] then begin
         repeat
           Inc(vRowEnd);
         until not(vRowEnd^ in [#32, #9]);
-      end
-      else begin
+      end else begin
         vRowMinEnd := vRowBegin + fMinRowLength;
         vRunner := vRowEnd - 1;
-        while vRunner > vRowMinEnd do
-        begin
-          if vRunner^ in fBreakChars then
-          begin
+
+        while vRunner > vRowMinEnd do begin
+          if vRunner^ in fBreakChars then begin
             vRowEnd := vRunner + 1;
             break;
           end;
+
           Dec(vRunner);
         end;
       end;
-      //
-      if vRowEnd - vRowBegin > High(TRowLength) then
-      begin
+
+      if vRowEnd - vRowBegin > High(TRowLength) then begin
         vRowEnd := vRowBegin + High(TRowLength);
         vRowMinEnd := vRowEnd - (High(TRowLength) mod Editor.TabWidth);
-        while (vRowEnd^ = #9) and (vRowEnd > vRowMinEnd) do
-          Dec(vRowEnd);
+        while (vRowEnd^ = #9) and (vRowEnd > vRowMinEnd) do Dec(vRowEnd);
       end;
+
 {$IFDEF SYN_MBCSSUPPORT}
       if StrByteType(vRowBegin, vRowEnd - vRowBegin) = mbTrailByte then
         Dec(vRowEnd);
 {$ENDIF}
+
       fRowLengths[cRow] := vRowEnd - vRowBegin;
-      //
       Inc(cRow);
       vRowBegin := vRowEnd;
       Inc(vRowEnd, fMaxRowLength);
     end;
-    if (vLineEnd > vRowBegin) or (Length(vLine) = 0) then
-    begin
+
+    if (vLineEnd > vRowBegin) or (Length(vLine) = 0) then begin
       fRowLengths[cRow] := vLineEnd - vRowBegin;
       Inc(cRow);
     end;
+
     fLineOffsets[cLine] := cRow;
   end;
+  
   fLineCount := Editor.Lines.Count;
 end;
 

@@ -36,6 +36,8 @@
 (* SYN_COMPILER_7_UP    : Delphi 7, Kylix 3 or higher is the compiler.        *)
 (* SYN_COMPILER_9       : Delphi 2005 is the compiler.                        *)
 (* SYN_COMPILER_9_UP    : Delphi 2005 or higher is the compiler.              *)
+(* SYN_COMPILER_10      : Delphi 2006 is the compiler.                        *)
+(* SYN_COMPILER_10_UP   : Delphi 2006 or higher is the compiler.              *)
 (* SYN_CPPB             : Any version of C++Builder is being used.            *)
 (* SYN_CPPB_1           : C++B v1.0x is being used.                           *)
 (* SYN_CPPB_3           : C++B v3.0x is being used.                           *)
@@ -64,6 +66,8 @@
 (* SYN_DELPHI_8_UP      : Delphi 8 or higher is being used.                   *)
 (* SYN_DELPHI_2005      : Delphi 2005 is being used.                          *)
 (* SYN_DELPHI_2005_UP   : Delphi 2005 or higher is being used.                *)
+(* SYN_DELPHI_2006      : Delphi 2006 is being used.                          *)
+(* SYN_DELPHI_2006_UP   : Delphi 2006 or higher is being used.                *)
 (* SYN_KYLIX            : Kylix 1.0 is being using.                           *)
 (* SYN_CLX              : A CLX application is being created.                 *)
 (******************************************************************************)
@@ -80,6 +84,12 @@
   {$DEFINE SYN_COMPILER_6}
   {$DEFINE SYN_DELPHI}
   {$DEFINE SYN_DELPHI_6}
+{$ENDIF}
+
+{$IFDEF VER180}
+  {$DEFINE SYN_COMPILER_10}
+  {$DEFINE SYN_DELPHI}
+  {$DEFINE SYN_DELPHI_2006}
 {$ENDIF}
 
 {$IFDEF VER170}
@@ -231,6 +241,19 @@
   {$DEFINE SYN_COMPILER_9_UP}
 {$ENDIF}
 
+{$IFDEF SYN_COMPILER_10}
+  {$DEFINE SYN_COMPILER_1_UP}
+  {$DEFINE SYN_COMPILER_2_UP}
+  {$DEFINE SYN_COMPILER_3_UP}
+  {$DEFINE SYN_COMPILER_4_UP}
+  {$DEFINE SYN_COMPILER_5_UP}
+  {$DEFINE SYN_COMPILER_6_UP}
+  {$DEFINE SYN_COMPILER_7_UP}
+  {$DEFINE SYN_COMPILER_8_UP}
+  {$DEFINE SYN_COMPILER_9_UP}
+  {$DEFINE SYN_COMPILER_10_UP}
+{$ENDIF}
+
 {$IFDEF SYN_DELPHI_2}
   {$DEFINE SYN_DELPHI_2_UP}
 {$ENDIF}
@@ -289,6 +312,18 @@
   {$DEFINE SYN_DELPHI_7_UP}
   {$DEFINE SYN_DELPHI_8_UP}
   {$DEFINE SYN_DELPHI_2005_UP}
+{$ENDIF}
+
+{$IFDEF SYN_DELPHI_2006}
+  {$DEFINE SYN_DELPHI_2_UP}
+  {$DEFINE SYN_DELPHI_3_UP}
+  {$DEFINE SYN_DELPHI_4_UP}
+  {$DEFINE SYN_DELPHI_5_UP}
+  {$DEFINE SYN_DELPHI_6_UP}
+  {$DEFINE SYN_DELPHI_7_UP}
+  {$DEFINE SYN_DELPHI_8_UP}
+  {$DEFINE SYN_DELPHI_2005_UP}
+  {$DEFINE SYN_DELPHI_2006_UP}
 {$ENDIF}
 
 {$IFDEF SYN_CPPB_6}
@@ -366,4 +401,4 @@
 
 {$ENDIF}
 
-// $Id: SynEdit.inc,v 1.6 2005/01/08 17:04:27 specu Exp $
+// $Id: SynEdit.inc,v 1.20 2005/12/31 07:34:36 skyweb Exp $

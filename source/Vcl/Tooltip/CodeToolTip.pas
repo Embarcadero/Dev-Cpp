@@ -169,7 +169,7 @@ type
     function FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;
-    function PaintToolTip : integer;
+    procedure PaintToolTip;
     function RemoveEditor(AEditor: TCustomSynEdit): boolean;
     procedure RethinkCoordAndActivate;
     procedure SetEditor(const Value: TCustomSynEdit);
@@ -587,9 +587,7 @@ begin
 	Canvas.CopyRect(ClientRect, FBmp.Canvas, ClientRect);
 end;
 
-function TCodeToolTip.PaintToolTip : Integer;
-const
-	cStipple : array [0..3] of Integer = (0,1,2,1);
+procedure TCodeToolTip.PaintToolTip;
 var
 	BracePos: Integer;
 	WidthParam: Integer;
@@ -633,57 +631,53 @@ var
 begin
 
 	BracePos := AnsiPos('(', Caption);
-	if BracePos > 0 then begin
+	CurParam := 0;
+	WidthParam := 4; // left start position in pixels
 
-		CurParam := 0;
-		WidthParam := 4; // left start position in pixels
-
-		// Clear the backbuffer and set options
-		with FBmp.Canvas do begin
-			Brush.Color := TColor($E1FFFF);
-			FillRect(ClientRect);
-			Font.Name := 'Courier New';
-			Font.Size := 10;
-			Brush.Style := bsClear;
-		end;
-
-		// when more than one tooltip is in the list
-		// we must draw the buttons as well ...
-		if FToolTips.Count > 1 then begin
-			// paint the UP button
-			FUpButton.Paint(FBmp.Canvas);
-			Inc(WidthParam, FUpButton.Left + FUpButton.Width);
-
-			// output text between the buttons
-			FBmp.Canvas.Font.Style := [];
-			S := Format(SCodeToolTipIndexXOfX, [FSelIndex+1, FToolTips.Count]);
-			FBmp.Canvas.TextOut(WidthParam, 1, S);
-			Inc(WidthParam, FBmp.Canvas.TextWidth(S)+3);
-
-			// paint the DOWN button
-			FDownButton.Paint(FBmp.Canvas);
-			FDownButton.Left := WidthParam;
-			Inc(WidthParam, 3 + FDownButton.Width+FUpButton.Left);
-		end;
-
-		// now loop through the hint and draw each letter
-		for i := 1 to Length(Caption)-1 do begin
-			CurChar := Caption[I];
-
-			// if the current char is one of our delimiters
-			// we must increase the CurParam variable which indicates
-			// at which comma index our cursor is.
-			if AnsiPos(CurChar, FDelimiters) > 0 then
-				Inc(CurParam);
-
-			if (CurParam = FCurParamIndex) and (AnsiPos(CurChar, FDelimiters)=0) and (I > BracePos) and (CurChar <> ')') and (CurChar <> ' ') and (AnsiPos(')',Caption) > I) then
-				DrawParamLetterEx(I, True) // at current comma index
-			else
-				DrawParamLetterEx(I, False); // normal
-		end;
+	// Clear the backbuffer and set options
+	with FBmp.Canvas do begin
+		Brush.Color := TColor($E1FFFF);
+		FillRect(ClientRect);
+		Font.Name := 'Courier New';
+		Font.Size := 10;
+		Brush.Style := bsClear;
 	end;
 
-	Result := WidthParam+4;
+	// when more than one tooltip is in the list
+	// we must draw the buttons as well ...
+	if FToolTips.Count > 1 then begin
+
+		// paint the UP button
+		FUpButton.Paint(FBmp.Canvas);
+		Inc(WidthParam, FUpButton.Left + FUpButton.Width);
+
+		// output text between the buttons
+		FBmp.Canvas.Font.Style := [];
+		S := Format(SCodeToolTipIndexXOfX, [FSelIndex+1, FToolTips.Count]);
+		FBmp.Canvas.TextOut(WidthParam, 1, S);
+		Inc(WidthParam, FBmp.Canvas.TextWidth(S)+3);
+
+		// paint the DOWN button
+		FDownButton.Left := WidthParam;
+		FDownButton.Paint(FBmp.Canvas);
+		Inc(WidthParam, 3 + FDownButton.Width+FUpButton.Left);
+	end;
+
+	// now loop through the hint and draw each letter
+	for I := 1 to Length(Caption)-1 do begin
+		CurChar := Caption[I];
+
+		// if the current char is one of our delimiters
+		// we must increase the CurParam variable which indicates
+		// at which comma index our cursor is.
+		if AnsiPos(CurChar, FDelimiters) > 0 then
+			Inc(CurParam);
+
+		if (CurParam = FCurParamIndex) and (AnsiPos(CurChar, FDelimiters)=0) and (I > BracePos) and (CurChar <> ')') and (CurChar <> ' ') and (AnsiPos(')',Caption) > I) then
+			DrawParamLetterEx(I, True) // at current comma index
+		else
+			DrawParamLetterEx(I, False) // Normal
+	end;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -707,12 +701,14 @@ end;
 
 procedure TCodeToolTip.RethinkCoordAndActivate;
 var
-  Pt: TPoint;
-  Width : integer;
+	Pt: TPoint;
+	Width : integer;
 begin
 
-	// Paint to obtain size
-	Width := PaintToolTip;
+	// Simulate size to prevent drawing twice...
+	Width := FBmp.Canvas.TextWidth(Caption);
+	if FToolTips.Count > 1 then
+		Width := Width + 72; // Button stuff
 
 	// this displays the rect below the current line and at the same position where the token begins
 	Pt := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos))));
@@ -830,10 +826,11 @@ begin
 
 	// get the current position in the text
 	Idx := FEditor.SelStart;
-	CurPos := FEditor.SelStart;
+	CurPos := Idx;
 
 	// get a pointer to the text
 	P := PChar(FEditor.Lines.Text);
+//	MsgBox(P);
 
 	nBraces := 0;
 	nCommas := 0;

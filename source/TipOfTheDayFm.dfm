@@ -3,8 +3,8 @@ object TipOfTheDayForm: TTipOfTheDayForm
   Top = 348
   BorderStyle = bsDialog
   Caption = 'Tip Of The Day'
-  ClientHeight = 237
-  ClientWidth = 385
+  ClientHeight = 263
+  ClientWidth = 409
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -23,8 +23,8 @@ object TipOfTheDayForm: TTipOfTheDayForm
   object Panel1: TPanel
     Left = 4
     Top = 4
-    Width = 293
-    Height = 209
+    Width = 317
+    Height = 237
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Color = clWhite
@@ -129,22 +129,23 @@ object TipOfTheDayForm: TTipOfTheDayForm
     object Bevel1: TBevel
       Left = 52
       Top = 52
-      Width = 233
+      Width = 256
       Height = 2
+      Shape = bsBottomLine
     end
     object lblTip: TLabel
       Left = 52
       Top = 64
-      Width = 233
-      Height = 129
+      Width = 253
+      Height = 153
       AutoSize = False
       Caption = 'lblTip'
       WordWrap = True
     end
     object lblUrl: TLabel
       Left = 4
-      Top = 192
-      Width = 281
+      Top = 216
+      Width = 309
       Height = 13
       Cursor = crHandPoint
       Alignment = taCenter
@@ -160,7 +161,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     end
   end
   object btnPrev: TButton
-    Left = 304
+    Left = 328
     Top = 32
     Width = 77
     Height = 25
@@ -169,7 +170,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     OnClick = btnPrevClick
   end
   object btnNext: TButton
-    Left = 304
+    Left = 328
     Top = 4
     Width = 77
     Height = 25
@@ -178,8 +179,8 @@ object TipOfTheDayForm: TTipOfTheDayForm
     OnClick = btnNextClick
   end
   object btnClose: TButton
-    Left = 304
-    Top = 207
+    Left = 328
+    Top = 231
     Width = 77
     Height = 25
     Cancel = True
@@ -189,14 +190,14 @@ object TipOfTheDayForm: TTipOfTheDayForm
   end
   object chkNotAgain: TCheckBox
     Left = 4
-    Top = 216
-    Width = 150
+    Top = 243
+    Width = 317
     Height = 16
     Caption = 'Don'#39't display tips on startup'
     TabOrder = 3
   end
   object btnRandom: TButton
-    Left = 304
+    Left = 328
     Top = 60
     Width = 77
     Height = 25

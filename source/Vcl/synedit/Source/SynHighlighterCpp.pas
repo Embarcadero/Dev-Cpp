@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterCpp.pas,v 1.10 2005/01/08 17:04:29 specu Exp $
+$Id: SynHighlighterCpp.pas,v 1.22 2004/07/13 00:00:30 markonjezic Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -62,7 +62,8 @@ uses
   SynEditHighlighter,
 {$ENDIF}
   SysUtils,
-  Classes;
+  Classes,
+  SynEditCodeFolding;
 
 type
   TtkTokenKind = (tkAsm, tkComment, tkDirective, tkIdentifier, tkKey, tkNull,
@@ -1303,7 +1304,7 @@ begin
         end;
       'l', 'L':
         begin
-          for i := idx1 to Run - 2 do
+          for i := idx1 to Pred(Run) do
             if FLine[i] in ['l', 'L'] then // declaration syntax error
             begin
               fTokenID := tkUnknown;

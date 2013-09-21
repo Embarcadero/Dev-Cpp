@@ -24,7 +24,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditReg.pas,v 1.8 2005/01/08 17:04:29 specu Exp $
+$Id: SynEditReg.pas,v 1.33 2004/06/13 17:22:40 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -55,6 +55,7 @@ uses
   QSynEditExport,
   QSynExportHTML,
   QSynExportRTF,
+  QSynExportTeX,
   QSynHighlighterMulti,
   QSynCompletionProposal,
   QSynEditPythonBehaviour,
@@ -63,10 +64,65 @@ uses
   QSynMacroRecorder,
   QSynAutoCorrect,
   QSynEditSearch,
+  QSynEditRegexSearch,
   QSynHighlighterManager,
   QSynEditOptionsDialog,
+  QSynHighlighterADSP21xx,
+  QSynHighlighterAsm,
+  QSynHighlighterAWK,
+  QSynHighlighterBaan,
+  QSynHighlighterBat,
+  QSynHighlighterCAC,
+  QSynHighlighterCache,
+  QSynHighlighterCobol,
   QSynHighlighterCpp,
+  QSynHighlighterCS,
+  QSynHighlighterCss,
+  QSynHighlighterDfm,
+  QSynHighlighterDml,
+  QSynHighlighterDOT,
+  QSynHighlighterEiffel,
+  QSynHighlighterFortran,
+  QSynHighlighterFoxpro,
+  QSynHighlighterGalaxy,
+  QSynHighlighterGeneral,
+  QSynHighlighterHaskell,
+  QSynHighlighterHC11,
+  QSynHighlighterHP48,
+  QSynHighlighterHtml,
+  QSynHighlighterIni,
+  QSynHighlighterInno,
+  QSynHighlighterJava,
+  QSynHighlighterJScript,
+  QSynHighlighterKix,
+  QSynHighlighterModelica,
+  QSynHighlighterM3,
+  QSynHighlighterPas,
+  QSynHighlighterPerl,
+  QSynHighlighterPHP,
+  QSynHighlighterProgress,
+  QSynHighlighterPython,
   QSynHighlighterRC,
+  QSynHighlighterRuby,
+  QSynHighlighterSml,
+  QSynHighlighterSQL,
+  QSynHighlighterTclTk,
+  QSynHighlighterTeX,
+  QSynHighlighterUNIXShellScript,
+  QSynHighlighterURI,
+  QSynHighlighterVB,
+  QSynHighlighterVBScript,
+  QSynHighlighterVrml97,
+  QSynHighlighterGWS,
+  QSynHighlighterCPM,
+  QSynHighlighterSDD,
+  QSynHighlighterXML,
+  QSynHighlighterMsg,
+  QSynHighlighterIDL,
+  QSynHighlighterUnreal,
+  QSynHighlighterST,
+  QSynHighlighterLDraw,
+  QSynURIOpener,
 {$ELSE}
   // SynEdit components
   SynEdit,
@@ -81,6 +137,7 @@ uses
   SynEditExport,
   SynExportHTML,
   SynExportRTF,
+  SynExportTeX,
   SynHighlighterMulti,
   SynCompletionProposal,
   SynEditPythonBehaviour,
@@ -89,12 +146,67 @@ uses
   SynMacroRecorder,
   SynAutoCorrect,
   SynEditSearch,
+  SynEditRegexSearch,
   {$IFDEF SYN_COMPILER_4_UP}
   SynHighlighterManager,
   {$ENDIF}
   SynEditOptionsDialog,
+  SynHighlighterADSP21xx,
+  SynHighlighterAsm,
+  SynHighlighterAWK,
+  SynHighlighterBaan,
+  SynHighlighterBat,
+  SynHighlighterCAC,
+  SynHighlighterCache,
+  SynHighlighterCobol,
   SynHighlighterCpp,
+  SynHighlighterCS,
+  SynHighlighterCss,
+  SynHighlighterDfm,
+  SynHighlighterDml,
+  SynHighlighterDOT,
+  SynHighlighterEiffel,
+  SynHighlighterFortran,
+  SynHighlighterFoxpro,
+  SynHighlighterGalaxy,
+  SynHighlighterGeneral,
+  SynHighlighterHaskell,
+  SynHighlighterHC11,
+  SynHighlighterHP48,
+  SynHighlighterHtml,
+  SynHighlighterIni,
+  SynHighlighterInno,
+  SynHighlighterJava,
+  SynHighlighterJScript,
+  SynHighlighterKix,
+  SynHighlighterModelica,
+  SynHighlighterM3,
+  SynHighlighterPas,
+  SynHighlighterPerl,
+  SynHighlighterPHP,
+  SynHighlighterProgress,
+  SynHighlighterPython,
   SynHighlighterRC,
+  SynHighlighterRuby,
+  SynHighlighterSml,
+  SynHighlighterSQL,
+  SynHighlighterTclTk,
+  SynHighlighterTeX,
+  SynHighlighterUNIXShellScript,
+  SynHighlighterURI,
+  SynHighlighterVB,
+  SynHighlighterVBScript,
+  SynHighlighterVrml97,
+  SynHighlighterGWS,
+  SynHighlighterCPM,
+  SynHighlighterSDD,
+  SynHighlighterXML,
+  SynHighlighterMsg,
+  SynHighlighterIDL,
+  SynHighlighterUnreal,
+  SynHighlighterST,
+  SynHighlighterLDraw,
+  SynURIOpener,
 {$ENDIF}
   Classes;
 
@@ -125,14 +237,15 @@ begin
   GroupDescendentsWith(TSynEditPythonBehaviour, TSynEdit);
   GroupDescendentsWith(TSynHighlighterManager, TSynEdit);
   GroupDescendentsWith(TSynEditOptionsDialog, TSynEdit);
+  GroupDescendentsWith(TSynURIOpener, TSynEdit);
 {$ENDIF}
 
 // SynEdit extra components
   RegisterComponents(SYNS_ComponentsPage, [TSynExporterHTML, TSynExporterRTF,
-    TSynEditPythonBehaviour, TSynMultiSyn,
+    TSynExporterTeX, TSynEditPythonBehaviour, TSynMultiSyn,
     TSynCompletionProposal, TSynAutoComplete, TSynMacroRecorder,
     TSynEditPrint, TSynEditPrintPreview, TSynAutoCorrect,
-    TSynEditSearch, TSynEditOptionsDialog]);
+    TSynEditSearch, TSynEditRegexSearch, TSynEditOptionsDialog, TSynURIOpener]);
 {$IFDEF SYN_COMPILER_4_UP}
   RegisterComponents(SYNS_ComponentsPage, [TSynHighlighterManager]);
 {$ENDIF}
@@ -140,9 +253,26 @@ begin
 // SynEdit highlighters
   RegisterComponents(SYNS_HighlightersPage, [
     //classic
-    TSynCppSyn,
+    TSynCppSyn, TSynEiffelSyn, TSynFortranSyn, TSynGeneralSyn, TSynJavaSyn,
+    TSynM3Syn, TSynPasSyn, TSynVBSyn, TSynCobolSyn, TSynCSSyn,
+    // internet
+    TSynCssSyn, TSynHTMLSyn, TSynJScriptSyn, TSynPHPSyn, TSynVBScriptSyn,
+    TSynXMLSyn, TSynVrml97Syn,
+    //interpreted
+    TSynAWKSyn, TSynBATSyn, TSynKixSyn, TSynPerlSyn, TSynPythonSyn,
+    TSynTclTkSyn, TSynGWScriptSyn, TSynRubySyn, TSynUNIXShellScriptSyn, 
+    //database
+    TSynCACSyn, TSynCacheSyn, TSynFoxproSyn, TSynSQLSyn, TSynSDDSyn,
+    //assembler
+    TSynADSP21xxSyn, TSynAsmSyn, TSynHC11Syn, TSynHP48Syn, TSynSTSyn,
+    //data modeling
+    TSynDmlSyn, TSynModelicaSyn, TSynSMLSyn,
+    //data
+    TSynDfmSyn, TSynIniSyn, TSynInnoSyn,
     // other
-    TSynRCSyn
+    TSynBaanSyn, TSynGalaxySyn, TSynProgressSyn, TSynMsgSyn,
+    TSynIdlSyn, TSynUnrealSyn, TSynCPMSyn, TSynTeXSyn, 
+    TSynHaskellSyn, TSynLDRSyn, TSynURISyn, TSynDOTSyn, TSynRCSyn
   ]);
 end;
 

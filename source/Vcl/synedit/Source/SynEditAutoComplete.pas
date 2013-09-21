@@ -29,7 +29,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditAutoComplete.pas,v 1.6 2005/01/08 17:04:28 specu Exp $
+$Id: SynEditAutoComplete.pas,v 1.10 2004/05/06 19:16:44 markonjezic Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net

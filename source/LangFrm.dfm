@@ -277,16 +277,30 @@ object LangForm: TLangForm
         Columns = 2
         ItemHeight = 13
         Items.Strings = (
+          'assert.h'
+          'complex.h'
+          'ctype.h'
+          'errno.h'
+          'fenv.h'
+          'float.h'
+          'inttypes.h'
+          'limits.h'
+          'locale.h'
+          'math.h'
+          'setjmp.h'
+          'signal.h'
+          'stdarg.h'
+          'stddef.h'
+          'stdint.h'
           'stdio.h'
           'stdlib.h'
-          'math.h'
           'string.h'
           'time.h'
+          'wchar.h'
+          'wctype.h'
           'windows.h'
-          'windowsx.h'
           'd3d9.h'
-          'd3dx9.h'
-          'gdiplus.h')
+          'd3dx9.h')
         TabOrder = 3
       end
       object ButtonAddFile: TButton

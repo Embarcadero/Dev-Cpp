@@ -163,7 +163,6 @@ begin
   if (not FEnabled) or not (eoAutoIndent in (Sender as TCustomSynEdit).Options) then
     Exit;
 
-    
   if AfterProcessing then
   begin
     case Command of

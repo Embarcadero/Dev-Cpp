@@ -170,7 +170,7 @@ begin
 	try
 	for I := 0 to MainForm.PageControl.PageCount - 1 do
 		if TEditor(MainForm.PageControl.Pages[I].Tag).FileName = Filename then
-		sl.Assign(TEditor(MainForm.PageControl.Pages[I].Tag).Text.Lines)
+		sl.Assign(TEditor(MainForm.PageControl.Pages[I].Tag).Text.UnCollapsedLines)
 		else if FileExists(Filename) then
 		sl.LoadFromFile(Filename);
 	if sl.Count = 0 then
@@ -342,12 +342,12 @@ begin
 	if Assigned(e) then begin
 	PToDoRec(Item.Data)^.IsDone := Item.Checked;
 	if Item.Checked then begin
-		e.Text.Lines[PToDoRec(Item.Data)^.Line] := StringReplace(e.Text.Lines[PToDoRec(Item.Data)^.Line], 'TODO', 'DONE', []);
+		e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line] := StringReplace(e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line], 'TODO', 'DONE', []);
 		if chkNoDone.Checked then
 		BuildList;
 	end
 	else
-		e.Text.Lines[PToDoRec(Item.Data)^.Line] := StringReplace(e.Text.Lines[PToDoRec(Item.Data)^.Line], 'DONE', 'TODO', []);
+		e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line] := StringReplace(e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line], 'DONE', 'TODO', []);
 	e.Modified := True;
 	lv.Refresh;
 	end;

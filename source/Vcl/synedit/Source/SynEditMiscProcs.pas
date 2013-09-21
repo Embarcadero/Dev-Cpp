@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditMiscProcs.pas,v 1.7 2005/01/08 17:04:28 specu Exp $
+$Id: SynEditMiscProcs.pas,v 1.34 2004/07/31 23:41:55 markonjezic Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -47,12 +47,13 @@ uses
 {$IFDEF SYN_CLX}
   Types,
   kTextDrawer,
-  QGraphics,
   QSynEditTypes,
   QSynEditHighlighter,
+  {$IFDEF SYN_CLX}
+  QGraphics,
+  {$ENDIF}
 {$ELSE}
   Windows,
-  Graphics,
   SynEditTypes,
   SynEditHighlighter,
 {$ENDIF}
@@ -178,7 +179,6 @@ function StringReplace(const S, OldPattern, NewPattern: string;
 function GetRValue(RGBValue: TColor): byte;
 function GetGValue(RGBValue: TColor): byte;
 function GetBValue(RGBValue: TColor): byte;
-function RGB(r, g, b: Byte): Cardinal;
 {$ENDIF}
 
 type
@@ -197,9 +197,6 @@ function EnumHighlighterAttris(Highlighter: TSynCustomHighlighter;
 // Calculates Frame Check Sequence (FCS) 16-bit Checksum (as defined in RFC 1171)
 function CalcFCS(const ABuf; ABufSize: Cardinal): Word;
 {$ENDIF}
-
-procedure SynDrawGradient(const ACanvas: TCanvas; const AStartColor, AEndColor: TColor;
-  ASteps: integer; const ARect: TRect; const AHorizontal: boolean);
 
 implementation
 
@@ -873,11 +870,6 @@ function GetBValue(RGBValue: TColor): byte;
 begin
   Result := TColorRec(RGBValue).Blue;
 end;
-
-function RGB(r, g, b: Byte): Cardinal;
-begin
-  Result := (r or (g shl 8) or (b shl 16));
-end;
 {$ENDIF}
 
 {$IFDEF SYN_MBCSSUPPORT}
@@ -936,7 +928,7 @@ begin
   for i := 0 to HighlighterList.Count - 1 do
     if HighlighterList[i] = Highlighter then
       Exit
-    else if Assigned(HighlighterList[i]) and (TObject(HighlighterList[i]).ClassType = Highlighter.ClassType) then
+    else if TObject(HighlighterList[i]).ClassType = Highlighter.ClassType then
       inc(Result);
 end;
 
@@ -1068,61 +1060,5 @@ begin
   Result := CurFCS;
 end;
 {$ENDIF}
-
-procedure SynDrawGradient(const ACanvas: TCanvas; const AStartColor, AEndColor: TColor;
-  ASteps: integer; const ARect: TRect; const AHorizontal: boolean);
-var
-  StartColorR, StartColorG, StartColorB : byte;
-  DiffColorR, DiffColorG, DiffColorB : integer;
-  i, Size : integer;
-  PaintRect: TRect;
-begin
-  StartColorR := GetRValue(ColorToRGB(AStartColor));
-  StartColorG := GetGValue(ColorToRGB(AStartColor));
-  StartColorB := GetBValue(ColorToRGB(AStartColor));
-
-  DiffColorR := GetRValue(ColorToRGB(AEndColor)) - StartColorR;
-  DiffColorG := GetGValue(ColorToRGB(AEndColor)) - StartColorG;
-  DiffColorB := GetBValue(ColorToRGB(AEndColor)) - StartColorB;
-
-  ASteps := MinMax(ASteps, 2, 256);
-
-  if AHorizontal then
-  begin
-    Size := ARect.Right - ARect.Left;
-    PaintRect.Top := ARect.Top;
-    PaintRect.Bottom := ARect.Bottom;
-
-    for i := 0 to ASteps - 1 do
-    begin
-      PaintRect.Left := ARect.Left + MulDiv(i, Size, ASteps);
-      PaintRect.Right := ARect.Left + MulDiv(i + 1, Size, ASteps);
-
-      ACanvas.Brush.Color := RGB(StartColorR + MulDiv(i, DiffColorR, ASteps - 1),
-                                 StartColorG + MulDiv(i, DiffColorG, ASteps - 1),
-                                 StartColorB + MulDiv(i, DiffColorB, ASteps - 1));
-
-      ACanvas.FillRect(PaintRect);
-    end;
-  end
-  else
-  begin
-    Size := ARect.Bottom - ARect.Top;
-    PaintRect.Left := ARect.Left;
-    PaintRect.Right := ARect.Right;
-
-    for i := 0 to ASteps - 1 do
-    begin
-      PaintRect.Top := ARect.Top + MulDiv(i, Size, ASteps);
-      PaintRect.Bottom := ARect.Top + MulDiv(i + 1, Size, ASteps);
-
-      ACanvas.Brush.Color := RGB(StartColorR + MulDiv(i, DiffColorR, ASteps - 1),
-                                 StartColorG + MulDiv(i, DiffColorG, ASteps - 1),
-                                 StartColorB + MulDiv(i, DiffColorB, ASteps - 1));
-
-      ACanvas.FillRect(PaintRect);
-    end;
-  end;
-end;
 
 end.

@@ -1,8 +1,8 @@
 1) Install the following packages by double clicking them and clicking on compile and/or install:
 
-.\Vcl\DevCpp.dpk
-.\Vcl\SynEditPackages\SynEdit_D7.dpk
-.\Vcl\Class Browser & Completion\ClassBrowsing.dpk
+.\VCL\DevCpp.dpk
+.\VCL\SynEditPackages\SynEdit_D7.dpk
+.\VCL\Class Browser & Completion\ClassBrowsing.dpk
 
 2) Compile resources: run .\CompileResources.bat to create binary .res files or run manually from cmd:
 

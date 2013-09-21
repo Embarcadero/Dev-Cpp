@@ -1,5 +1,7 @@
 package SynEdit_D7;
 
+{ $Id: SynEdit_D7.dpk,v 1.4 2004/04/22 21:01:21 markonjezic Exp $ }
+
 {$R *.res}
 {$R '..\Source\SynEditReg.dcr'}
 {$ALIGN 8}
@@ -8,7 +10,7 @@ package SynEdit_D7;
 {$DEBUGINFO ON}
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
-{$IOCHECKS OFF}
+{$IOCHECKS ON}
 {$LOCALSYMBOLS ON}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}

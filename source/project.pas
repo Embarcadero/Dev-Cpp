@@ -329,7 +329,7 @@ begin
            if Lines.Count > 0 then
              if Lines[Lines.Count -1] <> '' then
                Lines.Add('');
-       fEditor.Text.Lines.SavetoFile(fFileName);
+       fEditor.Text.UnCollapsedLines.SavetoFile(fFileName);
        fEditor.New := False;
        fEditor.Modified := False;
        FreeAndNil(fEditor);
@@ -342,7 +342,7 @@ begin
            if Lines.Count > 0 then
              if Lines[Lines.Count -1] <> '' then
                Lines.Add('');
-       fEditor.Text.Lines.SaveToFile(fEditor.FileName);
+       fEditor.Text.UnCollapsedLines.SaveToFile(fEditor.FileName);
        if FileExists(fEditor.FileName) then
          FileSetDate(fEditor.FileName, DateTimeToFileDate(Now)); // fix the "Clock skew detected" warning ;)
        fEditor.New := False;

@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditKeyCmds.pas,v 1.6 2005/01/08 17:04:28 specu Exp $
+$Id: SynEditKeyCmds.pas,v 1.23 2004/06/12 01:33:00 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -201,6 +201,16 @@ const
   ecString          = 630;  //Insert a whole string
 
   ecUserFirst       = 1001; // Start of user-defined commands
+
+  //### Code Folding ###
+  ecCollapse = ecUserFirst + 100;
+  ecUncollapse = ecUserFirst + 101;
+  ecCollapseLevel = ecUserFirst + 102;
+  ecUncollapseLevel = ecUserFirst + 103;
+  ecCollapseAll = ecUserFirst + 104;
+  ecUncollapseAll = ecUserFirst + 105;
+  ecCollapseCurrent = ecUserFirst + 109;
+  //### End Code Folding ###
 
 type
   ESynKeyError = class(Exception);

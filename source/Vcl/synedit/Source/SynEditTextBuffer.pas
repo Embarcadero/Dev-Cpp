@@ -27,14 +27,13 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditTextBuffer.pas,v 1.6 2005/01/08 17:04:29 specu Exp $
+$Id: SynEditTextBuffer.pas,v 1.63 2004/07/29 19:24:40 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
 
 Known Issues:
 -------------------------------------------------------------------------------}
-//todo: Avoid calculating expanded string unncessarily (just calculate expandedLength instead).
 
 {$IFNDEF QSYNEDITTEXTBUFFER}
 unit SynEditTextBuffer;
@@ -113,6 +112,7 @@ type
     procedure InsertItem(Index: integer; const S: string);
     procedure PutRange(Index: integer; ARange: TSynEditRange);
   protected
+    fLongestLineIndex: integer;
     function Get(Index: integer): string; override;
     function GetCapacity: integer;
       {$IFDEF SYN_COMPILER_3_UP} override; {$ENDIF}
@@ -175,7 +175,10 @@ type
     crNothing,
     crGroupBreak,
     crDeleteAll,
-    crWhiteSpaceAdd //for undo/redo of adding a character past EOL and repositioning the caret
+    crWhiteSpaceAdd, //for undo/redo of adding a character past EOL and repositioning the caret
+    //### Code Folding ###
+    crDeleteCollapsedFold
+    //### End Code Folding ###
     );
 
   TSynEditUndoItem = class(TPersistent)
@@ -186,6 +189,10 @@ type
     fChangeEndPos: TBufferCoord;
     fChangeStr: string;
     fChangeNumber: integer;
+    //### Code Folding ###
+    fChangeData: Pointer;
+    fChangeIndex: Integer;
+    //### End Code Folding ###
   public
     procedure Assign(Source: TPersistent); override;
     property ChangeReason: TSynChangeReason read fChangeReason;
@@ -194,6 +201,10 @@ type
     property ChangeEndPos: TBufferCoord read fChangeEndPos;
     property ChangeStr: string read fChangeStr;
     property ChangeNumber: integer read fChangeNumber;
+    //### Code Folding ###
+    property ChangeData: Pointer read fChangeData;
+    property ChangeIndex: Integer read fChangeIndex;
+    //### End Code Folding ###
   end;
 
   TSynEditUndoList = class(TPersistent)
@@ -218,8 +229,13 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    
+    //### Code Folding ###
     procedure AddChange(AReason: TSynChangeReason; const AStart, AEnd: TBufferCoord;
-      const ChangeText: string; SelMode: TSynSelectionMode);
+      const ChangeText: string; SelMode: TSynSelectionMode; Data: Pointer = nil;
+      Index: Integer = 0);
+    //### End Code Folding ###
+
     procedure BeginBlock;
     procedure Clear;
     procedure EndBlock;
@@ -487,6 +503,7 @@ end;
 constructor TSynEditStringList.Create;
 begin
   inherited Create;
+  fAppendNewLineAtEOF := True; //Retain current behavior
   fFileFormat := sffDos;
   fIndexOfLongestLine := -1;
   TabWidth := 8;
@@ -732,7 +749,7 @@ end;
 function TSynEditStringList.GetTextStr: string;
 begin
   Result := inherited GetTextStr;
-  System.Delete(Result, Length(Result) - Length(SLineBreak) + 1, MaxInt);
+  System.Delete(Result, Length(Result) - Length(SLineBreak) + 1, Length(SLineBreak));
 end;
 
 procedure TSynEditStringList.Grow;
@@ -1128,7 +1145,8 @@ begin
 end;
 
 procedure TSynEditUndoList.AddChange(AReason: TSynChangeReason; const AStart,
-  AEnd: TBufferCoord; const ChangeText: string; SelMode: TSynSelectionMode);
+  AEnd: TBufferCoord; const ChangeText: string; SelMode: TSynSelectionMode;
+  Data: Pointer = nil; Index: Integer = 0);
 var
   NewItem: TSynEditUndoItem;
 begin
@@ -1141,6 +1159,12 @@ begin
         fChangeStartPos := AStart;
         fChangeEndPos := AEnd;
         fChangeStr := ChangeText;
+        
+        //### Code Folding ###
+        fChangeData := Data;
+        fChangeIndex := Index;
+        //### End Code Folding ###
+
         if fBlockChangeNumber <> 0 then
           fChangeNumber := fBlockChangeNumber
         else begin

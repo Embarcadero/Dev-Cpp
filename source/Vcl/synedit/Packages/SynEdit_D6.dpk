@@ -1,6 +1,6 @@
 package SynEdit_D6;
 
-{ $Id: SynEdit_D6.dpk,v 1.4 2005/01/08 17:04:26 specu Exp $ }
+{ $Id: SynEdit_D6.dpk,v 1.5 2003/12/31 11:08:26 markonjezic Exp $ }
 
 {$R *.res}
 {$R '..\Source\SynEditReg.dcr'}

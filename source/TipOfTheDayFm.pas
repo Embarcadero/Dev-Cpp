@@ -251,6 +251,10 @@ end;
 
 procedure TTipOfTheDayForm.LoadText;
 begin
+
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_TIPS_CAPTION];
   lblTitle.Caption := Lang[ID_TIPS_DIDYOUKNOW];
   lblTip.Caption := Lang[ID_TIPS_NOTIPSTODISPLAY];

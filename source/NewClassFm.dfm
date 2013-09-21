@@ -1,6 +1,6 @@
 object NewClassForm: TNewClassForm
-  Left = 225
-  Top = 301
+  Left = 771
+  Top = 293
   BorderStyle = bsDialog
   Caption = 'New class'
   ClientHeight = 500

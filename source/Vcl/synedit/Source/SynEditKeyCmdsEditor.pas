@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditKeyCmdsEditor.pas,v 1.6 2005/01/08 17:04:28 specu Exp $
+$Id: SynEditKeyCmdsEditor.pas,v 1.10 2004/04/23 16:26:58 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -190,25 +190,22 @@ begin
 end;
 
 procedure TSynEditKeystrokesEditorForm.FormResize(Sender: TObject);
+var
+  x: integer;
 begin
-  pnlBottom.Width := pnlBottom.Left + ClientWidth - 25;
-  pnlBottom.Height := ClientHeight - 11;
-  pnlCommands.Width := ClientWidth - 136;
-  pnlCommands.Height := ClientHeight - 75;
-
-  btnAdd.Left := pnlCommands.Left + pnlCommands.Width + 14;
-  btnEdit.Left := pnlCommands.Left + pnlCommands.Width + 14;
-  btnDelete.Left := pnlCommands.Left + pnlCommands.Width + 14;
-  btnClear.Left := pnlCommands.Left + pnlCommands.Width + 14;
-  btnReset.Left := pnlCommands.Left + pnlCommands.Width + 14;
-
-  btnOK.Left := pnlCommands.Left + pnlCommands.Width + 14;
-  btnOK.Top := pnlCommands.Top + pnlCommands.Height - 19;
-  btnCancel.Left := pnlCommands.Left + pnlCommands.Width + 14;
-  btnCancel.Top := pnlCommands.Top + pnlCommands.Height + 13;
-
-  lnlInfo.Top := pnlCommands.Top + pnlCommands.Height + 11;
-  lnlInfo2.Top := pnlCommands.Top + pnlCommands.Height + 27;
+  for x := 0 to ControlCount-1 do
+    if Controls[x] is TButton then
+    begin
+      Controls[x].Left := ClientWidth - Controls[x].Width - 7;
+      if Controls[x] = btnOK then
+        Controls[x].Top := ClientHeight - (Controls[x].Height * 2) - 10;
+      if Controls[x] = btnCancel then
+        Controls[x].Top := ClientHeight - Controls[x].Height - 3;
+    end else if Controls[x] is TListView then
+    begin
+      Controls[x].Width := ClientWidth - 96;
+      Controls[x].Height := ClientHeight - 8;
+    end;
 end;
 
 {***************}

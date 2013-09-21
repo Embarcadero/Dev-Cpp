@@ -140,8 +140,11 @@ begin
 end;
 
 procedure OpenHelpFile;
+var
+	abshelp : string;
 begin
-	ShellExecute(GetDesktopWindow(), 'open', PChar(devDirs.Help + DEV_MAINHELP_FILE), nil, nil, SW_SHOWNORMAL);
+	abshelp := StringReplace(devDirs.Help,  '%path%\',devDirs.Exec,[rfReplaceAll]) + DEV_MAINHELP_FILE;
+	ShellExecute(GetDesktopWindow(), 'open', PChar(abshelp), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure FilesFromWildcard(Directory, Mask: String;var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);

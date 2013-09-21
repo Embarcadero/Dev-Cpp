@@ -1,6 +1,6 @@
 object FilePropertiesForm: TFilePropertiesForm
-  Left = 432
-  Top = 332
+  Left = 529
+  Top = 340
   BorderStyle = bsDialog
   Caption = 'File properties'
   ClientHeight = 265
@@ -70,14 +70,14 @@ object FilePropertiesForm: TFilePropertiesForm
   end
   object Label1: TLabel
     Left = 24
-    Top = 48
+    Top = 24
     Width = 45
     Height = 13
     Caption = 'Filename:'
   end
   object Label2: TLabel
     Left = 24
-    Top = 24
+    Top = 48
     Width = 47
     Height = 13
     Caption = 'In project:'
@@ -116,33 +116,6 @@ object FilePropertiesForm: TFilePropertiesForm
     Width = 56
     Height = 13
     Caption = 'Empty lines:'
-  end
-  object lblFilename: TLabel
-    Left = 100
-    Top = 48
-    Width = 285
-    Height = 13
-    AutoSize = False
-    Caption = 'lblFilename'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object lblProject: TLabel
-    Left = 100
-    Top = 24
-    Width = 285
-    Height = 13
-    AutoSize = False
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = [fsBold]
-    ParentFont = False
   end
   object lblSize: TLabel
     Left = 381
@@ -269,6 +242,15 @@ object FilePropertiesForm: TFilePropertiesForm
     Font.Style = [fsBold]
     ParentFont = False
   end
+  object lblProject: TEdit
+    Left = 100
+    Top = 44
+    Width = 285
+    Height = 20
+    AutoSize = False
+    ReadOnly = True
+    TabOrder = 4
+  end
   object lblAbsolute: TEdit
     Left = 100
     Top = 68
@@ -300,7 +282,7 @@ object FilePropertiesForm: TFilePropertiesForm
   end
   object cmbFiles: TComboBox
     Left = 100
-    Top = 44
+    Top = 20
     Width = 289
     Height = 21
     Style = csDropDownList

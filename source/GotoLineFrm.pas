@@ -52,7 +52,7 @@ type
     FEditor: TCustomSynEdit;
     procedure SetEditor(AEditor: TCustomSynEdit);
   public
-    procedure LoadTexts;
+    procedure LoadText;
     property Editor: TCustomSynEdit read FEditor write SetEditor;
   end;
 
@@ -70,7 +70,7 @@ uses
 
 procedure TGotoLineForm.FormCreate(Sender: TObject);
 begin
-  LoadTexts;
+  LoadText;
 end;
 
 procedure TGotoLineForm.FormShow(Sender: TObject);
@@ -89,7 +89,7 @@ begin
 {$ENDIF}
 end;
 
-procedure TGotoLineForm.LoadTexts;
+procedure TGotoLineForm.LoadText;
 begin
   Caption := Lang[ID_GOTO_CAPTION];
   GotoLabel.Caption := Lang[ID_GOTO_TEXT];

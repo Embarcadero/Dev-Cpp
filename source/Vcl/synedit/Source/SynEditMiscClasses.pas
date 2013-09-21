@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditMiscClasses.pas,v 1.6 2005/01/08 17:04:28 specu Exp $
+$Id: SynEditMiscClasses.pas,v 1.35 2004/07/31 15:31:41 markonjezic Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -45,7 +45,7 @@ interface
 
 uses
 {$IFDEF SYN_CLX}
-  {$IFDEF SYN_LINUX}
+  {$IFDEF LINUX}
   Xlib,
   {$ENDIF}
   Types,
@@ -75,6 +75,9 @@ uses
 {$IFDEF SYN_COMPILER_4_UP}
   Math,
 {$ENDIF}
+	//### Code Folding ###
+  SynEditCodeFolding,
+  //### End Code Folding ###
   Classes,
   SysUtils;
 
@@ -101,7 +104,6 @@ type
   private
     fFont: TFont;
     fColor: TColor;
-    fBorderColor: TColor;
     fWidth: integer;
     fShowLineNumbers: boolean;
     fDigitCount: integer;
@@ -116,13 +118,7 @@ type
     fAutoSize: boolean;
     fAutoSizeDigitCount: integer;
     fBorderStyle: TSynGutterBorderStyle;
-    fLineNumberStart: Integer;
-    fGradient: Boolean;
-    fGradientStartColor: TColor;
-    fGradientEndColor: TColor;
-    fGradientSteps: Integer;
     procedure SetAutoSize(const Value: boolean);
-    procedure SetBorderColor(const Value: TColor);
     procedure SetColor(const Value: TColor);
     procedure SetDigitCount(Value: integer);
     procedure SetLeadingZeros(const Value: boolean);
@@ -136,11 +132,6 @@ type
     procedure SetFont(Value: TFont);
     procedure OnFontChange(Sender: TObject);
     procedure SetBorderStyle(const Value: TSynGutterBorderStyle);
-    procedure SetLineNumberStart(const Value: Integer);
-    procedure SetGradient(const Value: Boolean);
-    procedure SetGradientStartColor(const Value: TColor);
-    procedure SetGradientEndColor(const Value: TColor);
-    procedure SetGradientSteps(const Value: Integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -153,7 +144,6 @@ type
     property BorderStyle: TSynGutterBorderStyle read fBorderStyle
       write SetBorderStyle default gbsMiddle;
     property Color: TColor read fColor write SetColor default clBtnFace;
-    property BorderColor: TColor read fBorderColor write SetBorderColor default clWindow;
     property Cursor: TCursor read fCursor write fCursor default crDefault;
     property DigitCount: integer read fDigitCount write SetDigitCount
       default 4;
@@ -167,18 +157,77 @@ type
     property ShowLineNumbers: boolean read fShowLineNumbers
       write SetShowLineNumbers default FALSE;
     property UseFontStyle: boolean read fUseFontStyle write SetUseFontStyle
-      default True;
+      default TRUE;
     property Visible: boolean read fVisible write SetVisible default TRUE;
     property Width: integer read fWidth write SetWidth default 30;
     property ZeroStart: boolean read fZeroStart write SetZeroStart
-      default False;
-    property LineNumberStart: Integer read fLineNumberStart write SetLineNumberStart default 1;
-    property Gradient: Boolean read fGradient write SetGradient default False;
-    property GradientStartColor: TColor read fGradientStartColor write SetGradientStartColor default clWindow;
-    property GradientEndColor: TColor read fGradientEndColor write SetGradientEndColor default clBtnFace;
-    property GradientSteps: Integer read fGradientSteps write SetGradientSteps default 48;
+      default FALSE;
     property OnChange: TNotifyEvent read fOnChange write fOnChange;
   end;
+
+  //### Code Folding ###
+  TSynCollapsingMarkStyle = (msSquare, msEllipse);
+  TSynCodeFoldingChanges = (fcEnabled, fcRefresh, fcRescan);
+
+  TCodeFoldingChangeEvent = procedure(Event: TSynCodeFoldingChanges) of object;
+
+	TSynCodeFolding = class(TPersistent)
+  private
+    fHighlighterFoldRegions: Boolean;
+    fCollapsedCodeHint: Boolean;
+    fIndentGuides: Boolean;
+    fShowCollapsedLine: Boolean;
+    fCollapsedLineColor: TColor;
+    fEnabled: Boolean;
+    fHighlightIndentGuides: Boolean;
+    fFolderBarColor: TColor;
+    fFolderBarLinesColor: TColor;
+    fCollapsingMarkStyle: TSynCollapsingMarkStyle;
+    fFoldRegions: TFoldRegions;
+    fCaseSensitive: Boolean;
+    fOnChange: TCodeFoldingChangeEvent;
+    
+    procedure SetFolderBarColor(const Value: TColor);
+    procedure SetFolderBarLinesColor(const Value: TColor);
+    procedure SetEnabled(const Value: Boolean);
+    procedure SetCollapsedCodeHint(const Value: Boolean);
+    procedure SetCollapsedLineColor(const Value: TColor);
+    procedure SetCollapsingMarkStyle(const Value: TSynCollapsingMarkStyle);
+    procedure SetHighlighterFoldRegions(const Value: Boolean);
+    procedure SetHighlightIndentGuides(const Value: Boolean);
+    procedure SetIndentGuides(const Value: Boolean);
+    procedure SetShowCollapsedLine(const Value: Boolean);
+    procedure SetCaseSensitive(const Value: Boolean);
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure Assign(Source: TPersistent); override;
+
+    property CaseSensitive: Boolean read fCaseSensitive write SetCaseSensitive;
+    property CollapsedCodeHint: Boolean read fCollapsedCodeHint
+    	write SetCollapsedCodeHint default True;
+    property CollapsedLineColor: TColor read fCollapsedLineColor
+    	write SetCollapsedLineColor default clDefault;
+    property CollapsingMarkStyle: TSynCollapsingMarkStyle
+    	read fCollapsingMarkStyle write SetCollapsingMarkStyle default msSquare;
+    property Enabled: Boolean read fEnabled write SetEnabled default False;
+    property FoldRegions: TFoldRegions read fFoldRegions;
+    property FolderBarColor: TColor read fFolderBarColor
+    	write SetFolderBarColor default clDefault;
+    property FolderBarLinesColor: TColor read fFolderBarLinesColor
+    	write SetFolderBarLinesColor default clDefault;
+    property HighlighterFoldRegions: Boolean read fHighlighterFoldRegions
+    	write SetHighlighterFoldRegions default True;
+    property HighlightIndentGuides: Boolean read fHighlightIndentGuides
+    	write SetHighlightIndentGuides default True;
+    property IndentGuides: Boolean read fIndentGuides write SetIndentGuides
+    	default True;
+    property ShowCollapsedLine: Boolean read fShowCollapsedLine
+    	write SetShowCollapsedLine default True;
+    property OnChange: TCodeFoldingChangeEvent read fOnChange write fOnChange;
+  end;
+  //### End Code Folding ###
 
   TSynBookMarkOpt = class(TPersistent)
   private
@@ -452,14 +501,7 @@ begin
   fDigitCount := 4;
   fAutoSizeDigitCount := fDigitCount;
   fRightOffset := 2;
-  fBorderColor := clWindow;
   fBorderStyle := gbsMiddle;
-  fLineNumberStart := 1;
-  fZeroStart := False;
-  fGradient := False;
-  fGradientStartColor := clWindow;
-  fGradientEndColor := clBtnFace;
-  fGradientSteps := 48;
 end;
 
 destructor TSynGutter.Destroy;
@@ -487,7 +529,6 @@ begin
     fRightOffset := Src.fRightOffset;
     fAutoSize := Src.fAutoSize;
     fAutoSizeDigitCount := Src.fAutoSizeDigitCount;
-    fLineNumberStart := Src.fLineNumberStart;
     if Assigned(fOnChange) then fOnChange(Self);
   end else
     inherited;
@@ -497,13 +538,8 @@ procedure TSynGutter.AutoSizeDigitCount(LinesCount: integer);
 var
   nDigits: integer;
 begin
-  if fVisible and fAutoSize and fShowLineNumbers then 
-  begin
-    if fZeroStart then
-      Dec(LinesCount)
-    else if fLineNumberStart > 1 then
-      Inc(LinesCount, fLineNumberStart - 1);
-
+  if fVisible and fAutoSize and fShowLineNumbers then begin            
+    if fZeroStart then Dec(LinesCount);
     nDigits := Max(Length(IntToStr(LinesCount)), fDigitCount);
     if fAutoSizeDigitCount <> nDigits then begin
       fAutoSizeDigitCount := nDigits;
@@ -517,10 +553,7 @@ function TSynGutter.FormatLineNumber(Line: integer): string;
 var
   i: integer;
 begin
-  if fZeroStart then
-    Dec(Line)
-  else if fLineNumberStart > 1 then
-    Inc(Line, fLineNumberStart - 1);
+  if fZeroStart then Dec(Line);
   Str(Line : fAutoSizeDigitCount, Result);
   if fLeadingZeros then
     for i := 1 to fAutoSizeDigitCount - 1 do begin
@@ -646,68 +679,6 @@ procedure TSynGutter.SetBorderStyle(const Value: TSynGutterBorderStyle);
 begin
   fBorderStyle := Value;
   if Assigned(fOnChange) then fOnChange(Self);
-end;
-
-procedure TSynGutter.SetLineNumberStart(const Value: Integer);
-begin
-  if Value <> fLineNumberStart then
-  begin
-    fLineNumberStart := Value;
-    if fLineNumberStart < 0 then
-      fLineNumberStart := 0;
-    if fLineNumberStart = 0 then
-      fZeroStart := True
-    else
-      fZeroStart := False;
-    if Assigned(fOnChange) then fOnChange(Self);
-  end;
-end;
-
-procedure TSynGutter.SetBorderColor(const Value: TColor);
-begin
-  if fBorderColor <> Value then 
-  begin
-    fBorderColor := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
-  end;
-end;
-
-procedure TSynGutter.SetGradient(const Value: Boolean);
-begin
-  if Value <> fGradient then
-  begin
-    fGradient := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
-  end;
-end;
-
-procedure TSynGutter.SetGradientEndColor(const Value: TColor);
-begin
-  if Value <> fGradientEndColor then
-  begin
-    fGradientEndColor := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
-  end;
-end;
-
-procedure TSynGutter.SetGradientStartColor(const Value: TColor);
-begin
-  if Value <> fGradientStartColor then
-  begin
-    fGradientStartColor := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
-  end;
-end;
-
-procedure TSynGutter.SetGradientSteps(const Value: Integer);
-begin
-  if Value <> fGradientSteps then
-  begin
-    fGradientSteps := Value;
-    if fGradientSteps < 2 then
-      fGradientSteps := 2;
-    if Assigned(fOnChange) then fOnChange(Self);
-  end;
 end;
 
 { TSynBookMarkOpt }
@@ -1317,11 +1288,11 @@ procedure TSynHotKey.KeyDown(var Key: Word; Shift: TShiftState);
 var
   MaybeInvalidKey: THKInvalidKey;
   SavedKey: Word;
-  {$IFDEF SYN_LINUX}
+  {$IFDEF LINUX}
   Code: Byte;
   {$ENDIF}
 begin
-  {$IFDEF SYN_LINUX}
+  {$IFDEF LINUX}
   // uniform Keycode: key has the same value wether Shift is pressed or not
   if Key <= 255 then
   begin
@@ -1363,12 +1334,12 @@ begin
 end;
 
 procedure TSynHotKey.KeyUp(var Key: Word; Shift: TShiftState);
-{$IFDEF SYN_LINUX}
+{$IFDEF LINUX}
 var
   Code: Byte;
 {$ENDIF}
 begin
-  {$IFDEF SYN_LINUX}
+  {$IFDEF LINUX}
   // uniform Keycode: key has the same value wether Shift is pressed or not
   if Key <= 255 then
   begin
@@ -1517,6 +1488,125 @@ end; { TBetterRegistry.OpenKeyReadOnly }
   {$ENDIF SYN_COMPILER_4_UP}
 {$ENDIF SYN_CLX}
 
+//### Code Folding ###
+{ TSynCodeFolding }
+
+procedure TSynCodeFolding.Assign(Source: TPersistent);
+begin
+	inherited
+end;
+
+constructor TSynCodeFolding.Create;
+begin
+	fHighlighterFoldRegions := True;
+  fCollapsingMarkStyle := msSquare;
+  fShowCollapsedLine := True;
+  fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
+end;
+
+destructor TSynCodeFolding.Destroy;
+begin
+  fFoldRegions.Free;
+  inherited;
+end;
+
+procedure TSynCodeFolding.SetEnabled(const Value: Boolean);
+begin
+	fEnabled := Value;
+
+  if Assigned(fOnChange) then fOnChange(fcEnabled);
+end;
+
+procedure TSynCodeFolding.SetFolderBarColor(const Value: TColor);
+var
+	HSLColor: THSLColor;
+begin
+  if Value = clDefault then
+  begin
+		HSLColor := RGB2HSL(clBtnFace);
+  	Inc(HSLColor.Luminace, 5);
+		fFolderBarColor := HSL2RGB(HSLColor);
+  end
+  else
+  	fFolderBarColor := Value;
+
+  if Assigned(fOnChange) then fOnChange(fcRefresh);
+end;
+
+procedure TSynCodeFolding.SetFolderBarLinesColor(const Value: TColor);
+var
+	HSLColor: THSLColor;
+begin
+	if Value = clDefault then
+  begin
+  	HSLColor := RGB2HSL(clBtnFace);
+  	Dec(HSLColor.Luminace, 20);
+  	fFolderBarLinesColor := HSL2RGB(HSLColor);
+  end
+  else
+  	fFolderBarLinesColor := Value;
+
+  if Assigned(fOnChange) then fOnChange(fcRefresh);
+end;
+
+procedure TSynCodeFolding.SetCollapsedCodeHint(const Value: Boolean);
+begin
+	fCollapsedCodeHint := Value;
+
+  if Assigned(fOnChange) then fOnChange(fcRefresh);
+end;
+
+procedure TSynCodeFolding.SetCollapsedLineColor(const Value: TColor);
+begin
+	fCollapsedLineColor := Value;
+
+  if Assigned(fOnChange) then fOnChange(fcRefresh);
+end;
+
+procedure TSynCodeFolding.SetCollapsingMarkStyle(const Value: TSynCollapsingMarkStyle);
+begin
+	fCollapsingMarkStyle := Value;
+  
+  if Assigned(fOnChange) then fOnChange(fcRefresh);
+end;
+
+procedure TSynCodeFolding.SetHighlighterFoldRegions(const Value: Boolean);
+begin
+	fHighlighterFoldRegions := Value;
+  
+  if Assigned(fOnChange) then fOnChange(fcRescan);
+end;
+
+procedure TSynCodeFolding.SetHighlightIndentGuides(const Value: Boolean);
+begin
+	fHighlightIndentGuides := Value;
+  
+  if Assigned(fOnChange) then fOnChange(fcRefresh);
+end;
+
+procedure TSynCodeFolding.SetIndentGuides(const Value: Boolean);
+begin
+	fIndentGuides := Value;
+  
+  if Assigned(fOnChange) then fOnChange(fcRefresh);
+end;
+
+procedure TSynCodeFolding.SetShowCollapsedLine(const Value: Boolean);
+begin
+	fShowCollapsedLine := Value;
+
+  if Assigned(fOnChange) then fOnChange(fcRefresh);
+end;
+
+procedure TSynCodeFolding.SetCaseSensitive(const Value: Boolean);
+begin
+	fCaseSensitive := Value;
+
+  if Assigned(fOnChange) then fOnChange(fcRescan);
+end;
+//### End Code Folding ###
+
 begin
   InternalResources := nil;
 end.
+
