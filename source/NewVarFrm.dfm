@@ -1,6 +1,6 @@
 object NewVarForm: TNewVarForm
-  Left = 779
-  Top = 259
+  Left = 1182
+  Top = 264
   BorderStyle = bsDialog
   Caption = 'New variable'
   ClientHeight = 449

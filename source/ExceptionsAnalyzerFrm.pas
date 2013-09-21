@@ -161,7 +161,7 @@ var
   frmExceptionsAnalyzer: TfrmExceptionsAnalyzer;
 
 class procedure TEAnalyzer.EHandler(Sender: TObject;E: Exception);
-const usermsg = 'Please include a description of what you were doing before the error occured (please give as much precisions as possible) : ';
+const usermsg = 'Please include a description of what you were doing before the error occured:';
 var
   target: pointer;
   p, stackstart: ^pointer;
@@ -216,12 +216,9 @@ begin
 		lblError.Caption := E.Message;
 		memStackTrace.Text := Res;
 		si := GatherSystemInfo;
-		memBugReport.Text := si
-                       + #13#10
-                       + 'The following error occured in version ' + DEVCPP_VERSION + ':'#13#10
-                       + lblError.Caption + ' (at address ' + lblAddress.Caption + ')'#13#10#13#10#13#10
-                       + usermsg + #13#10#13#10#13#10
-                       + 'State information follows:'#13#10;
+		memBugReport.Text := si + 'The following error occured in version ' + DEVCPP_VERSION + ':'#13#10
+                           + lblError.Caption + ' (at address ' + lblAddress.Caption + ')'#13#10#13#10#13#10
+                           + usermsg + #13#10#13#10#13#10;
 		if fReportStackTrace then
 			memBugReport.Text := memBugReport.Text + 'Stack trace:'#13#10'------------'#13#10 + Res;
 		if ShowModal = mrAbort then
@@ -483,7 +480,7 @@ begin
 
   if fReportMachine or fReportComputerName then begin
     Result := Result + 'Machine info'#13#10;
-    Result := Result + '---------'#13#10;
+    Result := Result + '------------'#13#10;
     if fReportMachine then begin
       vi.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
       GetVersionEx(vi);
@@ -523,16 +520,16 @@ begin
   if fReportMemory then begin
     ms.dwLength := SizeOf(TMemoryStatus);
     GlobalMemoryStatus(ms);
-    Result := Result + 'Memory Status'#13#10;
-    Result := Result + '-------------'#13#10;
+    //Result := Result + 'Memory Status'#13#10;
+    //Result := Result + '-------------'#13#10;
 
     Tot := ms.dwTotalPhys;
     Avail := ms.dwAvailPhys;
     FreeP := (Avail * 100) / Tot;
     UsedP := 100 - FreeP;
-    Result := Result + Format('Physical memory: %13.0n total'#13#10, [Tot]);
-    Result := Result + Format('                 %13.0n in use (%6.2f%%)'#13#10, [Tot - Avail, UsedP]);
-    Result := Result + Format('                 %13.0n free   (%6.2f%%)'#13#10, [Avail, FreeP]);
+    //Result := Result + Format('Physical memory: %13.0n total'#13#10, [Tot]);
+    //Result := Result + Format('                 %13.0n in use (%6.2f%%)'#13#10, [Tot - Avail, UsedP]);
+    //Result := Result + Format('                 %13.0n free   (%6.2f%%)'#13#10, [Avail, FreeP]);
     frmExceptionsAnalyzer.lblTotalPhys.Caption := Format('%0.0n', [Tot]);
     frmExceptionsAnalyzer.lblUsedPhys.Caption := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
     frmExceptionsAnalyzer.lblFreePhys.Caption := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
@@ -541,9 +538,9 @@ begin
     Avail := ms.dwAvailPageFile;
     FreeP := (Avail * 100) / Tot;
     UsedP := 100 - FreeP;
-    Result := Result + Format('Cache          : %13.0n total'#13#10, [Tot]);
-    Result := Result + Format('                 %13.0n in use (%6.2f%%)'#13#10, [Tot - Avail, UsedP]);
-    Result := Result + Format('                 %13.0n free   (%6.2f%%)'#13#10, [Avail, FreeP]);
+    //Result := Result + Format('Cache          : %13.0n total'#13#10, [Tot]);
+    //Result := Result + Format('                 %13.0n in use (%6.2f%%)'#13#10, [Tot - Avail, UsedP]);
+    //Result := Result + Format('                 %13.0n free   (%6.2f%%)'#13#10, [Avail, FreeP]);
     frmExceptionsAnalyzer.lblTotalCache.Caption := Format('%0.0n', [Tot]);
     frmExceptionsAnalyzer.lblUsedCache.Caption := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
     frmExceptionsAnalyzer.lblFreeCache.Caption := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
@@ -552,10 +549,10 @@ begin
     Avail := ms.dwAvailVirtual;
     FreeP := (Avail * 100) / Tot;
     UsedP := 100 - FreeP;
-    Result := Result + Format('Virtual memory : %13.0n total'#13#10, [Tot]);
-    Result := Result + Format('                 %13.0n in use (%6.2f%%)'#13#10, [Tot - Avail, UsedP]);
-    Result := Result + Format('                 %13.0n free   (%6.2f%%)'#13#10, [Avail, FreeP]);
-    Result := Result + Format('Memory load    : %12d%%'#13#10, [ms.dwMemoryLoad]);
+    //Result := Result + Format('Virtual memory : %13.0n total'#13#10, [Tot]);
+    //Result := Result + Format('                 %13.0n in use (%6.2f%%)'#13#10, [Tot - Avail, UsedP]);
+    //Result := Result + Format('                 %13.0n free   (%6.2f%%)'#13#10, [Avail, FreeP]);
+    //Result := Result + Format('Memory load    : %12d%%'#13#10, [ms.dwMemoryLoad]);
     frmExceptionsAnalyzer.lblTotalVirt.Caption := Format('%0.0n', [Tot]);
     frmExceptionsAnalyzer.lblUsedVirt.Caption := Format('%0.0n'#13#10'%6.2f%%', [Tot - Avail, UsedP]);
     frmExceptionsAnalyzer.lblFreeVirt.Caption := Format('%0.0n'#13#10'%6.2f%%', [Avail, FreeP]);
@@ -601,8 +598,8 @@ var
 begin
 	Cmd := 'mailto:' + fEmail + '?Subject=' + fSubject + '&Body=';
 	for I := 0 to memBugReport.Lines.Count - 1 do
-		Cmd := Cmd + memBugReport.Lines[I] + #13#10;
-	//Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
+		Cmd := Cmd + memBugReport.Lines[I] + '%0A';
+	Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
 	ShellExecute(0, 'open', PAnsiChar(Cmd), nil, nil, SW_SHOWNORMAL);
 end;
 

@@ -81,7 +81,7 @@ type
     fSearchEngine : TSynEditSearch;
     fTempSynEdit : TSynEdit;
     procedure LoadText;
-    procedure CustomOnReplace(Sender: TObject; const aSearch,aReplace: AnsiString; Line, Column: integer; var Action: TSynReplaceAction);
+    procedure FindAllAction(Sender: TObject; const aSearch,aReplace: AnsiString; Line, Column: integer; var Action: TSynReplaceAction);
     function FindReplaceFirst(editor : TSynEdit) : integer;
     function FindReplaceFiles(editor : TSynEdit;isreplace : boolean) : integer;
   public
@@ -144,7 +144,7 @@ begin
 
 	// When using find in files, report each find using OnReplaceText
 	if not isreplace then
-		editor.OnReplaceText := CustomOnReplace;
+		editor.OnReplaceText := FindAllAction;
 
 	// And do the final search
 	editor.SearchEngine := fSearchEngine;
@@ -178,10 +178,15 @@ begin
 		if cboFindText.Items.IndexOf(cboFindText.Text) = -1 then
 			cboFindText.AddItem(cboFindText.Text,nil);
 	end else begin
-		MessageBox(Application.Handle, PAnsiChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),PAnsiChar(Lang[ID_INFO]), MB_ICONINFORMATION);
+		MessageBox(
+			Application.Handle,
+			PAnsiChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),
+			PAnsiChar(Lang[ID_INFO]),
+			MB_ICONINFORMATION or MB_TOPMOST);
 		Exit;
 	end;
 
+	// Replacing something by nothing is allowed...
 	if (cboReplaceText.Text <> '') and (isreplace or isreplacefiles) then
 		if cboReplaceText.Items.IndexOf(cboReplaceText.Text) = -1 then
 			cboReplaceText.AddItem(cboReplaceText.Text,nil);
@@ -218,26 +223,30 @@ begin
 	if isfindfiles or isreplacefiles then
 		Include(fSearchOptions,ssoEntireScope);
 
+	// do a fake prompted replace when using find in files
 	if isfindfiles or isreplace or isreplacefiles then
-		Include(fSearchOptions,ssoReplace); // do a fake prompted replace when using find in files
+		Include(fSearchOptions,ssoReplace);
 
 	if isfindfiles or isreplacefiles then
 		Include(fSearchOptions,ssoReplaceAll);
 
 	MainForm.FindOutput.Items.BeginUpdate;
 
-	// Do the actual searching
+	// Find the first one, then quit
 	if isfind or isreplace then begin
 		e := MainForm.GetEditor;
 
 		Inc(findcount,FindReplaceFirst(e.Text));
 
 		if findcount = 0 then
-			MessageBox(Application.Handle,PAnsiChar(Format(Lang[ID_MSG_TEXTNOTFOUND],[cboFindText.Text])),PAnsiChar(Lang[ID_INFO]), MB_ICONINFORMATION);
-	end;
+			MessageBox(
+				Application.Handle,
+				PAnsiChar(Format(Lang[ID_MSG_TEXTNOTFOUND],[cboFindText.Text])),
+				PAnsiChar(Lang[ID_INFO]),
+				MB_ICONINFORMATION or MB_TOPMOST);
 
-	// Do the actual searching
-	if isfindfiles or isreplacefiles then begin
+	// Or find everything
+	end else begin
 
 		if isfindfiles then
 			MainForm.FindOutput.Clear;
@@ -266,6 +275,7 @@ begin
 				// file is already open, use memory
 				if Assigned(e) then begin
 
+					// Bring an editor up front if we use prompting
 					if isreplacefiles and (ssoPrompt in fSearchOptions) then
 						e.Activate;
 
@@ -324,7 +334,7 @@ begin
 		MainForm.OpenCloseMessageSheet(FALSE);
 end;
 
-procedure TfrmFind.CustomOnReplace(Sender: TObject;const aSearch, aReplace: AnsiString; Line, Column: integer;var Action: TSynReplaceAction);
+procedure TfrmFind.FindAllAction(Sender: TObject;const aSearch, aReplace: AnsiString; Line, Column: integer;var Action: TSynReplaceAction);
 var
 	p : TBufferCoord;
 	q : TDisplayCoord;

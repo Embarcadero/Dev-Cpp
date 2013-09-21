@@ -382,7 +382,7 @@ begin
   if Assigned(It) and Assigned(It.Data) then begin
     e := MainForm.GetEditorFromFileName(MainForm.CppParser.GetImplementationFileName(PStatement(It.Data)));
     if Assigned(e) then begin
-      e.GotoLineNr(MainForm.CppParser.GetImplementationLine(PStatement(It.Data)));
+      e.SetCaretPos(MainForm.CppParser.GetImplementationLine(PStatement(It.Data)),1);
       e.Activate;
     end;
   end;

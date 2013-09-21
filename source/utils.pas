@@ -856,7 +856,7 @@ begin
 		result:= utcppSrc
 	else if AnsiMatchText(ext, ['.h']) then
 		result:= utcHead
-	else if AnsiMatchText(ext, ['.h', '.hpp', '.rh', '.hh', '.hxx']) then
+	else if AnsiMatchText(ext, ['.hpp', '.rh', '.hh', '.hxx']) then
 		result:= utcppHead
 	else if AnsiMatchText(ext, ['.res', '.rc']) then
 		result:= utresSrc
@@ -896,7 +896,7 @@ begin
    result:= TRUE
   else
    if (s1 = '') then
-    result:= FileExists(s2 +FileName);
+    result:= FileExists(s2 + FileName);
 end;
 
 procedure CloneMenu(FromMenu, ToMenu: TMenuItem);

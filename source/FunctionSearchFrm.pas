@@ -33,7 +33,7 @@ uses
 
 type
   TFunctionSearchForm = class(TForm)
-    Label1: TLabel;
+    lblSearch: TLabel;
     txtSearch: TEdit;
     lvEntries: TListView;
     procedure txtSearchChange(Sender: TObject);
@@ -51,14 +51,14 @@ type
   public
     { Public declarations }
     fParser: TCppParser;
-    fFileName: TFileName;
+    fFileName: AnsiString;
   end;
 
 implementation
 
 uses 
 {$IFDEF WIN32}
-  MultiLangSupport, devcfg;
+  MultiLangSupport, devcfg, utils;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, MultiLangSupport, devcfg;
@@ -69,6 +69,7 @@ uses
 procedure TFunctionSearchForm.txtSearchChange(Sender: TObject);
 var
 	I: integer;
+	st : PStatement;
 begin
 	if not Assigned(fParser) then
 		Exit;
@@ -76,29 +77,34 @@ begin
 	lvEntries.Items.BeginUpdate;
 	lvEntries.Items.Clear;
 
-	for I := 0 to fParser.Statements.Count - 1 do
-		if PStatement(fParser.Statements[I])^._Kind = skFunction then
-			if (PStatement(fParser.Statements[I])^._IsDeclaration and SameText(PStatement(fParser.Statements[I])^._DeclImplFileName, fFilename)) or
-			   (not PStatement(fParser.Statements[I])^._IsDeclaration and SameText(PStatement(fParser.Statements[I])^._FileName, fFilename)) then
+	for I := 0 to fParser.Statements.Count - 1 do begin
 
-				if (txtSearch.Text = '') or (Pos(LowerCase(txtSearch.Text), LowerCase(PStatement(fParser.Statements[I])^._ScopelessCmd)) > 0) then begin
+		st := PStatement(fParser.Statements[I]);
+
+		if st^._Kind in [skFunction,skConstructor,skDestructor] then
+			if (st^._IsDeclaration and SameFileName(st^._DeclImplFileName, fFilename)) or
+		   (not st^._IsDeclaration and SameFileName(st^._FileName, fFilename)) then
+
+				if (txtSearch.Text = '') or ContainsText(st^._ScopelessCmd, txtSearch.Text) then begin
 					with lvEntries.Items.Add do begin
 						ImageIndex := -1;
-						case PStatement(fParser.Statements[I])^._ClassScope of
+						case st^._ClassScope of
 							scsPrivate: StateIndex := 5;
 							scsProtected: StateIndex := 6;
 							scsPublic: StateIndex := 7;
 							scsPublished: StateIndex := 7;
 						end;
-						SubItems.Add(PStatement(fParser.Statements[I])^._Type);
-						SubItems.Add(PStatement(fParser.Statements[I])^._ScopeCmd);
-						if PStatement(fParser.Statements[I])^._IsDeclaration then
-							SubItems.Add(IntToStr(PStatement(fParser.Statements[I])^._DeclImplLine))
+						SubItems.Add(st^._Type);
+						SubItems.Add(st^._ScopeCmd);
+						if st^._IsDeclaration then
+							SubItems.Add(IntToStr(st^._DeclImplLine))
 						else
-							SubItems.Add(IntToStr(PStatement(fParser.Statements[I])^._Line));
+							SubItems.Add(IntToStr(st^._Line));
 						Data := fParser.Statements[I];
 					end;
 				end;
+
+	end;
 
 	lvEntries.AlphaSort;
 	if lvEntries.ItemIndex = -1 then
@@ -119,22 +125,22 @@ end;
 
 procedure TFunctionSearchForm.txtSearchKeyPress(Sender: TObject;var Key: Char);
 begin
-	if lvEntries = nil then Exit;
 	case Key of
 		Chr(VK_ESCAPE): begin
 			ModalResult := mrCancel;
 			Key := #0;
 		end;
 		Chr(VK_RETURN): begin
-			ModalResult := mrOK;
-			Key := #0;
+			if Assigned(lvEntries.Selected) then begin
+				ModalResult := mrOK;
+				Key := #0;
+			end;
 		end;
 	end;
 end;
 
 procedure TFunctionSearchForm.txtSearchKeyDown(Sender: TObject;var Key: Word; Shift: TShiftState);
 begin
-	if lvEntries = nil then Exit;
 	case Key of
 		VK_DOWN, VK_UP: begin
 			lvEntries.Perform(WM_KEYDOWN, Key, 0); // send the key to lventries
@@ -144,27 +150,33 @@ end;
 
 procedure TFunctionSearchForm.lvEntriesDblClick(Sender: TObject);
 begin
-	if lvEntries.Selected <> nil then
+	if Assigned(lvEntries.Selected) then
 		ModalResult := mrOK;
 end;
 
-procedure TFunctionSearchForm.lvEntriesCompare(Sender: TObject; Item1,
-  Item2: TListItem; Data: Integer; var Compare: Integer);
+procedure TFunctionSearchForm.lvEntriesCompare(Sender: TObject; Item1,Item2: TListItem; Data: Integer; var Compare: Integer);
 begin
 	Compare := CompareText(Item1.SubItems[1], Item2.SubItems[1]);
 end;
 
 procedure TFunctionSearchForm.LoadText;
+var
+	len : integer;
 begin
 	// Set interface font
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
 	Caption := StringReplace(Lang[ID_ITEM_GOTOFUNCTION], '&', '', []);
-	Label1.Caption := Lang[ID_GF_TEXT];
+	lblSearch.Caption := Lang[ID_GF_TEXT];
 	lvEntries.Column[1].Caption := Lang[ID_GF_TYPE];
 	lvEntries.Column[2].Caption := Lang[ID_GF_FUNCTION];
 	lvEntries.Column[3].Caption := Lang[ID_GF_LINE];
+
+	// Make sure the translation fits
+	len := Canvas.TextWidth(lblSearch.Caption);
+	txtSearch.Left := len + 10;
+	txtSearch.Width := ClientWidth - len - 14;
 end;
 
 procedure TFunctionSearchForm.FormCreate(Sender: TObject);

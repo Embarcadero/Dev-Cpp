@@ -421,15 +421,11 @@ type
 {$ENDIF}
 
 	//### Code Folding ###
-	function FoldStartAtLine(Line: Integer): TSynEditFoldRange;
-	function FoldEndAtLine(Line: Integer): TSynEditFoldRange;
-	function FoldAroundLine(Line: Integer): TSynEditFoldRange;
-	procedure Collapse(AFoldRange: TSynEditFoldRange);
 	procedure CollapseLevel(ALevel: Integer);
-	procedure Uncollapse(FoldRange: TSynEditFoldRange);
 	procedure UncollapseLevel(ALevel: Integer);
 	procedure ReScanForFoldRanges;
 	procedure GetUncollapsedLines;
+	procedure ReScan;
 	procedure MoveFoldRangesAfter(FoldRange: TSynEditFoldRange;LineCount: Integer);
 	procedure ScanForFoldRanges(TopFoldRanges: TSynEditFoldRanges;Strings: TStrings);
 	function GetLineIndent(const Line : AnsiString): Integer;
@@ -782,8 +778,14 @@ type
 		//### Code Folding ###
 		procedure CollapseAll;
 		procedure UncollapseAll;
-		procedure ReScan;
-		function GetRealLineNumber(aLine: Integer): Integer;
+		procedure Collapse(AFoldRange: TSynEditFoldRange);
+		procedure Uncollapse(FoldRange: TSynEditFoldRange);
+		function FoldStartAtLine(Line: Integer): TSynEditFoldRange;
+		function FoldEndAtLine(Line: Integer): TSynEditFoldRange;
+		function CollapsedFoldAroundLine(Line: Integer): TSynEditFoldRange;
+		function FoldAroundLine(Line: Integer): TSynEditFoldRange;
+		function UncollapsedLineToLine(Line: Integer): Integer;
+		function LineToUncollapsedLine(Line: Integer): Integer;
 		property UnCollapsedLines: TSynEditStringList read fUncollapsedLines;
 		property UnCollapsedLinesLength: Integer read fUncollapsedLinesLength;
 		property CodeFolding: TSynCodeFolding read fCodeFolding;
@@ -1681,12 +1683,12 @@ begin
 		// GetRealLineNumber uses 1-based too, so only shift to 0-based afterwards!
 		ColFrom := BlockBegin.Char;
 		First := BlockBegin.Line;
-		First := GetRealLineNumber(First)-1;
+		First := LineToUncollapsedLine(First)-1;
 
 		// GetRealLineNumber uses 1-based too, so only shift to 0-based afterwards!
 		ColTo := BlockEnd.Char;
 		Last := BlockEnd.Line;
-		Last := GetRealLineNumber(Last)-1;
+		Last := LineToUncollapsedLine(Last)-1;
 
 		TotalLen := 0;
 		case fActiveSelectionMode of
@@ -2108,7 +2110,8 @@ var
 begin
 	Exclude(fStateFlags, sfLinesChanging);
 
-	ReScan; // doesn't need Handle?
+	if not fEditingFolds then
+		ReScan; // doesn't need Handle?
 
 	if HandleAllocated then begin
 
@@ -2611,7 +2614,7 @@ begin
 
 				//### Code Folding ###
 				if CodeFolding.Enabled then
-					s := fGutter.FormatLineNumber(GetRealLineNumber(cLine))
+					s := fGutter.FormatLineNumber(LineToUncollapsedLine(cLine))
 				else
 					s := fGutter.FormatLineNumber(cLine);
 				//### End Code Folding ###
@@ -2709,8 +2712,15 @@ begin
 
 			FoldRange := FoldStartAtLine(cLine);
 
-			// Any fold range begins on this line?
+			// Any fold ranges beginning on this line?
 			if Assigned(FoldRange) then begin
+
+				// Draw the bottom part of a line
+				if not FoldRange.Collapsed then begin
+					x := rect.Left + ((rect.Right - rect.Left) div 2);
+					Canvas.MoveTo(x, (rect.Top + rect.Bottom) div 2);
+					Canvas.LineTo(x, rect.Bottom);
+				end;
 
 				// make a square rect
 				InflateRect(rect, -3, -0);
@@ -5298,7 +5308,9 @@ begin
 		for i := fAllFoldRanges.Count - 1 downto 0 do
 			with fAllFoldRanges[i] do
 				if Collapsed and not ParentCollapsed then
-					if(FromLine >= aIndex + 1) and (FromLine < aIndex + 1 + aCount) then
+
+					// FromLine is at or after aIndex
+					if(FromLine > aIndex + 1) and (FromLine < aIndex + 1 + aCount) then
 						fAllFoldRanges.Delete(i);
 
 		MoveCollapsedRangesFromBy(aIndex + 1, -aCount);
@@ -6858,9 +6870,9 @@ begin
           MoveCaretAndSelection( CaretXY, CaretNew, Command = ecSelWordRight );
         end;
       ecSelWord:
-      	begin
-      		SetSelWord;
-      	end;
+        begin
+          SetSelWord;
+        end;
       ecSelectAll:
         begin
           SelectAll;
@@ -7160,7 +7172,7 @@ begin
       ecDeleteLine:
         if not ReadOnly and (Lines.Count > 0) and not ((CaretY = Lines.Count) and (Length(Lines[CaretY - 1]) = 0))
         then begin
-          DoOnPaintTransient(ttBefore);   
+          DoOnPaintTransient(ttBefore);
           if SelAvail then
             SetBlockBegin(CaretXY);
           Helper := LineText;
@@ -10582,9 +10594,9 @@ procedure TCustomSynEdit.Collapse(AFoldRange: TSynEditFoldRange);
 var
 	i: Integer;
 begin
-	Lines.BeginUpdate;
-
 	fEditingFolds := true;
+
+	Lines.BeginUpdate;
 
 	with AFoldRange do begin
 		LinesCollapsed := ToLine - FromLine - 1;
@@ -10602,9 +10614,9 @@ begin
 		MoveFoldRangesAfter(AFoldRange, - LinesCollapsed - 1);
 	end;
 
-	fEditingFolds := false;
-
 	Lines.EndUpdate;
+
+	fEditingFolds := false;
 
 	// Redraw the collapsed line
 	if CodeFolding.ShowCollapsedLine then
@@ -10640,9 +10652,9 @@ procedure TCustomSynEdit.Uncollapse(FoldRange: TSynEditFoldRange);
 var
 	i: Integer;
 begin
-	Lines.BeginUpdate;
-
 	fEditingFolds := true;
+
+	Lines.BeginUpdate;
 
 	with FoldRange do begin
 		for i := 0 to CollapsedLines.Count - 1 do
@@ -10657,9 +10669,9 @@ begin
 		CollapsedLines.Clear;
 	end;
 
-	fEditingFolds := false;
-
 	Lines.EndUpdate;
+
+	fEditingFolds := false;
 
 	// Redraw the collapsed line
 	if CodeFolding.ShowCollapsedLine then
@@ -10756,25 +10768,25 @@ begin
 	if fAllFoldRanges.Count > 0 then begin
 
 		// Create a lookup table with information which lines have folds and which don't
-		SetLength(FoldLookup, Lines.Count  + 1);
+		SetLength(FoldLookup, Lines.Count);
 		FoldLookupCount := 0;
 
 		// Set FoldLookup to true for every line that contains a fold!
 		for i := 0 to fAllFoldRanges.Count - 1 do
 			with fAllFoldRanges[i] do
 				if not ParentCollapsed then begin
-					FoldLookup[FromLine] := True; // 1 based!
+					FoldLookup[FromLine - 1] := True; // 1 based?
 					Inc(FoldLookupCount);
 				end;
 
 		TemporaryLines := TSynEditStringList.Create;
-		SetLength(RealLineNumbersLookup, Lines.Count - FoldLookupCount + 1);
+		SetLength(RealLineNumbersLookup, Lines.Count - FoldLookupCount);
 
 		// Then, copy every line that has NO fold from Lines to TemporaryLines
 		for i := 0 to Lines.Count - 1 do
-			if not FoldLookup[Succ(i)] then begin
+			if not FoldLookup[i] then begin
 				TemporaryLines.Add(Lines[i]);
-				RealLineNumbersLookup[TemporaryLines.Count] := Succ(i);
+				RealLineNumbersLookup[TemporaryLines.Count-1] := Succ(i);
 			end;
 
 		TemporaryAllFoldRanges := TSynEditFoldRanges.Create;
@@ -10784,8 +10796,8 @@ begin
 		// Now we need to correct the FromLine and ToLine properites of the new folds
 		for i := 0 to TemporaryAllFoldRanges.Count - 1 do
 			with TemporaryAllFoldRanges[i] do begin
-				FromLine := RealLineNumbersLookup[FromLine];
-				ToLine := RealLineNumbersLookup[ToLine];
+				FromLine := RealLineNumbersLookup[FromLine - 1];
+				ToLine := RealLineNumbersLookup[ToLine - 1];
 			end;
 
 		// Combine new with old folds, preserve parent order
@@ -11008,7 +11020,8 @@ end;
 
 procedure TCustomSynEdit.SetUseCodeFolding(value : boolean);
 begin
-	if value <> fCodeFolding.Enabled then begin
+	if value <> fUseCodeFolding then begin
+		fUseCodeFolding := value;
 		fCodeFolding.Enabled := value;// and Assigned(fHighlighter);
 	end;
 end;
@@ -11042,6 +11055,37 @@ begin
 					Break;
 				end;
 			end else if(FromLine > Line) then
+				break;
+end;
+
+function TCustomSynEdit.CollapsedFoldAroundLine(Line: Integer): TSynEditFoldRange;
+var
+	i, compareline: Integer;
+begin
+	Result := nil;
+	compareline := Line;
+
+	for i := 0 to fAllFoldRanges.Count - 1 do
+		with fAllFoldRanges[i] do
+
+			// The fold starts before our line...
+			if (FromLine < compareline) then begin
+
+				// Only accept visible collapsed folds
+				if not ParentCollapsed and Collapsed then begin
+
+					// compareline can be found inside the fold...
+					if (FromLine + RealLinesCollapsed + 1 >= compareline) then begin
+						Result := fAllFoldRanges[i];
+						Break;
+
+					// compareline can be found AFTER the fold, make sure the input value uses row indices, not real line indices
+					end else
+						Dec(compareline, RealLinesCollapsed + 1);
+				end;
+
+			// Folds are sorted by FromLine, it's of no use checking further...
+			end else if(FromLine > compareline) then
 				break;
 end;
 
@@ -11086,22 +11130,34 @@ begin
 		end;
 end;
 
-function TCustomSynEdit.GetRealLineNumber(aLine: Integer): Integer;
+function TCustomSynEdit.UncollapsedLineToLine(Line: Integer): Integer;
 var
-	Diff, i: Integer;
+	i: Integer;
 begin
-	Diff := 0;
-	Result := aLine;
+	Result := Line;
 
 	for i := 0 to fAllFoldRanges.Count - 1 do
 		with fAllFoldRanges[i] do
 			if Collapsed and not ParentCollapsed then
-				if (FromLine < aLine) then
-					Inc(Diff, RealLinesCollapsed + 1)
-				else if(FromLine > aLine) then
+				if (FromLine + RealLinesCollapsed - 1 < Result) then
+					Dec(Result, RealLinesCollapsed + 1)
+				else if(FromLine > Result) then
 					Break; // folds are sorted by fromline, so its of no use checking further
+end;
 
-	Inc(Result, Diff);
+function TCustomSynEdit.LineToUncollapsedLine(Line: Integer): Integer;
+var
+	i: Integer;
+begin
+	Result := Line;
+
+	for i := 0 to fAllFoldRanges.Count - 1 do
+		with fAllFoldRanges[i] do
+			if Collapsed and not ParentCollapsed then
+				if (FromLine < Line) then
+					Inc(Result, RealLinesCollapsed + 1)
+				else if(FromLine > Line) then
+					Break; // folds are sorted by fromline, so its of no use checking further
 end;
 
 //### End Code Folding ###

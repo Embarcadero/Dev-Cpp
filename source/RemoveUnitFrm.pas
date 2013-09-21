@@ -73,11 +73,12 @@ procedure TRemoveUnitForm.DelBtnClick(Sender: TObject);
 var
 	I : integer;
 begin
-	// Delete selection
-	for i := 0 to UnitList.Count - 1 do
+	// Delete selection from project
+	for i := UnitList.Count - 1 downto 0 do
 		if UnitList.Selected[i] then
 			MainForm.fProject.Remove(i,true);
 
+	// Delete selection from list
 	for I := UnitList.Count - 1 downto 0 do
 		if UnitList.Selected[I] then
 			UnitList.Items.Delete(I);

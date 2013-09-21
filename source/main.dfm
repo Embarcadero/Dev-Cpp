@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 646
-  Top = 336
+  Left = 579
+  Top = 173
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -64,7 +64,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -107,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -137,14 +137,14 @@ object MainForm: TMainForm
         end
         object SizeOfOutput: TLabel
           Left = 8
-          Top = 36
+          Top = 60
           Width = 84
           Height = 13
           Caption = 'Size of output file:'
         end
         object btnAbortCompilation: TSpeedButton
           Left = 8
-          Top = 56
+          Top = 82
           Width = 218
           Height = 30
           Action = actAbortCompilation
@@ -155,9 +155,16 @@ object MainForm: TMainForm
           Font.Style = []
           ParentFont = False
         end
+        object WarningLabel: TLabel
+          Left = 8
+          Top = 36
+          Width = 72
+          Height = 13
+          Caption = 'Total warnings:'
+        end
         object SizeFile: TEdit
           Left = 96
-          Top = 32
+          Top = 56
           Width = 128
           Height = 21
           ReadOnly = True
@@ -171,6 +178,15 @@ object MainForm: TMainForm
           Height = 21
           ReadOnly = True
           TabOrder = 0
+          Text = '0'
+        end
+        object TotalWarnings: TEdit
+          Left = 96
+          Top = 32
+          Width = 128
+          Height = 21
+          ReadOnly = True
+          TabOrder = 2
           Text = '0'
         end
       end
@@ -202,13 +218,13 @@ object MainForm: TMainForm
         Left = 471
         Top = 0
         Width = 357
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           357
-          154)
+          155)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -230,7 +246,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 350
-          Height = 123
+          Height = 121
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -242,7 +258,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 471
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -250,7 +266,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           471
-          154)
+          155)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -412,7 +428,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 26
+          Height = 22
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -452,7 +468,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -992,7 +1008,7 @@ object MainForm: TMainForm
         BorderStyle = bsNone
         MultiSelectStyle = []
         ShowFilter = sfAll
-        OnSelect = ClassBrowser1Select
+        OnSelect = ClassBrowserSelect
         Parser = CppParser
         ItemImages.Globals = 0
         ItemImages.Classes = 1
@@ -2929,6 +2945,7 @@ object MainForm: TMainForm
       Category = 'Edit'
       Caption = 'Goto Bookmark'
       ImageIndex = 20
+      OnExecute = actGotoExecute
       OnUpdate = actUpdatePageCount
     end
     object actNextIns: TAction

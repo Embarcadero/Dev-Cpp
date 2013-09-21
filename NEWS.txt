@@ -1,3 +1,24 @@
+Version 5.3.0.4 - 31 December 2012
+
+- The class browser now always differentiates between private and public members.
+- Fixed the "String not found" messagebox appearing behind the find form.
+- Greatly enhanced the autosave feature. It can now save timestamps and filter by project too.
+- Reduced flicker when closing editors.
+- Added tcc files to the highlighting list.
+- Fixed some rare folding bugs, and improved their performance a bit.
+- When using Goto line or any other function that changes the current line, folds will be uncollapsed to make the destination line visible now.
+- Evaluate and GDB input edit controls now do not cut off the selection when autocompleting.
+- Double clicking on a find result now correctly shows the find result at the top line (instead of one line above that).
+- Errors now have more priority than warnings (which have more priority than other messages) when changing focus to a compilation issue.
+- Swap Header/Source now opens complementary files in a tab right next to the current file.
+- Translations in Goto function will now always fit.
+- Compile Log now shows a final warning count too.
+- Fixed the function tooltip highlighting wrong arguments when putting a space before (.
+- When renaming project files, you'll be asked before any overwriting takes place.
+- Removed WM_CLOSE handling from the default WinMain snippet. DefWindowProc will handle this.
+- The function parameter tooltip now shows class scope info too.
+- More bug fixes and feature additions here and there.
+
 Version 5.3.0.3 - 11 November 2012
 
 - Fixed really long watch variables being cut off sometimes.

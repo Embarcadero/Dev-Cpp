@@ -1,6 +1,6 @@
 object FunctionSearchForm: TFunctionSearchForm
-  Left = 1124
-  Top = 530
+  Left = 694
+  Top = 563
   BorderStyle = bsDialog
   Caption = 'Goto function...'
   ClientHeight = 377
@@ -20,7 +20,7 @@ object FunctionSearchForm: TFunctionSearchForm
     377)
   PixelsPerInch = 96
   TextHeight = 15
-  object Label1: TLabel
+  object lblSearch: TLabel
     Left = 4
     Top = 8
     Width = 56
@@ -34,6 +34,8 @@ object FunctionSearchForm: TFunctionSearchForm
     Height = 345
     Align = alCustom
     Anchors = [akLeft, akTop, akRight, akBottom]
+    BevelInner = bvNone
+    BevelOuter = bvNone
     Columns = <
       item
         Width = 30
@@ -48,6 +50,7 @@ object FunctionSearchForm: TFunctionSearchForm
       item
         Caption = 'Line'
       end>
+    ColumnClick = False
     HideSelection = False
     LargeImages = dmMain.ClassImages
     ReadOnly = True

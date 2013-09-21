@@ -389,14 +389,14 @@ var
 	e: TEditor;
 begin
 	if not Assigned(lv.Selected) then
-	Exit;
+		Exit;
 	if not Assigned(lv.Selected.Data) then
-	Exit;
+		Exit;
 
 	e := MainForm.GetEditorFromFilename(PToDoRec(lv.Selected.Data)^.Filename);
 	if Assigned(e) then begin
-	e.GotoLineNr(PToDoRec(lv.Selected.Data)^.Line + 1);
-	Close;
+		e.SetCaretPos(PToDoRec(lv.Selected.Data)^.Line + 1,1);
+		Close;
 	end;
 end;
 

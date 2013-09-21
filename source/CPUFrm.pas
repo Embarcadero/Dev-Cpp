@@ -327,7 +327,7 @@ begin
 	if Assigned(sel) then begin
 		e := MainForm.GetEditorFromFileName(sel.SubItems[0]);
 		if Assigned(e) then
-			e.GotoLineNr(StrToIntDef(sel.SubItems[1],1));
+			e.SetCaretPos(StrToIntDef(sel.SubItems[1],1),1);
 	end;
 end;
 

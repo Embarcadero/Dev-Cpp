@@ -145,6 +145,7 @@ type
     FParser: TCppParser;
     FTokenPos: Integer;
     FFunctionEnd : Integer;
+    FFunctionStart : Integer;
     FUpButton: TCustomCodeToolTipButton;
     FDownButton: TCustomCodeToolTipButton;
     FSelIndex: Integer;
@@ -164,7 +165,7 @@ type
   protected
     function GetCommaIndex(P: PAnsiChar; Start, CurPos: Integer):Integer;
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    function FindClosestToolTip(ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
+    function FindClosestToolTip(const ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     function DummyPaint : integer; // obtain tooltip width
     procedure Paint; override;
@@ -177,7 +178,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function Select(const ToolTip: AnsiString): Integer;
     procedure Show;
     procedure ActivateHint(Rect: TRect; const AHint: AnsiString); override;
     procedure ReleaseHandle;
@@ -395,13 +395,14 @@ begin
 	end;
 end;
 
-function TCodeToolTip.FindClosestToolTip(ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
+function TCodeToolTip.FindClosestToolTip(const ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
 var
 	I,K: Integer;
 	NewIndex: Integer;
 	Str: AnsiString;
 	LastCommaCnt: Integer;
 begin
+
 	// Don't change selection if the current tooltip is correct too
 	if ToolTip = FToolTips.Strings[FSelIndex] then
 		if CountCommas(FToolTips.Strings[FSelIndex]) <= CommaIndex then Exit;
@@ -540,6 +541,7 @@ begin
 	end;
 end;
 
+// Determine how much space we need...
 function TCodeToolTip.DummyPaint : integer;
 var
 	ArgumentIndex,HighlightStart: Integer;
@@ -590,7 +592,7 @@ begin
 		end;
 
 		with FBmp.Canvas do begin
-			Font.Color := clBlack; //don't use clCaptionText can be white too, making stuff unreadable
+			Font.Color := clBlack; //don't use clCaptionText: can be white too, making stuff unreadable
 			if (ArgumentIndex = FCurParamIndex) and (CurPos >= HighlightStart) then begin
 				Font.Style := [fsBold];
 				if (ttoCurrentArgumentExtra in FOptions) then
@@ -606,11 +608,11 @@ end;
 // This function paints the tooltip to FBmp and copies it to the tooltip client surface
 procedure TCodeToolTip.Paint;
 var
-	ArgumentIndex,HighlightStart,WidthParam: Integer;
-	S: AnsiString;
+	ArgumentIndex,HighlightStart,WidthParam : Integer;
+	S : AnsiString;
 	CurPos : integer;
 	InsideString : boolean;
-	HLAttr: TSynHighlighterAttributes;
+	HLAttr : TSynHighlighterAttributes;
 begin
 	// Clear the backbuffer and set options
 	with FBmp.Canvas do begin
@@ -728,37 +730,6 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function TCodeToolTip.Select(const ToolTip: AnsiString): Integer;
-
-//  selects the tooltip specified by ToolTip and returns
-//  the index from it, in the list.
-//  the tooltip must be already added to the tooltiplist,
-//  otherwise it cannot find it and returns -1
-//
-//  on success it returns the index of the tooltip in the list
-//  otherwise it returns -1
-
-var
-  I: Integer;
-begin
-  Result := -1;
-
-  if FToolTips.Count <> -1 then
-  begin
-    for I := 0 to FToolTips.Count-1 do
-    begin
-      if FToolTips.Strings[I] = ToolTip then
-      begin
-        SelIndex := I;  // set the current index
-        Result := I;  // return the index
-        Break;
-      end;
-    end;
-  end;
-end;
-
-//----------------------------------------------------------------------------------------------------------------------
-
 procedure TCodeToolTip.SetEditor(Value: TCustomSynEdit);
 begin
 	if Assigned(FEditor) then
@@ -797,6 +768,8 @@ var
 	S : AnsiString;
 	Idx : Integer;
 	nCommas : Integer;
+	token : AnsiString;
+	HLAttr : TSynHighlighterAttributes;
 begin
 
 	// get the current position in the collapsed text
@@ -856,7 +829,7 @@ begin
 		Inc(CurPos);
 	end;
 
-	// If we couldn't find the closing brace or reached the FMaxScanLength
+	// If we couldn't find the closing brace or reached the FMaxScanLength...
 	if (nBraces <> -1) then begin // -1 means found it
 		ReleaseHandle;
 		Exit;
@@ -895,6 +868,8 @@ begin
 		Exit;
 	end;
 
+	FFunctionStart := CurPos;
+
 	// Skip blanks
 	while (CurPos > 1) and (P[CurPos-1] in [#32,#9,#13,#10]) do
 		Dec(CurPos);
@@ -902,14 +877,9 @@ begin
 	// Get the name of the function we're about to show
 	S := FEditor.GetWordAtRowCol(FEditor.CharIndexToRowCol(CurPos-1));
 
-	// Don't bother scanning the database when there's no word to scan for
-	if  SameStr(S,'') or
-		SameStr(S,'if') or
-		SameStr(S,'else') or
-		SameStr(S,'case') or
-		SameStr(S,'switch') or
-		SameStr(S,'while') or
-		SameStr(S,'for') then begin
+	// Don't bother scanning the database when there's no identifier to scan for
+	FEditor.GetHighlighterAttriAtRowCol(FEditor.CharIndexToRowCol(CurPos-1),token,HLAttr);
+	if not (HLAttr = FEditor.Highlighter.IdentifierAttribute) then begin
 		ReleaseHandle;
 		Exit;
 	end;
@@ -938,13 +908,14 @@ begin
 	// this is where the prototype name usually starts
 	FTokenPos := CurPos - Length(S);
 
-	// Otherwise, search for the best possible overload match according to comma count
+	// Search for the best possible overload match according to comma count
 	if (shoFindBestMatchingToolTip in FOptions) then
 
 		// Only do so when the user didn't select his own
 		if not FCustomSelIndex then
 			S := FindClosestToolTip(S, nCommas);
 
+	// Select the current one
 	if (FSelIndex < FToolTips.Count) then
 		S := FToolTips.Strings[FSelIndex];
 
@@ -957,7 +928,7 @@ begin
 	FLookupEditor.Highlighter := FEditor.Highlighter;
 
 	// get the index of the current argument (where the cursor is)
-	FCurParamIndex := GetCommaIndex(P, CurPos+1, Idx-1);
+	FCurParamIndex := GetCommaIndex(P, FFunctionStart + 1, Idx - 1);
 	RethinkCoordAndActivate;
 end;
 

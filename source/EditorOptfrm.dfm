@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 714
-  Top = 267
+  Left = 300
+  Top = 265
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 462
@@ -1196,20 +1196,20 @@ object EditorOptForm: TEditorOptForm
     object tabAutosave: TTabSheet
       Caption = 'Autosave'
       ImageIndex = 5
-      object EnableDisableAutosave: TCheckBox
+      object cbAutoSave: TCheckBox
         Left = 8
         Top = 8
-        Width = 385
+        Width = 457
         Height = 17
         Caption = 'Enable editor autosave'
         TabOrder = 0
-        OnClick = EnableDisableAutosaveClick
+        OnClick = cbAutoSaveClick
       end
       object OptionsGroup: TGroupBox
         Left = 8
         Top = 32
         Width = 457
-        Height = 297
+        Height = 353
         Caption = ' Options '
         TabOrder = 1
         object SaveInterval: TLabel
@@ -1233,15 +1233,28 @@ object EditorOptForm: TEditorOptForm
           OnChange = MinutesDelayChange
         end
         object FileOptions: TRadioGroup
-          Left = 18
+          Left = 16
           Top = 80
           Width = 239
-          Height = 65
+          Height = 97
           Caption = 'Files'
           Items.Strings = (
-            'Save the currently visible file'
-            'Save all other open files too')
+            'Save only the currently visible file'
+            'Save all open files after each interval'
+            'Save all project files')
           TabOrder = 1
+        end
+        object NameOptions: TRadioGroup
+          Left = 16
+          Top = 188
+          Width = 239
+          Height = 97
+          Caption = 'Filenames'
+          Items.Strings = (
+            'Overwrite file'
+            'Append UNIX timestamp'
+            'Append formatted timestamp')
+          TabOrder = 2
         end
       end
     end

@@ -320,6 +320,7 @@ const
   ID_GRP_COMPRESULTS                    = 16006;
   ID_TOTALERRORS                        = 16007;
   ID_OUTPUTSIZE                         = 16008;
+  ID_TOTALWARNINGS                      = 16009;
   //free to 329 for compile log sheet
 
   ID_DEB_WATCHES                        = 17001;
@@ -476,6 +477,7 @@ const
 
     // Class browsing Tab
   // 490 is empty now - you can use it ;)
+  ID_EOPT_AUTOSAVEONLYOPENFILE          = 27040;
   ID_EOPT_BROWSERLOCAL                  = 27041;
   ID_EOPT_BROWSERSAMPLE                 = 27042;
   ID_EOPT_BROWSERENGINE                 = 27043;
@@ -485,8 +487,7 @@ const
 
   ID_EOPT_ENABLEAUTOSAVE                = 27047;
   ID_EOPT_AUTOSAVEINTERNAL              = 27048;
-  ID_EOPT_SAVEALLFILES                  = 27049;
-  ID_EOPT_SAVEONLYOPENFILE              = 27040;
+  ID_EOPT_AUTOSAVEALLFILES              = 27049;
 
   ID_NP                                 = 27050;
   ID_NP_DESC                            = 27051;
@@ -498,6 +499,11 @@ const
   ID_EOPT_SYMBOLINCLUDE                 = 27056;
   ID_EOPT_SYMBOLSQUARE                  = 27057;
   ID_EOPT_SYMBOLCOMMENT                 = 27058;
+  ID_EOPT_AUTOSAVEPROJECT               = 27059;
+  ID_EOPT_AUTOSAVEOVERWRITE             = 27060;
+  ID_EOPT_AUTOSAVEUNIX                  = 27061;
+  ID_EOPT_AUTOSAVETIME                  = 27062;
+  ID_EOPT_AUTOSAVEMODE                  = 27063;
 
   // new project
   ID_NP_PRJNAME                         = 28001;

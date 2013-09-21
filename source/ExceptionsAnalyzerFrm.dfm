@@ -215,7 +215,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Top = 160
     Width = 500
     Height = 200
-    ActivePage = tabMemory
+    ActivePage = tabFullReport
     Style = tsFlatButtons
     TabOrder = 2
     TabStop = False
@@ -541,7 +541,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         Font.Name = 'Courier New'
         Font.Style = []
         Lines.Strings = (
-          'StackTrace')
+          'BugReport')
         ParentFont = False
         ReadOnly = True
         ScrollBars = ssBoth

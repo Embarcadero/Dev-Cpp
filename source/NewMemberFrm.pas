@@ -250,7 +250,7 @@ begin
         scsPublished: e.Text.Lines.Insert(Line, #9'published:');
       end;
 
-    e.GotoLineNr(Line + 1);
+    e.SetCaretPos(Line + 1,1);
     e.Text.Modified := True;
 
     if chkInline.Checked or chkPure.Checked then
@@ -286,7 +286,7 @@ begin
       e.Text.Lines.Append(#9'// insert your code here');
     e.Text.Lines.Append('}');
     e.Text.Lines.Append('');
-    e.GotoLineNr(e.Text.Lines.Count - 1);
+    e.SetCaretPos(e.Text.Lines.Count - 1,1);
     e.Text.Modified := True;
   end;
   Exit;

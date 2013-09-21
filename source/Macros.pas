@@ -108,18 +108,11 @@ begin
   end;
 
   { Editor macros }
-  if Assigned(e) then
-  begin
+  if Assigned(e) then begin
       Replace(Result, '<SOURCENAME>', e.FileName);
-
-      if Length(e.FileName) = 0 then
-          Replace(Result, '<SOURCENAME>', devDirs.Default)
-      else
-          Replace(Result, '<SOURCENAME>', ExtractFilePath(e.FileName));
-
+      Replace(Result, '<SOURCENAME>', ExtractFilePath(e.FileName));
       Replace(Result, '<WORDXY>', e.Text.WordAtCursor);
-  end else
-  begin
+  end else begin
       // clear unchanged macros
       Replace(Result, '<SOURCENAME>', '');
       Replace(Result, '<SOURCENAME>', '');

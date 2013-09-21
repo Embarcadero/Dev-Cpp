@@ -322,20 +322,20 @@ end;
 function TCppParser.StatementClassScopeStr(Value: TStatementClassScope): AnsiString;
 begin
   case Value of
-    scsPublic: Result := 'scsPublic';
-    scsPublished: Result := 'scsPublished';
-    scsPrivate: Result := 'scsPrivate';
-    scsProtected: Result := 'scsProtected';
-    scsNone: Result := 'scsNone';
+    scsPublic: Result := 'public';
+    scsPublished: Result := 'published';
+    scsPrivate: Result := 'private';
+    scsProtected: Result := 'protected';
+    scsNone: Result := '';
   end;
 end;
 
 function TCppParser.StatementScopeStr(Value: TStatementScope): AnsiString;
 begin
   case Value of
-    ssGlobal: Result := 'ssGlobal';
-    ssClassLocal: Result := 'ssClassLocal';
-    ssLocal: Result := 'ssLocal';
+    ssGlobal: Result := 'Global';
+    ssClassLocal: Result := 'ClassLocal';
+    ssLocal: Result := 'Local';
   end;
 end;
 
@@ -551,13 +551,20 @@ begin
     if fCurrentClass[fCurrentClass.Count - 1] <> ID then begin
       fCurrentClass.Add(ID);
       fCurrentClassLevel.Add(fLevel);
-      fClassScope := scsPublic;
+
+      if PStatement(fStatementList[IndexOfStatement(ID)])^._Type = 'class' then
+        fClassScope := scsPrivate // classes are private by default
+      else
+        fClassScope := scsPublic;
     end;
   end
   else begin
     fCurrentClass.Add(ID);
     fCurrentClassLevel.Add(fLevel);
-    fClassScope := scsPublic;
+    if PStatement(fStatementList[IndexOfStatement(ID)])^._Type = 'class' then
+      fClassScope := scsPrivate // classes are private by default
+    else
+      fClassScope := scsPublic;
   end;
 end;
 
@@ -568,9 +575,15 @@ begin
       fCurrentClass.Delete(fCurrentClass.Count - 1);
       fCurrentClassLevel.Delete(fCurrentClassLevel.Count - 1);
       if fCurrentClassLevel.Count = 0 then
-        fClassScope := scsNone
-      else
-        fClassScope := scsPublic;
+        fClassScope := scsNone // no classes or structs remaining
+      else begin
+
+        // Check top level class
+        if PStatement(fStatementList[IndexOfStatement(fCurrentClass[fCurrentClass.Count-1])])^._Type = 'class' then
+          fClassScope := scsPrivate // classes are private by default
+        else
+          fClassScope := scsPublic;
+      end;
     end;
 end;
 
@@ -1779,49 +1792,72 @@ begin
 end;
 
 function TCppParser.IsCfile(const Filename: AnsiString): boolean;
+const
+	sourceexts: array[0..5] of AnsiString = ('.c','.cpp', '.cc', '.cxx', '.c++', '.cp');
 var
-  ext: AnsiString;
+	ext: AnsiString;
+	i : integer;
 begin
-  ext := LowerCase(ExtractFileExt(Filename));
-  Result := (ext = '.cpp') or (ext = '.c') or (ext = '.cc');
+	result := false;
+
+	ext := LowerCase(ExtractFileExt(Filename));
+	for I := 0 to 5 do
+		if ext = sourceexts[i] then begin
+			result := true;
+			Exit;
+		end;
 end;
 
 function TCppParser.IsHfile(const Filename: AnsiString): boolean;
+const
+	headerexts: array[0..5] of AnsiString = ('.h','.hpp', '.rh', '.hh', '.hxx', '.inl');
 var
-  ext: AnsiString;
+	ext: AnsiString;
+	i : integer;
 begin
-  ext := LowerCase(ExtractFileExt(Filename));
-  Result := (ext = '.h') or (ext = '.hpp') or (ext = '.hh') or (ext = '') or (ext = '.inl');
+	result := false;
+
+	ext := LowerCase(ExtractFileExt(Filename));
+	for I := 0 to 5 do
+		if ext = headerexts[i] then begin
+			result := true;
+			Exit;
+		end;
 end;
 
 procedure TCppParser.GetSourcePair(const FName: AnsiString; var CFile, HFile: AnsiString);
+const
+	headerexts: array[0..5] of AnsiString = ('.h','.hpp', '.rh', '.hh', '.hxx', '.inl');
+	sourceexts: array[0..5] of AnsiString = ('.c','.cpp', '.cc', '.cxx', '.c++', '.cp');
+var
+	i : integer;
 begin
-  if IsCfile(FName) then begin
-    CFile := FName;
-    if FileExists(ChangeFileExt(FName, '.h')) then
-      HFile := ChangeFileExt(FName, '.h')
-    else if FileExists(ChangeFileExt(FName, '.hpp')) then
-      HFile := ChangeFileExt(FName, '.hpp')
-    else if FileExists(ChangeFileExt(FName, '.hh')) then
-      HFile := ChangeFileExt(FName, '.hh')
-    else
-      HFile := '';
-  end
-  else if IsHfile(FName) then begin
-    HFile := FName;
-    if FileExists(ChangeFileExt(FName, '.c')) then
-      CFile := ChangeFileExt(FName, '.c')
-    else if FileExists(ChangeFileExt(FName, '.cpp')) then
-      CFile := ChangeFileExt(FName, '.cpp')
-    else if FileExists(ChangeFileExt(FName, '.cc')) then
-      CFile := ChangeFileExt(FName, '.cc')
-    else
-      CFile := '';
-  end
-  else begin
-    CFile := FName;
-    HFile := '';
-  end;
+	if IsCfile(FName) then begin
+
+		CFile := FName;
+		HFile := '';
+
+		// Find corresponding header
+		for I := 0 to 5 do
+			if FileExists(ChangeFileExt(FName,headerexts[i])) then begin
+				HFile := ChangeFileExt(FName,headerexts[i]);
+				break;
+			end;
+	end else if IsHfile(FName) then begin
+
+		HFile := FName;
+		CFile := '';
+
+		// Find corresponding source
+		for I := 0 to 5 do
+			if FileExists(ChangeFileExt(FName,sourceexts[i])) then begin
+				CFile := ChangeFileExt(FName,sourceexts[i]);
+				break;
+			end;
+	end else begin
+		CFile := FName;
+		HFile := '';
+	end;
 end;
 
 procedure TCppParser.AddFileToScan(Value: AnsiString; InProject: boolean);
@@ -1909,12 +1945,11 @@ begin
   if Assigned(fOnBusy) then
     fOnBusy(Self);
 
-  CFile := '';
-  HFile := '';
-  if IsCfile(FName) then
-    GetSourcePair(FName, CFile, HFile)
-  else if IsHfile(FName) then
-    HFile := FName;
+	// Always reparse both. If we don't, reparsing the header
+	// screws up the information inside the source file
+	CFile := '';
+	HFile := '';
+	GetSourcePair(FName, CFile, HFile);
 
   fInvalidatedIDs.Clear;
   InvalidateFile(CFile);
@@ -2252,6 +2287,7 @@ begin
 		end;
 	finally
 		CloseHandle(hFile);
+		fNextID := fStatementList.Count;
 		fBaseIndex := fStatementList.Count;
 		fScannedBaseIndex := fCacheContents.Count;
 		PostProcessInheritance;
@@ -2444,18 +2480,28 @@ end;
 procedure TCppParser.FillListOf(const Full: AnsiString; List: TStringList; Kinds : TStatementKindSet);
 var
 	I: integer;
+	s : AnsiString;
+	st : PStatement;
 begin
+
+	List.Clear;
 
 	// Tweaked for specific use by CodeToolTip. Also avoids AnsiString compares whenever possible
 	for I := fStatementList.Count - 1 downto 0 do begin // Prefer user declared names
-		if PStatement(fStatementList[I])^._Kind in Kinds then
+		st := PStatement(fStatementList[I]);
+		if st^._Kind in Kinds then
 
 			// Also add Win32 Ansi/Wide variants...
-			if  SameStr(Full,       PStatement(fStatementList[I])^._ScopelessCmd) or
-				SameStr(Full + 'A', PStatement(fStatementList[I])^._ScopelessCmd) or
-				SameStr(Full + 'W', PStatement(fStatementList[I])^._ScopelessCmd)
-			then
-				List.Add(PStatement(fStatementList[I])^._FullText);
+			if  SameStr(Full,       st^._ScopelessCmd) or
+				SameStr(Full + 'A', st^._ScopelessCmd) or
+				SameStr(Full + 'W', st^._ScopelessCmd)
+			then begin
+				s := StatementClassScopeStr(st^._ClassScope);
+				if s <> '' then
+					List.Add(StatementClassScopeStr(st^._ClassScope) + ' ' + st^._FullText)
+				else
+					List.Add(st^._FullText);
+			end;
 	end;
 end;
 

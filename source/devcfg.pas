@@ -315,8 +315,9 @@ type
     // Autosave
     fEnableAutoSave : boolean;
     fInterval : integer;
-    fSaveType : integer;
-
+    fAutoSaveFilter : integer;
+    fAutoSaveMode : integer;
+    
     // Symbol completion
     fBraceComplete : boolean;
     fParentheseComplete : boolean;
@@ -385,7 +386,8 @@ type
     // Autosave
     property EnableAutoSave: boolean read fEnableAutoSave write fEnableAutoSave;
     property Interval: integer read fInterval write fInterval;
-    property SaveType: integer read fSaveType write fSaveType;
+    property AutoSaveFilter: integer read fAutoSaveFilter write fAutoSaveFilter;
+    property AutoSaveMode: integer read fAutoSaveMode write fAutoSaveMode;
 
     // Brace completion
     property BraceComplete: boolean read fBraceComplete write fBraceComplete;
@@ -1549,7 +1551,7 @@ begin
 	fUseSyn:= TRUE;
 	//last ; is for files with no extension
 	//which should be treated as cpp header files
-	fSynExt:= 'c;cpp;h;hpp;cc;cxx;cp;hp;rh;fx;inl;;';
+	fSynExt:= 'c;cpp;h;hpp;cc;cxx;cp;hp;rh;fx;inl;tcc;;';
 	fHighCurrLine:= TRUE;
 	fHighColor:= $FFFFCC; // Light Turquoise
 	fTabSize:= 4;
@@ -1572,7 +1574,8 @@ begin
 	// Autosave
 	fEnableAutoSave := FALSE;
 	Interval := 10;
-	fSaveType := 0;
+	fAutoSaveFilter := 0;
+	fAutoSaveMode := 0;
 
 	// Symbol completion
 	fBraceComplete := TRUE;

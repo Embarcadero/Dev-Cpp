@@ -142,7 +142,7 @@ type
     cbTrimTrailingSpaces: TCheckBox;
     ScrollHint: TLabel;
     tabAutosave: TTabSheet;
-    EnableDisableAutosave: TCheckBox;
+    cbAutoSave: TCheckBox;
     OptionsGroup: TGroupBox;
     SaveInterval: TLabel;
     MinutesDelay: TTrackBar;
@@ -167,6 +167,7 @@ type
     cbHighlightColor: TLabel;
     cbDefaultCode: TCheckBox;
     seDefault: TSynEdit;
+    NameOptions: TRadioGroup;
     procedure FormCreate(Sender: TObject);
     procedure SetGutter;
     procedure ElementListClick(Sender: TObject);
@@ -206,7 +207,7 @@ type
     procedure chkCBShowInheritedClick(Sender: TObject);
     procedure OnGutterClick(Sender: TObject; Button: TMouseButton; X, Y,Line: Integer; Mark: TSynEditMark);
     procedure cbHighCurrLineClick(Sender: TObject);
-    procedure EnableDisableAutosaveClick(Sender: TObject);
+    procedure cbAutoSaveClick(Sender: TObject);
     procedure MinutesDelayChange(Sender: TObject);
     procedure cbSymbolCompleteClick(Sender: TObject);
     procedure cboEditorFontDrawItem(Control: TWinControl; Index: Integer;
@@ -521,12 +522,18 @@ begin
 	lblCompletionDelay.Caption := Lang[ID_EOPT_COMPLETIONDELAY] + ' ' + IntToStr(tbCompletionDelay.Position)+' ms';
 
   // Autosave
-  EnableDisableAutosave.Caption:=Lang[ID_EOPT_ENABLEAUTOSAVE];
-  SaveInterval.Caption:=         Lang[ID_EOPT_AUTOSAVEINTERNAL];
-  FileOptions.Caption:=          ' '+Lang[ID_EOPT_AUTOSAVEFILE]+' ';
-  FileOptions.Items[0]:=         Lang[ID_EOPT_SAVEONLYOPENFILE];
-  FileOptions.Items[1]:=         Lang[ID_EOPT_SAVEALLFILES];
+  cbAutoSave.Caption:=           Lang[ID_EOPT_ENABLEAUTOSAVE];
   OptionsGroup.Caption:=         ' '+Lang[ID_EOPT_OPTIONS]+' ';
+
+  FileOptions.Caption:=          ' '+Lang[ID_EOPT_AUTOSAVEFILE]+' ';
+  FileOptions.Items[0]:=         Lang[ID_EOPT_AUTOSAVEONLYOPENFILE];
+  FileOptions.Items[1]:=         Lang[ID_EOPT_AUTOSAVEALLFILES];
+  FileOptions.Items[2]:=         Lang[ID_EOPT_AUTOSAVEPROJECT];
+
+  NameOptions.Caption:=          ' '+Lang[ID_EOPT_AUTOSAVEMODE]+' ';
+  NameOptions.Items[0]:=         Lang[ID_EOPT_AUTOSAVEOVERWRITE];
+  NameOptions.Items[1]:=         Lang[ID_EOPT_AUTOSAVEUNIX];
+  NameOptions.Items[2]:=         Lang[ID_EOPT_AUTOSAVETIME];
 end;
 
 procedure TEditorOptForm.LoadSampleText;
@@ -728,14 +735,15 @@ begin
 
 	// Autosave
 	MinutesDelay.Position := devEditor.Interval;
-	FileOptions.ItemIndex := devEditor.SaveType;
-	EnableDisableAutosave.Checked := devEditor.EnableAutoSave;
+	FileOptions.ItemIndex := devEditor.AutoSaveFilter;
+	NameOptions.ItemIndex := devEditor.AutoSaveMode;
+	cbAutoSave.Checked := devEditor.EnableAutoSave;
 
-	MinutesDelay.Enabled := EnableDisableAutosave.Checked;
-	SaveInterval.Enabled := EnableDisableAutosave.Checked;
-	FileOptions.Enabled := EnableDisableAutosave.Checked;
-	OptionsGroup.Enabled := EnableDisableAutosave.Checked;
-	FileOptions.Enabled := EnableDisableAutosave.Checked;
+	MinutesDelay.Enabled := cbAutoSave.Checked;
+	SaveInterval.Enabled := cbAutoSave.Checked;
+	FileOptions.Enabled := cbAutoSave.Checked;
+	OptionsGroup.Enabled := cbAutoSave.Checked;
+	NameOptions.Enabled := cbAutoSave.Checked;
 
 	SetGutter;
 end;
@@ -884,12 +892,29 @@ begin
 	devClassBrowsing.ShowInheritedMembers:=chkCBShowInherited.Checked;
 
 	// Autosave
+	devEditor.EnableAutoSave := cbAutoSave.Checked;
 	devEditor.Interval := MinutesDelay.Position;
-	devEditor.SaveType := FileOptions.ItemIndex;
-	devEditor.EnableAutoSave := EnableDisableAutosave.Checked;
+	devEditor.AutoSaveFilter := FileOptions.ItemIndex;
+	devEditor.AutoSaveMode := NameOptions.ItemIndex;
 
-	MainForm.AutoSaveTimer.Interval := devEditor.Interval*60*1000;
-	MainForm.AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
+	// Properly configure the timer object
+	if not devEditor.EnableAutoSave then begin
+
+		// Delete the timer when we don't need it anymore
+		if Assigned(MainForm.AutoSaveTimer) then
+			FreeAndNil(MainForm.AutoSaveTimer);
+
+	end else begin
+
+		// Create the timer when we changed the enable option
+		if not Assigned(MainForm.AutoSaveTimer) then
+			MainForm.AutoSaveTimer := TTImer.Create(Self);
+
+		// And set corresponding options
+		MainForm.AutoSaveTimer.Interval := devEditor.Interval*60*1000; // miliseconds to minutes
+		MainForm.AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
+		MainForm.AutoSaveTimer.OnTimer := MainForm.EditorSaveTimer;
+	end;
 
 	SaveOptions;
 	dmMain.LoadDataMod;
@@ -1668,13 +1693,13 @@ begin
 	cpHighColor.Enabled := cbHighCurrLine.Checked;
 end;
 
-procedure TEditorOptForm.EnableDisableAutosaveClick(Sender: TObject);
+procedure TEditorOptForm.cbAutoSaveClick(Sender: TObject);
 begin
-	MinutesDelay.Enabled := EnableDisableAutosave.Checked;
-	SaveInterval.Enabled := EnableDisableAutosave.Checked;
-	FileOptions.Enabled := EnableDisableAutosave.Checked;
-	OptionsGroup.Enabled := EnableDisableAutosave.Checked;
-	FileOptions.Enabled := EnableDisableAutosave.Checked;
+	MinutesDelay.Enabled := cbAutoSave.Checked;
+	SaveInterval.Enabled := cbAutoSave.Checked;
+	FileOptions.Enabled := cbAutoSave.Checked;
+	OptionsGroup.Enabled := cbAutoSave.Checked;
+	NameOptions.Enabled := cbAutoSave.Checked;
 end;
 
 procedure TEditorOptForm.MinutesDelayChange(Sender: TObject);

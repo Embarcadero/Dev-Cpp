@@ -27,7 +27,7 @@ uses
 {$IFDEF WIN32}
 	Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
 	Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils,
-	Project, editor, compiler, ActnList, ToolFrm, AppEvnts,
+	Project, editor, DateUtils, compiler, ActnList, ToolFrm, AppEvnts,
 	debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
 	StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan,
 	CVSFrm, devShortcuts, debugreader, CommCtrl, devcfg, VistaAltFixUnit;
@@ -594,6 +594,8 @@ type
     N74: TMenuItem;
     MsgSellAllItem: TMenuItem;
     actMsgSelAll: TAction;
+    WarningLabel: TLabel;
+    TotalWarnings: TEdit;
 
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
 		procedure FormDestroy(Sender: TObject);
@@ -697,7 +699,7 @@ type
 		procedure actFileMenuExecute(Sender: TObject);
 		procedure actToolsMenuExecute(Sender: TObject);
 		procedure actDeleteExecute(Sender: TObject);
-		procedure ClassBrowser1Select(Sender: TObject; Filename: TFileName;Line: Integer);
+		procedure ClassBrowserSelect(Sender: TObject; Filename: TFileName;Line: Integer);
 		procedure CppParserTotalProgress(Sender: TObject;const FileName: string;Total, Current: Integer);
 		procedure CodeCompletionResize(Sender: TObject);
 		procedure actSwapHeaderSourceUpdate(Sender: TObject);
@@ -859,6 +861,7 @@ type
 		fShowTips         : boolean;
 		fRemoveOptions    : boolean;
 		fOptionsDir       : AnsiString;
+		fCurrentPageHint  : AnsiString;
 		function ParseParams(s : AnsiString) : AnsiString;
 		procedure BuildBookMarkMenus;
 		procedure SetHints;
@@ -892,7 +895,7 @@ type
 
 		procedure InitClassBrowser(ReloadCache: boolean);
 		procedure UpdateAppTitle;
-		procedure OpenCloseMessageSheet(_Show: boolean);
+		procedure OpenCloseMessageSheet(Open: boolean);
 		function SaveFile(e : TEditor): Boolean;
 		procedure OpenFile(const s : AnsiString);
 		procedure OpenProject(const s: AnsiString);
@@ -941,15 +944,12 @@ uses
 {$R *.dfm}
 
 procedure TMainForm.LoadTheme;
-var
-	Idx: Integer;
 begin
 	if devImageThemes.IndexOf(devData.Theme) = -1 then
 		devData.Theme := devImageThemes.Themes[0].Title; // 0 = New look (see ImageTheme.pas)
 
 	// make sure the theme in question is in the list
-	Idx := devImageThemes.IndexOf(devData.Theme);
-	if Idx <> -1 then begin
+	if devImageThemes.IndexOf(devData.Theme) <> -1 then begin
 		devImageThemes.ActivateTheme(devData.Theme);
 
 		with devImageThemes do begin
@@ -1008,6 +1008,7 @@ begin
 	devData.ProjectWidth:=LeftPageControl.Width;
 	devData.OutputHeight:=fPreviousHeight;
 
+	// Save the options dir somewhere else cause we will need it after deleting devDirs
 	if fRemoveOptions then
 		fOptionsDir := devDirs.Config;
 
@@ -1411,6 +1412,7 @@ begin
 	FindOutput.Columns[2].Caption :=	Lang[ID_COL_FILE];
 	FindOutput.Columns[3].Caption :=	Lang[ID_COL_MSG];
 	ErrorLabel.Caption :=				Lang[ID_TOTALERRORS];
+	WarningLabel.Caption :=				Lang[ID_TOTALWARNINGS];
 	SizeOfOutput.Caption :=				Lang[ID_OUTPUTSIZE];
 	ProjectSheet.Caption :=				Lang[ID_LP_PROJECT];
 	ClassSheet.Caption :=				Lang[ID_LP_CLASSES];
@@ -1435,17 +1437,15 @@ end;
 
 function TMainForm.FileIsOpen(const s: AnsiString; inPrj: boolean = FALSE): integer;
 var
-	e: TEditor;
+	e : TEditor;
 begin
-	for result:= 0 to pred(PageControl.PageCount) do begin
+	for result := 0 to PageControl.PageCount - 1 do begin
 		e:= GetEditor(result);
-		if e.filename <> '' then begin
-			if SameText(e.FileName, s) then
-				if (not inprj) or (e.InProject) then exit;
-			end
-		else
-			if SameText(e.TabSheet.Caption, ExtractfileName(s)) then
-				if (not inprj) or (e.InProject) then exit;
+		if SameFileName(e.FileName, s) then
+
+			// Only accept project files?
+			if (not inprj) or e.InProject then
+				Exit;
 	end;
 	result:= -1;
 end;
@@ -1461,10 +1461,7 @@ begin
 	Result := True;
 	idx:= -1;
 	if assigned(fProject) then begin
-		if e.FileName = '' then
-			idx:= fProject.GetUnitFromString(e.TabSheet.Caption)
-		else
-			idx:= fProject.Units.Indexof(e.FileName);
+		idx:= fProject.Units.Indexof(e.FileName);
 		if fProject.Options.UseGPP then begin
 			BuildFilter(flt, [FLT_CPPS, FLT_CS, FLT_HEADS]);
 			dext:= CPP_EXT;
@@ -1496,19 +1493,14 @@ begin
 		HFilter := 3;
 	end;
 
-	if e.FileName = '' then
-		s:= e.TabSheet.Caption
-	else
-		s:= e.FileName;
+	s := e.FileName;
 
 	with dmMain.SaveDialog do begin
 		Title:= Lang[ID_NV_SAVEFILE];
 		Filter:= flt;
 
 		// select appropriate filter
-		if (CompareText(ExtractFileExt(s), '.h')   = 0) or
-		   (CompareText(ExtractFileExt(s), '.hpp') = 0) or
-		   (CompareText(ExtractFileExt(s), '.hh')  = 0) then begin
+		if GetFileTyp(s) in [utcHead,utcppHead] then begin
 			 FilterIndex := HFilter;
 		end else begin
 			if Assigned(fProject) then
@@ -1629,10 +1621,7 @@ begin
 		// Ask user if he wants to save
 		if e.Text.Modified then begin
 
-			if e.FileName = '' then
-				s:= e.TabSheet.Caption
-			else
-				s:= e.FileName;
+			s:= e.FileName;
 
 			case MessageDlg(format(Lang[ID_MSG_ASKSAVECLOSE], [s]),mtConfirmation, mbYesNoCancel, 0) of
 				mrYes:
@@ -1674,7 +1663,7 @@ var
 begin
 	e:= GetEditor;
 	if Assigned(e) then begin
-		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[ e.Text.GetRealLineNumber(e.Text.DisplayY),
+		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[ e.Text.LineToUncollapsedLine(e.Text.DisplayY),
 																	e.Text.DisplayX,
 																	e.Text.SelLength,
 																	e.Text.UnCollapsedLines.Count,
@@ -1687,7 +1676,7 @@ begin
 	end;
 end;
 
-procedure TMainForm.SetStatusbarMessage(const msg:AnsiString);
+procedure TMainForm.SetStatusbarMessage(const msg : AnsiString);
 begin
 	Statusbar.Panels[2].Text:= msg;
 end;
@@ -1717,24 +1706,24 @@ var
 begin
 	e:=GetEditor;
 	if assigned(e) then
-		e.Text.GotoBookMark((Sender as TMenuItem).Tag);
+		e.Text.GotoBookMark(TMenuItem(Sender).Tag);
 end;
 
-procedure TMainForm.OpenCloseMessageSheet(_Show: boolean);
+procedure TMainForm.OpenCloseMessageSheet(Open: boolean);
 begin
 	if Assigned(ReportToolWindow) then
 		exit;
 
 	// Switch between open and close
 	with MessageControl do
-		if _Show then
+		if Open then
 			Height := fPreviousHeight
 		else begin
 			Height := Height - CompSheet.Height;
 			ActivePageIndex:= -1;
 		end;
-	CloseSheet.TabVisible:= _Show;
-	SplitterBottom.Visible := _Show;
+	CloseSheet.TabVisible:= Open;
+	SplitterBottom.Visible := Open;
 	Statusbar.Top:= Self.ClientHeight;
 end;
 
@@ -1766,17 +1755,14 @@ var
  e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then begin
-		e.Text.BeginUpdate;
+	if assigned(e) then
 		e.InsertString(dmMain.CodeInserts[TMenuItem(Sender).Tag].Line, TRUE);
-		e.Text.EndUpdate;
-	end;
 end;
 
 procedure TMainForm.ToolItemClick(Sender: TObject);
 var
 	idx: integer;
-begin
+begin // TODO: ask on SO
 	idx:= (Sender as TMenuItem).Tag;
 //	MsgBox('icon index:' + inttostr((Sender as TMenuItem).ImageIndex),(Sender as TMenuItem).Caption);
 
@@ -1826,6 +1812,7 @@ var
 	e: TEditor;
 	idx : integer;
 begin
+	// Don't bother opening duplicates
 	idx := FileIsOpen(s);
 	if (idx <> -1) then begin
 		GetEditor(idx).Activate;
@@ -1837,10 +1824,10 @@ begin
 		Exit;
 	end;
 
-	e:= TEditor.Create;
+	e := TEditor.Create;
 	e.Init(FALSE, ExtractFileName(s), s, TRUE);
-	if assigned(fProject) then begin
-		if NotSameText(fProject.FileName,s) and (fProject.GetUnitFromString(s) = -1) then
+	if Assigned(fProject) then begin
+		if (not SameFileName(fProject.FileName,s)) and (fProject.GetUnitFromString(s) = -1) then
 			dmMain.RemoveFromHistory(s);
 	end else begin
 		dmMain.RemoveFromHistory(s);
@@ -1909,10 +1896,7 @@ begin
 			s:= StringReplace(s, cCurSrc, e.FileName, [rfReplaceAll]);
 
 			// <SOURCEPATH>
-			if e.FileName = '' then
-				s:= StringReplace(s, cSrcPath, devDirs.Default, [rfReplaceAll])
-			else
-				s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
+			s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
 		end;
 
 		// <SOURCESPCLIST>
@@ -1934,15 +1918,11 @@ begin
 		s:= StringReplace(s, cCurSrc, e.FileName, [rfReplaceAll]);
 
 		// <SOURCEPATH>
-		// if fActiveEditor is "untitled"/new file return users default directory
-		if e.FileName = '' then
-			s:= StringReplace(s, cSrcPath, devDirs.Default, [rfReplaceAll])
-		else
-			s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
+		s:= StringReplace(s, cSrcPath, ExtractFilePath(e.FileName), [rfReplaceAll]);
 
-			// <WORDXY>
-			s:= StringReplace(s, cWordXY, e.Text.WordAtCursor, [rfReplaceAll]);
-		end;
+		// <WORDXY>
+		s:= StringReplace(s, cWordXY, e.Text.WordAtCursor, [rfReplaceAll]);
+	end;
 
 	// clear unchanged macros
 
@@ -1990,6 +1970,10 @@ var
 	HasSize : boolean;
 	I: integer;
 begin
+	// Set UI data...
+	TotalErrors.Text := IntToStr(fCompiler.ErrorCount);
+	TotalWarnings.Text := IntToStr(fCompiler.WarningCount);
+
 	// Close it if there's nothing to show
 	if (CompilerOutput.Items.Count = 0) and actCompOnNeed.Checked then
 		OpenCloseMessageSheet(FALSE)
@@ -2001,8 +1985,8 @@ begin
 		OpenCloseMessageSheet(TRUE);
 	end;
 
+	// Only set file size if compilation was successful
 	if fCompiler.ErrorCount = 0 then begin
-		TotalErrors.Text := '0';
 		HasSize := False;
 		if Assigned(fProject) then begin
 			FindFirst(fProject.Executable, faAnyFile, F);
@@ -2011,24 +1995,55 @@ begin
 			FindFirst(ChangeFileExt(GetEditor.FileName, EXE_EXT), faAnyFile, F);
 			HasSize := FileExists(ChangeFileExt(GetEditor.FileName, EXE_EXT));
 		end;
+
+		// Format nicely so it fits in the edit control
 		if HasSize then begin
-			SizeFile.Text := IntToStr(F.Size) + ' ' + Lang[ID_BYTES];
-			if F.Size > 1024*1024 then begin
-				SizeFile.Text := SizeFile.Text + ' (' + IntToStr((F.Size div 1024) div 1024) + ' MiB)';
-			end else if F.Size > 1024 then
-				SizeFile.Text := SizeFile.Text + ' (' + IntToStr(F.Size div 1024) + ' KiB)';
+			if F.Size < 1024 then
+				SizeFile.Text := IntToStr(F.Size) + ' ' + Lang[ID_BYTES]
+			else if F.Size < 1024*1024 then
+				SizeFile.Text := FloatToStr(F.Size/1024) + ' KiB'
+			else if F.Size < 1024*1024*1024 then
+				SizeFile.Text := FloatToStr((F.Size/1024)/1024) + ' MiB'
+			else
+				SizeFile.Text := FloatToStr(((F.Size/1024)/1024)/1024) + ' GiB';
 		end else
 			SizeFile.Text := '0';
+
 	end else begin
+
+		// First try to find errors
 		for I := 0 to CompilerOutput.Items.Count-1 do begin
 
 			// Caption equals the 'Line' column
 			if not SameStr(CompilerOutput.Items[I].Caption,'') then begin
 
-				// This item has a line number, proceed to set cursor properly
+				if StartsStr('[Error]',CompilerOutput.Items[I].SubItems[2]) then begin
+
+					// This item has a line number, proceed to set cursor properly
+					CompilerOutput.Selected:=CompilerOutput.Items[I];
+					CompilerOutputDblClick(nil);
+					Exit;
+				end;
+			end;
+		end;
+
+		// Then try to find warnings
+		for I := 0 to CompilerOutput.Items.Count-1 do begin
+			if not SameStr(CompilerOutput.Items[I].Caption,'') then begin
+				if StartsStr('[Warning]',CompilerOutput.Items[I].SubItems[2]) then begin
+					CompilerOutput.Selected:=CompilerOutput.Items[I];
+					CompilerOutputDblClick(nil);
+					Exit;
+				end;
+			end;
+		end;
+
+		// Then try to find anything with a line number...
+		for I := 0 to CompilerOutput.Items.Count-1 do begin
+			if not SameStr(CompilerOutput.Items[I].Caption,'') then begin
 				CompilerOutput.Selected:=CompilerOutput.Items[I];
 				CompilerOutputDblClick(nil);
-				Break;
+				Exit;
 			end;
 		end;
 	end;
@@ -2668,9 +2683,8 @@ end;
 
 procedure TMainForm.actUnitRenameExecute(Sender: TObject);
 var
- idx: integer;
- oldName,
- NewName: AnsiString;
+	idx: integer;
+	OldName, NewName, CurDir: AnsiString;
 begin
 	if not assigned(fProject) then exit;
 	if not assigned(ProjectView.Selected) or
@@ -2679,24 +2693,33 @@ begin
 	if ProjectView.Selected.Data=Pointer(-1) then
 		Exit;
 
-	idx:= integer(ProjectView.Selected.Data);
-	OldName:= fProject.Units[idx].FileName;
-	NewName:= ExtractFileName(OldName);
+	// Get the original name
+	idx := integer(ProjectView.Selected.Data);
+	OldName := fProject.Units[idx].FileName;
+	NewName := ExtractFileName(OldName);
+	CurDir := ExtractFilePath(OldName);
 
-	if InputQuery(Lang[ID_RENAME], Lang[ID_MSG_FILERENAME], NewName) and
-		(ExtractFileName(NewName) <> '') and
-		(NewName <> OldName) then
-	 try
-		 chdir(ExtractFilePath(OldName));
-		 // change in project first so on failure
-		 // file isn't already renamed
-		 fProject.SaveUnitAs(idx, ExpandFileto(NewName, GetCurrentDir));
-		 devFileMonitor.Deactivate; // deactivate for renaming or a message will raise
-		 Renamefile(OldName, NewName);
-		 devFileMonitor.Activate;
-	 except
-		 MessageDlg(format(Lang[ID_ERR_RENAMEFILE], [OldName]), mtError, [mbok], 0);
-	 end;
+	if InputQuery(Lang[ID_RENAME], Lang[ID_MSG_FILERENAME], NewName) and (ExtractFileName(NewName) <> '') then begin
+
+		NewName := ExpandFileto(NewName,CurDir);
+
+		// Only continue if the user says so...
+		if FileExists(NewName) then
+			if MessageDlg(Lang[ID_MSG_FILEEXISTS], mtConfirmation, [mbYes,mbNo], 0) = mrNo then Exit;
+
+		try
+
+			// change in project first so on failure the file isn't already renamed
+			fProject.SaveUnitAs(idx, NewName);
+
+			// deactivate for renaming or a message will raise
+			devFileMonitor.Deactivate;
+			Renamefile(OldName, NewName);
+			devFileMonitor.Activate;
+		except
+			MessageDlg(format(Lang[ID_ERR_RENAMEFILE], [OldName]), mtError, [mbok], 0);
+		end;
+	end;
 end;
 
 procedure TMainForm.actUnitOpenExecute(Sender: TObject);
@@ -2928,8 +2951,9 @@ begin
 	end;
 
 	ClearMessageControl;
-	SizeFile.Text:= '';
-	TotalErrors.Text:= '0';
+	SizeFile.Text := '0';
+	TotalErrors.Text := '0';
+	TotalWarnings.Text := '0';
 
 	if not devData.ShowProgress then begin
 		// if no compile progress window, open the compiler output
@@ -3265,7 +3289,7 @@ var
 	e: TEditor;
 begin
 	e := GetEditor;
-	TCustomAction(Sender).Enabled := Assigned(e) and not IsEmpty(e.Text) and (not Assigned(frmFind) or not frmFind.Showing);
+	TCustomAction(Sender).Enabled := Assigned(e) and (not Assigned(frmFind) or not frmFind.Showing);
 end;
 
 procedure TMainForm.ToolbarClick(Sender: TObject);
@@ -3332,8 +3356,16 @@ begin
 		1:
 			if Resourceoutput.ItemIndex <> -1 then
 				Clipboard.AsText := ResourceOutput.Items[ResourceOutput.ItemIndex];
-		2:
-			LogOutput.CopyToClipboard;
+		2: begin
+			if TotalErrors.Focused then
+				TotalErrors.CopyToClipboard
+			else if TotalWarnings.Focused then
+				TotalWarnings.CopyToClipboard
+			else if SizeFile.Focused then
+				SizeFile.CopyToClipboard
+			else if LogOutput.Focused then
+				LogOutput.CopyToClipboard;
+		end;
 		3: begin
 			if EvaluateInput.Focused then
 				Clipboard.AsText := EvaluateInput.SelText
@@ -3400,6 +3432,8 @@ begin
 		2: begin
 			if TotalErrors.Focused then
 				TotalErrors.SelectAll
+			else if TotalWarnings.Focused then
+				TotalWarnings.SelectAll
 			else if SizeFile.Focused then
 				SizeFile.SelectAll
 			else if LogOutput.Focused then
@@ -3579,13 +3613,15 @@ begin
 		Col:= StrToIntDef(selected.SubItems[0],1);
 		Line:= StrToIntDef(selected.Caption,1);
 
+		// And open up
 		e := GetEditorFromFileName(selected.SubItems[1]);
-
 		if Assigned(e) then begin
-			e.Text.CaretXY:= BufferCoord(col, line);
+
+			e.SetCaretPos(Line,Col); // uncollapse folds if needed
+
+			// Then select the word we searched for
 			e.Text.SetSelWord;
-			e.Text.CaretXY:= e.Text.BlockBegin;
-			e.Activate;
+			e.Text.CaretXY := e.Text.BlockBegin;
 		end;
 	end;
 end;
@@ -3948,14 +3984,14 @@ begin
 	SetStatusbarMessage(Lang[ID_DONEPARSING] + ' in ' + FormatFloat('#,###,##0.00', (GetTickCount-I1)/1000)+' seconds');
 end;
 
-procedure TMainForm.ClassBrowser1Select(Sender: TObject;Filename: TFileName; Line: Integer);
+procedure TMainForm.ClassBrowserSelect(Sender: TObject;Filename: TFileName; Line: Integer);
 var
-	E: TEditor;
+	e: TEditor;
 begin
 	// mandrav
-	E := GetEditorFromFilename(FileName);
-	if Assigned(E) then
-		E.GotoLineNr(Line);
+	e := GetEditorFromFilename(FileName);
+	if Assigned(e) then
+		e.SetCaretPos(Line,1);
 end;
 
 procedure TMainForm.CppParserTotalProgress(Sender: TObject;const FileName: string; Total, Current: Integer);
@@ -3980,64 +4016,38 @@ end;
 
 procedure TMainForm.actSwapHeaderSourceExecute(Sender: TObject);
 var
-	e: TEditor;
-	FromFile,ToFile: AnsiString;
-	i : integer;
-	toheader,tosource : boolean;
+	e : TEditor;
+	CFile,HFile,ToFile: AnsiString;
+	isalreadyopen,iscfile,ishfile : boolean;
 begin
 	e:= GetEditor;
 	if not Assigned(e) then
 		Exit;
 
-	FromFile := e.FileName;
+	iscfile := CppParser.IsCfile(e.FileName);
+	ishfile := CppParser.IsHfile(e.FileName);
 
-	if GetFileTyp(FromFile) in [utcSrc,utcppSrc] then begin
-		toheader := true;
-		tosource := false;
-	end else if GetFileTyp(e.FileName) in [utcHead,utcppHead] then begin
-		tosource := true;
-		toheader := false;
-	end else
-		Exit;
+	CppParser.GetSourcePair(e.FileName,CFile,HFile);
+	if iscfile then
+		ToFile := HFile
+	else if ishfile then
+		ToFile := CFile
+	else
+		ToFile := '';
 
-	if Assigned(fProject) then begin
+	// TODO: Couldn't find our counterpart next to us on disk? Search the project instead?
 
-		// Check project list
-		for i := 0 to fProject.Units.Count - 1 do begin
-			if ((GetFileTyp(fProject.Units[i].FileName) in [utcHead,utcppHead]) and toheader) or
-               ((GetFileTyp(fProject.Units[i].FileName) in [utcSrc,utcppSrc])   and tosource) then begin
-
-				// Compare name without extension...
-				if AnsiCompareFileName(ChangeFileExt(ExtractFileName(FromFile),''),ChangeFileExt(ExtractFileName(fProject.Units[i].FileName),'')) = 0 then begin
-					ToFile := fProject.Units[i].FileName;
-					break;
-				end;
-			end;
-		end;
-	end else begin
-
-		// Check opened files
-		for i := 0 to PageControl.PageCount - 1 do begin
-			e := GetEditor(i);
-			if Assigned(e) then begin
-
-				if ((GetFileTyp(e.FileName) in [utcHead,utcppHead]) and toheader) or
-                   ((GetFileTyp(e.FileName) in [utcSrc,utcppSrc])   and tosource) then begin
-
-					// Compare name without extension...
-					if AnsiCompareFileName(ChangeFileExt(ExtractFileName(FromFile),''),ChangeFileExt(ExtractFileName(e.FileName),'')) = 0 then begin
-						ToFile := e.FileName;
-						break;
-					end;
-				end;
-			end;
-		end;
-	end;
+	// Check before actually opening the file
+	isalreadyopen := FileIsOpen(ToFile) > 0;
 
 	e := GetEditorFromFileName(ToFile);
-	if Assigned(e) then
-		e.Activate
-	else
+	if Assigned(e) then begin
+
+		// move new file tab next to the old one
+		if not isalreadyopen then
+			e.SetTabIndex(PageControl.ActivePageIndex + 1);
+		e.Activate;
+	end else
 		SetStatusBarMessage('Could not find corresponding header/source file!');
 end;
 
@@ -4079,17 +4089,60 @@ end;
 procedure TMainForm.EditorSaveTimer(Sender : TObject);
 var
 	e : TEditor;
+	i : integer;
+	editorlist : TList;
+	newfilename : AnsiString;
 begin
-	e:=GetEditor;
-	if Assigned(e) then begin
-		if devEditor.SaveType = 0 then begin
-			if SaveFile(e) then
-				SetStatusbarMessage('Autosaved file "' + e.FileName + '"')
-		end else if devEditor.SaveType = 1 then begin
-			actSaveAllExecute(nil);
-			SetStatusbarMessage('Autosaved all open files');
+	editorlist := TList.Create;
+
+	// Assemble a list of files that need saving
+	case devEditor.AutoSaveFilter of
+		0: begin // Save current file
+			e := GetEditor;
+			if Assigned(e) and not e.New then // don't save untitled files
+				editorlist.Add(e);
+		end;
+		1: begin // Save all open files
+			for I := 0 to PageControl.PageCount - 1 do begin
+				e := GetEditor(i);
+				if Assigned(e) and not e.New then
+					editorlist.Add(e);
+			end;
+		end;
+		2: begin // Save all project files
+
+			for I := 0 to PageControl.PageCount - 1 do begin
+				e := GetEditor(i);
+				if Assigned(e) and e.InProject and not e.New then
+					editorlist.Add(e);
+			end;
 		end;
 	end;
+
+	// Then process the list
+	for I := 0 to editorlist.Count - 1 do begin
+		e := TEditor(editorlist[i]);
+		case devEditor.AutoSaveMode of
+			0: begin // overwrite (standard save)
+				if e.Text.Modified and SaveFile(e) then
+					SetStatusbarMessage('Autosaved file "' + e.FileName + '"');
+			end;
+			1: begin // append UNIX timestamp
+				newfilename := ChangeFileExt(e.FileName,'.' + IntToStr(DateTimeToUnix(Now)) + ExtractFileExt(e.FileName));
+				e.Text.UnCollapsedLines.SaveToFile(newfilename);
+
+				SetStatusbarMessage('Autosaved file "' + e.FileName + '" as "' + newfilename + '"');
+			end;
+			2: begin // append formatted timestamp
+				newfilename := ChangeFileExt(e.FileName,'.' + FormatDateTime('yyyy mm dd hh mm ss',Now) + ExtractFileExt(e.FileName));
+				e.Text.UnCollapsedLines.SaveToFile(newfilename);
+
+				SetStatusbarMessage('Autosaved file "' + e.FileName + '" as "' + newfilename + '"');
+			end;
+		end;
+	end;
+
+	editorlist.Free;
 end;
 
 procedure TMainForm.PageControlChange(Sender: TObject);
@@ -4109,7 +4162,7 @@ begin
 			SetStatusbarLineCol;
 
 			if ClassBrowser.Enabled then
-				ClassBrowser.CurrentFile:=e.FileName;
+				ClassBrowser.CurrentFile := e.FileName;
 
 			for i := 1 to 9 do
 				if e.Text.GetBookMark(i, x, y) then begin
@@ -4170,7 +4223,7 @@ end;
 
 procedure TMainForm.PageControlMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-	thispage : integer;
+	thispage,curpage : integer;
 begin
 	thispage:=PageControl.IndexOfTabAt(X, Y);
 	if Button = mbRight then begin // select new tab even with right mouse button
@@ -4180,7 +4233,13 @@ begin
 		end;
 	end else if Button = mbMiddle then begin
 		if thispage <> -1 then begin
+
+			curpage := PageControl.ActivePageIndex;
 			CloseEditor(thispage);
+
+			// Retain active index!
+			if thispage > PageControl.ActivePageIndex + 1 then
+				PageControl.ActivePageIndex := curpage;
 		end;
 	end else // see if it's a drag operation
 		PageControl.Pages[PageControl.ActivePageIndex].BeginDrag(False);
@@ -4231,17 +4290,17 @@ procedure TMainForm.PageControlDragOver(Sender, Source: TObject; X,Y: Integer; S
 var
 	I: integer;
 begin
-	I:=PageControl.IndexOfTabAt(X, Y);
-	Accept:=(Source is TTabSheet) and (I<>PageControl.ActivePageIndex);
+	I := PageControl.IndexOfTabAt(X, Y);
+	Accept := (Source is TTabSheet) and (I<>PageControl.ActivePageIndex);
 end;
 
 procedure TMainForm.PageControlDragDrop(Sender, Source: TObject; X,Y: Integer);
 var
 	I: integer;
 begin
-	I:=PageControl.IndexOfTabAt(X, Y);
+	I := PageControl.IndexOfTabAt(X, Y);
 	if (Source is TTabSheet) and (I<>PageControl.ActivePageIndex) then
-		PageControl.Pages[PageControl.ActivePageIndex].PageIndex:=I;
+		PageControl.Pages[PageControl.ActivePageIndex].PageIndex := I;
 end;
 
 procedure TMainForm.actGotoFunctionExecute(Sender: TObject);
@@ -4249,28 +4308,35 @@ var
 	e: TEditor;
 	st: PStatement;
 begin
-	with TFunctionSearchForm.Create(Self) do begin
-		fFileName:=GetEditor.FileName;
-		fParser:=CppParser;
-		if ShowModal=mrOK then begin
-			st:=PStatement(lvEntries.Selected.Data);
-			//make sure statement still exists
-			if fParser.Statements.IndexOf(lvEntries.Selected.Data) = -1 then
-				lvEntries.Selected.Data := nil;
-			e:=GetEditor;
-			if Assigned(e) and Assigned(st) then begin
+
+	e := GetEditor;
+	if not Assigned(e) then
+		Exit;
+
+	with TFunctionSearchForm.Create(Self) do try
+
+		fFileName := e.FileName;
+		fParser := CppParser;
+
+		if ShowModal = mrOK then begin
+
+			st := PStatement(lvEntries.Selected.Data);
+
+			if Assigned(st) then begin
 				if st^._IsDeclaration then
-					e.GotoLineNr(st^._DeclImplLine)
+					e.SetCaretPos(st^._DeclImplLine,1)
 				else
-					e.GotoLineNr(st^._Line);
+					e.SetCaretPos(st^._Line,1);
 			end;
 		end;
+	finally
+		Free;
 	end;
 end;
 
 procedure TMainForm.actBrowserGotoDeclUpdate(Sender: TObject);
 begin
-	(Sender as TAction).Enabled:=Assigned(ClassBrowser.Selected);
+	TAction(Sender).Enabled := Assigned(ClassBrowser.Selected);
 end;
 
 procedure TMainForm.actBrowserGotoImplUpdate(Sender: TObject);
@@ -4289,7 +4355,7 @@ end;
 
 procedure TMainForm.actBrowserNewClassUpdate(Sender: TObject);
 begin
-	(Sender as TAction).Enabled:=ClassBrowser.Enabled and Assigned(fProject);
+	TAction(Sender).Enabled := ClassBrowser.Enabled and Assigned(fProject);
 end;
 
 procedure TMainForm.actBrowserNewMemberUpdate(Sender: TObject);
@@ -4341,7 +4407,7 @@ begin
 	line:=CppParser.GetDeclarationLine(Node.Data);
 	e:=GetEditorFromFileName(fname);
 	if Assigned(e) then
-		e.GotoLineNr(line);
+		e.SetCaretPos(line,1);
 end;
 
 procedure TMainForm.actBrowserGotoImplExecute(Sender: TObject);
@@ -4356,7 +4422,7 @@ begin
 	line:=CppParser.GetImplementationLine(Node.Data);
 	e:=GetEditorFromFileName(fname);
 	if Assigned(e) then
-		e.GotoLineNr(line);
+		e.SetCaretPos(line,1);
 end;
 
 procedure TMainForm.actBrowserNewClassExecute(Sender: TObject);
@@ -4717,7 +4783,12 @@ begin
 	if fDebugger.Executing then begin
 		if Key = Chr(VK_RETURN) then begin
 			if Length(edGDBCommand.Text) > 0 then begin
+
+				// Disable key, but make sure not to remove selected text
+				EvaluateInput.SelStart := 0;
+				EvaluateInput.SelLength := 0;
 				Key := #0;
+
 				fDebugger.SendCommand(edGDBCommand.Text,'');
 
 				if edGDBCommand.Items.IndexOf(edGDBCommand.Text) = -1 then
@@ -4828,20 +4899,27 @@ begin
 end;
 
 procedure TMainForm.CppParserStartParsing(Sender: TObject);
+var
+	e : TEditor;
 begin
-	Screen.Cursor:=crHourglass;
+	Screen.Cursor := crHourglass;
+
+	// Hide anything that uses the database (which will be invalidated)
+	e := GetEditor;
+	if Assigned(e) then begin
+		e.FunctionTip.ReleaseHandle;
+		e.CompletionBox.Hide;
+	end;
 end;
 
 procedure TMainForm.CppParserEndParsing(Sender: TObject);
 begin
-	Screen.Cursor:=crDefault;
+	Screen.Cursor := crDefault;
+
+	RebuildClassesToolbar;
 
 	// do this work only if this was the last file scanned
-	if CppParser.FilesToScan.Count = 0 then begin
-		SetStatusBarMessage(Lang[ID_DONEPARSING]);
-
-		RebuildClassesToolbar;
-	end;
+	SetStatusBarMessage(Lang[ID_DONEPARSING]);
 end;
 
 procedure TMainForm.UpdateAppTitle;
@@ -4931,10 +5009,7 @@ begin
 		Act.Tag:=i;
 		Act.OnExecute:=dynactOpenEditorByTagExecute;
 		Item.Action:=Act;
-		if e.FileName='' then
-			Item.Caption:='&'+chr(49+i)+' Unnamed'
-		else
-			Item.Caption:='&'+chr(49+i)+' '+e.FileName;
+		Item.Caption:='&'+chr(49+i)+' '+e.FileName;
 		if e.Text.Modified then
 			Item.Caption:=Item.Caption+' *';
 		WindowMenu.Insert(WindowMenu.Count - 1,Item);
@@ -5452,7 +5527,7 @@ begin
 
 	cmbClasses.Items.EndUpdate;
 
-	// if we can't finx the old selection anymore (-> -1), default to 0 (globals)
+	// if we can't find the old selection anymore (-> -1), default to 0 (globals)
 	cmbClasses.ItemIndex := max(0,cmbClasses.Items.IndexOf(OldSelection));
 	cmbClassesChange(cmbClasses);
 end;
@@ -5476,7 +5551,7 @@ begin
 	end;
 
 	// If we selected a class
-	if(ParentID <> -1) and (PStatement(CppParser.Statements[CppParser.IndexOfStatement(ParentID)])^._Type = 'class ') then begin
+	if(ParentID <> -1) and (PStatement(CppParser.Statements[CppParser.IndexOfStatement(ParentID)])^._Type = 'class') then begin
 
 		// Don't allow variables of classes
 		for I:=0 to CppParser.Statements.Count-1 do begin
@@ -5519,7 +5594,7 @@ begin
 
 	e := GetEditorFromFilename(fname);
 	if Assigned(e) then
-		e.GotoLineNr(I);
+		e.SetCaretPos(I,1);
 end;
 
 procedure TMainForm.CompilerOutputKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
@@ -5771,7 +5846,7 @@ begin
 			// Go to the location
 			e := GetEditorFromFileName(filename);
 			if Assigned(e) then
-				e.GotoLineNr(line);
+				e.SetCaretPos(line,1);
 
 			SetStatusbarMessage('');
 		end else
@@ -6057,11 +6132,13 @@ begin
 		PageControl.TabPosition:= tpRight;
 	PageControl.MultiLine:= devData.MultiLineTab;
 
-	// Create an autosave timer
-	AutoSaveTimer := TTimer.Create(Application);
-	AutoSaveTimer.Interval := devEditor.Interval*60*1000; // ms to minutes of course
-	AutoSaveTimer.OnTimer := EditorSaveTimer;
-	AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
+	// Don't create the autosave timer when we don't need it
+	if devEditor.EnableAutoSave then begin
+		AutoSaveTimer := TTImer.Create(Self);
+		AutoSaveTimer.OnTimer := EditorSaveTimer;
+		AutoSaveTimer.Interval := devEditor.Interval*60*1000; // miliseconds to minutes
+		AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
+	end;
 
 	// Create some more things?
 	LoadTheme;
@@ -6086,15 +6163,23 @@ end;
 procedure TMainForm.PageControlMouseMove(Sender: TObject;Shift: TShiftState; X, Y: Integer);
 var
 	thispage : integer;
+	newhint : AnsiString;
 	e : TEditor;
 begin
 	thispage := PageControl.IndexOfTabAt(X, Y);
 	if thispage <> -1 then begin
 		e := GetEditor(thispage);
 		if Assigned(e) then
-			PageControl.Hint := e.FileName;
+			newhint := e.FileName;
 	end else
-		PageControl.Hint := '';
+		newhint := '';
+
+	// Only call CancelHint when the hint changes
+	if(newhint <> fCurrentPageHint) then begin
+		Application.CancelHint;
+		fCurrentPageHint := newhint;
+		PageControl.Hint := newhint;
+	end;
 end;
 
 procedure TMainForm.actBreakPointExecute(Sender: TObject);
@@ -6118,7 +6203,12 @@ begin
 	if fDebugger.Executing then begin
 		if Key = Chr(VK_RETURN) then begin
 			if Length(EvaluateInput.Text) > 0 then begin
+
+				// Disable key, but make sure not to remove selected text
+				EvaluateInput.SelStart := 0;
+				EvaluateInput.SelLength := 0;
 				Key := #0;
+
 				fDebugger.OnEvalReady := OnInputEvalReady;
 				fDebugger.SendCommand('print',EvaluateInput.Text,true);
 

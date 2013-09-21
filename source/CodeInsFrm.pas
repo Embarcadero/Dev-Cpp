@@ -244,11 +244,6 @@ begin
 	'	switch(Message) {'+#13#10+
 	'		case *|*: {'+#13#10+
 	'			break;'+#13#10+
-	'		}'+#13#10+
-	'		case WM_CLOSE: {'+#13#10+
-	'			DestroyWindow(hwnd);'+#13#10+
-	'			break;'+#13#10+
-	'		}'+#13#10+
 	'		case WM_DESTROY: {'+#13#10+
 	'			PostQuitMessage(0);'+#13#10+
 	'			break;'+#13#10+
