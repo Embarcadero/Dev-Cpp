@@ -126,10 +126,10 @@ begin
   Ini := TIniFile.Create(FFileName);
   FAppName := Ini.ReadString('Setup', 'AppName', 'ThIsNaMeDoEsNoTeXiStS-6.1GoLd');
   // this may not be a ini file...
-  if CompareStr(FAppName, 'ThIsNaMeDoEsNoTeXiStS-6.1GoLd') = 0 then
+  if AnsiCompareStr(FAppName, 'ThIsNaMeDoEsNoTeXiStS-6.1GoLd') = 0 then
   begin
       FAppName := Ini.ReadString('Setup', 'AppName', 'ThIsIsNoTaNiNi');
-      if CompareStr(FAppName, 'ThIsIsNoTaNiNi') = 0 then
+      if AnsiCompareStr(FAppName, 'ThIsIsNoTaNiNi') = 0 then
           Exit;
   end;
 

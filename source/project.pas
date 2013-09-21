@@ -659,7 +659,7 @@ begin
       begin
           Original := TStringList.Create;
           Original.LoadFromFile(Res);
-          if CompareStr(Original.Text, ResFile.Text) <> 0 then
+          if AnsiCompareStr(Original.Text, ResFile.Text) <> 0 then
           begin
             ResFile.SaveToFile(Res);
           end;

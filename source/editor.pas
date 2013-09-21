@@ -1302,8 +1302,15 @@ var
 	p : TBufferCoord;
 	attr : TSynHighlighterAttributes;
 	st: PStatement;
-	localfindpoint : TPoint;
 begin
+	if fText.SelAvail then
+		Exit;
+
+	if ((devEditor.ParserHints and not MainForm.fDebugger.Executing) or (devData.WatchHint and MainForm.fDebugger.Executing)) then
+		s := fText.WordAtMouse
+	else
+		Exit;
+
 	// Check if we're inside a comment or string by looking at text color. If we are, skip without showing a tooltip
 	p := fText.DisplayToBufferPos(fText.PixelsToRowColumn(X, Y));
 	if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
@@ -1312,9 +1319,6 @@ begin
 			fText.Hint := '';
 			Exit;
 		end;
-
-	if (devEditor.ParserHints and not MainForm.fDebugger.Executing) or (devData.WatchHint and MainForm.fDebugger.Executing) then
-		s := fText.WordAtMouse;
 
 	if (s <> '') then begin
 
@@ -1328,11 +1332,11 @@ begin
 				fCurrentWord := s;
 
 				if devEditor.ParserHints and not MainForm.fDebugger.Executing then begin
-					st:=MainForm.FindStatement(s,fText.WordStartEx(p),localfind,localfindpoint);
+					st:=MainForm.FindStatement(s,fText.WordStartEx(p),localfind,p);
 					if localfind <> '' then begin
 						Application.CancelHint;
-						if (localfindpoint.X <> 12345) and (localfindpoint.Y <> 12345) then
-							fText.Hint:=localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(localfindpoint.y) + ') - Ctrl+Click to follow'
+						if (p.Char <> 12345) and (p.Line <> 12345) then
+							fText.Hint:=localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(p.Line) + ') - Ctrl+Click to follow'
 						else
 							fText.Hint:=localfind;
 					end else if Assigned(st) then begin
@@ -1340,19 +1344,21 @@ begin
 						fText.Hint:=Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
 					end else begin
 						Application.CancelHint;
+						fCurrentWord := s;
 						fText.Hint := '';
 					end;
 				end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
-					MainForm.fDebugger.SendCommand(GDB_DISPLAY, fCurrentWord);
+					MainForm.fDebugger.SendCommand(GDB_DISPLAY, s);
 
 					Application.CancelHint;
-					fText.Hint:=MainForm.fDebugger.WatchVar+': '+MainForm.fDebugger.WatchValue;
+					fText.Hint:=MainForm.fDebugger.WatchVar + ' = ' + MainForm.fDebugger.WatchValue;
 				end;
 			end;
 		end;
 	end else begin
-		fCurrentWord := s;
 		fText.Cursor:=crIBeam;
+
+		fCurrentWord := s;
 		Application.CancelHint;
 		fText.Hint := '';
 	end;
@@ -1520,8 +1526,7 @@ var
 	Attri: TSynHighlighterAttributes;
 begin
 	P := fText.CaretXY;
-	fText.GetHighlighterAttriAtRowCol(P, S, Attri);
-	if Assigned(Attri) and (fText.Highlighter.SymbolAttribute = Attri) and (fText.CaretX<=length(fText.LineText) + 1) then begin
+	if fText.GetHighlighterAttriAtRowCol(P, S, Attri) and (fText.Highlighter.SymbolAttribute = Attri) then begin
 		for i := 0 to 2 do begin
 			if (S = OpenChars[i]) or (S = CloseChars[i]) then begin
 				Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(p));

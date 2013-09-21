@@ -125,7 +125,6 @@ type
     lblMemoryLoad: TLabel;
     memBugReport: TMemo;
     btnHelp: TSpeedButton;
-    XPMenu: TXPMenu;
     procedure FormShow(Sender: TObject);
     procedure btnViewClick(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
@@ -143,7 +142,7 @@ implementation
 {$R *.dfm}
 
 uses 
-  PackmanUtils{, devcfg, version};
+  PackmanUtils;
 
 const
   MAX_DEPTH = 10000;
@@ -253,7 +252,7 @@ begin
             if idx > 0 then begin
               sUnitName := Copy(sl[I], 18, idx - 18);
               for idx := 0 to fUnits.Count - 1 do
-                if CompareStr(sUnitName, PUnitEntry(fUnits[idx])^.Name) = 0 then begin
+                if AnsiCompareStr(sUnitName, PUnitEntry(fUnits[idx])^.Name) = 0 then begin
                   CurrUnit := idx;
                   Break;
                 end;

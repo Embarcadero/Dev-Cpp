@@ -844,7 +844,7 @@ type
 		procedure actGotoImplDeclEditorExecute(Sender: TObject);
 		procedure actHideFSBarExecute(Sender: TObject);
 		procedure UpdateSplash(const text : string);
-		function FindStatement(const statement : string;cursorpos : TBufferCoord;var localfind : string;var localfindpoint : TPoint) : PStatement;
+		function FindStatement(const statement : string;cursorpos : TBufferCoord;var localfind : string;var localfindpoint : TBufferCoord) : PStatement;
 		procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 		procedure ImportCBCprojectClick(Sender: TObject);
 		procedure CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
@@ -1099,9 +1099,6 @@ begin
 
 	// Multiline tab
 	PageControl.MultiLine:= devData.MultiLineTab;
-
-	Application.HintPause := 500;
-	Application.HintHidePause := 5000;
 
 	// Some more compiler settings
 	fCompiler.RunParams:='';
@@ -6222,7 +6219,7 @@ begin
 end;
 
 // Monolithic function that reads code and tries to find definitons. Uses mouse or caret to determine word and returns a statement or a findpoint
-function TMainForm.FindStatement(const statement : string;cursorpos : TBufferCoord;var localfind : string;var localfindpoint : TPoint) : PStatement;
+function TMainForm.FindStatement(const statement : string;cursorpos : TBufferCoord;var localfind : string;var localfindpoint : TBufferCoord) : PStatement;
 var
 	e : TEditor;
 	text : PChar;
@@ -6284,7 +6281,7 @@ begin
 						else
 							compare2 := PStatement(CppParser.Statements[I])^._ScopelessCmd;
 
-						if CompareStr(compare1,compare2) = 0 then begin
+						if AnsiCompareStr(compare1,compare2) = 0 then begin
 
 							// We only need the type of the parent we've found!
 							ParentType := PStatement(CppParser.Statements[I])^._Type;
@@ -6305,7 +6302,7 @@ begin
 		for I:=cursorpos.Line-1 downto 0 do begin
 
 			// We're inside a class definition, save the name of the parent class...
-			if CompareStr('class ',TrimLeft(actualtext[I])) = 0 then begin
+			if AnsiCompareStr('class ',TrimLeft(actualtext[I])) = 0 then begin
 				classdefline := TrimLeft(actualtext[I]);
 
 				len:=7;
@@ -6352,7 +6349,7 @@ begin
 								compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopelessCmd;
 						end;
 
-						if CompareStr(compare1,compare2) = 0 then begin
+						if AnsiCompareStr(compare1,compare2) = 0 then begin
 							ParentType := Copy(compare1,1,Pos('::',compare1)-1);
 							FoundParentType := true;
 							Break;
@@ -6375,8 +6372,7 @@ begin
 		while I > cursorindex-1024 do begin
 			Dec(I);
 
-			e.Text.GetHighlighterAttriAtRowCol(e.Text.CharIndexToRowCol(I),token,HLAttr);
-			if Assigned(HLAttr) then
+			if e.Text.GetHighlighterAttriAtRowCol(e.Text.CharIndexToRowCol(I),token,HLAttr) then
 				if (HLAttr = e.Text.Highlighter.StringAttribute) or (HLAttr = e.Text.Highlighter.CommentAttribute) then
 					continue;
 
@@ -6389,28 +6385,34 @@ begin
 
 			// Wwe've found a word that matches what we were looking for...
 			compare2 := e.Text.GetWordAtRowCol(e.Text.CharIndexToRowCol(I));
-			if (CompareStr(compare1,compare2) = 0) then begin
+			if (AnsiCompareStr(compare1,compare2) = 0) then begin
 
 				wordstart := e.Text.RowColToCharIndex(e.Text.WordStartEx(e.Text.CharIndexToRowCol(I)),true);
 				wordend := e.Text.RowColToCharIndex(e.Text.WordEndEx(e.Text.CharIndexToRowCol(I)),true);
 
 				// First, starting at the found point, scan backwards until we find an invalid character
-				repeat
+				while (wordstart > 1) do begin
+
+					// Only allow whitespace and standard characters
+					if not (text[wordstart-1] in e.Text.IdentChars) and not (text[wordstart-1] in [#0..#32,'&','*']) then Break;
+
+					// Don't allow comments
+					if e.Text.GetHighlighterAttriAtRowCol(e.Text.CharIndexToRowCol(wordstart-1),token,HLAttr) then
+						if (HLAttr = e.Text.Highlighter.CommentAttribute) then
+							Break;
+
 					Dec(wordstart);
-				until (wordstart = 0) or not ((text[wordstart] in e.Text.IdentChars) or (text[wordstart] in [#0..#32]));
+				end;
 
 				// Trim whitespace
-				repeat
+				while (text[wordstart] in [#0..#32]) do
 					Inc(wordstart);
-				until not (text[wordstart] in [#0..#32]);
 
 				if (wordend - wordstart > Length(compare1)) then begin
-					localfind := Copy(text,wordstart,wordend - wordstart + 1);
-					localfindpoint.x := e.Text.CharIndexToRowCol(wordstart).Char;
-					localfindpoint.y := e.Text.CharIndexToRowCol(wordstart).Line;
+					localfind := Copy(text,wordstart + 1,wordend - wordstart);
+					localfindpoint := e.Text.CharIndexToRowCol(wordstart);
 					Exit;
-				end else
-					// Too bad, couldn't find anything, skip rest of word
+				end else if(wordstart < I) then
 					I := wordstart;
 			end;
 		end;
@@ -6447,7 +6449,7 @@ begin
 			end;
 		end;
 
-		if CompareStr(compare1,compare2) = 0 then begin
+		if AnsiCompareStr(compare1,compare2) = 0 then begin
 			Result := PStatement(CppParser.Statements[I]);
 			Exit;
 		end;
@@ -6456,8 +6458,8 @@ begin
 	// if we couldn't find anything, just display what we've been able to gather
 	if FoundParentType then begin
 		localfind := compare1;
-		localfindpoint.x := 12345; // magic number
-		localfindpoint.y := 12345;
+		localfindpoint.Char := 12345; // magic number
+		localfindpoint.Line := 12345;
 	end;
 end;
 
@@ -6469,7 +6471,7 @@ var
 
 	// Opslag voor FindStatement
 	localfind : string;
-	localfindpoint : TPoint;
+	localfindpoint : TBufferCoord;
 
 	// Voor navigeren
 	statement : PStatement;
@@ -6495,15 +6497,17 @@ begin
 
 		// Menu shortcut
 		wordtofind := e.Text.WordAtCursor;
+		atposition := e.Text.WordStart;
 	end;
-	atposition := e.Text.WordStart;
 
-	//SetStatusBarMessage(wordtofind + inttostr(RandomRange(0,1000)));
+	// After we've found the place where we clicked/hover, find the start of the word at that position
+	atposition := e.Text.WordStartEx(atposition);
+
 	statement:=FindStatement(wordtofind,atposition,localfind,localfindpoint);
 
 	// If we found it locally (not present in the class browser)
-	if localfind <> '' then begin
-		e.Text.CaretXY:=BufferCoord(localfindpoint.x,localfindpoint.y);
+	if (localfind <> '') and (localfindpoint.Char <> 12345) and (localfindpoint.Line <> 12345) then begin
+		e.Text.CaretXY := localfindpoint;
 
 	// Otherwise scan the returned class browser statement
 	end else if Assigned(statement) then begin

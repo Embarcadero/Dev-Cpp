@@ -10116,7 +10116,7 @@ begin
 
   { inside the editor, get the word under the mouse pointer }
   aPos := DisplayToBufferPos( PixelsToRowColumn(Point.X,Point.Y) );
-  Result := True;                   
+  Result := True;
 end;
 
 function TCustomSynEdit.GetWordAtMouse: string;

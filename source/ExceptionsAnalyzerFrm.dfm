@@ -1,6 +1,6 @@
 object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
-  Left = 530
-  Top = 270
+  Left = 694
+  Top = 368
   BorderStyle = bsDialog
   Caption = 'Oops!'
   ClientHeight = 369
