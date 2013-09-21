@@ -1032,8 +1032,7 @@ begin
   // if it is not found then empty the string sp
   // the tooltip just hides then
   if not ProtoFound then S := '';
-  
-  
+
   if (S <> '') then
   begin  
     // when the user has choosen an own index, ermm when he clicked
@@ -1047,9 +1046,8 @@ begin
       S := FToolTips.Strings[FSelIndex];
   end;
 
-      
   if S <> '' then
-  begin       
+  begin
     // set the hint caption
     Caption := S;
     

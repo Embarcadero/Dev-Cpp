@@ -1029,8 +1029,8 @@ procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftStat
 var
 	M: TMemoryStream;
 	counter : integer;
-//	attr: TSynHighlighterAttributes;
-//	s : string;
+	attr: TSynHighlighterAttributes;
+	s : string;
 begin
 	// Indent/Unindent selected text with TAB key, like Visual C++ ...
 {$IFDEF WIN32}
@@ -1049,10 +1049,11 @@ begin
 		end;
 	end;
 
+	// Code wordt niet toegevoegd in string, comment en onbekend bestandsformaat...
 	if devEditor.AutoCloseBrace then begin
-	//	fText.GetHighlighterAttriAtRowCol(fText.CaretXY, s, attr);
-	//	if Assigned(attr) then begin
-	//		if (attr <> fText.Highlighter.StringAttribute) and (attr <> fText.Highlighter.CommentAttribute) then begin
+		fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr);
+		if Assigned(attr) or (Length(Trim(fText.LineText)) = 0) then begin
+			if (Length(Trim(fText.LineText)) = 0) or (attr <> fText.Highlighter.StringAttribute) and (attr <> fText.Highlighter.CommentAttribute) then begin
 				if Key = 57 then begin // 9 key + shift = (
 					if (ssShift in Shift) then
 						InsertString(')',false);
@@ -1072,11 +1073,10 @@ begin
 						InsertString('>',false);
 		//		end else if Key = 222 then begin // ' key + shift = "
 		//			if (ssShift in Shift) then
-		//				InsertString('""',false);
-		//			Abort;
+		//				InsertString('""',false); // Annoying...
 				end;
-	//		end;
-	//	end;
+			end;
+		end;
 	end;
 
 	if fCompletionBox.Enabled then begin

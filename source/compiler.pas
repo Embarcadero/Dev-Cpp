@@ -184,7 +184,6 @@ end;
 function TCompiler.NewMakeFile(var F : TextFile) : boolean;
 resourcestring
 	cAppendStr = '%s %s';
-
 var
 	ObjResFile, Objects, LinkObjects, Comp_ProgCpp, Comp_Prog, ofile, tfile, tmp: string;
 	i: integer;
@@ -202,14 +201,15 @@ begin
 
 		tfile := ExtractRelativePath(fProject.FileName,fProject.Units[i].FileName);
 		if GetFileTyp(tfile) <> utHead then begin
-			if fProject.Options.ObjectOutput<>'' then begin
+			if fProject.Options.ObjectOutput <> '' then begin
+				SetPath(fProject.Directory); // BEZIG
 				if not DirectoryExists(fProject.Options.ObjectOutput) then
 					MkDir(fProject.Options.ObjectOutput);
-					ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(fProject.Units[i].FileName);
-					ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)), True, True);
-					Objects := Format(cAppendStr, [Objects, ofile]);
-					if fProject.Units[i].Link then
-						LinkObjects := Format(cAppendStr, [LinkObjects, ofile]);
+				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(fProject.Units[i].FileName);
+				ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)), True, True);
+				Objects := Format(cAppendStr, [Objects, ofile]);
+				if fProject.Units[i].Link then
+					LinkObjects := Format(cAppendStr, [LinkObjects, ofile]);
 			end else begin
 				Objects := Format(cAppendStr, [Objects,GenMakePath(ChangeFileExt(tfile, OBJ_EXT), True, True)]);
 				if fProject.Units[i].Link then
@@ -255,11 +255,12 @@ begin
 	Assignfile(F, fMakefile);
 	try
 		Rewrite(F);
-	except on E: Exception do begin
-		MessageDlg('Could not create Makefile: "' + fMakefile + '"' + #13#10 + E.Message, mtError, [mbOK], 0);
-		result := false;
-		exit;
-	end;
+	except
+		on E: Exception do begin
+			MessageDlg('Could not create Makefile: "' + fMakefile + '"' + #13#10 + E.Message, mtError, [mbOK], 0);
+			result := false;
+			exit;
+		end;
 	end;
 	result := true;
 	writeln(F, '# Project: ' + fProject.Name);
@@ -625,6 +626,7 @@ begin
 		 if SingleFile<>'' then begin
 				if fProject.Options.ObjectOutput<>'' then
 				begin
+					SetPath(fProject.Directory);
 					if not DirectoryExists(fProject.Options.ObjectOutput) then
 						MkDir(fProject.Options.ObjectOutput);
 					ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(SingleFile);
@@ -1501,6 +1503,9 @@ begin
 		if devData.AutoCloseProgress or (fErrCount>0) or (fWarnCount>0) then
 			ReleaseProgressForm;
 	end;
+
+	// BEZIG, LOGGEN
+	fProject.SaveToLog;
 end;
 
 procedure TCompiler.ProcessProgressForm(Line: string);

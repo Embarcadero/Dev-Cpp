@@ -226,6 +226,9 @@ type
    { end XXXKF }
    procedure CheckProjectFileForUpdate;
    procedure IncrementBuildNumber;
+
+	// Orwell
+	procedure SaveToLog;
  end;
 
 implementation
@@ -249,6 +252,60 @@ begin
     FreeAndNil(fEditor);
   fNode:=nil;
   inherited;
+end;
+
+procedure TProject.SaveToLog;
+var
+	temp: string;
+	temp2: string;
+	i : integer;
+	logfile : TextFile;
+begin
+	temp := '';
+	if fOptions.LogOutputEnabled and (MainForm.CompilerOutput.Items.Count > 0) then begin
+
+		// Formatted log
+		AssignFile(logfile,fOptions.LogOutput + '\Formatted Compiler Output.txt');
+		try
+			if FileExists(fOptions.LogOutput + '\Formatted Compiler Output.txt') = false then begin
+				Rewrite(logfile);
+				Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
+			end else begin
+				Reset(logfile);
+				Append(logfile);
+				Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);  // BEZIG
+			end;
+
+			for i:=0 to pred(MainForm.CompilerOutput.Items.Count) do begin
+				temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
+				temp2 := StringReplace(temp2,#10,#9,[]);
+				temp2 := StringReplace(temp2,#10,#9,[]);
+				temp2 := StringReplace(temp2,#10,#9,[]);
+				temp := temp + temp2;
+			end;
+			Write(logfile,temp);
+		finally
+			CloseFile(logfile);
+		end;
+
+		// Raw log
+		if Length(MainForm.LogOutput.Text) > 0 then begin
+			AssignFile(logfile,fOptions.LogOutput + '\Raw Build Output.txt');
+			try
+				if FileExists(fOptions.LogOutput + '\Raw Build Output.txt') = false then begin
+					Rewrite(logfile);
+					Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
+				end else begin
+					Reset(logfile);
+					Append(logfile);
+					Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);  // BEZIG
+				end;
+				Write(logfile,MainForm.LogOutput.Lines.Text);
+			finally
+				CloseFile(logfile);
+			end;
+		end;
+	end;
 end;
 
 function TProjUnit.Save: boolean;
@@ -847,6 +904,8 @@ begin
 			fOptions.UseGpp:= Read('IsCpp', FALSE);
 			fOptions.ExeOutput := Read('ExeOutput', '');
 			fOptions.ObjectOutput := Read('ObjectOutput', '');
+			fOptions.LogOutput := Read('LogOutput', '');
+			fOptions.LogOutputEnabled := Read('LogOutputEnabled', FALSE);
 			fOptions.OverrideOutput := Read('OverrideOutput', FALSE);
 			fOptions.OverridenOutput := Read('OverrideOutputName', '');
 			fOptions.HostApplication := Read('HostApplication', '');
@@ -933,6 +992,8 @@ begin
 		Write('Icon', ExtractRelativePath(Directory, fOptions.Icon));
 		Write('ExeOutput', fOptions.ExeOutput);
 		Write('ObjectOutput', fOptions.ObjectOutput);
+		Write('LogOutput', fOptions.LogOutput);
+		Write('LogOutputEnabled', fOptions.LogOutputEnabled);
 		Write('OverrideOutput', fOptions.OverrideOutput);
 		Write('OverrideOutputName', fOptions.OverridenOutput);
 		Write('HostApplication', fOptions.HostApplication);

@@ -80,6 +80,8 @@ type
 
    ExeOutput: String;
    ObjectOutput: String;
+   LogOutput: String;
+   LogOutputEnabled : boolean;
 
    OverrideOutput: boolean;
    OverridenOutput: string;

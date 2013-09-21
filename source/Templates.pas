@@ -183,6 +183,7 @@ begin
         // RNC -- 07-23-04 Added the ability to set an output dir in a template
         fOptions.ExeOutput:= ReadString(cProject, 'ExeOutput', '');
         fOptions.ObjectOutput:= ReadString(cProject, 'ObjectOutput', '');
+        fOptions.LogOutput:= ReadString(cProject, 'LogOutput', '');
         fOptions.CompilerOptions:= ReadString(cProject, 'CompilerSettings','');
         // units are read on demand
       end;

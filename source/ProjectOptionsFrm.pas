@@ -142,6 +142,12 @@ type
     btnObjOutDir: TSpeedButton;
     btnCustomMakeBrowse: TSpeedButton;
     btnMakeBrowse: TSpeedButton;
+    SpeedButton1: TSpeedButton;
+    edLogOutput: TEdit;
+    lblLogOutput: TLabel;
+    btnLogOutputDir: TSpeedButton;
+    CheckBox1: TCheckBox;
+    Label1: TLabel;
     procedure ListClick(Sender: TObject);
     procedure EditChange(SEnder: TObject);
     procedure ButtonClick(Sender: TObject);
@@ -155,7 +161,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnRemoveIconClick(Sender: TObject);
     procedure BrowseExecutableOutDirClick(Sender: TObject);
-    procedure BrowseObjDirClick(Sender: TObject);
+    procedure BrowseLogDirClick(Sender: TObject);
     procedure btnMakeBrowseClick(Sender: TObject);
     procedure btnMakClick(Sender: TObject);
     procedure MakButtonClick(Sender: TObject);
@@ -181,6 +187,8 @@ type
     procedure SetFileVersion(Sender: TObject);
     procedure PageControlChange(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure btnLogOutputDirClick(Sender: TObject);
+    procedure CheckBox1Click(Sender: TObject);
   private
     fOptions: TProjOptions;
     fIcon: string;
@@ -410,6 +418,8 @@ begin
 		// Build Options
 		ExeOutput := edExeOutput.Text;
 		ObjectOutput := edObjOutput.Text;
+		LogOutput := edLogOutput.Text;
+		LogOutputEnabled := CheckBox1.Checked;
 		OverrideOutput := chkOverrideOutput.Checked;
 		OverridenOutput := edOverridenOutput.Text;
 
@@ -513,7 +523,11 @@ begin
   // Output tab
   edExeOutput.Text := fOptions.ExeOutput;
   edObjOutput.Text := fOptions.ObjectOutput;
+  edLogOutput.Text := fOptions.LogOutput;
+  CheckBox1.Checked := fOptions.LogOutputEnabled;
   chkOverrideOutput.Checked := fOptions.OverrideOutput;
+  if not CheckBox1.Checked then
+	edLogOutput.Enabled := false;
   if fOptions.OverridenOutput<>'' then
     edOverridenOutput.Text := ExtractFilename(fOptions.OverridenOutput)
   else
@@ -609,6 +623,10 @@ begin
     btnUp.Refresh;
     btnDown.Refresh;
     btnBrowse.Refresh;
+
+	CheckBox1.Refresh;
+	lblLogOutput.Refresh;
+	Label1.Refresh;
 end;
 
 procedure TfrmProjectOptions.btnIconLibClick(Sender: TObject);
@@ -766,7 +784,7 @@ begin
 	edExeOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
 end;
 
-procedure TfrmProjectOptions.BrowseObjDirClick(Sender: TObject);
+procedure TfrmProjectOptions.BrowseLogDirClick(Sender: TObject);
 var
 {$IFDEF WIN32}
   Dir: String;
@@ -781,6 +799,23 @@ begin
     Dir:=fProject.Directory;
   SelectDirectory('Select Directory', '', Dir);
   edObjOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
+end;
+
+procedure TfrmProjectOptions.btnLogOutputDirClick(Sender: TObject);
+var
+{$IFDEF WIN32}
+  Dir: String;
+{$ENDIF}
+{$IFDEF LINUX}
+  Dir: WideString;
+{$ENDIF}
+begin
+  if fProject.Options.LogOutput<>'' then
+    Dir:=ExpandFileto(fProject.Options.LogOutput, fProject.Directory)
+  else
+    Dir:=fProject.Directory;
+  SelectDirectory('Select Directory', '', Dir);
+  edLogOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
 end;
 
 procedure TfrmProjectOptions.btnMakeBrowseClick(Sender: TObject);
@@ -1218,8 +1253,7 @@ begin
   UpdateMakButtons();
 end;
 
-procedure TfrmProjectOptions.MakeIncludesDrawItem(Control: TWinControl;
-  Index: Integer; Rect: TRect; State: TOwnerDrawState);
+procedure TfrmProjectOptions.MakeIncludesDrawItem(Control: TWinControl;Index: Integer; Rect: TRect; State: TOwnerDrawState);
 begin
   btnMakUp.Enabled := MakeIncludes.Items.Count > 0;
   btnMakDown.Enabled := MakeIncludes.Items.Count > 0;
@@ -1233,6 +1267,11 @@ end;
 procedure TfrmProjectOptions.FormActivate(Sender: TObject);
 begin
 	StyleFix;
+end;
+
+procedure TfrmProjectOptions.CheckBox1Click(Sender: TObject);
+begin
+	edLogOutput.Enabled := CheckBox1.Checked;
 end;
 
 end.

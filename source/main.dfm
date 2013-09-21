@@ -109,7 +109,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 996
-        Height = 100
+        Height = 101
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -589,7 +589,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 988
-            Height = 69
+            Height = 70
             Align = alClient
             Columns = <
               item
@@ -675,7 +675,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 996
-        Height = 100
+        Height = 101
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -3148,7 +3148,7 @@ object MainForm: TMainForm
   object MessagePopup: TPopupMenu
     OnPopup = MessagePopupPopup
     Left = 203
-    Top = 451
+    Top = 515
     object MsgCopyItem: TMenuItem
       Caption = '&Copy'
       ShortCut = 16451

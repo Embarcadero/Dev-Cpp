@@ -591,8 +591,8 @@ type
 		ToolButton2: TToolButton;
 		ProfileBtn: TToolButton;
 		ProfilingInforBtn: TToolButton;
-    CompResGroupBox: TGroupBox;
-    LogOutput: TMemo;
+		CompResGroupBox: TGroupBox;
+		LogOutput: TMemo;
 
 		procedure FormShow(Sender: TObject);
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -3743,7 +3743,7 @@ end;
 procedure TMainForm.actMsgSaveAllExecute(Sender: TObject);
 var
 	i:integer;
-	temp:string;
+	temp,temp2:string;
 	Stream: TFileStream;
 	savedialog : TSaveDialog;
 begin
@@ -3751,9 +3751,14 @@ begin
 	savedialog := TSaveDialog.Create(self);
 	case MessageControl.ActivePageIndex of
 		cCompTab: begin
-			savedialog.FileName:= 'FormattedCompileLog';
-			for i:=0 to pred(CompilerOutput.Items.Count) do
-				temp:= temp + StringReplace(StringReplace(CompilerOutput.Items[i].Caption +' ' +CompilerOutput.Items[i].SubItems.Text, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]) + #13#10;
+			savedialog.FileName:= 'Formatted Compiler Output';
+			for i:=0 to pred(CompilerOutput.Items.Count) do begin
+				temp2 := MainForm.CompilerOutput.Items[i].Caption + #10 + MainForm.CompilerOutput.Items[i].SubItems.Text;
+				temp2 := StringReplace(temp2,#10,#9,[]);
+				temp2 := StringReplace(temp2,#10,#9,[]);
+				temp2 := StringReplace(temp2,#10,#9,[]);
+				temp := temp + temp2;
+			end;
 		end;
 		cResTab: begin
 			savedialog.FileName:= 'ResourceLog';
