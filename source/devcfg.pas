@@ -1087,6 +1087,7 @@ begin
 	sl.Add('K8=k8');
 	sl.Add('K8 Rev.E=k8-sse3');
 	sl.Add('K10=barcelona');
+	sl.Add('Bulldozer=bdver1');
 	AddOption(Lang[ID_COPT_ARCH], False, True, True, True, 0, '-march=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 
 	// Built-in processor functions
@@ -1115,6 +1116,7 @@ begin
 	sl.Add('Med=2');
 	sl.Add('High=3');
 	sl.Add('Highest (fast)=fast');
+	sl.Add('Size (s)=s');
 	AddOption(Lang[ID_COPT_OPTIMIZE], False, True, True, True, 0, '-O', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 
 	// 32bit/64bit
@@ -1126,12 +1128,14 @@ begin
 	// C++ Standards
 	sl := TStringList.Create;
 	sl.Add(''); // Passing nothing effectively lets the compiler decide
+	sl.Add('ISO C90=c90');
 	sl.Add('ISO C99=c99');
 	sl.Add('ISO C++=c++98');
-	sl.Add('ISO C++0x=c++0x');
+	sl.Add('ISO C++11=c++0x');
+	sl.Add('GNU C90=gnu90');
 	sl.Add('GNU C99=gnu99');
 	sl.Add('GNU C++=gnu++98');
-	sl.Add('GNU C++0x=gnu++0x');
+	sl.Add('GNU C++11=gnu++0x');
 	AddOption(Lang[ID_COPT_STD], False, True, True, True, 0, '-std=', Lang[ID_COPT_GRP_CODEGEN], [], sl);
 end;
 

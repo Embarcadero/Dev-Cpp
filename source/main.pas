@@ -1700,10 +1700,10 @@ begin
 	CompilerOutput.Columns[1].Caption:=	Lang[ID_COL_COL];
 	CompilerOutput.Columns[2].Caption:=	Lang[ID_COL_FILE];
 	CompilerOutput.Columns[3].Caption:=	Lang[ID_COL_MSG];
-	FindOutput.Columns[0].Caption :=	Lang[ID_COL_FLINE];
-	FindOutput.Columns[1].Caption :=	Lang[ID_COL_FCOL];
-	FindOutput.Columns[2].Caption :=	Lang[ID_COL_FFILE];
-	FindOutput.Columns[3].Caption :=	Lang[ID_COL_FMSG];
+	FindOutput.Columns[0].Caption :=	Lang[ID_COL_LINE];
+	FindOutput.Columns[1].Caption :=	Lang[ID_COL_COL];
+	FindOutput.Columns[2].Caption :=	Lang[ID_COL_FILE];
+	FindOutput.Columns[3].Caption :=	Lang[ID_COL_MSG];
 	ErrorLabel.Caption :=				Lang[ID_TOTALERRORS];
 	SizeOfOutput.Caption :=				Lang[ID_OUTPUTSIZE];
 	InfoGroupBox.Caption :=				Lang[ID_GRP_INFO];
@@ -4904,7 +4904,7 @@ begin
 				prof := false;
 			end;
 		end else
-			prof := optS.optValue > 0;
+			prof := optP.optValue > 0;
 	end;
 
 	// see if exe stripping is enabled

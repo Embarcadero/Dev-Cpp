@@ -1702,7 +1702,7 @@ procedure TEditor.DoOnCodeCompletion(Sender: TObject; const AStatement: TStateme
 begin
 	// disable the tooltip here, because we check against Enabled
 	// in the 'EditorStatusChange' event to prevent it's redrawing there
-	if Assigned(FCodeToolTip) then begin
+	if Assigned(FCodeToolTip) and devEditor.ParserHints then begin
 		FCodeToolTip.Enabled := False;
 		FCodeToolTip.ReleaseHandle;
 		FCodeToolTip.Show;

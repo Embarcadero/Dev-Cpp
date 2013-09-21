@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 685
-  Top = 323
-  Width = 968
+  Left = 538
+  Top = 304
+  Width = 1121
   Height = 692
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
@@ -39,7 +39,7 @@ object MainForm: TMainForm
   object SplitterBottom: TSplitter
     Left = 0
     Top = 479
-    Width = 952
+    Width = 1105
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -49,7 +49,7 @@ object MainForm: TMainForm
   object MessageControl: TPageControl
     Left = 0
     Top = 482
-    Width = 952
+    Width = 1105
     Height = 133
     ActivePage = FindSheet
     Align = alBottom
@@ -68,10 +68,10 @@ object MainForm: TMainForm
       object CompilerOutput: TListView
         Left = 0
         Top = 0
-        Width = 940
-        Height = 101
+        Width = 1093
+        Height = 100
         Align = alClient
-        BevelOuter = bvRaised
+        BevelOuter = bvNone
         BorderStyle = bsNone
         Columns = <
           item
@@ -84,7 +84,7 @@ object MainForm: TMainForm
           end
           item
             Caption = 'Unit'
-            Width = 200
+            Width = 320
           end
           item
             Caption = 'Message'
@@ -110,8 +110,8 @@ object MainForm: TMainForm
       object ResourceOutput: TListBox
         Left = 0
         Top = 0
-        Width = 940
-        Height = 101
+        Width = 1093
+        Height = 100
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -210,8 +210,8 @@ object MainForm: TMainForm
       object DebugSubPages: TPageControl
         Left = 0
         Top = 0
-        Width = 940
-        Height = 101
+        Width = 1093
+        Height = 100
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -223,7 +223,7 @@ object MainForm: TMainForm
             Left = 468
             Top = 0
             Width = 156
-            Height = 48
+            Height = 69
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 0
@@ -302,7 +302,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 156
-            Height = 48
+            Height = 69
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 1
@@ -397,7 +397,7 @@ object MainForm: TMainForm
             Left = 156
             Top = 0
             Width = 156
-            Height = 48
+            Height = 69
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 2
@@ -492,7 +492,7 @@ object MainForm: TMainForm
             Left = 312
             Top = 0
             Width = 156
-            Height = 48
+            Height = 69
             Align = alLeft
             BevelOuter = bvLowered
             TabOrder = 3
@@ -590,8 +590,8 @@ object MainForm: TMainForm
           object lvBacktrace: TListView
             Left = 0
             Top = 0
-            Width = 932
-            Height = 70
+            Width = 1085
+            Height = 69
             Align = alClient
             Columns = <
               item
@@ -624,8 +624,8 @@ object MainForm: TMainForm
           object DebugOutput: TMemo
             Left = 0
             Top = 22
-            Width = 932
-            Height = 48
+            Width = 1085
+            Height = 47
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -636,7 +636,7 @@ object MainForm: TMainForm
           object GdbOutputPanel: TPanel
             Left = 0
             Top = 0
-            Width = 932
+            Width = 1085
             Height = 22
             Align = alTop
             BevelOuter = bvNone
@@ -676,8 +676,8 @@ object MainForm: TMainForm
       object FindOutput: TListView
         Left = 0
         Top = 0
-        Width = 940
-        Height = 101
+        Width = 1093
+        Height = 100
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -692,23 +692,17 @@ object MainForm: TMainForm
           end
           item
             Caption = 'Unit'
-            Width = 200
+            Width = 320
           end
           item
             Caption = 'Message'
             Width = 640
           end>
         ColumnClick = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -7
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
         GridLines = True
         HideSelection = False
         ReadOnly = True
         RowSelect = True
-        ParentFont = False
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
@@ -725,7 +719,7 @@ object MainForm: TMainForm
   object ControlBar1: TControlBar
     Left = 0
     Top = 16
-    Width = 952
+    Width = 1105
     Height = 56
     Align = alTop
     AutoDock = False
@@ -1101,7 +1095,7 @@ object MainForm: TMainForm
   object StatusBar: TStatusBar
     Left = 0
     Top = 615
-    Width = 952
+    Width = 1105
     Height = 19
     Panels = <
       item
@@ -1122,7 +1116,7 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 196
     Top = 72
-    Width = 756
+    Width = 909
     Height = 407
     Align = alClient
     HotTrack = True
@@ -1138,7 +1132,7 @@ object MainForm: TMainForm
   object pnlFull: TPanel
     Left = 0
     Top = 0
-    Width = 952
+    Width = 1105
     Height = 16
     Align = alTop
     BevelOuter = bvNone
@@ -1148,10 +1142,10 @@ object MainForm: TMainForm
     TabOrder = 4
     Visible = False
     DesignSize = (
-      952
+      1105
       16)
     object btnFullScrRevert: TSpeedButton
-      Left = 935
+      Left = 1088
       Top = 0
       Width = 16
       Height = 16

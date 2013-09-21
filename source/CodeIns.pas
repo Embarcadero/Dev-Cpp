@@ -274,7 +274,7 @@ begin
 	'}',1);
 
 		// Generic C
-		AddItemByValues('for()','for loop','for(*|*,,) {'+#13#10+'}',2);
+		AddItemByValues('for()','for loop','for(*|*;;) {'+#13#10+'}',2);
 		AddItemByValues('while()','while loop','while(*|*) {'+#13#10+'}',2);
 		AddItemByValues('do-while()','do-while loop','do {'+#13#10+'} while(*|*);',2);
 		AddItemByValues('if()','if statement','if(*|*) {'+#13#10+'}',2);

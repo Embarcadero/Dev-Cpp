@@ -1,10 +1,10 @@
 object EnviroForm: TEnviroForm
-  Left = 751
-  Top = 315
+  Left = 549
+  Top = 302
   BorderStyle = bsDialog
   Caption = 'Environment Options'
-  ClientHeight = 444
-  ClientWidth = 418
+  ClientHeight = 432
+  ClientWidth = 464
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,13 +18,13 @@ object EnviroForm: TEnviroForm
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    418
-    444)
+    464
+    432)
   PixelsPerInch = 96
   TextHeight = 13
   object btnOk: TBitBtn
-    Left = 161
-    Top = 412
+    Left = 200
+    Top = 400
     Width = 80
     Height = 25
     Anchors = [akRight, akBottom]
@@ -53,8 +53,8 @@ object EnviroForm: TEnviroForm
     NumGlyphs = 2
   end
   object btnCancel: TBitBtn
-    Left = 241
-    Top = 412
+    Left = 290
+    Top = 400
     Width = 80
     Height = 25
     Anchors = [akRight, akBottom]
@@ -62,9 +62,9 @@ object EnviroForm: TEnviroForm
     Kind = bkCancel
   end
   object btnHelp: TBitBtn
-    Left = 332
-    Top = 412
-    Width = 75
+    Left = 380
+    Top = 400
+    Width = 80
     Height = 25
     Anchors = [akRight, akBottom]
     Enabled = False
@@ -73,12 +73,11 @@ object EnviroForm: TEnviroForm
     Kind = bkHelp
   end
   object PagesMain: TPageControl
-    Left = 8
-    Top = 8
-    Width = 400
-    Height = 393
-    ActivePage = tabCVS
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Left = 0
+    Top = 0
+    Width = 464
+    Height = 395
+    ActivePage = tabGeneral
     HotTrack = True
     TabOrder = 3
     OnChange = PagesMainChange
@@ -87,10 +86,10 @@ object EnviroForm: TEnviroForm
       ParentShowHint = False
       ShowHint = False
       DesignSize = (
-        392
-        365)
+        456
+        367)
       object lblMRU: TLabel
-        Left = 192
+        Left = 256
         Top = 8
         Width = 137
         Height = 13
@@ -98,7 +97,7 @@ object EnviroForm: TEnviroForm
         Caption = 'Max Files in History List:'
       end
       object lblMsgTabs: TLabel
-        Left = 192
+        Left = 256
         Top = 40
         Width = 145
         Height = 17
@@ -106,7 +105,7 @@ object EnviroForm: TEnviroForm
         Caption = 'Editor Tab Location:'
       end
       object lblLang: TLabel
-        Left = 192
+        Left = 256
         Top = 72
         Width = 170
         Height = 13
@@ -114,7 +113,7 @@ object EnviroForm: TEnviroForm
         Caption = 'Language'
       end
       object lblTheme: TLabel
-        Left = 192
+        Left = 256
         Top = 104
         Width = 41
         Height = 13
@@ -122,16 +121,16 @@ object EnviroForm: TEnviroForm
         Caption = 'Theme'
       end
       object UIfontlabel: TLabel
-        Left = 192
+        Left = 256
         Top = 136
         Width = 35
         Height = 13
         Caption = 'UI font:'
       end
       object cbBackups: TCheckBox
-        Left = 8
-        Top = 29
-        Width = 169
+        Left = 16
+        Top = 37
+        Width = 210
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Create File Backups'
@@ -140,9 +139,9 @@ object EnviroForm: TEnviroForm
         TabOrder = 0
       end
       object cbMinOnRun: TCheckBox
-        Left = 8
-        Top = 50
-        Width = 169
+        Left = 16
+        Top = 58
+        Width = 210
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Minimize on Run'
@@ -151,9 +150,9 @@ object EnviroForm: TEnviroForm
         TabOrder = 1
       end
       object cbDefCpp: TCheckBox
-        Left = 8
-        Top = 8
-        Width = 177
+        Left = 16
+        Top = 16
+        Width = 210
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Default to C++ on New Project'
@@ -162,9 +161,9 @@ object EnviroForm: TEnviroForm
         TabOrder = 2
       end
       object cbShowBars: TCheckBox
-        Left = 8
-        Top = 72
-        Width = 169
+        Left = 16
+        Top = 80
+        Width = 210
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Show Toolbars in Full Screen'
@@ -173,9 +172,9 @@ object EnviroForm: TEnviroForm
         TabOrder = 3
       end
       object cbMultiLineTab: TCheckBox
-        Left = 8
-        Top = 93
-        Width = 169
+        Left = 16
+        Top = 101
+        Width = 210
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Enable Editor Multiline Tabs'
@@ -186,7 +185,7 @@ object EnviroForm: TEnviroForm
       object rgbAutoOpen: TRadioGroup
         Left = 8
         Top = 189
-        Width = 189
+        Width = 217
         Height = 90
         Caption = '   Auto Open  '
         Items.Strings = (
@@ -196,9 +195,9 @@ object EnviroForm: TEnviroForm
         TabOrder = 5
       end
       object cbdblFiles: TCheckBox
-        Left = 8
-        Top = 114
-        Width = 177
+        Left = 16
+        Top = 122
+        Width = 210
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Double Click to Open Files'
@@ -207,14 +206,14 @@ object EnviroForm: TEnviroForm
         TabOrder = 6
       end
       object gbDebugger: TGroupBox
-        Left = 207
+        Left = 240
         Top = 189
-        Width = 182
+        Width = 205
         Height = 68
         Caption = '  Debug Variable Browser  '
         TabOrder = 7
         object cbWatchHint: TCheckBox
-          Left = 8
+          Left = 14
           Top = 14
           Width = 170
           Height = 27
@@ -222,7 +221,7 @@ object EnviroForm: TEnviroForm
           TabOrder = 0
         end
         object cbWatchError: TCheckBox
-          Left = 8
+          Left = 14
           Top = 40
           Width = 170
           Height = 17
@@ -231,17 +230,17 @@ object EnviroForm: TEnviroForm
         end
       end
       object cbNoSplashScreen: TCheckBox
-        Left = 8
-        Top = 136
-        Width = 169
+        Left = 16
+        Top = 144
+        Width = 210
         Height = 17
         Caption = 'No Splash Screen on startup'
         TabOrder = 8
       end
       object rgbOpenStyle: TRadioGroup
-        Left = 207
+        Left = 240
         Top = 267
-        Width = 182
+        Width = 205
         Height = 90
         Caption = '  Open/Save Dialog Style  '
         Items.Strings = (
@@ -253,7 +252,7 @@ object EnviroForm: TEnviroForm
       object gbProgress: TGroupBox
         Left = 8
         Top = 288
-        Width = 189
+        Width = 217
         Height = 69
         Caption = 'Compilation Progress Window '
         TabOrder = 10
@@ -275,7 +274,7 @@ object EnviroForm: TEnviroForm
         end
       end
       object seMRUMax: TSpinEdit
-        Left = 336
+        Left = 400
         Top = 16
         Width = 51
         Height = 22
@@ -286,7 +285,7 @@ object EnviroForm: TEnviroForm
         Value = 0
       end
       object cboTabsTop: TComboBox
-        Left = 248
+        Left = 312
         Top = 56
         Width = 139
         Height = 21
@@ -300,7 +299,7 @@ object EnviroForm: TEnviroForm
           'Right')
       end
       object cboLang: TComboBox
-        Left = 248
+        Left = 312
         Top = 88
         Width = 139
         Height = 21
@@ -309,7 +308,7 @@ object EnviroForm: TEnviroForm
         TabOrder = 13
       end
       object cboTheme: TComboBox
-        Left = 248
+        Left = 312
         Top = 120
         Width = 139
         Height = 21
@@ -318,7 +317,7 @@ object EnviroForm: TEnviroForm
         TabOrder = 14
       end
       object cbUIfont: TComboBox
-        Left = 248
+        Left = 312
         Top = 152
         Width = 139
         Height = 21
@@ -368,7 +367,7 @@ object EnviroForm: TEnviroForm
       end
       object btnDefBrws: TSpeedButton
         Tag = 1
-        Left = 366
+        Left = 414
         Top = 108
         Width = 23
         Height = 22
@@ -403,8 +402,8 @@ object EnviroForm: TEnviroForm
       end
       object btnOutputbrws: TSpeedButton
         Tag = 2
-        Left = 365
-        Top = 165
+        Left = 413
+        Top = 173
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -438,7 +437,7 @@ object EnviroForm: TEnviroForm
       end
       object btnBrwIcon: TSpeedButton
         Tag = 3
-        Left = 365
+        Left = 413
         Top = 221
         Width = 23
         Height = 22
@@ -473,7 +472,7 @@ object EnviroForm: TEnviroForm
       end
       object btnBrwLang: TSpeedButton
         Tag = 5
-        Left = 365
+        Left = 413
         Top = 274
         Width = 23
         Height = 22
@@ -508,7 +507,7 @@ object EnviroForm: TEnviroForm
       end
       object btnBrwSplash: TSpeedButton
         Tag = 4
-        Left = 365
+        Left = 413
         Top = 327
         Width = 23
         Height = 22
@@ -544,7 +543,7 @@ object EnviroForm: TEnviroForm
       object edUserDir: TEdit
         Left = 16
         Top = 109
-        Width = 344
+        Width = 385
         Height = 21
         ReadOnly = True
         TabOrder = 1
@@ -553,7 +552,7 @@ object EnviroForm: TEnviroForm
       object edTemplatesDir: TEdit
         Left = 16
         Top = 165
-        Width = 344
+        Width = 385
         Height = 21
         ReadOnly = True
         TabOrder = 2
@@ -562,7 +561,7 @@ object EnviroForm: TEnviroForm
       object edSplash: TEdit
         Left = 16
         Top = 327
-        Width = 344
+        Width = 385
         Height = 21
         ReadOnly = True
         TabOrder = 3
@@ -571,7 +570,7 @@ object EnviroForm: TEnviroForm
       object edIcoLib: TEdit
         Left = 16
         Top = 221
-        Width = 344
+        Width = 385
         Height = 21
         ReadOnly = True
         TabOrder = 4
@@ -580,7 +579,7 @@ object EnviroForm: TEnviroForm
       object edLang: TEdit
         Left = 16
         Top = 274
-        Width = 344
+        Width = 385
         Height = 21
         ReadOnly = True
         TabOrder = 5
@@ -589,13 +588,13 @@ object EnviroForm: TEnviroForm
       object gbAltConfig: TGroupBox
         Left = 8
         Top = 12
-        Width = 381
+        Width = 433
         Height = 73
         Caption = ' Alternate Configuration File '
         TabOrder = 0
         object btnAltConfig: TSpeedButton
           Tag = 7
-          Left = 350
+          Left = 358
           Top = 42
           Width = 23
           Height = 22
@@ -650,8 +649,8 @@ object EnviroForm: TEnviroForm
     object tabExternal: TTabSheet
       Caption = 'External Programs'
       DesignSize = (
-        392
-        365)
+        456
+        367)
       object lblExternal: TLabel
         Left = 8
         Top = 8
@@ -660,8 +659,8 @@ object EnviroForm: TEnviroForm
         Caption = 'External programs associations:'
       end
       object btnExtAdd: TSpeedButton
-        Left = 82
-        Top = 334
+        Left = 121
+        Top = 336
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -669,8 +668,8 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtAddClick
       end
       object btnExtDel: TSpeedButton
-        Left = 191
-        Top = 334
+        Left = 248
+        Top = 336
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -678,10 +677,10 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtDelClick
       end
       object vleExternal: TValueListEditor
-        Left = 16
+        Left = 32
         Top = 24
-        Width = 333
-        Height = 306
+        Width = 397
+        Height = 308
         Anchors = [akLeft, akTop, akRight, akBottom]
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         Options = [goVertLine, goHorzLine, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -693,7 +692,7 @@ object EnviroForm: TEnviroForm
         OnValidate = vleExternalValidate
         ColWidths = (
           72
-          255)
+          319)
       end
     end
     object tabAssocs: TTabSheet
@@ -701,8 +700,8 @@ object EnviroForm: TEnviroForm
       ParentShowHint = False
       ShowHint = False
       DesignSize = (
-        392
-        365)
+        456
+        367)
       object lblAssocFileTypes: TLabel
         Left = 8
         Top = 8
@@ -711,9 +710,9 @@ object EnviroForm: TEnviroForm
         Caption = 'File Types:'
       end
       object lblAssocDesc: TLabel
-        Left = 16
-        Top = 326
-        Width = 333
+        Left = 40
+        Top = 328
+        Width = 397
         Height = 35
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
@@ -723,10 +722,10 @@ object EnviroForm: TEnviroForm
         WordWrap = True
       end
       object lstAssocFileTypes: TCheckListBox
-        Left = 16
+        Left = 32
         Top = 24
-        Width = 333
-        Height = 290
+        Width = 397
+        Height = 292
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
@@ -752,7 +751,7 @@ object EnviroForm: TEnviroForm
       end
       object btnCVSExecBrws: TSpeedButton
         Tag = 6
-        Left = 365
+        Left = 413
         Top = 33
         Width = 23
         Height = 22
@@ -805,7 +804,7 @@ object EnviroForm: TEnviroForm
       object edCVSExec: TEdit
         Left = 16
         Top = 33
-        Width = 345
+        Width = 385
         Height = 21
         TabOrder = 0
         Text = 'edCVSExec'

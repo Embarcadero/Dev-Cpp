@@ -31,13 +31,17 @@ object CompOptionsFrame: TCompOptionsFrame
     Width = 454
     Height = 420
     Align = alClient
-    DisplayOptions = []
+    DisplayOptions = [doAutoColResize, doKeyColFixed]
+    DropDownRows = 40
     FixedCols = 1
-    Options = [goColSizing, goEditing, goAlwaysShowEditor, goThumbTracking]
+    Options = [goEditing, goTabs, goAlwaysShowEditor]
     TabOrder = 1
     TitleCaptions.Strings = (
       'Option'
       'Value')
     OnSetEditText = vleSetEditText
+    ColWidths = (
+      224
+      224)
   end
 end

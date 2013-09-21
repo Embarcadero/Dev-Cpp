@@ -1,6 +1,6 @@
 object FilePropertiesForm: TFilePropertiesForm
-  Left = 287
-  Top = 160
+  Left = 432
+  Top = 332
   BorderStyle = bsDialog
   Caption = 'File properties'
   ClientHeight = 265
@@ -243,20 +243,6 @@ object FilePropertiesForm: TFilePropertiesForm
     Height = 13
     Caption = 'Relative:'
   end
-  object lblAbsolute: TLabel
-    Left = 100
-    Top = 72
-    Width = 285
-    Height = 13
-    AutoSize = False
-  end
-  object lblRelative: TLabel
-    Left = 100
-    Top = 92
-    Width = 285
-    Height = 13
-    AutoSize = False
-  end
   object Bevel9: TBevel
     Left = 16
     Top = 192
@@ -282,6 +268,24 @@ object FilePropertiesForm: TFilePropertiesForm
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsBold]
     ParentFont = False
+  end
+  object lblAbsolute: TEdit
+    Left = 100
+    Top = 68
+    Width = 288
+    Height = 20
+    AutoSize = False
+    ReadOnly = True
+    TabOrder = 2
+  end
+  object lblRelative: TEdit
+    Left = 100
+    Top = 92
+    Width = 288
+    Height = 20
+    AutoSize = False
+    ReadOnly = True
+    TabOrder = 3
   end
   object btnOK: TButton
     Left = 167

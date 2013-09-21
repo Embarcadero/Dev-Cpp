@@ -1,11 +1,11 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 554
-  Top = 279
+  Left = 550
+  Top = 315
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
-  ClientHeight = 338
-  ClientWidth = 471
+  ClientHeight = 342
+  ClientWidth = 484
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,45 +19,11 @@ object frmProjectOptions: TfrmProjectOptions
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object SpeedButton1: TSpeedButton
-    Left = 416
-    Top = 174
-    Width = 23
-    Height = 22
-    Glyph.Data = {
-      36030000424D3603000000000000360000002800000010000000100000000100
-      18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-      00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-      BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-      00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-      00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-      BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-      00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000000000
-      000000000000000000000000000000000000000000000000000000BFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBF00000000AEFF0096DB0096DB0096DB0096DB0096DB00
-      96DB0096DB0082BE000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-      00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF00AEFF00AEFF00AEFF00
-      AEFF00AEFF0096DB000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-      00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF5DCCFF5DCCFF5DCCFF5D
-      CCFF5DCCFF00AEFF000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF686868BDEBFF
-      5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
-    OnClick = BrowseLogDirClick
-  end
   object btnOk: TBitBtn
-    Left = 190
-    Top = 308
-    Width = 93
-    Height = 24
+    Left = 220
+    Top = 310
+    Width = 80
+    Height = 25
     Caption = '&OK'
     Default = True
     ModalResult = 1
@@ -83,30 +49,30 @@ object frmProjectOptions: TfrmProjectOptions
     NumGlyphs = 2
   end
   object btnCancel: TBitBtn
-    Left = 283
-    Top = 308
-    Width = 93
-    Height = 24
+    Left = 310
+    Top = 310
+    Width = 80
+    Height = 25
     Caption = '&Cancel'
     TabOrder = 1
     OnClick = btnCancelClick
     Kind = bkCancel
   end
   object btnHelp: TBitBtn
-    Left = 387
-    Top = 308
-    Width = 77
-    Height = 24
+    Left = 400
+    Top = 310
+    Width = 80
+    Height = 25
     TabOrder = 2
     OnClick = btnHelpClick
     Kind = bkHelp
   end
   object PageControl: TPageControl
-    Left = 7
-    Top = 8
-    Width = 458
-    Height = 289
-    ActivePage = tabFilesDir
+    Left = 0
+    Top = 0
+    Width = 484
+    Height = 305
+    ActivePage = tabGeneral
     TabOrder = 3
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -127,45 +93,45 @@ object frmProjectOptions: TfrmProjectOptions
       object lblPrjFname: TLabel
         Left = 88
         Top = 48
-        Width = 353
+        Width = 369
         Height = 13
         AutoSize = False
         Caption = 'lblPrjFname'
       end
       object lblUnits: TLabel
         Left = 8
-        Top = 88
+        Top = 104
         Width = 27
         Height = 13
         Caption = 'Units:'
       end
       object lblPrjUnits: TLabel
         Left = 88
-        Top = 88
-        Width = 353
+        Top = 104
+        Width = 369
         Height = 13
         AutoSize = False
         Caption = 'lblPrjUnits'
       end
       object lblPrjOutputFname: TLabel
         Left = 88
-        Top = 68
-        Width = 353
+        Top = 76
+        Width = 369
         Height = 13
         AutoSize = False
         Caption = 'lblPrjOutputFname'
       end
       object lblPrjOutput: TLabel
         Left = 8
-        Top = 68
+        Top = 76
         Width = 35
         Height = 13
         Caption = 'Output:'
       end
       object grpIcon: TGroupBox
         Left = 12
-        Top = 153
-        Width = 205
+        Top = 169
+        Width = 213
         Height = 96
         Caption = '  Icon:  '
         TabOrder = 0
@@ -299,9 +265,9 @@ object frmProjectOptions: TfrmProjectOptions
         end
       end
       object grpType: TGroupBox
-        Left = 224
-        Top = 153
-        Width = 220
+        Left = 248
+        Top = 169
+        Width = 225
         Height = 96
         Caption = '  Type:  '
         TabOrder = 1
@@ -332,7 +298,7 @@ object frmProjectOptions: TfrmProjectOptions
       object edProjectName: TEdit
         Left = 87
         Top = 10
-        Width = 354
+        Width = 370
         Height = 21
         Hint = 
           'Note: The exe filename is taken from the project filename, not t' +
@@ -345,8 +311,8 @@ object frmProjectOptions: TfrmProjectOptions
       object lvFiles: TTreeView
         Left = 8
         Top = 8
-        Width = 200
-        Height = 241
+        Width = 193
+        Height = 257
         HideSelection = False
         Indent = 19
         MultiSelect = True
@@ -356,10 +322,10 @@ object frmProjectOptions: TfrmProjectOptions
         OnChange = lvFilesChange
       end
       object grpUnitOptions: TGroupBox
-        Left = 216
+        Left = 208
         Top = 8
-        Width = 229
-        Height = 241
+        Width = 265
+        Height = 257
         Caption = 'Unit Options'
         TabOrder = 1
         object lblPriority: TLabel
@@ -400,8 +366,8 @@ object frmProjectOptions: TfrmProjectOptions
         object txtOverrideBuildCmd: TMemo
           Left = 8
           Top = 122
-          Width = 209
-          Height = 111
+          Width = 249
+          Height = 127
           Lines.Strings = (
             'txtOverrideBuildCmd')
           ScrollBars = ssBoth
@@ -419,7 +385,7 @@ object frmProjectOptions: TfrmProjectOptions
           OnClick = chkCompileClick
         end
         object spnPriority: TSpinEdit
-          Left = 116
+          Left = 124
           Top = 16
           Width = 105
           Height = 22
@@ -434,8 +400,8 @@ object frmProjectOptions: TfrmProjectOptions
     object tabCompiler: TTabSheet
       Caption = 'Compiler'
       DesignSize = (
-        450
-        261)
+        476
+        277)
       object lblCompilerSet: TLabel
         Left = 8
         Top = 36
@@ -444,14 +410,14 @@ object frmProjectOptions: TfrmProjectOptions
         Caption = 'Compiler:'
       end
       object lblCompileInfo: TLabel
-        Left = 8
+        Left = 23
         Top = 0
         Width = 441
-        Height = 33
+        Height = 25
         AutoSize = False
         Caption = 
           'NOTE: These settings will override the global Compiler Options a' +
-          'ffecting this project only.'
+          'nd affect this project only.'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clMaroon
         Font.Height = -11
@@ -461,28 +427,58 @@ object frmProjectOptions: TfrmProjectOptions
         Layout = tlCenter
         WordWrap = True
       end
+      object OptionsTip: TLabel
+        Left = 80
+        Top = 240
+        Width = 294
+        Height = 13
+        Caption = 'For more information about GCC'#39's compiler options, please visit'
+      end
+      object OptionsLink: TLabel
+        Left = 88
+        Top = 258
+        Width = 271
+        Height = 13
+        Cursor = crHandPoint
+        Caption = 'http://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html'
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlue
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsUnderline]
+        ParentColor = False
+        ParentFont = False
+        OnClick = OptionsLinkClick
+      end
       inline CompOptionsFrame1: TCompOptionsFrame
         Left = 9
         Top = 60
-        Width = 438
-        Height = 194
+        Width = 464
+        Height = 178
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 0
         inherited Splitter1: TSplitter
-          Height = 194
+          Height = 178
         end
         inherited tv: TTreeView
-          Height = 194
+          Height = 178
         end
         inherited vle: TValueListEditor
-          Width = 319
-          Height = 194
+          Width = 345
+          Height = 178
+          DefaultColWidth = 215
+          DisplayOptions = [doKeyColFixed]
+          ParentShowHint = False
+          ColWidths = (
+            215
+            215)
         end
       end
       object cmbCompiler: TComboBox
         Left = 72
         Top = 32
-        Width = 373
+        Width = 385
         Height = 21
         Style = csDropDownList
         ItemHeight = 0
@@ -507,7 +503,7 @@ object frmProjectOptions: TfrmProjectOptions
         Caption = 'Compiler:'
       end
       object lblCppCompiler: TLabel
-        Left = 158
+        Left = 166
         Top = 24
         Width = 141
         Height = 13
@@ -515,37 +511,38 @@ object frmProjectOptions: TfrmProjectOptions
         Caption = 'C++ Compiler:'
       end
       object lblLinker: TLabel
-        Left = 304
+        Left = 320
         Top = 24
-        Width = 141
+        Width = 153
         Height = 13
         AutoSize = False
-        Caption = 'Linker options / Optional libraries or object files :'
+        Caption = 'Linker'
+        WordWrap = True
       end
       object edCompiler: TMemo
         Left = 10
         Top = 40
-        Width = 140
-        Height = 209
+        Width = 151
+        Height = 217
         Lines.Strings = (
           'edCompiler')
         ScrollBars = ssBoth
         TabOrder = 0
       end
       object edCppCompiler: TMemo
-        Left = 158
+        Left = 166
         Top = 40
-        Width = 140
-        Height = 209
+        Width = 147
+        Height = 217
         Lines.Strings = (
           'edCppCompiler')
         ScrollBars = ssBoth
         TabOrder = 1
       end
       object edLinker: TMemo
-        Left = 306
+        Left = 320
         Top = 40
-        Width = 138
+        Width = 148
         Height = 177
         Lines.Strings = (
           'edLinker')
@@ -553,10 +550,10 @@ object frmProjectOptions: TfrmProjectOptions
         TabOrder = 2
       end
       object AddLibBtn: TBitBtn
-        Left = 306
-        Top = 221
-        Width = 138
-        Height = 25
+        Left = 320
+        Top = 224
+        Width = 148
+        Height = 30
         Caption = 'Add Library or Object'
         TabOrder = 3
         OnClick = AddLibBtnClick
@@ -594,8 +591,8 @@ object frmProjectOptions: TfrmProjectOptions
       object SubTabs: TTabControl
         Left = 0
         Top = 0
-        Width = 450
-        Height = 261
+        Width = 476
+        Height = 277
         Align = alClient
         TabOrder = 0
         Tabs.Strings = (
@@ -605,7 +602,7 @@ object frmProjectOptions: TfrmProjectOptions
         TabIndex = 0
         OnChange = SubTabsChange
         object btnDown: TSpeedButton
-          Left = 416
+          Left = 440
           Top = 114
           Width = 23
           Height = 22
@@ -656,7 +653,7 @@ object frmProjectOptions: TfrmProjectOptions
           OnClick = UpDownClick
         end
         object btnUp: TSpeedButton
-          Left = 416
+          Left = 440
           Top = 90
           Width = 23
           Height = 22
@@ -707,8 +704,8 @@ object frmProjectOptions: TfrmProjectOptions
           OnClick = UpDownClick
         end
         object btnBrowse: TSpeedButton
-          Left = 415
-          Top = 194
+          Left = 439
+          Top = 210
           Width = 23
           Height = 22
           Glyph.Data = {
@@ -743,16 +740,16 @@ object frmProjectOptions: TfrmProjectOptions
         object lstList: TListBox
           Left = 14
           Top = 37
-          Width = 395
-          Height = 155
+          Width = 419
+          Height = 164
           ItemHeight = 13
           TabOrder = 0
           OnClick = ListClick
         end
         object btnDelInval: TButton
           Tag = 4
-          Left = 323
-          Top = 225
+          Left = 347
+          Top = 241
           Width = 81
           Height = 23
           Caption = 'Delete Invalid'
@@ -761,16 +758,16 @@ object frmProjectOptions: TfrmProjectOptions
         end
         object edEntry: TEdit
           Left = 14
-          Top = 195
-          Width = 395
+          Top = 211
+          Width = 419
           Height = 21
           TabOrder = 2
           OnChange = EditChange
         end
         object btnReplace: TButton
           Tag = 1
-          Left = 78
-          Top = 225
+          Left = 102
+          Top = 241
           Width = 75
           Height = 23
           Caption = '&Replace'
@@ -780,8 +777,8 @@ object frmProjectOptions: TfrmProjectOptions
         end
         object btnDelete: TButton
           Tag = 3
-          Left = 241
-          Top = 225
+          Left = 265
+          Top = 241
           Width = 75
           Height = 23
           Caption = '&Delete'
@@ -791,8 +788,8 @@ object frmProjectOptions: TfrmProjectOptions
         end
         object btnAdd: TButton
           Tag = 2
-          Left = 159
-          Top = 225
+          Left = 183
+          Top = 241
           Width = 75
           Height = 23
           Caption = '&Add'
@@ -806,7 +803,7 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Build Options'
       object Label1: TLabel
         Left = 8
-        Top = 200
+        Top = 216
         Width = 118
         Height = 13
         Caption = 'Override output filename:'
@@ -814,7 +811,7 @@ object frmProjectOptions: TfrmProjectOptions
       object grpOutDirectories: TGroupBox
         Left = 8
         Top = 12
-        Width = 437
+        Width = 465
         Height = 181
         Caption = 'Directories'
         TabOrder = 0
@@ -835,7 +832,7 @@ object frmProjectOptions: TfrmProjectOptions
           FocusControl = edObjOutput
         end
         object btnExeOutDir: TSpeedButton
-          Left = 400
+          Left = 424
           Top = 38
           Width = 23
           Height = 22
@@ -869,7 +866,7 @@ object frmProjectOptions: TfrmProjectOptions
           OnClick = BrowseExecutableOutDirClick
         end
         object btnObjOutDir: TSpeedButton
-          Left = 400
+          Left = 424
           Top = 94
           Width = 23
           Height = 22
@@ -911,7 +908,7 @@ object frmProjectOptions: TfrmProjectOptions
           FocusControl = edObjOutput
         end
         object btnLogOutputDir: TSpeedButton
-          Left = 400
+          Left = 424
           Top = 150
           Width = 23
           Height = 22
@@ -947,21 +944,21 @@ object frmProjectOptions: TfrmProjectOptions
         object edExeOutput: TEdit
           Left = 10
           Top = 38
-          Width = 383
+          Width = 407
           Height = 21
           TabOrder = 0
         end
         object edObjOutput: TEdit
           Left = 10
           Top = 94
-          Width = 383
+          Width = 407
           Height = 21
           TabOrder = 1
         end
         object edLogOutput: TEdit
           Left = 32
           Top = 150
-          Width = 361
+          Width = 385
           Height = 21
           TabOrder = 2
         end
@@ -976,14 +973,14 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object edOverridenOutput: TEdit
         Left = 24
-        Top = 224
-        Width = 413
+        Top = 240
+        Width = 441
         Height = 21
         TabOrder = 1
       end
       object chkOverrideOutput: TCheckBox
         Left = 4
-        Top = 225
+        Top = 241
         Width = 13
         Height = 17
         TabOrder = 2
@@ -993,7 +990,7 @@ object frmProjectOptions: TfrmProjectOptions
     object tabMakefile: TTabSheet
       Caption = 'Makefile'
       object btnCustomMakeBrowse: TSpeedButton
-        Left = 421
+        Left = 429
         Top = 32
         Width = 23
         Height = 22
@@ -1027,7 +1024,7 @@ object frmProjectOptions: TfrmProjectOptions
         OnClick = btnCustomMakeBrowseClick
       end
       object btnMakDown: TSpeedButton
-        Left = 421
+        Left = 445
         Top = 157
         Width = 23
         Height = 22
@@ -1078,7 +1075,7 @@ object frmProjectOptions: TfrmProjectOptions
         OnClick = btnMakClick
       end
       object btnMakeBrowse: TSpeedButton
-        Left = 421
+        Left = 445
         Top = 208
         Width = 23
         Height = 22
@@ -1112,7 +1109,7 @@ object frmProjectOptions: TfrmProjectOptions
         OnClick = btnMakeBrowseClick
       end
       object btnMakUp: TSpeedButton
-        Left = 421
+        Left = 445
         Top = 125
         Width = 23
         Height = 22
@@ -1252,7 +1249,7 @@ object frmProjectOptions: TfrmProjectOptions
       object edCustomMakefile: TEdit
         Left = 36
         Top = 32
-        Width = 377
+        Width = 381
         Height = 21
         ReadOnly = True
         TabOrder = 5
@@ -1261,7 +1258,7 @@ object frmProjectOptions: TfrmProjectOptions
       object edMakeInclude: TEdit
         Left = 12
         Top = 208
-        Width = 401
+        Width = 429
         Height = 21
         TabOrder = 6
         OnChange = edMakeIncludeChange
@@ -1269,7 +1266,7 @@ object frmProjectOptions: TfrmProjectOptions
       object MakeIncludes: TListBox
         Left = 12
         Top = 112
-        Width = 401
+        Width = 429
         Height = 89
         ItemHeight = 13
         TabOrder = 7
@@ -1291,8 +1288,8 @@ object frmProjectOptions: TfrmProjectOptions
       object grpVersion: TGroupBox
         Left = 8
         Top = 27
-        Width = 437
-        Height = 230
+        Width = 465
+        Height = 238
         Caption = 'Version details'
         TabOrder = 1
         object lblVerMajor: TLabel
@@ -1324,7 +1321,7 @@ object frmProjectOptions: TfrmProjectOptions
           Caption = 'Build:'
         end
         object lblVerLang: TLabel
-          Left = 272
+          Left = 264
           Top = 20
           Width = 51
           Height = 13
@@ -1377,23 +1374,23 @@ object frmProjectOptions: TfrmProjectOptions
         object vleVersion: TValueListEditor
           Left = 12
           Top = 80
-          Width = 413
-          Height = 137
+          Width = 437
+          Height = 145
           DisplayOptions = [doAutoColResize, doKeyColFixed]
           FixedCols = 1
           Options = [goVertLine, goHorzLine, goColSizing, goEditing, goAlwaysShowEditor, goThumbTracking]
           TabOrder = 7
           ColWidths = (
             150
-            257)
+            281)
         end
         object cmbLangID: TComboBox
           Left = 272
           Top = 36
-          Width = 153
+          Width = 177
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 4
         end
         object chkAutoIncBuild: TCheckBox
@@ -1405,9 +1402,9 @@ object frmProjectOptions: TfrmProjectOptions
           TabOrder = 5
         end
         object chkSyncProduct: TCheckBox
-          Left = 260
+          Left = 268
           Top = 60
-          Width = 413
+          Width = 181
           Height = 17
           Caption = 'Sync product with file version'
           TabOrder = 6
@@ -1423,19 +1420,19 @@ object frmProjectOptions: TfrmProjectOptions
     Options = [ofHideReadOnly, ofAllowMultiSelect]
     Title = 'Open object file'
     Left = 38
-    Top = 302
+    Top = 310
   end
   object dlgPic: TOpenPictureDialog
     DefaultExt = 'ico'
     Filter = 'Icons (*.ico)|*.ico'
     Title = 'Open icon'
     Left = 3
-    Top = 302
+    Top = 310
   end
   object dlgMakeInclude: TOpenDialog
     Filter = 'Makefile Addons (*.mak)|*.mak|All Files (*.*)|*.*'
     Left = 72
-    Top = 304
+    Top = 312
   end
   object OpenLibDialog: TOpenDialog
     Filter = 
@@ -1443,12 +1440,12 @@ object frmProjectOptions: TfrmProjectOptions
       'iles (*.*)|*.*'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
     Left = 112
-    Top = 304
+    Top = 312
   end
   object dlgCustomMake: TOpenDialog
     Filter = 'All Files (*.*)|*.*'
     FilterIndex = 0
     Left = 148
-    Top = 304
+    Top = 312
   end
 end

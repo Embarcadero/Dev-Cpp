@@ -94,7 +94,6 @@ type
     btnEdit: TButton;
     btnRemove: TButton;
     lvCodeins: TListView;
-    lblCode: TLabel;
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     btnHelp: TBitBtn;
@@ -162,6 +161,8 @@ type
     MinutesDelay: TTrackBar;
     Panel1: TPanel;
     FileOptions: TRadioGroup;
+    HighCurLineBox: TGroupBox;
+    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -575,7 +576,6 @@ begin
   btnSaveSyntax.Hint:=           Lang[ID_EOPT_SAVESYNTAX];
 
 // Code Tab
-  lblCode.Caption:=              Lang[ID_EOPT_CICODE];
   lvCodeIns.Columns[0].Caption:= Lang[ID_EOPT_CIMENU];
   lvCodeIns.Columns[1].Caption:= Lang[ID_EOPT_CISECTION];
   lvCodeIns.Columns[2].Caption:= Lang[ID_EOPT_CIDESC];

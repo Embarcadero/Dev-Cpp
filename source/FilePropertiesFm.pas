@@ -64,8 +64,8 @@ type
     cmbFiles: TComboBox;
     Label9: TLabel;
     Label10: TLabel;
-    lblAbsolute: TLabel;
-    lblRelative: TLabel;
+    lblAbsolute: TEdit;
+    lblRelative: TEdit;
     Bevel9: TBevel;
     Label11: TLabel;
     lblTimestamp: TLabel;
@@ -245,13 +245,13 @@ begin
   lblFilename.Caption := MinimizeName(FileName, lblFilename.Canvas, 285);
   if Assigned(MainForm.fProject) then begin
     lblProject.Caption := MainForm.fProject.Name;
-    lblRelative.Caption := ExtractRelativePath(MainForm.fProject.Directory, Filename)
+    lblRelative.Text := ExtractRelativePath(MainForm.fProject.Directory, Filename)
   end
   else begin
     lblProject.Caption := '-';
-    lblRelative.Caption := '-';
+    lblRelative.Text := '-';
   end;
-  lblAbsolute.Caption := Filename;
+  lblAbsolute.Text := Filename;
   lblTotal.Caption := IntToStr(Total);
   lblSize.Caption := FormatFloat('#,###,##0', Size);
   lblCode.Caption := IntToStr(Code);
