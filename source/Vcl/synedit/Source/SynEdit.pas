@@ -4726,7 +4726,7 @@ var
   iWheelClicks: integer;
   iLinesToScroll: integer;
 begin
-  if ssCtrl in Application.KeyState then
+  if ssShift in Application.KeyState then
     iLinesToScroll := LinesInWindow shr Ord(eoHalfPageScroll in fOptions)
   else
     iLinesToScroll := 3;

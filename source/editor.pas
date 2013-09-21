@@ -220,22 +220,19 @@ begin
 	else
 		fFileName := File_name;
 
-	// Setup an new tabs
+	// Setup a new tab
 	fTabSheet := TTabSheet.Create(MainForm.PageControl);
 	fTabSheet.Caption := Caption_;
 	fTabSheet.PageControl := MainForm.PageControl;
-	fTabSheet.TabVisible:= FALSE;//FALSE;
-	// This way we can contact the editor from MainForm.PageControl.TabIndex
-	fTabSheet.Tag := integer(self);
+	fTabSheet.Tag := integer(self); // Define an index for each tab
 
-	// Set events
+	// Set breakpoint events
 	fOnBreakpointToggle := MainForm.OnBreakpointToggle;
 
 	// Create an editor
 	fText := TSynEdit.Create(fTabSheet);
-	fText.Parent := fTabSheet;
-	fText.Align := alClient;
 
+	// Load the file
 	if (DoOpen) then
 		try
 			fText.Lines.LoadFromFile(FileName);
@@ -257,17 +254,22 @@ begin
 	else
 		fNew := True;
 
-	fText.Visible := True;
+	// Create a tooltip timer
 	fHintTimer := TTimer.Create(Application);
 	fHintTimer.Interval := 100;
 	fHintTimer.OnTimer := EditorHintTimer;
 	fHintTimer.Enabled := False;
 
+	// Set a whole lot of data
+	fText.Parent := fTabSheet;
+	fText.Align := alClient;
+//	fText.BorderStyle := bsNone;
+	fText.Visible := True;
 	fText.PopupMenu := MainForm.EditorPopupMenu;
 	fText.Font.Color:= clWindowText;
 	fText.Color:= clWindow;
-	fText.Font.Name:= 'Courier';
-	fText.Font.Size:= 10;
+//	fText.Font.Name:= 'Courier New';
+//	fText.Font.Size:= 10;
 	fText.WantTabs := True;
 	fText.OnStatusChange:= EditorStatusChange;
 	fText.OnSpecialLineColors:= EditorSpecialLineColors;
@@ -276,11 +278,12 @@ begin
 	fText.OnDropFiles:= EditorDropFiles;
 	fText.OnDblClick:= EditorDblClick;
 	fText.OnMouseDown := EditorMouseDown;
+	fText.OnMouseMove := EditorMouseMove;
 	fText.OnPaintTransient := EditorPaintTransient;
-
 	fText.MaxScrollWidth:=4096; // bug-fix #600748
 	fText.MaxUndo:=4096;
 
+	// Set the current editor and highlighter
 	devEditor.AssignEditor(fText);
 	if not fNew then
 		fText.Highlighter:= dmMain.GetHighlighter(fFileName)
@@ -289,16 +292,15 @@ begin
 	else
 		fText.Highlighter:= dmMain.cpp;
 
-	// update the selected text color
+	// Set the text color
 	StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
 	fText.SelectedColor.Background:= pt.X;
 	fText.SelectedColor.Foreground:= pt.Y;
 
-	fTabSheet.PageControl.ActivePage := fTabSheet;
-	fTabSheet.TabVisible:= TRUE;
+	// Create a gutter
 	fDebugGutter := TDebugGutter.Create(self);
-	Application.ProcessMessages;
 
+	// Initialize code completion
 	InitCompletion;
 
 	// Function arguments
@@ -334,14 +336,15 @@ begin
 	FAutoIndent.IndentChars := '{:';
 	FAutoIndent.UnIndentChars := '}';
 
-	fText.OnMouseMove := EditorMouseMove;
-
-	// monitor this file for outside changes
+	// Setup a monitor which keeps track of outside-of-editor changes
 	MainForm.devFileMonitor1.Files.Add(fFileName);
 	MainForm.devFileMonitor1.Refresh(True);
 
 	// RNC set any breakpoints that should be set in this file
 	SetBreakPointsOnOpen;
+
+	// Only show on the very last
+//	fTabSheet.PageControl.ActivePage := fTabSheet; // unneeded, pagecontrols switch to new tabs automagically
 end;
 
 destructor TEditor.Destroy;
@@ -391,7 +394,7 @@ procedure TEditor.Activate;
 begin
 	if assigned(fTabSheet) then begin
 		fTabSheet.PageControl.Show;
-		fTabSheet.PageControl.ActivePage:=  fTabSheet;
+		fTabSheet.PageControl.ActivePage:= fTabSheet;
 
 		if fText.Visible then
 			fText.SetFocus;

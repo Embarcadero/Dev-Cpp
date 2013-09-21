@@ -202,7 +202,7 @@ begin
 		tfile := ExtractRelativePath(fProject.FileName,fProject.Units[i].FileName);
 		if GetFileTyp(tfile) <> utHead then begin
 			if fProject.Options.ObjectOutput <> '' then begin
-				SetPath(fProject.Directory); // BEZIG
+				SetPath(fProject.Directory);
 				if not DirectoryExists(fProject.Options.ObjectOutput) then
 					MkDir(fProject.Options.ObjectOutput);
 				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(fProject.Units[i].FileName);
@@ -222,6 +222,7 @@ begin
 		ObjResFile := ''
 	else begin
 		if fProject.Options.ObjectOutput<>'' then begin
+			SetPath(fProject.Directory);
 			if not DirectoryExists(fProject.Options.ObjectOutput) then
 				MkDir(fProject.Options.ObjectOutput);
 			ObjResFile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ChangeFileExt(fProject.Options.PrivateResource, RES_EXT);
@@ -373,6 +374,7 @@ begin
 		if GetFileTyp(tfile) <> utHead then begin
 			writeln(F);
 			if fProject.Options.ObjectOutput<>'' then begin
+				SetPath(fProject.Directory);
 				if not DirectoryExists(fProject.Options.ObjectOutput) then
 					MkDir(fProject.Options.ObjectOutput);
 
@@ -381,31 +383,31 @@ begin
 			end else
 				ofile := GenMakePath(ChangeFileExt(tfile, OBJ_EXT));
 
-				if DoCheckSyntax then begin
-					writeln(F, GenMakePath2(ofile) + ':' + GenMakePath2(tfile));
-					if fProject.Units[i].CompileCpp then
-						writeln(F, #9 + '$(CPP) -S ' + GenMakePath(tfile) + ' -o nul $(CXXFLAGS)')
-					else
-						writeln(F, #9 + '$(CC) -S ' + GenMakePath(tfile) + ' -o nul $(CFLAGS)');
-				end else begin
-					if PerfectDepCheck and not fSingleFile then
-						writeln(F, GenMakePath2(ofile) + ': ' + GenMakePath2(tfile) + ' ' + FindDeps(fProject.Directory + tfile))
-					else
-						writeln(F, GenMakePath2(ofile) + ': ' + GenMakePath2(tfile));
+			if DoCheckSyntax then begin
+				writeln(F, GenMakePath2(ofile) + ':' + GenMakePath2(tfile));
+				if fProject.Units[i].CompileCpp then
+					writeln(F, #9 + '$(CPP) -S ' + GenMakePath(tfile) + ' -o nul $(CXXFLAGS)')
+				else
+					writeln(F, #9 + '$(CC) -S ' + GenMakePath(tfile) + ' -o nul $(CFLAGS)');
+			end else begin
+				if PerfectDepCheck and not fSingleFile then
+					writeln(F, GenMakePath2(ofile) + ': ' + GenMakePath2(tfile) + ' ' + FindDeps(fProject.Directory + tfile))
+				else
+					writeln(F, GenMakePath2(ofile) + ': ' + GenMakePath2(tfile));
 
-					if fProject.Units[i].OverrideBuildCmd and (fProject.Units[i].BuildCmd<>'') then begin
-						tmp:=fProject.Units[i].BuildCmd;
-						tmp:=StringReplace(tmp, '<CRTAB>', #10#9, [rfReplaceAll]);
-						writeln(F, #9+tmp);
-					end else begin
-						if fProject.Units[i].CompileCpp then
-							writeln(F, #9 + '$(CPP) -c ' + GenMakePath(tfile) + ' -o ' + ofile + ' $(CXXFLAGS)')
-						else
-							writeln(F, #9 + '$(CC) -c ' + GenMakePath(tfile) + ' -o ' + ofile + ' $(CFLAGS)');
-					end;
+				if fProject.Units[i].OverrideBuildCmd and (fProject.Units[i].BuildCmd<>'') then begin
+					tmp:=fProject.Units[i].BuildCmd;
+					tmp:=StringReplace(tmp, '<CRTAB>', #10#9, [rfReplaceAll]);
+					writeln(F, #9+tmp);
+				end else begin
+					if fProject.Units[i].CompileCpp then
+						writeln(F, #9 + '$(CPP) -c ' + GenMakePath(tfile) + ' -o ' + ofile + ' $(CXXFLAGS)')
+					else
+						writeln(F, #9 + '$(CC) -c ' + GenMakePath(tfile) + ' -o ' + ofile + ' $(CFLAGS)');
 				end;
 			end;
 		end;
+	end;
 
 	if (Length(fProject.Options.PrivateResource) > 0) then begin
 		ResFiles := '';
@@ -600,10 +602,9 @@ var
 begin
 	fSingleFile:=SingleFile<>'';
 	fRunAfterCompileFinish:= FALSE;
-	if Assigned(fDevRun) then
-	begin
-			MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
-			Exit;
+	if Assigned(fDevRun) then begin
+		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
+		Exit;
 	end;
 
 	if fTarget = ctNone then exit;
@@ -618,87 +619,68 @@ begin
 	GetLibrariesParams;
 	GetIncludesParams;
 
-	if fTarget = ctProject then
-	 begin
-		 BuildMakeFile;
-		 Application.ProcessMessages;
+	if fTarget = ctProject then begin
+		BuildMakeFile;
+		Application.ProcessMessages;
 
-		 if SingleFile<>'' then begin
-				if fProject.Options.ObjectOutput<>'' then
-				begin
-					SetPath(fProject.Directory);
-					if not DirectoryExists(fProject.Options.ObjectOutput) then
-						MkDir(fProject.Options.ObjectOutput);
-					ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(SingleFile);
-					ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
-				end
-				else
-					ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(SingleFile, OBJ_EXT)));
-			 if (devCompiler.makeName <> '') then
-				 cmdline:= format(cSingleFileMakeLine, [devCompiler.makeName, fMakeFile, ofile])
-			 else
-				 cmdline:= format(cSingleFileMakeLine, [MAKE_PROGRAM, fMakeFile, ofile]);
-		 end
-		 else begin
-			 if (devCompiler.makeName <> '') then
-				 cmdline:= format(cMakeLine, [devCompiler.makeName, fMakeFile])
-			 else
-				 cmdline:= format(cMakeLine, [MAKE_PROGRAM, fMakeFile]);
-		 end;
+		if SingleFile<>'' then begin
+			if fProject.Options.ObjectOutput<>'' then begin
+				SetPath(fProject.Directory);
+				if not DirectoryExists(fProject.Options.ObjectOutput) then
+					MkDir(fProject.Options.ObjectOutput);
+				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(SingleFile);
+				ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
+			end else
+				ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(SingleFile, OBJ_EXT)));
+			if (devCompiler.makeName <> '') then
+				cmdline:= format(cSingleFileMakeLine, [devCompiler.makeName, fMakeFile, ofile])
+			else
+				cmdline:= format(cSingleFileMakeLine, [MAKE_PROGRAM, fMakeFile, ofile]);
+		end else begin
+			if (devCompiler.makeName <> '') then
+				cmdline:= format(cMakeLine, [devCompiler.makeName, fMakeFile])
+			else
+				cmdline:= format(cMakeLine, [MAKE_PROGRAM, fMakeFile]);
+		end;
 
-		 DoLogEntry(format(Lang[ID_EXECUTING],	[cMake +cDots]));
-		 DoLogEntry(cmdline);
-		 //DoLogEntry('Compiler Delay: '+inttostr(devCompiler.Delay));
-		 Sleep(devCompiler.Delay);
-		 LaunchThread(cmdline, ExtractFilePath(Project.FileName));
-	 end
-	else if (GetFileTyp(fSourceFile) = utRes) then begin
+		DoLogEntry(format(Lang[ID_EXECUTING], [cMake +cDots]));
+		DoLogEntry(cmdline);
+	//	DoLogEntry('Compiler Delay: '+inttostr(devCompiler.Delay));
+		Sleep(devCompiler.Delay);
+		LaunchThread(cmdline, ExtractFilePath(Project.FileName));
+	end else if (GetFileTyp(fSourceFile) = utRes) then begin
 		if (devCompiler.windresName <> '') then
 			s := devCompiler.windresName
 		else
 			s := WINDRES_PROGRAM;
-		cmdline := s + ' --input-format=rc -i ' + fSourceFile + ' -o ' +
-							 ChangeFileExt(fSourceFile, OBJ_EXT);
+		cmdline := s + ' --input-format=rc -i ' + fSourceFile + ' -o ' + ChangeFileExt(fSourceFile, OBJ_EXT);
 		DoLogEntry(format(Lang[ID_EXECUTING], [' ' + s +cDots]));
 		DoLogEntry(cmdline);
-	end
-	else begin
-		 if (GetFileTyp(fSourceFile) = utSrc) and
-				(GetExTyp(fSourceFile) = utCppSrc) then
-			begin
-				if (devCompiler.gppName <> '') then
-					s := devCompiler.gppName
-				else
-					s := GPP_PROGRAM;
-				if DoCheckSyntax then
-						cmdline:= format(cCmdLine,
-							[s, fSourceFile, 'nul', fCppCompileParams,
-							fCppIncludesParams, fLibrariesParams])
-				else
-						cmdline:= format(cCmdLine,
-							[s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT),
-							fCppCompileParams, fCppIncludesParams, fLibrariesParams]);
-				DoLogEntry(format(Lang[ID_EXECUTING], [' ' +s +cDots]));
-				DoLogEntry(cmdline);
-			end
-		 else
-			begin
-				if (devCompiler.gccName <> '') then
-					s := devCompiler.gccName
-				else
-					s := GCC_PROGRAM;
-				if DoCheckSyntax then
-						cmdline:= format(cCmdLine,
-							[s, fSourceFile, 'nul', fCompileParams,
-							fIncludesParams, fLibrariesParams])
-				else
-						cmdline:= format(cCmdLine,
-							[s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT),
-							fCompileParams, fIncludesParams, fLibrariesParams]);
-				DoLogEntry(format(Lang[ID_EXECUTING], [' ' + s + cDots]));
-				DoLogEntry(cmdline);
-			end;
-		 LaunchThread(cmdline, ExtractFilePath(fSourceFile));
+	end else begin
+		if (GetFileTyp(fSourceFile) = utSrc) and (GetExTyp(fSourceFile) = utCppSrc) then begin
+			if (devCompiler.gppName <> '') then
+				s := devCompiler.gppName
+			else
+				s := GPP_PROGRAM;
+			if DoCheckSyntax then
+				cmdline:= format(cCmdLine,[s, fSourceFile, 'nul', fCppCompileParams,fCppIncludesParams, fLibrariesParams])
+			else
+				cmdline:= format(cCmdLine, [s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT),fCppCompileParams, fCppIncludesParams, fLibrariesParams]);
+			DoLogEntry(format(Lang[ID_EXECUTING], [' ' +s +cDots]));
+			DoLogEntry(cmdline);
+		end else begin
+			if (devCompiler.gccName <> '') then
+				s := devCompiler.gccName
+			else
+				s := GCC_PROGRAM;
+			if DoCheckSyntax then
+				cmdline:= format(cCmdLine,[s, fSourceFile, 'nul', fCompileParams,fIncludesParams, fLibrariesParams])
+			else
+				cmdline:= format(cCmdLine,[s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT),fCompileParams, fIncludesParams, fLibrariesParams]);
+			DoLogEntry(format(Lang[ID_EXECUTING], [' ' + s + cDots]));
+			DoLogEntry(cmdline);
+		end;
+		LaunchThread(cmdline, ExtractFilePath(fSourceFile));
 	end;
 end;
 

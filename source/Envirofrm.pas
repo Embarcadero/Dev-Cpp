@@ -366,10 +366,7 @@ begin
 			else
 				Unassociate(idx);
 	except
-		MainForm.MsgBox('Dev-C++ was unable to set file associations.'#13#13 +
-						'This is known to be caused by using UAC on a normal non-admin user account.'#13#10 +
-						'Please disable UAC or run Dev-C++ as an admin if you want to change file associations using Dev-C++. ' +
-						'You might want to try the "Default Programs" feature in Windows Vista or 7.','Access Error');
+		MainForm.MsgBox(Lang[ID_ENV_UACERROR],'Error');
 	end;
 
 	devCVSHandler.Executable:= edCVSExec.Text;

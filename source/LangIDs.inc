@@ -976,7 +976,7 @@ const
   ID_CPU_ASMCODE                   = 2601;
   ID_CPU_FUNC                      = 2602;
   ID_CPU_SYNTAX                    = 2603;
-  ID_CPU_REGISTERS                 = 2604;               
+  ID_CPU_REGISTERS                 = 2604;
 
 { Tip Of The Day }
   ID_TIPS_CAPTION                  = 2700;
@@ -1007,6 +1007,7 @@ const
   ID_ENV_GBALTCONFIG               = 2817;
   ID_ENV_USEALTCONFIG              = 2818;
   ID_ENV_CONFIGCHANGED             = 2819;
+  ID_ENV_UACERROR                  = 2820;
 
 { Execute menu }
   ID_ITEM_EXECPARAMS               = 2900;

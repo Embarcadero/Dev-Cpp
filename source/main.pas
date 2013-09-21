@@ -859,6 +859,8 @@ type
 		procedure actHideFSBarExecute(Sender: TObject);
 
 		function findstatement(var localfind : string; var localfindpoint : TPoint;mousecursor : boolean) : PStatement;
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 
 	private
 		fTab				: integer;
@@ -2932,15 +2934,14 @@ begin
 	// sudo radio with actCompOnNeed
 	MessageControl.TabIndex:= fTab;
 	if AlwaysShowItem.Checked then
-			OpenCloseMessageSheet(TRUE)
+		OpenCloseMessageSheet(TRUE)
 	else if not actCompOnNeed.Checked then
-			OpenCloseMessageSheet(FALSE);
+		OpenCloseMessageSheet(FALSE);
 
 	if actCompOutput.Checked then
-			actCompOnNeed.Checked := False
-	else if (not actCompOutput.Checked) and
-					(not actCompOnNeed.Checked) then
-			OpenCloseMessageSheet(False);
+		actCompOnNeed.Checked := False
+	else if (not actCompOutput.Checked) and (not actCompOnNeed.Checked) then
+		OpenCloseMessageSheet(False);
 	devData.ShowOutput:=actCompOutput.Checked;
 	devData.OutputOnNeed:=actCompOnNeed.Checked;
 end;
@@ -6547,10 +6548,10 @@ begin
 		// Als we uiteindelijk nog steeds niks hebben gevonden, scan de functie voor locals
 		if (isglobal) then begin
 			cpos := e.Text.RowColToCharIndex(cursorpos);
-			text := Copy(e.Text.Text,cpos-512,512);
+			text := Copy(e.Text.Text,cpos-1024-Length(member),min(cpos,1024));
 			wantbrace := 0;
 			wantquote := false;
-			for I:=Length(text) downto 0 do begin
+			for I:=Length(text) downto 1 do begin
 
 				// Skip strings
 				if text[I] = '"' then
@@ -6570,24 +6571,37 @@ begin
 				if parampos = 0 then parampos := AnsiPos('	' + member,text);
 				if parampos = 0 then parampos := AnsiPos('	*' + member,text);
 				if parampos = 0 then parampos := AnsiPos('	&' + member,text);
-				if parampos = I then begin
+				if (parampos = I) then begin
 
-					// Type bepalen...
+					// Type bepalen, doorgaan tot blank
 					len := 0;
 					repeat
 						Inc(len);
-					until not (text[I-len] in [#65..#90,#97..#122]);
+					until not (text[parampos-len] in [#65..#90,#97..#122,'#']);
+
+					// Kijken wat we gevonden hebben...
+					len2 := 0;
+					if AnsiStartsStr('#',text[parampos-len+1]) then begin
+
+						// Define gevonden
+						repeat
+							Inc(len2);
+						until (text[parampos+len2] in [#10,'#']);
+					end else begin
+
+						// Daarna vooruit door tot = of [ of ;
+						repeat
+							Inc(len2);
+						until (text[parampos+len2] in ['#','{',';','=',')',',']);
+					end;
 
 					// Als er wat zinnigs staat
 					if len > 2 then begin
-					//	localfind := Copy(text,parampos+1-len,len-1);
-					//	if (localfind <> 'new') and (localfind <> 'delete') then begin
-							localfind := Trim(Copy(text,parampos+1-len,Length(member)+len+1));
-							localfindpoint.x := e.Text.CharIndexToRowCol(cpos-(512-I)).Char-1;
-							localfindpoint.y := e.Text.CharIndexToRowCol(cpos-(512-I)).Line;
-							Screen.Cursor := crDefault;
-							Exit;
-					//	end;
+						localfind := Trim(Copy(text,parampos-len+1,len+len2-1));
+						localfindpoint.x := e.Text.CharIndexToRowCol(cpos-1024+I).Char-1;
+						localfindpoint.y := e.Text.CharIndexToRowCol(cpos-1024+I).Line;
+						Screen.Cursor := crDefault;
+						Exit;
 					end;
 				end;
 			end;
@@ -6622,11 +6636,11 @@ begin
 
 			if AnsiCompareStr(compareto,comparewith)=0 then begin
 				Result := PStatement(CppParser1.Statements[I]);
-				Screen.Cursor := crDefault;
 				Break;
 			end;
 		end;
 	end;
+	Screen.Cursor := crDefault;
 end;
 
 procedure TMainForm.actGotoImplDeclEditorExecute(Sender: TObject);
@@ -6694,6 +6708,47 @@ begin
 			pnlFull.Height := 0
 		else
 			pnlFull.Height := 16;
+end;
+
+procedure TMainForm.FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+var
+	e : TEditor;
+	State : TKeyboardState;
+	I : integer;
+begin
+
+	// Check if control is pressed
+	GetKeyboardState(State);
+	e := GetEditor;
+
+	// Check if we're focussing on an editor
+	if (Screen.ActiveControl = e.Text) and ((State[vk_Control] and 128) <> 0) then begin
+
+		for I:=0 to pred(PageControl.PageCount) do begin
+			e := GetEditor(I);
+
+			// If so, set the font size of all editors...
+			if WheelDelta > 0 then begin
+				e.Text.Font.Size := Max(1,e.Text.Font.Size + 1);
+				e.Text.Gutter.Font.Size := Max(1,e.Text.Gutter.Font.Size + 1);
+			end else if WheelDelta < 0 then begin
+				e.Text.Font.Size := Max(1,e.Text.Font.Size - 1);
+				e.Text.Gutter.Font.Size := Max(1,e.Text.Gutter.Font.Size - 1);
+			end;
+		end;
+
+		// And set the corresponding option
+		if WheelDelta > 0 then begin;
+			devEditor.Font.Size := Max(1,devEditor.Font.Size + 1);
+			devEditor.Gutterfont.Size := Max(1,devEditor.Gutterfont.Size + 1);
+		end else if WheelDelta < 0 then begin
+			devEditor.Font.Size := Max(1,devEditor.Font.Size - 1);
+			devEditor.Gutterfont.Size := Max(1,devEditor.Gutterfont.Size - 1);
+		end;
+
+		// We don't like to send the actual scrolling message to the editor
+		Abort;
+	end;
 end;
 
 end.
