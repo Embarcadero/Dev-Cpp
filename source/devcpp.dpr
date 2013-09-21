@@ -87,7 +87,6 @@ uses
   ParamsFrm in 'ParamsFrm.pas' {ParamsForm},
   CompOptionsFrame in 'CompOptionsFrame.pas' {CompOptionsFrame: TFrame},
   CompOptionsFrm in 'CompOptionsFrm.pas' {CompOptionsForm},
-  CompileProgressFrm in 'CompileProgressFrm.pas' {CompileProgressForm},
   WebThread in 'Tools\webupdate\WebThread.pas',
   WebUpdate in 'Tools\webupdate\WebUpdate.pas' {WebUpdateForm},
   ProcessListFrm in 'ProcessListFrm.pas' {ProcessListForm},

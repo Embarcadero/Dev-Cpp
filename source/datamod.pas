@@ -80,7 +80,7 @@ type
     procedure SaveHistory;
   public
     procedure RebuildMRU;
-    procedure AddtoHistory(const s: AnsiString;rebuildmenu : boolean);
+    procedure AddtoHistory(const s: AnsiString);
     procedure RemoveFromHistory(const s: AnsiString);
     procedure ClearHistory;
     property MRUMenu: TMenuItem read fMRUMenu write fMRUMenu;
@@ -255,7 +255,7 @@ end;
 
  { ---------- MRU ---------- }
 
-procedure TdmMain.AddtoHistory(const s: AnsiString;rebuildmenu : boolean);
+procedure TdmMain.AddtoHistory(const s: AnsiString);
 var
 	I: integer;
 	newitem : PMRUItem;
@@ -275,8 +275,7 @@ begin
 	// insert first
 	fMRU.Insert(0, newitem);
 
-	if rebuildmenu then
-		RebuildMRU;
+	RebuildMRU;
 end;
 
 procedure TdmMain.RemoveFromHistory(const s: AnsiString);
@@ -330,8 +329,9 @@ end;
 
 procedure TdmMain.LoadHistory;
 var
-	I: integer;
+	I,J: integer;
 	sl : TStringList;
+	newitem : PMRUItem;
 begin
 	sl := TStringList.Create;
 	try
@@ -344,10 +344,24 @@ begin
 			if not FileExists(sl.ValueFromIndex[I]) then
 				sl.Delete(I);
 
-		// Create struct list
-		for I := 0 to sl.Count - 1 do
-			AddtoHistory(sl.ValueFromIndex[i],false); // reuse
+		// Remove duplicates
+		for I := 0 to sl.Count - 1 do begin
+			J := I + 1;
+			while J < sl.Count do begin
+				if(sl.ValueFromIndex[i] = sl.ValueFromIndex[j]) then
+					sl.Delete(j)
+				else
+					Inc(j);
+			end;
+		end;
 
+		// Create struct list
+		for I := 0 to sl.Count - 1 do begin
+			newitem := new(PMRUItem);
+			newitem^.filename := sl.ValueFromIndex[i];
+			newitem^.MenuItem := nil; // to be filled by RebuildMRU
+			fMRU.Add(newitem);
+		end;
 	finally
 		sl.Free;
 	end;
@@ -378,6 +392,7 @@ procedure TdmMain.RebuildMRU;
 var
 	i,startidx,count: integer;
 	Parent,Item,TopSep,BottomSep: TMenuItem;
+	fNewMRU: TList;
 begin
 	// Delete all menu items
 	for I:= 0 to fMRU.Count - 1 do
@@ -386,12 +401,16 @@ begin
 	// Remove deleted files
 	FilterHistory;
 
+	// Determine where in the main menu to dump our list
 	Parent := fMRUMenu.Parent;
 	startidx := Parent.IndexOf(fMRUMenu) - 1; // start above
 	if startidx = -1 then Exit; // no menu item given?
 
 	TopSep := Parent[startidx-1];
 	BottomSep := Parent[startidx];
+
+	// Only save what is currently visible
+	fNewMRU := TList.Create;
 
 	// Add menu items up to MRUmax
 	count := 0;
@@ -408,6 +427,7 @@ begin
 			// Hand a pointer to the MRU item, so it can remove it itself
 			PMRUItem(fMRU[I])^.MenuItem := Item;
 
+			fNewMRU.Add(fMRU[I]);
 			Inc(count);
 			if count = devData.MRUMax then
 				break;
@@ -427,6 +447,7 @@ begin
 				// Hand a pointer to the MRU item, so it can remove it itself
 				PMRUItem(fMRU[I])^.MenuItem := Item;
 
+				fNewMRU.Add(fMRU[I]);
 				Inc(count);
 				if count = devData.MRUMax then
 					break;
@@ -438,6 +459,10 @@ begin
 	TopSep.Visible := (count > 0);
 	BottomSep.Visible := (count > 0);
 	fMRUMenu.Visible := (count > 0);
+
+	// update MRU
+	fMRU.Assign(fNewMRU);
+	fNewMRU.Free;
 end;
 
 { ---------- Code Insert Methods ---------- }

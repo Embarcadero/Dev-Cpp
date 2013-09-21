@@ -61,6 +61,7 @@ type
     fIgnoreCaretChange : boolean;
     fPreviousTabs : TList; // list of editor pointers
     fDblClickTime : Cardinal;
+    fDblClickLine : integer;
 
     fCompletionTimer: TTimer;
     fCompletionBox: TCodeCompletion;
@@ -133,7 +134,8 @@ type
 
     function EvaluationPhrase(p : TBufferCoord): AnsiString;
     function CompletionPhrase(p : TBufferCoord): AnsiString;
-
+    function GetFullFileName(const Line: AnsiString): AnsiString;
+  
     procedure CommentSelection;
     procedure UncommentSelection;
     procedure IndentSelection;
@@ -347,7 +349,8 @@ end;
 
 destructor TEditor.Destroy;
 var
-	I, CurIndex: integer;
+	I: integer;
+	CurPage : TTabSheet;
 	e: TEditor;
 begin
 	// Deactivate the file change monitor
@@ -381,9 +384,9 @@ begin
 				end;
 			end;
 		end else begin // we are not the active page
-			CurIndex := ActivePageIndex; // remember active page index
+			CurPage := ActivePage; // remember active page index
 			fTabSheet.Free; // remove old
-			ActivePageIndex := max(0,CurIndex - 1);
+			ActivePage := CurPage;
 		end;
 	end;
 	fPreviousTabs.Free;
@@ -540,7 +543,8 @@ end;
 
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
-	if scModified in Changes then begin // scModified is only fired when the modified state changes
+	// scModified is only fired when the modified state changes
+	if scModified in Changes then begin
 		if fText.Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
 			UpdateCaption('[*] ' + ExtractfileName(fFileName));
@@ -828,9 +832,12 @@ end;
 
 procedure TEditor.UpdateCaption(const NewCaption: AnsiString);
 begin
-	if assigned(fTabSheet) then
-		fTabSheet.Caption:= NewCaption;
-	MainForm.UpdateAppTitle;
+	if Assigned(fTabSheet) then begin // not needed?
+		if NewCaption <> fTabSheet.Caption then begin
+			fTabSheet.Caption:= NewCaption;
+			MainForm.UpdateAppTitle;
+		end;
+	end;
 end;
 
 procedure TEditor.SetFileName(const value: AnsiString);
@@ -1269,6 +1276,38 @@ begin
 	Delete(Result,1,curpos-1);
 end;
 
+function TEditor.GetFullFileName(const Line: AnsiString) : AnsiString;
+var
+	walker, start: integer;
+	filename : AnsiString;
+begin
+	walker := 0;
+	repeat
+		Inc(walker);
+	until (walker = Length(line)) or (line[walker] in ['<','"']);
+	start := walker + 1;
+
+	repeat
+		Inc(walker);
+	until (walker = Length(line)) or (line[walker] in ['>','"']);
+
+	filename := Copy(line, start, walker-start);
+	if Length(filename) = 0 then begin
+		result := '';
+		exit;
+	end;
+
+	// assume std:: C++ header
+	if (filename[1] = 'c') and (Pos('.h',filename) = 0) then begin
+		Delete(filename,1,1); // remove 'c'
+		filename := filename + '.h';
+	end;
+
+	result := MainForm.CppParser.GetFullFileName(filename);
+	if result = ExtractFileName(filename) then // no path info, so prepend path of active file
+		result := ExtractFilePath(fFileName) + filename;
+end;
+
 procedure TEditor.CompletionInsert(const append: AnsiString);
 var
 	Statement: PStatement;
@@ -1311,6 +1350,7 @@ end;
 procedure TEditor.EditorDblClick(Sender: TObject);
 begin
 	fDblClickTime := GetTickCount;
+	fDblClickLine := fText.CaretY;
 end;
 
 procedure TEditor.EditorClick(Sender: TObject);
@@ -1319,7 +1359,7 @@ var
 	fNewState: TSynStateFlags;
 begin
 	fTripleClickTime := GetTickCount;
-	if (fTripleClickTime > fDblClickTime) and (fTripleClickTime - GetDoubleClickTime < fDblClickTime) then begin
+	if (fTripleClickTime > fDblClickTime) and (fTripleClickTime - GetDoubleClickTime < fDblClickTime) and (fText.CaretY = fDblClickLine) then begin
 
 		// Don't let the editor change the caret
 		fNewState := fText.StateFlags;
@@ -1339,10 +1379,58 @@ end;
 
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
-	s : AnsiString;
+	s,Line : AnsiString;
 	p : TBufferCoord;
 	st: PStatement;
 	M : TMemoryStream;
+
+	procedure ShowFileHint;
+	var
+		FileName: AnsiString;
+	begin
+		FileName := GetFullFileName(fText.Lines[p.Line - 1]);
+		if FileName <> '' then
+			fText.Hint := FileName + ' - Ctrl+Click to follow'
+		else
+			fText.Hint := '';
+	end;
+
+	procedure ShowParserHint;
+	begin
+		// When debugging, evaluate stuff under cursor, and optionally add to watch list
+		if MainForm.fDebugger.Executing then begin
+
+			// Add to list
+			if devData.WatchHint then
+				MainForm.fDebugger.AddWatchVar(s);
+
+			// Evaluate s
+			fCurrentEvalWord := EvaluationPhrase(p);
+			MainForm.fDebugger.OnEvalReady := OnMouseOverEvalReady;
+			MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
+
+		// Otherwise, parse code and show information about variable
+		end else if devEditor.ParserHints and fText.Focused then begin
+
+			// This piece of code changes the parser database, possibly making hints and code completion invalid...
+			M := TMemoryStream.Create;
+			try
+				fText.UnCollapsedLines.SaveToStream(M);
+				st := MainForm.CppParser.FindStatementOf(fFileName,CompletionPhrase(p),p.Line,M);
+			finally
+				M.Free;
+			end;
+
+			if Assigned(st) then begin
+				if st^._ClassScope <> scsNone then
+					fText.Hint := MainForm.CppParser.StatementClassScopeStr(st^._ClassScope) + ' ' + st^._ScopeCmd + st^._MethodArgs + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow'
+				else
+					fText.Hint := Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow';
+			end else
+				// couldn't find anything? disable hint
+				fText.Hint := '';
+		end;
+	end;
 
 	procedure CancelHint;
 	begin
@@ -1378,39 +1466,12 @@ begin
 			else
 				fText.Cursor:=crIBeam;
 
-			// When debugging, evaluate stuff under cursor, and optionally add to watch list
-			if MainForm.fDebugger.Executing then begin
-
-				// Add to list
-				if devData.WatchHint then
-					MainForm.fDebugger.AddWatchVar(s);
-
-				// Evaluate s
-				fCurrentEvalWord := EvaluationPhrase(p);
-				MainForm.fDebugger.OnEvalReady := OnMouseOverEvalReady;
-				MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
-
-			// Otherwise, parse code and show information about variable
-			end else if devEditor.ParserHints and fText.Focused then begin
-
-				// This piece of code changes the parser database, possibly making hints and code completion invalid...
-				M := TMemoryStream.Create;
-				try
-					fText.UnCollapsedLines.SaveToStream(M);
-					st := MainForm.CppParser.FindStatementOf(fFileName,CompletionPhrase(p),p.Line,M);
-				finally
-					M.Free;
-				end;
-
-				if Assigned(st) then begin
-					if st^._ClassScope <> scsNone then
-						fText.Hint := MainForm.CppParser.StatementClassScopeStr(st^._ClassScope) + ' ' + Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow'
-					else
-						fText.Hint := Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow';
-				end else
-					// couldn't find anything? disable hint
-					fText.Hint := '';
-			end;
+			// Either show an include filename or parser info
+			Line := Trim(fText.Lines[p.Line -1]);
+			if StartsStr('#include',line) then // show filename hint
+				ShowFileHint
+			else
+				ShowParserHint;
 		end;
 	end else begin
 		fText.Cursor:=crIBeam;
@@ -1594,8 +1655,7 @@ end;
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
 var
 	p: TDisplayCoord;
-	line,fname,headername: AnsiString;
-	walker,start : integer;
+	line,FileName: AnsiString;
 	e : TEditor;
 begin
 	// if ctrl+clicked
@@ -1607,34 +1667,13 @@ begin
 			// reset the cursor
 			fText.Cursor := crIBeam;
 
+			// Try to open the header
 			line := Trim(fText.Lines[p.Row-1]);
 			if StartsStr('#include',line) then begin
-
-				// We've clicked an #include...
-				walker := 0;
-				repeat
-					Inc(walker);
-				until (walker = Length(line)) or (line[walker] in ['<','"']);
-				start := walker + 1;
-
-				repeat
-					Inc(walker);
-				until (walker = Length(line)) or (line[walker] in ['>','"']);
-
-				headername := Copy(line, start, walker-start);
-
-				// assume std:: C++ header
-				if (headername[1] = 'c') and (Pos('.h',headername) = 0) then begin
-					Delete(headername,1,1); // remove 'c'
-					headername := headername + '.h';
-				end;
-
-				fname := MainForm.CppParser.GetFullFileName(headername);
-				if fname = ExtractFileName(fname) then // no path info, so prepend path of active file
-					fname := ExtractFilePath(fFileName)+fname;
+				FileName := GetFullFileName(line);
 
 				// refer to the editor of the filename (will open if needed and made active)
-				e:=MainForm.GetEditorFromFileName(fname);
+				e := MainForm.GetEditorFromFileName(FileName);
 				if Assigned(e) then
 					e.SetCaretPos(1,1);
 			end else

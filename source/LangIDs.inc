@@ -935,6 +935,11 @@ const
   ID_SEARCHCOUNT                        = 62021;
   ID_DONEPARSINGIN                      = 62022;
   ID_DONEPARSINGHINT                    = 62023;
+  ID_COMPILEFAILSEC                     = 62024;
+  ID_COMPILEABORTSEC                    = 62025;
+  ID_COMPILESUCCESSSEC                  = 62026;
+  ID_COMPILEWARNINGS                    = 62027;
+  ID_COMPILEERRORS                      = 62028;
 
   ID_BTN_OK                             = 63001;
   ID_BTN_CANCEL                         = 63002;

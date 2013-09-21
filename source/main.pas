@@ -87,10 +87,6 @@ type
     ViewMenu: TMenuItem;
     ProjectManagerItem: TMenuItem;
     StatusbarItem: TMenuItem;
-    CompileroutputItem: TMenuItem;
-    AlwaysShowItem: TMenuItem;
-    N37: TMenuItem;
-    ShowonlywhenneededItem: TMenuItem;
     ToolbarsItem: TMenuItem;
     ToolMainItem: TMenuItem;
     ToolCompileandRunItem: TMenuItem;
@@ -218,8 +214,6 @@ type
     actGotoLine: TAction;
     actProjectManager: TAction;
     actStatusbar: TAction;
-    actCompOutput: TAction;
-    actCompOnNeed: TAction;
     actProjectNew: TAction;
     actProjectAdd: TAction;
     actProjectRemove: TAction;
@@ -294,8 +288,8 @@ type
     N23: TMenuItem;
     Swapheadersource2: TMenuItem;
     actSwapHeaderSource: TAction;
-    SizeFile: TEdit;
-    TotalErrors: TEdit;
+    edSizeFile: TEdit;
+    edTotalErrors: TEdit;
     InsertItem: TMenuItem;
     SyntaxCheckItem: TMenuItem;
     actSyntaxCheck: TAction;
@@ -557,7 +551,7 @@ type
     MsgSellAllItem: TMenuItem;
     actMsgSelAll: TAction;
     WarningLabel: TLabel;
-    TotalWarnings: TEdit;
+    edTotalWarnings: TEdit;
     actNewClass: TAction;
     actSearchAgain: TAction;
     actSearchAgain1: TMenuItem;
@@ -574,6 +568,7 @@ type
     actRevSearchAgain: TAction;
     SearchAgainBackwards1: TMenuItem;
     actDeleteLine: TAction;
+    pbCompilation: TProgressBar;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -613,8 +608,6 @@ type
     procedure actSelectAllExecute(Sender: TObject);
     procedure actProjectManagerExecute(Sender: TObject);
     procedure actStatusBarExecute(Sender: TObject);
-    procedure actCompOutputExecute(Sender: TObject);
-    procedure actCompOnNeedExecute(Sender: TObject);
     procedure actFullScreenExecute(Sender: TObject);
     procedure actNextExecute(Sender: TObject);
     procedure actPrevExecute(Sender: TObject);
@@ -1234,10 +1227,7 @@ begin
 	// View Menu
 	actProjectManager.Caption:=			Lang[ID_ITEM_PROJECTVIEW];
 	actStatusbar.Caption:=				Lang[ID_ITEM_Statusbar];
-	CompilerOutputItem.Caption:=		Lang[ID_SUB_COMPOUTPUT];
 	ToolBarsItem.Caption:=				Lang[ID_SUB_TOOLBARS];
-	actCompOutput.Caption:=				Lang[ID_ITEM_COMPOUTALWAYS];
-	actCompOnNeed.Caption:=				Lang[ID_ITEM_COMPOUTONNEED];
 
 	ToolMainItem.Caption:=				Lang[ID_TOOLMAIN];
 	ToolEditItem.Caption:=				Lang[ID_TOOLEDIT];
@@ -1463,7 +1453,7 @@ begin
 			if projindex <> -1 then
 				fProject.CloseUnit(projindex);
 		end else begin
-			dmMain.AddtoHistory(e.FileName,true);
+			dmMain.AddtoHistory(e.FileName);
 			FreeAndNil(e);
 		end;
 
@@ -1809,13 +1799,8 @@ var
 	HasSize : boolean;
 	I: integer;
 begin
-
-	// Set UI data...
-	TotalErrors.Text := IntToStr(fCompiler.ErrorCount);
-	TotalWarnings.Text := IntToStr(fCompiler.WarningCount);
-
 	// Close it if there's nothing to show
-	if (CompilerOutput.Items.Count = 0) and (ResourceOutput.Items.Count = 0) and actCompOnNeed.Checked then begin
+	if (CompilerOutput.Items.Count = 0) and (ResourceOutput.Items.Count = 0) and devData.AutoCloseProgress then begin
 		OpenCloseMessageSheet(FALSE)
 
 	// Or open it if there is anything to show
@@ -1844,15 +1829,15 @@ begin
 		// Format nicely so it fits in the edit control
 		if HasSize then begin
 			if F.Size < 1024 then
-				SizeFile.Text := IntToStr(F.Size) + ' ' + Lang[ID_BYTES]
+				edSizeFile.Text := IntToStr(F.Size) + ' ' + Lang[ID_BYTES]
 			else if F.Size < 1024*1024 then
-				SizeFile.Text := FloatToStr(F.Size/1024) + ' KiB'
+				edSizeFile.Text := FloatToStr(F.Size/1024) + ' KiB'
 			else if F.Size < 1024*1024*1024 then
-				SizeFile.Text := FloatToStr((F.Size/1024)/1024) + ' MiB'
+				edSizeFile.Text := FloatToStr((F.Size/1024)/1024) + ' MiB'
 			else
-				SizeFile.Text := FloatToStr(((F.Size/1024)/1024)/1024) + ' GiB';
+				edSizeFile.Text := FloatToStr(((F.Size/1024)/1024)/1024) + ' GiB';
 		end else
-			SizeFile.Text := '0';
+			edSizeFile.Text := '0';
 
 	end else begin
 
@@ -2203,7 +2188,7 @@ begin
 	end;
 
 	fCompiler.Project:= nil;
-	dmMain.AddtoHistory(fProject.FileName,true);
+	dmMain.AddtoHistory(fProject.FileName);
 
 	FreeandNil(fProject);
 	ProjectView.Items.Clear;
@@ -2395,29 +2380,6 @@ begin
 	devData.Statusbar:= actStatusbar.Checked;
 	Statusbar.Visible:= actStatusbar.Checked;
 	Statusbar.Top:= Self.ClientHeight;
-end;
-
-procedure TMainForm.actCompOutputExecute(Sender: TObject);
-begin
-	if AlwaysShowItem.Checked then
-		OpenCloseMessageSheet(TRUE)
-	else if not actCompOnNeed.Checked then
-		OpenCloseMessageSheet(FALSE);
-
-	if actCompOutput.Checked then
-		actCompOnNeed.Checked := False
-	else if (not actCompOutput.Checked) and (not actCompOnNeed.Checked) then
-		OpenCloseMessageSheet(False);
-	devData.ShowOutput:=actCompOutput.Checked;
-	devData.OutputOnNeed:=actCompOnNeed.Checked;
-end;
-
-procedure TMainForm.actCompOnNeedExecute(Sender: TObject);
-begin
-	if actCompOnNeed.Checked or ((not actCompOutput.Checked) and (not actCompOnNeed.Checked)) then
-		OpenCloseMessageSheet(False);
-	devData.ShowOutput:=actCompOutput.Checked;
-	devData.OutputOnNeed:=actCompOnNeed.Checked;
 end;
 
 procedure TMainForm.btnFullScrRevertClick(Sender: TObject);
@@ -2835,12 +2797,12 @@ begin
 	end;
 
 	ClearCompileMessages;
-	SizeFile.Text := '0';
-	TotalErrors.Text := '0';
-	TotalWarnings.Text := '0';
+	edSizeFile.Text := '0';
+	edTotalErrors.Text := '0';
+	edTotalWarnings.Text := '0';
 
-	// if no compile progress window, open the compiler output
-	if not devData.ShowProgress then begin
+	// always show compilation log (no intrusive windows anymore)
+	if devData.ShowProgress then begin
 		OpenCloseMessageSheet(True);
 		MessageControl.ActivePage:= LogSheet;
 	end;
@@ -3248,12 +3210,12 @@ begin
 		1:
 			Clipboard.AsText := GetPrettyLine(ResourceOutput);
 		2: begin
-			if TotalErrors.Focused then
-				TotalErrors.CopyToClipboard
-			else if TotalWarnings.Focused then
-				TotalWarnings.CopyToClipboard
-			else if SizeFile.Focused then
-				SizeFile.CopyToClipboard
+			if edTotalErrors.Focused then
+				edTotalErrors.CopyToClipboard
+			else if edTotalWarnings.Focused then
+				edTotalWarnings.CopyToClipboard
+			else if edSizeFile.Focused then
+				edSizeFile.CopyToClipboard
 			else if LogOutput.Focused then
 				LogOutput.CopyToClipboard;
 		end;
@@ -3323,12 +3285,12 @@ procedure TMainForm.actMsgSelAllExecute(Sender: TObject);
 begin
 	case MessageControl.ActivePageIndex of
 		2: begin
-			if TotalErrors.Focused then
-				TotalErrors.SelectAll
-			else if TotalWarnings.Focused then
-				TotalWarnings.SelectAll
-			else if SizeFile.Focused then
-				SizeFile.SelectAll
+			if edTotalErrors.Focused then
+				edTotalErrors.SelectAll
+			else if edTotalWarnings.Focused then
+				edTotalWarnings.SelectAll
+			else if edSizeFile.Focused then
+				edSizeFile.SelectAll
 			else if LogOutput.Focused then
 				LogOutput.SelectAll;
 		end;
@@ -5983,8 +5945,6 @@ begin
 		FloatingReportwindowItem.Click;
 		devData.ReportWindowState.SetPlacement(fReportToolWindow.Handle);
 	end;
-	actCompOnNeed.Checked:=devData.OutputOnNeed;
-	actCompOutput.Checked:=devData.ShowOutput;
 
 	// Set statusbar to previous state
 	actStatusbar.Checked:= devData.Statusbar;
@@ -6038,6 +5998,8 @@ begin
 		Lang.SelectLanguage
 	else
 		Lang.Open(devData.Language);
+
+	UpdateSplash('Applying translation...');
 
 	// Load bookmarks, captions and hints
 	LoadText;
@@ -6150,7 +6112,7 @@ begin
 			Exit;
 		end;
 
-		OpenCloseMessageSheet(devData.ShowOutput);
+		OpenCloseMessageSheet(false);
 
 		// Toolbar positions, needs to be done here, because on Create, the width of the TControlBar isn't yet set
 		tbMain.Left:= devData.ToolbarMainX;

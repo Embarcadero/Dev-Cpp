@@ -47,7 +47,7 @@ object MainForm: TMainForm
     Top = 433
     Width = 896
     Height = 183
-    ActivePage = DebugSheet
+    ActivePage = LogSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -187,7 +187,7 @@ object MainForm: TMainForm
           Height = 13
           Caption = 'Total warnings:'
         end
-        object SizeFile: TEdit
+        object edSizeFile: TEdit
           Left = 96
           Top = 56
           Width = 128
@@ -196,7 +196,7 @@ object MainForm: TMainForm
           TabOrder = 1
           Text = '0'
         end
-        object TotalErrors: TEdit
+        object edTotalErrors: TEdit
           Left = 96
           Top = 8
           Width = 128
@@ -205,7 +205,7 @@ object MainForm: TMainForm
           TabOrder = 0
           Text = '0'
         end
-        object TotalWarnings: TEdit
+        object edTotalWarnings: TEdit
           Left = 96
           Top = 32
           Width = 128
@@ -213,6 +213,14 @@ object MainForm: TMainForm
           ReadOnly = True
           TabOrder = 2
           Text = '0'
+        end
+        object pbCompilation: TProgressBar
+          Left = 8
+          Top = 118
+          Width = 218
+          Height = 21
+          Step = 1
+          TabOrder = 3
         end
       end
       object CompResGroupBox: TPanel
@@ -238,6 +246,7 @@ object MainForm: TMainForm
           ReadOnly = True
           ScrollBars = ssBoth
           TabOrder = 0
+          WantTabs = True
           WordWrap = False
         end
       end
@@ -249,13 +258,13 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 299
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           299
-          155)
+          154)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -277,7 +286,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 292
-          Height = 111
+          Height = 107
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -289,7 +298,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 589
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -297,7 +306,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           589
-          155)
+          154)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -443,7 +452,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 40
+          Height = 36
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -483,7 +492,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -1354,23 +1363,6 @@ object MainForm: TMainForm
       object StatusbarItem: TMenuItem
         Action = actStatusbar
         AutoCheck = True
-      end
-      object CompileroutputItem: TMenuItem
-        Caption = '&Compiler Output'
-        object AlwaysShowItem: TMenuItem
-          Action = actCompOutput
-          AutoCheck = True
-          GroupIndex = 1
-        end
-        object N37: TMenuItem
-          Caption = '-'
-          GroupIndex = 1
-        end
-        object ShowonlywhenneededItem: TMenuItem
-          Action = actCompOnNeed
-          AutoCheck = True
-          GroupIndex = 1
-        end
       end
       object ToolbarsItem: TMenuItem
         Caption = '&Toolbars'
@@ -2280,20 +2272,6 @@ object MainForm: TMainForm
       AutoCheck = True
       Caption = '&Statusbar'
       OnExecute = actStatusbarExecute
-    end
-    object actCompOutput: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = '&Always show Compiler Output'
-      GroupIndex = 2
-      OnExecute = actCompOutputExecute
-    end
-    object actCompOnNeed: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = '&Show only when needed'
-      GroupIndex = 2
-      OnExecute = actCompOnNeedExecute
     end
     object actProjectNew: TAction
       Tag = 1

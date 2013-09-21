@@ -464,7 +464,7 @@ var
 	InsideString : boolean;
 	HLAttr: TSynHighlighterAttributes;
 begin
-	Result := 4; // left offset in pixels
+	Result := 8; // some margin on the left and right sides
 
 	// when more than one tooltip is in the list
 	// we must draw the buttons as well ...
@@ -533,6 +533,7 @@ begin
 		Brush.Color := TColor($E1FFFF);
 		FillRect(ClientRect);
 		Brush.Style := bsClear;
+		Font.Style := [];
 	end;
 
 	WidthParam := 4; // left offset in pixels
@@ -807,11 +808,11 @@ begin
 		S := FToolTips.Strings[FSelIndex];
 
 	// set the hint caption
-	Caption := S;
+	Caption := Trim(S);
 
 	// we use the LookupEditor to get the highlighter-attributes
 	// from. check the DrawAdvanced method!
-	FLookupEditor.Text := S;
+	FLookupEditor.Text := Caption;
 	FLookupEditor.Highlighter := FEditor.Highlighter;
 
 	// get the index of the current argument (where the cursor is)

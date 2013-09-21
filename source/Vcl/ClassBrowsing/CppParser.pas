@@ -2281,7 +2281,7 @@ begin
 			fIncludesList.Add(P);
 		end;
 	finally
-		Free; // cache file
+		Free; // cache file TMemoryStream, not 'this'
 		fNextID := fStatementList.Count;
 		fBaseIndex := fStatementList.Count;
 		fScannedBaseIndex := fCacheContents.Count;
@@ -2840,7 +2840,7 @@ begin
 				SameStr(Full + 'W', st^._ScopelessCmd)
 			then begin
 				if st^._ClassScope <> scsNone then
-					List.Add(StatementClassScopeStr(st^._ClassScope) + ' ' + st^._FullText)
+					List.Add(StatementClassScopeStr(st^._ClassScope) + ' ' + st^._ScopeCmd + st^._MethodArgs)
 				else
 					List.Add(st^._FullText);
 			end;

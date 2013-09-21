@@ -251,7 +251,6 @@ object ToolEditForm: TToolEditForm
     Height = 23
     AutoSize = False
     Color = clBtnFace
-    Enabled = False
     ReadOnly = True
     TabOrder = 9
   end

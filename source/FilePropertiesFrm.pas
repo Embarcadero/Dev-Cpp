@@ -261,16 +261,15 @@ begin
 		for I := 0 to cmbfiles.Items.Count - 1 do begin
 
 			// Get file name
-			if Assigned(cmbFiles.Items.Objects[I]) then
-				loopfilename := TProjUnit(cmbFiles.Items.Objects[I]).FileName
-			else
-				loopfilename := cmbFiles.Items[I];
-
-			if not SameStr('.dev',ExtractFileExt(loopfilename)) then begin
-				try
-					fEdit.Lines.LoadFromFile(loopfilename);
-					CalculateFile(loopfilename);
-				except end;
+			if Assigned(cmbFiles.Items.Objects[I]) then begin // only count project files
+				loopfilename := TProjUnit(cmbFiles.Items.Objects[I]).FileName;
+				if not SameStr('.dev',ExtractFileExt(loopfilename)) then begin
+					try
+						fEdit.Lines.LoadFromFile(loopfilename);
+						CalculateFile(loopfilename);
+					except
+					end;
+				end;
 			end;
 		end;
 
@@ -320,8 +319,8 @@ var
 	idx: integer;
 	e: TEditor;
 begin
-	cmbFiles.Clear;
 	cmbFiles.Items.BeginUpdate;
+	cmbFiles.Clear;
 
 	// add all project files
 	if Assigned(MainForm.fProject) then begin
@@ -340,7 +339,7 @@ begin
 			cmbFiles.Items.Add(e.FileName);
 	end;
 
-	// Highlight current file 
+	// Highlight current file
 	idx := cmbFiles.Items.IndexOf(ExtractFileName(fFilename));
 	if idx = -1 then
 		idx := cmbFiles.Items.IndexOf(fFilename);

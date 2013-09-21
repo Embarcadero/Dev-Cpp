@@ -429,8 +429,6 @@ type
     fShowLeftPages: boolean;          // Show the left page control
     fProjectWidth: integer;           // Width of project browser
     fLeftActivePage: integer;         // 0 == project, 1 == class, 2 == debug
-    fOutput: boolean;                 // show compiler message window
-    fOutputOnNeed: boolean;           // show compiler messages only when problem
     fOutputHeight: integer;           // the height of the output window
     fStatusbar: boolean;              // Statusbar Visible
     fFullScr: boolean;                // IDE is Full screen
@@ -552,8 +550,6 @@ type
 
     //Running Status Options
     property DefCpp: boolean read fDefCpp write fDefCpp;
-    property ShowOutput: boolean read fOutput write fOutput;
-    property OutputOnNeed: boolean read fOutputOnNeed write fOutputOnNeed;
     property OutputHeight: integer read fOutputHeight write fOutputHeight;
     property ShowLeftPages: boolean read fShowLeftPages write fShowLeftPages;
     property LeftActivePage: integer read fLeftActivePage write fLeftActivePage;
@@ -836,8 +832,6 @@ begin
   fShowLeftPages:= TRUE;
   fLeftActivePage:= 0;
   fProjectWidth:=161;
-  fOutput:= FALSE;
-  fOutputOnNeed:= TRUE;
   fOutputHeight:=183;
   fStatusbar:= TRUE;
   fShowBars:= FALSE;

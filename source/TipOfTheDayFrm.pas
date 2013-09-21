@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, ShellAPI;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, Math, ShellAPI;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -179,7 +179,7 @@ begin
 	Randomize;
 	repeat
 		// Make sure the same tip is never shown twice in a row
-		newval := 1 + Random(sl.Count - 1);
+		newval := RandomRange(0,sl.Count - 1);
 	until newval <> TipsCounter;
 	TipsCounter := newval;
 	Result := ConvertMacros(sl[TipsCounter]);
