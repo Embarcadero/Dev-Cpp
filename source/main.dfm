@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 229
-  Top = 254
+  Left = 646
+  Top = 336
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -19,6 +19,7 @@ object MainForm: TMainForm
   Position = poDefault
   ShowHint = True
   WindowState = wsMaximized
+  OnActivate = FormActivate
   OnClose = FormClose
   OnContextPopup = FormContextPopup
   OnCreate = FormCreate
@@ -63,7 +64,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -106,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 155
+        Height = 154
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -201,13 +202,13 @@ object MainForm: TMainForm
         Left = 471
         Top = 0
         Width = 357
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           357
-          155)
+          154)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -229,7 +230,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 350
-          Height = 108
+          Height = 123
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -241,7 +242,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 471
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -249,7 +250,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           471
-          155)
+          154)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -335,7 +336,7 @@ object MainForm: TMainForm
             FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00}
         end
         object lblEvaluate: TLabel
-          Left = 9
+          Left = 4
           Top = 104
           Width = 45
           Height = 13
@@ -411,7 +412,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 13
+          Height = 26
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -451,7 +452,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -945,7 +946,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -981,7 +982,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1018,7 +1019,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -2355,7 +2356,7 @@ object MainForm: TMainForm
       ImageIndex = 33
       ShortCut = 122
       OnExecute = actCompRunExecute
-      OnUpdate = actRunUpdate
+      OnUpdate = actCompileRunUpdate
     end
     object actRebuild: TAction
       Tag = 4
@@ -2689,7 +2690,7 @@ object MainForm: TMainForm
       Caption = 'Profile analysis'
       ImageIndex = 43
       OnExecute = actProfileProjectExecute
-      OnUpdate = actRunUpdate
+      OnUpdate = actCompileRunUpdate
     end
     object actBrowserAddFolder: TAction
       Category = 'ClassBrowser'

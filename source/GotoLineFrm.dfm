@@ -18,6 +18,7 @@ object GotoLineForm: TGotoLineForm
   Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnKeyUp = FormKeyUp
   PixelsPerInch = 96
   TextHeight = 15
@@ -37,7 +38,6 @@ object GotoLineForm: TGotoLineForm
     MinValue = 0
     TabOrder = 0
     Value = 1
-    OnKeyDown = LineKeyDown
   end
   object BtnOK: TButton
     Left = 162

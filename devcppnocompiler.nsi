@@ -3,11 +3,9 @@
 
 !define COMPILERNAME "No Compiler"
 !define COMPILERFOLDER ""
-!define DEVCPP_VERSION "5.3.0.2"
+!define DEVCPP_VERSION "5.3.0.3"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
-
-Var LOCAL_APPDATA
 
 !include "MUI2.nsh"
 !include "logiclib.nsh" ; needed by ${switch}
@@ -327,36 +325,7 @@ SectionEnd
 SubSectionEnd
 
 Section "Remove old configuration files" SectionConfig
-  Delete "$APPDATA\Dev-Cpp\devcpp.ini"
-  Delete "$APPDATA\Dev-Cpp\devcpp.cfg"
-  Delete "$APPDATA\Dev-Cpp\cache.ccc"
-  Delete "$APPDATA\Dev-Cpp\defaultcode.cfg"
-  Delete "$APPDATA\Dev-Cpp\devshortcuts.cfg"
-  Delete "$APPDATA\Dev-Cpp\classfolders.dcf"
-  Delete "$APPDATA\Dev-Cpp\mirrors.cfg"
-  Delete "$APPDATA\Dev-Cpp\tools.ini"
-  Delete "$APPDATA\Dev-Cpp\devcpp.ci"
-  
-  call GetLocalAppData
-  Delete "$LOCAL_APPDATA\devcpp.ini"
-  Delete "$LOCAL_APPDATA\devcpp.cfg"
-  Delete "$LOCAL_APPDATA\cache.ccc"
-  Delete "$LOCAL_APPDATA\defaultcode.cfg"
-  Delete "$LOCAL_APPDATA\devshortcuts.cfg"
-  Delete "$LOCAL_APPDATA\classfolders.dcf"
-  Delete "$LOCAL_APPDATA\mirrors.cfg"
-  Delete "$LOCAL_APPDATA\tools.ini"
-  Delete "$LOCAL_APPDATA\devcpp.ci"
-
-  Delete "$APPDATA\devcpp.ini"
-  Delete "$APPDATA\devcpp.cfg"
-  Delete "$APPDATA\cache.ccc"
-  Delete "$APPDATA\defaultcode.cfg"
-  Delete "$APPDATA\devshortcuts.cfg"
-  Delete "$APPDATA\classfolders.dcf"
-  Delete "$APPDATA\mirrors.cfg"
-  Delete "$APPDATA\tools.ini"
-  Delete "$APPDATA\devcpp.ci"
+  RMDir /r "$APPDATA\Dev-Cpp"
   
   Delete "$INSTDIR\devcpp.ini"
   Delete "$INSTDIR\devcpp.cfg"
@@ -395,6 +364,12 @@ LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configur
 
 Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
+
+  IfFileExists "C:\Dev-Cpp\devcpp.exe" 0 +2
+    SectionSetFlags ${SectionConfig} ${SF_SELECTED} # Remove old Dev-Cpp config files
+	
+  IfFileExists "$APPDATA\Dev-Cpp\devcpp.cfg" 0 +2 # deprecated config file
+    SectionSetFlags ${SectionConfig} ${SF_SELECTED}
 FunctionEnd
 
 ;backup file association
@@ -487,26 +462,6 @@ Function StrCSpnReverse
  Exch $R0
 FunctionEnd
 
-#Fill the global variable with Local\Application Data directory CSIDL_LOCAL_APPDATA
-!define CSIDL_LOCAL_APPDATA 0x001C
-Function GetLocalAppData
-  StrCpy $0 ${NSIS_MAX_STRLEN}
-
-  System::Call 'shfolder.dll::SHGetFolderPathA(i, i, i, i, t) i \
-                (0, ${CSIDL_LOCAL_APPDATA}, 0, 0, .r0) .r1'
-  
-  StrCpy $LOCAL_APPDATA $0
-FunctionEnd
-
-Function un.GetLocalAppData
-  StrCpy $0 ${NSIS_MAX_STRLEN}
-
-  System::Call 'shfolder.dll::SHGetFolderPathA(i, i, i, i, t) i \
-                (0, ${CSIDL_LOCAL_APPDATA}, 0, 0, .r0) .r1'
-  
-  StrCpy $LOCAL_APPDATA $0
-FunctionEnd
-
 Function un.DeleteDirIfEmpty
   FindFirst $R0 $R1 "$0\*.*"
   strcmp $R1 "." 0 NoDelete
@@ -597,36 +552,17 @@ Section "Uninstall"
 
   MessageBox MB_YESNO "Do you want to remove all the remaining configuration files?" IDNO Done
 
-  Delete "$APPDATA\Dev-Cpp\devcpp.ini"
-  Delete "$APPDATA\Dev-Cpp\devcpp.cfg"
-  Delete "$APPDATA\Dev-Cpp\cache.ccc"
-  Delete "$APPDATA\Dev-Cpp\defaultcode.cfg"
-  Delete "$APPDATA\Dev-Cpp\devshortcuts.cfg"
-  Delete "$APPDATA\Dev-Cpp\classfolders.dcf"
-  Delete "$APPDATA\Dev-Cpp\mirrors.cfg"
-  Delete "$APPDATA\Dev-Cpp\tools.ini"
-  Delete "$APPDATA\Dev-Cpp\devcpp.ci"
+  RMDir /r "$APPDATA\Dev-Cpp"
   
-  call un.GetLocalAppData
-  Delete "$LOCAL_APPDATA\devcpp.ini"
-  Delete "$LOCAL_APPDATA\devcpp.cfg"
-  Delete "$LOCAL_APPDATA\cache.ccc"
-  Delete "$LOCAL_APPDATA\defaultcode.cfg"
-  Delete "$LOCAL_APPDATA\devshortcuts.cfg"
-  Delete "$LOCAL_APPDATA\classfolders.dcf"
-  Delete "$LOCAL_APPDATA\mirrors.cfg"
-  Delete "$LOCAL_APPDATA\tools.ini"
-  Delete "$LOCAL_APPDATA\devcpp.ci"
-
-  Delete "$APPDATA\devcpp.ini"
-  Delete "$APPDATA\devcpp.cfg"
-  Delete "$APPDATA\cache.ccc"
-  Delete "$APPDATA\defaultcode.cfg"
-  Delete "$APPDATA\devshortcuts.cfg"
-  Delete "$APPDATA\classfolders.dcf"
-  Delete "$APPDATA\mirrors.cfg"
-  Delete "$APPDATA\tools.ini"
-  Delete "$APPDATA\devcpp.ci"
+  Delete "$INSTDIR\devcpp.ini"
+  Delete "$INSTDIR\devcpp.cfg"
+  Delete "$INSTDIR\cache.ccc"
+  Delete "$INSTDIR\defaultcode.cfg"
+  Delete "$INSTDIR\devshortcuts.cfg"
+  Delete "$INSTDIR\classfolders.dcf"
+  Delete "$INSTDIR\mirrors.cfg"
+  Delete "$INSTDIR\tools.ini"
+  Delete "$INSTDIR\devcpp.ci"
 
 Done:
 SectionEnd

@@ -88,7 +88,7 @@ object EnviroForm: TEnviroForm
         395)
       object lblMRU: TLabel
         Left = 312
-        Top = 16
+        Top = 14
         Width = 126
         Height = 15
         AutoSize = False
@@ -128,7 +128,7 @@ object EnviroForm: TEnviroForm
       object cbBackups: TCheckBox
         Left = 16
         Top = 37
-        Width = 257
+        Width = 265
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Create File Backups'
@@ -139,7 +139,7 @@ object EnviroForm: TEnviroForm
       object cbMinOnRun: TCheckBox
         Left = 16
         Top = 58
-        Width = 257
+        Width = 265
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Minimize on Run'
@@ -150,7 +150,7 @@ object EnviroForm: TEnviroForm
       object cbDefCpp: TCheckBox
         Left = 16
         Top = 16
-        Width = 257
+        Width = 265
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Default to C++ on New Project'
@@ -161,7 +161,7 @@ object EnviroForm: TEnviroForm
       object cbShowBars: TCheckBox
         Left = 16
         Top = 80
-        Width = 257
+        Width = 265
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Show Toolbars in Full Screen'
@@ -172,7 +172,7 @@ object EnviroForm: TEnviroForm
       object cbMultiLineTab: TCheckBox
         Left = 16
         Top = 101
-        Width = 257
+        Width = 265
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Enable Editor Multiline Tabs'
@@ -196,7 +196,7 @@ object EnviroForm: TEnviroForm
       object cbdblFiles: TCheckBox
         Left = 16
         Top = 122
-        Width = 257
+        Width = 265
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Double Click to Open Files'
@@ -223,7 +223,7 @@ object EnviroForm: TEnviroForm
       object cbNoSplashScreen: TCheckBox
         Left = 16
         Top = 144
-        Width = 257
+        Width = 265
         Height = 17
         Caption = 'No Splash Screen on startup'
         TabOrder = 8
@@ -335,7 +335,7 @@ object EnviroForm: TEnviroForm
       object cbPauseConsole: TCheckBox
         Left = 16
         Top = 166
-        Width = 257
+        Width = 265
         Height = 17
         Caption = 'Pause console programs after return'
         TabOrder = 16

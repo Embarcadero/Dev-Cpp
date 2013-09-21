@@ -1,7 +1,7 @@
 object frmFind: TfrmFind
   Left = 353
   Top = 337
-  BorderIcons = []
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Find Text'
   ClientHeight = 330

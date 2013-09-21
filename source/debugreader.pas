@@ -38,13 +38,13 @@ type
                    TDisplayExpression,
                    TFrameSourceFile, TFrameSourceBegin, TFrameSourceLine, TFrameFunctionName, TFrameWhere,
                    TFrameArgs,
-                   TFrameBegin,TFrameEnd,
+                   TFrameBegin, TFrameEnd,
                    TErrorBegin, TErrorEnd,
                    TArrayBegin, TArrayEnd,
-                   TElt,TEltRep,TEltRepEnd,
+                   TElt,TEltRep, TEltRepEnd,
                    TExit,
                    TSignal,TSignalName,TSignalNameEnd,TSignalString,TSignalStringEnd,
-                   TValueHistoryValue,
+                   TValueHistoryValue, TValueHistoryBegin, TValueHistoryEnd,
                    TArgBegin, TArgEnd, TArgValue, TArgNameEnd,
                    TFieldBegin, TFieldEnd, TFieldValue, TFieldNameEnd,
                    TInfoReg, TInfoAsm,
@@ -108,8 +108,7 @@ type
 	doupdatecpuwindow : boolean;
 	doupdateexecution : boolean;
 	doreceivedsignal : boolean;
-
-	// GDB pipe fragmentation
+	doreceivedsfwarning : boolean;
 
 	// Evaluation tree output handlers
     procedure ProcessWatchStruct(parentnode : TTreeNode);
@@ -140,16 +139,27 @@ type
 implementation
 
 uses
-  main, devcfg, CPUFrm, debugger, utils, Controls, Math;
+  main, devcfg, CPUFrm, multilangsupport ,debugger, utils, Controls, Math;
 
 // macro for all the things that need to be done when we are finished parsing the current block
 procedure TDebugReader.SyncFinishedParsing;
 var
 	SignalDialog: TForm;
 	SignalCheck: TCheckBox;
+	spawnedcpuform : boolean;
 begin
+	spawnedcpuform := false;
+
+	if doreceivedsfwarning then begin
+		if MessageDlg(Lang[ID_MSG_SOURCEMORERECENT],mtConfirmation,[mbYes,mbNo],0) = mrYes then begin
+			MainForm.fDebugger.Stop;
+			MainForm.actCompileExecute(nil);
+			Exit;
+		end;
+	end;
+
 	if doprocessexited then begin
-		MainForm.fDebugger.Stop(nil);
+		MainForm.fDebugger.Stop;
 		Exit;
 	end;
 
@@ -197,14 +207,17 @@ begin
 		MessageBeep(MB_ICONERROR);
 		if SignalDialog.ShowModal = ID_OK then begin
 			devData.ShowCPUSignal := SignalCheck.Checked;
-			if SignalCheck.Checked then
+			if SignalCheck.Checked and not Assigned(CPUForm) then begin
 				MainForm.ViewCPUItemClick(nil);
+				spawnedcpuform := true;
+			end;
 		end;
 
 		SignalDialog.Free;
 	end;
 
-	if (doupdatecpuwindow or doreceivedsignal) and Assigned(CPUForm) then begin
+	// CPU form updates itself when spawned, don't update twice!
+	if (doupdatecpuwindow and not spawnedcpuform) and Assigned(CPUForm) then begin
 		MainForm.fDebugger.SendCommand('disas','');
 		MainForm.fDebugger.SendCommand('info registers','');
 		MainForm.fDebugger.SendCommand('backtrace','');
@@ -377,7 +390,7 @@ begin
 		result := TPrePrompt
 	else if SameStr(s,'prompt') then
 		result := TPrompt
-	else if SameStr(s,'post-prompt') then begin // todo: clean up
+	else if SameStr(s,'post-prompt') then begin
 		result := TPostPrompt;
 
 		oldpos := curpos;
@@ -452,6 +465,10 @@ begin
 		result := TFieldEnd
 	else if SameStr(s,'value-history-value') then
 		result := TValueHistoryValue
+	else if SameStr(s,'value-history-begin') then
+		result := TValueHistoryBegin
+	else if SameStr(s,'value-history-end') then
+		result := TValueHistoryEnd
 	else if SameStr(s,'signal') then
 		result := TSignal
 	else if SameStr(s,'signal-name') then
@@ -648,8 +665,11 @@ begin
 					result := result + s;
 					Dec(indent);
 				end;
-			end else
+			end;
+
+			TDisplayEnd,TValueHistoryEnd : begin
 				break;
+			end;
 		end;
 	end;
 end;
@@ -672,9 +692,14 @@ begin
 	doupdateexecution := false;
 	doreceivedsignal := false;
 	doupdatecpuwindow := false;
+	doreceivedsfwarning := false;
 
 	len := Length(gdbout);
 	curpos := 1;
+
+	// Global checks
+	if Pos('warning: Source file is more recent than executable.',gdbout) > 0 then
+		doreceivedsfwarning := true;
 
 	while curpos < len do begin
 		case GetNextAnnotation of
@@ -1004,9 +1029,9 @@ begin
 
 		if not Terminated then begin
 
-			// Assume fragments end nicely with TErrorBegin or TPrompt
+			// Assume fragments don't end nicely with TErrorBegin or TPrompt
 			if GetLastAnnotation(tmp,totalbytesread,1 + totalbytesread + chunklen) in [TErrorBegin,TPrompt] then begin
-				gdbout := Copy(tmp,1,totalbytesread); // make sure we perform a deep copy
+				gdbout := tmp; // todo: I sure hope this is a deep copy...
 				Analyze;
 
 				// Reset storage

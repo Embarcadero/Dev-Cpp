@@ -601,8 +601,8 @@ var
 begin
 	Cmd := 'mailto:' + fEmail + '?Subject=' + fSubject + '&Body=';
 	for I := 0 to memBugReport.Lines.Count - 1 do
-		Cmd := Cmd + memBugReport.Lines[I] + '%0A';
-	Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
+		Cmd := Cmd + memBugReport.Lines[I] + #13#10;
+	//Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
 	ShellExecute(0, 'open', PAnsiChar(Cmd), nil, nil, SW_SHOWNORMAL);
 end;
 

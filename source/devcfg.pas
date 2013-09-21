@@ -100,6 +100,7 @@ type
 		// Set stuff
 		procedure LoadSet(Index: integer);
 		procedure SaveSet(Index: integer);
+		procedure ClearSet;
 
 		procedure ReadSets;
 		procedure WriteSets;
@@ -152,7 +153,6 @@ type
     fEnabled: boolean;
     fUseCacheFiles: boolean;
     fCacheFiles: TStrings;
-    procedure SetDelay(Value: integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -162,7 +162,7 @@ type
   published
     property Width: integer read fWidth write fWidth;
     property Height: integer read fHeight write fHeight;
-    property Delay: integer read fDelay write SetDelay;
+    property Delay: integer read fDelay write fDelay;
     property BackColor: integer read fBackColor write fBackColor;
     property Enabled: boolean read fEnabled write fEnabled;
     property UseCacheFiles: boolean read fUseCacheFiles write fUseCacheFiles;
@@ -600,7 +600,7 @@ type
     property DirBackward : boolean read fDirBackward write fDirBackward;
   end;
 
-function DevData: TdevData;
+function devData: TdevData;
 
 procedure InitializeOptions;
 procedure SaveOptions;
@@ -641,49 +641,6 @@ uses
 procedure InitializeOptions;
 var
 	compilername : AnsiString;
-
-	function GetInfoOf(const binfolder : AnsiString) : AnsiString;
-	var
-		gccoutput,gccversion,gcctype : AnsiString;
-		start,stop : integer;
-	begin
-
-		result := '';
-
-		if FileExists(binfolder + 'gcc.exe') then begin
-			gccoutput := RunAndGetOutput(binfolder + 'gcc.exe -v',binfolder,nil,nil,nil,False);
-
-			// Obtain version number and compiler distro
-			start := Pos('gcc version ',gccoutput);
-			if start > 0 then begin
-
-				// Find version number
-				Inc(start,Length('gcc version '));
-				stop := start;
-				while(not (gccoutput[stop] in [#0..#32])) do
-					Inc(stop);
-
-				gccversion := Copy(gccoutput,start,stop-start);
-
-				// Find compiler builder
-				start := stop;
-				while(not (gccoutput[start] = '(')) do
-					Inc(start);
-				while(not (gccoutput[stop] = ')')) do
-					Inc(stop);
-
-				gcctype := Copy(gccoutput,start,stop-start+1);
-
-				// Assemble user friendly name
-				if ContainsStr(gcctype,'tdm64') then
-					result := 'TDM-GCC ' + gccversion
-				else if ContainsStr(gcctype,'tdm') then
-					result := 'TDM-GCC ' + gccversion
-				else if ContainsStr(gcctype,'GCC') then
-					result := 'MinGW GCC ' + gccversion;
-			end;
-		end;
-	end;
 begin
 	if not assigned(devDirs) then
 		devDirs:= TdevDirs.Create;
@@ -696,10 +653,10 @@ begin
 
 		devCompiler.Sets.Clear;
 
-		// Assum
-		if DirectoryExists(devDirs.fExec + 'MinGW64\') then begin
+		// Assume 64bit compilers are put in the MinGW64 folder
+		if DirectoryExists(devDirs.Exec + 'MinGW64\') then begin
 
-			compilername := GetInfoOf(devDirs.fExec + 'MinGW64\bin\');
+			compilername := GetInfoOfCompiler(devDirs.Exec + 'MinGW64\bin\');
 			if compilername = '' then
 				compilername := 'MinGW64';
 
@@ -711,9 +668,9 @@ begin
 			devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW64');
 			devCompiler.SaveSet(devCompiler.Sets.Count-1);
 		end;
-		if DirectoryExists(devDirs.fExec + 'MinGW32\') then begin
+		if DirectoryExists(devDirs.Exec + 'MinGW32\') then begin
 
-			compilername := GetInfoOf(devDirs.fExec + 'MinGW32\bin\');
+			compilername := GetInfoOfCompiler(devDirs.Exec + 'MinGW32\bin\');
 			if compilername = '' then
 				compilername := 'MinGW32';
 
@@ -1009,7 +966,7 @@ end;
 
 procedure TdevCompiler.LoadSet(Index: integer);
 var
-	key{, msg} : AnsiString;
+	key : AnsiString;
 begin
 	// Load the current index from disk
 	key := 'CompilerSets_' + IntToStr(Index);
@@ -1062,36 +1019,6 @@ begin
 
 	devCompiler.CurrentIndex := Index;
 
-	// Then do some basic sanity checking
-	{msg := '';
-	if not FileExists(fBinDir + pd + fgccname) then begin
-		msg := msg + 'Cannot find the C compiler of compiler set ' + devCompiler.fSets[Index] + ':' + #13#10;
-		msg := msg + fBinDir + pd + fgccname;
-		msg := msg + #13#10 + #13#10;
-	end;
-	if not FileExists(fBinDir + pd + fgppname) then begin
-		msg := msg + 'Cannot find the C++ compiler of compiler set ' + devCompiler.fSets[Index] + ':' + #13#10;
-		msg := msg + fBinDir + pd + fgppname;
-		msg := msg + #13#10 + #13#10;
-	end;
-	if not FileExists(fBinDir + pd + fmakeName) then begin
-		msg := msg + 'Cannot find the makefile processor of compiler set ' + devCompiler.fSets[Index] + ':' + #13#10;
-		msg := msg + fBinDir + pd + fmakeName;
-		msg := msg + #13#10 + #13#10;
-	end;
-	if msg <> '' then begin
-		msg := msg + 'Would you like Dev-C++ to insert defaults?' + #13#10;
-		msg := msg + #13#10;
-		msg := msg + 'Unless you know exactly what you''re doing, it is recommended that you click Yes';
-
-		// If confirmed, insert working(?) ones into default path list
-		if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-			fgccName:=     GCC_PROGRAM;
-			fgppName:=     GPP_PROGRAM;
-			fmakeName:=    MAKE_PROGRAM;
-		end;
-	end;}
-
 	if devDirs.OriginalPath = '' then // first time only
 		devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 
@@ -1132,6 +1059,33 @@ begin
 		SaveSettingS(key, 'Cpp',   ReplaceFirstStr(fCppDir,devDirs.fExec,'%path%\'));
 		SaveSettingS(key, 'Lib',   ReplaceFirstStr(fLibDir,devDirs.fExec,'%path%\'));
 	end;
+end;
+
+procedure TdevCompiler.ClearSet;
+begin
+	fgccName := '';
+	fgppName := '';
+	fgdbName := '';
+	fmakeName := '';
+	fwindresName := '';
+	fdllwrapName := '';
+	fgprofName := '';
+
+	fOptionString := '';
+	OptionStringToList(fOptionString);
+
+	fCompOpt := '';
+	fLinkOpt := '';
+	fCompAdd := false;
+	fLinkAdd := false;
+
+	fDelay := 0;
+	fFastDep := false;
+
+	fBinDir := '';
+	fCDir := '';
+	fCppDir := '';
+	fLibDir := '';
 end;
 
 procedure TdevCompiler.SettoDefaults(const setname,dir : AnsiString);
@@ -1756,11 +1710,6 @@ end;
 procedure TdevCodeCompletion.SaveSettings;
 begin
   devData.SaveObject(Self,'CodeCompletion');
-end;
-
-procedure TdevCodeCompletion.SetDelay(Value: integer);
-begin
-	fDelay:=Value;
 end;
 
 procedure TdevCodeCompletion.SettoDefaults;

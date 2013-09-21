@@ -1278,7 +1278,7 @@ begin
 	if GetFileTyp(fUnits.GetItem(index).FileName)=utResSrc then
 		BuildPrivateResource(True);
 	if DoClose and Assigned(fUnits.GetItem(index).fEditor) then begin
-		if not MainForm.CloseEditor(fUnits.GetItem(index).fEditor.TabSheet.PageIndex, False) then
+		if not MainForm.CloseEditor(fUnits.GetItem(index).fEditor.TabSheet.PageIndex) then
 			exit;
 	end;
 

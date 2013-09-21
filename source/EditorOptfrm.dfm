@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 1138
-  Top = 281
+  Left = 714
+  Top = 267
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 462
@@ -644,7 +644,7 @@ object EditorOptForm: TEditorOptForm
         Gutter.GradientEndColor = clBackground
         HideSelection = True
         Highlighter = cpp
-        UseCodeFolding = True
+        UseCodeFolding = False
         Options = [eoAutoIndent, eoDisableScrollArrows, eoHideShowScrollbars, eoNoCaret, eoNoSelection, eoSmartTabs, eoTrimTrailingSpaces]
         ReadOnly = True
         RightEdge = 0
@@ -856,7 +856,7 @@ object EditorOptForm: TEditorOptForm
             Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
             Highlighter = cpp
-            UseCodeFolding = True
+            UseCodeFolding = False
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4
             WantTabs = True
@@ -967,7 +967,7 @@ object EditorOptForm: TEditorOptForm
             Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
             Highlighter = cpp
-            UseCodeFolding = True
+            UseCodeFolding = False
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4
             WantTabs = True

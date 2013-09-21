@@ -32,7 +32,13 @@ object CodeComplForm: TCodeComplForm
     BevelOuter = bvNone
     BorderStyle = bsNone
     ExtendedSelect = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Courier New'
+    Font.Style = []
     ItemHeight = 16
+    ParentFont = False
     TabOrder = 0
     OnDblClick = lbCompletionDblClick
     OnDrawItem = lbCompletionDrawItem

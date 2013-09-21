@@ -37,12 +37,12 @@ type
   TEditor = class;
   TDebugGutter = class(TSynEditPlugin)
   protected
-    fEditor : TEditor;
+    e : TEditor;
     procedure AfterPaint(ACanvas: TCanvas; const AClip: TRect;FirstLine, LastLine: integer); override;
     procedure LinesInserted(FirstLine, Count: integer); override;
     procedure LinesDeleted(FirstLine, Count: integer); override;
   public
-    constructor Create(ed : TEditor);
+    constructor Create(editor : TEditor);
   end;
 
   TEditor = class(TObject)
@@ -104,7 +104,7 @@ type
     // Recoded breakpoint stuff
     function HasBreakPoint(Line : integer): integer;
     procedure ToggleBreakPoint(Line : integer);
-    procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
+    procedure DebugAfterPaint(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 
     // Debugger callback
     procedure OnMouseOverEvalReady(const evalvalue : AnsiString);
@@ -128,7 +128,6 @@ type
     procedure IndentSelection;
     procedure UnindentSelection;
 
-    procedure UpdateParser; // Must be called after recreating the parser
     procedure InitCompletion;
     procedure DestroyCompletion;
 
@@ -146,7 +145,7 @@ implementation
 uses
 {$IFDEF WIN32}
   main, project, MultiLangSupport, devcfg, utils,
-  datamod, GotoLineFrm, Macros, debugreader, SynEditMiscClasses;
+  datamod, GotoLineFrm, Macros, debugreader, CodeCompletionForm, SynEditMiscClasses;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, main, project, MultiLangSupport, devcfg, Search_Center, utils,
@@ -155,23 +154,42 @@ uses
 
 { TDebugGutter }
 
-constructor TDebugGutter.Create(ed : TEditor);
+constructor TDebugGutter.Create(editor : TEditor);
 begin
-	inherited Create(ed.Text);
-	fEditor := ed;
+	inherited Create(editor.Text);
+	e := editor;
 end;
 
 procedure TDebugGutter.AfterPaint(ACanvas: TCanvas; const AClip: TRect;FirstLine, LastLine: integer);
 begin
-	fEditor.DrawGutterImages(ACanvas, AClip, FirstLine, LastLine);
+	e.DebugAfterPaint(ACanvas,AClip,FirstLine,LastLine);
 end;
 
 procedure TDebugGutter.LinesInserted(FirstLine, Count: integer);
+var
+	I : integer;
+	bp : PBreakPoint;
 begin
+	for I := 0 to MainForm.fDebugger.BreakPointList.Count - 1 do begin
+		bp := PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I]);
+		if (integer(bp^.editor) = integer(e)) and (bp^.line >= FirstLine) then
+			Inc(bp^.line,Count);
+	end;
 end;
 
 procedure TDebugGutter.LinesDeleted(FirstLine, Count: integer);
+var
+	I : integer;
+	bp : PBreakPoint;
 begin
+	for I := MainForm.fDebugger.BreakPointList.Count - 1 downto 0 do begin
+		bp := PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I]);
+		if (integer(bp^.editor) = integer(e)) and (bp^.line >= FirstLine) then
+			if (bp^.line >= FirstLine + Count) then
+				Dec(bp^.line,Count)
+			else
+				e.ToggleBreakPoint(bp^.line); // remove breakpoints INSIDE deleted selection
+	end;
 end;
 
 { TEditor }
@@ -371,7 +389,7 @@ begin
 	end;
 end;
 
-procedure TEditor.DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
+procedure TEditor.DebugAfterPaint(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 var
 	X, Y, I: integer;
 begin
@@ -710,28 +728,26 @@ begin
 		// The completion form is already shown
 		case Key of
 			Char(VK_BACK): begin
-			if fText.SelStart > 0 then begin
+				if fText.SelStart > 0 then begin
 					fText.SelStart := fText.SelStart - 1;
 					fText.SelEnd := fText.SelStart + 1;
 					fText.SelText := '';
 					fCompletionBox.Search(nil, CompletionPhrase(fText.CaretXY), fFileName);
 				end;
 			end;
-			Char(VK_RETURN): begin
+
+			// We have finished making a selection
+			Char(VK_RETURN),';','(',#9,#32: begin
 				SetEditorText(Key);
 				fCompletionBox.Hide;
 			end;
+
+			// Abort, don't insert anything
 			Char(VK_ESCAPE): begin
 				fCompletionBox.Hide;
 			end;
-			';', '(', ' ': begin
-				SetEditorText(Key);
-				fCompletionBox.Hide;
-			end;
-			'.', '>', ':': begin
-				SetEditorText(Key);
-				fCompletionBox.Search(nil, CompletionPhrase(fText.CaretXY), fFileName);
-			end;
+
+			// Continue filtering
 			else begin
 				fText.SelText := Key;
 				fCompletionBox.Search(nil, CompletionPhrase(fText.CaretXY), fFileName);
@@ -785,7 +801,7 @@ begin
 					InsertString('*/',false);
 			end else if (Key = '{') and devEditor.BraceComplete then begin
 
-				s1 := fText.LineText;
+				s1 := Copy(fText.LineText,1,fText.CaretX-1);
 				s2 := Trim(s1);
 
 				if EndsStr(')',s2) or
@@ -794,6 +810,7 @@ begin
 					EndsStr('catch',s2) or
 					EndsStr('default',s2) or
 					EndsStr('do',s2) or
+					StartsStr('default',s2) or
 					SameStr('',s2) then begin
 
 					// Copy indentation
@@ -863,8 +880,8 @@ begin
 		// Use a timer to show the completion window when we just typed a few parent-member linking chars
 		case Key of
 			'.': fCompletionTimer.Enabled:=True;
-			'>': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
-			':': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
+			'>': if (fText.CaretX > 1) and (Length(fText.LineText) > 1) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
+			':': if (fText.CaretX > 1) and (Length(fText.LineText) > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
 			' ': begin
 
 				// If Ctrl is down, immediately show completionbox when space is hit
@@ -950,6 +967,12 @@ begin
 
 	M:=TMemoryStream.Create;
 	try
+
+		// Scan the file and corresponding header, ignore function bodies
+		//if fText.Modified then
+		//	MainForm.CppParser.ReParseFile(fFileName,InProject);
+
+		// Scan the current function
 		fText.UnCollapsedLines.SaveToStream(M);
 		fCompletionBox.CurrentClass:=MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M);
 	finally
@@ -1136,6 +1159,7 @@ begin
 	end;
 
 	if Assigned(Statement) then begin
+
 		// delete selections made
 		fText.SelText:='';
 
@@ -1151,8 +1175,12 @@ begin
 		// and function takes arguments...
 		if (not (Key in ['.', '>'])) and (FuncAddOn<>'') and ( (Length(Statement^._Args)>2) or (Statement^._Args='()') ) then begin
 			fText.CaretX:=fText.CaretX-Length(FuncAddOn)+1;
-			if FunctionTipAllowed then
+
+			// immediately activate function hint
+			if devEditor.ShowFunctionTip and Assigned(fText.Highlighter) then begin
+				fText.SetFocus;
 				fFunctionTip.Show;
+			end;
 		end;
 	end;
 end;
@@ -1220,8 +1248,9 @@ begin
 				MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
 
 			// Otherwise, parse code and show information about variable
-			end else if devEditor.ParserHints then begin
+			end else if devEditor.ParserHints and fText.Focused then begin
 
+				//if not fCompletionBox.Parser then begin
 				M := TMemoryStream.Create;
 				try
 					fText.UnCollapsedLines.SaveToStream(M);
@@ -1466,9 +1495,8 @@ begin
 				e:=MainForm.GetEditorFromFileName(fname);
 				if Assigned(e) then
 					e.GotoLineNr(1);
-			end;
-
-			MainForm.actGotoImplDeclEditorExecute(self);
+			end else
+				MainForm.actGotoImplDeclEditorExecute(self);
 		end;
 	end;
 end;
@@ -1528,12 +1556,6 @@ procedure TEditor.EditorPaintTransient(Sender: TObject; Canvas: TCanvas;Transien
 begin
 	if Assigned(fText.Highlighter) and devEditor.Match and not fText.SelAvail then
 		PaintMatchingBrackets(TransientType);
-end;
-
-// Editor needs to be told when class browser has been recreated otherwise AV !
-procedure TEditor.UpdateParser;
-begin
-	fFunctionTip.Parser := MainForm.CppParser;
 end;
 
 end.

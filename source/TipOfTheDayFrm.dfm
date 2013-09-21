@@ -1,6 +1,7 @@
 object TipOfTheDayForm: TTipOfTheDayForm
   Left = 462
   Top = 348
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Tip Of The Day'
   ClientHeight = 263

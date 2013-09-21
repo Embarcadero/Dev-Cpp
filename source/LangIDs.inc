@@ -727,6 +727,11 @@ const
   ID_COPT_RENAMECOMPSET                 = 47007;
   ID_COPT_PROMPTRENAMECOMPSET           = 47008;
   ID_COPT_FURTHEROPTS                   = 47009;
+  ID_COPT_ADDCOMPILERS                  = 47010;
+  ID_COPT_FINDCOMPHINT                  = 47011;
+  ID_COPT_ADDCOMPHINT                   = 47012;
+  ID_COPT_DELCOMPHINT                   = 47013;
+  ID_COPT_RENAMECOMPHINT                = 47014;
 
   // Help Menu Editor Form
   ID_HE                                 = 48001;
@@ -1067,6 +1072,8 @@ const
   ID_ENV_CONFIGCHANGED                  = 66020;
   ID_ENV_UACERROR                       = 66021;
   ID_ENV_UIFONT                         = 66022;
+  ID_ENV_CACHEFAIL                      = 66023;
+  ID_ENV_PRINTERFAIL                    = 66024;
 
 { Execute menu }
   ID_ITEM_EXECPARAMS                    = 67001;

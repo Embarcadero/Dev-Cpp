@@ -825,7 +825,7 @@ begin
 		end else if (P[CurPos] = ')') then begin
 			Dec(nBraces);
 			if nBraces = -1 then
-				break
+				break;
 
 		// Single line comments
 		end else if (P[CurPos] = '/') and (P[CurPos+1] = '/') then begin
@@ -920,9 +920,9 @@ begin
 		FCustomSelIndex := False;
 
 		// Fill a cache of known functions...
-		FToolTips.Clear;
 		FToolTips.BeginUpdate;
-		FParser.FillListOf(S, FToolTips, skFunction);
+		FToolTips.Clear;
+		FParser.FillListOf(S, FToolTips, [skFunction,skConstructor,skDestructor]);
 		FToolTips.EndUpdate;
 	end;
 

@@ -120,7 +120,7 @@ begin
 	enginebackup := editor.SearchEngine;
 	editor.SearchEngine := fSearchEngine;
 
-	result := editor.SearchReplace(cboFindText.Text,'',fSearchOptions);
+	result := editor.SearchReplace(cboFindText.Text,cboReplaceText.Text,fSearchOptions);
 
 	// Apply search engine backup
 	editor.SearchEngine := enginebackup;
@@ -128,13 +128,17 @@ end;
 
 function TfrmFind.FindReplaceFiles(editor : TSynEdit;isreplace : boolean) : integer;
 var
-	caretbackup : TBufferCoord;
+	caretbackup,blockbeginbackup,blockendbackup : TBufferCoord;
 	onreplacebackup : TReplaceTextEvent;
 	enginebackup : TSynEditSearchCustom;
+	toplinebackup : integer;
 begin
 
 	// Back some data up
 	caretbackup := editor.CaretXY;
+	blockbeginbackup := editor.BlockBegin;
+	blockendbackup := editor.BlockEnd;
+	toplinebackup := editor.TopLine;
 	onreplacebackup := editor.OnReplaceText;
 	enginebackup := editor.SearchEngine;
 
@@ -148,6 +152,9 @@ begin
 	editor.SearchEngine := enginebackup;
 
 	editor.CaretXY := caretbackup;
+	editor.BlockBegin := blockbeginbackup;
+	editor.BlockEnd := blockendbackup;
+	editor.TopLine := toplinebackup;
 	editor.OnReplaceText := onreplacebackup;
 end;
 
@@ -243,14 +250,11 @@ begin
 				e := MainForm.GetEditor(i);
 				fCurFile := e.FileName;
 
-				if isreplacefiles then
+				// Bring an editor up front if we use prompting
+				if isreplacefiles and (ssoPrompt in fSearchOptions) then
 					e.Activate;
 
 				Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
-
-				// TODO: save all or not? user can Ctrl+Z if he wishes to
-				if isreplacefiles then
-					MainForm.SaveFile(e);
 			end;
 
 		// loop through project
@@ -262,7 +266,7 @@ begin
 				// file is already open, use memory
 				if Assigned(e) then begin
 
-					if isreplacefiles then
+					if isreplacefiles and (ssoPrompt in fSearchOptions) then
 						e.Activate;
 
 					Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
@@ -304,8 +308,6 @@ begin
 			if Assigned(e) then begin
 
 				fCurFile := e.FileName;
-				if isreplacefiles then
-					e.Activate;
 
 				Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
 			end;
@@ -353,6 +355,9 @@ begin
 		devData.SearchWhere := 1
 	else if rbCurFile.Checked then
 		devData.SearchWhere := 2;
+
+	// Save some memory
+	fTempSynEdit.ClearAll;
 
 	Action := caHide;
 end;

@@ -901,6 +901,7 @@ begin
 		if not devEditor.Match then
 			e.PaintMatchingBrackets(ttBefore);
 
+		// Repaint highlighted line
 		if cbHighCurrLine.Checked then
 			e.Text.ActiveLineColor := cpHighColor.SelectionColor
 		else
@@ -1537,49 +1538,76 @@ begin
     sl.Free;
   end;
 
-  with dmMain do begin
-    BuildFilter(flt, [FLT_HEADS]);
-    OpenDialog.Filter:=flt;
-    if OpenDialog.Execute then begin
-      Screen.Cursor:=crHourglass;
-      Application.ProcessMessages;
-      for I:=0 to OpenDialog.Files.Count-1 do
-        CppParser.AddFileToScan(OpenDialog.Files[I]);
-      CppParser.ParseList;
-      CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
-      lbCCC.Items.Assign(CppParser.CacheContents);
-      Screen.Cursor:=crDefault;
-      chkCCCache.Tag:=1; // mark modified
-    end;
-  end;
+	with dmMain do begin
+		BuildFilter(flt, [FLT_HEADS]);
+		OpenDialog.Filter:=flt;
+
+		if OpenDialog.Execute then begin
+			Screen.Cursor:=crHourglass;
+			Application.ProcessMessages;
+
+			for I:=0 to OpenDialog.Files.Count-1 do
+				CppParser.AddFileToScan(OpenDialog.Files[I]);
+			CppParser.ParseList;
+			CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
+
+			lbCCC.Items.BeginUpdate;
+			lbCCC.Clear;
+			for I := 0 to CppParser.CacheContents.Count - 1 do
+				lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,'.\'));
+			lbCCC.Items.EndUpdate;
+
+			Screen.Cursor:=crDefault;
+			chkCCCache.Tag:=1; // mark modified
+		end;
+	end;
 end;
 
 procedure TEditorOptForm.btnCCCdeleteClick(Sender: TObject);
+var
+	I : integer;
 begin
-  if lbCCC.Items.Count=0 then
-    Exit;
-  if MessageDlg('Are you sure you want to clear the cache?', mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
-    DeleteFile(devDirs.Config+DEV_COMPLETION_CACHE);
-    FreeAndNil(CppParser);
-    CppParser:=TCppParser.Create(Self);
-    CppParser.Tokenizer:=CppTokenizer;
-    CppParser.ParseLocalHeaders:=True;
-    CppParser.ParseGlobalHeaders:=True;
-    CppParser.OnStartParsing:=CppParser1StartParsing;
-    CppParser.OnEndParsing:=CppParser1EndParsing;
-    CppParser.OnTotalProgress:=CppParser1TotalProgress;
-    lbCCC.Items.Assign(CppParser.CacheContents);
-    chkCCCache.Tag:=1; // mark modified
-  end;
+	if lbCCC.Items.Count=0 then
+		Exit;
+
+	if MessageDlg('Are you sure you want to clear the cache?', mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
+		DeleteFile(devDirs.Config+DEV_COMPLETION_CACHE);
+
+		FreeAndNil(CppParser);
+		CppParser:=TCppParser.Create(Self);
+		CppParser.Tokenizer:=CppTokenizer;
+		CppParser.ParseLocalHeaders:=True;
+		CppParser.ParseGlobalHeaders:=True;
+		CppParser.OnStartParsing:=CppParser1StartParsing;
+		CppParser.OnEndParsing:=CppParser1EndParsing;
+		CppParser.OnTotalProgress:=CppParser1TotalProgress;
+
+		lbCCC.Items.BeginUpdate;
+		lbCCC.Clear;
+		for I := 0 to CppParser.CacheContents.Count - 1 do
+			lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,'.\'));
+		lbCCC.Items.EndUpdate;
+
+		chkCCCache.Tag:=1; // mark modified
+	end;
 end;
 
 procedure TEditorOptForm.FillCCC;
+var
+	I : integer;
 begin
-  Screen.Cursor:=crHourglass;
-  Application.ProcessMessages;
-  CppParser.Load(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
-  lbCCC.Items.Assign(CppParser.CacheContents);
-  Screen.Cursor:=crDefault;
+	Screen.Cursor:=crHourglass;
+	Application.ProcessMessages;
+
+	CppParser.Load(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
+
+	lbCCC.Items.BeginUpdate;
+	lbCCC.Clear;
+	for I := 0 to CppParser.CacheContents.Count - 1 do
+		lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,'.\'));
+	lbCCC.Items.EndUpdate;
+
+	Screen.Cursor:=crDefault;
 end;
 
 procedure TEditorOptForm.chkCCCacheClick(Sender: TObject);
@@ -1637,7 +1665,7 @@ end;
 
 procedure TEditorOptForm.cbHighCurrLineClick(Sender: TObject);
 begin
-  cpHighColor.Enabled := cbHighCurrLine.Checked;
+	cpHighColor.Enabled := cbHighCurrLine.Checked;
 end;
 
 procedure TEditorOptForm.EnableDisableAutosaveClick(Sender: TObject);

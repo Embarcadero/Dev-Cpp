@@ -117,6 +117,14 @@ type
 
 	function ProgramHasConsole(const path : AnsiString) : boolean;
 
+	function IsEmpty(editor : TSynEdit) : boolean;
+
+	function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
+
+	function CtrlDown : Boolean;
+
+	function GetInfoOfCompiler(const binfolder : AnsiString) : AnsiString;
+
 // Fast replacements of localized functions
 function EndsStr(const subtext, text: AnsiString): boolean;
 function EndsText(const subtext, text: AnsiString): boolean;
@@ -139,12 +147,6 @@ function ReplaceFirstText(const S, OldPattern, NewPattern : AnsiString) : AnsiSt
 function ReplaceLastStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 function ReplaceLastText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 
-function IsEmpty(editor : TSynEdit) : boolean;
-
-function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
-
-function CtrlDown : Boolean;
-
 implementation
 
 uses
@@ -154,6 +156,48 @@ uses
 {$IFDEF LINUX}
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
+
+function GetInfoOfCompiler(const binfolder : AnsiString) : AnsiString;
+var
+	gccoutput,gccversion,gcctype : AnsiString;
+	start,stop : integer;
+begin
+	result := '';
+
+	if FileExists(binfolder + 'gcc.exe') then begin
+		gccoutput := RunAndGetOutput(binfolder + 'gcc.exe -v',binfolder,nil,nil,nil,False);
+
+		// Obtain version number and compiler distro
+		start := Pos('gcc version ',gccoutput);
+		if start > 0 then begin
+
+			// Find version number
+			Inc(start,Length('gcc version '));
+			stop := start;
+			while(not (gccoutput[stop] in [#0..#32])) do
+				Inc(stop);
+
+			gccversion := Copy(gccoutput,start,stop-start);
+
+			// Find compiler builder
+			start := stop;
+			while(not (gccoutput[start] = '(')) do
+				Inc(start);
+			while(not (gccoutput[stop] = ')')) do
+				Inc(stop);
+
+			gcctype := Copy(gccoutput,start,stop-start+1);
+
+			// Assemble user friendly name
+			if ContainsStr(gcctype,'tdm64') then
+				result := 'TDM-GCC ' + gccversion
+			else if ContainsStr(gcctype,'tdm') then
+				result := 'TDM-GCC ' + gccversion
+			else if ContainsStr(gcctype,'GCC') then
+				result := 'MinGW GCC ' + gccversion;
+		end;
+	end;
+end;
 
 function CtrlDown : Boolean;
 var

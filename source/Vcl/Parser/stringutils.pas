@@ -47,8 +47,8 @@ function NotSameText(const s1,s2 : AnsiString) : boolean;
 function StartsStr(const subtext,text : AnsiString) : boolean;
 function StartsText(const subtext,text : AnsiString) : boolean;
 
-function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
-function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
+function ReplaceFirstStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+function ReplaceFirstText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 
 implementation
 

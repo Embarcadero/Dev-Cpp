@@ -102,8 +102,6 @@ begin
 
 		statement := PStatement(Items.Objects[Index]);
 
-		if not Assigned(statement) then Exit; // TODO: why is this needed?
-
 		// Draw statement kind string, like 'Preprocessor'
 		if odSelected in State then begin
 			Canvas.Brush.Color := clHighlight;
@@ -149,12 +147,6 @@ end;
 
 procedure TCodeComplForm.lbCompletionKeyPress(Sender: TObject;var Key: Char);
 begin
-	case Key of
-		Char(VK_ESCAPE), '.', '>': begin
-			fOwner.Hide;
-		end;
-	end;
-
 	if Assigned(fOwner.OnKeyPress) then
 		fOwner.OnKeyPress(self, Key);
 end;

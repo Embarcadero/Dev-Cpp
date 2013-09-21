@@ -183,9 +183,8 @@ begin
 			MainForm.ClassBrowser.SetUpdateOff;
 
 			s := TStringList.Create;
-			if (AltCache.Checked) then begin
-				devClassBrowsing.ParseGlobalHeaders := false; // Too slow
-				for I:=0 to AltFileList.Count-1 do
+			if AltCache.Checked then begin
+				for I := 0 to AltFileList.Count - 1 do
 					s.Add(AltFileList.Items[I]);
 			end else
 				StrToList(devCompiler.CppDir, s);
@@ -196,8 +195,9 @@ begin
 			f := TStringList.Create;
 			if not AltCache.Checked then begin
 				for i := 0 to pred(s.Count) do begin
+
 					// Relative paths make the recursive/loop searcher go nuts
-					s[i] := StringReplace(s[i],'%path%\',devDirs.exec,[]);
+					s[i] := ReplaceFirstStr(s[i],'%path%\',devDirs.exec);
 					if DirectoryExists(s[i]) then begin
 						FilesFromWildcard(s[i], '*.*', f, false, false, false);
 						for j := 0 to f.Count - 1 do
@@ -212,7 +212,7 @@ begin
 					if s[i][1] = ':' then
 						fullpath := s[i]
 					else
-						fullpath := devCompiler.CppDir + '\' + s[i];
+						fullpath := devCompiler.CppDir + pd + s[i];
 
 					// Then check for existance
 					if FileExists(fullpath) then begin
@@ -222,14 +222,15 @@ begin
 					//	MessageDlg('File "' + fullpath + '" does not exist', mtWarning, [mbOK], 0);
 				end;
 			end;
+			s.Free;
+			f.Free;
 
-			// Deze regel duurt heel lang
 			MainForm.CppParser.ParseList;
 
 			ParseLabel.Caption := 'Saving...';
 			Application.ProcessMessages;
 
-			MainForm.CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE,devDirs.Exec);
+			MainForm.CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
 
 			MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;
 			MainForm.CppParser.OnEndParsing := MainForm.CppParserEndParsing;
@@ -237,14 +238,15 @@ begin
 
 			MainForm.ClassBrowser.SetUpdateOn;
 
+			// Erase ALL memory of the C++ parser
+			MainForm.CppParser.Reset(false);
+
 			Screen.Cursor:=crDefault;
-			s.Free;
-			f.Free;
 		end else begin
 			devClassBrowsing.Enabled := true;
 			devClassBrowsing.ParseLocalHeaders := true;
 			devClassBrowsing.ParseGlobalHeaders := false;
-			devClassBrowsing.ShowInheritedMembers := true;
+			devClassBrowsing.ShowInheritedMembers := false;
 		end;
 		OkBtn.Tag := 3;
 		OkBtn.Kind := bkOK;
@@ -252,7 +254,7 @@ begin
 		OkBtn.Enabled := true;
 		FinishPanel.Visible := true;
 		CachePanel.Visible := false;
-	end
+	end;
 end;
 
 procedure TLangForm.ThemeChange(Sender: TObject);

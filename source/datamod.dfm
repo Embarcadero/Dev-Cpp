@@ -2,7 +2,7 @@ object dmMain: TdmMain
   OldCreateOrder = False
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
-  Left = 1187
+  Left = 1186
   Top = 592
   Height = 354
   Width = 494

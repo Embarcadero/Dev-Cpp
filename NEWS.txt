@@ -1,3 +1,21 @@
+Version 5.3.0.3 - 11 November 2012
+
+- Fixed really long watch variables being cut off sometimes.
+- Fixed the goto line form playing a beep when hitting enter.
+- Fixed an infinite loop bug when parsing inheritance.
+- The tip of the day window is now focused on startup, making hiding it using the keyboard easier.
+- The C++ parser now understands what to do with <cxxx> includes: parse <xxx.h> instead.
+- Simple replacing ("Replace") now correctly replaces matches by the replacement text instead of nothing.
+- Dev-C++ will now show a nice warning dialog about incompatible caches instead of throwing exceptions.
+- Startup time has been improved by as much as 20%.
+- Code completion now properly shows all global functions again.
+- Project closing is done instantly now when using 'Scan global includes'.
+- The function tooltip now also shows constructors and destructors.
+- Added a button to Compiler Options that will autodetect compilers.
+- Updated chinese (TW) translations.
+- CPU window now opens up 50% faster after a signal is received during debugging.
+- More bug fixes here and there.
+
 Version 5.3.0.2 - 24 Oktober 2012
 
 - Fixed error line focus dissapearing when moving focus on the same line.

@@ -92,6 +92,7 @@ type
     btnBrowse7: TSpeedButton;
     btnBrowse8: TSpeedButton;
     CompOptionsFrame1: TCompOptionsFrame;
+    btnFindCompilers: TSpeedButton;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -120,6 +121,7 @@ type
     procedure cbCompAddClick(Sender: TObject);
     procedure cbLinkerAddClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnFindCompilersClick(Sender: TObject);
   private
     fBins: AnsiString;
     fLibs: AnsiString;
@@ -150,23 +152,13 @@ end;
 
 procedure TCompOptForm.btnOkClick(Sender: TObject);
 begin
-	// Check if bins is set correctly...
-	if (fBins = '') then begin
-		MessageDlg('You have not indicated the location of your compiler binaries.'#13' Please do so now.', mtWarning, [mbOK], 0);
-
-		MainPages.ActivePage := tabDirectories;
-		DirTabs.TabIndex := 0;
-		DirTabs.OnChange(nil);
-
-		ModalResult := mrNone;
-		exit;
-	end;
-
 	// Set general options for the current compiler...
 	devCompiler.AddtoComp := cbCompAdd.Checked;
 	devCompiler.AddtoLink := cbLinkerAdd.Checked;
+
 	devCompiler.CompOpts := Commands.Lines.Text;
 	devCompiler.LinkOpts := Linker.Lines.Text;
+
 	devCompiler.Delay := seCompDelay.Value;
 	devCompiler.FastDep := cbFastDep.Checked;
 
@@ -191,7 +183,6 @@ procedure TCompOptForm.SetOptions(first : boolean);
 begin
 	// fill compiler lists
 	if first then begin
-		cmbCompilerSetComp.Items.Clear;
 		cmbCompilerSetComp.Items.Assign(devCompiler.Sets);
 
 		if devCompiler.CurrentIndex < cmbCompilerSetComp.Items.Count then
@@ -202,9 +193,12 @@ begin
 
 	// Load the new set
 	CurrentSet := cmbCompilerSetComp.ItemIndex;
-	devCompiler.LoadSet(cmbCompilerSetComp.ItemIndex);
+	if CurrentSet <> -1 then
+		devCompiler.LoadSet(cmbCompilerSetComp.ItemIndex)
+	else
+		devCompiler.ClearSet;
 
-	// Apply the new set to the UI
+		// Apply the new set to the UI
 	with devCompiler do begin
 		fBins := BinDir;
 		fC := CDir;
@@ -431,6 +425,12 @@ begin
 
 	// Text above compiler select
 	grpCompSet.Caption:=                 ' '+Lang[ID_COPT_COMPSETS]+' ';
+
+	// Set some hints too
+	BtnFindCompilers.Hint:=              Lang[ID_COPT_FINDCOMPHINT];
+	btnAddCompilerSet.Hint:=             Lang[ID_COPT_ADDCOMPHINT];
+	btnDelCompilerSet.Hint:=             Lang[ID_COPT_DELCOMPHINT];
+	btnRenameCompilerSet.Hint:=          Lang[ID_COPT_RENAMECOMPHINT];
 end;
 
 procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);
@@ -441,6 +441,9 @@ begin
 
 	devCompiler.AddtoLink := cbLinkerAdd.Checked;
 	devCompiler.AddtoComp := cbCompAdd.Checked;
+
+	devCompiler.FastDep := cbFastDep.Checked;
+	devCompiler.Delay := seCompDelay.Value;
 
 	// other settings are saved to devCompiler by the UI components!
 
@@ -508,30 +511,29 @@ end;
 
 procedure TCompOptForm.btnDelCompilerSetClick(Sender: TObject);
 begin
-  if cmbCompilerSetComp.Items.Count=1 then begin
-    MessageDlg(Lang[ID_COPT_CANTDELETECOMPSET], mtError, [mbOk], 0);
-    Exit;
-  end;
+	if cmbCompilerSetComp.ItemIndex <> -1 then begin
+		if MessageDlg(Lang[ID_COPT_DELETECOMPSET], mtConfirmation, [mbYes, mbNo], 0)=mrNo then
+			Exit;
 
-  if MessageDlg(Lang[ID_COPT_DELETECOMPSET], mtConfirmation, [mbYes, mbNo], 0)=mrNo then
-    Exit;
-
-  devCompiler.Sets.Delete(cmbCompilerSetComp.ItemIndex);
-  cmbCompilerSetComp.Items.Delete(cmbCompilerSetComp.ItemIndex);
-  cmbCompilerSetComp.ItemIndex:=0;
-  cmbCompilerSetCompChange(nil);
+		devCompiler.Sets.Delete(cmbCompilerSetComp.ItemIndex);
+		cmbCompilerSetComp.Items.Delete(cmbCompilerSetComp.ItemIndex);
+		cmbCompilerSetComp.ItemIndex:=0;
+		cmbCompilerSetCompChange(nil);
+	end;
 end;
 
 procedure TCompOptForm.btnRenameCompilerSetClick(Sender: TObject);
 var
-  S: AnsiString;
+	S: AnsiString;
 begin
-  S:=cmbCompilerSetComp.Text;
-  if not InputQuery(Lang[ID_COPT_RENAMECOMPSET], Lang[ID_COPT_PROMPTRENAMECOMPSET], S) or (S='') or (S=cmbCompilerSetComp.Text) then
-    Exit;
+	if cmbCompilerSetComp.ItemIndex <> -1 then begin
+		S:=cmbCompilerSetComp.Text;
+		if not InputQuery(Lang[ID_COPT_RENAMECOMPSET], Lang[ID_COPT_PROMPTRENAMECOMPSET], S) or (S='') or (S=cmbCompilerSetComp.Text) then
+			Exit;
 
-  cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex]:=S;
-  cmbCompilerSetComp.ItemIndex:=cmbCompilerSetComp.Items.IndexOf(S);
+		cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex]:=S;
+		cmbCompilerSetComp.ItemIndex:=cmbCompilerSetComp.Items.IndexOf(S);
+	end;
 end;
 
 procedure TCompOptForm.GccEditChange(Sender: TObject);
@@ -590,6 +592,62 @@ begin
 	CompOptionsFrame1.vle.Strings.Clear;
 
 	Action := caFree;
+end;
+
+procedure TCompOptForm.btnFindCompilersClick(Sender: TObject);
+var
+	compilername : AnsiString;
+	dlgresult : integer;
+begin
+	dlgresult := MessageDlg(
+		Format(Lang[ID_COPT_ADDCOMPILERS],[devDirs.Exec + 'MinGW32',devDirs.Exec + 'MinGW64']),mtConfirmation,[mbYes,mbNo,mbCancel],0);
+
+	if dlgresult = mrCancel then Exit;
+
+	cmbCompilerSetComp.Items.BeginUpdate;
+
+	// Dialog asked to clear the current compiler list...
+	if dlgresult = mrYes then
+		devCompiler.Sets.Clear;
+
+	// copy from InitializeOptions
+
+	// Assume 64bit compilers are put in the MinGW64 folder
+	if DirectoryExists(devDirs.Exec + 'MinGW64\') then begin
+
+		compilername := GetInfoOfCompiler(devDirs.Exec + 'MinGW64\bin\');
+		if compilername = '' then
+			compilername := 'MinGW64';
+
+		devCompiler.Sets.Add(compilername + ' 64-bit');
+		devCompiler.SettoDefaults(compilername + ' 64-bit','MinGW64');
+		devCompiler.SaveSet(devCompiler.Sets.Count-1);
+
+		devCompiler.Sets.Add(compilername + ' 32-bit');
+		devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW64');
+		devCompiler.SaveSet(devCompiler.Sets.Count-1);
+	end;
+	if DirectoryExists(devDirs.Exec + 'MinGW32\') then begin
+
+		compilername := GetInfoOfCompiler(devDirs.Exec + 'MinGW32\bin\');
+		if compilername = '' then
+			compilername := 'MinGW32';
+
+		devCompiler.Sets.Add(compilername + ' 32-bit');
+		devCompiler.SettoDefaults(compilername + ' 32-bit','MinGW32');
+		devCompiler.SaveSet(devCompiler.Sets.Count-1);
+	end;
+
+	// Write the compiler list
+	devCompiler.WriteSets;
+
+	cmbCompilerSetComp.Items.Assign(devCompiler.Sets);
+	cmbCompilerSetComp.ItemIndex := 0;
+	devCompiler.CurrentIndex := 0;
+
+	cmbCompilerSetComp.Items.EndUpdate;
+
+	cmbCompilerSetCompChange(nil);
 end;
 
 end.

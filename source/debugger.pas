@@ -62,7 +62,7 @@ type
     destructor  Destroy; override;
 
     procedure Start;
-    procedure Stop(Sender : TObject);
+    procedure Stop;
     procedure SendCommand(const command,params : AnsiString;viewinui : boolean = false);
 
     // CPU window
@@ -106,7 +106,7 @@ destructor TDebugger.Destroy;
 var
 	I : integer;
 begin
-	Stop(nil);
+	Stop;
 
 	for i := 0 to WatchVarList.Count - 1 do
 		Dispose(PWatchVar(WatchVarList.Items[i]));
@@ -175,13 +175,15 @@ begin
 	// Load GDB exe used by project set
 	MainForm.fCompiler.SwitchToProjectCompilerSet;
 	gdb := devCompiler.gdbName;
-	MainForm.fCompiler.SwitchToOriginalCompilerSet;
 
 	if not CreateProcess(nil, PAnsiChar('"' + devCompiler.BinDir + pd + gdb + '"' + ' --annotate=2 --silent'), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
-		MsgErr('Error launching ' + gdb + ':' + #13#10#13#10 + SysErrorMessage(GetLastError));
+		MsgErr('Error launching:' + #13#10#13#10 + devCompiler.BinDir + pd + gdb + #13#10#13#10 + SysErrorMessage(GetLastError));
 		Executing := false;
+		MainForm.fCompiler.SwitchToOriginalCompilerSet;
 		Exit;
 	end;
+
+	MainForm.fCompiler.SwitchToOriginalCompilerSet;
 
 	fProcessID := pi.hProcess;
 
@@ -199,7 +201,7 @@ begin
 	Application.HintHidePause := 5000;
 end;
 
-procedure TDebugger.Stop(Sender : TObject);
+procedure TDebugger.Stop;
 begin
 	if Executing then begin
 		Executing := false;

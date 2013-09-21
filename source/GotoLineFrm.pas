@@ -46,8 +46,8 @@ type
     BtnCancel: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
-    procedure LineKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   public
     procedure LoadText;
   end;
@@ -67,17 +67,6 @@ uses
 procedure TGotoLineForm.FormCreate(Sender: TObject);
 begin
 	LoadText;
-end;
-
-procedure TGotoLineForm.LineKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-{$IFDEF WIN32}
-  if Key = VK_RETURN then BtnOK.Click;
-{$ENDIF}
-{$IFDEF LINUX}
-  if Key = XK_RETURN then BtnOK.Click;
-{$ENDIF}
 end;
 
 procedure TGotoLineForm.LoadText;
@@ -107,4 +96,18 @@ begin
 	Action := caFree;
 end;
 
+procedure TGotoLineForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+	// Alternative method to listen to VK_RETURN key presses of the Line component
+	// This is needed to be able to mute the beep that plays when the enter key is hit
+	// VK_RETURN isn't trapped by KeyPress of spinedits, and can't be deleted by KeyDown of it
+	if Line.Focused then begin
+		if Key = Chr(VK_RETURN) then begin
+			Key := #0;
+			BtnOK.Click;
+		end;
+	end;
+end;
+
 end.
+

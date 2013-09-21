@@ -21,7 +21,7 @@
     History:
     
       23 May 2004 - Peter Schraut (peter_)
-        * Fixed this issue in TCodeCompletion.Search: 
+        * Fixed this issue in TCodeCompletion.Search:
           https://sourceforge.net/tracker/index.php?func=detail&aid=935068&group_id=10639&atid=110639
     
 }
@@ -54,6 +54,7 @@ type
     fWidth: integer;
     fHeight: integer;
     fEnabled: boolean;
+    fShowCount: integer;
     fOnKeyPress: TKeyPressEvent;
     fOnResize: TNotifyEvent;
     fOnlyGlobals: boolean;
@@ -78,6 +79,7 @@ type
     function SelectedIsFunction: boolean;
     function GetClass(const Phrase: AnsiString): AnsiString;
   published
+    property ShowCount : integer read fShowCount write fShowCount;
     property Parser: TCppParser read fParser write fParser;
     property Position: TPoint read fPos write SetPosition;
     property Color: TColor read fColor write fColor;
@@ -96,7 +98,8 @@ type
 
 implementation
 
-uses CodeCompletionForm;
+uses
+  CodeCompletionForm, Math;
 
 { TCodeCompletion }
 
@@ -119,6 +122,7 @@ begin
   fColor := clWindow;
   fEnabled := True;
   fOnlyGlobals := False;
+  fShowCount := 100; // keep things fast
 end;
 
 destructor TCodeCompletion.Destroy;
@@ -234,7 +238,7 @@ end;
 
 procedure TCodeCompletion.GetCompletionFor(const _Class, _Value: AnsiString; HasDot: boolean);
 var
-  I, I1: integer;
+  I: integer;
   InheritanceIDs: TIntList;
   ClassIDs: TIntList;
   sl: TStringList;
@@ -250,7 +254,7 @@ var
     iST: integer;
   begin
     if ClassIndex <> -1 then begin
-      ParID := ClassIndex;
+      ParID := PStatement(fParser.Statements[ClassIndex])^._ID;
       isID := ClassIndex;
       repeat
         sl.CommaText := PStatement(fParser.Statements[isID])^._InheritsFromIDs;
@@ -261,7 +265,7 @@ var
           if iID = -1 then
             Continue;
           InheritanceIDs.Add(iID);
-          iST := iID;
+          iST := fParser.IndexOfStatement(iID);
           if iST = -1 then
             Continue;
           pST := PStatement(fParser.Statements[iST]);
@@ -274,49 +278,66 @@ var
   end;
 begin
 	bOnlyLocal := False;
+	ParID := -1;
 	ClassIDs := TIntList.Create;
 	InheritanceIDs := TIntList.Create;
 	sl := TStringList.Create;
 	try
-		ParID := -1;
+
 		if not HasDot then begin // only add globals and members of the current class
 			GetInheritance(fCurrClassID);
-			for I := 0 to fParser.Statements.Count - 1 do begin
+
+			// Then add globals...
+			for I := 0 to fParser.Statements.Count - 1 do
 				if ApplyClassFilter(I, ParID, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
-			end;
-		end else begin // look for class members only
-			for I1 := 0 to fParser.Statements.Count - 1 do
-				if SameStr(PStatement(fParser.Statements[I1])^._ScopelessCmd,_Class) then begin
-					if PStatement(fParser.Statements[I1])^._Kind = skClass then begin
+
+		end else begin
+
+			// Look for the parent class before the operator. Don't scan the headers?
+			for I := 0 to fParser.Statements.Count - 1 do
+				if SameStr(PStatement(fParser.Statements[I])^._ScopelessCmd,_Class) then begin
+					if PStatement(fParser.Statements[I])^._Kind = skClass then begin
 
 						// added for the case "Class::Member", where "Class" is the actual class
 						ClassIDs.Clear;
-						ClassIDs.Add(I1);
+						ClassIDs.Add(PStatement(fParser.Statements[I])^._ID);
 						bOnlyLocal := True;
 					end else
-						GetTypeID(PStatement(fParser.Statements[I1])^._Type, ClassIDs);
+						GetTypeID(PStatement(fParser.Statements[I])^._Type, ClassIDs);
 				end;
 
 			if not bOnlyLocal then
-				for I1 := 0 to ClassIDs.Count - 1 do
-					GetInheritance(ClassIDs[I1]);
+				for I := 0 to ClassIDs.Count - 1 do
+					GetInheritance(fParser.IndexOfStatement(ClassIDs[I]));
 
 			if fCurrClassID <> -1 then
-				CurrentID := fCurrClassID
+				CurrentID := PStatement(fParser.Statements[fCurrClassID])^._ID
 			else
 				CurrentID := -1;
 
+			// Then look for members...
 			for I := 0 to fParser.Statements.Count - 1 do
 				if ApplyMemberFilter(_Class, I, CurrentID, ClassIDs, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
-
 		end;
 	finally
 		sl.Free;
 		InheritanceIDs.Free;
 		ClassIDs.Free;
 	end;
+end;
+
+function ListSort(Item1, Item2: Pointer): Integer;
+begin
+	// first take into account that parsed statements need to be higher
+	// in the list than loaded ones
+	if PStatement(Item1)^._Loaded and (not PStatement(Item2)^._Loaded) then
+		Result := 1
+	else if (not PStatement(Item1)^._Loaded) and PStatement(Item2)^._Loaded then
+		Result := -1
+	else // otherwise, sort by name
+		Result := CompareText(PStatement(Item1)^._ScopelessCmd, PStatement(Item2)^._ScopelessCmd);
 end;
 
 procedure TCodeCompletion.FilterList(const _Class, _Value: AnsiString;HasDot: boolean);
@@ -339,6 +360,7 @@ begin
 		for I := 0 to fFullCompletionStatementList.Count - 1 do
 			fCompletionStatementList.Add(fFullCompletionStatementList[I]);
 	end;
+	fCompletionStatementList.Sort(@ListSort);
 end;
 
 function TCodeCompletion.GetHasDot(const Phrase: AnsiString): boolean;
@@ -395,7 +417,7 @@ begin
 		   (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '&') = 0) or
 		   (CompareText(_Value, PStatement(fParser.Statements[I])^._ScopelessCmd + '**') = 0) then begin
 			if (Result = -1) or ((Result <> -1) and (PStatement(fParser.Statements[I])^._ParentID <> Result)) then begin
-				Result := I;
+				Result := PStatement(fParser.Statements[I])^._ID;
 				if Assigned(il) then
 					il.Add(Result)
 				else
@@ -412,23 +434,10 @@ begin
 	// Clear data, do not free pointed memory: data is owned by CppParser
 	fCompletionStatementList.Clear;
 	fFullCompletionStatementList.Clear;
-	CodeComplForm.lbCompletion.Items.Clear; // clear UI too
+	CodeComplForm.lbCompletion.Items.BeginUpdate;
+	CodeComplForm.lbCompletion.Items.Clear;
+	CodeComplForm.lbCompletion.Items.EndUpdate;
 	fIncludedFiles.Clear; // is recreated anyway on reshow, so save some memory when hiding
-end;
-
-function ListSort(Item1, Item2: Pointer): Integer;
-begin
-	// first take into account that parsed statements need to be higher
-	// in the list than loaded ones
-	Result := 0;
-	if PStatement(Item1)^._Loaded and not PStatement(Item2)^._Loaded then
-		Result := 1
-	else if not PStatement(Item1)^._Loaded and PStatement(Item2)^._Loaded then
-		Result := -1;
-
-	// after that, consider string comparison
-	if Result = 0 then
-		Result := CompareText(PStatement(Item1)^._ScopelessCmd, PStatement(Item2)^._ScopelessCmd);
 end;
 
 procedure TCodeCompletion.Search(Sender: TWinControl;const Phrase, Filename: AnsiString);
@@ -455,17 +464,16 @@ begin
 			end;
 
 			// filter fFullCompletionStatementList to fCompletionStatementList
-			FilterList(C, M, D);
+			FilterList(C, M, D); // and sort here too
 			Screen.Cursor := crDefault;
 		end;
 
 		if fCompletionStatementList.Count > 0 then begin
-			fCompletionStatementList.Sort(@ListSort);
-
 			CodeComplForm.lbCompletion.Items.BeginUpdate;
 			CodeComplForm.lbCompletion.Items.Clear;
 
-			for I := 0 to fCompletionStatementList.Count - 1 do
+			// Only slow one hundred statements...
+			for I := 0 to min(fShowCount,fCompletionStatementList.Count - 1) do
 				CodeComplForm.lbCompletion.Items.AddObject('',fCompletionStatementList[I]);
 
 			CodeComplForm.lbCompletion.Items.EndUpdate;
