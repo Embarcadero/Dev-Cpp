@@ -43,6 +43,7 @@ type
     procedure EditKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure btnPrevClick(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   public
     SearchString : AnsiString;
     Editor       : TSynEdit;
@@ -143,6 +144,11 @@ begin
 	end;
 	Exclude(rOptions,ssoEntireScope);
 	lastcommand:=1; // 1 == next
+end;
+
+procedure TfrmIncremental.FormClose(Sender: TObject;var Action: TCloseAction);
+begin
+	Action := caFree;
 end;
 
 end.

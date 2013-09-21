@@ -43,7 +43,6 @@ type
    fImgfiles: TOysStringList;
    procedure ClearLists;
    function GetImage(const Index: Integer; var imglst: TImageList): boolean;
-   function GetPreview: AnsiString;
   public
    constructor Create;
    destructor Destroy; override;
@@ -59,7 +58,6 @@ type
    property Projects: TImageList read fProjects;
    property Specials: TImageList read fSpecials;
    property Browser: TImageList read fBrowser;
-   property Preview: AnsiString read GetPreview;
  end;
 
 var
@@ -74,7 +72,6 @@ uses
 {$IFDEF LINUX}
   SysUtils, QForms, QGraphics, devcfg, utils, datamod, version;
 {$ENDIF}
-
 
 { TdevTheme }
 
@@ -120,11 +117,6 @@ begin
   fProjects.Clear;
   fSpecials.Clear;
   fBrowser.Clear;
-end;
-
-function GetPreview: AnsiString;
-begin
-
 end;
 
 function TdevTheme.GetImage(const Index: Integer; var imglst: TImageList): boolean;
@@ -286,11 +278,13 @@ end;
 
 function TdevTheme.ThemeList: TStrings;
 var
- idx: integer;
+	I : integer;
 begin
-  Result:= TStringList.Create;
-  for idx:= 0 to pred(fthemes.Count) do
-   Result.Add(fThemes.Values[idx]);
+	Result := TStringList.Create;
+	for I := 0 to fthemes.Count - 1 do
+		Result.Add(fThemes.Values[I]);
+
+	// Caller needs to free stuff
 end;
 
 procedure TdevTheme.ScanThemes;
@@ -326,12 +320,6 @@ begin
       tmp.Free;
      end;
    end;
-end;
-
-
-function TdevTheme.GetPreview: AnsiString;
-begin
-//
 end;
 
 end.

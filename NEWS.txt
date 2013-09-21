@@ -1,5 +1,9 @@
 Version 5.3.0.0 - *
 
+- Completely rewritten the debugger.
+- Improved some internal (compiler) data structures, reducing memory usage.
+- Improved startup speed, splashscreen is hidden (not loaded) when startup times are low enough.
+- Fixed a lot of memory leaks.
 - Indent guides are now painted faster, reducing flicker.
 - Code completion is now more clear and pops up faster.
 - Color selectors in Editor Options now properly set their own defaults, not those of other controls.
@@ -8,6 +12,9 @@ Version 5.3.0.0 - *
 - Code folding is updated much faster now.
 - The code parser now understands multiple definitions after the } symbol of structs.
 - Much more performance enhancements in the typing/editing department.
+- TODO: test MinGW 4.7.
+- TODO: refine the debugger.
+- TODO: much more unit testing.
 
 Version 5.2.0.3 - 25 Juni 2012
 
@@ -356,39 +363,39 @@ Version 4.9.9.6 - 20 Juli 2011
 - Fixed the file version string: it now keeps in sync with incremented build numbers.
 - The spin edits which control the Project file version are now kept in sync with the strings below.
 - Added an option to synchronize product and file versions.
-- Set the default installation directory to C:\Program Files (x86)\Dev-Cpp instead of C:\Dev-Cpp.
+- Set the default installation directory to (Program Files)\Dev-C++ instead of C:\Dev-Cpp.
 
 Version 4.9.9.5 - 16 Juli 2011
 
 - Added column reporting for a few more error types.
 - Made a proper portable version this time: it comes in a 7zip file, saving a few more registry entries compared to 4.9.9.4's portable setup.
-- The uninstaller now adds itself to Windows' "Programs and Features" list.
+- Dev-C++ now adds itself to Windows' "Programs and Features" list.
 
 Version 4.9.9.4 - 12 Juli 2011
 
 - Added a %path% macro to every path. Use this string in the config files to add relative paths to Compiler Directories.
-- Fixed a bug in the Code Completion Cache Creator (CCCC :D): it used to add 2 copies of every file (one relatively referred to and one referred to with a full path).
+- Fixed a bug in the Code Completion Cache Creator (CCCC :D): it used to add two copies of every file (one relatively referred to and one referred to with a full path).
 - Cleaned up a few duplicate and unused headers and binaries. The installer is now a whopping 200KiB smaller.
 - Updated the make.exe searcher to check for GCC 4.5.2's make.exe.
-- Added a few install profiles: minimalist and portable.
+- Added a few NSIS installation profiles: minimalist and portable.
 - Fixed a few grammar errors.
-- Updated the About window.
-- Added an icon to the installer.
+- Updated the About window layout and text.
+- Added an icon to the NSIS installer.
 
 Version 4.9.9.3 - 24 Juni 2011
 
-- Upgraded the Default Compiler to GCC 4.5.2.
-- When encountering an error, Dev will now point you to the error line and (new) positions the cursor next to it.
-- Added some more -march generic optimization options (core2, k8-sse3, amdfam10). Also added 'native' and 'generic' for advanced use. :P
-- Cleaned the explicit -m(some instruction set) options. Added a few more (but they're a bit useless, -march essentialy controls them).
-- Cleaned up the TODO viewer.
-- Fixed a bug in the Compiler Error parser: it used to read 1 byte too much afer the \0 of each error line, possibly causing crashes.
-- Added a column column in the Compiler log.
-- Tweaked the default settings. Enable line numbers by default for example.
-- Fixed a bug in the Compiler Set creator: it didn't feel like storing command line options for each Compiler.
+- Upgraded the default compiler to GCC 4.5.2.
+- When encountering an error, Dev-C++ will now position the caret next to it.
+- Added some more -march optimization options, including core2, k8-sse3, amdfam10, 'native' and 'generic'.
+- Cleaned up the explicit -m(instruction set) options by removing outdated and unsupported ones. Added a couple of modern instructions
+- Cleaned up the TODO viewer layout.
+- Fixed a bug in the compiler error parser: it used to read 1 byte too much afer the \0 of each error line, possibly causing crashes.
+- Added a 'Column' column in the Compiler log.
+- Tweaked the default settings, by enabling line numbers by default for example.
+- Fixed a bug in the compiler set creator: it wasn't storing storing command line options for each compiler.
 - Added more UI controls for frequently used GCC flags like -Wall, -Wextra and -pedantic.
 - Moved warning related flag options to a new section called 'Code Warnings'.
-- Removed the silly optimization controls. Now has a proper None/Low/Med/High combobox.
+- Removed the compiler optimization tree controls. Now has a proper None/Low/Med/High combobox.
 - Updated the default directory listings to GCC 4.5.2's directories.
 - Removed the [Compiler] section from the ini file. Instead of saving the current Compiler Set twice, it saves a Compiler index to refer to.
 - And some more stuff I forgot about.

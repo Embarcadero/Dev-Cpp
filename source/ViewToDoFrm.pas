@@ -33,7 +33,7 @@ uses
 
 type
 	PToDoRec = ^TToDoRec;
-	TToDoRec = packed record
+	TToDoRec = record
 		TokenIndex		: integer;
 		Filename		: AnsiString;
 		Line			: integer;

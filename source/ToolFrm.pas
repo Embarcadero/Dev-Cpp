@@ -173,8 +173,8 @@ var
  Value,
  section: AnsiString;
 begin
-	if not FileExists(devDirs.Config + 'devcpp.cfg') then exit;
-	with TINIFile.Create(devDirs.Config + 'devcpp.cfg') do
+	if not FileExists(devDirs.Config + DEV_TOOLS_FILE) then exit;
+	with TINIFile.Create(devDirs.Config + DEV_TOOLS_FILE) do
 		try
 			Count:= Readinteger('Tools', 'Count', 0);
 			for idx:= 0 to pred(Count) do begin
@@ -209,7 +209,8 @@ var
  section: AnsiString;
  item: PToolItem;
 begin
-	with TINIFile.Create(devDirs.Config +'devcpp.cfg') do
+	if fList.Count = 0 then Exit; // don't bother saving empty files
+	with TINIFile.Create(devDirs.Config + DEV_TOOLS_FILE) do
 		try
 			// remove extra sections if items removed
 			Count := ReadInteger('Tools', 'Count', 0);

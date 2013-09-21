@@ -292,7 +292,7 @@ var
 	alignleft : integer;
 	aligntop : integer;
 begin
-	with (Control as TComboBox) do begin
+	with TComboBox(Control) do begin
 		Canvas.Font.Name := Items.Strings[Index];
 		Canvas.Font.Size := edEditorSize.Value;
 		Canvas.FillRect(Rect);
@@ -307,7 +307,7 @@ var
 	alignleft : integer;
 	aligntop : integer;
 begin
-	with (Control as TComboBox) do begin
+	with TComboBox(Control) do begin
 
 		if cbGutterFnt.Checked then begin
 			Canvas.Font.Name := Items.Strings[Index];
@@ -543,7 +543,6 @@ begin
 		Add('}');
 	end;
 	CppEdit.Lines.EndUpdate;
-	CppEdit.ReScan;
 end;
 
 procedure TEditorOptForm.GetOptions;
@@ -684,7 +683,6 @@ begin
 
 	if FileExists(devDirs.Config + DEV_DEFAULTCODE_FILE) then begin
 		seDefault.Lines.LoadFromFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
-		seDefault.ReScan;
 	end;
 
 	// CODE_COMPLETION
@@ -996,8 +994,7 @@ end;
 
 procedure TEditorOptForm.DefaultSelect(Sender: TObject);
 begin
-	with (Sender as TColorPickerButton) do
-		SelectionColor:= clNone;
+	TColorPickerButton(Sender).SelectionColor:= clNone;
 end;
 
 procedure TEditorOptForm.PickerHint(Sender: TObject; Cell: integer; var Hint: AnsiString);
@@ -1309,7 +1306,6 @@ begin
 	Codeins.ClearAll;
 	CodeIns.Text:= StrtoCodeIns(Item.SubItems[2]);
 	UpdateCIButtons;
-	CodeIns.ReScan;
 end;
 
 procedure TEditorOptForm.CodeInsStatusChange(Sender: TObject;Changes: TSynStatusChanges);
@@ -1510,7 +1506,7 @@ begin
   sl:=TStringList.Create;
   try
     sl.Delimiter:=';';
-    sl.DelimitedText:=devDirs.C;
+    sl.DelimitedText:=devCompiler.CppDir;
     if sl.Count>1 then begin
       MaxHits:=0;
       MaxIndex:=0;
@@ -1527,7 +1523,7 @@ begin
       CppParser.ProjectDir:=IncludeTrailingPathDelimiter(sl[MaxIndex]);
     end
     else
-      CppParser.ProjectDir:=IncludeTrailingPathDelimiter(devDirs.C);
+      CppParser.ProjectDir:=IncludeTrailingPathDelimiter(devCompiler.CppDir);
   finally
     sl.Free;
   end;

@@ -58,20 +58,20 @@ begin
   Replace(Result, '<DATETIME>', DateTimeToStr(Now));
 
   Dir := ExtractFilePath(ParamStr(0)) + '\include';
-  if (not DirectoryExists(Dir)) and (devDirs.C <> '') then
+  if (not DirectoryExists(Dir)) and (devCompiler.CppDir <> '') then
   begin
       StrList := TStringList.Create;
-      StrToList(devDirs.C, StrList);
+      StrToList(devCompiler.CppDir, StrList);
       Dir := StrList.Strings[0];
       StrList.Free;
   end;
   Replace(Result, '<INCLUDE>', Dir);
 
   Dir := ExtractFilePath(ParamStr(0)) + '\lib';
-  if (not DirectoryExists(Dir)) and (devDirs.Lib <> '') then
+  if (not DirectoryExists(Dir)) and (devCompiler.LibDir <> '') then
   begin
       StrList := TStringList.Create;
-      StrToList(devDirs.Lib, StrList);
+      StrToList(devCompiler.LibDir, StrList);
       Dir := StrList.Strings[0];
       StrList.Free;
   end;

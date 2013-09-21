@@ -286,7 +286,7 @@ begin
     if FileExists(devDirs.Config + 'devcpp.cfg') then
       with TIniFile.Create(devDirs.Config + 'devcpp.cfg') do
         try
-          WriteString(WEBUPDATE_SECTION, PUpdateRec(wThread.Files[index])^.Name, PUpdateRec(wThread.Files[index])^.Version);
+          WriteString('WEBUPDATE', PUpdateRec(wThread.Files[index])^.Name, PUpdateRec(wThread.Files[index])^.Version);
         finally
           Free;
         end;
@@ -427,7 +427,7 @@ begin
       P^.Version := Ini.ReadString(sl[I], 'Version', '<unknown>');
       P^.LocalVersion := GetPackmanPackVersion(PackmanPacks, P^.Name);
       if P^.LocalVersion = '' then
-        P^.LocalVersion := LocalIni.ReadString(WEBUPDATE_SECTION, P^.Name, '');
+        P^.LocalVersion := LocalIni.ReadString('WEBUPDATE', P^.Name, '');
       P^.Size := Ini.ReadInteger(sl[I], 'Size', 0);
       P^.Date := Ini.ReadString(sl[I], 'Date', '');
       P^.Selected := False;
@@ -914,8 +914,8 @@ begin
 
   with TIniFile.Create(devDirs.Config + 'devcpp.cfg') do
     try
-      devcppversion2 := ReadString(WEBUPDATE_SECTION, 'Dev-C++ Update', '');
-      packmanversion2 := ReadString(WEBUPDATE_SECTION, 'PackMan', '');
+      devcppversion2 := ReadString('WEBUPDATE', 'Dev-C++ Update', '');
+      packmanversion2 := ReadString('WEBUPDATE', 'PackMan', '');
     finally
       Free;
     end;
@@ -924,7 +924,7 @@ begin
   if (devcppversion <> '') and (devcppversion <> devcppversion2) then
     with TIniFile.Create(devDirs.Config + 'devcpp.cfg') do
       try
-        WriteString(WEBUPDATE_SECTION, 'Dev-C++ Update', devcppversion);
+        WriteString('WEBUPDATE', 'Dev-C++ Update', devcppversion);
       finally
         Free;
       end;
@@ -933,7 +933,7 @@ begin
   if (packmanversion <> '') and (packmanversion <> packmanversion2) then
     with TIniFile.Create(devDirs.Config + 'devcpp.cfg') do
       try
-        WriteString(WEBUPDATE_SECTION, 'PackMan', packmanversion);
+        WriteString('WEBUPDATE', 'PackMan', packmanversion);
       finally
         Free;
       end;

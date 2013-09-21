@@ -22,7 +22,7 @@ unit CFGINI;
 interface
 
 uses
-  Classes, IniFiles, cfgTypes, TypInfo;
+  Classes, IniFiles, TypInfo;
 
 type
  TCFGINI = class(TObject)
@@ -44,8 +44,8 @@ type
    procedure ReadConfig;
    procedure SaveConfig;
 
-   procedure LoadObject(var Obj: TCFGOptions);
-   procedure SaveObject(var  Obj: TCFGOptions);
+   procedure LoadObject(var Obj: TPersistent;const CustomName : AnsiString);
+   procedure SaveObject(var  Obj: TPersistent;const CustomName : AnsiString);
 
    function LoadSetting(const key: AnsiString; const Entry: AnsiString): AnsiString;
    procedure SaveSettingS(const key: AnsiString; const entry: AnsiString; const value: AnsiString);
@@ -268,28 +268,32 @@ begin
    end;
 end;
 
-procedure TCFGINI.LoadObject(var Obj: TCFGOptions);
+procedure TCFGINI.LoadObject(var Obj: TPersistent;const CustomName : AnsiString);
 begin
-  if not assigned(Obj) then exit;
-  try
-   ReadObject(Obj.Name, Obj);
-  except end;
+	if not assigned(Obj) then exit;
+	if CustomName <> '' then
+		ReadObject(CustomName, Obj)
+	else
+		ReadObject(Obj.ClassName, Obj);
 end;
 
 function TCFGINI.LoadSetting(const key, Entry: AnsiString): AnsiString;
 begin
-  result:= fini.ReadString(Key, Entry, '');
+	result:= fini.ReadString(Key, Entry, '');
 end;
 
-procedure TCFGINI.SaveObject(var Obj: TCFGOptions);
+procedure TCFGINI.SaveObject(var Obj: TPersistent;const CustomName : AnsiString);
 begin
-  if not assigned(Obj) then exit;
-  WriteObject(Obj.Name, Obj);
+	if not assigned(Obj) then exit;
+	if CustomName <> '' then
+		WriteObject(CustomName, Obj)
+	else
+		WriteObject(Obj.ClassName,Obj);
 end;
 
 procedure TCFGINI.SaveSettingS(const key, entry, value: AnsiString);
 begin
-  fini.WriteString(Key, Entry, Value);
+	fini.WriteString(Key, Entry, Value);
 end;
 
 procedure TCFGINI.ClearSection(const Name: AnsiString);

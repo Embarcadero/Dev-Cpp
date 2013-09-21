@@ -544,7 +544,7 @@ begin
   MakeIncludes.Items.AddStrings(fOptions.MakeIncludes);
 
   // Files tab
-  cmbCompiler.Items.Assign(devCompilerSet.Sets);
+  cmbCompiler.Items.Assign(devCompiler.Sets);
   cmbCompiler.ItemIndex:=fOptions.CompilerSet;
 
   // Version tab
@@ -599,7 +599,7 @@ begin
   txtOverrideBuildCmd.Enabled:=False;
   txtOverrideBuildCmd.Text:='';
   chkSupportXP.Enabled:=fOptions.typ=dptGUI;
-  devCompiler.OptionStr:=fOptions.CompilerOptions;
+  devCompiler.fOptionString:=fOptions.CompilerOptions;
   CompOptionsFrame1.FillOptions(fProject);
   SubTabsChange(Self);
   UpdateMakButtons();
@@ -906,7 +906,7 @@ end;
 procedure TfrmProjectOptions.FormCloseQuery(Sender: TObject;var CanClose: Boolean);
 begin
   // check for disallowed characters in filename
-  if (Pos('/', edOverridenOutput.Text)>0) or
+  {if (Pos('/', edOverridenOutput.Text)>0) or
      (Pos('\', edOverridenOutput.Text)>0) or
      (Pos(':', edOverridenOutput.Text)>0) or
      (Pos('*', edOverridenOutput.Text)>0) or
@@ -921,10 +921,10 @@ begin
      CanClose:=False;
   end;
   if CanClose then begin
-    fOptions.CompilerOptions:=devCompiler.OptionStr;
-    devCompilerSet.LoadSet(devCompiler.CompilerSet);
-    devCompilerSet.AssignToCompiler;
-  end;
+    fOptions.CompilerOptions:=devCompiler.OptionString;
+    devCompiler.LoadSet(devCompiler.CompilerSet);
+    devCompiler.AssignToCompiler;
+  end;}
 end;
 
 procedure TfrmProjectOptions.lvFilesChange(Sender: TObject;
@@ -1097,15 +1097,13 @@ end;
 
 procedure TfrmProjectOptions.cmbCompilerChange(Sender: TObject);
 begin
-  devCompilerSet.LoadSet(cmbCompiler.ItemIndex);
-  devCompilerSet.AssignToCompiler;
+  devCompiler.LoadSet(cmbCompiler.ItemIndex);
   CompOptionsFrame1.FillOptions(fProject);
 end;
 
 procedure TfrmProjectOptions.btnCancelClick(Sender: TObject);
 begin
-  devCompilerSet.LoadSet(fOptions.CompilerSet);
-  devCompilerSet.AssignToCompiler;
+  devCompiler.LoadSet(fOptions.CompilerSet);
 end;
 
 procedure TfrmProjectOptions.lstTypeClick(Sender: TObject);
@@ -1116,7 +1114,7 @@ end;
 procedure TfrmProjectOptions.btnOkClick(Sender: TObject);
 begin
   SaveDirSettings;
-  fOptions.CompilerOptions:=devCompiler.OptionStr;
+  fOptions.CompilerOptions:=devCompiler.fOptionString;
 end;
 
 procedure TfrmProjectOptions.AddLibBtnClick(Sender: TObject);

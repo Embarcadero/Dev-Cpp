@@ -1,10 +1,10 @@
 object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
-  Left = 694
-  Top = 368
+  Left = 711
+  Top = 387
   BorderStyle = bsDialog
   Caption = 'Oops!'
-  ClientHeight = 369
-  ClientWidth = 465
+  ClientHeight = 360
+  ClientWidth = 500
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,30 +14,25 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Shape1: TShape
     Left = 0
     Top = 0
-    Width = 465
+    Width = 500
     Height = 45
     Align = alTop
     Pen.Style = psClear
   end
   object lblError: TLabel
-    Left = 84
+    Left = 94
     Top = 68
-    Width = 373
+    Width = 395
     Height = 53
     AutoSize = False
     Caption = 'lblError'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = [fsBold]
-    ParentFont = False
     WordWrap = True
   end
   object lblTitle: TLabel
@@ -60,15 +55,9 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Width = 41
     Height = 13
     Caption = 'Address:'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = []
-    ParentFont = False
   end
   object lblAddress: TLabel
-    Left = 84
+    Left = 94
     Top = 52
     Width = 48
     Height = 13
@@ -80,17 +69,11 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Width = 70
     Height = 13
     Caption = 'Error message:'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = []
-    ParentFont = False
   end
   object btnSend: TSpeedButton
-    Left = 96
+    Left = 104
     Top = 130
-    Width = 83
+    Width = 92
     Height = 25
     Caption = '&Send bug report'
     ParentShowHint = False
@@ -98,9 +81,9 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     OnClick = btnSendClick
   end
   object btnView: TSpeedButton
-    Left = 8
+    Left = 4
     Top = 130
-    Width = 83
+    Width = 92
     Height = 25
     AllowAllUp = True
     GroupIndex = 1
@@ -109,16 +92,10 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     ShowHint = True
     OnClick = btnViewClick
   end
-  object Bevel1: TBevel
-    Left = 8
-    Top = 160
-    Width = 449
-    Height = 2
-  end
   object Bevel2: TBevel
     Left = 0
     Top = 45
-    Width = 465
+    Width = 500
     Height = 2
     Align = alTop
   end
@@ -202,17 +179,17 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
       FFFFFFFF0000000000000000}
   end
   object btnHelp: TSpeedButton
-    Left = 384
+    Left = 404
     Top = 130
-    Width = 73
+    Width = 92
     Height = 25
     Caption = '&Help'
     OnClick = btnHelpClick
   end
   object btnClose: TButton
-    Left = 196
+    Left = 204
     Top = 130
-    Width = 83
+    Width = 92
     Height = 25
     Cancel = True
     Caption = '&Continue'
@@ -223,9 +200,9 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     TabOrder = 0
   end
   object btnTerminate: TButton
-    Left = 284
+    Left = 304
     Top = 130
-    Width = 83
+    Width = 92
     Height = 25
     Caption = '&Terminate'
     ModalResult = 3
@@ -234,10 +211,10 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     TabOrder = 1
   end
   object PageControl1: TPageControl
-    Left = 8
-    Top = 168
-    Width = 449
-    Height = 197
+    Left = 0
+    Top = 160
+    Width = 500
+    Height = 200
     ActivePage = tabMemory
     Style = tsFlatButtons
     TabOrder = 2
@@ -253,7 +230,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         Caption = 'Program path:'
       end
       object lblProgramPath: TLabel
-        Left = 100
+        Left = 120
         Top = 16
         Width = 71
         Height = 13
@@ -267,7 +244,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         Caption = 'Program version:'
       end
       object lblProgramVersion: TLabel
-        Left = 100
+        Left = 120
         Top = 36
         Width = 84
         Height = 13
@@ -285,7 +262,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         Caption = 'Platform:'
       end
       object lblPlatform: TLabel
-        Left = 100
+        Left = 120
         Top = 16
         Width = 48
         Height = 13
@@ -299,7 +276,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         Caption = 'OS version:'
       end
       object lblOSversion: TLabel
-        Left = 100
+        Left = 120
         Top = 36
         Width = 59
         Height = 13
@@ -313,7 +290,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         Caption = 'Additional info:'
       end
       object lblAdditionalInfo: TLabel
-        Left = 100
+        Left = 120
         Top = 56
         Width = 74
         Height = 13
@@ -327,7 +304,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         Caption = 'Computer name:'
       end
       object lblComputerName: TLabel
-        Left = 100
+        Left = 120
         Top = 76
         Width = 83
         Height = 13
@@ -338,14 +315,14 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
       Caption = 'Memory'
       ImageIndex = 3
       object Label10: TLabel
-        Left = 166
+        Left = 150
         Top = 144
         Width = 63
         Height = 13
         Caption = 'Memory load:'
       end
       object lblMemoryLoad: TLabel
-        Left = 238
+        Left = 240
         Top = 144
         Width = 71
         Height = 13
@@ -353,13 +330,13 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
       end
       object GroupBox1: TGroupBox
         Left = 12
-        Top = 16
-        Width = 133
+        Top = 8
+        Width = 150
         Height = 117
         Caption = 'Physical memory'
         TabOrder = 0
         object Label4: TLabel
-          Left = 4
+          Left = 12
           Top = 24
           Width = 27
           Height = 13
@@ -376,7 +353,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
           WordWrap = True
         end
         object Label8: TLabel
-          Left = 4
+          Left = 12
           Top = 44
           Width = 32
           Height = 13
@@ -393,7 +370,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
           WordWrap = True
         end
         object Label11: TLabel
-          Left = 4
+          Left = 12
           Top = 80
           Width = 24
           Height = 13
@@ -411,9 +388,9 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         end
       end
       object GroupBox2: TGroupBox
-        Left = 152
-        Top = 16
-        Width = 133
+        Left = 172
+        Top = 8
+        Width = 150
         Height = 117
         Caption = 'Virtual memory'
         TabOrder = 1
@@ -470,9 +447,9 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         end
       end
       object GroupBox3: TGroupBox
-        Left = 292
-        Top = 16
-        Width = 133
+        Left = 332
+        Top = 8
+        Width = 150
         Height = 117
         Caption = 'Cache memory'
         TabOrder = 2
@@ -530,13 +507,12 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
       end
     end
     object tabStackTrace: TTabSheet
-      Caption = 'StackTrace'#169
+      Caption = 'StackTrace'
       object memStackTrace: TMemo
         Left = 0
         Top = 0
-        Width = 441
-        Height = 166
-        Align = alClient
+        Width = 492
+        Height = 169
         Font.Charset = GREEK_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
@@ -556,8 +532,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
       object memBugReport: TMemo
         Left = 0
         Top = 0
-        Width = 441
-        Height = 166
+        Width = 492
+        Height = 169
         Align = alClient
         Font.Charset = GREEK_CHARSET
         Font.Color = clWindowText

@@ -30,6 +30,12 @@ uses
 {$ENDIF}
 
 type
+  TMenuAndShortcut = record
+    Caption: AnsiString;
+    Shortcut: TShortCut;
+  end;
+  PMenuAndShortcut = ^TMenuAndShortcut;
+
   TdevShortcuts = class(TComponent)
   private
     { Private declarations }
@@ -43,6 +49,7 @@ type
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Load;
     procedure Edit;
   published
@@ -66,7 +73,7 @@ uses
 
 procedure Register;
 begin
-  RegisterComponents('dev-c++', [TdevShortcuts]);
+  RegisterComponents('Dev-C++', [TdevShortcuts]);
 end;
 
 { TdevShortcuts }
@@ -75,8 +82,13 @@ constructor TdevShortcuts.Create(AOwner: TComponent);
 begin
   inherited;
   fOwner := AOwner;
-  fFileName := 'shortcuts.cfg';
+  fFileName := 'shortcuts.ini'; // DEV_SHORTCUTS_FILE
   fAltColor := $E0E0E0;
+end;
+
+destructor TdevShortcuts.Destroy;
+begin
+  inherited;
 end;
 
 procedure TdevShortcuts.Edit;
@@ -109,11 +121,6 @@ begin
 end;
 
 procedure TdevShortcuts.Load;
-type TMenuAndShortcut = record
-      Caption: AnsiString;
-      Shortcut: TShortCut;
-end;
-PMenuAndShortcut = ^TMenuAndShortcut;
 var
   I, x: integer;
   Fini: TIniFile;
@@ -168,14 +175,12 @@ begin
             ms^.Shortcut:=sct;
             Entries.Add(ms);
           end;
-  finally
-    Fini.Free;
-    while Entries.Count>0 do begin
-      Dispose(Entries[0]);
-      Entries.Delete(0);
-    end;
-    Entries.Free;
-  end;
+	finally
+		Fini.Free;
+		for I := 0 to Entries.Count - 1 do
+			Dispose(PMenuAndShortcut(Entries[i]));
+		Entries.Free;
+	end;
 end;
 
 procedure TdevShortcuts.ReadShortcuts;

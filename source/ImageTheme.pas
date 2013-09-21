@@ -488,12 +488,12 @@ end;
 
 function TCustomImageThemeFactory.GetTheme(Index: Integer): TCustomImageTheme;
 begin
-  Result := FThemes[Index] as TCustomImageTheme;
+  Result := TCustomImageTheme(FThemes[Index]);
 end;
 
 function TCustomImageThemeFactory.GetThemeFilename(Index: Integer): AnsiString;
 begin
-  Result := (FThemes[Index] as TCustomImageTheme).Filename;
+  Result := TCustomImageTheme(FThemes[Index]).Filename;
 end;
 
 procedure TCustomImageThemeFactory.GetThemeTitles(ADest: TStrings);
@@ -527,7 +527,7 @@ end;
 
 function TCustomImageThemeFactory.GetThemeTitle(Index: Integer): AnsiString;
 begin
-  Result := (FThemes[Index] as TCustomImageTheme).Title;
+  Result := TCustomImageTheme(FThemes[Index]).Title;
 end; 
 
 procedure TCustomImageThemeFactory.LoadFromDirectory(ADirectory: AnsiString);
@@ -602,7 +602,7 @@ end;
 
 function TDevImageThemeFactory.GetCurrentTheme: TDevImageTheme;
 begin
-	Result := inherited CurrentTheme as TDevImageTheme;
+	Result := TDevImageTheme(inherited CurrentTheme);
 end;
 
 procedure TDevImageThemeFactory.SetCurrentTheme(const ATheme: TDevImageTheme);
@@ -619,7 +619,7 @@ end;
 
 function TDevImageThemeFactory.GetTheme(Index: Integer): TDevImageTheme;
 begin
-	Result := inherited Themes[Index] as TDevImageTheme;
+	Result := TDevImageTheme(inherited Themes[Index]);
 end;
 
 end.

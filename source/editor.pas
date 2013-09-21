@@ -45,11 +45,8 @@ type
     constructor Create(ed : TEditor);
   end;
 
-  // RNC no longer uses an Editor to toggle
-  TBreakpointToggleEvent = procedure (index: integer; BreakExists: boolean) of object;
-
-  TEditor = class
-   private
+  TEditor = class(TObject)
+  private
     fInProject: boolean;
     fFileName: AnsiString;
     fNew: boolean;
@@ -59,13 +56,11 @@ type
     fErrorLine: integer;
     fActiveLine: integer;
     fDebugGutter: TDebugGutter;
-    fOnBreakPointToggle: TBreakpointToggleEvent;
     fCurrentWord: AnsiString;
     fCompletionEatSpace: boolean;
     fCompletionTimer: TTimer;
     fCompletionTimerKey: Char;
     fCompletionBox: TCodeCompletion;
-    fRunToCursorLine: integer;
     fFunctionTipTimer : TTimer;
     fFunctionTip: TCodeToolTip;
     fMouseOverTimer : TTimer;
@@ -81,13 +76,15 @@ type
     procedure EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure EditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
-    procedure EditorSpecialLineColors(Sender: TObject; Line: integer;var Special: boolean; var FG, BG: TColor);
-    procedure EditorGutterClick(Sender: TObject; Button: TMouseButton;x, y, Line: integer; mark: TSynEditMark);
     procedure EditorReplaceText(Sender: TObject;const aSearch, aReplace: AnsiString; Line, Column: integer;var Action: TSynReplaceAction);
     procedure EditorDropFiles(Sender: TObject; x, y: integer;aFiles: TStrings);
     procedure EditorDblClick(Sender: TObject);
     procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure EditorExit(Sender : TObject);
+    procedure EditorGutterClick(Sender: TObject; Button: TMouseButton;x, y, Line: integer; mark: TSynEditMark);
+    procedure EditorSpecialLineColors(Sender: TObject; Line: integer;var Special: boolean; var FG, BG: TColor);
+
+    procedure CompletionKeyPress(Sender: TObject; var Key: Char);
 
     procedure MouseOverTimer(Sender : TObject);
 
@@ -95,27 +92,21 @@ type
     function CurrentPhrase: AnsiString;
     procedure CompletionTimer(Sender: TObject);
 
-    procedure TurnOffBreakpoint(line: integer);
-    procedure TurnOnBreakpoint(line: integer);
-
     function FunctionTipAllowed : boolean;
     procedure FunctionTipTimer(Sender : TObject);
 
     procedure SetFileName(const value: AnsiString);
-    procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
-   public
+  public
     procedure Init(InProject : boolean;const Caption, Filename : AnsiString;DoOpen : boolean;IsRes: boolean = FALSE);
     destructor Destroy; override;
 
-    procedure SetBreakPointsOnOpen;
-    function HasBreakPoint(line_number: integer): integer;
-    procedure InsertBreakpoint(line: integer);
-    procedure RemoveBreakpoint(line: integer);
+    // Recoded breakpoint stuff
+    function HasBreakPoint(Line : integer): integer;
+    procedure ToggleBreakPoint(Line : integer);
+    procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 
     procedure Activate;
-    function ToggleBreakPoint(Line: integer): boolean;
-    procedure RunToCursor(Line : integer);
     procedure GotoLine;
     procedure GotoLineNr(Nr: integer);
     function Search(isReplace: boolean): boolean;
@@ -128,7 +119,7 @@ type
     procedure UpdateCaption(const NewCaption: AnsiString);
     procedure InsertDefaultText;
     procedure PaintMatchingBrackets(TransientType: TTransientType);
-    
+
     procedure CommentSelection;
     procedure UncommentSelection;
     procedure IndentSelection;
@@ -138,7 +129,6 @@ type
     procedure InitCompletion;
     procedure DestroyCompletion;
 
-    property OnBreakpointToggle: TBreakpointToggleEvent read fOnBreakpointToggle write fOnBreakpointToggle;
     property FileName: AnsiString read fFileName write SetFileName;
     property InProject: boolean read fInProject write fInProject;
     property New: boolean read fNew write fNew;
@@ -164,8 +154,8 @@ uses
 
 constructor TDebugGutter.Create(ed : TEditor);
 begin
-  inherited Create(ed.Text);
-  fEditor := ed;
+	inherited Create(ed.Text);
+	fEditor := ed;
 end;
 
 procedure TDebugGutter.AfterPaint(ACanvas: TCanvas; const AClip: TRect;FirstLine, LastLine: integer);
@@ -175,12 +165,10 @@ end;
 
 procedure TDebugGutter.LinesInserted(FirstLine, Count: integer);
 begin
-// if this method is not defined -> Abstract error
 end;
 
 procedure TDebugGutter.LinesDeleted(FirstLine, Count: integer);
 begin
-// if this method is not defined -> Abstract error
 end;
 
 { TEditor }
@@ -193,7 +181,6 @@ begin
 	// Set generic options
 	fErrorLine:= -1;
 	fActiveLine:= -1;
-	fRunToCursorLine := -1;
 	fRes:= IsRes;
 	fInProject := InProject;
 	if Filename = '' then
@@ -206,9 +193,6 @@ begin
 	fTabSheet.Caption := Caption;
 	fTabSheet.PageControl := MainForm.PageControl;
 	fTabSheet.Tag := integer(self); // Define an index for each tab
-
-	// Set breakpoint events
-	fOnBreakpointToggle := MainForm.OnBreakpointToggle;
 
 	// Create an editor and set static options
 	fText := TSynEdit.Create(fTabSheet);
@@ -233,13 +217,13 @@ begin
 	fText.WantTabs := True;
 	fText.ShowHint := True;
 	fText.OnStatusChange:= EditorStatusChange;
-	fText.OnSpecialLineColors:= EditorSpecialLineColors;
-	fText.OnGutterClick:= EditorGutterClick;
 	fText.OnReplaceText:= EditorReplaceText;
 	fText.OnDropFiles:= EditorDropFiles;
 	fText.OnDblClick:= EditorDblClick;
 	fText.OnMouseUp := EditorMouseUp;
 	fText.OnMouseMove := EditorMouseMove;
+	fText.OnGutterClick := EditorGutterClick;
+	fText.OnSpecialLineColors := EditorSpecialLineColors;
 	fText.OnExit := EditorExit;
 	fText.OnPaintTransient := EditorPaintTransient;
 	fText.MaxScrollWidth:=4096; // bug-fix #600748
@@ -260,9 +244,6 @@ begin
 		fText.Highlighter:= dmMain.Res
 	else
 		fText.Highlighter:= dmMain.cpp;
-
-	// ReScan depends on the highlighter, so scan here
-	fText.ReScan;
 
 	// Set the text color
 	StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
@@ -287,9 +268,6 @@ begin
 	// Setup a monitor which keeps track of outside-of-editor changes
 	MainForm.devFileMonitor.Files.Add(fFileName);
 	MainForm.devFileMonitor.Refresh(True);
-
-	// RNC set any breakpoints that should be set in this file
-	SetBreakPointsOnOpen;
 
 	// Set status bar for the first time
 	with MainForm.Statusbar do begin
@@ -319,9 +297,7 @@ begin
 	DestroyCompletion;
 
 	// Free everything
-	fDebugGutter.Free;
 	fFunctionTip.Free;
-	//fAutoIndent.Free;
 	fText.Free;
 
 	// Activates previous tab instead of first one when closing
@@ -340,166 +316,95 @@ end;
 
 procedure TEditor.Activate;
 begin
-	if Assigned(fTabSheet) then begin
-		fTabSheet.PageControl.Show;
-		fTabSheet.PageControl.ActivePage := fTabSheet;
+	fTabSheet.PageControl.Show;
+	fTabSheet.PageControl.ActivePage := fTabSheet;
 
-		if fText.Visible then
-			fText.SetFocus;
-		if MainForm.ClassBrowser.Enabled then
-			MainForm.PageControlChange(MainForm.PageControl); // this makes sure that the classbrowser is consistent
-	end;
+	if fText.Visible then
+		fText.SetFocus;
+	if MainForm.ClassBrowser.Enabled then
+		MainForm.PageControlChange(MainForm.PageControl); // this makes sure that the classbrowser is consistent
 end;
 
-// RNC 07-21-04 These functions are used to turn off/on a breakpoint
-// without calling RemoveBreakpoint or AddBreakpoint in fDebugger.
-// This is helpful when trying to automitically remove a breakpoint
-// when a user tries to add one while the debugger is running
-procedure TEditor.InsertBreakpoint(line: integer);
+procedure TEditor.EditorGutterClick(Sender: TObject; Button: TMouseButton;x, y, Line: integer; mark: TSynEditMark);
 begin
-	if(line > 0) and (line <= fText.UnCollapsedLines.Count) then begin
-		fText.InvalidateLine(line);
-		fText.InvalidateGutterLine(line);
-	end;
+	// Toggle breakpoint at line
+	ToggleBreakPoint(Line);
 end;
 
-procedure TEditor.RemoveBreakpoint(line: integer);
-begin
-	if(line > 0) and (line <= fText.UnCollapsedLines.Count) then begin
-		fText.InvalidateLine(line);
-		fText.InvalidateGutterLine(line);
-	end;
-end;
-
-// RNC -- 07-02-2004
-// I added methods to turn a breakpoint on or off.  Sometimes run to cursor
-// got confused and by toggling a breakpoint was turning something on that should
-// have been turned off.  By using these functions to explicitly turn on or turn
-// off a breakpoint, this cannot happen
-procedure TEditor.TurnOnBreakpoint(line: integer);
+procedure TEditor.ToggleBreakpoint(Line: integer);
 var
-index:integer;
+	thisbreakpoint : integer;
 begin
-	index := 0;
-  if(line > 0) and (line <= fText.UnCollapsedLines.Count) then
-    begin
-      fText.InvalidateLine(line);
-      // RNC new synedit stuff
-      fText.InvalidateGutterLine(line);
-      MainForm.AddBreakPointToList(line, self, fFilename);
-      index := BreakPointList.Count -1;
-  end;
-  if Assigned(fOnBreakpointToggle) then
-    fonBreakpointToggle(index, true);
+	thisbreakpoint := HasBreakPoint(Line);
+	if thisbreakpoint <> -1 then
+		MainForm.RemoveBreakPoint(thisbreakpoint)
+	else
+		MainForm.AddBreakPoint(Line,self);
+
+	fText.InvalidateGutterLine(line);
+	fText.InvalidateLine(line);
 end;
 
-procedure TEditor.TurnOffBreakpoint(line: integer);
+function TEditor.HasBreakPoint(Line : integer): integer;
 var
-  index: integer;
+	I : integer;
 begin
-  if(line > 0) and (line <= fText.UnCollapsedLines.Count) then
-    begin
-      fText.InvalidateLine(line);
-      // RNC new synedit stuff
-      fText.InvalidateGutterLine(line);
-      index := HasBreakPoint(line);
-      if index <> -1 then begin
-        index:=MainForm.RemoveBreakPointFromList(line, self);
-        if Assigned(fOnBreakpointToggle) then
-          fonBreakpointToggle(index, false);
-      end;
-  end;
-end;
-
-//RNC function to set breakpoints in a file when it is opened
-procedure TEditor.SetBreakPointsOnOpen;
-var
-  i: integer;
-begin
-  for i:=0 to BreakPointList.Count -1 do
-  begin
-      if PBreakPointEntry(BreakPointList.Items[i])^.file_name = self.TabSheet.Caption then begin
-          InsertBreakpoint(PBreakPointEntry(BreakPointList.Items[i])^.line);
-          PBreakPointEntry(BreakPointList.Items[i])^.editor := self;
-      end;
-  end;
-end;
-
-function TEditor.ToggleBreakpoint(Line: integer): boolean;
-var
-	idx: integer;
-begin
-	idx := 0; // Was declared but not defined, could've contained random data
-	result:= FALSE;
-	if (line > 0) and (line <= fText.UnCollapsedLines.Count) then begin
-		fText.InvalidateGutterLine(line);
-		fText.InvalidateLine(line);
-		idx:= HasBreakPoint(Line);
-
-		//RNC moved the check to see if the debugger is running to here
-		if idx <> -1 then begin
-			if (MainForm.fDebugger.Executing and MainForm.fDebugger.IsBroken) or not MainForm.fDebugger.Executing then begin
-				idx := MainForm.RemoveBreakPointFromList(line, self); // RNC
-			end else if (MainForm.fDebugger.Executing and not MainForm.fDebugger.IsBroken) then begin
-				MessageDlg('Cannot remove a breakpoint while the debugger is executing.', mtError, [mbOK], 0);
-			end;
-		end else begin
-			if (MainForm.fDebugger.Executing and MainForm.fDebugger.IsBroken) or not MainForm.fDebugger.Executing then begin
-				MainForm.AddBreakPointToList(line, self, self.TabSheet.Caption); // RNC
-				idx := BreakPointList.Count -1;
-				result:= TRUE;
-			end else if (MainForm.fDebugger.Executing and not MainForm.fDebugger.IsBroken) then begin
-				MessageDlg('Cannot add a breakpoint while the debugger is executing.', mtError, [mbOK], 0);
-			end;
-		end;
-	end else
-		fText.Invalidate;
-	if Assigned(fOnBreakpointToggle) then
-		fOnBreakpointToggle(idx, Result);
-end;
-
-//Rnc change to use the new list of breakpoints
-function TEditor.HasBreakPoint(line_number: integer): integer;
-begin
-	for result:= 0 to BreakPointList.Count-1 do begin
-		if PBreakPointEntry(BreakPointList.Items[result])^.editor = self then begin
-			if PBreakPointEntry(BreakPointList.Items[result])^.line = line_number then
- 				exit;
-		end;
-	end;
 	result:= -1;
+	for I := 0 to BreakPointList.Count - 1 do
+		if PBreakPoint(BreakPointList.Items[I])^.editor = self then
+			if PBreakPoint(BreakPointList.Items[I])^.line = Line then begin
+				Result := I;
+ 				break;
+			end;
 end;
 
-procedure TEditor.EditorSpecialLineColors(Sender: TObject; Line: Integer;
-    var Special: Boolean; var FG, BG: TColor);
+procedure TEditor.EditorSpecialLineColors(Sender: TObject; Line: Integer;var Special: Boolean; var FG, BG: TColor);
 var
- pt: TPoint;
+	pt: TPoint;
 begin
-  if (Line = fActiveLine) then begin
-   StrtoPoint(pt, devEditor.Syntax.Values[cABP]);
-   BG:= pt.X;
-   FG:= pt.Y;
-   Special:= TRUE;
-  end
-  else if (HasBreakpoint(line) <> -1) then
-   begin
-     StrtoPoint(pt, devEditor.Syntax.Values[cBP]);
-     BG := pt.x;
-     FG := pt.y;
-     Special := TRUE;
-   end
-  else
-   if Line = fErrorLine then
-    begin
-      StrtoPoint(pt, devEditor.Syntax.Values[cErr]);
-      bg:= pt.x;
-      fg:= pt.y;
-      Special:= TRUE;
-    end;
+	if (Line = fActiveLine) then begin
+		StrtoPoint(pt, devEditor.Syntax.Values[cABP]);
+		BG:= pt.X;
+		FG:= pt.Y;
+		Special:= TRUE;
+	end else if (HasBreakpoint(Line) <> -1) then begin
+		StrtoPoint(pt, devEditor.Syntax.Values[cBP]);
+		BG:= pt.X;
+		FG:= pt.Y;
+		Special := TRUE;
+	end else if Line = fErrorLine then begin
+		StrtoPoint(pt, devEditor.Syntax.Values[cErr]);
+		BG:= pt.X;
+		FG:= pt.Y;
+		Special:= TRUE;
+	end;
 end;
 
-// ** undo after insert removes all text above insert point;
-// ** seems to be a synedit bug!!
+procedure TEditor.DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
+var
+	X, Y, I: integer;
+	ImgIndex: integer;
+begin
+	X := fText.Gutter.RealGutterWidth(fText.CharWidth) - fText.Gutter.RightOffset + 3;//AClip.Left;
+	Y := (fText.LineHeight - dmMain.GutterImages.Height) div 2 + fText.LineHeight * (FirstLine - fText.TopLine);
+
+	for I := FirstLine to LastLine do begin
+		if HasBreakpoint(I) <> -1 then
+			ImgIndex := 0
+		else if fActiveLine = I then
+			ImgIndex := 1
+		else if fErrorLine = I then
+			ImgIndex := 2
+		else
+			ImgIndex := -1;
+
+		if ImgIndex <> -1 then
+			dmMain.GutterImages.Draw(ACanvas, X, Y, ImgIndex);
+
+		Inc(Y, fText.LineHeight);
+	end;
+end;
+
 procedure TEditor.EditorDropFiles(Sender: TObject; x, y: integer;aFiles: TStrings);
 var
 	sl: TStringList;
@@ -521,7 +426,7 @@ begin
 	end else
 
 		// Create new tab/project
-		for I := 0 to pred(aFiles.Count) do begin
+		for I := 0 to aFiles.Count - 1 do begin
 			J := MainForm.FileIsOpen(aFiles[I]);
 			if J = -1 then begin // if not open yet
 				if GetFileTyp(aFiles[I]) = utPrj then
@@ -540,12 +445,6 @@ begin
 		fText.BlockBegin:= BufferCoord(1, fText.CaretY);
 		fText.BlockEnd:= BufferCoord(1, fText.CaretY +1);
 	end;
-end;
-
-procedure TEditor.EditorGutterClick(Sender: TObject; Button: TMouseButton;
-  x, y, Line: integer; mark: TSynEditMark);
-begin
-  ToggleBreakPoint(Line);
 end;
 
 procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch,aReplace: AnsiString; Line, Column: integer; var Action: TSynReplaceAction);
@@ -802,28 +701,22 @@ end;
 
 procedure TEditor.SetActiveBreakpointFocus(Line: integer);
 begin
-  if (fActiveLine <> Line) and (fActiveLine <> -1) then
-   fText.InvalidateLine(fActiveLine);
-   fText.InvalidateGutterLine(fActiveLine);
-  fActiveLine:= Line;
-  fText.InvalidateLine(fActiveLine);
-   fText.InvalidateGutterLine(fActiveLine);
-  fText.CaretY:= Line;
-  fText.EnsureCursorPosVisible;
-  // RNC -- 07.02.2004 This will clear the run to cursor value when a breakpoint is hit
-  {if Line = fRunToCursorLine then begin}
-  if fRunToCursorLine <> -1 then begin
-    TurnOffBreakpoint(fRunToCursorLine);
-    fRunToCursorLine := -1;
-  end;
+	fText.CaretXY := BufferCoord(1, Line);
+	fText.EnsureCursorPosVisible;
+
+	if fActiveLine <> -1 then
+		fText.InvalidateGutterLine(fActiveLine);
+	fActiveLine := Line;
+	fText.InvalidateGutterLine(fActiveLine);
 end;
 
 procedure TEditor.RemoveBreakpointFocus;
 begin
-  if fActiveLine <> -1 then
-   fText.InvalidateLine(fActiveLine);
-   fText.InvalidateGutterLine(fActiveLine);
-  fActiveLine:= -1;
+	if fActiveLine <> -1 then begin
+		fText.InvalidateLine(fActiveLine);
+		fText.InvalidateGutterLine(fActiveLine);
+		fActiveLine:= -1;
+	end;
 end;
 
 procedure TEditor.UpdateCaption(const NewCaption: AnsiString);
@@ -839,32 +732,6 @@ begin
      ffileName:= value;
      UpdateCaption(ExtractfileName(fFileName));
    end;
-end;
-
-procedure TEditor.DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
-var
-  LH, X, Y: integer;
-  ImgIndex: integer;
-begin
-  X := 14;
-  LH := fText.LineHeight;
-  Y := (LH - dmMain.GutterImages.Height) div 2
-       + LH * (FirstLine - fText.TopLine);
-
-  while FirstLine <= LastLine do begin
-    if HasBreakpoint(FirstLine) <> -1 then
-      ImgIndex := 0
-    else if fActiveLine = FirstLine then
-      ImgIndex := 1
-    else if fErrorLine = FirstLine then
-      ImgIndex := 2
-    else
-      ImgIndex := -1;
-    if ImgIndex >= 0 then
-      dmMain.GutterImages.Draw(ACanvas, X, Y, ImgIndex);
-    Inc(FirstLine);
-    Inc(Y, LH);
-  end;
 end;
 
 procedure TEditor.InsertDefaultText;
@@ -889,6 +756,45 @@ begin
 	Activate;
 end;
 
+procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);
+begin
+	// We received a key from the completion box...
+	if fCompletionBox.Enabled then begin
+
+		// The completion form is already shown
+		case Key of
+			Char(VK_BACK): begin
+			if fText.SelStart > 0 then begin
+					fText.SelStart := fText.SelStart - 1;
+					fText.SelEnd := fText.SelStart + 1;
+					fText.SelText := '';
+					fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+				end;
+			end;
+			Char(VK_RETURN): begin
+				SetEditorText(Key);
+				fCompletionBox.Hide;
+			end;
+			Char(VK_ESCAPE): begin
+				fCompletionBox.Hide;
+			end;
+			';', '(', ' ': begin
+				SetEditorText(Key);
+				fCompletionBox.Hide;
+			end;
+			'.', '>', ':': begin
+				SetEditorText(Key);
+				fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+			end;
+			else begin
+				fText.SelText := Key;
+				fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+			end;
+		end;
+		fCompletionEatSpace:=False;
+	end;
+end;
+
 procedure TEditor.EditorKeyPress(Sender: TObject; var Key: Char);
 var
 	P: TPoint;
@@ -900,9 +806,9 @@ var
 begin
 
 	// Doing this here instead of in EditorKeyDown to be able to delete some key messages
-	if devEditor.CompleteSymbols and not fText.SelAvail and not (Sender is TForm) then begin
+	if devEditor.CompleteSymbols and not fText.SelAvail then begin
 
-		// Allerhande voorwaarden
+		// Don't complete symbols inside strings or comments
 		allowcompletion := true;
 		if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr)) then
 			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
@@ -1004,63 +910,31 @@ begin
 	if fCompletionBox.Enabled then begin
 
 		// If we haven't yet showed the completion window...
-		if not (Sender is TForm) then begin
-			fCompletionTimer.Enabled:=False;
-			fCompletionTimerKey:=Key;
-			case Key of
-				'.': fCompletionTimer.Enabled:=True;
-				'>': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
-				':': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
-				' ': if fCompletionEatSpace then Key:=#0; // eat space if it was ctrl+space (code-completion)
-			end;
-
-			if fCompletionTimer.Enabled or fCompletionEatSpace then begin
-				P := fText.RowColumnToPixels(fText.DisplayXY);
-				P.Y := P.Y + 16;
-
-				P := fText.ClientToScreen(P);
-				fCompletionBox.Position:=P;
-			end;
-
-		// The completion form is already shown
-		end else begin
-			case Key of
-				Char(VK_BACK): begin
-					if fText.SelStart > 0 then begin
-						fText.SelStart := fText.SelStart - 1;
-						fText.SelEnd := fText.SelStart + 1;
-						fText.SelText := '';
-						fCompletionBox.Search(nil, CurrentPhrase, fFileName);
-					end;
-				end;
-				Char(VK_RETURN): begin
-					SetEditorText(Key);
-					fCompletionBox.Hide;
-				end;
-				Char(VK_ESCAPE): begin
-					fCompletionBox.Hide;
-				end;
-				';', '(', ' ': begin
-					SetEditorText(Key);
-					fCompletionBox.Hide;
-				end;
-				'.', '>', ':': begin
-					SetEditorText(Key);
-					fCompletionBox.Search(nil, CurrentPhrase, fFileName);
-				end;
-				else begin
-					fText.SelText := Key;
-					fCompletionBox.Search(nil, CurrentPhrase, fFileName);
-				end;
-			end;
+		fCompletionTimer.Enabled:=False;
+		fCompletionTimerKey:=Key;
+		case Key of
+			'.': fCompletionTimer.Enabled:=True;
+			'>': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
+			':': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
+			' ': if fCompletionEatSpace then Key:=#0; // eat space if it was ctrl+space (code-completion)
 		end;
-		fCompletionEatSpace:=False;
+
+		if fCompletionTimer.Enabled or fCompletionEatSpace then begin
+			P := fText.RowColumnToPixels(fText.DisplayXY);
+			P.Y := P.Y + 16;
+
+			P := fText.ClientToScreen(P);
+			fCompletionBox.Position:=P;
+		end;
 	end;
 end;
 
 procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 var
 	M: TMemoryStream;
+	P : TBufferCoord;
+	s : AnsiString;
+	attr : TSynHighlighterAttributes;
 begin
 	if devEditor.CompleteSymbols then begin
 		if not (ssShift in Shift) then begin
@@ -1070,11 +944,33 @@ begin
 		end;
 	end;
 
+	// Update the cursor if it is hovering above a keyword and ctrl is pressed
+	if (ssCtrl in Shift) and fText.GetPositionOfMouse(p) and fAllowMouseOver then begin
+
+		// Only show info about variables or includes
+		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
+			if not (attr = fText.Highlighter.IdentifierAttribute) and not (SameStr(attr.Name,'Preprocessor')) then begin
+				Application.CancelHint;
+				fText.Hint := '';
+				Exit;
+			end;
+
+		s := fText.GetWordAtRowCol(p);
+
+		if(s <> '') then begin
+
+			// Handle Ctrl+Click too
+			if ssCtrl in Shift then
+				fText.Cursor:=crHandPoint
+			else
+				fText.Cursor:=crIBeam;
+		end;
+	end;
+
 	// Show the completion box. This needs to be done after the key is inserted!
 	if fCompletionBox.Enabled then begin
-		fCompletionBox.OnKeyPress:=EditorKeyPress;
 		if ssCtrl in Shift then
-			if Key=VK_SPACE then begin
+			if Key = VK_SPACE then begin
 				M:=TMemoryStream.Create;
 				try
 					fText.Lines.SaveToStream(M);
@@ -1173,7 +1069,7 @@ begin
 
 	// The other stuff is fully completion dependant
 	if fCompletionBox.Enabled then begin
-		fCompletionBox.OnKeyPress:=EditorKeyPress;
+		fCompletionBox.OnKeyPress:=CompletionKeyPress;
 		fCompletionBox.Width:=devCodeCompletion.Width;
 		fCompletionBox.Height:=devCodeCompletion.Height;
 
@@ -1328,39 +1224,29 @@ begin
 			if(s <> fCurrentWord) then begin
 
 				fCurrentWord := s;
+				Application.CancelHint;
 
 				if devEditor.ParserHints and not MainForm.fDebugger.Executing then begin
-					st:=MainForm.FindStatement(s,fText.WordStartEx(p),localfind,p);
+					st := MainForm.FindStatement(s,fText.WordStartEx(p),localfind,p);
 					if localfind <> '' then begin
-						Application.CancelHint;
 						if (p.Char <> 12345) and (p.Line <> 12345) then
 							fText.Hint := localfind + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(p.Line) + ') - Ctrl+Click to follow'
 						else
 							fText.Hint := localfind;
 					end else if Assigned(st) then begin
-						Application.CancelHint;
 						fText.Hint := st^._FullText + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
-					end else begin
-						Application.CancelHint;
-						fText.Hint := '';
 					end;
 				end else if devData.WatchHint and MainForm.fDebugger.Executing then begin
-					MainForm.fDebugger.SendCommand(GDB_DISPLAY, s);
-
-					Sleep(500); // ???
-
-					Application.CancelHint;
-					fText.Hint:=MainForm.fDebugger.WatchVar + ' = ' + MainForm.fDebugger.WatchValue;
+					MainForm.AddWatchVariable(s);
+					//fText.Hint := MainForm.fDebugger.WatchVar + ' = ' + MainForm.fDebugger.WatchValue;
 				end;
 			end;
 		end else begin
 
 			// Handle Ctrl+Click too
 			fText.Cursor:=crIBeam;
-
 			fCurrentWord := s;
 			Application.CancelHint;
-			fText.Hint := '';
 		end;
 	end else
 		fCurrentWord := s; // Reinit mouseovers when hovering above anything else than words
@@ -1528,7 +1414,7 @@ begin
 	if (ssCtrl in Shift) and (Button = mbLeft) and not fText.SelAvail then begin
 
 		p := fText.PixelsToRowColumn(X,Y);
-		if P.Row < fText.Lines.Count then begin
+		if P.Row <= fText.Lines.Count then begin
 
 			// reset the cursor
 			fText.Cursor:=crIBeam;
@@ -1568,14 +1454,6 @@ begin
 			MainForm.actGotoImplDeclEditorExecute(self);
 		end;
 	end;
-end;
-
-procedure TEditor.RunToCursor(Line : integer);
-begin
-	if fRunToCursorLine <> -1 then
-		TurnOffBreakpoint(fRunToCursorLine);
-	fRunToCursorLine := Line;
-	TurnOnBreakpoint(fRunToCursorLine);
 end;
 
 procedure TEditor.PaintMatchingBrackets(TransientType: TTransientType);

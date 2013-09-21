@@ -301,6 +301,7 @@ type
     fCodeFolding:            TSynCodeFolding;
     fUncollapsedLines:       TSynEditStringList;
     fUncollapsedLinesLength: Integer;
+    fEditingFolds:           boolean;
     //### End Code Folding ###
 
     fAlwaysShowCaret: Boolean;
@@ -2101,9 +2102,10 @@ var
 	vOldMode: TSynSelectionMode;
 begin
 	Exclude(fStateFlags, sfLinesChanging);
-	if HandleAllocated then begin
 
-		ReScan;
+	ReScan; // doesn't need Handle?
+
+	if HandleAllocated then begin
 
 		UpdateScrollBars;
 		vOldMode := fActiveSelectionMode;
@@ -5263,13 +5265,15 @@ var
 	I : integer;
 begin
 	// ### Code Folding
-	for i := fAllFoldRanges.Count - 1 downto 0 do
-		with fAllFoldRanges[i] do
-			if Collapsed and not ParentCollapsed then
-				if(FromLine >= aIndex) and (FromLine < aIndex + aCount) then
-					fAllFoldRanges.Delete(i);
+	if not fEditingFolds then begin
+		for i := fAllFoldRanges.Count - 1 downto 0 do
+			with fAllFoldRanges[i] do
+				if Collapsed and not ParentCollapsed then
+					if(FromLine >= aIndex) and (FromLine < aIndex + aCount) then
+						fAllFoldRanges.Delete(i);
 
-	MoveCollapsedRangesFromBy(aIndex, -aCount);
+		MoveCollapsedRangesFromBy(aIndex, -aCount);
+	end;
 	// ### End Code Folding
 
   if Assigned(fHighlighter) and (Lines.Count > 0) then
@@ -5289,7 +5293,8 @@ var
   vLastScan: integer;
 begin
 	// ### Code Folding
-	MoveCollapsedRangesFromBy(Index, aCount);
+	if not fEditingFolds then
+		MoveCollapsedRangesFromBy(Index, aCount);
 	// ### End Code Folding
 
   if Assigned(fHighlighter) and (Lines.Count > 0) then
@@ -10550,6 +10555,8 @@ var
 begin
 	Lines.BeginUpdate;
 
+	fEditingFolds := true;
+
 	with AFoldRange do begin
 		LinesCollapsed := ToLine - FromLine - 1;
 
@@ -10565,6 +10572,8 @@ begin
 		SetPCOfSubFoldRanges(True, RealLevel);
 		MoveFoldRangesAfter(AFoldRange, - LinesCollapsed - 1);
 	end;
+
+	fEditingFolds := false;
 
 	Lines.EndUpdate;
 
@@ -10604,6 +10613,8 @@ var
 begin
 	Lines.BeginUpdate;
 
+	fEditingFolds := true;
+
 	with FoldRange do begin
 		for i := 0 to CollapsedLines.Count - 1 do
 			Lines.Insert(FromLine, CollapsedLines[i]);
@@ -10616,6 +10627,8 @@ begin
 		SetPCOfSubFoldRanges(False, RealLevel);
 		CollapsedLines.Clear;
 	end;
+
+	fEditingFolds := false;
 
 	Lines.EndUpdate;
 
@@ -10687,9 +10700,13 @@ end;
 
 procedure TCustomSynEdit.ReScan;
 begin
-	ReScanForFoldRanges;
+	if Assigned(fHighlighter) then
+		ReScanForFoldRanges;
+
 	GetUnCollapsedLines;
-	InvalidateGutter;
+
+	if Assigned(fHighlighter) then
+		InvalidateGutter;
 end;
 
 procedure TCustomSynEdit.ReScanForFoldRanges;
@@ -10700,15 +10717,13 @@ var
 	TemporaryLines: TSynEditStringList;
 	TemporaryAllFoldRanges: TSynEditFoldRanges;
 begin
-	if not Assigned(fHighlighter) then Exit;
-
 	// Delete all uncollapsed folds
 	for i := fAllFoldRanges.Count - 1 downto 0 do
 		with fAllFoldRanges[i] do
 			if not Collapsed and not ParentCollapsed then
 				fAllFoldRanges.Delete(i);
 
-	// Did we leave any collapsed folds?
+	// Did we leave any collapsed folds and are we viewing a code file?
 	if fAllFoldRanges.Count > 0 then begin
 
 		// Create a lookup table with information which lines have folds and which don't
@@ -10775,60 +10790,60 @@ var
 	i,j,k : integer;
 	hascollapsedfold : boolean;
 begin
-	// Check if there are any collapsed folds...
-	hascollapsedfold := false;
-	for i := 0 to fAllFoldRanges.Count - 1 do
-		with fAllFoldRanges[i] do
-			if Collapsed or ParentCollapsed then begin
-				hascollapsedfold := true;
-				break;
+
+	// Copy the collapsed text
+	fUncollapsedLines.Assign(fLines);
+
+	// Scan for uncollapsable stuff only when we edit code files
+	if Assigned(fHighlighter) then begin
+
+		// Check if there are any collapsed folds...
+		hascollapsedfold := false;
+		for i := 0 to fAllFoldRanges.Count - 1 do
+			with fAllFoldRanges[i] do
+				if Collapsed or ParentCollapsed then begin
+					hascollapsedfold := true;
+					break;
+				end;
+
+		// Only bother uncollapsing our copy if there is anything to uncollapse...
+		if hascollapsedfold then begin
+			for I := 0 to fAllFoldRanges.Count - 1 do begin
+				fAllFoldRanges[i].Backup;
+				fAllFoldRanges[i].BackupPCOfSubFoldRanges;
 			end;
 
-	// hascollapsedfold = false is implied by not Assigned(highlighter)!
-	if hascollapsedfold then begin // do it the hard way...
+			// Unfold to the copy
+			fUncollapsedLines.BeginUpdate;
+			for i := 0 to 9 do begin
+				for j := fAllFoldRanges.Count - 1 downto 0 do begin
+					with fAllFoldRanges[j] do begin
+						if (RealLevel = i) and Collapsed and not ParentCollapsed then begin
+							for k := 0 to CollapsedLines.Count - 1 do
+								if FromLine < fUncollapsedLines.Count then
+									fUncollapsedLines.Insert(FromLine, CollapsedLines[k])
+								else
+									fUncollapsedLines.Add(CollapsedLines[k]);
+							if FoldRegion.AddEnding then
+								fUncollapsedLines[FromLine-1] := Copy(fUncollapsedLines[FromLine-1], 1,Length(fUncollapsedLines[FromLine-1]) - Length(FoldRegion.Close));
 
-		for i :=0 to fAllFoldRanges.Count - 1 do begin
-			fAllFoldRanges[i].Backup;
-			fAllFoldRanges[i].BackupPCOfSubFoldRanges;
-		end;
-
-		// Copy the collapsed text
-		fUncollapsedLines.Assign(fLines);
-
-		// Unfold to the copy
-		fUncollapsedLines.BeginUpdate;
-		for i := 0 to 9 do begin
-			for j := fAllFoldRanges.Count - 1 downto 0 do
-				with fAllFoldRanges[j] do begin
-
-					if (RealLevel = i) and Collapsed and not ParentCollapsed then begin
-
-						for k := 0 to CollapsedLines.Count - 1 do
-							if FromLine < fUncollapsedLines.Count then
-								fUncollapsedLines.Insert(FromLine, CollapsedLines[k])
-							else
-								fUncollapsedLines.Add(CollapsedLines[k]);
-						if FoldRegion.AddEnding then
-							fUncollapsedLines[FromLine-1] := Copy(fUncollapsedLines[FromLine-1], 1,Length(fUncollapsedLines[FromLine-1]) - Length(FoldRegion.Close));
-
-						Collapsed := False;
-						MoveFoldRangesAfter(fAllFoldRanges[j], CollapsedLines.Count);
-						SetPCOfSubFoldRanges(False, RealLevel);
+							Collapsed := False;
+							MoveFoldRangesAfter(fAllFoldRanges[j], CollapsedLines.Count);
+							SetPCOfSubFoldRanges(False, RealLevel);
+						end;
 					end;
 				end;
-		end;
-		fUncollapsedLines.EndUpdate;
+			end;
+			fUncollapsedLines.EndUpdate;
 
-		for i := 0 to fAllFoldRanges.Count - 1 do begin
-			fAllFoldRanges[i].Fix;
-			fAllFoldRanges[i].FixPCOfSubFoldRanges;
+			for i := 0 to fAllFoldRanges.Count - 1 do begin
+				fAllFoldRanges[i].Fix;
+				fAllFoldRanges[i].FixPCOfSubFoldRanges;
+			end;
 		end;
-	end else begin
-
-		// Copy the collapsed text
-		fUncollapsedLines.Assign(fLines); // TODO: shallow copy
 	end;
 
+	// Avoids call to GetTextStr!
 	fUncollapsedLinesLength := fUncollapsedLines.GetTextLength;
 end;
 

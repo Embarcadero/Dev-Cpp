@@ -129,7 +129,7 @@ Set the default options for FastMM here.
    stack for valid return addresses. Note that this is significantly slower
    than using the stack frame tracing method, but is usually more complete. Has
    no effect unless FullDebugMode is enabled}
-  {.$define RawStackTraces}
+  {$define RawStackTraces}
 
   {Set this option to check for user code that uses an interface of a freed
    object. Note that this will disable the checking of blocks modified after
@@ -140,7 +140,7 @@ Set the default options for FastMM here.
   {Set this option to log all errors to a text file in the same folder as the
    application. Memory errors (with the FullDebugMode option set) will be
    appended to the log file. Has no effect if "FullDebugMode" is not set.}
-  {.$define LogErrorsToFile}
+  {$define LogErrorsToFile}
 
   {Set this option to log all memory leaks to a text file in the same folder as
    the application. Memory leak reports (with the FullDebugMode option set)
@@ -149,11 +149,11 @@ Set the default options for FastMM here.
    logged, even if they are "expected" leaks registered through
    AddExpectedMemoryLeaks. Expected leaks registered by pointer may be excluded
    through the HideExpectedLeaksRegisteredByPointer option.}
-  {.$define LogMemoryLeakDetailToFile}
+  {$define LogMemoryLeakDetailToFile}
 
   {Deletes the error log file on startup. No effect if LogErrorsToFile is not
    also set.}
-  {.$define ClearLogFileOnStartup}
+  {$define ClearLogFileOnStartup}
 
   {Loads the FASTMM_FullDebugMode.dll dynamically. If the DLL cannot be found
    then stack traces will not be available. Note that this may cause problems
@@ -185,7 +185,7 @@ Set the default options for FastMM here.
    lost. With this option set FastMM will ignore errors inside FreeMem when an
    exception is being handled, thus allowing the original exception to
    propagate.}
-  {.$define SuppressFreeMemErrorsInsideException}
+  {$define SuppressFreeMemErrorsInsideException}
 
   {Adds support for notification of memory manager events in FullDebugMode.
    With this define set, the application may assign the OnDebugGetMemFinish,
@@ -204,7 +204,7 @@ Set the default options for FastMM here.
    ambiguous, so these expected leaks are always logged to file (in
    FullDebugMode with the LogMemoryLeakDetailToFile option set) and are never
    hidden from the leak display if there are more leaks than are expected.}
-  {.$define HideExpectedLeaksRegisteredByPointer}
+  {$define HideExpectedLeaksRegisteredByPointer}
 
   {Set this option to require the presence of the Delphi IDE to report memory
    leaks. This option has no effect if the option "EnableMemoryLeakReporting"
@@ -213,14 +213,14 @@ Set the default options for FastMM here.
 
   {Set this option to require the program to be run inside the IDE debugger to
    report memory leaks. This option has no effect if the option
-   "EnableMemoryLeakReporting" is not also set. Note that this option does not
+   "EnableMemoryLeakReporting" is not also set. Note that this option does not 
    work with libraries, only EXE projects.}
   {$define RequireDebuggerPresenceForLeakReporting}
 
   {Set this option to require the presence of debug info ($D+ option) in the
    compiled unit to perform memory leak checking. This option has no effect if
    the option "EnableMemoryLeakReporting" is not also set.}
-  {.$define RequireDebugInfoForLeakReporting}
+  {$define RequireDebugInfoForLeakReporting}
 
   {Set this option to enable manual control of the memory leak report. When
    this option is set the ReportMemoryLeaksOnShutdown variable (default = false)
@@ -424,3 +424,4 @@ Set the default options for FastMM here.
     {$endif}
   {$endif}
 {$endif}
+

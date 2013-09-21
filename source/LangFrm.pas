@@ -75,6 +75,7 @@ type
     procedure ButtonRemoveClick(Sender: TObject);
     procedure ButtonAddFolderClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     HasProgressStarted : boolean;
 
@@ -95,16 +96,14 @@ uses
 
 procedure TLangForm.UpdateList;
 var
- idx: integer;
- sel: integer;
+	I, sel: integer;
 begin
-  ListBox.Clear;
-  for idx:= 0 to pred(List.Count) do
-  begin
-   sel := ListBox.Items.Add(List.Values[List.Names[idx]]);
-   if Pos('english', LowerCase(ListBox.Items[sel])) > 0 then
-     ListBox.Selected[sel] := True;
-  end;
+	ListBox.Clear;
+	for I := 0 to List.Count - 1 do begin
+		sel := ListBox.Items.Add(List.Values[List.Names[I]]);
+		if Pos('english', LowerCase(ListBox.Items[sel])) > 0 then
+			ListBox.Selected[sel] := True;
+	end;
 end;
 
 function TLangForm.GetSelected: integer;
@@ -188,7 +187,7 @@ begin
 				for I:=0 to AltFileList.Count-1 do
 					s.Add(AltFileList.Items[I]);
 			end else
-				StrToList(devDirs.Cpp, s);
+				StrToList(devCompiler.CppDir, s);
 
 			// Make it look busy
 			Screen.Cursor:=crHourglass;
@@ -212,7 +211,7 @@ begin
 					if s[i][1] = ':' then
 						fullpath := s[i]
 					else
-						fullpath := devDirs.Cpp + '\' + s[i];
+						fullpath := devCompiler.CppDir + '\' + s[i];
 
 					// Then check for existance
 					if FileExists(fullpath) then begin
@@ -280,10 +279,10 @@ begin
 	with dmMain.OpenDialog do begin
 		Filter:= FLT_HEADS;
 		Title:= Lang[ID_NV_OPENFILE];
-		InitialDir := devDirs.Cpp;
+		InitialDir := devCompiler.CppDir;
 		if Execute then begin
 			for i:= 0 to pred(Files.Count) do begin
-				s := StringReplace(Files.Strings[i],devDirs.Cpp + '\','',[rfReplaceAll]);
+				s := StringReplace(Files.Strings[i],devCompiler.CppDir + '\','',[rfReplaceAll]);
 				AltFileList.Items.Add(s);
 			end;
 		end;
@@ -313,13 +312,16 @@ begin
 	if SelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
 		FilesFromWildcard(Dir, '*.*', f, false, false, false);
 		for i := 0 to f.Count-1 do begin
-			s := StringReplace(f[i],devDirs.Cpp + '\','',[rfReplaceAll]);
+			s := StringReplace(f[i],devCompiler.CppDir + '\','',[rfReplaceAll]);
 			AltFileList.Items.Add(s);
 		end;
 	end;
+	f.Free;
 end;
 
 procedure TLangForm.FormShow(Sender: TObject);
+var
+	tmp : TStrings;
 begin
 	// Set interface font
 	Font.Name := devData.InterfaceFont;
@@ -328,7 +330,10 @@ begin
 	HasProgressStarted := false;
 
 	// Themes
-	ThemeBox.Items.AddStrings(devTheme.ThemeList);
+	tmp := devTheme.ThemeList;
+	ThemeBox.Items.AddStrings(tmp);
+	tmp.Free;
+
 	ThemeBox.ItemIndex := 0;
 
 	// Editor styles
@@ -337,6 +342,11 @@ begin
 	EditorBox.ItemIndex := 1;
 
 	ThemeImage.Picture.Bitmap.LoadFromResourceName(HInstance, 'NEWLOOKCLASSICPLUS');
+end;
+
+procedure TLangForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+	Action := caFree;
 end;
 
 end.

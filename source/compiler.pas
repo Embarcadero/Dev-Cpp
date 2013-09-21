@@ -79,8 +79,8 @@ type
 		function Clean: Boolean;
 		function RebuildAll: Boolean;
 		function FindDeps(const TheFile: AnsiString): AnsiString;
-		function SwitchToProjectCompilerSet: integer; // returns the original compiler set
-		procedure SwitchToOriginalCompilerSet(Index: integer); // switches the original compiler set to index
+		procedure SwitchToProjectCompilerSet;
+		procedure SwitchToOriginalCompilerSet;
 
 		property Compiling: Boolean read GetCompiling;
 		property Project: TProject read fProject write fProject;
@@ -180,7 +180,7 @@ function TCompiler.NewMakeFile(var F : TextFile) : boolean;
 var
 	ObjResFile, Objects, LinkObjects, Comp_ProgCpp, Comp_Prog, ofile, tfile, tmp: AnsiString;
 	i: integer;
-	opt: TCompilerOption;
+	opt: PCompilerOption;
 	idx: integer;
 begin
 
@@ -249,7 +249,7 @@ begin
 	GetLibrariesParams;
 	GetIncludesParams;
 
-	fMakefile := fProject.Directory + DEV_MAKE_FILE;
+	fMakefile := fProject.Directory + 'Makefile.win';
 	DoLogEntry('Building Makefile "'+fMakefile +'"');
 	Assignfile(F, fMakefile);
 	try
@@ -535,6 +535,7 @@ procedure TCompiler.GetCompileParams;
 	end;
 var
 	I, val: integer;
+	option : TCompilerOption;
 begin
 	{ Check user's compiler options }
 	with devCompiler do begin
@@ -547,37 +548,40 @@ begin
 			fCompileParams := StringReplace(fProject.Options.cmdlines.Compiler, '_@@_', ' ', [rfReplaceAll]);
 		end;
 
-		if (devCompilerSet.CompOpts <> '') and devCompilerSet.AddtoComp then
-			AppendStr(fUserParams, devCompilerSet.CompOpts);
+		if (devCompiler.CompOpts <> '') and devCompiler.AddtoComp then
+			AppendStr(fUserParams, devCompiler.CompOpts);
 
 		AppendStr(fCompileParams, fUserParams);
 		AppendStr(fCppCompileParams, fUserParams);
 
-		for I := 0 to devCompiler.OptionsCount - 1 do begin
+		for I := 0 to devCompiler.fOptionList.Count - 1 do begin
+
+			option := PCompilerOption(devCompiler.fOptionList[I])^;
+
 			// consider project specific options for the compiler, else global compiler options
-			if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and (devCompiler.Options[I].optValue > 0)) then begin
-				if devCompiler.Options[I].optIsC then begin
-					if Assigned(devCompiler.Options[I].optChoices) then begin
+			if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and (option.optValue > 0)) then begin
+				if option.optIsC then begin
+					if Assigned(option.optChoices) then begin
 						if Assigned(fProject) then
 							val := devCompiler.ConvertCharToValue(fProject.Options.CompilerOptions[I+1])
 						else
-							val := devCompiler.Options[I].optValue;
-						if (val > 0) and (val < devCompiler.Options[I].optChoices.Count) then
-							AppendStr(fCompileParams, devCompiler.Options[I].optSetting + devCompiler.Options[I].optChoices.Values[devCompiler.Options[I].optChoices.Names[val]]);
+							val := option.optValue;
+						if (val > 0) and (val < option.optChoices.Count) then
+							AppendStr(fCompileParams, option.optSetting + option.optChoices.Values[option.optChoices.Names[val]]);
 					end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I+1], 0)=1)) or (not Assigned(fProject)) then begin
-						AppendStr(fCompileParams, devCompiler.Options[I].optSetting);
+						AppendStr(fCompileParams, option.optSetting);
 					end;
 				end;
-				if devCompiler.Options[I].optIsCpp then begin
-					if Assigned(devCompiler.Options[I].optChoices) then begin
+				if option.optIsCpp then begin
+					if Assigned(option.optChoices) then begin
 						if Assigned(fProject) then
 							val := devCompiler.ConvertCharToValue(fProject.Options.CompilerOptions[I+1])
 						else
-							val := devCompiler.Options[I].optValue;
-						if (val > 0) and (val < devCompiler.Options[I].optChoices.Count) then
-							AppendStr(fCppCompileParams, devCompiler.Options[I].optSetting + devCompiler.Options[I].optChoices.Values[devCompiler.Options[I].optChoices.Names[val]]);
+							val := option.optValue;
+						if (val > 0) and (val < option.optChoices.Count) then
+							AppendStr(fCppCompileParams, option.optSetting + option.optChoices.Values[option.optChoices.Names[val]]);
 					end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I+1], 0)=1)) or (not Assigned(fProject)) then begin
-						AppendStr(fCppCompileParams, devCompiler.Options[I].optSetting);
+						AppendStr(fCppCompileParams, option.optSetting);
 					end;
 				end;
 			end;
@@ -617,7 +621,7 @@ begin
 
 	InitProgressForm('Compiling...');
 
-	DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
+	DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
 
 	// Done by buildmakefile
 	if not Assigned(fProject) then begin
@@ -761,20 +765,18 @@ const
 	cCleanLine = '%s clean -f "%s"';
 	cmsg = ' make clean';
 var
-	cmdLine	: AnsiString;
-	s 		: AnsiString;
-	cs		: integer;
+	cmdLine,s : AnsiString;
 begin
 	fSingleFile:=True; // fool clean; don't run deps checking since all we do is cleaning
 	
 	if Project <> nil then begin
-		cs:=SwitchToProjectCompilerSet;
-		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
+		SwitchToProjectCompilerSet;
+		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
 		Result := True;
 		InitProgressForm('Cleaning...');
 		BuildMakeFile;
 		if not FileExists(fMakefile) then begin
-			SwitchToOriginalCompilerSet(cs);
+			SwitchToOriginalCompilerSet;
 			DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
 			DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
 			MessageBox(Application.MainForm.Handle,PAnsiChar(Lang[ID_ERR_NOMAKEFILE]),PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONHAND);
@@ -800,19 +802,18 @@ const
 var
 	cmdLine	: AnsiString;
 	s		: AnsiString;
-	cs		: integer;
 begin
 	fSingleFile := True; // fool rebuild; don't run deps checking since all files will be rebuilt
 	Result := True;
-	cs := SwitchToProjectCompilerSet;
+	SwitchToProjectCompilerSet;
 
 	InitProgressForm('Rebuilding...');
 	if Assigned(Project) then begin
 
-		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
+		DoLogEntry(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
 		BuildMakeFile;
 		if not FileExists(fMakefile) then begin
-			SwitchToOriginalCompilerSet(cs);
+			SwitchToOriginalCompilerSet;
 			DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
 			DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
 			MessageBox(Application.Handle,PAnsiChar(Lang[ID_ERR_NOMAKEFILE]),PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
@@ -890,7 +891,7 @@ begin
 		end;
 	end else if fAbortThread then
 		DoLogEntry(Lang[ID_COMPILEABORT]);
-	SwitchToOriginalCompilerSet(fOriginalSet);
+	SwitchToOriginalCompilerSet;
 end;
 
 procedure TCompiler.OnLineOutput(Sender: TObject; const Line: AnsiString);
@@ -967,8 +968,8 @@ begin
 	end;
 
 	// Make errors
-	if (Pos(devCompilerSet.makeName + ': ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
-		cpos := Length(devCompilerSet.makeName + ': ***');
+	if (Pos(devCompiler.makeName + ': ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
+		cpos := Length(devCompiler.makeName + ': ***');
 		O_Msg := '[Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 		if Assigned(fProject) then
 			O_File := Makefile
@@ -1359,13 +1360,14 @@ resourcestring
 	cAppendStr = '%s -L"%s"';
 var
 	i, val : integer;
+	option : TCompilerOption;
 begin
 	fLibrariesParams := '';
-	fLibrariesParams := CommaStrToStr(devDirs.lib, cAppendStr);
+	fLibrariesParams := CommaStrToStr(devCompiler.LibDir, cAppendStr);
 
 	//RNC
-	if (devCompilerSet.LinkOpts <> '') and devCompilerSet.AddtoLink then
-		fLibrariesParams := fLibrariesParams + ' ' + devCompilerSet.LinkOpts;
+	if (devCompiler.LinkOpts <> '') and devCompiler.AddtoLink then
+		fLibrariesParams := fLibrariesParams + ' ' + devCompiler.LinkOpts;
 	if (fTarget = ctProject) and assigned(fProject) then begin
 		for i := 0 to pred(fProject.Options.Libs.Count) do
 			fLibrariesParams := format(cAppendStr, [fLibrariesParams, fProject.Options.Libs[i]]);
@@ -1380,19 +1382,21 @@ begin
 		fLibrariesParams :=  ' -pg' + fLibrariesParams; // ' -lgmon -pg '
 
 	fLibrariesParams := fLibrariesParams + ' ';
-	for I := 0 to devCompiler.OptionsCount - 1 do
-		if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and (devCompiler.Options[I].optValue > 0)) then begin
-			if devCompiler.Options[I].optIsLinker then
-				if Assigned(devCompiler.Options[I].optChoices) then begin
+	for I := 0 to devCompiler.fOptionList.Count - 1 do begin
+		option := PCompilerOption(devCompiler.fOptionList[I])^;
+		if (Assigned(fProject) and (I<Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and (option.optValue > 0)) then begin
+			if option.optIsLinker then
+				if Assigned(option.optChoices) then begin
 					if Assigned(fProject) then
 						val := devCompiler.ConvertCharToValue(fProject.Options.CompilerOptions[I+1])
 					else
-						val := devCompiler.Options[I].optValue;
-					if (val > 0) and (val < devCompiler.Options[I].optChoices.Count) then
-						fLibrariesParams := fLibrariesParams + devCompiler.Options[I].optSetting + devCompiler.Options[I].optChoices.Values[devCompiler.Options[I].optChoices.Names[val]] + ' ';
+						val := option.optValue;
+					if (val > 0) and (val < option.optChoices.Count) then
+						fLibrariesParams := fLibrariesParams + option.optSetting + option.optChoices.Values[option.optChoices.Names[val]] + ' ';
 				end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I+1], 0)=1)) or (not Assigned(fProject)) then
-					fLibrariesParams := fLibrariesParams + devCompiler.Options[I].optSetting + ' ';
+					fLibrariesParams := fLibrariesParams + option.optSetting + ' ';
 		end;
+	end;
 end;
 
 procedure TCompiler.GetIncludesParams;
@@ -1404,8 +1408,8 @@ begin
 	fIncludesParams := '';
 	fCppIncludesParams := '';
 
-	fIncludesParams := CommaStrToStr(devDirs.C, cAppendStr);
-	fCppIncludesParams := CommaStrToStr(devDirs.Cpp, cAppendStr);
+	fIncludesParams := CommaStrToStr(devCompiler.CDir, cAppendStr);
+	fCppIncludesParams := CommaStrToStr(devCompiler.CppDir, cAppendStr);
 
 	if (fTarget = ctProject) and assigned(fProject) then
 		for i := 0 to pred(fProject.Options.Includes.Count) do
@@ -1420,33 +1424,17 @@ begin
 	Result := fDevRun <> nil;
 end;
 
-procedure TCompiler.SwitchToOriginalCompilerSet(Index: integer);
+procedure TCompiler.SwitchToOriginalCompilerSet;
 begin
-	if not Assigned(fProject) then
-		Exit;
-
-	if Index = devCompiler.CompilerSet then
-		Exit;
-
-	devCompilerSet.LoadSet(Index);
-	devCompilerSet.AssignToCompiler;
-	devCompiler.CompilerSet:=Index;
+	if Assigned(fProject) and (devCompiler.CurrentIndex <> fOriginalSet) then
+		devCompiler.LoadSet(fOriginalSet);
 end;
 
-function TCompiler.SwitchToProjectCompilerSet: integer;
+procedure TCompiler.SwitchToProjectCompilerSet;
 begin
-	fOriginalSet :=devCompiler.CompilerSet;
-	result := 0;
-
-	if not Assigned(fProject) then
-		Exit;
-
-	if devCompiler.CompilerSet = fProject.Options.CompilerSet then
-		Exit;
-
-	devCompilerSet.LoadSet(fProject.Options.CompilerSet);
-	devCompilerSet.AssignToCompiler;
-	devCompiler.CompilerSet:=fProject.Options.CompilerSet;
+	fOriginalSet := devCompiler.CurrentIndex;
+	if Assigned(fProject) and (devCompiler.CurrentIndex <> fProject.Options.CompilerSet) then
+		devCompiler.LoadSet(fProject.Options.CompilerSet);
 end;
 
 procedure TCompiler.InitProgressForm(const Status: AnsiString);
@@ -1460,11 +1448,11 @@ begin
 	with CompileProgressForm do begin
 
 		memoMiniLog.Lines.Clear;
-		memoMiniLog.Lines.Add(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
+		memoMiniLog.Lines.Add(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompiler.Sets[devCompiler.CurrentIndex]]));
 
 		btnClose.OnClick:=OnAbortCompile;
 
-		lblCompiler.Caption:=devCompilerSet.SetName(devCompiler.CompilerSet);
+		lblCompiler.Caption:=devCompiler.Sets[devCompiler.CurrentIndex];
 		lblStatus.Caption:=Status;
 		lblStatus.Font.Style:=[];
 

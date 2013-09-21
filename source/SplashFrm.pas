@@ -39,7 +39,7 @@ type
   end;
 
 var
-  SplashForm: TSplashForm;
+  SplashForm: TSplashForm = nil;
 
 implementation
 

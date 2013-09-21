@@ -69,6 +69,7 @@ type
 	function IncludeQuoteIfSpaces(s : AnsiString) : AnsiString;
 	function IncludeQuoteIfNeeded(s : AnsiString) : AnsiString;
 
+	procedure MsgErr(const text:AnsiString;const caption:AnsiString = 'Error');
 	procedure MsgBox(const text:AnsiString;const caption:AnsiString = 'Message'); overload;
 	procedure MsgBox(textlist:TStrings;const caption:AnsiString = 'Message'); overload;
 	procedure MsgBox(text:integer;const caption:AnsiString = 'Message'); overload;
@@ -117,6 +118,8 @@ type
 
 	function IsNumeric(const s : AnsiString) : boolean;
 
+	function CountChar(const s : AnsiString;c : Char) : integer;
+
 	procedure OpenHelpFile;
 
 	function ProgramHasConsole(const path : AnsiString) : boolean;
@@ -139,6 +142,9 @@ function StartsText(const subtext,text : AnsiString) : boolean;
 
 function ReplaceFirstStr(const S, OldPattern, NewPattern : string) : string;
 function ReplaceFirstText(const S, OldPattern, NewPattern : string) : string;
+
+function ReplaceLastStr(const S, OldPattern, NewPattern : string) : string;
+function ReplaceLastText(const S, OldPattern, NewPattern : string) : string;
 
 function IsEmpty(editor : TSynEdit) : boolean;
 
@@ -260,6 +266,39 @@ begin
 	end;
 end;
 
+function ReplaceLastStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+var
+	Offset: Integer;
+begin
+
+	Offset := GetLastPos(OldPattern, S);
+	if Offset = 0 then begin
+		Result := S;
+	end else begin
+
+		// Copy the preceding stuff, append the new part, append old stuff after old pattern
+		Result := Copy(S, 1, Offset - 1) + NewPattern + Copy(S, Offset + Length(OldPattern), MaxInt);
+	end;
+end;
+
+function ReplaceLastText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+var
+	Offset: Integer;
+	UpperS,UpperOldPattern : string;
+begin
+	UpperS := UpperCase(S);
+	UpperOldPattern := UpperCase(OldPattern);
+
+	Offset := GetLastPos(UpperOldPattern, UpperS);
+	if Offset = 0 then begin
+		Result := S;
+	end else begin
+
+		// Copy the preceding stuff, append the new part, append old stuff after old pattern
+		Result := Copy(S, 1, Offset - 1) + NewPattern + Copy(S, Offset + Length(UpperOldPattern), MaxInt);
+	end;
+end;
+
 function ProgramHasConsole(const path : AnsiString) : boolean;
 var
 	handle : Cardinal;
@@ -285,6 +324,10 @@ begin
 end;
 
 // got tired of typing application.handle,PAnsiChar,PAnsiChar MB_OK, etc ;)
+procedure MsgErr(const text,caption:AnsiString);
+begin
+	MessageBox(application.handle,PAnsiChar(text),PAnsiChar(caption),MB_ICONERROR);
+end;
 procedure MsgBox(const text,caption:AnsiString);
 begin
 	MessageBox(application.handle,PAnsiChar(text),PAnsiChar(caption),MB_OK);
@@ -308,7 +351,7 @@ procedure OpenHelpFile;
 var
 	abshelp : AnsiString;
 begin
-	abshelp := ReplaceFirstStr(devDirs.Help,  '%path%\',devDirs.Exec) + DEV_MAINHELP_FILE;
+	abshelp := ReplaceFirstStr(devDirs.Help,  '%path%\',devDirs.Exec) + 'devcpp.htm';
 	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(abshelp), nil, nil, SW_SHOWNORMAL);
 end;
 
@@ -463,7 +506,7 @@ end;
 
 procedure SetPath(const Add: AnsiString;UseOriginal: boolean = TRUE);
 var
-	OldPath: array[0..PATH_LEN] of char;
+	OldPath: array[0..512] of char;
 	NewPath: AnsiString;
 begin
 	NewPath := Add;
@@ -480,7 +523,7 @@ begin
 	if UseOriginal then
 		NewPath:= NewPath + devDirs.OriginalPath
 	else begin
-		GetEnvironmentVariable(PAnsiChar('PATH'), @OldPath, PATH_LEN);
+		GetEnvironmentVariable(PAnsiChar('PATH'), @OldPath, 512);
 		NewPath:= NewPath + AnsiString(OldPath);
 	end;
 
@@ -1048,5 +1091,16 @@ begin
 			exit;
 		end;
 end;
+
+function CountChar(const s : AnsiString; c : char) : integer;
+var
+	i : integer;
+begin
+	result := 0;
+	for i := 1 to length(s) do
+		if s[i] = c then
+			Inc(result);
+end;
+
 
 end.

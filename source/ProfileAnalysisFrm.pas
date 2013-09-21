@@ -338,7 +338,7 @@ procedure TProfileAnalysisForm.lvFlatMouseMove(Sender: TObject; Shift: TShiftSta
 var
   It: TListItem;
 begin
-  with Sender as TListView do begin
+  with TListView(Sender) do begin
     It := GetItemAt(X, Y);
     if Assigned(It) and Assigned(It.Data) then
       Cursor := crHandPoint

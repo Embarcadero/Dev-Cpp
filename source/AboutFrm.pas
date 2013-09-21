@@ -115,13 +115,14 @@ begin
 end;
 
 procedure TAboutForm.LabelClick(Sender: TObject);
-var s : AnsiString;
+var
+	s : AnsiString;
 begin
-  if pos('@',(Sender as TLabel).Caption)<> 0 then
-    s := 'mailto:'+(Sender as TLabel).Caption
-  else
-    s := (Sender as TLabel).Caption;
-  ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(s), nil, nil, SW_SHOWNORMAL);
+	if pos('@',TLabel(Sender).Caption) <> 0 then
+		s := 'mailto:'+TLabel(Sender).Caption
+	else
+		s := TLabel(Sender).Caption;
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(s), nil, nil, SW_SHOWNORMAL);
 end;
 
 

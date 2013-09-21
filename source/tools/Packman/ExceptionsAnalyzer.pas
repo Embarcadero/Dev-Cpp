@@ -27,13 +27,11 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, StdCtrls, Buttons, ExtCtrls, ShellAPI, ComCtrls,
-  XPMenu;
+  Dialogs, StrUtils, StdCtrls, Buttons, ExtCtrls, ShellAPI, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, StrUtils, QStdCtrls, QButtons, QExtCtrls, QComCtrls
-  ;
+  QDialogs, StrUtils, QStdCtrls, QButtons, QExtCtrls, QComCtrls;
 {$ENDIF}
 
 type

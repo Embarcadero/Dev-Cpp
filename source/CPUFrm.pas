@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, SynEdit, StrUtils;
+  Dialogs, StdCtrls, Buttons, SynEdit, StrUtils, ComCtrls, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -32,182 +32,149 @@ uses
 {$ENDIF}
 
 type
+
+  PRegister = ^TRegister;
+  TRegister = record
+    name : AnsiString;
+    value : AnsiString;
+  end;
+
   TCPUForm = class(TForm)
-    gbAsm: TGroupBox;
-    gbSyntax: TGroupBox;
-    rbIntel: TRadioButton;
-    rbATT: TRadioButton;
     edFunc: TEdit;
     lblFunc: TLabel;
     CodeList: TSynEdit;
-    gbRegisters: TGroupBox;
-    lblEIP: TLabel;
-    EIPText: TEdit;
-    EAXText: TEdit;
-    lblEAX: TLabel;
-    EBXText: TEdit;
-    lblEBX: TLabel;
-    lblECX: TLabel;
-    ECXText: TEdit;
-    lblEDX: TLabel;
-    EDXText: TEdit;
-    lblESI: TLabel;
-    ESIText: TEdit;
-    lblEDI: TLabel;
-    EDIText: TEdit;
-    lblEBP: TLabel;
-    EBPText: TEdit;
-    lblESP: TLabel;
-    ESPText: TEdit;
-    lblCS: TLabel;
-    CSText: TEdit;
-    lblDS: TLabel;
-    DSText: TEdit;
-    lblSS: TLabel;
-    SSText: TEdit;
-    lblES: TLabel;
-    ESText: TEdit;
-    lblFS: TLabel;
-    FSText: TEdit;
-    lblGS: TLabel;
-    GSText: TEdit;
+    RegisterListbox: TListView;
+    gbSyntax: TRadioGroup;
+    DisasPanel: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edFuncKeyPress(Sender: TObject; var Key: Char);
-    procedure rbSyntaxClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure gbSyntaxClick(Sender: TObject);
   private
-    ActiveLine : integer;
+    fActiveLine : integer;
+    fRegisters : TList;
+    fAssembler : TStringList;
 
     procedure LoadText;
-
-    procedure OnActiveLine(Sender: TObject; Line: Integer;var Special: Boolean; var FG, BG: TColor);
-
   public
+    procedure OnAssemblerReady;
     procedure OnRegistersReady;
+    procedure OnBacktraceReady;
   end;
 
 var
-  CPUForm: TCPUForm;
+  CPUForm: TCPUForm = nil;
 
 implementation
 
-uses 
-  main, version, MultiLangSupport, debugger, utils,
-  devcfg, debugwait, Types; 
+uses
+  main, version, MultiLangSupport, debugger, datamod, utils,
+  devcfg, Types;
 
 {$R *.dfm}
 
 procedure TCPUForm.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+	I : integer;
 begin
-  MainForm.fDebugger.OnRegistersReady := nil;
-  action := caFree;
+	for I := 0 to fRegisters.Count - 1 do
+		Dispose(PRegister(fRegisters.Items[I]));
+	fRegisters.Free;
+	fAssembler.Free;
+	action := caFree;
 end;
 
 procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
-var
-	tmp : AnsiString;
 begin
-	if key = #13 then begin
-		if (MainForm.fDebugger.Executing) then
-			CodeList.Lines.Clear;
-			tmp:=edFunc.Text;
-			if EndsStr('()',edFunc.Text) then begin
-				Delete(tmp,length(tmp)-1,2);
-				edFunc.Text:=tmp;
-			end;
-			MainForm.fDebugger.SendCommand(GDB_DISASSEMBLE,tmp);
+	if MainForm.fDebugger.Executing then begin
+		if Key = Chr(VK_RETURN) then begin
+			Key := #0;
+			MainForm.fDebugger.SendCommand('disassemble',TEdit(Sender).Text);
+		end;
 	end;
-end;
-
-procedure TCPUForm.rbSyntaxClick(Sender: TObject);
-var
-	cb : TCheckBox;
-	tmp : AnsiString;
-begin
-  cb := TCheckBox(sender);
-  while (MainForm.fDebugger.InAssembler) do
-   sleep(20);
-  if (MainForm.fDebugger.Executing) then begin
-    CodeList.Lines.Clear;
-    if cb.Tag = 0 then
-      MainForm.fDebugger.SendCommand(GDB_SETFLAVOR, GDB_ATT)
-    else
-      MainForm.fDebugger.SendCommand(GDB_SETFLAVOR, GDB_INTEL);
-
-    MainForm.fDebugger.Idle;
-
-    if EndsStr('()',edFunc.Text) then begin
-		Delete(tmp,length(tmp)-1,2);
-		edFunc.Text:=tmp;
-	end;
-    MainForm.fDebugger.SendCommand(GDB_DISASSEMBLE,tmp);
-    MainForm.fDebugger.Idle;
-  end;
 end;
 
 procedure TCPUForm.LoadText;
-begin
-  with Lang do begin
-    Caption := Strings[ID_CPU_CAPTION];
-    gbAsm.Caption := '  '+Strings[ID_CPU_ASMCODE]+'  ';
-    gbSyntax.Caption := '  '+Strings[ID_CPU_SYNTAX]+'  ';
-    gbRegisters.Caption := '  '+Strings[ID_CPU_REGISTERS]+'  ';
-    lblFunc.Caption := Strings[ID_CPU_FUNC];
-  end;
-end;
-
-procedure TCPUForm.FormCreate(Sender: TObject);
-begin
-  ActiveLine := -1;
-  CodeList.OnSpecialLineColors := OnActiveLine;
-  MainForm.fDebugger.OnRegistersReady := OnRegistersReady;
-  LoadText;
-end;
-
-procedure TCPUForm.OnRegistersReady;
-var
-	i : integer;
 begin
 	// Set interface font
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
-  EAXText.Text := MainForm.fDebugger.Registers[EAX];
-  EBXText.Text := MainForm.fDebugger.Registers[EBX];
-  ECXText.Text := MainForm.fDebugger.Registers[ECX];
-  EDXText.Text := MainForm.fDebugger.Registers[EDX];
-  ESIText.Text := MainForm.fDebugger.Registers[ESI];
-  EDIText.Text := MainForm.fDebugger.Registers[EDI];
-  EBPText.Text := MainForm.fDebugger.Registers[EBP];
-  ESPText.Text := MainForm.fDebugger.Registers[ESP];
-  EIPText.Text := MainForm.fDebugger.Registers[EIP];
-  CSText.Text :=  MainForm.fDebugger.Registers[CS];
-  DSText.Text :=  MainForm.fDebugger.Registers[DS];
-  SSText.Text :=  MainForm.fDebugger.Registers[SS];
-  ESText.Text :=  MainForm.fDebugger.Registers[ES];
-  FSText.Text :=  MainForm.fDebugger.Registers[FS];
-  GSText.Text :=  MainForm.fDebugger.Registers[GS];
-  for i := 0 to CodeList.Lines.Count - 1 do
-    if pos(EIPText.Text, CodeList.Lines[i]) <> 0 then begin
-      if (ActiveLine <> i) and (ActiveLine <> -1) then
-        CodeList.InvalidateLine(ActiveLine);
-      ActiveLine := i + 1;
-      CodeList.InvalidateLine(ActiveLine);
-      CodeList.CaretY := ActiveLine;
-      CodeList.EnsureCursorPosVisible;
-      break;
-    end;
+	Caption := Lang[ID_CPU_CAPTION];
+	gbSyntax.Caption := '  ' + Lang[ID_CPU_SYNTAX] +'  ';
+	lblFunc.Caption := Lang[ID_CPU_FUNC];
 end;
 
-procedure TCPUForm.OnActiveLine(Sender: TObject; Line: Integer;var Special: Boolean; var FG, BG: TColor);
-var pt : TPoint;
+procedure TCPUForm.OnBacktraceReady;
 begin
-   if (Line = ActiveLine) then begin
-     StrtoPoint(pt, devEditor.Syntax.Values[cABP]);
-     BG:= pt.X;
-     FG:= pt.Y;
-     Special:= TRUE;
-   end;
+	// ...
+end;
+
+procedure TCPUForm.OnAssemblerReady;
+var
+	I : integer;
+begin
+	edFunc.Text := fAssembler.Strings[0];
+
+	CodeList.BeginUpdate;
+	CodeList.Clear;
+	for I := 1 to fAssembler.Count - 1 do
+		CodeList.Lines.Add(fAssembler.Strings[i]);
+	CodeList.EndUpdate;
+
+	// Free list
+	fAssembler.Clear;
+end;
+
+procedure TCPUForm.OnRegistersReady;
+var
+	item : TListItem;
+	I : integer;
+begin
+	RegisterListbox.Items.BeginUpdate;
+	for I := 0 to fRegisters.Count - 1 do begin
+		item := RegisterListbox.Items.Add;
+		item.Caption := UpperCase(PRegister(fRegisters.Items[I])^.name);
+		item.SubItems.Add(PRegister(fRegisters.Items[I])^.value);
+	end;
+	RegisterListBox.Items.EndUpdate;
+
+	// Free list
+	for I := 0 to fRegisters.Count - 1 do
+		Dispose(PRegister(fRegisters.Items[I]));
+	fRegisters.Clear;
+end;
+
+procedure TCPUForm.FormCreate(Sender: TObject);
+begin
+	fActiveLine := -1;
+	LoadText;
+
+	fRegisters := TList.Create;
+	fAssembler := TStringList.Create;
+
+	if MainForm.fDebugger.Executing then begin
+
+		// Load the registers...
+		MainForm.fDebugger.SetRegisters(fRegisters);
+		MainForm.fDebugger.SendCommand('info','registers');
+
+		// Set disassembly flavor and load the current function
+		MainForm.fDebugger.SetDisassembly(fAssembler);
+		gbSyntaxClick(nil);
+	end;
+end;
+
+procedure TCPUForm.gbSyntaxClick(Sender: TObject);
+begin
+	// Set disassembly flavor
+	if gbSyntax.ItemIndex = 0 then
+		MainForm.fDebugger.SendCommand('set disassembly-flavor','att')
+	else
+		MainForm.fDebugger.SendCommand('set disassembly-flavor','intel');
+
+	// Reload the current function
+	MainForm.fDebugger.SendCommand('disassemble',edFunc.Text);
 end;
 
 end.

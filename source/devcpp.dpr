@@ -64,14 +64,12 @@ uses
   FindFrm in 'FindFrm.pas' {FindForm},
   editor in 'editor.pas',
   EnviroFrm in 'EnviroFrm.pas' {EnviroForm},
-  debugwait in 'debugwait.pas',
   debugreader in 'debugreader.pas',
   debugger in 'debugger.pas',
   CFGData in 'CFGData.pas',
   CFGINI in 'CFGINI.pas',
   CheckForUpdate in 'CheckForUpdate.pas',
   prjtypes in 'prjtypes.pas',
-  DebugFrm in 'DebugFrm.pas' {DebugForm},
   ResourceSelectorFrm in 'ResourceSelectorFrm.pas' {ResourceSelectorForm},
   Macros in 'Macros.pas',
   devExec in 'devExec.pas',
@@ -101,87 +99,76 @@ uses
   WebThread in 'Tools\webupdate\WebThread.pas',
   WebUpdate in 'Tools\webupdate\WebUpdate.pas' {WebUpdateForm},
   ProcessListFrm in 'ProcessListFrm.pas' {ProcessListForm},
-  ModifyVarFrm in 'ModifyVarFrm.pas' {ModifyVarForm},
   PackmanExitCodesU in 'Tools\Packman\PackmanExitCodesU.pas',
   ImageTheme in 'ImageTheme.pas';
 
 {$R *.res}
 
 var
-	// ConfigMode moved to devcfg, 'cause I need it in enviroform (for AltConfigFile)
-	UserHome, strLocalAppData, strAppData, strIniFile, exefolder: AnsiString;
+	appdata, inifilename, exefolder: AnsiString;
 	tempc: array [0..MAX_PATH] of char;
 begin
+	inifilename := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
+	exefolder := ExtractFilePath(Application.ExeName);
 
-	strIniFile := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
-	exefolder := ReplaceFirstStr(Application.ExeName,ExtractFileName(Application.ExeName),'');
-
-	if (ParamCount > 0) and (ParamStr(1) = CONFIG_PARAM) then begin
+	// Did someone pass the -c command to us?
+	if (ParamCount >= 2) and SameStr(ParamStr(1),'-c') then begin
 		if not DirectoryExists(ParamStr(2)) then
 			CreateDir(ParamStr(2));
 
-		if ParamStr(2)[2] <> ':' then// if a relative path is specified...
-			devData.INIFile := exefolder + IncludeTrailingBackslash(ParamStr(2)) + strIniFile
+		if ParamStr(2)[2] <> ':' then // if a relative path is specified...
+			devData.INIFile := exefolder + IncludeTrailingBackslash(ParamStr(2)) + inifilename
 		else
-			devData.INIFile := IncludeTrailingBackslash(ParamStr(2)) + strIniFile;
+			devData.INIFile := IncludeTrailingBackslash(ParamStr(2)) + inifilename;
+
 		ConfigMode := CFG_PARAM;
 	end else begin
-		//default dir should be %APPDATA%\Dev-Cpp
-		strLocalAppData := '';
-		if SUCCEEDED(SHGetFolderPath(0, CSIDL_LOCAL_APPDATA, 0, 0, tempc)) then
-			strLocalAppData := IncludeTrailingBackslash(AnsiString(tempc));
 
-		strAppData := '';
+		// default dir should be %APPDATA%\Dev-Cpp
+		appdata := '';
 		if SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, tempc)) then
-			strAppData := IncludeTrailingBackslash(AnsiString(tempc));
+			appdata := IncludeTrailingBackslash(AnsiString(tempc));
 
-		if (strLocalAppData <> '') and FileExists(strLocalAppData + strIniFile) then begin
-			UserHome := strLocalAppData;
-			devData.INIFile := UserHome + strIniFile;
-			ConfigMode := CFG_USER;
-		end else if (strAppData <> '') and FileExists(strAppData + strIniFile) then begin
-			UserHome := strAppData;
-			devData.INIFile := UserHome + strIniFile;
-			ConfigMode := CFG_USER;
-		end else if (strAppData <> '') and (DirectoryExists(strAppData + 'Dev-Cpp') or CreateDir(strAppData + 'Dev-Cpp')) then begin
-			UserHome := strAppData + 'Dev-Cpp\';
-			devData.INIFile := UserHome + strIniFile;
-			ConfigMode := CFG_USER;
-		end else
-			devData.INIFile:= ChangeFileExt(Application.EXEName, INI_EXT);
+		if (appdata <> '') and (DirectoryExists(appdata + 'Dev-Cpp') or CreateDir(appdata + 'Dev-Cpp')) then begin
+			devData.INIFile := appdata + 'Dev-Cpp\' + inifilename;
+			ConfigMode := CFG_APPDATA;
+		end else begin
+
+			// store it in the default portable config folder anyways...
+			devData.INIFile := exefolder + 'config\' + inifilename;
+			ConfigMode := CFG_EXEFOLDER;
+		end;
 	end;
+
+	// free ansistrings...
+	SetLength(appdata,0);
+	SetLength(inifilename,0);
+	SetLength(exefolder,0);
 
 	// support for user-defined alternate ini file (permanent, but overriden by command-line -c)
 	if ConfigMode <> CFG_PARAM then begin
-		StandardConfigFile:=devData.INIFile;
+		StandardConfigFile := devData.INIFile;
 		CheckForAltConfigFile(devData.INIFile);
 		if UseAltConfigFile and (AltConfigFile<>'') and FileExists(AltConfigFile) then
 			devData.INIFile:=AltConfigFile;
 	end;
 
+	// Create and fill settings structures
 	InitializeOptions;
-	if ConfigMode = CFG_PARAM then begin
-		if ParamStr(2)[2] <> ':' then // if a relative path is specified...
-			devDirs.Config := exefolder + IncludeTrailingBackslash(ParamStr(2))
-		else
-			devDirs.Config := IncludeTrailingBackslash(ParamStr(2));
-	end else if ConfigMode = CFG_USER then
-		devDirs.Config := UserHome;
-	devData.ReadConfigData;
+	devData.ReadConfigData; // fill devData ???
 
-	devTheme:= TdevTheme.Create;
 	Application.Initialize;
 	Application.Title := 'Dev-C++';
 	Application.CreateForm(TMainForm, MainForm);
 
-	// Display it a bit later
-	if not devData.NoSplashScreen then
+	// Display it a bit later, and only if its worth viewing...
+	if (not devData.NoSplashScreen and devCodeCompletion.UseCacheFiles) or devData.First then
 		SplashForm := TSplashForm.Create(Application);
 
 	// do the creation stuff when the splashscreen is displayed because it takes quite a while ...
 	MainForm.DoCreateEverything;
 
-	if not devData.NoSplashScreen then
+	if Assigned(SplashForm) then
 		SplashForm.Free;
 
 	Application.Run;

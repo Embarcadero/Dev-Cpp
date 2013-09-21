@@ -86,13 +86,13 @@ type
   end;
 
   POutstandingTypedef = ^TOutstandingTypedef;
-  TOutstandingTypedef = packed record
+  TOutstandingTypedef = record
     _WaitForTypedef: AnsiString;
     _ExistingID: integer;
   end;
 
   PIncludesRec = ^TIncludesRec;
-  TIncludesRec = packed record
+  TIncludesRec = record
     BaseFile: AnsiString;
     IncludeFiles: AnsiString;
   end;
@@ -542,50 +542,58 @@ begin
 end;
 
 function TCppParser.GetCurrentClass(fMultipleIndex : integer): integer;
+var
+	requestindex : integer;
 begin
-  if fCurrentClass.Count > 0 then begin
 
-    // The idea behind this is that there might be multiple current classes for a given variable.
-    // Take for example:
+	// The idea behind this is that there might be multiple current classes for a given variable.
+	// Take for example:
 
-    // struct {
-    //   int a;
-    // } type1_t, type2_t;
+	// struct {
+	//   int a;
+	// } type1_t, type2_t;
 
-    // Here, int a should be twice, once with type1_t as the parent and once in combination with type2_t.
-    // That kind of wizardry is done here, with fMultipleParentsCount keeping track of the amount of simultaneous
-    // parents, and fMultipleIndex referring to the 1 based index in that list
+	// Here, int a should be added twice, once with type1_t as the parent and once in combination with type2_t.
+	// That kind of wizardry is done here, with fMultipleParentsCount keeping track of the amount of simultaneous
+	// parents, and fMultipleIndex referring to the 1 based index in that list
 
-    if fMultipleIndex <> -1 then
-      Result := fCurrentClass[fCurrentClass.Count - 1 - fStructParentCount + fMultipleIndex]
-    else
-      Result := fCurrentClass[fCurrentClass.Count - 1];
-  end else
-    Result := -1;
+	if fMultipleIndex <> -1 then
+		requestindex := fCurrentClass.Count - 1 - fStructParentCount + fMultipleIndex
+	else
+		requestindex := fCurrentClass.Count - 1;
+
+	if (requestindex >= 0) and (fCurrentClass.Count > requestindex) then
+		Result := fCurrentClass[requestindex]
+	else
+		Result := -1;
 end;
 
 procedure TCppParser.SetCurrentClass(ID: integer);
 begin
-  if fCurrentClass.Count > 0 then begin
-    if fCurrentClass[fCurrentClass.Count - 1] <> ID then begin
-      fCurrentClass.Add(ID);
-      fCurrentClassLevel.Add(fLevel);
-      fClassScope := scsPublic;
-    end;
-  end
-  else begin
-    fCurrentClass.Add(ID);
-    fCurrentClassLevel.Add(fLevel);
-    fClassScope := scsPublic;
-  end;
+	if fCurrentClass.Count > 0 then begin
+		if fCurrentClass[fCurrentClass.Count - 1] <> ID then begin
+			fCurrentClass.Add(ID);
+			fCurrentClassLevel.Add(fLevel);
+			fClassScope := scsPublic;
+		end;
+	end else begin
+		fCurrentClass.Add(ID);
+		fCurrentClassLevel.Add(fLevel);
+		fClassScope := scsPublic;
+	end;
 end;
 
 procedure TCppParser.RemoveCurrentClass;
 var
-	I : integer;
+	i,removecount : integer;
 begin
-	if fCurrentClassLevel.Count > 0 then begin
-		for I := 0 to fStructParentCount - 1 do begin
+	if fStructParentCount > 0 then
+		removecount := fStructParentCount
+	else
+		removecount := 1;
+
+	if fCurrentClassLevel.Count >= removecount then begin
+		for I := 1 to removecount do begin
 			if fCurrentClassLevel[fCurrentClassLevel.Count - 1] = fLevel then begin
 				fCurrentClass.Delete(fCurrentClass.Count - 1);
 				fCurrentClassLevel.Delete(fCurrentClassLevel.Count - 1);
@@ -1609,6 +1617,7 @@ begin
   fIndex := 0;
   fLevel := 0;
   fLastID := -1;
+  fStructParentCount := 0;
   P := New(PIncludesRec);
   P^.BaseFile := fCurrentFile;
   P^.IncludeFiles := '';

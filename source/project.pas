@@ -33,26 +33,24 @@ uses
 {$ENDIF}
 
 type
- TProjUnit = class;
+  TProjUnit = class;
 
- TUnitList = class
+  TUnitList = class
   private
-   fList: TObjectList;
-   function GetCount: integer;
-   function  GetItem(index: integer): TProjUnit;
-   procedure SetItem(index: integer; value: TProjUnit);
+    fList: TList;
+    function GetCount: integer;
+    function  GetItem(index: integer): TProjUnit;
   public
-   constructor Create;
-   destructor Destroy; override;
-   function Add(aunit: TProjUnit): integer;
-   procedure Remove(index: integer);
-   function Indexof(FileName: AnsiString): integer; overload;
-   function Indexof(Node: TTreeNode): integer; overload;
-   function Indexof(Editor: TEditor): integer; overload;
+    constructor Create;
+    destructor Destroy; override;
+    function Add(aunit: TProjUnit): integer;
+    procedure Remove(index: integer);
+    function Indexof(const FileName: AnsiString): integer; overload;
+    function Indexof(Editor: TEditor): integer; overload;
 
-   property Items[index: integer]: Tprojunit read GetItem write SetItem; default;
-   property Count: integer read GetCount;
- end;
+    property Items[index: integer]: Tprojunit read GetItem; default;
+    property Count: integer read GetCount;
+  end;
 
  TProject = class;
  TProjUnit = class
@@ -64,7 +62,7 @@ type
    fNode     : TTreeNode;
    fFolder   : AnsiString;
    fCompile  : boolean;
-   fCompileCpp: boolean;
+   fCompileCpp : boolean;
    fOverrideBuildCmd: boolean;
    fBuildCmd : AnsiString;
    fLink  : boolean;
@@ -92,106 +90,86 @@ type
    procedure Assign(Source: TProjUnit);
  end;
 
- TProject = class
+  TProject = class
   private
-   fUnits: TUnitList;
-   fOptions: TProjOptions;
-   finiFile: TMemIniFile;
-   fName: AnsiString;
-   fFileName: AnsiString;
-   fNode: TTreeNode;
-   fModified: boolean;
-   fFolders: TStringList;
-   { begin XXXKF }
-   fFolderNodes: TObjectList;
-   { end XXXKF }
-   fCmdLineArgs: AnsiString;
-   fUseCustomMakefile: boolean;
-   fCustomMakefile: AnsiString;
-   function GetDirectory : AnsiString;
-   function GetExecutableName : AnsiString;
-   procedure SetFileName(value: AnsiString);
-   procedure SetNode(value: TTreeNode);
+    fUnits: TUnitList;
+    fOptions: TProjOptions;
+    finiFile: TMemIniFile;
+    fName: AnsiString;
+    fFileName: AnsiString;
+    fNode: TTreeNode;
+    fModified: boolean;
+    fFolders: TStringList;
+    fFolderNodes: TObjectList;
+    fCmdLineArgs: AnsiString;
+    fUseCustomMakefile: boolean;
+    fCustomMakefile: AnsiString;
+    function GetDirectory : AnsiString;
+    function GetExecutableName : AnsiString;
+    procedure SetFileName(const value: AnsiString);
 
-   procedure SortUnitsByPriority;
+    function GetModified: boolean;
+    procedure SetModified(value: boolean);
+
+    procedure SortUnitsByPriority;
     procedure SetCmdLineArgs(const Value: AnsiString);
     procedure SetCustomMakefile(const Value: AnsiString);
     procedure SetUseCustomMakefile(const Value: boolean);
   public
-	function GetModified: boolean;
-	procedure SetModified(value: boolean);
+    property Options: TProjOptions read fOptions write fOptions;
+    property Name: AnsiString read fName write fName;
+    property FileName: AnsiString read fFileName write SetFileName;
+    property Node: TTreeNode read fNode write fNode;
+    property Directory : AnsiString read GetDirectory;
+    property Executable : AnsiString read GetExecutableName;
+    property Units: TUnitList read fUnits write fUnits;
+    property INIFile: TMemIniFile read fINIFile write fINIFile;
+    property Modified: boolean read GetModified write SetModified;
+    property CmdLineArgs: AnsiString read fCmdLineArgs write SetCmdLineArgs;
+    property UseCustomMakefile: boolean read fUseCustomMakefile write SetUseCustomMakefile;
+    property CustomMakefile: AnsiString read fCustomMakefile write SetCustomMakefile;
 
-   property Options: TProjOptions read fOptions write fOptions;
-   property Name: AnsiString read fName write fName;
-   property FileName: AnsiString read fFileName write SetFileName;
-   property Node: TTreeNode read fNode write SetNode;
+    constructor Create(const nFileName, nName: AnsiString);
+    destructor Destroy; override;
 
-   property Directory : AnsiString read GetDirectory;
-   property Executable : AnsiString read GetExecutableName;
-
-   property Units: TUnitList read fUnits write fUnits;
-   property INIFile: TMemIniFile read fINIFile write fINIFile;
-   property Modified: boolean read GetModified write SetModified;
-
-   property CmdLineArgs: AnsiString read fCmdLineArgs write SetCmdLineArgs;
-
-   property UseCustomMakefile: boolean read fUseCustomMakefile write SetUseCustomMakefile;
-   property CustomMakefile: AnsiString read fCustomMakefile write SetCustomMakefile;
-   constructor Create(nFileName, nName : AnsiString);
-   destructor Destroy; override;
-   function NewUnit(NewProject : boolean; CustomFileName: AnsiString = ''): integer;
-   { begin XXXKF changed }
-   function AddUnit(s : AnsiString; var pFolder: TTreeNode; Rebuild: Boolean) : TProjUnit;
-   { end XXXKF changed }
-   function GetFolderPath(Node: TTreeNode): AnsiString;
-   procedure UpdateFolders;
-   procedure AddFolder(s: AnsiString);
-   function OpenUnit(index : integer): TEditor;
-   procedure CloseUnit(index: integer);
-   procedure SaveUnitAs(i : integer; sFileName : AnsiString);
-   procedure Save;
-   procedure SaveProjectFile;
-   procedure LoadLayout;
-   procedure LoadUnitLayout(e: TEditor; Index: integer);
-   procedure SaveLayout;
-   procedure SaveUnitLayout(e: TEditor; Index: integer);
-   function MakeProjectNode : TTreeNode;
-   { begin XXXKF changed }
-   function MakeNewFileNode(const s : AnsiString; IsFolder: boolean; NewParent: TTreeNode) : TTreeNode;
-   { end XXXKF changed }
-   procedure BuildPrivateResource(ForceSave: boolean = False);
-   procedure Update;
-   procedure UpdateFile;
-   function UpdateUnits: Boolean;
-   procedure Open;
-   function FileAlreadyExists(s : AnsiString) : boolean;
-   function Remove(index : integer; DoClose : boolean) : boolean;
-   function GetUnitFromEditor(ed : TEditor) : integer;
-   function GetUnitFromString(s : AnsiString) : integer;
-   function GetUnitFromNode(t : TTreeNode) : integer;
-   function GetFullUnitFileName(const index: integer): AnsiString;
-   function DoesEditorExists(e : TEditor) : boolean;
-   procedure AddLibrary(s : AnsiString);
-   procedure AddInclude(s : AnsiString);
-   procedure RemoveLibrary(index : integer);
-   procedure RemoveInclude(index : integer);
-   procedure RebuildNodes;
-   function ListUnitStr(const sep: char): AnsiString;
-   procedure Exportto(const HTML: boolean);
-   procedure ShowOptions;
-   function AssignTemplate(const aFileName: AnsiString; const aTemplate: TTemplate): boolean;
-   procedure SetHostApplication(s : AnsiString);
-   { begin XXXKF }
-   function FolderNodeFromName(name: AnsiString):TTreeNode;
-   procedure CreateFolderNodes;
-   procedure UpdateNodeIndexes;
-   procedure SetNodeValue(value: TTreeNode);
-   { end XXXKF }
-   procedure CheckProjectFileForUpdate;
-   procedure IncrementBuildNumber;
-
-	// Orwell
-	procedure SaveToLog;
+    function NewUnit(NewProject : boolean;const CustomFileName: AnsiString = ''): integer;
+    function AddUnit(s : AnsiString; var pFolder: TTreeNode; Rebuild: Boolean) : TProjUnit;
+    function GetFolderPath(Node: TTreeNode): AnsiString;
+    procedure UpdateFolders;
+    procedure AddFolder(const s: AnsiString);
+    function OpenUnit(index : integer): TEditor;
+    procedure CloseUnit(index: integer);
+    procedure SaveUnitAs(i : integer; sFileName : AnsiString);
+    procedure Save;
+    procedure SaveProjectFile;
+    procedure LoadLayout;
+    procedure LoadUnitLayout(e: TEditor; Index: integer);
+    procedure SaveLayout;
+    procedure SaveUnitLayout(e: TEditor; Index: integer);
+    function MakeProjectNode : TTreeNode;
+    function MakeNewFileNode(const s : AnsiString; IsFolder: boolean; NewParent: TTreeNode) : TTreeNode;
+    procedure BuildPrivateResource(ForceSave: boolean = False);
+    procedure Update;
+    procedure UpdateFile;
+    function UpdateUnits: Boolean;
+    procedure Open;
+    function FileAlreadyExists(const s : AnsiString) : boolean;
+    function Remove(index : integer; DoClose : boolean) : boolean;
+    function GetUnitFromEditor(ed : TEditor) : integer;
+    function GetUnitFromString(const s : AnsiString) : integer;
+    procedure RebuildNodes;
+    function ListUnitStr(sep: char): AnsiString;
+    procedure Exportto(HTML: boolean);
+    procedure ShowOptions;
+    function AssignTemplate(const aFileName: AnsiString;aTemplate: TTemplate): boolean;
+    procedure SetHostApplication(const s : AnsiString);
+    function FolderNodeFromName(const name: AnsiString):TTreeNode;
+    procedure CreateFolderNodes;
+    procedure UpdateNodeIndexes;
+    procedure SetNodeValue(value: TTreeNode);
+    procedure CheckProjectFileForUpdate;
+    procedure IncrementBuildNumber;
+    procedure SaveToLog;
  end;
 
 implementation
@@ -348,7 +326,7 @@ end;
 
 { TProject }
 
-constructor TProject.Create(nFileName, nName: AnsiString);
+constructor TProject.Create(const nFileName, nName: AnsiString);
 begin
 	inherited Create;
 	fNode := nil;
@@ -382,11 +360,11 @@ begin
   fUnits.Free;
   if (fNode <> nil) and (not fNode.Deleting) then
     fNode.Free;
-  fOptions.Includes.Free;
-  fOptions.Libs.Free;
-  fOptions.ResourceIncludes.Free;
-  fOptions.MakeIncludes.Free;
-  fOptions.ObjFiles.Free;
+  Options.Includes.Free;
+  Options.Libs.Free;
+  Options.ResourceIncludes.Free;
+  Options.MakeIncludes.Free;
+  Options.ObjFiles.Free;
   inherited;
 end;
 
@@ -400,13 +378,13 @@ begin
 	temp := '';
 
 	// The commented line below is used by the project logger
-	if fOptions.LogOutputEnabled then begin
+	if Options.LogOutputEnabled then begin
 
 		// Formatted log
 		if (MainForm.CompilerOutput.Items.Count > 0) then begin
-			AssignFile(logfile,fOptions.LogOutput + '\Formatted Compiler Output.txt');
+			AssignFile(logfile,Options.LogOutput + '\Formatted Compiler Output.txt');
 			try
-				if FileExists(fOptions.LogOutput + '\Formatted Compiler Output.txt') = false then begin
+				if FileExists(Options.LogOutput + '\Formatted Compiler Output.txt') = false then begin
 					Rewrite(logfile);
 					Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
 				end else begin
@@ -430,9 +408,9 @@ begin
 
 		// Raw log
 		if Length(MainForm.LogOutput.Text) > 0 then begin
-			AssignFile(logfile,fOptions.LogOutput + '\Raw Build Output.txt');
+			AssignFile(logfile,Options.LogOutput + '\Raw Build Output.txt');
 			try
-				if FileExists(fOptions.LogOutput + '\Raw Build Output.txt') = false then begin
+				if FileExists(Options.LogOutput + '\Raw Build Output.txt') = false then begin
 					Rewrite(logfile);
 					Write(logfile,DateTimeToStr(Now) + ': Creating log...' + #13#10#13#10);
 				end else begin
@@ -489,7 +467,7 @@ begin
   // and does not include the XP style manifest
   // and does not include version info
   // then do not create a private resource file
-  if (comp=0) and (not fOptions.SupportXPThemes) and (not fOptions.IncludeVersionInfo) and (fOptions.Icon = '') then begin
+  if (comp=0) and (not Options.SupportXPThemes) and (not Options.IncludeVersionInfo) and (Options.Icon = '') then begin
     fOptions.PrivateResource:='';
     exit;
   end;
@@ -520,7 +498,7 @@ begin
   ResFile.Add('/* DO NOT EDIT! */');
   ResFile.Add('');
 
-  if fOptions.IncludeVersionInfo then begin
+  if Options.IncludeVersionInfo then begin
     ResFile.Add('#include <windows.h> // include for version info constants');
     ResFile.Add('');
   end;
@@ -557,15 +535,15 @@ begin
       ResFile.Add('1 24 "'+ExtractFileName(Executable)+'.Manifest"');
   end;
 
-  if fOptions.IncludeVersionInfo then begin
+  if Options.IncludeVersionInfo then begin
     ResFile.Add('');
     ResFile.Add('//');
     ResFile.Add('// TO CHANGE VERSION INFORMATION, EDIT PROJECT OPTIONS...');
     ResFile.Add('//');
     ResFile.Add('1 VERSIONINFO');
-    ResFile.Add('FILEVERSION '+Format('%d,%d,%d,%d', [fOptions.VersionInfo.Major, fOptions.VersionInfo.Minor, fOptions.VersionInfo.Release, fOptions.VersionInfo.Build]));
-    ResFile.Add('PRODUCTVERSION '+Format('%d,%d,%d,%d', [fOptions.VersionInfo.Major, fOptions.VersionInfo.Minor, fOptions.VersionInfo.Release, fOptions.VersionInfo.Build]));
-    case fOptions.typ of
+    ResFile.Add('FILEVERSION '+Format('%d,%d,%d,%d', [Options.VersionInfo.Major, Options.VersionInfo.Minor, Options.VersionInfo.Release, Options.VersionInfo.Build]));
+    ResFile.Add('PRODUCTVERSION '+Format('%d,%d,%d,%d', [Options.VersionInfo.Major, Options.VersionInfo.Minor, Options.VersionInfo.Release, Options.VersionInfo.Build]));
+    case Options.typ of
       dptGUI,
       dptCon:  ResFile.Add('FILETYPE VFT_APP');
       dptStat: ResFile.Add('FILETYPE VFT_STATIC_LIB');
@@ -573,26 +551,26 @@ begin
     end;
     ResFile.Add('{');
     ResFile.Add('  BLOCK "StringFileInfo"');
-    ResFile.Add('	 {');
-    ResFile.Add('		 BLOCK "'+Format('%4.4x%4.4x', [fOptions.VersionInfo.LanguageID, fOptions.VersionInfo.CharsetID])+'"');
-    ResFile.Add('		 {');
-    ResFile.Add('			 VALUE "CompanyName", "'+fOptions.VersionInfo.CompanyName+'"');
-    ResFile.Add('			 VALUE "FileVersion", "'+fOptions.VersionInfo.FileVersion+'"');
-    ResFile.Add('			 VALUE "FileDescription", "'+fOptions.VersionInfo.FileDescription+'"');
-    ResFile.Add('			 VALUE "InternalName", "'+fOptions.VersionInfo.InternalName+'"');
-    ResFile.Add('			 VALUE "LegalCopyright", "'+fOptions.VersionInfo.LegalCopyright+'"');
-    ResFile.Add('			 VALUE "LegalTrademarks", "'+fOptions.VersionInfo.LegalTrademarks+'"');
-    ResFile.Add('			 VALUE "OriginalFilename", "'+fOptions.VersionInfo.OriginalFilename+'"');
-    ResFile.Add('			 VALUE "ProductName", "'+fOptions.VersionInfo.ProductName+'"');
-    ResFile.Add('			 VALUE "ProductVersion", "'+fOptions.VersionInfo.ProductVersion+'"');
-    ResFile.Add('		 }');
-    ResFile.Add('	 }');
+    ResFile.Add('  {');
+    ResFile.Add('    BLOCK "'+Format('%4.4x%4.4x', [fOptions.VersionInfo.LanguageID, fOptions.VersionInfo.CharsetID])+'"');
+    ResFile.Add('    {');
+    ResFile.Add('      VALUE "CompanyName", "'+fOptions.VersionInfo.CompanyName+'"');
+    ResFile.Add('      VALUE "FileVersion", "'+fOptions.VersionInfo.FileVersion+'"');
+    ResFile.Add('      VALUE "FileDescription", "'+fOptions.VersionInfo.FileDescription+'"');
+    ResFile.Add('      VALUE "InternalName", "'+fOptions.VersionInfo.InternalName+'"');
+    ResFile.Add('      VALUE "LegalCopyright", "'+fOptions.VersionInfo.LegalCopyright+'"');
+    ResFile.Add('      VALUE "LegalTrademarks", "'+fOptions.VersionInfo.LegalTrademarks+'"');
+    ResFile.Add('      VALUE "OriginalFilename", "'+fOptions.VersionInfo.OriginalFilename+'"');
+    ResFile.Add('      VALUE "ProductName", "'+fOptions.VersionInfo.ProductName+'"');
+    ResFile.Add('      VALUE "ProductVersion", "'+fOptions.VersionInfo.ProductVersion+'"');
+    ResFile.Add('    }');
+    ResFile.Add('  }');
 
     // additional block for windows 95->NT
     ResFile.Add('  BLOCK "VarFileInfo"');
-    ResFile.Add('	 {');
-    ResFile.Add('		 VALUE "Translation", '+Format('0x%4.4x, %4.4d', [fOptions.VersionInfo.LanguageID, fOptions.VersionInfo.CharsetID]));
-    ResFile.Add('	 }');
+    ResFile.Add('  {');
+    ResFile.Add('    VALUE "Translation", '+Format('0x%4.4x, %4.4d', [fOptions.VersionInfo.LanguageID, fOptions.VersionInfo.CharsetID]));
+    ResFile.Add('  }');
 
     ResFile.Add('}');
   end;
@@ -696,7 +674,7 @@ begin
   ResFile.Free;
 end;
 
-function TProject.NewUnit(NewProject : boolean; CustomFileName: AnsiString): integer;
+function TProject.NewUnit(NewProject : boolean;const CustomFileName: AnsiString): integer;
 var
 	newunit: TProjUnit;
 	s: AnsiString;
@@ -852,12 +830,12 @@ begin
 
 			fOptions.IncludeVersionInfo := ReadBool('Project','IncludeVersionInfo', False);
 			fOptions.SupportXPThemes := ReadBool('Project','SupportXPThemes', False);
-			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompiler.CompilerSet);
-			if fOptions.CompilerSet > devCompilerSet.Sets.Count-1 then begin
+			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompiler.CurrentIndex);
+			if fOptions.CompilerSet > devCompiler.Sets.Count-1 then begin
 				MessageDlg('The compiler set you have selected for this project, no longer exists.'#13#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
-				fOptions.CompilerSet:=devCompiler.CompilerSet;
+				fOptions.CompilerSet:=devCompiler.CurrentIndex;
 			end;
-			fOptions.CompilerOptions:=ReadString('Project','CompilerSettings', devCompiler.OptionStr);
+			fOptions.CompilerOptions:=ReadString('Project','CompilerSettings', devCompiler.fOptionString);
 
 			fOptions.VersionInfo.Major:=            ReadInteger('VersionInfo','Major',             0);
 			fOptions.VersionInfo.Minor:=            ReadInteger('VersionInfo','Minor',             1);
@@ -938,8 +916,8 @@ begin
 		if(Length(fOptions.CompilerOptions) > 0) then
 			WriteString('Project','CompilerSettings', fOptions.CompilerOptions)
 		else begin
-			WriteString('Project','CompilerSettings', devCompiler.OptionStr);
-			fOptions.CompilerOptions := devCompiler.OptionStr;
+			WriteString('Project','CompilerSettings', devCompiler.fOptionString);
+			fOptions.CompilerOptions := devCompiler.fOptionString;
 		end;
 
 		WriteInteger('VersionInfo','Major',            fOptions.VersionInfo.Major);
@@ -1020,11 +998,9 @@ begin
 	Result := True;
 end;
 
-{ begin XXXKF }
-
-function TProject.FolderNodeFromName(name: AnsiString):TTreeNode;
+function TProject.FolderNodeFromName(const name: AnsiString):TTreeNode;
 var
-  i:integer;
+	i:integer;
 begin
   FolderNodeFromName:=fNode;
   If name<>'' then
@@ -1233,29 +1209,29 @@ begin
 		// save editor info
 		for idx:= 0 to pred(fUnits.Count) do
 			with fUnits[idx] do begin
-      // save info on open state
-      aset:= Assigned(editor);
-      layIni.WriteBool('Editor_'+IntToStr(idx), 'Open', aset);
-      layIni.WriteBool('Editor_'+IntToStr(idx), 'Top', aset and
-         (Editor.TabSheet = Editor.TabSheet.PageControl.ActivePage));
-      if aset then begin
-        layIni.WriteInteger('Editor_'+IntToStr(idx), 'CursorCol', Editor.Text.CaretX);
-        layIni.WriteInteger('Editor_'+IntToStr(idx), 'CursorRow', Editor.Text.CaretY);
-        layIni.WriteInteger('Editor_'+IntToStr(idx), 'TopLine', Editor.Text.TopLine);
-        layIni.WriteInteger('Editor_'+IntToStr(idx), 'LeftChar', Editor.Text.LeftChar);
-      end;
 
-      // remove old data from project file
-      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'Open');
-      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'Top');
-      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'CursorCol');
-      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'CursorRow');
-      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'TopLine');
-      fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'LeftChar');
-    end;
-  finally
-    layIni.Free;
-  end;
+				// save info on open state
+				aset:= Assigned(editor);
+				layIni.WriteBool('Editor_'+IntToStr(idx), 'Open', aset);
+				layIni.WriteBool('Editor_'+IntToStr(idx), 'Top', aset and (Editor.TabSheet = Editor.TabSheet.PageControl.ActivePage));
+				if aset then begin
+					layIni.WriteInteger('Editor_'+IntToStr(idx), 'CursorCol', Editor.Text.CaretX);
+					layIni.WriteInteger('Editor_'+IntToStr(idx), 'CursorRow', Editor.Text.CaretY);
+					layIni.WriteInteger('Editor_'+IntToStr(idx), 'TopLine', Editor.Text.TopLine);
+					layIni.WriteInteger('Editor_'+IntToStr(idx), 'LeftChar', Editor.Text.LeftChar);
+				end;
+
+				// remove old data from project file
+				fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'Open');
+				fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'Top');
+				fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'CursorCol');
+				fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'CursorRow');
+				fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'TopLine');
+				fIniFile.DeleteKey('Unit'+IntToStr(idx+1),'LeftChar');
+			end;
+	finally
+		layIni.Free;
+	end;
 end;
 
 procedure TProject.SaveUnitLayout(e: TEditor; Index: integer);
@@ -1329,7 +1305,7 @@ begin
 			end;
 end;
 
-function TProject.FileAlreadyExists(s : AnsiString) : boolean;
+function TProject.FileAlreadyExists(const s : AnsiString) : boolean;
 begin
 	if fUnits.Indexof(s) > -1 then
 		result := true
@@ -1396,14 +1372,9 @@ begin
   result:= fUnits.Indexof(Ed);
 end;
 
-function TProject.GetUnitFromString(s : AnsiString) : integer;
+function TProject.GetUnitFromString(const s : AnsiString) : integer;
 begin
   result:= fUnits.Indexof(ExpandFileto(s, Directory));
-end;
-
-function TProject.GetUnitFromNode(t : TTreeNode) : integer;
-begin
-  result:= fUnits.Indexof(t);
 end;
 
 function TProject.GetExecutableName : AnsiString;
@@ -1424,7 +1395,7 @@ begin
 	if Length(Options.ExeOutput) > 0 then begin
 		if not DirectoryExists(Directory + Options.ExeOutput) then
 			try
-				SysUtils.ForceDirectories(Directory + Options.ExeOutput);
+				ForceDirectories(Directory + Options.ExeOutput);
 			except
 				MessageDlg('Could not create executable output directory: "' + Options.ExeOutput + '". Please check your access settings.', mtWarning, [mbOK], 0);
 				exit;
@@ -1433,46 +1404,12 @@ begin
 	end;
 end;
 
-function TProject.GetFullUnitFileName(const index: integer): AnsiString;
-begin
-  result:= ExpandFileto(fUnits[index].FileName, Directory);
-end;
-
-function TProject.DoesEditorExists(e : TEditor) : boolean;
-var i : integer;
-begin
-  result:= FALSE;
-  for i := 0 to pred(fUnits.Count) do
-   if fUnits[i].Editor = e then
-    result:= TRUE;
-end;
-
 function TProject.GetDirectory : AnsiString;
 begin
   result := ExtractFilePath(FileName);
 end;
 
-procedure TProject.AddLibrary(s : AnsiString);
-begin
-  fOptions.Libs.Add(s);
-end;
-
-procedure TProject.AddInclude(s : AnsiString);
-begin
-  fOptions.Includes.Add(s);
-end;
-
-procedure TProject.RemoveLibrary(index : integer);
-begin
-  fOptions.Libs.Delete(index);
-end;
-
-procedure TProject.RemoveInclude(index : integer);
-begin
-  fOptions.Includes.Delete(index);
-end;
-
-function TProject.ListUnitStr(const sep: char): AnsiString;
+function TProject.ListUnitStr(sep: char): AnsiString;
 var
  idx: integer;
   sDir: AnsiString;
@@ -1485,25 +1422,29 @@ begin
    result:= result +sep +'"'+ExpandFileName(fUnits[idx].FileName)+'"';
 end;
 
-procedure TProject.SetFileName(value: AnsiString);
+procedure TProject.SetFileName(const value: AnsiString);
 begin
-  if fFileName<>value then begin
-    fFileName:= value;
-    SetModified(True);
-    finifile.Rename(value, FALSE);
-  end;
+	if fFileName<>value then begin
+		fFileName:= value;
+		SetModified(True);
+		finifile.Rename(value, FALSE);
+	end;
 end;
 
 function TProject.GetModified: boolean;
 var
- idx: integer;
- ismod: boolean;
+	I : integer;
+	ismod: boolean;
 begin
-  ismod:= FALSE;
-  for idx:= 0 to pred(fUnits.Count) do
-   if fUnits[idx].Dirty then ismod:= TRUE;
+	ismod:= FALSE;
+	for I := 0 to fUnits.Count - 1 do
+		if fUnits[I].Dirty then begin
+			ismod:= TRUE;
+			break;
+		end;
 
-  result:= fModified or ismod;
+	// project file or any unit modified...
+	result:= fModified or ismod;
 end;
 
 procedure TProject.SetModified(value: boolean);
@@ -1515,21 +1456,12 @@ begin
     fModified:= value;
 end;
 
-procedure TProject.SetNode(value: TTreeNode);
-begin
-  if assigned(fNode) then
-   begin
-     fNode.DeleteChildren;
-     fNode:= Value;
-   end;
-end;
-
 procedure TProject.SetNodeValue(value: TTreeNode);
 begin
    fNode:= Value;
 end;
 
-procedure TProject.Exportto(const HTML: boolean);
+procedure TProject.Exportto(HTML: boolean);
   function ConvertFilename(Filename, FinalPath, Extension: AnsiString): AnsiString;
   begin
     Result:=ExtractRelativePath(Directory, Filename);
@@ -1674,7 +1606,12 @@ begin
   end;
 end;
 
-function TProject.AssignTemplate(const aFileName: AnsiString; const aTemplate: TTemplate): boolean;
+procedure TProject.SetHostApplication(const s : AnsiString);
+begin
+  fOptions.HostApplication := s;
+end;
+
+function TProject.AssignTemplate(const aFileName: AnsiString;aTemplate: TTemplate): boolean;
 var
 	Options: TProjOptions;
 	idx: integer;
@@ -1883,7 +1820,7 @@ begin
   Delete(Result, Length(Result), 1); // remove last '/'
 end;
 
-procedure TProject.AddFolder(s: AnsiString);
+procedure TProject.AddFolder(const s: AnsiString);
 begin
   if fFolders.IndexOf(s)=-1 then begin
     fFolders.Add(s);
@@ -1892,11 +1829,6 @@ begin
     FolderNodeFromName(s).MakeVisible;
     SetModified(TRUE);
   end;
-end;
-
-procedure TProject.SetHostApplication(s : AnsiString);
-begin
-  fOptions.HostApplication := s;
 end;
 
 procedure TProject.CheckProjectFileForUpdate;
@@ -1973,10 +1905,10 @@ end;
 
 procedure TProject.SetCmdLineArgs(const Value: AnsiString);
 begin
-  if (Value<>fCmdLineArgs) then begin
-    fCmdLineArgs := Value;
-    SetModified(TRUE);
-  end;
+	if (Value<>fCmdLineArgs) then begin
+		fCmdLineArgs := Value;
+		SetModified(TRUE);
+	end;
 end;
 
 procedure TProject.IncrementBuildNumber;
@@ -1998,10 +1930,10 @@ end;
 
 procedure TProject.SetUseCustomMakefile(const Value: boolean);
 begin
-  if (Value<>fUseCustomMakefile) then begin
-    fUseCustomMakefile := Value;
-    SetModified(true);
-  end;
+	if (Value<>fUseCustomMakefile) then begin
+		fUseCustomMakefile := Value;
+		SetModified(true);
+	end;
 end;
 
 { TUnitList }
@@ -2009,15 +1941,15 @@ end;
 constructor TUnitList.Create;
 begin
 	inherited Create;
-	fList:= TObjectList.Create;
+	fList:= TList.Create;
 end;
 
 destructor TUnitList.Destroy;
 var
 	I: integer;
 begin
-	for I := fList.Count - 1 downto 0 do
-		Remove(I);
+	for I := 0 to fList.Count - 1 do
+		TProjUnit(fList[I]).Free;
 	fList.Free;
 	inherited;
 end;
@@ -2044,34 +1976,21 @@ begin
 	result:= TProjUnit(fList[index]);
 end;
 
-procedure TUnitList.SetItem(index: integer; value: TProjUnit);
-begin
-	fList[index]:= value;
-end;
-
 function TUnitList.Indexof(Editor: TEditor): integer;
 begin
 	result:= Indexof(editor.FileName);
 end;
 
-function TUnitList.Indexof(FileName: AnsiString): integer;
+function TUnitList.Indexof(const FileName: AnsiString): integer;
 var
 	s1, s2: AnsiString;
 begin
-	for result:= 0 to pred(fList.Count) do begin
+	for result := 0 to pred(fList.Count) do begin
 		s1 := GetRealPath(TProjUnit(fList[result]).FileName,TProjUnit(fList[result]).fParent.Directory);
 		s2 := GetRealPath(FileName, TProjUnit(fList[result]).fParent.Directory);
 		if CompareText(s1, s2) = 0 then
 			exit;
 	end;
-	result:= -1;
-end;
-
-function TUnitList.Indexof(Node: TTreeNode): integer;
-begin
-	for result:= 0 to pred(fList.Count) do
-		if TProjUnit(fList[result]).Node = Node then
-			exit;
 	result:= -1;
 end;
 

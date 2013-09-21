@@ -1,9 +1,9 @@
 object FunctionSearchForm: TFunctionSearchForm
-  Left = 516
-  Top = 265
+  Left = 1124
+  Top = 530
   BorderStyle = bsDialog
   Caption = 'Goto function...'
-  ClientHeight = 374
+  ClientHeight = 377
   ClientWidth = 469
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,7 +17,7 @@ object FunctionSearchForm: TFunctionSearchForm
   OnShow = FormShow
   DesignSize = (
     469
-    374)
+    377)
   PixelsPerInch = 96
   TextHeight = 15
   object Label1: TLabel
@@ -31,7 +31,7 @@ object FunctionSearchForm: TFunctionSearchForm
     Left = 0
     Top = 32
     Width = 469
-    Height = 342
+    Height = 345
     Align = alCustom
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <

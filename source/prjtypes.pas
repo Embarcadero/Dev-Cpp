@@ -36,143 +36,142 @@ const
  dptDyn  = 3;
 
 type
- TProjType = byte;
- TProjTypeSet = set of TProjType;
+  TProjType = byte;
+  TProjTypeSet = set of TProjType;
 
- TProjVersionInfo = record
-  Major: integer;
-  Minor: integer;
-  Release: integer;
-  Build: integer;
-  LanguageID: integer;
-  CharsetID: integer;
-  CompanyName: AnsiString;
-  FileVersion: AnsiString;
-  FileDescription: AnsiString;
-  InternalName: AnsiString;
-  LegalCopyright: AnsiString;
-  LegalTrademarks: AnsiString;
-  OriginalFilename: AnsiString;
-  ProductName: AnsiString;
-  ProductVersion: AnsiString;
-  AutoIncBuildNr: boolean;
-  SyncProduct: boolean;
- end;
+  TProjVersionInfo = record
+    Major: integer;
+    Minor: integer;
+    Release: integer;
+    Build: integer;
+    LanguageID: integer;
+    CharsetID: integer;
+    CompanyName: AnsiString;
+    FileVersion: AnsiString;
+    FileDescription: AnsiString;
+    InternalName: AnsiString;
+    LegalCopyright: AnsiString;
+    LegalTrademarks: AnsiString;
+    OriginalFilename: AnsiString;
+    ProductName: AnsiString;
+    ProductVersion: AnsiString;
+    AutoIncBuildNr: boolean;
+    SyncProduct: boolean;
+  end;
 
- TProjOptions = record
-   typ: TProjType;
-   Ver: integer;
-   Objfiles: TStrings;
+  PProjOptions = ^TProjOptions;
+  TProjOptions = record
+    typ: TProjType;
+    Ver: integer;
+    Objfiles: TStrings;
 
-   cmdLines: record
-     Compiler: AnsiString;
-     CppCompiler: AnsiString;
-     Linker: AnsiString;
-   end;
+    cmdLines: record
+      Compiler: AnsiString;
+      CppCompiler: AnsiString;
+      Linker: AnsiString;
+    end;
 
-   Includes: TStrings;
-   Libs: TStrings;
-   PrivateResource: AnsiString; // Dev-C++ will overwrite this file
-   ResourceIncludes: TStringList;
-   MakeIncludes: TStringList;
-   useGPP: boolean;
-   Icon: AnsiString;
+    Includes: TStrings;
+    Libs: TStrings;
+    PrivateResource: AnsiString; // Dev-C++ will overwrite this file
+    ResourceIncludes: TStringList;
+    MakeIncludes: TStringList;
+    useGPP: boolean;
+    Icon: AnsiString;
 
-   ExeOutput: AnsiString;
-   ObjectOutput: AnsiString;
-   LogOutput: AnsiString;
-   LogOutputEnabled : boolean;
+    ExeOutput: AnsiString;
+    ObjectOutput: AnsiString;
+    LogOutput: AnsiString;
+    LogOutputEnabled : boolean;
 
-   OverrideOutput: boolean;
-   OverridenOutput: AnsiString;
+    OverrideOutput: boolean;
+    OverridenOutput: AnsiString;
 
-   HostApplication : AnsiString;
+    HostApplication : AnsiString;
 
-   IncludeVersionInfo: boolean;
-   SupportXPThemes: boolean;
-   CompilerSet: integer;
-   CompilerOptions: AnsiString;
-   VersionInfo: TProjVersionInfo;
- end;
+    IncludeVersionInfo: boolean;
+    SupportXPThemes: boolean;
+    CompilerSet: integer;
+    CompilerOptions: AnsiString;
+    VersionInfo: TProjVersionInfo;
+  end;
 
 procedure InitOptionsRec(var Rec: TProjOptions);
 procedure AssignOptionsRec(R1 : TProjOptions;var R2: TProjOptions);
 
 implementation
 
-uses 
+uses
   devcfg;
 
 procedure InitOptionsRec(var Rec: TProjOptions);
 begin
-  with Rec do
-   begin
-     Includes:= TStringList.Create;
-     Libs:= TStringList.Create;
-     ResourceIncludes := TStringList.Create;
-     MakeIncludes := TStringList.Create;
-     ObjFiles:= TStringList.Create;
-     Includes.Delimiter:= ';';
-     Libs.Delimiter:= ';';
-     PrivateResource := '';
-     ResourceIncludes.Delimiter:= ';';
-     MakeIncludes.Delimiter := ';';
-     ObjFiles.Delimiter:= ';';
-     Icon := '';
-     ExeOutput := '';
-     ObjectOutput := '';
-     HostApplication := '';
-     SupportXPThemes:=False;
-     CompilerSet:=0;
-     CompilerOptions:=devCompiler.OptionStr;
+	with Rec do begin
+		Includes:= TStringList.Create;
+		Libs:= TStringList.Create;
+		ResourceIncludes := TStringList.Create;
+		MakeIncludes := TStringList.Create;
+		ObjFiles:= TStringList.Create;
+		Includes.Delimiter:= ';';
+		Libs.Delimiter:= ';';
+		PrivateResource := '';
+		ResourceIncludes.Delimiter:= ';';
+		MakeIncludes.Delimiter := ';';
+		ObjFiles.Delimiter:= ';';
+		Icon := '';
+		ExeOutput := '';
+		ObjectOutput := '';
+		HostApplication := '';
+		SupportXPThemes:=False;
+		CompilerSet:=0;
+		CompilerOptions:=devCompiler.fOptionString;
 
-     IncludeVersionInfo:=False;
-     VersionInfo.Major:=1;
-     VersionInfo.Minor:=0;
-     VersionInfo.Release:=0;
-     VersionInfo.Build:=0;
-     VersionInfo.LanguageID:=$0409; // US English
-     VersionInfo.CharsetID:=$04E4; // Windows multilingual
-     VersionInfo.CompanyName:='';
-     VersionInfo.FileVersion:='';
-     VersionInfo.FileDescription:='Developed using the Dev-C++ IDE';
-     VersionInfo.InternalName:='';
-     VersionInfo.LegalCopyright:='';
-     VersionInfo.LegalTrademarks:='';
-     VersionInfo.OriginalFilename:='';
-     VersionInfo.ProductName:='';
-     VersionInfo.ProductVersion:='';
-     VersionInfo.AutoIncBuildNr:=False;
-     VersionInfo.SyncProduct:=True;
-   end;
+		IncludeVersionInfo:=False;
+		VersionInfo.Major:=1;
+		VersionInfo.Minor:=0;
+		VersionInfo.Release:=0;
+		VersionInfo.Build:=0;
+		VersionInfo.LanguageID:=$0409; // US English
+		VersionInfo.CharsetID:=$04E4; // Windows multilingual
+		VersionInfo.CompanyName:='';
+		VersionInfo.FileVersion:='';
+		VersionInfo.FileDescription:='Developed using the Dev-C++ IDE';
+		VersionInfo.InternalName:='';
+		VersionInfo.LegalCopyright:='';
+		VersionInfo.LegalTrademarks:='';
+		VersionInfo.OriginalFilename:='';
+		VersionInfo.ProductName:='';
+		VersionInfo.ProductVersion:='';
+		VersionInfo.AutoIncBuildNr:=False;
+		VersionInfo.SyncProduct:=True;
+	end;
 end;
 
 procedure AssignOptionsRec(R1 : TProjOptions;var R2: TProjOptions);
 begin
-  with R2 do
-   begin
-     typ:= R1.typ;
-     Ver:= r1.ver;
-     Objfiles.Text:= r1.ObjFiles.Text;
-     Includes.Text:= R1.Includes.Text;
-     Libs.Text:= R1.Libs.Text;
-     PrivateResource := R1.PrivateResource;
-     ResourceIncludes.Text := R1.ResourceIncludes.Text;
-     MakeIncludes.Text := R1.MakeIncludes.Text;
-     cmdLines.Compiler:= R1.cmdLines.Compiler;
-     cmdLines.CppCompiler:= R1.cmdLines.CppCompiler;
-     cmdLines.Linker:= R1.cmdLines.Linker;
-     useGPP:= R1.useGPP;
-     icon:= R1.icon;
-     ExeOutput := R1.ExeOutput;
-     ObjectOutput := R1.ObjectOutput;
-     HostApplication := R1.HostApplication;
-     IncludeVersionInfo:=R1.IncludeVersionInfo;
-     SupportXPThemes:=R1.SupportXPThemes;
-     CompilerSet:=R1.CompilerSet;
-     CompilerOptions:=R1.CompilerOptions;
-     VersionInfo:=R1.VersionInfo;
-   end;
+	with R2 do begin
+		typ:= R1.typ;
+		Ver:= R1.ver;
+		Objfiles.Text:= R1.ObjFiles.Text;
+		Includes.Text:= R1.Includes.Text;
+		Libs.Text:= R1.Libs.Text;
+		PrivateResource := R1.PrivateResource;
+		ResourceIncludes.Text := R1.ResourceIncludes.Text;
+		MakeIncludes.Text := R1.MakeIncludes.Text;
+		cmdLines.Compiler:= R1.cmdLines.Compiler;
+		cmdLines.CppCompiler:= R1.cmdLines.CppCompiler;
+		cmdLines.Linker:= R1.cmdLines.Linker;
+		useGPP:= R1.useGPP;
+		icon:= R1.icon;
+		ExeOutput := R1.ExeOutput;
+		ObjectOutput := R1.ObjectOutput;
+		HostApplication := R1.HostApplication;
+		IncludeVersionInfo:=R1.IncludeVersionInfo;
+		SupportXPThemes:=R1.SupportXPThemes;
+		CompilerSet:=R1.CompilerSet;
+		CompilerOptions:=R1.CompilerOptions;
+		VersionInfo:=R1.VersionInfo;
+	end;
 end;
 
 end.

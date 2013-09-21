@@ -23,23 +23,23 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Classes, sysUtils, TypInfo, CFGINI, cfgtypes, version;
+  Windows, Classes, sysUtils, TypInfo, CFGINI, version;
 {$ENDIF}
 {$IFDEF LINUX}
-  Classes, sysUtils, TypInfo, cfgreg, CFGINI, cfgtypes;
+  Classes, sysUtils, TypInfo, cfgreg, CFGINI;
 {$ENDIF}
 
 type
  EConfigDataError = class(Exception);
 
- TConfigData = class(TComponent)
+  TConfigData = class(TComponent)
   private
-   finiFileName: AnsiString;               // ini filename
-   finiSection: AnsiString;                // default section of ini file
-   fIgnores: TStrings;                 // Ignored properties of objects
-   GetINI: TCFGINI;
+   finiFileName: AnsiString;
+    finiSection: AnsiString; // current section of ini file
+    fIgnores: TStrings;      // Ignored properties of objects
+    GetINI: TCFGINI;
 
-   procedure SetIni(s : AnsiString);
+   procedure SetIni(const s : AnsiString);
   public
    constructor Create(aOwner: TComponent); override;
    destructor Destroy; override;
@@ -56,9 +56,9 @@ type
    function LoadSettingB(const key: AnsiString; const entry: AnsiString; const default: AnsiString): boolean; overload;
    function LoadSettingS(const key: AnsiString; const entry: AnsiString): AnsiString;
 
-   // load/save TCFGOptions
-   procedure SaveObject(obj: TCFGOptions); virtual;
-   procedure LoadObject(obj: TCFGOptions); virtual;
+   // load/save TPersistent object
+   procedure SaveObject(obj: TPersistent;const CustomName : AnsiString);
+   procedure LoadObject(obj: TPersistent;const CustomName : AnsiString);
 
    property INIFile: AnsiString read fINIFileName write SetIni;
    property INISection: AnsiString read finiSection write finiSection;
@@ -104,12 +104,11 @@ constructor TConfigData.Create(aOwner: TComponent);
 begin
 	inherited Create(aOwner);
 	GetINI := TCFGINI.Create(Self);
-	INISection := OPT_OPTIONS;
+	INISection := 'Options';
 	fIgnores:= TStringList.Create;
 	with fIgnores do begin
 		Add('Name');
 		Add('Tag');
-		// local props (might not need)
 	end;
 end;
 
@@ -120,7 +119,7 @@ begin
 	inherited Destroy;
 end;
 
-procedure TConfigData.SetIni(s : AnsiString);
+procedure TConfigData.SetIni(const s : AnsiString);
 begin
 	fIniFileName := s;
 	GetINI.SetIniFile(s);
@@ -136,14 +135,14 @@ begin
 	GetINI.SaveConfig;
 end;
 
-procedure TConfigData.LoadObject(obj: TCFGOptions);
+procedure TConfigData.LoadObject(obj: TPersistent;const CustomName : AnsiString);
 begin
-	GetINI.LoadObject(Obj);
+	GetINI.LoadObject(Obj,CustomName);
 end;
 
-procedure TConfigData.SaveObject(obj: TCFGOptions);
+procedure TConfigData.SaveObject(obj: TPersistent;const CustomName : AnsiString);
 begin
-	GetINI.SaveObject(Obj);
+	GetINI.SaveObject(Obj,CustomName);
 end;
 
 function TConfigData.LoadSettingB(const key, entry: AnsiString): boolean;

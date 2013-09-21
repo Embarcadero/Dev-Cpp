@@ -61,9 +61,9 @@ var
 begin
 	fProject := Proj;
 
-	for I := 0 to devCompiler.OptionsCount - 1 do
-		if tabs.Tabs.IndexOf(devCompiler.Options[I].optSection) = -1 then
-			tabs.Tabs.Add(devCompiler.Options[I].optSection);
+	for I := 0 to devCompiler.fOptionList.Count - 1 do
+		if tabs.Tabs.IndexOf(PCompilerOption(devCompiler.fOptionList[I])^.optSection) = -1 then
+			tabs.Tabs.Add(PCompilerOption(devCompiler.fOptionList[I])^.optSection);
 
 	tabsChange(nil);
 end;
@@ -72,24 +72,26 @@ procedure TCompOptionsFrame.tabsChange(Sender: TObject);
 var
 	I,J,idx : integer;
 	currenttab : AnsiString;
+	option : TCompilerOption;
 begin
 	vle.Strings.Clear;
 
 	currenttab := tabs.Tabs[tabs.TabIndex];
 
-	for I := 0 to devCompiler.OptionsCount - 1 do begin
-		if SameStr(devCompiler.Options[I].optSection, currenttab) then begin
-			if Assigned(devCompiler.Options[I].optChoices) and (devCompiler.Options[I].optValue < devCompiler.Options[I].optChoices.Count) then
-				idx := vle.InsertRow(devCompiler.Options[I].optName, devCompiler.Options[I].optChoices.Names[devCompiler.Options[I].optValue], True)
+	for I := 0 to devCompiler.fOptionList.Count - 1 do begin
+		option := PCompilerOption(devCompiler.fOptionList[I])^;
+		if SameStr(option.optSection, currenttab) then begin
+			if Assigned(option.optChoices) and (option.optValue < option.optChoices.Count) then
+				idx := vle.InsertRow(option.optName, option.optChoices.Names[option.optValue], True) // a,b,c,d
 			else
-				idx := vle.InsertRow(devCompiler.Options[I].optName, BoolValYesNo[devCompiler.Options[I].optValue > 0], True);
+				idx := vle.InsertRow(option.optName, BoolValYesNo[option.optValue > 0], True); // No Yes
 
 			vle.Strings.Objects[idx] := Pointer(I);
 			vle.ItemProps[idx].EditStyle := esPickList;
 			vle.ItemProps[idx].ReadOnly := True;
-			if Assigned(devCompiler.Options[I].optChoices) then begin
-				for j := 0 to devCompiler.Options[I].optChoices.Count - 1 do
-					vle.ItemProps[idx].PickList.Add(devCompiler.Options[I].optChoices.Names[J]);
+			if Assigned(option.optChoices) then begin
+				for j := 0 to option.optChoices.Count - 1 do
+					vle.ItemProps[idx].PickList.Add(option.optChoices.Names[J]);
 			end else begin
 				vle.ItemProps[idx].PickList.Add(BoolValYesNo[False]);
 				vle.ItemProps[idx].PickList.Add(BoolValYesNo[True]);
@@ -101,41 +103,27 @@ end;
 
 procedure TCompOptionsFrame.vleSetEditText(Sender: TObject; ACol,ARow: Integer; const Value: String);
 var
-	opt, opt1: TCompilerOption;
+	option : PCompilerOption;
 	I: integer;
 begin
 	if (vle.Strings.Count = 0) then
 		Exit;
 
-	opt := devCompiler.Options[Integer(vle.Strings.Objects[ARow])];
+	option := PCompilerOption(devCompiler.fOptionList[Integer(vle.Strings.Objects[ARow])]);
 
-	if Value = 'Yes' then
-		opt.optValue := 1  // True
-	else if Value = 'No' then
-		opt.optValue := 0  //False
-	else if opt.optChoices = nil then
+	if SameStr(Value,'Yes') then
+		option^.optValue := 1
+	else if SameStr(Value,'No') then
+		option^.optValue := 0
+	else if option^.optChoices = nil then
 		Exit
 	else begin
-		for i := 0 to opt.optChoices.Count - 1 do
-			if Value = opt.optChoices.Names[i] then begin
-				opt.optValue := i;
+		for i := 0 to option^.optChoices.Count - 1 do
+			if SameStr(Value,option^.optChoices.Names[i]) then begin
+				option^.optValue := i;
 				break;
 			end;
 	end;
-
-	devCompiler.Options[Integer(vle.Strings.Objects[ARow])] := opt;
-
-	if opt.optValue > 0 then
-		if opt.optIsGroup then begin
-			for I := 0 to devCompiler.OptionsCount - 1 do
-				if (I <> Integer(vle.Strings.Objects[ARow])) and (devCompiler.Options[I].optSection = opt.optSection) then begin
-					opt1 := devCompiler.Options[I];
-					opt1.optValue := 0;
-					devCompiler.Options[I] := opt1;
-				end;
-			tabsChange(tabs);
-			vle.Row := ARow;
-		end;
 end;
 
 end.

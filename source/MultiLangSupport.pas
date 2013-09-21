@@ -119,7 +119,7 @@ begin
   fDefaultLang := TStringList.Create;
   ms:= TMemoryStream.Create;
   try
-   LoadFilefromResource(DEFAULT_LANG_FILE, ms);
+   LoadFilefromResource('English.lng', ms);
    fStrings.LoadFromStream(ms);
    ms.Seek(0, soFromBeginning);
    fDefaultLang.LoadFromStream(ms);
@@ -207,7 +207,7 @@ begin
          tmp.Clear;
          tmp.LoadFromFile(fLangList[idx]);
          s:= tmp.Values['Lang'];
-         if (Lowercase(ExtractFileName(fLangList[idx]))=LowerCase(DEFAULT_LANG_FILE)) and
+         if (Lowercase(ExtractFileName(fLangList[idx]))=LowerCase('English.lng')) and
            (devData.Language='') then
            fCurLang:=s;
          if s =  '' then
@@ -255,7 +255,7 @@ begin
       end
      else begin
 
-      Open(DEFAULT_LANG_FILE);
+      Open('English.lng');
      end;
   finally
     Free;
@@ -263,7 +263,7 @@ begin
   end
   else
    begin
-     Open(DEFAULT_LANG_FILE);
+     Open('English.lng');
      fSelect:= FALSE;
    end;
 end;
