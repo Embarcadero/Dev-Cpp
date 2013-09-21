@@ -3,9 +3,12 @@ Version 5.0.0.9 - *
 - Fixed a minor settings detection bug in the profiler.
 - The code completion dialog now hides its tooltips when the user chooses so by unticking "Enable editor hints", preventing an access error.
 - Reorganized parts of the interface: now makes better use of free space.
-- One can select and copy now the information in the file properties window.
+- One can now select and copy the information in the file properties window.
 - Added a link to GCC's compiler documentation below the compiler options.
-- Added a few more options to -march, -std and -O. Note: this might change settings in pre-5.0.0.9, please reapply them!
+- Added a few more options to -march, -std and -O. Note: this might change settings in pre-5.0.0.9 projects, please reapply them!
+- The code tooltip is quite a bit faster now.
+- Fixed a bug in the brace completion code, reported by garywho.
+- (RC2+) The function tooltip now does not show up when no prototype could be found (making it a lot faster).
 
 Version 5.0.0.8 - 20 November 2011
 

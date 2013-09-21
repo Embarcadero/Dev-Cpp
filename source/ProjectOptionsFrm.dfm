@@ -72,7 +72,7 @@ object frmProjectOptions: TfrmProjectOptions
     Top = 0
     Width = 484
     Height = 305
-    ActivePage = tabGeneral
+    ActivePage = tabCompiler
     TabOrder = 3
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -481,7 +481,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 385
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 1
       end
     end
@@ -1390,7 +1390,7 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 177
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 4
         end
         object chkAutoIncBuild: TCheckBox

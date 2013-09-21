@@ -55,15 +55,12 @@ type
     property Activated;
     property SelIndex;
   published
-    property ActivateKey;
     property Color;
     property Editor;
-    property EndWhenChr;
     property Hints;
     property MaxScanLength;
     property Options;
     property Parser: TCppParser read FParser write FParser;
-    property StartWhenChr;
   end;
   
 implementation

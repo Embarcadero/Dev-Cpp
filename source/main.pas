@@ -848,7 +848,6 @@ type
 		procedure actModifyWatchUpdate(Sender: TObject);
 		procedure ClearallWatchPopClick(Sender: TObject);
 		procedure ApplicationEvents1Deactivate(Sender: TObject);
-		procedure PageControlChanging(Sender: TObject;var AllowChange: Boolean);
 		procedure mnuCVSClick(Sender: TObject);
 
 		// Orwell 2011
@@ -860,6 +859,8 @@ type
 
 		function findstatement(var localfind : string; var localfindpoint : TPoint;mousecursor : boolean) : PStatement;
 		procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure PageControlChanging(Sender: TObject;
+      var AllowChange: Boolean);
 
 	private
 		fTab				: integer;
@@ -4581,6 +4582,7 @@ begin
 	if PageControl.ActivePageIndex > -1 then begin
 		e:=GetEditor(PageControl.ActivePageIndex);
 		if Assigned(e) then begin
+			HideCodeTooltip;
 			e.Text.SetFocus;
 
 			// keep statusbar updated
@@ -6836,6 +6838,7 @@ begin
 		Abort;
 	end;
 end;
+
 
 end.
 

@@ -402,6 +402,8 @@ const
   ID_EOPT_CARET2                    = 25029;
   ID_EOPT_CARET3                    = 25030;
   ID_EOPT_CARET4                    = 25031;
+  ID_EOPT_HIGHCURLINE               = 25032;
+
   ID_EOPT_SPECIALCHARS              = 26001;
   ID_EOPT_PARSERHINTS               = 26002;
   ID_EOPT_MATCH                     = 26003;
@@ -640,6 +642,7 @@ const
   ID_COPT_CODEGENTAB                = 40004;
   ID_COPT_LINKERTAB                 = 40005;
   ID_COPT_PROGRAMSTAB               = 40006;
+  ID_COPT_COMPILERTIP               = 40007;
   // free to 709 for new tabs
 
   ID_COPT_BIN                       = 41001;

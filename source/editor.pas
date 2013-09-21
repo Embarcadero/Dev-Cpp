@@ -977,10 +977,10 @@ end;
 procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 var
 	M: TMemoryStream;
-	counter : integer;
 	attr: TSynHighlighterAttributes;
 	s : string;
 	allowcompletion : boolean;
+	cursorpos : integer;
 
 	// Key localisation
 	keystate: TKeyboardState;
@@ -1039,37 +1039,37 @@ begin
 				InsertString(']',false);
 			end else if localizedkey = '{' then begin
 
-				// If there's any text before the cursor
-				if Length(fText.LineText) > 1 then begin
+				// If there's any text before the cursor...
+				cursorpos:=fText.CaretX;
+				if (cursorpos > 1) then begin
 
-					// Check what we're typing at the moment
-					counter:=0;
+					// See what the last nonwhite character before the cursor is
 					repeat
-						Inc(counter);
-					until not (fText.LineText[fText.CaretX-counter] in [#9,#32]);
+						Dec(cursorpos);
+					until (cursorpos=1) or not (fText.LineText[cursorpos] in [#9,#32]);
 
 					// First check if the user is opening a function
-					if (fText.LineText[fText.CaretX-counter] = ')') then begin
+					if (cursorpos > 0) and (fText.LineText[cursorpos] in [')']) or (Pos('else',fText.LineText)=(cursorpos-3)) then begin
 
 						// Check indentation
-						counter:=0;
+						cursorpos:=0;
 						repeat
-							Inc(counter);
-						until not (fText.LineText[counter] in [#9,#32]);
+							Inc(cursorpos);
+						until not (fText.LineText[cursorpos] in [#9,#32]);
 
-						InsertString(#13#10 + Copy(fText.LineText,1,counter-1) + '}',false);
+						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
 					end else if AnsiStartsStr('struct',TrimLeft(fText.LineText)) or
-								AnsiStartsStr('union',TrimLeft(fText.LineText))  or
-								AnsiStartsStr('class',TrimLeft(fText.LineText))  or
-								AnsiStartsStr('enum',TrimLeft(fText.LineText)) then begin
+								AnsiStartsStr('union', TrimLeft(fText.LineText)) or
+								AnsiStartsStr('class', TrimLeft(fText.LineText)) or
+								AnsiStartsStr('enum',  TrimLeft(fText.LineText)) then begin
 
 						// Check indentation too
-						counter:=0;
+						cursorpos:=0;
 						repeat
-							Inc(counter);
-						until not (fText.LineText[counter] in [#9,#32]);
+							Inc(cursorpos);
+						until not (fText.LineText[cursorpos] in [#9,#32]);
 
-						InsertString(#13#10 + Copy(fText.LineText,1,counter-1) + '};',false);
+						InsertString(#13#10 + Copy(fText.LineText,1,cursorpos-1) + '};',false);
 					end else
 						InsertString('}',false);
 				end else
@@ -1077,6 +1077,9 @@ begin
 			end else if localizedkey = '<' then begin
 				if AnsiStartsStr('#include',fText.LineText) then
 					InsertString('>',false);
+			end else if localizedkey = '"' then begin
+				if AnsiStartsStr('#include',fText.LineText) then
+					InsertString('"',false);
 			end;
 		end;
 	end;
@@ -1693,7 +1696,7 @@ end;
 
 procedure TEditor.EditorPaintTransient(Sender: TObject; Canvas: TCanvas;TransientType: TTransientType);
 begin
-	if (Assigned(fText.Highlighter)) and devEditor.Match then
+	if (Assigned(fText.Highlighter)) and devEditor.Match and not fText.SelAvail then
 		PaintMatchingBrackets(TransientType);
 end;
 

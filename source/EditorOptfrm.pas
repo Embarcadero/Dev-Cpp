@@ -162,7 +162,7 @@ type
     Panel1: TPanel;
     FileOptions: TRadioGroup;
     HighCurLineBox: TGroupBox;
-    Label1: TLabel;
+    HighCurLineLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -526,6 +526,8 @@ begin
   cbMarginVis.Caption:=          Lang[ID_EOPT_VISIBLE];
   lblMarginWidth.Caption:=       Lang[ID_EOPT_WIDTH];
   lblMarginColor.Caption:=       Lang[ID_EOPT_COLOR];
+  HighCurLineLabel.Caption:=     Lang[ID_EOPT_COLOR];
+  HighCurLineBox.Caption:=       Lang[ID_EOPT_HIGHCURLINE];
 
   grpCaret.Caption:=             '  '+Lang[ID_EOPT_CARET]+'  ';
   lblInsertCaret.Caption:=       Lang[ID_EOPT_INSCARET];

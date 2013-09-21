@@ -101,9 +101,9 @@ uses
 type
   TCustomCodeToolTipButton = class(TPersistent)
   private
-    FLeft,
-    FTop,
-    FWidth,
+    FLeft: Integer;
+    FTop: Integer;
+    FWidth: Integer;
     FHeight: Integer;
   protected
     procedure Paint(const TargetCanvas: TCanvas); virtual; abstract;
@@ -142,9 +142,8 @@ type
   { Options to customize the CodeToolTip behavior }
   TToolTipOptions = set of
   (
-    ttoHideOnEnter,               // hides the tooltip when Return has been pressed
     ttoHideOnEsc,                 // hides the tooltip when ESC has been pressed
-    ttoCurrentArgumentBlackOnly,  // force the current argument to be black only
+    ttoCurrentArgumentExtra,      // force the current argument to attract extra attention
     shoFindBestMatchingToolTip    // automatically find the best matching tooltip (for overloaded functions)
   );
 
@@ -163,12 +162,7 @@ type
     FOptions: TToolTipOptions;
     FEditor: TCustomSynEdit;
     FKeyDownProc: TKeyEvent;
-    FEndWhenChr: String;
-    FStartWhenChr: String;
     FToolTips: TStringList;
-    FCurCharW: Word;
-    FCurShift: TShiftState;
-    FActivateKey: TShortCut;
     FCurParamIndex: Integer;
     FLookupEditor: TCustomSynEdit;
     FDelimiters: string;
@@ -188,15 +182,12 @@ type
     function PaintToolTip: Integer; virtual;
     function RemoveEditor(AEditor: TCustomSynEdit): boolean; virtual;
     procedure RethinkCoordAndActivate; virtual;
-    procedure SetEditor(const Value: TCustomSynEdit); virtual; 
-    property ActivateKey: TShortCut read FActivateKey write FActivateKey; 
+    procedure SetEditor(const Value: TCustomSynEdit); virtual;
     property Editor: TCustomSynEdit read FEditor write SetEditor;
-    property EndWhenChr: String read FEndWhenChr write FEndWhenChr;
     property Hints: TStringList read FToolTips write SetToolTips;
     property MaxScanLength: Integer read FMaxScanLength write FMaxScanLength;
     property Options: TToolTipOptions read FOptions write FOptions;
     property SelIndex: Integer read FSelIndex write SetSelIndex;
-    property StartWhenChr: String read FStartWhenChr write FStartWhenChr;
   public
     OldFunction : string;
     constructor Create(AOwner: TComponent); override;
@@ -210,14 +201,11 @@ type
     property Activated;
     property SelIndex;
   published
-    property ActivateKey;
     property Color;
     property Editor;
-    property EndWhenChr;
     property Hints;
     property MaxScanLength;
     property Options;
-    property StartWhenChr;
   end;
 
 implementation
@@ -286,11 +274,11 @@ function GetPrototypeName(const S: string): string;
 var
 	iStart, iLen: Integer;
 begin
-	// functie(args) moet 'functie' returnen
+	// passing 'foo(bar)' should return 'foo'
 	iStart := AnsiPos('(', S);
 	iLen := 0;
 
-	// Als we de ( van een functie gevonden hebben
+	// If we found the starting ( of a function
 	if iStart > 0 then begin
 
 		repeat
@@ -299,7 +287,7 @@ begin
 		repeat
 			Dec(iStart);
 			Inc(iLen);
-		until (S[iStart] in [#0..#32]) or (iStart = 1); // This fixes an unsigned 0 - 1 range error
+		until (iStart = 1) or (S[iStart] in [#0..#32]); // This fixes an unsigned 0 - 1 range error
 
 		Result := Copy(S, iStart+1, iLen);
 	end else
@@ -381,13 +369,18 @@ begin
 
 	FLookupEditor := TSynEdit.Create(Self);
 
-	FOptions := [ttoHideOnEsc,ttoCurrentArgumentBlackOnly,shoFindBestMatchingToolTip];
+	FOptions := [ttoHideOnEsc,ttoCurrentArgumentExtra,shoFindBestMatchingToolTip];
 
 	FBmp := TBitmap.Create;
 	with FBmp do begin
 		PixelFormat := pf24Bit;
 		Width := Screen.Width; // worst case hintwidth
 		Height := 32;
+		with Canvas do begin
+			Font.Name := 'Courier New';
+			Font.Size := 10;
+			Brush.Style := bsClear;
+		end;
 	end;
 
 	FToolTips := TStringList.Create;
@@ -397,19 +390,8 @@ begin
 		//Duplicates := dupIgnore;
 	end;
 
-	// This character is used to separate parameters...
-	FDelimiters := ',';
-
-	FStartWhenChr := '('; // Start to check, when one of this char is pressed
-	EndWhenChr := ';\';
-	FActivateKey := ShortCut(Ord(#32), [ssCtrl,ssShift]);
-	FCurCharW := 0;
-	FCurShift := [];
-
-	// since we support scanning over multiple lines,
-	// we have a limit of how many chars we scan maximal...
-	FMaxScanLength := 256;
-
+	FDelimiters := ','; // This character is used to separate parameters...
+	FMaxScanLength := 128; // Number of character to walk through trying to find ( and )
 	FKeyDownProc  := EditorKeyDown;
 
 	FUpButton := TCodeToolTipUpButton.Create;
@@ -417,7 +399,7 @@ begin
 	FUpButton.Top := 3;
 
 	FDownButton := TCodeToolTipDownButton.Create;
-	FDownButton.Left := 20; // unknown, it's calculated at runtime
+	FDownButton.Left := 20; // Edited at runtime
 	FDownButton.Top := 3;
 end;
 
@@ -451,11 +433,6 @@ end;
 // Handles input of the tooltip...
 procedure TBaseCodeToolTip.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-	FCurCharW := Key;
-	FCurShift := Shift;
-
-	if FActivateKey = Shortcut(Key, Shift) then Show;
-
 	if Activated then begin
 		case Key of
 {$IFDEF WIN32}
@@ -465,14 +442,6 @@ begin
 			XK_ESCAPE: begin
 {$ENDIF}
 				if (ttoHideOnESC in FOptions) then ReleaseHandle;
-			end;
-{$IFDEF WIN32}
-			VK_RETURN: begin
-{$ENDIF}
-{$IFDEF LINUX}
-			XK_RETURN: begin
-{$ENDIF}
-				if (ttoHideOnEnter in FOptions) then ReleaseHandle else Show;
 			end;
 		end;
 	end;
@@ -597,8 +566,8 @@ end;
 
 procedure TBaseCodeToolTip.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  Pt: TPoint;
-  NeedRefresh: Boolean;
+	Pt: TPoint;
+	NeedRefresh: Boolean;
 begin
 	inherited;
 
@@ -655,26 +624,21 @@ var
 	CurChar: WideChar;
 {$ENDIF}
 
-	procedure DrawParamLetterEx(Index: Integer; CurrentParam: Boolean=False);
+	procedure DrawParamLetterEx(Index: Integer; CurrentParam: Boolean);
 	var
 		HLAttr: TSynHighlighterAttributes;
 	begin
-		// we use a lookup editor to get the syntax coloring
-		// for our tooltips :)
+		// we use a lookup editor to get the syntax coloring for our tooltips :)
 		FLookupEditor.CaretX := Index;
 		FLookupEditor.GetHighlighterAttriAtRowCol(FLookupEditor.CaretXY, StrToken, HLAttr);
 
 		with FBmp.Canvas do begin
-			Font.Name := 'Courier New';
-			Font.Size := 10;
-			Brush.Style := bsClear;
 			Font.Color := clCaptionText;
 
-			// if it is the word where the cursor currently is
-			// we draw it in bold and also check for further drawing options
+			// The current argument should be drawing extra attention
 			if CurrentParam then begin
 				Font.Style := [fsBold];
-				if (ttoCurrentArgumentBlackOnly in FOptions) then
+				if (ttoCurrentArgumentExtra in FOptions) then
 					Font.Color := clRed;
 			end else if (AnsiPos('(',FLookupEditor.Text) > Index) and Assigned(HLAttr) then
 				Font.Style := HLAttr.Style
@@ -695,10 +659,13 @@ begin
 		CurParam := 0;
 		WidthParam := 4; // left start position in pixels
 
-		// clear the backbuffer
+		// Clear the backbuffer and set options
 		with FBmp.Canvas do begin
 			Brush.Color := Self.Color;
 			FillRect(ClientRect);
+			Font.Name := 'Courier New';
+			Font.Size := 10;
+			Brush.Style := bsClear;
 		end;
 
 		// when more than one tooltip is in the list
@@ -733,7 +700,7 @@ begin
 			if (CurParam = FCurParamIndex) and (AnsiPos(CurChar, FDelimiters)=0) and (I > BracePos) and (CurChar <> ')') and (CurChar <> ' ') and (AnsiPos(')',Caption) > I) then
 				DrawParamLetterEx(I, True) // at current comma index
 			else
-				DrawParamLetterEx(I); // normal
+				DrawParamLetterEx(I, False); // normal
 		end;
 	end;
 
@@ -893,7 +860,7 @@ var
 			end;
 
 			Inc(I);
-			if i > FMaxScanLength then
+			if I > FMaxScanLength then
 				Break;
 		until P[CurPos] in [#0];
 	end;
@@ -911,39 +878,47 @@ begin
 
 	// Find out where the function ends...
 	for I := 1 to FMaxScanLength do begin
-		if P[CurPos] = '(' then
+
+		// Opening brace, increase count
+		if P[CurPos] = '(' then begin
 			Inc(nBraces);
-		if P[CurPos] = ')' then begin
+
+		// Ending brace, decreace count or success!
+		end else if P[CurPos] = ')' then begin
 			if nBraces = 0 then
 				break
 			else
 				Dec(nBraces);
-		end;
-		if ((P[CurPos] = #0) and (nBraces = 0)) or (P[CurPos] = ';') then begin
+
+		// Stopping characters...
+		end else if (P[CurPos] = #0) or (P[CurPos] = ';') then begin
 			ReleaseHandle;
 			Exit;
-		end;
-		if (P[CurPos] = '/') and (P[CurPos+1] = '/') then begin
+
+		// Single line comments
+		end else if (P[CurPos] = '/') and (P[CurPos+1] = '/') then begin
 			repeat
 				Inc(CurPos);
-			until P[CurPos] = #10;
+			until (CurPos > FMaxScanLength) or (P[CurPos] in [#10,#0]);
+
+		// Multiline comments
+		end else if (P[CurPos] = '/') and (P[CurPos+1] = '*') then begin
+			repeat
+				Inc(CurPos);
+			until (CurPos > FMaxScanLength) or (P[CurPos] = #0) or ((P[CurPos] = '*') and (P[CurPos+1] = '/'));
 		end;
 		Inc(CurPos);
 	end;
 
-	// If we couldn't find the closing brace
-	if nBraces <> 0 then begin
+	// If we couldn't find the closing brace or reached the start
+	if (nBraces <> 0) then begin
 		ReleaseHandle;
 		Exit;
 	end;
 
-	Inc(CurPos);
-
-	// Then walk back and analyse everything
+	// We've stopped at the ending ), start walking backwards )*here*
 	for I := 1 to FMaxScanLength do begin
-		Dec(CurPos);
 		if CurPos = 0 then break;
-
 		case P[CurPos] of
 			'/':
 				if P[CurPos-1] = '*' then
@@ -959,7 +934,7 @@ begin
 
 			'(': begin
 				Dec(nBraces);
-				if nBraces = 0 then begin
+				if nBraces = 0 then begin // Found it!
 					Inc(CurPos);
 					Break;
 				end;
@@ -970,10 +945,19 @@ begin
 					Inc(nCommas);
 			end;
 		end;
+		Dec(CurPos);
 	end;
 
 	// Get the name of the function we're about to show
 	S := PreviousWordString(P, CurPos);
+
+	// Don't bother scanning the database when there's no word to scan for
+	if S = '' then begin
+		ReleaseHandle;
+		Exit;
+	end;
+
+	// Only do the cumbersome list filling when showing a new tooltip...
 	if (S <> OldFunction) or not Activated then begin
 		FSelIndex := 0;
 		FCustomSelIndex := False;
@@ -985,11 +969,13 @@ begin
 	// this is where the prototype name usually starts
 	FTokenPos := CurPos - Length(S) - 1;
 
-	// check if the token is added to the list
+	// Check if this function is a known one...
 	ProtoFound := False;
 	for I := 0 to FToolTips.Count-1 do begin
 		if GetPrototypeName(FToolTips.Strings[I]) = S then begin
 			ProtoFound := True;
+
+			// And set the selection index if we're about to show up
 			if not Activated then
 				FSelIndex := I;
 			Break;
@@ -997,18 +983,18 @@ begin
 	end;
 
 	// If we can't find it, hide
-	if not ProtoFound then S := '';
-
-	// Search for the best possible match according to comma count
-	if (S <> '') then begin
+	if not ProtoFound then begin
+		ReleaseHandle;
+		Exit;
+	end else begin
+		// Otherwise, search for the best possible overload match according to comma count
 		if (shoFindBestMatchingToolTip in FOptions) then
+
+			// Only do so when the user didn't select his own
 			if not FCustomSelIndex then
 				S := FindClosestToolTip(S, nCommas);
 		if (FToolTips.Count > 0) and (FSelIndex < FToolTips.Count) then
 			S := FToolTips.Strings[FSelIndex];
-	end;
-
-	if (S <> '') then begin
 
 		// set the hint caption
 		Caption := S;
@@ -1018,11 +1004,9 @@ begin
 		FLookupEditor.Text := S;
 		FLookupEditor.Highlighter := FEditor.Highlighter;
 
-		// get the index of the current bracket where the cursor it
+		// get the index of the current bracket where the cursor is
 		FCurParamIndex := GetCommaIndex(P, CurPos, Idx-1);
 		RethinkCoordAndActivate;
-	end else begin
-		ReleaseHandle;
 	end;
 end;
 

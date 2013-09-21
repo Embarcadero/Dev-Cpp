@@ -426,6 +426,9 @@ begin
 	tabDirectories.Caption:=             Lang[ID_COPT_DIRTAB];
 	tabPrograms.Caption:=                Lang[ID_COPT_PROGRAMSTAB];
 
+	// Settings tab
+	OptionsTip.Caption:=                 Lang[ID_COPT_COMPILERTIP];
+
 	// Directories, subtabs
 	DirTabs.Tabs.Clear;
 	DirTabs.Tabs.Append(Lang[ID_COPT_BIN]);

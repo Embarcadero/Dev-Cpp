@@ -363,7 +363,7 @@ object EditorOptForm: TEditorOptForm
           OnDefaultSelect = cpMarginColorDefaultSelect
           OnHint = cpMarginColorHint
         end
-        object Label1: TLabel
+        object HighCurLineLabel: TLabel
           Left = 24
           Top = 38
           Width = 24

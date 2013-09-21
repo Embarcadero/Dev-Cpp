@@ -69,7 +69,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1093
-        Height = 100
+        Height = 101
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -111,7 +111,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1093
-        Height = 100
+        Height = 101
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -211,7 +211,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1093
-        Height = 100
+        Height = 101
         ActivePage = tabVars
         Align = alClient
         Style = tsFlatButtons
@@ -591,7 +591,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 1085
-            Height = 69
+            Height = 70
             Align = alClient
             Columns = <
               item
@@ -625,7 +625,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 22
             Width = 1085
-            Height = 47
+            Height = 48
             Align = alClient
             Lines.Strings = (
               'Debugger output')
@@ -677,7 +677,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1093
-        Height = 100
+        Height = 101
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone

@@ -123,7 +123,7 @@ object CompForm: TCompForm
     Top = 0
     Width = 464
     Height = 350
-    ActivePage = tabPrograms
+    ActivePage = tabCodeGen
     TabOrder = 4
     object tabCompiler: TTabSheet
       Caption = 'Compiler'
@@ -343,12 +343,12 @@ object CompForm: TCompForm
     object tabCodeGen: TTabSheet
       Caption = 'Settings'
       object OptionsTip: TLabel
-        Left = 80
+        Left = 96
         Top = 283
-        Width = 294
+        Width = 252
         Height = 13
         Alignment = taCenter
-        Caption = 'For more information about GCC'#39's compiler options, please visit'
+        Caption = 'For more information about GCC'#39's options, please visit'
       end
       object OptionsLink: TLabel
         Left = 88
