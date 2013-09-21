@@ -65,6 +65,9 @@ begin
 		if tabs.Tabs.IndexOf(PCompilerOption(devCompiler.fOptionList[I])^.optSection) = -1 then
 			tabs.Tabs.Add(PCompilerOption(devCompiler.fOptionList[I])^.optSection);
 
+	//if tabs.Tabs.Count > 0 then
+	//	tabs.TabIndex := 0;
+
 	tabsChange(nil);
 end;
 
@@ -74,6 +77,7 @@ var
 	currenttab : AnsiString;
 	option : TCompilerOption;
 begin
+	vle.OnSetEditText := nil;
 	vle.Strings.Clear;
 
 	currenttab := tabs.Tabs[tabs.TabIndex];
@@ -99,6 +103,7 @@ begin
 		end;
 	end;
 	vle.ColWidths[0] := vle.ClientWidth - 90;
+	vle.OnSetEditText := vleSetEditText;
 end;
 
 procedure TCompOptionsFrame.vleSetEditText(Sender: TObject; ACol,ARow: Integer; const Value: String);
@@ -106,9 +111,6 @@ var
 	option : PCompilerOption;
 	I: integer;
 begin
-	if (vle.Strings.Count = 0) then
-		Exit;
-
 	option := PCompilerOption(devCompiler.fOptionList[Integer(vle.Strings.Objects[ARow])]);
 
 	if SameStr(Value,'Yes') then

@@ -127,7 +127,7 @@ type
     fC: AnsiString;
     fCpp: AnsiString;
     CurrentSet : Integer;
-    procedure SetOptions;
+    procedure SetOptions(first : boolean);
     procedure UpdateButtons;
     procedure LoadText;
   end;
@@ -171,11 +171,11 @@ begin
 	devCompiler.Delay := seCompDelay.Value;
 	devCompiler.FastDep := cbFastDep.Checked;
 
-	// directories are saved by the UI components
+	// directories are saved to devCompiler by the UI components
 
-	// compiler/linker flags are applied by the UI components
+	// compiler/linker flags are saved to devCompiler by the UI components
 
-	// program names are applied by the UI components
+	// program names are saved to devCompiler by the UI components
 
 	// write compiler list
 	devCompiler.Sets.Assign(cmbCompilerSetComp.Items);
@@ -188,31 +188,55 @@ begin
 	SetPath(fBins);
 end;
 
-procedure TCompOptForm.SetOptions;
+procedure TCompOptForm.SetOptions(first : boolean);
 begin
-	with devCompiler do begin
-		seCompDelay.Value := Delay;
-		cbFastDep.Checked := FastDep;
-
-		cbCompAdd.Checked := AddtoComp;
-		Commands.Text := CompOpts;
-		cbLinkerAdd.Checked := AddtoLink;
-		Linker.Text := LinkOpts;
-
+	// fill compiler lists
+	if first then begin
 		cmbCompilerSetComp.Items.Clear;
 		cmbCompilerSetComp.Items.Assign(devCompiler.Sets);
-		cmbCompilerSetComp.ItemIndex:=devCompiler.CurrentIndex;
 
-		currentSet:=cmbCompilerSetComp.ItemIndex;
-		devCompiler.LoadSet(currentSet);
-		cmbCompilerSetCompChange(nil);
+		if devCompiler.CurrentIndex < cmbCompilerSetComp.Items.Count then
+			cmbCompilerSetComp.ItemIndex := devCompiler.CurrentIndex
+		else if cmbCompilerSetComp.Items.Count > 0 then
+			cmbCompilerSetComp.ItemIndex := 0;
 	end;
+
+	// Load the new set
+	CurrentSet := cmbCompilerSetComp.ItemIndex;
+	devCompiler.LoadSet(cmbCompilerSetComp.ItemIndex);
+
+	// Apply the new set to the UI
+	with devCompiler do begin
+		fBins := BinDir;
+		fC := CDir;
+		fCpp := CppDir;
+		fLibs := LibDir;
+		Commands.Lines.Text := CompOpts;
+		Linker.Lines.Text := LinkOpts;
+		cbCompAdd.Checked := AddtoComp;
+		cbLinkerAdd.Checked := AddtoLink;
+		Commands.Lines.Text := CompOpts;
+		Linker.Lines.Text := LinkOpts;
+		seCompDelay.Value := Delay;
+		cbFastDep.Checked := FastDep;
+		GccEdit.Text := gccName;
+		GppEdit.Text := gppName;
+		GdbEdit.Text := gdbName;
+		MakeEdit.Text := makeName;
+		WindresEdit.Text := windresName;
+		DllwrapEdit.Text := dllwrapName;
+		GprofEdit.Text := gprofName;
+	end;
+
+	// fill tab controls
+	CompOptionsFrame1.FillOptions(nil);
+	DirTabsChange(Self);
 end;
 
 procedure TCompOptForm.btnDefaultClick(Sender: TObject);
 begin
 	devCompiler.SettoDefaults;
-	SetOptions;
+	SetOptions(true);
 end;
 
 procedure TCompOptForm.btnHelpClick(Sender: TObject);
@@ -362,9 +386,7 @@ end;
 procedure TCompOptForm.FormCreate(Sender: TObject);
 begin
 	LoadText;
-	CompOptionsFrame1.FillOptions(nil);
-	SetOptions;
-	DirTabsChange(Self);
+	SetOptions(true);
 	cbCompAddClick(cbCompAdd);
 	cbLinkerAddClick(cbLinkerAdd);
 end;
@@ -426,41 +448,12 @@ begin
 	devCompiler.AddtoLink := cbLinkerAdd.Checked;
 	devCompiler.AddtoComp := cbCompAdd.Checked;
 
+	// other settings are saved to devCompiler by the UI components!
+
 	devCompiler.SaveSet(CurrentSet);
 
-	// Load the new set
-	CurrentSet:=cmbCompilerSetComp.ItemIndex;
-	devCompiler.LoadSet(cmbCompilerSetComp.ItemIndex);
-
-	// Apply the new set
-	with devCompiler do begin
-		fBins:=BinDir;
-		fC:=CDir;
-		fCpp:=CppDir;
-		fLibs:=LibDir;
-		Commands.Lines.Text:= CompOpts;
-		Linker.Lines.Text:= LinkOpts;
-		cbCompAdd.Checked:=AddtoComp;
-		cbLinkerAdd.Checked:=AddtoLink;
-		Commands.Lines.Text:=CompOpts;
-		Linker.Lines.Text:=LinkOpts;
-		seCompDelay.Value:=Delay;
-		cbFastDep.Checked:=FastDep;
-	end;
-
-	DirTabsChange(DirTabs);
-
-	with devCompiler do begin
-		GccEdit.Text := gccName;
-		GppEdit.Text := gppName;
-		GdbEdit.Text := gdbName;
-		MakeEdit.Text := makeName;
-		WindresEdit.Text := windresName;
-		DllwrapEdit.Text := dllwrapName;
-		GprofEdit.Text := gprofName;
-
-		CompOptionsFrame1.FillOptions(nil);
-	end;
+	// Load the new set, apply new set to UI
+	SetOptions(false);
 end;
 
 procedure TCompOptForm.btnBrws1Click(Sender: TObject);

@@ -1,6 +1,6 @@
 object CompOptForm: TCompOptForm
-  Left = 889
-  Top = 435
+  Left = 1173
+  Top = 515
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'

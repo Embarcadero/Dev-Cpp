@@ -48,6 +48,7 @@ type
     StackTrace: TListView;
     RadioATT: TRadioButton;
     RadioIntel: TRadioButton;
+    lblBacktrace: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edFuncKeyPress(Sender: TObject; var Key: Char);
     procedure FormCreate(Sender: TObject);
@@ -95,11 +96,18 @@ begin
 end;
 
 procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
+var
+	propercmd : AnsiString;
 begin
 	if MainForm.fDebugger.Executing then begin
 		if Key = Chr(VK_RETURN) then begin
 			Key := #0;
-			MainForm.fDebugger.SendCommand('disassemble',TEdit(Sender).Text);
+
+			// Although GDB omits void the C++ way in its own output, it only accepts C style empty parameter lists for input...
+			propercmd := TEdit(Sender).Text;
+			if EndsStr('()',propercmd) then
+				propercmd := ReplaceLastStr(propercmd,'()','(void)');
+			MainForm.fDebugger.SendCommand('disassemble',propercmd);
 		end;
 	end;
 end;
@@ -112,6 +120,7 @@ begin
 
 	Caption := Lang[ID_CPU_CAPTION];
 	lblFunc.Caption := Lang[ID_CPU_FUNC];
+	lblBacktrace.Caption := Lang[ID_DEB_BACKTRACE];
 end;
 
 procedure TCPUForm.OnBacktraceReady;
@@ -197,6 +206,8 @@ begin
 end;
 
 procedure TCPUForm.gbSyntaxClick(Sender: TObject);
+var
+	key : Char;
 begin
 	// Set disassembly flavor
 	if RadioAtt.Checked then begin
@@ -208,7 +219,8 @@ begin
 	end;
 
 	// Reload the current function
-	MainForm.fDebugger.SendCommand('disassemble',edFunc.Text);
+	key := Chr(VK_RETURN);
+	edFuncKeyPress(nil,key);
 end;
 
 end.
