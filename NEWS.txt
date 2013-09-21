@@ -1,9 +1,10 @@
 Version 5.3.0.0 - *
 
-- Completely rewritten the debugger.
+- Completely rewritten the debugger interface.
+- Completely rewritten the find/replace form.
 - Improved some internal (compiler) data structures, reducing memory usage and potentially improving stability by simplifying code.
-- Improved startup speed, splashscreen is hidden (not even loaded) when startup times are low enough.
-- Fixed nearly all of memory leaks.
+- Improved startup speed, splashscreen is hidden (not even loaded) when startup times are estimated to be very low.
+- Fixed nearly all the memory leaks.
 - Indent guides are now painted faster, reducing flicker.
 - Code completion is now more clear and pops up faster.
 - Color selectors in Editor Options now properly set their own defaults, not those of other controls.
@@ -12,7 +13,11 @@ Version 5.3.0.0 - *
 - Code folding is updated much faster now.
 - The code parser now understands multiple definitions after the } symbol of structs.
 - Much more performance enhancements in the typing/editing department.
-- TODO: add/test MinGW 4.7.
+- Dev-C++ now autodetects compiler versions (using gcc -v) automatically on first startup, instead of assuming versions it shipped with.
+- One can now use Cut/Copy/Paste/... in the find form, CPU form and debug interfaces.
+- Compilers can now be downloaded separately from the SourceForge repository. They will be autodetected at first launch when put next to devcpp.exe.
+- Updated Japanese and Portuguese translations.
+- Fixed loads of bugs.
 
 Version 5.2.0.3 - 25 Juni 2012
 

@@ -43,6 +43,7 @@ type
                    TArrayBegin, TArrayEnd,
                    TElt,TEltRep,TEltRepEnd,
                    TExit,
+                   TSignal,TSignalName,TSignalNameEnd,TSignalString,TSignalStringEnd,
                    TValueHistoryValue,
                    TArgBegin, TArgEnd, TArgValue, TArgNameEnd,
                    TFieldBegin, TFieldEnd, TFieldValue, TFieldNameEnd,
@@ -85,7 +86,6 @@ type
     BreakpointList : TList;
     WatchVarList : TList; // contains all parents
     DebugTree : TTreeView;
-    hintedvar : AnsiString;
   private
     curpos : integer;
     len : integer;
@@ -93,6 +93,7 @@ type
     bfile : AnsiString;
     gdbout : AnsiString;
     evalvalue : AnsiString;
+    signal : AnsiString;
     nextannotation : TAnnotateType;
 
 	// attempt to cut down on Synchronize calls
@@ -103,6 +104,7 @@ type
 	doevalready : boolean;
 	doprocessexited : boolean;
 	doupdateexecution : boolean;
+	doreceivedsignal : boolean;
 
 	// Evaluation tree output handlers
     procedure ProcessWatchStruct(parentnode : TTreeNode);
@@ -141,12 +143,11 @@ begin
 		Exit;
 	end;
 
-	if doevalready then begin
-		if Assigned(MainForm.fDebugger.OnEvalReady) then
-			MainForm.fDebugger.OnEvalReady(evalvalue)
-		else
-			MainForm.EvalOutput.Text := evalvalue;
-	end;
+	if doreceivedsignal then
+		MsgErr(signal); // can't miss that one
+
+	if doevalready and Assigned(MainForm.fDebugger.OnEvalReady) then
+		MainForm.fDebugger.OnEvalReady(evalvalue);
 
 	// Delete unimportant stuff to reduce clutter
 	gdbout := StringReplace(gdbout,#26,'->',[rfReplaceAll]);
@@ -156,14 +157,16 @@ begin
 	MainForm.DebugOutput.Lines.Add(gdbout);
 	//MainForm.DebugOutput.Lines.Add('-----------------------------');
 
-	if doregistersready then
-		CPUForm.OnRegistersReady;
+	if Assigned(CPUForm) then begin
+		if doregistersready then
+			CPUForm.OnRegistersReady;
 
-	if dodisassemblerready then
-		CPUForm.OnAssemblerReady;
+		if dodisassemblerready then
+			CPUForm.OnAssemblerReady;
 
-	if dobacktraceready then
-		CPUForm.OnBacktraceReady;
+		if dobacktraceready then
+			CPUForm.OnBacktraceReady;
+	end;
 
 	if doupdateexecution then begin
 		MainForm.GotoBreakpoint(bfile, bline); // set active line
@@ -367,6 +370,16 @@ begin
 		result := TFieldEnd
 	else if SameStr(s,'value-history-value') then
 		result := TValueHistoryValue
+	else if SameStr(s,'signal') then
+		result := TSignal
+	else if SameStr(s,'signal-name') then
+		result := TSignalName
+	else if SameStr(s,'signal-name-end') then
+		result := TSignalNameEnd
+	else if SameStr(s,'signal-string') then
+		result := TSignalString
+	else if SameStr(s,'signal-string-end') then
+		result := TSignalStringEnd
 	else if (curpos = len) then
 		result := TEOF
 	else
@@ -514,7 +527,7 @@ end;
 procedure TDebugReader.Analyze;
 var
 	s,t,u : AnsiString;
-	i,x,y : integer; // dump
+	i,x,y : integer;
 	wparent : PWatchParent;
 	node : TTreeNode;
 	reg : PRegister;
@@ -532,6 +545,7 @@ begin
 	doevalready := false;
 	doprocessexited := false;
 	doupdateexecution := false;
+	doreceivedsignal := false;
 
 	while curpos < len do begin
 		case GetNextAnnotation of
@@ -548,6 +562,30 @@ begin
 					end;
 				end;
 				doevalready := true;
+			end;
+			TSignal : begin
+
+				// Assemble user string
+
+				signal := GetNextFilledLine; // Program received signal
+
+				if not FindAnnotation(TSignalName) then Exit;
+
+				signal := signal + GetNextFilledLine; // signal code
+
+				if not FindAnnotation(TSignalNameEnd) then Exit;
+
+				signal := signal + GetNextFilledLine; // comma
+
+				if not FindAnnotation(TSignalString) then Exit;
+
+				signal := signal + GetNextFilledLine; // user friendly description
+
+				if not FindAnnotation(TSignalStringEnd) then Exit;
+
+				signal := signal + GetNextFilledLine; // period
+
+				doreceivedsignal := true;
 			end;
 			TExit : begin
 				doprocessexited := true;
@@ -795,7 +833,7 @@ end;
 
 procedure TDebugReader.Execute;
 var
-	tmp : array [0..8192] of char; // 1 extra
+	tmp : array [0..20000] of char; // should be enough for anything
 	bytesread : DWORD;
 begin
 	bytesread := 0;
@@ -804,7 +842,7 @@ begin
 		FillChar(tmp,bytesread+1,0);
 
 		// ReadFile returns when there's something to read
-		if not ReadFile(hPipeRead, tmp, 8192, bytesread, nil) or (bytesread = 0) then break;
+		if not ReadFile(hPipeRead, tmp, 20000, bytesread, nil) or (bytesread = 0) then break;
 
 		gdbout := gdbout + tmp;
 

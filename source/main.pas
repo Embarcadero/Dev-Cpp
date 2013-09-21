@@ -556,7 +556,7 @@ type
 		NextLineBtn: TButton;
 		IntoLineBtn: TButton;
 		lblSendCommandGdb: TLabel;
-		edGdbCommand: TEdit;
+    edGdbCommand: TComboBox;
 		DebugOutput: TMemo;
 		DebugSendPanel: TPanel;
 		ViewCPUBtn: TButton;
@@ -565,7 +565,7 @@ type
 		Abortcompilation1: TMenuItem;
 		Modifywatch1: TMenuItem;
 		Removewatch1: TMenuItem;
-		EvaluateInput: TEdit;
+    EvaluateInput: TComboBox;
 		lblEvaluate: TLabel;
 		EvalOutput: TMemo;
 		SkipFuncBtn: TButton;
@@ -588,6 +588,8 @@ type
 		actReplaceAll: TAction;
 		ReplaceAll1: TMenuItem;
 		N72: TMenuItem;
+    actMsgCut: TAction;
+    actMsgCut1: TMenuItem;
 
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
 		procedure FormDestroy(Sender: TObject);
@@ -833,6 +835,7 @@ type
 		procedure actReplaceAllExecute(Sender: TObject);
 		procedure DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView;Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;var PaintImages, DefaultDraw: Boolean);
 		procedure FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+    procedure actMsgCutExecute(Sender: TObject);
 	private
 		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
 		fTools            : TToolController; // tool list controller
@@ -893,6 +896,7 @@ type
 		function CheckCompileOption(const option : AnsiString;var optionstructout : PCompilerOption;var optionindexout : integer) : boolean;
 		function CloseEditor(index : integer; Rem : boolean): Boolean;
 		procedure EditorSaveTimer(sender : TObject);
+		procedure OnInputEvalReady(const evalvalue : AnsiString);
 end;
 
 var
@@ -1141,6 +1145,7 @@ begin
 	actCloseAll.Caption:=				Lang[ID_ITEM_CLOSEALL];
 	actCloseProject.Caption:=			Lang[ID_ITEM_CLOSEPROJECT];
 
+	actMsgCut.Caption :=				Lang[ID_ITEM_CUT];
 	actMsgCopy.Caption :=				Lang[ID_ITEM_COPY];
 	actMsgCopyAll.Caption :=			Lang[ID_ITEM_COPYALL];
 	actMsgPaste.Caption :=				Lang[ID_ITEM_PASTE];
@@ -1363,6 +1368,7 @@ begin
 	ClassSheet.Caption :=				Lang[ID_LP_CLASSES];
 
 	lblSendCommandGdb.Caption:=			Lang[ID_DEB_SENDGDBCOMMAND];
+	lblEvaluate.Caption:=				Lang[ID_DEB_EVALUATE];
 
 	pnlFull.Caption:=					Format(Lang[ID_FULLSCREEN_MSG], [DEVCPP, DEVCPP_VERSION]);
 
@@ -2396,10 +2402,15 @@ end;
 procedure TMainForm.actCutExecute(Sender: TObject);
 var
 	e: TEditor;
+	oldtopline : integer;
 begin
 	e:= GetEditor;
-	if assigned(e) then
+	if Assigned(e) then begin
+		oldtopline := e.Text.TopLine;
 		e.Text.CutToClipboard;
+		if e.Text.TopLine <> oldtopline then
+			e.Text.Repaint; // fix for repaint fail
+	end;
 end;
 
 procedure TMainForm.actCopyExecute(Sender: TObject);
@@ -2414,10 +2425,15 @@ end;
 procedure TMainForm.actPasteExecute(Sender: TObject);
 var
 	e: TEditor;
+	oldtopline : integer;
 begin
 	e:= GetEditor;
-	if Assigned(e) then
+	if Assigned(e) then begin
+		oldtopline := e.Text.TopLine;
 		e.Text.PasteFromClipboard;
+		if e.Text.TopLine <> oldtopline then
+			e.Text.Repaint; // fix for repaint fail
+	end;
 end;
 
 procedure TMainForm.actSelectAllExecute(Sender: TObject);
@@ -2970,13 +2986,14 @@ end;
 procedure TMainForm.PrepareDebugger;
 var
 	I : integer;
-	watchparent : PWatchParent;
+	node : TTreeNode;
+	wparent : PWatchParent;
 begin
-	// Stop the debugger
 	fDebugger.Stop(nil);
 
 	// Clear logs
 	DebugOutput.Clear;
+	EvalOutput.Clear;
 
 	// Focus on the debugging buttons
 	LeftPageControl.ActivePage := DebugLeftSheet;
@@ -2985,13 +3002,22 @@ begin
 
 	// Reset watch vars
 	for I := 0 to fDebugger.WatchVarList.Count - 1 do begin
-		watchparent := PWatchParent(fDebugger.WatchVarList.Items[I]);
+		wparent := PWatchParent(fDebugger.WatchVarList.Items[I]);
 
-		// Clear children list
-		watchparent^.node.DeleteChildren;
-		watchparent^.gdbindex := -1;
-		watchparent^.node.Text := 'Execute to evaluate';
+		// Delete children
+		while wparent^.node.HasChildren do begin
+			node := wparent^.node.GetLastChild;
+			Dispose(PWatchMember(node.Data));
+			node.Delete;
+		end;
+		Dispose(PWatchParent(fDebugger.WatchVarList.Items[I]));
+
+		wparent^.gdbindex := -1;
+		wparent^.node.Text := 'Execute to evaluate';
 	end;
+
+	// Clear invalid breakpoints, only on debugger startup, allow closing editors after starting debugger
+	fDebugger.RefreshBreakPoints;
 end;
 
 procedure TMainForm.actDebugExecute(Sender: TObject);
@@ -3052,7 +3078,7 @@ begin
 			PrepareDebugger;
 
 			fDebugger.Start;
-			fDebugger.SendCommand('file', '"' + StringReplace(fProject.Executable, '\', '/', [rfReplaceAll]) + '"');
+			fDebugger.SendCommand('file','"' + StringReplace(fProject.Executable, '\', '/', [rfReplaceAll]) + '"');
 
 			if fProject.Options.typ = dptDyn then
 				fDebugger.SendCommand('exec-file', '"' + StringReplace(fProject.Options.HostApplication, '\', '/', [rfReplaceAll]) +'"');
@@ -3238,6 +3264,21 @@ begin
 	OpenFile(fCompiler.MakeFile);
 end;
 
+procedure TMainForm.actMsgCutExecute(Sender: TObject);
+begin
+	case MessageControl.ActivePageIndex of
+		3: begin
+			if EvaluateInput.Focused then begin
+				Clipboard.AsText := EvaluateInput.SelText;
+				EvaluateInput.SelText := '';
+			end else if edGDBcommand.Focused then begin
+				Clipboard.AsText := edGDBCommand.SelText;
+				edGDBCommand.SelText := '';
+			end;
+		end;
+	end;
+end;
+
 procedure TMainForm.actMsgCopyExecute(Sender: TObject);
 begin
 	case MessageControl.ActivePageIndex of
@@ -3250,11 +3291,11 @@ begin
 			LogOutput.CopyToClipboard;
 		3: begin
 			if EvaluateInput.Focused then
-				EvaluateInput.CopyToClipboard
+				Clipboard.AsText := EvaluateInput.SelText
 			else if EvalOutput.Focused then
 				EvalOutput.CopyToClipboard
 			else if edGDBcommand.Focused then
-				edGDBcommand.CopyToClipboard
+				Clipboard.AsText := edGDBCommand.SelText
 			else if DebugOutput.Focused then
 				DebugOutput.CopyToClipboard;
 		end;
@@ -3280,13 +3321,13 @@ begin
 			LogOutput.CopyToClipboard;
 		3: begin
 			if EvaluateInput.Focused then
-				EvaluateInput.CopyToClipboard
+				Clipboard.AsText := EvaluateInput.Text
 			else if EvalOutput.Focused then
-				EvalOutput.CopyToClipboard
+				Clipboard.AsText := EvalOutput.Text
 			else if edGDBcommand.Focused then
-				edGDBcommand.CopyToClipboard
+				Clipboard.AsText := edGDBcommand.Text
 			else if DebugOutput.Focused then
-				DebugOutput.CopyToClipboard;
+				Clipboard.AsText := DebugOutput.Text
 		end;
 		4: begin
 			ClipBoard.AsText := '';
@@ -3301,9 +3342,9 @@ begin
 	case MessageControl.ActivePageIndex of
 		3: begin
 			if EvaluateInput.Focused then
-				EvaluateInput.PasteFromClipboard
+				EvaluateInput.SelText := ClipBoard.AsText
 			else if edGDBcommand.Focused then
-				edGDBcommand.PasteFromClipboard;
+				edGdbCommand.SelText := ClipBoard.AsText
 		end;
 	end;
 end;
@@ -4613,8 +4654,11 @@ procedure TMainForm.edGdbCommandKeyPress(Sender: TObject; var Key: Char);
 begin
 	if fDebugger.Executing then begin
 		if Key = Chr(VK_RETURN) then begin
-			Key := #0;
-			fDebugger.SendCommand(TEdit(Sender).Text,'');
+			if Length(edGDBCommand.Text) > 0 then begin
+				Key := #0;
+				fDebugger.SendCommand(edGDBCommand.Text,'');
+				edGDBCommand.AddItem(edGDBCommand.Text,nil);
+			end;
 		end;
 	end;
 end;
@@ -6086,11 +6130,6 @@ begin
 	fDebugger := TDebugger.Create;
 	fDebugger.DebugTree := DebugTree;
 
-	// TODO: reduce flicker? Might increase MEM usage
-	DebugTree.DoubleBuffered := true;
-	ClassBrowser.DoubleBuffered := true;
-	ProjectView.DoubleBuffered := true;
-
 	// Set bottom panel height
 	MessageControl.Height:=devData.OutputHeight;
 	fPreviousHeight:= MessageControl.Height;
@@ -6219,13 +6258,22 @@ begin
 		e.ToggleBreakPoint(e.Text.CaretY);
 end;
 
+procedure TMainForm.OnInputEvalReady(const evalvalue : AnsiString);
+begin
+	EvalOutput.Text := evalvalue;
+	MainForm.fDebugger.OnEvalReady := nil;
+end;
+
 procedure TMainForm.EvaluateInputKeyPress(Sender: TObject; var Key: Char);
 begin
 	if fDebugger.Executing then begin
 		if Key = Chr(VK_RETURN) then begin
-			Key := #0;
-			fDebugger.OnEvalReady := nil;
-			fDebugger.SendCommand('print',TEdit(Sender).Text);
+			if Length(EvaluateInput.Text) > 0 then begin
+				Key := #0;
+				fDebugger.OnEvalReady := OnInputEvalReady;
+				fDebugger.SendCommand('print',EvaluateInput.Text);
+				EvaluateInput.AddItem(EvaluateInput.Text,nil);
+			end;
 		end;
 	end;
 end;

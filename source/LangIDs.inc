@@ -327,6 +327,7 @@ const
   ID_DEB_OUTPUT                         = 17003;
   ID_DEB_SENDGDBCOMMAND                 = 17004;
   ID_DEB_SEND                           = 17005;
+  ID_DEB_EVALUATE                       = 17006;
   //free to 339 for column titles
 
   //specials toolbar

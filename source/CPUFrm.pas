@@ -40,7 +40,7 @@ type
   end;
 
   TCPUForm = class(TForm)
-    edFunc: TEdit;
+    edFunc: TComboBox;
     lblFunc: TLabel;
     CodeList: TSynEdit;
     RegisterListbox: TListView;
@@ -116,11 +116,13 @@ begin
 		if Key = Chr(VK_RETURN) then begin
 			Key := #0;
 
-			// Although GDB omits void the C++ way in its own output, it only accepts C style empty parameter lists for input...
-			propercmd := TEdit(edFunc).Text;
+			// Although GDB omits void inside () in its own output, it only accepts C style empty parameter lists for input...
+			propercmd := edFunc.Text;
 			if EndsStr('()',propercmd) then
 				propercmd := ReplaceLastStr(propercmd,'()','(void)');
 			MainForm.fDebugger.SendCommand('disas',propercmd);
+			if Length(edFunc.Text) > 0 then
+				edFunc.AddItem(edFunc.Text,nil);
 		end;
 	end;
 end;
@@ -253,10 +255,18 @@ begin
 	edFuncKeyPress(nil,key);
 end;
 
+procedure TCPUForm.MenuCutClick(Sender: TObject);
+begin
+	if edFunc.Focused then begin
+		ClipBoard.AsText := edFunc.SelText;
+		edFunc.SelText := '';
+	end;
+end;
+
 procedure TCPUForm.MenuCopyClick(Sender: TObject);
 begin
 	if edFunc.Focused then
-		edFunc.CopyToClipboard
+		ClipBoard.AsText := edFunc.SelText
 	else if CodeList.Focused then
 		CodeList.CopyToClipboard
 	else if StackTrace.Focused then
@@ -270,7 +280,7 @@ var
 	i:integer;
 begin
 	if edFunc.Focused then
-		edFunc.CopyToClipboard
+		ClipBoard.AsText := edFunc.Text
 	else if CodeList.Focused then
 		CodeList.CopyToClipboard
 	else if StackTrace.Focused then begin
@@ -287,13 +297,7 @@ end;
 procedure TCPUForm.MenuPasteClick(Sender: TObject);
 begin
 	if edFunc.Focused then
-		edFunc.PasteFromClipboard;
-end;
-
-procedure TCPUForm.MenuCutClick(Sender: TObject);
-begin
-	if edFunc.Focused then
-		edFunc.CutToClipboard;
+		edFunc.SelText := ClipBoard.AsText;
 end;
 
 procedure TCPUForm.StackTraceClick(Sender: TObject);

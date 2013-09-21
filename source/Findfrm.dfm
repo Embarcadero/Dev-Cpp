@@ -1,6 +1,6 @@
 object frmFind: TfrmFind
-  Left = 1281
-  Top = 209
+  Left = 473
+  Top = 535
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Find Text'
@@ -13,8 +13,8 @@ object frmFind: TfrmFind
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   FormStyle = fsStayOnTop
-  KeyPreview = True
   OldCreateOrder = False
+  PopupMenu = FindPopup
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
@@ -230,6 +230,25 @@ object frmFind: TfrmFind
       Height = 21
       ItemHeight = 13
       TabOrder = 6
+    end
+  end
+  object FindPopup: TPopupMenu
+    Left = 112
+    Top = 296
+    object FindCut: TMenuItem
+      Caption = 'Cut'
+      ShortCut = 16472
+      OnClick = FindCutClick
+    end
+    object FindCopy: TMenuItem
+      Caption = 'Copy'
+      ShortCut = 16451
+      OnClick = FindCopyClick
+    end
+    object FindPaste: TMenuItem
+      Caption = 'Paste'
+      ShortCut = 16470
+      OnClick = FindPasteClick
     end
   end
 end

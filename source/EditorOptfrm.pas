@@ -494,6 +494,7 @@ begin
   chkCBParseLocalH.Caption:=     Lang[ID_EOPT_BROWSERLOCAL];
   chkCBParseGlobalH.Caption:=    Lang[ID_EOPT_BROWSERGLOBAL];
   chkCBUseColors.Caption:=       Lang[ID_POP_USECOLORS];
+  chkCBShowInherited.Caption:=   Lang[ID_POP_SHOWINHERITED];
   chkCCCache.Caption:=           Lang[ID_EOPT_CCCACHECHECK];
   btnCCCnew.Caption:=            Lang[ID_BTN_ADD];
   btnCCCdelete.Caption:=         Lang[ID_BTN_CLEAR];

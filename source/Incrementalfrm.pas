@@ -37,13 +37,12 @@ type
     btnPrev: TButton;
     btnNext: TButton;
     procedure EditChange(Sender: TObject);
-    procedure EditKeyPress(Sender: TObject; var Key: Char);
-    procedure EditKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure btnPrevClick(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   public
     Editor : TSynEdit;
     OrgPt : TBufferCoord;
@@ -126,24 +125,12 @@ begin
 	OriginalColor := Edit.Color;
 end;
 
-procedure TfrmIncremental.EditKeyPress(Sender: TObject; var Key: Char);
+procedure TfrmIncremental.FormKeyPress(Sender: TObject; var Key: Char);
 begin
-	if Key = #27 then begin // Escape
-		Key := #0; // mute beep
+	if Key = #27 then begin // Esc
+		Key := #0; // Mute beep
 		Close;
 	end;
-end;
-
-procedure TfrmIncremental.EditKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
-begin
-  case Key of
-{$IFDEF WIN32}
-    VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN : Close;
-{$ENDIF}
-{$IFDEF LINUX}
-    XK_LEFT, XK_RIGHT, XK_UP, XK_DOWN : Close;
-{$ENDIF}
-  end;
 end;
 
 end.

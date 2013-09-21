@@ -69,15 +69,14 @@ type
     procedure SetDisassembly(StringListin : TStringList);
     procedure SetBacktrace(Listin : TList);
 
-    // Watch var tooltip
-    procedure SetHintedWatchVar(const namein : AnsiString);
-
     // breakpoints
     procedure AddBreakPoint(i : integer); overload;
     procedure RemoveBreakPoint(i : integer); overload;
 
     procedure AddBreakPoint(Linein : integer;e : TEditor); overload;
     procedure RemoveBreakPoint(Linein : integer;e : TEditor); overload;
+
+    procedure RefreshBreakPoints;
 
     // watch var
     procedure AddWatchVar(i : integer); overload;
@@ -104,12 +103,24 @@ end;
 destructor TDebugger.Destroy;
 var
 	I : integer;
+	wparent : PWatchParent;
+	node : TTreeNode;
 begin
 	Stop(nil);
 
 	// Remove watch vars (list is contained in UI component)
-	for i := 0 to WatchVarList.Count - 1 do
-		Dispose(PWatchParent(WatchVarList.Items[i]));
+	for i := 0 to WatchVarList.Count - 1 do begin
+
+		wparent := PWatchParent(WatchVarList.Items[I]);
+
+		// Delete children
+		while wparent^.node.HasChildren do begin
+			node := wparent^.node.GetLastChild;
+			Dispose(PWatchMember(node.Data));
+			node.Delete;
+		end;
+		Dispose(PWatchParent(WatchVarList.Items[I]));
+	end;
 	WatchVarList.Free;
 
 	// Remove the breakpoints
@@ -118,11 +129,6 @@ begin
 	BreakPointList.Free;
 
 	inherited;
-end;
-
-procedure TDebugger.SetHintedWatchVar(const namein : AnsiString);
-begin
-	Reader.hintedvar := namein;
 end;
 
 procedure TDebugger.SetRegisters(Listin : TList);
@@ -250,20 +256,20 @@ end;
 
 procedure TDebugger.AddBreakpoint(i : integer);
 var
-	arguments : AnsiString;
+	filename : AnsiString;
 begin
 	// "filename":linenum
-	arguments := '"' + StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName,'\','/',[rfReplaceAll]) + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line);
-	SendCommand('break',arguments);
+	filename := StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName,'\','/',[rfReplaceAll]);
+	SendCommand('break','"' + filename + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line));
 end;
 
 procedure TDebugger.RemoveBreakpoint(i : integer);
 var
-	arguments : AnsiString;
+	filename : AnsiString;
 begin
 	// "filename":linenum
-	arguments := '"' + StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName,'\','/',[rfReplaceAll]) + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line);
-	SendCommand('clear',arguments);
+	filename := StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName,'\','/',[rfReplaceAll]);
+	SendCommand('clear','"' + filename + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line));
 end;
 
 procedure TDebugger.AddBreakPoint(linein : integer;e : TEditor);
@@ -299,6 +305,22 @@ begin
 			break;
 		end;
 	end;
+end;
+
+procedure TDebugger.RefreshBreakPoints;
+var
+	I : integer;
+begin
+	// Breakpoints in closed files need to be deleted
+	for i := BreakPointList.Count - 1 downto 0 do
+
+		if not Assigned(PBreakPoint(BreakPointList.Items[i])^.editor) then begin
+
+			// Remove from list
+			Dispose(PBreakPoint(BreakPointList.Items[i]));
+			BreakPointList.Delete(i);
+			break;
+		end;
 end;
 
 procedure TDebugger.AddWatchVar(i : integer);

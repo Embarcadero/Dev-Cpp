@@ -108,7 +108,7 @@ type
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 
     // Debugger callback
-    procedure OnEvalReady(const evalvalue : AnsiString);
+    procedure OnMouseOverEvalReady(const evalvalue : AnsiString);
 
     procedure Activate;
     procedure GotoLine;
@@ -316,7 +316,7 @@ begin
 	inherited;
 end;
 
-procedure TEditor.OnEvalReady(const evalvalue : AnsiString);
+procedure TEditor.OnMouseOverEvalReady(const evalvalue : AnsiString);
 begin
 	fText.Hint := fCurrentEvalWord + ' = ' + evalvalue;
 	MainForm.fDebugger.OnEvalReady := nil;
@@ -445,8 +445,8 @@ end;
 procedure TEditor.EditorDblClick(Sender: TObject);
 begin
 	if devEditor.DblClkLine then begin
-		fText.BlockBegin:= BufferCoord(1, fText.CaretY);
-		fText.BlockEnd:= BufferCoord(1, fText.CaretY +1);
+		fText.BlockBegin := BufferCoord(1, fText.CaretY);
+		fText.BlockEnd := BufferCoord(1, fText.CaretY + 1);
 	end;
 end;
 
@@ -635,33 +635,33 @@ procedure TEditor.SetErrorFocus(Col, Line: integer);
 begin
 	// Disable previous error focus
 	if fErrorLine <> -1 then begin
-		fText.InvalidateLine(fErrorLine);
 		fText.InvalidateGutterLine(fErrorLine);
-		fActiveLine:= -1;
+		fText.InvalidateLine(fErrorLine);
 	end;
 
+	fErrorLine := Line;
+
 	// Set new error focus
-	fText.CaretXY := BufferCoord(Col, Line);
+	fText.CaretXY := BufferCoord(Col, fErrorLine);
 	fText.EnsureCursorPosVisible;
 
 	// Redraw new error line
-	fText.InvalidateGutterLine(Line);
-	fText.InvalidateLine(Line);
-
-	fErrorLine := Line;
+	fText.InvalidateGutterLine(fErrorLine);
+	fText.InvalidateLine(fErrorLine);
 end;
 
 procedure TEditor.SetActiveBreakpointFocus(Line: integer);
 begin
-	fText.CaretXY := BufferCoord(1, Line);
-	fText.EnsureCursorPosVisible;
-
-	// Invalidate old active line
+	// Disable previous active focus
 	if fActiveLine <> -1 then begin
 		fText.InvalidateGutterLine(fActiveLine);
 		fText.InvalidateLine(fActiveLine);
 	end;
+
 	fActiveLine := Line;
+
+	fText.CaretXY := BufferCoord(1, fActiveLine);
+	fText.EnsureCursorPosVisible;
 
 	// Invalidate new active line
 	fText.InvalidateGutterLine(fActiveLine);
@@ -798,9 +798,9 @@ begin
 			end else if (Key = '{') and devEditor.BraceComplete then begin
 
 				s := fText.LineText;
-				s2 := Trim(fText.LineText);
+				s2 := Trim(s);
 
-				if EndsStr(')',s2) or EndsStr('else',s2) or (s2 = '') then begin
+				if EndsStr(')',s2) or EndsStr('else',s2) or EndsStr('do',s2) or (s2 = '') then begin
 
 					// Copy indentation
 					indent := 0;
@@ -1032,26 +1032,21 @@ begin
 		phrasebegin := p.Char;
 		phraseend := p.Char;
 
-		// Special case #1: hovering above ]?, scan back until [ and proceed as usual
-		{if s[phraseend] = ']' then begin
-			while((phrasebegin > 1) and not (s[phrasebegin] = '[')) do
-				Dec(phrasebegin);
-
-			Dec(phrasebegin);
-		end else begin}
-
-			// Copy forward until end of identifier
-			while((phraseend <= len) and (s[phraseend] in fText.IdentChars)) do
-				Inc(phraseend);
-
-		//end;
+		// Copy forward until end of identifier
+		while((phraseend <= len) and (s[phraseend] in fText.IdentChars)) do
+			Inc(phraseend);
 
 		// Copy backward until some chars
-		while(
-			   (phrasebegin > 1) and ((s[phrasebegin-1] in fText.IdentChars) or (s[phrasebegin-1] in ['.','*','&',':','[',']']))
-			or (phrasebegin > 2) and (s[phrasebegin-2] = '-') and (s[phrasebegin-1] = '>')
-			) do
-			Dec(phrasebegin);
+		while(phrasebegin > 1) do begin
+			if (s[phrasebegin-1] in fText.IdentChars) or (s[phrasebegin-1] in ['.','&',':','[',']']) then
+				Dec(phrasebegin)
+			else if (phrasebegin > 2) and (s[phrasebegin-2] = '-') and (s[phrasebegin-1] = '>') then
+				Dec(phrasebegin)
+			else if (s[phrasebegin-1] = '-') and (s[phrasebegin] = '>') then
+				Dec(phrasebegin)
+			else
+				break;
+		end;
 
 		if phraseend > phrasebegin then
 			result := Copy(s,phrasebegin,phraseend-phrasebegin);
@@ -1214,7 +1209,7 @@ begin
 
 				// Evaluate s
 				fCurrentEvalWord := EvaluationPhrase(p);
-				MainForm.fDebugger.OnEvalReady := OnEvalReady;
+				MainForm.fDebugger.OnEvalReady := OnMouseOverEvalReady;
 				MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
 
 			// Otherwise, parse code and show information about variable
@@ -1235,14 +1230,31 @@ begin
 	end;
 end;
 
+procedure TEditor.IndentSelection;
+begin
+	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
+		fText.ExecuteCommand(ecBlockIndent, #0, nil)
+	else
+		fText.ExecuteCommand(ecTab,#0, nil);
+end;
+
+procedure TEditor.UnindentSelection;
+begin
+	if fText.BlockBegin.Line <> fText.BlockEnd.Line then
+		fText.ExecuteCommand(ecBlockUnIndent,#0, nil)
+	else
+		fText.ExecuteCommand(ecShiftTab,#0, nil);
+end;
+
 procedure TEditor.CommentSelection;
 var
-	oldbbegin,oldbend : TBufferCoord;
+	oldbbegin,oldbend,oldcaret : TBufferCoord;
 	localcopy : string;
 	CurPos,len : integer;
 begin
 	oldbbegin := fText.BlockBegin;
 	oldbend := fText.BlockEnd;
+	oldcaret := fText.CaretXY;
 
 	// Prevent repaints while we're busy
 	fText.BeginUpdate;
@@ -1283,43 +1295,38 @@ begin
 		fText.EndUndoBlock;
 	end;
 
+	// Move begin of selection
+	if oldbbegin.Char > 1 then
+		Inc(oldbbegin.Char,2);
+
+	// Move end of selection
+	if oldbend.Char > 1 then
+		Inc(oldbend.Char,2);
+
+	// Move caret
+	if oldcaret.Char > 1 then
+		Inc(oldcaret.Char,2);
+
+	fText.CaretXY := oldcaret;
+	fText.BlockBegin := oldbbegin;
+	fText.BlockEnd := oldbend;
+
 	// Prevent repaints while we're busy
 	fText.EndUpdate;
-
-	fText.BlockBegin := oldbbegin;
-	if oldbend.Char = 1 then // move due to comment chars
-		fText.BlockEnd := oldbend
-	else
-		fText.BlockEnd := BufferCoord(oldbend.Char + 2,oldbend.line);
 
 	fText.UpdateCaret;
 	fText.Modified := true;
 end;
 
-procedure TEditor.IndentSelection;
-begin
-	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
-		fText.ExecuteCommand(ecBlockIndent, #0, nil)
-	else
-		fText.ExecuteCommand(ecTab,#0, nil);
-end;
-
-procedure TEditor.UnindentSelection;
-begin
-	if fText.BlockBegin.Line <> fText.BlockEnd.Line then
-		fText.ExecuteCommand(ecBlockUnIndent,#0, nil)
-	else
-		fText.ExecuteCommand(ecShiftTab,#0, nil);
-end;
-
 procedure TEditor.UncommentSelection;
 var
-	oldbbegin,oldbend : TBufferCoord;
-	localcopy : string;
-	CurPos : integer;
+	oldbbegin,oldbend,oldcaret : TBufferCoord;
+	localcopy : AnsiString;
+	CurPos,len : integer;
 begin
 	oldbbegin := fText.BlockBegin;
 	oldbend := fText.BlockEnd;
+	oldcaret := fText.CaretXY;
 
 	// Prevent repaints while we're busy
 	fText.BeginUpdate;
@@ -1327,60 +1334,77 @@ begin
 	if fText.BlockBegin.Line <> fText.BlockEnd.Line then begin
 		localcopy := fText.SelText;
 		CurPos := 1;
+		len := Length(localcopy);
 
 		// Delete the first one
 		if StrLComp(@localcopy[1],'//',2) = 0 then
 			Delete(localcopy,CurPos,2);
 
-		while(localcopy[CurPos] <> #0) do begin
+		while(CurPos < len) do begin
 
 			// find any enter sequence...
 			if(localcopy[CurPos] in [#13,#10]) then begin
 				repeat
 					Inc(CurPos);
-				until not (localcopy[CurPos] in [#0..#32]);
+				until (CurPos = len-1) or not (localcopy[CurPos] in [#0..#32]);
 
-				if StrLComp(@localcopy[CurPos],'//',2) = 0 then
+				if (CurPos+1 < len) and (StrLComp(@localcopy[CurPos],'//',2) = 0) then
 					Delete(localcopy,CurPos,2);
 			end;
 			Inc(CurPos);
 		end;
 		fText.SelText := localcopy;
 	end else begin
-		fText.BeginUndoBlock;
 
 		localcopy := fText.LineText;
 		CurPos := 1;
-		while(localcopy[CurPos] <> #0) do begin
+		len := Length(localcopy);
 
-			// find any enter sequence...
-			if StrLComp(@localcopy[CurPos],'//',2) = 0 then begin
-				Delete(localcopy,CurPos,2);
-				break;
-			end;
-			if not (localcopy[CurPos] in [#0..#32]) then
-				break;
+		// Skip spaces
+		while((CurPos < len) and (localcopy[CurPos] in [#0..#32])) do
 			Inc(CurPos);
+
+		// First nonblank is comment? Remove
+		if (CurPos+1 < len) and (StrLComp(@localcopy[CurPos],'//',2) = 0) then begin
+			fText.BeginUndoBlock;
+
+			Delete(localcopy,CurPos,2);
+
+			// Move begin of selection
+			if oldbbegin.Char = 2 then
+				Dec(oldbbegin.Char,1)
+			else if oldbbegin.Char > 2 then
+				Dec(oldbbegin.Char,2);
+
+			// Move end of selection
+			if oldbend.Char = 2 then
+				Dec(oldbend.Char,1)
+			else if oldbend.Char > 2 then
+				Dec(oldbend.Char,2);
+
+			// Move caret
+			if oldcaret.Char = 2 then
+				Dec(oldcaret.Char,1)
+			else if oldcaret.Char > 2 then
+				Dec(oldcaret.Char,2);
+
+			fText.LineText := localcopy;
+
+			fText.UndoList.AddChange(crDelete,
+				BufferCoord(CurPos,fText.CaretY),
+				BufferCoord(CurPos,fText.CaretY),
+				'//',smNormal);
+
+			fText.EndUndoBlock;
 		end;
-
-		fText.LineText := localcopy;
-
-		fText.UndoList.AddChange(crDelete,
-			BufferCoord(CurPos,fText.CaretY),
-			BufferCoord(CurPos,fText.CaretY),
-			'//',smNormal);
-
-		fText.EndUndoBlock;
 	end;
 
 	// Prevent repaints while we're busy
 	fText.EndUpdate;
 
+	fText.CaretXY := oldcaret;
 	fText.BlockBegin := oldbbegin;
-	if oldbend.Char < 3 then // move due to comment chars
-		fText.BlockEnd := oldbend
-	else
-		fText.BlockEnd := BufferCoord(oldbend.Char - 2,oldbend.line);
+	fText.BlockEnd := oldbend;
 
 	fText.UpdateCaret;
 	fText.Modified := true;

@@ -105,7 +105,7 @@ type
 		procedure SetOption(option : PCompilerOption;index : integer;newvalue : char);
 
 		// converts
-		procedure OptionStringToList(const input : AnsiString);
+		procedure OptionStringToList(var input : AnsiString);
 		procedure OptionListToString;
 
 		// utils
@@ -964,26 +964,30 @@ begin
 		fOptionString := fOptionString + ValueToChar[PCompilerOption(fOptionList[I])^.optValue];
 end;
 
-procedure TdevCompiler.OptionStringToList(const input : AnsiString);
+procedure TdevCompiler.OptionStringToList(var input : AnsiString);
 var
 	I: integer;
 begin
 	for I := 0 to fOptionList.Count - 1 do
-		if I < Length(input) then
-			PCompilerOption(fOptionList[I])^.optValue := CharToValue(input[I+1]);
+		if I < Length(input) then // set option in list
+			PCompilerOption(fOptionList[I])^.optValue := CharToValue(input[I+1])
+		else
+			input := input + '0'; // append value so string is complete
 end;
 
 procedure TdevCompiler.SetOption(option : PCompilerOption;index : integer;newvalue : char);
 begin
 	if Assigned(option) then
 		option^.optValue := CharToValue(newvalue);
-	fOptionString[index+1] := newvalue;
+
+	if index+1 < Length(fOptionString) then
+		fOptionString[index+1] := newvalue;
+		// complete string?
 end;
 
 procedure TdevCompiler.LoadSet(Index: integer);
 var
 	key,msg : AnsiString;
-	I,J : integer;
 begin
 	// Load the current index from disk
 	key := 'CompilerSets_' + IntToStr(Index);
@@ -1009,21 +1013,8 @@ begin
 	// Load the option string
 	fOptionString := devData.LoadSettingS(key, 'Options');
 
-	// Set fOptionList to values found in fOptionString
-	for I := 0 to fOptionList.Count - 1 do begin
-
-		// Unknown options are set to false
-		if I >= Length(fOptionString) then
-			PCompilerOption(fOptionList[I])^.optValue := 0
-		else
-			// Else, scan valuearray
-			for J := 0 to 27 do begin
-				if fOptionString[I+1] = ValueToChar[J] then begin
-					PCompilerOption(fOptionList[I])^.optValue := J;
-					Break;
-				end;
-			end;
-	end;
+	// Convert to better list format
+	OptionStringToList(fOptionString);
 
 	// Extra parameters
 	fCompOpt := devData.LoadSettingS(key, 'CompOpt');
@@ -1040,8 +1031,6 @@ begin
 	fCDir   := devData.LoadSettingS(key, 'C');
 	fCppDir := devData.LoadSettingS(key, 'Cpp');
 	fLibDir := devData.LoadSettingS(key, 'Lib');
-
-	// TODO: select defaults?
 
 	// Directories
 	fBinDir := ReplaceFirstStr(fBinDir, '%path%\',devDirs.Exec);

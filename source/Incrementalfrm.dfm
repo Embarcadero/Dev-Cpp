@@ -15,9 +15,11 @@ object frmIncremental: TfrmIncremental
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   FormStyle = fsStayOnTop
+  KeyPreview = True
   OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -65,7 +67,5 @@ object frmIncremental: TfrmIncremental
     ParentFont = False
     TabOrder = 2
     OnChange = EditChange
-    OnKeyDown = EditKeyDown
-    OnKeyPress = EditKeyPress
   end
 end

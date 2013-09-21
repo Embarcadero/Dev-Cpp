@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 634
-  Top = 290
+  Left = 821
+  Top = 336
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -65,7 +65,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -107,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 155
+        Height = 154
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -216,12 +216,13 @@ object MainForm: TMainForm
           Height = 13
           Caption = 'Send command to GDB :'
         end
-        object edGdbCommand: TEdit
+        object edGdbCommand: TComboBox
           Left = 136
           Top = 3
           Width = 217
           Height = 21
           Anchors = [akLeft, akTop, akRight]
+          ItemHeight = 13
           TabOrder = 0
           OnKeyPress = edGdbCommandKeyPress
         end
@@ -229,7 +230,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 350
-          Height = 109
+          Height = 114
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -397,12 +398,13 @@ object MainForm: TMainForm
           Action = actModifyWatch
           TabOrder = 6
         end
-        object EvaluateInput: TEdit
+        object EvaluateInput: TComboBox
           Left = 64
           Top = 100
           Width = 400
           Height = 21
           Anchors = [akLeft, akTop, akRight]
+          ItemHeight = 13
           TabOrder = 7
           OnKeyPress = EvaluateInputKeyPress
         end
@@ -410,7 +412,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 12
+          Height = 19
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -944,7 +946,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 312
+        Height = 311
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -980,7 +982,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 312
+        Height = 311
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1016,7 +1018,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 312
+        Height = 311
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -2946,6 +2948,11 @@ object MainForm: TMainForm
       OnExecute = actSkipFunctionExecute
       OnUpdate = actUpdateDebuggerRunning
     end
+    object actMsgCut: TAction
+      Caption = 'actMsgCut'
+      ShortCut = 16472
+      OnExecute = actMsgCutExecute
+    end
     object actMsgCopy: TAction
       Caption = 'actMsgCopy'
       ShortCut = 16451
@@ -2974,6 +2981,9 @@ object MainForm: TMainForm
   object MessagePopup: TPopupMenu
     Left = 203
     Top = 371
+    object actMsgCut1: TMenuItem
+      Action = actMsgCut
+    end
     object MsgCopyItem: TMenuItem
       Action = actMsgCopy
     end

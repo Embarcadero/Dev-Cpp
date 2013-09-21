@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, editor, SysUtils, Classes, Graphics, Controls, Forms,
-  SynEdit, StdCtrls, SynEditTypes, SynEditSearch, ComCtrls;
+  SynEdit, StdCtrls, SynEditTypes, SynEditSearch, Clipbrd, ComCtrls, Menus;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms,
@@ -56,6 +56,10 @@ type
     cbPrompt: TCheckBox;
     cboReplaceText: TComboBox;
     lblReplace: TLabel;
+    FindPopup: TPopupMenu;
+    FindCopy: TMenuItem;
+    FindPaste: TMenuItem;
+    FindCut: TMenuItem;
     procedure btnFindClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnCancelClick(Sender: TObject);
@@ -63,6 +67,9 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FindCutClick(Sender: TObject);
+    procedure FindCopyClick(Sender: TObject);
+    procedure FindPasteClick(Sender: TObject);
   private
     fSearchOptions : TSynSearchOptions;
     fCurFile : AnsiString;
@@ -85,7 +92,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  Main, Dialogs, MultiLangSupport, devcfg, SynEditMiscClasses;
+  Main, Dialogs, MultiLangSupport, devcfg, utils, SynEditMiscClasses;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, Main, QDialogs, MultiLangSupport, devcfg;
@@ -352,6 +359,10 @@ begin
   //buttons
   btnFind.Caption:=        Lang[ID_BTN_FIND];
   btnCancel.Caption:=      Lang[ID_BTN_CANCEL];
+
+	FindCut.Caption := Lang[ID_ITEM_CUT];
+	FindCopy.Caption := Lang[ID_ITEM_COPY];
+	FindPaste.Caption := Lang[ID_ITEM_PASTE];
 end;
 
 procedure TfrmFind.FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
@@ -395,6 +406,33 @@ begin
 	rbEntireScope.Checked := devData.OriginEntireScope;
 
 	FindTabsChange(nil);
+end;
+
+procedure TfrmFind.FindCutClick(Sender: TObject);
+begin
+	if cboFindText.Focused then begin
+		Clipboard.AsText := cboFindText.SelText;
+		cboFindText.SelText := '';
+	end else if cboReplaceText.Focused then begin
+		Clipboard.AsText := cboReplaceText.SelText;
+		cboReplaceText.SelText := '';
+	end;
+end;
+
+procedure TfrmFind.FindCopyClick(Sender: TObject);
+begin
+	if cboFindText.Focused then
+		Clipboard.AsText := cboFindText.SelText
+	else if cboReplaceText.Focused then
+		Clipboard.AsText := cboReplaceText.SelText;
+end;
+
+procedure TfrmFind.FindPasteClick(Sender: TObject);
+begin
+	if cboFindText.Focused then
+		cboFindText.SelText := Clipboard.AsText
+	else if cboReplaceText.Focused then
+		cboReplaceText.SelText := Clipboard.AsText;
 end;
 
 end.

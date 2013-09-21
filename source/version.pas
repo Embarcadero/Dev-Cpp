@@ -32,8 +32,8 @@ const
 
 	// exe properties
 	DEVCPP                = 'Dev-C++';
-	DEVCPP_VERSION        = '5.3.0.0 RC9';
-	DEVCPP_BUILDTIME      = 'September 20 2012 - 23:13';
+	DEVCPP_VERSION        = '5.3.0.0 RC10';
+	DEVCPP_BUILDTIME      = 'September 23 2012 - 13:04';
 
 	// delimiters
 	DEV_INTERNAL_OPEN     = '$__DEV_INTERNAL_OPEN';
