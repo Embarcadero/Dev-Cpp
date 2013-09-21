@@ -1,8 +1,8 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "4.9.9.5"
-!define DISPLAY_NAME "Dev-C++ 5 beta 12 release (${DEVCPP_VERSION})"
+!define DEVCPP_VERSION "4.9.9.6"
+!define DISPLAY_NAME "Dev-C++ 5 beta 13 release (${DEVCPP_VERSION})"
 
 Var LOCAL_APPDATA
 
@@ -16,13 +16,8 @@ Name "${DISPLAY_NAME}"
 OutFile "devcpp-${DEVCPP_VERSION}_setup.exe"
 Caption "${DISPLAY_NAME}"
 
-# [Licence Attributes]
-LicenseText "Dev-C++ is distributed under the GNU General Public License:"
 LicenseData "copying.txt"
-
-# [Directory Selection]
-InstallDir "C:\Dev-Cpp"
-DirText "Select the directory to install Dev-C++ to:"
+InstallDir $PROGRAMFILES\Dev-Cpp
 
 ############################################
 # Interface Settings
@@ -40,8 +35,6 @@ XPStyle on
 InstType "Full";1
 InstType "Minimal";2
 
-ComponentText "Choose components"
-
 ############################################
 # Pages
 
@@ -49,7 +42,6 @@ ComponentText "Choose components"
 !define MUI_UNICON "devcpp.ico"
 !define MUI_ABORTWARNING
 !define MUI_LANGDLL_ALLLANGUAGES
-!define MUI_PAGE_CUSTOMFUNCTION_LEAVE dirLeave
 !define MUI_FINISHPAGE_RUN "$INSTDIR\devcpp.exe"
 !define MUI_FINISHPAGE_NOREBOOTSUPPORT
 
@@ -413,7 +405,7 @@ LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configur
 # Functions
 
 Function .onInit
-  MessageBox MB_OK "Welcome to Dev-C++ install program. Please do not install this version of Dev-C++ over an existing installation."
+  MessageBox MB_OK "Welcome to Dev-C++'s install program. Please do not install this version of Dev-C++ over an existing installation."
 FunctionEnd
 
 ;backup file association
@@ -504,30 +496,6 @@ Function StrCSpnReverse
  Pop $R2
  Pop $R1
  Exch $R0
-FunctionEnd
-
-#Verify the installation directory
-Function dirLeave
-  Push "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:-_\"
-  Push $INSTDIR
-  Call StrCSpnReverse
-  Pop $R0
-  StrCmp $R0 "" +3
-  MessageBox MB_OK|MB_ICONEXCLAMATION "Installation directory cannot contain: '$R0'. Only letters, numbers and ':-_\' are allowed."
-  Abort
-
-  GetInstDirError $0
-  ${Switch} $0
-    ${Case} 1
-      MessageBox MB_OK "invalid installation directory!"
-      Abort
-      ${Break}
-    ${Case} 2
-      MessageBox MB_OK "not enough free space!"
-      Abort
-      ${Break}
-  ${EndSwitch}
-
 FunctionEnd
 
 #Fill the global variable with Local\Application Data directory CSIDL_LOCAL_APPDATA

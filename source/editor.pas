@@ -1465,108 +1465,6 @@ begin
   end;
 end;
 
-
-(*
-// SynEdit has an indent/unindent command, no need to make it the hard way
-procedure TEditor.IndentSelection;
-var
-  TabString: string; // customize depending on devEditor values
-  S: string;
-  Offset: integer;
-  ss: integer;
-  backup: TPoint;
-begin
-  // init TabString
-  if not devEditor.TabToSpaces then // keep tabs
-{$IFDEF WIN32}
-    TabString:=Char(VK_TAB)
-  else
-    TabString:=StringOfChar(Char(VK_SPACE), devEditor.TabSize);
-{$ENDIF}
-{$IFDEF LINUX}
-    TabString:=Char(XK_TAB)
-  else
-    TabString:=StringOfChar(Char(XK_SPACE), devEditor.TabSize);
-{$ENDIF}
-
-  if Text.SelAvail then begin // has selection
-    backup:=Text.CaretXY;
-    Text.BeginUpdate;
-    ss:=Text.SelStart;
-    S:=#10+Text.SelText;
-    Offset:=0;
-    if S[Length(S)]=#10 then begin // if the selection ends with a newline, eliminate it
-      if S[Length(S)-1]=#13 then // do we ignore 1 or 2 chars?
-        Offset:=2
-      else
-        Offset:=1;
-      S:=Copy(S, 1, Length(S)-Offset);
-    end;
-    S:=StringReplace(S, #10, #10+TabString, [rfReplaceAll]);
-    if Offset=1 then
-      S:=S+#10
-    else if Offset=2 then
-      S:=S+#13#10;
-    Text.SelText:=Copy(S, 2, Length(S)-1);
-    Text.SelStart:=ss;
-    Text.SelEnd:=ss+Length(S)-1;
-    Text.EndUpdate;
-    Text.CaretXY:=backup;
-  end
-  else // no selection; easy stuff ;)
-    Text.LineText:=TabString+Text.LineText;
-  Text.Modified:=True;
-end;
-
-
-procedure TEditor.UnindentSelection;
-var
-  TabString: string; // customize depending on devEditor values
-  S: string;
-  ss: integer;
-  backup: TPoint;
-begin
-  // init TabString
-{$IFDEF WIN32}
-  TabString:=StringOfChar(Char(VK_SPACE), devEditor.TabSize);
-{$ENDIF}
-{$IFDEF LINUX}
-  TabString:=StringOfChar(Char(XK_SPACE), devEditor.TabSize);
-{$ENDIF}
-
-  if Text.SelAvail then begin // has selection
-    backup:=Text.CaretXY;
-    Text.BeginUpdate;
-    ss:=Text.SelStart;
-    S:=Text.SelText;
-    if Length(S)>=Length(TabString) then // sanity check
-    begin
-      if Copy(S,1,1)=#9 then
-        S:=Copy(S, 2, Length(S)-1)
-      else if Copy(S, 1, Length(TabString))=TabString then // if it starts with indent
-        S:=Copy(S, Length(TabString)+1, Length(S)-Length(TabString)); // remove it
-    end;
-    S:=StringReplace(S, #10+TabString, #10#9, [rfReplaceAll]);
-    S:=StringReplace(S, #10#9, #10, [rfReplaceAll]);
-    Text.SelText:=S;
-    Text.SelStart:=ss;
-    Text.SelEnd:=ss+Length(S);
-    Text.EndUpdate;
-    Text.CaretXY:=backup;
-  end
-  else // no selection; easy stuff ;)
-    if Length(Text.LineText)>=Length(TabString) then
-    begin
-      if Copy(Text.LineText,1,1)=#9 then
-        Text.LineText:=Copy(Text.LineText, 2, Length(Text.LineText)-1)
-      else if Copy(Text.LineText, 1, Length(TabString))=TabString then
-        Text.LineText:=Copy(Text.LineText, Length(TabString)+1, Length(Text.LineText)-Length(TabString));
-    end;
-  Text.Modified:=True;
-end;
-*)
-
-
 {** Modified by Peter **}
 procedure TEditor.UncommentSelection;
 
@@ -1593,7 +1491,7 @@ var
   I: Integer;
   Idx: Integer;
   Strings: TStringList;
-begin            
+begin
   // has selection
   if Text.SelAvail then 
   begin

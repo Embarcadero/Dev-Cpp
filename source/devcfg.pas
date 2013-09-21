@@ -510,14 +510,14 @@ type
    fToolbarClassesX: integer;
    fToolbarClassesY: integer;
 
-   // file associations (see FileAssocs.pas)
-   fAssociateCpp: boolean;
-   fAssociateC: boolean;
-   fAssociateHpp: boolean;
-   fAssociateH: boolean;
-   fAssociateDev: boolean;
-   fAssociateRc: boolean;
-   fAssociateTemplate: boolean;
+		// file associations (see FileAssocs.pas)
+		fAssociateCpp: boolean;
+		fAssociateC: boolean;
+		fAssociateHpp: boolean;
+		fAssociateH: boolean;
+		fAssociateDev: boolean;
+		fAssociateRc: boolean;
+		fAssociateTemplate: boolean;
 
 		// More misc stuff
 		fShowTipsOnStart: boolean;
@@ -1502,7 +1502,6 @@ begin
 	fGutterFont.Name:= 'Courier New';
 	fGutterFont.Size:= 10;
 	fGutterSize:= 32;
-
 end;
 
 procedure TdevEditor.AssignEditor(Editor: TSynEdit);
@@ -1637,10 +1636,10 @@ end;
 
 constructor TdevClassBrowsing.Create;
 begin
- inherited Create;
- Name:= 'ClassBrowsing';
- SettoDefaults;
- LoadSettings;
+	inherited Create;
+	Name:= 'ClassBrowsing';
+	SettoDefaults;
+	LoadSettings;
 end;
 
 procedure TdevClassBrowsing.LoadSettings;
@@ -1655,13 +1654,14 @@ end;
 
 procedure TdevClassBrowsing.SettoDefaults;
 begin
-  fCBViewStyle:=0;
-  fEnabled:=True;
-  fParseLocalHeaders:=False;
-  fParseGlobalHeaders:=False;
-  fShowFilter:=0;
-  fUseColors:=True;
-  fShowInheritedMembers:=False;
+	fEnabled:=True;
+	fCBViewStyle:=0;
+
+	fParseLocalHeaders:=False;
+	fParseGlobalHeaders:=False;
+	fShowFilter:=0;
+	fUseColors:=True;
+	fShowInheritedMembers:=False;
 end;
 
 { TdevCVSHandler }
@@ -1693,7 +1693,7 @@ end;
 procedure TdevCVSHandler.SettoDefaults;
 begin
    fExecutable:='cvs.exe';
-   fCompression:=4;
+   fCompression:=9;
    fUseSSH:=True;
 end;
 
@@ -1734,11 +1734,7 @@ end;
 
 procedure TdevCompilerSet.LoadSet(Index: integer);
 var
-	key: string;
-	goodBinDir, goodCDir, goodCppDir, goodLibDir: String;
-	msg: String;
-	tempStr: String;
-	gnumakereply, mingwmakereply: String;
+	key, goodBinDir, goodCDir, goodCppDir, goodLibDir, msg, tempStr, gnumakereply, mingwmakereply: String;
 begin
 	if Index<0 then Exit;
 	with devData do begin

@@ -123,6 +123,7 @@ type
     lblPriority: TLabel;
     spnPriority: TSpinEdit;
     chkAutoIncBuild: TCheckBox;
+    chkSyncProduct: TCheckBox;
     tabCompOpts: TdevPage;
     CompOptionsFrame1: TCompOptionsFrame;
     cmbCompiler: TComboBox;
@@ -150,8 +151,7 @@ type
     procedure UpDownClick(Sender: TObject);
     procedure BrowseClick(Sender: TObject);
     procedure SubTabsChange(Sender: TObject);
-    procedure SubTabsChanging(Sender: TObject; NewIndex: Integer;
-      var AllowChange: Boolean);
+    procedure SubTabsChanging(Sender: TObject; NewIndex: Integer;var AllowChange: Boolean);
     procedure FormShow(Sender: TObject);
     procedure btnIconLibClick(Sender: TObject);
     procedure btnIconBrwseClick(Sender: TObject);
@@ -180,8 +180,8 @@ type
     procedure spnPriorityChange(Sender: TObject);
     procedure btnCustomMakeBrowseClick(Sender: TObject);
     procedure cbUseCustomMakefileClick(Sender: TObject);
-    procedure MakeIncludesDrawItem(Control: TWinControl; Index: Integer;
-      Rect: TRect; State: TOwnerDrawState);
+    procedure MakeIncludesDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
+    procedure SetFileVersion(Sender: TObject);
   private
     fOptions: TProjOptions;
     fIcon: string;
@@ -369,11 +369,10 @@ end;
 
 function TfrmProjectOptions.GetOptions: TProjOptions;
 var
-  I: integer;
+	I: integer;
 begin
-  with fOptions do
-   begin
-     Icon:= fIcon;
+	with fOptions do begin
+		Icon:= fIcon;
      { I had to remove the delimiter text thing, since it causes the edit box to add
        unwanted quotes around the string. We could remove them but that could conflict with user's own quotes,
        for example when using filenames containing spaces }
@@ -392,89 +391,109 @@ begin
       All I have to do when I want the actual string back, is call StringReplace() et voila :)
      }
 
-     // mandrav: start
-     cmdlines.Linker:= edLinker.Lines.Text;
-     cmdLines.Compiler:='';
-     for I:=0 to edCompiler.Lines.Count-1 do
-      cmdLines.Compiler := cmdLines.Compiler + edCompiler.Lines[I] + '_@@_';
-     cmdLines.CppCompiler:='';
-     for I:=0 to edCppCompiler.Lines.Count-1 do
-      cmdLines.CppCompiler := cmdLines.CppCompiler + edCppCompiler.Lines[I] + '_@@_';
-     cmdLines.Linker:='';
-     for I:=0 to edLinker.Lines.Count-1 do
-      cmdLines.Linker := cmdLines.Linker + edLinker.Lines[I] + '_@@_';
-     // mandrav: end
+		// mandrav: start, Options Tab
+		cmdLines.Compiler:='';
+		for I:=0 to edCompiler.Lines.Count-1 do
+			cmdLines.Compiler := cmdLines.Compiler + edCompiler.Lines[I] + '_@@_';
 
-     typ:= lstType.ItemIndex;
+		cmdLines.CppCompiler:='';
+		for I:=0 to edCppCompiler.Lines.Count-1 do
+			cmdLines.CppCompiler := cmdLines.CppCompiler + edCppCompiler.Lines[I] + '_@@_';
 
-     ExeOutput := edExeOutput.Text;
-     ObjectOutput := edObjOutput.Text;
-     OverrideOutput := chkOverrideOutput.Checked;
-     OverridenOutput := edOverridenOutput.Text;
-     if cbUseCustomMakefile.Checked and FileExists(edCustomMakefile.Text) then
-       fProject.UseCustomMakefile := true
-     else
-       fProject.UseCustomMakefile := false;
-     fProject.CustomMakefile:=edCustomMakefile.Text;
-     MakeIncludes.Clear;
-     MakeIncludes.AddStrings(Self.MakeIncludes.Items);
+		cmdLines.Linker:='';
+		for I:=0 to edLinker.Lines.Count-1 do
+			cmdLines.Linker := cmdLines.Linker + edLinker.Lines[I] + '_@@_';
+		// mandrav: end
 
-     fOptions.SupportXPThemes:=chkSupportXP.Checked;
-     fOptions.CompilerSet:=cmbCompiler.ItemIndex;
+		typ:= lstType.ItemIndex;
 
-     fOptions.IncludeVersionInfo:=chkVersionInfo.Checked;
+		// Build Options
+		ExeOutput := edExeOutput.Text;
+		ObjectOutput := edObjOutput.Text;
+		OverrideOutput := chkOverrideOutput.Checked;
+		OverridenOutput := edOverridenOutput.Text;
 
-     fOptions.VersionInfo.Major:=spnMajor.Value;
-     fOptions.VersionInfo.Minor:=spnMinor.Value;
-     fOptions.VersionInfo.Release:=spnRelease.Value;
-     fOptions.VersionInfo.Build:=spnBuild.Value;
-     fOptions.VersionInfo.AutoIncBuildNr:=chkAutoIncBuild.Checked;
+		// Makefile
+		if cbUseCustomMakefile.Checked and FileExists(edCustomMakefile.Text) then
+			fProject.UseCustomMakefile := true
+		else
+			fProject.UseCustomMakefile := false;
+		fProject.CustomMakefile:=edCustomMakefile.Text;
+		MakeIncludes.Clear;
+		MakeIncludes.AddStrings(Self.MakeIncludes.Items);
 
-     fOptions.VersionInfo.FileDescription:=   vleVersion.Cells[1, 0];
-     fOptions.VersionInfo.FileVersion:=       vleVersion.Cells[1, 1];
-     fOptions.VersionInfo.ProductName:=       vleVersion.Cells[1, 2];
-     fOptions.VersionInfo.ProductVersion:=    vleVersion.Cells[1, 3];
-     fOptions.VersionInfo.OriginalFilename:=  vleVersion.Cells[1, 4];
-     fOptions.VersionInfo.InternalName:=      vleVersion.Cells[1, 5];
-     fOptions.VersionInfo.CompanyName:=       vleVersion.Cells[1, 6];
-     fOptions.VersionInfo.LegalCopyright:=    vleVersion.Cells[1, 7];
-     fOptions.VersionInfo.LegalTrademarks:=   vleVersion.Cells[1, 8];
+		// General
+		fOptions.SupportXPThemes:=chkSupportXP.Checked;
+		fOptions.CompilerSet:=cmbCompiler.ItemIndex;
 
-     if cmbLangID.ItemIndex>-1 then
-     begin
-      //fOptions.VersionInfo.LanguageID:=Languages.LocaleID[cmbLangID.ItemIndex];
-      
-      for I := 0 to Languages.Count-1 do
-        if SameText(Languages.Name[I], cmbLangID.Text) then
-        begin
-          FOptions.VersionInfo.LanguageID := Languages.LocaleID[I];
-          Break;
-        end;
-     end;
-     
-   end;
-  result:= fOptions;
+		// Version info
+		fOptions.IncludeVersionInfo:=chkVersionInfo.Checked;
+
+		fOptions.VersionInfo.Major:=spnMajor.Value;
+		fOptions.VersionInfo.Minor:=spnMinor.Value;
+		fOptions.VersionInfo.Release:=spnRelease.Value;
+		fOptions.VersionInfo.Build:=spnBuild.Value;
+		fOptions.VersionInfo.AutoIncBuildNr:=chkAutoIncBuild.Checked;
+		fOptions.VersionInfo.SyncProduct:=chkSyncProduct.Checked;
+
+		fOptions.VersionInfo.FileDescription:=   vleVersion.Cells[1, 0];
+		fOptions.VersionInfo.FileVersion:=       vleVersion.Cells[1, 1];
+		fOptions.VersionInfo.ProductName:=       vleVersion.Cells[1, 2];
+		fOptions.VersionInfo.ProductVersion:=    vleVersion.Cells[1, 3];
+		fOptions.VersionInfo.OriginalFilename:=  vleVersion.Cells[1, 4];
+		fOptions.VersionInfo.InternalName:=      vleVersion.Cells[1, 5];
+		fOptions.VersionInfo.CompanyName:=       vleVersion.Cells[1, 6];
+		fOptions.VersionInfo.LegalCopyright:=    vleVersion.Cells[1, 7];
+		fOptions.VersionInfo.LegalTrademarks:=   vleVersion.Cells[1, 8];
+
+		// Get international language ID (1026 ...)
+		for I := 0 to Languages.Count-1 do begin
+			if SameText(Languages.Name[I], cmbLangID.Text) then begin
+				fOptions.VersionInfo.LanguageID := Languages.LocaleID[I];
+				Break;
+			end;
+		end;
+
+	end;
+	result:= fOptions;
+end;
+
+procedure TfrmProjectOptions.SetFileVersion(Sender: TObject);
+begin
+	fOptions.VersionInfo.FileVersion := Format('%d.%d.%d.%d', [spnMajor.Value,spnMinor.Value,spnRelease.Value,spnBuild.Value]);
+	if(chkSyncProduct.Checked) then
+		fOptions.VersionInfo.ProductVersion := Format('%d.%d.%d.%d', [spnMajor.Value,spnMinor.Value,spnRelease.Value,spnBuild.Value]);
+	vleVersion.Strings.Clear;
+	vleVersion.InsertRow('File Description',  fOptions.VersionInfo.FileDescription,   True);
+	vleVersion.InsertRow('File Version',      fOptions.VersionInfo.FileVersion,       True);
+	vleVersion.InsertRow('Product Name',      fOptions.VersionInfo.ProductName,       True);
+	vleVersion.InsertRow('Product Version',   fOptions.VersionInfo.ProductVersion,    True);
+	vleVersion.InsertRow('Original Filename', fOptions.VersionInfo.OriginalFilename,  True);
+	vleVersion.InsertRow('Internal Name',     fOptions.VersionInfo.InternalName,      True);
+	vleVersion.InsertRow('Company Name',      fOptions.VersionInfo.CompanyName,       True);
+	vleVersion.InsertRow('Legal Copyright',   fOptions.VersionInfo.LegalCopyright,    True);
+	vleVersion.InsertRow('Legal Trademarks',  fOptions.VersionInfo.LegalTrademarks,   True);
 end;
 
 procedure TfrmProjectOptions.SetOptions(Value: TProjOptions);
 var
-  idx, cntSrc, cntHdr, cntRes: integer;
+	idx, cntSrc, cntHdr, cntRes: integer;
 begin
-  fOptions:= Value;
-  fIcon:= GetRealPath(fOptions.Icon, fProject.Directory);
-  if (fIcon <> '') and (FileExists(fIcon)) then
-   try
-    Icon.Picture.LoadFromFile(fIcon);
-   except
-    fIcon:= '';
-   end;
+	fOptions:= Value;
+	fIcon:= GetRealPath(fOptions.Icon, fProject.Directory);
+	if (fIcon <> '') and (FileExists(fIcon)) then
+		try
+			Icon.Picture.LoadFromFile(fIcon);
+		except
+			fIcon:= '';
+		end;
 
-  // General Tab
-  lstType.ItemIndex:= fOptions.typ;
-  edCompiler.Lines.Text:= StringReplace(fOptions.cmdlines.Compiler, '_@@_', #13#10, [rfReplaceAll]);
-  edCppCompiler.Lines.Text:= StringReplace(fOptions.cmdlines.CppCompiler, '_@@_', #13#10, [rfReplaceAll]);
-  edLinker.Lines.Text:= StringReplace(fOptions.cmdlines.Linker, '_@@_', #13#10, [rfReplaceAll]);
-  edProjectName.Text:= fProject.Name;
+	// General Tab
+	lstType.ItemIndex:= fOptions.typ;
+	edCompiler.Lines.Text:= StringReplace(fOptions.cmdlines.Compiler, '_@@_', #13#10, [rfReplaceAll]);
+	edCppCompiler.Lines.Text:= StringReplace(fOptions.cmdlines.CppCompiler, '_@@_', #13#10, [rfReplaceAll]);
+	edLinker.Lines.Text:= StringReplace(fOptions.cmdlines.Linker, '_@@_', #13#10, [rfReplaceAll]);
+	edProjectName.Text:= fProject.Name;
   lblPrjFname.Caption:=fProject.FileName;
   lblPrjOutputFname.Caption:=fProject.Executable;
   cntSrc:=0;
@@ -680,28 +699,29 @@ begin
   btnMakDelInval.Caption:=   Lang[ID_BTN_DELINVAL];
 
   // files tab
-  tabFiles.Caption:=          Lang[ID_POPT_FILESTAB];
-  lblProjectFiles.Caption:=   Lang[ID_POPT_PROJFILES];
-  lblCompilerSet.Caption:=    Lang[ID_POPT_COMP];
-  lblCompileInfo.Caption:=    Lang[ID_POPT_COMPINFO];
-  grpUnitOptions.Caption:=    Lang[ID_POPT_UNITOPTS];
-  lblPriority.Caption:=       Lang[ID_POPT_BUILDPRIORITY];
-  chkCompile.Caption:=        Lang[ID_POPT_COMPUNIT];
-  chkCompileCpp.Caption:=     Lang[ID_POPT_UNITUSEGPP];
+  tabFiles.Caption:=           Lang[ID_POPT_FILESTAB];
+  lblProjectFiles.Caption:=    Lang[ID_POPT_PROJFILES];
+  lblCompilerSet.Caption:=     Lang[ID_POPT_COMP];
+  lblCompileInfo.Caption:=     Lang[ID_POPT_COMPINFO];
+  grpUnitOptions.Caption:=     '  '+Lang[ID_POPT_UNITOPTS]+'  ';
+  lblPriority.Caption:=        Lang[ID_POPT_BUILDPRIORITY];
+  chkCompile.Caption:=         Lang[ID_POPT_COMPUNIT];
+  chkCompileCpp.Caption:=      Lang[ID_POPT_UNITUSEGPP];
   chkOverrideBuildCmd.Caption:=Lang[ID_POPT_OVERRIDEBUILDCMD];
-  chkLink.Caption:=           Lang[ID_POPT_LINKUNIT];
+  chkLink.Caption:=            Lang[ID_POPT_LINKUNIT];
 
   // version info tab
-  tabVersion.Caption:=        Lang[ID_POPT_VERTAB];
-  chkVersionInfo.Caption:=    Lang[ID_POPT_INCLUDEVERSION];
-  grpVersion.Caption:=        Lang[ID_POPT_VDETAILS];
-  lblVerMajor.Caption:=       Lang[ID_POPT_VMAJOR];
-  lblVerMinor.Caption:=       Lang[ID_POPT_VMINOR];
-  lblVerRel.Caption:=         Lang[ID_POPT_VRELEASE];
-  lblVerBuild.Caption:=       Lang[ID_POPT_VBUILD];
-  lblVerLang.Caption:=        Lang[ID_POPT_VLANG];
-  lblVerAdditional.Caption:=  Lang[ID_POPT_VADDITIONAL];
-  chkAutoIncBuild.Caption:=   Lang[ID_POPT_VAUTOINCBUILDNR];
+  tabVersion.Caption:=         Lang[ID_POPT_VERTAB];
+  chkVersionInfo.Caption:=     Lang[ID_POPT_INCLUDEVERSION];
+  grpVersion.Caption:=         '  '+Lang[ID_POPT_VDETAILS]+'  ';
+  lblVerMajor.Caption:=        Lang[ID_POPT_VMAJOR];
+  lblVerMinor.Caption:=        Lang[ID_POPT_VMINOR];
+  lblVerRel.Caption:=          Lang[ID_POPT_VRELEASE];
+  lblVerBuild.Caption:=        Lang[ID_POPT_VBUILD];
+  lblVerLang.Caption:=         Lang[ID_POPT_VLANG];
+  lblVerAdditional.Caption:=   Lang[ID_POPT_VADDITIONAL];
+  chkAutoIncBuild.Caption:=    Lang[ID_POPT_VAUTOINCBUILDNR];
+  chkSyncProduct.Caption:=     Lang[ID_POPT_SYNCPRODUCT];
 end;
 
 procedure TfrmProjectOptions.btnRemoveIconClick(Sender: TObject);
@@ -720,12 +740,12 @@ var
   Dir: WideString;
 {$ENDIF}
 begin
-  if fProject.Options.ExeOutput<>'' then
-    Dir:=ExpandFileto(fProject.Options.ExeOutput, fProject.Directory)
-  else
-    Dir:=fProject.Directory;
-  SelectDirectory('Select Directory', '', Dir);
-  edExeOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
+	if fProject.Options.ExeOutput<>'' then
+		Dir:=ExpandFileto(fProject.Options.ExeOutput, fProject.Directory)
+	else
+		Dir:=fProject.Directory;
+	SelectDirectory('Select Directory', '', Dir);
+	edExeOutput.Text := ExtractRelativePath(fProject.Directory, Dir);
 end;
 
 procedure TfrmProjectOptions.BrowseObjDirClick(Sender: TObject);
@@ -999,36 +1019,35 @@ end;
 
 procedure TfrmProjectOptions.InitVersionInfo;
 var
-  I: integer;
-  S: string;
+	I: integer;
 begin
-  chkVersionInfo.Checked:=fOptions.IncludeVersionInfo;
-  chkVersionInfoClick(nil);
+	chkVersionInfo.Checked:=fOptions.IncludeVersionInfo;
+	chkVersionInfoClick(nil);
 
-  spnMajor.Value:=fOptions.VersionInfo.Major;
-  spnMinor.Value:=fOptions.VersionInfo.Minor;
-  spnRelease.Value:=fOptions.VersionInfo.Release;
-  spnBuild.Value:=fOptions.VersionInfo.Build;
-  chkAutoIncBuild.Checked:=fOptions.VersionInfo.AutoIncBuildNr;
+	spnMajor.Value:=fOptions.VersionInfo.Major;
+	spnMinor.Value:=fOptions.VersionInfo.Minor;
+	spnRelease.Value:=fOptions.VersionInfo.Release;
+	spnBuild.Value:=fOptions.VersionInfo.Build;
+	chkAutoIncBuild.Checked:=fOptions.VersionInfo.AutoIncBuildNr;
+	chkSyncProduct.Checked:=fOptions.VersionInfo.SyncProduct;
 
-  vleVersion.Strings.Clear;
-  vleVersion.InsertRow('File Description',  fOptions.VersionInfo.FileDescription,   True);
-  vleVersion.InsertRow('File Version',      fOptions.VersionInfo.FileVersion,       True);
-  vleVersion.InsertRow('Product Name',      fOptions.VersionInfo.ProductName,       True);
-  vleVersion.InsertRow('Product Version',   fOptions.VersionInfo.ProductVersion,    True);
-  vleVersion.InsertRow('Original Filename', fOptions.VersionInfo.OriginalFilename,  True);
-  vleVersion.InsertRow('Internal Name',     fOptions.VersionInfo.InternalName,      True);
-  vleVersion.InsertRow('Company Name',      fOptions.VersionInfo.CompanyName,       True);
-  vleVersion.InsertRow('Legal Copyright',   fOptions.VersionInfo.LegalCopyright,    True);
-  vleVersion.InsertRow('Legal Trademarks',  fOptions.VersionInfo.LegalTrademarks,   True);
+	vleVersion.Strings.Clear;
+	vleVersion.InsertRow('File Description',  fOptions.VersionInfo.FileDescription,   True);
+	vleVersion.InsertRow('File Version',      fOptions.VersionInfo.FileVersion,       True);
+	vleVersion.InsertRow('Product Name',      fOptions.VersionInfo.ProductName,       True);
+	vleVersion.InsertRow('Product Version',   fOptions.VersionInfo.ProductVersion,    True);
+	vleVersion.InsertRow('Original Filename', fOptions.VersionInfo.OriginalFilename,  True);
+	vleVersion.InsertRow('Internal Name',     fOptions.VersionInfo.InternalName,      True);
+	vleVersion.InsertRow('Company Name',      fOptions.VersionInfo.CompanyName,       True);
+	vleVersion.InsertRow('Legal Copyright',   fOptions.VersionInfo.LegalCopyright,    True);
+	vleVersion.InsertRow('Legal Trademarks',  fOptions.VersionInfo.LegalTrademarks,   True);
 
-  cmbLangID.Items.Clear;
-  for I:=0 to Languages.Count-1 do
-    cmbLangID.Items.Add(Languages.Name[I]);
-  if Languages.Count > fOptions.VersionInfo.LanguageID then begin
-    S := Languages.NameFromLocaleID[fOptions.VersionInfo.LanguageID];
-    cmbLangID.ItemIndex := cmbLangID.Items.IndexOf(S);
-  end;
+	cmbLangID.Items.Clear;
+	for I:=0 to Languages.Count-1 do
+		cmbLangID.Items.Add(Languages.Name[I]);
+
+	// Zoek item met naam van internationale index op
+	cmbLangID.ItemIndex := cmbLangID.Items.IndexOf(Languages.NameFromLocaleID[fOptions.VersionInfo.LanguageID]);
 end;
 
 procedure TfrmProjectOptions.chkVersionInfoClick(Sender: TObject);
@@ -1040,6 +1059,7 @@ begin
   cmbLangID.Enabled:=chkVersionInfo.Checked;
   vleVersion.Enabled:=chkVersionInfo.Checked;
   chkAutoIncBuild.Enabled:=chkVersionInfo.Checked;
+  chkSyncProduct.Enabled:=chkVersionInfo.Checked;
 end;
 
 procedure TfrmProjectOptions.cmbCompilerChange(Sender: TObject);

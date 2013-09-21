@@ -56,6 +56,7 @@ type
   ProductName: string;
   ProductVersion: string;
   AutoIncBuildNr: boolean;
+  SyncProduct: boolean;
  end;
 
  TProjOptions = record
@@ -124,10 +125,10 @@ begin
      CompilerOptions:=  devCompiler.OptionStr;
 
      IncludeVersionInfo:=False;
-     VersionInfo.Major:=0;
-     VersionInfo.Minor:=1;
-     VersionInfo.Release:=1;
-     VersionInfo.Build:=1;
+     VersionInfo.Major:=1;
+     VersionInfo.Minor:=0;
+     VersionInfo.Release:=0;
+     VersionInfo.Build:=0;
      VersionInfo.LanguageID:=$0409; // US English
      VersionInfo.CharsetID:=$04E4; // Windows multilingual
      VersionInfo.CompanyName:='';
@@ -140,6 +141,7 @@ begin
      VersionInfo.ProductName:='';
      VersionInfo.ProductVersion:='';
      VersionInfo.AutoIncBuildNr:=False;
+     VersionInfo.SyncProduct:=True;
    end;
 end;
 

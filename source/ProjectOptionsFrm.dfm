@@ -1,6 +1,6 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 802
-  Top = 409
+  Left = 1189
+  Top = 667
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -72,7 +72,7 @@ object frmProjectOptions: TfrmProjectOptions
     Top = 8
     Width = 458
     Height = 265
-    ActivePage = tabFilesDir
+    ActivePage = tabVersion
     object tabGeneral: TdevPage
       Left = 0
       Top = 23
@@ -621,6 +621,7 @@ object frmProjectOptions: TfrmProjectOptions
       Align = alClient
       BevelKind = bkTile
       TabOrder = 1
+      Visible = False
       Caption = 'Directories'
       object btnUp: TSpeedButton
         Left = 421
@@ -1289,7 +1290,6 @@ object frmProjectOptions: TfrmProjectOptions
       Align = alClient
       BevelKind = bkTile
       TabOrder = 5
-      Visible = False
       Caption = 'Version Info'
       object chkVersionInfo: TCheckBox
         Left = 12
@@ -1358,6 +1358,7 @@ object frmProjectOptions: TfrmProjectOptions
           MinValue = 0
           TabOrder = 0
           Value = 0
+          OnChange = SetFileVersion
         end
         object spnMinor: TSpinEdit
           Left = 72
@@ -1368,6 +1369,7 @@ object frmProjectOptions: TfrmProjectOptions
           MinValue = 0
           TabOrder = 1
           Value = 0
+          OnChange = SetFileVersion
         end
         object spnRelease: TSpinEdit
           Left = 132
@@ -1378,6 +1380,7 @@ object frmProjectOptions: TfrmProjectOptions
           MinValue = 0
           TabOrder = 2
           Value = 0
+          OnChange = SetFileVersion
         end
         object spnBuild: TSpinEdit
           Left = 192
@@ -1388,6 +1391,7 @@ object frmProjectOptions: TfrmProjectOptions
           MinValue = 0
           TabOrder = 3
           Value = 0
+          OnChange = SetFileVersion
         end
         object vleVersion: TValueListEditor
           Left = 12
@@ -1397,7 +1401,7 @@ object frmProjectOptions: TfrmProjectOptions
           DisplayOptions = [doAutoColResize, doKeyColFixed]
           FixedCols = 1
           Options = [goVertLine, goHorzLine, goColSizing, goEditing, goAlwaysShowEditor, goThumbTracking]
-          TabOrder = 6
+          TabOrder = 7
           ColWidths = (
             150
             257)
@@ -1408,16 +1412,25 @@ object frmProjectOptions: TfrmProjectOptions
           Width = 153
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 4
         end
         object chkAutoIncBuild: TCheckBox
           Left = 12
           Top = 60
-          Width = 413
+          Width = 220
           Height = 17
           Caption = 'Auto-increment build number on compile'
           TabOrder = 5
+        end
+        object chkSyncProduct: TCheckBox
+          Left = 260
+          Top = 60
+          Width = 413
+          Height = 17
+          Caption = 'Sync product with file version'
+          TabOrder = 6
+          OnClick = SetFileVersion
         end
       end
     end

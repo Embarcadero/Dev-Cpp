@@ -206,7 +206,7 @@ object WebUpdateForm: TWebUpdateForm
   object Label7: TLabel
     Left = 8
     Top = 56
-    Width = 61
+    Width = 104
     Height = 13
     Caption = '&Select devpak server:'
     FocusControl = cmbMirrors
@@ -399,8 +399,6 @@ object WebUpdateForm: TWebUpdateForm
     Top = 156
     Width = 417
     Height = 16
-    Min = 0
-    Max = 100
     TabOrder = 3
   end
   object cmbMirrors: TComboBox

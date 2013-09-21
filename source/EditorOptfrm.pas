@@ -185,20 +185,14 @@ type
     procedure btnOkClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
     procedure lvCodeinsColumnClick(Sender: TObject; Column: TListColumn);
-    procedure lvCodeinsCompare(Sender: TObject; Item1, Item2: TListItem;
-      Data: Integer; var Compare: Integer);
-    procedure lvCodeinsSelectItem(Sender: TObject; Item: TListItem;
-      Selected: Boolean);
-    procedure CodeInsStatusChange(Sender: TObject;
-      Changes: TSynStatusChanges);
-    function FormHelp(Command: Word; Data: Integer;
-      var CallHelp: Boolean): Boolean;
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure lvCodeinsCompare(Sender: TObject; Item1, Item2: TListItem;Data: Integer; var Compare: Integer);
+    procedure lvCodeinsSelectItem(Sender: TObject; Item: TListItem;Selected: Boolean);
+    procedure CodeInsStatusChange(Sender: TObject;Changes: TSynStatusChanges);
+    function FormHelp(Command: Word; Data: Integer;var CallHelp: Boolean): Boolean;
+    procedure FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure cboDblClick(Sender: TObject);
     procedure cboQuickColorSelect(Sender: TObject);
-    procedure CppEditSpecialLineColors(Sender: TObject; Line: Integer;
-      var Special: Boolean; var FG, BG: TColor);
+    procedure CppEditSpecialLineColors(Sender: TObject; Line: Integer;var Special: Boolean; var FG, BG: TColor);
     procedure tbCompletionDelayChange(Sender: TObject);
     procedure chkEnableCompletionClick(Sender: TObject);
     procedure chkEnableClassBrowserClick(Sender: TObject);
@@ -209,12 +203,10 @@ type
     procedure chkCCCacheClick(Sender: TObject);
     procedure CppParser1StartParsing(Sender: TObject);
     procedure CppParser1EndParsing(Sender: TObject);
-    procedure CppParser1TotalProgress(Sender: TObject; FileName: String;
-      Total, Current: Integer);
+    procedure CppParser1TotalProgress(Sender: TObject; FileName: String;Total, Current: Integer);
     procedure devPages1Change(Sender: TObject);
     procedure chkCBShowInheritedClick(Sender: TObject);
-    procedure OnGutterClick(Sender: TObject; Button: TMouseButton; X, Y,
-      Line: Integer; Mark: TSynEditMark);
+    procedure OnGutterClick(Sender: TObject; Button: TMouseButton; X, Y,Line: Integer; Mark: TSynEditMark);
     procedure cbHighCurrLineClick(Sender: TObject);
   private
     ffgColor: TColor;
@@ -233,7 +225,6 @@ type
     procedure LoadCodeIns;
     procedure LoadSampleText;
     procedure GetOptions;
-    procedure CheckAssoc;
     procedure SaveCodeIns;
     procedure UpdateCIButtons;
     procedure SetGutter;
@@ -313,7 +304,7 @@ procedure TEditorOptForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
 {$IFDEF WIN32}
-  if key = vk_F1 then
+  if key = VK_F1 then
 {$ENDIF}
 {$IFDEF LINUX}
   if key = XK_F1 then
@@ -590,8 +581,8 @@ begin
   lblCompletionColor.Caption:=   Lang[ID_EOPT_COMPLETIONCOLOR];
 
 // Class browsing Tab
-  gbCBEngine.Caption:=           Lang[ID_EOPT_BROWSERENGINE];
-  gbCBView.Caption:=             Lang[ID_EOPT_BROWSERVIEW];
+  gbCBEngine.Caption:=           '  '+Lang[ID_EOPT_BROWSERENGINE]+'  ';
+  gbCBView.Caption:=             '  '+Lang[ID_EOPT_BROWSERVIEW]+'  ';
   chkEnableClassBrowser.Caption:=Lang[ID_EOPT_BROWSERENABLE];
   lblClassBrowserSample.Caption:=Lang[ID_EOPT_BROWSERSAMPLE];
   chkCBParseLocalH.Caption:=     Lang[ID_EOPT_BROWSERLOCAL];
@@ -636,27 +627,25 @@ end;
 
 procedure TEditorOptForm.GetOptions;
 var
- aName: string;
- attr: TSynHighlighterAttributes;
- a,
- idx: integer;
+	aName: string;
+	attr: TSynHighlighterAttributes;
+	a, idx: integer;
 begin
-  with devEditor do
-   begin
-     cboEditorFont.ItemIndex:=       cboEditorFont.Items.IndexOf(Font.Name);
-     cboEditorSize.Text:=            inttostr(Font.Size);
-     FontSizeChange(cboEditorSize);
-     FontChange(cboEditorFont);
+	with devEditor do begin
+		cboEditorFont.ItemIndex:=       cboEditorFont.Items.IndexOf(Font.Name);
+		cboEditorSize.Text:=            inttostr(Font.Size);
+		FontSizeChange(cboEditorSize);
+		FontChange(cboEditorFont);
 
-     cbGutterFnt.Checked:=           Gutterfnt;
-     cboGutterFont.ItemIndex:=       cboGutterFont.Items.IndexOf(Gutterfont.Name);
-     cboGutterSize.Text:=            inttostr(GutterFont.Size);
-     FontSizeChange(cboGutterSize);
-     FontChange(cboGutterFont);
+		cbGutterFnt.Checked:=           Gutterfnt;
+		cboGutterFont.ItemIndex:=       cboGutterFont.Items.IndexOf(Gutterfont.Name);
+		cboGutterSize.Text:=            inttostr(GutterFont.Size);
+		FontSizeChange(cboGutterSize);
+		FontChange(cboGutterFont);
 
      cbGutterAuto.Checked:=          GutterAuto;
      cbGutterVis.Checked:=           GutterVis;
-     edGutterWidth.Value:=            GutterSize;
+     edGutterWidth.Value:=           GutterSize;
      cbLineNum.Checked:=             LineNumbers;
      cbLeadZero.Checked:=            LeadZero;
      cbFirstZero.Checked:=           FirstLineZero;
@@ -698,113 +687,103 @@ begin
      cpHighColor.SelectionColor :=   HighColor;
      cpHighColor.Enabled :=          cbHighCurrLine.Checked;
 
-     StrtoPoint(fGutColor, Syntax.Values[cGut]);
-     StrtoPoint(fbpColor, Syntax.Values[cBP]);
-     StrtoPoint(fErrColor, Syntax.Values[cErr]);
-     StrtoPoint(fABPColor, Syntax.Values[cABP]);
-     StrtoPoint(fSelColor, Syntax.Values[cSel]);
-   end;
+		StrtoPoint(fGutColor, Syntax.Values[cGut]);
+		StrtoPoint(fbpColor, Syntax.Values[cBP]);
+		StrtoPoint(fErrColor, Syntax.Values[cErr]);
+		StrtoPoint(fABPColor, Syntax.Values[cABP]);
+		StrtoPoint(fSelColor, Syntax.Values[cSel]);
+	end;
 
-  CheckAssoc;
+	for idx:= 0 to pred(cpp.AttrCount) do begin
+		aName:= cpp.Attribute[idx].Name;
+		a:= devEditor.Syntax.IndexOfName(aName);
+		if a <> -1 then begin
+			Attr:= TSynHighlighterAttributes.Create(aName);
+			try
+				StrtoAttr(Attr, devEditor.Syntax.Values[aName]);
+				cpp.Attribute[idx].Assign(attr);
+			finally
+				Attr.Free;
+			end;
+		end else
+			devEditor.Syntax.Append(aName);
+	end;
 
-  for idx:= 0 to pred(cpp.AttrCount) do
-   begin
-     aName:= cpp.Attribute[idx].Name;
-     a:= devEditor.Syntax.IndexOfName(aName);
-     if a <> -1 then
-      begin
-        Attr:= TSynHighlighterAttributes.Create(aName);
-        try
-          StrtoAttr(Attr, devEditor.Syntax.Values[aName]);
-          cpp.Attribute[idx].Assign(attr);
-        finally
-          Attr.Free;
-        end;
-      end
-     else
-      devEditor.Syntax.Append(aName);
-   end;
-  ElementList.Clear;
-  for idx:= 0 to pred(cpp.AttrCount) do
-   ElementList.Items.Append(cpp.Attribute[idx].Name);
+	ElementList.Clear;
+	for idx:= 0 to pred(cpp.AttrCount) do
+		ElementList.Items.Append(cpp.Attribute[idx].Name);
 
-   // selection color
-  if devEditor.Syntax.IndexofName(cSel) = -1 then
-   devEditor.Syntax.Append(cSel);
-  ElementList.Items.Append(cSel);
+	// selection color
+	if devEditor.Syntax.IndexofName(cSel) = -1 then
+		devEditor.Syntax.Append(cSel);
+	ElementList.Items.Append(cSel);
 
-   // right margin
+	// right margin
 
-  // gutter colors
-  if devEditor.Syntax.IndexofName(cGut) = -1 then
-   devEditor.Syntax.Append(cGut);
-  ElementList.Items.Append(cGut);
+	// gutter colors
+	if devEditor.Syntax.IndexofName(cGut) = -1 then
+		devEditor.Syntax.Append(cGut);
+	ElementList.Items.Append(cGut);
 
-  // breakpoint
-  if devEditor.Syntax.IndexOfName(cBP) = -1 then
-   devEditor.Syntax.Append(cBP);
-  ElementList.Items.Append(cBP);
+	// breakpoint
+	if devEditor.Syntax.IndexOfName(cBP) = -1 then
+		devEditor.Syntax.Append(cBP);
+	ElementList.Items.Append(cBP);
 
-  // error line
-  if devEditor.Syntax.IndexOfName(cErr) = -1 then
-   devEditor.Syntax.Append(cErr);
-  ElementList.Items.Append(cErr);
+	// error line
+	if devEditor.Syntax.IndexOfName(cErr) = -1 then
+		devEditor.Syntax.Append(cErr);
+	ElementList.Items.Append(cErr);
 
-  // active breakpoint
-  if devEditor.Syntax.IndexOfName(cABP) = -1 then
-   devEditor.Syntax.Append(cABP);
-  ElementList.Items.Append(cABP);
+	// active breakpoint
+	if devEditor.Syntax.IndexOfName(cABP) = -1 then
+		devEditor.Syntax.Append(cABP);
+	ElementList.Items.Append(cABP);
 
-  ffgColor:= cpp.WhitespaceAttribute.Foreground;
-  fbgColor:= cpp.WhitespaceAttribute.Background;
+	ffgColor:= cpp.WhitespaceAttribute.Foreground;
+	fbgColor:= cpp.WhitespaceAttribute.Background;
 
-  if ElementList.Items.Count> 0 then
-   begin
-     ElementList.ItemIndex:= 0;
-     ElementListClick(nil);
-   end;
+	if ElementList.Items.Count> 0 then begin
+		ElementList.ItemIndex:= 0;
+		ElementListClick(nil);
+	end;
 
-  // init gutter colors 
-  SetGutter;
-  if FileExists(devDirs.Config + DEV_DEFAULTCODE_FILE) then
-   seDefault.Lines.LoadFromFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
+	// init gutter colors
+	SetGutter;
+	if FileExists(devDirs.Config + DEV_DEFAULTCODE_FILE) then
+		seDefault.Lines.LoadFromFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
 
-  // CODE_COMPLETION //
-  chkEnableCompletion.OnClick:=nil;
-  chkEnableCompletion.Checked:=devCodeCompletion.Enabled;
-  chkEnableCompletion.OnClick:=chkEnableCompletionClick;
-  tbCompletionDelay.Position:=devCodeCompletion.Delay;
-  cpCompletionBackground.SelectionColor:=devCodeCompletion.BackColor;
-  tbCompletionDelay.Enabled:=chkEnableCompletion.Checked;
-  cpCompletionBackground.Enabled:=chkEnableCompletion.Checked;
-  chkCCCache.Checked:=devCodeCompletion.UseCacheFiles;
-  chkCCCache.Tag:=0; // mark un-modified
-  chkCCCache.Enabled:=chkEnableCompletion.Checked;
-  lbCCC.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
-  btnCCCnew.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
-  btnCCCdelete.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
+	// CODE_COMPLETION
+	chkEnableCompletion.OnClick:=nil;
+	chkEnableCompletion.Checked:=devCodeCompletion.Enabled;
+	chkEnableCompletion.OnClick:=chkEnableCompletionClick;
+	tbCompletionDelay.Position:=devCodeCompletion.Delay;
+	cpCompletionBackground.SelectionColor:=devCodeCompletion.BackColor;
+	tbCompletionDelay.Enabled:=chkEnableCompletion.Checked;
+	cpCompletionBackground.Enabled:=chkEnableCompletion.Checked;
+	chkCCCache.Checked:=devCodeCompletion.UseCacheFiles;
+	chkCCCache.Tag:=0; // mark un-modified
+	chkCCCache.Enabled:=chkEnableCompletion.Checked;
+	lbCCC.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
+	btnCCCnew.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
+	btnCCCdelete.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
 
-  // CLASS_BROWSING //
-  chkEnableClassBrowser.Checked:=devClassBrowsing.Enabled;
-  ClassBrowser1.Enabled:=chkEnableClassBrowser.Checked;
-  ClassBrowser1.UseColors:=devClassBrowsing.UseColors;
-  ClassBrowser1.ShowInheritedMembers:=devClassBrowsing.ShowInheritedMembers;
-  ClassBrowser1.ShowSampleData;
-  chkCBParseLocalH.Checked:= devClassBrowsing.ParseLocalHeaders;
-  chkCBParseGlobalH.Checked:= devClassBrowsing.ParseGlobalHeaders;
-  chkCBParseLocalH.Enabled:= chkEnableClassBrowser.Checked;
-  chkCBParseGlobalH.Enabled:= chkEnableClassBrowser.Checked;
-  chkCBUseColors.Checked:= devClassBrowsing.UseColors;
-  chkCBShowInherited.Checked:= devClassBrowsing.ShowInheritedMembers;
-  chkCBUseColors.Enabled:= chkEnableClassBrowser.Checked;
-  chkEnableCompletion.Enabled:=chkEnableClassBrowser.Checked;
-  tbCompletionDelay.Enabled:=chkEnableClassBrowser.Checked;
-  cpCompletionBackground.Enabled:=chkEnableClassBrowser.Checked;
-end;
-
-//check file associations
-procedure TEditorOptForm.CheckAssoc;
-begin
+	// CLASS_BROWSING
+	chkEnableClassBrowser.Checked:=devClassBrowsing.Enabled;
+	ClassBrowser1.Enabled:=chkEnableClassBrowser.Checked;
+	ClassBrowser1.UseColors:=devClassBrowsing.UseColors;
+	ClassBrowser1.ShowInheritedMembers:=devClassBrowsing.ShowInheritedMembers;
+	ClassBrowser1.ShowSampleData;
+	chkCBParseLocalH.Checked:= devClassBrowsing.ParseLocalHeaders;
+	chkCBParseGlobalH.Checked:= devClassBrowsing.ParseGlobalHeaders;
+	chkCBParseLocalH.Enabled:= chkEnableClassBrowser.Checked;
+	chkCBParseGlobalH.Enabled:= chkEnableClassBrowser.Checked;
+	chkCBUseColors.Checked:= devClassBrowsing.UseColors;
+	chkCBShowInherited.Checked:= devClassBrowsing.ShowInheritedMembers;
+	chkCBUseColors.Enabled:= chkEnableClassBrowser.Checked;
+	chkEnableCompletion.Enabled:=chkEnableClassBrowser.Checked;
+	tbCompletionDelay.Enabled:=chkEnableClassBrowser.Checked;
+	cpCompletionBackground.Enabled:=chkEnableClassBrowser.Checked;
 end;
 
 procedure TEditorOptForm.btnOkClick(Sender: TObject);
@@ -1379,16 +1358,14 @@ begin
     Compare:= -1;
 end;
 
-procedure TEditorOptForm.lvCodeinsSelectItem(Sender: TObject;
-  Item: TListItem; Selected: Boolean);
+procedure TEditorOptForm.lvCodeinsSelectItem(Sender: TObject;Item: TListItem; Selected: Boolean);
 begin
   Codeins.ClearAll;
   CodeIns.Text:= StrtoCodeIns(Item.SubItems[2]);
   UpdateCIButtons;
 end;
 
-procedure TEditorOptForm.CodeInsStatusChange(Sender: TObject;
-  Changes: TSynStatusChanges);
+procedure TEditorOptForm.CodeInsStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
   if assigned(lvCodeIns.Selected) then
    if (Changes * [scModified] <> []) then
@@ -1445,14 +1422,13 @@ end;
 
 procedure TEditorOptForm.chkEnableCompletionClick(Sender: TObject);
 begin
-  with chkEnableCompletion do
-  begin
-    tbCompletionDelay.Enabled := Checked;
-    cpCompletionBackground.Enabled := Checked;
-    chkCCCache.Checked := chkCCCache.Checked and Checked;
-    chkCCCache.Enabled := Checked;
-    chkCCCacheClick(Self);
-  end;
+	with chkEnableCompletion do begin
+		tbCompletionDelay.Enabled := Checked;
+		cpCompletionBackground.Enabled := Checked;
+		chkCCCache.Checked := chkCCCache.Checked and Checked;
+		chkCCCache.Enabled := Checked;
+		chkCCCacheClick(Self);
+	end;
 end;
 
 procedure TEditorOptForm.chkEnableClassBrowserClick(Sender: TObject);

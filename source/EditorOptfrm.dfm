@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 457
-  Top = 252
+  Left = 1223
+  Top = 543
   HelpType = htKeyword
   BorderStyle = bsDialog
   Caption = 'Editor Options'
@@ -30,7 +30,7 @@ object EditorOptForm: TEditorOptForm
     Top = 8
     Width = 415
     Height = 365
-    ActivePage = tabSyntax
+    ActivePage = tabClassBrowsing
     Anchors = [akLeft, akTop, akRight, akBottom]
     OnChange = PagesMainChange
     OnKeyDown = FormKeyDown
@@ -624,6 +624,7 @@ object EditorOptForm: TEditorOptForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 2
+      Visible = False
       Caption = 'Syntax'
       object cpForeground: TColorPickerButton
         Left = 161
@@ -1078,7 +1079,6 @@ object EditorOptForm: TEditorOptForm
       Align = alClient
       BevelKind = bkTile
       TabOrder = 4
-      Visible = False
       Caption = 'Class browsing'
       object chkEnableClassBrowser: TCheckBox
         Left = 8

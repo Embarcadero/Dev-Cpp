@@ -3,4 +3,4 @@ upx -9 --compress-icons=0 devcpp.exe
 
 otherwise upx will compress all icons (but the first one)
 and the file associations will point to nonexisting icons
-within the devcpp.exe
+within devcpp.exe

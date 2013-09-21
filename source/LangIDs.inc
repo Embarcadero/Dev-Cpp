@@ -1103,6 +1103,7 @@ const
   ID_POPT_USECUSTOMMAKEFILE        = 3224;
   ID_POPT_INFOCUSTOMMAKEFILE       = 3225;
   ID_POPT_INCFILEMAKEFILE          = 3226;
+  ID_POPT_SYNCPRODUCT              = 3227;
   // free to 3400
 
   // New compilter options

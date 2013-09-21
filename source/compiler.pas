@@ -967,8 +967,7 @@ begin
 			{ Make errors }
 			if (Pos('make.exe: ***', LowerLine) > 0) and (Pos('Clock skew detected. Your build may be incomplete',Line) <= 0) then begin
 				cpos := Length('make.exe: ***');
-				O_Msg := '[Build Error] ' + Copy(Line, cpos + 1, Length(Line) - cpos);
-
+				O_Msg := '[Build Error] ' + Copy(Line, cpos + 2, Length(Line) - cpos - 1);
 				if Assigned(fProject) then
 					O_File := Makefile
 				else
@@ -1103,17 +1102,20 @@ begin
 			end;
 
 			{ foo.cpp: In method `bool MyApp::Bar()': }
-			cpos := GetLastPos('In method `', Line);
+			cpos := GetLastPos('In method ''', Line);
 			// GCC >= 3.2 support
 			if cpos <= 0 then
 				{ foo.cpp: In member function `bool MyApp::Bar()': }
-				cpos := GetLastPos('In member function `', Line);
+				cpos := GetLastPos('In member function ''', Line);
+			if cpos <= 0 then
+				{ foo.cpp: In member function `bool MyApp::Bar()': }
+				cpos := GetLastPos('In static member function ''', Line);
 			if cpos <= 0 then
 				{ foo.cpp: In constructor `MyApp::MyApp()': }
-				cpos := GetLastPos('In constructor `', Line);
+				cpos := GetLastPos('In constructor ''', Line);
 			if cpos <= 0 then
 				{ foo.cpp: In destructor `MyApp::MyApp()': }
-				cpos := GetLastPos('In destructor `', Line);
+				cpos := GetLastPos('In destructor ''', Line);
 			if cpos > 0 then begin
 				O_Msg := Copy(Line, cpos, Length(Line) - cpos + 1);
 				Delete(Line, cpos - 2, Length(Line) - cpos + 3);

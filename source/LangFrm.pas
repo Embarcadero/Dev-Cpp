@@ -264,6 +264,7 @@ begin
 			devClassBrowsing.Enabled := true;
 			devClassBrowsing.ParseLocalHeaders := true;
 			devClassBrowsing.ParseGlobalHeaders := false;
+			devClassBrowsing.ShowInheritedMembers := true;
 		end;
 		OkBtn.Tag := 3;
 		OkBtn.Kind := bkOK;

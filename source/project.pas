@@ -171,7 +171,6 @@ type
 
    property UseCustomMakefile: boolean read fUseCustomMakefile write SetUseCustomMakefile;
    property CustomMakefile: string read fCustomMakefile write SetCustomMakefile;
-  public
    constructor Create(nFileName, nName : string);
    destructor Destroy; override;
    function NewUnit(NewProject : boolean; CustomFileName: string = ''): integer;
@@ -880,6 +879,7 @@ begin
         fOptions.VersionInfo.ProductName:=      Read('ProductName',       Name);
         fOptions.VersionInfo.ProductVersion:=   Read('ProductVersion',    '0.1');
         fOptions.VersionInfo.AutoIncBuildNr:=   Read('AutoIncBuildNr',    False);
+        fOptions.VersionInfo.SyncProduct:=      Read('SyncProduct',    False);
       end
      else
       begin // dev-c < 4
@@ -962,6 +962,7 @@ begin
      Write('ProductName',       fOptions.VersionInfo.ProductName);
      Write('ProductVersion',    fOptions.VersionInfo.ProductVersion);
      Write('AutoIncBuildNr',    fOptions.VersionInfo.AutoIncBuildNr);
+     Write('SyncProduct',       fOptions.VersionInfo.SyncProduct);
 
      Section:= 'Project';
 
@@ -1440,38 +1441,36 @@ end;
 
 function TProject.GetExecutableName : string;
 var
-  Base: string;
+	Base: string;
 begin
-  if fOptions.OverrideOutput and (fOptions.OverridenOutput<>'') then
-    Base:=ExtractFilePath(Filename)+fOptions.OverridenOutput
-  else
-    Base:=ChangeFileExt(Filename, '');
+	if fOptions.OverrideOutput and (fOptions.OverridenOutput<>'') then
+		Base:=ExtractFilePath(Filename)+fOptions.OverridenOutput
+	else
+		Base:=ChangeFileExt(Filename, '');
 
-  // only mess with file extension if not supplied by the user
-  // if he supplied one, then we assume he knows what he's doing...
-  if ExtractFileExt(Base)='' then begin
-    if fOptions.typ = dptStat then
-      result := ChangeFileExt(Base, LIB_EXT)
-    else if fOptions.typ = dptDyn then
-      result := ChangeFileExt(Base, DLL_EXT)
-    else
-      result := ChangeFileExt(Base, EXE_EXT);
-  end
-  else
-    result := Base;
+	// only mess with file extension if not supplied by the user
+	// if he supplied one, then we assume he knows what he's doing...
+	if ExtractFileExt(Base)='' then begin
+		if fOptions.typ = dptStat then
+			result := ChangeFileExt(Base, LIB_EXT)
+		else if fOptions.typ = dptDyn then
+			result := ChangeFileExt(Base, DLL_EXT)
+		else
+ 			result := ChangeFileExt(Base, EXE_EXT);
+	end else
+		result := Base;
 
-  if Length(Options.ExeOutput) > 0 then begin
-      if not DirectoryExists(Options.ExeOutput) then
-        try
-          SysUtils.ForceDirectories(Options.ExeOutput);
-        except
-          MessageDlg('Could not create executable output directory: "'
-            + Options.ExeOutput + '". Please check your settings', mtWarning, [mbOK], 0);
-          exit;
-        end;
-      Result := GetRealPath(IncludeTrailingPathDelimiter(Options.ExeOutput) +
-        ExtractFileName(Result));
-  end;
+	if Length(Options.ExeOutput) > 0 then begin
+		// MAAK HIER VOLLEDIG PAD
+		if not DirectoryExists(Directory + Options.ExeOutput) then
+			try
+				SysUtils.ForceDirectories(Directory + Options.ExeOutput);
+			except
+				MessageDlg('Could not create executable output directory: "' + Options.ExeOutput + '". Please check your access settings.', mtWarning, [mbOK], 0);
+				exit;
+			end;
+		result := GetRealPath(IncludeTrailingPathDelimiter(Directory + Options.ExeOutput) + ExtractFileName(Result));
+	end;
 end;
 
 function TProject.GetFullUnitFileName(const index: integer): string;
@@ -1989,25 +1988,25 @@ end;
 
 procedure TProject.SortUnitsByPriority;
 var
-  I: integer;
-  tmpU: TProjUnit;
-  Again: boolean;
+	I: integer;
+	tmpU: TProjUnit;
+	Again: boolean;
 begin
-  repeat
-    I:=0;
-    Again:=False;
-    while I < Units.Count-1 do begin
-      if Units[I+1].Priority < Units[I].Priority then begin
-        tmpU:=TProjUnit.Create(Self);
-        tmpU.Assign(Units[I]);
-        Units[I].Assign(Units[I+1]);
-        Units[I+1].Assign(tmpU);
-        tmpU.Free;
-        Again:=True;
-      end;
-      Inc(I);
-    end;
-  until not Again;
+	repeat
+		I:=0;
+		Again:=False;
+		while I < Units.Count-1 do begin
+			if Units[I+1].Priority < Units[I].Priority then begin
+				tmpU:=TProjUnit.Create(Self);
+				tmpU.Assign(Units[I]);
+				Units[I].Assign(Units[I+1]);
+				Units[I+1].Assign(tmpU);
+				tmpU.Free;
+				Again:=True;
+			end;
+			Inc(I);
+		end;
+	until not Again;
 end;
 
 procedure TProject.SetCmdLineArgs(const Value: string);
@@ -2020,16 +2019,19 @@ end;
 
 procedure TProject.IncrementBuildNumber;
 begin
-  Inc(fOptions.VersionInfo.Build);
-  SetModified(True);
+	Inc(fOptions.VersionInfo.Build);
+	fOptions.VersionInfo.FileVersion := Format('%d.%d.%d.%d', [fOptions.VersionInfo.Major,fOptions.VersionInfo.Minor,fOptions.VersionInfo.Release,fOptions.VersionInfo.Build]);
+	if(fOptions.VersionInfo.SyncProduct) then
+		fOptions.VersionInfo.ProductVersion := Format('%d.%d.%d.%d', [fOptions.VersionInfo.Major,fOptions.VersionInfo.Minor,fOptions.VersionInfo.Release,fOptions.VersionInfo.Build]);
+	SetModified(True);
 end;
 
 procedure TProject.SetCustomMakefile(const Value: string);
 begin
-  if (Value<>fCustomMakefile) then begin
-    fCustomMakefile := Value;
-    SetModified(true);
-  end;
+	if (Value<>fCustomMakefile) then begin
+		fCustomMakefile := Value;
+		SetModified(true);
+	end;
 end;
 
 procedure TProject.SetUseCustomMakefile(const Value: boolean);
@@ -2050,16 +2052,17 @@ end;
 
 destructor TUnitList.Destroy;
 var
- idx: integer;
+	I: integer;
 begin
-  for idx:= pred(fList.Count) downto 0 do Remove(0);
-  fList.Free;
-  inherited;
+	for I:= pred(fList.Count) downto 0 do
+		Remove(0);
+	fList.Free;
+	inherited;
 end;
 
 function TUnitList.Add(aunit: TProjUnit): integer;
 begin
-  result:= fList.Add(aunit);
+	result:= fList.Add(aunit);
 end;
 
 procedure TUnitList.Remove(index: integer);
@@ -2091,23 +2094,23 @@ end;
 
 function TUnitList.Indexof(FileName: string): integer;
 var
-  s1, s2: String;
+	s1, s2: String;
 begin
-  for result:= 0 to pred(fList.Count) do
-  begin
-     s1 := GetRealPath(TProjUnit(fList[result]).FileName,
-       TProjUnit(fList[result]).fParent.Directory);
-     s2 := GetRealPath(FileName, TProjUnit(fList[result]).fParent.Directory);
-     if CompareText(s1, s2) = 0 then exit;
-  end;
-  result:= -1;
+	for result:= 0 to pred(fList.Count) do begin
+		s1 := GetRealPath(TProjUnit(fList[result]).FileName,TProjUnit(fList[result]).fParent.Directory);
+		s2 := GetRealPath(FileName, TProjUnit(fList[result]).fParent.Directory);
+		if CompareText(s1, s2) = 0 then
+			exit;
+	end;
+	result:= -1;
 end;
 
 function TUnitList.Indexof(Node: TTreeNode): integer;
 begin
-  for result:= 0 to pred(fList.Count) do
-   if TProjUnit(fList[result]).Node = Node then exit;
-  result:= -1;
+	for result:= 0 to pred(fList.Count) do
+		if TProjUnit(fList[result]).Node = Node then
+			exit;
+	result:= -1;
 end;
 
 
@@ -2220,10 +2223,10 @@ end;
 
 procedure TdevINI.UpdateFile;
 begin
-  {$WARN SYMBOL_PLATFORM OFF}
-  if not FileExists(FileName) or (FileExists(FileName) and (FileGetAttr(FileName) and faReadOnly = 0)) then
-  {$WARN SYMBOL_PLATFORM ON}
-    fINIFile.UpdateFile;
+{$WARN SYMBOL_PLATFORM OFF}
+	if not FileExists(FileName) or (FileExists(FileName) and (FileGetAttr(FileName) and faReadOnly = 0)) then
+{$WARN SYMBOL_PLATFORM ON}
+		fINIFile.UpdateFile;
 end;
 
 procedure TdevINI.ClearSection(const Section: string = '');

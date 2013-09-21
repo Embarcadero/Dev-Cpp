@@ -1960,8 +1960,7 @@ begin
 		 if Execute then
 		 begin
 				s:= FileName;
-				if FileExists(s) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],
-															mtWarning, [mbYes, mbNo], 0) = mrNo) then
+				if FileExists(s) and (MessageDlg(Lang[ID_MSG_FILEEXISTS],mtWarning, [mbYes, mbNo], 0) = mrNo) then
 					exit;
 
 				e.FileName := s;
@@ -3516,17 +3515,9 @@ var
  i: Integer;
 begin
 	Result := False;
-	if (Assigned(fProject)) and (fProject.Units.Count = 0) then
-	begin
-			Application.MessageBox(
-				'Why in the world are you trying to compile an empty project? ;-)',
-{$IFDEF WIN32}
-				'Huh?', MB_ICONINFORMATION);
-{$ENDIF}
-{$IFDEF LINUX}
-				'Huh?', [smbOK], smsInformation);
-{$ENDIF}
-			Exit;
+	if (Assigned(fProject)) and (fProject.Units.Count = 0) then begin
+		MessageDlg('Why in the world are you trying to compile an empty project? ;-)', mtWarning,[mbOK], 0);
+		Exit;
 	end;
 
 	LogOutput.Clear;
@@ -3535,16 +3526,12 @@ begin
 	ResSheet.Highlighted := false;
 	SizeFile.Text:= '';
 	TotalErrors.Text:= '0';
-	//if actCompOutput.Checked or actCompOnNeed.Checked then
-	// begin
 
 	if not devData.ShowProgress then begin
 		// if no compile progress window, open the compiler output
 		 OpenCloseMessageSheet(True);
 		 MessageControl.ActivePage:= LogSheet;
 	end;
-
-	// end;
 
 	e:= GetEditor;
 	fCompiler.Target:= ctNone;
@@ -3553,35 +3540,28 @@ begin
 		// no matter if the editor file is not in project,
 		// the target is ctProject since we have a project open...
 		fCompiler.Target:= ctProject
-	else
-	 if assigned(e) and
-		(GetFiletyp(e.Filename) in [utSrc, utRes]) or e.new then
+	else if assigned(e) and (GetFiletyp(e.Filename) in [utSrc, utRes]) or e.new then
 		fCompiler.Target:= ctFile;
 
-	if fCompiler.Target = ctFile then
-	 begin
-		 if not SaveFile(e) then
-				 Exit;
-		 fCompiler.SourceFile:= e.FileName;
-	 end
-	else
-	 if fCompiler.Target = ctProject then
-	 begin
-			 actSaveAllExecute(Self);
-			 for i := 0 to pred(PageControl.PageCount) do
-			 begin
-					 e := GetEditor(i);
-					 if (e.InProject) and (e.Modified) then
-							 Exit;
-			 end;
-	 end;
+	if fCompiler.Target = ctFile then begin
+		if not SaveFile(e) then
+				Exit;
+		fCompiler.SourceFile:= e.FileName;
+	end else if fCompiler.Target = ctProject then begin
+		actSaveAllExecute(Self);
+		for i := 0 to pred(PageControl.PageCount) do begin
+			e := GetEditor(i);
+			if (e.InProject) and (e.Modified) then
+				Exit;
+		end;
+	end;
 
 	fCompiler.PerfectDepCheck := not devCompiler.FastDep;
 
 	if Assigned(fProject) then begin
-			if fProject.Options.VersionInfo.AutoIncBuildNr then
-				fProject.IncrementBuildNumber;
-			fProject.BuildPrivateResource;
+		if fProject.Options.VersionInfo.AutoIncBuildNr then
+			fProject.IncrementBuildNumber;
+		fProject.BuildPrivateResource;
 	end;
 
 	Result := True;
@@ -3589,8 +3569,7 @@ end;
 
 procedure TMainForm.actCompileExecute(Sender: TObject);
 begin
-	if fCompiler.Compiling then
-	begin
+	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
 	end;
@@ -3609,52 +3588,46 @@ begin
 	e:= GetEditor;
 	fCompiler.Target:= ctNone;
 
-	if assigned(fProject) then
-	 begin
-		 if assigned(e) and (not e.InProject) then
+	if assigned(fProject) then begin
+		if assigned(e) and (not e.InProject) then
 			fCompiler.Target:= ctFile
-		 else
+		else
 			fCompiler.Target:= ctProject;
-	 end
-	else
-	 if assigned(e) then
+	end else if assigned(e) then
 		fCompiler.Target:= ctFile;
 
 	if fCompiler.Target = ctFile then
-	 fCompiler.SourceFile:= e.FileName;
+		fCompiler.SourceFile:= e.FileName;
 
 	fCompiler.Run;
 end;
 
 procedure TMainForm.actCompRunExecute(Sender: TObject);
 begin
-	if fCompiler.Compiling then
-	begin
-			MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
-			Exit;
+	if fCompiler.Compiling then begin
+		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
+		Exit;
 	end;
 	if not PrepareForCompile then
-			Exit;
+		Exit;
 	fCompiler.CompileAndRun;
 end;
 
 procedure TMainForm.actRebuildExecute(Sender: TObject);
 begin
-	if fCompiler.Compiling then
-	begin
-			MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
-			Exit;
+	if fCompiler.Compiling then begin
+		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
+		Exit;
 	end;
 	if not PrepareForCompile then
-			Exit;
+		Exit;
 	fCompiler.RebuildAll;
 	Application.ProcessMessages;
 end;
 
 procedure TMainForm.actCleanExecute(Sender: TObject);
 begin
-	if fCompiler.Compiling then
-	begin
+	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
 	end;
@@ -6023,9 +5996,6 @@ begin
 		ExecuteFile(aFile, '', devDirs.Help, SW_SHOW)
 	else begin
 		Application.HelpFile := aFile;
-		// moving this to WordToHelpKeyword
-		// it's annoying to display the index when the topic has been found and is already displayed...
-//		Application.HelpCommand(HELP_FINDER, 0);
 		WordToHelpKeyword;
 	end;
 end;
@@ -6125,8 +6095,7 @@ begin
 	if devData.DblFiles then begin
 		ProjectView.HotTrack:=False;
 		ProjectView.MultiSelect:=True;
-	end
-	else begin
+	end else begin
 		ProjectView.HotTrack:=True;
 		ProjectView.MultiSelect:=False;
 	end;
@@ -6136,8 +6105,7 @@ procedure TMainForm.actCompileCurrentFileExecute(Sender: TObject);
 var
 	e: TEditor;
 begin
-	if fCompiler.Compiling then
-	begin
+	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
 	end;
@@ -6153,9 +6121,7 @@ end;
 
 procedure TMainForm.actCompileCurrentFileUpdate(Sender: TObject);
 begin
-	(Sender as TCustomAction).Enabled:= (assigned(fProject) and (PageControl.PageCount> 0)) and
-																			not devExecutor.Running and not fDebugger.Executing and
-																			not fCompiler.Compiling;
+	(Sender as TCustomAction).Enabled:= (assigned(fProject) and (PageControl.PageCount> 0)) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling;
 end;
 
 procedure TMainForm.actSaveProjectAsExecute(Sender: TObject);
@@ -6413,14 +6379,14 @@ begin
 	if assigned(fProject) and (fProject.Options.typ = dptDyn) then begin
 		(Sender as TCustomAction).Visible := true;
 		(Sender as TCustomAction).Enabled:= not devExecutor.Running;
-	end
-	else
+	end else
 		(Sender as TCustomAction).Visible := false;
 end;
 
 procedure TMainForm.actAttachProcessExecute(Sender: TObject);
-var idx : integer;
-		s : string;
+var
+	idx : integer;
+	s : string;
 begin
 	PrepareDebugger;
 	if assigned(fProject) then begin
