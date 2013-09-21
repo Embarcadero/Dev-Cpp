@@ -122,64 +122,42 @@ end;
 
 procedure TdevShortcuts.Load;
 var
-  I, x: integer;
-  Fini: TIniFile;
-  Entries: TList;
-  ms: PMenuAndShortcut;
-  sct: TShortCut;
-  SmenuOld, SmenuNew, Entry: AnsiString;
-  Found: boolean;
+	I: integer;
+	Fini: TIniFile;
+	item: TMenuItem;
+	entry, value: AnsiString;
+	shortcut: TShortCut;
 begin
-  if fOwner = nil then
-    Exit;
-  if (fFileName = '') or not FileExists(fFileName) then
-    Exit;
-  Entries:=TList.Create;
-  Fini := TIniFile.Create(fFileName);
-  try
-    for I := 0 to fOwner.ComponentCount - 1 do
-      if (fOwner.Components[I] is TMenuItem) then
-        if not TMenuItem(fOwner.Components[I]).IsLine then
-          if (TMenuItem(fOwner.Components[I]).Count = 0) then begin
-            SmenuOld := StripHotkey(TMenuItem(fOwner.Components[I]).Caption);
-            SmenuNew := StripHotkey(GetTopmostItemAncestor(TMenuItem(fOwner.Components[I])))+':'+SmenuOld;
-            Entry :=Fini.ReadString('Shortcuts', SmenuNew, '');
+	if fOwner = nil then
+		Exit;
+	if (fFileName = '') or not FileExists(fFileName) then
+		Exit;
 
-            Found:=False;
-            for x:=0 to Entries.Count-1 do begin
-              ms:=Entries[x];
-              if ms^.Caption=SmenuOld then begin
-                TMenuItem(fOwner.Components[I]).ShortCut:=ms^.Shortcut;
-                if Assigned(TMenuItem(fOwner.Components[I]).Action) then
-                  TAction(TMenuItem(fOwner.Components[I]).Action).ShortCut:=ms^.Shortcut;
-                found:=True;
-                Break;
-              end;
-            end;
-            if Found then
-              Continue;
+	// Read shortcuts for all menu items
+	Fini := TIniFile.Create(fFileName);
+	try
+		for I := 0 to fOwner.ComponentCount - 1 do begin
+			if (fOwner.Components[I] is TMenuItem) then begin
+				item := TMenuItem(fOwner.Components[I]);
+				if (not item.IsLine) and (item.Count = 0) then begin // don't process foldouts and separators
 
-            if Entry='' then
-              Entry :=Fini.ReadString('Shortcuts', SmenuOld, ShortCutToText(
-                TMenuItem(fOwner.Components[I]).ShortCut));
-            if Entry <> 'none' then
-              sct := TextToShortCut(Entry)
-            else
-              sct:=0;
-            TMenuItem(fOwner.Components[I]).ShortCut := sct;
-            if Assigned(TMenuItem(fOwner.Components[I]).Action) then
-              TAction(TMenuItem(fOwner.Components[I]).Action).ShortCut:=sct;
+					// Read entry from disk
+					entry := StripHotkey(GetTopmostItemAncestor(item)) + ':' + StripHotkey(item.Caption);
+					value := Fini.ReadString('Shortcuts', entry, ''); // shortcut in text format
+					if value <> 'none' then
+						shortcut := TextToShortCut(value)
+					else
+						shortcut := 0;
 
-            ms:=New(PMenuAndShortcut);
-            ms^.Caption:=SmenuOld;
-            ms^.Shortcut:=sct;
-            Entries.Add(ms);
-          end;
+					// Assign it
+					item.ShortCut := shortcut;
+					if Assigned(item.Action) then
+						TAction(item.Action).ShortCut := shortcut;
+				end;
+			end;
+		end;
 	finally
 		Fini.Free;
-		for I := 0 to Entries.Count - 1 do
-			Dispose(PMenuAndShortcut(Entries[i]));
-		Entries.Free;
 	end;
 end;
 
@@ -239,8 +217,7 @@ begin
 			Items[I].ShortCut := ShortCuts[I];
 			if Assigned(Items[I].Action) then
 				TAction(Items[I].Action).ShortCut := ShortCuts[I];
-			Smenu := StripHotkey(GetTopmostItemAncestor(Items[I]))+':'+
-			StripHotkey(Items[I].Caption);
+			Smenu := StripHotkey(GetTopmostItemAncestor(Items[I]))+':'+StripHotkey(Items[I].Caption);
 			Scut := ShortCutToText(ShortCuts[I]);
 			if Scut = '' then
 				Scut := 'none';

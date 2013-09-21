@@ -30,123 +30,114 @@ uses
 {$ENDIF}
 
 const
-	BoolValYesNo: array[boolean] of AnsiString = ('No', 'Yes');
-	ValueToChar: array[0..27] of char = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-                                         'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                                         's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+  BoolValYesNo: array[boolean] of AnsiString = ('No', 'Yes');
+  ValueToChar: array[0..27] of char = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+                                       'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+                                       's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
 type
-	// the comments are an example of the record
-	PCompilerOption = ^TCompilerOption;
+  // the comments are an example of the record
+  PCompilerOption = ^TCompilerOption;
 	TCompilerOption = record
-		Name: integer; // language table index of "Generate debugging info"
-		Section: integer; // language table index of "C options"
-		IsC: boolean;
-		IsCpp: boolean; // True (C++ option?) - can be both C and C++ option...
-		IsLinker: boolean; // Is it a linker param
-		Value: Integer; // True
-		Setting: AnsiString; // "-g3"
-		Choices : TStringList; // replaces "Yes/No" standard choices (max 30 different choices)
-	end;
+    Name: integer; // language table index of "Generate debugging info"
+    Section: integer; // language table index of "C options"
+    IsC: boolean;
+    IsCpp: boolean; // True (C++ option?) - can be both C and C++ option...
+    IsLinker: boolean; // Is it a linker param
+    Value: Integer; // True
+    Setting: AnsiString; // "-g3"
+    Choices : TStringList; // replaces "Yes/No" standard choices (max 30 different choices)
+  end;
 
-	// compiler-set configuration
-	TdevCompiler = class(TPersistent)
-	private
-		// Names of all compilers
-		fSets: TStrings;
-		fCurrentSet : integer;
+  // compiler-set configuration
+  TdevCompiler = class(TPersistent)
+  private
+    // Names of all compilers
+    fSets: TStrings;
+    fCurrentSet : integer;
 
-		// Exe Directories
-		fgccName : AnsiString;
-		fgppName : AnsiString;
-		fmakeName : AnsiString;
-		fgdbName : AnsiString;
-		fwindresName : AnsiString;
-		fdllwrapName : AnsiString;
-		fgprofName : AnsiString;
+    // Exe Directories
+    fgccName : AnsiString;
+    fgppName : AnsiString;
+    fmakeName : AnsiString;
+    fgdbName : AnsiString;
+    fwindresName : AnsiString;
+    fdllwrapName : AnsiString;
+    fgprofName : AnsiString;
 
-		// Folders
-		fBinDir : TStringList;
-		fCDir : TStringList;
-		fCppDir : TStringList;
-		fLibDir : TStringList;
+    // Folders
+    fBinDir : TStringList;
+    fCDir : TStringList;
+    fCppDir : TStringList;
+    fLibDir : TStringList;
 
-		// User Parameters
-		fCompAdd : boolean;
-		fLinkAdd : boolean;
-		fCompOpt : AnsiString;
-		flinkOpt : AnsiString;
+    // User Parameters
+    fCompAdd : boolean;
+    fLinkAdd : boolean;
+    fCompOpt : AnsiString;
+    flinkOpt : AnsiString;
 
-		fDelay : integer;
-		fFastDep : boolean;
+    fDelay : integer;
+    fFastDep : boolean;
+  public
 
-		function GetGCC : AnsiString;
-		function GetGPP : AnsiString;
-		function GetMake : AnsiString;
-		function GetGDB : AnsiString;
-		function GetWindres : AnsiString;
-		function GetDllWrap : AnsiString;
-		function GetGPROF : AnsiString;
+    fOptionString : AnsiString; // options in INI format
+    fOptionList: TList; // options in usable memory format
 
-	public
+    constructor Create;
+    destructor Destroy; override;
+    procedure SettoDefaults(const setname,dir : AnsiString);
 
-		fOptionString : AnsiString; // options in INI format
-		fOptionList: TList; // options in usable memory format
+    // Set stuff
+    procedure LoadSet(Index: integer);
+    procedure SaveSet(Index: integer);
+    procedure EraseSet(Index: integer);
+    procedure ClearSet;
+    procedure ValidateSet;
+    procedure AddSet(const Name,Folder : AnsiString);
 
-		constructor Create;
-		destructor Destroy; override;
-		procedure SettoDefaults(const setname,dir : AnsiString);
+    procedure ReadSets;
+    procedure WriteSets;
+    procedure FindSets;
 
-		// Set stuff
-		procedure LoadSet(Index: integer);
-		procedure SaveSet(Index: integer);
-		procedure EraseSet(Index: integer);
-		procedure ClearSet;
-		procedure ValidateSet;
-		procedure AddSet(const Name,Folder : AnsiString);
+    property Sets: TStrings read fSets write fSets;
+    property CurrentSet: integer read fCurrentSet write fCurrentSet;
 
-		procedure ReadSets;
-		procedure WriteSets;
-		procedure FindSets;
+    // Option utils
+    procedure AddDefaultOptions;
+    procedure AddOption(Name, Section: integer; IsC, IsCpp, IsLinker: boolean; Value: integer;const Setting : AnsiString; Choices: TStringList);
+    function FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
+    procedure SetOption(option : PCompilerOption; newvalue : char); overload;
+    procedure SetOption(index : integer; newvalue : char); overload;
 
-		property Sets: TStrings read fSets write fSets;
-		property CurrentSet: integer read fCurrentSet write fCurrentSet;
+    // converts
+    procedure OptionStringToList(var input : AnsiString);
+    procedure OptionListToString;
 
-		// Option utils
-		procedure AddDefaultOptions;
-		procedure AddOption(Name, Section: integer; IsC, IsCpp, IsLinker: boolean; Value: integer;const Setting : AnsiString; Choices: TStringList);
-		function FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
-		procedure SetOption(option : PCompilerOption; newvalue : char); overload;
-		procedure SetOption(index : integer; newvalue : char); overload;
+    // utils
+    function CharToValue(c : char) : integer;
 
-		// converts
-		procedure OptionStringToList(var input : AnsiString);
-		procedure OptionListToString;
+    property Delay: integer read fDelay write fDelay;
+    property FastDep: boolean read fFastDep write fFastDep;
 
-		// utils
-		function CharToValue(c : char) : integer;
+    property gccName: AnsiString read fgccName write fgccName;
+    property gppName: AnsiString read fgppName write fgppName;
+    property makeName: AnsiString read fmakeName write fmakeName;
+    property gdbName: AnsiString read fgdbName write fgdbName;
+    property windresName: AnsiString read fwindresName write fwindresName;
+    property dllwrapName: AnsiString read fdllwrapName write fdllwrapName;
+    property gprofName: AnsiString read fgprofName write fgprofName;
 
-		property Delay: integer read fDelay write fDelay;
-		property FastDep: boolean read fFastDep write fFastDep;
+    property BinDir: TStringList read fBinDir write fBinDir;
+    property CDir: TStringList read fCDir write fCDir;
+    property CppDir: TStringList read fCppDir write fCppDir;
+    property LibDir: TStringList read fLibDir write fLibDir;
 
-		property gccName: AnsiString read GetGCC write fgccName;
-		property gppName: AnsiString read GetGPP write fgppName;
-		property makeName: AnsiString read GetMake write fmakeName;
-		property gdbName: AnsiString read GetGDB write fgdbName;
-		property windresName: AnsiString read GetWindres write fwindresName;
-		property dllwrapName: AnsiString read GetDllWrap write fdllwrapName;
-		property gprofName: AnsiString read GetGPROF write fgprofName;
-
-		property BinDir: TStringList read fBinDir write fBinDir;
-		property CDir: TStringList read fCDir write fCDir;
-		property CppDir: TStringList read fCppDir write fCppDir;
-		property LibDir: TStringList read fLibDir write fLibDir;
-
-		property AddtoComp: boolean read fCompAdd write fCompAdd;
-		property AddtoLink: boolean read fLinkAdd write fLinkAdd;
-		property CompOpts: AnsiString read fCompOpt write fCompOpt;
-		property LinkOpts: AnsiString read fLinkOpt write fLinkOpt;
-	end;
+    property AddtoComp: boolean read fCompAdd write fCompAdd;
+    property AddtoLink: boolean read fLinkAdd write fLinkAdd;
+    property CompOpts: AnsiString read fCompOpt write fCompOpt;
+    property LinkOpts: AnsiString read fLinkOpt write fLinkOpt;
+  end;
 
   // code-completion window size and other config
   TdevCodeCompletion = class(TPersistent)
@@ -400,6 +391,28 @@ type
     property CompleteSymbols: boolean read fCompleteSymbols write fCompleteSymbols;
   end;
 
+  TWindowState = class(TPersistent)
+  private
+    fLeft: integer;
+    fTop: integer;
+    fRight: integer;
+    fBottom: integer;
+    fShowCmd: integer;
+    fFlags: integer;
+    fStruct: TWindowPlacement; // don't store on disk!
+  public
+    constructor Create;
+    procedure GetPlacement(Source : HWND);
+    procedure SetPlacement(Destination : HWND);
+  published
+    property Left : integer read fLeft write fLeft; // TWindowPlacement parts
+    property Top : integer read fTop write fTop;
+    property Right : integer read fRight write fRight;
+    property Bottom : integer read fBottom write fBottom;
+    property ShowCmd : integer read fShowCmd write fShowCmd;
+    property Flags : integer read fFlags write fFlags;
+  end;
+
   // master option object -- contains program globals
   TdevData = class(TConfigData)
   private
@@ -434,11 +447,9 @@ type
     fConsolePause : boolean;
 
     // TWindowPlacement parts
-    fWindowLeft: integer;
-    fWindowTop: integer;
-    fWindowRight: integer;
-    fWindowBottom: integer;
-    fWindowState: integer;
+    fWindowState: TWindowState;
+    fReportWindowState: TWindowState;
+    fProjectWindowState: TWindowState;
 
     fToolbarMain: boolean;            // These ones follow the enable/x-offset/y-offset patern
     fToolbarMainX: integer;
@@ -534,11 +545,9 @@ type
     property MultiLineTab: boolean read fMultiLineTab write fMultiLineTab;
 
     // TWindowPlacement parts
-    property WindowLeft : integer read fWindowLeft write fWindowLeft;
-    property WindowTop : integer read fWindowTop write fWindowTop;
-    property WindowRight : integer read fWindowRight write fWindowRight;
-    property WindowBottom : integer read fWindowBottom write fWindowBottom;
-    property WindowState : integer read fWindowState write fWindowState;
+    property WindowState : TWindowState read fWindowState write fWindowState;
+    property ReportWindowState : TWindowState read fReportWindowState write fReportWindowState;
+    property ProjectWindowState : TWindowState read fProjectWindowState write fProjectWindowState;
 
     //Running Status Options
     property DefCpp: boolean read fDefCpp write fDefCpp;
@@ -787,17 +796,21 @@ begin
 	result := fDevData; // assume constructor succeeded
 end;
 
-// add strings to lang file
 constructor TdevData.Create;
 begin
 	inherited Create;
-
+	fWindowState := TWindowState.Create;
+	fReportWindowState := TWindowState.Create;
+	fProjectWindowState := TWindowState.Create;
 	SettoDefaults;
 end;
 
 destructor TdevData.Destroy;
 begin
 	fdevData:= nil;
+	fWindowState.Free;
+	fReportWindowState.Free;
+	fProjectWindowState.Free;
 	inherited;
 end;
 
@@ -896,7 +909,7 @@ begin
 	fShowCPUSignal := true;
 	fCPURegisterCol1 := 70;
 	fCPURegisterCol2 := 104;
-	fCPURegisterCol3 := 8;
+	fCPURegisterCol3 := 10;
 
 	// Search stuff
 	fCaseSensitive := false;
@@ -910,6 +923,39 @@ begin
 	// Floating windows
 	fMessageFloat := false;
 	fProjectFloat := false;
+end;
+
+{ TWindowState }
+
+constructor TWindowState.Create;
+begin
+	inherited Create;
+	fStruct.length := sizeof(WINDOWPLACEMENT);
+	flags := -1; // -1 means GetWindowPlacement isn't called yet
+end;
+
+procedure TWindowState.GetPlacement(Source : HWND);
+begin
+	GetWindowPlacement(Source,@fStruct);
+	fLeft := fStruct.rcNormalPosition.Left;
+	fTop := fStruct.rcNormalPosition.Top;
+	fRight := fStruct.rcNormalPosition.Right;
+	fBottom := fStruct.rcNormalPosition.Bottom;
+	fShowCmd := fStruct.showCmd;
+	fFlags := fStruct.flags;
+end;
+
+procedure TWindowState.SetPlacement(Destination : HWND);
+begin
+	if flags <> -1 then begin
+		fStruct.rcNormalPosition.Left := fLeft;
+		fStruct.rcNormalPosition.Top := fTop;
+		fStruct.rcNormalPosition.Right := fRight;
+		fStruct.rcNormalPosition.Bottom := fBottom;
+		fStruct.showCmd := fShowCmd;
+		fStruct.flags := fFlags;
+		SetWindowPlacement(Destination,@fStruct);
+	end;
 end;
 
 { TdevCompiler }
@@ -1130,6 +1176,9 @@ begin
 			SaveSet(fCurrentSet);
 		end;
 	end;
+
+	// Don't bother checking exes if the dir is not set
+	if fBinDir.Count = 0 then Exit;
 
 	SetPath(fBinDir[0]);
 
@@ -1470,55 +1519,6 @@ begin
 		AddSet(compilername + ' 32-bit Debug','MinGW32');
 		AddSet(compilername + ' 32-bit Profiling','MinGW32');
 	end;
-end;
-
-function TdevCompiler.GetGCC : AnsiString;
-begin
-	result := fgccName;
-	if SameStr(result,'') then
-		result := GCC_PROGRAM;
-end;
-
-function TdevCompiler.GetGPP : AnsiString;
-begin
-	result := fgppName;
-	if SameStr(result,'') then
-		result := GPP_PROGRAM;
-end;
-
-function TdevCompiler.GetMake : AnsiString;
-begin
-	result := fmakeName;
-	if SameStr(result,'') then
-		result := MAKE_PROGRAM;
-end;
-
-function TdevCompiler.GetGDB : AnsiString;
-begin
-	result := fgdbname;
-	if SameStr(result,'') then
-		result := GDB_PROGRAM;
-end;
-
-function TdevCompiler.GetWindres : AnsiString;
-begin
-	result := fwindresname;
-	if SameStr(result,'') then
-		result := WINDRES_PROGRAM;
-end;
-
-function TdevCompiler.GetDllWrap : AnsiString;
-begin
-	result := fdllwrapname;
-	if SameStr(result,'') then
-		result := DLLWRAP_PROGRAM;
-end;
-
-function TdevCompiler.GetGPROF : AnsiString;
-begin
-	result := fgprofname;
-	if SameStr(result,'') then
-		result := GPROF_PROGRAM;
 end;
 
 procedure TdevCompiler.AddDefaultOptions;

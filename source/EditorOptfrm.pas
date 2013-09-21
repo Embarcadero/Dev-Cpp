@@ -710,7 +710,6 @@ procedure TEditorOptForm.btnOkClick(Sender: TObject);
 var
  s, aName: AnsiString;
  a, idx: integer;
- e : TEditor;
 begin
 	with devEditor do begin
 		AutoIndent:=          cbAutoIndent.Checked;
@@ -844,12 +843,14 @@ begin
 
 	SaveCodeIns;
 
-	devCodeCompletion.Enabled:=chkEnableCompletion.Checked;
-	devCodeCompletion.Delay:=tbCompletionDelay.Position;
-	devCodeCompletion.BackColor:=cpCompletionBackground.Selected;
-	devCodeCompletion.UseCacheFiles:=chkCCCache.Checked;
-	devCodeCompletion.ParseLocalHeaders:=chkCBParseLocalH.Checked;
-	devCodeCompletion.ParseGlobalHeaders:=chkCBParseGlobalH.Checked;
+	with devCodeCompletion do begin
+		Enabled:=chkEnableCompletion.Checked;
+		Delay:=tbCompletionDelay.Position;
+		BackColor:=cpCompletionBackground.Selected;
+		UseCacheFiles:=chkCCCache.Checked;
+		ParseLocalHeaders:=chkCBParseLocalH.Checked;
+		ParseGlobalHeaders:=chkCBParseGlobalH.Checked;
+	end;
 
 	// Properly configure the timer object
 	if not devEditor.EnableAutoSave then begin
@@ -872,20 +873,6 @@ begin
 
 	SaveOptions;
 	dmMain.LoadDataMod;
-
-	e := MainForm.GetEditor;
-	if Assigned(e) then begin
-
-		// Unpaint matching symbols
-		if not devEditor.Match then
-			e.PaintMatchingBrackets(ttBefore);
-
-		// Repaint highlighted line
-		if cbHighCurrLine.Checked then
-			e.Text.ActiveLineColor := cpHighColor.Selected
-		else
-			e.Text.ActiveLineColor := clNone;
-	end;
 end;
 
 procedure TEditorOptForm.btnHelpClick(Sender: TObject);

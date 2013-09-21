@@ -1,5 +1,6 @@
 Version 5.4.2 - *
 
+- As of RC3, Dev-C++ will now play nicely with old settings files instead of showing a 0px high window.
 - Fixed compiler default selection not being saved on first startup.
 - Dev-C++ will now suggest to disable DEP instead of crash when trying to execute data.
 - The compiler set validator will now not add any duplicate paths anymore.

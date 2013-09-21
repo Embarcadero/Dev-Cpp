@@ -276,7 +276,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 410
-          Height = 107
+          Height = 106
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -458,7 +458,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 8
+          Height = 7
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -2411,7 +2411,7 @@ object MainForm: TMainForm
     object actCompRun: TAction
       Tag = 3
       Category = 'Execute'
-      Caption = 'Compile &and Run'
+      Caption = 'Compile and Run'
       ImageIndex = 33
       ShortCut = 122
       OnExecute = actCompRunExecute

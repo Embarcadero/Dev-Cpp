@@ -962,8 +962,6 @@ begin
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
-var
-	fWindowPlacement : TWindowPlacement;
 begin
 	if assigned(fProject) then
 		actCloseProject.Execute;
@@ -996,20 +994,18 @@ begin
 	devData.ToolbarClassesX:=tbClasses.Left;
 	devData.ToolbarClassesY:=tbClasses.Top;
 
-	// Remember window placement
-	fWindowPlacement.length := sizeof(WINDOWPLACEMENT);
-	GetWindowPlacement(Self.Handle,@fWindowPlacement);
-	devData.WindowLeft := fWindowPlacement.rcNormalPosition.Left;
-	devData.WindowTop := fWindowPlacement.rcNormalPosition.Top;
-	devData.WindowRight := fWindowPlacement.rcNormalPosition.Right;
-	devData.WindowBottom := fWindowPlacement.rcNormalPosition.Bottom;
-	devData.WindowState := fWindowPlacement.showCmd;
-
 	// Save left page control states
 	devData.ProjectWidth := LeftPageControl.Width;
 	devData.OutputHeight := fPreviousHeight;
 	devData.ProjectFloat := Assigned(fProjectToolWindow) and fProjectToolWindow.Visible;
 	devData.MessageFloat := Assigned(fReportToolWindow) and fReportToolWindow.Visible;
+
+	// Remember window placement
+	devData.WindowState.GetPlacement(Self.Handle);
+	if Assigned(fProjectToolWindow) then
+		devData.ProjectWindowState.GetPlacement(fProjectToolWindow.Handle);
+	if Assigned(fReportToolWindow) then
+		devData.ReportWindowState.GetPlacement(fReportToolWindow.Handle);
 
 	// Save the options dir somewhere else cause we will need it after deleting devDirs
 	if fRemoveOptions then
@@ -2508,6 +2504,11 @@ begin
 				devEditor.AssignEditor(e.Text,e.FileName);
 				e.InitCompletion;
 			end;
+
+			// Repaint current editor
+			e := GetEditor;
+			if Assigned(e) then
+				e.Text.Repaint; // apply colors
 
 			// Cache options have changed...
 			if chkCCCache.Tag = 1 then begin
@@ -5137,8 +5138,7 @@ begin
 		Key := #0;
 end;
 
-procedure TMainForm.ProjectViewMouseDown(Sender: TObject;
-	Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.ProjectViewMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
 	// bug-fix: when *not* clicking on an item, re-opens the last clicked file-node
 	// this was introduced in the latest commit by XXXKF (?)
@@ -5884,8 +5884,6 @@ begin
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
-var
-	fWindowPlacement: TWindowPlacement;
 begin
 	fFirstShow := true;
 	fFirstActivate := true;
@@ -5902,15 +5900,18 @@ begin
 		try
 			CheckAssociations(true); // check and fix
 		except
-			MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
+			MessageBox(Application.Handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
 			devData.CheckAssocs := false; // don't bother again
 		end;
 	end;
 
+	// Accept file drags
 	DragAcceptFiles(Self.Handle, true);
+
+	// Create datamod
 	dmMain := TdmMain.Create(Self);
 
-	// Set left panel to previous state
+	// Set left page control to previous state
 	actProjectManager.Checked:= devData.ProjectView;
 	if devData.ClassView then
 		LeftPageControl.ActivePage:=ClassSheet
@@ -5918,14 +5919,24 @@ begin
 		LeftPageControl.ActivePage:=ProjectSheet;
 	actProjectManagerExecute(nil);
 	LeftPageControl.Width := devData.ProjectWidth;
-	if devData.ProjectFloat then
+	if devData.ProjectFloat then begin
 		FloatingPojectManagerItem.Click;
+		devData.ProjectWindowState.SetPlacement(fProjectToolWindow.Handle);
+	end;
+
+	// Set bottom page control to previous state
+	MessageControl.Height:=devData.OutputHeight;
+	fPreviousHeight:= MessageControl.Height;
+	if devData.MessageFloat then begin
+		FloatingReportwindowItem.Click;
+		devData.ReportWindowState.SetPlacement(fReportToolWindow.Handle);
+	end;
 
 	// Set statusbar to previous state
 	actStatusbar.Checked:= devData.Statusbar;
 	actStatusbarExecute(nil);
 
-	// Add compiler events
+	// Crate a compiler
 	fCompiler:= TCompiler.Create;
 	fCompiler.OnLogEntry := LogEntryProc;
 	fCompiler.OnOutput := CompOutputProc;
@@ -5935,12 +5946,6 @@ begin
 	// Create a debugger
 	fDebugger := TDebugger.Create;
 	fDebugger.DebugTree := DebugTree;
-
-	// Set bottom panel height
-	MessageControl.Height:=devData.OutputHeight;
-	fPreviousHeight:= MessageControl.Height;
-	if devData.MessageFloat then
-		FloatingReportwindowItem.Click;
 
 	// Custom tools
 	fTools:= TToolController.Create;
@@ -5959,7 +5964,7 @@ begin
 	actCompOnNeed.Checked:=devData.OutputOnNeed;
 	actCompOutput.Checked:=devData.ShowOutput;
 
-	// Toolbar visibility
+	// Set toolbars to previous state
 	ToolMainItem.checked:= devData.ToolbarMain;
 	ToolEditItem.Checked:= devData.ToolbarEdit;
 	ToolCompileandRunItem.Checked:= devData.ToolbarCompile;
@@ -6020,14 +6025,7 @@ begin
 	end else begin
 
 		// Remember window placement
-		fWindowPlacement.length := sizeof(WINDOWPLACEMENT);
-		GetWindowPlacement(Self.Handle,@fWindowPlacement);
-		fWindowPlacement.rcNormalPosition.Left := devData.WindowLeft;
-		fWindowPlacement.rcNormalPosition.Top := devData.WindowTop;
-		fWindowPlacement.rcNormalPosition.Right := devData.WindowRight;
-		fWindowPlacement.rcNormalPosition.Bottom := devData.WindowBottom;
-		fWindowPlacement.showCmd := devData.WindowState;
-		SetWindowPlacement(Self.Handle,@fWindowPlacement);
+		devData.WindowState.SetPlacement(Self.Handle);
 
 		Lang.Open(devData.Language);
 	end;
@@ -6110,9 +6108,11 @@ begin
 	if fFirstShow then begin
 		fFirstShow := false;
 
-		if fRemoveOptions then Close;
+		if fRemoveOptions then begin
+			Close;
+			Exit;
+		end;
 
-		MessageControl.ActivePageIndex:= 0;
 		OpenCloseMessageSheet(devData.ShowOutput);
 
 		// Toolbar positions, needs to be done here, because on Create, the width of the TControlBar isn't yet set

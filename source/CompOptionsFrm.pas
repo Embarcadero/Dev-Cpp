@@ -166,6 +166,7 @@ begin
 
 	// write full compiler list
 	devCompiler.Sets.Assign(cmbCompilerSetComp.Items);
+	devCompiler.CurrentSet := cmbCompilerSetComp.ItemIndex;
 	devCompiler.WriteSets;
 end;
 

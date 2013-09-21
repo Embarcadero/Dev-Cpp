@@ -33,7 +33,7 @@ type
   TConfigData = class(TPersistent)
   private
     fIni: TIniFile;
-     function GetIniFileName : AnsiString;
+    function GetIniFileName : AnsiString;
     procedure SetIniFileName(const s : AnsiString);
   public
     constructor Create;
@@ -142,6 +142,11 @@ begin
 
 	for I := 0 to GetPropCount(Obj)-1 do begin
 		PropName:= GetPropName(Obj, I);
+
+		// Ignore properties which aren't listed in the INI (leave defaults)
+		if (not fINI.ValueExists(Section, PropName)) and (not fINI.SectionExists(Section + '.' + PropName)) then
+			Continue;
+
 		case PropType(Obj, PropName) of
 			tkString,
 			tkLString,
