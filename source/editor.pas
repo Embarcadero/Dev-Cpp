@@ -62,15 +62,15 @@ type
     fDebugGutter: TDebugGutter;
     fOnBreakPointToggle: TBreakpointToggleEvent;
     fCurrentWord: string;
-    //////// CODE-COMPLETION - mandrav /////////////
     fCompletionEatSpace: boolean;
-    fTimer: TTimer;
-    fTimerKey: Char;
+    fCompletionTimer: TTimer;
+    fCompletionTimerKey: Char;
     fCompletionBox: TCodeCompletion;
     fRunToCursorLine: integer;
-    FCodeToolTip: TCodeToolTip;
-    FLastPos : TBufferCoord;
-    FAutoIndent: TSynAutoIndent;
+    fFunctionTipTimer : TTimer;
+    fFunctionTip: TCodeToolTip;
+    fLastPos : TBufferCoord;
+    fAutoIndent: TSynAutoIndent;
     HasCompletedParentheses : integer; // Set to 2 on completion during KeyPress, to 1 immediately after by KeyDown, and to 0 upon next key
     HasCompletedArray : integer; // ...
     HasCompletedCurly : integer; // ...
@@ -85,7 +85,7 @@ type
     procedure DestroyCompletion;
     function CurrentPhrase: string;
     function CheckAttributes(P: TBufferCoord;const Phrase: string): boolean;
-    //////// CODE-COMPLETION - mandrav - END ///////
+
     function GetModified: boolean;
     procedure SetModified(value: boolean);
 
@@ -101,6 +101,8 @@ type
     procedure EditorDblClick(Sender: TObject);
     procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure EditorExit(sender : TObject);
+
+    procedure FunctionTipTimer(Sender : TObject);
 
     procedure SetFileName(const value: string);
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
@@ -150,7 +152,7 @@ type
     property IsRes: boolean read fRes write fRes;
     property Text: TSynEdit read fText write fText;
     property TabSheet: TTabSheet read fTabSheet write fTabSheet;
-    property CodeToolTip: TCodeToolTip read FCodeToolTip;
+    property FunctionTip: TCodeToolTip read fFunctionTip;
   end;
 
 implementation
@@ -206,20 +208,31 @@ begin
 	else
 		fFileName := Filename;
 
-	// Setup a new tab
+	// Create a new tab
 	fTabSheet := TTabSheet.Create(MainForm.PageControl);
 	fTabSheet.Caption := Caption;
 	fTabSheet.PageControl := MainForm.PageControl;
-	fTabSheet.BorderWidth := 0;
 	fTabSheet.Tag := integer(self); // Define an index for each tab
 
 	// Set breakpoint events
 	fOnBreakpointToggle := MainForm.OnBreakpointToggle;
 
-	// Create an editor
+	// Create an editor and set static options
 	fText := TSynEdit.Create(fTabSheet);
 
-	// Set a whole lot of data
+	// Load the file using Lines
+	if (DoOpen) then begin
+		fText.Lines.LoadFromFile(FileName);
+		fNew := False;
+		if devData.Backups then begin
+			s:= ExtractfileExt(FileName);
+			Insert('~', s, AnsiPos('.', s) + 1);
+			Delete(s, Length(s) -1, 1);
+			fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
+		end;
+	end else
+		fNew := True;
+
 	fText.Parent := fTabSheet;
 	fText.Align := alClient;
 	fText.Visible := True;
@@ -244,8 +257,10 @@ begin
 	fText.Gutter.RightOffset := 21;
 	fText.Gutter.BorderStyle := gbsNone;
 
-	// Set the current editor and highlighter
+	// Set the variable options
 	devEditor.AssignEditor(fText);
+
+	// Select a highlighter
 	if not fNew then
 		fText.Highlighter:= dmMain.GetHighlighter(fFileName)
 	else if fRes then
@@ -253,19 +268,8 @@ begin
 	else
 		fText.Highlighter:= dmMain.cpp;
 
-	// Load the file using lines - make sure the highlighter is assigned
-	if (DoOpen) then begin
-		fText.Lines.LoadFromFile(FileName);
-		fText.ReScan;
-		fNew := False;
-		if devData.Backups then begin
-			s:= ExtractfileExt(FileName);
-			Insert('~', s, AnsiPos('.', s) + 1);
-			Delete(s, Length(s) -1, 1);
-			fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
-		end;
-	end else
-		fNew := True;
+	// ReScan depends on the highlighter, so scan here
+	fText.ReScan;
 
 	// Set the text color
 	StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
@@ -279,13 +283,13 @@ begin
 	// Create a gutter
 	fDebugGutter := TDebugGutter.Create(self);
 
-	// Initialize code completion
+	// Initialize code completion stuff
 	InitCompletion;
 
 	// Function parameter tips
-	FCodeToolTip := TCodeToolTip.Create(Application);
-	FCodeToolTip.Editor := FText;
-	FCodeToolTip.Parser := MainForm.CppParser;
+	fFunctionTip := TCodeToolTip.Create(Application);
+	fFunctionTip.Editor := FText;
+	fFunctionTip.Parser := MainForm.CppParser;
 
 	// Auto indent synedit plugin
 	FAutoIndent := TSynAutoIndent.Create(Application);
@@ -329,7 +333,7 @@ begin
 
 	// Free everything
 	fDebugGutter.Free;
-	fCodeTooltip.Free;
+	fFunctionTip.Free;
 	fAutoIndent.Free;
 	fText.Free;
 
@@ -605,8 +609,8 @@ end;
 // Handle WM_KILLFOCUS instead of all the special cases to hide the code tooltip
 procedure TEditor.EditorExit(Sender : TObject);
 begin
-	if Assigned(FCodeToolTip) then
-		FCodeToolTip.ReleaseHandle;
+	if Assigned(fFunctionTip) then
+		fFunctionTip.ReleaseHandle;
 end;
 
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
@@ -644,8 +648,12 @@ begin
 			fText.InvalidateGutterLine(fErrorLine);
 		end;
 
-		if FCodeToolTip.Activated or not fText.SelAvail and FText.Focused and devEditor.ShowFunctionTip then
-			FCodeToolTip.Show;
+		if fFunctionTip.Activated and not fText.SelAvail then
+			fFunctionTip.Show
+		else begin // Reset the timer
+			fFunctionTipTimer.Enabled := false;
+			fFunctionTipTimer.Enabled := true;
+		end;
 	end;
 
 	if scInsertMode in Changes then begin
@@ -659,6 +667,12 @@ begin
 				Panels[1].Text:= Lang[ID_OVERWRITE];
 		end;
 	end;
+end;
+
+procedure TEditor.FunctionTipTimer(Sender : TObject);
+begin
+	if fText.Focused and devEditor.ShowFunctionTip then
+		fFunctionTip.Show;
 end;
 
 procedure TEditor.Exportto(filetype: integer);
@@ -723,8 +737,8 @@ begin
 	NewCursorPos := fText.CaretXY;
 	if MoveCursor then begin
 		P := PChar(value);
-		Char := 1;
-		Line := 1;
+		Char := fText.CaretX;
+		Line := fText.CaretY;
 		I := 0;
 		while P[I] <> #0 do begin
 
@@ -1016,12 +1030,12 @@ begin
 
 	if fCompletionBox.Enabled then begin
 		if not (Sender is TForm) then begin // TForm is the code-completion window
-			fTimer.Enabled:=False;
-			fTimerKey:=Key;
+			fCompletionTimer.Enabled:=False;
+			fCompletionTimerKey:=Key;
 			case Key of
-				'.': fTimer.Enabled:=True;
-				'>': if (fText.CaretX > 1) and (Length(fText.LineText)>0) and (fText.LineText[fText.CaretX-1]='-') then fTimer.Enabled:=True;
-				':': if (fText.CaretX > 1) and (Length(fText.LineText)>0) and (fText.LineText[fText.CaretX-1]=':') then fTimer.Enabled:=True;
+				'.': fCompletionTimer.Enabled:=True;
+				'>': if (fText.CaretX > 1) and (Length(fText.LineText)>0) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
+				':': if (fText.CaretX > 1) and (Length(fText.LineText)>0) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
 				' ': if fCompletionEatSpace then Key:=#0; // eat space if it was ctrl+space (code-completion)
 			end;
 			P := fText.RowColumnToPixels(fText.DisplayXY);
@@ -1117,11 +1131,11 @@ var
 	M: TMemoryStream;
 	curr: string;
 begin
-	fTimer.Enabled:=False;
+	fCompletionTimer.Enabled:=False;
 	curr:=CurrentPhrase;
 
 	if not CheckAttributes(BufferCoord(fText.CaretX-1, fText.CaretY), curr) then begin
-		fTimerKey:=#0;
+		fCompletionTimerKey:=#0;
 		Exit;
 	end;
 
@@ -1132,7 +1146,7 @@ begin
 	finally
 		M.Free;
 	end;
-	case fTimerKey of
+	case fCompletionTimerKey of
 	'.':
 		fCompletionBox.Search(nil, curr, fFileName);
 	'>':
@@ -1144,7 +1158,7 @@ begin
 			if fText.LineText[fText.CaretX-2]=':' then // it makes a '::'
 				fCompletionBox.Search(nil, curr, fFileName);
 	end;
-	fTimerKey:=#0;
+	fCompletionTimerKey:=#0;
 end;
 
 procedure TEditor.ReconfigCompletion;
@@ -1159,8 +1173,10 @@ end;
 
 procedure TEditor.DestroyCompletion;
 begin
-	if Assigned(fTimer) then
-		FreeAndNil(fTimer);
+	if Assigned(fCompletionTimer) then
+		FreeAndNil(fCompletionTimer);
+	if Assigned(fFunctionTipTimer) then
+		FreeAndNil(fFunctionTipTimer);
 end;
 
 procedure TEditor.InitCompletion;
@@ -1179,12 +1195,17 @@ begin
 		fCompletionBox.Width:=devCodeCompletion.Width;
 		fCompletionBox.Height:=devCodeCompletion.Height;
 
-		if not Assigned(fTimer) then
-			fTimer:=TTimer.Create(nil);
+		if not Assigned(fCompletionTimer) then
+			fCompletionTimer:=TTimer.Create(nil);
+		fCompletionTimer.Enabled:=False;
+		fCompletionTimer.OnTimer:=CompletionTimer;
+		fCompletionTimer.Interval:=devCodeCompletion.Delay;
 
-		fTimer.Enabled:=False;
-		fTimer.OnTimer:=CompletionTimer;
-		fTimer.Interval:=devCodeCompletion.Delay;
+		if not Assigned(fFunctionTipTimer) then
+			fFunctionTipTimer:=TTimer.Create(nil);
+		fFunctionTipTimer.Enabled:=devEditor.ShowFunctionTip;
+		fFunctionTipTimer.OnTimer:=FunctionTipTimer;
+		fFunctionTipTimer.Interval:=devCodeCompletion.Delay;
 	end;
 	fCompletionEatSpace:=False;
 end;
@@ -1269,7 +1290,7 @@ begin
 		// and function takes arguments...
 		if (not (Key in ['.', '>'])) and (FuncAddOn<>'') and ( (Length(Statement^._Args)>2) or (Statement^._Args='()') ) then begin
 			fText.CaretX:=fText.CaretX-Length(FuncAddOn)+1;
-			FCodeToolTip.Show;
+			fFunctionTip.Show;
 		end;
 	end;
 end;
@@ -1455,22 +1476,11 @@ begin
 end;
 
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
-	procedure DoOpen(Fname: string; Line: integer);
-	var
-		e: TEditor;
-	begin
-		if fname = ExtractFileName(fname) then // no path info, so prepend path of active file
-			fname:=ExtractFilePath(fFileName)+fname;
-
-		// refer to the editor of the filename (will open if needed and made active)
-		e:=MainForm.GetEditorFromFileName(fname);
-		if Assigned(e) then
-			e.GotoLineNr(line);
-	end;
 var
 	p: TDisplayCoord;
-	line: string;
+	line,fname: string;
 	walker,start : integer;
+	e : TEditor;
 begin
 	p := fText.PixelsToRowColumn(X,Y);
 
@@ -1494,7 +1504,14 @@ begin
 				Inc(walker);
 			until line[walker] in ['>','"'];
 
-			DoOpen(MainForm.CppParser.GetFullFileName(Copy(line, start, walker-start)), 1);
+			fname := MainForm.CppParser.GetFullFileName(Copy(line, start, walker-start));
+			if fname = ExtractFileName(fname) then // no path info, so prepend path of active file
+				fname:=ExtractFilePath(fFileName)+fname;
+
+			// refer to the editor of the filename (will open if needed and made active)
+			e:=MainForm.GetEditorFromFileName(fname);
+			if Assigned(e) then
+				e.GotoLineNr(1);
 		end;
 
 		MainForm.actGotoImplDeclEditorExecute(self);
@@ -1569,7 +1586,7 @@ end;
 // Editor needs to be told when class browser has been recreated otherwise AV !
 procedure TEditor.UpdateParser;
 begin
-	FCodeToolTip.Parser := MainForm.CppParser;
+	fFunctionTip.Parser := MainForm.CppParser;
 end;
 
 end.

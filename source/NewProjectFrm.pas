@@ -175,6 +175,9 @@ begin
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
+	TemplateLabel.Font.Name := devData.InterfaceFont;
+	TemplateLabel.Font.Size := devData.InterfaceFontSize;
+
 	Caption :=              Lang[ID_NP];
 	lblPrjName.Caption:=    Lang[ID_NP_PRJNAME];
 	rbC.Caption :=          Lang[ID_NP_DEFAULTC];

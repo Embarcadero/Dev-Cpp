@@ -2391,32 +2391,29 @@ end;
 
 procedure TMainForm.OpenUnit;
 var
- Node: TTreeNode;
- i, idx: integer;
- pt: TPoint;
- e: TEditor;
+	Node: TTreeNode;
+	i, idx: integer;
+	pt: TPoint;
+	e: TEditor;
 begin
 	if assigned(ProjectView.Selected) then
-	 Node:= ProjectView.Selected
-	else
-	 begin
-		 pt:= ProjectView.ScreenToClient(Mouse.CursorPos);
-		 Node:= ProjectView.GetNodeAt(pt.x, pt.y);
-	 end;
+		Node:= ProjectView.Selected
+	else begin
+		pt:= ProjectView.ScreenToClient(Mouse.CursorPos);
+		Node:= ProjectView.GetNodeAt(pt.x, pt.y);
+	end;
 	if assigned(Node) { begin XXXKF } and (integer(Node.Data)<>-1) { end XXXKF } then
-	 if (Node.Level >= 1) then
-		begin
+		if (Node.Level >= 1) then begin
 			i:= integer(Node.Data);
 			idx:= FileIsOpen(fProject.Units[i].FileName, TRUE);
 			if idx> -1 then
-			 e:= GetEditor(idx)
+				e:= GetEditor(idx)
 			else
-			 e:= fProject.OpenUnit(i);
-			if assigned(e) then
-			 begin
+				e:= fProject.OpenUnit(i);
+			if assigned(e) then begin
 				e.Activate;
 //				ClassBrowser1.CurrentFile:=e.FileName;
-			 end;
+			end;
 		end;
 end;
 
@@ -2437,8 +2434,8 @@ end;
 
 procedure TMainForm.ProjectViewDblClick(Sender: TObject);
 begin
-	if not devData.dblFiles then exit;
-	OpenUnit;
+	if devData.dblFiles then
+		OpenUnit;
 end;
 
 procedure TMainForm.actNewSourceExecute(Sender: TObject);
@@ -6469,82 +6466,63 @@ end;
 
 procedure TMainForm.actGotoImplDeclEditorExecute(Sender: TObject);
 var
-	wordtofind : string;
-	atposition : TBufferCoord;
-	P : TPoint;
-
-	// Opslag voor FindStatement
 	localfind : string;
 	localfindpoint : TBufferCoord;
 
-	// Voor navigeren
 	statement : PStatement;
 	filename : string;
 	line : integer;
 
-	// Current editor
 	e : TEditor;
 begin
 	e:=GetEditor;
 
-	// Scan the word at the mouse cursor or the caret
-	if Sender.ClassName = 'TEditor' then begin
+	if Assigned(e) then begin
 
-		// Ctrl+Click
-		wordtofind := e.Text.WordAtMouse;
+		localfindpoint.Char := 0;
+		localfindpoint.Line := 0;
 
-		GetCursorPos(P);
-		P:=e.Text.ScreenToClient(P);
-		atposition.Char := e.Text.PixelsToRowColumn(P.X,P.Y).Column;
-		atposition.Line := e.Text.PixelsToRowColumn(P.X,P.Y).Row;
-	end else begin
+		// When searching using menu shortcuts, the caret is set to the proper place
+		// When searching using ctrl+click, the cursor is set properly too, so do NOT use WordAtMouse
+		statement:=FindStatement(e.Text.WordAtCursor,e.Text.WordStart,localfind,localfindpoint);
 
-		// Menu shortcut
-		wordtofind := e.Text.WordAtCursor;
-		atposition := e.Text.WordStart;
+		// If we found it locally (not present in the class browser)
+		if (localfind <> '') and (localfindpoint.Char <> 12345) and (localfindpoint.Line <> 12345) then begin
+			e.Text.CaretXY := localfindpoint;
+
+		// Otherwise scan the returned class browser statement
+		end else if Assigned(statement) then begin
+
+			// If the caret position was used
+			if Sender.ClassType = TEditor then begin
+
+				// Switching between declaration and definition
+				if e.Text.CaretY <> statement^._Line then begin
+					filename:=statement^._FileName;
+					line:=statement^._Line;
+				end else begin
+					filename:=statement^._DeclImplFileName;
+					line:=statement^._DeclImplLine;
+				end;
+
+			// Menu item or mouse cursor
+			end else begin
+				if Pos('Decl',(Sender as TCustomAction).Name) > 0 then begin
+					filename:=statement^._FileName;
+					line:=statement^._Line;
+				end else begin
+					filename:=statement^._DeclImplFileName;
+					line:=statement^._DeclImplLine;
+				end;
+			end;
+
+			// Go to the location
+			e:=GetEditorFromFileName(filename);
+			if Assigned(e) then
+				e.GotoLineNr(line);
+		end else
+			SetStatusbarMessage('Could not find declaration...');
 	end;
-
-	// After we've found the place where we clicked/hover, find the start of the word at that position
-	atposition := e.Text.WordStartEx(atposition);
-
-	statement:=FindStatement(wordtofind,atposition,localfind,localfindpoint);
-
-	// If we found it locally (not present in the class browser)
-	if (localfind <> '') and (localfindpoint.Char <> 12345) and (localfindpoint.Line <> 12345) then begin
-		e.Text.CaretXY := localfindpoint;
-
-	// Otherwise scan the returned class browser statement
-	end else if Assigned(statement) then begin
-
-		// If the caret position was used
-		if Sender.ClassName = 'TEditor' then begin
-
-			// Switching between declaration and definition
-			if e.Text.CaretY <> statement^._Line then begin
-				filename:=statement^._FileName;
-				line:=statement^._Line;
-			end else begin
-				filename:=statement^._DeclImplFileName;
-				line:=statement^._DeclImplLine;
-			end;
-
-		// Menu item or mouse cursor
-		end else begin
-			if Pos('Decl',(Sender as TCustomAction).Name) > 0 then begin
-				filename:=statement^._FileName;
-				line:=statement^._Line;
-			end else begin
-				filename:=statement^._DeclImplFileName;
-				line:=statement^._DeclImplLine;
-			end;
-		end;
-
-		// Go to the location
-		e:=GetEditorFromFileName(filename);
-		if Assigned(e) then
-			e.GotoLineNr(line);
-	end else
-		SetStatusbarMessage('Could not find declaration...');
 end;
 
 procedure TMainForm.actHideFSBarExecute(Sender: TObject);
@@ -6655,7 +6633,6 @@ begin
 	for I := 0 to cmbMembers.Items.Count-1 do
 		widestwidth := Max(widestwidth,cmbMembers.Canvas.TextWidth(cmbMembers.Items[I]) + 8); // padding
 
-	// set the width of drop down if needed
 	if(widestwidth > cmbMembers.Width) then begin
 
 		// Add scrollbar width

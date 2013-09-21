@@ -335,7 +335,7 @@ begin
 		Duplicates := dupAccept;
 	end;
 
-	FMaxScanLength := 192; // Number of character to walk through trying to find ( and )
+	FMaxScanLength := 256; // Number of character to walk through trying to find ( and )
 	FKeyDownProc  := EditorKeyDown;
 
 	FUpButton := TCodeToolTipUpButton.Create;

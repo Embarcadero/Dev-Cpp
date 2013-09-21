@@ -1210,13 +1210,17 @@ begin
    end;
 
 	case devData.AutoOpen of
-		0:
-			for i:= 0 to pred(fUnits.Count) do OpenUnit(i).Activate; // Open all
+		0: begin
+			for i:= 0 to pred(fUnits.Count) do
+				OpenUnit(i); // Open all
+			fUnits[0].Editor.Activate;
+		end;
 		1:
 			OpenUnit(0).Activate; // Open first
 		2:
 			LoadLayout; // Open previous selection
 	end;
+
 	RebuildNodes;
 end;
 

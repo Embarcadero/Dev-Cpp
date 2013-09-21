@@ -65,7 +65,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 71
+        Height = 72
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone

@@ -1594,7 +1594,7 @@ begin
 			lblFile.Caption:='';
 		end;
 
-		if devData.AutoCloseProgress then
+		if devData.AutoCloseProgress or (fErrCount>0) or (fWarnCount>0) then
 			ReleaseProgressForm;
 	end;
 

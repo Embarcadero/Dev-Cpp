@@ -63,8 +63,6 @@ type
 		fSubFoldRegions: TFoldRegions;
 		fOpen: PChar;
 		fClose: PChar;
-		fParentRegion: TFoldRegionItem;
-		fWholeWords: Boolean;
 		fName: String;
 
 		procedure SetClose(const Value: PChar);
@@ -78,8 +76,6 @@ type
 		property SubFoldRegions: TFoldRegions read fSubFoldRegions;
 		property Open: PChar read fOpen write SetOpen;
 		property Close: PChar read fClose write SetClose;
-		property ParentRegion: TFoldRegionItem read fParentRegion write fParentRegion;
-		property WholeWords: Boolean read fWholeWords write fWholeWords;
 		property Name: String read fName write fName;
 	end;
 
@@ -89,7 +85,7 @@ type
 	public
 		constructor Create(ItemClass: TCollectionItemClass);
 		destructor Destroy; override;
-		function Add(AType: TFoldRegionType; AAddEnding, ANoSubFoldRegions,AWholeWords: Boolean; AOpen, AClose: PChar;AParentRegion: TFoldRegionItem = nil): TFoldRegionItem;
+		function Add(AType: TFoldRegionType; AAddEnding, ANoSubFoldRegions: Boolean; AOpen, AClose: PChar): TFoldRegionItem;
 
 		property Items[Index: Integer]: TFoldRegionItem read GetItem; default;
 	end;
@@ -145,6 +141,14 @@ type
 		fAllFoldRanges: TSynEditAllFoldRanges; // TAllFoldRanges pointer
 		fFoldRegion: TFoldRegionItem; // FoldRegion pointer
 		fHintMarkLeft: Integer;
+
+		// For GetUncollapsedLines
+		fFromLineBackup : integer;
+		fToLineBackup : integer;
+		fCollapsedByBackup: Integer;
+		fParentCollapsedBackup: Boolean;
+		fCollapsedBackup : boolean;
+		fModified: Boolean;
 		procedure SetRealLevel(const Value: Integer);
 	public
 		constructor Create;
@@ -156,6 +160,11 @@ type
 		procedure MoveChildren(By: Integer);
 		procedure Widen(LineCount: Integer);
 		function Collapsable: Boolean;
+
+		procedure Backup;
+		procedure Fix;
+		procedure BackupPCOfSubFoldRanges;
+		procedure FixPCOfSubFoldRanges;
 
 		property RealLevel: Integer read fRealLevel write SetRealLevel;
 		property SubFoldRanges: TSynEditFoldRanges read fSubFoldRanges;
@@ -169,6 +178,7 @@ type
 		property CollapsedLines: TStringList read fCollapsedLines;
 		property FoldRegion: TFoldRegionItem read fFoldRegion write fFoldRegion;
 		property HintMarkLeft: Integer read fHintMarkLeft write fHintMarkLeft;
+		property Modified : Boolean read fModified write fModified;
 	end;
 
 implementation
@@ -332,6 +342,46 @@ begin
 	end;
 end;
 
+procedure TSynEditFoldRange.BackupPCOfSubFoldRanges;
+var
+	i: Integer;
+begin
+	for i := 0 to fSubFoldRanges.Count - 1 do begin
+		fSubFoldRanges[i].BackupPCOfSubFoldRanges;
+
+		// Always backup for GetUncollapsedLines
+		fSubFoldRanges[i].fParentCollapsedBackup := fSubFoldRanges[i].fParentCollapsed;
+		fSubFoldRanges[i].fCollapsedByBackup := fSubFoldRanges[i].fCollapsedBy;
+	end;
+end;
+
+procedure TSynEditFoldRange.FixPCOfSubFoldRanges;
+var
+	i: Integer;
+begin
+	for i := 0 to fSubFoldRanges.Count - 1 do begin
+		fSubFoldRanges[i].FixPCOfSubFoldRanges;
+
+		// And revert to old settings
+		fSubFoldRanges[i].fParentCollapsed := fSubFoldRanges[i].fParentCollapsedBackup;
+		fSubFoldRanges[i].fCollapsedBy := fSubFoldRanges[i].fCollapsedByBackup;
+	end;
+end;
+
+procedure TSynEditFoldRange.Backup;
+begin
+	fCollapsedBackup := fCollapsed;
+	fFromLineBackup := fFromLine;
+	fToLineBackup := fToLine;
+end;
+
+procedure TSynEditFoldRange.Fix;
+begin
+	fCollapsed := fCollapsedBackup;
+	fFromLine := fFromLineBackup;
+	fToLine := fToLineBackup;
+end;
+
 procedure TSynEditFoldRange.SetRealLevel(const Value: Integer);
 var
 	i: Integer;
@@ -371,18 +421,15 @@ end;
 { TFoldRegions }
 
 function TFoldRegions.Add(AType: TFoldRegionType; AAddEnding,
-		ANoSubFoldRegions, AWholeWords: Boolean; AOpen, AClose: PChar;
-		AParentRegion: TFoldRegionItem): TFoldRegionItem;
+		ANoSubFoldRegions: Boolean; AOpen, AClose: PChar): TFoldRegionItem;
 begin
 	Result := TFoldRegionItem(inherited Add);
 	with Result do begin
 		fType := AType;
 		fAddEnding := AAddEnding;
 		fNoSubFoldRegions := ANoSubFoldRegions;
-		fWholeWords := AWholeWords;
 		Open := AOPen;
 		Close := AClose;
-		fParentRegion := AParentRegion;
 	end;
 end;
 
@@ -430,8 +477,8 @@ begin
 
 	fFoldRegions := TFoldRegions.Create(TFoldRegionItem); // TODO: Leaky?
 	with fFoldRegions do begin
-		Add(rtChar, False, False, False, '{', '}', nil);
-		Add(rtKeyword, False, False, True, 'BEGIN', 'END', nil);
+		Add(rtChar, False, False, '{', '}');
+		Add(rtKeyword, False, False, 'BEGIN', 'END');
 	end;
 end;
 

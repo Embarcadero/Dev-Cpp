@@ -25,13 +25,13 @@ object NewProjectForm: TNewProjectForm
     Left = 24
     Top = 110
     Width = 240
-    Height = 25
+    Height = 27
     AutoSize = False
     Caption = '<desc>'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
   end

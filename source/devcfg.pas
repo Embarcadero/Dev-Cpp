@@ -1491,7 +1491,7 @@ begin
 	fUseTabs:= TRUE;
 	fSmartTabs:= FALSE;
 	fGroupUndo:= TRUE;
-	fInsDropFiles:= FALSE;
+	fInsDropFiles:= TRUE;
 	fSpecialChar:= FALSE;
 
 	// General #2
@@ -1676,7 +1676,7 @@ procedure TdevCodeCompletion.SettoDefaults;
 begin
 	fWidth:=320;
 	fHeight:=240;
-	fDelay:=1000;
+	fDelay:=400;
 	fBackColor:=clWindow;
 	fEnabled:=True;
 	fUseCacheFiles:=False;
@@ -1784,7 +1784,9 @@ end;
 
 procedure TdevCompilerSet.LoadSet(Index: integer);
 var
-	key, goodBinDir, goodCDir, goodCppDir, goodLibDir, msg, tempStr, gnumakereply, mingwmakereply: String;
+	key, goodBinDir, goodCDir, goodCppDir, goodLibDir, msg, tempStr, makereply: string;
+	bindirs : TStringList;
+	i : integer;
 begin
 	if Index<0 then Exit;
 	with devData do begin
@@ -1884,43 +1886,28 @@ begin
 	if devDirs.OriginalPath = '' then // first time only
 		devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 
-	// First check if the current one exist
-	SetPath(fBinDir);
-	mingwmakereply := RunAndGetOutput(devCompilerSet.makeName + ' -v',fBinDir, nil, nil, nil);
+	// First check if the current one exists
+	bindirs := TStringList.Create;
+	StrToList(fBinDir,bindirs);
 
-	// If the currently selected Make does not reply
-	if not AnsiStartsStr('GNU Make ', mingwmakereply) then begin
+	for I := 0 to bindirs.Count -1 do begin
 
-		// Try the old GNU one
-		SetPath(fBinDir);
-		gnumakereply := RunAndGetOutput('make.exe --v',fBinDir, nil, nil, nil);
+		// First try the chosen makefile processor
+		SetPath(bindirs.Strings[i]);
+		makereply := RunAndGetOutput(devCompilerSet.makeName + ' -v',bindirs.Strings[i], nil, nil, nil);
 
-		// Yay, there's an old make.exe in the bin directory!
-		if AnsiStartsStr('GNU Make ', gnumakereply) then begin
-			msg := 'Dev-C++ was unable to find the current make processor ('
-			+ devCompilerSet.makeName  + ') in '
-			+ fBinDir + ' with current settings, '
-			+ 'however a probably older GNU make.exe has been found in that folder. '
-			+ 'Would you like Dev-C++ to adjust the settings for you to '
-			+ 'use GNU Make?'
-			+ #13#10#13#10
-			+ 'Unless you know exactly what you''re doing, it is recommended '
-			+ 'that you click Yes.';
-
-			if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-				devCompilerSet.makeName := 'make.exe';
-				devCompiler.makeName := 'make.exe';
-			end;
+		if AnsiStartsStr('GNU Make ', makereply) then begin
+			Exit; // pass sanity check for the chosen processor
 		end else begin
 
-			// Try MinGW
-			SetPath(fBinDir);
-			mingwmakereply := RunAndGetOutput('mingw32-make.exe -v',fBinDir, nil, nil, nil);
+			// Then try the default makefile processor
+			SetPath(bindirs.Strings[i]);
+			makereply := RunAndGetOutput('mingw32-make.exe -v',bindirs.Strings[i], nil, nil, nil);
 
-			if AnsiStartsStr('GNU Make ', mingwmakereply) then begin
+			if AnsiStartsStr('GNU Make ', makereply) then begin
 				msg := 'Dev-C++ was unable to find the current make processor ('
 				+ devCompilerSet.makeName  + ') in '
-				+ fBinDir + ' with current settings, '
+				+ bindirs.Strings[i] + ' with current settings, '
 				+ 'however a MinGW mingw32-make.exe has been found in that folder. '
 				+ 'Would you like Dev-C++ to adjust the settings for you to '
 				+ 'use MinGW Make?'
@@ -1931,17 +1918,40 @@ begin
 					devCompilerSet.makeName := 'mingw32-make.exe';
 					devCompiler.makeName := 'mingw32-make.exe';
 				end;
+				Exit; // pass sanity check for a different make proc
 			end else begin
-				msg := 'There doesn''t seem to be any Make file in Dev-C++''s Bin path ('
-				+ fBinDir + '). Please make sure that you have correctly set '
-				+ 'GNU Make and adjust the Bin settings environment '
-				+ 'variable and that the make setting in Compiler Option '
-				+ 'contains a correct filename, otherwise you will not '
-				+ 'be able to compile anything.';
-				MessageDlg(msg, mtConfirmation, [mbOK], 0);
+
+				// Then try the old makefile processor
+				SetPath(bindirs.Strings[i]);
+				makereply := RunAndGetOutput('make.exe --v',bindirs.Strings[i], nil, nil, nil);
+
+				if AnsiStartsStr('GNU Make ', makereply) then begin
+					msg := 'Dev-C++ was unable to find the current make processor ('
+					+ devCompilerSet.makeName  + ') in '
+					+ bindirs.Strings[i] + ' with current settings, '
+					+ 'however a probably older GNU make.exe has been found in that folder. '
+					+ 'Would you like Dev-C++ to adjust the settings for you to '
+					+ 'use GNU Make?'
+					+ #13#10#13#10
+					+ 'Unless you know exactly what you''re doing, it is recommended '
+					+ 'that you click Yes.';
+					if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+						devCompilerSet.makeName := 'make.exe';
+						devCompiler.makeName := 'make.exe';
+					end;
+					Exit; // pass sanity check
+				end;
 			end;
 		end;
 	end;
+
+	msg := 'There doesn''t seem to be any Make file in Dev-C++''s Bin path ('
+		+ fBinDir + '). Please make sure that you have correctly set '
+		+ 'GNU Make and adjust the Bin settings environment '
+		+ 'variable and that the make setting in Compiler Options '
+		+ 'contains a correct filename, otherwise you will not '
+		+ 'be able to compile anything.';
+	MessageDlg(msg, mtConfirmation, [mbOK], 0);
 end;
 
 procedure TdevCompilerSet.LoadSettings;
