@@ -1,4 +1,4 @@
-Version 5.3.0.2 - *
+Version 5.3.0.2 - 24 Oktober 2012
 
 - Fixed error line focus dissapearing when moving focus on the same line.
 - The window caption now shows more information, like the debugging/compiling/executing status.
@@ -11,8 +11,15 @@ Version 5.3.0.2 - *
 - When trying to debug, Dev-C++ now suggests to compile, instead of showing an error that the source isn't compiled.
 - Project options are now properly applied when not changing tabs in Project Options >> Compiler.
 - New projects now properly use the global compiler set by default.
+- Added two more themes. Credits go to Andrei Luca.
 - Improved parsing speed somewhat.
 - Improved startup time.
+- Reduced the amount of clicks needed to change compiler options.
+- Fixed numerous debugger bugs, most are related to watch variables.
+- When a signal is received by gdb, Dev-C++ now suggests to open up CPU window.
+- Fixed a lot more bugs.
+- Fixed a bug in the code completion form that prevented the source from being compiled on fresh Delphi IDEs.
+- Fixed an error in the relative path solver, making Dev-C++ fully portable again.
 
 Version 5.3.0.1 - 2 Oktober 2012
 

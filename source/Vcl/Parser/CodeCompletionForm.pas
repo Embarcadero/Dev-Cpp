@@ -58,6 +58,7 @@ procedure TCodeComplForm.FormShow(Sender: TObject);
 begin
 	Width := fOwner.Width;
 	Height := fOwner.Height;
+	lbCompletion.DoubleBuffered := true; // reduces flicker
 end;
 
 procedure TCodeComplForm.FormDeactivate(Sender: TObject);
@@ -75,10 +76,6 @@ end;
 constructor TCodeComplForm.Create(AOwner: TComponent);
 begin
 	inherited Create(AOwner);
-
-	lbCompletion.Font.Name := 'Courier New';
-	lbCompletion.Font.Size := 10;
-	lbCompletion.DoubleBuffered := True;
 
 	fOwner := TCodeCompletion(AOwner);
 end;

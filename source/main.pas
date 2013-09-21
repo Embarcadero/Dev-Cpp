@@ -345,7 +345,6 @@ type
 		mnuBrowserGotoImpl: TMenuItem;
 		mnuBrowserSep1: TMenuItem;
 		mnuBrowserNewClass: TMenuItem;
-		mnuBrowserSep2: TMenuItem;
 		mnuBrowserNewMember: TMenuItem;
 		mnuBrowserNewVariable: TMenuItem;
 		mnuBrowserSep3: TMenuItem;
@@ -592,6 +591,9 @@ type
     actMsgCut1: TMenuItem;
     N71: TMenuItem;
     N73: TMenuItem;
+    N74: TMenuItem;
+    MsgSellAllItem: TMenuItem;
+    actMsgSelAll: TAction;
 
 		procedure FormClose(Sender: TObject; var Action: TCloseAction);
 		procedure FormDestroy(Sender: TObject);
@@ -839,6 +841,7 @@ type
 		procedure actMsgCutExecute(Sender: TObject);
 		procedure FindOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
 		procedure CompilerOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
+    procedure actMsgSelAllExecute(Sender: TObject);
 	private
 		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
 		fTools            : TToolController; // tool list controller
@@ -1151,8 +1154,9 @@ begin
 	actMsgCopy.Caption :=				Lang[ID_ITEM_COPY];
 	actMsgCopyAll.Caption :=			Lang[ID_ITEM_COPYALL];
 	actMsgPaste.Caption :=				Lang[ID_ITEM_PASTE];
-	actMsgClear.Caption :=				Lang[ID_ITEM_CLEAR];
+	actMsgSelAll.Caption :=				Lang[ID_ITEM_SELECTALL];
 	actMsgSaveAll.Caption :=			Lang[ID_ITEM_SAVEALL];
+	actMsgClear.Caption :=				Lang[ID_ITEM_CLEAR];
 
 	actFileProperties.Caption:=			Lang[ID_ITEM_PROPERTIES];
 
@@ -2394,13 +2398,13 @@ end;
 procedure TMainForm.actCutExecute(Sender: TObject);
 var
 	e: TEditor;
-	oldtopline : integer;
+	oldbottomline : integer;
 begin
 	e:= GetEditor;
 	if Assigned(e) then begin
-		oldtopline := e.Text.TopLine;
+		oldbottomline := e.Text.TopLine + e.Text.LinesInWindow;
 		e.Text.CutToClipboard;
-		if e.Text.TopLine <> oldtopline then
+		if (e.Text.TopLine + e.Text.LinesInWindow) <> oldbottomline then
 			e.Text.Repaint; // fix for repaint fail
 	end;
 end;
@@ -2432,15 +2436,9 @@ procedure TMainForm.actSelectAllExecute(Sender: TObject);
 var
 	e: TEditor;
 begin
-	if LogOutput.Focused then
-		LogOutput.SelectAll
-	else if DebugOutput.Focused then
-		DebugOutput.SelectAll
-	else begin
-		e:= GetEditor;
-		if assigned(e) then
-			e.Text.SelectAll;
-	end;
+	e:= GetEditor;
+	if assigned(e) then
+		e.Text.SelectAll;
 end;
 
 procedure TMainForm.actDeleteExecute(Sender: TObject);
@@ -2565,7 +2563,7 @@ begin
 				dmMain.UpdateHighlighter;
 				for I:= 0 to PageControl.PageCount - 1 do begin
 					e := TEditor(PageControl.Pages[I].Tag);
-					devEditor.AssignEditor(e);
+					devEditor.AssignEditor(e.Text,e.FileName);
 					e.InitCompletion;
 				end;
 
@@ -3340,6 +3338,30 @@ begin
 	end;
 end;
 
+procedure TMainForm.actMsgSelAllExecute(Sender: TObject);
+begin
+	case MessageControl.ActivePageIndex of
+		2: begin
+			if TotalErrors.Focused then
+				TotalErrors.SelectAll
+			else if SizeFile.Focused then
+				SizeFile.SelectAll
+			else if LogOutput.Focused then
+				LogOutput.SelectAll;
+		end;
+		3: begin
+			if EvaluateInput.Focused then
+				EvaluateInput.SelectAll
+			else if edGdbCommand.Focused then
+				edGdbCommand.SelectAll
+			else if EvalOutput.Focused then
+				EvalOutput.SelectAll
+			else if DebugOutput.Focused then
+				DebugOutput.SelectAll;
+		end;
+	end;
+end;
+
 procedure TMainForm.actMsgSaveAllExecute(Sender: TObject);
 var
 	i:integer;
@@ -3568,14 +3590,14 @@ end;
 procedure TMainForm.actNextLineExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
-		fDebugger.SendCommand('next', '');
+		fDebugger.SendCommand('next', '', true);
 	end;
 end;
 
 procedure TMainForm.actStepLineExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
-		fDebugger.SendCommand('step', '');
+		fDebugger.SendCommand('step', '', true);
 	end;
 end;
 
@@ -3585,6 +3607,11 @@ var
 begin
 	node := DebugTree.Selected;
 	if Assigned(node) then begin
+
+		// Retrieve topmost node
+		while Assigned(node.Parent) do
+			node := node.Parent;
+
 		fDebugger.RemoveWatchVar(node);
 	end;
 end;
@@ -3617,7 +3644,7 @@ procedure TMainForm.actStepOverExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
 		RemoveActiveBreakpoints;
-		fDebugger.SendCommand('continue','');
+		fDebugger.SendCommand('continue','', true);
 	end;
 end;
 
@@ -4656,6 +4683,9 @@ begin
 					edGDBCommand.AddItem(edGDBCommand.Text,nil);
 			end;
 		end;
+
+		// View command examples only when edit is empty or when the UI itself added the current command
+		fDebugger.GDBcommandchanged := true;
 	end;
 end;
 
@@ -4766,7 +4796,7 @@ begin
 	Screen.Cursor:=crDefault;
 
 	// do this work only if this was the last file scanned
-	if (CppParser.FilesToScan.Count = 0) then begin
+	if CppParser.FilesToScan.Count = 0 then begin
 
 		// Fix indices
 		CppParser.FixIndices;
@@ -5564,21 +5594,44 @@ var
 	curnode : TTreeNode;
 	fullname: AnsiString;
 	value : AnsiString;
+
+	function GetNodeName(node : TTreeNode) : AnsiString;
+	var
+		epos : integer;
+	begin
+		Result := '';
+		epos := Pos(' = ',node.Text);
+		if epos > 0 then
+			Result := Copy(node.Text,1,epos - 1);
+	end;
+
+	function GetNodeValue(node : TTreeNode) : AnsiString;
+	var
+		epos : integer;
+	begin
+		Result := '';
+		epos := Pos(' = ',node.Text);
+		if epos > 0 then
+			Result := Copy(node.Text,epos + 3,Length(node.Text) - epos);
+	end;
+
 begin
 	curnode := DebugTree.Selected;
 	if Assigned(curnode) then begin // only edit members
 
-		fullname := PWatchMember(curnode.Data)^.name;
+		fullname := GetNodeName(curnode);
 
 		// Assemble full name including parents
 		while Assigned(curnode.Parent) do begin
-			if not StartsStr('{',PWatchMember(curnode.Parent.Data)^.name) then
-				fullname := PWatchMember(curnode.Parent.Data)^.name + '.' + fullname;
 			curnode := curnode.Parent;
+			if not StartsStr('{',GetNodeName(curnode)) then
+				fullname := GetNodeName(curnode) + '.' + fullname;
 		end;
 
+		value := GetNodeValue(DebugTree.Selected);
+
 		if InputQuery(Lang[ID_NV_MODIFYVALUE],fullname,value) then
-			fDebugger.SendCommand('set variable',fullname + ' = ' + value);
+			fDebugger.SendCommand('set variable',fullname + ' = ' + value, true);
 	end;
 end;
 
@@ -6022,7 +6075,7 @@ begin
 			if Length(EvaluateInput.Text) > 0 then begin
 				Key := #0;
 				fDebugger.OnEvalReady := OnInputEvalReady;
-				fDebugger.SendCommand('print',EvaluateInput.Text);
+				fDebugger.SendCommand('print',EvaluateInput.Text,true);
 
 				// Tell the user we're updating...
 				EvalOutput.Font.Color := clGrayText;
@@ -6079,38 +6132,42 @@ end;
 procedure TMainForm.actSkipFunctionExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
-		fDebugger.SendCommand('finish','');
+		fDebugger.SendCommand('finish','', true);
 	end;
 end;
 
 procedure TMainForm.actNextInsExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
-		fDebugger.SendCommand('nexti','');
+		fDebugger.SendCommand('nexti','', true);
 	end;
 end;
 
 procedure TMainForm.actStepInsExecute(Sender: TObject);
 begin
 	if fDebugger.Executing then begin
-		fDebugger.SendCommand('stepi','');
+		fDebugger.SendCommand('stepi','', true);
 	end;
 end;
 
 procedure TMainForm.DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;Stage: TCustomDrawStage; var PaintImages, DefaultDraw: Boolean);
+var
+	curnode : TTreeNode;
 begin
-	if Assigned(node.Parent) then begin
-		if PWatchParent(Node.Parent.Data)^.gdbindex <> -1 then begin
-			Sender.Canvas.Font.Color := clGreen;
-		end else begin
+	curnode := node;
+	while Assigned(curnode.Parent) do
+		curnode := curnode.Parent;
+
+	if (curnode.Level = 0) and (PWatchVar(curnode.Data)^.gdbindex = -1) then begin
+		if cdsSelected in State then
+			Sender.Canvas.Font.Color := clWhite
+		else
 			Sender.Canvas.Font.Color := clRed;
-		end;
 	end else begin
-		if PWatchParent(Node.Data)^.gdbindex <> -1 then begin
-			Sender.Canvas.Font.Color := clGreen;
-		end else begin
-			Sender.Canvas.Font.Color := clRed;
-		end;
+		if cdsSelected in State then
+			Sender.Canvas.Font.Color := clWhite
+		else
+			Sender.Canvas.Font.Color := clBlack;
 	end;
 end;
 
@@ -6198,4 +6255,5 @@ begin
 end;
 
 end.
+
 

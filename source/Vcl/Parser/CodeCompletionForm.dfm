@@ -10,8 +10,8 @@ object CodeComplForm: TCodeComplForm
   Constraints.MinWidth = 256
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -13
+  Font.Name = 'Courier New'
   Font.Style = []
   FormStyle = fsStayOnTop
   KeyPreview = True
@@ -19,17 +19,19 @@ object CodeComplForm: TCodeComplForm
   OnDeactivate = FormDeactivate
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object lbCompletion: TListBox
     Left = 0
     Top = 0
     Width = 472
     Height = 286
     Style = lbOwnerDrawFixed
+    AutoComplete = False
     Align = alClient
     BevelInner = bvNone
     BevelOuter = bvNone
     BorderStyle = bsNone
+    ExtendedSelect = False
     ItemHeight = 16
     TabOrder = 0
     OnDblClick = lbCompletionDblClick

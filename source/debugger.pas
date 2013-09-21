@@ -23,7 +23,7 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Sysutils, Windows, Messages, Classes, ShellAPI, Dialogs, Controls,
+  Sysutils, Windows, Messages, Forms, Classes, ShellAPI, Dialogs, Controls,
   debugreader, version, editor, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -50,6 +50,7 @@ type
 
   public
     Executing : boolean;
+    GDBcommandchanged : boolean;
 
     DebugTree : TTreeView;
     BreakPointList : TList;
@@ -62,7 +63,7 @@ type
 
     procedure Start;
     procedure Stop(Sender : TObject);
-    procedure SendCommand(const command, params : AnsiString);
+    procedure SendCommand(const command,params : AnsiString;viewinui : boolean = false);
 
     // CPU window
     procedure SetRegisters(Listin : TList);
@@ -87,8 +88,6 @@ type
 
     procedure RefreshWatchVars;
     procedure DeleteWatchVars(deleteparent : boolean);
-
-    procedure DeleteNode(node : TTreeNode;isparentdata : boolean);
   end;
 
 implementation
@@ -98,9 +97,9 @@ uses
 
 constructor TDebugger.Create;
 begin
+	inherited;
 	BreakPointList := TList.Create;
 	WatchVarList := TList.Create;
-	inherited;
 end;
 
 destructor TDebugger.Destroy;
@@ -109,7 +108,8 @@ var
 begin
 	Stop(nil);
 
-	DeleteWatchVars(true);
+	for i := 0 to WatchVarList.Count - 1 do
+		Dispose(PWatchVar(WatchVarList.Items[i]));
 	WatchVarList.Free;
 
 	// Remove the breakpoints
@@ -195,6 +195,8 @@ begin
 	Reader.Resume;
 
 	MainForm.UpdateAppTitle;
+
+	Application.HintHidePause := 5000;
 end;
 
 procedure TDebugger.Stop(Sender : TObject);
@@ -226,24 +228,42 @@ begin
 		MainForm.RemoveActiveBreakpoints;
 
 		MainForm.UpdateAppTitle;
+
+		Application.HintHidePause := 2500;
 	end;
 end;
 
-procedure TDebugger.SendCommand(const command, params : AnsiString);
+procedure TDebugger.SendCommand(const command,params : AnsiString;viewinui : boolean);
 var
-	P : array [0..512] of char;
+	P : PAnsiChar;
 	nBytesWrote : DWORD;
 begin
 	if Executing then begin
 
 		// Convert command to C string
-		if Length(params) > 0 then
+		if Length(params) > 0 then begin
+			GetMem(P,Length(command) + Length(params) + 3);
 			StrPCopy(P, command + ' ' + params + #10)
-		else
+		end else begin
+			GetMem(P,Length(command) + 2);
 			StrPCopy(P, command + #10);
+		end;
 
-		if not WriteFile(fInputwrite, P, strlen(P), nBytesWrote, nil) then
+		if not WriteFile(fInputwrite, P^, strlen(P), nBytesWrote, nil) then
 			MsgErr('Error writing to GDB');
+
+		if viewinui then
+			if (not GDBcommandchanged) or (MainForm.edGdbCommand.Text = '') then begin
+				// Convert command to C string
+				if Length(params) > 0 then
+					MainForm.edGdbCommand.Text := command + ' ' + params
+				else
+					MainForm.edGdbCommand.Text := command;
+
+				GDBcommandchanged := false;
+			end;
+
+		FreeMem(P);
 	end;
 end;
 
@@ -253,7 +273,7 @@ var
 begin
 	// "filename":linenum
 	filename := StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName,'\','/',[rfReplaceAll]);
-	SendCommand('break','"' + filename + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line));
+	SendCommand('break','"' + filename + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line),true);
 end;
 
 procedure TDebugger.RemoveBreakpoint(i : integer);
@@ -262,7 +282,7 @@ var
 begin
 	// "filename":linenum
 	filename := StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName,'\','/',[rfReplaceAll]);
-	SendCommand('clear','"' + filename + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line));
+	SendCommand('clear','"' + filename + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line),true);
 end;
 
 procedure TDebugger.AddBreakPoint(linein : integer;e : TEditor);
@@ -312,34 +332,33 @@ begin
 			// Remove from list
 			Dispose(PBreakPoint(BreakPointList.Items[i]));
 			BreakPointList.Delete(i);
-			break;
 		end;
 end;
 
 procedure TDebugger.AddWatchVar(i : integer);
 begin
-	SendCommand('display',PWatchParent(WatchVarList.Items[i])^.name);
+	SendCommand('display',PWatchVar(WatchVarList.Items[i])^.name, true);
 end;
 
 procedure TDebugger.RemoveWatchVar(i : integer);
 begin
-	SendCommand('undisplay',IntToStr(PWatchParent(WatchVarList.Items[i])^.gdbindex));
+	SendCommand('undisplay',IntToStr(PWatchVar(WatchVarList.Items[i])^.gdbindex), true);
 end;
 
 procedure TDebugger.AddWatchVar(const namein : AnsiString);
 var
 	parentnode : TTreeNode;
 	I : integer;
-	wparent : PWatchParent;
+	wparent : PWatchVar;
 begin
 
 	// Don't allow duplicates...
 	for I := 0 to WatchVarList.Count - 1 do
-		if SameStr(PWatchParent(WatchVarList.Items[i])^.name,namein) then
+		if SameStr(PWatchVar(WatchVarList.Items[i])^.name,namein) then
 			Exit;
 
 	// Add parent to list
-	wparent := New(PWatchParent);
+	wparent := New(PWatchVar);
 	wparent^.name := namein;
 	wparent^.value := 'Execute to evaluate';
 	wparent^.gdbindex := -1; // filled by GDB
@@ -361,18 +380,23 @@ end;
 procedure TDebugger.RemoveWatchVar(nodein : TTreeNode);
 var
 	I : integer;
+	wparent : PWatchVar;
 begin
 	for i := 0 to WatchVarList.Count - 1 do begin
-		if SameStr(PWatchParent(WatchVarList.Items[i])^.name,PWatchParent(nodein.Data)^.name) then begin
+		wparent := PWatchVar(WatchVarList.Items[I]);
+
+		if SameStr(wparent^.name,PWatchVar(nodein.Data)^.name) then begin
 
 			// Debugger already running and GDB scanned this one? Remove it from GDB
-			if Executing and (PWatchParent(WatchVarList.Items[i])^.gdbindex <> -1) then
+			if Executing and (wparent^.gdbindex <> -1) then
 				RemoveWatchVar(i);
 
 			// Remove from UI
-			DeleteNode(nodein,true);
+			nodein.DeleteChildren;
+			nodein.Delete;
 
 			// Remove from list
+			Dispose(PWatchVar(WatchVarList.Items[i]));
 			WatchVarList.Delete(i);
 
 			break;
@@ -386,61 +410,42 @@ var
 begin
 	// Variables that aren't found need to be re-displayed!
 	for i := 0 to WatchVarList.Count - 1 do
-		if SameStr(PWatchParent(WatchVarList.Items[i])^.value,'Not found in current context') then
+		if SameStr(PWatchVar(WatchVarList.Items[i])^.value,'Not found in current context') then
 			AddWatchVar(i);
 end;
 
 procedure TDebugger.DeleteWatchVars(deleteparent : boolean);
 var
 	I : integer;
-	wparent : PWatchParent;
+	wparent : PWatchVar;
 begin
 	DebugTree.Items.BeginUpdate;
 	for I := WatchVarList.Count - 1 downto 0 do begin
-		wparent := PWatchParent(WatchVarList.Items[I]);
+		wparent := PWatchVar(WatchVarList.Items[I]);
 
 		if deleteparent then begin
 
 			// Remove from UI
-			DeleteNode(wparent^.node,true);
+			if wparent^.node.HasChildren then
+			wparent^.node.DeleteChildren;
+				wparent^.node.Delete;
 
 			// Remove from list
+			Dispose(PWatchVar(WatchVarList.Items[i]));
 			WatchVarList.Delete(i);
 		end else begin
 
-			// Leave parent node intact...
+			// Remove from UI
 			if wparent^.node.HasChildren then
-				DeleteNode(wparent^.node.getFirstChild,false);
+				wparent^.node.DeleteChildren;
 
+			// Leave parent node intact...
 			wparent^.gdbindex := -1;
 			wparent^.value := 'Execute to evaluate';
 			wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
 		end;
 	end;
 	DebugTree.Items.EndUpdate;
-end;
-
-procedure TDebugger.DeleteNode(node : TTreeNode;isparentdata : boolean);
-var
-	sibling,nextsib : TTreeNode;
-begin
-	// Manually walk through the tree to remove data pointers...
-	sibling := node;
-	while Assigned(sibling) do begin
-		if sibling.HasChildren then
-			DeleteNode(sibling.getFirstChild,false);
-
-		// We've reached a node without children finally...
-		if isparentdata then
-			Dispose(PWatchParent(sibling.Data))
-		else
-			Dispose(PWatchMember(sibling.Data));
-
-		// Store next one and prevent deletion of next info
-		nextsib := sibling.getNextSibling;
-		sibling.Delete;
-		sibling := nextsib;
-	end;
 end;
 
 end.

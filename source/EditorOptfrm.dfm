@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 366
-  Top = 282
+  Left = 1138
+  Top = 281
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 462
@@ -742,7 +742,9 @@ object EditorOptForm: TEditorOptForm
           'Visual Studio'
           'Borland'
           'Matrix'
-          'Obsidian')
+          'Obsidian'
+          'GSS Hacker'
+          'Obvilion')
       end
       object edSyntaxExt: TEdit
         Left = 168

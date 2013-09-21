@@ -27,9 +27,9 @@ object NewClassForm: TNewClassForm
   object Label4: TLabel
     Left = 8
     Top = 228
-    Width = 116
+    Width = 76
     Height = 13
-    Caption = 'Implementation filename:'
+    Caption = 'Source filename'
   end
   object Label5: TLabel
     Left = 8
@@ -160,9 +160,9 @@ object NewClassForm: TNewClassForm
     OnChange = txtCppFileChange
   end
   object chkAddToProject: TCheckBox
-    Left = 232
+    Left = 8
     Top = 284
-    Width = 129
+    Width = 353
     Height = 17
     Alignment = taLeftJustify
     Caption = 'Add to current project'

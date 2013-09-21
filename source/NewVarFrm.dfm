@@ -1,6 +1,6 @@
 object NewVarForm: TNewVarForm
-  Left = 221
-  Top = 80
+  Left = 779
+  Top = 259
   BorderStyle = bsDialog
   Caption = 'New variable'
   ClientHeight = 449
@@ -32,7 +32,7 @@ object NewVarForm: TNewVarForm
     Caption = 'Variable name:'
   end
   object Label3: TLabel
-    Left = 52
+    Left = 76
     Top = 172
     Width = 31
     Height = 13
@@ -40,7 +40,7 @@ object NewVarForm: TNewVarForm
     Caption = 'Name:'
   end
   object Label4: TLabel
-    Left = 52
+    Left = 76
     Top = 224
     Width = 31
     Height = 13
@@ -113,18 +113,18 @@ object NewVarForm: TNewVarForm
     OnClick = chkWriteFuncClick
   end
   object txtReadFunc: TEdit
-    Left = 88
+    Left = 112
     Top = 168
-    Width = 253
+    Width = 229
     Height = 21
     TabOrder = 6
     Text = 'txtReadFunc'
     OnChange = cmbTypeChange
   end
   object txtWriteFunc: TEdit
-    Left = 88
+    Left = 112
     Top = 220
-    Width = 253
+    Width = 229
     Height = 21
     TabOrder = 9
     Text = 'txtWriteFunc'
@@ -217,21 +217,19 @@ object NewVarForm: TNewVarForm
     end
   end
   object chkInlineR: TCheckBox
-    Left = 288
-    Top = 148
+    Left = 8
+    Top = 172
     Width = 53
     Height = 17
-    Alignment = taLeftJustify
     Caption = 'Inline'
     Enabled = False
     TabOrder = 5
   end
   object chkInlineW: TCheckBox
-    Left = 288
-    Top = 200
+    Left = 8
+    Top = 224
     Width = 53
     Height = 17
-    Alignment = taLeftJustify
     Caption = 'Inline'
     Enabled = False
     TabOrder = 8

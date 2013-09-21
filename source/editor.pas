@@ -238,7 +238,7 @@ begin
 	fText.Gutter.BorderStyle := gbsNone;
 
 	// Set the variable options
-	devEditor.AssignEditor(self);
+	devEditor.AssignEditor(self.fText,self.fFileName);
 
 	// Create a gutter
 	fDebugGutter := TDebugGutter.Create(self);
@@ -870,14 +870,15 @@ begin
 				// If Ctrl is down, immediately show completionbox when space is hit
 				if CtrlDown then begin
 
+					// Delete space keypress
+					Key := #0;
+
 					P := fText.RowColumnToPixels(fText.DisplayXY);
 					Inc(P.Y,16);
 					fCompletionBox.Position := fText.ClientToScreen(P);
 
 					// Force show
 					fCompletionTimer.OnTimer(nil);
-					fCompletionTimer.Enabled := false;
-					Key := #0;
 				end;
 			end;
 		end;

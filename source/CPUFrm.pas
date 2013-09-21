@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Windows, Messages, SysUtils, Variants, Classes, Math, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, SynEdit, SynEditTypes, ClipBrd, StrUtils, ComCtrls, ExtCtrls, Menus;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -32,13 +32,6 @@ uses
 {$ENDIF}
 
 type
-
-  PRegister = ^TRegister;
-  TRegister = record
-    name : AnsiString;
-    value : AnsiString;
-  end;
-
   TCPUForm = class(TForm)
     edFunc: TComboBox;
     lblFunc: TLabel;
@@ -71,6 +64,7 @@ type
     procedure CPUCutClick(Sender: TObject);
     procedure StackTraceClick(Sender: TObject);
     procedure CPUSelectAllClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     fRegisters : TList;
     fAssembler : TStringList;
@@ -111,6 +105,11 @@ begin
 	MainForm.fDebugger.SetRegisters(nil);
 	MainForm.fDebugger.SetDisassembly(nil);
 	MainForm.fDebugger.SetBacktrace(nil);
+
+	// Save column widths of registerbox
+	devData.CPURegisterCol1 := RegisterListbox.Column[0].Width;
+	devData.CPURegisterCol2 := RegisterListbox.Column[1].Width;
+	devData.CPURegisterCol3 := RegisterListbox.Column[2].Width;
 
 	action := caFree;
 	CPUForm := nil;
@@ -206,7 +205,8 @@ begin
 	for I := 0 to fRegisters.Count - 1 do begin
 		item := RegisterListbox.Items.Add;
 		item.Caption := UpperCase(PRegister(fRegisters.Items[I])^.name);
-		item.SubItems.Add(PRegister(fRegisters.Items[I])^.value);
+		item.SubItems.Add(PRegister(fRegisters.Items[I])^.valuehex);
+		item.SubItems.Add(PRegister(fRegisters.Items[I])^.valuedec);
 	end;
 	RegisterListBox.Items.EndUpdate;
 
@@ -215,10 +215,13 @@ begin
 		Dispose(PRegister(fRegisters.Items[I]));
 	fRegisters.Clear;
 end;
-
 procedure TCPUForm.FormCreate(Sender: TObject);
 begin
 	LoadText;
+
+	// Make it look a bit like a regular editor
+	CodeList.Font.Assign(devEditor.Font);
+	CodeList.Highlighter := dmMain.GetHighlighter('main.cpp'); // use C++ highlighting
 
 	RadioATT.Checked := devData.UseATTSyntax;
 	RadioIntel.Checked := not devData.UseATTSyntax;
@@ -326,6 +329,14 @@ begin
 		if Assigned(e) then
 			e.GotoLineNr(StrToIntDef(sel.SubItems[1],1));
 	end;
+end;
+
+procedure TCPUForm.FormShow(Sender: TObject);
+begin
+	// Get column widths of registerbox
+	RegisterListbox.Column[0].Width := devData.CPURegisterCol1;
+	RegisterListbox.Column[1].Width := devData.CPURegisterCol2;
+	RegisterListbox.Column[2].Width := devData.CPURegisterCol3;
 end;
 
 end.

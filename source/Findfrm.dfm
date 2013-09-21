@@ -1,6 +1,6 @@
 object frmFind: TfrmFind
-  Left = 941
-  Top = 554
+  Left = 353
+  Top = 337
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Find Text'
@@ -19,7 +19,6 @@ object frmFind: TfrmFind
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
     305
@@ -106,7 +105,7 @@ object frmFind: TfrmFind
       object cbWholeWord: TCheckBox
         Left = 8
         Top = 40
-        Width = 120
+        Width = 121
         Height = 17
         Caption = '&Whole words only'
         TabOrder = 1
@@ -150,26 +149,34 @@ object frmFind: TfrmFind
       Left = 156
       Top = 118
       Width = 140
-      Height = 70
+      Height = 87
       Caption = '  Where:  '
       TabOrder = 3
       object rbProjectFiles: TRadioButton
         Left = 8
         Top = 18
-        Width = 110
+        Width = 121
         Height = 17
         Caption = 'Files in Project'
         Checked = True
         TabOrder = 0
         TabStop = True
       end
-      object rbOpenFIles: TRadioButton
+      object rbOpenFiles: TRadioButton
         Left = 8
         Top = 42
-        Width = 110
+        Width = 121
         Height = 17
         Caption = 'Open Files'
         TabOrder = 1
+      end
+      object rbCurFile: TRadioButton
+        Left = 8
+        Top = 64
+        Width = 121
+        Height = 17
+        Caption = 'Current file'
+        TabOrder = 2
       end
     end
     object grpScope: TGroupBox

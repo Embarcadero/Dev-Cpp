@@ -20,8 +20,7 @@
 program devcpp;
 {$R 'icons.res' 'icons.rc'}
 {$R 'DefaultFiles.res' 'DefaultFiles.rc'}
-{$R 'LangForm.res' 'LangFrm.rc'}
-
+{$R 'LangFrm.res' 'LangFrm.rc'}
 {%File 'LangIDs.inc'}
 
 uses
@@ -50,7 +49,6 @@ uses
   compiler in 'compiler.pas',
   devrun in 'devrun.pas',
   ProjectOptionsFrm in 'ProjectOptionsFrm.pas' {ProjectOptionsForm},
-  CompOptionsFrm in 'CompOptionsFrm.pas' {CompOptionsForm},
   ToolFrm in 'ToolFrm.pas' {ToolFrom},
   ToolEditFrm in 'ToolEditFrm.pas' {ToolEditForm},
   IconFrm in 'IconFrm.pas' {IconForm},
@@ -92,7 +90,8 @@ uses
   CVSPasswdFrm in 'CVSPasswdFrm.pas' {CVSPasswdForm},
   DevThemes in 'DevThemes.pas',
   ParamsFrm in 'ParamsFrm.pas' {ParamsForm},
-  CompilerOptionsFrame in 'CompilerOptionsFrame.pas' {CompOptionsFrame: TFrame},
+  CompOptionsFrame in 'CompOptionsFrame.pas' {CompOptionsFrame: TFrame},
+  CompOptionsFrm in 'CompOptionsFrm.pas' {CompOptionsForm},
   CompileProgressFrm in 'CompileProgressFrm.pas' {CompileProgressForm},
   WebThread in 'Tools\webupdate\WebThread.pas',
   WebUpdate in 'Tools\webupdate\WebUpdate.pas' {WebUpdateForm},
@@ -162,8 +161,7 @@ begin
 	Application.Initialize;
 	Application.Title := 'Dev-C++';
 	Application.CreateForm(TMainForm, MainForm);
-
-	if Assigned(SplashForm) then
+  if Assigned(SplashForm) then
 		SplashForm.Close;
 
 	Application.Run;

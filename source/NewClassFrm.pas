@@ -362,6 +362,10 @@ end;
 
 procedure TNewClassForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_POP_NEWCLASS];
   Label1.Caption := Lang[ID_NEWCLASS_NAME];
   Label9.Caption := Lang[ID_NEWMEMB_ARGS];

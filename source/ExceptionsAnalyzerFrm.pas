@@ -612,7 +612,7 @@ begin
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
-	fEmail := 'orwelldevcpp@users.sourceforge.net';
+	fEmail := 'johanmes93@gmail.com';
 	fSubject := 'Orwell Dev-C++ ' + DEVCPP_VERSION + ' bug report';
 	fReportEXEversion := True;
 	fReportComputerName := True;

@@ -358,6 +358,11 @@ end;
 
 procedure TNewVarForm.LoadText;
 begin
+
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_POP_NEWVAR];
   Label1.Caption := Lang[ID_NEWVAR_VARTYPE];
   Label2.Caption := Lang[ID_NEWVAR_VARNAME];

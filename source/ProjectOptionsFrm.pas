@@ -28,12 +28,12 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
-  prjtypes, Spin, ValEdit, CompilerOptionsFrame, ShellApi, Grids;
+  prjtypes, Spin, ValEdit, CompOptionsFrame, ShellApi, Grids;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
   QStdCtrls, QExtCtrls, QButtons, QComCtrls, main, project,
-  prjtypes, CompilerOptionsFrame, Types;
+  prjtypes, CompOptionsFrame, Types;
 {$ENDIF}
 
 type
@@ -449,16 +449,8 @@ begin
 		if chkSyncProduct.Checked then
 			VersionInfo.ProductVersion := Format('%d.%d.%d.%d', [spnMajor.Value,spnMinor.Value,spnRelease.Value,spnBuild.Value]);
 
-		vleVersion.Strings.Clear;
-		vleVersion.InsertRow('File Description',  VersionInfo.FileDescription,  True);
-		vleVersion.InsertRow('File Version',      VersionInfo.FileVersion,      True);
-		vleVersion.InsertRow('Product Name',      VersionInfo.ProductName,      True);
-		vleVersion.InsertRow('Product Version',   VersionInfo.ProductVersion,   True);
-		vleVersion.InsertRow('Original Filename', VersionInfo.OriginalFilename, True);
-		vleVersion.InsertRow('Internal Name',     VersionInfo.InternalName,     True);
-		vleVersion.InsertRow('Company Name',      VersionInfo.CompanyName,      True);
-		vleVersion.InsertRow('Legal Copyright',   VersionInfo.LegalCopyright,   True);
-		vleVersion.InsertRow('Legal Trademarks',  VersionInfo.LegalTrademarks,  True);
+		vleVersion.Values['File Version'] := VersionInfo.FileVersion;
+		vleVersion.Values['Product Version'] := VersionInfo.ProductVersion;
 	end;
 end;
 
@@ -1005,15 +997,8 @@ var
 	I: integer;
 begin
 	with fProjectCopy.Options.VersionInfo do begin
-		chkVersionInfo.Checked:=fProjectCopy.Options.IncludeVersionInfo;
+		chkVersionInfo.Checked := fProjectCopy.Options.IncludeVersionInfo;
 		chkVersionInfoClick(nil);
-
-		spnMajor.Value:=Major;
-		spnMinor.Value:=Minor;
-		spnRelease.Value:=Release;
-		spnBuild.Value:=Build;
-		chkAutoIncBuild.Checked:=AutoIncBuildNr;
-		chkSyncProduct.Checked:=SyncProduct;
 
 		vleVersion.Strings.Clear;
 		vleVersion.InsertRow('File Description',  FileDescription,   True);
@@ -1025,6 +1010,13 @@ begin
 		vleVersion.InsertRow('Company Name',      CompanyName,       True);
 		vleVersion.InsertRow('Legal Copyright',   LegalCopyright,    True);
 		vleVersion.InsertRow('Legal Trademarks',  LegalTrademarks,   True);
+
+		spnMajor.Value := Major;
+		spnMinor.Value := Minor;
+		spnRelease.Value := Release;
+		spnBuild.Value := Build;
+		chkAutoIncBuild.Checked := AutoIncBuildNr;
+		chkSyncProduct.Checked := SyncProduct;
 
 		cmbLangID.Items.Clear;
 		for I:=0 to Languages.Count-1 do

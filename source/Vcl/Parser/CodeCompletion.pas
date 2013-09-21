@@ -76,7 +76,7 @@ type
     procedure Hide;
     function SelectedStatement: PStatement;
     function SelectedIsFunction: boolean;
-    function GetClass(Phrase: AnsiString): AnsiString;
+    function GetClass(const Phrase: AnsiString): AnsiString;
   published
     property Parser: TCppParser read fParser write fParser;
     property Position: TPoint read fPos write SetPosition;
@@ -130,7 +130,7 @@ begin
   inherited Destroy;
 end;
 
-function TCodeCompletion.GetClass(Phrase: AnsiString): AnsiString;
+function TCodeCompletion.GetClass(const Phrase: AnsiString): AnsiString;
 var
   I: integer;
 begin
@@ -406,8 +406,14 @@ end;
 
 procedure TCodeCompletion.Hide;
 begin
-    OnKeyPress := nil;
+	OnKeyPress := nil;
 	CodeComplForm.Hide;
+
+	// Clear data, do not free pointed memory: data is owned by CppParser
+	fCompletionStatementList.Clear;
+	fFullCompletionStatementList.Clear;
+	CodeComplForm.lbCompletion.Items.Clear; // clear UI too
+	fIncludedFiles.Clear; // is recreated anyway on reshow, so save some memory when hiding
 end;
 
 function ListSort(Item1, Item2: Pointer): Integer;
@@ -444,7 +450,6 @@ begin
 
 			// only perform full new search if just invoked
 			if not CodeComplForm.Showing then begin
-				fFullCompletionStatementList.Clear;
 				fIncludedFiles.CommaText := fParser.GetFileIncludes(Filename);
 				GetCompletionFor(C, M, D);
 			end;
@@ -467,9 +472,10 @@ begin
 
 			CodeComplForm.Show;
 			CodeComplForm.lbCompletion.SetFocus;
-			CodeComplForm.lbCompletion.ItemIndex := 0;
+			if CodeComplForm.lbCompletion.Items.Count > 0 then
+				CodeComplForm.lbCompletion.ItemIndex := 0;
 		end else
-			CodeComplForm.Hide;
+			Hide;
 	end;
 end;
 

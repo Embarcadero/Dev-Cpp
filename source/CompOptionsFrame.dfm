@@ -14,7 +14,7 @@ object CompOptionsFrame: TCompOptionsFrame
     Align = alClient
     TabOrder = 0
     OnChange = tabsChange
-    object vle: TValueListEditor
+    object vle: TCompOptionsList
       Left = 4
       Top = 6
       Width = 565
@@ -22,15 +22,12 @@ object CompOptionsFrame: TCompOptionsFrame
       Align = alClient
       BorderStyle = bsNone
       DefaultRowHeight = 22
-      DisplayOptions = []
+      DisplayOptions = [doKeyColFixed]
       DropDownRows = 40
       FixedCols = 1
       Options = [goEditing, goAlwaysShowEditor]
       ScrollBars = ssNone
       TabOrder = 0
-      TitleCaptions.Strings = (
-        'Option'
-        'Value')
       OnSetEditText = vleSetEditText
       ColWidths = (
         199

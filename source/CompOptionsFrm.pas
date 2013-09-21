@@ -26,12 +26,12 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, Spin,
-  CompilerOptionsFrame;
+  CompOptionsFrame, CompOptionsList;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
   QButtons, QStdCtrls, Inifiles, QExtCtrls, QComCtrls,
-  CompilerOptionsFrame;
+  CompOptionsFrame;
 {$ENDIF}
 
 type
@@ -77,7 +77,6 @@ type
     cbFastDep: TCheckBox;
     cbLinkerAdd: TCheckBox;
     Linker: TMemo;
-    CompOptionsFrame1: TCompOptionsFrame;
     grpCompSet: TGroupBox;
     OptionsTip: TLabel;
     cmbCompilerSetComp: TComboBox;
@@ -92,6 +91,7 @@ type
     btnBrowse6: TSpeedButton;
     btnBrowse7: TSpeedButton;
     btnBrowse8: TSpeedButton;
+    CompOptionsFrame1: TCompOptionsFrame;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);

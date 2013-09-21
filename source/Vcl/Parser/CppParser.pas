@@ -1613,7 +1613,7 @@ begin
       fOnEndParsing(Self);
     Exit;
   end;
-  fCurrentFile := LowerCase(FileName);
+  fCurrentFile := FileName;
   fIsProjectFile := fProjectFiles.IndexOf(fCurrentFile) <> -1;
   fIndex := 0;
   fLevel := 0;
@@ -2730,9 +2730,12 @@ begin
 	m := Pos('->',Phrase);
 	n := Pos('::',Phrase);
 	o := Pos('.',Phrase);
-	if (m>0) or (n>0) then begin
-		parentword := Copy(Phrase,1,m-1); // m equals n
+	if (m>0) then begin
+		parentword := Copy(Phrase,1,m-1);
 		memberword := Copy(Phrase,m + 2,Length(Phrase) - m);
+	end else if (n>0) then begin
+		parentword := Copy(Phrase,1,n-1);
+		memberword := Copy(Phrase,n + 2,Length(Phrase) - n);
 	end else if (o>0) then begin
 		parentword := Copy(Phrase,1,o-1); // m equals o
 		memberword := Copy(Phrase,o + 1,Length(Phrase) - o);

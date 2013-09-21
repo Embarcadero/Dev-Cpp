@@ -217,8 +217,7 @@ type
     procedure edGutterSizeChange(Sender: TObject);
     procedure cboEditorFontChange(Sender: TObject);
     procedure cpHighColorDefaultSelect(Sender: TObject);
-    procedure cpHighColorHint(Sender: TObject; Cell: Integer;
-      var Hint: String);
+    procedure cpHighColorHint(Sender: TObject; Cell: Integer;var Hint: String);
   private
     ffgColor: TColor;
     fbgColor: TColor;
@@ -267,6 +266,15 @@ const
 procedure TEditorOptForm.FormCreate(Sender: TObject);
 begin
 	LoadText;
+
+	// Make editors look a similar to main ones
+	CppEdit.Font.Assign(devEditor.Font);
+	CodeIns.Font.Assign(devEditor.Font);
+	seDefault.Font.Assign(devEditor.Font);
+
+	CppEdit.Gutter.Font.Assign(devEditor.Gutterfont);
+	CodeIns.Gutter.Font.Assign(devEditor.Gutterfont);
+	seDefault.Gutter.Font.Assign(devEditor.Gutterfont);
 
 	// Code snippets
 	LoadCodeIns;
@@ -1185,7 +1193,7 @@ var
  i: integer;
  attr: TSynHighlighterAttributes;
 begin
-	if cboQuickColor.ItemIndex > 7 then begin
+	if cboQuickColor.ItemIndex > 9 then begin
 		// custom style; load from disk
 		LoadSyntax(cboQuickColor.Items[cboQuickColor.ItemIndex]);
 		Exit;
@@ -1207,7 +1215,7 @@ begin
 	StrtoPoint(fABPColor,  LoadStr(offset+19)); // active breakpoint
 	StrtoPoint(fgutColor,  LoadStr(offset+20)); // gutter
 	StrtoPoint(fSelColor,  LoadStr(offset+21)); // selected text
-	StrtoPoint(fFoldColor, LoadStr(offset+22)); // selected text
+	StrtoPoint(fFoldColor, LoadStr(offset+22)); // folding bar lines
 
 	cppEdit.InvalidateLine(cSelection);
 	cppEdit.InvalidateLine(cBreakLine);

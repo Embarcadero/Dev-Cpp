@@ -341,13 +341,13 @@ begin
 	devExternalPrograms.Programs.Assign(vleExternal.Strings);
 
 	try
-		for idx:=0 to AssociationsCount-1 do
+		for idx:=0 to AssociationsCount - 1 do
 			if lstAssocFileTypes.Checked[idx] then
 				Associate(idx)
 			else
 				Unassociate(idx);
 	except
-		MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar('Error'),MB_OK);
+		MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
 	end;
 
 	devCVSHandler.Executable:= edCVSExec.Text;

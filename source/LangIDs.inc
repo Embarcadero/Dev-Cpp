@@ -645,6 +645,7 @@ const
   ID_FIND_REPLACEFILES                  = 38057;
   ID_FIND_REPLACEWITH                   = 38058;
   ID_FIND_PROMPTREPLACE                 = 38059;
+  ID_FIND_CURRENTFILE                   = 38060;
 
   // Goto function form
   ID_GF_TEXT                            = 40001;

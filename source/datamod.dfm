@@ -2,8 +2,8 @@ object dmMain: TdmMain
   OldCreateOrder = False
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
-  Left = 974
-  Top = 504
+  Left = 1187
+  Top = 592
   Height = 354
   Width = 494
   object Cpp: TSynCppSyn
@@ -9223,29 +9223,6 @@ object dmMain: TdmMain
     Filter = 'Resource Scripts (*.rc)|*.rc|All files (*.*)|*.*'
     Left = 112
     Top = 120
-  end
-  object SynHint: TSynCompletionProposal
-    DefaultType = ctHint
-    Options = [scoCaseSensitive, scoLimitToMatchedText, scoUsePrettyText]
-    NbLinesInWindow = 1
-    Width = 262
-    EndOfTokenChr = '()[]. '
-    TriggerChars = '.'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = []
-    TitleFont.Charset = DEFAULT_CHARSET
-    TitleFont.Color = clBtnText
-    TitleFont.Height = -11
-    TitleFont.Name = 'MS Sans Serif'
-    TitleFont.Style = [fsBold]
-    Columns = <>
-    ShortCut = 16416
-    TimerInterval = 2000
-    Left = 224
-    Top = 248
   end
   object ClassImages: TImageList
     Left = 392

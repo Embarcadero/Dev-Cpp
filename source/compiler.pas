@@ -283,7 +283,7 @@ begin
 	else
 		Writeln(F, '.PHONY: all all-before all-after clean clean-custom');
 	Writeln(F, '');
-	Writeln(F, 'all: all-before ' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)) + ' all-after');
+	Writeln(F, 'all: all-before $(BIN) all-after');
 	Writeln(F, '');
 
 	for i := 0 to fProject.Options.MakeIncludes.Count - 1 do
@@ -451,9 +451,9 @@ begin
 	writeln(F, '$(BIN): $(OBJ)'); // CL: changed from $(LINKOBJ) to $(OBJ), in order to call overrided buid commands not included in linking
 	if not DoCheckSyntax then
 		if fProject.Options.useGPP then
-			writeln(F, #9 + '$(CPP) $(LINKOBJ) -o "' + ExtractRelativePath(Makefile, fProject.Executable) + '" $(LIBS)')
+			writeln(F, #9 + '$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)')
 		else
-			writeln(F, #9 + '$(CC) $(LINKOBJ) -o "' + ExtractRelativePath(Makefile, fProject.Executable) + '" $(LIBS)');
+			writeln(F, #9 + '$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)');
 	WriteMakeObjFilesRules(F);
 	Flush(F);
 	CloseFile(F);
@@ -517,9 +517,11 @@ begin
 		fCompileParams := '';
 		fCppCompileParams := '';
 
-		if Assigned(fProject) and (fTarget = ctProject) and (Length(fProject.Options.cmdlines.Compiler) > 0) then begin
-			fCppCompileParams := TrimRight(StringReplace(fProject.Options.cmdlines.CppCompiler, '_@@_', ' ', [rfReplaceAll]));
-			fCompileParams := TrimRight(StringReplace(fProject.Options.cmdlines.Compiler, '_@@_', ' ', [rfReplaceAll]));
+		if Assigned(fProject) and (fTarget = ctProject) then begin
+			if Length(fProject.Options.cmdlines.Compiler) > 0 then
+				fCompileParams := TrimRight(StringReplace(fProject.Options.cmdlines.Compiler, '_@@_', ' ', [rfReplaceAll]));
+			if Length(fProject.Options.cmdlines.CppCompiler) > 0 then
+				fCppCompileParams := TrimRight(StringReplace(fProject.Options.cmdlines.CppCompiler, '_@@_', ' ', [rfReplaceAll]));
 		end;
 
 		if (Length(devCompiler.CompOpts) > 0) and devCompiler.AddtoComp then begin
@@ -764,7 +766,7 @@ begin
 	fSingleFile := True; // fool rebuild; don't run deps checking since all files will be rebuilt
 	Result := True;
 
-	if Assigned(Project) then begin
+	if Assigned(fProject) then begin
 
 		SwitchToProjectCompilerSet;
 

@@ -358,14 +358,9 @@ object CompOptForm: TCompOptForm
         inherited tabs: TTabControl
           Width = 476
           Height = 353
-          inherited vle: TValueListEditor
+          inherited vle: TCompOptionsList
             Width = 468
             Height = 343
-            ParentShowHint = False
-            ShowHint = True
-            ColWidths = (
-              224
-              108)
           end
         end
       end

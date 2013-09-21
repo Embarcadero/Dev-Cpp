@@ -62,7 +62,6 @@ type
     ProjectImage_Blue: TImageList;
     Specialimages_Blue: TImageList;
     ResourceDialog: TOpenDialog;
-    SynHint: TSynCompletionProposal;
     ClassImages: TImageList;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);

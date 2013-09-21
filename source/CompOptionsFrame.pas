@@ -17,14 +17,14 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit CompilerOptionsFrame;
+unit CompOptionsFrame;
 
 interface
 
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Grids, ValEdit, ComCtrls, ExtCtrls, project, utils, prjtypes, StdCtrls;
+  Grids, ValEdit, ComCtrls, ExtCtrls, CompOptionsList, project, utils, prjtypes, StdCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -34,10 +34,9 @@ uses
 type
   TCompOptionsFrame = class(TFrame)
     tabs: TTabControl;
-    vle: TValueListEditor;
+    vle: TCompOptionsList;
     procedure tabsChange(Sender: TObject);
-    procedure vleSetEditText(Sender: TObject; ACol, ARow: Integer;
-      const Value: String);
+    procedure vleSetEditText(Sender: TObject; ACol, ARow: Integer;const Value: String);
   private
     { Private declarations }
     fProject: TProject;
@@ -91,7 +90,7 @@ begin
 
 			vle.Strings.Objects[idx] := Pointer(I);
 			vle.ItemProps[idx].EditStyle := esPickList;
-			vle.ItemProps[idx].ReadOnly := True;
+			vle.ItemProps[idx].ReadOnly := true;
 			if Assigned(option.optChoices) then begin
 				for j := 0 to option.optChoices.Count - 1 do
 					vle.ItemProps[idx].PickList.Add(option.optChoices.Names[J]);
@@ -102,7 +101,7 @@ begin
 		end;
 	end;
 	vle.ColWidths[0] := vle.ClientWidth - 90;
-
+	vle.ColWidths[1] := 90;
 	vle.OnSetEditText := vleSetEditText;
 
 	vle.Strings.EndUpdate;
@@ -128,7 +127,7 @@ begin
 	end;
 
 	// update string too
-	devCompiler.SetOption(nil,Integer(vle.Strings.Objects[ARow]),ValueToChar[option^.optValue]);
+	devCompiler.SetOption(option,Integer(vle.Strings.Objects[ARow]),ValueToChar[option^.optValue]);
 end;
 
 end.

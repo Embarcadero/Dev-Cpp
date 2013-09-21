@@ -23,22 +23,11 @@ interface
 
 uses
 {$IFDEF WIN32}
- Classes, Controls, ColorPickerButton, devFileMonitor,
+ Classes, Controls, ColorPickerButton, devFileMonitor;
 {$ENDIF}
 {$IFDEF LINUX}
- Classes, QControls, ColorPickerButton, devFileMonitor,
+ Classes, QControls, ColorPickerButton, devFileMonitor;
 {$ENDIF}
-
-{$IFDEF VER130}
- DsgnIntf
-{$ELSE}
- DesignEditors,
- DesignIntf
-{$ENDIF};
-
-type
- TdevPageEditor = class(TComponentEditor)
- end;
 
 procedure Register;
 

@@ -302,6 +302,10 @@ end;
 
 procedure TNewMemberForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_POP_NEWMEMBER];
   Label1.Caption := Lang[ID_NEWVAR_VARTYPE];
   Label2.Caption := Lang[ID_NEWMEMB_MEMBNAME];

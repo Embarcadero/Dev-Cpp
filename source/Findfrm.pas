@@ -52,7 +52,7 @@ type
     rbEntireScope: TRadioButton;
     grpWhere: TGroupBox;
     rbProjectFiles: TRadioButton;
-    rbOpenFIles: TRadioButton;
+    rbOpenFiles: TRadioButton;
     cbPrompt: TCheckBox;
     cboReplaceText: TComboBox;
     lblReplace: TLabel;
@@ -62,11 +62,11 @@ type
     FindCut: TMenuItem;
     N1: TMenuItem;
     FindSelAll: TMenuItem;
+    rbCurFile: TRadioButton;
     procedure btnFindClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnCancelClick(Sender: TObject);
     procedure FindTabsChange(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FindCutClick(Sender: TObject);
@@ -95,7 +95,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  Main, Dialogs, MultiLangSupport, devcfg, utils, SynEditMiscClasses;
+  Main, Dialogs, MultiLangSupport, devcfg, utils, SynEditMiscClasses, Math;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, Main, QDialogs, MultiLangSupport, devcfg;
@@ -248,12 +248,13 @@ begin
 
 				Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
 
+				// TODO: save all or not? user can Ctrl+Z if he wishes to
 				if isreplacefiles then
 					MainForm.SaveFile(e);
 			end;
 
 		// loop through project
-		end else begin
+		end else if rbProjectFiles.Checked then begin
 			for I := 0 to MainForm.fProject.Units.Count - 1 do begin
 				e := MainForm.fProject.Units[i].Editor;
 				fCurFile := MainForm.fProject.Units[i].FileName;
@@ -264,7 +265,7 @@ begin
 					if isreplacefiles then
 						e.Activate;
 
-					Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles))
+					Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
 
 				// not open? load from disk
 				end else begin
@@ -296,6 +297,17 @@ begin
 						Inc(findcount,FindReplaceFiles(fTempSynEdit,isreplacefiles));
 					end;
 				end;
+			end;
+		end else if rbCurFile.Checked then begin
+			e := MainForm.GetEditor;
+
+			if Assigned(e) then begin
+
+				fCurFile := e.FileName;
+				if isreplacefiles then
+					e.Activate;
+
+				Inc(findcount,FindReplaceFiles(e.Text,isreplacefiles));
 			end;
 		end;
 	end;
@@ -333,8 +345,14 @@ begin
 
 	devData.ScopeIsSelected := rbSelectedOnly.Checked;
 	devData.DirBackward := rbBackward.Checked;
-	devData.WhereOpenFiles := rbOpenFiles.Checked;
 	devData.OriginEntireScope := rbEntireScope.Checked;
+
+	if rbProjectFiles.Checked then
+		devData.SearchWhere := 0
+	else if rbOpenFiles.Checked then
+		devData.SearchWhere := 1
+	else if rbCurFile.Checked then
+		devData.SearchWhere := 2;
 
 	Action := caHide;
 end;
@@ -405,6 +423,7 @@ begin
   grpWhere.Caption:=       Lang[ID_FIND_GRP_WHERE];
   rbProjectFiles.Caption:= Lang[ID_FIND_PRJFILES];
   rbOpenFIles.Caption:=    Lang[ID_FIND_OPENFILES];
+  rbCurFile.Caption:=      Lang[ID_FIND_CURRENTFILE];
 
   grpScope.Caption:=       '  ' +Lang[ID_FIND_GRP_SCOPE] +'  ';
   rbGlobal.Caption:=       Lang[ID_FIND_GLOBAL];
@@ -428,22 +447,9 @@ begin
 	FindSelAll.Caption := Lang[ID_ITEM_SELECTALL];
 end;
 
-procedure TfrmFind.FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
-begin
-{$IFDEF WIN32}
-	if (Key=VK_TAB) and (Shift=[ssCtrl]) then
-{$ENDIF}
-{$IFDEF LINUX}
-	if (Key=XK_TAB) and (Shift=[ssCtrl]) then
-{$ENDIF}
-		// eliminated a branch! :D
-		FindTabs.TabIndex := (FindTabs.TabIndex+1) mod 4;
-end;
-
 procedure TfrmFind.FormCreate(Sender: TObject);
 begin
 	LoadText;
-	ActiveControl := cboFindText;
 
 	fSearchEngine := TSynEditSearch.Create(Self);
 
@@ -465,8 +471,15 @@ begin
 
 	rbSelectedOnly.Checked := devData.ScopeIsSelected;
 	rbBackward.Checked := devData.DirBackward;
-	rbOpenFiles.Checked := devData.WhereOpenFiles;
 	rbEntireScope.Checked := devData.OriginEntireScope;
+
+	case devData.SearchWhere of
+		0 : rbProjectFiles.Checked := true;
+		1 : rbOpenFIles.Checked := true;
+		2 : rbCurFile.Checked := true;
+	end;
+
+	ActiveControl := cboFindText;
 
 	FindTabsChange(nil);
 end;

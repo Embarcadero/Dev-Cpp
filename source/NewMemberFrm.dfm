@@ -3,7 +3,7 @@ object NewMemberForm: TNewMemberForm
   Top = 107
   BorderStyle = bsDialog
   Caption = 'New member function'
-  ClientHeight = 480
+  ClientHeight = 469
   ClientWidth = 350
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
