@@ -40,18 +40,27 @@ type
                    TFrameArgs,
                    TFrameBegin,TFrameEnd,
                    TErrorBegin, TErrorEnd,
+                   TArrayBegin, TArrayEnd,
+                   TElt,TEltRep,TEltRepEnd,
                    TExit,
-                   TValueHistory,
-                   TArgBegin, TArgEnd,TArgValue,TArgNameEnd,
+                   TValueHistoryValue,
+                   TArgBegin, TArgEnd, TArgValue, TArgNameEnd,
+                   TFieldBegin, TFieldEnd, TFieldValue, TFieldNameEnd,
                    TInfoReg, TInfoAsm,
                    TUnknown,TEOF);
 
-  PWatchVar = ^TWatchVar;
-  TWatchVar = record
+  PWatchParent = ^TWatchParent;
+  TWatchParent = record
     name : AnsiString;
     value : AnsiString;
     gdbindex : integer;
     node : TTreeNode;
+  end;
+
+  PWatchMember = ^TWatchMember;
+  TWatchMember = record
+    name : AnsiString;
+    value : AnsiString;
   end;
 
   PBreakPoint = ^TBreakPoint;
@@ -74,7 +83,7 @@ type
     Disassembly : TStringList; // convert to TList with proper data formatting?
     Backtrace : TList;
     BreakpointList : TList;
-    WatchVarList : TList;
+    WatchVarList : TList; // contains all parents
     DebugTree : TTreeView;
     hintedvar : AnsiString;
   private
@@ -84,6 +93,7 @@ type
     bfile : AnsiString;
     gdbout : AnsiString;
     evalvalue : AnsiString;
+    nextannotation : TAnnotateType;
 
 	// attempt to cut down on Synchronize calls
 	dobacktraceready : boolean;
@@ -93,6 +103,10 @@ type
 	doevalready : boolean;
 	doprocessexited : boolean;
 	doupdateexecution : boolean;
+
+	// Evaluation tree output handlers
+    procedure ProcessWatchStruct(parentnode : TTreeNode);
+    function ProcessEvalStruct(indent : integer) : AnsiString;
 
     procedure Analyze;
 
@@ -261,6 +275,7 @@ var
 begin
 	oldpos := curpos;
 	Result := GetNextAnnotation;
+	nextannotation := Result;
 	curpos := oldpos;
 end;
 
@@ -287,12 +302,12 @@ begin
 		curpos := oldpos;
 
 		// Hack fix to catch register dump
-		if Assigned(Registers) and Assigned(CPUForm) then
+		if Assigned(Registers) then
 			if StartsStr('rax ',s) or StartsStr('eax ',s) then
 				result := TInfoReg;
 
 		// Another hack to catch assembler
-		if Assigned(Disassembly) and Assigned(CPUForm) then
+		if Assigned(Disassembly) then
 			if StartsStr('Dump of assembler code for function ',s) then
 				result := TInfoAsm;
 
@@ -332,19 +347,160 @@ begin
 		result := TArgValue
 	else if SameStr(s,'arg-end') then
 		result := TArgEnd
+	else if SameStr(s,'array-section-begin') then
+		result := TArrayBegin
+	else if SameStr(s,'array-section-end') then
+		result := TArrayEnd
+	else if SameStr(s,'elt') then
+		result := TElt
+	else if SameStr(s,'elt-rep') then
+		result := TEltRep
+	else if SameStr(s,'elt-rep-end') then
+		result := TEltRepEnd
+	else if SameStr(s,'field-begin') then
+		result := TFieldBegin
+	else if SameStr(s,'field-name-end') then
+		result := TFieldNameEnd
+	else if SameStr(s,'field-value') then
+		result := TFieldValue
+	else if SameStr(s,'field-end') then
+		result := TFieldEnd
 	else if SameStr(s,'value-history-value') then
-		result := TValueHistory
+		result := TValueHistoryValue
 	else if (curpos = len) then
 		result := TEOF
 	else
 		result := TUnknown;
 end;
 
+procedure TDebugReader.ProcessWatchStruct(parentnode : TTreeNode);
+var
+	newnode : TTreeNode;
+	wmember : PWatchMember;
+begin
+	while (PeekAnnotation = TFieldBegin) do begin
+
+		wmember := new(PWatchMember);
+
+		// field name
+		if not FindAnnotation(TFieldBegin) then begin
+			Dispose(PWatchMember(wmember));
+			Exit;
+		end;
+
+		wmember^.name := GetNextFilledLine;
+
+		// =
+		if not FindAnnotation(TFieldNameEnd) then begin
+			Dispose(PWatchMember(wmember));
+			Exit;
+		end;
+
+		// field value
+		if not FindAnnotation(TFieldValue) then begin
+			Dispose(PWatchMember(wmember));
+			Exit;
+		end;
+
+		wmember^.value := GetNextFilledLine;
+
+		// TODO: unsafe to already add it here
+		newnode := DebugTree.Items.AddChildObject(parentnode,wmember^.name + ' = ' + wmember^.value,wmember);
+
+		// This might be a struct too...
+		if wmember^.value = '{' then
+			ProcessWatchStruct(newnode);
+
+		// End of current argument
+		if not FindAnnotation(TFieldEnd) then begin
+			Dispose(PWatchMember(wmember));
+			Exit;
+		end;
+	end;
+end;
+
+function TDebugReader.ProcessEvalStruct(indent : integer) : AnsiString;
+var
+	i : integer;
+	s : AnsiString;
+begin
+	result := '';
+	while curpos < len do begin
+		case GetNextAnnotation of
+
+			TFieldBegin : begin
+
+				for i := 0 to (4*indent) - 1 do
+					result := result + ' ';
+
+				// Field name
+				result := result + GetNextLine;
+
+				// =
+				if not FindAnnotation(TFieldNameEnd) then Exit;
+
+				result := result + GetNextLine;
+
+				// field value
+				if not FindAnnotation(TFieldValue) then Exit;
+
+				s := GetNextLine;
+				result := result + s;
+
+				// This might be a struct too...
+				if EndsStr('{',s) then
+					result := result + #13#10 + ProcessEvalStruct(indent+1);
+
+			end;
+
+			// Add value to current indent
+			TArrayBegin : begin
+				s := GetNextLine;
+				result := result + s;
+				if EndsStr('{',s) then
+					result := result + ProcessEvalStruct(indent+1);
+			end;
+
+			// Add value to current indent
+			TElt,TEltRep : begin
+				s := GetNextLine;
+				result := result + s;
+				if EndsStr('{',s) then
+					result := result + ProcessEvalStruct(indent+1);
+			end;
+
+			// Add, complete current indent
+			TFieldEnd : begin
+				s := GetNextLine;
+				result := result + ';' + #13#10;
+
+				// End of structure, complete braces
+				if EndsStr('}',s) then begin
+
+					for i := 0 to (4*(indent-1)) - 1 do
+						result := result + ' ';
+
+					result := result + s;
+					break;
+				end;
+			end;
+
+			// Add, exit current indent
+			TArrayEnd : begin
+				s := GetNextLine;
+				result := result + s;
+				break;
+			end;
+		end;
+	end;
+end;
+
 procedure TDebugReader.Analyze;
 var
 	s,t,u : AnsiString;
 	i,x,y : integer; // dump
-	wvar : PWatchVar;
+	wparent : PWatchParent;
+	node : TTreeNode;
 	reg : PRegister;
 	trace : PTrace;
 begin
@@ -363,10 +519,12 @@ begin
 
 	while curpos < len do begin
 		case GetNextAnnotation of
-			TValueHistory : begin
+			TValueHistoryValue : begin
 				evalvalue := GetNextLine; // value, might be empty
 				if SameStr(evalvalue,'') then
-					evalvalue := 'Error evaluating input';
+					evalvalue := 'Error evaluating input'
+				else if EndsStr('{',evalvalue) then
+					evalvalue := evalvalue + #13#10 + ProcessEvalStruct(1);
 
 				doevalready := true;
 			end;
@@ -375,7 +533,7 @@ begin
 			end;
 			TFrameBegin : begin
 				s := GetNextFilledLine;
-				if Assigned(Backtrace) and Assigned(CPUForm) and StartsStr('#',s) then begin
+				if Assigned(Backtrace) and StartsStr('#',s) then begin
 
 					trace := new(PTrace);
 
@@ -470,49 +628,51 @@ begin
 				end;
 			end;
 			TInfoAsm : begin
+				if Assigned(Disassembly) then begin
 
-				// Skip info messages
-				s := GetNextLine; // Dump of ... foo()
+					// Skip info messages
+					s := GetNextLine; // Dump of ... foo()
 
-				// the current function name will be saved at index 0
-				Disassembly.Add(Copy(s,37,Length(s)-37));
+					// the current function name will be saved at index 0
+					Disassembly.Add(Copy(s,37,Length(s)-37));
 
-				s := GetNextLine;
-
-				// Add lines of disassembly
-				while not SameStr('End of assembler dump.',s) do begin
-					Disassembly.Add(s);
 					s := GetNextLine;
-				end;
 
-				// Is Disassembly assigned? Assume CPU window called for this
-				dodisassemblerready := true;
-			end;
-			TInfoReg : begin
-				// Scan all registers until end of gdb output
-
-				s := GetNextFilledLine;
-
-				repeat
-
-					// name(spaces)hexvalue(tab)decimalvalue
-					reg := new(PRegister);
-					x := Pos(' ',s);
-					if x > 0 then begin
-						reg^.name := Copy(s,1,x-1);
-						y := Pos(#9,s);
-						if y > 0 then
-							reg^.value := Copy(s,y+1,Length(s)-y+1);
+					// Add lines of disassembly
+					while not SameStr('End of assembler dump.',s) do begin
+						Disassembly.Add(s);
+						s := GetNextLine;
 					end;
 
-					Registers.Add(reg);
+					dodisassemblerready := true;
+				end;
+			end;
+			TInfoReg : begin
+				if Assigned(Registers) then begin
 
+					// Scan all registers until end of gdb output
 					s := GetNextFilledLine;
 
-				until StartsStr(#26#26,s);
+					repeat
 
-				// Is Registers assigned? Assume CPU window called for this
-				doregistersready := true;
+						// name(spaces)hexvalue(tab)decimalvalue
+						reg := new(PRegister);
+						x := Pos(' ',s);
+						if x > 0 then begin
+							reg^.name := Copy(s,1,x-1);
+							y := Pos(#9,s);
+							if y > 0 then
+								reg^.value := Copy(s,y+1,Length(s)-y+1);
+						end;
+
+						Registers.Add(reg);
+
+						s := GetNextFilledLine;
+
+					until StartsStr(#26#26,s);
+
+					doregistersready := true;
+				end;
 			end;
 			TErrorBegin : begin
 				s := GetNextLine; // error text
@@ -523,11 +683,18 @@ begin
 
 					// Update current...
 					for I := 0 to WatchVarList.Count - 1 do begin
-						wvar := PWatchVar(WatchVarList.Items[I]);
-						if SameStr(wvar^.name,t) then begin
+						wparent := PWatchParent(WatchVarList.Items[I]);
+						if SameStr(wparent^.name,t) then begin
 
-							wvar^.value := 'Not found in current context';
-							wvar^.node.Text := wvar^.name + ' = ' + wvar^.value;
+							wparent^.value := 'Not found in current context';
+							wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
+
+							// Delete now invalid children
+							while wparent^.node.HasChildren do begin
+								node := wparent^.node.getNextSibling;
+								Dispose(PWatchMember(node.Data));
+								node.Delete;
+							end;
 							break;
 						end;
 					end;
@@ -537,36 +704,44 @@ begin
 			end;
 			TDisplayBegin : begin
 
+				wparent := nil;
+
 				s := GetNextLine; // watch index
 
 				if not FindAnnotation(TDisplayExpression) then Exit;
 
-				t := GetNextLine; // variable name
+				t := GetNextLine; // watch name
+
+				// Find parent we're talking about
+				for I := 0 to WatchVarList.Count - 1 do begin
+					wparent := PWatchParent(WatchVarList.Items[I]);
+					if SameStr(wparent^.name,t) then begin
+						// Delete now invalid children
+						while wparent^.node.HasChildren do begin
+							node := wparent^.node.getNextSibling;
+							Dispose(PWatchMember(node.Data));
+							node.Delete;
+						end;
+						break;
+					end;
+				end;
+
+				if not Assigned(wparent) then Exit;
 
 				if not FindAnnotation(TDisplayExpression) then Exit;
 
 				u := GetNextLine; // variable value (can be empty)
-				if u = '' then
-					u := 'Error evaluating variable';
+				if u = '{' then // scan fields recursively
+					ProcessWatchStruct(wparent^.node);
 
-				// Update...
-				for I := 0 to WatchVarList.Count - 1 do begin
-					wvar := PWatchVar(WatchVarList.Items[I]);
-					if SameStr(wvar^.name,t) then begin
-
-						wvar^.gdbindex := StrToInt(s);
-						wvar^.value := u;
-
-						wvar^.node.Text := wvar^.name + ' = ' + wvar^.value;
-
-						break;
-					end;
-				end;
+				wparent^.gdbindex := StrToInt(s);
+				wparent^.value := u;
+				wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
 			end;
 			TSource : begin // source filename:line:offset:beg/middle/end:addr
 				s := TrimLeft(GetRemainingLine);
 
-				// remove offset, beg/middle/end, addr
+				// remove offset, beg/middle/end, address
 				for I := 1 to 3 do begin
 					x := Length(s);
 					y := GetLastPos(':',s);

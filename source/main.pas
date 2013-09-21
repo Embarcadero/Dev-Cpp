@@ -832,6 +832,7 @@ type
 		procedure actUpdateEmptyEditorFindForm(Sender: TObject);
 		procedure actReplaceAllExecute(Sender: TObject);
 		procedure DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView;Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;var PaintImages, DefaultDraw: Boolean);
+		procedure FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 	private
 		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
 		fTools            : TToolController; // tool list controller
@@ -887,7 +888,7 @@ type
 		function GetEditorFromFileName(const ffile : AnsiString) : TEditor;
 		procedure GotoBreakpoint(const bfile: AnsiString; bline: integer);
 		procedure RemoveActiveBreakpoints;
-		procedure AddFindOutputItem(const line, col, filename, msg: AnsiString);
+		procedure AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
 		procedure SetProjCompOpt(idx: integer; Value: char);
 		function CheckCompileOption(const option : AnsiString;var optionstructout : PCompilerOption;var optionindexout : integer) : boolean;
 		function CloseEditor(index : integer; Rem : boolean): Boolean;
@@ -1793,12 +1794,13 @@ begin
 		CppParser.ReParseFile(e.FileName, e.InProject, True);
 end;
 
-procedure TMainForm.AddFindOutputItem(const line, col, filename, msg: AnsiString);
+procedure TMainForm.AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
 var
 	ListItem : TListItem;
 begin
 	ListItem := FindOutput.Items.Add;
 	ListItem.Caption := line;
+	ListItem.Data := Pointer(Length(keyword));
 	ListItem.SubItems.Add(col);
 	ListItem.SubItems.Add(filename);
 	ListItem.SubItems.Add(msg);
@@ -2969,7 +2971,7 @@ end;
 procedure TMainForm.PrepareDebugger;
 var
 	I : integer;
-	wvar : PWatchVar;
+	watchparent : PWatchParent;
 begin
 	// Stop the debugger
 	fDebugger.Stop(nil);
@@ -2984,10 +2986,12 @@ begin
 
 	// Reset watch vars
 	for I := 0 to fDebugger.WatchVarList.Count - 1 do begin
-		wvar := PWatchVar(fDebugger.WatchVarList.Items[I]);
-		wvar^.value := 'Execute to evaluate';
-		wvar^.gdbindex := -1;
-		wvar^.node.Text := wvar^.name + ' = ' + wvar^.value;
+		watchparent := PWatchParent(fDebugger.WatchVarList.Items[I]);
+
+		// Clear children list
+		watchparent^.node.DeleteChildren;
+		watchparent^.gdbindex := -1;
+		watchparent^.node.Text := 'Execute to evaluate';
 	end;
 end;
 
@@ -3080,10 +3084,12 @@ begin
 			fDebugger.AddBreakpoint(i);
 
 		libdirs := TStringList.Create;
-		libdirs.Delimiter := ';';
-		libdirs.CommaText := StringReplace(devCompiler.LibDir, '\', '\\', [rfReplaceAll]);
+
+		// hack fix due to:
+		// http://stackoverflow.com/questions/1335027/delphi-stringlist-delimiter-is-always-a-space-character-even-if-delimiter-is-se
+		ExtractStrings([';'],[],PChar(devCompiler.LibDir),libdirs);
 		for I := 0 to libdirs.Count - 1 do
-			fDebugger.SendCommand('dir','"' + libdirs[i] + '"'); // ???
+			fDebugger.SendCommand('dir','"' + StringReplace(libdirs[i],'\','/',[rfReplaceAll]) + '"'); // ???
 
 		libdirs.Free;
 
@@ -3410,18 +3416,17 @@ var
 begin
 	e := GetEditor;
 	if Assigned(e) then begin
-		//SearchCenter.Editor := e;
-		//SearchCenter.AssignSearchEngine;
 
 		pt := ClienttoScreen(point(PageControl.Left, PageControl.Top));
 
 		// Only create the form when we need to do so
-		with TFrmIncremental.Create(Self) do begin
-			Left:= pt.x;
-			Top:= pt.y;
-			editor:= e.Text;
-			Show;
-		end;
+		if not Assigned(frmIncremental) then
+			frmIncremental := TfrmIncremental.Create(self);
+
+		frmIncremental.Left:= pt.x;
+		frmIncremental.Top:= pt.y;
+		frmIncremental.editor:= e.Text;
+		frmIncremental.Show;
 	end;
 end;
 
@@ -3487,14 +3492,14 @@ end;
 
 function TMainForm.GetEditor(index: integer): TEditor;
 var
- i: integer;
+	i: integer;
 begin
 	if index = -1 then
-		i:= PageControl.ActivePageIndex
+		i := PageControl.ActivePageIndex
 	else
-		i:= index;
+		i := index;
 
-	if PageControl.PageCount <= 0 then
+	if (PageControl.PageCount <= 0) or (i < 0) then
 		result:= nil
 	else
 		result:= TEditor(PageControl.Pages[i].Tag);
@@ -3556,9 +3561,7 @@ procedure TMainForm.GotoBreakpoint(const bfile : AnsiString; bline : integer);
 var
 	e : TEditor;
 begin
-	// todo: remove focus of previous if we switch editors...
-
-	// correct win32 make's path
+	// correct win32 path
 	e := GetEditorFromFileName(StringReplace(bfile, '/', '\', [rfReplaceAll]));
 	if assigned(e) then begin
 		e.Activate;
@@ -5477,15 +5480,17 @@ end;
 procedure TMainForm.actModifyWatchExecute(Sender: TObject);
 var
 	node : TTreeNode;
+	parentname,membername : AnsiString;
 	value : AnsiString;
-	name : AnsiString;
 begin
 	node := DebugTree.Selected;
-	if Assigned(node) then begin
-		value := PWatchVar(node.Data)^.value;
-		name := PWatchVar(node.Data)^.name;
-		if InputQuery(Lang[ID_NV_MODIFYVALUE],name,value) then
-			fDebugger.SendCommand('set variable',name + ' = ' + value);
+	if Assigned(node) and Assigned(node.Parent) then begin // only edit members
+
+		parentname := PWatchParent(node.Parent.Data)^.name;
+		membername := PWatchMember(node.Data)^.name;
+
+		if InputQuery(Lang[ID_NV_MODIFYVALUE],parentname + '.' + membername,value) then
+			fDebugger.SendCommand('set variable',parentname + '.' + membername + ' = ' + value);
 	end;
 end;
 
@@ -6203,6 +6208,7 @@ begin
 	if fDebugger.Executing then begin
 		if Key = Chr(VK_RETURN) then begin
 			Key := #0;
+			fDebugger.OnEvalReady := nil;
 			fDebugger.SendCommand('print',TEdit(Sender).Text);
 		end;
 	end;
@@ -6270,11 +6276,68 @@ end;
 
 procedure TMainForm.DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;Stage: TCustomDrawStage; var PaintImages, DefaultDraw: Boolean);
 begin
-	if PWatchVar(Node.Data)^.gdbindex <> -1 then begin
-		// found!
-		Sender.Canvas.Font.Color := clGreen;
+	if Assigned(node.Parent) then begin
+		if PWatchParent(Node.Parent.Data)^.gdbindex <> -1 then begin
+			Sender.Canvas.Font.Color := clGreen;
+		end else begin
+			Sender.Canvas.Font.Color := clRed;
+		end;
 	end else begin
-		Sender.Canvas.Font.Color := clRed;
+		if PWatchParent(Node.Data)^.gdbindex <> -1 then begin
+			Sender.Canvas.Font.Color := clGreen;
+		end else begin
+			Sender.Canvas.Font.Color := clRed;
+		end;
+	end;
+end;
+
+procedure TMainForm.FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView; Item: TListItem; SubItem: Integer;State: TCustomDrawState; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
+var
+	boldstart,boldlen,i : integer;
+	rect : TRect;
+
+	procedure Draw(const s : AnsiString);
+	var
+		sizerect : TRect;
+	begin
+		DrawText(Sender.Canvas.Handle,PAnsiChar(s),Length(s),rect,DT_EXPANDTABS or DT_NOCLIP or DT_HIDEPREFIX);
+
+		// Get text extent
+		FillChar(sizerect,sizeof(sizerect),0);
+		DrawText(Sender.Canvas.Handle,PAnsiChar(s),Length(s),sizerect,DT_CALCRECT or DT_EXPANDTABS or DT_NOCLIP or DT_HIDEPREFIX);
+		Inc(rect.Left,sizerect.Right-sizerect.Left);
+	end;
+begin
+	if SubItem = 3 then begin
+		boldstart := StrToInt(Item.SubItems[0]);
+		boldlen := Integer(Item.Data);
+
+		// Get rect of subitem
+		rect := Item.DisplayRect(drBounds);
+		OffsetRect(rect,1,1); // make it appear as if Windows drawed it
+		for i := 0 to 2 do begin
+			rect.Left := rect.Left + Sender.Column[i].Width;
+			rect.Right := rect.Right + Sender.Column[i].Width;
+		end;
+
+		// Draw part before bold highlight
+		Draw(Copy(Item.SubItems[2],1,boldstart-1));
+
+		// Enable bold
+		Sender.Canvas.Font.Style := [fsBold];
+		Sender.Canvas.Refresh;
+
+		// Draw bold highlight
+		Draw(Copy(Item.SubItems[2],boldstart,boldlen));
+
+		// Disable bold
+		Sender.Canvas.Font.Style := [];
+		Sender.Canvas.Refresh;
+
+		// Draw bold highlight
+		Draw(Copy(Item.SubItems[2],boldstart+boldlen,Length(Item.SubItems[2])-boldstart-boldlen+1));
+
+		DefaultDraw := false;
 	end;
 end;
 

@@ -1,6 +1,6 @@
 object frmFind: TfrmFind
-  Left = 821
-  Top = 448
+  Left = 1281
+  Top = 209
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Find Text'
@@ -123,7 +123,7 @@ object frmFind: TfrmFind
       Left = 156
       Top = 118
       Width = 140
-      Height = 68
+      Height = 70
       Caption = '  Direction:  '
       TabOrder = 2
       object rbBackward: TRadioButton

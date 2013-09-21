@@ -83,7 +83,7 @@ type
     procedure AddWatchVar(i : integer); overload;
     procedure RemoveWatchVar(i : integer); overload;
 
-    function AddWatchVar(const namein : AnsiString) : PWatchVar; overload;
+    procedure AddWatchVar(const namein : AnsiString); overload;
     procedure RemoveWatchVar(nodein : TTreeNode); overload;
 
     procedure RefreshWatchVars;
@@ -109,7 +109,7 @@ begin
 
 	// Remove watch vars (list is contained in UI component)
 	for i := 0 to WatchVarList.Count - 1 do
-		Dispose(PWatchVar(WatchVarList.Items[i]));
+		Dispose(PWatchParent(WatchVarList.Items[i]));
 	WatchVarList.Free;
 
 	// Remove the breakpoints
@@ -171,7 +171,7 @@ begin
 	// Set up the start up info struct.
 	FillChar(si, sizeof(TStartupInfo), 0);
 	si.cb := sizeof(TStartupInfo);
-	si.dwFlags := STARTF_USESTDHANDLES;
+	si.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW or STARTF_USESHOWWINDOW;
 	si.hStdInput := fInputread;
 	si.hStdOutput := fOutputwrite;
 	si.hStdError := fOutputwrite;
@@ -302,48 +302,40 @@ end;
 
 procedure TDebugger.AddWatchVar(i : integer);
 begin
-	SendCommand('display',PWatchVar(WatchVarList.Items[i])^.name);
+	SendCommand('display',PWatchParent(WatchVarList.Items[i])^.name);
 end;
 
 procedure TDebugger.RemoveWatchVar(i : integer);
 begin
-	SendCommand('undisplay',IntToStr(PWatchVar(WatchVarList.Items[i])^.gdbindex));
+	SendCommand('undisplay',IntToStr(PWatchParent(WatchVarList.Items[i])^.gdbindex));
 end;
 
-function TDebugger.AddWatchVar(const namein : AnsiString) : PWatchVar;
+procedure TDebugger.AddWatchVar(const namein : AnsiString);
 var
-	newnode : TTreeNode;
+	parentnode : TTreeNode;
 	I : integer;
-	wvar : PWatchVar;
+	wparent : PWatchParent;
 begin
 
 	// Don't allow duplicates...
 	for I := 0 to WatchVarList.Count - 1 do
-		if SameStr(PWatchVar(WatchVarList.Items[i])^.name,namein) then begin
-			result := WatchVarList.Items[i];
+		if SameStr(PWatchParent(WatchVarList.Items[i])^.name,namein) then
 			Exit;
-		end;
 
-	// Add to list
-	wvar := New(PWatchVar);
-	with wvar^ do begin
-		name := namein;
-		value := 'Execute to evaluate';
-		gdbindex := -1; // filled by GDB
-	end;
-	WatchVarList.Add(wvar);
+	// Add parent to list
+	wparent := New(PWatchParent);
+	wparent^.name := namein;
+	wparent^.value := 'Execute to evaluate';
+	wparent^.gdbindex := -1; // filled by GDB
+	WatchVarList.Add(wparent);
 
-	result := wvar;
-
-	// Add to GUI
-	newnode := DebugTree.Items.AddObject(nil,wvar^.name + ' = ' + wvar^.value,wvar);
-	newnode.ImageIndex := 21;
-	newnode.SelectedIndex := 21;
+	// Add parent to GUI
+	parentnode := DebugTree.Items.AddObject(nil,wparent^.name + ' = ' + wparent^.value,wparent);
+	parentnode.ImageIndex := 21;
+	parentnode.SelectedIndex := 21;
 
 	// Refer to list from GUI
-	with wvar^ do begin
-		node := newnode;
-	end;
+	wparent^.node := parentnode;
 
 	// Debugger already running? Add it to GDB
 	if Executing then
@@ -355,14 +347,14 @@ var
 	I : integer;
 begin
 	for i := 0 to WatchVarList.Count - 1 do begin
-		if SameStr(PWatchVar(WatchVarList.Items[i])^.name,PWatchVar(nodein.Data)^.name) then begin
+		if SameStr(PWatchParent(WatchVarList.Items[i])^.name,PWatchParent(nodein.Data)^.name) then begin
 
 			// Debugger already running and GDB scanned this one? Remove it from GDB
-			if Executing and (PWatchVar(WatchVarList.Items[i])^.gdbindex <> -1) then
+			if Executing and (PWatchParent(WatchVarList.Items[i])^.gdbindex <> -1) then
 				RemoveWatchVar(i);
 
 			// Remove from list
-			Dispose(PWatchVar(WatchVarList.Items[i]));
+			Dispose(PWatchParent(WatchVarList.Items[i]));
 			WatchVarList.Delete(i);
 
 			// Remove from UI
@@ -379,7 +371,7 @@ var
 begin
 	// Variables that aren't found need to be re-displayed!
 	for i := 0 to WatchVarList.Count - 1 do
-		if SameStr(PWatchVar(WatchVarList.Items[i])^.value,'Not found in current context') then
+		if SameStr(PWatchParent(WatchVarList.Items[i])^.value,'Not found in current context') then
 			AddWatchVar(i);
 end;
 

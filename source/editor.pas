@@ -58,9 +58,8 @@ type
     fDebugGutter: TDebugGutter;
     fCurrentWord: AnsiString;
     fCurrentEvalWord : AnsiString;
-    fCompletionEatSpace: boolean;
+
     fCompletionTimer: TTimer;
-    fCompletionTimerKey: Char;
     fCompletionBox: TCodeCompletion;
     fFunctionTipTimer : TTimer;
     fFunctionTip: TCodeToolTip;
@@ -90,7 +89,8 @@ type
     procedure MouseOverTimer(Sender : TObject);
 
     procedure SetEditorText(Key: Char);
-    function CurrentPhrase: AnsiString;
+    function CompletionPhrase: AnsiString;
+    function EvaluationPhrase(p : TBufferCoord): AnsiString;
     procedure CompletionTimer(Sender: TObject);
 
     function FunctionTipAllowed : boolean;
@@ -108,7 +108,7 @@ type
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 
     // Debugger callback
-    procedure OnWatchVarReady(const evalvalue : AnsiString);
+    procedure OnEvalReady(const evalvalue : AnsiString);
 
     procedure Activate;
     procedure GotoLine;
@@ -316,7 +316,7 @@ begin
 	inherited;
 end;
 
-procedure TEditor.OnWatchVarReady(const evalvalue : AnsiString);
+procedure TEditor.OnEvalReady(const evalvalue : AnsiString);
 begin
 	fText.Hint := fCurrentEvalWord + ' = ' + evalvalue;
 	MainForm.fDebugger.OnEvalReady := nil;
@@ -727,7 +727,7 @@ begin
 					fText.SelStart := fText.SelStart - 1;
 					fText.SelEnd := fText.SelStart + 1;
 					fText.SelText := '';
-					fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+					fCompletionBox.Search(nil, CompletionPhrase, fFileName);
 				end;
 			end;
 			Char(VK_RETURN): begin
@@ -743,14 +743,13 @@ begin
 			end;
 			'.', '>', ':': begin
 				SetEditorText(Key);
-				fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+				fCompletionBox.Search(nil, CompletionPhrase, fFileName);
 			end;
 			else begin
 				fText.SelText := Key;
-				fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+				fCompletionBox.Search(nil, CompletionPhrase, fFileName);
 			end;
 		end;
-		fCompletionEatSpace:=False;
 	end;
 end;
 
@@ -769,7 +768,7 @@ begin
 
 		// Don't complete symbols inside strings or comments
 		allowcompletion := true;
-		if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr)) then
+		if fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s, attr) then
 			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
 				allowcompletion := false;
 
@@ -868,33 +867,43 @@ begin
 
 	if fCompletionBox.Enabled then begin
 
-		// If we haven't yet showed the completion window...
-		fCompletionTimer.Enabled:=False;
-		fCompletionTimerKey:=Key;
+		// Use a timer to show the completion window when we just typed a few parent-member linking chars
+		fCompletionTimer.Enabled := False;
 		case Key of
 			'.': fCompletionTimer.Enabled:=True;
 			'>': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
 			':': if (fText.CaretX > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
-			' ': if fCompletionEatSpace then Key:=#0; // eat space if it was ctrl+space (code-completion)
+			' ': begin
+
+				// If Ctrl is down, show completionbox when key is down
+				if CtrlDown then begin
+
+					P := fText.RowColumnToPixels(fText.DisplayXY);
+					Inc(P.Y,16);
+					fCompletionBox.Position := fText.ClientToScreen(P);
+
+					// Force show
+					fCompletionTimer.OnTimer(nil);
+					Key := #0;
+				end;
+			end;
 		end;
 
-		if fCompletionTimer.Enabled or fCompletionEatSpace then begin
+		if fCompletionTimer.Enabled then begin
 			P := fText.RowColumnToPixels(fText.DisplayXY);
-			P.Y := P.Y + 16;
-
-			P := fText.ClientToScreen(P);
-			fCompletionBox.Position:=P;
+			Inc(P.Y,16);
+			fCompletionBox.Position := fText.ClientToScreen(P);
 		end;
 	end;
 end;
 
 procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 var
-	M: TMemoryStream;
 	P : TBufferCoord;
 	s : AnsiString;
 	attr : TSynHighlighterAttributes;
 begin
+	// Allow the user to overwrite ending symbols
 	if devEditor.CompleteSymbols then begin
 		if not (ssShift in Shift) then begin
 			Dec(HasCompletedParentheses);
@@ -908,15 +917,10 @@ begin
 
 		// Only show info about variables or includes
 		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
-			if not (attr = fText.Highlighter.IdentifierAttribute) and not (SameStr(attr.Name,'Preprocessor')) then begin
-				Application.CancelHint;
-				fText.Hint := '';
+			if not (attr = fText.Highlighter.IdentifierAttribute) and not (SameStr(attr.Name,'Preprocessor')) then
 				Exit;
-			end;
 
-		s := fText.GetWordAtRowCol(p);
-
-		if(s <> '') then begin
+		if(fText.GetWordAtRowCol(p) <> '') then begin
 
 			// Handle Ctrl+Click too
 			if ssCtrl in Shift then
@@ -924,22 +928,6 @@ begin
 			else
 				fText.Cursor:=crIBeam;
 		end;
-	end;
-
-	// Show the completion box. This needs to be done after the key is inserted!
-	if fCompletionBox.Enabled then begin
-		if ssCtrl in Shift then
-			if Key = VK_SPACE then begin
-				M:=TMemoryStream.Create;
-				try
-					fText.Lines.SaveToStream(M);
-					fCompletionBox.CurrentClass:=MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M);
-				finally
-					M.Free;
-					fCompletionBox.Search(nil, CurrentPhrase, fFileName);
-				end;
-				fCompletionEatSpace:=True; // this is a hack. without this after ctrl+space, the space appears in the editor :(
-			end;
 	end;
 end;
 
@@ -951,19 +939,16 @@ end;
 procedure TEditor.CompletionTimer(Sender: TObject);
 var
 	M: TMemoryStream;
-	curr,s: AnsiString;
+	s: AnsiString;
 	attr: TSynHighlighterAttributes;
 begin
 	fCompletionTimer.Enabled:=False;
 
-	if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1, fText.CaretY), s, attr)) then begin
-		if (attr = fText.Highlighter.StringAttribute) or
-		   (attr = fText.Highlighter.CommentAttribute) then begin
-
-			fCompletionTimerKey:=#0;
+	if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1, fText.CaretY), s, attr)) then
+		if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
 			Exit;
-		end;
-	end;
+
+	fCompletionBox.OnKeyPress := CompletionKeyPress;
 
 	M:=TMemoryStream.Create;
 	try
@@ -973,20 +958,7 @@ begin
 		M.Free;
 	end;
 
-	curr:=CurrentPhrase;
-	case fCompletionTimerKey of
-	'.':
-		fCompletionBox.Search(nil, curr, fFileName);
-	'>':
-		if fText.CaretX > 1 then
-			if fText.LineText[fText.CaretX-2]='-' then // it makes a '->'
-				fCompletionBox.Search(nil, curr, fFileName);
-	':':
-		if fText.CaretX > 1 then
-			if fText.LineText[fText.CaretX-2]=':' then // it makes a '::'
-				fCompletionBox.Search(nil, curr, fFileName);
-	end;
-	fCompletionTimerKey:=#0;
+	fCompletionBox.Search(nil, CompletionPhrase, fFileName);
 end;
 
 procedure TEditor.DestroyCompletion;
@@ -1001,8 +973,8 @@ end;
 
 procedure TEditor.InitCompletion;
 begin
-	fCompletionBox:=MainForm.CodeCompletion;
-	fCompletionBox.Enabled:=devClassBrowsing.Enabled and devCodeCompletion.Enabled;
+	fCompletionBox := MainForm.CodeCompletion;
+	fCompletionBox.Enabled := devClassBrowsing.Enabled and devCodeCompletion.Enabled;
 
 	// This way symbols and tabs are also completed without code completion
 	fText.OnKeyPress := EditorKeyPress;
@@ -1028,7 +1000,6 @@ begin
 
 	// The other stuff is fully completion dependant
 	if fCompletionBox.Enabled then begin
-		fCompletionBox.OnKeyPress:=CompletionKeyPress;
 		fCompletionBox.Width:=devCodeCompletion.Width;
 		fCompletionBox.Height:=devCodeCompletion.Height;
 
@@ -1038,8 +1009,6 @@ begin
 		fCompletionTimer.OnTimer:=CompletionTimer;
 		fCompletionTimer.Interval:=devCodeCompletion.Delay;
 	end;
-
-	fCompletionEatSpace:=False;
 end;
 
 procedure TEditor.MouseOverTimer(Sender : TObject);
@@ -1049,7 +1018,34 @@ begin
 		fAllowMouseOver := true;
 end;
 
-function TEditor.CurrentPhrase: AnsiString;
+function TEditor.EvaluationPhrase(p : TBufferCoord): AnsiString;
+var
+	phrasebegin,phraseend,len : integer;
+	s : AnsiString;
+begin
+	result := '';
+
+	if (p.Line >= 1) and (p.Line <= fText.Lines.Count) then begin
+		s := fText.Lines[p.Line-1];
+		len := Length(s);
+		if len = 0 then Exit;
+
+		// Copy forward until end of identifier
+		phraseend := p.Char;
+		while((phraseend <= len) and (s[phraseend] in fText.IdentChars)) do
+			Inc(phraseend);
+
+		// Copy backward until some delimiters
+		phrasebegin := p.Char;
+		while((phrasebegin > 1) and ((s[phrasebegin-1] in fText.IdentChars) or (s[phrasebegin-1] in ['*','&',':','[',']']))) do
+		Dec(phrasebegin);
+
+		if phraseend > phrasebegin then
+			result := Copy(s,phrasebegin,phraseend-phrasebegin);
+	end;
+end;
+
+function TEditor.CompletionPhrase: AnsiString;
 var
 	wordend,wordstart,arrayend,arraystart : integer;
 	combiningcharfound : boolean;
@@ -1074,7 +1070,7 @@ begin
 			break;
 		end;
 		Dec(wordstart);
-	until (wordstart = 0) or (not (text[wordstart] in fText.IdentChars) and not (text[wordstart] in [':','-','>','.']));
+	until (wordstart = -1) or (not (text[wordstart] in fText.IdentChars) and not (text[wordstart] in [':','-','>','.']));
 
 	// Then, only allow fText.IdentChars, and skip array bits
 	if combiningcharfound then begin
@@ -1087,14 +1083,13 @@ begin
 				arraystart := wordstart;
 			end;
 			Dec(wordstart);
-		until (wordstart = 0) or (not (text[wordstart] in fText.IdentChars));
+		until (wordstart = -1) or (not (text[wordstart] in fText.IdentChars));
 	end;
 
 	Result := Copy(text,wordstart+2,wordend-wordstart-1);
 	if arrayend <> arraystart then
 		Delete(Result,arraystart-wordstart,arrayend-arraystart+1);
 end;
-
 
 procedure TEditor.SetEditorText(Key: Char);
 var
@@ -1162,9 +1157,9 @@ begin
 	// If the mouse can be found INSIDE the window
 	if fText.GetPositionOfMouse(p) and fAllowMouseOver then begin
 
-		// Only show info about variables
+		// Only show info about variables and preprocessor stuff
 		if fText.GetHighlighterAttriAtRowCol(p, s, attr) then
-			if not (attr = fText.Highlighter.IdentifierAttribute) then begin
+			if not (attr = fText.Highlighter.IdentifierAttribute) or SameStr(attr.Name,'Preprocessor') then begin
 				Application.CancelHint;
 				fText.Hint := '';
 				Exit;
@@ -1172,52 +1167,57 @@ begin
 
 		s := fText.GetWordAtRowCol(p);
 
-		if(s <> '') then begin
+		if (Length(s) = 0) then begin
+			fText.Cursor:=crIBeam;
+			Exit;
+		end;
 
-			// Handle Ctrl+Click too
-			if ssCtrl in Shift then
+		// Don't rescan the same stuff over and over again (that's slow)
+		if (s <> fCurrentWord) then begin
+
+			// Cancel evaluation
+			MainForm.fDebugger.OnEvalReady := nil;
+
+			// Different word? Cancel old now incorrect hint
+			fCurrentWord := s;
+			Application.CancelHint;
+
+			// Cursor hovering above an identifier? Allow handpoint cursor
+			if (ssCtrl in Shift) then
 				fText.Cursor:=crHandPoint
 			else
 				fText.Cursor:=crIBeam;
 
-			if(s <> fCurrentWord) then begin
+			// When debugging, evaluate stuff under cursor, and optionally add to watch list
+			if MainForm.fDebugger.Executing then begin
 
-				fCurrentWord := s;
-				Application.CancelHint;
+				// Add to list
+				if devData.WatchHint then
+					MainForm.fDebugger.AddWatchVar(s);
 
-				if devEditor.ParserHints and not MainForm.fDebugger.Executing then begin
-					st := MainForm.FindStatement(s,fText.WordStartEx(p),localfind,p);
-					if localfind <> '' then begin
-						if (p.Char <> 12345) and (p.Line <> 12345) then
-							fText.Hint := Trim(localfind) + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(p.Line) + ') - Ctrl+Click to follow'
-						else
-							fText.Hint := Trim(localfind);
-					end else if Assigned(st) then begin
-						fText.Hint := Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
-					end else
-						// couldn't find anything? disable hint
-						fText.Hint := '';
-				end else if MainForm.fDebugger.Executing then begin
+				// Evaluate s
+				fCurrentEvalWord := EvaluationPhrase(p);
+				MainForm.fDebugger.OnEvalReady := OnEvalReady;
+				MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
 
-					// Add to list
-					if devData.WatchHint then
-						MainForm.fDebugger.AddWatchVar(s);
-
-					// Evaluate s
-					fCurrentEvalWord := s;
-					MainForm.fDebugger.OnEvalReady := OnWatchVarReady;
-					MainForm.fDebugger.SendCommand('print',s);
-				end;
+			// Otherwise, parse code and show information about variable
+			end else if devEditor.ParserHints then begin
+				st := MainForm.FindStatement(s,fText.WordStartEx(p),localfind,p);
+				if localfind <> '' then begin
+					if (p.Char <> 12345) and (p.Line <> 12345) then
+						fText.Hint := Trim(localfind) + ' - ' + ExtractFileName(fFileName) + ' (' + inttostr(p.Line) + ') - Ctrl+Click to follow'
+					else
+						fText.Hint := Trim(localfind);
+				end else if Assigned(st) then begin
+					fText.Hint := Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + inttostr(st^._Line) + ') - Ctrl+Click to follow';
+				end else
+					// couldn't find anything? disable hint
+					fText.Hint := '';
 			end;
-		end else begin
-
-			// Handle Ctrl+Click too
-			fText.Cursor:=crIBeam;
-			fCurrentWord := s;
-			Application.CancelHint;
 		end;
-	end else
-		fCurrentWord := s; // Reinit mouseovers when hovering above anything else than words
+
+		fCurrentWord := s;
+	end;
 end;
 
 procedure TEditor.CommentSelection;

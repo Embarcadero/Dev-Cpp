@@ -143,6 +143,8 @@ function IsEmpty(editor : TSynEdit) : boolean;
 
 function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
 
+function CtrlDown : Boolean;
+
 implementation
 
 uses
@@ -152,6 +154,14 @@ uses
 {$IFDEF LINUX}
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
+
+function CtrlDown : Boolean;
+var
+	State : TKeyboardState;
+begin
+	GetKeyboardState(State);
+	Result := ((State[VK_CONTROL] and 128) <> 0);
+end;
 
 function IsEmpty(editor : TSynEdit) : boolean;
 var

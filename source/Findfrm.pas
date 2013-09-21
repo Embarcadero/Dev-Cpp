@@ -75,18 +75,17 @@ type
     procedure FindReplaceFirst(editor : TSynEdit);
     procedure FindReplaceFiles(editor : TSynEdit;isreplace : boolean);
   public
-    property SearchOptions : TSynSearchOptions read fSearchOptions;
     property TabIndex : integer read fTabIndex write fTabIndex;
   end;
 
 var
- frmFind: TfrmFind;
+ frmFind: TfrmFind = nil;
 
 implementation
 
-uses 
+uses
 {$IFDEF WIN32}
-  Main, Dialogs, MultiLangSupport, devcfg;
+  Main, Dialogs, MultiLangSupport, devcfg, SynEditMiscClasses;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, Main, QDialogs, MultiLangSupport, devcfg;
@@ -95,20 +94,29 @@ uses
 {$R *.dfm}
 
 procedure TfrmFind.FindReplaceFirst(editor : TSynEdit);
+var
+	enginebackup : TSynEditSearchCustom;
 begin
+	// Make sure we do not find the same word again and again when using 'from cursor'
+	if editor.SelAvail then
+		editor.CaretX := editor.BlockEnd.Char;
+
+	enginebackup := editor.SearchEngine;
 	editor.SearchEngine := fSearchEngine;
-	if(editor.SearchReplace(cboFindText.Text,cboReplaceText.Text,fSearchOptions) = 0) then
+	if(editor.SearchReplace(cboFindText.Text,'',fSearchOptions) = 0) then
 		MessageBox(Application.Handle,PChar(format(Lang[ID_MSG_TEXTNOTFOUND], [cboFindText.Text])),PChar('Info'),MB_ICONINFORMATION);
-	editor.SearchEngine := nil;
+	editor.SearchEngine := enginebackup;
 end;
 
 procedure TfrmFind.FindReplaceFiles(editor : TSynEdit;isreplace : boolean);
 var
 	caretbackup : TBufferCoord;
 	onreplacebackup : TReplaceTextEvent;
+	enginebackup : TSynEditSearchCustom;
 begin
 	caretbackup := editor.CaretXY;
 	onreplacebackup := editor.OnReplaceText;
+	enginebackup := editor.SearchEngine;
 
 	// Don't skip when replacing!
 	if not isreplace then
@@ -116,7 +124,7 @@ begin
 
 	editor.SearchEngine := fSearchEngine;
 	editor.SearchReplace(cboFindText.Text,cboReplaceText.Text,fSearchOptions);
-	editor.SearchEngine := nil;
+	editor.SearchEngine := enginebackup;
 
 	editor.CaretXY := caretbackup;
 	editor.OnReplaceText := onreplacebackup;
@@ -135,10 +143,12 @@ begin
 	isreplace := (FindTabs.TabIndex = 2);
 	isreplacefiles := (FindTabs.TabIndex = 3);
 
-	cboFindText.AddItem(cboFindText.Text,nil);
+	if cboFindText.Items.IndexOf(cboFindText.Text) = -1 then
+		cboFindText.AddItem(cboFindText.Text,nil);
 
 	if (isreplace or isreplacefiles) and (cboReplaceText.Text <> '') then
-		cboReplaceText.AddItem(cboReplaceText.Text,nil);
+		if cboReplaceText.Items.IndexOf(cboReplaceText.Text) = -1 then
+			cboReplaceText.AddItem(cboReplaceText.Text,nil);
 
 	fSearchOptions := [];
 
@@ -146,23 +156,31 @@ begin
 		Include(fSearchOptions,ssoMatchCase);
 	if cbWholeWord.Checked then
 		Include(fSearchOptions,ssoWholeWord);
-	if cbPrompt.Checked or isfindfiles then
-		Include(fSearchOptions,ssoPrompt); // do a fake prompted replace when using find in files
+	if cbPrompt.Checked or isfindfiles then // do a fake prompted replace when using find in files
+		Include(fSearchOptions,ssoPrompt);
 
-	if rbBackward.Checked then
-		Include(fSearchOptions,ssoBackwards);
+	if grpDirection.Visible then begin
+		if rbBackward.Checked then
+			Include(fSearchOptions,ssoBackwards);
+	end;
 
 	if rbEntireScope.Checked or isfindfiles or isreplacefiles then
 		Include(fSearchOptions,ssoEntireScope);
 
-	if rbSelectedOnly.Checked then
-		Include(fSearchOptions,ssoSelectedOnly);
+	if grpScope.Visible then begin
+		if rbSelectedOnly.Checked then
+			Include(fSearchOptions,ssoSelectedOnly);
+	end;
 
-	if isreplace or isreplacefiles or isfindfiles then
-		Include(fSearchOptions,ssoReplace); // do a fake prompted replace when using find in files
+	if not isfind then begin
 
-	if isfindfiles or isreplace or isreplacefiles then
+		// do a fake prompted replace when using find in files
+		Include(fSearchOptions,ssoReplace);
+
+		// Don't stop asking for replaces under any circumstances
 		Include(fSearchOptions,ssoReplaceAll);
+
+	end;
 
 	if isfind or isreplace then begin
 		fEditor := MainForm.GetEditor;
@@ -184,7 +202,8 @@ begin
 				fEditor := MainForm.GetEditor(i);
 				fCurFile := fEditor.FileName;
 
-				fEditor.Activate;
+				if isreplacefiles then
+					fEditor.Activate;
 
 				FindReplaceFiles(fEditor.Text,isreplacefiles);
 			end;
@@ -197,7 +216,9 @@ begin
 
 				// file is already open, use memory
 				if Assigned(fEditor) then begin
-					fEditor.Activate;
+
+					if isreplacefiles then
+						fEditor.Activate;
 
 					FindReplaceFiles(fEditor.Text,isreplacefiles);
 
@@ -218,13 +239,31 @@ begin
 end;
 
 procedure TfrmFind.CustomOnReplace(Sender: TObject;const aSearch, aReplace: AnsiString; Line, Column: integer;var Action: TSynReplaceAction);
+var
+	p : TBufferCoord;
+	q : TDisplayCoord;
 begin
-	MainForm.AddFindOutputItem(IntToStr(Line),IntToStr(Column),fCurFile,TCustomSynEdit(Sender).Lines[Line-1]);
+	p.Char := Column;
+	p.Line := Line;
+	q := TCustomSynEdit(Sender).BufferToDisplayPos(p);
+
+	// Convert to display coords
+	MainForm.AddFindOutputItem(IntToStr(Line),IntToStr(Column),fCurFile,TCustomSynEdit(Sender).Lines[Line-1],aSearch);
 	action := raSkip;
 end;
 
 procedure TfrmFind.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+	// update devData
+	devData.CaseSensitive := cbMatchCase.Checked;
+	devData.Wholewords := cbWholeWord.Checked;
+	devData.PromptReplace := cbPrompt.Checked;
+
+	devData.ScopeIsSelected := rbSelectedOnly.Checked;
+	devData.DirBackward := rbBackward.Checked;
+	devData.WhereOpenFiles := rbOpenFiles.Checked;
+	devData.OriginEntireScope := rbEntireScope.Checked;
+
 	fSearchEngine.Free;
 	fTempSynEdit.Free;
 	Action := caFree;
@@ -248,10 +287,10 @@ begin
 	lblReplace.Visible := isreplace or isreplacefiles;
 	cboReplaceText.Visible := isreplace or isreplacefiles;
 
-	grpDirection.Visible := isfind or isreplace;
 	grpOrigin.Visible := isfind or isreplace;
 	grpScope.Visible := isfind or isreplace;
 	grpWhere.Visible := isfindfiles or isreplacefiles;
+	grpDirection.Visible := not isfindfiles;
 	// grpOption is always visible
 
 	// Disable project search option when none is open
@@ -332,15 +371,29 @@ begin
 	LoadText;
 	ActiveControl := cboFindText;
 
-	// TODO: weird stuff
 	fSearchEngine := TSynEditSearch.Create(Self);
+
+	// Create a temporary editor for closed file searching
 	fTempSynEdit := TSynEdit.Create(Self);
+
+	fTempSynEdit.WantTabs := devEditor.UseTabs;
+	fTempSynEdit.TabWidth := devEditor.TabSize;
 end;
 
 procedure TfrmFind.FormShow(Sender: TObject);
 begin
 	FindTabs.TabIndex := fTabIndex;
 	FindTabsChange(nil);
+
+	// read devData
+	cbMatchCase.Checked := devData.CaseSensitive;
+	cbWholeWord.Checked := devData.Wholewords;
+	cbPrompt.Checked := devData.PromptReplace;
+
+	rbSelectedOnly.Checked := devData.ScopeIsSelected;
+	rbBackward.Checked := devData.DirBackward;
+	rbOpenFiles.Checked := devData.WhereOpenFiles;
+	rbEntireScope.Checked := devData.OriginEntireScope;
 end;
 
 end.

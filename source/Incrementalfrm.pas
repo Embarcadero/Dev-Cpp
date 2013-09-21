@@ -17,7 +17,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-(* derived from the free pascal editor project source *)
 unit IncrementalFrm;
 
 interface
@@ -25,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ActnList, SynEdit, SynEditTypes;
+  StdCtrls, ActnList, SynEdit, SynEditTypes, SynEditSearch, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -38,20 +37,26 @@ type
     btnPrev: TButton;
     btnNext: TButton;
     procedure EditChange(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure EditKeyPress(Sender: TObject; var Key: Char);
     procedure EditKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure btnPrevClick(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   public
-    SearchString : AnsiString;
-    Editor       : TSynEdit;
-    OrgPt        : TBufferCoord;
-    lastcommand  : integer;
+    Editor : TSynEdit;
+    OrgPt : TBufferCoord;
+    lastcommand : integer;
+    OriginalColor : TColor;
   private
     rOptions : TSynSearchOptions;
+    fSearchEngine : TSynEditSearch;
+    procedure DoSearch;
   end;
+
+var
+	frmIncremental : TFrmIncremental = nil;
 
 implementation
 
@@ -65,45 +70,68 @@ uses
   Xlib, main;
 {$ENDIF}
 
-procedure TfrmIncremental.EditChange(Sender: TObject);
+procedure TfrmIncremental.DoSearch;
 begin
-	if Editor.SelAvail then
-		Editor.CaretX := Editor.CaretX - Editor.SelLength;
-
-	// Als we niks vinden...
+	// When the editor changes, search forwards
 	if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then begin
 
-		// Zoek dan achterstevoren
-		Include(rOptions, ssoBackwards);
-		Editor.CaretX := Editor.CaretX + Editor.SelLength;
-
-		// Nog steeds niks? Kleurtje geven
+		// nothing found? wrap around
+		Include(rOptions, ssoEntireScope);
 		if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then
-			Edit.Font.Color:=clRed
+			Edit.Color := clRed
 		else
-			Edit.Font.Color:=clBlack;
+			Edit.Color := OriginalColor;
 	end else
-		Edit.Font.Color:=clBlack;
+		Edit.Color := OriginalColor;
+end;
 
+procedure TfrmIncremental.EditChange(Sender: TObject);
+begin
 	rOptions := [];
-	if Length(Edit.Text) = 0 then begin
-		Editor.BlockBegin := OrgPt;
-		Editor.BlockEnd   := OrgPt;
-		Editor.CaretXY    := OrgPt;
-	end;
+
+	// Stick with the same word when query changes
+	if Editor.SelAvail then
+		Editor.CaretX := Editor.BlockBegin.Char;
+
+	DoSearch;
+end;
+
+procedure TfrmIncremental.btnPrevClick(Sender: TObject);
+begin
+	rOptions := [ssoBackWards];
+	DoSearch;
+end;
+
+procedure TfrmIncremental.btnNextClick(Sender: TObject);
+begin
+	rOptions := [];
+	DoSearch;
+end;
+
+procedure TfrmIncremental.FormClose(Sender: TObject;var Action: TCloseAction);
+begin
+	fSearchEngine.Free;
+	Action := caFree;
+end;
+
+procedure TfrmIncremental.FormCreate(Sender: TObject);
+begin
+	fSearchEngine := TSynEditSearch.Create(Self);
 end;
 
 procedure TfrmIncremental.FormShow(Sender: TObject);
 begin
-	SearchString := Edit.Text;
-	Edit.Text    := '';
-	OrgPt        := Editor.CaretXY;
-	lastcommand  := 2;
+	editor.SearchEngine := fSearchEngine;
+	ActiveControl := Edit;
+	OriginalColor := Edit.Color;
 end;
 
 procedure TfrmIncremental.EditKeyPress(Sender: TObject; var Key: Char);
 begin
-	if Key = #27 then Close; // Escape
+	if Key = #27 then begin // Escape
+		Key := #0; // mute beep
+		Close;
+	end;
 end;
 
 procedure TfrmIncremental.EditKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
@@ -116,39 +144,6 @@ begin
     XK_LEFT, XK_RIGHT, XK_UP, XK_DOWN : Close;
 {$ENDIF}
   end;
-end;
-
-procedure TfrmIncremental.btnPrevClick(Sender: TObject);
-begin
-	Include(rOptions,ssoBackWards);
-	if lastcommand = 1 then
-		Editor.SearchReplace(Edit.Text,'',rOptions);
-	if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then begin
-		Include(rOptions,ssoEntireScope);
-		if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then
-			Edit.Font.Color:=clRed;
-	end;
-	Exclude(rOptions,ssoEntireScope);
-	lastcommand:=0; // 0 == prev
-end;
-
-procedure TfrmIncremental.btnNextClick(Sender: TObject);
-begin
-	Exclude(rOptions,ssoBackWards);
-	if lastcommand = 0 then
-		Editor.SearchReplace(Edit.Text,'',rOptions);
-	if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then begin
-		Include(rOptions,ssoEntireScope);
-		if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then
-			Edit.Font.Color:=clRed;
-	end;
-	Exclude(rOptions,ssoEntireScope);
-	lastcommand:=1; // 1 == next
-end;
-
-procedure TfrmIncremental.FormClose(Sender: TObject;var Action: TCloseAction);
-begin
-	Action := caFree;
 end;
 
 end.

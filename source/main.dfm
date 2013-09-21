@@ -65,7 +65,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -107,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -202,13 +202,13 @@ object MainForm: TMainForm
         Left = 471
         Top = 0
         Width = 357
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           357
-          154)
+          155)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -229,7 +229,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 350
-          Height = 112
+          Height = 111
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -241,7 +241,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 471
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -249,7 +249,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           471
-          154)
+          155)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -410,10 +410,11 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 15
+          Height = 14
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
+          ScrollBars = ssVertical
           TabOrder = 8
         end
         object SkipFuncBtn: TButton
@@ -449,7 +450,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 828
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -479,6 +480,7 @@ object MainForm: TMainForm
         ShowHint = True
         TabOrder = 0
         ViewStyle = vsReport
+        OnAdvancedCustomDrawSubItem = FindOutputAdvancedCustomDrawSubItem
         OnDblClick = FindOutputDblClick
         OnKeyDown = FindOutputKeyDown
       end
@@ -942,7 +944,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -978,7 +980,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1014,7 +1016,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 311
+        Height = 312
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1127,7 +1129,6 @@ object MainForm: TMainForm
         Caption = '&Import'
         object ImportMSVisualCproject: TMenuItem
           Action = actImportMSVC
-          Caption = 'MS Visual C++ project'
         end
         object ImportCBCproject: TMenuItem
           Caption = 'Code::Blocks project'
@@ -1256,11 +1257,9 @@ object MainForm: TMainForm
       end
       object CollapseAll: TMenuItem
         Action = actCollapse
-        Caption = 'Collapse All'
       end
       object UncollapseAll: TMenuItem
         Action = actUnCollapse
-        Caption = 'Uncollapse All'
       end
     end
     object SearchMenu: TMenuItem
@@ -2752,7 +2751,7 @@ object MainForm: TMainForm
     end
     object actImportMSVC: TAction
       Category = 'File'
-      Caption = 'Import MS Visual C++ project'
+      Caption = 'MS Visual C++ project'
       OnExecute = actImportMSVCExecute
     end
     object actExecParams: TAction
@@ -2899,13 +2898,13 @@ object MainForm: TMainForm
     end
     object actCollapse: TAction
       Category = 'Edit'
-      Caption = 'actCollapse'
+      Caption = 'Collapse All'
       OnExecute = actCollapseExecute
       OnUpdate = actUpdateEmptyEditor
     end
     object actUnCollapse: TAction
       Category = 'Edit'
-      Caption = 'actUnCollapse'
+      Caption = 'Uncollapse All'
       OnExecute = actUnCollapseExecute
       OnUpdate = actUpdateEmptyEditor
     end

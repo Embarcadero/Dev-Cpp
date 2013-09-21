@@ -469,6 +469,15 @@ type
 		fWatchHint : boolean;             // watch variable under mouse
 		fUseATTSyntax : boolean;
 
+		// Search preferences
+		fCaseSensitive : boolean;
+		fWholewords : boolean;
+		fPromptReplace : boolean;
+		fScopeIsSelected : boolean; // false == Global
+		fOriginEntireScope : boolean; // false == from cursor
+		fWhereOpenFiles : boolean; // you get the idea
+		fDirBackward : boolean;
+
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -563,6 +572,15 @@ type
     // General debugging options
     property WatchHint : boolean read fWatchHint write fWatchHint;
     property UseATTSyntax : boolean read fUseATTSyntax write fUseATTSyntax;
+
+    // Search preferences
+    property CaseSensitive : boolean read fCaseSensitive write fCaseSensitive;
+    property Wholewords : boolean read fWholewords write fWholewords;
+    property PromptReplace : boolean read fPromptReplace write fPromptReplace;
+    property ScopeIsSelected : boolean read fScopeIsSelected write fScopeIsSelected;
+    property OriginEntireScope : boolean read fOriginEntireScope write fOriginEntireScope;
+    property WhereOpenFiles : boolean read fWhereOpenFiles write fWhereOpenFiles;
+    property DirBackward : boolean read fDirBackward write fDirBackward;
   end;
 
 function DevData: TdevData;
@@ -742,20 +760,20 @@ end;
 // add strings to lang file
 constructor TdevData.Create(aOwner: Tcomponent);
 begin
-  if assigned(fdevData) then
-   raise Exception.Create('Dev Data already created');
-  if fExternal then
-   raise Exception.Create('Dev Data Externally Created');
-  inherited Create(aOwner);
-  IgnoreProperties.Add('Style');
+	if assigned(fdevData) then
+		raise Exception.Create('devData already created');
+	if fExternal then
+		raise Exception.Create('devData Externally Created');
+	inherited Create(aOwner);
+	IgnoreProperties.Add('Style');
 
-  SettoDefaults;
+	SettoDefaults;
 end;
 
 destructor TdevData.Destroy;
 begin
-  fdevData:= nil;
-  inherited;
+	fdevData:= nil;
+	inherited;
 end;
 
 procedure TdevData.SettoDefaults;
@@ -842,8 +860,19 @@ begin
   fPrintWordWrap := FALSE;
   fPrintLineNumbers := TRUE;
   fPrintLineNumbersMargins := FALSE;
-  fWatchHint := TRUE;
-  fUseATTSyntax := TRUE;
+
+	// Debug stuff
+	fWatchHint := false;
+	fUseATTSyntax := true;
+
+	// Search stuff
+	fCaseSensitive := false;
+	fWholewords := false;
+	fPromptReplace := false;
+	fScopeIsSelected := false;
+	fOriginEntireScope := false;
+	fWhereOpenFiles := false;
+	fDirBackward := true;
 end;
 
 { TdevCompiler }

@@ -3,7 +3,7 @@ object frmIncremental: TfrmIncremental
   Top = 564
   Anchors = []
   AutoSize = True
-  BorderIcons = [biSystemMenu]
+  BorderIcons = []
   BorderStyle = bsToolWindow
   Caption = 'Incremental Search'
   ClientHeight = 25
@@ -17,9 +17,40 @@ object frmIncremental: TfrmIncremental
   FormStyle = fsStayOnTop
   OldCreateOrder = False
   OnClose = FormClose
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
+  object btnNext: TButton
+    Left = 257
+    Top = 0
+    Width = 25
+    Height = 25
+    Caption = #187
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Courier'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 0
+    OnClick = btnNextClick
+  end
+  object btnPrev: TButton
+    Left = 232
+    Top = 0
+    Width = 25
+    Height = 25
+    Caption = #171
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Courier'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 1
+    OnClick = btnPrevClick
+  end
   object Edit: TEdit
     Left = 0
     Top = 0
@@ -32,39 +63,9 @@ object frmIncremental: TfrmIncremental
     Font.Name = 'Courier New'
     Font.Style = []
     ParentFont = False
-    TabOrder = 0
+    TabOrder = 2
     OnChange = EditChange
     OnKeyDown = EditKeyDown
     OnKeyPress = EditKeyPress
-  end
-  object btnPrev: TButton
-    Left = 232
-    Top = 0
-    Width = 25
-    Height = 25
-    Caption = '<'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Courier'
-    Font.Style = [fsBold]
-    ParentFont = False
-    TabOrder = 1
-    OnClick = btnPrevClick
-  end
-  object btnNext: TButton
-    Left = 257
-    Top = 0
-    Width = 25
-    Height = 25
-    Caption = '>'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Courier'
-    Font.Style = [fsBold]
-    ParentFont = False
-    TabOrder = 2
-    OnClick = btnNextClick
   end
 end
