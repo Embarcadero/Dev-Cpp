@@ -107,8 +107,8 @@ object LangForm: TLangForm
       AutoSize = False
       Caption = 
         'If you need help using Dev-C++, please refer to the Dev-C++ help' +
-        ' file in the Help menu. You will also find there a FAQ (which is' +
-        ' very important to read in case you have a problem).'
+        ' file in the Help menu or send the developer a message (he doesn' +
+        #39't mind!).'
       WordWrap = True
     end
     object Finish3: TLabel
@@ -119,9 +119,8 @@ object LangForm: TLangForm
       AutoSize = False
       Caption = 
         'You can also download packages (like libraries or tools) to use ' +
-        'with Dev-C++, and upgrade to the latest version by using WebUpda' +
-        'te, which you will find in Tools menu, Check for Updates/Package' +
-        's.'
+        'with Dev-C++ using WebUpdate, which you will find in Tools menu ' +
+        '>> Check for Packages.'
       WordWrap = True
     end
     object Finish1: TLabel

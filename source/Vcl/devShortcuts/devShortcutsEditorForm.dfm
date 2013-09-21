@@ -1,6 +1,6 @@
 object frmShortcutsEditor: TfrmShortcutsEditor
-  Left = 1163
-  Top = 384
+  Left = 473
+  Top = 271
   BorderStyle = bsDialog
   Caption = 'Configure Shortcuts'
   ClientHeight = 470
@@ -8,13 +8,13 @@ object frmShortcutsEditor: TfrmShortcutsEditor
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
-  Font.Name = 'Segoe UI'
+  Font.Height = -11
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
   PixelsPerInch = 96
-  TextHeight = 15
+  TextHeight = 13
   object lvShortcuts: TListView
     Left = 0
     Top = 0
@@ -58,5 +58,14 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     Default = True
     ModalResult = 1
     TabOrder = 2
+  end
+  object btnDefault: TButton
+    Left = 8
+    Top = 440
+    Width = 75
+    Height = 25
+    Caption = 'Defaults'
+    TabOrder = 3
+    OnClick = btnDefaultClick
   end
 end

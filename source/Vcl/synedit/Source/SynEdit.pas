@@ -299,7 +299,7 @@ type
     //### Code Folding ###
     fAllFoldRanges:          TSynEditFoldRanges;
     fCodeFolding:            TSynCodeFolding;
-    fUncollapsedLines:       TSynEditStringList;
+    fUncollapsedLines:       TStrings;
     fUncollapsedLinesLength: Integer;
     fEditingFolds:           boolean;
     fUseCodeFolding:         boolean;
@@ -319,8 +319,8 @@ type
     fMBCSStepAside: Boolean;
 {$ENDIF}
     fInserting: Boolean;
-    fLines: TSynEditStringList;
-    fOrigLines : TSynEditStringList;
+    fLines: TStrings;
+    fOrigLines : TStrings;
     fOrigUndoList: TSynEditUndoList;
     fOrigRedoList: TSynEditUndoList;
     fLinesInWindow: Integer;
@@ -420,19 +420,19 @@ type
     procedure ScrollEvent(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 {$ENDIF}
 
-	//### Code Folding ###
-	procedure CollapseLevel(ALevel: Integer);
-	procedure UncollapseLevel(ALevel: Integer);
-	procedure ReScanForFoldRanges;
-	procedure GetUncollapsedLines;
-	procedure ReScan;
-	procedure MoveFoldRangesAfter(FoldRange: TSynEditFoldRange;LineCount: Integer);
-	procedure ScanForFoldRanges(TopFoldRanges: TSynEditFoldRanges;txt: TStrings);
-	function GetLineIndent(const Line : AnsiString): Integer;
-	procedure MoveRangesBy(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
-	procedure MoveCollapsedRangesFromBy(CurrentLine, LineCount: Integer);
-	procedure SetUseCodeFolding(value : boolean);
-	//### End Code Folding ###
+    //### Code Folding ###
+    procedure CollapseLevel(ALevel: Integer);
+    procedure UncollapseLevel(ALevel: Integer);
+    procedure ReScanForFoldRanges;
+    procedure GetUncollapsedLines;
+    procedure ReScan;
+    procedure MoveFoldRangesAfter(FoldRange: TSynEditFoldRange;LineCount: Integer);
+    procedure ScanForFoldRanges(TopFoldRanges: TSynEditFoldRanges;txt: TStrings);
+    function GetLineIndent(const Line : AnsiString): Integer;
+    procedure MoveRangesBy(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
+    procedure MoveCollapsedRangesFromBy(CurrentLine, LineCount: Integer);
+    procedure SetUseCodeFolding(value : boolean);
+    //### End Code Folding ###
 
     procedure BookMarkOptionsChanged(Sender: TObject);
     procedure ComputeCaret(X, Y: Integer);
@@ -477,10 +477,12 @@ type
     function LeftSpacesEx(const Line: string; WantTabs: Boolean): Integer;
     function GetLeftSpacing(CharCount: Integer; WantTabs: Boolean): String;
     procedure LinesChanging(Sender: TObject);
-    procedure MoveCaretAndSelection(const ptBefore, ptAfter: TBufferCoord;SelectionCommand: boolean);
+    procedure MoveCaretAndSelection(const ptBefore, ptAfter: TBufferCoord;
+      SelectionCommand: boolean);
     procedure MoveCaretHorz(DX: integer; SelectionCommand: boolean);
     procedure MoveCaretVert(DY: integer; SelectionCommand: boolean);
-    procedure PluginsAfterPaint(ACanvas: TCanvas; const AClip: TRect;FirstLine, LastLine: integer);
+    procedure PluginsAfterPaint(ACanvas: TCanvas; const AClip: TRect;
+      FirstLine, LastLine: integer);
     procedure ReadAddedKeystrokes(Reader: TReader);
     procedure ReadRemovedKeystrokes(Reader: TReader);
     function ScanFrom(Index: integer): integer;
@@ -505,7 +507,7 @@ type
     procedure SetInsertMode(const Value: boolean);
     procedure SetKeystrokes(const Value: TSynEditKeyStrokes);
     procedure SetLeftChar(Value: Integer);
-    procedure SetLines(Value: TSynEditStringList);
+    procedure SetLines(Value: TStrings);
     procedure SetLineText(Value: string);
     procedure SetMaxScrollWidth(Value: integer);
     procedure SetMaxUndo(const Value: Integer);
@@ -543,7 +545,8 @@ type
     function GetClientOrigin: TPoint; override;
     function GetClientRect: TRect; override;
     function WidgetFlags: integer; override;
-    function NeedKey(Key: Integer; Shift: TShiftState;const KeyText: WideString): Boolean; override;
+    function NeedKey(Key: Integer; Shift: TShiftState;
+      const KeyText: WideString): Boolean; override;
 {$ELSE}
     procedure CreateParams(var Params: TCreateParams); override;
     procedure CreateWnd; override;
@@ -555,7 +558,8 @@ type
     procedure DefineProperties(Filer: TFiler); override;
     procedure DoChange; virtual;
     procedure DragCanceled; override;
-    procedure DragOver(Source: TObject; X, Y: Integer;State: TDragState; var Accept: Boolean); override;
+    procedure DragOver(Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean); override;
     function GetReadOnly: boolean; virtual;
     procedure HighlighterAttrChanged(Sender: TObject);
     procedure IncPaintLock;
@@ -775,21 +779,21 @@ type
       aUndo, aRedo: TSynEditUndoList);
     procedure UnHookTextBuffer;
 
-		//### Code Folding ###
-		procedure CollapseAll;
-		procedure UncollapseAll;
-		procedure Collapse(AFoldRange: TSynEditFoldRange);
-		procedure Uncollapse(FoldRange: TSynEditFoldRange);
-		function FoldStartAtLine(Line: Integer): TSynEditFoldRange;
-		function FoldEndAtLine(Line: Integer): TSynEditFoldRange;
-		function CollapsedFoldAroundLine(Line: Integer): TSynEditFoldRange;
-		function FoldAroundLine(Line: Integer): TSynEditFoldRange;
-		function UncollapsedLineToLine(Line: Integer): Integer;
-		function LineToUncollapsedLine(Line: Integer): Integer;
-		property UnCollapsedLines: TSynEditStringList read fUncollapsedLines;
-		property UnCollapsedLinesLength: Integer read fUncollapsedLinesLength;
-		property CodeFolding: TSynCodeFolding read fCodeFolding;
-		//### End Code Folding ###
+    //### Code Folding ###
+    procedure CollapseAll;
+    procedure UncollapseAll;
+    procedure Collapse(AFoldRange: TSynEditFoldRange);
+    procedure Uncollapse(FoldRange: TSynEditFoldRange);
+    function FoldStartAtLine(Line: Integer): TSynEditFoldRange;
+    function FoldEndAtLine(Line: Integer): TSynEditFoldRange;
+    function CollapsedFoldAroundLine(Line: Integer): TSynEditFoldRange;
+    function FoldAroundLine(Line: Integer): TSynEditFoldRange;
+    function UncollapsedLineToLine(Line: Integer): Integer;
+    function LineToUncollapsedLine(Line: Integer): Integer;
+    property UnCollapsedLines: TStrings read fUncollapsedLines;
+    property UnCollapsedLinesLength: Integer read fUncollapsedLinesLength;
+    property CodeFolding: TSynCodeFolding read fCodeFolding;
+    //### End Code Folding ###
 
     property BlockBegin: TBufferCoord read GetBlockBegin write SetBlockBegin;
     property BlockEnd: TBufferCoord read GetBlockEnd write SetBlockEnd;
@@ -816,7 +820,7 @@ type
     property LineHeight: integer read fTextHeight;
     property LinesInWindow: Integer read fLinesInWindow;
     property LineText: string read GetLineText write SetLineText;
-    property Lines: TSynEditStringList read fLines write SetLines;
+    property Lines: TStrings read fLines write SetLines;
     property Marks: TSynEditMarkList read fMarkList;
     property MaxScrollWidth: integer read fMaxScrollWidth write SetMaxScrollWidth
       default 1024;
@@ -1295,146 +1299,147 @@ end;
 
 constructor TCustomSynEdit.Create(AOwner: TComponent);
 begin
-	inherited Create(AOwner);
-	fLines := TSynEditStringList.Create;
-	fOrigLines := fLines;
-	fPlugins := TList.Create;
-	with TSynEditStringList(fLines) do begin
-		OnChange := LinesChanged;
-		OnChanging := LinesChanging;
-		OnCleared := ListCleared;
-		OnDeleted := ListDeleted;
-		OnInserted := ListInserted;
-		OnPutted := ListPutted;
-	end;
-	fFontDummy := TFont.Create;
-	fUndoList := TSynEditUndoList.Create;
-	fUndoList.OnAddedUndo := UndoRedoAdded;
-	fOrigUndoList := fUndoList;
-	fRedoList := TSynEditUndoList.Create;
-	fRedoList.OnAddedUndo := UndoRedoAdded;
-	fOrigRedoList := fRedoList;
+  inherited Create(AOwner);
+  fLines := TSynEditStringList.Create;
+  fOrigLines := fLines;
+  fPlugins := TList.Create;
+  with TSynEditStringList(fLines) do
+  begin
+    OnChange := LinesChanged;
+    OnChanging := LinesChanging;
+    OnCleared := ListCleared;
+    OnDeleted := ListDeleted;
+    OnInserted := ListInserted;
+    OnPutted := ListPutted;
+  end;
+  fFontDummy := TFont.Create;
+  fUndoList := TSynEditUndoList.Create;
+  fUndoList.OnAddedUndo := UndoRedoAdded;
+  fOrigUndoList := fUndoList;
+  fRedoList := TSynEditUndoList.Create;
+  fRedoList.OnAddedUndo := UndoRedoAdded;
+  fOrigRedoList := fRedoList;
 
 {$IFDEF SYN_COMPILER_4_UP}
 {$IFDEF SYN_CLX}
 {$ELSE}
-	DoubleBuffered := false;
+  DoubleBuffered := false;
 {$ENDIF}
 {$ENDIF}
-	fActiveLineColor := clNone;
-	fSelectedColor := TSynSelectedColor.Create;
-	fSelectedColor.OnChange := SelectedColorsChanged;
-	fBookMarkOpt := TSynBookMarkOpt.Create(Self);
-	fBookMarkOpt.OnChange := BookMarkOptionsChanged;
-//	fRightEdge has to be set before FontChanged is called for the first time
-	fRightEdge := 80;
-	fGutter := TSynGutter.Create;
-	fGutter.RightOffset := 21;
-	fGutter.OnChange := GutterChanged;
-	fGutterWidth := fGutter.Width;
-	fWordWrapGlyph := TSynGlyph.Create(HINSTANCE, 'SynEditWrapped', clLime);
-	fWordWrapGlyph.OnChange := WordWrapGlyphChange;
-	fTextOffset := fGutterWidth;
+  fActiveLineColor := clNone;
+  fSelectedColor := TSynSelectedColor.Create;
+  fSelectedColor.OnChange := SelectedColorsChanged;
+  fBookMarkOpt := TSynBookMarkOpt.Create(Self);
+  fBookMarkOpt.OnChange := BookMarkOptionsChanged;
+//  fRightEdge has to be set before FontChanged is called for the first time
+  fRightEdge := 80;
+  fGutter := TSynGutter.Create;
+  fGutter.RightOffset := 21;
+  fGutter.OnChange := GutterChanged;
+  fGutterWidth := fGutter.Width;
+  fWordWrapGlyph := TSynGlyph.Create(HINSTANCE, 'SynEditWrapped', clLime);
+  fWordWrapGlyph.OnChange := WordWrapGlyphChange;
+  fTextOffset := fGutterWidth;
 {$IFDEF SYN_COMPILER_7_UP}
 {$IFNDEF SYN_CLX}
-	ControlStyle := ControlStyle + [csOpaque, csSetCaption, csNeedsBorderPaint];
+  ControlStyle := ControlStyle + [csOpaque, csSetCaption, csNeedsBorderPaint];
 {$ELSE}
-	ControlStyle := ControlStyle + [csOpaque, csSetCaption];
+  ControlStyle := ControlStyle + [csOpaque, csSetCaption];
 {$ENDIF}
 {$ELSE}
-	ControlStyle := ControlStyle + [csOpaque, csSetCaption];
+  ControlStyle := ControlStyle + [csOpaque, csSetCaption];
 {$ENDIF}
-	Height := 150;
-	Width := 200;
-	Cursor := crIBeam;
-	Color := clWindow;
+  Height := 150;
+  Width := 200;
+  Cursor := crIBeam;
+  Color := clWindow;
 {$IFDEF SYN_WIN32}
-	fFontDummy.Name := 'Courier New';
-	fFontDummy.Size := 10;
+  fFontDummy.Name := 'Courier New';
+  fFontDummy.Size := 10;
 {$ENDIF}
 {$IFDEF SYN_KYLIX}
-	fFontDummy.Name := 'adobe-courier';
-	if fFontDummy.Name = 'adobe-courier' then
-		fFontDummy.Size := 12
-	else begin
-		fFontDummy.Name := 'terminal';
-		fFontDummy.Size := 14;
-	end;
+  fFontDummy.Name := 'adobe-courier';
+  if fFontDummy.Name = 'adobe-courier' then
+    fFontDummy.Size := 12
+  else begin
+    fFontDummy.Name := 'terminal';
+    fFontDummy.Size := 14;
+  end;
 {$ENDIF}
 {$IFDEF SYN_COMPILER_3_UP}
-	fFontDummy.CharSet := DEFAULT_CHARSET;
+  fFontDummy.CharSet := DEFAULT_CHARSET;
 {$ENDIF}
-	fTextDrawer := TheTextDrawer.Create([fsBold], fFontDummy);
-	Font.Assign(fFontDummy);
-	Font.OnChange := SynFontChanged;
-	ParentFont := False;
-	ParentColor := False;
-	TabStop := True;
-	fInserting := True;
-	fMaxScrollWidth := 1024;
-	fScrollBars := ssBoth;
-	fBorderStyle := bsSingle;
-	fInsertCaret := ctVerticalLine;
-	fOverwriteCaret := ctBlock;
-	FSelectionMode := smNormal;
-	fActiveSelectionMode := smNormal;
-	fFocusList := TList.Create;
-	fKbdHandler := TSynEditKbdHandler.Create;
-	fKeystrokes := TSynEditKeyStrokes.Create(Self);
-	fMarkList := TSynEditMarkList.Create();
-	fMarkList.OnChange := MarkListChange;
-	SetDefaultKeystrokes;
-	fRightEdgeColor := clSilver;
+  fTextDrawer := TheTextDrawer.Create([fsBold], fFontDummy);
+  Font.Assign(fFontDummy);
+  Font.OnChange := SynFontChanged;
+  ParentFont := False;
+  ParentColor := False;
+  TabStop := True;
+  fInserting := True;
+  fMaxScrollWidth := 1024;
+  fScrollBars := ssBoth;
+  fBorderStyle := bsSingle;
+  fInsertCaret := ctVerticalLine;
+  fOverwriteCaret := ctBlock;
+  FSelectionMode := smNormal;
+  fActiveSelectionMode := smNormal;
+  fFocusList := TList.Create;
+  fKbdHandler := TSynEditKbdHandler.Create;
+  fKeystrokes := TSynEditKeyStrokes.Create(Self);
+  fMarkList := TSynEditMarkList.Create();
+  fMarkList.OnChange := MarkListChange;
+  SetDefaultKeystrokes;
+  fRightEdgeColor := clSilver;
 {$IFDEF SYN_MBCSSUPPORT}
-	fImeCount := 0;
-	fMBCSStepAside := False;
+  fImeCount := 0;
+  fMBCSStepAside := False;
 {$ENDIF}
-	fWantReturns := True;
-	fWantTabs := False;
-	fTabWidth := 8;
-	fLeftChar := 1;
-	fTopLine := 1;
-	fCaretX := 1;
-	fLastCaretX := 1;
-	fCaretY := 1;
-	fBlockBegin.Char := 1;
-	fBlockBegin.Line := 1;
-	fBlockEnd := fBlockBegin;
-	fOptions := SYNEDIT_DEFAULT_OPTIONS;
-	fScrollTimer := TTimer.Create(Self);
-	fScrollTimer.Enabled := False;
-	fScrollTimer.Interval := 100;
-	fScrollTimer.OnTimer := ScrollTimerHandler;
+  fWantReturns := True;
+  fWantTabs := False;
+  fTabWidth := 8;
+  fLeftChar := 1;
+  fTopLine := 1;
+  fCaretX := 1;
+  fLastCaretX := 1;
+  fCaretY := 1;
+  fBlockBegin.Char := 1;
+  fBlockBegin.Line := 1;
+  fBlockEnd := fBlockBegin;
+  fOptions := SYNEDIT_DEFAULT_OPTIONS;
+  fScrollTimer := TTimer.Create(Self);
+  fScrollTimer.Enabled := False;
+  fScrollTimer.Interval := 100;
+  fScrollTimer.OnTimer := ScrollTimerHandler;
 
 {$IFDEF SYN_CLX}
-	InputKeys := [ikArrows, ikChars, ikReturns, ikEdit, ikNav, ikEsc];
+  InputKeys := [ikArrows, ikChars, ikReturns, ikEdit, ikNav, ikEsc];
 
-	FHScrollBar := TSynEditScrollbar.Create(self);
-	FHScrollBar.Kind := sbHorizontal;
-	FHScrollBar.Height := CYHSCROLL;
-	FHScrollBar.OnScroll := ScrollEvent;
-	FVScrollBar := TSynEditScrollbar.Create(self);
-	FVScrollBar.Kind := sbVertical;
-	FVScrollBar.Width := CXVSCROLL;
-	FVScrollBar.OnScroll := ScrollEvent;
+  FHScrollBar := TSynEditScrollbar.Create(self);
+  FHScrollBar.Kind := sbHorizontal;
+  FHScrollBar.Height := CYHSCROLL;
+  FHScrollBar.OnScroll := ScrollEvent;
+  FVScrollBar := TSynEditScrollbar.Create(self);
+  FVScrollBar.Kind := sbVertical;
+  FVScrollBar.Width := CXVSCROLL;
+  FVScrollBar.OnScroll := ScrollEvent;
 
-	// Set parent after BOTH scrollbars are created.
-	FHScrollBar.Parent := Self;
-	FHScrollBar.Color := clScrollBar;
-	FVScrollBar.Parent := Self;
-	FVScrollBar.Color := clScrollBar;
+  // Set parent after BOTH scrollbars are created.
+  FHScrollBar.Parent := Self;
+  FHScrollBar.Color := clScrollBar;
+  FVScrollBar.Parent := Self;
+  FVScrollBar.Color := clScrollBar;
 {$ENDIF}
-	fScrollHintColor := clInfoBk;
-	fScrollHintFormat := shfTopLineOnly;
+  fScrollHintColor := clInfoBk;
+  fScrollHintFormat := shfTopLineOnly;
 
-	SynFontChanged(nil);
+  SynFontChanged(nil);
 
-	//### Code Folding ###
-	fAllFoldRanges := TSynEditFoldRanges.Create;
-	fAllFoldRanges.OwnsObjects := true;
-	fCodeFolding := TSynCodeFolding.Create;
-	fUncollapsedLines := fLines; // folding is disabled by default, so use pointer instead of copy
-	//### End Code Folding ###
+  //### Code Folding ###
+  fAllFoldRanges := TSynEditFoldRanges.Create;
+  fAllFoldRanges.OwnsObjects := true;
+  fCodeFolding := TSynCodeFolding.Create;
+  fUncollapsedLines := fLines; // folding is disabled by default, so use pointer instead of copy
+  //### End Code Folding ###
 end;
 
 {$IFDEF SYN_CLX}
@@ -1677,109 +1682,106 @@ var
   vAuxRowCol: TDisplayCoord;
   vTrimCount: Integer;
 begin
-	if not SelAvail then
-		Result := ''
-	else begin
+  if not SelAvail then
+    Result := ''
+  else begin
+    ColFrom := BlockBegin.Char;
+    First := LineToUncollapsedLine(BlockBegin.Line) - 1;
+    //
+    ColTo := BlockEnd.Char;
+    Last := LineToUncollapsedLine(BlockEnd.Line) - 1;
+    //
+    TotalLen := 0;
+    case fActiveSelectionMode of
+      smNormal:
+        if (First = Last) then
+          Result := Copy(fUncollapsedLines[First], ColFrom, ColTo - ColFrom)
+        else begin
+          // step1: calculate total length of result string
+          TotalLen := Max(0, Length(fUncollapsedLines[First]) - ColFrom + 1);
+          for i := First + 1 to Last - 1 do
+            Inc(TotalLen, Length(fUncollapsedLines[i]));
+          Inc(TotalLen, ColTo - 1);
+          Inc(TotalLen, Length(sLineBreak) * (Last - First));
+          // step2: build up result string
+          SetLength(Result, TotalLen);
+          P := PChar(Result);
+          CopyAndForward(fUncollapsedLines[First], ColFrom, MaxInt, P);
 
-		// GetRealLineNumber uses 1-based too, so only shift to 0-based afterwards!
-		ColFrom := BlockBegin.Char;
-		First := BlockBegin.Line;
-		First := LineToUncollapsedLine(First)-1;
+          CopyAndForward(sLineBreak, 1, MaxInt, P);
 
-		// GetRealLineNumber uses 1-based too, so only shift to 0-based afterwards!
-		ColTo := BlockEnd.Char;
-		Last := BlockEnd.Line;
-		Last := LineToUncollapsedLine(Last)-1;
-
-		TotalLen := 0;
-		case fActiveSelectionMode of
-			smNormal:
-				if (First = Last) then
-					Result := Copy(fUncollapsedLines[First], ColFrom, ColTo - ColFrom)
-				else begin
-
-					// step1: calculate total length of result string
-					TotalLen := Max(0, Length(fUncollapsedLines[First]) - ColFrom + 1);
-					for i := First + 1 to Last - 1 do
-						Inc(TotalLen, Length(fUncollapsedLines[i]));
-					Inc(TotalLen, ColTo - 1);
-					Inc(TotalLen, Length(sLineBreak) * (Last - First));
-
-					// step2: build up result string
-					SetLength(Result, TotalLen);
-					P := PChar(Result);
-					CopyAndForward(fUncollapsedLines[First], ColFrom, MaxInt, P);
-					CopyAndForward(sLineBreak, 1, MaxInt, P);
-
-					for i := First + 1 to Last - 1 do begin
-						CopyAndForward(fUncollapsedLines[i], 1, MaxInt, P);
-						CopyAndForward(sLineBreak, 1, MaxInt, P);
-					end;
-					CopyAndForward(fUncollapsedLines[Last], 1, ColTo - 1, P);
-				end;
-			smColumn:
-				begin
-					with BufferToDisplayPos(BlockBegin) do begin
-						First := Row;
-						ColFrom := Column;
-					end;
-					with BufferToDisplayPos(BlockEnd) do begin
-						Last := Row;
-						ColTo := Column;
-					end;
-					if ColFrom > ColTo then
-						SwapInt(ColFrom, ColTo);
-
-					// step1: pre-allocate string large enough for worst case
-					TotalLen := ((ColTo - ColFrom) + Length(sLineBreak)) * (Last - First +1);
+          for i := First + 1 to Last - 1 do
+          begin
+            CopyAndForward(fUncollapsedLines[i], 1, MaxInt, P);
+            CopyAndForward(sLineBreak, 1, MaxInt, P);
+          end;
+          CopyAndForward(fUncollapsedLines[Last], 1, ColTo - 1, P);
+        end;
+      smColumn:
+        begin
+          with BufferToDisplayPos(BlockBegin) do
+          begin
+            First := Row;
+            ColFrom := Column;
+          end;
+          with BufferToDisplayPos(BlockEnd) do
+          begin
+            Last := Row;
+            ColTo := Column;
+          end;
+          if ColFrom > ColTo then
+            SwapInt(ColFrom, ColTo);
+          // step1: pre-allocate string large enough for worst case  
+          TotalLen := ((ColTo - ColFrom) + Length(sLineBreak)) *
+            (Last - First +1);
 {$IFDEF SYN_MBCSSUPPORT}
-					TotalLen := TotalLen * 2;
+          TotalLen := TotalLen * 2;
 {$ENDIF}
-					SetLength(Result, TotalLen);
-					P := PChar(Result);
-
-					// step2: copy chunks to the pre-allocated string
-					TotalLen := 0;
-					for cRow := First to Last do begin
-						vAuxRowCol.Row := cRow;
-						vAuxRowCol.Column := ColFrom;
-						vAuxLineChar := DisplayToBufferPos(vAuxRowCol);
-						l := vAuxLineChar.Char;
-						s := fUncollapsedLines[vAuxLineChar.Line -1];
-						vAuxRowCol.Column := ColTo;
-						r := DisplayToBufferPos(vAuxRowCol).Char;
+          SetLength(Result, TotalLen);
+          P := PChar(Result);
+          // step2: copy chunks to the pre-allocated string
+          TotalLen := 0;
+          for cRow := First to Last do
+          begin
+            vAuxRowCol.Row := cRow;
+            vAuxRowCol.Column := ColFrom;
+            vAuxLineChar := DisplayToBufferPos(vAuxRowCol);
+            l := vAuxLineChar.Char;
+            s := fUncollapsedLines[vAuxLineChar.Line -1];
+            vAuxRowCol.Column := ColTo;
+            r := DisplayToBufferPos(vAuxRowCol).Char;
 {$IFDEF SYN_MBCSSUPPORT}
-						MBCSGetSelRangeInLineWhenColumnSelectionMode(s, l, r);
+            MBCSGetSelRangeInLineWhenColumnSelectionMode(s, l, r);
 {$ENDIF}
-						vTrimCount := CopyPaddedAndForward(s, l, r - l, P);
-						TotalLen := TotalLen + (r - l) - vTrimCount + Length(sLineBreak);
-						CopyAndForward(sLineBreak, 1, MaxInt, P);
-					end;
-					SetLength(Result, TotalLen - Length(sLineBreak));
-				end;
-			smLine:
-				begin
-					// If block selection includes LastLine,
-					// line break code(s) of the last line will not be added.
-					// step1: calculate total length of result string
-					for i := First to Last do
-						Inc(TotalLen, Length(fUncollapsedLines[i]) + Length(sLineBreak));
-					if Last = fUncollapsedLines.Count -1 then
-						Dec(TotalLen, Length(sLineBreak));
-
-					// step2: build up result string
-					SetLength(Result, TotalLen);
-					P := PChar(Result);
-					for i := First to Last - 1 do begin
-						CopyAndForward(fUncollapsedLines[i], 1, MaxInt, P);
-						CopyAndForward(sLineBreak, 1, MaxInt, P);
-					end;
-					CopyAndForward(fUncollapsedLines[Last], 1, MaxInt, P);
-					if Last < fUncollapsedLines.Count -1 then
-						CopyAndForward(sLineBreak, 1, MaxInt, P);
-				end;
-		end;
-	end;
+            vTrimCount := CopyPaddedAndForward(s, l, r - l, P);
+            TotalLen := TotalLen + (r - l) - vTrimCount + Length(sLineBreak);
+            CopyAndForward(sLineBreak, 1, MaxInt, P);
+          end;
+          SetLength(Result, TotalLen - Length(sLineBreak));
+        end;
+      smLine:
+        begin
+          // If block selection includes LastLine,
+          // line break code(s) of the last line will not be added.
+          // step1: calculate total length of result string
+          for i := First to Last do
+            Inc(TotalLen, Length(fUncollapsedLines[i]) + Length(sLineBreak));
+          if Last = fUncollapsedLines.Count -1 then
+            Dec(TotalLen, Length(sLineBreak));
+          // step2: build up result string
+          SetLength(Result, TotalLen);
+          P := PChar(Result);
+          for i := First to Last - 1 do
+          begin
+            CopyAndForward(fUncollapsedLines[i], 1, MaxInt, P);
+            CopyAndForward(sLineBreak, 1, MaxInt, P);
+          end;
+          CopyAndForward(fUncollapsedLines[Last], 1, MaxInt, P);
+          if Last < fUncollapsedLines.Count -1 then
+            CopyAndForward(sLineBreak, 1, MaxInt, P);
+        end;
+    end;
+  end;
 end;
 
 function TCustomSynEdit.SynGetText: string;
@@ -2107,26 +2109,23 @@ end;
 
 procedure TCustomSynEdit.LinesChanged(Sender: TObject);
 var
-	vOldMode: TSynSelectionMode;
+  vOldMode: TSynSelectionMode;
 begin
-	Exclude(fStateFlags, sfLinesChanging);
-
-	if not fEditingFolds then
-		ReScan; // doesn't need Handle?
-
-	if HandleAllocated then begin
-
-		UpdateScrollBars;
-		vOldMode := fActiveSelectionMode;
-		SetBlockBegin(CaretXY);
-		fActiveSelectionMode := vOldMode;
-		InvalidateRect(fInvalidateRect, False);
-		FillChar(fInvalidateRect, SizeOf(TRect), 0);
-		if fGutter.ShowLineNumbers and fGutter.AutoSize then
-			fGutter.AutoSizeDigitCount(LineToUncollapsedLine(Lines.Count));
-		if not (eoScrollPastEof in Options) then
-			TopLine := TopLine;
-	end;
+  Exclude(fStateFlags, sfLinesChanging);
+  if HandleAllocated then
+  begin
+    ReScan;
+    UpdateScrollBars;
+    vOldMode := fActiveSelectionMode;
+    SetBlockBegin(CaretXY);
+    fActiveSelectionMode := vOldMode;
+    InvalidateRect(fInvalidateRect, False);
+    FillChar(fInvalidateRect, SizeOf(TRect), 0);
+    if fGutter.ShowLineNumbers and fGutter.AutoSize then
+      fGutter.AutoSizeDigitCount(LineToUncollapsedLine(Lines.Count));
+    if not (eoScrollPastEof in Options) then
+      TopLine := TopLine;
+  end;
 end;
 
 procedure TCustomSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState;
@@ -2358,15 +2357,15 @@ end;
 
 procedure TCustomSynEdit.DoOnGutterClick(Button: TMouseButton; X, Y: integer);
 var
-	i     : integer;
-	offs  : integer;
-	line  : integer;
-	allmrk: TSynEditLineMarks;
-	mark  : TSynEditMark;
-	//### Code Folding ###
-	FoldRange: TSynEditFoldRange;
-	rect : TRect;
-	//### End Code Folding ###
+  i     : integer;
+  offs  : integer;
+  line  : integer;
+  allmrk: TSynEditLineMarks;
+  mark  : TSynEditMark;
+  //### Code Folding ###
+  FoldRange: TSynEditFoldRange;
+  rect : TRect;
+  //### End Code Folding ###
 begin
 	//### Code Folding ###
 	if fUseCodeFolding then begin
@@ -2390,24 +2389,29 @@ begin
 	end;
 	//### End Code Folding ###
 
-	if Assigned(fOnGutterClick) then begin
-		line := DisplayToBufferPos(PixelsToRowColumn(X,Y)).Line;
-		if line <= Lines.Count then begin
-			Marks.GetMarksForLine(line, allmrk);
-			offs := 0;
-			mark := nil;
-			for i := Low(allmrk) to High(allmrk) do begin
-				if assigned(allmrk[i]) then begin
-					Inc(offs, BookMarkOptions.XOffset);
-					if X < offs then begin
-						mark := allmrk[i];
-						break;
-					end;
-				end;
-			end;
-			fOnGutterClick(Self, Button, X, Y, line, mark);
-		end;
-	end;
+  if Assigned(fOnGutterClick) then
+  begin
+    line := DisplayToBufferPos(PixelsToRowColumn(X,Y)).Line;
+    if line <= Lines.Count then
+    begin
+      Marks.GetMarksForLine(line, allmrk);
+      offs := 0;
+      mark := nil;
+      for i := Low(allmrk) to High(allmrk) do
+      begin
+        if assigned(allmrk[i]) then
+        begin
+          Inc(offs, BookMarkOptions.XOffset);
+          if X < offs then
+          begin
+            mark := allmrk[i];
+            break;
+          end;
+        end;
+      end; //for
+      fOnGutterClick(Self, Button, X, Y, line, mark);
+    end;
+  end;
 end;
 
 procedure TCustomSynEdit.Paint;
@@ -2466,33 +2470,35 @@ begin
   nL2 := MinMax( TopLine + (rcClip.Bottom + fTextHeight - 1) div fTextHeight,
     1, DisplayLineCount );
 
-	// Now paint everything while the caret is hidden.
-	HideCaret;
-
-	// First paint the gutter area if it was (partly) invalidated.
-	if (rcClip.Left < fGutterWidth) then begin
-		rcDraw := rcClip;
-		rcDraw.Right := fGutterWidth;
-		PaintGutter(rcDraw, nL1, nL2);
-	end;
-
-	// Then paint the text area if it was (partly) invalidated.
-	if (rcClip.Right > fGutterWidth) then begin
-		rcDraw := rcClip;
-		rcDraw.Left := Max(rcDraw.Left, fGutterWidth);
-		PaintTextLines(rcDraw, nL1, nL2, nC1, nC2);
-	end;
-	PluginsAfterPaint(Canvas, rcClip, nL1, nL2);
+  // Now paint everything while the caret is hidden.
+  HideCaret;
+  try
+    // First paint the gutter area if it was (partly) invalidated.
+    if (rcClip.Left < fGutterWidth) then
+    begin
+      rcDraw := rcClip;
+      rcDraw.Right := fGutterWidth;
+      PaintGutter(rcDraw, nL1, nL2);
+    end;
+    // Then paint the text area if it was (partly) invalidated.
+    if (rcClip.Right > fGutterWidth) then
+    begin
+      rcDraw := rcClip;
+      rcDraw.Left := Max(rcDraw.Left, fGutterWidth);
+      PaintTextLines(rcDraw, nL1, nL2, nC1, nC2);
+    end;
+    PluginsAfterPaint(Canvas, rcClip, nL1, nL2);
 {$IFDEF SYN_CLX}
-	if iRestoreViewPort then
-		QPainter_setViewport( Canvas.Handle, 0, 0, Width, Height);
+    if iRestoreViewPort then
+      QPainter_setViewport( Canvas.Handle, 0, 0, Width, Height );
 {$ENDIF}
-	// If there is a custom paint handler call it.
-	DoOnPaint;
-	DoOnPaintTransient(ttAfter);
+    // If there is a custom paint handler call it.
+    DoOnPaint;
+    DoOnPaintTransient(ttAfter);   
 
-	// And repaint the caret
-	UpdateCaret;
+  finally
+    UpdateCaret;
+  end;
 end;
 
 procedure TCustomSynEdit.PaintGutter(const AClip: TRect;
@@ -2557,8 +2563,8 @@ var
 	FoldRange: TSynEditFoldRange;
 	//### End Code Folding ###
 begin
-	vFirstLine := RowToLine( aFirstRow );
-	vLastLine := RowToLine( aLastRow );
+  vFirstLine := RowToLine( aFirstRow );
+  vLastLine := RowToLine( aLastRow );
   //todo: Does the following comment still apply?
   // Changed to use fTextDrawer.BeginDrawing and fTextDrawer.EndDrawing only
   // when absolutely necessary.  Note: Never change brush / pen / font of the
@@ -2568,121 +2574,125 @@ begin
   // and fill only the area after the last visible line.
 {$IFDEF SYN_CLX}
 {$ELSE}
-	dc := Canvas.Handle;
+  dc := Canvas.Handle;
 {$ENDIF}
 
-	// Won't compile, won't be using it, so disabling it
-	//if fGutter.Gradient then
-	//	SynDrawGradient(Canvas, fGutter.GradientStartColor, fGutter.GradientEndColor,fGutter.GradientSteps, Rect(0, 0, fGutterWidth, ClientHeight), True);
+// Doesn't compile, and not using it anyway
+//  if fGutter.Gradient then
+//    SynDrawGradient(Canvas, fGutter.GradientStartColor, fGutter.GradientEndColor,
+//                    fGutter.GradientSteps, Rect(0, 0, fGutterWidth, ClientHeight), True);
 
-	Canvas.Brush.Color := fGutter.Color;
+  Canvas.Brush.Color := fGutter.Color;
 
-	if fGutter.ShowLineNumbers then begin
-		if fGutter.UseFontStyle then
-			fTextDrawer.SetBaseFont(fGutter.Font)
-		else
-			fTextDrawer.Style := [];
+  if fGutter.ShowLineNumbers then
+  begin
+    if fGutter.UseFontStyle then
+      fTextDrawer.SetBaseFont(fGutter.Font)
+    else
+      fTextDrawer.Style := [];
 {$IFDEF SYN_CLX}
-		fTextDrawer.BeginDrawing(canvas);
+    fTextDrawer.BeginDrawing(canvas);
 {$ELSE}
-		fTextDrawer.BeginDrawing(dc);
+    fTextDrawer.BeginDrawing(dc);
 {$ENDIF}
-		try
-			if fGutter.UseFontStyle then
-				fTextDrawer.SetForeColor(fGutter.Font.Color)
-			else
-				fTextDrawer.SetForeColor(Self.Font.Color);
-			fTextDrawer.SetBackColor(fGutter.Color);
+    try
+      if fGutter.UseFontStyle then
+        fTextDrawer.SetForeColor(fGutter.Font.Color)
+      else
+        fTextDrawer.SetForeColor(Self.Font.Color);
+      fTextDrawer.SetBackColor(fGutter.Color);
 
-			// prepare the rect initially
-			rcLine := AClip;
+      // prepare the rect initially
+      rcLine := AClip;
+      rcLine.Right := Max(rcLine.Right, fGutterWidth - 2);
+      rcLine.Bottom := rcLine.Top;
 
-			rcLine.Bottom := rcLine.Top;
+      for cLine := vFirstLine to vLastLine do
+      begin
+        vLineTop := (LineToRow(cLine) - TopLine) * fTextHeight;
+        if WordWrap and not fGutter.Gradient then
+        begin
+          // erase space between wrapped lines (from previous line to current one)
+          rcLine.Top := rcLine.Bottom;
+          rcLine.Bottom := vLineTop;
+          with rcLine do
+            fTextDrawer.ExtTextOut(Left, Top, ETO_OPAQUE, rcLine, nil, 0);
+        end;
+        // next line rect
+        rcLine.Top := vLineTop;
+        rcLine.Bottom := rcLine.Top + fTextHeight;
 
-			for cLine := vFirstLine to vLastLine do begin
-				vLineTop := (LineToRow(cLine) - TopLine) * fTextHeight;
-				if WordWrap and not fGutter.Gradient then begin
-					// erase space between wrapped lines (from previous line to current one)
-					rcLine.Top := rcLine.Bottom;
-					rcLine.Bottom := vLineTop;
-					with rcLine do
-						fTextDrawer.ExtTextOut(Left, Top, ETO_OPAQUE, rcLine, nil, 0);
-				end;
+        //### Code Folding ###
+        if fUseCodeFolding then
+          s := fGutter.FormatLineNumber(LineToUncollapsedLine(cLine))
+        else
+          s := fGutter.FormatLineNumber(cLine);
+        //### End Code Folding ###
 
-				// next line rect
- 				rcLine.Top := vLineTop;
-				rcLine.Bottom := rcLine.Top + fTextHeight;
-
-				//### Code Folding ###
-				if fUseCodeFolding then
-					s := fGutter.FormatLineNumber(LineToUncollapsedLine(cLine))
-				else
-					s := fGutter.FormatLineNumber(cLine);
-				//### End Code Folding ###
-
-				if Assigned(OnGutterGetText) then
-					OnGutterGetText(Self,cLine,s);
-
+        if Assigned(OnGutterGetText) then
+          OnGutterGetText( Self, cLine, s );
 {$IFDEF SYN_CLX}
-				if fGutter.Gradient then
-					Canvas.Brush.Style := bsClear
-				else
-					Canvas.Brush.Style := bsSolid;
-
-				Canvas.FillRect(rcLine);
-				Canvas.TextRect(rcLine, fGutter.LeftOffset, rcLine.Top, s);
-
-				// restore brush
-				if fGutter.Gradient then
-					Canvas.Brush.Style := bsSolid;
+        if fGutter.Gradient then
+          Canvas.Brush.Style := bsClear
+        else
+          Canvas.Brush.Style := bsSolid;
+        Canvas.FillRect(rcLine);
+        Canvas.TextRect(rcLine, fGutter.LeftOffset, rcLine.Top, s);
+        // restore brush
+        if fGutter.Gradient then
+          Canvas.Brush.Style := bsSolid;
 {$ELSE}
-				GetTextExtentPoint32(DC, PChar(s), Length(s), TextSize);
-
-				if fGutter.Gradient then begin
-					SetBkMode(DC, TRANSPARENT);
-					Windows.ExtTextOut(DC, (fGutterWidth - fGutter.RightOffset - 2) - TextSize.cx,
-										rcLine.Top + ((fTextHeight - Integer(TextSize.cy)) div 2), 0,
-										@rcLine, PChar(s), Length(s), nil);
-					SetBkMode(DC, OPAQUE);
-				end else
-					Windows.ExtTextOut(DC, (fGutterWidth - fGutter.RightOffset - 2) - TextSize.cx,
-										rcLine.Top + ((fTextHeight - integer(TextSize.cy)) div 2), ETO_OPAQUE,
-										@rcLine, PChar(s), Length(s), nil);
+        GetTextExtentPoint32(DC, PChar(s), Length(s), TextSize);
+        if fGutter.Gradient then
+        begin
+          SetBkMode(DC, TRANSPARENT);
+          Windows.ExtTextOut(DC, (fGutterWidth - fGutter.RightOffset - 2) - TextSize.cx,
+            rcLine.Top + ((fTextHeight - Integer(TextSize.cy)) div 2), 0,
+            @rcLine, PChar(s), Length(s), nil);
+          SetBkMode(DC, OPAQUE);
+        end
+        else
+          Windows.ExtTextOut(DC, (fGutterWidth - fGutter.RightOffset - 2) - TextSize.cx,
+            rcLine.Top + ((fTextHeight - integer(TextSize.cy)) div 2), ETO_OPAQUE, 
+            @rcLine, PChar(s), Length(s), nil);
 {$ENDIF}
-			end;
+      end;
 
-			// now erase the remaining area if any
-			if (AClip.Bottom > rcLine.Bottom) and not fGutter.Gradient then begin
-				rcLine.Top := rcLine.Bottom;
-				rcLine.Bottom := AClip.Bottom;
-				with rcLine do
-					fTextDrawer.ExtTextOut(Left, Top, ETO_OPAQUE, rcLine, nil, 0);
-			end;
-		finally
-			fTextDrawer.EndDrawing;
-			if fGutter.UseFontStyle then
-				fTextDrawer.SetBaseFont(Self.Font);
-		end;
-	end else if not fGutter.Gradient then
-		Canvas.FillRect(AClip);
+      // now erase the remaining area if any
+      if (AClip.Bottom > rcLine.Bottom) and not fGutter.Gradient then
+      begin
+        rcLine.Top := rcLine.Bottom;
+        rcLine.Bottom := AClip.Bottom;
+        with rcLine do
+          fTextDrawer.ExtTextOut(Left, Top, ETO_OPAQUE, rcLine, nil, 0);
+      end;
+    finally
+      fTextDrawer.EndDrawing;
+      if fGutter.UseFontStyle then
+        fTextDrawer.SetBaseFont(Self.Font);
+    end;
+  end
+  else
+  if not fGutter.Gradient then
+    Canvas.FillRect(AClip);
 
 {$IFDEF SYN_WIN32}
-	// draw word wrap glyphs transparently over gradient
-	if fGutter.Gradient then
-		Canvas.Brush.Style := bsClear;
+  // draw word wrap glyphs transparently over gradient
+  if fGutter.Gradient then
+    Canvas.Brush.Style := bsClear;
 {$ENDIF}
 
-	// paint wrapped line glyphs
-	if WordWrap and fWordWrapGlyph.Visible then
-		for cLine := aFirstRow to aLastRow do
-			if LineToRow( RowToLine(cLine) ) <> cLine then
-				fWordWrapGlyph.Draw(Canvas,
-									(fGutterWidth - fGutter.RightOffset - 2) - fWordWrapGlyph.Width,
-									(cLine - TopLine) * fTextHeight, fTextHeight);
+  // paint wrapped line glyphs
+  if WordWrap and fWordWrapGlyph.Visible then
+    for cLine := aFirstRow to aLastRow do
+      if LineToRow( RowToLine(cLine) ) <> cLine then
+        fWordWrapGlyph.Draw(Canvas,
+                            (fGutterWidth - fGutter.RightOffset - 2) - fWordWrapGlyph.Width,
+                            (cLine - TopLine) * fTextHeight, fTextHeight);
 {$IFDEF SYN_WIN32}
-	// restore brush
-	if fGutter.Gradient then
-		Canvas.Brush.Style := bsSolid;
+  // restore brush
+  if fGutter.Gradient then
+    Canvas.Brush.Style := bsSolid;
 {$ENDIF}
 
 	//### Code Folding ###
@@ -2755,10 +2765,12 @@ begin
 	end;
 	//### End Code Folding ###
 
-	// now the gutter marks
-	if BookMarkOptions.GlyphsVisible and (Marks.Count > 0) and (vLastLine >= vFirstLine) then begin
-		aGutterOffs := AllocMem((aLastRow - aFirstRow + 1) * SizeOf(integer));
-		try
+  // now the gutter marks
+  if BookMarkOptions.GlyphsVisible and (Marks.Count > 0)
+    and (vLastLine >= vFirstLine) then
+  begin
+    aGutterOffs := AllocMem((aLastRow - aFirstRow + 1) * SizeOf(integer));
+    try
       // Instead of making a two pass loop we look while drawing the bookmarks
       // whether there is any other mark to be drawn
       bHasOtherMarks := FALSE;
@@ -2969,7 +2981,7 @@ var
       begin
         if (fShowSpecChar) and (Token[Counter] = #32) then
           Token[Counter] := SynSpaceGlyph
-        else if (Token[Counter] = #9) then
+        else if (Token[Counter] = TSynTabChar) then
         begin
           Token[Counter] := #32;  //Tabs painted differently if necessary
           DoTabPainting := fShowSpecChar;
@@ -3006,10 +3018,10 @@ var
       begin
         //fix everything before the FirstChar
           for i := 1 to First - 1 do               //wipe the text out so we don't
-            if sTabbedToken[i] = #9 then  //count it out of the range
+            if sTabbedToken[i] = TSynTabChar then  //count it out of the range
               sTabbedToken[i] := #32;              //we're looking for
 
-        TabStart := pos(#9, sTabbedToken);
+        TabStart := pos(TSynTabChar, sTabbedToken);
         rcTab.Top := rcToken.Top;
         rcTab.Bottom := rcToken.Bottom;
         while (TabStart > 0) and (TabStart >= First) and (TabStart <= Last) do
@@ -3032,7 +3044,7 @@ var
           for i := 0 to TabLen - 1 do           //wipe the text out so we don't
             sTabbedToken[TabStart + i] := #32;  //count it again
 
-          TabStart := pos(#9, sTabbedToken);
+          TabStart := pos(TSynTabChar, sTabbedToken);
         end;
       end;
       rcToken.Left := rcToken.Right;
@@ -3304,14 +3316,12 @@ var
     // inside the loop. Get only the starting point for this.
     rcLine := AClip;
     rcLine.Bottom := (aFirstRow - TopLine) * fTextHeight;
-    
     // Make sure the token accumulator string doesn't get reassigned too often.
     if Assigned(fHighlighter) then
     begin
       TokenAccu.MaxLen := Max(128, fCharsInWindow);
       SetLength(TokenAccu.s, TokenAccu.MaxLen);
     end;
-
     // Now loop through all the lines. The indices are valid for Lines.
     for nLine := vFirstLine to vLastLine do
     begin
@@ -3343,7 +3353,7 @@ var
       end;
       vStartRow := Max( LineToRow(nLine), aFirstRow );
       vEndRow := Min( LineToRow(nLine+1) -1, aLastRow );
-      for cRow := vStartRow to vEndRow do // single iteration loop if wordwrap is disabled
+      for cRow := vStartRow to vEndRow do
       begin
         if WordWrap then
         begin
@@ -4215,7 +4225,7 @@ begin
   end;
 end;
 
-procedure TCustomSynEdit.SetLines(Value: TSynEditStringList);
+procedure TCustomSynEdit.SetLines(Value: TStrings);
 begin
   Lines.Assign(Value);
 end;
@@ -4753,9 +4763,7 @@ begin
         ScrollInfo.fMask := ScrollInfo.fMask or SIF_DISABLENOSCROLL;
       end;
 
-      //if Visible then SendMessage(Handle, WM_SETREDRAW, 0, 0);
-
-      if (fScrollBars in [ssBoth, ssHorizontal]) and not WordWrap then
+      if (fScrollBars in [ssBoth, ssHorizontal]) and (not WordWrap) then
       begin
         if eoScrollPastEol in Options then
           nMaxScroll := MaxScrollWidth
@@ -4840,10 +4848,6 @@ begin
         end
         else
           EnableScrollBar(Handle, SB_VERT, ESB_ENABLE_BOTH);
-
-        //if Visible then SendMessage(Handle, WM_SETREDRAW, 1, 0);
-        //if fPaintLock=0 then
-        //   Paint; // do NOT redraw the whole window!
       end
       else
         ShowScrollBar( Handle, SB_VERT, False );
@@ -4935,11 +4939,12 @@ var
   iWheelClicks: integer;
   iLinesToScroll: integer;
 begin
-  // Orwell Mod: Do not hijack the control key!
+  // Use control for text resizing, so don't handle the message here
   if ssCtrl in Shift then begin
     Result := false;
     exit;
   end;
+  // use alt for fast scrolling
   if ssAlt in Shift then
     iLinesToScroll := LinesInWindow shr Ord(eoHalfPageScroll in fOptions)
   else
@@ -5362,10 +5367,11 @@ begin
   end;
 end;
 
-procedure TCustomSynEdit.ListPutted(Sender: TObject; Index: Integer; aCount: integer);
+procedure TCustomSynEdit.ListPutted(Sender: TObject; Index: Integer;
+  aCount: integer);
 var
-	L: Integer;
-	vEndLine: integer;
+  L: Integer;
+  vEndLine: integer;
 begin
   vEndLine := Index +1;
   if WordWrap then
@@ -6696,10 +6702,6 @@ end;
 procedure TCustomSynEdit.CommandProcessor(Command: TSynEditorCommand;
   AChar: char; Data: pointer);
 begin
-  if Command = ecLineBreak then begin
-  Inc(AChar)
-  end;
-
   // first the program event handler gets a chance to process the command
   DoOnProcessCommand(Command, AChar, Data);
   if Command <> ecNone then
@@ -6782,6 +6784,7 @@ var
   iUndoBegin, iUndoEnd: TBufferCoord;
   vCaretRow: integer;
   vTabTrim: integer;
+  Attr: TSynHighlighterAttributes;
 begin
   IncPaintLock;
   try
@@ -7189,7 +7192,7 @@ begin
             Helper := Helper + #13#10;
             fUndoList.AddChange(crSilentDeleteAfterCursor, BufferCoord(1, CaretY),
               BufferCoord(1, CaretY + 1), Helper, smNormal);
-            DoLinesDeleted(CaretY, 1);
+            DoLinesDeleted(CaretY - 1, 1);
           end;
           InternalCaretXY := BufferCoord(1, CaretY); // like seen in the Delphi editor
           DoOnPaintTransient(ttAfter);
@@ -7213,7 +7216,7 @@ begin
               fActiveSelectionMode);
           end;
           Temp := LineText;
-          Temp2 := Temp; 
+          Temp2 := Temp;
 // This is sloppy, but the Right Thing would be to track the column of markers
 // too, so they could be moved depending on whether they are after the caret...
           InsDelta := Ord(CaretX = 1);
@@ -7257,29 +7260,28 @@ begin
               end;
               Lines.Insert(CaretY, '');
               Caret := CaretXY;
-
-              fUndoList.AddChange(crLineBreak, Caret, Caret, '', smNormal);   //KV
               if Command = ecLineBreak then
               begin
-                InternalCaretXY := BufferCoord(1, CaretY +1);
                 if SpaceCount2 > 0 then
                 begin
-                  SpaceBuffer := Copy(Lines[BackCounter], 1, SpaceCount2);
-                  for i := 1 to Length(SpaceBuffer) do
-                    if SpaceBuffer[i] = #9 then
-                      CommandProcessor(ecTab, #0, nil)
-                    else
-                      CommandProcessor(ecChar, SpaceBuffer[i], nil);
+                  Lines[CaretY] := Copy(Lines[BackCounter], 1, SpaceCount2); // copy previous indent
                 end;
-                if Temp[Length(Temp)] in ['{',':'] then begin // add more indent for these too
-                  if not (eoTabsToSpaces in Options) then
-                    CommandProcessor(ecTab, #0, nil)
-                  else begin
-                    for i := 1 to TabWidth do
-                      CommandProcessor(ecChar,' ',nil);
+                if GetHighlighterAttriAtRowCol(BufferCoord(Length(Temp),CaretY),Temp,Attr) then begin // only add indent to source files
+                  if Attr <> Highlighter.CommentAttribute then begin // and outside of comments
+                    if Temp[Length(Temp)] in ['{',':'] then begin // add more indent for these too
+                      if not (eoTabsToSpaces in Options) then begin
+                        Lines[CaretY] := Lines[CaretY] + TSynTabChar;
+                        Inc(SpaceCount2,1);
+                      end else begin
+                        Lines[CaretY] := Lines[CaretY] + StringOfChar(' ',TabWidth);
+                        Inc(SpaceCount2,TabWidth); // update caret counter
+                      end;
+                    end;
                   end;
                 end;
+                InternalCaretXY := BufferCoord(SpaceCount2 + 1, CaretY + 1);
               end;
+              fUndoList.AddChange(crLineBreak, Caret, Caret, '', smNormal);
             end;
           end
           else begin
@@ -8305,12 +8307,13 @@ end;
 
 procedure TCustomSynEdit.SetFocus;
 begin
-	if (fFocusList.Count > 0) then begin
-		if TWinControl(fFocusList.Last).CanFocus then
-			TWinControl(fFocusList.Last).SetFocus;
-		exit;
-	end;
-	inherited;
+  if (fFocusList.Count > 0) then
+  begin
+    if TWinControl(fFocusList.Last).CanFocus then
+      TWinControl(fFocusList.Last).SetFocus;
+    exit;
+  end;
+  inherited;
 end;
 
 procedure TCustomSynEdit.UpdateMouseCursor;
@@ -8945,20 +8948,20 @@ begin
           nDistanceToTab := i - nPhysX;
           nSpacesToNextTabStop := TabWidth - ((nPhysX - 1) mod TabWidth);
           if nSpacesToNextTabStop <= nDistanceToTab then begin
-            Spaces := #9;
+            Spaces := TSynTabChar;
             Dec(nDistanceToTab, nSpacesToNextTabStop);
           end;
           while nDistanceToTab >= TabWidth do begin
-            Spaces := Spaces + #9;
+            Spaces := Spaces + TSynTabChar;
             Dec(nDistanceToTab, TabWidth);
           end;
           if nDistanceToTab > 0 then
             Spaces := Spaces + StringOfChar(#32, nDistanceToTab);
         end else
-          Spaces := #9;
+          Spaces := TSynTabChar;
       end
       else begin
-        Spaces := #9;
+        Spaces := TSynTabChar;
       end;
       if (eoTrimTrailingSpaces in Options) and (Length(TrimTrailingSpaces(LineText)) = 0) then
         NewCaretX := StartOfBlock.Char + GetExpandedLength(Spaces, TabWidth)
@@ -9985,7 +9988,7 @@ begin
     l := Length(s);
     x := 0;
     for i := 1 to p.Char - 1 do begin
-      if (i <= l) and (s[i] = #9) then
+      if (i <= l) and (s[i] = TSynTabChar) then
         inc(x, TabWidth - (x mod TabWidth))
       else
         inc(x);
@@ -10018,7 +10021,7 @@ begin
     while x < Result.Char  do
     begin
       inc(i);
-      if (i <= l) and (s[i] = #9) then
+      if (i <= l) and (s[i] = TSynTabChar) then
         inc(x, TabWidth - (x mod TabWidth))
       else
         inc(x);
@@ -10205,49 +10208,53 @@ end;
 function TCustomSynEdit.CharIndexToRowCol(Index: integer;collapsed : boolean): TBufferCoord;
 { Index is 0-based; Result.x and Result.y are 1-based }
 var
-	x, y, Chars: integer;
-	text : TStrings;
+  x, y, Chars: integer;
+  text : TStrings;
 begin
-	x := 0;
-	y := 0;
-	Chars := 0;
+  x := 0;
+  y := 0;
+  Chars := 0;
 
-	if collapsed then
-		text := Lines
-	else
-		text := fUncollapsedLines;
+  // pick a buffer
+  if collapsed then
+    text := Lines
+  else
+    text := fUncollapsedLines;
 
-	while y < text.Count do begin
-		x := Length(text[y]);
-		if Chars + x + 2 > Index then begin
-			x := Index - Chars;
-			break;
-		end;
-		Inc(Chars, x + 2);
-		x := 0;
-		Inc(y);
-	end;
-	Result.Char := x + 1;
-	Result.Line := y + 1;
+  while y < text.Count do
+  begin
+    x := Length(text[y]);
+    if Chars + x + 2 > Index then
+    begin
+      x := Index - Chars;
+      break;
+    end;
+    Inc(Chars, x + 2);
+    x := 0;
+    Inc(y);
+  end;
+  Result.Char := x + 1;
+  Result.Line := y + 1;
 end;
 
 function TCustomSynEdit.RowColToCharIndex(RowCol: TBufferCoord;collapsed : boolean): integer;
 { Row and Col are 1-based; Result is 0 based }
 var
-	i: integer;
-	text : TStrings;
+  i: integer;
+  text : TStrings;
 begin
-	Result := 0;
+  Result := 0;
 
-	if collapsed then
-		text := Lines
-	else
-		text := fUncollapsedLines;
+  // pick a buffer
+  if collapsed then
+    text := Lines
+  else
+    text := fUncollapsedLines;
 
-	RowCol.Line := Min(text.Count, RowCol.Line) - 1;
-	for i := 0 to RowCol.Line - 1 do
-		Result := Result + Length(text[i]) + 2;
-	Result := Result + (RowCol.Char -1);
+  RowCol.Line := Min(text.Count, RowCol.Line) - 1;
+  for i := 0 to RowCol.Line - 1 do
+    Result := Result + Length(text[i]) + 2;
+  Result := Result + (RowCol.Char -1);
 end;
 // ### End Code Folding
 
@@ -10596,7 +10603,8 @@ end;
 //### Code Folding ###
 procedure TCustomSynEdit.Collapse(AFoldRange: TSynEditFoldRange);
 var
-	i: Integer;
+	i, openpos: Integer;
+	s : AnsiString;
 begin
 	fEditingFolds := true;
 
@@ -10610,8 +10618,15 @@ begin
 			Lines.Delete(i);
 		end;
 
-		if FoldRegion.AddEnding then
-			Lines[FromLine-1] := Lines[FromLine-1] + FoldRegion.Close;
+		if FoldRegion.AddEnding then begin
+			openpos :=  Pos(FoldRegion.Open,Lines[FromLine-1]);
+			if openpos > 0 then begin
+				s := Lines[FromLine - 1];
+				Insert(FoldRegion.Close,s,openpos + 1);
+				Lines[FromLine - 1] := s;
+			end else
+				Lines[FromLine-1] := Lines[FromLine-1] + FoldRegion.Close;
+		end;
 
 		Collapsed := True;
 		SetPCOfSubFoldRanges(True, RealLevel);
@@ -10654,7 +10669,8 @@ end;
 
 procedure TCustomSynEdit.Uncollapse(FoldRange: TSynEditFoldRange);
 var
-	i: Integer;
+	i, closepos: Integer;
+	s : AnsiString;
 begin
 	fEditingFolds := true;
 
@@ -10664,9 +10680,15 @@ begin
 		for i := 0 to CollapsedLines.Count - 1 do
 			Lines.Insert(FromLine, CollapsedLines[i]);
 
-		if FoldRegion.AddEnding then
-			Lines[FromLine-1] := Copy(Lines[FromLine-1], 1,Length(Lines[FromLine-1]) - Length(FoldRegion.Close));
-
+		if FoldRegion.AddEnding then begin
+			closepos :=  Pos(FoldRegion.Close,Lines[FromLine-1]);
+			if closepos > 0 then begin
+				s := Lines[FromLine - 1];
+				Delete(s,closepos,Length(FoldRegion.Close));
+				Lines[FromLine - 1] := s;
+			end else
+				Lines[FromLine-1] := Copy(Lines[FromLine-1], 1,Length(Lines[FromLine-1]) - Length(FoldRegion.Close));
+		end;
 		Collapsed := False;
 		MoveFoldRangesAfter(FoldRange, CollapsedLines.Count);
 		SetPCOfSubFoldRanges(False, RealLevel);
@@ -10856,7 +10878,7 @@ begin
 		fUncollapsedLines := fLines; // don't bother using a copy
 
 	// Avoids call to GetTextStr!
-	fUncollapsedLinesLength := fUncollapsedLines.GetTextLength;
+	fUncollapsedLinesLength := TSynEditStringList(fUncollapsedLines).GetTextLength;
 end;
 
 

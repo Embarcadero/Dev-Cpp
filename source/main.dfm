@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 744
-  Top = 331
+  Left = 577
+  Top = 246
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -62,7 +62,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -95,6 +95,7 @@ object MainForm: TMainForm
         OnAdvancedCustomDraw = CompilerOutputAdvancedCustomDraw
         OnAdvancedCustomDrawItem = CompilerOutputAdvancedCustomDrawItem
         OnDblClick = CompilerOutputDblClick
+        OnDeletion = CompilerOutputDeletion
         OnKeyDown = CompilerOutputKeyDown
       end
     end
@@ -105,7 +106,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -138,6 +139,7 @@ object MainForm: TMainForm
         OnAdvancedCustomDraw = CompilerOutputAdvancedCustomDraw
         OnAdvancedCustomDrawItem = CompilerOutputAdvancedCustomDrawItem
         OnDblClick = CompilerOutputDblClick
+        OnDeletion = ResourceOutputDeletion
         OnKeyDown = CompilerOutputKeyDown
       end
     end
@@ -245,16 +247,16 @@ object MainForm: TMainForm
       Caption = 'Debugging'
       ImageIndex = 32
       object DebugSendPanel: TPanel
-        Left = 471
+        Left = 589
         Top = 0
-        Width = 417
-        Height = 155
+        Width = 299
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
-          417
-          155)
+          299
+          154)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -265,7 +267,7 @@ object MainForm: TMainForm
         object edGdbCommand: TComboBox
           Left = 136
           Top = 3
-          Width = 277
+          Width = 159
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           ItemHeight = 13
@@ -275,8 +277,8 @@ object MainForm: TMainForm
         object DebugOutput: TMemo
           Left = 4
           Top = 30
-          Width = 410
-          Height = 106
+          Width = 292
+          Height = 112
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -287,16 +289,16 @@ object MainForm: TMainForm
       object DebugStartPanel: TPanel
         Left = 0
         Top = 0
-        Width = 471
-        Height = 155
+        Width = 589
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
         ParentBiDiMode = False
         TabOrder = 1
         DesignSize = (
-          471
-          155)
+          589
+          154)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -383,7 +385,7 @@ object MainForm: TMainForm
         end
         object lblEvaluate: TLabel
           Left = 4
-          Top = 104
+          Top = 76
           Width = 45
           Height = 13
           Caption = 'Evaluate:'
@@ -397,8 +399,8 @@ object MainForm: TMainForm
           TabOrder = 0
         end
         object StepOverBtn: TButton
-          Left = 236
-          Top = 68
+          Left = 352
+          Top = 8
           Width = 112
           Height = 25
           Action = actStepOver
@@ -418,76 +420,60 @@ object MainForm: TMainForm
           Width = 112
           Height = 25
           Action = actAddWatch
-          TabOrder = 5
-        end
-        object RemoveWatchBtn: TButton
-          Left = 120
-          Top = 68
-          Width = 112
-          Height = 25
-          Action = actRemoveWatch
-          TabOrder = 3
-        end
-        object ViewCPUBtn: TButton
-          Left = 4
-          Top = 68
-          Width = 112
-          Height = 25
-          Action = actViewCPU
           TabOrder = 4
         end
-        object ModifyWatchBtn: TButton
+        object ViewCPUBtn: TButton
           Left = 120
           Top = 38
           Width = 112
           Height = 25
-          Action = actModifyWatch
-          TabOrder = 6
+          Action = actViewCPU
+          TabOrder = 3
         end
         object EvaluateInput: TComboBox
           Left = 64
-          Top = 100
-          Width = 400
+          Top = 72
+          Width = 518
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           ItemHeight = 13
-          TabOrder = 7
+          TabOrder = 5
           OnKeyPress = EvaluateInputKeyPress
         end
         object EvalOutput: TMemo
           Left = 4
-          Top = 127
-          Width = 460
-          Height = 7
+          Top = 100
+          Width = 578
+          Height = 41
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
-          TabOrder = 8
+          TabOrder = 6
         end
         object SkipFuncBtn: TButton
-          Left = 352
-          Top = 68
-          Width = 112
-          Height = 25
-          Action = actSkipFunction
-          TabOrder = 9
-        end
-        object IntoInsBtn: TButton
           Left = 352
           Top = 38
           Width = 112
           Height = 25
+          Action = actSkipFunction
+          TabOrder = 7
+        end
+        object IntoInsBtn: TButton
+          Left = 468
+          Top = 38
+          Width = 112
+          Height = 25
           Action = actStepIns
-          TabOrder = 10
+          TabOrder = 8
         end
         object NextInsBtn: TButton
-          Left = 352
+          Left = 468
           Top = 8
           Width = 112
           Height = 25
           Action = actNextIns
-          TabOrder = 11
+          TabOrder = 9
         end
       end
     end
@@ -498,7 +484,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -530,6 +516,7 @@ object MainForm: TMainForm
         OnAdvancedCustomDraw = FindOutputAdvancedCustomDraw
         OnAdvancedCustomDrawSubItem = FindOutputAdvancedCustomDrawSubItem
         OnDblClick = FindOutputDblClick
+        OnDeletion = FindOutputDeletion
         OnKeyDown = FindOutputKeyDown
       end
     end
@@ -1531,64 +1518,6 @@ object MainForm: TMainForm
         Action = actProgramReset
       end
     end
-    object DebugMenu: TMenuItem
-      Action = actDebugMenu
-      object DebugItem: TMenuItem
-        Tag = 10
-        Action = actDebug
-      end
-      object AttachtoprocessItem: TMenuItem
-        Action = actAttachProcess
-      end
-      object StopExecution1: TMenuItem
-        Action = actStopExecute
-      end
-      object N18: TMenuItem
-        Caption = '-'
-      end
-      object DbgNextItem: TMenuItem
-        Action = actNextLine
-      end
-      object DbgSingleStep: TMenuItem
-        Action = actStepLine
-      end
-      object N68: TMenuItem
-        Caption = '-'
-      end
-      object actNextIns1: TMenuItem
-        Action = actNextIns
-      end
-      object Intoinstruction1: TMenuItem
-        Action = actStepIns
-      end
-      object N70: TMenuItem
-        Caption = '-'
-      end
-      object StepoverItem: TMenuItem
-        Action = actStepOver
-      end
-      object Skipfunction1: TMenuItem
-        Action = actSkipFunction
-      end
-      object N69: TMenuItem
-        Caption = '-'
-      end
-      object Abortcompilation1: TMenuItem
-        Action = actAddWatch
-      end
-      object Modifywatch1: TMenuItem
-        Action = actModifyWatch
-      end
-      object Removewatch1: TMenuItem
-        Action = actRemoveWatch
-      end
-      object N21: TMenuItem
-        Caption = '-'
-      end
-      object ViewCPUItem: TMenuItem
-        Action = actViewCPU
-      end
-    end
     object ToolsMenu: TMenuItem
       Action = actToolsMenu
       object CompileroptionsItem: TMenuItem
@@ -1616,7 +1545,6 @@ object MainForm: TMainForm
       end
       object CheckforupdatesItem: TMenuItem
         Action = actUpdateCheck
-        Caption = '&Check for Packages'
       end
       object PackageManagerItem: TMenuItem
         Bitmap.Data = {
@@ -2411,7 +2339,7 @@ object MainForm: TMainForm
     object actCompRun: TAction
       Tag = 3
       Category = 'Execute'
-      Caption = 'Compile and Run'
+      Caption = 'Compile && Run'
       ImageIndex = 33
       ShortCut = 122
       OnExecute = actCompRunExecute
@@ -2497,7 +2425,7 @@ object MainForm: TMainForm
     end
     object actUpdateCheck: TAction
       Category = 'Help'
-      Caption = '&Check for Updates/Packages'
+      Caption = '&Check for Packages'
       ImageIndex = 41
       OnExecute = actUpdateCheckExecute
     end
@@ -3116,7 +3044,6 @@ object MainForm: TMainForm
   end
   object devShortcuts: TdevShortcuts
     Filename = 'devShortcuts.cfg'
-    AlternateColor = 14737632
     Left = 628
     Top = 280
   end

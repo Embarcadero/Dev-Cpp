@@ -366,7 +366,6 @@ begin
 
 		// General tab
 		SupportXPThemes:=chkSupportXP.Checked;
-		CompilerSet:=cmbCompiler.ItemIndex;
 		useGPP:=chkDefCpp.Checked;
 		Icon := fProjectCopy.Options.Icon;
 		typ := lstType.ItemIndex;
@@ -375,6 +374,7 @@ begin
 
 		// Compiler tab
 		CompilerOptions := devCompiler.fOptionString;
+		CompilerSet:=cmbCompiler.ItemIndex;
 
 		// Options tab
 		CompilerCmd:='';

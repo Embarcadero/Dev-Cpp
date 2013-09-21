@@ -245,6 +245,7 @@ begin
   btnNext.Caption := Lang[ID_TIPS_NEXTTIP];
   btnPrev.Caption := Lang[ID_TIPS_PREVIOUSTIP];
   btnClose.Caption := Lang[ID_BTN_CLOSE];
+  btnRandom.Caption := lang[ID_TIPS_RANDOMTIP];
 end;
 
 end.

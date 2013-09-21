@@ -35,7 +35,7 @@ uses
 
 type
   TEditor = class;
-  TDebugGutter = class(TSynEditPlugin) // use other name, used for compiler/find messages too now
+  TDebugGutter = class(TSynEditPlugin)
   protected
     e : TEditor;
     procedure AfterPaint(ACanvas: TCanvas; const AClip: TRect;FirstLine, LastLine: integer); override;
@@ -907,6 +907,7 @@ var
 	attr : TSynHighlighterAttributes;
 	s1,s2 : AnsiString;
 	Ptr : PAnsiChar;
+	HighlightPos : TBufferCoord;
 begin
 
 	// Doing this here instead of in EditorKeyDown to be able to delete some key messages
@@ -914,7 +915,14 @@ begin
 
 		// Don't complete symbols inside strings or comments
 		allowcompletion := true;
-		if fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1,fText.CaretY), s1, attr) then
+
+		// Empty line? Check if we're inside an uncompleted comment block, check last nonblank char
+		HighlightPos := BufferCoord(fText.CaretX-1,fText.CaretY);
+		while (HighlightPos.Line > 0) and (Length(fText.Lines[HighlightPos.Line-1]) = 0) do
+			Dec(HighlightPos.Line);
+		HighlightPos.Char := Length(fText.Lines[HighlightPos.Line-1]);
+
+		if fText.GetHighlighterAttriAtRowCol(HighlightPos, s1, attr) then
 			if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) or SameStr(attr.Name,'Character') then
 				allowcompletion := false;
 

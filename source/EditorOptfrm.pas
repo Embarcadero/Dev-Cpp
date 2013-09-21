@@ -1287,7 +1287,7 @@ begin
 	dmMain.CodeInserts.Clear;
 	for I := lvCodeIns.FixedRows to lvCodeIns.RowCount - 1 do begin
 		if lvCodeIns.Cells[0,I] <> '' then begin
-			new(Item);
+			Item := new(PCodeIns);
 
 			// Get snippet from attached object
 			Item.Caption := lvCodeIns.Cells[0,I];

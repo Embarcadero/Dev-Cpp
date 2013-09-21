@@ -1063,6 +1063,7 @@ const
   ID_TIPS_DONTSHOWTIPS                  = 65004;
   ID_TIPS_NEXTTIP                       = 65005;
   ID_TIPS_PREVIOUSTIP                   = 65006;
+  ID_TIPS_RANDOMTIP                     = 65007;
 
 { Environment Options }
   ID_ENV_FASSTAB                        = 66001;
@@ -1216,3 +1217,10 @@ const
   ID_CMPPRG_ERRORS                      = 74004;
   ID_CMPPRG_WARNINGS                    = 74005;
   ID_CMPPRG_CAPTION                     = 74006;
+
+  ID_COMPVALID_DIRNOTFOUND              = 75001;
+  ID_COMPVALID_DIRNOTSET                = 75002;
+  ID_COMPVALID_DIRSEARCHED              = 75003;
+  ID_COMPVALID_BINFIXSUGGESTION         = 75004;
+  ID_COMPVALID_DIRFIXSUGGESTION         = 75005;
+  ID_COMPVALID_BINNOTFOUND              = 75006;

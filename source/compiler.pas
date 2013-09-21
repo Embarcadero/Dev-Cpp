@@ -886,7 +886,7 @@ var
 	OLine,OCol,OFile,OMsg,S : AnsiString;
 	delim : integer;
 
-	procedure GetFileName;
+	procedure GetFileName; // obtain delimiter AFTER (full) filename
 	begin
 		OMsg := Trim(OMsg);
 		if (Length(OMsg) > 2) and (OMsg[2] = ':') then begin // full file path at start, ignore this one
@@ -924,7 +924,7 @@ var
 			delim := FPos(',',OMsg,1);
 		if delim > 0 then begin
 			OCol := Copy(OMsg,1,delim-1);
-			if StrToIntDef(OLine,-1) = -1 then // don't accept
+			if StrToIntDef(OCol,-1) = -1 then // don't accept
 				OCol := ''
 			else
 				Delete(OMsg,1,delim);

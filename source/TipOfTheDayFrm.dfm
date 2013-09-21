@@ -1,5 +1,5 @@
 object TipOfTheDayForm: TTipOfTheDayForm
-  Left = 462
+  Left = 785
   Top = 348
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog

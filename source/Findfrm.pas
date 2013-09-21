@@ -326,7 +326,8 @@ begin
 
 	if actiontype = faFindFiles then begin
 		MainForm.MessageControl.ActivePageIndex := 4; // Find Tab
-		MainForm.AddFindOutputItem('','','',Format(Lang[ID_SEARCHCOUNT],[findcount]),'');
+		MainForm.FindSheet.Caption := Lang[ID_SHEET_FIND] + ' (' + IntToStr(findcount) + ')';
+		//MainForm.AddFindOutputItem('','','',Format(Lang[ID_SEARCHCOUNT],[findcount]),'');
 		MainForm.OpenCloseMessageSheet(TRUE);
 	end else begin
 		if findcount = 0 then

@@ -431,9 +431,7 @@ begin
           + 'Version     : ' + DEVCPP_VERSION + #13#10
           + 'Build Time  : ' + lblBuildTime.Caption + #13#10
           + 'Message     : ' + lblError.Caption + #13#10
-          + 'Address     : ' + lblAddress.Caption + #13#10
-          + 'Description : <Please include a description of what you' + #13#10
-          + '               were doing before the error occurred>';
+          + 'Address     : ' + lblAddress.Caption + #13#10;
 end;
 
 function TExceptionFrm.GetMachineReport: AnsiString;
@@ -448,7 +446,7 @@ begin
     Result := Result + 'Service Pack  : ' + lblAdditionalInfo.Caption + #13#10;
 
   // TODO: remove this useles info?
-  Result := Result + 'Computer Name : ' + lblComputerName.Caption;;
+  Result := Result + 'Computer Name : ' + lblComputerName.Caption;
 end;
 
 function TExceptionFrm.GetMemoryReport: AnsiString;
@@ -550,6 +548,7 @@ var
 	I: integer;
 begin
 	Cmd := 'mailto:' + fEmail + '?Subject=' + fSubject + '&Body=';
+	Cmd := Cmd + '<Please include a description of what you were doing before the error occurred>%0A%0A';
 	for I := 0 to memBugReport.Lines.Count - 1 do
 		Cmd := Cmd + memBugReport.Lines[I] + '%0A';
 	Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
