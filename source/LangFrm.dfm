@@ -249,9 +249,7 @@ object LangForm: TLangForm
         Width = 257
         Height = 17
         Caption = 'Yes, cache the default include folder'
-        Checked = True
         TabOrder = 0
-        TabStop = True
       end
       object NoCache: TRadioButton
         Left = 8
@@ -267,7 +265,9 @@ object LangForm: TLangForm
         Width = 257
         Height = 17
         Caption = 'Only cache these files and their includes:'
+        Checked = True
         TabOrder = 2
+        TabStop = True
       end
       object AltFileList: TListBox
         Left = 4

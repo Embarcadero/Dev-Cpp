@@ -857,18 +857,15 @@ type
 		procedure actGotoImplDeclEditorExecute(Sender: TObject);
 		procedure actHideFSBarExecute(Sender: TObject);
 		procedure UpdateSplash(text : string);
-
 		function findstatement(var localfind : string; var localfindpoint : TPoint;mousecursor : boolean) : PStatement;
 		procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 		procedure PageControlChanging(Sender: TObject;var AllowChange: Boolean);
 		procedure ImportCBCprojectClick(Sender: TObject);
-    procedure CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView;
-      Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;
-      var DefaultDraw: Boolean);
-    procedure cmbMembersDropDown(Sender: TObject);
-    procedure NewFileBtnClick(Sender: TObject);
-    procedure actUnCollapseExecute(Sender: TObject);
-    procedure actCollapseExecute(Sender: TObject);
+		procedure CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
+		procedure cmbMembersDropDown(Sender: TObject);
+		procedure NewFileBtnClick(Sender: TObject);
+		procedure actUnCollapseExecute(Sender: TObject);
+		procedure actCollapseExecute(Sender: TObject);
 
 	private
 		fTab				: integer;
@@ -2015,7 +2012,7 @@ var
 begin
 	e:= GetEditor;
 	if Assigned(e) then
-		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[e.Text.GetRealLineNumber(e.Text.DisplayY), e.Text.DisplayX, e.Text.SelLength, e.Text.GetTextLen, e.Text.UnCollapsedLines.Count]);
+		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[e.Text.GetRealLineNumber(e.Text.DisplayY), e.Text.DisplayX, e.Text.SelLength, e.Text.UnCollapsedLines.Count, Length(e.Text.UnCollapsedLines.Text)]);
 end;
 
 procedure TMainForm.SetStatusbarMessage(msg:string);
@@ -2029,7 +2026,7 @@ var
 begin
 	e:= GetEditor;
 	with Sender as TMenuItem do
-		if assigned(e) then begin
+		if Assigned(e) then begin
 			Checked:= not Checked;
 			if (Parent = ToggleBookmarksItem) then
 				TogglebookmarksPopItem.Items[Tag - 1].Checked := Checked
@@ -2046,7 +2043,7 @@ procedure TMainForm.GotoBookmarkClick(Sender: TObject);
 var
  e: TEditor;
 begin
-	e:= GetEditor;
+	e:=GetEditor;
 	if assigned(e) then
 		e.Text.GotoBookMark((Sender as TMenuItem).Tag);
 end;
@@ -2828,10 +2825,8 @@ var
  e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then begin
+	if assigned(e) then
 		e.Text.Undo;
-		e.Text.ReScanForFoldRanges; // SynEdit itself doesn't process the message properly itself in TCustomSynEdit.DoOnCommandProcessed
-	end;
 end;
 
 procedure TMainForm.actRedoExecute(Sender: TObject);
@@ -2839,10 +2834,8 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) then begin
+	if assigned(e) then
 		e.Text.Redo;
-		e.Text.ReScanForFoldRanges; // SynEdit itself doesn't process the message properly itself in TCustomSynEdit.DoOnCommandProcessed
-	end;
 end;
 
 procedure TMainForm.actCutExecute(Sender: TObject);
@@ -2872,7 +2865,6 @@ begin
 	e:= GetEditor;
 	if Assigned(e) then begin
 		e.Text.PasteFromClipboard;
-		e.Text.ReScanForFoldRanges; // SynEdit itself doesn't process the message properly itself in TCustomSynEdit.DoOnCommandProcessed
 		e.Text.Repaint;
 	end;
 end;
@@ -2897,7 +2889,7 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if assigned(e) and e.Text.SelAvail then
+	if assigned(e) then
 		e.Text.ClearSelection;
 end;
 
@@ -2935,11 +2927,8 @@ end;
 
 procedure TMainForm.actCompOnNeedExecute(Sender: TObject);
 begin
-	if actCompOnNeed.Checked then
-			OpenCloseMessageSheet(FALSE)
-	else if (not actCompOutput.Checked) and
-					(not actCompOnNeed.Checked) then
-			OpenCloseMessageSheet(False);
+	if actCompOnNeed.Checked or ((not actCompOutput.Checked) and (not actCompOnNeed.Checked)) then
+		OpenCloseMessageSheet(False);
 	devData.ShowOutput:=actCompOutput.Checked;
 	devData.OutputOnNeed:=actCompOnNeed.Checked;
 end;

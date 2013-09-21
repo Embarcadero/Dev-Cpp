@@ -287,6 +287,7 @@ begin
 		end;
 	end;
 	fText.ReScanForFoldRanges;
+	fText.GetUncollapsedStrings;
 
 	// Set the current editor and highlighter
 	devEditor.AssignEditor(fText);
@@ -643,7 +644,6 @@ end;
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
 	if scModified in Changes then begin // scModified is only fired upon first change
-		fText.ReScanForFoldRanges; // rescan on first modify
 		if Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
 			UpdateCaption('[*] '+ExtractfileName(fFileName));

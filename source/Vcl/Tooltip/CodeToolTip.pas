@@ -711,7 +711,7 @@ begin
 		Width := Width + 72; // Button stuff
 
 	// this displays the rect below the current line and at the same position where the token begins
-	Pt := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos))));
+	Pt := FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos,true))));
 
 	ActivateHint(Rect(Pt.X,
                     Pt.Y+FEditor.LineHeight+2,
@@ -824,13 +824,12 @@ var
 	end;
 begin
 
-	// get the current position in the text
-	Idx := FEditor.SelStart;
+	// get the current position in the uncollapsed text
+	Idx := FEditor.RowColToCharIndex(FEditor.CaretXY,true);
 	CurPos := Idx;
 
-	// get a pointer to the text
+	// get a pointer to the uncollapsed text
 	P := PChar(FEditor.Lines.Text);
-//	MsgBox(P);
 
 	nBraces := 0;
 	nCommas := 0;
@@ -842,7 +841,7 @@ begin
 		if P[CurPos] = '(' then begin
 			Inc(nBraces);
 
-		// Ending brace, decreace count or success!
+		// Ending brace, decrease count or success!
 		end else if P[CurPos] = ')' then begin
 			Dec(nBraces);
 			if nBraces = -1 then

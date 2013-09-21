@@ -70,7 +70,8 @@ function IncludeQuoteIfNeeded(s : string) : string;
 
 procedure MsgBox(text,caption:string); overload;
 procedure MsgBox(text:string); overload;
-
+procedure MsgBox(text:integer;caption:string); overload;
+procedure MsgBox(text:integer); overload;
 // Added by MikeB
 procedure LoadFilefromResource(const FileName: string; ms: TMemoryStream);
 
@@ -137,6 +138,14 @@ end;
 procedure MsgBox(text:string);
 begin
 	MessageBox(application.handle,PChar(text),PChar('Message'),MB_OK);
+end;
+procedure MsgBox(text:integer;caption:string);
+begin
+	MessageBox(application.handle,PChar(inttostr(text)),PChar(caption),MB_OK);
+end;
+procedure MsgBox(text:integer);
+begin
+	MessageBox(application.handle,PChar(inttostr(text)),PChar('Message'),MB_OK);
 end;
 
 procedure OpenHelpFile;
