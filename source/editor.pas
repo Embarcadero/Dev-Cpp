@@ -203,147 +203,144 @@ end;
 
 procedure TEditor.Init(In_Project : boolean; Caption_, File_name : string;DoOpen : boolean; const IsRes: boolean = FALSE);
 var
- s: string;
- pt: TPoint;
+	s: string;
+	pt: TPoint;
 begin
-  fModified := false;
-  fErrorLine:= -1;
-  fActiveLine:= -1;
-  fRunToCursorLine := -1;
-  fRes:= IsRes;
-  fInProject := In_Project;
-  fLastParamFunc := nil;
-  if File_name='' then
-    fFileName := Caption_
-  else
-    fFileName := File_name;
-  fTabSheet := TTabSheet.Create(MainForm.PageControl);
-  fTabSheet.Caption := Caption_;
-  fTabSheet.PageControl := MainForm.PageControl;
-  fTabSheet.TabVisible:= FALSE;
-  { This is to have a pointer to the TEditor using
-    the PageControl in MainForm }
-  fTabSheet.Tag := integer(self);
+	// Set generic options
+	fModified := false;
+	fErrorLine:= -1;
+	fActiveLine:= -1;
+	fRunToCursorLine := -1;
+	fRes:= IsRes;
+	fInProject := In_Project;
+	fLastParamFunc := nil;
+	if File_name='' then
+		fFileName := Caption_
+	else
+		fFileName := File_name;
 
-  fOnBreakpointToggle := MainForm.OnBreakpointToggle;
+	// Setup an new tabs
+	fTabSheet := TTabSheet.Create(MainForm.PageControl);
+	fTabSheet.Caption := Caption_;
+	fTabSheet.PageControl := MainForm.PageControl;
+	fTabSheet.TabVisible:= FALSE;//FALSE;
+	// This way we can contact the editor from MainForm.PageControl.TabIndex
+	fTabSheet.Tag := integer(self);
 
+	// Set events
+	fOnBreakpointToggle := MainForm.OnBreakpointToggle;
 
-  fText := TSynEdit.Create(fTabSheet);
-  fText.Parent := fTabSheet;
-  fText.Align := alClient;
-  fText.Visible := True;
+	// Create an editor
+	fText := TSynEdit.Create(fTabSheet);
+	fText.Parent := fTabSheet;
+	fText.Align := alClient;
 
-  if (DoOpen) then
-   try
-    fText.Lines.LoadFromFile(FileName);
-    fNew := False;
-    if devData.Backups then // create a backup of the file
-     begin
-       s:= ExtractfileExt(FileName);
-       insert('~', s, pos('.', s) +1);
-       delete(s, length(s) -1, 1);
-       if devEditor.AppendNewline then
-         with fText do
-           if Lines.Count > 0 then
-             if Lines[Lines.Count -1] <> '' then
-               Lines.Add('');
-       fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
-     end;
-   except
-    raise;
-   end
-  else
-    fNew := True;
+	if (DoOpen) then
+		try
+			fText.Lines.LoadFromFile(FileName);
+			fNew := False;
+			if devData.Backups then begin
+				s:= ExtractfileExt(FileName);
+				Insert('~', s, AnsiPos('.', s) +1);
+				Delete(s, Length(s) -1, 1);
+				if devEditor.AppendNewline then
+					with fText do
+						if Lines.Count > 0 then
+							if Lines[Lines.Count -1] <> '' then
+								Lines.Add('');
+				fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
+			end;
+		except
+			raise;
+		end
+	else
+		fNew := True;
 
-  fHintTimer := TTimer.Create(Application);
-  fHintTimer.Interval := 1000;
-  fHintTimer.OnTimer := EditorHintTimer;
-  fHintTimer.Enabled := False;
+	fText.Visible := True;
+	fHintTimer := TTimer.Create(Application);
+	fHintTimer.Interval := 100;
+	fHintTimer.OnTimer := EditorHintTimer;
+	fHintTimer.Enabled := False;
 
-  fText.PopupMenu := MainForm.EditorPopupMenu;
-  fText.Font.Color:= clWindowText;
-  fText.Color:= clWindow;
-  fText.Font.Name:= 'Courier';
-  fText.Font.Size:= 10;
-  fText.WantTabs := True;
-  fText.OnStatusChange:= EditorStatusChange;
-  fText.OnSpecialLineColors:= EditorSpecialLineColors;
-  fText.OnGutterClick:= EditorGutterClick;
-  fText.OnReplaceText:= EditorReplaceText;
-  fText.OnDropFiles:= EditorDropFiles;
-  fText.OnDblClick:= EditorDblClick;
-  fText.OnMouseDown := EditorMouseDown;
-  fText.OnPaintTransient := EditorPaintTransient;
+	fText.PopupMenu := MainForm.EditorPopupMenu;
+	fText.Font.Color:= clWindowText;
+	fText.Color:= clWindow;
+	fText.Font.Name:= 'Courier';
+	fText.Font.Size:= 10;
+	fText.WantTabs := True;
+	fText.OnStatusChange:= EditorStatusChange;
+	fText.OnSpecialLineColors:= EditorSpecialLineColors;
+	fText.OnGutterClick:= EditorGutterClick;
+	fText.OnReplaceText:= EditorReplaceText;
+	fText.OnDropFiles:= EditorDropFiles;
+	fText.OnDblClick:= EditorDblClick;
+	fText.OnMouseDown := EditorMouseDown;
+	fText.OnPaintTransient := EditorPaintTransient;
 
-  fText.MaxScrollWidth:=4096; // bug-fix #600748
-  fText.MaxUndo:=4096;
+	fText.MaxScrollWidth:=4096; // bug-fix #600748
+	fText.MaxUndo:=4096;
 
-  devEditor.AssignEditor(fText);
-  if not fNew then
-   fText.Highlighter:= dmMain.GetHighlighter(fFileName)
-  else
-   if fRes then
-    fText.Highlighter:= dmMain.Res
-   else
-    fText.Highlighter:= dmMain.cpp;
+	devEditor.AssignEditor(fText);
+	if not fNew then
+		fText.Highlighter:= dmMain.GetHighlighter(fFileName)
+	else if fRes then
+		fText.Highlighter:= dmMain.Res
+	else
+		fText.Highlighter:= dmMain.cpp;
 
-  // update the selected text color
-  StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
-  fText.SelectedColor.Background:= pt.X;
-  fText.SelectedColor.Foreground:= pt.Y;
+	// update the selected text color
+	StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
+	fText.SelectedColor.Background:= pt.X;
+	fText.SelectedColor.Foreground:= pt.Y;
 
-  fTabSheet.PageControl.ActivePage := fTabSheet;
-  fTabSheet.TabVisible:= TRUE;
-  fDebugGutter := TDebugGutter.Create(self);
-  Application.ProcessMessages;
+	fTabSheet.PageControl.ActivePage := fTabSheet;
+	fTabSheet.TabVisible:= TRUE;
+	fDebugGutter := TDebugGutter.Create(self);
+	Application.ProcessMessages;
 
-  InitCompletion;
+	InitCompletion;
 
-  {** Modified by Peter **}
-  fFunctionArgs:=TSynCompletionProposal.Create(fText);
-  with fFunctionArgs do begin
-    EndOfTokenChr:='';
-    //TriggerChars:='('; {** Modified by Peter **}
-    // we dont need triggerchars here anymore, because the tooltips
-    // are handled by FCodeToolTip now
-    TriggerChars:=''; {** Modified by Peter **}
-    TimerInterval:=devCodeCompletion.Delay;
-    DefaultType:=ctParams;
-    OnExecute:=FunctionArgsExecute;
-    Editor:=fText;
-    Options:=Options+[scoUseBuiltInTimer];
+	// Function arguments
+	fFunctionArgs:=TSynCompletionProposal.Create(fText);
+	with fFunctionArgs do begin
+		EndOfTokenChr:='';
+		// TriggerChars:='('; {** Modified by Peter **}
+		// we dont need triggerchars here anymore, because the tooltips
+		// are handled by FCodeToolTip now
+		TriggerChars:=''; {** Modified by Peter **}
+		TimerInterval:=devCodeCompletion.Delay;
+		DefaultType:=ctParams;
+		OnExecute:=FunctionArgsExecute;
+		Editor:=fText;
+		Options:=Options+[scoUseBuiltInTimer];
 {$IFDEF WIN32}
-    ShortCut:=Menus.ShortCut(Word(VK_SPACE), [ssCtrl, ssShift]);
+		ShortCut:=Menus.ShortCut(Word(VK_SPACE), [ssCtrl, ssShift]);
 {$ENDIF}
 {$IFDEF LINUX}
-    ShortCut:=Menus.ShortCut(Word(XK_SPACE), [ssCtrl, ssShift]);
+		ShortCut:=Menus.ShortCut(Word(XK_SPACE), [ssCtrl, ssShift]);
 {$ENDIF}
-  end;
+	end;
 
-   
-  {** Modified by Peter **}
-  // create the codetooltip
-  FCodeToolTip := TDevCodeToolTip.Create(Application);
-  FCodeToolTip.Editor := FText;
-  FCodeToolTip.Parser := MainForm.CppParser1;
-  
-  
-  {** Modified by Peter **}
-  // The Editor must have 'Auto Indent' activated  to use FAutoIndent.
-  // It's under Tools | Editor Options and then the General tab
-  FAutoIndent := TSynAutoIndent.Create(Application);
-  FAutoIndent.Editor := FText;
-  FAutoIndent.IndentChars := '{:';
-  FAutoIndent.UnIndentChars := '}';
-  
-  
-  fText.OnMouseMove := EditorMouseMove;
+	// Function parameter tips
+	FCodeToolTip := TDevCodeToolTip.Create(Application);
+	FCodeToolTip.Editor := FText;
+	FCodeToolTip.Parser := MainForm.CppParser1;
 
-  // monitor this file for outside changes
-  MainForm.devFileMonitor1.Files.Add(fFileName);
-  MainForm.devFileMonitor1.Refresh(True);
-  // RNC set any breakpoints that should be set in this file
-  SetBreakPointsOnOpen;
+	// The Editor must have 'Auto Indent' activated  to use FAutoIndent.
+	// It's under Tools >> Editor Options and then the General tab
+	FAutoIndent := TSynAutoIndent.Create(Application);
+	FAutoIndent.Editor := FText;
+	FAutoIndent.IndentChars := '{:';
+	FAutoIndent.UnIndentChars := '}';
+
+	fText.OnMouseMove := EditorMouseMove;
+
+	// monitor this file for outside changes
+	MainForm.devFileMonitor1.Files.Add(fFileName);
+	MainForm.devFileMonitor1.Refresh(True);
+
+	// RNC set any breakpoints that should be set in this file
+	SetBreakPointsOnOpen;
 end;
 
 destructor TEditor.Destroy;
@@ -1111,34 +1108,37 @@ end;
 
 procedure TEditor.CompletionTimer(Sender: TObject);
 var
-  M: TMemoryStream;
-  curr: string;
+	M: TMemoryStream;
+	curr: string;
 begin
-  fTimer.Enabled:=False;
-  curr:=CurrentPhrase;
+	fTimer.Enabled:=False;
+	curr:=CurrentPhrase;
 
-  if not CheckAttributes(BufferCoord(fText.CaretX-1, fText.CaretY), curr) then begin
-    fTimerKey:=#0;
-    Exit;
-  end;
+	if not CheckAttributes(BufferCoord(fText.CaretX-1, fText.CaretY), curr) then begin
+		fTimerKey:=#0;
+		Exit;
+	end;
 
-  M:=TMemoryStream.Create;
-  try
-    fText.Lines.SaveToStream(M);
-    fCompletionBox.CurrentClass:=MainForm.CppParser1.FindAndScanBlockAt(fFileName, fText.CaretY, M);
-  finally
-    M.Free;
-  end;
-  case fTimerKey of
-    '.': fCompletionBox.Search(nil, curr, fFileName);
-    '>': if fText.CaretX-2>=0 then
-           if fText.LineText[fText.CaretX-2]='-' then // it makes a '->'
-             fCompletionBox.Search(nil, curr, fFileName);
-    ':': if fText.CaretX-2>=0 then
-           if fText.LineText[fText.CaretX-2]=':' then // it makes a '::'
-             fCompletionBox.Search(nil, curr, fFileName);
-  end;
-  fTimerKey:=#0;
+	M:=TMemoryStream.Create;
+	try
+		fText.Lines.SaveToStream(M);
+		fCompletionBox.CurrentClass:=MainForm.CppParser1.FindAndScanBlockAt(fFileName, fText.CaretY, M);
+	finally
+		M.Free;
+	end;
+	case fTimerKey of
+	'.':
+		fCompletionBox.Search(nil, curr, fFileName);
+	'>':
+		if fText.CaretX-2>=0 then
+			if fText.LineText[fText.CaretX-2]='-' then // it makes a '->'
+				fCompletionBox.Search(nil, curr, fFileName);
+	':':
+		if fText.CaretX-2>=0 then
+			if fText.LineText[fText.CaretX-2]=':' then // it makes a '::'
+				fCompletionBox.Search(nil, curr, fFileName);
+	end;
+	fTimerKey:=#0;
 end;
 
 procedure TEditor.ReconfigCompletion;
@@ -1787,28 +1787,36 @@ begin
 	end;
 end;
 
-{** Modified by Peter **}
-// added on 25th march 2004
+// This code is executed whenever a function parameter suggestion balloon is shown
 procedure TEditor.DoOnCodeCompletion(Sender: TObject; const AStatement: TStatement; const AIndex: Integer);
-//
-//  this event is triggered whenever the codecompletion box is going to make its work,
-//  or in other words, when it did a codecompletion ...
-//
+//var
+//	stubborntooltip : boolean;
 begin
 	// disable the tooltip here, becasue we check against Enabled
 	// in the 'EditorStatusChange' event to prevent it's redrawing there
-	if FCodeToolTip <> nil then begin
-		//FCodeToolTip may not be initialized under some
-		//circumstances when create TEditor
+	if Assigned(FCodeToolTip) then begin
+		//FCodeToolTip may not be initialized under some circumstances when creating TEditor
 		//I suspect it's in TProject.OpenUnit --specu
+//		stubborntooltip := false;
+//		try
+//			FCodeToolTip.Enabled := False;
+//		except
+//			stubborntooltip := true;
+//		end;
+//		if stubborntooltip then begin
+//			FCodeToolTip := nil;
+//			FCodeToolTip := TDevCodeToolTip.Create(Application);
+//			FCodeToolTip.Editor := FText;
+//			FCodeToolTip.Parser := MainForm.CppParser1;
+//		end;
 		FCodeToolTip.Enabled := False;
 		FCodeToolTip.ReleaseHandle;
 		FCodeToolTip.Show;
 		FCodeToolTip.Select(AStatement._FullText);
 		FCodeToolTip.Enabled := True;
+		FCodeToolTip.Show;
 	end;
 end;
-
 // Editor needs to be told when class browser has been recreated otherwise AV !
 procedure TEditor.UpdateParser;
 begin

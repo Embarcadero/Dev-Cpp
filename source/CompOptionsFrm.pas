@@ -185,6 +185,8 @@ begin
 	devCompilerSet.AddtoLink:= cbLinkerAdd.Checked;
 	devCompilerSet.CompOpts:= Commands.Lines.Text;
 	devCompilerSet.LinkOpts:= Linker.Lines.Text;
+	devCompilerSet.Delay := seCompDelay.Value;
+	devCompilerSet.FastDep := cbFastDep.Checked;
 
 	devCompilerSet.OptionsStr:=devCompiler.OptionStr;
 	devCompilerSet.SaveSet(currentSet);
@@ -261,6 +263,7 @@ begin
      Commands.Text:= devCompilerSet.CompOpts;
      cbLinkerAdd.Checked:= devCompilerSet.AddtoLink;
      Linker.Text:= devCompilerSet.LinkOpts;
+     // BEZIG
 
      cmbCompilerSetComp.Items.Clear;
      cmbCompilerSetComp.Items.Assign(devCompilerSet.Sets);

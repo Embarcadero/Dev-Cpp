@@ -78,10 +78,11 @@ type
 		fCompOpt : string;
 		flinkOpt : string;
 
+		fDelay : integer;
+		fFastDep : boolean;
+
 		// All options
 		fOptions : string;
-
-		// Not included in each compiler profile: fastdep,delay
 
 		procedure WriteSets;
 		procedure UpdateSets;
@@ -117,6 +118,9 @@ type
 		property AddtoLink: boolean read fLinkAdd write fLinkAdd;
 		property CompOpts: string read fCompOpt write fCompOpt;
 		property LinkOpts: string read fLinkOpt write fLinkOpt;
+
+		property Delay: integer read fDelay write fDelay;
+		property FastDep: boolean read fFastDep write fFastDep;
 	end;
 
 	// Each compiler is contained in one class
@@ -148,14 +152,12 @@ type
 
 		// All options
 		fOptions: TList;
-
-		// Makefile (global)
-		fFastDep: Boolean;
+		fDelay : integer;
+		fFastDep : boolean;
 
 		// Debugger
 		fModified: boolean;         // has options been changed since last compile
 		fSaveLog: boolean;          // Save Compiler Output
-		fDelay: integer;            // delay in milliseconds -- for compiling
 
 		procedure SetCompilerSet(const Value: integer);
 		function GetOptions(Index: integer): TCompilerOption;
@@ -182,12 +184,11 @@ type
 		procedure ChangeOptionsLang;
 		function ConvertCharToValue(c : char) : integer;
 	published
-		property FastDep: Boolean read fFastDep write fFastDep;
-
 		property RunParams: string read fRunParams write fRunParams;
 		property UseExecParams: boolean read fUseParams write fUseParams;
 		property SaveLog: boolean read fSaveLog write fSaveLog;
 		property Delay: integer read fDelay write fDelay;
+		property FastDep: boolean read fFastDep write fFastDep;
 
 		property gccName: string read fgccName write fgccName;
 		property gppName: string read fgppName write fgppName;
@@ -1211,20 +1212,20 @@ begin
 		CompilerSet := StrToIntDef(LoadSettingS('Compiler', 'CompilerSet'), 0);
 		key := 'CompilerSets_' + IntToStr(CompilerSet);
 
-		fUseParams:=    LoadSettingB(key, 'UseParams');
-		fIntermediate:= LoadSettingS(key, 'InterDir');
-		fOutputDir:=    LoadSettingS(key, 'OutputDir');
-		fRunParams:=    LoadSettingS(key, 'RunParams');
-		fCompAdd:=      LoadSettingB(key, 'CompAdd');
-		fLinkAdd:=      LoadSettingB(key, 'LinkAdd');
-		fCompOpt:=      LoadSettingS(key, 'CompOpt');
-		fLinkOpt:=      LoadSettingS(key, 'LinkOpt');
-		fSaveLog:=      LoadSettingB(key, 'Log');
+		fUseParams:=      LoadSettingB(key, 'UseParams');
+		fIntermediate:=   LoadSettingS(key, 'InterDir');
+		fOutputDir:=      LoadSettingS(key, 'OutputDir');
+		fRunParams:=      LoadSettingS(key, 'RunParams');
+		fCompAdd:=        LoadSettingB(key, 'CompAdd');
+		fLinkAdd:=        LoadSettingB(key, 'LinkAdd');
+		fCompOpt:=        LoadSettingS(key, 'CompOpt');
+		fLinkOpt:=        LoadSettingS(key, 'LinkOpt');
+		fSaveLog:=        LoadSettingB(key, 'Log');
 
-		dummystring:=   LoadSettingS(key, 'Delay');
-		fDelay:= StrToIntDef(dummystring,0);
+		fDelay:= strtointdef(LoadSettingS(key, 'Delay'),0);
+		fFastDep:=        LoadSettingB(key, 'FastDep','1');
 
-		dummystring := LoadSettingS(key, 'Options');
+		dummystring :=    LoadSettingS(key, 'Options');
 		for I := 0 to fOptions.Count - 1 do begin
 			opt := Options[I];
 			// Unknown options are set to false
@@ -1240,9 +1241,6 @@ begin
 				end;
 			Options[I] := opt;
 		end;
-
-		// Entry might nog exist yet, so pass a default
-		fFastDep:= LoadSettingB('Makefile', 'FastDep','1');
 	end;
 end;
 
@@ -1287,6 +1285,9 @@ begin
 	fLinkOpt := devCompilerSet.LinkOpts;
 	fCompAdd := devCompilerSet.AddToComp;
 	fLinkAdd := devCompilerSet.AddToLink;
+
+	fDelay := devCompilerSet.fDelay;
+	fFastDep := devCompilerSet.fFastDep;
 end;
 
 procedure TdevCompiler.SetOptions(Index: integer;const Value: TCompilerOption);
@@ -1622,7 +1623,7 @@ procedure TdevCodeCompletion.SettoDefaults;
 begin
   fWidth:=320;
   fHeight:=240;
-  fDelay:=200;
+  fDelay:=100;
   fBackColor:=clWindow;
   fEnabled:=True;
   fUseCacheFiles:=False;
@@ -1759,6 +1760,9 @@ begin
 		fCompAdd:= LoadSettingB(key, 'CompAdd');
 		fLinkAdd:= LoadSettingB(key, 'LinkAdd');
 
+		fDelay:= strtointdef(LoadSettingS(key, 'Delay'),0);
+		fFastDep:=        LoadSettingB(key, 'FastDep','1');
+
 		// dirs
 		devDirs.Exec   := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 		fBinDir := StringReplace(LoadSettingS(key, 'Bins'),'%path%\',devDirs.Exec,[rfReplaceAll]);
@@ -1881,6 +1885,9 @@ begin
 		SaveSettingS(key, 'LinkOpt',       fLinkOpt);
 		SaveSettingB(key, 'CompAdd',       fCompAdd);
 		SaveSettingB(key, 'LinkAdd',       fLinkAdd);
+		SaveSettingS(key, 'Delay',         inttostr(fDelay));
+		SaveSettingB(key, 'FastDep',       fFastDep);
+
 		// Paths
 		SaveSettingS(key, 'Bins',  StringReplace(fBinDir,devDirs.fExec,'%path%\',[rfReplaceAll]));
 		SaveSettingS(key, 'C',     StringReplace(fCDir,  devDirs.fExec,'%path%\',[rfReplaceAll]));
@@ -1915,6 +1922,9 @@ begin
   fCompAdd:= FALSE;
   fLinkAdd:= TRUE;
   fCompOpt:='';
+  fDelay:=0;
+  fFastDep:=TRUE;
+
   fLinkOpt:='-static-libstdc++ -static-libgcc';
 
   // dirs

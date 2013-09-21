@@ -123,7 +123,7 @@ type
     destructor Destroy; override;
   end;
 
-  
+
   TCodeToolTipDownButton = class(TCustomCodeToolTipButton)
   private
     FBitmap: TBitmap;
@@ -211,13 +211,12 @@ type
     property EndWhenChr;
     property Hints;
     property MaxScanLength;
-    property Options;    
+    property Options;
     property StartWhenChr;
   end;
 
 implementation
-uses
-	main;
+
 // contains the up/down buttons
 // i tried to draw them using DrawFrameControl first,
 // but it looked very bad, so I use a bitmap instead.
@@ -245,37 +244,37 @@ begin
 		Identifiers[c] := True;
 
 	Identifiers['_'] := True;
+	Identifiers['~'] := True;
 end;
 
-  function PreviousWordString(S: string; Index: Integer):string;
-  var
-    I: Integer;
-  begin
- 
-    Result := '';
+function PreviousWordString(S: string; Index: Integer):string;
+var
+	I: Integer;
+begin
+	Result := '';
 
-    if (Index <= 1) or (S = '') then
-      Exit;
+	if (Index <= 1) or (S = '') then
+		Exit;
 
-    I := Index;
+	I := Index;
 
-    // Skip blanks and TAB's
-    repeat
-      Dec(Index);
-    until not (S[Index] in [#32,#9]);
-    Inc(Index);
+	// Skip blanks and TAB's
+	repeat
+		Dec(Index);
+	until not (S[Index] in [#32,#9]);
+	Inc(Index);
 
-    repeat
-      Dec(Index);
-      if Index < 2 then
-        Break;
-    until not Identifiers[S[Index]];
+	repeat
+		Dec(Index);
+		if Index < 2 then
+			Break;
+	until not Identifiers[S[Index]];
 
-    if not Identifiers[S[Index]] then
-      Inc(Index);
+	if not Identifiers[S[Index]] then
+		Inc(Index);
 
-    Result := Copy(S, Index, I-Index);
-  end;
+	Result := Copy(S, Index, I-Index);
+end;
 
 // Returns name of function, so passing foo(bar) will return foo
 function GetPrototypeName(const S: string): string;
@@ -479,7 +478,7 @@ begin
 	end;
 end;
 
-// Blabla.
+// Gaat de lijst met matchende tooltips langs, kijkt welke met beste past bij code
 function TBaseCodeToolTip.FindClosestToolTip(ToolTip: string; CommaIndex: Integer): string;
 var
 	I,K: Integer;
@@ -512,8 +511,6 @@ begin
 	Result := FToolTips.Strings[NewIndex];
 	SelIndex := NewIndex;
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 function TBaseCodeToolTip.GetCommaIndex(P: PChar; BraceStart, CurPos: Integer):Integer;
 //  to highlight the current prototype argument, we need
@@ -597,8 +594,6 @@ begin
 		Inc(i);
 	end;
 end;
-
-//----------------------------------------------------------------------------------------------------------------------
 
 procedure TBaseCodeToolTip.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var

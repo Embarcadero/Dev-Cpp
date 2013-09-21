@@ -273,7 +273,7 @@ begin
 			end else begin
 				Reset(logfile);
 				Append(logfile);
-				Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);  // BEZIG
+				Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);
 			end;
 
 			for i:=0 to pred(MainForm.CompilerOutput.Items.Count) do begin
@@ -298,7 +298,7 @@ begin
 				end else begin
 					Reset(logfile);
 					Append(logfile);
-					Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);  // BEZIG
+					Write(logfile,#13#10 + DateTimeToStr(Now) + ': Appending to log...' + #13#10#13#10);
 				end;
 				Write(logfile,MainForm.LogOutput.Lines.Text);
 			finally
@@ -1919,7 +1919,7 @@ begin
     for idx := 0 to Items.Count -1 do
     begin
       tempnode := Items[idx];
-      if tempnode.Expanded AND (tempnode.Data=Pointer(-1)) then //data=pointer(-1) - it's folder
+      if tempnode.Expanded and (tempnode.Data=Pointer(-1)) then //data=pointer(-1) - it's folder
         oldPaths.Add(GetFolderPath(tempnode));
     end;
 

@@ -1226,7 +1226,8 @@ begin
         FName := StringReplace(FName, '>', '', [rfReplaceAll]);
         FName := StringReplace(FName, '"', '', [rfReplaceAll]);
         FullFName := LowerCase(ExpandFileName(GetFullFileName(FName)));
-        PIncludesRec(fIncludesList[fIncludesList.Count - 1])^.IncludeFiles := PIncludesRec(fIncludesList[fIncludesList.Count - 1])^.IncludeFiles + AnsiQuotedStr(FullFName, '"') + ',';
+        with PIncludesRec(fIncludesList[fIncludesList.Count - 1])^ do
+          IncludeFiles := IncludeFiles + AnsiQuotedStr(FullFName, '"') + ',';
         IsGlobal := IsGlobalFile(FullFName);
         if {not fReparsing and}((fParseGlobalHeaders and IsGlobal) or (fParseLocalHeaders and not IsGlobal)) then begin
           AddFileToScan(FullFName);
@@ -1662,7 +1663,8 @@ begin
     end;
   finally
     // remove last comma
-    Delete(PIncludesRec(fIncludesList[fIncludesList.Count - 1])^.IncludeFiles, Length(PIncludesRec(fIncludesList[fIncludesList.Count - 1])^.IncludeFiles), 1);
+    with PIncludesRec(fIncludesList[fIncludesList.Count - 1])^ do
+  	       Delete(IncludeFiles, Length(IncludeFiles), 1);
     fSkipList.Clear;
     fCurrentClassLevel.Clear;
     FCurrentClass.Clear;
@@ -1682,6 +1684,8 @@ procedure TCppParser.Reset(KeepLoaded: boolean = True);
 var
   I: integer;
   I1: integer;
+  s : PStatement;
+  p: Pointer;
 begin
   if Assigned(fOnBusy) then
     fOnBusy(Self);
@@ -1697,29 +1701,32 @@ begin
     I := fBaseIndex
   else
     I := 0;
-  while I < fStatementList.Count do
-    if not KeepLoaded or (KeepLoaded and not PStatement(fStatementList[I])^._Loaded) then begin
-      I1 := fScannedFiles.IndexOf(PStatement(fStatementList[I])^._Filename);
+  while I < fStatementList.Count do begin
+    s := PStatement(fStatementList[I]);
+    if not KeepLoaded or (KeepLoaded and not s^._Loaded) then begin
+      I1 := fScannedFiles.IndexOf(s^._Filename);
       if I1 = -1 then
-        I1 := fScannedFiles.IndexOf(PStatement(fStatementList[I])^._DeclImplFileName);
+        I1 := fScannedFiles.IndexOf(s^._DeclImplFileName);
       if I1 <> -1 then
         fScannedFiles.Delete(I1);
-      I1 := fCacheContents.IndexOf(PStatement(fStatementList[I])^._Filename);
+      I1 := fCacheContents.IndexOf(s^._Filename);
       if I1 = -1 then
-        I1 := fCacheContents.IndexOf(PStatement(fStatementList[I])^._DeclImplFileName);
+        I1 := fCacheContents.IndexOf(s^._DeclImplFileName);
       if I1 <> -1 then
         fCacheContents.Delete(I1);
-      Dispose(PStatement(fStatementList[I]));
+      Dispose(s);
       fStatementList.Delete(I);
     end
-    else
+	else
       Inc(I);
+  end;
   fStatementList.Pack;
 
   if not KeepLoaded then begin
     while fIncludesList.Count > 0 do begin
-      if Assigned(fIncludesList[fIncludesList.Count - 1]) then
-        Dispose(PIncludesRec(fIncludesList[fIncludesList.Count - 1]));
+	  p := fIncludesList[fIncludesList.Count - 1];
+      if p <> nil then
+        Dispose(PIncludesRec(p));
       fIncludesList.Delete(fIncludesList.Count - 1);
     end;
     fNextID := 0;
@@ -2106,7 +2113,7 @@ end;
 procedure TCppParser.Save(FileName: TFileName);
 var
   hFile: integer;
-  I, I2, tmp, HowMany: integer;
+  I, I2, HowMany: integer;
   MAGIC: array[0..7] of Char;
   P: array[0..4095] of Char;
 begin
@@ -2123,14 +2130,14 @@ begin
     FileWrite(hFile, HowMany, SizeOf(Integer));
     for I := 0 to fStatementList.Count - 1 do begin
       with PStatement(fStatementList[I])^ do begin
-        if Length(_FullText) > SizeOf(P) then begin
+        {if Length(_FullText) > SizeOf(P) then begin
           tmp := FileSeek(hFile, 0, 1);  // retrieve currrent pos
           FileSeek(hFile, SizeOf(Magic), 0); // seek to the number of statements
           HowMany := HowMany - 1;
           FileWrite(hFile, HowMany, SizeOf(Integer)); // write new number of statements
           FileSeek(hFile, tmp, 0); // seek to original offset
           Continue;
-        end;
+        end;}
         FileWrite(hFile, _ID, SizeOf(integer));
         FileWrite(hFile, _ParentID, SizeOf(integer));
         FileWrite(hFile, _Kind, SizeOf(byte));

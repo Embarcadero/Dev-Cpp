@@ -1504,7 +1504,6 @@ begin
 			ReleaseProgressForm;
 	end;
 
-	// BEZIG, LOGGEN
 	fProject.SaveToLog;
 end;
 

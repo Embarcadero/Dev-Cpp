@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 412
-  Top = 168
+  Left = 623
+  Top = 228
   Width = 1024
   Height = 768
   HorzScrollBar.Visible = False
@@ -1233,8 +1233,6 @@ object MainForm: TMainForm
         TabOrder = 0
         PopupMenu = BrowserPopup
         BorderStyle = bsNone
-        MultiSelect = True
-        MultiSelectStyle = [msShiftSelect]
         ShowFilter = sfAll
         OnSelect = ClassBrowser1Select
         Parser = CppParser1
