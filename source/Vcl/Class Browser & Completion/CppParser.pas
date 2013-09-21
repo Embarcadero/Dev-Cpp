@@ -201,7 +201,7 @@ type
     procedure GetClassesList(var List: TStrings);
     function SuggestMemberInsertionLine(ParentID: integer; Scope: TStatementClassScope; var AddScopeStr: boolean): integer;
     function GetFullFilename(Value: string): string;
-    procedure Load(FileName: TFileName);
+    procedure Load(FileName: string);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Parse(FileName: TFileName); overload;
@@ -222,7 +222,7 @@ type
     procedure PostProcessInheritance;
     procedure ReProcessInheritance;
     function Locate(Full: string; WithScope: boolean): PStatement;
-    function FillListOf(Full: string; WithScope: boolean; List: TList): boolean;
+    procedure FillListOf(Full: string; List: TList;Kind : TStatementKind);
     function FindAndScanBlockAt(Filename: string; Row: integer; Stream: TStream = nil): integer;
     function GetThisPointerID: integer;
   published
@@ -532,7 +532,7 @@ begin
 		with Statement^ do begin
 
 			if ID = -1 then
-				_ID := fNextID // TODO: Should reset this on a rescan?
+				_ID := fNextID // TODO: Should reset this on a reparse?
 			else
 				_ID := ID;
 
@@ -2232,80 +2232,79 @@ begin
 	fBaseIndex := fNextID;
 end;
 
-procedure TCppParser.Load(FileName: TFileName);
+procedure TCppParser.Load(FileName: string);
 var
 	hFile: integer;
 	HowMany: integer;
-	I, I2: integer;
+	I, ItemLength: integer;
 	MAGIC: array[0..7] of Char;
 	Statement: PStatement;
 	Buf: array[0..8191] of Char;
 	P: PIncludesRec;
+	bytes : DWORD;
 begin
-	Reset;
-
 	// File and file type check
-	hFile := FileOpen(FileName, fmOpenRead);
+	hFile := CreateFile(PChar(FileName),GENERIC_READ,0,nil,OPEN_EXISTING,FILE_FLAG_SEQUENTIAL_SCAN,0);
 	if hFile > 0 then begin
-		FileRead(hFile, MAGIC, SizeOf(MAGIC));
+		ReadFile(hFile,MAGIC,sizeof(MAGIC),bytes,nil);
 		if MAGIC = 'CPPP 0.1' then begin
-			FileRead(hFile, HowMany, SizeOf(Integer));
+			ReadFile(hFile, HowMany, SizeOf(Integer),bytes,nil);
 			for I := 0 to HowMany do begin
 				Statement := New(PStatement);
 				with Statement^ do begin
 
 					// Read the actual statement
-					FileRead(hFile, _ParentID, SizeOf(integer));
-					FileRead(hFile, _Kind, SizeOf(byte));
-					FileRead(hFile, _Scope, SizeOf(integer));
-					FileRead(hFile, _ClassScope, SizeOf(integer));
-					FileRead(hFile, _IsDeclaration, SizeOf(boolean));
-					FileRead(hFile, _DeclImplLine, SizeOf(integer));
-					FileRead(hFile, _Line, SizeOf(integer));
+					ReadFile(hFile, _ParentID, SizeOf(integer),bytes,nil);
+					ReadFile(hFile, _Kind, SizeOf(byte),bytes,nil);
+					ReadFile(hFile, _Scope, SizeOf(integer),bytes,nil);
+					ReadFile(hFile, _ClassScope, SizeOf(integer),bytes,nil);
+					ReadFile(hFile, _IsDeclaration, SizeOf(boolean),bytes,nil);
+					ReadFile(hFile, _DeclImplLine, SizeOf(integer),bytes,nil);
+					ReadFile(hFile, _Line, SizeOf(integer),bytes,nil);
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil); // Read next item length
+					FillChar(Buf, ItemLength+1, 0);                         // Clear item length of the buffer, add \0
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);             // And store the actual item in the buffer
 					_FullText := Buf;
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					FillChar(Buf, ItemLength+1, 0);
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_Type := Buf;
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					FillChar(Buf, ItemLength+1, 0);
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_Command := Buf;
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					FillChar(Buf, ItemLength+1, 0);
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_Args := Buf;
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					FillChar(Buf, ItemLength+1, 0);
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_ScopelessCmd := Buf;
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					FillChar(Buf, ItemLength+1, 0);
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_DeclImplFileName := Buf;
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					FillChar(Buf, ItemLength+1, 0);
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_FileName := Buf;
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					FillChar(Buf, ItemLength+1, 0);
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_InheritsFromIDs := Buf;
 
-					FileRead(hFile, I2, SizeOf(Integer));
-					FillChar(Buf, SizeOf(Buf), 0);
-					FileRead(hFile, Buf, I2);
+					ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+					FillChar(Buf, ItemLength+1, 0);
+					ReadFile(hFile, Buf, ItemLength,bytes,nil);
 					_InheritsFromClasses := Buf;
 
 					_Loaded := True;
@@ -2323,11 +2322,11 @@ begin
 			end;
 
 			// read scanned files - cache contents
-			FileRead(hFile, HowMany, SizeOf(Integer));
+			ReadFile(hFile, HowMany, SizeOf(Integer),bytes,nil);
 			for I := 0 to HowMany do begin
-				FileRead(hFile, I2, SizeOf(Integer));
-				FillChar(Buf, SizeOf(Buf), 0);
-				FileRead(hFile, Buf, I2);
+				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				FillChar(Buf, ItemLength+1, 0);
+				ReadFile(hFile, Buf, ItemLength,bytes,nil);
 				if fScannedFiles.IndexOf(Buf) = -1 then
 					fScannedFiles.Add(Buf);
 				if fCacheContents.IndexOf(Buf) = -1 then
@@ -2335,24 +2334,26 @@ begin
 			end;
 
 			// read includes info for each scanned file
-			FileRead(hFile, HowMany, SizeOf(Integer));
+			ReadFile(hFile, HowMany, SizeOf(Integer),bytes,nil);
 			for I := 0 to HowMany do begin
 				P := New(PIncludesRec);
-				FileRead(hFile, I2, SizeOf(Integer));
-				FillChar(Buf, SizeOf(Buf), 0);
-				FileRead(hFile, Buf, I2);
+
+				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				FillChar(Buf, ItemLength+1, 0);
+				ReadFile(hFile, Buf, ItemLength,bytes,nil);
 				P^.BaseFile := Buf;
-				FileRead(hFile, I2, SizeOf(Integer));
-				FillChar(Buf, SizeOf(Buf), 0);
-				FileRead(hFile, Buf, I2);
+
+				ReadFile(hFile, ItemLength, SizeOf(Integer),bytes,nil);
+				FillChar(Buf, ItemLength+1, 0);
+				ReadFile(hFile, Buf, ItemLength,bytes,nil);
 				P^.IncludeFiles := Buf;
+
 				fIncludesList.Add(P);
 			end;
 		end;
-		FileClose(hFile);
 	end;
-	//Inc(fNextID);
-	fBaseIndex := fNextID;//fStatementList.Count;
+	CloseHandle(hFile);
+	fBaseIndex := fNextID;
 	PostProcessInheritance;
 end;
 
@@ -2529,33 +2530,22 @@ begin
   end;
 end;
 
-function TCppParser.FillListOf(Full: string; WithScope: boolean; List: TList): boolean;
+procedure TCppParser.FillListOf(Full: string; List: TList;Kind : TStatementKind);
 var
-  I: integer;
+	I: integer;
 begin
-  Result := False;
-  if not Assigned(List) then
-    Exit;
-  List.Clear;
-  if Full = '' then begin
-    List.Assign(fStatementList);
-    Result := True;
-    Exit;
-  end;
-  for I := 0 to fStatementList.Count - 1 do begin
-    if WithScope then begin
-      if AnsiCompareStr(Full, PStatement(fStatementList[I])^._ScopeCmd) = 0 then begin
-        Result := True;
-        List.Add(PStatement(fStatementList[I]));
-      end;
-    end
-    else begin
-      if AnsiCompareStr(Full, PStatement(fStatementList[I])^._Command) = 0 then begin
-        Result := True;
-        List.Add(PStatement(fStatementList[I]));
-      end;
-    end;
-  end;
+
+	// Tweaked for specific use by CodeToolTip. Also avoids string compares whenever possible
+	for I := 0 to fStatementList.Count - 1 do begin
+		if PStatement(fStatementList[I])^._Kind = Kind then
+
+			// Also add Win32 Ansi/Wide variants...
+			if  (AnsiCompareStr(Full,       PStatement(fStatementList[I])^._Command) = 0) or
+				(AnsiCompareStr(Full + 'A', PStatement(fStatementList[I])^._Command) = 0) or
+				(AnsiCompareStr(Full + 'W', PStatement(fStatementList[I])^._Command) = 0)
+			then
+				List.Add(PStatement(fStatementList[I]))
+	end;
 end;
 
 function TCppParser.FindAndScanBlockAt(Filename: string; Row: integer; Stream: TStream): integer;

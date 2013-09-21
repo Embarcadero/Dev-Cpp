@@ -210,7 +210,6 @@ const
   ecUncollapseLevel = ecUserFirst + 103;
   ecCollapseAll = ecUserFirst + 104;
   ecUncollapseAll = ecUserFirst + 105;
-  ecCollapseCurrent = ecUserFirst + 109;
   //### End Code Folding ###
 
 type

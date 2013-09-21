@@ -54,7 +54,6 @@ type
     fFileName: string;
     fNew: boolean;
     fRes: boolean;
-    fModified: boolean;
     fText: TSynEdit;
     fTabSheet: TTabSheet;
     fErrorLine: integer;
@@ -107,7 +106,7 @@ type
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
    public
-    procedure Init(In_Project : boolean; Caption_, File_name : string; DoOpen : boolean; const IsRes: boolean = FALSE);
+    procedure Init(InProject : boolean; Caption, Filename : string;DoOpen : boolean;IsRes: boolean = FALSE);
     destructor Destroy; override;
     // RNC set the breakpoints for this file when it is opened
     procedure SetBreakPointsOnOpen;
@@ -116,7 +115,6 @@ type
     function HasBreakPoint(line_number: integer): integer;
     procedure InsertBreakpoint(line: integer);
     procedure RemoveBreakpoint(line: integer);
-    procedure InvalidateGutter;
 
     procedure Activate;
     function ToggleBreakPoint(Line: integer): boolean;
@@ -126,7 +124,7 @@ type
     function Search(const isReplace: boolean): boolean;
     procedure SearchAgain;
     procedure Exportto(const isHTML: boolean);
-    procedure InsertString(const Value: string; const move: boolean);
+    procedure InsertString(const Value: string; const MoveCursor: boolean);
     function GetWordAtCursor: string;
     procedure SetErrorFocus(const Col, Line: integer);
     procedure SetActiveBreakpointFocus(const Line: integer);
@@ -153,12 +151,12 @@ type
     property IsRes: boolean read fRes write fRes;
     property Text: TSynEdit read fText write fText;
     property TabSheet: TTabSheet read fTabSheet write fTabSheet;
-    property CodeToolTip: TCodeToolTip read FCodeToolTip; // added on 23rd may 2004 by peter_
+    property CodeToolTip: TCodeToolTip read FCodeToolTip;
   end;
 
 implementation
 
-uses 
+uses
 {$IFDEF WIN32}
   main, project, MultiLangSupport, devcfg, Search_Center, utils,
   datamod, GotoLineFrm, Macros, SynEditMiscClasses;
@@ -193,26 +191,25 @@ end;
 
 { TEditor }
 
-procedure TEditor.Init(In_Project : boolean; Caption_, File_name : string;DoOpen : boolean; const IsRes: boolean = FALSE);
+procedure TEditor.Init(InProject : boolean; Caption, Filename : string;DoOpen : boolean;IsRes: boolean = FALSE);
 var
 	s: string;
 	pt: TPoint;
 begin
 	// Set generic options
-	fModified := false;
 	fErrorLine:= -1;
 	fActiveLine:= -1;
 	fRunToCursorLine := -1;
 	fRes:= IsRes;
-	fInProject := In_Project;
-	if File_name = '' then
-		fFileName := Caption_
+	fInProject := InProject;
+	if Filename = '' then
+		fFileName := Caption
 	else
-		fFileName := File_name;
+		fFileName := Filename;
 
 	// Setup a new tab
 	fTabSheet := TTabSheet.Create(MainForm.PageControl);
-	fTabSheet.Caption := Caption_;
+	fTabSheet.Caption := Caption;
 	fTabSheet.PageControl := MainForm.PageControl;
 	fTabSheet.BorderWidth := 0;
 	fTabSheet.Tag := integer(self); // Define an index for each tab
@@ -225,18 +222,15 @@ begin
 
 	// Load the file using lines, we're not using CodeFolding here yet
 	if (DoOpen) then begin
-		try
-			fText.Lines.LoadFromFile(FileName);
-			fNew := False;
-			if devData.Backups then begin
-				s:= ExtractfileExt(FileName);
-				Insert('~', s, AnsiPos('.', s) + 1);
-				Delete(s, Length(s) -1, 1);
-				fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
-			end;
-		except
-			raise;
-		end
+		fText.Lines.LoadFromFile(FileName);
+		fText.ReScan;
+		fNew := False;
+		if devData.Backups then begin
+			s:= ExtractfileExt(FileName);
+			Insert('~', s, AnsiPos('.', s) + 1);
+			Delete(s, Length(s) -1, 1);
+			fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
+		end;
 	end else
 		fNew := True;
 
@@ -264,26 +258,6 @@ begin
 	fText.MaxScrollWidth:=4096; // bug-fix #600748
 	fText.MaxUndo:=4096;
 	fText.BorderStyle:=bsNone;
-
-	// Initialise code folding
-	with fText.CodeFolding do begin
-		Enabled := True;
-		IndentGuides := True;
-		CaseSensitive := True;
-		FolderBarColor := clBtnFace;
-		FolderBarLinesColor := clBlack;
-		CollapsingMarkStyle := TSynCollapsingMarkStyle(0);
-
-		with FoldRegions do begin
-			Add(rtChar, False, False, False, '{', '}', nil);
-			//Add(rtKeyword, True, False, False, '/*', '*/', nil);
-			//Add(rtKeyword, False, False, True, 'BEGIN', 'END', nil);
-		end;
-	end;
-
-	// Apply folding for the first time
-	fText.InitCodeFolding;
-	fText.ReScan;
 
 	// Set the current editor and highlighter
 	devEditor.AssignEditor(fText);
@@ -373,7 +347,7 @@ end;
 
 procedure TEditor.Activate;
 begin
-	if assigned(fTabSheet) then begin
+	if Assigned(fTabSheet) then begin
 		fTabSheet.PageControl.Show;
 		fTabSheet.PageControl.ActivePage := fTabSheet;
 
@@ -386,15 +360,12 @@ end;
 
 function TEditor.GetModified: boolean;
 begin
-	result:= fModified or fText.Modified;
+	result:= fText.Modified;
 end;
 
 procedure TEditor.SetModified(value: boolean);
 begin
-	fModified:= value;
 	fText.Modified:= Value;
-	if Value and (fText.UnCollapsedLines.Count = 0) then
-		fText.ReScan;
 end;
 
 // RNC 07-21-04 These functions are used to turn off/on a breakpoint
@@ -631,7 +602,7 @@ end;
 
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
-	if scModified in Changes then begin // scModified is only fired upon first change
+	if scModified in Changes then begin // scModified is only fired when the modified state changes
 		if Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
 			UpdateCaption('[*] '+ExtractfileName(fFileName));
@@ -735,42 +706,30 @@ begin
 end;
 
 
-procedure TEditor.InsertString(const Value: string; const move: boolean);
+procedure TEditor.InsertString(const Value: string; const MoveCursor: boolean);
 var
-	Line: string;
-	idx,idx2: integer;
-	pt: TBufferCoord;
-	tmp: TStringList;
+	NewCursorPos: TBufferCoord;
+	LocalCopy: TStringList;
 begin
-	if not assigned(fText) then exit;
-	pt:= fText.CaretXY;
-	tmp:= TStringList.Create;
-	try // move cursor to pipe '|', don't do that, might be used by code, use *|* instead
-		tmp.Text:= Value;
-		if Move then
-			for idx:= 0 to pred(tmp.Count) do begin
-				Line:= tmp[idx];
-				idx2:= AnsiPos('*|*', Line);
-				if idx2> 0 then begin
-					delete(Line, idx2, 3);
-					tmp[idx]:= Line;
-					inc(pt.Line, idx);
-					if idx = 0 then
-						inc(pt.Char, idx2 -1)
-					else
-						pt.Char:= idx2;
+	NewCursorPos := fText.CaretXY;
 
-					break;
-				end;
-			end;
-		Line:= tmp.Text;
-		Delete(Line,Length(Line)-1,2);
-		fText.SelText:= Line;
-		fText.CaretXY:= pt;
-		fText.EnsureCursorPosVisible;
-	finally
-		tmp.Free;
+	if MoveCursor then begin
+		LocalCopy := TStringList.Create;
+		LocalCopy.Text := Value;
+
+		// move cursor to pipe '|', don't do that, might be used by code, use *|* instead
+		if LocalCopy.Find('*|*',NewCursorPos.Line) then begin
+			NewCursorPos.Char := AnsiPos('*|*',LocalCopy[NewCursorPos.Line]);
+		end;
+		LocalCopy.Free;
 	end;
+
+	// The actual line that does the awesome trick
+	fText.SelText:= Value;
+
+	// Update the cursor
+	fText.CaretXY:= NewCursorPos;
+	fText.EnsureCursorPosVisible;
 end;
 
 function TEditor.Search(const isReplace: boolean): boolean;
@@ -1092,8 +1051,10 @@ var
 	M: TMemoryStream;
 begin
 	if devEditor.CompleteSymbols then begin
-		Dec(HasCompletedParentheses);
-		Dec(HasCompletedArray);
+		if not (ssShift in Shift) then begin
+			Dec(HasCompletedParentheses);
+			Dec(HasCompletedArray);
+		end;
 	end;
 
 	// Show the completion box. This needs to be done after the key is inserted!
@@ -1106,7 +1067,6 @@ begin
 {$IFDEF LINUX}
 			if Key=XK_SPACE then begin
 {$ENDIF}
-				Key:=0;
 				if not (ssShift in Shift) then begin
 					M:=TMemoryStream.Create;
 					try
@@ -1417,7 +1377,7 @@ begin
 			if thisword = fCurrentWord then Exit;
 			fCurrentWord := thisword;
 
-			st:=MainForm.findstatement(localfind,localfindpoint,false);
+			st:=MainForm.FindStatement(fCurrentWord,fText.CaretXY,localfind,localfindpoint);
 
 			r.Left := Mouse.CursorPos.X;
 			r.Top := Mouse.CursorPos.Y - 2*fText.LineHeight;
@@ -1555,36 +1515,21 @@ begin
 end;
 
 procedure TEditor.EditorMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
-  procedure DoOpen(Fname: string; Line: integer; wrd: string);
-  var
-    e: TEditor;
-    ws: integer;
-  begin
-    if fname = ExtractFileName(fname) then // no path info, so prepend path of active file
-      fname:=ExtractFilePath(fFileName)+fname;
+	procedure DoOpen(Fname: string; Line: integer);
+	var
+		e: TEditor;
+	begin
+		if fname = ExtractFileName(fname) then // no path info, so prepend path of active file
+			fname:=ExtractFilePath(fFileName)+fname;
 
-    // refer to the editor of the filename (will open if needed and made active)
-    e:=MainForm.GetEditorFromFileName(fname);
-
-    if Assigned(e) then begin
-      // go to the specific line
-      e.GotoLineNr(line);
-
-      if wrd<>'' then begin
-        // find the clicked word on this line and set the cursor on it ;)
-        ws:=AnsiPos(wrd, e.Text.LineText);
-        if ws>0 then
-          e.Text.CaretX:=ws;
-      end;
-
-      // remove any selection made by Synedit.OnMouseDown
-      fText.BlockBegin:=fText.CaretXY;
-      fText.BlockEnd:=fText.BlockBegin;
-    end;
-  end;
+		// refer to the editor of the filename (will open if needed and made active)
+		e:=MainForm.GetEditorFromFileName(fname);
+		if Assigned(e) then
+			e.GotoLineNr(line);
+	end;
 var
 	p: TPoint;
-	s, s1: string;
+	line: string;
 	f1, f2: integer;
 begin
 	p.X := X;
@@ -1592,53 +1537,50 @@ begin
 
 	p.X := fText.PixelsToRowColumn(p.X, p.Y).Column;
 	p.Y := fText.PixelsToRowColumn(p.X, p.Y).Row;
-	s := fText.GetWordAtRowCol(BufferCoord(p.X, p.Y));
 
 	// if ctrl+clicked
-	if (ssCtrl in Shift) and (Button=mbLeft) and (p.Y <= fText.UnCollapsedLines.Count) then begin
+	if (ssCtrl in Shift) and (Button = mbLeft) and (p.Y <= fText.UnCollapsedLines.Count) then begin
 
 		// reset the cursor
 		fText.Cursor:=crIBeam;
 
 		// see if it's #include
-		s1:=fText.UnCollapsedLines[p.Y-1];
-		s1:=StringReplace(s1, ' ', '', [rfReplaceAll]);
-		if AnsiStartsStr('#include', s1) then begin
+		line:=fText.UnCollapsedLines[p.Y-1];
+		line:=StringReplace(line,' ', '', [rfReplaceAll]);
+		if AnsiStartsStr('#include',line) then begin
+
 			// We've clicked an #include <>
-			f1:=AnsiPos('<', s1);
+			f1:=AnsiPos('<', line);
 			if f1>0 then begin
 				Inc(f1);
 				f2:=f1;
-				while (f2<Length(s1)) and (s1[f2]<>'>') do
+				while (f2<Length(line)) and (line[f2]<>'>') do
 					Inc(f2);
-				if s1[f2]<>'>' then
+				if line[f2]<>'>' then
 					Abort;
 				f2:=f2-f1;
-				DoOpen(MainForm.CppParser.GetFullFileName(Copy(s1, f1, f2)), 1, '');
+				DoOpen(MainForm.CppParser.GetFullFileName(Copy(line, f1, f2)), 1);
 
 				// the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
 				Abort;
 			end;
 
-			f1:=AnsiPos('"', s1);
 			// We've clicked an #include ""
+			f1:=AnsiPos('"', line);
 			if f1>0 then begin
 				Inc(f1);
 				f2:=f1;
-				while (f2<Length(s1)) and (s1[f2]<>'"') do
+				while (f2<Length(line)) and (line[f2]<>'"') do
 					Inc(f2);
-				if s1[f2]<>'"' then
+				if line[f2]<>'"' then
 					Abort;
 				f2:=f2-f1;
-				DoOpen(MainForm.CppParser.GetFullFileName(Copy(s1, f1, f2)), 1, '');
+				DoOpen(MainForm.CppParser.GetFullFileName(Copy(line, f1, f2)), 1);
 
 				// the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
 				Abort;
 			end;
-
-			// if we reached here, exit; we cannot locate and extract the filename...
-			Exit;
-		end; // #include
+		end;
 
 		MainForm.actGotoImplDeclEditorExecute(self);
 
@@ -1657,7 +1599,6 @@ end;
 
 procedure TEditor.PaintMatchingBrackets(TransientType: TTransientType);
 const
-	BracketSet = ['{','[','(','}',']',')'];
 	OpenChars:array[0..2] of Char=('{','[','(');
 	CloseChars:array[0..2] of Char=('}',']',')');
 var
@@ -1710,7 +1651,7 @@ end;
 
 procedure TEditor.EditorPaintTransient(Sender: TObject; Canvas: TCanvas;TransientType: TTransientType);
 begin
-	if (Assigned(fText.Highlighter)) and devEditor.Match and not fText.SelAvail then
+	if Assigned(fText.Highlighter) and devEditor.Match and not fText.SelAvail then
 		PaintMatchingBrackets(TransientType);
 end;
 
@@ -1718,11 +1659,6 @@ end;
 procedure TEditor.UpdateParser;
 begin
 	FCodeToolTip.Parser := MainForm.CppParser;
-end;
-
-procedure TEditor.InvalidateGutter;
-begin
-	fText.InvalidateGutter;
 end;
 
 end.

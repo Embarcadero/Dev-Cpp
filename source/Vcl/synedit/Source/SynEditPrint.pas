@@ -306,11 +306,11 @@ begin
       for i := 0 to Value.Count - 1 do
       begin
         TmpString := ConvertTabsProc(Value[i], FTabWidth);
-        j := pos(TSynTabChar, TmpString);
+        j := pos(#9, TmpString);
         While j > 0 do
         begin
           TmpString[j] := ' ';
-          j := pos(TSynTabChar, TmpString);
+          j := pos(#9, TmpString);
         end;
         Add(TmpString);
       end;

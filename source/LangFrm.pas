@@ -259,7 +259,7 @@ begin
 
 			MainForm.CppParser.Save(devDirs.Config+DEV_COMPLETION_CACHE);
 
-			MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;;
+			MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;
 			MainForm.CppParser.OnEndParsing := MainForm.CppParserEndParsing;
 			MainForm.CppParser.OnTotalProgress := MainForm.CppParserTotalProgress;
 

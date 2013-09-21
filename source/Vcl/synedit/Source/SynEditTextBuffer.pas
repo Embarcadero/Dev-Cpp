@@ -927,8 +927,10 @@ begin
         Add('');
     end;
   finally
+
     EndUpdate;
   end;
+
   if fCR and not fLF then
     fFileFormat := sffMac
   else if fLF and not fCR then

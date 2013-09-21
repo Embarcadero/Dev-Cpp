@@ -96,7 +96,7 @@ type
  end;
 
 procedure InitOptionsRec(var Rec: TProjOptions);
-procedure AssignOptionsRec(var R1, R2: TProjOptions);
+procedure AssignOptionsRec(R1 : TProjOptions;var R2: TProjOptions);
 
 implementation
 
@@ -147,7 +147,7 @@ begin
    end;
 end;
 
-procedure AssignOptionsRec(var R1, R2: TProjOptions);
+procedure AssignOptionsRec(R1 : TProjOptions;var R2: TProjOptions);
 begin
   with R2 do
    begin

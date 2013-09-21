@@ -25,7 +25,7 @@ program devcpp;
 {%File 'LangIDs.inc'}
 
 uses
-  //MemCheck in 'MemCheck.pas',
+  FastMM4 in 'FastMM4.pas',
 
 {$IFDEF WIN32}
   Windows, Forms, sysUtils, SHFolder, Dialogs,
@@ -69,7 +69,6 @@ uses
   debugger in 'debugger.pas',
   CFGData in 'CFGData.pas',
   CFGINI in 'CFGINI.pas',
-  CFGReg in 'CFGReg.pas',
   CheckForUpdate in 'CheckForUpdate.pas',
   prjtypes in 'prjtypes.pas',
   debugfrm in 'debugfrm.pas' {DebugForm},
@@ -113,7 +112,6 @@ var
 	UserHome, strLocalAppData, strAppData, strIniFile, exefolder: String;
 	tempc: array [0..MAX_PATH] of char;
 begin
-	//MemChk;
 
 	strIniFile := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
 	exefolder := StringReplace(Application.ExeName,ExtractFileName(Application.ExeName),'',[rfReplaceAll]);
@@ -153,10 +151,6 @@ begin
 			devData.INIFile:= ChangeFileExt(Application.EXEName, INI_EXT);
 	end;
 
-	devData.UseRegistry:= FALSE;
-	devData.BoolAsWords:= FALSE;
-	devData.INISection:= OPT_OPTIONS;
-
 	// support for user-defined alternate ini file (permanent, but overriden by command-line -c)
 	if ConfigMode <> CFG_PARAM then begin
 		StandardConfigFile:=devData.INIFile;
@@ -181,11 +175,8 @@ begin
 	Application.CreateForm(TMainForm, MainForm);
 
 	// Display it a bit later
-	if not devData.NoSplashScreen then begin
+	if not devData.NoSplashScreen then
 		SplashForm := TSplashForm.Create(Application);
-		SplashForm.Show;
-		SplashForm.Update;
-	end;
 
 	// do the creation stuff when the splashscreen is displayed because it takes quite a while ...
 	MainForm.DoCreateEverything;

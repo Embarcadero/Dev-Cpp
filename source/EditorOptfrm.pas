@@ -401,7 +401,6 @@ begin
   cboGutterSize.Enabled:= cbGutterfnt.Checked;
 end;
 
-
 { ---------- Form Init/Done Methods ----------}
 
 procedure TEditorOptForm.LoadText;
@@ -551,29 +550,30 @@ end;
 
 procedure TEditorOptForm.LoadSampleText;
 begin
-  with cppEdit.Lines do
-   begin
-     append('// Syntax Preview');
-     append('#include <iostream>');
-     append('#include <cstdio>');
-     append('#include <conio.h>');
-     append('');
-     append('int main(int argc, char **argv)');
-     append('{');
-     append('	int numbers[20];');
-     append('	float average, total; //breakpoint');
-     append('	for (int i = 0; i <= 19; i++)');
-     append('	{ // active breakpoint');
-     append('		numbers[i] = i;');
-     append('		Total += i; // error line');
-     append('	}');
-     append('	average = total / 20;');
-     append('	cout << numbers[0] << "\n" << numbers[19] << "\n";');
-     append('	cout << "total: " << total << "\nAverage: " << average;');
-     append('	printf("\n\nPress any key...");');
-     append('	getch();');
-     append('}');
-   end;
+	CppEdit.Lines.BeginUpdate;
+	with cppEdit.Lines do begin
+		Add('// Syntax Preview');
+		Add('#include <iostream>');
+		Add('#include <cstdio>');
+		Add('#include <conio.h>');
+		Add('');
+		Add('int main(int argc, char **argv)');
+		Add('{');
+		Add('	int numbers[20];');
+		Add('	float average, total; //breakpoint');
+		Add('	for (int i = 0; i <= 19; i++)');
+		Add('	{ // active breakpoint');
+		Add('		numbers[i] = i;');
+		Add('		Total += i; // error line');
+		Add('	}');
+		Add('	average = total / 20;');
+		Add('	cout << numbers[0] << "\n" << numbers[19] << "\n";');
+		Add('	cout << "total: " << total << "\nAverage: " << average;');
+		Add('	printf("\n\nPress any key...");');
+		Add('	getch();');
+		Add('}');
+	end;
+	CppEdit.Lines.EndUpdate;
 end;
 
 procedure TEditorOptForm.GetOptions;
@@ -909,20 +909,21 @@ begin
 	MainForm.AutoSaveTimer.Interval := devEditor.Interval*60*1000;
 	MainForm.AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
 
-  SaveOptions;
-  dmMain.LoadDataMod;
-  if not devEditor.Match then begin
-    e := MainForm.GetEditor;
-    if assigned(e) then
-      e.PaintMatchingBrackets(ttBefore);
-  end;
+	SaveOptions;
+	dmMain.LoadDataMod;
 
-  e := MainForm.GetEditor;
-  if Assigned(e) then
-    if cbHighCurrLine.Checked then
-      e.Text.ActiveLineColor := cpHighColor.SelectionColor
-    else
-      e.Text.ActiveLineColor := clNone;
+	e := MainForm.GetEditor;
+	if Assigned(e) then begin
+
+		// Unpaint matching symbols
+		if not devEditor.Match then
+			e.PaintMatchingBrackets(ttBefore);
+
+		if cbHighCurrLine.Checked then
+			e.Text.ActiveLineColor := cpHighColor.SelectionColor
+		else
+			e.Text.ActiveLineColor := clNone;
+	end;
 end;
 
 procedure TEditorOptForm.btnHelpClick(Sender: TObject);
@@ -1341,19 +1342,19 @@ end;
 
 procedure TEditorOptForm.lvCodeinsSelectItem(Sender: TObject;Item: TListItem; Selected: Boolean);
 begin
-  Codeins.ClearAll;
-  CodeIns.Text:= StrtoCodeIns(Item.SubItems[2]);
-  UpdateCIButtons;
+	Codeins.ClearAll;
+	CodeIns.Text:= StrtoCodeIns(Item.SubItems[2]);
+	UpdateCIButtons;
+	CodeIns.ReScan;
 end;
 
 procedure TEditorOptForm.CodeInsStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
-  if assigned(lvCodeIns.Selected) then
-   if (Changes * [scModified] <> []) then
-    begin
-      lvCodeIns.Selected.SubItems[2]:= CodeInstoStr(CodeIns.Text);
-      CodeIns.Modified:= false;
-    end;
+	if assigned(lvCodeIns.Selected) then
+		if (scModified in Changes) then begin
+			lvCodeIns.Selected.SubItems[2]:= CodeInstoStr(CodeIns.Text);
+			CodeIns.Modified:= false;
+		end;
 end;
 
 procedure TEditorOptForm.LoadCodeIns;

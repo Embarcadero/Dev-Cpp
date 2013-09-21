@@ -16,13 +16,13 @@ L=1
 M=0
 N=1
 O=1
-P=1
+P=0
 Q=0
 R=0
 S=0
 T=0
 U=0
-V=1
+V=0
 W=0
 X=1
 Y=1
@@ -31,7 +31,7 @@ ShowHints=1
 ShowWarnings=1
 UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 NamespacePrefix=
-SymbolDeprecated=1
+SymbolDeprecated=0
 SymbolLibrary=1
 SymbolPlatform=0
 UnitLibrary=1
@@ -94,7 +94,7 @@ OutputDir=..
 UnitOutputDir=units
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
+SearchPath=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip;.\
 Packages=vcl;rtl;vclactnband;vclx;vcldb;dbrtl;dbexpress;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;VclSmp;dbxcds;soaprtl;vclshlctrls;ClassBrowsing
 Conditionals=
 DebugSourceDirs=
@@ -134,8 +134,9 @@ Comments=Under the GNU General Public License
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=1
-Item0=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
+Count=2
+Item0=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip;.\
+Item1=Vcl;Vcl\Class Browser & Completion;Vcl\Color Picker;Vcl\Dev Reg;Vcl\File Monitor;Vcl\Monitor Thread;Vcl\Shortcuts;Vcl\SynEdit\Source;Vcl\Tooltip
 [HistoryLists\hlUnitOutputDirectory]
 Count=1
 Item0=units

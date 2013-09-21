@@ -417,12 +417,7 @@ procedure TCodeToolTip.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShi
 begin
 	if Activated then begin
 		case Key of
-{$IFDEF WIN32}
 			VK_ESCAPE: begin
-{$ENDIF}
-{$IFDEF LINUX}
-			XK_ESCAPE: begin
-{$ENDIF}
 				if (ttoHideOnESC in FOptions) then ReleaseHandle;
 			end;
 		end;
@@ -796,8 +791,6 @@ var
 	S : string;
 	Idx : Integer;
 	nCommas : Integer;
-	ProtoFound : Boolean;
-	ProtoName : PChar;
 
 	// skip c/c++ commentblocks
 	procedure SkipCommentBlock;
@@ -901,7 +894,13 @@ begin
 	S := PreviousWordString(P, CurPos);
 
 	// Don't bother scanning the database when there's no word to scan for
-	if S = '' then begin
+	if  (S = '') or
+		(S = 'if') or
+		(S = 'else') or
+		(S = 'case') or
+		(S = 'switch') or
+		(S = 'while') or
+		(S = 'for') then begin
 		ReleaseHandle;
 		Exit;
 	end;
@@ -913,7 +912,8 @@ begin
 
 		// Fill a cache of known functions...
 		FToolTips.Clear;
-		FParser.FillListOf(S, False, FList);
+		FList.Clear;
+		FParser.FillListOf(S, FList,skFunction);
 		FToolTips.BeginUpdate;
 		try
 			for I := 0 to FList.Count-1 do begin
@@ -930,27 +930,8 @@ begin
 	// this is where the prototype name usually starts
 	FTokenPos := CurPos - Length(S) - 1;
 
-	// Check if this function is a known one...
-	ProtoFound := False;
-	for I := 0 to FToolTips.Count-1 do begin
-
-		// Also accept if S does not have any pointer prefixes
-		ProtoName := PChar(GetPrototypeName(FToolTips.Strings[I]));
-		while (ProtoName^ in ['*','&']) do
-			Inc(ProtoName);
-
-		if ProtoName = S then begin
-			ProtoFound := True;
-
-			// And set the selection index if we're about to show up
-			if not Activated then
-				FSelIndex := I;
-			Break;
-		end;
-	end;
-
 	// If we can't find it, hide
-	if not ProtoFound then begin
+	if FToolTips.Count = 0 then begin
 		ReleaseHandle;
 		Exit;
 	end else begin

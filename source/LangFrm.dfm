@@ -248,7 +248,7 @@ object LangForm: TLangForm
         Top = 4
         Width = 257
         Height = 17
-        Caption = 'Yes, cache the default include folder'
+        Caption = 'Cache the default include folder'
         TabOrder = 0
       end
       object NoCache: TRadioButton
@@ -256,7 +256,7 @@ object LangForm: TLangForm
         Top = 128
         Width = 257
         Height = 17
-        Caption = 'No, don'#39't cache anything'
+        Caption = 'Don'#39't cache anything'
         TabOrder = 1
       end
       object AltCache: TRadioButton

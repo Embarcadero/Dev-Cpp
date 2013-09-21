@@ -50,8 +50,6 @@ const
                         ')', '{', '}', '^', '-', '=', '+', '-', '*', '/', '\',
                         '|'];
 
-  TSynTabChar = #9;
-
 //These might need to be localized depending on the characterset because they might be
 //interpreted as valid ident characters.
   SynTabGlyph = Chr($BB);       //'»'

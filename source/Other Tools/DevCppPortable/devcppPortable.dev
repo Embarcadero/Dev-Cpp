@@ -22,12 +22,12 @@ OverrideOutput=1
 OverrideOutputName=devcppPortable.exe
 HostApplication=
 Folders=
-CommandLine=
+CommandLine=sdadaw
 UseCustomMakefile=0
 CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
-CompilerSet=0
+CompilerSet=1
 CompilerSettings=000000000000000000001100d10
 UnitCount=2
 

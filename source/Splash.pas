@@ -56,6 +56,8 @@ begin
 		ClientWidth:= Image.Width;
 		ClientHeight:= Image.Height + Statusbar.Height;
 	end;
+	Show;
+	Update;
 end;
 
 end.

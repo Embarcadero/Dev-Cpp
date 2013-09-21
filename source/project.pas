@@ -1788,11 +1788,10 @@ begin
 			exit;
 		end;
 
-   fName:= aTemplate.ProjectName;
-   finifile.FileName:= aFileName;
-
-   Options:= aTemplate.OptionsRec;
-   AssignOptionsRec(Options, fOptions);
+		fName:= aTemplate.ProjectName;
+		finifile.FileName:= aFileName;
+		Options:= aTemplate.OptionsRec;
+		AssignOptionsRec(Options, fOptions);
 
    if Length(aTemplate.ProjectIcon) > 0 then
    begin

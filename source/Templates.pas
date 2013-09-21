@@ -103,7 +103,7 @@ resourcestring
 
 constructor TTemplate.Create;
 begin
-  initOptionsRec(fOptions);
+  InitOptionsRec(fOptions);
 end;
 
 destructor TTemplate.Destroy;

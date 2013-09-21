@@ -28,8 +28,6 @@ uses
 type
 	TFoldRegionType = (rtChar, rtKeyWord);
 	TSynCollapsingMarkStyle = (msSquare, msEllipse);
-	TSynCodeFoldingChanges = (fcEnabled, fcRefresh, fcRescan);
-	TCodeFoldingChangeEvent = procedure(Event: TSynCodeFoldingChanges) of object;
 
 	TSynEditFoldRange = class;
 	TSynEditAllFoldRanges = class;
@@ -40,41 +38,23 @@ type
 		fIndentGuides: Boolean;
 		fShowCollapsedLine: Boolean;
 		fCollapsedLineColor: TColor;
-		fEnabled: Boolean;
-		fHighlightIndentGuides: Boolean;
 		fFolderBarColor: TColor;
 		fFolderBarLinesColor: TColor;
 		fCollapsingMarkStyle: TSynCollapsingMarkStyle;
-		fFoldRegions: TFoldRegions;
 		fCaseSensitive: Boolean;
-		fOnChange: TCodeFoldingChangeEvent;
-
-		procedure SetFolderBarColor(const Value: TColor);
-		procedure SetFolderBarLinesColor(const Value: TColor);
-		procedure SetEnabled(const Value: Boolean);
-		procedure SetCollapsedLineColor(const Value: TColor);
-		procedure SetCollapsingMarkStyle(const Value: TSynCollapsingMarkStyle);
-		procedure SetHighlightIndentGuides(const Value: Boolean);
-		procedure SetIndentGuides(const Value: Boolean);
-		procedure SetShowCollapsedLine(const Value: Boolean);
-		procedure SetCaseSensitive(const Value: Boolean);
+		fFoldRegions: TFoldRegions;
 	public
 		constructor Create;
 		destructor Destroy; override;
 
-		procedure Assign(Source: TPersistent); override;
-
-		property CaseSensitive: Boolean read fCaseSensitive write SetCaseSensitive;
-		property CollapsedLineColor: TColor read fCollapsedLineColor write SetCollapsedLineColor default clDefault;
-		property CollapsingMarkStyle: TSynCollapsingMarkStyle read fCollapsingMarkStyle write SetCollapsingMarkStyle default msSquare;
-		property Enabled: Boolean read fEnabled write SetEnabled default False;
+		property CaseSensitive: Boolean read fCaseSensitive write fCaseSensitive;
+		property CollapsedLineColor: TColor read fCollapsedLineColor write fCollapsedLineColor;
+		property CollapsingMarkStyle: TSynCollapsingMarkStyle read fCollapsingMarkStyle write fCollapsingMarkStyle;
+		property FolderBarColor: TColor read fFolderBarColor write fFolderBarColor;
+		property FolderBarLinesColor: TColor read fFolderBarLinesColor write fFolderBarLinesColor;
+		property IndentGuides: Boolean read fIndentGuides write fIndentGuides;
+		property ShowCollapsedLine: Boolean read fShowCollapsedLine write fShowCollapsedLine;
 		property FoldRegions: TFoldRegions read fFoldRegions;
-		property FolderBarColor: TColor read fFolderBarColor write SetFolderBarColor default clDefault;
-		property FolderBarLinesColor: TColor read fFolderBarLinesColor write SetFolderBarLinesColor default clDefault;
-		property HighlightIndentGuides: Boolean read fHighlightIndentGuides write SetHighlightIndentGuides default True;
-		property IndentGuides: Boolean read fIndentGuides write SetIndentGuides default True;
-		property ShowCollapsedLine: Boolean read fShowCollapsedLine write SetShowCollapsedLine default True;
-		property OnChange: TCodeFoldingChangeEvent read fOnChange write fOnChange;
 	end;
 
 	TFoldRegionItem = class(TCollectionItem)
@@ -116,7 +96,7 @@ type
 		property Items[Index: Integer]: TFoldRegionItem read GetItem; default;
 	end;
 
-	// A parent fold which owns fold ranges
+	// A parent fold which owns fold ranges (branch)
 	TSynEditFoldRanges = class(TObject)
 	private
 		fRanges: TList;
@@ -134,7 +114,7 @@ type
 		property Ranges: TList read fRanges;
 	end;
 
-	// Top-level folds
+	// Top-level fold list containing ALL FOLDS
 	TSynEditAllFoldRanges = class(TSynEditFoldRanges)
 	private
 		fAllRanges: TList;
@@ -441,85 +421,28 @@ begin
 	StrCopy(fOpen, Value);
 end;
 
-procedure TSynCodeFolding.Assign(Source: TPersistent);
-begin
-	inherited
-end;
-
 constructor TSynCodeFolding.Create;
 begin
-	fCollapsingMarkStyle := msSquare;
-	fShowCollapsedLine := True;
+	IndentGuides := True;
+	ShowCollapsedLine := True;
+	CollapsedLineColor := clBlack;
+	FolderBarColor := clBtnFace;
+	FolderBarLinesColor := clBlack;
+	CollapsingMarkStyle := msSquare;
+	CaseSensitive := True;
+
 	fFoldRegions := TFoldRegions.Create(TFoldRegionItem); // Leaky
+	with fFoldRegions do begin
+		Add(rtChar, False, False, False, '{', '}', nil);
+		Add(rtKeyword, True, False, False, '/*', '*/', nil);
+		Add(rtKeyword, False, False, True, 'BEGIN', 'END', nil);
+	end;
 end;
 
 destructor TSynCodeFolding.Destroy;
 begin
 	fFoldRegions.Free;
 	inherited;
-end;
-
-procedure TSynCodeFolding.SetEnabled(const Value: Boolean);
-begin
-	fEnabled := Value;
-
-	if Assigned(fOnChange) then fOnChange(fcEnabled);
-end;
-
-procedure TSynCodeFolding.SetFolderBarColor(const Value: TColor);
-begin
-	fFolderBarColor := Value;
-
-	if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetFolderBarLinesColor(const Value: TColor);
-begin
-	fFolderBarLinesColor := Value;
-
-	if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetCollapsedLineColor(const Value: TColor);
-begin
-	fCollapsedLineColor := Value;
-
-	if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetCollapsingMarkStyle(const Value: TSynCollapsingMarkStyle);
-begin
-	fCollapsingMarkStyle := Value;
-  
-  if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetHighlightIndentGuides(const Value: Boolean);
-begin
-	fHighlightIndentGuides := Value;
-  
-  if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetIndentGuides(const Value: Boolean);
-begin
-	fIndentGuides := Value;
-  
-  if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetShowCollapsedLine(const Value: Boolean);
-begin
-	fShowCollapsedLine := Value;
-
-  if Assigned(fOnChange) then fOnChange(fcRefresh);
-end;
-
-procedure TSynCodeFolding.SetCaseSensitive(const Value: Boolean);
-begin
-	fCaseSensitive := Value;
-
-	if Assigned(fOnChange) then fOnChange(fcRescan);
 end;
 
 end.

@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Messages, Classes, sysUtils, TypInfo, cfgreg, CFGINI, cfgtypes;
+  Windows, Messages, Classes, sysUtils, TypInfo, CFGINI, cfgtypes, version;
 {$ENDIF}
 {$IFDEF LINUX}
   Classes, sysUtils, TypInfo, cfgreg, CFGINI, cfgtypes;
@@ -36,14 +36,7 @@ type
   private
    finiFileName: string;               // ini filename
    finiSection: string;                // default section of ini file
-   fRegKey: string;                    // root key for registry
-   fRegRoot: HKEY;                     // registry main key
-
-   // options
-   fUseRegistry: boolean;              // Save settings to registry
-   fboolAsWords: boolean;              // Save boolean values as TRUE/FALSE
-   fIgnores: TStrings;                 // Ignored Properties
-   GetReg: TCFGReg;
+   fIgnores: TStrings;                 // Ignored properties of objects
    GetINI: TCFGINI;
 
    procedure SetIni(s : string);
@@ -57,7 +50,6 @@ type
 
    // load/save windowplacement structure
    procedure SaveWindowPlacement(const key: string; value: TWindowPlacement);
-
    function LoadWindowPlacement(const key: string; var Value: TWindowPlacement): boolean;
 
    // load/save functions
@@ -72,51 +64,39 @@ type
    procedure SaveObject(obj: TCFGOptions); virtual;
    procedure LoadObject(obj: TCFGOptions); virtual;
 
-   property BaseRegKey: string read fRegKey write fRegKey;
-   property BoolAsWords: boolean read fboolAsWords write fboolAsWords;
    property INIFile: string read fINIFileName write SetIni;
    property INISection: string read finiSection write finiSection;
-   property Root: HKEY read fRegRoot write fRegRoot;
-   property UseRegistry: boolean read fUseRegistry write fUseRegistry;
    property IgnoreProperties: TStrings read fIgnores write fIgnores;
  end;
 
-function ReadBoolString(Value: string): boolean;
 function GetPropName(Instance: TPersistent; Index: Integer): String;
 function GetPropCount(Instance: TPersistent): Integer;
-
-const
- boolStr: array[boolean] of string[5] = ('False', 'True');
 
 implementation
 
-// returns boolean value of passed string
-function ReadBoolString(Value: string): boolean;
-begin
-  result:= uppercase(Value) = 'TRUE';
-end;
-
 // returns empty TWindowPlacement Record
 function EmptyWinPlace: TWindowPlacement;
- begin
-   FillChar(result, Sizeof(TWindowPlacement), #0);
-   Result.Length:= Sizeof(TWindowPlacement);
- end;
+begin
+	FillChar(result, Sizeof(TWindowPlacement), #0);
+	Result.Length:= Sizeof(TWindowPlacement);
+end;
 
 //Returns the number of properties of a given object
 function GetPropCount(Instance: TPersistent): Integer;
-var Data: PTypeData;
-Begin
-  Data:=GetTypeData(Instance.Classinfo);
-  Result:=Data^.PropCount;
-End;
+var
+	Data: PTypeData;
+begin
+	Data:=GetTypeData(Instance.Classinfo);
+	Result:=Data^.PropCount;
+end;
 
 //Returns the property name of an instance at a certain index
 function GetPropName(Instance: TPersistent; Index: Integer): String;
-var PropList: PPropList;
-PropInfo:PPropInfo;
-Data: PTypeData;
-Begin
+var
+	PropList: PPropList;
+	PropInfo:PPropInfo;
+	Data: PTypeData;
+begin
   Result:='';
   Data:=GetTypeData(Instance.Classinfo);
   GetMem(PropList,Data^.PropCount*Sizeof(PPropInfo));
@@ -127,63 +107,44 @@ Begin
   finally
   FreeMem(PropList,Data^.PropCount*Sizeof(PPropInfo));
   End;
-End;
-
+end;
 
 { TConfigData }
 
 constructor TConfigData.Create(aOwner: TComponent);
 begin
-  inherited Create(aOwner);
-  GetINI := TCFGINI.Create(Self);
-  GetREG := TCFGREG.Create(Self);
-  fUseRegistry:= TRUE;                 // defaultly use the registry to save info
-  fRegRoot:= HKEY_CURRENT_USER;        // default to current user registry
-  fIgnores:= TStringList.Create;
-  with fIgnores do
-   begin
-     Add('Name');
-     Add('Tag');
-     // local props (might not need)
-   end;
+	inherited Create(aOwner);
+	GetINI := TCFGINI.Create(Self);
+	INISection := OPT_OPTIONS;
+	fIgnores:= TStringList.Create;
+	with fIgnores do begin
+		Add('Name');
+		Add('Tag');
+		// local props (might not need)
+	end;
 end;
 
 destructor TConfigData.Destroy;
 begin
-  GetINI.Free;
-  GetREG.Free;
-  fIgnores.Free;
-  inherited Destroy;
+	GetINI.Free;
+	fIgnores.Free;
+	inherited Destroy;
 end;
 
 procedure TConfigData.SetIni(s : string);
 begin
-    fIniFileName := s;
-    GetINI.SetIniFile(s);
+	fIniFileName := s;
+	GetINI.SetIniFile(s);
 end;
 
 procedure TConfigData.ReadConfigData;
 begin
-  if fUseRegistry then
-   try
-    GetReg.ReadConfig;
-   except end
-  else
-   try
-    GetINI.ReadConfig;
-   except end;
+	GetINI.ReadConfig;
 end;
 
 procedure TConfigData.SaveConfigData;
 begin
-  if fUseRegistry then
-   try
-    GetReg.SaveConfig;
-   except end
-  else
-   try
-    GetINI.SaveConfig;
-   except end;
+	GetINI.SaveConfig;
 end;
 
 function TConfigData.LoadWindowPlacement(const key: string; var Value: TWindowPlacement): boolean;
@@ -219,18 +180,15 @@ function TConfigData.LoadWindowPlacement(const key: string; var Value: TWindowPl
    end;
 
 var
- s: string;
+	s: string;
 begin
-  try
-   if fUseRegistry then
-    s:= GetReg.LoadSetting(key, 'WinPlace')
-   else
-    s:= GetINI.LoadSetting(key, 'WinPlace');
-   value:= StrtoWinPlace(s);
-   result:= TRUE;
-  except
-   result:= false;
-  end;
+	try
+		s:= GetINI.LoadSetting(key, 'WinPlace');
+		value:= StrtoWinPlace(s);
+		result:= TRUE;
+	except
+		result:= false;
+	end;
 end;
 
 procedure TConfigData.SaveWindowPlacement(const key: string;
@@ -246,35 +204,20 @@ procedure TConfigData.SaveWindowPlacement(const key: string;
          rcNormalPosition.Right, rcNormalPosition.Bottom]);
    end;
 var
- s: string;
+	s: string;
 begin
-  try
-   s:= WinPlacetoStr(Value);
-   if fUseRegistry then
-    GetReg.SaveSettingS(key, 'WinPlace', s)
-   else
-    GetINI.SaveSettingS(key, 'WinPlace', s);
-  except end;
+	s:= WinPlacetoStr(Value);
+	GetINI.SaveSettingS(key, 'WinPlace', s);
 end;
 
 procedure TConfigData.LoadObject(obj: TCFGOptions);
 begin
-  try
-   if fUseRegistry then
-    GetReg.LoadObject(Obj)
-   else
-    GetINI.LoadObject(Obj);
-  except end;
+	GetINI.LoadObject(Obj);
 end;
 
 procedure TConfigData.SaveObject(obj: TCFGOptions);
 begin
-  try
-   if fUseRegistry then
-    GetReg.SaveObject(Obj)
-   else
-    GetINI.SaveObject(Obj);
-  except end;
+	GetINI.SaveObject(Obj);
 end;
 
 function TConfigData.LoadSettingB(const key, entry: string): boolean;
@@ -282,17 +225,11 @@ var
 	s: string;
 begin
 	try
-		if fUseRegistry then
-			s:= GetReg.LoadSetting(Key, Entry)
-		else
-			s:= GetINI.LoadSetting(key, Entry);
+		s:= GetINI.LoadSetting(key, Entry);
 
 		if s = '' then
 			s:= '0';
-		if fboolAsWords then
-			result:= ReadboolString(s)
-		else
-			result:= strtoint(s) = 1;
+		result:= strtoint(s) = 1;
 	except
 		result:= FALSE;
 	end;
@@ -303,17 +240,11 @@ var
 	s: string;
 begin
 	try
-		if fUseRegistry then
-			s:= GetReg.LoadSetting(Key, Entry)
-		else
-			s:= GetINI.LoadSetting(key, Entry);
+		s:= GetINI.LoadSetting(key, Entry);
 
 		if s = '' then
 			s:= default;
-		if fboolAsWords then
-			result:= ReadboolString(s) // TRUE vs FALSE
-		else
-			result:= strtoint(s) = 1; // 1 vs 0
+		result:= strtoint(s) = 1;
 	except
 		result:= FALSE;
 	end;
@@ -321,41 +252,17 @@ end;
 
 function TConfigData.LoadSettingS(const key, entry: string): string;
 begin
-  try
-   if fUseRegistry then
-    result:= GetReg.LoadSetting(key, Entry)
-   else
-    result:= GetINI.LoadSetting(key, Entry);
-  except end;
+	result:= GetINI.LoadSetting(key, Entry);
 end;
 
-procedure TConfigData.SaveSettingS(const key: string; const Entry: string;
-  const value: string);
+procedure TConfigData.SaveSettingS(const key: string; const Entry: string;const value: string);
 begin
-  try
-   if fUseRegistry then
-    GetReg.SaveSettingS(key, Entry, Value)
-   else
-    GetINI.SaveSettingS(key, Entry, Value);
-  except end;
+	GetINI.SaveSettingS(key, Entry, Value);
 end;
 
-procedure TConfigData.SaveSettingB(const key: string; const entry: string;
-  const value: boolean);
-var
- s: string;
+procedure TConfigData.SaveSettingB(const key: string; const entry: string; const value: boolean);
 begin
-  try
-   if fBoolAsWords then
-    s:= boolStr[value]
-   else
-    s:= inttostr(ord(value));
-
-   if fUseRegistry then
-    GetReg.SaveSettingS(key, Entry, s)
-   else
-    GetINI.SaveSettingS(key, Entry, s);
-  except end;
+	GetINI.SaveSettingS(key, Entry, inttostr(ord(value)));
 end;
 
 end.

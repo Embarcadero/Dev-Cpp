@@ -31,11 +31,8 @@ type
    fini: Tinifile;
     procedure ReadFrominifile(Obj: TPersistent; const Section: string);
     procedure ReadObject(const Name: string; Obj: TPersistent);
-    function ReadSet(const Name: string; TypeInfo: PTypeInfo): integer;
     procedure ReadStrings(const Name: string; value: TStrings);
     procedure WriteObject(const Name: string; Obj: TPersistent);
-    procedure WriteSet(const Name: string; value: integer;
-      TypeInfo: PTypeInfo);
     procedure WriteStrings(const Name: string; value: TStrings);
     procedure Writetoinifile(const Section: string; Obj: TPersistent);
     procedure ClearSection(const Name: string);
@@ -114,25 +111,7 @@ begin
    except end;
 end;
 
-
 // Reading methods
-
-function TCFGINI.ReadSet(const Name: string; TypeInfo: PTypeInfo): integer;
-var
- idx: integer;
- value: integer;
-begin
-  result := 0;
-  if not assigned(fIni) then exit;
-  TypeInfo:= GetTypeData(TypeInfo).CompType^;
-  value:= 0;
-  if fINI.SectionExists(Name) then
-   with GetTypeData(TypeInfo)^ do
-    for idx:= MinValue to MaxValue do
-     if ReadBoolString(fini.ReadString(Name, GetENumName(TypeInfo, idx), 'FALSE')) then
-      include(TIntegerSet(value), idx);
-  result:= value;
-end;
 
 procedure TCFGINI.ReadStrings(const Name: string; value: TStrings);
 begin
@@ -192,9 +171,6 @@ begin
 
       tkFloat: SetFloatProp(Obj, PropName, StrtoFloat(fINI.ReadString(Section, PropName, '0.0')));
 
-      tkSet: SetOrdProp(Obj, PropName, ReadSet(Section +'.' +PropName,
-          GetPropInfo(Obj, PropName, [tkSet])^.PropType^));
-
       tkClass:
        begin
          if TPersistent(GetOrdProp(Obj, PropName)) is TStrings then
@@ -204,25 +180,6 @@ begin
        end;
      end;
    end;
-end;
-
-// Writing Methods
-procedure TCFGINI.WriteSet(const Name: string; value: integer;
-  TypeInfo: PTypeInfo);
-var
- idx: integer;
- s: string;
-begin
-  TypeInfo:= GetTypeData(TypeInfo).CompType^;
-  ClearSection(Name);
-  with GetTypeData(TypeInfo)^ do
-   for idx:= MinValue to MaxValue do
-    begin
-      s:= GetENumName(TypeInfo, idx);
-      if fINI.ValueExists(Name, s) then
-       fini.DeleteKey(Name, s);
-      fINI.WriteString(Name, s, boolStr[idx in TIntegerSet(value)]);
-    end;
 end;
 
 procedure TCFGINI.WriteStrings(const Name: string; value: TStrings);
@@ -300,8 +257,6 @@ begin
 
       tkFloat: fINI.WriteString(Section, PropName, FloattoStr(GetFloatProp(Obj, PropName)));
 
-      tkSet: WriteSet(Section +'.' +PropName, GetOrdProp(Obj, PropName),
-        GetPropInfo(Obj, PropName, [tkSet])^.PropType^);
       tkClass:
        begin
          if TPersistent(GetOrdProp(Obj, PropName)) is TStrings then

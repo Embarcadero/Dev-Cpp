@@ -135,22 +135,19 @@ end;
 
 function TNewProjectForm.GetTemplate: TTemplate;
 var
- Opts: TProjOptions;
+	Opts: TProjOptions;
 begin
-  InitOptionsRec(Opts);
-  if assigned(ProjView.Selected) then
-   begin
-     result:= TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
-     Opts:= result.OptionsRec;
-   end
-  else
-   begin
-     result:= TTemplate.Create;
-     result.Version:= -1;
-   end;
-  result.ProjectName:= edProjectName.Text;
-  Opts.useGPP:= rbCpp.Checked;
-  result.OptionsRec:= Opts;
+	InitOptionsRec(Opts);
+	if assigned(ProjView.Selected) then begin
+		result:= TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
+		Opts:= result.OptionsRec;
+	end else begin
+		result:= TTemplate.Create;
+		result.Version:= -1;
+	end;
+	result.ProjectName:= edProjectName.Text;
+	Opts.useGPP:= rbCpp.Checked;
+	result.OptionsRec:= Opts;
 end;
 
 procedure TNewProjectForm.ProjViewChange(Sender: TObject; Item: TListItem;Change: TItemChange);

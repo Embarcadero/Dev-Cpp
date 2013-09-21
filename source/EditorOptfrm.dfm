@@ -28,7 +28,7 @@ object EditorOptForm: TEditorOptForm
     Top = 0
     Width = 464
     Height = 375
-    ActivePage = tabGeneral
+    ActivePage = tabCode
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -819,7 +819,7 @@ object EditorOptForm: TEditorOptForm
         Top = 0
         Width = 456
         Height = 347
-        ActivePage = tabSymbols
+        ActivePage = tabCPInserts
         Align = alClient
         TabOrder = 0
         object tabCPInserts: TTabSheet
