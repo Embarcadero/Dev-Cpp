@@ -5,7 +5,7 @@ DevCpp.dpk
 SynEdit_D7.dpk
 ClassBrowsing.dpk
 
-2) compile resources manually. run cmd (Delphi adds brcc32 to global definitions):
+2) compile resources manually: run CompileResources.bat or run manually:
 brcc32 DefaultFiles.rc
 brcc32 webupdate\selfupdater.rc
 brcc32 LangFrm.rc

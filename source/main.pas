@@ -4239,7 +4239,7 @@ end;
 
 procedure TMainForm.actUndoUpdate(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	actUndo.Enabled := assigned(e) and e.Text.CanUndo;
@@ -4247,7 +4247,7 @@ end;
 
 procedure TMainForm.actRedoUpdate(Sender: TObject);
 var
- e: TEditor;
+	e: TEditor;
 begin
 	e:= GetEditor;
 	actRedo.enabled:= assigned(e) and e.Text.CanRedo;

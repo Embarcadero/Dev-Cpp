@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 324
-  Top = 184
+  Left = 843
+  Top = 312
   Width = 759
   Height = 685
   Color = clBtnFace
@@ -46,7 +46,7 @@ object MainForm: TMainForm
     Top = 496
     Width = 743
     Height = 112
-    ActivePage = DebugSheet
+    ActivePage = CompSheet
     Align = alBottom
     Constraints.MinHeight = 1
     Images = dmMain.MenuImages_NewLook
@@ -64,7 +64,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 731
-        Height = 79
+        Height = 80
         Align = alClient
         BevelOuter = bvRaised
         BorderStyle = bsNone
@@ -1185,7 +1185,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 393
+        Height = 394
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1220,7 +1220,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 393
+        Height = 394
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1256,7 +1256,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 393
+        Height = 394
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -2069,11 +2069,9 @@ object MainForm: TMainForm
     Top = 135
     object RemoveFilefromprojectPopItem: TMenuItem
       Action = actUnitRemove
-      ShortCut = 46
     end
     object RenamefilePopItem: TMenuItem
       Action = actUnitRename
-      ShortCut = 113
     end
     object N30: TMenuItem
       Caption = '-'
@@ -3113,7 +3111,7 @@ object MainForm: TMainForm
   object MessagePopup: TPopupMenu
     OnPopup = MessagePopupPopup
     Left = 203
-    Top = 387
+    Top = 451
     object MsgCopyItem: TMenuItem
       Caption = '&Copy'
       ShortCut = 16451
@@ -3131,7 +3129,6 @@ object MainForm: TMainForm
     end
     object MsgClearItem: TMenuItem
       Caption = 'C&lear'
-      ShortCut = 46
       OnClick = actMsgClearExecute
     end
   end

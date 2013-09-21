@@ -27,7 +27,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-	Windows, SysUtils, Dialogs, StdCtrls, ComCtrls, Forms,
+	Windows, Editor, SysUtils, Dialogs, StdCtrls, ComCtrls, Forms,
 	devrun, version, project, utils, prjtypes, Classes, Graphics;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -1454,6 +1454,7 @@ begin
 	if not Assigned(CompileProgressForm) then
 		CompileProgressForm:=TCompileProgressForm.Create(Application);
 	with CompileProgressForm do begin
+		starttime:=GetTickCount;
 		Memo1.Lines.Clear;
 		btnClose.Caption:=Lang[ID_BTN_CANCEL];
 		btnClose.OnClick:=OnAbortCompile;
@@ -1480,6 +1481,7 @@ end;
 procedure TCompiler.EndProgressForm;
 var
 	sMsg: string;
+    e : TEditor;
 begin
 	if Assigned(CompileProgressForm) then begin
 		with CompileProgressForm do begin
@@ -1490,7 +1492,7 @@ begin
 			if fAbortThread then
 				sMsg := 'Aborted'
 			else
-				sMsg := 'Done';
+				sMsg := 'Done in '+FormatFloat('#,###,##0.00', (GetTickCount-starttime)/1000)+' seconds';
 			if fErrCount>0 then
 				sMsg := sMsg+' with errors.'
 			else if fWarnCount>0 then
@@ -1499,9 +1501,15 @@ begin
 				sMsg:=sMsg+'.';
 			Memo1.Lines.Add(sMsg);
 			lblStatus.Caption:=sMsg;
+
 			lblStatus.Font.Style:=[fsBold];
 			lblFile.Caption:='';
 		end;
+
+		// Always update the statusbar
+		e:=TEditor.Create;
+		e.SetDone(sMsg);
+
 		Application.ProcessMessages;
 		if devData.AutoCloseProgress or (fErrCount>0) or (fWarnCount>0) then
 			ReleaseProgressForm;

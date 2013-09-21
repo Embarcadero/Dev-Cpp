@@ -119,6 +119,7 @@ type
     // RNC set the breakpoints for this file when it is opened
     procedure SetBreakPointsOnOpen;
     procedure SetLineCol;
+    procedure SetDone(msg:string);
 
     // RNC 07-21-04
     // Add remove a breakpoint without calling OnBreakpointToggle
@@ -653,6 +654,12 @@ begin
 	// keep statusbar updated
 	MainForm.Statusbar.Panels[0].Text:= format('%6d: %d', [fText.DisplayY, fText.DisplayX]);
 	MainForm.Statusbar.Panels[3].Text:= format(Lang[ID_LINECOUNT], [fText.Lines.Count]);
+end;
+
+procedure TEditor.SetDone(msg:string);
+begin
+	// keep statusbar updated BEZIG
+	MainForm.Statusbar.Panels[3].Text:= msg;
 end;
 
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
@@ -1424,19 +1431,21 @@ end;
 {** Modified by Peter **}
 procedure TEditor.IndentSelection;
 begin
-  if FText.SelAvail then
-  begin
-    FText.ExecuteCommand(ecBlockIndent, #0, nil);
-  end;
+	if FText.SelAvail then begin
+		FText.ExecuteCommand(ecBlockIndent, #0, nil);
+	end else begin
+		FText.ExecuteCommand(ecTab,#0, nil);
+	end;
 end;
 
 {** Modified by Peter **}
 procedure TEditor.UnindentSelection;
 begin
-  if FText.SelAvail then
-  begin
-    FText.ExecuteCommand(ecBlockUnIndent, #0, nil);
-  end;
+	if FText.SelAvail then begin
+		FText.ExecuteCommand(ecBlockUnIndent, #0, nil);
+	end else begin
+		FText.ExecuteCommand(ecShiftTab,#0, nil);
+	end;
 end;
 
 {** Modified by Peter **}

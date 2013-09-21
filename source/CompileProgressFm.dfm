@@ -43,7 +43,6 @@ object CompileProgressForm: TCompileProgressForm
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     Style = tsFlatButtons
-    TabIndex = 0
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'Progress'
@@ -228,8 +227,6 @@ object CompileProgressForm: TCompileProgressForm
     Width = 268
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
-    Min = 0
-    Max = 100
     TabOrder = 2
   end
 end
