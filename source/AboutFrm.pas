@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  Windows, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, Buttons, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -76,7 +76,7 @@ implementation
 
 uses 
 {$IFDEF WIN32}
-  ShellAPI, devcfg, MultiLangSupport, CheckForUpdate, main;
+  ShellAPI, devcfg, MultiLangSupport,  main;
 {$ENDIF}
 {$IFDEF LINUX}
   devcfg, MultiLangSupport, CheckForUpdate, main;

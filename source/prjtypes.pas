@@ -23,10 +23,10 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Classes, editor, ComCtrls, datamod, Windows;
+  Classes, editor, ComCtrls, Windows;
 {$ENDIF}
 {$IFDEF LINUX}
-  Classes, editor, QComCtrls, datamod;
+  Classes, editor, QComCtrls;
 {$ENDIF}
 
 const

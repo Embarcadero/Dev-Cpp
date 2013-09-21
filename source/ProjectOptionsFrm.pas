@@ -28,12 +28,12 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
-  devTabs, prjtypes, Spin, Grids, ValEdit, CompilerOptionsFrame, ShellApi;
+  devTabs, prjtypes, Spin, ValEdit, CompilerOptionsFrame, ShellApi, Grids;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
   QStdCtrls, QExtCtrls, QButtons, QComCtrls, main, project,
-  devTabs, prjtypes, QGrids, CompilerOptionsFrame, Types;
+  devTabs, prjtypes, CompilerOptionsFrame, Types;
 {$ENDIF}
 
 type

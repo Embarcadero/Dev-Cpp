@@ -1,13 +1,14 @@
-Version 5.0.0.6 - * 2011
+Version 5.0.0.6 - 2 November 2011
 
 - Fixed an nil pointer read crash in the append closing brace code.
 - Updated the comment/uncomment functions.
 - The variable scanner now also supports local variables in non-class functions.
 - The scanner now does not scan the same word twice (making it 2x faster).
 - The Environment Options window now does not crash when its not allowed to edit file associations.
-- One can now use Ctrl+Scroll to edit text size, just like in browsers. Also added information about it.
+- One can now use Ctrl+Scroll to edit text size, just like in browsers. Also added information about it in the Options menu.
 - Files now open up much faster thanks to avoiding repaints.
-- Fixed a buffer overflow in the tooltip generator and rewritten the locals scanner.
+- Fixed a buffer overflow in the tooltip generator and rewritten the locals scanner, which is now 50% faster.
+- The append closing braces function now works on every keyboard Win32 supports.
 
 Version 5.0.0.5 - 24 Oktober 2011
 

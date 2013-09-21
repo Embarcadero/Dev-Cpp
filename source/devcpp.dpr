@@ -62,7 +62,6 @@ uses
   IconFrm in 'IconFrm.pas' {IconForm},
   devcfg in 'devcfg.pas',
   datamod in 'datamod.pas' {dmMain: TDataModule},
-  helpfrm in 'helpfrm.pas' {frmHelpEdit},
   EditorOptfrm in 'EditorOptfrm.pas' {EditorOptForm},
   CodeIns in 'CodeIns.pas' {frmCodeEdit},
   Incrementalfrm in 'Incrementalfrm.pas' {frmIncremental},

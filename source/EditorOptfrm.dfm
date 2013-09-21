@@ -887,7 +887,7 @@ object EditorOptForm: TEditorOptForm
           object lblCode: TLabel
             Left = 0
             Top = 107
-            Width = 401
+            Width = 28
             Height = 13
             Align = alBottom
             Caption = 'Code:'

@@ -1,6 +1,6 @@
 object AddToDoForm: TAddToDoForm
-  Left = 192
-  Top = 107
+  Left = 421
+  Top = 208
   BorderStyle = bsToolWindow
   Caption = 'Add To-Do item'
   ClientHeight = 205

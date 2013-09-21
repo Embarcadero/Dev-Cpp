@@ -23,10 +23,10 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Dialogs, Windows, Classes, Graphics, SynEdit, CFGData, CFGTypes, IniFiles, prjtypes, Math, EditorOptfrm;
+  Dialogs, Windows, Classes, Graphics, SynEdit, CFGData, CFGTypes, IniFiles, prjtypes, Math;
 {$ENDIF}
 {$IFDEF LINUX}
-  QDialogs, Classes, QGraphics, QSynEdit, CFGData, CFGTypes, IniFiles, Math, prjtypes, EditorOptfrm;
+  QDialogs, Classes, QGraphics, QSynEdit, CFGData, CFGTypes, IniFiles, Math, prjtypes;
 {$ENDIF}
 
 const
@@ -665,11 +665,11 @@ implementation
 uses
 {$IFDEF WIN32}
   MultiLangSupport, SysUtils, StrUtils, Forms, Controls, version, utils, SynEditMiscClasses,
-  datamod, FileAssocs;
+  FileAssocs;
 {$ENDIF}
 {$IFDEF LINUX}
   MultiLangSupport, SysUtils, StrUtils, QForms, QControls, version, utils, QSynEditMiscClasses,
-  datamod, FileAssocs, Types;
+  FileAssocs, Types;
 {$ENDIF}
 
 function ValidatePaths(dirList: String; var badDirs: String): String;

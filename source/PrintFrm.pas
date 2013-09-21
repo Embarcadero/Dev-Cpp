@@ -24,11 +24,11 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, MultiLangSupport, Spin, datamod;
+  StdCtrls, Buttons, MultiLangSupport, Spin;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-  QStdCtrls, QButtons, MultiLangSupport, QComCtrls, datamod;
+  QStdCtrls, QButtons, MultiLangSupport, QComCtrls;
 {$ENDIF}
 
 type

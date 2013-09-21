@@ -62,10 +62,10 @@ implementation
 
 uses 
 {$IFDEF WIN32}
-  datamod, MultiLangSupport, devcfg;
+  MultiLangSupport, devcfg;
 {$ENDIF}
 {$IFDEF LINUX}
-  Xlib, datamod, MultiLangSupport, devcfg;
+  Xlib, MultiLangSupport, devcfg;
 {$ENDIF} 
 
 {$R *.dfm}

@@ -27,7 +27,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-	Windows, Editor, SysUtils, Dialogs, StdCtrls, ComCtrls, Forms,
+	Windows, SysUtils, Dialogs, StdCtrls, ComCtrls, Forms,
 	devrun, version, project, utils, prjtypes, Classes, Graphics;
 {$ENDIF}
 {$IFDEF LINUX}

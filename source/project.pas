@@ -235,7 +235,7 @@ implementation
 
 uses
   main, MultiLangSupport, devcfg, ProjectOptionsFrm, datamod, utils,
-  RemoveUnitFrm, ResourceSelector;
+  RemoveUnitFrm;
 
 { TProjUnit }
 

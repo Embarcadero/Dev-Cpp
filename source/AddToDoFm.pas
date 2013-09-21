@@ -23,12 +23,12 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Spin, SynEditTextBuffer, SynEditTypes;
+  SysUtils, Classes, Graphics, Controls, Forms,
+  StdCtrls, Spin, SynEditTextBuffer, SynEditTypes;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QComCtrls, QSynEditTextBuffer, QSynEditTypes;
+  SysUtils, Classes, QGraphics, QControls, QForms,
+  QStdCtrls, QComCtrls, QSynEditTextBuffer, QSynEditTypes;
 {$ENDIF}
 
 type
@@ -58,7 +58,7 @@ var
 implementation
 
 uses 
-  main, editor, MultiLangSupport, devcfg;
+  main, editor, MultiLangSupport;
 
 {$R *.dfm}
 

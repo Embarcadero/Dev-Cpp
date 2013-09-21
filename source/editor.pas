@@ -24,19 +24,13 @@ interface
 uses 
 {$IFDEF WIN32}
   Windows, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser,
-  Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version, Grids,
-  SynCompletionProposal, StrUtils, SynEditTypes, SynEditHighlighter, 
-
-  {** Modified by Peter **}
-  DevCodeToolTip, SynAutoIndent;
+  Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
+  SynCompletionProposal, StrUtils, SynEditTypes, SynEditHighlighter, DevCodeToolTip, SynAutoIndent;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, Graphics, QControls, QForms, QDialogs, CodeCompletion, CppParser,
-  QMenus, QImgList, QComCtrls, QStdCtrls, QExtCtrls, QSynEdit, QSynEditKeyCmds, version, QGrids,
-  QSynCompletionProposal, StrUtils, QSynEditTypes, QSynEditHighlighter, 
-
-  {** Modified by Peter **}
-  DevCodeToolTip, QSynAutoIndent, Types;
+  QMenus, QImgList, QComCtrls, QStdCtrls, QExtCtrls, QSynEdit, QSynEditKeyCmds, version,
+  QSynCompletionProposal, StrUtils, QSynEditTypes, QSynEditHighlighter, DevCodeToolTip, QSynAutoIndent, Types;
 {$ENDIF}
 
 type
@@ -1030,6 +1024,11 @@ var
 	attr: TSynHighlighterAttributes;
 	s : string;
 	allowcompletion : boolean;
+
+	// Key localisation
+	keystate: TKeyboardState;
+	localizedkey : string;
+	charlen : integer;
 begin
 	// Indent/Unindent selected text with TAB key, like Visual C++ ...
 {$IFDEF WIN32}
@@ -1061,26 +1060,38 @@ begin
 				allowcompletion := false;
 
 		if allowcompletion then begin
-			if Key = 57 then begin // 9 key + shift = (
-				if (ssShift in Shift) then
-					InsertString(')',false);
-			end else if Key = 219 then begin // [ key on US standard layout according to MSDN
-				if (ssShift in Shift) then begin
-					counter:=0;
-					if Length(fText.LineText) > 1 then begin
-						repeat
-							Inc(counter);
-						until not (fText.LineText[counter] in [#9,#32]);
-						fText.Lines.Insert(FText.CaretY,Copy(FText.LineText,1,counter-1) + '}');
-					end else
-						InsertString(#13#10 + '}',false);
-				end;
-			end else if Key = 188 then begin // , key + shift = <
-				if (ssShift in Shift) and (AnsiStartsStr('#include',TrimLeft(fText.LineText))) then
+
+			// Kijken waar we op klikten
+			GetKeyboardState(keystate);
+			SetLength(localizedkey,2);
+
+			// yes, you saw that right. I'm calling it twice. Have a look at this for an explanation
+			// http://stackoverflow.com/questions/1964614/toascii-tounicode-in-a-keyboard-hook-destroys-dead-keys
+			ToAscii(Key,MapVirtualKey(Key,0),keystate,@localizedkey[1],0);
+			charlen := ToAscii(Key,MapVirtualKey(Key,0),keystate,@localizedkey[1],0);
+
+			// Skip key combinations
+			if charlen = 1 then
+				SetLength(localizedkey,1);
+			if charlen = 0 then Exit;
+
+			// Check if we typed anything completable...
+			if localizedkey = '(' then begin
+				InsertString(')',false);
+			end else if localizedkey = '[' then begin
+				InsertString(']',false);
+			end else if localizedkey = '{' then begin
+				counter:=0;
+				if Length(fText.LineText) > 1 then begin
+					repeat
+						Inc(counter);
+					until not (fText.LineText[counter] in [#9,#32]);
+					fText.Lines.Insert(FText.CaretY,Copy(FText.LineText,1,counter-1) + '}');
+				end else
+					InsertString(#13#10 + '}',false);
+			end else if localizedkey = '<' then begin
+				if (AnsiStartsStr('#include',TrimLeft(fText.LineText))) then
 					InsertString('>',false);
-//			end else if Key = 222 then begin // ' key + shift = "
-//				if (ssShift in Shift) then
-//					InsertString('""',false); // Annoying...
 			end;
 		end;
 	end;

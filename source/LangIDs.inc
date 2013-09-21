@@ -413,6 +413,7 @@ const
 
 
     // Display Tab
+  ID_EOPT_CTRLSCROLLHINT           = 459;
   ID_EOPT_EDFONT                   = 460;
   ID_EOPT_FONT                     = 461;
   ID_EOPT_SIZE                     = 462;

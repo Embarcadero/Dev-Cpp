@@ -27,18 +27,18 @@ uses
 {$IFDEF WIN32}
 	Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
 	Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils,
-	Project, editor, compiler, ActnList, oysUtils, Toolfrm, AppEvnts, Grids,
-	debugger, ClassBrowser, DevThemes, CodeCompletion, CppParser, CppTokenizer,
+	Project, editor, compiler, ActnList, oysUtils, Toolfrm, AppEvnts,
+	debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
 	devShortcuts, StrUtils, devFileMonitor, devMonitorTypes, DdeMan,
-	CVSFm, ImageTheme;
+	CVSFm;
 {$ENDIF}
 {$IFDEF LINUX}
 	SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
 	QMenus, QStdCtrls, QComCtrls, QExtCtrls, QButtons, utils,
-	project, editor, compiler, QActnList, oysUtils, QGrids,
-	debugger, ClassBrowser, DevThemes, CodeCompletion, CppParser, CppTokenizer,
+	project, editor, compiler, QActnList, oysUtils,
+	debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
 	devShortcuts, StrUtils, devFileMonitor, devMonitorTypes,
-	CVSFm, ImageTheme, Types;
+	CVSFm, Types;
 {$ENDIF}
 
 type
@@ -954,10 +954,10 @@ implementation
 uses
 {$IFDEF WIN32}
 	ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
-	devcfg, datamod, helpfrm, NewProjectFrm, AboutFrm, PrintFrm,
+	devcfg, datamod, NewProjectFrm, AboutFrm, PrintFrm,
 	CompOptionsFrm, EditorOptfrm, Incrementalfrm, Search_Center, Envirofrm,
-	SynEdit, SynEditTypes, Math,
-	CheckForUpdate, debugfrm, Types, Prjtypes, devExec,
+	SynEdit, SynEditTypes, Math, ImageTheme,
+	debugfrm, Types, Prjtypes, devExec,
 	NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
 	ProfileAnalysisFm, debugwait, FilePropertiesFm, AddToDoFm, ViewToDoFm,
 	ImportMSVCFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
@@ -965,10 +965,10 @@ uses
 {$ENDIF}
 {$IFDEF LINUX}
 	Xlib, IniFiles, QClipbrd, MultiLangSupport, version,
-	devcfg, datamod, helpfrm, NewProjectFrm, AboutFrm, PrintFrm,
+	devcfg, datamod, NewProjectFrm, AboutFrm, PrintFrm,
 	CompOptionsFrm, EditorOptfrm, Incrementalfrm, Search_Center, Envirofrm,
 	QSynEdit, QSynEditTypes,
-	CheckForUpdate, debugfrm, Prjtypes, devExec,
+	debugfrm, Prjtypes, devExec,
 	NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
 	ProfileAnalysisFm, debugwait, FilePropertiesFm, AddToDoFm, ViewToDoFm,
 	ImportMSVCFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
@@ -2076,9 +2076,8 @@ begin
 	TrackPopupMenu(mnuNew.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,pt.X, pt.y, 0, Self.Handle, nil);
 end;
 
-procedure TMainForm.OpenCloseMessageSheet;
+procedure TMainForm.OpenCloseMessageSheet(const _Show: boolean);
 begin
-//	devData.ShowOutput:= _Show;
 	if Assigned(ReportToolWindow) then
 		exit;
 	with MessageControl do
@@ -2106,8 +2105,7 @@ begin
 		OpenCloseMessageSheet(TRUE);
 end;
 
-procedure TMainForm.MessageControlChanging(Sender: TObject;
-	var AllowChange: Boolean);
+procedure TMainForm.MessageControlChanging(Sender: TObject;var AllowChange: Boolean);
 begin
 	if MessageControl.ActivePage <> CloseSheet then
 	 fTab:= MessageControl.ActivePageIndex;
@@ -2115,13 +2113,13 @@ end;
 
 procedure TMainForm.MRUClick(Sender: TObject);
 var
- s : string;
+	s : string;
 begin
 	s:= dmMain.MRU[(Sender as TMenuItem).Tag];
 	if GetFileTyp(s) = utPrj then
-	 OpenProject(s)
+		OpenProject(s)
 	else
-	 OpenFile(s);
+		OpenFile(s);
 end;
 
 procedure TMainForm.CodeInsClick(Sender: TObject);
@@ -3568,32 +3566,27 @@ end;
 
 procedure TMainForm.actUpdatePageCount(Sender: TObject);
 begin
-	(Sender as TCustomAction).Enabled:= PageControl.PageCount> 0;
+	(Sender as TCustomAction).Enabled := PageControl.PageCount> 0;
 end;
 
 procedure TMainForm.actUpdatePageorProject(Sender: TObject);
 begin
-	(Sender as TCustomAction).Enabled:= assigned(fProject)
-		or (PageControl.PageCount> 0);
+	(Sender as TCustomAction).Enabled := assigned(fProject) or (PageControl.PageCount> 0);
 end;
 
 procedure TMainForm.actDebugUpdate(Sender: TObject);
 begin
-	(Sender as TCustomAction).Enabled:= (assigned(fProject) or (PageControl.PageCount> 0)) and
-																			not devExecutor.Running;
+	(Sender as TCustomAction).Enabled := (assigned(fProject) or (PageControl.PageCount> 0)) and not devExecutor.Running;
 end;
 
 procedure TMainForm.actCompileUpdate(Sender: TObject);
 begin
-	(Sender as TCustomAction).Enabled:= (assigned(fProject) or (PageControl.PageCount> 0)) and
-																			not devExecutor.Running and not fDebugger.Executing and
-																			not fCompiler.Compiling;
+	(Sender as TCustomAction).Enabled := (assigned(fProject) or (PageControl.PageCount> 0)) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling;
 end;
 
 procedure TMainForm.actUpdatePageProject(Sender: TObject);
 begin
-	(Sender as TCustomAction).Enabled:=
-		 assigned(fProject) and (PageControl.PageCount> 0);
+	(Sender as TCustomAction).Enabled := assigned(fProject) and (PageControl.PageCount> 0);
 end;
 
 procedure TMainForm.actUpdateProject(Sender: TObject);
@@ -3606,10 +3599,10 @@ var
  e: TEditor;
 begin
 	e:= GetEditor;
-	if (assigned(e)) then
-		 (Sender as TAction).Enabled:= (e.Text.Text <> '')
+	if assigned(e) then
+		(Sender as TAction).Enabled:= (e.Text.Text <> '')
 	else
-		 (Sender as TAction).Enabled:= false;
+		(Sender as TAction).Enabled:= false;
 end;
 
 procedure TMainForm.actUpdateDebuggerRunning(Sender: TObject);
@@ -3626,7 +3619,6 @@ begin
 	tbSpecials.Visible:= ToolSpecialsItem.Checked;
 	tbSearch.Visible:= ToolSearchItem.Checked;
 	tbClasses.Visible:= ToolClassesItem.Checked;
-//	ProjectView.Visible:= actProjectManager.Checked;
 
 	devData.ToolbarMain:=ToolMainItem.checked;
 	devData.ToolbarEdit:=ToolEditItem.Checked;
@@ -3637,10 +3629,9 @@ begin
 	devData.ToolbarClasses:=ToolClassesItem.Checked;
 end;
 
-procedure TMainForm.ControlBar1ContextPopup(Sender: TObject;
-	MousePos: TPoint; var Handled: Boolean);
+procedure TMainForm.ControlBar1ContextPopup(Sender: TObject;MousePos: TPoint; var Handled: Boolean);
 var
- pt: TPoint;
+	pt: TPoint;
 begin
 	pt:= ControlBar1.ClientToScreen(MousePos);
 	TrackPopupMenu(ToolbarsItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,
@@ -3648,8 +3639,7 @@ begin
 	Handled:= TRUE;
 end;
 
-procedure TMainForm.SplitterBottomCanResize(Sender: TObject;
-	var NewSize: Integer; var Accept: Boolean);
+procedure TMainForm.SplitterBottomCanResize(Sender: TObject;var NewSize: Integer; var Accept: Boolean);
 begin
 	accept:= MessageControl.Height = fmsgHeight;
 end;
@@ -3658,13 +3648,12 @@ procedure TMainForm.SplitterBottomMoved(Sender: TObject);
 begin
 	if MessageControl.ActivePageIndex<>-1 then begin
 		if MessageControl.Height>0 then
-		 fmsgHeight:= MessageControl.Height;
-	 OpenCloseMessageSheet(true);
+			fmsgHeight:= MessageControl.Height;
+		OpenCloseMessageSheet(true);
 	end;
 end;
 
-procedure TMainForm.ApplicationEvents1Idle(Sender: TObject;
-	var Done: Boolean);
+procedure TMainForm.ApplicationEvents1Idle(Sender: TObject;var Done: Boolean);
 begin
 	PageControl.Visible:= assigned(PageControl.FindNextPage(nil, TRUE, TRUE));
 	InsertBtn.Enabled:= InsertItem.Visible;
@@ -6387,6 +6376,7 @@ begin
 			MessageBox(Application.handle,PChar('Could not find profiling file ' + path + '!'),PChar('Error'),MB_ICONERROR);
 end;
 
+// Monolithic function that reads code and tries to find definitons. Uses mouse or caret to determine word and returns a statement or a findpoint
 function TMainForm.findstatement(var localfind : string; var localfindpoint : TPoint;mousecursor : boolean) : PStatement;
 var
 	e : TEditor;
@@ -6411,6 +6401,8 @@ var
 	text : string;
 	wantbrace : integer;
 	wantquote : boolean;
+	found : boolean;
+	curtext : string;
 begin
 
 	Screen.Cursor := crHourglass;
@@ -6437,18 +6429,20 @@ begin
 		len2:=0;
 		isglobal:=true;
 
-		// Als we op een classmemberfunctie klikken, komt foo:: erbij, we willen het met scope doen
+		// Kijk of we op een member klikken waar de parent al bijstaat...
 		cpos := Pos('::' + member,e.Text.Lines[cursorpos.Line-1]);
 		ppos := Pos('.'  + member,e.Text.Lines[cursorpos.Line-1]);
 		apos := Pos('->' + member,e.Text.Lines[cursorpos.Line-1]);
 		if cpos > 0 then begin
+
+			// Vind de namespace of class...
 			repeat
 				Inc(len);
 			until not (e.Text.Lines[cursorpos.Line-1][cpos-len] in [#48..#57,#65..#90,#95,#97..#122]);
 			parent := Copy(e.Text.Lines[cursorpos.Line-1],cpos-len+1,len-1);
 			isglobal := false;
 
-			// Hier hoeven we NIET te scannen, want definitie staat er al
+			// Hier hoeven we NIET verder te scannen, want definitie staat er al
 
 		end else if (ppos > 0) or (apos > 0) then begin
 
@@ -6547,8 +6541,10 @@ begin
 			end;
 		end;
 
+		// BEZIG
+
 		// Als we uiteindelijk nog steeds niks hebben gevonden, scan de functie voor locals
-		if (isglobal) then begin
+		if isglobal then begin
 			cpos := e.Text.RowColToCharIndex(cursorpos);
 			text := Copy(e.Text.Text,max(1,cpos-1024),min(cpos,1024));
 			apos := Length(text); // Variable recycling
@@ -6568,16 +6564,17 @@ begin
 					Dec(wantbrace);
 				if wantbrace > 0 then continue;
 
-				parampos := AnsiPos(' ' + member,Copy(text,I,apos-I));
-				if parampos = 0 then parampos := AnsiPos(' *'  + member,Copy(text,I,apos-I));
-				if parampos = 0 then parampos := AnsiPos(' &'  + member,Copy(text,I,apos-I));
-				if parampos = 0 then parampos := AnsiPos('	'  + member,Copy(text,I,apos-I));
-				if parampos = 0 then parampos := AnsiPos('	*' + member,Copy(text,I,apos-I));
-				if parampos = 0 then parampos := AnsiPos('	&' + member,Copy(text,I,apos-I));
-				if (parampos = 1) then begin
+				curtext := Copy(text,I,apos-I);
+				found := AnsiStartsStr(' ' + member,curtext);
+				if not found then found := AnsiStartsStr(' *'  + member,curtext);
+				if not found then found := AnsiStartsStr(' &'  + member,curtext);
+				if not found then found := AnsiStartsStr('	'  + member,curtext);
+				if not found then found := AnsiStartsStr('	*' + member,curtext);
+				if not found then found := AnsiStartsStr('	&' + member,curtext);
+				if found then begin
 
 					// Offset toevoegen
-					parampos := parampos + I - 1;
+					parampos := I;
 
 					// Type bepalen, doorgaan tot blank
 					len := 0;
@@ -6752,7 +6749,7 @@ begin
 			devEditor.Gutterfont.Size := Max(1,devEditor.Gutterfont.Size - 1);
 		end;
 
-		// We don't like to send the actual scrolling message to the editor
+		// We don't like to send the actual scrolling message to the editor when zooming
 		Abort;
 	end;
 end;

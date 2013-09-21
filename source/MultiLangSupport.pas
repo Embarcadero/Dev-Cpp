@@ -228,10 +228,14 @@ end;
 
 function TdevMultiLangSupport.GetString(ID : integer) : string;
 begin
-  result:= fStrings.Values[inttostr(ID)];
-  if Result = '' then Result := fDefaultLang.Values[inttostr(ID)];
-  if result = '' then result:= format('<ERR: %d>', [ID])
-    else result:=StringReplace(result, '<CR>', #13#10, [rfReplaceAll]);
+	result:= fStrings.Values[inttostr(ID)];
+	if Result = '' then begin
+		Result := fDefaultLang.Values[inttostr(ID)];
+	end;
+	if result = '' then
+		result:= format('ID %d translation missing>', [ID])
+	else
+		result:=StringReplace(result, '<CR>', #13#10, [rfReplaceAll]);
 end;
 
 function TdevMultiLangSupport.GetLangName: string;

@@ -25,13 +25,13 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, devTabs, StdCtrls, ExtCtrls, Spin, ColorPickerButton,
-  SynEdit, SynEditHighlighter, SynHighlighterCpp, CheckLst, SynMemo,
+  SynEdit, SynEditHighlighter, SynHighlighterCpp,
   Buttons, ClassBrowser, CppParser, CppTokenizer, StrUtils;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
   QDialogs, QComCtrls, devTabs, QStdCtrls, QExtCtrls, ColorPickerButton,
-  QSynEdit, QSynEditHighlighter, QSynHighlighterCpp, QCheckLst, QSynMemo,
+  QSynEdit, QSynEditHighlighter, QSynHighlighterCpp, QCheckLst,
   QButtons, ClassBrowser, CppParser, CppTokenizer, StrUtils, Types;
 {$ENDIF}
 
@@ -622,6 +622,8 @@ begin
   btnAdd.Caption:=               Lang[ID_BTN_ADD];
   btnEdit.Caption:=              Lang[ID_BTN_EDIT];
   btnRemove.Caption:=            Lang[ID_BTN_REMOVE];
+
+  ScrollHint.Caption:=           Lang[ID_EOPT_CTRLSCROLLHINT];
 end;
 
 procedure TEditorOptForm.LoadSampleText;

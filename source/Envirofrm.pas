@@ -25,12 +25,12 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Spin, ExtCtrls, devTabs, ExtDlgs, Buttons, DevThemes,
+  Dialogs, StdCtrls, Spin, ExtCtrls, devTabs, ExtDlgs, Buttons,
   CheckLst, Grids, ValEdit;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QComCtrls, QExtCtrls, devTabs, QButtons, DevThemes,
+  QDialogs, QStdCtrls, QComCtrls, QExtCtrls, devTabs, QButtons,
   QCheckLst, QGrids;
 {$ENDIF}
 

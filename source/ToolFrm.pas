@@ -116,7 +116,7 @@ type
 implementation
 
 uses ToolEditFrm, inifiles, devcfg, utils, MultiLangSupport, datamod,
-  version, main;
+  version;
 
 {$R *.dfm}
 
@@ -324,7 +324,6 @@ begin
 			Item.Caption:= fToolList.Items[I].Title;
 			Item.OnClick:= fOnClick;
 			Item.Tag:= I;
-
 
 			// If it doesn't have an icon already
 			if not fToolList.Items[I].HasIcon then begin
