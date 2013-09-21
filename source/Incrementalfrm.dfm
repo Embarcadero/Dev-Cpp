@@ -1,9 +1,9 @@
 object frmIncremental: TfrmIncremental
-  Left = 862
-  Top = 564
+  Left = 861
+  Top = 494
   Anchors = []
   AutoSize = True
-  BorderIcons = []
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
   Caption = 'Incremental Search'
   ClientHeight = 25
@@ -20,6 +20,7 @@ object frmIncremental: TfrmIncremental
   PopupMenu = IncrementalPop
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96
@@ -29,7 +30,7 @@ object frmIncremental: TfrmIncremental
     Top = 0
     Width = 25
     Height = 25
-    Caption = #187
+    Caption = '>'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -44,7 +45,7 @@ object frmIncremental: TfrmIncremental
     Top = 0
     Width = 25
     Height = 25
-    Caption = #171
+    Caption = '<'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16

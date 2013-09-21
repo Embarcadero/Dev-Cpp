@@ -56,6 +56,11 @@ type
     CPUCut: TMenuItem;
     N2: TMenuItem;
     CPUSelectAll: TMenuItem;
+    RegPanel: TPanel;
+    TracePanel: TPanel;
+    VertSplit: TSplitter;
+    HorzSplit: TSplitter;
+    LeftPanel: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edFuncKeyPress(Sender: TObject; var Key: Char);
     procedure FormCreate(Sender: TObject);

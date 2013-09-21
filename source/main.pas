@@ -30,7 +30,7 @@ uses
 	Project, editor, compiler, ActnList, ToolFrm, AppEvnts,
 	debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
 	StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan,
-	CVSFrm, devShortcuts, debugreader, devcfg, VistaAltFixUnit;
+	CVSFrm, devShortcuts, debugreader, CommCtrl, devcfg, VistaAltFixUnit;
 {$ENDIF}
 {$IFDEF LINUX}
 	SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -274,7 +274,7 @@ type
 		actIncremental: TAction;
 		IncrementalSearch1: TMenuItem;
 		actShowBars: TAction;
-		PageControl: TPageControl;
+    PageControl: TPageControl;
 		Close1: TMenuItem;
 		N16: TMenuItem;
 		DebugMenu: TMenuItem;
@@ -811,7 +811,6 @@ type
 		procedure actGotoImplDeclEditorExecute(Sender: TObject);
 		procedure actHideFSBarExecute(Sender: TObject);
 		procedure UpdateSplash(const text : AnsiString);
-		function FindStatement(const statement : AnsiString;cursorpos : TBufferCoord;var localfind : AnsiString;var localfindpoint : TBufferCoord) : PStatement;
 		procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 		procedure ImportCBCprojectClick(Sender: TObject);
 		procedure CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
@@ -838,12 +837,8 @@ type
 		procedure DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView;Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;var PaintImages, DefaultDraw: Boolean);
 		procedure FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 		procedure actMsgCutExecute(Sender: TObject);
-    procedure FindOutputAdvancedCustomDraw(Sender: TCustomListView;
-      const ARect: TRect; Stage: TCustomDrawStage;
-      var DefaultDraw: Boolean);
-    procedure CompilerOutputAdvancedCustomDraw(Sender: TCustomListView;
-      const ARect: TRect; Stage: TCustomDrawStage;
-      var DefaultDraw: Boolean);
+		procedure FindOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
+		procedure CompilerOutputAdvancedCustomDraw(Sender: TCustomListView;const ARect: TRect; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
 	private
 		fPreviousHeight   : integer; // stores MessageControl height to be able to restore to previous height
 		fTools            : TToolController; // tool list controller
@@ -875,7 +870,6 @@ type
 		procedure InitClassBrowser(FullInitParser,Startup: boolean);
 		procedure ScanActiveProject;
 		procedure CheckForDLLProfiling;
-		procedure UpdateAppTitle;
 		procedure DoCVSAction(Sender: TObject; whichAction: TCVSAction);
 		procedure ProjectWindowClose(Sender: TObject; var Action: TCloseAction);
 		procedure SetupProjectView;
@@ -889,6 +883,7 @@ type
 		fDebugger : TDebugger;
 		fCompiler : TCompiler;
 
+		procedure UpdateAppTitle;
 		procedure OpenCloseMessageSheet(_Show: boolean);
 		function SaveFile(e : TEditor): Boolean;
 		procedure OpenFile(const s : AnsiString);
@@ -1607,12 +1602,8 @@ begin
 				fProject.CloseUnit(fProject.Units.Indexof(e));
 		end;
 
-		if PageControl.PageCount = 0 then begin
-			PageControl.Visible := false;
-			Statusbar.Panels[0].Text := '';
-			Statusbar.Panels[1].Text := '';
-			StatusBar.Panels[2].Text := '';
-		end;
+		SetStatusbarLineCol;
+		UpdateAppTitle;
 
 		e:=GetEditor;
 		if Assigned(e) then begin
@@ -1628,12 +1619,18 @@ var
 	e: TEditor;
 begin
 	e:= GetEditor;
-	if Assigned(e) then
+	if Assigned(e) then begin
 		Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS],[ e.Text.GetRealLineNumber(e.Text.DisplayY),
 																	e.Text.DisplayX,
 																	e.Text.SelLength,
 																	e.Text.UnCollapsedLines.Count,
 																	e.Text.UnCollapsedLinesLength]);
+	end else begin
+		PageControl.Visible := false;
+		Statusbar.Panels[0].Text := '';
+		Statusbar.Panels[1].Text := '';
+		StatusBar.Panels[2].Text := '';
+	end;
 end;
 
 procedure TMainForm.SetStatusbarMessage(const msg:AnsiString);
@@ -2246,7 +2243,7 @@ procedure TMainForm.actCloseAllExecute(Sender: TObject);
 var
 	idx: integer;
 begin
-	for idx := pred(PageControl.PageCount) downto 0 do
+	for idx := PageControl.PageCount - 1 downto 0 do
 		if not CloseEditor(0, True) then
 			Break;
 
@@ -2270,7 +2267,7 @@ begin
 	fProject.CmdLineArgs:=fCompiler.RunParams;
 	fProject.SaveLayout;
 
-	// ** should we save watches?
+	// TODO: should we save watches?
 	if fProject.Modified then begin
 		if fProject.Name = '' then
 			s:= fProject.FileName
@@ -2294,12 +2291,7 @@ begin
 	ClassBrowser.ProjectDir:='';
 	CppParser.Reset;
 
-	if PageControl.PageCount = 0 then begin
-		PageControl.Visible := false;
-		Statusbar.Panels[0].Text := '';
-		Statusbar.Panels[1].Text := '';
-		StatusBar.Panels[2].Text := '';
-	end;
+	SetStatusbarLineCol;
 
 	if wa then
 		devFileMonitor.Activate;
@@ -2564,18 +2556,18 @@ end;
 
 procedure TMainForm.actEditorOptionsExecute(Sender: TObject);
 var
-	I: integer;
+	I : integer;
+	e : TEditor;
 begin
 	with TEditorOptForm.Create(Self) do
 		try
 			if ShowModal = mrOk then begin
 				dmMain.UpdateHighlighter;
-				for I:= 0 to pred(PageControl.PageCount) do
-					with TEditor(PageControl.Pages[I].Tag) do begin
-						devEditor.AssignEditor(Text);
-						Text.Highlighter := dmMain.GetHighlighter(FileName);
-						InitCompletion;
-					end;
+				for I:= 0 to PageControl.PageCount - 1 do begin
+					e := TEditor(PageControl.Pages[I].Tag);
+					devEditor.AssignEditor(e);
+					e.InitCompletion;
+				end;
 
 				InitClassBrowser(chkCCCache.Tag=1,false);
 				if CppParser.Statements.Count=0 then
@@ -2993,10 +2985,6 @@ begin
 end;
 
 procedure TMainForm.PrepareDebugger;
-var
-	I : integer;
-	node : TTreeNode;
-	wparent : PWatchParent;
 begin
 	fDebugger.Stop(nil);
 
@@ -3010,20 +2998,7 @@ begin
 	OpenCloseMessageSheet(True);
 
 	// Reset watch vars
-	for I := 0 to fDebugger.WatchVarList.Count - 1 do begin
-		wparent := PWatchParent(fDebugger.WatchVarList.Items[I]);
-
-		// Delete children
-		while wparent^.node.HasChildren do begin
-			node := wparent^.node.GetLastChild;
-			Dispose(PWatchMember(node.Data));
-			node.Delete;
-		end;
-
-		wparent^.gdbindex := -1;
-		wparent^.value := 'Execute to evaluate';
-		wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
-	end;
+	fDebugger.DeleteWatchVars(false);
 end;
 
 procedure TMainForm.actDebugExecute(Sender: TObject);
@@ -3069,7 +3044,9 @@ begin
 
 		// Did we compile?
 		if not FileExists(fProject.Executable) then begin
-			MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILED], mtWarning, [mbOK], 0);
+			if MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+				actCompileExecute(nil);
+			end;
 			exit;
 		end;
 
@@ -3098,7 +3075,9 @@ begin
 
 			// Did we compile?
 			if not FileExists(ChangeFileExt(e.FileName, EXE_EXT)) then begin
-				MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
+				if MessageDlg(Lang[ID_ERR_SRCNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+					actCompileExecute(nil);
+				end;
 				Exit;
 			end;
 
@@ -3500,38 +3479,36 @@ var
 begin
 	selection := CompilerOutput.Selected;
 	if Assigned(selection) then begin
-		Line := StrToIntDef(selection.Caption,-1);
-		Col := StrToIntDef(selection.SubItems[0],-1);
+		Line := StrToIntDef(selection.Caption,1);
+		Col := StrToIntDef(selection.SubItems[0],1);
 		errorfiletab := GetEditorFromFileName(selection.SubItems[1]);
 
 		if Assigned(errorfiletab) then begin
 			errorfiletab.Activate;
-			if Col <> -1 then
-				errorfiletab.SetErrorFocus(Col, Line)
-			else
-				errorfiletab.SetErrorFocus(1, Line);
+			errorfiletab.SetErrorFocus(Col, Line);
 		end;
 	end;
 end;
 
 procedure TMainForm.FindOutputDblClick(Sender: TObject);
 var
- col, line: integer;
- e: TEditor;
+	col, line: integer;
+	e: TEditor;
+	selected : TListItem;
 begin
-	// goto find pos
-	if not assigned(FindOutPut.Selected) then exit;
-	Col:= strtoint(FindOutput.Selected.SubItems[0]);
-	Line:= strtoint(FindOutput.Selected.Caption);
+	selected := FindOutPut.Selected;
+	if Assigned(selected) and not SameStr(selected.Caption,'') then begin
+		Col:= StrToIntDef(selected.SubItems[0],1);
+		Line:= StrToIntDef(selected.Caption,1);
 
-	// replaced redundant code...
-	e:=GetEditorFromFileName(FindOutput.Selected.SubItems[1]);
+		e := GetEditorFromFileName(selected.SubItems[1]);
 
-	if assigned(e) then begin
-		e.Text.CaretXY:= BufferCoord(col, line);
-		e.Text.SetSelWord;
-		e.Text.CaretXY:= e.Text.BlockBegin;
-		e.Activate;
+		if Assigned(e) then begin
+			e.Text.CaretXY:= BufferCoord(col, line);
+			e.Text.SetSelWord;
+			e.Text.CaretXY:= e.Text.BlockBegin;
+			e.Activate;
+		end;
 	end;
 end;
 
@@ -4055,12 +4032,15 @@ var
 	e: TEditor;
 	i, x, y : integer;
 begin
-	if PageControl.ActivePageIndex > -1 then begin
+	if PageControl.ActivePageIndex <> -1 then begin
 		e:=GetEditor(PageControl.ActivePageIndex);
 		if Assigned(e) then begin
 			e.Text.SetFocus;
 
-			// keep Statusbar updated
+			// Keep window title updated
+			UpdateAppTitle;
+
+			// keep Status bar updated
 			SetStatusbarLineCol;
 
 			ClassBrowser.CurrentFile:=e.FileName;
@@ -4102,9 +4082,9 @@ end;
 procedure TMainForm.actProgramResetUpdate(Sender: TObject);
 begin
 	if Assigned(fProject) then
-		(Sender as TCustomAction).Enabled := not (fProject.Options.typ = dptStat) and devExecutor.Running
+		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and devExecutor.Running
 	else
-		(Sender as TCustomAction).Enabled := (PageControl.PageCount > 0) and devExecutor.Running;
+		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and devExecutor.Running;
 end;
 
 procedure TMainForm.CommentheaderMenuItemClick(Sender: TObject);
@@ -4407,7 +4387,7 @@ begin
 
 	// Ask the user if he wants to generate data...
 	if not FileExists(path) then begin
-		if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtInformation, [mbYes, mbNo], 0) = mrYes then begin
+		if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 			actRunExecute(nil);
 		end;
 		Exit;
@@ -4798,13 +4778,47 @@ begin
 end;
 
 procedure TMainForm.UpdateAppTitle;
+var
+	e : TEditor;
 begin
 	if Assigned(fProject) then begin
-		Caption:=Format('%s %s - [ %s ] - %s', [DEVCPP, DEVCPP_VERSION, fProject.Name, ExtractFilename(fProject.Filename)]);
-		Application.Title:=Format('%s - [%s]', [DEVCPP, fProject.Name]);
+		if fDebugger.Executing then begin
+			Caption := Format('%s - [%s] - [Debugging] - %s %s',
+				[fProject.Name, ExtractFilename(fProject.Filename), DEVCPP, DEVCPP_VERSION]);
+			Application.Title := Format('%s - [Debugging] - %s', [fProject.Name, DEVCPP]);
+		end else if devExecutor.Running then begin
+			Caption :=  Format('%s - [%s] - [Executing] - %s %s',
+				[fProject.Name, ExtractFilename(fProject.Filename), DEVCPP, DEVCPP_VERSION]);
+			Application.Title := Format('%s - [Executing] - %s', [fProject.Name, DEVCPP]);
+		end else if fCompiler.Compiling then begin
+			Caption :=  Format('%s - [%s] - [Compiling] - %s %s',
+				[fProject.Name, ExtractFilename(fProject.Filename), DEVCPP, DEVCPP_VERSION]);
+			Application.Title := Format('%s - [Compiling] - %s', [fProject.Name, DEVCPP]);
+		end else begin
+			Caption :=  Format('%s - [%s] - %s %s',
+				[fProject.Name, ExtractFilename(fProject.Filename), DEVCPP, DEVCPP_VERSION]);
+			Application.Title := Format('%s - %s', [fProject.Name, DEVCPP]);
+		end;
 	end else begin
-		Caption:=Format('%s %s', [DEVCPP, DEVCPP_VERSION]);
-		Application.Title:=Format('%s', [DEVCPP]);
+		e := GetEditor;
+		if Assigned(e) then begin
+			if fDebugger.Executing then begin
+				Caption :=  Format('%s - [Debugging] - %s %s',[e.FileName, DEVCPP, DEVCPP_VERSION]);
+				Application.Title := Format('%s - [Debugging] - %s', [ExtractFileName(e.FileName), DEVCPP]);
+			end else if devExecutor.Running then begin
+				Caption :=  Format('%s - [Executing] - %s %s',[e.FileName, DEVCPP, DEVCPP_VERSION]);
+				Application.Title := Format('%s - [Executing] - %s', [ExtractFileName(e.FileName), DEVCPP]);
+			end else if fCompiler.Compiling then begin
+				Caption :=  Format('%s - [Compiling] - %s %s',[e.FileName, DEVCPP, DEVCPP_VERSION]);
+				Application.Title := Format('%s - [Compiling] - %s', [ExtractFileName(e.FileName), DEVCPP]);
+			end else begin
+				Caption :=  Format('%s - %s %s',[e.FileName, DEVCPP, DEVCPP_VERSION]);
+				Application.Title := Format('%s - %s', [ExtractFileName(e.FileName), DEVCPP]);
+			end;
+		end else begin
+			Caption := Format('%s %s',[DEVCPP, DEVCPP_VERSION]);
+			Application.Title := Format('%s', [DEVCPP]);
+		end;
 	end;
 end;
 
@@ -5359,14 +5373,16 @@ var
 begin
 	OldSelection:=cmbClasses.Text;
 
-	cmbClasses.Clear;
 	cmbClasses.Items.BeginUpdate;
+	cmbClasses.Clear;
 	cmbClasses.Items.Add('(globals)');
+
 	for I:=0 to CppParser.Statements.Count-1 do begin
 		st:=PStatement(CppParser.Statements[I]);
 		if st^._InProject and (st^._Kind = skClass) then // skClass equals struct + typedef + class
 			cmbClasses.Items.AddObject(st^._ScopelessCmd, Pointer(I));
 	end;
+
 	cmbClasses.Items.EndUpdate;
 
 	// if we can't finx the old selection anymore (-> -1), default to 0 (globals)
@@ -5379,6 +5395,7 @@ var
 	I, ParentID: integer;
 	st: PStatement;
 begin
+	cmbMembers.Items.BeginUpdate;
 	cmbMembers.Clear;
 
 	// Select the correct parentID
@@ -5387,8 +5404,6 @@ begin
 	// Support '(globals)'
 	if cmbClasses.ItemIndex = 0 then
 		ParentID := -1;
-
-	cmbMembers.Items.BeginUpdate;
 
 	// If we selected a class
 	if(ParentID <> -1) and (PStatement(CppParser.Statements[ParentID])^._Type = 'class ') then begin
@@ -5573,12 +5588,8 @@ begin
 end;
 
 procedure TMainForm.ClearallWatchPopClick(Sender: TObject);
-var
-	I : integer;
 begin
-	for I := DebugTree.Items.Count - 1 downto 0 do begin
-		fDebugger.RemoveWatchVar(DebugTree.Items[i]);
-	end;
+	fDebugger.DeleteWatchVars(true);
 end;
 
 procedure TMainForm.mnuCVSClick(Sender: TObject);
@@ -5608,305 +5619,32 @@ begin
 	end;
 end;
 
-// Monolithic function that reads code and tries to find definitons. Uses mouse or caret to determine word and returns a statement or a findpoint
-function TMainForm.FindStatement(const statement : AnsiString;cursorpos : TBufferCoord;var localfind : AnsiString;var localfindpoint : TBufferCoord) : PStatement;
-var
-	e : TEditor;
-	text : PAnsiChar;
-	ParentType : AnsiString;
-	FoundParentType : boolean;
-	compare1,compare2 : AnsiString;
-	wantbrace : integer;
-	cursorindex : integer;
-	I, wordstart, wordend : integer;
-	token : AnsiString;
-	HLAttr: TSynHighlighterAttributes;
-begin
-	Result := nil;
-
-	if MainForm.CppParser.FilesToScan.Count > 0 then begin
-		localfind := 'CppParser is busy...';
-		localfindpoint.Char := 12345; // magic number
-		localfindpoint.Line := 12345;
-		Exit;
-	end;
-
-	// Assume e isn't nil, because if so, this function wouldn't even be called
-	e:=GetEditor;
-	text := PAnsiChar(e.Text.Text);
-	cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
-
-	FoundParentType := false;
-
-	// Try to find the word before :: or -> or .
-	if ((text[cursorindex-2] = ':') and (text[cursorindex-1] = ':')) or
-       ((text[cursorindex-2] = '-') and (text[cursorindex-1] = '>')) or
-        (text[cursorindex-1] = '.') then begin
-
-		if (text[cursorindex-1] = '.') then
-			wordend := cursorindex-2 // Start before the .
-		else
-			wordend := cursorindex-3; // Start before the -> or ::
-
-		// Find the word before the array stuff
-		if text[wordend] = ']' then begin
-			repeat
-				Dec(wordend);
-			until (wordend = -1) or (text[wordend+1] = '[');
-		end;
-
-		// Then find the word itself
-		wordstart := wordend;
-		repeat
-			Dec(wordstart);
-		until (wordstart = -1) or not (text[wordstart] in e.Text.IdentChars);
-		compare1 := Copy(text,wordstart+2,wordend-wordstart);
-
-		// Don't bother looking for a match if empty
-		if compare1 <> '' then begin
-
-			// Don't look for the types of classes, because we'll just find 'class', which is useless
-			if not ((text[cursorindex-2] = ':') and (text[cursorindex-1] = ':')) then begin
-
-				// if we previously found an instance, look for its type
-				for I:=0 to CppParser.Statements.Count-1 do begin
-					if PStatement(CppParser.Statements[I])^._ParentID = -1 then begin
-
-						// Try to find the place where this instance name first showed up
-						if PStatement(CppParser.Statements[I])^._ScopeCmd <> '' then
-							compare2 := PStatement(CppParser.Statements[I])^._ScopeCmd
-						else
-							compare2 := PStatement(CppParser.Statements[I])^._ScopelessCmd;
-
-						if SameStr(compare1,compare2) then begin
-
-							// We only need the type of the parent we've found!
-							ParentType := PStatement(CppParser.Statements[I])^._Type;
-							FoundParentType := true;
-							Break;
-						end;
-					end;
-				end;
-			end else begin
-				ParentType := compare1;
-				FoundParentType := true;
-			end;
-		end;
-
-	// otherwise, we clicked an 'unattached' variable. First check if we're inside a class header body
-	end else begin
-
-		cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
-		I := cursorindex;
-		while (I > max(0,cursorindex-1024)) do begin
-
-			// We're inside a class definition, save the name of the parent class...
-			compare1 := Copy(text,I,6);
-			if CompareStr('class ',compare1) = 0 then begin
-
-				wordstart := I + 7; // start at the end of 'class'
-				wordend := wordstart;
-				while text[wordend] in e.Text.IdentChars do
-					Inc(wordend);
-
-				ParentType := Copy(text,wordstart-1,wordend-wordstart+2);
-				break;
-			end;
-			Dec(I);
-		end;
-	end;
-
-	// If we couldn't directly find its parent, assume it belongs to the class function we're in
-	if not FoundParentType then begin
-
-		// Then scan back trying to find the base function (or class)
-		cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
-		I := cursorindex;
-		while (I > max(0,cursorindex-2048)) do begin
-			if (text[I] = ':') and (text[I+1] = ':') then begin
-				// Then find the word itself
-				wordend := I;
-				wordstart := wordend;
-				repeat
-					Dec(wordstart);
-				until not (text[wordstart] in e.Text.IdentChars);
-				ParentType := Copy(text,wordstart+2,wordend-wordstart-1);
-				break;
-			end;
-			Dec(I);
-		end;
-	end;
-
-	if (ParentType <> '') and not FoundParentType then begin
-		compare1 := ParentType + '::' + statement;
-
-		// Check if the found class instance actually contains the variable...
-		for I:=0 to CppParser.Statements.Count-1 do begin
-			with PStatement(CppParser.Statements[I])^ do begin
-				if _ParentID <> -1 then begin
-					if _Kind = skFunction then begin
-						if _ScopeCmd <> '' then
-							compare2 := _ScopeCmd
-						else
-							compare2 := _ScopelessCmd;
-					end else begin
-						if _ScopeCmd <> '' then
-							compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopeCmd
-						else
-							compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopelessCmd;
-					end;
-
-					if SameStr(compare1,compare2) then begin
-						ParentType := Copy(compare1,1,Pos('::',compare1)-1);
-						FoundParentType := true;
-						Break;
-					end;
-				end;
-			end;
-		end;
-	end;
-
-	// Found nothing belonging to any parents? Assume a local variable
-	if not FoundParentType then begin
-
-		compare1 := StringReplace(statement,'*','',[rfReplaceAll]);
-		compare1 := StringReplace(statement,'&','',[rfReplaceAll]);
-
-		wantbrace := 0;
-		cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
-		I := cursorindex;
-		while (I > max(0,cursorindex-2048)) do begin
-			Dec(I);
-
-			if e.Text.GetHighlighterAttriAtRowCol(e.Text.CharIndexToRowCol(I),token,HLAttr) then
-				if (HLAttr = e.Text.Highlighter.StringAttribute) or (HLAttr = e.Text.Highlighter.CommentAttribute) then
-					continue;
-
-			// Skip forbidden scopes
-			if text[I] = '}' then
-				Inc(wantbrace);
-			if text[I] = '{' then
-				Dec(wantbrace);
-			if wantbrace > 0 then continue;
-
-			// Wwe've found a word that matches what we were looking for...
-			compare2 := e.Text.GetWordAtRowCol(e.Text.CharIndexToRowCol(I));
-			if CompareStr(compare1,compare2) = 0 then begin
-
-				wordstart := e.Text.RowColToCharIndex(e.Text.WordStartEx(e.Text.CharIndexToRowCol(I)),true);
-				wordend := e.Text.RowColToCharIndex(e.Text.WordEndEx(e.Text.CharIndexToRowCol(I)),true);
-
-				// The char before the word MUST be blank!
-				if text[wordstart-1] in [#0..#32] then begin
-
-					// First, starting at the found point, scan backwards until we find an invalid character
-					while (wordstart > 1) do begin
-
-						// Only allow whitespace and standard characters
-						if not (text[wordstart-1] in e.Text.IdentChars) and not (text[wordstart-1] in [#0..#32,'&','*']) then Break;
-
-						// Don't allow comments
-						if e.Text.GetHighlighterAttriAtRowCol(e.Text.CharIndexToRowCol(wordstart-1),token,HLAttr) then
-							if (HLAttr = e.Text.Highlighter.CommentAttribute) then
-								Break;
-
-						Dec(wordstart);
-					end;
-
-					// Trim whitespace
-					while (text[wordstart] in [#0..#32]) do
-						Inc(wordstart);
-
-					if (wordend - wordstart > Length(compare1)) then begin
-						localfind := Copy(text,wordstart + 1,wordend - wordstart);
-						localfindpoint := e.Text.CharIndexToRowCol(wordstart);
-						Exit;
-					end else if(wordstart < I) then
-						I := wordstart;
-				end;
-			end;
-		end;
-	end;
-
-	// Use to Parent::Member notation for structs too
-	if FoundParentType then
-		compare1 := ParentType + '::' + statement
-	else
-		compare1 := statement;
-
-	compare1 := StringReplace(compare1,'*','',[rfReplaceAll]);
-	compare1 := StringReplace(compare1,'&','',[rfReplaceAll]);
-
-	// For every item, try to assemble ParentType :: WordToFind or simply WordToFind
-	for I := 0 to CppParser.Statements.Count - 1 do begin
-		with PStatement(CppParser.Statements[I])^ do begin
-
-			// If _ParentID = -1, then it does NOT have a parent class
-			if _ParentID = -1 then begin
-				compare2 := _ScopelessCmd;
-			end else begin
-				if _Kind = skFunction then begin
-					if _ScopeCmd <> '' then
-						compare2 := _ScopeCmd
-					else
-						compare2 := _ScopelessCmd;
-				end else begin
-
-					// TODO:
-					// Sometimes PStatement(CppParser.Statements[I])^_ParentID returns an ID
-					// that is equal to CppParser.Statements.Count or more, which is out of bounds and
-					// of course wrong. Why? CppParser is stuck at some piece of code...
-
-					if PStatement(CppParser.Statements[I])^._ScopeCmd <> '' then
-						compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopeCmd
-					else
-						compare2 := PStatement(CppParser.Statements[_ParentID])^._ScopeCmd + '::' + _ScopelessCmd;
-				end;
-			end;
-		end;
-
-		if SameStr(compare1,compare2) then begin
-			Result := PStatement(CppParser.Statements[I]);
-			Exit;
-		end;
-	end;
-
-	// if we couldn't find anything, just display what we've been able to gather
-	if FoundParentType then begin
-		localfind := compare1;
-		localfindpoint.Char := 12345; // magic number
-		localfindpoint.Line := 12345;
-	end;
-end;
-
 procedure TMainForm.actGotoImplDeclEditorExecute(Sender: TObject);
 var
-	localfind : AnsiString;
-	localfindpoint : TBufferCoord;
-
 	statement : PStatement;
 	filename : AnsiString;
 	line : integer;
-
+	M : TMemoryStream;
 	e : TEditor;
 begin
 	e := GetEditor;
 
 	if Assigned(e) then begin
 
-		localfindpoint.Char := 0;
-		localfindpoint.Line := 0;
-
 		// When searching using menu shortcuts, the caret is set to the proper place
 		// When searching using ctrl+click, the cursor is set properly too, so do NOT use WordAtMouse
-		statement:=FindStatement(e.Text.WordAtCursor,e.Text.WordStart,localfind,localfindpoint);
-
-		// If we found it locally (not present in the class browser)
-		if (localfind <> '') and (localfindpoint.Char <> 12345) and (localfindpoint.Line <> 12345) then begin
-			e.Text.CaretXY := localfindpoint;
+		M:=TMemoryStream.Create;
+		try
+			e.Text.UnCollapsedLines.SaveToStream(M);
+			statement := CppParser.FindStatementOf(
+				e.FileName,
+				e.CompletionPhrase(e.Text.CaretXY),e.Text.CaretY,M);
+		finally
+			M.Free;
+		end;
 
 		// Otherwise scan the returned class browser statement
-		end else if Assigned(statement) then begin
+		if Assigned(statement) then begin
 
 			// If the caret position was used
 			if Sender = e then begin // Ctrl+Click from current editor
@@ -6110,7 +5848,6 @@ begin
 	// Fix Alt key painting problems
 	//TVistaAltFix.Create(Self); // causes too much flicker :(
 
-	Caption := DEVCPP + ' ' + DEVCPP_VERSION;
 	DDETopic:=DevCppDDEServer.Name;
 	CheckAssociations; // register file associations and DDE services <-- !!!
 	DragAcceptFiles(Self.Handle, TRUE);
@@ -6274,6 +6011,7 @@ end;
 procedure TMainForm.OnInputEvalReady(const evalvalue : AnsiString);
 begin
 	EvalOutput.Text := evalvalue;
+	EvalOutput.Font.Color := clWindowText;
 	MainForm.fDebugger.OnEvalReady := nil;
 end;
 
@@ -6285,6 +6023,9 @@ begin
 				Key := #0;
 				fDebugger.OnEvalReady := OnInputEvalReady;
 				fDebugger.SendCommand('print',EvaluateInput.Text);
+
+				// Tell the user we're updating...
+				EvalOutput.Font.Color := clGrayText;
 
 				// Add to history
 				if EvaluateInput.Items.IndexOf(EvaluateInput.Text) = -1 then
@@ -6325,6 +6066,8 @@ begin
 			end;
 			inc(i);
 		end;
+
+		UpdateAppTitle;
 
 		// do not show tips if Dev-C++ is launched with a file and only slow
 		// when the form shows for the first time, not when going fullscreen too
@@ -6389,7 +6132,7 @@ var
 		Inc(rect.Left,sizerect.Right-sizerect.Left+1); // 1 extra pixel for extra width caused by bold
 	end;
 begin
-	if (SubItem = 3) then begin
+	if not SameStr(Item.Caption,'') and (SubItem = 3) then begin
 
 		// shut up compiler warning...
 		oldbcolor := 0;

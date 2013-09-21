@@ -1,8 +1,24 @@
+Version 5.3.0.2 - *
+
+- Fixed error line focus dissapearing when moving focus on the same line.
+- The window caption now shows more information, like the debugging/compiling/executing status.
+- Fixed compilation failing when the compilation progress window is hidden.
+- CPU Window now updates faster.
+- One can now properly use Replace in Files to replace files not yet opened.
+- Upgraded the variable finder.
+- Added a find count to the bottom of the find output list.
+- Debug evaluation now hints the user when it contains old potentially invalid data.
+- When trying to debug, Dev-C++ now suggests to compile, instead of showing an error that the source isn't compiled.
+- Project options are now properly applied when not changing tabs in Project Options >> Compiler.
+- New projects now properly use the global compiler set by default.
+- Improved parsing speed somewhat.
+- Improved startup time.
+
 Version 5.3.0.1 - 2 Oktober 2012
 
 - Searching is now done forward instead of backward by default
-- Search history is remembered while Dev-C++ is opened instead of while the find window is opened
-- Fixed a bug in CPU window that causes Dev-C++ to consume an infinite amount of memory
+- Search history is remembered while Dev-C++ is opened instead of while the find window is opened.
+- Fixed a bug in CPU window that causes Dev-C++ to consume an infinite amount of memory.
 - Dev-C++ now checks if there are any compilers installed before attempting to use them, avoiding crashes.
 - One can now view project information like total lines in the File Properties window.
 - Rewritten the code that reads profiling output, drastically reducing flicker.

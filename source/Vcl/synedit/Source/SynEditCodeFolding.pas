@@ -40,8 +40,11 @@ type
 		fFolderBarLinesColor: TColor;
 		fCollapsingMarkStyle: TSynCollapsingMarkStyle;
 		fFoldRegions: TFoldRegions;
+		fEnabled : boolean;
+
+		procedure SetEnabled(value : boolean);
 	public
-		constructor Create;
+		constructor Create(enable : boolean);
 		destructor Destroy; override;
 
 		property CollapsedLineColor: TColor read fCollapsedLineColor write fCollapsedLineColor;
@@ -49,7 +52,8 @@ type
 		property FolderBarLinesColor: TColor read fFolderBarLinesColor write fFolderBarLinesColor;
 		property IndentGuides: Boolean read fIndentGuides write fIndentGuides;
 		property ShowCollapsedLine: Boolean read fShowCollapsedLine write fShowCollapsedLine;
-		property FoldRegions: TFoldRegions read fFoldRegions;
+		property FoldRegions: TFoldRegions read fFoldRegions write fFoldRegions;
+		property Enabled : Boolean read fEnabled write SetEnabled;
 	end;
 
 	TFoldRegionItem = class(TCollectionItem)
@@ -421,18 +425,21 @@ begin
 	StrCopy(fOpen, Value);
 end;
 
-constructor TSynCodeFolding.Create;
+constructor TSynCodeFolding.Create(enable : boolean);
 begin
-	IndentGuides := True;
-	ShowCollapsedLine := True;
-	CollapsedLineColor := clBlack;
-	FolderBarLinesColor := clBlack;
-	CollapsingMarkStyle := msSquare;
+	fIndentGuides := True;
+	fShowCollapsedLine := True;
+	fCollapsedLineColor := clBlack;
+	fFolderBarLinesColor := clBlack;
+	fCollapsingMarkStyle := msSquare;
+	fEnabled := false;
 
-	fFoldRegions := TFoldRegions.Create(TFoldRegionItem); // TODO: Leaky?
-	with fFoldRegions do begin
-		Add(rtChar, False, '{', '}');
-		Add(rtKeyword, False, 'BEGIN', 'END');
+	if fEnabled then begin
+		fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
+		with fFoldRegions do begin
+			Add(rtChar, False, '{', '}');
+			Add(rtKeyword, False, 'BEGIN', 'END');
+		end;
 	end;
 end;
 
@@ -441,5 +448,26 @@ begin
 	fFoldRegions.Free;
 	inherited;
 end;
+
+procedure TSynCodeFolding.SetEnabled(value : boolean);
+begin
+	if value <> fEnabled then begin
+		fEnabled := value;
+
+		// Disabling? Free fold regions
+		if not fEnabled then begin
+			fFoldRegions.Free;
+
+		// Enabling? Other way round
+		end else begin
+			fFoldRegions := TFoldRegions.Create(TFoldRegionItem);
+			with fFoldRegions do begin
+				Add(rtChar, False, '{', '}');
+				Add(rtKeyword, False, 'BEGIN', 'END');
+			end;
+		end;
+	end;
+end;
+
 
 end.

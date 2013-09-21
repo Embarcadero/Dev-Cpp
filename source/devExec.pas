@@ -69,6 +69,9 @@ function devExecutor: TdevExecutor;
 
 implementation
 
+uses
+	main;
+
 { TExecThread }
 
 procedure TExecThread.Execute;
@@ -145,9 +148,9 @@ end;
 
 procedure TdevExecutor.Reset;
 begin
-  if Assigned(fExec) then
-    TerminateProcess(fExec.Process, 0);
-  fIsRunning := False;
+	if Assigned(fExec) then
+		TerminateProcess(fExec.Process, 0);
+	fIsRunning := False;
 end;
 
 procedure TdevExecutor.TerminateEvent(Sender: TObject);

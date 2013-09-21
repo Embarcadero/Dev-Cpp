@@ -427,7 +427,7 @@ begin
 				newnode := DebugTree.Items.AddChildObject(parentnode,wmember^.name + ' = ' + wmember^.value,wmember);
 
 				// This might be a struct too...
-				if EndsStr('{',wmember^.value) then begin
+				if EndsStr('{',wmember^.value) or EndsStr(', ',wmember^.value) or EndsStr(',',wmember^.value) then begin
 					case PeekAnnotation of
 						TFieldBegin:
 							ProcessWatchStruct(newnode);
@@ -440,11 +440,26 @@ begin
 
 				s := GetNextLine;
 
-				if Assigned(wmember) then // update current value
-					wmember^.value := wmember^.value + s;
+				// Only create nodes for arrays of structs/objects
+				if EndsStr('{',s) or EndsStr(', ',s) or EndsStr(',',s) then begin
+					case PeekAnnotation of
+						TFieldBegin: begin
+							wmember := new(PWatchMember);
 
-				if Assigned(newnode) then
-					newnode.Text := wmember^.name + ' = ' + wmember^.value;
+							// Add node to debug tree
+							newnode := DebugTree.Items.AddChildObject(parentnode,'',wmember);
+
+							ProcessWatchStruct(newnode);
+						end;
+						else begin
+							if Assigned(wmember) then // update current value
+								wmember^.value := wmember^.value + s;
+
+							if Assigned(newnode) then
+								newnode.Text := wmember^.name + ' = ' + wmember^.value;
+						end;
+					end;
+				end;
 			end;
 
 			// Add, complete current indent
@@ -488,7 +503,7 @@ begin
 				result := result + s;
 
 				// This might be a struct too...
-				if EndsStr('{',s) then begin
+				if EndsStr('{',s) or EndsStr(', ',s) or EndsStr(',',s) then begin
 					case PeekAnnotation of
 						TArrayBegin:
 							result := result + ProcessEvalStruct(indent+1);
@@ -501,11 +516,23 @@ begin
 			// Add value to current indent
 			TArrayBegin,TArrayEnd,TElt,TEltRep : begin
 				s := GetNextLine;
-				result := result + s;
-				if EndsStr('{',s) then
-					result := result + ProcessEvalStruct(indent+1)
-				else if EndsStr('}',s) then
+				if EndsStr('{',s) or EndsStr(', ',s) or EndsStr(',',s) then begin
+					if PeekAnnotation = TFieldBegin then begin
+
+						result := result + #13#10;
+
+						for i := 0 to (4*indent) - 1 do
+							result := result + ' ';
+
+						result := result + s + #13#10 + ProcessEvalStruct(indent+1);
+					end else begin
+						result := result + s + ProcessEvalStruct(indent+1);
+					end;
+				end else if EndsStr('}',s) then begin
+					result := result + s;
 					break;
+				end else
+					result := result + s;
 			end;
 
 			// Add, complete current indent
@@ -532,7 +559,6 @@ var
 	s,t,u : AnsiString;
 	i,x,y : integer;
 	wparent : PWatchParent;
-	node : TTreeNode;
 	reg : PRegister;
 	trace : PTrace;
 begin
@@ -700,7 +726,7 @@ begin
 					// Get info message
 					s := GetNextLine; // Dump of ... foo()
 
-					// the current function name will be saved at index 0
+					// the full function name will be saved at index 0
 					Disassembly.Add(Copy(s,37,Length(s)-37));
 
 					s := GetNextLine;
@@ -753,15 +779,16 @@ begin
 						wparent := PWatchParent(WatchVarList.Items[I]);
 						if SameStr(wparent^.name,t) then begin
 
+							DebugTree.Items.BeginUpdate;
+
 							wparent^.value := 'Not found in current context';
 							wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
 
 							// Delete now invalid children
-							while wparent^.node.HasChildren do begin
-								node := wparent^.node.GetLastChild;
-								Dispose(PWatchMember(node.Data));
-								node.Delete;
-							end;
+							if wparent^.node.HasChildren then
+								MainForm.fDebugger.DeleteNode(wparent^.node.getFirstChild,false);
+
+							DebugTree.Items.EndUpdate;
 
 							break;
 						end;
@@ -771,8 +798,6 @@ begin
 				end;
 			end;
 			TDisplayBegin : begin
-
-				wparent := nil;
 
 				s := GetNextLine; // watch index
 
@@ -785,28 +810,27 @@ begin
 					wparent := PWatchParent(WatchVarList.Items[I]);
 					if SameStr(wparent^.name,t) then begin
 
+						MainForm.DebugTree.Items.BeginUpdate;
+
 						// Delete now invalid children
-						while wparent^.node.HasChildren do begin
-							node := wparent^.node.GetLastChild;
-							Dispose(PWatchMember(node.Data));
-							node.Delete;
-						end;
+						if wparent^.node.HasChildren then
+							MainForm.fDebugger.DeleteNode(wparent^.node.getFirstChild,false);
+
+						if not FindAnnotation(TDisplayExpression) then Exit;
+
+						u := GetNextLine; // variable value (can be empty)
+						if EndsStr('{',u) then // scan fields recursively
+							ProcessWatchStruct(wparent^.node);
+
+						wparent^.gdbindex := StrToInt(s);
+						wparent^.value := u;
+						wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
+
+						MainForm.DebugTree.Items.EndUpdate;
 
 						break;
 					end;
 				end;
-
-				if not Assigned(wparent) then Exit;
-
-				if not FindAnnotation(TDisplayExpression) then Exit;
-
-				u := GetNextLine; // variable value (can be empty)
-				if u = '{' then // scan fields recursively
-					ProcessWatchStruct(wparent^.node);
-
-				wparent^.gdbindex := StrToInt(s);
-				wparent^.value := u;
-				wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
 			end;
 			TSource : begin // source filename:line:offset:beg/middle/end:addr
 				s := TrimLeft(GetRemainingLine);
@@ -842,7 +866,7 @@ end;
 
 procedure TDebugReader.Execute;
 var
-	tmp : array [0..20000] of char; // should be enough for anything
+	tmp : array [0..8000] of char; // should be enough for almost anything?
 	bytesread : DWORD;
 	containsdisasstart, containsdisasend : boolean;
 begin
@@ -852,7 +876,7 @@ begin
 		FillChar(tmp,bytesread+1,0);
 
 		// ReadFile returns when there's something to read
-		if not ReadFile(hPipeRead, tmp, 20000, bytesread, nil) or (bytesread = 0) then break;
+		if not ReadFile(hPipeRead, tmp, 8000, bytesread, nil) or (bytesread = 0) then break;
 
 		gdbout := gdbout + tmp;
 
@@ -862,7 +886,7 @@ begin
 			containsdisasend := ContainsStr(gdbout,'End of assembler dump.',);
 
 			// Avoid fragmentation...
-			if (containsdisasstart and containsdisasend) or (not containsdisasstart and not containsdisasend) then begin
+			if (containsdisasstart = containsdisasend) then begin // both or neither...
 				Analyze;
 				gdbout := '';
 			end;

@@ -126,7 +126,7 @@ type
 implementation
 
 uses
-	MultiLangSupport, devcfg, Macros, devExec, CompileProgressFrm, StrUtils;
+	MultiLangSupport, devcfg, Macros, devExec, main, CompileProgressFrm, StrUtils;
 
 procedure TCompiler.DoLogEntry(const msg: AnsiString);
 begin
@@ -654,6 +654,7 @@ end;
 procedure TCompiler.RunTerminate(Sender: TObject);
 begin
 	Application.Restore;
+	MainForm.UpdateAppTitle;
 end;
 
 procedure TCompiler.Run;
@@ -677,6 +678,7 @@ begin
 				if devData.MinOnRun then
 					Application.Minimize;
 				devExecutor.ExecuteAndWatch(fProject.Options.HostApplication, fRunParams, ExtractFileDir(fProject.Options.HostApplication), True, INFINITE, RunTerminate);
+				MainForm.UpdateAppTitle;
 			end;
 		end else begin // execute normally
 
@@ -691,6 +693,7 @@ begin
 			if devData.MinOnRun then
 				Application.Minimize;
 			devExecutor.ExecuteAndWatch(FileToRun, Parameters, ExtractFileDir(fProject.Executable), True, INFINITE, RunTerminate);
+			MainForm.UpdateAppTitle;
 		end;
 	end else begin
 		if not FileExists(ChangeFileExt(fSourceFile, EXE_EXT)) then
@@ -708,6 +711,7 @@ begin
 			if devData.MinOnRun then
 				Application.Minimize;
 			devExecutor.ExecuteAndWatch(FileToRun, Parameters, ExtractFilePath(fSourceFile), True, INFINITE, RunTerminate);
+			MainForm.UpdateAppTitle;
 		end;
 	end;
 end;
@@ -800,6 +804,8 @@ begin
 		fDevRun.OnCheckAbort := ThreadCheckAbort;
 		fDevRun.FreeOnTerminate := True;
 		fDevRun.Resume;
+
+		MainForm.UpdateAppTitle;
 	end;
 end;
 
@@ -831,6 +837,8 @@ begin
 
 	fDevRun := nil;
 
+	MainForm.UpdateAppTitle;
+
 	EndProgressForm;
 
 	if (fErrCount = 0) and not fAbortThread then begin
@@ -856,7 +864,8 @@ begin
 	List.Text := Line;
 	for I := 0 to List.Count - 1 do begin
 		ParseSingleLine(List.Strings[I]);
-		ProcessProgressForm(List.Strings[I]);
+		if Assigned(CompileProgressForm) then
+			ProcessProgressForm(List.Strings[I]);
 	end;
 	List.Free;
 end;
@@ -1391,6 +1400,7 @@ procedure TCompiler.InitProgressForm(const Status: AnsiString);
 var
 	numsourcefiles,I : integer;
 begin
+
 	if not devData.ShowProgress then exit;
 	if not Assigned(CompileProgressForm) then
 		CompileProgressForm:=TCompileProgressForm.Create(Application);

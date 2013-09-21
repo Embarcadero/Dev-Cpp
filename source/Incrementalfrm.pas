@@ -56,6 +56,8 @@ type
     procedure IncrementalPasteClick(Sender: TObject);
     procedure IncrementalSelAllClick(Sender: TObject);
     procedure IncrementalUndoClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   public
     Editor : TSynEdit;
     OrgPt : TBufferCoord;
@@ -164,9 +166,20 @@ end;
 
 procedure TfrmIncremental.FormKeyPress(Sender: TObject; var Key: Char);
 begin
-	if Key = #27 then begin // Esc
+	if Key = Chr(VK_ESCAPE) then begin // Esc
 		Key := #0; // Mute beep
 		Close;
+	end;
+end;
+
+procedure TfrmIncremental.FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+begin
+	if Key = VK_DOWN then begin
+		btnNextClick(nil);
+		Key := 0; // Stop processing by input window
+	end else if Key = VK_UP then begin
+		btnPrevClick(nil);
+		Key := 0; // Stop processing by input window
 	end;
 end;
 

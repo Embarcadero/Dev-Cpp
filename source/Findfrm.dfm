@@ -1,6 +1,6 @@
 object frmFind: TfrmFind
-  Left = 473
-  Top = 535
+  Left = 941
+  Top = 554
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Find Text'
@@ -250,6 +250,14 @@ object frmFind: TfrmFind
       Caption = 'Paste'
       ShortCut = 16470
       OnClick = FindPasteClick
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object FindSelAll: TMenuItem
+      Caption = 'Select All'
+      ShortCut = 16449
+      OnClick = FindSelAllClick
     end
   end
 end

@@ -122,7 +122,7 @@ type
     fIncludePaths: TStringList;
     fProjectIncludePaths: TStringList;
     fProjectFiles: TStringList;
-    fFilesToScan: TStrings;
+    fFilesToScan: TStringList;
     fScannedFiles: TStringList;
     fFileIncludes: TStringList;
     fCacheContents: TStringList;
@@ -189,7 +189,7 @@ type
     procedure HandleOtherTypedefs;
     procedure HandleStructs(IsTypedef: boolean = False);
     procedure HandleMethod;
-    function ScanMethodArgs(const ArgStr: AnsiString; AddTemps: boolean;const Filename: AnsiString; Line, ClassID: integer): AnsiString;
+    procedure ScanMethodArgs(const ArgStr: AnsiString; const Filename: AnsiString; Line, ClassID: integer);
     procedure HandleScope;
     procedure HandlePreprocessor;
     procedure HandleKeyword;
@@ -233,7 +233,8 @@ type
     procedure ReProcessInheritance;
     function Locate(const Full: AnsiString; WithScope: boolean): PStatement;
     procedure FillListOf(const Full: AnsiString; List: TStringList;Kind : TStatementKind);
-    function FindAndScanBlockAt(const Filename: AnsiString; Row: integer; Stream: TStream = nil): integer;
+    function FindAndScanBlockAt(const Filename : AnsiString; Row : integer; Stream: TStream): integer;
+    function FindStatementOf(const FileName,Phrase : AnsiString; Row : integer; Stream: TStream): PStatement;
     function GetThisPointerID: integer;
   published
     property Enabled: boolean read fEnabled write fEnabled;
@@ -252,7 +253,7 @@ type
     property ProjectDir: AnsiString read fProjectDir write fProjectDir;
     property OnStartParsing: TNotifyEvent read fOnStartParsing write fOnStartParsing;
     property OnEndParsing: TNotifyEvent read fOnEndParsing write fOnEndParsing;
-    property FilesToScan: TStrings read fFilesToScan;
+    property FilesToScan: TStringList read fFilesToScan;
   end;
 
 implementation
@@ -2060,7 +2061,7 @@ begin
 	// delete statements from file
 	I := 0;
 	while I < fStatementList.Count do
-		if (CompareStr(PStatement(fStatementList[I])^._FileName, FileName) = 0) or (CompareStr(PStatement(fStatementList[I])^._DeclImplFileName, FileName) = 0) then begin
+		if SameText(PStatement(fStatementList[I])^._FileName, FileName) or SameText(PStatement(fStatementList[I])^._DeclImplFileName, FileName) then begin
 			if PStatement(fStatementList[I])^._Kind = skClass then // only classes have inheritance
 				fInvalidatedIDs.Add(I);
 
@@ -2469,7 +2470,7 @@ end;
 
 procedure TCppParser.GetClassesList(var List: TStrings);
 var
-  I: integer;
+	I: integer;
 begin
 	// fills List with a list of all the known classes
 	List.Clear;
@@ -2480,23 +2481,26 @@ end;
 
 function TCppParser.Locate(const Full: AnsiString; WithScope: boolean): PStatement;
 var
-  I: integer;
+	I: integer;
 begin
-  Result := nil;
-  for I := 0 to fStatementList.Count - 1 do begin
-    if WithScope then begin
-      if CompareStr(Full, PStatement(fStatementList[I])^._ScopeCmd) = 0 then begin
-        Result := PStatement(fStatementList[I]);
-        Break;
-      end;
-    end
-    else begin
-      if CompareStr(Full, PStatement(fStatementList[I])^._ScopelessCmd) = 0 then begin
-        Result := PStatement(fStatementList[I]);
-        Break;
-      end;
-    end;
-  end;
+	Result := nil;
+
+	// Evaluate if outside of loop (ONCE, not tens of thousands of times)
+	if WithScope then begin
+		for I := 0 to fStatementList.Count - 1 do begin
+			if SameStr(Full, PStatement(fStatementList[I])^._ScopeCmd) then begin
+				Result := PStatement(fStatementList[I]);
+				Break;
+			end;
+		end;
+	end else begin
+		for I := 0 to fStatementList.Count - 1 do begin
+			if SameStr(Full, PStatement(fStatementList[I])^._ScopelessCmd) then begin
+				Result := PStatement(fStatementList[I]);
+				Break;
+			end;
+		end;
+	end;
 end;
 
 procedure TCppParser.FillListOf(const Full: AnsiString; List: TStringList; Kind : TStatementKind);
@@ -2505,7 +2509,7 @@ var
 begin
 
 	// Tweaked for specific use by CodeToolTip. Also avoids AnsiString compares whenever possible
-	for I := 0 to fStatementList.Count - 1 do begin
+	for I := fStatementList.Count - 1 downto 0 do begin // Prefer user declared names
 		if PStatement(fStatementList[I])^._Kind = Kind then
 
 			// Also add Win32 Ansi/Wide variants...
@@ -2518,7 +2522,7 @@ begin
 end;
 
 function TCppParser.FindAndScanBlockAt(const Filename: AnsiString; Row: integer; Stream: TStream): integer;
-  function GetFuncStartLine(const Index, StartLine: integer): integer;
+  function GetFuncStartLine(Index, StartLine: integer): integer;
   var
     idx: integer;
   begin
@@ -2536,7 +2540,7 @@ function TCppParser.FindAndScanBlockAt(const Filename: AnsiString; Row: integer;
       Inc(idx);
     end;
   end;
-  function GetFuncEndLine(const Index: integer): integer;
+  function GetFuncEndLine(Index: integer): integer;
   var
     iLevel: integer;
     idx: integer;
@@ -2552,68 +2556,85 @@ function TCppParser.FindAndScanBlockAt(const Filename: AnsiString; Row: integer;
     end;
     Result := idx;
   end;
+
+  // partial copy from HandleMethod
+  function GetImplementationMethodArgs(fIndex: integer): AnsiString;
+  begin
+    Result := '';
+    if(fIndex >= 0) then begin
+      while (fIndex < fTokenizer.Tokens.Count) and (not (PToken(fTokenizer.Tokens[fIndex])^.Text[1] in [';', ':', '{', '}', #0])) do begin
+        if (fIndex < fTokenizer.Tokens.Count - 1) and (PToken(fTokenizer.Tokens[fIndex + 1])^.Text[1] = '(') and ((fIndex < fTokenizer.Tokens.Count - 2) and (PToken(fTokenizer.Tokens[fIndex + 2])^.Text[1] <> '(')) then begin
+          result := PToken(fTokenizer.Tokens[fIndex + 1])^.Text;
+          break;
+        end;
+        Inc(fIndex);
+      end;
+    end;
+  end;
+
 var
-  I: integer;
+  I,FuncLine: integer;
   ClosestStatement: integer;
   ClosestLine: integer;
   Done: boolean;
-  loFilename: AnsiString;
-  sExt: AnsiString;
+  sExt,FuncArgs: AnsiString;
 begin
-  // finds the function in the specified filename that contains the line Row,
-  // and parses it...
-  DeleteTemporaries;
-  Result := -1;
-  ClosestLine := -1;
-  ClosestStatement := -1;
-  loFilename := LowerCase(Filename);
-  for I := 0 {fBaseIndex} to fStatementList.Count - 1 do
-    if PStatement(fStatementList[I])^._Kind in [skFunction, skConstructor, skDestructor] then
-      if (CompareText(PStatement(fStatementList[I])^._FileName, loFilename) = 0) then begin
-        if (PStatement(fStatementList[I])^._Line <= Row) and (PStatement(fStatementList[I])^._Line > ClosestLine) then begin
-          ClosestStatement := I;
-          ClosestLine := PStatement(fStatementList[I])^._Line;
-        end;
-      end
-      else if (CompareText(PStatement(fStatementList[I])^._DeclImplFileName, loFilename) = 0) then begin
-        if (PStatement(fStatementList[I])^._DeclImplLine <= Row) and (PStatement(fStatementList[I])^._DeclImplLine > ClosestLine) then begin
-          ClosestStatement := I;
-          ClosestLine := PStatement(fStatementList[I])^._DeclImplLine;
-        end;
-      end;
 
-  if (ClosestStatement <> -1) then begin
-    // found!
-    Result := PStatement(fStatementList[ClosestStatement])^._ParentID;
-    fTokenizer.Reset;
-    if Assigned(Stream) then
-      fTokenizer.Tokenize(Stream)
-    else
-      fTokenizer.Tokenize(Filename);
-    fIndex := 0;
-    fLevel := 0;
-    Done := False;
+	Result := -1;
 
-    // find start of function and start from the opening brace
-    fIndex := GetFuncStartLine(0, ClosestLine);
-    // now find the end of the function and check that the Row is still in scope
-    I := GetFuncEndLine(fIndex + 1);
+	// TODO: fix
+	if FilesToScan.Count > 0 then Exit;
 
-    // if we 're past the end of function, we are not in the scope...
-    if (Row > PToken(fTokenizer.Tokens[I - 1])^.Line) or (Row < PToken(fTokenizer.Tokens[fIndex])^.Line) then begin
-      ClosestLine := PStatement(fStatementList[ClosestStatement])^._DeclImplLine;
-      fIndex := GetFuncStartLine(0, ClosestLine);
-      I := GetFuncEndLine(fIndex + 1);
-      if PToken(fTokenizer.Tokens[I - 1])^.Line < Row then begin
-        Result := -1;
-        Exit;
-      end;
-    end;
+	// finds the function in the specified filename that contains the line Row, nd parses it...
+	DeleteTemporaries;
+	ClosestLine := -1;
+	ClosestStatement := -1;
+
+	for I := fStatementList.Count - 1 downto 0 do // TODO: really scan the whole database? Why not only [baseindex..count]?
+		if PStatement(fStatementList[I])^._Kind in [skFunction, skConstructor, skDestructor] then
+			if SameText(PStatement(fStatementList[I])^._FileName, Filename) then begin
+				if (PStatement(fStatementList[I])^._Line <= Row) and (PStatement(fStatementList[I])^._Line > ClosestLine) then begin
+					ClosestStatement := I;
+					ClosestLine := PStatement(fStatementList[I])^._Line;
+				end;
+			end else if SameText(PStatement(fStatementList[I])^._DeclImplFileName, Filename) then begin
+				if (PStatement(fStatementList[I])^._DeclImplLine <= Row) and (PStatement(fStatementList[I])^._DeclImplLine > ClosestLine) then begin
+					ClosestStatement := I;
+					ClosestLine := PStatement(fStatementList[I])^._DeclImplLine;
+				end;
+			end;
+
+	// found!
+	if (ClosestStatement <> -1) then begin
+		Result := PStatement(fStatementList[ClosestStatement])^._ParentID;
+		fTokenizer.Reset;
+		fTokenizer.Tokenize(Stream);
+
+		fIndex := 0;
+		fLevel := 0;
+		Done := False;
+
+		// find start of function and start from the opening brace
+		fIndex := GetFuncStartLine(0, ClosestLine);
+
+		// now find the end of the function and check that the Row is still in scope
+		I := GetFuncEndLine(fIndex + 1);
+
+		// if we 're past the end of function, we are not in the scope...
+		if (Row > PToken(fTokenizer.Tokens[I - 1])^.Line) or (Row < PToken(fTokenizer.Tokens[fIndex])^.Line) then begin
+			ClosestLine := PStatement(fStatementList[ClosestStatement])^._DeclImplLine;
+			fIndex := GetFuncStartLine(0, ClosestLine);
+			I := GetFuncEndLine(fIndex + 1);
+			if PToken(fTokenizer.Tokens[I - 1])^.Line < Row then begin
+				Result := -1;
+				Exit;
+			end;
+		end;
 
     fLaterScanning := True;
-    fCurrentFile := loFileName;
+    fCurrentFile := Filename;
     fLastID := -1;
-    sExt := ExtractFileExt(loFileName);
+    sExt := ExtractFileExt(Filename);
     fIsHeader := (sExt = '.h') or (sExt = '.hpp') or (sExt = '.hh');
     fCurrentClass := TIntList.Create;
     fCurrentClassLevel := TIntList.Create;
@@ -2635,12 +2656,20 @@ begin
           scsPrivate,
           False,
           True);
-      // add the function's args
-      ScanMethodArgs(PStatement(fStatementList[ClosestStatement])^._Args,
-        True,
+
+      // Try to use arglist which include names (implementation, not declaration)
+      FuncArgs := GetImplementationMethodArgs(fIndex-2);
+      FuncLine := PStatement(fStatementList[ClosestStatement])^._DeclImplLine;
+      if FuncArgs = '' then begin
+        FuncArgs := PStatement(fStatementList[ClosestStatement])^._Args;
+        FuncLine := PStatement(fStatementList[ClosestStatement])^._Line;
+      end;
+
+      ScanMethodArgs(FuncArgs,
         Filename,
-        PStatement(fStatementList[ClosestStatement])^._Line,
+        FuncLine,
         PStatement(fStatementList[ClosestStatement])^._ParentID);
+
       repeat
         if PToken(fTokenizer.Tokens[fIndex])^.Text[1] = '{' then begin
           Inc(fLevel, 2);
@@ -2683,6 +2712,123 @@ begin
   fLaterScanning := False;
 end;
 
+function TCppParser.FindStatementOf(const FileName,Phrase : AnsiString; Row : integer; Stream: TStream): PStatement;
+var
+	curclass, i,m,n,o : integer;
+	parentword,memberword,parenttype : AnsiString;
+begin
+	Result := nil;
+
+	// TODO: fix
+	if FilesToScan.Count > 0 then Exit;
+
+	// Couldn't find anything useful? Assume class variable
+	curclass := FindAndScanBlockAt(FileName, Row, Stream); // also invokes parser for us
+
+	// Is this word attached using ->, :: or .?, then assume it belongs to that class, also assume this happens on the same line...
+	// Try to find the word before :: or -> or .
+	m := Pos('->',Phrase);
+	n := Pos('::',Phrase);
+	o := Pos('.',Phrase);
+	if (m>0) or (n>0) then begin
+		parentword := Copy(Phrase,1,m-1); // m equals n
+		memberword := Copy(Phrase,m + 2,Length(Phrase) - m);
+	end else if (o>0) then begin
+		parentword := Copy(Phrase,1,o-1); // m equals o
+		memberword := Copy(Phrase,o + 1,Length(Phrase) - o);
+	end else begin
+		parentword := '';
+		memberword := Phrase;
+	end;
+
+	if not SameStr('',parentword) then begin
+
+		parenttype := '';
+
+		// Try to find where the instance before the operator is defined...
+		for I := fStatementList.Count - 1 downto 0 do begin
+			if PStatement(fStatementList[I])^._Kind in [skVariable] then begin
+				if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,parentword) then begin
+					parenttype := PStatement(fStatementList[I])^._Type;
+					break;
+				end;
+			end;
+		end;
+
+		// Find the base class...
+		if not SameStr('',parenttype) then begin
+
+			// Strip * and & from name
+			i := Length(parenttype);
+			while(i> 0) and (parenttype[i] in ['*','&']) do
+				Dec(i);
+
+			if i <> Length(parenttype) then
+				Delete(parenttype,i+1,Length(parenttype)-1);
+
+			// Try to find the type of the instance before the operator
+			for I := fStatementList.Count - 1 downto 0 do begin
+				if PStatement(fStatementList[I])^._Kind in [skClass] then begin
+					if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,parenttype) then begin
+						curclass := I;
+						break;
+					end;
+				end;
+			end;
+		end;
+
+		// Now, assume the variable belongs to the class before that operator
+		if curclass <> -1 then begin
+
+			// Start scanning backwards, because owner data is found there
+			for I := fStatementList.Count - 1 downto 0 do begin
+				if PStatement(fStatementList[I])^._ParentID = curclass then begin
+					if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,memberword) then begin
+						result := PStatement(fStatementList[I]);
+						Exit;
+					end;
+				end;
+			end;
+		end;
+
+		// Don't bother checking globals or anything?
+		Exit;
+	end;
+
+	// First, assume the current word is a local variable, either visible in body or argument list
+	for I := Statements.Count - 1 downto 0 do begin
+		if PStatement(fStatementList[I])^._Scope in [ssLocal,ssClassLocal] then begin
+			if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,memberword) then begin
+				result := PStatement(fStatementList[I]);
+				Exit;
+			end;
+		end else
+			break; // don't scan locals in header files?
+	end;
+
+	// Then, assume the variable belongs to the current scope/class
+	if curclass <> -1 then begin
+
+		// Start scanning backwards, because owner data is found there
+		for I := fStatementList.Count - 1 downto 0 do begin
+			if PStatement(fStatementList[I])^._ParentID = curclass then begin
+				if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,memberword) then begin
+					result := PStatement(fStatementList[I]);
+					Exit;
+				end;
+			end;
+		end;
+	end;
+
+	// What remains are globals. Just do a raw scan...
+	for I := 0 to fStatementList.Count - 1 do begin
+		if SameStr(PStatement(fStatementList[I])^._ScopelessCmd,memberword) then begin
+			result := PStatement(fStatementList[I]);
+			Exit;
+		end;
+	end;
+end;
+
 procedure TCppParser.DeleteTemporaries;
 var
   I: integer;
@@ -2699,135 +2845,71 @@ begin
   fThisPointerID := -1;
 end;
 
-function TCppParser.ScanMethodArgs(const ArgStr: AnsiString; AddTemps: boolean;const Filename: AnsiString; Line, ClassID: integer): AnsiString;
-  function GetWordAt(Str: AnsiString; var Index: integer; JustPeek: boolean): AnsiString;
-  var
-    IdxBkp: integer;
-  begin
-    Result := '';
-    IdxBkp := Index;
-    if Str = '' then
-      Exit;
-    if Length(Str) < Index then
-      Exit;
-
-    // first skip leading spaces
-    while (Index <= Length(Str)) and (Str[Index] in [' ', #9, #10, #13]) do
-      Inc(Index);
-
-    // now get the word at Index
-    if (Index <= Length(Str)) and (Str[Index] in ['&', '*']) then begin
-      while (Index <= Length(Str)) and (Str[Index] in ['&', '*']) do begin
-        Result := Result + Str[Index];
-        Inc(Index);
-      end;
-    end
-    else begin
-      while (Index <= Length(Str)) and not (Str[Index] in [' ', #9, #10, #13]) do begin
-        Result := Result + Str[Index];
-        Inc(Index);
-      end;
-    end;
-    if JustPeek then
-      Index := IdxBkp;
-  end;
-
-  function IsKnown(Str: AnsiString): boolean;
-  begin
-    // standard C types
-    Result :=
-      SameStr(Str, '*') or
-      SameStr(Str, '&') or
-      SameStr(Str, 'int') or
-      SameStr(Str, 'bool') or
-      SameStr(Str, 'char') or
-      SameStr(Str, 'uint') or
-      SameStr(Str, 'uint8') or
-      SameStr(Str, 'uint16') or
-      SameStr(Str, 'uint32') or
-      SameStr(Str, '...') or
-      SameStr(Str, 'const') or
-      SameStr(Str, 'static');
-  end;
-
-  procedure AddSt(_Type, _Ident: AnsiString);
-  begin
-    AddStatement(-1,
-      ClassID,
-      Filename,
-      _Type + ' ' + _Ident,
-      _Type,
-      _Ident,
-      '',
-      Line,
-      skVariable,
-      ssClassLocal,
-      scsPrivate,
-      False,
-      True);
-  end;
+procedure TCppParser.ScanMethodArgs(const ArgStr: AnsiString; const Filename: AnsiString; Line, ClassID: integer);
 var
-  idx: integer;
-  tmpStr: AnsiString;
-  S: AnsiString;
-  LastType: AnsiString;
-begin
-  // ArgStr contains the method args enclosed in parenthesis.
-  // What we 'll do here is remove the vars from the args.
-  // e.g. (char * tmp, int x) will be (char *, int)
-  // what's important and will help us here is this rule:
-  // because we don't know the type of the var and it may consist
-  // of one, two or more words, we 'll strip out the last word
-  // before a ',' or ')'. The identifier is only one word ;)
-  // The tough part is that we don't know if this is a declaration
-  // or an implementation, so we might encounter a function call
-  // inside the ArgStr. But this will be taken care of in GetWordAt.
-  Result := ArgStr;
-  if (ArgStr = '') or (ArgStr[1] <> '(') or (ArgStr[Length(ArgStr)] <> ')') then
-    Exit;
+	spacepos,idx,len,start : integer;
+	S,T : AnsiString;
 
-  Result := '';
-  LastType := '';
-  tmpStr := Copy(ArgStr, 2, Length(ArgStr) - 1); // remove '('
-  idx := 1;
-  S := '';
-  repeat
-    S := GetWordAt(tmpStr, idx, False);
-    if S <> '' then begin
-      // check if we got a ','
-      if S[Length(S)] in [',', ')'] then begin
-        if Length(S) > 1 then begin
-          if IsKnown(Copy(S, 1, Length(S) - 1)) then
-            Result := Result + S + ' '
-          else begin
-            Result := Trim(Result) + S[Length(S)] + ' '; // identifier
-            if AddTemps then
-              AddSt(Trim(LastType), Copy(S, 1, Length(S) - 1));
-          end;
-        end
-        else
-          Result := Trim(Result) + S + ' ';
-        LastType := '';
-      end
-      else if (GetWordAt(tmpStr, idx, True) = ',') or
-        (GetWordAt(tmpStr, idx, True) = ')') or
-        (GetWordAt(tmpStr, idx, True) = '') then begin // this peeks at the following word
-        // this is the last word before the comma
-        // we must check that it is not a known type
-        // (don't forget: the declaration might *not* have identifiers in it)
-        if IsKnown(S) then
-          Result := Result + S + ' '
-        else if AddTemps then // identifier
-          AddSt(Trim(LastType), S);
-        LastType := '';
-      end
-      else begin
-        Result := Result + S + ' ';
-        LastType := LastType + S + ' ';
-      end;
-    end;
-  until S = '';
-  Result := '(' + Trim(Result);
+	function GetNextWordOrToken : AnsiString;
+	begin
+
+		// Keep adding until we find some delimiter...
+		start := idx;
+		while(idx <= len) and not (ArgStr[idx] in [#9, #10, #13, #32, '(', ')', ',']) do begin
+			Inc(idx);
+		end;
+
+		if (idx = start) then begin
+			Result := Copy(ArgStr,start,idx - start + 1); // delimiter only
+
+			// Skip over delimiter
+			Inc(idx);
+		end else
+			Result := Copy(ArgStr,start,idx - start); // strip delimiter
+	end;
+begin
+	if (ArgStr = '') or (ArgStr[1] <> '(') or (ArgStr[Length(ArgStr)] <> ')') then
+		Exit;
+
+	T := '';
+	idx := 2; // skip (
+	len := Length(ArgStr);
+
+	while(idx <= len) do begin
+		S := GetNextWordOrToken;
+		if (Length(S) > 0) then begin
+
+			// Not yet done creating info strings?
+			if not (S[1] in ['(', ')', ',']) then begin
+				T := T + S; // T stores complete variable string, like 'char a'
+
+			// We found a variable 'ending' char, add to DB
+			end else begin
+
+				spacepos := LastDelimiter(#9#10#13#32 + '&*',T);
+
+				if not(spacepos = len) then begin // don't add vars without name
+
+					// Name should be last word of T
+					AddStatement(-1,
+						ClassID,
+						Filename,
+						T, // 'int* a'
+						Copy(T,1,spacepos-1), // 'int*'
+						Copy(T,spacepos + 1,len - spacepos),// a
+						'',
+						Line,
+						skVariable,
+						ssClassLocal,
+						scsPrivate,
+						False,
+						True);
+				end;
+
+				T := '';
+			end;
+		end;
+	end;
 end;
 
 function TCppParser.FindIncludeRec(const Filename: AnsiString; DeleteIt: boolean): PIncludesRec;
@@ -2836,7 +2918,7 @@ var
 begin
 	Result := nil;
 	for I := 0 to fIncludesList.Count - 1 do
-		if PIncludesRec(fIncludesList[I])^.BaseFile = Filename then begin
+		if SameText(PIncludesRec(fIncludesList[I])^.BaseFile,Filename) then begin
 			Result := PIncludesRec(fIncludesList[I]);
 			if DeleteIt then
 				fIncludesList.Delete(I);
@@ -2845,6 +2927,7 @@ begin
 end;
 
 function TCppParser.GetFileIncludes(const Filename: AnsiString): AnsiString;
+
 	procedure RecursiveFind(const Fname: AnsiString);
 	var
 		I: integer;
@@ -2881,16 +2964,17 @@ begin
 
 	// Set TStringList properties
 	fFileIncludes.Clear;
+	fFileIncludes.CaseSensitive := false;
 	fFileIncludes.Sorted := True;
 	fFileIncludes.Duplicates := dupIgnore;
 
-	RecursiveFind(LowerCase(Filename));
+	RecursiveFind(Filename);
 	Result := fFileIncludes.CommaText;
 end;
 
 function TCppParser.GetThisPointerID: integer;
 begin
-  Result := fThisPointerID;
+	Result := fThisPointerID;
 end;
 
 end.

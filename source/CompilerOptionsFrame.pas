@@ -75,6 +75,8 @@ var
 	option : TCompilerOption;
 begin
 	vle.OnSetEditText := nil;
+
+	vle.Strings.BeginUpdate;
 	vle.Strings.Clear;
 
 	currenttab := tabs.Tabs[tabs.TabIndex];
@@ -100,7 +102,10 @@ begin
 		end;
 	end;
 	vle.ColWidths[0] := vle.ClientWidth - 90;
+
 	vle.OnSetEditText := vleSetEditText;
+
+	vle.Strings.EndUpdate;
 end;
 
 procedure TCompOptionsFrame.vleSetEditText(Sender: TObject; ACol,ARow: Integer; const Value: String);

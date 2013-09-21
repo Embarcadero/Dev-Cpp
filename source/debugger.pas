@@ -86,6 +86,9 @@ type
     procedure RemoveWatchVar(nodein : TTreeNode); overload;
 
     procedure RefreshWatchVars;
+    procedure DeleteWatchVars(deleteparent : boolean);
+
+    procedure DeleteNode(node : TTreeNode;isparentdata : boolean);
   end;
 
 implementation
@@ -103,24 +106,10 @@ end;
 destructor TDebugger.Destroy;
 var
 	I : integer;
-	wparent : PWatchParent;
-	node : TTreeNode;
 begin
 	Stop(nil);
 
-	// Remove watch vars (list is contained in UI component)
-	for i := 0 to WatchVarList.Count - 1 do begin
-
-		wparent := PWatchParent(WatchVarList.Items[I]);
-
-		// Delete children
-		while wparent^.node.HasChildren do begin
-			node := wparent^.node.GetLastChild;
-			Dispose(PWatchMember(node.Data));
-			node.Delete;
-		end;
-		Dispose(PWatchParent(WatchVarList.Items[I]));
-	end;
+	DeleteWatchVars(true);
 	WatchVarList.Free;
 
 	// Remove the breakpoints
@@ -204,6 +193,8 @@ begin
 	Reader.WatchVarList := WatchVarList;
 	Reader.DebugTree := DebugTree;
 	Reader.Resume;
+
+	MainForm.UpdateAppTitle;
 end;
 
 procedure TDebugger.Stop(Sender : TObject);
@@ -233,6 +224,8 @@ begin
 		//	DisplayError('CloseHandle - input write');
 
 		MainForm.RemoveActiveBreakpoints;
+
+		MainForm.UpdateAppTitle;
 	end;
 end;
 
@@ -376,12 +369,11 @@ begin
 			if Executing and (PWatchParent(WatchVarList.Items[i])^.gdbindex <> -1) then
 				RemoveWatchVar(i);
 
-			// Remove from list
-			Dispose(PWatchParent(WatchVarList.Items[i]));
-			WatchVarList.Delete(i);
-
 			// Remove from UI
-			DebugTree.Items.Delete(nodein);
+			DeleteNode(nodein,true);
+
+			// Remove from list
+			WatchVarList.Delete(i);
 
 			break;
 		end;
@@ -396,6 +388,59 @@ begin
 	for i := 0 to WatchVarList.Count - 1 do
 		if SameStr(PWatchParent(WatchVarList.Items[i])^.value,'Not found in current context') then
 			AddWatchVar(i);
+end;
+
+procedure TDebugger.DeleteWatchVars(deleteparent : boolean);
+var
+	I : integer;
+	wparent : PWatchParent;
+begin
+	DebugTree.Items.BeginUpdate;
+	for I := WatchVarList.Count - 1 downto 0 do begin
+		wparent := PWatchParent(WatchVarList.Items[I]);
+
+		if deleteparent then begin
+
+			// Remove from UI
+			DeleteNode(wparent^.node,true);
+
+			// Remove from list
+			WatchVarList.Delete(i);
+		end else begin
+
+			// Leave parent node intact...
+			if wparent^.node.HasChildren then
+				DeleteNode(wparent^.node.getFirstChild,false);
+
+			wparent^.gdbindex := -1;
+			wparent^.value := 'Execute to evaluate';
+			wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
+		end;
+	end;
+	DebugTree.Items.EndUpdate;
+end;
+
+procedure TDebugger.DeleteNode(node : TTreeNode;isparentdata : boolean);
+var
+	sibling,nextsib : TTreeNode;
+begin
+	// Manually walk through the tree to remove data pointers...
+	sibling := node;
+	while Assigned(sibling) do begin
+		if sibling.HasChildren then
+			DeleteNode(sibling.getFirstChild,false);
+
+		// We've reached a node without children finally...
+		if isparentdata then
+			Dispose(PWatchParent(sibling.Data))
+		else
+			Dispose(PWatchMember(sibling.Data));
+
+		// Store next one and prevent deletion of next info
+		nextsib := sibling.getNextSibling;
+		sibling.Delete;
+		sibling := nextsib;
+	end;
 end;
 
 end.

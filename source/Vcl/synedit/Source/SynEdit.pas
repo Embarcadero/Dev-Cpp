@@ -302,6 +302,7 @@ type
     fUncollapsedLines:       TSynEditStringList;
     fUncollapsedLinesLength: Integer;
     fEditingFolds:           boolean;
+    fUseCodeFolding:         boolean;
     //### End Code Folding ###
 
     fAlwaysShowCaret: Boolean;
@@ -434,7 +435,7 @@ type
 	function GetLineIndent(const Line : AnsiString): Integer;
 	procedure MoveRangesBy(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
 	procedure MoveCollapsedRangesFromBy(CurrentLine, LineCount: Integer);
-
+	procedure SetUseCodeFolding(value : boolean);
 	//### End Code Folding ###
 
     procedure BookMarkOptionsChanged(Sender: TObject);
@@ -869,6 +870,9 @@ type
       read FScrollBars write SetScrollBars default ssBoth;
     property SelectedColor: TSynSelectedColor
       read FSelectedColor write FSelectedColor;
+    //### Code Folding
+    property UseCodeFolding : boolean read fUseCodeFolding write SetUseCodeFolding;
+    //### End Code Folding
     property SelectionMode: TSynSelectionMode
       read FSelectionMode write SetSelectionMode default smNormal;
     property ActiveSelectionMode: TSynSelectionMode read fActiveSelectionMode
@@ -973,6 +977,7 @@ type
     property InsertCaret;
     property InsertMode;
     property Keystrokes;
+    property UseCodeFolding;
     property Lines;
     property MaxScrollWidth;
     property MaxUndo;
@@ -1425,7 +1430,7 @@ begin
 	//### Code Folding ###
 	fAllFoldRanges := TSynEditFoldRanges.Create;
 	fAllFoldRanges.OwnsObjects := true;
-	fCodeFolding := TSynCodeFolding.Create;
+	fCodeFolding := TSynCodeFolding.Create(fUseCodeFolding);
 	fUncollapsedLines := TSynEditStringList.Create;
 	//### End Code Folding ###
 end;
@@ -2356,16 +2361,28 @@ var
 	mark  : TSynEditMark;
 	//### Code Folding ###
 	FoldRange: TSynEditFoldRange;
+	rect : TRect;
 	//### End Code Folding ###
 begin
 	//### Code Folding ###
-	FoldRange := FoldStartAtLine(RowToLine(PixelsToRowColumn(X, Y).Row));
-	if Assigned(FoldRange) then begin
-		if FoldRange.Collapsed then
-			Uncollapse(FoldRange)
-		else
-			Collapse(FoldRange);
-		Exit;
+	if CodeFolding.Enabled then begin
+		FoldRange := FoldStartAtLine(RowToLine(PixelsToRowColumn(X, Y).Row));
+		if Assigned(FoldRange) then begin
+
+			// See if we actually clicked on the rectangle...
+			rect.Left := Gutter.RealGutterWidth(CharWidth) - Gutter.RightOffset;
+			rect.Right := rect.Left + Gutter.RightOffset - 4;
+			rect.Top := (DisplayToBufferPos(PixelsToRowColumn(X,Y)).Line - fTopLine) * LineHeight;
+			rect.Bottom := rect.Top + LineHeight;
+
+			if PtInRect(rect,Point(X,Y)) then begin
+				if FoldRange.Collapsed then
+					Uncollapse(FoldRange)
+				else
+					Collapse(FoldRange);
+				Exit;
+			end;
+		end;
 	end;
 	//### End Code Folding ###
 
@@ -2593,7 +2610,10 @@ begin
 				rcLine.Bottom := rcLine.Top + fTextHeight;
 
 				//### Code Folding ###
-				s := fGutter.FormatLineNumber(GetRealLineNumber(cLine));
+				if CodeFolding.Enabled then
+					s := fGutter.FormatLineNumber(GetRealLineNumber(cLine))
+				else
+					s := fGutter.FormatLineNumber(cLine);
 				//### End Code Folding ###
 
 				if Assigned(OnGutterGetText) then
@@ -2662,61 +2682,63 @@ begin
 {$ENDIF}
 
 	//### Code Folding ###
-	for cLine := vFirstLine to vLastLine do begin
+	if CodeFolding.Enabled then begin
+		for cLine := vFirstLine to vLastLine do begin
 
-		rect.Left := Gutter.RealGutterWidth(CharWidth) - Gutter.RightOffset;
-		rect.Right := rect.Left + Gutter.RightOffset - 4;
-		rect.Top := (cLine - fTopLine) * LineHeight;
-		rect.Bottom := rect.Top + LineHeight;
+			rect.Left := Gutter.RealGutterWidth(CharWidth) - Gutter.RightOffset;
+			rect.Right := rect.Left + Gutter.RightOffset - 4;
+			rect.Top := (cLine - fTopLine) * LineHeight;
+			rect.Bottom := rect.Top + LineHeight;
 
-		Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
+			Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
 
-		// Need to paint a line?
-		if Assigned(FoldAroundLine(cLine)) then begin
-			x := rect.Left + ((rect.Right - rect.Left) div 2);
-			Canvas.MoveTo(x, rect.Top);
-			Canvas.LineTo(x, rect.Bottom);
-		end;
-
-		// Need to paint a line end?
-		if Assigned(FoldEndAtLine(cLine)) then begin
-			x := rect.Left + ((rect.Right - rect.Left) div 2);
-			Canvas.MoveTo(x, rect.Top);
-			Canvas.LineTo(x, rect.Top + ((rect.Bottom - rect.Top) div 2));
-			Canvas.LineTo(rect.Right - 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
-		end;
-
-		FoldRange := FoldStartAtLine(cLine);
-
-		// Any fold range begins on this line?
-		if Assigned(FoldRange) then begin
-
-			// make a square rect
-			InflateRect(rect, -3, -0);
-			H := (rect.Right - rect.Left);
-			rect.Top := rect.Top + ((LineHeight - H) div 2);
-			rect.Bottom := rect.Top + H;
-
-			if CodeFolding.CollapsingMarkStyle = msSquare then begin
-				Canvas.Brush.Color := clWindow;
-				Canvas.FillRect(rect);
-				Canvas.Brush.Color := CodeFolding.FolderBarLinesColor;
-				Canvas.FrameRect(rect);
-			end else if CodeFolding.CollapsingMarkStyle = msEllipse then begin
-				Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
-				Canvas.Brush.Color := clWindow;
-				Canvas.Ellipse(rect);
+			// Need to paint a line?
+			if Assigned(FoldAroundLine(cLine)) then begin
+				x := rect.Left + ((rect.Right - rect.Left) div 2);
+				Canvas.MoveTo(x, rect.Top);
+				Canvas.LineTo(x, rect.Bottom);
 			end;
 
-			// Paint minus sign
-			Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
-			Canvas.MoveTo(rect.Left + 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
-			Canvas.LineTo(rect.Right - 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
+			// Need to paint a line end?
+			if Assigned(FoldEndAtLine(cLine)) then begin
+				x := rect.Left + ((rect.Right - rect.Left) div 2);
+				Canvas.MoveTo(x, rect.Top);
+				Canvas.LineTo(x, rect.Top + ((rect.Bottom - rect.Top) div 2));
+				Canvas.LineTo(rect.Right - 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
+			end;
 
-			if FoldRange.Collapsed then begin
-				// Paint vertical line of plus sign
-				Canvas.MoveTo(rect.Left + ((rect.Right - rect.Left) div 2), rect.Top + 2);
-				Canvas.LineTo(rect.Left + ((rect.Right - rect.Left) div 2), rect.Bottom - 2);
+			FoldRange := FoldStartAtLine(cLine);
+
+			// Any fold range begins on this line?
+			if Assigned(FoldRange) then begin
+
+				// make a square rect
+				InflateRect(rect, -3, -0);
+				H := (rect.Right - rect.Left);
+				rect.Top := rect.Top + ((LineHeight - H) div 2);
+				rect.Bottom := rect.Top + H;
+
+				if CodeFolding.CollapsingMarkStyle = msSquare then begin
+					Canvas.Brush.Color := clWindow;
+					Canvas.FillRect(rect);
+					Canvas.Brush.Color := CodeFolding.FolderBarLinesColor;
+					Canvas.FrameRect(rect);
+				end else if CodeFolding.CollapsingMarkStyle = msEllipse then begin
+					Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
+					Canvas.Brush.Color := clWindow;
+					Canvas.Ellipse(rect);
+				end;
+
+				// Paint minus sign
+				Canvas.Pen.Color := CodeFolding.FolderBarLinesColor;
+				Canvas.MoveTo(rect.Left + 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
+				Canvas.LineTo(rect.Right - 2, rect.Top + ((rect.Bottom - rect.Top) div 2));
+
+				if FoldRange.Collapsed then begin
+					// Paint vertical line of plus sign
+					Canvas.MoveTo(rect.Left + ((rect.Right - rect.Left) div 2), rect.Top + 2);
+					Canvas.LineTo(rect.Left + ((rect.Right - rect.Left) div 2), rect.Bottom - 2);
+				end;
 			end;
 		end;
 	end;
@@ -3283,7 +3305,10 @@ var
     for nLine := vFirstLine to vLastLine do
     begin
       //### Code Folding ###
-      FoldRange := FoldStartAtLine(nLine);
+      if CodeFolding.Enabled then
+        FoldRange := FoldStartAtLine(nLine)
+      else
+        FoldRange := nil;
       //### End Code Folding ###
 
       // Get the expanded line.
@@ -3493,44 +3518,46 @@ var
 
 		//### Code Folding ###
 		// Indent guides painting
-		if CodeFolding.IndentGuides then begin
+		if CodeFolding.Enabled then begin
+			if CodeFolding.IndentGuides then begin
 
-			OldColor := Canvas.Pen.Color;
-			Canvas.Pen.Color := clGray;
+				OldColor := Canvas.Pen.Color;
+				Canvas.Pen.Color := clGray;
 
-			for i := 0 to fAllFoldRanges.Count - 1 do begin
-				with fAllFoldRanges[i] do begin
-					if FromLine < RowToLine(cRow) then begin
-						if (ToLine > RowToLine(cRow)) and not Collapsed and not ParentCollapsed and (Indent > 0) then begin
+				for i := 0 to fAllFoldRanges.Count - 1 do begin
+					with fAllFoldRanges[i] do begin
+						if FromLine < RowToLine(cRow) then begin
+							if (ToLine > RowToLine(cRow)) and not Collapsed and not ParentCollapsed and (Indent > 0) then begin
 
-							X := Indent * CharWidth + fTextOffset - 2;
-							Y := rcLine.Top;
-							if (LineHeight mod 2 = 1) and (nLine mod 2 = 1) then
-								Inc(Y);
+								X := Indent * CharWidth + fTextOffset - 2;
+								Y := rcLine.Top;
+								if (LineHeight mod 2 = 1) and (nLine mod 2 = 1) then
+									Inc(Y);
 
-							while Y < rcLine.Bottom do begin
-								Canvas.MoveTo(X, Y);
-								Inc(Y);
-								Canvas.LineTo(X, Y);
-								Inc(Y);
+								while Y < rcLine.Bottom do begin
+									Canvas.MoveTo(X, Y);
+									Inc(Y);
+									Canvas.LineTo(X, Y);
+									Inc(Y);
+								end;
 							end;
-						end;
-					end else
-						break; // no point checking folds below this point
+						end else
+							break; // no point checking folds below this point
+					end;
 				end;
+
+				Canvas.Pen.Color := OldColor;
+
 			end;
 
-			Canvas.Pen.Color := OldColor;
-
-		end;
-
-		// Collapsed line painting
-		if (CodeFolding.ShowCollapsedLine) and (FoldRange <> nil) and (FoldRange.Collapsed) and (not FoldRange.ParentCollapsed) then begin
-			OldColor := Canvas.Pen.Color;
-			Canvas.Pen.Color := CodeFolding.CollapsedLineColor;
-			Canvas.MoveTo(rcLine.Left, rcLine.Bottom - 1);
-			Canvas.LineTo(Width, rcLine.Bottom - 1);
-			Canvas.Pen.Color := OldColor;
+			// Collapsed line painting
+			if (CodeFolding.ShowCollapsedLine) and (FoldRange <> nil) and (FoldRange.Collapsed) and (not FoldRange.ParentCollapsed) then begin
+				OldColor := Canvas.Pen.Color;
+				Canvas.Pen.Color := CodeFolding.CollapsedLineColor;
+				Canvas.MoveTo(rcLine.Left, rcLine.Bottom - 1);
+				Canvas.LineTo(Width, rcLine.Bottom - 1);
+				Canvas.Pen.Color := OldColor;
+			end;
 		end;
 		//### End Code Folding ###
 
@@ -4805,7 +4832,7 @@ begin
 
         //if Visible then SendMessage(Handle, WM_SETREDRAW, 1, 0);
         //if fPaintLock=0 then
-        //   Invalidate; // do NOT redraw the whole window!
+        //   Paint; // do NOT redraw the whole window!
       end
       else
         ShowScrollBar( Handle, SB_VERT, False );
@@ -10702,12 +10729,12 @@ end;
 
 procedure TCustomSynEdit.ReScan;
 begin
-	if Assigned(fHighlighter) then
+	if CodeFolding.Enabled then
 		ReScanForFoldRanges;
 
 	GetUnCollapsedLines;
 
-	if Assigned(fHighlighter) then
+	if CodeFolding.Enabled then
 		InvalidateGutter;
 end;
 
@@ -10794,10 +10821,13 @@ var
 begin
 
 	// Copy the collapsed text
-	fUncollapsedLines.Assign(fLines);
+	fUncollapsedLines.Assign(fLines); // TODO: use pointer when folding is disabled?
 
 	// Scan for uncollapsable stuff only when we edit code files
-	if Assigned(fHighlighter) then begin
+	if CodeFolding.Enabled then begin
+
+		// Copy the collapsed text
+		fUncollapsedLines.Assign(fLines);
 
 		// Check if there are any collapsed folds...
 		hascollapsedfold := false;
@@ -10974,6 +11004,13 @@ begin
 
 	// Recursively scan for folds
 	FindSubFoldRange(Ptr,nil);
+end;
+
+procedure TCustomSynEdit.SetUseCodeFolding(value : boolean);
+begin
+	if value <> fCodeFolding.Enabled then begin
+		fCodeFolding.Enabled := value;// and Assigned(fHighlighter);
+	end;
 end;
 
 function TCustomSynEdit.FoldStartAtLine(Line: Integer): TSynEditFoldRange;

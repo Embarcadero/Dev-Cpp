@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 676
-  Top = 339
+  Left = 345
+  Top = 277
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -31,7 +31,6 @@ object MainForm: TMainForm
     Left = 193
     Top = 70
     Height = 340
-    AutoSnap = False
     MinSize = 45
     ResizeStyle = rsUpdate
   end
@@ -42,8 +41,7 @@ object MainForm: TMainForm
     Height = 3
     Cursor = crVSplit
     Align = alBottom
-    Color = clBtnFace
-    ParentColor = False
+    ResizeStyle = rsUpdate
     OnMoved = SplitterBottomMoved
   end
   object MessageControl: TPageControl
@@ -231,7 +229,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 350
-          Height = 112
+          Height = 111
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -413,11 +411,11 @@ object MainForm: TMainForm
           Left = 4
           Top = 127
           Width = 460
-          Height = 17
+          Height = 16
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
-          ScrollBars = ssVertical
+          ScrollBars = ssBoth
           TabOrder = 8
         end
         object SkipFuncBtn: TButton

@@ -525,14 +525,14 @@ begin
 		cbUseCustomMakefileClick(nil);
 		lbMakeIncludes.Items.AddStrings(MakeIncludes);
 
+		// temporarily apply project settings
+		devCompiler.fOptionString := fProjectCopy.Options.CompilerOptions;
+		devCompiler.OptionStringToList(devCompiler.fOptionString);
+
 		// Compiler tab
 		cmbCompiler.Items.Assign(devCompiler.Sets);
 		cmbCompiler.ItemIndex:=CompilerSet;
 		CompOptionsFrame1.FillOptions(fProjectCopy);
-
-		// temporarily apply project settings
-		devCompiler.fOptionString := fProjectCopy.Options.CompilerOptions;
-		devCompiler.OptionStringToList(devCompiler.fOptionString);
 
 		// Version tab
 		InitVersionInfo;
@@ -1187,7 +1187,7 @@ begin
 	// Correct memory leak in VCL
 	CompOptionsFrame1.vle.Strings.Clear;
 
-	action := caFree;
+	Action := caFree;
 end;
 
 end.

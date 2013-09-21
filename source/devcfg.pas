@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Dialogs, Windows, Classes, Graphics, SynEdit, CFGData, IniFiles, prjtypes, Math;
+  Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, prjtypes, Math;
 {$ENDIF}
 {$IFDEF LINUX}
   QDialogs, Classes, QGraphics, QSynEdit, CFGData, IniFiles, Math, prjtypes;
@@ -331,7 +331,7 @@ type
     procedure SaveSettings;
     procedure LoadSettings;
 
-    procedure AssignEditor(Editor: TSynEdit);
+    procedure AssignEditor(Editor: TEditor);
   published
     //Editor props
     property AutoIndent: boolean read fAutoIndent write fAutoIndent;
@@ -622,7 +622,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  MultiLangSupport, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
+  MultiLangSupport, datamod, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
   FileAssocs;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -1615,11 +1615,11 @@ begin
 	fCompleteSymbols := TRUE;
 end;
 
-procedure TdevEditor.AssignEditor(Editor: TSynEdit);
+procedure TdevEditor.AssignEditor(Editor: TEditor);
 var
 	pt: TPoint;
 begin
-	with Editor do begin
+	with Editor.Text do begin
 		BeginUpdate;
 		try
 			TabWidth:= fTabSize;
@@ -1633,19 +1633,37 @@ begin
 				LeadingZeros:= fLeadZero;
 				ZeroStart:= fFirstisZero;
 
-				// Always apply custom colors, even when not using a custom font
-				StrtoPoint(pt, fSyntax.Values[cGut]);
-				Color:= pt.x;
-				Font.Color:= pt.y;
+				// Select a highlighter
+				Highlighter := dmMain.GetHighlighter(Editor.FileName);
+
+				// Set gutter color
+				if Assigned(Highlighter) then begin
+					StrtoPoint(pt, fSyntax.Values[cGut]);
+					Color:= pt.x;
+					Font.Color:= pt.y;
+				end else begin // editor not colored, pick defaults
+					Color:= clBtnFace;
+					Font.Color:= clBlack;
+				end;
 			end;
 
-			// update the selected text color
-			StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
-			SelectedColor.Background:= pt.X;
-			SelectedColor.Foreground:= pt.Y;
+			// Set selection color
+			if Assigned(Highlighter) then begin
+				StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
+				SelectedColor.Background:= pt.X;
+				SelectedColor.Foreground:= pt.Y;
+			end else begin // editor not colored, pick defaults
+				SelectedColor.Background:= clNavy;
+				SelectedColor.Foreground:= clWhite;
+			end;
 
-			StrtoPoint(pt, fSyntax.Values[cFld]);
-			CodeFolding.FolderBarLinesColor := pt.y;
+			// Set folding bar color
+			if Assigned(Highlighter) then begin
+				StrtoPoint(pt, devEditor.Syntax.Values[cFld]);
+				CodeFolding.FolderBarLinesColor := pt.y;
+			end else begin // editor not colored, pick defaults
+				CodeFolding.FolderBarLinesColor := clBlack;
+			end;
 
 			if fMarginVis then
 				RightEdge:= fMarginSize
@@ -1659,7 +1677,7 @@ begin
 
 			ScrollHintFormat:= shfTopToBottom;
 
-			if HighCurrLine then
+			if HighCurrLine and Assigned(Highlighter) then
 				ActiveLineColor := HighColor
 			else
 				ActiveLineColor := clNone;

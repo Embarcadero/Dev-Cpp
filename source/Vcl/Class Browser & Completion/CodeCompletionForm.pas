@@ -88,7 +88,7 @@ var
 	Key: Char;
 begin
 	// Send command to TEditor
-	if Assigned(OnKeyPress) then begin
+	if Assigned(fOwner.OnKeyPress) then begin
 		Key := Char(VK_RETURN);
 		fOwner.OnKeyPress(self,Key);
 	end;
@@ -99,12 +99,13 @@ var
 	Offset: integer;
 	statement : PStatement;
 begin
-
 	Offset := 4;
 
 	with lbCompletion do begin
 
 		statement := PStatement(Items.Objects[Index]);
+
+		if not Assigned(statement) then Exit; // TODO: why is this needed?
 
 		// Draw statement kind string, like 'Preprocessor'
 		if odSelected in State then begin
