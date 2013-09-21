@@ -1515,7 +1515,6 @@ begin
   end;
 end;
 
-
 procedure TEditor.EditorMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
   procedure DoOpen(Fname: string; Line: integer; wrd: string);
   var
@@ -1545,107 +1544,76 @@ procedure TEditor.EditorMouseDown(Sender: TObject; Button: TMouseButton;Shift: T
     end;
   end;
 var
-  p: TPoint;
-  s, s1: string;
-  I: integer;
-  umSt: PStatement;
-  fname: string;
-  line: integer;
-  f1, f2: integer;
+	p: TPoint;
+	s, s1: string;
+	f1, f2: integer;
 begin
-  p.X := X;
-  p.Y := Y;
+	p.X := X;
+	p.Y := Y;
 
-  p.X := fText.PixelsToRowColumn(p.X, p.Y).Column;
-  p.Y := fText.PixelsToRowColumn(p.X, p.Y).Row;
-  s := fText.GetWordAtRowCol(BufferCoord(p.X, p.Y));
+	p.X := fText.PixelsToRowColumn(p.X, p.Y).Column;
+	p.Y := fText.PixelsToRowColumn(p.X, p.Y).Row;
+	s := fText.GetWordAtRowCol(BufferCoord(p.X, p.Y));
 
-  // if ctrl+clicked
-  if (ssCtrl in Shift) and (Button=mbLeft) then begin
+	// if ctrl+clicked
+	if (ssCtrl in Shift) and (Button=mbLeft) then begin
 
-    // reset the cursor
-    fText.Cursor:=crIBeam;
+		// reset the cursor
+		fText.Cursor:=crIBeam;
 
-    // see if it's #include
-    s1:=fText.Lines[p.Y-1];
-    s1:=StringReplace(s1, ' ', '', [rfReplaceAll]);
-    if AnsiStartsStr('#include', s1) then begin
-      // it is #include
-      // check for #include <...>
-      f1:=AnsiPos('<', s1);
-      if f1>0 then begin
-        Inc(f1);
-        f2:=f1;
-        while (f2<Length(s1)) and (s1[f2]<>'>') do
-          Inc(f2);
-        if s1[f2]<>'>' then
-          // not located...
-          Abort;
-        f2:=f2-f1;
-        DoOpen(MainForm.CppParser1.GetFullFileName(Copy(s1, f1, f2)), 1, '');
-        // the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
-        Abort;
-      end;
+		// see if it's #include
+		s1:=fText.Lines[p.Y-1];
+		s1:=StringReplace(s1, ' ', '', [rfReplaceAll]);
+		if AnsiStartsStr('#include', s1) then begin
+			// We've clicked an #include <>
+			f1:=AnsiPos('<', s1);
+			if f1>0 then begin
+				Inc(f1);
+				f2:=f1;
+				while (f2<Length(s1)) and (s1[f2]<>'>') do
+					Inc(f2);
+				if s1[f2]<>'>' then
+					Abort;
+				f2:=f2-f1;
+				DoOpen(MainForm.CppParser1.GetFullFileName(Copy(s1, f1, f2)), 1, '');
 
-      f1:=AnsiPos('"', s1);
-      // since we reached here, we haven't found it yet
-      // check for #include "..."
-      if f1>0 then begin
-        Inc(f1);
-        f2:=f1;
-        while (f2<Length(s1)) and (s1[f2]<>'"') do
-          Inc(f2);
-        if s1[f2]<>'"' then
-          // not located...
-          Abort;
-        f2:=f2-f1;
-        DoOpen(MainForm.CppParser1.GetFullFileName(Copy(s1, f1, f2)), 1, '');
-        // the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
-        Abort;
-      end;
+				// the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
+				Abort;
+			end;
 
-      // if we reached here, exit; we cannot locate and extract the filename...
-      Exit;
-    end;  // #include
+			f1:=AnsiPos('"', s1);
+			// We've clicked an #include ""
+			if f1>0 then begin
+				Inc(f1);
+				f2:=f1;
+				while (f2<Length(s1)) and (s1[f2]<>'"') do
+					Inc(f2);
+				if s1[f2]<>'"' then
+					Abort;
+				f2:=f2-f1;
+				DoOpen(MainForm.CppParser1.GetFullFileName(Copy(s1, f1, f2)), 1, '');
 
+				// the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
+				Abort;
+			end;
 
-    umSt:=nil;
-    // if there *is* a word under the mouse cursor
-    if S<>'' then begin
-      // search for statement
-      for I:=0 to MainForm.CppParser1.Statements.Count-1 do
-      if AnsiCompareStr(PStatement(MainForm.CppParser1.Statements[I])^._ScopelessCmd, S)=0 then begin
-        umSt:=PStatement(MainForm.CppParser1.Statements[I]);
-        Break;
-      end;
-    end;
+			// if we reached here, exit; we cannot locate and extract the filename...
+			Exit;
+		end; // #include
 
-    // if statement found
-    if Assigned(umSt) then begin
-      // get the filename and the line number declared
-      if umSt^._IsDeclaration then begin
-        fname:=umSt^._DeclImplFileName;
-        line:=umSt^._DeclImplLine;
-      end
-      else begin
-        fname:=umSt^._FileName;
-        line:=umSt^._Line;
-      end;
+		MainForm.actGotoImplDeclEditorExecute(self);
 
-      DoOpen(fname, line, s); // BEZIG
-
-      // the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
-      Abort;
-    end;
-  end;
+		// the mousedown must *not* get to the SynEdit or else it repositions the caret!!!
+		Abort;
+	end;
 end;
 
 procedure TEditor.RunToCursor(Line : integer);
 begin
-  if fRunToCursorLine <> -1 then
-    TurnOffBreakpoint(fRunToCursorLine);
-  fRunToCursorLine := Line;
-  TurnOnBreakpoint(fRunToCursorLine);
+	if fRunToCursorLine <> -1 then
+		TurnOffBreakpoint(fRunToCursorLine);
+	fRunToCursorLine := Line;
+	TurnOnBreakpoint(fRunToCursorLine);
 end;
 
 procedure TEditor.PaintMatchingBrackets(TransientType: TTransientType);

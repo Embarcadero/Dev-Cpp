@@ -111,7 +111,7 @@ object LangForm: TLangForm
       Width = 265
       Height = 59
       Caption = 'Select your Dev-C++ theme:'
-      TabOrder = 2
+      TabOrder = 0
       object ThemeBox: TComboBox
         Left = 16
         Top = 22
@@ -188,11 +188,11 @@ object LangForm: TLangForm
       Left = 4
       Top = 0
       Width = 249
-      Height = 39
+      Height = 52
       Caption = 
         'You decided to use the code completion feature. To optimize this' +
         ' process, it is recommended to create a cache of the standard he' +
-        'aders files.'
+        'aders files. This will allow you to browse these headers too.'
       WordWrap = True
     end
     object Label3: TLabel
@@ -217,7 +217,7 @@ object LangForm: TLangForm
       object ParseLabel: TLabel
         Left = 4
         Top = 24
-        Width = 65
+        Width = 229
         Height = 13
         Caption = 'Parsing files...'
         WordWrap = True
@@ -225,7 +225,7 @@ object LangForm: TLangForm
       object pbCCCache: TProgressBar
         Left = 4
         Top = 70
-        Width = 245
+        Width = 255
         Height = 20
         TabOrder = 0
         Visible = False
@@ -322,23 +322,22 @@ object LangForm: TLangForm
       Left = 4
       Top = 0
       Width = 258
-      Height = 52
+      Height = 39
       Caption = 
         'Dev-C++ can retrieve information from headers files, to help you' +
-        ' find  functions, classes and variables prototypes easily, throu' +
-        'gh a class browser and a code completion list. '
+        ' find functions, classes and variables easily, through a class b' +
+        'rowser and a code completion list.'
       WordWrap = True
     end
     object Label5: TLabel
       Left = 4
       Top = 72
-      Width = 235
-      Height = 65
+      Width = 229
+      Height = 52
       Caption = 
         'Although this feature is useful, it requires more CPU power and ' +
-        'memory, and may not be suitable for all developers. Do you want ' +
-        'to use it ? You can enable or disable it later in Editor Options' +
-        ', Class Browser.'
+        'memory. Do you want to use it? You can enable or disable it late' +
+        'r in Editor Options, Class Browser.'
       WordWrap = True
     end
     object YesClassBrowser: TRadioButton

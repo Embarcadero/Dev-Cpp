@@ -8165,7 +8165,7 @@ begin
             bPrompt := False;
             if bEndUndoBlock = false then
               BeginUndoBlock;
-            bEndUndoBlock:= true;                      
+            bEndUndoBlock:= true;
           end;
           //Allow advanced substition in the search engine
           SelText := fSearchEngine.Replace( SelText, AReplace );

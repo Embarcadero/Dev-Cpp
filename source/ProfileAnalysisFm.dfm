@@ -1,6 +1,6 @@
 object ProfileAnalysisForm: TProfileAnalysisForm
-  Left = 992
-  Top = 462
+  Left = 1049
+  Top = 400
   Width = 649
   Height = 531
   Caption = 'Profile analysis'
@@ -32,7 +32,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
       Top = 0
       Width = 633
       Height = 493
-      ActivePage = tabOpts
+      ActivePage = tabGraph
       Align = alClient
       TabOrder = 0
       OnChange = PageControl1Change

@@ -34,7 +34,7 @@ resourcestring
 	// misc strings
 	GCC_VERSION          = '4.5.2';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.0.0.3';
+	DEVCPP_VERSION       = '5.0.0.4';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -58,11 +58,11 @@ resourcestring
 	BIN_DIR              = '%path%' + pd + 'bin';
 	LIB_DIR              = '%path%' + pd + 'lib;%path%' + pd + 'lib' + pd + 'gcc';
 	C_INCLUDE_DIR        = '%path%' + pd + 'include';
-	CPP_INCLUDE_DIR      = '%path%' + pd + 'include;' +
+	CPP_INCLUDE_DIR      = '%path%' + pd + 'include';// +
                         // '%path%' + pd + 'include' + pd + 'sys;' +
-                           '%path%' + pd + 'include' + pd + 'ddk;' +
-                           '%path%' + pd + 'include' + pd + 'gdiplus;' +
-                           '%path%' + pd + 'include' + pd + 'GL';
+                        //   '%path%' + pd + 'include' + pd + 'ddk;' +
+                        //   '%path%' + pd + 'include' + pd + 'gdiplus;' +
+                        //   '%path%' + pd + 'include' + pd + 'GL';
 	LANGUAGE_DIR         = 'Lang' + pd;
 	ICON_DIR             = 'Icons' + pd;
 	HELP_DIR             = ''; // exe folder
@@ -90,7 +90,7 @@ resourcestring
   WINDRES_PROGRAM      = 'windres.exe';
   DLLWRAP_PROGRAM      = 'dllwrap.exe';
   GPROF_PROGRAM        = 'gprof.exe';
-  PACKMAN_PROGRAM      = 'packman.exe'; 
+  PACKMAN_PROGRAM      = 'packman.exe';
 
   // option sections
   OPT_DIRS             = 'Directories';

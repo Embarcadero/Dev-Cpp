@@ -39,7 +39,7 @@ interface
 uses
   SysUtils, Classes, CodeToolTip, CppParser;
 
-type        
+type
   TDevCodeToolTipError = class(Exception);
   
   
@@ -61,7 +61,7 @@ type
     property EndWhenChr;
     property Hints;
     property MaxScanLength;
-    property Options;    
+    property Options;
     property Parser: TCppParser read FParser write FParser;
     property StartWhenChr;
   end;

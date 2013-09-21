@@ -48,8 +48,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure UnitListDblClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure UnitListKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure UnitListKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
   end;
 
 implementation

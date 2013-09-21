@@ -95,7 +95,7 @@ uses
   QSynEditKbdHandler, QSynEdit, QSynEditHighlighter, Types, XPToolTip;
 {$ENDIF}
 
-         
+
 type
   TCustomCodeToolTipButton = class(TPersistent)
   private
@@ -409,7 +409,7 @@ begin
     Width := Screen.Width; // worst case hintwidth
     Height := 32;
     Canvas.Font := Screen.HintFont;
-  end; 
+  end;
 
   FToolTips := TStringList.Create;
   with FToolTips do

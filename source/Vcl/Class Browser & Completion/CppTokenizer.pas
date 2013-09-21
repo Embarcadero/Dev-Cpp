@@ -582,26 +582,29 @@ end;
 
 function TCppTokenizer.Simplify(Str: string): string;
 var
-  I: integer;
-  len: integer;
+	I: integer;
+	len: integer;
 begin
-  Result := Str;
-  if Str = '' then
-    Exit;
+	Result := Str;
+	if Str = '' then
+		Exit;
 
-  len := Length(Result);
-  fTmpOutput^ := #0;
-  I := 1;
-  while I <= len do begin
-    // simplify spaces
-    if Result[I] in [' ', #9] then begin
-      while (Result[I] in [' ', #9]) and (I <= len) do
-        Inc(I);
-      StrLCat(StrEnd(fTmpOutput), ' ', 1);
-    end;
-    // remove comments
-    if (I < len) and (Result[I] = '/') then begin
-      case Result[I + 1] of
+	len := Length(Result);
+	fTmpOutput^ := #0;
+	I := 1;
+	while I <= len do begin
+
+		// remove multiple spaces
+		if Result[I] in [#9,#32] then begin
+			repeat
+				Inc(I);
+			until (I >= len - 1) or not (Result[I] in [#9,#32]);
+			StrLCat(StrEnd(fTmpOutput), ' ', 1);
+		end;
+
+		// remove comments
+		if (I < len) and (Result[I] = '/') then begin
+			case Result[I + 1] of
         '*': begin // C style
             repeat
               Inc(I);

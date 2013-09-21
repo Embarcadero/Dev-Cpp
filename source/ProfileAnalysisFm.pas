@@ -117,27 +117,27 @@ var
 begin
 	Cmd := '';
 	if not chkCustom.Checked then begin
-	if (devCompiler.gprofName <> '') then
-		Cmd := devCompiler.gprofName
-	else
-		Cmd := GPROF_PROGRAM;
+		if (devCompiler.gprofName <> '') then
+			Cmd := devCompiler.gprofName
+		else
+			Cmd := GPROF_PROGRAM;
 
-	Params := ' ' + GPROF_CMD_GENFLAT;
+		Params := ' ' + GPROF_CMD_GENFLAT;
 
-	// Checkbox options
-	if not chkHideNotCalled.checked then
-		Params := Params + ' -z';
-	if chkSuppressStatic.checked then
-		Params := Params + ' -a';
-	Params := Params + ' -m ' + spnMinCount.Text;
+		// Checkbox options
+		if not chkHideNotCalled.checked then
+			Params := Params + ' -z';
+		if chkSuppressStatic.checked then
+			Params := Params + ' -a';
+		Params := Params + ' -m ' + spnMinCount.Text;
 
-	if Assigned(MainForm.fProject) then begin
-		Dir := ExtractFilePath(MainForm.fProject.Executable);
-		Params := Params + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
-	end else begin
-		Dir := ExtractFilePath(MainForm.GetEditor.FileName);
-		Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
-	end;
+		if Assigned(MainForm.fProject) then begin
+			Dir := ExtractFilePath(MainForm.fProject.Executable);
+			Params := Params + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
+		end else begin
+			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
+			Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
+		end;
 	end else begin
 		Params := editCustom.Text + ' -p';
 		if Assigned(MainForm.fProject) then
@@ -210,7 +210,7 @@ begin
 	else
 		Cmd := GPROF_PROGRAM;
 
-	Params := GPROF_CMD_GENMAP;
+	Params := ' ' + GPROF_CMD_GENMAP;
 
 	// Checkbox options
 	if not chkHideNotCalled.checked then
@@ -261,9 +261,9 @@ begin
           else
             Data := MainForm.CppParser1.Locate(Caption, True);
 
-        for J:=0 to 5 do begin
+        for J:=0 to 4 do begin
         	Line := TrimLeft(Line);
-        	spacepos := Pos(' ',Line);
+        	spacepos := Pos('  ',Line);
         	SubItems.Add(Trim(Copy(Line, 1, spacepos)));
         	System.Delete(Line,1,spacepos);
         end;

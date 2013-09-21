@@ -73,7 +73,7 @@ object frmProjectOptions: TfrmProjectOptions
     Top = 8
     Width = 458
     Height = 265
-    ActivePage = tabVersion
+    ActivePage = tabGeneral
     OnChange = PageControlChange
     object tabGeneral: TdevPage
       Left = 0
@@ -87,7 +87,6 @@ object frmProjectOptions: TfrmProjectOptions
       Align = alClient
       BevelKind = bkTile
       TabOrder = 0
-      Visible = False
       Caption = 'General'
       object lblPrjName: TLabel
         Left = 8
@@ -488,7 +487,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 373
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 1
       end
     end
@@ -1285,6 +1284,7 @@ object frmProjectOptions: TfrmProjectOptions
       Align = alClient
       BevelKind = bkTile
       TabOrder = 5
+      Visible = False
       Caption = 'Version Info'
       object chkVersionInfo: TCheckBox
         Left = 12

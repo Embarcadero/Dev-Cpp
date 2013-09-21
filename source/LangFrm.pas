@@ -204,7 +204,7 @@ begin
 			devCodeCompletion.UseCacheFiles := true;
 			devClassBrowsing.Enabled := true;
 			devClassBrowsing.ParseLocalHeaders := true;
-			devClassBrowsing.ParseGlobalHeaders := false;
+			devClassBrowsing.ParseGlobalHeaders := true;
 			SaveOptions;
 
 			MainForm.CppParser1.ParseLocalHeaders := True;

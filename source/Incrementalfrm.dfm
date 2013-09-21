@@ -1,12 +1,13 @@
 object frmIncremental: TfrmIncremental
-  Left = 278
-  Top = 241
+  Left = 996
+  Top = 628
   Anchors = []
   AutoSize = True
-  BorderStyle = bsNone
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsToolWindow
   Caption = 'Incremental Search'
-  ClientHeight = 24
-  ClientWidth = 201
+  ClientHeight = 25
+  ClientWidth = 282
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,7 +21,7 @@ object frmIncremental: TfrmIncremental
   object Edit: TEdit
     Left = 0
     Top = 0
-    Width = 201
+    Width = 233
     Height = 24
     Color = clBtnFace
     Font.Charset = ANSI_CHARSET
@@ -34,13 +35,34 @@ object frmIncremental: TfrmIncremental
     OnKeyDown = EditKeyDown
     OnKeyPress = EditKeyPress
   end
-  object ActionList1: TActionList
-    Left = 123
-    Top = 3
-    object SearchAgain: TAction
-      Caption = 'SearchAgain'
-      ShortCut = 16460
-      OnExecute = SearchAgainExecute
-    end
+  object btnPrev: TButton
+    Left = 232
+    Top = 0
+    Width = 25
+    Height = 25
+    Caption = '<'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Courier'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 1
+    OnClick = btnPrevClick
+  end
+  object btnNext: TButton
+    Left = 257
+    Top = 0
+    Width = 25
+    Height = 25
+    Caption = '>'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Courier'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 2
+    OnClick = btnNextClick
   end
 end

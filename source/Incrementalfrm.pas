@@ -35,18 +35,19 @@ uses
 type
   TfrmIncremental = class(TForm)
     Edit: TEdit;
-    ActionList1: TActionList;
-    SearchAgain: TAction;
+    btnPrev: TButton;
+    btnNext: TButton;
     procedure EditChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure EditKeyPress(Sender: TObject; var Key: Char);
-    procedure SearchAgainExecute(Sender: TObject);
-    procedure EditKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure EditKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+    procedure btnPrevClick(Sender: TObject);
+    procedure btnNextClick(Sender: TObject);
   public
     SearchString : string;
     Editor       : TSynEdit;
     OrgPt        : TBufferCoord;
+    lastcommand  : integer;
   private
     rOptions : TSynSearchOptions;
   end;
@@ -67,61 +68,47 @@ uses
 {$ENDIF}
 
 procedure TfrmIncremental.EditChange(Sender: TObject);
-var
-  ALen : Integer;
 begin
-  ALen := 0;
-  if Editor.SelAvail then
-    begin
-      ALen := Length(Editor.SelText);
-      Editor.CaretX := Editor.CaretX - ALen;
-    end;
-  if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then
-    begin
-      Include(rOptions, ssoBackwards);
-      Editor.CaretX := Editor.CaretX + ALen;
-      if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then
-        Edit.Font.Color:=clRed
-      else
-        Edit.Font.Color:=clBlack;
-    end
-  else
-    Edit.Font.Color:=clBlack;
-  rOptions := [];
-  if Length(Edit.Text) = 0 then
-    begin
-      Editor.BlockBegin := OrgPt;
-      Editor.BlockEnd   := OrgPt;
-      Editor.CaretXY    := OrgPt;
-    end;
+	if Editor.SelAvail then
+		Editor.CaretX := Editor.CaretX - Editor.SelLength;
+
+	// Als we niks vinden...
+	if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then begin
+
+		// Zoek dan achterstevoren
+		Include(rOptions, ssoBackwards);
+		Editor.CaretX := Editor.CaretX + Editor.SelLength;
+
+		// Nog steeds niks? Kleurtje geven
+		if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then
+			Edit.Font.Color:=clRed
+		else
+			Edit.Font.Color:=clBlack;
+	end else
+		Edit.Font.Color:=clBlack;
+
+	rOptions := [];
+	if Length(Edit.Text) = 0 then begin
+		Editor.BlockBegin := OrgPt;
+		Editor.BlockEnd   := OrgPt;
+		Editor.CaretXY    := OrgPt;
+	end;
 end;
 
 procedure TfrmIncremental.FormShow(Sender: TObject);
 begin
-  SearchString := Edit.Text;
-  Edit.Text := '';
-  OrgPt     := Editor.CaretXY;
+	SearchString := Edit.Text;
+	Edit.Text    := '';
+	OrgPt        := Editor.CaretXY;
+	lastcommand  := 2;
 end;
 
 procedure TfrmIncremental.EditKeyPress(Sender: TObject; var Key: Char);
 begin
-  case Key of
-    #27 : Close;
-    #13 : Close;
-  else
-    begin
-    end;
-  end;
+	if Key = #27 then Close; // Escape
 end;
 
-procedure TfrmIncremental.SearchAgainExecute(Sender: TObject);
-begin
-  MainForm.actFindNextExecute(Self);
-  OrgPt := Editor.CaretXY;
-end;
-
-procedure TfrmIncremental.EditKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TfrmIncremental.EditKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 begin
   case Key of
 {$IFDEF WIN32}
@@ -131,6 +118,34 @@ begin
     XK_LEFT, XK_RIGHT, XK_UP, XK_DOWN : Close;
 {$ENDIF}
   end;
+end;
+
+procedure TfrmIncremental.btnPrevClick(Sender: TObject);
+begin
+	Include(rOptions,ssoBackWards);
+	if lastcommand = 1 then
+		Editor.SearchReplace(Edit.Text,'',rOptions);
+	if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then begin
+		Include(rOptions,ssoEntireScope);
+		if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then
+			Edit.Font.Color:=clRed;
+	end;
+	Exclude(rOptions,ssoEntireScope);
+	lastcommand:=0; // 0 == prev
+end;
+
+procedure TfrmIncremental.btnNextClick(Sender: TObject);
+begin
+	Exclude(rOptions,ssoBackWards);
+	if lastcommand = 0 then
+		Editor.SearchReplace(Edit.Text,'',rOptions);
+	if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then begin
+		Include(rOptions,ssoEntireScope);
+		if Editor.SearchReplace(Edit.Text,'',rOptions) = 0 then
+			Edit.Font.Color:=clRed;
+	end;
+	Exclude(rOptions,ssoEntireScope);
+	lastcommand:=1; // 1 == next
 end;
 
 end.
