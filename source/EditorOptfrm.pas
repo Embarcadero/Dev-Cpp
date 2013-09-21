@@ -201,7 +201,7 @@ type
     procedure chkCCCacheClick(Sender: TObject);
     procedure CppParser1StartParsing(Sender: TObject);
     procedure CppParser1EndParsing(Sender: TObject);
-    procedure CppParser1TotalProgress(Sender: TObject; const FileName: AnsiString;Total, Current: Integer);
+    procedure CppParser1TotalProgress(Sender: TObject; const FileName: string;Total, Current: Integer);
     procedure ClassCodePageChange(Sender: TObject);
     procedure chkCBShowInheritedClick(Sender: TObject);
     procedure OnGutterClick(Sender: TObject; Button: TMouseButton; X, Y,Line: Integer; Mark: TSynEditMark);
@@ -1582,7 +1582,7 @@ begin
   pbCCCache.Visible:=False;
 end;
 
-procedure TEditorOptForm.CppParser1TotalProgress(Sender: TObject;const FileName: AnsiString; Total, Current: Integer);
+procedure TEditorOptForm.CppParser1TotalProgress(Sender: TObject;const FileName: string; Total, Current: Integer);
 begin
 	if not HasProgressStarted then begin
 		pbCCCache.Max := Total;

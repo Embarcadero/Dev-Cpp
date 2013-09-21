@@ -1784,11 +1784,10 @@ end;
 
 procedure TdevCompilerSet.LoadSet(Index: integer);
 var
-	key, goodBinDir, goodCDir, goodCppDir, goodLibDir, msg, tempStr, makereply: AnsiString;
-	bindirs : TStringList;
-	i : integer;
+	key, goodBinDir, goodCDir, goodCppDir, goodLibDir, msg, tempStr: AnsiString;
 begin
-	if Index<0 then Exit;
+	if Index < 0 then Exit; // Removing breaks the compile process, but why???
+
 	with devData do begin
 		key:= OPT_COMPILERSETS+'_'+IntToStr(Index);
 
@@ -1800,8 +1799,11 @@ begin
 		fwindresName := LoadSettingS(key, WINDRES_PROGRAM);
 		fdllwrapName := LoadSettingS(key, DLLWRAP_PROGRAM);
 		fgprofName :=   LoadSettingS(key, GPROF_PROGRAM);
-		fOptions :=     LoadSettingS(key, 'Options');
 
+		// Load the option string
+		fOptions :=     LoadSettingS(key, OPT_OPTIONS);
+
+		// If nothing was found, select defaults
 		if fgccName=''     then fgccName:=     GCC_PROGRAM;
 		if fgppName=''     then fgppName:=     GPP_PROGRAM;
 		if fgdbName=''     then fgdbName:=     GDB_PROGRAM;
@@ -1810,21 +1812,23 @@ begin
 		if fdllwrapName='' then fdllwrapName:= DLLWRAP_PROGRAM;
 		if fgprofName=''   then fgprofName:=   GPROF_PROGRAM;
 
+		// Extra parameters
 		fCompOpt:= LoadSettingS(key, 'CompOpt');
 		fLinkOpt:= LoadSettingS(key, 'LinkOpt');
 		fCompAdd:= LoadSettingB(key, 'CompAdd');
 		fLinkAdd:= LoadSettingB(key, 'LinkAdd');
 
+		// Misc. (general tab)
 		fDelay:= strtointdef(LoadSettingS(key, 'Delay'),0);
 		fFastDep:=        LoadSettingB(key, 'FastDep','1');
 
-		// dirs
-		devDirs.Exec   := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
+		// Directories
 		fBinDir := StringReplace(LoadSettingS(key, 'Bins'),'%path%\',devDirs.Exec,[rfReplaceAll]);
 		fCDir   := StringReplace(LoadSettingS(key, 'C'),   '%path%\',devDirs.Exec,[rfReplaceAll]);
 		fCppDir := StringReplace(LoadSettingS(key, 'Cpp'), '%path%\',devDirs.Exec,[rfReplaceAll]);
 		fLibDir := StringReplace(LoadSettingS(key, 'Lib'), '%path%\',devDirs.Exec,[rfReplaceAll]);
 
+		// Again, if nothing was found, select defaults
 		if fBinDir='' then fBinDir:=devDirs.Bins;
 		if fCDir=''   then fCDir:=devDirs.C;
 		if fCppDir='' then fCppDir:=devDirs.Cpp;
@@ -1834,25 +1838,25 @@ begin
 		msg := '';
 		goodBinDir := ValidatePaths(fBinDir, tempStr);
 		if tempStr <> '' then begin
-			msg := msg + 'Following Bin directories don''t exist:' + #13#10;
+			msg := msg + 'Following Bin directories of compiler ' + devCompilerSet.fSets[Index] + ' don''t exist:' + #13#10;
 			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
 			msg := msg + #13#10 + #13#10;
 		end;
 		goodCDir := ValidatePaths(fCDir, tempStr);
 		if tempStr <> '' then  begin
-			msg := msg + 'Following C Include directories don''t exist:' + #13#10;
+			msg := msg + 'Following C Include directories of compiler ' + devCompilerSet.fSets[Index] + ' don''t exist:' + #13#10;
 			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
 			msg := msg + #13#10 + #13#10;
 		end;
 		goodCppDir := ValidatePaths(fCppDir, tempStr);
 		if tempStr <> '' then begin
-			msg := msg + 'Following C++ Include directories don''t exist:' + #13#10;
+			msg := msg + 'Following C++ Include directories of compiler ' + devCompilerSet.fSets[Index] + ' don''t exist:' + #13#10;
 			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
 			msg := msg + #13#10 + #13#10;
 		end;
 		goodLibDir := ValidatePaths(fLibDir, tempStr);
 		if tempStr <> '' then begin
-			msg := msg + 'Following Libs directories don''t exist:' + #13#10;
+			msg := msg + 'Following Libs directories of compiler ' + devCompilerSet.fSets[Index] + ' don''t exist:' + #13#10;
 			msg := msg + StringReplace(tempStr, ';', #13#10, [rfReplaceAll]);
 			msg := msg + #13#10 + #13#10;
 		end;
@@ -1880,78 +1884,31 @@ begin
 				end;
 			end;
 		end;
+
+		// Check if the really needed programs even exist
+		msg := '';
+		if not FileExists(fBinDir + fgccname) then begin
+			msg := msg + 'Following programs don''t exist:' + #13#10;
+			msg := msg + fgccname;
+			msg := msg + #13#10 + #13#10;
+		end;
+		if not FileExists(fBinDir + fgppname) then begin
+			msg := msg + 'Following programs don''t exist:' + #13#10;
+			msg := msg + fgppname;
+			msg := msg + #13#10 + #13#10;
+		end;
+		if not FileExists(fBinDir + fmakeName) then begin
+			msg := msg + 'Following programs don''t exist:' + #13#10;
+			msg := msg + fmakeName;
+			msg := msg + #13#10 + #13#10;
+		end;
 	end;
 
 	// The code below checks for makefile processors...
 	if devDirs.OriginalPath = '' then // first time only
 		devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 
-	// First check if the current one exists
-	bindirs := TStringList.Create;
-	StrToList(fBinDir,bindirs);
-
-	for I := 0 to bindirs.Count -1 do begin
-
-		// First try the chosen makefile processor
-		SetPath(bindirs.Strings[i]);
-		makereply := RunAndGetOutput(devCompilerSet.makeName + ' -v',bindirs.Strings[i], nil, nil, nil);
-
-		if StartsStr('GNU Make ', makereply) then begin
-			bindirs.Free;
-			Exit; // pass sanity check for the chosen processor
-		end else begin
-
-			// Then try the default makefile processor
-			SetPath(bindirs.Strings[i]);
-			makereply := RunAndGetOutput('mingw32-make.exe -v',bindirs.Strings[i], nil, nil, nil);
-
-			if StartsStr('GNU Make ', makereply) then begin
-				msg := 'Dev-C++ was unable to find the current make processor ('
-				+ devCompilerSet.makeName  + ') in '
-				+ bindirs.Strings[i] + ' with current settings, '
-				+ 'however a MinGW mingw32-make.exe has been found in that folder. '
-				+ 'Would you like Dev-C++ to adjust the settings for you to '
-				+ 'use MinGW Make?'
-				+ #13#10#13#10
-				+ 'Unless you know exactly what you''re doing, it is recommended '
-				+ 'that you click Yes.';
-				if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-					devCompilerSet.makeName := 'mingw32-make.exe';
-					devCompiler.makeName := 'mingw32-make.exe';
-				end;
-				bindirs.Free;
-				Exit; // pass sanity check for a different make proc
-			end else begin
-
-				// Then try the old makefile processor
-				SetPath(bindirs.Strings[i]);
-				makereply := RunAndGetOutput('make.exe --v',bindirs.Strings[i], nil, nil, nil);
-
-				if StartsStr('GNU Make ', makereply) then begin
-					msg := 'Dev-C++ was unable to find the current make processor ('
-					+ devCompilerSet.makeName  + ') in '
-					+ bindirs.Strings[i] + ' with current settings, '
-					+ 'however a probably older GNU make.exe has been found in that folder. '
-					+ 'Would you like Dev-C++ to adjust the settings for you to '
-					+ 'use GNU Make?'
-					+ #13#10#13#10
-					+ 'Unless you know exactly what you''re doing, it is recommended '
-					+ 'that you click Yes.';
-					if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-						devCompilerSet.makeName := 'make.exe';
-						devCompiler.makeName := 'make.exe';
-					end;
-					bindirs.Free;
-					Exit; // pass sanity check
-				end;
-			end;
-		end;
-	end;
-
-	msg := 'There doesn''t seem to be any Make file in any of Dev-C++''s Bin paths. '
-		+ 'Please make sure that you have correctly set bin paths in Compiler Options >> Directories '
-		+ ' and have correctly set your make''s name in Programs. Otherwise, you will not be able to compile anything.';
-	MessageDlg(msg, mtConfirmation, [mbOK], 0);
+	SetPath(fBinDir);
 end;
 
 procedure TdevCompilerSet.LoadSettings;

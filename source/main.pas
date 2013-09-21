@@ -6294,7 +6294,7 @@ begin
 
 		cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
 		I := cursorindex;
-		while (I > max(0,cursorindex-2048)) do begin
+		while (I > max(0,cursorindex-1024)) do begin
 
 			// We're inside a class definition, save the name of the parent class...
 			compare1 := Copy(text,I,6);
@@ -6318,7 +6318,7 @@ begin
 		// Then scan back trying to find the base function (or class)
 		cursorindex := e.Text.RowColToCharIndex(cursorpos,true);
 		I := cursorindex;
-		while (I > max(0,cursorindex-2048)) do begin
+		while (I > max(0,cursorindex-1024)) do begin
 			if (text[I] = ':') and (text[I+1] = ':') then begin
 				// Then find the word itself
 				wordend := I;
