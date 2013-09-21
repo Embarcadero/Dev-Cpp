@@ -5,40 +5,40 @@
 #include <windows.h>
 #include <conio.h>
 
-char* GetErrorMessage(const char* format,...) { // make wide?
-
-	va_list parameters;
-	va_start(parameters,format);
-
-	char* result = NULL;
+const char* GetErrorMessage(char* result,int size) { // TODO: make wide?
 	FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_ALLOCATE_BUFFER,//|FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		GetLastError(),
-		MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),
-		(LPSTR)&result,
-		0,
-		&parameters);
-		
-	va_end(parameters);
+		FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,GetLastError(),MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),(LPSTR)&result,size,NULL);
 	
-	return result; // use localfree!
+	// Strip newlines at the end
+	int length = strlen(result)-1;
+	while(length >= 0 && isspace(result[length])) {
+		result[length] = 0;
+		length--;
+	}
+	return result;
 }
 
 int main(int argc, char** argv) {
-
+	
 	// First make sure we aren't going to read nonexistent arrays
 	if(argc < 2) {
-		MessageBox(NULL,"Usage:\n\nConsolePauser.exe <filename> <parameters>\n","Info",MB_ICONINFORMATION);
+		printf("\n--------------------------------");
+		printf("\nUsage: ConsolePauser.exe <filename> <parameters>");
+		printf("\nPress any key to continue . . . ");
+		getch();
 		return 0;
 	}
-
+	
+	// Make us look like the paused program
+	SetConsoleTitle(argv[1]);
+	
 	// Then build the to-run application command
-	char cmd[MAX_PATH] = "";
+	char command[1024] = "";
 	for(int i = 1;i < argc;i++) {
-		strcat(cmd,&argv[i][0]);
+		strcat(command,&argv[i][0]);
 		if(i != (argc-1)) { // Leave out the last space
-			strcat(cmd," ");
+			strcat(command," ");
 		}
 	}
 	
@@ -47,32 +47,24 @@ int main(int argc, char** argv) {
 	memset(&si,0,sizeof(si));
 	si.cb = sizeof(si);
 	memset(&pi,0,sizeof(pi));
-
-	if(!CreateProcess(NULL, cmd, NULL, NULL, false, 0, NULL, NULL, &si, &pi)) {
-		
-		// Put error in body
-		char* errortext = GetErrorMessage(cmd);
-		
-		char fulltext[1024]; // should be enough
-		snprintf(fulltext,1024,"Error launching program (%lu):\r\n\r\n%s",GetLastError(),errortext);
-		
-		MessageBox(NULL,fulltext,"Error",MB_ICONERROR);
-		LocalFree(errortext);
+	
+	// Create and immediately wait to prevent the cursor from switching to "loading"
+	if(!CreateProcess(NULL, command, NULL, NULL, false, 0, NULL, NULL, &si, &pi)) {
+		char errorbuffer[1024];
+		printf("\n--------------------------------");
+		printf("\nFailed to execute \"%s\":",command);
+		printf("\nError %lu: %s",GetLastError(),GetErrorMessage(errorbuffer,1024));
+		printf("\nPress any key to continue . . . ");
+		getch();
 		return 1;
 	}
-	
-	SetConsoleTitle(argv[1]); // program name
-	
 	WaitForSingleObject(pi.hProcess, INFINITE); // Wait for it to finish
 	
-	//SetCursor(LoadCursor(GetModuleHandle(0),IDC_ARROW));
-
 	DWORD retval = 0;
 	GetExitCodeProcess(pi.hProcess, &retval);
 	printf("\n--------------------------------");
 	printf("\nProcess exited with return value %lu",retval);
 	printf("\nPress any key to continue . . . ");
 	getch();
-
 	return 0;
 }

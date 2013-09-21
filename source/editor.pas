@@ -61,7 +61,7 @@ type
     fIgnoreCaretChange : boolean;
     fPreviousTabs : TList; // list of editor pointers
     fDblClickTime : Cardinal;
-    fDblClickLine : integer;
+    fDblClickMousePos : TBufferCoord;
 
     fCompletionTimer: TTimer;
     fCompletionBox: TCodeCompletion;
@@ -449,18 +449,20 @@ end;
 procedure TEditor.EditorSpecialLineColors(Sender: TObject; Line: Integer;var Special: Boolean; var FG, BG: TColor);
 var
 	pt: TPoint;
+	RealLine: integer;
 begin
-	if (Line = fActiveLine) then begin
+	RealLine := fText.LineToUncollapsedLine(Line);
+	if (RealLine = fActiveLine) then begin
 		StrtoPoint(pt, devEditor.Syntax.Values[cABP]);
 		BG:= pt.X;
 		FG:= pt.Y;
 		Special:= TRUE;
-	end else if (HasBreakpoint(Line) <> -1) then begin
+	end else if (HasBreakpoint(RealLine) <> -1) then begin
 		StrtoPoint(pt, devEditor.Syntax.Values[cBP]);
 		BG:= pt.X;
 		FG:= pt.Y;
 		Special := TRUE;
-	end else if Line = fErrorLine then begin
+	end else if RealLine = fErrorLine then begin
 		StrtoPoint(pt, devEditor.Syntax.Values[cErr]);
 		BG:= pt.X;
 		FG:= pt.Y;
@@ -470,17 +472,18 @@ end;
 
 procedure TEditor.DebugAfterPaint(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 var
-	X, Y, I: integer;
+	X, Y, I, RealLine: integer;
 begin
 	X := (fText.Gutter.RealGutterWidth(fText.CharWidth) - fText.Gutter.RightOffset) div 2 - 3;
 	Y := (fText.LineHeight - dmMain.GutterImages.Height) div 2 + fText.LineHeight * (FirstLine - fText.TopLine);
 
 	for I := FirstLine to LastLine do begin
-		if fActiveLine = I then // prefer active line over breakpoints
+		RealLine := fText.LineToUncollapsedLine(I);
+		if fActiveLine = RealLine then // prefer active line over breakpoints
 			dmMain.GutterImages.Draw(ACanvas, X, Y, 1)
-		else if HasBreakpoint(I) <> -1 then
+		else if HasBreakpoint(RealLine) <> -1 then
 			dmMain.GutterImages.Draw(ACanvas, X, Y, 0)
-		else if fErrorLine = I then
+		else if fErrorLine = RealLine then
 			dmMain.GutterImages.Draw(ACanvas, X, Y, 2);
 
 		Inc(Y, fText.LineHeight);
@@ -1350,16 +1353,21 @@ end;
 procedure TEditor.EditorDblClick(Sender: TObject);
 begin
 	fDblClickTime := GetTickCount;
-	fDblClickLine := fText.CaretY;
+	fText.GetPositionOfMouse(fDblClickMousePos);
 end;
 
 procedure TEditor.EditorClick(Sender: TObject);
 var
 	fTripleClickTime: Cardinal;
+	fTripleClickMousePos: TBufferCoord;
 	fNewState: TSynStateFlags;
 begin
 	fTripleClickTime := GetTickCount;
-	if (fTripleClickTime > fDblClickTime) and (fTripleClickTime - GetDoubleClickTime < fDblClickTime) and (fText.CaretY = fDblClickLine) then begin
+	fText.GetPositionOfMouse(fTripleClickMousePos);
+	if (fTripleClickTime > fDblClickTime) and
+       (fTripleClickTime - GetDoubleClickTime < fDblClickTime) and
+       (fTripleClickMousePos.Char = fDblClickMousePos.Char) and
+       (fTripleClickMousePos.Line = fDblClickMousePos.Line) then begin
 
 		// Don't let the editor change the caret
 		fNewState := fText.StateFlags;
@@ -1421,13 +1429,9 @@ var
 				M.Free;
 			end;
 
-			if Assigned(st) then begin
-				if st^._ClassScope <> scsNone then
-					fText.Hint := MainForm.CppParser.StatementClassScopeStr(st^._ClassScope) + ' ' + st^._ScopeCmd + st^._MethodArgs + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow'
-				else
-					fText.Hint := Trim(st^._FullText) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow';
-			end else
-				// couldn't find anything? disable hint
+			if Assigned(st) then
+				fText.Hint := MainForm.CppParser.PrettyPrintStatement(st) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow'
+			else // couldn't find anything? disable hint
 				fText.Hint := '';
 		end;
 	end;

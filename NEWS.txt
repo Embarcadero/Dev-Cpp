@@ -1,6 +1,7 @@
 Version 5.4.3 - *
 
-- Mouseover hints are now also shown when hovering above #includes
+- Clicking in the gutter does not change the caret position anymore.
+- Mouseover hints are now also shown when hovering above #includes.
 - Fixed editor closing not always remembering the previous tab.
 - The matching brace highlighter now ignores text highlighted as 'Character'.
 - Custom compiler commands are now added to the end of the call to GCC.
@@ -9,6 +10,12 @@ Version 5.4.3 - *
 - The MRU list now does not reverse order each time it is loaded.
 - File Properties now does not add open files not belonging to the current project to project stats.
 - Editor mouseover tooltips now also shows which class each function belongs to.
+- The function tooltip now shows types again.
+- The MRU list now separates files and project files with a line.
+- Breakpoints are now moved when folding code.
+- Triple clicks now don't happen anymore when the mouse moves between clicks.
+- Updated Catalan translation.
+- The console pauser now does not show a "loading" cursor anymore.
 
 Version 5.4.2 - 24 Mei 2013
 

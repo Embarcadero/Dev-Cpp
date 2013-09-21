@@ -228,6 +228,7 @@ type
     procedure ReProcessInheritance;
     function IndexOfStatement(ID: integer): integer;
     function Locate(const Full: AnsiString; WithScope: boolean): PStatement;
+    function PrettyPrintStatement(st: PStatement) : AnsiString;
     procedure FillListOfFunctions(const Full: AnsiString; List: TStringList);
     function FindAndScanBlockAt(const Filename : AnsiString; Row : integer; Stream: TStream): integer;
     function FindStatementOf(FileName, Phrase : AnsiString; Row : integer; Stream: TStream): PStatement; overload;
@@ -2822,6 +2823,17 @@ begin
 		GetInheritanceIDs(PStatement(fStatementList[index]),List);
 end;
 
+function TCppParser.PrettyPrintStatement(st : PStatement) : AnsiString;
+begin
+	if st^._ClassScope <> scsNone then
+		if st^._Type <> '' then
+			result := StatementClassScopeStr(st^._ClassScope) + ' ' + st^._Type + ' ' + st^._ScopeCmd + st^._MethodArgs
+		else
+			result := StatementClassScopeStr(st^._ClassScope) + ' ' + st^._ScopeCmd + st^._MethodArgs
+	else
+		result := st^._FullText;
+end;
+
 procedure TCppParser.FillListOfFunctions(const Full: AnsiString; List: TStringList);
 var
 	I: integer;
@@ -2839,10 +2851,7 @@ begin
 				SameStr(Full + 'A', st^._ScopelessCmd) or
 				SameStr(Full + 'W', st^._ScopelessCmd)
 			then begin
-				if st^._ClassScope <> scsNone then
-					List.Add(StatementClassScopeStr(st^._ClassScope) + ' ' + st^._ScopeCmd + st^._MethodArgs)
-				else
-					List.Add(st^._FullText);
+				List.Add(PrettyPrintStatement(st));
 			end;
 		end;
 	end;

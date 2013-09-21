@@ -47,7 +47,7 @@ object MainForm: TMainForm
     Top = 433
     Width = 896
     Height = 183
-    ActivePage = LogSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -258,13 +258,13 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 299
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           299
-          154)
+          155)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -298,7 +298,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 589
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -306,7 +306,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           589
-          154)
+          155)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -492,7 +492,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -1200,13 +1200,16 @@ object MainForm: TMainForm
         Action = actPrintSU
         GroupIndex = 9
       end
+      object N21: TMenuItem
+        Caption = '-'
+        GroupIndex = 9
+      end
       object N76: TMenuItem
         Caption = '-'
         GroupIndex = 9
       end
       object N11: TMenuItem
         Caption = '-'
-        Enabled = False
         GroupIndex = 9
       end
       object ClearhistoryItem: TMenuItem

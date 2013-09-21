@@ -569,6 +569,7 @@ type
     SearchAgainBackwards1: TMenuItem;
     actDeleteLine: TAction;
     pbCompilation: TProgressBar;
+    N21: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -2548,8 +2549,15 @@ begin
 		NewName := ExpandFileto(NewName,CurDir);
 
 		// Only continue if the user says so...
-		if FileExists(NewName) then
-			if MessageDlg(Lang[ID_MSG_FILEEXISTS], mtConfirmation, [mbYes,mbNo], 0) = mrNo then Exit;
+		if FileExists(NewName) then begin
+			if MessageDlg(Lang[ID_MSG_FILEEXISTS], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+
+				// Remove the old file
+				DeleteFile(NewName);
+				// TODO: update project listing
+			end else
+				Exit;
+		end;
 
 		try
 

@@ -231,8 +231,8 @@ begin
 
 		AddItemByValues('Class Header Template','Class',
 
-	'#ifndef SOMETHING_INCLUDED'+#13#10+
-	'#define SOMETHING_INCLUDED'+#13#10#13#10+
+	'#ifndef SOMETHING_H'+#13#10+
+	'#define SOMETHING_H'+#13#10#13#10+
 	'class *|* {'+#13#10+
 	'	// Private section'+#13#10+
 	'	public:'+#13#10+

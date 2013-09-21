@@ -118,9 +118,9 @@ var
 type
 {$IFDEF SYN_CLX}
   TSynBorderStyle = bsNone..bsSingle;
-	TBufferCoord = QSynEditTypes.TBufferCoord;
-	TDisplayCoord = QSynEditTypes.TDisplayCoord;
-	TSynEditMark = QSynEditMiscClasses.TSynEditMark;
+  TBufferCoord = QSynEditTypes.TBufferCoord;
+  TDisplayCoord = QSynEditTypes.TDisplayCoord;
+  TSynEditMark = QSynEditMiscClasses.TSynEditMark;
 {$ELSE}
   TSynBorderStyle = TBorderStyle;
   TBufferCoord = SynEditTypes.TBufferCoord;
@@ -305,7 +305,6 @@ type
     fEditingFolds:           boolean;
     fUseCodeFolding:         boolean;
     //### End Code Folding ###
-
     fAlwaysShowCaret: Boolean;
     fBlockBegin: TBufferCoord;
     fBlockEnd: TBufferCoord;
@@ -410,7 +409,6 @@ type
     fChainedEditor: TCustomSynEdit;
     fChainUndoAdded: TNotifyEvent;
     fChainRedoAdded: TNotifyEvent;
-
 {$IFDEF SYN_LINUX}
     FDeadKeysFixed: Boolean;
 {$ENDIF}
@@ -2145,7 +2143,7 @@ begin
   {$ENDIF}
 
   // don't perform a click when we click the gutter
-  if (X < fGutterWidth +2) then begin
+  if (X < fGutterWidth) then begin
     DoOnGutterClick(Button, X, Y);
     Exit;
   end;
@@ -2234,7 +2232,7 @@ begin
     end;
   end;
 
-  if (X < fGutterWidth +2) then
+  if (X < fGutterWidth) then
   begin
     if Button = mbRight then
       DoOnGutterClick(Button, X, Y)
