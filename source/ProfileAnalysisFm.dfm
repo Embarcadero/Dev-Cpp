@@ -1,6 +1,6 @@
 object ProfileAnalysisForm: TProfileAnalysisForm
-  Left = 1049
-  Top = 400
+  Left = 990
+  Top = 156
   Width = 649
   Height = 531
   Caption = 'Profile analysis'
@@ -32,7 +32,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
       Top = 0
       Width = 633
       Height = 493
-      ActivePage = tabGraph
+      ActivePage = tabOpts
       Align = alClient
       TabOrder = 0
       OnChange = PageControl1Change
@@ -192,14 +192,14 @@ object ProfileAnalysisForm: TProfileAnalysisForm
           Height = 105
           Caption = ' Function Hiding '
           TabOrder = 0
-          object Label1: TLabel
+          object PrevText: TLabel
             Left = 16
             Top = 78
             Width = 160
             Height = 13
             Caption = 'Supress functions called less than'
           end
-          object Label2: TLabel
+          object PostText: TLabel
             Left = 240
             Top = 78
             Width = 24

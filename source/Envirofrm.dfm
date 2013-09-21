@@ -121,7 +121,7 @@ object EnviroForm: TEnviroForm
         AutoSize = False
         Caption = 'Theme'
       end
-      object Label1: TLabel
+      object UIfontlabel: TLabel
         Left = 192
         Top = 136
         Width = 35
@@ -324,6 +324,7 @@ object EnviroForm: TEnviroForm
         Height = 21
         ItemHeight = 13
         TabOrder = 15
+        OnChange = cbUIfontChange
       end
     end
     object tabPaths: TTabSheet

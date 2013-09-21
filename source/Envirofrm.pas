@@ -101,7 +101,7 @@ type
     edCVSExec: TEdit;
     spnCVSCompression: TSpinEdit;
     chkCVSUseSSH: TCheckBox;
-    Label1: TLabel;
+    UIfontlabel: TLabel;
     cbUIfont: TComboBox;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
@@ -115,6 +115,7 @@ type
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
+    procedure cbUIfontChange(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -272,7 +273,8 @@ begin
 		EnumFontFamilies(DC, nil, @EnumFontFamilyProc, integer(cbUIfont.Items));
 		ReleaseDC(0, DC);
 		cbUIfont.Sorted:= TRUE;
-        cbUIfont.Text:=InterfaceFont;
+		cbUIfont.Text:=InterfaceFont;
+		cbUIfont.Font.Name:=cbUIfont.Text;
 	end;
 end;
 
@@ -441,6 +443,7 @@ begin
   lblCVSExec.Caption:=       Lang[ID_ENV_CVSEXE];
   lblCVSCompression.Caption:=Lang[ID_ENV_CVSCOMPR];
   chkCVSUseSSH.Caption:=     Lang[ID_ENV_CVSUSESSH];
+  uifontlabel.Caption:=      Lang[ID_ENV_UIFONT];
 end;
 
 procedure TEnviroForm.btnHelpClick(Sender: TObject);
@@ -522,6 +525,11 @@ begin
   chkAltConfig.Enabled:=ConfigMode <> CFG_PARAM;
   edAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
   btnAltConfig.Enabled:= chkAltConfig.Enabled and chkAltConfig.Checked;
+end;
+
+procedure TEnviroForm.cbUIfontChange(Sender: TObject);
+begin
+	(Sender as TComboBox).Font.Name := (Sender as TComboBox).Text;
 end;
 
 end.

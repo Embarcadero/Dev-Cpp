@@ -884,6 +884,14 @@ const
   ID_PROF_TABFLAT                   = 57002;
   ID_PROF_TABGRAPH                  = 57003;
   ID_PROF_TABOPTS                   = 57004;
+  ID_PROF_FUNCHIDING                = 57005;
+  ID_PROF_HIDENOTLONG               = 57006;
+  ID_PROF_SUPPRESSTATIC             = 57007;
+  ID_PROF_PREVTEXT                  = 57008;
+  ID_PROF_POSTTEXT                  = 57009;
+  ID_PROF_APPLY                     = 57010;
+  ID_PROF_CUSTOMCOMMANDS            = 57011;
+  ID_PROF_CUSTOMUSE                 = 57012;
 
 { -- global strings  -- }
   //messages and prompts - 1000+
@@ -1016,6 +1024,7 @@ const
   ID_ENV_USEALTCONFIG               = 64019;
   ID_ENV_CONFIGCHANGED              = 64020;
   ID_ENV_UACERROR                   = 64021;
+  ID_ENV_UIFONT                     = 64022;
 
 { Execute menu }
   ID_ITEM_EXECPARAMS                = 65001;

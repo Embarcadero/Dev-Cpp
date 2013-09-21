@@ -47,9 +47,9 @@ type
     FuncHiding: TGroupBox;
     chkHideNotCalled: TCheckBox;
     chkSuppressStatic: TCheckBox;
-    Label1: TLabel;
+    PrevText: TLabel;
     spnMinCount: TSpinEdit;
-    Label2: TLabel;
+    PostText: TLabel;
     btnApply: TButton;
     CustomCommands: TGroupBox;
     chkCustom: TCheckBox;
@@ -338,6 +338,15 @@ begin
   tabFlat.Caption := Lang[ID_PROF_TABFLAT];
   tabGraph.Caption := Lang[ID_PROF_TABGRAPH];
   tabOpts.Caption := Lang[ID_PROF_TABOPTS];
+
+  FuncHiding.Caption := Lang[ID_PROF_FUNCHIDING];
+  chkHideNotCalled.Caption := Lang[ID_PROF_HIDENOTLONG];
+  chkSuppressStatic.Caption := Lang[ID_PROF_SUPPRESSTATIC];
+  PrevText.Caption := Lang[ID_PROF_PREVTEXT];
+  PostText.Caption := Lang[ID_PROF_POSTTEXT];
+  btnApply.Caption := Lang[ID_PROF_APPLY];
+  CustomCommands.Caption := Lang[ID_PROF_CUSTOMCOMMANDS];
+  chkCustom.Caption := Lang[ID_PROF_CUSTOMUSE];
 end;
 
 procedure TProfileAnalysisForm.lvFlatMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);

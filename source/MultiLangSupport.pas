@@ -233,7 +233,7 @@ begin
 		Result := fDefaultLang.Values[inttostr(ID)];
 	end;
 	if result = '' then
-		result:= format('ID %d translation missing>', [ID])
+		result:= format('<ID %d translation missing>', [ID])
 	else
 		result:=StringReplace(result, '<CR>', #13#10, [rfReplaceAll]);
 end;

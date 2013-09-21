@@ -1136,6 +1136,7 @@ end;
 
 procedure TMainForm.UpdateFont;
 begin
+	Screen.MenuFont.Name := devData.InterfaceFont;
 	MainForm.Font.Name := devData.InterfaceFont;
 //	fEnviroFrm.
 end;
@@ -6600,7 +6601,7 @@ begin
 					len := 0;
 
 					// Then check if that line contains a newline
-					repeat
+					while not (I-len = 1) and not (text[I-len] in [#10]) do begin
 						Inc(len);
 
 						// if the current line is a comment, skip by 'len' steps
@@ -6608,7 +6609,7 @@ begin
 							Inc(wantcomment);
 							break;
 						end;
-					until (I-len = 1) or (text[I-len] in [#10]);
+					end;
 				end;
 
 				// Skip multi-line comments

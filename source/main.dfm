@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 700
-  Top = 317
+  Left = 347
+  Top = 236
   Width = 968
   Height = 698
   HorzScrollBar.Visible = False
@@ -1005,8 +1005,11 @@ object MainForm: TMainForm
       Flat = True
       Images = dmMain.SpecialImages_NewLook
       List = True
+      ParentShowHint = False
       ShowCaptions = True
+      ShowHint = False
       TabOrder = 5
+      Transparent = False
       Wrapable = False
       object NewAllBtn: TToolButton
         Left = 0
