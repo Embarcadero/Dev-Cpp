@@ -63,6 +63,10 @@ uses Version, MultiLangSupport, devcfg, utils;
 
 procedure TIconForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption:=             Lang[ID_IF];
   btnOk.Caption:=       Lang[ID_IF_USEICO];
   btnCancel.Caption:=   Lang[ID_BTN_CANCEL];

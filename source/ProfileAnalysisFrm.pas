@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit ProfileAnalysisFm;
+unit ProfileAnalysisFrm;
 
 interface
 
@@ -100,7 +100,6 @@ end;
 procedure TProfileAnalysisForm.FormClose(Sender: TObject;var Action: TCloseAction);
 begin
   Action := caFree;
-  ProfileAnalysisForm := nil;
 end;
 
 procedure TProfileAnalysisForm.DoFlat;
@@ -334,6 +333,10 @@ end;
 
 procedure TProfileAnalysisForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
 	Caption := Lang[ID_PROF_CAPTION];
 	tabFlat.Caption := Lang[ID_PROF_TABFLAT];
 	tabGraph.Caption := Lang[ID_PROF_TABGRAPH];

@@ -33,8 +33,8 @@ const
 resourcestring
 	// misc strings
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '5.1.1.1 RC3';
-	DEVCPP_BUILDTIME     = 'April 6 2012 - 11:17';
+	DEVCPP_VERSION       = '5.2.0.0';
+	DEVCPP_BUILDTIME     = 'April 17 2012 - 19:08';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -124,6 +124,7 @@ resourcestring
   cABP                 = 'Active Breakpoints';
   cGut                 = 'Gutter';
   cSel                 = 'Selected text';
+  cFld                 = 'Fold bar lines';
 
 const
   // source file extensions

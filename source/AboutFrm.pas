@@ -66,8 +66,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnAuthorsClick(Sender: TObject);
     procedure btnUpdateCheckClick(Sender: TObject);
-    procedure btnAuthorsDragOver(Sender, Source: TObject; X, Y: Integer;
-      State: TDragState; var Accept: Boolean);
+    procedure btnAuthorsDragOver(Sender, Source: TObject; X, Y: Integer;State: TDragState; var Accept: Boolean);
     procedure btnAuthorsDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure Timer1Timer(Sender: TObject);
     procedure FishImageClick(Sender: TObject);
@@ -91,6 +90,10 @@ uses
 
 procedure TAboutForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption:=                Lang[ID_AB_CAPTION];
   GroupBox1.Caption:=      Lang[ID_AB_LICENSE];
   GroupBox2.Caption:=      Lang[ID_AB_WEBCAP];
@@ -124,10 +127,10 @@ end;
 
 procedure TAboutForm.FormCreate(Sender: TObject);
 begin
-  LoadText;
-  VersionLabel.Caption:= VersionLabel.Caption + DEVCPP_VERSION + #13#10 + 'Build time: ' + DEVCPP_BUILDTIME;
-  if FileExists(devData.Splash) then
-   Image1.Picture.LoadFromFile(devData.Splash);
+	LoadText;
+	VersionLabel.Caption := VersionLabel.Caption + DEVCPP_VERSION + #13#10 + 'Build time: ' + DEVCPP_BUILDTIME;
+	if FileExists(devData.Splash) then
+		Image1.Picture.LoadFromFile(devData.Splash);
 end;
 
 procedure TAboutForm.btnAuthorsClick(Sender: TObject);
@@ -148,7 +151,6 @@ end;
 
 procedure TAboutForm.btnUpdateCheckClick(Sender: TObject);
 begin
-  //CheckUpdate(Self); old check for update
   MainForm.actUpdateCheckExecute(sender);
 end;
 
@@ -192,7 +194,7 @@ end;
 
 procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-	action := caFree;
+	Action := caFree;
 end;
 
 end.

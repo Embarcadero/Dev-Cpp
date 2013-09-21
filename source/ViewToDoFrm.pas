@@ -17,7 +17,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit ViewToDoFm;
+unit ViewToDoFrm;
 
 interface
 
@@ -77,8 +77,8 @@ type
 	{ Public declarations }
 	end;
 
-var
-	ViewToDoForm: TViewToDoForm;
+//var
+//	ViewToDoForm: TViewToDoForm;
 
 implementation
 

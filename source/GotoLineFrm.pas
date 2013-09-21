@@ -91,6 +91,10 @@ end;
 
 procedure TGotoLineForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_GOTO_CAPTION];
   GotoLabel.Caption := Lang[ID_GOTO_TEXT];
   BtnOk.Caption := Lang[ID_BTN_OK];

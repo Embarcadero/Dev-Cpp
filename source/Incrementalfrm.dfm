@@ -1,6 +1,6 @@
 object frmIncremental: TfrmIncremental
-  Left = 996
-  Top = 628
+  Left = 862
+  Top = 564
   Anchors = []
   AutoSize = True
   BorderIcons = [biSystemMenu]
@@ -14,6 +14,7 @@ object frmIncremental: TfrmIncremental
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
+  FormStyle = fsStayOnTop
   OldCreateOrder = False
   OnShow = FormShow
   PixelsPerInch = 96

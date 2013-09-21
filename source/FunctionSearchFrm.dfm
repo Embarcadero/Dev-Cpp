@@ -1,22 +1,22 @@
 object FunctionSearchForm: TFunctionSearchForm
-  Left = 196
-  Top = 109
+  Left = 717
+  Top = 386
   BorderStyle = bsDialog
   Caption = 'Goto function...'
-  ClientHeight = 329
+  ClientHeight = 332
   ClientWidth = 451
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object Panel1: TPanel
     Left = 0
     Top = 0
@@ -31,15 +31,15 @@ object FunctionSearchForm: TFunctionSearchForm
     object Label1: TLabel
       Left = 4
       Top = 8
-      Width = 52
-      Height = 13
+      Width = 56
+      Height = 15
       Caption = 'Search for:'
     end
     object txtSearch: TEdit
       Left = 84
       Top = 4
       Width = 361
-      Height = 21
+      Height = 23
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
       OnChange = txtSearchChange
@@ -51,11 +51,11 @@ object FunctionSearchForm: TFunctionSearchForm
     Left = 0
     Top = 29
     Width = 451
-    Height = 300
+    Height = 303
     Align = alClient
     Columns = <
       item
-        Width = 32
+        Width = 30
       end
       item
         Caption = 'Type'

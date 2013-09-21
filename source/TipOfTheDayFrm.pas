@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit TipOfTheDayFm;
+unit TipOfTheDayFrm;
 
 interface
 
@@ -64,15 +64,11 @@ type
     function NextTip: string;
     function PreviousTip: string;
     function RandomTip: string;
-    procedure SetTipsCounter(const Value: integer);
     procedure LoadText;
-  public
-    { Public declarations }
-    property Current: integer read TipsCounter write SetTipsCounter;
   end;
 
-var
-  TipOfTheDayForm: TTipOfTheDayForm;
+//var
+//  TipOfTheDayForm: TTipOfTheDayForm;
 
 implementation
 
@@ -113,7 +109,7 @@ end;
 
 procedure TTipOfTheDayForm.btnCloseClick(Sender: TObject);
 begin
-  Close;
+	Close;
 end;
 
 function TTipOfTheDayForm.ConvertMacros(Str: string): string;
@@ -150,14 +146,15 @@ end;
 
 procedure TTipOfTheDayForm.FormCreate(Sender: TObject);
 begin
-  LoadText;
-  TipsCounter := 0;
-  sl := TStringList.Create;
+	LoadText;
+	chkNotAgain.Checked:=not devData.ShowTipsOnStart;
+	TipsCounter := devData.LastTip;
+	sl := TStringList.Create;
 end;
 
 procedure TTipOfTheDayForm.FormDestroy(Sender: TObject);
 begin
-  sl.Free;
+	sl.Free;
 end;
 
 function TTipOfTheDayForm.CurrentTip: string;
@@ -230,16 +227,10 @@ begin
   end;
 end;
 
-procedure TTipOfTheDayForm.SetTipsCounter(const Value: integer);
-begin
-  if Value <> TipsCounter then
-    TipsCounter := Value;
-end;
-
 procedure TTipOfTheDayForm.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-	devData.LastTip:=Current+1;
+	devData.LastTip:=TipsCounter+1;
 	devData.ShowTipsOnStart:=not chkNotAgain.Checked;
 	Action := caFree;
 end;

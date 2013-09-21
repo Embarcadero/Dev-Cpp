@@ -17,68 +17,50 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit CompileProgressFm;
+unit CVSPasswdFrm;
 
 interface
 
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls;
+  Dialogs, StdCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QExtCtrls, QComCtrls;
+  QDialogs, QStdCtrls;
 {$ENDIF}
 
 type
-  TCompileProgressForm = class(TForm)
-    btnClose: TButton;
-    PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    Memo1: TMemo;
+  TCVSPasswdForm = class(TForm)
     Label1: TLabel;
-    lblCompiler: TLabel;
-    Label3: TLabel;
-    lblStatus: TLabel;
-    Label5: TLabel;
-    lblFile: TLabel;
-    Bevel1: TBevel;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
-    Bevel4: TBevel;
-    Label2: TLabel;
-    Label4: TLabel;
-    lblErr: TLabel;
-    lblWarn: TLabel;
-    Bevel5: TBevel;
-    Bevel6: TBevel;
-    pb: TProgressBar;
+    txtPass: TEdit;
+    btnOK: TButton;
     procedure FormShow(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
+    { Private declarations }
   public
-    starttime : cardinal;
-    stoptime : cardinal;
+    { Public declarations }
   end;
 
-var
-  CompileProgressForm: TCompileProgressForm;
+//var
+//  CVSPasswdForm: TCVSPasswdForm;
 
 implementation
 
+uses 
+  devcfg;
+
 {$R *.dfm}
 
-procedure TCompileProgressForm.FormShow(Sender: TObject);
+procedure TCVSPasswdForm.FormShow(Sender: TObject);
 begin
-  PageControl1.ActivePageIndex := 0;
-end;
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
 
-procedure TCompileProgressForm.FormClose(Sender: TObject;
-  var Action: TCloseAction);
-begin
-  Action := caFree;
+	txtPass.Text := '';
+	txtPass.SetFocus;
 end;
 
 end.

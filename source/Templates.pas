@@ -65,7 +65,6 @@ type
    destructor Destroy; override;
 
    procedure ReadTemplateFile(const FileName: string);
-   procedure LoadFromStream(const ms: TStream);
    function AddUnit: integer;
    procedure RemoveUnit(const index: integer);
    function Save: boolean;
@@ -333,20 +332,17 @@ end;
 
 procedure TTemplate.SetUnit(index: integer; value: TTemplateUnit);
 var
- section: string;
+	section: string;
 begin
-  if not assigned(fTemplate) or (fVersion <= 0) then exit;
-  section:= 'Unit' +inttostr(index);
-  if fTemplate.SectionExists(section) then
-   begin
-     fTemplate.WriteString(section, 'C', value.CText);
-     fTemplate.WriteString(section, 'Cpp', value.CppText);
-     fTemplate.WriteString(section, 'CName', value.CName);
-     fTemplate.WriteString(section, 'CppName', value.CppName);
-   end
-  else
-   // debugging (we need to add debugging mode defines)
-   showmessage('Section doesn''t exists '+inttostr(index));
+	if assigned(fTemplate) and (fVersion > 0) then begin
+		section:= 'Unit' +inttostr(index);
+		if fTemplate.SectionExists(section) then begin
+			fTemplate.WriteString(section, 'C', value.CText);
+			fTemplate.WriteString(section, 'Cpp', value.CppText);
+			fTemplate.WriteString(section, 'CName', value.CName);
+			fTemplate.WriteString(section, 'CppName', value.CppName);
+		end;
+	end;
 end;
 
 function TTemplate.GetUnitCount: integer;
@@ -363,11 +359,6 @@ end;
 function TTemplate.GetVersion: integer;
 begin
   result:= fVersion;
-end;
-
-procedure TTemplate.LoadFromStream(const ms: TStream);
-begin
-//
 end;
 
 end.

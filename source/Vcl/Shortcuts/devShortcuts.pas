@@ -30,34 +30,12 @@ uses
 {$ENDIF}
 
 type
-  TmlStrings = class(TPersistent)
-  private
-    fCaption: string;
-    fTitle: string;
-    fTip: string;
-    fHeaderEntry: string;
-    fHeaderShortcut: string;
-    fOK: string;
-    fCancel: string;
-  protected
-  public
-  published
-    property Caption: string read fCaption write fCaption;
-    property Title: string read fTitle write fTitle;
-    property Tip: string read fTip write fTip;
-    property HeaderEntry: string read fHeaderEntry write fHeaderEntry;
-    property HeaderShortcut: string read fHeaderShortcut write fHeaderShortcut;
-    property OK: string read fOK write fOK;
-    property Cancel: string read fCancel write fCancel;
-  end;
-
   TdevShortcuts = class(TComponent)
   private
     { Private declarations }
     fOwner: TComponent;
     fAltColor: TColor;
     fFilename: TFileName;
-    fMLStrings: TmlStrings;
     procedure ReadShortcuts;
     procedure Save;
   protected
@@ -65,14 +43,12 @@ type
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     procedure Load;
     procedure Edit;
   published
     { Published declarations }
     property Filename: TFilename read fFilename write fFilename;
     property AlternateColor: TColor read fAltColor write fAltColor;
-    property MultiLangStrings: TmlStrings read fMLStrings write fMLStrings;
   end;
 
 procedure Register;
@@ -101,22 +77,6 @@ begin
   fOwner := AOwner;
   fFileName := 'shortcuts.cfg';
   fAltColor := $E0E0E0;
-  fMLStrings := TMLStrings.Create;
-  with fMLStrings do begin
-    Caption := 'Configure Shortcuts';
-    Title := ' Click on an item and press the shortcut you desire!';
-    Tip := 'Tip: press "Escape" to clear a shortcut...';
-    HeaderEntry := 'Menu entry';
-    HeaderShortcut := 'Shortcut assigned';
-    OK := 'OK';
-    Cancel := 'Cancel';
-  end;
-end;
-
-destructor TdevShortcuts.Destroy;
-begin
-  fMLStrings.Free;
-  inherited;
 end;
 
 procedure TdevShortcuts.Edit;
@@ -125,13 +85,6 @@ begin
   with frmShortcutsEditor do
   try
     AltColor := fAltColor;
-    Caption := fMLStrings.Caption;
-    lblTitle.Caption := fMLStrings.Title;
-    lblTip.Caption := fMLStrings.Tip;
-    lvShortcuts.Column[0].Caption := fMLStrings.HeaderEntry;
-    lvShortcuts.Column[1].Caption := fMLStrings.HeaderShortcut;
-    btnOk.Caption := fMLStrings.OK;
-    btnCancel.Caption := fMLStrings.Cancel;
     Clear;
     ReadShortcuts;
     if ShowModal = mrOK then
@@ -273,27 +226,22 @@ var
   Smenu: string;
   Scut: string;
 begin
-  if fFileName = '' then
-    Exit;
-//  if(fFileName[2] <> ':') then // if relative
-//	Fini := TIniFile.Create(devdirs.Exec+fFileName)
-//  else
+	if fFileName = '' then
+		Exit;
 	Fini := TIniFile.Create(fFileName);
-  try
-    for I := 0 to frmShortcutsEditor.Count - 1 do begin
-      frmShortcutsEditor.Items[I].ShortCut := frmShortcutsEditor.ShortCuts[I];
-      if Assigned(frmShortcutsEditor.Items[I].Action) then
-        TAction(frmShortcutsEditor.Items[I].Action).ShortCut := frmShortcutsEditor.ShortCuts[I];
-      Smenu := StripHotkey(GetTopmostItemAncestor(frmShortcutsEditor.Items[I]))+':'+
-        StripHotkey(frmShortcutsEditor.Items[I].Caption);
-      Scut := ShortCutToText(frmShortcutsEditor.ShortCuts[I]);
-      if Scut = '' then
-        Scut := 'none';
-      Fini.WriteString('Shortcuts', Smenu, Scut);
-    end; // BEZIG
-  finally
-    Fini.Free;
-  end;
+	with frmShortcutsEditor do begin
+		for I := 0 to Count - 1 do begin
+			Items[I].ShortCut := ShortCuts[I];
+			if Assigned(Items[I].Action) then
+				TAction(Items[I].Action).ShortCut := ShortCuts[I];
+			Smenu := StripHotkey(GetTopmostItemAncestor(Items[I]))+':'+
+			StripHotkey(Items[I].Caption);
+			Scut := ShortCutToText(ShortCuts[I]);
+			if Scut = '' then
+				Scut := 'none';
+			Fini.WriteString('Shortcuts', Smenu, Scut);
+		end;
+	end;
 end;
 
 end.

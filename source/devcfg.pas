@@ -378,7 +378,7 @@ type
    fShowFunctionTip: boolean;  // show function tip
    fMarginColor: TColor;       // Color of right margin
    fSyntax: TStrings;          // Holds attributes settings
-   fDefaultIntoPrj: boolean;   // Insert Default Source Code into "empty" project
+   fDefaultCode: boolean;      // Insert Default Source Code into new files
    fParserHints: boolean;      // Show parser's hint for the word under the cursor
    fMatch : boolean;           // Highlight matching parenthesis
    fHighCurrLine: boolean;     // Highlight current line
@@ -449,7 +449,7 @@ type
    property Syntax: TStrings read fSyntax write fSyntax;
 
    // other
-   property DefaulttoPrj: boolean read fDefaultIntoPrj write fDefaultIntoPrj;
+   property DefaultCode: boolean read fDefaultCode write fDefaultCode;
    property ParserHints: boolean read fParserHints write fParserHints;
    property Match: boolean read fMatch write fMatch;
    property HighCurrLine: boolean read fHighCurrLine write fHighCurrLine;
@@ -472,7 +472,6 @@ type
  // master option object -- contains program globals
  TdevData = class(TConfigData)
   private
-   fVersion: string;                 // The configuration file's version
    fLang: string;                    // Language file
    fTheme: string;                   // Theme file
    fFindCols: string;                // Find Column widths (comma sep)
@@ -495,7 +494,6 @@ type
    fDefCpp: boolean;                 // Default to C++ project (compile with g++)
    fFirst: boolean;                  // first run of dev-c
    fSplash: string;                  // user selected splash screen
-   fWinPlace: TWindowPlacement;      // Main forms size, state and position.
    fdblFiles: boolean;               // double click opens files out of project manager
    fLangChange: boolean;             // flag for language change
    fthemeChange: boolean;            // did the theme change?
@@ -557,15 +555,11 @@ type
    constructor Create(aOwner: TComponent); override;
    destructor Destroy; override;
    procedure SettoDefaults; override;
-   procedure SaveConfigData; override;
-   procedure ReadConfigData; override;
 
    class function DevData: TDevData;
-   property WindowPlacement: TWindowPlacement read fWinPlace write fWinPlace;
    property LangChange: boolean read fLangChange write fLangChange;
    property ThemeChange: boolean read fThemeChange write fThemeChange;
   published
-   property Version: string read fVersion write fVersion;
    property Language: string read fLang write fLang;
    property Theme: string read fTheme write fTheme;
    property First: boolean read fFirst write fFirst;
@@ -936,18 +930,6 @@ begin
   inherited;
 end;
 
-procedure TdevData.ReadConfigData;
-begin
-  inherited;
-  LoadWindowPlacement('Position', fWinPlace);
-end;
-
-procedure TdevData.SaveConfigData;
-begin
-  inherited;
-  SaveWindowPlacement('Position', fWinPlace);
-end;
-
 procedure TdevData.SettoDefaults;
 
   function getAssociation(I: integer): Boolean;
@@ -960,7 +942,6 @@ procedure TdevData.SettoDefaults;
   end;
 
 begin
-  fVersion:=''; // this is filled in MainForm.Create()
   fFirst:= TRUE;
   fLang:= DEFAULT_LANG_FILE;
   fFindCols:= '75, 75, 120, 150';
@@ -1543,7 +1524,7 @@ begin
 	fLeadZero:= FALSE;
 	fGutterFont.Name:= 'Courier New';
 	fGutterFont.Size:= 10;
-	fGutterSize:= 32;
+	fGutterSize:= 1;
 
 	// Autosave
 	fEnableAutoSave := FALSE;
@@ -1561,86 +1542,87 @@ end;
 
 procedure TdevEditor.AssignEditor(Editor: TSynEdit);
 var
-	pt,guttercolor: TPoint;
-	x: integer;
+	pt: TPoint;
 begin
 	if (not assigned(Editor)) or (not (Editor is TCustomSynEdit)) then exit;
 	with Editor do begin
 		BeginUpdate;
-	try
-		TabWidth:= fTabSize;
-		Font.Assign(fFont);
-		with Gutter do begin
-			UseFontStyle:= fCustomGutter;
-			Font.Assign(fGutterFont);
-			Width:= fGutterSize;
-			Visible:= fShowGutter;
-			AutoSize:= fGutterAuto;
-			ShowLineNumbers:= fLineNumbers;
-			LeadingZeros:= fLeadZero;
-			ZeroStart:= fFirstisZero;
-			x:= fSyntax.IndexofName(cGut);
-			if x <> -1 then begin
-				// Hacky color fix
-				guttercolor.x:= clBtnFace;
-				guttercolor.y:= clBlack;
-				fSyntax.Values[cGut]:= PointtoStr(guttercolor);
+		try
+			TabWidth:= fTabSize;
+			Font.Assign(fFont);
+			with Gutter do begin
+				Font.Assign(fGutterFont);
+				DigitCount:= fGutterSize;
+				Visible:= fShowGutter;
+				AutoSize:= fGutterAuto;
+				ShowLineNumbers:= fLineNumbers;
+				LeadingZeros:= fLeadZero;
+				ZeroStart:= fFirstisZero;
+
+				// Always apply custom colors, even when not using a custom font
 				StrtoPoint(pt, fSyntax.Values[cGut]);
 				Color:= pt.x;
 				Font.Color:= pt.y;
 			end;
-		end;
 
-		if fMarginVis then
-			RightEdge:= fMarginSize
-		else
-			RightEdge:= 0;
+			// update the selected text color
+			StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
+			SelectedColor.Background:= pt.X;
+			SelectedColor.Foreground:= pt.Y;
 
-		RightEdgeColor:= fMarginColor;
+			StrtoPoint(pt, fSyntax.Values[cFld]);
+			CodeFolding.FolderBarLinesColor := pt.y;
 
-		InsertCaret:= TSynEditCaretType(fInsertCaret);
-		OverwriteCaret:= TSynEditCaretType(fOverwriteCaret);
+			if fMarginVis then
+				RightEdge:= fMarginSize
+			else
+				RightEdge:= 0;
 
-		ScrollHintFormat:= shfTopToBottom;
+			RightEdgeColor:= fMarginColor;
 
-		if HighCurrLine then
-			ActiveLineColor := HighColor
-		else
-			ActiveLineColor := clNone;
+			InsertCaret:= TSynEditCaretType(fInsertCaret);
+			OverwriteCaret:= TSynEditCaretType(fOverwriteCaret);
 
-		Options := [
-			eoAltSetsColumnMode, eoDisableScrollArrows,
-			eoDragDropEditing, eoDropFiles, eoKeepCaretX, eoTabsToSpaces,
-			eoRightMouseMovesCursor, eoScrollByOneLess, eoAutoSizeMaxScrollWidth
-		];
+			ScrollHintFormat:= shfTopToBottom;
 
-		//Optional synedit options in devData
-		if fAutoIndent then
-			Options := Options + [eoAutoIndent];
-		if fEHomeKey then
-			Options := Options + [eoEnhanceHomeKey];
-		if fGroupUndo then
-			Options := Options + [eoGroupUndo];
-		if fHalfPage then
-			Options := Options + [eoHalfPageScroll];
-		if fShowScrollbars then
-			Options := Options + [eoHideShowScrollbars];
-		if fPastEOF then
-			Options := Options + [eoScrollPastEOF];
-		if fPastEOL then
-			Options := Options + [eoScrollPastEOL];
-		if fShowScrollHint then
-			Options := Options + [eoScrollHintFollows,eoShowScrollHint];
-		if fSmartTabs then
-			Options := Options + [eoSmartTabs];
-		if fSmartTabs then
-			Options := Options + [eoSmartTabDelete];
-		if fUseTabs then
-			Options := Options - [eoTabsToSpaces];
-		if fSpecialChar then
-			Options := Options + [eoShowSpecialChars];
-		if fTrimTrailingSpaces then
-			Options := Options + [eoTrimTrailingSpaces];
+			if HighCurrLine then
+				ActiveLineColor := HighColor
+			else
+				ActiveLineColor := clNone;
+
+			Options := [
+				eoAltSetsColumnMode, eoDisableScrollArrows,
+				eoDragDropEditing, eoDropFiles, eoKeepCaretX, eoTabsToSpaces,
+				eoRightMouseMovesCursor, eoScrollByOneLess, eoAutoSizeMaxScrollWidth
+			];
+
+			//Optional synedit options in devData
+			if fAutoIndent then
+				Options := Options + [eoAutoIndent];
+			if fEHomeKey then
+				Options := Options + [eoEnhanceHomeKey];
+			if fGroupUndo then
+				Options := Options + [eoGroupUndo];
+			if fHalfPage then
+				Options := Options + [eoHalfPageScroll];
+			if fShowScrollbars then
+				Options := Options + [eoHideShowScrollbars];
+			if fPastEOF then
+				Options := Options + [eoScrollPastEOF];
+			if fPastEOL then
+				Options := Options + [eoScrollPastEOL];
+			if fShowScrollHint then
+				Options := Options + [eoScrollHintFollows,eoShowScrollHint];
+			if fSmartTabs then
+				Options := Options + [eoSmartTabs];
+			if fSmartTabs then
+				Options := Options + [eoSmartTabDelete];
+			if fUseTabs then
+				Options := Options - [eoTabsToSpaces];
+			if fSpecialChar then
+				Options := Options + [eoShowSpecialChars];
+			if fTrimTrailingSpaces then
+				Options := Options + [eoTrimTrailingSpaces];
 		finally
 			EndUpdate;
 		end;

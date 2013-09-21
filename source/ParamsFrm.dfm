@@ -1,6 +1,6 @@
 object ParamsForm: TParamsForm
-  Left = 389
-  Top = 262
+  Left = 581
+  Top = 259
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Parameters'
@@ -9,14 +9,14 @@ object ParamsForm: TParamsForm
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object grpParameters: TGroupBox
     Left = 8
     Top = 8
@@ -28,7 +28,7 @@ object ParamsForm: TParamsForm
       Left = 8
       Top = 22
       Width = 264
-      Height = 21
+      Height = 23
       TabOrder = 0
     end
   end
@@ -77,7 +77,7 @@ object ParamsForm: TParamsForm
       Left = 8
       Top = 22
       Width = 234
-      Height = 21
+      Height = 23
       TabOrder = 0
     end
   end

@@ -1432,8 +1432,7 @@ begin
        chdir(Directory);
        fEditor.Init(TRUE, ExtractFileName(FileName), ExpandFileName(FileName), not New);
        if New then
-         if devEditor.DefaulttoPrj then
-           fEditor.InsertDefaultText;
+         fEditor.InsertDefaultText;
        LoadUnitLayout(fEditor, index);
        result:= fEditor;
       except

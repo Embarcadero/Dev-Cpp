@@ -1448,7 +1448,7 @@ begin
 	fCodeFolding := TSynCodeFolding.Create;
 	fActualLines := TStringList.Create;
 	fPlugins.Add(fCodeFoldingPlugin);
-    InitCodeFolding;
+	InitCodeFolding;
 	//### End Code Folding ###
 end;
 
@@ -2468,7 +2468,8 @@ begin
   nL1 := Max(TopLine + rcClip.Top div fTextHeight, TopLine);
   nL2 := MinMax( TopLine + (rcClip.Bottom + fTextHeight - 1) div fTextHeight,
     1, DisplayLineCount );
-  // Now paint everything while the caret is hidden.
+
+	// Now paint everything while the caret is hidden.
 	HideCaret;
 
 	// First paint the gutter area if it was (partly) invalidated.
@@ -2674,7 +2675,6 @@ begin
 				// Calculate the number to show on gutter
 				s := fGutter.FormatLineNumber(GetRealLineNumber(cLine));
 				//### End Code Folding ###
-
 
 				if Assigned(OnGutterGetText) then
 					OnGutterGetText( Self, cLine, s );
@@ -5112,7 +5112,7 @@ begin
   CommandProcessor( ecLostFocus, #0, nil );
   //Added check for focused to prevent caret disappearing problem
   if Focused or FAlwaysShowCaret then
-    exit;                                           
+    exit;
   HideCaret;
   Windows.DestroyCaret;
   if FHideSelection and SelAvail then
@@ -10120,7 +10120,7 @@ var
 begin
   { Return the word under the mouse }
   if GetPositionOfMouse(Point) then        // if point is valid
-    Result := Self.GetWordAtRowCol(Point); // return the point at the mouse position
+    Result := GetWordAtRowCol(Point); // return the point at the mouse position
 end;
 
 // ### Code Folding
@@ -10540,7 +10540,7 @@ begin
 
 		Collapsed := True;
 		SetPCOfSubFoldRanges(True, RealLevel);
-		MoveFoldRangesAfter(AFoldRange, 0 - LinesCollapsed - 1);
+		MoveFoldRangesAfter(AFoldRange, - LinesCollapsed - 1);
 	end;
 
 	Lines.EndUpdate;
@@ -10626,7 +10626,7 @@ var
 	begin
 		for j := fAllFoldRanges.AllCount - 1 downto 0 do
 			with fAllFoldRanges[j] do begin
-				if (RealLevel = ALevel) and (Collapsed) {and (not ParentCollapsed)} then begin
+				if (RealLevel = ALevel) and (Collapsed) then begin
 
 					// This is the UnCollapse part
 					for k := 0 to CollapsedLines.Count - 1 do
@@ -10638,7 +10638,6 @@ var
 					// Update fold positions
 					Collapsed := False;
 					MoveFoldRangesAfter(fAllFoldRanges[j], CollapsedLines.Count);
-					//SetPCOfSubFoldRanges(False, RealLevel);
 				end;
 			end;
 	end;
@@ -10722,7 +10721,7 @@ begin
 	// Delete all uncollapsed folds
 	for i := fAllFoldRanges.AllCount - 1 downto 0 do
 		with fAllFoldRanges[i] do
-			if (not Collapsed) and (not ParentCollapsed) then
+			if not Collapsed and not ParentCollapsed then
 				fAllFoldRanges.Delete(i);
 
 	// Create a lookup table with information which lines have folds and which don't

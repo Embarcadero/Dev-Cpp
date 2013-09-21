@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 707
-  Top = 283
+  Left = 608
+  Top = 439
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -24,7 +24,6 @@ object MainForm: TMainForm
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnMouseWheel = FormMouseWheel
-  OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -65,7 +64,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 72
+        Height = 71
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -107,7 +106,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 72
+        Height = 71
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -582,7 +581,7 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 768
-            Height = 41
+            Height = 40
             Align = alClient
             Columns = <
               item
@@ -667,7 +666,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 776
-        Height = 72
+        Height = 71
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -1093,8 +1092,8 @@ object MainForm: TMainForm
     MultiLine = True
     PopupMenu = EditorPopupMenu
     TabOrder = 3
+    Visible = False
     OnChange = PageControlChange
-    OnChanging = PageControlChanging
     OnDragDrop = PageControlDragDrop
     OnDragOver = PageControlDragOver
     OnMouseDown = PageControlMouseDown
@@ -3130,12 +3129,6 @@ object MainForm: TMainForm
       OnExecute = actUnCollapseExecute
     end
   end
-  object ApplicationEvents: TApplicationEvents
-    OnDeactivate = ApplicationEventsDeactivate
-    OnIdle = ApplicationEventsIdle
-    Left = 626
-    Top = 202
-  end
   object MessagePopup: TPopupMenu
     OnPopup = MessagePopupPopup
     Left = 203
@@ -3197,13 +3190,6 @@ object MainForm: TMainForm
   object devShortcuts: TdevShortcuts
     Filename = 'devShortcuts.cfg'
     AlternateColor = 14737632
-    MultiLangStrings.Caption = 'Configure devShortcuts'
-    MultiLangStrings.Title = ' Click on an item and press the shortcut you desire!'
-    MultiLangStrings.Tip = 'Tip: press "Escape" to clear a shortcut...'
-    MultiLangStrings.HeaderEntry = 'Menu entry'
-    MultiLangStrings.HeaderShortcut = 'Shortcut assigned'
-    MultiLangStrings.OK = 'OK'
-    MultiLangStrings.Cancel = 'Cancel'
     Left = 628
     Top = 280
   end

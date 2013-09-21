@@ -371,6 +371,7 @@ const
   ID_EOPT_CODETAB                   = 23005;
   ID_EOPT_COMPLETIONTAB             = 23006;
   ID_EOPT_BROWSERTAB                = 23007;
+  ID_EOPT_AUTOSAVETAB               = 23008;
 
     // sub-tab captions
   ID_EOPT_CPINSERTS                 = 24001;
@@ -386,7 +387,6 @@ const
   ID_EOPT_INSERTMODE                = 25004;
   ID_EOPT_TAB2SPC                   = 25005;
   ID_EOPT_SMARTTABS                 = 25006;
-  ID_EOPT_SMARTUN                   = 25007;
   ID_EOPT_TRAILBLANKS               = 25008;
   ID_EOPT_GROUPUNDO                 = 25009;
   ID_EOPT_EHOMEKEY                  = 25010;
@@ -413,6 +413,8 @@ const
   ID_EOPT_CARET4                    = 25031;
   ID_EOPT_HIGHCURLINE               = 25032;
   ID_EOPT_TRIMTRAILINGSPACES        = 25033;
+  ID_EOPT_GENERICENABLED            = 25034;
+  ID_EOPT_GUTTERWIDTH               = 25035;
 
   ID_EOPT_SPECIALCHARS              = 26001;
   ID_EOPT_PARSERHINTS               = 26002;
@@ -454,7 +456,7 @@ const
   ID_EOPT_CIMENU                    = 26031;
   ID_EOPT_CISECTION                 = 26032;
   ID_EOPT_CIDESC                    = 26033;
-  ID_EOPT_DEFCODEPRJ                = 26034;
+  ID_EOPT_DEFCODE                   = 26034;
 
     // Completion Tab
   ID_EOPT_CCCACHECHECK              = 26035;
@@ -626,6 +628,8 @@ const
   ID_FIND_GRP_DIRECTION             = 37051;
   ID_FIND_FORE                      = 37052;
   ID_FIND_BACK                      = 37053;
+
+  ID_ENV_PAUSECONSOLE               = 37054;
 
   // Replace form
   ID_RPLC                           = 38001;
@@ -1171,3 +1175,10 @@ const
   ID_COPT_OPTIMIZE                  = 71004;
   ID_COPT_STD                       = 71005;
   ID_COPT_PTRWIDTH                  = 71006;
+
+  // Compile progress window
+  ID_CMPRPG_COMPILER                = 72001;
+  ID_CMPPRG_STATUS                  = 72002;
+  ID_CMPPRG_FILE                    = 72003;
+  ID_CMPPRG_ERRORS                  = 72004;
+  ID_CMPPRG_WARNINGS                = 72005;

@@ -1,8 +1,10 @@
 object CVSForm: TCVSForm
-  Left = 589
-  Top = 224
-  Width = 562
-  Height = 474
+  Left = 446
+  Top = 188
+  Width = 735
+  Height = 473
+  HorzScrollBar.Visible = False
+  VertScrollBar.Visible = False
   BorderIcons = [biSystemMenu]
   Caption = 'CVS'
   Color = clBtnFace
@@ -20,70 +22,75 @@ object CVSForm: TCVSForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    546
-    436)
+    719
+    435)
   PixelsPerInch = 96
   TextHeight = 13
   object devPages1: TPageControl
-    Left = 8
-    Top = 8
-    Width = 538
-    Height = 393
-    ActivePage = tabCommit
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Left = 0
+    Top = 0
+    Width = 719
+    Height = 400
+    ActivePage = tabOutput
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 0
     object tabImport: TTabSheet
       Caption = 'Import'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object lblCVSImportDir: TLabel
         Left = 12
         Top = 16
-        Width = 75
-        Height = 13
+        Width = 89
+        Height = 15
         Caption = 'Import directory:'
       end
       object lblImpAction: TLabel
         Left = 12
         Top = 232
-        Width = 33
-        Height = 13
+        Width = 38
+        Height = 15
         Caption = 'Action:'
       end
       object lblImpVendor: TLabel
         Left = 12
         Top = 72
-        Width = 37
-        Height = 13
+        Width = 41
+        Height = 15
         Caption = 'Vendor:'
       end
       object lblImpRelease: TLabel
         Left = 12
         Top = 96
         Width = 42
-        Height = 13
+        Height = 15
         Caption = 'Release:'
       end
       object lblImpMsg: TLabel
         Left = 12
         Top = 120
-        Width = 66
-        Height = 13
+        Width = 72
+        Height = 15
         Caption = 'Log message:'
       end
       object lblImpModule: TLabel
         Left = 12
         Top = 44
-        Width = 67
-        Height = 13
+        Width = 77
+        Height = 15
         Caption = 'Module name:'
       end
       object txtCVSImportDir: TEdit
         Left = 116
         Top = 12
-        Width = 384
-        Height = 21
+        Width = 565
+        Height = 23
         Anchors = [akLeft, akTop, akRight]
         ReadOnly = True
         TabOrder = 0
@@ -91,7 +98,7 @@ object CVSForm: TCVSForm
       end
       object btnCVSImportBrws: TButton
         Tag = 6
-        Left = 501
+        Left = 682
         Top = 12
         Width = 20
         Height = 21
@@ -102,8 +109,8 @@ object CVSForm: TCVSForm
       end
       object vle: TValueListEditor
         Left = 116
-        Top = 231
-        Width = 404
+        Top = 236
+        Width = 585
         Height = 124
         Anchors = [akLeft, akRight, akBottom]
         FixedCols = 1
@@ -115,13 +122,13 @@ object CVSForm: TCVSForm
         OnGetPickList = vleGetPickList
         ColWidths = (
           94
-          304)
+          485)
       end
       object txtImpVendor: TEdit
         Left = 116
         Top = 68
         Width = 121
-        Height = 21
+        Height = 23
         TabOrder = 3
         Text = 'txtImpVendor'
         OnChange = txtImpModuleChange
@@ -130,7 +137,7 @@ object CVSForm: TCVSForm
         Left = 116
         Top = 92
         Width = 121
-        Height = 21
+        Height = 23
         TabOrder = 4
         Text = 'txtImpRelease'
         OnChange = txtImpModuleChange
@@ -138,8 +145,8 @@ object CVSForm: TCVSForm
       object memImpMsg: TMemo
         Left = 116
         Top = 120
-        Width = 404
-        Height = 100
+        Width = 585
+        Height = 105
         Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'memImpMsg')
@@ -152,7 +159,7 @@ object CVSForm: TCVSForm
         Left = 116
         Top = 40
         Width = 121
-        Height = 21
+        Height = 23
         TabOrder = 2
         Text = 'txtImpModule'
         OnChange = txtImpModuleChange
@@ -161,27 +168,27 @@ object CVSForm: TCVSForm
     object tabCheckout: TTabSheet
       Caption = 'Checkout'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object lblCOModule: TLabel
         Left = 12
         Top = 16
-        Width = 67
-        Height = 13
+        Width = 77
+        Height = 15
         Caption = 'Module name:'
       end
       object lblCODir: TLabel
         Left = 12
         Top = 104
-        Width = 92
-        Height = 13
+        Width = 104
+        Height = 15
         Caption = 'Checkout directory:'
       end
       object txtCOmodule: TEdit
         Left = 116
         Top = 12
         Width = 213
-        Height = 21
+        Height = 23
         TabOrder = 0
         Text = 'txtCOmodule'
         OnChange = txtCOmoduleChange
@@ -189,8 +196,8 @@ object CVSForm: TCVSForm
       object txtCOdir: TEdit
         Left = 116
         Top = 100
-        Width = 332
-        Height = 21
+        Width = 513
+        Height = 23
         Anchors = [akLeft, akTop, akRight]
         ReadOnly = True
         TabOrder = 3
@@ -199,7 +206,7 @@ object CVSForm: TCVSForm
       end
       object btnCOBrws: TButton
         Tag = 6
-        Left = 449
+        Left = 630
         Top = 100
         Width = 20
         Height = 21
@@ -211,7 +218,7 @@ object CVSForm: TCVSForm
       object chkCOrecurse: TCheckBox
         Left = 12
         Top = 136
-        Width = 456
+        Width = 637
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recurse into sub-directories'
@@ -223,7 +230,7 @@ object CVSForm: TCVSForm
         Left = 116
         Top = 36
         Width = 213
-        Height = 21
+        Height = 23
         Enabled = False
         TabOrder = 2
         Text = 'txtCOModuleAs'
@@ -241,8 +248,8 @@ object CVSForm: TCVSForm
         Left = 180
         Top = 164
         Width = 165
-        Height = 21
-        ItemHeight = 13
+        Height = 23
+        ItemHeight = 0
         TabOrder = 6
         Text = 'cmbCOBeforeDate'
       end
@@ -268,8 +275,8 @@ object CVSForm: TCVSForm
         Left = 180
         Top = 188
         Width = 165
-        Height = 21
-        ItemHeight = 13
+        Height = 23
+        ItemHeight = 0
         TabOrder = 9
         Text = 'cmbCORevision'
       end
@@ -285,20 +292,20 @@ object CVSForm: TCVSForm
     object tabCommit: TTabSheet
       Caption = 'Commit'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object lblCommitMsg: TLabel
         Left = 12
         Top = 16
-        Width = 46
-        Height = 13
+        Width = 49
+        Height = 15
         Caption = 'Message:'
       end
       object memCommitMsg: TMemo
         Left = 116
         Top = 12
-        Width = 352
-        Height = 288
+        Width = 533
+        Height = 293
         Anchors = [akLeft, akTop, akRight, akBottom]
         ScrollBars = ssBoth
         TabOrder = 0
@@ -309,12 +316,12 @@ object CVSForm: TCVSForm
     object tabUpdate: TTabSheet
       Caption = 'Update'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object chkUpdRecurse: TCheckBox
         Left = 12
         Top = 16
-        Width = 432
+        Width = 613
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recurse into sub-directories'
@@ -325,7 +332,7 @@ object CVSForm: TCVSForm
       object chkUpdResetSticky: TCheckBox
         Left = 12
         Top = 44
-        Width = 432
+        Width = 613
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Reset any sticky options'
@@ -334,7 +341,7 @@ object CVSForm: TCVSForm
       object chkUpdCreateDirs: TCheckBox
         Left = 12
         Top = 72
-        Width = 432
+        Width = 613
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Create missing directories'
@@ -345,7 +352,7 @@ object CVSForm: TCVSForm
       object chkUpdCleanCopy: TCheckBox
         Left = 12
         Top = 128
-        Width = 432
+        Width = 613
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Drop changes made locally'
@@ -354,7 +361,7 @@ object CVSForm: TCVSForm
       object grpUpdRevisions: TGroupBox
         Left = 12
         Top = 184
-        Width = 460
+        Width = 641
         Height = 113
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Other revisions:'
@@ -389,8 +396,8 @@ object CVSForm: TCVSForm
           Left = 180
           Top = 20
           Width = 165
-          Height = 21
-          ItemHeight = 13
+          Height = 23
+          ItemHeight = 0
           TabOrder = 3
           Text = 'cmbBeforeDate'
         end
@@ -398,8 +405,8 @@ object CVSForm: TCVSForm
           Left = 180
           Top = 44
           Width = 165
-          Height = 21
-          ItemHeight = 13
+          Height = 23
+          ItemHeight = 0
           TabOrder = 4
           Text = 'cmbRevision'
         end
@@ -407,7 +414,7 @@ object CVSForm: TCVSForm
       object chkUpdPrune: TCheckBox
         Left = 12
         Top = 100
-        Width = 432
+        Width = 613
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Remove empty directories'
@@ -419,12 +426,12 @@ object CVSForm: TCVSForm
     object tabDiff: TTabSheet
       Caption = 'Diff'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object chkDiffRecurse: TCheckBox
         Left = 12
         Top = 16
-        Width = 432
+        Width = 613
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recurse into sub-directories'
@@ -435,7 +442,7 @@ object CVSForm: TCVSForm
       object chkDiffUnified: TCheckBox
         Left = 12
         Top = 44
-        Width = 432
+        Width = 613
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Perform a unified diff'
@@ -444,7 +451,7 @@ object CVSForm: TCVSForm
       object grpDiff: TGroupBox
         Left = 12
         Top = 76
-        Width = 460
+        Width = 641
         Height = 157
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Diff revisions'
@@ -452,22 +459,22 @@ object CVSForm: TCVSForm
         object lblDiffRev1: TLabel
           Left = 32
           Top = 100
-          Width = 111
-          Height = 13
+          Width = 120
+          Height = 15
           Caption = 'Revision/branch/tag 1:'
         end
         object lblDiffRev2: TLabel
           Left = 32
           Top = 124
-          Width = 111
-          Height = 13
+          Width = 120
+          Height = 15
           Caption = 'Revision/branch/tag 2:'
         end
         object txtDiffRev1: TEdit
           Left = 172
           Top = 96
           Width = 85
-          Height = 21
+          Height = 23
           Enabled = False
           TabOrder = 0
           Text = 'txtDiffRev1'
@@ -476,7 +483,7 @@ object CVSForm: TCVSForm
           Left = 172
           Top = 120
           Width = 85
-          Height = 21
+          Height = 23
           Enabled = False
           TabOrder = 2
           Text = 'txtDiffRev2'
@@ -533,12 +540,12 @@ object CVSForm: TCVSForm
     object tabLog: TTabSheet
       Caption = 'Log'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object chkLogRecurse: TCheckBox
         Left = 12
         Top = 16
-        Width = 484
+        Width = 665
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recurse into sub-directories'
@@ -549,7 +556,7 @@ object CVSForm: TCVSForm
       object chkLogDefBranch: TCheckBox
         Left = 12
         Top = 44
-        Width = 484
+        Width = 665
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Log the default branch'
@@ -558,7 +565,7 @@ object CVSForm: TCVSForm
       object chkLogRCS: TCheckBox
         Left = 12
         Top = 72
-        Width = 484
+        Width = 665
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'List only the RCS filenames'
@@ -567,7 +574,7 @@ object CVSForm: TCVSForm
       object chkLogNoTag: TCheckBox
         Left = 12
         Top = 96
-        Width = 484
+        Width = 665
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Don'#39't print tag names'
@@ -576,7 +583,7 @@ object CVSForm: TCVSForm
       object grpLogFilter: TGroupBox
         Left = 12
         Top = 132
-        Width = 508
+        Width = 689
         Height = 101
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Filter'
@@ -612,9 +619,9 @@ object CVSForm: TCVSForm
           Left = 140
           Top = 20
           Width = 201
-          Height = 21
+          Height = 23
           Enabled = False
-          ItemHeight = 13
+          ItemHeight = 15
           TabOrder = 1
           Text = 'cmbLogFbyRev'
           Items.Strings = (
@@ -629,7 +636,7 @@ object CVSForm: TCVSForm
           Left = 140
           Top = 44
           Width = 201
-          Height = 21
+          Height = 23
           Enabled = False
           ItemHeight = 0
           TabOrder = 3
@@ -639,9 +646,9 @@ object CVSForm: TCVSForm
           Left = 140
           Top = 68
           Width = 201
-          Height = 21
+          Height = 23
           Enabled = False
-          ItemHeight = 13
+          ItemHeight = 15
           TabOrder = 5
           Text = 'cmbLogFbyUser'
           Items.Strings = (
@@ -654,20 +661,20 @@ object CVSForm: TCVSForm
     object tabAdd: TTabSheet
       Caption = 'Add'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object lblAddMsg: TLabel
         Left = 12
         Top = 16
-        Width = 46
-        Height = 13
+        Width = 49
+        Height = 15
         Caption = 'Message:'
       end
       object memAddMsg: TMemo
         Left = 116
         Top = 12
-        Width = 352
-        Height = 288
+        Width = 533
+        Height = 293
         Anchors = [akLeft, akTop, akRight, akBottom]
         ScrollBars = ssBoth
         TabOrder = 0
@@ -678,12 +685,12 @@ object CVSForm: TCVSForm
     object tabRemove: TTabSheet
       Caption = 'Remove'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object chkRemove: TCheckBox
         Left = 12
         Top = 16
-        Width = 432
+        Width = 613
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Remove the file from disk also...'
@@ -693,20 +700,20 @@ object CVSForm: TCVSForm
     object tabFiles: TTabSheet
       Caption = 'Files'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object lblFiles: TLabel
         Left = 12
         Top = 16
-        Width = 24
-        Height = 13
+        Width = 26
+        Height = 15
         Caption = 'Files:'
       end
       object lstFiles: TCheckListBox
         Left = 116
         Top = 12
-        Width = 403
-        Height = 340
+        Width = 584
+        Height = 345
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -724,19 +731,19 @@ object CVSForm: TCVSForm
     object tabRepos: TTabSheet
       Caption = 'Repository'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object lblRep: TLabel
         Left = 12
         Top = 16
-        Width = 76
-        Height = 13
+        Width = 84
+        Height = 15
         Caption = 'Access method:'
       end
       object grpRepDetails: TGroupBox
         Left = 12
         Top = 44
-        Width = 512
+        Width = 693
         Height = 165
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Repository details'
@@ -744,29 +751,29 @@ object CVSForm: TCVSForm
         object lblMethod: TLabel
           Left = 16
           Top = 20
-          Width = 76
-          Height = 13
+          Width = 84
+          Height = 15
           Caption = 'Access method:'
         end
         object lblUser: TLabel
           Left = 16
           Top = 44
-          Width = 25
-          Height = 13
+          Width = 26
+          Height = 15
           Caption = 'User:'
         end
         object lblServer: TLabel
           Left = 16
           Top = 68
-          Width = 34
-          Height = 13
+          Width = 35
+          Height = 15
           Caption = 'Server:'
         end
         object lblDir: TLabel
           Left = 16
           Top = 116
-          Width = 83
-          Height = 13
+          Width = 94
+          Height = 15
           Caption = 'Remote directory:'
         end
         object lblRepos: TLabel
@@ -786,15 +793,15 @@ object CVSForm: TCVSForm
         object lblPort: TLabel
           Left = 16
           Top = 92
-          Width = 60
-          Height = 13
+          Width = 70
+          Height = 15
           Caption = 'Port number:'
         end
         object txtUser: TEdit
           Left = 120
           Top = 40
           Width = 225
-          Height = 21
+          Height = 23
           TabOrder = 0
           Text = 'txtUser'
           OnChange = cmbMethodChange
@@ -803,7 +810,7 @@ object CVSForm: TCVSForm
           Left = 120
           Top = 64
           Width = 225
-          Height = 21
+          Height = 23
           TabOrder = 1
           Text = 'txtServer'
           OnChange = cmbMethodChange
@@ -812,7 +819,7 @@ object CVSForm: TCVSForm
           Left = 120
           Top = 112
           Width = 225
-          Height = 21
+          Height = 23
           TabOrder = 3
           Text = 'txtDir'
           OnChange = cmbMethodChange
@@ -821,9 +828,9 @@ object CVSForm: TCVSForm
           Left = 120
           Top = 16
           Width = 105
-          Height = 21
+          Height = 23
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 15
           ItemIndex = 1
           TabOrder = 4
           Text = 'pserver'
@@ -838,7 +845,7 @@ object CVSForm: TCVSForm
           Left = 120
           Top = 88
           Width = 225
-          Height = 21
+          Height = 23
           TabOrder = 2
           Text = 'txtPort'
           OnChange = cmbMethodChange
@@ -847,8 +854,8 @@ object CVSForm: TCVSForm
       object cmbRepos: TComboBox
         Left = 116
         Top = 12
-        Width = 408
-        Height = 21
+        Width = 589
+        Height = 23
         AutoDropDown = True
         Anchors = [akLeft, akTop, akRight]
         ItemHeight = 0
@@ -860,20 +867,20 @@ object CVSForm: TCVSForm
     object tabGlobal: TTabSheet
       Caption = 'Global Options'
       DesignSize = (
-        530
-        365)
+        711
+        370)
       object lblCompression: TLabel
         Left = 12
         Top = 16
-        Width = 63
-        Height = 13
+        Width = 73
+        Height = 15
         Caption = 'Compression:'
       end
       object spnCompression: TSpinEdit
         Left = 172
         Top = 12
         Width = 49
-        Height = 22
+        Height = 24
         MaxLength = 1
         MaxValue = 9
         MinValue = 0
@@ -883,7 +890,7 @@ object CVSForm: TCVSForm
       object chkUseSSH: TCheckBox
         Left = 12
         Top = 44
-        Width = 456
+        Width = 637
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Use SSH instead of RSH'
@@ -894,15 +901,12 @@ object CVSForm: TCVSForm
     end
     object tabOutput: TTabSheet
       Caption = 'CVS Output'
-      DesignSize = (
-        530
-        365)
       object memOutput: TRichEdit
-        Left = 4
-        Top = 4
-        Width = 526
-        Height = 355
-        Anchors = [akLeft, akTop, akRight, akBottom]
+        Left = 0
+        Top = 0
+        Width = 711
+        Height = 370
+        Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
@@ -920,8 +924,8 @@ object CVSForm: TCVSForm
     end
   end
   object btnOK: TButton
-    Left = 357
-    Top = 406
+    Left = 530
+    Top = 405
     Width = 91
     Height = 25
     Anchors = [akRight, akBottom]
@@ -931,8 +935,8 @@ object CVSForm: TCVSForm
     OnClick = btnOKClick
   end
   object btnCancel: TButton
-    Left = 453
-    Top = 406
+    Left = 626
+    Top = 405
     Width = 91
     Height = 25
     Anchors = [akRight, akBottom]

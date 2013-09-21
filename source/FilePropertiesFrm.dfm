@@ -1,6 +1,6 @@
 object FilePropertiesForm: TFilePropertiesForm
-  Left = 529
-  Top = 340
+  Left = 626
+  Top = 341
   BorderStyle = bsDialog
   Caption = 'File properties'
   ClientHeight = 265
@@ -8,8 +8,8 @@ object FilePropertiesForm: TFilePropertiesForm
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
@@ -18,7 +18,7 @@ object FilePropertiesForm: TFilePropertiesForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object Bevel7: TBevel
     Left = 8
     Top = 8
@@ -71,50 +71,50 @@ object FilePropertiesForm: TFilePropertiesForm
   object Label1: TLabel
     Left = 24
     Top = 24
-    Width = 45
-    Height = 13
+    Width = 51
+    Height = 15
     Caption = 'Filename:'
   end
   object Label2: TLabel
     Left = 24
     Top = 48
-    Width = 47
-    Height = 13
+    Width = 53
+    Height = 15
     Caption = 'In project:'
   end
   object Label3: TLabel
     Left = 20
     Top = 124
-    Width = 78
-    Height = 13
+    Width = 89
+    Height = 15
     Caption = 'Total lines in file:'
   end
   object Label4: TLabel
     Left = 20
     Top = 148
-    Width = 96
-    Height = 13
+    Width = 107
+    Height = 15
     Caption = 'Actual lines of code:'
   end
   object Label5: TLabel
     Left = 20
     Top = 172
-    Width = 71
-    Height = 13
+    Width = 84
+    Height = 15
     Caption = 'Comment lines:'
   end
   object Label6: TLabel
     Left = 212
     Top = 148
-    Width = 40
-    Height = 13
+    Width = 43
+    Height = 15
     Caption = 'File size:'
   end
   object Label7: TLabel
     Left = 212
     Top = 124
-    Width = 56
-    Height = 13
+    Width = 64
+    Height = 15
     Caption = 'Empty lines:'
   end
   object lblSize: TLabel
@@ -185,8 +185,8 @@ object FilePropertiesForm: TFilePropertiesForm
   object Label8: TLabel
     Left = 212
     Top = 172
-    Width = 65
-    Height = 13
+    Width = 73
+    Height = 15
     Caption = 'Included files:'
   end
   object lblIncludes: TLabel
@@ -205,15 +205,15 @@ object FilePropertiesForm: TFilePropertiesForm
   object Label9: TLabel
     Left = 24
     Top = 72
-    Width = 44
-    Height = 13
+    Width = 50
+    Height = 15
     Caption = 'Absolute:'
   end
   object Label10: TLabel
     Left = 24
-    Top = 92
-    Width = 42
-    Height = 13
+    Top = 96
+    Width = 44
+    Height = 15
     Caption = 'Relative:'
   end
   object Bevel9: TBevel
@@ -225,8 +225,8 @@ object FilePropertiesForm: TFilePropertiesForm
   object Label11: TLabel
     Left = 20
     Top = 196
-    Width = 54
-    Height = 13
+    Width = 63
+    Height = 15
     Caption = 'Timestamp:'
   end
   object lblTimestamp: TLabel
@@ -245,7 +245,7 @@ object FilePropertiesForm: TFilePropertiesForm
   object lblProject: TEdit
     Left = 100
     Top = 44
-    Width = 285
+    Width = 288
     Height = 20
     AutoSize = False
     ReadOnly = True
@@ -284,9 +284,9 @@ object FilePropertiesForm: TFilePropertiesForm
     Left = 100
     Top = 20
     Width = 289
-    Height = 21
+    Height = 23
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 15
     TabOrder = 0
     OnClick = cmbFilesClick
   end

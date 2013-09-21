@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit AddToDoFm;
+unit AddToDoFrm;
 
 interface
 
@@ -52,18 +52,17 @@ type
     { Public declarations }
   end;
 
-var
-  AddToDoForm: TAddToDoForm;
+//var
+//  AddToDoForm: TAddToDoForm;
 
 implementation
 
 uses 
-  main, editor, MultiLangSupport;
+  main, editor, devcfg, MultiLangSupport;
 
 {$R *.dfm}
 
-procedure TAddToDoForm.FormClose(Sender: TObject;
-  var Action: TCloseAction);
+procedure TAddToDoForm.FormClose(Sender: TObject;var Action: TCloseAction);
 begin
   Action := caFree;
 end;
@@ -134,6 +133,10 @@ end;
 
 procedure TAddToDoForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_ADDTODO_MENUITEM];
   Label1.Caption := Lang[ID_ADDTODO_DESCRIPTION] + ':';
   Label2.Caption := Lang[ID_ADDTODO_PRIORITY] + ':';

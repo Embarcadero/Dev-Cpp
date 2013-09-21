@@ -1,25 +1,26 @@
 object PrintForm: TPrintForm
-  Left = 705
-  Top = 627
+  Left = 623
+  Top = 463
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Print file'
-  ClientHeight = 185
+  ClientHeight = 194
   ClientWidth = 432
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object btnCancel: TBitBtn
     Left = 348
-    Top = 156
+    Top = 164
     Width = 75
     Height = 24
     Caption = '&Cancel'
@@ -28,7 +29,7 @@ object PrintForm: TPrintForm
   end
   object btnOk: TBitBtn
     Left = 270
-    Top = 156
+    Top = 164
     Width = 75
     Height = 24
     Caption = '&OK'
@@ -101,29 +102,29 @@ object PrintForm: TPrintForm
     Left = 8
     Top = 85
     Width = 417
-    Height = 63
+    Height = 76
     Caption = 'Pages :'
     TabOrder = 3
     object lblCopies: TLabel
       Left = 8
-      Top = 16
-      Width = 89
-      Height = 13
+      Top = 20
+      Width = 101
+      Height = 15
       Caption = 'Number of copies :'
     end
     object seCopies: TSpinEdit
       Left = 16
-      Top = 32
+      Top = 40
       Width = 75
-      Height = 22
+      Height = 24
       MaxValue = 10000000
       MinValue = 1
       TabOrder = 0
       Value = 1
     end
     object cbSelection: TCheckBox
-      Left = 168
-      Top = 16
+      Left = 152
+      Top = 20
       Width = 200
       Height = 17
       Caption = 'Print &selection only'

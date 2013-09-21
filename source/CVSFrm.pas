@@ -18,7 +18,7 @@
 }
 
 {$WARN UNIT_PLATFORM OFF}
-unit CVSFm;
+unit CVSFrm;
 
 interface
 
@@ -195,7 +195,7 @@ var
 implementation
 
 uses 
-  devcfg, utils, MultiLangSupport, CVSPasswdFm;
+  devcfg, utils, MultiLangSupport, CVSPasswdFrm;
 
 {$R *.dfm}
 

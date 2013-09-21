@@ -111,7 +111,8 @@ type
 
 implementation
 
-uses ToolEditFrm, inifiles, devcfg, utils, MultiLangSupport, datamod,
+uses
+  ToolEditFrm, inifiles, devcfg, utils, MultiLangSupport, datamod,
   version, main;
 
 {$R *.dfm}

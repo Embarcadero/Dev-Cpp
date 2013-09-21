@@ -32,7 +32,7 @@ interface
 uses 
 {$IFDEF WIN32}
   Windows, Classes, Forms, SysUtils, Controls, Graphics, StrUtils, CppParser,
-  ExtCtrls, U_IntList, Dialogs;
+  ExtCtrls, U_IntList;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, Classes, QForms, SysUtils, QControls, QGraphics, StrUtils, CppParser,

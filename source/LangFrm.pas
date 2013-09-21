@@ -40,11 +40,11 @@ type
     FirstPanel: TPanel;
     ListBox: TListBox;
     GroupBox1: TGroupBox;
-    Label1: TLabel;
+    LanguageInfo: TLabel;
     ThemeGroupBox: TGroupBox;
     ThemeBox: TComboBox;
     CachePanel: TPanel;
-    Label2: TLabel;
+    CacheInfo1: TLabel;
     BuildPanel: TPanel;
     YesCache: TRadioButton;
     NoCache: TRadioButton;
@@ -52,23 +52,23 @@ type
     pbCCCache: TProgressBar;
     ParseLabel: TLabel;
     SecondPanel: TPanel;
-    SecondLabel: TLabel;
-    Label5: TLabel;
+    ClassBrowserInfo1: TLabel;
+    ClassBrowserInfo2: TLabel;
     YesClassBrowser: TRadioButton;
     NoClassBrowser: TRadioButton;
     FinishPanel: TPanel;
-    Label4: TLabel;
-    Label7: TLabel;
+    Finish2: TLabel;
+    Finish3: TLabel;
     AltCache: TRadioButton;
     AltFileList: TListBox;
-    Label3: TLabel;
+    CacheInfo2: TLabel;
     ButtonAddFile: TButton;
     ButtonRemove: TButton;
     ButtonAddFolder: TButton;
     EditorBox: TComboBox;
     InterfaceLbl: TLabel;
     EditorLbl: TLabel;
-    Label6: TLabel;
+    Finish1: TLabel;
     procedure FormActivate(Sender: TObject);
     procedure OkBtnClick(Sender: TObject);
     procedure ThemeChange(Sender: TObject);
@@ -79,7 +79,7 @@ type
     HasProgressStarted : boolean;
 
     function GetSelected: integer;
-    procedure CppParserTotalProgress(Sender: TObject; FileName: String; Total, Current: Integer);
+    procedure CppParserTotalProgress(Sender: TObject; const FileName: String; Total, Current: Integer);
 
   public
     procedure UpdateList(const List: TStrings);
@@ -113,17 +113,16 @@ begin
 end;
 
 procedure TLangForm.FormActivate(Sender: TObject);
-var s : array [0..255] of char;
-    d : DWORD;
-    sl : TStrings;
 begin
-  HasProgressStarted := false;
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
+	HasProgressStarted := false;
 
 	// Themes
-	sl := devTheme.ThemeList;
-	ThemeBox.Items.AddStrings(sl);
+	ThemeBox.Items.AddStrings(devTheme.ThemeList);
 	ThemeBox.ItemIndex := 0;
-	sl.Free;
 
 	// Editor styles
 	EditorBox.Items.Add('Classic');
@@ -131,10 +130,9 @@ begin
 	EditorBox.ItemIndex := 1;
 
 	ThemeImage.Picture.Bitmap.LoadFromResourceName(HInstance, 'NEWLOOKCLASSICPLUS');
-	GetUserName(s, d);
 end;
 
-procedure TLangForm.CppParserTotalProgress(Sender: TObject; FileName: String; Total, Current: Integer);
+procedure TLangForm.CppParserTotalProgress(Sender: TObject; const FileName: String; Total, Current: Integer);
 var
 	tmp : string;
 begin

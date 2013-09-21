@@ -47,12 +47,13 @@ type
     cbSelection: TCheckBox;
     rbNoLN: TRadioButton;
     procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   public
     procedure LoadText;
   end;
 
-var
-  PrintForm: TPrintForm;
+//var
+//  PrintForm: TPrintForm;
 
 implementation
 
@@ -63,6 +64,10 @@ uses
 
 procedure TPrintForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption:=                 Lang[ID_PRT];
   grpParams.Caption:=       '  '+Lang[ID_PRT_GRP_PARAMS] +'  ';
   grpPages.Caption:=        '  '+Lang[ID_PRT_GRP_PAGES]+'  ';
@@ -88,6 +93,11 @@ begin
   rbLN.Checked := devData.PrintLineNumbers;
   rbNoLN.Checked := not devData.PrintLineNumbers;
   rbLNMargin.Checked := devData.PrintLineNumbersMargins;
+end;
+
+procedure TPrintForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+	Action := caFree;
 end;
 
 end.

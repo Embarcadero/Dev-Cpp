@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Dialogs, Windows, Classes, SysUtils, StrUtils, ComCtrls, U_IntList, CppTokenizer,utils;
+  Dialogs, Windows, Classes, SysUtils, StrUtils, ComCtrls, U_IntList, CppTokenizer;
 {$ENDIF}
 {$IFDEF LINUX}
   QDialogs, Classes, SysUtils, StrUtils, QComCtrls, U_IntList, CppTokenizer;
@@ -134,11 +134,11 @@ type
     fInvalidatedIDs: TIntList;
     function AddStatement(ID,
       ParentID: integer;
-      Filename: TFileName;
-      FullText,
-      StType,
-      StCommand,
-      StArgs: string;
+      const Filename: string;
+      const FullText: string;
+            StType: string;
+            StCommand: string;
+      const StArgs: string;
       Line: integer;
       Kind: TStatementKind;
       Scope: TStatementScope;
@@ -147,12 +147,12 @@ type
       AllowDuplicate: boolean = True;
       IsDeclaration: boolean = False;
       IsValid: boolean = True): integer;
-    procedure InvalidateFile(FileName: TFileName);
-    function IsGlobalFile(Value: string): boolean;
-    function GetClassID(Value: string; Kind: TStatementKind): integer;
+    procedure InvalidateFile(const FileName: string);
+    function IsGlobalFile(const Value: string): boolean;
+    function GetClassID(const Value: string; Kind: TStatementKind): integer;
     procedure ClearOutstandingTypedefs;
-    function CheckForOutstandingTypedef(Value: string): integer;
-    procedure AddToOutstandingTypedefs(Value: string; ID: integer);
+    function CheckForOutstandingTypedef(const Value: string): integer;
+    procedure AddToOutstandingTypedefs(const Value: string; ID: integer);
     function GetCurrentClass: integer;
     procedure SetInheritance(Index: integer);
     procedure SetCurrentClass(ID: integer);
@@ -178,16 +178,16 @@ type
     procedure HandleOtherTypedefs;
     procedure HandleStructs(IsTypedef: boolean = False);
     procedure HandleMethod;
-    function ScanMethodArgs(ArgStr: string; AddTemps: boolean; Filename: string; Line, ClassID: integer): string;
+    function ScanMethodArgs(const ArgStr: string; AddTemps: boolean;const Filename: string; Line, ClassID: integer): string;
     procedure HandleScope;
     procedure HandlePreprocessor;
     procedure HandleKeyword;
     procedure HandleVar;
     procedure HandleEnum;
     function HandleStatement: boolean;
-    procedure Parse(FileName: TFileName; IsVisible: boolean; ManualUpdate: boolean = False; processInh: boolean = True); overload;
+    procedure Parse(const FileName: string; IsVisible: boolean; ManualUpdate: boolean = False; processInh: boolean = True); overload;
     procedure DeleteTemporaries;
-    function FindIncludeRec(Filename: string; DeleteIt: boolean = False): PIncludesRec;
+    function FindIncludeRec(const Filename: string; DeleteIt: boolean = False): PIncludesRec;
   public
     procedure FixIndices;
     function GetFileIncludes(Filename: string): string;
@@ -200,17 +200,17 @@ type
     function GetDeclarationFileName(Statement: PStatement): string;
     procedure GetClassesList(var List: TStrings);
     function SuggestMemberInsertionLine(ParentID: integer; Scope: TStatementClassScope; var AddScopeStr: boolean): integer;
-    function GetFullFilename(Value: string): string;
-    procedure Load(FileName: string);
+    function GetFullFilename(const Value: string): string;
+    procedure Load(const FileName: string);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Parse(FileName: TFileName); overload;
     procedure ParseList;
-    procedure ReParseFile(FileName: TFileName; InProject: boolean; OnlyIfNotParsed: boolean = False; UpdateView: boolean = True);
+    procedure ReParseFile(const FileName: string; InProject: boolean; OnlyIfNotParsed: boolean = False; UpdateView: boolean = True);
     function StatementKindStr(Value: TStatementKind): string;
     function StatementScopeStr(Value: TStatementScope): string;
-    function StatementClassScopeStr(Value: TStatementClassScope): string;
-    function CheckIfCommandExists(Value: string; Kind: TStatementKind; UseParent: boolean = False; ParID: integer = -1): integer;
+    function StatementClassScopeStr(const Value: TStatementClassScope): string;
+    function CheckIfCommandExists(const Value: string; Kind: TStatementKind; UseParent: boolean = False; ParID: integer = -1): integer;
     procedure Reset(KeepLoaded: boolean = True);
     procedure ClearIncludePaths;
     procedure ClearProjectIncludePaths;
@@ -222,7 +222,7 @@ type
     procedure PostProcessInheritance;
     procedure ReProcessInheritance;
     function Locate(Full: string; WithScope: boolean): PStatement;
-    procedure FillListOf(Full: string; List: TList;Kind : TStatementKind);
+    procedure FillListOf(Full: string; List: TStringList;Kind : TStatementKind);
     function FindAndScanBlockAt(Filename: string; Row: integer; Stream: TStream = nil): integer;
     function GetThisPointerID: integer;
   published
@@ -344,7 +344,7 @@ begin
   inherited Destroy;
 end;
 
-function TCppParser.StatementClassScopeStr(Value: TStatementClassScope): string;
+function TCppParser.StatementClassScopeStr(const Value: TStatementClassScope): string;
 begin
   case Value of
     scsPublic: Result := 'scsPublic';
@@ -379,7 +379,7 @@ begin
   end;
 end;
 
-function TCppParser.GetClassID(Value: string; Kind: TStatementKind): integer;
+function TCppParser.GetClassID(const Value: string; Kind: TStatementKind): integer;
 begin
   Result := CheckIfCommandExists(Value, Kind);
 end;
@@ -396,7 +396,7 @@ begin
   fOutstandingTypedefs.Clear;
 end;
 
-function TCppParser.CheckForOutstandingTypedef(Value: string): integer;
+function TCppParser.CheckForOutstandingTypedef(const Value: string): integer;
 var
   I: integer;
 begin
@@ -415,7 +415,7 @@ begin
   end;
 end;
 
-procedure TCppParser.AddToOutstandingTypedefs(Value: string; ID: integer);
+procedure TCppParser.AddToOutstandingTypedefs(const Value: string; ID: integer);
 var
   ot: POutstandingTypedef;
 begin
@@ -444,7 +444,7 @@ begin
   Result := StartAt;
 end;
 
-function TCppParser.CheckIfCommandExists(Value: string; Kind: TStatementKind; UseParent: boolean; ParID: integer): integer;
+function TCppParser.CheckIfCommandExists(const Value: string; Kind: TStatementKind; UseParent: boolean; ParID: integer): integer;
 var
   I: integer;
   srch: set of TStatementKind;
@@ -473,11 +473,11 @@ end;
 
 function TCppParser.AddStatement(ID,
   ParentID: integer;
-  Filename: TFileName;
-  FullText,
-  StType,
-  StCommand,
-  StArgs: string;
+    const Filename: string;
+    const FullText: string;
+          StType: string;
+          StCommand: string;
+    const StArgs: string;
   Line: integer;
   Kind: TStatementKind;
   Scope: TStatementScope;
@@ -1600,7 +1600,7 @@ begin
   Result := fIndex < fTokenizer.Tokens.Count;
 end;
 
-procedure TCppParser.Parse(FileName: TFileName; IsVisible: boolean; ManualUpdate: boolean = False; processInh: boolean = True);
+procedure TCppParser.Parse(const FileName: string; IsVisible: boolean; ManualUpdate: boolean = False; processInh: boolean = True);
 var
   sTime: myTickCount;
   P: PIncludesRec;
@@ -1822,7 +1822,7 @@ begin
 		fOnUpdate(Self);
 end;
 
-function TCppParser.GetFullFilename(Value: string): string;
+function TCppParser.GetFullFilename(const Value: string): string;
 var
   I: integer;
   tmp: string;
@@ -1960,7 +1960,7 @@ begin
   fProjectIncludePaths.Clear;
 end;
 
-function TCppParser.IsGlobalFile(Value: string): boolean;
+function TCppParser.IsGlobalFile(const Value: string): boolean;
 var
   I: integer;
 begin
@@ -1987,7 +1987,7 @@ begin
 	end;
 end;
 
-procedure TCppParser.ReParseFile(FileName: TFileName; InProject: boolean; OnlyIfNotParsed: boolean; UpdateView: boolean);
+procedure TCppParser.ReParseFile(const FileName: string; InProject: boolean; OnlyIfNotParsed: boolean; UpdateView: boolean);
 var
   FName: string;
   CFile, HFile: string;
@@ -2057,7 +2057,7 @@ begin
       fOnUpdate(Self);
 end;
 
-procedure TCppParser.InvalidateFile(FileName: TFileName);
+procedure TCppParser.InvalidateFile(const FileName: string);
 var
 	I: integer;
 	I1: integer;
@@ -2232,7 +2232,7 @@ begin
 	fBaseIndex := fNextID;
 end;
 
-procedure TCppParser.Load(FileName: string);
+procedure TCppParser.Load(const FileName: string);
 var
 	hFile: integer;
 	HowMany: integer;
@@ -2530,7 +2530,7 @@ begin
   end;
 end;
 
-procedure TCppParser.FillListOf(Full: string; List: TList;Kind : TStatementKind);
+procedure TCppParser.FillListOf(Full: string; List: TStringList; Kind : TStatementKind);
 var
 	I: integer;
 begin
@@ -2544,7 +2544,7 @@ begin
 				(AnsiCompareStr(Full + 'A', PStatement(fStatementList[I])^._Command) = 0) or
 				(AnsiCompareStr(Full + 'W', PStatement(fStatementList[I])^._Command) = 0)
 			then
-				List.Add(PStatement(fStatementList[I]))
+				List.Add(PStatement(fStatementList[I])^._FullText);
 	end;
 end;
 
@@ -2730,7 +2730,7 @@ begin
   fThisPointerID := -1;
 end;
 
-function TCppParser.ScanMethodArgs(ArgStr: string; AddTemps: boolean; Filename: string; Line, ClassID: integer): string;
+function TCppParser.ScanMethodArgs(const ArgStr: string; AddTemps: boolean;const Filename: string; Line, ClassID: integer): string;
   function GetWordAt(Str: string; var Index: integer; JustPeek: boolean): string;
   var
     IdxBkp: integer;
@@ -2860,7 +2860,7 @@ begin
   Result := '(' + Trim(Result);
 end;
 
-function TCppParser.FindIncludeRec(Filename: string; DeleteIt: boolean): PIncludesRec;
+function TCppParser.FindIncludeRec(const Filename: string; DeleteIt: boolean): PIncludesRec;
 var
   I: integer;
 begin

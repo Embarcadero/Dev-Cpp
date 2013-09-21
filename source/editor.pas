@@ -70,21 +70,23 @@ type
     fTimerKey: Char;
     fCompletionBox: TCodeCompletion;
     fRunToCursorLine: integer;
-    FCodeToolTip: TCodeToolTip;//** Modified by Peter **}
+    FCodeToolTip: TCodeToolTip;
     FLastPos : TBufferCoord;
     FAutoIndent: TSynAutoIndent;
     HasCompletedParentheses : integer; // Set to 2 on completion during KeyPress, to 1 immediately after by KeyDown, and to 0 upon next key
-    HasCompletedArray : integer; // idem
-    procedure CompletionTimer( Sender: TObject );
-    procedure EditorKeyPress( Sender: TObject; var Key: Char );
-    procedure EditorKeyDown( Sender: TObject; var Key: Word; Shift: TShiftState );
-    procedure EditorKeyUp( Sender: TObject; var Key: Word; Shift: TShiftState );
+    HasCompletedArray : integer; // ...
+    HasCompletedCurly : integer; // ...
+    procedure CompletionTimer(Sender: TObject);
+    procedure EditorKeyPress(Sender: TObject; var Key: Char);
+    procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+
     procedure SetEditorText(Key: Char);
     procedure InitCompletion;
     procedure DestroyCompletion;
     function CurrentPhrase: string;
-    function CheckAttributes(P: TBufferCoord; Phrase: string): boolean;
+    function CheckAttributes(P: TBufferCoord;const Phrase: string): boolean;
     //////// CODE-COMPLETION - mandrav - END ///////
     function GetModified: boolean;
     procedure SetModified(value: boolean);
@@ -101,12 +103,13 @@ type
     procedure EditorDblClick(Sender: TObject);
     procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure EditorHintTimer(sender : TObject);
+    procedure EditorExit(sender : TObject);
 
-    procedure SetFileName(value: string);
+    procedure SetFileName(const value: string);
     procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
    public
-    procedure Init(InProject : boolean; Caption, Filename : string;DoOpen : boolean;IsRes: boolean = FALSE);
+    procedure Init(InProject : boolean;const Caption, Filename : string;DoOpen : boolean;IsRes: boolean = FALSE);
     destructor Destroy; override;
     // RNC set the breakpoints for this file when it is opened
     procedure SetBreakPointsOnOpen;
@@ -121,15 +124,15 @@ type
     procedure RunToCursor(Line : integer);
     procedure GotoLine;
     procedure GotoLineNr(Nr: integer);
-    function Search(const isReplace: boolean): boolean;
+    function Search(isReplace: boolean): boolean;
     procedure SearchAgain;
-    procedure Exportto(const isHTML: boolean);
-    procedure InsertString(const Value: string; const MoveCursor: boolean);
+    procedure Exportto(isHTML: boolean);
+    procedure InsertString(const Value: string;MoveCursor: boolean);
     function GetWordAtCursor: string;
-    procedure SetErrorFocus(const Col, Line: integer);
-    procedure SetActiveBreakpointFocus(const Line: integer);
+    procedure SetErrorFocus(Col, Line: integer);
+    procedure SetActiveBreakpointFocus(Line: integer);
     procedure RemoveBreakpointFocus;
-    procedure UpdateCaption(NewCaption: string);
+    procedure UpdateCaption(const NewCaption: string);
     procedure InsertDefaultText;
     procedure PaintMatchingBrackets(TransientType: TTransientType);
 
@@ -191,7 +194,7 @@ end;
 
 { TEditor }
 
-procedure TEditor.Init(InProject : boolean; Caption, Filename : string;DoOpen : boolean;IsRes: boolean = FALSE);
+procedure TEditor.Init(InProject : boolean;const Caption, Filename : string;DoOpen : boolean;IsRes: boolean = FALSE);
 var
 	s: string;
 	pt: TPoint;
@@ -254,10 +257,15 @@ begin
 	fText.OnDblClick:= EditorDblClick;
 	fText.OnMouseDown := EditorMouseDown;
 	fText.OnMouseMove := EditorMouseMove;
+	fText.OnExit := EditorExit;
 	fText.OnPaintTransient := EditorPaintTransient;
 	fText.MaxScrollWidth:=4096; // bug-fix #600748
 	fText.MaxUndo:=4096;
 	fText.BorderStyle:=bsNone;
+
+	fText.Gutter.LeftOffset := 4;
+	fText.Gutter.RightOffset := 21;
+	fText.Gutter.BorderStyle := gbsNone;
 
 	// Set the current editor and highlighter
 	devEditor.AssignEditor(fText);
@@ -272,6 +280,10 @@ begin
 	StrtoPoint(pt, devEditor.Syntax.Values[cSel]);
 	fText.SelectedColor.Background:= pt.X;
 	fText.SelectedColor.Foreground:= pt.Y;
+
+	// Folding bar color
+	StrtoPoint(pt, devEditor.Syntax.Values[cFld]);
+	fText.CodeFolding.FolderBarLinesColor := pt.y;
 
 	// Create a gutter
 	fDebugGutter := TDebugGutter.Create(self);
@@ -600,12 +612,21 @@ begin
    end;
 end;
 
+// Handle WM_KILLFOCUS instead of all the special cases to hide the code tooltip
+procedure TEditor.EditorExit(Sender : TObject);
+begin
+	if Assigned(FCodeToolTip) then
+		FCodeToolTip.ReleaseHandle;
+end;
+
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
 	if scModified in Changes then begin // scModified is only fired when the modified state changes
 		if Modified then begin
 			MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
 			UpdateCaption('[*] '+ExtractfileName(fFileName));
+			if fText.UnCollapsedLines.Count = 0 then
+				fText.ReScan;
 		end else begin
 			UpdateCaption(ExtractfileName(fFileName));
 			MainForm.SetStatusbarMessage('');
@@ -618,15 +639,13 @@ begin
 
 	if Changes * [scCaretX, scCaretY] <> [] then begin
 
-		// Prevent loading twice (on CaretX and CaretY change)
+		// Prevent doing this stuff twice (on CaretX and CaretY change)
 		if (fText.CaretX = FLastPos.Char) and (fText.CaretY = FLastPos.Line) then
 			Exit;
 
-		// Store old pos
 		FLastPos.Char := fText.CaretX;
 		FLastPos.Line := fText.CaretY;
 
-		// Only on caret changes...
 		if not fErrSetting and (fErrorLine <> -1) then begin
 			fText.InvalidateLine(fErrorLine);
 			fText.InvalidateGutterLine(fErrorLine);
@@ -635,7 +654,7 @@ begin
 			fText.InvalidateGutterLine(fErrorLine);
 		end;
 
-		if FCodeToolTip.Activated or (not fText.SelAvail) and fText.Focused and devEditor.ShowFunctionTip then
+		if FCodeToolTip.Activated or (not fText.SelAvail) and devEditor.ShowFunctionTip then
 			FCodeToolTip.Show;
 	end;
 
@@ -652,7 +671,7 @@ begin
 	end;
 end;
 
-procedure TEditor.ExportTo(const isHTML: boolean);
+procedure TEditor.ExportTo(isHTML: boolean);
 begin
   if IsHTML then
    begin
@@ -705,34 +724,46 @@ begin
   end;
 end;
 
-
-procedure TEditor.InsertString(const Value: string; const MoveCursor: boolean);
+procedure TEditor.InsertString(const Value: string;MoveCursor: boolean);
 var
 	NewCursorPos: TBufferCoord;
 	LocalCopy: TStringList;
+	idx,idx2 : integer;
+	Line : string;
 begin
 	NewCursorPos := fText.CaretXY;
 
-	if MoveCursor then begin
-		LocalCopy := TStringList.Create;
-		LocalCopy.Text := Value;
+	LocalCopy := TStringList.Create;
+	LocalCopy.Text := Value;
 
-		// move cursor to pipe '|', don't do that, might be used by code, use *|* instead
-		if LocalCopy.Find('*|*',NewCursorPos.Line) then begin
-			NewCursorPos.Char := AnsiPos('*|*',LocalCopy[NewCursorPos.Line]);
+	if MoveCursor then begin
+		for idx := 0 to LocalCopy.Count-1 do begin
+			Line:= LocalCopy[idx];
+			idx2:= AnsiPos('*|*', Line);
+			if idx2 > 0 then begin
+				Delete(Line, idx2, 3);
+				LocalCopy[idx]:= Line;
+				inc(NewCursorPos.Line, idx);
+				if idx = 0 then
+					inc(NewCursorPos.Char, idx2 - 1)
+				else
+					NewCursorPos.Char:= idx2;
+
+				break;
+			end;
 		end;
-		LocalCopy.Free;
 	end;
 
-	// The actual line that does the awesome trick
-	fText.SelText:= Value;
+	fText.SelText:= Copy(LocalCopy.Text,0,Length(LocalCopy.Text)-2);
+
+	LocalCopy.Free;
 
 	// Update the cursor
 	fText.CaretXY:= NewCursorPos;
 	fText.EnsureCursorPosVisible;
 end;
 
-function TEditor.Search(const isReplace: boolean): boolean;
+function TEditor.Search(isReplace: boolean): boolean;
 var
  s: string;
 begin
@@ -778,7 +809,7 @@ begin
 		MessageDlg(format(Lang[ID_MSG_TEXTNOTFOUND], [SearchCenter.FindText]),mtInformation, [mbOk], 0);
 end;
 
-procedure TEditor.SetErrorFocus(const Col, Line: integer);
+procedure TEditor.SetErrorFocus(Col, Line: integer);
 begin
 	fErrSetting:= TRUE;
 	if fErrorLine <> Line then begin
@@ -795,7 +826,7 @@ begin
 	fErrSetting := FALSE;
 end;
 
-procedure TEditor.SetActiveBreakpointFocus(const Line: integer);
+procedure TEditor.SetActiveBreakpointFocus(Line: integer);
 begin
   if (fActiveLine <> Line) and (fActiveLine <> -1) then
    fText.InvalidateLine(fActiveLine);
@@ -821,13 +852,13 @@ begin
   fActiveLine:= -1;
 end;
 
-procedure TEditor.UpdateCaption(NewCaption: string);
+procedure TEditor.UpdateCaption(const NewCaption: string);
 begin
   if assigned(fTabSheet) then
    fTabSheet.Caption:= NewCaption;
 end;
 
-procedure TEditor.SetFileName(value: string);
+procedure TEditor.SetFileName(const value: string);
 begin
   if value <> fFileName then
    begin
@@ -866,7 +897,7 @@ procedure TEditor.InsertDefaultText;
 var
 	tmp: TStrings;
 begin
-	if FileExists(devDirs.Config + DEV_DEFAULTCODE_FILE) then begin
+	if devEditor.DefaultCode and FileExists(devDirs.Config + DEV_DEFAULTCODE_FILE) then begin
 		tmp:= TStringList.Create;
 		try
 			tmp.LoadFromFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
@@ -894,7 +925,7 @@ var
 begin
 
 	// Doing this here instead of in EditorKeyDown to be able to delete some key messages
-	if devEditor.CompleteSymbols and not (Sender is TForm) then begin
+	if devEditor.CompleteSymbols and not (Sender is TForm) and not fText.SelAvail then begin
 
 		// Allerhande voorwaarden
 		allowcompletion := true;
@@ -976,10 +1007,16 @@ begin
 						InsertString('{' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + #9 + 'break;' + #13#10 + Copy(fText.LineText,1,cursorpos-1) + '}',false);
 						fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
 						Key:=#0;
-					end else
+					end else begin
+						HasCompletedCurly := 2;
 						InsertString('}',false);
+					end;
 				end else
 					InsertString(#13#10 + '}',false);
+			end else if (Key = '}') and (HasCompletedCurly > 0) then begin
+				fText.CaretXY := BufferCoord(fText.CaretX + 1,fText.CaretY);
+				HasCompletedCurly := 0;
+				Key:=#0;
 			end else if (Key = '<') and devEditor.IncludeComplete then begin
 				if AnsiStartsStr('#include',fText.LineText) then
 					InsertString('>',false);
@@ -1054,6 +1091,7 @@ begin
 		if not (ssShift in Shift) then begin
 			Dec(HasCompletedParentheses);
 			Dec(HasCompletedArray);
+			Dec(HasCompletedCurly);
 		end;
 	end;
 
@@ -1134,8 +1172,8 @@ end;
 
 procedure TEditor.DestroyCompletion;
 begin
-  if Assigned(fTimer) then
-    FreeAndNil(fTimer);
+	if Assigned(fTimer) then
+		FreeAndNil(fTimer);
 end;
 
 procedure TEditor.InitCompletion;
@@ -1268,7 +1306,7 @@ begin
 	end;
 end;
 
-function TEditor.CheckAttributes(P: TBufferCoord; Phrase: string): boolean;
+function TEditor.CheckAttributes(P: TBufferCoord; const Phrase: string): boolean;
 var
   token: string;
   attri: TSynHighlighterAttributes;
@@ -1435,7 +1473,6 @@ begin
 	Text.Modified:=True;
 end;
 
-{** Modified by Peter **}
 procedure TEditor.IndentSelection;
 begin
 	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
@@ -1444,7 +1481,6 @@ begin
 		FText.ExecuteCommand(ecTab,#0, nil);
 end;
 
-{** Modified by Peter **}
 procedure TEditor.UnindentSelection;
 begin
 	if FText.BlockBegin.Line <> FText.BlockEnd.Line then
@@ -1479,7 +1515,7 @@ var
 	selection: string;
 begin
 	// has selection
-	if FText.SelAvail then begin
+	if fText.SelAvail then begin
 
 		// start an undoblock, so we can undo it afterwards!
 		FText.BeginUndoBlock;

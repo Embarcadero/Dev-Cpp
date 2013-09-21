@@ -32,15 +32,21 @@ object ProfileAnalysisForm: TProfileAnalysisForm
       Top = 0
       Width = 633
       Height = 493
-      ActivePage = tabOpts
+      ActivePage = tabFlat
       Align = alClient
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 0
       OnChange = PageControl1Change
       object tabFlat: TTabSheet
         Caption = 'Flat output'
         object Splitter2: TSplitter
           Left = 0
-          Top = 325
+          Top = 323
           Width = 625
           Height = 8
           Cursor = crVSplit
@@ -48,7 +54,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
         end
         object memFlat: TMemo
           Left = 0
-          Top = 333
+          Top = 331
           Width = 625
           Height = 132
           Align = alBottom
@@ -67,7 +73,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
           Left = 0
           Top = 0
           Width = 625
-          Height = 325
+          Height = 323
           Align = alClient
           Columns = <
             item
@@ -116,7 +122,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
         ImageIndex = 1
         object Splitter1: TSplitter
           Left = 0
-          Top = 325
+          Top = 323
           Width = 625
           Height = 8
           Cursor = crVSplit
@@ -124,7 +130,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
         end
         object memGraph: TMemo
           Left = 0
-          Top = 333
+          Top = 331
           Width = 625
           Height = 132
           Align = alBottom
@@ -143,7 +149,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
           Left = 0
           Top = 0
           Width = 625
-          Height = 325
+          Height = 323
           Align = alClient
           Columns = <
             item
@@ -195,15 +201,15 @@ object ProfileAnalysisForm: TProfileAnalysisForm
           object PrevText: TLabel
             Left = 16
             Top = 78
-            Width = 160
-            Height = 13
+            Width = 176
+            Height = 15
             Caption = 'Supress functions called less than'
           end
           object PostText: TLabel
             Left = 240
             Top = 78
-            Width = 24
-            Height = 13
+            Width = 29
+            Height = 15
             Caption = 'times'
           end
           object chkHideNotCalled: TCheckBox
@@ -230,7 +236,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
             Left = 184
             Top = 75
             Width = 49
-            Height = 22
+            Height = 24
             MaxValue = 999999999
             MinValue = 0
             TabOrder = 2
@@ -267,7 +273,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
             Left = 16
             Top = 48
             Width = 289
-            Height = 21
+            Height = 23
             Enabled = False
             TabOrder = 1
             Text = 'editCustom'

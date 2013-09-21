@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit CodeIns;
+unit CodeInsFrm;
 
 interface
 
@@ -85,11 +85,10 @@ type
     property Entry: PCodeIns read fEntry write SetEntry;
   end;
 
-
 implementation
 
 uses
- SysUtils, IniFiles, devCFG, Utils, version, MultiLangSupport, main;
+ SysUtils, IniFiles, devCFG, Utils, version, MultiLangSupport;
 
 {$R *.dfm}
  { TCodeInsList }
@@ -212,7 +211,7 @@ begin
 	''+#13#10+
 	'	memset(&wc,0,sizeof(wc));'+#13#10+
 	'	wc.cbSize		 = sizeof(WNDCLASSEX);'+#13#10+
-	'	wc.lpfnWndProc	 = *|* /* insert window procedure function here */;'+#13#10+
+	'	wc.lpfnWndProc	 = *|*; /* insert window procedure function here */;'+#13#10+
 	'	wc.hInstance	 = hInstance;'+#13#10+
 	'	wc.hCursor		 = LoadCursor(NULL, IDC_ARROW);'+#13#10+
 	'	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);'+#13#10+
@@ -350,6 +349,10 @@ end;
 
 procedure TfrmCodeEdit.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   if Edit then
    Caption:= Lang[ID_CIE_EDCAPTION]
   else

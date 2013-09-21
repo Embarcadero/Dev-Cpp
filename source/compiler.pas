@@ -39,7 +39,7 @@ type
 	TLogEntryEvent = procedure(const msg: string) of object;
 	TOutputEvent = procedure(const _Line, _Col, _Unit, _Message: string) of object;
 	TResOutputEvent = procedure(const _Line, _Unit, _Message: string) of object;
-	TSuccessEvent = procedure(const messages : integer) of object;
+	TSuccessEvent = procedure(messages : integer) of object;
 
 	TTarget = (ctNone, ctFile, ctProject);
 
@@ -66,20 +66,20 @@ type
 		function GetMakeFile: string;
 		function GetCompiling: Boolean;
 		procedure RunTerminate(Sender: TObject);
-		procedure InitProgressForm(Status: string);
+		procedure InitProgressForm(const Status: string);
 		procedure EndProgressForm;
 		procedure ReleaseProgressForm;
-		procedure ProcessProgressForm(Line: string);
+		procedure ProcessProgressForm(const Line: string);
 	public
 		procedure BuildMakeFile;
 		procedure CheckSyntax; virtual;
-		procedure Compile(SingleFile: string = ''); virtual;
+		procedure Compile(const SingleFile: string = ''); virtual;
 		procedure Run; virtual;
 		procedure CompileAndRun; virtual;
 		procedure Debug; virtual;
 		function Clean: Boolean; virtual;
 		function RebuildAll: Boolean; virtual;
-		function FindDeps(TheFile: String): String;
+		function FindDeps(const TheFile: string): string;
 		function SwitchToProjectCompilerSet: integer; // returns the original compiler set
 		procedure SwitchToOriginalCompilerSet(Index: integer); // switches the original compiler set to index
 
@@ -115,7 +115,7 @@ type
 		procedure GetCompileParams; virtual;
 		procedure GetLibrariesParams; virtual;
 		procedure GetIncludesParams; virtual;
-		procedure LaunchThread(s, dir : string); virtual;
+		procedure LaunchThread(const s, dir : string); virtual;
 		procedure ThreadCheckAbort(var AbortThread: boolean); virtual;
 		procedure OnCompilationTerminated(Sender: TObject); virtual;
 		procedure OnLineOutput(Sender: TObject; const Line: String); virtual;
@@ -128,7 +128,7 @@ type
 implementation
 
 uses
-	MultiLangSupport, devcfg, Macros, devExec, CompileProgressFm, StrUtils;
+	MultiLangSupport, devcfg, Macros, devExec, CompileProgressFrm, StrUtils;
 
 procedure TCompiler.DoLogEntry(const msg: string);
 begin
@@ -213,7 +213,7 @@ begin
 			end else begin
 				Objects := Format(cAppendStr, [Objects,GenMakePath(ChangeFileExt(tfile, OBJ_EXT), True, True)]);
 				if fProject.Units[i].Link then
-					LinkObjects := Format(cAppendStr, [LinkObjects, GenMakePath(ChangeFileExt(tfile, OBJ_EXT))]);
+					LinkObjects := Format(cAppendStr, [LinkObjects, GenMakePath1(ChangeFileExt(tfile, OBJ_EXT))]);
 			end;
 		end;
 	end;
@@ -226,9 +226,9 @@ begin
 			if not DirectoryExists(fProject.Options.ObjectOutput) then
 				MkDir(fProject.Options.ObjectOutput);
 			ObjResFile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ChangeFileExt(fProject.Options.PrivateResource, RES_EXT);
-			ObjResFile := GenMakePath(ExtractRelativePath(fProject.FileName, ObjResFile));
+			ObjResFile := GenMakePath1(ExtractRelativePath(fProject.FileName, ObjResFile));
 		end else
-			ObjResFile := GenMakePath(ChangeFileExt(fProject.Options.PrivateResource, RES_EXT));
+			ObjResFile := GenMakePath1(ChangeFileExt(fProject.Options.PrivateResource, RES_EXT));
 	end;
 
 	if (devCompiler.gppName <> '') then
@@ -288,7 +288,7 @@ begin
 	writeln(F, 'INCS     ='  + tmp);
 	tmp:=StringReplace(fCppIncludesParams, '\', '/', [rfReplaceAll]);
 	writeln(F, 'CXXINCS  ='  + tmp);
-	writeln(F, 'BIN      = ' + GenMakePath(ExtractRelativePath(Makefile, fProject.Executable)));
+	writeln(F, 'BIN      = ' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)));
 
 	writeln(F, 'CXXFLAGS = $(CXXINCS) ' + fCppCompileParams);
 	writeln(F, 'CFLAGS   = $(INCS) ' + fCompileParams);
@@ -300,19 +300,19 @@ begin
 	else
 		Writeln(F, '.PHONY: all all-before all-after clean clean-custom');
 	Writeln(F, '');
-	Writeln(F, 'all: all-before ' + GenMakePath(ExtractRelativePath(Makefile, fProject.Executable)) + ' all-after');
+	Writeln(F, 'all: all-before ' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)) + ' all-after');
 	Writeln(F, '');
 
 	for i := 0 to fProject.Options.MakeIncludes.Count - 1 do
-		Writeln(F, 'include ' + GenMakePath(fProject.Options.MakeIncludes.Strings[i]));
+		Writeln(F, 'include ' + GenMakePath1(fProject.Options.MakeIncludes.Strings[i]));
 
 	WriteMakeClean(F);
 	writeln(F);
 end;
 
-function TCompiler.FindDeps(TheFile: String): String;
+function TCompiler.FindDeps(const TheFile: string): string;
 var
-	Output, Cmd, Includes, GppStr: String;
+	Output, Cmd, Includes, GppStr: string;
 	l : TStringList;
 	i : integer;
 begin
@@ -381,16 +381,16 @@ begin
 					MkDir(fProject.Options.ObjectOutput);
 
 				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(fProject.Units[i].FileName);
-				ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
+				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
 			end else
-				ofile := GenMakePath(ChangeFileExt(tfile, OBJ_EXT));
+				ofile := GenMakePath1(ChangeFileExt(tfile, OBJ_EXT));
 
 			if DoCheckSyntax then begin
 				writeln(F, GenMakePath2(ofile) + ':' + GenMakePath2(tfile));
 				if fProject.Units[i].CompileCpp then
-					writeln(F, #9 + '$(CPP) -S ' + GenMakePath(tfile) + ' -o nul $(CXXFLAGS)')
+					writeln(F, #9 + '$(CPP) -S ' + GenMakePath1(tfile) + ' -o nul $(CXXFLAGS)')
 				else
-					writeln(F, #9 + '$(CC) -S ' + GenMakePath(tfile) + ' -o nul $(CFLAGS)');
+					writeln(F, #9 + '$(CC) -S ' + GenMakePath1(tfile) + ' -o nul $(CFLAGS)');
 			end else begin
 				if PerfectDepCheck and not fSingleFile then
 					writeln(F, GenMakePath2(ofile) + ': ' + GenMakePath2(tfile) + ' ' + FindDeps(fProject.Directory + tfile))
@@ -403,9 +403,9 @@ begin
 					writeln(F, #9+tmp);
 				end else begin
 					if fProject.Units[i].CompileCpp then
-						writeln(F, #9 + '$(CPP) -c ' + GenMakePath(tfile) + ' -o ' + ofile + ' $(CXXFLAGS)')
+						writeln(F, #9 + '$(CPP) -c ' + GenMakePath1(tfile) + ' -o ' + ofile + ' $(CXXFLAGS)')
 					else
-						writeln(F, #9 + '$(CC) -c ' + GenMakePath(tfile) + ' -o ' + ofile + ' $(CFLAGS)');
+						writeln(F, #9 + '$(CC) -c ' + GenMakePath1(tfile) + ' -o ' + ofile + ' $(CFLAGS)');
 				end;
 			end;
 		end;
@@ -421,7 +421,7 @@ begin
 			ShortPath:=GetShortName(fProject.Options.ResourceIncludes[i]);
 			// only add include-dir if it is existing dir...
 			if ShortPath<>'' then
-				ResIncludes := ResIncludes + ' --include-dir ' + GenMakePath(ShortPath);
+				ResIncludes := ResIncludes + ' --include-dir ' + GenMakePath1(ShortPath);
 		end;
 
 		for i := 0 to fProject.Units.Count - 1 do begin
@@ -438,8 +438,8 @@ begin
 			ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ChangeFileExt(fProject.Options.PrivateResource, RES_EXT)
 		else
 			ofile := ChangeFileExt(fProject.Options.PrivateResource, RES_EXT);
-		ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ofile));//GenMakePath(ExtractRelativePath(Makefile, ChangeFileExt(fProject.Options.PrivateResource, RES_EXT)));
-		tfile := GenMakePath(ExtractRelativePath(fProject.FileName, fProject.Options.PrivateResource));
+		ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ofile));
+		tfile := GenMakePath1(ExtractRelativePath(fProject.FileName, fProject.Options.PrivateResource));
 
 		if(AnsiContainsStr(fCompileParams,'-m32')) then
 			windresargs := ' -F pe-i386'
@@ -512,8 +512,8 @@ begin
 		tfile:= ExtractFileName(tFile)
 	else
 		tfile:= ExtractRelativePath(Makefile, tfile);
-	writeln(F, 'DEFFILE=' + GenMakePath(ChangeFileExt(tfile, '.def')));
-	writeln(F, 'STATICLIB=' + GenMakePath(ChangeFileExt(tfile, LIB_EXT)));
+	writeln(F, 'DEFFILE=' + GenMakePath1(ChangeFileExt(tfile, '.def')));
+	writeln(F, 'STATICLIB=' + GenMakePath1(ChangeFileExt(tfile, LIB_EXT)));
 	writeln(F);
 	writeln(F, '$(BIN): $(LINKOBJ)');
 
@@ -595,7 +595,7 @@ begin
 	DoCheckSyntax := False;
 end;
 
-procedure TCompiler.Compile(SingleFile: string);
+procedure TCompiler.Compile(const SingleFile: string);
 resourcestring
  cCmdLine = '%s "%s" -o "%s" %s %s %s';
  cMakeLine = '%s -f "%s" all';
@@ -634,9 +634,9 @@ begin
 				if not DirectoryExists(fProject.Options.ObjectOutput) then
 					MkDir(fProject.Options.ObjectOutput);
 				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(SingleFile);
-				ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
+				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
 			end else
-				ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(SingleFile, OBJ_EXT)));
+				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(SingleFile, OBJ_EXT)));
 			if (devCompiler.makeName <> '') then
 				cmdline:= format(cSingleFileMakeLine, [devCompiler.makeName, fMakeFile, ofile])
 			else
@@ -695,7 +695,6 @@ procedure TCompiler.RunTerminate(Sender: TObject);
 begin
 	Application.Restore;
 end;
-
 
 procedure TCompiler.Run;
 var
@@ -841,22 +840,21 @@ begin
 	end;
 end;
 
-procedure TCompiler.LaunchThread(s, dir : string);
+procedure TCompiler.LaunchThread(const s, dir : string);
 begin
 	if Assigned(fDevRun) then
-			MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0)
-	else
-	begin
-		 Application.ProcessMessages;
-		 fAbortThread:=False;
-		 fDevRun := TDevRun.Create(true);
-		 fDevRun.Command := s;
-		 fDevRun.Directory := dir;
-		 fDevRun.OnTerminate := OnCompilationTerminated;
-		 fDevRun.OnLineOutput := OnLineOutput;
-		 fDevRun.OnCheckAbort := ThreadCheckAbort;
-		 fDevRun.FreeOnTerminate := True;
-		 fDevRun.Resume;
+		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0)
+	else begin
+		Application.ProcessMessages;
+		fAbortThread:=False;
+		fDevRun := TDevRun.Create(true);
+		fDevRun.Command := s;
+		fDevRun.Directory := dir;
+		fDevRun.OnTerminate := OnCompilationTerminated;
+		fDevRun.OnLineOutput := OnLineOutput;
+		fDevRun.OnCheckAbort := ThreadCheckAbort;
+		fDevRun.FreeOnTerminate := True;
+		fDevRun.Resume;
 	end;
 end;
 
@@ -1495,30 +1493,32 @@ begin
 	devCompiler.CompilerSet:=fProject.Options.CompilerSet;
 end;
 
-procedure TCompiler.InitProgressForm(Status: string);
+procedure TCompiler.InitProgressForm(const Status: string);
 begin
 	if not devData.ShowProgress then exit;
 	if not Assigned(CompileProgressForm) then
 		CompileProgressForm:=TCompileProgressForm.Create(Application);
 	with CompileProgressForm do begin
-		starttime:=GetTickCount;
+
 		Memo1.Lines.Clear;
-		btnClose.Caption:=Lang[ID_BTN_CANCEL];
-		btnClose.OnClick:=OnAbortCompile;
-		Show;
 		Memo1.Lines.Add(Format('%s: %s', [Lang[ID_COPT_COMPTAB], devCompilerSet.SetName(devCompiler.CompilerSet)]));
+
+		btnClose.OnClick:=OnAbortCompile;
+
 		lblCompiler.Caption:=devCompilerSet.SetName(devCompiler.CompilerSet);
 		lblStatus.Caption:=Status;
 		lblStatus.Font.Style:=[];
 		lblFile.Caption:='';
 		lblErr.Caption:='0';
 		lblWarn.Caption:='0';
-		pb.Position:=0;
-		pb.Step:=1;
+
 		if Assigned(fProject) then
 			pb.Max:=fProject.Units.Count+2 // all project units + linking output + private resource
 		else
 			pb.Max:=1; // just fSourceFile
+
+		starttime:=GetTickCount;
+		Show;
 	end;
 	fWarnCount:=0;
 	fErrCount:=0;
@@ -1561,7 +1561,7 @@ begin
 		fProject.SaveToLog;
 end;
 
-procedure TCompiler.ProcessProgressForm(Line: string);
+procedure TCompiler.ProcessProgressForm(const Line: string);
 var
 	I: integer;
 	srch: string;
@@ -1570,14 +1570,14 @@ var
 	OK: boolean;
 	prog: integer;
 begin
-	if not Assigned(CompileProgressForm) then
-		Exit;
+	//if not Assigned(CompileProgressForm) then
+	//	Exit;
 
 	with CompileProgressForm do begin
 		// report currently compiling file
 		if not Assigned(fProject) then begin
 			Memo1.Lines.Add(fSourceFile);
-			Memo1.Lines.Add('Compiling '+fil);
+			Memo1.Lines.Add('Compiling ' + fil);
 			lblStatus.Caption:='Compiling...';
 			lblFile.Caption:=fSourceFile;
 			Exit;
@@ -1624,8 +1624,7 @@ begin
 				if not schk then
 					act:='Cleaning';
 				lblFile.Caption:='';
-			end
-			else if (Pos(srch, Line)>0) then begin
+			end else if (Pos(srch, Line)>0) then begin
 				fil:=srch;
 				prog:=pb.Max;
 				if not schk then
@@ -1644,11 +1643,10 @@ end;
 
 procedure TCompiler.ReleaseProgressForm;
 begin
-	if not Assigned(CompileProgressForm) then
-		Exit;
-
-	CompileProgressForm.Close; // it's freed on close
-	CompileProgressForm:=nil;
+	if Assigned(CompileProgressForm) then begin
+		CompileProgressForm.Close; // it's freed on close
+		CompileProgressForm:=nil;
+	end;
 end;
 
 end.

@@ -18,7 +18,7 @@
 }
 
 {$WARN UNIT_PLATFORM OFF}
-unit Envirofrm;
+unit EnviroFrm;
 
 interface
 
@@ -116,9 +116,9 @@ type
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
     procedure cvsdownloadlabelClick(Sender: TObject);
-    procedure cbUIfontSelect(Sender: TObject);
     procedure cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
     procedure cbUIfontsizeDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
+    procedure cbUIfontsizeChange(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -262,13 +262,15 @@ begin
 		spnCVSCompression.Value:= devCVSHandler.Compression;
 		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
 
-		// Font opstellen
+		// Add all fonts and select the current one
 		cbUIfont.Items.Assign(Screen.Fonts);
 		for idx:=0 to pred(cbUIfont.Items.Count) do
 			if cbUIfont.Items.Strings[idx] = InterfaceFont then begin
 				cbUIfont.ItemIndex := idx;
 				break;
 			end;
+
+		// Do the same for the size selection
 		for idx:=0 to pred(cbUIfontsize.Items.Count) do
 			if strtoint(cbUIfontsize.Items.Strings[idx]) = InterfaceFontSize then begin
 				cbUIfontsize.ItemIndex := idx;
@@ -362,6 +364,10 @@ end;
 
 procedure TEnviroForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption:=                  Lang[ID_ENV];
 
   //Tabs
@@ -384,6 +390,7 @@ begin
   cbMinOnRun.Caption:=       Lang[ID_ENV_MINONRUN];
   cbdblFiles.Caption:=       Lang[ID_ENV_DBLFILES];
   cbNoSplashScreen.Caption:= Lang[ID_ENV_NOSPLASH];
+  cbPauseConsole.Caption:=   Lang[ID_ENV_PAUSECONSOLE];
 
   gbProgress.Caption :=      '  '+Lang[ID_ENV_COMPPROGRESSWINDOW]+'  ';
   cbShowProgress.Caption :=  Lang[ID_ENV_SHOWPROGRESS];
@@ -437,8 +444,7 @@ end;
 
 procedure TEnviroForm.FormCreate(Sender: TObject);
 begin
-  LoadText;
-  PagesMain.ActivePageIndex:= 0;
+	LoadText;
 end;
 
 procedure TEnviroForm.vleExternalEditButtonClick(Sender: TObject);
@@ -497,12 +503,6 @@ begin
 	ShellExecute(GetDesktopWindow(), 'open', PChar((Sender as TLabel).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
-procedure TEnviroForm.cbUIfontSelect(Sender: TObject);
-begin
-	(Sender as TComboBox).Font.Name := cbUIfont.Text;
-	(Sender as TComboBox).Font.Size := strtoint(cbUIfontsize.Text);
-end;
-
 procedure TEnviroForm.cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 begin
 	with (Control as TComboBox) do begin
@@ -521,6 +521,11 @@ begin
 		Canvas.FillRect(Rect);
 		Canvas.TextOut(Rect.Left, Rect.Top, Items.Strings[Index]);
 	end;
+end;
+
+procedure TEnviroForm.cbUIfontsizeChange(Sender: TObject);
+begin
+	cbUIfont.Repaint;
 end;
 
 end.

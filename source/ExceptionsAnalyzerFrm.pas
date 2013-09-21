@@ -20,7 +20,7 @@
 {$WARN SYMBOL_PLATFORM OFF}
 {$D+} // debugging in this unit
 {$OPTIMIZATION off } // and no optimization
-unit ExceptionsAnalyzer;
+unit ExceptionsAnalyzerFrm;
 
 interface
 

@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit FunctionSearchFm;
+unit FunctionSearchFrm;
 
 interface
 
@@ -55,8 +55,8 @@ type
     fFileName: TFileName;
   end;
 
-var
-  FunctionSearchForm: TFunctionSearchForm;
+//var
+//  FunctionSearchForm: TFunctionSearchForm;
 
 implementation
 
@@ -173,6 +173,10 @@ end;
 
 procedure TFunctionSearchForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := StringReplace(Lang[ID_ITEM_GOTOFUNCTION], '&', '', []);
   Label1.Caption := Lang[ID_GF_TEXT];
   lvEntries.Column[1].Caption := Lang[ID_GF_TYPE];

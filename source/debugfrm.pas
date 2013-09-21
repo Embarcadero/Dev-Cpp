@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit debugfrm;
+unit DebugFrm;
 
 interface
 
@@ -44,8 +44,8 @@ type
     { Public declarations }
   end;
 
-var
-  DebugForm: TDebugForm;
+//var
+//  DebugForm: TDebugForm;
 
 implementation
 

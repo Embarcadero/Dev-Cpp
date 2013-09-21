@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit NewTemplateFm;
+unit NewTemplateFrm;
 
 interface
 
@@ -92,12 +92,13 @@ type
     TempProject: TProject;
   end;
 
-var
-  NewTemplateForm: TNewTemplateForm;
+//var
+//  NewTemplateForm: TNewTemplateForm;
 
 implementation
 
-uses utils, IconFrm, devcfg, version, Templates, MultiLangSupport;
+uses
+  utils, IconFrm, devcfg, version, Templates, MultiLangSupport;
 
 {$R *.dfm}
 

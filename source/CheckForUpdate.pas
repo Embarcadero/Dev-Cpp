@@ -23,7 +23,7 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Classes, Windows, Wininet, Forms, Messages, SysUtils,
+  Classes, Wininet, Forms, SysUtils,
   Dialogs;
 {$ENDIF}
 {$IFDEF LINUX}

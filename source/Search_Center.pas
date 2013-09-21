@@ -93,10 +93,10 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  SysUtils, Controls, Dialogs, Findfrm, Replacefrm, version, MultiLangSupport;
+  SysUtils, Controls, Dialogs, FindFrm, ReplaceFrm, version, MultiLangSupport;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, QControls, QDialogs, Findfrm, Replacefrm, version, MultiLangSupport;
+  SysUtils, QControls, QDialogs, FindFrm, Replacefrm, version, MultiLangSupport;
 {$ENDIF}
 
 { TdevSearchCenter }
@@ -172,14 +172,6 @@ function TdevSearchCenter.RunProject: boolean;
 var
  idx: integer;
 begin
-  if not assigned(fProject) then
-   begin
-     // another debug message
-     ShowMessage('ERROR: Searching a Project with no project assigned');
-     result:= FALSE;
-     exit;
-   end;
-
   for idx:= 0 to pred(fProject.Units.Count) do
    begin
      fCurFile:= fProject.Units[idx].FileName;

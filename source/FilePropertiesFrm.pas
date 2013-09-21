@@ -18,7 +18,7 @@
 }
 
 {$WARN UNIT_PLATFORM OFF}
-unit FilePropertiesFm;
+unit FilePropertiesFrm;
 
 interface
 
@@ -89,7 +89,7 @@ type
   end;
 
 var
-  FilePropertiesForm: TFilePropertiesForm;
+//  FilePropertiesForm: TFilePropertiesForm;
   Size, Stamp, Total, Code, Comments, Includes, Empty: integer;
 
 implementation
@@ -198,6 +198,10 @@ end;
 
 procedure TFilePropertiesForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_ITEM_PROPERTIES];
   btnOK.Caption := Lang[ID_BTN_OK];
   Label1.Caption := Lang[ID_PROPS_FILENAME] + ':';

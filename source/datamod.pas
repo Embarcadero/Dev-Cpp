@@ -26,7 +26,7 @@ uses
   SysUtils, Classes, Menus, Dialogs, ImgList, Controls,
   SynEditExport, SynExportHTML, SynExportRTF,
   SynEditHighlighter, SynHighlighterCpp, SynEditPrint,
-  oysUtils, CodeIns, SynHighlighterRC, SynCompletionProposal,
+  oysUtils, CodeInsFrm, SynHighlighterRC, SynCompletionProposal,
   SynEditMiscClasses, SynEditSearch;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -178,6 +178,7 @@ begin
   AddSpecial(cABP, offset+19); // active breakpoint
   AddSpecial(cGut, offset+20); // gutter
   AddSpecial(cSel, offset+21); // selected text
+  AddSpecial(cFld, offset+22); // fold bar lines
 end;
 
 procedure TdmMain.UpdateHighlighter;

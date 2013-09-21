@@ -38,7 +38,6 @@ type
 		fIndentGuides: Boolean;
 		fShowCollapsedLine: Boolean;
 		fCollapsedLineColor: TColor;
-		fFolderBarColor: TColor;
 		fFolderBarLinesColor: TColor;
 		fCollapsingMarkStyle: TSynCollapsingMarkStyle;
 		fCaseSensitive: Boolean;
@@ -50,7 +49,6 @@ type
 		property CaseSensitive: Boolean read fCaseSensitive write fCaseSensitive;
 		property CollapsedLineColor: TColor read fCollapsedLineColor write fCollapsedLineColor;
 		property CollapsingMarkStyle: TSynCollapsingMarkStyle read fCollapsingMarkStyle write fCollapsingMarkStyle;
-		property FolderBarColor: TColor read fFolderBarColor write fFolderBarColor;
 		property FolderBarLinesColor: TColor read fFolderBarLinesColor write fFolderBarLinesColor;
 		property IndentGuides: Boolean read fIndentGuides write fIndentGuides;
 		property ShowCollapsedLine: Boolean read fShowCollapsedLine write fShowCollapsedLine;
@@ -426,15 +424,13 @@ begin
 	IndentGuides := True;
 	ShowCollapsedLine := True;
 	CollapsedLineColor := clBlack;
-	FolderBarColor := clBtnFace;
 	FolderBarLinesColor := clBlack;
 	CollapsingMarkStyle := msSquare;
 	CaseSensitive := True;
 
-	fFoldRegions := TFoldRegions.Create(TFoldRegionItem); // Leaky
+	fFoldRegions := TFoldRegions.Create(TFoldRegionItem); // TODO: Leaky?
 	with fFoldRegions do begin
 		Add(rtChar, False, False, False, '{', '}', nil);
-		Add(rtKeyword, True, False, False, '/*', '*/', nil);
 		Add(rtKeyword, False, False, True, 'BEGIN', 'END', nil);
 	end;
 end;

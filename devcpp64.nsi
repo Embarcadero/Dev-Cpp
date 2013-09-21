@@ -2,7 +2,7 @@
 # Startup
 
 !define COMPILERNAME "MinGW64"
-!define DEVCPP_VERSION "5.1.1.1"
+!define DEVCPP_VERSION "5.2.0.0"
 !define FINALNAME "devcpp-${DEVCPP_VERSION}_64bit_setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
@@ -28,8 +28,7 @@ ShowInstDetails show
 AutoCloseWindow false
 SilentInstall normal
 CRCCheck on
-SetCompress force
-SetCompressor /SOLID lzma
+SetCompressor /SOLID /FINAL lzma
 SetDatablockOptimize on
 SetOverwrite try
 XPStyle on

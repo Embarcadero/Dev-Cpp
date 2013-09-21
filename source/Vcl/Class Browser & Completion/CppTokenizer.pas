@@ -41,8 +41,8 @@ const
 type
   TSetOfChars = set of Char;
 
-  TLogTokenEvent = procedure(Sender: TObject; Msg: string) of object;
-  TProgressEvent = procedure(Sender: TObject; FileName: string; Total, Current: integer) of object;
+  TLogTokenEvent = procedure(Sender: TObject; const Msg: string) of object;
+  TProgressEvent = procedure(Sender: TObject; const FileName: string; Total, Current: integer) of object;
 
   PToken = ^TToken;
   TToken = record

@@ -35,7 +35,6 @@ type
   TProcessListForm = class(TForm)
     OKBtn: TBitBtn;
     CancelBtn: TBitBtn;
-    Panel1: TPanel;
     ProcessCombo: TComboBox;
     MainLabel: TLabel;
     procedure FormCreate(Sender: TObject);
@@ -54,7 +53,7 @@ var
 implementation
 
 uses 
-  tlhelp32;
+  tlhelp32, devcfg;
 
 {$R *.dfm}
 
@@ -87,6 +86,10 @@ end;
 
 procedure TProcessListForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_ITEM_ATTACHPROCESS];
   MainLabel.Caption := Lang[ID_MSG_ATTACH];
   MainLabel.Width := 360;

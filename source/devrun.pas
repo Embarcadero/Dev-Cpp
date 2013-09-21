@@ -41,8 +41,8 @@ type
   protected
     procedure CallLineOutputEvent;
     procedure Execute; override;
-    procedure LineOutput(Line: String);
-    procedure ShowError(Msg: String);
+    procedure LineOutput(const Line: string);
+    procedure ShowError(const Msg: string);
     procedure ShowMsg;
   public
     Command   : string;
@@ -56,10 +56,10 @@ implementation
 
 procedure TDevRun.ShowMsg;
 begin
-  utils.ShowError(TheMsg);
+  MsgBox(TheMsg);
 end;
 
-procedure TDevRun.ShowError(Msg: String);
+procedure TDevRun.ShowError(const Msg: String);
 begin
   TheMsg := Msg;
   Synchronize(ShowMsg);
@@ -70,7 +70,7 @@ begin
     FLineOutput(Self, CurrentLine);
 end;
 
-procedure TDevRun.LineOutput(Line: String);
+procedure TDevRun.LineOutput(const Line: string);
 begin
   CurrentLine := Line;
   if Assigned(FLineOutput) then
@@ -79,8 +79,8 @@ end;
 
 procedure TDevRun.Execute;
 begin
-  Output := RunAndGetOutput(Command, Directory, Self.ShowError,
-    LineOutput, FCheckAbort);
+  Output := RunAndGetOutput(Command, Directory, Self.ShowError, LineOutput, FCheckAbort);
 end;
 
 end.
+

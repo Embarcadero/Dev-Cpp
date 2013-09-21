@@ -66,7 +66,6 @@ type
     Panel1: TPanel;
     Icon: TImage;
     tabOutputDir: TTabSheet;
-    grpOutDirectories: TGroupBox;
     lblExeOutput: TLabel;
     lblObjOutput: TLabel;
     edExeOutput: TEdit;
@@ -639,6 +638,10 @@ end;
 
 procedure TfrmProjectOptions.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption:= Lang[ID_POPT];
   //tabs
   tabGeneral.Caption:=   Lang[ID_POPT_GENTAB];
@@ -681,7 +684,6 @@ begin
   SubTabs.Tabs.Append(Lang[ID_POPT_RESDIRS]);
 
   //output tab
-  grpOutDirectories.Caption:=Lang[ID_POPT_OUTDIRGRP];
   lblExeOutput.Caption:=     Lang[ID_POPT_EXEOUT];
   lblObjOutput.Caption:=     Lang[ID_POPT_OBJOUT];
   chkOverrideOutput.Caption:=Lang[ID_POPT_OVERRIDEOUT];
@@ -1118,7 +1120,7 @@ begin
   if OpenLibDialog.Execute then begin
     for i := 0 to OpenLibDialog.Files.Count - 1 do begin
       S:=ExtractRelativePath(fProject.Directory, OpenLibDialog.Files[i]);
-      S:=GenMakePath(S);
+      S:=GenMakePath1(S);
       edLinker.Lines.Add(S);
     end;
   end;
@@ -1136,14 +1138,14 @@ begin
   if fProject.Options.ObjectOutput<>'' then
   begin
     ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(tfile);
-    ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
+    ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
   end
   else
-    ofile := GenMakePath(ChangeFileExt(tfile, OBJ_EXT));
+    ofile := GenMakePath1(ChangeFileExt(tfile, OBJ_EXT));
   if fProject.Units[idx].CompileCpp then
-    Result := '$(CPP) -c '+GenMakePath(tfile)+' -o '+ ofile+' $(CXXFLAGS)'
+    Result := '$(CPP) -c '+GenMakePath1(tfile)+' -o '+ ofile+' $(CXXFLAGS)'
   else
-    Result := '$(CC) -c '+GenMakePath(tfile)+' -o '+ ofile+' $(CFLAGS)';
+    Result := '$(CC) -c '+GenMakePath1(tfile)+' -o '+ ofile+' $(CFLAGS)';
 end;
 
 procedure TfrmProjectOptions.txtOverrideBuildCmdChange(Sender: TObject);

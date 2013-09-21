@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit NewVarFm;
+unit NewVarFrm;
 
 interface
 
@@ -69,8 +69,8 @@ type
     { Public declarations }
   end;
 
-var
-  NewVarForm: TNewVarForm;
+//var
+//  NewVarForm: TNewVarForm;
 
 implementation
 

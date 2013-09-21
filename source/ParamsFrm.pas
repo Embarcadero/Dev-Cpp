@@ -57,12 +57,16 @@ var
 implementation
 
 uses
-  MultiLangSupport;
+  MultiLangSupport, devcfg;
 
 {$R *.dfm}
 
 procedure TParamsForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_PARAM_CAPTION];
   grpParameters.Caption := Lang[ID_PARAM_PARAMS];
   grpHost.Caption := Lang[ID_PARAM_HOST];

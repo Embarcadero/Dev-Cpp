@@ -1,28 +1,40 @@
-Version 5.1.1.1 - *
+Version 5.2.0.0 - 17 April 2012
 
 - Fixed maximize not covering the whole screen correctly on netbook screens.
 - Fixed some crashes regarding code folding.
 - Code folding is a bit faster now.
 - Opening files is a bit faster now.
-- The tip of the day form now does not show up when going fullscreen.
-- Panel resizers now hide when there's nothing to resize.
-- Fixed a mulitple struct definition after ; detection bug.
-- Tidied up editor options.
+- The tip of the day form now does not show up when toggling fullscreen.
+- Panel resizers in the main form now hide when there's nothing to resize.
+- Fixed a mulitple struct definition after '};' detection bug.
 - Moved to a more recent SynEdit component.
 - Symbol completion is faster and has more options now.
 - Added a console pausing option to Environment options.
 - Fixed a font color issue in the function argument tooltip.
 - Added back trim trailing spaces.
-- Symbols are now skipped more smartly.
+- Completed symbols are now skipped more smartly.
 - Windres is now, by default, forced to output i386 res files when compiling 32bit executables.
 - Loading using the standard caching options is now 0.1 second faster.
-- The Classes toolbar now hides member variables, making stuff a lot more readable.
+- The Classes toolbar now hides variables of classes, making stuff a lot more readable.
 - Project opening is now quite a bit faster.
 - The SynEdit components in Editor Options now support code folding too.
 - Code Folding is a bit faster now.
 - DevCppPortable now accepts parameters and passes it to devcpp.exe.
 - Dev-C++ now uses FastMM4 to manage its memory, making allocations faster!
 - Fixed 'Close all but this' closing all tabs.
+- The code tooltip now properly hides when opening new tabs.
+- One can now edit text while using Incremental Search.
+- Commas inside strings inside function parameters don't make Dev-C++ seperate arguments anymore.
+- Added the user selectable font to all dialogs.
+- Redesigned some dialogs.
+- Simplified font selecting in Editor Options.
+- The compile progress window can now be translated.
+- Gutter colors are fixed: user themes can now properly modify its colors.
+- Updated the Chinese (TW) translations (translated by cin.getline).
+- Saved one fopen call per created tab in case you do not use default code snippets.
+- Newly created files will now be properly rescanned for folds.
+- The default code editor in Editor Options now retains focus when pressing tab.
+- Some more fixes I forgot about.
 
 Version 5.1.1.0 - 16 Februari 2012
 
@@ -45,7 +57,7 @@ Version 5.1.1.0 - 16 Februari 2012
 
 Version 5.1.0.0 - 27 December 2011
 
-- This is the first version to fully support 64bit MinGW compilers! Just place one in a folder called 'MinGW64' next to devcpp.exe, Dev will automatically adapt itself to it!
+- This is the first version to fully support 64bit MinGW compilers! Just place one in a folder called 'MinGW64' next to devcpp.exe, and Dev will automatically adapt itself to it!
 - When launching for the first time, Dev-C++ will set defaults based on available 32bit or 64bit compilers (favors 64bit). 
 - The XP style manifest creator now also supports 64bit.
 - The "Delete Profiling Information" button now does not check for the gmon.out file 60 times a second to keep itself updated.
@@ -53,7 +65,7 @@ Version 5.1.0.0 - 27 December 2011
 - Project files with dots in their names now do not confuse the executable namer anymore.
 - One more update to the compiler progress window: the warning counter was positioned a bit too much to the right.
 - Added formatting support for 'Sorry Unimplemented' and fixed up 'Unknown escape sequence'.
-- The main form now properly maximises when not starting for the first time.
+- The main form now properly maximizes when not starting for the first time.
 - The main form child windows now properly scale themselves when the 'Tip of the Day' window is shown.
 - Slightly lowered startup times again.
 - The code browser toolbar now also shows types and struct members.
@@ -64,7 +76,7 @@ Version 5.1.0.0 - 27 December 2011
 - Added a new editor style called Classic Plus, which highlights symbols like { and (.
 - The Code Completion Cache creator can now also be told to cache a selection of files.
 - Updated MinGW32 to GCC 4.6.2. Added TDM-GCC 4.6.1 x64.
-- Added updated the Chinese translations by cin.getline.
+- Updated the Chinese translations (translated by cin.getline).
 - More stuff I forgot about.
 
 Version 5.0.0.9 - 10 December 2011

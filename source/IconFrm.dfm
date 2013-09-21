@@ -1,7 +1,7 @@
 object IconForm: TIconForm
-  Left = 251
-  Top = 52
-  Width = 456
+  Left = 495
+  Top = 239
+  Width = 500
   Height = 394
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
@@ -9,8 +9,8 @@ object IconForm: TIconForm
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = True
   Position = poOwnerFormCenter
@@ -18,23 +18,29 @@ object IconForm: TIconForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    440
+    484
     356)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object btnOk: TBitBtn
-    Left = 192
+    Left = 232
     Top = 328
     Width = 153
     Height = 24
     Anchors = [akLeft, akBottom]
     Caption = '&Use selected icon'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 1
     OnClick = btnOkClick
     Kind = bkOK
   end
   object btnCancel: TBitBtn
-    Left = 344
+    Left = 392
     Top = 328
     Width = 87
     Height = 24
@@ -44,13 +50,12 @@ object IconForm: TIconForm
     Kind = bkCancel
   end
   object IconView: TListView
-    Left = 8
-    Top = 8
-    Width = 425
-    Height = 297
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    BevelInner = bvLowered
-    BevelKind = bkSoft
+    Left = 0
+    Top = 0
+    Width = 484
+    Height = 321
+    BevelInner = bvNone
+    BevelOuter = bvNone
     BorderStyle = bsNone
     Columns = <>
     HideSelection = False
@@ -82,8 +87,8 @@ object IconForm: TIconForm
   object ImageList: TImageList
     Height = 32
     Width = 32
-    Left = 289
-    Top = 216
+    Left = 409
+    Top = 272
     Bitmap = {
       494C010110001400040020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000080000000A000000001002000000000000040
@@ -2736,7 +2741,7 @@ object IconForm: TIconForm
     DefaultExt = 'ico'
     Filter = 'Icons (*.ico)|*.ico'
     Title = 'Open icon'
-    Left = 289
-    Top = 183
+    Left = 409
+    Top = 239
   end
 end

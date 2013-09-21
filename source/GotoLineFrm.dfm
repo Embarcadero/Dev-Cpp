@@ -10,8 +10,8 @@ object GotoLineForm: TGotoLineForm
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -20,19 +20,19 @@ object GotoLineForm: TGotoLineForm
   OnKeyUp = FormKeyUp
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object GotoLabel: TLabel
     Left = 11
     Top = 12
-    Width = 89
-    Height = 13
+    Width = 102
+    Height = 15
     Caption = 'Go to line number :'
   end
   object Line: TSpinEdit
     Left = 12
     Top = 28
     Width = 137
-    Height = 22
+    Height = 24
     MaxValue = 2
     MinValue = 1
     TabOrder = 0

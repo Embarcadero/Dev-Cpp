@@ -35,7 +35,7 @@ uses
 {$ENDIF}
 
 type
-  TCompForm = class(TForm)
+  TCompOptForm = class(TForm)
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     btnDefault: TBitBtn;
@@ -96,7 +96,6 @@ type
     OptionsLink: TLabel;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
     procedure btnDefaultClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure DirTabsChange(Sender: TObject);
@@ -121,6 +120,9 @@ type
     procedure DllwrapEditChange(Sender: TObject);
     procedure GprofEditChange(Sender: TObject);
     procedure OptionsLinkClick(Sender: TObject);
+    procedure cbCompAddClick(Sender: TObject);
+    procedure cbLinkerAddClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
    private
     fBins: string;
     fLibs: string;
@@ -147,31 +149,14 @@ uses
 
 {$R *.dfm}
 
-const
- Help_Topics: array[0..3] of string = (
-  'CompOpt_Directories',
-  'CompOpt_Compiler',
-  'CompOpt_CodeGen',
-  'CompOpt_Linker');
-
-procedure TCompForm.btnCancelClick(Sender: TObject);
+procedure TCompOptForm.btnCancelClick(Sender: TObject);
 begin
 	devCompiler.CompilerSet:=cmbCompilerSetComp.ItemIndex;
 	Close;
 end;
 
-procedure TCompForm.btnOkClick(Sender: TObject);
+procedure TCompOptForm.btnOkClick(Sender: TObject);
 begin
-	if cbCompAdd.Checked and (Commands.Text = '') then begin
-		MessageDlg('You have selected the "Add compiler commands" option but no commands have been specified.', MtError,[MbOK],0);
-		cbCompAdd.Checked := False;
-	end;
-
-	if cbLinkerAdd.Checked and (Linker.Text = '') then begin
-		MessageDlg('You have selected the "Add linker commands" option but no commands have been specified.', MtError,[MbOK],0);
-		cbLinkerAdd.Checked := False;
-	end;
-
 	if (fBins = '') then begin
 		MessageDlg('You have not indicated the location of your binaries (compiler).'#13' Please do so now.', mtWarning, [mbOK], 0);
 		ModalResult := mrNone;
@@ -220,13 +205,7 @@ begin
 	devCompiler.SaveSettings;
 end;
 
-procedure TCompForm.FormActivate(Sender: TObject);
-begin
-  SetOptions;
-  DirTabsChange(Self);
-end;
-
-procedure TCompForm.SetOptions;
+procedure TCompOptForm.SetOptions;
 begin
 	with devCompiler do begin
 		seCompDelay.Value:= Delay;
@@ -251,18 +230,18 @@ begin
 	end;
 end;
 
-procedure TCompForm.btnDefaultClick(Sender: TObject);
+procedure TCompOptForm.btnDefaultClick(Sender: TObject);
 begin
   devCompiler.SettoDefaults;
   SetOptions;
 end;
 
-procedure TCompForm.btnHelpClick(Sender: TObject);
+procedure TCompOptForm.btnHelpClick(Sender: TObject);
 begin
 	OpenHelpFile;
 end;
 
-procedure TCompForm.DirTabsChange(Sender: TObject);
+procedure TCompOptForm.DirTabsChange(Sender: TObject);
 begin
   case DirTabs.TabIndex of
    0: StrtoList(fBins, TStrings(lstDirs.Items));
@@ -274,22 +253,23 @@ begin
   UpdateButtons;
 end;
 
-procedure TCompForm.lstDirsClick(Sender: TObject);
+procedure TCompOptForm.lstDirsClick(Sender: TObject);
 begin
   UpdateButtons;
 end;
 
-procedure TCompForm.lstDirsDblClick(Sender: TObject);
+procedure TCompOptForm.lstDirsDblClick(Sender: TObject);
 begin
-  edEntry.Text:= lstDirs.Items[lstDirs.ItemIndex];
+	if lstDirs.ItemIndex <> -1 then
+		edEntry.Text:= lstDirs.Items[lstDirs.ItemIndex];
 end;
 
-procedure TCompForm.edEntryChange(Sender: TObject);
+procedure TCompOptForm.edEntryChange(Sender: TObject);
 begin
-  UpdateButtons;
+	UpdateButtons;
 end;
 
-procedure TCompForm.btnBrowseClick(Sender: TObject);
+procedure TCompOptForm.btnBrowseClick(Sender: TObject);
 var
 {$IFDEF WIN32}
   NewItem: string;
@@ -306,7 +286,7 @@ begin
    edEntry.Text:= NewItem;
 end;
 
-procedure TCompForm.ButtonClick(Sender: TObject);
+procedure TCompOptForm.ButtonClick(Sender: TObject);
 var
  idx: integer;
 begin
@@ -335,7 +315,7 @@ begin
   devCompilerSet.LibDir:=fLibs;
 end;
 
-procedure TCompForm.UpDownClick(Sender: TObject);
+procedure TCompOptForm.UpDownClick(Sender: TObject);
 var
  idx: integer;
 begin
@@ -369,7 +349,7 @@ begin
   UpdateButtons;
 end;
 
-procedure TCompForm.UpdateButtons;
+procedure TCompOptForm.UpdateButtons;
 begin
   btnAdd.Enabled:= edEntry.Text <> '';
   if lstDirs.ItemIndex>= 0 then
@@ -389,7 +369,7 @@ begin
   btnDelInval.Enabled:= lstDirs.Items.Count> 0;
 end;
 
-procedure TCompForm.edEntryKeyUp(Sender: TObject; var Key: Word;
+procedure TCompOptForm.edEntryKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
 {$IFDEF WIN32}
@@ -400,16 +380,22 @@ begin
 {$ENDIF}
 end;
 
-procedure TCompForm.FormCreate(Sender: TObject);
+procedure TCompOptForm.FormCreate(Sender: TObject);
 begin
   LoadText;
   CompOptionsFrame1.FillOptions(nil);
-  MainPages.ActivePageIndex:= 0;
-  DirTabs.TabIndex:= 0;
+  SetOptions;
+  DirTabsChange(Self);
+  cbCompAddClick(cbCompAdd);
+  cbLinkerAddClick(cbLinkerAdd);
 end;
 
-procedure TCompForm.LoadText;
+procedure TCompOptForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
 	Caption:=                            Lang[ID_COPT];
 
 	// Tabs
@@ -455,7 +441,7 @@ begin
 	grpCompSet.Caption:=                 '  '+Lang[ID_COPT_COMPSETS]+'  ';
 end;
 
-procedure TCompForm.cmbCompilerSetCompChange(Sender: TObject);
+procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);
 begin
 	devCompilerSet.OptionsStr:=devCompiler.OptionStr;
 	devCompilerSet.CompOpts:=Commands.Lines.Text;
@@ -499,7 +485,7 @@ begin
   end;
 end;
 
-procedure TCompForm.btnBrws1Click(Sender: TObject);
+procedure TCompOptForm.btnBrws1Click(Sender: TObject);
 var
   sl: TStringList;
   Obj: TEdit;
@@ -542,7 +528,7 @@ begin
   end;
 end;
 
-procedure TCompForm.btnAddCompilerSetClick(Sender: TObject);
+procedure TCompOptForm.btnAddCompilerSetClick(Sender: TObject);
 var
   S: string;
 begin
@@ -555,7 +541,7 @@ begin
   devCompilerSet.Sets.Add(S);
 end;
 
-procedure TCompForm.btnDelCompilerSetClick(Sender: TObject);
+procedure TCompOptForm.btnDelCompilerSetClick(Sender: TObject);
 begin
   if cmbCompilerSetComp.Items.Count=1 then begin
     MessageDlg(Lang[ID_COPT_CANTDELETECOMPSET], mtError, [mbOk], 0);
@@ -571,7 +557,7 @@ begin
   cmbCompilerSetCompChange(nil);
 end;
 
-procedure TCompForm.btnRenameCompilerSetClick(Sender: TObject);
+procedure TCompOptForm.btnRenameCompilerSetClick(Sender: TObject);
 var
   S: string;
 begin
@@ -583,47 +569,62 @@ begin
   cmbCompilerSetComp.ItemIndex:=cmbCompilerSetComp.Items.IndexOf(S);
 end;
 
-procedure TCompForm.GccEditChange(Sender: TObject);
+procedure TCompOptForm.GccEditChange(Sender: TObject);
 begin
   devCompilerSet.gccName := GccEdit.Text;
 end;
 
-procedure TCompForm.GppEditChange(Sender: TObject);
+procedure TCompOptForm.GppEditChange(Sender: TObject);
 begin
   devCompilerSet.gppName := GppEdit.Text;
 end;
 
-procedure TCompForm.MakeEditChange(Sender: TObject);
+procedure TCompOptForm.MakeEditChange(Sender: TObject);
 begin
   devCompilerSet.makeName := MakeEdit.Text;
 end;
 
-procedure TCompForm.GdbEditChange(Sender: TObject);
+procedure TCompOptForm.GdbEditChange(Sender: TObject);
 begin
   devCompilerSet.gdbName := GdbEdit.Text;
 end;
 
-procedure TCompForm.WindresEditChange(Sender: TObject);
+procedure TCompOptForm.WindresEditChange(Sender: TObject);
 begin
   devCompilerSet.windresName := WindresEdit.Text;
 end;
 
-procedure TCompForm.DllwrapEditChange(Sender: TObject);
+procedure TCompOptForm.DllwrapEditChange(Sender: TObject);
 begin
   devCompilerSet.dllwrapName := DllwrapEdit.Text;
 end;
 
-procedure TCompForm.GprofEditChange(Sender: TObject);
+procedure TCompOptForm.GprofEditChange(Sender: TObject);
 begin
   devCompilerSet.gprofName := GprofEdit.Text;
 end;
 
-procedure TCompForm.OptionsLinkClick(Sender: TObject);
+procedure TCompOptForm.OptionsLinkClick(Sender: TObject);
 var
 	s : string;
 begin
 	s := (Sender as TLabel).Caption;
 	ShellExecute(GetDesktopWindow(), 'open', PChar(s), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TCompOptForm.cbCompAddClick(Sender: TObject);
+begin
+	Commands.Enabled := (Sender as TCheckBox).Checked;
+end;
+
+procedure TCompOptForm.cbLinkerAddClick(Sender: TObject);
+begin
+	Linker.Enabled := (Sender as TCheckBox).Checked;
+end;
+
+procedure TCompOptForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+	Action := caFree;
 end;
 
 end.

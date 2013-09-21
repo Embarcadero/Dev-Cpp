@@ -18,7 +18,7 @@
 }
 
 (* derived from the free pascal editor project source *)
-unit Incrementalfrm;
+unit IncrementalFrm;
 
 interface
 

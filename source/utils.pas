@@ -32,99 +32,101 @@ uses
 {$ENDIF}
 
 type
- PdevSearchResult = ^TdevSearchResult;
- TdevSearchResult = record
-  pt: TPoint;
-  InFile: string;
-  msg: string;
- end;
+	PdevSearchResult = ^TdevSearchResult;
+	TdevSearchResult = record
+		pt: TPoint;
+		InFile: string;
+		msg: string;
+	end;
 
 
- { File ID types }
- TUnitType = (utSrc, utHead, utRes, utPrj, utOther);
- TExUnitType = (utcSrc,      // c source file (.c)
-                utcppSrc,    // c++ source file (.cpp)
-                utcHead,     // c header (.h)
-                utcppHead,   // c++ header (.hpp)
-                utresHead,   // resouce header (.rh)
-                utresComp,   // resource compiled (.res)
-                utresSrc,    // resource source (.rc)
-                utxPrj,
-                utxOther);   // any others
+	{ File ID types }
+	TUnitType = (utSrc, utHead, utRes, utPrj, utOther);
+	TExUnitType = (
+		utcSrc,      // c source file (.c)
+		utcppSrc,    // c++ source file (.cpp)
+		utcHead,     // c header (.h)
+		utcppHead,   // c++ header (.hpp)
+		utresHead,   // resouce header (.rh)
+		utresComp,   // resource compiled (.res)
+		utresSrc,    // resource source (.rc)
+		utxPrj,      // project file (.dev)
+		utxOther     // any others
+	);   
 
- TFilterSet = (ftOpen, ftHelp, ftPrj, ftSrc, ftAll);
+	TFilterSet = (ftOpen, ftHelp, ftPrj, ftSrc, ftAll);
 
- TErrFunc = procedure(Msg: String) of Object;
- TLineOutputFunc = procedure(Line: String) of Object;
- TCheckAbortFunc = procedure(var AbortThread: boolean) of object;
+	TErrFunc = procedure(const Msg: String) of object;
+	TLineOutputFunc = procedure(const Line: String) of object;
+	TCheckAbortFunc = procedure(var AbortThread: boolean) of object;
 
-procedure FilesFromWildcard(Directory, Mask: string;var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
-function ExecuteFile(const FileName, Params, DefaultDir: string;ShowCmd: Integer): THandle;
-function RunAndGetOutput(Cmd, WorkDir: string;ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): string;
-function GetShortName(FileName: string): string;
-procedure ShowError(Msg: String);
+	procedure FilesFromWildcard(Directory : string;const Mask: string;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
+	
+	function ExecuteFile(const FileName, Params, DefaultDir: string;ShowCmd: Integer): THandle;
+	function RunAndGetOutput(const Cmd, WorkDir: string;ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): string;
+	
+	function GetShortName(const FileName: string): string;
 
-function CommaStrToStr(s : string; formatstr : string) : string;
-function IncludeQuoteIfSpaces(s : string) : string;
-function IncludeQuoteIfNeeded(s : string) : string;
+	function CommaStrToStr(s : string; formatstr : string) : string;
+	function IncludeQuoteIfSpaces(s : string) : string;
+	function IncludeQuoteIfNeeded(s : string) : string;
 
-procedure MsgBox(text:string;caption:string = 'Message'); overload;
-procedure MsgBox(textlist:TStrings;caption:string = 'Message'); overload;
-procedure MsgBox(text:integer;caption:string = 'Message'); overload;
+	procedure MsgBox(const text:string;const caption:string = 'Message'); overload;
+	procedure MsgBox(textlist:TStrings;const caption:string = 'Message'); overload;
+	procedure MsgBox(text:integer;const caption:string = 'Message'); overload;
 
-// Added by MikeB
-procedure LoadFilefromResource(const FileName: string; ms: TMemoryStream);
+	procedure LoadFilefromResource(const FileName: string; ms: TMemoryStream);
 
-function ValidateFile(const FileName: string; const WorkPath: string;const CheckDirs: boolean = FALSE): string;
+	function ValidateFile(const FileName: string; const WorkPath: string;const CheckDirs: boolean = FALSE): string;
 
-function BuildFilter(var value: string; const FLTStyle: TFILTERSET): boolean; overload;
-function BuildFilter(var value: string; const _filters: array of string): boolean; overload;
+	function BuildFilter(var value: string; const Filters: TFilterSet): boolean; overload;
+	function BuildFilter(var value: string; const Filters: array of string): boolean; overload;
 
-function CodeInstoStr(s: string): string;
-function StrtoCodeIns(s: string): string;
+	function CodeInstoStr(const s: string): string;
+	function StrtoCodeIns(const s: string): string;
 
-procedure StrtoAttr(var Attr: TSynHighlighterAttributes; Value: string);
-function AttrtoStr(const Attr: TSynHighlighterAttributes): string;
+	procedure StrtoAttr(var Attr: TSynHighlighterAttributes;const Value: string);
+	function AttrtoStr(Attr: TSynHighlighterAttributes): string;
 
-procedure StrtoPoint(var pt: TPoint; value: string);
-function PointtoStr(const pt: TPoint): string;
+	procedure StrtoPoint(var pt: TPoint;const value: string);
+	function PointtoStr(pt: TPoint): string;
 
-function ListtoStr(const List: TStrings): string;
-procedure StrtoList(s: string; const List: TStrings; const delimiter: char=';');
+	function ListtoStr(List: TStrings): string;
+	procedure StrtoList(s: string;List: TStrings; delimiter: char=';');
 
-function GetFileTyp(const FileName: string): TUnitType;
-function GetExTyp(const FileName: string): TExUnitType;
+	function GetFileTyp(const FileName: string): TUnitType;
+	function GetExTyp(const FileName: string): TExUnitType;
 
-procedure SetPath(Add: string; const UseOriginal: boolean = TRUE);
-function ExpandFileto(const FileName: string; const BasePath: string): string;
-function FileSamePath(const FileName: string; const TestPath: string): boolean;
-procedure CloneMenu(const FromMenu: TMenuItem; ToMenu: TMenuItem);
+	procedure SetPath(const Add: string;UseOriginal: boolean = TRUE);
+	function ExpandFileto(const FileName, BasePath: string): string;
+	function FileSamePath(const FileName, TestPath: string): boolean;
+	procedure CloneMenu(FromMenu, ToMenu: TMenuItem);
 
-function GetLastPos(const SubStr: string; const S: string): integer;
+	function GetLastPos(const SubStr, S: string): integer;
 
-function GenMakePath(FileName: String): String; overload;
-function GenMakePath2(FileName: String): String;
-function GenMakePath(FileName: String; EscapeSpaces,EncloseInQuotes: Boolean): String; overload;
+	function GenMakePath1(const FileName: String): string;
+	function GenMakePath2(const FileName: String): string;
+	function GenMakePath(const FileName: String; EscapeSpaces,EncloseInQuotes: Boolean): string; overload;
 
-function GetRealPath(BrokenFileName: String; Directory: String = ''): String;
+	function GetRealPath(const BrokenFileName: string;const Directory: String = ''): String;
 
-function CalcMod(Count: Integer): Integer;
+	function CalcMod(Count: Integer): Integer;
 
-function GetVersionString(FileName: string): string;
+	function GetVersionString(const FileName: string): string;
 
-function CheckChangeDir(var Dir: string): boolean;
+	function CheckChangeDir(var Dir: string): boolean;
 
-function GetAssociatedProgram(const Extension: string; var Filename, Description: string): boolean;
+	function GetAssociatedProgram(const Extension: string; var Filename, Description: string): boolean;
 
-function IsNumeric(s : string) : boolean;
+	function IsNumeric(const s : string) : boolean;
 
-procedure OpenHelpFile;
+	procedure OpenHelpFile;
 
-function ProgramHasConsole(const path : string) : boolean;
+	function ProgramHasConsole(const path : string) : boolean;
 
 implementation
 
-uses 
+uses
 {$IFDEF WIN32}
   devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
@@ -142,35 +144,36 @@ var
 	opt_header : _IMAGE_OPTIONAL_HEADER;
 begin
 	handle := CreateFile(PChar(path),GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
+	if handle <> INVALID_HANDLE_VALUE then begin
+		ReadFile(Handle, dos_header, sizeof(dos_header), bytesread, nil);
+		SetFilePointer(Handle, dos_header._lfanew, nil, 0);
+		ReadFile(Handle, signature,  sizeof(signature),  bytesread, nil);
+		ReadFile(Handle, pe_header,  sizeof(pe_header),  bytesread, nil);
+		ReadFile(Handle, opt_header, sizeof(opt_header), bytesread, nil);
 
-	ReadFile(Handle, dos_header, sizeof(dos_header), bytesread, nil);
-	SetFilePointer(Handle, dos_header._lfanew, nil, 0);
-	ReadFile(Handle, signature,  sizeof(signature),  bytesread, nil);
-	ReadFile(Handle, pe_header,  sizeof(pe_header),  bytesread, nil);
-	ReadFile(Handle, opt_header, sizeof(opt_header), bytesread, nil);
-
-	Result := (opt_header.Subsystem = IMAGE_SUBSYSTEM_WINDOWS_CUI);
+		Result := (opt_header.Subsystem = IMAGE_SUBSYSTEM_WINDOWS_CUI);
+	end else
+		Result := false;
 
 	CloseHandle(handle);
 end;
 
 // got tired of typing application.handle,PChar,PChar MB_OK, etc ;)
-procedure MsgBox(text,caption:string);
+procedure MsgBox(const text:string;const caption:string);
 begin
 	MessageBox(application.handle,PChar(text),PChar(caption),MB_OK);
 end;
-procedure MsgBox(textlist:TStrings;caption:string);
+procedure MsgBox(textlist:TStrings;const caption:string);
 var
 	I : integer;
 	final : string;
 begin
-	if not Assigned(textlist) then Exit;
 	final := '';
 	for I := 0 to textList.Count - 1 do
 		final := final + inttostr(Succ(I)) + #9 + textList.Strings[i] + #13#10;
 	MessageBox(application.handle,PChar(final),PChar(caption),MB_OK);
 end;
-procedure MsgBox(text:integer;caption:string);
+procedure MsgBox(text:integer;const caption:string);
 begin
 	MessageBox(application.handle,PChar(inttostr(text)),PChar(caption),MB_OK);
 end;
@@ -183,7 +186,7 @@ begin
 	ShellExecute(GetDesktopWindow(), 'open', PChar(abshelp), nil, nil, SW_SHOWNORMAL);
 end;
 
-procedure FilesFromWildcard(Directory, Mask: String;var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
+procedure FilesFromWildcard(Directory:string;const Mask: string;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 var
   SearchRec: TSearchRec;
   Attr, Error: Integer;
@@ -228,15 +231,15 @@ begin
      end;
   end;
 end;
-function ExecuteFile(const FileName, Params, DefaultDir: string;
-  ShowCmd: Integer): THandle;
+
+function ExecuteFile(const FileName, Params, DefaultDir: string;ShowCmd: Integer): THandle;
 begin
   Result := ShellExecute(Application.MainForm.Handle, nil,
     PChar(FileName), PChar(Params),
     PChar(DefaultDir), ShowCmd);
 end;
 
-function RunAndGetOutput(Cmd, WorkDir: string;
+function RunAndGetOutput(const Cmd, WorkDir: string;
   ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;
   CheckAbortFunc: TCheckAbortFunc;
   ShowReturnValue: Boolean): string;
@@ -332,29 +335,30 @@ begin
 
 end;
 
-procedure SetPath(Add: string; const UseOriginal: boolean = TRUE);
+procedure SetPath(const Add: string;UseOriginal: boolean = TRUE);
 var
- OldPath: array[0..PATH_LEN] of char;
- NewPath: string;
+	OldPath: array[0..PATH_LEN] of char;
+	NewPath: string;
 begin
-  if add <> '' then
-   if Add[length(Add)] <> ';' then
-    Add:= Add +';';
+	NewPath := Add;
 
-  // PATH environment variable does *not* like quotes in paths...
-  // Even if there are spaces in pathnames, it doesn't matter.
-  // It splits them up by the ';'
-  Add:=StringReplace(Add, '"', '', [rfReplaceAll]);
+	if NewPath <> '' then
+		if NewPath[length(NewPath)] <> ';' then
+			NewPath := NewPath +';';
 
-  if UseOriginal then
-   NewPath:= Add+ devDirs.OriginalPath
-  else
-   begin
-     GetEnvironmentVariable(pchar('PATH'), @OldPath, PATH_LEN);
-     NewPath:= Add +string(OldPath);
-   end;
+	// PATH environment variable does *not* like quotes in paths...
+	// Even if there are spaces in pathnames, it doesn't matter.
+	// It splits them up by the ';'
+	NewPath:=StringReplace(NewPath, '"', '', [rfReplaceAll]);
 
-  SetEnvironmentVariable(pchar('PATH'), pchar(NewPath));
+	if UseOriginal then
+		NewPath:= NewPath + devDirs.OriginalPath
+	else begin
+		GetEnvironmentVariable(pchar('PATH'), @OldPath, PATH_LEN);
+		NewPath:= NewPath + string(OldPath);
+	end;
+
+	SetEnvironmentVariable(pchar('PATH'), pchar(NewPath));
 end;
 
 function ValidateFile(const FileName: string; const WorkPath: string;
@@ -437,83 +441,73 @@ begin
   FreeResource(HRes);
 end;
 
-function GetShortName(FileName: string): string;
+function GetShortName(const FileName: string): string;
 var
- pFileName: array[0..2048] of char;
+	pFileName: array[0..2048] of char;
 begin
-  GetShortPathName(pchar(FileName), pFileName, 2048);
-  result:= strpas(pFileName);
-end;
-
-procedure ShowError(Msg: String);
-begin
-  Application.MessageBox(PChar(Msg), 'Error', MB_ICONHAND);
+	GetShortPathName(pchar(FileName), pFileName, 2048);
+	result:= strpas(pFileName);
 end;
 
 function AddFilter(var value: string; const _Filter: string): boolean;
 var
- idx: integer;
- s,
- LFilter: string;
+	idx: integer;
+	s,LFilter: string;
 begin
-  result:= TRUE;
-  try
-   if _Filter = '' then exit;
-
-   LFilter:= value;
-   idx:= pos('|', LFilter);
-   if idx> 0 then
-    begin
-      Insert(_Filter +'|', LFilter, AnsiPos(FLT_ALLFILES, LFIlter));
-      s:= Copy(_Filter, AnsiPos('|', _Filter) +1, length(_Filter)) +';';
-      Insert(s, LFilter, AnsiPos('|', LFilter) +1);
-      if LFilter[Length(LFilter)] <> '|' then
-       LFilter:= LFilter +'|';
-    end;
-   value:= LFilter;
-  except
-   result:= FALSE;
-  end;
+	result:= TRUE;
+	try
+		LFilter:= value;
+		idx:= pos('|', LFilter);
+		if idx > 0 then begin
+			Insert(_Filter +'|', LFilter, AnsiPos(FLT_ALLFILES, LFIlter));
+			s:= Copy(_Filter, AnsiPos('|', _Filter) +1, length(_Filter)) +';';
+			Insert(s, LFilter, AnsiPos('|', LFilter) +1);
+			if LFilter[Length(LFilter)] <> '|' then
+				LFilter:= LFilter +'|';
+		end;
+		value:= LFilter;
+	except
+		result:= FALSE;
+	end;
 end;
 
-function BuildFilter(var value: string; const FLTStyle: TFILTERSET): boolean; overload;
+function BuildFilter(var value: string; const Filters: TFilterSet): boolean; overload;
 begin
-  value:= FLT_BASE +FLT_ALLFILES;
-  case FLTStyle of
-   ftOpen: result:= BuildFilter(value, [FLT_PROJECTS, FLT_HEADS, FLT_CS, FLT_CPPS, FLT_RES]);
-   ftHelp: result:= BuildFilter(value, [FLT_HELPS]);
-   ftPrj: result:= BuildFilter(value, [FLT_PROJECTS]);
-   ftSrc: result:= BuildFilter(value, [FLT_HEADS, FLT_RES, FLT_CS, FLT_CPPS]);
-   ftAll: result:= BuildFilter(value, [FLT_PROJECTS, FLT_HEADS, FLT_RES, FLT_CS,
-     FLT_CPPS]);
-  else
-   result:= TRUE;
-  end;
+	value:= FLT_BASE + FLT_ALLFILES;
+	case Filters of
+		ftOpen: result:= BuildFilter(value, [FLT_PROJECTS, FLT_HEADS, FLT_CS, FLT_CPPS, FLT_RES]);
+		ftHelp: result:= BuildFilter(value, [FLT_HELPS]);
+		ftPrj:  result:= BuildFilter(value, [FLT_PROJECTS]);
+		ftSrc:  result:= BuildFilter(value, [FLT_HEADS, FLT_RES, FLT_CS, FLT_CPPS]);
+		ftAll:  result:= BuildFilter(value, [FLT_PROJECTS, FLT_HEADS, FLT_RES, FLT_CS,FLT_CPPS]);
+	else
+		result:= TRUE;
+	end;
 end;
 
-function BuildFilter(var value: string; const _filters: array of string): boolean; overload;
+function BuildFilter(var value: string; const Filters: array of string): boolean; overload;
 var
- idx: integer;
+	I: integer;
 begin
-  result:= FALSE;
-  value:= FLT_BASE +FLT_ALLFILES;
-  for idx:= 0 to high(_Filters) do
-   if not AddFilter(value, _Filters[idx]) then
-    exit;
-  result:= TRUE;
+	result:= FALSE;
+	value:= FLT_BASE + FLT_ALLFILES;
+	for I:= 0 to high(Filters) do
+		if not AddFilter(value, Filters[I]) then
+			exit;
+	result:= TRUE;
 end;
 
-function CodeInstoStr(s: string): string;
+function CodeInstoStr(const s: string): string;
 begin
   result:= StringReplace(s, #13#10, '$_', [rfReplaceAll]);
 end;
 
-function StrtoCodeIns(s: string): string;
+function StrtoCodeIns(const s: string): string;
 begin
   result:= StringReplace(s, '$_', #13#10, [rfReplaceAll]);
 end;
 
-procedure StrtoPoint(var pt: TPoint; value: string);
+procedure StrtoPoint(var pt: TPoint;const value: string);
 var
  tmp: TStringList;
 begin
@@ -532,12 +526,12 @@ begin
   end;
 end;
 
-function PointtoStr(const pt: TPoint): string;
+function PointtoStr(pt: TPoint): string;
 begin
   result:= format('%d, %d', [pt.y, pt.x]);
 end;
 
-function AttrtoStr(const Attr: TSynHighlighterAttributes): string;
+function AttrtoStr(Attr: TSynHighlighterAttributes): string;
 begin
   result:= format('%s, %s, %d, %d, %d',
            [ColortoString(Attr.Foreground),
@@ -547,7 +541,7 @@ begin
             ord(fsUnderline in Attr.Style)]);
 end;
 
-procedure StrtoAttr(var Attr: TSynHighlighterAttributes; Value: string);
+procedure StrtoAttr(var Attr: TSynHighlighterAttributes;const Value: string);
 var
  tmp: TStringList;
 begin
@@ -578,17 +572,6 @@ begin
   end;
 end;
 
-(*procedure StrtoList(s: string; const List: TStrings; const delimiter: char=';');
-begin
-  List.BeginUpdate;
-  try
-   List.Clear;
-   List.CommaText:= stringreplace(s, delimiter, ',', [rfReplaceAll, rfIgnoreCase]);
-  finally
-   List.EndUpdate;
-  end;
-end;*)
-
 function CommaStrToStr(s : string; formatstr : string) : string;
 var i : integer;
     tmp : string;
@@ -604,35 +587,28 @@ begin
     result := format(formatstr, [result, s]);
 end;
 
-procedure StrtoList(s: string; const List: TStrings; const delimiter: char=';');
-var tmp : string;
-    i   : integer;
+procedure StrtoList(s: string; List: TStrings; delimiter : char);
+var
+	tmp : string;
+	i   : integer;
 begin
-  List.BeginUpdate;
-  try
-   List.Clear;
-   while pos(delimiter, s) > 0 do begin
-     i := pos(delimiter, s);
-     tmp := Copy(s, 1, i - 1);
-     Delete(s, 1, i);
-     List.Add(tmp);
-   end;
-   if s <> '' then
-     List.Add(s);
-  finally
-   List.EndUpdate;
-  end;
+	List.BeginUpdate;
+	try
+		List.Clear;
+		while pos(delimiter, s) > 0 do begin
+			i := pos(delimiter, s);
+			tmp := Copy(s, 1, i - 1);
+			Delete(s, 1, i);
+			List.Add(tmp);
+		end;
+		if s <> '' then
+			List.Add(s);
+	finally
+		List.EndUpdate;
+	end;
 end;
 
-(*function ListtoStr(const List: TStrings): string;
-begin
-  if List.Count = 0 then
-   result:= ''
-  else
-   result:= StringReplace(List.CommaText, ',', ';', [rfReplaceAll, rfIgnoreCase]);
-end;*)
-
-function ListtoStr(const List: TStrings): string;
+function ListtoStr(List: TStrings): string;
 var i : integer;
 begin
   result := '';
@@ -707,7 +683,7 @@ end;
 
 // seems stupid now but I want to expand to account for .. chars
 //in basepath and or filename
-function ExpandFileto(const FileName: string; const BasePath: string): string;
+function ExpandFileto(const FileName, BasePath: string): string;
 var
  oldPath: string;
 begin
@@ -724,7 +700,7 @@ begin
   end;
 end;
 
-function FileSamePath(const FileName: string; const TestPath: string): boolean;
+function FileSamePath(const FileName, TestPath: string): boolean;
 var
  s1, s2: string;
 begin
@@ -738,7 +714,7 @@ begin
     result:= FileExists(s2 +FileName);
 end;
 
-procedure CloneMenu(const FromMenu: TMenuItem; ToMenu: TMenuItem);
+procedure CloneMenu(FromMenu, ToMenu: TMenuItem);
 var
  idx: integer;
  Item: TMenuItem;
@@ -761,7 +737,7 @@ begin
   ToMenu.Visible:= FromMenu.Visible;
 end;
 
-function GetLastPos(const SubStr: string; const s: string): integer;
+function GetLastPos(const SubStr, s: string): integer;
 var
   Last,
   Current: PAnsiChar;
@@ -783,18 +759,17 @@ begin
 end;
 
 { GenMakePath: convert a filename to a format that can be used by make }
-function GenMakePath(FileName: String): String;
+function GenMakePath1(const FileName: string): String;
 begin
   Result := GenMakePath(FileName, False, True);
 end;
 
-function GenMakePath2(FileName: String): String;
+function GenMakePath2(const FileName: string): String;
 begin
   Result := GenMakePath(FileName, True, False);
 end;
 
-function GenMakePath(FileName: String; EscapeSpaces,
-                     EncloseInQuotes: Boolean): String;
+function GenMakePath(const FileName: String; EscapeSpaces,EncloseInQuotes: Boolean): String;
 begin
   Result := FileName;
 
@@ -809,7 +784,7 @@ begin
       Result := '"' + Result + '"';
 end;
 
-function GetRealPath(BrokenFileName: String; Directory: String): String;
+function GetRealPath(const BrokenFileName, Directory: string): string;
 var
   e: TEditor;
 begin
@@ -896,7 +871,7 @@ end;
 // added by mandrav 13 Sep 2002
 // returns the file version of the .exe specified by filename
 // in the form x.x.x.x
-function GetVersionString(FileName: string): string;
+function GetVersionString(const FileName: string): string;
 var
   Buf: Pointer;
   i: cardinal;
@@ -974,16 +949,16 @@ begin
   end;
 end;
 
-function IsNumeric(s : string) : boolean;
-var i : integer;
+function IsNumeric(const s : string) : boolean;
+var
+	i : integer;
 begin
-  result := true;
-  for i := 1 to length(s) do
-    if not (s[i] in ['0'..'9']) then begin
-      result := false;
-      exit;
-    end;
+	result := true;
+	for i := 1 to length(s) do
+		if not (s[i] in ['0'..'9']) then begin
+			result := false;
+			exit;
+		end;
 end;
 
 end.
-

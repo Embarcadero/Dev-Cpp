@@ -33,12 +33,9 @@ uses
 
 type
   TfrmShortcutsEditor = class(TForm)
-    lblTitle: TLabel;
     lvShortcuts: TListView;
-    Panel1: TPanel;
     btnOk: TButton;
     btnCancel: TButton;
-    lblTip: TLabel;
     procedure lvShortcutsKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure lvShortcutsCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure lvShortcutsCustomDrawSubItem(Sender: TCustomListView;Item: TListItem; SubItem: Integer; State: TCustomDrawState;var DefaultDraw: Boolean);
@@ -62,7 +59,8 @@ var
 
 implementation
 
-uses StrUtils;
+uses
+	StrUtils;
 
 {$R *.dfm}
 

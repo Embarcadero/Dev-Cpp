@@ -100,7 +100,7 @@ uses
 procedure TCPUForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   MainForm.fDebugger.OnRegistersReady := nil;
-  CPUForm := nil;
+  action := caFree;
 end;
 
 procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
@@ -168,6 +168,10 @@ procedure TCPUForm.OnRegistersReady;
 var
 	i : integer;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   EAXText.Text := MainForm.fDebugger.Registers[EAX];
   EBXText.Text := MainForm.fDebugger.Registers[EBX];
   ECXText.Text := MainForm.fDebugger.Registers[ECX];

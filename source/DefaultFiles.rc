@@ -2,8 +2,6 @@ CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "..\devcpp.exe.manifest"
 
 English lng ..\lang\English.lng
 
-NOIMG BITMAP ".\images\noimg.bmp"
-
 /* default order of highlighter component
    may be good idea to make more concrete
 (fore, back, bold, italic, under)
@@ -28,6 +26,7 @@ NOIMG BITMAP ".\images\noimg.bmp"
 19 Active Breakpoint
 20 Gutter
 21 Selected Text
+22 Fold bar lines (fg only)
 */
 STRINGTABLE
 {
@@ -51,8 +50,9 @@ STRINGTABLE
  17, "clWhite, clRed"
  18, "clWhite, clMaroon"
  19, "clWhite, clBlue"
- 20, "clnone, clnone"
+ 20, "clBlack, clBtnFace"
  21, "clWhite, clNavy"
+ 22, "clBlack, clBtnFace"
 
 /* Classic Plus */
  1001, "clBlue, clNone, 0, 0, 0"
@@ -74,8 +74,9 @@ STRINGTABLE
  1017, "clWhite, clRed"
  1018, "clWhite, clMaroon"
  1019, "clWhite, clBlue"
- 1020, "clnone, clnone"
+ 1020, "clBlack, clBtnFace"
  1021, "clWhite, clNavy"
+ 1022, "clBlack, clBtnFace"
 
 /* Twilight */
  2001, "clLime, clNone, 0, 0, 0"
@@ -99,6 +100,7 @@ STRINGTABLE
  2019, "clWhite, clBlue"
  2020, "clWhite, clBlack"
  2021, "clWhite, clNavy"
+ 2022, "clWhite, clBtnFace"
 
 /* Ocean */
  3001, "clBlue, clNone, 0, 0, 0"
@@ -120,8 +122,9 @@ STRINGTABLE
  3017, "clWhite, clRed"
  3018, "clWhite, clMaroon"
  3019, "clWhite, clBlue"
- 3020, "clBlack, clAqua"
+ 3020, "clBlue, clAqua"
  3021, "clWhite, clNavy"
+ 3022, "clBlue, clBtnFace"
 
 /* Visual Studio */
  4001, "clBlack, clNone, 0, 0, 0"
@@ -143,8 +146,9 @@ STRINGTABLE
  4017, "clWhite, clRed"
  4018, "clRed, clNone"
  4019, "clWhite, clBlue"
- 4020, "clNone, clNone"
+ 4020, "clNone, clWhite"
  4021, "clWhite, clNavy"
+ 4022, "clNone, clBtnFace"
 
 /* Borland */
  5001, "clLime, clNone, 0, 0, 0"
@@ -166,8 +170,9 @@ STRINGTABLE
  5017, "clWhite, clRed"
  5018, "clWhite, clMaroon"
  5019, "clBlack, clAqua"
- 5020, "clBlack, clNone"
+ 5020, "clYellow, clNavy"
  5021, "clBlack, clSilver"
+ 5022, "clYellow, clBtnFace"
 
 /* Matrix */
  6001, "clLime, clNone, 0, 0, 0"
@@ -183,12 +188,13 @@ STRINGTABLE
  6011, "clGreen, clNone, 0, 0, 0"
  6012, "clWhite, clBlack, 0, 0, 0"
  6013, "$00C3C3C3, clNone, 0, 0, 0"
- 6014, "clLime, clNone, 0, 0, 0"
+ 6014, "clRed, clNone, 0, 0, 0"
  6015, "clHighlight, clWhite, 0, 0, 0"
  6016, "clWhite, clMaroon, 0, 0, 0"
- 6017, "16777215, 8421504"
- 6018, "16777215, 255"
- 6019, "16777215, 16711680"
+ 6017, "clWhite, 8421504"
+ 6018, "clWhite, 255"
+ 6019, "clWhite, 16711680"
  6020, "clLime, clBlack"
  6021, "clWhite, clNavy"
+ 6022, "clLime, clBtnFace"
 }

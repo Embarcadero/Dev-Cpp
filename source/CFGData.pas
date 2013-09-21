@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Messages, Classes, sysUtils, TypInfo, CFGINI, cfgtypes, version;
+  Windows, Classes, sysUtils, TypInfo, CFGINI, cfgtypes, version;
 {$ENDIF}
 {$IFDEF LINUX}
   Classes, sysUtils, TypInfo, cfgreg, CFGINI, cfgtypes;
@@ -48,10 +48,6 @@ type
    procedure SaveConfigData; virtual;
    procedure ReadConfigData; virtual;
 
-   // load/save windowplacement structure
-   procedure SaveWindowPlacement(const key: string; value: TWindowPlacement);
-   function LoadWindowPlacement(const key: string; var Value: TWindowPlacement): boolean;
-
    // load/save functions
    procedure SaveSettingB(const key: string; const entry: string; const value: boolean);
    procedure SaveSettingS(const key: string; const Entry: string; const value: string);
@@ -73,13 +69,6 @@ function GetPropName(Instance: TPersistent; Index: Integer): String;
 function GetPropCount(Instance: TPersistent): Integer;
 
 implementation
-
-// returns empty TWindowPlacement Record
-function EmptyWinPlace: TWindowPlacement;
-begin
-	FillChar(result, Sizeof(TWindowPlacement), #0);
-	Result.Length:= Sizeof(TWindowPlacement);
-end;
 
 //Returns the number of properties of a given object
 function GetPropCount(Instance: TPersistent): Integer;
@@ -145,69 +134,6 @@ end;
 procedure TConfigData.SaveConfigData;
 begin
 	GetINI.SaveConfig;
-end;
-
-function TConfigData.LoadWindowPlacement(const key: string; var Value: TWindowPlacement): boolean;
-
-  // convert string to TWindowPlacement record
-  function StrtoWinPlace(s: string): TWindowPlacement;
-   var
-    tmp: TSTringList;
-   begin
-     if s = '' then result:= EmptyWinPlace
-     else
-      begin
-        tmp:= TStringList.Create;
-        try
-         tmp.CommaText:= s;
-         if tmp.Count = 10 then
-          with Result do
-           begin
-             Length:= Sizeof(TWindowPlacement);
-             Flags:= StrtoInt(tmp[0]);
-             ShowCmd:= StrtoInt(tmp[1]);
-             ptMinPosition:= point(StrtoInt(tmp[2]), StrtoInt(tmp[3]));
-             ptMaxPosition:= point(StrtoInt(tmp[4]), StrtoInt(tmp[5]));
-             rcNormalPosition:= rect(StrtoInt(tmp[6]), StrtoInt(tmp[7]),
-                                     StrtoInt(tmp[8]), StrtoInt(tmp[9]));
-           end
-          else
-           result:= emptyWinPlace;
-        finally
-         tmp.Free;
-        end;
-      end;
-   end;
-
-var
-	s: string;
-begin
-	try
-		s:= GetINI.LoadSetting(key, 'WinPlace');
-		value:= StrtoWinPlace(s);
-		result:= TRUE;
-	except
-		result:= false;
-	end;
-end;
-
-procedure TConfigData.SaveWindowPlacement(const key: string;
-  value: TWindowPlacement);
-
-  function WinPlacetoStr(WinPlace: TWindowPlacement): string;
-   begin
-     with WinPlace do
-      Result:= format('%d, %d, %d, %d, %d, %d, %d, %d, %d, %d',
-        [Flags, ShowCmd, ptMinPosition.X, ptMinPosition.Y,
-         ptMaxPosition.X, ptMaxPosition.Y,
-         rcNormalPosition.Left, rcNormalPosition.Top,
-         rcNormalPosition.Right, rcNormalPosition.Bottom]);
-   end;
-var
-	s: string;
-begin
-	s:= WinPlacetoStr(Value);
-	GetINI.SaveSettingS(key, 'WinPlace', s);
 end;
 
 procedure TConfigData.LoadObject(obj: TCFGOptions);

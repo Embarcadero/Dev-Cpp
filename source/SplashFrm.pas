@@ -17,35 +17,30 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit CVSPasswdFm;
+unit SplashFrm;
 
 interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  ExtCtrls, ComCtrls, Version;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls;
+  SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
+  QExtCtrls, QComCtrls, Version;
 {$ENDIF}
 
 type
-  TCVSPasswdForm = class(TForm)
-    Label1: TLabel;
-    txtPass: TEdit;
-    btnOK: TButton;
-    Label2: TLabel;
-    procedure FormShow(Sender: TObject);
-  private
-    { Private declarations }
-  public
-    { Public declarations }
+  TSplashForm = class(TForm)
+    Panel: TPanel;
+    Image: TImage;
+    Statusbar: TStatusbar;
+    procedure FormCreate(Sender: TObject);
   end;
 
 var
-  CVSPasswdForm: TCVSPasswdForm;
+  SplashForm: TSplashForm;
 
 implementation
 
@@ -54,11 +49,15 @@ uses
 
 {$R *.dfm}
 
-procedure TCVSPasswdForm.FormShow(Sender: TObject);
+procedure TSplashForm.FormCreate(Sender: TObject);
 begin
-  txtPass.Text := '';
-  txtPass.SetFocus;
+	if (devData.Splash <> '') and FileExists(devData.Splash) then begin
+		Image.Picture.LoadFromFile(devData.Splash);
+		ClientWidth:= Image.Width;
+		ClientHeight:= Image.Height + Statusbar.Height;
+	end;
+	Show;
+	Update;
 end;
 
 end.
-
