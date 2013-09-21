@@ -99,8 +99,7 @@ type
     procedure btnDefaultClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure DirTabsChange(Sender: TObject);
-    procedure DirTabsChanging(Sender: TObject; NewIndex: Integer;
-      var AllowChange: Boolean);
+    procedure DirTabsChanging(Sender: TObject; NewIndex: Integer;var AllowChange: Boolean);
     procedure lstDirsClick(Sender: TObject);
     procedure lstDirsDblClick(Sender: TObject);
     procedure edEntryChange(Sender: TObject);
@@ -108,8 +107,7 @@ type
     procedure ButtonClick(Sender: TObject);
     procedure UpDownClick(Sender: TObject);
     procedure PageControlChange(Sender: TObject);
-    procedure edEntryKeyUp(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure edEntryKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure btnBrws1Click(Sender: TObject);
     procedure cmbCompilerSetCompChange(Sender: TObject);

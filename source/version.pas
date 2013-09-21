@@ -34,7 +34,7 @@ resourcestring
 	// misc strings
 	GCC_VERSION          = '4.5.2';
 	DEVCPP               = 'Dev-C++';
-	DEVCPP_VERSION       = '4.9.9.6';
+	DEVCPP_VERSION       = '4.9.9.7';
 	DEFAULT_LANG_FILE    = 'English.lng';
 	HTTP                 = 'http://';
 	DEV_INTERNAL_OPEN    = '$__DEV_INTERNAL_OPEN';
@@ -59,7 +59,7 @@ resourcestring
 	LIB_DIR              = '%path%' + pd + 'lib;%path%' + pd + 'lib' + pd + 'gcc';
 	C_INCLUDE_DIR        = '%path%' + pd + 'include';
 	CPP_INCLUDE_DIR      = '%path%' + pd + 'include;' +
-                           '%path%' + pd + 'include' + pd + 'sys;' +
+                       //  '%path%' + pd + 'include' + pd + 'sys;' +
                            '%path%' + pd + 'include' + pd + 'ddk;' +
                            '%path%' + pd + 'include' + pd + 'gdiplus;' +
                            '%path%' + pd + 'include' + pd + 'GL';

@@ -232,7 +232,7 @@ begin
 			Application.ProcessMessages;
 
 			f := TStringList.Create;
-			for i := 0 to s.Count - 1 do begin
+			for i := 0 to pred(s.Count) do begin
 				// Relative paths make the recursive/loop searcher go nuts
 				s[i] := StringReplace(s[i],'%path%\',devDirs.exec,[rfReplaceAll]);
 				if DirectoryExists(s[i]) then begin

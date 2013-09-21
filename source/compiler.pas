@@ -926,14 +926,14 @@ begin
 		IMod := CalcMod(pred(LOutput.Count));
 
 		// Concatenate errors which are on multiple lines
-		for curLine := 0 to pred(LOutput.Count) do begin
-			if (curLine > 0) and (Pos('   ', LOutput[curLine]) > 0) then begin
+	//	for curLine := 0 to pred(LOutput.Count) do begin
+	//		if (curLine > 0) and (Pos('   ', LOutput[curLine]) > 0) then begin
 
-				cpos := Pos('   ', LOutput[curLine]);
-				O_Msg := Copy(LOutput[curLine],cpos+2,Length(LOutput[curLine]) - cpos - 1);
-				LOutput[curLine - 1] := LOutput[curLine - 1] + O_Msg;
-			end;
-		end;
+	//			cpos := Pos('   ', LOutput[curLine]);
+	//			O_Msg := Copy(LOutput[curLine],cpos+2,Length(LOutput[curLine]) - cpos - 1);
+	//			LOutput[curLine - 1] := LOutput[curLine - 1] + O_Msg;
+	//		end;
+	//	end;
 
 		for curLine := 0 to pred(LOutput.Count) do begin
 			if (IMod = 0) or (curLine mod IMod = 0) then
@@ -943,12 +943,12 @@ begin
 			LowerLine := LowerCase(Line);
 
 			// Skip errors alreay concatenated
-			if Pos('error:   ', Line) > 0 then
-				Continue;
+		//	if Pos('error:   ', Line) > 0 then
+		//		Continue;
 
 			if Messages > 500 then begin
 				DoOutput('','','','[General Error] Too many messages; abort.');
-				DoOutput('','','','[General Error] There must be something terribly wrong with your code. Please fix it.');
+				DoOutput('','','','[General Error] There must be something terribly wrong with your code. Please fix it. ;)');
 				Break;
 			end;
 
@@ -1037,21 +1037,6 @@ begin
 				end;
 			end;
 
-			// foo.c: In function 'bar':
-			if Pos(' In function ', Line) > 0 then begin
-				// Message
-				cpos := GetLastPos(': ', Line);
-				O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
-				Delete(Line, cpos, Length(Line) - cpos + 1);
-
-				// Remaing part contains file
-				O_File := Line;
-
-				Inc(fWarnCount);
-				DoOutput('','', O_File, O_Msg);
-				Continue;
-			end;
-
 			// In file included from foo.c:1:0,
 			if Pos('In file included from ', Line) > 0 then begin
 
@@ -1103,12 +1088,14 @@ begin
 
 			{ foo.cpp: In method `bool MyApp::Bar()': }
 			cpos := GetLastPos('In method ''', Line);
-			// GCC >= 3.2 support
+			if cpos <= 0 then
+				{ foo.cpp: In function `bar': }
+				cpos := GetLastPos('In function ''', Line);
 			if cpos <= 0 then
 				{ foo.cpp: In member function `bool MyApp::Bar()': }
 				cpos := GetLastPos('In member function ''', Line);
 			if cpos <= 0 then
-				{ foo.cpp: In member function `bool MyApp::Bar()': }
+				{ foo.cpp: In static member function `bool MyApp::Bar()': }
 				cpos := GetLastPos('In static member function ''', Line);
 			if cpos <= 0 then
 				{ foo.cpp: In constructor `MyApp::MyApp()': }
@@ -1122,6 +1109,8 @@ begin
 				O_File := Line;
 
 				DoOutput('','', O_File, O_Msg);
+
+				Inc(Messages);
 				Continue;
 			end;
 
@@ -1183,21 +1172,34 @@ begin
 				Continue;
 			end;
 
-			{ foo.cpp:1: candidates are: FooClass::Bar(void) }
-			cpos := GetLastPos(': candidates are: ', Line);
+			// foo.cpp:1: note:/error candidates are/candidate is: FooClass::Bar(void)
+			cpos := GetLastPos(': candidate', Line);
 			if cpos > 0 then begin
+				// candidates are (...) is message
+				cpos := GetLastPos(': candidate', Line);
 				O_Msg := Copy(Line, cpos + 2, Length(Line) - cpos - 1);
+
+				// 'note'/'error' is removed
+				cpos := GetLastPos(': note', Line);
+				if(cpos <=0) then
+					cpos := GetLastPos(': error', Line);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
+				// Get column number
 				cpos := GetLastPos(':', Line);
-				O_Line := Copy(Line, cpos + 1, Length(Line) - cpos);
+				O_Col := Copy(Line, cpos + 1, Length(Line) - cpos);
+				Delete(Line, cpos, Length(Line) - cpos + 1);
+
+				// Get line number
+				cpos := GetLastPos(':', Line);
+				O_line := Copy(Line, cpos+1, Length(Line) - cpos);
 				Delete(Line, cpos, Length(Line) - cpos + 1);
 
 				O_File := Line;
 
 				Inc(fErrCount);
 				Inc(Messages);
-				DoOutput(O_Line, '', O_File, O_Msg);
+				DoOutput(O_Line, O_Col, O_File, O_Msg);
 				Continue;
 			end;
 
@@ -1234,6 +1236,14 @@ begin
 					O_File := '';
 					Delete(Line, 1, 6);
 					O_Msg := '[Info] ' + Line;
+				end else if Pos('note: ', Line) > 0 then begin
+					cpos := Pos('note: ', Line);
+					Delete(Line, cpos - 2, Length(Line) - cpos + 3);
+
+					// Get column number
+					cpos := GetLastPos(':', Line);
+					O_Col := Copy(Line, cpos+1, Length(Line) - cpos);
+					Delete(Line, cpos, Length(Line) - cpos + 1);
 				end else begin
 					Inc(fErrCount);
 				end;
@@ -1256,15 +1266,14 @@ begin
 					O_Msg := '[Error] ' + O_Msg;
 					O_File := Line;
 				end else begin
-
-					// Process generic parts of info/warning messages
+					// foo.bar:1
 					cpos := GetLastPos(':', Line);
 					if StrToIntDef(Copy(Line, cpos + 1, Length(Line) - cpos - 1), -1) <> -1 then begin
 						O_Line := Copy(Line, cpos + 1, Length(Line) - cpos);
 						Delete(Line, cpos, Length(Line) - cpos + 1);
 						O_File := Line;
 
-						// filename may also contain column as "filename:line:col"
+						// foo.bar:1:2
 						cpos := GetLastPos(':', Line);
 						if StrToIntDef(Copy(Line, cpos + 1, Length(Line) - cpos), -1) <> -1 then begin
 							O_Line := Copy(Line, cpos + 1, Length(Line) - cpos) + ':' + O_Line;

@@ -4665,22 +4665,23 @@ end;
 
 procedure TMainForm.PageControlChange(Sender: TObject);
 var
- e: TEditor;
- i, x, y : integer;
+	e: TEditor;
+	i, x, y : integer;
 begin
-	if ClassBrowser1.Enabled then begin
-		if PageControl.ActivePageIndex> -1 then begin
-			e:=GetEditor(PageControl.ActivePageIndex);
-			if Assigned(e) then begin
-				e.Text.SetFocus;
-				ClassBrowser1.CurrentFile:=e.FileName;
+	if PageControl.ActivePageIndex> -1 then begin
+		e:=GetEditor(PageControl.ActivePageIndex);
+		if Assigned(e) then begin
+			e.Text.SetFocus;
 
+			// keep statusbar updated
+			e.SetLineCol;
+			ClassBrowser1.CurrentFile:=e.FileName;
+			if ClassBrowser1.Enabled then begin
 				for i := 1 to 9 do
 					if e.Text.GetBookMark(i, x, y) then begin
 						TogglebookmarksPopItem.Items[i - 1].Checked := true;
 						TogglebookmarksItem.Items[i - 1].Checked := true;
-					end
-					else begin
+					end else begin
 						TogglebookmarksPopItem.Items[i - 1].Checked := false;
 						TogglebookmarksItem.Items[i - 1].Checked := false;
 					end;
@@ -4730,8 +4731,7 @@ begin
 	end;
 end;
 
-procedure TMainForm.PageControlMouseDown(Sender: TObject;
-	Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.PageControlMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
 	I	: integer;
 begin

@@ -109,19 +109,15 @@ type
     procedure FormShow(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure PagesMainChange(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure vleExternalEditButtonClick(Sender: TObject);
-    procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;
-      const KeyName, KeyValue: String);
+    procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;const KeyName, KeyValue: String);
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
     procedure chkAltConfigClick(Sender: TObject);
   private
     procedure LoadText;
-  public
-    { Public declarations }
   end;
 
 implementation
@@ -183,8 +179,7 @@ begin
     begin
       s:= ExpandFileto(edLang.Text, devDirs.Exec);
       if SelectDirectory(Lang[ID_ENV_SELLANGDIR], '', s) then
-       edLang.Text:= IncludeTrailingPathDelimiter(
-                        ExtractRelativePath(devDirs.Exec, s));
+       edLang.Text:= IncludeTrailingPathDelimiter(ExtractRelativePath(devDirs.Exec, s));
     end;
 
    6: // CVS Executable Filename
@@ -209,151 +204,145 @@ procedure TEnviroForm.FormShow(Sender: TObject);
 var
  idx: integer;
 begin
-  with devData do
-   begin
-     rgbAutoOpen.ItemIndex:= AutoOpen;
-     cbDefCpp.Checked:= defCpp;
-     cbShowBars.Checked:= ShowBars;
-     cbBackups.Checked:= BackUps;
-     cbMinOnRun.Checked:= MinOnRun;
-     cbdblFiles.Checked:= DblFiles;
-     cbNoSplashScreen.Checked:= NoSplashScreen;
-     seMRUMax.Value:= MRUMax;
-     cboLang.Clear;
-     for idx:= 0 to pred(Lang.Langs.Count) do
-      cboLang.Items.append(Lang.Langs.Values[idx]);
-     cboLang.ItemIndex:= cboLang.Items.Indexof(Lang.CurrentLanguage);
-     rgbOpenStyle.ItemIndex:= OpenStyle;
+	with devData do begin
+		rgbAutoOpen.ItemIndex:= AutoOpen;
+		cbDefCpp.Checked:= defCpp;
+		cbShowBars.Checked:= ShowBars;
+		cbBackups.Checked:= BackUps;
+		cbMinOnRun.Checked:= MinOnRun;
+		cbdblFiles.Checked:= DblFiles;
+		cbNoSplashScreen.Checked:= NoSplashScreen;
+		seMRUMax.Value:= MRUMax;
+		cboLang.Clear;
+		for idx:= 0 to pred(Lang.Langs.Count) do
+		 cboLang.Items.append(Lang.Langs.Values[idx]);
+		cboLang.ItemIndex:= cboLang.Items.Indexof(Lang.CurrentLanguage);
+		rgbOpenStyle.ItemIndex:= OpenStyle;
 
-     {*** Modified by Peter ***}
-     cboTheme.Items.Clear;
-     devImageThemes.GetThemeTitles(cboTheme.Items);
-     cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
-     //cboTheme.Text := devImageThemes.CurrentTheme.Title;
-     //cboTheme.Items.AddStrings(devTheme.ThemeList);
-     //cboTheme.ItemIndex := cboTheme.Items.IndexOf(devData.Theme);
+		{*** Modified by Peter ***}
+		cboTheme.Items.Clear;
+		devImageThemes.GetThemeTitles(cboTheme.Items);
+		cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
+		//cboTheme.Text := devImageThemes.CurrentTheme.Title;
+		//cboTheme.Items.AddStrings(devTheme.ThemeList);
+		//cboTheme.ItemIndex := cboTheme.Items.IndexOf(devData.Theme);
 
-     cbXPTheme.Checked := XPTheme;
+		cbXPTheme.Checked := XPTheme;
 
-     cbShowProgress.Checked := ShowProgress;
-     cbAutoCloseProgress.Checked := AutoCloseProgress;
+		cbShowProgress.Checked := ShowProgress;
+		cbAutoCloseProgress.Checked := AutoCloseProgress;
 
-     cbWatchHint.Checked := WatchHint;
-     cbWatchError.Checked := WatchError;
+		cbWatchHint.Checked := WatchHint;
+		cbWatchError.Checked := WatchError;
 
-     cboTabsTop.ItemIndex:= ord(msgTabs);
+		cboTabsTop.ItemIndex:= ord(msgTabs);
 
-     chkAltConfig.Checked:= UseAltConfigFile;
-     edAltConfig.Text:= AltConfigFile;
-     chkAltConfigClick(nil);
+		chkAltConfig.Checked:= UseAltConfigFile;
+		edAltConfig.Text:= AltConfigFile;
+		chkAltConfigClick(nil);
 
-     edSplash.Text:= Splash;
-     edIcoLib.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Icons);
-     edUserDir.Text:= devDirs.Default;
-     edTemplatesDir.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Templates);
-     edLang.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Lang);
+		edSplash.Text:= Splash;
+		edIcoLib.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Icons);
+		edUserDir.Text:= devDirs.Default;
+		edTemplatesDir.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Templates);
+		edLang.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Lang);
 
-     vleExternal.Strings.Assign(devExternalPrograms.Programs);
-     for idx:=0 to vleExternal.Strings.Count-1 do
-       vleExternal.ItemProps[idx].EditStyle:=esEllipsis;
+		vleExternal.Strings.Assign(devExternalPrograms.Programs);
+		for idx:=0 to vleExternal.Strings.Count-1 do
+			vleExternal.ItemProps[idx].EditStyle:=esEllipsis;
 
-     lstAssocFileTypes.Clear;
-     for idx:=0 to AssociationsCount-1 do begin
-       lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[idx, 1], Associations[idx, 0]]));
-       lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count-1]:=IsAssociated(idx);
-     end;
+		lstAssocFileTypes.Clear;
+		for idx:=0 to AssociationsCount-1 do begin
+			lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[idx, 1], Associations[idx, 0]]));
+			lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count-1]:=IsAssociated(idx);
+		end;
 
-     edCVSExec.Text:= devCVSHandler.Executable;
-     spnCVSCompression.Value:= devCVSHandler.Compression;
-     chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
-   end;
+		edCVSExec.Text:= devCVSHandler.Executable;
+		spnCVSCompression.Value:= devCVSHandler.Compression;
+		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
+	end;
 end;
 
 procedure TEnviroForm.btnOkClick(Sender: TObject);
 var
-  idx: integer;
-  s : string;
+	idx: integer;
+	s : string;
 begin
-  if chkAltConfig.Enabled then begin
-    if UseAltConfigFile<>chkAltConfig.Checked then
-      MessageDlg(Lang[ID_ENV_CONFIGCHANGED], mtInformation, [mbOk], 0);
-    UseAltConfigFile:= chkAltConfig.Checked and (edAltConfig.Text<>'');
-    AltConfigFile:= edAltConfig.Text;
-    UpdateAltConfigFile;
-  end;
+	if chkAltConfig.Enabled then begin
+		if UseAltConfigFile<>chkAltConfig.Checked then
+			MessageDlg(Lang[ID_ENV_CONFIGCHANGED], mtInformation, [mbOk], 0);
+		UseAltConfigFile:= chkAltConfig.Checked and (edAltConfig.Text<>'');
+		AltConfigFile:= edAltConfig.Text;
+		UpdateAltConfigFile;
+	end;
 
-  with devData do
-   begin
-     DefCpp:= cbDefCpp.Checked;
-     ShowBars:= cbShowBars.Checked;
-     ShowMenu:=  cbShowMenu.Checked;
-     BackUps:=  cbBackups.Checked;
-     MinOnRun:= cbMinOnRun.Checked;
-     DblFiles:= cbdblFiles.Checked;
-     MRUMax:= seMRUMax.Value;
-     MsgTabs:= boolean(cboTabsTop.ItemIndex);
-     OpenStyle:= rgbOpenStyle.ItemIndex;
-     AutoOpen:= rgbAutoOpen.ItemIndex;
-     Splash:= edSplash.Text;
+	with devData do begin
+		DefCpp:= cbDefCpp.Checked;
+		ShowBars:= cbShowBars.Checked;
+		ShowMenu:=  cbShowMenu.Checked;
+		BackUps:=  cbBackups.Checked;
+		MinOnRun:= cbMinOnRun.Checked;
+		DblFiles:= cbdblFiles.Checked;
+		MRUMax:= seMRUMax.Value;
+		MsgTabs:= boolean(cboTabsTop.ItemIndex);
+		OpenStyle:= rgbOpenStyle.ItemIndex;
+		AutoOpen:= rgbAutoOpen.ItemIndex;
+		Splash:= edSplash.Text;
 
-     s := Lang.FileFromDescription(cboLang.Text);
-     LangChange:= s <> Language;
-     Language:= s;
-     ThemeChange := cboTheme.Text <> devData.Theme;
-     Theme := cboTheme.Text;
-     NoSplashScreen := cbNoSplashScreen.Checked;
-     if not ThemeChange then
-       ThemeChange := XPTheme <> cbXPTheme.Checked;
-     XPTheme := cbXPTheme.Checked;
-     ShowProgress := cbShowProgress.Checked;
-     AutoCloseProgress := cbAutoCloseProgress.Checked;
-     WatchHint := cbWatchHint.Checked;
-     WatchError := cbWatchError.Checked;
-   end;
+		s := Lang.FileFromDescription(cboLang.Text);
+		LangChange:= s <> Language;
+		Language:= s;
+		ThemeChange := cboTheme.Text <> devData.Theme;
+		Theme := cboTheme.Text;
+		NoSplashScreen := cbNoSplashScreen.Checked;
+		if not ThemeChange then
+			ThemeChange := XPTheme <> cbXPTheme.Checked;
+		XPTheme := cbXPTheme.Checked;
+		ShowProgress := cbShowProgress.Checked;
+		AutoCloseProgress := cbAutoCloseProgress.Checked;
+		WatchHint := cbWatchHint.Checked;
+		WatchError := cbWatchError.Checked;
+	end;
 
-  devDirs.Icons:= IncludeTrailingPathDelimiter(ExpandFileto(edIcoLib.Text, devDirs.Exec));
-  devDirs.Templates:= IncludeTrailingPathDelimiter(ExpandFileto(edTemplatesDir.Text, devDirs.Exec));
-  devDirs.Default:= edUserDir.Text;
+	devDirs.Icons:= IncludeTrailingPathDelimiter(ExpandFileto(edIcoLib.Text, devDirs.Exec));
+	devDirs.Templates:= IncludeTrailingPathDelimiter(ExpandFileto(edTemplatesDir.Text, devDirs.Exec));
+	devDirs.Default:= edUserDir.Text;
 
-  if edLang.Text <> ExtractRelativePath(devDirs.Exec, devDirs.Lang) then
-   begin
-     devDirs.Lang:= IncludeTrailingPathDelimiter(ExpandFileto(edLang.Text, devDirs.Exec));
-     Lang.CheckLanguageFiles;
-   end;
+	if edLang.Text <> ExtractRelativePath(devDirs.Exec, devDirs.Lang) then begin
+		devDirs.Lang:= IncludeTrailingPathDelimiter(ExpandFileto(edLang.Text, devDirs.Exec));
+		Lang.CheckLanguageFiles;
+	end;
 
-  with dmMain.OpenDialog do
-   case devData.OpenStyle of
-    0: // win2k
-     begin
-       OptionsEx:= [];
-       Options:= Options -[ofOldStyleDialog, ofNoLongNames];
-     end;
-    1: // win9x
-     begin
-       OptionsEx:= [ofExNoPlacesBar];
-       Options:= Options -[ofOldStyleDialog, ofNoLongNames];
-     end;
-    2: // win31
-     begin
-      OptionsEx:= [ofExNoPlacesBar]; // basically ignored anyway
-      Options:= Options +[ofOldStyleDialog, ofNoLongNames];
-     end;
-   end;
+	with dmMain.OpenDialog do
+		case devData.OpenStyle of
+			0: begin // Sidebar Win2000/XP
+				OptionsEx:= [];
+				Options:= Options - [ofOldStyleDialog, ofNoLongNames];
+			end;
+			1: begin // Win98
+				OptionsEx:= [ofExNoPlacesBar];
+				Options:= Options - [ofOldStyleDialog, ofNoLongNames];
+			end;
+			2: begin // Win31
+				OptionsEx:= [ofExNoPlacesBar]; // basically ignored anyway
+				Options:= Options +[ofOldStyleDialog, ofNoLongNames];
+			end;
+	end;
 
-  dmMain.SaveDialog.OptionsEx:= dmMain.OpenDialog.OptionsEx;
-  dmMain.SaveDialog.Options:= dmMain.OpenDialog.Options;
+	dmMain.SaveDialog.OptionsEx:= dmMain.OpenDialog.OptionsEx;
+	dmMain.SaveDialog.Options:= dmMain.OpenDialog.Options;
 
-  devExternalPrograms.Programs.Assign(vleExternal.Strings);
+	devExternalPrograms.Programs.Assign(vleExternal.Strings);
 
-  for idx:=0 to AssociationsCount-1 do
-    if lstAssocFileTypes.Checked[idx] then
-      Associate(idx)
-    else
-      Unassociate(idx);
+	for idx:=0 to AssociationsCount-1 do
+		if lstAssocFileTypes.Checked[idx] then
+			Associate(idx)
+		else
+			Unassociate(idx);
 
-  devCVSHandler.Executable:= edCVSExec.Text;
-  devCVSHandler.Compression:= spnCVSCompression.Value;
-  devCVSHandler.UseSSH:= chkCVSUseSSH.Checked;
+	devCVSHandler.Executable:= edCVSExec.Text;
+	devCVSHandler.Compression:= spnCVSCompression.Value;
+	devCVSHandler.UseSSH:= chkCVSUseSSH.Checked;
 end;
 
 procedure TEnviroForm.LoadText;
@@ -387,7 +376,7 @@ begin
   cbNoSplashScreen.Caption:= Lang[ID_ENV_NOSPLASH];
   cbXPTheme.Caption :=       Lang[ID_ENV_XPTHEME];
 
-  gbProgress.Caption :=      Lang[ID_ENV_COMPPROGRESSWINDOW];
+  gbProgress.Caption :=      '  '+Lang[ID_ENV_COMPPROGRESSWINDOW]+'  ';
   cbShowProgress.Caption :=  Lang[ID_ENV_SHOWPROGRESS];
   cbAutoCloseProgress.Caption :=  Lang[ID_ENV_AUTOCLOSEPROGRESS];
 
@@ -395,12 +384,12 @@ begin
   cbWatchError.Caption := Lang[ID_ENV_WATCHERROR];
   gbDebugger.Caption := Lang[ID_ENV_DEBUGGER];
 
-  rgbOpenStyle.Caption:=     '  ' +Lang[ID_ENV_OPENSTYLE] +'  ';
+  rgbOpenStyle.Caption:=     '  '+Lang[ID_ENV_OPENSTYLE]+'  ';
   rgbOpenStyle.Items[0]:=    Lang[ID_ENV_OPEN2k];
   rgbOpenStyle.Items[1]:=    Lang[ID_ENV_OPEN9x];
   rgbOpenStyle.Items[2]:=    Lang[ID_ENV_OPEN31];
 
-  rgbAutoOpen.Caption:=      '  ' +Lang[ID_ENV_AUTOOPEN] +'  ';
+  rgbAutoOpen.Caption:=      '  '+Lang[ID_ENV_AUTOOPEN]+'  ';
   rgbAutoOpen.Items[0]:=     Lang[ID_ENV_AUTOALL];
   rgbAutoOpen.Items[1]:=     Lang[ID_ENV_AUTOFIRST];
   rgbAutoOpen.Items[2]:=     Lang[ID_ENV_AUTONONE];

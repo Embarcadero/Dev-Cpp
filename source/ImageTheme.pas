@@ -141,7 +141,7 @@ type
   public
     constructor Create; virtual;
     function ActivateTheme(ATheme: TCustomImageTheme): Boolean; overload;
-    function ActivateTheme(AThemeTitle: string): Boolean; overload;    
+    function ActivateTheme(AThemeTitle: string): Boolean; overload;
     procedure AddTheme(const ATheme: TCustomImageTheme);
     function Count: Integer;
     function IndexOf(const AThemeTitle: string): Integer;

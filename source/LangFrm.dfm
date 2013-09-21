@@ -94,7 +94,7 @@ object LangForm: TLangForm
       Top = 48
       Width = 265
       Height = 121
-      Caption = 'Select your language :'
+      Caption = 'Select your language:'
       TabOrder = 1
     end
     object ThemeGroupBox: TGroupBox
@@ -102,7 +102,7 @@ object LangForm: TLangForm
       Top = 176
       Width = 265
       Height = 73
-      Caption = 'Select your Dev-C++ theme :'
+      Caption = 'Select your Dev-C++ theme:'
       TabOrder = 2
       object ThemeBox: TComboBox
         Left = 16
@@ -224,18 +224,18 @@ object LangForm: TLangForm
       TabOrder = 1
       Visible = False
       object ParseLabel: TLabel
-        Left = 16
+        Left = 4
         Top = 24
-        Width = 65
+        Width = 245
         Height = 13
         Caption = 'Parsing files...'
         WordWrap = True
       end
       object pbCCCache: TProgressBar
-        Left = 14
-        Top = 62
-        Width = 235
-        Height = 16
+        Left = 4
+        Top = 70
+        Width = 245
+        Height = 20
         TabOrder = 0
         Visible = False
       end

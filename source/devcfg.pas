@@ -317,7 +317,6 @@ type
    fLibDir: string;            // Libraries
    fMingw: string;             // Mingw root -- should be set in installer if mingw included
    fOldPath: string;           // Enviroment Path at program start
-   procedure FixPaths;
   public
    constructor Create;
    procedure SettoDefaults; override;
@@ -958,12 +957,12 @@ begin
   fMRUMax:= 10;
   fMinOnRun:= FALSE;
   fBackup:= FALSE;
-  fAutoOpen:= 2;
+  fAutoOpen:= 0;
   fShowProject:= TRUE;
-  fClassView:= False;
+  fClassView:= FALSE;
   fProjectWidth:=161;
-  fOutput:= false;
-  fOutputOnNeed:= true;
+  fOutput:= FALSE;
+  fOutputOnNeed:= TRUE;
   fOutputHeight:=120;
   fStatusbar:= TRUE;
   fShowBars:= FALSE;
@@ -1005,19 +1004,19 @@ begin
   fAssociateRc := getAssociation(5);
   fAssociateTemplate := getAssociation(6);
   
-  fShowTipsOnStart:=True;
+  fShowTipsOnStart:=TRUE;
   fLastTip:=0;
-  fXPTheme := false;
+  fXPTheme := FALSE;
   fFileDate := 0;
-  fShowProgress := true;
-  fAutoCloseProgress := false;
-  fPrintColors := true;
-  fPrintHighlight := true;
-  fPrintWordWrap := false;
-  fPrintLineNumbers := false;
-  fPrintLineNumbersMargins := false;
-  fWatchHint := true;
-  fWatchError := true;
+  fShowProgress := TRUE;
+  fAutoCloseProgress := FALSE;
+  fPrintColors := TRUE;
+  fPrintHighlight := TRUE;
+  fPrintWordWrap := FALSE;
+  fPrintLineNumbers := FALSE;
+  fPrintLineNumbersMargins := FALSE;
+  fWatchHint := TRUE;
+  fWatchError := TRUE;
 end;
 
 { TCompilerOpts }
@@ -1245,7 +1244,7 @@ begin
 		end;
 
 		// Entry might nog exist yet, so pass a default
-		fFastDep:= LoadSettingB('Makefile', 'FastDep','TRUE');
+		fFastDep:= LoadSettingB('Makefile', 'FastDep','1');
 	end;
 end;
 
@@ -1349,10 +1348,10 @@ end;
 
 constructor TdevDirs.Create;
 begin
- inherited Create;
- Name:= OPT_DIRS;
- SettoDefaults;
- LoadSettings;
+	inherited Create;
+	Name:= OPT_DIRS;
+	SettoDefaults;
+	LoadSettings;
 end;
 
 procedure TdevDirs.SettoDefaults;
@@ -1376,39 +1375,38 @@ procedure TdevDirs.LoadSettings;
 begin
   devData.LoadObject(Self);
   fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
-  if fHelp = ''   then  fHelp:=   fExec + HELP_DIR;
-  if fIcons = ''  then  fIcons:=  fExec + ICON_DIR;
-  if fLang = ''   then  fLang:=   fExec + LANGUAGE_DIR;
-  if fTemp = ''   then  fTemp:=   fExec + TEMPLATE_DIR;
-  if fThemes = '' then  fThemes:= fExec + THEME_DIR;
-  FixPaths;
+  fHelp:=   StringReplace(fHelp,'%path%\',fExec,[rfReplaceAll]);
+  fIcons:=  StringReplace(fIcons,'%path%\',fExec,[rfReplaceAll]);
+  fLang:=   StringReplace(fLang,'%path%\',fExec,[rfReplaceAll]);
+  fTemp:=   StringReplace(fTemp,'%path%\',fExec,[rfReplaceAll]);
+  fThemes:= StringReplace(fThemes,'%path%\',fExec,[rfReplaceAll]);
 end;
 
 procedure TdevDirs.SaveSettings;
 begin
-  fHelp:=   ExtractRelativePath(fExec, fHelp);
-  fIcons:=  ExtractRelativePath(fExec, fIcons);
-  fLang:=   ExtractRelativePath(fExec, fLang);
-  fTemp:=   ExtractRelativePath(fExec, fTemp);
-  fMingw:=  ExtractRelativePath(fExec, fMingw);
-  fThemes:= ExtractRelativePath(fExec, fThemes);
-  devData.SaveObject(Self);
-  FixPaths;
-end;
+  fHelp :=  StringReplace(fHelp,fExec,'%path%\',[rfReplaceAll]);
+  fIcons:=  StringReplace(fIcons,fExec,'%path%\',[rfReplaceAll]);
+  fLang:=   StringReplace(fLang,fExec,'%path%\',[rfReplaceAll]);
+  fTemp:=   StringReplace(fTemp,fExec,'%path%\',[rfReplaceAll]);
+  fMingw:=  StringReplace(fMingw,fExec,'%path%\',[rfReplaceAll]);
+  fThemes:= StringReplace(fThemes,fExec,'%path%\',[rfReplaceAll]);
+  fLibDir:= StringReplace(fLibDir,fExec,'%path%\',[rfReplaceAll]);
+  fBinDir:= StringReplace(fBinDir,fExec,'%path%\',[rfReplaceAll]);
+  fCDir:=   StringReplace(fCDir,fExec,'%path%\',[rfReplaceAll]);
+  fCppDir:= StringReplace(fCppDir,fExec,'%path%\',[rfReplaceAll]);
 
-procedure TdevDirs.FixPaths;
-begin
-  // if we are called by double-clicking a .dev file in explorer,
-  // we must perform the next checks or else the dirs are
-  // really screwed up...
-  // Basically it checks if it is a relative path (as it should be).
-  // If so, it prepends the base Dev-C++ directory...
-  if ExtractFileDrive(fHelp)=''   then fHelp:=   fExec+fHelp;
-  if ExtractFileDrive(fIcons)=''  then fIcons:=  fExec+fIcons;
-  if ExtractFileDrive(fLang)=''   then fLang:=   fExec+fLang;
-  if ExtractFileDrive(fTemp)=''   then fTemp:=   fExec+fTemp;
-  if ExtractFileDrive(fThemes)='' then fThemes:= fExec+fThemes;
-  if ExtractFileDrive(fMingw)=''  then fMingw:=  fExec+fMingw;
+  devData.SaveObject(Self);
+
+  fHelp :=  StringReplace(fHelp,'%path%\',fExec,[rfReplaceAll]);
+  fIcons:=  StringReplace(fIcons,'%path%\',fExec,[rfReplaceAll]);
+  fLang:=   StringReplace(fLang,'%path%\',fExec,[rfReplaceAll]);
+  fTemp:=   StringReplace(fTemp,'%path%\',fExec,[rfReplaceAll]);
+  fMingw:=  StringReplace(fMingw,'%path%\',fExec,[rfReplaceAll]);
+  fThemes:= StringReplace(fThemes,'%path%\',fExec,[rfReplaceAll]);
+  fLibDir:= StringReplace(fLibDir,'%path%\',fExec,[rfReplaceAll]);
+  fBinDir:= StringReplace(fBinDir,'%path%\',fExec,[rfReplaceAll]);
+  fCDir:=   StringReplace(fCDir,'%path%\',fExec,[rfReplaceAll]);
+  fCppDir:= StringReplace(fCppDir,'%path%\',fExec,[rfReplaceAll]);
 end;
 
 constructor TdevEditor.Create;
@@ -1450,7 +1448,7 @@ begin
 	fInsertMode:= TRUE;
 	fTabtoSpaces:= FALSE; // Use Tab Character (inverse)
 	fSmartTabs:= FALSE;
-	fTrailBlanks:= FALSE;
+	fTrailBlanks:= TRUE;
 	fSmartUnindent:= TRUE; // Backspace unindents
 	fGroupUndo:= TRUE;
 	fInsDropFiles:= FALSE;

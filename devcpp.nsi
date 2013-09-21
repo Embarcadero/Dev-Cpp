@@ -1,8 +1,8 @@
 ############################################
 # Startup
 
-!define DEVCPP_VERSION "4.9.9.6"
-!define DISPLAY_NAME "Dev-C++ 5 beta 13 release (${DEVCPP_VERSION})"
+!define DEVCPP_VERSION "4.9.9.7"
+!define DISPLAY_NAME "Dev-C++ 5 beta 14 release (${DEVCPP_VERSION})"
 
 Var LOCAL_APPDATA
 

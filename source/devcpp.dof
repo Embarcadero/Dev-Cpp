@@ -3,13 +3,13 @@ Version=7.0
 [Compiler]
 A=8
 B=0
-C=0
+C=1
 D=1
 E=0
 F=0
 G=1
 H=1
-I=1
+I=0
 J=0
 K=0
 L=1
@@ -17,15 +17,15 @@ M=0
 N=1
 O=1
 P=1
-Q=1
-R=1
+Q=0
+R=0
 S=0
 T=0
 U=0
 V=1
 W=0
 X=1
-Y=2
+Y=1
 Z=1
 ShowHints=1
 ShowWarnings=1
@@ -111,7 +111,7 @@ AutoIncBuild=0
 MajorVer=4
 MinorVer=9
 Release=9
-Build=5
+Build=7
 Debug=0
 PreRelease=0
 Special=0
@@ -122,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Bloodshed Software
 FileDescription=Dev-C++ IDE
-FileVersion=4.9.9.5
+FileVersion=4.9.9.7
 InternalName=devcpp.exe
 LegalCopyright=Copyright Bloodshed Software
 LegalTrademarks=
@@ -130,3 +130,21 @@ OriginalFilename=devcpp.exe
 ProductName=Dev-C++
 ProductVersion=5
 Comments=Under the GNU General Public License
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=C:\V5\source\Vcl\codetooltip\;C:\V5\source\Vcl\Parser\;C:\V5\source\Vcl\synedit\Source\
+[HistoryLists\hlConditionals]
+Count=1
+Item0=BETAVERSION
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=vcl;vcl\parser;vcl\synedit\source;vcl\codetooltip
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=units
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=..

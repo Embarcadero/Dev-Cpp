@@ -55,8 +55,7 @@ type
     Label2: TLabel;
     btnHelp: TBitBtn;
     XPMenu: TXPMenu;
-    procedure ProjViewChange(Sender: TObject; Item: TListItem;
-      Change: TItemChange);
+    procedure ProjViewChange(Sender: TObject; Item: TListItem;Change: TItemChange);
     procedure FormCreate(Sender: TObject);
     procedure LoadText;
     procedure FormDestroy(Sender: TObject);
@@ -90,26 +89,25 @@ uses
 
 procedure TNewProjectForm.FormCreate(Sender: TObject);
 begin
-  fTemplates:= TList.Create;
-//  edProjectFile.Text:= devDirs.Default +edProjectName.Text;
-  LoadText;
-  ReadTemplateIndex;
-  edProjectName.Text:= format(Lang[ID_NEWPROJECT], [dmMain.GetNumber]);
+	fTemplates:= TList.Create;
+	LoadText;
+	ReadTemplateIndex;
+	edProjectName.Text:= format(Lang[ID_NEWPROJECT], [dmMain.GetNumber]);
 end;
 
 procedure TNewProjectForm.FormDestroy(Sender: TObject);
 begin
-  fTemplates.Free;
+	fTemplates.Free;
 end;
 
 procedure TNewProjectForm.AddTemplate(FileName: string);
 var
- Template: TTemplate;
+	Template: TTemplate;
 begin
-  if not FileExists(FileName) then exit;
-  Template:= TTemplate.Create;
-  Template.ReadTemplateFile(FileName);
-  fTemplates.Add(Template);
+	if not FileExists(FileName) then exit;
+	Template:= TTemplate.Create;
+	Template.ReadTemplateFile(FileName);
+	fTemplates.Add(Template);
 end;
 
 procedure TNewProjectForm.ReadTemplateIndex;
@@ -125,10 +123,8 @@ begin
   end;
   LTemplates:= TStringList.Create;
   try
-   FilesFromWildCard(devDirs.Templates, '*' +TEMPLATE_EXT,
-     LTemplates, FALSE, FALSE, TRUE);
-   if LTemplates.Count> 0 then
-    begin
+   FilesFromWildCard(devDirs.Templates,'*'+TEMPLATE_EXT,LTemplates,FALSE,FALSE,TRUE);
+   if LTemplates.Count> 0 then begin
       for i:= 0 to pred(LTemplates.Count) do
        AddTemplate(LTemplates[i]);
       UpdateView;
@@ -158,33 +154,26 @@ begin
   result.OptionsRec:= Opts;
 end;
 
-procedure TNewProjectForm.ProjViewChange(Sender: TObject; Item: TListItem;
-  Change: TItemChange);
+procedure TNewProjectForm.ProjViewChange(Sender: TObject; Item: TListItem;Change: TItemChange);
 var
- LTemplate: TTemplate;
+	LTemplate: TTemplate;
 begin
-  if not assigned(ProjView.Selected) then
-   begin
-     TemplateLabel.Caption:= '';
-//     edProjectName.Text:= '';
-     btnOk.Enabled := False;
-   end
-  else
-   begin
-     btnOk.Enabled := True;
-     LTemplate:= TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
-     if not assigned(LTemplate) then exit;
-     TemplateLabel.Caption:= LTemplate.Description;
+	if not assigned(ProjView.Selected) then begin
+		TemplateLabel.Caption:= '';
+		btnOk.Enabled := False;
+	end else begin
+		btnOk.Enabled := True;
+		LTemplate:= TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
+		if not assigned(LTemplate) then
+			exit;
+		TemplateLabel.Caption:= LTemplate.Description;
 
-     if LTemplate.OptionsRec.useGPP then
-     begin
-         rbC.Enabled := False;
-         rbCpp.Checked := True;
-     end else
-         rbC.Enabled := True;
-
-//     edProjectName.Text:= LTemplate.ProjectName;
-   end;
+		if LTemplate.OptionsRec.useGPP then begin
+			rbC.Enabled := False;
+			rbCpp.Checked := True;
+		end else
+			rbC.Enabled := True;
+	end;
 end;
 
 procedure TNewProjectForm.LoadText;
@@ -223,11 +212,10 @@ var
  LIcon: TIcon;
  fName: string;
 begin
-  for idx:= 0 to pred(fTemplates.Count) do
-   begin
-     LTemplate:= TTemplate(fTemplates[idx]);
-     if not HasPage(LTemplate.Catagory) then
-      TabsMain.Tabs.Append(LTemplate.Catagory);
+	for idx:= 0 to pred(fTemplates.Count) do begin
+		LTemplate:= TTemplate(fTemplates[idx]);
+		if not HasPage(LTemplate.Catagory) then
+			TabsMain.Tabs.Append(LTemplate.Catagory);
    end;
 
   // create current page
@@ -236,37 +224,34 @@ begin
   else
    ProjView.LargeImages:= ImageList;
 
-  ProjView.Items.Clear;
-  for idx:= pred(ImageList1.Count) downto 1 do
-   ImageList1.Delete(idx);
+	ProjView.Items.Clear;
+	for idx:= pred(ImageList1.Count) downto 1 do
+		ImageList1.Delete(idx);
 
-  for idx:= 0 to pred(fTemplates.Count) do
-   begin
-     LTemplate:= TTemplate(fTemplates[idx]);
-     if LTemplate.Catagory = '' then LTemplate.Catagory:= Lang[ID_NP_PRJSHEET];
-     if AnsiCompareText(LTemplate.Catagory, TabsMain.Tabs[TabsMain.TabIndex]) = 0 then
-      begin
-        Item:= ProjView.Items.Add;
-        Item.Caption:= LTemplate.Name;
-        Item.Data:= pointer(idx);
-//        ShowMessage(LTemplate.Name + ': ' + LTemplate.OptionsRec.icon);
-        fName:= ValidateFile(LTemplate.OptionsRec.Icon, ExtractFilePath(LTemplate.FileName));
-        if fName <> '' then
-         begin
-           LIcon:= TIcon.Create;
-           try
-            LIcon.LoadFromFile(ExpandFileto(fName, ExtractFilePath(LTemplate.FileName)));
-            Item.ImageIndex:= ImageList1.AddIcon(LIcon);
-            if Item.ImageIndex = -1 then
-             Item.ImageIndex:= 0;
-           finally
-            LIcon.Free;
-           end;
-         end
-        else
-         Item.ImageIndex:= LTemplate.IconIndex;
-      end;
-   end;
+	for idx:= 0 to pred(fTemplates.Count) do begin
+		LTemplate:= TTemplate(fTemplates[idx]);
+		if LTemplate.Catagory = '' then
+			LTemplate.Catagory:= Lang[ID_NP_PRJSHEET];
+		if AnsiCompareText(LTemplate.Catagory, TabsMain.Tabs[TabsMain.TabIndex]) = 0 then begin
+			Item:= ProjView.Items.Add;
+			Item.Caption:= LTemplate.Name;
+			Item.Data:= pointer(idx);
+			fName:= ValidateFile(LTemplate.OptionsRec.Icon, ExtractFilePath(LTemplate.FileName));
+			if fName <> '' then begin
+				LIcon:= TIcon.Create;
+				try
+					LIcon.LoadFromFile(ExpandFileto(fName, ExtractFilePath(LTemplate.FileName)));
+					Item.ImageIndex:= ImageList1.AddIcon(LIcon);
+					if Item.ImageIndex = -1 then
+						Item.ImageIndex:= 0;
+				finally
+					LIcon.Free;
+				end;
+			end else begin
+				Item.ImageIndex:= LTemplate.IconIndex;
+			end;
+		end;
+	end;
 end;
 
 procedure TNewProjectForm.TabsMainChange(Sender: TObject);

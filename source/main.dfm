@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 1095
-  Top = 413
+  Left = 930
+  Top = 355
   Width = 587
   Height = 587
   Color = clBtnFace
@@ -1185,7 +1185,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 161
-        Height = 264
+        Height = 265
         Align = alClient
         ChangeDelay = 1
         DragMode = dmAutomatic
@@ -1217,7 +1217,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 161
-        Height = 264
+        Height = 265
         Align = alClient
         Images = dmMain.ClassImages
         ReadOnly = True
@@ -1252,7 +1252,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 161
-        Height = 264
+        Height = 265
         Align = alClient
         Images = dmMain.MenuImages_NewLook
         Indent = 19

@@ -134,45 +134,51 @@ uses
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
 
-procedure FilesFromWildcard(Directory, Mask: String; var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
+   procedure FilesFromWildcard(Directory, Mask: String;var Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 var
-	SearchResult: TSearchRec;
-	Attr, Error: Integer;
+  SearchRec: TSearchRec;
+  Attr, Error: Integer;
 begin
-	Directory := IncludeTrailingPathDelimiter(Directory);
+  Directory := IncludeTrailingPathDelimiter(Directory);
 
-	// Find any file, optionally exclude directories
-	Attr := faAnyFile;
-	if ShowDirs = False then
-		Attr := Attr - faDirectory;
+  { First, find the required file... }
+  Attr := faAnyFile;
+  if ShowDirs = False then
+     Attr := Attr - faDirectory;
+  Error := FindFirst(Directory + Mask, Attr, SearchRec);
+  if (Error = 0) then
+  begin
+     while (Error = 0) do
+     begin
+     { Found one! }
+        Files.Add(Directory + SearchRec.Name);
+        Error := FindNext(SearchRec);
+        if Multitasking then
+           Application.ProcessMessages;
+     end;
+     FindClose(SearchRec);
+  end;
 
-	// If a file is found...
-	if (FindFirst(Directory + Mask, Attr, SearchResult) = 0) then begin
-		// While files are being found...
-		while (FindNext(SearchResult) = 0) do begin
-			Files.Add(Directory + SearchResult.Name);
-			if Multitasking then
-				Application.ProcessMessages;
-		end;
-		FindClose(SearchResult);
-	end;
-
-	// Scan folders if requested
-	if Subdirs then begin
-		Error := FindFirst(Directory + '*.*', faAnyFile, SearchResult);
-		if (FindFirst(Directory + '*.*', faAnyFile, SearchResult) = 0) then begin
-			while (Error = 0) do begin
-				{ Found one! }
-				if (SearchResult.Name[1] <> '.') and (SearchResult.Attr and faDirectory <> 0) then
-					{ We do this recursively! }
-					FilesFromWildcard(Directory + SearchResult.Name, Mask, Files, Subdirs, ShowDirs, Multitasking);
-				Error := FindNext(SearchResult);
-			end;
-			FindClose(SearchResult);
-		end;
-	end;
+  { Then walk through all subdirectories. }
+  if Subdirs then
+  begin
+     Error := FindFirst(Directory + '*.*', faAnyFile, SearchRec);
+     if (Error = 0) then
+     begin
+        while (Error = 0) do
+        begin
+           { Found one! }
+           if (SearchRec.Name[1] <> '.') and (SearchRec.Attr and
+             faDirectory <> 0) then
+              { We do this recursively! }
+              FilesFromWildcard(Directory + SearchRec.Name, Mask, Files,
+                Subdirs, ShowDirs, Multitasking);
+           Error := FindNext(SearchRec);
+        end;
+     FindClose(SearchRec);
+     end;
+  end;
 end;
-
 function ExecuteFile(const FileName, Params, DefaultDir: string;
   ShowCmd: Integer): THandle;
 begin

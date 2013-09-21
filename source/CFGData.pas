@@ -64,8 +64,8 @@ type
    procedure SaveSettingB(const key: string; const entry: string; const value: boolean);
    procedure SaveSettingS(const key: string; const Entry: string; const value: string);
 
-   function LoadSettingB(const key: string; const entry: string): boolean; overload;
-   function LoadSettingB(const key: string; const entry: string; const default: string): boolean; overload;
+   function LoadSettingB(const key,entry: string): boolean; overload;
+   function LoadSettingB(const key,entry,default: string): boolean; overload;
    function LoadSettingS(const key: string; const entry: string): string;
 
    // load/save TCFGOptions
@@ -309,13 +309,13 @@ begin
 			s:= GetINI.LoadSetting(key, Entry);
 
 		if s = '' then
-			s:= 'TRUE';
+			s:= default;
 		if fboolAsWords then
-			result:= ReadboolString(s)
+			result:= ReadboolString(s) // TRUE vs FALSE
 		else
-			result:= strtoint(s) = 1;
+			result:= strtoint(s) = 1; // 1 vs 0
 	except
-		result:= TRUE;
+		result:= FALSE;
 	end;
 end;
 

@@ -44,8 +44,7 @@ type
   TDebugGutter = class(TSynEditPlugin)
   protected
     fEditor : TEditor;
-    procedure AfterPaint(ACanvas: TCanvas; const AClip: TRect;
-      FirstLine, LastLine: integer); override;
+    procedure AfterPaint(ACanvas: TCanvas; const AClip: TRect;FirstLine, LastLine: integer); override;
     procedure LinesInserted(FirstLine, Count: integer); override;
     procedure LinesDeleted(FirstLine, Count: integer); override;
   public
@@ -100,25 +99,18 @@ type
     procedure TurnOnBreakpoint(line: integer);
 
     procedure EditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
-    procedure EditorSpecialLineColors(Sender: TObject; Line: integer;
-      var Special: boolean; var FG, BG: TColor);
-    procedure EditorGutterClick(Sender: TObject; Button: TMouseButton;
-      x, y, Line: integer; mark: TSynEditMark);
-    procedure EditorReplaceText(Sender: TObject;
-      const aSearch, aReplace: string; Line, Column: integer;
-      var Action: TSynReplaceAction);
-    procedure EditorDropFiles(Sender: TObject; x, y: integer;
-      aFiles: TStrings);
+    procedure EditorSpecialLineColors(Sender: TObject; Line: integer;var Special: boolean; var FG, BG: TColor);
+    procedure EditorGutterClick(Sender: TObject; Button: TMouseButton;x, y, Line: integer; mark: TSynEditMark);
+    procedure EditorReplaceText(Sender: TObject;const aSearch, aReplace: string; Line, Column: integer;var Action: TSynReplaceAction);
+    procedure EditorDropFiles(Sender: TObject; x, y: integer;aFiles: TStrings);
     procedure EditorDblClick(Sender: TObject);
     procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure EditorHintTimer(sender : TObject);
 
     procedure SetFileName(value: string);
-    procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;
-                               FirstLine, LastLine: integer);
+    procedure DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
-    procedure FunctionArgsExecute(Kind: SynCompletionType; Sender: TObject;
-      var AString: String; var x, y: Integer; var CanExecute: Boolean);
+    procedure FunctionArgsExecute(Kind: SynCompletionType; Sender: TObject;var AString: String; var x, y: Integer; var CanExecute: Boolean);
    protected
     procedure DoOnCodeCompletion(Sender: TObject; const AStatement: TStatement; const AIndex: Integer); {** Modified by Peter **}
    public
@@ -126,6 +118,7 @@ type
     destructor Destroy; override;
     // RNC set the breakpoints for this file when it is opened
     procedure SetBreakPointsOnOpen;
+    procedure SetLineCol;
 
     // RNC 07-21-04
     // Add remove a breakpoint without calling OnBreakpointToggle
@@ -193,8 +186,7 @@ begin
   fEditor := ed;
 end;
 
-procedure TDebugGutter.AfterPaint(ACanvas: TCanvas; const AClip: TRect;
-                                  FirstLine, LastLine: integer);
+procedure TDebugGutter.AfterPaint(ACanvas: TCanvas; const AClip: TRect;FirstLine, LastLine: integer);
 begin
   fEditor.DrawGutterImages(ACanvas, AClip, FirstLine, LastLine);
 end;
@@ -402,15 +394,15 @@ end;
 
 procedure TEditor.Activate;
 begin
-  if assigned(fTabSheet) then
-   begin
-     fTabSheet.PageControl.Show;
-     fTabSheet.PageControl.ActivePage:=  fTabSheet;
-     if fText.Visible then
-       fText.SetFocus;
-     if MainForm.ClassBrowser1.Enabled then
-       MainForm.PageControlChange(MainForm.PageControl); // this makes sure that the classbrowser is consistent
-   end;
+	if assigned(fTabSheet) then begin
+		fTabSheet.PageControl.Show;
+		fTabSheet.PageControl.ActivePage:=  fTabSheet;
+
+		if fText.Visible then
+			fText.SetFocus;
+		if MainForm.ClassBrowser1.Enabled then
+			MainForm.PageControlChange(MainForm.PageControl); // this makes sure that the classbrowser is consistent
+	end;
 end;
 
 function TEditor.GetModified: boolean;
@@ -656,6 +648,12 @@ begin
    end;
 end;
 
+procedure TEditor.SetLineCol;
+begin
+	// keep statusbar updated
+	MainForm.Statusbar.Panels[0].Text:= format('%6d: %d', [fText.CaretY, fText.CaretX]);
+	MainForm.Statusbar.Panels[3].Text:= format(Lang[ID_LINECOUNT], [fText.Lines.Count]);
+end;
 
 procedure TEditor.EditorStatusChange(Sender: TObject;Changes: TSynStatusChanges);
 begin
@@ -760,28 +758,6 @@ begin
     GotoForm.Free;
   end;
 end;
-
-{
-procedure TEditor.GotoLine;
-var
- pt: TPoint;
-begin
-  with TGotoLineForm.Create(fText) do
-   try
-    pt.x:= (fText.Width div 2) - (Width div 2);
-    pt.y:= fText.Top;
-    pt:= fText.ClienttoScreen(pt);
-    Left:= pt.x;
-    Top:= pt.y;
-    Line.Value:= fText.CaretY;
-    if ShowModal = mrok then
-     fText.CaretXY:= point(fText.CaretX, Line.Value);
-    Activate;
-   finally
-    Free;
-   end;
-end;
-}
 
 procedure TEditor.InsertString(const Value: string; const move: boolean);
 var
@@ -929,8 +905,7 @@ begin
    end;
 end;
 
-procedure TEditor.DrawGutterImages(ACanvas: TCanvas; AClip: TRect;
-                                   FirstLine, LastLine: integer);
+procedure TEditor.DrawGutterImages(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
 var
   LH, X, Y: integer;
   ImgIndex: integer;
@@ -1050,58 +1025,56 @@ begin
   end;
 end;
 
-procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 var
-  M: TMemoryStream;
+	M: TMemoryStream;
 begin
+	// Indent/Unindent selected text with TAB key, like Visual C++ ...
+{$IFDEF WIN32}
+	if Key = VK_TAB then begin
+{$ENDIF}
+{$IFDEF LINUX}
+	if Key = XK_TAB then begin
+{$ENDIF}
+		if FText.SelText <> '' then begin
+			if FText.BlockBegin.Line <> FText.BlockEnd.Line then begin
+				if not (ssShift in Shift) then
+					FText.ExecuteCommand(ecBlockIndent, #0, nil)
+				else
+					FText.ExecuteCommand(ecBlockUnindent, #0, nil);
+				Abort;
+			end;
+		end;
+	end;
 
-  {** Modified by Peter **}
+	if fCompletionBox.Enabled then begin
+		fCompletionBox.OnKeyPress:=EditorKeyPress;
+		if ssCtrl in Shift then
 {$IFDEF WIN32}
-  if Key = VK_TAB then
+			if Key=VK_SPACE then begin
 {$ENDIF}
 {$IFDEF LINUX}
-  if Key = XK_TAB then
+			if Key=XK_SPACE then begin
 {$ENDIF}
-  begin
-    // Indent/Unindent selected text with TAB key, like Visual C++ ...
-    if FText.SelText <> '' then
-    begin
-      if not (ssShift in Shift) then FText.ExecuteCommand(ecBlockIndent, #0, nil)
-      else FText.ExecuteCommand(ecBlockUnindent, #0, nil);
-      Abort;
-    end;
-  end;
-  
-  if fCompletionBox.Enabled then begin
-    fCompletionBox.OnKeyPress:=EditorKeyPress;
-    if ssCtrl in Shift then
-{$IFDEF WIN32}
-      if Key=vk_Space then begin
-{$ENDIF}
-{$IFDEF LINUX}
-      if Key = XK_Space then begin
-{$ENDIF}
-        Key:=0;
-        if not (ssShift in Shift) then begin
-          M:=TMemoryStream.Create;
-          try
-            fText.Lines.SaveToStream(M);
-            fCompletionBox.CurrentClass:=MainForm.CppParser1.FindAndScanBlockAt(fFileName, fText.CaretY, M);
-          finally
-            M.Free;
-          end;
-          fCompletionBox.Search(nil, CurrentPhrase, fFileName);
-        end;
-        fCompletionEatSpace:=True; // this is a hack. without this after ctrl+space, the space appears in the editor :(
-      end;
-  end;
+				Key:=0;
+				if not (ssShift in Shift) then begin
+					M:=TMemoryStream.Create;
+					try
+						fText.Lines.SaveToStream(M);
+						fCompletionBox.CurrentClass:=MainForm.CppParser1.FindAndScanBlockAt(fFileName, fText.CaretY, M);
+					finally
+						M.Free;
+				end;
+				fCompletionBox.Search(nil, CurrentPhrase, fFileName);
+			end;
+			fCompletionEatSpace:=True; // this is a hack. without this after ctrl+space, the space appears in the editor :(
+		end;
+	end;
 end;
 
-procedure TEditor.EditorKeyUp(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TEditor.EditorKeyUp(Sender: TObject; var Key: Word;Shift: TShiftState);
 begin
-  fText.Cursor:=crIBeam;
+	fText.Cursor:=crIBeam;
 end;
 
 procedure TEditor.CompletionTimer(Sender: TObject);
@@ -1158,9 +1131,9 @@ begin
   fCompletionBox.Enabled:=devCodeCompletion.Enabled;
   fCompletionBox.OnCompletion := DoOnCodeCompletion; {** Modified by Peter **}
 
+  fText.OnKeyDown := EditorKeyDown; // This way tabs are also processed without Code Completion!
   if fCompletionBox.Enabled then begin
     fText.OnKeyPress := EditorKeyPress;
-    fText.OnKeyDown := EditorKeyDown;
     fText.OnKeyUp := EditorKeyUp;
     fCompletionBox.OnKeyPress:=EditorKeyPress;
     fCompletionBox.Width:=devCodeCompletion.Width;

@@ -1156,17 +1156,15 @@ begin
       end;
    end;
 
-   case devData.AutoOpen of
-    0:                              // Open All
-     for i:= 0 to pred(fUnits.Count) do
-      OpenUnit(i).Activate;
-    1:                              // Open First
-     OpenUnit(0).Activate;
-     else
-       LoadLayout;
-   end;
-   RebuildNodes;
-//   MainForm.ProjectView.FullExpand;
+	case devData.AutoOpen of
+		0:
+			for i:= 0 to pred(fUnits.Count) do OpenUnit(i).Activate; // Open all
+		1:
+			OpenUnit(0).Activate; // Open first
+		2:
+			LoadLayout; // Open nothing
+	end;
+	RebuildNodes;
 end;
 
 { end XXXKF changed }

@@ -206,7 +206,7 @@ object EnviroForm: TEnviroForm
         Width = 154
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
       end
       object cboTheme: TComboBox
@@ -215,7 +215,7 @@ object EnviroForm: TEnviroForm
         Width = 153
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 1
       end
       object cboTabsTop: TComboBox
@@ -651,8 +651,8 @@ object EnviroForm: TEnviroForm
         Caption = 'External programs associations:'
       end
       object btnExtAdd: TSpeedButton
-        Left = 98
-        Top = 286
+        Left = 97
+        Top = 282
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -660,8 +660,8 @@ object EnviroForm: TEnviroForm
         OnClick = btnExtAddClick
       end
       object btnExtDel: TSpeedButton
-        Left = 199
-        Top = 286
+        Left = 197
+        Top = 282
         Width = 99
         Height = 25
         Anchors = [akBottom]
@@ -671,8 +671,8 @@ object EnviroForm: TEnviroForm
       object vleExternal: TValueListEditor
         Left = 16
         Top = 24
-        Width = 360
-        Height = 255
+        Width = 356
+        Height = 251
         Anchors = [akLeft, akTop, akRight, akBottom]
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         Options = [goVertLine, goHorzLine, goEditing, goAlwaysShowEditor, goThumbTracking]
@@ -715,8 +715,8 @@ object EnviroForm: TEnviroForm
       end
       object lblAssocDesc: TLabel
         Left = 16
-        Top = 262
-        Width = 355
+        Top = 258
+        Width = 351
         Height = 49
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
@@ -728,8 +728,8 @@ object EnviroForm: TEnviroForm
       object lstAssocFileTypes: TCheckListBox
         Left = 16
         Top = 24
-        Width = 356
-        Height = 235
+        Width = 352
+        Height = 231
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
