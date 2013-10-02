@@ -1,5 +1,6 @@
 Version 5.4.3 - *
 
+- Dev-C++ now supports parsing STL files.
 - Clicking in the gutter does not change the caret position anymore.
 - Mouseover hints are now also shown when hovering above #includes.
 - Fixed editor closing not always remembering the previous tab.
@@ -18,6 +19,11 @@ Version 5.4.3 - *
 - The console pauser now does not show a "loading" cursor anymore.
 - Updated Japanese translation.
 - Added a toggle comment function (listens to Ctrl+/ by default).
+- Added the PlasticCodeWrap color style.
+- Cleaned up Project Options >> Compiler.
+- Changed the default font to Consolas.
+- Upgraded the parser: it now supports function pointer arguments and is a lot faster.
+- And much more.
 
 Version 5.4.2 - 24 Mei 2013
 

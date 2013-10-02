@@ -38,6 +38,7 @@ type
     procedure tabsChange(Sender: TObject);
     procedure vleSetEditText(Sender: TObject; ACol, ARow: Integer;const Value: String);
   public
+    fCurrentIndex : integer;
     procedure FillOptions;
   end;
 
@@ -53,10 +54,14 @@ uses
 procedure TCompOptionsFrame.FillOptions;
 var
 	I : integer;
+	CompilerSet: TdevCompilerSet;
 begin
-	for I := 0 to devCompiler.fOptionList.Count - 1 do
-		if tabs.Tabs.IndexOf(Lang[PCompilerOption(devCompiler.fOptionList[I])^.Section]) = -1 then
-			tabs.Tabs.Add(Lang[PCompilerOption(devCompiler.fOptionList[I])^.Section]);
+	if fCurrentIndex = -1 then
+		Exit;
+	CompilerSet := devCompilerSets[fCurrentIndex];
+	for I := 0 to CompilerSet.OptionList.Count - 1 do
+		if tabs.Tabs.IndexOf(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]) = -1 then
+			tabs.Tabs.Add(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]);
 
 	tabsChange(nil);
 end;
@@ -66,7 +71,11 @@ var
 	I,J,idx : integer;
 	currenttab : AnsiString;
 	option : TCompilerOption;
+	CompilerSet: TdevCompilerSet;
 begin
+	if fCurrentIndex = -1 then
+		Exit;
+
 	vle.OnSetEditText := nil;
 
 	vle.Strings.BeginUpdate;
@@ -74,8 +83,9 @@ begin
 
 	currenttab := tabs.Tabs[tabs.TabIndex];
 
-	for I := 0 to devCompiler.fOptionList.Count - 1 do begin
-		option := PCompilerOption(devCompiler.fOptionList[I])^;
+	CompilerSet := devCompilerSets[fCurrentIndex];
+	for I := 0 to CompilerSet.OptionList.Count - 1 do begin
+		option := PCompilerOption(CompilerSet.OptionList[I])^;
 		if SameStr(Lang[option.Section], currenttab) then begin
 			if Assigned(option.Choices) and (option.Value < option.Choices.Count) then
 				idx := vle.InsertRow(Lang[option.Name], option.Choices.Names[option.Value], True) // a,b,c,d
@@ -105,8 +115,13 @@ procedure TCompOptionsFrame.vleSetEditText(Sender: TObject; ACol,ARow: Integer; 
 var
 	option : PCompilerOption;
 	I: integer;
+	CompilerSet: TdevCompilerSet;
 begin
-	option := PCompilerOption(devCompiler.fOptionList[Integer(vle.Strings.Objects[ARow])]);
+	if fCurrentIndex = -1 then
+		Exit;
+	CompilerSet := devCompilerSets[fCurrentIndex];
+
+	option := PCompilerOption(CompilerSet.OptionList[Integer(vle.Strings.Objects[ARow])]);
 
 	if SameStr(Value,'Yes') then
 		option^.Value := 1
@@ -121,7 +136,7 @@ begin
 	end;
 
 	// update string too
-	devCompiler.SetOption(option,ValueToChar[option^.Value]);
+	CompilerSet.SetOption(option,ValueToChar[option^.Value]);
 end;
 
 end.

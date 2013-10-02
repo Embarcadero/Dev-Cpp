@@ -62,23 +62,26 @@ type
 
   TExceptionFrm = class(TForm)
     lblError: TLabel;
-    btnClose: TButton;
+    btnContinue: TButton;
     lblTitle: TLabel;
     lblAddressTitle: TLabel;
     lblAddress: TLabel;
     lblErrorTitle: TLabel;
     btnTerminate: TButton;
-    btnSend: TSpeedButton;
+    btnSend: TButton;
     Shape1: TShape;
     Bevel2: TBevel;
     Image1: TImage;
     memBugReport: TMemo;
     memUserReport: TMemo;
+    lblUpdateSuggest: TLabel;
+    lblUpdateLink: TLabel;
     procedure btnSendClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnTerminateClick(Sender: TObject);
-    procedure btnCloseClick(Sender: TObject);
+    procedure btnContinueClick(Sender: TObject);
+    procedure lblUpdateLinkClick(Sender: TObject);
   public
     fPlatform: AnsiString;
     fBuildTime: AnsiString;
@@ -406,11 +409,11 @@ begin
           + 'Platform      : ' + fPlatform + #13#10
           + 'OS version    : ' + fOSVersion + #13#10;
 
-  // Don't waste our precious 1280 bytes!
+  // We have room to spare with our POST approach, so include anyway
   if fAdditionalInfo <> '' then
     Result := Result + 'Service Pack  : ' + fAdditionalInfo + #13#10;
 
-  // TODO: remove this useless info?
+  // Idem dito
   Result := Result + 'Computer Name : ' + fComputerName;
 end;
 
@@ -502,6 +505,10 @@ var
 //	Buffer: array[0..1024] of Char;
 	Cmd, EmailBody, EmailSubject : AnsiString;
 begin
+	// Move focus to other button
+	btnSend.Default := false;
+	btnContinue.Default := true;
+
 	// use a blocking WinSock to send mail via PHP
 	Socket := TClientSocket.Create(self);
 	Socket.Port := 80;
@@ -578,9 +585,14 @@ begin
 		TerminateProcess(GetCurrentProcess, 0);
 end;
 
-procedure TExceptionFrm.btnCloseClick(Sender: TObject);
+procedure TExceptionFrm.btnContinueClick(Sender: TObject);
 begin
 	Close;
+end;
+
+procedure TExceptionFrm.lblUpdateLinkClick(Sender: TObject);
+begin
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
 initialization

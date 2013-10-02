@@ -1214,6 +1214,7 @@ begin
 	CommentHeaderMenuItem.Caption:=		Lang[ID_ITEM_COMMENTHEADER];
 	actComment.Caption:=				Lang[ID_ITEM_COMMENTSELECTION];
 	actUncomment.Caption:=				Lang[ID_ITEM_UNCOMMENTSELECTION];
+	actToggleComment.Caption:=			Lang[ID_ITEM_TOGGLECOMMENT];
 	actIndent.Caption:=					Lang[ID_ITEM_INDENTSELECTION];
 	actUnindent.Caption:=				Lang[ID_ITEM_UNINDENTSELECTION];
 	actSwapHeaderSource.Caption:=		Lang[ID_ITEM_SWAPHEADERSOURCE];
@@ -2722,7 +2723,7 @@ end;
 
 procedure TMainForm.actProjectOptionsExecute(Sender: TObject);
 begin
-	if assigned(fProject) then begin
+	if Assigned(fProject) then begin
 		fProject.ShowOptions;
 		UpdateAppTitle;
 	end;
@@ -2876,7 +2877,7 @@ begin
 		end;
 	end;
 
-	fCompiler.PerfectDepCheck := not devCompiler.FastDep;
+	fCompiler.PerfectDepCheck := not devCompilerSets.CurrentSet.FastDep;
 
 	if Assigned(fProject) then begin
 		if fProject.Options.VersionInfo.AutoIncBuildNr then
@@ -2889,6 +2890,7 @@ end;
 
 procedure TMainForm.actCompileExecute(Sender: TObject);
 begin
+	actStopExecuteExecute(nil);
 	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
@@ -2904,6 +2906,7 @@ procedure TMainForm.actRunExecute(Sender: TObject);
 var
 	e: TEditor;
 begin
+	actStopExecuteExecute(nil);
 	e:= GetEditor;
 	fCompiler.Target:= ctNone;
 
@@ -2931,6 +2934,7 @@ end;
 
 procedure TMainForm.actCompRunExecute(Sender: TObject);
 begin
+	actStopExecuteExecute(nil);
 	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
@@ -2944,6 +2948,7 @@ end;
 
 procedure TMainForm.actRebuildExecute(Sender: TObject);
 begin
+	actStopExecuteExecute(nil);
 	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
@@ -2955,11 +2960,18 @@ end;
 
 procedure TMainForm.actCleanExecute(Sender: TObject);
 begin
-	ClearCompileMessages;
+	actStopExecuteExecute(nil);
 	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
 	end;
+
+	// always show compilation log (no intrusive windows anymore)
+	if devData.ShowProgress then begin
+		OpenCloseMessageSheet(True);
+		MessageControl.ActivePage:= LogSheet;
+	end;
+	
 	fCompiler.Clean;
 end;
 
@@ -3013,8 +3025,9 @@ begin
 		SetCompilerOption(idxD,'1');
 		SetCompilerOption(idxS,'0');
 
+		// The project will save this option by iteself
 		if not Assigned(fProject) then
-			devCompiler.SaveSet(devCompiler.CurrentSet);
+			devCompilerSets.SaveSet(devCompilerSets.CurrentIndex);
 
 		fCompSuccessAction := csaDebug;
 		actRebuildExecute(nil);
@@ -3079,16 +3092,18 @@ begin
 	end;
 
 	// Add library folders
-	for I := 0 to devCompiler.LibDir.Count - 1 do
-		fDebugger.SendCommand('dir','"' + StringReplace(devCompiler.LibDir[i],'\','/',[rfReplaceAll]) + '"');
+	with devCompilerSets.CurrentSet do begin
+		for I := 0 to LibDir.Count - 1 do
+			fDebugger.SendCommand('dir','"' + StringReplace(LibDir[i],'\','/',[rfReplaceAll]) + '"');
 
-	// Add include folders
-	for I := 0 to devCompiler.CDir.Count - 1 do
-		fDebugger.SendCommand('dir','"' + StringReplace(devCompiler.CDir[i],'\','/',[rfReplaceAll]) + '"');
+		// Add include folders
+		for I := 0 to CDir.Count - 1 do
+			fDebugger.SendCommand('dir','"' + StringReplace(CDir[i],'\','/',[rfReplaceAll]) + '"');
 
-	// Add more include folders, duplicates will be added/moved to front of list
-	for I := 0 to devCompiler.CppDir.Count - 1 do
-		fDebugger.SendCommand('dir','"' + StringReplace(devCompiler.CppDir[i],'\','/',[rfReplaceAll]) + '"');
+		// Add more include folders, duplicates will be added/moved to front of list
+		for I := 0 to CppDir.Count - 1 do
+			fDebugger.SendCommand('dir','"' + StringReplace(CppDir[i],'\','/',[rfReplaceAll]) + '"');
+	end;
 
 	// Add breakpoints and watch vars
 	for i := 0 to fDebugger.WatchVarList.Count - 1 do
@@ -3155,7 +3170,7 @@ end;
 
 procedure TMainForm.actCompileUpdate(Sender: TObject);
 begin
-	TCustomAction(Sender).Enabled := (assigned(fProject) or (PageControl.PageCount > 0)) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling and (devCompiler.CurrentSet >= 0) and (devCompiler.CurrentSet < devCompiler.Sets.Count);
+	TCustomAction(Sender).Enabled := (assigned(fProject) or (PageControl.PageCount > 0)) and not fCompiler.Compiling and (devCompilerSets.CurrentIndex >= 0) and (devCompilerSets.CurrentIndex < devCompilerSets.Count);
 end;
 
 procedure TMainForm.actUpdatePageProject(Sender: TObject);
@@ -3743,7 +3758,7 @@ end;
 
 function TMainForm.GetEditorFromFileName(const ffile: AnsiString) : TEditor;
 var
-	index, index2 : integer; //mandrav
+	index, index2 : integer;
 	e: TEditor;
 begin
 	result := nil;
@@ -3805,10 +3820,13 @@ begin
 	CppParser.OnTotalProgress := CppParserTotalProgress;
 
 	// Add the include dirs to the parser
-	for I := 0 to devCompiler.CDir.Count - 1 do
-		CppParser.AddIncludePath(devCompiler.CDir[I]);
-	for I := 0 to devCompiler.CppDir.Count - 1 do
-		CppParser.AddIncludePath(devCompiler.CppDir[I]);
+	if Assigned(devCompilerSets.CurrentSet) then
+		with devCompilerSets.CurrentSet do begin
+			for I := 0 to CDir.Count - 1 do
+				CppParser.AddIncludePath(CDir[I]);
+			for I := 0 to CppDir.Count - 1 do
+			CppParser.AddIncludePath(CppDir[I]);
+		end;
 
 	// This takes up about 99% of our time
 	if devCodeCompletion.UseCacheFiles and ReloadCache then begin
@@ -3968,6 +3986,7 @@ end;
 
 procedure TMainForm.actSyntaxCheckExecute(Sender: TObject);
 begin
+	actStopExecuteExecute(nil);
 	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
@@ -3988,17 +4007,17 @@ end;
 procedure TMainForm.actRunUpdate(Sender: TObject);
 begin
 	if Assigned(fProject) then
-		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling
+		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and not fCompiler.Compiling
 	else
-		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling;
+		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and not fCompiler.Compiling;
 end;
 
 procedure TMainForm.actCompileRunUpdate(Sender: TObject);
 begin
 	if Assigned(fProject) then
-		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling and (devCompiler.Sets.Count > 0)
+		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and not fCompiler.Compiling and (devCompilerSets.Count > 0)
 	else
-		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and not devExecutor.Running and not fDebugger.Executing and not fCompiler.Compiling and (devCompiler.Sets.Count > 0);
+		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and not fCompiler.Compiling and (devCompilerSets.Count > 0);
 end;
 
 procedure TMainForm.EditorSaveTimer(Sender : TObject);
@@ -4430,7 +4449,7 @@ begin
 		SetCompilerOption(idxS,'0');
 
 		if not Assigned(fProject) then
-			devCompiler.SaveSet(devCompiler.CurrentSet);
+			devCompilerSets.SaveSet(devCompilerSets.CurrentIndex);
 
 		fCompSuccessAction := csaProfile;
 		actRebuildExecute(nil);
@@ -4450,10 +4469,8 @@ begin
 	//Gather data by running our project...
 	fRunEndAction := reaProfile;
 	if not FileExists(path) then begin
-		//if MessageDlg(Lang[ID_MSG_NORUNPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-			fRunEndAction := reaProfile;
-			actRunExecute(nil);
-		//end;
+		fRunEndAction := reaProfile;
+		actRunExecute(nil);
 	end else begin // If the data is there, open up the form
 		RunEndProc;
 	end;
@@ -4537,7 +4554,8 @@ var
 begin
 	case ChangeType of
 		mctChanged: begin
-			if MessageDlg(Filename + ' has changed. Reload from disk?', mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
+			Application.Restore;
+			if MessageDlg(Format(Lang[ID_ERR_FILECHANGED],[Filename]), mtConfirmation, [mbYes, mbNo], 0)=mrYes then begin
 				e:=GetEditorFromFileName(Filename);
 				if Assigned(e) then begin
 					p := e.Text.CaretXY;
@@ -4548,7 +4566,8 @@ begin
 			end;
 		end;
 		mctDeleted : begin
-			MessageDlg(Filename + ' has been renamed or deleted...', mtInformation, [mbOk], 0);
+			Application.Restore;
+			MessageDlg(Format(Lang[ID_ERR_RENAMEDDELETED],[Filename]), mtInformation, [mbOk], 0);
 		end;
 	end;
 end;
@@ -4735,7 +4754,7 @@ begin
 		Exit;
 
 	// profiling not enabled
-	if not devCompiler.FindOption('-pg', opt, idx) then
+	if not devCompilerSets.CurrentSet.FindOption('-pg', opt, idx) then
 		Exit;
 
 	if (fProject.Options.typ in [dptDyn, dptStat]) and (opt.Value > 0) then begin
@@ -5272,7 +5291,7 @@ var
 begin
 
 	// Try to find the value in the predefined list
-	if devCompiler.FindOption(option, optionstruct, index) then begin // the option exists...
+	if devCompilerSets.CurrentSet.FindOption(option, optionstruct, index) then begin // the option exists...
 
 		// Search project options...
 		if Assigned(fProject) then
@@ -5287,7 +5306,7 @@ begin
 	if Assigned(fProject) then
 		fProject.SetCompilerOption(index,value)
 	else
-		devCompiler.SetOption(index,value);
+		devCompilerSets.CurrentSet.SetOption(index,value);
 end;
 
 procedure TMainForm.SetupProjectView;
@@ -5305,6 +5324,7 @@ procedure TMainForm.actCompileCurrentFileExecute(Sender: TObject);
 var
 	e: TEditor;
 begin
+	actStopExecuteExecute(nil);
 	if fCompiler.Compiling then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
@@ -5965,7 +5985,7 @@ begin
 
 	// Don't create the autosave timer when we don't need it
 	if devEditor.EnableAutoSave then begin
-		AutoSaveTimer := TTImer.Create(Self);
+		AutoSaveTimer := TTimer.Create(Self);
 		AutoSaveTimer.OnTimer := EditorSaveTimer;
 		AutoSaveTimer.Interval := devEditor.Interval*60*1000; // miliseconds to minutes
 		AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
@@ -6064,7 +6084,7 @@ begin
 	UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
 
 	// Load the current compiler set (needs translations)
-	devCompiler.LoadSet(devCompiler.CurrentSet);
+	devCompilerSets.LoadSets;
 
 	// Try to fix the file associations. Needs write access to registry, which might cause exceptions to be thrown
 	DDETopic := DevCppDDEServer.Name;
@@ -6404,6 +6424,7 @@ end;
 
 procedure TMainForm.FindOutputDeletion(Sender: TObject; Item: TListItem);
 begin
+	if DontRecreateSingletons then Exit; // form is being destroyed, don't use Lang which has been freed already...
 	if FindOutput.Items.Count > 1 then
 		FindSheet.Caption := Lang[ID_SHEET_FIND] + ' (' + IntToStr(FindOutput.Items.Count - 1) + ')'
 	else
@@ -6413,6 +6434,7 @@ end;
 procedure TMainForm.CompilerOutputDeletion(Sender: TObject;
   Item: TListItem);
 begin
+	if DontRecreateSingletons then Exit; // form is being destroyed
 	if CompilerOutput.Items.Count > 1 then
 		CompSheet.Caption := Lang[ID_SHEET_COMP] + ' (' + IntToStr(CompilerOutput.Items.Count - 1) + ')'
 	else
@@ -6422,6 +6444,7 @@ end;
 procedure TMainForm.ResourceOutputDeletion(Sender: TObject;
   Item: TListItem);
 begin
+	if DontRecreateSingletons then Exit; // form is being destroyed
 	if ResourceOutput.Items.Count > 1 then
 		ResSheet.Caption := Lang[ID_SHEET_RES] + ' (' + IntToStr(ResourceOutput.Items.Count - 1) + ')'
 	else

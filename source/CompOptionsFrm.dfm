@@ -1,6 +1,6 @@
 object CompOptForm: TCompOptForm
-  Left = 722
-  Top = 383
+  Left = 746
+  Top = 341
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -17,7 +17,7 @@ object CompOptForm: TCompOptForm
   ShowHint = True
   OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
+  OnShow = InterfaceSave
   DesignSize = (
     484
     512)
@@ -102,7 +102,6 @@ object CompOptForm: TCompOptForm
     Height = 405
     ActivePage = tabCompiler
     TabOrder = 0
-    OnChange = MainPagesChange
     object tabCompiler: TTabSheet
       Caption = 'Compiler'
       DesignSize = (
@@ -127,7 +126,7 @@ object CompOptForm: TCompOptForm
         ScrollBars = ssVertical
         TabOrder = 1
         WantReturns = False
-        OnChange = CommandsChange
+        OnChange = InterfaceChange
       end
       object cbLinkerAdd: TCheckBox
         Left = 10
@@ -148,7 +147,7 @@ object CompOptForm: TCompOptForm
         ScrollBars = ssVertical
         TabOrder = 3
         WantReturns = False
-        OnChange = LinkerChange
+        OnChange = InterfaceChange
       end
     end
     object tabCodeGen: TTabSheet
@@ -737,7 +736,7 @@ object CompOptForm: TCompOptForm
         Width = 329
         Height = 23
         TabOrder = 0
-        OnChange = GccEditChange
+        OnChange = InterfaceChange
       end
       object GppEdit: TEdit
         Left = 80
@@ -745,7 +744,7 @@ object CompOptForm: TCompOptForm
         Width = 329
         Height = 23
         TabOrder = 1
-        OnChange = GppEditChange
+        OnChange = InterfaceChange
       end
       object MakeEdit: TEdit
         Left = 80
@@ -753,7 +752,7 @@ object CompOptForm: TCompOptForm
         Width = 329
         Height = 23
         TabOrder = 2
-        OnChange = MakeEditChange
+        OnChange = InterfaceChange
       end
       object GdbEdit: TEdit
         Left = 80
@@ -761,7 +760,7 @@ object CompOptForm: TCompOptForm
         Width = 329
         Height = 23
         TabOrder = 3
-        OnChange = GdbEditChange
+        OnChange = InterfaceChange
       end
       object WindresEdit: TEdit
         Left = 80
@@ -769,7 +768,7 @@ object CompOptForm: TCompOptForm
         Width = 329
         Height = 23
         TabOrder = 4
-        OnChange = WindresEditChange
+        OnChange = InterfaceChange
       end
       object DllwrapEdit: TEdit
         Left = 80
@@ -777,7 +776,7 @@ object CompOptForm: TCompOptForm
         Width = 329
         Height = 23
         TabOrder = 5
-        OnChange = DllwrapEditChange
+        OnChange = InterfaceChange
       end
       object GprofEdit: TEdit
         Left = 80
@@ -785,7 +784,7 @@ object CompOptForm: TCompOptForm
         Width = 329
         Height = 23
         TabOrder = 6
-        OnChange = GprofEditChange
+        OnChange = InterfaceChange
       end
     end
     object tabMakefile: TTabSheet
@@ -824,7 +823,7 @@ object CompOptForm: TCompOptForm
           Height = 17
           Caption = 'Use fast but imperfect dependency generation'
           TabOrder = 1
-          OnClick = cbFastDepClick
+          OnClick = InterfaceChange
         end
         object seCompDelay: TSpinEdit
           Left = 111
@@ -835,7 +834,7 @@ object CompOptForm: TCompOptForm
           MinValue = 0
           TabOrder = 0
           Value = 650
-          OnChange = seCompDelayChange
+          OnChange = InterfaceChange
         end
       end
     end
@@ -847,8 +846,8 @@ object CompOptForm: TCompOptForm
     Height = 53
     Caption = 'Compiler set to configure'
     TabOrder = 4
-    object btnAddCompilerSet: TSpeedButton
-      Left = 378
+    object btnAddBlankCompilerSet: TSpeedButton
+      Left = 360
       Top = 20
       Width = 22
       Height = 22
@@ -880,10 +879,10 @@ object CompOptForm: TCompOptForm
         BFBFBFBFBFBFBFBFBFBFBFBF5B5B5B353535353535353535BFBFBFBFBFBFBFBF
         BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
         BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
-      OnClick = btnAddCompilerSetClick
+      OnClick = btnAddBlankCompilerSetClick
     end
     object btnDelCompilerSet: TSpeedButton
-      Left = 402
+      Left = 432
       Top = 20
       Width = 22
       Height = 22
@@ -918,7 +917,7 @@ object CompOptForm: TCompOptForm
       OnClick = btnDelCompilerSetClick
     end
     object btnRenameCompilerSet: TSpeedButton
-      Left = 426
+      Left = 408
       Top = 20
       Width = 22
       Height = 22
@@ -953,11 +952,16 @@ object CompOptForm: TCompOptForm
       OnClick = btnRenameCompilerSetClick
     end
     object btnFindCompilers: TSpeedButton
-      Left = 354
+      Left = 336
       Top = 20
       Width = 22
       Height = 22
       Hint = 'Find and automatically configure compilers'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
       Glyph.Data = {
         36030000424D3603000000000000360000002800000010000000100000000100
         18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -985,12 +989,48 @@ object CompOptForm: TCompOptForm
         BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
         BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
         BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
+      ParentFont = False
       OnClick = btnFindCompilersClick
+    end
+    object btnAddFilledCompilerSet: TSpeedButton
+      Left = 384
+      Top = 20
+      Width = 22
+      Height = 22
+      Hint = 'Add a new compiler set'
+      Glyph.Data = {
+        36030000424D3603000000000000360000002800000010000000100000000100
+        18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0F0F0F0F
+        0F0F0F0F0F0F0F0FBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBF0F0F0F00C04400A33B00A33B008D310F0F0FBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0F0F0F94FF9400
+        C04400B33F00A33B0F0F0FBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBF0F0F0F94FF9400C04400C04400A33B0F0F0FBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0F0F0F0F0F0F0F0F0F0F0F0F94FF9400
+        C04400C04400A33B0F0F0F0F0F0F0F0F0F0F0F0FBFBFBFBFBFBFBFBFBF353535
+        00C04400A33B00A33B00A33B00C04400C04400C04400A33B00A33B00A33B00A3
+        3B008D310F0F0FBFBFBFBFBFBF35353594FF9400C04400C04400C04400C04400
+        C04400C04400C04400C04400C04400B33F00A33B0F0F0FBFBFBFBFBFBF353535
+        94FF9400E05000C04400C04400C04400C04400C04400C04400C04400C04400C0
+        4400A33B0F0F0FBFBFBFBFBFBF5B5B5BBFFFD694FF9494FF9494FF94BFFFD600
+        C04400C04400C044BFFFD694FF9494FF9400C0440F0F0FBFBFBFBFBFBFBFBFBF
+        5B5B5B35353535353535353594FF9400C04400C04400A33B0F0F0F0F0F0F0F0F
+        0F0F0F0FBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF35353594FF9400
+        C04400C04400A33B0F0F0FBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBF35353594FF9400E05000C04400A33B0F0F0FBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF5B5B5BBFFFD694
+        FF9494FF9400C0440F0F0FBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBFBFBFBF5B5B5B353535353535353535BFBFBFBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+        BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
+      OnClick = btnAddFilledCompilerSetClick
     end
     object cmbCompilerSetComp: TComboBox
       Left = 8
       Top = 20
-      Width = 345
+      Width = 321
       Height = 23
       Style = csDropDownList
       ItemHeight = 15

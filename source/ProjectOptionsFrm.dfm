@@ -1,6 +1,6 @@
 object frmProjectOptions: TfrmProjectOptions
-  Left = 527
-  Top = 304
+  Left = 993
+  Top = 552
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -412,29 +412,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Compiler'
       object lblCompilerSet: TLabel
         Left = 8
-        Top = 28
-        Width = 52
+        Top = 4
+        Width = 95
         Height = 15
-        Caption = 'Compiler:'
-      end
-      object lblCompileInfo: TLabel
-        Left = 0
-        Top = 0
-        Width = 526
-        Height = 22
-        Alignment = taCenter
-        AutoSize = False
-        Caption = 
-          'NOTE: These settings will override the global Compiler Options a' +
-          'nd affect this project only.'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clMaroon
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentFont = False
-        Layout = tlCenter
-        WordWrap = True
+        Caption = 'Base compiler set:'
       end
       object OptionsTip: TLabel
         Left = 0
@@ -464,20 +445,27 @@ object frmProjectOptions: TfrmProjectOptions
         ParentFont = False
         OnClick = OptionsLinkClick
       end
+      object lblCompilerHint: TLabel
+        Left = 8
+        Top = 56
+        Width = 209
+        Height = 15
+        Caption = 'Customize (applies to this project only):'
+      end
       inline CompOptionsFrame1: TCompOptionsFrame
         Left = 0
-        Top = 48
+        Top = 78
         Width = 526
-        Height = 217
+        Height = 187
         HorzScrollBar.Visible = False
         VertScrollBar.Visible = False
         TabOrder = 0
         inherited tabs: TTabControl
           Width = 526
-          Height = 217
+          Height = 187
           inherited vle: TCompOptionsList
             Width = 518
-            Height = 207
+            Height = 177
             DefaultColWidth = 215
             ParentShowHint = False
             ColWidths = (
@@ -487,9 +475,9 @@ object frmProjectOptions: TfrmProjectOptions
         end
       end
       object cmbCompiler: TComboBox
-        Left = 72
+        Left = 16
         Top = 24
-        Width = 449
+        Width = 495
         Height = 23
         Style = csDropDownList
         ItemHeight = 0

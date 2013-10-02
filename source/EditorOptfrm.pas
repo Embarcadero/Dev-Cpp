@@ -1104,7 +1104,7 @@ var
 	i: integer;
 	attr: TSynHighlighterAttributes;
 begin
-	if cboQuickColor.ItemIndex > 9 then begin
+	if cboQuickColor.ItemIndex > 10 then begin // 10 == number of built-in styles
 		// custom style; load from disk
 		LoadSyntax(cboQuickColor.Items[cboQuickColor.ItemIndex]);
 	end else begin
@@ -1406,8 +1406,8 @@ begin
 		Options := Options + [ofAllowMultiSelect];
 
 		// Start in the include folder, if it's set
-		if devCompiler.CppDir.Count > 0 then
-			InitialDir := devCompiler.CppDir[0];
+		if devCompilerSets.CurrentSet.CppDir.Count > 0 then
+			InitialDir := devCompilerSets.CurrentSet.CppDir[0];
 
 		if Execute then begin
 			Screen.Cursor:=crHourglass;

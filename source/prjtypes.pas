@@ -173,8 +173,8 @@ begin
 	ObjectOutput := '';
 	HostApplication := '';
 	SupportXPThemes:=False;
-	CompilerSet:=devCompiler.CurrentSet;
-	CompilerOptions:=devCompiler.fOptionString;
+	CompilerSet:=devCompilerSets.CurrentIndex;
+	CompilerOptions:=devCompilerSets[CompilerSet].OptionString;
 	VersionInfo := TProjVersionInfo.Create;
 	IncludeVersionInfo:=False;
 end;

@@ -1308,7 +1308,7 @@ begin
 	end;
 
 	result := MainForm.CppParser.GetFullFileName(filename);
-	if result = ExtractFileName(filename) then // no path info, so prepend path of active file
+	if (Length(result) <= 2) or (result[2] <> ':') then // no full path, so prepend path of active file
 		result := ExtractFilePath(fFileName) + filename;
 end;
 
@@ -1317,14 +1317,14 @@ var
 	Statement: PStatement;
 	FuncAddOn: AnsiString;
 begin
-	Statement:=fCompletionBox.SelectedStatement;
+	Statement := fCompletionBox.SelectedStatement;
 	if not Assigned(Statement) then Exit;
 
 	// if we are inserting a function,
 	if Statement^._Kind in [skFunction, skConstructor, skDestructor] then begin
 
-		// If they argument list is already there, don't add another ()
-		if fText.LineText[fText.WordEnd.Char] <> '(' then begin
+		// If the argument list is already there, don't add another ()
+		if (Length(fText.LineText) = 0) or (fText.LineText[fText.WordEnd.Char] <> '(') then begin
 			FuncAddOn := '()';
 		end else
 			FuncAddOn := '';
@@ -1398,8 +1398,8 @@ var
 		FileName: AnsiString;
 	begin
 		FileName := GetFullFileName(fText.Lines[p.Line - 1]);
-		if FileName <> '' then
-			fText.Hint := FileName + ' - Ctrl+Click to follow'
+		if (FileName <> '') and FileExists(FileName) then
+			fText.Hint := FileName + ' - Ctrl+Click for more info'
 		else
 			fText.Hint := '';
 	end;
@@ -1430,9 +1430,10 @@ var
 				M.Free;
 			end;
 
-			if Assigned(st) then
-				fText.Hint := MainForm.CppParser.PrettyPrintStatement(st) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click to follow'
-			else // couldn't find anything? disable hint
+			if Assigned(st) then begin
+				fText.Hint := MainForm.CppParser.PrettyPrintStatement(st) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click for more info';
+				fText.Hint := StringReplace(fText.Hint,'|',#5,[rfReplaceAll]); // vertical bar is used to split up short and long hint versions...
+			end else // couldn't find anything? disable hint
 				fText.Hint := '';
 		end;
 	end;
@@ -1473,7 +1474,7 @@ begin
 
 			// Either show an include filename or parser info
 			Line := Trim(fText.Lines[p.Line -1]);
-			if StartsStr('#include',line) then // show filename hint
+			if StartsStr('#include',line) or StartsStr('# include',line) then // show filename hint
 				ShowFileHint
 			else
 				ShowParserHint;
@@ -1581,7 +1582,7 @@ begin
 		J := 1;
 		while (J+1 <= length(editcopy)) and (editcopy[j] in [#0..#32]) do
 			Inc(J);
-		if (editcopy[j] = '/') and (editcopy[j+1] = '/') then begin
+		if (j+1 <= length(editcopy)) and (editcopy[j] = '/') and (editcopy[j+1] = '/') then begin
 			Delete(EditCopy,J,2);
 			fText.Lines[i] := editcopy;
 
@@ -1662,8 +1663,6 @@ begin
 			line := Trim(fText.Lines[p.Row-1]);
 			if StartsStr('#include',line) then begin
 				FileName := GetFullFileName(line);
-
-				// refer to the editor of the filename (will open if needed and made active)
 				e := MainForm.GetEditorFromFileName(FileName);
 				if Assigned(e) then
 					e.SetCaretPos(1,1);

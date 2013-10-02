@@ -718,7 +718,7 @@ object EditorOptForm: TEditorOptForm
       object cboQuickColor: TComboBox
         Left = 32
         Top = 356
-        Width = 117
+        Width = 130
         Height = 23
         Style = csDropDownList
         ItemHeight = 15
@@ -734,19 +734,20 @@ object EditorOptForm: TEditorOptForm
           'Matrix'
           'Obsidian'
           'GSS Hacker'
-          'Obvilion')
+          'Obvilion'
+          'PlasticCodeWrap')
       end
       object edSyntaxExt: TEdit
-        Left = 168
+        Left = 180
         Top = 356
-        Width = 297
+        Width = 280
         Height = 23
         TabOrder = 4
       end
       object cbSyntaxHighlight: TCheckBox
-        Left = 160
+        Left = 175
         Top = 330
-        Width = 313
+        Width = 300
         Height = 17
         Caption = 'Use Syntax Highlighting'
         TabOrder = 5

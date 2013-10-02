@@ -1,9 +1,9 @@
 object ExceptionFrm: TExceptionFrm
-  Left = 996
-  Top = 586
+  Left = 578
+  Top = 237
   BorderStyle = bsDialog
   Caption = 'Oops!'
-  ClientHeight = 416
+  ClientHeight = 456
   ClientWidth = 500
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -74,25 +74,6 @@ object ExceptionFrm: TExceptionFrm
     Width = 70
     Height = 13
     Caption = 'Error message:'
-  end
-  object btnSend: TSpeedButton
-    Left = 8
-    Top = 130
-    Width = 180
-    Height = 25
-    Hint = 
-      'Sends a bug report to the application support team describing th' +
-      'e error'
-    Caption = '&Send anonymous bug report'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = [fsBold]
-    ParentFont = False
-    ParentShowHint = False
-    ShowHint = True
-    OnClick = btnSendClick
   end
   object Bevel2: TBevel
     Left = 0
@@ -180,7 +161,54 @@ object ExceptionFrm: TExceptionFrm
       FFFFFE03FFFFFF07FFFFFF07FFFFFF87FFFFFF8FFFFFFF8FFFFFFFDFFFFFFFDF
       FFFFFFFF0000000000000000}
   end
-  object btnClose: TButton
+  object lblUpdateSuggest: TLabel
+    Left = 0
+    Top = 414
+    Width = 500
+    Height = 15
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'Please check for updates here, which might solve this bug:'
+  end
+  object lblUpdateLink: TLabel
+    Left = 0
+    Top = 434
+    Width = 500
+    Height = 15
+    Cursor = crHandPoint
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'http://sourceforge.net/projects/orwelldevcpp/'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsUnderline]
+    ParentFont = False
+    OnClick = lblUpdateLinkClick
+  end
+  object btnSend: TButton
+    Left = 8
+    Top = 130
+    Width = 180
+    Height = 25
+    Hint = 
+      'Sends a bug report to the application support team describing th' +
+      'e error'
+    Caption = '&Send anonymous bug report'
+    Default = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 0
+    OnClick = btnSendClick
+  end
+  object btnContinue: TButton
     Left = 300
     Top = 130
     Width = 92
@@ -190,12 +218,11 @@ object ExceptionFrm: TExceptionFrm
       'ution'
     Cancel = True
     Caption = '&Continue'
-    Default = True
     ModalResult = 1
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 0
-    OnClick = btnCloseClick
+    TabOrder = 1
+    OnClick = btnContinueClick
   end
   object btnTerminate: TButton
     Left = 400
@@ -206,7 +233,7 @@ object ExceptionFrm: TExceptionFrm
     Caption = '&Terminate'
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 1
+    TabOrder = 2
     OnClick = btnTerminateClick
   end
   object memBugReport: TMemo
@@ -223,8 +250,8 @@ object ExceptionFrm: TExceptionFrm
       'memBugReport')
     ParentFont = False
     ReadOnly = True
-    ScrollBars = ssBoth
-    TabOrder = 2
+    ScrollBars = ssVertical
+    TabOrder = 4
   end
   object memUserReport: TMemo
     Left = 8

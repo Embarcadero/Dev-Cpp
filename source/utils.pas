@@ -112,6 +112,8 @@ type
 
   function CountChar(const s : AnsiString;c : Char) : integer;
 
+  function CharToValue(c : char) : integer;
+
   procedure OpenHelpFile;
 
   function ProgramHasConsole(const Path : AnsiString) : boolean;
@@ -123,8 +125,6 @@ type
   function IsKeyDown(key : integer) : boolean;
 
   function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
-
-  function GetInfoOfCompiler(const binfolder : AnsiString) : AnsiString;
 
   // Fast replacements of localized functions
   function EndsStr(const subtext, text: AnsiString): boolean;
@@ -173,52 +173,6 @@ begin
 	result := EndsStr(' (x86)',AnsiString(buffer));
 end;
 
-function GetInfoOfCompiler(const binfolder : AnsiString) : AnsiString;
-var
-	gccoutput,gccversion,gcctype : AnsiString;
-	start,stop : integer;
-begin
-	result := '';
-
-	// Try the x64 version of GCC too
-	if FileExists(binfolder + 'gcc.exe') then
-		gccoutput := RunAndGetOutput(binfolder + 'gcc.exe -v',binfolder,nil,nil,nil,False)
-	else if FileExists(binfolder + 'x86_64-w64-mingw32-gcc.exe') then
-		gccoutput := RunAndGetOutput(binfolder + 'x86_64-w64-mingw32-gcc.exe -v',binfolder,nil,nil,nil,False)
-	else
-		Exit;
-
-	// Obtain version number and compiler distro
-	start := Pos('gcc version ',gccoutput);
-	if start > 0 then begin
-
-		// Find version number
-		Inc(start,Length('gcc version '));
-		stop := start;
-		while(not (gccoutput[stop] in [#0..#32])) do
-			Inc(stop);
-
-		gccversion := Copy(gccoutput,start,stop-start);
-
-		// Find compiler builder
-		start := stop;
-		while(not (gccoutput[start] = '(')) do
-			Inc(start);
-		while(not (gccoutput[stop] = ')')) do
-			Inc(stop);
-
-		gcctype := Copy(gccoutput,start,stop-start+1);
-
-		// Assemble user friendly name
-		if ContainsStr(gcctype,'tdm64') then
-			result := 'TDM-GCC ' + gccversion
-		else if ContainsStr(gcctype,'tdm') then
-			result := 'TDM-GCC ' + gccversion
-		else if ContainsStr(gcctype,'GCC') then
-			result := 'MinGW GCC ' + gccversion;
-	end;
-end;
-
 function IsEmpty(editor : TSynEdit) : boolean;
 var
 	i : integer;
@@ -230,6 +184,16 @@ begin
 			break;
 		end;
 	end;
+end;
+
+function CharToValue(c : char) : integer;
+begin
+	if c in ['a'..'z'] then
+		result := integer(c) - integer('a') + 2
+	else if (StrToIntDef(c, 0) = 1) then
+		result := 1
+	else
+		result := 0;
 end;
 
 function GetPrettyLine(hwnd : TListView;i : integer) : AnsiString;

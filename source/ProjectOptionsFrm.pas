@@ -122,7 +122,6 @@ type
     CompOptionsFrame1: TCompOptionsFrame;
     cmbCompiler: TComboBox;
     lblCompilerSet: TLabel;
-    lblCompileInfo: TLabel;
     lblAdditions: TLabel;
     lblCompiler: TLabel;
     edCompiler: TMemo;
@@ -147,6 +146,7 @@ type
     OptionsTip: TLabel;
     OptionsLink: TLabel;
     chkDefCpp: TCheckBox;
+    lblCompilerHint: TLabel;
     procedure ListClick(Sender: TObject);
     procedure EditChange(SEnder: TObject);
     procedure ButtonClick(Sender: TObject);
@@ -194,6 +194,7 @@ type
     function DefaultBuildCommand(idx: integer): AnsiString;
     procedure SaveDirSettings;
   public
+    fOldIndex : integer;
     fProjectCopy : TProject; // do work on this copy and assign it to the original when the user presses OK
     procedure SetInterface(Source : TProject); // fProjectCopy -> UI
     procedure GetInterface(Destination : TProject); // UI -> fProjectCopy
@@ -373,8 +374,8 @@ begin
 		// Files tab
 
 		// Compiler tab
-		CompilerOptions := devCompiler.fOptionString;
-		CompilerSet:=cmbCompiler.ItemIndex;
+		CompilerOptions := devCompilerSets[cmbCompiler.ItemIndex].OptionString;
+		CompilerSet := cmbCompiler.ItemIndex;
 
 		// Options tab
 		CompilerCmd:='';
@@ -500,11 +501,12 @@ begin
 		// Files tab
 
 		// Compiler tab
-		devCompiler.LoadSet(CompilerSet);
-		devCompiler.fOptionString := fProjectCopy.Options.CompilerOptions; // temporarily apply project settings
-		devCompiler.OptionStringToList(devCompiler.fOptionString);
-		cmbCompiler.Items.Assign(devCompiler.Sets);
-		cmbCompiler.ItemIndex:=CompilerSet;
+		for I := 0 to devCompilerSets.Count-1 do
+			cmbCompiler.Items.Add(devCompilerSets[i].Name);
+		cmbCompiler.ItemIndex := CompilerSet;
+		fOldIndex := CompilerSet;
+		devCompilerSets[CompilerSet].OptionString := fProjectCopy.Options.CompilerOptions;
+		CompOptionsFrame1.fCurrentIndex := cmbCompiler.ItemIndex;
 		CompOptionsFrame1.FillOptions;
 
 		// Options tab
@@ -602,6 +604,9 @@ procedure TfrmProjectOptions.FormCreate(Sender: TObject);
 begin
 	LoadText;
 
+	// Set default compiler set selection
+	fOldIndex := -1;
+
 	// Create file tree
 	lvFiles.Images:=MainForm.ProjectView.Images;
 	lvFiles.Items.Assign(MainForm.ProjectView.Items);
@@ -689,7 +694,7 @@ begin
   // files tab
   tabFiles.Caption:=           Lang[ID_POPT_FILESTAB];
   lblCompilerSet.Caption:=     Lang[ID_POPT_COMP];
-  lblCompileInfo.Caption:=     Lang[ID_POPT_COMPINFO];
+  lblCompilerHint.Caption:=    Lang[iD_POPT_COMPCUSTOMHINT];
   grpUnitOptions.Caption:=     '  '+Lang[ID_POPT_UNITOPTS]+'  ';
   lblPriority.Caption:=        Lang[ID_POPT_BUILDPRIORITY];
   chkCompile.Caption:=         Lang[ID_POPT_COMPUNIT];
@@ -1050,13 +1055,24 @@ end;
 
 procedure TfrmProjectOptions.cmbCompilerChange(Sender: TObject);
 begin
-	// When we change compiler sets, load defaults of selected compiler
-	if MessageDlg(Lang[ID_POPT_RESETPROJECTCOMPILER],mtConfirmation,[mbYes,mbNo],0) = mrYes then begin // replace settings by defaults
-		devCompiler.LoadSet(cmbCompiler.ItemIndex);
-		devCompiler.OptionStringToList(devCompiler.fOptionString);
-		fProjectCopy.Options.CompilerCmd := devCompiler.fOptionString;
-		CompOptionsFrame1.FillOptions;
+	if fOldIndex = cmbCompiler.ItemIndex then
+		Exit;
+
+	// If true, continue, otherwise, revert selection change
+	if (fOldIndex <> -1) and (MessageDlg(Lang[ID_POPT_DISCARDCUSTOM],mtConfirmation,[mbYes,mbNo],0) = mrNo) then begin
+		cmbCompiler.ItemIndex := fOldIndex;
+		Exit;
 	end;
+
+	// Discard changes made to the old set...
+	if fOldIndex <> -1 then
+		devCompilerSets.LoadSet(fOldIndex);
+
+	// And update UI
+	CompOptionsFrame1.fCurrentIndex := cmbCompiler.ItemIndex;
+	CompOptionsFrame1.FillOptions;
+
+	fOldIndex := cmbCompiler.ItemIndex;
 end;
 
 procedure TfrmProjectOptions.btnCancelClick(Sender: TObject);
@@ -1083,12 +1099,9 @@ begin
 		Filter := BuildFilter([FLT_LIBRARIES]);
 		Options := Options + [ofAllowMultiSelect];
 
-		// Pick the project compiler set
-		MainForm.fCompiler.SwitchToProjectCompilerSet;
-
 		// Start in the lib folder
-		if devCompiler.LibDir.Count > 0 then
-			InitialDir := devCompiler.LibDir[0];
+		if devCompilerSets.CurrentSet.LibDir.Count > 0 then
+			InitialDir := devCompilerSets.CurrentSet.LibDir[0];
 
 		if Execute then begin
 			for i := 0 to Files.Count - 1 do begin
@@ -1097,8 +1110,6 @@ begin
 				edLinker.Lines.Add(S);
 			end;
 		end;
-
-		MainForm.fCompiler.SwitchToOriginalCompilerSet;
 	finally
 		Free;
 	end;

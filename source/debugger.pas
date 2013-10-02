@@ -142,67 +142,66 @@ var
 	si : TStartupInfo;
 	sa : TSecurityAttributes;
 	gdb : AnsiString;
+	CompilerSet : TdevCompilerSet;
 begin
 	Executing := true;
-	MainForm.fCompiler.SwitchToProjectCompilerSet;
-	try
 
-		// Set up the security attributes struct.
-		sa.nLength := sizeof(TSecurityAttributes);
-		sa.lpSecurityDescriptor := nil;
-		sa.bInheritHandle := true;
+	// Set up the security attributes struct.
+	sa.nLength := sizeof(TSecurityAttributes);
+	sa.lpSecurityDescriptor := nil;
+	sa.bInheritHandle := true;
 
-		// Create the child output pipe.
-		if not CreatePipe(fOutputread, fOutputwrite, @sa, 0) then
-			MsgErr('CreatePipe output');
+	// Create the child output pipe.
+	if not CreatePipe(fOutputread, fOutputwrite, @sa, 0) then
+		MsgErr('CreatePipe output');
 
-		if not SetHandleInformation(fOutputread,HANDLE_FLAG_INHERIT,0) then
-			MsgErr('SetHandleInformation outputread');
+	if not SetHandleInformation(fOutputread,HANDLE_FLAG_INHERIT,0) then
+		MsgErr('SetHandleInformation outputread');
 
-		// Create the child input pipe.
-		if not CreatePipe(fInputread, fInputwrite, @sa, 0) then
-			MsgErr('CreatePipe input');
+	// Create the child input pipe.
+	if not CreatePipe(fInputread, fInputwrite, @sa, 0) then
+		MsgErr('CreatePipe input');
 
-		if not SetHandleInformation(fInputwrite,HANDLE_FLAG_INHERIT,0) then
-			MsgErr('SetHandleInformation inputwrite');
+	if not SetHandleInformation(fInputwrite,HANDLE_FLAG_INHERIT,0) then
+		MsgErr('SetHandleInformation inputwrite');
 
-		// Set up the start up info struct.
-		FillChar(si, sizeof(TStartupInfo), 0);
-		si.cb := sizeof(TStartupInfo);
-		si.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW or STARTF_USESHOWWINDOW;
-		si.hStdInput := fInputread;
-		si.hStdOutput := fOutputwrite;
-		si.hStdError := fOutputwrite;
-		si.wShowWindow := SW_HIDE;
+	// Set up the start up info struct.
+	FillChar(si, sizeof(TStartupInfo), 0);
+	si.cb := sizeof(TStartupInfo);
+	si.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW or STARTF_USESHOWWINDOW;
+	si.hStdInput := fInputread;
+	si.hStdOutput := fOutputwrite;
+	si.hStdError := fOutputwrite;
+	si.wShowWindow := SW_HIDE;
 
-		// Assume it's present in the first bin dir
-		if devCompiler.BinDir.Count > 0 then begin
-			gdb := devCompiler.BinDir[0] + pd + devCompiler.gdbName;
-			if not CreateProcess(nil, PAnsiChar('"' + gdb + '"' + ' --annotate=2 --silent'), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
-				MsgErr('Error launching:' + #13#10#13#10 + gdb + #13#10#13#10 + SysErrorMessage(GetLastError));
-				Executing := false;
-				Exit;
-			end;
-		end else
-			MsgErr('Error launching debugger: no executable directory provided!');
+	// Use the GDB provided in the project if needed
+	CompilerSet := devCompilerSets.CurrentSet;
 
-		fProcessID := pi.hProcess;
+	// Assume it's present in the first bin dir
+	if CompilerSet.BinDir.Count > 0 then begin
+		gdb := CompilerSet.BinDir[0] + pd + CompilerSet.gdbName;
+		if not CreateProcess(nil, PAnsiChar('"' + gdb + '"' + ' --annotate=2 --silent'), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
+			MsgErr('Error launching:' + #13#10#13#10 + gdb + #13#10#13#10 + SysErrorMessage(GetLastError));
+			Executing := false;
+			Exit;
+		end;
+	end else
+		MsgErr('Error launching debugger: no executable directory provided!');
 
-		// Create a thread that will read GDB output.
-		Reader := TDebugReader.Create(true);
-		Reader.hPipeRead := fOutputread;
-		Reader.FreeOnTerminate := true;
-		Reader.BreakpointList := BreakPointList;
-		Reader.WatchVarList := WatchVarList;
-		Reader.DebugTree := DebugTree;
-		Reader.Resume;
+	fProcessID := pi.hProcess;
 
-		MainForm.UpdateAppTitle;
+	// Create a thread that will read GDB output.
+	Reader := TDebugReader.Create(true);
+	Reader.hPipeRead := fOutputread;
+	Reader.FreeOnTerminate := true;
+	Reader.BreakpointList := BreakPointList;
+	Reader.WatchVarList := WatchVarList;
+	Reader.DebugTree := DebugTree;
+	Reader.Resume;
 
-		Application.HintHidePause := 5000;
-	finally
-		MainForm.fCompiler.SwitchToOriginalCompilerSet;
-	end;
+	MainForm.UpdateAppTitle;
+
+	Application.HintHidePause := 5000;
 end;
 
 procedure TDebugger.Stop;

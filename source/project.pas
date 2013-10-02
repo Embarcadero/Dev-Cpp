@@ -741,12 +741,12 @@ begin
 			fFolders.CommaText := ReadString('Project','Folders', '');
 			fOptions.IncludeVersionInfo := ReadBool('Project','IncludeVersionInfo', False);
 			fOptions.SupportXPThemes := ReadBool('Project','SupportXPThemes', False);
-			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompiler.CurrentSet);
-			if fOptions.CompilerSet > devCompiler.Sets.Count-1 then begin
+			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompilerSets.CurrentIndex);
+			if fOptions.CompilerSet > devCompilerSets.Count-1 then begin
 				MessageDlg('The compiler set you have selected for this project, no longer exists.'#13#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
-				fOptions.CompilerSet:=devCompiler.CurrentSet;
+				fOptions.CompilerSet := devCompilerSets.CurrentIndex; // TODO: translate
 			end;
-			fOptions.CompilerOptions:=ReadString('Project','CompilerSettings', devCompiler.fOptionString);
+			fOptions.CompilerOptions := ReadString('Project','CompilerSettings', devCompilerSets.CurrentSet.OptionString);
 
 			fOptions.VersionInfo.Major:=            ReadInteger('VersionInfo','Major',             0);
 			fOptions.VersionInfo.Minor:=            ReadInteger('VersionInfo','Minor',             1);
@@ -820,14 +820,8 @@ begin
 		WriteString('Project','Folders', fFolders.CommaText);
 		WriteBool('Project','IncludeVersionInfo', fOptions.IncludeVersionInfo);
 		WriteBool('Project','SupportXPThemes', fOptions.SupportXPThemes);
-
 		WriteInteger('Project','CompilerSet', fOptions.CompilerSet);
-		if(Length(fOptions.CompilerOptions) > 0) then
-			WriteString('Project','CompilerSettings', fOptions.CompilerOptions)
-		else begin
-			WriteString('Project','CompilerSettings', devCompiler.fOptionString);
-			fOptions.CompilerOptions := devCompiler.fOptionString;
-		end;
+		WriteString('Project','CompilerSettings', fOptions.CompilerOptions);
 
 		WriteInteger('VersionInfo','Major',            fOptions.VersionInfo.Major);
 		WriteInteger('VersionInfo','Minor',            fOptions.VersionInfo.Minor);
@@ -1498,15 +1492,15 @@ begin
 			end else
 				BuildPrivateResource;
 
-			// update the projects main node caption
+			// update the project's main node caption
 			if edProjectName.Text <> '' then begin
 				fName:= edProjectName.Text;
 				fNode.Text:= fName;
 			end;
 		end;
 
-		// Always discard changes, even if we canceled
-		devCompiler.LoadSet(devCompiler.CurrentSet);
+		// Discard changes, even when canceling
+		devCompilerSets.LoadSet(cmbCompiler.ItemIndex);
 	finally
 		Close;
 	end;

@@ -64,7 +64,6 @@ type
     procedure btnApplyClick(Sender: TObject);
     procedure chkCustomClick(Sender: TObject);
     procedure commandUpdate(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure lvFlatAdvancedCustomDraw(Sender: TCustomListView;
       const ARect: TRect; Stage: TCustomDrawStage;
       var DefaultDraw: Boolean);
@@ -72,7 +71,6 @@ type
       const ARect: TRect; Stage: TCustomDrawStage;
       var DefaultDraw: Boolean);
   private
-    gprofname : AnsiString;
     flatloaded : boolean;
     graphloaded : boolean;
     procedure LoadText;
@@ -151,7 +149,7 @@ begin
 
 	// Run a flat output
 	buffer := TStringList.Create;
-	buffer.Text := RunAndGetOutput(gprofname + Params, Dir, nil, nil, nil, False);
+	buffer.Text := RunAndGetOutput(devCompilerSets.CurrentSet.gprofName + Params, Dir, nil, nil, nil, False);
 
 	i := 0;
 
@@ -244,7 +242,7 @@ begin
 
 	// Run a graph output
 	buffer := TStringList.Create;
-	buffer.Text := RunAndGetOutput(gprofname + Params, Dir, nil, nil, nil, False);
+	buffer.Text := RunAndGetOutput(devCompilerSets.CurrentSet.gprofName + Params, Dir, nil, nil, nil, False);
 
 	i := 0;
 
@@ -432,7 +430,7 @@ var
 	assembly : AnsiString;
 begin
 	if not chkCustom.Checked then begin
-		assembly := gprofname;
+		assembly := devCompilerSets.CurrentSet.gprofName;
 		if Assigned(MainForm.fProject) then
 			assembly := assembly + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"'
 		else
@@ -444,14 +442,6 @@ begin
 		assembly := assembly + ' -m ' + spnMinCount.Text;
 		editCustom.Text := assembly;
 	end;
-end;
-
-procedure TProfileAnalysisForm.FormCreate(Sender: TObject);
-begin
-	// Load the proper gprof exe
-	MainForm.fCompiler.SwitchToProjectCompilerSet;
-	gprofname := devCompiler.gprofName;
-	MainForm.fCompiler.SwitchToOriginalCompilerSet;
 end;
 
 procedure TProfileAnalysisForm.lvFlatAdvancedCustomDraw(

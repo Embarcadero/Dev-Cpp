@@ -253,7 +253,9 @@ object LangForm: TLangForm
           'time.h'
           'wchar.h'
           'wctype.h'
-          'windows.h')
+          'windows.h'
+          'vector'
+          'list')
         MultiSelect = True
         TabOrder = 3
       end

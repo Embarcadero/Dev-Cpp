@@ -6,7 +6,7 @@ object MainForm: TMainForm
   AutoScroll = False
   Caption = 'Dev-C++'
   ClientHeight = 616
-  ClientWidth = 896
+  ClientWidth = 895
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -35,7 +35,7 @@ object MainForm: TMainForm
   object SplitterBottom: TSplitter
     Left = 0
     Top = 410
-    Width = 896
+    Width = 895
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -45,7 +45,7 @@ object MainForm: TMainForm
   object MessageControl: TPageControl
     Left = 0
     Top = 433
-    Width = 896
+    Width = 895
     Height = 183
     ActivePage = DebugSheet
     Align = alBottom
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -257,13 +257,13 @@ object MainForm: TMainForm
       object DebugSendPanel: TPanel
         Left = 589
         Top = 0
-        Width = 299
+        Width = 298
         Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
-          299
+          298
           155)
         object lblSendCommandGdb: TLabel
           Left = 4
@@ -275,7 +275,7 @@ object MainForm: TMainForm
         object edGdbCommand: TComboBox
           Left = 136
           Top = 3
-          Width = 159
+          Width = 158
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           ItemHeight = 13
@@ -285,8 +285,8 @@ object MainForm: TMainForm
         object DebugOutput: TMemo
           Left = 4
           Top = 30
-          Width = 292
-          Height = 107
+          Width = 291
+          Height = 118
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -452,7 +452,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 36
+          Height = 48
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -492,7 +492,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 888
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -536,7 +536,7 @@ object MainForm: TMainForm
   object Toolbar: TControlBar
     Left = 0
     Top = 16
-    Width = 896
+    Width = 895
     Height = 54
     Align = alTop
     AutoDock = False
@@ -900,7 +900,7 @@ object MainForm: TMainForm
   object Statusbar: TStatusBar
     Left = 0
     Top = 413
-    Width = 896
+    Width = 895
     Height = 20
     Panels = <
       item
@@ -918,7 +918,7 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 196
     Top = 70
-    Width = 700
+    Width = 699
     Height = 340
     Align = alClient
     HotTrack = True
@@ -935,7 +935,7 @@ object MainForm: TMainForm
   object pnlFull: TPanel
     Left = 0
     Top = 0
-    Width = 896
+    Width = 895
     Height = 16
     Align = alTop
     BevelOuter = bvNone
@@ -945,10 +945,10 @@ object MainForm: TMainForm
     TabOrder = 6
     Visible = False
     DesignSize = (
-      896
+      895
       16)
     object btnFullScrRevert: TSpeedButton
-      Left = 879
+      Left = 878
       Top = 0
       Width = 16
       Height = 16

@@ -38,7 +38,7 @@ const
 type
   // the comments are an example of the record
   PCompilerOption = ^TCompilerOption;
-	TCompilerOption = record
+  TCompilerOption = record
     Name: integer; // language table index of "Generate debugging info"
     Section: integer; // language table index of "C options"
     IsC: boolean;
@@ -49,14 +49,9 @@ type
     Choices : TStringList; // replaces "Yes/No" standard choices (max 30 different choices)
   end;
 
-  // compiler-set configuration
-  TdevCompiler = class(TPersistent)
+  TdevCompilerSet = class(TPersistent)
   private
-    // Names of all compilers
-    fSets: TStrings;
-    fCurrentSet : integer;
-
-    // Exe Directories
+    // Executables, most are hardcoded
     fgccName : AnsiString;
     fgppName : AnsiString;
     fmakeName : AnsiString;
@@ -65,63 +60,65 @@ type
     fdllwrapName : AnsiString;
     fgprofName : AnsiString;
 
-    // Folders
+    // Directories, mostly hardcoded too
     fBinDir : TStringList;
     fCDir : TStringList;
     fCppDir : TStringList;
     fLibDir : TStringList;
 
-    // User Parameters
+    // Misc. properties
+    fDumpMachine : AnsiString; // "x86_64-w64-mingw32", "mingw32" etc
+    fVersion : AnsiString; // "4.7.1"
+    fType : AnsiString; // "TDM-GCC", "MinGW"
+    fName: AnsiString; // "TDM-GCC 4.7.1 Release"
+    fFolder: AnsiString; // MinGW64, MinGW32
+
+    // User settings
     fCompAdd : boolean;
     fLinkAdd : boolean;
     fCompOpt : AnsiString;
     flinkOpt : AnsiString;
-
     fDelay : integer;
     fFastDep : boolean;
-  public
 
+    // Options
     fOptionString : AnsiString; // options in INI format
     fOptionList: TList; // options in usable memory format
 
-    constructor Create;
+    // Initialization
+    procedure SetProperties(const BinDir,BinFile : AnsiString);
+    procedure SetExecutables;
+    procedure SetDirectories;
+    procedure SetUserInput;
+    procedure SetOptions;
+
+    // Keeps string and list synchronized
+    procedure SetOptionString(const value : AnsiString);
+    procedure OptionListToString;
+
+    // Validation
+    function Validate : boolean; // returns true if valid
+    function ValidateDirs : boolean; // idem
+    function ValidateExes : boolean; // idem
+  public
+    constructor Create; overload; // create empty shell
+    constructor Create(const folder : AnsiString); overload; // create, and let if configure itself
     destructor Destroy; override;
-    procedure SettoDefaults(const setname,dir : AnsiString);
+    procedure Assign(Source: TPersistent); override;
 
-    // Set stuff
-    procedure LoadSet(Index: integer);
-    procedure SaveSet(Index: integer);
-    procedure EraseSet(Index: integer);
-    procedure ClearSet;
-    procedure ValidateSet;
-    procedure ValidateDirs;
-    procedure ValidateExes;
-    procedure AddSet(const Name,Folder : AnsiString);
-
-    procedure ReadSets;
-    procedure WriteSets;
-    procedure FindSets;
-
-    property Sets: TStrings read fSets write fSets;
-    property CurrentSet: integer read fCurrentSet write fCurrentSet;
+    // Clearing and saving to disk is done by TdevCompilerSet
+    procedure Clear;
 
     // Option utils
-    procedure AddDefaultOptions;
     procedure AddOption(Name, Section: integer; IsC, IsCpp, IsLinker: boolean; Value: integer;const Setting : AnsiString; Choices: TStringList);
     function FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
     procedure SetOption(option : PCompilerOption; newvalue : char); overload;
     procedure SetOption(index : integer; newvalue : char); overload;
 
-    // converts
-    procedure OptionStringToList(var input : AnsiString);
-    procedure OptionListToString;
+    // Obtain response from compiler
+    function GetCompilerOutput(const BinDir,BinFile,Input : AnsiString) : AnsiString;
 
-    // utils
-    function CharToValue(c : char) : integer;
-
-    property Delay: integer read fDelay write fDelay;
-    property FastDep: boolean read fFastDep write fFastDep;
-
+    // Executables
     property gccName: AnsiString read fgccName write fgccName;
     property gppName: AnsiString read fgppName write fgppName;
     property makeName: AnsiString read fmakeName write fmakeName;
@@ -130,15 +127,59 @@ type
     property dllwrapName: AnsiString read fdllwrapName write fdllwrapName;
     property gprofName: AnsiString read fgprofName write fgprofName;
 
+    // Directories
     property BinDir: TStringList read fBinDir write fBinDir;
     property CDir: TStringList read fCDir write fCDir;
     property CppDir: TStringList read fCppDir write fCppDir;
     property LibDir: TStringList read fLibDir write fLibDir;
 
+    // TODO: Properties
+    property Name: AnsiString read fName write fName;
+
+    // Options
+    property OptionList: TList read fOptionList write fOptionList;
+    property OptionString: AnsiString read fOptionString write SetOptionString;
+
+    // User settings
     property AddtoComp: boolean read fCompAdd write fCompAdd;
     property AddtoLink: boolean read fLinkAdd write fLinkAdd;
     property CompOpts: AnsiString read fCompOpt write fCompOpt;
     property LinkOpts: AnsiString read fLinkOpt write fLinkOpt;
+    property Delay: integer read fDelay write fDelay;
+    property FastDep: boolean read fFastDep write fFastDep;
+  end;
+
+  // compiler-set configuration
+  TdevCompilerSets = class(TPersistent)
+  private
+    fList: TList; // list of TdevCompilerSet
+    fCurrentIndex : integer;
+    function GetCurrentSet: TdevCompilerSet;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    // sigle set management in memory
+    procedure LoadSet(Index: integer;const SetName : AnsiString = '');
+    procedure SaveSet(Index: integer);
+    function AddSet : TdevCompilerSet; overload; // add empty shell
+    function AddSet(const Folder : AnsiString) : TdevCompilerSet; overload; // add empty shell, let it configure itself
+    function AddSet(compilerset : TdevCompilerSet) : TdevCompilerSet; overload; // add deep copy
+    function GetSet(Index: integer) : TdevCompilerSet;
+    procedure DeleteSet(Index: integer);
+    function Count : integer;
+
+    // all set management on disk
+    procedure LoadSets; // load everything from disk
+    procedure SaveSets; // save everything to disk
+    procedure SaveSetList; // only save the CompilerSets section
+    procedure FindSets;
+    procedure ClearSets;
+
+    // access to list
+    property CurrentSet: TdevCompilerSet read GetCurrentSet;
+    property CurrentIndex: integer read fCurrentIndex write fCurrentIndex;
+    property Sets[index: integer]: TdevCompilerSet read GetSet; default;
   end;
 
   // code-completion window size and other config
@@ -638,7 +679,7 @@ procedure CheckForAltConfigFile(const filename: AnsiString);
 procedure UpdateAltConfigFile;
 
 var
-  devCompiler: TdevCompiler = nil;
+  devCompilerSets: TdevCompilerSets = nil;
   devDirs: TdevDirs = nil;
   devEditor: TdevEditor = nil;
   devCodeCompletion: TdevCodeCompletion = nil;
@@ -671,41 +712,42 @@ begin
 	if not assigned(devDirs) then
 		devDirs:= TdevDirs.Create;
 
-	if not assigned(devCompiler) then
-		devCompiler:= TdevCompiler.Create;
+	if not assigned(devCompilerSets) then
+		devCompilerSets:= TdevCompilerSets.Create;
 
 	// load available compiler sets on first run
 	if devData.First then begin
 
 		// Obtain list of default compilers
-		devCompiler.Sets.Clear;
-		devCompiler.FindSets;
-		devCompiler.CurrentSet := -1;
+		devCompilerSets.FindSets;
+		devCompilerSets.CurrentIndex := -1;
 
 		// Pick a proper default
 		if IsWindows64 then begin // TDM-GCC x64, MinGW32, ???
-			for I := 0 to devCompiler.Sets.Count - 1 do begin
-				if ContainsText(devCompiler.Sets[i],'TDM-GCC') then begin
-					devCompiler.CurrentSet := i;
+			for I := 0 to devCompilerSets.Count - 1 do begin
+				if ContainsText(devCompilerSets[i].Name,'TDM-GCC') then begin
+					devCompilerSets.CurrentIndex := i;
 					break;
 				end;
 			end;
 
-			if devCompiler.CurrentSet = -1 then
-				devCompiler.CurrentSet := 0; // pick any
+			// Pick the 'release' build
+			if devCompilerSets.CurrentIndex = -1 then
+				devCompilerSets.CurrentIndex := 0;
 
 		end else begin // TDM-GCC x86, MinGW32, ???
-			for I := 0 to devCompiler.Sets.Count - 1 do begin
-				if ContainsText(devCompiler.Sets[i],'TDM-GCC') and ContainsText(devCompiler.Sets[i],'32-bit') then begin
-					devCompiler.CurrentSet := i;
+			for I := 0 to devCompilerSets.Count - 1 do begin
+				if ContainsText(devCompilerSets[i].Name,'TDM-GCC') and ContainsText(devCompilerSets[i].Name,'32-bit') then begin
+					devCompilerSets.CurrentIndex := i;
 					break;
 				end;
 			end;
 
-			if devCompiler.CurrentSet = -1 then
-				devCompiler.CurrentSet := 0; // pick any
+			// Again, pick the 'release' build
+			if devCompilerSets.CurrentIndex = -1 then
+				devCompilerSets.CurrentIndex := 0; // pick any
 		end;
-		devCompiler.WriteSets; // save CurrentSet setting to disk
+		devCompilerSets.SaveSets; // save everything to disk
 	end;
 
 	if not assigned(devEditor) then
@@ -740,7 +782,7 @@ procedure FinalizeOptions;
 begin
   // devData is freed last
   devDirs.Free;
-  devCompiler.Free;
+  devCompilerSets.Free;
   devEditor.Free;
   devCodeCompletion.Free;
   devClassBrowsing.Free;
@@ -820,25 +862,25 @@ var
 	end;
 
 begin
-  fFirst:= TRUE;
-  fLang:= 'English.lng';
-  fFindCols:= '75, 75, 120, 150';
-  fCompCols:= '75, 75, 120, 150';
-  fMsgTabs:= 0; // Top
-  fMRUMax:= 10;
-  fMinOnRun:= FALSE;
-  fBackup:= FALSE;
-  fAutoOpen:= 2; // Reopen
-  fShowLeftPages:= TRUE;
-  fLeftActivePage:= 0;
-  fProjectWidth:=161;
-  fOutputHeight:=183;
-  fStatusbar:= TRUE;
-  fShowBars:= FALSE;
-  fMultiLineTab:= TRUE;
-  fDefCpp:= TRUE;
-  fdblFiles:= FALSE;
-  fConsolePause:=TRUE;
+	fFirst:= TRUE;
+	fLang:= 'English.lng';
+	fFindCols:= '75, 75, 120, 150';
+	fCompCols:= '75, 75, 120, 150';
+	fMsgTabs:= 0; // Top
+	fMRUMax:= 10;
+	fMinOnRun:= FALSE;
+	fBackup:= FALSE;
+	fAutoOpen:= 2; // Reopen
+	fShowLeftPages:= TRUE;
+	fLeftActivePage:= 0;
+	fProjectWidth:=161;
+	fOutputHeight:=183;
+	fStatusbar:= TRUE;
+	fShowBars:= FALSE;
+	fMultiLineTab:= TRUE;
+	fDefCpp:= TRUE;
+	fdblFiles:= FALSE;
+	fConsolePause:=TRUE;
 
 	fToolbarMain:=TRUE;
 	fToolbarMainX:=11;
@@ -873,25 +915,25 @@ begin
 		fInterfaceFont := 'MS Sans Serif';
 	end;
 
-  //read associations set by installer as defaults
-  fAssociateC := getAssociation(0);
-  fAssociateCpp := getAssociation(1);
-  fAssociateH := getAssociation(2);
-  fAssociateHpp := getAssociation(3);
-  fAssociateDev := getAssociation(4);
-  fAssociateRc := getAssociation(5);
-  fAssociateTemplate := getAssociation(6);
-  fCheckAssocs := false;
+	//read associations set by installer as defaults
+	fAssociateC := getAssociation(0);
+	fAssociateCpp := getAssociation(1);
+	fAssociateH := getAssociation(2);
+	fAssociateHpp := getAssociation(3);
+	fAssociateDev := getAssociation(4);
+	fAssociateRc := getAssociation(5);
+	fAssociateTemplate := getAssociation(6);
+	fCheckAssocs := false;
 
-  fShowTipsOnStart := TRUE;
-  fLastTip := 0;
-  fShowProgress := TRUE;
-  fAutoCloseProgress := TRUE;
-  fPrintColors := TRUE;
-  fPrintHighlight := TRUE;
-  fPrintWordWrap := FALSE;
-  fPrintLineNumbers := TRUE;
-  fPrintLineNumbersMargins := FALSE;
+	fShowTipsOnStart := TRUE;
+	fLastTip := 0;
+	fShowProgress := TRUE;
+	fAutoCloseProgress := FALSE;
+	fPrintColors := TRUE;
+	fPrintHighlight := TRUE;
+	fPrintWordWrap := FALSE;
+	fPrintLineNumbers := TRUE;
+	fPrintLineNumbersMargins := FALSE;
 
 	// Debug stuff
 	fWatchHint := false;
@@ -948,32 +990,74 @@ begin
 	end;
 end;
 
-{ TdevCompiler }
+{ TdevCompilerSet }
 
-constructor TdevCompiler.Create;
+constructor TdevCompilerSet.Create;
 begin
-	inherited;
-	fSets := TStringList.Create;
-	fOptionList := TList.Create;
+	inherited Create;
+
+	// Create stuff on heap
 	fBinDir := TStringList.Create;
 	fCDir := TStringList.Create;
 	fCppDir := TStringList.Create;
 	fLibDir := TStringList.Create;
-	AddDefaultOptions;
-	ReadSets;
+	fOptionList := TList.Create;
+
+	// Do not set properties yet, as we don't know where to look for gcc.exe
+
+	// Every option is set to false/zero/null, except this crucial one
+	fFastDep := true;
+
+	// Add default options list though, no info needed
+	SetOptions;
 end;
 
-destructor TdevCompiler.Destroy;
+constructor TdevCompilerSet.Create(const folder : AnsiString);
+begin
+	inherited Create;
+
+	// Create stuff on heap
+	fBinDir := TStringList.Create;
+	fCDir := TStringList.Create;
+	fCppDir := TStringList.Create;
+	fLibDir := TStringList.Create;
+	fOptionList := TList.Create;
+
+	// If relative, append exe dir
+	if (Length(folder) < 2) or (folder[2] <> ':') then // if not absolute
+		fFolder := devDirs.Exec + folder
+	else
+		fFolder := folder;
+
+	// Set properties, assume bin\gcc.exe exists (it is our helper)
+	SetProperties(fFolder + pd + 'bin','gcc.exe');
+
+	// Depending on properties, set default exes
+	SetExecutables;
+
+	// Again depending on properties, set directories
+	SetDirectories;
+
+	// Same story, user input
+	SetUserInput;
+
+	// load options
+	SetOptions;
+end;
+
+destructor TdevCompilerSet.Destroy;
 var
 	I : integer;
 begin
+	// delete options
 	for I := 0 to fOptionList.Count - 1 do begin
 		if Assigned(PCompilerOption(fOptionList[I])^.Choices) then
 			PCompilerOption(fOptionList[I])^.Choices.Free;
 		Dispose(PCompilerOption(fOptionList[I]));
 	end;
 	fOptionList.Free;
-	fSets.Free;
+
+	// delete directories
 	fBinDir.Free;
 	fCDir.Free;
 	fCppDir.Free;
@@ -981,413 +1065,106 @@ begin
 	inherited;
 end;
 
-procedure TdevCompiler.OptionListToString;
+procedure TdevCompilerSet.Assign(Source: TPersistent);
 var
-	I : integer;
+	input : TdevCompilerSet;
 begin
-	fOptionString := '';
-	for I := 0 to fOptionList.Count - 1 do
-		fOptionString := fOptionString + ValueToChar[PCompilerOption(fOptionList[I])^.Value];
+	input := TdevCompilerSet(Source);
+
+	// Executables
+	fgccName := input.fgccName;
+	fgppName := input.fgppName;
+	fmakeName := input.fmakeName;
+	fgdbName := input.fgdbName;
+	fwindresName := input.windresName;
+	fdllwrapName := input.fdllwrapName;
+	fgprofName := input.fgprofName;
+
+	// Directories
+	fBinDir.Assign(input.fBinDir);
+	fCDir.Assign(input.fCDir);
+	fCppDir.Assign(input.fCppDir);
+	fLibDir.Assign(input.fLibDir);
+
+	// Misc. properties
+	fDumpMachine := input.fDumpMachine;
+	fVersion := input.fVersion;
+	fType := input.fType;
+	fName := input.fName;
+	fFolder := input.fFolder;
+	fCompAdd := input.fCompAdd;
+	fCompOpt := input.fCompOpt;
+	fLinkAdd := input.fLinkAdd;
+	flinkOpt := input.fLinkOpt;
+	fDelay := input.fDelay;
+	fFastDep := input.fFastdep;
+
+	// Option list
+	fOptionString := input.fOptionString;
 end;
 
-procedure TdevCompiler.OptionStringToList(var input : AnsiString);
+procedure TdevCompilerSet.SetProperties(const BinDir,BinFile : AnsiString);
 var
-	I: integer;
+	gccoutput : AnsiString;
+	start,stop,DelimPos : integer;
 begin
-	for I := 0 to fOptionList.Count - 1 do
-		if I < Length(input) then // set option in list
-			PCompilerOption(fOptionList[I])^.Value := CharToValue(input[I+1])
-		else
-			input := input + '0'; // append value so string is complete
-end;
 
-procedure TdevCompiler.SetOption(option : PCompilerOption; newvalue : char);
-begin
-	option^.Value := CharToValue(newvalue);
-	OptionListToString;
-end;
-
-procedure TdevCompiler.SetOption(index : integer; newvalue : char);
-begin
-	fOptionString[index+1] := newvalue;
-	OptionStringToList(fOptionString);
-end;
-
-procedure TdevCompiler.ValidateDirs;
-var
-	msg, goodbin, badbin, goodlib, badlib, goodinc, badinc, goodinccpp, badinccpp : AnsiString;
-
-	procedure CheckDirs(dirlist : TStringList;var gooddirs : AnsiString;var baddirs : AnsiString);
-	var
-		i : integer;
-	begin
-		gooddirs := '';
-		baddirs := '';
-
-		for I := 0 to dirlist.Count - 1 do begin
-			if not DirectoryExists(dirlist[i]) then begin
-				if Length(baddirs) > 0 then
-					baddirs := baddirs + ';' + dirlist[i]
-				else
-					baddirs := dirlist[i];
-			end else begin
-				if Length(gooddirs) > 0 then
-					gooddirs := gooddirs + ';' + dirlist[i]
-				else
-					gooddirs := dirlist[i];
-			end;
-		end;
-	end;
-
-	procedure RemoveDirs(var dirlist : TStringList;baddirs : AnsiString);
-	var
-		i, index : integer;
-		baddirlist : TStringList;
-	begin
-		baddirlist := TStringList.Create;
-		try
-			ExtractStrings([';'],[],PAnsiChar(baddirs),baddirlist);
-			for I := 0 to baddirlist.Count - 1 do begin
-				index := dirlist.IndexOf(baddirlist[i]);
-				if index <> -1 then
-					dirlist.Delete(index);
-			end;
-		finally
-			baddirlist.Free;
-		end;
-	end;
-
-	procedure AddUnique(var list : TStringList;const entry : AnsiString);
-	begin
-		if list.IndexOf(entry) = -1 then
-			list.Add(entry);
-	end;
-begin
-	// Check if we can find the directories the user pointed to
-	msg := '';
-	if fBinDir.Count > 0 then begin // we need some bin dir, so treat count=0 as an error too
-		CheckDirs(fBinDir,goodbin,badbin);
-		if badbin <> '' then begin
-			msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_BINARY]]) + #13#10;
-			msg := msg + StringReplace(badbin, ';', #13#10, [rfReplaceAll]);
-			msg := msg + #13#10 + #13#10;
-		end;
-	end else begin
-		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTSET],[Lang[ID_COMPVALID_BINARY]]);
-		msg := msg + #13#10 + #13#10;
-	end;
-
-	CheckDirs(fCDir,goodinc,badinc);
-	if badinc <> '' then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_CINCLUDE]]) + #13#10;
-		msg := msg + StringReplace(badinc, ';', #13#10, [rfReplaceAll]);
-		msg := msg + #13#10 + #13#10;
-	end;
-	CheckDirs(fCppDir,goodinccpp,badinccpp);
-	if badinccpp <> '' then begin
-		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_CPPINCLUDE]]) + #13#10;
-		msg := msg + StringReplace(badinccpp, ';', #13#10, [rfReplaceAll]);
-		msg := msg + #13#10 + #13#10;
-	end;
-	CheckDirs(fLibDir,goodlib,badlib);
-	if badlib <> '' then begin
-		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_LIBRARY]]) + #13#10;
-		msg := msg + StringReplace(badlib, ';', #13#10, [rfReplaceAll]);
-		msg := msg + #13#10 + #13#10;
-	end;
-	if msg <> '' then begin
-		msg := msg + Lang[ID_COMPVALID_DIRFIXSUGGESTION];
-
-		// If confirmed, insert working dirs into default path list
-		if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-
-			// Remove invalid
-			RemoveDirs(fBinDir,badbin);
-			RemoveDirs(fLibDir,badlib);
-			RemoveDirs(fCDir,badinc);
-			RemoveDirs(fCppDir,badinccpp);
-
-			// Copy from SetToDefaults!
-			if ContainsStr(fSets[fCurrentSet],'MinGW') and ContainsStr(fSets[fCurrentSet],'32-bit') then begin
-
-				// Add defaults
-				if (badbin <> '') or (fBinDir.Count = 0) then
-					AddUnique(fBinDir,devDirs.fExec + 'MinGW32\bin');
-				if badlib <> '' then
-					AddUnique(fLibDir,devDirs.fExec + 'MinGW32\lib');
-				if badinc <> '' then
-					AddUnique(fCDir,devDirs.fExec + 'MinGW32\include');
-				if badinccpp <> '' then
-					AddUnique(fCppDir,devDirs.fExec + 'MinGW32\include');
-
-			end else begin
-
-				// Add defaults
-				if (badbin <> '') or (fBinDir.Count = 0) then
-					AddUnique(fBinDir,devDirs.fExec + 'MinGW64\bin');
-				if badlib <> '' then begin
-					if ContainsStr(fSets[fCurrentSet],'TDM-GCC') and ContainsStr(fSets[fCurrentSet],'32-bit') then
-						AddUnique(fLibDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\lib32')
-					else
-						AddUnique(fLibDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\lib');
-				end;
-				if badinc <> '' then
-					AddUnique(fCDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\include');
-				if badinccpp <> '' then
-					AddUnique(fCppDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\include');
-
-			end;
-
-			// Immediately save to disk, don't keep bothering the user
-			SaveSet(fCurrentSet);
-		end;
-	end;
-end;
-
-procedure TdevCompiler.ValidateExes;
-var
-	msg : AnsiString;
-	I : integer;
-
-	function FindFile(dirlist : TStringList;const FileName : AnsiString) : boolean;
-	var
-		i : integer;
-	begin
-		result := false;
-
-		for I := 0 to dirlist.Count - 1 do begin
-			if FileExists(dirlist[i] + '\' + FileName) then begin
-				result := true;
-				Exit;
-			end;
-		end;
-	end;
-begin
-	// Don't bother checking exes if the dir is not set
-	if fBinDir.Count = 0 then Exit;
-
-	SetPath(fBinDir[0]);
-
-	// now check some exes
-	msg := '';
-	if not FindFile(fBinDir,fgccName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_CCOMP],fgccName]) + #13#10;
-	end;
-	if not FindFile(fBinDir,fgppName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_CPPCOMP],fgppName]) + #13#10;
-	end;
-	if not FindFile(fBinDir,fgdbName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_DEBUGGER],fgdbName]) + #13#10;
-	end;
-	if not FindFile(fBinDir,fgprofName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_PROFILER],fgprofName]) + #13#10;
-	end;
-	if not FindFile(fBinDir,fmakeName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_MAKE],fmakeName]) + #13#10;
-	end;
-	if not FindFile(fBinDir,fwindresName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_WINDRES],fwindresName]) + #13#10;
-	end;
-	if not FindFile(fBinDir,fdllwrapName) then  begin
-		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_DLLWRAP],fdllwrapName]) + #13#10;
-	end;
-	if msg <> '' then begin
-		msg := msg + #13#10 + Lang[ID_COMPVALID_DIRSEARCHED] + #13#10;
-		for I := 0 to fBinDir.Count - 1 do
-			msg := msg + fBinDir[i] + #13#10;
-		msg := msg + #13#10 + Lang[ID_COMPVALID_BINFIXSUGGESTION];
-		MessageDlg(msg, mtWarning, [mbOK], 0);
-	end;
-end;
-
-procedure TdevCompiler.ValidateSet;
-begin
-	ValidateDirs;
-	ValidateExes;
-end;
-
-procedure TdevCompiler.LoadSet(Index: integer);
-var
-	key : AnsiString;
-
-	procedure ReadDirList(list : TStringList;const entry : AnsiString);
-	var
-		i : integer;
-	begin
-		devData.ReadDelimitedString(key,entry,list);
-
-		// Resolve relative paths
-		for I := 0 to list.Count - 1 do
-			list[i] := ReplaceFirstStr(list[i], '%path%\',devDirs.Exec);
-	end;
-begin
-	// Assume it doesn't exist
-	if Index = -1 then begin
-		ClearSet;
+	// Try the x64 version of GCC too?
+	if FileExists(BinDir + pd + BinFile) then
+		gccoutput := GetCompilerOutput(BinDir + pd,BinFile,'-v')
+	else
 		Exit;
-	end;
 
-	// Load the current index from disk
-	key := 'CompilerSets_' + IntToStr(Index);
+	// Obtain version number and compiler distro
+	start := Pos('gcc version ',gccoutput);
+	if start > 0 then begin
 
-	// Programs
-	fgccName     := devData.ReadS(key, GCC_PROGRAM);
-	fgppName     := devData.ReadS(key, GPP_PROGRAM);
-	fgdbName     := devData.ReadS(key, GDB_PROGRAM);
-	fmakeName    := devData.ReadS(key, MAKE_PROGRAM);
-	fwindresName := devData.ReadS(key, WINDRES_PROGRAM);
-	fdllwrapName := devData.ReadS(key, DLLWRAP_PROGRAM);
-	fgprofName   := devData.ReadS(key, GPROF_PROGRAM);
+		// GCC replied. Set compiler folder
+		DelimPos := RPos(pd,BinDir);
+		if DelimPos > 0 then
+			fFolder := Copy(BinDir,1,DelimPos-1);
 
-	// If nothing was found, select defaults
-	if fgccName=''     then fgccName:=     GCC_PROGRAM;
-	if fgppName=''     then fgppName:=     GPP_PROGRAM;
-	if fgdbName=''     then fgdbName:=     GDB_PROGRAM;
-	if fmakeName=''    then fmakeName:=    MAKE_PROGRAM;
-	if fwindresName='' then fwindresName:= WINDRES_PROGRAM;
-	if fdllwrapName='' then fdllwrapName:= DLLWRAP_PROGRAM;
-	if fgprofName=''   then fgprofName:=   GPROF_PROGRAM;
+		// Find version number
+		Inc(start,Length('gcc version '));
+		stop := start;
+		while(not (gccoutput[stop] in [#0..#32])) do
+			Inc(stop);
 
-	// Load the option string
-	fOptionString := devData.ReadS(key, 'Options');
+		fVersion := Copy(gccoutput,start,stop-start);
 
-	// Convert to better list format
-	OptionStringToList(fOptionString);
+		// Find compiler builder
+		start := stop;
+		while(not (gccoutput[start] = '(')) do
+			Inc(start);
+		while(not (gccoutput[stop] = ')')) do
+			Inc(stop);
 
-	// Extra parameters
-	fCompOpt := devData.ReadS(key, 'CompOpt');
-	fLinkOpt := devData.ReadS(key, 'LinkOpt');
-	fCompAdd := devData.ReadB(key, 'CompAdd');
-	fLinkAdd := devData.ReadB(key, 'LinkAdd');
+		fType := Copy(gccoutput,start+1,stop-start-1);
 
-	// Misc. (general tab)
-	fDelay :=   devData.ReadDefaultI(key, 'Delay',0);
-	fFastDep := devData.ReadDefaultB(key, 'FastDep',true);
-
-	// Directories, undo relative stuff
-	ReadDirList(fBinDir,'Bins');
-	ReadDirList(fLibDir,'Lib');
-	ReadDirList(fCDir,'C');
-	ReadDirList(fCppDir,'Cpp');
-
-	CurrentSet := Index;
-
-	ValidateSet; // check dirs and exes
-
-	if fBinDir.Count > 0 then
-		SetPath(fBinDir[0]);
-end;
-
-procedure TdevCompiler.SaveSet(Index: integer);
-var
-	key: AnsiString;
-
-	procedure WriteDirList(list : TStringList;const entry : AnsiString);
-	var
-		I : integer;
-		sl : TStringList;
-	begin
-		sl := TStringList.Create;
-		try
-			sl.Assign(list); // work on a local copy
-			for I := 0 to sl.Count - 1 do
-				sl[i] := ReplaceFirstStr(sl[i],devDirs.Exec,'%path%\');
-
-			// Convert stringlist to string
-			devData.WriteDelimitedString(key,entry,sl);
-		finally
-			sl.Free;
+		// Assemble user friendly name if we don't have one yet
+		if fName = '' then begin
+			if ContainsStr(fType,'tdm64') then
+				fName := 'TDM-GCC ' + fVersion
+			else if ContainsStr(fType,'tdm') then
+				fName := 'TDM-GCC ' + fVersion
+			else if ContainsStr(fType,'GCC') then
+				fName := 'MinGW GCC ' + fVersion;
 		end;
 	end;
 
-begin
-	key := 'CompilerSets_' + IntToStr(Index);
-
-	// Programs
-	devData.Write(key, GCC_PROGRAM,     fgccName);
-	devData.Write(key, GPP_PROGRAM,     fgppName);
-	devData.Write(key, GDB_PROGRAM,     fgdbName);
-	devData.Write(key, MAKE_PROGRAM,    fmakeName);
-	devData.Write(key, WINDRES_PROGRAM, fwindresName);
-	devData.Write(key, DLLWRAP_PROGRAM, fdllwrapName);
-	devData.Write(key, GPROF_PROGRAM,   fgprofName);
-
-	// Save option string
-	devData.Write(key, 'Options',       fOptionString);
-
-	// Save extra 'general' options
-	devData.Write(key, 'CompOpt',       fCompOpt);
-	devData.Write(key, 'LinkOpt',       fLinkOpt);
-	devData.Write(key, 'CompAdd',       fCompAdd);
-	devData.Write(key, 'LinkAdd',       fLinkAdd);
-
-	devData.Write(key, 'Delay',         inttostr(fDelay));
-	devData.Write(key, 'FastDep',       fFastDep);
-
-	// Paths
-	WriteDirList(fBinDir,'Bins');
-	WriteDirList(fCDir,'C');
-	WriteDirList(fCppDir,'Cpp');
-	WriteDirList(fLibDir,'Lib');
+	// Obtain compiler target
+	fDumpMachine := GetCompilerOutput(BinDir + pd,BinFile,'-dumpmachine');
 end;
 
-procedure TdevCompiler.EraseSet(Index: integer);
+procedure TdevCompilerSet.SetExecutables;
 begin
-	devData.EraseSection('CompilerSets_' + IntToStr(Index));
-end;
-
-procedure TdevCompiler.AddSet(const Name, Folder : AnsiString);
-begin
-	Sets.Add(Name);
-	SettoDefaults(Name,Folder);
-	SaveSet(Sets.Count-1);
-end;
-
-procedure TdevCompiler.ClearSet;
-begin
-	fgccName := '';
-	fgppName := '';
-	fgdbName := '';
-	fmakeName := '';
-	fwindresName := '';
-	fdllwrapName := '';
-	fgprofName := '';
-
-	fOptionString := '';
-	OptionStringToList(fOptionString);
-
-	fCompOpt := '';
-	fLinkOpt := '';
-	fCompAdd := false;
-	fLinkAdd := false;
-
-	fDelay := 0;
-	fFastDep := true; // handy default
-
-	fBinDir.Clear;
-	fCDir.Clear;
-	fCppDir.Clear;
-	fLibDir.Clear;
-end;
-
-procedure TdevCompiler.SettoDefaults(const setname,dir : AnsiString);
-var
-	option : PCompilerOption;
-	index : integer;
-begin
-
-	fBinDir.Clear;
-	fCDir.Clear;
-	fCppDir.Clear;
-	fLibDir.Clear;
-
-	// Store program names
+	// Set executables
 	fgccName := GCC_PROGRAM;
 	fgppName := GPP_PROGRAM;
 
 	// Assume a special gdb32 is provided for 32bit users
-	if ContainsStr(setname,'TDM-GCC') and ContainsStr(setname,'32-bit') then
-		fgdbName := GDB32_PROGRAM
+	if ContainsStr(fName,'TDM-GCC') and ContainsStr(fName,'32-bit') then
+		fgdbName := GDB32_PROGRAM // custom, don't forget when bundling new compilers
 	else
 		fgdbName := GDB_PROGRAM;
 
@@ -1395,124 +1172,47 @@ begin
 	fwindresName := WINDRES_PROGRAM;
 	fdllwrapName := DLLWRAP_PROGRAM;
 	fgprofName := GPROF_PROGRAM;
+end;
 
-	// Command line text
+procedure TdevCompilerSet.SetDirectories;
+begin
+	// Add both the default and the autoconf directories
+	fBinDir.Add(fFolder + pd + 'bin');
+	fLibDir.Add(fFolder + pd + 'lib');
+	fCDir.Add(fFolder + pd + 'include');
+	fCppDir.Add(fFolder + pd + 'include');
+
+	// Try to obtain our target/autoconf folder
+	if fDumpMachine <> '' then begin
+		fBinDir.Add(fFolder + pd + fDumpMachine + pd + 'bin');
+		fLibDir.Add(fFolder + pd + fDumpMachine + pd + 'lib');
+		fCDir.Add(fFolder + pd + fDumpMachine + pd + 'include');
+		fCppDir.Add(fFolder + pd + fDumpMachine + pd + 'include');
+
+		// Custom STL folder?
+		// Currently, Dev-C++ is a bit slow at parsing this shit
+		fCppDir.Add(fFolder + pd + 'lib' + pd + 'gcc' + pd + fDumpMachine + pd + fVersion + pd + 'include' + pd + 'c++');
+	end;
+end;
+
+procedure TdevCompilerSet.SetUserInput;
+begin
+	// User input
 	fCompAdd := FALSE;
 	fLinkAdd := TRUE;
 	fCompOpt :='';
 
 	// MinGW32 requires special treatment
-	if ContainsStr(setname,'MinGW') then
+	if ContainsStr(fName,'MinGW') then
 		fLinkOpt := '-static-libstdc++ -static-libgcc'
 	else
 		fLinkOpt := '-static-libgcc';
 
-	if ContainsStr(setname,'MinGW') and ContainsStr(setname,'32-bit') then begin
-		fBinDir.Add(devDirs.fExec + dir + pd + 'bin');
-		fLibDir.Add(devDirs.fExec + dir + pd + 'lib');
-		fCDir.Add(devDirs.fExec + dir + pd + 'include');
-		fCppDir.Add(devDirs.fExec + dir + pd + 'include');
-	end else begin
-		fBinDir.Add(devDirs.fExec + dir + pd + 'bin');
-		if ContainsStr(setname,'TDM-GCC') and ContainsStr(setname,'32-bit') then
-			fLibDir.Add(devDirs.fExec + dir + '\x86_64-w64-mingw32\lib32')
-		else
-			fLibDir.Add(devDirs.fExec + dir + '\x86_64-w64-mingw32\lib');
-		fCDir.Add(devDirs.fExec + dir + '\x86_64-w64-mingw32\include');
-		fCppDir.Add(devDirs.fExec + dir + '\x86_64-w64-mingw32\include');
-	end;
-
-	// Makefile
 	fDelay := 0;
 	fFastDep := TRUE;
-
-	// Set default pointer width
-	if FindOption('-',option,index) then begin // -m is used my -mINSTRUCTIONSET, so use - instead
-		if ContainsStr(setname,'TDM-GCC') and ContainsStr(setname,'32-bit') then // for now, TDM-GCC builds are x64 by default
-			SetOption(option,'1')
-		else
-			SetOption(option,'0');
-	end;
-
-	// Set default debugging option
-	if FindOption('-g3',option,index) then begin
-		if ContainsStr(setname,'Debug') then
-			SetOption(option,'1')
-		else
-			SetOption(option,'0');
-	end;
-
-	// Set default debugging option
-	if FindOption('-pg',option,index) then begin
-		if ContainsStr(setname,'Profiling') then
-			SetOption(option,'1')
-		else
-			SetOption(option,'0');
-	end;
 end;
 
-procedure TdevCompiler.ReadSets;
-var
-	I: integer;
-	sl : TStringList;
-begin
-	sl := TStringList.Create;
-	try
-		// First list, then current index
-		devData.ReadStrings('CompilerSets',sl);
-
-		for I := 0 to sl.Count - 1 do
-			if not SameStr(sl.Names[I],'Current') then
-				fSets.Add(sl.Values[sl.Names[I]])
-			else
-				CurrentSet := StrToInt(sl.Values[sl.Names[I]]);
-	finally
-		sl.Free;
-	end;
-end;
-
-procedure TdevCompiler.WriteSets;
-begin
-	// Compiler list first
-	devData.WriteStrings('CompilerSets',fSets);
-
-	// Then current index
-	if fCurrentSet >= fSets.Count then
-		fCurrentSet := -1;
-	devData.Write('CompilerSets','Current',fCurrentSet)
-end;
-
-procedure TdevCompiler.FindSets;
-var
-	compilername : AnsiString;
-begin
-	// Assume 64bit compilers are put in the MinGW64 folder
-	if DirectoryExists(devDirs.Exec + 'MinGW64\') then begin
-
-		compilername := GetInfoOfCompiler(devDirs.Exec + 'MinGW64\bin\');
-		if compilername = '' then
-			compilername := 'MinGW64';
-
-		AddSet(compilername + ' 64-bit Release','MinGW64');
-		AddSet(compilername + ' 64-bit Debug','MinGW64');
-		AddSet(compilername + ' 64-bit Profiling','MinGW64');
-		AddSet(compilername + ' 32-bit Release','MinGW64');
-		AddSet(compilername + ' 32-bit Debug','MinGW64');
-		AddSet(compilername + ' 32-bit Profiling','MinGW64');
-	end;
-	if DirectoryExists(devDirs.Exec + 'MinGW32\') then begin
-
-		compilername := GetInfoOfCompiler(devDirs.Exec + 'MinGW32\bin\');
-		if compilername = '' then
-			compilername := 'MinGW32';
-
-		AddSet(compilername + ' 32-bit Release','MinGW32');
-		AddSet(compilername + ' 32-bit Debug','MinGW32');
-		AddSet(compilername + ' 32-bit Profiling','MinGW32');
-	end;
-end;
-
-procedure TdevCompiler.AddDefaultOptions;
+procedure TdevCompilerSet.SetOptions;
 var
 	sl : TStringList;
 begin
@@ -1661,7 +1361,7 @@ begin
 	OptionListToString;
 end;
 
-procedure TdevCompiler.AddOption(Name, Section: integer; IsC, IsCpp, IsLinker: boolean; Value: integer;const Setting : AnsiString; Choices: TStringList);
+procedure TdevCompilerSet.AddOption(Name, Section: integer; IsC, IsCpp, IsLinker: boolean; Value: integer;const Setting : AnsiString; Choices: TStringList);
 var
 	option: PCompilerOption;
 begin
@@ -1677,7 +1377,7 @@ begin
 	fOptionList.Add(option);
 end;
 
-function TdevCompiler.FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
+function TdevCompilerSet.FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
 var
 	I: integer;
 begin
@@ -1691,14 +1391,648 @@ begin
 		end;
 end;
 
-function TdevCompiler.CharToValue(c : char) : integer;
+procedure TdevCompilerSet.SetOptionString(const value : AnsiString);
+var
+	I : integer;
 begin
-	if c in ['a'..'z'] then
-		result := integer(c) - integer('a') + 2
-	else if (StrToIntDef(c, 0) = 1) then
-		result := 1
+	// set string
+	fOptionString := value;
+
+	// set list
+	for I := 0 to fOptionList.Count - 1 do
+		if I < Length(value) then // set option in list
+			PCompilerOption(fOptionList[I])^.Value := CharToValue(fOptionString[I+1])
+		else
+			fOptionString := fOptionString + '0';
+end;
+
+procedure TdevCompilerSet.OptionListToString;
+var
+	I : integer;
+begin
+	fOptionString := '';
+	for I := 0 to fOptionList.Count - 1 do
+		fOptionString := fOptionString + ValueToChar[PCompilerOption(fOptionList[I])^.Value];
+end;
+
+procedure TdevCompilerSet.SetOption(option : PCompilerOption; newvalue : char);
+begin
+	option^.Value := CharToValue(newvalue);
+	OptionListToString;
+end;
+
+procedure TdevCompilerSet.SetOption(index : integer; newvalue : char);
+begin
+	fOptionString[index+1] := newvalue;
+end;
+
+function TdevCompilerSet.GetCompilerOutput(const BinDir,BinFile,Input : AnsiString) : AnsiString;
+begin
+	result := Trim(RunAndGetOutput(BinDir + pd + BinFile + ' ' + Input,BinDir,nil,nil,nil,false))
+end;
+
+function TdevCompilerSet.ValidateDirs : boolean;
+var
+	msg, goodbin, badbin, goodlib, badlib, goodinc, badinc, goodinccpp, badinccpp : AnsiString;
+
+	procedure CheckDirs(dirlist : TStringList;var gooddirs : AnsiString;var baddirs : AnsiString);
+	var
+		i : integer;
+	begin
+		gooddirs := '';
+		baddirs := '';
+
+		for I := 0 to dirlist.Count - 1 do begin
+			if not DirectoryExists(dirlist[i]) then begin
+				if Length(baddirs) > 0 then
+					baddirs := baddirs + ';' + dirlist[i]
+				else
+					baddirs := dirlist[i];
+			end else begin
+				if Length(gooddirs) > 0 then
+					gooddirs := gooddirs + ';' + dirlist[i]
+				else
+					gooddirs := dirlist[i];
+			end;
+		end;
+	end;
+
+	procedure RemoveDirs(var dirlist : TStringList;baddirs : AnsiString);
+	var
+		i, index : integer;
+		baddirlist : TStringList;
+	begin
+		baddirlist := TStringList.Create;
+		try
+			ExtractStrings([';'],[],PAnsiChar(baddirs),baddirlist);
+			for I := 0 to baddirlist.Count - 1 do begin
+				index := dirlist.IndexOf(baddirlist[i]);
+				if index <> -1 then
+					dirlist.Delete(index);
+			end;
+		finally
+			baddirlist.Free;
+		end;
+	end;
+
+	procedure AddUnique(var list : TStringList;const entry : AnsiString);
+	begin
+		if list.IndexOf(entry) = -1 then
+			list.Add(entry);
+	end;
+begin
+	result := true;
+
+	// Check if we can find the directories the user pointed to
+	msg := '';
+	if fBinDir.Count > 0 then begin // we need some bin dir, so treat count=0 as an error too
+		CheckDirs(fBinDir,goodbin,badbin);
+		if badbin <> '' then begin
+			msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_BINARY]]) + #13#10;
+			msg := msg + StringReplace(badbin, ';', #13#10, [rfReplaceAll]);
+			msg := msg + #13#10 + #13#10;
+		end;
+	end else begin
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTSET],[Lang[ID_COMPVALID_BINARY]]);
+		msg := msg + #13#10 + #13#10;
+	end;
+
+	CheckDirs(fCDir,goodinc,badinc);
+	if badinc <> '' then  begin
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_CINCLUDE]]) + #13#10;
+		msg := msg + StringReplace(badinc, ';', #13#10, [rfReplaceAll]);
+		msg := msg + #13#10 + #13#10;
+	end;
+	CheckDirs(fCppDir,goodinccpp,badinccpp);
+	if badinccpp <> '' then begin
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_CPPINCLUDE]]) + #13#10;
+		msg := msg + StringReplace(badinccpp, ';', #13#10, [rfReplaceAll]);
+		msg := msg + #13#10 + #13#10;
+	end;
+	CheckDirs(fLibDir,goodlib,badlib);
+	if badlib <> '' then begin
+		msg := msg + Format(Lang[ID_COMPVALID_DIRNOTFOUND],[Lang[ID_COMPVALID_LIBRARY]]) + #13#10;
+		msg := msg + StringReplace(badlib, ';', #13#10, [rfReplaceAll]);
+		msg := msg + #13#10 + #13#10;
+	end;
+	if msg <> '' then begin
+		msg := msg + Lang[ID_COMPVALID_DIRFIXSUGGESTION];
+
+		// If confirmed, insert working dirs into default path list
+		if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+
+			// Remove invalid
+			RemoveDirs(fBinDir,badbin);
+			RemoveDirs(fLibDir,badlib);
+			RemoveDirs(fCDir,badinc);
+			RemoveDirs(fCppDir,badinccpp);
+
+			// If we know the folder, we should be able to predict dirs (copy from SetDirectories)
+			if fFolder <> '' then begin
+
+				// Add both the default and the autoconf directories
+				AddUnique(fBinDir,fFolder + pd + 'bin');
+				AddUnique(fLibDir,fFolder + pd + 'lib');
+				AddUnique(fCDir,fFolder + pd + 'include');
+				AddUnique(fCppDir,fFolder + pd + 'include');
+
+				// Try to obtain our target/autoconf folder
+				if fDumpMachine <> '' then begin
+					AddUnique(fBinDir,fFolder + pd + fDumpMachine + pd + 'bin');
+					AddUnique(fLibDir,fFolder + pd + fDumpMachine + pd + 'lib');
+					AddUnique(fCDir,fFolder + pd + fDumpMachine + pd + 'include');
+					AddUnique(fCppDir,fFolder + pd + fDumpMachine + pd + 'include');
+
+					// Custom STL folder?
+					// Currently, Dev-C++ is a bit slow at parsing this shit
+					AddUnique(fCppDir,fFolder + pd + 'lib' + pd + 'gcc' + pd + fDumpMachine + pd + fVersion + pd + 'include' + pd + 'c++');
+				end;
+
+			// Otherwise, make some guesses based on the set name...
+			end else if ContainsStr(fName,'MinGW') and ContainsStr(fName,'32-bit') then begin
+
+				// Add defaults
+				if (badbin <> '') or (fBinDir.Count = 0) then
+					AddUnique(fBinDir,devDirs.fExec + 'MinGW32' + pd + 'bin');
+				if badlib <> '' then
+					AddUnique(fLibDir,devDirs.fExec + 'MinGW32\lib');
+				if badinc <> '' then
+					AddUnique(fCDir,devDirs.fExec + 'MinGW32\include');
+				if badinccpp <> '' then
+					AddUnique(fCppDir,devDirs.fExec + 'MinGW32\include');
+
+			end else begin
+
+				// Add defaults
+				if (badbin <> '') or (fBinDir.Count = 0) then
+					AddUnique(fBinDir,devDirs.fExec + 'MinGW64\bin');
+				if badlib <> '' then begin
+					if ContainsStr(fName,'TDM-GCC') and ContainsStr(fName,'32-bit') then
+						AddUnique(fLibDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\lib32')
+					else
+						AddUnique(fLibDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\lib');
+				end;
+				if badinc <> '' then
+					AddUnique(fCDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\include');
+				if badinccpp <> '' then
+					AddUnique(fCppDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\include');
+
+			end;
+
+			result := false; // not valid
+		end;
+	end;
+end;
+
+function TdevCompilerSet.ValidateExes : boolean;
+var
+	msg : AnsiString;
+	I : integer;
+
+	function FindFile(dirlist : TStringList;const FileName : AnsiString) : boolean;
+	var
+		i : integer;
+	begin
+		result := false;
+
+		for I := 0 to dirlist.Count - 1 do begin
+			if FileExists(dirlist[i] + '\' + FileName) then begin
+				result := true;
+				Exit;
+			end;
+		end;
+	end;
+begin
+	result := true;
+
+	// Don't bother checking exes if the dir is not set
+	if fBinDir.Count = 0 then Exit;
+
+	SetPath(fBinDir[0]);
+
+	// now check some exes
+	msg := '';
+	if not FindFile(fBinDir,fgccName) then  begin
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_CCOMP],fgccName]) + #13#10;
+	end;
+	if not FindFile(fBinDir,fgppName) then  begin
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_CPPCOMP],fgppName]) + #13#10;
+	end;
+	if not FindFile(fBinDir,fgdbName) then  begin
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_DEBUGGER],fgdbName]) + #13#10;
+	end;
+	if not FindFile(fBinDir,fgprofName) then  begin
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_PROFILER],fgprofName]) + #13#10;
+	end;
+	if not FindFile(fBinDir,fmakeName) then  begin
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_MAKE],fmakeName]) + #13#10;
+	end;
+	if not FindFile(fBinDir,fwindresName) then  begin
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_WINDRES],fwindresName]) + #13#10;
+	end;
+	if not FindFile(fBinDir,fdllwrapName) then  begin
+		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_DLLWRAP],fdllwrapName]) + #13#10;
+	end;
+	if msg <> '' then begin
+		msg := msg + #13#10 + Lang[ID_COMPVALID_DIRSEARCHED] + #13#10;
+		for I := 0 to fBinDir.Count - 1 do
+			msg := msg + fBinDir[i] + #13#10;
+		msg := msg + #13#10 + Lang[ID_COMPVALID_BINFIXSUGGESTION];
+		MessageDlg(msg, mtWarning, [mbOK], 0);
+		result := false; // not valid
+	end;
+end;
+
+function TdevCompilerSet.Validate : boolean;
+begin
+	result := ValidateDirs and ValidateExes; // return true if valid
+end;
+
+procedure TdevCompilerSet.Clear;
+begin
+	fgccName := '';
+	fgppName := '';
+	fgdbName := '';
+	fmakeName := '';
+	fwindresName := '';
+	fdllwrapName := '';
+	fgprofName := '';
+
+	fOptionString := '';
+
+	fCompOpt := '';
+	fLinkOpt := '';
+	fCompAdd := false;
+	fLinkAdd := false;
+
+	fDelay := 0;
+	fFastDep := true; // handy default
+
+	fBinDir.Clear;
+	fCDir.Clear;
+	fCppDir.Clear;
+	fLibDir.Clear;
+end;
+
+{ TdevCompilerSets }
+
+constructor TdevCompilerSets.Create;
+begin
+	inherited;
+	fList := TList.Create;
+end;
+
+destructor TdevCompilerSets.Destroy;
+begin
+	ClearSets;
+	fList.Free;
+	inherited;
+end;
+
+function TdevCompilerSets.GetCurrentSet : TdevCompilerSet;
+var
+	index : integer;
+begin
+	if Assigned(MainForm.fProject) then
+		index := MainForm.fProject.Options.CompilerSet
 	else
-		result := 0;
+		index := fCurrentIndex;
+
+	// range check...
+	if (index >= 0) and (index < fList.Count) then
+		result := TdevCompilerSet(fList[index])
+	else
+		result := nil;
+end;
+
+procedure TdevCompilerSets.LoadSet(index : integer;const SetName : AnsiString = '');
+var
+	key : AnsiString;
+
+	procedure ReadDirList(list : TStringList;const entry : AnsiString);
+	var
+		i : integer;
+	begin
+		devData.ReadDelimitedString(key,entry,list);
+
+		// Resolve relative paths
+		for I := 0 to list.Count - 1 do
+			list[i] := ReplaceFirstStr(list[i], '%path%\',devDirs.Exec);
+	end;
+begin
+
+	// Load the current index from disk
+	key := 'CompilerSets_' + IntToStr(index);
+
+	// Programs
+	with TdevCompilerSet(fList[index]) do begin
+
+		// Load name from elsewhere in settings file (backward compat etc.)
+		if SetName <> '' then
+			fName := SetName;
+
+		// Load executable names
+		fgccName     := devData.ReadS(key, GCC_PROGRAM);
+		fgppName     := devData.ReadS(key, GPP_PROGRAM);
+		fgdbName     := devData.ReadS(key, GDB_PROGRAM);
+		fmakeName    := devData.ReadS(key, MAKE_PROGRAM);
+		fwindresName := devData.ReadS(key, WINDRES_PROGRAM);
+		fdllwrapName := devData.ReadS(key, DLLWRAP_PROGRAM);
+		fgprofName   := devData.ReadS(key, GPROF_PROGRAM);
+
+		// Load the option in string format
+		OptionString := devData.ReadS(key, 'Options');
+
+		// Extra parameters
+		fCompOpt := devData.ReadS(key, 'CompOpt');
+		fLinkOpt := devData.ReadS(key, 'LinkOpt');
+		fCompAdd := devData.ReadB(key, 'CompAdd');
+		fLinkAdd := devData.ReadB(key, 'LinkAdd');
+
+		// Misc. (general tab)
+		fDelay :=   devData.ReadDefaultI(key, 'Delay',0);
+		fFastDep := devData.ReadDefaultB(key, 'FastDep',true);
+
+		// Directories, undo relative stuff
+		ReadDirList(fBinDir,'Bins');
+		ReadDirList(fLibDir,'Lib');
+		ReadDirList(fCDir,'C');
+		ReadDirList(fCppDir,'Cpp');
+
+		// Set properties for current gcc path
+		if fBinDir.Count > 0 then begin
+			SetProperties(fBinDir[0],fgccName);
+			SetPath(fBinDir[0]);
+		end;
+	end;
+end;
+
+procedure TdevCompilerSets.SaveSet(Index: integer);
+var
+	key: AnsiString;
+
+	procedure WriteDirList(list : TStringList;const entry : AnsiString);
+	var
+		I : integer;
+		sl : TStringList;
+	begin
+		sl := TStringList.Create;
+		try
+			sl.Assign(list); // work on a local copy
+			for I := 0 to sl.Count - 1 do
+				sl[i] := ReplaceFirstStr(sl[i],devDirs.Exec,'%path%\');
+
+			// Convert stringlist to string
+			devData.WriteDelimitedString(key,entry,sl);
+		finally
+			sl.Free;
+		end;
+	end;
+
+begin
+	key := 'CompilerSets_' + IntToStr(Index);
+
+	with TdevCompilerSet(fList[index]) do begin
+
+		// Programs
+		devData.Write(key, GCC_PROGRAM,     fgccName);
+		devData.Write(key, GPP_PROGRAM,     fgppName);
+		devData.Write(key, GDB_PROGRAM,     fgdbName);
+		devData.Write(key, MAKE_PROGRAM,    fmakeName);
+		devData.Write(key, WINDRES_PROGRAM, fwindresName);
+		devData.Write(key, DLLWRAP_PROGRAM, fdllwrapName);
+		devData.Write(key, GPROF_PROGRAM,   fgprofName);
+
+		// Save option string
+		devData.Write(key, 'Options',       fOptionString);
+
+		// Save extra 'general' options
+		devData.Write(key, 'CompOpt',       fCompOpt);
+		devData.Write(key, 'LinkOpt',       fLinkOpt);
+		devData.Write(key, 'CompAdd',       fCompAdd);
+		devData.Write(key, 'LinkAdd',       fLinkAdd);
+
+		devData.Write(key, 'Delay',         fDelay);
+		devData.Write(key, 'FastDep',       fFastDep);
+
+		// Paths
+		WriteDirList(fBinDir,'Bins');
+		WriteDirList(fCDir,'C');
+		WriteDirList(fCppDir,'Cpp');
+		WriteDirList(fLibDir,'Lib');
+	end;
+end;
+
+function TdevCompilerSets.AddSet : TdevCompilerSet;
+begin
+	result := TdevCompilerSet.Create;
+	fList.Add(result);
+end;
+
+function TdevCompilerSets.AddSet(const Folder : AnsiString) : TdevCompilerSet;
+begin
+	result := TdevCompilerSet.Create(Folder);
+	fList.Add(result);
+end;
+
+function TdevCompilerSets.AddSet(compilerset : TdevCompilerSet) : TdevCompilerSet;
+begin
+	result := TdevCompilerSet.Create;
+	result.Assign(compilerset); // deep copy
+	fList.Add(result);
+end;
+
+function TdevCompilerSets.GetSet(index : integer) : TdevCompilerSet;
+begin
+	result := TdevCompilerSet(fList[index]);
+end;
+
+procedure TdevCompilerSets.DeleteSet(Index: integer);
+var
+	I : integer;
+begin
+	// Erase all sections at and above from disk
+	for I := Index to fList.Count - 1 do
+		devData.EraseSection('CompilerSets_' + IntToStr(I));
+
+	// Update memory
+	TdevCompilerSet(fList[index]).Free;
+	fList.Delete(index);
+
+	// Save new memory
+	for I := Index to fList.Count - 1 do
+		SaveSet(I);
+end;
+
+function TdevCompilerSets.Count : integer;
+begin
+	result := fList.Count;
+end;
+
+procedure TdevCompilerSets.LoadSets;
+var
+	I: integer;
+	sl : TStringList;
+begin
+	// Don't append, but replace
+	ClearSets;
+
+	sl := TStringList.Create;
+	try
+		// First list, then current index
+		devData.ReadStrings('CompilerSets',sl);
+
+		// Populate list
+		for I := 0 to sl.Count - 1 do
+			if not SameStr(sl.Names[I],'Current') then begin
+				fList.Add(TdevCompilerSet.Create); // add empty shell
+				LoadSet(StrToInt(sl.Names[I]),sl.Values[sl.Names[I]]); // backwards compatibility: save Name here and pass it
+			end else
+				CurrentIndex := StrToInt(sl.Values[sl.Names[I]]);
+
+		// Only validate the current set
+		if (CurrentIndex >= 0) and (CurrentIndex < fList.Count) then begin
+			if not CurrentSet.Validate then begin
+				SaveSet(CurrentIndex);
+
+				// Reset properties after validation
+				with CurrentSet do begin
+					if BinDir.Count > 0 then begin
+						SetProperties(BinDir[0],gccName);
+						SetPath(BinDir[0]);
+					end;
+				end;
+			end;
+		end;
+	finally
+		sl.Free;
+	end;
+end;
+
+procedure TdevCompilerSets.SaveSets;
+var
+	I : integer;
+begin
+	// Write all sets separately
+	for  I := 0 to fList.Count - 1 do
+		SaveSet(i);
+
+	// Then save the summary
+	SaveSetList;
+end;
+
+procedure TdevCompilerSets.SaveSetList;
+var
+	sl : TStringList;
+	I : integer;
+begin
+	// For the summary, compiler list first
+	sl := TStringList.Create;
+	try
+		for I := 0 to fList.Count - 1 do
+			sl.Add(TdevCompilerSet(fList[i]).Name);
+		devData.WriteStrings('CompilerSets',sl);
+	finally
+		sl.Free;
+	end;
+
+	// Then current index
+	if fCurrentIndex >= fList.Count then
+		fCurrentIndex := -1;
+	devData.Write('CompilerSets','Current',fCurrentIndex);
+end;
+
+procedure TdevCompilerSets.FindSets;
+var
+	BaseSet : TdevCompilerSet;
+	BaseName : AnsiString;
+	option : PCompilerOption;
+	index : integer;
+begin
+	// Assume 64bit compilers are put in the MinGW64 folder
+	if DirectoryExists(devDirs.Exec + 'MinGW64' + pd) then begin
+		if FileExists(devDirs.Exec + 'MinGW64' + pd + 'bin' + pd + 'gcc.exe') then begin // we only require GCC.exe to be present
+
+			// Default, release profile
+			BaseSet := AddSet(devDirs.Exec + 'MinGW64');
+			BaseName := BaseSet.Name;
+			with BaseSet do begin
+				Name := BaseName + ' 64-bit Release';
+			end;
+
+			// Debug profile
+			with AddSet(BaseSet) do begin
+				Name := BaseName + ' 64-bit Debug';
+				if FindOption('-g3',option,index) then
+					SetOption(option,'1');
+			end;
+
+			// Profiling profile
+			with AddSet(BaseSet) do begin
+				Name := BaseName + ' 64-bit Profiling';
+				if FindOption('-pg',option,index) then
+					SetOption(option,'1');
+			end;
+
+			// Default, 32bit release profile
+			BaseSet := AddSet(BaseSet);
+			with BaseSet do begin
+				Name := BaseName + ' 32-bit Release';
+				if FindOption('-',option,index) then // -m is used my -mINSTRUCTIONSET, so use - instead
+					SetOption(option,'1');
+			end;
+
+			// Debug profile
+			with AddSet(BaseSet) do begin
+				Name := BaseName + ' 32-bit Debug';
+				if FindOption('-g3',option,index) then
+					SetOption(option,'1');
+			end;
+
+			// Profiling profile
+			with AddSet(BaseSet) do begin
+				Name := BaseName + ' 32-bit Profiling';
+				if FindOption('-pg',option,index) then
+					SetOption(option,'1');
+			end;
+		end;
+	end;
+
+	// And assume 32bit compilers are put in the MinGW32 folder
+	if DirectoryExists(devDirs.Exec + 'MinGW32' + pd) then begin
+		if FileExists(devDirs.Exec + 'MinGW32' + pd + 'bin' + pd + 'gcc.exe') then begin
+
+			// Default, release profile
+			BaseSet := AddSet(devDirs.Exec + 'MinGW32');
+			BaseName := BaseSet.Name;
+			with BaseSet do begin
+				Name := BaseName + ' 32-bit Release';
+			end;
+
+			// Debug profile
+			with AddSet(BaseSet) do begin
+				Name := BaseName + ' 32-bit Debug';
+				if FindOption('-g3',option,index) then
+					SetOption(option,'1');
+			end;
+
+			// Profiling profile
+			with AddSet(BaseSet) do begin
+				Name := BaseName + ' 32-bit Profiling';
+				if FindOption('-pg',option,index) then
+					SetOption(option,'1');
+			end;
+		end;
+	end;
+end;
+
+procedure TdevCompilerSets.ClearSets;
+var
+	I : integer;
+begin
+	for I := 0 to fList.Count - 1 do
+		TdevCompilerSet(fList[i]).Free;
+	fList.Clear;
 end;
 
 { TDevDirs }
@@ -1824,7 +2158,7 @@ begin
 	fTabSize:= 4;
 
 	// Display
-	fFont.name:= 'Courier New';
+	fFont.name:= 'Consolas';
 	fFont.Size:= 10;
 
 	// Display #2
@@ -1834,7 +2168,7 @@ begin
 	fLineNumbers:= TRUE;
 	fFirstisZero:= FALSE;
 	fLeadZero:= FALSE;
-	fGutterFont.Name:= 'Courier New';
+	fGutterFont.Name:= 'Consolas';
 	fGutterFont.Size:= 10;
 	fGutterSize:= 1;
 
@@ -1991,7 +2325,7 @@ procedure TdevCodeCompletion.SettoDefaults;
 begin
 	fWidth:=320;
 	fHeight:=240;
-	fDelay:=300;
+	fDelay:=200;
 	fBackColor:=clWindow;
 	fEnabled:=True;
 	fUseCacheFiles:=False;
