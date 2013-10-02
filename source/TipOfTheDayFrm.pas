@@ -44,6 +44,7 @@ type
     Bevel1: TBevel;
     lblUrl: TLabel;
     btnRandom: TButton;
+    imgDonate: TImage;
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -52,6 +53,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lblUrlClick(Sender: TObject);
     procedure btnRandomClick(Sender: TObject);
+    procedure imgDonateClick(Sender: TObject);
   private
     { Private declarations }
     sl: TStringList;
@@ -142,6 +144,11 @@ begin
 			btnPrev.Enabled := False;
 		end;
 	end;
+
+	// For some reason, this fixes the panels' background color
+	Panel1.ParentBackground := False;
+	Panel1.ParentBackground := True;
+	Panel1.ParentBackground := False;
 end;
 
 procedure TTipOfTheDayForm.FormDestroy(Sender: TObject);
@@ -246,6 +253,11 @@ begin
   btnPrev.Caption := Lang[ID_TIPS_PREVIOUSTIP];
   btnClose.Caption := Lang[ID_BTN_CLOSE];
   btnRandom.Caption := lang[ID_TIPS_RANDOMTIP];
+end;
+
+procedure TTipOfTheDayForm.imgDonateClick(Sender: TObject);
+begin
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil, SW_SHOWNORMAL);
 end;
 
 end.

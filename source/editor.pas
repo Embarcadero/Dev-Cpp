@@ -1419,7 +1419,7 @@ var
 			MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
 
 		// Otherwise, parse code and show information about variable
-		end else if devEditor.ParserHints and fText.Focused then begin
+		end else if devEditor.ParserHints {and fText.Focused} then begin
 
 			// This piece of code changes the parser database, possibly making hints and code completion invalid...
 			M := TMemoryStream.Create;

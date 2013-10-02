@@ -40,8 +40,6 @@ const
   MAX_TOKEN_SIZE = 32768;
 
 type
-  TSetOfChars = set of Char;
-
   TLogTokenEvent = procedure(Sender: TObject; const Msg: AnsiString) of object;
   TProgressEvent = procedure(Sender: TObject; const FileName: AnsiString; Total, Current: integer) of object;
 
@@ -589,6 +587,24 @@ begin
             Advance;
             Done := True;
           end;
+        '>': begin // keep stream operators
+          if (pCurrent + 1)^ = '>' then begin
+            CountLines;
+            Result := '>>';
+            Advance;
+            Done := True;
+          end else
+            Advance;
+        end;
+        '<': begin
+          if (pCurrent + 1)^ = '<' then begin
+            CountLines;
+            Result := '<<';
+            Advance;
+            Done := True;
+          end else
+            Advance;
+        end;
       else
         Advance;
       end;

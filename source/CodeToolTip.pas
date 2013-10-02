@@ -375,16 +375,16 @@ var
   end;
 
   // skip strings! since it not unusual to
-  // have commas in AnsiString we MUST ignore them!
+  // have commas in string we MUST ignore them!
   procedure SkipStrings;
   begin
     Inc(i);
 
     repeat
       case P[i] of
-        // make sure not to skip inline AnsiString "'s
-        // for example, a c AnsiString: "Hello \"Bond, James\"..."
-        // This is ONE AnsiString only and we dont want to count commas in it
+        // make sure not to skip inline string "'s
+        // for example, a c string: "Hello \"Bond, James\"..."
+        // This is ONE string only and we dont want to count commas in it
         '\':
           if P[i+1] = '"' then
             Inc(i);
@@ -408,6 +408,7 @@ begin
 			repeat
 				Inc(I);
 			until (P[i] = #0) or (P[i] = ')');
+			continue;
 		end else if P[i] = '/' then begin
 			if P[i+1] = '/' then
 				SkipLine
@@ -456,9 +457,10 @@ begin
 end;
 
 // Determine how much space we need...
+// TODO: merge with Paint
 function TCodeToolTip.DummyPaint : integer;
 var
-	ArgumentIndex,HighlightStart: Integer;
+	ArgumentIndex,HighlightStart,BraceCount: Integer;
 	CurPos : integer;
 	s : AnsiString;
 	InsideString : boolean;
@@ -482,6 +484,7 @@ begin
 
 	ArgumentIndex := -1;
 	HighlightStart := 0;
+	BraceCount := 0;
 
 	// now loop through the hint and draw each letter
 	for CurPos := 1 to Length(Caption) do begin
@@ -493,15 +496,28 @@ begin
 
 		// Argument delimiters
 		if not InsideString then begin
-			if (Caption[CurPos] = ',') or (Caption[CurPos] = '(') then begin
-				Inc(ArgumentIndex);
-
-				// Don't draw this one red yet, but start at the next char...
-				HighlightStart := CurPos + 1;
-			end else if (Caption[CurPos] = ')') then begin
-
-				// Stop highlighting
-				Inc(ArgumentIndex,999);
+			case Caption[CurPos] of
+				'(' : begin
+					Inc(BraceCount);
+					if ArgumentIndex = -1 then begin // only the first one is a delimiter
+						Inc(ArgumentIndex);
+						HighlightStart := CurPos + 1;
+					end;
+				end;
+				')' : begin
+					Dec(BraceCount);
+					if BraceCount = 0 then begin // end of argument list
+						Inc(ArgumentIndex,000);
+						HighlightStart := CurPos + 1;
+					end;
+				end;
+				',' : begin
+					if BraceCount = 1 then begin
+						Inc(ArgumentIndex);
+						// Don't draw this one in red yet, but start at the next char...
+						HighlightStart := CurPos + 1;
+					end;
+				end;
 			end;
 		end;
 
@@ -522,7 +538,7 @@ end;
 // This function paints the tooltip to FBmp and copies it to the tooltip client surface
 procedure TCodeToolTip.Paint;
 var
-	ArgumentIndex,HighlightStart,WidthParam : Integer;
+	ArgumentIndex,HighlightStart,WidthParam,BraceCount : Integer;
 	S : AnsiString;
 	CurPos : integer;
 	InsideString : boolean;
@@ -559,6 +575,7 @@ begin
 
 	ArgumentIndex := -1;
 	HighlightStart := 0;
+	BraceCount := 0;
 
 	// now loop through the hint and draw each letter
 	for CurPos := 1 to Length(Caption) do begin
@@ -570,15 +587,28 @@ begin
 
 		// Argument delimiters
 		if not InsideString then begin
-			if (Caption[CurPos] = ',') or (Caption[CurPos] = '(') then begin
-				Inc(ArgumentIndex);
-
-				// Don't draw this one red yet, but start at the next char...
-				HighlightStart := CurPos + 1;
-			end else if (Caption[CurPos] = ')') then begin
-
-				// Stop highlighting
-				Inc(ArgumentIndex,999);
+			case Caption[CurPos] of
+				'(' : begin
+					Inc(BraceCount);
+					if ArgumentIndex = -1 then begin // only the first one is a delimiter
+						Inc(ArgumentIndex);
+						HighlightStart := CurPos + 1;
+					end;
+				end;
+				')' : begin
+					Dec(BraceCount);
+					if BraceCount = 0 then begin // end of argument list
+						Inc(ArgumentIndex,000);
+						HighlightStart := CurPos + 1;
+					end;
+				end;
+				',' : begin
+					if BraceCount = 1 then begin
+						Inc(ArgumentIndex);
+						// Don't draw this one in red yet, but start at the next char...
+						HighlightStart := CurPos + 1;
+					end;
+				end;
 			end;
 		end;
 
@@ -737,7 +767,7 @@ begin
 
 		end else if (P[CurPos] = '(') then begin
 			Dec(nBraces);
-			if nBraces = -1 then // Found it!
+			if nBraces = -1 then // found it!
 				Break;
 
 		end else if (P[CurPos] = ',') then begin

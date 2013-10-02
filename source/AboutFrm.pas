@@ -57,11 +57,9 @@ type
     Fish: TPanel;
     FishImage: TImage;
     Image1: TImage;
-    DonateSite: TLabel;
-    DonateLabel: TLabel;
     Label1: TLabel;
-    Label2: TLabel;
     Bevel1: TBevel;
+    imgDonate: TImage;
     procedure LabelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAuthorsClick(Sender: TObject);
@@ -70,8 +68,8 @@ type
     procedure btnAuthorsDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure Timer1Timer(Sender: TObject);
     procedure FishImageClick(Sender: TObject);
-    procedure DonateClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure imgDonateClick(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -143,14 +141,14 @@ end;
 procedure TAboutForm.btnAuthorsClick(Sender: TObject);
 const MessageText =
   'Authors:'#13#10#13#10+
+  '- Post-4.9.9.2 development: Johan Mes'#13#10 +
   '- Development: Colin Laplace, Mike Berg, Hongli Lai, Yiannis Mandravellos'#13#10 +
   '- Contributors: Peter Schraut, Marek Januszewski, Anonymous'#13#10 +
-  '- MinGW compiler system: Mumit Khan, J.J. Var Der Heidjen, Colin Hendrix and GNU developers'#13#10+
+  '- MinGW compiler system: Mumit Khan, J.J. van der Heijden, Colin Hendrix and GNU developers'#13#10+
   '- Splash screen and association icons: Matthijs Crielaard: '#13#10 +
   '- New Look theme: Gerard Caulfield'#13#10 +
   '- Gnome icons: Gnome designers'#13#10 +
-  '- Blue theme: Thomas Thron'#13#10 +
-  '- Post-4.9.9.2 development: Johan Mes'#13#10;
+  '- Blue theme: Thomas Thron';
 begin
   MessageBeep($F);
   MessageDlg(MessageText, MtInformation, [MbOK], 0);
@@ -194,14 +192,14 @@ begin
   Fish.Tag := not Fish.Tag;
 end;
 
-procedure TAboutForm.DonateClick(Sender: TObject);
-begin
-	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil, SW_SHOWNORMAL);
-end;
-
 procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 	Action := caFree;
+end;
+
+procedure TAboutForm.imgDonateClick(Sender: TObject);
+begin
+	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil, SW_SHOWNORMAL);
 end;
 
 end.

@@ -1,6 +1,6 @@
 object CompOptForm: TCompOptForm
-  Left = 746
-  Top = 341
+  Left = 1308
+  Top = 336
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -103,7 +103,7 @@ object CompOptForm: TCompOptForm
     ActivePage = tabCompiler
     TabOrder = 0
     object tabCompiler: TTabSheet
-      Caption = 'Compiler'
+      Caption = 'General'
       DesignSize = (
         476
         375)

@@ -155,6 +155,7 @@ type
     fList: TList; // list of TdevCompilerSet
     fCurrentIndex : integer;
     function GetCurrentSet: TdevCompilerSet;
+    procedure SetCurrentIndex(index : integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -178,7 +179,7 @@ type
 
     // access to list
     property CurrentSet: TdevCompilerSet read GetCurrentSet;
-    property CurrentIndex: integer read fCurrentIndex write fCurrentIndex;
+    property CurrentIndex: integer read fCurrentIndex write SetCurrentIndex;
     property Sets[index: integer]: TdevCompilerSet read GetSet; default;
   end;
 
@@ -1422,8 +1423,12 @@ begin
 end;
 
 procedure TdevCompilerSet.SetOption(index : integer; newvalue : char);
+var
+	NewOptionString : AnsiString;
 begin
-	fOptionString[index+1] := newvalue;
+	NewOptionString := fOptionString;
+	NewOptionString[index+1] := newvalue;
+	SetOptionString(NewOptionString);
 end;
 
 function TdevCompilerSet.GetCompilerOutput(const BinDir,BinFile,Input : AnsiString) : AnsiString;
@@ -1608,8 +1613,6 @@ begin
 	// Don't bother checking exes if the dir is not set
 	if fBinDir.Count = 0 then Exit;
 
-	SetPath(fBinDir[0]);
-
 	// now check some exes
 	msg := '';
 	if not FindFile(fBinDir,fgccName) then  begin
@@ -1693,7 +1696,7 @@ function TdevCompilerSets.GetCurrentSet : TdevCompilerSet;
 var
 	index : integer;
 begin
-	if Assigned(MainForm.fProject) then
+	if Assigned(MainForm) and Assigned(MainForm.fProject) then
 		index := MainForm.fProject.Options.CompilerSet
 	else
 		index := fCurrentIndex;
@@ -1703,6 +1706,17 @@ begin
 		result := TdevCompilerSet(fList[index])
 	else
 		result := nil;
+end;
+
+procedure TdevCompilerSets.SetCurrentIndex(index : integer);
+var
+	NewCurrentSet : TdevCompilerSet;
+begin
+	fCurrentIndex := index;
+	NewCurrentSet := GetCurrentSet;
+	if Assigned(NewCurrentSet) then
+		if NewCurrentSet.BinDir.Count > 0 then
+			SetPath(NewCurrentSet.BinDir[0]);
 end;
 
 procedure TdevCompilerSets.LoadSet(index : integer;const SetName : AnsiString = '');
@@ -1760,10 +1774,8 @@ begin
 		ReadDirList(fCppDir,'Cpp');
 
 		// Set properties for current gcc path
-		if fBinDir.Count > 0 then begin
+		if fBinDir.Count > 0 then
 			SetProperties(fBinDir[0],fgccName);
-			SetPath(fBinDir[0]);
-		end;
 	end;
 end;
 
@@ -1899,7 +1911,7 @@ begin
 				with CurrentSet do begin
 					if BinDir.Count > 0 then begin
 						SetProperties(BinDir[0],gccName);
-						SetPath(BinDir[0]);
+						SetPath(BinDir[0]); // bindir might have changed, reset it
 					end;
 				end;
 			end;

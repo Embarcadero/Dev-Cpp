@@ -230,13 +230,13 @@ begin
 	// Save the set to disk (can't be undone by Cancel...)
 	with devCompilerSets[index] do begin
 
-		// User options
+		// General
 		CompOpts := Commands.Lines.Text;
 		LinkOpts := Linker.Lines.Text;
 		AddtoLink := cbLinkerAdd.Checked;
 		AddtoComp := cbCompAdd.Checked;
-		FastDep := cbFastDep.Checked;
-		Delay := seCompDelay.Value;
+
+		// Settings (flags) are saved by the components
 
 		// Directories
 		BinDir.Assign(fBinDirCopy);
@@ -244,7 +244,18 @@ begin
 		CDir.Assign(fCDirCopy);
 		CppDir.Assign(fCppDirCopy);
 
-		// other settings of a compiler profile are saved to devCompiler by the UI components!
+		// Programs
+		gccName := GccEdit.Text;
+		gppName := gppEdit.Text;
+		makeName := MakeEdit.Text;
+		gdbName := GdbEdit.Text;
+		windresName := WindresEdit.Text;
+		dllwrapName := DllwrapEdit.Text;
+		gprofName := GprofEdit.Text;
+
+		// Makefile
+		Delay := seCompDelay.Value;
+		FastDep := cbFastDep.Checked;
 	end;
 
 	// Save...
@@ -548,7 +559,7 @@ procedure TCompOptForm.btnAddFilledCompilerSetClick(Sender: TObject);
 var
 	S: AnsiString;
 begin
-	if not SelectDirectory('',devDirs.Exec,S) then
+	if not SelectDirectory('','',S) then
 		Exit;
 
 	// Save old

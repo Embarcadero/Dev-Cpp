@@ -573,7 +573,7 @@ end;
 
 procedure SetPath(const Add: AnsiString;UseOriginal: boolean = TRUE);
 var
-	OldPath: array[0..512] of char;
+	OldPath: array[0..2048] of char;
 	NewPath: AnsiString;
 begin
 	NewPath := Add;
@@ -590,7 +590,7 @@ begin
 	if UseOriginal then
 		NewPath:= NewPath + devDirs.OriginalPath
 	else begin
-		GetEnvironmentVariable(PAnsiChar('PATH'), @OldPath, 512);
+		GetEnvironmentVariable(PAnsiChar('PATH'), @OldPath, 2048);
 		NewPath:= NewPath + AnsiString(OldPath);
 	end;
 

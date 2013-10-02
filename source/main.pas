@@ -883,8 +883,8 @@ type
     procedure GotoBreakpoint(const bfile: AnsiString; bline: integer);
     procedure RemoveActiveBreakpoints;
     procedure AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
-    procedure GetCompilerOption(const option : AnsiString;var value : char;var index : integer);
-    procedure SetCompilerOption(index : integer; value : char);
+    function GetCompilerOption(const OptionString : AnsiString) : Char;
+    procedure SetCompilerOption(const OptionString : AnsiString;OptionValue : Char);
     function CloseEditor(index : integer): Boolean;
     procedure EditorSaveTimer(sender : TObject);
     procedure OnInputEvalReady(const evalvalue : AnsiString);
@@ -1666,7 +1666,7 @@ begin
 		dmMain.RemoveFromHistory(s);
 	end;
 	e.Activate;
-	if not assigned(fProject) then
+	if not Assigned(fProject) then
 		CppParser.ReParseFile(e.FileName, e.InProject, True);
 end;
 
@@ -2999,31 +2999,19 @@ procedure TMainForm.actDebugExecute(Sender: TObject);
 var
 	e: TEditor;
 	i: integer;
-	idxD,idxS : integer;
 	filepath : AnsiString;
 	debug, strip : boolean;
-	value : char;
 begin
-
-	// Assume all is set up correctly
-	debug := true;
-	strip := false;
-
 	// Check if we enabled proper options
-	GetCompilerOption('-g3',value,idxD);
-	if idxD <> -1 then
-		debug := value <> '0';
-
-	GetCompilerOption('-s',value,idxS);
-	if idxS <> -1 then
-		strip := value <> '0';
+	debug := GetCompilerOption('-g3') <> '0';
+	strip := GetCompilerOption('-s') <> '0';
 
 	// Ask the user if he wants to enable debugging...
 	if (not debug or strip) and (MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
 
 		// Enable debugging, disable stripping
-		SetCompilerOption(idxD,'1');
-		SetCompilerOption(idxS,'0');
+		SetCompilerOption('-g3','1');
+		SetCompilerOption('-s','0');
 
 		// The project will save this option by iteself
 		if not Assigned(fProject) then
@@ -4422,31 +4410,19 @@ end;
 
 procedure TMainForm.actProfileExecute(Sender: TObject);
 var
-	idxP, idxS: integer;
 	prof, strip: boolean;
 	path : AnsiString;
 	e : TEditor;
-	value : char;
 begin
-
-	// Assume all is set up correctly
-	prof := true;
-	strip := false;
-
 	// Check if we enabled proper options
-	GetCompilerOption('-pg',value,idxP);
-	if idxP <> -1 then
-		prof := value <> '0';
-
-	GetCompilerOption('-s',value,idxS);
-	if idxS <> -1 then
-		strip := value <> '0';
+	prof := GetCompilerOption('-pg') <> '0';
+	strip := GetCompilerOption('-s') <> '0';
 
 	if (not prof or strip) and (MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
 
 		// Enable profiling, disable stripping
-		SetCompilerOption(idxP,'1');
-		SetCompilerOption(idxS,'0');
+		SetCompilerOption('-pg','1');
+		SetCompilerOption('-s','0');
 
 		if not Assigned(fProject) then
 			devCompilerSets.SaveSet(devCompilerSets.CurrentIndex);
@@ -5285,28 +5261,38 @@ begin
 	end;
 end;
 
-procedure TMainForm.GetCompilerOption(const option : AnsiString;var value : char;var index : integer);
+function TMainForm.GetCompilerOption(const OptionString : AnsiString) : Char;
 var
-	optionstruct : PCompilerOption;
+	OptionStruct : PCompilerOption;
+	OptionIndex : integer;
 begin
+	result := '0';
 
 	// Try to find the value in the predefined list
-	if devCompilerSets.CurrentSet.FindOption(option, optionstruct, index) then begin // the option exists...
+	if devCompilerSets.CurrentSet.FindOption(OptionString, OptionStruct, OptionIndex) then begin // the option exists...
 
 		// Search project options...
 		if Assigned(fProject) then
-			value := fProject.Options.CompilerOptions[index + 1]
+			result := fProject.Options.CompilerOptions[OptionIndex + 1]
 		else
-			value := ValueToChar[optionstruct^.Value];
+			result := ValueToChar[OptionStruct^.Value];
 	end;
 end;
 
-procedure TMainForm.SetCompilerOption(index : integer; value : char);
+procedure TMainForm.SetCompilerOption(const OptionString : AnsiString;OptionValue : Char);
+var
+	OptionStruct : PCompilerOption;
+	OptionIndex : integer;
 begin
-	if Assigned(fProject) then
-		fProject.SetCompilerOption(index,value)
-	else
-		devCompilerSets.CurrentSet.SetOption(index,value);
+	// Try to find the value in the predefined list
+	if devCompilerSets.CurrentSet.FindOption(OptionString, OptionStruct, OptionIndex) then begin // the option exists...
+
+		// Search project options...
+		if Assigned(fProject) then
+			fProject.SetCompilerOption(OptionIndex,OptionValue)
+		else
+			devCompilerSets.CurrentSet.SetOption(OptionIndex,OptionValue);
+	end;
 end;
 
 procedure TMainForm.SetupProjectView;

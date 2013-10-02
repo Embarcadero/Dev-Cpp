@@ -99,7 +99,6 @@ type
   TCppParser = class(TComponent)
   private
     fEnabled: boolean;
-    fInClass: integer;
     fNextID: integer;
     fScannedBaseIndex : integer; // keep count of cache files
     fBaseIndex: integer;
@@ -294,7 +293,6 @@ begin
   fReparsing := False;
   fLogStatements := False;
 
-  fInClass := 0;
   fNextID := 0;
   fBaseIndex := 0;
   fThisPointerID := -1;
@@ -427,67 +425,13 @@ function TCppParser.AddStatement(
   AllowDuplicate: boolean = True;
   IsDeclaration: boolean = False): integer;
 var
-	Statement: PStatement;
+	Statement, ExistingStatement: PStatement;
 	ExistingIndex, OperatorPos: integer;
 	NewKind : TStatementKind;
 	NewType, NewScopeCmd, NewScopelessCmd : AnsiString;
-begin
-	// Move '*', '&' to type rather than cmd (it's in the way for code-completion)
-	NewType := _Type;
-	NewScopeCmd := ScopeCmd;
-	while (Length(NewScopeCmd) > 0) and (NewScopeCmd[1] in ['*', '&']) do begin
-		NewType := NewType + NewScopeCmd[1];
-		Delete(NewScopeCmd,1,1); // remove first
-	end;
 
-	NewKind := Kind;
-
-	// Strip class prefix (e.g. MyClass::SomeFunc() = SomeFunc() )
-	if Kind = skFunction then begin
-		OperatorPos := Pos('::', NewScopeCmd);
-		if OperatorPos > 0 then begin
-			NewScopelessCmd := Copy(NewScopeCmd, OperatorPos + 2, MaxInt);
-			if SameStr(Copy(NewScopeCmd, 1, OperatorPos - 1), NewScopelessCmd) then
-				NewKind := skConstructor
-			else if SameStr('~' + Copy(NewScopeCmd, 1, OperatorPos - 1), NewScopelessCmd) then
-				NewKind := skDestructor;
-		end else
-			NewScopelessCmd := NewScopeCmd;
-	end else
-		NewScopelessCmd := NewScopeCmd;
-
-	// Remove template and namespace stuff from type
-	if NewKind in [skFunction,skVariable] then begin
-		OperatorPos := Pos('<',NewType);
-		if OperatorPos > 0 then
-			Delete(NewType,OperatorPos,MaxInt);
-		OperatorPos := Pos('::',NewType);
-		if OperatorPos > 0 then
-			Delete(NewType,1,OperatorPos+1);
-	end;
-
-	// Only search for certain kinds of statements
-	if not AllowDuplicate then begin
-		ExistingIndex := CheckIfCommandExists(NewScopelessCmd, Kind, ParentID);
-	end else
-		ExistingIndex := -1;
-
-	// We usually don't allow duplicates...
-	if (ExistingIndex <> -1) then begin
-
-		// But it might be a function declaration/definition pair. Allow that
-		if (IsDeclaration <> PStatement(fStatementList[ExistingIndex])^._IsDeclaration) then begin
-			PStatement(fStatementList[ExistingIndex])^._DeclImplLine := Line;
-			PStatement(fStatementList[ExistingIndex])^._DeclImplFileName := FileName;
-			if (NewKind in [skConstructor, skDestructor]) and (PStatement(fStatementList[ExistingIndex])^._Kind = skFunction) then
-				PStatement(fStatementList[ExistingIndex])^._Kind := NewKind
-			else if (NewKind = skFunction) and (Pos('::', ScopeCmd) > 0) then
-				PStatement(fStatementList[ExistingIndex])^._ScopeCmd := ScopeCmd;
-		end;
-
-		// But always return the old one
-		Result := PStatement(fStatementList[ExistingIndex])^._ID;
-	end else begin
+	function AddToList : integer;
+	begin
 		Statement := New(PStatement);
 		with Statement^ do begin
 
@@ -519,6 +463,74 @@ begin
 		fStatementList.Add(Statement);
 		Inc(fNextID);
 	end;
+begin
+	// Move '*', '&' to type rather than cmd (it's in the way for code-completion)
+	NewType := _Type;
+	NewScopeCmd := ScopeCmd;
+	while (Length(NewScopeCmd) > 0) and (NewScopeCmd[1] in ['*', '&']) do begin
+		NewType := NewType + NewScopeCmd[1];
+		Delete(NewScopeCmd,1,1); // remove first
+	end;
+
+	NewKind := Kind;
+
+	// Strip class prefix (e.g. MyClass::SomeFunc() = SomeFunc() )
+	if Kind = skFunction then begin
+		OperatorPos := Pos('::', NewScopeCmd);
+		if OperatorPos > 0 then begin
+			NewScopelessCmd := Copy(NewScopeCmd, OperatorPos + 2, MaxInt);
+			if SameStr(Copy(NewScopeCmd, 1, OperatorPos - 1), NewScopelessCmd) then
+				NewKind := skConstructor
+			else if SameStr('~' + Copy(NewScopeCmd, 1, OperatorPos - 1), NewScopelessCmd) then
+				NewKind := skDestructor;
+		end else
+			NewScopelessCmd := NewScopeCmd;
+	end else
+		NewScopelessCmd := NewScopeCmd;
+
+	// Remove namespace stuff from type (until we support namespaces)
+	if NewKind in [skFunction,skVariable] then begin
+		OperatorPos := Pos('::',NewType);
+		if OperatorPos > 0 then
+			Delete(NewType,1,OperatorPos+1);
+	end;
+
+	// Only search for certain kinds of statements
+	ExistingStatement := nil;
+	if not AllowDuplicate then begin
+		ExistingIndex := CheckIfCommandExists(NewScopelessCmd, Kind, ParentID);
+		if ExistingIndex <> -1 then
+			ExistingStatement := PStatement(fStatementList[ExistingIndex]);
+	end;
+
+	// We already have a statement with the same identifier...
+	if Assigned(ExistingStatement) then begin
+
+		// Functions receive special treatment...
+		if (NewKind in [skFunction,skConstructor,skDestructor]) then begin
+
+			// This could be a function definition/declaration pair
+			if (IsDeclaration <> ExistingStatement^._IsDeclaration) and (ExistingStatement^._Args = Args) then begin
+				ExistingStatement^._DeclImplLine := Line;
+				ExistingStatement^._DeclImplFileName := FileName;
+				if (NewKind in [skConstructor, skDestructor]) and (ExistingStatement^._Kind = skFunction) then
+					ExistingStatement^._Kind := NewKind
+				else if (NewKind = skFunction) and (Pos('::', ScopeCmd) > 0) then
+					ExistingStatement^._ScopeCmd := ScopeCmd;
+				Result := ExistingStatement^._ID;
+
+			// Otherwise, assume overloading. Allow that.
+			end else
+				Result := AddToList;
+
+		// Other duplicate statements are to be ignored completely
+		end else begin
+			Result := ExistingStatement^._ID;
+		end;
+
+	// No duplicates found. Proceed as usual
+	end else
+		Result := AddToList;
 end;
 
 function TCppParser.GetCurrentClass: integer;
@@ -530,45 +542,46 @@ begin
 end;
 
 procedure TCppParser.SetCurrentClass(ID: integer);
+var
+	ClassIndex : integer;
 begin
-  if fCurrentClass.Count > 0 then begin
-    if fCurrentClass[fCurrentClass.Count - 1] <> ID then begin
-      fCurrentClass.Add(ID);
-      fCurrentClassLevel.Add(fLevel);
+	// Don't add duplicate scopes. Does this ever happen though?
+	if (fCurrentClass.Count > 0) and (fCurrentClass[fCurrentClass.Count - 1] = ID) then
+		Exit;
 
-      if PStatement(fStatementList[IndexOfStatement(ID)])^._Type = 'class' then
-        fClassScope := scsPrivate // classes are private by default
-      else
-        fClassScope := scsPublic;
-    end;
-  end
-  else begin
-    fCurrentClass.Add(ID);
-    fCurrentClassLevel.Add(fLevel);
-    if PStatement(fStatementList[IndexOfStatement(ID)])^._Type = 'class' then
-      fClassScope := scsPrivate // classes are private by default
-    else
-      fClassScope := scsPublic;
-  end;
+	// Add class to list. If ID is -1, this is an extern {} 'class' or namespace
+	fCurrentClass.Add(ID);
+	fCurrentClassLevel.Add(fLevel);
+
+	// Check bounds before inserting..
+	ClassIndex := IndexOfStatement(ID);
+
+	// extern {}, namespace or class that doesn't exist
+	if (ClassIndex = -1) then begin
+		fClassScope := scsNone
+	end else if PStatement(fStatementList[ClassIndex])^._Type = 'class' then
+		fClassScope := scsPrivate // classes are private by default
+	else
+		fClassScope := scsPublic;
 end;
 
 procedure TCppParser.RemoveCurrentClass;
 begin
-  if fCurrentClassLevel.Count > 0 then
-    if fCurrentClassLevel[fCurrentClassLevel.Count - 1] = fLevel then begin
-      fCurrentClass.Delete(fCurrentClass.Count - 1);
-      fCurrentClassLevel.Delete(fCurrentClassLevel.Count - 1);
-      if fCurrentClassLevel.Count = 0 then
-        fClassScope := scsNone // no classes or structs remaining
-      else begin
+	if fCurrentClassLevel.Count > 0 then
+		if fCurrentClassLevel[fCurrentClassLevel.Count - 1] = fLevel then begin
+			fCurrentClass.Delete(fCurrentClass.Count - 1);
+			fCurrentClassLevel.Delete(fCurrentClassLevel.Count - 1);
+			if fCurrentClassLevel.Count = 0 then
+				fClassScope := scsNone // no classes or structs remaining
+			else begin
 
-        // Check top level class
-        if PStatement(fStatementList[IndexOfStatement(fCurrentClass[fCurrentClass.Count-1])])^._Type = 'class' then
-          fClassScope := scsPrivate // classes are private by default
-        else
-          fClassScope := scsPublic;
-      end;
-    end;
+				// Check top level class
+				if PStatement(fStatementList[IndexOfStatement(fCurrentClass[fCurrentClass.Count-1])])^._Type = 'class' then
+					fClassScope := scsPrivate // classes are private by default
+				else
+					fClassScope := scsPublic;
+			end;
+		end;
 end;
 
 procedure TCppParser.SetInheritance(Index: integer);
@@ -612,20 +625,33 @@ begin
   end;
 end;
 
+// a few percent speed can be gained by storing the prefered action here and directly executing that in HandleKeyword
+// however, CheckIfCommandExists is responsible for 95% of our slowness. fix that first.
 function TCppParser.CheckForKeyword: boolean;
 begin
   Result :=
+    SameStr(fTokenizer[fIndex]^.Text,'alignas') or // skip to )
+    SameStr(fTokenizer[fIndex]^.Text,'alignof') or // skip to )
+    SameStr(fTokenizer[fIndex]^.Text,'and') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'and_eq') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'asm') or // skip to }
     // auto is a type
+    SameStr(fTokenizer[fIndex]^.Text,'bitand') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'bitor') or // skip
     // bool is a type
     SameStr(fTokenizer[fIndex]^.Text,'break') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'case') or // skip to :
     SameStr(fTokenizer[fIndex]^.Text,'catch') or // skip to {
     // char is a type
+    // char16_t is a type
+    // char32_t is a type
     // class is handled elsewhere
+    SameStr(fTokenizer[fIndex]^.Text,'compl') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'const') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'constexpr') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'const_cast') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'continue') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'decltype') or // skip to )
     SameStr(fTokenizer[fIndex]^.Text,'default') or // skip to :
     SameStr(fTokenizer[fIndex]^.Text,'delete') or // skip to ;
     SameStr(fTokenizer[fIndex]^.Text,'do') or // skip to {
@@ -635,10 +661,10 @@ begin
     // enum is handled elsewhere
     SameStr(fTokenizer[fIndex]^.Text,'explicit') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'export') or // skip
-    SameStr(fTokenizer[fIndex]^.Text,'extern') or // skip to ;
+    SameStr(fTokenizer[fIndex]^.Text,'extern') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'false') or // skip
     // float is a type
-    SameStr(fTokenizer[fIndex]^.Text,'for') or // skip to )
+    SameStr(fTokenizer[fIndex]^.Text,'for') or // skip to ), ( when scanning code blocks
     SameStr(fTokenizer[fIndex]^.Text,'friend') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'goto') or // skip to ;
     SameStr(fTokenizer[fIndex]^.Text,'if') or  // skip to )
@@ -648,7 +674,13 @@ begin
     SameStr(fTokenizer[fIndex]^.Text,'mutable') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'namespace') or // skip to {
     SameStr(fTokenizer[fIndex]^.Text,'new') or  // skip to ;
+    SameStr(fTokenizer[fIndex]^.Text,'noexcept') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'not') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'not_eq') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'nullptr') or // skip
     // operator is handled elsewhere
+    SameStr(fTokenizer[fIndex]^.Text,'or') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'or_eq') or // skip
     // private is handled elsewhere
     // protected is handled elsewhere
     // public is handled elsewhere
@@ -665,6 +697,7 @@ begin
     SameStr(fTokenizer[fIndex]^.Text,'switch') or // skip to )
     // template is handled elsewhere
     SameStr(fTokenizer[fIndex]^.Text,'this') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'thread_local') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'throw') or // skip to ;
     SameStr(fTokenizer[fIndex]^.Text,'true') or // skip
     SameStr(fTokenizer[fIndex]^.Text,'try') or //skip to {
@@ -679,19 +712,8 @@ begin
     SameStr(fTokenizer[fIndex]^.Text,'volatile') or // skip
     // wchar_t is a type
     SameStr(fTokenizer[fIndex]^.Text,'while') or // skip to )
-
-    // Some C99 stuff, skip all
-    SameStr(fTokenizer[fIndex]^.Text,'and') or
-    SameStr(fTokenizer[fIndex]^.Text,'not_eq') or
-    SameStr(fTokenizer[fIndex]^.Text,'and_eq') or
-    SameStr(fTokenizer[fIndex]^.Text,'or') or
-    SameStr(fTokenizer[fIndex]^.Text,'bitand') or
-    SameStr(fTokenizer[fIndex]^.Text,'or_eq') or
-    SameStr(fTokenizer[fIndex]^.Text,'bitor') or
-    SameStr(fTokenizer[fIndex]^.Text,'xor') or
-    SameStr(fTokenizer[fIndex]^.Text,'compl') or
-    SameStr(fTokenizer[fIndex]^.Text,'xor_eq') or
-    SameStr(fTokenizer[fIndex]^.Text,'not');
+    SameStr(fTokenizer[fIndex]^.Text,'xor') or // skip
+    SameStr(fTokenizer[fIndex]^.Text,'xor_eq'); // skip
 end;
 
 function TCppParser.CheckForMember: boolean;
@@ -766,36 +788,41 @@ begin
 
 	while (I < fTokenizer.Tokens.Count) and not (fTokenizer[I]^.Text[1] in ['{', '}', ';', ',', #0]) do begin
 
-		// Skip function usage. We need declarations and all.
-		if (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = '.') or
-		   ((Length(fTokenizer[I]^.Text) > 1) and
-		   (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = '>') and
-		   (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text) - 1] = '-')) then begin
+		// Jump over preprocessor directives in definition
+		if fTokenizer[I]^.Text[1] <> '#' then begin
 
-			Result := False;
-			JumpOver := True;
-			Break;
+			// Skip function usage. We need declarations and all.
+			if (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = '.') or
+			   ((Length(fTokenizer[I]^.Text) > 1) and
+			   (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = '>') and
+			   (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text) - 1] = '-')) then begin
 
-		// Here is where the argument list starts
-		end else if (I+1 < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = '(') then begin
-			Result := fTokenizer[I + 1]^.Text[1] in [':', ';', '{', '}'];
+				Result := False;
+				JumpOver := True;
+				Break;
 
-			// There could be any amount of words between the () and {
-			if not Result then begin
+			// Here is where the argument list starts
+			end else if (I+1 < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = '(') then begin
 
-				// ???
-				if fTokenizer[I + 1]^.Text[1] = '(' then
-					Result := True // probably a function pointer
-				else begin
+				// Again, skip preprocessor
+				while (I+2 < fTokenizer.Tokens.Count) and (fTokenizer[I+1]^.Text[1] = '#') do
+					Inc(I);
+
+				// Check for a function body/inherit list/etc
+				Result := fTokenizer[I + 1]^.Text[1] in [':', ';', '{', '}'];
+
+				// There could be any amount of words between the () and {
+				if not Result then begin
+
 					// Skip the words
-					while (I+2 < fTokenizer.Tokens.Count) and IsValidIdentifier(fTokenizer[I+1]^.Text) do
+					while (I+2 < fTokenizer.Tokens.Count) and IsValidIdentifier(fTokenizer[I+1]^.Text) or (Tokenizer[I+1]^.Text[1] = '(') do
 						Inc(i);
 
 					// We now require an opening char
 					Result := fTokenizer[I + 1]^.Text[1] in [':', ';', '{', '}'];
 				end;
+				Break;
 			end;
-			Break;
 		end;
 		Inc(I);
 	end;
@@ -818,49 +845,79 @@ begin
 	Result := fTokenizer[fIndex]^.Text[1] = '#';
 end;
 
+// TODO: rewrite some day
 function TCppParser.CheckForVar: boolean;
 var
-	I: integer;
+	I,fIndexBackup: integer;
 begin
-	if fIndex < fTokenizer.Tokens.Count - 1 then
-		for I := 0 to 1 do // check the current and the next token
-			if CheckForKeyword or
-				(fTokenizer[fIndex + I]^.Text[1] in [',', ';', ':', '{', '}', '!', '/', '+', '-']) or
-				(fTokenizer[fIndex + I]^.Text[Length(fTokenizer[fIndex + I]^.Text)] = '.') or
-				((Length(fTokenizer[fIndex + I]^.Text) > 1) and
-				(fTokenizer[fIndex + I]^.Text[Length(fTokenizer[fIndex + I]^.Text) - 1] = '-') and
-				(fTokenizer[fIndex + I]^.Text[Length(fTokenizer[fIndex + I]^.Text)] = '>')) then begin
+	// Be pessimistic
+	Result := False;
 
-				Result := False;
-				Exit;
+	// Store old index
+	fIndexBackup := fIndex;
+
+	// Use fIndex so we can reuse checking functions
+	if fIndex < fTokenizer.Tokens.Count - 1 then begin
+
+		// Check the current and the next token
+		for I := 0 to 1 do begin
+			if CheckForKeyword or CheckForTemplate or CheckForPreprocessor or
+				(fTokenizer[fIndex]^.Text[1] in [',', ';', ':', '{', '}', '!', '/', '+', '-', '(', '<', '>']) or
+				(fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = '.') or
+				((Length(fTokenizer[fIndex]^.Text) > 1) and
+				(fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text) - 1] = '-') and
+				(fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = '>')) then begin
+
+				// Reset index and fail
+				fIndex := fIndexBackup;
+				Exit; // fail
 			end;
-
-	I := fIndex;
-	Result := True;
-	while I < fTokenizer.Tokens.Count - 1 do begin
-		if (fTokenizer[I]^.Text[1] in ['{', '}', '(']) or CheckForKeyword then begin
-			Result := False;
-			Break;
-		end else if fTokenizer[I]^.Text[1] in [',', ';'] then
-			Break;
-		Inc(I);
+			Inc(fIndex);
+		end;
 	end;
+
+	// Revert to the point we started at
+	fIndex := fIndexBackup;
+
+	// Fail if we do not find a comma or a semicolon or a ( (inline constructor)
+	while fIndex < fTokenizer.Tokens.Count - 1 do begin
+		if (fTokenizer[fIndex]^.Text[1] in ['{', '}']) or CheckForKeyword or CheckForTemplate or CheckForPreprocessor then begin
+			Break; // fail
+		end else if fTokenizer[fIndex]^.Text[1] in [',',';','('] then begin
+			Result := True;
+			Break;
+		end;
+		Inc(fIndex);
+	end;
+
+	// Revert to the point we started at
+	fIndex := fIndexBackup;
 end;
 
 function TCppParser.GetScope: TStatementScope;
+var
+	CurrClass : integer;
 begin
-  if fLaterScanning then begin
-    Result := ssLocal;
-    Exit;
-  end;
-  if fLevel = 0 then
-    Result := ssGlobal
-  else begin
-    if GetCurrentClass <> -1 then
-      Result := ssClassLocal
-    else
-      Result := ssLocal;
-  end;
+	// Function bodies...
+	if fLaterScanning then begin
+		Result := ssLocal;
+		Exit;
+	end;
+
+	// Don't blindly trust levels. Namespaces and externs can have levels too
+	CurrClass := GetCurrentClass;
+
+	// Invalid class or namespace/extern
+	if (CurrClass = -1) or (fLevel = 0) then
+		Result := ssGlobal
+
+	// We are inside a class body
+	else if CurrClass <> -1 then
+		Result := ssClassLocal
+
+	// Everything else
+	else
+		Result := ssLocal;
 end;
 
 procedure TCppParser.HandleMember;
@@ -873,25 +930,8 @@ end;
 
 procedure TCppParser.HandleTemplate;
 begin
-	// goto '{' or ';'
-	{while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in ['>', '{', ';']) do
-		Inc(fIndex);
-
-	if fTokenizer[fIndex]^.Text[1] = '{' then begin
-		Inc(fIndex);}
-
-		// we just skip over the template ;)
-		//while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] = '}') do begin
-		{	if fTokenizer[fIndex]^.Text[1] = '{' then //recurse
-				HandleTemplate;
-			Inc(fIndex);
-		end;
-	end else
-		Inc(fIndex); // probably on "class" keyword
-	}
-
 	// Step to the end of the template<> part
-	while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in ['>', '{', ';']) do
+	while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in ['>', ';']) do
 		Inc(fIndex);
 
 	// And step over it
@@ -955,37 +995,45 @@ begin
 
 	// normal class/struct decl
 	end else begin
-		Inc(fInClass);
 		if fTokenizer[fIndex]^.Text[1] <> '{' then begin
 			S1 := '';
 			S2 := '';
 			repeat
-				S := S + fTokenizer[fIndex]^.Text + ' ';
-				if not (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', ':']) then
-					S1 := S1 + fTokenizer[fIndex]^.Text + ' ';
-				if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] = '(') then
-					S2 := fTokenizer[fIndex]^.Text;
-				if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', '{', ':']) then begin
-					if S2 = '' then
+				if fTokenizer[fIndex]^.Text[1] <> '#' then begin
+					S := S + fTokenizer[fIndex]^.Text + ' ';
+					if not (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', ':']) then
+						S1 := S1 + fTokenizer[fIndex]^.Text + ' ';
+					if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] = '(') then
 						S2 := fTokenizer[fIndex]^.Text;
-					S1 := TrimRight(S1);
-					if S1 <> '' then begin
-						fLastID := AddStatement(
-							-1,
-							GetCurrentClass,
-							fCurrentFile,
-							Prefix + ' ' + S1,
-							Prefix,
-							S2,
-							'',
-							fTokenizer[fIndex]^.Line,
-							skClass,
-							GetScope,
-							fClassScope,
-							True,
-							False);
+					if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', '{', ':']) then begin
+						if S2 = '' then
+							S2 := fTokenizer[fIndex]^.Text;
+						S1 := TrimRight(S1);
+
+						// TODO: fix this the nice way
+						if (S1 = 'basic_string') and (S2 = 'basic_string') then begin
+							S1 := 'string';
+							S2 := 'string';
+						end;
+
+						if S1 <> '' then begin
+							fLastID := AddStatement(
+								-1,
+								GetCurrentClass,
+								fCurrentFile,
+								Prefix + ' ' + S1,
+								Prefix,
+								S2,
+								'',
+								fTokenizer[fIndex]^.Line,
+								skClass,
+								GetScope,
+								fClassScope,
+								True,
+								False);
+						end;
+						S1 := '';
 					end;
-					S1 := '';
 				end;
 				Inc(fIndex);
 			until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [':', '{', ';']);
@@ -1070,9 +1118,9 @@ var
   IsDeclaration: boolean;
 begin
 	IsValid := True;
-	S := ''; // should contain whole string "int function(int a) DEPRECATED"
+	S := ''; // should contain whole string "int foo::function(int a) DEPRECATED"
 	S1 := '';// should contain type "int"
-	S2 := '';// should contain function name "function"
+	S2 := '';// should contain function name "foo::function"
 	S3 := '';// should contain argument list "(int a)"
 	bNameOK := false;
 	bTypeOK := false;
@@ -1107,62 +1155,67 @@ begin
 		Inc(fIndex);
 	end;
 
-	// Check if this is a prototype
-	CurrClassID := GetCurrentClass;
-	if fTokenizer[fIndex]^.Text[1] in [';', '}'] then begin
-		IsDeclaration := True;
-		if not fIsHeader and (CurrClassID = -1) then
-			IsValid := False;
-	end else begin
+	// TODO: track down the cause of this fail
+	if S <> '' then begin
 
-		// Find the function body start after the inherited constructor
-		if fTokenizer[fIndex]^.Text[1] = ':' then
-			while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}', #0])) do
-				Inc(fIndex);
-
-		// Still a prototype
+		// Check if this is a prototype
+		CurrClassID := GetCurrentClass;
 		if fTokenizer[fIndex]^.Text[1] in [';', '}'] then begin
 			IsDeclaration := True;
 			if not fIsHeader and (CurrClassID = -1) then
 				IsValid := False;
-		end;
-	end;
+		end else begin
 
-	// Set type to nada if the prototyping stuff isn't working
-	if not bTypeOK then
-		S1 := '';
+			// Find the function body start after the inherited constructor
+			if fTokenizer[fIndex]^.Text[1] = ':' then
+				while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}', #0])) do
+					Inc(fIndex);
 
-	if IsValid then begin
-
-		// Use the class the function belongs to as the parent ID if the function is declared outside of the class body
-		DelimPos := Pos('::',S2);
-		if DelimPos > 0 then begin
-			ParentString := Copy(S2,1,DelimPos-1);
-			CurrClassIndex := CheckIfCommandExists(ParentString,skClass,CurrClassID);
-			if CurrClassIndex <> -1 then
-				CurrClassID := PStatement(fStatementList[CurrClassIndex])^._ID;
+			// Still a prototype
+			if fTokenizer[fIndex]^.Text[1] in [';', '}'] then begin
+				IsDeclaration := True;
+				if not fIsHeader and (CurrClassID = -1) then
+					IsValid := False;
+			end;
 		end;
 
-		fLastID := AddStatement(
-			-1,
-			CurrClassID,
-			fCurrentFile,
-			TrimRight(S),
-			TrimRight(S1),
-			TrimRight(S2),
-			TrimRight(S3),
-			fTokenizer[fIndex - 1]^.Line,
-			skFunction,
-			GetScope,
-			fClassScope,
-			True,
-			True, // allow duplicates for overloading
-			IsDeclaration);
-	end;
+		if IsValid then begin
+
+			// Use the class the function belongs to as the parent ID if the function is declared outside of the class body
+			DelimPos := Pos('::',S2);
+			if DelimPos > 0 then begin
+				ParentString := Copy(S2,1,DelimPos-1);
+				CurrClassIndex := CheckIfCommandExists(ParentString,skClass,CurrClassID);
+				if CurrClassIndex <> -1 then
+					CurrClassID := PStatement(fStatementList[CurrClassIndex])^._ID;
+			end;
+
+			// If this is a class function, check for duplicates to form declaration/definition pairs
+			// If this is a global function, don't perform duplicate checks (allow overloading), even if we do not check arg lists
+			fLastID := AddStatement(
+				-1,
+				CurrClassID,
+				fCurrentFile,
+				TrimRight(S),
+				TrimRight(S1),
+				TrimRight(S2),
+				TrimRight(S3),
+				fTokenizer[fIndex - 1]^.Line,
+				skFunction,
+				GetScope,
+				fClassScope,
+				True,
+				CurrClassID = -1, // allow dupes for globals
+				IsDeclaration);
+		end;
+	end else
+		Inc(fIndex);
 
 	// Don't parse the function's block now... It will be parsed when user presses ctrl+space inside it ;)
 	if (fTokenizer[fIndex]^.Text[1] = '{') then
-		fIndex := SkipBraces(fIndex) + 1; // add 1 so that '}' is not visible to parser
+		fIndex := SkipBraces(fIndex) + 1 // add 1 so that '}' is not visible to parser
+	else if (fTokenizer[fIndex]^.Text[1] = ';') then
+		Inc(fIndex);
 	if fLogStatements then
 		if Assigned(fOnLogStatement) and IsValid then
 			fOnLogStatement(Self, '[parser   ]: -M- ' + Format('%4d ', [fTokenizer[fIndex - 1]^.Line]) + StringOfChar(' ', fLevel) + Trim(S));
@@ -1318,44 +1371,47 @@ end;
 procedure TCppParser.HandleKeyword;
 begin
 	// Skip
-	if			SameStr(fTokenizer[fIndex]^.Text,'break') or
+	if			SameStr(fTokenizer[fIndex]^.Text,'and') or
+				SameStr(fTokenizer[fIndex]^.Text,'and_eq') or
+				SameStr(fTokenizer[fIndex]^.Text,'bitand') or
+				SameStr(fTokenizer[fIndex]^.Text,'bitor') or
+				SameStr(fTokenizer[fIndex]^.Text,'break') or
+				SameStr(fTokenizer[fIndex]^.Text,'compl') or
 				SameStr(fTokenizer[fIndex]^.Text,'const') or
+				SameStr(fTokenizer[fIndex]^.Text,'constexpr') or
 				SameStr(fTokenizer[fIndex]^.Text,'const_cast') or
 				SameStr(fTokenizer[fIndex]^.Text,'continue') or
 				SameStr(fTokenizer[fIndex]^.Text,'dynamic_cast') or
 				SameStr(fTokenizer[fIndex]^.Text,'else') or
 				SameStr(fTokenizer[fIndex]^.Text,'explicit') or
 				SameStr(fTokenizer[fIndex]^.Text,'export') or
+				SameStr(fTokenizer[fIndex]^.Text,'extern') or
 				SameStr(fTokenizer[fIndex]^.Text,'false') or
 				SameStr(fTokenizer[fIndex]^.Text,'friend') or
 				SameStr(fTokenizer[fIndex]^.Text,'inline') or
 				SameStr(fTokenizer[fIndex]^.Text,'mutable') or
+				SameStr(fTokenizer[fIndex]^.Text,'noexcept') or
+				SameStr(fTokenizer[fIndex]^.Text,'not') or
+				SameStr(fTokenizer[fIndex]^.Text,'not_eq') or
+				SameStr(fTokenizer[fIndex]^.Text,'nullptr') or
+				SameStr(fTokenizer[fIndex]^.Text,'or') or
+				SameStr(fTokenizer[fIndex]^.Text,'or_eq') or
 				SameStr(fTokenizer[fIndex]^.Text,'register') or
 				SameStr(fTokenizer[fIndex]^.Text,'reinterpret_cast') or
 				SameStr(fTokenizer[fIndex]^.Text,'static') or
 				SameStr(fTokenizer[fIndex]^.Text,'static_assert') or
 				SameStr(fTokenizer[fIndex]^.Text,'static_cast') or
 				SameStr(fTokenizer[fIndex]^.Text,'this') or
+				SameStr(fTokenizer[fIndex]^.Text,'thread_local') or
 				SameStr(fTokenizer[fIndex]^.Text,'true') or
-				SameStr(fTokenizer[fIndex]^.Text,'static') or
 				SameStr(fTokenizer[fIndex]^.Text,'virtual') or
 				SameStr(fTokenizer[fIndex]^.Text,'volatile') or
-				SameStr(fTokenizer[fIndex]^.Text,'and') or
-				SameStr(fTokenizer[fIndex]^.Text,'not_eq') or
-				SameStr(fTokenizer[fIndex]^.Text,'and_eq') or
-				SameStr(fTokenizer[fIndex]^.Text,'or') or
-				SameStr(fTokenizer[fIndex]^.Text,'bitand') or
-				SameStr(fTokenizer[fIndex]^.Text,'or_eq') or
-				SameStr(fTokenizer[fIndex]^.Text,'bitor') or
 				SameStr(fTokenizer[fIndex]^.Text,'xor') or
-				SameStr(fTokenizer[fIndex]^.Text,'compl') or
-				SameStr(fTokenizer[fIndex]^.Text,'xor_eq') or
-				SameStr(fTokenizer[fIndex]^.Text,'not') then begin
+				SameStr(fTokenizer[fIndex]^.Text,'xor_eq') then begin
 		Inc(fIndex);
 
 	// Skip to ;
 	end else if SameStr(fTokenizer[fIndex]^.Text,'delete') or
-
 				SameStr(fTokenizer[fIndex]^.Text,'goto') or
 				SameStr(fTokenizer[fIndex]^.Text,'new') or
 				SameStr(fTokenizer[fIndex]^.Text,'return') or
@@ -1363,7 +1419,8 @@ begin
 				SameStr(fTokenizer[fIndex]^.Text,'using') then begin
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [#0,';']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [#0,';']);
+		Inc(fIndex); // step over
 
 	// Skip to :
 	end else if SameStr(fTokenizer[fIndex]^.Text,'case') or
@@ -1371,19 +1428,24 @@ begin
 
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [#0,':']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [#0,':']);
 
 	// Skip to )
-	end else if SameStr(fTokenizer[fIndex]^.Text,'for') or
+	end else if SameStr(fTokenizer[fIndex]^.Text,'alignas') or
+				SameStr(fTokenizer[fIndex]^.Text,'alignof') or
+				SameStr(fTokenizer[fIndex]^.Text,'decltype') or
+				//SameStr(fTokenizer[fIndex]^.Text,'for') or
 				SameStr(fTokenizer[fIndex]^.Text,'if') or
 				SameStr(fTokenizer[fIndex]^.Text,'sizeof') or
 				SameStr(fTokenizer[fIndex]^.Text,'switch') or
 				SameStr(fTokenizer[fIndex]^.Text,'typeid') or
 				SameStr(fTokenizer[fIndex]^.Text,'typename') or
 				SameStr(fTokenizer[fIndex]^.Text,'while') then begin
+
 		repeat
 			Inc(fIndex);
 		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [#0,')']);
+		Inc(fIndex); // step over
 
 	// Skip to {
 	end else if SameStr(fTokenizer[fIndex]^.Text,'catch') or
@@ -1393,21 +1455,22 @@ begin
 
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [#0,'{']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [#0,'{']);
 
 	// Skip to }
 	end else if SameStr(fTokenizer[fIndex]^.Text,'asm') then begin
 
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [#0,'}']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [#0,'}']);
+		Inc(fIndex); // step over
 
-	// Skip to { or ;
-	end else if SameStr(fTokenizer[fIndex]^.Text,'extern') then begin
-
+	end else if SameStr(fTokenizer[fIndex]^.Text,'for') then begin
+		// TODO: when fLaterScanning is true, scan the for body too
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [#0,';','}']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [#0,')']);
+		Inc(fIndex); // step over
 	end;
 end;
 
@@ -1417,66 +1480,83 @@ var
   Args: AnsiString;
   Cmd: AnsiString;
 begin
-  LastType := '';
-  repeat
-    if (fIndex < fTokenizer.Tokens.Count - 1) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', ':', '}']) then
-      Break;
-    if NotSameStr(fTokenizer[fIndex]^.Text,'struct') and
-       NotSameStr(fTokenizer[fIndex]^.Text,'class') and
-       NotSameStr(fTokenizer[fIndex]^.Text,'union') then
-      LastType := Trim(LastType + ' ' + fTokenizer[fIndex]^.Text);
-    Inc(fIndex);
-  until fIndex = fTokenizer.Tokens.Count;
-  if fIndex = fTokenizer.Tokens.Count then
-    Exit;
+	// Keep going and stop on top of the variable name
+	LastType := '';
+	repeat
+		if (fIndex < fTokenizer.Tokens.Count - 1) and (fTokenizer[fIndex + 1]^.Text[1] in ['(',',', ';', ':', '}']) then
+			Break;
+		if NotSameStr(fTokenizer[fIndex]^.Text,'struct') and
+		   NotSameStr(fTokenizer[fIndex]^.Text,'class') and
+		   NotSameStr(fTokenizer[fIndex]^.Text,'union') then
+			LastType := Trim(LastType + ' ' + fTokenizer[fIndex]^.Text);
+		Inc(fIndex);
+	until fIndex >= fTokenizer.Tokens.Count;
+	if fIndex = fTokenizer.Tokens.Count then
+		Exit;
 
-  repeat
-    // skip bit identifiers,
-    // e.g.:
-    // handle
-    // unsigned short bAppReturnCode:8,reserved:6,fBusy:1,fAck:1
-    // as
-    // unsigned short bAppReturnCode,reserved,fBusy,fAck
-    if fTokenizer[fIndex]^.Text[1] = ':' then
-      repeat
-        Inc(fIndex);
-      until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', '}']);   // CL: added check for fIndex validity
-    if fIndex = fTokenizer.Tokens.Count then
-      Exit;
-    if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
-      if fLogStatements then
-        if Assigned(fOnLogStatement) then
-          fOnLogStatement(Self, '[parser   ]: -V- ' + Format('%4d ', [fTokenizer[fIndex]^.Line]) + StringOfChar(' ', fLevel) + Trim(LastType + ' ' + fTokenizer[fIndex]^.Text));
-      if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
-        Cmd := Copy(fTokenizer[fIndex]^.Text, 1, Pos('[', fTokenizer[fIndex]^.Text) - 1);
-        Args := Copy(fTokenizer[fIndex]^.Text, Pos('[', fTokenizer[fIndex]^.Text), Length(fTokenizer[fIndex]^.Text) - Pos('[', fTokenizer[fIndex]^.Text) + 1);
-      end
-      else begin
-        Cmd := fTokenizer[fIndex]^.Text;
-        Args := '';
-      end;
-        fLastID := AddStatement(
-          -1,
-          GetCurrentClass,
-          fCurrentFile,
-          LastType + ' ' + fTokenizer[fIndex]^.Text,
-          LastType,
-          Cmd,
-          Args,
-          fTokenizer[fIndex]^.Line,
-          skVariable,
-          GetScope,
-          fClassScope,
-          True,
-          True);
-    end;
-    if not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']) then
-      Inc(fIndex);
-  until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']);
-  if (fIndex >= fTokenizer.Tokens.Count) then
-    exit;
-  if not (fTokenizer[fIndex]^.Text[1] in ['{', '}']) then
-    Inc(fIndex);
+	// Step onto the variable name
+	repeat
+		// Skip bit identifiers,
+		// e.g.:
+		// handle
+		// unsigned short bAppReturnCode:8,reserved:6,fBusy:1,fAck:1
+		// as
+		// unsigned short bAppReturnCode,reserved,fBusy,fAck
+		if fTokenizer[fIndex]^.Text[1] = ':' then begin
+			repeat
+				Inc(fIndex);
+			until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', '}']);
+		end;
+
+		// Skip inline constructors,
+		// e.g.:
+		// handle
+		// int a(3)
+		// as
+		// int a
+		if fTokenizer[fIndex]^.Text[1] = '(' then begin
+			while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', '}']) do
+				Inc(fIndex);
+		end;
+
+		// We have failed you
+		if fIndex = fTokenizer.Tokens.Count then
+			Exit;
+
+		// Did we succeed?
+		if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
+			if fLogStatements then
+				if Assigned(fOnLogStatement) then
+					fOnLogStatement(Self, '[parser   ]: -V- ' + Format('%4d ', [fTokenizer[fIndex]^.Line]) + StringOfChar(' ', fLevel) + Trim(LastType + ' ' + fTokenizer[fIndex]^.Text));
+			if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
+				Cmd := Copy(fTokenizer[fIndex]^.Text, 1, Pos('[', fTokenizer[fIndex]^.Text) - 1);
+				Args := Copy(fTokenizer[fIndex]^.Text, Pos('[', fTokenizer[fIndex]^.Text), Length(fTokenizer[fIndex]^.Text) - Pos('[', fTokenizer[fIndex]^.Text) + 1);
+			end else begin
+				Cmd := fTokenizer[fIndex]^.Text;
+				Args := '';
+			end;
+			fLastID := AddStatement(
+				-1,
+				GetCurrentClass,
+				fCurrentFile,
+				LastType + ' ' + fTokenizer[fIndex]^.Text,
+				LastType,
+				Cmd,
+				Args,
+				fTokenizer[fIndex]^.Line,
+				skVariable,
+				GetScope,
+				fClassScope,
+				True,
+				True);
+		end;
+		if not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']) then
+			Inc(fIndex);
+	until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']);
+
+	// Skip ; and ,
+	if (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['{', '}']) then
+		Inc(fIndex);
 end;
 
 procedure TCppParser.HandleEnum;
@@ -1555,13 +1635,9 @@ begin
 	if fTokenizer[fIndex]^.Text[1] = '{' then begin
 		Inc(fLevel);
 		Inc(fIndex);
-		if fInClass > 0 then
-			Inc(fInClass);
 	end else if fTokenizer[fIndex]^.Text[1] = '}' then begin
 		Dec(fLevel);
 		Inc(fIndex);
-		if fInClass > 0 then
-			Dec(fInClass);
 		RemoveCurrentClass;
 	end else if CheckForPreprocessor then begin
 		HandlePreprocessor;
@@ -2978,6 +3054,11 @@ begin
 		Dec(position);
 	if position <> Length(s) then
 		Delete(s,position + 1,Length(s) - 1);
+
+	// Strip template stuff
+	position := Pos('<',s);
+	if position > 0 then
+		Delete(s,position,MaxInt);
 
 	// Use last word only (strip 'const', 'static', etc)
 	position := RPos(' ',s);

@@ -249,7 +249,7 @@ begin
 					if (Length(sl[i]) > 1) and (sl[i][2] = ':') then begin
 						if FileExists(sl[i]) then
 							MainForm.CppParser.AddFileToScan(sl[i]);
-					end else begin
+					end else if Assigned(devCompilerSets.CurrentSet) then begin
 						for j := 0 to devCompilerSets.CurrentSet.CppDir.Count-1 do begin
 							if FileExists(devCompilerSets.CurrentSet.CppDir[j] + pd + sl[i]) then begin
 								MainForm.CppParser.AddFileToScan(devCompilerSets.CurrentSet.CppDir[j] + pd + sl[i]);
@@ -306,18 +306,22 @@ var
 	s: AnsiString;
 begin
 	with TOpenDialog.Create(self) do try
-		Filter:= FLT_HEADS;
+		Filter:= BuildFilter([FLT_HEADS]);
 		Title:= Lang[ID_NV_OPENFILE];
 		Options := Options + [ofAllowMultiSelect];
 
 		// Start in the include folder
-		if devCompilerSets.CurrentSet.CppDir.Count > 0 then
+		FileName := '';
+		if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.CppDir.Count > 0) then
 			InitialDir := devCompilerSets.CurrentSet.CppDir[0];
 
 		if Execute then begin
 			for i:= 0 to Files.Count-1 do begin
-				for J := 0 to devCompilerSets.CurrentSet.CppDir.Count -1 do
-					s := StringReplace(Files[i],devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
+				if Assigned(devCompilerSets.CurrentSet) then begin
+					for J := 0 to devCompilerSets.CurrentSet.CppDir.Count -1 do
+						s := StringReplace(Files[i],devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
+				end else
+					s := Files[i];
 				AltFileList.Items.Add(s);
 			end;
 		end;
@@ -343,8 +347,11 @@ begin
 		if SelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
 			FilesFromWildcard(Dir, '*.*', f, false, false, false);
 			for i := 0 to f.Count-1 do begin
-				for J := 0 to devCompilerSets.CurrentSet.CppDir.Count -1 do
-					s := StringReplace(f[i],devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
+				if Assigned(devCompilerSets.CurrentSet) then begin
+					for J := 0 to devCompilerSets.CurrentSet.CppDir.Count -1 do
+						s := StringReplace(f[i],devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
+				end else
+					S := f[i];
 				AltFileList.Items.Add(s);
 			end;
 		end;
@@ -434,7 +441,7 @@ begin
 		Canvas.Font.Size := devEditor.Font.Size;
 		Canvas.FillRect(Rect);
 		alignleft := (Rect.Right - Rect.Left) div 2 - Canvas.TextWidth(Canvas.Font.Name) div 2;
-		aligntop  := Rect.Top + (Rect.Bottom - Rect.Top) div 2 - Canvas.TextHeight(Canvas.Font.Name) div 2;
+		aligntop := Rect.Top + (Rect.Bottom - Rect.Top) div 2 - Canvas.TextHeight(Canvas.Font.Name) div 2;
 		Canvas.TextOut(alignleft, aligntop,Canvas.Font.Name);
 	end;
 end;

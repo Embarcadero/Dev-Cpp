@@ -252,6 +252,7 @@ object ExceptionFrm: TExceptionFrm
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 4
+    WordWrap = False
   end
   object memUserReport: TMemo
     Left = 8

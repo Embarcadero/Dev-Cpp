@@ -1406,6 +1406,7 @@ begin
 		Options := Options + [ofAllowMultiSelect];
 
 		// Start in the include folder, if it's set
+		FileName := '';
 		if devCompilerSets.CurrentSet.CppDir.Count > 0 then
 			InitialDir := devCompilerSets.CurrentSet.CppDir[0];
 
