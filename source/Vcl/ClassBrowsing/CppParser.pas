@@ -2658,8 +2658,8 @@ begin
 	ClosestLine := -1;
 	ClosestStatement := -1;
 
-	for I := fStatementList.Count - 1 downto 0 do // TODO: really scan the whole database? Why not only [baseindex..count]?
-		if PStatement(fStatementList[I])^._Kind in [skFunction, skConstructor, skDestructor] then
+	for I := fStatementList.Count - 1 downto 0 do
+		if PStatement(fStatementList[I])^._Kind in [skClass, skFunction, skConstructor, skDestructor] then
 			if SameText(PStatement(fStatementList[I])^._FileName, Filename) then begin
 				if (PStatement(fStatementList[I])^._Line <= Row) and (PStatement(fStatementList[I])^._Line > ClosestLine) then begin
 					ClosestStatement := I;
@@ -2674,7 +2674,12 @@ begin
 
 	// found!
 	if (ClosestStatement <> -1) then begin
-		Result := IndexOfStatement(PStatement(fStatementList[ClosestStatement])^._ParentID);
+
+		// Don't pick the parent of the class body we're in
+		if PStatement(fStatementList[ClosestStatement])^._Kind = skClass then
+			Result := ClosestStatement
+		else
+			Result := IndexOfStatement(PStatement(fStatementList[ClosestStatement])^._ParentID);
 
 		fTokenizer.Reset;
 		fTokenizer.Tokenize(Stream);

@@ -32,6 +32,7 @@ uses
 type
   TShortCutItem = record
     Default: TShortCut;
+    Temporary: TShortCut; // we can't use UI strings to store temp shortcuts (not one to one), so use this instead
     IniEntry: AnsiString; // name in ini file, use untranslated MenuItem.Caption
     ListEntry: AnsiString; // name in editor form
     MenuItem: TMenuItem; // apply Current to this
@@ -137,6 +138,7 @@ begin
 
 					item := new(PShortcutItem);
 					item^.Default := MenuItem.ShortCut;
+					item^.Temporary :=  MenuItem.ShortCut;
 					item^.IniEntry := StripHotkey(GetTopmostItemAncestor(MenuItem)) + ':' + StripHotkey(MenuItem.Caption);
 					item^.ListEntry := ''; // to be filled by form (translated)
 					item^.MenuItem := MenuItem;
@@ -157,6 +159,7 @@ begin
 
 				item := new(PShortcutItem);
 				item^.Default := Action.ShortCut;
+				item^.Temporary := Action.ShortCut;
 				item^.IniEntry := Action.Caption;
 				item^.ListEntry := ''; // to be filled by form (translated)
 				item^.MenuItem := nil;
@@ -179,7 +182,7 @@ begin
 
 			// Read shortcut, assume ini file is untranslated
 			value := Fini.ReadString('Shortcuts', item^.IniEntry, '');
-			if (value <> 'none') and (value <> '') then begin // only apply when found in file
+			if (value <> '') then begin // only apply when found in file
 
 				// New format: unsigned int value
 				intvalue := StrToIntDef(value,High(ShortCut)+1);
@@ -195,6 +198,9 @@ begin
 				// Apply to action
 				if Assigned(item^.Action) then
 					item^.Action.ShortCut := shortcut;
+
+				// Store shortcut in int format
+				item^.Temporary := shortcut;
 			end;
 		end;
 	finally
@@ -251,15 +257,15 @@ begin
 
 				// Apply to Menu
 				if Assigned(MenuItem) then
-					MenuItem.ShortCut := ShortCuts[I]; // ShortCuts is the UI list
+					MenuItem.ShortCut := ShortCuts[I]^.Temporary; // ShortCuts is the UI list
 
 				// Apply to action
 				if Assigned(item^.Action) then
-					item^.Action.ShortCut := ShortCuts[I];
+					item^.Action.ShortCut := ShortCuts[I]^.Temporary;
 
 				// Save untranslated
 				entry := item^.IniEntry;
-				value := IntToStr(ShortCuts[I]); // save in new format
+				value := IntToStr(ShortCuts[I]^.Temporary); // save in new format
 				Fini.WriteString('Shortcuts', entry, value);
 			end;
 		end;

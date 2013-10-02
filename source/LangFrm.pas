@@ -222,7 +222,7 @@ begin
 			if AltCache.Checked then begin
 				for I := 0 to AltFileList.Count - 1 do
 					sl.Add(AltFileList.Items[I]);
-			end else
+			end else if Assigned(devCompilerSets.CurrentSet) then // cache all include dirs if there are any
 				sl.Assign(devCompilerSets.CurrentSet.CppDir);
 
 			// Make it look busy

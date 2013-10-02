@@ -1516,7 +1516,7 @@ begin
 
 	// Ignore the last line the cursor is placed on
 	if oldbend.Char = 1 then
-		EndLine := oldbend.Line-2
+		EndLine := max(oldbbegin.Line-1,oldbend.Line-2)
 	else
 		EndLine := oldbend.Line-1;
 
@@ -1571,7 +1571,7 @@ begin
 
 	// Ignore the last line the cursor is placed on
 	if oldbend.Char = 1 then
-		EndLine := oldbend.Line-2
+		EndLine := max(oldbbegin.Line-1,oldbend.Line-2)
 	else
 		EndLine := oldbend.Line-1;
 
@@ -1630,7 +1630,7 @@ begin
 
 	// Ignore the last line the cursor is placed on
 	if caretend.Char = 1 then
-		EndLine := caretend.Line-2
+		EndLine := max(caretbegin.Line-1,caretbegin.Line-1)
 	else
 		EndLine := caretend.Line-1;
 
