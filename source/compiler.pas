@@ -222,6 +222,7 @@ begin
 			ObjResFile := GenMakePath1(ChangeFileExt(fProject.Options.PrivateResource, RES_EXT));
 	end;
 
+	// Assume we can't click on compile when CurrentSet = nil
 	Comp_Prog:= devCompilerSets.CurrentSet.gccName;
 	Comp_ProgCpp := devCompilerSets.CurrentSet.gppName;
 

@@ -742,11 +742,14 @@ begin
 			fOptions.IncludeVersionInfo := ReadBool('Project','IncludeVersionInfo', False);
 			fOptions.SupportXPThemes := ReadBool('Project','SupportXPThemes', False);
 			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompilerSets.CurrentIndex);
-			if fOptions.CompilerSet > devCompilerSets.Count-1 then begin
+			if (fOptions.CompilerSet > devCompilerSets.Count-1) then begin
 				MessageDlg('The compiler set you have selected for this project, no longer exists.'#13#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
 				fOptions.CompilerSet := devCompilerSets.CurrentIndex; // TODO: translate
 			end;
-			fOptions.CompilerOptions := ReadString('Project','CompilerSettings', devCompilerSets.CurrentSet.OptionString);
+			if Assigned(devCompilerSets.CurrentSet) then
+				fOptions.CompilerOptions := ReadString('Project','CompilerSettings', devCompilerSets.CurrentSet.OptionString)
+			else
+				fOptions.CompilerOptions := ReadString('Project','CompilerSettings', '');
 
 			fOptions.VersionInfo.Major:=            ReadInteger('VersionInfo','Major',             0);
 			fOptions.VersionInfo.Minor:=            ReadInteger('VersionInfo','Minor',             1);

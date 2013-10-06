@@ -204,10 +204,13 @@ end;
 procedure TfrmShortcutsEditor.btnDefaultClick(Sender: TObject);
 var
 	I : integer;
+	Item: PShortCutItem;
 begin
 	lvShortcuts.Items.BeginUpdate;
 	for I := 0 to lvShortcuts.Items.Count - 1 do begin
-		lvShortcuts.Items[I].SubItems[0] := ShortCutToText(PShortCutItem(lvShortcuts.Items[I].Data)^.Temporary);
+		Item := PShortCutItem(lvShortcuts.Items[I].Data);
+		Item^.Temporary := Item^.Default;
+		lvShortcuts.Items[I].SubItems[0] := ShortCutToText(Item^.Temporary);
 	end;
 	lvShortcuts.Items.EndUpdate;
 end;

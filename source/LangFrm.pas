@@ -161,7 +161,7 @@ begin
 		HasProgressStarted := true;
 	end;
 	pbCCCache.Position := pbCCCache.Position + Current;
-	ParseLabel.Caption := Lang[ID_LANGFORM_PARSING] + #13#10 + ReplaceFirstText(FileName,devDirs.Exec,'\');
+	ParseLabel.Caption := Lang[ID_LANGFORM_PARSING] + #13#10 + ReplaceFirstText(FileName,devDirs.Exec,'');
 	Application.ProcessMessages;
 end;
 
@@ -317,11 +317,11 @@ begin
 
 		if Execute then begin
 			for i:= 0 to Files.Count-1 do begin
+				s := Files[i];
 				if Assigned(devCompilerSets.CurrentSet) then begin
 					for J := 0 to devCompilerSets.CurrentSet.CppDir.Count -1 do
-						s := StringReplace(Files[i],devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
-				end else
-					s := Files[i];
+						s := StringReplace(s,devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
+				end;
 				AltFileList.Items.Add(s);
 			end;
 		end;
@@ -347,11 +347,11 @@ begin
 		if SelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
 			FilesFromWildcard(Dir, '*.*', f, false, false, false);
 			for i := 0 to f.Count-1 do begin
+				s := f[i];
 				if Assigned(devCompilerSets.CurrentSet) then begin
 					for J := 0 to devCompilerSets.CurrentSet.CppDir.Count -1 do
-						s := StringReplace(f[i],devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
-				end else
-					S := f[i];
+						s := StringReplace(s,devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
+				end;
 				AltFileList.Items.Add(s);
 			end;
 		end;

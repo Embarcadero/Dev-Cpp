@@ -95,7 +95,7 @@ type
     tbCompletionDelay: TTrackBar;
     chkEnableCompletion: TCheckBox;
     chkCCCache: TCheckBox;
-    btnCCCnew: TButton;
+    btnCCCadd: TButton;
     btnCCCdelete: TButton;
     CppParser: TCppParser;
     lbCCC: TListBox;
@@ -160,6 +160,8 @@ type
     cpForeground: TColorBox;
     cpBackground: TColorBox;
     cpCompletionBackground: TColorBox;
+    edIncludeFile: TEdit;
+    btnFileBrowse: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure SetGutter;
     procedure ElementListClick(Sender: TObject);
@@ -179,7 +181,7 @@ type
     procedure tbCompletionDelayChange(Sender: TObject);
     procedure chkEnableCompletionClick(Sender: TObject);
     procedure btnSaveSyntaxClick(Sender: TObject);
-    procedure btnCCCnewClick(Sender: TObject);
+    procedure btnCCCaddClick(Sender: TObject);
     procedure btnCCCdeleteClick(Sender: TObject);
     procedure chkCCCacheClick(Sender: TObject);
     procedure CppParser1StartParsing(Sender: TObject);
@@ -203,6 +205,10 @@ type
     procedure PagesMainChange(Sender: TObject);
     procedure NameOptionsClick(Sender: TObject);
     procedure btnCCCrefreshClick(Sender: TObject);
+    procedure btnFileBrowseClick(Sender: TObject);
+    procedure edIncludeFileKeyPress(Sender: TObject; var Key: Char);
+    procedure edIncludeFileChange(Sender: TObject);
+    procedure edIncludeFileClick(Sender: TObject);
   private
     ffgColor: TColor;
     fbgColor: TColor;
@@ -480,7 +486,7 @@ begin
   chkCBParseLocalH.Caption:=     Lang[ID_EOPT_BROWSERLOCAL];
   chkCBParseGlobalH.Caption:=    Lang[ID_EOPT_BROWSERGLOBAL];
   chkCCCache.Caption:=           Lang[ID_EOPT_CCCACHECHECK];
-  btnCCCnew.Caption:=            Lang[ID_BTN_ADD];
+  btnCCCadd.Caption:=            Lang[ID_BTN_ADD];
   btnCCCdelete.Caption:=         Lang[ID_BTN_CLEAR];
   btnCCCrefresh.Caption:=        Lang[ID_BTN_REFRESH];
   lblRefreshHint.Caption:=       Lang[ID_EOPT_REFRESHHINT];
@@ -659,7 +665,7 @@ begin
 	chkCCCache.Tag:=0; // mark un-modified
 	chkCCCache.Enabled:=chkEnableCompletion.Checked;
 	lbCCC.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
-	btnCCCnew.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
+	btnCCCadd.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
 	btnCCCdelete.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
 
 	// Parser options
@@ -1396,9 +1402,11 @@ begin
     until FindNext(SR)<>0;
 end;
 
-procedure TEditorOptForm.btnCCCnewClick(Sender: TObject);
+procedure TEditorOptForm.btnFileBrowseClick(Sender: TObject);
 var
-	I: integer;
+	I,J: integer;
+	sl : TStringList;
+	S : AnsiString;
 begin
 	with TOpenDialog.Create(Self) do try
 
@@ -1407,29 +1415,72 @@ begin
 
 		// Start in the include folder, if it's set
 		FileName := '';
-		if devCompilerSets.CurrentSet.CppDir.Count > 0 then
+		if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.CppDir.Count > 0) then
 			InitialDir := devCompilerSets.CurrentSet.CppDir[0];
 
 		if Execute then begin
-			Screen.Cursor:=crHourglass;
-			Application.ProcessMessages;
+			sl := TStringList.Create;
+			try
+				// Make them all relative
+				for I := 0 to Files.Count - 1 do begin
+					S := Files[i];
+					if Assigned(devCompilerSets.CurrentSet) then begin
+						for J := 0 to devCompilerSets.CurrentSet.CppDir.Count -1 do
+							S := StringReplace(S,devCompilerSets.CurrentSet.CppDir[j] + pd,'',[rfReplaceAll]);
+					end;
+					sl.Add(s);
+				end;
 
-			for I:=0 to Files.Count-1 do
-				CppParser.AddFileToScan(Files[I]);
-			CppParser.ParseList;
-			CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
+				// Append ; to old part
+				if (Length(edIncludeFile.Text) > 0) and (edIncludeFile.Text[Length(edIncludeFile.Text)] <> ';') then
+					edIncludeFile.Text := edIncludeFile.Text + ';';
 
-			lbCCC.Items.BeginUpdate;
-			lbCCC.Clear;
-			for I := 0 to CppParser.CacheContents.Count - 1 do
-				lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,'.\'));
-			lbCCC.Items.EndUpdate;
-
-			Screen.Cursor := crDefault;
-			chkCCCache.Tag := 1; // mark modified
+				// Add all files, separated by ;
+				for I := 0 to sl.Count - 1 do
+					edIncludeFile.Text := edIncludeFile.Text + sl[i] + ';';
+			finally
+				sl.Free;
+			end;
 		end;
 	finally
 		Free;
+	end;
+end;
+
+procedure TEditorOptForm.btnCCCaddClick(Sender: TObject);
+var
+	I: integer;
+	sl : TStringList;
+	S : AnsiString;
+begin
+	sl := TStringList.Create;
+	try
+		// This edit box contains files separated by ;
+		ExtractStrings([';'],[],PAnsiChar(edIncludeFile.Text),sl);
+
+		Screen.Cursor:=crHourglass;
+		Application.ProcessMessages;
+
+		// Undo the make relative step
+		for I := 0 to sl.Count - 1 do begin
+			S := MainForm.CppParser.GetFullFileName(sl[i]);
+			CppParser.AddFileToScan(S);
+		end;
+
+		CppParser.ParseList;
+		CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
+
+		lbCCC.Items.BeginUpdate;
+		lbCCC.Clear;
+		for I := 0 to CppParser.CacheContents.Count - 1 do
+			lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,''));
+		lbCCC.Items.EndUpdate;
+
+		Screen.Cursor := crDefault;
+		edIncludeFile.Text := '';
+		chkCCCache.Tag := 1; // mark modified
+	finally
+		sl.Free;
 	end;
 end;
 
@@ -1501,8 +1552,10 @@ begin
 	lbCCC.Items.BeginUpdate;
 	lbCCC.Clear;
 	for I := 0 to CppParser.CacheContents.Count - 1 do
-		lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,'.\'));
+		lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,''));
 	lbCCC.Items.EndUpdate;
+
+	btnCCCadd.Enabled := false;
 
 	Screen.Cursor:=crDefault;
 end;
@@ -1511,8 +1564,9 @@ procedure TEditorOptForm.chkCCCacheClick(Sender: TObject);
 begin
 	chkCCCache.Tag:=1; // mark modified
 	lbCCC.Enabled:=chkCCCache.Checked;
-	btnCCCnew.Enabled:=chkCCCache.Checked;
+	btnCCCadd.Enabled:=chkCCCache.Checked and (edIncludeFile.Text <> '');
 	btnCCCdelete.Enabled:=chkCCCache.Checked;
+	edIncludeFile.Enabled:=chkCCCache.Checked;
 end;
 
 procedure TEditorOptForm.CppParser1StartParsing(Sender: TObject);
@@ -1606,6 +1660,28 @@ begin
 			lblTimeStampExample.Caption := Format(Lang[ID_EOPT_AUTOSAVEEXAMPLE],
 				[ChangeFileExt('main.cpp','.' + FormatDateTime('yyyy mm dd hh mm ss',Now) + ExtractFileExt('main.cpp'))]);
 		end;
+	end;
+end;
+
+procedure TEditorOptForm.edIncludeFileKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+	if Key = Chr(VK_RETURN) then begin
+		Key := #0; // mute beep
+		btnCCCaddClick(nil);
+	end;
+end;
+
+procedure TEditorOptForm.edIncludeFileChange(Sender: TObject);
+begin
+	btnCCCadd.Enabled := edIncludeFile.Text <> '';
+end;
+
+procedure TEditorOptForm.edIncludeFileClick(Sender: TObject);
+begin
+	if edIncludeFile.Font.Color <> clWindowText then begin // first click
+		edIncludeFile.Text := '';
+		edIncludeFile.Font.Color := clWindowText;
 	end;
 end;
 

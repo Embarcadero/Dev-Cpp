@@ -4,7 +4,7 @@ object frmShortcutsEditor: TfrmShortcutsEditor
   BorderStyle = bsDialog
   Caption = 'Configure Shortcuts'
   ClientHeight = 470
-  ClientWidth = 375
+  ClientWidth = 380
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,14 +19,14 @@ object frmShortcutsEditor: TfrmShortcutsEditor
   object lvShortcuts: TListView
     Left = 0
     Top = 0
-    Width = 375
+    Width = 380
     Height = 433
     BevelKind = bkFlat
     BorderStyle = bsNone
     Columns = <
       item
         Caption = 'Menu entry'
-        Width = 250
+        Width = 255
       end
       item
         Caption = 'Shortcut assigned'
@@ -42,18 +42,18 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     OnKeyDown = lvShortcutsKeyDown
   end
   object btnCancel: TButton
-    Left = 292
+    Left = 290
     Top = 440
-    Width = 75
+    Width = 85
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 1
   end
   object btnOk: TButton
-    Left = 204
+    Left = 200
     Top = 440
-    Width = 75
+    Width = 85
     Height = 25
     Caption = 'OK'
     Default = True
@@ -63,7 +63,7 @@ object frmShortcutsEditor: TfrmShortcutsEditor
   object btnDefault: TButton
     Left = 8
     Top = 440
-    Width = 75
+    Width = 85
     Height = 25
     Caption = 'Defaults'
     TabOrder = 3

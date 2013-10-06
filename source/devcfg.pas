@@ -72,6 +72,7 @@ type
     fType : AnsiString; // "TDM-GCC", "MinGW"
     fName: AnsiString; // "TDM-GCC 4.7.1 Release"
     fFolder: AnsiString; // MinGW64, MinGW32
+    fDefInclude: TStringList; // default include dir
 
     // User settings
     fCompAdd : boolean;
@@ -135,6 +136,7 @@ type
 
     // TODO: Properties
     property Name: AnsiString read fName write fName;
+    property DefInclude : TStringList read fDefInclude;
 
     // Options
     property OptionList: TList read fOptionList write fOptionList;
@@ -1004,6 +1006,9 @@ begin
 	fLibDir := TStringList.Create;
 	fOptionList := TList.Create;
 
+	// Misc.
+	fDefInclude := TStringList.Create;
+
 	// Do not set properties yet, as we don't know where to look for gcc.exe
 
 	// Every option is set to false/zero/null, except this crucial one
@@ -1023,6 +1028,9 @@ begin
 	fCppDir := TStringList.Create;
 	fLibDir := TStringList.Create;
 	fOptionList := TList.Create;
+
+	// Misc.
+	fDefInclude := TStringList.Create;
 
 	// If relative, append exe dir
 	if (Length(folder) < 2) or (folder[2] <> ':') then // if not absolute
@@ -1063,6 +1071,10 @@ begin
 	fCDir.Free;
 	fCppDir.Free;
 	fLibDir.Free;
+
+	// Etc.
+	fDefInclude.Free;
+
 	inherited;
 end;
 
@@ -1093,6 +1105,9 @@ begin
 	fType := input.fType;
 	fName := input.fName;
 	fFolder := input.fFolder;
+	fDefInclude.Assign(input.fDefInclude);
+
+	// User input
 	fCompAdd := input.fCompAdd;
 	fCompOpt := input.fCompOpt;
 	fLinkAdd := input.fLinkAdd;
@@ -1106,55 +1121,66 @@ end;
 
 procedure TdevCompilerSet.SetProperties(const BinDir,BinFile : AnsiString);
 var
-	gccoutput : AnsiString;
-	start,stop,DelimPos : integer;
+	output{,S} : AnsiString;
+	DelimPos1,DelimPos2 : integer;
 begin
 
 	// Try the x64 version of GCC too?
-	if FileExists(BinDir + pd + BinFile) then
-		gccoutput := GetCompilerOutput(BinDir + pd,BinFile,'-v')
-	else
-		Exit;
+	if FileExists(BinDir + pd + BinFile) then begin
+		output := GetCompilerOutput(BinDir + pd,BinFile,'-v');
 
-	// Obtain version number and compiler distro
-	start := Pos('gcc version ',gccoutput);
-	if start > 0 then begin
+		// Obtain version number and compiler distro etc
+		DelimPos1 := Pos('gcc version ',output);
+		if DelimPos1 > 0 then begin
 
-		// GCC replied. Set compiler folder
-		DelimPos := RPos(pd,BinDir);
-		if DelimPos > 0 then
-			fFolder := Copy(BinDir,1,DelimPos-1);
+			// Find version number
+			Inc(DelimPos1,Length('gcc version '));
+			DelimPos2 := DelimPos1;
+			while (DelimPos2 <= Length(output)) and not (output[DelimPos2] in [#0..#32]) do
+				Inc(DelimPos2);
+			fVersion := Copy(output,DelimPos1,DelimPos2 - DelimPos1);
 
-		// Find version number
-		Inc(start,Length('gcc version '));
-		stop := start;
-		while(not (gccoutput[stop] in [#0..#32])) do
-			Inc(stop);
+			// Set compiler folder
+			DelimPos1 := RPos(pd,BinDir);
+			if DelimPos1 > 0 then
+				fFolder := Copy(BinDir,1,DelimPos1-1);
 
-		fVersion := Copy(gccoutput,start,stop-start);
+			// Find compiler builder
+			DelimPos1 := DelimPos2;
+			while (DelimPos1 <= Length(output)) and not (output[DelimPos1] = '(') do
+				Inc(DelimPos1);
+			while (DelimPos2 <= Length(output)) and not (output[DelimPos2] = ')') do
+				Inc(DelimPos2);
+			fType := Copy(output,DelimPos1 + 1,DelimPos2 - DelimPos1 - 1);
 
-		// Find compiler builder
-		start := stop;
-		while(not (gccoutput[start] = '(')) do
-			Inc(start);
-		while(not (gccoutput[stop] = ')')) do
-			Inc(stop);
+			// Assemble user friendly name if we don't have one yet
+			if fName = '' then begin
+				if ContainsStr(fType,'tdm64') then
+					fName := 'TDM-GCC ' + fVersion
+				else if ContainsStr(fType,'tdm') then
+					fName := 'TDM-GCC ' + fVersion
+				else if ContainsStr(fType,'GCC') then
+					fName := 'MinGW GCC ' + fVersion;
+			end;
 
-		fType := Copy(gccoutput,start+1,stop-start-1);
-
-		// Assemble user friendly name if we don't have one yet
-		if fName = '' then begin
-			if ContainsStr(fType,'tdm64') then
-				fName := 'TDM-GCC ' + fVersion
-			else if ContainsStr(fType,'tdm') then
-				fName := 'TDM-GCC ' + fVersion
-			else if ContainsStr(fType,'GCC') then
-				fName := 'MinGW GCC ' + fVersion;
+			// Obtain compiler target
+			fDumpMachine := GetCompilerOutput(BinDir + pd,BinFile,'-dumpmachine');
 		end;
 	end;
 
-	// Obtain compiler target
-	fDumpMachine := GetCompilerOutput(BinDir + pd,BinFile,'-dumpmachine');
+	// Obtain default include dir from the preprocessor
+	{if FileExists(BinDir + pd + 'cpp.exe') then begin
+		output := GetCompilerOutput(BinDir + pd,'cpp.exe','-v');
+		DelimPos1 := Pos('#include <...> search starts here:',output);
+		if DelimPos1 > 0 then begin
+			DelimPos2 := Pos('End of search list.',output);
+			if DelimPos2 > 0 then begin
+				S := Copy(output,DelimPos1,DelimPos2-DelimPos1);
+				fDefInclude.Clear;
+				ExtractStrings([#10],[],PAnsiChar(S),fDefInclude);
+			end;
+		end;
+	end;}
 end;
 
 procedure TdevCompilerSet.SetExecutables;
@@ -1885,6 +1911,7 @@ procedure TdevCompilerSets.LoadSets;
 var
 	I: integer;
 	sl : TStringList;
+	CompSet : TdevCompilerSet;
 begin
 	// Don't append, but replace
 	ClearSets;
@@ -1904,15 +1931,16 @@ begin
 
 		// Only validate the current set
 		if (CurrentIndex >= 0) and (CurrentIndex < fList.Count) then begin
-			if not CurrentSet.Validate then begin
+
+			// Ignore project compiler sets
+			CompSet := fList[CurrentIndex];
+			if not CompSet.Validate then begin
 				SaveSet(CurrentIndex);
 
 				// Reset properties after validation
-				with CurrentSet do begin
-					if BinDir.Count > 0 then begin
-						SetProperties(BinDir[0],gccName);
-						SetPath(BinDir[0]); // bindir might have changed, reset it
-					end;
+				if CompSet.BinDir.Count > 0 then begin
+					CompSet.SetProperties(CompSet.BinDir[0],CompSet.gccName);
+					SetPath(CompSet.BinDir[0]); // bindir might have changed, reset it
 				end;
 			end;
 		end;

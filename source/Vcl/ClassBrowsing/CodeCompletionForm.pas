@@ -58,7 +58,7 @@ procedure TCodeComplForm.FormShow(Sender: TObject);
 begin
 	Width := fOwner.Width;
 	Height := fOwner.Height;
-	lbCompletion.DoubleBuffered := true; // reduces flicker
+	lbCompletion.DoubleBuffered := true; // performance hit, but reduces flicker a lit
 end;
 
 procedure TCodeComplForm.FormDeactivate(Sender: TObject);

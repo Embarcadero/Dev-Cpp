@@ -174,7 +174,8 @@ begin
 	HostApplication := '';
 	SupportXPThemes:=False;
 	CompilerSet:=devCompilerSets.CurrentIndex;
-	CompilerOptions:=devCompilerSets[CompilerSet].OptionString;
+	if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then
+		CompilerOptions:=devCompilerSets[CompilerSet].OptionString;
 	VersionInfo := TProjVersionInfo.Create;
 	IncludeVersionInfo:=False;
 end;

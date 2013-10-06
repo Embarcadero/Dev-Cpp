@@ -2877,6 +2877,7 @@ begin
 		end;
 	end;
 
+	// Assume we can't reach this if Assinged(devCompilerSets.CurrentSet) = false
 	fCompiler.PerfectDepCheck := not devCompilerSets.CurrentSet.FastDep;
 
 	if Assigned(fProject) then begin
@@ -3080,18 +3081,19 @@ begin
 	end;
 
 	// Add library folders
-	with devCompilerSets.CurrentSet do begin
-		for I := 0 to LibDir.Count - 1 do
-			fDebugger.SendCommand('dir','"' + StringReplace(LibDir[i],'\','/',[rfReplaceAll]) + '"');
+	if Assigned(devCompilerSets.CurrentSet) then
+		with devCompilerSets.CurrentSet do begin
+			for I := 0 to LibDir.Count - 1 do
+				fDebugger.SendCommand('dir','"' + StringReplace(LibDir[i],'\','/',[rfReplaceAll]) + '"');
 
-		// Add include folders
-		for I := 0 to CDir.Count - 1 do
-			fDebugger.SendCommand('dir','"' + StringReplace(CDir[i],'\','/',[rfReplaceAll]) + '"');
+			// Add include folders
+			for I := 0 to CDir.Count - 1 do
+				fDebugger.SendCommand('dir','"' + StringReplace(CDir[i],'\','/',[rfReplaceAll]) + '"');
 
-		// Add more include folders, duplicates will be added/moved to front of list
-		for I := 0 to CppDir.Count - 1 do
-			fDebugger.SendCommand('dir','"' + StringReplace(CppDir[i],'\','/',[rfReplaceAll]) + '"');
-	end;
+			// Add more include folders, duplicates will be added/moved to front of list
+			for I := 0 to CppDir.Count - 1 do
+				fDebugger.SendCommand('dir','"' + StringReplace(CppDir[i],'\','/',[rfReplaceAll]) + '"');
+		end;
 
 	// Add breakpoints and watch vars
 	for i := 0 to fDebugger.WatchVarList.Count - 1 do
@@ -3158,7 +3160,7 @@ end;
 
 procedure TMainForm.actCompileUpdate(Sender: TObject);
 begin
-	TCustomAction(Sender).Enabled := (assigned(fProject) or (PageControl.PageCount > 0)) and not fCompiler.Compiling and (devCompilerSets.CurrentIndex >= 0) and (devCompilerSets.CurrentIndex < devCompilerSets.Count);
+	TCustomAction(Sender).Enabled := (assigned(fProject) or (PageControl.PageCount > 0)) and not fCompiler.Compiling and Assigned(devCompilerSets.CurrentSet);
 end;
 
 procedure TMainForm.actUpdatePageProject(Sender: TObject);
@@ -3813,7 +3815,11 @@ begin
 			for I := 0 to CDir.Count - 1 do
 				CppParser.AddIncludePath(CDir[I]);
 			for I := 0 to CppDir.Count - 1 do
-			CppParser.AddIncludePath(CppDir[I]);
+				CppParser.AddIncludePath(CppDir[I]);
+
+			// Add default include dirs last, just like gcc does
+			for I := 0 to DefInclude.Count - 1 do
+				CppParser.AddIncludePath(DefInclude[I]);
 		end;
 
 	// This takes up about 99% of our time
@@ -4003,9 +4009,9 @@ end;
 procedure TMainForm.actCompileRunUpdate(Sender: TObject);
 begin
 	if Assigned(fProject) then
-		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and not fCompiler.Compiling and (devCompilerSets.Count > 0)
+		TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and not fCompiler.Compiling and Assigned(devCompilerSets.CurrentSet)
 	else
-		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and not fCompiler.Compiling and (devCompilerSets.Count > 0);
+		TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and not fCompiler.Compiling and Assigned(devCompilerSets.CurrentSet);
 end;
 
 procedure TMainForm.EditorSaveTimer(Sender : TObject);
@@ -4723,22 +4729,21 @@ end;
 
 procedure TMainForm.CheckForDLLProfiling;
 var
-	opt: PCompilerOption;
-	idx: integer;
+	prof : boolean;
 begin
 	if not Assigned(fProject) then
 		Exit;
 
-	// profiling not enabled
-	if not devCompilerSets.CurrentSet.FindOption('-pg', opt, idx) then
-		Exit;
+	// If this is a DLL / static link library project, then check for profiling
+	if (fProject.Options.typ in [dptDyn, dptStat]) then begin
 
-	if (fProject.Options.typ in [dptDyn, dptStat]) and (opt.Value > 0) then begin
-		// project is a lib or a dll, and profiling is enabled
-		// check for the existence of "-lgmon" in project's linker options
-		if Pos('-lgmon', fProject.Options.LinkerCmd) = 0 then begin
-			// does not have -lgmon
-			// warn the user that we should update its project options and include
+		// Check if profiling is enabled
+		prof := GetCompilerOption('-pg') <> '0';
+
+		// Check for the existence of "-lgmon" in project's linker options
+		if prof and (Pos('-lgmon', fProject.Options.LinkerCmd) = 0) then begin
+
+			// Warn the user that we should update its project options and include
 			// -lgmon in linker options, or else the compilation will fail
 			if MessageDlg('You have profiling enabled in Compiler Options and you are '+
 			    'working on a dynamic or static library. Do you want to add a special '+
@@ -4747,7 +4752,7 @@ begin
 			    'chances are that your library''s compilation will fail...', mtConfirmation,[mbYes, mbNo], 0) = mrYes
 			then begin
 				fProject.Options.LinkerCmd := fProject.Options.LinkerCmd + ' -lgmon';
-				fProject.Modified:=True;
+				fProject.Modified := True;
 			end;
 		end;
 	end;
@@ -5269,7 +5274,7 @@ begin
 	result := '0';
 
 	// Try to find the value in the predefined list
-	if devCompilerSets.CurrentSet.FindOption(OptionString, OptionStruct, OptionIndex) then begin // the option exists...
+	if Assigned(devCompilerSets.CurrentSet) and devCompilerSets.CurrentSet.FindOption(OptionString, OptionStruct, OptionIndex) then begin // the option exists...
 
 		// Search project options...
 		if Assigned(fProject) then
@@ -5285,7 +5290,7 @@ var
 	OptionIndex : integer;
 begin
 	// Try to find the value in the predefined list
-	if devCompilerSets.CurrentSet.FindOption(OptionString, OptionStruct, OptionIndex) then begin // the option exists...
+	if Assigned(devCompilerSets.CurrentSet) and devCompilerSets.CurrentSet.FindOption(OptionString, OptionStruct, OptionIndex) then begin // the option exists...
 
 		// Search project options...
 		if Assigned(fProject) then

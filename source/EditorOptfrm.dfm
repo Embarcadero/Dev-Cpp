@@ -989,26 +989,59 @@ object EditorOptForm: TEditorOptForm
         Caption = 'Background color:'
       end
       object lblRefreshHint: TLabel
-        Left = 264
-        Top = 344
-        Width = 201
-        Height = 49
+        Left = 188
+        Top = 346
+        Width = 261
+        Height = 15
         Alignment = taCenter
-        AutoSize = False
         Caption = 'Please refresh the cache when updating Dev-C++'
         WordWrap = True
       end
-      object btnCCCnew: TButton
-        Left = 8
-        Top = 342
-        Width = 80
-        Height = 25
-        Caption = 'Add files'
+      object btnFileBrowse: TSpeedButton
+        Left = 381
+        Top = 310
+        Width = 23
+        Height = 22
+        Glyph.Data = {
+          36030000424D3603000000000000360000002800000010000000100000000100
+          18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
+          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
+          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
+          BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
+          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
+          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
+          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
+          BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
+          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
+          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
+          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000000000
+          000000000000000000000000000000000000000000000000000000BFBFBFBFBF
+          BFBFBFBFBFBFBFBFBFBF00000000AEFF0096DB0096DB0096DB0096DB0096DB00
+          96DB0096DB0082BE000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
+          00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
+          BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF00AEFF00AEFF00AEFF00
+          AEFF00AEFF0096DB000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
+          00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
+          BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF5DCCFF5DCCFF5DCCFF5D
+          CCFF5DCCFF00AEFF000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF686868BDEBFF
+          5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
+          BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
+          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
+        OnClick = btnFileBrowseClick
+      end
+      object btnCCCadd: TButton
+        Left = 409
+        Top = 310
+        Width = 55
+        Height = 22
+        Caption = 'Add'
         TabOrder = 6
-        OnClick = btnCCCnewClick
+        OnClick = btnCCCaddClick
       end
       object btnCCCdelete: TButton
-        Left = 90
+        Left = 10
         Top = 342
         Width = 80
         Height = 25
@@ -1021,10 +1054,10 @@ object EditorOptForm: TEditorOptForm
         Top = 132
         Width = 297
         Height = 37
-        Max = 5000
+        Max = 2000
         Min = 1
         ParentShowHint = False
-        Frequency = 100
+        Frequency = 50
         Position = 1000
         ShowHint = False
         TabOrder = 2
@@ -1053,7 +1086,7 @@ object EditorOptForm: TEditorOptForm
         Left = 8
         Top = 200
         Width = 457
-        Height = 137
+        Height = 105
         ItemHeight = 15
         ParentShowHint = False
         ShowHint = True
@@ -1063,9 +1096,9 @@ object EditorOptForm: TEditorOptForm
       object pbCCCache: TProgressBar
         Left = 8
         Top = 370
-        Width = 244
+        Width = 457
         Height = 20
-        BorderWidth = 1
+        Smooth = True
         TabOrder = 9
         Visible = False
       end
@@ -1094,7 +1127,7 @@ object EditorOptForm: TEditorOptForm
         end
       end
       object btnCCCrefresh: TButton
-        Left = 172
+        Left = 92
         Top = 342
         Width = 80
         Height = 25
@@ -1111,6 +1144,23 @@ object EditorOptForm: TEditorOptForm
         Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
         ItemHeight = 16
         TabOrder = 3
+      end
+      object edIncludeFile: TEdit
+        Left = 8
+        Top = 310
+        Width = 370
+        Height = 23
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGray
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 10
+        Text = 'Example: stdio.h;C:\myfile.h;'
+        OnChange = edIncludeFileChange
+        OnClick = edIncludeFileClick
+        OnKeyPress = edIncludeFileKeyPress
       end
     end
     object tabAutosave: TTabSheet

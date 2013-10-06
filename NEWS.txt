@@ -1,6 +1,5 @@
 Version 5.4.3 - *
 
-- (TODO: test TDM-GCC 4.8.1 more)
 - Dev-C++ can now parse C++ header files too.
 - Clicking in the gutter does not change the caret position anymore.
 - Mouseover hints are now also shown when hovering above #includes.

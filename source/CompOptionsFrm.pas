@@ -160,7 +160,7 @@ begin
 	devCompilerSets.CurrentIndex := cmbCompilerSetComp.ItemIndex; // TODO: not needed
 
 	// Save the current set to disk
-	SaveSet(devCompilerSets.CurrentIndex);
+	SaveSet(cmbCompilerSetComp.ItemIndex);
 
 	// Save list of sets only
 	devCompilerSets.SaveSetList;

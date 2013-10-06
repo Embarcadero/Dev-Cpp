@@ -483,7 +483,7 @@ var
   tsi: TStartupInfo;
   tpi: TProcessInformation;
   nRead: DWORD;
-  aBuf: array[0..101] of char;
+  aBuf: array[0..1024] of char;
   sa: TSecurityAttributes;
   hOutputReadTmp, hOutputRead, hOutputWrite, hInputWriteTmp, hInputRead,
   hInputWrite, hErrorWrite: THandle;
@@ -526,7 +526,7 @@ begin
     exit;
   end;
   CloseHandle(hOutputWrite);
-  CloseHandle(hInputRead );
+  CloseHandle(hInputRead);
   CloseHandle(hErrorWrite);
 
   bAbort:=False;
@@ -537,7 +537,7 @@ begin
        TerminateProcess(tpi.hProcess, 1);
        Break;
      end;
-     if (not ReadFile(hOutputRead, aBuf, 16, nRead, nil)) or (nRead = 0) then
+     if (not ReadFile(hOutputRead, aBuf, SizeOf(aBuf), nRead, nil)) or (nRead = 0) then
      begin
         if GetLastError = ERROR_BROKEN_PIPE then
           Break
@@ -560,7 +560,7 @@ begin
   until False;
   GetExitCodeProcess(tpi.hProcess, nRead);
   if ShowReturnValue then
-     Result := FOutput + ' ' + inttostr(nread)
+     Result := FOutput + ' ' + IntToStr(nread)
   else
      Result := FOutput;
 
@@ -658,7 +658,7 @@ var
 	pFileName: array[0..2048] of char;
 begin
 	GetShortPathName(PAnsiChar(FileName), pFileName, 2048);
-	result:= strpas(pFileName);
+	result:= StrPas(pFileName);
 end;
 
 function BuildFilter(const Filters: array of AnsiString): AnsiString;

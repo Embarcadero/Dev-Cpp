@@ -374,7 +374,8 @@ begin
 		// Files tab
 
 		// Compiler tab
-		CompilerOptions := devCompilerSets[cmbCompiler.ItemIndex].OptionString;
+		if (cmbCompiler.ItemIndex < devCompilerSets.Count) and (cmbCompiler.ItemIndex >= 0) then
+			CompilerOptions := devCompilerSets[cmbCompiler.ItemIndex].OptionString;
 		CompilerSet := cmbCompiler.ItemIndex;
 
 		// Options tab
@@ -505,9 +506,11 @@ begin
 			cmbCompiler.Items.Add(devCompilerSets[i].Name);
 		cmbCompiler.ItemIndex := CompilerSet;
 		fOldIndex := CompilerSet;
-		devCompilerSets[CompilerSet].OptionString := fProjectCopy.Options.CompilerOptions;
-		CompOptionsFrame1.fCurrentIndex := cmbCompiler.ItemIndex;
-		CompOptionsFrame1.FillOptions;
+		if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then begin
+			devCompilerSets[CompilerSet].OptionString := fProjectCopy.Options.CompilerOptions;
+			CompOptionsFrame1.fCurrentIndex := cmbCompiler.ItemIndex;
+			CompOptionsFrame1.FillOptions;
+		end;
 
 		// Options tab
 		edCompiler.Lines.Text := StringReplace(CompilerCmd, '_@@_', #13#10, [rfReplaceAll]);
@@ -1100,7 +1103,7 @@ begin
 		Options := Options + [ofAllowMultiSelect];
 
 		// Start in the lib folder
-		if devCompilerSets.CurrentSet.LibDir.Count > 0 then
+		if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.LibDir.Count > 0) then
 			InitialDir := devCompilerSets.CurrentSet.LibDir[0];
 
 		if Execute then begin

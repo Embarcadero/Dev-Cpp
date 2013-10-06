@@ -56,13 +56,13 @@ begin
 	Replace(Result, '<DATETIME>', DateTimeToStr(Now));
 
 	// Only provide the first cpp dir
-	if devCompilerSets.CurrentSet.CppDir.Count > 0 then
+	if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.CppDir.Count > 0) then
 		Replace(Result, '<INCLUDE>', devCompilerSets.CurrentSet.CppDir[0])
 	else
 		Replace(Result, '<INCLUDE>', '');
 
 	// Only provide the first lib dir
-	if devCompilerSets.CurrentSet.LibDir.Count > 0 then
+	if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.LibDir.Count > 0) then
 		Replace(Result, '<LIB>', devCompilerSets.CurrentSet.LibDir[0])
 	else
 		Replace(Result, '<LIB>', '');
