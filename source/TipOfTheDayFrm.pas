@@ -133,6 +133,7 @@ begin
 	if not FileExists(S) then begin
 		btnNext.Enabled := False;
 		btnPrev.Enabled := False;
+		btnRandom.Enabled := False;
 	end else begin
 		LoadFromFile(S);
 		if (TipsCounter < 0) or (TipsCounter >= sl.Count) then

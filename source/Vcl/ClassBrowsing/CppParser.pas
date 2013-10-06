@@ -358,19 +358,19 @@ function TCppParser.SkipBraces(StartAt: integer): integer;
 var
   I1: integer;
 begin
-  if fTokenizer[StartAt]^.Text[1] = '{' then begin
-    I1 := 1;
-    repeat
-      Inc(StartAt);
-      if fTokenizer[StartAt]^.Text[1] = '{' then
-        Inc(I1)
-      else if fTokenizer[StartAt]^.Text[1] = '}' then
-        Dec(I1)
-      else if fTokenizer[StartAt]^.Text[1] = #0 then
-        I1 := 0; // exit immediately
-    until (I1 = 0);
-  end;
-  Result := StartAt;
+	if (StartAt < fTokenizer.Tokens.Count) and (fTokenizer[StartAt]^.Text[1] = '{') then begin
+		I1 := 1;
+		repeat
+			Inc(StartAt);
+			if fTokenizer[StartAt]^.Text[1] = '{' then
+				Inc(I1)
+			else if fTokenizer[StartAt]^.Text[1] = '}' then
+				Dec(I1)
+			else if fTokenizer[StartAt]^.Text[1] = #0 then
+				I1 := 0; // exit immediately
+		until (I1 = 0);
+	end;
+	Result := StartAt;
 end;
 
 // This function takes up about 96% of our parsing time. That should change
@@ -1040,14 +1040,17 @@ begin
 			UseID := fLastID;
 		end;
 
+		// Walk to opening brace
 		if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then begin
 			SetInheritance(fIndex); // set the _InheritsFromClasses value
 			while (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] <> '{') do // skip decl after ':'
 				Inc(fIndex);
 		end;
 
-		// check for struct names after '}'
+		// Check for struct names after '}'
 		if IsStruct then begin
+
+			// Walk to closing brace
 			I := SkipBraces(fIndex);
 
 			S1 := '';
