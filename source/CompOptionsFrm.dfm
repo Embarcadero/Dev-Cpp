@@ -833,7 +833,7 @@ object CompOptForm: TCompOptForm
           MaxValue = 0
           MinValue = 0
           TabOrder = 0
-          Value = 650
+          Value = 0
           OnChange = InterfaceChange
         end
       end

@@ -560,7 +560,7 @@ begin
   until False;
   GetExitCodeProcess(tpi.hProcess, nRead);
   if ShowReturnValue then
-     Result := FOutput + ' ' + IntToStr(nread)
+     Result := FOutput + ' ' + IntToStr(nRead)
   else
      Result := FOutput;
 

@@ -56,8 +56,9 @@ var
 	I : integer;
 	CompilerSet: TdevCompilerSet;
 begin
-	if fCurrentIndex = -1 then
+	if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
 		Exit;
+
 	CompilerSet := devCompilerSets[fCurrentIndex];
 	for I := 0 to CompilerSet.OptionList.Count - 1 do
 		if tabs.Tabs.IndexOf(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]) = -1 then
@@ -73,7 +74,7 @@ var
 	option : TCompilerOption;
 	CompilerSet: TdevCompilerSet;
 begin
-	if fCurrentIndex = -1 then
+	if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
 		Exit;
 
 	vle.OnSetEditText := nil;
@@ -117,8 +118,9 @@ var
 	I: integer;
 	CompilerSet: TdevCompilerSet;
 begin
-	if fCurrentIndex = -1 then
+	if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
 		Exit;
+
 	CompilerSet := devCompilerSets[fCurrentIndex];
 
 	option := PCompilerOption(CompilerSet.OptionList[Integer(vle.Strings.Objects[ARow])]);

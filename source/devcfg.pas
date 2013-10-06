@@ -1125,7 +1125,8 @@ var
 	DelimPos1,DelimPos2 : integer;
 begin
 
-	// Try the x64 version of GCC too?
+	// TODO: Try the x64 version of GCC too?
+
 	if FileExists(BinDir + pd + BinFile) then begin
 		output := GetCompilerOutput(BinDir + pd,BinFile,'-v');
 
@@ -1168,7 +1169,7 @@ begin
 		end;
 	end;
 
-	// Obtain default include dir from the preprocessor
+	// TODO: Obtain default include dir from the preprocessor
 	{if FileExists(BinDir + pd + 'cpp.exe') then begin
 		output := GetCompilerOutput(BinDir + pd,'cpp.exe','-v');
 		DelimPos1 := Pos('#include <...> search starts here:',output);
@@ -1202,23 +1203,29 @@ begin
 end;
 
 procedure TdevCompilerSet.SetDirectories;
+	procedure AddExistingDirectory(var list : TStringList; const Directory: AnsiString);
+	begin
+		if DirectoryExists(Directory) then
+			list.Add(Directory);
+	end;
 begin
 	// Add both the default and the autoconf directories
-	fBinDir.Add(fFolder + pd + 'bin');
-	fLibDir.Add(fFolder + pd + 'lib');
-	fCDir.Add(fFolder + pd + 'include');
-	fCppDir.Add(fFolder + pd + 'include');
+	AddExistingDirectory(fBinDir,fFolder + pd + 'bin');
+	AddExistingDirectory(fLibDir,fFolder + pd + 'lib');
+	AddExistingDirectory(fCDir,fFolder + pd + 'include');
+	AddExistingDirectory(fCppDir,fFolder + pd + 'include');
 
 	// Try to obtain our target/autoconf folder
 	if fDumpMachine <> '' then begin
-		fBinDir.Add(fFolder + pd + fDumpMachine + pd + 'bin');
-		fLibDir.Add(fFolder + pd + fDumpMachine + pd + 'lib');
-		fCDir.Add(fFolder + pd + fDumpMachine + pd + 'include');
-		fCppDir.Add(fFolder + pd + fDumpMachine + pd + 'include');
+		AddExistingDirectory(fBinDir,fFolder + pd + fDumpMachine + pd + 'bin');
+		AddExistingDirectory(fLibDir,fFolder + pd + fDumpMachine + pd + 'lib');
+		AddExistingDirectory(fCDir,fFolder + pd + fDumpMachine + pd + 'include');
+		AddExistingDirectory(fCppDir,fFolder + pd + fDumpMachine + pd + 'include');
 
 		// Custom STL folder?
 		// Currently, Dev-C++ is a bit slow at parsing this shit
-		fCppDir.Add(fFolder + pd + 'lib' + pd + 'gcc' + pd + fDumpMachine + pd + fVersion + pd + 'include' + pd + 'c++');
+		AddExistingDirectory(fCppDir,
+			fFolder + pd + 'lib' + pd + 'gcc' + pd + fDumpMachine + pd + fVersion + pd + 'include' + pd + 'c++');
 	end;
 end;
 
@@ -1508,7 +1515,7 @@ var
 
 	procedure AddUnique(var list : TStringList;const entry : AnsiString);
 	begin
-		if list.IndexOf(entry) = -1 then
+		if (list.IndexOf(entry) = -1) and DirectoryExists(entry) then
 			list.Add(entry);
 	end;
 begin
@@ -1586,11 +1593,11 @@ begin
 				if (badbin <> '') or (fBinDir.Count = 0) then
 					AddUnique(fBinDir,devDirs.fExec + 'MinGW32' + pd + 'bin');
 				if badlib <> '' then
-					AddUnique(fLibDir,devDirs.fExec + 'MinGW32\lib');
+					AddUnique(fLibDir,devDirs.fExec + 'MinGW32' + pd + 'lib');
 				if badinc <> '' then
-					AddUnique(fCDir,devDirs.fExec + 'MinGW32\include');
+					AddUnique(fCDir,devDirs.fExec + 'MinGW32' + pd + 'include');
 				if badinccpp <> '' then
-					AddUnique(fCppDir,devDirs.fExec + 'MinGW32\include');
+					AddUnique(fCppDir,devDirs.fExec + 'MinGW32' + 'include');
 
 			end else begin
 
@@ -1599,14 +1606,14 @@ begin
 					AddUnique(fBinDir,devDirs.fExec + 'MinGW64\bin');
 				if badlib <> '' then begin
 					if ContainsStr(fName,'TDM-GCC') and ContainsStr(fName,'32-bit') then
-						AddUnique(fLibDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\lib32')
+						AddUnique(fLibDir,devDirs.fExec + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'lib32')
 					else
-						AddUnique(fLibDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\lib');
+						AddUnique(fLibDir,devDirs.fExec + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'lib');
 				end;
 				if badinc <> '' then
-					AddUnique(fCDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\include');
+					AddUnique(fCDir,devDirs.fExec + 'MinGW64' + 'x86_64-w64-mingw32' + pd + 'include');
 				if badinccpp <> '' then
-					AddUnique(fCppDir,devDirs.fExec + 'MinGW64\x86_64-w64-mingw32\include');
+					AddUnique(fCppDir,devDirs.fExec + 'MinGW64' + pd + 'x86_64-w64-mingw32' + pd + 'include');
 
 			end;
 
@@ -1991,7 +1998,7 @@ var
 begin
 	// Assume 64bit compilers are put in the MinGW64 folder
 	if DirectoryExists(devDirs.Exec + 'MinGW64' + pd) then begin
-		if FileExists(devDirs.Exec + 'MinGW64' + pd + 'bin' + pd + 'gcc.exe') then begin // we only require GCC.exe to be present
+		if FileExists(devDirs.Exec + 'MinGW64' + pd + 'bin' + pd + GCC_PROGRAM) then begin // we only require GCC.exe to be present
 
 			// Default, release profile
 			BaseSet := AddSet(devDirs.Exec + 'MinGW64');

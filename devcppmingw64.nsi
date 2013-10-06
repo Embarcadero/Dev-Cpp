@@ -3,7 +3,7 @@
 
 !define COMPILERNAME "TDM-GCC x64 4.7.1"
 !define COMPILERFOLDER "MinGW64"
-!define DEVCPP_VERSION "5.4.3"
+!define DEVCPP_VERSION "5.5.0"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 

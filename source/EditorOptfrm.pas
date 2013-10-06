@@ -1562,11 +1562,11 @@ end;
 
 procedure TEditorOptForm.chkCCCacheClick(Sender: TObject);
 begin
-	chkCCCache.Tag:=1; // mark modified
-	lbCCC.Enabled:=chkCCCache.Checked;
-	btnCCCadd.Enabled:=chkCCCache.Checked and (edIncludeFile.Text <> '');
-	btnCCCdelete.Enabled:=chkCCCache.Checked;
-	edIncludeFile.Enabled:=chkCCCache.Checked;
+	chkCCCache.Tag := 1; // mark modified
+	lbCCC.Enabled := chkCCCache.Checked;
+	btnCCCadd.Enabled := chkCCCache.Checked and (edIncludeFile.Text <> '');
+	edIncludeFile.Enabled := chkCCCache.Checked;
+	btnFileBrowse.Enabled := chkCCCache.Checked;
 end;
 
 procedure TEditorOptForm.CppParser1StartParsing(Sender: TObject);

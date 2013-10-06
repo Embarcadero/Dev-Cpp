@@ -1503,7 +1503,8 @@ begin
 		end;
 
 		// Discard changes, even when canceling
-		devCompilerSets.LoadSet(cmbCompiler.ItemIndex);
+		if (cmbCompiler.ItemIndex < devCompilerSets.Count) and (cmbCompiler.ItemIndex >= 0) then
+			devCompilerSets.LoadSet(cmbCompiler.ItemIndex);
 	finally
 		Close;
 	end;
