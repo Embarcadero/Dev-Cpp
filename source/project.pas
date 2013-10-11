@@ -277,7 +277,13 @@ end;
 
 procedure TProject.SetCompilerOption(index : integer; value : char);
 begin
-	if fOptions.CompilerOptions[index+1] <> value then begin
+	// the option does not exist. copy options list from compiler set
+	if (index + 1 > Length(fOptions.CompilerOptions)) and (fOptions.CompilerSet < devCompilerSets.Count) and (fOptions.CompilerSet >= 0) then begin
+		fOptions.CompilerOptions := devCompilerSets[fOptions.CompilerSet].OptionString;
+	end;
+
+	// if the option exists, set it
+	if (index + 1 <= Length(fOptions.CompilerOptions)) and (fOptions.CompilerOptions[index+1] <> value) then begin
 		fOptions.CompilerOptions[index+1] := Value;
 		SetModified(true);
 	end;
@@ -742,7 +748,7 @@ begin
 			fOptions.IncludeVersionInfo := ReadBool('Project','IncludeVersionInfo', False);
 			fOptions.SupportXPThemes := ReadBool('Project','SupportXPThemes', False);
 			fOptions.CompilerSet := ReadInteger('Project','CompilerSet', devCompilerSets.CurrentIndex);
-			if (fOptions.CompilerSet > devCompilerSets.Count-1) then begin
+			if (fOptions.CompilerSet >= devCompilerSets.Count) then begin
 				MessageDlg('The compiler set you have selected for this project, no longer exists.'#13#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
 				fOptions.CompilerSet := devCompilerSets.CurrentIndex; // TODO: translate
 			end;

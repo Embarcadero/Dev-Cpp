@@ -928,7 +928,7 @@ begin
 	fAssociateTemplate := getAssociation(6);
 	fCheckAssocs := false;
 
-	fShowTipsOnStart := TRUE;
+	fShowTipsOnStart := FALSE; // due to popular demand
 	fLastTip := 0;
 	fShowProgress := TRUE;
 	fAutoCloseProgress := FALSE;
@@ -1634,7 +1634,7 @@ var
 		result := false;
 
 		for I := 0 to dirlist.Count - 1 do begin
-			if FileExists(dirlist[i] + '\' + FileName) then begin
+			if FileExists(dirlist[i] + pd + FileName) then begin
 				result := true;
 				Exit;
 			end;

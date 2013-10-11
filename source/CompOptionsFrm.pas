@@ -224,7 +224,7 @@ end;
 
 procedure TCompOptForm.SaveSet(Index: integer);
 begin
-	if index = -1 then
+	if (index >= devCompilerSets.Count) or (index < 0) then
 		Exit;
 
 	// Save the set to disk (can't be undone by Cancel...)
@@ -482,21 +482,6 @@ begin
 	btnRenameCompilerSet.Hint:=          Lang[ID_COPT_RENAMECOMPHINT];
 end;
 
-procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);
-begin
-	if fOldIndex = cmbCompilerSetComp.ItemIndex then Exit; // why the hell is this event firing anyway?
-
-	// Save old when modified
-	if (cmbCompilerSetComp.Tag = 1) and (MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[fOldIndex]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
-		SaveSet(fOldIndex);
-
-	fOldIndex := cmbCompilerSetComp.ItemIndex;
-	CompOptionsFrame1.fCurrentIndex := fOldIndex;
-
-	// Load the new set, apply new set to UI
-	LoadSet(fOldIndex);
-end;
-
 procedure TCompOptForm.btnBrws1Click(Sender: TObject);
 var
 	Obj: TEdit;
@@ -532,6 +517,29 @@ begin
 	end;
 end;
 
+procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);
+begin
+	// Don't allow browsing
+	MainPages.Enabled := cmbCompilerSetComp.Items.Count > 0;
+	btnDelCompilerSet.Enabled := cmbCompilerSetComp.Items.Count > 0;
+	btnRenameCompilerSet.Enabled := cmbCompilerSetComp.Items.Count > 0;
+	if cmbCompilerSetComp.Items.Count = 0 then
+		MainPages.ActivePageIndex := 0;
+
+	if fOldIndex = cmbCompilerSetComp.ItemIndex then Exit; // why the hell is this event firing anyway?
+
+	// Save old if it still exists
+	if (fOldIndex >= 0) and (fOldIndex < devCompilerSets.Count) then
+		if (cmbCompilerSetComp.Tag = 1) and (MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[fOldIndex]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+			SaveSet(fOldIndex);
+
+	fOldIndex := cmbCompilerSetComp.ItemIndex;
+	CompOptionsFrame1.fCurrentIndex := fOldIndex;
+
+	// Load the new set, apply new set to UI
+	LoadSet(fOldIndex);
+end;
+
 procedure TCompOptForm.btnAddBlankCompilerSetClick(Sender: TObject);
 var
 	S: AnsiString;
@@ -539,10 +547,6 @@ begin
 	S := 'New compiler';
 	if not InputQuery(Lang[ID_COPT_NEWCOMPSET], Lang[ID_COPT_PROMPTNEWCOMPSET], S) or (S='') then
 		Exit;
-
-	// Save old
-	if (cmbCompilerSetComp.Tag = 1) and (MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
-		SaveSet(fOldIndex);
 
 	// Add empty compiler set
 	devCompilerSets.AddSet;
@@ -562,10 +566,6 @@ begin
 	if not SelectDirectory('','',S) then
 		Exit;
 
-	// Save old
-	if (cmbCompilerSetComp.Tag = 1) and (MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE],[cmbCompilerSetComp.Items[cmbCompilerSetComp.ItemIndex]]) , mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
-		SaveSet(fOldIndex);
-
 	// Add empty compiler set
 	devCompilerSets.AddSet(S);
 
@@ -583,11 +583,7 @@ var
 begin
 	if cmbCompilerSetComp.ItemIndex <> -1 then begin
 
-		//if cmbCompilerSetComp.Items.Count = 1 then begin
-		//	MessageDlg(Lang[ID_COPT_ATLEASTONESET], mtInformation, [mbOK], 0);
-		//	Exit;
-		//end;
-
+		// Politely ask first
 		if MessageDlg(Lang[ID_COPT_DELETECOMPSET], mtConfirmation, [mbYes, mbNo], 0)=mrNo then
 			Exit;
 

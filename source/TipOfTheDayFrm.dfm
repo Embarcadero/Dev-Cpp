@@ -286,7 +286,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Width = 90
     Height = 25
     Caption = 'Previous tip'
-    TabOrder = 1
+    TabOrder = 2
     OnClick = btnPrevClick
   end
   object btnNext: TButton
@@ -295,7 +295,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Width = 90
     Height = 25
     Caption = 'Next tip'
-    TabOrder = 0
+    TabOrder = 1
     OnClick = btnNextClick
   end
   object btnClose: TButton
@@ -305,7 +305,8 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Height = 25
     Cancel = True
     Caption = 'Close'
-    TabOrder = 4
+    Default = True
+    TabOrder = 0
     OnClick = btnCloseClick
   end
   object chkNotAgain: TCheckBox
@@ -314,7 +315,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Width = 317
     Height = 16
     Caption = 'Don'#39't display tips on startup'
-    TabOrder = 3
+    TabOrder = 4
   end
   object btnRandom: TButton
     Left = 328
@@ -322,7 +323,7 @@ object TipOfTheDayForm: TTipOfTheDayForm
     Width = 90
     Height = 25
     Caption = 'Random Tip'
-    TabOrder = 2
+    TabOrder = 3
     OnClick = btnRandomClick
   end
 end

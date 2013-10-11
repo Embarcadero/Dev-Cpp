@@ -1,6 +1,6 @@
 object CompOptForm: TCompOptForm
-  Left = 1308
-  Top = 336
+  Left = 551
+  Top = 335
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
@@ -826,11 +826,11 @@ object CompOptForm: TCompOptForm
           OnClick = InterfaceChange
         end
         object seCompDelay: TSpinEdit
-          Left = 111
+          Left = 104
           Top = 32
-          Width = 54
+          Width = 61
           Height = 24
-          MaxValue = 0
+          MaxValue = 1000
           MinValue = 0
           TabOrder = 0
           Value = 0

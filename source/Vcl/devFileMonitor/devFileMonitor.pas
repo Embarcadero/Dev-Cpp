@@ -75,8 +75,7 @@ begin
   begin
     if Assigned(fNotifyChange) then
     begin
-      fNotifyChange(Self, TDevMonitorChangeType(Message.WParam),
-        PAnsiChar(Message.LParam));
+      fNotifyChange(Self, TDevMonitorChangeType(Message.WParam),PAnsiChar(Message.LParam));
       StrDispose(PAnsiChar(Message.LParam));
     end;
   end

@@ -1769,21 +1769,28 @@ begin
 	fTabSheet.PageIndex := index;
 end;
 
+
+
+
 function TEditor.HandpointAllowed(var mousepos : TBufferCoord) : boolean;
 var
 	s : AnsiString;
 	HLAttr : TSynHighlighterAttributes;
 begin
-	if fText.GetPositionOfMouse(mousepos) and fAllowMouseOver then begin
-		fText.GetHighlighterAttriAtRowCol(mousepos, s, HLAttr);
+	result := false;
 
-		// Only allow identifiers and preprocessor stuff
-		if (HLAttr = fText.Highlighter.IdentifierAttribute) or (Assigned(HLAttr) and SameStr(HLAttr.Name,'Preprocessor')) then
-			result := true
-		else
-			result := false;
-	end else
-		result := false;
+	// Only allow in the text area and don't allow when scrolling
+	if fAllowMouseOver and fText.GetPositionOfMouse(mousepos) and (mousepos.Char < fText.GutterWidth) then begin
+
+		// Only allow hand points in highlighted areas
+		if fText.GetHighlighterAttriAtRowCol(mousepos, s, HLAttr) then begin
+
+			// Only allow identifiers and preprocessor stuff
+			if (HLAttr = fText.Highlighter.IdentifierAttribute) or (Assigned(HLAttr) and SameStr(HLAttr.Name,'Preprocessor')) then begin
+				result := true;
+			end;
+		end;
+	end;
 end;
 
 function TEditor.Save : boolean;

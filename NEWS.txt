@@ -1,3 +1,8 @@
+Version 5.5.1 - 7 Oktober 2013
+
+- When editing a file opened in Dev-C++ elsewhere, Dev will only show one messagebox informing you of the change.
+- A bunch of bug fixes.
+
 Version 5.5.0 - 6 Oktober 2013
 
 - Dev-C++ can now parse C++ header files too.

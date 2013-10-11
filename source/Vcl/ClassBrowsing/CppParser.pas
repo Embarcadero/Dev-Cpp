@@ -1486,7 +1486,7 @@ begin
 	// Keep going and stop on top of the variable name
 	LastType := '';
 	repeat
-		if (fIndex < fTokenizer.Tokens.Count - 1) and (fTokenizer[fIndex + 1]^.Text[1] in ['(',',', ';', ':', '}']) then
+		if (fIndex+1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in ['(',',', ';', ':', '}']) then
 			Break;
 		if NotSameStr(fTokenizer[fIndex]^.Text,'struct') and
 		   NotSameStr(fTokenizer[fIndex]^.Text,'class') and
@@ -1494,18 +1494,21 @@ begin
 			LastType := Trim(LastType + ' ' + fTokenizer[fIndex]^.Text);
 		Inc(fIndex);
 	until fIndex >= fTokenizer.Tokens.Count;
-	if fIndex = fTokenizer.Tokens.Count then
+
+	// Don't bother entering the scanning loop when we have failed
+	if fIndex >= fTokenizer.Tokens.Count then
 		Exit;
 
-	// Step onto the variable name
+	// Find the variable name
 	repeat
+
 		// Skip bit identifiers,
 		// e.g.:
 		// handle
 		// unsigned short bAppReturnCode:8,reserved:6,fBusy:1,fAck:1
 		// as
 		// unsigned short bAppReturnCode,reserved,fBusy,fAck
-		if fTokenizer[fIndex]^.Text[1] = ':' then begin
+		if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then begin
 			repeat
 				Inc(fIndex);
 			until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', '}']);
@@ -1517,44 +1520,44 @@ begin
 		// int a(3)
 		// as
 		// int a
-		if fTokenizer[fIndex]^.Text[1] = '(' then begin
+		if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '(') then begin
 			while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', '}']) do
 				Inc(fIndex);
 		end;
 
-		// We have failed you
-		if fIndex = fTokenizer.Tokens.Count then
-			Exit;
-
-		// Did we succeed?
-		if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
-			if fLogStatements then
-				if Assigned(fOnLogStatement) then
-					fOnLogStatement(Self, '[parser   ]: -V- ' + Format('%4d ', [fTokenizer[fIndex]^.Line]) + StringOfChar(' ', fLevel) + Trim(LastType + ' ' + fTokenizer[fIndex]^.Text));
-			if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
-				Cmd := Copy(fTokenizer[fIndex]^.Text, 1, Pos('[', fTokenizer[fIndex]^.Text) - 1);
-				Args := Copy(fTokenizer[fIndex]^.Text, Pos('[', fTokenizer[fIndex]^.Text), Length(fTokenizer[fIndex]^.Text) - Pos('[', fTokenizer[fIndex]^.Text) + 1);
-			end else begin
-				Cmd := fTokenizer[fIndex]^.Text;
-				Args := '';
+		// Did we stop on top of the variable name?
+		if (fIndex < fTokenizer.Tokens.Count) then begin
+			if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
+				if fLogStatements then
+					if Assigned(fOnLogStatement) then
+						fOnLogStatement(Self, '[parser   ]: -V- ' + Format('%4d ', [fTokenizer[fIndex]^.Line]) + StringOfChar(' ', fLevel) + Trim(LastType + ' ' + fTokenizer[fIndex]^.Text));
+				if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
+					Cmd := Copy(fTokenizer[fIndex]^.Text, 1, Pos('[', fTokenizer[fIndex]^.Text) - 1);
+					Args := Copy(fTokenizer[fIndex]^.Text, Pos('[', fTokenizer[fIndex]^.Text), Length(fTokenizer[fIndex]^.Text) - Pos('[', fTokenizer[fIndex]^.Text) + 1);
+				end else begin
+					Cmd := fTokenizer[fIndex]^.Text;
+					Args := '';
+				end;
+						fLastID := AddStatement(
+					-1,
+					GetCurrentClass,
+					fCurrentFile,
+					LastType + ' ' + fTokenizer[fIndex]^.Text,
+					LastType,
+					Cmd,
+					Args,
+					fTokenizer[fIndex]^.Line,
+					skVariable,
+					GetScope,
+					fClassScope,
+					True,
+					True);
 			end;
-			fLastID := AddStatement(
-				-1,
-				GetCurrentClass,
-				fCurrentFile,
-				LastType + ' ' + fTokenizer[fIndex]^.Text,
-				LastType,
-				Cmd,
-				Args,
-				fTokenizer[fIndex]^.Line,
-				skVariable,
-				GetScope,
-				fClassScope,
-				True,
-				True);
+
+			// Step over the variable name
+			if not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']) then
+				Inc(fIndex);
 		end;
-		if not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']) then
-			Inc(fIndex);
 	until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']);
 
 	// Skip ; and ,

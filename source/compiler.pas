@@ -673,7 +673,7 @@ begin
 		if fProject.Options.typ = dptStat then
 			MessageDlg(Lang[ID_ERR_NOTEXECUTABLE], mtError, [mbOK], 0)
 		else if not FileExists(fProject.Executable) then begin
-			if devCompilerSets.Count > 0 then begin// suggest a compile
+			if MainForm.actCompRun.Enabled then begin // suggest a compile
 				if MessageDlg(Lang[ID_ERR_PROJECTNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes,mbNo], 0) = mrYes then begin
 					MainForm.actCompRunExecute(nil); // move this to mainform?
 				end;
@@ -707,7 +707,7 @@ begin
 		end;
 	end else begin
 		if not FileExists(ChangeFileExt(fSourceFile, EXE_EXT)) then begin
-			if devCompilerSets.Count > 0 then begin// suggest a compile
+			if MainForm.actCompRun.Enabled then begin // suggest a compile
 				if MessageDlg(Lang[ID_ERR_SRCNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes,mbNo], 0) = mrYes then begin
 					MainForm.actCompRunExecute(nil);
 				end;

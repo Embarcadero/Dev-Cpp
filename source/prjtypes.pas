@@ -175,7 +175,9 @@ begin
 	SupportXPThemes:=False;
 	CompilerSet:=devCompilerSets.CurrentIndex;
 	if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then
-		CompilerOptions:=devCompilerSets[CompilerSet].OptionString;
+		CompilerOptions:=devCompilerSets[CompilerSet].OptionString
+	else
+		CompilerOptions := '';
 	VersionInfo := TProjVersionInfo.Create;
 	IncludeVersionInfo:=False;
 end;

@@ -2569,6 +2569,7 @@ procedure TMainForm.actUnitRenameExecute(Sender: TObject);
 var
 	idx: integer;
 	OldName, NewName, CurDir: AnsiString;
+	wa: boolean;
 begin
 	if not assigned(fProject) then exit;
 	if not assigned(ProjectView.Selected) or
@@ -2604,9 +2605,11 @@ begin
 			fProject.SaveUnitAs(idx, NewName);
 
 			// deactivate for renaming or a message will raise
+			wa := devFileMonitor.Active;
 			devFileMonitor.Deactivate;
 			Renamefile(OldName, NewName);
-			devFileMonitor.Activate;
+			if wa then
+				devFileMonitor.Activate;
 		except
 			MessageDlg(format(Lang[ID_ERR_RENAMEFILE], [OldName]), mtError, [mbok], 0);
 		end;
@@ -2911,8 +2914,8 @@ begin
 	e:= GetEditor;
 	fCompiler.Target:= ctNone;
 
-	if assigned(fProject) then begin
-		if assigned(e) and not e.InProject then begin
+	if Assigned(fProject) then begin
+		if Assigned(e) and not e.InProject then begin
 
 			// There is an opened project, but this does file not belong to that project
 			if GetFileTyp(e.FileName) in [utCSrc,utCppSrc,utcHead,utCppHead,utresSrc,utresHead] then begin // it's a code file
@@ -4533,7 +4536,12 @@ procedure TMainForm.devFileMonitorNotifyChange(Sender: TObject;ChangeType: TdevM
 var
 	e: TEditor;
 	p : TBufferCoord;
+	wa : boolean;
 begin
+	// Deactivate monitoring for this file. One message is enough
+	wa := devFileMonitor.Active;
+	devFileMonitor.Deactivate;
+
 	case ChangeType of
 		mctChanged: begin
 			Application.Restore;
@@ -4552,6 +4560,10 @@ begin
 			MessageDlg(Format(Lang[ID_ERR_RENAMEDDELETED],[Filename]), mtInformation, [mbOk], 0);
 		end;
 	end;
+
+	// Activate once messagebox is gone
+	if wa then
+		devFileMonitor.Activate;
 end;
 
 procedure TMainForm.actFilePropertiesExecute(Sender: TObject);
@@ -4804,7 +4816,7 @@ end;
 procedure TMainForm.actShowTipsExecute(Sender: TObject);
 begin
 	with TTipOfTheDayForm.Create(Self) do
-		Show;
+		ShowModal;
 end;
 
 procedure TMainForm.HelpMenuItemClick(Sender: TObject);
@@ -5277,9 +5289,13 @@ begin
 	if Assigned(devCompilerSets.CurrentSet) and devCompilerSets.CurrentSet.FindOption(OptionString, OptionStruct, OptionIndex) then begin // the option exists...
 
 		// Search project options...
-		if Assigned(fProject) then
-			result := fProject.Options.CompilerOptions[OptionIndex + 1]
-		else
+		if Assigned(fProject) then begin
+
+			// An empty project without a compiler set might not have this string at all, fix that?
+			if (OptionIndex + 1 <= Length(fProject.Options.CompilerOptions)) then begin
+				result := fProject.Options.CompilerOptions[OptionIndex + 1];
+			end;
+		end else
 			result := ValueToChar[OptionStruct^.Value];
 	end;
 end;
@@ -6221,13 +6237,13 @@ begin
 			inc(i);
 		end;
 
+		// Update after opening files
+		UpdateAppTitle;
+
 		// do not show tips if Dev-C++ is launched with a file and only slow
 		// when the form shows for the first time, not when going fullscreen too
 		if devData.ShowTipsOnStart and fShowTips then
 			actShowTips.Execute;
-
-		// Update after opening files
-		UpdateAppTitle;
 	end;
 end;
 

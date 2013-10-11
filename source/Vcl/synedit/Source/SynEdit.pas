@@ -10190,7 +10190,7 @@ begin
   GetCursorPos(Point);                    // mouse position (on screen)
   Point := Self.ScreenToClient(Point);    // convert to SynEdit coordinates
   { Make sure it fits within the SynEdit bounds }
-  if (Point.X < 0) or (Point.Y < 0) or (Point.X > Self.Width) or (Point.Y> Self.Height) then
+  if (Point.X < Self.GutterWidth) or (Point.Y < 0) or (Point.X > Self.Width) or (Point.Y> Self.Height) then
   begin
     Result := False;
     EXIT;
