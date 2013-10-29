@@ -1,3 +1,17 @@
+Version 5.5.2 - 28 Oktober 2013
+
+- Rewritten the help files.
+- Fixed a bug in the shortcut editor window.
+- Fixed a bug when closing an editor.
+- Fixed a memory leak in the recent file list.
+- Switching editors is a bit faster now (class browser is only redrawn once instead of twice).
+- Fixed a crash in code completion caused by using mouseover hints at the same time.
+- Fixed a timer leak (the "Not enough timers available" bug).
+- Tidied up the File Properties window.
+- Renamed the file renaming procedure (fixes the "Thread error 6" bug).
+- Fixed a bug in the new project window.
+- Fixed a bug in the short editor window.
+
 Version 5.5.1 - 7 Oktober 2013
 
 - When editing a file opened in Dev-C++ elsewhere, Dev will only show one messagebox informing you of the change.

@@ -37,7 +37,7 @@ uses
 {$ENDIF}
 
 type
-  TfrmProjectOptions = class(TForm)
+  TProjectOptionsFrm = class(TForm)
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     btnHelp: TBitBtn;
@@ -212,7 +212,7 @@ uses
 
 {$R *.dfm}
 
-procedure TfrmProjectOptions.UpdateDirButtons;
+procedure TProjectOptionsFrm.UpdateDirButtons;
 begin
   btnDirAdd.Enabled:= edDirEntry.Text <> '';
   if lstDirList.ItemIndex>= 0 then
@@ -232,7 +232,7 @@ begin
   btnDirDelInval.Enabled:= lstDirList.Items.Count> 0;
 end;
 
-procedure TfrmProjectOptions.UpdateMakButtons;
+procedure TProjectOptionsFrm.UpdateMakButtons;
 begin
   btnMakAdd.Enabled:= edMakeInclude.Text <> '';
   if lbMakeIncludes.ItemIndex>= 0 then
@@ -252,7 +252,7 @@ begin
   btnMakDelInval.Enabled:= lbMakeIncludes.Items.Count> 0;
 end;
 
-procedure TfrmProjectOptions.BrowseClick(Sender: TObject);
+procedure TProjectOptionsFrm.BrowseClick(Sender: TObject);
 var
 {$IFDEF WIN32}
   NewItem: AnsiString;
@@ -284,7 +284,7 @@ begin
 	edDirEntry.SetFocus;
 end;
 
-procedure TfrmProjectOptions.ButtonClick(Sender: TObject);
+procedure TProjectOptionsFrm.ButtonClick(Sender: TObject);
 var
 	idx: integer;
 	item : AnsiString;
@@ -332,19 +332,19 @@ begin
 	UpdateDirButtons;
 end;
 
-procedure TfrmProjectOptions.EditChange(Sender: TObject);
+procedure TProjectOptionsFrm.EditChange(Sender: TObject);
 begin
 	UpdateDirButtons;
 end;
 
-procedure TfrmProjectOptions.ListClick(Sender: TObject);
+procedure TProjectOptionsFrm.ListClick(Sender: TObject);
 begin
 	UpdateDirButtons;
 	if lstDirList.Itemindex <> -1 then
 		edDirEntry.Text:= lstDirList.Items[lstDirList.Itemindex];
 end;
 
-procedure TfrmProjectOptions.UpDownClick(Sender: TObject);
+procedure TProjectOptionsFrm.UpDownClick(Sender: TObject);
 var
 	idx: integer;
 begin
@@ -359,7 +359,7 @@ begin
 	UpdateDirButtons;
 end;
 
-procedure TfrmProjectOptions.GetInterface(Destination : TProject);
+procedure TProjectOptionsFrm.GetInterface(Destination : TProject);
 var
 	I: integer;
 begin
@@ -446,7 +446,7 @@ begin
 	end;
 end;
 
-procedure TfrmProjectOptions.SetFileVersion(Sender: TObject);
+procedure TProjectOptionsFrm.SetFileVersion(Sender: TObject);
 begin
 	with fProjectCopy.Options do begin
 		VersionInfo.FileVersion := Format('%d.%d.%d.%d', [spnMajor.Value,spnMinor.Value,spnRelease.Value,spnBuild.Value]);
@@ -458,7 +458,7 @@ begin
 	end;
 end;
 
-procedure TfrmProjectOptions.SetInterface(Source : TProject);
+procedure TProjectOptionsFrm.SetInterface(Source : TProject);
 var
 	I, cntSrc, cntHdr, cntRes, cntOther: integer;
 	IconTmp : AnsiString;
@@ -546,7 +546,7 @@ begin
 	end;
 end;
 
-procedure TfrmProjectOptions.SaveDirSettings;
+procedure TProjectOptionsFrm.SaveDirSettings;
 var
 	sl: TStrings;
 begin
@@ -562,12 +562,12 @@ begin
 	end;
 end;
 
-procedure TfrmProjectOptions.SubTabsChanging(Sender: TObject;NewIndex: Integer; var AllowChange: Boolean);
+procedure TProjectOptionsFrm.SubTabsChanging(Sender: TObject;NewIndex: Integer; var AllowChange: Boolean);
 begin
 	SaveDirSettings;
 end;
 
-procedure TfrmProjectOptions.SubTabsChange(Sender: TObject);
+procedure TProjectOptionsFrm.SubTabsChange(Sender: TObject);
 begin
   case SubTabs.TabIndex of
    0: lstDirList.Items:= fProjectCopy.Options.Libs;
@@ -577,7 +577,7 @@ begin
   UpdateDirButtons;
 end;
 
-procedure TfrmProjectOptions.btnIconLibClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnIconLibClick(Sender: TObject);
 begin
 	with TIconForm.Create(Self) do try
 		if ShowModal = mrOk then
@@ -591,7 +591,7 @@ begin
 	end;
 end;
 
-procedure TfrmProjectOptions.btnIconBrowseClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnIconBrowseClick(Sender: TObject);
 begin
 	if dlgPic.Execute then begin
 		if FileExists(dlgPic.FileName) then begin
@@ -603,7 +603,7 @@ begin
 	end;
 end;
 
-procedure TfrmProjectOptions.FormCreate(Sender: TObject);
+procedure TProjectOptionsFrm.FormCreate(Sender: TObject);
 begin
 	LoadText;
 
@@ -616,7 +616,7 @@ begin
 	lvFiles.Items[0].Expand(False);
 end;
 
-procedure TfrmProjectOptions.LoadText;
+procedure TProjectOptionsFrm.LoadText;
 begin
 	// Set interface font
 	Font.Name := devData.InterfaceFont;
@@ -718,14 +718,14 @@ begin
   chkSyncProduct.Caption:=     Lang[ID_POPT_SYNCPRODUCT];
 end;
 
-procedure TfrmProjectOptions.btnRemoveIconClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnRemoveIconClick(Sender: TObject);
 begin
   btnRemoveIcon.Enabled := False;
   fProjectCopy.Options.Icon := '';
   IconPreview.Picture.Graphic := nil;
 end;
 
-procedure TfrmProjectOptions.BrowseExecutableOutDirClick(Sender: TObject);
+procedure TProjectOptionsFrm.BrowseExecutableOutDirClick(Sender: TObject);
 var
 {$IFDEF WIN32}
   Dir: AnsiString;
@@ -742,7 +742,7 @@ begin
 		edExeOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 
-procedure TfrmProjectOptions.BrowseLogDirClick(Sender: TObject);
+procedure TProjectOptionsFrm.BrowseLogDirClick(Sender: TObject);
 var
 {$IFDEF WIN32}
   Dir: AnsiString;
@@ -759,7 +759,7 @@ begin
 		edObjOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 
-procedure TfrmProjectOptions.btnLogOutputDirClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnLogOutputDirClick(Sender: TObject);
 var
 {$IFDEF WIN32}
   Dir: AnsiString;
@@ -776,14 +776,14 @@ begin
 		edLogOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 
-procedure TfrmProjectOptions.btnMakeBrowseClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnMakeBrowseClick(Sender: TObject);
 begin
 	if dlgMakeInclude.Execute then
 		edMakeInclude.Text := ExtractRelativePath(fProjectCopy.FileName,dlgMakeInclude.FileName);
 	edMakeInclude.SetFocus;
 end;
 
-procedure TfrmProjectOptions.btnMakClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnMakClick(Sender: TObject);
 var
   i: Integer;
 begin
@@ -805,7 +805,7 @@ begin
   UpdateMakButtons;
 end;
 
-procedure TfrmProjectOptions.MakButtonClick(Sender: TObject);
+procedure TProjectOptionsFrm.MakButtonClick(Sender: TObject);
 var
   i: Integer;
 begin
@@ -835,18 +835,18 @@ begin
   UpdateMakButtons;
 end;
 
-procedure TfrmProjectOptions.edMakeIncludeChange(Sender: TObject);
+procedure TProjectOptionsFrm.edMakeIncludeChange(Sender: TObject);
 begin
 	UpdateMakButtons;
 end;
 
-procedure TfrmProjectOptions.lbMakeIncludesClick(Sender: TObject);
+procedure TProjectOptionsFrm.lbMakeIncludesClick(Sender: TObject);
 begin
 	UpdateMakButtons;
 	edMakeInclude.Text := lbMakeIncludes.Items[lbMakeIncludes.Itemindex];
 end;
 
-procedure TfrmProjectOptions.InfoMakeBtnClick(Sender: TObject);
+procedure TProjectOptionsFrm.InfoMakeBtnClick(Sender: TObject);
 begin
   Application.MessageBox(
       'Dev-C++''s Makefile has two important targets:' + #13#10 +
@@ -867,17 +867,17 @@ begin
 {$ENDIF}
 end;
 
-procedure TfrmProjectOptions.btnHelpClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnHelpClick(Sender: TObject);
 begin
 	OpenHelpFile;
 end;
 
-procedure TfrmProjectOptions.chkOverrideOutputClick(Sender: TObject);
+procedure TProjectOptionsFrm.chkOverrideOutputClick(Sender: TObject);
 begin
   edOverridenOutput.Enabled:=chkOverrideOutput.Checked;
 end;
 
-procedure TfrmProjectOptions.lvFilesChange(Sender: TObject;Node: TTreeNode);
+procedure TProjectOptionsFrm.lvFilesChange(Sender: TObject;Node: TTreeNode);
 var
 	idx: integer;
 	filetype : TExUnitType;
@@ -940,7 +940,7 @@ begin
 	spnPriority.OnChange:=spnPriorityChange;
 end;
 
-procedure TfrmProjectOptions.chkCompileClick(Sender: TObject);
+procedure TProjectOptionsFrm.chkCompileClick(Sender: TObject);
   procedure DoNode(Node: TTreeNode);
   var
     I: integer;
@@ -1003,7 +1003,7 @@ begin
   end;
 end;
 
-procedure TfrmProjectOptions.InitVersionInfo;
+procedure TProjectOptionsFrm.InitVersionInfo;
 var
 	I: integer;
 begin
@@ -1044,7 +1044,7 @@ begin
 	end;
 end;
 
-procedure TfrmProjectOptions.chkVersionInfoClick(Sender: TObject);
+procedure TProjectOptionsFrm.chkVersionInfoClick(Sender: TObject);
 begin
   spnMajor.Enabled:=chkVersionInfo.Checked;
   spnMinor.Enabled:=chkVersionInfo.Checked;
@@ -1056,7 +1056,7 @@ begin
   chkSyncProduct.Enabled:=chkVersionInfo.Checked;
 end;
 
-procedure TfrmProjectOptions.cmbCompilerChange(Sender: TObject);
+procedure TProjectOptionsFrm.cmbCompilerChange(Sender: TObject);
 begin
 	if fOldIndex = cmbCompiler.ItemIndex then
 		Exit;
@@ -1078,22 +1078,22 @@ begin
 	fOldIndex := cmbCompiler.ItemIndex;
 end;
 
-procedure TfrmProjectOptions.btnCancelClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnCancelClick(Sender: TObject);
 begin
 	ModalResult := mrCancel;
 end;
 
-procedure TfrmProjectOptions.btnOkClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnOkClick(Sender: TObject);
 begin
 	ModalResult := mrOk;
 end;
 
-procedure TfrmProjectOptions.lstTypeClick(Sender: TObject);
+procedure TProjectOptionsFrm.lstTypeClick(Sender: TObject);
 begin
 	chkSupportXP.Enabled := (lstType.ItemIndex = 0);
 end;
 
-procedure TfrmProjectOptions.AddLibBtnClick(Sender: TObject);
+procedure TProjectOptionsFrm.AddLibBtnClick(Sender: TObject);
 var
 	s: AnsiString;
 	i: integer;
@@ -1118,7 +1118,7 @@ begin
 	end;
 end;
 
-function TfrmProjectOptions.DefaultBuildCommand(idx: integer): AnsiString;
+function TProjectOptionsFrm.DefaultBuildCommand(idx: integer): AnsiString;
 var
   tfile, ofile: AnsiString;
 begin
@@ -1140,7 +1140,7 @@ begin
     Result := '$(CC) -c '+GenMakePath1(tfile)+' -o '+ ofile+' $(CFLAGS)';
 end;
 
-procedure TfrmProjectOptions.txtOverrideBuildCmdChange(Sender: TObject);
+procedure TProjectOptionsFrm.txtOverrideBuildCmdChange(Sender: TObject);
 var
   idx: integer;
 begin
@@ -1151,7 +1151,7 @@ begin
     fProjectCopy.Units[idx].BuildCmd:=StringReplace(txtOverrideBuildCmd.Text, #13#10, '<CRTAB>', [rfReplaceAll]);
 end;
 
-procedure TfrmProjectOptions.spnPriorityChange(Sender: TObject);
+procedure TProjectOptionsFrm.spnPriorityChange(Sender: TObject);
 var
   I, idx: integer;
 begin
@@ -1164,14 +1164,14 @@ begin
   end;
 end;
 
-procedure TfrmProjectOptions.btnCustomMakeBrowseClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnCustomMakeBrowseClick(Sender: TObject);
 begin
   if dlgCustomMake.Execute then
       edCustomMakefile.Text := ExtractRelativePath(fProjectCopy.FileName, dlgCustomMake.FileName);
   edCustomMakefile.SetFocus;
 end;
 
-procedure TfrmProjectOptions.cbUseCustomMakefileClick(Sender: TObject);
+procedure TProjectOptionsFrm.cbUseCustomMakefileClick(Sender: TObject);
   procedure ColorDisabled(W: TWinControl);
   begin
     if not W.Enabled then
@@ -1202,23 +1202,23 @@ begin
   UpdateMakButtons;
 end;
 
-procedure TfrmProjectOptions.lbMakeIncludesDrawItem(Control: TWinControl;Index: Integer; Rect: TRect; State: TOwnerDrawState);
+procedure TProjectOptionsFrm.lbMakeIncludesDrawItem(Control: TWinControl;Index: Integer; Rect: TRect; State: TOwnerDrawState);
 begin
 	btnMakUp.Enabled := lbMakeIncludes.Items.Count > 0;
 	btnMakDown.Enabled := lbMakeIncludes.Items.Count > 0;
 end;
 
-procedure TfrmProjectOptions.chkLogOutputClick(Sender: TObject);
+procedure TProjectOptionsFrm.chkLogOutputClick(Sender: TObject);
 begin
 	edLogOutput.Enabled := chkLogOutput.Checked;
 end;
 
-procedure TfrmProjectOptions.OptionsLinkClick(Sender: TObject);
+procedure TProjectOptionsFrm.OptionsLinkClick(Sender: TObject);
 begin
 	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
-procedure TfrmProjectOptions.FormClose(Sender: TObject;var Action: TCloseAction);
+procedure TProjectOptionsFrm.FormClose(Sender: TObject;var Action: TCloseAction);
 begin
 	// Correct memory leak in VCL
 	CompOptionsFrame1.vle.Strings.Clear;

@@ -51,7 +51,6 @@ type
     edEmptyLines: TEdit;
     Bevel1: TBevel;
     Bevel2: TBevel;
-    Bevel3: TBevel;
     Bevel4: TBevel;
     Bevel5: TBevel;
     Bevel6: TBevel;
@@ -72,6 +71,7 @@ type
     PropertiesCopy: TMenuItem;
     N1: TMenuItem;
     PropertiesSelAll: TMenuItem;
+    Bevel3: TBevel;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnOKClick(Sender: TObject);
@@ -262,7 +262,7 @@ begin
 
 			// Get file name
 			if Assigned(cmbFiles.Items.Objects[I]) then begin // only count project files
-				loopfilename := TProjUnit(cmbFiles.Items.Objects[I]).FileName;
+				loopfilename := AnsiString(cmbFiles.Items.Objects[I]);
 				if not SameStr('.dev',ExtractFileExt(loopfilename)) then begin
 					try
 						fEdit.Lines.LoadFromFile(loopfilename);
@@ -285,14 +285,16 @@ begin
 	// Just show information about the selected file only
 	end else begin
 
+		// Get file properties
 		try
 			fEdit.Lines.LoadFromFile(Filename);
 			CalculateFile(FileName);
 		except end;
 
-		if Assigned(MainForm.fProject) then begin
+		// Check if it is in our project
+		if Assigned(MainForm.fProject) and (MainForm.fProject.Units.IndexOf(FileName) <> -1) then begin
 			edProject.Text := MainForm.fProject.Name;
-			edRelative.Text := ExtractRelativePath(MainForm.fProject.Directory, Filename)
+			edRelative.Text := ExtractRelativePath(MainForm.fProject.Directory,Filename)
 		end else begin
 			edProject.Text := '-';
 			edRelative.Text := '-';
@@ -306,18 +308,27 @@ begin
 	end;
 
 	edTotalLines.Text := IntToStr(fTotalLines);
-	edFileSize.Text := FormatFloat('#,###,##0', fFileSize);
 	edCodeLines.Text := IntToStr(fCodeLines);
 	edEmptyLines.Text := IntToStr(fEmptyLines);
 	edIncludes.Text := IntToStr(fIncludeLines);
 	edCommentLines.Text := IntToStr(fCommentLines);
+
+	// Pretty print total file size
+	if fFileSize < 1024 then
+		edFileSize.Text := FloatToStrF(fFileSize,ffGeneral,4,1) + ' ' + Lang[ID_BYTES]
+	else if fFileSize < 1024*1024 then
+		edFileSize.Text := FloatToStrF(fFileSize/1024,ffGeneral,4,1) + ' KiB'
+	else if fFileSize < 1024*1024*1024 then
+		edFileSize.Text := FloatToStrF((fFileSize/1024)/1024,ffGeneral,4,1) + ' MiB'
+	else
+		edFileSize.Text := FloatToStrF(((fFileSize/1024)/1024)/1024,ffGeneral,4,1) + ' GiB';
 end;
 
 procedure TFilePropertiesForm.FillFiles;
 var
 	I: integer;
-	idx: integer;
 	e: TEditor;
+	FullFileName, ShortFileName: AnsiString;
 begin
 	cmbFiles.Items.BeginUpdate;
 	cmbFiles.Clear;
@@ -326,36 +337,40 @@ begin
 	if Assigned(MainForm.fProject) then begin
 
 		// Add project file itself
-		cmbFiles.Items.Add(ExtractFileName(MainForm.fProject.FileName));
+		FullFileName := MainForm.fProject.FileName;
+		ShortFileName := ExtractFileName(FullFileName);
+		cmbFiles.Items.AddObject(ShortFileName,Pointer(FullFileName));
 
-		for I := 0 to MainForm.fProject.Units.Count - 1 do
-			cmbFiles.Items.AddObject(ExtractFileName(MainForm.fProject.Units[I].FileName), Pointer(MainForm.fProject.Units[I]));
+		// Add files belonging to project
+		for I := 0 to MainForm.fProject.Units.Count - 1 do begin
+			FullFileName := MainForm.fProject.Units[I].FileName;
+			ShortFileName := ExtractFileName(FullFileName);
+			cmbFiles.Items.AddObject(ShortFileName,Pointer(FullFileName));
+		end;
 	end;
 
-	// add all open editor files not in project
+	// add all open editor files not in project (they don't have that object)
 	for I := 0 to MainForm.PageControl.PageCount - 1 do begin
 		e := MainForm.GetEditor(I);
-		if not e.InProject then
-			cmbFiles.Items.Add(e.FileName);
+		if not e.InProject then begin
+			FullFileName := e.FileName;
+			ShortFileName := ExtractFileName(FullFileName);
+			cmbFiles.Items.AddObject(ShortFileName,Pointer(FullFileName));
+		end;
 	end;
 
 	// Highlight current file
-	idx := cmbFiles.Items.IndexOf(ExtractFileName(fFilename));
-	if idx = -1 then
-		idx := cmbFiles.Items.IndexOf(fFilename);
-	if idx <> -1 then // just to be on the safe side
-		cmbFiles.ItemIndex := idx;
+	I := cmbFiles.Items.IndexOf(ExtractFileName(fFilename));
+	if I = -1 then
+		I := cmbFiles.Items.IndexOf(fFilename);
+	cmbFiles.ItemIndex := I;
 
 	cmbFiles.Items.EndUpdate;
 end;
 
 procedure TFilePropertiesForm.cmbFilesClick(Sender: TObject);
 begin
-	if Assigned(cmbFiles.Items.Objects[cmbFiles.ItemIndex]) then begin
-		fFilename := TProjUnit(cmbFiles.Items.Objects[cmbFiles.ItemIndex]).FileName;
-		ShowPropsFor(fFilename);
-	end else
-		ShowPropsFor(cmbFiles.Items[cmbFiles.ItemIndex]);
+	ShowPropsFor(AnsiString(cmbFiles.Items.Objects[cmbFiles.ItemIndex]));
 end;
 
 procedure TFilePropertiesForm.SetFile(const Filename: AnsiString);

@@ -1,4 +1,4 @@
-object frmProjectOptions: TfrmProjectOptions
+object ProjectOptionsForm: TProjectOptionsFrm
   Left = 993
   Top = 552
   BorderIcons = [biSystemMenu]

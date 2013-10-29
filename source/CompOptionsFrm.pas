@@ -157,7 +157,7 @@ begin
 	// Update names and current selection
 	for I := 0 to cmbCompilerSetComp.Items.Count -1 do
 		devCompilerSets[i].Name := cmbCompilerSetComp.Items[i];
-	devCompilerSets.CurrentIndex := cmbCompilerSetComp.ItemIndex; // TODO: not needed
+	devCompilerSets.CurrentIndex := cmbCompilerSetComp.ItemIndex;
 
 	// Save the current set to disk
 	SaveSet(cmbCompilerSetComp.ItemIndex);

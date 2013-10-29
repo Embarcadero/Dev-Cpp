@@ -108,8 +108,14 @@ end;
 procedure TfrmShortcutsEditor.lvShortcutsKeyDown(Sender: TObject;var Key: Word; Shift: TShiftState);
 var
 	I, oldindex: integer;
-	TextShortCut: AnsiString;
 	IntShortCut: TShortCut;
+
+	// Handy macro. Please use
+	procedure SetShortCut(index : integer;ShortCut : integer);
+	begin
+		lvShortcuts.Items[index].SubItems[0] := ShortCutToText(ShortCut);
+		PShortCutItem(lvShortcuts.Items[index].Data)^.Temporary := IntShortCut;
+	end;
 begin
 	// Require a selection
 	if lvShortcuts.Selected = nil then
@@ -117,7 +123,7 @@ begin
 
 	// clear shortcut if ONLY Escape or Del is pressed
 	if (Key in [VK_ESCAPE,VK_DELETE]) and (Shift = []) then begin
-		lvShortcuts.Selected.SubItems[0] := '';
+		SetShortCut(lvShortcuts.ItemIndex,0);
 		Exit;
 	end;
 
@@ -134,7 +140,6 @@ begin
 		Exit;
 
 	IntShortCut := ShortCut(Key, Shift);
-	TextShortCut := ShortCutToText(IntShortCut);
 
 	oldindex := -1;
 	for I:=0 to lvShortcuts.Items.Count-1 do
@@ -149,13 +154,11 @@ begin
 	// Can be written in a more compact form, but I prefer readability
 	if oldindex <> -1 then begin // already in use
 		if MessageDlg(Format(fReplaceHint,[lvShortcuts.Items[oldindex].Caption]),mtConfirmation,[mbYes,mbNo],0) = mrYes then begin // replace...
-			lvShortcuts.Items[oldindex].SubItems[0] := ''; // remove old
-			lvShortcuts.Items[oldindex].Data := Pointer(0);
+			SetShortCut(oldindex,0); // remove old
 		end;
 	end;
 
-	lvShortcuts.Selected.SubItems[0] := TextShortCut; // set new
-	PShortCutItem(lvShortcuts.Selected.Data)^.Temporary := IntShortCut;
+	SetShortCut(lvShortcuts.ItemIndex,IntShortCut); // set new
 
 	// don't let the keystroke propagate...
 	Key := 0;

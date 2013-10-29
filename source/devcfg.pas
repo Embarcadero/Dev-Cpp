@@ -134,7 +134,7 @@ type
     property CppDir: TStringList read fCppDir write fCppDir;
     property LibDir: TStringList read fLibDir write fLibDir;
 
-    // TODO: Properties
+    // Properties
     property Name: AnsiString read fName write fName;
     property DefInclude : TStringList read fDefInclude;
 
@@ -2372,7 +2372,7 @@ procedure TdevCodeCompletion.SettoDefaults;
 begin
 	fWidth:=320;
 	fHeight:=240;
-	fDelay:=200;
+	fDelay:=180;
 	fBackColor:=clWindow;
 	fEnabled:=True;
 	fUseCacheFiles:=False;

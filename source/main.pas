@@ -159,9 +159,6 @@ type
     PastePopItem: TMenuItem;
     MenuItem2: TMenuItem;
     InsertPopItem: TMenuItem;
-    CommentheaderPopItem: TMenuItem;
-    DateandtimePopItem: TMenuItem;
-    MenuItem3: TMenuItem;
     TogglebookmarksPopItem: TMenuItem;
     GotobookmarksPopItem: TMenuItem;
     SelectAllPopItem: TMenuItem;
@@ -798,7 +795,6 @@ type
     procedure actInsertExecute(Sender: TObject);
     procedure actToggleExecute(Sender: TObject);
     procedure actGotoExecute(Sender: TObject);
-    procedure actEditMenuUpdate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,Y: Integer);
     procedure actBreakPointExecute(Sender: TObject);
@@ -1015,6 +1011,7 @@ begin
 	DontRecreateSingletons := true;
 
 	// Free non-singletons
+	AutoSaveTimer.Free;
 	devImageThemes.Free;
 	fCompiler.Free;
 	fDebugger.Free;
@@ -1477,8 +1474,7 @@ begin
 
 		e := GetEditor;
 		if Assigned(e) then begin
-			ClassBrowser.CurrentFile := e.FileName;
-			e.Text.SetFocus;
+			e.Activate;
 		end else if (ClassBrowser.ShowFilter=sfCurrent) or not Assigned(fProject) then begin
 			CppParser.Reset;
 			ClassBrowser.Clear;
@@ -2567,9 +2563,8 @@ end;
 
 procedure TMainForm.actUnitRenameExecute(Sender: TObject);
 var
-	idx: integer;
+	I, EditorIndex, ProjIndex: integer;
 	OldName, NewName, CurDir: AnsiString;
-	wa: boolean;
 begin
 	if not assigned(fProject) then exit;
 	if not assigned(ProjectView.Selected) or
@@ -2579,11 +2574,12 @@ begin
 		Exit;
 
 	// Get the original name
-	idx := integer(ProjectView.Selected.Data);
-	OldName := fProject.Units[idx].FileName;
+	I := integer(ProjectView.Selected.Data);
+	OldName := fProject.Units[I].FileName;
 	NewName := ExtractFileName(OldName);
 	CurDir := ExtractFilePath(OldName);
 
+	// Do we want to rename?
 	if InputQuery(Lang[ID_RENAME], Lang[ID_MSG_FILERENAME], NewName) and (ExtractFileName(NewName) <> '') then begin
 
 		NewName := ExpandFileto(NewName,CurDir);
@@ -2592,26 +2588,44 @@ begin
 		if FileExists(NewName) then begin
 			if MessageDlg(Lang[ID_MSG_FILEEXISTS], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 
-				// Remove the old file
+				// Close the target file...
+				EditorIndex := FileIsOpen(NewName);
+				if EditorIndex <> -1 then
+					CloseEditor(EditorIndex);
+
+				// Remove it from the current project...
+				projindex := fProject.Units.IndexOf(NewName);
+				if projindex <> -1 then
+					fProject.Remove(projindex,false);
+
+				// All references to the file are removed. Delete the file from disk
 				DeleteFile(NewName);
-				// TODO: update project listing
+
+			// User didn't want to overwrite
 			end else
 				Exit;
 		end;
 
+		// Target filename does not exist anymore. Do a rename
 		try
+			// change name in project file first (no actual file renaming on disk)
+			fProject.SaveUnitAs(I, NewName);
 
-			// change in project first so on failure the file isn't already renamed
-			fProject.SaveUnitAs(idx, NewName);
+			// remove old file from monitor list
+			I := devFileMonitor.Files.IndexOf(OldName);
+			if I <> -1 then begin
+				devFileMonitor.Files.Delete(I);
+				devFileMonitor.Refresh(true);
+			end;
 
-			// deactivate for renaming or a message will raise
-			wa := devFileMonitor.Active;
-			devFileMonitor.Deactivate;
-			Renamefile(OldName, NewName);
-			if wa then
-				devFileMonitor.Activate;
+			// Finally, we can rename without issues
+			RenameFile(OldName, NewName);
+
+			// Add new filename to file minitor
+			devFileMonitor.Files.Add(NewName);
+			devFileMonitor.Refresh(true);
 		except
-			MessageDlg(format(Lang[ID_ERR_RENAMEFILE], [OldName]), mtError, [mbok], 0);
+			MessageDlg(Format(Lang[ID_ERR_RENAMEFILE], [OldName]), mtError, [mbok], 0);
 		end;
 	end;
 end;
@@ -3064,6 +3078,7 @@ begin
 			// Did we compile?
 			if not FileExists(ChangeFileExt(e.FileName, EXE_EXT)) then begin
 				if MessageDlg(Lang[ID_ERR_SRCNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+					fCompSuccessAction := csaDebug;
 					actCompileExecute(nil);
 				end;
 				Exit;
@@ -4081,9 +4096,11 @@ var
 	e: TEditor;
 	i, x, y : integer;
 begin
-	e := GetEditor(PageControl.ActivePageIndex);
+	e := GetEditor;
 	if Assigned(e) then begin
-		e.Text.SetFocus;
+		// Update focus so user can keep typing
+		if e.Text.CanFocus then // TODO: can fail for some reason
+			e.Text.SetFocus;
 
 		// Keep window title updated
 		UpdateAppTitle;
@@ -5952,13 +5969,6 @@ begin
 	TrackPopupMenu(GotoBookmarksItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON, pt.x, pt.y, 0, Self.Handle, nil);
 end;
 
-procedure TMainForm.actEditMenuUpdate(Sender: TObject);
-begin
-	InsertItem.Enabled := PageControl.PageCount > 0;
-	ToggleBookmarksItem.Enabled := PageControl.PageCount > 0;
-	GotoBookmarksItem.Enabled := PageControl.PageCount > 0;
-end;
-
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
 	fFirstShow := true;
@@ -5992,7 +6002,7 @@ begin
 
 	// Don't create the autosave timer when we don't need it
 	if devEditor.EnableAutoSave then begin
-		AutoSaveTimer := TTimer.Create(Self);
+		AutoSaveTimer := TTimer.Create(nil);
 		AutoSaveTimer.OnTimer := EditorSaveTimer;
 		AutoSaveTimer.Interval := devEditor.Interval*60*1000; // miliseconds to minutes
 		AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
@@ -6390,7 +6400,7 @@ begin
 				if grpOrigin.Visible then
 					rbEntireScope.Checked := false;
 
-				// Always search backwards
+				// Always search forwards
 				if grpDirection.Visible then
 					rbForward.Checked := true;
 

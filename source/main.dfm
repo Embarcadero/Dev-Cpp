@@ -60,7 +60,7 @@ object MainForm: TMainForm
       object CompilerOutput: TListView
         Left = 0
         Top = 0
-        Width = 888
+        Width = 887
         Height = 154
         Align = alClient
         BevelOuter = bvNone
@@ -104,7 +104,7 @@ object MainForm: TMainForm
       object ResourceOutput: TListView
         Left = 0
         Top = 0
-        Width = 888
+        Width = 887
         Height = 154
         Align = alClient
         BevelOuter = bvNone
@@ -226,7 +226,7 @@ object MainForm: TMainForm
       object CompResGroupBox: TPanel
         Left = 233
         Top = 0
-        Width = 655
+        Width = 654
         Height = 154
         Align = alClient
         BevelOuter = bvNone
@@ -234,7 +234,7 @@ object MainForm: TMainForm
         object LogOutput: TMemo
           Left = 0
           Top = 0
-          Width = 655
+          Width = 654
           Height = 154
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
@@ -286,7 +286,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 291
-          Height = 118
+          Height = 117
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -452,7 +452,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 48
+          Height = 47
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -491,7 +491,7 @@ object MainForm: TMainForm
       object FindOutput: TListView
         Left = 0
         Top = 0
-        Width = 888
+        Width = 887
         Height = 154
         Align = alClient
         BevelOuter = bvNone
@@ -1264,14 +1264,13 @@ object MainForm: TMainForm
         Caption = '-'
       end
       object InsertItem: TMenuItem
-        Caption = '&Insert'
-        ImageIndex = 18
+        Action = actInsert
         object DateTimeMenuItem: TMenuItem
           Caption = '&Date/Time'
           OnClick = DateTimeMenuItemClick
         end
         object CommentheaderMenuItem: TMenuItem
-          Caption = '&Comment header'
+          Caption = '&Comment Header'
           OnClick = CommentheaderMenuItemClick
         end
         object N999: TMenuItem
@@ -1279,12 +1278,10 @@ object MainForm: TMainForm
         end
       end
       object ToggleBookmarksItem: TMenuItem
-        Caption = 'Toggle &Bookmarks'
-        ImageIndex = 19
+        Action = actToggle
       end
       object GotoBookmarksItem: TMenuItem
-        Caption = 'Goto Bookmark'
-        ImageIndex = 20
+        Action = actGoto
       end
       object N26: TMenuItem
         Caption = '-'
@@ -1732,7 +1729,7 @@ object MainForm: TMainForm
   end
   object EditorPopupMenu: TPopupMenu
     Left = 403
-    Top = 212
+    Top = 216
     object GotoDeclEditor: TMenuItem
       Action = actGotoDeclEditor
     end
@@ -1785,17 +1782,7 @@ object MainForm: TMainForm
       Caption = '-'
     end
     object InsertPopItem: TMenuItem
-      Caption = '&Insert'
-      ImageIndex = 30
-      object CommentheaderPopItem: TMenuItem
-        Caption = 'Comment header'
-      end
-      object DateandtimePopItem: TMenuItem
-        Caption = 'Date and time'
-      end
-      object MenuItem3: TMenuItem
-        Caption = '-'
-      end
+      Action = actInsert
     end
     object TogglebookmarksPopItem: TMenuItem
       Caption = '&Toggle bookmarks'

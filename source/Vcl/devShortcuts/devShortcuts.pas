@@ -128,13 +128,13 @@ begin
 
 		// Add all main menu items...
 		for I := 0 to fOwner.ComponentCount - 1 do begin
-			if (fOwner.Components[I] is TMenuItem) then begin
+			if fOwner.Components[I] is TMenuItem then begin
 				MenuItem := TMenuItem(fOwner.Components[I]);
 				if (not MenuItem.IsLine) and (MenuItem.Count = 0) then begin // don't process foldouts and separators
 
 					// Don't add if the main menu counterpart or their action has been added
 					if Assigned(MenuItem.Action) and (Actions.IndexOf(MenuItem.Action.Name) <> -1) then
-						continue;
+						Continue;
 
 					item := new(PShortcutItem);
 					item^.Default := MenuItem.ShortCut;
@@ -243,7 +243,6 @@ var
 	Fini: TIniFile;
 	entry, value: AnsiString;
 	item: PShortcutItem;
-	MenuItem: TMenuItem;
 begin
 	if fFileName = '' then
 		Exit;
@@ -253,11 +252,10 @@ begin
 		with frmShortcutsEditor do begin
 			for I := 0 to Count - 1 do begin
 				item := PShortCutItem(fShortcuts[i]);
-				MenuItem := item^.MenuItem;
 
 				// Apply to Menu
-				if Assigned(MenuItem) then
-					MenuItem.ShortCut := ShortCuts[I]^.Temporary; // ShortCuts is the UI list
+				if Assigned(item^.MenuItem) then
+					item^.MenuItem.ShortCut := ShortCuts[I]^.Temporary; // ShortCuts is the UI list
 
 				// Apply to action
 				if Assigned(item^.Action) then

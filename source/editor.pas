@@ -406,9 +406,6 @@ begin
 	fTabSheet.PageControl.Show;
 	fTabSheet.PageControl.ActivePage := fTabSheet;
 
-	if fText.Visible then
-		fText.SetFocus;
-
 	// this makes sure that the classbrowser is consistent
 	MainForm.PageControlChange(MainForm.PageControl);
 end;
@@ -612,7 +609,7 @@ end;
 
 function TEditor.FunctionTipAllowed : boolean;
 begin
-	Result := not fText.IsScrolling and fText.Focused and not fText.SelAvail and devEditor.ShowFunctionTip and Assigned(fText.Highlighter) and not fFunctionTip.ForceHide;
+	Result := not fText.IsScrolling and not fCompletionBox.Enabled and not fText.SelAvail and devEditor.ShowFunctionTip and Assigned(fText.Highlighter) and not fFunctionTip.ForceHide;
 end;
 
 procedure TEditor.FunctionTipTimer(Sender : TObject);
@@ -886,7 +883,9 @@ begin
 	if settopline then
 		fText.TopLine := collapsedline;
 
-	Activate;
+	// Changing editor focus is expensive (class browser listens to it). Don't do it if it's not needed
+	if not fText.Focused then
+		Activate;
 end;
 
 procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);
@@ -1419,7 +1418,7 @@ var
 			MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
 
 		// Otherwise, parse code and show information about variable
-		end else if devEditor.ParserHints {and fText.Focused} then begin
+		end else if devEditor.ParserHints then begin
 
 			// This piece of code changes the parser database, possibly making hints and code completion invalid...
 			M := TMemoryStream.Create;

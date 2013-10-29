@@ -3,8 +3,8 @@ object FilePropertiesForm: TFilePropertiesForm
   Top = 320
   BorderStyle = bsDialog
   Caption = 'File properties'
-  ClientHeight = 312
-  ClientWidth = 409
+  ClientHeight = 333
+  ClientWidth = 436
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -23,50 +23,44 @@ object FilePropertiesForm: TFilePropertiesForm
   object Bevel7: TBevel
     Left = 8
     Top = 8
-    Width = 393
-    Height = 265
+    Width = 420
+    Height = 289
     Style = bsRaised
   end
   object Bevel8: TBevel
-    Left = 208
-    Top = 208
-    Width = 185
-    Height = 21
+    Left = 220
+    Top = 220
+    Width = 200
+    Height = 30
   end
   object Bevel2: TBevel
-    Left = 208
-    Top = 176
-    Width = 185
-    Height = 21
-  end
-  object Bevel3: TBevel
-    Left = 16
-    Top = 144
-    Width = 185
-    Height = 21
+    Left = 220
+    Top = 182
+    Width = 200
+    Height = 30
   end
   object Bevel4: TBevel
     Left = 16
-    Top = 176
-    Width = 185
-    Height = 21
+    Top = 182
+    Width = 200
+    Height = 30
   end
   object Bevel6: TBevel
-    Left = 208
+    Left = 220
     Top = 144
-    Width = 185
-    Height = 21
+    Width = 200
+    Height = 30
   end
   object Bevel5: TBevel
     Left = 16
-    Top = 208
-    Width = 185
-    Height = 21
+    Top = 220
+    Width = 200
+    Height = 30
   end
   object Bevel1: TBevel
     Left = 16
     Top = 16
-    Width = 377
+    Width = 404
     Height = 121
   end
   object lblFileName: TLabel
@@ -85,42 +79,42 @@ object FilePropertiesForm: TFilePropertiesForm
   end
   object lblTotalLines: TLabel
     Left = 20
-    Top = 148
+    Top = 150
     Width = 89
     Height = 15
     Caption = 'Total lines in file:'
   end
   object lblCodeLines: TLabel
     Left = 20
-    Top = 180
+    Top = 188
     Width = 107
     Height = 15
     Caption = 'Actual lines of code:'
   end
   object lblCommentLines: TLabel
     Left = 20
-    Top = 212
+    Top = 226
     Width = 84
     Height = 15
     Caption = 'Comment lines:'
   end
   object lblFileSize: TLabel
-    Left = 212
-    Top = 180
+    Left = 228
+    Top = 188
     Width = 43
     Height = 15
     Caption = 'File size:'
   end
   object lblEmptyLines: TLabel
-    Left = 212
-    Top = 148
+    Left = 228
+    Top = 150
     Width = 64
     Height = 15
     Caption = 'Empty lines:'
   end
   object lblIncludes: TLabel
-    Left = 212
-    Top = 212
+    Left = 228
+    Top = 226
     Width = 73
     Height = 15
     Caption = 'Included files:'
@@ -141,69 +135,75 @@ object FilePropertiesForm: TFilePropertiesForm
   end
   object Bevel9: TBevel
     Left = 16
-    Top = 240
-    Width = 377
-    Height = 21
+    Top = 258
+    Width = 401
+    Height = 30
   end
   object lblTimeStamp: TLabel
     Left = 20
-    Top = 244
+    Top = 264
     Width = 63
     Height = 15
     Caption = 'Timestamp:'
   end
+  object Bevel3: TBevel
+    Left = 16
+    Top = 144
+    Width = 200
+    Height = 30
+  end
   object edFileSize: TEdit
-    Left = 336
-    Top = 180
-    Width = 50
+    Left = 350
+    Top = 186
+    Width = 65
     Height = 23
     ReadOnly = True
     TabOrder = 8
   end
   object edTotalLines: TEdit
-    Left = 144
+    Left = 146
     Top = 148
-    Width = 50
+    Width = 65
     Height = 23
     ReadOnly = True
     TabOrder = 4
   end
   object edCodeLines: TEdit
-    Left = 144
-    Top = 180
-    Width = 51
+    Left = 146
+    Top = 186
+    Width = 65
     Height = 23
     ReadOnly = True
     TabOrder = 5
   end
   object edCommentLines: TEdit
-    Left = 144
-    Top = 212
-    Width = 51
+    Left = 146
+    Top = 224
+    Width = 65
     Height = 23
     ReadOnly = True
     TabOrder = 6
   end
   object edEmptyLines: TEdit
-    Left = 336
+    Left = 350
     Top = 148
-    Width = 51
+    Width = 65
     Height = 23
     ReadOnly = True
     TabOrder = 7
   end
   object edIncludes: TEdit
-    Left = 336
-    Top = 212
-    Width = 51
+    Left = 350
+    Top = 224
+    Width = 65
     Height = 23
     ReadOnly = True
     TabOrder = 9
   end
   object edTimestamp: TEdit
     Left = 176
-    Top = 244
-    Width = 211
+    Top = 262
+    Width = 238
     Height = 23
     ReadOnly = True
     TabOrder = 10
@@ -211,7 +211,7 @@ object FilePropertiesForm: TFilePropertiesForm
   object edProject: TEdit
     Left = 100
     Top = 50
-    Width = 289
+    Width = 316
     Height = 23
     AutoSize = False
     ReadOnly = True
@@ -220,7 +220,7 @@ object FilePropertiesForm: TFilePropertiesForm
   object edAbsolute: TEdit
     Left = 100
     Top = 78
-    Width = 289
+    Width = 316
     Height = 23
     AutoSize = False
     ReadOnly = True
@@ -229,15 +229,15 @@ object FilePropertiesForm: TFilePropertiesForm
   object edRelative: TEdit
     Left = 100
     Top = 106
-    Width = 289
+    Width = 316
     Height = 23
     AutoSize = False
     ReadOnly = True
     TabOrder = 3
   end
   object btnOK: TButton
-    Left = 167
-    Top = 280
+    Left = 181
+    Top = 304
     Width = 75
     Height = 25
     Cancel = True
@@ -249,7 +249,7 @@ object FilePropertiesForm: TFilePropertiesForm
   object cmbFiles: TComboBox
     Left = 100
     Top = 22
-    Width = 289
+    Width = 316
     Height = 23
     Style = csDropDownList
     ItemHeight = 15
@@ -257,8 +257,8 @@ object FilePropertiesForm: TFilePropertiesForm
     OnClick = cmbFilesClick
   end
   object PropertiesPop: TPopupMenu
-    Left = 376
-    Top = 280
+    Left = 400
+    Top = 304
     object PropertiesCopy: TMenuItem
       Caption = 'Copy'
       ShortCut = 16451

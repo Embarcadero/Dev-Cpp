@@ -37,8 +37,9 @@ uses
 type
   PMRUItem = ^TMRUItem;
   TMRUItem = record
-    filename : AnsiString;
+    FileName : AnsiString;
     MenuItem : TMenuItem;
+    visible : boolean; // not all items in the list are shown
   end;
 
   TdmMain = class(TDataModule)
@@ -73,17 +74,23 @@ type
 { MRU List }
    private
     fMRU: TList; // let them store their own location
-    fMRUMenu: TMenuItem; // start of list
+    fMRUMenu: TMenuItem;
+    fMRUMenuParent: TMenuItem;
+    fMRUMenuStartIndex: integer;
+    fMRUTopSep: TMenuItem;
+    fMRUMiddleSep: TMenuItem;
+    fMRUBottomSep: TMenuItem;
     fMRUClick: TNotifyEvent;
     procedure FilterHistory; // remove deleted
     procedure LoadHistory;
     procedure SaveHistory;
+    procedure SetMRUMenu(value : TMenuItem);
   public
     procedure RebuildMRU;
     procedure AddtoHistory(const s: AnsiString);
     procedure RemoveFromHistory(const s: AnsiString);
     procedure ClearHistory;
-    property MRUMenu: TMenuItem read fMRUMenu write fMRUMenu;
+    property MRUMenu: TMenuItem read fMRUMenu write SetMRUMenu;
     property MRUClick: TNotifyEvent read fMRUClick write fMRUClick;
     property MRU: TList read fMRU;
   public
@@ -248,12 +255,25 @@ end;
 
 procedure TdmMain.LoadDataMod;
 begin
-  LoadHistory;
-  LoadCodeIns;
-  UpdateHighlighter;
+	LoadHistory;
+	LoadCodeIns;
+	UpdateHighlighter;
 end;
 
  { ---------- MRU ---------- }
+
+procedure TdmMain.SetMRUMenu(value : TMenuItem);
+begin
+	fMRUMenu := value;
+	fMRUMenuParent := fMRUMenu.Parent;
+	if Assigned(fMRUMenuParent) then begin
+		// Assume there are three separators above this item
+		fMRUMenuStartIndex := fMRUMenu.MenuIndex-2;
+		fMRUTopSep := fMRUMenuParent[fMRUMenuStartIndex-1];
+		fMRUMiddleSep := fMRUMenuParent[fMRUMenuStartIndex];
+		fMRUBottomSep := fMRUMenuParent[fMRUMenuStartIndex+1];
+	end;
+end;
 
 procedure TdmMain.AddtoHistory(const s: AnsiString);
 var
@@ -271,6 +291,7 @@ begin
 	newitem := new(PMRUItem);
 	newitem^.filename := s;
 	newitem^.MenuItem := nil; // to be filled by RebuildMRU
+	newitem^.visible := false; // idem
 
 	if GetFileTyp(s) = utPrj then begin
 		fMRU.Insert(0, newitem);// insert first
@@ -288,7 +309,6 @@ procedure TdmMain.RemoveFromHistory(const s: AnsiString);
 var
 	I : integer;
 begin
-
 	// Remove one, duplicates simply aren't present
 	for I := 0 to fMRU.Count - 1 do
 		if SameText(s,PMRUItem(fMRU[i])^.filename) then begin
@@ -341,7 +361,6 @@ var
 begin
 	sl := TStringList.Create;
 	try
-
 		// Use already open file handle
 		devData.ReadStrings('History',sl);
 
@@ -366,6 +385,7 @@ begin
 			newitem := new(PMRUItem);
 			newitem^.filename := sl.ValueFromIndex[i];
 			newitem^.MenuItem := nil; // to be filled by RebuildMRU
+			newitem^.visible := false;
 			fMRU.Add(newitem);
 		end;
 	finally
@@ -382,7 +402,6 @@ var
 begin
 	sl := TStringList.Create;
 	try
-
 		// Read struct list
 		for I := 0 to fMRU.Count - 1 do
 			sl.Add(PMRUItem(fMRU[i])^.filename);
@@ -396,29 +415,17 @@ end;
 
 procedure TdmMain.RebuildMRU;
 var
-	i,startidx,AllCount,ProjCount,FileCount: integer;
-	Parent,Item,TopSep,MiddleSep,BottomSep: TMenuItem;
-	fNewMRU: TList;
+	i,AllCount,ProjCount,FileCount: integer;
+	Item: TMenuItem;
 begin
 	// Delete all menu items
-	for I:= 0 to fMRU.Count - 1 do
+	for I:= 0 to fMRU.Count - 1 do begin
 		FreeAndNil(PMRUItem(fMRU[i])^.MenuItem);
+		PMRUItem(fMRU[i])^.visible := false;
+	end;
 
 	// Remove deleted files
 	FilterHistory;
-
-	// Determine where in the main menu to dump our list
-	Parent := fMRUMenu.Parent; // Clear history item
-	startidx := Parent.IndexOf(fMRUMenu); // start above
-	if startidx = -1 then Exit; // no menu item given?
-
-	TopSep := Parent[startidx-3];
-	MiddleSep := Parent[startidx-2];
-	BottomSep := Parent[startidx-1];
-	Dec(startidx,2); // start below the top separator
-
-	// Only save what is currently visible
-	fNewMRU := TList.Create;
 
 	// Add menu items up to MRUmax
 	AllCount := 0;
@@ -428,16 +435,19 @@ begin
 	// First add projects
 	for I := 0 to min(devData.MRUMax,fMRU.Count) - 1 do begin
 		if GetFileTyp(PMRUItem(fMRU[I])^.filename) = utPrj then begin
-			Item := TMenuItem.Create(Parent);
+
+			// Add item to main menu
+			Item := TMenuItem.Create(fMRUMenuParent);
 			Item.Caption:= Format('&%1x %s', [AllCount, PMRUItem(fMRU[I])^.filename]);
 			Item.OnClick:= fMRUClick;
 			Item.Tag := I;
-			Parent.Insert(startidx + AllCount,Item);
+			fMRUMenuParent.Insert(fMRUMenuStartIndex + AllCount,Item);
 
 			// Hand a pointer to the MRU item, so it can remove it itself
 			PMRUItem(fMRU[I])^.MenuItem := Item;
+			PMRUItem(fMRU[I])^.visible := true;
 
-			fNewMRU.Add(fMRU[I]);
+			// Keep count...
 			Inc(AllCount);
 			Inc(ProjCount);
 			if AllCount = devData.MRUMax then
@@ -449,16 +459,19 @@ begin
 	if AllCount <> devData.MRUMax then begin
 		for I := 0 to min(devData.MRUMax,fMRU.Count) - 1 do begin
 			if GetFileTyp(PMRUItem(fMRU[I])^.filename) <> utPrj then begin
-				Item := TMenuItem.Create(Parent);
+
+				// Add item to main menu
+				Item := TMenuItem.Create(fMRUMenuParent);
 				Item.Caption:= Format('&%1x %s', [AllCount, PMRUItem(fMRU[I])^.filename]);
 				Item.OnClick:= fMRUClick;
 				Item.Tag := I;
-				Parent.Insert(startidx + AllCount + 1,Item); // add AFTER middle separator
+				fMRUMenuParent.Insert(fMRUMenuStartIndex + AllCount + 1,Item); // add AFTER middle separator
 
 				// Hand a pointer to the MRU item, so it can remove it itself
 				PMRUItem(fMRU[I])^.MenuItem := Item;
+				PMRUItem(fMRU[I])^.visible := true;
 
-				fNewMRU.Add(fMRU[I]);
+				// Keep count...
 				Inc(AllCount);
 				Inc(FileCount);
 				if AllCount = devData.MRUMax then
@@ -468,14 +481,18 @@ begin
 	end;
 
 	// Hide unneeded separators and clear history button
-	TopSep.Visible := (AllCount > 0);
-	MiddleSep.Visible := (FileCount > 0) and (ProjCount > 0);
-	BottomSep.Visible := (AllCount > 0);
+	fMRUTopSep.Visible := (AllCount > 0);
+	fMRUMiddleSep.Visible := (FileCount > 0) and (ProjCount > 0);
+	fMRUBottomSep.Visible := (AllCount > 0);
 	fMRUMenu.Visible := (AllCount > 0);
 
-	// update MRU
-	fMRU.Assign(fNewMRU);
-	fNewMRU.Free;
+	// Remove invisible items...
+	for I := fMRU.Count-1 downto 0 do begin
+		if not PMRUItem(fMRU[I])^.visible then begin
+			Dispose(PMRUItem(fMRU[I]));
+			fMRU.Delete(I);
+		end;
+	end;
 end;
 
 { ---------- Code Insert Methods ---------- }

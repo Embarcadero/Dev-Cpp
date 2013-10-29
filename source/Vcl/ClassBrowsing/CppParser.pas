@@ -845,7 +845,6 @@ begin
 	Result := fTokenizer[fIndex]^.Text[1] = '#';
 end;
 
-// TODO: rewrite some day
 function TCppParser.CheckForVar: boolean;
 var
 	I,fIndexBackup: integer;

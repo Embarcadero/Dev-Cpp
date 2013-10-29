@@ -182,7 +182,6 @@ begin
   CreateMonitors;
 
   while not Terminated and not Suspended do begin
-    //iState := WaitForMultipleObjects(nMonitors, @hMonitors, False, INFINITE) - WAIT_OBJECT_0;
     iState := WaitForMultipleObjects(nMonitors, @hMonitors, False, INFINITE);
     if iState = WAIT_FAILED then
       break;
@@ -238,7 +237,6 @@ var
 begin
   P := StrNew(PAnsiChar(Filename));
   PostMessage(TdevFileMonitor(fOwner).Handle, APPMSG_NOTIFYFILECHANGED, integer(ChangeType), LPARAM(P));
-  //  Notify(ChangeType, );
 end;
 
 end.

@@ -418,7 +418,7 @@ procedure OpenHelpFile;
 var
 	abshelp : AnsiString;
 begin
-	abshelp := ReplaceFirstStr(devDirs.Help,  '%path%\',devDirs.Exec) + 'devcpp.htm';
+	abshelp := ReplaceFirstStr(devDirs.Help,  '%path%\',devDirs.Exec) + 'index.htm';
 	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(abshelp), nil, nil, SW_SHOWNORMAL);
 end;
 

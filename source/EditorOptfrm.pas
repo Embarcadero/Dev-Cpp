@@ -829,24 +829,15 @@ begin
 		ParseGlobalHeaders:=chkCBParseGlobalH.Checked;
 	end;
 
-	// Properly configure the timer object
-	if not devEditor.EnableAutoSave then begin
-
-		// Delete the timer when we don't need it anymore
-		if Assigned(MainForm.AutoSaveTimer) then
-			FreeAndNil(MainForm.AutoSaveTimer);
-
-	end else begin
-
-		// Create the timer when we changed the enable option
+	// Only create the timer if autosaving is enabled
+	if devEditor.EnableAutoSave then begin
 		if not Assigned(MainForm.AutoSaveTimer) then
-			MainForm.AutoSaveTimer := TTimer.Create(Self);
-
-		// And set corresponding options
+			MainForm.AutoSaveTimer := TTimer.Create(nil);
 		MainForm.AutoSaveTimer.Interval := devEditor.Interval*60*1000; // miliseconds to minutes
 		MainForm.AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
 		MainForm.AutoSaveTimer.OnTimer := MainForm.EditorSaveTimer;
-	end;
+	end else
+		FreeAndNil(MainForm.AutoSaveTimer);
 
 	SaveOptions;
 	dmMain.LoadDataMod;

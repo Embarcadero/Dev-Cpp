@@ -46,9 +46,8 @@ type
     destructor Destroy; override;
     function Add(aunit: TProjUnit): integer;
     procedure Remove(index: integer);
-    function Indexof(const FileName: AnsiString): integer; overload;
-    function Indexof(Editor: TEditor): integer; overload;
-
+    function IndexOf(const FileName: AnsiString): integer; overload;
+    function IndexOf(Editor: TEditor): integer; overload;
     property Items[index: integer]: TProjUnit read GetItem; default;
     property Count: integer read GetCount;
   end;
@@ -203,8 +202,8 @@ begin
 	end;
 
 	// Update node text
-	if assigned(fNode) then
-		fNode.Text:= ExtractfileName(fFileName);
+	if Assigned(fNode) then
+		fNode.Text := ExtractFileName(fFileName);
 end;
 
 function TProjUnit.GetDirty: boolean;
@@ -244,13 +243,13 @@ constructor TProject.Create(const nFileName, nName: AnsiString);
 begin
 	inherited Create;
 	fNode := nil;
-	fFolders:=TStringList.Create;
-	fFolders.Duplicates:=dupIgnore;
-	fFolders.Sorted:=True;
-	fFolderNodes:=TObjectList.Create(false);
-	fUnits:= TUnitList.Create;
+	fFolders := TStringList.Create;
+	fFolders.Duplicates := dupIgnore;
+	fFolders.Sorted := True;
+	fFolderNodes :=TObjectList.Create(false);
+	fUnits := TUnitList.Create;
 	fFileName := nFileName;
-	finiFile:= TMemIniFile.Create(fFileName);
+	finiFile := TMemIniFile.Create(fFileName);
 	fOptions := TProjOptions.Create;
 	if nName = DEV_INTERNAL_OPEN then
 		Open
@@ -1476,7 +1475,7 @@ procedure TProject.ShowOptions;
 var
 	IconFileName: AnsiString;
 begin
-	with TfrmProjectOptions.Create(MainForm) do try
+	with TProjectOptionsFrm.Create(MainForm) do try
 
 		// Apply current settings
 		SetInterface(Self);
@@ -1523,7 +1522,7 @@ end;
 
 function TProject.AssignTemplate(const aFileName: AnsiString;aTemplate: TTemplate): boolean;
 var
-	idx: integer;
+	I: integer;
 	s, s2: AnsiString;
 	OriginalIcon, DestIcon: AnsiString;
 begin
@@ -1563,75 +1562,73 @@ begin
 				fOptions.Icon := '';
 		end;
 
-   if aTemplate.Version> 0 then // new multi units
-    for idx:= 0 to pred(aTemplate.UnitCount) do
-     begin
-       if aTemplate.Options.useGPP then
-        s:= aTemplate.Units[idx].CppText
-       else
-        s:= aTemplate.Units[idx].CText;
+		// Add list of files
+		if aTemplate.Version > 0 then begin
+			for I := 0 to pred(aTemplate.UnitCount) do begin
 
-       if aTemplate.Options.useGPP then
-           NewUnit(FALSE, aTemplate.Units[idx].CppName)
-       else
-           NewUnit(FALSE, aTemplate.Units[idx].CName);
+				// Pick file contents
+				if aTemplate.Options.useGPP then
+					s:= aTemplate.Units[I].CppText
+				else
+					s:= aTemplate.Units[I].CText;
 
-       with fUnits[fUnits.Count -1] do
-        begin
-          Editor:= TEditor.Create(TRUE, ExtractFileName(filename), FileName, FALSE);
-          try
-           if (Length(aTemplate.Units[idx].CppName) > 0) and
-              (aTemplate.Options.useGPP) then
-           begin
-               Editor.FileName := aTemplate.Units[idx].CppName;
-               fUnits[fUnits.Count - 1].FileName := aTemplate.Units[idx].CppName;
-           end else if Length(aTemplate.Units[idx].CName) > 0 then
-           begin
-               Editor.FileName := aTemplate.Units[idx].CName;
-               fUnits[fUnits.Count - 1].FileName := aTemplate.Units[idx].CName;
-           end;
-           // ** if file isn't found blindly inserts text of unit
-           s2:= validateFile(s, devDirs.Templates);
-           if s2 <> '' then
-            begin
-              Editor.Text.Lines.LoadFromFile(s2);
-              Editor.Text.Modified:= TRUE;
-            end
-           else
-            if s <> '' then
-             begin
-               s:= StringReplace(s, '#13#10', #13#10, [rfReplaceAll]);
-               Editor.InsertString(s, FALSE);
-               Editor.Text.Modified:= TRUE;
-             end;
-           Editor.Activate;
-          except
-           Editor.Free;
-          end;
-        end;
-     end
-    else
-     begin
-       NewUnit(FALSE);
-       with fUnits[fUnits.Count -1] do
-        begin
-          Editor:= TEditor.Create(TRUE, FileName, FileName, FALSE);
-          if fOptions.useGPP then
-           s:= aTemplate.OldData.CppText
-          else
-           s:= aTemplate.OldData.CText;
-          s:= ValidateFile(s, ExpandFileto(devDirs.Templates, devDirs.Exec));
-          if s <> '' then
-           begin
-             Editor.Text.Lines.LoadFromFile(s);
-             Editor.Text.Modified:= TRUE;
-           end;
-          Editor.Activate;
-        end;
-     end;
-   except
-    result:= FALSE;
-   end;
+				// Add to project list
+				if aTemplate.Options.useGPP then
+					NewUnit(FALSE, aTemplate.Units[I].CppName)
+				else
+					NewUnit(FALSE, aTemplate.Units[I].CName);
+
+				// Create an editor
+				with fUnits[fUnits.Count -1] do begin
+					Editor:= TEditor.Create(TRUE, ExtractFileName(filename), FileName, FALSE);
+					try
+						// Set filename depending on C/C++ choice
+						if (Length(aTemplate.Units[I].CppName) > 0) and (aTemplate.Options.useGPP) then begin
+							Editor.FileName := aTemplate.Units[I].CppName;
+							fUnits[fUnits.Count - 1].FileName := aTemplate.Units[I].CppName;
+						end else if Length(aTemplate.Units[I].CName) > 0 then begin
+							Editor.FileName := aTemplate.Units[I].CName;
+							fUnits[fUnits.Count - 1].FileName := aTemplate.Units[I].CName;
+						end;
+
+						// if file isn't found blindly inserts text of unit
+						s2:= ValidateFile(s, devDirs.Templates);
+						if s2 <> '' then begin
+							Editor.Text.Lines.LoadFromFile(s2);
+						end else if s <> '' then begin
+							s := StringReplace(s, '#13#10', #13#10, [rfReplaceAll]);
+							Editor.InsertString(s, FALSE);
+						end;
+
+						// Always mark modified. We haven't saved yet
+						Editor.Text.Modified:= TRUE;
+						Editor.Activate;
+					except
+						Editor.Free;
+					end;
+				end;
+			end;
+
+		// Old  style...
+		end else begin
+			NewUnit(FALSE);
+			with fUnits[fUnits.Count -1] do begin
+				Editor:= TEditor.Create(TRUE, FileName, FileName, FALSE);
+				if fOptions.useGPP then
+					s:= aTemplate.OldData.CppText
+				else
+					s:= aTemplate.OldData.CText;
+				s:= ValidateFile(s, ExpandFileto(devDirs.Templates, devDirs.Exec));
+				if s <> '' then begin
+					Editor.Text.Lines.LoadFromFile(s);
+					Editor.Text.Modified:= TRUE;
+				end;
+				Editor.Activate;
+			end;
+		end;
+	except
+		result:= FALSE;
+	end;
 end;
 
 { begin XXXKF changed }
@@ -1857,12 +1854,12 @@ begin
 	result:= TProjUnit(fList[index]);
 end;
 
-function TUnitList.Indexof(Editor: TEditor): integer;
+function TUnitList.IndexOf(Editor: TEditor): integer;
 begin
-	result:= Indexof(editor.FileName);
+	result:= IndexOf(editor.FileName);
 end;
 
-function TUnitList.Indexof(const FileName: AnsiString): integer;
+function TUnitList.IndexOf(const FileName: AnsiString): integer;
 var
 	s1, s2: AnsiString;
 begin
