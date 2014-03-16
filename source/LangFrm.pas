@@ -97,7 +97,6 @@ type
     procedure cmbIconsChange(Sender: TObject);
     procedure cmbFontDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
   private
-    HasProgressStarted : boolean;
     function GetSelected: integer;
     procedure CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
   public
@@ -156,12 +155,11 @@ end;
 
 procedure TLangForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
 begin
-	if not HasProgressStarted then begin
+	if Total <> -1 then
 		pbCCCache.Max := Total;
-		HasProgressStarted := true;
-	end;
-	pbCCCache.Position := pbCCCache.Position + Current;
-	ParseLabel.Caption := Lang[ID_LANGFORM_PARSING] + #13#10 + ReplaceFirstText(FileName,devDirs.Exec,'');
+	if Current <> -1 then
+		pbCCCache.Position := Current + 1; // Current is 0-based
+	ParseLabel.Caption := Lang[ID_LANGFORM_PARSING] + #13#10 + WrapText(ReplaceFirstText(FileName,devDirs.Exec,''),sLineBreak,['\'],45);
 	Application.ProcessMessages;
 end;
 
@@ -169,7 +167,7 @@ procedure TLangForm.OkBtnClick(Sender: TObject);
 var
 	sl, f : TStringList;
 	i, j : integer;
-//	starttime : Cardinal;
+	S : AnsiString;
 begin
 	if OkBtn.Tag = 0 then begin // goto edit page
 		OkBtn.Tag := 1;
@@ -208,12 +206,13 @@ begin
 			devCodeCompletion.ParseGlobalHeaders := true;
 			SaveOptions;
 
+			MainForm.CppParser.Tokenizer := MainForm.CppTokenizer;
+			MainForm.CppParser.Preprocessor := MainForm.CppPreprocessor;
 			MainForm.CppParser.ParseLocalHeaders := True;
 			MainForm.CppParser.ParseGlobalHeaders := True;
 			MainForm.CppParser.OnTotalProgress := CppParserTotalProgress;
 			MainForm.CppParser.OnStartParsing := nil;
 			MainForm.CppParser.OnEndParsing := nil;
-			MainForm.CppParser.Tokenizer:= MainForm.CppTokenizer;
 			MainForm.CppParser.Enabled := true;
 
 			MainForm.ClassBrowser.SetUpdateOff;
@@ -228,6 +227,18 @@ begin
 			// Make it look busy
 			Screen.Cursor:=crHourglass;
 
+			// Add default include search directories
+			with devCompilerSets.CurrentSet do begin
+				for I := 0 to CDir.Count - 1 do
+					MainForm.CppParser.AddIncludePath(CDir[I]);
+				for I := 0 to CppDir.Count - 1 do
+					MainForm.CppParser.AddIncludePath(CppDir[I]);
+
+				// Add default include dirs last, just like gcc does
+				for I := 0 to DefInclude.Count - 1 do
+					MainForm.CppParser.AddIncludePath(DefInclude[I]);
+			end;
+
 			f := TStringList.Create;
 			if not AltCache.Checked then begin
 				for i := 0 to sl.Count-1 do begin
@@ -239,40 +250,23 @@ begin
 						for j := 0 to f.Count - 1 do
 							MainForm.CppParser.AddFileToScan(f[j]);
 					end;
-					//end else
-					//	MessageDlg('Directory "' + sl[i] + '" does not exist', mtWarning, [mbOK], 0);
 				end;
 			end else begin
 				for i := 0 to sl.Count-1 do begin
-
-					// Assemble full path
-					if (Length(sl[i]) > 1) and (sl[i][2] = ':') then begin
-						if FileExists(sl[i]) then
-							MainForm.CppParser.AddFileToScan(sl[i]);
-					end else if Assigned(devCompilerSets.CurrentSet) then begin
-						for j := 0 to devCompilerSets.CurrentSet.CppDir.Count-1 do begin
-							if FileExists(devCompilerSets.CurrentSet.CppDir[j] + pd + sl[i]) then begin
-								MainForm.CppParser.AddFileToScan(devCompilerSets.CurrentSet.CppDir[j] + pd + sl[i]);
-								break;
-							end;
-						end;
-					end;
-					//end else
-					//	MessageDlg('File "' + fullpath + '" does not exist', mtWarning, [mbOK], 0);
+					// only pass full filenames
+					S := MainForm.CppParser.GetSystemHeaderFileName(sl[i]);
+					MainForm.CppParser.AddFileToScan(S);
 				end;
 			end;
 			sl.Free;
 			f.Free;
 
-			// Parse all given files
-			{starttime := GetTickCount;}
+			// Parse all given files.
 			MainForm.CppParser.ParseList;
-			{MessageDlg(Format('Found %d statements in %f seconds',
-				[MainForm.CppParser.Statements.Count,(GetTickCount - starttime)/1000]),mtInformation,[mbOK],0);}
 
-			ParseLabel.Caption := Lang[ID_LANGFORM_SAVING];
+			// When done, save files
+			ParseLabel.Caption :=  Lang[ID_LANGFORM_SAVING];
 			Application.ProcessMessages;
-
 			MainForm.CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
 
 			MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;
@@ -288,15 +282,15 @@ begin
 		end else begin
 			devCodeCompletion.Enabled := true;
 			devCodeCompletion.ParseLocalHeaders := true;
-			devCodeCompletion.ParseGlobalHeaders := false; // can be slow without cache
+			devCodeCompletion.ParseGlobalHeaders := true; // can be slow without cache
 			devClassBrowsing.ShowInheritedMembers := false;
 		end;
 		OkBtn.Tag := 3;
 		OkBtn.Kind := bkOK;
 		OkBtn.ModalResult := mrOK;
 		OkBtn.Enabled := true;
-		FinishPanel.Visible := true;
 		CachePanel.Visible := false;
+		FinishPanel.Visible := true;
 	end;
 end;
 
@@ -306,8 +300,8 @@ var
 	s: AnsiString;
 begin
 	with TOpenDialog.Create(self) do try
-		Filter:= BuildFilter([FLT_HEADS]);
-		Title:= Lang[ID_NV_OPENFILE];
+		Filter := BuildFilter([FLT_HEADS]);
+		Title := Lang[ID_NV_OPENFILE];
 		Options := Options + [ofAllowMultiSelect];
 
 		// Start in the include folder
@@ -366,7 +360,6 @@ begin
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
-	HasProgressStarted := false;
 	synExample.CaretXY := BufferCoord(11,5);
 
 	// Interface themes

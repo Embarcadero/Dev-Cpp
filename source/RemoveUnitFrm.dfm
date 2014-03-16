@@ -1,11 +1,10 @@
 object RemoveUnitForm: TRemoveUnitForm
   Left = 687
   Top = 393
+  Width = 354
+  Height = 317
   BorderIcons = [biSystemMenu, biMaximize]
-  BorderStyle = bsDialog
   Caption = 'Remove from project'
-  ClientHeight = 279
-  ClientWidth = 338
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -26,6 +25,7 @@ object RemoveUnitForm: TRemoveUnitForm
     Width = 338
     Height = 251
     Align = alCustom
+    Anchors = [akLeft, akTop, akRight, akBottom]
     ItemHeight = 13
     MultiSelect = True
     TabOrder = 0
@@ -36,7 +36,7 @@ object RemoveUnitForm: TRemoveUnitForm
     Top = 252
     Width = 75
     Height = 25
-    Anchors = [akRight]
+    Anchors = [akBottom]
     Caption = 'Delete'
     TabOrder = 1
     OnClick = DelBtnClick

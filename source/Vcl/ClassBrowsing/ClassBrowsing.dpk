@@ -33,12 +33,13 @@ requires
   vcl;
 
 contains
-  U_IntList in 'U_IntList.pas',
+  IntList in 'IntList.pas',
   ClassBrowser in 'ClassBrowser.pas',
   CppParser in 'CppParser.pas',
+  CppPreprocessor in 'CppPreprocessor.pas',
   CppTokenizer in 'CppTokenizer.pas',
   CodeCompletion in 'CodeCompletion.pas',
   CodeCompletionForm in 'CodeCompletionForm.pas' {CodeComplForm},
-  stringutils in 'stringutils.pas';
+  cbutils in 'cbutils.pas';
 
 end.

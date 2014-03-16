@@ -91,6 +91,8 @@ const
   ID_ITEM_COLLAPSEALL                   = 22006;
   ID_ITEM_UNCOLLAPSEALL                 = 22007;
   ID_ITEM_TOGGLECOMMENT                 = 22008;
+  ID_ITEM_DUPLICATELINE                 = 22009;
+  ID_ITEM_DELETELINE                    = 22010;
 
   // search menu
   ID_ITEM_FIND                          = 5001;
@@ -122,6 +124,7 @@ const
   ID_TOOLSEARCH                         = 5023;
   ID_ITEM_FLOATREPORT                   = 5024;
   ID_ITEM_REPLACEFILES                  = 5025;
+  ID_TOOLCOMPILERS                      = 5026;
 
   // project menu
   ID_ITEM_NEWFILE                       = 6001;
@@ -433,6 +436,9 @@ const
   ID_EOPT_AUTOSAVEEXAMPLE               = 27064;
   ID_EOPT_CLEARCACHE                    = 27065;
   ID_EOPT_REFRESHHINT                   = 27066;
+  ID_EOPT_DELETESYMBOLPAIRS             = 27067;
+  ID_EOPT_SYMBOLSINGLEQUOTE             = 27068;
+  ID_EOPT_SYMBOLDOUBLEQUOTE             = 27069;
 
   // new project
   ID_NP_PRJNAME                         = 28001;
@@ -950,6 +956,13 @@ const
   ID_COMPILESUCCESSSEC                  = 62026;
   ID_COMPILEWARNINGS                    = 62027;
   ID_COMPILEERRORS                      = 62028;
+  ID_PARSINGFILE                        = 62029;
+  ID_AUTOSAVEDFILE                      = 62030;
+  ID_AUTOSAVEDFILEAS                    = 62031;
+  ID_DELETEDPROFDATA                    = 62032;
+  ID_COULDNOTFINDPROFDATA               = 62033;
+  ID_INFONOTFOUND                       = 62034;
+
 
   ID_BTN_OK                             = 63001;
   ID_BTN_CANCEL                         = 63002;
@@ -1179,6 +1192,7 @@ const
   ID_LANGFORM_NEXT                      = 76018;
   ID_LANGFORM_WAIT                      = 76019;
   ID_LANGFORM_SAVING                    = 76020;
+  ID_LANGFORM_DONEPARSINGSAVING         = 76021;
   
   ID_LOAD_COMPILERSET                   = 77001;
   ID_LOAD_FILEASSOC                     = 77002;

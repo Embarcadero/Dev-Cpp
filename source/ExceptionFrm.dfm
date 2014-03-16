@@ -1,9 +1,9 @@
 object ExceptionFrm: TExceptionFrm
-  Left = 578
-  Top = 237
+  Left = 886
+  Top = 432
   BorderStyle = bsDialog
   Caption = 'Oops!'
-  ClientHeight = 456
+  ClientHeight = 300
   ClientWidth = 500
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -163,7 +163,7 @@ object ExceptionFrm: TExceptionFrm
   end
   object lblUpdateSuggest: TLabel
     Left = 0
-    Top = 414
+    Top = 254
     Width = 500
     Height = 15
     Alignment = taCenter
@@ -171,9 +171,9 @@ object ExceptionFrm: TExceptionFrm
     Caption = 'Please check for updates here, which might solve this bug:'
   end
   object lblUpdateLink: TLabel
-    Left = 0
-    Top = 434
-    Width = 500
+    Left = 100
+    Top = 274
+    Width = 300
     Height = 15
     Cursor = crHandPoint
     Alignment = taCenter
@@ -190,7 +190,7 @@ object ExceptionFrm: TExceptionFrm
   object btnSend: TButton
     Left = 8
     Top = 130
-    Width = 180
+    Width = 200
     Height = 25
     Hint = 
       'Sends a bug report to the application support team describing th' +
@@ -238,9 +238,9 @@ object ExceptionFrm: TExceptionFrm
   end
   object memBugReport: TMemo
     Left = 8
-    Top = 224
+    Top = 300
     Width = 484
-    Height = 185
+    Height = 182
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -251,14 +251,14 @@ object ExceptionFrm: TExceptionFrm
     ParentFont = False
     ReadOnly = True
     ScrollBars = ssVertical
-    TabOrder = 4
+    TabOrder = 5
     WordWrap = False
   end
   object memUserReport: TMemo
     Left = 8
     Top = 160
     Width = 484
-    Height = 57
+    Height = 40
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -269,5 +269,37 @@ object ExceptionFrm: TExceptionFrm
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 3
+    OnEnter = memUserReportEnter
+    OnExit = memUserReportExit
+  end
+  object memEmailReport: TMemo
+    Left = 8
+    Top = 206
+    Width = 484
+    Height = 40
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    Font.Style = []
+    Lines.Strings = (
+      'memUserReport')
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 4
+    OnEnter = memEmailReportEnter
+    OnExit = memEmailReportExit
+  end
+  object btnShowReport: TButton
+    Left = 8
+    Top = 266
+    Width = 75
+    Height = 25
+    Hint = 'Show bug report'
+    Caption = 'Show report'
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 6
+    OnClick = btnShowReportClick
   end
 end

@@ -47,14 +47,13 @@ type
 
   TFilterSet = (ftOpen, ftPrj, ftSrc, ftAll);
 
-  TErrFunc = procedure(const Msg: AnsiString) of object;
   TLineOutputFunc = procedure(const Line: AnsiString) of object;
   TCheckAbortFunc = procedure(var AbortThread: boolean) of object;
 
   procedure FilesFromWildcard(Directory : AnsiString;const Mask: AnsiString;Files : TStringList; Subdirs, ShowDirs, Multitasking: Boolean);
 
   function ExecuteFile(const FileName, Params, DefaultDir: AnsiString;ShowCmd: Integer): THandle;
-  function RunAndGetOutput(const Cmd, WorkDir: AnsiString;ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): AnsiString;
+  function RunAndGetOutput(const Cmd, WorkDir: AnsiString; LineOutputFunc: TLineOutputFunc;CheckAbortFunc: TCheckAbortFunc;ShowReturnValue: Boolean = True): AnsiString;
 
   function GetShortName(const FileName: AnsiString): AnsiString;
 
@@ -120,33 +119,32 @@ type
 
   function GetBuildTime(const Path: AnsiString) : AnsiString;
 
-  function IsEmpty(editor : TSynEdit) : boolean;
-
   function IsKeyDown(key : integer) : boolean;
 
   function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
 
-  // Fast replacements of localized functions
+  // These functions are about six times faster than the locale sensitive AnsiX() versions
+  function StartsStr(const subtext,text : AnsiString) : boolean;
+  function StartsText(const subtext,text : AnsiString) : boolean;
+
+  function SameStr(const s1,s2 : AnsiString) : boolean;
+  function SameText(const s1,s2 : AnsiString) : boolean;
+
   function EndsStr(const subtext, text: AnsiString): boolean;
   function EndsText(const subtext, text: AnsiString): boolean;
 
   function ContainsStr(const text, subtext: AnsiString): boolean;
   function ContainsText(const text, subtext: AnsiString): boolean;
 
-  function SameStr(const s1,s2 : AnsiString) : boolean;
-  function SameText(const s1,s2 : AnsiString) : boolean;
-
-  function NotSameStr(const s1,s2 : AnsiString) : boolean;
-  function NotSameText(const s1,s2 : AnsiString) : boolean;
-
-  function StartsStr(const subtext,text : AnsiString) : boolean;
-  function StartsText(const subtext,text : AnsiString) : boolean;
-
+  // Same as StringReplace, but only replace first OldPattern (a lot faster)
   function ReplaceFirstStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
   function ReplaceFirstText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 
   function ReplaceLastStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
   function ReplaceLastText(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
+
+  // Reverse Pos() function
+  function LastPos(const SubStr, S: AnsiString): integer;
 
   function IsWindows64 : boolean;
 implementation
@@ -173,19 +171,6 @@ begin
 	result := EndsStr(' (x86)',AnsiString(buffer));
 end;
 
-function IsEmpty(editor : TSynEdit) : boolean;
-var
-	i : integer;
-begin
-	Result := true;
-	for i := 0 to editor.Lines.Count - 1 do begin
-		if Length(editor.Lines[i]) > 0 then begin
-			Result := false;
-			break;
-		end;
-	end;
-end;
-
 function CharToValue(c : char) : integer;
 begin
 	if c in ['a'..'z'] then
@@ -207,6 +192,26 @@ begin
 		result := hwnd.Items[i].Caption + #13#10 + hwnd.Items[i].SubItems.Text; // CRLF separated columns
 		result := Trim(StringReplace(result,#13#10,#9,[rfReplaceAll]));
 	end;
+end;
+
+function StartsStr(const subtext,text : AnsiString) : boolean;
+begin
+	Result := SameStr(subtext, Copy(text, 1, Length(subtext)));
+end;
+
+function StartsText(const subtext,text : AnsiString) : boolean;
+begin
+	Result := SameText(subtext, Copy(text, 1, Length(subtext)));
+end;
+
+function SameStr(const s1,s2 : AnsiString) : boolean;
+begin
+	Result := (CompareStr(s1,s2) = 0);
+end;
+
+function SameText(const s1,s2 : AnsiString) : boolean;
+begin
+	Result := (CompareText(s1,s2) = 0);
 end;
 
 function EndsStr(const subtext, text: AnsiString): boolean;
@@ -241,35 +246,6 @@ begin
 	Result := Pos(UpperCase(subtext), UpperCase(text)) > 0;
 end;
 
-function SameStr(const s1,s2 : AnsiString) : boolean;
-begin
-	Result := (CompareStr(s1,s2) = 0);
-end;
-
-function SameText(const s1,s2 : AnsiString) : boolean;
-begin
-	Result := (CompareText(s1,s2) = 0);
-end;
-
-function NotSameStr(const s1,s2 : AnsiString) : boolean;
-begin
-	Result := (CompareStr(s1,s2) <> 0);
-end;
-
-function NotSameText(const s1,s2 : AnsiString) : boolean;
-begin
-	Result := (CompareText(s1,s2) <> 0);
-end;
-
-function StartsStr(const subtext,text : AnsiString) : boolean;
-begin
-	Result := SameStr(subtext, Copy(text, 1, Length(subtext)));
-end;
-
-function StartsText(const subtext,text : AnsiString) : boolean;
-begin
-	Result := SameText(subtext, Copy(text, 1, Length(subtext)));
-end;
 
 function ReplaceFirstStr(const S, OldPattern, NewPattern : AnsiString) : AnsiString;
 var
@@ -335,6 +311,13 @@ begin
 		// Copy the preceding stuff, append the new part, append old stuff after old pattern
 		Result := Copy(S, 1, Offset - 1) + NewPattern + Copy(S, Offset + Length(UpperOldPattern), MaxInt);
 	end;
+end;
+
+function LastPos(const SubStr, s: AnsiString): integer;
+begin
+	result := Pos(ReverseString(SubStr),ReverseString(S));
+	if result <> 0 then
+		result := ((Length(S) - Length(SubStr)) + 1) - result + 1;
 end;
 
 function ProgramHasConsole(const path : AnsiString) : boolean;
@@ -476,12 +459,12 @@ begin
 end;
 
 function RunAndGetOutput(const Cmd, WorkDir: AnsiString;
-  ErrFunc: TErrFunc; LineOutputFunc: TLineOutputFunc;
+  LineOutputFunc: TLineOutputFunc;
   CheckAbortFunc: TCheckAbortFunc;
   ShowReturnValue: Boolean): AnsiString;
 var
-  tsi: TStartupInfo;
-  tpi: TProcessInformation;
+  si: TStartupInfo;
+  pi: TProcessInformation;
   nRead: DWORD;
   aBuf: array[0..1024] of char;
   sa: TSecurityAttributes;
@@ -493,82 +476,145 @@ var
 begin
   FOutput := '';
   CurrentLine := '';
+
+  // Set up the security attributes struct
   sa.nLength := SizeOf(TSecurityAttributes);
   sa.lpSecurityDescriptor := nil;
   sa.bInheritHandle := True;
 
-  CreatePipe(hOutputReadTmp, hOutputWrite, @sa, 0);
-  DuplicateHandle(GetCurrentProcess(), hOutputWrite, GetCurrentProcess(),
-                  @hErrorWrite, 0, true, DUPLICATE_SAME_ACCESS);
-  CreatePipe(hInputRead, hInputWriteTmp, @sa, 0);
+  // Create the child output pipe
+  if not CreatePipe(hOutputReadTmp, hOutputWrite, @sa, 0) then begin
+    Result := 'CreatePipe 1 error: ' + SysErrorMessage(GetLastError);
+    Exit; // its of no use to continue. quit
+  end;
+
+  // Create a duplicate of the output write handle for the std error
+  // write handle. This is necessary in case the child application
+  // closes one of its std output handles.
+  if not DuplicateHandle(GetCurrentProcess(), hOutputWrite,
+                         GetCurrentProcess(), @hErrorWrite,
+                         0, true, DUPLICATE_SAME_ACCESS) then begin
+    Result := 'DuplicateHandle 1 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+
+  // Create the child input pipe
+  if not CreatePipe(hInputRead, hInputWriteTmp, @sa, 0) then begin
+    Result := 'CreatePipe 2 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
 
   // Create new output read handle and the input write handle. Set
   // the inheritance properties to FALSE. Otherwise, the child inherits
   // the these handles; resulting in non-closeable handles to the pipes
   // being created.
-  DuplicateHandle(GetCurrentProcess(), hOutputReadTmp,  GetCurrentProcess(),
-                  @hOutputRead,  0, false, DUPLICATE_SAME_ACCESS);
-  DuplicateHandle(GetCurrentProcess(), hInputWriteTmp, GetCurrentProcess(),
-                  @hInputWrite, 0, false, DUPLICATE_SAME_ACCESS);
-  CloseHandle(hOutputReadTmp);
-  CloseHandle(hInputWriteTmp);
-
-  FillChar(tsi, SizeOf(TStartupInfo), 0);
-  tsi.cb := SizeOf(TStartupInfo);
-  tsi.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
-  tsi.hStdInput := hInputRead;
-  tsi.hStdOutput := hOutputWrite;
-  tsi.hStdError := hErrorWrite;
-
-  if not CreateProcess(nil, PAnsiChar(Cmd), @sa, @sa, true, 0, nil, PAnsiChar(WorkDir),
-                        tsi, tpi) then begin
-    result := 'Unable to run "' + Cmd + '": ' + SysErrorMessage(GetLastError);
-    exit;
+  if not DuplicateHandle(GetCurrentProcess(), hOutputReadTmp,
+                         GetCurrentProcess(), @hOutputRead,
+                         0, false, DUPLICATE_SAME_ACCESS) then begin
+    Result := 'DuplicateHandle 2 error: ' + SysErrorMessage(GetLastError);
+    Exit;
   end;
-  CloseHandle(hOutputWrite);
-  CloseHandle(hInputRead);
-  CloseHandle(hErrorWrite);
+
+  if not DuplicateHandle(GetCurrentProcess(), hInputWriteTmp,
+                         GetCurrentProcess(), @hInputWrite,
+                         0, false, DUPLICATE_SAME_ACCESS) then begin
+    Result := 'DuplicateHandle 3 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+
+  // Close inheritable copies of the handles you do not want to be
+  // inherited.
+  if not CloseHandle(hOutputReadTmp) then begin
+    Result := 'CloseHandle 1 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+  if not CloseHandle(hInputWriteTmp) then begin
+    Result := 'CloseHandle 2 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+
+  // Set up the start up info struct.
+  FillChar(si, SizeOf(TStartupInfo), 0);
+  si.cb := SizeOf(TStartupInfo);
+  si.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
+  si.hStdOutput := hOutputWrite;
+  si.hStdInput := hInputRead;
+  si.hStdError := hErrorWrite;
+
+  // Launch the process that we want to redirect.
+  if not CreateProcess(nil, PAnsiChar(Cmd), nil, nil, true, 0, nil, PAnsiChar(WorkDir),si, pi) then begin
+    Result := 'CreateProcess error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+
+  // Close any unnecessary handles.
+  if not CloseHandle(pi.hThread) then begin
+    Result := 'CloseHandle 3 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+
+  // Close pipe handles (do not continue to modify the parent).
+  // You need to make sure that no handles to the write end of the
+  // output pipe are maintained in this process or else the pipe will
+  // not close when the child process exits and the ReadFile will hang.
+  if not CloseHandle(hOutputWrite) then begin
+    Result := 'CloseHandle 4 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+  if not CloseHandle(hInputRead) then begin
+    Result := 'CloseHandle 5 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+  if not CloseHandle(hErrorWrite) then begin
+    Result := 'CloseHandle 6 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
 
   bAbort:=False;
   repeat
-     if Assigned(CheckAbortFunc) then
-        CheckAbortFunc(bAbort);
-     if bAbort then begin
-       TerminateProcess(tpi.hProcess, 1);
-       Break;
-     end;
-     if (not ReadFile(hOutputRead, aBuf, SizeOf(aBuf), nRead, nil)) or (nRead = 0) then
-     begin
-        if GetLastError = ERROR_BROKEN_PIPE then
-          Break
-        else
-          ErrFunc('Pipe read error, could not execute file');
-     end;
-     aBuf[nRead] := #0;
-     FOutput := FOutput + PAnsiChar(@aBuf[0]);
+    // Ask our caller if he wants us to quit
+    if Assigned(CheckAbortFunc) then
+      CheckAbortFunc(bAbort);
+    if bAbort then begin
+      TerminateProcess(pi.hProcess, 1);
+      Break;
+    end;
+    if (not ReadFile(hOutputRead, aBuf, SizeOf(aBuf), nRead, nil)) or (nRead = 0) then begin
+      if GetLastError = ERROR_BROKEN_PIPE then
+        Break; // pipe done - normal exit path
+    end;
+    aBuf[nRead] := #0;
+    FOutput := FOutput + PAnsiChar(@aBuf[0]);
 
-     if Assigned(LineOutputFunc) then
-     begin
-         CurrentLine := CurrentLine + PAnsiChar(@aBuf[0]);
-         if CurrentLine[Length(CurrentLine)] = #10 then
-         begin
-             Delete(CurrentLine, Length(CurrentLine), 1);
-             LineOutputFunc(CurrentLine);
-             CurrentLine := '';
-         end;
-     end;
+    if Assigned(LineOutputFunc) then begin
+      CurrentLine := CurrentLine + PAnsiChar(@aBuf[0]);
+      if CurrentLine[Length(CurrentLine)] = #10 then begin
+        Delete(CurrentLine, Length(CurrentLine), 1);
+        LineOutputFunc(CurrentLine);
+        CurrentLine := '';
+      end;
+    end;
   until False;
-  GetExitCodeProcess(tpi.hProcess, nRead);
-  if ShowReturnValue then
-     Result := FOutput + ' ' + IntToStr(nRead)
-  else
-     Result := FOutput;
 
-  CloseHandle(hOutputRead);
-  CloseHandle(hInputWrite);
-  CloseHandle(tpi.hProcess);
-  CloseHandle(tpi.hThread);
+  if ShowReturnValue then begin
+    GetExitCodeProcess(pi.hProcess, nRead);
+    Result := FOutput + ' ' + IntToStr(nRead);
+  end else
+    Result := FOutput;
 
+  // Close handles we don't need anymore.
+  if not CloseHandle(hOutputRead) then begin
+    Result := 'CloseHandle 7 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+  if not CloseHandle(hInputWrite) then begin
+    Result := 'CloseHandle 8 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
+  if not CloseHandle(pi.hProcess) then begin // TODO: shouldn't we terminate it?
+    Result := 'CloseHandle 9 error: ' + SysErrorMessage(GetLastError);
+    Exit;
+  end;
 end;
 
 procedure SetPath(const Add: AnsiString;UseOriginal: boolean = TRUE);
@@ -590,7 +636,7 @@ begin
 	if UseOriginal then
 		NewPath:= NewPath + devDirs.OriginalPath
 	else begin
-		GetEnvironmentVariable(PAnsiChar('PATH'), @OldPath, 2048);
+		GetEnvironmentVariable(PAnsiChar('PATH'), @OldPath, SizeOf(OldPath));
 		NewPath:= NewPath + AnsiString(OldPath);
 	end;
 

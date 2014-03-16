@@ -76,12 +76,19 @@ type
     memUserReport: TMemo;
     lblUpdateSuggest: TLabel;
     lblUpdateLink: TLabel;
+    memEmailReport: TMemo;
+    btnShowReport: TButton;
     procedure btnSendClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnTerminateClick(Sender: TObject);
     procedure btnContinueClick(Sender: TObject);
     procedure lblUpdateLinkClick(Sender: TObject);
+    procedure memUserReportEnter(Sender: TObject);
+    procedure memUserReportExit(Sender: TObject);
+    procedure memEmailReportEnter(Sender: TObject);
+    procedure memEmailReportExit(Sender: TObject);
+    procedure btnShowReportClick(Sender: TObject);
   public
     fPlatform: AnsiString;
     fBuildTime: AnsiString;
@@ -125,6 +132,9 @@ implementation
 uses
   utils, devcfg, version, DateUtils;
 
+const UserReportMsg = 'Please include a description of what you were doing before the error occurred...';
+const EmailReportMsg = 'Optionally, provide an email address to which the developer can send questions about the bug report...';
+
 class procedure TEAnalyzer.EHandler(Sender: TObject; E: Exception);
 begin
 	with TExceptionFrm.Create(Application.MainForm) do try
@@ -133,7 +143,8 @@ begin
 		lblError.Caption := E.Message;
 
 		// Can't make this much more clear
-		memUserReport.Text := 'Please include a description of what you were doing before the error occurred...';
+		memUserReport.Text := UserReportMsg;
+		memEmailReport.Text := EmailReportMsg;
 
 		// Include memory report too?
 		memBugReport.Text :=
@@ -516,9 +527,15 @@ begin
 	Socket.ClientType := ctBlocking;
 	Socket.Open;
 
-	// Send both messages in fully encoded form
-	EmailBody := memUserReport.Text + #13#10#13#10 + memBugReport.Text;
+	// Description, email, body
+	EmailBody := EmailBody + 'Description' + #13#10 + '-----------' + #13#10 + memUserReport.Text + #13#10#13#10#13#10;
+	EmailBody := EmailBody + 'Email' + #13#10 + '-----' + #13#10 + memEmailReport.Text + #13#10#13#10#13#10;
+	EmailBody := EmailBody + memBugReport.Text;
+
+	// And subject...
 	EmailSubject := 'Orwell Dev-C++ ' + DEVCPP_VERSION + ' bug report (' + IntToStr(DateTimeToUnix(Now)) + ')';
+
+	// Send everything messages in fully encoded form
 	for I := 0 to 255 do
 		if not (Chr(I) in ['a'..'z','A'..'Z','0'..'9','%']) then begin
 			EmailBody := StringReplace(EmailBody,Chr(I),'%' + IntToHex(I,2),[rfReplaceAll]);
@@ -593,6 +610,41 @@ end;
 procedure TExceptionFrm.lblUpdateLinkClick(Sender: TObject);
 begin
 	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TExceptionFrm.memUserReportEnter(Sender: TObject);
+begin
+	if memUserReport.Text = UserReportMsg then
+		memUserReport.Text := '';
+end;
+
+procedure TExceptionFrm.memUserReportExit(Sender: TObject);
+begin
+	if memUserReport.Text = '' then
+		memUserReport.Text := UserReportMsg;
+end;
+
+procedure TExceptionFrm.memEmailReportEnter(Sender: TObject);
+begin
+	if memEmailReport.Text = EmailReportMsg then
+		memEmailReport.Text := '';
+end;
+
+procedure TExceptionFrm.memEmailReportExit(Sender: TObject);
+begin
+	if memEmailReport.Text = '' then
+		memEmailReport.Text := EmailReportMsg;
+end;
+
+procedure TExceptionFrm.btnShowReportClick(Sender: TObject);
+begin
+	if btnShowReport.Caption = 'Hide report' then begin // up arrow
+		ClientHeight := 300;
+		btnShowReport.Caption := 'Show report';
+	end else begin
+		ClientHeight := 488;
+		btnShowReport.Caption := 'Hide report';
+	end;
 end;
 
 initialization

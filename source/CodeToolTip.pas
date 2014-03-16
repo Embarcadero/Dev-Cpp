@@ -48,7 +48,6 @@ type
     function ClientRect: TRect;
   end;
 
-
   TCodeToolTipUpButton = class(TCustomCodeToolTipButton)
   private
     FBitmap: TBitmap;
@@ -598,7 +597,7 @@ begin
 				')' : begin
 					Dec(BraceCount);
 					if BraceCount = 0 then begin // end of argument list
-						Inc(ArgumentIndex,000);
+						Inc(ArgumentIndex,100);
 						HighlightStart := CurPos + 1;
 					end;
 				end;

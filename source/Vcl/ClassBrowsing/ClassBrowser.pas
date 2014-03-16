@@ -23,8 +23,8 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Classes, SysUtils, U_IntList, Controls, ComCtrls, Graphics,
-  CppParser;
+  Windows, Classes, SysUtils, IntList, Controls, ComCtrls, Graphics,
+  CppParser, Forms, cbutils;
 {$ENDIF}
 {$IFDEF LINUX}
   Classes, SysUtils, QControls, QComCtrls, QForms, QGraphics,
@@ -81,7 +81,7 @@ type
     property InheritedVariablePublic: integer read fInhVariablePublicImg write fInhVariablePublicImg;
   end;
 
-  TShowFilter = (sfAll, sfProject, sfCurrent);
+  TShowFilter = (sfAll, sfProject, sfCurrent, sfSystemFiles);
 
   TClassBrowser = class(TCustomTreeView)
   private
@@ -191,37 +191,56 @@ begin
         scsNone: Node.ImageIndex := fImagesRecord.VariablePublic;
       end;
     skFunction, skConstructor, skDestructor: case Statement^._ClassScope of
+
         scsPrivate: Node.ImageIndex := fImagesRecord.MethodPrivate;
         scsProtected: if not bInherited then Node.ImageIndex := fImagesRecord.MethodProtected else Node.ImageIndex := fImagesRecord.InheritedMethodProtected;
         scsPublic: if not bInherited then Node.ImageIndex := fImagesRecord.MethodPublic else Node.ImageIndex := fImagesRecord.InheritedMethodPublic;
         scsNone: Node.ImageIndex := fImagesRecord.MethodPublic;
       end;
   end;
+
   Node.SelectedIndex := Node.ImageIndex;
   Node.StateIndex := Node.ImageIndex;
 end;
 
 procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
 var
-  I, iFrom, tmp: integer;
-  ParNode, NewNode: TTreeNode;
-  bInherited: boolean;
-  inheritanceids : TIntList;
-begin
-  if (not fShowInheritedMembers) and (ParentIndex >= 0) then
-    iFrom := ParentIndex // amazing speed-up
-  else
-    iFrom := 0; // if showing inheritance, a big speed penalty
+	I, iFrom : integer;
+	ParNode, NewNode : TTreeNode;
+	bInherited : boolean;
+	inheritanceids : TIntList;
 
-  // create folders that have this branch as parent
-  if ParentIndex <> -1 then with PStatement(fParser.Statements[ParentIndex])^ do begin
-      if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
-        CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
-    end
-  else begin
-    if HasSubFolder('') then
-      CreateFolders('', Node);
-  end;
+	procedure AddStatementNode(Index : integer);
+	var
+		tmp : integer;
+	begin
+		with PStatement(fParser.Statements[Index])^ do begin
+			tmp := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
+			if tmp <> -1 then
+				ParNode := GetNodeOfFolder(tmp)
+			else
+				ParNode := Node;
+
+			NewNode := Items.AddChildObject(ParNode, _ScopelessCmd, PStatement(fParser.Statements[Index]));
+			SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
+			if _Kind = skClass then
+				AddMembers(NewNode, Index, _ID);
+		end;
+	end;
+begin
+	if (not fShowInheritedMembers) and (ParentIndex >= 0) then
+		iFrom := ParentIndex + 1 // amazing speed-up
+	else
+		iFrom := 0; // if showing inheritance, a big speed penalty
+
+	// create folders that have this branch as parent
+	if ParentIndex <> -1 then with PStatement(fParser.Statements[ParentIndex])^ do begin
+		if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
+			CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
+	end else begin
+		if HasSubFolder('') then
+			CreateFolders('', Node);
+	end;
 
 	inheritanceids := TIntList.Create;
 	try
@@ -233,29 +252,34 @@ begin
 		bInherited := False;
 		for I := iFrom to fParser.Statements.Count - 1 do begin
 			with PStatement(fParser.Statements[I])^ do begin
-				if not _Visible then
+				if not _Visible or _Loaded then // TODO: for now, do NOT show loaded items
 					Continue;
+
+				// Stop the current recurse when we run out of children
 				if _ParentID <> ParentID then begin
 					bInherited := fShowInheritedMembers and (inheritanceids.IndexOf(_ParentID) <> -1);
 					if not bInherited then
 						Continue;
 				end;
 
-				if (fShowFilter = sfAll) or
-				((fShowFilter = sfProject) and (_InProject or bInherited)) or
-				((fShowFilter = sfCurrent) and (SameText(_Filename,fCurrentFileHeader) or SameText(_Filename,fCurrentFileImpl) or bInherited)) then begin
-
-					// check if belongs to folder
-					tmp := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
-					if tmp <> -1 then
-						ParNode := GetNodeOfFolder(tmp)
-					else
-						ParNode := Node;
-
-					NewNode := Items.AddChildObject(ParNode, _ScopelessCmd, PStatement(fParser.Statements[I]));
-					SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
-					if (PStatement(fParser.Statements[I])^._Kind = skClass) and (I <> ParentIndex) then  // CL: fixed potential infinite loop bug
-						AddMembers(NewNode, I, _ID);
+				// Only do inheritance checking when absolutely needed
+				case fShowFilter of
+					sfAll : begin // sfAll means all open files. not the system headers
+						if not _InSystemHeader then // do not show system headers
+							AddStatementNode(I);
+					end;
+					sfSystemFiles : begin
+						if _InSystemHeader then
+							AddStatementNode(I); // only show system header stuff
+					end;
+					sfCurrent: begin
+						if SameText(_Filename,fCurrentFileHeader) or SameText(_Filename,fCurrentFileImpl) or bInherited then
+							AddStatementNode(I);
+					end;
+					sfProject: begin
+						if _InProject or bInherited then
+							AddStatementNode(I);
+					end;
 				end;
 			end;
 		end;
@@ -306,6 +330,7 @@ begin
   if fParser = nil then
     Exit;
 
+  Screen.Cursor := crHourGlass;
   fParserBusy := True;
   Items.BeginUpdate;
   Clear;
@@ -317,6 +342,7 @@ begin
   WriteClassFolders;
   Items.EndUpdate;
   fParserBusy := False;
+  Screen.Cursor := crDefault;
   Repaint;
 end;
 
@@ -440,21 +466,20 @@ begin
 end;
 
 procedure TClassBrowser.SetCurrentFile(const Value: AnsiString);
+var
+	Dummy : AnsiString;
 begin
-  if fShowFilter <> sfCurrent then
-    Exit;
-  fCurrentFile := Value;
-  fCurrentFileHeader := ChangeFileExt(fCurrentFile, '.h');
-  if not FileExists(fCurrentFileHeader) then
-    fCurrentFileHeader := ChangeFileExt(fCurrentFile, '.hpp');
-  if not FileExists(fCurrentFileHeader) then
-    fCurrentFileHeader := ChangeFileExt(fCurrentFile, '.hh');
-  fCurrentFileImpl := ChangeFileExt(fCurrentFile, '.c');
-  if not FileExists(fCurrentFileImpl) then
-    fCurrentFileImpl := ChangeFileExt(fCurrentFile, '.cpp');
-  if not FileExists(fCurrentFileImpl) then
-    fCurrentFileImpl := ChangeFileExt(fCurrentFile, '.cc');
-  UpdateView;
+	// Saves an expensive UpdateView
+	if Value = fCurrentFile then
+		Exit;
+	if not (fShowFilter in [sfCurrent{,sfSystemFiles}]) then
+		Exit;
+
+	// Get current file pair
+	fCurrentFile := Value;
+	cbutils.GetSourcePair(fCurrentFile,Dummy,fCurrentFileHeader);
+
+	UpdateView;
 end;
 
 procedure TClassBrowser.Clear;
@@ -466,10 +491,10 @@ end;
 
 procedure TClassBrowser.SetShowFilter(const Value: TShowFilter);
 begin
-  if fShowFilter <> Value then begin
-    fShowFilter := Value;
-    UpdateView;
-  end;
+	if fShowFilter <> Value then begin
+		fShowFilter := Value;
+		UpdateView;
+	end;
 end;
 
 // returns the index to fFolders it belongs or -1 if does not
@@ -917,3 +942,4 @@ begin
 end;
 
 end.
+

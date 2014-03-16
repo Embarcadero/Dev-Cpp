@@ -147,7 +147,7 @@ type
     procedure cmbReposChange(Sender: TObject);
     procedure btnCOBrwsClick(Sender: TObject);
     procedure chkCOModuleAsClick(Sender: TObject);
-    procedure vleGetPickList(Sender: TObject; const KeyName: AnsiString;
+    procedure vleGetPickList(Sender: TObject; const KeyName: string;
       Values: TStrings);
     procedure txtImpModuleChange(Sender: TObject);
     procedure txtCOmoduleChange(Sender: TObject);
@@ -195,7 +195,7 @@ var
 implementation
 
 uses 
-  devcfg, utils, stringutils,MultiLangSupport, CVSPasswdFrm;
+  devcfg, utils, MultiLangSupport, CVSPasswdFrm;
 
 {$R *.dfm}
 

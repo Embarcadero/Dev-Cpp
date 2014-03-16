@@ -149,7 +149,7 @@ begin
 
 	// Run a flat output
 	buffer := TStringList.Create;
-	buffer.Text := RunAndGetOutput(devCompilerSets.CurrentSet.gprofName + Params, Dir, nil, nil, nil, False);
+	buffer.Text := RunAndGetOutput(devCompilerSets.CurrentSet.gprofName + Params, Dir, nil, nil, False);
 
 	i := 0;
 
@@ -242,7 +242,7 @@ begin
 
 	// Run a graph output
 	buffer := TStringList.Create;
-	buffer.Text := RunAndGetOutput(devCompilerSets.CurrentSet.gprofName + Params, Dir, nil, nil, nil, False);
+	buffer.Text := RunAndGetOutput(devCompilerSets.CurrentSet.gprofName + Params, Dir, nil, nil, False);
 
 	i := 0;
 

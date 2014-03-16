@@ -45,6 +45,13 @@ type
     constructor Create(editor : TEditor);
   end;
 
+  // Define what we want to see of the word at any position
+  TWordPurpose = (
+    wpCompletion,  // walk backwards over words, array, functions, parents, no forward movement
+    wpEvaluation,  // walk backwards over words, array, functions, parents, forwards over words, array
+    wpInformation  // walk backwards over words, array, functions, parents, forwards over words
+  );
+
   TEditor = class(TObject)
   private
     fInProject: boolean;
@@ -74,6 +81,8 @@ type
     WaitForParenths : integer; // 2 means true, 1 means 'handled by KeyDown', 0 means false
     WaitForArray : integer;
     WaitForCurly : integer;
+    WaitForSingleQuote : integer;
+    WaitForDoubleQuote : integer;
 
     procedure EditorKeyPress(Sender: TObject; var Key: Char);
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -132,9 +141,7 @@ type
     procedure UpdateCaption(const NewCaption: AnsiString);
     procedure InsertDefaultText;
 
-    function EvaluationPhrase(p : TBufferCoord): AnsiString;
-    function CompletionPhrase(p : TBufferCoord): AnsiString;
-    function GetFullFileName(const Line: AnsiString): AnsiString;
+    function GetWordAtPosition(P : TBufferCoord;Purpose : TWordPurpose) : AnsiString;
   
     procedure CommentSelection;
     procedure UncommentSelection;
@@ -568,6 +575,8 @@ begin
 		WaitForParenths := max(0,WaitForParenths - 1);
 		WaitForArray := max(0,WaitForArray - 1);
 		WaitForCurly := max(0,WaitForCurly - 1);
+		WaitForSingleQuote := max(0,WaitForSingleQuote - 1);
+		WaitForDoubleQuote := max(0,WaitForDoubleQuote - 1);
 
 		// Reset mouseover timer if caret changes
 		fAllowMouseOver := false;
@@ -887,7 +896,7 @@ begin
 	fText.CaretXY := BufferCoord(col, collapsedline);
 
 	if settopline then
-		fText.TopLine := collapsedline;
+		fText.TopLine := collapsedline - 3; // leave some space above to line, is easier on the eyes
 
 	// Changing editor focus is expensive (class browser listens to it). Don't do it if it's not needed
 	if not fText.Focused then
@@ -900,10 +909,10 @@ begin
 	if fCompletionBox.Enabled then begin
 		if (Key in fText.IdentChars) then begin // Continue filtering
 			fText.SelText := Key;
-			fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
+			fCompletionBox.Search(GetWordAtPosition(fText.CaretXY,wpCompletion), fFileName);
 		end else if Key = Char(VK_BACK) then begin
 			fText.ExecuteCommand(ecDeleteLastChar,#0,nil); // Simulate backspace in editor
-			fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
+			fCompletionBox.Search(GetWordAtPosition(fText.CaretXY,wpCompletion), fFileName);
 		end else if Key = Char(VK_ESCAPE) then begin
 			fCompletionBox.Hide;
 		end else if (Key in [Char(VK_RETURN),'(']) then begin  // Ending chars, don't insert
@@ -1037,17 +1046,24 @@ begin
 				if StartsStr('#include',fText.LineText) then
 					InsertString('>',false);
 			end else if (Key = '"') and devEditor.IncludeComplete then begin
-				if StartsStr('#include',fText.LineText) then
-					InsertString('"',false);
+				InsertString('"',false);
+				WaitForDoubleQuote := 2;
+			end else if (Key = '''') and devEditor.SingleQuoteComplete then begin
+				InsertString('''',false);
+				WaitForSingleQuote := 2;
 			end else begin
 				WaitForParenths := 0;
 				WaitForArray := 0;
 				WaitForCurly := 0;
+				WaitForSingleQuote := 0;
+				WaitForDoubleQuote := 0;
 			end;
 		end else begin
 			WaitForParenths := 0;
 			WaitForArray := 0;
 			WaitForCurly := 0;
+			WaitForSingleQuote := 0;
+			WaitForDoubleQuote := 0;
 		end;
 	end;
 
@@ -1088,6 +1104,21 @@ end;
 procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
 var
 	p : TBufferCoord;
+	DeletedChar,NextChar : Char;
+	S : AnsiString;
+
+	procedure UndoSymbolCompletion;
+	begin
+		if devEditor.DeleteSymbolPairs then begin
+			if (devEditor.ArrayComplete and (DeletedChar = '[') and (NextChar = ']')) or
+               (devEditor.ParentheseComplete and (DeletedChar = '(') and (NextChar = ')')) or
+               (devEditor.BraceComplete and  (DeletedChar = '{') and (NextChar = '}')) or
+               (devEditor.SingleQuoteComplete and (DeletedChar = '''') and (NextChar = '''')) or
+               (devEditor.DoubleQuoteComplete and  (DeletedChar = '"') and (NextChar = '"')) then begin
+				fText.LineText := Copy(S,1,fText.CaretX-1) + Copy(S,fText.CaretX+1,MaxInt);
+			end;
+		end;
+	end;
 begin
 	case(Key) of
 		VK_CONTROL: begin
@@ -1100,6 +1131,26 @@ begin
 			if ttoHideOnEsc in fFunctionTip.Options then begin
 				fFunctionTip.ReleaseHandle;
 				fFunctionTip.ForceHide := true;
+			end;
+		end;
+		VK_DELETE: begin // remove completed character
+			if not fText.SelAvail then begin
+				S := fText.LineText;
+				if fText.CaretX < Length(S) then begin
+					DeletedChar := S[fText.CaretX];
+					NextChar := S[fText.CaretX + 1];
+					UndoSymbolCompletion;
+				end;
+			end;
+		end;
+		VK_BACK: begin
+			if not fText.SelAvail then begin
+				S := fText.LineText;
+				if (fText.CaretX > 1) and (fText.CaretX <= Length(S)) then begin
+					DeletedChar := S[fText.CaretX - 1];
+					NextChar := S[fText.CaretX];
+					UndoSymbolCompletion;
+				end;
 			end;
 		end;
 	end;
@@ -1124,18 +1175,26 @@ begin
 		if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
 			Exit;
 
-	fCompletionBox.OnKeyPress := CompletionKeyPress;
-
-	// Scan the current function body
 	M := TMemoryStream.Create;
 	try
 		fText.UnCollapsedLines.SaveToStream(M);
-		fCompletionBox.CurrentIndex := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M)
+
+		// Reparse whole file (not function bodies) if it has been modified
+		// use stream, don't read from disk (not saved yet)
+		//if fText.Modified then
+		//	MainForm.CppParser.ReParseFile(fFileName,InProject,False,True,M);
+
+		// Scan the current function body
+		fCompletionBox.CurrentStatement := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M);
 	finally
 		M.Free;
 	end;
 
-	fCompletionBox.Search(CompletionPhrase(fText.CaretXY), fFileName);
+	// Redirect key presses to completion box if applicable
+	fCompletionBox.OnKeyPress := CompletionKeyPress;
+
+	// Filter the whole statement list
+	fCompletionBox.Search(GetWordAtPosition(fText.CaretXY,wpCompletion),fFileName);
 end;
 
 procedure TEditor.DestroyCompletion;
@@ -1201,120 +1260,76 @@ begin
 		fAllowMouseOver := true;
 end;
 
-function TEditor.EvaluationPhrase(p : TBufferCoord): AnsiString;
+function TEditor.GetWordAtPosition(P : TBufferCoord;Purpose : TWordPurpose) : AnsiString;
 var
-	phrasebegin,phraseend,len : integer;
+	WordBegin,WordEnd,ParamBegin,ParamEnd,len : integer;
 	s : AnsiString;
 begin
 	result := '';
-
 	if (p.Line >= 1) and (p.Line <= fText.Lines.Count) then begin
 		s := fText.Lines[p.Line-1];
 		len := Length(s);
 
-		phrasebegin := p.Char - 1;
-		phraseend := p.Char - 1;
+		WordBegin := p.Char - 1;
+		WordEnd := p.Char - 1;
 
-		// Copy forward until end of identifier, accept array stuff at the end
-		while(phraseend + 1 <= len) do begin
-			if s[phraseend + 1] = '[' then begin
-				if not FindComplement(s,'[',']',phraseend,1) then break;
-			end else if (s[phraseend + 1] in fText.IdentChars) then
-				Inc(phraseend)
-			else
-				break;
-		end;
-
-		// Copy backward until some chars
-		while(phrasebegin > 0) and (phrasebegin <= len) do begin
-
-			// Accept array and function stuff
-			if s[phrasebegin] = ']' then begin
-				if FindComplement(s,']','[',phrasebegin,-1) then
-					Dec(phrasebegin)
-				else
-					break;
-			end else if s[phrasebegin] = ')' then begin
-				if FindComplement(s,')','(',phrasebegin,-1) then
-					Dec(phrasebegin)
+		// Copy forward until end of word
+		if Purpose in [wpEvaluation,wpInformation] then begin
+			while(WordEnd + 1 <= len) do begin
+				if (Purpose = wpEvaluation) and (s[WordEnd + 1] = '[') then begin
+					if not FindComplement(s,'[',']',WordEnd,1) then
+						break;
+				end else if (s[WordEnd + 1] in fText.IdentChars) then
+					Inc(WordEnd)
 				else
 					break;
 			end;
-
-			// Accept -> :: & .
-			if (s[phrasebegin] in fText.IdentChars) or (s[phrasebegin] in ['.','&',':']) then
-				Dec(phrasebegin)
-			else if (phrasebegin > 1) and (s[phrasebegin-1] = '-') and (s[phrasebegin] = '>') then
-				Dec(phrasebegin,2)
-			else
-				break;
 		end;
 
-		if phraseend > phrasebegin then
-			result := Copy(s,phrasebegin + 1,phraseend-phrasebegin);
-	end;
-end;
-
-function TEditor.CompletionPhrase(P : TBufferCoord): AnsiString;
-var
-	len,curpos,stripbeg : integer;
-begin
-	Result := EvaluationPhrase(p);
-	len := Length(result);
-
-	// strip array and function bits
-	curpos := 1;
-	while (curpos <= len) do begin
-		if result[curpos] = '[' then begin
-			stripbeg := curpos;
-			if FindComplement(Result,'[',']',curpos,1) then
-				Delete(Result,stripbeg,curpos - stripbeg + 1);
-		end else if result[curpos] = '(' then begin
-			stripbeg := curpos;
-			if FindComplement(Result,'(',')',curpos,1) then
-				Delete(Result,stripbeg,curpos - stripbeg + 1);
+		// Copy backward until end of word
+		if Purpose in [wpCompletion,wpEvaluation,wpInformation] then begin
+			while (WordBegin > 0) and (WordBegin <= len) do begin
+				if (s[WordBegin] = '[') then begin
+					if not FindComplement(s,'[',']',WordBegin,-1) then break;
+				end else if (s[WordBegin] in fText.IdentChars) then begin
+					Dec(WordBegin);
+				end else if s[WordBegin] in ['.',':','~'] then begin // allow destructor signs
+					Dec(WordBegin);
+				end else if (WordBegin > 1) and (s[WordBegin - 1] = '-') and (s[WordBegin] = '>') then begin
+					Dec(WordBegin,2);
+				end else if (WordBegin > 1) and (s[WordBegin] = ')') then begin
+					if not FindComplement(s,')','(',WordBegin,-1) then
+						break
+					else
+						Dec(WordBegin); // step over (
+				end else
+					break;
+			end;
 		end;
-		Inc(curpos);
 	end;
 
-	// strip pointer bits
-	curpos := 1;
-	len := Length(result); // length can hanve changed
-	while (curpos <= len) and (result[curpos] in ['*','&']) do
-		Inc(curpos);
-	Delete(Result,1,curpos-1);
-end;
+	// Get end result
+	Result := Copy(S,WordBegin + 1,WordEnd - WordBegin);
 
-function TEditor.GetFullFileName(const Line: AnsiString) : AnsiString;
-var
-	walker, start: integer;
-	filename : AnsiString;
-begin
-	walker := 0;
-	repeat
-		Inc(walker);
-	until (walker = Length(line)) or (line[walker] in ['<','"']);
-	start := walker + 1;
-
-	repeat
-		Inc(walker);
-	until (walker = Length(line)) or (line[walker] in ['>','"']);
-
-	filename := Copy(line, start, walker-start);
-	if Length(filename) = 0 then begin
-		result := '';
-		exit;
+	// Strip function parameters
+	ParamBegin := Pos('(',Result);
+	if ParamBegin > 0 then begin
+		ParamEnd := RPos(')',Result);
+		if ParamEnd > 0 then begin
+			Delete(Result,ParamBegin,ParamEnd - ParamBegin + 1);
+		end;
 	end;
 
-	// assume std:: C++ header
-	if (filename[1] = 'c') and (Pos('.h',filename) = 0) then begin
-		Delete(filename,1,1); // remove 'c'
-		filename := filename + '.h';
+	// Strip array stuff
+	if not (Purpose = wpEvaluation) then begin
+		ParamBegin := Pos('[',Result);
+		if ParamBegin > 0 then begin
+			ParamEnd := RPos(')',Result);
+			if ParamEnd > 0 then begin
+				Delete(Result,ParamBegin,ParamEnd - ParamBegin + 1);
+			end;
+		end;
 	end;
-
-	result := MainForm.CppParser.GetFullFileName(filename);
-	if (Length(result) <= 2) or (result[2] <> ':') then // no full path, so prepend path of active file
-		result := ExtractFilePath(fFileName) + filename;
 end;
 
 procedure TEditor.CompletionInsert(const append: AnsiString);
@@ -1402,7 +1417,7 @@ var
 	var
 		FileName: AnsiString;
 	begin
-		FileName := GetFullFileName(fText.Lines[p.Line - 1]);
+		FileName := MainForm.CppParser.GetHeaderFileName(fFileName,fText.Lines[p.Line - 1]);
 		if (FileName <> '') and FileExists(FileName) then
 			fText.Hint := FileName + ' - Ctrl+Click for more info'
 		else
@@ -1419,7 +1434,7 @@ var
 				MainForm.fDebugger.AddWatchVar(s);
 
 			// Evaluate s
-			fCurrentEvalWord := EvaluationPhrase(p);
+			fCurrentEvalWord := GetWordAtPosition(p,wpEvaluation);
 			MainForm.fDebugger.OnEvalReady := OnMouseOverEvalReady;
 			MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
 
@@ -1430,7 +1445,7 @@ var
 			M := TMemoryStream.Create;
 			try
 				fText.UnCollapsedLines.SaveToStream(M);
-				st := MainForm.CppParser.FindStatementOf(fFileName,CompletionPhrase(p),p.Line,M);
+				st := MainForm.CppParser.FindStatementOf(fFileName,GetWordAtPosition(p,wpInformation),p.Line,M);
 			finally
 				M.Free;
 			end;
@@ -1667,7 +1682,7 @@ begin
 			// Try to open the header
 			line := Trim(fText.Lines[p.Row-1]);
 			if StartsStr('#include',line) then begin
-				FileName := GetFullFileName(line);
+				FileName := MainForm.CppParser.GetHeaderFileName(fFileName,line);
 				e := MainForm.GetEditorFromFileName(FileName);
 				if Assigned(e) then
 					e.SetCaretPos(1,1);
@@ -1825,8 +1840,7 @@ begin
 			Result := False;
 		end;
 
-		// Reparse
-		MainForm.CppParser.ReParseFile(fFileName,InProject); // don't need to scan for the first time
+		MainForm.CppParser.ReParseFile(fFileName,InProject);
 	end else if fNew then
 		Result := SaveAs; // we need a file name, use dialog
 
@@ -1869,6 +1883,10 @@ begin
 			InitialDir := MainForm.fProject.Directory;
 
 		if Execute then begin
+
+			// Remove old file from statement list
+			MainForm.CppParser.InvalidateFile(fFileName);
+
 			try
 				fText.UnCollapsedLines.SaveToFile(FileName);
 				fText.Modified := false;
@@ -1887,8 +1905,7 @@ begin
 			MainForm.UpdateAppTitle;
 
 			// We haven't scanned it yet...
-			MainForm.CppParser.AddFileToScan(FileName);
-			MainForm.CppParser.ParseList;
+			MainForm.CppParser.ReParseFile(FileName,InProject);
 		end else
 			Result := False;
 	finally

@@ -129,6 +129,8 @@ begin
      fDesc:= ReadString(cTemplate, 'Description', '');
      fIcon:= ReadString(cTemplate, 'Icon', '');
      fCategory:= ReadString(cTemplate, 'Category', '');
+     if fCategory = '' then
+       fCategory:= ReadString(cTemplate, 'Catagory', ''); // support the old format too
      fName:= ReadString(cTemplate, 'Name', '');
 
      // read old style

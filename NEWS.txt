@@ -1,3 +1,25 @@
+Version 5.6.0 - *
+
+- The class browser can now show the contents of system includes.
+- Added a compiler set selector to the toolbar.
+- The Remove Unit Form is resizable again.
+- Code completion now also works on modified files.
+- The parser now processes preprocessor lines too.
+- Parsing speed has been improved by around 400% (average of my own projects).
+- Added "Duplicate Line" and "Delete Line" functions to Menu >> Edit.
+- When only changing case during a Rename, the input file will not be deleted anymore.
+- Project templates now also accept the old "Catagory" input field again.
+- Fixed an "External Exception" when handling compiler sets.
+- When parsing, the status bar does not flicker anymore.
+- The executable version number is equal to the official version number again.
+- Added about twenty previously hardcoded text items to the language tables.
+- Cache saving speed has been improved infinitely when the cache is bigger than 16MiB.
+- Users can now input a correspondence e-mail into the crash reporter message.
+- In Editor Options, the "Symbol Completion" section has been moved to the "Code Completion" section.
+- Completed closing symbols are now deleted when the corresponding opening character is deleted.
+- Fixed a argument highlighting problem in the function tooltip.
+- As of 5.6.0 RC1, a different completion cache file format is used. Older versions are not forward compatible.
+
 Version 5.5.3 - 5 November 2013
 
 - Fixed lib32, -m32 and gdb32 not being used by default by 32bit profiles.

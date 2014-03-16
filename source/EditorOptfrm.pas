@@ -26,7 +26,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, ExtCtrls, Spin,
   SynEdit, SynEditHighlighter, SynHighlighterCpp,
-  Buttons, ClassBrowser, CppParser, CppTokenizer, StrUtils, Grids;
+  Buttons, ClassBrowser, CppParser, CppTokenizer, StrUtils, Grids,
+  CppPreprocessor;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -77,7 +78,7 @@ type
     cboInsertCaret: TComboBox;
     cboOverwriteCaret: TComboBox;
     tabCode: TTabSheet;
-    codepages: TPageControl;
+    PagesSnippets: TPageControl;
     tabCPInserts: TTabSheet;
     tabCPDefault: TTabSheet;
     btnAdd: TButton;
@@ -128,15 +129,7 @@ type
     MinutesDelay: TTrackBar;
     FileOptions: TRadioGroup;
     grpHighCurLine: TGroupBox;
-    tabSymbols: TTabSheet;
-    cbBraces: TCheckBox;
-    cbParenth: TCheckBox;
-    cbInclude: TCheckBox;
-    cbComments: TCheckBox;
-    cbArray: TCheckBox;
     cbFunctionHint: TCheckBox;
-    grpSpecific: TGroupBox;
-    cbSymbolComplete: TCheckBox;
     edSyntaxExt: TEdit;
     cbSyntaxHighlight: TCheckBox;
     grpTabs: TGroupBox;
@@ -162,6 +155,21 @@ type
     cpCompletionBackground: TColorBox;
     edIncludeFile: TEdit;
     btnFileBrowse: TSpeedButton;
+    PagesCompletion: TPageControl;
+    tabSymbolCompletion: TTabSheet;
+    grpSpecific: TGroupBox;
+    cbParenth: TCheckBox;
+    cbBraces: TCheckBox;
+    cbInclude: TCheckBox;
+    cbComments: TCheckBox;
+    cbArray: TCheckBox;
+    cbSymbolComplete: TCheckBox;
+    tabCodeCompletion: TTabSheet;
+    cbDeleteCompleted: TCheckBox;
+    cbSingleQuotes: TCheckBox;
+    cbDoubleQuotes: TCheckBox;
+    CppPreprocessor: TCppPreprocessor;
+    CppTokenizer: TCppTokenizer;
     procedure FormCreate(Sender: TObject);
     procedure SetGutter;
     procedure ElementListClick(Sender: TObject);
@@ -219,7 +227,6 @@ type
     fABPColor: TPoint;
     fSelColor: TPoint;
     fFoldColor : TPoint;
-    HasProgressStarted : boolean;
     procedure LoadFonts;
     procedure LoadText;
     procedure LoadCodeIns;
@@ -376,6 +383,7 @@ begin
   btnCancel.Caption:=            Lang[ID_BTN_CANCEL];
   btnHelp.Caption:=              Lang[ID_BTN_HELP];
 
+  // Top level tabs
   Caption:=                      Lang[ID_EOPT];
   tabGeneral.Caption:=           Lang[ID_EOPT_GENTAB];
   tabDisplay.Caption:=           Lang[ID_EOPT_DISPLAYTAB];
@@ -384,12 +392,14 @@ begin
   tabCBCompletion.Caption:=      Lang[ID_EOPT_COMPLETIONTAB];
   tabAutosave.Caption:=          Lang[ID_EOPT_AUTOSAVETAB];
 
-  // sub tabs
+  // Sub tabs (inserts)
   tabCPInserts.Caption:=         Lang[ID_EOPT_CPINSERTS];
   tabCPDefault.Caption:=         Lang[ID_EOPT_CPDEFAULT];
-  tabSymbols.Caption:=           Lang[ID_EOPT_CPSYMBOLS];
 
-// General Tab
+  // Sub tabs (completion)
+  tabSymbolCompletion.Caption:=           Lang[ID_EOPT_CPSYMBOLS];
+
+  // General Tab
   grpEditorOpts.Caption:=        ' '+Lang[ID_EOPT_EDOPTIONS]+' ';
   cbAutoIndent.Caption:=         Lang[ID_EOPT_AUTOINDENT2];
   cbInsertMode.Caption:=         Lang[ID_EOPT_INSERTMODE];
@@ -428,18 +438,18 @@ begin
   cbHighCurrLine.Caption :=      Lang[ID_EOPT_GENERICENABLED];
 
   cboInsertCaret.Clear;
-  cboInsertCaret.Items.Append(Lang[ID_EOPT_CARET1]);
-  cboInsertCaret.Items.Append(Lang[ID_EOPT_CARET2]);
-  cboInsertCaret.Items.Append(Lang[ID_EOPT_CARET3]);
-  cboInsertCaret.Items.Append(Lang[ID_EOPT_CARET4]);
+  cboInsertCaret.Items.Add(Lang[ID_EOPT_CARET1]);
+  cboInsertCaret.Items.Add(Lang[ID_EOPT_CARET2]);
+  cboInsertCaret.Items.Add(Lang[ID_EOPT_CARET3]);
+  cboInsertCaret.Items.Add(Lang[ID_EOPT_CARET4]);
 
   cboOverwriteCaret.Clear;
-  cboOverwriteCaret.Items.Append(Lang[ID_EOPT_CARET1]);
-  cboOverwriteCaret.Items.Append(Lang[ID_EOPT_CARET2]);
-  cboOverwriteCaret.Items.Append(Lang[ID_EOPT_CARET3]);
-  cboOverwriteCaret.Items.Append(Lang[ID_EOPT_CARET4]);
+  cboOverwriteCaret.Items.Add(Lang[ID_EOPT_CARET1]);
+  cboOverwriteCaret.Items.Add(Lang[ID_EOPT_CARET2]);
+  cboOverwriteCaret.Items.Add(Lang[ID_EOPT_CARET3]);
+  cboOverwriteCaret.Items.Add(Lang[ID_EOPT_CARET4]);
 
-// Display Tab
+  // Fonts Tab
   grpEditorFont.Caption:=        ' '+Lang[ID_EOPT_EDFONT]+' ';
   lblEditorFont.Caption:=        Lang[ID_EOPT_FONT];
   lblEditorSize.Caption:=        Lang[ID_EOPT_SIZE];
@@ -455,7 +465,7 @@ begin
   lblGutterFont.Caption:=        Lang[ID_EOPT_FONT];
   lblGutterFontSize.Caption:=    Lang[ID_EOPT_SIZE];
 
-// Syntax tab
+  // Colors tab
   lblForeground.Caption:=        Lang[ID_EOPT_FORE];
   lblBackground.Caption:=        Lang[ID_EOPT_BACK];
   grpStyle.Caption:=             ' '+Lang[ID_EOPT_STYLE] +' ';
@@ -465,21 +475,15 @@ begin
   lblSpeed.Caption:=             Lang[ID_EOPT_SPEED];
   btnSaveSyntax.Hint:=           Lang[ID_EOPT_SAVESYNTAX];
 
-// Code Tab
+  // Snippets tab
+  btnAdd.Caption:=               Lang[ID_BTN_ADD];
+  btnRemove.Caption:=            Lang[ID_BTN_REMOVE];
   lvCodeIns.Cols[0][0] := Lang[ID_EOPT_CIMENU];
   lvCodeIns.Cols[1][0] := Lang[ID_EOPT_CISECTION];
   lvCodeIns.Cols[2][0] := Lang[ID_EOPT_CIDESC];
   cbDefaultCode.Caption:=        Lang[ID_EOPT_DEFCODE];
 
-  cbSymbolComplete.Caption:=     Lang[ID_EOPT_SYMBOLCOMPLETE];
-  grpSpecific.Caption:=          ' '+Lang[ID_EOPT_SYMBOLGROUP]+' ';
-  cbBraces.Caption:=             Lang[ID_EOPT_SYMBOLBRACES];
-  cbParenth.Caption:=            Lang[ID_EOPT_SYMBOLPARENT];
-  cbInclude.Caption:=            Lang[ID_EOPT_SYMBOLINCLUDE];
-  cbArray.Caption:=              Lang[ID_EOPT_SYMBOLSQUARE];
-  cbComments.Caption:=           Lang[ID_EOPT_SYMBOLCOMMENT];
-
-  // Completion Tab
+  // Completion tab, code
   chkEnableCompletion.Caption:=  Lang[ID_EOPT_COMPLETIONENABLE];
   lblCompletionColor.Caption:=   Lang[ID_EOPT_COMPLETIONCOLOR];
   gbCBEngine.Caption:=           ' '+Lang[ID_EOPT_BROWSERENGINE]+' ';
@@ -491,9 +495,17 @@ begin
   btnCCCrefresh.Caption:=        Lang[ID_BTN_REFRESH];
   lblRefreshHint.Caption:=       Lang[ID_EOPT_REFRESHHINT];
 
-  // Code snippet tab
-  btnAdd.Caption:=               Lang[ID_BTN_ADD];
-  btnRemove.Caption:=            Lang[ID_BTN_REMOVE];
+  // Completion tab, symbol
+  cbSymbolComplete.Caption:=     Lang[ID_EOPT_SYMBOLCOMPLETE];
+  grpSpecific.Caption:=          ' '+Lang[ID_EOPT_SYMBOLGROUP]+' ';
+  cbBraces.Caption:=             Lang[ID_EOPT_SYMBOLBRACES];
+  cbParenth.Caption:=            Lang[ID_EOPT_SYMBOLPARENT];
+  cbInclude.Caption:=            Lang[ID_EOPT_SYMBOLINCLUDE];
+  cbArray.Caption:=              Lang[ID_EOPT_SYMBOLSQUARE];
+  cbComments.Caption:=           Lang[ID_EOPT_SYMBOLCOMMENT];
+  cbSingleQuotes.Caption:=       Lang[ID_EOPT_SYMBOLSINGLEQUOTE];
+  cbDoubleQuotes.Caption:=       Lang[ID_EOPT_SYMBOLDOUBLEQUOTE];
+  cbDeleteCompleted.Caption:=    Lang[ID_EOPT_DELETESYMBOLPAIRS];
 
   // Autosave
   cbAutoSave.Caption:=           Lang[ID_EOPT_ENABLEAUTOSAVE];
@@ -584,7 +596,11 @@ begin
 		cbComments.Checked := CommentComplete;
 		cbInclude.Checked := IncludeComplete;
 		cbParenth.Checked := ParentheseComplete;
+		cbSingleQuotes.Checked := SingleQuoteComplete;
+		cbDoubleQuotes.Checked := DoubleQuoteComplete;
+
 		cbSymbolComplete.Checked := CompleteSymbols;
+		cbDeleteCompleted.Checked := DeleteSymbolPairs;
 
 		cbArray.Enabled := cbSymbolComplete.Checked;
 		cbBraces.Enabled := cbSymbolComplete.Checked;
@@ -663,10 +679,10 @@ begin
 	cpCompletionBackground.Enabled:=chkEnableCompletion.Checked;
 	chkCCCache.Checked:=devCodeCompletion.UseCacheFiles;
 	chkCCCache.Tag:=0; // mark un-modified
-	chkCCCache.Enabled:=chkEnableCompletion.Checked;
-	lbCCC.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
-	btnCCCadd.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
-	btnCCCdelete.Enabled:=chkCCCache.Checked and chkEnableCompletion.Checked;
+	chkCCCache.Enabled := chkEnableCompletion.Checked;
+	lbCCC.Enabled := chkEnableCompletion.Checked;
+	btnCCCdelete.Enabled := chkEnableCompletion.Checked; // allow user to remove stuff even if the cache is unused
+	btnCCCrefresh.Enabled := chkEnableCompletion.Checked; // idem
 
 	// Parser options
 	chkCBParseLocalH.Checked := devCodeCompletion.ParseLocalHeaders;
@@ -743,15 +759,19 @@ begin
 		CommentComplete:=     cbComments.Checked;
 		IncludeComplete:=     cbInclude.Checked;
 		ParentheseComplete:=  cbParenth.Checked;
+		SingleQuoteComplete:= cbSingleQuotes.Checked;
+		DoubleQuoteComplete:= cbDoubleQuotes.Checked;
 		CompleteSymbols:=     cbSymbolComplete.Checked;
-
-		DefaultCode:=         cbDefaultCode.Checked;
+		DeleteSymbolPairs:=   cbDeleteCompleted.Checked;
 
 		// Autosave
 		EnableAutoSave:=      cbAutoSave.Checked;
 		Interval:=            MinutesDelay.Position;
 		AutoSaveFilter:=      FileOptions.ItemIndex;
 		AutoSaveMode:=        NameOptions.ItemIndex;
+
+		// Default source
+		DefaultCode:=         cbDefaultCode.Checked;
 
 		// load in attributes
 		for idx:= 0 to pred(cpp.AttrCount) do begin
@@ -813,7 +833,7 @@ begin
 	end;
 
 	// Save our code snippet even if we opted not to use it (user may want to keep it)
-	if not IsEmpty(seDefault) then
+	if not seDefault.IsEmpty then
 		seDefault.Lines.SavetoFile(devDirs.Config + DEV_DEFAULTCODE_FILE)
 	else
 		DeleteFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
@@ -1454,7 +1474,7 @@ begin
 
 		// Undo the make relative step
 		for I := 0 to sl.Count - 1 do begin
-			S := MainForm.CppParser.GetFullFileName(sl[i]);
+			S := MainForm.CppParser.GetSystemHeaderFileName(sl[i]); // could be local header file?
 			CppParser.AddFileToScan(S);
 		end;
 
@@ -1540,43 +1560,48 @@ begin
 
 	CppParser.Load(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
 
+	// Read the cache
 	lbCCC.Items.BeginUpdate;
 	lbCCC.Clear;
 	for I := 0 to CppParser.CacheContents.Count - 1 do
 		lbCCC.Items.Add(ReplaceFirststr(CppParser.CacheContents[i],devDirs.Exec,''));
 	lbCCC.Items.EndUpdate;
 
+	// Set include directories
+	if Assigned(devCompilerSets.CurrentSet) then begin
+		CppParser.ClearIncludePaths;
+		with devCompilerSets.CurrentSet do begin
+			for I := 0 to CppDir.Count - 1 do
+				CppParser.AddIncludePath(CppDir[i]);
+		end;
+	end;
+
 	btnCCCadd.Enabled := false;
 
-	Screen.Cursor:=crDefault;
+	Screen.Cursor := crDefault;
 end;
 
 procedure TEditorOptForm.chkCCCacheClick(Sender: TObject);
 begin
 	chkCCCache.Tag := 1; // mark modified
-	lbCCC.Enabled := chkCCCache.Checked;
-	btnCCCadd.Enabled := chkCCCache.Checked and (edIncludeFile.Text <> '');
-	edIncludeFile.Enabled := chkCCCache.Checked;
-	btnFileBrowse.Enabled := chkCCCache.Checked;
 end;
 
 procedure TEditorOptForm.CppParser1StartParsing(Sender: TObject);
 begin
-  pbCCCache.Visible:=True;
+	pbCCCache.Visible := True;
 end;
 
 procedure TEditorOptForm.CppParser1EndParsing(Sender: TObject);
 begin
-  pbCCCache.Visible:=False;
+	pbCCCache.Visible := False;
 end;
 
 procedure TEditorOptForm.CppParser1TotalProgress(Sender: TObject;const FileName: string; Total, Current: Integer);
 begin
-	if not HasProgressStarted then begin
+	if Total <> -1 then
 		pbCCCache.Max := Total;
-		HasProgressStarted := true;
-	end;
-	pbCCCache.Position := pbCCCache.Position + Current;
+	if Current <> -1 then
+		pbCCCache.Position := Current;
 	Application.ProcessMessages;
 end;
 

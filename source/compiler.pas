@@ -314,7 +314,7 @@ begin
 
 	Includes:=StringReplace(Includes, '\', '/', [rfReplaceAll]);
 	Cmd := GppStr + ' -MM ' + Includes +' '+ GenMakePath2(ExtractRelativePath(Makefile, TheFile));
-	Output := RunAndGetOutput(Cmd, ExtractFileDir(Makefile), nil, nil, nil, True);
+	Output := RunAndGetOutput(Cmd, ExtractFileDir(Makefile), nil, nil, True);
 
 	if Length(Output) > 0 then begin
 		if (Output[Length(Output)]<>'0') then begin

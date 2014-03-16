@@ -73,6 +73,7 @@ type
     fName: AnsiString; // "TDM-GCC 4.7.1 Release"
     fFolder: AnsiString; // MinGW64, MinGW32
     fDefInclude: TStringList; // default include dir
+    fDefines: TStringList; // list of predefined constants
 
     // User settings
     fCompAdd : boolean;
@@ -137,6 +138,7 @@ type
     // Properties
     property Name: AnsiString read fName write fName;
     property DefInclude : TStringList read fDefInclude;
+    property Defines : TStringList read fDefines;
 
     // Options
     property OptionList: TList read fOptionList write fOptionList;
@@ -363,7 +365,10 @@ type
     fIncludeComplete : boolean;
     fCommentComplete : boolean;
     fArrayComplete : boolean;
+    fSingleQuoteComplete : boolean;
+    fDoubleQuoteComplete : boolean;
     fCompleteSymbols : boolean;
+    fDeleteSymbolPairs : boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -433,7 +438,10 @@ type
     property IncludeComplete: boolean read fIncludeComplete write fIncludeComplete;
     property CommentComplete: boolean read fCommentComplete write fCommentComplete;
     property ArrayComplete: boolean read fArrayComplete write fArrayComplete;
+    property SingleQuoteComplete: boolean read fSingleQuoteComplete write fSingleQuoteComplete;
+    property DoubleQuoteComplete: boolean read fDoubleQuoteComplete write fDoubleQuoteComplete;
     property CompleteSymbols: boolean read fCompleteSymbols write fCompleteSymbols;
+    property DeleteSymbolPairs: boolean read fDeleteSymbolPairs write fDeleteSymbolPairs;
   end;
 
   TWindowState = class(TPersistent)
@@ -515,6 +523,9 @@ type
     fToolbarClasses: boolean;
     fToolbarClassesX: integer;
     fToolbarClassesY: integer;
+    fToolbarCompilers: boolean;
+    fToolbarCompilersX: integer;
+    fToolbarCompilersY: integer;
 
     // file associations (see FileAssocs.pas)
     fAssociateCpp: boolean;
@@ -625,6 +636,9 @@ type
     property ToolbarClasses: boolean read fToolbarClasses write fToolbarClasses;
     property ToolbarClassesX: integer read fToolbarClassesX write fToolbarClassesX;
     property ToolbarClassesY: integer read fToolbarClassesY write fToolbarClassesY;
+    property ToolbarCompilers: boolean read fToolbarCompilers write fToolbarCompilers;
+    property ToolbarCompilersX: integer read fToolbarCompilersX write fToolbarCompilersX;
+    property ToolbarCompilersY: integer read fToolbarCompilersY write fToolbarCompilersY;
 
     // file associations
     property AssociateCpp: boolean read fAssociateCpp write fAssociateCpp;
@@ -701,7 +715,7 @@ implementation
 uses
 {$IFDEF WIN32}
   MultiLangSupport, datamod, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
-  FileAssocs, TypInfo;
+  FileAssocs, TypInfo, DateUtils;
 {$ENDIF}
 {$IFDEF LINUX}
   MultiLangSupport, SysUtils, StrUtils, QForms, QControls, version, utils, QSynEditMiscClasses,
@@ -885,27 +899,31 @@ begin
 	fdblFiles:= FALSE;
 	fConsolePause:=TRUE;
 
-	fToolbarMain:=TRUE;
-	fToolbarMainX:=11;
-	fToolbarMainY:=2;
-	fToolbarEdit:=TRUE;
-	fToolbarEditX:=173;
-	fToolbarEditY:=2;
-	fToolbarCompile:=TRUE;
-	fToolbarCompileX:=441;
-	fToolbarCompileY:=2;
-	fToolbarProject:=TRUE;
-	fToolbarProjectX:=350;
-	fToolbarProjectY:=2;
-	fToolbarSpecials:=TRUE;
-	fToolbarSpecialsX:=624;
-	fToolbarSpecialsY:=2;
-	fToolbarSearch:=TRUE;
-	fToolbarSearchX:=233;
-	fToolbarSearchY:=2;
-	fToolbarClasses:=TRUE;
-	fToolbarClassesX:=11;
-	fToolbarClassesY:=30;
+	// TODO: retrieve directly from visual editor
+	fToolbarMain := TRUE;
+	fToolbarMainX := 11;
+	fToolbarMainY := 2;
+	fToolbarEdit := TRUE;
+	fToolbarEditX := 173;
+	fToolbarEditY := 2;
+	fToolbarCompile := TRUE;
+	fToolbarCompileX := 441;
+	fToolbarCompileY := 2;
+	fToolbarProject := TRUE;
+	fToolbarProjectX := 350;
+	fToolbarProjectY := 2;
+	fToolbarSpecials := TRUE;
+	fToolbarSpecialsX := 11;
+	fToolbarSpecialsY := 30;
+	fToolbarSearch := TRUE;
+	fToolbarSearchX := 233;
+	fToolbarSearchY := 2;
+	fToolbarClasses := TRUE;
+	fToolbarClassesX := 95;
+	fToolbarClassesY := 30;
+	fToolbarCompilers := TRUE;
+	fToolbarCompilersX := 663;
+	fToolbarCompilersY := 2;
 
 	// Office 2007 / Vista support
 	osinfo.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
@@ -1008,6 +1026,7 @@ begin
 
 	// Misc.
 	fDefInclude := TStringList.Create;
+	fDefines := TStringList.Create;
 
 	// Do not set properties yet, as we don't know where to look for gcc.exe
 
@@ -1031,6 +1050,7 @@ begin
 
 	// Misc.
 	fDefInclude := TStringList.Create;
+	fDefines := TStringList.Create;
 
 	// If relative, append exe dir
 	if (Length(folder) < 2) or (folder[2] <> ':') then // if not absolute
@@ -1074,6 +1094,7 @@ begin
 
 	// Etc.
 	fDefInclude.Free;
+	fDefines.Free;
 
 	inherited;
 end;
@@ -1106,6 +1127,7 @@ begin
 	fName := input.fName;
 	fFolder := input.fFolder;
 	fDefInclude.Assign(input.fDefInclude);
+	fDefines.Assign(input.fDefines);
 
 	// User input
 	fCompAdd := input.fCompAdd;
@@ -1121,60 +1143,58 @@ end;
 
 procedure TdevCompilerSet.SetProperties(const BinDir,BinFile : AnsiString);
 var
-	output{,S} : AnsiString;
-	DelimPos1,DelimPos2 : integer;
+	output{,DummyFileName,Cmd} : AnsiString;
+	DelimPos1,DelimPos2{,DummyHandle} : integer;
 begin
+	// GCC binaries not found../
+	if not FileExists(BinDir + pd + BinFile) then
+		Exit;
 
-	// TODO: Try the x64 version of GCC too?
+	// Obtain version number and compiler distro etc
+	output := GetCompilerOutput(BinDir + pd,BinFile,'-v');
+	DelimPos1 := Pos('gcc version ',output);
+	if DelimPos1 = 0 then
+		Exit; // unknown binary
 
-	if FileExists(BinDir + pd + BinFile) then begin
-		output := GetCompilerOutput(BinDir + pd,BinFile,'-v');
+	// Find version number
+	Inc(DelimPos1,Length('gcc version '));
+	DelimPos2 := DelimPos1;
+	while (DelimPos2 <= Length(output)) and not (output[DelimPos2] in [#0..#32]) do
+		Inc(DelimPos2);
+	fVersion := Copy(output,DelimPos1,DelimPos2 - DelimPos1);
 
-		// Obtain version number and compiler distro etc
-		DelimPos1 := Pos('gcc version ',output);
-		if DelimPos1 > 0 then begin
+	// Set compiler folder
+	DelimPos1 := RPos(pd,BinDir);
+	if DelimPos1 > 0 then
+		fFolder := Copy(BinDir,1,DelimPos1-1);
 
-			// Find version number
-			Inc(DelimPos1,Length('gcc version '));
-			DelimPos2 := DelimPos1;
-			while (DelimPos2 <= Length(output)) and not (output[DelimPos2] in [#0..#32]) do
-				Inc(DelimPos2);
-			fVersion := Copy(output,DelimPos1,DelimPos2 - DelimPos1);
+	// Find compiler builder
+	DelimPos1 := DelimPos2;
+	while (DelimPos1 <= Length(output)) and not (output[DelimPos1] = '(') do
+		Inc(DelimPos1);
+	while (DelimPos2 <= Length(output)) and not (output[DelimPos2] = ')') do
+		Inc(DelimPos2);
+	fType := Copy(output,DelimPos1 + 1,DelimPos2 - DelimPos1 - 1);
 
-			// Set compiler folder
-			DelimPos1 := RPos(pd,BinDir);
-			if DelimPos1 > 0 then
-				fFolder := Copy(BinDir,1,DelimPos1-1);
-
-			// Find compiler builder
-			DelimPos1 := DelimPos2;
-			while (DelimPos1 <= Length(output)) and not (output[DelimPos1] = '(') do
-				Inc(DelimPos1);
-			while (DelimPos2 <= Length(output)) and not (output[DelimPos2] = ')') do
-				Inc(DelimPos2);
-			fType := Copy(output,DelimPos1 + 1,DelimPos2 - DelimPos1 - 1);
-
-			// Assemble user friendly name if we don't have one yet
-			if fName = '' then begin
-				if ContainsStr(fType,'tdm64') then
-					fName := 'TDM-GCC ' + fVersion
-				else if ContainsStr(fType,'tdm') then
-					fName := 'TDM-GCC ' + fVersion
-				else if ContainsStr(fType,'GCC') then
-					fName := 'MinGW GCC ' + fVersion;
-			end;
-
-			// Obtain compiler target
-			fDumpMachine := GetCompilerOutput(BinDir + pd,BinFile,'-dumpmachine');
-		end;
+	// Assemble user friendly name if we don't have one yet
+	if fName = '' then begin
+		if ContainsStr(fType,'tdm64') then
+			fName := 'TDM-GCC ' + fVersion
+		else if ContainsStr(fType,'tdm') then
+			fName := 'TDM-GCC ' + fVersion
+		else if ContainsStr(fType,'GCC') then
+			fName := 'MinGW GCC ' + fVersion;
 	end;
 
-	// TODO: Obtain default include dir from the preprocessor
-	{if FileExists(BinDir + pd + 'cpp.exe') then begin
-		output := GetCompilerOutput(BinDir + pd,'cpp.exe','-v');
-		DelimPos1 := Pos('#include <...> search starts here:',output);
+	// Obtain compiler target
+	fDumpMachine := GetCompilerOutput(BinDir + pd,BinFile,'-dumpmachine');
+
+	// Find default include directories
+	{if FileExists(BinDir + pd + "cpp.exe") then begin
+		output := GetCompilerOutput(BinDir + pd,"cpp.exe","-v");
+		DelimPos1 := Pos("#include <...> search starts here:",output);
 		if DelimPos1 > 0 then begin
-			DelimPos2 := Pos('End of search list.',output);
+			DelimPos2 := ("End of search list.",output);
 			if DelimPos2 > 0 then begin
 				S := Copy(output,DelimPos1,DelimPos2-DelimPos1);
 				fDefInclude.Clear;
@@ -1182,6 +1202,9 @@ begin
 			end;
 		end;
 	end;}
+
+	// Obtain default includes when changing current file?
+	fDefines.CommaText := GetCompilerOutput(BinDir + pd,'cpp.exe','-dM -E -xc NUL'); // TODO: use pipe/cmd redirection
 end;
 
 procedure TdevCompilerSet.SetExecutables;
@@ -1213,11 +1236,18 @@ begin
 	if fDumpMachine <> '' then begin
 		AddExistingDirectory(fBinDir,fFolder + pd + fDumpMachine + pd + 'bin');
 		AddExistingDirectory(fLibDir,fFolder + pd + fDumpMachine + pd + 'lib');
+
+		// Regular include folder
 		AddExistingDirectory(fCDir,fFolder + pd + fDumpMachine + pd + 'include');
 		AddExistingDirectory(fCppDir,fFolder + pd + fDumpMachine + pd + 'include');
 
-		// Custom STL folder?
-		// Currently, Dev-C++ is a bit slow at parsing this shit
+		// Other include folder?
+		AddExistingDirectory(fCDir,
+			fFolder + pd + 'lib' + pd + 'gcc' + pd + fDumpMachine + pd + fVersion + pd + 'include');
+		AddExistingDirectory(fCppDir,
+			fFolder + pd + 'lib' + pd + 'gcc' + pd + fDumpMachine + pd + fVersion + pd + 'include');
+
+		// C++ only folder
 		AddExistingDirectory(fCppDir,
 			fFolder + pd + 'lib' + pd + 'gcc' + pd + fDumpMachine + pd + fVersion + pd + 'include' + pd + 'c++');
 	end;
@@ -1460,7 +1490,7 @@ end;
 
 function TdevCompilerSet.GetCompilerOutput(const BinDir,BinFile,Input : AnsiString) : AnsiString;
 begin
-	result := Trim(RunAndGetOutput(BinDir + pd + BinFile + ' ' + Input,BinDir,nil,nil,nil,false))
+	result := Trim(RunAndGetOutput(BinDir + pd + BinFile + ' ' + Input,BinDir,nil,nil,false))
 end;
 
 function TdevCompilerSet.ValidateDirs : boolean;
@@ -2230,7 +2260,10 @@ begin
 	fIncludeComplete := TRUE;
 	fCommentComplete := FALSE;
 	fArrayComplete := TRUE;
+	fSingleQuoteComplete := TRUE;
+	fDoubleQuoteComplete := TRUE;
 	fCompleteSymbols := TRUE;
+	fDeleteSymbolPairs := TRUE;
 end;
 
 procedure TdevEditor.AssignEditor(editor : TSynEdit;const FileName : AnsiString);

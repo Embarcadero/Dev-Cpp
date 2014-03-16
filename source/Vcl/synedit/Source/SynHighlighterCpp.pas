@@ -83,7 +83,7 @@ type
 
   TRangeState = (rsUnknown, rsAnsiC, rsAnsiCAsm, rsAnsiCAsmBlock, rsAsm,
     rsAsmBlock, rsDirective, rsDirectiveComment, rsString34, rsString39,
-    rsMultiLineString, rsMultiLineDirective);
+    rsMultiLineString, rsMultiLineDirective, rsCppComment);
 
   TProcTableProc = procedure of object;
 
@@ -177,6 +177,7 @@ type
     function Func166: TtkTokenKind;
     function Func206: TtkTokenKind;
     procedure AnsiCProc;
+    procedure AnsiCppProc;
     procedure AndSymbolProc;
     procedure AsciiCharProc;
     procedure AtSymbolProc;
@@ -927,7 +928,21 @@ begin
       #10: break;
       #13: break;
     else inc(Run);
-    end;
+  end;
+end;
+
+procedure TSynCppSyn.AnsiCppProc;
+begin
+  fTokenID := tkComment;
+  if fLine[Run] = #0 then begin
+    NullProc;
+    Exit;
+  end;
+  fRange := rsUnknown;
+  while not (fLine[Run] in [#13,#10,#0]) do
+    Inc(Run);
+  if (fLine[Run-1] = '\') and (fLine[Run] = #0) then
+    fRange := rsCppComment; // continues on next line
 end;
 
 procedure TSynCppSyn.AndSymbolProc;
@@ -1490,8 +1505,10 @@ begin
     '/':                               {c++ style comments}
       begin
         fTokenID := tkComment;
-        inc(Run, 2);
-        while not (fLine[Run] in [#0, #10, #13]) do Inc(Run);
+        while fLine[Run] <> #0 do
+          Inc(Run);
+        if fLine[Run-1] = '\' then
+          fRange := rsCppComment; // multiline C++ comment
       end;
     '*':                               {c style comments}
       begin
@@ -1500,7 +1517,7 @@ begin
           fRange := rsAnsiCAsm
         else if fRange = rsAsmBlock then
           fRange := rsAnsiCAsmBlock
-        else if fRange <> rsDirectiveComment then                          
+        else if fRange <> rsDirectiveComment then
           fRange := rsAnsiC;
         inc(Run, 2);
         while fLine[Run] <> #0 do
@@ -1696,6 +1713,7 @@ begin
   case fRange of
     rsAnsiC, rsAnsiCAsm,
     rsAnsiCAsmBlock, rsDirectiveComment: AnsiCProc;
+    rsCppComment: AnsiCppProc;
     rsMultiLineDirective: DirectiveEndProc;
     rsMultilineString: StringEndProc;
   else

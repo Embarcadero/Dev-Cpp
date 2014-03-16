@@ -34,7 +34,6 @@ type
 
   TDevRun = class(TThread)
   private
-    TheMsg     : AnsiString;
     CurrentLine: AnsiString;
     FLineOutput: TLineOutputEvent;
     fCheckAbort: TCheckAbortFunc;
@@ -42,8 +41,6 @@ type
     procedure CallLineOutputEvent;
     procedure Execute; override;
     procedure LineOutput(const Line: AnsiString);
-    procedure ShowError(const Msg: AnsiString);
-    procedure ShowMsg;
   public
     Command   : AnsiString;
     Directory : AnsiString;
@@ -54,17 +51,6 @@ type
 
 implementation
 
-procedure TDevRun.ShowMsg;
-begin
-  MsgBox(TheMsg);
-end;
-
-procedure TDevRun.ShowError(const Msg: AnsiString);
-begin
-  TheMsg := Msg;
-  Synchronize(ShowMsg);
-end;
-
 procedure TDevRun.CallLineOutputEvent;
 begin
     FLineOutput(Self, CurrentLine);
@@ -74,12 +60,12 @@ procedure TDevRun.LineOutput(const Line: AnsiString);
 begin
   CurrentLine := Line;
   if Assigned(FLineOutput) then
-      Synchronize(CallLineOutputEvent);
+    Synchronize(CallLineOutputEvent);
 end;
 
 procedure TDevRun.Execute;
 begin
-  Output := RunAndGetOutput(Command, Directory, Self.ShowError, LineOutput, FCheckAbort);
+  Output := RunAndGetOutput(Command, Directory, LineOutput, FCheckAbort);
 end;
 
 end.

@@ -176,7 +176,8 @@ const
   ecLineBreak       = 509;  // Break line at current position, move caret to new line
   ecInsertLine      = 510;  // Break line at current position, leave caret
   ecChar            = 511;  // Insert a character at current position
-
+  ecDuplicateLine   = 512;  // Duplicate current line
+  
   ecImeStr          = 550;  // Insert character(s) from IME
 
   ecUndo            = 601;  // Perform undo if available
@@ -326,7 +327,7 @@ type
 {$ENDIF}
 
 const
-  EditorCommandStrs: array[0..100] of TIdentMapEntry = (
+  EditorCommandStrs: array[0..101] of TIdentMapEntry = (
     (Value: ecNone; Name: 'ecNone'),
     (Value: ecLeft; Name: 'ecLeft'),
     (Value: ecRight; Name: 'ecRight'),
@@ -375,6 +376,7 @@ const
     (Value: ecLineBreak; Name: 'ecLineBreak'),
     (Value: ecInsertLine; Name: 'ecInsertLine'),
     (Value: ecChar; Name: 'ecChar'),
+    (Value: ecDuplicateLine; Name: 'ecDuplicateLine'),
     (Value: ecImeStr; Name: 'ecImeStr'),
     (Value: ecUndo; Name: 'ecUndo'),
     (Value: ecRedo; Name: 'ecRedo'),

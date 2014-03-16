@@ -32,7 +32,7 @@ interface
 uses 
 {$IFDEF WIN32}
   Windows, Classes, Forms, SysUtils, Controls, Graphics, CppParser,
-  stringutils, U_IntList;
+  cbutils, IntList;
 {$ENDIF}
 {$IFDEF LINUX}
   Xlib, Classes, QForms, SysUtils, QControls, QGraphics, CppParser,
@@ -58,7 +58,7 @@ type
     fOnKeyPress: TKeyPressEvent;
     fOnResize: TNotifyEvent;
     fOnlyGlobals: boolean;
-    fCurrentIndex: integer;
+    fCurrentStatement: PStatement;
     fIncludedFiles: TStringList;
     fHideDelay: integer; // allow empty list once, then hide when empty again
     function ApplyClassFilter(Index, CurrentID: integer; InheritanceIDs: TIntList): boolean;
@@ -75,6 +75,7 @@ type
     procedure Search(const Phrase, Filename: AnsiString);
     procedure Hide;
     function SelectedStatement: PStatement;
+    property CurrentStatement: PStatement read fCurrentStatement write fCurrentStatement;
   published
     property ShowCount : integer read fShowCount write fShowCount;
     property Parser: TCppParser read fParser write fParser;
@@ -90,7 +91,6 @@ type
     property OnKeyPress: TKeyPressEvent read fOnKeyPress write fOnKeyPress;
     property OnResize: TNotifyEvent read fOnResize write fOnResize;
     property OnlyGlobals: boolean read fOnlyGlobals write fOnlyGlobals;
-    property CurrentIndex: integer read fCurrentIndex write fCurrentIndex;
     property Visible: boolean read IsVisible;
   end;
 
@@ -157,7 +157,7 @@ begin
     )
     ) and
     (IsIncluded(PStatement(fParser.Statements[Index])^._FileName) or
-    IsIncluded(PStatement(fParser.Statements[Index])^._DeclImplFileName));
+     IsIncluded(PStatement(fParser.Statements[Index])^._DeclImplFileName));
 end;
 
 function TCodeCompletion.ApplyMemberFilter(Index, CurrentID, ParentID: integer; InheritanceIDs: TIntList): boolean;
@@ -194,17 +194,17 @@ procedure TCodeCompletion.GetCompletionFor(Phrase : AnsiString);
 var
 	I: integer;
 	InheritanceIDs: TIntList;
-	fCurrentID, fParentID: integer;
+	CurrentID, ParentID: integer;
 	parent : PStatement;
 begin
 	// Pulling off the same trick as in TCppParser.FindStatementOf, but ignore everything after last operator
 	InheritanceIDs := TIntList.Create;
 	try
 		// ID of current class
-		if fCurrentIndex <> -1 then
-			fCurrentID := PStatement(fParser.Statements[fCurrentIndex])^._ID
+		if Assigned(fCurrentStatement) then
+			CurrentID := fCurrentStatement^._ID
 		else
-			fCurrentID := -1;
+			CurrentID := -1;
 
 		I := fParser.FindLastOperator(Phrase);
 		if I = 0 then begin
@@ -212,9 +212,9 @@ begin
 			// only add globals and members of the current class
 
 			// Also consider classes the current class inherits from
-			fParser.GetInheritanceIDs(fCurrentIndex,InheritanceIDs);
+			fParser.GetInheritanceIDs(fCurrentStatement,InheritanceIDs);
 			for I := 0 to fParser.Statements.Count - 1 do
-				if ApplyClassFilter(I, fCurrentID, InheritanceIDs) then
+				if ApplyClassFilter(I, CurrentID, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
 
 		end else begin
@@ -223,23 +223,23 @@ begin
 			Delete(Phrase,I,MaxInt);
 
 			// Add statements of all the text before the last operator
-			parent := fParser.FindStatementOf(Phrase,fCurrentIndex);
+			parent := fParser.FindStatementOf(Phrase,fCurrentStatement);
 			if not Assigned(parent) then
 				Exit;
 
 			// Then determine which type it has (so we can use it as a parent ID)
-			if (parent^._Kind <> skClass) then begin // already found type
-				parent := fParser.FindTypeStatementOf(parent^._Type);
+			if not (parent^._Kind = skClass) then begin // already found type
+				parent := fParser.FindTypeStatementOf(parent^._Type,fCurrentStatement);
 				if not Assigned(parent) then
 					Exit;
 			end;
 
-			fParentID := parent^._ID;
+			ParentID := parent^._ID;
 			fParser.GetInheritanceIDs(parent,InheritanceIDs); // slow...
 
 			// Then add members of the ClassIDs and InheritanceIDs
 			for I := 0 to fParser.Statements.Count - 1 do
-				if ApplyMemberFilter(I, fCurrentID, fParentID, InheritanceIDs) then
+				if ApplyMemberFilter(I, CurrentID, ParentID, InheritanceIDs) then
 					fFullCompletionStatementList.Add(fParser.Statements[I]);
 		end;
 	finally

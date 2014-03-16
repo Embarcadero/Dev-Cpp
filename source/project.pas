@@ -188,11 +188,11 @@ var
 begin
 	try
 		result := true;
-		if not Assigned(fEditor) and not FileExists(fFileName) then begin  // create dummy editor
-			workeditor := TSynEdit.Create(nil); // does this even happen???
-			workeditor.UnCollapsedLines.SaveToFile(fFileName); // create blank file
+		if not Assigned(fEditor) and not FileExists(fFileName) then begin  // file is neither open, nor saved
+			workeditor := TSynEdit.Create(nil);
+			workeditor.UnCollapsedLines.SaveToFile(fFileName);
 			workeditor.Free;
-		end else if assigned(fEditor) and fEditor.Text.Modified then begin
+		end else if Assigned(fEditor) and fEditor.Text.Modified then begin
 			result := fEditor.Save;
 			if FileExists(fEditor.FileName) then
 				FileSetDate(fEditor.FileName, DateTimeToFileDate(Now));
@@ -263,15 +263,16 @@ end;
 
 destructor TProject.Destroy;
 begin
-  if fModified then Save;
-  fFolders.Free;
-  fFolderNodes.Free;
-  fIniFile.Free;
-  fUnits.Free;
-  if (fNode <> nil) and (not fNode.Deleting) then
-    fNode.Free;
-  fOptions.Free;
-  inherited;
+	if fModified then
+		Save;
+	fFolders.Free;
+	fFolderNodes.Free;
+	fIniFile.Free;
+	fUnits.Free;
+	if Assigned(fNode) and (not fNode.Deleting) then
+		fNode.Free;
+	fOptions.Free;
+	inherited;
 end;
 
 procedure TProject.SetCompilerOption(index : integer; value : char);

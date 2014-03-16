@@ -777,6 +777,7 @@ type
     procedure HookTextBuffer(aBuffer: TSynEditStringList;
       aUndo, aRedo: TSynEditUndoList);
     procedure UnHookTextBuffer;
+    function IsEmpty : boolean;
 
     //### Code Folding ###
     procedure CollapseAll;
@@ -6139,6 +6140,19 @@ begin
   WordWrap := vOldWrap;
 end;
 
+function TCustomSynEdit.IsEmpty : boolean;
+var
+	i : integer;
+begin
+	Result := true;
+	for i := 0 to fLines.Count - 1 do begin
+		if Length(fLines[i]) > 0 then begin
+			Result := false;
+			break;
+		end;
+	end;
+end;
+
 procedure TCustomSynEdit.HookTextBuffer(aBuffer: TSynEditStringList;
   aUndo, aRedo: TSynEditUndoList);
 var
@@ -7201,6 +7215,14 @@ begin
             DoLinesDeleted(CaretY, 1);
           end;
           InternalCaretXY := BufferCoord(1, CaretY); // like seen in the Delphi editor
+          DoOnPaintTransient(ttAfter);
+        end;
+      ecDuplicateLine:
+        if not ReadOnly and (Lines.Count > 0)
+        then begin
+          DoOnPaintTransient(ttBefore);
+          Lines.Insert(CaretY, Lines[CaretY - 1]);
+          DoLinesInserted(CaretY + 1, 1);
           DoOnPaintTransient(ttAfter);
         end;
       ecClearAll:
