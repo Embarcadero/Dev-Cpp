@@ -227,16 +227,18 @@ begin
 			// Make it look busy
 			Screen.Cursor:=crHourglass;
 
-			// Add default include search directories
-			with devCompilerSets.CurrentSet do begin
-				for I := 0 to CDir.Count - 1 do
-					MainForm.CppParser.AddIncludePath(CDir[I]);
-				for I := 0 to CppDir.Count - 1 do
-					MainForm.CppParser.AddIncludePath(CppDir[I]);
+			// Add default include search directories if a compiler has been installed
+			if Assigned(devCompilerSets.CurrentSet) then begin
+				with devCompilerSets.CurrentSet do begin
+					for I := 0 to CDir.Count - 1 do
+						MainForm.CppParser.AddIncludePath(CDir[I]);
+					for I := 0 to CppDir.Count - 1 do
+						MainForm.CppParser.AddIncludePath(CppDir[I]);
 
-				// Add default include dirs last, just like gcc does
-				for I := 0 to DefInclude.Count - 1 do
-					MainForm.CppParser.AddIncludePath(DefInclude[I]);
+					// Add default include dirs last, just like gcc does
+					for I := 0 to DefInclude.Count - 1 do
+						MainForm.CppParser.AddIncludePath(DefInclude[I]);
+				end;
 			end;
 
 			f := TStringList.Create;

@@ -1204,7 +1204,7 @@ begin
 	end;}
 
 	// Obtain default includes when changing current file?
-	fDefines.CommaText := GetCompilerOutput(BinDir + pd,'cpp.exe','-dM -E -xc NUL'); // TODO: use pipe/cmd redirection
+	fDefines.CommaText := GetCompilerOutput(BinDir + pd,'cpp.exe','-dM -E -x c++ NUL'); // TODO: use command of current file
 end;
 
 procedure TdevCompilerSet.SetExecutables;

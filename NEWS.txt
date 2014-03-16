@@ -19,6 +19,8 @@ Version 5.6.0 - *
 - Completed closing symbols are now deleted when the corresponding opening character is deleted.
 - Fixed a argument highlighting problem in the function tooltip.
 - As of 5.6.0 RC1, a different completion cache file format is used. Older versions are not forward compatible.
+- The console pauser can now pass 32K characters to the running program instead of just 1K.
+- Fixed a bug in the first time config window that caused a crash when no compilers were installed.
 
 Version 5.5.3 - 5 November 2013
 

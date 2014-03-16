@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\ClassBrowsing\
 UsePackages=0
 [Parameters]
-RunParams=-c .\config
+RunParams=
 HostApplication=
 Launcher=
 UseLauncher=0

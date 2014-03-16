@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 	SetConsoleTitle(argv[1]);
 	
 	// Then build the to-run application command
-	char command[1024] = "";
+	char command[32768] = ""; // the maximum amount CreateProcess can handle
 	for(int i = 1;i < argc;i++) {
 		strcat(command,&argv[i][0]);
 		if(i != (argc-1)) { // Leave out the last space
