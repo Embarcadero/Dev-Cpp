@@ -1494,7 +1494,7 @@ begin
 
 			// Either show an include filename or parser info
 			Line := Trim(fText.Lines[p.Line -1]);
-			if StartsStr('#include',line) or StartsStr('# include',line) then // show filename hint
+			if MainForm.CppParser.IsIncludeLine(Line) then // show filename hint
 				ShowFileHint
 			else
 				ShowParserHint;
@@ -1681,7 +1681,7 @@ begin
 
 			// Try to open the header
 			line := Trim(fText.Lines[p.Row-1]);
-			if StartsStr('#include',line) then begin
+			if MainForm.CppParser.IsIncludeLine(Line) then begin
 				FileName := MainForm.CppParser.GetHeaderFileName(fFileName,line);
 				e := MainForm.GetEditorFromFileName(FileName);
 				if Assigned(e) then

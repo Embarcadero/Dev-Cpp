@@ -193,6 +193,7 @@ type
     function GetSystemHeaderFileName(const FileName : AnsiString): AnsiString; // <file.h>
     function GetLocalHeaderFileName(const RelativeTo, FileName: AnsiString): AnsiString; // "file.h"
     function GetHeaderFileName(const RelativeTo, Line: AnsiString): AnsiString; // both
+    function IsIncludeLine(const Line: AnsiString): boolean;
     procedure Load(const FileName: AnsiString;const relativeto : AnsiString);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1799,6 +1800,11 @@ end;
 function TCppParser.GetHeaderFileName(const RelativeTo, Line: AnsiString): AnsiString;
 begin
 	Result := cbutils.GetHeaderFileName(RelativeTo,Line,fIncludePaths);
+end;
+
+function TCppParser.IsIncludeLine(const Line: AnsiString): boolean;
+begin
+	Result := cbutils.IsIncludeLine(Line);
 end;
 
 procedure TCppParser.AddFileToScan(Value: AnsiString; InProject: boolean);

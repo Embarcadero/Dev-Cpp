@@ -78,6 +78,7 @@ type
     procedure HandleBranch(const Line : AnsiString);
     procedure HandleInclude(const Line : AnsiString);
     function ExpandMacros(const Line : AnsiString) : AnsiString;
+    function RemoveSuffixes(const Input : AnsiString) : AnsiString;
     // line checking stuff
     function FirstLineChar(const Line : AnsiString) : Char;
     function LastLineChar(const Line : AnsiString) : Char;
@@ -394,7 +395,7 @@ begin
 	Item := new(PDefine);
 	Item^.Name := Name;
 	Item^.Args := Args;
-	Item^.Value := Value;
+	Item^.Value := Value; 
 	Item^.HardCoded := HardCoded;
 	if HardCoded then
 		fHardDefines.Add(Item)
@@ -408,7 +409,7 @@ var
 	Name, Args, Value, S : AnsiString;
 begin
 	// Remove define
-	S := TrimLeft(Copy(Line,Length('#define') + 1,MaxInt));
+	S := TrimLeft(Copy(Line,Length('#define') + 1,MaxInt)); // TODO: there may be spaces before define
 
 	// Split name/value by first space outside of ()
 	I := 1;
@@ -532,17 +533,20 @@ var
 		LeftOpValue, RightOpValue, ResultValue : Int64;
 		LeftOp, RightOp, Operator, ResultLine : AnsiString;
 
-		function RemoveSuffixes(const Input : AnsiString) : AnsiString;
+		function GetOperandValue(const Name : AnsiString) : integer;
 		var
-			I : integer;
+			Define : PDefine;
 		begin
-			Result := Input;
-			if not (Result[1] in ['0'..'9']) then
-				Exit; // don't process names
-			I := Length(Result);
-			while (I >= 0) and (Result[i] in ['A'..'Z','a'..'z']) do
-				Dec(I);
-			Delete(Result,I + 1,MaxInt);
+			Result := 0;
+			if Length(Name) > 0 then begin
+				if (Name[1] in ['0'..'9']) then // it's a number, don't try to find the define
+					Result := StrToIntDef(RemoveSuffixes(Name),0)
+				else begin // it's a word. try to get a define with the same name
+					Define := GetDefine(Name);
+					if Assigned(Define) then // this word is a define
+						Result := StrToIntDef(RemoveSuffixes(Define^.Value),0)
+				end;
+			end;
 		end;
 	begin
 		// Find the first closing brace (this should leave us at the innermost brace pair)
@@ -611,12 +615,9 @@ var
 				RightOp := Copy(Line,Tail,Head - Tail + 1);
 				EquatEnd := Head; // marks begin of equation
 
-				// Remove length suffixes from ops
-
-
 				// Evaluate after removing length suffixes...
-				LeftOpValue := StrToInt64Def(RemoveSuffixes(LeftOp),0);
-				RightOpValue := StrToInt64Def(RemoveSuffixes(RightOp),0);
+				LeftOpValue := GetOperandValue(LeftOp);
+				RightOpValue := GetOperandValue(RightOp);
 				if Operator = '+' then
 					ResultValue := LeftOpValue + RightOpValue
 				else if Operator = '-' then
@@ -731,7 +732,7 @@ begin
 			SetCurrentBranch(false) // so don't take this one either
 		else begin
 			IfLine := TrimLeft(Copy(Line,Length('if')+1,MaxInt)); // remove if
-			SetCurrentBranch(EvaluateIf(IfLine)); // TODO: evaluate
+			SetCurrentBranch(EvaluateIf(IfLine));
 		end;
 	end else if StartsStr('else',Line) then begin
 		// if a branch that is not at our level is false, ignore (that means we're skipping)
@@ -814,6 +815,21 @@ end;
 		until TokenEnd > Length(Value);
 	end else
 		fResult := fResult + Value;}
+
+function TCppPreprocessor.RemoveSuffixes(const Input : AnsiString) : AnsiString;
+var
+	I : integer;
+begin
+	Result := Input; // remove suffixes like L from integer values
+	if Length(Input) > 0 then begin
+		if not (Result[1] in ['0'..'9']) then
+			Exit; // don't process names
+		I := Length(Result);
+		while (I >= 0) and (Result[i] in ['A'..'Z','a'..'z']) do // find first alphabetical character at end
+			Dec(I);
+		Delete(Result,I + 1,MaxInt); // remove from there
+	end;
+end;
 
 procedure TCppPreprocessor.PreprocessBuffer;
 var

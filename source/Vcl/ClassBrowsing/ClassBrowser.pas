@@ -234,13 +234,14 @@ begin
 		iFrom := 0; // if showing inheritance, a big speed penalty
 
 	// create folders that have this branch as parent
-	if ParentIndex <> -1 then with PStatement(fParser.Statements[ParentIndex])^ do begin
-		if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
-			CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
-	end else begin
-		if HasSubFolder('') then
-			CreateFolders('', Node);
-	end;
+	if ParentIndex <> -1 then
+		with PStatement(fParser.Statements[ParentIndex])^ do begin
+			if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
+				CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
+			end else begin
+				if HasSubFolder('') then
+					CreateFolders('', Node);
+			end;
 
 	inheritanceids := TIntList.Create;
 	try
@@ -252,7 +253,13 @@ begin
 		bInherited := False;
 		for I := iFrom to fParser.Statements.Count - 1 do begin
 			with PStatement(fParser.Statements[I])^ do begin
-				if not _Visible or _Loaded then // TODO: for now, do NOT show loaded items
+
+				// TODO: for now, do NOT show loaded items
+				if not _Visible or _Loaded then
+					Continue;
+
+				// Prevent infinite parent/child loops
+				if I = ParentIndex then
 					Continue;
 
 				// Stop the current recurse when we run out of children
@@ -906,29 +913,27 @@ begin
 			Sender.Canvas.Font.Color := clGray;
 	end else if Stage = cdPostPaint then begin
 		st := Node.Data;
-		if Assigned(st) then begin // useless check really
-			if bInherited then
-				fCnv.Font.Color := clGray
-			else
-				fCnv.Font.Color := clMaroon;
+		if bInherited then
+			fCnv.Font.Color := clGray
+		else
+			fCnv.Font.Color := clMaroon;
 
-			// draw function arguments to the right of the already drawn text
-			NodeRect := Node.DisplayRect(true);
-			NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._ScopelessCmd) + 2;
-			fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
+		// draw function arguments to the right of the already drawn text
+		NodeRect := Node.DisplayRect(true);
+		NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._ScopelessCmd) + 2;
+		fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
 
-			fCnv.Font.Color := clGray;
-			if st^._Type <> '' then
-				typetext := st^._Type
-			else if st^._Kind in [skConstructor, skDestructor] then
-				typetext := fParser.StatementKindStr(st^._Kind)
-			else
-				Exit; // done
+		fCnv.Font.Color := clGray;
+		if st^._Type <> '' then
+			typetext := st^._Type
+		else if st^._Kind in [skConstructor, skDestructor] then
+			typetext := fParser.StatementKindStr(st^._Kind)
+		else
+			Exit; // done
 
-			// Then draw node type to the right of the arguments
-			NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
-			fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, ': ' + typetext);
-		end;
+		// Then draw node type to the right of the arguments
+		NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
+		fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, ': ' + typetext);
 	end;
 end;
 

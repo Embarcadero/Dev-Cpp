@@ -70,6 +70,7 @@ type
   function IsCfile(const Filename: AnsiString): boolean;
   function IsHfile(const Filename: AnsiString): boolean;
   procedure GetSourcePair(const FName: AnsiString; var CFile, HFile: AnsiString);
+  function IsIncludeLine(const Line : AnsiString) : boolean;
 
 implementation
 
@@ -222,6 +223,16 @@ begin
 		Result := Dir + Result
 	else
 		Result := FileName; // signifies failure
+end;
+
+function IsIncludeLine(const Line : AnsiString) : boolean;
+begin
+	Result := False;
+	if (Length(Line) > 0) and (Line[1] = '#') then begin // it's a preprocessor line
+		if StartsStr('include',TrimLeft(Copy(Line,2,MaxInt))) then begin // the first word after # is 'include'
+			Result := True;
+		end;
+	end;
 end;
 
 function GetHeaderFileName(const RelativeTo, Line: AnsiString; IncludePaths : TStringList): AnsiString;
