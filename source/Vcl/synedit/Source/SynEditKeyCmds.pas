@@ -137,7 +137,6 @@ const
   ecLineSelect      = 233;  // Line selection mode
 
   ecMatchBracket    = 250;  // Go to matching bracket
-  ecCommentBlock    = 251;  // Comment Block
 
   ecGotoMarker0     = 301;  // Goto marker
   ecGotoMarker1     = 302;  // Goto marker
@@ -177,7 +176,8 @@ const
   ecInsertLine      = 510;  // Break line at current position, leave caret
   ecChar            = 511;  // Insert a character at current position
   ecDuplicateLine   = 512;  // Duplicate current line
-  
+  ecMoveSelUp       = 513;  // Move selection up
+  ecMoveSelDown     = 514;  // Move selection down
   ecImeStr          = 550;  // Insert character(s) from IME
 
   ecUndo            = 601;  // Perform undo if available
@@ -189,7 +189,10 @@ const
   ecBlockUnindent   = 611;  // Unindent selection
   ecTab             = 612;  // Tab key
   ecShiftTab        = 613;  // Shift+Tab key
-
+  ecComment         = 614;
+  ecUncomment       = 615;
+  ecToggleComment   = 616;
+  
   ecAutoCompletion  = 650;
 
   ecUpperCase       = 620; // apply to the current or previous word
@@ -327,7 +330,7 @@ type
 {$ENDIF}
 
 const
-  EditorCommandStrs: array[0..101] of TIdentMapEntry = (
+  EditorCommandStrs: array[0..100] of TIdentMapEntry = (
     (Value: ecNone; Name: 'ecNone'),
     (Value: ecLeft; Name: 'ecLeft'),
     (Value: ecRight; Name: 'ecRight'),
@@ -395,7 +398,6 @@ const
     (Value: ecTab; Name: 'ecTab'),
     (Value: ecShiftTab; Name: 'ecShiftTab'),
     (Value: ecMatchBracket; Name: 'ecMatchBracket'),
-    (Value: ecCommentBlock; Name: 'ecCommentBlock'),
     (Value: ecNormalSelect; Name: 'ecNormalSelect'),
     (Value: ecColumnSelect; Name: 'ecColumnSelect'),
     (Value: ecLineSelect; Name: 'ecLineSelect'),

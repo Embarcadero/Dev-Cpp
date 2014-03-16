@@ -121,6 +121,8 @@ type
 
   function GetPrettyLine(hwnd : TListView;i : integer = -1) : AnsiString; // removes #10 subitem delimiters
 
+  function IsWindows64 : boolean;
+
   // These functions are about six times faster than the locale sensitive AnsiX() versions
   function StartsStr(const subtext,text : AnsiString) : boolean;
   function StartsText(const subtext,text : AnsiString) : boolean;
@@ -144,16 +146,77 @@ type
   // Reverse Pos() function
   function LastPos(const SubStr, S: AnsiString): integer;
 
-  function IsWindows64 : boolean;
+  // Native SelectDirectory function that lets you set flags
+  function NewSelectDirectory(const Caption: string; const Root: WideString; var Directory: string): Boolean;
+
+  // Fast implementation of StringReplace which does not use AnsiX (MBCS ready) comparison
+  function FastStringReplace(const S, OldPattern, NewPattern: AnsiString;Flags: TReplaceFlags): AnsiString;
+
+  // Fast implementation of IndexOf which does not use AnsiX (MBCS ready) comparison
+  function FastIndexOf(List : TStrings;const S : AnsiString) : integer; overload;
+  function FastIndexOf(List : TStringlist;const S : AnsiString) : integer; overload;
+
 implementation
 
 uses
 {$IFDEF WIN32}
-  devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor;
+  devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor, ShlObj, ActiveX;
 {$ENDIF}
 {$IFDEF LINUX}
   devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
 {$ENDIF}
+
+function FastStringReplace(const S, OldPattern, NewPattern: AnsiString;Flags: TReplaceFlags): AnsiString;
+var
+  SearchStr, Patt, NewStr: AnsiString;
+  Offset: Integer;
+begin
+  if rfIgnoreCase in Flags then
+  begin
+    SearchStr := UpperCase(S);
+    Patt := UpperCase(OldPattern);
+  end else
+  begin
+    SearchStr := S;
+    Patt := OldPattern;
+  end;
+  NewStr := S;
+  Result := '';
+  while SearchStr <> '' do
+  begin
+    Offset := Pos(Patt, SearchStr);
+    if Offset = 0 then
+    begin
+      Result := Result + NewStr;
+      Break;
+    end;
+    Result := Result + Copy(NewStr, 1, Offset - 1) + NewPattern;
+    NewStr := Copy(NewStr, Offset + Length(OldPattern), MaxInt);
+    if not (rfReplaceAll in Flags) then
+    begin
+      Result := Result + NewStr;
+      Break;
+    end;
+    SearchStr := Copy(SearchStr, Offset + Length(Patt), MaxInt);
+  end;
+end;
+
+function FastIndexOf(List : TStrings;const S : AnsiString) : integer;
+begin
+	with List do begin
+		for Result := 0 to Count - 1 do
+			if CompareText(List[Result], S) = 0 then Exit;
+		Result := -1;
+	end;
+end;
+
+function FastIndexOf(List : TStringlist;const S : AnsiString) : integer;
+begin
+	with List do begin
+		if not List.Sorted then Result := FastIndexOf(TStrings(List),S) else
+			if not Find(S, Result) then Result := -1;
+	end;
+end;
 
 function IsKeyDown(key : integer) : boolean;
 begin
@@ -1129,6 +1192,73 @@ begin
 	for i := 1 to length(s) do
 		if s[i] = c then
 			Inc(result);
+end;
+
+function NewSelectDirectoryCallback(Wnd: HWND; uMsg: UINT; lParam, lpData: LPARAM): Integer stdcall;
+begin
+	if (uMsg = BFFM_INITIALIZED) and (lpData <> 0) then
+		SendMessage(Wnd, BFFM_SETSELECTION, Integer(True), lpdata);
+	result := 0;
+end;
+
+function NewSelectDirectory(const Caption: string; const Root: WideString; var Directory: string): Boolean;
+var
+  WindowList: Pointer;
+  BrowseInfo: TBrowseInfo;
+  Buffer: PChar;
+  OldErrorMode: Cardinal;
+  RootItemIDList, ItemIDList: PItemIDList;
+  ShellMalloc: IMalloc;
+  IDesktopFolder: IShellFolder;
+  Eaten, Flags: LongWord;
+begin
+  Result := False;
+  if not DirectoryExists(Directory) then
+    Directory := '';
+  FillChar(BrowseInfo, SizeOf(BrowseInfo), 0);
+  if (ShGetMalloc(ShellMalloc) = S_OK) and (ShellMalloc <> nil) then
+  begin
+    Buffer := ShellMalloc.Alloc(MAX_PATH);
+    try
+      RootItemIDList := nil;
+      if Root <> '' then
+      begin
+        SHGetDesktopFolder(IDesktopFolder);
+        IDesktopFolder.ParseDisplayName(Application.Handle, nil,
+          POleStr(Root), Eaten, RootItemIDList, Flags);
+      end;
+      with BrowseInfo do
+      begin
+        hwndOwner := Application.Handle;
+        pidlRoot := RootItemIDList;
+        pszDisplayName := Buffer;
+        lpszTitle := PChar(Caption);
+        ulFlags := BIF_RETURNONLYFSDIRS or BIF_USENEWUI; // FIX
+        if Directory <> '' then
+        begin
+          lpfn := NewSelectDirectoryCallback;
+          lParam := Integer(PChar(Directory));
+        end;
+      end;
+      WindowList := DisableTaskWindows(0);
+      OldErrorMode := SetErrorMode(SEM_FAILCRITICALERRORS);
+      try
+        ItemIDList := ShBrowseForFolder(BrowseInfo);
+      finally
+        SetErrorMode(OldErrorMode);
+        EnableTaskWindows(WindowList);
+      end;
+      Result :=  ItemIDList <> nil;
+      if Result then
+      begin
+        ShGetPathFromIDList(ItemIDList, Buffer);
+        ShellMalloc.Free(ItemIDList);
+        Directory := Buffer;
+      end;
+    finally
+      ShellMalloc.Free(Buffer);
+    end;
+  end;
 end;
 
 end.

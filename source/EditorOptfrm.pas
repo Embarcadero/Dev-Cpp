@@ -591,22 +591,16 @@ begin
 		StrtoPoint(fFoldColor, Syntax.Values[cFld]);
 
 		// Completion
-		cbArray.Checked := ArrayComplete;
-		cbBraces.Checked := BraceComplete;
-		cbComments.Checked := CommentComplete;
-		cbInclude.Checked := IncludeComplete;
-		cbParenth.Checked := ParentheseComplete;
-		cbSingleQuotes.Checked := SingleQuoteComplete;
-		cbDoubleQuotes.Checked := DoubleQuoteComplete;
+		cbArray.Checked := ArrayComplete and CompleteSymbols;
+		cbBraces.Checked := BraceComplete and CompleteSymbols;
+		cbComments.Checked := CommentComplete and CompleteSymbols;
+		cbInclude.Checked := IncludeComplete and CompleteSymbols;
+		cbParenth.Checked := ParentheseComplete and CompleteSymbols;
+		cbSingleQuotes.Checked := SingleQuoteComplete and CompleteSymbols;
+		cbDoubleQuotes.Checked := DoubleQuoteComplete and CompleteSymbols;
 
 		cbSymbolComplete.Checked := CompleteSymbols;
 		cbDeleteCompleted.Checked := DeleteSymbolPairs;
-
-		cbArray.Enabled := cbSymbolComplete.Checked;
-		cbBraces.Enabled := cbSymbolComplete.Checked;
-		cbComments.Enabled := cbSymbolComplete.Checked;
-		cbInclude.Enabled := cbSymbolComplete.Checked;
-		cbParenth.Enabled := cbSymbolComplete.Checked;
 	end;
 
 	for idx:= 0 to pred(cpp.AttrCount) do begin
@@ -754,6 +748,7 @@ begin
 		ParserHints:=         cbParserHints.Checked;
 
 		// Completion
+		CompleteSymbols:=     cbSymbolComplete.Checked;
 		ArrayComplete:=       cbArray.Checked;
 		BraceComplete:=       cbBraces.Checked;
 		CommentComplete:=     cbComments.Checked;
@@ -761,7 +756,6 @@ begin
 		ParentheseComplete:=  cbParenth.Checked;
 		SingleQuoteComplete:= cbSingleQuotes.Checked;
 		DoubleQuoteComplete:= cbDoubleQuotes.Checked;
-		CompleteSymbols:=     cbSymbolComplete.Checked;
 		DeleteSymbolPairs:=   cbDeleteCompleted.Checked;
 
 		// Autosave
@@ -1641,11 +1635,13 @@ end;
 
 procedure TEditorOptForm.cbSymbolCompleteClick(Sender: TObject);
 begin
-	cbArray.Enabled := cbSymbolComplete.Checked;
-	cbBraces.Enabled := cbSymbolComplete.Checked;
-	cbComments.Enabled := cbSymbolComplete.Checked;
-	cbInclude.Enabled := cbSymbolComplete.Checked;
-	cbParenth.Enabled := cbSymbolComplete.Checked;
+	cbArray.Checked := cbSymbolComplete.Checked;
+	cbBraces.Checked := cbSymbolComplete.Checked;
+	cbComments.Checked := cbSymbolComplete.Checked;
+	cbInclude.Checked := cbSymbolComplete.Checked;
+	cbParenth.Checked := cbSymbolComplete.Checked;
+	cbSingleQuotes.Checked := cbSymbolComplete.Checked;
+	cbDoubleQuotes.Checked := cbSymbolComplete.Checked;
 end;
 
 procedure TEditorOptForm.FormClose(Sender: TObject;var Action: TCloseAction);

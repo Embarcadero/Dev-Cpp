@@ -153,6 +153,7 @@ type
     function CheckForKeyword: boolean;
     function CheckForMember: boolean;
     function CheckForTypedef: boolean;
+    function CheckForTypedefEnum: boolean;
     function CheckForTypedefStruct: boolean;
     function CheckForStructs: boolean;
     function CheckForMethod(var sType,sName,sArgs : AnsiString) : boolean;
@@ -173,14 +174,13 @@ type
     function HandleStatement: boolean;
     procedure Parse(const FileName: AnsiString; ManualUpdate: boolean = False; processInh: boolean = True;Stream : TMemoryStream = nil);
     procedure DeleteTemporaries;
-    function FindIncludeRec(const Filename: AnsiString; DeleteIt: boolean = False): PIncludesRec;
-    function IsValidIdentifier(const Name : AnsiString) : boolean;
+    function FindFileIncludes(const Filename: AnsiString; DeleteIt: boolean = False): PFileIncludes;
   public
     procedure ResetDefines;
     procedure AddHardDefineByParts(const Name, Args, Value : AnsiString);
     procedure AddHardDefineByLine(const Line: AnsiString);
     procedure InvalidateFile(const FileName: AnsiString);
-    function GetFileIncludes(const Filename: AnsiString): AnsiString;
+    procedure GetFileIncludes(const Filename: AnsiString;var List : TStringList);
     function IsCfile(const Filename: AnsiString): boolean;
     function IsHfile(const Filename: AnsiString): boolean;
     procedure GetSourcePair(const FName: AnsiString; var CFile, HFile: AnsiString);
@@ -290,7 +290,7 @@ begin
   FreeAndNil(fProjectFiles);
 
   for i := 0 to fIncludesList.Count -1 do
-    Dispose(PIncludesRec(fIncludesList.Items[i]));
+    Dispose(PFileIncludes(fIncludesList.Items[i]));
   FreeAndNil(fIncludesList);
 
   for i := 0 to fOutstandingTypedefs.Count -1 do
@@ -626,31 +626,6 @@ begin
 		Result := ssLocal;
 end;
 
-function TCppParser.IsValidIdentifier(const Name : AnsiString) : boolean;
-{var
-	I : integer;}
-begin
-	Result := True; // TODO: come up with a proper set of requirements
-	Exit;
-	{result := false;
-
-	// the first character must not be a number
-	if (Length(Name) > 0) and not (Name[1] in ['A'..'Z','a'..'z','_']) then
-		Exit;
-
-	// the remaining chars must be in the following range
-	for I := 2 to Length(Name) do
-		if not (Name[i] in ['0'..'9','A'..'Z','a'..'z','_','*','&']) then begin
-			// could be template stuff after this
-			if (Name[i] = '<') and (Name[Length(Name)] = '>') then
-				// don't bother scanning template contents. Too difficult :(
-				Result := true;
-			Exit;
-		end;
-
-	result := true;}
-end;
-
 procedure TCppParser.CheckForSkipStatement;
 var
   iSkip: integer;
@@ -776,6 +751,14 @@ begin
   Result := SameStr(fTokenizer[fIndex]^.Text,'enum');
 end;
 
+function TCppParser.CheckForTypedefEnum: boolean;
+begin
+  //we assume that typedef is the current index, so we check the next
+  //should call CheckForTypedef first!!!
+  Result := (fIndex < fTokenizer.Tokens.Count - 1) and
+    SameStr(fTokenizer[fIndex + 1]^.Text,'enum');
+end;
+
 function TCppParser.CheckForTypedefStruct: boolean;
 begin
   //we assume that typedef is the current index, so we check the next
@@ -836,14 +819,16 @@ begin
 	fIndexBackup := fIndex;
 
 	// Gather data for the string parts
-	while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['(', ';', ':', '{', '}', #0]) do begin
+	while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['(', ';', ':', '{', '}', #0, '#']) do begin
 
-		// Skip GCC extensions
-		if SameStr(fTokenizer[fIndex]^.Text,'__attribute__') then begin
-			Inc(fIndex); // keyword and its list
+		// Skip some compiler extensions BEFORE our function type
+		if not bTypeOK and StartsText('__mingw',fTokenizer[fIndex]^.Text) or SameStr('__attribute__',fTokenizer[fIndex]^.Text) then begin
+			// TODO: this should be fixed by performing macro expansion
+			if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] = '(') then
+				Inc(fIndex); // skip keyword. argument list is skipped at end of loop body
 
 		// If the first brace is ahead, we've found the function name. Stop adding to type
-		end else if (fIndex < fTokenizer.Tokens.Count - 1) and (fTokenizer[fIndex + 1]^.Text[1] = '(') then begin // and start of a function
+		end else if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] = '(') then begin // and start of a function
 			sName := fTokenizer[fIndex]^.Text;
 			sArgs := fTokenizer[fIndex + 1]^.Text;
 			bTypeOK := sType <> '';
@@ -852,6 +837,8 @@ begin
 
 			// Allow constructor/destructor too
 			if not bTypeOk then begin
+
+				// Check for constructor/destructor outside class body
 				DelimPos := Pos('::',sName);
 				if DelimPos > 0 then begin
 					bTypeOK := true;
@@ -874,7 +861,7 @@ begin
 			break;
 
 		// Still walking through type
-		end else if IsValidIdentifier(fTokenizer[fIndex]^.Text) then begin
+		end else {if IsValidIdentifier(fTokenizer[fIndex]^.Text) then} begin
 			sType := sType + fTokenizer[fIndex]^.Text + ' ';
 			bTypeOK := sType <> '';
 		end;
@@ -919,12 +906,12 @@ begin
 	fIndexBackup := fIndex;
 
 	// Use fIndex so we can reuse checking functions
-	if fIndex < fTokenizer.Tokens.Count - 1 then begin
+	if fIndex + 1 < fTokenizer.Tokens.Count then begin
 
 		// Check the current and the next token
 		for I := 0 to 1 do begin
 			if CheckForKeyword or
-				(fTokenizer[fIndex]^.Text[1] in [',', ';', ':', '{', '}', '!', '/', '+', '-', '(', '<', '>']) or
+				(fTokenizer[fIndex]^.Text[1] in ['#', ',', ';', ':', '{', '}', '!', '/', '+', '-', '<', '>']) or
 				(fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = '.') or
 				((Length(fTokenizer[fIndex]^.Text) > 1) and
 				(fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text) - 1] = '-') and
@@ -933,6 +920,19 @@ begin
 				// Reset index and fail
 				fIndex := fIndexBackup;
 				Exit; // fail
+
+			// Could be a function pointer?
+			end else if (fTokenizer[fIndex]^.Text[1] in ['(']) then begin
+
+				// Quick fix: there must be a pointer operator in the first tiken
+				if (fIndex + 1 >= fTokenizer.Tokens.Count) or
+                  (fTokenizer[fIndex+1]^.Text[1] <> '(') or
+                  (Pos('*',fTokenizer[fIndex]^.Text) = 0) then begin
+
+					// Reset index and fail
+					fIndex := fIndexBackup;
+					Exit; // fail
+				end;
 			end;
 			Inc(fIndex);
 		end;
@@ -943,11 +943,11 @@ begin
 
 	// Fail if we do not find a comma or a semicolon or a ( (inline constructor)
 	while fIndex < fTokenizer.Tokens.Count - 1 do begin
-		if (fTokenizer[fIndex]^.Text[1] in ['{', '}']) or CheckForKeyword then begin
+		if (fTokenizer[fIndex]^.Text[1] in ['#','{', '}']) or CheckForKeyword then begin
 			Break; // fail
-		end else if (fTokenizer[fIndex]^.Text[1] = '(') and (fTokenizer[fIndex]^.Text[2] = '(') then begin
+		end else if (fTokenizer[fIndex]^.Text[1] = '(') and (fTokenizer[fIndex]^.Text[2] = '(') then begin // TODO: is this used to remove __attribute stuff?
 			Break;
-		end else if fTokenizer[fIndex]^.Text[1] in [',',';','('] then begin
+		end else if fTokenizer[fIndex]^.Text[1] in [',',';'] then begin
 			Result := True;
 			Break;
 		end;
@@ -974,17 +974,21 @@ begin
 	Inc(fIndex);
 
 	// Walk up to first new word (before first comma or ;)
-	while (fIndex + 1 < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex + 1]^.Text[1] in [',',';'])) do begin
+	while (fIndex + 1 < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex + 1]^.Text[1] in ['(',',',';'])) do begin
 		OldType := OldType + fTokenizer[fIndex]^.Text + ' ';
 		Inc(fIndex);
 	end;
 	OldType := TrimRight(OldType);
 
 	// Add synonyms for old
-	if (fIndex < fTokenizer.Tokens.Count) then begin
+	if (fIndex < fTokenizer.Tokens.Count) and (OldType <> '') then begin
 		repeat
 			// Support multiword typedefs
-			if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
+			if (fIndex+1 < fTokenizer.Tokens.Count) and
+            (fTokenizer[fIndex+0]^.Text[1] = '(') and
+            (fTokenizer[fIndex+1]^.Text[1] = '(') then begin
+				break; // TODO: do NOT handle function pointer defines
+			end else if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
 				NewType := NewType + fTokenizer[fIndex]^.Text + ' '
 			end else begin
 				NewType := TrimRight(NewType);
@@ -1188,6 +1192,8 @@ begin
 						end else begin
 							if fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = ']' then // cut-off array brackets
 								S1 := S1 + Copy(fTokenizer[I]^.Text, 1, Pos('[', fTokenizer[I]^.Text) - 1) + ' '
+							else if fTokenizer[I]^.Text[1] in ['*','&'] then // do not add spaces after pointer operator
+								S1 := S1 + fTokenizer[I]^.Text
 							else
 								S1 := S1 + fTokenizer[I]^.Text + ' ';
 						end;
@@ -1414,21 +1420,29 @@ end;
 
 procedure TCppParser.HandleVar;
 var
-  LastType: AnsiString;
-  Args: AnsiString;
-  Cmd: AnsiString;
+	LastType, Args, Cmd, S: AnsiString;
+	IsFunctionPointer: boolean;
 begin
 	// Keep going and stop on top of the variable name
 	LastType := '';
+	IsFunctionPointer := False;
 	repeat
-		if (fIndex+1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in ['(',',', ';', ':', '}']) then
+		if (fIndex+2 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] = '(') and (fTokenizer[fIndex + 2]^.Text[1] = '(') then begin
+			IsFunctionPointer := Pos('*',fTokenizer[fIndex + 1]^.Text) > 0;
+			if not IsFunctionPointer then
+				break; // inline constructor
+		end else if (fIndex+1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in ['(',',', ';', ':', '}', '#']) then begin
 			Break;
+		end;
+
+		// TODO: why is this needed?
 		if (not SameStr(fTokenizer[fIndex]^.Text,'struct')) and
 		   (not SameStr(fTokenizer[fIndex]^.Text,'class')) and
 		   (not SameStr(fTokenizer[fIndex]^.Text,'union')) then
-			LastType := Trim(LastType + ' ' + fTokenizer[fIndex]^.Text);
+			LastType := LastType + ' ' + fTokenizer[fIndex]^.Text;
 		Inc(fIndex);
-	until fIndex >= fTokenizer.Tokens.Count;
+	until (fIndex >= fTokenizer.Tokens.Count) or IsFunctionPointer;
+	LastType := Trim(LastType);
 
 	// Don't bother entering the scanning loop when we have failed
 	if fIndex >= fTokenizer.Tokens.Count then
@@ -1455,15 +1469,21 @@ begin
 		// int a(3)
 		// as
 		// int a
-		if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '(') then begin
+		if (not IsFunctionPointer) and (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '(') then begin
 			while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', '}']) do
 				Inc(fIndex);
 		end;
 
 		// Did we stop on top of the variable name?
-		if (fIndex < fTokenizer.Tokens.Count) then begin
+		if fIndex < fTokenizer.Tokens.Count then begin
 			if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
-				if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
+				if IsFunctionPointer and (fIndex+1 < fTokenizer.Tokens.Count) then begin
+					S :=  fTokenizer[fIndex]^.Text;
+					Cmd := Trim(Copy(S,3,Length(S)-3)); // (*foo) -> foo
+					Args := fTokenizer[fIndex+1]^.Text; // (int a,int b)
+					LastType := LastType + '(*)' + Args; // void(int a,int b)
+					Inc(fIndex);
+				end else if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
 					Cmd := Copy(fTokenizer[fIndex]^.Text, 1, Pos('[', fTokenizer[fIndex]^.Text) - 1);
 					Args := Copy(fTokenizer[fIndex]^.Text, Pos('[', fTokenizer[fIndex]^.Text), Length(fTokenizer[fIndex]^.Text) - Pos('[', fTokenizer[fIndex]^.Text) + 1);
 				end else begin
@@ -1474,7 +1494,7 @@ begin
 					-1,
 					GetCurrentClass,
 					fCurrentFile,
-					LastType + ' ' + fTokenizer[fIndex]^.Text,
+					LastType + ' ' + Cmd,
 					LastType,
 					Cmd,
 					Args,
@@ -1588,8 +1608,11 @@ begin
 		HandleEnum;
 	end else if CheckForTypedef then begin
 		if CheckForTypedefStruct then begin
-			Inc(fIndex); // skip 'typdef'
+			Inc(fIndex); // skip 'typedef'
 			HandleStructs(True)
+		end else if CheckForTypedefEnum then begin
+			Inc(fIndex); // skip 'typedef'
+			HandleEnum;
 		end else
 			HandleOtherTypedefs;
 	end else if CheckForStructs then begin
@@ -1607,8 +1630,6 @@ begin
 end;
 
 procedure TCppParser.Parse(const FileName: AnsiString; ManualUpdate: boolean = False; processInh: boolean = True; Stream : TMemoryStream = nil);
-var
-  P: PIncludesRec;
 begin
   // Perform some validation before we start
   if not fEnabled then
@@ -1624,14 +1645,8 @@ begin
 
   // Preprocess the file...
   try
-    // Add the current file to the file record
-    P := New(PIncludesRec);
-    P^.BaseFile := FileName;
-    P^.IncludeFiles := '';
-    fIncludesList.Add(P);
-
-    // Let the preprocessor augment the include records and more
-    fPreprocessor.SetIncludesRec(P);
+    // Let the preprocessor augment the include records
+    fPreprocessor.SetIncludesList(fIncludesList);
     fPreprocessor.SetIncludePaths(fIncludePaths);
     fPreprocessor.SetScannedFileList(fScannedFiles);
     fPreprocessor.SetScanOptions(fParseGlobalHeaders,fParseLocalHeaders);
@@ -1650,13 +1665,14 @@ begin
   try
     fTokenizer.TokenizeBuffer(PAnsiChar(fPreprocessor.Result));
     if fTokenizer.Tokens.Count = 0 then begin
+      fPreprocessor.Reset;
       fTokenizer.Reset;
       Exit;
     end;
   except
     if (not ManualUpdate) and Assigned(fOnEndParsing) then
       fOnEndParsing(Self);
-    fPreprocessor.Reset; // remove buffers from memory
+    fPreprocessor.Reset;
     fTokenizer.Reset;
     Exit;
   end;
@@ -1672,9 +1688,6 @@ begin
     if processInh then
       PostProcessInheritance;
   finally
-    // remove last comma
-    with P^ do
-      Delete(IncludeFiles, Length(IncludeFiles), 1);
     fSkipList.Clear; // remove data from memory, but reuse structures
     fCurrentClassLevel.Clear;
     FCurrentClass.Clear;
@@ -1717,7 +1730,7 @@ begin
 
 		// Remove files included by cache
 		for I := fIncludesList.Count - 1 downto fScannedBaseIndex do begin
-			Dispose(PIncludesRec(fIncludesList[I]));
+			Dispose(PFileIncludes(fIncludesList[I]));
 			fIncludesList.Delete(I);
 		end;
 	end else begin
@@ -1732,7 +1745,7 @@ begin
 
 		// We don't include anything anymore
 		for I := fIncludesList.Count - 1 downto 0 do
-			Dispose(PIncludesRec(fIncludesList[I]));
+			Dispose(PFileIncludes(fIncludesList[I]));
 		fIncludesList.Clear;
 
 		// Clear the cache too
@@ -1935,7 +1948,7 @@ procedure TCppParser.InvalidateFile(const FileName: AnsiString);
 var
 	I: integer;
 	I1: integer;
-	P: PIncludesRec;
+	P: PFileIncludes;
 begin
 	if Filename = '' then
 		Exit;
@@ -1946,7 +1959,7 @@ begin
 	// what happens with the statements that inherit from one of these???
 	// POSSIBLE WORKAROUND 1: invalidate the other file too (don't like it much...)
 
-	// delete statements from file
+	// delete statements of file
 	I := 0;
 	while I < fStatementList.Count do
 		if SameText(PStatement(fStatementList[I])^._FileName, FileName) or SameText(PStatement(fStatementList[I])^._DeclImplFileName, FileName) then begin
@@ -1966,9 +1979,9 @@ begin
 		fScannedFiles.Delete(I1);
 
 	// remove its include files list
-	P := FindIncludeRec(FileName, True);
+	P := FindFileIncludes(FileName, True);
 	if Assigned(P) then
-		Dispose(PIncludesRec(P));
+		Dispose(PFileIncludes(P));
 end;
 
 procedure TCppParser.Save(const FileName: AnsiString;const relativeto : AnsiString);
@@ -2075,13 +2088,13 @@ begin
 		for I := 0 to HowMany do begin
 
 			// Save RELATIVE filenames
-			relative := ReplaceFirstText(PIncludesRec(fIncludesList[I])^.BaseFile,relativeto,'%path%\');
+			relative := ReplaceFirstText(PFileIncludes(fIncludesList[I])^.BaseFile,relativeto,'%path%\');
 			I2 := Length(relative);
 			Write(I2, SizeOf(Integer));
 			Write(relative[1], I2);
 
 			// Save RELATIVE filenames
-			relative := ReplaceFirstText(PIncludesRec(fIncludesList[I])^.IncludeFiles,relativeto,'%path%\');
+			relative := ReplaceFirstText(PFileIncludes(fIncludesList[I])^.IncludeFiles,relativeto,'%path%\');
 			I2 := Length(relative);
 			Write(I2,SizeOf(Integer));
 			Write(relative[1],I2);
@@ -2115,7 +2128,7 @@ var
 	I, ItemLength: integer;
 	MAGIC: array[0..7] of Char;
 	Statement: PStatement;
-	P: PIncludesRec;
+	P: PFileIncludes;
 	relative : AnsiString;
 begin
 
@@ -2225,7 +2238,7 @@ begin
 		// read includes info for each scanned file
 		Read(HowMany,SizeOf(Integer));
 		for I := 0 to HowMany do begin
-			P := New(PIncludesRec);
+			P := New(PFileIncludes);
 
 			// Load RELATIVE filenames
 			Read(ItemLength,SizeOf(Integer));
@@ -2408,11 +2421,16 @@ begin
 end;
 
 function TCppParser.IndexOfStatement(ID: integer): integer;
+var
+	I : integer;
 begin
-	for result := fStatementList.Count - 1 downto 0 do
-		if PStatement(fStatementList[result])^._ID = ID then
+	// Always perform a forward search. Otherwise multiple struct definitions will NOT work.
+	for I := 0 to fStatementList.Count - 1 do
+		if PStatement(fStatementList[I])^._ID = ID then begin
+			Result := I;
 			Exit;
-	result := -1;
+		end;
+	Result := -1;
 end;
 
 function TCppParser.Locate(const Full: AnsiString; WithScope: boolean): PStatement;
@@ -2590,8 +2608,6 @@ begin
 
 				CheckForSkipStatement;
 			until (fIndex >= fTokenizer.Tokens.Count) or (fIndex >= FuncEndIndex);
-			fLaterScanning := False;
-
 			// add the all-important "this" pointer as a local variable
 			if ParentIndex <> -1 then begin
 				AddStatement(
@@ -2617,114 +2633,98 @@ begin
 				PStatement(fStatementList[ClosestIndex])^._DeclImplFileName,
 				PStatement(fStatementList[ClosestIndex])^._DeclImplLine,
 				PStatement(fStatementList[ClosestIndex])^._ParentID);
+
+			// Everything scanned before this point should be removed
+			fLaterScanning := False;
 		end;
 	end;
 end;
 
 function TCppParser.GetClass(const Phrase : AnsiString) : AnsiString;
 var
-	firstop,position : integer;
+	I, FirstOp : integer;
 begin
-
 	// Obtain stuff before first operator
-	firstop := Pos('->',Phrase);
-	if firstop = 0 then begin
-		firstop := Pos('::',Phrase);
-		if firstop = 0 then begin
-			firstop := Pos('.',Phrase);
-			if firstop = 0 then begin // no operators? copy whole
-				Result := Phrase;
-				Exit;
-			end;
+	FirstOp := Length(Phrase)+1;
+	for I := 1 to Length(Phrase)-1 do begin
+		if (phrase[i] = '-') and (Phrase[i+1] = '>') then begin
+			FirstOp := I;
+			break;
+		end else if (Phrase[i] = ':') and (Phrase[i+1] = ':') then begin
+			FirstOp := I;
+			break;
+		end else if (Phrase[i] = '.') then begin
+			FirstOp := I;
+			break;
 		end;
 	end;
 
-	Result := Copy(Phrase,1,firstop-1);
-
-	// Strip function arguments at end
-	position := Pos('(', Result);
-	if position > 0 then
-		Result := Copy(Result, 1, position - 1);
+	Result := Copy(Phrase,1,FirstOp-1);
 end;
 
 function TCppParser.GetMember(const Phrase : AnsiString) : AnsiString;
 var
-	firstop,secondop,I,position : integer;
+	FirstOp,SecondOp,I : integer;
 begin
-
-	I := 1;
-	firstop := 0;
-	secondop := 0;
-
 	// Obtain stuff after first operator
-	while I < Length(phrase) do begin
-		if (phrase[i] = '-') and (phrase[i+1] = '>') then begin
-			firstop := i + 2;
+	FirstOp := 0;
+	for I := 1 to Length(Phrase)-1 do begin
+		if (phrase[i] = '-') and (Phrase[i+1] = '>') then begin
+			FirstOp := I + 2;
 			break;
-		end else if (phrase[i] = ':') and (phrase[i+1] = ':') then begin
-			firstop := i + 2;
+		end else if (Phrase[i] = ':') and (Phrase[i+1] = ':') then begin
+			FirstOp := I + 2;
 			break;
-		end else if (phrase[i] = '.') then begin
-			firstop := i + 1;
+		end else if (Phrase[i] = '.') then begin
+			FirstOp := I + 1;
 			break;
 		end;
-		Inc(i);
 	end;
 
-	if firstop = 0 then begin
+	if FirstOp = 0 then begin
 		Result := '';
 		Exit;
 	end;
 
-	// And before second op, if there is one
-	I := firstop;
-	while I < Length(phrase) do begin
-		if (phrase[i] = '-') and (phrase[i+1] = '>') then begin
-			secondop := i;
+	// ... and before second op, if there is one
+	SecondOp := 0;
+	for I := firstop to Length(Phrase)-1 do begin
+		if (phrase[i] = '-') and (Phrase[i+1] = '>') then begin
+			SecondOp := I;
 			break;
-		end else if (phrase[i] = ':') and (phrase[i+1] = ':') then begin
-			secondop := i;
+		end else if (Phrase[i] = ':') and (Phrase[i+1] = ':') then begin
+			SecondOp := I;
 			break;
-		end else if (phrase[i] = '.') then begin
-			secondop := i;
+		end else if (Phrase[i] = '.') then begin
+			SecondOp := I;
 			break;
 		end;
-		Inc(i);
 	end;
 
-	if secondop = 0 then
-		Result := Copy(Phrase,firstop,MaxInt)
+	if SecondOp = 0 then
+		Result := Copy(Phrase,FirstOp,MaxInt)
 	else
-		Result := Copy(Phrase,firstop,secondop - firstop);
-
-	// Strip function arguments at end
-	position := Pos('(', Result);
-	if position > 0 then
-		Result := Copy(Result, 1, position - 1);
+		Result := Copy(Phrase,FirstOp,SecondOp - FirstOp);
 end;
 
 function TCppParser.GetOperator(const Phrase : AnsiString) : AnsiString;
 var
 	I : integer;
 begin
-
-	I := 1;
-
-	// Obtain stuff after first operator
-	while I <= Length(phrase) do begin
-		if (i < Length(phrase)) and (phrase[i] = '-') and (phrase[i+1] = '>') then begin
-			Result := '->';
-			Exit;
-		end else if (i < Length(phrase)) and (phrase[i] = ':') and (phrase[i+1] = ':') then begin
-			Result := '::';
-			Exit;
-		end else if (phrase[i] = '.') then begin
-			Result := '.';
-			Exit;
-		end;
-		Inc(i);
-	end;
 	Result := '';
+	// Find first operator
+	for I := 1 to Length(Phrase)-1 do begin
+		if (phrase[i] = '-') and (Phrase[i+1] = '>') then begin
+			Result := '->';
+			break;
+		end else if (Phrase[i] = ':') and (Phrase[i+1] = ':') then begin
+			Result := '::';
+			break;
+		end else if (Phrase[i] = '.') then begin
+			Result := '.';
+			break;
+		end;
+	end;
 end;
 
 
@@ -3033,17 +3033,14 @@ end;
 
 procedure TCppParser.DeleteTemporaries;
 var
-  I: integer;
+	I: integer;
 begin
-  I := fBaseIndex;
-  while I < fStatementList.Count do begin
-    if PStatement(fStatementList[I])^._Temporary then begin
-      Dispose(PStatement(fStatementList[I]));
-      fStatementList.Delete(I);
-    end
-    else
-      Inc(I);
-  end;
+	for I := fStatementList.Count - 1 downto fBaseIndex do begin
+		if PStatement(fStatementList[I])^._Temporary then begin
+			Dispose(PStatement(fStatementList[I]));
+			fStatementList.Delete(I);
+		end;
+	end;
 end;
 
 procedure TCppParser.ScanMethodArgs(const ArgStr: AnsiString; const Filename: AnsiString; Line, ClassID: integer);
@@ -3082,8 +3079,8 @@ begin
 					skVariable,
 					ssLocal,
 					scsPrivate,
-					False,
-					True,
+					False, // not visible in class browser
+					True, // allow duplicates
 					False);
 			end;
 
@@ -3093,14 +3090,14 @@ begin
 	end;
 end;
 
-function TCppParser.FindIncludeRec(const Filename: AnsiString; DeleteIt: boolean): PIncludesRec;
+function TCppParser.FindFileIncludes(const Filename: AnsiString; DeleteIt: boolean): PFileIncludes;
 var
 	I: integer;
 begin
 	Result := nil;
 	for I := 0 to fIncludesList.Count - 1 do
-		if SameText(PIncludesRec(fIncludesList[I])^.BaseFile,Filename) then begin
-			Result := PIncludesRec(fIncludesList[I]);
+		if SameText(PFileIncludes(fIncludesList[I])^.BaseFile,Filename) then begin
+			Result := PFileIncludes(fIncludesList[I]);
 			if DeleteIt then
 				fIncludesList.Delete(I);
 			Break;
@@ -3122,53 +3119,39 @@ begin
 	cbutils.GetSourcePair(FName,CFile,HFile);
 end;
 
-function TCppParser.GetFileIncludes(const Filename: AnsiString): AnsiString;
+procedure TCppParser.GetFileIncludes(const Filename: AnsiString;var List : TStringList);
 
-	procedure RecursiveFind(const Fname: AnsiString);
+	procedure RecursiveFind(const FileName: AnsiString);
 	var
 		I: integer;
-		P: PIncludesRec;
+		P: PFileIncludes;
 		sl: TStrings;
 	begin
-		if Fname = '' then
+		if FileName = '' then
 			Exit;
+		List.Add(FileName);
 
-		fFileIncludes.Add(FName);
-
-		// Where did we include this file?
-		P := FindIncludeRec(Fname);
+		// Find the files this file includes
+		P := FindFileIncludes(FileName);
 		if Assigned(P) then begin
 
 			// recursively search included files
 			sl := TStringList.Create;
 			try
+				// For each file this file includes, perform the same trick
 				sl.CommaText := P^.IncludeFiles;
-				for I := 0 to sl.Count - 1 do begin
-					if fFileIncludes.IndexOf(sl[I]) = -1 then begin
-						fFileIncludes.Add(sl[I]);
+				for I := 0 to sl.Count - 2 do // Last one is always an empty item
+					if FastIndexOf(List,sl[I]) = -1 then
 						RecursiveFind(sl[I]);
-					end;
-				end;
 			finally
 				sl.Free;
 			end;
 		end;
 	end;
 begin
-	// returns a ';' separated list of all included files in file Filename
-	Result := '';
-
-	fFileIncludes.Clear;
-	fFileIncludes.CaseSensitive := false;
-	fFileIncludes.Sorted := True;
-	fFileIncludes.Duplicates := dupIgnore;
-
+	List.Clear;
+	List.Sorted := false;
 	RecursiveFind(Filename);
-	Result := fFileIncludes.CommaText;
 end;
 
 end.
-
-
-
-

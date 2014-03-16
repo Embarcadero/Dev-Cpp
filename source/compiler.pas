@@ -278,7 +278,7 @@ begin
 
 	writeln(F, 'CXXFLAGS = $(CXXINCS) ' + fCppCompileParams);
 	writeln(F, 'CFLAGS   = $(INCS) ' + fCompileParams);
-	writeln(F, 'RM       = rm -f');
+	writeln(F, 'RM       = ' + CLEAN_PROGRAM + ' -f'); // TODO: use del or rm?
 
 	Writeln(F);
 	if DoCheckSyntax then
@@ -295,7 +295,7 @@ begin
 		Writeln(F, 'include ' + GenMakePath1(fProject.Options.MakeIncludes.Strings[i]));
 
 	WriteMakeClean(F);
-	writeln(F);
+	Writeln(F);
 end;
 
 function TCompiler.FindDeps(const TheFile: AnsiString): AnsiString;
@@ -950,7 +950,7 @@ begin
        (Pos(CurrentSet.makeName,Line) = 1) or // ignore all make errors for now
        (Pos(CurrentSet.windresName + ' ',Line) = 1) or
        (Pos(CurrentSet.dllwrapName + ' ',Line) = 1) or
-       (Pos('rm ',Line) = 1) then Exit;
+       (Pos(CLEAN_PROGRAM + ' ',Line) = 1) then Exit;
 
 	// Direction strings
 	if StartsStr('In file included from ',OMsg) then begin
@@ -1026,6 +1026,8 @@ begin
 		if Length(fProject.Options.LinkerCmd) > 0 then
 			fLibrariesParams := fLibrariesParams + ' ' + StringReplace(fProject.Options.LinkerCmd, '_@@_', ' ', [rfReplaceAll])
 	end;
+
+	fLibrariesParams := Trim(fLibrariesParams);
 
 	// Add project settings that need to be passed to the linker
 	for I := 0 to CurrentSet.OptionList.Count - 1 do begin
@@ -1137,9 +1139,9 @@ begin
 				MainForm.pbCompilation.StepIt;
 			end;
 		end;
-	end else if StartsStr('rm -f ',Line) then begin // Cleaning obj files
+	end else if StartsStr(CLEAN_PROGRAM + ' ',Line) then begin // Cleaning obj files
 		MainForm.pbCompilation.StepIt;
-	end else if StartsStr('windres.exe ',Line) and Assigned(fProject) then begin // Resource files
+	end else if StartsStr(CurrentSet.windresName + ' ',Line) and Assigned(fProject) then begin // Resource files
 		filename := ExtractFileName(fProject.Options.PrivateResource);
 		if ContainsStr(Line,filename) then begin
 			MainForm.pbCompilation.StepIt;

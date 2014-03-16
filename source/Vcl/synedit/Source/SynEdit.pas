@@ -444,6 +444,8 @@ type
     procedure DoLinesInserted(FirstLine, Count: integer);
     procedure DoShiftTabKey;
     procedure DoTabKey;
+    procedure DoComment;
+    procedure DoUncomment;
     procedure DoCaseChange(const Cmd : TSynEditorCommand);
     function FindHookedCmdEvent(AHandlerProc: THookedCommandEvent): integer;
     procedure SynFontChanged(Sender: TObject);
@@ -6791,13 +6793,17 @@ var
   SpaceCount1: Integer;
   SpaceCount2: Integer;
   BackCounter: Integer;
+  OrigBlockBegin: TBufferCoord;
+  OrigBlockEnd: TBufferCoord;
+  OrigCaret: TBufferCoord;
+  EndLine: integer;
   StartOfBlock: TBufferCoord;
   bChangeScroll: boolean;
   moveBkm: boolean;
   WP: TBufferCoord;
   Caret: TBufferCoord;
   CaretNew: TBufferCoord;
-  i: integer;
+  i, j: integer;
 {$IFDEF SYN_MBCSSUPPORT}
   s: string;
 {$ENDIF}
@@ -7223,6 +7229,94 @@ begin
           DoOnPaintTransient(ttBefore);
           Lines.Insert(CaretY, Lines[CaretY - 1]);
           DoLinesInserted(CaretY + 1, 1);
+          fUndoList.AddChange(crLineBreak, CaretXY, CaretXY, '', smNormal);
+          InternalCaretXY := BufferCoord(1, CaretY); // like seen in the Delphi editor
+          DoOnPaintTransient(ttAfter);
+        end;
+      ecMoveSelUp:
+        if not ReadOnly and (Lines.Count > 0) and (BlockBegin.Line > 1)
+        then begin
+          DoOnPaintTransient(ttBefore);
+
+          // Backup caret and selection
+          OrigBlockBegin := BlockBegin;
+          OrigBlockEnd := BlockEnd;
+
+          // Delete line above selection
+          s := Lines[OrigBlockBegin.Line - 2]; // before start, 0 based
+          Lines.Delete(OrigBlockBegin.Line - 2); // before start, 0 based
+          DoLinesDeleted(OrigBlockBegin.Line - 1,1); // before start, 1 based
+
+          // Insert line below selection
+          Lines.Insert(OrigBlockEnd.Line - 1,S);
+          DoLinesInserted(OrigBlockEnd.Line,1);
+
+          // Restore caret and selection
+          SetCaretAndSelection(
+            BufferCoord(CaretX,CaretY-1),
+            BufferCoord(1,OrigBlockBegin.Line-1), // put start of selection at start of top line
+            BufferCoord(Length(Lines[OrigBlockEnd.Line-2]) + 1,OrigBlockEnd.Line-1)); // put end of selection at end of bottom line
+
+          // Support undo, implement as drag and drop
+          fUndoList.BeginBlock;
+          try
+            fUndoList.AddChange(crSelection,
+              OrigBlockBegin,
+              OrigBlockEnd,
+              '',
+              smNormal);
+            fUndoList.AddChange(crDragDropInsert,
+              BlockBegin, // modified
+              OrigBlockEnd, // same
+              S + #13#10 + SelText,
+              smNormal);
+          finally
+            fUndoList.EndBlock;
+          end;
+
+          DoOnPaintTransient(ttAfter);
+        end;
+      ecMoveSelDown:
+        if not ReadOnly and (Lines.Count > 0) and (BlockEnd.Line < Lines.Count)
+        then begin
+          DoOnPaintTransient(ttBefore);
+
+          // Backup caret and selection
+          OrigBlockBegin := BlockBegin;
+          OrigBlockEnd := BlockEnd;
+
+          // Delete line below selection
+          s := Lines[OrigBlockEnd.Line]; // after end, 0 based
+          Lines.Delete(OrigBlockEnd.Line); // after end, 0 based
+          DoLinesDeleted(OrigBlockEnd.Line,1); // before start, 1 based
+
+          // Insert line above selection
+          Lines.Insert(OrigBlockBegin.Line - 1,S);
+          DoLinesInserted(OrigBlockBegin.Line,1);
+
+          // Restore caret and selection
+          SetCaretAndSelection(
+            BufferCoord(CaretX,CaretY+1),
+            BufferCoord(1,OrigBlockBegin.Line+1),
+            BufferCoord(Length(Lines[OrigBlockEnd.Line]) + 1,OrigBlockEnd.Line+1));
+
+          // Support undo, implement as drag and drop
+          fUndoList.BeginBlock;
+          try
+            fUndoList.AddChange(crSelection,
+              OrigBlockBegin,
+              OrigBlockEnd,
+              '',
+              smNormal);
+            fUndoList.AddChange(crDragDropInsert,
+              OrigBlockBegin, // same
+              BlockEnd, // modified
+              SelText + #13#10 + S,
+              smNormal);
+          finally
+            fUndoList.EndBlock;
+          end;
+
           DoOnPaintTransient(ttAfter);
         end;
       ecClearAll:
@@ -7346,6 +7440,30 @@ begin
         if not ReadOnly then DoTabKey;
       ecShiftTab:
         if not ReadOnly then DoShiftTabKey;
+      ecComment:
+        DoComment;
+      ecUnComment:
+        DoUncomment;
+      ecToggleComment:
+        if not ReadOnly then begin
+          OrigBlockBegin := BlockBegin;
+          OrigBlockEnd := BlockEnd;
+
+          // Ignore the last line the cursor is placed on
+          if OrigBlockEnd.Char = 1 then
+            EndLine := max(OrigBlockBegin.Line-1,OrigBlockEnd.Line-1)
+          else
+            EndLine := OrigBlockEnd.Line-1;
+
+          // if everything is commented, then uncomment
+          for I := OrigBlockEnd.Line-1 to EndLine do begin
+            if Pos('//',TrimLeft(Lines[i])) = 1 then begin
+              DoUncomment;
+              Exit;
+           end;
+         end;
+         DoComment;
+        end;
       ecMatchBracket:
         FindMatchingBracket;
       ecChar:
@@ -9106,6 +9224,116 @@ begin
       OldCaretXY, OldSelText, smNormal);
 
     InternalCaretX := NewX;
+  end;
+end;
+
+procedure TCustomSynEdit.DoComment;
+var
+  OrigBlockBegin, OrigBlockEnd, OrigCaret: TBufferCoord;
+  EndLine, I: integer;
+begin
+  if not ReadOnly then begin
+    DoOnPaintTransient(ttBefore);
+    fUndoList.BeginBlock;
+    try
+      OrigBlockBegin := BlockBegin;
+      OrigBlockEnd := BlockEnd;
+      OrigCaret := CaretXY;
+
+      // Ignore the last line the cursor is placed on
+      if OrigBlockEnd.Char = 1 then
+        EndLine := max(OrigBlockBegin.Line-1,OrigBlockEnd.Line-2)
+      else
+        EndLine := OrigBlockEnd.Line-1;
+
+      for I := OrigBlockBegin.Line-1 to EndLine do begin
+        Lines[i] := '//' + Lines[i];
+        fUndoList.AddChange(crInsert,
+          BufferCoord(1,i+1),
+          BufferCoord(3,i+1),
+          '',smNormal);
+      end;
+
+      // When grouping similar commands, process one comment action per undo/redo
+      fUndoList.AddChange(crNothing,BufferCoord(0,0),BufferCoord(0,0),'',smNormal);
+    finally
+      fUndoList.EndBlock;
+    end;
+
+    // Move begin of selection
+    if OrigBlockBegin.Char > 1 then
+      Inc(OrigBlockBegin.Char,2);
+
+    // Move end of selection
+    if OrigBlockEnd.Char > 1 then
+      Inc(OrigBlockEnd.Char,2);
+
+    // Move caret
+    if OrigCaret.Char > 1 then
+      Inc(OrigCaret.Char,2);
+
+    SetCaretAndSelection(OrigCaret,OrigBlockBegin,OrigBlockEnd);
+  end;
+end;
+
+procedure TCustomSynEdit.DoUncomment;
+var
+  OrigBlockBegin, OrigBlockEnd, OrigCaret: TBufferCoord;
+  EndLine, I, J: integer;
+  S: AnsiString;
+begin
+  if not ReadOnly then begin
+    DoOnPaintTransient(ttBefore);
+    fUndoList.BeginBlock;
+    try
+      OrigBlockBegin := BlockBegin;
+      OrigBlockEnd := BlockEnd;
+      OrigCaret := CaretXY;
+
+      // Ignore the last line the cursor is placed on
+      if OrigBlockEnd.Char = 1 then
+        EndLine := max(OrigBlockBegin.Line-1,OrigBlockEnd.Line-2)
+      else
+        EndLine := OrigBlockEnd.Line-1;
+
+      for I := OrigBlockBegin.Line-1 to EndLine do begin
+        S := Lines[i];
+        // Find // after blanks only
+        J := 1;
+        while (J+1 <= length(S)) and (S[j] in [#0..#32]) do
+          Inc(J);
+        if (j+1 <= length(S)) and (S[j] = '/') and (S[j+1] = '/') then begin
+          Delete(S,J,2);
+          Lines[i] := S;
+
+          fUndoList.AddChange(crDelete,
+            BufferCoord(J,i+1),
+            BufferCoord(J+2,i+1),
+            '//',smNormal);
+
+          // Move begin of selection
+          if (I = OrigBlockBegin.Line-1) and (OrigBlockBegin.Char > 1) then
+            Dec(OrigBlockBegin.Char,2);
+
+          // Move end of selection
+          if (I = OrigBlockEnd.Line-1) and (OrigBlockEnd.Char > 1) then
+            Dec(OrigBlockEnd.Char,2);
+
+          // Move caret
+          if (I = OrigCaret.Line-1) and (OrigCaret.Char > 1) then
+            Dec(OrigCaret.Char,2);
+        end;
+      end;
+
+      // When grouping similar commands, process one uncomment action per undo/redo
+      fUndoList.AddChange(crNothing,BufferCoord(0,0),BufferCoord(0,0),'',smNormal);
+
+      CaretXY := OrigCaret;
+      BlockBegin := OrigBlockBegin;
+      BlockEnd := OrigBlockEnd;
+    finally
+      fUndoList.EndBlock;
+    end;
   end;
 end;
 

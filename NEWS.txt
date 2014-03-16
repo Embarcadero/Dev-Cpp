@@ -1,3 +1,22 @@
+Version 5.6.1 - 12 Februari 2014
+
+- Added rm.exe to MinGW 4.8.1 compiler sets. This prevents the "CreateProcess(rm.exe...)" error when rebuilding.
+- Updated blog URL in English.lng.
+- Fixed UI glitch in the Debug Tab: the gdb log was invisible.
+- Fixed an undo bug in Duplicate Line functionality.
+- Project unit information in .dev files is only read once instead of twice now.
+- Updated Chinese translations.
+- Added "Move Selection Up/Down" functionality (listens to Ctrl+Shift+Up/Down by default).
+- Specific symbol completion options are now greyed out when the global option is disabled in Editor Options.
+- When selecting a folder, one can now create, edit and delete folders inside the select window.
+- The Import from MSVC and "Tip of the day" windows now uses the global UI font.
+- Fixed some bugs in the preprocessor: more complete code completion is available now.
+- Improved code completion and formatting for function pointers.
+- Code completion input from included files is now preserved when editing files.
+- Removed ghost entries in the class browser that would randomly dissapear and cause crashes when clicked on.
+- More bugs that I forgot about or are not important enough to mention.
+- Added an icon and the company name information to the uninstaller in the Programs and Features list.
+
 Version 5.6.0 - 24 Januari 2014
 
 - Updated TDM64 and MinGW32 to version 4.8.1.

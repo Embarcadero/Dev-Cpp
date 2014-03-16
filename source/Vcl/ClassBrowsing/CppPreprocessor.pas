@@ -32,8 +32,10 @@ uses
 const
   LineChars: set of Char = [#13, #10];
   SpaceChars: set of Char = [' ', #9];
-  OperatorChars: set of Char = ['+', '-', '*', '/', '!', '=', '<', '>'];
+  OperatorChars: set of Char = ['+', '-', '*', '/', '!', '=', '<', '>', '&', '|', '^'];
   IdentChars: set of Char = ['A'..'Z', '0'..'9', 'a'..'z', '_', '*', '&', '~'];
+  MacroIdentChars: set of Char = ['A'..'Z', 'a'..'z', '_'];
+  Operators : array[0..14] of string = ('*','/','+','-','<','<=','>','>=','==','!=','&','^','|','&&','||');
 
 type
   PFile = ^TFile;
@@ -57,8 +59,9 @@ type
     fFileName: AnsiString; // idem
     fBuffer: TStringList; // idem
     fResult: TStringList;
+    fCurrentIncludes : PFileIncludes;
     fPreProcIndex: integer;
-    fIncludesRec : PIncludesRec;
+    fIncludesList : TList;
     fHardDefines : TList; // set by "cpp -dM -E -xc NUL"
     fDefines : TList; // working set, editable
     fIncludes : TList; // list of files we've stepped into. last one is current file, first one is source file
@@ -92,6 +95,8 @@ type
     procedure SetCurrentBranch(value : boolean);
     procedure RemoveCurrentBranch;
     function GetResult : AnsiString;
+    // include stuff
+    function GetFileIncludesEntry(const FileName : AnsiString) : PFileIncludes;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -104,7 +109,7 @@ type
     procedure SetScanOptions(ParseSystem, ParseLocal : boolean);
     procedure SetIncludePaths(var List : TStringList);
     procedure SetScannedFileList(var List : TStringList);
-    procedure SetIncludesRec(var Rec : PIncludesRec);
+    procedure SetIncludesList(var List : TList);
     procedure PreprocessStream(const FileName: AnsiString; Stream: TMemoryStream);
     procedure PreprocessFile(const FileName: AnsiString);
     property Result : AnsiString read GetResult;
@@ -116,17 +121,17 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('Dev-C++', [TCppPreprocessor]);
+	RegisterComponents('Dev-C++', [TCppPreprocessor]);
 end;
 
 constructor TCppPreprocessor.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-  fIncludes := TList.Create;
-  fHardDefines := TList.Create;
-  fDefines := TList.Create;
-  fBranchResults := TIntList.Create;
-  fResult := TStringList.Create;
+	inherited Create(AOwner);
+	fIncludes := TList.Create;
+	fHardDefines := TList.Create;
+	fDefines := TList.Create;
+	fBranchResults := TIntList.Create;
+	fResult := TStringList.Create;
 end;
 
 destructor TCppPreprocessor.Destroy;
@@ -163,6 +168,7 @@ begin
 	end;
 	fIncludes.Clear;
 	fBranchResults.Clear;
+	fCurrentIncludes := nil;
 	ResetDefines; // do not throw away hardcoded
 end;
 
@@ -189,7 +195,7 @@ end;
 
 procedure TCppPreprocessor.OpenInclude(const FileName : AnsiString;Stream : TMemoryStream = nil);
 var
-	Item : PFile;
+	FileItem : PFile;
 	IsSystemFile : boolean;
 	IncludeLine : AnsiString;
 begin
@@ -197,14 +203,34 @@ begin
 	if fIncludes.Count > 0 then
 		PFile(fIncludes[fIncludes.Count - 1])^.Index := fIndex;
 
-	// Create and add new
-	Item := new(PFile);
-	Item^.Index := 0; // 0-based line counter
-	Item^.FileName := FileName;
-	Item^.Buffer := TStringList.Create;
+	// Add the new file to the includes of the current file
+	// Only add items to the include list of the given file if the file hasn't been scanned yet
+	// The above is fixed by checking for duplicates.
+	// The proper way would be to do backtracking of files we have FINISHED scanned.
+	// These are not the same files as the ones in fScannedFiles. We have STARTED scanning these.
+	if Assigned(fCurrentIncludes) then
+		with fCurrentIncludes^ do
+			if not ContainsText(IncludeFiles,FileName) then
+				IncludeFiles := IncludeFiles + AnsiQuotedStr(FileName, '"') + ',';
+
+	// Create and add new buffer/position
+	FileItem := new(PFile);
+	FileItem^.Index := 0; // 0-based line counter
+	FileItem^.FileName := FileName;
+	FileItem^.Buffer := TStringList.Create;
 
 	// Don't parse stuff we have already parsed
-	if (fScannedFiles.IndexOf(FileName) = -1) or Assigned(Stream) then begin
+	if (FastIndexOf(fScannedFiles,FileName) = - 1) or Assigned(Stream) then begin
+
+		// Keep track of files we include here
+		// Only create new items for files we have NOT scanned yet
+		fCurrentIncludes := GetFileIncludesEntry(FileName);
+		if not Assigned(fCurrentIncludes) then begin // do NOT create a new item for a file that's already in the list
+			fCurrentIncludes := New(PFileIncludes);
+			fCurrentIncludes^.BaseFile := FileName;
+			fCurrentIncludes^.IncludeFiles := '';
+			fIncludesList.Add(fCurrentIncludes);
+		end;
 
 		// Parse ONCE
 		if not Assigned(Stream) then
@@ -215,17 +241,17 @@ begin
 		if (fParseSystem and IsSystemFile) or (fParseLocal and not IsSystemFile) then begin
 			if Assigned(Stream) then begin
 				Stream.Position := 0; // start scanning from here
-				Item^.Buffer.LoadFromStream(Stream)
+				FileItem^.Buffer.LoadFromStream(Stream)
 			end else if FileExists(FileName) then
-				Item^.Buffer.LoadFromFile(FileName); // load it now
+				FileItem^.Buffer.LoadFromFile(FileName); // load it now
 		end;
 	end;
-	fIncludes.Add(Item);
+	fIncludes.Add(FileItem);
 
 	// Process it
-	fIndex := Item^.Index;
-	fFileName := Item^.FileName;
-	fBuffer := Item^.Buffer;
+	fIndex := FileItem^.Index;
+	fFileName := FileItem^.FileName;
+	fBuffer := FileItem^.Buffer;
 
 	// Update result file
 	IncludeLine := '#include ' + FileName + ':1';
@@ -238,6 +264,8 @@ end;
 procedure TCppPreprocessor.CloseInclude;
 begin
 	if fIncludes.Count > 0 then begin
+
+		// Close current buffer
 		PFile(fIncludes[fIncludes.Count - 1])^.Buffer.Free;
 		Dispose(PFile(fIncludes[fIncludes.Count - 1]));
 		fIncludes.Delete(fIncludes.Count - 1);
@@ -248,6 +276,9 @@ begin
 			fIndex := Includes[fIncludes.Count - 1]^.Index;
 			fFileName := Includes[fIncludes.Count - 1]^.FileName;
 			fBuffer := Includes[fIncludes.Count - 1]^.Buffer; // Point to previous buffer and start past the include we walked into
+
+			// Start augmenting previous include list again
+			fCurrentIncludes := GetFileIncludesEntry(fFileName);
 
 			// Update result file (we've left the previous file)
 			fResult.Add('#include ' + Includes[fIncludes.Count - 1]^.FileName + ':' + IntToStr(Includes[fIncludes.Count - 1]^.Index + 1));
@@ -280,9 +311,9 @@ begin
 	fParseLocal := ParseLocal;
 end;
 
-procedure TCppPreprocessor.SetIncludesRec(var Rec : PIncludesRec);
+procedure TCppPreprocessor.SetIncludesList(var List : TList);
 begin
-	fIncludesRec := Rec;
+	fIncludesList := List;
 end;
 
 procedure TCppPreprocessor.SetIncludePaths(var List : TStringList);
@@ -350,6 +381,12 @@ begin
 	// Remove #
 	Output := Copy(Output,2,MaxInt);
 
+	// Remove newlines in concatenated expressions
+	Output := FastStringReplace(Output, '\'#13, '', [rfReplaceAll]);
+	Output := FastStringReplace(Output, '\'#10, '', [rfReplaceAll]);
+	Output := FastStringReplace(Output, #13, '', [rfReplaceAll]);
+	Output := FastStringReplace(Output, #10, '', [rfReplaceAll]);
+
 	// Remove C-style comments
 	while true do begin
 		DelimPosFrom := Pos('/*',Output);
@@ -365,13 +402,7 @@ begin
 
 	// Don't remove multiple spaces. This can ruin defines which explicity use multiple spaces in their values
 
-	// Remove newlines
-	Output := StringReplace(Output, '\'#13, '', [rfReplaceAll]);
-	Output := StringReplace(Output, '\'#10, '', [rfReplaceAll]);
-	Output := StringReplace(Output, #13, '', [rfReplaceAll]);
-	Output := StringReplace(Output, #10, '', [rfReplaceAll]);
-
-	Output := Trim(Output);
+	Output := Trim(Output); // removes spaces between # and the first word
 end;
 
 function TCppPreprocessor.GetDefine(const Name : AnsiString) : PDefine;
@@ -493,10 +524,10 @@ end;
 
 procedure TCppPreprocessor.HandleDefine(const Line : AnsiString);
 begin
-	AddDefineByLine(Line,false);
-
-	if GetCurrentBranch then
+	if GetCurrentBranch then begin
+		AddDefineByLine(Line,false);
 		fResult[fPreProcIndex] := '#' + Line; // add define to result file so the parser can handle it
+	end;
 end;
 
 procedure TCppPreprocessor.HandleUndefine(const Line : AnsiString);
@@ -510,10 +541,10 @@ begin
 	// Remove from soft list only
 	for I := fDefines.Count - 1 downto 0 do begin
 		if PDefine(fDefines[i])^.Name = Name then begin
-			if not PDefine(fDefines[i])^.HardCoded then // memory does not belong to hardcoded list
+			if not PDefine(fDefines[i])^.HardCoded then // memory belongs to hardcoded list
 				Dispose(PDefine(fDefines[i]));
 			fDefines.Delete(i);
-			break; // ignore overriden defines 
+			break; // ignore overriden defines
 		end;
 	end;
 end;
@@ -523,6 +554,135 @@ var
 	Name, IfLine : AnsiString;
 	OldResult : boolean;
 	I : integer;
+
+	// Should start on top of the opening char
+	function SkipBraces(const Line : AnsiString; var Index : integer; Step : integer = 1) : boolean;
+	var
+		Level : integer;
+	begin
+		Level := 0;
+		while (Index > 0) and (Index <= Length(Line)) do begin // Find the corresponding opening brace
+			if Line[Index] = '(' then begin
+				Inc(Level);
+				if Level = 0 then begin
+					Result := true;
+					Exit;
+				end;
+			end else if Line[Index] = ')' then begin
+				Dec(Level);
+				if Level = 0 then begin
+					Result := true;
+					Exit;
+				end;
+			end;
+			Inc(Index,Step);
+		end;
+		Result := false;
+	end;
+
+	// Expand any token that isn't a number
+	function ExpandDefines(Line : AnsiString) : AnsiString;
+	var
+		SearchPos, Head, Tail, NameStart, NameEnd : integer;
+		Name, Args, InsertValue : AnsiString;
+		Define : PDefine;
+
+		function ExpandFunction(FunctionDefine : PDefine;const ArgValueString : AnsiString) : AnsiString;
+		var
+			ArgNames, ArgValues : TStringList;
+			I : integer;
+		begin
+			// Replace function by this string
+			Result := FunctionDefine^.Value;
+
+			// Replace names by values...
+			ArgNames := TStringList.Create;
+			ArgValues := TStringList.Create;
+			try
+				ExtractStrings([',','(',')'],[],PAnsiChar(FunctionDefine^.Args),ArgNames);
+				ExtractStrings([',','(',')'],[],PAnsiChar(ArgValueString),ArgValues); // extract from Line string
+
+				// If the argument count matches up, replace names by values
+				if ArgNames.Count = ArgValues.Count then begin
+					for I := 0 to ArgNames.Count - 1 do
+						Result := StringReplace(Result,Trim(ArgNames[i]),Trim(ArgValues[i]),[rfReplaceAll]);
+				end;
+			finally
+				ArgNames.Free;
+				ArgValues.Free;
+			end;
+		end;
+	begin
+		SearchPos := 1;
+		while (SearchPos <= Length(Line)) do begin
+
+			// We have found an identifier. It is not a number suffix. Try to expand it
+			if (Line[SearchPos] in MacroIdentChars) and ((SearchPos = 1) or not (Line[SearchPos-1] in ['0'..'9'])) then begin
+				Tail := SearchPos;
+				Head := SearchPos;
+
+				// Get identifier name (numbers are allowed, but not at the start
+				while (Head <= Length(Line)) and ((Line[Head] in MacroIdentChars) or (Line[Head] in ['0'..'9'])) do
+					Inc(Head);
+				Name := Copy(Line,Tail,Head - Tail);
+				NameStart := Tail;
+				NameEnd := Head;
+
+				// Skip over contents of these built-in functions
+				if Name = 'defined' then begin
+					Head := SearchPos + Length(Name);
+					while (Head <= Length(Line)) and (Line[Head] in SpaceChars) do
+						Inc(Head); // skip spaces
+
+					// Skip over its arguments
+					if SkipBraces(Line,Head) then begin
+						SearchPos := Head;
+					end else begin
+						Line := ''; // broken line
+						break;
+					end;
+
+				// We have found a regular define. Replace it by its value
+				end else begin
+
+					// Does it exist in the database?
+					Define := GetDefine(Name);
+					if not Assigned(Define) then begin
+						InsertValue := '0';
+					end else begin
+						while (Head <= Length(Line)) and (Line[Head] in SpaceChars) do
+							Inc(Head); // skip spaces
+
+						// It is a function. Expand arguments
+						if (Head <= Length(Line)) and (Line[Head] = '(') then begin
+							Tail := Head;
+							if SkipBraces(Line,Head) then begin
+								Args := Copy(Line,Tail,Head - Tail + 1);
+								InsertValue := ExpandFunction(Define,Args);
+								NameEnd := Head + 1;
+							end else begin
+								Line := ''; // broken line
+								break;
+							end;
+
+						// Replace regular define
+						end else begin
+							if Define^.Value <> '' then
+								InsertValue := Define^.Value
+							else
+								InsertValue := '0';
+						end;
+					end;
+
+					// Insert found value at place
+					Delete(Line,NameStart,NameEnd - NameStart);
+					Insert(InsertValue,Line,SearchPos);
+				end;
+			end else
+				Inc(SearchPos);
+		end;
+		Result := Line;
+	end;
 
 	function EvaluateDefines(Line : AnsiString) : AnsiString;
 	var
@@ -537,143 +697,148 @@ var
 				InvertResult := (I > 1) and (Line[I - 1] = '!');
 
 				// Find expression enclosed in () or after space
-				Head := I + Length('defined'); // find (
-				while (Head <= Length(Line)) and not (Line[Head] in IdentChars) do // skip spaces between defined and ( or identifier
-					Inc(Head);
-				Tail := Head;
-				while (Tail <= Length(Line)) and (Line[Tail] in IdentChars) do // find end of identifier
+				Tail := I + Length('defined'); // find (
+
+				// Skip spaces after defined keyword
+				while (Tail <= Length(Line)) and (Line[Tail] in SpaceChars) do
 					Inc(Tail);
-				S := Copy(Line,Head,Tail - Head);
+
+				// If we find an opening brace, find its closing brace
+				Head := Tail;
+				if (Head <= Length(Line)) and (Line[Head] = '(') then begin
+					if not SkipBraces(Line,Head) then begin
+						Result := '';
+						Exit;
+					end;
+					S := Copy(Line,Tail + 1,Head - Tail - 1);
+				// If we find an identifier, walk until it ends
+				end else begin
+					while (Head <= Length(Line)) and (Line[Head] in IdentChars) do // find end of identifier
+						Inc(Head);
+					S := Copy(Line,Tail ,Head - Tail);
+				end;
 
 				// Delete expression from string
-				Head := I;
+				Tail := I;
 				if InvertResult then
-					Dec(Head);
-				Delete(Line,Head,Tail - Head + 1);
+					Dec(Tail);
+				Delete(Line,Tail,Head - Tail + 1);
 
 				// Evaludate and replace expression by 1 or 0 (true or false)
 				DefineResult := Assigned(GetDefine(S));
 				if (DefineResult and not InvertResult) or (not DefineResult and InvertResult) then
-					Insert('1',Line,Head)
+					Insert('1',Line,Tail)
 				else
-					Insert('0',Line,Head);
+					Insert('0',Line,Tail);
 			end else
 				break;
 		end;
 		Result := Line;
 	end;
 
-	function EvaluateExpressions(Line : AnsiString) : AnsiString;
+	function EvaluateExpression(Line : AnsiString) : AnsiString;
 	var
-		Head, Tail, Level, EquatStart, EquatEnd, I : integer;
+		Head, Tail, EquatStart, EquatEnd, OperatorPos : integer;
 		LeftOpValue, RightOpValue, ResultValue : Int64;
 		LeftOp, RightOp, Operator, ResultLine : AnsiString;
 
-		function GetOperandValue(const Name : AnsiString) : integer;
+		function GetNextOperator(var Offset : integer) : AnsiString;
 		var
-			Define : PDefine;
+			I, PastOperatorEnd : integer;
 		begin
-			Result := 0;
-			if Length(Name) > 0 then begin
-				if (Name[1] in ['0'..'9']) then // it's a number, don't try to find the define
-					Result := StrToIntDef(RemoveSuffixes(Name),0)
-				else begin // it's a word. try to get a define with the same name
-					Define := GetDefine(Name);
-					if Assigned(Define) then // this word is a define
-						Result := StrToIntDef(RemoveSuffixes(Define^.Value),0)
+			for I := Low(Operators) to High(Operators) do begin
+				Offset := Pos(Operators[i],Line);
+
+				// Is this operator present in the line?
+				if Offset > 0 then begin
+
+					// Aren't we misinterpreting && for & (for example)?
+					PastOperatorEnd := Offset + Length(Operators[i]);
+					if (PastOperatorEnd <= Length(Line)) and not (Line[PastOperatorEnd] in OperatorChars) then begin
+						Result := Operators[i];
+						Exit;
+					end;
 				end;
 			end;
+			Offset := 0;
+			Result := '';
 		end;
 	begin
 		// Find the first closing brace (this should leave us at the innermost brace pair)
 		while true do begin
 			Head := Pos(')',Line);
 			if Head > 0 then begin
-				Level := 1;
 				Tail := Head;
-				while (Tail <= Length(Line)) do begin // Find the corresponding opening brace
-					if Line[Tail] = ')' then
-						Inc(Level)
-					else if Line[Tail] = '(' then begin
-						Dec(level);
-						if level = 1 then
-							break;
-					end;
-					Dec(Tail);
+				if SkipBraces(Line,Tail,-1) then begin // find the corresponding opening brace
+					ResultLine := EvaluateExpression(Copy(Line,Tail + 1,Head - Tail - 1)); // evaluate this (without braces)
+					Delete(Line,Tail,Head - Tail + 1); // Remove the old part AND braces
+					Insert(ResultLine,Line,Tail); // and replace by result
+				end else begin
+					Result := '';
+					Exit;
 				end;
-				ResultLine := EvaluateExpressions(Copy(Line,Tail + 1,Head - Tail - 1)); // evaluate this
-				Delete(Line,Tail,Head - Tail + 1);
-				Insert(ResultLine,Line,Tail + 1); // and replace by result
 			end else
 				break;
 		end;
 
 		// Then evaluate braceless part
 		while true do begin
-			I := Pos('+',Line); // evaluate plus
-			if I = 0 then
-				I := Pos('-',Line); // and minus
-			if I = 0 then
-				I := Pos('*',Line); // and multiply
-			if I = 0 then
-				I := Pos('/',Line); // and divide
-			if I = 0 then
-				I := Pos('>',Line);
-			if I = 0 then
-				I := Pos('<',Line);
-			if I = 0 then
-				I := Pos('==',Line);
-			if I = 0 then
-				I := Pos('!=',Line);
-			if I > 0 then begin
+			Operator := GetNextOperator(OperatorPos);
+			if OperatorPos > 0 then begin
+
 				// Get left operand
-				Tail := I - 1;
+				Tail := OperatorPos - 1;
 				while (Tail >= 0) and (Line[Tail] in SpaceChars) do
 					Dec(Tail); // skip spaces
 				Head := Tail;
 				while (Head >= 0) and (Line[Head] in IdentChars) do
 					Dec(Head); // step over identifier
-				LeftOp := Copy(Line,Head,Tail - Head);
+				LeftOp := Copy(Line,Head + 1,Tail - Head);
 				EquatStart := Head + 1; // marks begin of equation
 
-				// Get operator
-				Tail := I;
-				while (Tail <= Length(Line)) and (Line[Tail] in OperatorChars) do
-					Inc(Tail); // skip operator
-				Operator := Copy(Line,I,Tail - I);
-
 				// Get right operand
+				Tail := OperatorPos + Length(Operator) + 1;
 				while (Tail <= Length(Line)) and (Line[Tail] in SpaceChars) do
 					Inc(Tail); // skip spaces
 				Head := Tail;
 				while (Head <= Length(Line)) and (Line[Head] in IdentChars) do
 					Inc(Head); // step over identifier
-				RightOp := Copy(Line,Tail,Head - Tail + 1);
+				RightOp := Copy(Line,Tail,Head - Tail);
 				EquatEnd := Head; // marks begin of equation
 
 				// Evaluate after removing length suffixes...
-				LeftOpValue := GetOperandValue(LeftOp);
-				RightOpValue := GetOperandValue(RightOp);
-				if Operator = '+' then
-					ResultValue := LeftOpValue + RightOpValue
-				else if Operator = '-' then
-					ResultValue := LeftOpValue - RightOpValue
-				else if Operator = '*' then
+				LeftOpValue := StrToIntDef(RemoveSuffixes(LeftOp),0);
+				RightOpValue := StrToIntDef(RemoveSuffixes(RightOp),0);
+				if Operator = '*' then
 					ResultValue := LeftOpValue * RightOpValue
 				else if Operator = '/' then
 					ResultValue := LeftOpValue div RightOpValue // int division
-				else if Operator = '>' then
-					ResultValue := integer(LeftOpValue > RightOpValue)
+				else if Operator = '+' then
+					ResultValue := LeftOpValue + RightOpValue
+				else if Operator = '-' then
+					ResultValue := LeftOpValue - RightOpValue
 				else if Operator = '<' then
 					ResultValue := integer(LeftOpValue < RightOpValue)
+				else if Operator = '<=' then
+					ResultValue := integer(LeftOpValue <= RightOpValue)
+				else if Operator = '>' then
+					ResultValue := integer(LeftOpValue > RightOpValue)
+				else if Operator = '>=' then
+					ResultValue := integer(LeftOpValue >= RightOpValue)
 				else if Operator = '==' then
 					ResultValue := integer(LeftOpValue = RightOpValue)
 				else if Operator = '!=' then
 					ResultValue := integer(LeftOpValue <> RightOpValue)
-				else if Operator = '>=' then
-					ResultValue := integer(LeftOpValue >= RightOpValue)
-				else if Operator = '<=' then
-					ResultValue := integer(LeftOpValue <= RightOpValue)
+				else if Operator = '&' then
+					ResultValue := integer(LeftOpValue and RightOpValue)
+				else if Operator = '^' then
+					ResultValue := integer(LeftOpValue or RightOpValue)
+				else if Operator = '|' then
+					ResultValue := integer(LeftOpValue xor RightOpValue)
+				else if Operator = '&&' then
+					ResultValue := integer(LeftOpValue and RightOpValue)
+				else if Operator = '||' then
+					ResultValue := integer(LeftOpValue or RightOpValue)
 				else
 					ResultValue := 0;
 
@@ -686,67 +851,11 @@ var
 		Result := Line;
 	end;
 
-	function EvaluateBooleans(Line : AnsiString) : boolean;
-	var
-		Head, Tail, Level : integer;
-		NextOp : AnsiString;
-	begin
-		// Find the first opening brace (this should leave us at the outermost brace pair)
-		Head := Pos('(',Line);
-		if Head > 0 then begin
-			Level := 1;
-			Tail := Head;
-			while (Tail <= Length(Line)) do begin // find corresponding closing brace
-				if Line[Tail] = '(' then
-					Inc(Level)
-				else if Line[Tail] = ')' then begin
-					Dec(level);
-					if level = 1 then
-						break;
-				end;
-				Inc(Tail);
-			end;
-			Result := EvaluateBooleans(Copy(Line,Head + 1,Tail - Head - 1)); // evaluate this
-			Delete(Line,Head,Tail - Head);
-
-			// Replace inside string
-			if Result then
-				Insert('1',Line,Head)
-			else
-				Insert('0',Line,Head);
-		end; // no braces remain. evaluate inner part
-
-		// Evaluate inner part
-		Result := (Length(Line) > 0) and (Line[1] = '1');
-		Tail := 2;
-		while Tail <= Length(Line) do begin
-
-			// Skip spaces
-			while (Tail <= Length(Line)) and (Line[Tail] in SpaceChars) do
-				Inc(Tail);
-
-			// Store operator
-			NextOp := Copy(Line,Tail,2);
-			Inc(Tail,2);
-
-			// Skip spaces
-			while (Tail <= Length(Line)) and (Line[Tail] in SpaceChars) do
-				Inc(Tail);// Skip spaces
-
-			// Get operand
-			if NextOp = '&&' then
-				Result := Result and (Line[Tail] = '1')
-			else if NextOp = '||' then
-				Result := Result or (Line[Tail] = '1');
-			Inc(Tail);
-		end;
-	end;
-
 	function EvaluateIf(Line : AnsiString) : boolean;
 	begin
-		Line := EvaluateDefines(Line); // e.g. replace all defined() by 1 or 0
-		Line := EvaluateExpressions(Line); // e.g. replace "MONKEY + 1" to value of MONKEY + 1
-		Result := EvaluateBooleans(Line); // e.g. replace ((1 && 0) || 1) by true
+		Line := ExpandDefines(Line); // replace FOO by numerical value of FOO
+		Line := EvaluateDefines(Line); // replace all defined() by 1 or 0
+		Result := StrToIntDef(EvaluateExpression(Line),-1) > 0; // perform the remaining int arithmetic
 	end;
 begin
 	if StartsStr('ifdef',Line) then begin
@@ -808,10 +917,7 @@ begin
 	// Get full header file name
 	FileName := cbutils.GetHeaderFileName(Includes[fIncludes.Count - 1]^.FileName,Line,fIncludePaths);
 
-	// Add the new file to the includes of the current file
-	with fIncludesRec^ do
-		IncludeFiles := IncludeFiles + AnsiQuotedStr(FileName, '"') + ',';
-
+	// And open a new entry
 	OpenInclude(FileName);
 end;
 
@@ -819,38 +925,6 @@ function TCppPreprocessor.ExpandMacros(const Line : AnsiString) : AnsiString; //
 begin
 	Result := Line;
 end;
-{var
-	TokenBegin, TokenEnd, I : integer;
-	Token : AnsiString;
-	// Perform macro expansion.
-	{if Expand and (TrimLeft(Value) <> '') then begin
-		TokenBegin := 1;
-		TokenEnd := 1;
-		repeat
-			// Add whitespace to result too
-			while (TokenEnd <= Length(Value)) and not (Value[TokenEnd] in IdentChars) do
-				Inc(TokenEnd);
-			fResult := fResult + Copy(Value,TokenBegin,TokenEnd-TokenBegin);
-			TokenBegin := TokenEnd;
-
-			// Get next token separated by whitespace
-			while (TokenEnd <= Length(Value)) and (Value[TokenEnd] in IdentChars) do
-				Inc(TokenEnd);
-			Token := Copy(Value,TokenBegin,TokenEnd - TokenBegin);
-			TokenBegin := TokenEnd;
-
-			// Perform expansion on token
-			if Length(Token) > 0 then
-				for I := 0 to fDefines.Count - 1 do begin
-					if Token = PDefine(fDefines[I])^.Name then begin
-						Token := PDefine(fDefines[I])^.Name;
-						break;
-					end;
-				end;
-			fResult := fResult + Token;
-		until TokenEnd > Length(Value);
-	end else
-		fResult := fResult + Value;}
 
 function TCppPreprocessor.RemoveSuffixes(const Input : AnsiString) : AnsiString;
 var
@@ -864,6 +938,19 @@ begin
 		while (I >= 0) and (Result[i] in ['A'..'Z','a'..'z']) do // find first alphabetical character at end
 			Dec(I);
 		Delete(Result,I + 1,MaxInt); // remove from there
+	end;
+end;
+
+function TCppPreprocessor.GetFileIncludesEntry(const FileName : AnsiString) : PFileIncludes;
+var
+	I : integer;
+begin
+	Result := nil;
+	for I := 0 to fIncludesList.Count - 1 do begin
+		if SameText(PFileIncludes(fIncludesList[I])^.BaseFile,Filename) then begin
+			Result := PFileIncludes(fIncludesList[I]);
+			Exit;
+		end;
 	end;
 end;
 
@@ -896,6 +983,7 @@ begin
 	Reset;
 	OpenInclude(FileName,nil);
 	PreprocessBuffer;
+	//fResult.SaveToFile('C:\TCppPreprocessorResult.txt');
 end;
 
 function TCppPreprocessor.GetResult : AnsiString;

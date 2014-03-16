@@ -340,7 +340,7 @@ var
 begin
 	f := TStringList.Create;
 	try
-		if SelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
+		if NewSelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
 			FilesFromWildcard(Dir, '*.*', f, false, false, false);
 			for i := 0 to f.Count-1 do begin
 				s := f[i];

@@ -144,21 +144,21 @@ begin
    1: // default dir browse
     begin
       s:= edUserDir.Text;
-      if SelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
+      if NewSelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
        edUserDir.Text:= IncludeTrailingPathDelimiter(s);
     end;
 
    2: // output dir browse
     begin
       s:= ExpandFileto(edTemplatesDir.Text, devDirs.Exec);
-      if SelectDirectory(Lang[ID_ENV_SELTEMPLATESDIR], '', s) then
+      if NewSelectDirectory(Lang[ID_ENV_SELTEMPLATESDIR], '', s) then
        edTemplatesDir.Text:= IncludeTrailingPathDelimiter(s);
     end;
 
    3: // icon library browse
     begin
       s:= ExpandFileto(edIcoLib.Text, devDirs.Exec);
-      if SelectDirectory(Lang[ID_ENV_SELICOLIB], '', s) then
+      if NewSelectDirectory(Lang[ID_ENV_SELICOLIB], '', s) then
        edIcoLib.Text:= IncludeTrailingPathDelimiter(s);
     end;
 
@@ -172,7 +172,7 @@ begin
    5: // Language Dir
     begin
       s:= ExpandFileto(edLang.Text, devDirs.Exec);
-      if SelectDirectory(Lang[ID_ENV_SELLANGDIR], '', s) then
+      if NewSelectDirectory(Lang[ID_ENV_SELLANGDIR], '', s) then
        edLang.Text:= IncludeTrailingPathDelimiter(ExtractRelativePath(devDirs.Exec, s));
     end;
 

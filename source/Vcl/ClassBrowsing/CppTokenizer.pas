@@ -35,6 +35,7 @@ const
   HexChars: set of Char = ['A'..'F', 'a'..'f', 'x', 'L'];
   SpaceChars: set of Char = [' ', #9];
   LineChars: set of Char = [#13, #10];
+  BlankChars: set of Char = [#0..#32];
   OperatorChars: set of Char = ['+', '-', '/', '*', '[', ']', '=', '%', '!', '&', '|', '>', '<', '^', '!'];
 
 type
@@ -78,6 +79,7 @@ type
     function IsForInit: boolean;
     function GetNextToken(bSkipParenthesis: boolean = False; bSkipArray: boolean = False; bSkipBlock: boolean = False): AnsiString;
     procedure Simplify(var Output: AnsiString);
+    procedure SimplifyArgs(var Output : AnsiString);
     procedure Advance;
     function OpenFile(const FileName: AnsiString): boolean;
     function OpenStream(Stream: TStream): boolean;
@@ -503,6 +505,7 @@ begin
   Offset := pCurrent;
   SkipPair('(', ')');
   SetString(Result, Offset, pCurrent - Offset);
+  SimplifyArgs(Result);
   if (pCurrent^ = '.') or ((pCurrent^ = '-') and ((pCurrent + 1)^ = '>')) then // skip '.' and '->'
     while not (pCurrent^ in [#0, '(', ';', '{', '}', ')'] + LineChars + SpaceChars) do
       Inc(pCurrent);
@@ -668,11 +671,68 @@ begin
 			break;
 	end;
 
-	Output := StringReplace(Output, '\'#13, '', [rfReplaceAll]);
-	Output := StringReplace(Output, '\'#10, '', [rfReplaceAll]);
-	Output := StringReplace(Output, #13, '', [rfReplaceAll]);
-	Output := StringReplace(Output, #10, '', [rfReplaceAll]);
+	Output := FastStringReplace(Output, '\'#13, '', [rfReplaceAll]);
+	Output := FastStringReplace(Output, '\'#10, '', [rfReplaceAll]);
+	Output := FastStringReplace(Output, #13, '', [rfReplaceAll]);
+	Output := FastStringReplace(Output, #10, '', [rfReplaceAll]);
 	Output := Trim(Output);
+end;
+
+procedure TCppTokenizer.SimplifyArgs(var Output : AnsiString);
+var
+	SearchStart, CommaPos : integer;
+
+	procedure FormatSpacesAround(Index : integer;InsertCount : integer);
+	var
+		Head, InsertIndex : integer;
+	begin
+		InsertIndex := Index + 1;
+
+		// Remove all before
+		if Index > 1 then begin
+			Head := Index;
+			while (Head > 0) and (Output[Head] in BlankChars) do
+				Dec(Head);
+			if (Head-1 > 0) and (Output[Head+1] in BlankChars) then begin
+				Delete(Output,Head,Index - Head);
+				// update insert index due to removal
+				Dec(InsertIndex,Index - Head);
+			end;
+		end;
+
+		// Remove all after
+		if Index+1 < Length(Output) then begin
+			Head := Index + 1;
+			while (Head <= Length(Output)) and (Output[Head] in BlankChars) do
+				Inc(Head);
+			if (Head-1 <= Length(Output)) and (Output[Head-1] in BlankChars) then
+				Delete(Output,Index+1,Head-Index-1);
+		end;
+
+		// Insert at starting position
+		if InsertCount > 0 then
+			Insert(StringOfChar(' ',InsertCount),Output,InsertIndex);
+	end;
+begin
+	// Format so that string that comes out is formatted as (int a, int b, int c)
+	if (Length(Output) = 0) then
+		Exit;
+
+	// Remove at starting brace
+	FormatSpacesAround(1,0);
+
+	SearchStart := 1;
+	while true do begin
+		CommaPos := PosEx(',',Output,SearchStart);
+		if CommaPos > 0 then begin
+			FormatSpacesAround(CommaPos,1);
+			SearchStart := CommaPos + 1;
+		end else
+			break;
+	end;
+
+	// Remove at ending brace
+	FormatSpacesAround(Length(Output),0);
 end;
 
 procedure TCppTokenizer.TokenizeBuffer(StartAt: PAnsiChar);

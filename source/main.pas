@@ -583,6 +583,11 @@ type
     CppTokenizer: TCppTokenizer;
     actBrowserViewIncludes: TAction;
     mnuBrowserViewInclude: TMenuItem;
+    actMoveSelUp: TAction;
+    actMoveSelDown: TAction;
+    N68: TMenuItem;
+    actMoveSelUp1: TMenuItem;
+    actMoveSelDown1: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -836,6 +841,8 @@ type
     procedure cmbCompilersChange(Sender: TObject);
     procedure actDuplicateLineExecute(Sender: TObject);
     procedure actBrowserViewIncludesExecute(Sender: TObject);
+    procedure actMoveSelUpExecute(Sender: TObject);
+    procedure actMoveSelDownExecute(Sender: TObject);
   private
     fPreviousHeight : integer; // stores MessageControl height to be able to restore to previous height
     fTools : TToolController; // tool list controller
@@ -1239,6 +1246,8 @@ begin
 	actUnCollapse.Caption:=				Lang[ID_ITEM_UNCOLLAPSEALL];
 	actDuplicateLine.Caption:=			Lang[ID_ITEM_DUPLICATELINE];
 	actDeleteLine.Caption:=				Lang[ID_ITEM_DELETELINE];
+	actMoveSelUp.Caption:=				Lang[ID_ITEM_MOVESELUP];
+	actMoveSelDown.Caption:=			Lang[ID_ITEM_MOVESELDOWN];
 
 	// Mainform toolbar buttons
 	actInsert.Caption:=					Lang[ID_TB_INSERT];
@@ -3859,9 +3868,6 @@ begin
 	for I := 0 to devCompilerSets.Count - 1 do
 		cmbCompilers.Items.Add(devCompilerSets[i].Name);
 
-	// Set current index
-	fOldCompilerToolbarIndex := -1;
-
 	// Check if the current file belongs to a project
 	e := GetEditor;
 	if Assigned(e) then begin
@@ -3879,6 +3885,9 @@ begin
 	end else begin
 		cmbCompilers.ItemIndex := devCompilerSets.CurrentIndex;
 	end;
+
+	// Remember current index
+	fOldCompilerToolbarIndex := cmbCompilers.ItemIndex;
 
 	cmbCompilers.Items.EndUpdate;
 end;
@@ -4245,16 +4254,7 @@ var
 begin
 	e:=GetEditor;
 	if Assigned(e) then
-		e.CommentSelection;
-end;
-
-procedure TMainForm.actToggleCommentExecute(Sender: TObject);
-var
-	e: TEditor;
-begin
-	e:=GetEditor;
-	if Assigned(e) then
-		e.ToggleCommentSelection;
+		e.Text.CommandProcessor(ecComment,#0,nil);
 end;
 
 procedure TMainForm.actUncommentExecute(Sender: TObject);
@@ -4263,7 +4263,16 @@ var
 begin
 	e:=GetEditor;
 	if Assigned(e) then
-		e.UncommentSelection;
+		e.Text.CommandProcessor(ecUncomment,#0,nil);
+end;
+
+procedure TMainForm.actToggleCommentExecute(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e:=GetEditor;
+	if Assigned(e) then
+		e.Text.CommandProcessor(ecToggleComment,#0,nil);
 end;
 
 procedure TMainForm.actIndentExecute(Sender: TObject);
@@ -6651,6 +6660,24 @@ begin
 	e := GetEditor;
 	if Assigned(e) then
 		e.Text.CommandProcessor(ecDuplicateLine,#0,nil);
+end;
+
+procedure TMainForm.actMoveSelUpExecute(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e := GetEditor;
+	if Assigned(e) then
+		e.Text.CommandProcessor(ecMoveSelUp,#0,nil);
+end;
+
+procedure TMainForm.actMoveSelDownExecute(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e := GetEditor;
+	if Assigned(e) then
+		e.Text.CommandProcessor(ecMoveSelDown,#0,nil);
 end;
 
 end.

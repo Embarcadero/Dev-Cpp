@@ -3,7 +3,7 @@
 
 !define COMPILERNAME "TDM-GCC x64 4.8.1"
 !define COMPILERFOLDER "MinGW64"
-!define DEVCPP_VERSION "5.6.0"
+!define DEVCPP_VERSION "5.6.1"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
@@ -97,7 +97,9 @@ Section "Dev-C++ program files (required)" SectionMain
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayName" "Dev-C++"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayVersion" "${DEVCPP_VERSION}"
-
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayIcon" "$INSTDIR\devcpp.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "Publisher" "Bloodshed Software"
+  
   ; Write required files
   File "devcpp.exe"
   File "devcpp.map"

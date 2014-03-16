@@ -69,7 +69,7 @@ procedure TFileForm.LoadBtnClick(Sender: TObject);
 var s : string;
 begin
   if Dir then begin
-    if SelectDirectory('Select Directory', ExtractFilePath(MainForm.FileName), s) then
+    if NewSelectDirectory('Select Directory', ExtractFilePath(MainForm.FileName), s) then
       edSource.Text := ExtractRelativePath(MainForm.FileName, s);
   end
   else begin

@@ -1580,7 +1580,7 @@ begin
 		msg := msg + #13#10 + #13#10;
 	end;
 	if msg <> '' then begin
-		msg := msg + Lang[ID_COMPVALID_DIRFIXSUGGESTION];
+		msg := Format(Lang[ID_COMPVALID_CHECKINGSET],[Name]) + #13#10#13#10 + msg + Lang[ID_COMPVALID_DIRFIXSUGGESTION];
 
 		// If confirmed, insert working dirs into default path list
 		if MessageDlg(msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
@@ -1696,7 +1696,7 @@ begin
 		msg := msg + Format(Lang[ID_COMPVALID_BINNOTFOUND],[Lang[ID_COMPVALID_DLLWRAP],fdllwrapName]) + #13#10;
 	end;
 	if msg <> '' then begin
-		msg := msg + #13#10 + Lang[ID_COMPVALID_DIRSEARCHED] + #13#10;
+		msg := Format(Lang[ID_COMPVALID_CHECKINGSET],[Name]) + #13#10#13#10 + msg + #13#10 + Lang[ID_COMPVALID_DIRSEARCHED] + #13#10;
 		for I := 0 to fBinDir.Count - 1 do
 			msg := msg + fBinDir[i] + #13#10;
 		msg := msg + #13#10 + Lang[ID_COMPVALID_BINFIXSUGGESTION];

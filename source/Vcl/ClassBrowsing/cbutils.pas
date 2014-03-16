@@ -34,10 +34,10 @@ const
   SourceExts: array[0..5] of AnsiString = ('.c','.cpp', '.cc', '.cxx', '.c++', '.cp');
 
 type
-  PIncludesRec = ^TIncludesRec;
-  TIncludesRec = record
+  PFileIncludes = ^TFileIncludes;
+  TFileIncludes = record
     BaseFile: AnsiString;
-    IncludeFiles: AnsiString;
+    IncludeFiles: AnsiString; // "file","file" etc
   end;
 
   TProgressEvent = procedure(Sender: TObject; const FileName: AnsiString; Total, Current: integer) of object;
@@ -62,6 +62,13 @@ type
   // Reverse Pos() function
   function LastPos(const SubStr, S: AnsiString): integer;
 
+  // Fast implementation of StringReplace which does not use AnsiX (MBCS ready) comparison
+  function FastStringReplace(const S, OldPattern, NewPattern: AnsiString;Flags: TReplaceFlags): AnsiString;
+
+  // Fast implementation of IndexOf which does not use AnsiX comparison
+  function FastIndexOf(List : TStrings;const S : AnsiString) : integer; overload;
+  function FastIndexOf(List : TStringlist;const S : AnsiString) : integer; overload;
+
   // Needed by Parser and Preprocessor (and class browser)
   function IsSystemHeaderFile(const FileName: AnsiString; IncludePaths : TStringList): boolean;
   function GetSystemHeaderFileName(const FileName : AnsiString; IncludePaths : TStringList): AnsiString; // <file.h>
@@ -73,6 +80,58 @@ type
   function IsIncludeLine(const Line : AnsiString) : boolean;
 
 implementation
+
+function FastStringReplace(const S, OldPattern, NewPattern: AnsiString;Flags: TReplaceFlags): AnsiString;
+var
+  SearchStr, Patt, NewStr: AnsiString;
+  Offset: Integer;
+begin
+  if rfIgnoreCase in Flags then
+  begin
+    SearchStr := UpperCase(S);
+    Patt := UpperCase(OldPattern);
+  end else
+  begin
+    SearchStr := S;
+    Patt := OldPattern;
+  end;
+  NewStr := S;
+  Result := '';
+  while SearchStr <> '' do
+  begin
+    Offset := Pos(Patt, SearchStr);
+    if Offset = 0 then
+    begin
+      Result := Result + NewStr;
+      Break;
+    end;
+    Result := Result + Copy(NewStr, 1, Offset - 1) + NewPattern;
+    NewStr := Copy(NewStr, Offset + Length(OldPattern), MaxInt);
+    if not (rfReplaceAll in Flags) then
+    begin
+      Result := Result + NewStr;
+      Break;
+    end;
+    SearchStr := Copy(SearchStr, Offset + Length(Patt), MaxInt);
+  end;
+end;
+
+function FastIndexOf(List : TStrings;const S : AnsiString) : integer;
+begin
+	with List do begin
+		for Result := 0 to Count - 1 do
+			if CompareText(List[Result], S) = 0 then Exit;
+		Result := -1;
+	end;
+end;
+
+function FastIndexOf(List : TStringlist;const S : AnsiString) : integer;
+begin
+	with List do begin
+		if not List.Sorted then Result := FastIndexOf(TStrings(List),S) else
+			if not Find(S, Result) then Result := -1;
+	end;
+end;
 
 function StartsStr(const subtext,text : AnsiString) : boolean;
 begin

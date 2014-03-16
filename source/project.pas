@@ -1062,7 +1062,7 @@ begin
 
 		for idx:=0 to sl.Count-1 do begin
 			currIdx:=StrToIntDef(sl[idx], -1);
-			LoadUnitLayout(OpenUnit(currIdx), currIdx);
+			OpenUnit(currIdx);
 		end;
 	finally
 		sl.Free;

@@ -778,7 +778,7 @@ var
   s: AnsiString;
 begin
   s := txtCVSImportDir.Text;
-  if SelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
+  if NewSelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
     txtCVSImportDir.Text := IncludeTrailingPathDelimiter(s);
 
   vle.Strings.Clear;
@@ -795,7 +795,7 @@ var
   s: AnsiString;
 begin
   s := txtCOdir.Text;
-  if SelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
+  if NewSelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
     txtCOdir.Text := IncludeTrailingPathDelimiter(s);
 end;
 

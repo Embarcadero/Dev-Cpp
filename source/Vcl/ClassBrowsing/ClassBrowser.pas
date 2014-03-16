@@ -255,7 +255,7 @@ begin
 			with PStatement(fParser.Statements[I])^ do begin
 
 				// TODO: for now, do NOT show loaded items
-				if not _Visible or _Loaded then
+				if not _Visible or _Loaded or _Temporary then
 					Continue;
 
 				// Prevent infinite parent/child loops
@@ -473,8 +473,6 @@ begin
 end;
 
 procedure TClassBrowser.SetCurrentFile(const Value: AnsiString);
-var
-	Dummy : AnsiString;
 begin
 	// Saves an expensive UpdateView
 	if Value = fCurrentFile then
@@ -484,7 +482,7 @@ begin
 
 	// Get current file pair
 	fCurrentFile := Value;
-	cbutils.GetSourcePair(fCurrentFile,Dummy,fCurrentFileHeader);
+	cbutils.GetSourcePair(fCurrentFile,fCurrentFileImpl,fCurrentFileHeader);
 
 	UpdateView;
 end;

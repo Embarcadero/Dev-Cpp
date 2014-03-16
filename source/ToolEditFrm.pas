@@ -143,7 +143,7 @@ begin
     new:=edWorkDir.Text
   else
     new:=ExtractFilePath(edProgram.Text);
-  if SelectDirectory('Select Working Dir', '', new) then
+  if NewSelectDirectory('Select Working Dir', '', new) then
    edWorkDir.text:= New;
 end;
 

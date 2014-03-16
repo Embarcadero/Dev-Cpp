@@ -129,9 +129,6 @@ type
     procedure InsertDefaultText;
     procedure ToggleBreakPoint(Line : integer);
     function GetWordAtPosition(P : TBufferCoord;Purpose : TWordPurpose) : AnsiString;
-    procedure CommentSelection;
-    procedure UncommentSelection;
-    procedure ToggleCommentSelection;
     procedure IndentSelection;
     procedure UnindentSelection;
     procedure InitCompletion;
@@ -1146,9 +1143,9 @@ var
 begin
 	fCompletionTimer.Enabled := False;
 
-	// Don't bother scanning inside strings or comments
+	// Don't bother scanning inside strings or comments or defines
 	if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1, fText.CaretY), s, attr)) then
-		if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) then
+		if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) or (attr.Name = 'Preprocessor') then
 			Exit;
 
 	M := TMemoryStream.Create;
@@ -1269,24 +1266,31 @@ begin
 	Result := Copy(S,WordBegin + 1,WordEnd - WordBegin);
 
 	// Strip function parameters
-	ParamBegin := Pos('(',Result);
-	if ParamBegin > 0 then begin
-		ParamEnd := RPos(')',Result);
-		if ParamEnd > 0 then begin
-			Delete(Result,ParamBegin,ParamEnd - ParamBegin + 1);
-		end;
+	while true do begin
+		ParamBegin := Pos('(',Result);
+		if ParamBegin > 0 then begin
+			ParamEnd := ParamBegin;
+			if FindComplement(Result,'(',')',ParamEnd,1) then begin
+				Delete(Result,ParamBegin,ParamEnd - ParamBegin + 1);
+			end else
+				break;
+		end else
+			break;
 	end;
 
 	// Strip array stuff
-	if not (Purpose = wpEvaluation) then begin
-		ParamBegin := Pos('[',Result);
-		if ParamBegin > 0 then begin
-			ParamEnd := RPos(')',Result);
-			if ParamEnd > 0 then begin
-				Delete(Result,ParamBegin,ParamEnd - ParamBegin + 1);
-			end;
+	if not (Purpose = wpEvaluation) then
+		while true do begin
+			ParamBegin := Pos('[',Result);
+			if ParamBegin > 0 then begin
+				ParamEnd := ParamBegin;
+				if FindComplement(Result,'(',']',ParamEnd,1) then begin
+					Delete(Result,ParamBegin,ParamEnd - ParamBegin + 1);
+				end else
+					break;
+			end else
+				break;
 		end;
-	end;
 end;
 
 procedure TEditor.CompletionInsert(const append: AnsiString);
@@ -1502,149 +1506,6 @@ begin
 		fText.ExecuteCommand(ecBlockUnIndent,#0, nil)
 	else
 		fText.ExecuteCommand(ecShiftTab,#0, nil);
-end;
-
-procedure TEditor.CommentSelection;
-var
-	oldbbegin,oldbend,oldcaret : TBufferCoord;
-	I,EndLine : integer;
-begin
-	oldbbegin := fText.BlockBegin;
-	oldbend := fText.BlockEnd;
-	oldcaret := fText.CaretXY;
-
-	// Prevent repaints while we're busy
-	fText.BeginUpdate;
-	fText.BeginUndoBlock;
-
-	// Ignore the last line the cursor is placed on
-	if oldbend.Char = 1 then
-		EndLine := max(oldbbegin.Line-1,oldbend.Line-2)
-	else
-		EndLine := oldbend.Line-1;
-
-	for I := oldbbegin.Line-1 to EndLine do begin
-		fText.Lines[i] := '//' + fText.Lines[i];
-		fText.UndoList.AddChange(crInsert,
-			BufferCoord(1,i+1),
-			BufferCoord(3,i+1),
-			'',smNormal);
-	end;
-
-	// When grouping similar commands, process one comment action per undo/redo
-	fText.UndoList.AddChange(crNothing,BufferCoord(0,0),BufferCoord(0,0),'',smNormal);
-
-	// Move begin of selection
-	if oldbbegin.Char > 1 then
-		Inc(oldbbegin.Char,2);
-
-	// Move end of selection
-	if oldbend.Char > 1 then
-		Inc(oldbend.Char,2);
-
-	// Move caret
-	if oldcaret.Char > 1 then
-		Inc(oldcaret.Char,2);
-
-	fText.CaretXY := oldcaret;
-	fText.BlockBegin := oldbbegin;
-	fText.BlockEnd := oldbend;
-
-	// Prevent repaints while we're busy
-	fText.EndUndoBlock;
-	fText.EndUpdate;
-
-	fText.UpdateCaret;
-	fText.Modified := true;
-end;
-
-procedure TEditor.UncommentSelection;
-var
-	oldbbegin,oldbend,oldcaret : TBufferCoord;
-	editcopy : AnsiString;
-	I,J,EndLine : integer;
-begin
-	oldbbegin := fText.BlockBegin;
-	oldbend := fText.BlockEnd;
-	oldcaret := fText.CaretXY;
-
-	// Prevent repaints while we're busy
-	fText.BeginUpdate;
-	fText.BeginUndoBlock;
-
-	// Ignore the last line the cursor is placed on
-	if oldbend.Char = 1 then
-		EndLine := max(oldbbegin.Line-1,oldbend.Line-2)
-	else
-		EndLine := oldbend.Line-1;
-
-	for I := oldbbegin.Line-1 to EndLine do begin
-		editcopy := fText.Lines[i];
-
-		// Find // after blanks only
-		J := 1;
-		while (J+1 <= length(editcopy)) and (editcopy[j] in [#0..#32]) do
-			Inc(J);
-		if (j+1 <= length(editcopy)) and (editcopy[j] = '/') and (editcopy[j+1] = '/') then begin
-			Delete(EditCopy,J,2);
-			fText.Lines[i] := editcopy;
-
-			fText.UndoList.AddChange(crDelete,
-				BufferCoord(J,i+1),
-				BufferCoord(J+2,i+1),
-				'//',smNormal);
-
-			// Move begin of selection
-			if (I = oldbbegin.Line-1) and (oldbbegin.Char > 1) then
-				Dec(oldbbegin.Char,2);
-
-			// Move end of selection
-			if (I = oldbend.Line-1) and (oldbend.Char > 1) then
-				Dec(oldbend.Char,2);
-
-			// Move caret
-			if (I = oldcaret.Line-1) and (oldcaret.Char > 1) then
-				Dec(oldcaret.Char,2);
-		end;
-	end;
-
-	// When grouping similar commands, process one uncomment action per undo/redo
-	fText.UndoList.AddChange(crNothing,BufferCoord(0,0),BufferCoord(0,0),'',smNormal);
-
-	fText.CaretXY := oldcaret;
-	fText.BlockBegin := oldbbegin;
-	fText.BlockEnd := oldbend;
-
-	// Prevent repaints while we're busy
-	fText.EndUndoBlock;
-	fText.EndUpdate;
-
-	fText.UpdateCaret;
-	fText.Modified := true;
-end;
-
-procedure TEditor.ToggleCommentSelection;
-var
-	caretbegin, caretend : TBufferCoord;
-	I,EndLine : integer;
-begin
-	caretbegin := fText.BlockBegin;
-	caretend := fText.BlockEnd;
-
-	// Ignore the last line the cursor is placed on
-	if caretend.Char = 1 then
-		EndLine := max(caretbegin.Line-1,caretbegin.Line-1)
-	else
-		EndLine := caretend.Line-1;
-
-	// if everything is commented, then uncomment
-	for I := caretbegin.Line-1 to EndLine do begin
-		if not StartsStr('//',Trimleft(fText.Lines[i])) then begin
-			CommentSelection;
-			Exit;
-		end;
-	end;
-	UncommentSelection;
 end;
 
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);

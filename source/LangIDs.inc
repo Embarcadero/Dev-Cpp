@@ -93,6 +93,8 @@ const
   ID_ITEM_TOGGLECOMMENT                 = 22008;
   ID_ITEM_DUPLICATELINE                 = 22009;
   ID_ITEM_DELETELINE                    = 22010;
+  ID_ITEM_MOVESELUP                     = 22011;
+  ID_ITEM_MOVESELDOWN                   = 22012;
 
   // search menu
   ID_ITEM_FIND                          = 5001;
@@ -1171,6 +1173,7 @@ const
   ID_COMPVALID_MAKE                     = 75015;
   ID_COMPVALID_WINDRES                  = 75016;
   ID_COMPVALID_DLLWRAP                  = 75017;
+  ID_COMPVALID_CHECKINGSET              = 75018;
 
   ID_LANGFORM_SELECTTHEME               = 76001;
   ID_LANGFORM_FONT                      = 76002;

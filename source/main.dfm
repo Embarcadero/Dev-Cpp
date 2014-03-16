@@ -47,7 +47,7 @@ object MainForm: TMainForm
     Top = 437
     Width = 1000
     Height = 183
-    ActivePage = LogSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -149,7 +149,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 233
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
@@ -227,7 +227,7 @@ object MainForm: TMainForm
         Left = 233
         Top = 0
         Width = 759
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
@@ -235,7 +235,7 @@ object MainForm: TMainForm
           Left = 0
           Top = 0
           Width = 759
-          Height = 155
+          Height = 154
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -258,7 +258,7 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 403
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
@@ -278,7 +278,7 @@ object MainForm: TMainForm
           Width = 263
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnKeyPress = edGdbCommandKeyPress
         end
@@ -286,7 +286,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 396
-          Height = 109
+          Height = 115
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -444,7 +444,7 @@ object MainForm: TMainForm
           Width = 518
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 5
           OnKeyPress = EvaluateInputKeyPress
         end
@@ -452,7 +452,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 39
+          Height = 44
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -492,7 +492,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -1356,6 +1356,15 @@ object MainForm: TMainForm
       end
       object DeleteLine1: TMenuItem
         Action = actDeleteLine
+      end
+      object N68: TMenuItem
+        Caption = '-'
+      end
+      object actMoveSelUp1: TMenuItem
+        Action = actMoveSelUp
+      end
+      object actMoveSelDown1: TMenuItem
+        Action = actMoveSelDown
       end
     end
     object SearchMenu: TMenuItem
@@ -3000,6 +3009,20 @@ object MainForm: TMainForm
       Caption = 'Duplicate Line'
       ShortCut = 16453
       OnExecute = actDuplicateLineExecute
+      OnUpdate = actUpdateEmptyEditor
+    end
+    object actMoveSelUp: TAction
+      Category = 'Edit'
+      Caption = 'actMoveSelUp'
+      ShortCut = 24614
+      OnExecute = actMoveSelUpExecute
+      OnUpdate = actUpdateEmptyEditor
+    end
+    object actMoveSelDown: TAction
+      Category = 'Edit'
+      Caption = 'actMoveSelDown'
+      ShortCut = 24616
+      OnExecute = actMoveSelDownExecute
       OnUpdate = actUpdateEmptyEditor
     end
   end

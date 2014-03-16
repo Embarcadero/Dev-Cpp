@@ -312,7 +312,7 @@ begin
     newitem:=edEntry.Text
   else
     newitem:=devDirs.Default;
-  if SelectDirectory('', '', NewItem) then
+  if NewSelectDirectory('', '', NewItem) then
    edEntry.Text:= NewItem;
 end;
 
@@ -564,7 +564,7 @@ procedure TCompOptForm.btnAddFilledCompilerSetClick(Sender: TObject);
 var
 	S: AnsiString;
 begin
-	if not SelectDirectory('','',S) then
+	if not NewSelectDirectory('','',S) then
 		Exit;
 
 	// Add empty compiler set

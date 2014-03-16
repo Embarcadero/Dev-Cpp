@@ -298,7 +298,7 @@ begin
 
 		// only perform full new search if just invoked
 		if not CodeComplForm.Showing then begin
-			fIncludedFiles.CommaText := fParser.GetFileIncludes(Filename);
+			fParser.GetFileIncludes(Filename,fIncludedFiles);
 			GetCompletionFor(Phrase);
 		end;
 
@@ -378,12 +378,12 @@ end;
 
 function TCodeCompletion.IsIncluded(const FileName: AnsiString): boolean;
 begin
-  Result := fIncludedFiles.IndexOf(Filename) <> -1;
+  Result := FastIndexOf(fIncludedFiles,FileName) <> -1;
 end;
 
 function TCodeCompletion.IsVisible : boolean;
 begin
-	result := fEnabled and CodeComplForm.Visible;
+	Result := fEnabled and CodeComplForm.Visible;
 end;
 
 end.

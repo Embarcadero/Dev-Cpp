@@ -101,7 +101,7 @@ begin
 	// public is used most of the time?
 	cmbScope.ItemIndex := cmbScope.Items.IndexOf('public');
 
-	// Drastic measures are needed to banish random bug reports of AVs here
+	// Check if the statement the user selected is a class...
 	if Assigned(MainForm.ClassBrowser.Selected) and
 	   Assigned(MainForm.ClassBrowser.Selected.Data) and
 	   (PStatement(MainForm.ClassBrowser.Selected.Data)^._Kind = skClass) then begin

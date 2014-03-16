@@ -607,6 +607,10 @@ end;
 
 procedure TImportMSVCForm.LoadText;
 begin
+	// Set interface font
+	Font.Name := devData.InterfaceFont;
+	Font.Size := devData.InterfaceFontSize;
+
   Caption := Lang[ID_MSVC_MENUITEM];
   lbSelect.Caption := Lang[ID_MSVC_SELECTMSVC] + ':';
   lbConf.Caption := Lang[ID_MSVC_CONFIGURATION] + ':';

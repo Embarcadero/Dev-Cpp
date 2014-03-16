@@ -269,15 +269,15 @@ begin
 
 	case SubTabs.TabIndex of
 		0: begin // Lib tab
-			if SelectDirectory('Library Directory', '', newitem) then
+			if NewSelectDirectory('Library Directory', '', newitem) then
 				edDirEntry.Text := NewItem;
 		end;
 		1: begin // Include tab
-			if SelectDirectory('Include Directory', '', newitem) then
+			if NewSelectDirectory('Include Directory', '', newitem) then
 				edDirEntry.Text:= NewItem;
 		end;
 		2: begin // Resource dir Tab
-			if SelectDirectory('Resource Directory', '', newitem) then
+			if NewSelectDirectory('Resource Directory', '', newitem) then
 				edDirEntry.Text:= NewItem;
 		end;
 	end;
@@ -738,7 +738,7 @@ begin
 		Dir := ExpandFileto(fProjectCopy.Options.ExeOutput, fProjectCopy.Directory)
 	else
 		Dir := fProjectCopy.Directory;
-	if SelectDirectory('Select Directory', '', Dir) then
+	if NewSelectDirectory('Select Directory', '', Dir) then
 		edExeOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 
@@ -755,7 +755,7 @@ begin
 		Dir := ExpandFileto(fProjectCopy.Options.ObjectOutput, fProjectCopy.Directory)
 	else
 		Dir := fProjectCopy.Directory;
-	if SelectDirectory('Select Directory', '', Dir) then
+	if NewSelectDirectory('Select Directory', '', Dir) then
 		edObjOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 
@@ -772,7 +772,7 @@ begin
 		Dir:=ExpandFileto(fProjectCopy.Options.LogOutput, fProjectCopy.Directory)
 	else
 		Dir:=fProjectCopy.Directory;
-	if SelectDirectory('Select Directory', '', Dir) then
+	if NewSelectDirectory('Select Directory', '', Dir) then
 		edLogOutput.Text := ExtractRelativePath(fProjectCopy.Directory, Dir);
 end;
 

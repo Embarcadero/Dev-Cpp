@@ -32,7 +32,7 @@ const
 
 	// exe properties
 	DEVCPP                = 'Dev-C++';
-	DEVCPP_VERSION        = '5.6.0';
+	DEVCPP_VERSION        = '5.6.1';
 
 	// delimiters
 	DEV_INTERNAL_OPEN     = '$__DEV_INTERNAL_OPEN';
@@ -93,6 +93,7 @@ const
 	DLLWRAP_PROGRAM       = 'dllwrap.exe';
 	GPROF_PROGRAM         = 'gprof.exe';
 	PACKMAN_PROGRAM       = 'packman.exe';
+	CLEAN_PROGRAM         = 'rm.exe'; // cannot use del, it doesn't have a quiet mode
 
 	// File dialog filters
 	FLT_ALLFILES          = 'All files (*.*)|*.*|';

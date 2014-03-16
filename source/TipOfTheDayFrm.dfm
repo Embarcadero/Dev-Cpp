@@ -235,16 +235,10 @@ object TipOfTheDayForm: TTipOfTheDayForm
     end
     object lblTitle: TLabel
       Left = 52
-      Top = 28
-      Width = 116
-      Height = 19
+      Top = 24
+      Width = 74
+      Height = 13
       Caption = 'Did you know...'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clMaroon
-      Font.Height = -16
-      Font.Name = 'Arial'
-      Font.Style = [fsBold]
-      ParentFont = False
     end
     object Bevel1: TBevel
       Left = 52
