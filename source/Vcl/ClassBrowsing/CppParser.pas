@@ -3210,7 +3210,7 @@ begin
 		if (ArgStr[i] = ',') or ((I = Length(ArgStr)) and (ArgStr[i] = ')')) then begin
 
 			// We've found "int* a" for example
-			S := Copy(ArgStr,ParamStart,I-ParamStart);
+			S := Trim(Copy(ArgStr,ParamStart,I-ParamStart));
 
 			// Can be a function pointer. If so, scan after last )
 			BracePos := RPos(')',S);

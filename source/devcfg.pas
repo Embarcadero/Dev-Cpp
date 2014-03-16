@@ -1116,7 +1116,7 @@ begin
 	fFastDep := input.fFastdep;
 
 	// Option list
-	fOptionString := input.fOptionString;
+	OptionString := input.fOptionString;
 end;
 
 procedure TdevCompilerSet.SetProperties(const BinDir,BinFile : AnsiString);
@@ -1189,13 +1189,7 @@ begin
 	// Set executables
 	fgccName := GCC_PROGRAM;
 	fgppName := GPP_PROGRAM;
-
-	// Assume a special gdb32 is provided for 32bit users
-	if ContainsStr(fName,'TDM-GCC') and ContainsStr(fName,'32-bit') then
-		fgdbName := GDB32_PROGRAM // custom, don't forget when bundling new compilers
-	else
-		fgdbName := GDB_PROGRAM;
-
+	fgdbName := GDB_PROGRAM;
 	fmakeName := MAKE_PROGRAM;
 	fwindresName := WINDRES_PROGRAM;
 	fdllwrapName := DLLWRAP_PROGRAM;
@@ -1994,7 +1988,7 @@ var
 	BaseSet : TdevCompilerSet;
 	BaseName : AnsiString;
 	option : PCompilerOption;
-	index : integer;
+	index,I : integer;
 begin
 	// Assume 64bit compilers are put in the MinGW64 folder
 	if DirectoryExists(devDirs.Exec + 'MinGW64' + pd) then begin
@@ -2027,6 +2021,11 @@ begin
 				Name := BaseName + ' 32-bit Release';
 				if FindOption('-',option,index) then // -m is used my -mINSTRUCTIONSET, so use - instead
 					SetOption(option,'1');
+
+				// Hack fix, but works...
+				fgdbName := GDB32_PROGRAM;
+				for I := 0 to fLibDir.Count - 1 do
+					fLibDir[i] := fLibDir[i] + '32';
 			end;
 
 			// Debug profile

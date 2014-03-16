@@ -3399,17 +3399,17 @@ begin
 					fulloutput := fulloutput + GetPrettyLine(ResourceOutput,i) + #13#10;
 			end;
 			2: begin
-				FileName:= 'Raw Build Log';
+				FileName := 'Raw Build Log';
 				if Length(LogOutput.Text) > 0 then
 					fulloutput := LogOutput.Text;
 			end;
 			3: begin
-				FileName:= 'Raw GDB Output';
+				FileName := 'Raw GDB Output';
 				if Length(DebugOutput.Text) > 0 then
 					fulloutput := DebugOutput.Text;
 			end;
 			4: begin
-				FileName:= 'Find Results';
+				FileName := 'Find Results';
 				for i:=0 to FindOutput.Items.Count - 1 do
 					fulloutput := fulloutput + GetPrettyLine(FindOutput,i) + #13#10;
 			end;

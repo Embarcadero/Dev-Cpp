@@ -1,3 +1,11 @@
+Version 5.5.3 - 5 November 2013
+
+- Fixed lib32, -m32 and gdb32 not being used by default by 32bit profiles.
+- The function tooltip works again.
+- The function tooltip hides again when its editor goes out of focus.
+- Fixed a possible crash in the code completion window.
+- Removed some superfluous spaces from variables found in argument lists.
+
 Version 5.5.2 - 28 Oktober 2013
 
 - Rewritten the help files.

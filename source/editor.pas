@@ -609,7 +609,13 @@ end;
 
 function TEditor.FunctionTipAllowed : boolean;
 begin
-	Result := not fText.IsScrolling and not fCompletionBox.Enabled and not fText.SelAvail and devEditor.ShowFunctionTip and Assigned(fText.Highlighter) and not fFunctionTip.ForceHide;
+	Result :=
+		not fText.IsScrolling and // don't update when scrolling
+		fText.Focused and // don't update other editors
+		not fText.SelAvail and // don't update when a selection is available
+		devEditor.ShowFunctionTip and // only update when option is enabled
+		Assigned(fText.Highlighter) and // don't update in plaintext files
+		not fFunctionTip.ForceHide; // don't update when user force hides it using ESC
 end;
 
 procedure TEditor.FunctionTipTimer(Sender : TObject);
@@ -1418,7 +1424,7 @@ var
 			MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
 
 		// Otherwise, parse code and show information about variable
-		end else if devEditor.ParserHints then begin
+		end else if devEditor.ParserHints and not fCompletionBox.Visible then begin // if the completion box is visible, don't rescan
 
 			// This piece of code changes the parser database, possibly making hints and code completion invalid...
 			M := TMemoryStream.Create;
@@ -1768,9 +1774,6 @@ begin
 	fTabSheet.PageIndex := index;
 end;
 
-
-
-
 function TEditor.HandpointAllowed(var mousepos : TBufferCoord) : boolean;
 var
 	s : AnsiString;
@@ -1779,7 +1782,7 @@ begin
 	result := false;
 
 	// Only allow in the text area and don't allow when scrolling
-	if fAllowMouseOver and fText.GetPositionOfMouse(mousepos) and (mousepos.Char < fText.GutterWidth) then begin
+	if fAllowMouseOver and fText.GetPositionOfMouse(mousepos) then begin
 
 		// Only allow hand points in highlighted areas
 		if fText.GetHighlighterAttriAtRowCol(mousepos, s, HLAttr) then begin

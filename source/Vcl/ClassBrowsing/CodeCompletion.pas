@@ -68,6 +68,7 @@ type
     procedure SetPosition(Value: TPoint);
     procedure OnFormResize(Sender: TObject);
     function IsIncluded(const FileName: AnsiString): boolean;
+    function IsVisible : boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -90,6 +91,7 @@ type
     property OnResize: TNotifyEvent read fOnResize write fOnResize;
     property OnlyGlobals: boolean read fOnlyGlobals write fOnlyGlobals;
     property CurrentIndex: integer read fCurrentIndex write fCurrentIndex;
+    property Visible: boolean read IsVisible;
   end;
 
 procedure Register;
@@ -377,6 +379,11 @@ end;
 function TCodeCompletion.IsIncluded(const FileName: AnsiString): boolean;
 begin
   Result := fIncludedFiles.IndexOf(Filename) <> -1;
+end;
+
+function TCodeCompletion.IsVisible : boolean;
+begin
+	result := fEnabled and CodeComplForm.Visible;
 end;
 
 end.
