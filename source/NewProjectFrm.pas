@@ -55,8 +55,8 @@ type
     procedure btnHelpClick(Sender: TObject);
     procedure edProjectNameChange(Sender: TObject);
    private
-    procedure AddTemplate(FileName: AnsiString);
-    procedure ReadTemplateIndex;
+    procedure AddTemplate(const FileName: AnsiString);
+    procedure ReadTemplateDir;
    private
     fTemplates: TList;
     procedure UpdateView;
@@ -80,10 +80,9 @@ uses
 
 procedure TNewProjectForm.FormCreate(Sender: TObject);
 begin
-	fTemplates:= TList.Create;
+	fTemplates := TList.Create;
 	LoadText;
-	ReadTemplateIndex;
-	edProjectName.Text:= format(Lang[ID_NEWPROJECT], [dmMain.GetNewFileNumber]);
+	ReadTemplateDir;
 end;
 
 procedure TNewProjectForm.FormDestroy(Sender: TObject);
@@ -95,38 +94,34 @@ begin
 	fTemplates.Free;
 end;
 
-procedure TNewProjectForm.AddTemplate(FileName: AnsiString);
+procedure TNewProjectForm.AddTemplate(const FileName: AnsiString);
 var
 	Template: TTemplate;
 begin
-	if not FileExists(FileName) then exit;
-	Template:= TTemplate.Create;
+	if not FileExists(FileName) then
+		Exit;
+
+	Template := TTemplate.Create;
 	Template.ReadTemplateFile(FileName);
 	fTemplates.Add(Template);
 end;
 
-procedure TNewProjectForm.ReadTemplateIndex;
+procedure TNewProjectForm.ReadTemplateDir;
 var
-  i: Integer;
-  LTemplates: TStringList;
-  sDir: AnsiString;
+	i: Integer;
+	TemplateFileNames: TStringList;
 begin
-  sDir:=devDirs.Templates;
-  if not CheckChangeDir(sDir) then begin
-    MessageDlg('Could not change to the Templates directory ('+devDirs.Templates+')...', mtError, [mbOk], 0);
-    Exit;
-  end;
-  LTemplates:= TStringList.Create;
-  try
-   FilesFromWildCard(devDirs.Templates,'*'+TEMPLATE_EXT,LTemplates,FALSE,FALSE,TRUE);
-   if LTemplates.Count> 0 then begin
-      for i:= 0 to pred(LTemplates.Count) do
-       AddTemplate(LTemplates[i]);
-      UpdateView;
-    end;
-  finally
-   LTemplates.Free;
-  end;
+	TemplateFileNames:= TStringList.Create;
+	try
+		FilesFromWildCard(devDirs.Templates,'*'+TEMPLATE_EXT,TemplateFileNames,FALSE,FALSE,TRUE);
+		if TemplateFileNames.Count > 0 then begin
+			for i:= 0 to TemplateFileNames.Count-1 do
+				AddTemplate(TemplateFileNames[i]);
+			UpdateView;
+		end;
+	finally
+		TemplateFileNames.Free;
+	end;
 end;
 
 function TNewProjectForm.GetTemplate: TTemplate;
@@ -141,24 +136,21 @@ end;
 
 procedure TNewProjectForm.ProjViewChange(Sender: TObject; Item: TListItem;Change: TItemChange);
 var
-	LTemplate: TTemplate;
+	TemplateItem: TTemplate;
 begin
 	if Assigned(ProjView.Selected) then begin
-		LTemplate:= TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
-		if not assigned(LTemplate) then
-			exit;
-		TemplateLabel.Caption:= LTemplate.Description;
+		TemplateItem := TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
+		if not Assigned(TemplateItem) then
+			Exit;
 
-		//if edProjectName.Text = '' then // suggest a name?
-		//	edProjectName.Text := LTemplate.Name;
-
-		if LTemplate.Options.useGPP then begin
+		TemplateLabel.Caption := TemplateItem.Description;
+		if TemplateItem.Options.useGPP then begin
 			rbC.Enabled := False;
 			rbCpp.Checked := True;
 		end else
 			rbC.Enabled := True;
 	end else
-		TemplateLabel.Caption:= '';
+		TemplateLabel.Caption := '';
 
 	btnOk.Enabled := Assigned(ProjView.Selected) and (edProjectName.Text <> '');
 end;
@@ -181,72 +173,86 @@ begin
 	btnOk.Caption :=        Lang[ID_BTN_OK];
 	btnCancel.Caption :=    Lang[ID_BTN_CANCEL];
 	btnHelp.Caption:=       Lang[ID_BTN_HELP];
+
+	edProjectName.Text := format(Lang[ID_NEWPROJECT], [dmMain.GetNewFileNumber]);
 end;
 
 procedure TNewProjectForm.UpdateView;
- function HasPage(const value: AnsiString): boolean;
-  var
-   idx: integer;
-  begin
-    result:= TRUE;
-    for idx:= 0 to pred(TabsMain.Tabs.Count) do
-     if CompareText(TabsMain.Tabs[idx], Value) = 0 then exit;
-    result:= FALSE;
-  end;
-var
- idx: integer;
- LTemplate: TTemplate;
- Item: TListItem;
- LIcon: TIcon;
- fName: AnsiString;
-begin
-	for idx:= 0 to pred(fTemplates.Count) do begin
-		LTemplate:= TTemplate(fTemplates[idx]);
-		if not HasPage(LTemplate.Category) then
-			TabsMain.Tabs.Append(LTemplate.Category);
+	function HasPage(const value: AnsiString): boolean;
+	var
+		I: integer;
+	begin
+		for I := 0 to TabsMain.Tabs.Count-1 do
+			if CompareText(TabsMain.Tabs[I], Value) = 0 then begin
+				Result := True;
+				Exit;
+			end;
+		Result := False;
 	end;
-
+var
+ I: integer;
+ TemplateItem: TTemplate;
+ ListItem: TListItem;
+ IconItem: TIcon;
+ IconFileName: AnsiString;
+begin
+	// Keep each icon in a separate image list
 	ImageList.Clear;
+
+	ProjView.Items.BeginUpdate;
 	ProjView.Items.Clear;
 
-	for idx := 0 to pred(fTemplates.Count) do begin
-		LTemplate:= TTemplate(fTemplates[idx]);
-		if LTemplate.Category = '' then
-			LTemplate.Category:= Lang[ID_NP_PRJSHEET];
-		if SameText(LTemplate.Category, TabsMain.Tabs[TabsMain.TabIndex]) then begin
-			Item:= ProjView.Items.Add;
-			Item.Caption:= LTemplate.Name;
-			Item.Data:= pointer(idx);
-			fName:= ValidateFile(LTemplate.Icon, '', true);
-			if fName <> '' then begin
-				LIcon:= TIcon.Create;
+	// Walk all items
+	for I := 0 to pred(fTemplates.Count) do begin
+		TemplateItem := TTemplate(fTemplates[I]);
+
+		// Add a page for each unique category
+		if not HasPage(TemplateItem.Category) then
+			TabsMain.Tabs.Append(TemplateItem.Category);
+
+		// Select a category
+		if TemplateItem.Category = '' then
+			TemplateItem.Category := Lang[ID_NP_PRJSHEET];
+
+		// Only add if we're viewing this category
+		if SameText(TemplateItem.Category, TabsMain.Tabs[TabsMain.TabIndex]) then begin
+			ListItem := ProjView.Items.Add;
+			ListItem.Caption := TemplateItem.Name;
+			ListItem.Data := pointer(I);
+			IconFileName := ValidateFile(TemplateItem.Icon, '', true);
+			if IconFileName <> '' then begin
+
+				// Add icon to central dump and tell ListItem to use it
+				IconItem:= TIcon.Create;
 				try
-					LIcon.LoadFromFile(fName); // ValidateFile prepends path
-					Item.ImageIndex:= ImageList.AddIcon(LIcon);
-					if Item.ImageIndex = -1 then
-						Item.ImageIndex:= 0;
+					IconItem.LoadFromFile(IconFileName); // ValidateFile prepends path
+					ListItem.ImageIndex := ImageList.AddIcon(IconItem);
+					if ListItem.ImageIndex = -1 then
+						ListItem.ImageIndex := 0;
 				finally
-					LIcon.Free;
+					IconItem.Free;
 				end;
 			end else
-				Item.ImageIndex := 0;
+				ListItem.ImageIndex := 0; // don't use an icon
 		end;
 	end;
+
+	ProjView.Items.EndUpdate;
 end;
 
 procedure TNewProjectForm.TabsMainChange(Sender: TObject);
 begin
-  UpdateView;
+	UpdateView;
 end;
 
 procedure TNewProjectForm.ProjViewDblClick(Sender: TObject);
 begin
-  ModalResult:= mrOk;
+	ModalResult := mrOk;
 end;
 
 procedure TNewProjectForm.btnHelpClick(Sender: TObject);
 begin
-	OpenHelpFile;
+	OpenHelpFile('index.htm');
 end;
 
 procedure TNewProjectForm.edProjectNameChange(Sender: TObject);

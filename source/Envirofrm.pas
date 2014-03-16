@@ -441,7 +441,7 @@ end;
 
 procedure TEnviroForm.btnHelpClick(Sender: TObject);
 begin
-	OpenHelpFile;
+	OpenHelpFile('index.htm');
 end;
 
 procedure TEnviroForm.FormCreate(Sender: TObject);

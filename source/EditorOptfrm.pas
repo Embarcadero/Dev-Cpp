@@ -865,7 +865,7 @@ end;
 
 procedure TEditorOptForm.btnHelpClick(Sender: TObject);
 begin
-	OpenHelpFile;
+	OpenHelpFile('index.htm');
 end;
 
 procedure TEditorOptForm.btnCancelClick(Sender: TObject);

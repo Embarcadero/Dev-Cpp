@@ -1,7 +1,7 @@
 ####################################################################
 # Startup
 
-!define COMPILERNAME "MinGW 4.7.2"
+!define COMPILERNAME "MinGW 4.8.1"
 !define COMPILERFOLDER "MinGW32"
 !define DEVCPP_VERSION "5.6.0"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"

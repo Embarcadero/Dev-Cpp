@@ -52,6 +52,14 @@ type
     wpInformation  // walk backwards over words, array, functions, parents, forwards over words
   );
 
+  // Define why we are allowed to change the cursor to a handpoint
+  THandPointReason = (
+    hprPreprocessor, // cursor hovers above preprocessor line
+    hprIdentifier,   // cursor hovers above identifier
+    hprSelection,    // cursor hovers above selection
+    hprNone          // mouseover not allowed
+  );
+
   TEditor = class(TObject)
   private
     fInProject: boolean;
@@ -69,21 +77,15 @@ type
     fPreviousTabs : TList; // list of editor pointers
     fDblClickTime : Cardinal;
     fDblClickMousePos : TBufferCoord;
-
     fCompletionTimer: TTimer;
     fCompletionBox: TCodeCompletion;
     fFunctionTipTimer : TTimer;
     fFunctionTip: TCodeToolTip;
-    fMouseOverTimer : TTimer;
-    fAllowMouseOver : boolean;
-
-    // These closing chars have already been typed, ignore manual closings
-    WaitForParenths : integer; // 2 means true, 1 means 'handled by KeyDown', 0 means false
-    WaitForArray : integer;
-    WaitForCurly : integer;
+    WaitForParenths : integer; // These closing chars have already been typed, ignore manual closings
+    WaitForArray : integer; // ... 2 means true, 1 means 'handled by KeyDown', 0 means false
+    WaitForCurly : integer; // etc
     WaitForSingleQuote : integer;
     WaitForDoubleQuote : integer;
-
     procedure EditorKeyPress(Sender: TObject; var Key: Char);
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -97,63 +99,43 @@ type
     procedure EditorExit(Sender : TObject);
     procedure EditorGutterClick(Sender: TObject; Button: TMouseButton;x, y, Line: integer; mark: TSynEditMark);
     procedure EditorSpecialLineColors(Sender: TObject; Line: integer;var Special: boolean; var FG, BG: TColor);
-
+    procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
     procedure CompletionKeyPress(Sender: TObject; var Key: Char);
-
-    procedure MouseOverTimer(Sender : TObject);
-
     procedure CompletionInsert(const append: AnsiString);
     procedure CompletionTimer(Sender: TObject);
-
     function FunctionTipAllowed : boolean;
     procedure FunctionTipTimer(Sender : TObject);
-    function HandpointAllowed(var mousepos : TBufferCoord) : boolean;
-
+    function HandpointAllowed(var mousepos : TBufferCoord) : THandPointReason; // returns for what reason it is allowed
     procedure SetFileName(const value: AnsiString);
-    procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
+    procedure OnMouseOverEvalReady(const evalvalue : AnsiString);
+    function HasBreakPoint(Line : integer): integer;
+    procedure DebugAfterPaint(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
   public
     constructor Create(InProject : boolean;const Caption, Filename : AnsiString;DoOpen : boolean;IsRes: boolean = FALSE);
     destructor Destroy; override;
-
-    // Recoded breakpoint stuff
-    function HasBreakPoint(Line : integer): integer;
-    procedure ToggleBreakPoint(Line : integer);
-    procedure DebugAfterPaint(ACanvas: TCanvas; AClip: TRect;FirstLine, LastLine: integer);
-
-    // Debugger callback
-    procedure OnMouseOverEvalReady(const evalvalue : AnsiString);
-
     function Save : boolean;
     function SaveAs : boolean;
-  
     procedure Activate;
     procedure GotoLine;
-    procedure SetCaretPos(line,col : integer;settopline : boolean = true); // takes folds into account
-
+    procedure SetCaretPos(Line, Col : integer; SetTopLine : boolean = true); // takes folds into account
     procedure ExportToHTML;
     procedure ExportToRTF;
     procedure ExportToTEX;
-
     procedure InsertString(Value: AnsiString;MoveCursor: boolean);
     procedure SetErrorFocus(Col, Line: integer);
     procedure SetActiveBreakpointFocus(Line: integer);
     procedure RemoveBreakpointFocus;
-    procedure UpdateCaption(const NewCaption: AnsiString);
+    procedure UpdateCaption(const NewCaption : AnsiString);
     procedure InsertDefaultText;
-
+    procedure ToggleBreakPoint(Line : integer);
     function GetWordAtPosition(P : TBufferCoord;Purpose : TWordPurpose) : AnsiString;
-  
     procedure CommentSelection;
     procedure UncommentSelection;
     procedure ToggleCommentSelection;
     procedure IndentSelection;
     procedure UnindentSelection;
-
     procedure InitCompletion;
     procedure DestroyCompletion;
-
-    procedure SetTabIndex(index : integer);
-
     property PreviousTabs: TList read fPreviousTabs;
     property FileName: AnsiString read fFileName write SetFileName;
     property InProject: boolean read fInProject write fInProject;
@@ -562,11 +544,6 @@ begin
 		end;
 	end;
 
-	// Don't allow mouseover tips when scrolling
-	if scTopLine in Changes then begin
-		fAllowMouseOver := false;
-	end;
-
 	// scSelection includes anything caret related
 	if scSelection in Changes then begin
 		MainForm.SetStatusbarLineCol;
@@ -577,9 +554,6 @@ begin
 		WaitForCurly := max(0,WaitForCurly - 1);
 		WaitForSingleQuote := max(0,WaitForSingleQuote - 1);
 		WaitForDoubleQuote := max(0,WaitForDoubleQuote - 1);
-
-		// Reset mouseover timer if caret changes
-		fAllowMouseOver := false;
 
 		// Update the function tip
 		fFunctionTip.ForceHide := false;
@@ -848,7 +822,7 @@ end;
 
 procedure TEditor.UpdateCaption(const NewCaption: AnsiString);
 begin
-	if Assigned(fTabSheet) then begin // not needed?
+	if Assigned(fTabSheet) then begin // TODO: not needed?
 		if NewCaption <> fTabSheet.Caption then begin
 			fTabSheet.Caption:= NewCaption;
 			MainForm.UpdateAppTitle;
@@ -1106,6 +1080,7 @@ var
 	p : TBufferCoord;
 	DeletedChar,NextChar : Char;
 	S : AnsiString;
+	Reason : THandPointReason;
 
 	procedure UndoSymbolCompletion;
 	begin
@@ -1122,7 +1097,8 @@ var
 begin
 	case(Key) of
 		VK_CONTROL: begin
-			if HandpointAllowed(p) then // Update the cursor if it is hovering above a keyword and ctrl is pressed
+			Reason := HandpointAllowed(p);
+			if Reason <> hprNone then
 				fText.Cursor:=crHandPoint
 			else
 				fText.Cursor:=crIBeam;
@@ -1203,8 +1179,6 @@ begin
 		FreeAndNil(fCompletionTimer);
 	if Assigned(fFunctionTipTimer) then
 		FreeAndNil(fFunctionTipTimer);
-	if Assigned(fMouseOverTimer) then
-		FreeAndNil(fMouseOverTimer);
 end;
 
 procedure TEditor.InitCompletion;
@@ -1228,16 +1202,6 @@ begin
 		FreeAndNil(fFunctionTipTimer); // remove timer, because we only have a limited number avaiable
 	end;
 
-	if devEditor.ParserHints or devData.WatchHint then begin
-		if not Assigned(fMouseOverTimer) then
-			fMouseOverTimer:=TTimer.Create(nil);
-		fMouseOverTimer.Enabled:=True;
-		fMouseOverTimer.OnTimer:=MouseOverTimer;
-		fMouseOverTimer.Interval:=500;
-	end else begin
-		FreeAndNil(fMouseOverTimer);
-	end;
-
 	// The other stuff is fully completion dependant
 	if fCompletionBox.Enabled then begin
 		fCompletionBox.Width:=devCodeCompletion.Width;
@@ -1251,13 +1215,6 @@ begin
 	end else begin
 		FreeAndNil(fCompletionTimer);
 	end;
-end;
-
-procedure TEditor.MouseOverTimer(Sender : TObject);
-begin
-	// If we waited long enough AFTER scrolling, allow mouseovers again
-	if not fText.SelAvail and Assigned(fText.Highlighter) then
-		fAllowMouseOver := true;
 end;
 
 function TEditor.GetWordAtPosition(P : TBufferCoord;Purpose : TWordPurpose) : AnsiString;
@@ -1408,53 +1365,50 @@ end;
 
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
-	s,Line : AnsiString;
+	s : AnsiString;
 	p : TBufferCoord;
 	st: PStatement;
 	M : TMemoryStream;
+	Reason : THandPointReason;
+	IsIncludeLine : boolean;
 
 	procedure ShowFileHint;
 	var
 		FileName: AnsiString;
 	begin
-		FileName := MainForm.CppParser.GetHeaderFileName(fFileName,fText.Lines[p.Line - 1]);
+		FileName := MainForm.CppParser.GetHeaderFileName(fFileName,s);
 		if (FileName <> '') and FileExists(FileName) then
 			fText.Hint := FileName + ' - Ctrl+Click for more info'
 		else
 			fText.Hint := '';
 	end;
 
+	procedure ShowDebugHint;
+	begin
+		// Add to list
+		if devData.WatchHint then
+			MainForm.fDebugger.AddWatchVar(s);
+
+		// Evaluate s
+		fCurrentEvalWord := s; // remember name when debugger finishes
+		MainForm.fDebugger.OnEvalReady := OnMouseOverEvalReady;
+		MainForm.fDebugger.SendCommand('print',s);
+	end;
+
 	procedure ShowParserHint;
 	begin
-		// When debugging, evaluate stuff under cursor, and optionally add to watch list
-		if MainForm.fDebugger.Executing then begin
+		// This piece of code changes the parser database, possibly making hints and code completion invalid...
+		M := TMemoryStream.Create;
+		try
+			fText.UnCollapsedLines.SaveToStream(M);
+			st := MainForm.CppParser.FindStatementOf(fFileName,s,p.Line,M);
+		finally
+			M.Free;
+		end;
 
-			// Add to list
-			if devData.WatchHint then
-				MainForm.fDebugger.AddWatchVar(s);
-
-			// Evaluate s
-			fCurrentEvalWord := GetWordAtPosition(p,wpEvaluation);
-			MainForm.fDebugger.OnEvalReady := OnMouseOverEvalReady;
-			MainForm.fDebugger.SendCommand('print',fCurrentEvalWord);
-
-		// Otherwise, parse code and show information about variable
-		end else if devEditor.ParserHints and not fCompletionBox.Visible then begin // if the completion box is visible, don't rescan
-
-			// This piece of code changes the parser database, possibly making hints and code completion invalid...
-			M := TMemoryStream.Create;
-			try
-				fText.UnCollapsedLines.SaveToStream(M);
-				st := MainForm.CppParser.FindStatementOf(fFileName,GetWordAtPosition(p,wpInformation),p.Line,M);
-			finally
-				M.Free;
-			end;
-
-			if Assigned(st) then begin
-				fText.Hint := MainForm.CppParser.PrettyPrintStatement(st) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click for more info';
-				fText.Hint := StringReplace(fText.Hint,'|',#5,[rfReplaceAll]); // vertical bar is used to split up short and long hint versions...
-			end else // couldn't find anything? disable hint
-				fText.Hint := '';
+		if Assigned(st) then begin
+			fText.Hint := MainForm.CppParser.PrettyPrintStatement(st) + ' - ' + ExtractFileName(st^._FileName) + ' (' + IntToStr(st^._Line) + ') - Ctrl+Click for more info';
+			fText.Hint := StringReplace(fText.Hint,'|',#5,[rfReplaceAll]); // vertical bar is used to split up short and long hint versions...
 		end;
 	end;
 
@@ -1473,35 +1427,64 @@ var
 	end;
 begin
 
-	// If the mouse can be found INSIDE the window
-	if HandpointAllowed(p) then begin
+	// Leverage Ctrl-Clickability to determine if we can show any information
+	Reason := HandpointAllowed(p);
 
-		s := fText.GetWordAtRowCol(p);
-
-		// Don't rescan the same stuff over and over again (that's slow)
-		if (s <> fCurrentWord) then begin
-
-			// Different word? Cancel old now incorrect hint
-			MainForm.fDebugger.OnEvalReady := nil;
-			Application.CancelHint;
-			fCurrentWord := s;
-
-			// Cursor hovering above an identifier or preprocessor? Allow handpoint cursor
-			if (ssCtrl in Shift) then
-				fText.Cursor:=crHandPoint
+	// Get subject
+	IsIncludeLine := False;
+	case Reason of
+		// When hovering above a preprocessor line, determine if we want to show an include or a identifier hint
+		hprPreprocessor: begin
+			s := fText.Lines[p.Line-1];
+			IsIncludeLine := MainForm.CppParser.IsIncludeLine(s); // show filename hint
+			if not IsIncludeLine then
+				s := fText.GetWordAtRowCol(p);
+		end;
+		hprIdentifier: begin
+			if MainForm.fDebugger.Executing then
+				s :=  GetWordAtPosition(p,wpEvaluation) // debugging
+			else if devEditor.ParserHints and not fCompletionBox.Visible then
+				s := GetWordAtPosition(p,wpInformation) // information during coding
 			else
-				fText.Cursor:=crIBeam;
+				s := '';
+		end;
+		hprSelection: begin
+			s := fText.SelText; // when a selection is available, always only use that
+		end;
+		hprNone: begin
+			fText.Cursor := crIBeam; // nope
+			CancelHint;
+		end;
+	end;
 
-			// Either show an include filename or parser info
-			Line := Trim(fText.Lines[p.Line -1]);
-			if MainForm.CppParser.IsIncludeLine(Line) then // show filename hint
+	// Don't rescan the same stuff over and over again (that's slow)
+	if s = fCurrentWord then
+		Exit; // do NOT remove hint when subject stays the same
+
+	// Remove hint
+	CancelHint;
+	fCurrentWord := s;
+
+	// We are allowed to change the cursor
+	if (ssCtrl in Shift) then
+		fText.Cursor := crHandPoint
+	else
+		fText.Cursor := crIBeam;
+
+	// Determine what to do with subject
+	case Reason of
+		hprPreprocessor: begin
+			if IsIncludeLine then
 				ShowFileHint
-			else
+			else if devEditor.ParserHints and not fCompletionBox.Visible then
 				ShowParserHint;
 		end;
-	end else begin
-		fText.Cursor:=crIBeam;
-		CancelHint;
+		hprIdentifier, hprSelection: begin
+			if MainForm.fDebugger.Executing then
+				ShowDebugHint
+			else if devEditor.ParserHints and not fCompletionBox.Visible then
+				ShowParserHint;
+		end;
 	end;
 end;
 
@@ -1784,27 +1767,28 @@ begin
 	Canvas.Brush.Style := bsSolid;
 end;
 
-procedure TEditor.SetTabIndex(index : integer);
-begin
-	fTabSheet.PageIndex := index;
-end;
-
-function TEditor.HandpointAllowed(var mousepos : TBufferCoord) : boolean;
+function TEditor.HandpointAllowed(var mousepos : TBufferCoord) : THandPointReason;
 var
 	s : AnsiString;
 	HLAttr : TSynHighlighterAttributes;
 begin
-	result := false;
+	Result := hprNone;
 
-	// Only allow in the text area and don't allow when scrolling
-	if fAllowMouseOver and fText.GetPositionOfMouse(mousepos) then begin
+	// Only allow in the text area...
+	if fText.GetPositionOfMouse(mousepos) then begin
 
 		// Only allow hand points in highlighted areas
 		if fText.GetHighlighterAttriAtRowCol(mousepos, s, HLAttr) then begin
 
-			// Only allow identifiers and preprocessor stuff
-			if (HLAttr = fText.Highlighter.IdentifierAttribute) or (Assigned(HLAttr) and SameStr(HLAttr.Name,'Preprocessor')) then begin
-				result := true;
+			// Only allow Identifiers, Preprocessor directives, and selection
+			if Assigned(HLAttr) then begin
+				if fText.SelAvail then begin
+					if fText.IsPointInSelection(MousePos) then
+						Result := hprSelection; // allow selection
+				end else if SameStr(HLAttr.Name,'Identifier') then
+					Result := hprIdentifier // allow identifiers if no selection is present
+				else if SameStr(HLAttr.Name,'Preprocessor') then
+					Result := hprPreprocessor; // and preprocessor line if no selection is present
 			end;
 		end;
 	end;

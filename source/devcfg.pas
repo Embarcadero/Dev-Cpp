@@ -159,7 +159,6 @@ type
     fList: TList; // list of TdevCompilerSet
     fCurrentIndex : integer;
     function GetCurrentSet: TdevCompilerSet;
-    procedure SetCurrentIndex(index : integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -183,7 +182,7 @@ type
 
     // access to list
     property CurrentSet: TdevCompilerSet read GetCurrentSet;
-    property CurrentIndex: integer read fCurrentIndex write SetCurrentIndex;
+    property CurrentIndex: integer read fCurrentIndex write fCurrentIndex;
     property Sets[index: integer]: TdevCompilerSet read GetSet; default;
   end;
 
@@ -1768,17 +1767,6 @@ begin
 		result := nil;
 end;
 
-procedure TdevCompilerSets.SetCurrentIndex(index : integer);
-var
-	NewCurrentSet : TdevCompilerSet;
-begin
-	fCurrentIndex := index;
-	NewCurrentSet := GetCurrentSet;
-	if Assigned(NewCurrentSet) then
-		if NewCurrentSet.BinDir.Count > 0 then
-			SetPath(NewCurrentSet.BinDir[0]);
-end;
-
 procedure TdevCompilerSets.LoadSet(index : integer;const SetName : AnsiString = '');
 var
 	key : AnsiString;
@@ -1974,7 +1962,6 @@ begin
 				// Reset properties after validation
 				if CompSet.BinDir.Count > 0 then begin
 					CompSet.SetProperties(CompSet.BinDir[0],CompSet.gccName);
-					SetPath(CompSet.BinDir[0]); // bindir might have changed, reset it
 				end;
 			end;
 		end;

@@ -849,6 +849,7 @@ type
     fRunEndAction: TRunEndAction;
     fCompSuccessAction: TCompSuccessAction;
     fParseStartTime: Cardinal; // TODO: move to CppParser
+    fOldCompilerToolbarIndex : integer;
     function ParseParams(s : AnsiString) : AnsiString;
     procedure BuildBookMarkMenus;
     procedure SetHints;
@@ -2388,7 +2389,7 @@ procedure TMainForm.actCopyExecute(Sender: TObject);
 var
 	e: TEditor;
 begin
-	e:=GetEditor;
+	e := GetEditor;
 	if Assigned(e) then
 		e.Text.CopyToClipboard;
 end;
@@ -2766,6 +2767,7 @@ begin
 	if Assigned(fProject) then begin
 		fProject.ShowOptions;
 		UpdateAppTitle;
+		UpdateCompilerList;
 	end;
 end;
 
@@ -2894,6 +2896,11 @@ begin
 		MessageControl.ActivePage:= LogSheet;
 	end;
 
+	// Set PATH variable (not overriden by SetCurrentDir)
+	if Assigned(devCompilerSets.CurrentSet) then
+		if devCompilerSets.CurrentSet.BinDir.Count > 0 then
+			SetPath(devCompilerSets.CurrentSet.BinDir[0]);
+
 	e:= GetEditor;
 	fCompiler.Target:= ctNone;
 
@@ -3010,7 +3017,7 @@ begin
 	// always show compilation log (no intrusive windows anymore)
 	if devData.ShowProgress then begin
 		OpenCloseMessageSheet(True);
-		MessageControl.ActivePage:= LogSheet;
+		MessageControl.ActivePage := LogSheet;
 	end;
 	
 	fCompiler.Clean;
@@ -3701,24 +3708,24 @@ procedure TMainForm.actCopyUpdate(Sender: TObject);
 var
 	e: TEditor;
 begin
-	e:= GetEditor;
-	actCopy.Enabled:= assigned(e) and e.Text.SelAvail;
+	e := GetEditor;
+	actCopy.Enabled:= Assigned(e) and e.Text.SelAvail;
 end;
 
 procedure TMainForm.actPasteUpdate(Sender: TObject);
 var
 	e: TEditor;
 begin
-	e:= GetEditor;
-	actPaste.Enabled:= assigned(e) and e.Text.CanPaste;
+	e := GetEditor;
+	actPaste.Enabled := Assigned(e) and e.Text.CanPaste;
 end;
 
 procedure TMainForm.actSaveUpdate(Sender: TObject);
 var
 	e: TEditor;
 begin
-	e:= GetEditor;
-	actSave.Enabled:= assigned(e) and (e.Text.Modified or (e.FileName = ''));
+	e := GetEditor;
+	actSave.Enabled := Assigned(e) and (e.Text.Modified or (e.FileName = ''));
 end;
 
 procedure TMainForm.actSaveAsUpdate(Sender: TObject);
@@ -3853,6 +3860,7 @@ begin
 		cmbCompilers.Items.Add(devCompilerSets[i].Name);
 
 	// Set current index
+	fOldCompilerToolbarIndex := -1;
 
 	// Check if the current file belongs to a project
 	e := GetEditor;
@@ -4027,7 +4035,7 @@ begin
 
 		// move new file tab next to the old one
 		if not isalreadyopen then
-			e.SetTabIndex(oldtabindex + 1);
+			e.TabSheet.PageIndex := oldtabindex + 1;
 		e.Activate;
 	end else if iscfile then begin
 		SetStatusBarMessage(Lang[ID_MSG_CORRESPONDINGHEADER]);
@@ -4914,7 +4922,7 @@ end;
 
 procedure TMainForm.HelpMenuItemClick(Sender: TObject);
 begin
-	OpenHelpFile;
+	OpenHelpFile('index.htm');
 end;
 
 procedure TMainForm.CppParserStartParsing(Sender: TObject);
@@ -6590,30 +6598,50 @@ procedure TMainForm.cmbCompilersChange(Sender: TObject);
 var
 	index : integer;
 	e : TEditor;
+
+	procedure ChangeProjectCompilerSet;
+	begin
+		// If true, continue, otherwise, revert selection change
+		if MessageDlg(Lang[ID_POPT_DISCARDCUSTOM],mtConfirmation,[mbYes,mbNo],0) = mrNo then begin // user cancels change
+			TComboBox(Sender).ItemIndex := fOldCompilerToolbarIndex; // undo index change
+			Exit;
+		end;
+
+		// Discard changes made to the old set...
+		fProject.Options.CompilerSet := index;
+		fProject.Options.CompilerOptions := devCompilerSets[index].OptionString;
+		fProject.Modified := true;
+	end;
+
+	procedure ChangeNonProjectCompilerSet;
+	begin
+		devCompilerSets.CurrentIndex := index;
+		devCompilerSets.SaveSetList;
+	end;
 begin
 	index := TComboBox(Sender).ItemIndex;
+	if index = fOldCompilerToolbarIndex then
+		Exit;
 
 	// Check if the current file belongs to a project
 	e := GetEditor;
 	if Assigned(e) then begin
 		if e.InProject and Assigned(fProject) then begin
-			fProject.Options.CompilerSet := index;
-			fProject.Modified := true;
+			ChangeProjectCompilerSet;
 		end else begin
-			devCompilerSets.CurrentIndex := index;
-			devCompilerSets.SaveSetList;
+			ChangeNonProjectCompilerSet;
 		end;
 
 	// No editors have been opened. Check if a project is open
 	end else if Assigned(fProject) then begin
-		fProject.Options.CompilerSet := index;
-		fProject.Modified := true;
+		ChangeProjectCompilerSet;
 
 	// No project, no editor, modify global
 	end else begin
-		devCompilerSets.CurrentIndex := index;
-		devCompilerSets.SaveSetList;
+		ChangeNonProjectCompilerSet;
 	end;
+
+	fOldCompilerToolbarIndex := index;
 end;
 
 procedure TMainForm.actDuplicateLineExecute(Sender: TObject);

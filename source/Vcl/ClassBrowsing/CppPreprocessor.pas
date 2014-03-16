@@ -95,7 +95,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure AddDefineByNameValue(const Name, Args, Value : AnsiString; HardCoded : boolean);
+    procedure AddDefineByParts(const Name, Args, Value : AnsiString; HardCoded : boolean);
+    procedure GetDefineParts(const Input : AnsiString; var Name, Args, Value : AnsiString);
     procedure AddDefineByLine(const Line : AnsiString; HardCoded : boolean);
     function GetDefine(const Name : AnsiString) : PDefine;
     procedure Reset;
@@ -387,7 +388,7 @@ begin
 	result := nil;
 end;
 
-procedure TCppPreprocessor.AddDefineByNameValue(const Name, Args, Value : AnsiString; HardCoded : boolean);
+procedure TCppPreprocessor.AddDefineByParts(const Name, Args, Value : AnsiString; HardCoded : boolean);
 var
 	Item : PDefine;
 begin
@@ -403,31 +404,66 @@ begin
 		fDefines.Add(Item);
 end;
 
+// input should omit the define word
+procedure TCppPreprocessor.GetDefineParts(const Input : AnsiString; var Name, Args, Value : AnsiString);
+var
+	I, Level, ArgStart : integer;
+	S : AnsiString;
+	IsFunction : boolean;
+begin
+	S := TrimLeft(Input);
+	Name := '';
+	Args := '';
+	Value := '';
+
+	// Rules:
+	// When the character before the first opening brace is nonblank, a function is defined.
+	// After that point, switch from name to args
+	// The value starts after the first blank character outside of the outermost () pair
+
+	I := 1;
+	Level := 0;
+	IsFunction := False;
+	ArgStart := 0;
+	while I <= Length(S) do begin
+
+		// When we find the first opening brace, check if this is a function define
+		if S[i] = '(' then begin
+			Inc(Level);
+			if (Level = 1) and not IsFunction then begin // found a function define!
+				Name := Copy(S,1,I-1);
+				ArgStart := I;
+				IsFunction := True;
+			end;
+		end else if S[i] = ')' then begin
+			Dec(Level);
+		end else if (S[i] in SpaceChars) and (Level = 0) then
+			break; // found the end of our idenfifier
+		Inc(I);
+	end;
+
+	if IsFunction then begin
+		// Name has already been found
+		Args := Copy(S,ArgStart,I-ArgStart);
+	end else begin
+		Name := Trim(Copy(S,1,I));
+		Args := '';
+	end;
+	Value := TrimLeft(Copy(S,I + 1,MaxInt));
+end;
+
 procedure TCppPreprocessor.AddDefineByLine(const Line : AnsiString; HardCoded : boolean);
 var
-	I, Level : integer;
 	Name, Args, Value, S : AnsiString;
 begin
 	// Remove define
-	S := TrimLeft(Copy(Line,Length('#define') + 1,MaxInt)); // TODO: there may be spaces before define
+	S := TrimLeft(Copy(Line,Length('define') + 1,MaxInt));
 
-	// Split name/value by first space outside of ()
-	I := 1;
-	Level := 0;
-	while I <= Length(S) do begin
-		if S[i] = '(' then
-			Inc(Level)
-		else if S[i] = ')' then
-			Dec(Level)
-		else if (S[i] in SpaceChars) and (Level = 0) then
-			break;
-		Inc(I);
-	end;
-	Name := Trim(Copy(S,1,I));
-	Args := '';
-	Value := TrimLeft(Copy(S,I + 1,MaxInt));
+	// Get parts from generalized function
+	GetDefineParts(S,Name,Args,Value);
 
-	AddDefineByNameValue(Name,Args,Value,HardCoded);
+	// Add to the list
+	AddDefineByParts(Name,Args,Value,HardCoded);
 end;
 
 procedure TCppPreprocessor.ResetDefines;
@@ -435,7 +471,7 @@ var
 	I : integer;
 begin
 	// Assign hard list to soft list
-	for I := 0 to fDefines.Count - 1 do begin// remove memory first
+	for I := 0 to fDefines.Count - 1 do begin // remove memory first
 		if not PDefine(fDefines[i])^.HardCoded then // memory belongs to hardcoded list
 			Dispose(PDefine(fDefines[i]));
 	end;
@@ -477,7 +513,7 @@ begin
 			if not PDefine(fDefines[i])^.HardCoded then // memory does not belong to hardcoded list
 				Dispose(PDefine(fDefines[i]));
 			fDefines.Delete(i);
-			break; // ignore overriden defines
+			break; // ignore overriden defines 
 		end;
 	end;
 end;

@@ -179,7 +179,7 @@ var
 begin
 
 	// Create OBJ output directory
-	SetCurrentDir(fProject.Directory);
+	SetCurrentDir(fProject.Directory); // .dev file location
 	if fProject.Options.ObjectOutput <> '' then
 		if not DirectoryExists(fProject.Options.ObjectOutput) then
 			CreateDir(fProject.Options.ObjectOutput);
@@ -212,6 +212,9 @@ begin
 		end;
 	end;
 
+	Objects := Trim(Objects);
+	LinkObjects := Trim(LinkObjects);
+
 	if Length(fProject.Options.PrivateResource) = 0 then
 		ObjResFile := ''
 	else begin
@@ -231,7 +234,7 @@ begin
 	GetIncludesParams;
 
 	// Include special debugging definition
-	if (Pos(' -g3',fCompileParams) > 0) then begin
+	if Pos(' -g3',fCompileParams) > 0 then begin
 		Comp_ProgCpp := Comp_ProgCpp + ' -D__DEBUG__';
 		Comp_Prog := Comp_Prog + ' -D__DEBUG__';
 	end;
@@ -262,15 +265,15 @@ begin
 	writeln(F, 'WINDRES  = ' + devCompilerSets.CurrentSet.windresName);
 	if(ObjResFile <> '') then begin
 		writeln(F, 'RES      = ' + ObjResFile);
-		writeln(F, 'OBJ      =' + Objects     + ' $(RES)');
-		writeln(F, 'LINKOBJ  =' + LinkObjects + ' $(RES)');
+		writeln(F, 'OBJ      = ' + Objects     + ' $(RES)');
+		writeln(F, 'LINKOBJ  = ' + LinkObjects + ' $(RES)');
 	end else begin
-		writeln(F, 'OBJ      =' + Objects);
-		writeln(F, 'LINKOBJ  =' + LinkObjects);
+		writeln(F, 'OBJ      = ' + Objects);
+		writeln(F, 'LINKOBJ  = ' + LinkObjects);
 	end;
-	writeln(F, 'LIBS     =' + StringReplace(fLibrariesParams, '\', '/', [rfReplaceAll]));
-	writeln(F, 'INCS     =' + StringReplace(fIncludesParams, '\', '/', [rfReplaceAll]));
-	writeln(F, 'CXXINCS  =' + StringReplace(fCppIncludesParams, '\', '/', [rfReplaceAll]));
+	writeln(F, 'LIBS     = ' + StringReplace(fLibrariesParams, '\', '/', [rfReplaceAll]));
+	writeln(F, 'INCS     = ' + StringReplace(fIncludesParams, '\', '/', [rfReplaceAll]));
+	writeln(F, 'CXXINCS  = ' + StringReplace(fCppIncludesParams, '\', '/', [rfReplaceAll]));
 	writeln(F, 'BIN      = ' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)));
 
 	writeln(F, 'CXXFLAGS = $(CXXINCS) ' + fCppCompileParams);
@@ -1040,6 +1043,8 @@ begin
 					fLibrariesParams := fLibrariesParams + ' ' + option.Setting;
 		end;
 	end;
+
+	fLibrariesParams := Trim(fLibrariesParams);
 end;
 
 procedure TCompiler.GetIncludesParams;
@@ -1060,6 +1065,9 @@ begin
 				fIncludesParams := format(cAppendStr, [fIncludesParams, fProject.Options.Includes[i]]);
 				fCppIncludesParams := format(cAppendStr, [fCppIncludesParams, fProject.Options.Includes[i]]);
 			end;
+
+	fIncludesParams := Trim(fIncludesParams);
+	fCppIncludesParams := Trim(fCppIncludesParams);
 end;
 
 function TCompiler.GetCompiling: Boolean;

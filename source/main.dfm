@@ -47,7 +47,7 @@ object MainForm: TMainForm
     Top = 437
     Width = 1000
     Height = 183
-    ActivePage = DebugSheet
+    ActivePage = LogSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -149,7 +149,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 233
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
@@ -227,7 +227,7 @@ object MainForm: TMainForm
         Left = 233
         Top = 0
         Width = 759
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
@@ -235,7 +235,7 @@ object MainForm: TMainForm
           Left = 0
           Top = 0
           Width = 759
-          Height = 154
+          Height = 155
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -258,7 +258,7 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 403
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
@@ -278,7 +278,7 @@ object MainForm: TMainForm
           Width = 263
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
           OnKeyPress = edGdbCommandKeyPress
         end
@@ -444,7 +444,7 @@ object MainForm: TMainForm
           Width = 518
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 5
           OnKeyPress = EvaluateInputKeyPress
         end

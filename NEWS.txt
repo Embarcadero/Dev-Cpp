@@ -1,5 +1,6 @@
-Version 5.6.0 - *
+Version 5.6.0 - 24 Januari 2014
 
+- Updated TDM64 and MinGW32 to version 4.8.1.
 - The class browser can now show the contents of system includes.
 - Added a compiler set selector to the toolbar.
 - The Remove Unit Form is resizable again.
@@ -21,6 +22,8 @@ Version 5.6.0 - *
 - As of 5.6.0 RC1, a different completion cache file format is used. Older versions are not forward compatible.
 - The console pauser can now pass 32K characters to the running program instead of just 1K.
 - Fixed a bug in the first time config window that caused a crash when no compilers were installed.
+- Updated Chinese and Chinese (traditional) translations.
+- Added a std::thread example. Only compiles on TDM-GCC based installations.
 
 Version 5.5.3 - 5 November 2013
 

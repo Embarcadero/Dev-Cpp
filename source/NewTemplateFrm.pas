@@ -209,11 +209,7 @@ procedure TNewTemplateForm.ReadCategories;
 var
   i: Integer;
   Templates: TStringList;
-  sDir: AnsiString;
 begin
-  sDir:=devDirs.Templates;
-  if not CheckChangeDir(sDir) then
-    Exit;
   cmbCateg.Clear;
   Templates := TStringList.Create;
   try

@@ -177,7 +177,7 @@ type
     function IsValidIdentifier(const Name : AnsiString) : boolean;
   public
     procedure ResetDefines;
-    procedure AddHardDefineByNameValue(const Name, Args, Value : AnsiString);
+    procedure AddHardDefineByParts(const Name, Args, Value : AnsiString);
     procedure AddHardDefineByLine(const Line: AnsiString);
     procedure InvalidateFile(const FileName: AnsiString);
     function GetFileIncludes(const Filename: AnsiString): AnsiString;
@@ -1016,11 +1016,11 @@ end;
 
 procedure TCppParser.HandlePreprocessor;
 var
-	DelimPos, Level, I : integer;
-	S, Command : AnsiString;
+	DelimPos: integer;
+	S, Name, Args, Value : AnsiString;
 begin
-	if StartsStr('#include ',fTokenizer[fIndex]^.Text) then begin // start of new file
-		// format: #include fullfilename:line
+	if StartsStr('#include ',fTokenizer[fIndex]^.Text) then begin// start of new file
+		// format: #(spaces)include fullfilename:line
 		// Strip keyword
 		S := Copy(fTokenizer[fIndex]^.Text,Length('#include ') + 1,MaxInt);
 		DelimPos := LastPos(':',S);
@@ -1035,29 +1035,22 @@ begin
 				fOnTotalProgress(Self,fCurrentFile,-1,-1);
 		end;
 	end else if StartsStr('#define ',fTokenizer[fIndex]^.Text) then begin
-		// format: #define A B
-		S := Copy(fTokenizer[fIndex]^.Text,Length('#define ') + 1,MaxInt);
 
-		// Walk up to the first space outside ()
-		Level := 1;
-		for I := 1 to Length(S) do begin
-			if S[i] = '(' then
-				Inc(Level)
-			else if S[i] = ')' then
-				Dec(Level)
-			else if (S[i] in [#9,#32]) and (Level = 1) then
-				break;
-		end;
-		Command := Copy(S,1,I-1);
+		// format: #define A B, remove define keyword
+		S := TrimLeft(Copy(fTokenizer[fIndex]^.Text,Length('#define ') + 1,MaxInt));
+
+		// Ask the preprocessor to cut parts up
+		if Assigned(fPreprocessor) then
+			fPreprocessor.GetDefineParts(S,Name,Args,Value);
 
 		AddStatement(
 			-1,
 			-1, // defines don't belong to any scope
 			fCurrentFile,
-			fTokenizer[fIndex]^.Text,
-			'',
-			Command,
-			'', // no arguments
+			'#define ' + Name + Args + ' ' + Value,
+			'', // define has no type
+			Name,
+			Args,
 			fTokenizer[FIndex]^.Line,
 			skPreprocessor,
 			ssGlobal,
@@ -1856,16 +1849,20 @@ begin
 		fPreprocessor.ResetDefines;
 end;
 
-procedure TCppParser.AddHardDefineByNameValue(const Name, Args, Value : AnsiString);
+procedure TCppParser.AddHardDefineByParts(const Name, Args, Value : AnsiString);
 begin
 	if Assigned(fPreprocessor) then
-		fPreprocessor.AddDefineByNameValue(Name, Args, Value, True);
+		fPreprocessor.AddDefineByParts(Name, Args, Value, True);
 end;
 
 procedure TCppParser.AddHardDefineByLine(const Line : AnsiString);
 begin
-	if Assigned(fPreprocessor) then
-		fPreprocessor.AddDefineByLine(Line,True);
+	if Assigned(fPreprocessor) then begin
+		if Pos('#',Line) = 1 then
+			fPreprocessor.AddDefineByLine(TrimLeft(Copy(Line,2,MaxInt)),True)
+		else
+			fPreprocessor.AddDefineByLine(Line,True);
+	end;
 end;
 
 function TCppParser.IsSystemHeaderFile(const FileName: AnsiString): boolean;

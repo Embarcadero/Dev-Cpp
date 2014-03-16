@@ -268,7 +268,7 @@ end;
 
 procedure TCompOptForm.btnHelpClick(Sender: TObject);
 begin
-	OpenHelpFile;
+	OpenHelpFile('Interface\Dialog Windows\Compiler Options\index.htm'); // TODO: open iframe instead of page
 end;
 
 procedure TCompOptForm.DirTabsChange(Sender: TObject);

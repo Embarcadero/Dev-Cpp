@@ -361,6 +361,7 @@ object CompOptForm: TCompOptForm
           Width = 435
           Height = 280
           ItemHeight = 15
+          ScrollWidth = 600
           TabOrder = 0
           OnClick = lstDirsClick
           OnDblClick = lstDirsDblClick

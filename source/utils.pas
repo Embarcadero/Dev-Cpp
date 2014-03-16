@@ -103,8 +103,6 @@ type
 
   function GetVersionString(const FileName: AnsiString): AnsiString;
 
-  function CheckChangeDir(var Dir: AnsiString): boolean;
-
   function GetAssociatedProgram(const Extension: AnsiString; var Filename, Description: AnsiString): boolean;
 
   function IsNumeric(const s : AnsiString) : boolean;
@@ -113,7 +111,7 @@ type
 
   function CharToValue(c : char) : integer;
 
-  procedure OpenHelpFile;
+  procedure OpenHelpFile(const HelpFileName : AnsiString);
 
   function ProgramHasConsole(const Path : AnsiString) : boolean;
 
@@ -397,11 +395,11 @@ begin
 	MessageBox(application.handle,PAnsiChar(inttostr(text)),PAnsiChar(caption),MB_OK);
 end;
 
-procedure OpenHelpFile;
+procedure OpenHelpFile(const HelpFileName : AnsiString);
 var
 	abshelp : AnsiString;
-begin
-	abshelp := ReplaceFirstStr(devDirs.Help,  '%path%\',devDirs.Exec) + 'index.htm';
+begin // TODO: fix iframe opening problem
+	abshelp := ReplaceFirstStr(devDirs.Help,  '%path%\',devDirs.Exec) + HelpFileName;
 	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(abshelp), nil, nil, SW_SHOWNORMAL);
 end;
 
@@ -1076,19 +1074,6 @@ begin
   finally
     FreeMem(Buf);
   end;
-end;
-
-// tries to change the current directory to Dir.
-// Returns True if succesfull, False otherwise.
-// If it succeeds, the Dir variable, holds the old dir.
-function CheckChangeDir(var Dir: AnsiString): boolean;
-var
-  Old: AnsiString;
-begin
-  Old:=GetCurrentDir;
-  Result:=SetCurrentDir(Dir);
-  if Result then
-    Dir:=Old;
 end;
 
 function GetAssociatedProgram(const Extension: AnsiString; var Filename, Description: AnsiString): boolean;

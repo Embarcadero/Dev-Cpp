@@ -143,7 +143,7 @@ type
     function GetUnitFromEditor(ed : TEditor) : integer;
     function GetUnitFromString(const s : AnsiString) : integer;
     procedure RebuildNodes;
-    function ListUnitStr(sep: char): AnsiString;
+    function ListUnitStr(Separator : char): AnsiString;
     procedure ExportToHTML;
     procedure ShowOptions;
     function AssignTemplate(const aFileName: AnsiString;aTemplate: TTemplate): boolean;
@@ -1309,17 +1309,13 @@ begin
   result := ExtractFilePath(FileName);
 end;
 
-function TProject.ListUnitStr(sep: char): AnsiString;
+function TProject.ListUnitStr(Separator : char): AnsiString;
 var
- idx: integer;
-  sDir: AnsiString;
+	I : integer;
 begin
-  Result:='';
-  sDir:=Directory;
-  if not CheckChangeDir(sDir) then
-    Exit;
-  for idx:= 0 to pred(fUnits.Count) do
-   result:= result +sep +'"'+ExpandFileName(fUnits[idx].FileName)+'"';
+	Result := '';
+	for I := 0 to fUnits.Count -1 do
+		result := result + '"' + ExpandFileName(fUnits[I].FileName) + '"' + Separator;
 end;
 
 procedure TProject.SetFileName(const value: AnsiString);
