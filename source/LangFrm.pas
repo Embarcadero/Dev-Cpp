@@ -376,6 +376,8 @@ begin
 	// Font options
 	cmbFont.Items.Assign(Screen.Fonts);
 	cmbFont.ItemIndex := cmbFont.Items.IndexOf('Consolas');
+	if cmbFont.ItemIndex = -1 then
+		cmbFont.ItemIndex := cmbFont.Items.IndexOf('Courier New');
 	lbLanguages.SetFocus;
 end;
 

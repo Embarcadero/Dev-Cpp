@@ -101,7 +101,7 @@ procedure TNewTemplateForm.FormShow(Sender: TObject);
 begin
   LoadText;
 
-  cmbName.Text := MainForm.fProject.Name;
+  cmbName.Text := MainForm.Project.Name;
   txtDescr.Text := 'This is a custom project.';
 
   ReadCategories;

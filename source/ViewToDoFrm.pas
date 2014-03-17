@@ -211,27 +211,27 @@ begin
 	end;
 
 	if InProject and not OpenOnly then begin
-	if Assigned(MainForm.fProject) then
-		for idx := 0 to pred(MainForm.fProject.Units.Count) do
-		AddToDo(MainForm.fProject.Units[idx].filename);
+		if Assigned(MainForm.Project) then
+			for idx := 0 to pred(MainForm.Project.Units.Count) do
+				AddToDo(MainForm.Project.Units[idx].filename);
 	end;
 
 	if OpenOnly then begin
-	for idx := 0 to pred(MainForm.PageControl.PageCount) do begin
-		e := MainForm.GetEditor(idx);
-		if Assigned(e) then
-		if InProject and e.InProject then
-			AddToDo(e.FileName)
-	end;
+		for idx := 0 to pred(MainForm.PageControl.PageCount) do begin
+			e := MainForm.GetEditor(idx);
+			if Assigned(e) then
+			if InProject and e.InProject then
+				AddToDo(e.FileName)
+		end;
 	end;
 
 	if NotInProject then begin
-	for idx := 0 to pred(MainForm.PageControl.PageCount) do begin
-		e := MainForm.GetEditor(idx);
-		if Assigned(e) then
-		if not e.InProject then
-			AddToDo(e.FileName);
-	end;
+		for idx := 0 to pred(MainForm.PageControl.PageCount) do begin
+			e := MainForm.GetEditor(idx);
+			if Assigned(e) then
+			if not e.InProject then
+				AddToDo(e.FileName);
+		end;
 	end;
 end;
 

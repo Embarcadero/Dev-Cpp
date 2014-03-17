@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, prjtypes, Math;
+  Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, prjtypes, Math, ShellAPI;
 {$ENDIF}
 {$IFDEF LINUX}
   QDialogs, Classes, QGraphics, QSynEdit, CFGData, IniFiles, Math, prjtypes;
@@ -691,8 +691,7 @@ function devData: TdevData;
 procedure InitializeOptions;
 procedure SaveOptions;
 procedure FinalizeOptions;
-procedure CheckForAltConfigFile(const filename: AnsiString);
-procedure UpdateAltConfigFile;
+procedure RemoveOptions(const OptionsDir : AnsiString);
 
 var
   devCompilerSets: TdevCompilerSets = nil;
@@ -704,9 +703,6 @@ var
   devExternalPrograms: TdevExternalPrograms = nil;
 
   ConfigMode : (CFG_APPDATA, CFG_PARAM, CFG_EXEFOLDER) = CFG_APPDATA;
-  StandardConfigFile : AnsiString;
-  UseAltConfigFile : boolean;
-  AltConfigFile : AnsiString;
   DontRecreateSingletons : boolean;
 
 implementation
@@ -806,34 +802,36 @@ begin
   devExternalPrograms.Free;
 end;
 
-procedure CheckForAltConfigFile(const filename: AnsiString);
+procedure RemoveOptions(const OptionsDir : AnsiString);
 var
-    Ini: TIniFile;
+	fostruct : SHFILEOPSTRUCT;
+	DirFrom,DirTo : array[0..MAX_PATH] of char;
 begin
-  UseAltConfigFile:=false;
-  AltConfigFile:='';
-  if not FileExists(filename) then
-    Exit;
-  Ini:=TIniFile.Create(filename);
-  try
-    UseAltConfigFile:=Ini.ReadBool('Options', 'UseAltConfigFile', false);
-    AltConfigFile:=Ini.ReadString('Options', 'AltConfigFile', '');
-  finally
-    Ini.Free;
-  end;
-end;
+	// Copy and delete
+	FillChar(DirFrom, Sizeof(DirFrom),0);
+	StrPCopy(DirFrom, OptionsDir);
 
-procedure UpdateAltConfigFile;
-var
-    Ini: TIniFile;
-begin
-  Ini:=TIniFile.Create(StandardConfigFile);
-  try
-    Ini.WriteBool('Options', 'UseAltConfigFile', UseAltConfigFile);
-    Ini.WriteString('Options', 'AltConfigFile', AltConfigFile);
-  finally
-    Ini.Free;
-  end;
+	FillChar(DirTo, Sizeof(DirFrom),0);
+	StrPCopy(DirTo, ExcludeTrailingBackslash(OptionsDir) + 'Backup' + pd);
+
+	FillChar(fostruct,Sizeof(fostruct),0);
+	with fostruct do begin
+		Wnd := 0;
+		pFrom := @DirFrom;
+		pTo := @DirTo;
+		wFunc := FO_COPY;
+		fFlags := FOF_ALLOWUNDO or FOF_SILENT or FOF_NOCONFIRMATION;
+	end;
+	SHFileOperation(fostruct);
+
+	FillChar(fostruct,Sizeof(fostruct),0);
+	with fostruct do begin
+		Wnd := 0;
+		pFrom := @DirFrom;
+		wFunc := FO_DELETE;
+		fFlags := FOF_ALLOWUNDO or FOF_SILENT or FOF_NOCONFIRMATION;
+	end;
+	SHFileOperation(fostruct);
 end;
 
 var
@@ -1755,8 +1753,8 @@ function TdevCompilerSets.GetCurrentSet : TdevCompilerSet;
 var
 	index : integer;
 begin
-	if Assigned(MainForm) and Assigned(MainForm.fProject) then
-		index := MainForm.fProject.Options.CompilerSet
+	if Assigned(MainForm) and Assigned(MainForm.Project) then
+		index := MainForm.Project.Options.CompilerSet
 	else
 		index := fCurrentIndex;
 

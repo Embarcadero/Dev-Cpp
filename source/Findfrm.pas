@@ -290,9 +290,9 @@ begin
 
 		// loop through project
 		end else if rbProjectFiles.Checked then begin
-			for I := 0 to MainForm.fProject.Units.Count - 1 do begin
-				e := MainForm.fProject.Units[i].Editor;
-				fCurFile := MainForm.fProject.Units[i].FileName;
+			for I := 0 to MainForm.Project.Units.Count - 1 do begin
+				e := MainForm.Project.Units[i].Editor;
+				fCurFile := MainForm.Project.Units[i].FileName;
 
 				// file is already open, use memory
 				if Assigned(e) then begin
@@ -318,7 +318,7 @@ begin
 
 								// Save and close
 								e.Save;
-								MainForm.fProject.CloseUnit(MainForm.fProject.Units.Indexof(e));
+								MainForm.Project.CloseUnit(MainForm.Project.Units.Indexof(e));
 							end;
 						end else begin
 
@@ -428,8 +428,8 @@ begin
 	// grpOption is always visible
 
 	// Disable project search option when none is open
-	rbProjectFiles.Enabled := Assigned(MainForm.fProject);
-	if not Assigned(MainForm.fProject) then
+	rbProjectFiles.Enabled := Assigned(MainForm.Project);
+	if not Assigned(MainForm.Project) then
 		rbOpenFiles.Checked := true;
 
 	// Disable prompt when doing finds

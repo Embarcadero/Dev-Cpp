@@ -52,7 +52,7 @@ type
     cbShowBars: TCheckBox;
     cbMultiLineTab: TCheckBox;
     rgbAutoOpen: TRadioGroup;
-    cbdblFiles: TCheckBox;
+    cbDblFiles: TCheckBox;
     gbDebugger: TGroupBox;
     cbWatchHint: TCheckBox;
     cbNoSplashScreen: TCheckBox;
@@ -79,10 +79,6 @@ type
     edSplash: TEdit;
     edIcoLib: TEdit;
     edLang: TEdit;
-    gbAltConfig: TGroupBox;
-    btnAltConfig: TSpeedButton;
-    chkAltConfig: TCheckBox;
-    edAltConfig: TEdit;
     tabExternal: TTabSheet;
     lblExternal: TLabel;
     btnExtAdd: TSpeedButton;
@@ -105,6 +101,9 @@ type
     cbUIfontsize: TComboBox;
     cbPauseConsole: TCheckBox;
     cbCheckAssocs: TCheckBox;
+    edOptionsDir: TEdit;
+    lblOptionsDir: TLabel;
+    btnResetDev: TButton;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -114,12 +113,12 @@ type
     procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;const KeyName, KeyValue: string);
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
-    procedure chkAltConfigClick(Sender: TObject);
     procedure cvsdownloadlabelClick(Sender: TObject);
     procedure cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
     procedure cbUIfontsizeDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
     procedure cbUIfontsizeChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnResetDevClick(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -186,44 +185,39 @@ begin
 				Free;
 			end;
 		end;
-
-		7: begin // Alternate Configuration File
-			with TOpenDialog.Create(self) do try
-				Filter := FLT_ALLFILES;
-				FileName := edAltConfig.Text;
-				if Execute then
-					edAltConfig.Text := FileName;
-			finally
-				Free;
-			end;
-		end;
 	end;
 end;
 
 procedure TEnviroForm.FormShow(Sender: TObject);
 var
-	idx,sel: integer;
+	I,sel: integer;
 begin
 	with devData do begin
-		rgbAutoOpen.ItemIndex:= AutoOpen;
+		// General, left column
 		cbDefCpp.Checked:= defCpp;
-		cbShowBars.Checked:= ShowBars;
-		cbMultiLineTab.Checked:= MultiLineTab;
 		cbBackups.Checked:= BackUps;
 		cbMinOnRun.Checked:= MinOnRun;
-		cbdblFiles.Checked:= DblFiles;
+		cbShowBars.Checked:= ShowBars;
+		cbMultiLineTab.Checked:= MultiLineTab;
+		cbDblFiles.Checked:= DblFiles;
 		cbNoSplashScreen.Checked:= NoSplashScreen;
 		cbPauseConsole.Checked:=ConsolePause;
 		cbCheckAssocs.Checked:=CheckAssocs;
+		cbWatchHint.Checked := WatchHint;
+		cbShowProgress.Checked := ShowProgress;
+		cbAutoCloseProgress.Checked := AutoCloseProgress;
+
+		// General, right column
 		seMRUMax.Value:= MRUMax;
+		cboTabsTop.ItemIndex:= msgTabs;
 
 		// List the languages
 		cboLang.Items.BeginUpdate;
 		cboLang.Clear;
-		for idx := 0 to Lang.Langs.Count - 1 do begin
-			sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[idx]);
-			if SameText(Lang.CurrentLanguage,cboLang.Items[sel]) then
-				cboLang.ItemIndex := idx;
+		for I := 0 to Lang.Langs.Count - 1 do begin
+			sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[I]);
+			if SameText(Lang.CurrentLanguage,cboLang.Items[I]) then
+				cboLang.ItemIndex := sel;
 		end;
 		cboLang.Items.EndUpdate;
 
@@ -232,51 +226,48 @@ begin
 		devImageThemes.GetThemeTitles(cboTheme.Items);
 		cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
 
-		cbShowProgress.Checked := ShowProgress;
-		cbAutoCloseProgress.Checked := AutoCloseProgress;
-
-		cbWatchHint.Checked := WatchHint;
-
-		cboTabsTop.ItemIndex:= msgTabs;
-
-		chkAltConfig.Checked:= UseAltConfigFile;
-		edAltConfig.Text:= AltConfigFile;
-		chkAltConfigClick(nil);
-
-		edSplash.Text:= Splash;
-		edIcoLib.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Icons);
-		edUserDir.Text:= devDirs.Default;
-		edTemplatesDir.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Templates);
-		edLang.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Lang);
-
-		vleExternal.Strings.Assign(devExternalPrograms.Programs);
-		for idx:=0 to vleExternal.Strings.Count-1 do
-			vleExternal.ItemProps[idx].EditStyle:=esEllipsis;
-
-		lstAssocFileTypes.Clear;
-		for idx:=0 to AssociationsCount-1 do begin
-			lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[idx, 1], Associations[idx, 0]]));
-			lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count-1]:=IsAssociated(idx);
-		end;
-
-		edCVSExec.Text:= devCVSHandler.Executable;
-		spnCVSCompression.Value:= devCVSHandler.Compression;
-		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
-
-		// Add all fonts and select the current one
+		// Add all font families and select the current one
 		cbUIfont.Items.Assign(Screen.Fonts);
-		for idx:=0 to pred(cbUIfont.Items.Count) do
-			if cbUIfont.Items.Strings[idx] = InterfaceFont then begin
-				cbUIfont.ItemIndex := idx;
+		for I := 0 to cbUIfont.Items.Count-1 do
+			if cbUIfont.Items.Strings[I] = InterfaceFont then begin
+				cbUIfont.ItemIndex := I;
 				break;
 			end;
 
 		// Do the same for the size selection
-		for idx:=0 to pred(cbUIfontsize.Items.Count) do
-			if strtoint(cbUIfontsize.Items.Strings[idx]) = InterfaceFontSize then begin
-				cbUIfontsize.ItemIndex := idx;
+		for I := 0 to cbUIfontsize.Items.Count-1 do
+			if StrToIntDef(cbUIfontsize.Items.Strings[I],-1) = InterfaceFontSize then begin
+				cbUIfontsize.ItemIndex := I;
 				break;
 			end;
+
+		// General tab, right column, last entry
+		rgbAutoOpen.ItemIndex:= AutoOpen;
+
+		// Directories tab
+		edOptionsDir.Text := devDirs.Config;
+		edUserDir.Text:= devDirs.Default;
+		edTemplatesDir.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Templates);
+		edIcoLib.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Icons);
+		edLang.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Lang);
+		edSplash.Text:= Splash;
+
+		// External Programs tab
+		vleExternal.Strings.Assign(devExternalPrograms.Programs);
+		for I := 0 to vleExternal.Strings.Count-1 do
+			vleExternal.ItemProps[I].EditStyle:=esEllipsis;
+
+		// File associations tab
+		lstAssocFileTypes.Clear;
+		for I := 0 to AssociationsCount-1 do begin
+			lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[I, 1], Associations[I, 0]]));
+			lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count-1]:=IsAssociated(I);
+		end;
+
+		// CVS Support tab
+		edCVSExec.Text:= devCVSHandler.Executable;
+		spnCVSCompression.Value:= devCVSHandler.Compression;
+		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
 	end;
 end;
 
@@ -285,14 +276,6 @@ var
 	I : integer;
 	s : AnsiString;
 begin
-	if chkAltConfig.Enabled then begin
-		if UseAltConfigFile<>chkAltConfig.Checked then
-			MessageDlg(Lang[ID_ENV_CONFIGCHANGED], mtInformation, [mbOk], 0);
-		UseAltConfigFile:= chkAltConfig.Checked and (edAltConfig.Text<>'');
-		AltConfigFile:= edAltConfig.Text;
-		UpdateAltConfigFile;
-	end;
-
 	with devData do begin
 		DefCpp:= cbDefCpp.Checked;
 		ShowBars:= cbShowBars.Checked;
@@ -305,7 +288,7 @@ begin
 		MRUMax:= seMRUMax.Value;
 		if not MultiLineTab then begin
 			if cboTabsTop.ItemIndex in [2,3] then begin
-				MessageBox(application.handle,PAnsiChar('Multiline tabs must be enabled when using vertical tabs.'+#13#10#13#10+'Reverting to Top Tabs...'),PAnsiChar('Error'),MB_OK);
+				MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_MULTILINETABERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
 				cboTabsTop.ItemIndex := 0;
 			end;
 		end;
@@ -407,12 +390,13 @@ begin
   cboTabsTop.Items[2]:=          Lang[ID_ENV_LEFT];
   cboTabsTop.Items[3]:=          Lang[ID_ENV_RIGHT];
 
-  gbAltConfig.Caption:=          ' '+Lang[ID_ENV_GBALTCONFIG]+' ';
   lblLang.Caption:=              Lang[ID_ENV_LANGUAGE];
   lblTheme.Caption:=             Lang[ID_ENV_THEME];
   lblmsgTabs.Caption:=           Lang[ID_ENV_MSGTABS];
   lblMRU.Caption:=               Lang[ID_ENV_MRU];
 
+  lblOptionsDir.Caption:=        Lang[ID_ENV_OPTIONSDIRHINT];
+  btnResetDev.Caption:=          Lang[ID_ENV_RESETDEV];
   lblUserDir.Caption:=           Lang[ID_ENV_USERDIR];
   lblTemplatesDir.Caption:=      Lang[ID_ENV_TEMPLATESDIR];
   lblIcoLib.Caption:=            Lang[ID_ENV_ICOLIB];
@@ -497,13 +481,6 @@ begin
     vleExternal.DeleteRow(vleExternal.Row);
 end;
 
-procedure TEnviroForm.chkAltConfigClick(Sender: TObject);
-begin
-  chkAltConfig.Enabled := ConfigMode <> CFG_PARAM;
-  edAltConfig.Enabled := chkAltConfig.Enabled and chkAltConfig.Checked;
-  btnAltConfig.Enabled := chkAltConfig.Enabled and chkAltConfig.Checked;
-end;
-
 procedure TEnviroForm.cvsdownloadlabelClick(Sender: TObject);
 begin
 	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
@@ -537,6 +514,15 @@ end;
 procedure TEnviroForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 	Action := caFree;
+end;
+
+procedure TEnviroForm.btnResetDevClick(Sender: TObject);
+begin
+	// Remove settings on exit
+	RemoveOptions(devDirs.Config);
+
+	// Quit without saving
+	TerminateProcess(GetCurrentProcess, 0);
 end;
 
 end.

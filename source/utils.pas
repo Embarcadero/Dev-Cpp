@@ -1044,47 +1044,43 @@ end;
 
 function GetRealPath(const BrokenFileName, Directory: AnsiString): AnsiString;
 var
-  e: TEditor;
+	e: TEditor;
 begin
-  Result := BrokenFileName;
+	Result := BrokenFileName;
 
-  { There are 3 kinds of bad filenames:
-    1: C:/Foo/Bar.txt              (must be backslashes)
-    2: /C/WINDOWS/Desktop/foo.c    (WinUnix paths?)
-    3: foo.c                       (not an absolute filename) }
+	// There are 3 kinds of bad filenames:
+	// 1: C:/Foo/Bar.txt              (must be backslashes)
+	// 2: /C/WINDOWS/Desktop/foo.c    (WinUnix paths?)
+	// 3: foo.c                       (not an absolute filename)
 
-  { First, check if this is a WinUnix path }
-  if CompareText(Copy(Result, 1, 1), '/') = 0 then
-  begin
-      Delete(Result, 1, 2);
-      Result[2] := ':';
-      Insert('\', Result, 3);
-  end;
+	// First, check if this is a WinUnix path
+	if CompareText(Copy(Result, 1, 1), '/') = 0 then begin
+		Delete(Result, 1, 2);
+		Result[2] := ':';
+		Insert('\', Result, 3);
+	end;
 
-  { Second, check if this is an absolute filename }
-  if (Length(Result) < 4) or not ((LowerCase(Result)[1] in ['A'..'Z']) and (Result[2] = ':')) then
-  begin
-      { It's not. }
-      if Length(Directory) = 0 then
-      begin
-          if Assigned(MainForm.fProject) then
-              Result := ExpandFileTo(Result, MainForm.fProject.Directory)
-          else begin
-              e := MainForm.GetEditor;
-              if (Assigned(e)) and (Length(ExtractFileDir(e.FileName)) > 0) then
-                  Result := ExpandFileTo(Result, ExtractFileDir(e.FileName))
-              else
-                  Result := ExpandFileName(Result);
-          end;
-      end else
-      begin
-          Result := ExpandFileTo(Result, Directory);
-      end;
-  end;
+	// Second, check if this is an absolute filename
+	if (Length(Result) < 4) or not ((LowerCase(Result)[1] in ['A'..'Z']) and (Result[2] = ':')) then begin
+		// It's not
+		if Length(Directory) = 0 then begin
+			if Assigned(MainForm.Project) then
+				Result := ExpandFileTo(Result, MainForm.Project.Directory)
+			else begin
+				e := MainForm.GetEditor;
+				if (Assigned(e)) and (Length(ExtractFileDir(e.FileName)) > 0) then
+ 					Result := ExpandFileTo(Result, ExtractFileDir(e.FileName))
+				else
+					Result := ExpandFileName(Result);
+			end;
+		end else begin
+			Result := ExpandFileTo(Result, Directory);
+		end;
+	end;
 
-  { Last, replace all slashes with backslahes }
+	// Last, replace all slashes with backslahes
 {$IFDEF WIN32}
-  StringReplace(Result, '/', '\', [rfReplaceAll]);
+	Result := StringReplace(Result, '/', '\', [rfReplaceAll]);
 {$ENDIF}
 end;
 

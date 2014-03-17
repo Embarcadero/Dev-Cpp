@@ -37,58 +37,52 @@ type
 
   TDebugger = class(TObject)
   private
-
-    // GDB process info
-    fOutputread : THandle;
-    fOutputwrite : THandle;
-    fInputread : THandle;
-    fInputwrite : THandle;
+    fOutputRead : THandle;
+    fOutputWrite : THandle;
+    fInputRead : THandle;
+    fInputWrite : THandle;
     fProcessID : THandle;
-
-    // GDB communication thread
-    Reader : TDebugReader;
-
+    fExecuting : boolean;
+    fCommandChanged : boolean;
+    fDebugTree : TTreeView;
+    fLeftPageIndexBackup : integer;
+    fBreakPointList : TList;
+    fWatchVarList : TList;
+    fOnEvalReady : TEvalReadyEvent;
+    fReader : TDebugReader;
   public
-    Executing : boolean;
-    GDBcommandchanged : boolean;
-
-    DebugTree : TTreeView;
-    LeftPageIndexBackup : integer;
-    BreakPointList : TList;
-    WatchVarList : TList;
-
-    OnEvalReady : TEvalReadyEvent;
-
     constructor Create;
     destructor  Destroy; override;
 
+    // Play/pause
     procedure Start;
     procedure Stop;
     procedure SendCommand(const command,params : AnsiString;viewinui : boolean = false);
 
-    // CPU window
-    procedure SetRegisters(Listin : TList);
-    procedure SetDisassembly(StringListin : TStringList);
-    procedure SetBacktrace(Listin : TList);
-
     // breakpoints
     procedure AddBreakPoint(i : integer); overload;
     procedure RemoveBreakPoint(i : integer); overload;
-
     procedure AddBreakPoint(Linein : integer;e : TEditor); overload;
     procedure RemoveBreakPoint(Linein : integer;e : TEditor); overload;
-
     procedure DeleteBreakPointsOf(editor : TEditor);
 
     // watch var
     procedure AddWatchVar(i : integer); overload;
     procedure RemoveWatchVar(i : integer); overload;
-
     procedure AddWatchVar(const namein : AnsiString); overload;
     procedure RemoveWatchVar(nodein : TTreeNode); overload;
-
     procedure RefreshWatchVars;
     procedure DeleteWatchVars(deleteparent : boolean);
+
+    // Access
+    property Executing : boolean read fExecuting write fExecuting;
+    property LeftPageIndexBackup : integer read fLeftPageIndexBackup write fLeftPageIndexBackup;
+    property WatchVarList : TList read fWatchVarList write fWatchVarList;
+    property BreakPointList : TList read fBreakPointList write fBreakPointList;
+    property CommandChanged : boolean read fCommandChanged write fCommandChanged;
+    property DebugTree : TTreeView read fDebugTree write fDebugTree;
+    property OnEvalReady : TEvalReadyEvent read fOnEvalReady write fOnEvalReady;
+    property Reader : TDebugReader read fReader write fReader;
   end;
 
 implementation
@@ -119,21 +113,6 @@ begin
 	BreakPointList.Free;
 
 	inherited;
-end;
-
-procedure TDebugger.SetRegisters(Listin : TList);
-begin
-	Reader.Registers := Listin;
-end;
-
-procedure TDebugger.SetDisassembly(StringListin : TStringList);
-begin
-	Reader.Disassembly := StringListin;
-end;
-
-procedure TDebugger.SetBacktrace(Listin : TList);
-begin
-	Reader.Backtrace := Listin;
 end;
 
 procedure TDebugger.Start;
@@ -192,7 +171,7 @@ begin
 
 	// Create a thread that will read GDB output.
 	Reader := TDebugReader.Create(true);
-	Reader.hPipeRead := fOutputread;
+	Reader.PipeRead := fOutputRead;
 	Reader.FreeOnTerminate := true;
 	Reader.BreakpointList := BreakPointList;
 	Reader.WatchVarList := WatchVarList;
@@ -241,7 +220,7 @@ begin
 	end;
 end;
 
-procedure TDebugger.SendCommand(const command,params : AnsiString;viewinui : boolean);
+procedure TDebugger.SendCommand(const Command, Params : AnsiString; ViewInUI : boolean);
 var
 	P : PAnsiChar;
 	nBytesWrote : DWORD;
@@ -260,15 +239,15 @@ begin
 		if not WriteFile(fInputwrite, P^, strlen(P), nBytesWrote, nil) then
 			MsgErr('Error writing to GDB');
 
-		if viewinui then
-			if (not GDBcommandchanged) or (MainForm.edGdbCommand.Text = '') then begin
+		if ViewInUI then
+			if (not CommandChanged) or (MainForm.edGdbCommand.Text = '') then begin
 				// Convert command to C string
 				if Length(params) > 0 then
-					MainForm.edGdbCommand.Text := command + ' ' + params
+					MainForm.edGdbCommand.Text := Command + ' ' + params
 				else
-					MainForm.edGdbCommand.Text := command;
+					MainForm.edGdbCommand.Text := Command;
 
-				GDBcommandchanged := false;
+				CommandChanged := false;
 			end;
 
 		FreeMem(P);
@@ -368,12 +347,12 @@ begin
 	// Add parent to list
 	wparent := New(PWatchVar);
 	wparent^.name := namein;
-	wparent^.value := 'Execute to evaluate';
+//	wparent^.value := 'Execute to evaluate';
 	wparent^.gdbindex := -1; // filled by GDB
 	WatchVarList.Add(wparent);
 
 	// Add parent to GUI
-	parentnode := DebugTree.Items.AddObject(nil,wparent^.name + ' = ' + wparent^.value,wparent);
+	parentnode := DebugTree.Items.AddObject(nil,wparent^.name + ' = Execute to evaluate',wparent);
 	parentnode.ImageIndex := 21;
 	parentnode.SelectedIndex := 21;
 
@@ -418,8 +397,8 @@ var
 begin
 	// Variables that aren't found need to be re-displayed!
 	for i := 0 to WatchVarList.Count - 1 do
-		if SameStr(PWatchVar(WatchVarList.Items[i])^.value,'Not found in current context') then
-			AddWatchVar(i);
+		if PWatchVar(WatchVarList.Items[i])^.gdbindex = -1 then
+			AddWatchVar(i); // resends command to display to GDB
 end;
 
 procedure TDebugger.DeleteWatchVars(deleteparent : boolean);
@@ -449,8 +428,7 @@ begin
 
 			// Leave parent node intact...
 			wparent^.gdbindex := -1;
-			wparent^.value := 'Execute to evaluate';
-			wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
+			wparent^.node.Text := wparent^.name + ' = Execute to evaluate';
 		end;
 	end;
 	DebugTree.Items.EndUpdate;

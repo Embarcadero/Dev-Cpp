@@ -102,16 +102,17 @@ begin
 		Dispose(PTrace(fBacktrace.Items[I]));
 	fBackTrace.Free;
 
-	MainForm.fDebugger.SetRegisters(nil);
-	MainForm.fDebugger.SetDisassembly(nil);
-	MainForm.fDebugger.SetBacktrace(nil);
+	// Clear contents of the debug reader
+	MainForm.Debugger.Reader.Registers := nil;
+	MainForm.Debugger.Reader.Disassembly := nil;
+	MainForm.Debugger.Reader.Backtrace := nil;
 
 	// Save column widths of registerbox
 	devData.CPURegisterCol1 := RegisterListbox.Column[0].Width;
 	devData.CPURegisterCol2 := RegisterListbox.Column[1].Width;
 	devData.CPURegisterCol3 := RegisterListbox.Column[2].Width;
 
-	action := caFree;
+	Action := caFree;
 	CPUForm := nil;
 end;
 
@@ -119,7 +120,7 @@ procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
 var
 	propercmd : AnsiString;
 begin
-	if MainForm.fDebugger.Executing then begin
+	if MainForm.Debugger.Executing then begin
 		if Key = Chr(VK_RETURN) then begin
 			Key := #0;
 
@@ -127,7 +128,7 @@ begin
 			propercmd := edFunc.Text;
 			if EndsStr('()',propercmd) then
 				propercmd := ReplaceLastStr(propercmd,'()','(void)');
-			MainForm.fDebugger.SendCommand('disas',propercmd);
+			MainForm.Debugger.SendCommand('disas',propercmd);
 			if (Length(edFunc.Text) > 0) and (edFunc.Items.IndexOf(edFunc.Text) = -1) then
 				edFunc.AddItem(edFunc.Text,nil);
 		end;
@@ -230,20 +231,20 @@ begin
 	fAssembler := TStringList.Create;
 	fBacktrace := TList.Create;
 
-	if MainForm.fDebugger.Executing then begin
+	if MainForm.Debugger.Executing then begin
 
 		// Load the registers...
-		MainForm.fDebugger.SetRegisters(fRegisters);
-		MainForm.fDebugger.SendCommand('info','registers');
+		MainForm.Debugger.Reader.Registers := fRegisters;
+		MainForm.Debugger.SendCommand('info','registers');
 
 		// Set disassembly flavor and load the current function
-		MainForm.fDebugger.SetDisassembly(fAssembler);
+		MainForm.Debugger.Reader.Disassembly := fAssembler;
 		if devData.UseATTSyntax then // gbSyntaxClick has NOT been called yet...
 			gbSyntaxClick(nil);
 
 		// Obtain stack trace too
-		MainForm.fDebugger.SetBacktrace(fBacktrace);
-		MainForm.fDebugger.SendCommand('backtrace','');
+		MainForm.Debugger.Reader.Backtrace := fBacktrace;
+		MainForm.Debugger.SendCommand('backtrace','');
 	end;
 end;
 
@@ -253,11 +254,11 @@ var
 begin
 	// Set disassembly flavor
 	if RadioAtt.Checked then begin
-		MainForm.fDebugger.SendCommand('set disassembly-flavor','att');
+		MainForm.Debugger.SendCommand('set disassembly-flavor','att');
 		RadioIntel.Checked := false;
 		devData.UseATTSyntax := true;
 	end else if RadioIntel.Checked then begin
-		MainForm.fDebugger.SendCommand('set disassembly-flavor','intel');
+		MainForm.Debugger.SendCommand('set disassembly-flavor','intel');
 		RadioAtt.Checked := false;
 		devData.UseATTSyntax := false;
 	end;

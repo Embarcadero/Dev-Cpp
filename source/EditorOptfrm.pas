@@ -590,17 +590,21 @@ begin
 		StrtoPoint(fABPColor,  Syntax.Values[cABP]);
 		StrtoPoint(fFoldColor, Syntax.Values[cFld]);
 
-		// Completion
-		cbArray.Checked := ArrayComplete and CompleteSymbols;
-		cbBraces.Checked := BraceComplete and CompleteSymbols;
-		cbComments.Checked := CommentComplete and CompleteSymbols;
-		cbInclude.Checked := IncludeComplete and CompleteSymbols;
-		cbParenth.Checked := ParentheseComplete and CompleteSymbols;
-		cbSingleQuotes.Checked := SingleQuoteComplete and CompleteSymbols;
-		cbDoubleQuotes.Checked := DoubleQuoteComplete and CompleteSymbols;
-
+		// Completion. Global options
 		cbSymbolComplete.Checked := CompleteSymbols;
 		cbDeleteCompleted.Checked := DeleteSymbolPairs;
+
+		// Completion. Always check if option is set
+		cbArray.Checked := ArrayComplete;
+		cbBraces.Checked := BraceComplete;
+		cbComments.Checked := CommentComplete;
+		cbInclude.Checked := IncludeComplete;
+		cbParenth.Checked := ParentheseComplete;
+		cbSingleQuotes.Checked := SingleQuoteComplete;
+		cbDoubleQuotes.Checked := DoubleQuoteComplete;
+
+		// Completion. Only enable if CompleteSymbols is true
+		cbSymbolCompleteClick(nil);
 	end;
 
 	for idx:= 0 to pred(cpp.AttrCount) do begin
@@ -850,8 +854,10 @@ begin
 		MainForm.AutoSaveTimer.Interval := devEditor.Interval*60*1000; // miliseconds to minutes
 		MainForm.AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
 		MainForm.AutoSaveTimer.OnTimer := MainForm.EditorSaveTimer;
-	end else
-		FreeAndNil(MainForm.AutoSaveTimer);
+	end else begin
+		MainForm.AutoSaveTimer.Free;
+		MainForm.AutoSaveTimer := nil;
+	end;
 
 	SaveOptions;
 	dmMain.LoadDataMod;
@@ -1635,13 +1641,13 @@ end;
 
 procedure TEditorOptForm.cbSymbolCompleteClick(Sender: TObject);
 begin
-	cbArray.Checked := cbSymbolComplete.Checked;
-	cbBraces.Checked := cbSymbolComplete.Checked;
-	cbComments.Checked := cbSymbolComplete.Checked;
-	cbInclude.Checked := cbSymbolComplete.Checked;
-	cbParenth.Checked := cbSymbolComplete.Checked;
-	cbSingleQuotes.Checked := cbSymbolComplete.Checked;
-	cbDoubleQuotes.Checked := cbSymbolComplete.Checked;
+	cbArray.Enabled := cbSymbolComplete.Checked;
+	cbBraces.Enabled := cbSymbolComplete.Checked;
+	cbComments.Enabled := cbSymbolComplete.Checked;
+	cbInclude.Enabled := cbSymbolComplete.Checked;
+	cbParenth.Enabled := cbSymbolComplete.Checked;
+	cbSingleQuotes.Enabled := cbSymbolComplete.Checked;
+	cbDoubleQuotes.Enabled := cbSymbolComplete.Checked;
 end;
 
 procedure TEditorOptForm.FormClose(Sender: TObject;var Action: TCloseAction);

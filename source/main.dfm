@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 606
-  Top = 241
+  Left = 809
+  Top = 369
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -27,8 +27,8 @@ object MainForm: TMainForm
   TextHeight = 13
   object SplitterLeft: TSplitter
     Left = 193
-    Top = 70
-    Height = 344
+    Top = 72
+    Height = 342
     MinSize = 45
     ResizeStyle = rsUpdate
   end
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -173,12 +173,6 @@ object MainForm: TMainForm
           Width = 218
           Height = 30
           Action = actAbortCompilation
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clRed
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
         end
         object WarningLabel: TLabel
           Left = 8
@@ -258,13 +252,13 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 403
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           403
-          155)
+          154)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -286,7 +280,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 396
-          Height = 115
+          Height = 112
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -298,7 +292,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 589
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -306,7 +300,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           589
-          155)
+          154)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -452,7 +446,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 44
+          Height = 40
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -492,7 +486,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -537,7 +531,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 16
     Width = 1000
-    Height = 54
+    Height = 56
     Align = alTop
     AutoDock = False
     AutoSize = True
@@ -552,10 +546,8 @@ object MainForm: TMainForm
       Left = 11
       Top = 2
       Width = 149
-      Height = 22
-      AutoSize = True
+      Height = 24
       Caption = 'Main'
-      DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -610,10 +602,8 @@ object MainForm: TMainForm
       Left = 441
       Top = 2
       Width = 209
-      Height = 22
-      AutoSize = True
+      Height = 24
       Caption = 'Compile and Run'
-      DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -692,10 +682,8 @@ object MainForm: TMainForm
       Left = 350
       Top = 2
       Width = 78
-      Height = 22
-      AutoSize = True
+      Height = 24
       Caption = 'Project'
-      DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -733,10 +721,8 @@ object MainForm: TMainForm
       Left = 173
       Top = 2
       Width = 47
-      Height = 22
-      AutoSize = True
+      Height = 24
       Caption = 'Edit'
-      DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -761,10 +747,8 @@ object MainForm: TMainForm
       Left = 233
       Top = 2
       Width = 104
-      Height = 22
-      AutoSize = True
+      Height = 24
       Caption = 'Search'
-      DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -807,10 +791,8 @@ object MainForm: TMainForm
       Left = 11
       Top = 30
       Width = 71
-      Height = 22
-      AutoSize = True
+      Height = 24
       Caption = 'Specials'
-      DragKind = dkDock
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -841,8 +823,7 @@ object MainForm: TMainForm
       Left = 95
       Top = 30
       Width = 700
-      Height = 22
-      AutoSize = True
+      Height = 24
       Caption = 'tbClasses'
       EdgeBorders = []
       EdgeInner = esNone
@@ -901,8 +882,7 @@ object MainForm: TMainForm
       Left = 663
       Top = 2
       Width = 270
-      Height = 22
-      AutoSize = True
+      Height = 24
       Caption = 'tbCompilers'
       EdgeBorders = []
       EdgeInner = esNone
@@ -952,9 +932,9 @@ object MainForm: TMainForm
   end
   object PageControl: TPageControl
     Left = 196
-    Top = 70
+    Top = 72
     Width = 804
-    Height = 344
+    Height = 342
     Align = alClient
     HotTrack = True
     MultiLine = True
@@ -1015,10 +995,10 @@ object MainForm: TMainForm
   end
   object LeftPageControl: TPageControl
     Left = 0
-    Top = 70
+    Top = 72
     Width = 193
-    Height = 344
-    ActivePage = ClassSheet
+    Height = 342
+    ActivePage = ProjectSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 1
@@ -1029,7 +1009,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 316
+        Height = 314
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1065,7 +1045,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 316
+        Height = 314
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
@@ -1100,7 +1080,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 316
+        Height = 314
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -3024,6 +3004,13 @@ object MainForm: TMainForm
       ShortCut = 24616
       OnExecute = actMoveSelDownExecute
       OnUpdate = actUpdateEmptyEditor
+    end
+    object actCodeCompletion: TAction
+      Category = 'ClassBrowser'
+      Caption = 'Show Code Completion'
+      ShortCut = 16416
+      OnExecute = actCodeCompletionExecute
+      OnUpdate = actCodeCompletionUpdate
     end
   end
   object MessagePopup: TPopupMenu

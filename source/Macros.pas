@@ -68,12 +68,12 @@ begin
 		Replace(Result, '<LIB>', '');
 
 	// Project-dependent macros
-	if Assigned(MainForm.fProject) then begin
-		Replace(Result, '<EXENAME>',       MainForm.fProject.Executable);
-		Replace(Result, '<PROJECTNAME>',   MainForm.fProject.Name);
-		Replace(Result, '<PROJECTFILE>',   MainForm.fProject.FileName);
-		Replace(Result, '<PROJECTPATH>',   MainForm.fProject.Directory);
-		Replace(Result, '<SOURCESPCLIST>', MainForm.fProject.ListUnitStr(' '));
+	if Assigned(MainForm.Project) then begin
+		Replace(Result, '<EXENAME>',       MainForm.Project.Executable);
+		Replace(Result, '<PROJECTNAME>',   MainForm.Project.Name);
+		Replace(Result, '<PROJECTFILE>',   MainForm.Project.FileName);
+		Replace(Result, '<PROJECTPATH>',   MainForm.Project.Directory);
+		Replace(Result, '<SOURCESPCLIST>', MainForm.Project.ListUnitStr(' '));
 	end else if Assigned(e) then begin // Non-project editor macros
 		Replace(Result, '<EXENAME>',       '"' + ChangeFileExt(e.FileName, EXE_EXT) + '"');
 		Replace(Result, '<PROJECTNAME>',   e.FileName);

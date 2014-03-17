@@ -588,6 +588,7 @@ type
     N68: TMenuItem;
     actMoveSelUp1: TMenuItem;
     actMoveSelDown1: TMenuItem;
+    actCodeCompletion: TAction;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -843,6 +844,8 @@ type
     procedure actBrowserViewIncludesExecute(Sender: TObject);
     procedure actMoveSelUpExecute(Sender: TObject);
     procedure actMoveSelDownExecute(Sender: TObject);
+    procedure actCodeCompletionUpdate(Sender: TObject);
+    procedure actCodeCompletionExecute(Sender: TObject);
   private
     fPreviousHeight : integer; // stores MessageControl height to be able to restore to previous height
     fTools : TToolController; // tool list controller
@@ -851,12 +854,15 @@ type
     WindowPlacement : TWindowPlacement; // idem
     fFirstShow : boolean; // true for first WM_SHOW, false for others
     fShowTips : boolean;
-    fRemoveOptions : boolean;
-    fOptionsDir : AnsiString;
     fRunEndAction: TRunEndAction;
     fCompSuccessAction: TCompSuccessAction;
-    fParseStartTime: Cardinal; // TODO: move to CppParser
+    fParseStartTime: Cardinal; // TODO: move to CppParser?
     fOldCompilerToolbarIndex : integer;
+    fAutoSaveTimer : TTimer;
+    fProject : TProject;
+    fDebugger : TDebugger;
+    fCompiler : TCompiler;
+    fCurrentPageHint : AnsiString;
     function ParseParams(s : AnsiString) : AnsiString;
     procedure BuildBookMarkMenus;
     procedure SetHints;
@@ -885,11 +891,6 @@ type
     procedure ClearCompileMessages;
     procedure ClearMessageControl;
   public
-    AutoSaveTimer : TTimer;
-    fProject : TProject;
-    fDebugger : TDebugger;
-    fCompiler : TCompiler;
-    fCurrentPageHint  : AnsiString;
     procedure UpdateCompilerList;
     procedure UpdateClassBrowser(ReloadCache: boolean);
     procedure UpdateAppTitle;
@@ -908,6 +909,12 @@ type
     function CloseEditor(index : integer): Boolean;
     procedure EditorSaveTimer(sender : TObject);
     procedure OnInputEvalReady(const evalvalue : AnsiString);
+
+    // Hide variables
+    property AutoSaveTimer : TTimer read fAutoSaveTimer write fAutoSaveTimer;
+    property Project : TProject read fProject write fProject;
+    property Debugger : TDebugger read fDebugger write fDebugger;
+    property CurrentPageHint : AnsiString read fCurrentPageHint write fCurrentPageHint;
 end;
 
 var
@@ -1017,10 +1024,6 @@ begin
 	if Assigned(fReportToolWindow) then
 		devData.ReportWindowState.GetPlacement(fReportToolWindow.Handle);
 
-	// Save the options dir somewhere else cause we will need it after deleting devDirs
-	if fRemoveOptions then
-		fOptionsDir := devDirs.Config;
-
 	// Save and free options
 	SaveOptions;
 	fTools.Free; // This one needs devDirs!
@@ -1030,9 +1033,6 @@ begin
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
-var
-	fostruct : SHFILEOPSTRUCT;
-	DirFrom,DirTo : array[0..MAX_PATH] of char;
 begin
 	// Prevent singleton reinit
 	DontRecreateSingletons := true;
@@ -1048,35 +1048,6 @@ begin
 	// Free these singletons on the very last
 	Lang.Free;
 	devData.Free;
-
-	// Copy and delete
-	if fRemoveOptions then begin
-
-		FillChar(DirFrom, Sizeof(DirFrom),0);
-		StrPCopy(DirFrom, fOptionsDir);
-
-		FillChar(DirTo, Sizeof(DirFrom),0);
-		StrPCopy(DirTo, ExcludeTrailingBackslash(fOptionsDir) + 'Backup' + pd);
-
-		FillChar(fostruct,Sizeof(fostruct),0);
-		with fostruct do begin
-			Wnd := 0;
-			pFrom := @DirFrom;
-			pTo := @DirTo;
-			wFunc := FO_COPY;
-			fFlags := FOF_ALLOWUNDO or FOF_SILENT or FOF_NOCONFIRMATION;
-		end;
-		SHFileOperation(fostruct);
-
-		FillChar(fostruct,Sizeof(fostruct),0);
-		with fostruct do begin
-			Wnd := 0;
-			pFrom := @DirFrom;
-			wFunc := FO_DELETE;
-			fFlags := FOF_ALLOWUNDO or FOF_SILENT or FOF_NOCONFIRMATION;
-		end;
-		SHFileOperation(fostruct);
-	end;
 end;
 
 procedure TMainForm.BuildBookMarkMenus;
@@ -1487,6 +1458,7 @@ begin
 
 		// Using this thing, because WM_SETREDRAW doesn't work
 		LockWindowUpdate(PageControl.Handle);
+//		SendMessage(PageControl.Handle,WM_SETREDRAW,0,0);
 
 		// We're allowed to close...
 		Result := True;
@@ -1500,6 +1472,8 @@ begin
 		end;
 
 		// Repaint after messing with the pages (see TEditor.Destroy)
+//		SendMessage(PageControl.Handle,WM_SETREDRAW,1,0);
+//		PageControl.Invalidate;
 		LockWindowUpdate(0);
 
 		SetStatusbarLineCol;
@@ -2074,7 +2048,6 @@ begin
 			s := edProjectName.Text + DEV_EXT;
 
 			with TSaveDialog.Create(Application) do try
-
 				Filter:= FLT_PROJECTS;
 				InitialDir:= devDirs.Default;
 				FileName:= s;
@@ -2084,7 +2057,10 @@ begin
 				if Execute then begin
 					s:= FileName;
 
+					// Create an empty project
 					fProject:= TProject.Create(s, edProjectName.Text);
+
+					// Assign the selected template to it
 					if not fProject.AssignTemplate(s, GetTemplate) then begin
 						FreeAndNil(fProject);
 						MessageBox(Application.Handle, PAnsiChar(Lang[ID_ERR_TEMPLATE]), PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
@@ -3747,8 +3723,7 @@ end;
 
 procedure TMainForm.ClearCompileMessages;
 begin
-	CompilerOutput.Items.Clear;
-
+	CompilerOutput.Clear;
 	ResourceOutput.Clear;
 	LogOutput.Clear;
 	DebugOutput.Clear;
@@ -3933,11 +3908,9 @@ begin
 				Format(Lang[ID_ENV_CACHEFAIL],[devDirs.Config,ExcludeTrailingBackslash(devDirs.Config) + 'Backup' + pd]),
 					mtConfirmation,[mbYes,mbNo],0) = mrYes then
 
-				// Close the form on show, because
-				// Calling Close or Free over here (inside WM_CREATE) will not exit the process properly
-				// Calling PostQuitMessage frees the thread, but leaves handles to settings files open,
-				// so we can't remove the settings folder...
-				fRemoveOptions := true;
+				// Remove and backup the current configuration directory.
+				RemoveOptions(devDirs.Config);
+				TerminateProcess(GetCurrentProcess(),1);
 		end;
 	end;
 
@@ -4845,7 +4818,7 @@ begin
 		end;
 
 		// View command examples only when edit is empty or when the UI itself added the current command
-		fDebugger.GDBcommandchanged := true;
+		fDebugger.CommandChanged := true;
 	end;
 end;
 
@@ -6312,11 +6285,6 @@ begin
 	if fFirstShow then begin
 		fFirstShow := false;
 
-		if fRemoveOptions then begin
-			Close;
-			Exit;
-		end;
-
 		OpenCloseMessageSheet(false);
 
 		// Toolbar positions, needs to be done here, because on Create, the width of the TControlBar isn't yet set
@@ -6399,6 +6367,7 @@ begin
 	while Assigned(curnode.Parent) do
 		curnode := curnode.Parent;
 
+	// Paint top level items in red if they aren't found
 	if (curnode.Level = 0) and (PWatchVar(curnode.Data)^.gdbindex = -1) then begin
 		if cdsSelected in State then
 			Sender.Canvas.Font.Color := clWhite
@@ -6678,6 +6647,23 @@ begin
 	e := GetEditor;
 	if Assigned(e) then
 		e.Text.CommandProcessor(ecMoveSelDown,#0,nil);
+end;
+
+procedure TMainForm.actCodeCompletionUpdate(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e := GetEditor;
+	TCustomAction(Sender).Enabled := Assigned(e) and e.Text.Focused;
+end;
+
+procedure TMainForm.actCodeCompletionExecute(Sender: TObject);
+var
+	e: TEditor;
+begin
+	e := GetEditor;
+	if Assigned(e) then
+		e.ShowCompletion;
 end;
 
 end.

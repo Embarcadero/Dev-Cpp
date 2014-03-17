@@ -274,8 +274,8 @@ begin
 		end;
 
 		edProject.Text := '-';
-		edAbsolute.Text := MainForm.fProject.FileName;
-		edRelative.Text := ExtractRelativePath(MainForm.fProject.Directory, Filename);
+		edAbsolute.Text := MainForm.Project.FileName;
+		edRelative.Text := ExtractRelativePath(MainForm.Project.Directory, Filename);
 
 		if fFileDate = 0 then
 			edTimestamp.Text := '(Project file only) -'
@@ -292,9 +292,9 @@ begin
 		except end;
 
 		// Check if it is in our project
-		if Assigned(MainForm.fProject) and (MainForm.fProject.Units.IndexOf(FileName) <> -1) then begin
-			edProject.Text := MainForm.fProject.Name;
-			edRelative.Text := ExtractRelativePath(MainForm.fProject.Directory,Filename)
+		if Assigned(MainForm.Project) and (MainForm.Project.Units.IndexOf(FileName) <> -1) then begin
+			edProject.Text := MainForm.Project.Name;
+			edRelative.Text := ExtractRelativePath(MainForm.Project.Directory,Filename)
 		end else begin
 			edProject.Text := '-';
 			edRelative.Text := '-';
@@ -334,16 +334,16 @@ begin
 	cmbFiles.Clear;
 
 	// add all project files
-	if Assigned(MainForm.fProject) then begin
+	if Assigned(MainForm.Project) then begin
 
 		// Add project file itself
-		FullFileName := MainForm.fProject.FileName;
+		FullFileName := MainForm.Project.FileName;
 		ShortFileName := ExtractFileName(FullFileName);
 		cmbFiles.Items.AddObject(ShortFileName,Pointer(FullFileName));
 
 		// Add files belonging to project
-		for I := 0 to MainForm.fProject.Units.Count - 1 do begin
-			FullFileName := MainForm.fProject.Units[I].FileName;
+		for I := 0 to MainForm.Project.Units.Count - 1 do begin
+			FullFileName := MainForm.Project.Units[I].FileName;
 			ShortFileName := ExtractFileName(FullFileName);
 			cmbFiles.Items.AddObject(ShortFileName,Pointer(FullFileName));
 		end;

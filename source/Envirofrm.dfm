@@ -1,6 +1,6 @@
 object EnviroForm: TEnviroForm
-  Left = 528
-  Top = 317
+  Left = 835
+  Top = 465
   BorderStyle = bsDialog
   Caption = 'Environment Options'
   ClientHeight = 462
@@ -193,7 +193,7 @@ object EnviroForm: TEnviroForm
           'None')
         TabOrder = 17
       end
-      object cbdblFiles: TCheckBox
+      object cbDblFiles: TCheckBox
         Left = 16
         Top = 122
         Width = 265
@@ -355,7 +355,7 @@ object EnviroForm: TEnviroForm
       ShowHint = False
       object lblUserDir: TLabel
         Left = 8
-        Top = 85
+        Top = 80
         Width = 400
         Height = 15
         AutoSize = False
@@ -363,7 +363,7 @@ object EnviroForm: TEnviroForm
       end
       object lblTemplatesDir: TLabel
         Left = 8
-        Top = 148
+        Top = 144
         Width = 400
         Height = 15
         AutoSize = False
@@ -379,7 +379,7 @@ object EnviroForm: TEnviroForm
       end
       object lblIcoLib: TLabel
         Left = 8
-        Top = 211
+        Top = 208
         Width = 400
         Height = 15
         AutoSize = False
@@ -387,7 +387,7 @@ object EnviroForm: TEnviroForm
       end
       object lblLangPath: TLabel
         Left = 8
-        Top = 274
+        Top = 273
         Width = 400
         Height = 15
         AutoSize = False
@@ -396,7 +396,7 @@ object EnviroForm: TEnviroForm
       object btnDefBrws: TSpeedButton
         Tag = 1
         Left = 438
-        Top = 105
+        Top = 100
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -431,7 +431,7 @@ object EnviroForm: TEnviroForm
       object btnOutputbrws: TSpeedButton
         Tag = 2
         Left = 437
-        Top = 168
+        Top = 164
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -466,7 +466,7 @@ object EnviroForm: TEnviroForm
       object btnBrwIcon: TSpeedButton
         Tag = 3
         Left = 437
-        Top = 231
+        Top = 228
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -501,7 +501,7 @@ object EnviroForm: TEnviroForm
       object btnBrwLang: TSpeedButton
         Tag = 5
         Left = 437
-        Top = 294
+        Top = 293
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -568,22 +568,30 @@ object EnviroForm: TEnviroForm
           BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
         OnClick = BrowseClick
       end
+      object lblOptionsDir: TLabel
+        Left = 8
+        Top = 10
+        Width = 457
+        Height = 31
+        AutoSize = False
+        Caption = 'Current Options directory. Click the button to reset Dev-C++.'
+      end
       object edUserDir: TEdit
         Left = 16
-        Top = 105
+        Top = 100
         Width = 409
         Height = 23
         ReadOnly = True
-        TabOrder = 1
+        TabOrder = 0
         Text = 'edUserDir'
       end
       object edTemplatesDir: TEdit
         Left = 16
-        Top = 168
+        Top = 164
         Width = 409
         Height = 23
         ReadOnly = True
-        TabOrder = 2
+        TabOrder = 1
         Text = 'edTemplatesDir'
       end
       object edSplash: TEdit
@@ -592,85 +600,44 @@ object EnviroForm: TEnviroForm
         Width = 409
         Height = 23
         ReadOnly = True
-        TabOrder = 3
+        TabOrder = 2
         Text = 'edSplash'
       end
       object edIcoLib: TEdit
         Left = 16
-        Top = 231
+        Top = 228
         Width = 409
         Height = 23
         ReadOnly = True
-        TabOrder = 4
+        TabOrder = 3
         Text = 'edIcoLib'
       end
       object edLang: TEdit
         Left = 16
-        Top = 294
+        Top = 293
         Width = 409
         Height = 23
         ReadOnly = True
-        TabOrder = 5
+        TabOrder = 4
         Text = 'edLang'
       end
-      object gbAltConfig: TGroupBox
+      object edOptionsDir: TEdit
         Left = 16
-        Top = 12
-        Width = 433
-        Height = 61
-        Caption = ' Alternate Configuration File '
-        TabOrder = 0
-        object btnAltConfig: TSpeedButton
-          Tag = 7
-          Left = 398
-          Top = 26
-          Width = 23
-          Height = 22
-          Glyph.Data = {
-            36030000424D3603000000000000360000002800000010000000100000000100
-            18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
-            BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-            00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-            BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-            BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-            00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-            BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-            BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-            00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-            BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-            BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-            00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-            BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000000000
-            000000000000000000000000000000000000000000000000000000BFBFBFBFBF
-            BFBFBFBFBFBFBFBFBFBF00000000AEFF0096DB0096DB0096DB0096DB0096DB00
-            96DB0096DB0082BE000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-            00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-            BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF00AEFF00AEFF00AEFF00
-            AEFF00AEFF0096DB000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-            00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-            BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF5DCCFF5DCCFF5DCCFF5D
-            CCFF5DCCFF00AEFF000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF686868BDEBFF
-            5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
-            BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
-            BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
-          OnClick = BrowseClick
-        end
-        object chkAltConfig: TCheckBox
-          Left = 12
-          Top = 28
-          Width = 13
-          Height = 17
-          TabOrder = 0
-          OnClick = chkAltConfigClick
-        end
-        object edAltConfig: TEdit
-          Left = 32
-          Top = 26
-          Width = 361
-          Height = 23
-          TabOrder = 1
-          Text = 'edAltConfig'
-        end
+        Top = 34
+        Width = 281
+        Height = 23
+        ReadOnly = True
+        TabOrder = 5
+        Text = 'edOptionsDir'
+      end
+      object btnResetDev: TButton
+        Left = 304
+        Top = 32
+        Width = 155
+        Height = 25
+        Caption = 'Remove settings and exit'
+        TabOrder = 6
+        OnClick = btnResetDevClick
       end
     end
     object tabExternal: TTabSheet

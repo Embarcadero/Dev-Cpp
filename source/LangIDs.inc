@@ -587,6 +587,8 @@ const
   ID_ENV_BOTTOM                         = 38063;
   ID_ENV_LEFT                           = 38064;
   ID_ENV_RIGHT                          = 38065;
+  ID_ENV_RESETDEV                       = 38066;
+  ID_ENV_OPTIONSDIRHINT                 = 38067;
 
   // Goto function form
   ID_GF_TEXT                            = 40001;
@@ -1028,6 +1030,7 @@ const
   ID_ENV_UIFONT                         = 66022;
   ID_ENV_CACHEFAIL                      = 66023;
   ID_ENV_PRINTERFAIL                    = 66024;
+  ID_ENV_MULTILINETABERROR              = 66025;
 
   // Execute menu
   ID_ITEM_EXECPARAMS                    = 67001;

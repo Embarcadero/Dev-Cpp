@@ -38,7 +38,7 @@ object NewProjectForm: TNewProjectForm
   object lblPrjName: TLabel
     Left = 8
     Top = 218
-    Width = -22
+    Width = 38
     Height = 15
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Name: '

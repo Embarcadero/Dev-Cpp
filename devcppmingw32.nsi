@@ -3,7 +3,7 @@
 
 !define COMPILERNAME "MinGW 4.8.1"
 !define COMPILERFOLDER "MinGW32"
-!define DEVCPP_VERSION "5.6.1"
+!define DEVCPP_VERSION "5.6.2"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 

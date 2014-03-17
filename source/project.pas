@@ -1606,7 +1606,7 @@ begin
 				end;
 			end;
 
-		// Old  style...
+		// Old style...
 		end else begin
 			NewUnit(FALSE);
 			with fUnits[fUnits.Count -1] do begin

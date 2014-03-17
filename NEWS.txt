@@ -1,3 +1,18 @@
+Version 5.6.2 - 16 Maart 2014
+
+- Updated Japanese language files.
+- Templates can now now not set the built in compiler settings anymore when creating a project. Instead, compiler settings are set by the current compiler profile.
+- Fixed checkboxes in Tools >> Editor Options >> Completion >> Symbol Completion being unchecked instead of disabled/greyed when "Enable symbol completion" is changed.
+- Added some margin above the progress bar at Tools >> Editor Options >> Completion >> Code Completion.
+- When the Consolas font is unavailable, Dev-C++ will now try to use Courier New as the editor font instead of the alphabetically first font.
+- Fixed an undo bug in Move Selection Up/Down.
+- Fixed a bug that cut off toolbars around 800 pixels on 1024 pixel wide resolutions.
+- One can now change the shortcut for code completion in Tools >> Configure Shortcuts.
+- Fixed an out of bounds error in TCppParser when parsing incorrect code.
+- Fixed a formatting error when printing structs inside struct in the Debug watch variable tree.
+- Increased performance of the GDB interface.
+- Hopefully fixed the infamous "Thread Error" exceptions.
+
 Version 5.6.1 - 12 Februari 2014
 
 - Added rm.exe to MinGW 4.8.1 compiler sets. This prevents the "CreateProcess(rm.exe...)" error when rebuilding.

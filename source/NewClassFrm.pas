@@ -128,8 +128,8 @@ end;
 procedure TNewClassForm.txtNameChange(Sender: TObject);
 begin
 	if txtName.Text <> '' then begin
-		txtCppFile.Text := MainForm.fProject.Directory + LowerCase(txtName.Text) + '.cpp';
-		txtHFile.Text := MainForm.fProject.Directory + LowerCase(txtName.Text) + '.h';
+		txtCppFile.Text := MainForm.Project.Directory + LowerCase(txtName.Text) + '.cpp';
+		txtHFile.Text := MainForm.Project.Directory + LowerCase(txtName.Text) + '.h';
 
 		// Make sure one can actually see what is going on
 		txtCppFile.SelStart := Length(txtCppFile.Text)-1;
@@ -183,8 +183,8 @@ var
 begin
 	// HEADER FILE IMPLEMENTATION
 	if chkAddToProject.Checked then begin
-		idx := MainForm.fProject.NewUnit(False, txtHFile.Text);
-		e := MainForm.fProject.OpenUnit(idx);
+		idx := MainForm.Project.NewUnit(False, txtHFile.Text);
+		e := MainForm.Project.OpenUnit(idx);
 		if idx = -1 then begin
 			MessageDlg('Cannot add header file to project...', mtError, [mbOk], 0);
 			Exit;
@@ -223,7 +223,7 @@ begin
 		st := nil;
 		for idx := 0 to MainForm.CppParser.Statements.Count - 1 do begin
 			st := MainForm.CppParser.Statements[idx];
-			if (st^._Kind = skClass) and (st^._ScopelessCmd = cmbClass.Text) and (MainForm.fProject.Units.Indexof(MainForm.CppParser.GetDeclarationFileName(st)) <> -1) then
+			if (st^._Kind = skClass) and (st^._ScopelessCmd = cmbClass.Text) and (MainForm.Project.Units.Indexof(MainForm.CppParser.GetDeclarationFileName(st)) <> -1) then
 				Break;
 			st:=nil;
 		end;
@@ -263,8 +263,8 @@ begin
 
 	// CPP FILE IMPLEMENTATION
 	if chkAddToProject.Checked then begin
-		idx := MainForm.fProject.NewUnit(False, txtCppFile.Text);
-		e := MainForm.fProject.OpenUnit(idx);
+		idx := MainForm.Project.NewUnit(False, txtCppFile.Text);
+		e := MainForm.Project.OpenUnit(idx);
 		if idx = -1 then begin
 			MessageDlg('Cannot add implementation file to project...', mtError, [mbOk], 0);
 			Exit;

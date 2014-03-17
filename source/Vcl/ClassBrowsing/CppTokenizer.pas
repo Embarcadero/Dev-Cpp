@@ -761,7 +761,6 @@ begin
     if S <> '' then
       AddToken(S, fCurrLine);
   until S = '';
-  AddToken(#0, fCurrLine);
 end;
 
 procedure TCppTokenizer.TokenizeStream(const FileName: AnsiString; Stream: TStream);

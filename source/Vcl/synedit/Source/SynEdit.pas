@@ -6796,6 +6796,7 @@ var
   OrigBlockBegin: TBufferCoord;
   OrigBlockEnd: TBufferCoord;
   OrigCaret: TBufferCoord;
+  MoveDelim : TBufferCoord;
   EndLine: integer;
   StartOfBlock: TBufferCoord;
   bChangeScroll: boolean;
@@ -7255,19 +7256,22 @@ begin
           SetCaretAndSelection(
             BufferCoord(CaretX,CaretY-1),
             BufferCoord(1,OrigBlockBegin.Line-1), // put start of selection at start of top line
-            BufferCoord(Length(Lines[OrigBlockEnd.Line-2]) + 1,OrigBlockEnd.Line-1)); // put end of selection at end of bottom line
+            BufferCoord(Length(Lines[OrigBlockEnd.Line-2]) + 1,OrigBlockEnd.Line-1)); // put end of selection at end of top line
+
+          // Retrieve end of line we moved up
+          MoveDelim := BufferCoord(Length(Lines[OrigBlockEnd.Line-1]) + 1,OrigBlockEnd.Line);
 
           // Support undo, implement as drag and drop
           fUndoList.BeginBlock;
           try
-            fUndoList.AddChange(crSelection,
+            fUndoList.AddChange(crSelection, // backup original selection
               OrigBlockBegin,
               OrigBlockEnd,
               '',
               smNormal);
             fUndoList.AddChange(crDragDropInsert,
               BlockBegin, // modified
-              OrigBlockEnd, // same
+              MoveDelim, // put at end of line me moved up
               S + #13#10 + SelText,
               smNormal);
           finally
@@ -7300,6 +7304,9 @@ begin
             BufferCoord(1,OrigBlockBegin.Line+1),
             BufferCoord(Length(Lines[OrigBlockEnd.Line]) + 1,OrigBlockEnd.Line+1));
 
+          // Retrieve start of line we moved down
+          MoveDelim := BufferCoord(1,OrigBlockBegin.Line);
+
           // Support undo, implement as drag and drop
           fUndoList.BeginBlock;
           try
@@ -7309,7 +7316,7 @@ begin
               '',
               smNormal);
             fUndoList.AddChange(crDragDropInsert,
-              OrigBlockBegin, // same
+              MoveDelim, // put at start of line me moved down
               BlockEnd, // modified
               SelText + #13#10 + S,
               smNormal);

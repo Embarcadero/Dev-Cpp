@@ -172,8 +172,8 @@ end;
 
 procedure TConfigData.WriteObject(const Section: AnsiString; Obj: TPersistent);
 var
- I: integer;
- PropName: AnsiString;
+	I: integer;
+	PropName: AnsiString;
 begin
 	EraseSection(Section);
 
@@ -197,9 +197,9 @@ begin
 
 			tkClass: begin
 				if TPersistent(GetOrdProp(Obj, PropName)) is TStrings then
-					WriteStrings(Section +'.'+PropName, TStrings(GetOrdProp(Obj, PropName)))
+					WriteStrings(Section + '.'+PropName, TStrings(GetOrdProp(Obj, PropName)))
 				else
-					WriteObject(Section +'.' +PropName, TPersistent(GetOrdProp(Obj, PropName)));
+					WriteObject(Section + '.' +PropName, TPersistent(GetOrdProp(Obj, PropName)));
 			end;
 		end;
 	end;
@@ -208,7 +208,7 @@ end;
 procedure TConfigData.ReadSelf;
 begin
 	if not Assigned(fIni) then
-		exit;
+		Exit;
 
 	try
 		ReadObject('Options',self);
@@ -218,8 +218,8 @@ end;
 
 procedure TConfigData.SaveSelf;
 begin
-	if not assigned(fIni) then
-		exit;
+	if not Assigned(fIni) then
+		Exit;
 
 	try
 		WriteObject('Options',self);

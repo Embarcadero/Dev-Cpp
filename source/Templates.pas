@@ -168,7 +168,10 @@ begin
         fOptions.ExeOutput:= ReadString(cProject, 'ExeOutput', '');
         fOptions.ObjectOutput:= ReadString(cProject, 'ObjectOutput', '');
         fOptions.LogOutput:= ReadString(cProject, 'LogOutput', '');
-        fOptions.CompilerOptions:= ReadString(cProject, 'CompilerSettings','');
+
+        // Disabling this option since it is not a portable way of changing compiler settings.
+        // Please use Compiler or CppCompiler instead. This entry is overridden by the settings of the current compiler
+        //fOptions.CompilerOptions:= ReadString(cProject, 'CompilerSettings','');
         // units are read on demand
       end;
    end;

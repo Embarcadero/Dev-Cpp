@@ -136,14 +136,6 @@ begin
 	SetLength(inifilename,0);
 	SetLength(exefolder,0);
 
-	// support for user-defined alternate ini file (permanent, but overriden by command-line -c)
-	if ConfigMode <> CFG_PARAM then begin
-		StandardConfigFile := devData.INIFileName;
-		CheckForAltConfigFile(devData.INIFileName);
-		if UseAltConfigFile and (AltConfigFile<>'') and FileExists(AltConfigFile) then
-			devData.INIFileName:=AltConfigFile;
-	end;
-
 	// Make the caption look nice
 	Application.Initialize;
 	Application.Title := 'Dev-C++';

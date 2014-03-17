@@ -132,6 +132,7 @@ type
     procedure IndentSelection;
     procedure UnindentSelection;
     procedure InitCompletion;
+    procedure ShowCompletion;
     procedure DestroyCompletion;
     property PreviousTabs: TList read fPreviousTabs;
     property FileName: AnsiString read fFileName write SetFileName;
@@ -187,8 +188,8 @@ var
 		end;
 	end;
 begin
-	for I := 0 to MainForm.fDebugger.BreakPointList.Count - 1 do begin
-		bp := PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I]);
+	for I := 0 to MainForm.Debugger.BreakPointList.Count - 1 do begin
+		bp := PBreakPoint(MainForm.Debugger.BreakPointList.Items[I]);
 		if (integer(bp^.editor) = integer(e)) and (bp^.line >= FirstLine) then
 			Inc(bp^.line,Count);
 	end;
@@ -221,8 +222,8 @@ var
 	end;
 
 begin
-	for I := MainForm.fDebugger.BreakPointList.Count -1 downto 0 do begin
-		bp := PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I]);
+	for I := MainForm.Debugger.BreakPointList.Count -1 downto 0 do begin
+		bp := PBreakPoint(MainForm.Debugger.BreakPointList.Items[I]);
 		if (integer(bp^.editor) = integer(e)) and (bp^.line >= FirstLine) then begin
 			if (bp^.line >= FirstLine + Count) then
 				Dec(bp^.line,Count)
@@ -355,7 +356,7 @@ begin
 	fText.Free;
 
 	// Delete breakpoints in this editor
-	MainForm.fDebugger.DeleteBreakPointsOf(self);
+	MainForm.Debugger.DeleteBreakPointsOf(self);
 
 	// Open up the previously openend tab, not the first one...
 	with MainForm.PageControl do begin
@@ -384,7 +385,7 @@ end;
 procedure TEditor.OnMouseOverEvalReady(const evalvalue : AnsiString);
 begin
 	fText.Hint := fCurrentEvalWord + ' = ' + evalvalue;
-	MainForm.fDebugger.OnEvalReady := nil;
+	MainForm.Debugger.OnEvalReady := nil;
 end;
 
 procedure TEditor.Activate;
@@ -409,9 +410,9 @@ begin
 	thisbreakpoint := HasBreakPoint(Line);
 
 	if thisbreakpoint <> -1 then
-		MainForm.fDebugger.RemoveBreakPoint(Line,self)
+		MainForm.Debugger.RemoveBreakPoint(Line,self)
 	else
-		MainForm.fDebugger.AddBreakPoint(Line,self);
+		MainForm.Debugger.AddBreakPoint(Line,self);
 
 	fText.InvalidateGutterLine(line);
 	fText.InvalidateLine(line);
@@ -422,9 +423,9 @@ var
 	I : integer;
 begin
 	result:= -1;
-	for I := 0 to MainForm.fDebugger.BreakPointList.Count - 1 do
-		if integer(PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I])^.editor) = integer(self) then
-			if PBreakPoint(MainForm.fDebugger.BreakPointList.Items[I])^.line = Line then begin
+	for I := 0 to MainForm.Debugger.BreakPointList.Count - 1 do
+		if integer(PBreakPoint(MainForm.Debugger.BreakPointList.Items[I])^.editor) = integer(self) then
+			if PBreakPoint(MainForm.Debugger.BreakPointList.Items[I])^.line = Line then begin
 				Result := I;
  				break;
 			end;
@@ -898,7 +899,6 @@ end;
 
 procedure TEditor.EditorKeyPress(Sender: TObject; var Key: Char);
 var
-	P: TPoint;
 	allowcompletion : boolean;
 	indent : integer;
 	attr : TSynHighlighterAttributes;
@@ -1038,36 +1038,16 @@ begin
 		end;
 	end;
 
+	// Is code completion enabled?
 	if fCompletionBox.Enabled then begin
 
 		// Use a timer to show the completion window when we just typed a few parent-member linking chars
 		case Key of
-			'.': fCompletionTimer.Enabled:=True;
-			'>': if (fText.CaretX > 1) and (Length(fText.LineText) > 1) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled:=True;
-			':': if (fText.CaretX > 1) and (Length(fText.LineText) > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled:=True;
-			' ': begin
-
-				// If Ctrl is down, immediately show completionbox when space is hit
-				if IsKeyDown(VK_CONTROL) then begin
-
-					// Delete space keypress
-					Key := #0;
-
-					P := fText.RowColumnToPixels(fText.DisplayXY);
-					Inc(P.Y,16);
-					fCompletionBox.Position := fText.ClientToScreen(P);
-
-					// Force show
-					fCompletionTimer.OnTimer(nil);
-				end;
-			end else
+			'.': fCompletionTimer.Enabled := True;
+			'>': if (fText.CaretX > 1) and (Length(fText.LineText) > 1) and (fText.LineText[fText.CaretX-1]='-') then fCompletionTimer.Enabled := True;
+			':': if (fText.CaretX > 1) and (Length(fText.LineText) > 1) and (fText.LineText[fText.CaretX-1]=':') then fCompletionTimer.Enabled := True;
+			else
 				fCompletionTimer.Enabled := False;
-		end;
-
-		if fCompletionTimer.Enabled then begin
-			P := fText.RowColumnToPixels(fText.DisplayXY);
-			Inc(P.Y,16);
-			fCompletionBox.Position := fText.ClientToScreen(P);
 		end;
 	end;
 end;
@@ -1136,12 +1116,23 @@ begin
 end;
 
 procedure TEditor.CompletionTimer(Sender: TObject);
+begin
+	ShowCompletion;
+end;
+
+procedure TEditor.ShowCompletion;
 var
+	P : TPoint;
 	M: TMemoryStream;
 	s: AnsiString;
 	attr: TSynHighlighterAttributes;
 begin
 	fCompletionTimer.Enabled := False;
+
+	// Position it at the top of the next line
+	P := fText.RowColumnToPixels(fText.DisplayXY);
+	Inc(P.Y,fText.LineHeight + 2);
+	fCompletionBox.Position := fText.ClientToScreen(P);
 
 	// Don't bother scanning inside strings or comments or defines
 	if(fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX-1, fText.CaretY), s, attr)) then
@@ -1391,12 +1382,12 @@ var
 	begin
 		// Add to list
 		if devData.WatchHint then
-			MainForm.fDebugger.AddWatchVar(s);
+			MainForm.Debugger.AddWatchVar(s);
 
 		// Evaluate s
 		fCurrentEvalWord := s; // remember name when debugger finishes
-		MainForm.fDebugger.OnEvalReady := OnMouseOverEvalReady;
-		MainForm.fDebugger.SendCommand('print',s);
+		MainForm.Debugger.OnEvalReady := OnMouseOverEvalReady;
+		MainForm.Debugger.SendCommand('print',s);
 	end;
 
 	procedure ShowParserHint;
@@ -1418,7 +1409,7 @@ var
 
 	procedure CancelHint;
 	begin
-		MainForm.fDebugger.OnEvalReady := nil;
+		MainForm.Debugger.OnEvalReady := nil;
 
 		// disable editor hint
 		Application.CancelHint;
@@ -1426,7 +1417,7 @@ var
 		fText.Hint := '';
 
 		// disable page control hint
-		MainForm.fCurrentPageHint := '';
+		MainForm.CurrentPageHint := '';
 		MainForm.PageControl.Hint := '';
 	end;
 begin
@@ -1445,7 +1436,7 @@ begin
 				s := fText.GetWordAtRowCol(p);
 		end;
 		hprIdentifier: begin
-			if MainForm.fDebugger.Executing then
+			if MainForm.Debugger.Executing then
 				s :=  GetWordAtPosition(p,wpEvaluation) // debugging
 			else if devEditor.ParserHints and not fCompletionBox.Visible then
 				s := GetWordAtPosition(p,wpInformation) // information during coding
@@ -1484,7 +1475,7 @@ begin
 				ShowParserHint;
 		end;
 		hprIdentifier, hprSelection: begin
-			if MainForm.fDebugger.Executing then
+			if MainForm.Debugger.Executing then
 				ShowDebugHint
 			else if devEditor.ParserHints and not fCompletionBox.Visible then
 				ShowParserHint;
@@ -1660,10 +1651,15 @@ var
 	wa: boolean;
 begin
 	Result := True;
+
+	// Is this file read-only?
 	if FileExists(fFileName) and (FileGetAttr(fFileName) and faReadOnly <> 0) then begin
-		// file is read-only
+
+		// Yes, ask the user if he wants us to fix that
 		if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [fFileName]), mtConfirmation, [mbYes, mbNo], 0) = mrNo then
 			Exit;
+
+		// Yes, remove read-only attribute
 		if FileSetAttr(fFileName, FileGetAttr(fFileName)-faReadOnly) <> 0 then begin
 			MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [fFileName]), mtError, [mbOk], 0);
 			Exit;
@@ -1707,8 +1703,8 @@ begin
 			FilterIndex := 4; // .h
 			DefaultExt := 'h';
 		end else begin
-			if Assigned(MainForm.fProject) then begin
-				if MainForm.fProject.Options.useGPP then begin
+			if Assigned(MainForm.Project) then begin
+				if MainForm.Project.Options.useGPP then begin
 					FilterIndex := 3; // .cpp
 					DefaultExt := 'cpp';
 				end else begin
@@ -1724,8 +1720,8 @@ begin
 		FileName := fFileName;
 		if (fFileName <> '') then
 			InitialDir := ExtractFilePath(fFileName)
-		else if Assigned(MainForm.fProject) then
-			InitialDir := MainForm.fProject.Directory;
+		else if Assigned(MainForm.Project) then
+			InitialDir := MainForm.Project.Directory;
 
 		if Execute then begin
 
@@ -1741,8 +1737,8 @@ begin
 				Result := False;
 			end;
 
-			if assigned(MainForm.fProject) then
-				MainForm.fProject.SaveUnitAs(MainForm.fProject.Units.IndexOf(fFileName), FileName) // index of old filename
+			if assigned(MainForm.Project) then
+				MainForm.Project.SaveUnitAs(MainForm.Project.Units.IndexOf(fFileName), FileName) // index of old filename
 			else
 				fTabSheet.Caption:= ExtractFileName(FileName);
 

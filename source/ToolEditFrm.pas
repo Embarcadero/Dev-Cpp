@@ -118,8 +118,8 @@ begin
 	with TOpenDialog.Create(self) do try
 		Filter := 'Applications (*.exe;*.bat;*.com;)|*.exe;*.bat;*.com|All files (*.*)|*.*';
 
-		if Assigned(MainForm.fProject) then
-			InitialDir := MainForm.fProject.Directory;
+		if Assigned(MainForm.Project) then
+			InitialDir := MainForm.Project.Directory;
 
 		if Execute then begin
 			edProgram.Text := FileName;

@@ -132,17 +132,17 @@ begin
 			Params := Params + ' -a';
 		Params := Params + ' -m ' + spnMinCount.Text;
 
-		if Assigned(MainForm.fProject) then begin
-			Dir := ExtractFilePath(MainForm.fProject.Executable);
-			Params := Params + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
+		if Assigned(MainForm.Project) then begin
+			Dir := ExtractFilePath(MainForm.Project.Executable);
+			Params := Params + ' "' + ExtractFileName(MainForm.Project.Executable) + '"';
 		end else begin
 			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
 			Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
 		end;
 	end else begin
 		Params := editCustom.Text + ' ' + GPROF_CMD_GENFLAT;
-		if Assigned(MainForm.fProject) then
-			Dir := ExtractFilePath(MainForm.fProject.Executable)
+		if Assigned(MainForm.Project) then
+			Dir := ExtractFilePath(MainForm.Project.Executable)
 		else
 			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
 	end;
@@ -225,17 +225,17 @@ begin
 			Params := Params + ' -a';
 		Params := Params + ' -m ' + spnMinCount.Text;
 
-		if Assigned(MainForm.fProject) then begin
-			Dir := ExtractFilePath(MainForm.fProject.Executable);
-			Params := Params + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"';
+		if Assigned(MainForm.Project) then begin
+			Dir := ExtractFilePath(MainForm.Project.Executable);
+			Params := Params + ' "' + ExtractFileName(MainForm.Project.Executable) + '"';
 		end else begin
 			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
 			Params := Params + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
 		end;
 	end else begin
 		Params := editCustom.Text + ' -q';
-		if Assigned(MainForm.fProject) then
-			Dir := ExtractFilePath(MainForm.fProject.Executable)
+		if Assigned(MainForm.Project) then
+			Dir := ExtractFilePath(MainForm.Project.Executable)
 		else
 			Dir := ExtractFilePath(MainForm.GetEditor.FileName);
 	end;
@@ -431,8 +431,8 @@ var
 begin
 	if not chkCustom.Checked then begin
 		assembly := devCompilerSets.CurrentSet.gprofName;
-		if Assigned(MainForm.fProject) then
-			assembly := assembly + ' "' + ExtractFileName(MainForm.fProject.Executable) + '"'
+		if Assigned(MainForm.Project) then
+			assembly := assembly + ' "' + ExtractFileName(MainForm.Project.Executable) + '"'
 		else
 			assembly := assembly + ' "' + ExtractFileName(ChangeFileExt(MainForm.GetEditor.FileName, EXE_EXT)) + '"';
 		if not chkHideNotCalled.Checked then

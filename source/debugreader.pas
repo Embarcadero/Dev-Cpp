@@ -53,10 +53,9 @@ type
 
   PWatchVar = ^TWatchVar;
   TWatchVar = record
-    name : AnsiString;
-    value : AnsiString;
+    Name : AnsiString;
     gdbindex : integer;
-    node : TTreeNode;
+    Node : TTreeNode;
   end;
 
   PBreakPoint = ^TBreakPoint;
@@ -80,42 +79,48 @@ type
   end;
 
   TDebugReader = class(TThread)
-  public
-    hPipeRead : THandle;
-    Registers : TList;
-    Disassembly : TStringList; // convert to TList with proper data formatting?
-    Backtrace : TList;
-    BreakpointList : TList;
-    WatchVarList : TList; // contains all parents
-    DebugTree : TTreeView;
   private
-    curpos : integer;
-    len : integer;
-    bline : integer;
-    bfile : AnsiString;
-    gdbout : AnsiString;
-    evalvalue : AnsiString;
-    signal : AnsiString;
-    prevannotation : TAnnotateType;
-    nextannotation : TAnnotateType;
+    fPipeRead : THandle;
+    fRegisters : TList;
+    fDisassembly : TStringList; // convert to TList with proper data formatting?
+    fBacktrace : TList;
+    fBreakpointList : TList;
+    fWatchVarList : TList; // contains all parents
+    fDebugTree : TTreeView;
+    fIndex : integer;
+    fBreakPointLine : integer;
+    fBreakPointFile : AnsiString;
+    fOutput : AnsiString;
+    fEvalValue : AnsiString;
+    fSignal : AnsiString;
 
-	// attempt to cut down on Synchronize calls
-	dobacktraceready : boolean;
-	dodisassemblerready : boolean;
-	doregistersready : boolean;
-	dorescanwatches : boolean;
-	doevalready : boolean;
-	doprocessexited : boolean;
-	doupdatecpuwindow : boolean;
-	doupdateexecution : boolean;
-	doreceivedsignal : boolean;
-	doreceivedsfwarning : boolean;
+    // attempt to cut down on Synchronize calls
+    dobacktraceready : boolean;
+    dodisassemblerready : boolean;
+    doregistersready : boolean;
+    dorescanwatches : boolean;
+    doevalready : boolean;
+    doprocessexited : boolean;
+    doupdatecpuwindow : boolean;
+    doupdateexecution : boolean;
+    doreceivedsignal : boolean;
+    doreceivedsfwarning : boolean;
 
-	// Evaluation tree output handlers
-    procedure ProcessWatchStruct(parentnode : TTreeNode);
-    function ProcessEvalStruct : AnsiString;
-
-    procedure Analyze;
+    // Signal handlers
+    procedure HandleValueHistoryValue;
+    procedure HandleSignal;
+    procedure HandleExit;
+    procedure HandleFrames;
+    procedure HandleDisassembly;
+    procedure HandleRegisters;
+    procedure HandleError;
+    procedure HandleDisplay;
+    procedure HandleSource;
+    
+    // Evaluation tree output handlers
+    procedure ProcessWatchOutput(WatchVar : PWatchVar);
+    function ProcessEvalOutput : AnsiString;
+    procedure ProcessDebugOutput;
 
     // synching with GUI
     procedure SyncFinishedParsing;
@@ -123,11 +128,10 @@ type
     // parsing
     procedure SkipSpaces; // skips space and tab
     procedure SkipToAnnotation; // skips until it finds #26#26 (GDB annotation for interfaces)
-    function FindAnnotation(an : TAnnotateType) : boolean; // Finds the given annotation, returns false on EOF
+    function FindAnnotation(Annotation : TAnnotateType) : boolean; // Finds the given annotation, returns false on EOF
     function GetNextAnnotation : TAnnotateType; // Returns the next annotation
     function GetLastAnnotation(const text : AnsiString;curpos,len : integer) : TAnnotateType; // Returns the last annotation in given string
-    function PeekNextAnnotation(nextcount : integer = 1) : TAnnotateType; // Returns the next annotation, but does not modify current scanning positions
-    function PeekPrevAnnotation(prevcount : integer = 1) : TAnnotateType; // Returns the prev annotation, but does not modify current scanning positions
+    function PeekNextAnnotation : TAnnotateType; // Returns the next annotation, but does not modify current scanning positions
     function GetNextWord : AnsiString; // copies the next word, stops when it finds chars 0..32
     function GetNextLine : AnsiString; // skips until enter sequence, skips ONE enter sequence, copies until next enter sequence
     function GetNextFilledLine : AnsiString; // skips until enter sequence, skips enter sequences, copies until next enter sequence
@@ -135,12 +139,20 @@ type
     function GetAnnotation(const s : AnsiString) : TAnnotateType; // converts string to TAnnotateType
   protected
     procedure Execute; override;
+  public
+    property Registers : TList read fRegisters write fRegisters;
+    property Disassembly : TStringList read fDisassembly write fDisassembly;
+    property Backtrace : TList read fBacktrace write fBacktrace;
+    property PipeRead : THandle read fPipeRead write fPipeRead;
+    property BreakPointList : TList read fBreakPointList write fBreakPointList;
+    property WatchVarList : TList read fWatchVarList write fWatchVarList;
+    property DebugTree : TTreeView read fDebugTree write fDebugTree;
   end;
 
 implementation
 
 uses
-  main, devcfg, CPUFrm, multilangsupport ,debugger, utils, Controls, Math;
+  main, devcfg, CPUFrm, multilangsupport, debugger, utils, Controls, Math;
 
 // macro for all the things that need to be done when we are finished parsing the current block
 procedure TDebugReader.SyncFinishedParsing;
@@ -153,23 +165,23 @@ begin
 
 	if doreceivedsfwarning then begin
 		if MessageDlg(Lang[ID_MSG_SOURCEMORERECENT],mtConfirmation,[mbYes,mbNo],0) = mrYes then begin
-			MainForm.fDebugger.Stop;
+			MainForm.Debugger.Stop;
 			MainForm.actCompileExecute(nil);
 			Exit;
 		end;
 	end;
 
 	if doprocessexited then begin
-		MainForm.fDebugger.Stop;
+		MainForm.Debugger.Stop;
 		Exit;
 	end;
 
-	if doevalready and Assigned(MainForm.fDebugger.OnEvalReady) then
-		MainForm.fDebugger.OnEvalReady(evalvalue);
+	if doevalready and Assigned(MainForm.Debugger.OnEvalReady) then
+		MainForm.Debugger.OnEvalReady(fEvalValue);
 
 	// Delete unimportant stuff to reduce clutter
-	gdbout := StringReplace(gdbout,#26,'->',[rfReplaceAll]);
-	MainForm.DebugOutput.Lines.Add(gdbout);
+	fOutput := StringReplace(fOutput,#26,'->',[rfReplaceAll]);
+	MainForm.DebugOutput.Lines.Add(fOutput);
 
 	if Assigned(CPUForm) and not doreceivedsignal then begin
 		if doregistersready then
@@ -183,12 +195,12 @@ begin
 	end;
 
 	if doupdateexecution then begin
-		MainForm.GotoBreakpoint(bfile, bline); // set active line
-		MainForm.fDebugger.RefreshWatchVars; // update variable information
+		MainForm.GotoBreakpoint(fBreakPointFile,fBreakPointLine); // set active line
+		MainForm.Debugger.RefreshWatchVars; // update variable information
 	end;
 
 	if doreceivedsignal then begin
-		SignalDialog := CreateMessageDialog(signal, mtError, [mbOk]);
+		SignalDialog := CreateMessageDialog(fSignal, mtError, [mbOk]);
 		SignalCheck := TCheckBox.Create(SignalDialog);
 
 		// Display it on top of everything
@@ -219,54 +231,55 @@ begin
 
 	// CPU form updates itself when spawned, don't update twice!
 	if (doupdatecpuwindow and not spawnedcpuform) and Assigned(CPUForm) then begin
-		MainForm.fDebugger.SendCommand('disas','');
-		MainForm.fDebugger.SendCommand('info registers','');
-		MainForm.fDebugger.SendCommand('backtrace','');
+		MainForm.Debugger.SendCommand('disas','');
+		MainForm.Debugger.SendCommand('info registers','');
+		MainForm.Debugger.SendCommand('backtrace','');
 	end;
 end;
 
 procedure TDebugReader.SkipSpaces;
 begin
-	while (curpos <= len) and (gdbout[curpos] in [#9,#32]) do
-		Inc(curpos);
+	while fOutput[fIndex] in [#9,#32] do
+		Inc(fIndex);
 end;
 
 procedure TDebugReader.SkipToAnnotation;
 begin
 	// Walk up to the next annotation
-	while (curpos <= len) and not (gdbout[curpos] in [#26]) do
-		Inc(curpos);
+	while not (fOutput[fIndex] in [#26,#0]) do
+		Inc(fIndex);
 
 	// Crawl through the remaining ->'s
-	while (curpos <= len) and (gdbout[curpos] in [#26]) do
-		Inc(curpos);
+	while fOutput[fIndex] in [#26] do
+		Inc(fIndex);
 end;
 
-function TDebugReader.FindAnnotation(an : TAnnotateType) : boolean;
+function TDebugReader.FindAnnotation(Annotation : TAnnotateType) : boolean;
 var
-	curran : TAnnotateType;
+	NextAnnotation : TAnnotateType;
 begin
-	result := false;
+	result := False;
 
 	repeat
-		curran := GetNextAnnotation;
-		if curran = TEOF then
-			Exit;
-	until curran = an;
+		NextAnnotation := GetNextAnnotation;
+		if NextAnnotation = TEOF then
+			Exit; // return false
+	until NextAnnotation = Annotation;
 
-	result := true;
+	result := True;
 end;
 
 function TDebugReader.GetNextWord : AnsiString;
 begin
-	Result:='';
+	Result := '';
 
 	// Called when at a space? Skip over
 	SkipSpaces;
 
-	while (curpos <= len) and not (gdbout[curpos] in [#0..#32]) do begin
-		Result := Result + gdbout[curpos];
-		Inc(curpos);
+	// Skip until a space
+	while not (fOutput[fIndex] in [#0..#32]) do begin
+		Result := Result + fOutput[fIndex];
+		Inc(fIndex);
 	end;
 end;
 
@@ -275,9 +288,9 @@ begin
 	Result := '';
 
 	// Return part of line still ahead of us
-	while (curpos <= len) and not (gdbout[curpos] in [#13, #10]) do begin
-		Result := Result + gdbout[curpos];
-		Inc(curpos);
+	while not (fOutput[fIndex] in [#13,#10,#0]) do begin
+		Result := Result + fOutput[fIndex];
+		Inc(fIndex);
 	end;
 end;
 
@@ -286,16 +299,20 @@ begin
 	Result := '';
 
 	// Walk up to an enter sequence
-	while (curpos <= len) and not (gdbout[curpos] in [#13, #10]) do
-		Inc(curpos);
+	while not (fOutput[fIndex] in [#13,#10,#0]) do
+		Inc(fIndex);
+
+	// End of output. Exit
+	if fOutput[fIndex] = #0 then
+		Exit;
 
 	// Skip ONE enter sequence (CRLF, CR, LF, etc.)
-	if (curpos+1 <= len) and (gdbout[curpos] = #13) and (gdbout[curpos+1] = #10) then // DOS
-		Inc(curpos,2)
-	else if (curpos <= len) and (gdbout[curpos] = #13) then // UNIX
-		Inc(curpos)
-	else if (curpos <= len) and (gdbout[curpos] = #10) then // MAC
-		Inc(curpos);
+	if (fOutput[fIndex] = #13) and (fOutput[fIndex+1] = #10) then // DOS
+		Inc(fIndex,2)
+	else if fOutput[fIndex] = #13 then // UNIX
+		Inc(fIndex)
+	else if fOutput[fIndex] = #10 then // MAC
+		Inc(fIndex);
 
 	// Return next line
 	Result := GetRemainingLine;
@@ -306,51 +323,24 @@ begin
 	Result := '';
 
 	// Walk up to an enter sequence
-	while (curpos <= len) and not (gdbout[curpos] in [#13, #10]) do
-		Inc(curpos);
+	while not (fOutput[fIndex] in [#13,#10,#0]) do
+		Inc(fIndex);
 
 	// Skip enter sequences (CRLF, CR, LF, etc.)
-	while (curpos <= len) and (gdbout[curpos] in [#13, #10]) do
-		Inc(curpos);
+	while (fOutput[fIndex] in [#13,#10,#0]) do
+		Inc(fIndex);
 
 	// Return next line
 	Result := GetRemainingLine;
 end;
 
-function TDebugReader.PeekPrevAnnotation(prevcount : integer) : TAnnotateType;
+function TDebugReader.PeekNextAnnotation : TAnnotateType;
 var
-	oldpos, I : integer;
+	IndexBackup : integer;
 begin
-	oldpos := curpos;
-
-	// Go back to before a #26#26
-	for I := 0 to prevcount -1 do begin
-		while (curpos > 1) and not ((gdbout[curpos-1] in [#26]) and (gdbout[curpos] in [#26])) do
-			Dec(curpos);
-		Dec(curpos); // continue BEFORE a #26
-	end;
-
+	IndexBackup := fIndex; // do NOT modifiy curpos
 	Result := GetNextAnnotation;
-	prevannotation := Result;
-	curpos := oldpos;
-end;
-
-function TDebugReader.PeekNextAnnotation(nextcount : integer) : TAnnotateType;
-var
-	oldpos, I : integer;
-begin
-	oldpos := curpos;
-
-	// Go back to after a #26#26
-	for I := 0 to nextcount -1 do begin
-		while (curpos < len) and not ((gdbout[curpos] in [#26]) and (gdbout[curpos+1] in [#26])) do
-			Inc(curpos);
-		Inc(curpos); // continue AFTER a #26
-	end;
-
-	Result := GetNextAnnotation;
-	nextannotation := Result;
-	curpos := oldpos;
+	fIndex := IndexBackup;
 end;
 
 function TDebugReader.GetLastAnnotation(const text : AnsiString;curpos,len : integer) : TAnnotateType;
@@ -384,7 +374,7 @@ end;
 
 function TDebugReader.GetAnnotation(const s : AnsiString) : TAnnotateType;
 var
-	oldpos : integer;
+	IndexBackup : integer;
 	t : AnsiString;
 begin
 	if SameStr(s,'pre-prompt') then
@@ -394,17 +384,17 @@ begin
 	else if SameStr(s,'post-prompt') then begin
 		result := TPostPrompt;
 
-		oldpos := curpos;
+		IndexBackup := fIndex;
 		t := GetNextFilledLine;
-		curpos := oldpos;
+		fIndex := IndexBackup;
 
 		// Hack fix to catch register dump
-		if Assigned(Registers) then
+		if Assigned(fRegisters) then
 			if StartsStr('rax ',t) or StartsStr('eax ',t) then
 				result := TInfoReg;
 
 		// Another hack to catch assembler
-		if Assigned(Disassembly) then
+		if Assigned(fDisassembly) then
 			if StartsStr('Dump of assembler code for function ',t) then
 				result := TInfoAsm;
 
@@ -480,223 +470,408 @@ begin
 		result := TSignalString
 	else if SameStr(s,'signal-string-end') then
 		result := TSignalStringEnd
-	else if (curpos = len) then
+	else if (fOutput[fIndex] = #0) then
 		result := TEOF
 	else
 		result := TUnknown;
 end;
 
-procedure TDebugReader.ProcessWatchStruct(parentnode : TTreeNode);
+procedure TDebugReader.ProcessWatchOutput(WatchVar : PWatchVar);
 var
-	evalout,s : AnsiString;
-	parent, prevparent : TTreeNode;
-	curpos, len, indent, previndent : integer;
-
-	// Similar to TDebugReader.GetRemainingLine, but skips enters too
-	function GetRemainingLine : AnsiString;
-	begin
-		Result := '';
-
-		// Return part of line still ahead of us
-		while (curpos <= len) and not (evalout[curpos] in [#13, #10]) do begin
-			Result := Result + evalout[curpos];
-			Inc(curpos);
-		end;
-
-		// Walk up to an enter sequence
-		while (curpos <= len) and not (evalout[curpos] in [#13, #10]) do
-			Inc(curpos);
-
-		// Skip enter sequences (CRLF, CR, LF, etc.)
-		while (curpos <= len) and (evalout[curpos] in [#13, #10]) do
-			Inc(curpos);
-	end;
-
-	function GetLineIndent : integer;
-	begin
-		Result := 0;
-
-		// Return part of line still ahead of us
-		while (curpos <= len) and (evalout[curpos] = #32) do begin
-			Inc(result);
-			Inc(curpos);
-		end;
-	end;
-
+	S, NodeText : AnsiString;
+	ParentNode : TTreeNode;
+	ParentWasExpanded : boolean;
+	I : integer;
+	sl : TStringList;
 begin
+	// Expand if it was expanded or if it didn't have any children
+	ParentWasExpanded := WatchVar^.Node.Expanded or not WatchVar^.Node.HasChildren;
+
+	// Do not remove root node of watch variable
+	WatchVar^.Node.DeleteChildren;
+	ParentNode := WatchVar^.Node;
+	ParentNode.Text := '';
 
 	// Process output parsed by ProcessEvalStruct
-	evalout := ProcessEvalStruct;
+	S := WatchVar^.Name + ' = ' + ProcessEvalOutput; // add placeholder name for variable name so we can format structs using one rule
 
-	parent := parentnode;
-	curpos := 1;
-	len := Length(evalout);
-	previndent := -1; // first indent should always be more
+	// Add children based on indent
+	sl := TStringList.Create;
+	try
+		sl.Text := S;
+		for I := 0 to sl.Count - 1 do begin
 
-	while curpos <= len do begin
-		indent := GetLineIndent;
+			// Format node text. Remove trailing comma
+			NodeText := Trim(sl[i]);
+			if EndsStr(',',NodeText) then
+				Delete(NodeText,Length(NodeText),1);
 
-		if indent > previndent then begin // set new parent
-			prevparent := parent;
-			parent := parent.GetLastChild;
-			if not Assigned(parent) then begin// there is no indent on the first line, expect array output
-				prevparent.Text := prevparent.Text + GetRemainingLine;
-				parent := prevparent;
-			end else // struct output on first line, proceed as usual
-				DebugTree.Items.AddChild(parent,GetRemainingLine)
-		end else if indent < previndent then begin // return to old parent
-			prevparent := parent;
-			if Assigned(parent) then
-				parent := parent.Parent;
-			if not Assigned(parent) then
-				parent := prevparent;
-
-			// Eat line
-			GetRemainingLine;
-		end else begin // indent is equal, add to current
-			s := GetRemainingLine;
-			if not StartsStr('}',s) then begin
-				if Assigned(parent) then
-					DebugTree.Items.AddChild(parent,s)
+			if EndsStr('{',NodeText) then begin // new member struct
+				if ParentNode.Text = '' then // root node, replace text only
+					ParentNode.Text := NodeText
 				else
-					DebugTree.Items.AddChild(DebugTree.TopItem,s);
+					ParentNode := DebugTree.Items.AddChild(ParentNode,NodeText);
+			end else if StartsStr('}',NodeText) then begin // end of struct, change parent
+				ParentNode := ParentNode.Parent;
+			end else begin // next parent member/child
+				if ParentNode.Text = '' then // root node, replace text only
+					ParentNode.Text := NodeText
+				else
+					DebugTree.Items.AddChild(ParentNode,NodeText);
 			end;
 		end;
-
-		previndent := indent;
+	finally
+		sl.Free;
 	end;
+
+	// TODO: remember expansion state
+	if ParentWasExpanded then
+		WatchVar^.Node.Expand(false);
 end;
 
-function TDebugReader.ProcessEvalStruct : AnsiString;
+function TDebugReader.ProcessEvalOutput : AnsiString;
 var
-	i, indent : integer;
+	indent : integer;
+	NextLine : AnsiString;
+	NextAnnotation : TAnnotateType;
+begin
+	indent := 0;
+
+	// First line gets special treatment
+	Result :=  GetNextLine;
+	if Result = '{' then
+		Inc(indent,4);
+
+	// Collect all data, add formatting in between
+	repeat
+		NextAnnotation := GetNextAnnotation;
+		NextLine := GetNextLine;
+		case NextAnnotation of
+
+			// Change indent if { or } is found
+			TFieldBegin: begin
+				Result := Result + #13#10 + StringOfChar(' ',indent);
+			end;
+			TFieldValue: begin
+				if StartsStr('{',NextLine) and (PeekNextAnnotation <> TArrayBegin) then
+					Inc(indent,4);
+			end;
+			TFieldEnd: begin
+				if EndsStr('}',NextLine) then begin
+					Dec(indent,4);
+					Result := Result + #13#10 + StringOfChar(' ',indent);
+				end;
+			end;
+		end;
+		Result := Result + NextLine;
+	until NextAnnotation in [TEOF, TValueHistoryEnd, TDisplayEnd];
+end;
+
+procedure TDebugReader.HandleValueHistoryValue;
+begin
+	fEvalValue := ProcessEvalOutput;
+	doevalready := true;
+end;
+
+procedure TDebugReader.HandleSignal;
+begin
+	fSignal := GetNextFilledLine; // Program received signal
+
+	if not FindAnnotation(TSignalName) then
+		Exit;
+
+	fSignal := fSignal + GetNextFilledLine; // signal code
+
+	if not FindAnnotation(TSignalNameEnd) then
+		Exit;
+
+	fSignal := fSignal + GetNextFilledLine; // comma
+
+	if not FindAnnotation(TSignalString) then
+		Exit;
+
+	fSignal := fSignal + GetNextFilledLine; // user friendly description
+
+	if not FindAnnotation(TSignalStringEnd) then
+		Exit;
+
+	fSignal := fSignal + GetNextFilledLine; // period
+
+	doreceivedsignal := true;
+end;
+
+procedure TDebugReader.HandleExit;
+begin
+	doprocessexited := true;
+end;
+
+procedure TDebugReader.HandleFrames;
+var
+	s : AnsiString;
+	trace : PTrace;
+begin
+	s := GetNextLine;
+
+	// Is this a backtrace dump?
+	if Assigned(fBacktrace) and StartsStr('#',s) then begin
+
+		trace := new(PTrace);
+
+		// Find function name
+		if not FindAnnotation(TFrameFunctionName) then begin
+			Dispose(PTrace(trace));
+			Exit;
+		end;
+
+		trace^.funcname := GetNextLine;
+
+		// Find argument list start
+		if not FindAnnotation(TFrameArgs) then begin
+			Dispose(PTrace(trace));
+			Exit;
+		end;
+
+		// Arguments are either () or detailed list
+		s := GetNextLine;
+
+		while (PeekNextAnnotation = TArgBegin) do begin
+
+			// argument name
+			if not FindAnnotation(TArgBegin) then begin
+				Dispose(PTrace(trace));
+				Exit;
+			end;
+
+			s := s + GetNextLine;
+
+			// =
+			if not FindAnnotation(TArgNameEnd) then begin
+				Dispose(PTrace(trace));
+				Exit;
+			end;
+
+			s := s + ' ' + GetNextLine + ' '; // should be =
+
+			// argument value
+			if not FindAnnotation(TArgValue) then begin
+				Dispose(PTrace(trace));
+				Exit;
+			end;
+
+			s := s + GetNextLine;
+
+			// argument end
+			if not FindAnnotation(TArgEnd) then begin
+				Dispose(PTrace(trace));
+				Exit;
+			end;
+
+			s := s + GetNextLine;
+		end;
+
+		trace^.funcname := trace^.funcname + Trim(s);
+
+		// If source info can't be found, skip
+		if PeekNextAnnotation = TFrameSourceBegin then begin
+
+			// Find filename
+			if not FindAnnotation(TFrameSourceFile) then begin
+				Dispose(PTrace(trace));
+				Exit;
+			end;
+
+			trace^.filename := GetNextLine;
+
+			// find line
+			if not FindAnnotation(TFrameSourceLine) then begin
+				Dispose(PTrace(trace));
+				Exit;
+			end;
+
+			trace^.line := GetNextLine;
+		end else begin
+			trace^.filename := '';
+			trace^.line := '';
+		end;
+
+		fBacktrace.Add(trace);
+
+		// Skip over the remaining frame part...
+		if not FindAnnotation(TFrameEnd) then Exit;
+
+		// Not another one coming? Done!
+		if PeekNextAnnotation <> TFrameBegin then begin
+
+			// End of stack trace dump!
+			dobacktraceready := true;
+		end;
+	end else
+		doupdatecpuwindow := true;
+end;
+
+procedure TDebugReader.HandleDisassembly;
+var
 	s : AnsiString;
 begin
-	indent := 1;
-	result := '';
-	while curpos < len do begin
-		case GetNextAnnotation of
-			TFieldBegin : begin
+	if not Assigned(fDisassembly) then
+		Exit;
 
-				for i := 0 to (4*indent) - 1 do
-					result := result + ' ';
+	// Get info message
+	s := GetNextLine;
 
-				// Field name
-				result := result + GetNextLine;
+	// the full function name will be saved at index 0
+	fDisassembly.Add(Copy(s,37,Length(s)-37));
 
-				// =
-				if not FindAnnotation(TFieldNameEnd) then Exit;
+	s := GetNextLine;
 
-				result := result + GetNextLine;
+	// Add lines of disassembly
+	while not SameStr('End of assembler dump.',s) and not SameStr(s,'') do begin
+		fDisassembly.Add(s);
+		s := GetNextLine;
+	end;
 
-				// field value
-				if not FindAnnotation(TFieldValue) then Exit;
+	dodisassemblerready := true;
+end;
 
-				s := GetNextLine;
-				result := result + s;
+procedure TDebugReader.HandleRegisters;
+var
+	s : AnsiString;
+	reg : PRegister;
+	x : integer;
+begin
+	if not Assigned(fRegisters) then
+		Exit;
 
-				case PeekNextAnnotation of
-					TFieldBegin : begin// struct inside struct
-						result := result + #13#10;
-						Inc(indent);
-					end;
-					TArrayBegin : begin
-						if PeekNextAnnotation(2) = TFieldBegin then begin // array of struct inside field
-							result := result + #13#10;
-							Inc(indent);
-						end;
-					end;
-				end;
-			end;
+	// name(spaces)hexvalue(tab)decimalvalue
+	s := GetNextFilledLine;
 
-			TArrayBegin,TArrayEnd : begin
-				s := GetNextLine;
-				if PeekNextAnnotation = TFieldBegin then begin // struct inside array
+	repeat
+		reg := new(PRegister);
 
-					for i := 0 to (4*indent) - 1 do
-						result := result + ' ';
+		// Cut name from 1 to first space
+		x := Pos(' ',s);
+		reg^.name := Copy(s,1,x-1);
+		Delete(s,1,x-1);
 
-					result := result + s + #13#10;
+		// Remove spaces
+		s := TrimLeft(s);
 
-					Inc(indent);
-				end else if PeekPrevAnnotation(3) = TFieldEnd then begin // end of struct inside array
-					result := result + #13#10;
 
-					for i := 0 to (4*(indent-1)) - 1 do
-						result := result + ' ';
+		// Cut hex value from 1 to first tab
+		x := Pos(#9,s);
+		reg^.valuehex := Copy(s,1,x-1);
+		Delete(s,1,x); // delete tab too
+		s := TrimLeft(s);
 
-					result := result + s;
+		// Remaining part contains decimal value
+		reg^.valuedec := s;
 
-					Dec(indent);
-				end else if PeekPrevAnnotation(4) = TFieldEnd then begin // end of repeated struct inside array
-					result := result + #13#10;
+		fRegisters.Add(reg);
 
-					for i := 0 to (4*(indent-1)) - 1 do
-						result := result + ' ';
+		s := GetNextLine;
 
-					result := result + s;
+	until SameStr('',s);
 
-					Dec(indent);
-				end else begin
-					result := result + s;
-				end;
-			end;
+	doregistersready := true;
+end;
 
-			TElt, TEltRep : begin
-				s := GetNextLine;
-				if PeekNextAnnotation = TFieldBegin then begin // struct inside array
+procedure TDebugReader.HandleError;
+var
+	s, WatchName : AnsiString;
+	Tail, Head, I : integer;
+	WatchVar : PWatchVar;
+begin
+	s := GetNextLine; // error text
+	if StartsStr('No symbol "',s) then begin
+		Tail := Pos('"',s);
+		Head := RPos('"',s);
+		WatchName := Copy(s,Tail+1,Head-Tail-1);
 
-					result := result + s + #13#10;
+		// Update current...
+		for I := 0 to WatchVarList.Count - 1 do begin
+			WatchVar := PWatchVar(WatchVarList.Items[I]);
+			if SameStr(WatchVar^.name,WatchName) then begin
 
-					Inc(indent);
-				end else if PeekPrevAnnotation(3) = TFieldEnd then begin // end of struct inside array
-					result := result + #13#10;
+				WatchVar^.Node.Text := WatchVar^.Name + ' = Not found in current context';
 
-					result := result + s;
+				// Delete now invalid children
+				WatchVar^.Node.DeleteChildren;
 
-					Dec(indent);
-				end else if PeekPrevAnnotation(4) = TFieldEnd then begin // end of repeated struct inside array
-					result := result + #13#10;
-
-					result := result + s;
-
-					Dec(indent);
-				end else begin
-					result := result + s;
-				end;
-			end;
-
-			// Add, complete current indent
-			TFieldEnd : begin
-				s := GetNextLine;
-
-				result := result + ';' + #13#10;
-
-				// End of structure, complete braces
-				if PeekNextAnnotation <> TFieldBegin then begin
-					for i := 0 to (4*(indent-1)) - 1 do
-						result := result + ' ';
-
-					result := result + s;
-					Dec(indent);
-				end;
-			end;
-
-			TDisplayEnd,TValueHistoryEnd : begin
+				dorescanwatches := true;
 				break;
 			end;
 		end;
 	end;
 end;
 
-procedure TDebugReader.Analyze;
+procedure TDebugReader.HandleDisplay;
 var
-	s,t : AnsiString;
-	i,x,y : integer;
-	wparent : PWatchVar;
-	reg : PRegister;
-	trace : PTrace;
+	s, WatchName : AnsiString;
+	I : integer;
+	WatchVar : PWatchVar;
 begin
+	s := GetNextLine; // watch index
+
+	if not FindAnnotation(TDisplayExpression) then
+		Exit;
+
+	WatchName := GetNextLine; // watch name
+
+	// Find parent we're talking about
+	for I := 0 to WatchVarList.Count - 1 do begin
+		WatchVar := PWatchVar(WatchVarList.Items[I]);
+		if SameStr(WatchVar^.name,WatchName) then begin
+
+			// Advance up to the value
+			if not FindAnnotation(TDisplayExpression) then Exit;
+
+			// Refresh GDB index so we can undisplay this by index
+			WatchVar^.gdbindex := StrToInt(s);
+
+			// Refresh members...
+			ProcessWatchOutput(WatchVar);
+			break;
+		end;
+	end;
+end;
+
+procedure TDebugReader.HandleSource;
+var
+	s : AnsiString;
+	DelimPos, I : integer;
+begin
+	// source filename:line:offset:beg/middle/end:addr
+	s := TrimLeft(GetRemainingLine);
+
+	// remove offset, beg/middle/end, address
+	for I := 1 to 3 do begin
+		DelimPos := RPos(':',s);
+		if DelimPos > 0 then
+			Delete(s,DelimPos,MaxInt)
+		else
+			Exit; // Wrong format. Don't bother to continue
+	end;
+
+	// get line
+	DelimPos := RPos(':',s);
+	if DelimPos > 0 then begin
+		fBreakPointLine := StrToIntDef(Copy(s,DelimPos+1,MaxInt),1);
+		Delete(s,DelimPos,MaxInt);
+	end;
+
+	// get file
+	fBreakPointFile := s;
+
+	doupdateexecution := true;
+	doupdatecpuwindow := true;
+end;
+
+procedure TDebugReader.ProcessDebugOutput;
+var
+	NextAnnotation : TAnnotateType;
+begin
+	// Only update once per update at most
+	DebugTree.Items.BeginUpdate;
 
 	dobacktraceready := false;
 	dodisassemblerready := false;
@@ -709,305 +884,39 @@ begin
 	doupdatecpuwindow := false;
 	doreceivedsfwarning := false;
 
-	len := Length(gdbout);
-	curpos := 1;
-
 	// Global checks
-	if Pos('warning: Source file is more recent than executable.',gdbout) > 0 then
+	if Pos('warning: Source file is more recent than executable.',fOutput) > 0 then
 		doreceivedsfwarning := true;
 
-	while curpos < len do begin
-		case GetNextAnnotation of
-			TValueHistoryValue : begin
-				evalvalue := GetNextLine; // value, might be empty
-				if SameStr(evalvalue,'') then
-					evalvalue := 'Error evaluating input'
-				else begin
-					case PeekNextAnnotation of
-						TFieldBegin : begin
-							evalvalue := evalvalue + #13#10 + ProcessEvalStruct;
-						end;
-						TArrayBegin : begin
-							if PeekNextAnnotation(2) = TFieldBegin then
-								evalvalue := evalvalue + #13#10 + ProcessEvalStruct
-							else
-								evalvalue := evalvalue + ProcessEvalStruct;
-						end;
-					end;
-				end;
-				doevalready := true;
-			end;
-			TSignal : begin
-
-				// Assemble user string
-
-				signal := GetNextFilledLine; // Program received signal
-
-				if not FindAnnotation(TSignalName) then Exit;
-
-				signal := signal + GetNextFilledLine; // signal code
-
-				if not FindAnnotation(TSignalNameEnd) then Exit;
-
-				signal := signal + GetNextFilledLine; // comma
-
-				if not FindAnnotation(TSignalString) then Exit;
-
-				signal := signal + GetNextFilledLine; // user friendly description
-
-				if not FindAnnotation(TSignalStringEnd) then Exit;
-
-				signal := signal + GetNextFilledLine; // period
-
-				doreceivedsignal := true;
-			end;
-			TExit : begin
-				doprocessexited := true;
-			end;
-			TFrameBegin : begin
-
-				s := GetNextLine;
-
-				// Is this a backtrace dump?
-				if Assigned(Backtrace) and StartsStr('#',s) then begin
-
-					trace := new(PTrace);
-
-					// Find function name
-					if not FindAnnotation(TFrameFunctionName) then begin
-						Dispose(PTrace(trace));
-						Exit;
-					end;
-
-					trace^.funcname := GetNextLine;
-
-					// Find argument list start
-					if not FindAnnotation(TFrameArgs) then begin
-						Dispose(PTrace(trace));
-						Exit;
-					end;
-
-					// Arguments are either () or detailed list
-					s := GetNextLine;
-
-					while (PeekNextAnnotation = TArgBegin) do begin
-
-						// argument name
-						if not FindAnnotation(TArgBegin) then begin
-							Dispose(PTrace(trace));
-							Exit;
-						end;
-
-						s := s + GetNextLine;
-
-						// =
-						if not FindAnnotation(TArgNameEnd) then begin
-							Dispose(PTrace(trace));
-							Exit;
-						end;
-
-						s := s + ' ' + GetNextLine + ' '; // should be =
-
-						// argument value
-						if not FindAnnotation(TArgValue) then begin
-							Dispose(PTrace(trace));
-							Exit;
-						end;
-
-						s := s + GetNextLine;
-
-						// argument end
-						if not FindAnnotation(TArgEnd) then begin
-							Dispose(PTrace(trace));
-							Exit;
-						end;
-
-						s := s + GetNextLine;
-					end;
-
-					trace^.funcname := trace^.funcname + Trim(s);
-
-					// If source info can't be found, skip
-					if PeekNextAnnotation = TFrameSourceBegin then begin
-
-						// Find filename
-						if not FindAnnotation(TFrameSourceFile) then begin
-							Dispose(PTrace(trace));
-							Exit;
-						end;
-
-						trace^.filename := GetNextLine;
-
-						// find line
-						if not FindAnnotation(TFrameSourceLine) then begin
-							Dispose(PTrace(trace));
-							Exit;
-						end;
-
-						trace^.line := GetNextLine;
-					end else begin
-						trace^.filename := '';
-						trace^.line := '';
-					end;
-
-					Backtrace.Add(trace);
-
-					// Skip over the remaining frame part...
-					if not FindAnnotation(TFrameEnd) then Exit;
-
-					// Not another one coming? Done!
-					if PeekNextAnnotation <> TFrameBegin then begin
-
-						// End of stack trace dump!
-						dobacktraceready := true;
-					end;
-				end else
-					doupdatecpuwindow := true;
-			end;
-			TInfoAsm : begin
-				if Assigned(Disassembly) then begin
-
-					// Get info message
-					s := GetNextLine;
-
-					// the full function name will be saved at index 0
-					Disassembly.Add(Copy(s,37,Length(s)-37));
-
-					s := GetNextLine;
-
-					// Add lines of disassembly
-					while not SameStr('End of assembler dump.',s) and not SameStr(s,'') do begin
-						Disassembly.Add(s);
-						s := GetNextLine;
-					end;
-
-					dodisassemblerready := true;
-				end;
-			end;
-			TInfoReg : begin
-				if Assigned(Registers) then begin
-
-					// name(spaces)hexvalue(tab)decimalvalue
-					s := GetNextFilledLine;
-
-					repeat
-						reg := new(PRegister);
-
-						// Cut name from 1 to first space
-						x := Pos(' ',s);
-						reg^.name := Copy(s,1,x-1);
-						Delete(s,1,x-1);
-
-						// Remove spaces
-						s := TrimLeft(s);
-
-
-						// Cut hex value from 1 to first tab
-						x := Pos(#9,s);
-						reg^.valuehex := Copy(s,1,x-1);
-						Delete(s,1,x); // delete tab too
-						s := TrimLeft(s);
-
-						// Remaining part contains decimal value
-						reg^.valuedec := s;
-
-						Registers.Add(reg);
-
-						s := GetNextLine;
-
-					until SameStr('',s);
-
-					doregistersready := true;
-				end;
-			end;
-			TErrorBegin : begin
-				s := GetNextLine; // error text
-				if StartsStr('No symbol "',s) then begin
-					x := Pos('"',s);
-					y := RPos('"',s);
-					t := Copy(s,x+1,y-x-1);
-
-					// Update current...
-					for I := 0 to WatchVarList.Count - 1 do begin
-						wparent := PWatchVar(WatchVarList.Items[I]);
-						if SameStr(wparent^.name,t) then begin
-
-							DebugTree.Items.BeginUpdate;
-
-							wparent^.value := 'Not found in current context';
-							wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
-
-							// Delete now invalid children
-							wparent^.node.DeleteChildren;
-
-							dorescanwatches := true;
-
-							DebugTree.Items.EndUpdate;
-
-							break;
-						end;
-					end;
-				end;
-			end;
-			TDisplayBegin : begin
-
-				s := GetNextLine; // watch index
-
-				if not FindAnnotation(TDisplayExpression) then Exit;
-
-				t := GetNextLine; // watch name
-
-				// Find parent we're talking about
-				for I := 0 to WatchVarList.Count - 1 do begin
-					wparent := PWatchVar(WatchVarList.Items[I]);
-					if SameStr(wparent^.name,t) then begin
-
-						DebugTree.Items.BeginUpdate;
-
-						// Advance up to the value
-						if not FindAnnotation(TDisplayExpression) then Exit;
-
-						wparent^.gdbindex := StrToInt(s);
-						wparent^.value := GetNextLine;
-						wparent^.node.Text := wparent^.name + ' = ' + wparent^.value;
-
-						// Refresh members...
-						wparent^.node.DeleteChildren;
-						ProcessWatchStruct(wparent^.node);
-						DebugTree.Items.EndUpdate;
-
-						break;
-					end;
-				end;
-			end;
-			TSource : begin // source filename:line:offset:beg/middle/end:addr
-				s := TrimLeft(GetRemainingLine);
-
-				// remove offset, beg/middle/end, address
-				for I := 1 to 3 do begin
-					x := Length(s);
-					y := RPos(':',s);
-					if y > 0 then begin
-						Delete(s,y,x-y+1);
-					end;
-				end;
-
-				// get line
-				x := Length(s);
-				y := RPos(':',s);
-				if y > 0 then begin
-					bline := StrToInt(Copy(s,y+1,x-y));
-					Delete(s,y,x-y+1);
-				end;
-
-				// get file
-				bfile := s;
-
-				doupdateexecution := true;
-				doupdatecpuwindow := true;
-			end;
+	fIndex := 1;
+	repeat
+		NextAnnotation := GetNextAnnotation;
+		case NextAnnotation of
+			TValueHistoryValue:
+				HandleValueHistoryValue;
+			TSignal:
+				HandleSignal;
+			TExit:
+				HandleExit;
+			TFrameBegin:
+				HandleFrames;
+			TInfoAsm:
+				HandleDisassembly;
+			TInfoReg:
+				HandleRegisters;
+			TErrorBegin:
+				HandleError;
+			TDisplayBegin:
+				HandleDisplay;
+			TSource:
+				HandleSource
+			//else
+			//	break;
 		end;
-	end;
+	until NextAnnotation = TEOF;
+
+	// Only update once per update at most
+	DebugTree.Items.EndUpdate;
 
 	Synchronize(SyncFinishedParsing);
 end;
@@ -1030,7 +939,7 @@ begin
 		FillChar(tmp[1 + totalbytesread],chunklen + 1,0);
 
 		// ReadFile returns when there's something to read
-		if not ReadFile(hPipeRead, tmp[1 + totalbytesread], chunklen, bytesread, nil) or (bytesread = 0) then break;
+		if not ReadFile(fPipeRead, tmp[1 + totalbytesread], chunklen, bytesread, nil) or (bytesread = 0) then break;
 
 		Inc(totalbytesread,bytesread);
 
@@ -1038,8 +947,8 @@ begin
 
 			// Assume fragments don't end nicely with TErrorBegin or TPrompt
 			if GetLastAnnotation(tmp,totalbytesread,1 + totalbytesread + chunklen) in [TErrorBegin,TPrompt] then begin
-				gdbout := tmp;
-				Analyze;
+				fOutput := tmp;
+				ProcessDebugOutput;
 
 				// Reset storage
 				totalbytesread := 0;

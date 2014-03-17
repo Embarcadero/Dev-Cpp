@@ -34,17 +34,14 @@ uses
 type
   TdevFileMonitor = class(TWinControl)
   private
-    { Private declarations }
     fMonitor: TdevMonitorThread;
     fFiles: TStrings;
     fNotifyChange: TdevMonitorChange;
     function GetActive: boolean;
     procedure SetActive(Value: boolean);
     procedure SetFiles(Value: TStrings);
-  protected
-    { Protected declarations }
+    procedure MonitorTerminated(Sender: TObject);
   public
-    { Public declarations }
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Activate;
@@ -52,7 +49,6 @@ type
     procedure Refresh(ActivateIfNot: boolean);
     procedure SubClassWndProc(var Message: TMessage);
   published
-    { Published declarations }
     property Active: boolean read GetActive write SetActive;
     property Files: TStrings read fFiles write SetFiles;
     property OnNotifyChange: TdevMonitorChange read fNotifyChange write fNotifyChange;
@@ -87,6 +83,7 @@ procedure TdevFileMonitor.Activate;
 begin
   if not Active then begin
     fMonitor := TdevMonitorThread.Create(Self, fFiles);
+    fMonitor.OnTerminate := MonitorTerminated;
     fMonitor.Resume;
   end;
 end;
@@ -114,6 +111,11 @@ begin
   Deactivate;
   fFiles.Free;
   inherited;
+end;
+
+procedure TdevFileMonitor.MonitorTerminated(Sender: TObject);
+begin
+  fMonitor := nil;
 end;
 
 function TdevFileMonitor.GetActive: boolean;

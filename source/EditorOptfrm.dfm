@@ -1090,7 +1090,7 @@ object EditorOptForm: TEditorOptForm
           end
           object pbCCCache: TProgressBar
             Left = 8
-            Top = 367
+            Top = 370
             Width = 457
             Height = 20
             Smooth = True

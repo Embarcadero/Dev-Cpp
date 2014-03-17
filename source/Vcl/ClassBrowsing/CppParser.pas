@@ -593,7 +593,7 @@ begin
 				if not (fTokenizer[Index]^.Text[1] in [',', ':', '(']) then
 					sl.Add(fTokenizer[Index]^.Text);
 			Inc(Index);
-		until fTokenizer[Index]^.Text[1] in ['{', ';', #0];
+		until (Index >= fTokenizer.Tokens.Count) or (fTokenizer[Index]^.Text[1] in ['{', ';']);
 	finally
 		PStatement(fStatementList[fStatementList.Count - 1])^._InheritsFromClasses := sl.CommaText;
 		sl.Free;
@@ -628,13 +628,13 @@ end;
 
 procedure TCppParser.CheckForSkipStatement;
 var
-  iSkip: integer;
+	iSkip: integer;
 begin
-  iSkip := fSkipList.IndexOf(fIndex);
-  if iSkip >= 0 then begin // skip to next ';'
-    repeat
-      Inc(fIndex);
-    until fTokenizer[fIndex]^.Text[1] in [';', #0];
+	iSkip := fSkipList.IndexOf(fIndex);
+	if iSkip >= 0 then begin // skip to next ';'
+		repeat
+			Inc(fIndex);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';']);
     Inc(fIndex); //skip ';'
     fSkipList.Delete(iSkip);
   end;
@@ -819,7 +819,7 @@ begin
 	fIndexBackup := fIndex;
 
 	// Gather data for the string parts
-	while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['(', ';', ':', '{', '}', #0, '#']) do begin
+	while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['(', ';', ':', '{', '}', '#']) do begin
 
 		// Skip some compiler extensions BEFORE our function type
 		if not bTypeOK and StartsText('__mingw',fTokenizer[fIndex]^.Text) or SameStr('__attribute__',fTokenizer[fIndex]^.Text) then begin
@@ -881,7 +881,7 @@ begin
 	// TODO: check if this is function usage and skip if so?
 	end else begin
 		Result := false;
-		//while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['{','}',',',';',#0]) do
+		//while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['{','}',',',';']) do
 		//	Inc(fIndex);
 	end;
 end;
@@ -1241,7 +1241,7 @@ begin
 	I := fIndex;
 
 	// Skip over argument list
-	while (fIndex + 2 < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [';', ':', '{', '}', #0]) do
+	while (fIndex + 2 < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [';', ':', '{', '}']) do
 		Inc(fIndex);
 
 	// Check if this is a prototype
@@ -1254,7 +1254,7 @@ begin
 
 		// Find the function body start after the inherited constructor
 		if fTokenizer[fIndex]^.Text[1] = ':' then
-			while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}', #0])) do
+			while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}'])) do
 				Inc(fIndex);
 
 		// Still a prototype
@@ -1301,7 +1301,7 @@ begin
 		Inc(fIndex);
 	if I = fIndex then // if not moved ahead, something is wrong but don't get stuck ;)
 		if fIndex < fTokenizer.Tokens.Count then
-			if not (fTokenizer[fIndex]^.Text[1] in ['{', '}', #0]) then
+			if not (fTokenizer[fIndex]^.Text[1] in ['{', '}']) then
 				Inc(fIndex);
 end;
 
@@ -1372,7 +1372,7 @@ begin
 				SameStr(fTokenizer[fIndex]^.Text,'using') then begin
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [#0,';']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';']);
 		Inc(fIndex); // step over
 
 	// Skip to :
@@ -1381,7 +1381,7 @@ begin
 
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [#0,':']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [':']);
 
 	// Skip to )
 	end else if SameStr(fTokenizer[fIndex]^.Text,'alignas') or
@@ -1395,7 +1395,7 @@ begin
 
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [#0,')']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [')']);
 		Inc(fIndex); // step over
 
 	// Skip to {
@@ -1406,14 +1406,14 @@ begin
 
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [#0,'{']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in ['{']);
 
 	// Skip to }
 	end else if SameStr(fTokenizer[fIndex]^.Text,'asm') then begin
 
 		repeat
 			Inc(fIndex);
-		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [#0,'}']);
+		until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in ['}']);
 		Inc(fIndex); // step over
 	end;
 end;
@@ -1520,69 +1520,65 @@ end;
 
 procedure TCppParser.HandleEnum;
 var
-  LastType: AnsiString;
-  Args: AnsiString;
-  Cmd: AnsiString;
-  I: integer;
+	LastType: AnsiString;
+	Args: AnsiString;
+	Cmd: AnsiString;
+	I: integer;
 begin
-  LastType := 'enum ';
-  Inc(fIndex); //skip 'enum'
-  if fTokenizer[fIndex]^.Text[1] = '{' then begin // enum {...} NAME
-    I := fIndex;
-    repeat
-      Inc(I);
-    until (I >= fTokenizer.Tokens.Count) or (fTokenizer[I]^.Text[1] in ['}', #0]);
-    if (I >= fTokenizer.Tokens.Count) then
-      exit;
-    if fTokenizer[I]^.Text[1] = '}' then
-      if fTokenizer[I + 1]^.Text[1] <> ';' then
-        LastType := LastType + fTokenizer[I + 1]^.Text + ' ';
-  end
-  else // enum NAME {...};
-    while not (fTokenizer[fIndex]^.Text[1] in ['{', ';', #0]) do begin
-      LastType := LastType + fTokenizer[fIndex]^.Text + ' ';
-      Inc(fIndex);
-      if (fIndex >= fTokenizer.Tokens.Count) then
-        exit;
-    end;
-  LastType := Trim(LastType);
+	LastType := 'enum ';
+	Inc(fIndex); //skip 'enum'
+	if fTokenizer[fIndex]^.Text[1] = '{' then begin // enum {...} NAME
 
-  if fTokenizer[fIndex]^.Text[1] = '{' then begin
-    Inc(fIndex);
+		// Skip to the closing brace
+		I := SkipBraces(fIndex);
 
-    repeat
-      if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
-        if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
-          Cmd := Copy(fTokenizer[fIndex]^.Text, 1, Pos('[', fTokenizer[fIndex]^.Text) - 1);
-          Args := Copy(fTokenizer[fIndex]^.Text, Pos('[', fTokenizer[fIndex]^.Text), Length(fTokenizer[fIndex]^.Text) - Pos('[', fTokenizer[fIndex]^.Text) + 1);
-        end
-        else begin
-          Cmd := fTokenizer[fIndex]^.Text;
-          Args := '';
-        end;
-        fLastID := AddStatement(
-          -1,
-          GetCurrentClass,
-          fCurrentFile,
-          LastType + ' ' + fTokenizer[fIndex]^.Text,
-          LastType,
-          Cmd,
-          Args,
-          fTokenizer[fIndex]^.Line,
-          skEnum,
-          GetScope,
-          fClassScope,
-          False,
-          True,
-          False);
-      end;
-      Inc(fIndex);
-      if (fIndex >= fTokenizer.Tokens.Count) then
-        exit;
-    until fTokenizer[fIndex]^.Text[1] in [';', '{', '}'];
-    if fTokenizer[fIndex]^.Text[1] = '}' then
-      Inc(fIndex);
-  end;
+		// Have we found the name?
+		if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = '}') then
+			if fTokenizer[I + 1]^.Text[1] <> ';' then
+				LastType := LastType + fTokenizer[I + 1]^.Text + ' ';
+	end else begin // enum NAME {...};
+		while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in ['{', ';'])) do begin
+			LastType := LastType + fTokenizer[fIndex]^.Text + ' ';
+			Inc(fIndex);
+		end;
+
+		// An opening brace must be present after NAME
+		if (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] <> '{') then
+			Exit;
+	end;
+	LastType := Trim(LastType);
+
+	repeat
+		if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
+			if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
+				Cmd := Copy(fTokenizer[fIndex]^.Text, 1, Pos('[', fTokenizer[fIndex]^.Text) - 1);
+				Args := Copy(fTokenizer[fIndex]^.Text, Pos('[', fTokenizer[fIndex]^.Text), Length(fTokenizer[fIndex]^.Text) - Pos('[', fTokenizer[fIndex]^.Text) + 1);
+			end else begin
+				Cmd := fTokenizer[fIndex]^.Text;
+				Args := '';
+			end;
+			fLastID := AddStatement(
+				-1,
+				GetCurrentClass,
+				fCurrentFile,
+				LastType + ' ' + fTokenizer[fIndex]^.Text,
+				LastType,
+				Cmd,
+				Args,
+				fTokenizer[fIndex]^.Line,
+				skEnum,
+				GetScope,
+				fClassScope,
+				False,
+				True,
+				False);
+		end;
+		Inc(fIndex);
+	until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']);
+
+	// Step over closing brace
+	if fTokenizer[fIndex]^.Text[1] = '}' then
+		Inc(fIndex);
 end;
 
 function TCppParser.HandleStatement: boolean;

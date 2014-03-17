@@ -126,7 +126,7 @@ end;
 
 function TNewProjectForm.GetTemplate: TTemplate;
 begin
-	if assigned(ProjView.Selected) then begin
+	if Assigned(ProjView.Selected) then begin
 		result := TTemplate(fTemplates[integer(ProjView.Selected.Data)]);
 		result.Options.useGPP := rbCpp.Checked;
 		result.Name := edProjectName.Text;

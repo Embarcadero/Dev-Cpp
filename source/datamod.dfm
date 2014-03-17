@@ -2,8 +2,8 @@ object dmMain: TdmMain
   OldCreateOrder = False
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
-  Left = 697
-  Top = 231
+  Left = 1307
+  Top = 361
   Height = 278
   Width = 354
   object Cpp: TSynCppSyn
