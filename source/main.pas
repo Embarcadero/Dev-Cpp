@@ -232,7 +232,6 @@ type
     actFullScreen: TAction;
     actNext: TAction;
     actPrev: TAction;
-    actUpdateCheck: TAction;
     actAbout: TAction;
     actProjectSource: TAction;
     actUnitRemove: TAction;
@@ -240,7 +239,7 @@ type
     actUnitHeader: TAction;
     actUnitOpen: TAction;
     actUnitClose: TAction;
-    EditorOptions1: TMenuItem;
+    EditorOptionsItem: TMenuItem;
     tbEdit: TToolBar;
     UndoBtn: TToolButton;
     RedoBtn: TToolButton;
@@ -293,7 +292,7 @@ type
     InsertItem: TMenuItem;
     SyntaxCheckItem: TMenuItem;
     actSyntaxCheck: TAction;
-    devShortcuts: TdevShortcuts;
+    Shortcuts: TdevShortcuts;
     actConfigdevShortcuts: TAction;
     ConfiguredevShortcuts1: TMenuItem;
     DateTimeMenuItem: TMenuItem;
@@ -350,7 +349,7 @@ type
     DebugVarsPopup: TPopupMenu;
     AddwatchPop: TMenuItem;
     RemoveWatchPop: TMenuItem;
-    devFileMonitor: TdevFileMonitor;
+    FileMonitor: TdevFileMonitor;
     actFileProperties: TAction;
     N35: TMenuItem;
     N1: TMenuItem;
@@ -366,9 +365,6 @@ type
     actProjectRenameFolder: TAction;
     Newfolder1: TMenuItem;
     N40: TMenuItem;
-    Addfolder1: TMenuItem;
-    Removefolder1: TMenuItem;
-    Renamefolder1: TMenuItem;
     actImportMSVC: TAction;
     ImportItem: TMenuItem;
     N41: TMenuItem;
@@ -388,8 +384,6 @@ type
     PackageManagerItem: TMenuItem;
     btnAbortCompilation: TSpeedButton;
     actAbortCompilation: TAction;
-    N44: TMenuItem;
-    Addfile1: TMenuItem;
     actCVSImport: TAction;
     actCVSCheckout: TAction;
     actCVSUpdate: TAction;
@@ -410,7 +404,6 @@ type
     mnuCVSDiff1: TMenuItem;
     N55: TMenuItem;
     mnuCVSLog1: TMenuItem;
-    N49: TMenuItem;
     CVS3: TMenuItem;
     mnuCVSCommit2: TMenuItem;
     mnuCVSUpdate2: TMenuItem;
@@ -462,14 +455,12 @@ type
     Logout1: TMenuItem;
     N66: TMenuItem;
     LeftPageControl: TPageControl;
-    ProjectSheet: TTabSheet;
+    LeftProjectSheet: TTabSheet;
     ProjectView: TTreeView;
-    ClassSheet: TTabSheet;
+    LeftClassSheet: TTabSheet;
     ClassBrowser: TClassBrowser;
     AddWatchBtn: TButton;
     FloatingPojectManagerItem: TMenuItem;
-    actCompileCurrentFile: TAction;
-    Compilecurrentfile1: TMenuItem;
     actSaveProjectAs: TAction;
     SaveprojectasItem: TMenuItem;
     mnuOpenWith: TMenuItem;
@@ -479,7 +470,7 @@ type
     cmbCompilers: TComboBox;
     N17: TMenuItem;
     ToolClassesItem: TMenuItem;
-    DebugLeftSheet: TTabSheet;
+    LeftDebugSheet: TTabSheet;
     DebugTree: TTreeView;
     StepOverBtn: TButton;
     DebugStartPanel: TPanel;
@@ -589,6 +580,19 @@ type
     actMoveSelUp1: TMenuItem;
     actMoveSelDown1: TMenuItem;
     actCodeCompletion: TAction;
+    actPackageCheck: TAction;
+    actPackageManager: TAction;
+    actHelp: TAction;
+    FolderPopup: TPopupMenu;
+    Addfolder2: TMenuItem;
+    Renamefolder2: TMenuItem;
+    Removefolder2: TMenuItem;
+    N44: TMenuItem;
+    Addfile1: TMenuItem;
+    N49: TMenuItem;
+    N69: TMenuItem;
+    N70: TMenuItem;
+    CloseProject1: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -734,7 +738,7 @@ type
     procedure actRunUpdate(Sender: TObject);
     procedure actCompileRunUpdate(Sender: TObject);
     procedure actCompileUpdate(Sender: TObject);
-    procedure devFileMonitorNotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: string);
+    procedure FileMonitorNotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: string);
     procedure actFilePropertiesExecute(Sender: TObject);
     procedure actViewToDoListExecute(Sender: TObject);
     procedure actAddToDoExecute(Sender: TObject);
@@ -749,11 +753,9 @@ type
     procedure actExecParamsExecute(Sender: TObject);
     procedure DevCppDDEServerExecuteMacro(Sender: TObject; Msg: TStrings);
     procedure actShowTipsExecute(Sender: TObject);
-    procedure HelpMenuItemClick(Sender: TObject);
     procedure CppParserStartParsing(Sender: TObject);
     procedure CppParserEndParsing(Sender: TObject);
     procedure actBrowserViewProjectExecute(Sender: TObject);
-    procedure PackageManagerItemClick(Sender: TObject);
     procedure actAbortCompilationUpdate(Sender: TObject);
     procedure actAbortCompilationExecute(Sender: TObject);
     procedure ProjectViewKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
@@ -780,7 +782,6 @@ type
     procedure actCVSLogoutExecute(Sender: TObject);
     procedure ReportWindowClose(Sender: TObject; var Action: TCloseAction);
     procedure FloatingPojectManagerItemClick(Sender: TObject);
-    procedure actCompileCurrentFileExecute(Sender: TObject);
     procedure actSaveProjectAsExecute(Sender: TObject);
     procedure mnuOpenWithClick(Sender: TObject);
     procedure cmbClassesChange(Sender: TObject);
@@ -801,7 +802,7 @@ type
     procedure actDeleteProfileExecute(Sender: TObject);
     procedure actGotoImplDeclEditorExecute(Sender: TObject);
     procedure actHideFSBarExecute(Sender: TObject);
-    procedure UpdateSplash(const text : AnsiString);
+    procedure UpdateSplash(const LoadingText : AnsiString);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure ImportCBCprojectClick(Sender: TObject);
     procedure CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView;Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;var DefaultDraw: Boolean);
@@ -846,6 +847,8 @@ type
     procedure actMoveSelDownExecute(Sender: TObject);
     procedure actCodeCompletionUpdate(Sender: TObject);
     procedure actCodeCompletionExecute(Sender: TObject);
+    procedure actPackageManagerExecute(Sender: TObject);
+    procedure actHelpExecute(Sender: TObject);
   private
     fPreviousHeight : integer; // stores MessageControl height to be able to restore to previous height
     fTools : TToolController; // tool list controller
@@ -969,9 +972,12 @@ begin
 			tbSearch.Images        := CurrentTheme.MenuImages;
 			tbSpecials.Images      := CurrentTheme.MenuImages;
 			tbCompilers.Images     := CurrentTheme.MenuImages;
-			DebugVarsPopup.Images  := CurrentTheme.MenuImages;
 			ProjectView.Images     := CurrentTheme.ProjectImages;
 			ClassBrowser.Images    := CurrentTheme.BrowserImages;
+			ProjectPopup.Images    := CurrentTheme.MenuImages;
+			UnitPopup.Images       := CurrentTheme.MenuImages;
+			FolderPopup.Images     := CurrentTheme.MenuImages;
+			EditorPopupMenu.Images := CurrentTheme.MenuImages;
 		end;
 	end;
 end;
@@ -1024,30 +1030,23 @@ begin
 	if Assigned(fReportToolWindow) then
 		devData.ReportWindowState.GetPlacement(fReportToolWindow.Handle);
 
-	// Save and free options
 	SaveOptions;
-	fTools.Free; // This one needs devDirs!
-	FinalizeOptions;
 
 	Action := caFree;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
-	// Prevent singleton reinit
-	DontRecreateSingletons := true;
-
-	// Free non-singletons
+	fTools.Free;
 	AutoSaveTimer.Free;
 	devImageThemes.Free;
 	fCompiler.Free;
 	fDebugger.Free;
 	devExecutor.Free;
 	dmMain.Free;
-
-	// Free these singletons on the very last
 	Lang.Free;
 	devData.Free;
+	DestroyOptions;
 end;
 
 procedure TMainForm.BuildBookMarkMenus;
@@ -1153,24 +1152,44 @@ begin
 	WindowMenu.Caption:=				Lang[ID_MNU_WINDOW];
 	HelpMenu.Caption:=					Lang[ID_MNU_HELP];
 
-	// file menu
+	// File menu
 	mnuNew.Caption:=					Lang[ID_SUB_NEW];
+
+	// New submenu
 	NewFileBtn.Hint:=					Lang[ID_HINT_NEW];
 	actNewSource.Caption:=				Lang[ID_ITEM_NEWSOURCE];
 	actNewProject.Caption:=				Lang[ID_ITEM_NEWPROJECT];
-	actNewTemplate.Caption:=			Lang[ID_ITEM_NEWTEMPLATE];
 	actNewRes.Caption:=					Lang[ID_ITEM_NEWRESOURCE];
+	actNewTemplate.Caption:=			Lang[ID_ITEM_NEWTEMPLATE];
 	actNewClass.Caption:=				Lang[ID_ITEM_NEWCLASS];
 
+	// Top level
 	actOpen.Caption:=					Lang[ID_ITEM_OPEN];
-	actHistoryClear.Caption:=			Lang[ID_ITEM_CLEARHISTORY];
 	actSave.Caption:=					Lang[ID_ITEM_SAVEFILE];
 	actSaveAs.Caption:=					Lang[ID_ITEM_SAVEAS];
-	SaveProjectAsItem.Caption :=		Lang[ID_ITEM_SAVEASPROJECT];
+	actSaveProjectAs.Caption :=			Lang[ID_ITEM_SAVEASPROJECT];
 	actSaveAll.Caption:=				Lang[ID_ITEM_SAVEALL];
 	actClose.Caption:=					Lang[ID_ITEM_CLOSEFILE];
-	actCloseAll.Caption:=				Lang[ID_ITEM_CLOSEALL];
 	actCloseProject.Caption:=			Lang[ID_ITEM_CLOSEPROJECT];
+	actCloseAll.Caption:=				Lang[ID_ITEM_CLOSEALL];
+	actFileProperties.Caption:=			Lang[ID_ITEM_PROPERTIES];
+
+	// Import submenu
+	ImportItem.Caption:=				Lang[ID_SUB_IMPORT];
+	actImportMSVC.Caption:=				Lang[ID_MSVC_MENUITEM];
+
+	// Exprt submenu
+	ExportItem.Caption:=				Lang[ID_SUB_EXPORT];
+	actExportHTML.Caption:=				Lang[ID_ITEM_EXPORTHTML];
+	actExportRTF.Caption:=				Lang[ID_ITEM_EXPORTRTF];
+	actExportTex.Caption:=				Lang[ID_ITEM_EXPORTTEX];
+	actExportProject.Caption:=			Lang[ID_ITEM_EXPORTPROJECT];
+
+	// Top level
+	actPrint.Caption:=					Lang[ID_ITEM_PRINT];
+	actPrintSU.Caption:=				Lang[ID_ITEM_PRINTSETUP];
+	actHistoryClear.Caption:=			Lang[ID_ITEM_CLEARHISTORY];
+	actExit.Caption:=					Lang[ID_ITEM_EXIT];
 
 	actMsgCut.Caption :=				Lang[ID_ITEM_CUT];
 	actMsgCopy.Caption :=				Lang[ID_ITEM_COPY];
@@ -1180,21 +1199,6 @@ begin
 	actMsgSaveAll.Caption :=			Lang[ID_ITEM_SAVEALL];
 	actMsgClear.Caption :=				Lang[ID_ITEM_CLEAR];
 
-	actFileProperties.Caption:=			Lang[ID_ITEM_PROPERTIES];
-
-	ImportItem.Caption:=				Lang[ID_SUB_IMPORT];
-	actImportMSVC.Caption:=				Lang[ID_MSVC_MENUITEM];
-
-	ExportItem.Caption:=				Lang[ID_SUB_EXPORT];
-	actExportHTML.Caption:=				Lang[ID_ITEM_EXPORTHTML];
-	actExportRTF.Caption:=				Lang[ID_ITEM_EXPORTRTF];
-	actExportTex.Caption:=				Lang[ID_ITEM_EXPORTTEX];
-	actExportProject.Caption:=			Lang[ID_ITEM_EXPORTPROJECT];
-
-	actPrint.Caption:=					Lang[ID_ITEM_PRINT];
-	actPrintSU.Caption:=				Lang[ID_ITEM_PRINTSETUP];
-	actExit.Caption:=					Lang[ID_ITEM_EXIT];
-
 	// Edit menu
 	actUndo.Caption:=					Lang[ID_ITEM_UNDO];
 	actRedo.Caption:=					Lang[ID_ITEM_REDO];
@@ -1202,17 +1206,22 @@ begin
 	actCopy.Caption:=					Lang[ID_ITEM_COPY];
 	actPaste.Caption:=					Lang[ID_ITEM_PASTE];
 	actSelectAll.Caption:=				Lang[ID_ITEM_SELECTALL];
-	InsertItem.Caption:=				Lang[ID_SUB_INSERT];
-	ToggleBookmarksItem.Caption:=		Lang[ID_SUB_TOGGLEMARKS];
-	GotoBookMarksItem.Caption:=			Lang[ID_SUB_GOTOMARKS];
+	actSwapHeaderSource.Caption:=		Lang[ID_ITEM_SWAPHEADERSOURCE];
+
+	// Insert submenu
+	actInsert.Caption:=					Lang[ID_TB_INSERT];
 	DateTimeMenuItem.Caption:=			Lang[ID_ITEM_DATETIME];
 	CommentHeaderMenuItem.Caption:=		Lang[ID_ITEM_COMMENTHEADER];
+
+	// Top level
+	actToggle.Caption:=					Lang[ID_TB_TOGGLE];
+	actGoto.Caption:=					Lang[ID_TB_GOTO];
+
 	actComment.Caption:=				Lang[ID_ITEM_COMMENTSELECTION];
 	actUncomment.Caption:=				Lang[ID_ITEM_UNCOMMENTSELECTION];
 	actToggleComment.Caption:=			Lang[ID_ITEM_TOGGLECOMMENT];
 	actIndent.Caption:=					Lang[ID_ITEM_INDENTSELECTION];
 	actUnindent.Caption:=				Lang[ID_ITEM_UNINDENTSELECTION];
-	actSwapHeaderSource.Caption:=		Lang[ID_ITEM_SWAPHEADERSOURCE];
 	actCollapse.Caption:=				Lang[ID_ITEM_COLLAPSEALL];
 	actUnCollapse.Caption:=				Lang[ID_ITEM_UNCOLLAPSEALL];
 	actDuplicateLine.Caption:=			Lang[ID_ITEM_DUPLICATELINE];
@@ -1220,26 +1229,23 @@ begin
 	actMoveSelUp.Caption:=				Lang[ID_ITEM_MOVESELUP];
 	actMoveSelDown.Caption:=			Lang[ID_ITEM_MOVESELDOWN];
 
-	// Mainform toolbar buttons
-	actInsert.Caption:=					Lang[ID_TB_INSERT];
-	actToggle.Caption:=					Lang[ID_TB_TOGGLE];
-	actGoto.Caption:=					Lang[ID_TB_GOTO];
-
 	// Search Menu
 	actFind.Caption:=					Lang[ID_ITEM_FIND];
 	actFindAll.Caption:=				Lang[ID_ITEM_FINDINALL];
 	actReplace.Caption:=				Lang[ID_ITEM_REPLACE];
 	actReplaceAll.Caption:=				Lang[ID_ITEM_REPLACEFILES];
-	actGotoLine.Caption:=				Lang[ID_ITEM_GOTO];
+	actSearchAgain.Caption:=			Lang[ID_ITEM_FINDNEXT];
+	actRevSearchAgain.Caption:=			Lang[ID_ITEM_FINDPREV];
 	actIncremental.Caption:=			Lang[ID_ITEM_INCREMENTAL];
 	actGotoFunction.Caption:=			Lang[ID_ITEM_GOTOFUNCTION];
-	actSearchAgain.Caption:=			Lang[ID_ITEM_FINDNEXT];
+	actGotoLine.Caption:=				Lang[ID_ITEM_GOTO];
 
 	// View Menu
 	actProjectManager.Caption:=			Lang[ID_ITEM_PROJECTVIEW];
-	actStatusbar.Caption:=				Lang[ID_ITEM_Statusbar];
-	ToolBarsItem.Caption:=				Lang[ID_SUB_TOOLBARS];
+	actStatusbar.Caption:=				Lang[ID_ITEM_STATUSBAR];
 
+	// Toolbar submenu
+	ToolBarsItem.Caption:=				Lang[ID_SUB_TOOLBARS];
 	ToolMainItem.Caption:=				Lang[ID_TOOLMAIN];
 	ToolEditItem.Caption:=				Lang[ID_TOOLEDIT];
 	ToolSearchItem.Caption:=			Lang[ID_TOOLSEARCH];
@@ -1249,13 +1255,7 @@ begin
 	ToolClassesItem.Caption:=			Lang[ID_LP_CLASSES];
 	ToolCompilersItem.Caption:=			Lang[ID_TOOLCOMPILERS];
 
-	tbMain.Caption:=					Lang[ID_TOOLMAIN];
-	tbEdit.Caption:=					Lang[ID_TOOLEDIT];
-	tbSearch.Caption:=					Lang[ID_TOOLSEARCH];
-	tbCompile.Caption:=					Lang[ID_TOOLCOMPRUN];
-	tbProject.Caption:=					Lang[ID_TOOLPROJECT];
-	tbSpecials.Caption:=				Lang[ID_TOOLSPECIAL];
-	tbCompilers.Caption:=				Lang[ID_TOOLCOMPILERS];
+	// Top level
 	actViewToDoList.Caption:=			Lang[ID_VIEWTODO_MENUITEM];
 	FloatingPojectManagerItem.Caption:=	Lang[ID_ITEM_FLOATWINDOW];
 	FloatingReportWindowItem.Caption:=	Lang[ID_ITEM_FLOATREPORT];
@@ -1271,34 +1271,17 @@ begin
 
 	// Execute menu
 	actCompile.Caption:=				Lang[ID_ITEM_COMP];
-	actCompileCurrentFile.Caption:=		Lang[ID_ITEM_COMPCURRENT];
 	actRun.Caption:=					Lang[ID_ITEM_RUN];
 	actCompRun.Caption:=				Lang[ID_ITEM_COMPRUN];
 	actRebuild.Caption:=				Lang[ID_ITEM_REBUILD];
-	actClean.Caption:=					Lang[ID_ITEM_CLEAN];
-	actSyntaxCheck.Caption:=			Lang[ID_ITEM_SYNTAXCHECK];
-	actProfile.Caption:=				Lang[ID_ITEM_PROFILE];
-	actDeleteProfile.Caption:=			Lang[ID_ITEM_DELPROFINFORMATION];
-	actAbortCompilation.Caption:=		Lang[ID_ITEM_ABORTCOMP];
 	actExecParams.Caption:=				Lang[ID_ITEM_EXECPARAMS];
-
-	// Debug menu
+	actSyntaxCheck.Caption:=			Lang[ID_ITEM_SYNTAXCHECK];
+	actClean.Caption:=					Lang[ID_ITEM_CLEAN];
+	actProfile.Caption:=				Lang[ID_ITEM_PROFILE];
 	actDebug.Caption:=					Lang[ID_ITEM_DEBUG];
 	actBreakPoint.Caption:=				Lang[ID_ITEM_TOGGLEBREAK];
-	actAddWatch.Caption:=				Lang[ID_ITEM_WATCHADD];
-	actEditWatch.Caption:=				Lang[ID_ITEM_WATCHEDIT];
-	actModifyWatch.Caption :=			Lang[ID_ITEM_MODIFYVALUE];
-	actRemoveWatch.Caption:=			Lang[ID_ITEM_WATCHREMOVE];
-	actNextLine.Caption:=				Lang[ID_ITEM_STEPNEXT];
-	actStepLine.Caption:=				Lang[ID_ITEM_STEPINTO];
-	actStepOver.Caption:=				Lang[ID_ITEM_STEPOVER];
-	actWatchItem.Caption:=				Lang[ID_ITEM_WATCHITEMS];
-	actStopExecute.Caption:=			Lang[ID_ITEM_STOPEXECUTION];
-	actViewCPU.Caption:=				Lang[ID_ITEM_CPUWINDOW];
-	ClearallWatchPop.Caption :=			Lang[ID_ITEM_CLEARALL];
-	actNextIns.Caption:=				Lang[ID_ITEM_NEXTINS];
-	actStepIns.Caption:=				Lang[ID_ITEM_STEPINS];
-	actSkipFunction.Caption:=			Lang[ID_ITEM_SKIPFUNCTION];
+	actDeleteProfile.Caption:=			Lang[ID_ITEM_DELPROFINFORMATION];
+	actAbortCompilation.Caption:=		Lang[ID_ITEM_ABORTCOMP];
 
 	// Tools menu
 	actCompOptions.Caption:=			Lang[ID_ITEM_COMPOPTIONS];
@@ -1306,6 +1289,8 @@ begin
 	actEditorOptions.Caption:=			Lang[ID_ITEM_EDITOROPTIONS];
 	actConfigTools.Caption:=			Lang[ID_ITEM_TOOLCONFIG];
 	actConfigdevShortcuts.Caption:=		Lang[ID_ITEM_SHORTCUTSCONFIG];
+	actPackageCheck.Caption:=			Lang[ID_ITEM_UPDATECHECK];
+	actPackageManager.Caption:=			Lang[ID_ITEM_PACKMAN];
 
 	// CVS menu
 	mnuCVSCurrent.Caption:=				Lang[ID_ITEM_CVSCURRENT];
@@ -1330,11 +1315,26 @@ begin
 
 	// Help menu
 	HelpMenuItem.Caption:=				Lang[ID_ITEM_HELPDEVCPP];
-	actUpdateCheck.Caption:=			Lang[ID_ITEM_UPDATECHECK];
 	actAbout.Caption:=					Lang[ID_ITEM_ABOUT];
 	actShowTips.Caption:=				Lang[ID_TIPS_CAPTION];
 
-	// units pop
+	// Debugging buttons
+	actAddWatch.Caption:=				Lang[ID_ITEM_WATCHADD];
+	actEditWatch.Caption:=				Lang[ID_ITEM_WATCHEDIT];
+	actModifyWatch.Caption:=			Lang[ID_ITEM_MODIFYVALUE];
+	actRemoveWatch.Caption:=			Lang[ID_ITEM_WATCHREMOVE];
+	actNextLine.Caption:=				Lang[ID_ITEM_STEPNEXT];
+	actStepLine.Caption:=				Lang[ID_ITEM_STEPINTO];
+	actStepOver.Caption:=				Lang[ID_ITEM_STEPOVER];
+	actWatchItem.Caption:=				Lang[ID_ITEM_WATCHITEMS];
+	actStopExecute.Caption:=			Lang[ID_ITEM_STOPEXECUTION];
+	actViewCPU.Caption:=				Lang[ID_ITEM_CPUWINDOW];
+	ClearallWatchPop.Caption:=			Lang[ID_ITEM_CLEARALL];
+	actNextIns.Caption:=				Lang[ID_ITEM_NEXTINS];
+	actStepIns.Caption:=				Lang[ID_ITEM_STEPINS];
+	actSkipFunction.Caption:=			Lang[ID_ITEM_SKIPFUNCTION];
+
+	// Project/Unit/Folder popup
 	actUnitRemove.Caption:=				Lang[ID_POP_REMOVE];
 	actUnitRename.Caption:=				Lang[ID_POP_RENAME];
 	actUnitOpen.Caption:=				Lang[ID_POP_OPEN];
@@ -1344,20 +1344,11 @@ begin
 	actProjectRenameFolder.Caption:=	Lang[ID_POP_RENAMEFOLDER];
 	mnuOpenWith.Caption:=				Lang[ID_POP_OPENWITH];
 
-	// editor pop
-	UndoPopItem.Caption:=				Lang[ID_ITEM_UNDO];
-	RedoPopItem.Caption:=				Lang[ID_ITEM_REDO];
-	CutPopItem.Caption:=				Lang[ID_ITEM_CUT];
-	CopyPopItem.Caption:=				Lang[ID_ITEM_COPY];
-	PastePopItem.Caption:=				Lang[ID_ITEM_PASTE];
-	SelectAllPopItem.Caption:=			Lang[ID_ITEM_SELECTALL];
-	InsertPopItem.Caption:=				Lang[ID_SUB_INSERT];
-	TogglebookmarksPopItem.Caption:=	Lang[ID_SUB_TOGGLEMARKS];
-	GotobookmarksPopItem.Caption:=		Lang[ID_SUB_GOTOMARKS];
-	actCloseAllButThis.Caption:=		Lang[ID_ITEM_CLOSEALLBUTTHIS];
-	actAddToDo.Caption:=				Lang[ID_ADDTODO_MENUITEM];
+	// Editor popup
+	actGotoDeclEditor.Caption:=			Lang[ID_POP_GOTODECL];
+	actGotoImplEditor.Caption:=			Lang[ID_POP_GOTOIMPL];
 
-	// class browser popup
+	// Class Browser Popup
 	actBrowserGotoDecl.Caption:=		Lang[ID_POP_GOTODECL];
 	actBrowserGotoImpl.Caption:=		Lang[ID_POP_GOTOIMPL];
 	actBrowserNewClass.Caption:=		Lang[ID_POP_NEWCLASS];
@@ -1372,37 +1363,32 @@ begin
 	actBrowserRenameFolder.Caption:=	Lang[ID_POP_RENAMEFOLDER];
 	actBrowserShowInherited.Caption:=	Lang[ID_POP_SHOWINHERITED];
 
-	actGotoDeclEditor.Caption:=			Lang[ID_POP_GOTODECL];
-	actGotoImplEditor.Caption:=			Lang[ID_POP_GOTOIMPL];
-
 	// Message Control tabs
 	CompSheet.Caption :=				Lang[ID_SHEET_COMP];
-	CloseSheet.Caption :=				Lang[ID_SHEET_CLOSE];
 	ResSheet.Caption :=					Lang[ID_SHEET_RES];
 	LogSheet.Caption :=					Lang[ID_SHEET_COMPLOG];
-	FindSheet.Caption :=				Lang[ID_SHEET_FIND];
 	DebugSheet.Caption:=				Lang[ID_SHEET_DEBUG];
-	DebugLeftSheet.Caption:=			Lang[ID_SHEET_DEBUG];
+	FindSheet.Caption :=				Lang[ID_SHEET_FIND];
+	CloseSheet.Caption :=				Lang[ID_SHEET_CLOSE];
 
-	// controls
+	// Compiler Tab
 	CompilerOutput.Columns[0].Caption:=	Lang[ID_COL_LINE];
 	CompilerOutput.Columns[1].Caption:=	Lang[ID_COL_COL];
 	CompilerOutput.Columns[2].Caption:=	Lang[ID_COL_FILE];
 	CompilerOutput.Columns[3].Caption:=	Lang[ID_COL_MSG];
+
+	// Resource Tab
 	ResourceOutput.Columns[0].Caption:=	Lang[ID_COL_LINE];
 	ResourceOutput.Columns[1].Caption:=	Lang[ID_COL_COL];
 	ResourceOutput.Columns[2].Caption:=	Lang[ID_COL_FILE];
 	ResourceOutput.Columns[3].Caption:=	Lang[ID_COL_MSG];
-	FindOutput.Columns[0].Caption :=	Lang[ID_COL_LINE];
-	FindOutput.Columns[1].Caption :=	Lang[ID_COL_COL];
-	FindOutput.Columns[2].Caption :=	Lang[ID_COL_FILE];
-	FindOutput.Columns[3].Caption :=	Lang[ID_COL_MSG];
+
+	// Compile Log Tab
 	ErrorLabel.Caption :=				Lang[ID_TOTALERRORS];
 	WarningLabel.Caption :=				Lang[ID_TOTALWARNINGS];
 	SizeOfOutput.Caption :=				Lang[ID_OUTPUTSIZE];
-	ProjectSheet.Caption :=				Lang[ID_LP_PROJECT];
-	ClassSheet.Caption :=				Lang[ID_LP_CLASSES];
 
+	// Debug Tab
 	lblSendCommandGdb.Caption:=			Lang[ID_DEB_SENDGDBCOMMAND];
 	lblEvaluate.Caption:=				Lang[ID_DEB_EVALUATE];
 
@@ -1415,6 +1401,18 @@ begin
 	EvaluateInput.Left := len + 10;
 	EvaluateInput.Width := EvalOutput.Width - len - 6;
 
+	// Find Results Tab
+	FindOutput.Columns[0].Caption :=	Lang[ID_COL_LINE];
+	FindOutput.Columns[1].Caption :=	Lang[ID_COL_COL];
+	FindOutput.Columns[2].Caption :=	Lang[ID_COL_FILE];
+	FindOutput.Columns[3].Caption :=	Lang[ID_COL_MSG];
+
+	// Left page control
+	LeftProjectSheet.Caption :=				Lang[ID_LP_PROJECT];
+	LeftClassSheet.Caption :=				Lang[ID_LP_CLASSES];
+	LeftDebugSheet.Caption:=			Lang[ID_SHEET_DEBUG];
+
+	// Misc.
 	pnlFull.Caption:=					Format(Lang[ID_FULLSCREEN_MSG], [DEVCPP, DEVCPP_VERSION]);
 
 	BuildBookMarkMenus;
@@ -1507,9 +1505,14 @@ begin
 																	e.Text.UnCollapsedLinesLength]);
 	end else begin
 		PageControl.Visible := false;
-		Statusbar.Panels[0].Text := '';
-		Statusbar.Panels[1].Text := '';
-		StatusBar.Panels[2].Text := '';
+		StatusBar.Panels.BeginUpdate;
+		try
+			Statusbar.Panels[0].Text := '';
+			Statusbar.Panels[1].Text := '';
+			StatusBar.Panels[2].Text := '';
+		finally
+			StatusBar.Panels.EndUpdate; // redraw once
+		end;
 	end;
 end;
 
@@ -1622,25 +1625,31 @@ begin
 			exit;
 	end;
 
-	fProject := TProject.Create(s, DEV_INTERNAL_OPEN);
-	if fProject.FileName <> '' then begin
-		fCompiler.Project := fProject;
-		fCompiler.RunParams := fProject.Options.CmdLineArgs;
-		fCompiler.Target := ctProject;
+	// Only update class browser once
+	ClassBrowser.BeginUpdate;
+	try
+		fProject := TProject.Create(s, DEV_INTERNAL_OPEN);
+		if fProject.FileName <> '' then begin
+			fCompiler.Project := fProject;
+			fCompiler.RunParams := fProject.Options.CmdLineArgs;
+			fCompiler.Target := ctProject;
 
-		dmMain.RemoveFromHistory(s);
+			dmMain.RemoveFromHistory(s);
 
-		// if project manager isn't open then open it
-		if not devData.ShowLeftPages then
-			actProjectManager.Execute;
+			// if project manager isn't open then open it
+			if not devData.ShowLeftPages then
+				actProjectManager.Execute;
 
-		CheckForDLLProfiling;
-		UpdateAppTitle;
-		UpdateCompilerList;
-		ScanActiveProject;
-	end else begin
-		fProject.Free;
-		fProject := nil;
+			CheckForDLLProfiling;
+			UpdateAppTitle;
+			UpdateCompilerList;
+			ScanActiveProject;
+		end else begin
+			fProject.Free;
+			fProject := nil;
+		end;
+	finally
+		ClassBrowser.EndUpdate;
 	end;
 end;
 
@@ -1661,6 +1670,7 @@ begin
 		Exit;
 	end;
 
+	// Open the file in an editor
 	e := TEditor.Create(false,ExtractFileName(s),s,true);
 	if Assigned(fProject) then begin
 		if (not SameFileName(fProject.FileName,s)) and (fProject.GetUnitFromString(s) = -1) then
@@ -1669,6 +1679,8 @@ begin
 		dmMain.RemoveFromHistory(s);
 	end;
 	e.Activate;
+
+	// Parse it after is has been shown so the user will not see random unpainted stuff for a while.
 	if not Assigned(fProject) then
 		CppParser.ReParseFile(e.FileName, e.InProject, True);
 end;
@@ -1938,24 +1950,25 @@ var
 	pt: TPoint;
 	Node: TTreeNode;
 begin
-	if not assigned(fProject) or devData.FullScreen then exit;
-	pt:= ProjectView.ClientToScreen(MousePos);
-	Node:= ProjectView.GetNodeAt(MousePos.X, MousePos.Y);
-	if not assigned(Node) then exit;
-	ProjectView.Selected:= Node;
+	if not assigned(fProject) or devData.FullScreen then
+		exit;
+
+	pt := ProjectView.ClientToScreen(MousePos);
+	Node := ProjectView.GetNodeAt(MousePos.X, MousePos.Y);
+	if not assigned(Node) then
+		exit;
+	ProjectView.Selected := Node;
+
+	// Is this the project node?
 	if Node.Level = 0 then
 		ProjectPopup.Popup(pt.x, pt.Y)
-	else begin
+
+	// This is either a folder or a file
+	else if Node.Data <> Pointer(-1) then begin
 		BuildOpenWith;
-		RemoveFilefromprojectPopItem.Visible:=Node.Data<>Pointer(-1);
-		RenamefilePopItem.Visible:=Node.Data<>Pointer(-1);
-		OpenPopItem.Visible:=Node.Data<>Pointer(-1);
-		ClosefilePopItem.Visible:=Node.Data<>Pointer(-1);
-		Removefolder1.Visible:=Node.Data=Pointer(-1);
-		Renamefolder1.Visible:=Node.Data=Pointer(-1);
-		Addfile1.Visible:=Node.Data=Pointer(-1);
-		mnuUnitProperties.Visible:=Node.Data<>Pointer(-1);
-		UnitPopup.Popup(pt.X, pt.Y);
+		UnitPopup.Popup(pt.X,pt.Y);
+	end else begin
+		FolderPopup.Popup(pt.X,pt.Y);
 	end;
 	Handled:= TRUE;
 end;
@@ -1990,12 +2003,14 @@ procedure TMainForm.ProjectViewClick(Sender: TObject);
 var
 	e: TEditor;
 begin
-	if devData.DblFiles then exit;
-	if not Assigned(ProjectView.Selected) then Exit;
-	if ProjectView.Selected.Data<>Pointer(-1) then
+	if devData.DblFiles then
+		Exit;
+	if not Assigned(ProjectView.Selected) then
+		Exit;
+	if ProjectView.Selected.Data <> Pointer(-1) then
 		OpenUnit
 	else begin
-		e:=GetEditor;
+		e := GetEditor;
 		if Assigned(e) then
 			e.Activate;
 	end;
@@ -2121,7 +2136,6 @@ var
 	I: integer;
 begin
 	with TOpenDialog.Create(Self) do try
-
 		Filter := BuildFilter([FLT_PROJECTS, FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]);
 		Title := Lang[ID_NV_OPENFILE];
 		Options := Options + [ofAllowMultiSelect];
@@ -2167,28 +2181,30 @@ end;
 
 procedure TMainForm.actSaveAllExecute(Sender: TObject);
 var
-	idx: integer;
+	I: integer;
 	wa: boolean;
 	e : TEditor;
 begin
-	wa:=devFileMonitor.Active;
-	devFileMonitor.Deactivate;
-	if assigned(fProject) then begin
+	// Pause the change notifier
+	wa := FileMonitor.Active;
+	FileMonitor.Deactivate;
+
+	if Assigned(fProject) then begin
 		fProject.Save;
 		UpdateAppTitle;
 		if CppParser.Statements.Count = 0 then // only scan entire project if it has not already been scanned...
 			ScanActiveProject;
 	end;
 
-	for idx:= 0 to pred(PageControl.PageCount) do begin
-		e := GetEditor(idx);
+	for I := 0 to pred(PageControl.PageCount) do begin
+		e := GetEditor(I);
 		if e.Text.Modified and ((not e.InProject) or e.IsRes) then
 			if not e.Save then
 				Break;
 	end;
 
 	if wa then
-		devFileMonitor.Activate;
+		FileMonitor.Activate;
 end;
 
 procedure TMainForm.actCloseExecute(Sender: TObject);
@@ -2198,11 +2214,16 @@ end;
 
 procedure TMainForm.actCloseAllExecute(Sender: TObject);
 var
-	idx: integer;
+	I: integer;
 begin
-	for idx := PageControl.PageCount - 1 downto 0 do
-		if not CloseEditor(0) then
-			Break;
+	ClassBrowser.BeginUpdate;
+	try
+		for I := PageControl.PageCount - 1 downto 0 do
+			if not CloseEditor(0) then
+				Break;
+	finally
+		ClassBrowser.EndUpdate;
+	end;
 end;
 
 procedure TMainForm.actCloseProjectExecute(Sender: TObject);
@@ -2211,8 +2232,10 @@ var
 	wa: boolean;
 begin
 	actStopExecute.Execute;
-	wa:=devFileMonitor.Active;
-	devFileMonitor.Deactivate;
+
+	// Pause monitoring
+	wa := FileMonitor.Active;
+	FileMonitor.Deactivate;
 
 	// save project layout anyway ;)
 	fProject.Options.CmdLineArgs:=fCompiler.RunParams;
@@ -2246,7 +2269,7 @@ begin
 	SetStatusbarLineCol;
 
 	if wa then
-		devFileMonitor.Activate;
+		FileMonitor.Activate;
 end;
 
 procedure TMainForm.actExportHTMLExecute(Sender: TObject);
@@ -2621,18 +2644,13 @@ begin
 			fProject.SaveUnitAs(I, NewName);
 
 			// remove old file from monitor list
-			I := devFileMonitor.Files.IndexOf(OldName);
-			if I <> -1 then begin
-				devFileMonitor.Files.Delete(I);
-				devFileMonitor.Refresh(true);
-			end;
+			FileMonitor.UnMonitor(OldName);
 
 			// Finally, we can rename without issues
 			RenameFile(OldName, NewName);
 
 			// Add new filename to file minitor
-			devFileMonitor.Files.Add(NewName);
-			devFileMonitor.Refresh(true);
+			FileMonitor.Monitor(NewName);
 		except
 			MessageDlg(Format(Lang[ID_ERR_RENAMEFILE], [OldName]), mtError, [mbok], 0);
 		end;
@@ -3020,7 +3038,7 @@ begin
 	fDebugger.LeftPageIndexBackup := MainForm.LeftPageControl.ActivePageIndex;
 
 	// Focus on the debugging buttons
-	LeftPageControl.ActivePage := DebugLeftSheet;
+	LeftPageControl.ActivePage := LeftDebugSheet;
 	MessageControl.ActivePage := DebugSheet;
 	OpenCloseMessageSheet(True);
 
@@ -3168,7 +3186,7 @@ begin
 			end;
 			if devData.ThemeChange then
 				Loadtheme;
-			devShortcuts.Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
+			Shortcuts.Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
 			dmMain.RebuildMRU;
 		end;
 	finally
@@ -3250,7 +3268,7 @@ begin
 	devData.ToolbarSpecials:=ToolSpecialsItem.Checked;
 	devData.ToolbarSearch:=ToolSearchItem.Checked;
 	devData.ToolbarClasses:=ToolClassesItem.Checked;
-	devData.ToolbarMain:=ToolCompilersItem.Checked;
+	devData.ToolbarCompilers:=ToolCompilersItem.Checked;
 end;
 
 procedure TMainForm.ToolbarContextPopup(Sender: TObject;MousePos: TPoint; var Handled: Boolean);
@@ -3825,10 +3843,10 @@ begin
 	end;
 end;
 
-procedure TMainForm.UpdateSplash(const text : AnsiString);
+procedure TMainForm.UpdateSplash(const LoadingText : AnsiString);
 begin
 	if Assigned(SplashForm) then
-		SplashForm.Statusbar.SimpleText := 'Bloodshed Dev-C++ 4.9.9.2 (Orwell update '+ DEVCPP_VERSION + ') ' + text;
+		SplashForm.SetText(LoadingText);
 end;
 
 procedure TMainForm.UpdateCompilerList;
@@ -3909,7 +3927,7 @@ begin
 					mtConfirmation,[mbYes,mbNo],0) = mrYes then
 
 				// Remove and backup the current configuration directory.
-				RemoveOptions(devDirs.Config);
+				RemoveOptionsDir(devDirs.Config);
 				TerminateProcess(GetCurrentProcess(),1);
 		end;
 	end;
@@ -3918,9 +3936,15 @@ begin
 	CodeCompletion.Width := devCodeCompletion.Width;
 	CodeCompletion.Height := devCodeCompletion.Height;
 
-	ClassBrowser.ShowFilter := TShowFilter(devClassBrowsing.ShowFilter);
-	ClassBrowser.ShowInheritedMembers := devClassBrowsing.ShowInheritedMembers;
-	ClassBrowser.ClassFoldersFile := DEV_CLASSFOLDERS_FILE;
+	// Only attempt to redraw once
+	ClassBrowser.BeginUpdate;
+	try
+		ClassBrowser.ShowFilter := TShowFilter(devClassBrowsing.ShowFilter);
+		ClassBrowser.ShowInheritedMembers := devClassBrowsing.ShowInheritedMembers;
+		ClassBrowser.ClassFoldersFile := DEV_CLASSFOLDERS_FILE;
+	finally
+		ClassBrowser.EndUpdate;
+	end;
 
 	actBrowserViewAll.Checked := ClassBrowser.ShowFilter=sfAll;
 	actBrowserViewProject.Checked := ClassBrowser.ShowFilter=sfProject;
@@ -3959,7 +3983,6 @@ procedure TMainForm.ClassBrowserSelect(Sender: TObject;Filename: TFileName; Line
 var
 	e: TEditor;
 begin
-	// mandrav
 	e := GetEditorFromFilename(FileName);
 	if Assigned(e) then
 		e.SetCaretPos(Line,1);
@@ -4162,7 +4185,7 @@ procedure TMainForm.actConfigdevShortcutsExecute(Sender: TObject);
 begin
 //	if(devShortcuts.FileName[2] <> ':') then // if relative
 //		devShortcuts.FileName := devdirs.Exec + devShortcuts.FileName;
-	devShortcuts.Edit(
+	Shortcuts.Edit(
       Lang[ID_SC_CAPTION],
       Lang[ID_SC_HDRENTRY],
       Lang[ID_SC_HDRSHORTCUT],
@@ -4484,19 +4507,19 @@ begin
 end;
 
 procedure TMainForm.actBrowserViewIncludesExecute(Sender: TObject);
-//var
-//	e: TEditor;
-begin // TODO: check if file is included in current file inside TCLassBrowser
+var
+	e: TEditor;
+begin
 	ClassBrowser.ShowFilter := sfSystemFiles;
 	actBrowserViewAll.Checked := False;
 	actBrowserViewProject.Checked := False;
 	actBrowserViewCurrent.Checked := False;
 	actBrowserViewIncludes.Checked := True;
-	//e := GetEditor;
-	//if Assigned(e) then
-	//	ClassBrowser.CurrentFile := e.FileName
-	//else
-	//	ClassBrowser.CurrentFile := '';
+	e := GetEditor;
+	if Assigned(e) then
+		ClassBrowser.CurrentFile := e.FileName
+	else
+		ClassBrowser.CurrentFile := '';
 	devClassBrowsing.ShowFilter := Ord(ClassBrowser.ShowFilter);
 end;
 
@@ -4615,15 +4638,15 @@ begin
 	end;
 end;
 
-procedure TMainForm.devFileMonitorNotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: string);
+procedure TMainForm.FileMonitorNotifyChange(Sender: TObject;ChangeType: TdevMonitorChangeType; Filename: string);
 var
 	e: TEditor;
 	p : TBufferCoord;
 	wa : boolean;
 begin
 	// Deactivate monitoring for this file. One message is enough
-	wa := devFileMonitor.Active;
-	devFileMonitor.Deactivate;
+	wa := FileMonitor.Active;
+	FileMonitor.Deactivate;
 
 	case ChangeType of
 		mctChanged: begin
@@ -4646,7 +4669,7 @@ begin
 
 	// Activate once messagebox is gone
 	if wa then
-		devFileMonitor.Activate;
+		FileMonitor.Activate;
 end;
 
 procedure TMainForm.actFilePropertiesExecute(Sender: TObject);
@@ -4902,11 +4925,6 @@ begin
 		ShowModal;
 end;
 
-procedure TMainForm.HelpMenuItemClick(Sender: TObject);
-begin
-	OpenHelpFile('index.htm');
-end;
-
 procedure TMainForm.CppParserStartParsing(Sender: TObject);
 var
 	e : TEditor;
@@ -4985,14 +5003,6 @@ begin
 			Application.Title := Format('%s', [DEVCPP]);
 		end;
 	end;
-end;
-
-procedure TMainForm.PackageManagerItemClick(Sender: TObject);
-var
-	s : AnsiString;
-begin
-	s := IncludeTrailingBackslash(devDirs.Exec) + PACKMAN_PROGRAM;
-	ExecuteFile(s, '', IncludeTrailingBackslash(devDirs.Exec), SW_SHOW)
 end;
 
 procedure TMainForm.actAbortCompilationUpdate(Sender: TObject);
@@ -5119,8 +5129,8 @@ var
 	pt: TBufferCoord;
 begin
 	actSaveAll.Execute;
-	wa:=devFileMonitor.Active;
-	devFileMonitor.Deactivate;
+	wa := FileMonitor.Active;
+	FileMonitor.Deactivate;
 
 	DoCVSAction(Sender, caUpdate);
 
@@ -5135,7 +5145,7 @@ begin
 	end;
 
 	if wa then
-		devFileMonitor.Activate;
+		FileMonitor.Activate;
 end;
 
 procedure TMainForm.actCVSCommitExecute(Sender: TObject);
@@ -5421,24 +5431,6 @@ begin
 	end;
 end;
 
-procedure TMainForm.actCompileCurrentFileExecute(Sender: TObject);
-var
-	e: TEditor;
-begin
-	actStopExecuteExecute(nil);
-	if fCompiler.Compiling then begin
-		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
-		Exit;
-	end;
-
-	e:=GetEditor;
-	if not Assigned(e) then
-		Exit;
-	if not PrepareForCompile then
-		Exit;
-	fCompiler.Compile(e.FileName);
-end;
-
 procedure TMainForm.actSaveProjectAsExecute(Sender: TObject);
 begin
 	if not Assigned(fProject) then
@@ -5446,8 +5438,9 @@ begin
 
 	with TSaveDialog.Create(nil) do try
 
-		Filter:= FLT_PROJECTS;
+		Filter := FLT_PROJECTS;
 		Options := Options + [ofOverwritePrompt];
+		Title := Lang[ID_NV_SAVEPROJECT];
 
 		if Execute then begin
 			fProject.FileName:=FileName;
@@ -5468,7 +5461,7 @@ begin
 	mnuOpenWith.Clear;
 	if not assigned(fProject) then exit;
 	if not assigned(ProjectView.Selected) or
-		 (ProjectView.Selected.Level	< 1) then exit;
+		 (ProjectView.Selected.Level < 1) then exit;
 	if ProjectView.Selected.Data=Pointer(-1) then
 		Exit;
 	idx:= integer(ProjectView.Selected.Data);
@@ -6091,8 +6084,8 @@ begin
 	UpdateSplash('Applying shortcuts...');
 
 	// Apply shortcuts BEFORE TRANSLATING!!!
-	devShortcuts.Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
-	devShortcuts.Load(ActionList);
+	Shortcuts.Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
+	Shortcuts.Load(ActionList);
 
 	UpdateSplash('Applying UI settings...');
 
@@ -6523,27 +6516,25 @@ end;
 
 procedure TMainForm.FindOutputDeletion(Sender: TObject; Item: TListItem);
 begin
-	if DontRecreateSingletons then Exit; // form is being destroyed, don't use Lang which has been freed already...
+	if Application.Terminated then Exit; // form is being destroyed, don't use Lang which has been freed already...
 	if FindOutput.Items.Count > 1 then
 		FindSheet.Caption := Lang[ID_SHEET_FIND] + ' (' + IntToStr(FindOutput.Items.Count - 1) + ')'
 	else
 		FindSheet.Caption := Lang[ID_SHEET_FIND];
 end;
 
-procedure TMainForm.CompilerOutputDeletion(Sender: TObject;
-  Item: TListItem);
+procedure TMainForm.CompilerOutputDeletion(Sender: TObject;Item: TListItem);
 begin
-	if DontRecreateSingletons then Exit; // form is being destroyed
+	if Application.Terminated then Exit; // form is being destroyed
 	if CompilerOutput.Items.Count > 1 then
 		CompSheet.Caption := Lang[ID_SHEET_COMP] + ' (' + IntToStr(CompilerOutput.Items.Count - 1) + ')'
 	else
 		CompSheet.Caption := Lang[ID_SHEET_COMP];
 end;
 
-procedure TMainForm.ResourceOutputDeletion(Sender: TObject;
-  Item: TListItem);
+procedure TMainForm.ResourceOutputDeletion(Sender: TObject;Item: TListItem);
 begin
-	if DontRecreateSingletons then Exit; // form is being destroyed
+	if Application.Terminated then Exit; // form is being destroyed
 	if ResourceOutput.Items.Count > 1 then
 		ResSheet.Caption := Lang[ID_SHEET_RES] + ' (' + IntToStr(ResourceOutput.Items.Count - 1) + ')'
 	else
@@ -6664,6 +6655,20 @@ begin
 	e := GetEditor;
 	if Assigned(e) then
 		e.ShowCompletion;
+end;
+
+procedure TMainForm.actPackageManagerExecute(Sender: TObject);
+var
+	s : AnsiString;
+begin
+	s := IncludeTrailingBackslash(devDirs.Exec) + PACKMAN_PROGRAM;
+	if FileExists(s) then
+		ExecuteFile(s, '', IncludeTrailingBackslash(devDirs.Exec), SW_SHOW);
+end;
+
+procedure TMainForm.actHelpExecute(Sender: TObject);
+begin
+	OpenHelpFile('index.htm');
 end;
 
 end.

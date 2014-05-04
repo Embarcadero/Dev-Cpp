@@ -127,6 +127,7 @@ const
   ID_ITEM_FLOATREPORT                   = 5024;
   ID_ITEM_REPLACEFILES                  = 5025;
   ID_TOOLCOMPILERS                      = 5026;
+  ID_ITEM_FINDPREV                      = 5027;
 
   // project menu
   ID_ITEM_NEWFILE                       = 6001;
@@ -174,6 +175,7 @@ const
   ID_ITEM_UPDATECHECK                   = 9002;
   ID_ITEM_CUSTOM                        = 9003;
   ID_ITEM_HELPDEVCPP                    = 9004;
+  ID_ITEM_PACKMAN                       = 9005;
 
   //debug menu
   ID_ITEM_DEBUG                         = 10001;
@@ -287,6 +289,7 @@ const
   ID_NV_SAVEFILE                        = 19004;
   ID_NV_SAVEPROJECT                     = 19005;
   ID_NV_HELPFILE                        = 19006;
+  ID_NV_SAVEAS                          = 19007;
 
   ID_NV_ADDWATCH                        = 20001;
   ID_NV_ENTERVAR                        = 20002;
@@ -357,7 +360,8 @@ const
   ID_EOPT_GUTTERWIDTH                   = 26027;
   ID_EOPT_AUTOINDENT2                   = 26028;
   ID_EOPT_ADDINDENT                     = 26029;
-
+  ID_EOPT_TABS                          = 26030;
+  
   ID_EOPT_SPECIALCHARS                  = 27001;
   ID_EOPT_PARSERHINTS                   = 27002;
   ID_EOPT_MATCH                         = 27003;
@@ -780,7 +784,7 @@ const
   ID_POPT_USEGPP                        = 55013;
   ID_POPT_ADDITIONAL                    = 55014;
   ID_POPT_COMP                          = 55015;
-  ID_POPT_LINKER                        = 55016;
+  ID_POPT_LINKEROPTS                    = 55016;
   ID_POPT_LIBDIRS                       = 55017;
   ID_POPT_RESFILES                      = 55018;
   ID_POPT_INCDIRS                       = 55019;
@@ -802,6 +806,8 @@ const
   ID_POPT_CCOMP                         = 55031;
   iD_POPT_COMPCUSTOMHINT                = 55032;
   ID_POPT_DISCARDCUSTOM                 = 55033;
+  ID_POPT_CPPCOMP                       = 55034;
+  ID_POPT_LINKER                        = 55035;
   
   // New template form
   ID_NEWTPL_NAME                        = 56001;
@@ -810,7 +816,7 @@ const
   ID_NEWTPL_PROJECTNAME                 = 56004;
   ID_NEWTPL_FILES                       = 56005;
   ID_NEWTPL_COMPILER                    = 56006;
-  ID_NEWTPL_LINKER                      = 56007;
+  ID_NEWTPL_LINKEROPTS                  = 56007;
   ID_NEWTPL_ICONS                       = 56008;
   ID_NEWTPL_PAGETEMPLATE                = 56009;
   ID_NEWTPL_PAGEFILES                   = 56010;
@@ -822,6 +828,10 @@ const
   ID_NEWTPL_INCDIR                      = 56016;
   ID_NEWTPL_LIBDIR                      = 56017;
   ID_NEWTPL_RESDIR                      = 56018;
+  ID_NEWTPL_LIBRARY                     = 56019;
+  ID_NEWTPL_CCOMP                       = 56020;
+  ID_NEWTPL_CPPCOMP                     = 56021;
+  ID_NEWTPL_LINKER                      = 56022;
 
   // New variable form
   ID_NEWVAR_VARTYPE                     = 57001;
@@ -865,10 +875,12 @@ const
   ID_PROPS_EMPTY                        = 58007;
   ID_PROPS_FILESIZE                     = 58008;
   ID_PROPS_ABSOLUTE                     = 58009;
-
+  // in use by project options
   ID_PROPS_RELATIVE                     = 58011;
   ID_PROPS_TIMESTAMP                    = 58012;
-
+  // in use by project options
+  ID_PROPS_PROPERTIES                   = 58014;
+  
   // Profile analysis form
   ID_PROF_CAPTION                       = 59001;
   ID_PROF_TABFLAT                       = 59002;

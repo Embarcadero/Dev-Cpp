@@ -539,7 +539,7 @@ begin
 
 	// First line gets special treatment
 	Result :=  GetNextLine;
-	if Result = '{' then
+	if StartsStr('{',Result) then
 		Inc(indent,4);
 
 	// Collect all data, add formatting in between

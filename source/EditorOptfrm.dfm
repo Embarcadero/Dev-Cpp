@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 743
-  Top = 203
+  Left = 770
+  Top = 472
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 492

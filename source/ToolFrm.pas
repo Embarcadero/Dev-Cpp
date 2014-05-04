@@ -439,12 +439,12 @@ begin
 	Font.Size := devData.InterfaceFontSize;
 
   Caption:=               Lang[ID_TF];
-  grpCurrent.Caption:=    '  '+Lang[ID_TF_LABEL] +'  ';
+  grpCurrent.Caption:=    Lang[ID_TF_LABEL];
 
   btnAdd.Caption:=        Lang[ID_BTN_ADD];
   btnDelete.Caption:=     Lang[ID_BTN_DELETE];
   btnEdit.Caption:=       Lang[ID_BTN_EDIT];
-  grpActions.Caption:=    '  '+Lang[ID_HE_GRP_ACTIONS]+'  ';
+  grpActions.Caption:=    Lang[ID_HE_GRP_ACTIONS];
 end;
 
 procedure TToolForm.FormCreate(Sender: TObject);

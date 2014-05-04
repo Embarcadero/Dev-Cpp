@@ -191,7 +191,7 @@ begin
 	PropertiesCopy.Caption := Lang[ID_ITEM_COPY];
 	PropertiesSelAll.Caption := Lang[ID_ITEM_SELECTALL];
 
-	Caption := Lang[ID_ITEM_PROPERTIES];
+	Caption := Lang[ID_PROPS_PROPERTIES];
 	btnOK.Caption := Lang[ID_BTN_OK];
 
 	lblFileName.Caption := Lang[ID_PROPS_FILENAME] + ':';

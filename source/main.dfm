@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 809
-  Top = 369
+  Left = 896
+  Top = 488
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -252,13 +252,13 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 403
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           403
-          154)
+          155)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -280,7 +280,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 396
-          Height = 112
+          Height = 111
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -292,7 +292,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 589
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -300,7 +300,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           589
-          154)
+          155)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -446,7 +446,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 40
+          Height = 39
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -486,7 +486,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -985,24 +985,23 @@ object MainForm: TMainForm
       OnClick = btnFullScrRevertClick
     end
   end
-  object devFileMonitor: TdevFileMonitor
+  object FileMonitor: TdevFileMonitor
     Left = 112
     Top = 152
     Width = 0
     Height = 0
-    Active = False
-    OnNotifyChange = devFileMonitorNotifyChange
+    OnNotifyChange = FileMonitorNotifyChange
   end
   object LeftPageControl: TPageControl
     Left = 0
     Top = 72
     Width = 193
     Height = 342
-    ActivePage = ProjectSheet
+    ActivePage = LeftProjectSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 1
-    object ProjectSheet: TTabSheet
+    object LeftProjectSheet: TTabSheet
       Caption = 'Project'
       ImageIndex = -1
       object ProjectView: TTreeView
@@ -1038,7 +1037,7 @@ object MainForm: TMainForm
         OnMouseDown = ProjectViewMouseDown
       end
     end
-    object ClassSheet: TTabSheet
+    object LeftClassSheet: TTabSheet
       Caption = 'Classes'
       ImageIndex = -1
       object ClassBrowser: TClassBrowser
@@ -1073,7 +1072,7 @@ object MainForm: TMainForm
         ShowInheritedMembers = False
       end
     end
-    object DebugLeftSheet: TTabSheet
+    object LeftDebugSheet: TTabSheet
       Caption = 'Debug'
       ImageIndex = -1
       object DebugTree: TTreeView
@@ -1158,11 +1157,11 @@ object MainForm: TMainForm
         Tag = 4
         Action = actClose
       end
-      object CloseAll2: TMenuItem
-        Action = actCloseAll
-      end
       object CloseprojectItem: TMenuItem
         Action = actCloseProject
+      end
+      object CloseAll2: TMenuItem
+        Action = actCloseAll
       end
       object N35: TMenuItem
         Caption = '-'
@@ -1516,9 +1515,6 @@ object MainForm: TMainForm
         Tag = 8
         Action = actCompile
       end
-      object Compilecurrentfile1: TMenuItem
-        Action = actCompileCurrentFile
-      end
       object RunItem: TMenuItem
         Tag = 9
         Action = actRun
@@ -1528,6 +1524,12 @@ object MainForm: TMainForm
       end
       object RebuildallItem: TMenuItem
         Action = actRebuild
+      end
+      object N69: TMenuItem
+        Caption = '-'
+      end
+      object N49: TMenuItem
+        Action = actProjectMakeFile
       end
       object N18: TMenuItem
         Caption = '-'
@@ -1583,7 +1585,7 @@ object MainForm: TMainForm
         Tag = 12
         Action = actEnviroOptions
       end
-      object EditorOptions1: TMenuItem
+      object EditorOptionsItem: TMenuItem
         Action = actEditorOptions
       end
       object N20: TMenuItem
@@ -1599,38 +1601,10 @@ object MainForm: TMainForm
         Caption = '-'
       end
       object CheckforupdatesItem: TMenuItem
-        Action = actUpdateCheck
+        Action = actPackageCheck
       end
       object PackageManagerItem: TMenuItem
-        Bitmap.Data = {
-          36030000424D3603000000000000360000002800000010000000100000000100
-          18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF00000000000000
-          0000000000000000000000000000000000000000000000000000BFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000DFDFDFB8B8B8B8B8B8B8B8B8B8B8B8B8B8B8B8B8
-          B8B8B8B8969696000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000F3F3F3DF
-          DFDFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFB8B8B8000000BFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000F3F3F3DFDFDF656565CFCFCF6565656565656565
-          65CFCFCFB8B8B8000000000000000000000000000000000000000000F3F3F3DF
-          DFDFDFDFDFDFDFDFDFDFDFCFCFCFCFCFCFCFCFCFB8B8B80000000000004CC6FF
-          4CB5E64CB5E64CB5E6000000F3F3F3DFDFDF656565656565DFDFDF6565656565
-          65CFCFCFB8B8B80000000000008DDBFF4CC6FF4CC6FF4CC6FF000000FFFFFFF3
-          F3F3F3F3F3F3F3F3F3F3F3F3F3F3F3F3F3F3F3F3DFDFDF0000000000008DDBFF
-          4CC6FF4CC6FF4CC6FF6868680000000000000000000000000000000000000000
-          000000000000000000000000008DDBFF4CC6FF4CC6FF4CC6FF4CC6FF4CC6FF24
-          607B4CC6FF4CC6FF4CC6FF4CC6FF4CC6FF4CB5E6000000BFBFBF000000296D8C
-          24607B24607B24607B24607B24607B24607B24607B24607B24607B24607B2460
-          7B1F536B000000BFBFBF0000008DDBFF4CC6FF4CC6FF4CC6FF4CC6FF4CC6FF24
-          607B4CC6FF4CC6FF226C8B226C8B226C8B4CB5E6000000BFBFBF0000008DDBFF
-          4CC6FF4CC6FF4CC6FF4CC6FF4CC6FF24607B4CC6FF4CC6FF226C8B226C8B226C
-          8B4CB5E6000000BFBFBF0000008DDBFF4CC6FF4CC6FF4CC6FF4CC6FF4CC6FF24
-          607B4CC6FF4CC6FF226C8B226C8B226C8B4CB5E6000000BFBFBF000000D1F1FF
-          8DDBFF8DDBFF8DDBFF8DDBFF8DDBFF296D8C8DDBFF8DDBFF8DDBFF8DDBFF8DDB
-          FF4CC6FF000000BFBFBF68686800000000000000000000000000000000000000
-          0000000000000000000000000000000000000000000000BFBFBF}
-        Caption = '&Package Manager'
-        OnClick = PackageManagerItemClick
+        Action = actPackageManager
       end
     end
     object mnuCVS: TMenuItem
@@ -1753,9 +1727,7 @@ object MainForm: TMainForm
       GroupIndex = 9
       OnClick = actFileMenuExecute
       object HelpMenuItem: TMenuItem
-        Caption = '&Help on Dev-C++'
-        ImageIndex = 46
-        OnClick = HelpMenuItemClick
+        Action = actHelp
       end
       object ShowTipsItem: TMenuItem
         Action = actShowTips
@@ -1824,12 +1796,10 @@ object MainForm: TMainForm
       Action = actInsert
     end
     object TogglebookmarksPopItem: TMenuItem
-      Caption = '&Toggle bookmarks'
-      ImageIndex = 31
+      Action = actToggle
     end
     object GotobookmarksPopItem: TMenuItem
-      Caption = '&Goto bookmarks'
-      ImageIndex = 32
+      Action = actGoto
     end
     object N41: TMenuItem
       Caption = '-'
@@ -1882,7 +1852,6 @@ object MainForm: TMainForm
     end
   end
   object UnitPopup: TPopupMenu
-    MenuAnimation = [maBottomToTop]
     Left = 11
     Top = 135
     object RemoveFilefromprojectPopItem: TMenuItem
@@ -1905,24 +1874,6 @@ object MainForm: TMainForm
       Action = actUnitClose
     end
     object N40: TMenuItem
-      Caption = '-'
-    end
-    object Addfile1: TMenuItem
-      Action = actProjectAdd
-    end
-    object N44: TMenuItem
-      Caption = '-'
-    end
-    object Addfolder1: TMenuItem
-      Action = actProjectNewFolder
-    end
-    object Renamefolder1: TMenuItem
-      Action = actProjectRenameFolder
-    end
-    object Removefolder1: TMenuItem
-      Action = actProjectRemoveFolder
-    end
-    object N49: TMenuItem
       Caption = '-'
     end
     object CVS3: TMenuItem
@@ -1969,12 +1920,12 @@ object MainForm: TMainForm
     end
   end
   object ProjectPopup: TPopupMenu
-    MenuAnimation = [maBottomToTop]
     Left = 11
     Top = 99
     object NewunitinprojectPopItem: TMenuItem
       Tag = 2
       Action = actProjectNew
+      Caption = '&New File'
     end
     object AddtoprojectPopItem: TMenuItem
       Action = actProjectAdd
@@ -2021,6 +1972,12 @@ object MainForm: TMainForm
         Tag = 1
         Action = actCVSLog
       end
+    end
+    object N70: TMenuItem
+      Caption = '-'
+    end
+    object CloseProject1: TMenuItem
+      Action = actCloseProject
     end
   end
   object ActionList: TActionList
@@ -2137,6 +2094,7 @@ object MainForm: TMainForm
       Tag = 6
       Category = 'File'
       Caption = 'Close Project'
+      ImageIndex = 11
       OnExecute = actCloseProjectExecute
       OnUpdate = actUpdateProject
     end
@@ -2455,12 +2413,6 @@ object MainForm: TMainForm
       ImageIndex = 40
       ShortCut = 24585
       OnExecute = actPrevExecute
-    end
-    object actUpdateCheck: TAction
-      Category = 'Help'
-      Caption = '&Check for Packages'
-      ImageIndex = 41
-      OnExecute = actUpdateCheckExecute
     end
     object actAbout: TAction
       Category = 'Help'
@@ -2819,14 +2771,6 @@ object MainForm: TMainForm
       Caption = 'Logout'
       OnExecute = actCVSLogoutExecute
     end
-    object actCompileCurrentFile: TAction
-      Category = 'Execute'
-      Caption = 'Compile current file'
-      ImageIndex = 28
-      ShortCut = 16504
-      OnExecute = actCompileCurrentFileExecute
-      OnUpdate = actCompileUpdate
-    end
     object actAttachProcess: TAction
       Category = 'Debug'
       Caption = 'Attach to process...'
@@ -3012,6 +2956,24 @@ object MainForm: TMainForm
       OnExecute = actCodeCompletionExecute
       OnUpdate = actCodeCompletionUpdate
     end
+    object actPackageCheck: TAction
+      Category = 'Tools'
+      Caption = '&Check for Packages'
+      ImageIndex = 41
+      OnExecute = actUpdateCheckExecute
+    end
+    object actPackageManager: TAction
+      Category = 'Tools'
+      Caption = 'actPackageManager'
+      ImageIndex = 48
+      OnExecute = actPackageManagerExecute
+    end
+    object actHelp: TAction
+      Category = 'Help'
+      Caption = 'actHelp'
+      ImageIndex = 46
+      OnExecute = actHelpExecute
+    end
   end
   object MessagePopup: TPopupMenu
     Left = 203
@@ -3074,8 +3036,8 @@ object MainForm: TMainForm
     Left = 60
     Top = 228
   end
-  object devShortcuts: TdevShortcuts
-    Filename = 'devShortcuts.cfg'
+  object Shortcuts: TdevShortcuts
+    Filename = 'shortcuts.ini'
     Left = 628
     Top = 280
   end
@@ -3175,5 +3137,24 @@ object MainForm: TMainForm
   object CppTokenizer: TCppTokenizer
     Left = 60
     Top = 166
+  end
+  object FolderPopup: TPopupMenu
+    Left = 12
+    Top = 168
+    object Addfolder2: TMenuItem
+      Action = actProjectNewFolder
+    end
+    object Renamefolder2: TMenuItem
+      Action = actProjectRenameFolder
+    end
+    object Removefolder2: TMenuItem
+      Action = actProjectRemoveFolder
+    end
+    object N44: TMenuItem
+      Caption = '-'
+    end
+    object Addfile1: TMenuItem
+      Action = actProjectAdd
+    end
   end
 end

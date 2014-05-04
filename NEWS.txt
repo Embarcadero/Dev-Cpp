@@ -1,3 +1,24 @@
+Version 5.6.3 - 4 Mei 2014
+
+- Fixed a bug in external program execution related to spaces in paths.
+- Updated Japanese language files.
+- Reduced flicker when opening Tools >> Environment Options.
+- Simplified the splash screen text.
+- Reduced class browser flicker. This significantly speeds up editor switching and project opening.
+- Greatly improved code completion performance.
+- Folder selection dialogs in Tools >> Project Options now start in the project directory.
+- Class Browser >> View Mode >> System Headers now also works with cached content.
+- Partially rewritten the file change monitor code. This should fix the thread handle bugs.
+- Fixed a bug that caused breakpoints to be placed on incorrect lines when using code folding above them.
+- Updated UI text capitalisation and spacing to adhere to the Windows Style Guide.
+- Added icons to the context menus of the project browser.
+- Cleaned up the context menus for folders and files in the project browser.
+- Added a close button to the context menu of the project root.
+- Added a "View Makefile" button to the Execute menu.
+- Removed the "Compile Current File" option.
+- When using "Save As", the class browser will now update when the "Current File" view is used.
+- Fixed a few bugs in the enum parser.
+
 Version 5.6.2 - 16 Maart 2014
 
 - Updated Japanese language files.

@@ -1,6 +1,6 @@
 object NewTemplateForm: TNewTemplateForm
-  Left = 635
-  Top = 385
+  Left = 557
+  Top = 743
   BorderStyle = bsDialog
   Caption = 'New Template'
   ClientHeight = 321
@@ -79,7 +79,7 @@ object NewTemplateForm: TNewTemplateForm
         Text = 'cmbName'
         OnChange = cmbNameChange
       end
-      object lblIcons: TGroupBox
+      object grpIcons: TGroupBox
         Left = 8
         Top = 120
         Width = 329
@@ -267,7 +267,7 @@ object NewTemplateForm: TNewTemplateForm
         Caption = 'Use project'#39's Library directories'
         TabOrder = 4
       end
-      object cbRessource: TCheckBox
+      object cbResource: TCheckBox
         Left = 16
         Top = 224
         Width = 329

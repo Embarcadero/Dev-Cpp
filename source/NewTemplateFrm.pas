@@ -58,8 +58,8 @@ type
     lblCppCompiler: TLabel;
     cbInclude: TCheckBox;
     cbLibrary: TCheckBox;
-    cbRessource: TCheckBox;
-    lblIcons: TGroupBox;
+    cbResource: TCheckBox;
+    grpIcons: TGroupBox;
     lstIcons: TListBox;
     btnLib: TBitBtn;
     btnBrowse: TBitBtn;
@@ -331,7 +331,7 @@ begin
       WriteString('Project', 'Includes', TempProject.Options.Includes.DelimitedText);
     if cbLibrary.Checked then
       WriteString('Project', 'Libs', TempProject.Options.Libs.DelimitedText);
-    if cbRessource.Checked then
+    if cbResource.Checked then
       WriteString('Project', 'ResourceIncludes', TempProject.Options.ResourceIncludes.DelimitedText);
 
     if IconFiles[1] <> '' then begin
@@ -352,28 +352,38 @@ begin
 	Font.Name := devData.InterfaceFont;
 	Font.Size := devData.InterfaceFontSize;
 
-	lblName.Caption := Lang[ID_NEWTPL_NAME];
-	lblDescr.Caption := Lang[ID_NEWTPL_DESCRIPTION];
-	lblCateg.Caption := Lang[ID_NEWTPL_CATEGORY];
-	lblFiles.Caption := Lang[ID_NEWTPL_FILES];
-	lblCompiler.Caption := Lang[ID_POPT_CCOMP];
-	lblCppCompiler.Caption := Lang[ID_COPT_GRP_CPP];
-	lblLinker.Caption := Lang[ID_COPT_LINKERTAB];
-	lblIcons.Caption := Lang[ID_NEWTPL_ICONS];
+	Caption := Lang[ID_NEWTPL_CAPTION];
+	btnCreate.Caption := Lang[ID_NEWTPL_CREATE];
+	btnCancel.Caption := Lang[ID_BTN_CANCEL];
+
+	// Tabs
 	pgTemplate.Caption := Lang[ID_NEWTPL_PAGETEMPLATE];
 	pgFiles.Caption := Lang[ID_NEWTPL_PAGEFILES];
 	pgExtras.Caption := Lang[ID_NEWTPL_PAGEEXTRAS];
-	sIcon := Lang[ID_NEWTPL_TEMPLATEICON];
-	sProjIcon := Lang[ID_NEWTPL_PROJECTICON];
-	btnCreate.Caption := Lang[ID_NEWTPL_CREATE];
-	btnCancel.Caption := Lang[ID_BTN_CANCEL];
-	btnLib.Caption := Lang[ID_POPT_ICOLIB];
+
+	// Template Info Tabs
+	lblName.Caption := Lang[ID_NEWTPL_NAME];
+	lblDescr.Caption := Lang[ID_NEWTPL_DESCRIPTION];
+	lblCateg.Caption := Lang[ID_NEWTPL_CATEGORY];
+
+	// Icons subgroup
+	grpIcons.Caption := Lang[ID_NEWTPL_ICONS];
+	btnLib.Caption := Lang[ID_NEWTPL_LIBRARY];
 	btnBrowse.Caption := Lang[ID_BTN_BROWSE];
 	btnRemove.Caption := Lang[ID_BTN_REMOVEICON];
-	Caption := Lang[ID_NEWTPL_CAPTION];
+	sIcon := Lang[ID_NEWTPL_TEMPLATEICON];
+	sProjIcon := Lang[ID_NEWTPL_PROJECTICON];
+
+	// Files Tab
+	lblFiles.Caption := Lang[ID_NEWTPL_FILES];
+
+	// Extras tab
+	lblCompiler.Caption := Lang[ID_NEWTPL_CCOMP];
+	lblCppCompiler.Caption := Lang[ID_NEWTPL_CPPCOMP];
+	lblLinker.Caption := Lang[ID_NEWTPL_LINKER];
 	cbInclude.Caption := Lang[ID_NEWTPL_INCDIR];
 	cbLibrary.Caption := Lang[ID_NEWTPL_LIBDIR];
-	cbRessource.Caption := Lang[ID_NEWTPL_RESDIR];
+	cbResource.Caption := Lang[ID_NEWTPL_RESDIR];
 end;
 
 end.

@@ -615,7 +615,7 @@ begin
   lbSelect.Caption := Lang[ID_MSVC_SELECTMSVC] + ':';
   lbConf.Caption := Lang[ID_MSVC_CONFIGURATION] + ':';
   lbDev.Caption := Lang[ID_MSVC_SELECTDEV] + ':';
-  gbOptions.Caption := '  ' + Lang[ID_MSVC_OPTIONS] + '  ';
+  gbOptions.Caption := Lang[ID_MSVC_OPTIONS];
   btnImport.Caption := Lang[ID_BTN_IMPORT];
   btnCancel.Caption := Lang[ID_BTN_CANCEL];
 end;

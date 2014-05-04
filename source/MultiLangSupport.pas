@@ -87,7 +87,7 @@ var
 
 function Lang: TdevMultiLangSupport;
 begin
-  if not assigned(fLang) and not DontRecreateSingletons then
+  if not assigned(fLang) and not Application.Terminated then
    begin
      fExternal:= false;
      try

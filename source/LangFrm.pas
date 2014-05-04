@@ -96,9 +96,11 @@ type
     procedure FontChange(Sender: TObject);
     procedure cmbIconsChange(Sender: TObject);
     procedure cmbFontDrawItem(Control: TWinControl; Index: Integer;Rect: TRect; State: TOwnerDrawState);
-  private
     function GetSelected: integer;
     procedure CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
+    procedure HandleLangPanel;
+    procedure HandleEditPanel;
+    procedure HandleCachePanel;
   public
     procedure LoadText; // call after selecting a language of course
     procedure UpdateList(List: TStrings);
@@ -163,136 +165,148 @@ begin
 	Application.ProcessMessages;
 end;
 
-procedure TLangForm.OkBtnClick(Sender: TObject);
+procedure TLangForm.HandleLangPanel;
+begin
+	OkBtn.Tag := 1;
+	LangPanel.Visible := false;
+
+	// Update translation
+	if Selected <> -1 then begin
+		Lang.Open(Lang.Langs.Names[Selected]);
+		devData.Language := Lang.FileFromDescription(Lang.Langs.Names[Selected]);
+	end else begin
+		Lang.Open('English.lng'); // never happens...
+	end;
+	LoadText;
+
+	EditPanel.Visible := true;
+end;
+
+procedure TLangForm.HandleEditPanel;
+begin
+	OkBtn.Tag := 2;
+	EditPanel.Visible := false;
+	CachePanel.Visible := true;
+	devData.ThemeChange := true;
+	devData.Theme := cmbIcons.Items[cmbIcons.ItemIndex];
+end;
+
+procedure TLangForm.HandleCachePanel;
 var
-	sl, f : TStringList;
-	i, j : integer;
+	sl,f : TStringList;
+	I, J : integer;
 	S : AnsiString;
 begin
-	if OkBtn.Tag = 0 then begin // goto edit page
-		OkBtn.Tag := 1;
-		LangPanel.Visible := false;
+	if YesCache.Checked or AltCache.Checked then begin
+		YesCache.Enabled := false;
+		NoCache.Enabled := false;
+		AltCache.Enabled := false;
+		AltFileList.Enabled := false;
+		OkBtn.Enabled := false;
+		BuildPanel.Visible := False;
+		ProgressPanel.Visible := True;
+		OkBtn.Caption := Lang[ID_LANGFORM_WAIT];
+		devCodeCompletion.Enabled := true;
+		devCodeCompletion.UseCacheFiles := true;
+		devCodeCompletion.Enabled := true;
+		devCodeCompletion.ParseLocalHeaders := true;
+		devCodeCompletion.ParseGlobalHeaders := true;
+		SaveOptions;
 
-		// Update translation
-		if Selected <> -1 then begin
-			Lang.Open(Lang.Langs.Names[Selected]);
-			devData.Language := Lang.FileFromDescription(Lang.Langs.Names[Selected]);
-		end else begin
-			Lang.Open('English.lng'); // never happens...
+		MainForm.CppParser.Tokenizer := MainForm.CppTokenizer;
+		MainForm.CppParser.Preprocessor := MainForm.CppPreprocessor;
+		MainForm.CppParser.ParseLocalHeaders := True;
+		MainForm.CppParser.ParseGlobalHeaders := True;
+		MainForm.CppParser.OnTotalProgress := CppParserTotalProgress;
+		MainForm.CppParser.OnStartParsing := nil;
+		MainForm.CppParser.OnEndParsing := nil;
+		MainForm.CppParser.Enabled := true;
+
+		MainForm.ClassBrowser.BeginUpdate;
+
+		sl := TStringList.Create;
+		if AltCache.Checked then begin
+			for I := 0 to AltFileList.Count - 1 do
+				sl.Add(AltFileList.Items[I]);
+		end else if Assigned(devCompilerSets.CurrentSet) then // cache all include dirs if there are any
+			sl.Assign(devCompilerSets.CurrentSet.CppDir);
+
+		// Make it look busy
+		Screen.Cursor:=crHourglass;
+
+		// Add default include search directories if a compiler has been installed
+		if Assigned(devCompilerSets.CurrentSet) then begin
+			with devCompilerSets.CurrentSet do begin
+				for I := 0 to CDir.Count - 1 do
+					MainForm.CppParser.AddIncludePath(CDir[I]);
+				for I := 0 to CppDir.Count - 1 do
+					MainForm.CppParser.AddIncludePath(CppDir[I]);
+
+				// Add default include dirs last, just like gcc does
+				for I := 0 to DefInclude.Count - 1 do
+					MainForm.CppParser.AddIncludePath(DefInclude[I]);
+			end;
 		end;
-		LoadText;
 
-		EditPanel.Visible := true;
-	end else if OkBtn.Tag = 1 then begin // goto cache page
-		OkBtn.Tag := 2;
-		EditPanel.Visible := false;
-		CachePanel.Visible := true;
-		devData.ThemeChange := true;
-		devData.Theme := cmbIcons.Items[cmbIcons.ItemIndex];
-	end else if OkBtn.Tag = 2 then begin // done, goto finish page
-		if YesCache.Checked or AltCache.Checked then begin
-			YesCache.Enabled := false;
-			NoCache.Enabled := false;
-			AltCache.Enabled := false;
-			AltFileList.Enabled := false;
-			OkBtn.Enabled := false;
-			BuildPanel.Visible := False;
-			ProgressPanel.Visible := True;
-			OkBtn.Caption := Lang[ID_LANGFORM_WAIT];
-			devCodeCompletion.Enabled := true;
-			devCodeCompletion.UseCacheFiles := true;
-			devCodeCompletion.Enabled := true;
-			devCodeCompletion.ParseLocalHeaders := true;
-			devCodeCompletion.ParseGlobalHeaders := true;
-			SaveOptions;
+		f := TStringList.Create;
+		if not AltCache.Checked then begin
+			for i := 0 to sl.Count-1 do begin
 
-			MainForm.CppParser.Tokenizer := MainForm.CppTokenizer;
-			MainForm.CppParser.Preprocessor := MainForm.CppPreprocessor;
-			MainForm.CppParser.ParseLocalHeaders := True;
-			MainForm.CppParser.ParseGlobalHeaders := True;
-			MainForm.CppParser.OnTotalProgress := CppParserTotalProgress;
-			MainForm.CppParser.OnStartParsing := nil;
-			MainForm.CppParser.OnEndParsing := nil;
-			MainForm.CppParser.Enabled := true;
-
-			MainForm.ClassBrowser.SetUpdateOff;
-
-			sl := TStringList.Create;
-			if AltCache.Checked then begin
-				for I := 0 to AltFileList.Count - 1 do
-					sl.Add(AltFileList.Items[I]);
-			end else if Assigned(devCompilerSets.CurrentSet) then // cache all include dirs if there are any
-				sl.Assign(devCompilerSets.CurrentSet.CppDir);
-
-			// Make it look busy
-			Screen.Cursor:=crHourglass;
-
-			// Add default include search directories if a compiler has been installed
-			if Assigned(devCompilerSets.CurrentSet) then begin
-				with devCompilerSets.CurrentSet do begin
-					for I := 0 to CDir.Count - 1 do
-						MainForm.CppParser.AddIncludePath(CDir[I]);
-					for I := 0 to CppDir.Count - 1 do
-						MainForm.CppParser.AddIncludePath(CppDir[I]);
-
-					// Add default include dirs last, just like gcc does
-					for I := 0 to DefInclude.Count - 1 do
-						MainForm.CppParser.AddIncludePath(DefInclude[I]);
+				// Relative paths make the recursive/loop searcher go nuts
+				sl[i] := ReplaceFirstStr(sl[i],'%path%\',devDirs.exec);
+				if DirectoryExists(sl[i]) then begin
+					FilesFromWildcard(sl[i], '*.*', f, false, false, false);
+					for j := 0 to f.Count - 1 do
+						MainForm.CppParser.AddFileToScan(f[j]);
 				end;
 			end;
-
-			f := TStringList.Create;
-			if not AltCache.Checked then begin
-				for i := 0 to sl.Count-1 do begin
-
-					// Relative paths make the recursive/loop searcher go nuts
-					sl[i] := ReplaceFirstStr(sl[i],'%path%\',devDirs.exec);
-					if DirectoryExists(sl[i]) then begin
-						FilesFromWildcard(sl[i], '*.*', f, false, false, false);
-						for j := 0 to f.Count - 1 do
-							MainForm.CppParser.AddFileToScan(f[j]);
-					end;
-				end;
-			end else begin
-				for i := 0 to sl.Count-1 do begin
-					// only pass full filenames
-					S := MainForm.CppParser.GetSystemHeaderFileName(sl[i]);
-					MainForm.CppParser.AddFileToScan(S);
-				end;
-			end;
-			sl.Free;
-			f.Free;
-
-			// Parse all given files.
-			MainForm.CppParser.ParseList;
-
-			// When done, save files
-			ParseLabel.Caption :=  Lang[ID_LANGFORM_SAVING];
-			Application.ProcessMessages;
-			MainForm.CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
-
-			MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;
-			MainForm.CppParser.OnEndParsing := MainForm.CppParserEndParsing;
-			MainForm.CppParser.OnTotalProgress := MainForm.CppParserTotalProgress;
-
-			MainForm.ClassBrowser.SetUpdateOn;
-
-			// Erase ALL memory of the C++ parser
-			MainForm.CppParser.Reset(false);
-
-			Screen.Cursor:=crDefault;
 		end else begin
-			devCodeCompletion.Enabled := true;
-			devCodeCompletion.ParseLocalHeaders := true;
-			devCodeCompletion.ParseGlobalHeaders := true; // can be slow without cache
-			devClassBrowsing.ShowInheritedMembers := false;
+			for i := 0 to sl.Count-1 do begin
+				// only pass full filenames
+				S := MainForm.CppParser.GetSystemHeaderFileName(sl[i]);
+				MainForm.CppParser.AddFileToScan(S);
+			end;
 		end;
-		OkBtn.Tag := 3;
-		OkBtn.Kind := bkOK;
-		OkBtn.ModalResult := mrOK;
-		OkBtn.Enabled := true;
-		CachePanel.Visible := false;
-		FinishPanel.Visible := true;
+		sl.Free;
+		f.Free;
+
+		// Parse all given files.
+		MainForm.CppParser.ParseList;
+
+		// When done, save files
+		ParseLabel.Caption :=  Lang[ID_LANGFORM_SAVING];
+		Application.ProcessMessages;
+		MainForm.CppParser.Save(devDirs.Config + DEV_COMPLETION_CACHE,devDirs.Exec);
+
+		MainForm.CppParser.OnStartParsing := MainForm.CppParserStartParsing;
+		MainForm.CppParser.OnEndParsing := MainForm.CppParserEndParsing;
+		MainForm.CppParser.OnTotalProgress := MainForm.CppParserTotalProgress;
+
+		// Erase ALL memory of the C++ parser
+		MainForm.CppParser.Reset(false);
+		MainForm.ClassBrowser.EndUpdate; // only mess with class browser once
+
+		Screen.Cursor:=crDefault;
+	end else begin
+		devCodeCompletion.Enabled := true;
+		devCodeCompletion.ParseLocalHeaders := true;
+		devCodeCompletion.ParseGlobalHeaders := true; // can be slow without cache
+		devClassBrowsing.ShowInheritedMembers := false;
+	end;
+	OkBtn.Tag := 3;
+	OkBtn.Kind := bkOK;
+	OkBtn.ModalResult := mrOK;
+	OkBtn.Enabled := true;
+	CachePanel.Visible := false;
+	FinishPanel.Visible := true;
+end;
+
+procedure TLangForm.OkBtnClick(Sender: TObject);
+begin
+	case OkBtn.Tag of
+		0: HandleLangPanel;
+		1: HandleEditPanel;
+		2: HandleCachePanel;
 	end;
 end;
 
@@ -340,7 +354,13 @@ var
 begin
 	f := TStringList.Create;
 	try
-		if NewSelectDirectory('Select Folder', devDirs.Exec, Dir) then begin
+		if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.CppDir.Count > 0) then
+			Dir := devCompilerSets.CurrentSet.CppDir[0]
+		else if devDirs.Default <> '' then
+			Dir := devDirs.Default
+		else
+			Dir := devDirs.Exec;
+		if NewSelectDirectory('Select Folder', '', Dir) then begin
 			FilesFromWildcard(Dir, '*.*', f, false, false, false);
 			for i := 0 to f.Count-1 do begin
 				s := f[i];

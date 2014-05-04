@@ -106,7 +106,6 @@ type
     btnResetDev: TButton;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure vleExternalEditButtonClick(Sender: TObject);
@@ -185,89 +184,6 @@ begin
 				Free;
 			end;
 		end;
-	end;
-end;
-
-procedure TEnviroForm.FormShow(Sender: TObject);
-var
-	I,sel: integer;
-begin
-	with devData do begin
-		// General, left column
-		cbDefCpp.Checked:= defCpp;
-		cbBackups.Checked:= BackUps;
-		cbMinOnRun.Checked:= MinOnRun;
-		cbShowBars.Checked:= ShowBars;
-		cbMultiLineTab.Checked:= MultiLineTab;
-		cbDblFiles.Checked:= DblFiles;
-		cbNoSplashScreen.Checked:= NoSplashScreen;
-		cbPauseConsole.Checked:=ConsolePause;
-		cbCheckAssocs.Checked:=CheckAssocs;
-		cbWatchHint.Checked := WatchHint;
-		cbShowProgress.Checked := ShowProgress;
-		cbAutoCloseProgress.Checked := AutoCloseProgress;
-
-		// General, right column
-		seMRUMax.Value:= MRUMax;
-		cboTabsTop.ItemIndex:= msgTabs;
-
-		// List the languages
-		cboLang.Items.BeginUpdate;
-		cboLang.Clear;
-		for I := 0 to Lang.Langs.Count - 1 do begin
-			sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[I]);
-			if SameText(Lang.CurrentLanguage,cboLang.Items[I]) then
-				cboLang.ItemIndex := sel;
-		end;
-		cboLang.Items.EndUpdate;
-
-		// List the themes
-		cboTheme.Items.Clear;
-		devImageThemes.GetThemeTitles(cboTheme.Items);
-		cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
-
-		// Add all font families and select the current one
-		cbUIfont.Items.Assign(Screen.Fonts);
-		for I := 0 to cbUIfont.Items.Count-1 do
-			if cbUIfont.Items.Strings[I] = InterfaceFont then begin
-				cbUIfont.ItemIndex := I;
-				break;
-			end;
-
-		// Do the same for the size selection
-		for I := 0 to cbUIfontsize.Items.Count-1 do
-			if StrToIntDef(cbUIfontsize.Items.Strings[I],-1) = InterfaceFontSize then begin
-				cbUIfontsize.ItemIndex := I;
-				break;
-			end;
-
-		// General tab, right column, last entry
-		rgbAutoOpen.ItemIndex:= AutoOpen;
-
-		// Directories tab
-		edOptionsDir.Text := devDirs.Config;
-		edUserDir.Text:= devDirs.Default;
-		edTemplatesDir.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Templates);
-		edIcoLib.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Icons);
-		edLang.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Lang);
-		edSplash.Text:= Splash;
-
-		// External Programs tab
-		vleExternal.Strings.Assign(devExternalPrograms.Programs);
-		for I := 0 to vleExternal.Strings.Count-1 do
-			vleExternal.ItemProps[I].EditStyle:=esEllipsis;
-
-		// File associations tab
-		lstAssocFileTypes.Clear;
-		for I := 0 to AssociationsCount-1 do begin
-			lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[I, 1], Associations[I, 0]]));
-			lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count-1]:=IsAssociated(I);
-		end;
-
-		// CVS Support tab
-		edCVSExec.Text:= devCVSHandler.Executable;
-		spnCVSCompression.Value:= devCVSHandler.Compression;
-		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
 	end;
 end;
 
@@ -372,14 +288,14 @@ begin
   cbPauseConsole.Caption:=       Lang[ID_ENV_PAUSECONSOLE];
   cbCheckAssocs.Caption:=        Lang[ID_ENV_CHECKASSOCS];
 
-  gbProgress.Caption:=           ' '+Lang[ID_ENV_COMPPROGRESSWINDOW]+' ';
+  gbProgress.Caption:=           Lang[ID_ENV_COMPPROGRESSWINDOW];
   cbShowProgress.Caption:=       Lang[ID_ENV_SHOWPROGRESS];
   cbAutoCloseProgress.Caption:=  Lang[ID_ENV_AUTOCLOSEPROGRESS];
 
   cbWatchHint.Caption :=         Lang[ID_ENV_WATCHHINT];
-  gbDebugger.Caption :=          ' '+Lang[ID_ENV_DEBUGGER]+' ';
+  gbDebugger.Caption :=          Lang[ID_ENV_DEBUGGER];
 
-  rgbAutoOpen.Caption:=          ' '+Lang[ID_ENV_AUTOOPEN]+' ';
+  rgbAutoOpen.Caption:=          Lang[ID_ENV_AUTOOPEN];
   rgbAutoOpen.Items[0]:=         Lang[ID_ENV_AUTOALL];
   rgbAutoOpen.Items[1]:=         Lang[ID_ENV_AUTOFIRST];
   rgbAutoOpen.Items[2]:=         Lang[ID_ENV_AUTOREMEMBER];
@@ -429,10 +345,89 @@ begin
 end;
 
 procedure TEnviroForm.FormCreate(Sender: TObject);
+var
+	I,sel: integer;
 begin
 	LoadText;
 
-	CheckAssociations(false); // read only, don't try to fix them
+	with devData do begin
+		// General, left column
+		cbDefCpp.Checked:= defCpp;
+		cbBackups.Checked:= BackUps;
+		cbMinOnRun.Checked:= MinOnRun;
+		cbShowBars.Checked:= ShowBars;
+		cbMultiLineTab.Checked:= MultiLineTab;
+		cbDblFiles.Checked:= DblFiles;
+		cbNoSplashScreen.Checked:= NoSplashScreen;
+		cbPauseConsole.Checked:=ConsolePause;
+		cbCheckAssocs.Checked:=CheckAssocs;
+		cbWatchHint.Checked := WatchHint;
+		cbShowProgress.Checked := ShowProgress;
+		cbAutoCloseProgress.Checked := AutoCloseProgress;
+
+		// General, right column
+		seMRUMax.Value:= MRUMax;
+		cboTabsTop.ItemIndex:= msgTabs;
+
+		// List the languages
+		cboLang.Items.BeginUpdate;
+		cboLang.Clear;
+		for I := 0 to Lang.Langs.Count - 1 do begin
+			sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[I]);
+			if SameText(Lang.CurrentLanguage,cboLang.Items[I]) then
+				cboLang.ItemIndex := sel;
+		end;
+		cboLang.Items.EndUpdate;
+
+		// List the themes
+		cboTheme.Items.Clear;
+		devImageThemes.GetThemeTitles(cboTheme.Items);
+		cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
+
+		// Add all font families and select the current one
+		cbUIfont.Items.Assign(Screen.Fonts);
+		for I := 0 to cbUIfont.Items.Count-1 do
+			if cbUIfont.Items.Strings[I] = InterfaceFont then begin
+				cbUIfont.ItemIndex := I;
+				break;
+			end;
+
+		// Do the same for the size selection
+		for I := 0 to cbUIfontsize.Items.Count-1 do
+			if StrToIntDef(cbUIfontsize.Items.Strings[I],-1) = InterfaceFontSize then begin
+				cbUIfontsize.ItemIndex := I;
+				break;
+			end;
+
+		// General tab, right column, last entry
+		rgbAutoOpen.ItemIndex:= AutoOpen;
+
+		// Directories tab
+		edOptionsDir.Text := devDirs.Config;
+		edUserDir.Text:= devDirs.Default;
+		edTemplatesDir.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Templates);
+		edIcoLib.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Icons);
+		edLang.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Lang);
+		edSplash.Text:= Splash;
+
+		// External Programs tab
+		vleExternal.Strings.Assign(devExternalPrograms.Programs);
+		for I := 0 to vleExternal.Strings.Count-1 do
+			vleExternal.ItemProps[I].EditStyle:=esEllipsis;
+
+		// File associations tab
+		CheckAssociations(false); // read only, don't try to fix them
+		lstAssocFileTypes.Clear;
+		for I := 0 to AssociationsCount-1 do begin
+			lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[I, 1], Associations[I, 0]]));
+			lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count-1]:=IsAssociated(I);
+		end;
+
+		// CVS Support tab
+		edCVSExec.Text:= devCVSHandler.Executable;
+		spnCVSCompression.Value:= devCVSHandler.Compression;
+		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
+	end;
 end;
 
 procedure TEnviroForm.vleExternalEditButtonClick(Sender: TObject);
@@ -519,7 +514,7 @@ end;
 procedure TEnviroForm.btnResetDevClick(Sender: TObject);
 begin
 	// Remove settings on exit
-	RemoveOptions(devDirs.Config);
+	RemoveOptionsDir(devDirs.Config);
 
 	// Quit without saving
 	TerminateProcess(GetCurrentProcess, 0);

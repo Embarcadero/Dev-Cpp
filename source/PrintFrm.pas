@@ -66,8 +66,8 @@ begin
 	Font.Size := devData.InterfaceFontSize;
 
   Caption:=                 Lang[ID_PRT];
-  grpParams.Caption:=       '  '+Lang[ID_PRT_GRP_PARAMS] +'  ';
-  grpPages.Caption:=        '  '+Lang[ID_PRT_GRP_PAGES]+'  ';
+  grpParams.Caption:=       Lang[ID_PRT_GRP_PARAMS];
+  grpPages.Caption:=        Lang[ID_PRT_GRP_PAGES];
   cbColors.Caption:=        Lang[ID_PRT_COLORS];
   cbHighlight.Caption:=     Lang[ID_PRT_HIGHLIGHT];
   cbWordWrap.Caption:=      Lang[ID_PRT_WORDWRAP];

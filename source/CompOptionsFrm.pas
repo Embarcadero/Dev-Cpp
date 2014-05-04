@@ -301,19 +301,15 @@ end;
 
 procedure TCompOptForm.btnBrowseClick(Sender: TObject);
 var
-{$IFDEF WIN32}
-  NewItem: AnsiString;
-{$ENDIF}
-{$IFDEF LINUX}
-  NewItem: WideString;
-{$ENDIF}
+	NewItem: AnsiString;
 begin
-  if (Trim(edEntry.Text)<>'') and DirectoryExists(Trim(edEntry.Text)) then
-    newitem:=edEntry.Text
-  else
-    newitem:=devDirs.Default;
-  if NewSelectDirectory('', '', NewItem) then
-   edEntry.Text:= NewItem;
+	NewItem := Trim(edEntry.Text);
+	if (NewItem <> '') and DirectoryExists(edEntry.Text) then
+		NewItem := edEntry.Text
+	else
+		NewItem := devDirs.Default;
+	if NewSelectDirectory('', '', NewItem) then
+		edEntry.Text := NewItem;
 end;
 
 procedure TCompOptForm.ButtonClick(Sender: TObject);
@@ -464,7 +460,7 @@ begin
 	lblDelayMsg.Caption:=                Lang[ID_COPT_DELAYMSG];
 
 	// Makefile generation
-	grpMakefileGen.Caption:=             ' '+Lang[ID_COPT_MAKEFILEGEN]+' ';
+	grpMakefileGen.Caption:=             Lang[ID_COPT_MAKEFILEGEN];
 	cbFastDep.Caption:=                  Lang[ID_COPT_FASTDEP];
 
 	OptionsTip.Caption:=                 Lang[ID_COPT_COMPILERTIP];
@@ -473,7 +469,7 @@ begin
 	lblProgramsText.Caption:=            Lang[ID_COPT_PROGRAMS];
 
 	// Text above compiler select
-	grpCompSet.Caption:=                 ' '+Lang[ID_COPT_COMPSETS]+' ';
+	grpCompSet.Caption:=                 Lang[ID_COPT_COMPSETS];
 
 	// Set some hints too
 	BtnFindCompilers.Hint:=              Lang[ID_COPT_FINDCOMPHINT];
@@ -562,13 +558,17 @@ end;
 
 procedure TCompOptForm.btnAddFilledCompilerSetClick(Sender: TObject);
 var
-	S: AnsiString;
+	Directory: AnsiString;
 begin
-	if not NewSelectDirectory('','',S) then
+	if devDirs.Default <> '' then
+		Directory := devDirs.Default
+	else
+		Directory := devDirs.Exec;
+	if not NewSelectDirectory('','',Directory) then
 		Exit;
 
 	// Add empty compiler set
-	devCompilerSets.AddSet(S);
+	devCompilerSets.AddSet(Directory);
 
 	// Add name to list
 	cmbCompilerSetComp.ItemIndex := cmbCompilerSetComp.Items.Add(devCompilerSets[devCompilerSets.Count-1].Name);

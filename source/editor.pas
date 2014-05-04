@@ -328,8 +328,7 @@ begin
 	InitCompletion;
 
 	// Setup a monitor which keeps track of outside-of-editor changes
-	MainForm.devFileMonitor.Files.Add(fFileName);
-	MainForm.devFileMonitor.Refresh(True);
+	MainForm.FileMonitor.Monitor(fFileName);
 
 	// Set status bar for the first time
 	EditorStatusChange(Self,[scInsertMode]);
@@ -342,11 +341,7 @@ var
 	e: TEditor;
 begin
 	// Deactivate the file change monitor
-	I := MainForm.devFileMonitor.Files.IndexOf(fFileName);
-	if I <> -1 then begin
-		MainForm.devFileMonitor.Files.Delete(I);
-		MainForm.devFileMonitor.Refresh(False);
-	end;
+	MainForm.FileMonitor.UnMonitor(fFileName);
 
 	// Destroy any completion stuff
 	DestroyCompletion;
@@ -399,13 +394,12 @@ end;
 
 procedure TEditor.EditorGutterClick(Sender: TObject; Button: TMouseButton;x, y, Line: integer; mark: TSynEditMark);
 begin
-	// Toggle breakpoint at line
 	ToggleBreakPoint(Line);
 end;
 
 procedure TEditor.ToggleBreakpoint(Line: integer);
 var
-	thisbreakpoint : integer;
+	thisbreakpoint, DisplayLine : integer;
 begin
 	thisbreakpoint := HasBreakPoint(Line);
 
@@ -414,8 +408,10 @@ begin
 	else
 		MainForm.Debugger.AddBreakPoint(Line,self);
 
-	fText.InvalidateGutterLine(line);
-	fText.InvalidateLine(line);
+	// Convert buffer to display position
+	DisplayLine := fText.UncollapsedLineToLine(Line);
+	fText.InvalidateGutterLine(DisplayLine);
+	fText.InvalidateLine(DisplayLine);
 end;
 
 function TEditor.HasBreakPoint(Line : integer): integer;
@@ -427,7 +423,7 @@ begin
 		if integer(PBreakPoint(MainForm.Debugger.BreakPointList.Items[I])^.editor) = integer(self) then
 			if PBreakPoint(MainForm.Debugger.BreakPointList.Items[I])^.line = Line then begin
 				Result := I;
- 				break;
+				break;
 			end;
 end;
 
@@ -1234,8 +1230,11 @@ begin
 		// Copy backward until end of word
 		if Purpose in [wpCompletion,wpEvaluation,wpInformation] then begin
 			while (WordBegin > 0) and (WordBegin <= len) do begin
-				if (s[WordBegin] = '[') then begin
-					if not FindComplement(s,'[',']',WordBegin,-1) then break;
+				if (s[WordBegin] = ']') then begin
+					if not FindComplement(s,']','[',WordBegin,-1) then
+						break
+					else
+						Dec(WordBegin); // step over [
 				end else if (s[WordBegin] in fText.IdentChars) then begin
 					Dec(WordBegin);
 				end else if s[WordBegin] in ['.',':','~'] then begin // allow destructor signs
@@ -1275,7 +1274,7 @@ begin
 			ParamBegin := Pos('[',Result);
 			if ParamBegin > 0 then begin
 				ParamEnd := ParamBegin;
-				if FindComplement(Result,'(',']',ParamEnd,1) then begin
+				if FindComplement(Result,'[',']',ParamEnd,1) then begin
 					Delete(Result,ParamBegin,ParamEnd - ParamBegin + 1);
 				end else
 					break;
@@ -1666,8 +1665,8 @@ begin
 		end;
 	end;
 
-	wa := MainForm.devFileMonitor.Active;
-	MainForm.devFileMonitor.Deactivate;
+	wa := MainForm.FileMonitor.Active;
+	MainForm.FileMonitor.Deactivate;
 
 	// Filename already present? Save without dialog
 	if (not fNew) and fText.Modified then begin
@@ -1686,7 +1685,7 @@ begin
 		Result := SaveAs; // we need a file name, use dialog
 
 	if wa then
-		MainForm.devFileMonitor.Activate;
+		MainForm.FileMonitor.Activate;
 end;
 
 function TEditor.SaveAs : boolean;
@@ -1694,7 +1693,7 @@ begin
 	Result := True;
 	with TSaveDialog.Create(Application) do try
 
-		Title := Lang[ID_NV_SAVEFILE];
+		Title := Lang[ID_NV_SAVEAS];
 		Filter := BuildFilter([FLT_CS,FLT_CPPS,FLT_HEADS,FLT_RES]);
 		Options := Options + [ofOverwritePrompt];
 
@@ -1747,6 +1746,9 @@ begin
 
 			// We haven't scanned it yet...
 			MainForm.CppParser.ReParseFile(FileName,InProject);
+
+			// Update class browser
+			MainForm.ClassBrowser.CurrentFile := FileName;
 		end else
 			Result := False;
 	finally

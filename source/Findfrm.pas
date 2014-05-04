@@ -462,7 +462,7 @@ begin
   //controls
   lblFind.Caption:=        Lang[ID_FIND_TEXT];
   lblReplace.Caption:=     Lang[ID_FIND_REPLACEWITH];
-  grpOptions.Caption:=     '  '+Lang[ID_FIND_GRP_OPTIONS] +'  ';
+  grpOptions.Caption:=     Lang[ID_FIND_GRP_OPTIONS];
   cbMatchCase.Caption:=    Lang[ID_FIND_CASE];
   cbWholeWord.Caption:=    Lang[ID_FIND_WWORD];
   cbPrompt.Caption:=       Lang[ID_FIND_PROMPTREPLACE];
@@ -472,15 +472,15 @@ begin
   rbOpenFIles.Caption:=    Lang[ID_FIND_OPENFILES];
   rbCurFile.Caption:=      Lang[ID_FIND_CURRENTFILE];
 
-  grpScope.Caption:=       '  ' +Lang[ID_FIND_GRP_SCOPE] +'  ';
+  grpScope.Caption:=       Lang[ID_FIND_GRP_SCOPE];
   rbGlobal.Caption:=       Lang[ID_FIND_GLOBAL];
   rbSelectedOnly.Caption:= Lang[ID_FIND_SELONLY];
 
-  grpOrigin.Caption:=      '  ' +Lang[ID_FIND_GRP_ORIGIN] +'  ';
+  grpOrigin.Caption:=      Lang[ID_FIND_GRP_ORIGIN];
   rbFromCursor.Caption:=   Lang[ID_FIND_CURSOR];
   rbEntireScope.Caption:=  Lang[ID_FIND_ENTIRE];
 
-  grpDirection.Caption:=   '  ' +Lang[ID_FIND_GRP_DIRECTION] +'  ';
+  grpDirection.Caption:=   Lang[ID_FIND_GRP_DIRECTION];
   rbForward.Caption:=      Lang[ID_FIND_FORE];
   rbBackward.Caption:=     Lang[ID_FIND_BACK];
 

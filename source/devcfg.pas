@@ -219,8 +219,7 @@ type
   // class-browsing view style
   TdevClassBrowsing = class(TPersistent)
   private
-    fCBViewStyle: integer;
-    fShowFilter: integer; // 0 - show all, 1 - show project, 2 - show current
+    fShowFilter: integer;
     fShowInheritedMembers: boolean;
   public
     constructor Create;
@@ -228,7 +227,6 @@ type
     procedure SaveSettings;
     procedure LoadSettings;
   published
-    property ViewStyle: integer read fCBViewStyle write fCBViewStyle;
     property ShowFilter: integer read fShowFilter write fShowFilter;
     property ShowInheritedMembers: boolean read fShowInheritedMembers write fShowInheritedMembers;
   end;
@@ -688,10 +686,10 @@ type
 
 function devData: TdevData;
 
-procedure InitializeOptions;
+procedure CreateOptions;
 procedure SaveOptions;
-procedure FinalizeOptions;
-procedure RemoveOptions(const OptionsDir : AnsiString);
+procedure DestroyOptions;
+procedure RemoveOptionsDir(const Directory : AnsiString);
 
 var
   devCompilerSets: TdevCompilerSets = nil;
@@ -703,7 +701,6 @@ var
   devExternalPrograms: TdevExternalPrograms = nil;
 
   ConfigMode : (CFG_APPDATA, CFG_PARAM, CFG_EXEFOLDER) = CFG_APPDATA;
-  DontRecreateSingletons : boolean;
 
 implementation
 
@@ -717,14 +714,14 @@ uses
   FileAssocs, Types;
 {$ENDIF}
 
-procedure InitializeOptions;
+procedure CreateOptions;
 var
 	I : integer;
 begin
-	if not assigned(devDirs) then
+	if not Assigned(devDirs) then
 		devDirs:= TdevDirs.Create;
 
-	if not assigned(devCompilerSets) then
+	if not Assigned(devCompilerSets) then
 		devCompilerSets:= TdevCompilerSets.Create;
 
 	// load available compiler sets on first run
@@ -765,16 +762,16 @@ begin
 	if not assigned(devEditor) then
 		devEditor:= TdevEditor.Create;
 
-	if not assigned(devCodeCompletion) then
+	if not Assigned(devCodeCompletion) then
 		devCodeCompletion:= TdevCodeCompletion.Create;
 
-	if not assigned(devClassBrowsing) then
+	if not Assigned(devClassBrowsing) then
 		devClassBrowsing:= TdevClassBrowsing.Create;
 
-	if not assigned(devCVSHandler) then
+	if not Assigned(devCVSHandler) then
 		devCVSHandler:= TdevCVSHandler.Create;
 
-	if not assigned(devExternalPrograms) then
+	if not Assigned(devExternalPrograms) then
 		devExternalPrograms:= TdevExternalPrograms.Create;
 end;
 
@@ -790,7 +787,7 @@ begin
   devExternalPrograms.SaveSettings;
 end;
 
-procedure FinalizeOptions;
+procedure DestroyOptions;
 begin
   // devData is freed last
   devDirs.Free;
@@ -802,17 +799,17 @@ begin
   devExternalPrograms.Free;
 end;
 
-procedure RemoveOptions(const OptionsDir : AnsiString);
+procedure RemoveOptionsDir(const Directory : AnsiString);
 var
 	fostruct : SHFILEOPSTRUCT;
 	DirFrom,DirTo : array[0..MAX_PATH] of char;
 begin
 	// Copy and delete
 	FillChar(DirFrom, Sizeof(DirFrom),0);
-	StrPCopy(DirFrom, OptionsDir);
+	StrPCopy(DirFrom, Directory);
 
 	FillChar(DirTo, Sizeof(DirFrom),0);
-	StrPCopy(DirTo, ExcludeTrailingBackslash(OptionsDir) + 'Backup' + pd);
+	StrPCopy(DirTo, ExcludeTrailingBackslash(Directory) + 'Backup' + pd);
 
 	FillChar(fostruct,Sizeof(fostruct),0);
 	with fostruct do begin
@@ -839,7 +836,7 @@ var
 
 function devData: TdevData;
 begin
-	if not assigned(fdevData) and not DontRecreateSingletons then
+	if not Assigned(fdevData) and not Application.Terminated then
 		fdevData := TdevData.Create;
 	result := fDevData; // assume constructor succeeded
 end;
@@ -2110,14 +2107,15 @@ end;
 
 procedure TdevDirs.SettoDefaults;
 begin
-	fExec:= IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
-	fConfig := fExec;
+	fExec    := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
+	fConfig  := fExec;
 
 	fHelp    := fExec + HELP_DIR;
 	fIcons   := fExec + ICON_DIR;
 	fLang    := fExec + LANGUAGE_DIR;
 	fTemp    := fExec + TEMPLATE_DIR;
 	fThemes  := fExec + THEME_DIR;
+	fDefault := fExec;
 end;
 
 procedure TdevDirs.LoadSettings;
@@ -2419,8 +2417,7 @@ end;
 
 procedure TdevClassBrowsing.SettoDefaults;
 begin
-	fCBViewStyle:=0;
-	fShowFilter:=0;
+	fShowFilter := 2; // sfCurrent
 	fShowInheritedMembers:=False;
 end;
 

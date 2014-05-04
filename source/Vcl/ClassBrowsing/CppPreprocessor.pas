@@ -220,7 +220,7 @@ begin
 	FileItem^.Buffer := TStringList.Create;
 
 	// Don't parse stuff we have already parsed
-	if (FastIndexOf(fScannedFiles,FileName) = - 1) or Assigned(Stream) then begin
+	if Assigned(Stream) or (FastIndexOf(fScannedFiles,FileName) = - 1) then begin
 
 		// Keep track of files we include here
 		// Only create new items for files we have NOT scanned yet

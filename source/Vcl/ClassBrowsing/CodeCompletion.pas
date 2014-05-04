@@ -16,15 +16,7 @@
     along with Dev-C++; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
-{
 
-    History:
-    
-      23 May 2004 - Peter Schraut (peter_)
-        * Fixed this issue in TCodeCompletion.Search:
-          https://sourceforge.net/tracker/index.php?func=detail&aid=935068&group_id=10639&atid=110639
-    
-}
 unit CodeCompletion;
 
 interface
@@ -59,8 +51,10 @@ type
     fOnResize: TNotifyEvent;
     fOnlyGlobals: boolean;
     fCurrentStatement: PStatement;
-    fIncludedFiles: TStringList;
     fHideDelay: integer; // allow empty list once, then hide when empty again
+    fIncludedFiles: TStringList;
+    fIsIncludedCacheFileName: AnsiString;
+    fIsIncludedCacheResult: boolean;
     function ApplyClassFilter(Index, CurrentID: integer; InheritanceIDs: TIntList): boolean;
     function ApplyMemberFilter(Index, CurrentID, ParentID: integer; InheritanceIDs: TIntList): boolean;
     procedure GetCompletionFor(Phrase : AnsiString);
@@ -129,6 +123,9 @@ begin
   fOnlyGlobals := False;
   fShowCount := 100; // keep things fast
   fHideDelay := 0;
+
+  fIsIncludedCacheFileName := '';
+  fIsIncludedCacheResult := false;
 end;
 
 destructor TCodeCompletion.Destroy;
@@ -197,6 +194,10 @@ var
 	CurrentID, ParentID: integer;
 	parent : PStatement;
 begin
+	// Reset filter cache
+	fIsIncludedCacheFileName := '';
+	fIsIncludedCacheResult := false;
+
 	// Pulling off the same trick as in TCppParser.FindStatementOf, but ignore everything after last operator
 	InheritanceIDs := TIntList.Create;
 	try
@@ -378,7 +379,14 @@ end;
 
 function TCodeCompletion.IsIncluded(const FileName: AnsiString): boolean;
 begin
-  Result := FastIndexOf(fIncludedFiles,FileName) <> -1;
+	// Only do the slow check if the cache is invalid
+	if not SameStr(FileName,fIsIncludedCacheFileName) then begin
+		fIsIncludedCacheFileName := FileName;
+		fIsIncludedCacheResult := FastIndexOf(fIncludedFiles,FileName) <> -1;
+	end;
+
+	// Cache has been updated. Use it.
+	Result := fIsIncludedCacheResult;
 end;
 
 function TCodeCompletion.IsVisible : boolean;

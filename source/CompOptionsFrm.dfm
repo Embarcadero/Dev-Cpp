@@ -440,51 +440,51 @@ object CompOptForm: TCompOptForm
       object lblgcc: TLabel
         Left = 24
         Top = 72
-        Width = 28
+        Width = 25
         Height = 15
-        Caption = 'gcc : '
+        Caption = 'gcc: '
       end
       object lblgpp: TLabel
         Left = 24
         Top = 116
-        Width = 32
+        Width = 29
         Height = 15
-        Caption = 'g++ : '
+        Caption = 'g++: '
       end
       object lblmake: TLabel
         Left = 24
         Top = 160
-        Width = 38
+        Width = 35
         Height = 15
-        Caption = 'make : '
+        Caption = 'make: '
       end
       object lblgdb: TLabel
         Left = 24
         Top = 204
-        Width = 30
+        Width = 27
         Height = 15
-        Caption = 'gdb : '
+        Caption = 'gdb: '
       end
       object lblwindres: TLabel
         Left = 24
         Top = 248
-        Width = 50
+        Width = 47
         Height = 15
-        Caption = 'windres : '
+        Caption = 'windres: '
       end
       object lbldllwrap: TLabel
         Left = 24
         Top = 292
-        Width = 48
+        Width = 45
         Height = 15
-        Caption = 'dllwrap : '
+        Caption = 'dllwrap: '
       end
       object lblgprof: TLabel
         Left = 24
         Top = 336
-        Width = 38
+        Width = 35
         Height = 15
-        Caption = 'gprof : '
+        Caption = 'gprof: '
       end
       object btnBrowse2: TSpeedButton
         Tag = 2

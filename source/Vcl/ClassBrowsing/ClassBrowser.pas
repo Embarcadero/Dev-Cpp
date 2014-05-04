@@ -90,16 +90,17 @@ type
     fImagesRecord: TImagesRecord;
     fShowFilter: TShowFilter;
     fCurrentFile: AnsiString;
-    fCurrentFileHeader: AnsiString;
-    fCurrentFileImpl: AnsiString;
     fProjectDir: AnsiString;
     fClassFoldersFile: AnsiString;
     fFolders: array of TFolders;
     fFolderAssocs: array of TFolderAssocs;
     fLastSelection: AnsiString;
     fCnv: TControlCanvas;
-    fParserBusy: boolean;
     fShowInheritedMembers: boolean;
+    fIncludedFiles: TStringList;
+    fIsIncludedCacheFileName: AnsiString;
+    fIsIncludedCacheResult: boolean;
+    fUpdateCount: integer;
     procedure SetParser(Value: TCppParser);
     procedure AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
     procedure AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
@@ -127,6 +128,7 @@ type
     function IndexOfFolder(const Fld: AnsiString): integer;
     procedure ReSelect;
     procedure SetShowInheritedMembers(const Value: boolean);
+    function IsIncluded(const FileName: AnsiString): boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -136,8 +138,8 @@ type
     procedure RemoveFolder(S: AnsiString);
     procedure RenameFolder(Old, New: AnsiString);
     function FolderCount: integer;
-    procedure SetUpdateOn;
-    procedure SetUpdateOff;
+    procedure BeginUpdate;
+    procedure EndUpdate;
   published
     property Align;
     property Font;
@@ -173,6 +175,57 @@ begin
 end;
 
 { TClassBrowser }
+
+constructor TClassBrowser.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  OnMouseUp := OnNodeChange;
+  OnMouseDown := OnNodeChanging;
+  DragMode := dmAutomatic;
+  OnDragOver := myDragOver;
+  OnDragDrop := myDragDrop;
+  SetLength(fFolders, 0);
+  SetLength(fFolderAssocs, 0);
+  fImagesRecord := TImagesRecord.Create;
+  fCurrentFile := '';
+  fShowFilter := sfCurrent;
+  fProjectDir := '';
+  fClassFoldersFile := '';
+  ShowHint := True;
+  HideSelection := False;
+  RightClickSelect := True;
+  fShowInheritedMembers := False;
+  fCnv := TControlCanvas.Create;
+  fCnv.Control := Self;
+  fCnv.Font.Assign(Self.Font);
+  OnAdvancedCustomDrawItem := AdvancedCustomDrawItem;
+  fIncludedFiles := TStringList.Create;
+  fIsIncludedCacheFileName := '';
+  fIsIncludedCacheResult := false;
+  fUpdateCount := 0;
+end;
+
+destructor TClassBrowser.Destroy;
+begin
+  SetLength(fFolderAssocs, 0);
+  SetLength(fFolders, 0);
+  FreeAndNil(fImagesRecord);
+  FreeAndNil(fCnv);
+  fIncludedFiles.Free;
+  inherited Destroy;
+end;
+
+procedure TClassBrowser.BeginUpdate;
+begin
+	Inc(fUpdateCount);
+end;
+
+procedure TClassBrowser.EndUpdate;
+begin
+	Dec(fUpdateCount);
+	if fUpdateCount = 0 then
+		UpdateView;
+end;
 
 procedure TClassBrowser.SetNodeImages(Node: TTreeNode; Statement: PStatement);
 var
@@ -253,9 +306,7 @@ begin
 		bInherited := False;
 		for I := iFrom to fParser.Statements.Count - 1 do begin
 			with PStatement(fParser.Statements[I])^ do begin
-
-				// TODO: for now, do NOT show loaded items
-				if not _Visible or _Loaded or _Temporary then
+				if not _Visible or _Temporary then
 					Continue;
 
 				// Prevent infinite parent/child loops
@@ -276,11 +327,11 @@ begin
 							AddStatementNode(I);
 					end;
 					sfSystemFiles : begin
-						if _InSystemHeader then
+						if _InSystemHeader and IsIncluded(_FileName) then
 							AddStatementNode(I); // only show system header stuff
 					end;
 					sfCurrent: begin
-						if SameText(_Filename,fCurrentFileHeader) or SameText(_Filename,fCurrentFileImpl) or bInherited then
+						if not _InSystemHeader and IsIncluded(_FileName) then
 							AddStatementNode(I);
 					end;
 					sfProject: begin
@@ -295,66 +346,44 @@ begin
 	end;
 end;
 
-constructor TClassBrowser.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  OnMouseUp := OnNodeChange;
-  OnMouseDown := OnNodeChanging;
-  DragMode := dmAutomatic;
-  OnDragOver := myDragOver;
-  OnDragDrop := myDragDrop;
-  SetLength(fFolders, 0);
-  SetLength(fFolderAssocs, 0);
-  fImagesRecord := TImagesRecord.Create;
-  fCurrentFile := '';
-  fCurrentFileHeader := '';
-  fCurrentFileImpl := '';
-  fShowFilter := sfAll;
-  fParserBusy := False;
-  fProjectDir := '';
-  fClassFoldersFile := '';
-  ShowHint := True;
-  HideSelection := False;
-  RightClickSelect := True;
-  fShowInheritedMembers := False;
-  fCnv := TControlCanvas.Create;
-  fCnv.Control := Self;
-  fCnv.Font.Assign(Self.Font);
-  OnAdvancedCustomDrawItem := AdvancedCustomDrawItem;
-end;
-
-destructor TClassBrowser.Destroy;
-begin
-  SetLength(fFolderAssocs, 0);
-  SetLength(fFolders, 0);
-  FreeAndNil(fImagesRecord);
-  FreeAndNil(fCnv);
-  inherited Destroy;
-end;
-
 procedure TClassBrowser.UpdateView;
 begin
-  if fParser = nil then
-    Exit;
+	if not Assigned(fParser) then
+		Exit;
+	if fCurrentFile = '' then
+		Exit;
+	if fUpdateCount <> 0 then
+		Exit;
 
-  Screen.Cursor := crHourGlass;
-  fParserBusy := True;
-  Items.BeginUpdate;
-  Clear;
-  ReadClassFolders;
-  AddMembers(nil, -1, -1);
-  Sort;
-  if fLastSelection <> '' then
-    ReSelect;
-  WriteClassFolders;
-  Items.EndUpdate;
-  fParserBusy := False;
-  Screen.Cursor := crDefault;
-  Repaint;
+	// We are busy...
+	Items.BeginUpdate;
+	Clear;
+
+	// Update file includes, reset cache
+	fParser.GetFileIncludes(fCurrentFile,fIncludedFiles);
+	fIsIncludedCacheFileName := '';
+	fIsIncludedCacheResult := false;
+
+	// Did the user add custom folders?
+	ReadClassFolders;
+
+	// Add everything recursively
+	AddMembers(nil, -1, -1);
+	Sort;
+
+	// Remember selection
+	if fLastSelection <> '' then
+		ReSelect;
+
+	// Add custom folders
+	WriteClassFolders;
+	Items.EndUpdate;
+
+	// Always fully repaint.
+	Repaint;
 end;
 
-procedure TClassBrowser.OnNodeChanging(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TClassBrowser.OnNodeChanging(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   Node: TTreeNode;
 begin
@@ -422,39 +451,14 @@ begin
   end;
 end;
 
-procedure TClassBrowser.SetParser(Value: TCppParser);
+procedure TClassBrowser.OnParserBusy(Sender: TObject);
 begin
-  if Value <> fParser then begin
-    fParser := Value;
-    if Assigned(fParser) then begin
-      fParser.OnUpdate := OnParserUpdate;
-      fParser.OnBusy := OnParserBusy;
-    end;
-    UpdateView;
-  end;
-end;
-
-procedure TClassBrowser.SetUpdateOn;
-begin
-  if Assigned(fParser) then
-    fParser.OnUpdate := OnParserUpdate;
-end;
-
-procedure TClassBrowser.SetUpdateOff;
-begin
-  if Assigned(fParser) then
-    fParser.OnUpdate := nil;
+	BeginUpdate;
 end;
 
 procedure TClassBrowser.OnParserUpdate(Sender: TObject);
 begin
-  fParserBusy := False;
-  UpdateView;
-end;
-
-procedure TClassBrowser.OnParserBusy(Sender: TObject);
-begin
-  fParserBusy := True;
+	EndUpdate;
 end;
 
 function CustomSortProc(Node1, Node2: TTreeNode; Data: Integer): Integer; stdcall;
@@ -472,21 +476,6 @@ begin
   CustomSort(@CustomSortProc, 0);
 end;
 
-procedure TClassBrowser.SetCurrentFile(const Value: AnsiString);
-begin
-	// Saves an expensive UpdateView
-	if Value = fCurrentFile then
-		Exit;
-	if not (fShowFilter in [sfCurrent{,sfSystemFiles}]) then
-		Exit;
-
-	// Get current file pair
-	fCurrentFile := Value;
-	cbutils.GetSourcePair(fCurrentFile,fCurrentFileImpl,fCurrentFileHeader);
-
-	UpdateView;
-end;
-
 procedure TClassBrowser.Clear;
 begin
   Items.Clear;
@@ -494,16 +483,46 @@ begin
   SetLength(fFolderAssocs, 0);
 end;
 
+procedure TClassBrowser.SetParser(Value: TCppParser);
+begin
+	if Value = fParser then
+		Exit;
+
+	fParser := Value;
+	if Assigned(fParser) then begin
+		fParser.OnUpdate := OnParserUpdate;
+		fParser.OnBusy := OnParserBusy;
+	end;
+	UpdateView;
+end;
+
+procedure TClassBrowser.SetCurrentFile(const Value: AnsiString);
+begin
+	if Value = fCurrentFile then
+		Exit;
+	fCurrentFile := Value;
+	if fShowFilter = sfAll then // content does not depend on current file. do NOT redraw
+		Exit;
+	UpdateView;
+end;
+
 procedure TClassBrowser.SetShowFilter(const Value: TShowFilter);
 begin
-	if fShowFilter <> Value then begin
-		fShowFilter := Value;
-		UpdateView;
-	end;
+	if fShowFilter = Value then
+		Exit;
+	fShowFilter := Value;
+	UpdateView;
+end;
+
+procedure TClassBrowser.SetShowInheritedMembers(const Value: boolean);
+begin
+	if Value = fShowInheritedMembers then
+		Exit;
+	fShowInheritedMembers := Value;
+	UpdateView;
 end;
 
 // returns the index to fFolders it belongs or -1 if does not
-
 function TClassBrowser.BelongsToFolder(const Cmd: AnsiString): integer;
 var
 	I: integer;
@@ -895,9 +914,6 @@ var
 	bInherited: boolean;
 	typetext : AnsiString;
 begin
-	if fParserBusy then
-		Exit;
-
 	// Assume the node image is correct
 	bInherited := fShowInheritedMembers and (Node.ImageIndex in [
 		fImagesRecord.fInhMethodProtectedImg,
@@ -935,13 +951,16 @@ begin
 	end;
 end;
 
-procedure TClassBrowser.SetShowInheritedMembers(const Value: boolean);
+function TClassBrowser.IsIncluded(const FileName: AnsiString): boolean;
 begin
-  if Value <> fShowInheritedMembers then begin
-    fShowInheritedMembers := Value;
-    if not fParserBusy then
-      UpdateView;
-  end;
+	// Only do the slow check if the cache is invalid
+	if not SameStr(FileName,fIsIncludedCacheFileName) then begin
+		fIsIncludedCacheFileName := FileName;
+		fIsIncludedCacheResult := FastIndexOf(fIncludedFiles,FileName) <> -1;
+	end;
+
+	// Cache has been updated. Use it.
+	Result := fIsIncludedCacheResult;
 end;
 
 end.

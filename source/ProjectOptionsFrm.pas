@@ -265,19 +265,19 @@ begin
 	if (NewItem <> '') and DirectoryExists(NewItem) then
 		newitem := edDirEntry.Text
 	else
-		newitem := devDirs.Default;
+		newitem := fProjectCopy.Directory;
 
 	case SubTabs.TabIndex of
 		0: begin // Lib tab
-			if NewSelectDirectory('Library Directory', '', newitem) then
+			if NewSelectDirectory('Library Directory', '', NewItem) then
 				edDirEntry.Text := NewItem;
 		end;
 		1: begin // Include tab
-			if NewSelectDirectory('Include Directory', '', newitem) then
+			if NewSelectDirectory('Include Directory', '', NewItem) then
 				edDirEntry.Text:= NewItem;
 		end;
 		2: begin // Resource dir Tab
-			if NewSelectDirectory('Resource Directory', '', newitem) then
+			if NewSelectDirectory('Resource Directory', '', NewItem) then
 				edDirEntry.Text:= NewItem;
 		end;
 	end;
@@ -636,9 +636,9 @@ begin
   lblFname.Caption:=      Lang[ID_PROPS_FILENAME]+':';
   lblPrjOutput.Caption:=  Lang[ID_POPT_OUTPUTFILENAME]+':';
   lblUnits.Caption:=      Lang[ID_POPT_FILESTAB]+':';
-  grpIcon.Caption:=       '  '+Lang[ID_POPT_GRP_ICON] +'  ';
+  grpIcon.Caption:=       Lang[ID_POPT_GRP_ICON];
   btnIconLib.Caption:=    Lang[ID_POPT_ICOLIB];
-  grpType.Caption:=       '  '+Lang[ID_POPT_GRP_TYPE]+'  ';
+  grpType.Caption:=       Lang[ID_POPT_GRP_TYPE];
   lstType.Clear;
   lstType.Items.Append(Lang[ID_POPT_TYPE1]);
   lstType.Items.Append(Lang[ID_POPT_TYPE2]);
@@ -649,10 +649,10 @@ begin
 
   // compiler tab
   tabCompOpts.Caption:=    Lang[ID_PARAM_CAPTION];
-  lblAdditions.Caption:=   '  '+Lang[ID_POPT_ADDITIONAL]+'  ';
+  lblAdditions.Caption:=   Lang[ID_POPT_ADDITIONAL];
   lblCompiler.Caption:=    Lang[ID_POPT_CCOMP];
-  lblCppCompiler.Caption:= Lang[ID_COPT_GRP_CPP];
-  lblLinker.Caption:=      Lang[ID_COPT_LINKERTAB];
+  lblCppCompiler.Caption:= Lang[ID_POPT_CPPCOMP];
+  lblLinker.Caption:=      Lang[ID_POPT_LINKER];
   AddLibBtn.Caption:=      Lang[ID_POPT_ADDLIBRARY];
 
   // Settings
@@ -698,7 +698,7 @@ begin
   tabFiles.Caption:=           Lang[ID_POPT_FILESTAB];
   lblCompilerSet.Caption:=     Lang[ID_POPT_COMP];
   lblCompilerHint.Caption:=    Lang[iD_POPT_COMPCUSTOMHINT];
-  grpUnitOptions.Caption:=     '  '+Lang[ID_POPT_UNITOPTS]+'  ';
+  grpUnitOptions.Caption:=     Lang[ID_POPT_UNITOPTS];
   lblPriority.Caption:=        Lang[ID_POPT_BUILDPRIORITY];
   chkCompile.Caption:=         Lang[ID_POPT_COMPUNIT];
   chkCompileCpp.Caption:=      Lang[ID_POPT_UNITUSEGPP];
@@ -708,7 +708,7 @@ begin
   // version info tab
   tabVersion.Caption:=         Lang[ID_POPT_VERTAB];
   chkVersionInfo.Caption:=     Lang[ID_POPT_INCLUDEVERSION];
-  grpVersion.Caption:=         '  '+Lang[ID_POPT_VDETAILS]+'  ';
+  grpVersion.Caption:=         Lang[ID_POPT_VDETAILS];
   lblVerMajor.Caption:=        Lang[ID_POPT_VMAJOR];
   lblVerMinor.Caption:=        Lang[ID_POPT_VMINOR];
   lblVerRel.Caption:=          Lang[ID_POPT_VRELEASE];
@@ -734,7 +734,7 @@ var
   Dir: WideString;
 {$ENDIF}
 begin
-	if fProjectCopy.Options.ExeOutput<>'' then
+	if fProjectCopy.Options.ExeOutput <> '' then
 		Dir := ExpandFileto(fProjectCopy.Options.ExeOutput, fProjectCopy.Directory)
 	else
 		Dir := fProjectCopy.Directory;

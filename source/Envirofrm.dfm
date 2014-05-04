@@ -15,7 +15,6 @@ object EnviroForm: TEnviroForm
   Position = poOwnerFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
   DesignSize = (
     484
     462)

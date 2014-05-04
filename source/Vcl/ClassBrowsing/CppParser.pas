@@ -1523,9 +1523,10 @@ var
 	LastType: AnsiString;
 	Args: AnsiString;
 	Cmd: AnsiString;
+	EnumName: AnsiString;
 	I: integer;
 begin
-	LastType := 'enum ';
+	EnumName := '';
 	Inc(fIndex); //skip 'enum'
 	if fTokenizer[fIndex]^.Text[1] = '{' then begin // enum {...} NAME
 
@@ -1535,19 +1536,41 @@ begin
 		// Have we found the name?
 		if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = '}') then
 			if fTokenizer[I + 1]^.Text[1] <> ';' then
-				LastType := LastType + fTokenizer[I + 1]^.Text + ' ';
+				EnumName := EnumName + fTokenizer[I + 1]^.Text + ' ';
 	end else begin // enum NAME {...};
 		while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in ['{', ';'])) do begin
-			LastType := LastType + fTokenizer[fIndex]^.Text + ' ';
+			EnumName := EnumName + fTokenizer[fIndex]^.Text + ' ';
 			Inc(fIndex);
 		end;
 
 		// An opening brace must be present after NAME
 		if (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] <> '{') then
 			Exit;
-	end;
-	LastType := Trim(LastType);
 
+		// Skip opening brace
+		Inc(fIndex);
+	end;
+	EnumName := Trim(EnumName);
+
+	// Add statement for enum name too
+	AddStatement(
+		-1,
+		GetCurrentClass,
+		fCurrentFile,
+		'enum ' + EnumName,
+		'enum',
+		EnumName,
+		Args,
+		fTokenizer[fIndex]^.Line,
+		skTypedef,
+		GetScope,
+		fClassScope,
+		False,
+		True,
+		False);
+
+	// Call every member "enum NAME ITEMNAME"
+	LastType := 'enum ' + Trim(EnumName);
 	repeat
 		if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
 			if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
@@ -1558,7 +1581,7 @@ begin
 				Args := '';
 			end;
 			fLastID := AddStatement(
-				-1,
+				-1, // enum members are treated as globals for now
 				GetCurrentClass,
 				fCurrentFile,
 				LastType + ' ' + fTokenizer[fIndex]^.Text,
@@ -1704,9 +1727,6 @@ begin
 	if Assigned(fOnBusy) then
 		fOnBusy(Self);
 
-	//if Assigned(fOnStartParsing) then
-	//	fOnStartParsing(Self);
-
 	fFilesToScan.Clear;
 	if Assigned(fTokenizer) then
 		fTokenizer.Reset;
@@ -1752,9 +1772,6 @@ begin
 	end;
 
 	fProjectFiles.Clear;
-
-	//if Assigned(fOnEndParsing) then
-	//	fOnEndParsing(Self);
 
 	if Assigned(fOnUpdate) then
 		fOnUpdate(Self);
@@ -1924,11 +1941,11 @@ begin
   try
     if not Assigned(Stream) then begin
       if CFile = '' then
-        Parse(HFile, True, False) // headers should be parsed via include
+        Parse(HFile, True, True) // headers should be parsed via include
       else
-        Parse(CFile, True, False); // headers should be parsed via include
+        Parse(CFile, True, True); // headers should be parsed via include
     end else
-      Parse(FileName, True, False, Stream); // or from stream
+      Parse(FileName, True, True, Stream); // or from stream
     fFilesToScan.Clear;
     ReProcessInheritance;
   finally
@@ -2546,6 +2563,10 @@ begin
 		if PStatement(fStatementList[ClosestIndex])^._Kind in [skFunction,skConstructor,skDestructor] then begin
 
 			// Preprocess the stream that contains the latest version of the current file (not on disk)
+			fPreprocessor.SetIncludesList(fIncludesList);
+			fPreprocessor.SetIncludePaths(fIncludePaths);
+			fPreprocessor.SetScannedFileList(fScannedFiles);
+			fPreprocessor.SetScanOptions(fParseGlobalHeaders,fParseLocalHeaders);
 			fPreprocessor.PreProcessStream(FileName,Stream);
 
 			// Tokenize the stream so we can find the start and end of the function body

@@ -58,7 +58,6 @@ type
     fErrCount: integer;
     DoCheckSyntax: Boolean;
     fWarnCount: integer;
-    fSingleFile: boolean;
     fStartTime : cardinal;
     procedure DoLogEntry(const msg: AnsiString);
     procedure DoOutput(const s1, s2, s3, s4: AnsiString);
@@ -72,7 +71,7 @@ type
   public
     procedure BuildMakeFile;
     procedure CheckSyntax;
-    procedure Compile(const SingleFile: AnsiString = '');
+    procedure Compile;
     procedure Run;
     procedure Clean;
     procedure RebuildAll;
@@ -375,7 +374,7 @@ begin
 				else
 					writeln(F, #9 + '$(CC) -S ' + GenMakePath1(tfile) + ' -o nul $(CFLAGS)');
 			end else begin
-				if PerfectDepCheck and not fSingleFile then
+				if PerfectDepCheck then
 					writeln(F, GenMakePath2(ofile) + ': ' + GenMakePath2(tfile) + ' ' + FindDeps(fProject.Directory + tfile))
 				else
 					writeln(F, GenMakePath2(ofile) + ': ' + GenMakePath2(tfile));
@@ -579,7 +578,7 @@ begin
 	DoCheckSyntax := False;
 end;
 
-procedure TCompiler.Compile(const SingleFile: AnsiString);
+procedure TCompiler.Compile;
 resourcestring
  cCmdLine = '%s "%s" -o "%s" %s %s %s';
  cMakeLine = '%s -f "%s" all';
@@ -589,9 +588,7 @@ resourcestring
 var
  cmdline : AnsiString;
  s : AnsiString;
- ofile: AnsiString;
 begin
-	fSingleFile := SingleFile<>'';
 	if Assigned(fDevRun) then begin
 		MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
 		Exit;
@@ -611,17 +608,7 @@ begin
 	if fTarget = ctProject then begin
 		BuildMakeFile;
 
-		if SingleFile <> '' then begin
-			if fProject.Options.ObjectOutput<>'' then begin
-				ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput)+ExtractFileName(SingleFile);
-				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
-			end else
-				ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(SingleFile, OBJ_EXT)));
-			cmdline:= format(cSingleFileMakeLine, [devCompilerSets.CurrentSet.makeName, fMakeFile, ofile])
-		end else begin
-			cmdline:= format(cMakeLine, [devCompilerSets.CurrentSet.makeName, fMakeFile])
-		end;
-
+		cmdline:= format(cMakeLine, [devCompilerSets.CurrentSet.makeName, fMakeFile]);
 		DoLogEntry(format(Lang[ID_EXECUTING], [cMake + cDots]));
 		DoLogEntry(cmdline);
 
@@ -741,8 +728,6 @@ const
 var
 	cmdLine : AnsiString;
 begin
-	fSingleFile:=True; // fool clean; don't run deps checking since all we do is cleaning
-	
 	if Assigned(fProject) then begin
 		InitProgressForm('Cleaning...');
 
@@ -769,8 +754,6 @@ const
 var
 	cmdLine : AnsiString;
 begin
-	fSingleFile := True; // fool rebuild; don't run deps checking since all files will be rebuilt
-
 	if Assigned(fProject) then begin
 		InitProgressForm('Rebuilding...');
 

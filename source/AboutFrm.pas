@@ -145,7 +145,7 @@ const MessageText =
   '- Development: Colin Laplace, Mike Berg, Hongli Lai, Yiannis Mandravellos'#13#10 +
   '- Contributors: Peter Schraut, Marek Januszewski, Anonymous'#13#10 +
   '- MinGW compiler system: Mumit Khan, J.J. van der Heijden, Colin Hendrix and GNU developers'#13#10+
-  '- Splash screen and association icons: Matthijs Crielaard: '#13#10 +
+  '- Splash screen and association icons: Matthijs Crielaard'#13#10 +
   '- New Look theme: Gerard Caulfield'#13#10 +
   '- Gnome icons: Gnome designers'#13#10 +
   '- Blue theme: Thomas Thron';

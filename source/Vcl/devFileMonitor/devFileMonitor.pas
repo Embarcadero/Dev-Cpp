@@ -35,22 +35,20 @@ type
   TdevFileMonitor = class(TWinControl)
   private
     fMonitor: TdevMonitorThread;
-    fFiles: TStrings;
+    fFiles: TStringList;
     fNotifyChange: TdevMonitorChange;
     function GetActive: boolean;
-    procedure SetActive(Value: boolean);
-    procedure SetFiles(Value: TStrings);
-    procedure MonitorTerminated(Sender: TObject);
+    procedure SubClassWndProc(var Message: TMessage);
+    procedure Refresh;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Activate;
     procedure Deactivate;
-    procedure Refresh(ActivateIfNot: boolean);
-    procedure SubClassWndProc(var Message: TMessage);
+    procedure Monitor(const FileName : AnsiString);
+    procedure UnMonitor(const FileName : AnsiString);
   published
-    property Active: boolean read GetActive write SetActive;
-    property Files: TStrings read fFiles write SetFiles;
+    property Active: boolean read GetActive;
     property OnNotifyChange: TdevMonitorChange read fNotifyChange write fNotifyChange;
   end;
 
@@ -65,83 +63,78 @@ begin
 	RegisterComponents('Dev-C++', [TdevFileMonitor]);
 end;
 
-procedure TdevFileMonitor.SubClassWndProc(var Message: TMessage);
-begin
-  if Message.Msg = APPMSG_NOTIFYFILECHANGED then
-  begin
-    if Assigned(fNotifyChange) then
-    begin
-      fNotifyChange(Self, TDevMonitorChangeType(Message.WParam),PAnsiChar(Message.LParam));
-      StrDispose(PAnsiChar(Message.LParam));
-    end;
-  end
-  else
-    WndProc(Message);
-end;
-
-procedure TdevFileMonitor.Activate;
-begin
-  if not Active then begin
-    fMonitor := TdevMonitorThread.Create(Self, fFiles);
-    fMonitor.OnTerminate := MonitorTerminated;
-    fMonitor.Resume;
-  end;
-end;
-
 constructor TdevFileMonitor.Create(AOwner: TComponent);
 begin
-  inherited;
-  fFiles := TStringList.Create;
-  fMonitor := nil;
-  WindowProc := SubClassWndProc;
-end;
-
-procedure TdevFileMonitor.Deactivate;
-begin
-  if Assigned(fMonitor) then begin
-    fMonitor.TellToQuit;
-    fMonitor.WaitFor;
-    fMonitor.Free;
-    fMonitor:=nil;
-  end;
+	inherited;
+	fFiles := TStringList.Create;
+	fMonitor := nil;
+	WindowProc := SubClassWndProc;
 end;
 
 destructor TdevFileMonitor.Destroy;
 begin
-  Deactivate;
-  fFiles.Free;
-  inherited;
+	Deactivate;
+	fFiles.Free;
+	inherited;
 end;
 
-procedure TdevFileMonitor.MonitorTerminated(Sender: TObject);
+procedure TdevFileMonitor.SubClassWndProc(var Message: TMessage);
 begin
-  fMonitor := nil;
+	if Message.Msg = APPMSG_NOTIFYFILECHANGED then begin
+		if Assigned(fNotifyChange) then begin
+			fNotifyChange(Self, TDevMonitorChangeType(Message.WParam),PAnsiChar(Message.LParam));
+			StrDispose(PAnsiChar(Message.LParam));
+		end;
+	end else
+		WndProc(Message);
+end;
+
+procedure TdevFileMonitor.Activate;
+begin
+	if not Active then begin
+		fMonitor := TdevMonitorThread.Create(Self, fFiles);
+		fMonitor.Resume;
+	end;
+end;
+
+procedure TdevFileMonitor.Deactivate;
+begin
+	if Assigned(fMonitor) then begin // we can spawn a new fMonitor instance directly after calling this
+		fMonitor.TellToQuit;
+		fMonitor := nil; // frees itself
+	end;
 end;
 
 function TdevFileMonitor.GetActive: boolean;
 begin
-  Result := Assigned(fMonitor);
+	Result := Assigned(fMonitor);
 end;
 
-procedure TdevFileMonitor.Refresh(ActivateIfNot: boolean);
+procedure TdevFileMonitor.Monitor(const FileName : AnsiString);
 begin
-  if not Active then
-    Activate
-  else
-    fMonitor.ReloadList(fFiles);
+	fFiles.Add(FileName);
+	Refresh;
 end;
 
-procedure TdevFileMonitor.SetActive(Value: boolean);
+procedure TdevFileMonitor.UnMonitor(const FileName : AnsiString);
+var
+	I : integer;
 begin
-  if Value and not Active then
-    Activate
-  else if not Value and Active then
-    Deactivate;
+	I := fFiles.IndexOf(FileName);
+	if I <> -1 then begin
+		fFiles.Delete(I);
+		Refresh;
+	end;
 end;
 
-procedure TdevFileMonitor.SetFiles(Value: TStrings);
+procedure TdevFileMonitor.Refresh;
 begin
-  fFiles.Assign(Value);
+	if not Active then
+		Activate
+	else begin
+		Deactivate;
+		Activate;
+	end;
 end;
 
 end.

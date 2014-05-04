@@ -89,9 +89,7 @@ uses
   SynEditKeyCmds,
   SynEditHighlighter,
   SynEditKbdHandler,
-  //### Code Folding ###
   SynEditCodeFolding,
-  //### End Code Folding ###
 {$ENDIF}
   Math,
   SysUtils,
@@ -297,14 +295,12 @@ type
     procedure WMMouseWheel(var Msg: TMessage); message WM_MOUSEWHEEL;
 {$ENDIF}
   private
-    //### Code Folding ###
-    fAllFoldRanges:          TSynEditFoldRanges;
-    fCodeFolding:            TSynCodeFolding;
-    fUncollapsedLines:       TStrings;
+    fAllFoldRanges: TSynEditFoldRanges;
+    fCodeFolding: TSynCodeFolding;
+    fUncollapsedLines: TStrings;
     fUncollapsedLinesLength: Integer;
-    fEditingFolds:           boolean;
-    fUseCodeFolding:         boolean;
-    //### End Code Folding ###
+    fEditingFolds: boolean;
+    fUseCodeFolding: boolean;
     fAlwaysShowCaret: Boolean;
     fBlockBegin: TBufferCoord;
     fBlockEnd: TBufferCoord;
@@ -418,8 +414,6 @@ type
     FVScrollBar : TSynEditScrollBar;
     procedure ScrollEvent(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 {$ENDIF}
-
-    //### Code Folding ###
     procedure CollapseLevel(ALevel: Integer);
     procedure UncollapseLevel(ALevel: Integer);
     procedure ReScanForFoldRanges;
@@ -431,8 +425,6 @@ type
     procedure MoveRangesBy(FoldRanges: TSynEditFoldRanges;LineCount: Integer);
     procedure MoveCollapsedRangesFromBy(CurrentLine, LineCount: Integer);
     procedure SetUseCodeFolding(value : boolean);
-    //### End Code Folding ###
-
     procedure BookMarkOptionsChanged(Sender: TObject);
     procedure ComputeCaret(X, Y: Integer);
     procedure ComputeScroll(X, Y: Integer);
@@ -780,8 +772,6 @@ type
       aUndo, aRedo: TSynEditUndoList);
     procedure UnHookTextBuffer;
     function IsEmpty : boolean;
-
-    //### Code Folding ###
     procedure CollapseAll;
     procedure UncollapseAll;
     procedure Collapse(AFoldRange: TSynEditFoldRange);
@@ -795,8 +785,6 @@ type
     property UnCollapsedLines: TStrings read fUncollapsedLines;
     property UnCollapsedLinesLength: Integer read fUncollapsedLinesLength;
     property CodeFolding: TSynCodeFolding read fCodeFolding;
-    //### End Code Folding ###
-
     property BlockBegin: TBufferCoord read GetBlockBegin write SetBlockBegin;
     property BlockEnd: TBufferCoord read GetBlockEnd write SetBlockEnd;
     property CanPaste: Boolean read GetCanPaste;
@@ -878,9 +866,7 @@ type
       read FScrollBars write SetScrollBars default ssBoth;
     property SelectedColor: TSynSelectedColor
       read FSelectedColor write FSelectedColor;
-    //### Code Folding
     property UseCodeFolding : boolean read fUseCodeFolding write SetUseCodeFolding default False;
-    //### End Code Folding
     property SelectionMode: TSynSelectionMode
       read FSelectionMode write SetSelectionMode default smNormal;
     property ActiveSelectionMode: TSynSelectionMode read fActiveSelectionMode
@@ -1436,12 +1422,10 @@ begin
 
   SynFontChanged(nil);
 
-  //### Code Folding ###
   fAllFoldRanges := TSynEditFoldRanges.Create;
   fAllFoldRanges.OwnsObjects := true;
   fCodeFolding := TSynCodeFolding.Create;
   fUncollapsedLines := fLines; // folding is disabled by default, so use pointer instead of copy
-  //### End Code Folding ###
 end;
 
 {$IFDEF SYN_CLX}
@@ -1548,13 +1532,10 @@ begin
   fInternalImage.Free;
   fFontDummy.Free;
   fOrigLines.Free;
-
-	//### Code Folding ###
 	fAllFoldRanges.Free;
 	if fUseCodeFolding then // this means we were storing a copy
 		fUncollapsedLines.Free;
 	fCodeFolding.Free;
-	//### End Code Folding ###
 end;
 
 function TCustomSynEdit.GetBlockBegin: TBufferCoord;
@@ -2368,25 +2349,28 @@ end;
 
 procedure TCustomSynEdit.DoOnGutterClick(Button: TMouseButton; X, Y: integer);
 var
-  i     : integer;
-  offs  : integer;
-  line  : integer;
+  i: integer;
+  offs: integer;
   allmrk: TSynEditLineMarks;
-  mark  : TSynEditMark;
-  //### Code Folding ###
+  mark: TSynEditMark;
   FoldRange: TSynEditFoldRange;
   rect : TRect;
-  //### End Code Folding ###
+  RowColumn: TDisplayCoord;
+  Line: integer;
 begin
-	//### Code Folding ###
+	RowColumn := PixelsToRowColumn(X,Y);
+	Line := DisplayToBufferPos(RowColumn).Line;
+	Line := LineToUncollapsedLine(Line);
+
+	// Check if we clicked on a folding thing
 	if fUseCodeFolding then begin
-		FoldRange := FoldStartAtLine(RowToLine(PixelsToRowColumn(X, Y).Row));
+		FoldRange := FoldStartAtLine(Line);
 		if Assigned(FoldRange) then begin
 
 			// See if we actually clicked on the rectangle...
 			rect.Left := Gutter.RealGutterWidth(CharWidth) - Gutter.RightOffset;
 			rect.Right := rect.Left + Gutter.RightOffset - 4;
-			rect.Top := (DisplayToBufferPos(PixelsToRowColumn(X,Y)).Line - fTopLine) * LineHeight;
+			rect.Top := (Line - fTopLine) * LineHeight;
 			rect.Bottom := rect.Top + LineHeight;
 
 			if PtInRect(rect,Point(X,Y)) then begin
@@ -2398,14 +2382,13 @@ begin
 			end;
 		end;
 	end;
-	//### End Code Folding ###
 
+	// If not, check gutter marks
   if Assigned(fOnGutterClick) then
   begin
-    line := DisplayToBufferPos(PixelsToRowColumn(X,Y)).Line;
-    if line <= Lines.Count then
+    if line <= UnCollapsedLines.Count then
     begin
-      Marks.GetMarksForLine(line, allmrk);
+      Marks.GetMarksForLine(Line, allmrk);
       offs := 0;
       mark := nil;
       for i := Low(allmrk) to High(allmrk) do
@@ -2420,7 +2403,7 @@ begin
           end;
         end;
       end; //for
-      fOnGutterClick(Self, Button, X, Y, line, mark);
+      fOnGutterClick(Self, Button, X, Y, Line, mark);
     end;
   end;
 end;

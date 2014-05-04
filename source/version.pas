@@ -32,7 +32,7 @@ const
 
 	// exe properties
 	DEVCPP                = 'Dev-C++';
-	DEVCPP_VERSION        = '5.6.2';
+	DEVCPP_VERSION        = '5.6.3';
 
 	// delimiters
 	DEV_INTERNAL_OPEN     = '$__DEV_INTERNAL_OPEN';

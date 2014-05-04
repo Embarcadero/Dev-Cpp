@@ -23,7 +23,7 @@ interface
 
 uses 
 {$IFDEF WIN32}
-  Windows, Classes, devcfg,utils;
+  Windows, Classes, Forms, devcfg, utils;
 {$ENDIF}
 {$IFDEF LINUX}
   Classes;
@@ -70,7 +70,7 @@ function devExecutor: TdevExecutor;
 implementation
 
 uses
-	main;
+  main;
 
 { TExecThread }
 
@@ -97,7 +97,7 @@ begin
     else
       wShowWindow := SW_HIDE;
   end;
-  if CreateProcess(nil, PAnsiChar(fFile + ' ' + fParams), nil, nil, False,
+  if CreateProcess(nil, PAnsiChar('"' + fFile + '" ' + fParams), nil, nil, False,
     NORMAL_PRIORITY_CLASS, nil, PAnsiChar(fPath),
     StartupInfo, ProcessInfo) then begin
     fProcess := ProcessInfo.hProcess;
@@ -112,7 +112,7 @@ var
 
 function devExecutor: TdevExecutor;
 begin
-  if not Assigned(fDevExecutor) and not DontRecreateSingletons then begin
+  if not Assigned(fDevExecutor) and not Application.Terminated then begin
     try
       fDevExecutor := TdevExecutor.Create;
     finally

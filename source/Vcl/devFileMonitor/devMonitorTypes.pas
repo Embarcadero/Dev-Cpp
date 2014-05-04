@@ -33,6 +33,12 @@ type
   TdevMonitorChangeType = (mctChanged, mctDeleted);
   TdevMonitorChange = procedure(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: AnsiString) of object;
 
+  PdevMonitorFile = ^TdevMonitorFile;
+  TdevMonitorFile = record
+    FileName : AnsiString;
+    TimeStamp : integer;
+  end;
+  
 implementation
 
 end.

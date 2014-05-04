@@ -156,7 +156,7 @@ begin
   lbSelect.Caption := Lang[ID_CB_SELECTCB] + ':';
   lbConf.Caption := Lang[ID_CB_CONFIGURATION] + ':';
   lbDev.Caption := Lang[ID_CB_SELECTDEV] + ':';
-  gbOptions.Caption := '  ' + Lang[ID_CB_OPTIONS] + '  ';
+  gbOptions.Caption := Lang[ID_CB_OPTIONS];
   btnImport.Caption := Lang[ID_BTN_IMPORT];
   btnCancel.Caption := Lang[ID_BTN_CANCEL];
 end;

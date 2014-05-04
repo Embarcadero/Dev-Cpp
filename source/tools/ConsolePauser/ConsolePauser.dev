@@ -28,7 +28,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=3
-CompilerSettings=0000000100111000000001000
+CompilerSettings=0000000100111000000001001
 UnitCount=1
 
 [VersionInfo]

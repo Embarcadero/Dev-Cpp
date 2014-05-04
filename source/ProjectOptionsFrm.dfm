@@ -1,6 +1,6 @@
 object ProjectOptionsFrm: TProjectOptionsFrm
-  Left = 993
-  Top = 552
+  Left = 724
+  Top = 441
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -338,8 +338,8 @@ object ProjectOptionsFrm: TProjectOptionsFrm
         object lblPriority: TLabel
           Left = 8
           Top = 20
-          Width = 161
-          Height = 13
+          Width = 153
+          Height = 15
           AutoSize = False
           Caption = 'Build priority:'
         end
@@ -395,9 +395,9 @@ object ProjectOptionsFrm: TProjectOptionsFrm
           OnClick = chkCompileClick
         end
         object spnPriority: TSpinEdit
-          Left = 132
+          Left = 168
           Top = 16
-          Width = 105
+          Width = 85
           Height = 24
           Enabled = False
           MaxValue = 0
@@ -480,7 +480,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
         Width = 495
         Height = 23
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 1
         OnChange = cmbCompilerChange
       end
@@ -1229,7 +1229,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
       object cbUseCustomMakefile: TCheckBox
         Left = 16
         Top = 24
-        Width = 429
+        Width = 497
         Height = 17
         Caption = 'Use custom Makefile (do not generate a Makefile, use this one)'
         TabOrder = 4
@@ -1379,7 +1379,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
           Width = 209
           Height = 23
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 15
           Sorted = True
           TabOrder = 4
         end

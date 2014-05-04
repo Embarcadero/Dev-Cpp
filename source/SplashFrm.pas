@@ -37,6 +37,8 @@ type
     Statusbar: TStatusbar;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  public
+    procedure SetText(const LoadingText : AnsiString);
   end;
 
 var
@@ -63,6 +65,11 @@ end;
 procedure TSplashForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 	Action := caFree;
+end;
+
+procedure TSplashForm.SetText(const LoadingText : AnsiString);
+begin
+	Statusbar.SimpleText := 'Bloodshed/Orwell Dev-C++ ' + DEVCPP_VERSION + ' ' + LoadingText;
 end;
 
 end.
