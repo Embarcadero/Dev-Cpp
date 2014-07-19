@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 896
-  Top = 488
+  Left = 315
+  Top = 92
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -47,7 +47,7 @@ object MainForm: TMainForm
     Top = 437
     Width = 1000
     Height = 183
-    ActivePage = DebugSheet
+    ActivePage = LogSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -148,88 +148,53 @@ object MainForm: TMainForm
       object InfoGroupBox: TPanel
         Left = 0
         Top = 0
-        Width = 233
-        Height = 154
+        Width = 156
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
-        object ErrorLabel: TLabel
-          Left = 8
-          Top = 12
-          Width = 56
-          Height = 13
-          Caption = 'Total errors:'
-        end
-        object SizeOfOutput: TLabel
-          Left = 8
-          Top = 60
-          Width = 84
-          Height = 13
-          Caption = 'Size of output file:'
-        end
+        DesignSize = (
+          156
+          155)
         object btnAbortCompilation: TSpeedButton
-          Left = 8
-          Top = 82
-          Width = 218
+          Left = 4
+          Top = 4
+          Width = 144
           Height = 30
           Action = actAbortCompilation
         end
-        object WarningLabel: TLabel
-          Left = 8
-          Top = 36
-          Width = 72
-          Height = 13
-          Caption = 'Total warnings:'
-        end
-        object edSizeFile: TEdit
-          Left = 96
-          Top = 56
-          Width = 128
-          Height = 21
-          ReadOnly = True
-          TabOrder = 1
-          Text = '0'
-        end
-        object edTotalErrors: TEdit
-          Left = 96
-          Top = 8
-          Width = 128
-          Height = 21
-          ReadOnly = True
-          TabOrder = 0
-          Text = '0'
-        end
-        object edTotalWarnings: TEdit
-          Left = 96
-          Top = 32
-          Width = 128
-          Height = 21
-          ReadOnly = True
-          TabOrder = 2
-          Text = '0'
-        end
         object pbCompilation: TProgressBar
-          Left = 8
-          Top = 118
-          Width = 218
-          Height = 21
+          Left = 4
+          Top = 40
+          Width = 144
+          Height = 24
+          Anchors = [akLeft, akTop, akRight]
           Step = 1
-          TabOrder = 3
+          TabOrder = 0
+        end
+        object chkShortenPaths: TCheckBox
+          Left = 4
+          Top = 128
+          Width = 144
+          Height = 17
+          Action = actShortenCompPaths
+          Anchors = [akLeft, akRight, akBottom]
+          TabOrder = 1
         end
       end
       object CompResGroupBox: TPanel
-        Left = 233
+        Left = 156
         Top = 0
-        Width = 759
-        Height = 154
+        Width = 836
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
         object LogOutput: TMemo
           Left = 0
           Top = 0
-          Width = 759
-          Height = 154
+          Width = 836
+          Height = 155
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -252,7 +217,7 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 403
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
@@ -272,7 +237,7 @@ object MainForm: TMainForm
           Width = 263
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
           OnKeyPress = edGdbCommandKeyPress
         end
@@ -280,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 396
-          Height = 111
+          Height = 117
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -438,7 +403,7 @@ object MainForm: TMainForm
           Width = 518
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 5
           OnKeyPress = EvaluateInputKeyPress
         end
@@ -446,7 +411,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 39
+          Height = 38
           Align = alCustom
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
@@ -486,7 +451,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -2974,6 +2939,11 @@ object MainForm: TMainForm
       ImageIndex = 46
       OnExecute = actHelpExecute
     end
+    object actShortenCompPaths: TAction
+      Category = 'Execute'
+      Caption = 'Shorten compiler paths'
+      OnExecute = actShortenCompPathsExecute
+    end
   end
   object MessagePopup: TPopupMenu
     Left = 203
@@ -3152,6 +3122,9 @@ object MainForm: TMainForm
     end
     object N44: TMenuItem
       Caption = '-'
+    end
+    object SourceFile1: TMenuItem
+      Action = actProjectNew
     end
     object Addfile1: TMenuItem
       Action = actProjectAdd

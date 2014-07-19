@@ -979,7 +979,6 @@ const
   ID_COULDNOTFINDPROFDATA               = 62033;
   ID_INFONOTFOUND                       = 62034;
 
-
   ID_BTN_OK                             = 63001;
   ID_BTN_CANCEL                         = 63002;
   ID_BTN_HELP                           = 63003;
@@ -1216,3 +1215,30 @@ const
   ID_LOAD_FILEASSOC                     = 77002;
   ID_LOAD_INITCLASSBROWSER              = 77003;
   ID_LOAD_RESTOREWINDOW                 = 77004;
+
+  ID_LOG_COMPILER                       = 78001;
+  ID_LOG_BUILDINGMAKEFILE               = 78002;
+  ID_LOG_REBUILDINGPROJECT              = 78003;
+  ID_LOG_PROCESSINGMAKE                 = 78004;
+  ID_LOG_PROJECTFILE                    = 78005;
+  ID_LOG_COMPILERNAME                   = 78006;
+  ID_LOG_MAKEFILENAME                   = 78007;
+  ID_LOG_RESFILENAME                    = 78008;
+  ID_LOG_MAKEFILEPROC                   = 78009;
+  ID_LOG_COMMAND                        = 78010;
+  ID_LOG_COMPILERESULTS                 = 78011;
+  ID_LOG_ERRORS                         = 78012;
+  ID_LOG_WARNINGS                       = 78013;
+  ID_LOG_OUTPUTSIZE                     = 78014;
+  ID_LOG_COMPILETIME                    = 78015;
+  ID_LOG_OUTPUTFILE                     = 78016;
+  ID_LOG_CCOMPILINGFILE                 = 78017;
+  ID_LOG_SOURCEFILE                     = 78018;
+  ID_LOG_PROCESSINGRES                  = 78019;
+  ID_LOG_WINDRESNAME                    = 78020;
+  ID_LOG_PROCESSINGCPPSRC               = 78021;
+  ID_LOG_GPPNAME                        = 78022;
+  ID_LOG_PROCESSINGCSRC                 = 78023;
+  ID_LOG_GCCNAME                        = 78024;
+  ID_LOG_PROJECTCOMPILE                 = 78025;
+  ID_LOG_FILENAME                       = 78026;

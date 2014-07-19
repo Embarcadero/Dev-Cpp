@@ -3,7 +3,7 @@
 
 !define COMPILERNAME "MinGW 4.8.1"
 !define COMPILERFOLDER "MinGW32"
-!define DEVCPP_VERSION "5.6.3"
+!define DEVCPP_VERSION "5.7.0"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
@@ -317,24 +317,16 @@ Section "Remove old configuration files" SectionConfig
 SectionEnd
 
 ####################################################################
-# Mouseovers
-
-LangString DESC_SectionMain        ${LANG_ENGLISH} "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
-LangString DESC_SectionIcons       ${LANG_ENGLISH} "Various icons that you can use in your programs"
-LangString DESC_SectionMinGW       ${LANG_ENGLISH} "The ${COMPILERNAME} compiler and associated tools, headers and libraries"
-LangString DESC_SectionLangs       ${LANG_ENGLISH} "The Dev-C++ interface translated to different languages (other than English which is built-in)"
-LangString DESC_SectionAssocs      ${LANG_ENGLISH} "Use Dev-C++ as the default application for opening these types of files"
-LangString DESC_SectionShortcuts   ${LANG_ENGLISH} "Create shortcuts to Dev-C++ in various folders"
-LangString DESC_SectionConfig      ${LANG_ENGLISH} "Remove all leftover configuration files from previous installs"
+# TODO: Create language tables that describe installation components using LangString
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        $(DESC_SectionMain)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       $(DESC_SectionIcons)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionMinGW}       $(DESC_SectionMinGW)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       $(DESC_SectionLangs)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      $(DESC_SectionAssocs)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   $(DESC_SectionShortcuts)
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionConfig}      $(DESC_SectionConfig)
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       "Various icons that you can use in your programs"
+#!insertmacro MUI_DESCRIPTION_TEXT ${SectionMinGW}       "The ${COMPILERNAME} compiler and associated tools, headers and libraries"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       "The Dev-C++ interface translated to different languages (other than English which is built-in)"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      "Use Dev-C++ as the default application for opening these types of files"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   "Create shortcuts to Dev-C++ in various folders"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionConfig}      "Remove all leftover configuration files from previous installs"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ####################################################################

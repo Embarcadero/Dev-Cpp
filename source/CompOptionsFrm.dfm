@@ -472,16 +472,9 @@ object CompOptForm: TCompOptForm
         Height = 15
         Caption = 'windres: '
       end
-      object lbldllwrap: TLabel
-        Left = 24
-        Top = 292
-        Width = 45
-        Height = 15
-        Caption = 'dllwrap: '
-      end
       object lblgprof: TLabel
         Left = 24
-        Top = 336
+        Top = 288
         Width = 35
         Height = 15
         Caption = 'gprof: '
@@ -661,45 +654,10 @@ object CompOptForm: TCompOptForm
           BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
         OnClick = btnBrws1Click
       end
-      object btnBrowse7: TSpeedButton
+      object btnBrowse8: TSpeedButton
         Tag = 7
         Left = 419
         Top = 288
-        Width = 23
-        Height = 22
-        Glyph.Data = {
-          36030000424D3603000000000000360000002800000010000000100000000100
-          18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-          BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-          BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000000000
-          000000000000000000000000000000000000000000000000000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF00000000AEFF0096DB0096DB0096DB0096DB0096DB00
-          96DB0096DB0082BE000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-          00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF00AEFF00AEFF00AEFF00
-          AEFF00AEFF0096DB000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-          00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF5DCCFF5DCCFF5DCCFF5D
-          CCFF5DCCFF00AEFF000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF686868BDEBFF
-          5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
-        OnClick = btnBrws1Click
-      end
-      object btnBrowse8: TSpeedButton
-        Tag = 8
-        Left = 419
-        Top = 332
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -771,72 +729,13 @@ object CompOptForm: TCompOptForm
         TabOrder = 4
         OnChange = InterfaceChange
       end
-      object DllwrapEdit: TEdit
+      object GprofEdit: TEdit
         Left = 80
         Top = 288
         Width = 329
         Height = 23
         TabOrder = 5
         OnChange = InterfaceChange
-      end
-      object GprofEdit: TEdit
-        Left = 80
-        Top = 332
-        Width = 329
-        Height = 23
-        TabOrder = 6
-        OnChange = InterfaceChange
-      end
-    end
-    object tabMakefile: TTabSheet
-      Caption = 'Makefile'
-      ImageIndex = 4
-      object grpMakefileGen: TGroupBox
-        Left = 8
-        Top = 8
-        Width = 457
-        Height = 100
-        Caption = '  Makefile generation:  '
-        TabOrder = 0
-        object lblDelay: TLabel
-          Left = 16
-          Top = 35
-          Width = 80
-          Height = 15
-          Caption = 'Compile Delay:'
-        end
-        object lblDelayMsg: TLabel
-          Left = 176
-          Top = 19
-          Width = 273
-          Height = 54
-          AutoSize = False
-          Caption = 
-            'Enables a delay in milliseconds if make complains about makefile' +
-            #39's time stamp (in compile log)'
-          Layout = tlCenter
-          WordWrap = True
-        end
-        object cbFastDep: TCheckBox
-          Left = 10
-          Top = 75
-          Width = 431
-          Height = 17
-          Caption = 'Use fast but imperfect dependency generation'
-          TabOrder = 1
-          OnClick = InterfaceChange
-        end
-        object seCompDelay: TSpinEdit
-          Left = 104
-          Top = 32
-          Width = 61
-          Height = 24
-          MaxValue = 1000
-          MinValue = 0
-          TabOrder = 0
-          Value = 0
-          OnChange = InterfaceChange
-        end
       end
     end
   end

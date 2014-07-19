@@ -1,3 +1,19 @@
+Version 5.7.0 - 19 Juli 2014
+
+- Redesigned Compiler Log.
+- Added an option to shorten compiler paths in Compiler Log.
+- Removed the Perfect Dependency Checking option in Tools >> Compiler Options >> Makefile.
+- Updated DLL Makefile creation to call gcc/g++ instead of dllwrap.exe.
+- Dev-C++ does not require the presence of dllwrap.exe anymore.
+- Fixed a few bugs that caused usage mixups between project compiler sets and global compiler sets.
+- The compiler set validator now does not complain if executables are not set.
+- Removed the Compile Delay option in Tools >> Compiler Options >> Makefile.
+- Fixed a bug that prevented editor tab filenames from being updated when using Save As.
+- Added an option to directly add a file to a folder in the project tree.
+- Fixed a crash in the class browser that happened when it had to redraw during parsing.
+- Fixed a crash in the project saving code that happened due to opening a file twice at the same time.
+- Fixed a crash in the file change monitor code.
+
 Version 5.6.3 - 4 Mei 2014
 
 - Fixed a bug in external program execution related to spaces in paths.

@@ -96,62 +96,62 @@ uses
 {$R *.res}
 
 var
-	appdata, inifilename, exefolder: AnsiString;
-	tempc: array [0..MAX_PATH] of char;
+  appdata, inifilename, exefolder: AnsiString;
+  tempc: array[0..MAX_PATH] of char;
 begin
-	inifilename := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
-	exefolder := ExtractFilePath(Application.ExeName);
+  inifilename := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
+  exefolder := ExtractFilePath(Application.ExeName);
 
-	// Did someone pass the -c command to us?
-	if (ParamCount >= 2) and SameStr(ParamStr(1),'-c') then begin
-		if not DirectoryExists(ParamStr(2)) then
-			CreateDir(ParamStr(2));
+  // Did someone pass the -c command to us?
+  if (ParamCount >= 2) and SameStr(ParamStr(1), '-c') then begin
+    if not DirectoryExists(ParamStr(2)) then
+      CreateDir(ParamStr(2));
 
-		if ParamStr(2)[2] <> ':' then // if a relative path is specified...
-			devData.INIFileName := exefolder + IncludeTrailingBackslash(ParamStr(2)) + inifilename
-		else
-			devData.INIFileName := IncludeTrailingBackslash(ParamStr(2)) + inifilename;
+    if ParamStr(2)[2] <> ':' then // if a relative path is specified...
+      devData.INIFileName := exefolder + IncludeTrailingBackslash(ParamStr(2)) + inifilename
+    else
+      devData.INIFileName := IncludeTrailingBackslash(ParamStr(2)) + inifilename;
 
-		ConfigMode := CFG_PARAM;
-	end else begin
+    ConfigMode := CFG_PARAM;
+  end else begin
 
-		// default dir should be %APPDATA%\Dev-Cpp
-		appdata := '';
-		if SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, tempc)) then
-			appdata := IncludeTrailingBackslash(AnsiString(tempc));
+    // default dir should be %APPDATA%\Dev-Cpp
+    appdata := '';
+    if SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, tempc)) then
+      appdata := IncludeTrailingBackslash(AnsiString(tempc));
 
-		if (appdata <> '') and (DirectoryExists(appdata + 'Dev-Cpp') or CreateDir(appdata + 'Dev-Cpp')) then begin
-			devData.INIFileName := appdata + 'Dev-Cpp\' + inifilename;
-			ConfigMode := CFG_APPDATA;
-		end else begin
+    if (appdata <> '') and (DirectoryExists(appdata + 'Dev-Cpp') or CreateDir(appdata + 'Dev-Cpp')) then begin
+      devData.INIFileName := appdata + 'Dev-Cpp\' + inifilename;
+      ConfigMode := CFG_APPDATA;
+    end else begin
 
-			// store it in the default portable config folder anyways...
-			devData.INIFileName := exefolder + 'config\' + inifilename;
-			ConfigMode := CFG_EXEFOLDER;
-		end;
-	end;
+      // store it in the default portable config folder anyways...
+      devData.INIFileName := exefolder + 'config\' + inifilename;
+      ConfigMode := CFG_EXEFOLDER;
+    end;
+  end;
 
-	// free ansistrings...
-	SetLength(appdata,0);
-	SetLength(inifilename,0);
-	SetLength(exefolder,0);
+  // free ansistrings...
+  SetLength(appdata, 0);
+  SetLength(inifilename, 0);
+  SetLength(exefolder, 0);
 
-	// Make the caption look nice
-	Application.Initialize;
-	Application.Title := 'Dev-C++';
+  // Make the caption look nice
+  Application.Initialize;
+  Application.Title := 'Dev-C++';
 
-	// Create and fill settings structures
-	devData.ReadSelf;
-	CreateOptions;
+  // Create and fill settings structures
+  devData.ReadSelf;
+  CreateOptions;
 
-	// Display it as soon as possible, and only if its worth viewing...
-	if (not devData.NoSplashScreen and devCodeCompletion.UseCacheFiles) or devData.First then
-		SplashForm := TSplashForm.Create(nil);
+  // Display it as soon as possible, and only if its worth viewing...
+  if (not devData.NoSplashScreen and devCodeCompletion.UseCacheFiles) or devData.First then
+    SplashForm := TSplashForm.Create(nil);
 
-	Application.CreateForm(TMainForm, MainForm);
-	if Assigned(SplashForm) then
-		SplashForm.Close;
+  Application.CreateForm(TMainForm, MainForm);
+  if Assigned(SplashForm) then
+    SplashForm.Close;
 
-	Application.Run;
+  Application.Run;
 end.
 

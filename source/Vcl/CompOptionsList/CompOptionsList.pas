@@ -29,11 +29,11 @@ type
 
   TCompOptionsList = class(TValueListEditor)
   private
-    procedure DrawDropDownButton(ACol, ARow: Integer; ARect: TRect;AState: TGridDrawState);
+    procedure DrawDropDownButton(ACol, ARow: Integer; ARect: TRect; AState: TGridDrawState);
     function MouseOverButton(X: Integer): Boolean;
   protected
-    procedure DrawCell(ACol, ARow: Integer; ARect: TRect;AState: TGridDrawState); override;
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X,Y: Integer); override;
+    procedure DrawCell(ACol, ARow: Integer; ARect: TRect; AState: TGridDrawState); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   end;
 
 procedure Register;
@@ -42,56 +42,61 @@ implementation
 
 procedure Register;
 begin
-	RegisterComponents('Dev-C++', [TCompOptionsList]);
+  RegisterComponents('Dev-C++', [TCompOptionsList]);
 end;
 
-procedure TCompOptionsList.DrawCell(ACol, ARow: Integer; ARect: TRect;AState: TGridDrawState);
+procedure TCompOptionsList.DrawCell(ACol, ARow: Integer; ARect: TRect; AState: TGridDrawState);
 begin
-	inherited DrawCell(ACol, ARow, ARect, AState);
-	DrawDropDownButton(ACol, ARow, ARect, AState);
+  inherited DrawCell(ACol, ARow, ARect, AState);
+  DrawDropDownButton(ACol, ARow, ARect, AState);
 end;
 
-procedure TCompOptionsList.DrawDropDownButton(ACol, ARow: Integer;ARect: TRect; AState: TGridDrawState);
+procedure TCompOptionsList.DrawDropDownButton(ACol, ARow: Integer; ARect: TRect; AState: TGridDrawState);
 var
-	Details: TThemedElementDetails;
+  Details: TThemedElementDetails;
 begin
-	if not Assigned(EditList) then Exit; // this can be the case at design time
-	if not ThemeServices.ThemesEnabled then Exit;
+  if not Assigned(EditList) then
+    Exit; // this can be the case at design time
+  if not ThemeServices.ThemesEnabled then
+    Exit;
 
-	if (ACol = 1) and (ARow >= FixedRows) and not (gdFocused in AState) and ItemProps[ARow - FixedRows].HasPickList then begin
-		ARect.Left := ARect.Right - EditList.ButtonWidth;
-		Details := ThemeServices.GetElementDetails(tcDropDownButtonNormal);
-		ThemeServices.DrawElement(Canvas.Handle, Details, ARect);
-	end;
+  if (ACol = 1) and (ARow >= FixedRows) and not (gdFocused in AState) and ItemProps[ARow - FixedRows].HasPickList then
+    begin
+    ARect.Left := ARect.Right - EditList.ButtonWidth;
+    Details := ThemeServices.GetElementDetails(tcDropDownButtonNormal);
+    ThemeServices.DrawElement(Canvas.Handle, Details, ARect);
+  end;
 end;
 
-procedure TCompOptionsList.MouseDown(Button: TMouseButton; Shift: TShiftState;X, Y: Integer);
+procedure TCompOptionsList.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-	ACol: Integer;
-	ARow: Integer;
+  ACol: Integer;
+  ARow: Integer;
 begin
-	inherited MouseDown(Button, Shift, X, Y);
+  inherited MouseDown(Button, Shift, X, Y);
 
-	if not Assigned(EditList) then Exit;
-	if not ThemeServices.ThemesEnabled then Exit;
+  if not Assigned(EditList) then
+    Exit;
+  if not ThemeServices.ThemesEnabled then
+    Exit;
 
-	MouseToCell(X, Y, ACol, ARow);
-	if (Button = mbLeft) and (ARow > FixedRows) and
-		ItemProps[ARow - FixedRows].HasPickList and
-		not EditList.ListVisible and MouseOverButton(X) then
-	begin
-		EditorMode := True;
-		TInplaceEditListAccess(EditList).DropDown;
-	end;
+  MouseToCell(X, Y, ACol, ARow);
+  if (Button = mbLeft) and (ARow > FixedRows) and
+    ItemProps[ARow - FixedRows].HasPickList and
+    not EditList.ListVisible and MouseOverButton(X) then begin
+    EditorMode := True;
+    TInplaceEditListAccess(EditList).DropDown;
+  end;
 end;
 
 function TCompOptionsList.MouseOverButton(X: Integer): Boolean;
 begin
-	if Assigned(EditList) and ThemeServices.ThemesEnabled then
-		Result := (UseRightToLeftAlignment and (X < EditList.ButtonWidth)) or
-				  (not UseRightToLeftAlignment and (X > ClientWidth - EditList.ButtonWidth))
-	else
-		Result := false;
+  if Assigned(EditList) and ThemeServices.ThemesEnabled then
+    Result := (UseRightToLeftAlignment and (X < EditList.ButtonWidth)) or
+      (not UseRightToLeftAlignment and (X > ClientWidth - EditList.ButtonWidth))
+  else
+    Result := false;
 end;
 
 end.
+

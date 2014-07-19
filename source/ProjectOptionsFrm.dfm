@@ -1,6 +1,6 @@
 object ProjectOptionsFrm: TProjectOptionsFrm
-  Left = 724
-  Top = 441
+  Left = 277
+  Top = 609
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
