@@ -151,7 +151,7 @@ type
     CloseSheet: TTabSheet;
     SaveAllBtn: TToolButton;
     SplitterLeft: TSplitter;
-    EditorPopupMenu: TPopupMenu;
+    EditorPopup: TPopupMenu;
     UndoPopItem: TMenuItem;
     RedoPopItem: TMenuItem;
     MenuItem1: TMenuItem;
@@ -427,7 +427,6 @@ type
     N46: TMenuItem;
     Commit1: TMenuItem;
     ListItem: TMenuItem;
-    GotoprojectmanagerItem: TMenuItem;
     N50: TMenuItem;
     mnuFileProps: TMenuItem;
     N54: TMenuItem;
@@ -441,7 +440,6 @@ type
     mnuCVSAdd2: TMenuItem;
     mnuCVSRemove2: TMenuItem;
     N63: TMenuItem;
-    GoToClassBrowserItem: TMenuItem;
     actBrowserShowInherited: TAction;
     Showinheritedmembers1: TMenuItem;
     actCVSLogin: TAction;
@@ -467,14 +465,13 @@ type
     N17: TMenuItem;
     ToolClassesItem: TMenuItem;
     LeftDebugSheet: TTabSheet;
-    DebugTree: TTreeView;
+    DebugView: TTreeView;
     StepOverBtn: TButton;
     DebugStartPanel: TPanel;
     DDebugBtn: TSpeedButton;
     StopExecBtn: TSpeedButton;
     N67: TMenuItem;
     FloatingReportwindowItem: TMenuItem;
-    N57: TMenuItem;
     actAttachProcess: TAction;
     ModifyWatchPop: TMenuItem;
     actModifyWatch: TAction;
@@ -590,6 +587,8 @@ type
     SourceFile1: TMenuItem;
     chkShortenPaths: TCheckBox;
     actShortenCompPaths: TAction;
+    actSyntaxCheckFile: TAction;
+    SyntaxCheckCurrentFile1: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure SetStatusbarLineCol;
@@ -663,7 +662,6 @@ type
     procedure actMsgHideExecute(Sender: TObject);
     procedure actUpdatePageCount(Sender: TObject); // enable on pagecount> 0
     procedure actUpdateProject(Sender: TObject); // enable on fproject assigned
-    procedure actUpdatePageProject(Sender: TObject); // enable on both above
     procedure actUpdatePageorProject(Sender: TObject); // enable on either of above
     procedure actUpdateEmptyEditor(Sender: TObject); // enable on unempty editor
     procedure actUpdateDebuggerRunning(Sender: TObject); // enable when debugger running
@@ -696,7 +694,6 @@ type
     procedure actSwapHeaderSourceUpdate(Sender: TObject);
     procedure actSwapHeaderSourceExecute(Sender: TObject);
     procedure actSyntaxCheckExecute(Sender: TObject);
-    procedure actUpdateExecute(Sender: TObject);
     procedure PageControlChange(Sender: TObject);
     procedure actConfigdevShortcutsExecute(Sender: TObject);
     procedure DateTimeMenuItemClick(Sender: TObject);
@@ -786,7 +783,7 @@ type
     procedure cmbMembersChange(Sender: TObject);
     procedure CompilerOutputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FindOutputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure DebugTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure DebugViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure DebugVarsPopupPopup(Sender: TObject);
     procedure FloatingReportwindowItemClick(Sender: TObject);
     procedure actAttachProcessUpdate(Sender: TObject);
@@ -825,7 +822,7 @@ type
     procedure actUpdateDebuggerRunningCPU(Sender: TObject);
     procedure actUpdateEmptyEditorFindForm(Sender: TObject);
     procedure actReplaceAllExecute(Sender: TObject);
-    procedure DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; Stage:
+    procedure DebugViewAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; Stage:
       TCustomDrawStage; var PaintImages, DefaultDraw: Boolean);
     procedure FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView; Item: TListItem; SubItem: Integer; State:
       TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
@@ -854,6 +851,8 @@ type
     procedure actPackageManagerExecute(Sender: TObject);
     procedure actHelpExecute(Sender: TObject);
     procedure actShortenCompPathsExecute(Sender: TObject);
+    procedure actSyntaxCheckFileExecute(Sender: TObject);
+    procedure LeftPageControlChange(Sender: TObject);
   private
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
@@ -862,8 +861,8 @@ type
     WindowPlacement: TWindowPlacement; // idem
     fFirstShow: boolean; // true for first WM_SHOW, false for others
     fShowTips: boolean;
-    fRunEndAction: TRunEndAction;
-    fCompSuccessAction: TCompSuccessAction;
+    fRunEndAction: TRunEndAction; // determines what to do when program execution finishes
+    fCompSuccessAction: TCompSuccessAction; // determines what to do when compilation finishes
     fParseStartTime: Cardinal; // TODO: move to CppParser?
     fOldCompilerToolbarIndex: integer;
     fAutoSaveTimer: TTimer;
@@ -887,8 +886,9 @@ type
     procedure RunEndProc;
     procedure LoadText;
     procedure OpenUnit;
-    function PrepareForRun: Boolean;
-    function PrepareForCompile: Boolean;
+    function PrepareForRun(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
+    function PrepareForCompile(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
+    function PrepareForClean(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
     procedure LoadTheme;
     procedure ScanActiveProject;
     procedure CheckForDLLProfiling;
@@ -903,7 +903,7 @@ type
   public
     function GetCompileTarget: TTarget;
     procedure UpdateCompilerList;
-    procedure UpdateClassBrowser(ReloadCache: boolean);
+    procedure UpdateClassBrowser;
     procedure UpdateAppTitle;
     procedure OpenCloseMessageSheet(Open: boolean);
     procedure OpenFile(const s: AnsiString);
@@ -937,7 +937,7 @@ uses
   datamod, NewProjectFrm, AboutFrm, PrintFrm,
   CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
   SynEdit, Math, ImageTheme, SynEditKeyCmds,
-  Types, FindFrm, Prjtypes, devExec,
+  Types, FindFrm, ProjectTypes, devExec,
   NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
   ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
@@ -983,7 +983,7 @@ begin
       ProjectPopup.Images := CurrentTheme.MenuImages;
       UnitPopup.Images := CurrentTheme.MenuImages;
       FolderPopup.Images := CurrentTheme.MenuImages;
-      EditorPopupMenu.Images := CurrentTheme.MenuImages;
+      EditorPopup.Images := CurrentTheme.MenuImages;
     end;
   end;
 end;
@@ -1267,8 +1267,6 @@ begin
   actViewToDoList.Caption := Lang[ID_VIEWTODO_MENUITEM];
   FloatingPojectManagerItem.Caption := Lang[ID_ITEM_FLOATWINDOW];
   FloatingReportWindowItem.Caption := Lang[ID_ITEM_FLOATREPORT];
-  GotoprojectmanagerItem.Caption := Lang[ID_ITEM_GOTOPROJECTVIEW];
-  GoToClassBrowserItem.Caption := Lang[ID_ITEM_GOTOCLASSBROWSER];
 
   // Project menu
   actProjectNew.Caption := Lang[ID_ITEM_NEWFILE];
@@ -1284,6 +1282,7 @@ begin
   actRebuild.Caption := Lang[ID_ITEM_REBUILD];
   actExecParams.Caption := Lang[ID_ITEM_EXECPARAMS];
   actSyntaxCheck.Caption := Lang[ID_ITEM_SYNTAXCHECK];
+  actSyntaxCheckFile.Caption := Lang[ID_ITEM_SYNTAXCHECKFILE];
   actClean.Caption := Lang[ID_ITEM_CLEAN];
   actProfile.Caption := Lang[ID_ITEM_PROFILE];
   actDebug.Caption := Lang[ID_ITEM_DEBUG];
@@ -1313,7 +1312,7 @@ begin
   actCVSRemove.Caption := Lang[ID_CVS_REMOVE];
 
   // Window menu
-  if devData.fullScreen then
+  if devData.FullScreen then
     actFullScreen.Caption := Lang[ID_ITEM_FULLSCRBACK]
   else
     actFullScreen.Caption := Lang[ID_ITEM_FULLSCRMODE];
@@ -1444,7 +1443,7 @@ var
 begin
   Result := False;
   e := GetEditor(index);
-  if assigned(e) then begin
+  if Assigned(e) then begin
 
     // Ask user if he wants to save
     if e.Text.Modified and not e.Text.IsEmpty then begin
@@ -1554,14 +1553,14 @@ end;
 procedure TMainForm.OpenCloseMessageSheet(Open: boolean);
 begin
   if Assigned(fReportToolWindow) then
-    exit;
+    Exit;
 
   // Switch between open and close
   with MessageControl do
     if Open then
-      Height := fPreviousHeight
+      Height := fPreviousHeight // remember height
     else begin
-      Height := Height - CompSheet.Height;
+      Height := Height - CompSheet.Height; // only show the tab captions
       ActivePageIndex := -1;
     end;
   CloseSheet.TabVisible := Open;
@@ -1710,7 +1709,6 @@ resourcestring
   cExecDir = '<EXECPATH>';
   cSrcList = '<SOURCESPCLIST>';
   cWordxy = '<WORDXY>';
-
 var
   e: TEditor;
 begin
@@ -2167,29 +2165,29 @@ end;
 procedure TMainForm.actSaveAllExecute(Sender: TObject);
 var
   I: integer;
-  wa: boolean;
   e: TEditor;
 begin
   // Pause the change notifier
-  wa := FileMonitor.Active;
-  FileMonitor.Deactivate;
+  FileMonitor.BeginUpdate;
+  try
+    // Make changes to files
+    if Assigned(fProject) then begin
+      fProject.SaveAll;
+      UpdateAppTitle;
+      if CppParser.Statements.Count = 0 then // only scan entire project if it has not already been scanned...
+        ScanActiveProject;
+    end;
 
-  if Assigned(fProject) then begin
-    fProject.SaveAll;
-    UpdateAppTitle;
-    if CppParser.Statements.Count = 0 then // only scan entire project if it has not already been scanned...
-      ScanActiveProject;
+    // Make changes to files
+    for I := 0 to pred(PageControl.PageCount) do begin
+      e := GetEditor(I);
+      if e.Text.Modified and ((not e.InProject) or e.IsRes) then
+        if not e.Save then
+          Break;
+    end;
+  finally
+    FileMonitor.EndUpdate;
   end;
-
-  for I := 0 to pred(PageControl.PageCount) do begin
-    e := GetEditor(I);
-    if e.Text.Modified and ((not e.InProject) or e.IsRes) then
-      if not e.Save then
-        Break;
-  end;
-
-  if wa then
-    FileMonitor.Activate;
 end;
 
 procedure TMainForm.actCloseExecute(Sender: TObject);
@@ -2214,51 +2212,50 @@ end;
 procedure TMainForm.actCloseProjectExecute(Sender: TObject);
 var
   s: AnsiString;
-  wa: boolean;
 begin
   actStopExecute.Execute;
 
   // Pause monitoring
-  wa := FileMonitor.Active;
-  FileMonitor.Deactivate;
+  FileMonitor.BeginUpdate;
+  try
 
-  // TODO: should we save watches?
-  if fProject.Modified then begin
-    if fProject.Name = '' then
-      s := fProject.FileName
-    else
-      s := fProject.Name;
+    // TODO: should we save watches?
+    if fProject.Modified then begin
+      if fProject.Name = '' then
+        s := fProject.FileName
+      else
+        s := fProject.Name;
 
-    case MessageDlg(Format(Lang[ID_MSG_SAVEPROJECT], [s]), mtConfirmation, mbYesNoCancel, 0) of
-      mrYes: begin
-          fProject.SaveAll; // do NOT save layout twice
-        end;
-      mrNo: begin
-          fProject.Modified := FALSE;
-          fProject.SaveLayout;
-        end;
-      mrCancel: begin
-          fProject.SaveLayout;
-          Exit;
-        end;
-    end;
-  end else
-    fProject.SaveLayout; // always save layout, but not when SaveAll has been called
+      case MessageDlg(Format(Lang[ID_MSG_SAVEPROJECT], [s]), mtConfirmation, mbYesNoCancel, 0) of
+        mrYes: begin
+            fProject.SaveAll; // do NOT save layout twice
+          end;
+        mrNo: begin
+            fProject.Modified := FALSE;
+            fProject.SaveLayout;
+          end;
+        mrCancel: begin
+            fProject.SaveLayout;
+            Exit;
+          end;
+      end;
+    end else
+      fProject.SaveLayout; // always save layout, but not when SaveAll has been called
 
-  dmMain.AddtoHistory(fProject.FileName);
+    dmMain.AddtoHistory(fProject.FileName);
 
-  FreeandNil(fProject);
-  ProjectView.Items.Clear;
-  ClearMessageControl;
-  UpdateCompilerList;
-  UpdateAppTitle;
-  ClassBrowser.ProjectDir := '';
-  CppParser.Reset;
+    FreeandNil(fProject);
+    ProjectView.Items.Clear;
+    ClearMessageControl;
+    UpdateCompilerList;
+    UpdateAppTitle;
+    ClassBrowser.ProjectDir := '';
+    CppParser.Reset;
 
-  SetStatusbarLineCol;
-
-  if wa then
-    FileMonitor.Activate;
+    SetStatusbarLineCol;
+  finally
+    FileMonitor.EndUpdate;
+  end;
 end;
 
 procedure TMainForm.actExportHTMLExecute(Sender: TObject);
@@ -2428,8 +2425,8 @@ procedure TMainForm.actProjectManagerExecute(Sender: TObject);
 begin
   // Hide/show this first, or otherwhise it'll show up to the left of ProjectToolWindow
   SplitterLeft.Visible := actProjectManager.Checked;
-  //if (MessageControl <> self) and assigned(ProjectToolWindow) then
-  //	ProjectToolWindow.Close;
+  if Assigned(fProjectToolWindow) then
+    fProjectToolWindow.Close;
   LeftPageControl.Visible := actProjectManager.Checked;
   devData.ShowLeftPages := actProjectManager.Checked;
 end;
@@ -2520,6 +2517,8 @@ var
 begin
   with TEditorOptForm.Create(Self) do try
       if ShowModal = mrOk then begin
+
+        // Apply editor options
         dmMain.UpdateHighlighter;
         for I := 0 to PageControl.PageCount - 1 do begin
           e := TEditor(PageControl.Pages[I].Tag);
@@ -2527,25 +2526,21 @@ begin
           e.InitCompletion;
         end;
 
-        // Repaint current editor
+        // Repaint current editor to show new colors
         e := GetEditor;
         if Assigned(e) then
-          e.Text.Repaint; // apply colors
+          e.Text.Repaint;
 
-        // Cache options have changed...
-        if chkCCCache.Tag = 1 then
-          CppParser.Reset(true);
-
-        UpdateClassBrowser(chkCCCache.Tag = 1);
-
-        // After updating, do a rescan if options have changed.
-        if chkCCCache.Tag = 1 then
+        // Only do a lengthy reparse if completion options have changed
+        if taCompletion in AccessedTabs then begin
+          UpdateClassBrowser;
           ScanActiveProject;
 
-        // if there is no active editor, clear the class-browser
-        e := GetEditor;
-        if not Assigned(e) and (ClassBrowser.ShowFilter = sfCurrent) then
-          ClassBrowser.Clear;
+          // if there is no active editor, clear the class-browser
+          e := GetEditor;
+          if not Assigned(e) and (ClassBrowser.ShowFilter = sfCurrent) then
+            ClassBrowser.Clear;
+        end;
       end;
     finally
       Free;
@@ -2891,25 +2886,30 @@ begin
       Result := ctFile;
     end;
 
-  // No editors have been opened. Check if a project is open
+    // No editors have been opened. Check if a project is open
   end else if Assigned(fProject) then begin
     Result := ctProject;
 
-  // No project, no editor...
+    // No project, no editor...
   end else begin
     Result := ctNone;
   end;
 end;
 
-function TMainForm.PrepareForRun: Boolean;
+function TMainForm.PrepareForRun(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
 begin
   Result := False;
 
   // Determine what to run
   fCompiler.Project := nil;
   fCompiler.SourceFile := '';
-  fCompiler.Target := GetCompileTarget;
+  if ForcedCompileTarget <> ctInvalid then
+    fCompiler.Target := ForcedCompileTarget
+  else
+    fCompiler.Target := GetCompileTarget;
   case fCompiler.Target of
+    ctInvalid:
+      Exit;
     ctNone:
       Exit;
     ctFile: begin
@@ -2923,7 +2923,7 @@ begin
   Result := True;
 end;
 
-function TMainForm.PrepareForCompile: Boolean;
+function TMainForm.PrepareForCompile(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
 var
   i: Integer;
   e: TEditor;
@@ -2939,17 +2939,30 @@ begin
   end;
 
   // Set PATH variable (not overriden by SetCurrentDir)
-  if Assigned(devCompilerSets.CurrentSet) then
+  if Assigned(devCompilerSets.CurrentSet) then begin // should NOT be false
     if devCompilerSets.CurrentSet.BinDir.Count > 0 then
-      SetPath(devCompilerSets.CurrentSet.BinDir[0]);
+      SetPath(devCompilerSets.CurrentSet.BinDir[0])
+    else begin
+      LogEntryProc(Format(Lang[ID_LOG_NOBINDIRABORT], [devCompilerSets.CurrentSet.Name]));
+      Exit; // returns false
+    end;
+  end;
 
   // Determine what to compile
   fCompiler.Project := nil;
   fCompiler.SourceFile := '';
-  fCompiler.Target := GetCompileTarget;
+  if ForcedCompileTarget <> ctInvalid then
+    fCompiler.Target := ForcedCompileTarget
+  else
+    fCompiler.Target := GetCompileTarget;
   case fCompiler.Target of
-    ctNone:
-      Exit;
+    ctInvalid: begin
+        Exit;
+      end;
+    ctNone: begin
+        LogEntryProc(Lang[ID_LOG_NOTHINGABORT]);
+        Exit;
+      end;
     ctFile: begin
         e := GetEditor; // always succeeds if ctFile is returned
         fCompiler.SourceFile := e.FileName;
@@ -2958,20 +2971,77 @@ begin
       end;
     ctProject: begin
         fCompiler.Project := fProject;
-        actSaveAllExecute(Self);
+
+        // Save all files that are in a project
+        if not fProject.SaveUnits then
+          Exit;
+        UpdateAppTitle;
+        if CppParser.Statements.Count = 0 then // only scan entire project if it has not already been scanned...
+          ScanActiveProject;
+
+        // Check if saves have been succesful
         for i := 0 to PageControl.PageCount - 1 do begin // check if saving failed
           e := GetEditor(i);
           if e.InProject and e.Text.Modified then
             Exit;
         end;
+
+        // Increment build number automagically
+        if fProject.Options.VersionInfo.AutoIncBuildNr then
+          fProject.IncrementBuildNumber;
+        fProject.BuildPrivateResource;
       end;
   end;
 
-  // Etc.
-  if Assigned(fProject) then begin
-    if fProject.Options.VersionInfo.AutoIncBuildNr then
-      fProject.IncrementBuildNumber;
-    fProject.BuildPrivateResource;
+  Result := True;
+end;
+
+function TMainForm.PrepareForClean(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
+var
+  e: TEditor;
+begin
+  Result := False;
+
+  ClearCompileMessages;
+
+  // always show compilation log (no intrusive windows anymore)
+  if devData.ShowProgress then begin
+    OpenCloseMessageSheet(True);
+    MessageControl.ActivePage := LogSheet;
+  end;
+
+  // Set PATH variable (not overriden by SetCurrentDir)
+  if Assigned(devCompilerSets.CurrentSet) then begin // should NOT be false
+    if devCompilerSets.CurrentSet.BinDir.Count > 0 then
+      SetPath(devCompilerSets.CurrentSet.BinDir[0])
+    else begin
+      LogEntryProc(Format(Lang[ID_LOG_NOBINDIRABORT], [devCompilerSets.CurrentSet.Name]));
+      Exit; // returns false
+    end;
+  end;
+
+  // Determine what to compile
+  fCompiler.Project := nil;
+  fCompiler.SourceFile := '';
+  if ForcedCompileTarget <> ctInvalid then
+    fCompiler.Target := ForcedCompileTarget
+  else
+    fCompiler.Target := GetCompileTarget;
+  case fCompiler.Target of
+    ctInvalid: begin
+        Exit;
+      end;
+    ctNone: begin
+        LogEntryProc(Lang[ID_LOG_NOTHINGABORT]);
+        Exit;
+      end;
+    ctFile: begin
+        e := GetEditor; // always succeeds if ctFile is returned
+        fCompiler.SourceFile := e.FileName;
+      end;
+    ctProject: begin
+        fCompiler.Project := fProject;
+      end;
   end;
 
   Result := True;
@@ -3034,13 +3104,8 @@ begin
     MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
     Exit;
   end;
-
-  // always show compilation log (no intrusive windows anymore)
-  if devData.ShowProgress then begin
-    OpenCloseMessageSheet(True);
-    MessageControl.ActivePage := LogSheet;
-  end;
-
+  if not PrepareForClean then
+    Exit;
   fCompiler.Clean;
 end;
 
@@ -3071,9 +3136,6 @@ var
   filepath: AnsiString;
   DebugEnabled, StripEnabled: boolean;
 begin
-  if not Assigned(devCompilerSets.CurrentSet) then
-    Exit;
-
   case GetCompileTarget of
     ctProject: begin
         // Check if we enabled proper options
@@ -3218,28 +3280,29 @@ procedure TMainForm.actEnviroOptionsExecute(Sender: TObject);
 begin
   with TEnviroForm.Create(Self) do try
       if ShowModal = mrOk then begin
-        if devData.MsgTabs = 0 then
-          PageControl.TabPosition := tpTop
-        else if devData.MsgTabs = 1 then
-          PageControl.TabPosition := tpBottom
-        else if devData.MsgTabs = 2 then
-          PageControl.TabPosition := tpLeft
-        else if devData.MsgTabs = 3 then
-          PageControl.TabPosition := tpRight;
-        SetupProjectView;
-
+        // Update pagecontrol
+        PageControl.TabPosition := devData.MsgTabs;
         PageControl.MultiLine := devData.MultiLineTab;
 
+        // Update left pagecontrol selection options
+        SetupProjectView;
+
+        // Update fullscreen options
         if devData.FullScreen then
           Toolbar.Visible := devData.ShowBars;
 
+        // Pick new language if we have to (long process)
         if devData.LangChange then begin
           Lang.SetLang(devData.Language);
           LoadText;
         end;
+
+        // Load new icons, also only if we have to
         if devData.ThemeChange then
           Loadtheme;
         Shortcuts.Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
+
+        // Rebuild recent file list (max count could have changed
         dmMain.RebuildMRU;
       end;
     finally
@@ -3254,23 +3317,18 @@ end;
 
 procedure TMainForm.actUpdateDeleteWatch(Sender: TObject);
 begin
-  TCustomAction(Sender).Enabled := Assigned(DebugTree.Selected);
+  TCustomAction(Sender).Enabled := Assigned(DebugView.Selected);
 end;
 
 procedure TMainForm.actUpdatePageorProject(Sender: TObject);
 begin
-  TCustomAction(Sender).Enabled := assigned(fProject) or (PageControl.PageCount > 0);
+  TCustomAction(Sender).Enabled := Assigned(fProject) or (PageControl.PageCount > 0);
 end;
 
 procedure TMainForm.actCompileUpdate(Sender: TObject);
 begin
-  TCustomAction(Sender).Enabled := (assigned(fProject) or (PageControl.PageCount > 0)) and not fCompiler.Compiling and
+  TCustomAction(Sender).Enabled := (not fCompiler.Compiling) and (GetCompileTarget <> ctNone) and
     Assigned(devCompilerSets.CurrentSet);
-end;
-
-procedure TMainForm.actUpdatePageProject(Sender: TObject);
-begin
-  TCustomAction(Sender).Enabled := assigned(fProject) and (PageControl.PageCount > 0);
 end;
 
 procedure TMainForm.actUpdateProject(Sender: TObject);
@@ -3302,6 +3360,25 @@ var
 begin
   e := GetEditor;
   TCustomAction(Sender).Enabled := Assigned(e) and (not Assigned(FindForm) or not FindForm.Showing);
+end;
+
+procedure TMainForm.actRunUpdate(Sender: TObject);
+begin
+  if Assigned(fProject) then
+    TCustomAction(Sender).Enabled := (GetCompileTarget <> ctNone) and (fProject.Options.typ <> dptStat) and (not
+      fCompiler.Compiling)
+  else
+    TCustomAction(Sender).Enabled := (GetCompileTarget <> ctNone) and (not fCompiler.Compiling);
+end;
+
+procedure TMainForm.actCompileRunUpdate(Sender: TObject);
+begin
+  if Assigned(fProject) then
+    TCustomAction(Sender).Enabled := (fProject.Options.typ <> dptStat) and (not fCompiler.Compiling) and
+      (GetCompileTarget <> ctNone) and Assigned(devCompilerSets.CurrentSet)
+  else
+    TCustomAction(Sender).Enabled := (not fCompiler.Compiling) and (GetCompileTarget <> ctNone) and
+      Assigned(devCompilerSets.CurrentSet)
 end;
 
 procedure TMainForm.ToolbarClick(Sender: TObject);
@@ -3679,7 +3756,7 @@ procedure TMainForm.actRemoveWatchExecute(Sender: TObject);
 var
   node: TTreeNode;
 begin
-  node := DebugTree.Selected;
+  node := DebugView.Selected;
   if Assigned(node) then begin
 
     // Retrieve topmost node
@@ -3916,10 +3993,11 @@ begin
   cmbCompilers.Items.EndUpdate;
 end;
 
-procedure TMainForm.UpdateClassBrowser(ReloadCache: boolean);
+procedure TMainForm.UpdateClassBrowser;
 var
   I: integer;
 begin
+  CppParser.Reset(False);
   CppParser.Tokenizer := CppTokenizer;
   CppParser.Preprocessor := CppPreprocessor;
   CppParser.Enabled := devCodeCompletion.Enabled;
@@ -3948,7 +4026,7 @@ begin
     end;
 
   // This takes up about 99% of our time
-  if devCodeCompletion.UseCacheFiles and ReloadCache then begin
+  if devCodeCompletion.UseCacheFiles then begin
     try
       Application.ProcessMessages;
       CppParser.Load(devDirs.Config + DEV_COMPLETION_CACHE, devDirs.Exec);
@@ -3973,6 +4051,7 @@ begin
     ClassBrowser.ShowFilter := TShowFilter(devClassBrowsing.ShowFilter);
     ClassBrowser.ShowInheritedMembers := devClassBrowsing.ShowInheritedMembers;
     ClassBrowser.ClassFoldersFile := DEV_CLASSFOLDERS_FILE;
+    ClassBrowser.TabVisible := LeftPageControl.ActivePageIndex = 1;
   finally
     ClassBrowser.EndUpdate;
   end;
@@ -4090,32 +4169,6 @@ begin
   if not PrepareForCompile then
     Exit;
   fCompiler.CheckSyntax;
-end;
-
-procedure TMainForm.actUpdateExecute(Sender: TObject);
-begin
-  if Assigned(fProject) then
-    TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat)
-  else
-    TCustomAction(Sender).Enabled := PageControl.PageCount > 0;
-end;
-
-procedure TMainForm.actRunUpdate(Sender: TObject);
-begin
-  if Assigned(fProject) then
-    TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and not fCompiler.Compiling
-  else
-    TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and not fCompiler.Compiling;
-end;
-
-procedure TMainForm.actCompileRunUpdate(Sender: TObject);
-begin
-  if Assigned(fProject) then
-    TCustomAction(Sender).Enabled := not (fProject.Options.typ = dptStat) and not fCompiler.Compiling and
-      Assigned(devCompilerSets.CurrentSet)
-  else
-    TCustomAction(Sender).Enabled := (PageControl.PageCount > 0) and not fCompiler.Compiling and
-      Assigned(devCompilerSets.CurrentSet);
 end;
 
 procedure TMainForm.EditorSaveTimer(Sender: TObject);
@@ -4563,9 +4616,6 @@ var
   path: AnsiString;
   e: TEditor;
 begin
-  if not Assigned(devCompilerSets.CurrentSet) then
-    Exit;
-
   case GetCompileTarget of
     ctProject: begin
         // Check if we enabled proper options
@@ -4577,7 +4627,7 @@ begin
           0) = mrYes) then begin
 
           // Enable profiling, disable stripping
-          fProject.SetCompilerOption('-g3', '1');
+          fProject.SetCompilerOption('-pg', '1');
           fProject.SetCompilerOption('-s', '0');
 
           fCompSuccessAction := csaProfile;
@@ -4598,7 +4648,7 @@ begin
 
           // Enable profiling, disable stripping
           with devCompilerSets.CurrentSet do begin
-            SetOption('-g3', '1');
+            SetOption('-pg', '1');
             SetOption('-s', '0');
           end;
 
@@ -4709,36 +4759,47 @@ end;
 
 procedure TMainForm.FileMonitorNotifyChange(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: string);
 var
+  EditorIndex: integer;
   e: TEditor;
   p: TBufferCoord;
-  wa: boolean;
 begin
   // Deactivate monitoring for this file. One message is enough
-  wa := FileMonitor.Active;
-  FileMonitor.Deactivate;
-
-  case ChangeType of
-    mctChanged: begin
-        Application.Restore;
-        if MessageDlg(Format(Lang[ID_ERR_FILECHANGED], [Filename]), mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-          e := GetEditorFromFileName(Filename);
-          if Assigned(e) then begin
-            p := e.Text.CaretXY;
-            e.Text.Lines.LoadFromFile(Filename);
-            if (p.Line <= e.Text.Lines.Count) then
-              e.Text.CaretXY := p;
+  FileMonitor.BeginUpdate;
+  try
+    case ChangeType of
+      mctChanged: begin
+          Application.Restore;
+          if MessageDlg(Format(Lang[ID_ERR_FILECHANGED], [Filename]), mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+            begin
+            e := GetEditorFromFileName(Filename);
+            if Assigned(e) then begin
+              p := e.Text.CaretXY;
+              e.Text.Lines.LoadFromFile(Filename);
+              if (p.Line <= e.Text.Lines.Count) then
+                e.Text.CaretXY := p;
+            end;
           end;
         end;
-      end;
-    mctDeleted: begin
-        Application.Restore;
-        MessageDlg(Format(Lang[ID_ERR_RENAMEDDELETED], [Filename]), mtInformation, [mbOk], 0);
-      end;
+      mctDeleted: begin
+          Application.Restore;
+          case MessageDlg(Format(Lang[ID_ERR_RENAMEDDELETEDKEEP], [Filename]), mtInformation, [mbYes, mbNo], 0) of
+            mrYes: begin
+                EditorIndex := FileIsOpen(Filename);
+                e := GetEditor(EditorIndex);
+                if Assigned(e) then
+                  e.Text.Modified := True;
+              end;
+            mrNo: begin
+                EditorIndex := FileIsOpen(Filename);
+                if EditorIndex <> -1 then
+                  CloseEditor(EditorIndex);
+              end;
+          end;
+        end;
+    end;
+  finally
+    FileMonitor.EndUpdate;
   end;
-
-  // Activate once messagebox is gone
-  if wa then
-    FileMonitor.Activate;
 end;
 
 procedure TMainForm.actFilePropertiesExecute(Sender: TObject);
@@ -4950,9 +5011,7 @@ procedure TMainForm.actExecParamsExecute(Sender: TObject);
 begin
   with TParamsForm.Create(self) do try
       case GetCompileTarget of
-        ctNone:
-          ParamEdit.Text := '';
-        ctFile:
+        ctNone, ctFile:
           ParamEdit.Text := fCompiler.RunParams;
         ctProject: begin
             HostEdit.Text := fProject.Options.HostApplication;
@@ -5216,29 +5275,28 @@ end;
 
 procedure TMainForm.actCVSUpdateExecute(Sender: TObject);
 var
-  wa: boolean;
   I: integer;
   e: TEditor;
   pt: TBufferCoord;
 begin
-  actSaveAll.Execute;
-  wa := FileMonitor.Active;
-  FileMonitor.Deactivate;
+  // We will change files. Do not monitor for changes
+  FileMonitor.BeginUpdate;
+  try
+    actSaveAll.Execute;
+    DoCVSAction(Sender, caUpdate);
 
-  DoCVSAction(Sender, caUpdate);
-
-  // Refresh CVS Changes
-  for I := 0 to PageControl.PageCount - 1 do begin
-    e := GetEditor(I);
-    if Assigned(e) and FileExists(e.FileName) then begin
-      pt := e.Text.CaretXY;
-      e.Text.Lines.LoadFromFile(e.FileName);
-      e.Text.CaretXY := pt;
+    // Refresh CVS Changes
+    for I := 0 to PageControl.PageCount - 1 do begin
+      e := GetEditor(I);
+      if Assigned(e) and FileExists(e.FileName) then begin
+        pt := e.Text.CaretXY;
+        e.Text.Lines.LoadFromFile(e.FileName);
+        e.Text.CaretXY := pt;
+      end;
     end;
+  finally
+    FileMonitor.EndUpdate;
   end;
-
-  if wa then
-    FileMonitor.Activate;
 end;
 
 procedure TMainForm.actCVSCommitExecute(Sender: TObject);
@@ -5709,7 +5767,7 @@ begin
       FindOutputDblClick(sender);
 end;
 
-procedure TMainForm.DebugTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TMainForm.DebugViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
 {$IFDEF WIN32}
   if Key = VK_DELETE then
@@ -5722,7 +5780,7 @@ end;
 
 procedure TMainForm.DebugVarsPopupPopup(Sender: TObject);
 begin
-  RemoveWatchPop.Enabled := Assigned(DebugTree.Selected);
+  RemoveWatchPop.Enabled := Assigned(DebugView.Selected);
 end;
 
 procedure TMainForm.FloatingReportwindowItemClick(Sender: TObject);
@@ -5821,7 +5879,7 @@ var
   end;
 
 begin
-  curnode := DebugTree.Selected;
+  curnode := DebugView.Selected;
   if Assigned(curnode) then begin // only edit members
 
     fullname := GetNodeName(curnode);
@@ -5833,7 +5891,7 @@ begin
         fullname := GetNodeName(curnode) + '.' + fullname;
     end;
 
-    value := GetNodeValue(DebugTree.Selected);
+    value := GetNodeValue(DebugView.Selected);
 
     if InputQuery(Lang[ID_NV_MODIFYVALUE], fullname, value) then
       fDebugger.SendCommand('set variable', fullname + ' = ' + value, true);
@@ -5842,7 +5900,7 @@ end;
 
 procedure TMainForm.actModifyWatchUpdate(Sender: TObject);
 begin
-  TCustomAction(Sender).Enabled := Assigned(DebugTree.Selected) and fDebugger.Executing;
+  TCustomAction(Sender).Enabled := Assigned(DebugView.Selected) and fDebugger.Executing;
 end;
 
 procedure TMainForm.ClearallWatchPopClick(Sender: TObject);
@@ -6119,19 +6177,23 @@ begin
 
   // Create a compiler
   fCompiler := TCompiler.Create;
-  fCompiler.OnLogEntry := LogEntryProc;
-  fCompiler.OnOutput := CompOutputProc;
-  fCompiler.OnResOutput := CompResOutputProc;
-  fCompiler.OnCompEnd := CompEndProc;
-  fCompiler.OnCompSuccess := CompSuccessProc;
-  fCompiler.OnRunEnd := RunEndProc;
+  with fCompiler do begin
+    OnLogEntry := LogEntryProc;
+    OnOutput := CompOutputProc;
+    OnResOutput := CompResOutputProc;
+    OnCompEnd := CompEndProc;
+    OnCompSuccess := CompSuccessProc;
+    OnRunEnd := RunEndProc;
+  end;
 
   // Remember long version of paths
   fLogOutputRawData := TStringList.Create;
 
   // Create a debugger
   fDebugger := TDebugger.Create;
-  fDebugger.DebugTree := DebugTree;
+  with fDebugger do begin
+    DebugTree := DebugView;
+  end;
 
   // Custom tools
   fTools := TToolController.Create;
@@ -6145,9 +6207,11 @@ begin
   // Don't create the autosave timer when we don't need it
   if devEditor.EnableAutoSave then begin
     AutoSaveTimer := TTimer.Create(nil);
-    AutoSaveTimer.OnTimer := EditorSaveTimer;
-    AutoSaveTimer.Interval := devEditor.Interval * 60 * 1000; // miliseconds to minutes
-    AutoSaveTimer.Enabled := devEditor.EnableAutoSave;
+    with AutoSaveTimer do begin
+      OnTimer := EditorSaveTimer;
+      Interval := devEditor.Interval * 60 * 1000; // miliseconds to minutes
+      Enabled := devEditor.EnableAutoSave;
+    end;
   end;
 
   UpdateSplash('Applying shortcuts...');
@@ -6167,6 +6231,7 @@ begin
   // Set left page control to previous state
   actProjectManager.Checked := devData.ShowLeftPages;
   LeftPageControl.ActivePageIndex := devData.LeftActivePage;
+  SetupProjectView;
   actProjectManagerExecute(nil);
   LeftPageControl.Width := devData.ProjectWidth;
   if devData.ProjectFloat then begin
@@ -6175,8 +6240,8 @@ begin
   end;
 
   // Set bottom page control to previous state
-  MessageControl.Height := devData.OutputHeight;
-  fPreviousHeight := MessageControl.Height;
+  fPreviousHeight := devData.OutputHeight;
+  OpenCloseMessageSheet(False);
   if devData.MessageFloat then begin
     FloatingReportwindowItem.Click;
     devData.ReportWindowState.SetPlacement(fReportToolWindow.Handle);
@@ -6187,8 +6252,39 @@ begin
   actStatusbar.Checked := devData.Statusbar;
   actStatusbarExecute(nil);
 
-  // Set toolbars to previous state
-  ToolMainItem.checked := devData.ToolbarMain;
+  // Set toolbars to previous state.
+  // 1) position
+  tbMain.Left := devData.ToolbarMainX;
+  tbMain.Top := devData.ToolbarMainY;
+  tbEdit.Left := devData.ToolbarEditX;
+  tbEdit.Top := devData.ToolbarEditY;
+  tbCompile.Left := devData.ToolbarCompileX;
+  tbCompile.Top := devData.ToolbarCompileY;
+  tbProject.Left := devData.ToolbarProjectX;
+  tbProject.Top := devData.ToolbarProjectY;
+  tbSpecials.Left := devData.ToolbarSpecialsX;
+  tbSpecials.Top := devData.ToolbarSpecialsY;
+  tbSearch.Left := devData.ToolbarSearchX;
+  tbSearch.Top := devData.ToolbarSearchY;
+  tbClasses.Left := devData.ToolbarClassesX;
+  tbClasses.Top := devData.ToolbarClassesY;
+  tbCompilers.Left := devData.ToolbarCompilersX;
+  tbCompilers.Top := devData.ToolbarCompilersY;
+
+  // Set toolbars to previous state.
+  // 2) Visibility
+  tbMain.Visible := devData.ToolbarMain;
+  tbEdit.Visible := devData.ToolbarEdit;
+  tbCompile.Visible := devData.ToolbarCompile;
+  tbProject.Visible := devData.ToolbarProject;
+  tbSpecials.Visible := devData.ToolbarSpecials;
+  tbSearch.Visible := devData.ToolbarSearch;
+  tbClasses.Visible := devData.ToolbarClasses;
+  tbCompilers.Visible := devData.ToolbarCompilers;
+
+  // Set toolbars to previous state.
+  // 3) UI components
+  ToolMainItem.Checked := devData.ToolbarMain;
   ToolEditItem.Checked := devData.ToolbarEdit;
   ToolCompileandRunItem.Checked := devData.ToolbarCompile;
   ToolProjectItem.Checked := devData.ToolbarProject;
@@ -6196,19 +6292,9 @@ begin
   ToolSearchItem.Checked := devData.ToolbarSearch;
   ToolClassesItem.Checked := devData.ToolbarClasses;
   ToolCompilersItem.Checked := devData.ToolbarCompilers;
-  ToolbarClick(nil);
-
-  SetupProjectView;
 
   // PageControl settings
-  if devData.MsgTabs = 0 then
-    PageControl.TabPosition := tpTop
-  else if devData.MsgTabs = 1 then
-    PageControl.TabPosition := tpBottom
-  else if devData.MsgTabs = 2 then
-    PageControl.TabPosition := tpLeft
-  else if devData.MsgTabs = 3 then
-    PageControl.TabPosition := tpRight;
+  PageControl.TabPosition := devData.MsgTabs;
   PageControl.MultiLine := devData.MultiLineTab;
 
   UpdateSplash('Loading MRU list...');
@@ -6264,7 +6350,7 @@ begin
 
   UpdateSplash(Lang[ID_LOAD_INITCLASSBROWSER]);
 
-  UpdateClassBrowser(true);
+  UpdateClassBrowser;
 
   UpdateSplash(Lang[ID_LOAD_RESTOREWINDOW]);
 
@@ -6348,26 +6434,6 @@ begin
   if fFirstShow then begin
     fFirstShow := false;
 
-    OpenCloseMessageSheet(false);
-
-    // Toolbar positions, needs to be done here, because on Create, the width of the TControlBar isn't yet set
-    tbMain.Left := devData.ToolbarMainX;
-    tbMain.Top := devData.ToolbarMainY;
-    tbEdit.Left := devData.ToolbarEditX;
-    tbEdit.Top := devData.ToolbarEditY;
-    tbCompile.Left := devData.ToolbarCompileX;
-    tbCompile.Top := devData.ToolbarCompileY;
-    tbProject.Left := devData.ToolbarProjectX;
-    tbProject.Top := devData.ToolbarProjectY;
-    tbSpecials.Left := devData.ToolbarSpecialsX;
-    tbSpecials.Top := devData.ToolbarSpecialsY;
-    tbSearch.Left := devData.ToolbarSearchX;
-    tbSearch.Top := devData.ToolbarSearchY;
-    tbClasses.Left := devData.ToolbarClassesX;
-    tbClasses.Top := devData.ToolbarClassesY;
-    tbCompilers.Left := devData.ToolbarCompilersX;
-    tbCompilers.Top := devData.ToolbarCompilersY;
-
     // Open files passed to us (HAS to be done at FormShow)
     i := 1;
     fShowTips := true;
@@ -6422,7 +6488,7 @@ begin
   end;
 end;
 
-procedure TMainForm.DebugTreeAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
+procedure TMainForm.DebugViewAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
   Stage: TCustomDrawStage; var PaintImages, DefaultDraw: Boolean);
 var
   curnode: TTreeNode;
@@ -6763,15 +6829,33 @@ begin
   // Re-add data to undo/redo shortening
   LogOutput.Lines.BeginUpdate;
   try
+    LogOutput.Lines.Clear;
     for I := 0 to fLogOutputRawData.Count - 1 do begin
       if devData.ShortenCompPaths then
-        LogOutput.Lines[i] := ShortenLogOutput(fLogOutputRawData[i])
+        LogOutput.Lines.Add(ShortenLogOutput(fLogOutputRawData[i]))
       else
-        LogOutput.Lines[i] := fLogOutputRawData[i];
+        LogOutput.Lines.Add(fLogOutputRawData[i]);
     end;
   finally
     LogOutput.Lines.EndUpdate;
   end;
+end;
+
+procedure TMainForm.actSyntaxCheckFileExecute(Sender: TObject);
+begin
+  actStopExecuteExecute(Self);
+  if fCompiler.Compiling then begin
+    MessageDlg(Lang[ID_MSG_ALREADYCOMP], mtInformation, [mbOK], 0);
+    Exit;
+  end;
+  if not PrepareForCompile(ctFile) then
+    Exit;
+  fCompiler.CheckSyntax;
+end;
+
+procedure TMainForm.LeftPageControlChange(Sender: TObject);
+begin
+  ClassBrowser.TabVisible := LeftPageControl.ActivePage = LeftClassSheet;
 end;
 
 end.

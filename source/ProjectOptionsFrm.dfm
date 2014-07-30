@@ -480,7 +480,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
         Width = 495
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
+        ItemHeight = 0
         TabOrder = 1
         OnChange = cmbCompilerChange
       end
@@ -1379,7 +1379,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
           Width = 209
           Height = 23
           Style = csDropDownList
-          ItemHeight = 15
+          ItemHeight = 0
           Sorted = True
           TabOrder = 4
         end

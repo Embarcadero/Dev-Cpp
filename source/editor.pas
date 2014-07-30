@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
-    SynEditExport, SynExportRTF,
+  SynEditExport, SynExportRTF,
   Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version, SynEditCodeFolding, SynExportHTML,
   SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils, CodeToolTip;
 {$ENDIF}
@@ -295,7 +295,7 @@ begin
   fText.Parent := fTabSheet;
   fText.Visible := True;
   fText.Align := alClient;
-  fText.PopupMenu := MainForm.EditorPopupMenu;
+  fText.PopupMenu := MainForm.EditorPopup;
   fText.WantTabs := True;
   fText.ShowHint := True;
   fText.OnStatusChange := EditorStatusChange;
@@ -1416,7 +1416,7 @@ var
       fText.Hint := MainForm.CppParser.PrettyPrintStatement(st) + ' - ' + ExtractFileName(st^._FileName) + ' (' +
         IntToStr(st^._Line) + ') - Ctrl+Click for more info';
       fText.Hint := StringReplace(fText.Hint, '|', #5, [rfReplaceAll]);
-        // vertical bar is used to split up short and long hint versions...
+      // vertical bar is used to split up short and long hint versions...
     end;
   end;
 
@@ -1662,46 +1662,46 @@ begin
 end;
 
 function TEditor.Save: boolean;
-var
-  wa: boolean;
 begin
   Result := True;
 
-  // Is this file read-only?
-  if FileExists(fFileName) and (FileGetAttr(fFileName) and faReadOnly <> 0) then begin
+  // We will be changing files. Stop monitoring
+  MainForm.FileMonitor.BeginUpdate;
+  try
 
-    // Yes, ask the user if he wants us to fix that
-    if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [fFileName]), mtConfirmation, [mbYes, mbNo], 0) = mrNo then
-      Exit;
+    // Is this file read-only?
+    if FileExists(fFileName) and (FileGetAttr(fFileName) and faReadOnly <> 0) then begin
 
-    // Yes, remove read-only attribute
-    if FileSetAttr(fFileName, FileGetAttr(fFileName) - faReadOnly) <> 0 then begin
-      MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [fFileName]), mtError, [mbOk], 0);
-      Exit;
+      // Yes, ask the user if he wants us to fix that
+      if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [fFileName]), mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+        Exit;
+
+      // Yes, remove read-only attribute
+      if FileSetAttr(fFileName, FileGetAttr(fFileName) - faReadOnly) <> 0 then begin
+        MessageDlg(Format(Lang[ID_MSG_FILEREADONLYERROR], [fFileName]), mtError, [mbOk], 0);
+        Exit;
+      end;
     end;
+
+    // Filename already present? Save without dialog
+    if (not fNew) and fText.Modified then begin
+
+      // Save contents directly
+      try
+        fText.UnCollapsedLines.SaveToFile(fFileName);
+        fText.Modified := false;
+      except
+        MessageDlg(Format(Lang[ID_ERR_SAVEFILE], [fFileName]), mtError, [mbOk], 0);
+        Result := False;
+      end;
+
+      MainForm.CppParser.ReParseFile(fFileName, InProject);
+    end else if fNew then
+      Result := SaveAs; // we need a file name, use dialog
+
+  finally
+    MainForm.FileMonitor.EndUpdate;
   end;
-
-  wa := MainForm.FileMonitor.Active;
-  MainForm.FileMonitor.Deactivate;
-
-  // Filename already present? Save without dialog
-  if (not fNew) and fText.Modified then begin
-
-    // Save contents directly
-    try
-      fText.UnCollapsedLines.SaveToFile(fFileName);
-      fText.Modified := false;
-    except
-      MessageDlg(Format(Lang[ID_ERR_SAVEFILE], [fFileName]), mtError, [mbOk], 0);
-      Result := False;
-    end;
-
-    MainForm.CppParser.ReParseFile(fFileName, InProject);
-  end else if fNew then
-    Result := SaveAs; // we need a file name, use dialog
-
-  if wa then
-    MainForm.FileMonitor.Activate;
 end;
 
 function TEditor.SaveAs: boolean;
@@ -1745,6 +1745,7 @@ begin
         // Remove old file from statement list
         MainForm.CppParser.InvalidateFile(fFileName);
 
+        // Try to save to disk
         try
           fText.UnCollapsedLines.SaveToFile(FileName);
           fText.Modified := false;
@@ -1754,21 +1755,26 @@ begin
           Result := False;
         end;
 
+        // Update project information
         if Assigned(MainForm.Project) and Self.InProject then begin
           UnitIndex := MainForm.Project.Units.IndexOf(fFileName); // index of old filename
           if UnitIndex <> -1 then
-            MainForm.Project.SaveUnitAs(UnitIndex,FileName); // save as new filename
+            MainForm.Project.SaveUnitAs(UnitIndex, FileName); // save as new filename
         end else
           fTabSheet.Caption := ExtractFileName(FileName);
 
+        // Update window captions
         fFileName := FileName;
         MainForm.UpdateAppTitle;
 
-        // We haven't scanned it yet...
-        MainForm.CppParser.ReParseFile(FileName, InProject);
-
-        // Update class browser
-        MainForm.ClassBrowser.CurrentFile := FileName;
+        // Update class browser, redraw once
+        MainForm.ClassBrowser.BeginUpdate;
+        try
+          MainForm.CppParser.ReParseFile(FileName, InProject);
+          MainForm.ClassBrowser.CurrentFile := FileName;
+        finally
+          MainForm.ClassBrowser.EndUpdate;
+        end;
       end else
         Result := False;
     finally

@@ -21,12 +21,12 @@ unit devMonitorTypes;
 
 interface
 
-uses 
+uses
 {$IFDEF WIN32}
   Classes, Windows;
 {$ENDIF}
 {$IFDEF LINUX}
-  Classes;
+Classes;
 {$ENDIF}
 
 type
@@ -35,10 +35,11 @@ type
 
   PdevMonitorFile = ^TdevMonitorFile;
   TdevMonitorFile = record
-    FileName : AnsiString;
-    TimeStamp : integer;
+    FileName: AnsiString;
+    TimeStamp: integer;
   end;
-  
+
 implementation
 
 end.
+

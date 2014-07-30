@@ -17,14 +17,14 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit compiler;
+unit Compiler;
 
 interface
 
 uses
 {$IFDEF WIN32}
   Windows, SysUtils, Dialogs, StdCtrls, Controls, ComCtrls, Forms,
-  devrun, version, project, utils, prjtypes, Classes, Graphics;
+  devrun, version, project, utils, ProjectTypes, Classes, Graphics;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, QDialogs, QStdCtrls, QComCtrls, QForms,
@@ -39,7 +39,7 @@ type
   TCompSuccessEvent = procedure of object;
   TRunEndEvent = procedure of object;
 
-  TTarget = (ctNone, ctFile, ctProject);
+  TTarget = (ctInvalid, ctNone, ctFile, ctProject);
 
   TCompiler = class
   private
@@ -55,9 +55,10 @@ type
     fMakefile: AnsiString;
     fTarget: TTarget;
     fErrCount: integer;
-    DoCheckSyntax: Boolean;
+    fCheckSyntax: Boolean;
     fWarnCount: integer;
     fStartTime: cardinal;
+    fShowOutputInfo: boolean;
     procedure DoLogEntry(const msg: AnsiString);
     procedure DoOutput(const s1, s2, s3, s4: AnsiString);
     procedure DoResOutput(const s1, s2, s3, s4: AnsiString);
@@ -88,7 +89,6 @@ type
     property Target: TTarget read fTarget write fTarget;
     property WarningCount: integer read fWarnCount;
     property ErrorCount: integer read fErrCount;
-    procedure OnAbortCompile(Sender: TObject);
     procedure AbortThread;
   protected
     fCompileParams: AnsiString;
@@ -99,9 +99,9 @@ type
     fBinDirs: AnsiString;
     fDevRun: TDevRun;
     fAbortThread: boolean;
-    procedure CreateMakefile;
-    procedure CreateStaticMakefile;
-    procedure CreateDynamicMakefile;
+    procedure CreateStandardMakeFile; // executable creation
+    procedure CreateStaticMakeFile; // static library creation
+    procedure CreateDynamicMakeFile; // dynamic library creation
     procedure GetCompileParams;
     procedure GetLibrariesParams;
     procedure GetIncludesParams;
@@ -110,9 +110,13 @@ type
     procedure OnCompilationTerminated(Sender: TObject);
     procedure OnLineOutput(Sender: TObject; const Line: AnsiString);
     procedure ProcessOutput(const line: AnsiString);
-    function NewMakeFile(var F: TextFile): boolean;
-    procedure WriteMakeClean(var F: TextFile);
-    procedure WriteMakeObjFilesRules(var F: TextFile);
+    procedure NewMakeFile(var F: TextFile); // create a fits-all makefile
+    procedure WriteMakeHeader(var F: TextFile); // append commented header
+    procedure WriteMakeDefines(var F: TextFile); // append definitions
+    procedure WriteMakeTarget(var F: TextFile); // append target definitions (PHONY, all)
+    procedure WriteMakeIncludes(var F: TextFile); // append list of includes
+    procedure WriteMakeClean(var F: TextFile); // append cleaning rules
+    procedure WriteMakeObjFilesRules(var F: TextFile); // append linkage rules
   end;
 
 implementation
@@ -159,17 +163,14 @@ begin
     dptStat: CreateStaticMakeFile;
     dptDyn: CreateDynamicMakeFile;
   else
-    CreateMakeFile;
+    CreateStandardMakeFile;
   end;
 
   if FileExists(fMakeFile) then
     FileSetDate(fMakefile, DateTimeToFileDate(Now)); // fix the "Clock skew detected" warning ;)
 end;
 
-function TCompiler.NewMakeFile(var F: TextFile): boolean;
-var
-  ObjResFile, Objects, LinkObjects, ofile, tfile: AnsiString;
-  i: integer;
+procedure TCompiler.NewMakeFile(var F: TextFile);
 begin
   // Create OBJ output directory
   SetCurrentDir(fProject.Directory); // .dev file location
@@ -177,7 +178,53 @@ begin
     if not DirectoryExists(fProject.Options.ObjectOutput) then
       CreateDir(fProject.Options.ObjectOutput);
 
+  fMakefile := fProject.Directory + 'Makefile.win';
+
+  // Write more information to the log file than before
+  DoLogEntry(Lang[ID_LOG_BUILDINGMAKEFILE]);
+  DoLogEntry('--------');
+  DoLogEntry(Format(Lang[ID_LOG_MAKEFILENAME], [fMakefile]));
+
+  // Create the actual file
+  Assignfile(F, fMakefile);
+  Rewrite(F);
+
+  // Write header
+  WriteMakeHeader(F);
+
+  // Writes definition list
+  WriteMakeDefines(F);
+
+  // Write PHONY and all targets
+  WriteMakeTarget(F);
+
+  // Write list of includes
+  WriteMakeIncludes(F);
+
+  // Write clean command
+  WriteMakeClean(F);
+end;
+
+procedure TCompiler.WriteMakeHeader(var F: TextFile);
+begin
+  Writeln(F, '# Project: ' + fProject.Name);
+  Writeln(F, '# Makefile created by Dev-C++ ' + DEVCPP_VERSION);
+  Writeln(F);
+  if fCheckSyntax then begin
+    Writeln(F, '# This Makefile is written for syntax check!');
+    Writeln(F, '# Regenerate it if you want to use this Makefile to build.');
+    Writeln(F);
+  end;
+end;
+
+procedure TCompiler.WriteMakeDefines(var F: TextFile);
+var
+  Objects, ObjResFile, LinkObjects, ObjFile, RelativeName, OutputFileDir, LibOutputFile: AnsiString;
+  I: integer;
+begin
+  // Get list of object files
   Objects := '';
+  LinkObjects := '';
 
   // Create a list of object files
   for i := 0 to Pred(fProject.Units.Count) do begin
@@ -186,22 +233,22 @@ begin
       Continue;
 
     // Only process source files
-    tfile := ExtractRelativePath(fProject.FileName, fProject.Units[i].FileName);
-    if not (GetFileTyp(tfile) in [utcHead, utcppHead, utResSrc]) then begin
+    RelativeName := ExtractRelativePath(fProject.FileName, fProject.Units[i].FileName);
+    if not (GetFileTyp(RelativeName) in [utcHead, utcppHead, utResSrc]) then begin
       if fProject.Options.ObjectOutput <> '' then begin
 
         // ofile = C:\MyProgram\obj\main.o
-        ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput) +
+        ObjFile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput) +
           ExtractFileName(fProject.Units[i].FileName);
-        ofile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)), True, True);
-        Objects := Objects + ' ' + ofile;
+        ObjFile := GenMakePath(ExtractRelativePath(fProject.FileName, ChangeFileExt(ObjFile, OBJ_EXT)), True, True);
+        Objects := Objects + ' ' + ObjFile;
 
         if fProject.Units[i].Link then
-          LinkObjects := LinkObjects + ' ' + ofile;
+          LinkObjects := LinkObjects + ' ' + ObjFile;
       end else begin
-        Objects := Objects + ' ' + GenMakePath(ChangeFileExt(tfile, OBJ_EXT), True, True);
+        Objects := Objects + ' ' + GenMakePath(ChangeFileExt(RelativeName, OBJ_EXT), True, True);
         if fProject.Units[i].Link then
-          LinkObjects := LinkObjects + ' ' + GenMakePath1(ChangeFileExt(tfile, OBJ_EXT));
+          LinkObjects := LinkObjects + ' ' + GenMakePath1(ChangeFileExt(RelativeName, OBJ_EXT));
       end;
     end;
   end;
@@ -209,6 +256,7 @@ begin
   Objects := Trim(Objects);
   LinkObjects := Trim(LinkObjects);
 
+  // Get windres file
   if Length(fProject.Options.PrivateResource) = 0 then begin
     ObjResFile := '';
   end else begin
@@ -219,90 +267,80 @@ begin
       ObjResFile := ChangeFileExt(fProject.Options.PrivateResource, RES_EXT);
   end;
 
+  // Mention progress in the logs
+  if ObjResFile <> '' then
+    DoLogEntry(Format(Lang[ID_LOG_RESFILENAME], [ExpandFileto(ObjResFile, fProject.Directory)]));
+  DoLogEntry('');
+
+  // Get list of applicable flags
   GetCompileParams;
   GetLibrariesParams;
   GetIncludesParams;
 
-  fMakefile := fProject.Directory + 'Makefile.win';
-  Assignfile(F, fMakefile);
-
-  // Write more information to the log file than before
-  DoLogEntry(Lang[ID_LOG_BUILDINGMAKEFILE]);
-  DoLogEntry('--------');
-  DoLogEntry(Format(Lang[ID_LOG_MAKEFILENAME], [fMakefile]));
-  if ObjResFile <> '' then
-    DoLogEntry(Format(Lang[ID_LOG_RESFILENAME], [ExpandFileto(ObjResFile, fProject.Directory)]));
-  DoLogEntry(Format(Lang[ID_LOG_OUTPUTFILE], [fProject.Executable]));
-  DoLogEntry('');
-
-  try
-    Rewrite(F);
-  except
-    on E: Exception do begin
-      MessageDlg('Could not create Makefile "' + fMakefile + '"' + #13#10 + E.Message, mtError, [mbOK], 0);
-      result := false;
-      exit;
-    end;
-  end;
-  result := true;
-  writeln(F, '# Project: ' + fProject.Name);
-  writeln(F, '# Makefile created by Dev-C++ ' + DEVCPP_VERSION);
-  writeln(F);
-  if DoCheckSyntax then begin
-    writeln(F, '# This Makefile is written for syntax check!');
-    writeln(F, '# Regenerate it if you want to use this Makefile to build.');
-    writeln(F);
-  end;
   if Pos(' -g3', fCompileParams) > 0 then begin
-    writeln(F, 'CPP      = ' + devCompilerSets.CurrentSet.gppName + ' -D__DEBUG__');
-    writeln(F, 'CC       = ' + devCompilerSets.CurrentSet.gccName + ' -D__DEBUG__');
+    Writeln(F, 'CPP      = ' + devCompilerSets.CurrentSet.gppName + ' -D__DEBUG__');
+    Writeln(F, 'CC       = ' + devCompilerSets.CurrentSet.gccName + ' -D__DEBUG__');
   end else begin
-    writeln(F, 'CPP      = ' + devCompilerSets.CurrentSet.gppName);
-    writeln(F, 'CC       = ' + devCompilerSets.CurrentSet.gccName);
+    Writeln(F, 'CPP      = ' + devCompilerSets.CurrentSet.gppName);
+    Writeln(F, 'CC       = ' + devCompilerSets.CurrentSet.gccName);
   end;
-  writeln(F, 'WINDRES  = ' + devCompilerSets.CurrentSet.windresName);
+  Writeln(F, 'WINDRES  = ' + devCompilerSets.CurrentSet.windresName);
   if (ObjResFile <> '') then begin
-    writeln(F, 'RES      = ' + GenMakePath1(ObjResFile));
-    writeln(F, 'OBJ      = ' + Objects + ' $(RES)');
-    writeln(F, 'LINKOBJ  = ' + LinkObjects + ' $(RES)');
+    Writeln(F, 'RES      = ' + GenMakePath1(ObjResFile));
+    Writeln(F, 'OBJ      = ' + Objects + ' $(RES)');
+    Writeln(F, 'LINKOBJ  = ' + LinkObjects + ' $(RES)');
   end else begin
-    writeln(F, 'OBJ      = ' + Objects);
-    writeln(F, 'LINKOBJ  = ' + LinkObjects);
+    Writeln(F, 'OBJ      = ' + Objects);
+    Writeln(F, 'LINKOBJ  = ' + LinkObjects);
   end;
-  writeln(F, 'LIBS     = ' + StringReplace(fLibrariesParams, '\', '/', [rfReplaceAll]));
-  writeln(F, 'INCS     = ' + StringReplace(fIncludesParams, '\', '/', [rfReplaceAll]));
-  writeln(F, 'CXXINCS  = ' + StringReplace(fCppIncludesParams, '\', '/', [rfReplaceAll]));
-  writeln(F, 'BIN      = ' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)));
+  Writeln(F, 'LIBS     = ' + StringReplace(fLibrariesParams, '\', '/', [rfReplaceAll]));
+  Writeln(F, 'INCS     = ' + StringReplace(fIncludesParams, '\', '/', [rfReplaceAll]));
+  Writeln(F, 'CXXINCS  = ' + StringReplace(fCppIncludesParams, '\', '/', [rfReplaceAll]));
+  Writeln(F, 'BIN      = ' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)));
+  Writeln(F, 'CXXFLAGS = $(CXXINCS) ' + fCppCompileParams);
+  Writeln(F, 'CFLAGS   = $(INCS) ' + fCompileParams);
+  Writeln(F, 'RM       = ' + CLEAN_PROGRAM + ' -f'); // TODO: use del or rm?
 
-  writeln(F, 'CXXFLAGS = $(CXXINCS) ' + fCppCompileParams);
-  writeln(F, 'CFLAGS   = $(INCS) ' + fCompileParams);
-  writeln(F, 'RM       = ' + CLEAN_PROGRAM + ' -f'); // TODO: use del or rm?
+  // This needs to be put in before the clean command.
+  if fProject.Options.typ = dptDyn then begin
+    OutputFileDir := ExtractFilePath(Project.Executable);
+    LibOutputFile := OutputFileDir + 'lib' + ExtractFileName(Project.Executable);
+    if FileSamePath(LibOutputFile, Project.Directory) then
+      LibOutputFile := ExtractFileName(LibOutputFile)
+    else
+      LibOutputFile := ExtractRelativePath(Makefile, LibOutputFile);
 
+    Writeln(F, 'DEF      = ' + GenMakePath1(ChangeFileExt(LibOutputFile, DEF_EXT)));
+    Writeln(F, 'STATIC   = ' + GenMakePath1(ChangeFileExt(LibOutputFile, LIB_EXT)));
+  end;
   Writeln(F);
-  if DoCheckSyntax then
+end;
+
+procedure TCompiler.WriteMakeTarget(var F: TextFile);
+begin
+  if fCheckSyntax then
     Writeln(F, '.PHONY: all all-before all-after clean clean-custom $(OBJ) $(BIN)')
   else
     Writeln(F, '.PHONY: all all-before all-after clean clean-custom');
   Writeln(F);
   Writeln(F, 'all: all-before $(BIN) all-after');
+  Writeln(F);
+end;
 
-  if fProject.Options.MakeIncludes.Count > 0 then
-    Writeln(F);
-
+procedure TCompiler.WriteMakeIncludes(var F: TextFile);
+var
+  I: integer;
+begin
   for i := 0 to fProject.Options.MakeIncludes.Count - 1 do
     Writeln(F, 'include ' + GenMakePath1(fProject.Options.MakeIncludes.Strings[i]));
-
-  WriteMakeClean(F);
-  Writeln(F);
+  if fProject.Options.MakeIncludes.Count > 0 then
+    Writeln(F);
 end;
 
 procedure TCompiler.WriteMakeObjFilesRules(var F: TextFile);
 var
   i: integer;
-  ShortPath: AnsiString;
-  ResIncludes: AnsiString;
-  tfile, ofile, ResFiles, tmp: AnsiString;
-  windresargs: AnsiString;
+  FileName, ShortFileName, ObjFileName, BuildCmd, ResFiles, ResIncludes, ResFile, PrivResName, WindresArgs: AnsiString;
 begin
   for i := 0 to pred(fProject.Units.Count) do begin
     if not fProject.Units[i].Compile then
@@ -312,162 +350,168 @@ begin
     if GetFileTyp(fProject.Units[i].FileName) = utResSrc then
       Continue;
 
-    tfile := fProject.Units[i].FileName;
-    if FileSamePath(tfile, fProject.Directory) then
-      tfile := ExtractFileName(tFile)
+    // Get unit filename relative to project or relative to makefile
+    FileName := fProject.Units[i].FileName;
+    if FileSamePath(FileName, fProject.Directory) then
+      ShortFileName := ExtractFileName(FileName)
     else
-      tfile := ExtractRelativePath(Makefile, tfile);
+      ShortFileName := ExtractRelativePath(Makefile, FileName);
 
     // Only process source files
-    if not (GetFileTyp(tfile) in [utcHead, utcppHead]) then begin
-      writeln(F);
-      if fProject.Options.ObjectOutput <> '' then begin
-        ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput) +
-          ExtractFileName(fProject.Units[i].FileName);
-        ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ofile, OBJ_EXT)));
-      end else
-        ofile := GenMakePath1(ChangeFileExt(tfile, OBJ_EXT));
+    if GetFileTyp(ShortFileName) in [utcSrc, utcppSrc] then begin
+      Writeln(F);
 
-      if DoCheckSyntax then begin
-        writeln(F, GenMakePath2(ofile) + ':' + GenMakePath2(tfile));
-        if fProject.Units[i].CompileCpp then
-          writeln(F, #9 + '$(CPP) -S ' + GenMakePath1(tfile) + ' -o nul $(CXXFLAGS)')
-        else
-          writeln(F, #9 + '$(CC) -S ' + GenMakePath1(tfile) + ' -o nul $(CFLAGS)');
+      // Get obj filename (e.g. obj/main.o)
+      if fProject.Options.ObjectOutput <> '' then begin
+        ObjFileName := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput) +
+          ExtractFileName(fProject.Units[i].FileName);
+        ObjFileName := GenMakePath1(ExtractRelativePath(fProject.FileName, ChangeFileExt(ObjFileName, OBJ_EXT)));
+      end else
+        ObjFileName := GenMakePath1(ChangeFileExt(ShortFileName, OBJ_EXT));
+
+      // objectfile: sourcefile
+      Writeln(F, GenMakePath2(ObjFileName) + ': ' + GenMakePath2(ShortFileName));
+
+      // Write custom build command
+      if fProject.Units[i].OverrideBuildCmd and (fProject.Units[i].BuildCmd <> '') then begin
+        BuildCmd := fProject.Units[i].BuildCmd;
+        BuildCmd := StringReplace(BuildCmd, '<CRTAB>', #10#9, [rfReplaceAll]);
+        Writeln(F, #9 + BuildCmd);
+
+        // Or roll our own
       end else begin
-        writeln(F, GenMakePath2(ofile) + ': ' + GenMakePath2(tfile));
-        if fProject.Units[i].OverrideBuildCmd and (fProject.Units[i].BuildCmd <> '') then begin
-          tmp := fProject.Units[i].BuildCmd;
-          tmp := StringReplace(tmp, '<CRTAB>', #10#9, [rfReplaceAll]);
-          writeln(F, #9 + tmp);
+        if fCheckSyntax then begin
+          if fProject.Units[i].CompileCpp then
+            Writeln(F, #9 + '$(CPP) -c ' + GenMakePath1(ShortFileName) + ' $(CXXFLAGS)')
+          else
+            Writeln(F, #9 + '$(CC) -c ' + GenMakePath1(ShortFileName) + ' $(CFLAGS)');
         end else begin
           if fProject.Units[i].CompileCpp then
-            writeln(F, #9 + '$(CPP) -c ' + GenMakePath1(tfile) + ' -o ' + ofile + ' $(CXXFLAGS)')
+            Writeln(F, #9 + '$(CPP) -c ' + GenMakePath1(ShortFileName) + ' -o ' + ObjFileName + ' $(CXXFLAGS)')
           else
-            writeln(F, #9 + '$(CC) -c ' + GenMakePath1(tfile) + ' -o ' + ofile + ' $(CFLAGS)');
+            Writeln(F, #9 + '$(CC) -c ' + GenMakePath1(ShortFileName) + ' -o ' + ObjFileName + ' $(CFLAGS)');
         end;
       end;
     end;
   end;
 
   if (Length(fProject.Options.PrivateResource) > 0) then begin
-    ResFiles := '';
+
+    // Concatenate all resource include directories
     ResIncludes := ' ';
-
-    // for some strange reason, lately, windres doesn't like long filenames
-    // in "--include-dir"...
     for i := 0 to fProject.Options.ResourceIncludes.Count - 1 do begin
-      ShortPath := GetShortName(fProject.Options.ResourceIncludes[i]);
-      // only add include-dir if it is existing dir...
-      if ShortPath <> '' then
-        ResIncludes := ResIncludes + ' --include-dir ' + GenMakePath1(ShortPath);
+      ShortFileName := GetShortName(fProject.Options.ResourceIncludes[i]);
+      if ShortFileName <> '' then
+        ResIncludes := ResIncludes + ' --include-dir ' + GenMakePath1(ShortFileName);
     end;
 
-    for i := 0 to fProject.Units.Count - 1 do begin
-      if GetFileTyp(fProject.Units[i].FileName) <> utResSrc then
-        Continue;
-      tfile := ExtractRelativePath(fProject.Executable, fProject.Units[i].FileName);
-      if FileExists(GetRealPath(tfile, fProject.Directory)) then
-        ResFiles := ResFiles + GenMakePath2(tfile) + ' ';
+    // Concatenate all resource filenames (not created when syntax checking)
+    if not fCheckSyntax then begin
+      ResFiles := '';
+      for i := 0 to fProject.Units.Count - 1 do begin
+        if GetFileTyp(fProject.Units[i].FileName) <> utResSrc then
+          Continue;
+        ResFile := ExtractRelativePath(fProject.Executable, fProject.Units[i].FileName);
+        if FileExists(GetRealPath(ResFile, fProject.Directory)) then
+          ResFiles := ResFiles + GenMakePath2(ResFile) + ' ';
+      end;
+      ResFiles := Trim(ResFiles);
     end;
 
-    writeln(F);
-
+    // Determine resource output file
     if fProject.Options.ObjectOutput <> '' then
-      ofile := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput) +
+      ObjFileName := IncludeTrailingPathDelimiter(fProject.Options.ObjectOutput) +
         ChangeFileExt(fProject.Options.PrivateResource, RES_EXT)
     else
-      ofile := ChangeFileExt(fProject.Options.PrivateResource, RES_EXT);
-    ofile := GenMakePath1(ExtractRelativePath(fProject.FileName, ofile));
-    tfile := GenMakePath1(ExtractRelativePath(fProject.FileName, fProject.Options.PrivateResource));
+      ObjFileName := ChangeFileExt(fProject.Options.PrivateResource, RES_EXT);
+    ObjFileName := GenMakePath1(ExtractRelativePath(fProject.FileName, ObjFileName));
+    PrivResName := GenMakePath1(ExtractRelativePath(fProject.FileName, fProject.Options.PrivateResource));
 
-    if (ContainsStr(fCompileParams, '-m32')) then
-      windresargs := ' -F pe-i386'
+    // Build final cmd
+    if ContainsStr(fCompileParams, '-m32') then
+      WindresArgs := ' -F pe-i386'
     else
-      windresargs := '';
-    if DoCheckSyntax then begin
-      writeln(F, ofile + ':');
-      writeln(F, #9 + '$(WINDRES) -i ' + tfile + windresargs + ' --input-format=rc -o nul -O coff' + ResIncludes)
+      WindresArgs := '';
+    if fCheckSyntax then begin
+      Writeln(F);
+      Writeln(F, ObjFileName + ':');
+      Writeln(F, #9 + '$(WINDRES) -i ' + PrivResName + WindresArgs + ' --input-format=rc -o nul -O coff' + ResIncludes)
     end else begin
-      writeln(F, ofile + ': ' + tfile + ' ' + ResFiles);
-      writeln(F, #9 + '$(WINDRES) -i ' + tfile + windresargs + ' --input-format=rc -o ' + ofile + ' -O coff' +
-        ResIncludes);
+      Writeln(F);
+      Writeln(F, ObjFileName + ': ' + PrivResName + ' ' + ResFiles);
+      Writeln(F, #9 + '$(WINDRES) -i ' + PrivResName + WindresArgs + ' --input-format=rc -o ' + ObjFileName + ' -O coff'
+        + ResIncludes);
     end;
+    Writeln(F);
   end;
 end;
 
 procedure TCompiler.WriteMakeClean(var F: TextFile);
 begin
-  Writeln(F);
   Writeln(F, 'clean: clean-custom');
-  Writeln(F, #9 + '${RM} $(OBJ) $(BIN)');
-end;
-
-procedure TCompiler.CreateMakefile;
-var
-  F: TextFile;
-begin
-  if not NewMakeFile(F) then
-    Exit;
-  Writeln(F, '$(BIN): $(OBJ)');
-  if not DoCheckSyntax then
-    if fProject.Options.useGPP then
-      writeln(F, #9 + '$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)')
-    else
-      writeln(F, #9 + '$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)');
-  WriteMakeObjFilesRules(F);
-  Flush(F);
-  CloseFile(F);
-end;
-
-procedure TCompiler.CreateStaticMakefile;
-var
-  F: TextFile;
-begin
-  if not NewMakeFile(F) then
-    exit;
-  writeln(F, '$(BIN): $(LINKOBJ)');
-  if not DoCheckSyntax then begin
-    writeln(F, #9 + 'ar r $(BIN) $(LINKOBJ)');
-    writeln(F, #9 + 'ranlib $(BIN)');
-  end;
-  WriteMakeObjFilesRules(F);
-  Flush(F);
-  CloseFile(F);
-end;
-
-procedure TCompiler.CreateDynamicMakefile;
-var
-  F: TextFile;
-  pfile, tfile: AnsiString;
-begin
-  if not NewMakeFile(F) then
-    exit;
-
-  pfile := ExtractFilePath(Project.Executable);
-  tfile := pfile + 'lib' + ExtractFileName(Project.Executable);
-  if FileSamePath(tfile, Project.Directory) then
-    tfile := ExtractFileName(tFile)
+  case fProject.Options.typ of
+    dptDyn:
+      Writeln(F, #9 + '${RM} $(OBJ) $(BIN) $(DEF) $(STATIC)');
   else
-    tfile := ExtractRelativePath(Makefile, tfile);
-
-  writeln(F, 'DEFFILE   = ' + GenMakePath1(ChangeFileExt(tfile, '.def')));
-  writeln(F, 'STATICLIB = ' + GenMakePath1(ChangeFileExt(tfile, LIB_EXT)));
-  writeln(F);
-  writeln(F, '$(BIN): $(LINKOBJ)');
-
-  if not DoCheckSyntax then begin
-    if fProject.Options.useGPP then
-      writeln(F, #9 +
-        '$(CPP) -shared $(LINKOBJ) -o $(BIN) $(LIBS) -Wl,--output-def,$(DEFFILE),--out-implib,$(STATICLIB),--add-stdcall-alias')
-    else
-      writeln(F, #9 +
-        '$(CC) -shared $(LINKOBJ) -o $(BIN) $(LIBS) -Wl,--output-def,$(DEFFILE),--out-implib,$(STATICLIB),--add-stdcall-alias')
+    Writeln(F, #9 + '${RM} $(OBJ) $(BIN)');
   end;
+  Writeln(F);
+end;
 
-  WriteMakeObjFilesRules(F);
-  Flush(F);
-  CloseFile(F);
+procedure TCompiler.CreateStandardMakefile;
+var
+  F: TextFile;
+begin
+  try
+    NewMakeFile(F);
+    Writeln(F, '$(BIN): $(OBJ)');
+    if not fCheckSyntax then
+      if fProject.Options.useGPP then
+        Writeln(F, #9 + '$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)')
+      else
+        Writeln(F, #9 + '$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)');
+    WriteMakeObjFilesRules(F);
+  finally
+    CloseFile(F);
+  end;
+end;
+
+procedure TCompiler.CreateStaticMakeFile;
+var
+  F: TextFile;
+begin
+  try
+    NewMakeFile(F);
+    Writeln(F, '$(BIN): $(LINKOBJ)');
+    if not fCheckSyntax then begin
+      Writeln(F, #9 + 'ar r $(BIN) $(LINKOBJ)');
+      Writeln(F, #9 + 'ranlib $(BIN)');
+    end;
+    WriteMakeObjFilesRules(F);
+  finally
+    CloseFile(F);
+  end;
+end;
+
+procedure TCompiler.CreateDynamicMakeFile;
+var
+  F: TextFile;
+begin
+  try
+    NewMakeFile(F);
+    Writeln(F, '$(BIN): $(LINKOBJ)');
+    if not fCheckSyntax then begin
+      if fProject.Options.useGPP then
+        Writeln(F, #9 +
+          '$(CPP) -shared $(LINKOBJ) -o $(BIN) $(LIBS) -Wl,--output-def,$(DEF),--out-implib,$(STATIC),--add-stdcall-alias')
+      else
+        Writeln(F, #9 +
+          '$(CC) -shared $(LINKOBJ) -o $(BIN) $(LIBS) -Wl,--output-def,$(DEFFILE),--out-implib,$(STATICLIB),--add-stdcall-alias')
+    end;
+    WriteMakeObjFilesRules(F);
+  finally
+    CloseFile(F);
+  end;
 end;
 
 procedure TCompiler.GetCompileParams;
@@ -476,8 +520,15 @@ var
   option: TCompilerOption;
 begin
   with devCompilerSets.CurrentSet do begin
-    fCompileParams := '';
-    fCppCompileParams := '';
+
+    // Force syntax checking when we have to
+    if fCheckSyntax then begin
+      fCompileParams := '-fsyntax-only';
+      fCppCompileParams := '-fsyntax-only';
+    end else begin
+      fCompileParams := '';
+      fCppCompileParams := '';
+    end;
 
     for I := 0 to OptionList.Count - 1 do begin
 
@@ -540,18 +591,23 @@ end;
 
 procedure TCompiler.CheckSyntax;
 begin
-  DoCheckSyntax := True;
+  fCheckSyntax := True;
   Compile;
-  DoCheckSyntax := False;
+  fCheckSyntax := False;
 end;
 
 procedure TCompiler.Compile;
 resourcestring
-  cCmdLine = '%s "%s" -o "%s" %s %s %s';
+  // windres, input, output
+  cResourceCmdLine = '%s --input-format=rc -i %s -o %s';
+  // gcc, input, compileparams, includeparams, librariesparams
+  cSyntaxCmdLine = '%s "%s" %s %s %s';
+  // gcc, input, compileparams, includeparams, librariesparams
+  cHeaderCmdLine = '%s "%s" %s %s %s';
+  // gcc, input, output, compileparams, includeparams, librariesparams
+  cSourceCmdLine = '%s "%s" -o "%s" %s %s %s';
+  // make, makefile
   cMakeLine = '%s -f "%s" all';
-  cSingleFileMakeLine = '%s -f "%s" %s';
-  cMake = ' make';
-  cDots = '...';
 var
   cmdline: AnsiString;
   s: AnsiString;
@@ -560,7 +616,7 @@ begin
     ctFile: begin
         InitProgressForm;
 
-        DoLogEntry(Lang[ID_LOG_CCOMPILINGFILE]);
+        DoLogEntry(Lang[ID_LOG_COMPILINGFILE]);
         DoLogEntry('--------');
         DoLogEntry(Format(Lang[ID_LOG_SOURCEFILE], [fSourceFile]));
         DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [devCompilerSets.CurrentSet.Name]));
@@ -575,44 +631,60 @@ begin
         case GetFileTyp(fSourceFile) of
           utResSrc: begin
               s := devCompilerSets.CurrentSet.windresName;
-              cmdline := s + ' --input-format=rc -i ' + fSourceFile + ' -o ' + ChangeFileExt(fSourceFile, OBJ_EXT);
+              if fCheckSyntax then
+                cmdline := Format(cResourceCmdLine, [s, fSourceFile, 'nul'])
+              else
+                cmdline := Format(cResourceCmdLine, [s, fSourceFile, ChangeFileExt(fSourceFile, OBJ_EXT)]);
 
               DoLogEntry(Lang[ID_LOG_PROCESSINGRES]);
               DoLogEntry('--------');
               DoLogEntry(Format(Lang[ID_LOG_WINDRESNAME],
                 [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
               DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
-              DoLogEntry('');
+            end;
+          utcSrc: begin
+              s := devCompilerSets.CurrentSet.gccName;
+              if fCheckSyntax then
+                cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCompileParams, fIncludesParams, fLibrariesParams])
+              else
+                cmdline := Format(cSourceCmdLine, [s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT), fCompileParams,
+                  fIncludesParams, fLibrariesParams]);
+
+              DoLogEntry(Lang[ID_LOG_PROCESSINGCSRC]);
+              DoLogEntry('--------');
+              DoLogEntry(Format(Lang[ID_LOG_GCCNAME],
+                [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
+              DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
             end;
           utCppSrc: begin
               s := devCompilerSets.CurrentSet.gppName;
-              if DoCheckSyntax then
-                cmdline := format(cCmdLine, [s, fSourceFile, 'nul', fCppCompileParams, fCppIncludesParams,
+              if fCheckSyntax then
+                cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCppCompileParams, fCppIncludesParams,
                   fLibrariesParams])
               else
-                cmdline := format(cCmdLine, [s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT), fCppCompileParams,
-                  fCppIncludesParams, fLibrariesParams]);
+                cmdline := Format(cSourceCmdLine, [s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT),
+                  fCppCompileParams, fCppIncludesParams, fLibrariesParams]);
 
               DoLogEntry(Lang[ID_LOG_PROCESSINGCPPSRC]);
               DoLogEntry('--------');
               DoLogEntry(Format(Lang[ID_LOG_GPPNAME],
                 [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
               DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
-              //DoLogEntry('');
-            end else begin
-            s := devCompilerSets.CurrentSet.gccName;
-            if DoCheckSyntax then
-              cmdline := format(cCmdLine, [s, fSourceFile, 'nul', fCompileParams, fIncludesParams, fLibrariesParams])
+            end;
+        else begin // any header files
+            s := devCompilerSets.CurrentSet.gppName;
+            if fCheckSyntax then
+              cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCppCompileParams, fCppIncludesParams,
+                fLibrariesParams])
             else
-              cmdline := format(cCmdLine, [s, fSourceFile, ChangeFileExt(fSourceFile, EXE_EXT), fCompileParams,
-                fIncludesParams, fLibrariesParams]);
+              cmdline := Format(cHeaderCmdLine, [s, fSourceFile, fCompileParams, fIncludesParams,
+                fLibrariesParams]);
 
-            DoLogEntry(Lang[ID_LOG_PROCESSINGCSRC]);
+            DoLogEntry(Lang[ID_LOG_PROCESSINGHEADER]);
             DoLogEntry('--------');
             DoLogEntry(Format(Lang[ID_LOG_GCCNAME],
               [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
             DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
-            //DoLogEntry('');
           end;
         end;
 
@@ -662,7 +734,18 @@ begin
     ctNone:
       Exit;
     ctFile: begin
-        if not FileExists(ChangeFileExt(fSourceFile, EXE_EXT)) then begin
+        // Determine file to execute
+        case GetFileTyp(fSourceFile) of
+          utcSrc, utcppSrc: begin
+              FileToRun := ChangeFileExt(fSourceFile, EXE_EXT);
+            end;
+        else begin
+            Exit; // nothing to run...
+          end;
+        end;
+
+        // Check if it exists
+        if not FileExists(FileToRun) then begin
           if MainForm.actCompRun.Enabled then begin // suggest a compile
             if MessageDlg(Lang[ID_ERR_SRCNOTCOMPILEDSUGGEST], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
               MainForm.actCompRunExecute(nil);
@@ -671,12 +754,13 @@ begin
             MessageDlg(Lang[ID_ERR_SRCNOTCOMPILED], mtWarning, [mbOK], 0);
         end else begin
 
-          if devData.ConsolePause and ProgramHasConsole(ChangeFileExt(fSourceFile, EXE_EXT)) then begin
-            Parameters := '"' + ChangeFileExt(fSourceFile, EXE_EXT) + '" ' + fRunParams;
+          // Pause programs if they contain a console
+          if devData.ConsolePause and ProgramHasConsole(FileToRun) then begin
+            Parameters := '"' + FileToRun + '" ' + fRunParams;
             FileToRun := devDirs.Exec + 'ConsolePauser.exe';
           end else begin
             Parameters := fRunParams;
-            FileToRun := ChangeFileExt(fSourceFile, EXE_EXT);
+            FileToRun := FileToRun;
           end;
 
           if devData.MinOnRun then
@@ -733,23 +817,70 @@ const
   cmsg = 'make clean';
 var
   cmdLine: AnsiString;
+  FileName: AnsiString;
 begin
-  if Assigned(fProject) then begin
-    InitProgressForm;
+  case fTarget of
+    ctFile: begin
+        InitProgressForm;
 
-    // TODO: move this to new function?
-    DoLogEntry(Format('%s: %s', [Lang[ID_LOG_COMPILER], devCompilerSets.CurrentSet.Name]));
-    BuildMakeFile;
-    if not FileExists(fMakefile) then begin
-      DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
-      DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
-      MessageBox(MainForm.Handle, PAnsiChar(Lang[ID_ERR_NOMAKEFILE]), PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONHAND);
-      Exit;
-    end;
+        DoLogEntry(Lang[ID_LOG_CLEANINGFILE]);
+        DoLogEntry('--------');
+        DoLogEntry(Format(Lang[ID_LOG_SOURCEFILE], [fSourceFile]));
+        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [devCompilerSets.CurrentSet.Name]));
+        DoLogEntry('');
 
-    DoLogEntry(Format(Lang[ID_EXECUTING], [cmsg]));
-    cmdLine := Format(cCleanLine, [devCompilerSets.CurrentSet.makeName, fMakeFile]);
-    LaunchThread(cmdLine, fProject.Directory);
+        FileName := '';
+        case GetFileTyp(fSourceFile) of
+          utresSrc: begin
+              FileName := ChangeFileExt(fSourceFile, OBJ_EXT);
+            end;
+          utcSrc: begin
+              FileName := ChangeFileExt(fSourceFile, EXE_EXT);
+            end;
+          utcppSrc: begin
+              FileName := ChangeFileExt(fSourceFile, EXE_EXT);
+            end;
+        else begin
+            FileName := fSourceFile + GCH_EXT;
+          end;
+        end;
+        if FileExists(FileName) then begin
+          DoLogEntry(Format(Lang[ID_LOG_CLEANEDFILE], [FileName]));
+          DeleteFile(FileName);
+        end else
+          DoLogEntry(Lang[ID_LOG_NOCLEANFILE]);
+      end;
+    ctProject: begin
+        InitProgressForm;
+
+        DoLogEntry(Lang[ID_LOG_CLEANINGPROJECT]);
+        DoLogEntry('--------');
+        DoLogEntry(Format(Lang[ID_LOG_PROJECTFILE], [fProject.FileName]));
+        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [devCompilerSets.CurrentSet.Name]));
+        DoLogEntry('');
+
+        // Try to create a makefile that cleans for the whole project...
+        BuildMakeFile;
+        if not FileExists(fMakefile) then begin
+          DoLogEntry(Lang[ID_ERR_NOMAKEFILE]);
+          DoLogEntry(Lang[ID_ERR_CLEANFAILED]);
+          MessageBox(MainForm.Handle, PAnsiChar(Lang[ID_ERR_NOMAKEFILE]), PAnsiChar(Lang[ID_ERROR]), MB_OK or
+            MB_ICONERROR);
+          Exit;
+        end;
+
+        cmdLine := Format(cCleanLine, [devCompilerSets.CurrentSet.makeName, fMakeFile]);
+
+        DoLogEntry(Lang[ID_LOG_PROCESSINGMAKE]);
+        DoLogEntry('--------');
+        DoLogEntry(Format(Lang[ID_LOG_MAKEFILEPROC],
+          [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + devCompilerSets.CurrentSet.MakeName]));
+        DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
+        DoLogEntry('');
+
+        // Let make parse the makefile
+        LaunchThread(cmdLine, fProject.Directory);
+      end;
   end;
 end;
 
@@ -826,12 +957,6 @@ begin
   if not Assigned(fDevRun) then
     Exit;
   fAbortThread := True;
-end;
-
-procedure TCompiler.OnAbortCompile(Sender: TObject);
-begin
-  if Assigned(fDevRun) then
-    fAbortThread := True;
 end;
 
 procedure TCompiler.OnCompilationTerminated(Sender: TObject);
@@ -1102,9 +1227,13 @@ begin
   end else
     MainForm.pbCompilation.Max := 1; // just fSourceFile
 
+  // Initialize counters
   fStartTime := GetTickCount;
   fWarnCount := 0;
   fErrCount := 0;
+
+  // Set some preferences
+  fShowOutputInfo := not fCheckSyntax;
 end;
 
 procedure TCompiler.ProcessProgressForm(const Line: AnsiString);
@@ -1172,9 +1301,28 @@ begin
   // Check if the output file has been created
   if Assigned(fProject) then
     FileName := ExpandFileto(fProject.Executable, fProject.Directory)
-  else
-    FileName := ChangeFileExt(fSourceFile, EXE_EXT);
-  DoLogEntry(Format(Lang[ID_LOG_OUTPUTSIZE], [FormatFileSize(GetFileSize(FileName))]));
+  else begin
+    case GetFileTyp(fSourceFile) of
+      utresSrc: begin
+          FileName := ChangeFileExt(fSourceFile, OBJ_EXT);
+        end;
+      utcSrc: begin
+          FileName := ChangeFileExt(fSourceFile, EXE_EXT);
+        end;
+      utcppSrc: begin
+          FileName := ChangeFileExt(fSourceFile, EXE_EXT);
+        end;
+    else begin
+        FileName := fSourceFile + GCH_EXT;
+      end;
+    end;
+  end;
+
+  // Only show information if we managed to create the file and if it was the result of the current compilation
+  if fShowOutputInfo and FileExists(FileName) then begin
+    DoLogEntry(Format(Lang[ID_LOG_OUTPUTFILE], [FileName]));
+    DoLogEntry(Format(Lang[ID_LOG_OUTPUTSIZE], [FormatFileSize(GetFileSize(FileName))]));
+  end;
   DoLogEntry(Format(Lang[ID_LOG_COMPILETIME], [CompileTime]));
 
   if Assigned(fProject) then

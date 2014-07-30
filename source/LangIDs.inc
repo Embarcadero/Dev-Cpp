@@ -151,6 +151,7 @@ const
   ID_ITEM_PROFILE                       = 7009;
   ID_ITEM_ABORTCOMP                     = 7010;
   ID_ITEM_DELPROFINFORMATION            = 7016;
+  ID_ITEM_SYNTAXCHECKFILE               = 7017;
 
   // tools menu
   ID_ITEM_COMPOPTIONS                   = 7011;
@@ -943,6 +944,7 @@ const
   ID_ERR_SRCNOTCOMPILEDSUGGEST          = 61018;
   ID_ERR_FILECHANGED                    = 61019;
   ID_ERR_RENAMEDDELETED                 = 61020;
+  ID_ERR_RENAMEDDELETEDKEEP             = 61021;
 
   ID_UNTITLED                           = 62001;
   ID_READONLY                           = 62002;
@@ -1232,7 +1234,7 @@ const
   ID_LOG_OUTPUTSIZE                     = 78014;
   ID_LOG_COMPILETIME                    = 78015;
   ID_LOG_OUTPUTFILE                     = 78016;
-  ID_LOG_CCOMPILINGFILE                 = 78017;
+  ID_LOG_COMPILINGFILE                  = 78017;
   ID_LOG_SOURCEFILE                     = 78018;
   ID_LOG_PROCESSINGRES                  = 78019;
   ID_LOG_WINDRESNAME                    = 78020;
@@ -1241,4 +1243,10 @@ const
   ID_LOG_PROCESSINGCSRC                 = 78023;
   ID_LOG_GCCNAME                        = 78024;
   ID_LOG_PROJECTCOMPILE                 = 78025;
-  ID_LOG_FILENAME                       = 78026;
+  ID_LOG_PROCESSINGHEADER               = 78026;
+  ID_LOG_NOBINDIRABORT                  = 78027;
+  ID_LOG_NOTHINGABORT                   = 78028;
+  ID_LOG_CLEANINGPROJECT                = 78029;
+  ID_LOG_CLEANINGFILE                   = 78030;
+  ID_LOG_CLEANEDFILE                    = 78031;
+  ID_LOG_NOCLEANFILE                    = 78032;

@@ -1,3 +1,18 @@
+Version 5.7.1 - 29 Juli 2014
+
+- Resolved errors in compile log when using Syntax Check on non-project compilations.
+- One can now create precompiled headers when compiling non-project header files.
+- Compile log now mentions the output filename under Compilation Results.
+- Dev-C++ will now issue an error when compiling using a compiler set that does not have a valid binary directory.
+- When a currently open file is renamed or deleted, one can now choose to close the editor of the file in question.
+- Fixed a bug in "Shorten Compiler Paths" that mixed up library and binary paths.
+- Attempt to fix a common crash related to TdevMonitorThread.TellToQuit.
+- Reduced overdraw in the class browser when switching between or saving files.
+- Added the ability to syntax check the currently visible file only, even if it belongs to a project.
+- Added icons for Syntax Check, Syntax Check Current File and Clean
+- Fixed an out of bounds problem in the parser.
+- Dev-C++ now restores windows to their Aero Snap position.
+
 Version 5.7.0 - 19 Juli 2014
 
 - Redesigned Compiler Log.

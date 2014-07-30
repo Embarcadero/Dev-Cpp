@@ -27,8 +27,8 @@ uses
   CppParser, Forms, cbutils;
 {$ENDIF}
 {$IFDEF LINUX}
-  Classes, SysUtils, QControls, QComCtrls, QForms, QGraphics,
-  CppParser;
+Classes, SysUtils, QControls, QComCtrls, QForms, QGraphics,
+CppParser;
 {$ENDIF}
 
 const
@@ -101,6 +101,7 @@ type
     fIsIncludedCacheFileName: AnsiString;
     fIsIncludedCacheResult: boolean;
     fUpdateCount: integer;
+    fTabVisible: boolean;
     procedure SetParser(Value: TCppParser);
     procedure AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
     procedure AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
@@ -115,19 +116,21 @@ type
     procedure SetNodeImages(Node: TTreeNode; Statement: PStatement);
     procedure Sort;
     procedure SetCurrentFile(const Value: AnsiString);
-    procedure SetShowFilter(const Value: TShowFilter);
+    procedure SetShowFilter(Value: TShowFilter);
     procedure ReadClassFolders; // read folders from disk
     procedure WriteClassFolders; // write folders to disk
     function HasSubFolder(const Cmd: AnsiString): boolean; // if Command has subfolders, returns true
     procedure CreateFolders(const Cmd: AnsiString; Node: TTreeNode); // creates folders under Command
-    function BelongsToFolder(const Cmd: AnsiString): integer; // returns the index to fFolders it belongs or -1 if does not
+    function BelongsToFolder(const Cmd: AnsiString): integer;
+    // returns the index to fFolders it belongs or -1 if does not
     function GetNodeOfFolder(Index: integer): TTreeNode; overload;
     function GetNodeOfFolder(const Folder: AnsiString): TTreeNode; overload;
     procedure AddFolderAssociation(Fld, Cmd: AnsiString);
     procedure RemoveFolderAssociation(Fld, Cmd: AnsiString);
     function IndexOfFolder(const Fld: AnsiString): integer;
     procedure ReSelect;
-    procedure SetShowInheritedMembers(const Value: boolean);
+    procedure SetShowInheritedMembers(Value: boolean);
+    procedure SetTabVisible(Value: boolean);
     function IsIncluded(const FileName: AnsiString): boolean;
   public
     constructor Create(AOwner: TComponent); override;
@@ -160,6 +163,7 @@ type
     property ProjectDir: AnsiString read fProjectDir write fProjectDir;
     property ClassFoldersFile: AnsiString read fClassFoldersFile write fClassFoldersFile;
     property ShowInheritedMembers: boolean read fShowInheritedMembers write SetShowInheritedMembers;
+    property TabVisible: boolean read fTabVisible write SetTabVisible;
   end;
 
 const
@@ -203,6 +207,7 @@ begin
   fIsIncludedCacheFileName := '';
   fIsIncludedCacheResult := false;
   fUpdateCount := 0;
+  fTabVisible := true;
 end;
 
 destructor TClassBrowser.Destroy;
@@ -217,21 +222,22 @@ end;
 
 procedure TClassBrowser.BeginUpdate;
 begin
-	Inc(fUpdateCount);
+  Inc(fUpdateCount);
 end;
 
 procedure TClassBrowser.EndUpdate;
 begin
-	Dec(fUpdateCount);
-	if fUpdateCount = 0 then
-		UpdateView;
+  Dec(fUpdateCount);
+  if fUpdateCount = 0 then
+    UpdateView;
 end;
 
 procedure TClassBrowser.SetNodeImages(Node: TTreeNode; Statement: PStatement);
 var
   bInherited: boolean;
 begin
-  bInherited := fShowInheritedMembers and Assigned(Node.Parent) and (PStatement(Node.Parent.Data)^._ID <> PStatement(Node.Data)^._ParentID);
+  bInherited := fShowInheritedMembers and Assigned(Node.Parent) and (PStatement(Node.Parent.Data)^._ID <>
+    PStatement(Node.Data)^._ParentID);
 
   case Statement^._Kind of
     skClass: begin
@@ -239,15 +245,27 @@ begin
       end;
     skVariable, skEnum: case Statement^._ClassScope of
         scsPrivate: Node.ImageIndex := fImagesRecord.VariablePrivate;
-        scsProtected: if not bInherited then Node.ImageIndex := fImagesRecord.VariableProtected else Node.ImageIndex := fImagesRecord.InheritedVariableProtected;
-        scsPublic: if not bInherited then Node.ImageIndex := fImagesRecord.VariablePublic else Node.ImageIndex := fImagesRecord.InheritedVariablePublic;
+        scsProtected: if not bInherited then
+            Node.ImageIndex := fImagesRecord.VariableProtected
+          else
+            Node.ImageIndex := fImagesRecord.InheritedVariableProtected;
+        scsPublic: if not bInherited then
+            Node.ImageIndex := fImagesRecord.VariablePublic
+          else
+            Node.ImageIndex := fImagesRecord.InheritedVariablePublic;
         scsNone: Node.ImageIndex := fImagesRecord.VariablePublic;
       end;
     skFunction, skConstructor, skDestructor: case Statement^._ClassScope of
 
         scsPrivate: Node.ImageIndex := fImagesRecord.MethodPrivate;
-        scsProtected: if not bInherited then Node.ImageIndex := fImagesRecord.MethodProtected else Node.ImageIndex := fImagesRecord.InheritedMethodProtected;
-        scsPublic: if not bInherited then Node.ImageIndex := fImagesRecord.MethodPublic else Node.ImageIndex := fImagesRecord.InheritedMethodPublic;
+        scsProtected: if not bInherited then
+            Node.ImageIndex := fImagesRecord.MethodProtected
+          else
+            Node.ImageIndex := fImagesRecord.InheritedMethodProtected;
+        scsPublic: if not bInherited then
+            Node.ImageIndex := fImagesRecord.MethodPublic
+          else
+            Node.ImageIndex := fImagesRecord.InheritedMethodPublic;
         scsNone: Node.ImageIndex := fImagesRecord.MethodPublic;
       end;
   end;
@@ -258,132 +276,138 @@ end;
 
 procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
 var
-	I, iFrom : integer;
-	ParNode, NewNode : TTreeNode;
-	bInherited : boolean;
-	inheritanceids : TIntList;
+  I, iFrom: integer;
+  ParNode, NewNode: TTreeNode;
+  bInherited: boolean;
+  inheritanceids: TIntList;
 
-	procedure AddStatementNode(Index : integer);
-	var
-		tmp : integer;
-	begin
-		with PStatement(fParser.Statements[Index])^ do begin
-			tmp := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
-			if tmp <> -1 then
-				ParNode := GetNodeOfFolder(tmp)
-			else
-				ParNode := Node;
+  procedure AddStatementNode(Index: integer);
+  var
+    tmp: integer;
+  begin
+    with PStatement(fParser.Statements[Index])^ do begin
+      tmp := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
+      if tmp <> -1 then
+        ParNode := GetNodeOfFolder(tmp)
+      else
+        ParNode := Node;
 
-			NewNode := Items.AddChildObject(ParNode, _ScopelessCmd, PStatement(fParser.Statements[Index]));
-			SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
-			if _Kind = skClass then
-				AddMembers(NewNode, Index, _ID);
-		end;
-	end;
+      NewNode := Items.AddChildObject(ParNode, _ScopelessCmd, PStatement(fParser.Statements[Index]));
+      SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
+      if _Kind = skClass then
+        AddMembers(NewNode, Index, _ID);
+    end;
+  end;
 begin
-	if (not fShowInheritedMembers) and (ParentIndex >= 0) then
-		iFrom := ParentIndex + 1 // amazing speed-up
-	else
-		iFrom := 0; // if showing inheritance, a big speed penalty
+  if (not fShowInheritedMembers) and (ParentIndex >= 0) then
+    iFrom := ParentIndex + 1 // amazing speed-up
+  else
+    iFrom := 0; // if showing inheritance, a big speed penalty
 
-	// create folders that have this branch as parent
-	if ParentIndex <> -1 then
-		with PStatement(fParser.Statements[ParentIndex])^ do begin
-			if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
-				CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
-			end else begin
-				if HasSubFolder('') then
-					CreateFolders('', Node);
-			end;
+  // create folders that have this branch as parent
+  if ParentIndex <> -1 then
+    with PStatement(fParser.Statements[ParentIndex])^ do begin
+      if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
+        CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
+    end else begin
+    if HasSubFolder('') then
+      CreateFolders('', Node);
+  end;
 
-	inheritanceids := TIntList.Create;
-	try
-		// allow inheritance propagation, including MI
-		if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass) then begin
-			fParser.GetInheritanceIDs(ParentIndex,inheritanceids);
-		end;
+  inheritanceids := TIntList.Create;
+  try
+    // allow inheritance propagation, including MI
+    if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass)
+      then begin
+      fParser.GetInheritanceIDs(ParentIndex, inheritanceids);
+    end;
 
-		bInherited := False;
-		for I := iFrom to fParser.Statements.Count - 1 do begin
-			with PStatement(fParser.Statements[I])^ do begin
-				if not _Visible or _Temporary then
-					Continue;
+    bInherited := False;
+    for I := iFrom to fParser.Statements.Count - 1 do begin
+      with PStatement(fParser.Statements[I])^ do begin
+        if not _Visible or _Temporary then
+          Continue;
 
-				// Prevent infinite parent/child loops
-				if I = ParentIndex then
-					Continue;
+        // Prevent infinite parent/child loops
+        if I = ParentIndex then
+          Continue;
 
-				// Stop the current recurse when we run out of children
-				if _ParentID <> ParentID then begin
-					bInherited := fShowInheritedMembers and (inheritanceids.IndexOf(_ParentID) <> -1);
-					if not bInherited then
-						Continue;
-				end;
+        // Stop the current recurse when we run out of children
+        if _ParentID <> ParentID then begin
+          bInherited := fShowInheritedMembers and (inheritanceids.IndexOf(_ParentID) <> -1);
+          if not bInherited then
+            Continue;
+        end;
 
-				// Only do inheritance checking when absolutely needed
-				case fShowFilter of
-					sfAll : begin // sfAll means all open files. not the system headers
-						if not _InSystemHeader then // do not show system headers
-							AddStatementNode(I);
-					end;
-					sfSystemFiles : begin
-						if _InSystemHeader and IsIncluded(_FileName) then
-							AddStatementNode(I); // only show system header stuff
-					end;
-					sfCurrent: begin
-						if not _InSystemHeader and IsIncluded(_FileName) then
-							AddStatementNode(I);
-					end;
-					sfProject: begin
-						if _InProject or bInherited then
-							AddStatementNode(I);
-					end;
-				end;
-			end;
-		end;
-	finally
-		inheritanceids.Free;
-	end;
+        // Only do inheritance checking when absolutely needed
+        case fShowFilter of
+          sfAll: begin // sfAll means all open files. not the system headers
+              if not _InSystemHeader then // do not show system headers
+                AddStatementNode(I);
+            end;
+          sfSystemFiles: begin
+              if _InSystemHeader and IsIncluded(_FileName) then
+                AddStatementNode(I); // only show system header stuff
+            end;
+          sfCurrent: begin
+              if not _InSystemHeader and IsIncluded(_FileName) then
+                AddStatementNode(I);
+            end;
+          sfProject: begin
+              if _InProject or bInherited then
+                AddStatementNode(I);
+            end;
+        end;
+      end;
+    end;
+  finally
+    inheritanceids.Free;
+  end;
 end;
 
 procedure TClassBrowser.UpdateView;
 begin
-	if not Assigned(fParser) then
-		Exit;
-	if fCurrentFile = '' then
-		Exit;
-	if fUpdateCount <> 0 then
-		Exit;
+  if not Assigned(fParser) then
+    Exit;
+  if fCurrentFile = '' then
+    Exit;
+  if fUpdateCount <> 0 then
+    Exit;
+  if not Visible or not TabVisible then
+    Exit;
 
-	// We are busy...
-	Items.BeginUpdate;
-	Clear;
+  // We are busy...
+  Items.BeginUpdate;
+  try
+    Clear;
 
-	// Update file includes, reset cache
-	fParser.GetFileIncludes(fCurrentFile,fIncludedFiles);
-	fIsIncludedCacheFileName := '';
-	fIsIncludedCacheResult := false;
+    // Update file includes, reset cache
+    fParser.GetFileIncludes(fCurrentFile, fIncludedFiles);
+    fIsIncludedCacheFileName := '';
+    fIsIncludedCacheResult := false;
 
-	// Did the user add custom folders?
-	ReadClassFolders;
+    // Did the user add custom folders?
+    ReadClassFolders;
 
-	// Add everything recursively
-	AddMembers(nil, -1, -1);
-	Sort;
+    // Add everything recursively
+    AddMembers(nil, -1, -1);
+    Sort;
 
-	// Remember selection
-	if fLastSelection <> '' then
-		ReSelect;
+    // Remember selection
+    if fLastSelection <> '' then
+      ReSelect;
 
-	// Add custom folders
-	WriteClassFolders;
-	Items.EndUpdate;
+    // Add custom folders
+    WriteClassFolders;
+  finally
+    Items.EndUpdate;
+  end;
 
-	// Always fully repaint.
-	Repaint;
+  // Always fully repaint.
+  Repaint;
 end;
 
-procedure TClassBrowser.OnNodeChanging(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TClassBrowser.OnNodeChanging(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   Node: TTreeNode;
 begin
@@ -405,24 +429,17 @@ begin
   else
     Node := nil;
 
-  if not Assigned(Node) then
-  begin
+  if not Assigned(Node) then begin
     fLastSelection := '';
     Exit;
-  end
-  else if not Assigned(Node.Data) then
-  begin
+  end else if not Assigned(Node.Data) then begin
     fLastSelection := '';
     Exit;
-  end
-  else if fParser = nil then
-  begin
+  end else if fParser = nil then begin
     Node.Data := nil;
     fLastSelection := '';
     Exit;
-  end
-  else if fParser.Statements.IndexOf(Node.Data) = -1 then
-  begin
+  end else if fParser.Statements.IndexOf(Node.Data) = -1 then begin
     Node.Data := nil;
     fLastSelection := '';
     Exit;
@@ -433,8 +450,7 @@ begin
     Exit;
   end;
 
-  with PStatement(Node.Data)^ do
-  begin
+  with PStatement(Node.Data)^ do begin
     fLastSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText;
 
     if Assigned(fOnSelect) then
@@ -453,12 +469,12 @@ end;
 
 procedure TClassBrowser.OnParserBusy(Sender: TObject);
 begin
-	BeginUpdate;
+  BeginUpdate;
 end;
 
 procedure TClassBrowser.OnParserUpdate(Sender: TObject);
 begin
-	EndUpdate;
+  EndUpdate;
 end;
 
 function CustomSortProc(Node1, Node2: TTreeNode; Data: Integer): Integer; stdcall;
@@ -485,79 +501,88 @@ end;
 
 procedure TClassBrowser.SetParser(Value: TCppParser);
 begin
-	if Value = fParser then
-		Exit;
+  if Value = fParser then
+    Exit;
 
-	fParser := Value;
-	if Assigned(fParser) then begin
-		fParser.OnUpdate := OnParserUpdate;
-		fParser.OnBusy := OnParserBusy;
-	end;
-	UpdateView;
+  fParser := Value;
+  if Assigned(fParser) then begin
+    fParser.OnUpdate := OnParserUpdate;
+    fParser.OnBusy := OnParserBusy;
+  end;
+  UpdateView;
 end;
 
 procedure TClassBrowser.SetCurrentFile(const Value: AnsiString);
 begin
-	if Value = fCurrentFile then
-		Exit;
-	fCurrentFile := Value;
-	if fShowFilter = sfAll then // content does not depend on current file. do NOT redraw
-		Exit;
-	UpdateView;
+  if Value = fCurrentFile then
+    Exit;
+  fCurrentFile := Value;
+  if fShowFilter = sfAll then // content does not depend on current file. do NOT redraw
+    Exit;
+  UpdateView;
 end;
 
-procedure TClassBrowser.SetShowFilter(const Value: TShowFilter);
+procedure TClassBrowser.SetShowFilter(Value: TShowFilter);
 begin
-	if fShowFilter = Value then
-		Exit;
-	fShowFilter := Value;
-	UpdateView;
+  if fShowFilter = Value then
+    Exit;
+  fShowFilter := Value;
+  UpdateView;
 end;
 
-procedure TClassBrowser.SetShowInheritedMembers(const Value: boolean);
+procedure TClassBrowser.SetShowInheritedMembers(Value: boolean);
 begin
-	if Value = fShowInheritedMembers then
-		Exit;
-	fShowInheritedMembers := Value;
-	UpdateView;
+  if Value = fShowInheritedMembers then
+    Exit;
+  fShowInheritedMembers := Value;
+  UpdateView;
+end;
+
+procedure TClassBrowser.SetTabVisible(Value: boolean);
+begin
+  if Value = fTabVisible then
+    Exit;
+  fTabVisible := Value;
+  UpdateView;
 end;
 
 // returns the index to fFolders it belongs or -1 if does not
+
 function TClassBrowser.BelongsToFolder(const Cmd: AnsiString): integer;
 var
-	I: integer;
+  I: integer;
 begin
-	Result := -1;
-	for I := Low(fFolderAssocs) to High(fFolderAssocs) do
-		if CompareText(fFolderAssocs[I].Command, Cmd) = 0 then begin
-			Result := fFolderAssocs[I].FolderID;
-			break;
-		end;
+  Result := -1;
+  for I := Low(fFolderAssocs) to High(fFolderAssocs) do
+    if CompareText(fFolderAssocs[I].Command, Cmd) = 0 then begin
+      Result := fFolderAssocs[I].FolderID;
+      break;
+    end;
 end;
 
 // creates folders under Command
 
 procedure TClassBrowser.CreateFolders(const Cmd: AnsiString; Node: TTreeNode);
 var
-	I: integer;
+  I: integer;
 begin
-	for I := Low(fFolders) to High(fFolders) do
-		if CompareText(fFolders[I].Under, Cmd) = 0 then begin
-			fFolders[I].Node := Items.AddChildObjectFirst(Node, fFolders[I].Name, @fFolders[I]);
-			CreateFolders(#01#02 + Char(I), fFolders[I].Node);
-		end;
+  for I := Low(fFolders) to High(fFolders) do
+    if CompareText(fFolders[I].Under, Cmd) = 0 then begin
+      fFolders[I].Node := Items.AddChildObjectFirst(Node, fFolders[I].Name, @fFolders[I]);
+      CreateFolders(#01#02 + Char(I), fFolders[I].Node);
+    end;
 end;
 
 function TClassBrowser.HasSubFolder(const Cmd: AnsiString): boolean;
 var
-	I: integer;
+  I: integer;
 begin
-	Result := False;
-	for I := Low(fFolders) to High(fFolders) do
-		if CompareText(fFolders[I].Under, Cmd) = 0 then begin
-			Result := True;
-			Break;
-		end;
+  Result := False;
+  for I := Low(fFolders) to High(fFolders) do
+    if CompareText(fFolders[I].Under, Cmd) = 0 then begin
+      Result := True;
+      Break;
+    end;
 end;
 
 procedure TClassBrowser.ReadClassFolders;
@@ -665,7 +690,8 @@ begin
     else
       fFolders[High(fFolders)].Under := #01#02 + Char(PFolders(Node.Data)^.Index);
   end;
-  fFolders[High(fFolders)].Node := Items.AddChildObjectFirst(Node, fFolders[High(fFolders)].Name, @fFolders[High(fFolders)]);
+  fFolders[High(fFolders)].Node := Items.AddChildObjectFirst(Node, fFolders[High(fFolders)].Name,
+    @fFolders[High(fFolders)]);
   WriteClassFolders;
 end;
 
@@ -730,8 +756,7 @@ begin
         for C := I + 1 to High(fFolderAssocs) do
           fFolderAssocs[C - 1] := fFolderAssocs[C];
         SetLength(fFolderAssocs, High(fFolderAssocs));
-      end
-      else
+      end else
         Inc(I);
   end;
 end;
@@ -773,12 +798,12 @@ begin
             PFolders(Selected.Data)^.Under := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText
         else
           PFolders(Selected.Data)^.Under := #01#02 + Char(PFolders(Node.Data)^.Index);
-      end
-      else
+      end else
         PFolders(Selected.Data)^.Under := '';
   end
-  // drag node is statement
-  else with PStatement(Selected.Data)^ do begin // dragged node is Statement, so Node is folder
+    // drag node is statement
+  else
+    with PStatement(Selected.Data)^ do begin // dragged node is Statement, so Node is folder
       RemoveFolderAssociation('', ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
       if Assigned(Node) then
         AddFolderAssociation(Node.Text, ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
@@ -807,15 +832,18 @@ begin
     (
     (
     // drag node is folder, drop node is not and drop node has children
-    Assigned(Node) and (Selected.ImageIndex = fImagesRecord.fGlobalsImg) {and (Node.ImageIndex <> fImagesRecord.fGlobalsImg)} and Node.HasChildren
+    Assigned(Node) and (Selected.ImageIndex = fImagesRecord.fGlobalsImg)
+    {and (Node.ImageIndex <> fImagesRecord.fGlobalsImg)}and Node.HasChildren
     ) or
     (
     // drag node is folder and drop node is folder
-    Assigned(Node) and (Selected.ImageIndex = fImagesRecord.fGlobalsImg) and (Node.ImageIndex = fImagesRecord.fGlobalsImg)
+    Assigned(Node) and (Selected.ImageIndex = fImagesRecord.fGlobalsImg) and (Node.ImageIndex =
+    fImagesRecord.fGlobalsImg)
     ) or
     (
     // drag node is not folder, drop node is folder
-    Assigned(Node) and (Selected.ImageIndex <> fImagesRecord.fGlobalsImg) and (Node.ImageIndex = fImagesRecord.fGlobalsImg)
+    Assigned(Node) and (Selected.ImageIndex <> fImagesRecord.fGlobalsImg) and (Node.ImageIndex =
+    fImagesRecord.fGlobalsImg)
     ) or
     // not drop node
     not Assigned(Node)
@@ -872,13 +900,11 @@ procedure TClassBrowser.ReSelect;
         Selected := Node[I];
         Result := True;
         Break;
-      end
-      else
-        if Node[I].HasChildren then begin
-          Result := DoSelect(Node[I]);
-          if Result then
-            Break;
-        end;
+      end else if Node[I].HasChildren then begin
+        Result := DoSelect(Node[I]);
+        if Result then
+          Break;
+      end;
     end;
   end;
 var
@@ -894,11 +920,9 @@ begin
     if CompareStr(OldSelection, fLastSelection) = 0 then begin
       Selected := Items[I];
       Break;
-    end
-    else
-      if Items[I].HasChildren then
-        if DoSelect(Items[I]) then
-          Break;
+    end else if Items[I].HasChildren then
+      if DoSelect(Items[I]) then
+        Break;
   end;
 end;
 
@@ -907,60 +931,63 @@ begin
   Result := High(fFolders) + 1;
 end;
 
-procedure TClassBrowser.AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,DefaultDraw: Boolean);
+procedure TClassBrowser.AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; Stage:
+  TCustomDrawStage; var PaintImages, DefaultDraw: Boolean);
 var
-	NodeRect: TRect;
-	st: PStatement;
-	bInherited: boolean;
-	typetext : AnsiString;
+  NodeRect: TRect;
+  st: PStatement;
+  bInherited: boolean;
+  typetext: AnsiString;
 begin
-	// Assume the node image is correct
-	bInherited := fShowInheritedMembers and (Node.ImageIndex in [
-		fImagesRecord.fInhMethodProtectedImg,
-		fImagesRecord.fInhMethodPublicImg,
-		fImagesRecord.fInhVariableProtectedImg,
-		fImagesRecord.fInhVariablePublicImg]);
+  // Assume the node image is correct
+  bInherited := fShowInheritedMembers and (Node.ImageIndex in [
+    fImagesRecord.fInhMethodProtectedImg,
+      fImagesRecord.fInhMethodPublicImg,
+      fImagesRecord.fInhVariableProtectedImg,
+      fImagesRecord.fInhVariablePublicImg]);
 
-	if Stage = cdPrePaint then begin
-		Sender.Canvas.Font.Style := [fsBold];
-		if bInherited then
-			Sender.Canvas.Font.Color := clGray;
-	end else if Stage = cdPostPaint then begin
-		st := Node.Data;
-		if bInherited then
-			fCnv.Font.Color := clGray
-		else
-			fCnv.Font.Color := clMaroon;
+  if Stage = cdPrePaint then begin
+    Sender.Canvas.Font.Style := [fsBold];
+    if bInherited then
+      Sender.Canvas.Font.Color := clGray;
+  end else if Stage = cdPostPaint then begin
+    st := Node.Data;
+    if not Assigned(st) then
+      Exit;
+    if bInherited then
+      fCnv.Font.Color := clGray
+    else
+      fCnv.Font.Color := clMaroon;
 
-		// draw function arguments to the right of the already drawn text
-		NodeRect := Node.DisplayRect(true);
-		NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._ScopelessCmd) + 2;
-		fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
+    // draw function arguments to the right of the already drawn text
+    NodeRect := Node.DisplayRect(true);
+    NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._ScopelessCmd) + 2;
+    fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
 
-		fCnv.Font.Color := clGray;
-		if st^._Type <> '' then
-			typetext := st^._Type
-		else if st^._Kind in [skConstructor, skDestructor] then
-			typetext := fParser.StatementKindStr(st^._Kind)
-		else
-			Exit; // done
+    fCnv.Font.Color := clGray;
+    if st^._Type <> '' then
+      typetext := st^._Type
+    else if st^._Kind in [skConstructor, skDestructor] then
+      typetext := fParser.StatementKindStr(st^._Kind)
+    else
+      Exit; // done
 
-		// Then draw node type to the right of the arguments
-		NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
-		fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, ': ' + typetext);
-	end;
+    // Then draw node type to the right of the arguments
+    NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
+    fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, ': ' + typetext);
+  end;
 end;
 
 function TClassBrowser.IsIncluded(const FileName: AnsiString): boolean;
 begin
-	// Only do the slow check if the cache is invalid
-	if not SameStr(FileName,fIsIncludedCacheFileName) then begin
-		fIsIncludedCacheFileName := FileName;
-		fIsIncludedCacheResult := FastIndexOf(fIncludedFiles,FileName) <> -1;
-	end;
+  // Only do the slow check if the cache is invalid
+  if not SameStr(FileName, fIsIncludedCacheFileName) then begin
+    fIsIncludedCacheFileName := FileName;
+    fIsIncludedCacheResult := FastIndexOf(fIncludedFiles, FileName) <> -1;
+  end;
 
-	// Cache has been updated. Use it.
-	Result := fIsIncludedCacheResult;
+  // Cache has been updated. Use it.
+  Result := fIsIncludedCacheResult;
 end;
 
 end.

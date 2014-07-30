@@ -22,7 +22,7 @@ unit Templates;
 interface
 
 uses 
-  Classes, Types, IniFiles, prjtypes;
+  Classes, Types, IniFiles, ProjectTypes;
 
 type
   TTemplateUnit = record

@@ -1,6 +1,6 @@
 object EditorOptForm: TEditorOptForm
-  Left = 770
-  Top = 472
+  Left = 879
+  Top = 375
   BorderStyle = bsDialog
   Caption = 'Editor Options'
   ClientHeight = 492
@@ -1329,12 +1329,12 @@ object EditorOptForm: TEditorOptForm
     Left = 5
     Top = 458
   end
-  object CppParser: TCppParser
+  object CppParserCopy: TCppParser
     BaseIndex = 0
     Enabled = True
     OnTotalProgress = CppParser1TotalProgress
-    Tokenizer = CppTokenizer
-    Preprocessor = CppPreprocessor
+    Tokenizer = CppTokenizerCopy
+    Preprocessor = CppPreprocessorCopy
     ParseLocalHeaders = True
     ParseGlobalHeaders = True
     OnStartParsing = CppParser1StartParsing
@@ -1342,11 +1342,11 @@ object EditorOptForm: TEditorOptForm
     Left = 40
     Top = 458
   end
-  object CppPreprocessor: TCppPreprocessor
+  object CppPreprocessorCopy: TCppPreprocessor
     Left = 72
     Top = 456
   end
-  object CppTokenizer: TCppTokenizer
+  object CppTokenizerCopy: TCppTokenizer
     Left = 104
     Top = 456
   end

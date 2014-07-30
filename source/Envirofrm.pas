@@ -29,9 +29,9 @@ uses
   CheckLst, Grids, ValEdit, ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QComCtrls, QExtCtrls, QButtons,
-  QCheckLst, QGrids;
+SysUtils, Variants, Classes, QGraphics, QControls, QForms,
+QDialogs, QStdCtrls, QComCtrls, QExtCtrls, QButtons,
+QCheckLst, QGrids;
 {$ENDIF}
 
 type
@@ -109,7 +109,7 @@ type
     procedure btnHelpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure vleExternalEditButtonClick(Sender: TObject);
-    procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer;const KeyName, KeyValue: string);
+    procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer; const KeyName, KeyValue: string);
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
     procedure cvsdownloadlabelClick(Sender: TObject);
@@ -129,321 +129,316 @@ uses
   ShellAPI, Filectrl, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme, main;
 {$ENDIF}
 {$IFDEF LINUX}
-  Xlib, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme;
+Xlib, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme;
 {$ENDIF}
 
 {$R *.dfm}
 
 procedure TEnviroForm.BrowseClick(Sender: TObject);
 var
-	s: AnsiString;
+  s: AnsiString;
 begin
   case TComponent(Sender).Tag of
-   1: // default dir browse
-    begin
-      s:= edUserDir.Text;
-      if NewSelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
-       edUserDir.Text:= IncludeTrailingPathDelimiter(s);
-    end;
+    1: {// default dir browse} begin
+        s := edUserDir.Text;
+        if NewSelectDirectory(Lang[ID_ENV_SELUSERDIR], '', s) then
+          edUserDir.Text := IncludeTrailingPathDelimiter(s);
+      end;
 
-   2: // output dir browse
-    begin
-      s:= ExpandFileto(edTemplatesDir.Text, devDirs.Exec);
-      if NewSelectDirectory(Lang[ID_ENV_SELTEMPLATESDIR], '', s) then
-       edTemplatesDir.Text:= IncludeTrailingPathDelimiter(s);
-    end;
+    2: {// output dir browse} begin
+        s := ExpandFileto(edTemplatesDir.Text, devDirs.Exec);
+        if NewSelectDirectory(Lang[ID_ENV_SELTEMPLATESDIR], '', s) then
+          edTemplatesDir.Text := IncludeTrailingPathDelimiter(s);
+      end;
 
-   3: // icon library browse
-    begin
-      s:= ExpandFileto(edIcoLib.Text, devDirs.Exec);
-      if NewSelectDirectory(Lang[ID_ENV_SELICOLIB], '', s) then
-       edIcoLib.Text:= IncludeTrailingPathDelimiter(s);
-    end;
+    3: {// icon library browse} begin
+        s := ExpandFileto(edIcoLib.Text, devDirs.Exec);
+        if NewSelectDirectory(Lang[ID_ENV_SELICOLIB], '', s) then
+          edIcoLib.Text := IncludeTrailingPathDelimiter(s);
+      end;
 
-   4: // splash screen browse
-    begin
-      dlgPic.InitialDir:= ExtractFilePath(edSplash.Text);
-      if dlgPic.Execute then
-       edSplash.Text:= dlgPic.FileName;
-    end;
+    4: {// splash screen browse} begin
+        dlgPic.InitialDir := ExtractFilePath(edSplash.Text);
+        if dlgPic.Execute then
+          edSplash.Text := dlgPic.FileName;
+      end;
 
-   5: // Language Dir
-    begin
-      s:= ExpandFileto(edLang.Text, devDirs.Exec);
-      if NewSelectDirectory(Lang[ID_ENV_SELLANGDIR], '', s) then
-       edLang.Text:= IncludeTrailingPathDelimiter(ExtractRelativePath(devDirs.Exec, s));
-    end;
+    5: {// Language Dir} begin
+        s := ExpandFileto(edLang.Text, devDirs.Exec);
+        if NewSelectDirectory(Lang[ID_ENV_SELLANGDIR], '', s) then
+          edLang.Text := IncludeTrailingPathDelimiter(ExtractRelativePath(devDirs.Exec, s));
+      end;
 
-		6: begin // CVS Executable Filename
-			with TOpenDialog.Create(self) do try
-				Filter := FLT_ALLFILES;
-				FileName := edCVSExec.Text;
-				if Execute then
-					edCVSExec.Text := FileName;
-			finally
-				Free;
-			end;
-		end;
-	end;
+    6: begin // CVS Executable Filename
+        with TOpenDialog.Create(self) do try
+            Filter := FLT_ALLFILES;
+            FileName := edCVSExec.Text;
+            if Execute then
+              edCVSExec.Text := FileName;
+          finally
+            Free;
+          end;
+      end;
+  end;
 end;
 
 procedure TEnviroForm.btnOkClick(Sender: TObject);
 var
-	I : integer;
-	s : AnsiString;
+  I: integer;
+  s: AnsiString;
 begin
-	with devData do begin
-		DefCpp:= cbDefCpp.Checked;
-		ShowBars:= cbShowBars.Checked;
-		MultiLineTab:=  cbMultiLineTab.Checked;
-		BackUps:=  cbBackups.Checked;
-		MinOnRun:= cbMinOnRun.Checked;
-		DblFiles:= cbdblFiles.Checked;
-		ConsolePause:= cbPauseConsole.Checked;
-		CheckAssocs:=cbCheckAssocs.Checked;
-		MRUMax:= seMRUMax.Value;
-		if not MultiLineTab then begin
-			if cboTabsTop.ItemIndex in [2,3] then begin
-				MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_MULTILINETABERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
-				cboTabsTop.ItemIndex := 0;
-			end;
-		end;
-		MsgTabs:= cboTabsTop.ItemIndex;
-		AutoOpen:= rgbAutoOpen.ItemIndex;
-		Splash:= edSplash.Text;
+  with devData do begin
+    DefCpp := cbDefCpp.Checked;
+    ShowBars := cbShowBars.Checked;
+    MultiLineTab := cbMultiLineTab.Checked;
+    BackUps := cbBackups.Checked;
+    MinOnRun := cbMinOnRun.Checked;
+    DblFiles := cbdblFiles.Checked;
+    ConsolePause := cbPauseConsole.Checked;
+    CheckAssocs := cbCheckAssocs.Checked;
+    MRUMax := seMRUMax.Value;
+    if not MultiLineTab then begin
+      if cboTabsTop.ItemIndex in [2, 3] then begin
+        MessageBox(application.handle, PAnsiChar(Lang[ID_ENV_MULTILINETABERROR]), PAnsiChar(Lang[ID_ERROR]), MB_OK);
+        cboTabsTop.ItemIndex := 0;
+      end;
+    end;
+    MsgTabs := TTabPosition(cboTabsTop.ItemIndex);
+    AutoOpen := rgbAutoOpen.ItemIndex;
+    Splash := edSplash.Text;
 
-		s := Lang.FileFromDescription(cboLang.Text);
-		LangChange:= s <> Language;
-		Language:= s;
-		ThemeChange := cboTheme.Text <> devData.Theme;
-		Theme := cboTheme.Text;
-		NoSplashScreen := cbNoSplashScreen.Checked;
-		ShowProgress := cbShowProgress.Checked;
-		AutoCloseProgress := cbAutoCloseProgress.Checked;
-		WatchHint := cbWatchHint.Checked;
-		InterfaceFont := cbUIFont.Text;
-		InterfaceFontSize := StrToIntDef(cbUIfontsize.Text,9);
-	end;
+    s := Lang.FileFromDescription(cboLang.Text);
+    LangChange := s <> Language;
+    Language := s;
+    ThemeChange := cboTheme.Text <> devData.Theme;
+    Theme := cboTheme.Text;
+    NoSplashScreen := cbNoSplashScreen.Checked;
+    ShowProgress := cbShowProgress.Checked;
+    AutoCloseProgress := cbAutoCloseProgress.Checked;
+    WatchHint := cbWatchHint.Checked;
+    InterfaceFont := cbUIFont.Text;
+    InterfaceFontSize := StrToIntDef(cbUIfontsize.Text, 9);
+  end;
 
-	MainForm.Font.Name := devData.InterfaceFont;
-	MainForm.Font.Size := devData.InterfaceFontSize;
+  MainForm.Font.Name := devData.InterfaceFont;
+  MainForm.Font.Size := devData.InterfaceFontSize;
 
-	try
+  try
 
-		// Force update
-		for I := 0 to AssociationsCount - 1 do
-			if lstAssocFileTypes.Checked[I] then
-				Associate(I)
-			else
-				Unassociate(I);
-	except
-		MessageBox(application.handle,PAnsiChar(Lang[ID_ENV_UACERROR]),PAnsiChar(Lang[ID_ERROR]),MB_OK);
-		devData.CheckAssocs := false; // don't bother the user again on next startup
-	end;
+    // Force update
+    for I := 0 to AssociationsCount - 1 do
+      if lstAssocFileTypes.Checked[I] then
+        Associate(I)
+      else
+        Unassociate(I);
+  except
+    MessageBox(application.handle, PAnsiChar(Lang[ID_ENV_UACERROR]), PAnsiChar(Lang[ID_ERROR]), MB_OK);
+    devData.CheckAssocs := false; // don't bother the user again on next startup
+  end;
 
-	devDirs.Icons:= IncludeTrailingPathDelimiter(ExpandFileto(edIcoLib.Text, devDirs.Exec));
-	devDirs.Templates:= IncludeTrailingPathDelimiter(ExpandFileto(edTemplatesDir.Text, devDirs.Exec));
-	devDirs.Default:= edUserDir.Text;
+  devDirs.Icons := IncludeTrailingPathDelimiter(ExpandFileto(edIcoLib.Text, devDirs.Exec));
+  devDirs.Templates := IncludeTrailingPathDelimiter(ExpandFileto(edTemplatesDir.Text, devDirs.Exec));
+  devDirs.Default := edUserDir.Text;
 
-	if edLang.Text <> ExtractRelativePath(devDirs.Exec, devDirs.Lang) then begin
-		devDirs.Lang:= IncludeTrailingPathDelimiter(ExpandFileto(edLang.Text, devDirs.Exec));
-		Lang.CheckLanguageFiles;
-	end;
+  if edLang.Text <> ExtractRelativePath(devDirs.Exec, devDirs.Lang) then begin
+    devDirs.Lang := IncludeTrailingPathDelimiter(ExpandFileto(edLang.Text, devDirs.Exec));
+    Lang.CheckLanguageFiles;
+  end;
 
-	devExternalPrograms.Programs.Assign(vleExternal.Strings);
+  devExternalPrograms.Programs.Assign(vleExternal.Strings);
 
-	devCVSHandler.Executable:= edCVSExec.Text;
-	devCVSHandler.Compression:= spnCVSCompression.Value;
-	devCVSHandler.UseSSH:= chkCVSUseSSH.Checked;
+  devCVSHandler.Executable := edCVSExec.Text;
+  devCVSHandler.Compression := spnCVSCompression.Value;
+  devCVSHandler.UseSSH := chkCVSUseSSH.Checked;
 end;
 
 procedure TEnviroForm.LoadText;
 begin
-	// Set interface font
-	Font.Name := devData.InterfaceFont;
-	Font.Size := devData.InterfaceFontSize;
+  // Set interface font
+  Font.Name := devData.InterfaceFont;
+  Font.Size := devData.InterfaceFontSize;
 
-  Caption:=                  Lang[ID_ENV];
+  Caption := Lang[ID_ENV];
 
   //Tabs
-  tabGeneral.Caption:=           Lang[ID_ENV_GENTAB];
-  tabPaths.Caption:=             Lang[ID_ENV_PATHTAB];
-  tabAssocs.Caption:=            Lang[ID_ENV_FASSTAB];
-  tabCVS.Caption:=               Lang[ID_ENV_CVSTAB];
-  tabExternal.Caption:=          Lang[ID_ENV_EXTERNALS];
+  tabGeneral.Caption := Lang[ID_ENV_GENTAB];
+  tabPaths.Caption := Lang[ID_ENV_PATHTAB];
+  tabAssocs.Caption := Lang[ID_ENV_FASSTAB];
+  tabCVS.Caption := Lang[ID_ENV_CVSTAB];
+  tabExternal.Caption := Lang[ID_ENV_EXTERNALS];
 
   //Buttons
-  btnOk.Caption:=                Lang[ID_BTN_OK];
-  btnCancel.Caption:=            Lang[ID_BTN_CANCEL];
-  btnHelp.Caption:=              Lang[ID_BTN_HELP];
+  btnOk.Caption := Lang[ID_BTN_OK];
+  btnCancel.Caption := Lang[ID_BTN_CANCEL];
+  btnHelp.Caption := Lang[ID_BTN_HELP];
 
   //Controls
-  cbDefCpp.Caption:=             Lang[ID_ENV_DEFCPP];
-  cbShowBars.Caption:=           Lang[ID_ENV_SHOWBARS];
-  cbMultiLineTab.Caption:=       Lang[ID_ENV_MULTILINETABS];
-  cbBackups.Caption:=            Lang[ID_ENV_BACKUPS];
-  cbMinOnRun.Caption:=           Lang[ID_ENV_MINONRUN];
-  cbdblFiles.Caption:=           Lang[ID_ENV_DBLFILES];
-  cbNoSplashScreen.Caption:=     Lang[ID_ENV_NOSPLASH];
-  cbPauseConsole.Caption:=       Lang[ID_ENV_PAUSECONSOLE];
-  cbCheckAssocs.Caption:=        Lang[ID_ENV_CHECKASSOCS];
+  cbDefCpp.Caption := Lang[ID_ENV_DEFCPP];
+  cbShowBars.Caption := Lang[ID_ENV_SHOWBARS];
+  cbMultiLineTab.Caption := Lang[ID_ENV_MULTILINETABS];
+  cbBackups.Caption := Lang[ID_ENV_BACKUPS];
+  cbMinOnRun.Caption := Lang[ID_ENV_MINONRUN];
+  cbdblFiles.Caption := Lang[ID_ENV_DBLFILES];
+  cbNoSplashScreen.Caption := Lang[ID_ENV_NOSPLASH];
+  cbPauseConsole.Caption := Lang[ID_ENV_PAUSECONSOLE];
+  cbCheckAssocs.Caption := Lang[ID_ENV_CHECKASSOCS];
 
-  gbProgress.Caption:=           Lang[ID_ENV_COMPPROGRESSWINDOW];
-  cbShowProgress.Caption:=       Lang[ID_ENV_SHOWPROGRESS];
-  cbAutoCloseProgress.Caption:=  Lang[ID_ENV_AUTOCLOSEPROGRESS];
+  gbProgress.Caption := Lang[ID_ENV_COMPPROGRESSWINDOW];
+  cbShowProgress.Caption := Lang[ID_ENV_SHOWPROGRESS];
+  cbAutoCloseProgress.Caption := Lang[ID_ENV_AUTOCLOSEPROGRESS];
 
-  cbWatchHint.Caption :=         Lang[ID_ENV_WATCHHINT];
-  gbDebugger.Caption :=          Lang[ID_ENV_DEBUGGER];
+  cbWatchHint.Caption := Lang[ID_ENV_WATCHHINT];
+  gbDebugger.Caption := Lang[ID_ENV_DEBUGGER];
 
-  rgbAutoOpen.Caption:=          Lang[ID_ENV_AUTOOPEN];
-  rgbAutoOpen.Items[0]:=         Lang[ID_ENV_AUTOALL];
-  rgbAutoOpen.Items[1]:=         Lang[ID_ENV_AUTOFIRST];
-  rgbAutoOpen.Items[2]:=         Lang[ID_ENV_AUTOREMEMBER];
-  rgbAutoOpen.Items[3]:=         Lang[ID_ENV_AUTONONE];
+  rgbAutoOpen.Caption := Lang[ID_ENV_AUTOOPEN];
+  rgbAutoOpen.Items[0] := Lang[ID_ENV_AUTOALL];
+  rgbAutoOpen.Items[1] := Lang[ID_ENV_AUTOFIRST];
+  rgbAutoOpen.Items[2] := Lang[ID_ENV_AUTOREMEMBER];
+  rgbAutoOpen.Items[3] := Lang[ID_ENV_AUTONONE];
 
-  cboTabsTop.Items[0]:=          Lang[ID_ENV_TOP];
-  cboTabsTop.Items[1]:=          Lang[ID_ENV_BOTTOM];
-  cboTabsTop.Items[2]:=          Lang[ID_ENV_LEFT];
-  cboTabsTop.Items[3]:=          Lang[ID_ENV_RIGHT];
+  cboTabsTop.Items[0] := Lang[ID_ENV_TOP];
+  cboTabsTop.Items[1] := Lang[ID_ENV_BOTTOM];
+  cboTabsTop.Items[2] := Lang[ID_ENV_LEFT];
+  cboTabsTop.Items[3] := Lang[ID_ENV_RIGHT];
 
-  lblLang.Caption:=              Lang[ID_ENV_LANGUAGE];
-  lblTheme.Caption:=             Lang[ID_ENV_THEME];
-  lblmsgTabs.Caption:=           Lang[ID_ENV_MSGTABS];
-  lblMRU.Caption:=               Lang[ID_ENV_MRU];
+  lblLang.Caption := Lang[ID_ENV_LANGUAGE];
+  lblTheme.Caption := Lang[ID_ENV_THEME];
+  lblmsgTabs.Caption := Lang[ID_ENV_MSGTABS];
+  lblMRU.Caption := Lang[ID_ENV_MRU];
 
-  lblOptionsDir.Caption:=        Lang[ID_ENV_OPTIONSDIRHINT];
-  btnResetDev.Caption:=          Lang[ID_ENV_RESETDEV];
-  lblUserDir.Caption:=           Lang[ID_ENV_USERDIR];
-  lblTemplatesDir.Caption:=      Lang[ID_ENV_TEMPLATESDIR];
-  lblIcoLib.Caption:=            Lang[ID_ENV_ICOLIB];
-  lblSplash.Caption:=            Lang[ID_ENV_SPLASH];
-  lblLangPath.Caption:=          Lang[ID_ENV_SELLANGDIR];
+  lblOptionsDir.Caption := Lang[ID_ENV_OPTIONSDIRHINT];
+  btnResetDev.Caption := Lang[ID_ENV_RESETDEV];
+  lblUserDir.Caption := Lang[ID_ENV_USERDIR];
+  lblTemplatesDir.Caption := Lang[ID_ENV_TEMPLATESDIR];
+  lblIcoLib.Caption := Lang[ID_ENV_ICOLIB];
+  lblSplash.Caption := Lang[ID_ENV_SPLASH];
+  lblLangPath.Caption := Lang[ID_ENV_SELLANGDIR];
 
   // externals tab
-  lblExternal.Caption:=          Lang[ID_ENV_EXTERNPROGASSOCS];
+  lblExternal.Caption := Lang[ID_ENV_EXTERNPROGASSOCS];
   vleExternal.TitleCaptions.Clear;
   vleExternal.TitleCaptions.Add(Lang[ID_ENV_EXTERNEXT]);
   vleExternal.TitleCaptions.Add(Lang[ID_ENV_EXTERNPROG]);
 
-  btnExtAdd.Caption:=            Lang[ID_BTN_ADD];
-  btnExtDel.Caption:=            Lang[ID_BTN_DELETE];
+  btnExtAdd.Caption := Lang[ID_BTN_ADD];
+  btnExtDel.Caption := Lang[ID_BTN_DELETE];
 
   // associations tab
-  lblAssocFileTypes.Caption:=    Lang[ID_ENV_FASSTYPES];
-  lblAssocDesc.Caption:=         Lang[ID_ENV_FASSDESC];
+  lblAssocFileTypes.Caption := Lang[ID_ENV_FASSTYPES];
+  lblAssocDesc.Caption := Lang[ID_ENV_FASSDESC];
 
   // CVS support tab
-  lblCVSExec.Caption:=       Lang[ID_ENV_CVSEXE];
-  lblCVSCompression.Caption:=Lang[ID_ENV_CVSCOMPR];
-  chkCVSUseSSH.Caption:=     Lang[ID_ENV_CVSUSESSH];
-  uifontlabel.Caption:=      Lang[ID_ENV_UIFONT];
+  lblCVSExec.Caption := Lang[ID_ENV_CVSEXE];
+  lblCVSCompression.Caption := Lang[ID_ENV_CVSCOMPR];
+  chkCVSUseSSH.Caption := Lang[ID_ENV_CVSUSESSH];
+  uifontlabel.Caption := Lang[ID_ENV_UIFONT];
 end;
 
 procedure TEnviroForm.btnHelpClick(Sender: TObject);
 begin
-	OpenHelpFile('index.htm');
+  OpenHelpFile('index.htm');
 end;
 
 procedure TEnviroForm.FormCreate(Sender: TObject);
 var
-	I,sel: integer;
+  I, sel: integer;
 begin
-	LoadText;
+  LoadText;
 
-	with devData do begin
-		// General, left column
-		cbDefCpp.Checked:= defCpp;
-		cbBackups.Checked:= BackUps;
-		cbMinOnRun.Checked:= MinOnRun;
-		cbShowBars.Checked:= ShowBars;
-		cbMultiLineTab.Checked:= MultiLineTab;
-		cbDblFiles.Checked:= DblFiles;
-		cbNoSplashScreen.Checked:= NoSplashScreen;
-		cbPauseConsole.Checked:=ConsolePause;
-		cbCheckAssocs.Checked:=CheckAssocs;
-		cbWatchHint.Checked := WatchHint;
-		cbShowProgress.Checked := ShowProgress;
-		cbAutoCloseProgress.Checked := AutoCloseProgress;
+  with devData do begin
+    // General, left column
+    cbDefCpp.Checked := defCpp;
+    cbBackups.Checked := BackUps;
+    cbMinOnRun.Checked := MinOnRun;
+    cbShowBars.Checked := ShowBars;
+    cbMultiLineTab.Checked := MultiLineTab;
+    cbDblFiles.Checked := DblFiles;
+    cbNoSplashScreen.Checked := NoSplashScreen;
+    cbPauseConsole.Checked := ConsolePause;
+    cbCheckAssocs.Checked := CheckAssocs;
+    cbWatchHint.Checked := WatchHint;
+    cbShowProgress.Checked := ShowProgress;
+    cbAutoCloseProgress.Checked := AutoCloseProgress;
 
-		// General, right column
-		seMRUMax.Value:= MRUMax;
-		cboTabsTop.ItemIndex:= msgTabs;
+    // General, right column
+    seMRUMax.Value := MRUMax;
+    cboTabsTop.ItemIndex := Integer(msgTabs);
 
-		// List the languages
-		cboLang.Items.BeginUpdate;
-		cboLang.Clear;
-		for I := 0 to Lang.Langs.Count - 1 do begin
-			sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[I]);
-			if SameText(Lang.CurrentLanguage,cboLang.Items[I]) then
-				cboLang.ItemIndex := sel;
-		end;
-		cboLang.Items.EndUpdate;
+    // List the languages
+    cboLang.Items.BeginUpdate;
+    cboLang.Clear;
+    for I := 0 to Lang.Langs.Count - 1 do begin
+      sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[I]);
+      if SameText(Lang.CurrentLanguage, cboLang.Items[I]) then
+        cboLang.ItemIndex := sel;
+    end;
+    cboLang.Items.EndUpdate;
 
-		// List the themes
-		cboTheme.Items.Clear;
-		devImageThemes.GetThemeTitles(cboTheme.Items);
-		cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
+    // List the themes
+    cboTheme.Items.Clear;
+    devImageThemes.GetThemeTitles(cboTheme.Items);
+    cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
 
-		// Add all font families and select the current one
-		cbUIfont.Items.Assign(Screen.Fonts);
-		for I := 0 to cbUIfont.Items.Count-1 do
-			if cbUIfont.Items.Strings[I] = InterfaceFont then begin
-				cbUIfont.ItemIndex := I;
-				break;
-			end;
+    // Add all font families and select the current one
+    cbUIfont.Items.Assign(Screen.Fonts);
+    for I := 0 to cbUIfont.Items.Count - 1 do
+      if cbUIfont.Items.Strings[I] = InterfaceFont then begin
+        cbUIfont.ItemIndex := I;
+        break;
+      end;
 
-		// Do the same for the size selection
-		for I := 0 to cbUIfontsize.Items.Count-1 do
-			if StrToIntDef(cbUIfontsize.Items.Strings[I],-1) = InterfaceFontSize then begin
-				cbUIfontsize.ItemIndex := I;
-				break;
-			end;
+    // Do the same for the size selection
+    for I := 0 to cbUIfontsize.Items.Count - 1 do
+      if StrToIntDef(cbUIfontsize.Items.Strings[I], -1) = InterfaceFontSize then begin
+        cbUIfontsize.ItemIndex := I;
+        break;
+      end;
 
-		// General tab, right column, last entry
-		rgbAutoOpen.ItemIndex:= AutoOpen;
+    // General tab, right column, last entry
+    rgbAutoOpen.ItemIndex := AutoOpen;
 
-		// Directories tab
-		edOptionsDir.Text := devDirs.Config;
-		edUserDir.Text:= devDirs.Default;
-		edTemplatesDir.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Templates);
-		edIcoLib.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Icons);
-		edLang.Text:= ExtractRelativePath(devDirs.Exec, devDirs.Lang);
-		edSplash.Text:= Splash;
+    // Directories tab
+    edOptionsDir.Text := devDirs.Config;
+    edUserDir.Text := devDirs.Default;
+    edTemplatesDir.Text := ExtractRelativePath(devDirs.Exec, devDirs.Templates);
+    edIcoLib.Text := ExtractRelativePath(devDirs.Exec, devDirs.Icons);
+    edLang.Text := ExtractRelativePath(devDirs.Exec, devDirs.Lang);
+    edSplash.Text := Splash;
 
-		// External Programs tab
-		vleExternal.Strings.Assign(devExternalPrograms.Programs);
-		for I := 0 to vleExternal.Strings.Count-1 do
-			vleExternal.ItemProps[I].EditStyle:=esEllipsis;
+    // External Programs tab
+    vleExternal.Strings.Assign(devExternalPrograms.Programs);
+    for I := 0 to vleExternal.Strings.Count - 1 do
+      vleExternal.ItemProps[I].EditStyle := esEllipsis;
 
-		// File associations tab
-		CheckAssociations(false); // read only, don't try to fix them
-		lstAssocFileTypes.Clear;
-		for I := 0 to AssociationsCount-1 do begin
-			lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[I, 1], Associations[I, 0]]));
-			lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count-1]:=IsAssociated(I);
-		end;
+    // File associations tab
+    CheckAssociations(false); // read only, don't try to fix them
+    lstAssocFileTypes.Clear;
+    for I := 0 to AssociationsCount - 1 do begin
+      lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[I, 1], Associations[I, 0]]));
+      lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count - 1] := IsAssociated(I);
+    end;
 
-		// CVS Support tab
-		edCVSExec.Text:= devCVSHandler.Executable;
-		spnCVSCompression.Value:= devCVSHandler.Compression;
-		chkCVSUseSSH.Checked:= devCVSHandler.UseSSH;
-	end;
+    // CVS Support tab
+    edCVSExec.Text := devCVSHandler.Executable;
+    spnCVSCompression.Value := devCVSHandler.Compression;
+    chkCVSUseSSH.Checked := devCVSHandler.UseSSH;
+  end;
 end;
 
 procedure TEnviroForm.vleExternalEditButtonClick(Sender: TObject);
 begin
-  if Trim(vleExternal.Cells[0, vleExternal.Row])='' then begin
+  if Trim(vleExternal.Cells[0, vleExternal.Row]) = '' then begin
     MessageDlg('Add an extension first!', mtError, [mbOk], 0);
     Exit;
   end;
 
-	with TOpenDialog.Create(Self) do try
-		Filter:=FLT_ALLFILES;
-		if Execute then
-			vleExternal.Cells[1, vleExternal.Row] := Filename;
-	finally
-		Free;
-	end;
+  with TOpenDialog.Create(Self) do try
+      Filter := FLT_ALLFILES;
+      if Execute then
+        vleExternal.Cells[1, vleExternal.Row] := Filename;
+    finally
+      Free;
+    end;
 end;
 
 procedure TEnviroForm.vleExternalValidate(Sender: TObject; ACol,
@@ -451,20 +446,20 @@ procedure TEnviroForm.vleExternalValidate(Sender: TObject; ACol,
 var
   idx: integer;
 begin
-  if vleExternal.FindRow(KeyName, idx) and (idx<>ARow) then begin
+  if vleExternal.FindRow(KeyName, idx) and (idx <> ARow) then begin
     MessageDlg('Extension exists...', mtError, [mbOk], 0);
-    vleExternal.Col:=0;
-    vleExternal.Row:=ARow;
+    vleExternal.Col := 0;
+    vleExternal.Row := ARow;
     Abort;
   end;
-  vleExternal.ItemProps[ARow-1].EditStyle:=esEllipsis;
+  vleExternal.ItemProps[ARow - 1].EditStyle := esEllipsis;
 end;
 
 procedure TEnviroForm.btnExtAddClick(Sender: TObject);
 begin
   vleExternal.InsertRow('', '', True);
-  vleExternal.Row:=vleExternal.RowCount-1;
-  vleExternal.Col:=0;
+  vleExternal.Row := vleExternal.RowCount - 1;
+  vleExternal.Col := 0;
   vleExternal.SetFocus;
 end;
 
@@ -478,46 +473,47 @@ end;
 
 procedure TEnviroForm.cvsdownloadlabelClick(Sender: TObject);
 begin
-	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
+  ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TEnviroForm.cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 begin
-	with TComboBox(Control) do begin
-		Canvas.Font.Name := Items.Strings[Index];
-		Canvas.Font.Size := strtoint(cbUIfontsize.Text);
-		Canvas.FillRect(Rect);
-		Canvas.TextOut(Rect.Left, Rect.Top, Canvas.Font.Name);
-	end;
+  with TComboBox(Control) do begin
+    Canvas.Font.Name := Items.Strings[Index];
+    Canvas.Font.Size := strtoint(cbUIfontsize.Text);
+    Canvas.FillRect(Rect);
+    Canvas.TextOut(Rect.Left, Rect.Top, Canvas.Font.Name);
+  end;
 end;
 
 procedure TEnviroForm.cbUIfontsizeDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 begin
-	with TComboBox(Control) do begin
-		Canvas.Font.Name := cbUIfont.Text;
-		Canvas.Font.Size := strtoint(Items.Strings[Index]);
-		Canvas.FillRect(Rect);
-		Canvas.TextOut(Rect.Left, Rect.Top, Items.Strings[Index]);
-	end;
+  with TComboBox(Control) do begin
+    Canvas.Font.Name := cbUIfont.Text;
+    Canvas.Font.Size := strtoint(Items.Strings[Index]);
+    Canvas.FillRect(Rect);
+    Canvas.TextOut(Rect.Left, Rect.Top, Items.Strings[Index]);
+  end;
 end;
 
 procedure TEnviroForm.cbUIfontsizeChange(Sender: TObject);
 begin
-	cbUIfont.Repaint;
+  cbUIfont.Repaint;
 end;
 
 procedure TEnviroForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-	Action := caFree;
+  Action := caFree;
 end;
 
 procedure TEnviroForm.btnResetDevClick(Sender: TObject);
 begin
-	// Remove settings on exit
-	RemoveOptionsDir(devDirs.Config);
+  // Remove settings on exit
+  RemoveOptionsDir(devDirs.Config);
 
-	// Quit without saving
-	TerminateProcess(GetCurrentProcess, 0);
+  // Quit without saving
+  TerminateProcess(GetCurrentProcess, 0);
 end;
 
 end.
+

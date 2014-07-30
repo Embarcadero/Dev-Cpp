@@ -1,11 +1,11 @@
 object MainForm: TMainForm
   Left = 315
-  Top = 92
+  Top = 91
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
   Caption = 'Dev-C++'
-  ClientHeight = 620
+  ClientHeight = 621
   ClientWidth = 1000
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -28,13 +28,13 @@ object MainForm: TMainForm
   object SplitterLeft: TSplitter
     Left = 193
     Top = 72
-    Height = 342
+    Height = 343
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 414
+    Top = 415
     Width = 1000
     Height = 3
     Cursor = crVSplit
@@ -44,7 +44,7 @@ object MainForm: TMainForm
   end
   object MessageControl: TPageControl
     Left = 0
-    Top = 437
+    Top = 418
     Width = 1000
     Height = 183
     ActivePage = LogSheet
@@ -174,7 +174,7 @@ object MainForm: TMainForm
         end
         object chkShortenPaths: TCheckBox
           Left = 4
-          Top = 128
+          Top = 126
           Width = 144
           Height = 17
           Action = actShortenCompPaths
@@ -227,9 +227,9 @@ object MainForm: TMainForm
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
-          Width = 118
+          Width = 115
           Height = 13
-          Caption = 'Send command to GDB :'
+          Caption = 'Send command to GDB:'
         end
         object edGdbCommand: TComboBox
           Left = 136
@@ -245,8 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 396
-          Height = 117
-          Align = alCustom
+          Height = 122
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -411,8 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 38
-          Align = alCustom
+          Height = 48
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
@@ -879,7 +877,7 @@ object MainForm: TMainForm
   end
   object Statusbar: TStatusBar
     Left = 0
-    Top = 417
+    Top = 601
     Width = 1000
     Height = 20
     Panels = <
@@ -899,11 +897,11 @@ object MainForm: TMainForm
     Left = 196
     Top = 72
     Width = 804
-    Height = 342
+    Height = 343
     Align = alClient
     HotTrack = True
     MultiLine = True
-    PopupMenu = EditorPopupMenu
+    PopupMenu = EditorPopup
     TabOrder = 2
     Visible = False
     OnChange = PageControlChange
@@ -961,11 +959,12 @@ object MainForm: TMainForm
     Left = 0
     Top = 72
     Width = 193
-    Height = 342
-    ActivePage = LeftProjectSheet
+    Height = 343
+    ActivePage = LeftClassSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 1
+    OnChange = LeftPageControlChange
     object LeftProjectSheet: TTabSheet
       Caption = 'Project'
       ImageIndex = -1
@@ -973,7 +972,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 314
+        Height = 315
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -1009,7 +1008,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 314
+        Height = 315
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
@@ -1040,11 +1039,11 @@ object MainForm: TMainForm
     object LeftDebugSheet: TTabSheet
       Caption = 'Debug'
       ImageIndex = -1
-      object DebugTree: TTreeView
+      object DebugView: TTreeView
         Left = 0
         Top = 0
         Width = 185
-        Height = 314
+        Height = 315
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1057,8 +1056,8 @@ object MainForm: TMainForm
         ReadOnly = True
         RightClickSelect = True
         TabOrder = 0
-        OnAdvancedCustomDrawItem = DebugTreeAdvancedCustomDrawItem
-        OnKeyDown = DebugTreeKeyDown
+        OnAdvancedCustomDrawItem = DebugViewAdvancedCustomDrawItem
+        OnKeyDown = DebugViewKeyDown
       end
     end
   end
@@ -1439,19 +1438,6 @@ object MainForm: TMainForm
         Caption = 'Floating &Report window'
         OnClick = FloatingReportwindowItemClick
       end
-      object N57: TMenuItem
-        Caption = '-'
-      end
-      object GotoprojectmanagerItem: TMenuItem
-        Caption = 'Go to Project &Manager'
-        ShortCut = 16497
-        OnClick = actGotoProjectManagerExecute
-      end
-      object GoToClassBrowserItem: TMenuItem
-        Caption = 'Go to Class &Browser'
-        ShortCut = 16498
-        OnClick = GoToClassBrowserItemClick
-      end
     end
     object ProjectMenu: TMenuItem
       Caption = '&Project'
@@ -1493,22 +1479,25 @@ object MainForm: TMainForm
       object N69: TMenuItem
         Caption = '-'
       end
-      object N49: TMenuItem
-        Action = actProjectMakeFile
+      object SyntaxCheckItem: TMenuItem
+        Action = actSyntaxCheck
       end
-      object N18: TMenuItem
+      object SyntaxCheckCurrentFile1: TMenuItem
+        Action = actSyntaxCheckFile
+      end
+      object N10: TMenuItem
         Caption = '-'
       end
       object mnuExecParameters: TMenuItem
         Action = actExecParams
       end
-      object N10: TMenuItem
+      object N8: TMenuItem
         Caption = '-'
       end
-      object SyntaxCheckItem: TMenuItem
-        Action = actSyntaxCheck
+      object N49: TMenuItem
+        Action = actProjectMakeFile
       end
-      object N8: TMenuItem
+      object N18: TMenuItem
         Caption = '-'
       end
       object CleanItem: TMenuItem
@@ -1703,7 +1692,7 @@ object MainForm: TMainForm
       end
     end
   end
-  object EditorPopupMenu: TPopupMenu
+  object EditorPopup: TPopupMenu
     Left = 403
     Top = 216
     object GotoDeclEditor: TMenuItem
@@ -2314,6 +2303,7 @@ object MainForm: TMainForm
       Tag = 5
       Category = 'Execute'
       Caption = 'C&lean'
+      ImageIndex = 5
       OnExecute = actCleanExecute
       OnUpdate = actCompileUpdate
     end
@@ -2370,6 +2360,7 @@ object MainForm: TMainForm
       ImageIndex = 39
       ShortCut = 16393
       OnExecute = actNextExecute
+      OnUpdate = actUpdatePageCount
     end
     object actPrev: TAction
       Tag = 3
@@ -2378,6 +2369,7 @@ object MainForm: TMainForm
       ImageIndex = 40
       ShortCut = 24585
       OnExecute = actPrevExecute
+      OnUpdate = actUpdatePageCount
     end
     object actAbout: TAction
       Category = 'Help'
@@ -2480,6 +2472,7 @@ object MainForm: TMainForm
     object actSyntaxCheck: TAction
       Category = 'Execute'
       Caption = '&Syntax Check'
+      ImageIndex = 49
       OnExecute = actSyntaxCheckExecute
       OnUpdate = actCompileUpdate
     end
@@ -2580,6 +2573,13 @@ object MainForm: TMainForm
       Caption = 'Current file'
       OnExecute = actBrowserViewCurrentExecute
       OnUpdate = actBrowserViewAllUpdate
+    end
+    object actSyntaxCheckFile: TAction
+      Category = 'Execute'
+      Caption = '&Syntax Check Current File'
+      ImageIndex = 49
+      OnExecute = actSyntaxCheckFileExecute
+      OnUpdate = actCompileUpdate
     end
     object actProfile: TAction
       Category = 'Execute'

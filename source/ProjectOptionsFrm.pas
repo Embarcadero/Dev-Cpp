@@ -28,7 +28,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
-  prjtypes, Spin, ValEdit, CompOptionsFrame, ShellApi, Grids;
+  ProjectTypes, Spin, ValEdit, CompOptionsFrame, ShellApi, Grids;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,

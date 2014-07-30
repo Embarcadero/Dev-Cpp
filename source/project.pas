@@ -17,14 +17,14 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit project;
+unit Project;
 
 interface
 
 uses
 {$IFDEF WIN32}
   IniFiles, SysUtils, Dialogs, ComCtrls, Editor, Contnrs, SynExportHTML,
-  Classes, Controls, version, Forms, Templates, prjtypes,
+  Classes, Controls, version, Forms, Templates, ProjectTypes,
   Windows;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -185,19 +185,24 @@ function TProjUnit.Save: boolean;
 var
   workeditor: TSynEdit;
 begin
+  MainForm.FileMonitor.BeginUpdate;
   try
-    result := true;
-    if not Assigned(fEditor) and not FileExists(fFileName) then begin // file is neither open, nor saved
-      workeditor := TSynEdit.Create(nil);
-      workeditor.UnCollapsedLines.SaveToFile(fFileName);
-      workeditor.Free;
-    end else if Assigned(fEditor) and fEditor.Text.Modified then begin
-      result := fEditor.Save;
-      if FileExists(fEditor.FileName) then
-        FileSetDate(fEditor.FileName, DateTimeToFileDate(Now));
+    try
+      result := true;
+      if not Assigned(fEditor) and not FileExists(fFileName) then begin // file is neither open, nor saved
+        workeditor := TSynEdit.Create(nil);
+        workeditor.UnCollapsedLines.SaveToFile(fFileName);
+        workeditor.Free;
+      end else if Assigned(fEditor) and fEditor.Text.Modified then begin
+        result := fEditor.Save;
+        if FileExists(fEditor.FileName) then
+          FileSetDate(fEditor.FileName, DateTimeToFileDate(Now));
+      end;
+    except
+      result := false;
     end;
-  except
-    result := false;
+  finally
+    MainForm.FileMonitor.EndUpdate;
   end;
 
   // Update node text
@@ -297,8 +302,8 @@ begin
   // Does the option exist?
   if devCompilerSets[fOptions.CompilerSet].FindOption(OptionString, OptionStruct, OptionIndex) then begin
     // Can it be found in the project options list?
-    if (OptionIndex + 1 <= Length(fOptions.CompilerOptions)) and (fOptions.CompilerOptions[OptionIndex + 1] <> value) then
-      begin
+    if (OptionIndex + 1 <= Length(fOptions.CompilerOptions)) and (fOptions.CompilerOptions[OptionIndex + 1] <> value)
+      then begin
       fOptions.CompilerOptions[OptionIndex + 1] := Value;
       SetModified(true);
     end;
@@ -911,7 +916,7 @@ begin
       if not (New and Dirty) then begin
         finifile.WriteString('Unit' + IntToStr(Count + 1), 'FileName', ExtractRelativePath(Directory,
           fUnits[idx].FileName));
-        inc(Count);
+        Inc(Count);
       end;
       case GetFileTyp(fUnits[idx].FileName) of
         utcHead, utcppHead, utcSrc, utcppSrc: finifile.WriteBool('Unit' + IntToStr(idx + 1), 'CompileCpp', CompileCpp);

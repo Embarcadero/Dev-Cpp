@@ -32,7 +32,7 @@ const
 
   // exe properties
   DEVCPP = 'Dev-C++';
-  DEVCPP_VERSION = '5.7.0';
+  DEVCPP_VERSION = '5.7.1';
 
   // delimiters
   DEV_INTERNAL_OPEN = '$__DEV_INTERNAL_OPEN';
@@ -59,7 +59,7 @@ const
   THEME_DIR = 'Themes' + pd;
   PACKAGES_DIR = 'Packages' + pd;
 
-  // file fxtensions
+  // file extensions
   LIB_EXT = '.a';
   OBJ_EXT = '.o';
   DLL_EXT = '.dll';
@@ -82,6 +82,8 @@ const
   RC_EXT = '.rc';
   RES_EXT = '.res';
   RH_EXT = '.rh';
+  GCH_EXT = '.gch'; // precompiled header
+  DEF_EXT = '.def'; // definitions file
 
   // program defaults
   MAKE_PROGRAM = 'mingw32-make.exe';

@@ -954,10 +954,10 @@ begin
   fIndex := fIndexBackup;
 
   // Fail if we do not find a comma or a semicolon or a ( (inline constructor)
-  while fIndex < fTokenizer.Tokens.Count - 1 do begin
+  while fIndex < fTokenizer.Tokens.Count do begin
     if (fTokenizer[fIndex]^.Text[1] in ['#', '{', '}']) or CheckForKeyword then begin
       Break; // fail
-    end else if (fTokenizer[fIndex]^.Text[1] = '(') and (fTokenizer[fIndex]^.Text[2] = '(') then
+    end else if (fIndex+1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '(') and (fTokenizer[fIndex]^.Text[2] = '(') then
       begin // TODO: is this used to remove __attribute stuff?
       Break;
     end else if fTokenizer[fIndex]^.Text[1] in [',', ';'] then begin
@@ -1273,7 +1273,7 @@ begin
         Inc(fIndex);
 
     // Still a prototype
-    if fTokenizer[fIndex]^.Text[1] in [';', '}'] then begin
+    if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] in [';', '}']) then begin
       IsDeclaration := True;
       if not fIsHeader and (CurrClassID = -1) then
         IsValid := False;
@@ -1769,6 +1769,8 @@ begin
       Dispose(PFileIncludes(fIncludesList[I]));
       fIncludesList.Delete(I);
     end;
+
+  // Delete everything
   end else begin
 
     // Remove all statements

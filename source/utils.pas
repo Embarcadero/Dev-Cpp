@@ -1292,12 +1292,12 @@ begin
     with devCompilerSets.CurrentSet do begin
       for I := 0 to BinDir.Count - 1 do
         Result := StringReplace(Result, BinDir[i], '%BinDir' + IntToStr(i) + '%', [rfReplaceAll]);
-      for I := 0 to LibDir.Count - 1 do
-        Result := StringReplace(Result, BinDir[i], '%LibDir' + IntToStr(i) + '%', [rfReplaceAll]);
-      for I := 0 to CDir.Count - 1 do
-        Result := StringReplace(Result, CDir[i], '%CIncludeDir' + IntToStr(i) + '%', [rfReplaceAll]);
       for I := 0 to CppDir.Count - 1 do
         Result := StringReplace(Result, CppDir[i], '%CppIncludeDir' + IntToStr(i) + '%', [rfReplaceAll]);
+      for I := 0 to CDir.Count - 1 do
+        Result := StringReplace(Result, CDir[i], '%CIncludeDir' + IntToStr(i) + '%', [rfReplaceAll]);
+      for I := 0 to LibDir.Count - 1 do
+        Result := StringReplace(Result, LibDir[i], '%LibDir' + IntToStr(i) + '%', [rfReplaceAll]);
     end;
     Result := StringReplace(Result, devDirs.Exec, '%Dev-Cpp%\', [rfReplaceAll]);
   end;

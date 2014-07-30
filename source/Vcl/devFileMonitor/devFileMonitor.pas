@@ -27,8 +27,8 @@ uses
   devMonitorThread, devMonitorTypes;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, Classes, QForms, QControls,
-  devMonitorThread, devMonitorTypes;
+SysUtils, Classes, QForms, QControls,
+devMonitorThread, devMonitorTypes;
 {$ENDIF}
 
 type
@@ -37,18 +37,19 @@ type
     fMonitor: TdevMonitorThread;
     fFiles: TStringList;
     fNotifyChange: TdevMonitorChange;
-    function GetActive: boolean;
+    fUpdateCount: integer;
     procedure SubClassWndProc(var Message: TMessage);
     procedure Refresh;
+    procedure Activate;
+    procedure Deactivate;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Activate;
-    procedure Deactivate;
-    procedure Monitor(const FileName : AnsiString);
-    procedure UnMonitor(const FileName : AnsiString);
+    procedure Monitor(const FileName: AnsiString);
+    procedure UnMonitor(const FileName: AnsiString);
+    procedure BeginUpdate;
+    procedure EndUpdate;
   published
-    property Active: boolean read GetActive;
     property OnNotifyChange: TdevMonitorChange read fNotifyChange write fNotifyChange;
   end;
 
@@ -60,81 +61,91 @@ implementation
 
 procedure Register;
 begin
-	RegisterComponents('Dev-C++', [TdevFileMonitor]);
+  RegisterComponents('Dev-C++', [TdevFileMonitor]);
 end;
 
 constructor TdevFileMonitor.Create(AOwner: TComponent);
 begin
-	inherited;
-	fFiles := TStringList.Create;
-	fMonitor := nil;
-	WindowProc := SubClassWndProc;
+  inherited;
+  fFiles := TStringList.Create;
+  fMonitor := nil;
+  fUpdateCount := 0;
+  WindowProc := SubClassWndProc;
 end;
 
 destructor TdevFileMonitor.Destroy;
 begin
-	Deactivate;
-	fFiles.Free;
-	inherited;
+  Deactivate;
+  fFiles.Free;
+  inherited;
 end;
 
 procedure TdevFileMonitor.SubClassWndProc(var Message: TMessage);
 begin
-	if Message.Msg = APPMSG_NOTIFYFILECHANGED then begin
-		if Assigned(fNotifyChange) then begin
-			fNotifyChange(Self, TDevMonitorChangeType(Message.WParam),PAnsiChar(Message.LParam));
-			StrDispose(PAnsiChar(Message.LParam));
-		end;
-	end else
-		WndProc(Message);
+  if Message.Msg = APPMSG_NOTIFYFILECHANGED then begin
+    if Assigned(fNotifyChange) then begin
+      fNotifyChange(Self, TDevMonitorChangeType(Message.WParam), PAnsiChar(Message.LParam));
+      StrDispose(PAnsiChar(Message.LParam));
+    end;
+  end else
+    WndProc(Message);
 end;
 
 procedure TdevFileMonitor.Activate;
 begin
-	if not Active then begin
-		fMonitor := TdevMonitorThread.Create(Self, fFiles);
-		fMonitor.Resume;
-	end;
+  if not Assigned(fMonitor) then begin
+    fMonitor := TdevMonitorThread.Create(Self, fFiles);
+    fMonitor.Resume;
+  end;
 end;
 
 procedure TdevFileMonitor.Deactivate;
 begin
-	if Assigned(fMonitor) then begin // we can spawn a new fMonitor instance directly after calling this
-		fMonitor.TellToQuit;
-		fMonitor := nil; // frees itself
-	end;
+  if Assigned(fMonitor) then begin // we can spawn a new fMonitor instance directly after calling this
+    fMonitor.TellToQuit;
+    fMonitor := nil; // frees itself
+  end;
 end;
 
-function TdevFileMonitor.GetActive: boolean;
+procedure TdevFileMonitor.BeginUpdate;
 begin
-	Result := Assigned(fMonitor);
+  Inc(fUpdateCount);
+  if fUpdateCount <> 0 then
+    Deactivate;
 end;
 
-procedure TdevFileMonitor.Monitor(const FileName : AnsiString);
+procedure TdevFileMonitor.EndUpdate;
 begin
-	fFiles.Add(FileName);
-	Refresh;
+  Dec(fUpdateCount);
+  if fUpdateCount = 0 then
+    Activate;
 end;
 
-procedure TdevFileMonitor.UnMonitor(const FileName : AnsiString);
+procedure TdevFileMonitor.Monitor(const FileName: AnsiString);
+begin
+  fFiles.Add(FileName);
+  Refresh;
+end;
+
+procedure TdevFileMonitor.UnMonitor(const FileName: AnsiString);
 var
-	I : integer;
+  I: integer;
 begin
-	I := fFiles.IndexOf(FileName);
-	if I <> -1 then begin
-		fFiles.Delete(I);
-		Refresh;
-	end;
+  I := fFiles.IndexOf(FileName);
+  if I <> -1 then begin
+    fFiles.Delete(I);
+    Refresh;
+  end;
 end;
 
 procedure TdevFileMonitor.Refresh;
 begin
-	if not Active then
-		Activate
-	else begin
-		Deactivate;
-		Activate;
-	end;
+  if not Assigned(fMonitor) then
+    Activate
+  else begin
+    Deactivate;
+    Activate;
+  end;
 end;
 
 end.

@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Grids, ValEdit, ComCtrls, ExtCtrls, CompOptionsList, project, utils, prjtypes, StdCtrls;
+  Grids, ValEdit, ComCtrls, ExtCtrls, CompOptionsList, project, utils, ProjectTypes, StdCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,

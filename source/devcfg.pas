@@ -23,7 +23,8 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, prjtypes, Math, ShellAPI, ShlObj;
+  Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, ProjectTypes, Math, ShellAPI, ShlObj,
+  ComCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
 QDialogs, Classes, QGraphics, QSynEdit, CFGData, IniFiles, Math, prjtypes;
@@ -111,9 +112,9 @@ type
     // Option utils
     procedure AddOption(Name, Section: integer; IsC, IsCpp, IsLinker: boolean; Value: integer; const Setting:
       AnsiString; Choices: TStringList);
-    function GetOption(const Setting: AnsiString): Char;
-    function FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
-    procedure SetOption(const Setting: AnsiString; Value: Char); overload;
+    function GetOption(const Option: AnsiString): Char;
+    function FindOption(const Option: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
+    procedure SetOption(const Option: AnsiString; Value: Char); overload;
     procedure SetOption(Option: PCompilerOption; Value: char); overload;
     procedure SetOption(Index: integer; Value: char); overload;
 
@@ -467,7 +468,7 @@ type
     fTheme: AnsiString; // Theme file
     fFindCols: AnsiString; // Find Column widths (comma sep)
     fCompCols: AnsiString; // Compiler Column Widths (comma sep)
-    fMsgTabs: integer; // Editor Tabs
+    fMsgTabs: TTabPosition; // Editor Tabs
     fMinOnRun: boolean; // Minimize IDE on run
     fMRUMax: integer; // Max number of files in history list
     fBackup: boolean; // Create backup files
@@ -588,7 +589,7 @@ type
     property AutoOpen: integer read fAutoOpen write fAutoOpen;
 
     //Windows
-    property MsgTabs: integer read fMsgTabs write fMsgTabs;
+    property MsgTabs: TTabPosition read fMsgTabs write fMsgTabs;
     property InterfaceFont: AnsiString read fInterfaceFont write fInterfaceFont;
     property InterfaceFontSize: integer read fInterfaceFontSize write fInterfaceFontSize;
     property ShowBars: boolean read fShowbars write fShowbars;
@@ -706,7 +707,7 @@ implementation
 uses
 {$IFDEF WIN32}
   MultiLangSupport, datamod, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
-  FileAssocs, TypInfo, DateUtils;
+  FileAssocs, TypInfo, DateUtils, Types;
 {$ENDIF}
 {$IFDEF LINUX}
 MultiLangSupport, SysUtils, StrUtils, QForms, QControls, version, utils, QSynEditMiscClasses,
@@ -877,7 +878,7 @@ begin
   fLang := 'English.lng';
   fFindCols := '75, 75, 120, 150';
   fCompCols := '75, 75, 120, 150';
-  fMsgTabs := 0; // Top
+  fMsgTabs := tpTop; // Top
   fMRUMax := 10;
   fMinOnRun := FALSE;
   fBackup := FALSE;
@@ -984,13 +985,21 @@ end;
 
 procedure TWindowState.GetPlacement(Source: HWND);
 begin
-  GetWindowPlacement(Source, @fStruct);
-  fLeft := fStruct.rcNormalPosition.Left;
-  fTop := fStruct.rcNormalPosition.Top;
-  fRight := fStruct.rcNormalPosition.Right;
-  fBottom := fStruct.rcNormalPosition.Bottom;
-  fShowCmd := fStruct.showCmd;
-  fFlags := fStruct.flags;
+  if GetWindowPlacement(Source, @fStruct) then begin
+    fShowCmd := fStruct.showCmd;
+    fFlags := fStruct.flags;
+
+    // Attempt to correct for Aero Snap. GetWindowPlacement ignores this functionality
+    // Only do that if the window is not minimized/maximized
+    if fStruct.showCmd = SW_SHOWNORMAL then
+      GetWindowRect(Source, fStruct.rcNormalPosition);
+
+    // Apply fixed aero values
+    fLeft := fStruct.rcNormalPosition.Left;
+    fTop := fStruct.rcNormalPosition.Top;
+    fRight := fStruct.rcNormalPosition.Right;
+    fBottom := fStruct.rcNormalPosition.Bottom;
+  end;
 end;
 
 procedure TWindowState.SetPlacement(Destination: HWND);
@@ -1425,24 +1434,24 @@ begin
   fOptionList.Add(option);
 end;
 
-function TdevCompilerSet.GetOption(const Setting: AnsiString): Char;
+function TdevCompilerSet.GetOption(const Option: AnsiString): Char;
 var
   OptionStruct: PCompilerOption;
   OptionIndex: integer;
 begin
-  if FindOption(Setting, OptionStruct, OptionIndex) then
+  if FindOption(Option, OptionStruct, OptionIndex) then
     result := ValueToChar[OptionStruct^.Value]
   else
     result := '0';
 end;
 
-function TdevCompilerSet.FindOption(const Setting: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
+function TdevCompilerSet.FindOption(const Option: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
 var
   I: integer;
 begin
   Result := False;
   for I := 0 to fOptionList.Count - 1 do
-    if SameStr(PCompilerOption(fOptionList[I])^.Setting, Setting) then begin
+    if SameStr(PCompilerOption(fOptionList[I])^.Setting, Option) then begin
       opt := PCompilerOption(fOptionList[I]);
       Index := I;
       Result := True;
@@ -1474,12 +1483,12 @@ begin
     fOptionString := fOptionString + ValueToChar[PCompilerOption(fOptionList[I])^.Value];
 end;
 
-procedure TdevCompilerSet.SetOption(const Setting: AnsiString; Value: Char);
+procedure TdevCompilerSet.SetOption(const Option: AnsiString; Value: Char);
 var
   OptionStruct: PCompilerOption;
   OptionIndex: integer;
 begin
-  if FindOption(OptionString, OptionStruct, OptionIndex) then
+  if FindOption(Option, OptionStruct, OptionIndex) then
     SetOption(OptionIndex, Value);
 end;
 
