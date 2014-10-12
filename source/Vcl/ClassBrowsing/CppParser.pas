@@ -957,8 +957,8 @@ begin
   while fIndex < fTokenizer.Tokens.Count do begin
     if (fTokenizer[fIndex]^.Text[1] in ['#', '{', '}']) or CheckForKeyword then begin
       Break; // fail
-    end else if (fIndex+1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '(') and (fTokenizer[fIndex]^.Text[2] = '(') then
-      begin // TODO: is this used to remove __attribute stuff?
+    end else if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '(') and
+      (fTokenizer[fIndex]^.Text[2] = '(') then begin // TODO: is this used to remove __attribute stuff?
       Break;
     end else if fTokenizer[fIndex]^.Text[1] in [',', ';'] then begin
       Result := True;
@@ -1770,7 +1770,7 @@ begin
       fIncludesList.Delete(I);
     end;
 
-  // Delete everything
+    // Delete everything
   end else begin
 
     // Remove all statements
@@ -1810,12 +1810,15 @@ begin
   if Assigned(fOnStartParsing) then
     fOnStartParsing(Self);
   try
-    for I := 0 to fFilesToScan.Count - 1 do begin
+    // Support stopping of parsing when files closes unexpectedly
+    I := 0;
+    while I < fFilesToScan.Count do begin
       if Assigned(fOnTotalProgress) then
         fOnTotalProgress(Self, fFilesToScan[i], fFilesToScan.Count, i);
       if fScannedFiles.IndexOf(fFilesToScan[i]) = -1 then begin
         Parse(fFilesToScan[i], True, False);
       end;
+      Inc(I);
     end;
     fFilesToScan.Clear;
     PostProcessInheritance;
@@ -2572,7 +2575,7 @@ begin
     // If we're not in a class, but in a member function, get the parent of the member function
     if PStatement(fStatementList[ClosestIndex])^._Kind = skClass then begin
       ParentID := PStatement(fStatementList[ClosestIndex])^._ID;
-        // parent contains class of function we're in or class itself we're in
+      // parent contains class of function we're in or class itself we're in
       ParentIndex := ClosestIndex;
     end else begin
       ParentID := PStatement(fStatementList[ClosestIndex])^._ParentID;
@@ -2999,204 +3002,206 @@ function TCppParser.FindStatementOf(Phrase: AnsiString; CurrentClass: PStatement
 var
   parenttype: PStatement;
   i: integer;
-  parentword, memberword, operator: AnsiString;
-    inheritanceIDs: TIntList; // reuse?
-  begin
+  parentword, memberword, OperatorToken: AnsiString;
+  inheritanceIDs: TIntList; // reuse?
+begin
 
-    // Get the FIRST class and member, surrounding the FIRST operator
-    parentword := GetClass(Phrase);
-    operator := GetOperator(Phrase);
-      memberword := GetMember(Phrase);
+  // Get the FIRST class and member, surrounding the FIRST operator
+  parentword := GetClass(Phrase);
 
-      // Determine which variable we are dealing with
-      result := FindVariableOf(parentword, CurrentClass);
-      if not Assigned(result) then
-        Exit;
+  OperatorToken := GetOperator(Phrase);
+  memberword := GetMember(Phrase);
 
-      // Then determine which type it has (so we can use it as a parent ID)
-      if result^._Kind = skClass then begin // already found type
-        parenttype := result;
-      end else begin
-        parenttype := FindTypeStatementOf(result^._Type, CurrentClass);
-        if not Assigned(parenttype) then
-          Exit;
-      end;
+  // Determine which variable we are dealing with
+  result := FindVariableOf(parentword, CurrentClass);
+  if not Assigned(result) then
+    Exit;
 
-      inheritanceIDs := TIntList.Create;
-    try
-      // Walk the chain of operators
-      while (memberword <> '') do begin
+  // Then determine which type it has (so we can use it as a parent ID)
+  if result^._Kind = skClass then begin // already found type
+    parenttype := result;
+  end else begin
+    parenttype := FindTypeStatementOf(result^._Type, CurrentClass);
+    if not Assigned(parenttype) then
+      Exit;
+  end;
 
-        inheritanceIDs.Clear;
-        GetInheritanceIDs(parenttype, inheritanceIDs);
+  inheritanceIDs := TIntList.Create;
+  try
+    // Walk the chain of operators
+    while (memberword <> '') do begin
 
-        // Add members of this type
-        for I := 0 to fStatementList.Count - 1 do begin
-          if PStatement(fStatementList[I])^._ParentID = parenttype^._ID then begin
-            if SameStr(PStatement(fStatementList[I])^._ScopelessCmd, memberword) then begin
-              result := fStatementList[I];
-              break; // there can be only one with an equal name
-            end;
-          end else if (inheritanceIDs.IndexOf(PStatement(fStatementList[I])^._ParentID) <> -1) then
-            begin // try inheritance
-            // hide private stuff?
-            if SameStr(PStatement(fStatementList[I])^._ScopelessCmd, memberword) then begin
-              result := fStatementList[I];
-              break;
-            end;
+      inheritanceIDs.Clear;
+      GetInheritanceIDs(parenttype, inheritanceIDs);
+
+      // Add members of this type
+      for I := 0 to fStatementList.Count - 1 do begin
+        if PStatement(fStatementList[I])^._ParentID = parenttype^._ID then begin
+          if SameStr(PStatement(fStatementList[I])^._ScopelessCmd, memberword) then begin
+            result := fStatementList[I];
+            break; // there can be only one with an equal name
+          end;
+        end else if (inheritanceIDs.IndexOf(PStatement(fStatementList[I])^._ParentID) <> -1) then
+          begin // try inheritance
+          // hide private stuff?
+          if SameStr(PStatement(fStatementList[I])^._ScopelessCmd, memberword) then begin
+            result := fStatementList[I];
+            break;
           end;
         end;
-
-        // next operator
-        Delete(phrase, 1, Length(parentword) + Length(operator));
-
-        // Get the NEXT member, surrounding the next operator
-        parentword := GetClass(Phrase);
-        operator := GetOperator(Phrase);
-          memberword := GetMember(Phrase);
-
-          // Don't bother finding types
-          if memberword = '' then
-            break;
-
-          // At this point, we have a list of statements that conform to the a(operator)b demand.
-          // Now make these statements "a(operator)b" the parents, so we can use them as filters again
-          parenttype := FindTypeStatementOf(result^._Type, CurrentClass);
-          if not Assigned(parenttype) then
-            Exit;
       end;
-    finally
-      inheritanceIDs.Free;
-    end;
-  end;
 
-  function TCppParser.FindStatementOf(FileName, Phrase: AnsiString; Row: integer; Stream: TMemoryStream): PStatement;
-  begin
-    Result := FindStatementOf(Phrase, FindAndScanBlockAt(FileName, Row, Stream));
-  end;
+      // next operator
+      Delete(phrase, 1, Length(parentword) + Length(OperatorToken));
 
-  procedure TCppParser.DeleteTemporaries;
-  var
-    I: integer;
-  begin
-    for I := fStatementList.Count - 1 downto fBaseIndex do begin
-      if PStatement(fStatementList[I])^._Temporary then begin
-        Dispose(PStatement(fStatementList[I]));
-        fStatementList.Delete(I);
-      end;
-    end;
-  end;
+      // Get the NEXT member, surrounding the next operator
+      parentword := GetClass(Phrase);
 
-  procedure TCppParser.ScanMethodArgs(const ArgStr: AnsiString; const Filename: AnsiString; Line, ClassID: integer);
-  var
-    I, ParamStart, SpacePos, BracePos: integer;
-    S: AnsiString;
-  begin
+      OperatorToken := GetOperator(Phrase);
+      memberword := GetMember(Phrase);
 
-    // Split up argument string by ,
-    I := 2; // assume it starts with ( and ends with )
-    ParamStart := I;
+      // Don't bother finding types
+      if memberword = '' then
+        break;
 
-    while I <= Length(ArgStr) do begin
-      if (ArgStr[i] = ',') or ((I = Length(ArgStr)) and (ArgStr[i] = ')')) then begin
-
-        // We've found "int* a" for example
-        S := Trim(Copy(ArgStr, ParamStart, I - ParamStart));
-
-        // Can be a function pointer. If so, scan after last )
-        BracePos := LastPos(')', S);
-        if BracePos > 0 then // it's a function pointer...
-          SpacePos := Pos(' ', Copy(S, BracePos, MaxInt)) // start search at brace
-        else
-          SpacePos := Pos(' ', S); // Cut up at last space
-
-        if SpacePos > 0 then begin
-          AddStatement(
-            -1,
-            ClassID,
-            Filename,
-            S, // 'int* a'
-            Copy(S, 1, SpacePos - 1), // 'int*'
-            Copy(S, SpacePos + 1, MaxInt), // a
-            '',
-            Line,
-            skVariable,
-            ssLocal,
-            scsPrivate,
-            False, // not visible in class browser
-            True, // allow duplicates
-            False);
-        end;
-
-        ParamStart := I + 1; // step over ,
-      end;
-      Inc(I);
-    end;
-  end;
-
-  function TCppParser.FindFileIncludes(const Filename: AnsiString; DeleteIt: boolean): PFileIncludes;
-  var
-    I: integer;
-  begin
-    Result := nil;
-    for I := 0 to fIncludesList.Count - 1 do
-      if SameText(PFileIncludes(fIncludesList[I])^.BaseFile, Filename) then begin
-        Result := PFileIncludes(fIncludesList[I]);
-        if DeleteIt then
-          fIncludesList.Delete(I);
-        Break;
-      end;
-  end;
-
-  function TCppParser.IsCfile(const Filename: AnsiString): boolean;
-  begin
-    result := cbutils.IsCfile(FileName);
-  end;
-
-  function TCppParser.IsHfile(const Filename: AnsiString): boolean;
-  begin
-    result := cbutils.IsHfile(Filename);
-  end;
-
-  procedure TCppParser.GetSourcePair(const FName: AnsiString; var CFile, HFile: AnsiString);
-  begin
-    cbutils.GetSourcePair(FName, CFile, HFile);
-  end;
-
-  procedure TCppParser.GetFileIncludes(const Filename: AnsiString; var List: TStringList);
-
-    procedure RecursiveFind(const FileName: AnsiString);
-    var
-      I: integer;
-      P: PFileIncludes;
-      sl: TStrings;
-    begin
-      if FileName = '' then
+      // At this point, we have a list of statements that conform to the a(operator)b demand.
+      // Now make these statements "a(operator)b" the parents, so we can use them as filters again
+      parenttype := FindTypeStatementOf(result^._Type, CurrentClass);
+      if not Assigned(parenttype) then
         Exit;
-      List.Add(FileName);
+    end;
+  finally
+    inheritanceIDs.Free;
+  end;
+end;
 
-      // Find the files this file includes
-      P := FindFileIncludes(FileName);
-      if Assigned(P) then begin
+function TCppParser.FindStatementOf(FileName, Phrase: AnsiString; Row: integer; Stream: TMemoryStream): PStatement;
+begin
+  Result := FindStatementOf(Phrase, FindAndScanBlockAt(FileName, Row, Stream));
+end;
 
-        // recursively search included files
-        sl := TStringList.Create;
-        try
-          // For each file this file includes, perform the same trick
-          sl.CommaText := P^.IncludeFiles;
-          for I := 0 to sl.Count - 2 do // Last one is always an empty item
-            if FastIndexOf(List, sl[I]) = -1 then
-              RecursiveFind(sl[I]);
-        finally
-          sl.Free;
-        end;
+procedure TCppParser.DeleteTemporaries;
+var
+  I: integer;
+begin
+  for I := fStatementList.Count - 1 downto fBaseIndex do begin
+    if PStatement(fStatementList[I])^._Temporary then begin
+      Dispose(PStatement(fStatementList[I]));
+      fStatementList.Delete(I);
+    end;
+  end;
+end;
+
+procedure TCppParser.ScanMethodArgs(const ArgStr: AnsiString; const Filename: AnsiString; Line, ClassID: integer);
+var
+  I, ParamStart, SpacePos, BracePos: integer;
+  S: AnsiString;
+begin
+
+  // Split up argument string by ,
+  I := 2; // assume it starts with ( and ends with )
+  ParamStart := I;
+
+  while I <= Length(ArgStr) do begin
+    if (ArgStr[i] = ',') or ((I = Length(ArgStr)) and (ArgStr[i] = ')')) then begin
+
+      // We've found "int* a" for example
+      S := Trim(Copy(ArgStr, ParamStart, I - ParamStart));
+
+      // Can be a function pointer. If so, scan after last )
+      BracePos := LastPos(')', S);
+      if BracePos > 0 then // it's a function pointer...
+        SpacePos := Pos(' ', Copy(S, BracePos, MaxInt)) // start search at brace
+      else
+        SpacePos := Pos(' ', S); // Cut up at last space
+
+      if SpacePos > 0 then begin
+        AddStatement(
+          -1,
+          ClassID,
+          Filename,
+          S, // 'int* a'
+          Copy(S, 1, SpacePos - 1), // 'int*'
+          Copy(S, SpacePos + 1, MaxInt), // a
+          '',
+          Line,
+          skVariable,
+          ssLocal,
+          scsPrivate,
+          False, // not visible in class browser
+          True, // allow duplicates
+          False);
+      end;
+
+      ParamStart := I + 1; // step over ,
+    end;
+    Inc(I);
+  end;
+end;
+
+function TCppParser.FindFileIncludes(const Filename: AnsiString; DeleteIt: boolean): PFileIncludes;
+var
+  I: integer;
+begin
+  Result := nil;
+  for I := 0 to fIncludesList.Count - 1 do
+    if SameText(PFileIncludes(fIncludesList[I])^.BaseFile, Filename) then begin
+      Result := PFileIncludes(fIncludesList[I]);
+      if DeleteIt then
+        fIncludesList.Delete(I);
+      Break;
+    end;
+end;
+
+function TCppParser.IsCfile(const Filename: AnsiString): boolean;
+begin
+  result := cbutils.IsCfile(FileName);
+end;
+
+function TCppParser.IsHfile(const Filename: AnsiString): boolean;
+begin
+  result := cbutils.IsHfile(Filename);
+end;
+
+procedure TCppParser.GetSourcePair(const FName: AnsiString; var CFile, HFile: AnsiString);
+begin
+  cbutils.GetSourcePair(FName, CFile, HFile);
+end;
+
+procedure TCppParser.GetFileIncludes(const Filename: AnsiString; var List: TStringList);
+
+  procedure RecursiveFind(const FileName: AnsiString);
+  var
+    I: integer;
+    P: PFileIncludes;
+    sl: TStrings;
+  begin
+    if FileName = '' then
+      Exit;
+    List.Add(FileName);
+
+    // Find the files this file includes
+    P := FindFileIncludes(FileName);
+    if Assigned(P) then begin
+
+      // recursively search included files
+      sl := TStringList.Create;
+      try
+        // For each file this file includes, perform the same trick
+        sl.CommaText := P^.IncludeFiles;
+        for I := 0 to sl.Count - 2 do // Last one is always an empty item
+          if FastIndexOf(List, sl[I]) = -1 then
+            RecursiveFind(sl[I]);
+      finally
+        sl.Free;
       end;
     end;
-  begin
-    List.Clear;
-    List.Sorted := false;
-    RecursiveFind(Filename);
   end;
+begin
+  List.Clear;
+  List.Sorted := false;
+  RecursiveFind(Filename);
+end;
 
 end.
 

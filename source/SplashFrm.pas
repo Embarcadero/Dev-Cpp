@@ -27,8 +27,8 @@ uses
   ExtCtrls, ComCtrls, Version;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-  QExtCtrls, QComCtrls, Version;
+SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
+QExtCtrls, QComCtrls, Version;
 {$ENDIF}
 
 type
@@ -38,7 +38,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   public
-    procedure SetText(const LoadingText : AnsiString);
+    procedure SetText(const LoadingText: AnsiString);
   end;
 
 var
@@ -46,30 +46,31 @@ var
 
 implementation
 
-uses 
+uses
   devcfg;
 
 {$R *.dfm}
 
 procedure TSplashForm.FormCreate(Sender: TObject);
 begin
-	if (devData.Splash <> '') and FileExists(devData.Splash) then begin
-		Image.Picture.LoadFromFile(devData.Splash);
-		ClientWidth:= Image.Width;
-		ClientHeight:= Image.Height + Statusbar.Height;
-	end;
-	Show;
-	Update;
+  if (devData.Splash <> '') and FileExists(devData.Splash) then begin
+    Image.Picture.LoadFromFile(devData.Splash);
+    ClientWidth := Image.Width;
+    ClientHeight := Image.Height + Statusbar.Height;
+  end;
+  Show;
+  Update;
 end;
 
 procedure TSplashForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-	Action := caFree;
+  Action := caFree;
 end;
 
-procedure TSplashForm.SetText(const LoadingText : AnsiString);
+procedure TSplashForm.SetText(const LoadingText: AnsiString);
 begin
-	Statusbar.SimpleText := 'Bloodshed/Orwell Dev-C++ ' + DEVCPP_VERSION + ' ' + LoadingText;
+  Statusbar.SimpleText := 'Dev-C++ ' + DEVCPP_VERSION + ' ' + LoadingText;
 end;
 
 end.
+

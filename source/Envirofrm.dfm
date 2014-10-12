@@ -190,18 +190,7 @@ object EnviroForm: TEnviroForm
           'Only first project file'
           'Opened files at previous closing'
           'None')
-        TabOrder = 17
-      end
-      object cbDblFiles: TCheckBox
-        Left = 16
-        Top = 122
-        Width = 265
-        Height = 17
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Double Click to Open Files'
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 5
+        TabOrder = 16
       end
       object gbDebugger: TGroupBox
         Left = 15
@@ -209,7 +198,7 @@ object EnviroForm: TEnviroForm
         Width = 215
         Height = 53
         Caption = '  Debug Variable Browser  '
-        TabOrder = 9
+        TabOrder = 8
         object cbWatchHint: TCheckBox
           Left = 14
           Top = 22
@@ -221,11 +210,11 @@ object EnviroForm: TEnviroForm
       end
       object cbNoSplashScreen: TCheckBox
         Left = 16
-        Top = 144
+        Top = 122
         Width = 265
         Height = 17
         Caption = 'No Splash Screen on startup'
-        TabOrder = 6
+        TabOrder = 5
       end
       object gbProgress: TGroupBox
         Left = 15
@@ -233,7 +222,7 @@ object EnviroForm: TEnviroForm
         Width = 215
         Height = 70
         Caption = 'Compilation Progress Window '
-        TabOrder = 10
+        TabOrder = 9
         object cbShowProgress: TCheckBox
           Left = 14
           Top = 22
@@ -259,7 +248,7 @@ object EnviroForm: TEnviroForm
         MaxLength = 2
         MaxValue = 0
         MinValue = 0
-        TabOrder = 11
+        TabOrder = 10
         Value = 0
       end
       object cboTabsTop: TComboBox
@@ -269,7 +258,7 @@ object EnviroForm: TEnviroForm
         Height = 23
         Style = csDropDownList
         ItemHeight = 15
-        TabOrder = 12
+        TabOrder = 11
         Items.Strings = (
           'Top'
           'Bottom'
@@ -283,7 +272,7 @@ object EnviroForm: TEnviroForm
         Height = 23
         Style = csDropDownList
         ItemHeight = 15
-        TabOrder = 13
+        TabOrder = 12
       end
       object cboTheme: TComboBox
         Left = 302
@@ -292,7 +281,7 @@ object EnviroForm: TEnviroForm
         Height = 23
         Style = csDropDownList
         ItemHeight = 15
-        TabOrder = 14
+        TabOrder = 13
       end
       object cbUIfont: TComboBox
         Left = 248
@@ -304,7 +293,7 @@ object EnviroForm: TEnviroForm
         DropDownCount = 10
         ItemHeight = 20
         Sorted = True
-        TabOrder = 15
+        TabOrder = 14
         OnDrawItem = cbUIfontDrawItem
       end
       object cbUIfontsize: TComboBox
@@ -316,7 +305,7 @@ object EnviroForm: TEnviroForm
         Style = csOwnerDrawVariable
         DropDownCount = 10
         ItemHeight = 20
-        TabOrder = 16
+        TabOrder = 15
         OnChange = cbUIfontsizeChange
         OnDrawItem = cbUIfontsizeDrawItem
         Items.Strings = (
@@ -333,19 +322,19 @@ object EnviroForm: TEnviroForm
       end
       object cbPauseConsole: TCheckBox
         Left = 16
-        Top = 166
+        Top = 143
         Width = 265
         Height = 17
         Caption = 'Pause console programs after return'
-        TabOrder = 7
+        TabOrder = 6
       end
       object cbCheckAssocs: TCheckBox
         Left = 16
-        Top = 188
+        Top = 164
         Width = 265
         Height = 17
         Caption = 'Check file associations on startup'
-        TabOrder = 8
+        TabOrder = 7
       end
     end
     object tabPaths: TTabSheet
@@ -722,106 +711,6 @@ object EnviroForm: TEnviroForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 15
         TabOrder = 0
-      end
-    end
-    object tabCVS: TTabSheet
-      Caption = 'CVS Support'
-      ParentShowHint = False
-      ShowHint = False
-      object lblCVSExec: TLabel
-        Left = 8
-        Top = 9
-        Width = 91
-        Height = 15
-        Caption = 'CVS Program File'
-      end
-      object lblCVSCompression: TLabel
-        Left = 8
-        Top = 93
-        Width = 100
-        Height = 15
-        Caption = 'Compression Level'
-      end
-      object btnCVSExecBrws: TSpeedButton
-        Tag = 6
-        Left = 413
-        Top = 33
-        Width = 23
-        Height = 22
-        Glyph.Data = {
-          36030000424D3603000000000000360000002800000010000000100000000100
-          18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-          BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-          BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-          00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000000000
-          000000000000000000000000000000000000000000000000000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF00000000AEFF0096DB0096DB0096DB0096DB0096DB00
-          96DB0096DB0082BE000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-          00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF00AEFF00AEFF00AEFF00
-          AEFF00AEFF0096DB000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-          00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF5DCCFF5DCCFF5DCCFF5D
-          CCFF5DCCFF00AEFF000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF686868BDEBFF
-          5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
-          BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
-        OnClick = BrowseClick
-      end
-      object cvsdownloadlabel: TLabel
-        Left = 16
-        Top = 64
-        Width = 348
-        Height = 13
-        Cursor = crHandPoint
-        Caption = 
-          'http://download.savannah.gnu.org/releases/cvs/binary/stable/x86-' +
-          'woe/'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlue
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsUnderline]
-        ParentFont = False
-        OnClick = cvsdownloadlabelClick
-      end
-      object edCVSExec: TEdit
-        Left = 16
-        Top = 33
-        Width = 385
-        Height = 23
-        TabOrder = 0
-        Text = 'edCVSExec'
-      end
-      object spnCVSCompression: TSpinEdit
-        Left = 16
-        Top = 116
-        Width = 53
-        Height = 24
-        MaxLength = 1
-        MaxValue = 9
-        MinValue = 0
-        TabOrder = 1
-        Value = 0
-      end
-      object chkCVSUseSSH: TCheckBox
-        Left = 16
-        Top = 148
-        Width = 373
-        Height = 17
-        Caption = 'Use SSH instead of RSH'
-        Checked = True
-        State = cbChecked
-        TabOrder = 2
       end
     end
   end

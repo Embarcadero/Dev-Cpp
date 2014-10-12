@@ -77,7 +77,7 @@ var
   Hdr: AnsiString;
   Prepend: AnsiString;
 begin
-  e := MainForm.GetEditor;
+  e := MainForm.EditorList.GetEditor;
   if not Assigned(e) then begin
     Close;
     Exit;

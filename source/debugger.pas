@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit debugger;
+unit Debugger;
 
 interface
 
@@ -44,12 +44,13 @@ type
     fProcessID: THandle;
     fExecuting: boolean;
     fCommandChanged: boolean;
-    fDebugTree: TTreeView;
+    fDebugView: TTreeView;
     fLeftPageIndexBackup: integer;
     fBreakPointList: TList;
     fWatchVarList: TList;
     fOnEvalReady: TEvalReadyEvent;
     fReader: TDebugReader;
+    function GetBreakPointFile: AnsiString;
   public
     constructor Create;
     destructor Destroy; override;
@@ -80,9 +81,10 @@ type
     property WatchVarList: TList read fWatchVarList write fWatchVarList;
     property BreakPointList: TList read fBreakPointList write fBreakPointList;
     property CommandChanged: boolean read fCommandChanged write fCommandChanged;
-    property DebugTree: TTreeView read fDebugTree write fDebugTree;
+    property DebugView: TTreeView read fDebugView write fDebugView;
     property OnEvalReady: TEvalReadyEvent read fOnEvalReady write fOnEvalReady;
     property Reader: TDebugReader read fReader write fReader;
+    property BreakPointFile: AnsiString read GetBreakPointFile;
   end;
 
 implementation
@@ -176,7 +178,7 @@ begin
   Reader.FreeOnTerminate := true;
   Reader.BreakpointList := BreakPointList;
   Reader.WatchVarList := WatchVarList;
-  Reader.DebugTree := DebugTree;
+  Reader.DebugView := DebugView;
   Reader.Resume;
 
   MainForm.UpdateAppTitle;
@@ -255,7 +257,15 @@ begin
   end;
 end;
 
-procedure TDebugger.AddBreakpoint(i: integer);
+function TDebugger.GetBreakPointFile: AnsiString;
+begin
+  if Executing then
+    Result := fReader.BreakPointFile
+  else
+    Result := '';
+end;
+
+procedure TDebugger.AddBreakPoint(i: integer);
 var
   filename: AnsiString;
 begin
@@ -264,7 +274,7 @@ begin
   SendCommand('break', '"' + filename + '":' + inttostr(PBreakPoint(BreakPointList.Items[i])^.line), true);
 end;
 
-procedure TDebugger.RemoveBreakpoint(i: integer);
+procedure TDebugger.RemoveBreakPoint(i: integer);
 var
   filename: AnsiString;
 begin
@@ -354,7 +364,7 @@ begin
   WatchVarList.Add(wparent);
 
   // Add parent to GUI
-  parentnode := DebugTree.Items.AddObject(nil, wparent^.name + ' = Execute to evaluate', wparent);
+  parentnode := DebugView.Items.AddObject(nil, wparent^.name + ' = Execute to evaluate', wparent);
   parentnode.ImageIndex := 21;
   parentnode.SelectedIndex := 21;
 
@@ -408,32 +418,35 @@ var
   I: integer;
   wparent: PWatchVar;
 begin
-  DebugTree.Items.BeginUpdate;
-  for I := WatchVarList.Count - 1 downto 0 do begin
-    wparent := PWatchVar(WatchVarList.Items[I]);
+  DebugView.Items.BeginUpdate;
+  try
+    for I := WatchVarList.Count - 1 downto 0 do begin
+      wparent := PWatchVar(WatchVarList.Items[I]);
 
-    if deleteparent then begin
+      if deleteparent then begin
 
-      // Remove from UI
-      if wparent^.node.HasChildren then
-        wparent^.node.DeleteChildren;
-      wparent^.node.Delete;
+        // Remove from UI
+        if wparent^.node.HasChildren then
+          wparent^.node.DeleteChildren;
+        wparent^.node.Delete;
 
-      // Remove from list
-      Dispose(PWatchVar(WatchVarList.Items[i]));
-      WatchVarList.Delete(i);
-    end else begin
+        // Remove from list
+        Dispose(PWatchVar(WatchVarList.Items[i]));
+        WatchVarList.Delete(i);
+      end else begin
 
-      // Remove from UI
-      if wparent^.node.HasChildren then
-        wparent^.node.DeleteChildren;
+        // Remove from UI
+        if wparent^.node.HasChildren then
+          wparent^.node.DeleteChildren;
 
-      // Leave parent node intact...
-      wparent^.gdbindex := -1;
-      wparent^.node.Text := wparent^.name + ' = Execute to evaluate';
+        // Leave parent node intact...
+        wparent^.gdbindex := -1;
+        wparent^.node.Text := wparent^.name + ' = Execute to evaluate';
+      end;
     end;
+  finally
+    DebugView.Items.EndUpdate;
   end;
-  DebugTree.Items.EndUpdate;
 end;
 
 end.

@@ -32,7 +32,7 @@ const
 
   // exe properties
   DEVCPP = 'Dev-C++';
-  DEVCPP_VERSION = '5.7.1';
+  DEVCPP_VERSION = '5.8.0';
 
   // delimiters
   DEV_INTERNAL_OPEN = '$__DEV_INTERNAL_OPEN';
@@ -45,6 +45,9 @@ const
   DEV_CODEINS_FILE = 'codeinsertion.ini';
   DEV_WEBMIRRORS_FILE = 'webmirrors.ini';
   DEV_TOOLS_FILE = 'tools.ini';
+
+  // make stuff
+  DEV_MAKE_FILE = 'Makefile.win';
 
   // themes
   DEV_GNOME_THEME = 'Gnome';

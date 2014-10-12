@@ -27,8 +27,8 @@ uses
   Dialogs, StdCtrls, Buttons, SynEdit, SynEditTypes, ClipBrd, StrUtils, ComCtrls, ExtCtrls, Menus;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QButtons, QSynEdit;
+SysUtils, Variants, Classes, QGraphics, QControls, QForms,
+QDialogs, QStdCtrls, QButtons, QSynEdit;
 {$ENDIF}
 
 type
@@ -66,9 +66,9 @@ type
     procedure CPUSelectAllClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
-    fRegisters : TList;
-    fAssembler : TStringList;
-    fBacktrace : TList;
+    fRegisters: TList;
+    fAssembler: TStringList;
+    fBacktrace: TList;
 
     procedure LoadText;
   public
@@ -83,261 +83,263 @@ var
 implementation
 
 uses
-  main, version, MultiLangSupport, debugger, debugreader, datamod, utils,
+  main, version, MultiLangSupport, debugger, debugreader, DataFrm, utils,
   devcfg, editor, Types;
 
 {$R *.dfm}
 
 procedure TCPUForm.FormClose(Sender: TObject; var Action: TCloseAction);
 var
-	I : integer;
+  I: integer;
 begin
-	for I := 0 to fRegisters.Count - 1 do
-		Dispose(PRegister(fRegisters.Items[I]));
-	fRegisters.Free;
+  for I := 0 to fRegisters.Count - 1 do
+    Dispose(PRegister(fRegisters.Items[I]));
+  fRegisters.Free;
 
-	fAssembler.Free;
+  fAssembler.Free;
 
-	for I := 0 to fBacktrace.Count - 1 do
-		Dispose(PTrace(fBacktrace.Items[I]));
-	fBackTrace.Free;
+  for I := 0 to fBacktrace.Count - 1 do
+    Dispose(PTrace(fBacktrace.Items[I]));
+  fBackTrace.Free;
 
-	// Clear contents of the debug reader
-	MainForm.Debugger.Reader.Registers := nil;
-	MainForm.Debugger.Reader.Disassembly := nil;
-	MainForm.Debugger.Reader.Backtrace := nil;
+  // Clear contents of the debug reader
+  MainForm.Debugger.Reader.Registers := nil;
+  MainForm.Debugger.Reader.Disassembly := nil;
+  MainForm.Debugger.Reader.Backtrace := nil;
 
-	// Save column widths of registerbox
-	devData.CPURegisterCol1 := RegisterListbox.Column[0].Width;
-	devData.CPURegisterCol2 := RegisterListbox.Column[1].Width;
-	devData.CPURegisterCol3 := RegisterListbox.Column[2].Width;
+  // Save column widths of registerbox
+  devData.CPURegisterCol1 := RegisterListbox.Column[0].Width;
+  devData.CPURegisterCol2 := RegisterListbox.Column[1].Width;
+  devData.CPURegisterCol3 := RegisterListbox.Column[2].Width;
 
-	Action := caFree;
-	CPUForm := nil;
+  Action := caFree;
+  CPUForm := nil;
 end;
 
 procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
 var
-	propercmd : AnsiString;
+  propercmd: AnsiString;
 begin
-	if MainForm.Debugger.Executing then begin
-		if Key = Chr(VK_RETURN) then begin
-			Key := #0;
+  if MainForm.Debugger.Executing then begin
+    if Key = Chr(VK_RETURN) then begin
+      Key := #0;
 
-			// Although GDB omits void inside () in its own output, it only accepts C style empty parameter lists for input...
-			propercmd := edFunc.Text;
-			if EndsStr('()',propercmd) then
-				propercmd := ReplaceLastStr(propercmd,'()','(void)');
-			MainForm.Debugger.SendCommand('disas',propercmd);
-			if (Length(edFunc.Text) > 0) and (edFunc.Items.IndexOf(edFunc.Text) = -1) then
-				edFunc.AddItem(edFunc.Text,nil);
-		end;
-	end;
+      // Although GDB omits void inside () in its own output, it only accepts C style empty parameter lists for input...
+      propercmd := edFunc.Text;
+      if EndsStr('()', propercmd) then
+        propercmd := ReplaceLastStr(propercmd, '()', '(void)');
+      MainForm.Debugger.SendCommand('disas', propercmd);
+      if (Length(edFunc.Text) > 0) and (edFunc.Items.IndexOf(edFunc.Text) = -1) then
+        edFunc.AddItem(edFunc.Text, nil);
+    end;
+  end;
 end;
 
 procedure TCPUForm.LoadText;
 begin
-	// Set interface font
-	Font.Name := devData.InterfaceFont;
-	Font.Size := devData.InterfaceFontSize;
+  // Set interface font
+  Font.Name := devData.InterfaceFont;
+  Font.Size := devData.InterfaceFontSize;
 
-	Caption := Lang[ID_CPU_CAPTION];
-	lblFunc.Caption := Lang[ID_CPU_FUNC];
-	lblBacktrace.Caption := Lang[ID_DEB_BACKTRACE];
+  Caption := Lang[ID_CPU_CAPTION];
+  lblFunc.Caption := Lang[ID_CPU_FUNC];
+  lblBacktrace.Caption := Lang[ID_DEB_BACKTRACE];
 
-	CPUCut.Caption := Lang[ID_ITEM_CUT];
-	CPUCopy.Caption := Lang[ID_ITEM_COPY];
-	CPUCopyAll.Caption := Lang[ID_ITEM_COPYALL];
-	CPUPaste.Caption := Lang[ID_ITEM_PASTE];
-	CPUSelectAll.Caption := Lang[ID_ITEM_SELECTALL];
+  CPUCut.Caption := Lang[ID_ITEM_CUT];
+  CPUCopy.Caption := Lang[ID_ITEM_COPY];
+  CPUCopyAll.Caption := Lang[ID_ITEM_COPYALL];
+  CPUPaste.Caption := Lang[ID_ITEM_PASTE];
+  CPUSelectAll.Caption := Lang[ID_ITEM_SELECTALL];
 end;
 
 procedure TCPUForm.OnBacktraceReady;
 var
-	I : integer;
-	item : TListItem;
+  I: integer;
+  item: TListItem;
 begin
-	StackTrace.Items.BeginUpdate;
-	StackTrace.Clear;
-	for I := 0 to fBacktrace.Count - 1 do begin
-		item := StackTrace.Items.Add;
-		item.Caption := PTrace(fBacktrace.Items[I])^.funcname;
-		item.SubItems.Add(PTrace(fBacktrace.Items[I])^.filename);
-		item.SubItems.Add(PTrace(fBacktrace.Items[I])^.line);
-	end;
-	StackTrace.Items.EndUpdate;
+  StackTrace.Items.BeginUpdate;
+  StackTrace.Clear;
+  for I := 0 to fBacktrace.Count - 1 do begin
+    item := StackTrace.Items.Add;
+    item.Caption := PTrace(fBacktrace.Items[I])^.funcname;
+    item.SubItems.Add(PTrace(fBacktrace.Items[I])^.filename);
+    item.SubItems.Add(PTrace(fBacktrace.Items[I])^.line);
+  end;
+  StackTrace.Items.EndUpdate;
 
-	// Free list for reuse
-	for I := 0 to fBacktrace.Count - 1 do
-		Dispose(PTrace(fBacktrace.Items[I]));
-	fBacktrace.Clear;
+  // Free list for reuse
+  for I := 0 to fBacktrace.Count - 1 do
+    Dispose(PTrace(fBacktrace.Items[I]));
+  fBacktrace.Clear;
 end;
 
 procedure TCPUForm.OnAssemblerReady;
 var
-	I,activeline : integer;
+  I, activeline: integer;
 begin
-	activeline := -1;
-	edFunc.Text := fAssembler.Strings[0];
+  activeline := -1;
+  edFunc.Text := fAssembler.Strings[0];
 
-	CodeList.BeginUpdate;
-	CodeList.Clear;
-	for I := 1 to fAssembler.Count - 1 do begin
-		CodeList.Lines.Add(fAssembler.Strings[i]);
-		if StartsStr('=>',fAssembler.Strings[i]) then
-			activeline := i + 1;
-	end;
-	CodeList.EndUpdate;
+  CodeList.BeginUpdate;
+  CodeList.Clear;
+  for I := 1 to fAssembler.Count - 1 do begin
+    CodeList.Lines.Add(fAssembler.Strings[i]);
+    if StartsStr('=>', fAssembler.Strings[i]) then
+      activeline := i + 1;
+  end;
+  CodeList.EndUpdate;
 
-	// Free list for reuse
-	fAssembler.Clear;
+  // Free list for reuse
+  fAssembler.Clear;
 
-	if activeline <> -1 then
-		CodeList.CaretXY := BufferCoord(1,activeline);
+  if activeline <> -1 then
+    CodeList.CaretXY := BufferCoord(1, activeline);
 end;
 
 procedure TCPUForm.OnRegistersReady;
 var
-	item : TListItem;
-	I : integer;
+  item: TListItem;
+  I: integer;
 begin
-	RegisterListbox.Items.BeginUpdate;
-	RegisterListBox.Clear;
-	for I := 0 to fRegisters.Count - 1 do begin
-		item := RegisterListbox.Items.Add;
-		item.Caption := UpperCase(PRegister(fRegisters.Items[I])^.name);
-		item.SubItems.Add(PRegister(fRegisters.Items[I])^.valuehex);
-		item.SubItems.Add(PRegister(fRegisters.Items[I])^.valuedec);
-	end;
-	RegisterListBox.Items.EndUpdate;
+  RegisterListbox.Items.BeginUpdate;
+  RegisterListBox.Clear;
+  for I := 0 to fRegisters.Count - 1 do begin
+    item := RegisterListbox.Items.Add;
+    item.Caption := UpperCase(PRegister(fRegisters.Items[I])^.name);
+    item.SubItems.Add(PRegister(fRegisters.Items[I])^.valuehex);
+    item.SubItems.Add(PRegister(fRegisters.Items[I])^.valuedec);
+  end;
+  RegisterListBox.Items.EndUpdate;
 
-	// Free list for reuse
-	for I := 0 to fRegisters.Count - 1 do
-		Dispose(PRegister(fRegisters.Items[I]));
-	fRegisters.Clear;
+  // Free list for reuse
+  for I := 0 to fRegisters.Count - 1 do
+    Dispose(PRegister(fRegisters.Items[I]));
+  fRegisters.Clear;
 end;
+
 procedure TCPUForm.FormCreate(Sender: TObject);
 begin
-	LoadText;
+  LoadText;
 
-	// Make it look a bit like a regular editor
-	CodeList.Font.Assign(devEditor.Font);
-	CodeList.Highlighter := dmMain.GetHighlighter('main.cpp'); // use C++ highlighting
+  // Make it look a bit like a regular editor
+  CodeList.Font.Assign(devEditor.Font);
+  CodeList.Highlighter := dmMain.GetHighlighter('main.cpp'); // use C++ highlighting
 
-	RadioATT.Checked := devData.UseATTSyntax;
-	RadioIntel.Checked := not devData.UseATTSyntax;
+  RadioATT.Checked := devData.UseATTSyntax;
+  RadioIntel.Checked := not devData.UseATTSyntax;
 
-	fRegisters := TList.Create;
-	fAssembler := TStringList.Create;
-	fBacktrace := TList.Create;
+  fRegisters := TList.Create;
+  fAssembler := TStringList.Create;
+  fBacktrace := TList.Create;
 
-	if MainForm.Debugger.Executing then begin
+  if MainForm.Debugger.Executing then begin
 
-		// Load the registers...
-		MainForm.Debugger.Reader.Registers := fRegisters;
-		MainForm.Debugger.SendCommand('info','registers');
+    // Load the registers...
+    MainForm.Debugger.Reader.Registers := fRegisters;
+    MainForm.Debugger.SendCommand('info', 'registers');
 
-		// Set disassembly flavor and load the current function
-		MainForm.Debugger.Reader.Disassembly := fAssembler;
-		if devData.UseATTSyntax then // gbSyntaxClick has NOT been called yet...
-			gbSyntaxClick(nil);
+    // Set disassembly flavor and load the current function
+    MainForm.Debugger.Reader.Disassembly := fAssembler;
+    if devData.UseATTSyntax then // gbSyntaxClick has NOT been called yet...
+      gbSyntaxClick(nil);
 
-		// Obtain stack trace too
-		MainForm.Debugger.Reader.Backtrace := fBacktrace;
-		MainForm.Debugger.SendCommand('backtrace','');
-	end;
+    // Obtain stack trace too
+    MainForm.Debugger.Reader.Backtrace := fBacktrace;
+    MainForm.Debugger.SendCommand('backtrace', '');
+  end;
 end;
 
 procedure TCPUForm.gbSyntaxClick(Sender: TObject);
 var
-	key : Char;
+  key: Char;
 begin
-	// Set disassembly flavor
-	if RadioAtt.Checked then begin
-		MainForm.Debugger.SendCommand('set disassembly-flavor','att');
-		RadioIntel.Checked := false;
-		devData.UseATTSyntax := true;
-	end else if RadioIntel.Checked then begin
-		MainForm.Debugger.SendCommand('set disassembly-flavor','intel');
-		RadioAtt.Checked := false;
-		devData.UseATTSyntax := false;
-	end;
+  // Set disassembly flavor
+  if RadioAtt.Checked then begin
+    MainForm.Debugger.SendCommand('set disassembly-flavor', 'att');
+    RadioIntel.Checked := false;
+    devData.UseATTSyntax := true;
+  end else if RadioIntel.Checked then begin
+    MainForm.Debugger.SendCommand('set disassembly-flavor', 'intel');
+    RadioAtt.Checked := false;
+    devData.UseATTSyntax := false;
+  end;
 
-	// load the current function
-	key := Chr(VK_RETURN);
-	edFuncKeyPress(nil,key);
+  // load the current function
+  key := Chr(VK_RETURN);
+  edFuncKeyPress(nil, key);
 end;
 
 procedure TCPUForm.CPUCutClick(Sender: TObject);
 begin
-	if edFunc.Focused then begin
-		ClipBoard.AsText := edFunc.SelText;
-		edFunc.SelText := '';
-	end;
+  if edFunc.Focused then begin
+    ClipBoard.AsText := edFunc.SelText;
+    edFunc.SelText := '';
+  end;
 end;
 
 procedure TCPUForm.CPUCopyClick(Sender: TObject);
 begin
-	if edFunc.Focused then
-		ClipBoard.AsText := edFunc.SelText
-	else if CodeList.Focused then
-		CodeList.CopyToClipboard
-	else if StackTrace.Focused then
-		Clipboard.AsText := GetPrettyLine(StackTrace)
-	else if RegisterListbox.Focused then
-		Clipboard.AsText := GetPrettyLine(RegisterListbox);
+  if edFunc.Focused then
+    ClipBoard.AsText := edFunc.SelText
+  else if CodeList.Focused then
+    CodeList.CopyToClipboard
+  else if StackTrace.Focused then
+    Clipboard.AsText := GetPrettyLine(StackTrace)
+  else if RegisterListbox.Focused then
+    Clipboard.AsText := GetPrettyLine(RegisterListbox);
 end;
 
 procedure TCPUForm.CPUCopyAllClick(Sender: TObject);
 var
-	i:integer;
+  i: integer;
 begin
-	if edFunc.Focused then
-		ClipBoard.AsText := edFunc.Text
-	else if CodeList.Focused then
-		CodeList.CopyToClipboard
-	else if StackTrace.Focused then begin
-		ClipBoard.AsText := '';
-		for i:=0 to pred(StackTrace.Items.Count) do
-			Clipboard.AsText := Clipboard.AsText + GetPrettyLine(StackTrace,i) + #13#10;
-	end else if RegisterListbox.Focused then begin
-		ClipBoard.AsText := '';
-		for i:=0 to pred(RegisterListbox.Items.Count) do
-			Clipboard.AsText := Clipboard.AsText + GetPrettyLine(RegisterListbox,i) + #13#10;
-	end;
+  if edFunc.Focused then
+    ClipBoard.AsText := edFunc.Text
+  else if CodeList.Focused then
+    CodeList.CopyToClipboard
+  else if StackTrace.Focused then begin
+    ClipBoard.AsText := '';
+    for i := 0 to pred(StackTrace.Items.Count) do
+      Clipboard.AsText := Clipboard.AsText + GetPrettyLine(StackTrace, i) + #13#10;
+  end else if RegisterListbox.Focused then begin
+    ClipBoard.AsText := '';
+    for i := 0 to pred(RegisterListbox.Items.Count) do
+      Clipboard.AsText := Clipboard.AsText + GetPrettyLine(RegisterListbox, i) + #13#10;
+  end;
 end;
 
 procedure TCPUForm.CPUPasteClick(Sender: TObject);
 begin
-	if edFunc.Focused then
-		edFunc.SelText := ClipBoard.AsText;
+  if edFunc.Focused then
+    edFunc.SelText := ClipBoard.AsText;
 end;
 
 procedure TCPUForm.CPUSelectAllClick(Sender: TObject);
 begin
-	if edFunc.Focused then
-		edFunc.SelectAll;
+  if edFunc.Focused then
+    edFunc.SelectAll;
 end;
 
 procedure TCPUForm.StackTraceClick(Sender: TObject);
 var
-	sel : TListItem;
-	e : TEditor;
+  sel: TListItem;
+  e: TEditor;
 begin
-	sel := StackTrace.Selected;
-	if Assigned(sel) then begin
-		e := MainForm.GetEditorFromFileName(sel.SubItems[0]);
-		if Assigned(e) then
-			e.SetCaretPos(StrToIntDef(sel.SubItems[1],1),1);
-	end;
+  sel := StackTrace.Selected;
+  if Assigned(sel) then begin
+    e := MainForm.EditorList.GetEditorFromFileName(sel.SubItems[0]);
+    if Assigned(e) then
+      e.SetCaretPos(StrToIntDef(sel.SubItems[1], 1), 1);
+  end;
 end;
 
 procedure TCPUForm.FormShow(Sender: TObject);
 begin
-	// Get column widths of registerbox
-	RegisterListbox.Column[0].Width := devData.CPURegisterCol1;
-	RegisterListbox.Column[1].Width := devData.CPURegisterCol2;
-	RegisterListbox.Column[2].Width := devData.CPURegisterCol3;
+  // Get column widths of registerbox
+  RegisterListbox.Column[0].Width := devData.CPURegisterCol1;
+  RegisterListbox.Column[1].Width := devData.CPURegisterCol2;
+  RegisterListbox.Column[2].Width := devData.CPURegisterCol3;
 end;
 
 end.
+

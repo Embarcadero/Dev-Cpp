@@ -128,7 +128,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, datamod;
+  ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
 {$ENDIF}
 {$IFDEF LINUX}
 Xlib, Main, version, devcfg, utils, MultiLangSupport, datamod;

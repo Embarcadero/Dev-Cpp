@@ -68,7 +68,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  MultiLangSupport, utils, datamod, FileCtrl, devcfg, version,
+  MultiLangSupport, utils, DataFrm, FileCtrl, devcfg, version,
   project, ProjectTypes;
 {$ENDIF}
 {$IFDEF LINUX}

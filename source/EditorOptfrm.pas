@@ -247,7 +247,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, datamod, IniFiles, editor,
+  shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, DataFrm, IniFiles, editor,
   main;
 {$ENDIF}
 {$IFDEF LINUX}

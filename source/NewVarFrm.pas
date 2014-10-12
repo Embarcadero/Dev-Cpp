@@ -162,7 +162,7 @@ begin
 	end;
 
 	// Open header file
-	e := MainForm.GetEditorFromFileName(fName);
+	e := MainForm.EditorList.GetEditorFromFileName(fName);
 	if not Assigned(e) then
 		Exit;
 
@@ -238,7 +238,7 @@ begin
 	if not ((chkInlineR.Enabled and not chkInlineR.Checked) or (chkInlineW.Enabled and not chkInlineW.Checked)) then
 		Exit;
 
-	e := MainForm.GetEditorFromFileName(CppFname);
+	e := MainForm.EditorList.GetEditorFromFileName(CppFname);
 	if not Assigned(e) then
 		Exit;
 

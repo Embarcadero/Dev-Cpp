@@ -129,7 +129,7 @@ type
     edCppCompiler: TMemo;
     lblLinker: TLabel;
     edLinker: TMemo;
-    AddLibBtn: TBitBtn;
+    btnAddLib: TBitBtn;
     cbUseCustomMakefile: TCheckBox;
     edCustomMakefile: TEdit;
     dlgCustomMake: TOpenDialog;
@@ -175,7 +175,7 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure lstTypeClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
-    procedure AddLibBtnClick(Sender: TObject);
+    procedure btnAddLibClick(Sender: TObject);
     procedure txtOverrideBuildCmdChange(Sender: TObject);
     procedure spnPriorityChange(Sender: TObject);
     procedure btnCustomMakeBrowseClick(Sender: TObject);
@@ -526,7 +526,7 @@ begin
     chkOverrideOutput.Checked := OverrideOutput;
     if not chkLogOutput.Checked then
       edLogOutput.Enabled := false;
-    if OverridenOutput <> '' then
+    if OverrideOutput and (OverridenOutput <> '') then
       edOverridenOutput.Text := ExtractFilename(OverridenOutput)
     else
       edOverridenOutput.Text := ExtractFilename(fProjectCopy.Executable);
@@ -622,82 +622,39 @@ begin
 
   Caption := Lang[ID_POPT];
 
-  //tabs
+  // Tab captions
   tabGeneral.Caption := Lang[ID_POPT_GENTAB];
-  tabFilesDir.Caption := Lang[ID_POPT_DIRTAB];
+  tabFiles.Caption := Lang[ID_POPT_FILESTAB];
   tabCompiler.Caption := Lang[ID_SHEET_COMP];
+  tabCompOpts.Caption := Lang[ID_PARAM_CAPTION];
+  tabFilesDir.Caption := Lang[ID_POPT_DIRTAB];
   tabOutputDir.Caption := Lang[ID_POPT_OUTTAB];
   tabMakefile.Caption := Lang[ID_POPT_MAKTAB];
+  tabVersion.Caption := Lang[ID_POPT_VERTAB];
 
-  //controls (general tab)
+  // General tab
   lblPrjName.Caption := Lang[ID_POPT_PRJNAME];
   lblFname.Caption := Lang[ID_PROPS_FILENAME];
   lblPrjOutput.Caption := Lang[ID_POPT_OUTPUTFILENAME];
-  lblUnits.Caption := Lang[ID_POPT_FILESTAB];
+  lblUnits.Caption := Lang[ID_POPT_FILES];
   grpIcon.Caption := Lang[ID_POPT_GRP_ICON];
   btnIconLib.Caption := Lang[ID_POPT_ICOLIB];
+  btnIconBrowse.Caption := Lang[ID_BTN_BROWSE];
+  btnRemoveIcon.Caption := Lang[ID_BTN_REMOVEICON];
   grpType.Caption := Lang[ID_POPT_GRP_TYPE];
   chkSupportXP.Caption := Lang[ID_POPT_SUPPORTXP];
   chkDefCpp.Caption := Lang[ID_POPT_DEFCPP];
+  dlgPic.Title := Lang[ID_POPT_OPENICO];
+  dlgOpen.Title := Lang[ID_POPT_OPENOBJ];
 
-  // Populate project type list.
+  // Populate project type list
   lstType.Clear;
   lstType.Items.Add(Lang[ID_POPT_TYPE1]);
   lstType.Items.Add(Lang[ID_POPT_TYPE2]);
   lstType.Items.Add(Lang[ID_POPT_TYPE3]);
   lstType.Items.Add(Lang[ID_POPT_TYPE4]);
 
-  // compiler tab
-  tabCompOpts.Caption := Lang[ID_PARAM_CAPTION];
-  lblAdditions.Caption := Lang[ID_POPT_ADDITIONAL];
-  lblCompiler.Caption := Lang[ID_POPT_CCOMP];
-  lblCppCompiler.Caption := Lang[ID_POPT_CPPCOMP];
-  lblLinker.Caption := Lang[ID_POPT_LINKER];
-  AddLibBtn.Caption := Lang[ID_POPT_ADDLIBRARY];
-
-  // Settings
-  OptionsTip.Caption := Lang[ID_COPT_COMPILERTIP];
-
-  //dir tab
-  SubTabs.Tabs.Clear;
-  SubTabs.Tabs.Append(Lang[ID_POPT_LIBDIRS]);
-  SubTabs.Tabs.Append(Lang[ID_POPT_INCDIRS]);
-  SubTabs.Tabs.Append(Lang[ID_POPT_RESDIRS]);
-
-  //output tab
-  lblExeOutput.Caption := Lang[ID_POPT_EXEOUT];
-  lblObjOutput.Caption := Lang[ID_POPT_OBJOUT];
-  lblLogOutput.Caption := Lang[ID_POPT_LOGAUTOSAVE];
-  lblOverrideOutput.Caption := Lang[ID_POPT_OVERRIDEOUT];
-
-  //dialogs
-  dlgPic.Title := Lang[ID_POPT_OPENICO];
-  dlgOpen.Title := Lang[ID_POPT_OPENOBJ];
-
-  //buttons
-  btnDirReplace.Caption := Lang[ID_BTN_REPLACE];
-  btnDirAdd.Caption := Lang[ID_BTN_ADD];
-  btnDirDelete.Caption := Lang[ID_BTN_DELETE];
-  btnDirDelInval.Caption := Lang[ID_BTN_DELINVAL];
-  btnOk.Caption := Lang[ID_BTN_OK];
-  btnCancel.Caption := Lang[ID_BTN_CANCEL];
-  btnHelp.Caption := Lang[ID_BTN_HELP];
-  btnIconBrowse.Caption := Lang[ID_BTN_BROWSE];
-  btnRemoveIcon.Caption := Lang[ID_BTN_REMOVEICON];
-
-  cbUseCustomMakefile.Caption := Lang[ID_POPT_USECUSTOMMAKEFILE];
-  InfoMakeBtn.Caption := Lang[ID_POPT_INFOCUSTOMMAKEFILE];
-  IncMakeLabel.Caption := Lang[ID_POPT_INCFILEMAKEFILE];
-
-  btnMakReplace.Caption := Lang[ID_BTN_REPLACE];
-  btnMakAdd.Caption := Lang[ID_BTN_ADD];
-  btnMakDelete.Caption := Lang[ID_BTN_DELETE];
-  btnMakDelInval.Caption := Lang[ID_BTN_DELINVAL];
-
-  // files tab
-  tabFiles.Caption := Lang[ID_POPT_FILESTAB];
-  lblCompilerSet.Caption := Lang[ID_POPT_COMP];
-  lblCompilerHint.Caption := Lang[iD_POPT_COMPCUSTOMHINT];
+  // Files tab
   grpUnitOptions.Caption := Lang[ID_POPT_UNITOPTS];
   lblPriority.Caption := Lang[ID_POPT_BUILDPRIORITY];
   chkCompile.Caption := Lang[ID_POPT_COMPUNIT];
@@ -705,8 +662,44 @@ begin
   chkOverrideBuildCmd.Caption := Lang[ID_POPT_OVERRIDEBUILDCMD];
   chkLink.Caption := Lang[ID_POPT_LINKUNIT];
 
+  // Compiler tab
+  lblCompilerSet.Caption := Lang[ID_POPT_COMP];
+  lblCompilerHint.Caption := Lang[iD_POPT_COMPCUSTOMHINT];
+  OptionsTip.Caption := Lang[ID_COPT_COMPILERTIP];
+
+  // Options tab
+  lblAdditions.Caption := Lang[ID_POPT_ADDITIONAL];
+  lblCompiler.Caption := Lang[ID_POPT_CCOMP];
+  lblCppCompiler.Caption := Lang[ID_POPT_CPPCOMP];
+  lblLinker.Caption := Lang[ID_POPT_LINKER];
+  btnAddLib.Caption := Lang[ID_POPT_ADDLIBRARY];
+
+  // Directories tab
+  SubTabs.Tabs.Clear;
+  SubTabs.Tabs.Append(Lang[ID_POPT_LIBDIRS]);
+  SubTabs.Tabs.Append(Lang[ID_POPT_INCDIRS]);
+  SubTabs.Tabs.Append(Lang[ID_POPT_RESDIRS]);
+  btnDirReplace.Caption := Lang[ID_BTN_REPLACE];
+  btnDirAdd.Caption := Lang[ID_BTN_ADD];
+  btnDirDelete.Caption := Lang[ID_BTN_DELETE];
+  btnDirDelInval.Caption := Lang[ID_BTN_DELINVAL];
+
+  // Output tab
+  lblExeOutput.Caption := Lang[ID_POPT_EXEOUT];
+  lblObjOutput.Caption := Lang[ID_POPT_OBJOUT];
+  lblLogOutput.Caption := Lang[ID_POPT_LOGAUTOSAVE];
+  lblOverrideOutput.Caption := Lang[ID_POPT_OVERRIDEOUT];
+
+  // Makefile tab
+  cbUseCustomMakefile.Caption := Lang[ID_POPT_USECUSTOMMAKEFILE];
+  InfoMakeBtn.Caption := Lang[ID_POPT_INFOCUSTOMMAKEFILE];
+  IncMakeLabel.Caption := Lang[ID_POPT_INCFILEMAKEFILE];
+  btnMakReplace.Caption := Lang[ID_BTN_REPLACE];
+  btnMakAdd.Caption := Lang[ID_BTN_ADD];
+  btnMakDelete.Caption := Lang[ID_BTN_DELETE];
+  btnMakDelInval.Caption := Lang[ID_BTN_DELINVAL];
+
   // version info tab
-  tabVersion.Caption := Lang[ID_POPT_VERTAB];
   chkVersionInfo.Caption := Lang[ID_POPT_INCLUDEVERSION];
   grpVersion.Caption := Lang[ID_POPT_VDETAILS];
   lblVerMajor.Caption := Lang[ID_POPT_VMAJOR];
@@ -716,6 +709,11 @@ begin
   lblVerLang.Caption := Lang[ID_POPT_VLANG];
   chkAutoIncBuild.Caption := Lang[ID_POPT_VAUTOINCBUILDNR];
   chkSyncProduct.Caption := Lang[ID_POPT_SYNCPRODUCT];
+
+  // Misc. buttons
+  btnOk.Caption := Lang[ID_BTN_OK];
+  btnCancel.Caption := Lang[ID_BTN_CANCEL];
+  btnHelp.Caption := Lang[ID_BTN_HELP];
 end;
 
 procedure TProjectOptionsFrm.btnRemoveIconClick(Sender: TObject);
@@ -1088,7 +1086,7 @@ begin
   chkSupportXP.Enabled := (lstType.ItemIndex = 0);
 end;
 
-procedure TProjectOptionsFrm.AddLibBtnClick(Sender: TObject);
+procedure TProjectOptionsFrm.btnAddLibClick(Sender: TObject);
 var
   s: AnsiString;
   i: integer;

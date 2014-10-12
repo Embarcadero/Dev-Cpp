@@ -279,7 +279,7 @@ begin
       fBuffer := Includes[fIncludes.Count - 1]^.Buffer;
       // Point to previous buffer and start past the include we walked into
 
-    // Start augmenting previous include list again
+      // Start augmenting previous include list again
       fCurrentIncludes := GetFileIncludesEntry(fFileName);
 
       // Update result file (we've left the previous file)

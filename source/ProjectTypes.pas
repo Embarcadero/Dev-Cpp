@@ -26,14 +26,14 @@ uses
   Classes, editor, ComCtrls, Windows;
 {$ENDIF}
 {$IFDEF LINUX}
-  Classes, editor, QComCtrls;
+Classes, editor, QComCtrls;
 {$ENDIF}
 
 const
- dptGUI  = 0;
- dptCon  = 1;
- dptStat = 2;
- dptDyn  = 3;
+  dptGUI = 0;
+  dptCon = 1;
+  dptStat = 2;
+  dptDyn = 3;
 
 type
   TProjType = byte;
@@ -85,12 +85,12 @@ type
     ExeOutput: AnsiString;
     ObjectOutput: AnsiString;
     LogOutput: AnsiString;
-    LogOutputEnabled : boolean;
+    LogOutputEnabled: boolean;
     UseCustomMakefile: boolean;
     CustomMakefile: AnsiString;
     OverrideOutput: boolean;
     OverridenOutput: AnsiString;
-    HostApplication : AnsiString;
+    HostApplication: AnsiString;
     IncludeVersionInfo: boolean;
     SupportXPThemes: boolean;
     CompilerSet: integer;
@@ -106,128 +106,129 @@ uses
 
 constructor TProjVersionInfo.Create;
 begin
-	inherited Create;
+  inherited Create;
 
-	Major:=1;
-	Minor:=0;
-	Release:=0;
-	Build:=0;
-	LanguageID:=$0409; // US English
-	CharsetID:=$04E4; // Windows multilingual
-	CompanyName:='';
-	FileVersion:='';
-	FileDescription:='Developed using the Dev-C++ IDE';
-	InternalName:='';
-	LegalCopyright:='';
-	LegalTrademarks:='';
-	OriginalFilename:='';
-	ProductName:='';
-	ProductVersion:='';
-	AutoIncBuildNr:=False;
-	SyncProduct:=True;
+  Major := 1;
+  Minor := 0;
+  Release := 0;
+  Build := 0;
+  LanguageID := $0409; // US English
+  CharsetID := $04E4; // Windows multilingual
+  CompanyName := '';
+  FileVersion := '';
+  FileDescription := 'Developed using the Dev-C++ IDE';
+  InternalName := '';
+  LegalCopyright := '';
+  LegalTrademarks := '';
+  OriginalFilename := '';
+  ProductName := '';
+  ProductVersion := '';
+  AutoIncBuildNr := False;
+  SyncProduct := True;
 end;
 
 procedure TProjVersionInfo.Assign(Source: TPersistent);
 var
-	input : TProjVersionInfo;
+  input: TProjVersionInfo;
 begin
-	input := TProjVersionInfo(Source);
+  input := TProjVersionInfo(Source);
 
-	Major := input.Major;
-	Minor := input.Minor;
-	Release := input.Release;
-	Build := input.Build;
-	LanguageID := input.LanguageID;
-	CharsetID := input.CharsetID;
-	CompanyName := input.CompanyName;
-	FileVersion := input.FileVersion;
-	FileDescription := input.FileDescription;
-	InternalName := input.InternalName;
-	LegalCopyright := input.LegalCopyright;
-	LegalTrademarks := input.LegalTrademarks;
-	OriginalFilename := input.OriginalFilename;
-	ProductName := input.ProductName;
-	ProductVersion := input.ProductVersion;
-	AutoIncBuildNr := input.AutoIncBuildNr;
-	SyncProduct := input.SyncProduct;
+  Major := input.Major;
+  Minor := input.Minor;
+  Release := input.Release;
+  Build := input.Build;
+  LanguageID := input.LanguageID;
+  CharsetID := input.CharsetID;
+  CompanyName := input.CompanyName;
+  FileVersion := input.FileVersion;
+  FileDescription := input.FileDescription;
+  InternalName := input.InternalName;
+  LegalCopyright := input.LegalCopyright;
+  LegalTrademarks := input.LegalTrademarks;
+  OriginalFilename := input.OriginalFilename;
+  ProductName := input.ProductName;
+  ProductVersion := input.ProductVersion;
+  AutoIncBuildNr := input.AutoIncBuildNr;
+  SyncProduct := input.SyncProduct;
 end;
 
 constructor TProjOptions.Create;
 begin
-	inherited Create;
+  inherited Create;
 
-	Ver := 2;// 2 since 5.2.0.3
-	Includes:= TStringList.Create;
-	Libs:= TStringList.Create;
-	ResourceIncludes := TStringList.Create;
-	MakeIncludes := TStringList.Create;
-	ObjFiles:= TStringList.Create;
-	Includes.Delimiter:= ';';
-	Libs.Delimiter:= ';';
-	PrivateResource := '';
-	ResourceIncludes.Delimiter:= ';';
-	MakeIncludes.Delimiter := ';';
-	ObjFiles.Delimiter:= ';';
-	Icon := '';
-	ExeOutput := '';
-	ObjectOutput := '';
-	HostApplication := '';
-	SupportXPThemes:=False;
-	CompilerSet:=devCompilerSets.CurrentIndex;
-	if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then
-		CompilerOptions:=devCompilerSets[CompilerSet].OptionString
-	else
-		CompilerOptions := '';
-	VersionInfo := TProjVersionInfo.Create;
-	IncludeVersionInfo:=False;
+  Ver := 2; // 2 since 5.2.0.3
+  Includes := TStringList.Create;
+  Libs := TStringList.Create;
+  ResourceIncludes := TStringList.Create;
+  MakeIncludes := TStringList.Create;
+  ObjFiles := TStringList.Create;
+  Includes.Delimiter := ';';
+  Libs.Delimiter := ';';
+  PrivateResource := '';
+  ResourceIncludes.Delimiter := ';';
+  MakeIncludes.Delimiter := ';';
+  ObjFiles.Delimiter := ';';
+  Icon := '';
+  ExeOutput := '';
+  ObjectOutput := '';
+  HostApplication := '';
+  SupportXPThemes := False;
+  CompilerSet := devCompilerSets.CurrentIndex;
+  if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then
+    CompilerOptions := devCompilerSets[CompilerSet].OptionString
+  else
+    CompilerOptions := '';
+  VersionInfo := TProjVersionInfo.Create;
+  IncludeVersionInfo := False;
 end;
 
 destructor TProjOptions.Destroy;
 begin
-	Includes.Free;
-	Libs.Free;
-	ResourceIncludes.Free;
-	MakeIncludes.Free;
-	ObjFiles.Free;
-	VersionInfo.Free;
+  Includes.Free;
+  Libs.Free;
+  ResourceIncludes.Free;
+  MakeIncludes.Free;
+  ObjFiles.Free;
+  VersionInfo.Free;
 
-	inherited;
+  inherited;
 end;
 
 procedure TProjOptions.Assign(Source: TPersistent);
 var
-	input : TProjOptions;
+  input: TProjOptions;
 begin
-	input := TProjOptions(Source);
+  input := TProjOptions(Source);
 
-	typ := input.typ;
-	Ver := input.Ver;
-	Objfiles.Assign(input.Objfiles);
-	CompilerCmd := input.CompilerCmd;
-	CppCompilerCmd := input.CppCompilerCmd;
-	LinkerCmd := input.LinkerCmd;
-	Includes.Assign(input.Includes);
-	Libs.Assign(input.Libs);
-	PrivateResource := input.PrivateResource;
-	ResourceIncludes.Assign(input.ResourceIncludes);
-	MakeIncludes.Assign(input.MakeIncludes);
-	useGPP := input.useGPP;
-	Icon := input.Icon;
-	ExeOutput := input.ExeOutput;
-	ObjectOutput := input.ObjectOutput;
-	LogOutput := input.LogOutput;
-	LogOutputEnabled := input.LogOutputEnabled;
-	UseCustomMakefile := input.UseCustomMakefile;
-	CustomMakefile := input.CustomMakefile;
-	OverrideOutput := input.OverrideOutput;
-	OverridenOutput := input.OverridenOutput;
-	HostApplication := input.HostApplication;
-	IncludeVersionInfo := input.IncludeVersionInfo;
-	SupportXPThemes := input.SupportXPThemes;
-	CompilerSet := input.CompilerSet;
-	CompilerOptions := input.CompilerOptions;
-	VersionInfo.Assign(input.VersionInfo);
-	CmdLineArgs := input.CmdLineArgs;
+  typ := input.typ;
+  Ver := input.Ver;
+  Objfiles.Assign(input.Objfiles);
+  CompilerCmd := input.CompilerCmd;
+  CppCompilerCmd := input.CppCompilerCmd;
+  LinkerCmd := input.LinkerCmd;
+  Includes.Assign(input.Includes);
+  Libs.Assign(input.Libs);
+  PrivateResource := input.PrivateResource;
+  ResourceIncludes.Assign(input.ResourceIncludes);
+  MakeIncludes.Assign(input.MakeIncludes);
+  useGPP := input.useGPP;
+  Icon := input.Icon;
+  ExeOutput := input.ExeOutput;
+  ObjectOutput := input.ObjectOutput;
+  LogOutput := input.LogOutput;
+  LogOutputEnabled := input.LogOutputEnabled;
+  UseCustomMakefile := input.UseCustomMakefile;
+  CustomMakefile := input.CustomMakefile;
+  OverrideOutput := input.OverrideOutput;
+  OverridenOutput := input.OverridenOutput;
+  HostApplication := input.HostApplication;
+  IncludeVersionInfo := input.IncludeVersionInfo;
+  SupportXPThemes := input.SupportXPThemes;
+  CompilerSet := input.CompilerSet;
+  CompilerOptions := input.CompilerOptions;
+  VersionInfo.Assign(input.VersionInfo);
+  CmdLineArgs := input.CmdLineArgs;
 end;
 
 end.
+

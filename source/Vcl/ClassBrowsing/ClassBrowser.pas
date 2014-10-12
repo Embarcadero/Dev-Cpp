@@ -369,8 +369,6 @@ procedure TClassBrowser.UpdateView;
 begin
   if not Assigned(fParser) then
     Exit;
-  if fCurrentFile = '' then
-    Exit;
   if fUpdateCount <> 0 then
     Exit;
   if not Visible or not TabVisible then
@@ -380,25 +378,26 @@ begin
   Items.BeginUpdate;
   try
     Clear;
+    if fCurrentFile <> '' then begin
+      // Update file includes, reset cache
+      fParser.GetFileIncludes(fCurrentFile, fIncludedFiles);
+      fIsIncludedCacheFileName := '';
+      fIsIncludedCacheResult := false;
 
-    // Update file includes, reset cache
-    fParser.GetFileIncludes(fCurrentFile, fIncludedFiles);
-    fIsIncludedCacheFileName := '';
-    fIsIncludedCacheResult := false;
+      // Did the user add custom folders?
+      ReadClassFolders;
 
-    // Did the user add custom folders?
-    ReadClassFolders;
+      // Add everything recursively
+      AddMembers(nil, -1, -1);
+      Sort;
 
-    // Add everything recursively
-    AddMembers(nil, -1, -1);
-    Sort;
+      // Remember selection
+      if fLastSelection <> '' then
+        ReSelect;
 
-    // Remember selection
-    if fLastSelection <> '' then
-      ReSelect;
-
-    // Add custom folders
-    WriteClassFolders;
+      // Add custom folders
+      WriteClassFolders;
+    end;
   finally
     Items.EndUpdate;
   end;

@@ -178,7 +178,8 @@ begin
     if not DirectoryExists(fProject.Options.ObjectOutput) then
       CreateDir(fProject.Options.ObjectOutput);
 
-  fMakefile := fProject.Directory + 'Makefile.win';
+  // Should not return custom filename
+  fMakefile := fProject.MakeFileName;
 
   // Write more information to the log file than before
   DoLogEntry(Lang[ID_LOG_BUILDINGMAKEFILE]);
@@ -506,7 +507,7 @@ begin
           '$(CPP) -shared $(LINKOBJ) -o $(BIN) $(LIBS) -Wl,--output-def,$(DEF),--out-implib,$(STATIC),--add-stdcall-alias')
       else
         Writeln(F, #9 +
-          '$(CC) -shared $(LINKOBJ) -o $(BIN) $(LIBS) -Wl,--output-def,$(DEFFILE),--out-implib,$(STATICLIB),--add-stdcall-alias')
+          '$(CC) -shared $(LINKOBJ) -o $(BIN) $(LIBS) -Wl,--output-def,$(DEF),--out-implib,$(STATIC),--add-stdcall-alias')
     end;
     WriteMakeObjFilesRules(F);
   finally
@@ -671,7 +672,22 @@ begin
                 [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
               DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
             end;
-        else begin // any header files
+          utcHead, utcppHead: begin // any header files
+              s := devCompilerSets.CurrentSet.gppName;
+              if fCheckSyntax then
+                cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCppCompileParams, fCppIncludesParams,
+                  fLibrariesParams])
+              else
+                cmdline := Format(cHeaderCmdLine, [s, fSourceFile, fCompileParams, fIncludesParams,
+                  fLibrariesParams]);
+
+              DoLogEntry(Lang[ID_LOG_PROCESSINGHEADER]);
+              DoLogEntry('--------');
+              DoLogEntry(Format(Lang[ID_LOG_GCCNAME],
+                [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
+              DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
+            end;
+        else begin
             s := devCompilerSets.CurrentSet.gppName;
             if fCheckSyntax then
               cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCppCompileParams, fCppIncludesParams,
@@ -680,7 +696,7 @@ begin
               cmdline := Format(cHeaderCmdLine, [s, fSourceFile, fCompileParams, fIncludesParams,
                 fLibrariesParams]);
 
-            DoLogEntry(Lang[ID_LOG_PROCESSINGHEADER]);
+            DoLogEntry(Lang[ID_LOG_PROCESSINGUNKNOWN]);
             DoLogEntry('--------');
             DoLogEntry(Format(Lang[ID_LOG_GCCNAME],
               [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
@@ -739,9 +755,9 @@ begin
           utcSrc, utcppSrc: begin
               FileToRun := ChangeFileExt(fSourceFile, EXE_EXT);
             end;
-        else begin
-            Exit; // nothing to run...
-          end;
+          //else begin
+          //    Exit; // nothing to run...
+          //  end;
         end;
 
         // Check if it exists
@@ -1312,8 +1328,11 @@ begin
       utcppSrc: begin
           FileName := ChangeFileExt(fSourceFile, EXE_EXT);
         end;
+      utcHead, utcppHead: begin
+          FileName := fSourceFile + GCH_EXT;
+        end;
     else begin
-        FileName := fSourceFile + GCH_EXT;
+        FileName := fSourceFile;
       end;
     end;
   end;

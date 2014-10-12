@@ -66,7 +66,6 @@ type
     procedure chkNoDoneClick(Sender: TObject);
     procedure cmbFilterChange(Sender: TObject);
   private
-    { Private declarations }
     fToDoList: TList;
     fSortColumn: integer;
     function MatchesMask(SearchStr, MaskStr: AnsiString): boolean;
@@ -76,12 +75,7 @@ type
     procedure AddToDo(Filename: AnsiString);
     function BreakupToDo(Filename: AnsiString; sl: TStrings; Line: integer; Token: AnsiString; HasUser, HasPriority:
       boolean): integer;
-  public
-    { Public declarations }
   end;
-
-  //var
-  //	ViewToDoForm: TViewToDoForm;
 
 implementation
 
@@ -169,14 +163,19 @@ procedure TViewToDoForm.AddToDo(Filename: AnsiString);
 var
   sl: TStrings;
   I: integer;
+  e: TEditor;
 begin
   sl := TStringList.Create;
   try
-    for I := 0 to MainForm.PageControl.PageCount - 1 do
-      if TEditor(MainForm.PageControl.Pages[I].Tag).FileName = Filename then
-        sl.Assign(TEditor(MainForm.PageControl.Pages[I].Tag).Text.UnCollapsedLines)
-      else if FileExists(Filename) then
-        sl.LoadFromFile(Filename);
+    for I := 0 to MainForm.EditorList.PageCount - 1 do begin
+      e := MainForm.EditorList.Editors[i];
+      if Assigned(e) then begin
+        if e.FileName = Filename then
+          sl.Assign(e.Text.UnCollapsedLines)
+        else if FileExists(Filename) then
+          sl.LoadFromFile(Filename);
+      end;
+    end;
     if sl.Count = 0 then
       if FileExists(Filename) then
         sl.LoadFromFile(Filename);
@@ -205,10 +204,10 @@ end;
 procedure TViewToDoForm.AddFiles(Current, InProject, NotInProject, OpenOnly: boolean);
 var
   e: TEditor;
-  idx: integer;
+  I: integer;
 begin
   if Current then begin
-    e := MainForm.GetEditor;
+    e := MainForm.EditorList.GetEditor;
     if Assigned(e) then
       AddToDo(e.FileName);
     Exit;
@@ -216,13 +215,13 @@ begin
 
   if InProject and not OpenOnly then begin
     if Assigned(MainForm.Project) then
-      for idx := 0 to pred(MainForm.Project.Units.Count) do
-        AddToDo(MainForm.Project.Units[idx].filename);
+      for I := 0 to pred(MainForm.Project.Units.Count) do
+        AddToDo(MainForm.Project.Units[I].filename);
   end;
 
   if OpenOnly then begin
-    for idx := 0 to pred(MainForm.PageControl.PageCount) do begin
-      e := MainForm.GetEditor(idx);
+    for I := 0 to pred(MainForm.EditorList.PageCount) do begin
+      e := MainForm.EditorList[i];
       if Assigned(e) then
         if InProject and e.InProject then
           AddToDo(e.FileName)
@@ -230,10 +229,9 @@ begin
   end;
 
   if NotInProject then begin
-    for idx := 0 to pred(MainForm.PageControl.PageCount) do begin
-      e := MainForm.GetEditor(idx);
-      if Assigned(e) then
-        if not e.InProject then
+    for I := 0 to pred(MainForm.EditorList.PageCount) do begin
+      e := MainForm.EditorList[i];
+      if Assigned(e) and not e.InProject then
           AddToDo(e.FileName);
     end;
   end;
@@ -347,7 +345,7 @@ begin
   if not Assigned(Item.Data) then
     Exit;
 
-  e := MainForm.GetEditorFromFileName(PToDoRec(Item.Data)^.Filename);
+  e := MainForm.EditorList.GetEditorFromFileName(PToDoRec(Item.Data)^.Filename);
   if Assigned(e) then begin
     PToDoRec(Item.Data)^.IsDone := Item.Checked;
     if Item.Checked then begin
@@ -397,7 +395,7 @@ begin
   if not Assigned(lv.Selected.Data) then
     Exit;
 
-  e := MainForm.GetEditorFromFilename(PToDoRec(lv.Selected.Data)^.Filename);
+  e := MainForm.EditorList.GetEditorFromFilename(PToDoRec(lv.Selected.Data)^.Filename);
   if Assigned(e) then begin
     e.SetCaretPos(PToDoRec(lv.Selected.Data)^.Line + 1, 1);
     Close;

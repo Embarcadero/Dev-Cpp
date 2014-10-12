@@ -94,16 +94,15 @@ end;
 procedure TdevFileMonitor.Activate;
 begin
   if not Assigned(fMonitor) then begin
-    fMonitor := TdevMonitorThread.Create(Self, fFiles);
-    fMonitor.Resume;
+    fMonitor := TdevMonitorThread.Create(Self, fFiles); // starts immediately
   end;
 end;
 
 procedure TdevFileMonitor.Deactivate;
 begin
   if Assigned(fMonitor) then begin // we can spawn a new fMonitor instance directly after calling this
-    fMonitor.TellToQuit;
-    fMonitor := nil; // frees itself
+    fMonitor.Free;
+    fMonitor := nil;
   end;
 end;
 

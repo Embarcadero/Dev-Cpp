@@ -229,25 +229,6 @@ type
     property ShowInheritedMembers: boolean read fShowInheritedMembers write fShowInheritedMembers;
   end;
 
-  // CVS handling module
-  TdevCVSHandler = class(TPersistent)
-  private
-    fRepositories: TStrings;
-    fExecutable: AnsiString;
-    fCompression: byte;
-    fUseSSH: boolean;
-  public
-    constructor Create;
-    destructor Destroy; override;
-    procedure SettoDefaults;
-    procedure SaveSettings;
-    procedure LoadSettings;
-  published
-    property Repositories: TStrings read fRepositories write fRepositories;
-    property Executable: AnsiString read fExecutable write fExecutable;
-    property Compression: byte read fCompression write fCompression;
-    property UseSSH: boolean read fUseSSH write fUseSSH;
-  end;
 
   TdevExternalPrograms = class(TPersistent)
   private
@@ -578,7 +559,6 @@ type
     property First: boolean read fFirst write fFirst;
     property Splash: AnsiString read fSplash write fSplash;
     property MRUMax: integer read fMRUMax write fMRUMax;
-    property DblFiles: boolean read fDblFiles write fDblFiles;
     property NoSplashScreen: boolean read fNoSplashScreen write fNoSplashScreen;
     property ShortenCompPaths: boolean read fShortenCompPaths write fShortenCompPaths;
 
@@ -697,7 +677,6 @@ var
   devEditor: TdevEditor = nil;
   devCodeCompletion: TdevCodeCompletion = nil;
   devClassBrowsing: TdevClassBrowsing = nil;
-  devCVSHandler: TdevCVSHandler = nil;
   devExternalPrograms: TdevExternalPrograms = nil;
 
   ConfigMode: (CFG_APPDATA, CFG_PARAM, CFG_EXEFOLDER) = CFG_APPDATA;
@@ -706,7 +685,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  MultiLangSupport, datamod, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
+  MultiLangSupport, DataFrm, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
   FileAssocs, TypInfo, DateUtils, Types;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -769,9 +748,6 @@ begin
   if not Assigned(devClassBrowsing) then
     devClassBrowsing := TdevClassBrowsing.Create;
 
-  if not Assigned(devCVSHandler) then
-    devCVSHandler := TdevCVSHandler.Create;
-
   if not Assigned(devExternalPrograms) then
     devExternalPrograms := TdevExternalPrograms.Create;
 end;
@@ -784,7 +760,6 @@ begin
   devEditor.SaveSettings;
   devCodeCompletion.SaveSettings;
   devClassBrowsing.SaveSettings;
-  devCVSHandler.SaveSettings;
   devExternalPrograms.SaveSettings;
 end;
 
@@ -796,7 +771,6 @@ begin
   devEditor.Free;
   devCodeCompletion.Free;
   devClassBrowsing.Free;
-  devCVSHandler.Free;
   devExternalPrograms.Free;
 end;
 
@@ -900,13 +874,13 @@ begin
   fToolbarMainX := 11;
   fToolbarMainY := 2;
   fToolbarEdit := TRUE;
-  fToolbarEditX := 173;
+  fToolbarEditX := 196;
   fToolbarEditY := 2;
   fToolbarCompile := TRUE;
-  fToolbarCompileX := 441;
+  fToolbarCompileX := 464;
   fToolbarCompileY := 2;
   fToolbarProject := TRUE;
-  fToolbarProjectX := 350;
+  fToolbarProjectX := 373;
   fToolbarProjectY := 2;
   fToolbarSpecials := TRUE;
   fToolbarSpecialsX := 11;
@@ -918,7 +892,7 @@ begin
   fToolbarClassesX := 95;
   fToolbarClassesY := 30;
   fToolbarCompilers := TRUE;
-  fToolbarCompilersX := 663;
+  fToolbarCompilersX := 686;
   fToolbarCompilersY := 2;
 
   // Office 2007 / Vista support
@@ -2453,38 +2427,6 @@ procedure TdevClassBrowsing.SettoDefaults;
 begin
   fShowFilter := 2; // sfCurrent
   fShowInheritedMembers := False;
-end;
-
-{ TdevCVSHandler }
-
-constructor TdevCVSHandler.Create;
-begin
-  inherited Create;
-  fRepositories := TStringList.Create;
-  SettoDefaults;
-  LoadSettings;
-end;
-
-destructor TdevCVSHandler.Destroy;
-begin
-  fRepositories.Free;
-end;
-
-procedure TdevCVSHandler.LoadSettings;
-begin
-  devData.ReadObject('CVSHandler', Self);
-end;
-
-procedure TdevCVSHandler.SaveSettings;
-begin
-  devData.WriteObject('CVSHandler', Self);
-end;
-
-procedure TdevCVSHandler.SettoDefaults;
-begin
-  fExecutable := 'cvs.exe';
-  fCompression := 9;
-  fUseSSH := True;
 end;
 
 { TdevExternalPrograms }

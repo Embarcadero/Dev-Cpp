@@ -574,7 +574,7 @@ begin
     if IsPreprocessor then begin
       CountLines;
       Result := GetPreprocessor; // don't count preprocessor lines
-      if StartsStr('#include',Result) then begin
+      if StartsStr('#include',Result) then begin // if we find
         DelimPos := LastPos(':',Result);
         if DelimPos > 0 then
           fCurrLine := StrToInt(TrimRight(Copy(Result,DelimPos + 1,MaxInt))) - 1; // fCurrLine is 0 based

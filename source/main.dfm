@@ -1,11 +1,11 @@
 object MainForm: TMainForm
-  Left = 315
-  Top = 91
+  Left = 664
+  Top = 348
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
   Caption = 'Dev-C++'
-  ClientHeight = 621
+  ClientHeight = 700
   ClientWidth = 1000
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -28,13 +28,13 @@ object MainForm: TMainForm
   object SplitterLeft: TSplitter
     Left = 193
     Top = 72
-    Height = 343
+    Height = 422
     MinSize = 45
     ResizeStyle = rsUpdate
   end
   object SplitterBottom: TSplitter
     Left = 0
-    Top = 415
+    Top = 494
     Width = 1000
     Height = 3
     Cursor = crVSplit
@@ -44,15 +44,15 @@ object MainForm: TMainForm
   end
   object MessageControl: TPageControl
     Left = 0
-    Top = 418
+    Top = 497
     Width = 1000
     Height = 183
-    ActivePage = LogSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
     PopupMenu = MessagePopup
-    TabOrder = 3
+    TabOrder = 2
     OnChange = MessageControlChange
     object CompSheet: TTabSheet
       Caption = 'Compiler'
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -174,11 +174,11 @@ object MainForm: TMainForm
         end
         object chkShortenPaths: TCheckBox
           Left = 4
-          Top = 126
+          Top = 131
           Width = 144
           Height = 17
           Action = actShortenCompPaths
-          Anchors = [akLeft, akRight, akBottom]
+          Anchors = [akLeft, akBottom]
           TabOrder = 1
         end
       end
@@ -194,7 +194,7 @@ object MainForm: TMainForm
           Left = 0
           Top = 0
           Width = 836
-          Height = 155
+          Height = 154
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -217,7 +217,7 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 403
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
@@ -237,7 +237,7 @@ object MainForm: TMainForm
           Width = 263
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnKeyPress = edGdbCommandKeyPress
         end
@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 396
-          Height = 122
+          Height = 120
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -402,7 +402,7 @@ object MainForm: TMainForm
           Width = 518
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 5
           OnKeyPress = EvaluateInputKeyPress
         end
@@ -410,7 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 48
+          Height = 50
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
@@ -449,7 +449,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -490,7 +490,7 @@ object MainForm: TMainForm
       ImageIndex = 9
     end
   end
-  object Toolbar: TControlBar
+  object ToolbarDock: TControlBar
     Left = 0
     Top = 16
     Width = 1000
@@ -503,12 +503,12 @@ object MainForm: TMainForm
     BevelKind = bkNone
     RowSize = 28
     TabOrder = 0
-    OnClick = ToolbarClick
-    OnContextPopup = ToolbarContextPopup
+    OnClick = ToolbarDockClick
+    OnContextPopup = ToolbarDockContextPopup
     object tbMain: TToolBar
       Left = 11
       Top = 2
-      Width = 149
+      Width = 172
       Height = 24
       Caption = 'Main'
       EdgeBorders = []
@@ -532,7 +532,7 @@ object MainForm: TMainForm
         Top = 0
         Action = actOpen
       end
-      object SaveUnitBtn: TToolButton
+      object SaveBtn: TToolButton
         Left = 46
         Top = 0
         Action = actSave
@@ -547,8 +547,13 @@ object MainForm: TMainForm
         Top = 0
         Action = actClose
       end
-      object ToolButton7: TToolButton
+      object CloseAllBtn: TToolButton
         Left = 115
+        Top = 0
+        Action = actCloseAll
+      end
+      object ToolButton7: TToolButton
+        Left = 138
         Top = 0
         Width = 8
         Caption = 'ToolButton7'
@@ -556,13 +561,13 @@ object MainForm: TMainForm
         Style = tbsSeparator
       end
       object PrintBtn: TToolButton
-        Left = 123
+        Left = 146
         Top = 0
         Action = actPrint
       end
     end
     object tbCompile: TToolBar
-      Left = 441
+      Left = 464
       Top = 2
       Width = 209
       Height = 24
@@ -642,7 +647,7 @@ object MainForm: TMainForm
       end
     end
     object tbProject: TToolBar
-      Left = 350
+      Left = 373
       Top = 2
       Width = 78
       Height = 24
@@ -681,7 +686,7 @@ object MainForm: TMainForm
       end
     end
     object tbEdit: TToolBar
-      Left = 173
+      Left = 196
       Top = 2
       Width = 47
       Height = 24
@@ -707,7 +712,7 @@ object MainForm: TMainForm
       end
     end
     object tbSearch: TToolBar
-      Left = 233
+      Left = 256
       Top = 2
       Width = 104
       Height = 24
@@ -842,9 +847,9 @@ object MainForm: TMainForm
       end
     end
     object tbCompilers: TToolBar
-      Left = 663
+      Left = 686
       Top = 2
-      Width = 270
+      Width = 250
       Height = 24
       Caption = 'tbCompilers'
       EdgeBorders = []
@@ -856,7 +861,7 @@ object MainForm: TMainForm
       object cmbCompilers: TComboBox
         Left = 0
         Top = 0
-        Width = 270
+        Width = 250
         Height = 22
         Style = csDropDownList
         Ctl3D = True
@@ -877,7 +882,7 @@ object MainForm: TMainForm
   end
   object Statusbar: TStatusBar
     Left = 0
-    Top = 601
+    Top = 680
     Width = 1000
     Height = 20
     Panels = <
@@ -893,24 +898,7 @@ object MainForm: TMainForm
     ParentFont = True
     UseSystemFont = False
   end
-  object PageControl: TPageControl
-    Left = 196
-    Top = 72
-    Width = 804
-    Height = 343
-    Align = alClient
-    HotTrack = True
-    MultiLine = True
-    PopupMenu = EditorPopup
-    TabOrder = 2
-    Visible = False
-    OnChange = PageControlChange
-    OnDragDrop = PageControlDragDrop
-    OnDragOver = PageControlDragOver
-    OnMouseDown = PageControlMouseDown
-    OnMouseMove = PageControlMouseMove
-  end
-  object pnlFull: TPanel
+  object FullScreenPanel: TPanel
     Left = 0
     Top = 0
     Width = 1000
@@ -920,7 +908,7 @@ object MainForm: TMainForm
     Caption = 
       'Dev-C++ Fullscreen. Press F10 to toggle this bar, F11 to toggle ' +
       'Toolbars or F12 to toggle Fullscreen.'
-    TabOrder = 6
+    TabOrder = 5
     Visible = False
     DesignSize = (
       1000
@@ -959,8 +947,8 @@ object MainForm: TMainForm
     Left = 0
     Top = 72
     Width = 193
-    Height = 343
-    ActivePage = LeftClassSheet
+    Height = 422
+    ActivePage = LeftProjectSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
     TabOrder = 1
@@ -972,7 +960,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 315
+        Height = 394
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -993,7 +981,6 @@ object MainForm: TMainForm
         OnClick = ProjectViewClick
         OnCompare = ProjectViewCompare
         OnContextPopup = ProjectViewContextPopup
-        OnDblClick = ProjectViewDblClick
         OnDragDrop = ProjectViewDragDrop
         OnDragOver = ProjectViewDragOver
         OnKeyDown = ProjectViewKeyDown
@@ -1008,7 +995,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 315
+        Height = 394
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
@@ -1043,7 +1030,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 315
+        Height = 394
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1059,6 +1046,59 @@ object MainForm: TMainForm
         OnAdvancedCustomDrawItem = DebugViewAdvancedCustomDrawItem
         OnKeyDown = DebugViewKeyDown
       end
+    end
+  end
+  object PageControlPanel: TPanel
+    Left = 196
+    Top = 72
+    Width = 804
+    Height = 422
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 6
+    OnResize = PageControlPanelResize
+    object EditorPageControlSplitter: TSplitter
+      Left = 804
+      Top = 0
+      Width = 0
+      Height = 422
+      Align = alRight
+      ResizeStyle = rsUpdate
+      Visible = False
+    end
+    object EditorPageControlLeft: TPageControl
+      Left = 0
+      Top = 0
+      Width = 804
+      Height = 422
+      Align = alClient
+      HotTrack = True
+      MultiLine = True
+      PopupMenu = EditorPopup
+      TabOrder = 0
+      Visible = False
+      OnChange = EditorPageControlLeftChange
+      OnDragDrop = EditorPageControlLeftDragDrop
+      OnDragOver = EditorPageControlLeftDragOver
+      OnMouseDown = EditorPageControlLeftMouseDown
+      OnMouseMove = EditorPageControlLeftMouseMove
+    end
+    object EditorPageControlRight: TPageControl
+      Left = 804
+      Top = 0
+      Width = 0
+      Height = 422
+      Align = alRight
+      HotTrack = True
+      MultiLine = True
+      PopupMenu = EditorPopup
+      TabOrder = 1
+      Visible = False
+      OnChange = EditorPageControlLeftChange
+      OnDragDrop = EditorPageControlLeftDragDrop
+      OnDragOver = EditorPageControlLeftDragOver
+      OnMouseDown = EditorPageControlLeftMouseDown
+      OnMouseMove = EditorPageControlLeftMouseMove
     end
   end
   object MainMenu: TMainMenu
@@ -1080,9 +1120,6 @@ object MainForm: TMainForm
         end
         object N13: TMenuItem
           Caption = '-'
-        end
-        object NewresourcefileItem: TMenuItem
-          Action = actNewRes
         end
         object NewTemplateItem: TMenuItem
           Action = actNewTemplate
@@ -1235,12 +1272,6 @@ object MainForm: TMainForm
       object N23: TMenuItem
         Caption = '-'
       end
-      object Swapheadersource2: TMenuItem
-        Action = actSwapHeaderSource
-      end
-      object N14: TMenuItem
-        Caption = '-'
-      end
       object InsertItem: TMenuItem
         Action = actInsert
         object DateTimeMenuItem: TMenuItem
@@ -1370,19 +1401,19 @@ object MainForm: TMainForm
           AutoCheck = True
           Caption = '&Main'
           Checked = True
-          OnClick = ToolbarClick
+          OnClick = ToolbarDockClick
         end
         object ToolEditItem: TMenuItem
           AutoCheck = True
           Caption = 'Edit'
           Checked = True
-          OnClick = ToolbarClick
+          OnClick = ToolbarDockClick
         end
         object ToolSearchItem: TMenuItem
           AutoCheck = True
           Caption = 'Search'
           Checked = True
-          OnClick = ToolbarClick
+          OnClick = ToolbarDockClick
         end
         object N2: TMenuItem
           Caption = '-'
@@ -1391,19 +1422,19 @@ object MainForm: TMainForm
           AutoCheck = True
           Caption = '&Project'
           Checked = True
-          OnClick = ToolbarClick
+          OnClick = ToolbarDockClick
         end
         object ToolCompileandRunItem: TMenuItem
           AutoCheck = True
           Caption = '&Compile and Run'
           Checked = True
-          OnClick = ToolbarClick
+          OnClick = ToolbarDockClick
         end
         object ToolCompilersItem: TMenuItem
           AutoCheck = True
           Caption = 'Compilers'
           Checked = True
-          OnClick = ToolbarClick
+          OnClick = ToolbarDockClick
         end
         object N9: TMenuItem
           Caption = '-'
@@ -1412,7 +1443,7 @@ object MainForm: TMainForm
           AutoCheck = True
           Caption = '&Specials'
           Checked = True
-          OnClick = ToolbarClick
+          OnClick = ToolbarDockClick
         end
         object N17: TMenuItem
           Caption = '-'
@@ -1421,11 +1452,20 @@ object MainForm: TMainForm
           AutoCheck = True
           Caption = 'Classes'
           Checked = True
-          OnClick = ToolbarClick
+          OnClick = ToolbarDockClick
         end
       end
       object oDolist1: TMenuItem
         Action = actViewToDoList
+      end
+      object N14: TMenuItem
+        Caption = '-'
+      end
+      object MoveToOtherViewItem: TMenuItem
+        Action = actSwapEditor
+      end
+      object SwapHeaderSourceItem: TMenuItem
+        Action = actSwapHeaderSource
       end
       object N63: TMenuItem
         Caption = '-'
@@ -1515,6 +1555,9 @@ object MainForm: TMainForm
       object N25: TMenuItem
         Caption = '-'
       end
+      object Abortcompilation2: TMenuItem
+        Action = actGotoBreakPoint
+      end
       object oggleBreakpoint1: TMenuItem
         Action = actBreakPoint
       end
@@ -1559,91 +1602,6 @@ object MainForm: TMainForm
       end
       object PackageManagerItem: TMenuItem
         Action = actPackageManager
-      end
-    end
-    object mnuCVS: TMenuItem
-      Caption = 'CVS'
-      OnClick = mnuCVSClick
-      object mnuCVSCurrent: TMenuItem
-        Caption = 'Current File...'
-        object mnuCVSUpdate: TMenuItem
-          Tag = 3
-          Action = actCVSUpdate
-        end
-        object mnuCVSDiff: TMenuItem
-          Tag = 3
-          Action = actCVSDiff
-        end
-        object N53: TMenuItem
-          Caption = '-'
-        end
-        object mnuCVSCommit: TMenuItem
-          Tag = 3
-          Action = actCVSCommit
-        end
-        object N56: TMenuItem
-          Caption = '-'
-        end
-        object mnuCVSLog: TMenuItem
-          Tag = 3
-          Action = actCVSLog
-        end
-        object N61: TMenuItem
-          Caption = '-'
-        end
-        object mnuCVSAdd: TMenuItem
-          Tag = 3
-          Action = actCVSAdd
-        end
-        object mnuCVSRemove: TMenuItem
-          Tag = 3
-          Action = actCVSRemove
-        end
-      end
-      object mnuCVSWhole: TMenuItem
-        Caption = 'Whole Project...'
-        object mnuCVSUpdateP: TMenuItem
-          Tag = 4
-          Action = actCVSUpdate
-        end
-        object mnuCVSDiffP: TMenuItem
-          Tag = 4
-          Action = actCVSDiff
-        end
-        object N58: TMenuItem
-          Caption = '-'
-        end
-        object Commit1: TMenuItem
-          Tag = 4
-          Action = actCVSCommit
-        end
-        object N46: TMenuItem
-          Caption = '-'
-        end
-        object mnuCVSLogP: TMenuItem
-          Tag = 4
-          Action = actCVSLog
-        end
-      end
-      object N65: TMenuItem
-        Caption = '-'
-      end
-      object Login1: TMenuItem
-        Action = actCVSLogin
-      end
-      object Logout1: TMenuItem
-        Action = actCVSLogout
-      end
-      object N66: TMenuItem
-        Caption = '-'
-      end
-      object mnuCVSImportP: TMenuItem
-        Tag = 4
-        Action = actCVSImport
-      end
-      object mnuCVSCheckoutP: TMenuItem
-        Tag = 4
-        Action = actCVSCheckout
       end
     end
     object WindowMenu: TMenuItem
@@ -1713,6 +1671,12 @@ object MainForm: TMainForm
     object Closeallexceptthis1: TMenuItem
       Action = actCloseAllButThis
     end
+    object N77: TMenuItem
+      Caption = '-'
+    end
+    object actOpenFolder1: TMenuItem
+      Action = actOpenFolder
+    end
     object N16: TMenuItem
       Caption = '-'
     end
@@ -1742,6 +1706,12 @@ object MainForm: TMainForm
     end
     object Swapheadersource1: TMenuItem
       Action = actSwapHeaderSource
+    end
+    object N57: TMenuItem
+      Caption = '-'
+    end
+    object Movetootherview1: TMenuItem
+      Action = actSwapEditor
     end
     object MenuItem2: TMenuItem
       Caption = '-'
@@ -1773,34 +1743,6 @@ object MainForm: TMainForm
     object N45: TMenuItem
       Caption = '-'
     end
-    object CVS1: TMenuItem
-      Caption = 'CVS'
-      object mnuCVSUpdate3: TMenuItem
-        Tag = 3
-        Action = actCVSUpdate
-      end
-      object mnuCVSDiff3: TMenuItem
-        Tag = 3
-        Action = actCVSDiff
-      end
-      object N60: TMenuItem
-        Caption = '-'
-      end
-      object mnuCVSCommit3: TMenuItem
-        Tag = 3
-        Action = actCVSCommit
-      end
-      object N47: TMenuItem
-        Caption = '-'
-      end
-      object mnuCVSLog3: TMenuItem
-        Tag = 3
-        Action = actCVSLog
-      end
-    end
-    object N50: TMenuItem
-      Caption = '-'
-    end
     object mnuFileProps: TMenuItem
       Action = actFileProperties
     end
@@ -1830,52 +1772,13 @@ object MainForm: TMainForm
     object N40: TMenuItem
       Caption = '-'
     end
-    object CVS3: TMenuItem
-      Caption = 'CVS'
-      object mnuCVSUpdate2: TMenuItem
-        Tag = 2
-        Action = actCVSUpdate
-      end
-      object mnuCVSDiff2: TMenuItem
-        Tag = 2
-        Action = actCVSDiff
-      end
-      object N52: TMenuItem
-        Caption = '-'
-      end
-      object mnuCVSCommit2: TMenuItem
-        Tag = 2
-        Action = actCVSCommit
-      end
-      object N51: TMenuItem
-        Caption = '-'
-      end
-      object mnuCVSLog2: TMenuItem
-        Tag = 2
-        Action = actCVSLog
-      end
-      object N62: TMenuItem
-        Caption = '-'
-      end
-      object mnuCVSAdd2: TMenuItem
-        Tag = 2
-        Action = actCVSAdd
-      end
-      object mnuCVSRemove2: TMenuItem
-        Tag = 2
-        Action = actCVSRemove
-      end
-    end
-    object N54: TMenuItem
-      Caption = '-'
-    end
     object mnuUnitProperties: TMenuItem
       Action = actFileProperties
     end
   end
   object ProjectPopup: TPopupMenu
     Left = 11
-    Top = 99
+    Top = 104
     object NewunitinprojectPopItem: TMenuItem
       Tag = 2
       Action = actProjectNew
@@ -1900,34 +1803,6 @@ object MainForm: TMainForm
       Action = actProjectOptions
     end
     object N48: TMenuItem
-      Caption = '-'
-    end
-    object CVS2: TMenuItem
-      Caption = 'CVS'
-      object mnuCVSUpdate1: TMenuItem
-        Tag = 1
-        Action = actCVSUpdate
-      end
-      object mnuCVSDiff1: TMenuItem
-        Tag = 1
-        Action = actCVSDiff
-      end
-      object N59: TMenuItem
-        Caption = '-'
-      end
-      object mnuCVSCommit1: TMenuItem
-        Tag = 1
-        Action = actCVSCommit
-      end
-      object N55: TMenuItem
-        Caption = '-'
-      end
-      object mnuCVSLog1: TMenuItem
-        Tag = 1
-        Action = actCVSLog
-      end
-    end
-    object N70: TMenuItem
       Caption = '-'
     end
     object CloseProject1: TMenuItem
@@ -1959,13 +1834,6 @@ object MainForm: TMainForm
       ImageIndex = 0
       OnExecute = actNewProjectExecute
     end
-    object actNewRes: TAction
-      Tag = 3
-      Category = 'File'
-      Caption = '&Resource File'
-      ImageIndex = 2
-      OnExecute = actNewResExecute
-    end
     object actNewTemplate: TAction
       Tag = 4
       Category = 'File'
@@ -1977,6 +1845,7 @@ object MainForm: TMainForm
     object actNewClass: TAction
       Category = 'File'
       Caption = '&Class...'
+      ImageIndex = 51
       OnExecute = actBrowserNewClassExecute
       OnUpdate = actBrowserNewClassUpdate
     end
@@ -2026,7 +1895,7 @@ object MainForm: TMainForm
       Caption = 'Save A&ll'
       ImageIndex = 8
       OnExecute = actSaveAllExecute
-      OnUpdate = actUpdatePageorProject
+      OnUpdate = actSaveAllUpdate
     end
     object actClose: TAction
       Tag = 7
@@ -2041,6 +1910,7 @@ object MainForm: TMainForm
       Tag = 11
       Category = 'File'
       Caption = 'Close All'
+      ImageIndex = 50
       OnExecute = actCloseAllExecute
       OnUpdate = actUpdatePageCount
     end
@@ -2057,21 +1927,21 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = 'to &HTML'
       OnExecute = actExportHTMLExecute
-      OnUpdate = actUpdatePageCount
+      OnUpdate = actUpdateEmptyEditor
     end
     object actExportRTF: TAction
       Tag = 2
       Category = 'File'
       Caption = 'to &RTF'
       OnExecute = actExportRTFExecute
-      OnUpdate = actUpdatePageCount
+      OnUpdate = actUpdateEmptyEditor
     end
     object actExportTex: TAction
       Tag = 3
       Category = 'File'
       Caption = 'to &Tex'
       OnExecute = actExportTexExecute
-      OnUpdate = actUpdatePageCount
+      OnUpdate = actUpdateEmptyEditor
     end
     object actExportProject: TAction
       Tag = 3
@@ -2464,10 +2334,10 @@ object MainForm: TMainForm
     end
     object actSwapHeaderSource: TAction
       Category = 'Edit'
-      Caption = '&Swap header/source'
+      Caption = '&Swap Header/Source'
       ShortCut = 16465
       OnExecute = actSwapHeaderSourceExecute
-      OnUpdate = actSwapHeaderSourceUpdate
+      OnUpdate = actUpdatePageCount
     end
     object actSyntaxCheck: TAction
       Category = 'Execute'
@@ -2675,66 +2545,10 @@ object MainForm: TMainForm
       OnExecute = actAbortCompilationExecute
       OnUpdate = actAbortCompilationUpdate
     end
-    object actCVSImport: TAction
-      Category = 'CVS'
-      Caption = 'Import'
-      OnExecute = actCVSImportExecute
-    end
-    object actCVSCheckout: TAction
-      Category = 'CVS'
-      Caption = 'Checkout'
-      OnExecute = actCVSCheckoutExecute
-    end
-    object actCVSUpdate: TAction
-      Category = 'CVS'
-      Caption = 'Update'
-      OnExecute = actCVSUpdateExecute
-      OnUpdate = actUpdatePageorProject
-    end
-    object actCVSCommit: TAction
-      Category = 'CVS'
-      Caption = 'Commit'
-      OnExecute = actCVSCommitExecute
-      OnUpdate = actUpdatePageorProject
-    end
-    object actCVSDiff: TAction
-      Category = 'CVS'
-      Caption = 'Diff'
-      OnExecute = actCVSDiffExecute
-      OnUpdate = actUpdatePageorProject
-    end
-    object actCVSLog: TAction
-      Category = 'CVS'
-      Caption = 'Log'
-      OnExecute = actCVSLogExecute
-      OnUpdate = actUpdatePageorProject
-    end
-    object actCVSAdd: TAction
-      Category = 'CVS'
-      Caption = 'Add'
-      OnExecute = actCVSAddExecute
-      OnUpdate = actUpdatePageorProject
-    end
-    object actCVSRemove: TAction
-      Category = 'CVS'
-      Caption = 'Remove'
-      OnExecute = actCVSRemoveExecute
-      OnUpdate = actUpdatePageorProject
-    end
     object actBrowserShowInherited: TAction
       Category = 'ClassBrowser'
       Caption = 'Show inherited members'
       OnExecute = actBrowserShowInheritedExecute
-    end
-    object actCVSLogin: TAction
-      Category = 'CVS'
-      Caption = 'Login'
-      OnExecute = actCVSLoginExecute
-    end
-    object actCVSLogout: TAction
-      Category = 'CVS'
-      Caption = 'Logout'
-      OnExecute = actCVSLogoutExecute
     end
     object actAttachProcess: TAction
       Category = 'Debug'
@@ -2943,6 +2757,26 @@ object MainForm: TMainForm
       Category = 'Execute'
       Caption = 'Shorten compiler paths'
       OnExecute = actShortenCompPathsExecute
+    end
+    object actSwapEditor: TAction
+      Category = 'View'
+      Caption = 'Move To Other View'
+      ShortCut = 16461
+      OnExecute = actSwapEditorExecute
+      OnUpdate = actSwapEditorUpdate
+    end
+    object actOpenFolder: TAction
+      Category = 'File'
+      Caption = 'Open Containing Folder'
+      ImageIndex = 0
+      OnExecute = actOpenFolderExecute
+      OnUpdate = actUpdatePageCount
+    end
+    object actGotoBreakPoint: TAction
+      Category = 'Debug'
+      Caption = 'Goto Breakpoint'
+      OnExecute = actGotoBreakPointExecute
+      OnUpdate = actUpdateDebuggerRunning
     end
   end
   object MessagePopup: TPopupMenu

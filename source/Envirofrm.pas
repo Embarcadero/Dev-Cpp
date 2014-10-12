@@ -52,7 +52,6 @@ type
     cbShowBars: TCheckBox;
     cbMultiLineTab: TCheckBox;
     rgbAutoOpen: TRadioGroup;
-    cbDblFiles: TCheckBox;
     gbDebugger: TGroupBox;
     cbWatchHint: TCheckBox;
     cbNoSplashScreen: TCheckBox;
@@ -88,16 +87,8 @@ type
     lblAssocFileTypes: TLabel;
     lblAssocDesc: TLabel;
     lstAssocFileTypes: TCheckListBox;
-    tabCVS: TTabSheet;
-    lblCVSExec: TLabel;
-    lblCVSCompression: TLabel;
-    btnCVSExecBrws: TSpeedButton;
-    edCVSExec: TEdit;
-    spnCVSCompression: TSpinEdit;
-    chkCVSUseSSH: TCheckBox;
     UIfontlabel: TLabel;
     cbUIfont: TComboBox;
-    cvsdownloadlabel: TLabel;
     cbUIfontsize: TComboBox;
     cbPauseConsole: TCheckBox;
     cbCheckAssocs: TCheckBox;
@@ -112,7 +103,6 @@ type
     procedure vleExternalValidate(Sender: TObject; ACol, ARow: Integer; const KeyName, KeyValue: string);
     procedure btnExtAddClick(Sender: TObject);
     procedure btnExtDelClick(Sender: TObject);
-    procedure cvsdownloadlabelClick(Sender: TObject);
     procedure cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
     procedure cbUIfontsizeDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
     procedure cbUIfontsizeChange(Sender: TObject);
@@ -126,7 +116,7 @@ implementation
 
 uses
 {$IFDEF WIN32}
-  ShellAPI, Filectrl, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme, main;
+  ShellAPI, Filectrl, devcfg, MultiLangSupport, version, DataFrm, utils, FileAssocs, ImageTheme, main;
 {$ENDIF}
 {$IFDEF LINUX}
 Xlib, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme;
@@ -168,17 +158,6 @@ begin
         if NewSelectDirectory(Lang[ID_ENV_SELLANGDIR], '', s) then
           edLang.Text := IncludeTrailingPathDelimiter(ExtractRelativePath(devDirs.Exec, s));
       end;
-
-    6: begin // CVS Executable Filename
-        with TOpenDialog.Create(self) do try
-            Filter := FLT_ALLFILES;
-            FileName := edCVSExec.Text;
-            if Execute then
-              edCVSExec.Text := FileName;
-          finally
-            Free;
-          end;
-      end;
   end;
 end;
 
@@ -193,7 +172,6 @@ begin
     MultiLineTab := cbMultiLineTab.Checked;
     BackUps := cbBackups.Checked;
     MinOnRun := cbMinOnRun.Checked;
-    DblFiles := cbdblFiles.Checked;
     ConsolePause := cbPauseConsole.Checked;
     CheckAssocs := cbCheckAssocs.Checked;
     MRUMax := seMRUMax.Value;
@@ -246,10 +224,6 @@ begin
   end;
 
   devExternalPrograms.Programs.Assign(vleExternal.Strings);
-
-  devCVSHandler.Executable := edCVSExec.Text;
-  devCVSHandler.Compression := spnCVSCompression.Value;
-  devCVSHandler.UseSSH := chkCVSUseSSH.Checked;
 end;
 
 procedure TEnviroForm.LoadText;
@@ -264,7 +238,6 @@ begin
   tabGeneral.Caption := Lang[ID_ENV_GENTAB];
   tabPaths.Caption := Lang[ID_ENV_PATHTAB];
   tabAssocs.Caption := Lang[ID_ENV_FASSTAB];
-  tabCVS.Caption := Lang[ID_ENV_CVSTAB];
   tabExternal.Caption := Lang[ID_ENV_EXTERNALS];
 
   //Buttons
@@ -278,7 +251,6 @@ begin
   cbMultiLineTab.Caption := Lang[ID_ENV_MULTILINETABS];
   cbBackups.Caption := Lang[ID_ENV_BACKUPS];
   cbMinOnRun.Caption := Lang[ID_ENV_MINONRUN];
-  cbdblFiles.Caption := Lang[ID_ENV_DBLFILES];
   cbNoSplashScreen.Caption := Lang[ID_ENV_NOSPLASH];
   cbPauseConsole.Caption := Lang[ID_ENV_PAUSECONSOLE];
   cbCheckAssocs.Caption := Lang[ID_ENV_CHECKASSOCS];
@@ -326,12 +298,6 @@ begin
   // associations tab
   lblAssocFileTypes.Caption := Lang[ID_ENV_FASSTYPES];
   lblAssocDesc.Caption := Lang[ID_ENV_FASSDESC];
-
-  // CVS support tab
-  lblCVSExec.Caption := Lang[ID_ENV_CVSEXE];
-  lblCVSCompression.Caption := Lang[ID_ENV_CVSCOMPR];
-  chkCVSUseSSH.Caption := Lang[ID_ENV_CVSUSESSH];
-  uifontlabel.Caption := Lang[ID_ENV_UIFONT];
 end;
 
 procedure TEnviroForm.btnHelpClick(Sender: TObject);
@@ -352,7 +318,6 @@ begin
     cbMinOnRun.Checked := MinOnRun;
     cbShowBars.Checked := ShowBars;
     cbMultiLineTab.Checked := MultiLineTab;
-    cbDblFiles.Checked := DblFiles;
     cbNoSplashScreen.Checked := NoSplashScreen;
     cbPauseConsole.Checked := ConsolePause;
     cbCheckAssocs.Checked := CheckAssocs;
@@ -417,11 +382,6 @@ begin
       lstAssocFileTypes.Items.Add(Format('%s  (*.%s)', [Associations[I, 1], Associations[I, 0]]));
       lstAssocFileTypes.Checked[lstAssocFileTypes.Items.Count - 1] := IsAssociated(I);
     end;
-
-    // CVS Support tab
-    edCVSExec.Text := devCVSHandler.Executable;
-    spnCVSCompression.Value := devCVSHandler.Compression;
-    chkCVSUseSSH.Checked := devCVSHandler.UseSSH;
   end;
 end;
 
@@ -469,11 +429,6 @@ begin
     exit;
   if (vleExternal.RowCount > 1) and (vleExternal.Row > 0) then
     vleExternal.DeleteRow(vleExternal.Row);
-end;
-
-procedure TEnviroForm.cvsdownloadlabelClick(Sender: TObject);
-begin
-  ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TEnviroForm.cbUIfontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);

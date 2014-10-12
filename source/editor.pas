@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit editor;
+unit Editor;
 
 interface
 
@@ -66,7 +66,6 @@ type
     fInProject: boolean;
     fFileName: AnsiString;
     fNew: boolean;
-    fRes: boolean;
     fText: TSynEdit;
     fTabSheet: TTabSheet;
     fErrorLine: integer;
@@ -75,7 +74,7 @@ type
     fCurrentWord: AnsiString;
     fCurrentEvalWord: AnsiString;
     fIgnoreCaretChange: boolean;
-    fPreviousTabs: TList; // list of editor pointers
+    fPreviousEditors: TList;
     fDblClickTime: Cardinal;
     fDblClickMousePos: TBufferCoord;
     fCompletionTimer: TTimer;
@@ -102,6 +101,7 @@ type
     procedure EditorGutterClick(Sender: TObject; Button: TMouseButton; x, y, Line: integer; mark: TSynEditMark);
     procedure EditorSpecialLineColors(Sender: TObject; Line: integer; var Special: boolean; var FG, BG: TColor);
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
+    procedure EditorEnter(Sender: TObject);
     procedure CompletionKeyPress(Sender: TObject; var Key: Char);
     procedure CompletionInsert(const append: AnsiString);
     procedure CompletionTimer(Sender: TObject);
@@ -112,9 +112,10 @@ type
     procedure OnMouseOverEvalReady(const evalvalue: AnsiString);
     function HasBreakPoint(Line: integer): integer;
     procedure DebugAfterPaint(ACanvas: TCanvas; AClip: TRect; FirstLine, LastLine: integer);
+    function GetPageControl: TPageControl;
+    procedure SetPageControl(Value: TPageControl);
   public
-    constructor Create(InProject: boolean; const Caption, Filename: AnsiString; DoOpen: boolean; IsRes: boolean =
-      FALSE);
+    constructor Create(const Filename: AnsiString; InProject, NewFile: boolean; ParentPageControl: TPageControl);
     destructor Destroy; override;
     function Save: boolean;
     function SaveAs: boolean;
@@ -126,6 +127,7 @@ type
     procedure ExportToTEX;
     procedure InsertString(Value: AnsiString; MoveCursor: boolean);
     procedure SetErrorFocus(Col, Line: integer);
+    procedure GotoActiveBreakpoint;
     procedure SetActiveBreakpointFocus(Line: integer);
     procedure RemoveBreakpointFocus;
     procedure UpdateCaption(const NewCaption: AnsiString);
@@ -137,15 +139,15 @@ type
     procedure InitCompletion;
     procedure ShowCompletion;
     procedure DestroyCompletion;
-    property PreviousTabs: TList read fPreviousTabs;
+    property PreviousEditors: TList read fPreviousEditors;
     property FileName: AnsiString read fFileName write SetFileName;
     property InProject: boolean read fInProject write fInProject;
     property New: boolean read fNew write fNew;
-    property IsRes: boolean read fRes write fRes;
     property Text: TSynEdit read fText write fText;
     property TabSheet: TTabSheet read fTabSheet write fTabSheet;
     property FunctionTip: TCodeToolTip read fFunctionTip;
     property CompletionBox: TCodeCompletion read fCompletionBox;
+    property PageControl: TPageControl read GetPageControl write SetPageControl;
   end;
 
 implementation
@@ -153,7 +155,7 @@ implementation
 uses
 {$IFDEF WIN32}
   main, project, MultiLangSupport, devcfg, utils,
-  datamod, GotoLineFrm, Macros, debugreader, CodeCompletionForm, SynEditMiscClasses;
+  DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm, CodeCompletionForm, SynEditMiscClasses;
 {$ENDIF}
 {$IFDEF LINUX}
 Xlib, main, project, MultiLangSupport, devcfg, Search_Center, utils,
@@ -243,8 +245,7 @@ end;
 
 { TEditor }
 
-constructor TEditor.Create(InProject: boolean; const Caption, Filename: AnsiString; DoOpen: boolean; IsRes: boolean =
-  FALSE);
+constructor TEditor.Create(const Filename: AnsiString; InProject, NewFile: boolean; ParentPageControl: TPageControl);
 var
   s: AnsiString;
   I: integer;
@@ -253,33 +254,32 @@ begin
   // Set generic options
   fErrorLine := -1;
   fActiveLine := -1;
-  fRes := IsRes;
   fInProject := InProject;
-  if Filename = '' then
-    fFileName := Caption
+  if FileName <> '' then
+    fFileName := Filename
   else
-    fFileName := Filename;
+    fFileName := Lang[ID_UNTITLED] + IntToStr(dmMain.GetNewFileNumber);
 
   // Remember previous tabs
-  fPreviousTabs := TList.Create;
-  if Assigned(MainForm.PageControl.ActivePage) then begin
-    e := TEditor(MainForm.PageControl.ActivePage.Tag); // copy list of previous editor
-    for I := 0 to e.PreviousTabs.Count - 1 do
-      fPreviousTabs.Add(e.PreviousTabs[i]);
-    fPreviousTabs.Add(Pointer(e)); // make current editor history too
+  fPreviousEditors := TList.Create;
+  if Assigned(ParentPageControl.ActivePage) then begin
+    e := TEditor(ParentPageControl.ActivePage.Tag); // copy list of previous editor
+    for I := 0 to e.PreviousEditors.Count - 1 do
+      fPreviousEditors.Add(e.PreviousEditors[i]);
+    fPreviousEditors.Add(Pointer(e)); // make current editor history too
   end;
 
   // Create a new tab
-  fTabSheet := TTabSheet.Create(MainForm.PageControl);
-  fTabSheet.Caption := Caption;
-  fTabSheet.PageControl := MainForm.PageControl;
-  fTabSheet.Tag := integer(self); // Define an index for each tab
+  fTabSheet := TTabSheet.Create(ParentPageControl);
+  fTabSheet.Caption := ExtractFileName(fFilename); // UntitlexX or main.cpp
+  fTabSheet.PageControl := ParentPageControl;
+  fTabSheet.Tag := integer(Self); // Define an index for each tab
 
   // Create an editor and set static options
   fText := TSynEdit.Create(fTabSheet);
 
   // Load the file using Lines
-  if DoOpen then begin
+  if not NewFile and FileExists(FileName) then begin
     fText.Lines.LoadFromFile(FileName);
     fNew := False;
 
@@ -288,7 +288,6 @@ begin
       s := '.' + IntToStr(DateTimeToUnix(Now)) + ExtractFileExt(FileName);
       fText.Lines.SaveToFile(ChangeFileExt(FileName, s));
     end;
-
   end else
     fNew := True;
 
@@ -307,6 +306,7 @@ begin
   fText.OnMouseMove := EditorMouseMove;
   fText.OnGutterClick := EditorGutterClick;
   fText.OnSpecialLineColors := EditorSpecialLineColors;
+  fText.OnEnter := EditorEnter;
   fText.OnExit := EditorExit;
   fText.OnPaintTransient := EditorPaintTransient;
   fText.MaxScrollWidth := 4096; // bug-fix #600748
@@ -342,43 +342,70 @@ destructor TEditor.Destroy;
 var
   I: integer;
   CurPage: TTabSheet;
+  CurPageControl: TPageControl;
   e: TEditor;
 begin
-  // Deactivate the file change monitor
-  MainForm.FileMonitor.UnMonitor(fFileName);
+  MainForm.EditorList.BeginUpdate;
+  try
+    // Deactivate the file change monitor
+    MainForm.FileMonitor.UnMonitor(fFileName);
 
-  // Destroy any completion stuff
-  DestroyCompletion;
+    // Destroy any completion stuff
+    DestroyCompletion;
 
-  // Free everything
-  fFunctionTip.Free;
-  fText.Free;
+    // Free everything
+    fFunctionTip.Free;
+    fText.Free;
 
-  // Delete breakpoints in this editor
-  MainForm.Debugger.DeleteBreakPointsOf(self);
+    // Delete breakpoints in this editor
+    MainForm.Debugger.DeleteBreakPointsOf(self);
 
-  // Open up the previously openend tab, not the first one...
-  with MainForm.PageControl do begin
-    if ActivePage = fTabSheet then begin // this is the current page...
-      fTabSheet.Free; // remove old
+    // Open up the previously openend tab, not the first one...
+    CurPageControl := fTabSheet.PageControl;
+    with CurPageControl do begin
+      if ActivePage = fTabSheet then begin // this is the current page...
+        fTabSheet.Free; // remove old
 
-      // Find the first tab in the history list that is still open
-      for I := fPreviousTabs.Count - 1 downto 0 do begin
-        e := MainForm.GetEditorFromTag(integer(fPreviousTabs[i]));
-        if Assigned(e) then begin
-          ActivePageIndex := e.TabSheet.PageIndex;
-          break;
+        // Find the first tab in the history list that is still open
+        if fPreviousEditors.Count > 0 then begin
+          for I := fPreviousEditors.Count - 1 downto 0 do begin
+            e := MainForm.EditorList.GetEditorFromTag(integer(fPreviousEditors[i]));
+            if Assigned(e) then begin
+              e.Activate;
+              Break;
+            end;
+          end;
+        end else if CurPageControl.PageCount > 0 then begin
+          // No previous editors? Activate editor to the left
+          ActivePageIndex := max(0, ActivePageIndex - 1);
+          OnChange(CurPageControl);
         end;
+      end else begin // we are not the active page
+        CurPage := ActivePage; // remember active page index
+        fTabSheet.Free; // remove old
+        ActivePage := CurPage;
       end;
-    end else begin // we are not the active page
-      CurPage := ActivePage; // remember active page index
-      fTabSheet.Free; // remove old
-      ActivePage := CurPage;
+      // Current edito list went empty -> goto other one
     end;
+    fPreviousEditors.Free;
+  finally
+    MainForm.EditorList.EndUpdate;
   end;
-  fPreviousTabs.Free;
-
   inherited;
+end;
+
+function TEditor.GetPageControl: TPageControl;
+begin
+  if Assigned(fTabSheet) then
+    Result := fTabSheet.PageControl
+  else
+    Result := nil;
+end;
+
+procedure TEditor.SetPageControl(Value: TPageControl);
+begin
+  if Assigned(fTabSheet) then
+    fTabSheet.PageControl := Value;
 end;
 
 procedure TEditor.OnMouseOverEvalReady(const evalvalue: AnsiString);
@@ -389,11 +416,13 @@ end;
 
 procedure TEditor.Activate;
 begin
-  fTabSheet.PageControl.Show;
-  fTabSheet.PageControl.ActivePage := fTabSheet;
+  // Don't waste time refocusing
+  if fText.Focused then
+    Exit;
 
-  // this makes sure that the classbrowser is consistent
-  MainForm.PageControlChange(MainForm.PageControl);
+  // Allow the user to start typing right away
+  fTabSheet.PageControl.ActivePage := fTabSheet;
+  fTabSheet.PageControl.OnChange(fTabSheet.PageControl); // event is not fired when changing ActivePage
 end;
 
 procedure TEditor.EditorGutterClick(Sender: TObject; Button: TMouseButton; x, y, Line: integer; mark: TSynEditMark);
@@ -478,7 +507,8 @@ end;
 procedure TEditor.EditorDropFiles(Sender: TObject; x, y: integer; aFiles: TStrings);
 var
   sl: TStringList;
-  I, J: integer;
+  I: integer;
+  e: TEditor;
 begin
   // Insert into current editor
   if devEditor.InsDropFiles then begin
@@ -497,14 +527,14 @@ begin
 
     // Create new tab/project
     for I := 0 to aFiles.Count - 1 do begin
-      J := MainForm.FileIsOpen(aFiles[I]);
-      if J = -1 then begin // if not open yet
+      e := MainForm.EditorList.FileIsOpen(aFiles[I]);
+      if Assigned(e) then
+        e.Activate
+      else begin // if not open yet
         if GetFileTyp(aFiles[I]) = utPrj then
           MainForm.OpenProject(aFiles[I])
         else
           MainForm.OpenFile(aFiles[I]);
-      end else begin // if already open
-        TEditor(MainForm.PageControl.Pages[J].Tag).Activate;
       end;
     end;
 end;
@@ -532,16 +562,47 @@ begin
   fFunctionTip.ReleaseHandle;
 end;
 
+procedure TEditor.EditorEnter(Sender: TObject);
+var
+  I, x, y: integer;
+begin
+  // Set title bar to current file
+  MainForm.UpdateAppTitle;
+
+  // Set classbrowser to current file
+  MainForm.ClassBrowser.CurrentFile := fFileName;
+
+  // Set compiler selector to current file
+  MainForm.UpdateCompilerList;
+
+  // Update status bar
+  MainForm.SetStatusbarLineCol;
+
+  // Update bookmark menu
+  for i := 1 to 9 do
+    if fText.GetBookMark(i, x, y) then begin
+      MainForm.TogglebookmarksPopItem.Items[i - 1].Checked := true;
+      MainForm.TogglebookmarksItem.Items[i - 1].Checked := true;
+    end else begin
+      MainForm.TogglebookmarksPopItem.Items[i - 1].Checked := false;
+      MainForm.TogglebookmarksItem.Items[i - 1].Checked := false;
+    end;
+
+  // Update focus of incremental search
+  if Assigned(IncrementalForm) and IncrementalForm.Showing then
+    IncrementalForm.Editor := fText;
+end;
+
 procedure TEditor.EditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
 begin
   // scModified is only fired when the modified state changes
   if scModified in Changes then begin
     if fText.Modified then begin
       MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
-      UpdateCaption('[*] ' + ExtractfileName(fFileName));
+      UpdateCaption('[*] ' + ExtractFileName(fFileName));
     end else begin
       MainForm.SetStatusbarMessage('');
-      UpdateCaption(ExtractfileName(fFileName));
+      UpdateCaption(ExtractFileName(fFileName));
     end;
   end;
 
@@ -617,19 +678,19 @@ begin
   try
     with TSaveDialog.Create(Application) do try
 
-        Filter := SynExporterHTML.DefaultFilter;
-        Title := Lang[ID_NV_EXPORT];
-        DefaultExt := HTML_EXT;
-        FileName := ChangeFileExt(fFileName, HTML_EXT);
-        Options := Options + [ofOverwritePrompt];
+      Filter := SynExporterHTML.DefaultFilter;
+      Title := Lang[ID_NV_EXPORT];
+      DefaultExt := HTML_EXT;
+      FileName := ChangeFileExt(fFileName, HTML_EXT);
+      Options := Options + [ofOverwritePrompt];
 
-        if Execute then
-          SaveFileName := FileName
-        else
-          Exit; // automatically gotos finally
-      finally
-        Free;
-      end;
+      if Execute then
+        SaveFileName := FileName
+      else
+        Exit; // automatically gotos finally
+    finally
+      Free;
+    end;
 
     SynExporterHTML.Title := ExtractFileName(SaveFileName);
     SynExporterHTML.CreateHTMLFragment := False;
@@ -654,19 +715,19 @@ begin
   try
     with TSaveDialog.Create(Application) do try
 
-        Filter := SynExporterRTF.DefaultFilter;
-        Title := Lang[ID_NV_EXPORT];
-        DefaultExt := RTF_EXT;
-        FileName := ChangeFileExt(fFileName, RTF_EXT);
-        Options := Options + [ofOverwritePrompt];
+      Filter := SynExporterRTF.DefaultFilter;
+      Title := Lang[ID_NV_EXPORT];
+      DefaultExt := RTF_EXT;
+      FileName := ChangeFileExt(fFileName, RTF_EXT);
+      Options := Options + [ofOverwritePrompt];
 
-        if Execute then
-          SaveFileName := FileName
-        else
-          Exit;
-      finally
-        Free;
-      end;
+      if Execute then
+        SaveFileName := FileName
+      else
+        Exit;
+    finally
+      Free;
+    end;
 
     SynExporterRTF.Title := ExtractFileName(SaveFileName);
     SynExporterRTF.ExportAsText := True;
@@ -689,20 +750,19 @@ begin
   SynExporterTEX := TSynExporterTEX.Create(nil);
   try
     with TSaveDialog.Create(Application) do try
+      Filter := SynExporterTEX.DefaultFilter;
+      Title := Lang[ID_NV_EXPORT];
+      DefaultExt := TEX_EXT;
+      FileName := ChangeFileExt(fFileName, TEX_EXT);
+      Options := Options + [ofOverwritePrompt];
 
-        Filter := SynExporterTEX.DefaultFilter;
-        Title := Lang[ID_NV_EXPORT];
-        DefaultExt := TEX_EXT;
-        FileName := ChangeFileExt(fFileName, TEX_EXT);
-        Options := Options + [ofOverwritePrompt];
-
-        if Execute then
-          SaveFileName := FileName
-        else
-          Exit;
-      finally
-        Free;
-      end;
+      if Execute then
+        SaveFileName := FileName
+      else
+        Exit;
+    finally
+      Free;
+    end;
 
     SynExporterTex.Title := ExtractFileName(SaveFileName);
     SynExporterTex.ExportAsText := True;
@@ -720,11 +780,11 @@ end;
 procedure TEditor.GotoLine;
 begin
   with TGotoLineForm.Create(nil) do try
-      if ShowModal = mrOK then
-        SetCaretPos(Line.Value, 1);
-    finally
-      Free;
-    end;
+    if ShowModal = mrOK then
+      SetCaretPos(Line.Value, 1);
+  finally
+    Free;
+  end;
 end;
 
 procedure TEditor.InsertString(Value: AnsiString; MoveCursor: boolean);
@@ -783,12 +843,16 @@ begin
   fErrorLine := Line;
 
   // Set new error focus
-  SetCaretPos(fErrorLine, col, false);
-  fText.EnsureCursorPosVisible;
+  SetCaretPos(fErrorLine, col, true);
 
   // Redraw new error line
   fText.InvalidateGutterLine(fErrorLine);
   fText.InvalidateLine(fErrorLine);
+end;
+
+procedure TEditor.GotoActiveBreakpoint;
+begin
+  SetCaretPos(fActiveLine, 1, true);
 end;
 
 procedure TEditor.SetActiveBreakpointFocus(Line: integer);
@@ -801,10 +865,9 @@ begin
       fText.InvalidateLine(fActiveLine);
     end;
 
+    // Put the caret at the active breakpoint
     fActiveLine := Line;
-
-    SetCaretPos(fActiveLine, 1, false);
-    fText.EnsureCursorPosVisible;
+    SetCaretPos(fActiveLine, 1, true);
 
     // Invalidate new active line
     fText.InvalidateGutterLine(fActiveLine);
@@ -1431,7 +1494,7 @@ var
 
     // disable page control hint
     MainForm.CurrentPageHint := '';
-    MainForm.PageControl.Hint := '';
+    fTabSheet.PageControl.Hint := '';
   end;
 begin
 
@@ -1531,7 +1594,7 @@ begin
       line := Trim(fText.Lines[p.Row - 1]);
       if MainForm.CppParser.IsIncludeLine(Line) then begin
         FileName := MainForm.CppParser.GetHeaderFileName(fFileName, line);
-        e := MainForm.GetEditorFromFileName(FileName);
+        e := MainForm.EditorList.GetEditorFromFileName(FileName);
         if Assigned(e) then
           e.SetCaretPos(1, 1);
       end else
@@ -1707,79 +1770,86 @@ end;
 function TEditor.SaveAs: boolean;
 var
   UnitIndex: integer;
+  SaveFileName: AnsiString;
 begin
   Result := True;
   with TSaveDialog.Create(Application) do try
+    Title := Lang[ID_NV_SAVEAS];
+    Filter := BuildFilter([FLT_CS, FLT_CPPS, FLT_HEADS, FLT_RES]);
+    Options := Options + [ofOverwritePrompt];
 
-      Title := Lang[ID_NV_SAVEAS];
-      Filter := BuildFilter([FLT_CS, FLT_CPPS, FLT_HEADS, FLT_RES]);
-      Options := Options + [ofOverwritePrompt];
-
-      // select appropriate filter
-      if GetFileTyp(fFileName) in [utcHead, utcppHead] then begin
-        FilterIndex := 4; // .h
-        DefaultExt := 'h';
-      end else begin
-        if Assigned(MainForm.Project) then begin
-          if MainForm.Project.Options.useGPP then begin
-            FilterIndex := 3; // .cpp
-            DefaultExt := 'cpp';
-          end else begin
-            FilterIndex := 2; // .c
-            DefaultExt := 'c';
-          end;
-        end else begin
+    // select appropriate filter
+    if GetFileTyp(fFileName) in [utcHead, utcppHead] then begin
+      FilterIndex := 4; // .h
+      DefaultExt := 'h';
+    end else begin
+      if Assigned(MainForm.Project) then begin
+        if MainForm.Project.Options.useGPP then begin
           FilterIndex := 3; // .cpp
           DefaultExt := 'cpp';
+        end else begin
+          FilterIndex := 2; // .c
+          DefaultExt := 'c';
         end;
+      end else begin
+        FilterIndex := 3; // .cpp
+        DefaultExt := 'cpp';
       end;
-
-      FileName := fFileName;
-      if (fFileName <> '') then
-        InitialDir := ExtractFilePath(fFileName)
-      else if Assigned(MainForm.Project) then
-        InitialDir := MainForm.Project.Directory;
-
-      if Execute then begin
-
-        // Remove old file from statement list
-        MainForm.CppParser.InvalidateFile(fFileName);
-
-        // Try to save to disk
-        try
-          fText.UnCollapsedLines.SaveToFile(FileName);
-          fText.Modified := false;
-          fNew := false;
-        except
-          MessageDlg(Lang[ID_ERR_SAVEFILE] + '"' + FileName + '"', mtError, [mbOk], 0);
-          Result := False;
-        end;
-
-        // Update project information
-        if Assigned(MainForm.Project) and Self.InProject then begin
-          UnitIndex := MainForm.Project.Units.IndexOf(fFileName); // index of old filename
-          if UnitIndex <> -1 then
-            MainForm.Project.SaveUnitAs(UnitIndex, FileName); // save as new filename
-        end else
-          fTabSheet.Caption := ExtractFileName(FileName);
-
-        // Update window captions
-        fFileName := FileName;
-        MainForm.UpdateAppTitle;
-
-        // Update class browser, redraw once
-        MainForm.ClassBrowser.BeginUpdate;
-        try
-          MainForm.CppParser.ReParseFile(FileName, InProject);
-          MainForm.ClassBrowser.CurrentFile := FileName;
-        finally
-          MainForm.ClassBrowser.EndUpdate;
-        end;
-      end else
-        Result := False;
-    finally
-      Free;
     end;
+
+    // Set save box options
+    FileName := fFileName;
+    if (fFileName <> '') then
+      InitialDir := ExtractFilePath(fFileName)
+    else if Assigned(MainForm.Project) then
+      InitialDir := MainForm.Project.Directory;
+
+    // Open the save box
+    if Execute then
+      SaveFileName := FileName // prevent collision between TEditor.FileName and Dialog.FileName
+    else begin
+      Result := False;
+      Exit;
+    end;
+  finally
+    Free;
+  end;
+
+  // Remove *old* file from statement list
+  MainForm.CppParser.InvalidateFile(FileName);
+
+  // Try to save to disk
+  try
+    fText.UnCollapsedLines.SaveToFile(SaveFileName);
+    fText.Modified := False;
+    fNew := False;
+  except
+    MessageDlg(Lang[ID_ERR_SAVEFILE] + '"' + SaveFileName + '"', mtError, [mbOk], 0);
+    Result := False;
+  end;
+
+  // Update project information
+  if Assigned(MainForm.Project) and Self.InProject then begin
+    UnitIndex := MainForm.Project.Units.IndexOf(FileName); // index of *old* filename
+    if UnitIndex <> -1 then
+      MainForm.Project.SaveUnitAs(UnitIndex, SaveFileName); // save as new filename
+  end else
+    fTabSheet.Caption := ExtractFileName(SaveFileName);
+
+  // Update window captions
+  MainForm.UpdateAppTitle;
+
+  // Update class browser, redraw once
+  MainForm.ClassBrowser.BeginUpdate;
+  try
+    MainForm.CppParser.ReParseFile(SaveFileName, InProject);
+    MainForm.ClassBrowser.CurrentFile := SaveFileName;
+  finally
+    MainForm.ClassBrowser.EndUpdate;
+  end;
+
+  // Set new file name
+  FileName := SaveFileName;
 end;
 
 end.

@@ -95,6 +95,7 @@ const
   ID_ITEM_DELETELINE                    = 22010;
   ID_ITEM_MOVESELUP                     = 22011;
   ID_ITEM_MOVESELDOWN                   = 22012;
+  ID_ITEM_SWAPEDITOR                    = 22013;
 
   // search menu
   ID_ITEM_FIND                          = 5001;
@@ -1153,7 +1154,8 @@ const
   ID_POPT_DEFCPP                        = 72029;
   ID_POPT_RESETPROJECTCOMPILER          = 72030;
   ID_POPT_LANGUAGEDEP                   = 72031;
-
+  ID_POPT_FILES                         = 72032;
+  
   // New compiler options
   ID_COPT_STRIP                         = 73001;
   ID_COPT_ARCH                          = 73002;
@@ -1250,3 +1252,4 @@ const
   ID_LOG_CLEANINGFILE                   = 78030;
   ID_LOG_CLEANEDFILE                    = 78031;
   ID_LOG_NOCLEANFILE                    = 78032;
+  ID_LOG_PROCESSINGUNKNOWN              = 78033;

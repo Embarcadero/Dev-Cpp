@@ -66,8 +66,8 @@ type
     fBuildCmd: AnsiString;
     fLink: boolean;
     fPriority: integer;
-    function GetDirty: boolean;
-    procedure SetDirty(value: boolean);
+    function GetModified: boolean;
+    procedure SetModified(value: boolean);
     function Save: boolean;
   public
     constructor Create(aOwner: TProject);
@@ -75,7 +75,7 @@ type
     property Editor: TEditor read fEditor write fEditor;
     property FileName: AnsiString read fFileName write fFileName;
     property New: boolean read fNew write fNew;
-    property Dirty: boolean read GetDirty write SetDirty;
+    property Modified: boolean read GetModified write SetModified;
     property Node: TTreeNode read fNode write fNode;
     property Parent: TProject read fParent write fParent;
     property Folder: AnsiString read fFolder write fFolder;
@@ -103,6 +103,7 @@ type
     function GetExecutableName: AnsiString;
     procedure SetFileName(const value: AnsiString);
     function GetModified: boolean;
+    function GetMakeFileName : AnsiString;
     procedure SetModified(value: boolean);
     procedure SortUnitsByPriority;
   public
@@ -115,10 +116,11 @@ type
     property Units: TUnitList read fUnits write fUnits;
     property INIFile: TMemIniFile read fINIFile write fINIFile;
     property Modified: boolean read GetModified write SetModified;
+    property MakeFileName : AnsiString read GetMakeFileName;
     constructor Create(const nFileName, nName: AnsiString);
     destructor Destroy; override;
-    function NewUnit(NewProject: boolean; Folder: TTreeNode; const CustomFileName: AnsiString = ''): integer;
-    function AddUnit(s: AnsiString; var pFolder: TTreeNode; Rebuild: Boolean): TProjUnit;
+    function NewUnit(NewProject: boolean; ParentNode: TTreeNode; const CustomFileName: AnsiString = ''): integer;
+    function AddUnit(const InFileName: AnsiString; ParentNode: TTreeNode; Rebuild: Boolean): TProjUnit;
     function GetFolderPath(Node: TTreeNode): AnsiString;
     procedure UpdateFolders;
     procedure AddFolder(const s: AnsiString);
@@ -139,7 +141,6 @@ type
     procedure Open;
     function FileAlreadyExists(const s: AnsiString): boolean;
     function Remove(index: integer; DoClose: boolean): boolean;
-    function GetUnitFromEditor(ed: TEditor): integer;
     function GetUnitFromString(const s: AnsiString): integer;
     procedure RebuildNodes;
     function ListUnitStr(Separator: char): AnsiString;
@@ -160,8 +161,8 @@ type
 implementation
 
 uses
-  main, MultiLangSupport, devcfg, ProjectOptionsFrm, datamod, utils,
-  RemoveUnitFrm, SynEdit;
+  main, MultiLangSupport, devcfg, ProjectOptionsFrm, DataFrm, utils,
+  RemoveUnitFrm, SynEdit, EditorList;
 
 { TProjUnit }
 
@@ -193,7 +194,7 @@ begin
         workeditor := TSynEdit.Create(nil);
         workeditor.UnCollapsedLines.SaveToFile(fFileName);
         workeditor.Free;
-      end else if Assigned(fEditor) and fEditor.Text.Modified then begin
+      end else if Assigned(fEditor) and Modified then begin
         result := fEditor.Save;
         if FileExists(fEditor.FileName) then
           FileSetDate(fEditor.FileName, DateTimeToFileDate(Now));
@@ -210,18 +211,23 @@ begin
     fNode.Text := ExtractFileName(fFileName);
 end;
 
-function TProjUnit.GetDirty: boolean;
+function TProjUnit.GetModified: boolean;
 begin
-  if assigned(fEditor) then
+  if Assigned(fEditor) then
     result := fEditor.Text.Modified
   else
     result := FALSE;
 end;
 
-procedure TProjUnit.SetDirty(value: boolean);
+procedure TProjUnit.SetModified(value: boolean);
 begin
-  if assigned(fEditor) then
+  // Mark the change in the coupled editor
+  if Assigned(fEditor) then
     fEditor.Text.Modified := value;
+
+  // If modified is set to true, mark project as modified too
+  if Value then
+    fParent.Modified := True;
 end;
 
 procedure TProjUnit.Assign(Source: TProjUnit);
@@ -229,7 +235,7 @@ begin
   fEditor := Source.fEditor;
   fFileName := Source.fFileName;
   fNew := Source.fNew;
-  Dirty := Source.Dirty;
+  Modified := Source.Modified;
   fNode := Source.fNode;
   fParent := Source.fParent;
   fFolder := Source.fFolder;
@@ -267,8 +273,6 @@ end;
 
 destructor TProject.Destroy;
 begin
-  if fModified then
-    SaveAll;
   fFolders.Free;
   fFolderNodes.Free;
   fIniFile.Free;
@@ -308,6 +312,14 @@ begin
       SetModified(true);
     end;
   end;
+end;
+
+function TProject.GetMakeFileName : AnsiString;
+begin
+  if fOptions.UseCustomMakefile then
+    Result := fOptions.CustomMakefile
+  else
+    Result := Directory + DEV_MAKE_FILE;
 end;
 
 procedure TProject.SaveToLog;
@@ -376,8 +388,6 @@ begin
   MainForm.ProjectView.FullExpand;
 end;
 
-{ begin XXXKF changed }
-
 function TProject.MakeNewFileNode(const s: AnsiString; IsFolder: boolean; NewParent: TTreeNode): TTreeNode;
 begin
   MakeNewFileNode := MainForm.ProjectView.Items.AddChild(NewParent, s);
@@ -390,7 +400,6 @@ begin
     MakeNewFileNode.ImageIndex := 1;
   end;
 end;
-{ end XXXKF changed }
 
 procedure TProject.BuildPrivateResource(ForceSave: boolean = False);
 var
@@ -609,122 +618,113 @@ begin
   ResFile.Free;
 end;
 
-function TProject.NewUnit(NewProject: boolean; Folder: TTreeNode; const CustomFileName: AnsiString): integer;
+function TProject.NewUnit(NewProject: boolean; ParentNode: TTreeNode; const CustomFileName: AnsiString): integer;
 var
-  newunit: TProjUnit;
+  NewUnit: TProjUnit;
   s: AnsiString;
-  ParentNode, CurNode: TTreeNode;
 begin
   NewUnit := TProjUnit.Create(Self);
-  if Folder <> nil then
-    ParentNode := Folder
-  else
-    ParentNode := Node;
+
+  // Select folder to add unit to
+  if not Assigned(ParentNode) then
+    ParentNode := Node; // project root node
+
   with NewUnit do try
-      if Length(CustomFileName) = 0 then
-        s := Directory + Lang[ID_Untitled] + inttostr(dmMain.GetNewFileNumber)
-      else begin
-        if ExtractFilePath(CustomFileName) = '' then // just filename, no path
-          // make it full path filename, so that the save dialog, starts at the right directory ;)
-          s := Directory + CustomFileName
-        else
-          s := CustomFileName;
-      end;
+    // Find unused 'new' filename
+    if Length(CustomFileName) = 0 then begin
+      repeat
+        s := Directory + Lang[ID_Untitled] + IntToStr(dmMain.GetNewFileNumber);
+      until not FileAlreadyExists(s);
 
-      if FileAlreadyExists(s) then
-        repeat
-          s := Directory + Lang[ID_Untitled] + inttostr(dmMain.GetNewFileNumber);
-        until not FileAlreadyExists(s);
-
-      Filename := s;
-      New := True;
-      Editor := nil;
-      CurNode := MakeNewFileNode(ExtractFileName(FileName), false, ParentNode);
-      NewUnit.Folder := ParentNode.Text;
-      NewUnit.Node := CurNode;
-      result := fUnits.Add(NewUnit);
-      CurNode.Data := pointer(result);
-      Dirty := TRUE;
-      Compile := True;
-      CompileCpp := Self.Options.useGPP;
-      Link := True;
-      Priority := 1000;
-      OverrideBuildCmd := False;
-      BuildCmd := '';
-      SetModified(TRUE);
-    except
-      result := -1;
-      NewUnit.Free;
+      // Or use provided filename
+    end else begin
+      if ExtractFilePath(CustomFileName) = '' then // just filename, no path
+        s := Directory + CustomFileName
+      else
+        s := CustomFileName;
     end;
+
+    // Add
+    Result := fUnits.Add(NewUnit);
+
+    // Set all properties
+    FileName := s;
+    New := True;
+    Editor := nil;
+    Folder := GetFolderPath(ParentNode);
+    Node := MakeNewFileNode(ExtractFileName(FileName), False, ParentNode);
+    Node.Data := pointer(result);
+    Compile := True;
+    CompileCpp := Self.Options.useGPP;
+    Link := True;
+    Priority := 1000;
+    OverrideBuildCmd := False;
+    BuildCmd := '';
+    Modified := True;
+  except
+    result := -1;
+    NewUnit.Free;
+  end;
 end;
 
 { begin XXXKF changed }
 
-function TProject.AddUnit(s: AnsiString; var pFolder: TTreeNode; Rebuild: Boolean): TProjUnit;
+function TProject.AddUnit(const InFileName: AnsiString; ParentNode: TTreeNode; Rebuild: Boolean): TProjUnit;
 var
   NewUnit: TProjUnit;
-  s2: AnsiString;
-  TmpNode: TTreeNode;
 begin
   result := nil;
-  if s[length(s)] = '.' then // correct filename if the user gives an alone dot to force the no extension
-    s[length(s)] := #0;
   NewUnit := TProjUnit.Create(Self);
   with NewUnit do try
-      if FileAlreadyExists(s) then begin
-        if fname = '' then
-          s2 := fFileName
-        else
-          s2 := fName;
-        MessageDlg(format(Lang[ID_MSG_FILEINPROJECT], [s, s2])
-          + #13#10 + Lang[ID_SPECIFY], mtError, [mbok], 0);
-        NewUnit.Free;
-        Exit;
-      end;
-      FileName := s;
-      New := False;
-      Editor := nil;
-      Node := MakeNewFileNode(ExtractFileName(FileName), false, pFolder);
-      Node.Data := pointer(fUnits.Add(NewUnit));
-      Folder := pFolder.Text;
-      TmpNode := pFolder.Parent;
-      while Assigned(TmpNode) and (TmpNode <> self.fNode) do begin
-        Folder := TmpNode.Text + '/' + Folder;
-        TmpNode := TmpNode.Parent;
-      end;
 
-      case GetFileTyp(s) of
-        utcSrc, utcppSrc, utcHead, utcppHead: begin
-            Compile := True;
-            CompileCpp := Self.Options.useGPP;
-            Link := True;
-          end;
-        utResSrc: begin
-            Compile := True;
-            CompileCpp := Self.Options.useGPP;
-            Link := False;
-            // if a resource was added, force (re)creation of private resource...
-            BuildPrivateResource(True);
-          end;
-      else begin
-          Compile := False;
-          CompileCpp := False;
+    // Don't add if it already exists
+    if FileAlreadyExists(InFileName) then begin
+      MessageDlg(Format(Lang[ID_MSG_FILEINPROJECT], [InFileName, Self.FileName]) + #13#10 + Lang[ID_SPECIFY], mtError,
+        [mbOK], 0);
+      NewUnit.Free;
+      Exit;
+    end;
+
+    // Add
+    Result := NewUnit;
+
+    // Set all properties
+    FileName := InFileName;
+    New := False;
+    Editor := nil;
+    Folder := GetFolderPath(ParentNode);
+    Node := MakeNewFileNode(ExtractFileName(FileName), false, ParentNode);
+    Node.Data := pointer(fUnits.Add(NewUnit));
+
+    // Determine compilation flags
+    case GetFileTyp(InFileName) of
+      utcSrc, utcppSrc, utcHead, utcppHead: begin
+          Compile := True;
+          CompileCpp := Self.Options.useGPP;
+          Link := True;
+        end;
+      utResSrc: begin
+          Compile := True;
+          CompileCpp := Self.Options.useGPP;
           Link := False;
         end;
+    else begin
+        Compile := False;
+        CompileCpp := False;
+        Link := False;
       end;
-      Priority := 1000;
-      OverrideBuildCmd := False;
-      BuildCmd := '';
-      if Rebuild then
-        RebuildNodes;
-      SetModified(TRUE);
-      Result := NewUnit;
-    except
-      result := nil;
-      NewUnit.Free;
     end;
+    Priority := 1000;
+    OverrideBuildCmd := False;
+    BuildCmd := '';
+    if Rebuild then
+      RebuildNodes;
+    Modified := True;
+  except
+    result := nil;
+    NewUnit.Free;
+  end;
 end;
-{ end XXXKF changed }
 
 procedure TProject.LoadOptions;
 begin
@@ -896,7 +896,8 @@ begin
     with fUnits[idx] do begin
 
 {$WARN SYMBOL_PLATFORM OFF}
-      if fUnits[idx].Dirty and FileExists(fUnits[idx].FileName) and (FileGetAttr(fUnits[idx].FileName) and faReadOnly <>
+      if fUnits[idx].Modified and FileExists(fUnits[idx].FileName) and (FileGetAttr(fUnits[idx].FileName) and faReadOnly
+        <>
         0) then begin
         // file is read-only
         if MessageDlg(Format(Lang[ID_MSG_FILEISREADONLY], [fUnits[idx].FileName]), mtConfirmation, [mbYes, mbNo], 0) =
@@ -913,7 +914,7 @@ begin
         Exit;
 
       // saved new file or an existing file add to project file
-      if not (New and Dirty) then begin
+      if not (New and Modified) then begin
         finifile.WriteString('Unit' + IntToStr(Count + 1), 'FileName', ExtractRelativePath(Directory,
           fUnits[idx].FileName));
         Inc(Count);
@@ -1066,7 +1067,7 @@ end;
 procedure TProject.LoadLayout;
 var
   layIni: TIniFile;
-  top: integer;
+  TopLeft {, TopRight}: integer;
   sl: TStringList;
   idx, currIdx: integer;
 begin
@@ -1074,7 +1075,10 @@ begin
   try
     layIni := TIniFile.Create(ChangeFileExt(Filename, '.layout'));
     try
-      top := layIni.ReadInteger('Editors', 'Focused', -1);
+      // Remember focus for left and right page controls
+      TopLeft := layIni.ReadInteger('Editors', 'Focused', -1);
+      //TopRight := layIni.ReadInteger('Editors', 'FocusedRight', -1);
+
       // read order of open files and open them accordingly
       sl.CommaText := layIni.ReadString('Editors', 'Order', '');
     finally
@@ -1089,8 +1093,11 @@ begin
     sl.Free;
   end;
 
-  if (Top <> -1) and (top < fUnits.Count) and Assigned(fUnits[top].Editor) then
-    fUnits[top].Editor.Activate;
+  // Set focus for left and right page controls
+  if (TopLeft <> -1) and (TopLeft < fUnits.Count) and Assigned(fUnits[TopLeft].Editor) then
+    fUnits[TopLeft].Editor.Activate;
+  //if (TopRight <> -1) and (TopRight < fUnits.Count) and Assigned(fUnits[TopRight].Editor) then
+  //  fUnits[TopRight].Editor.Activate;
 end;
 
 procedure TProject.LoadUnitLayout(e: TEditor; Index: integer);
@@ -1113,58 +1120,54 @@ end;
 procedure TProject.SaveLayout;
 var
   layIni: TIniFile;
-  idx: Integer;
-  aset: boolean;
+  I: Integer;
   sl: TStringList;
   S: AnsiString;
+  e, e2: TEditor;
 begin
   s := ChangeFileExt(Filename, '.layout');
   layIni := TIniFile.Create(s);
   try
     sl := TStringList.Create;
     try
-      // write order of open files
-      for idx := 0 to MainForm.PageControl.PageCount - 1 do begin
-        S := MainForm.PageControl.Pages[idx].Caption;
-
-        // the file is modified and the tabsheet's caption starts with '[*] ' - delete it
-        if (Length(S) > 4) and (Copy(S, 1, 4) = '[*] ') then
-          S := Copy(S, 5, Length(S) - 4);
-
-        // if this file belongs to the project...
-        if sl.IndexOf(IntToStr(fUnits.Indexof(S))) = -1 then
-          sl.Add(IntToStr(fUnits.Indexof(S)));
-        if MainForm.PageControl.ActivePageIndex = idx then
-          layIni.WriteInteger('Editors', 'Focused', fUnits.Indexof(S));
+      // Write list of open project files
+      for I := 0 to MainForm.EditorList.PageCount - 1 do begin
+        e := MainForm.EditorList[i];
+        if Assigned(e) and e.InProject then
+          sl.Add(IntToStr(fUnits.IndexOf(e)));
       end;
       layIni.WriteString('Editors', 'Order', sl.CommaText);
+
+      // Remember what files were visible
+      MainForm.EditorList.GetVisibleEditors(e, e2);
+      if Assigned(e) then
+        layIni.WriteInteger('Editors', 'Focused', fUnits.IndexOf(e));
+      //if Assigned(e2) then
+      //  layIni.WriteInteger('Editors', 'FocusedRight', fUnits.IndexOf(e2));
     finally
       sl.Free;
     end;
 
     // save editor info
-    for idx := 0 to pred(fUnits.Count) do
-      with fUnits[idx] do begin
-
+    for I := 0 to pred(fUnits.Count) do
+      with fUnits[I] do begin
         // save info on open state
-        aset := Assigned(editor);
-        layIni.WriteBool('Editor_' + IntToStr(idx), 'Open', aset);
-        layIni.WriteBool('Editor_' + IntToStr(idx), 'Top', aset and (Editor.TabSheet =
-          Editor.TabSheet.PageControl.ActivePage));
-        if aset then begin
-          layIni.WriteInteger('Editor_' + IntToStr(idx), 'CursorCol', Editor.Text.CaretX);
-          layIni.WriteInteger('Editor_' + IntToStr(idx), 'CursorRow', Editor.Text.CaretY);
-          layIni.WriteInteger('Editor_' + IntToStr(idx), 'TopLine', Editor.Text.TopLine);
-          layIni.WriteInteger('Editor_' + IntToStr(idx), 'LeftChar', Editor.Text.LeftChar);
+        if Assigned(editor) then begin
+          layIni.WriteInteger('Editor_' + IntToStr(I), 'CursorCol', Editor.Text.CaretX);
+          layIni.WriteInteger('Editor_' + IntToStr(I), 'CursorRow', Editor.Text.CaretY);
+          layIni.WriteInteger('Editor_' + IntToStr(I), 'TopLine', Editor.Text.TopLine);
+          layIni.WriteInteger('Editor_' + IntToStr(I), 'LeftChar', Editor.Text.LeftChar);
+          //   layIni.WriteBool('Editor_' + IntToStr(I), 'PageControl', e.TabSheet.PageControl =
+          //     MainForm.EditorList.LeftPageControl);
         end;
 
         // remove old data from project file
-        fIniFile.DeleteKey('Unit' + IntToStr(idx + 1), 'Open');
-        fIniFile.DeleteKey('Unit' + IntToStr(idx + 1), 'Top');
-        fIniFile.DeleteKey('Unit' + IntToStr(idx + 1), 'CursorCol');
-        fIniFile.DeleteKey('Unit' + IntToStr(idx + 1), 'CursorRow');
-        fIniFile.DeleteKey('Unit' + IntToStr(idx + 1), 'TopLine');
-        fIniFile.DeleteKey('Unit' + IntToStr(idx + 1), 'LeftChar');
+        fIniFile.DeleteKey('Unit' + IntToStr(I + 1), 'Open');
+        fIniFile.DeleteKey('Unit' + IntToStr(I + 1), 'Top');
+        fIniFile.DeleteKey('Unit' + IntToStr(I + 1), 'CursorCol');
+        fIniFile.DeleteKey('Unit' + IntToStr(I + 1), 'CursorRow');
+        fIniFile.DeleteKey('Unit' + IntToStr(I + 1), 'TopLine');
+        fIniFile.DeleteKey('Unit' + IntToStr(I + 1), 'LeftChar');
       end;
   finally
     layIni.Free;
@@ -1182,6 +1185,8 @@ begin
       layIni.WriteInteger('Editor_' + IntToStr(Index), 'CursorRow', e.Text.CaretY);
       layIni.WriteInteger('Editor_' + IntToStr(Index), 'TopLine', e.Text.TopLine);
       layIni.WriteInteger('Editor_' + IntToStr(Index), 'LeftChar', e.Text.LeftChar);
+      //   layIni.WriteBool('Editor_' + IntToStr(Index), 'PageControl', e.TabSheet.PageControl =
+      //     MainForm.EditorList.LeftPageControl);
     end;
   finally
     layIni.Free;
@@ -1207,13 +1212,10 @@ function TProject.Remove(index: integer; DoClose: boolean): boolean;
 begin
   result := false;
 
-  // if a resource was removed, force (re)creation of private resource...
-  if GetFileTyp(fUnits.GetItem(index).FileName) = utResSrc then
-    BuildPrivateResource(True);
-  if DoClose and Assigned(fUnits.GetItem(index).fEditor) then begin
-    if not MainForm.CloseEditor(fUnits.GetItem(index).fEditor.TabSheet.PageIndex) then
-      exit;
-  end;
+  // Attempt to close it
+  if DoClose and Assigned(fUnits.GetItem(index).fEditor) then
+    if not MainForm.EditorList.CloseEditor(fUnits.GetItem(index).fEditor) then
+      Exit;
 
   result := true;
 
@@ -1229,7 +1231,7 @@ end;
 
 function TProject.FileAlreadyExists(const s: AnsiString): boolean;
 begin
-  if fUnits.Indexof(s) > -1 then
+  if fUnits.IndexOf(s) > -1 then
     result := true
   else
     result := false;
@@ -1245,13 +1247,11 @@ begin
     if FileName <> '' then begin
       try
         SetCurrentDir(Directory);
-        fEditor := TEditor.Create(true, ExtractFileName(FileName), ExpandFileName(FileName), not New);
-        if New then
-          fEditor.InsertDefaultText;
+        fEditor := MainForm.EditorList.NewEditor(ExpandFileName(FileName), true, false);
         LoadUnitLayout(fEditor, index);
-        result := fEditor;
+        Result := fEditor;
       except
-        MessageDlg(format(Lang[ID_ERR_OPENFILE], [Filename]), mtError, [mbOK], 0);
+        MessageDlg(Format(Lang[ID_ERR_OPENFILE], [Filename]), mtError, [mbOK], 0);
       end;
     end;
   end;
@@ -1260,7 +1260,7 @@ end;
 procedure TProject.CloseUnit(index: integer);
 begin
   with fUnits[index] do begin
-    if assigned(fEditor) then begin
+    if Assigned(fEditor) then begin
       SaveUnitLayout(fEditor, index);
       FreeAndNil(fEditor);
     end;
@@ -1288,41 +1288,35 @@ begin
   Modified := true;
 end;
 
-function TProject.GetUnitFromEditor(ed: TEditor): integer;
-begin
-  result := fUnits.Indexof(Ed);
-end;
-
 function TProject.GetUnitFromString(const s: AnsiString): integer;
 begin
   result := fUnits.Indexof(ExpandFileto(s, Directory));
 end;
 
 function TProject.GetExecutableName: AnsiString;
+var
+  ExeFileName, ExePath: AnsiString;
 begin
-  // Add the proper extension
+  // Determine filename ('hello.exe')
   if fOptions.OverrideOutput and (fOptions.OverridenOutput <> '') then begin
-    result := ExtractFilePath(Filename) + fOptions.OverridenOutput;
+    ExeFileName := fOptions.OverridenOutput;
   end else begin
     if fOptions.typ = dptStat then
-      result := ChangeFileExt(Filename, LIB_EXT)
+      ExeFileName := ChangeFileExt(ExtractFileName(Filename), LIB_EXT)
     else if fOptions.typ = dptDyn then
-      result := ChangeFileExt(Filename, DLL_EXT)
+      ExeFileName := ChangeFileExt(ExtractFileName(Filename), DLL_EXT)
     else
-      result := ChangeFileExt(Filename, EXE_EXT);
+      ExeFileName := ChangeFileExt(ExtractFileName(Filename), EXE_EXT);
   end;
 
-  // Create alternative directory if possible
-  if Length(Options.ExeOutput) > 0 then begin
-    if not DirectoryExists(Directory + Options.ExeOutput) then try
-        ForceDirectories(Directory + Options.ExeOutput);
-      except
-        MessageDlg('Could not create executable output directory: "' + Options.ExeOutput +
-          '". Please check your access settings.', mtWarning, [mbOK], 0);
-        exit;
-      end;
-    result := GetRealPath(IncludeTrailingPathDelimiter(Directory + Options.ExeOutput) + ExtractFileName(Result));
-  end;
+  // Determine file path ('X;\Hello\');
+  if Length(Options.ExeOutput) > 0 then
+    ExePath := IncludeTrailingPathDelimiter(ExpandFileto(Options.ExeOutput, Directory))
+  else
+    ExePath := IncludeTrailingPathDelimiter(Directory);
+
+  // Compute result
+  Result := GetRealPath(ExePath + ExeFileName);
 end;
 
 function TProject.GetDirectory: AnsiString;
@@ -1351,17 +1345,23 @@ end;
 function TProject.GetModified: boolean;
 var
   I: integer;
-  ismod: boolean;
 begin
-  ismod := FALSE;
-  for I := 0 to fUnits.Count - 1 do
-    if fUnits[I].Dirty then begin
-      ismod := TRUE;
-      break;
+  // Project file modified? Done
+  if fModified then
+    Result := True // quick exit avoids loop over all units
+
+    // Otherwise, check all units
+  else begin
+    for I := 0 to fUnits.Count - 1 do begin
+      if fUnits[I].Modified then begin
+        Result := True;
+        Exit; // don't bother checking others
+      end;
     end;
 
-  // project file or any unit modified...
-  result := fModified or ismod;
+    // Not modified
+    Result := False;
+  end;
 end;
 
 procedure TProject.SetModified(value: boolean);
@@ -1401,21 +1401,21 @@ begin
   SynExporterHTML := TSynExporterHTML.Create(nil);
   with TSaveDialog.Create(nil) do try
 
-      Filter := SynExporterHTML.DefaultFilter;
-      Title := Lang[ID_NV_EXPORT];
-      DefaultExt := HTML_EXT;
-      FileName := ChangeFileExt(fFileName, HTML_EXT);
-      Options := Options + [ofOverwritePrompt];
+    Filter := SynExporterHTML.DefaultFilter;
+    Title := Lang[ID_NV_EXPORT];
+    DefaultExt := HTML_EXT;
+    FileName := ChangeFileExt(fFileName, HTML_EXT);
+    Options := Options + [ofOverwritePrompt];
 
-      if not Execute then begin
-        SynExporterHTML.Free;
-        Exit;
-      end;
-
-      fName := FileName; // project html filename
-    finally
-      Free;
+    if not Execute then begin
+      SynExporterHTML.Free;
+      Exit;
     end;
+
+    fName := FileName; // project html filename
+  finally
+    Free;
+  end;
 
   BaseDir := ExtractFilePath(fName);
   CreateDir(BaseDir + pd + 'files');
@@ -1497,42 +1497,38 @@ var
 begin
   with TProjectOptionsFrm.Create(MainForm) do try
 
-      // Apply current settings
-      SetInterface(Self);
+    // Apply current settings
+    SetInterface(Self);
 
-      if ShowModal = mrOk then begin
+    if ShowModal = mrOk then begin
 
-        // Save new settings to RAM
-        GetInterface(Self);
+      // Save new settings to RAM
+      GetInterface(Self);
 
-        SetModified(TRUE); // don't save to disk yet
-        SortUnitsByPriority;
-        RebuildNodes;
+      SetModified(TRUE); // don't save to disk yet
+      SortUnitsByPriority;
+      RebuildNodes;
 
-        // Copy icon to project directoy
-        IconFileName := ChangeFileExt(ExtractFileName(FileName), '.ico');
-        if not SameText(IconFileName, fOptions.Icon) and (fOptions.Icon <> '') then begin
-          CopyFile(PAnsiChar(fOptions.Icon), PAnsiChar(ExpandFileto(IconFileName, Directory)), False);
-          fOptions.Icon := IconFileName;
-
-          // force save of private resource to force rebuild, since icon has changed...
-          BuildPrivateResource(True);
-        end else
-          BuildPrivateResource;
-
-        // update the project's main node caption
-        if edProjectName.Text <> '' then begin
-          fName := edProjectName.Text;
-          fNode.Text := fName;
-        end;
+      // Copy icon to project directoy
+      IconFileName := ChangeFileExt(ExtractFileName(FileName), '.ico');
+      if not SameText(IconFileName, fOptions.Icon) and (fOptions.Icon <> '') then begin
+        CopyFile(PAnsiChar(fOptions.Icon), PAnsiChar(ExpandFileto(IconFileName, Directory)), False);
+        fOptions.Icon := IconFileName;
       end;
 
-      // Discard changes, even when canceling
-      if (cmbCompiler.ItemIndex < devCompilerSets.Count) and (cmbCompiler.ItemIndex >= 0) then
-        devCompilerSets.LoadSet(cmbCompiler.ItemIndex);
-    finally
-      Close;
+      // update the project's main node caption
+      if edProjectName.Text <> '' then begin
+        fName := edProjectName.Text;
+        fNode.Text := fName;
+      end;
     end;
+
+    // Discard changes, even when canceling
+    if (cmbCompiler.ItemIndex < devCompilerSets.Count) and (cmbCompiler.ItemIndex >= 0) then
+      devCompilerSets.LoadSet(cmbCompiler.ItemIndex);
+  finally
+    Close;
+  end;
 end;
 
 function TProject.AssignTemplate(const aFileName: AnsiString; aTemplate: TTemplate): boolean;
@@ -1552,7 +1548,7 @@ begin
         fIniFile := TMemIniFile.Create(aFileName);
       NewUnit(FALSE, nil);
       with fUnits[fUnits.Count - 1] do begin
-        Editor := TEditor.Create(true, ExtractFileName(FileName), FileName, false);
+        Editor := MainForm.EditorList.NewEditor(FileName, True, True);
         Editor.InsertDefaultText;
         Editor.Activate;
       end;
@@ -1595,7 +1591,7 @@ begin
 
         // Create an editor
         with fUnits[fUnits.Count - 1] do begin
-          Editor := TEditor.Create(TRUE, ExtractFileName(filename), FileName, FALSE);
+          Editor := MainForm.EditorList.NewEditor(FileName, True, True);
           try
             // Set filename depending on C/C++ choice
             if (Length(aTemplate.Units[I].CppName) > 0) and (aTemplate.Options.useGPP) then begin
@@ -1628,7 +1624,7 @@ begin
     end else begin
       NewUnit(FALSE, nil);
       with fUnits[fUnits.Count - 1] do begin
-        Editor := TEditor.Create(TRUE, FileName, FileName, FALSE);
+        Editor := MainForm.EditorList.NewEditor(FileName, TRUE, True);
         if fOptions.useGPP then
           s := aTemplate.OldData.CppText
         else
@@ -1655,47 +1651,47 @@ var
   tempnode: TTreeNode;
 begin
   MainForm.ProjectView.Items.BeginUpdate;
+  try
+    // Remember if folder nodes were expanded or collapsed
+    // Create a list of expanded folder nodes
+    oldPaths := TStringList.Create;
+    with MainForm.ProjectView do
+      for idx := 0 to Items.Count - 1 do begin
+        tempnode := Items[idx];
+        if tempnode.Expanded and (tempnode.Data = Pointer(-1)) then // data=pointer(-1) - it's folder
+          oldPaths.Add(GetFolderPath(tempnode));
+      end;
 
-  //remember if folder nodes were expanded or collapsed
-  //create a list of expanded folder nodes
-  oldPaths := TStringList.Create;
-  with MainForm.ProjectView do
-    for idx := 0 to Items.Count - 1 do begin
-      tempnode := Items[idx];
-      if tempnode.Expanded and (tempnode.Data = Pointer(-1)) then //data=pointer(-1) - it's folder
-        oldPaths.Add(GetFolderPath(tempnode));
+    // Delete everything
+    fNode.DeleteChildren;
+
+    // Recreate everything
+    CreateFolderNodes;
+    for idx := 0 to pred(fUnits.Count) do begin
+      fUnits[idx].Node := MakeNewFileNode(ExtractFileName(fUnits[idx].FileName), False,
+        FolderNodeFromName(fUnits[idx].Folder));
+      fUnits[idx].Node.Data := pointer(idx);
     end;
+    for idx := 0 to pred(fFolders.Count) do
+      TTreeNode(fFolderNodes[idx]).AlphaSort(False);
+    Node.AlphaSort(False);
 
-  fNode.DeleteChildren;
+    // expand nodes expanded before recreating the project tree
+    fNode.Collapse(True);
+    with MainForm.ProjectView do
+      for idx := 0 to Items.Count - 1 do begin
+        tempnode := Items[idx];
+        if (tempnode.Data = Pointer(-1)) then //it's a folder
+          if oldPaths.IndexOf(GetFolderPath(tempnode)) >= 0 then
+            tempnode.Expand(False);
+      end;
+    FreeAndNil(oldPaths);
 
-  CreateFolderNodes;
-  {
-    for idx:=0 to pred(fFolders.Count) do
-      MakeNewFileNode(fFolders[idx], True).Data:=Pointer(-1);}
-  for idx := 0 to pred(fUnits.Count) do begin
-    fUnits[idx].Node := MakeNewFileNode(ExtractFileName(fUnits[idx].FileName), False,
-      FolderNodeFromName(fUnits[idx].Folder));
-    fUnits[idx].Node.Data := pointer(idx);
+    fNode.Expand(False);
+  finally
+    MainForm.ProjectView.Items.EndUpdate;
   end;
-  for idx := 0 to pred(fFolders.Count) do
-    TTreeNode(fFolderNodes[idx]).AlphaSort(False);
-  Node.AlphaSort(False);
-
-  //expand nodes expanded before recreating the project tree
-  fNode.Collapse(True);
-  with MainForm.ProjectView do
-    for idx := 0 to Items.Count - 1 do begin
-      tempnode := Items[idx];
-      if (tempnode.Data = Pointer(-1)) then //it's a folder
-        if oldPaths.IndexOf(GetFolderPath(tempnode)) >= 0 then
-          tempnode.Expand(False);
-    end;
-  FreeAndNil(oldPaths);
-
-  fNode.Expand(False);
-  MainForm.ProjectView.Items.EndUpdate;
 end;
-{ end XXXKF changed }
 
 procedure TProject.UpdateFolders;
   procedure RunNode(Node: TTreeNode);
@@ -1823,7 +1819,7 @@ begin
   Inc(fOptions.VersionInfo.Build);
   fOptions.VersionInfo.FileVersion := Format('%d.%d.%d.%d', [fOptions.VersionInfo.Major, fOptions.VersionInfo.Minor,
     fOptions.VersionInfo.Release, fOptions.VersionInfo.Build]);
-  if (fOptions.VersionInfo.SyncProduct) then
+  if fOptions.VersionInfo.SyncProduct then
     fOptions.VersionInfo.ProductVersion := Format('%d.%d.%d.%d', [fOptions.VersionInfo.Major,
       fOptions.VersionInfo.Minor, fOptions.VersionInfo.Release, fOptions.VersionInfo.Build]);
   SetModified(True);

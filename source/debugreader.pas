@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit debugreader;
+unit DebugReader;
 
 interface
 
@@ -86,7 +86,7 @@ type
     fBacktrace: TList;
     fBreakpointList: TList;
     fWatchVarList: TList; // contains all parents
-    fDebugTree: TTreeView;
+    fDebugView: TTreeView;
     fIndex: integer;
     fBreakPointLine: integer;
     fBreakPointFile: AnsiString;
@@ -131,14 +131,14 @@ type
     function FindAnnotation(Annotation: TAnnotateType): boolean; // Finds the given annotation, returns false on EOF
     function GetNextAnnotation: TAnnotateType; // Returns the next annotation
     function GetLastAnnotation(const text: AnsiString; curpos, len: integer): TAnnotateType;
-      // Returns the last annotation in given string
+    // Returns the last annotation in given string
     function PeekNextAnnotation: TAnnotateType;
-      // Returns the next annotation, but does not modify current scanning positions
+    // Returns the next annotation, but does not modify current scanning positions
     function GetNextWord: AnsiString; // copies the next word, stops when it finds chars 0..32
     function GetNextLine: AnsiString;
-      // skips until enter sequence, skips ONE enter sequence, copies until next enter sequence
+    // skips until enter sequence, skips ONE enter sequence, copies until next enter sequence
     function GetNextFilledLine: AnsiString;
-      // skips until enter sequence, skips enter sequences, copies until next enter sequence
+    // skips until enter sequence, skips enter sequences, copies until next enter sequence
     function GetRemainingLine: AnsiString; // copies until enter sequence
     function GetAnnotation(const s: AnsiString): TAnnotateType; // converts string to TAnnotateType
   protected
@@ -150,7 +150,8 @@ type
     property PipeRead: THandle read fPipeRead write fPipeRead;
     property BreakPointList: TList read fBreakPointList write fBreakPointList;
     property WatchVarList: TList read fWatchVarList write fWatchVarList;
-    property DebugTree: TTreeView read fDebugTree write fDebugTree;
+    property DebugView: TTreeView read fDebugView write fDebugView;
+    property BreakPointFile : AnsiString read fBreakPointFile;
   end;
 
 implementation
@@ -168,6 +169,7 @@ var
 begin
   spawnedcpuform := false;
 
+  // GDB determined that the source code is more recent than the executable. Ask the user if he wants to rebuild.
   if doreceivedsfwarning then begin
     if MessageDlg(Lang[ID_MSG_SOURCEMORERECENT], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
       MainForm.Debugger.Stop;
@@ -176,11 +178,13 @@ begin
     end;
   end;
 
+  // The program to debug has stopped. Stop the debugger
   if doprocessexited then begin
     MainForm.Debugger.Stop;
     Exit;
   end;
 
+  // An evaluation variable has been processed. Forward the results
   if doevalready and Assigned(MainForm.Debugger.OnEvalReady) then
     MainForm.Debugger.OnEvalReady(fEvalValue);
 
@@ -188,6 +192,7 @@ begin
   fOutput := StringReplace(fOutput, #26, '->', [rfReplaceAll]);
   MainForm.DebugOutput.Lines.Add(fOutput);
 
+  // Some part of the CPU form has been updated
   if Assigned(CPUForm) and not doreceivedsignal then begin
     if doregistersready then
       CPUForm.OnRegistersReady;
@@ -499,9 +504,9 @@ begin
 
   // Process output parsed by ProcessEvalStruct
   S := WatchVar^.Name + ' = ' + ProcessEvalOutput;
-    // add placeholder name for variable name so we can format structs using one rule
+  // add placeholder name for variable name so we can format structs using one rule
 
-  // Add children based on indent
+// Add children based on indent
   sl := TStringList.Create;
   try
     sl.Text := S;
@@ -516,14 +521,14 @@ begin
         if ParentNode.Text = '' then // root node, replace text only
           ParentNode.Text := NodeText
         else
-          ParentNode := DebugTree.Items.AddChild(ParentNode, NodeText);
+          ParentNode := DebugView.Items.AddChild(ParentNode, NodeText);
       end else if StartsStr('}', NodeText) then begin // end of struct, change parent
         ParentNode := ParentNode.Parent;
       end else begin // next parent member/child
         if ParentNode.Text = '' then // root node, replace text only
           ParentNode.Text := NodeText
         else
-          DebugTree.Items.AddChild(ParentNode, NodeText);
+          DebugView.Items.AddChild(ParentNode, NodeText);
       end;
     end;
   finally
@@ -878,52 +883,55 @@ var
   NextAnnotation: TAnnotateType;
 begin
   // Only update once per update at most
-  DebugTree.Items.BeginUpdate;
+  DebugView.Items.BeginUpdate;
+  try
 
-  dobacktraceready := false;
-  dodisassemblerready := false;
-  doregistersready := false;
-  dorescanwatches := false;
-  doevalready := false;
-  doprocessexited := false;
-  doupdateexecution := false;
-  doreceivedsignal := false;
-  doupdatecpuwindow := false;
-  doreceivedsfwarning := false;
+    dobacktraceready := false;
+    dodisassemblerready := false;
+    doregistersready := false;
+    dorescanwatches := false;
+    doevalready := false;
+    doprocessexited := false;
+    doupdateexecution := false;
+    doreceivedsignal := false;
+    doupdatecpuwindow := false;
+    doreceivedsfwarning := false;
 
-  // Global checks
-  if Pos('warning: Source file is more recent than executable.', fOutput) > 0 then
-    doreceivedsfwarning := true;
+    // Global checks
+    if Pos('warning: Source file is more recent than executable.', fOutput) > 0 then
+      doreceivedsfwarning := true;
 
-  fIndex := 1;
-  repeat
-    NextAnnotation := GetNextAnnotation;
-    case NextAnnotation of
-      TValueHistoryValue:
-        HandleValueHistoryValue;
-      TSignal:
-        HandleSignal;
-      TExit:
-        HandleExit;
-      TFrameBegin:
-        HandleFrames;
-      TInfoAsm:
-        HandleDisassembly;
-      TInfoReg:
-        HandleRegisters;
-      TErrorBegin:
-        HandleError;
-      TDisplayBegin:
-        HandleDisplay;
-      TSource:
-        HandleSource
-          //else
+    fIndex := 1;
+    repeat
+      NextAnnotation := GetNextAnnotation;
+      case NextAnnotation of
+        TValueHistoryValue:
+          HandleValueHistoryValue;
+        TSignal:
+          HandleSignal;
+        TExit:
+          HandleExit;
+        TFrameBegin:
+          HandleFrames;
+        TInfoAsm:
+          HandleDisassembly;
+        TInfoReg:
+          HandleRegisters;
+        TErrorBegin:
+          HandleError;
+        TDisplayBegin:
+          HandleDisplay;
+        TSource:
+          HandleSource
+            //else
         //	break;
-    end;
-  until NextAnnotation = TEOF;
+      end;
+    until NextAnnotation = TEOF;
 
-  // Only update once per update at most
-  DebugTree.Items.EndUpdate;
+    // Only update once per update at most
+  finally
+    DebugView.Items.EndUpdate;
+  end;
 
   Synchronize(SyncFinishedParsing);
 end;

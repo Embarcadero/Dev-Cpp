@@ -42,6 +42,7 @@ type
     utresComp, // resource compiled (.res)
     utresSrc, // resource source (.rc)
     utPrj, // project file (.dev)
+    utMakefile, // makefile (.win)
     utOther // any others
     );
 
@@ -877,7 +878,7 @@ function GetFileTyp(const FileName: AnsiString): TExUnitType;
 var
   ext: AnsiString;
 begin
-  Ext := ExtractfileExt(FileName);
+  Ext := ExtractFileExt(FileName);
   if AnsiMatchText(Ext, ['.dev']) then
     result := utPrj
   else if AnsiMatchText(ext, ['.c']) then
@@ -1072,7 +1073,7 @@ begin
       if Assigned(MainForm.Project) then
         Result := ExpandFileTo(Result, MainForm.Project.Directory)
       else begin
-        e := MainForm.GetEditor;
+        e := MainForm.EditorList.GetEditor;
         if (Assigned(e)) and (Length(ExtractFileDir(e.FileName)) > 0) then
           Result := ExpandFileTo(Result, ExtractFileDir(e.FileName))
         else

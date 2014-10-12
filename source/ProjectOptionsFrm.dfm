@@ -1,6 +1,6 @@
 object ProjectOptionsFrm: TProjectOptionsFrm
-  Left = 277
-  Top = 609
+  Left = 820
+  Top = 561
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Project Options'
@@ -480,7 +480,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
         Width = 495
         Height = 23
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 1
         OnChange = cmbCompilerChange
       end
@@ -546,14 +546,14 @@ object ProjectOptionsFrm: TProjectOptionsFrm
         ScrollBars = ssBoth
         TabOrder = 2
       end
-      object AddLibBtn: TBitBtn
+      object btnAddLib: TBitBtn
         Left = 368
         Top = 272
         Width = 148
         Height = 30
         Caption = 'Add Library or Object'
         TabOrder = 3
-        OnClick = AddLibBtnClick
+        OnClick = btnAddLibClick
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
           18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -797,7 +797,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
       end
     end
     object tabOutputDir: TTabSheet
-      Caption = 'Build Options'
+      Caption = 'Output'
       object lblOverrideOutput: TLabel
         Left = 8
         Top = 234
@@ -1379,7 +1379,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
           Width = 209
           Height = 23
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 15
           Sorted = True
           TabOrder = 4
         end

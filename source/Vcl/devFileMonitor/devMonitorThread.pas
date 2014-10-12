@@ -52,7 +52,6 @@ type
     constructor Create(AOwner: TComponent; FileNames: TStringList);
     destructor Destroy; override;
     procedure Execute; override;
-    procedure TellToQuit;
   end;
 
 implementation
@@ -63,8 +62,7 @@ uses devFileMonitor;
 
 constructor TdevMonitorThread.Create(AOwner: TComponent; FileNames: TStringList);
 begin
-  inherited Create(True);
-  FreeOnTerminate := True;
+  inherited Create(False); // start immediately
   fOwner := AOwner;
   fFileNames := TStringList.Create;
   fFileNames.Assign(FileNames);
@@ -76,16 +74,19 @@ end;
 
 destructor TdevMonitorThread.Destroy;
 begin
+  // Ask the thread to stop (we're in another thread now)
+  fShouldQuit.SetEvent;
+  Terminate; // set Terminated flag
+
+  // Wait for it
+  WaitFor;
+
+  // Clear stuff
   DestroyMonitors;
   fFileProperties.Free;
   fFileNames.Free;
   fShouldQuit.Free;
   inherited;
-end;
-
-procedure TdevMonitorThread.TellToQuit;
-begin
-  fShouldQuit.SetEvent;
 end;
 
 procedure TdevMonitorThread.CreateMonitors;
