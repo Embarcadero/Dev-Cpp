@@ -27,8 +27,8 @@ uses
   StdCtrls, Buttons, ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-  QStdCtrls, QButtons, QExtCtrls;
+SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
+QStdCtrls, QButtons, QExtCtrls;
 {$ENDIF}
 
 type
@@ -43,45 +43,46 @@ type
 
 implementation
 
-uses 
+uses
   MultiLangSupport, devcfg, main;
 
 {$R *.dfm}
 
 procedure TRemoveUnitForm.FormCreate(Sender: TObject);
 begin
-	// Set interface font
-	Font.Name := devData.InterfaceFont;
-	Font.Size := devData.InterfaceFontSize;
+  // Set interface font
+  Font.Name := devData.InterfaceFont;
+  Font.Size := devData.InterfaceFontSize;
 
-	Caption := Lang[ID_RU];
-	DelBtn.Caption := Lang[ID_ITEM_DELETE];
+  Caption := Lang[ID_RU];
+  DelBtn.Caption := Lang[ID_ITEM_DELETE];
 end;
 
-procedure TRemoveUnitForm.FormClose(Sender: TObject;var Action: TCloseAction);
+procedure TRemoveUnitForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-	Action := caFree;
+  Action := caFree;
 end;
 
 procedure TRemoveUnitForm.UnitListKeyPress(Sender: TObject; var Key: Char);
 begin
-	if Key = Chr(VK_DELETE) then
-		DelBtnClick(nil);
+  if Key = Chr(VK_DELETE) then
+    DelBtnClick(nil);
 end;
 
 procedure TRemoveUnitForm.DelBtnClick(Sender: TObject);
 var
-	I : integer;
+  I: integer;
 begin
-	// Delete selection from project
-	for i := UnitList.Count - 1 downto 0 do
-		if UnitList.Selected[i] then
-			MainForm.Project.Remove(i,true);
+  // Delete selection from project
+  for i := UnitList.Count - 1 downto 0 do
+    if UnitList.Selected[i] then
+      MainForm.Project.RemoveEditor(i, true);
 
-	// Delete selection from list
-	for I := UnitList.Count - 1 downto 0 do
-		if UnitList.Selected[I] then
-			UnitList.Items.Delete(I);
+  // Delete selection from list
+  for I := UnitList.Count - 1 downto 0 do
+    if UnitList.Selected[I] then
+      UnitList.Items.Delete(I);
 end;
 
 end.
+

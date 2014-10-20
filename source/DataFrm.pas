@@ -39,7 +39,7 @@ type
   TMRUItem = record
     FileName: AnsiString;
     MenuItem: TMenuItem;
-    visible: boolean; // not all items in the list are shown
+    Visible: boolean; // not all items in the list are shown
   end;
 
   TdmMain = class(TDataModule)
@@ -285,9 +285,9 @@ begin
       Exit;
 
   newitem := new(PMRUItem);
-  newitem^.filename := s;
+  newitem^.FileName := s;
   newitem^.MenuItem := nil; // to be filled by RebuildMRU
-  newitem^.visible := false; // idem
+  newitem^.Visible := false; // idem
 
   if GetFileTyp(s) = utPrj then begin
     fMRU.Insert(0, newitem); // insert first
@@ -379,9 +379,9 @@ begin
     // Create struct list
     for I := 0 to sl.Count - 1 do begin
       newitem := new(PMRUItem);
-      newitem^.filename := sl.ValueFromIndex[i];
+      newitem^.FileName := sl.ValueFromIndex[i];
       newitem^.MenuItem := nil; // to be filled by RebuildMRU
-      newitem^.visible := false;
+      newitem^.Visible := false;
       fMRU.Add(newitem);
     end;
   finally
@@ -441,7 +441,7 @@ begin
 
       // Hand a pointer to the MRU item, so it can remove it itself
       PMRUItem(fMRU[I])^.MenuItem := Item;
-      PMRUItem(fMRU[I])^.visible := true;
+      PMRUItem(fMRU[I])^.Visible := true;
 
       // Keep count...
       Inc(AllCount);
@@ -465,7 +465,7 @@ begin
 
         // Hand a pointer to the MRU item, so it can remove it itself
         PMRUItem(fMRU[I])^.MenuItem := Item;
-        PMRUItem(fMRU[I])^.visible := true;
+        PMRUItem(fMRU[I])^.Visible := true;
 
         // Keep count...
         Inc(AllCount);

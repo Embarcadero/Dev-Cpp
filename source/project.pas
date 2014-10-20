@@ -103,7 +103,7 @@ type
     function GetExecutableName: AnsiString;
     procedure SetFileName(const value: AnsiString);
     function GetModified: boolean;
-    function GetMakeFileName : AnsiString;
+    function GetMakeFileName: AnsiString;
     procedure SetModified(value: boolean);
     procedure SortUnitsByPriority;
   public
@@ -116,7 +116,7 @@ type
     property Units: TUnitList read fUnits write fUnits;
     property INIFile: TMemIniFile read fINIFile write fINIFile;
     property Modified: boolean read GetModified write SetModified;
-    property MakeFileName : AnsiString read GetMakeFileName;
+    property MakeFileName: AnsiString read GetMakeFileName;
     constructor Create(const nFileName, nName: AnsiString);
     destructor Destroy; override;
     function NewUnit(NewProject: boolean; ParentNode: TTreeNode; const CustomFileName: AnsiString = ''): integer;
@@ -140,7 +140,8 @@ type
     function SaveUnits: Boolean;
     procedure Open;
     function FileAlreadyExists(const s: AnsiString): boolean;
-    function Remove(index: integer; DoClose: boolean): boolean;
+    function RemoveFolder(Node: TTreeNode): boolean;
+    function RemoveEditor(index: integer; DoClose: boolean): boolean;
     function GetUnitFromString(const s: AnsiString): integer;
     procedure RebuildNodes;
     function ListUnitStr(Separator: char): AnsiString;
@@ -314,7 +315,7 @@ begin
   end;
 end;
 
-function TProject.GetMakeFileName : AnsiString;
+function TProject.GetMakeFileName: AnsiString;
 begin
   if fOptions.UseCustomMakefile then
     Result := fOptions.CustomMakefile
@@ -1208,9 +1209,50 @@ begin
   SetModified(false);
 end;
 
-function TProject.Remove(index: integer; DoClose: boolean): boolean;
+function TProject.RemoveFolder(Node: TTreeNode): boolean;
+  procedure RemoveFolderRecurse(Node: TTreeNode);
+  var
+    I, EditorIndex: integer;
+    ChildNode: TTreeNode;
+  begin
+    // Recursively remove folders
+    for I := 0 to Node.Count - 1 do begin
+      ChildNode := Node.Item[i];
+
+      // Remove folder inside folder
+      if (ChildNode.Data = Pointer(-1)) and (ChildNode.Level > 0) then
+        RemoveFolderRecurse(ChildNode)
+
+        // Or remove editors at this level
+      else if (ChildNode.Data <> Pointer(-1)) and (ChildNode.Level > 0) then begin
+
+        // Remove editor in folder from project
+        EditorIndex := integer(ChildNode.Data);
+        if not RemoveEditor(EditorIndex, true) then
+          Exit;
+      end;
+    end;
+
+    Node.Delete;
+  end;
 begin
-  result := false;
+  Result := False;
+
+  // Sanity check
+  if not Assigned(Node) then
+    Exit;
+
+  // Check if this is actually a folder
+  if (Node.Data <> Pointer(-1)) or (Node.Level < 1) then
+    Exit;
+
+  // Let this function call itself
+  RemoveFolderRecurse(Node);
+end;
+
+function TProject.RemoveEditor(index: integer; DoClose: boolean): boolean;
+begin
+  result := False;
 
   // Attempt to close it
   if DoClose and Assigned(fUnits.GetItem(index).fEditor) then

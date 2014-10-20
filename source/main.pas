@@ -337,7 +337,7 @@ type
     Closeallexceptthis1: TMenuItem;
     CloseAll2: TMenuItem;
     actStepLine: TAction;
-    DebugVarsPopup: TPopupMenu;
+    DebugPopup: TPopupMenu;
     AddwatchPop: TMenuItem;
     RemoveWatchPop: TMenuItem;
     FileMonitor: TdevFileMonitor;
@@ -719,7 +719,7 @@ type
     procedure CompilerOutputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FindOutputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure DebugViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure DebugVarsPopupPopup(Sender: TObject);
+    procedure DebugPopupPopup(Sender: TObject);
     procedure FloatingReportwindowItemClick(Sender: TObject);
     procedure actAttachProcessUpdate(Sender: TObject);
     procedure actAttachProcessExecute(Sender: TObject);
@@ -904,9 +904,12 @@ begin
     devImageThemes.ActivateTheme(devData.Theme);
 
     with devImageThemes do begin
+      // Misc items images
       ActionList.Images := CurrentTheme.MenuImages;
       MainMenu.Images := CurrentTheme.MenuImages;
       MessageControl.Images := CurrentTheme.MenuImages;
+
+      // Set toolbar images
       tbMain.Images := CurrentTheme.MenuImages;
       tbCompile.Images := CurrentTheme.MenuImages;
       tbProject.Images := CurrentTheme.MenuImages;
@@ -915,11 +918,18 @@ begin
       tbSearch.Images := CurrentTheme.MenuImages;
       tbSpecials.Images := CurrentTheme.MenuImages;
       tbCompilers.Images := CurrentTheme.MenuImages;
+
+      // Set left control images
       ProjectView.Images := CurrentTheme.ProjectImages;
       ClassBrowser.Images := CurrentTheme.BrowserImages;
+      DebugView.Images := CurrentTheme.MenuImages;
+
+      // Set left control and editor popup images
       ProjectPopup.Images := CurrentTheme.MenuImages;
       UnitPopup.Images := CurrentTheme.MenuImages;
       FolderPopup.Images := CurrentTheme.MenuImages;
+      BrowserPopup.Images := CurrentTheme.MenuImages;
+      DebugPopup.Images := CurrentTheme.MenuImages;
       EditorPopup.Images := CurrentTheme.MenuImages;
     end;
   end;
@@ -1438,11 +1448,14 @@ procedure TMainForm.MRUClick(Sender: TObject);
 var
   s: AnsiString;
 begin
-  s := PMRUItem(dmMain.MRU[TMenuItem(Sender).Tag])^.filename;
-  if GetFileTyp(s) = utPrj then
-    OpenProject(s)
-  else
-    OpenFile(s);
+  s := PMRUItem(dmMain.MRU[TMenuItem(Sender).Tag])^.FileName;
+  if FileExists(s) then begin
+    if GetFileTyp(s) = utPrj then
+      OpenProject(s)
+    else
+      OpenFile(s);
+  end else
+    MessageDlg(Format(Lang[ID_ERR_RENAMEDDELETED], [s]), mtInformation, [mbOK], 0);
 end;
 
 procedure TMainForm.CodeInsClick(Sender: TObject);
@@ -2412,7 +2425,7 @@ begin
 
       idx := integer(node.Data);
 
-      if not fProject.Remove(idx, true) then
+      if not fProject.RemoveEditor(idx, true) then
         exit;
     end;
   end;
@@ -2456,7 +2469,7 @@ begin
         // Remove it from the current project...
         projindex := fProject.Units.IndexOf(NewName);
         if projindex <> -1 then
-          fProject.Remove(projindex, false);
+          fProject.RemoveEditor(projindex, false);
 
         // All references to the file are removed. Delete the file from disk
         DeleteFile(NewName);
@@ -4618,29 +4631,22 @@ begin
 end;
 
 procedure TMainForm.actProjectRemoveFolderExecute(Sender: TObject);
-var
-  idx: integer;
-  node: TTreeNode;
 begin
-  if not assigned(fProject) then
+  // Useless check...
+  if not Assigned(fProject) then
     exit;
+
+  // Check if the current item is a folder
   if Assigned(ProjectView.Selected) and (ProjectView.Selected.Data = Pointer(-1)) then
+
+    // Ask if we want to remove...
     if MessageDlg(Lang[ID_MSG_REMOVEBROWSERFOLDER], mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
       ProjectView.Items.BeginUpdate;
-      while ProjectView.Selected.Count > 0 do begin
-        node := ProjectView.Selected.Item[0];
-        if not assigned(node) then
-          Continue;
-        if (node.Data = Pointer(-1)) or (node.Level < 1) then
-          Continue;
-        idx := integer(node.Data);
-        if not fProject.Remove(idx, true) then
-          exit;
+      try
+        fProject.RemoveFolder(ProjectView.Selected);
+      finally
+        ProjectView.Items.EndUpdate;
       end;
-      ProjectView.TopItem.AlphaSort(False);
-      ProjectView.Selected.Delete;
-      ProjectView.Items.EndUpdate;
-      fProject.UpdateFolders;
     end;
 end;
 
@@ -4990,7 +4996,7 @@ begin
     if Node.Data = Pointer(-1) then
       actProjectRemoveFolderExecute(nil)
     else
-      fProject.Remove(integer(Node.Data), true);
+      fProject.RemoveEditor(integer(Node.Data), true);
   end;
 end;
 
@@ -5428,7 +5434,7 @@ begin
       actRemoveWatchExecute(sender);
 end;
 
-procedure TMainForm.DebugVarsPopupPopup(Sender: TObject);
+procedure TMainForm.DebugPopupPopup(Sender: TObject);
 begin
   RemoveWatchPop.Enabled := Assigned(DebugView.Selected);
 end;

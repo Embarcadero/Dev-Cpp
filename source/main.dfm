@@ -960,7 +960,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 394
+        Height = 393
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -995,7 +995,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 394
+        Height = 393
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
@@ -1030,7 +1030,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 394
+        Height = 393
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1039,7 +1039,7 @@ object MainForm: TMainForm
         Images = dmMain.MenuImages_NewLook
         Indent = 19
         MultiSelectStyle = []
-        PopupMenu = DebugVarsPopup
+        PopupMenu = DebugPopup
         ReadOnly = True
         RightClickSelect = True
         TabOrder = 0
@@ -1748,6 +1748,7 @@ object MainForm: TMainForm
     end
   end
   object UnitPopup: TPopupMenu
+    Images = dmMain.MenuImages_NewLook
     Left = 11
     Top = 135
     object RemoveFilefromprojectPopItem: TMenuItem
@@ -1777,6 +1778,7 @@ object MainForm: TMainForm
     end
   end
   object ProjectPopup: TPopupMenu
+    Images = dmMain.MenuImages_NewLook
     Left = 11
     Top = 104
     object NewunitinprojectPopItem: TMenuItem
@@ -2410,6 +2412,7 @@ object MainForm: TMainForm
     object actBrowserNewClass: TAction
       Category = 'ClassBrowser'
       Caption = 'New class'
+      ImageIndex = 51
       OnExecute = actBrowserNewClassExecute
       OnUpdate = actBrowserNewClassUpdate
     end
@@ -2846,6 +2849,7 @@ object MainForm: TMainForm
     Top = 280
   end
   object BrowserPopup: TPopupMenu
+    Images = dmMain.MenuImages_NewLook
     Left = 56
     Top = 100
     object mnuBrowserGotoDecl: TMenuItem
@@ -2908,8 +2912,9 @@ object MainForm: TMainForm
       end
     end
   end
-  object DebugVarsPopup: TPopupMenu
-    OnPopup = DebugVarsPopupPopup
+  object DebugPopup: TPopupMenu
+    Images = dmMain.MenuImages_NewLook
+    OnPopup = DebugPopupPopup
     Left = 104
     Top = 100
     object AddwatchPop: TMenuItem
@@ -2943,6 +2948,7 @@ object MainForm: TMainForm
     Top = 166
   end
   object FolderPopup: TPopupMenu
+    Images = dmMain.MenuImages_NewLook
     Left = 12
     Top = 168
     object Addfolder2: TMenuItem
