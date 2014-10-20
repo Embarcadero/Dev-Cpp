@@ -12,7 +12,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = False
-  Position = poOwnerFormCenter
+  Position = poMainFormCenter
   OnClose = FormClose
   OnShow = FormShow
   PixelsPerInch = 96

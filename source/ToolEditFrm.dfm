@@ -13,7 +13,7 @@ object ToolEditForm: TToolEditForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
-  Position = poScreenCenter
+  Position = poMainFormCenter
   OnCreate = FormCreate
   DesignSize = (
     484

@@ -16,7 +16,7 @@ object FindForm: TFindForm
   KeyPreview = True
   OldCreateOrder = False
   PopupMenu = FindPopup
-  Position = poScreenCenter
+  Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy

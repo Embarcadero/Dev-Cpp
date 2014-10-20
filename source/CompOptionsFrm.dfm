@@ -13,7 +13,7 @@ object CompOptForm: TCompOptForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = True
-  Position = poOwnerFormCenter
+  Position = poMainFormCenter
   ShowHint = True
   OnClose = FormClose
   OnCreate = FormCreate

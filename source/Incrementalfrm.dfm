@@ -18,6 +18,7 @@ object IncrementalForm: TIncrementalForm
   KeyPreview = True
   OldCreateOrder = False
   PopupMenu = IncrementalPop
+  Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown

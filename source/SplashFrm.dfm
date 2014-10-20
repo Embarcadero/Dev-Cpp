@@ -13,7 +13,7 @@ object SplashForm: TSplashForm
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = True
-  Position = poScreenCenter
+  Position = poMainFormCenter
   Scaled = False
   OnClose = FormClose
   OnCreate = FormCreate

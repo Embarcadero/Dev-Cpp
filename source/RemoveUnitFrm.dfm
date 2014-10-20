@@ -12,6 +12,7 @@ object RemoveUnitForm: TRemoveUnitForm
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = True
+  Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   DesignSize = (

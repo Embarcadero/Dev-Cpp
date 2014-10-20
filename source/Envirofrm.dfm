@@ -12,7 +12,7 @@ object EnviroForm: TEnviroForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
-  Position = poOwnerFormCenter
+  Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   DesignSize = (

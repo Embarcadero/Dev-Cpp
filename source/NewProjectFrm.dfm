@@ -13,7 +13,7 @@ object NewProjectForm: TNewProjectForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
-  Position = poOwnerFormCenter
+  Position = poMainFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (

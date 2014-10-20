@@ -13,7 +13,7 @@ object IconForm: TIconForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = True
-  Position = poOwnerFormCenter
+  Position = poMainFormCenter
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy

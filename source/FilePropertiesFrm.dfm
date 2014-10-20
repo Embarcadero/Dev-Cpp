@@ -13,7 +13,7 @@ object FilePropertiesForm: TFilePropertiesForm
   Font.Style = []
   OldCreateOrder = False
   PopupMenu = PropertiesPop
-  Position = poScreenCenter
+  Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
