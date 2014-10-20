@@ -1216,7 +1216,7 @@ function TProject.RemoveFolder(Node: TTreeNode): boolean;
     ChildNode: TTreeNode;
   begin
     // Recursively remove folders
-    for I := 0 to Node.Count - 1 do begin
+    for I := Node.Count - 1 downto 0 do begin
       ChildNode := Node.Item[i];
 
       // Remove folder inside folder
@@ -1248,6 +1248,9 @@ begin
 
   // Let this function call itself
   RemoveFolderRecurse(Node);
+
+  // Update list of folders (sets modified)
+  UpdateFolders;
 end;
 
 function TProject.RemoveEditor(index: integer; DoClose: boolean): boolean;
