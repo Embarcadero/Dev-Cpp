@@ -1,3 +1,12 @@
+Version 5.8.0 - 21 Oktober 2014
+
+- Added support for two file views next to each other.
+- All windows are now opened at the centre of the main window instead of at random places across random monitors.
+- Slightly improved performance of the function tooltip.
+- Fixed a bug in makefile creation of C DLL's that prevented compilation.
+- When compiling, header files are now treated separately from other files.
+- Removed CVS support. CVS is considered deprecated, we recommend using explorer based code managers for alternatives like Git or SVN.
+
 Version 5.7.1 - 29 Juli 2014
 
 - Resolved errors in compile log when using Syntax Check on non-project compilations.

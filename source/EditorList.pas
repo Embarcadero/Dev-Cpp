@@ -53,6 +53,7 @@ type
     function GetEditor(PageIndex: integer = -1; PageControl: TPageControl = nil): TEditor;
     function GetEditorFromFileName(const FileName: AnsiString): TEditor;
     function GetEditorFromTag(tag: integer): TEditor;
+    function GetPreviousEditor(Editor: TEditor): TEditor;
     function CloseEditor(Editor: TEditor): Boolean;
     function CloseAll: boolean;
     function CloseAllButThis: boolean;
@@ -200,9 +201,66 @@ begin
   Result := TEditor(TabSheet.Tag);
 end;
 
+function TEditorList.GetPreviousEditor(Editor: TEditor): TEditor;
+var
+  I: integer;
+  EditorPageControl: TPageControl;
+  e: TEditor;
+begin
+  result := nil;
+  if not Assigned(Editor) then
+    Exit;
+
+  // Determine what to view next
+  EditorPageControl := Editor.PageControl;
+  with EditorPageControl do begin
+
+    // If we are closing the active tab, open the tab that was opened when this tab was created
+    if ActivePage = Editor.TabSheet then begin // this is the current page...
+
+      // Find the first tab in the history list that is still open
+      if Editor.PreviousEditors.Count > 0 then begin
+        for I := Editor.PreviousEditors.Count - 1 downto 0 do begin
+          e := GetEditorFromTag(integer(Editor.PreviousEditors[i]));
+          if Assigned(e) then begin
+            Result := e;
+            Exit;
+          end;
+        end;
+      end;
+
+      // All history items are gone or this was the first tab to open which has no history
+      // Select the editor that would appear naturally when closing this one
+      if EditorPageControl.PageCount > 1 then begin // we need more than only our own tab sheet
+        if ActivePageIndex = EditorPageControl.PageCount-1 then // we are the last editor, next one will be second to last editor
+          Result := GetEditor(ActivePageIndex-1,EditorPageControl)
+        else // otherwise, select the next one
+          Result := GetEditor(ActivePageIndex+1,EditorPageControl);
+        Exit;
+      end;
+
+      // Otherwise, select the current editor in the other page control
+      if fLayout = lstBoth then begin
+        if EditorPageControl = LeftPageControl then begin
+          Result := GetEditor(-1, RightPageControl);
+          Exit;
+        end else begin
+          Result := GetEditor(-1, LeftPageControl);
+          Exit;
+        end;
+      end;
+
+      // If we are not closing the active tab, don't change focus
+    end else begin
+      Result := GetEditor(-1, EditorPageControl);
+    end;
+  end;
+end;
+
 function TEditorList.CloseEditor(Editor: TEditor): Boolean;
 var
   projindex: integer;
+  PrevEditor: TEditor;
 begin
   Result := False;
   if not Assigned(Editor) then
@@ -221,7 +279,10 @@ begin
       end;
     end;
 
-    // Using this thing, because WM_SETREDRAW doesn't work
+    // Select editor to open when this one closes
+    PrevEditor := GetPreviousEditor(Editor);
+
+    // Using this thing, because WM_SETREDRAW doesn't work :(
     LockWindowUpdate(Editor.PageControl.Handle);
     try
       // We're allowed to close...
@@ -234,6 +295,10 @@ begin
         dmMain.AddtoHistory(Editor.FileName);
         FreeAndNil(Editor);
       end;
+
+      // Show new editor
+      if Assigned(PrevEditor) then
+        PrevEditor.Activate;
     finally
       LockWindowUpdate(0);
     end;

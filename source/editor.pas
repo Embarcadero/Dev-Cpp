@@ -339,16 +339,14 @@ begin
 end;
 
 destructor TEditor.Destroy;
-var
-  I: integer;
-  CurPage: TTabSheet;
-  CurPageControl: TPageControl;
-  e: TEditor;
 begin
   MainForm.EditorList.BeginUpdate;
   try
     // Deactivate the file change monitor
     MainForm.FileMonitor.UnMonitor(fFileName);
+
+    // Delete breakpoints in this editor
+    MainForm.Debugger.DeleteBreakPointsOf(self);
 
     // Destroy any completion stuff
     DestroyCompletion;
@@ -356,37 +354,7 @@ begin
     // Free everything
     fFunctionTip.Free;
     fText.Free;
-
-    // Delete breakpoints in this editor
-    MainForm.Debugger.DeleteBreakPointsOf(self);
-
-    // Open up the previously openend tab, not the first one...
-    CurPageControl := fTabSheet.PageControl;
-    with CurPageControl do begin
-      if ActivePage = fTabSheet then begin // this is the current page...
-        fTabSheet.Free; // remove old
-
-        // Find the first tab in the history list that is still open
-        if fPreviousEditors.Count > 0 then begin
-          for I := fPreviousEditors.Count - 1 downto 0 do begin
-            e := MainForm.EditorList.GetEditorFromTag(integer(fPreviousEditors[i]));
-            if Assigned(e) then begin
-              e.Activate;
-              Break;
-            end;
-          end;
-        end else if CurPageControl.PageCount > 0 then begin
-          // No previous editors? Activate editor to the left
-          ActivePageIndex := max(0, ActivePageIndex - 1);
-          OnChange(CurPageControl);
-        end;
-      end else begin // we are not the active page
-        CurPage := ActivePage; // remember active page index
-        fTabSheet.Free; // remove old
-        ActivePage := CurPage;
-      end;
-      // Current edito list went empty -> goto other one
-    end;
+    fTabSheet.Free;
     fPreviousEditors.Free;
   finally
     MainForm.EditorList.EndUpdate;
