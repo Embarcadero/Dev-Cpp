@@ -219,23 +219,22 @@ begin
     if ActivePage = Editor.TabSheet then begin // this is the current page...
 
       // Find the first tab in the history list that is still open
-      if Editor.PreviousEditors.Count > 0 then begin
-        for I := Editor.PreviousEditors.Count - 1 downto 0 do begin
-          e := GetEditorFromTag(integer(Editor.PreviousEditors[i]));
-          if Assigned(e) then begin
-            Result := e;
-            Exit;
-          end;
+      for I := Editor.PreviousEditors.Count - 1 downto 0 do begin
+        e := GetEditorFromTag(integer(Editor.PreviousEditors[i]));
+        if Assigned(e) then begin
+          Result := e;
+          Exit;
         end;
       end;
 
       // All history items are gone or this was the first tab to open which has no history
       // Select the editor that would appear naturally when closing this one
       if EditorPageControl.PageCount > 1 then begin // we need more than only our own tab sheet
-        if ActivePageIndex = EditorPageControl.PageCount-1 then // we are the last editor, next one will be second to last editor
-          Result := GetEditor(ActivePageIndex-1,EditorPageControl)
+        if ActivePageIndex = EditorPageControl.PageCount - 1 then
+          // we are the last editor, next one will be second to last editor
+          Result := GetEditor(ActivePageIndex - 1, EditorPageControl)
         else // otherwise, select the next one
-          Result := GetEditor(ActivePageIndex+1,EditorPageControl);
+          Result := GetEditor(ActivePageIndex + 1, EditorPageControl);
         Exit;
       end;
 

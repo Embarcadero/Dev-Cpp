@@ -6,6 +6,7 @@ Version 5.8.0 - 21 Oktober 2014
 - Fixed a bug in makefile creation of C DLL's that prevented compilation.
 - When compiling, header files are now treated separately from other files.
 - Removed CVS support. CVS is considered deprecated, we recommend using explorer based code managers for alternatives like Git or SVN.
+- Fixed a crash in the file change monitor code.
 
 Version 5.7.1 - 29 Juli 2014
 

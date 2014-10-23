@@ -648,7 +648,7 @@ begin
       TerminateProcess(pi.hProcess, 1);
       Break;
     end;
-    if (not ReadFile(hOutputRead, aBuf, SizeOf(aBuf), nRead, nil)) or (nRead = 0) then begin
+    if (not ReadFile(hOutputRead, aBuf, SizeOf(aBuf)-1, nRead, nil)) or (nRead = 0) then begin
       if GetLastError = ERROR_BROKEN_PIPE then
         Break; // pipe done - normal exit path
     end;

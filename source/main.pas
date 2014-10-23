@@ -4054,8 +4054,8 @@ end;
 
 procedure TMainForm.actConfigdevShortcutsExecute(Sender: TObject);
 begin
-  //	if(devShortcuts.FileName[2] <> ':') then // if relative
-  //		devShortcuts.FileName := devdirs.Exec + devShortcuts.FileName;
+  //if(devShortcuts.FileName[2] <> ':') then // if relative
+  //  devShortcuts.FileName := devdirs.Exec + devShortcuts.FileName;
   Shortcuts.Edit(
     Lang[ID_SC_CAPTION],
     Lang[ID_SC_HDRENTRY],

@@ -229,7 +229,6 @@ type
     property ShowInheritedMembers: boolean read fShowInheritedMembers write fShowInheritedMembers;
   end;
 
-
   TdevExternalPrograms = class(TPersistent)
   private
     fDummy: boolean;
@@ -1034,7 +1033,7 @@ begin
     fFolder := folder;
 
   // Set properties, assume bin\gcc.exe exists (it is our helper)
-  SetProperties(fFolder + pd + 'bin', 'gcc.exe');
+  SetProperties(fFolder + pd + 'bin', GCC_PROGRAM);
 
   // Depending on properties, set default exes
   SetExecutables;
@@ -2005,8 +2004,9 @@ var
 begin
   // Assume 64bit compilers are put in the MinGW64 folder
   if DirectoryExists(devDirs.Exec + 'MinGW64' + pd) then begin
-    if FileExists(devDirs.Exec + 'MinGW64' + pd + 'bin' + pd + GCC_PROGRAM) then
-      begin // we only require GCC.exe to be present
+
+    // we only require GCC.exe to be present
+    if FileExists(devDirs.Exec + 'MinGW64' + pd + 'bin' + pd + GCC_PROGRAM) then begin
 
       // Default, release profile
       BaseSet := AddSet(devDirs.Exec + 'MinGW64');
