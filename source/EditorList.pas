@@ -44,6 +44,7 @@ type
     function GetForEachEditor(index: integer): TEditor;
     function GetPageCount: integer;
     function GetFocusedPageControl: TPageControl;
+    function GetNewEditorPageControl: TPageControl;
     procedure ShowLayout(Layout: TLayoutShowType);
     procedure Update; // reconfigures layout
   public
@@ -85,13 +86,29 @@ begin
 end;
 
 function TEditorList.GetFocusedPageControl: TPageControl;
+var
+  ActivePage: TTabSheet;
 begin
-  if Assigned(fLeftPageControl.ActivePage) and TEditor(fLeftPageControl.ActivePage.Tag).Text.Focused then
-    Result := fLeftPageControl
-  else if Assigned(fRightPageControl.ActivePage) and TEditor(fRightPageControl.ActivePage.Tag).Text.Focused then
-    Result := fRightPageControl
+  case fLayout of
+    lstLeft: begin
+        Result := fLeftPageControl
+      end;
+    lstRight: begin
+        Result := fLeftPageControl
+      end;
+    lstBoth: begin
+        ActivePage := fLeftPageControl.ActivePage;
+        if TEditor(ActivePage.Tag).Text.Focused then
+          Result := fLeftPageControl
+        else
+          Result := fRightPageControl;
+      end;
+    lstNone: begin
+        Result := nil;
+      end;
   else
-    Result := fLeftPageControl; // default one
+    Result := nil;
+  end;
 end;
 
 procedure TEditorList.BeginUpdate;
@@ -124,6 +141,26 @@ begin
   Result := nil;
 end;
 
+function TEditorList.GetNewEditorPageControl;
+begin
+  case fLayout of
+    lstNone: begin
+        Result := fLeftPageControl; // first editor should be shown in the leftmost control
+      end;
+    lstLeft: begin
+        Result := fLeftPageControl;
+      end;
+    lstRight: begin
+        Result := fRightPageControl;
+      end;
+    lstBoth: begin
+        Result := GetFocusedPageControl; // depends on the current keyboard focus
+      end;
+  else
+    Result := nil;
+  end;
+end;
+
 function TEditorList.NewEditor(const Filename: AnsiString; InProject, NewFile: boolean; PageControl: TPageControl =
   nil):
   TEditor;
@@ -133,7 +170,7 @@ begin
   BeginUpdate;
   try
     if PageControl = nil then
-      ParentPageControl := GetFocusedPageControl
+      ParentPageControl := GetNewEditorPageControl
     else
       ParentPageControl := PageControl;
     Result := TEditor.Create(FileName, InProject, NewFile, ParentPageControl);

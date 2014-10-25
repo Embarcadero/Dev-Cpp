@@ -3712,7 +3712,7 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  actSaveAs.Enabled := assigned(e);
+  actSaveAs.Enabled := Assigned(e);
 end;
 
 procedure TMainForm.ClearCompileMessages;
