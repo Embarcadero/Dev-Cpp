@@ -1,3 +1,8 @@
+Version 5.8.1 -
+
+- Fixed an overflow error in TCppParser.CheckForStructs that caused errors when opening/saving files.
+- Attempt to fix a crash in TEditorList.GetFocusedPageControl that fixes random crashes.
+
 Version 5.8.0 - 21 Oktober 2014
 
 - Added support for two file views next to each other.
