@@ -854,10 +854,9 @@ end;
 
 procedure TEditor.UpdateCaption(const NewCaption: AnsiString);
 begin
-  if Assigned(fTabSheet) then begin // TODO: not needed?
+  if Assigned(fTabSheet) then begin
     if NewCaption <> fTabSheet.Caption then begin
       fTabSheet.Caption := NewCaption;
-      MainForm.UpdateAppTitle;
     end;
   end;
 end;
@@ -1751,7 +1750,7 @@ begin
       FilterIndex := 4; // .h
       DefaultExt := 'h';
     end else begin
-      if Assigned(MainForm.Project) then begin
+      if Assigned(MainForm.Project) and fInProject then begin
         if MainForm.Project.Options.useGPP then begin
           FilterIndex := 3; // .cpp
           DefaultExt := 'cpp';

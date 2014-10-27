@@ -32,7 +32,7 @@ devrun, version, project, utils, prjtypes, Classes, QGraphics;
 {$ENDIF}
 
 type
-  TLayoutShowType = (lstLeft, lstRight, lstBoth, lstNone);
+  TLayoutShowType = (lstNone, lstLeft, lstRight, lstBoth);
   TEditorList = class
   private
     fLayout: TLayoutShowType;
@@ -40,7 +40,7 @@ type
     fRightPageControl: TPageControl;
     fSplitter: TSplitter;
     fUpdateCount: integer;
-    fPanel: TPanel;
+    fPanel: TPanel; // ui component that is the base layer for all page controls
     function GetForEachEditor(index: integer): TEditor;
     function GetPageCount: integer;
     function GetFocusedPageControl: TPageControl;
@@ -94,14 +94,20 @@ begin
         Result := fLeftPageControl
       end;
     lstRight: begin
-        Result := fLeftPageControl
+        Result := fRightPageControl
       end;
     lstBoth: begin
+        // Check if left is focused, otherwise assume right one is focused
         ActivePage := fLeftPageControl.ActivePage;
-        if TEditor(ActivePage.Tag).Text.Focused then
-          Result := fLeftPageControl
-        else
-          Result := fRightPageControl;
+        if Assigned(ActivePage) then begin
+          if TEditor(ActivePage.Tag).Text.Focused then
+            Result := fLeftPageControl
+          else
+            Result := fRightPageControl;
+
+          // If ActivePage is not assigned, this means that this function is called during layout changes
+        end else
+          Result := nil;
       end;
     lstNone: begin
         Result := nil;
@@ -332,7 +338,7 @@ begin
         FreeAndNil(Editor);
       end;
 
-      // Show new editor
+      // AFTER changing layout, show new editor
       if Assigned(PrevEditor) then
         PrevEditor.Activate;
     finally
@@ -487,9 +493,6 @@ begin
 
     // Switch to previous editor in the other one
     FromPageControl.ActivePageIndex := max(0, FromPageControlIndex - 1);
-
-    // Notify component of changes
-    Editor.Activate;
   finally
     EndUpdate;
   end;
@@ -508,9 +511,14 @@ begin
 end;
 
 procedure TEditorList.ShowLayout(Layout: TLayoutShowType);
+var
+  ManualNotifyChange: boolean;
 begin
   if Layout = fLayout then
     Exit;
+
+  // When no editor is left, perform a fake OnChange notify
+  ManualNotifyChange := False;
 
   // Apply widths if layout does not change
   case Layout of
@@ -561,11 +569,16 @@ begin
         fSplitter.Visible := False;
         fSplitter.Width := 0;
 
-        // Normally, change events are trigger by editor focus, but since there's no one left, fake it
-        fRightPageControl.OnChange(fRightPageControl);
+        // No editors are listening to change anymore. Fake it
+        ManualNotifyChange := True;
       end;
   end;
   fLayout := Layout;
+
+  // Normally, change events are trigger by editor focus, but since there's no one left, fake it
+  // Notify of change AFTER we change the official layout
+  if ManualNotifyChange then
+    fLeftPageControl.OnChange(fLeftPageControl);
 end;
 
 procedure TEditorList.SelectNextPage;
@@ -588,14 +601,18 @@ end;
 
 procedure TEditorList.GetVisibleEditors(var Left: TEditor; var Right: TEditor);
 begin
-  Left := nil;
-  Right := nil;
   case fLayout of
+    lstNone: begin
+        Left := nil;
+        Right := nil;
+      end;
     lstLeft: begin
         Left := GetEditor(-1, fLeftPageControl);
+        Right := nil;
       end;
     lstRight: begin
-        Right := GetEditor(-1, fLeftPageControl);
+        Left := nil;
+        Right := GetEditor(-1, fRightPageControl);
       end;
     lstBoth: begin
         Left := GetEditor(-1, fLeftPageControl);

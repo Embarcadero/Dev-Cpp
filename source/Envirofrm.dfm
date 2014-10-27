@@ -184,9 +184,9 @@ object EnviroForm: TEnviroForm
         Top = 272
         Width = 215
         Height = 109
-        Caption = '   Auto Open  '
+        Caption = 'Auto Open'
         Items.Strings = (
-          'Al project files'
+          'All project files'
           'Only first project file'
           'Opened files at previous closing'
           'None')
@@ -197,7 +197,7 @@ object EnviroForm: TEnviroForm
         Top = 240
         Width = 215
         Height = 53
-        Caption = '  Debug Variable Browser  '
+        Caption = 'Debug Variable Browser'
         TabOrder = 8
         object cbWatchHint: TCheckBox
           Left = 14

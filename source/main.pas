@@ -638,18 +638,18 @@ type
     procedure CodeCompletionResize(Sender: TObject);
     procedure actSwapHeaderSourceExecute(Sender: TObject);
     procedure actSyntaxCheckExecute(Sender: TObject);
-    procedure EditorPageControlLeftChange(Sender: TObject);
+    procedure EditorPageControlChange(Sender: TObject);
     procedure actConfigdevShortcutsExecute(Sender: TObject);
     procedure DateTimeMenuItemClick(Sender: TObject);
     procedure CommentheaderMenuItemClick(Sender: TObject);
-    procedure EditorPageControlLeftMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure EditorPageControlMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure actNewTemplateUpdate(Sender: TObject);
     procedure actCommentExecute(Sender: TObject);
     procedure actUncommentExecute(Sender: TObject);
     procedure actIndentExecute(Sender: TObject);
     procedure actUnindentExecute(Sender: TObject);
-    procedure EditorPageControlLeftDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure EditorPageControlLeftDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept:
+    procedure EditorPageControlDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure EditorPageControlDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept:
       Boolean);
     procedure actGotoFunctionExecute(Sender: TObject);
     procedure actBrowserGotoDeclUpdate(Sender: TObject);
@@ -744,7 +744,7 @@ type
     procedure actToggleExecute(Sender: TObject);
     procedure actGotoExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure EditorPageControlLeftMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure EditorPageControlMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure actBreakPointExecute(Sender: TObject);
     procedure EvaluateInputKeyPress(Sender: TObject; var Key: Char);
     procedure FormShow(Sender: TObject);
@@ -4014,24 +4014,21 @@ begin
   editorlist.Free;
 end;
 
-procedure TMainForm.EditorPageControlLeftChange(Sender: TObject);
+procedure TMainForm.EditorPageControlChange(Sender: TObject);
 var
   e: TEditor;
   PageControl: TPageControl;
+  I: integer;
 begin
   PageControl := TPageControl(Sender);
   e := fEditorList.GetEditor(-1, PageControl);
   if Assigned(e) then begin
-    PageControl.Visible := True;
-
     // Update focus so user can keep typing
     if e.Text.CanFocus then // TODO: can fail for some reason
       e.Text.SetFocus; // this should trigger then OnEnter even of the Text control
 
     // No editors are visible
   end else begin
-    PageControl.Visible := False;
-
     // Set title bar to current file
     UpdateAppTitle;
 
@@ -4044,7 +4041,11 @@ begin
     // Update status bar
     SetStatusbarLineCol;
 
-    // TODO: set bookmarks?
+    // Update bookmark menu
+    for i := 1 to 9 do begin
+      TogglebookmarksPopItem.Items[i - 1].Checked := false;
+      TogglebookmarksItem.Items[i - 1].Checked := false;
+    end;
 
     // Update focus of incremental search
     if Assigned(IncrementalForm) and IncrementalForm.Showing then
@@ -4092,7 +4093,7 @@ begin
   end;
 end;
 
-procedure TMainForm.EditorPageControlLeftMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y:
+procedure TMainForm.EditorPageControlMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y:
   Integer);
 var
   PageIndex: integer;
@@ -4167,7 +4168,7 @@ begin
     e.UnindentSelection;
 end;
 
-procedure TMainForm.EditorPageControlLeftDragDrop(Sender, Source: TObject; X, Y: Integer);
+procedure TMainForm.EditorPageControlDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
   I: integer;
   SenderPageControl: TPageControl;
@@ -4178,7 +4179,7 @@ begin
     SenderPageControl.Pages[SenderPageControl.ActivePageIndex].PageIndex := I;
 end;
 
-procedure TMainForm.EditorPageControlLeftDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept:
+procedure TMainForm.EditorPageControlDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept:
   Boolean);
 var
   I: integer;
@@ -6023,7 +6024,7 @@ begin
   devData.First := FALSE;
 end;
 
-procedure TMainForm.EditorPageControlLeftMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.EditorPageControlMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
   PageIndex: integer;
   newhint: AnsiString;
