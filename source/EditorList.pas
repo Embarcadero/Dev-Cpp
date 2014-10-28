@@ -61,7 +61,6 @@ type
     procedure OnPanelResize(Sender: TObject);
     procedure SelectNextPage;
     procedure SelectPrevPage;
-
     procedure GetVisibleEditors(var Left: TEditor; var Right: TEditor);
     procedure SetPreferences(TabPosition: TTabPosition; MultiLine: boolean);
     property LeftPageControl: TPageControl read fLeftPageControl write fLeftPageControl;
@@ -97,15 +96,10 @@ begin
     lstBoth: begin
         // Check if left is focused, otherwise assume right one is focused
         ActivePage := fLeftPageControl.ActivePage;
-        if Assigned(ActivePage) then begin
-          if TEditor(ActivePage.Tag).Text.Focused then
-            Result := fLeftPageControl
-          else
-            Result := fRightPageControl;
-
-          // If ActivePage is not assigned, this means that this function is called during layout changes
-        end else
-          Result := nil;
+        if TEditor(ActivePage.Tag).Text.Focused then
+          Result := fLeftPageControl
+        else
+          Result := fRightPageControl;
       end;
     lstNone: begin
         Result := nil;
@@ -165,7 +159,7 @@ begin
     ParentPageControl := PageControl;
   Result := TEditor.Create(FileName, InProject, NewFile, ParentPageControl);
 
-  // Force layout update
+  // Force layout update when creating, destroying or moving editors
   Update;
 end;
 
@@ -320,8 +314,10 @@ begin
       FreeAndNil(Editor);
     end;
 
-    // Show new editor after forcing an layout update
+    // Force layout update when creating, destroying or moving editors
     Update;
+
+    // Show new editor after forcing an layout update
     if Assigned(PrevEditor) then
       PrevEditor.Activate;
   finally
@@ -464,7 +460,7 @@ begin
   // Switch to previous editor in the other one
   FromPageControl.ActivePage := FromPageControlPrevTab;
 
-  // Force layout update
+  // Force layout update when creating, destroying or moving editors
   Update;
 
   // Move editor focus too
