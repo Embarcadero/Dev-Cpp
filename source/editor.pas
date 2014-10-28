@@ -340,25 +340,22 @@ end;
 
 destructor TEditor.Destroy;
 begin
-  MainForm.EditorList.BeginUpdate;
-  try
-    // Deactivate the file change monitor
-    MainForm.FileMonitor.UnMonitor(fFileName);
+  // Deactivate the file change monitor
+  MainForm.FileMonitor.UnMonitor(fFileName);
 
-    // Delete breakpoints in this editor
-    MainForm.Debugger.DeleteBreakPointsOf(self);
+  // Delete breakpoints in this editor
+  MainForm.Debugger.DeleteBreakPointsOf(self);
 
-    // Destroy any completion stuff
-    DestroyCompletion;
+  // Destroy any completion stuff
+  DestroyCompletion;
 
-    // Free everything
-    fFunctionTip.Free;
-    fText.Free;
-    fTabSheet.Free;
-    fPreviousEditors.Free;
-  finally
-    MainForm.EditorList.EndUpdate;
-  end;
+  // Free everything
+  fFunctionTip.Free;
+  fText.Free;
+  fTabSheet.Free;
+  fPreviousEditors.Free;
+
+  // Move into TObject.Destroy...
   inherited;
 end;
 

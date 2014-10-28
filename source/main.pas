@@ -4020,6 +4020,7 @@ var
   PageControl: TPageControl;
   I: integer;
 begin
+  // Determine who sent this message
   PageControl := TPageControl(Sender);
   e := fEditorList.GetEditor(-1, PageControl);
   if Assigned(e) then begin
