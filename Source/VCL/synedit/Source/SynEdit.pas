@@ -466,8 +466,6 @@ type
     function GetWordWrap: boolean;
     procedure GutterChanged(Sender: TObject);
     procedure InsertBlock(const BB, BE: TBufferCoord; ChangeStr: PChar; AddToUndoList: Boolean);
-    function LeftSpaces(const Line: string): Integer;
-    function LeftSpacesEx(const Line: string; WantTabs: Boolean): Integer;
     function GetLeftSpacing(CharCount: Integer; WantTabs: Boolean): string;
     procedure LinesChanging(Sender: TObject);
     procedure MoveCaretAndSelection(const ptBefore, ptAfter: TBufferCoord;
@@ -661,6 +659,8 @@ type
     procedure AddKey(Command: TSynEditorCommand; Key1: word; SS1: TShiftState;
       Key2: word; SS2: TShiftState);
 {$ENDIF}
+    function LeftSpaces(const Line: string): Integer;
+    function LeftSpacesEx(const Line: string; WantTabs: Boolean): Integer;
     procedure BeginUndoBlock;
     procedure BeginUpdate;
     function CaretInView: Boolean;

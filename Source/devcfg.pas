@@ -2249,14 +2249,14 @@ begin
   fAutoSaveMode := 0;
 
   // Symbol completion
+  fCompleteSymbols := TRUE;
   fBraceComplete := TRUE;
   fParentheseComplete := TRUE;
   fIncludeComplete := TRUE;
-  fCommentComplete := FALSE;
   fArrayComplete := TRUE;
+  fCommentComplete := FALSE;
   fSingleQuoteComplete := TRUE;
   fDoubleQuoteComplete := TRUE;
-  fCompleteSymbols := TRUE;
   fDeleteSymbolPairs := TRUE;
 end;
 

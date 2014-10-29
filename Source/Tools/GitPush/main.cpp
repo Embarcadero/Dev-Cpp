@@ -27,7 +27,7 @@ void GitPush() {
 
 int main() {
 	// add source files
-	GitAdd("source");
+	GitAdd("Source");
 	GitAdd("devcpp.ico");
 	GitAdd(".gitignore");
 	GitAdd("*.nsi");

@@ -24,9 +24,9 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
-  SynEditExport, SynExportRTF,
-  Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version, SynEditCodeFolding, SynExportHTML,
-  SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils, CodeToolTip;
+  SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
+  SynEditCodeFolding, SynExportHTML, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils,
+  CodeToolTip;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Classes, Graphics, QControls, QForms, QDialogs, CodeCompletion, CppParser,
@@ -61,6 +61,13 @@ type
     hprNone // mouseover not allowed
     );
 
+  // Define what we want to skip
+  TSymbolCompleteState = (
+    scsSkipped, // skipped over completed symbol
+    scsInserted, // opening symbol has been inserted
+    scsFinished // keystroke that triggered insertion has completed
+    );
+
   TEditor = class(TObject)
   private
     fInProject: boolean;
@@ -79,13 +86,14 @@ type
     fDblClickMousePos: TBufferCoord;
     fCompletionTimer: TTimer;
     fCompletionBox: TCodeCompletion;
+    fCompletionInitialPosition: TBufferCoord;
     fFunctionTipTimer: TTimer;
     fFunctionTip: TCodeToolTip;
-    WaitForParenths: integer; // These closing chars have already been typed, ignore manual closings
-    WaitForArray: integer; // ... 2 means true, 1 means 'handled by KeyDown', 0 means false
-    WaitForCurly: integer; // etc
-    WaitForSingleQuote: integer;
-    WaitForDoubleQuote: integer;
+    fParenthCompleteState: TSymbolCompleteState;
+    fArrayCompleteState: TSymbolCompleteState;
+    fBraceCompleteState: TSymbolCompleteState;
+    //fSingleQuoteCompleteState: TSymbolCompleteState;
+    //fDoubleQuoteCompleteState: TSymbolCompleteState;
     procedure EditorKeyPress(Sender: TObject; var Key: Char);
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -107,6 +115,8 @@ type
     procedure CompletionTimer(Sender: TObject);
     function FunctionTipAllowed: boolean;
     procedure FunctionTipTimer(Sender: TObject);
+    procedure HandleSymbolCompletion(var Key: Char);
+    procedure HandleCodeCompletion(var Key: Char);
     function HandpointAllowed(var mousepos: TBufferCoord): THandPointReason; // returns for what reason it is allowed
     procedure SetFileName(const value: AnsiString);
     procedure OnMouseOverEvalReady(const evalvalue: AnsiString);
@@ -308,6 +318,9 @@ begin
   fText.OnSpecialLineColors := EditorSpecialLineColors;
   fText.OnEnter := EditorEnter;
   fText.OnExit := EditorExit;
+  fText.OnKeyPress := EditorKeyPress;
+  fText.OnKeyDown := EditorKeyDown;
+  fText.OnKeyUp := EditorKeyUp;
   fText.OnPaintTransient := EditorPaintTransient;
   fText.MaxScrollWidth := 4096; // bug-fix #600748
   fText.MaxUndo := 4096;
@@ -346,7 +359,7 @@ begin
   // Delete breakpoints in this editor
   MainForm.Debugger.DeleteBreakPointsOf(self);
 
-  // Destroy any completion stuff
+  // Destroy code completion stuff
   DestroyCompletion;
 
   // Free everything
@@ -575,12 +588,13 @@ begin
   if scSelection in Changes then begin
     MainForm.SetStatusbarLineCol;
 
-    // Decrement character completion counter
-    WaitForParenths := max(0, WaitForParenths - 1);
-    WaitForArray := max(0, WaitForArray - 1);
-    WaitForCurly := max(0, WaitForCurly - 1);
-    WaitForSingleQuote := max(0, WaitForSingleQuote - 1);
-    WaitForDoubleQuote := max(0, WaitForDoubleQuote - 1);
+    // Finish symbol completion
+    if fParenthCompleteState = scsInserted then
+      fParenthCompleteState := scsFinished;
+    if fArrayCompleteState = scsInserted then
+      fArrayCompleteState := scsFinished;
+    if fBraceCompleteState = scsInserted then
+      fBraceCompleteState := scsFinished;
 
     // Update the function tip
     fFunctionTip.ForceHide := false;
@@ -927,149 +941,212 @@ begin
   end;
 end;
 
-procedure TEditor.EditorKeyPress(Sender: TObject; var Key: Char);
+procedure TEditor.HandleSymbolCompletion(var Key: Char);
 var
-  allowcompletion: boolean;
-  indent: integer;
-  attr: TSynHighlighterAttributes;
-  s1, s2: AnsiString;
-  Ptr: PAnsiChar;
+  Attr: TSynHighlighterAttributes;
+  Token: AnsiString;
   HighlightPos: TBufferCoord;
-begin
 
-  // Doing this here instead of in EditorKeyDown to be able to delete some key messages
-  if devEditor.CompleteSymbols and not fText.SelAvail then begin
+  procedure HandleParentheseCompletion;
+  begin
+    InsertString(')', false);
+    if FunctionTipAllowed then
+      fFunctionTip.Activated := true;
+    fParenthCompleteState := scsInserted;
+  end;
 
-    // Don't complete symbols inside strings or comments
-    allowcompletion := true;
-
-    // Empty line? Check if we're inside an uncompleted comment block, check last nonblank char
-    HighlightPos := BufferCoord(fText.CaretX - 1, fText.CaretY);
-    while (HighlightPos.Line > 0) and (Length(fText.Lines[HighlightPos.Line - 1]) = 0) do
-      Dec(HighlightPos.Line);
-    HighlightPos.Char := Length(fText.Lines[HighlightPos.Line - 1]);
-
-    if fText.GetHighlighterAttriAtRowCol(HighlightPos, s1, attr) then
-      if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) or SameStr(attr.Name,
-        'Character') then
-        allowcompletion := false;
-
-    if allowcompletion then begin
-
-      // Check if we typed anything completable...
-      if (Key = '(') and devEditor.ParentheseComplete then begin
-        InsertString(')', false);
-        WaitForParenths := 2;
-
-        // immediately activate function hint
-        if FunctionTipAllowed then
-          fFunctionTip.Activated := true;
-      end else if (Key = ')') and (WaitForParenths > 0) then begin
-        fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
-        WaitForParenths := 0;
-        Key := #0;
-      end else if (Key = '[') and devEditor.ArrayComplete then begin
-        InsertString(']', false);
-        WaitForArray := 2;
-      end else if (Key = ']') and (WaitForArray > 0) then begin
-        fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
-        WaitForArray := 0;
-        Key := #0;
-      end else if (Key = '*') and devEditor.CommentComplete then begin
-        if (fText.CaretX > 1) and (fText.LineText[fText.CaretX - 1] = '/') then
-          InsertString('*/', false);
-      end else if (Key = '{') and devEditor.BraceComplete then begin
-
-        s1 := Copy(fText.LineText, 1, fText.CaretX - 1);
-        s2 := Trim(s1);
-
-        if EndsStr(')', s2) or
-          EndsStr('else', s2) or
-          EndsStr('try', s2) or
-          EndsStr('catch', s2) or
-          EndsStr('default', s2) or
-          EndsStr('do', s2) or
-          StartsStr('default', s2) or
-          SameStr('', s2) then begin
-
-          // Copy indentation
-          indent := 0;
-          Ptr := PAnsiChar(s1);
-          while Ptr^ in [#1..#32] do begin
-            Inc(indent);
-            Inc(Ptr);
-          end;
-
-          // { + enter + indent + }
-          InsertString('{' + #13#10 + Copy(s1, 1, indent) + '}', false);
-          fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
-          Key := #0;
-        end else if StartsStr('struct', s2) or
-          StartsStr('union', s2) or
-          StartsStr('class', s2) or
-          StartsStr('enum', s2) or
-          StartsStr('typedef', s2) then begin
-
-          // Copy indentation
-          indent := 0;
-          Ptr := PAnsiChar(s1);
-          while Ptr^ in [#1..#32] do begin
-            Inc(indent);
-            Inc(Ptr);
-          end;
-
-          // { + enter + indent + };
-          InsertString('{' + #13#10 + Copy(s1, 1, indent) + '};', false);
-          fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
-          Key := #0;
-        end else if StartsStr('case', s2) then begin
-
-          // Copy indentation
-          indent := 0;
-          Ptr := PAnsiChar(s1);
-          while Ptr^ in [#1..#32] do begin
-            Inc(indent);
-            Inc(Ptr);
-          end;
-
-          // { + enter + indent + tab + break; + enter + }
-          InsertString('{' + #13#10 + Copy(s1, 1, indent) + #9 + 'break;' + #13#10 + Copy(s1, 1, indent) + '}', false);
-          fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
-          Key := #0;
-        end else begin
-          WaitForCurly := 2;
-          InsertString('}', false);
-        end;
-      end else if (Key = '}') and (WaitForCurly > 0) then begin
-        fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
-        WaitForCurly := 2;
-        Key := #0;
-      end else if (Key = '<') and devEditor.IncludeComplete then begin
-        if StartsStr('#include', fText.LineText) then
-          InsertString('>', false);
-      end else if (Key = '"') and devEditor.IncludeComplete then begin
-        InsertString('"', false);
-        WaitForDoubleQuote := 2;
-      end else if (Key = '''') and devEditor.SingleQuoteComplete then begin
-        InsertString('''', false);
-        WaitForSingleQuote := 2;
-      end else begin
-        WaitForParenths := 0;
-        WaitForArray := 0;
-        WaitForCurly := 0;
-        WaitForSingleQuote := 0;
-        WaitForDoubleQuote := 0;
-      end;
-    end else begin
-      WaitForParenths := 0;
-      WaitForArray := 0;
-      WaitForCurly := 0;
-      WaitForSingleQuote := 0;
-      WaitForDoubleQuote := 0;
+  procedure HandleParentheseSkip;
+  begin
+    if fParenthCompleteState = scsFinished then begin
+      fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY); // skip over
+      fParenthCompleteState := scsSkipped;
+      Key := #0; // remove key press
     end;
   end;
 
-  // Is code completion enabled?
+  procedure HandleArrayCompletion;
+  begin
+    InsertString(']', false);
+    fArrayCompleteState := scsInserted;
+  end;
+
+  procedure HandleArraySkip;
+  begin
+    if fArrayCompleteState = scsFinished then begin
+      fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY); // skip over
+      fArrayCompleteState := scsSkipped;
+      Key := #0; // remove key press
+    end;
+  end;
+
+  procedure HandleMultilineCommentCompletion;
+  begin
+    if (fText.CaretX > 1) and (fText.LineText[fText.CaretX - 1] = '/') then
+      InsertString('*/', false);
+  end;
+
+  procedure HandleBraceCompletion;
+  var
+    KeyWordBefore, Indent, MoreIndent: AnsiString;
+    IndentCount: integer;
+  begin
+    // Determine what word is before us
+    KeyWordBefore := Trim(Copy(fText.LineText, 1, fText.CaretX - 1));
+
+    // Determine new indent
+    // Add one tab
+    IndentCount := fText.LeftSpacesEx(fText.LineText, True);
+
+    // Get indentation string
+    if eoTabsToSpaces in fText.Options then
+      Indent := System.StringOfChar(#32, IndentCount)
+    else
+      Indent := System.StringOfChar(#9, IndentCount div fText.TabWidth);
+
+    // For case, do the following:
+    //{ + enter + indent + tab + break; + enter + }
+    if StartsStr('case', KeyWordBefore) then begin
+
+      // Get extra indentation string
+      if eoTabsToSpaces in fText.Options then
+        MoreIndent := System.StringOfChar(#32, IndentCount + fText.TabWidth)
+      else
+        MoreIndent := System.StringOfChar(#9, (IndentCount + fText.TabWidth) div fText.TabWidth);
+
+      InsertString('{' + #13#10 + MoreIndent + 'break;' + #13#10 + Indent + '}', false);
+      fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
+      Key := #0; // cancel original key insertion
+
+      // For other valid block starts, do the following:
+      // { + enter + indent + }
+    end else if EndsStr(')', KeyWordBefore) or
+      SameStr('', KeyWordBefore) or
+      EndsStr('else', KeyWordBefore) or
+      EndsStr('try', KeyWordBefore) or
+      EndsStr('catch', KeyWordBefore) or
+      EndsStr('default', KeyWordBefore) or
+      EndsStr('do', KeyWordBefore) then begin
+
+      InsertString('{' + #13#10 + Indent + '}', false);
+      fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
+      Key := #0; // cancel original key insertion
+
+      // For structs and derivatives, do the following:
+      // { + enter + indent + }; <-- SAME EXCEPT FOR THE SEMICOLON
+    end else if
+      StartsStr('struct', KeyWordBefore) or
+      StartsStr('union', KeyWordBefore) or
+      StartsStr('class', KeyWordBefore) or
+      StartsStr('enum', KeyWordBefore) or
+      StartsStr('typedef ', KeyWordBefore) then begin
+
+      InsertString('{' + #13#10 + Indent + '};', false);
+      fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
+      Key := #0; // cancel original key insertion
+    end else begin
+      InsertString('}', false);
+      fBraceCompleteState := scsInserted;
+    end;
+  end;
+
+  procedure HandleBraceSkip;
+  begin
+    if fBraceCompleteState = scsFinished then begin
+      fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY); // skip over
+      fBraceCompleteState := scsSkipped;
+      Key := #0; // remove key press
+    end;
+  end;
+
+  procedure HandleIncludeCompletion;
+  begin
+    if StartsStr('#include', fText.LineText) then
+      InsertString('>', false);
+  end;
+
+  procedure HandleSingleQuoteCompletion;
+  begin
+    InsertString('''', false);
+    //fSingleQuoteCompleteState := scsTyped;
+  end;
+
+  procedure HandleDoubleQuoteCompletion;
+  begin
+    InsertString('"', false);
+    //fDoubleQuoteCompleteState := scsTyped;
+  end;
+
+begin
+  if not devEditor.CompleteSymbols or fText.SelAvail then
+    Exit;
+
+  // Find the end of the first nonblank line above us
+  HighlightPos := BufferCoord(fText.CaretX - 1, fText.CaretY);
+  while (HighlightPos.Line > 0) and (Length(fText.Lines[HighlightPos.Line - 1]) = 0) do
+    Dec(HighlightPos.Line);
+  HighlightPos.Char := Length(fText.Lines[HighlightPos.Line - 1]);
+
+  // Check if that line is highlighted as string or character or comment
+  if fText.GetHighlighterAttriAtRowCol(HighlightPos, Token, Attr) then
+    if (Attr = fText.Highlighter.StringAttribute) or (Attr = fText.Highlighter.CommentAttribute) or SameStr(Attr.Name,
+      'Character') then
+      Exit;
+
+  case Key of
+    '(': begin
+        if devEditor.ParentheseComplete then
+          HandleParentheseCompletion;
+      end;
+    ')': begin
+        if devEditor.ParentheseComplete then
+          HandleParentheseSkip;
+      end;
+    '[': begin
+        if devEditor.ArrayComplete then
+          HandleArrayCompletion;
+      end;
+    ']': begin
+        if devEditor.ParentheseComplete then
+          HandleArraySkip;
+      end;
+    '*': begin
+        if devEditor.CommentComplete then
+          HandleMultilineCommentCompletion;
+      end;
+    '{': begin
+        if devEditor.BraceComplete then
+          HandleBraceCompletion;
+      end;
+    '}': begin
+        if devEditor.BraceComplete then
+          HandleBraceSkip;
+      end;
+    '<': begin
+        if devEditor.IncludeComplete then // include <>
+          HandleIncludeCompletion;
+      end;
+    '''': begin
+        if devEditor.SingleQuoteComplete then // characters
+          HandleSingleQuoteCompletion;
+      end;
+    '"': begin
+        if devEditor.IncludeComplete then // include ""
+          HandleIncludeCompletion;
+        if devEditor.DoubleQuoteComplete then // strings
+          HandleDoubleQuoteCompletion;
+      end;
+  else begin
+      fParenthCompleteState := scsSkipped;
+      fArrayCompleteState := scsSkipped;
+      fBraceCompleteState := scsSkipped;
+      //fSingleQuoteCompleteState := scsSkipped;
+      //fDoubleQuoteCompleteState := scsSkipped;
+    end;
+  end;
+end;
+
+procedure TEditor.HandleCodeCompletion(var Key: Char);
+begin
   if fCompletionBox.Enabled then begin
 
     // Use a timer to show the completion window when we just typed a few parent-member linking chars
@@ -1082,7 +1159,19 @@ begin
     else
       fCompletionTimer.Enabled := False;
     end;
+
+    // Stop code completion timer if the cursor moves
+    fCompletionInitialPosition := BufferCoord(fText.CaretX + 1, fText.CaretY);
   end;
+end;
+
+procedure TEditor.EditorKeyPress(Sender: TObject; var Key: Char);
+begin
+  // Doing this here instead of in EditorKeyDown to be able to delete some key messages
+  HandleSymbolCompletion(Key);
+
+  // Spawn code completion window if we are allowed to
+  HandleCodeCompletion(Key);
 end;
 
 procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1129,7 +1218,7 @@ begin
           end;
         end;
       end;
-    VK_BACK: begin
+    VK_BACK: begin // remove completed character
         if not fText.SelAvail then begin
           S := fText.LineText;
           if (fText.CaretX > 1) and (fText.CaretX <= Length(S)) then begin
@@ -1153,65 +1242,10 @@ begin
   ShowCompletion;
 end;
 
-procedure TEditor.ShowCompletion;
-var
-  P: TPoint;
-  M: TMemoryStream;
-  s: AnsiString;
-  attr: TSynHighlighterAttributes;
-begin
-  fCompletionTimer.Enabled := False;
-
-  // Position it at the top of the next line
-  P := fText.RowColumnToPixels(fText.DisplayXY);
-  Inc(P.Y, fText.LineHeight + 2);
-  fCompletionBox.Position := fText.ClientToScreen(P);
-
-  // Don't bother scanning inside strings or comments or defines
-  if (fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX - 1, fText.CaretY), s, attr)) then
-    if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) or (attr.Name =
-      'Preprocessor') then
-      Exit;
-
-  M := TMemoryStream.Create;
-  try
-    fText.UnCollapsedLines.SaveToStream(M);
-
-    // Reparse whole file (not function bodies) if it has been modified
-    // use stream, don't read from disk (not saved yet)
-    //if fText.Modified then
-    //	MainForm.CppParser.ReParseFile(fFileName,InProject,False,True,M);
-
-    // Scan the current function body
-    fCompletionBox.CurrentStatement := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M);
-  finally
-    M.Free;
-  end;
-
-  // Redirect key presses to completion box if applicable
-  fCompletionBox.OnKeyPress := CompletionKeyPress;
-
-  // Filter the whole statement list
-  fCompletionBox.Search(GetWordAtPosition(fText.CaretXY, wpCompletion), fFileName);
-end;
-
-procedure TEditor.DestroyCompletion;
-begin
-  if Assigned(fCompletionTimer) then
-    FreeAndNil(fCompletionTimer);
-  if Assigned(fFunctionTipTimer) then
-    FreeAndNil(fFunctionTipTimer);
-end;
-
 procedure TEditor.InitCompletion;
 begin
   fCompletionBox := MainForm.CodeCompletion;
   fCompletionBox.Enabled := devCodeCompletion.Enabled;
-
-  // This way symbols and tabs are also completed without code completion
-  fText.OnKeyPress := EditorKeyPress;
-  fText.OnKeyDown := EditorKeyDown;
-  fText.OnKeyUp := EditorKeyUp;
 
   if devEditor.ShowFunctionTip then begin
     if not Assigned(fFunctionTipTimer) then
@@ -1237,6 +1271,61 @@ begin
   end else begin
     FreeAndNil(fCompletionTimer);
   end;
+end;
+
+procedure TEditor.ShowCompletion;
+var
+  P: TPoint;
+  M: TMemoryStream;
+  s: AnsiString;
+  attr: TSynHighlighterAttributes;
+begin
+  fCompletionTimer.Enabled := False;
+
+  // Don't show the completion box if the cursor has moved during the timer rundown
+  if (fText.CaretX <> fCompletionInitialPosition.Char) or
+    (fText.CaretY <> fCompletionInitialPosition.Line) then
+    Exit;
+
+  // Position it at the top of the next line
+  P := fText.RowColumnToPixels(fText.DisplayXY);
+  Inc(P.Y, fText.LineHeight + 2);
+  fCompletionBox.Position := fText.ClientToScreen(P);
+
+  // Don't bother scanning inside strings or comments or defines
+  if (fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX - 1, fText.CaretY), s, attr)) then
+    if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) or (attr.Name =
+      'Preprocessor') then
+      Exit;
+
+  M := TMemoryStream.Create;
+  try
+    fText.UnCollapsedLines.SaveToStream(M);
+
+    // Reparse whole file (not function bodies) if it has been modified
+    // use stream, don't read from disk (not saved yet)
+    if fText.Modified then
+      MainForm.CppParser.ReParseFile(fFileName, InProject, False, True, M);
+
+    // Scan the current function body
+    fCompletionBox.CurrentStatement := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M);
+  finally
+    M.Free;
+  end;
+
+  // Redirect key presses to completion box if applicable
+  fCompletionBox.OnKeyPress := CompletionKeyPress;
+
+  // Filter the whole statement list
+  fCompletionBox.Search(GetWordAtPosition(fText.CaretXY, wpCompletion), fFileName);
+end;
+
+procedure TEditor.DestroyCompletion;
+begin
+  if Assigned(fCompletionTimer) then
+    FreeAndNil(fCompletionTimer);
+  if Assigned(fFunctionTipTimer) then
+    FreeAndNil(fFunctionTipTimer);
 end;
 
 function TEditor.GetWordAtPosition(P: TBufferCoord; Purpose: TWordPurpose): AnsiString;
