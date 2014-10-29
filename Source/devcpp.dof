@@ -91,13 +91,13 @@ ImageBase=1048576
 ExeDescription=
 [Directories]
 OutputDir=..
-UnitOutputDir=units
+UnitOutputDir=Units
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=VCL\ClassBrowsing;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;Tools\webupdate;Tools\Packman
 Packages=vcl;rtl;vclactnband;vclx;vcldb;dbrtl;dbexpress;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;VclSmp;dbxcds;soaprtl;vclshlctrls;SynEdit_R7
 Conditionals=
-DebugSourceDirs=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\source\VCL\ClassBrowsing\
+DebugSourceDirs=C:\Program Files (x86)\Dev-Cpp\source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\Source\VCL\ClassBrowsing\
 UsePackages=0
 [Parameters]
 RunParams=
