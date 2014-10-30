@@ -512,7 +512,7 @@ begin
         ')': begin
             Dec(BraceCount);
             if BraceCount = 0 then begin // end of argument list
-              Inc(ArgumentIndex, 000);
+              Inc(ArgumentIndex);
               HighlightStart := CurPos + 1;
             end;
           end;
