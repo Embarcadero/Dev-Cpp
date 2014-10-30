@@ -846,6 +846,7 @@ type
     procedure UpdateAppTitle;
     procedure OpenCloseMessageSheet(Open: boolean);
     procedure OpenFile(const FileName: AnsiString);
+    procedure OpenFileList(List: TStringList);
     procedure OpenProject(const s: AnsiString);
     procedure GotoBreakpoint(const FileName: AnsiString; Line: integer);
     procedure RemoveActiveBreakpoints;
@@ -1045,57 +1046,28 @@ begin
     TCustomAction(ActionList.Actions[idx]).Hint := StripHotKey(TCustomAction(ActionList.Actions[idx]).Caption);
 end;
 
-// allows user to drop files from explorer on to form
-
 procedure TMainForm.WMDropFiles(var msg: TMessage);
 var
   I, Count: integer;
   FileNameBuffer: array[0..260] of char;
-  DragPoint: TPoint;
   MessageHandle: THandle;
-  ProjectFileName: AnsiString;
+  FileList: TStringList;
 begin
   try
-    // Get drag count
+    // Get drop information
     MessageHandle := THandle(msg.wParam);
-    count := DragQueryFile(MessageHandle, $FFFFFFFF, nil, 0);
-    DragQueryPoint(MessageHandle, DragPoint);
+    Count := DragQueryFile(MessageHandle, $FFFFFFFF, nil, 0);
 
-    // Traverse list of files. See if there's a project in there
-    ProjectFileName := '';
-    for I := 0 to Count - 1 do begin
-      DragQueryFile(MessageHandle, I, FileNameBuffer, SizeOf(FileNameBuffer));
-
-      // Is there a project?
-      if GetFileTyp(FileNameBuffer) = utPrj then begin
-        ProjectFileName := FileNameBuffer;
-        Break;
+    // Build file list
+    FileList := TStringList.Create;
+    try
+      for I := 0 to Count - 1 do begin
+        DragQueryFile(MessageHandle, I, FileNameBuffer, SizeOf(FileNameBuffer));
+        FileList.Add(FileNameBuffer);
       end;
-    end;
-
-    // If there's a project in there, only open that.
-    // Otherwise, open all files
-    if ProjectFileName <> '' then
-      OpenProject(ProjectFileName)
-    else begin
-
-      // Only update the class browser once
-      ClassBrowser.BeginUpdate;
-      try
-
-        // Only repaint the editor list once
-        fEditorList.BeginUpdate;
-        try
-          for I := 0 to Count - 1 do begin
-            DragQueryFile(MessageHandle, I, FileNameBuffer, SizeOf(FileNameBuffer));
-            OpenFile(FileNameBuffer)
-          end;
-        finally
-          fEditorList.EndUpdate;
-        end;
-      finally
-        ClassBrowser.EndUpdate;
-      end;
+      OpenFileList(FileList);
+    finally
+      FileList.Free;
     end;
   finally
     msg.Result := 0;
@@ -1485,7 +1457,6 @@ var
   idx: integer;
 begin // TODO: ask on SO
   idx := (Sender as TMenuItem).Tag;
-  //	MsgBox('icon index:' + inttostr((Sender as TMenuItem).ImageIndex),(Sender as TMenuItem).Caption);
 
   with fTools.ToolList[idx]^ do
     ExecuteFile(ParseParams(Exec), ParseParams(Params), ParseParams(WorkDir), SW_SHOW);
@@ -1561,6 +1532,36 @@ begin
   // Parse it after is has been shown so the user will not see random unpainted stuff for a while.
   if not Assigned(fProject) then
     CppParser.ReParseFile(e.FileName, e.InProject, True);
+end;
+
+procedure TMainForm.OpenFileList(List: TStringList);
+var
+  I: integer;
+begin
+  if List.Count = 0 then
+    Exit;
+
+  // Check if there is a project file inside the list
+  for I := 0 to List.Count - 1 do begin
+    if GetFileTyp(List[I]) = utPrj then begin
+      OpenProject(List[I]); // open only the first found project
+      Exit;
+    end;
+  end;
+
+  // Didn't find a project? Open the whole list
+  ClassBrowser.BeginUpdate;
+  try
+    fEditorList.BeginUpdate;
+    try
+      for I := 0 to List.Count - 1 do
+        OpenFile(List[I]); // open all files
+    finally
+      fEditorList.EndUpdate;
+    end;
+  finally
+    ClassBrowser.EndUpdate;
+  end;
 end;
 
 procedure TMainForm.AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
@@ -1971,35 +1972,15 @@ begin
 end;
 
 procedure TMainForm.actOpenExecute(Sender: TObject);
-var
-  I: integer;
 begin
   with TOpenDialog.Create(Self) do try
     Filter := BuildFilter([FLT_PROJECTS, FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]);
     Title := Lang[ID_NV_OPENFILE];
     Options := Options + [ofAllowMultiSelect];
 
-    if Execute and (Files.Count > 0) then begin
-      for I := 0 to Files.Count - 1 do
-        if GetFileTyp(Files[I]) = utPrj then begin
-          OpenProject(Files[I]); // open only the first found project
-          Exit;
-        end;
-
-      // Didn't find a project? Open the whole list
-      ClassBrowser.BeginUpdate;
-      try
-        fEditorList.BeginUpdate;
-        try
-          for I := 0 to Files.Count - 1 do
-            OpenFile(Files[I]); // open all files
-        finally
-          fEditorList.EndUpdate;
-        end;
-      finally
-        ClassBrowser.EndUpdate;
-      end;
-    end;
+    // Open all provided files
+    if Execute then
+      OpenFileList(TStringList(Files));
   finally
     Free;
   end;

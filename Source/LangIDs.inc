@@ -946,6 +946,9 @@ const
   ID_ERR_FILECHANGED                    = 61019;
   ID_ERR_RENAMEDDELETED                 = 61020;
   ID_ERR_RENAMEDDELETEDKEEP             = 61021;
+  ID_ERR_ERRORLAUNCHINGGDB              = 61022;
+  ID_ERR_GDBNOUTFOUND                   = 61023;
+  ID_ERR_WRITEGDB                       = 61024;
 
   ID_UNTITLED                           = 62001;
   ID_READONLY                           = 62002;

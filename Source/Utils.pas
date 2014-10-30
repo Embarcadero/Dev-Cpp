@@ -64,11 +64,6 @@ function FormatList(const sl: TStrings; formatstr: AnsiString): AnsiString;
 function IncludeQuoteIfSpaces(const s: AnsiString): AnsiString;
 function IncludeQuoteIfNeeded(const s: AnsiString): AnsiString;
 
-procedure MsgErr(const text: AnsiString; const caption: AnsiString = 'Error');
-procedure MsgBox(const text: AnsiString; const caption: AnsiString = 'Message'); overload;
-procedure MsgBox(textlist: TStrings; const caption: AnsiString = 'Message'); overload;
-procedure MsgBox(text: integer; const caption: AnsiString = 'Message'); overload;
-
 procedure LoadFilefromResource(const FileName: AnsiString; ms: TMemoryStream);
 
 function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString; const CheckDirs: boolean = FALSE):
@@ -440,34 +435,6 @@ begin
   //	CloseHandle(handle);
 
   DateTimeToString(Result, 'mmmm d yyyy - hh:nn', datedouble);
-end;
-
-// got tired of typing application.handle,PAnsiChar,PAnsiChar MB_OK, etc ;)
-
-procedure MsgErr(const text, caption: AnsiString);
-begin
-  MessageBox(application.handle, PAnsiChar(text), PAnsiChar(caption), MB_ICONERROR);
-end;
-
-procedure MsgBox(const text, caption: AnsiString);
-begin
-  MessageBox(application.handle, PAnsiChar(text), PAnsiChar(caption), MB_OK);
-end;
-
-procedure MsgBox(textlist: TStrings; const caption: AnsiString);
-var
-  I: integer;
-  final: AnsiString;
-begin
-  final := '';
-  for I := 0 to textList.Count - 1 do
-    final := final + inttostr(Succ(I)) + #9 + textList.Strings[i] + #13#10;
-  MessageBox(application.handle, PAnsiChar(final), PAnsiChar(caption), MB_OK);
-end;
-
-procedure MsgBox(text: integer; const caption: AnsiString);
-begin
-  MessageBox(application.handle, PAnsiChar(inttostr(text)), PAnsiChar(caption), MB_OK);
 end;
 
 procedure OpenHelpFile(const HelpFileName: AnsiString);

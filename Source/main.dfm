@@ -1896,6 +1896,7 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = 'Save A&ll'
       ImageIndex = 8
+      ShortCut = 24659
       OnExecute = actSaveAllExecute
       OnUpdate = actSaveAllUpdate
     end
@@ -1913,6 +1914,7 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = 'Close All'
       ImageIndex = 50
+      ShortCut = 24663
       OnExecute = actCloseAllExecute
       OnUpdate = actUpdatePageCount
     end
@@ -1921,6 +1923,7 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = 'Close Project'
       ImageIndex = 11
+      ShortCut = 49239
       OnExecute = actCloseProjectExecute
       OnUpdate = actUpdateProject
     end

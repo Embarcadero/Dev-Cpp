@@ -97,7 +97,7 @@ procedure TEditorList.EndUpdate;
 begin
   Dec(fUpdateCount);
   if fUpdateCount = 0 then begin
-    SendMessage(fPanel.Handle, WM_SETREDRAW, 1, 0); // stop drawing, it's slow
+    SendMessage(fPanel.Handle, WM_SETREDRAW, 1, 0); // allow drawing again
     RedrawWindow(fPanel.Handle, nil, 0, RDW_ERASE or RDW_FRAME or RDW_INVALIDATE or RDW_ALLCHILDREN); // draw once
   end;
 end;

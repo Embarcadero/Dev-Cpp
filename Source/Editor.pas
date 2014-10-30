@@ -500,6 +500,9 @@ begin
     finally
       sl.Free;
     end;
+    // Open list of provided files
+  end else begin
+    MainForm.OpenFileList(TStringList(aFiles));
   end;
 end;
 
@@ -932,6 +935,7 @@ var
   Attr: TSynHighlighterAttributes;
   Token: AnsiString;
   HighlightPos: TBufferCoord;
+  TabCount: integer;
 
   procedure HandleParentheseCompletion;
   begin
@@ -979,15 +983,17 @@ var
     // Determine what word is before us
     KeyWordBefore := Trim(Copy(fText.LineText, 1, fText.CaretX - 1));
 
-    // Determine new indent
-    // Add one tab
+    // Determine current indent
     IndentCount := fText.LeftSpacesEx(fText.LineText, True);
 
     // Get indentation string
     if eoTabsToSpaces in fText.Options then
       Indent := System.StringOfChar(#32, IndentCount)
-    else
-      Indent := System.StringOfChar(#9, IndentCount div fText.TabWidth);
+    else begin
+      // Use tabs as much as possible, add remaining indent using spaces
+      TabCount := IndentCount div fText.TabWidth;
+      Indent := System.StringOfChar(#9, TabCount) + System.StringOfChar(#32, IndentCount - fText.TabWidth * TabCount);
+    end;
 
     // For case, do the following:
     //{ + enter + indent + tab + break; + enter + }
@@ -1044,7 +1050,16 @@ var
     end;
   end;
 
-  procedure HandleIncludeCompletion;
+  procedure HandleLocalIncludeCompletion;
+  begin
+    if StartsStr('#include', fText.LineText) then begin
+      InsertString('"', false);
+      fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY); // skip over
+      Key := #0;
+    end;
+  end;
+
+  procedure HandleGlobalIncludeCompletion;
   begin
     if StartsStr('#include', fText.LineText) then
       InsertString('>', false);
@@ -1109,7 +1124,7 @@ begin
       end;
     '<': begin
         if devEditor.IncludeComplete then // include <>
-          HandleIncludeCompletion;
+          HandleGlobalIncludeCompletion;
       end;
     '''': begin
         if devEditor.SingleQuoteComplete then // characters
@@ -1117,7 +1132,7 @@ begin
       end;
     '"': begin
         if devEditor.IncludeComplete then // include ""
-          HandleIncludeCompletion;
+          HandleLocalIncludeCompletion;
         if devEditor.DoubleQuoteComplete then // strings
           HandleDoubleQuoteCompletion;
       end;
@@ -1225,6 +1240,11 @@ end;
 
 procedure TEditor.CompletionTimer(Sender: TObject);
 begin
+  // Don't show the completion box if the cursor has moved during the timer rundown
+  if (fText.CaretX <> fCompletionInitialPosition.Char) or
+    (fText.CaretY <> fCompletionInitialPosition.Line) then
+    Exit;
+
   ShowCompletion;
 end;
 
@@ -1267,11 +1287,6 @@ var
   attr: TSynHighlighterAttributes;
 begin
   fCompletionTimer.Enabled := False;
-
-  // Don't show the completion box if the cursor has moved during the timer rundown
-  if (fText.CaretX <> fCompletionInitialPosition.Char) or
-    (fText.CaretY <> fCompletionInitialPosition.Line) then
-    Exit;
 
   // Position it at the top of the next line
   P := fText.RowColumnToPixels(fText.DisplayXY);

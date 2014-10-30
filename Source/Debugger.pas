@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Sysutils, Windows, Messages, Forms, Classes, Controls,
-  debugreader, version, editor, ComCtrls;
+  debugreader, version, editor, ComCtrls, Dialogs, MultiLangSupport;
 {$ENDIF}
 {$IFDEF LINUX}
 Sysutils, Classes, QDialogs, QControls,
@@ -105,6 +105,7 @@ var
 begin
   Stop;
 
+  // Remove watch vars
   for i := 0 to WatchVarList.Count - 1 do
     Dispose(PWatchVar(WatchVarList.Items[i]));
   WatchVarList.Free;
@@ -122,7 +123,7 @@ var
   pi: TProcessInformation;
   si: TStartupInfo;
   sa: TSecurityAttributes;
-  gdb: AnsiString;
+  GDBFile, GDBCommand: AnsiString;
   CompilerSet: TdevCompilerSet;
 begin
   Executing := true;
@@ -134,17 +135,15 @@ begin
 
   // Create the child output pipe.
   if not CreatePipe(fOutputread, fOutputwrite, @sa, 0) then
-    MsgErr('CreatePipe output');
-
+    Exit;
   if not SetHandleInformation(fOutputread, HANDLE_FLAG_INHERIT, 0) then
-    MsgErr('SetHandleInformation outputread');
+    Exit;
 
   // Create the child input pipe.
   if not CreatePipe(fInputread, fInputwrite, @sa, 0) then
-    MsgErr('CreatePipe input');
-
+    Exit;
   if not SetHandleInformation(fInputwrite, HANDLE_FLAG_INHERIT, 0) then
-    MsgErr('SetHandleInformation inputwrite');
+    Exit;
 
   // Set up the start up info struct.
   FillChar(si, sizeof(TStartupInfo), 0);
@@ -160,15 +159,16 @@ begin
 
   // Assume it's present in the first bin dir
   if CompilerSet.BinDir.Count > 0 then begin
-    gdb := CompilerSet.BinDir[0] + pd + CompilerSet.gdbName;
-    if not CreateProcess(nil, PAnsiChar('"' + gdb + '"' + ' --annotate=2 --silent'), nil, nil, true, CREATE_NEW_CONSOLE,
-      nil, nil, si, pi) then begin
-      MsgErr('Error launching:' + #13#10#13#10 + gdb + #13#10#13#10 + SysErrorMessage(GetLastError));
+    GDBFile := CompilerSet.BinDir[0] + pd + CompilerSet.gdbName;
+    GDBCommand := '"' + GDBFile + '"' + ' --annotate=2 --silent';
+    if not CreateProcess(nil, PAnsiChar(GDBCommand), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
+      MessageDlg(Format(Lang[ID_ERR_ERRORLAUNCHINGGDB],[GDBFile,SysErrorMessage(GetLastError)]), mtError,
+        [mbOK], 0);
       Executing := false;
       Exit;
     end;
   end else
-    MsgErr('Error launching debugger: no executable directory provided!');
+    MessageDlg(Lang[ID_ERR_GDBNOUTFOUND], mtError, [mbOK], 0);
 
   fProcessID := pi.hProcess;
 
@@ -205,15 +205,11 @@ begin
 
     // Free resources
     if not CloseHandle(fProcessID) then
-      MsgErr('CloseHandle - gdb process');
-    //if not CloseHandle(outputread) then // hangs?
-    //	DisplayError('CloseHandle - output read');
+      Exit;
     if not CloseHandle(fOutputwrite) then
-      MsgErr('CloseHandle - output write');
+      Exit;
     if not CloseHandle(fInputread) then
-      MsgErr('CloseHandle - input read');
-    //if not CloseHandle(inputwrite) then
-    //	DisplayError('CloseHandle - input write');
+      Exit;
 
     MainForm.RemoveActiveBreakpoints;
 
@@ -240,7 +236,7 @@ begin
     end;
 
     if not WriteFile(fInputwrite, P^, strlen(P), nBytesWrote, nil) then
-      MsgErr('Error writing to GDB');
+      MessageDlg(Lang[ID_ERR_WRITEGDB], mtError, [mbOK], 0);
 
     if ViewInUI then
       if (not CommandChanged) or (MainForm.edGdbCommand.Text = '') then begin
