@@ -486,7 +486,6 @@ procedure TEditor.EditorDropFiles(Sender: TObject; x, y: integer; aFiles: TStrin
 var
   sl: TStringList;
   I: integer;
-  e: TEditor;
 begin
   // Insert into current editor
   if devEditor.InsDropFiles then begin
@@ -501,20 +500,7 @@ begin
     finally
       sl.Free;
     end;
-  end else
-
-    // Create new tab/project
-    for I := 0 to aFiles.Count - 1 do begin
-      e := MainForm.EditorList.FileIsOpen(aFiles[I]);
-      if Assigned(e) then
-        e.Activate
-      else begin // if not open yet
-        if GetFileTyp(aFiles[I]) = utPrj then
-          MainForm.OpenProject(aFiles[I])
-        else
-          MainForm.OpenFile(aFiles[I]);
-      end;
-    end;
+  end;
 end;
 
 procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch, aReplace: AnsiString; Line, Column: integer; var

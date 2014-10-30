@@ -177,8 +177,10 @@ end;
 
 destructor TProjUnit.Destroy;
 begin
-  if Assigned(fEditor) then
-    FreeAndNil(fEditor);
+  if Assigned(fEditor) then begin
+    MainForm.EditorList.ForceCloseEditor(fEditor);
+    fEditor := nil;
+  end;
   fNode := nil;
   inherited;
 end;
@@ -1307,7 +1309,8 @@ begin
   with fUnits[index] do begin
     if Assigned(fEditor) then begin
       SaveUnitLayout(fEditor, index);
-      FreeAndNil(fEditor);
+      MainForm.EditorList.ForceCloseEditor(fEditor);
+      fEditor := nil;
     end;
   end;
 end;

@@ -2,6 +2,11 @@ Version 5.8.1 - 28 Oktober 2014
 
 - Fixed an overflow error in TCppParser.CheckForStructs that caused errors when opening/saving files.
 - Fixed a crash in TEditorList.GetFocusedPageControl that fixes random crashes.
+- Refactored symbol completion code.
+- The code completion window does not show anymore when the cursor changes during the timer rundown after typing . or :: or ->.
+- Improved multiple file opening performance.
+- Improved project closing performance.
+- Updated compilation readme.
 
 Version 5.8.0 - 21 Oktober 2014
 

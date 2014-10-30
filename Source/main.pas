@@ -1049,41 +1049,54 @@ end;
 
 procedure TMainForm.WMDropFiles(var msg: TMessage);
 var
-  idx,
-    count: integer;
-  szFileName: array[0..260] of char;
-  pt: TPoint;
-  hdl: THandle;
-  ProjectFN: AnsiString;
-  e: TEditor;
+  I, Count: integer;
+  FileNameBuffer: array[0..260] of char;
+  DragPoint: TPoint;
+  MessageHandle: THandle;
+  ProjectFileName: AnsiString;
 begin
   try
-    ProjectFN := '';
-    hdl := THandle(msg.wParam);
-    count := DragQueryFile(hdl, $FFFFFFFF, nil, 0);
-    DragQueryPoint(hdl, pt);
+    // Get drag count
+    MessageHandle := THandle(msg.wParam);
+    count := DragQueryFile(MessageHandle, $FFFFFFFF, nil, 0);
+    DragQueryPoint(MessageHandle, DragPoint);
 
-    for idx := 0 to pred(count) do begin
-      DragQueryFile(hdl, idx, szFileName, sizeof(szFileName));
+    // Traverse list of files. See if there's a project in there
+    ProjectFileName := '';
+    for I := 0 to Count - 1 do begin
+      DragQueryFile(MessageHandle, I, FileNameBuffer, SizeOf(FileNameBuffer));
 
       // Is there a project?
-      if SameText(ExtractFileExt(szFileName), DEV_EXT) then begin
-        ProjectFN := szFileName;
+      if GetFileTyp(FileNameBuffer) = utPrj then begin
+        ProjectFileName := FileNameBuffer;
         Break;
       end;
     end;
 
-    if Length(ProjectFN) > 0 then
-      OpenProject(ProjectFN)
-    else
-      for idx := 0 to pred(count) do begin
-        DragQueryFile(hdl, idx, szFileName, sizeof(szFileName));
-        e := fEditorList.FileIsOpen(szFileName);
-        if Assigned(e) then
-          e.Activate
-        else // open file
-          OpenFile(szFileName)
+    // If there's a project in there, only open that.
+    // Otherwise, open all files
+    if ProjectFileName <> '' then
+      OpenProject(ProjectFileName)
+    else begin
+
+      // Only update the class browser once
+      ClassBrowser.BeginUpdate;
+      try
+
+        // Only repaint the editor list once
+        fEditorList.BeginUpdate;
+        try
+          for I := 0 to Count - 1 do begin
+            DragQueryFile(MessageHandle, I, FileNameBuffer, SizeOf(FileNameBuffer));
+            OpenFile(FileNameBuffer)
+          end;
+        finally
+          fEditorList.EndUpdate;
+        end;
+      finally
+        ClassBrowser.EndUpdate;
       end;
+    end;
   finally
     msg.Result := 0;
     DragFinish(THandle(msg.WParam));
@@ -1976,8 +1989,13 @@ begin
       // Didn't find a project? Open the whole list
       ClassBrowser.BeginUpdate;
       try
-        for I := 0 to Files.Count - 1 do
-          OpenFile(Files[I]); // open all files
+        fEditorList.BeginUpdate;
+        try
+          for I := 0 to Files.Count - 1 do
+            OpenFile(Files[I]); // open all files
+        finally
+          fEditorList.EndUpdate;
+        end;
       finally
         ClassBrowser.EndUpdate;
       end;
@@ -2051,7 +2069,7 @@ procedure TMainForm.actCloseAllExecute(Sender: TObject);
 begin
   ClassBrowser.BeginUpdate;
   try
-    fEditorList.CloseAll;
+    fEditorList.CloseAll; // PageControlChange triggers other UI updates
   finally
     ClassBrowser.EndUpdate;
   end;
@@ -2064,7 +2082,7 @@ begin
   // Stop executing program
   actStopExecuteExecute(Self);
 
-  // Pause monitoring
+  // Only update file monitor once (and ignore updates)
   FileMonitor.BeginUpdate;
   try
     // TODO: should we save watches?
@@ -2090,16 +2108,35 @@ begin
     end else
       fProject.SaveLayout; // always save layout, but not when SaveAll has been called
 
+    // Remember it
     dmMain.AddtoHistory(fProject.FileName);
 
-    FreeandNil(fProject);
-    ProjectView.Items.Clear;
-    ClearMessageControl;
-    UpdateCompilerList;
-    UpdateAppTitle;
-    ClassBrowser.ProjectDir := '';
-    CppParser.Reset;
-    SetStatusbarLineCol;
+    // Only update class browser once
+    ClassBrowser.BeginUpdate;
+    try
+      // Only update page control once
+      fEditorList.BeginUpdate;
+      try
+        FreeandNil(fProject);
+      finally
+        fEditorList.EndUpdate;
+      end;
+
+      // Clear project browser
+      ProjectView.Items.Clear;
+
+      // Clear error browser
+      ClearMessageControl;
+
+      // Clear class browser
+      ClassBrowser.ProjectDir := '';
+      CppParser.Reset;
+
+      // Because fProject was assigned during editor closing, force update trigger again
+      EditorPageControlLeft.OnChange(EditorPageControlLeft);
+    finally
+      ClassBrowser.EndUpdate;
+    end;
   finally
     FileMonitor.EndUpdate;
   end;
