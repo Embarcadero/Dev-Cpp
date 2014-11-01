@@ -3981,55 +3981,57 @@ var
   newfilename: AnsiString;
 begin
   EditorSaveList := TList.Create;
-
-  // Assemble a list of files that need saving
-  case devEditor.AutoSaveFilter of
-    0: begin // Save current file
-        e := fEditorList.GetEditor;
-        if Assigned(e) and not e.New then // don't save untitled files
-          EditorSaveList.Add(e);
-      end;
-    1: begin // Save all open files
-        for I := 0 to EditorList.PageCount - 1 do begin
-          e := fEditorList[i];
-          if Assigned(e) and not e.New then
+  try
+    // Assemble a list of files that need saving
+    case devEditor.AutoSaveFilter of
+      0: begin // Save current file
+          e := fEditorList.GetEditor;
+          if Assigned(e) and not e.New then // don't save untitled files
             EditorSaveList.Add(e);
         end;
-      end;
-    2: begin // Save all project files
-        for I := 0 to EditorList.PageCount - 1 do begin
-          e := fEditorList[i];
-          if Assigned(e) and e.InProject and not e.New then
-            EditorSaveList.Add(e);
+      1: begin // Save all open files
+          for I := 0 to EditorList.PageCount - 1 do begin
+            e := fEditorList[i];
+            if Assigned(e) and not e.New then
+              EditorSaveList.Add(e);
+          end;
         end;
-      end;
-  end;
-
-  // Then process the list
-  for I := 0 to EditorSaveList.Count - 1 do begin
-    e := TEditor(EditorSaveList[i]);
-    case devEditor.AutoSaveMode of
-      0: begin // overwrite (standard save)
-          if e.Text.Modified and e.Save then
-            SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILE], [e.FileName]));
-        end;
-      1: begin // append UNIX timestamp (backup copy, don't update class browser)
-          newfilename := ChangeFileExt(e.FileName, '.' + IntToStr(DateTimeToUnix(Now)) + ExtractFileExt(e.FileName));
-          e.Text.UnCollapsedLines.SaveToFile(newfilename);
-
-          SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, newfilename]));
-        end;
-      2: begin // append formatted timestamp (backup copy, don't update class browser)
-          newfilename := ChangeFileExt(e.FileName, '.' + FormatDateTime('yyyy mm dd hh mm ss', Now) +
-            ExtractFileExt(e.FileName));
-          e.Text.UnCollapsedLines.SaveToFile(newfilename);
-
-          SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, newfilename]));
+      2: begin // Save all project files
+          for I := 0 to EditorList.PageCount - 1 do begin
+            e := fEditorList[i];
+            if Assigned(e) and e.InProject and not e.New then
+              EditorSaveList.Add(e);
+          end;
         end;
     end;
-  end;
 
-  editorlist.Free;
+    // Then process the list
+    for I := 0 to EditorSaveList.Count - 1 do begin
+      e := TEditor(EditorSaveList[i]);
+      case devEditor.AutoSaveMode of
+        0: begin // overwrite (standard save)
+            if e.Text.Modified and e.Save then
+              SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILE], [e.FileName]));
+          end;
+        1: begin // append UNIX timestamp (backup copy, don't update class browser)
+            newfilename := ChangeFileExt(e.FileName, '.' + IntToStr(DateTimeToUnix(Now)) + ExtractFileExt(e.FileName));
+            e.Text.UnCollapsedLines.SaveToFile(newfilename);
+
+            SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, newfilename]));
+          end;
+        2: begin // append formatted timestamp (backup copy, don't update class browser)
+            newfilename := ChangeFileExt(e.FileName, '.' + FormatDateTime('yyyy mm dd hh mm ss', Now) +
+              ExtractFileExt(e.FileName));
+            e.Text.UnCollapsedLines.SaveToFile(newfilename);
+
+            SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, newfilename]));
+          end;
+      end;
+    end;
+  finally
+    // Do not save members.
+    EditorSaveList.Free;
+  end;
 end;
 
 procedure TMainForm.EditorPageControlChange(Sender: TObject);

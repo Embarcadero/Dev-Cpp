@@ -6,8 +6,6 @@ Source\VCL\ClassBrowsing\ClassBrowsing.dpk
 
 2) Compile resources: run Source\CompileResources.bat to create binary .res files.
 
-3) Create the folder Source\Units to allow Delphi to store its object files there. This empty folder is required but not commited by Git because it's empty. :(
+3) Opening and using the main project file 'devcpp.dpr' should not bring up any 'Module Not Found' errors now.
 
-4) Opening and using the main project file 'devcpp.dpr' should not bring up any 'Module Not Found' errors now.
-
-5) Other versions of Delphi should work, but I've only tested Delphi 7.
+4) Other versions of Delphi should work, but I've only tested Delphi 7.
