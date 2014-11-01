@@ -3978,7 +3978,7 @@ var
   e: TEditor;
   i: integer;
   EditorSaveList: TList;
-  newfilename: AnsiString;
+  NewFileName: AnsiString;
 begin
   EditorSaveList := TList.Create;
   try
@@ -4006,6 +4006,7 @@ begin
     end;
 
     // Then process the list
+    // For each file, get original filename, determine copy filename, and save the copy
     for I := 0 to EditorSaveList.Count - 1 do begin
       e := TEditor(EditorSaveList[i]);
       case devEditor.AutoSaveMode of
@@ -4014,17 +4015,15 @@ begin
               SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILE], [e.FileName]));
           end;
         1: begin // append UNIX timestamp (backup copy, don't update class browser)
-            newfilename := ChangeFileExt(e.FileName, '.' + IntToStr(DateTimeToUnix(Now)) + ExtractFileExt(e.FileName));
-            e.Text.UnCollapsedLines.SaveToFile(newfilename);
-
-            SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, newfilename]));
+            NewFileName := ChangeFileExt(e.FileName, '.' + IntToStr(DateTimeToUnix(Now)) + ExtractFileExt(e.FileName));
+            e.Text.UnCollapsedLines.SaveToFile(NewFileName);
+            SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, NewFileName]));
           end;
         2: begin // append formatted timestamp (backup copy, don't update class browser)
-            newfilename := ChangeFileExt(e.FileName, '.' + FormatDateTime('yyyy mm dd hh mm ss', Now) +
+            NewFileName := ChangeFileExt(e.FileName, '.' + FormatDateTime('yyyy mm dd hh mm ss', Now) +
               ExtractFileExt(e.FileName));
-            e.Text.UnCollapsedLines.SaveToFile(newfilename);
-
-            SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, newfilename]));
+            e.Text.UnCollapsedLines.SaveToFile(NewFileName);
+            SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, NewFileName]));
           end;
       end;
     end;
