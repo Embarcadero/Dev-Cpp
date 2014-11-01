@@ -21,17 +21,19 @@ void GitCommit() {
 }
 
 void GitPush() {
-	char buffer[512];
 	GitExecute("git push origin master");
 }
 
 int main() {
-	// add source files
+	// Add source files
 	GitAdd("Source");
-	GitAdd("devcpp.ico");
-	GitAdd(".gitignore");
 	GitAdd("*.nsi");
 	GitAdd("NEWS.txt");
+	GitAdd("devcpp.ico");
+	
+	// Add git files
+	GitAdd(".gitignore");
+	GitAdd("GitPush.exe"); // push self
 	
 	// commit with comment
 	GitCommit();
