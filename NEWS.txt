@@ -1,3 +1,7 @@
+Version 5.8.3 - *
+
+- 
+
 Version 5.8.2 - 1 November 2014
 
 - Fixed bug in procedure TMainForm.EditorSaveTimer that corrupted the editor views.

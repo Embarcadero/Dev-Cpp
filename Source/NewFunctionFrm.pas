@@ -155,51 +155,64 @@ begin
   if chkPure.Checked then
     S := S + ' = 0';
 
-  // Implement it in the class if needed
+  // Implement it in the class in the header file if needed
   e.Text.BeginUpdate;
-  e.SetCaretPos(Line, 1); // uncollapse folds around this line
-  if chkInline.Checked then begin
-    e.Text.Lines.Insert(Line, #9#9'}');
-    if chkToDo.Checked then
-      e.Text.Lines.Insert(Line, #9#9#9'/* TODO (#1#): Define ' + cmbClass.Text + '::' + txtName.Text + '(' +
-        txtArguments.Text + ') */');
-    e.Text.Lines.Insert(Line, #9#9'{');
-  end else
-    S := S + ';';
-  e.Text.Lines.Insert(Line, S);
+  try
+    e.SetCaretPos(Line, 1); // uncollapse folds around this line
+    if chkInline.Checked then begin
+      e.Text.Lines.Insert(Line, #9#9'}');
+      if chkToDo.Checked then
+        e.Text.Lines.Insert(Line, #9#9#9'/* TODO (#1#): Define ' + cmbClass.Text + '::' + txtName.Text + '(' +
+          txtArguments.Text + ') */');
+      e.Text.Lines.Insert(Line, #9#9'{');
+    end else
+      S := S + ';';
+    e.Text.Lines.Insert(Line, S);
 
-  // insert, if needed, the scope string
-  if AddScopeStr then
-    case VarScope of
-      scsPrivate: e.Text.Lines.Insert(Line, #9'private:');
-      scsProtected: e.Text.Lines.Insert(Line, #9'protected:');
-      scsPublic: e.Text.Lines.Insert(Line, #9'public:');
-    end;
+    // insert, if needed, the scope string
+    if AddScopeStr then
+      case VarScope of
+        scsPrivate: e.Text.Lines.Insert(Line, #9'private:');
+        scsProtected: e.Text.Lines.Insert(Line, #9'protected:');
+        scsPublic: e.Text.Lines.Insert(Line, #9'public:');
+      end;
 
-  // Mark modified and we're done
-  e.SetCaretPos(Line + 1, 1);
-  e.Text.Modified := True;
+    // Mark modified and we're done editing the header file
+    e.SetCaretPos(Line + 1, 1);
+    e.Text.Modified := True;
+  finally
+    e.Text.EndUpdate;
+  end;
 
-  if chkInline.Checked or chkPure.Checked then
+  // Continue work on the source file if needed
+  if chkInline.Checked or chkPure.Checked then begin
+    e.Activate; // activate it if we're not modifying the source file
     Exit;
+  end;
 
   e := MainForm.EditorList.GetEditorFromFileName(CppFname);
   if not Assigned(e) then
     Exit;
 
-  // insert the definition
-  if Trim(e.Text.Lines[e.Text.Lines.Count - 1]) <> '' then
-    e.Text.Lines.Add('');
-  e.Text.Lines.Add(txtType.Text + ' ' + cmbClass.Text + '::' + txtName.Text + '(' + txtArguments.Text + ')');
-  e.Text.Lines.Add('{');
-  if chkToDo.Checked then
-    e.Text.Lines.Add(#9'/* TODO (#1#): Define ' + cmbClass.Text + '::' + txtName.Text + '() */');
-  e.Text.Lines.Add('}');
+  // Implement it in the class if needed
+  e.Text.BeginUpdate;
+  try
+    // insert the definition
+    if Trim(e.Text.Lines[e.Text.Lines.Count - 1]) <> '' then
+      e.Text.Lines.Add('');
+    e.Text.Lines.Add(txtType.Text + ' ' + cmbClass.Text + '::' + txtName.Text + '(' + txtArguments.Text + ')');
+    e.Text.Lines.Add('{');
+    if chkToDo.Checked then
+      e.Text.Lines.Add(#9'/* TODO (#1#): Define ' + cmbClass.Text + '::' + txtName.Text + '() */');
+    e.Text.Lines.Add('}');
 
-  // Set caret and leave
-  e.SetCaretPos(e.Text.Lines.Count - 1, 1);
-  e.Text.Modified := True;
-  e.Text.EndUpdate;
+    // Set caret and leave
+    e.SetCaretPos(e.Text.Lines.Count - 1, 1);
+    e.Activate;
+    e.Text.Modified := True;
+  finally
+    e.Text.EndUpdate;
+  end;
 end;
 
 procedure TNewFunctionForm.LoadText;

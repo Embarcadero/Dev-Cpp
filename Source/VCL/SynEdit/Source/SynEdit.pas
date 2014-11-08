@@ -6264,9 +6264,9 @@ begin
         TopLine := vCaretRow - (LinesInWindow - 1) div 2;
     end else begin
       if vCaretRow < TopLine then
-        TopLine := vCaretRow
+        TopLine := vCaretRow - 3 // keep 3 lines of margin
       else if vCaretRow > TopLine + (LinesInWindow - 1) then
-        TopLine := vCaretRow - (LinesInWindow - 1)
+        TopLine := vCaretRow - (LinesInWindow - 1) + 3
       else
         TopLine := TopLine;
     end;

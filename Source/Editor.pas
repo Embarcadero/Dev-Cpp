@@ -131,7 +131,7 @@ type
     function SaveAs: boolean;
     procedure Activate;
     procedure GotoLine;
-    procedure SetCaretPos(Line, Col: integer; SetTopLine: boolean = true); // takes folds into account
+    procedure SetCaretPos(Line, Col: integer);
     procedure ExportToHTML;
     procedure ExportToRTF;
     procedure ExportToTEX;
@@ -763,39 +763,41 @@ var
 begin
   // prevent lots of repaints
   fText.BeginUpdate;
+  try
+    NewCursorPos := fText.CaretXY;
+    if MoveCursor then begin
+      P := PAnsiChar(value);
+      Char := fText.CaretX;
+      Line := fText.CaretY;
+      I := 0;
+      while P[I] <> #0 do begin
 
-  NewCursorPos := fText.CaretXY;
-  if MoveCursor then begin
-    P := PAnsiChar(value);
-    Char := fText.CaretX;
-    Line := fText.CaretY;
-    I := 0;
-    while P[I] <> #0 do begin
-
-      // Assume DOS newlines
-      if (P[I] = #13) and (P[I + 1] = #10) then begin
-        Inc(I, 2);
-        Inc(Line);
-        Char := 1;
-      end else if (P[I] = '*') and (P[I + 1] = '|') and (P[I + 2] = '*') then begin
-        NewCursorPos.Char := Char;
-        NewCursorPos.Line := Line;
-        Delete(value, I + 1, 3);
-        break;
-      end else begin
-        Inc(Char);
-        Inc(I);
+        // Assume DOS newlines
+        if (P[I] = #13) and (P[I + 1] = #10) then begin
+          Inc(I, 2);
+          Inc(Line);
+          Char := 1;
+        end else if (P[I] = '*') and (P[I + 1] = '|') and (P[I + 2] = '*') then begin
+          NewCursorPos.Char := Char;
+          NewCursorPos.Line := Line;
+          Delete(value, I + 1, 3);
+          break;
+        end else begin
+          Inc(Char);
+          Inc(I);
+        end;
       end;
     end;
+    fText.SelText := value;
+
+    // Update the cursor
+    fText.CaretXY := NewCursorPos;
+    fText.EnsureCursorPosVisible; // not needed?
+
+    // prevent lots of repaints
+  finally
+    fText.EndUpdate;
   end;
-  fText.SelText := value;
-
-  // Update the cursor
-  fText.CaretXY := NewCursorPos;
-  fText.EnsureCursorPosVisible; // not needed?
-
-  // prevent lots of repaints
-  fText.EndUpdate;
 end;
 
 procedure TEditor.SetErrorFocus(Col, Line: integer);
@@ -811,7 +813,7 @@ begin
   fErrorLine := Line;
 
   // Set new error focus
-  SetCaretPos(fErrorLine, col, true);
+  SetCaretPos(fErrorLine, col);
 
   // Redraw new error line
   fText.InvalidateGutterLine(fErrorLine);
@@ -820,7 +822,8 @@ end;
 
 procedure TEditor.GotoActiveBreakpoint;
 begin
-  SetCaretPos(fActiveLine, 1, true);
+  if fActiveLine <> -1 then
+    SetCaretPos(fActiveLine, 1);
 end;
 
 procedure TEditor.SetActiveBreakpointFocus(Line: integer);
@@ -835,7 +838,7 @@ begin
 
     // Put the caret at the active breakpoint
     fActiveLine := Line;
-    SetCaretPos(fActiveLine, 1, true);
+    SetCaretPos(fActiveLine, 1);
 
     // Invalidate new active line
     fText.InvalidateGutterLine(fActiveLine);
@@ -884,28 +887,22 @@ begin
   end;
 end;
 
-procedure TEditor.SetCaretPos(line, col: integer; settopline: boolean = true);
+procedure TEditor.SetCaretPos(Line, Col: integer);
 var
-  fold: TSynEditFoldRange;
-  collapsedline: integer;
+  Fold: TSynEditFoldRange;
+  CollapsedLine: integer;
 begin
   // Open up the closed folds around the focused line until we can see the line we're looking for
   repeat
-    fold := fText.CollapsedFoldAroundLine(line);
-    if Assigned(fold) then
-      fText.Uncollapse(fold);
-  until not Assigned(fold);
+    Fold := fText.CollapsedFoldAroundLine(line);
+    if Assigned(Fold) then
+      fText.Uncollapse(Fold);
+  until not Assigned(Fold);
+  CollapsedLine := fText.UncollapsedLineToLine(Line);
 
-  collapsedline := fText.UncollapsedLineToLine(line);
-
-  fText.CaretXY := BufferCoord(col, collapsedline);
-
-  if settopline then
-    fText.TopLine := collapsedline - 3; // leave some space above to line, is easier on the eyes
-
-  // Changing editor focus is expensive (class browser listens to it). Don't do it if it's not needed
-  if not fText.Focused then
-    Activate;
+  // Position the caret
+  fText.CaretXY := BufferCoord(Col, CollapsedLine);
+  fText.EnsureCursorPosVisible;
 end;
 
 procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);
@@ -1649,8 +1646,10 @@ begin
       if MainForm.CppParser.IsIncludeLine(Line) then begin
         FileName := MainForm.CppParser.GetHeaderFileName(fFileName, line);
         e := MainForm.EditorList.GetEditorFromFileName(FileName);
-        if Assigned(e) then
+        if Assigned(e) then begin
           e.SetCaretPos(1, 1);
+          e.Activate;
+        end;
       end else
         MainForm.actGotoImplDeclEditorExecute(self);
     end;

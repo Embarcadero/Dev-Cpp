@@ -328,8 +328,10 @@ begin
   sel := StackTrace.Selected;
   if Assigned(sel) then begin
     e := MainForm.EditorList.GetEditorFromFileName(sel.SubItems[0]);
-    if Assigned(e) then
+    if Assigned(e) then begin
       e.SetCaretPos(StrToIntDef(sel.SubItems[1], 1), 1);
+      e.Activate;
+    end;
   end;
 end;
 

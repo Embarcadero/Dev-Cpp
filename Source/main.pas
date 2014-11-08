@@ -1448,7 +1448,7 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if assigned(e) then
+  if Assigned(e) then
     e.InsertString(dmMain.CodeInserts[TMenuItem(Sender).Tag].Line, TRUE);
 end;
 
@@ -3540,8 +3540,8 @@ begin
     errorfiletab := fEditorList.GetEditorFromFileName(selection.SubItems[1]);
 
     if Assigned(errorfiletab) then begin
-      errorfiletab.Activate;
       errorfiletab.SetErrorFocus(Col, Line);
+      errorfiletab.Activate;
     end;
   end;
 end;
@@ -3561,11 +3561,16 @@ begin
     e := fEditorList.GetEditorFromFileName(selected.SubItems[1]);
     if Assigned(e) then begin
 
-      e.SetCaretPos(Line, Col); // uncollapse folds if needed
+      // Position the caret
+      // uncollapse folds if needed
+      e.SetCaretPos(Line, Col);
 
       // Then select the word we searched for
       e.Text.SetSelWord;
       e.Text.CaretXY := e.Text.BlockBegin;
+
+      // And show to the user
+      e.Activate;
     end;
   end;
 end;
@@ -3654,9 +3659,9 @@ begin
 
   // Then active the current line in the current file
   e := fEditorList.GetEditorFromFileName(StringReplace(FileName, '/', '\', [rfReplaceAll]));
-  if assigned(e) then begin
-    e.Activate;
+  if Assigned(e) then begin
     e.SetActiveBreakpointFocus(Line);
+    e.Activate;
   end;
   Application.BringToFront;
 end;
@@ -3899,8 +3904,10 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditorFromFilename(FileName);
-  if Assigned(e) then
+  if Assigned(e) then begin
     e.SetCaretPos(Line, 1);
+    e.Activate;
+  end;
 end;
 
 procedure TMainForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
@@ -4102,7 +4109,7 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if assigned(e) then begin
+  if Assigned(e) then begin
     e.InsertString('/*' + #13#10 +
       '	Name: ' + #13#10 +
       '	Copyright: ' + #13#10 +
@@ -4231,6 +4238,7 @@ begin
           e.SetCaretPos(st^._DeclImplLine, 1)
         else
           e.SetCaretPos(st^._Line, 1);
+        e.Activate;
       end;
     end;
   finally
@@ -4314,8 +4322,10 @@ begin
   fName := CppParser.GetDeclarationFileName(Node.Data);
   line := CppParser.GetDeclarationLine(Node.Data);
   e := fEditorList.GetEditorFromFileName(fname);
-  if Assigned(e) then
+  if Assigned(e) then begin
     e.SetCaretPos(line, 1);
+    e.Activate;
+  end;
 end;
 
 procedure TMainForm.actBrowserGotoImplExecute(Sender: TObject);
@@ -4329,8 +4339,10 @@ begin
   fName := CppParser.GetImplementationFileName(Node.Data);
   line := CppParser.GetImplementationLine(Node.Data);
   e := fEditorList.GetEditorFromFileName(fname);
-  if Assigned(e) then
+  if Assigned(e) then begin
     e.SetCaretPos(line, 1);
+    e.Activate;
+  end;
 end;
 
 procedure TMainForm.actBrowserNewClassExecute(Sender: TObject);
@@ -5418,8 +5430,10 @@ begin
   end;
 
   e := fEditorList.GetEditorFromFilename(fname);
-  if Assigned(e) then
+  if Assigned(e) then begin
     e.SetCaretPos(I, 1);
+    e.Activate;
+  end;
 end;
 
 procedure TMainForm.CompilerOutputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -5671,8 +5685,10 @@ begin
 
       // Go to the location
       e := fEditorList.GetEditorFromFileName(filename);
-      if Assigned(e) then
+      if Assigned(e) then begin
         e.SetCaretPos(line, 1);
+        e.Activate;
+      end;
 
       SetStatusbarMessage('');
     end else
@@ -6605,8 +6621,10 @@ begin
   FileName := fDebugger.BreakPointFile;
   if FileName <> '' then begin
     e := fEditorList.GetEditorFromFileName(FileName);
-    if Assigned(e) then
+    if Assigned(e) then begin
       e.GotoActiveBreakpoint;
+      e.Activate;
+    end;
   end;
 end;
 
