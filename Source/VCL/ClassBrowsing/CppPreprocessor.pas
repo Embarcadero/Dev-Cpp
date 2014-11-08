@@ -68,6 +68,7 @@ type
     fBranchResults: TIntList;
     // list of branch results (boolean). last one is current branch, first one is outermost branch
     fIncludePaths: TStringList; // *pointer* to buffer of CppParser
+    fProjectIncludePaths: TStringList;
     fScannedFiles: TStringList; // idem
     fParseSystem: boolean;
     fParseLocal: boolean;
@@ -109,6 +110,7 @@ type
     procedure ResetDefines;
     procedure SetScanOptions(ParseSystem, ParseLocal: boolean);
     procedure SetIncludePaths(var List: TStringList);
+    procedure SetProjectIncludePaths(var List: TStringList);
     procedure SetScannedFileList(var List: TStringList);
     procedure SetIncludesList(var List: TList);
     procedure PreprocessStream(const FileName: AnsiString; Stream: TMemoryStream);
@@ -322,6 +324,11 @@ end;
 procedure TCppPreprocessor.SetIncludePaths(var List: TStringList);
 begin
   fIncludePaths := List;
+end;
+
+procedure TCppPreprocessor.SetProjectIncludePaths(var List: TStringList);
+begin
+  fProjectIncludePaths := List;
 end;
 
 procedure TCppPreprocessor.SetScannedFileList(var List: TStringList);
@@ -920,7 +927,7 @@ begin
     Exit;
 
   // Get full header file name
-  FileName := cbutils.GetHeaderFileName(Includes[fIncludes.Count - 1]^.FileName, Line, fIncludePaths);
+  FileName := cbutils.GetHeaderFileName(Includes[fIncludes.Count - 1]^.FileName, Line, fIncludePaths, fProjectIncludePaths);
 
   // And open a new entry
   OpenInclude(FileName);

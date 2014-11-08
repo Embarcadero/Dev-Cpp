@@ -1687,6 +1687,7 @@ begin
     // Let the preprocessor augment the include records
     fPreprocessor.SetIncludesList(fIncludesList);
     fPreprocessor.SetIncludePaths(fIncludePaths);
+    fPreprocessor.SetProjectIncludePaths(fProjectIncludePaths);
     fPreprocessor.SetScannedFileList(fScannedFiles);
     fPreprocessor.SetScanOptions(fParseGlobalHeaders, fParseLocalHeaders);
     if Assigned(Stream) then
@@ -1838,12 +1839,12 @@ end;
 
 function TCppParser.GetLocalHeaderFileName(const RelativeTo, FileName: AnsiString): AnsiString;
 begin
-  Result := cbutils.GetLocalHeaderFileName(RelativeTo, FileName);
+  Result := cbutils.GetLocalHeaderFileName(RelativeTo, FileName, fProjectIncludePaths);
 end;
 
 function TCppParser.GetHeaderFileName(const RelativeTo, Line: AnsiString): AnsiString;
 begin
-  Result := cbutils.GetHeaderFileName(RelativeTo, Line, fIncludePaths);
+  Result := cbutils.GetHeaderFileName(RelativeTo, Line, fIncludePaths, fProjectIncludePaths);
 end;
 
 function TCppParser.IsIncludeLine(const Line: AnsiString): boolean;
@@ -2592,6 +2593,7 @@ begin
       // Preprocess the stream that contains the latest version of the current file (not on disk)
       fPreprocessor.SetIncludesList(fIncludesList);
       fPreprocessor.SetIncludePaths(fIncludePaths);
+      fPreprocessor.SetProjectIncludePaths(fProjectIncludePaths);
       fPreprocessor.SetScannedFileList(fScannedFiles);
       fPreprocessor.SetScanOptions(fParseGlobalHeaders, fParseLocalHeaders);
       fPreprocessor.PreProcessStream(FileName, Stream);
