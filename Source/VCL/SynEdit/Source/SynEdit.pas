@@ -6263,10 +6263,10 @@ begin
       if (vCaretRow < TopLine) or (vCaretRow>(TopLine + (LinesInWindow - 1))) then
         TopLine := vCaretRow - (LinesInWindow - 1) div 2;
     end else begin
-      if vCaretRow < TopLine then
+      if (vCaretRow - 3) < TopLine then
         TopLine := vCaretRow - 3 // keep 3 lines of margin
-      else if vCaretRow > TopLine + (LinesInWindow - 1) then
-        TopLine := vCaretRow - (LinesInWindow - 1) + 3
+      else if vCaretRow > TopLine + (LinesInWindow - 1) + 3 then
+        TopLine := vCaretRow - (LinesInWindow - 1) + 3 // keep 3 lines of margin
       else
         TopLine := TopLine;
     end;

@@ -84,9 +84,6 @@ type
     procedure HandleInclude(const Line: AnsiString);
     function ExpandMacros(const Line: AnsiString): AnsiString;
     function RemoveSuffixes(const Input: AnsiString): AnsiString;
-    // line checking stuff
-    function FirstLineChar(const Line: AnsiString): Char;
-    function LastLineChar(const Line: AnsiString): Char;
     // current file stuff
     function GetInclude(index: integer): PFile;
     procedure OpenInclude(const FileName: AnsiString; Stream: TMemoryStream = nil);
@@ -175,22 +172,6 @@ begin
   ResetDefines; // do not throw away hardcoded
 end;
 
-function TCppPreprocessor.FirstLineChar(const Line: AnsiString): Char;
-begin
-  if Length(Line) > 0 then
-    Result := Line[1]
-  else
-    Result := #0;
-end;
-
-function TCppPreprocessor.LastLineChar(const Line: AnsiString): Char;
-begin
-  if Length(Line) > 0 then
-    Result := Line[Length(Line)]
-  else
-    Result := #0;
-end;
-
 function TCppPreprocessor.GetInclude(index: integer): PFile;
 begin
   result := PFile(fIncludes[index]);
@@ -201,6 +182,7 @@ var
   FileItem: PFile;
   IsSystemFile: boolean;
   IncludeLine: AnsiString;
+  I: integer;
 begin
   // Backup old position if we're entering a new file
   if fIncludes.Count > 0 then
@@ -255,6 +237,10 @@ begin
   fIndex := FileItem^.Index;
   fFileName := FileItem^.FileName;
   fBuffer := FileItem^.Buffer;
+
+  // Trim all lines
+  for I := 0 to fBuffer.Count - 1 do
+    fBuffer[i] := Trim(fBuffer[i]);
 
   // Update result file
   IncludeLine := '#include ' + FileName + ':1';
@@ -337,6 +323,13 @@ begin
 end;
 
 procedure TCppPreprocessor.SkipToPreprocessor;
+  function FirstLineChar(const Line: AnsiString): Char;
+  begin
+    if Length(Line) > 0 then
+      Result := TrimLeft(Line)[1] // assume trimmed lines
+    else
+      Result := #0;
+  end;
 begin
   // Increment until a line begins with a #
   while (fIndex < fBuffer.Count) and (FirstLineChar(fBuffer[fIndex]) <> '#') do begin
@@ -349,6 +342,13 @@ begin
 end;
 
 procedure TCppPreprocessor.SkipToEndOfPreprocessor;
+  function LastLineChar(const Line: AnsiString): Char;
+  begin
+    if Length(Line) > 0 then
+      Result := Line[Length(Line)] // assume trimmed lines
+    else
+      Result := #0;
+  end;
 begin
   // Skip until last char of line is NOT \ anymore
   while (fIndex < fBuffer.Count) and (LastLineChar(fBuffer[fIndex]) = '\') do begin
@@ -927,7 +927,8 @@ begin
     Exit;
 
   // Get full header file name
-  FileName := cbutils.GetHeaderFileName(Includes[fIncludes.Count - 1]^.FileName, Line, fIncludePaths, fProjectIncludePaths);
+  FileName := cbutils.GetHeaderFileName(Includes[fIncludes.Count - 1]^.FileName, Line, fIncludePaths,
+    fProjectIncludePaths);
 
   // And open a new entry
   OpenInclude(FileName);
@@ -995,7 +996,7 @@ begin
   Reset;
   OpenInclude(FileName, nil);
   PreprocessBuffer;
-  //fResult.SaveToFile('C:\TCppPreprocessorResult.txt');
+  //fResult.SaveToFile('C:\TCppPreprocessorResult' + ExtractFileName(FileName) + '.txt');
 end;
 
 function TCppPreprocessor.GetResult: AnsiString;

@@ -1,6 +1,12 @@
-Version 5.8.3 - *
+Version 5.8.3 - 10 November 2014
 
-- 
+- Slightly decreased flicker during editor opening.
+- Makefiles are now edited as if they are source files. It's better than nothing.
+- Opening braces after default are now completed correctly.
+- Fixed a bug in NewFunctionFrm and NewVarFrm that caused crashes (thank you for reporting).
+- Rewritten ancient source code of devcppPortable.exe. It is now immune to overflows due to arguments of length more than 400.
+- Fixed a bug in TCppParser that caused it to ignore project include paths.
+- Fixed a crash in TCppTokenizer due to spaces before #include in combination with comments after the <file> or "file" part (like " #include <foo> // bar").
 
 Version 5.8.2 - 1 November 2014
 

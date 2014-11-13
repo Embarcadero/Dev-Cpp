@@ -1939,8 +1939,7 @@ begin
 
   // Always invalidate file pairs. If we don't, reparsing the header
   // screws up the information inside the source file
-  if not Assigned(Stream) then
-    GetSourcePair(FName, CFile, HFile);
+  GetSourcePair(FName, CFile, HFile);
   fInvalidatedIDs.Clear;
   if not Assigned(Stream) then begin
     InvalidateFile(CFile);

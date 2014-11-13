@@ -2216,13 +2216,13 @@ begin
   fMatch := TRUE;
 
   // Margin
-  fMarginVis := TRUE;
-  fMarginSize := 0; // disable by default, receiving lots of complaints about it enabled
+  fMarginVis := False;
+  fMarginSize := 80; // disable by default, receiving lots of complaints about it enabled
   fMarginColor := cl3DLight;
 
   // Misc.
   fUseSyn := TRUE;
-  fSynExt := 'c;cpp;h;hpp;cc;cxx;cp;hp;rh;fx;inl;tcc;;'; //last ; is for files with no extension
+  fSynExt := 'c;cpp;h;hpp;cc;cxx;cp;hp;rh;fx;inl;tcc;win;;'; //last ; is for files with no extension
   fHighCurrLine := TRUE;
   fHighColor := $FFFFCC; // Light Turquoise
   fTabSize := 4;

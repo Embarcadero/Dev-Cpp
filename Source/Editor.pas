@@ -928,12 +928,6 @@ begin
 end;
 
 procedure TEditor.HandleSymbolCompletion(var Key: Char);
-var
-  Attr: TSynHighlighterAttributes;
-  Token: AnsiString;
-  HighlightPos: TBufferCoord;
-  TabCount: integer;
-
   procedure HandleParentheseCompletion;
   begin
     InsertString(')', false);
@@ -975,7 +969,7 @@ var
   procedure HandleBraceCompletion;
   var
     KeyWordBefore, Indent, MoreIndent: AnsiString;
-    IndentCount: integer;
+    IndentCount, TabCount: integer;
   begin
     // Determine what word is before us
     KeyWordBefore := Trim(Copy(fText.LineText, 1, fText.CaretX - 1));
@@ -994,7 +988,8 @@ var
 
     // For case, do the following:
     //{ + enter + indent + tab + break; + enter + }
-    if StartsStr('case', KeyWordBefore) then begin
+    if StartsStr('case', KeyWordBefore) or
+      StartsStr('default', KeyWordBefore) then begin
 
       // Get extra indentation string
       if eoTabsToSpaces in fText.Options then
@@ -1013,7 +1008,6 @@ var
       EndsStr('else', KeyWordBefore) or
       EndsStr('try', KeyWordBefore) or
       EndsStr('catch', KeyWordBefore) or
-      EndsStr('default', KeyWordBefore) or
       EndsStr('do', KeyWordBefore) then begin
 
       InsertString('{' + #13#10 + Indent + '}', false);
@@ -1077,18 +1071,6 @@ var
 begin
   if not devEditor.CompleteSymbols or fText.SelAvail then
     Exit;
-
-  // Find the end of the first nonblank line above us
-  HighlightPos := BufferCoord(fText.CaretX - 1, fText.CaretY);
-  while (HighlightPos.Line > 0) and (Length(fText.Lines[HighlightPos.Line - 1]) = 0) do
-    Dec(HighlightPos.Line);
-  HighlightPos.Char := Length(fText.Lines[HighlightPos.Line - 1]);
-
-  // Check if that line is highlighted as string or character or comment
-  if fText.GetHighlighterAttriAtRowCol(HighlightPos, Token, Attr) then
-    if (Attr = fText.Highlighter.StringAttribute) or (Attr = fText.Highlighter.CommentAttribute) or SameStr(Attr.Name,
-      'Character') then
-      Exit;
 
   case Key of
     '(': begin
