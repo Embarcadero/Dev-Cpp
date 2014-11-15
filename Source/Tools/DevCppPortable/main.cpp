@@ -2,7 +2,7 @@
 #include <string>
 using std::wstring;
 
-// Tried to use wmain, but GCC/MinGW doesn't define it cause it's MS specific
+// Tried to use wmain, but GCC/MinGW doesn't define it because it's MS specific
 // So, I'm sticking to the Windows API for now
 
 int main() {

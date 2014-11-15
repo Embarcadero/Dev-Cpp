@@ -928,6 +928,11 @@ begin
 end;
 
 procedure TEditor.HandleSymbolCompletion(var Key: Char);
+var
+  Attr: TSynHighlighterAttributes;
+  Token: AnsiString;
+  HighlightPos: TBufferCoord;
+
   procedure HandleParentheseCompletion;
   begin
     InsertString(')', false);
@@ -1071,6 +1076,18 @@ procedure TEditor.HandleSymbolCompletion(var Key: Char);
 begin
   if not devEditor.CompleteSymbols or fText.SelAvail then
     Exit;
+
+  // Find the end of the first nonblank line above us
+  HighlightPos := BufferCoord(fText.CaretX - 1, fText.CaretY);
+  while (HighlightPos.Line > 0) and (Length(fText.Lines[HighlightPos.Line - 1]) = 0) do
+    Dec(HighlightPos.Line);
+  HighlightPos.Char := Length(fText.Lines[HighlightPos.Line - 1]);
+
+  // Check if that line is highlighted as string or character or comment
+  if fText.GetHighlighterAttriAtRowCol(HighlightPos, Token, Attr) then
+    if (Attr = fText.Highlighter.StringAttribute) or (Attr = fText.Highlighter.CommentAttribute) or SameStr(Attr.Name,
+      'Character') then
+      Exit;
 
   case Key of
     '(': begin
