@@ -1,3 +1,12 @@
+Version 5.8.4 - *
+
+- Huge rewrite of code folding implementation.
+- Major improvements in typing responsiveness.
+- Major reduction in flickering during typing.
+- Around 40-50% reduction in memory usage per open file.
+- Fixed devcppPortable not passing files with spaces in names to devcpp correctly.
+- Improved performance when using a file to open Dev-C++.
+
 Version 5.8.3 - 10 November 2014
 
 - Slightly decreased flicker during editor opening.

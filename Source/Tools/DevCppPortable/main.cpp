@@ -13,7 +13,12 @@ int main() {
 	// Then build our selection to pass to devcpp.exe
 	wstring ArgumentsToDev = L"-c .\\config ";
 	for(int i = 1;i < ArgumentCount;i++) {
-		ArgumentsToDev.append(ArgumentInput[i]);
+		ArgumentsToDev += '\"';
+		ArgumentsToDev += ArgumentInput[i];
+		ArgumentsToDev += '\"';
+		if(i != ArgumentCount - 1) {
+			ArgumentsToDev += ' ';
+		}
 	}
 	
 	// Free the strings pointed to by argv

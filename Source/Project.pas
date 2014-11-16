@@ -195,7 +195,7 @@ begin
       result := true;
       if not Assigned(fEditor) and not FileExists(fFileName) then begin // file is neither open, nor saved
         workeditor := TSynEdit.Create(nil);
-        workeditor.UnCollapsedLines.SaveToFile(fFileName);
+        workeditor.Lines.SaveToFile(fFileName);
         workeditor.Free;
       end else if Assigned(fEditor) and Modified then begin
         result := fEditor.Save;

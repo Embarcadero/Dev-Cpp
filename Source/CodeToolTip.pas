@@ -656,11 +656,9 @@ begin
 
   // this displays the rect below the current line and at the same position where the token begins
   Pt.X :=
-    FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos,
-    true)))).X;
+    FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FTokenPos)))).X;
   Pt.Y :=
-    FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FFunctionEnd,
-    true)))).Y;
+    FEditor.ClientToScreen(FEditor.RowColumnToPixels(FEditor.BufferToDisplayPos(FEditor.CharIndexToRowCol(FFunctionEnd)))).Y;
 
   ActivateHint(Rect(Pt.X,
     Pt.Y + FEditor.LineHeight + 2,
@@ -700,7 +698,7 @@ var
 begin
 
   // get the current position in the collapsed text
-  CaretPos := FEditor.RowColToCharIndex(FEditor.CaretXY, true);
+  CaretPos := FEditor.RowColToCharIndex(FEditor.CaretXY);
   CurPos := CaretPos;
 
   // get a pointer to the collapsed text
@@ -803,7 +801,7 @@ begin
     Dec(CurPos);
 
   // Get the name of the function we're about to show
-  FuncStartXY := FEditor.CharIndexToRowCol(CurPos - 1, true);
+  FuncStartXY := FEditor.CharIndexToRowCol(CurPos - 1);
   S := FEditor.GetWordAtRowCol(FuncStartXY);
 
   // Don't bother scanning the database when there's no identifier to scan for

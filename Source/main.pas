@@ -1349,11 +1349,12 @@ var
 begin
   e := fEditorList.GetEditor;
   if Assigned(e) then begin
-    Statusbar.Panels[0].Text := format(Lang[ID_STATUSBARPLUS], [e.Text.LineToUncollapsedLine(e.Text.DisplayY),
+    Statusbar.Panels[0].Text := Format(Lang[ID_STATUSBARPLUS],
+      [e.Text.DisplayY,
       e.Text.DisplayX,
         e.Text.SelLength,
-        e.Text.UnCollapsedLines.Count,
-        e.Text.UnCollapsedLinesLength]);
+        e.Text.Lines.Count,
+        e.Text.Lines.GetTextLength]);
   end else begin
     StatusBar.Panels.BeginUpdate;
     try
@@ -4023,13 +4024,13 @@ begin
           end;
         1: begin // append UNIX timestamp (backup copy, don't update class browser)
             NewFileName := ChangeFileExt(e.FileName, '.' + IntToStr(DateTimeToUnix(Now)) + ExtractFileExt(e.FileName));
-            e.Text.UnCollapsedLines.SaveToFile(NewFileName);
+            e.Text.Lines.SaveToFile(NewFileName);
             SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, NewFileName]));
           end;
         2: begin // append formatted timestamp (backup copy, don't update class browser)
             NewFileName := ChangeFileExt(e.FileName, '.' + FormatDateTime('yyyy mm dd hh mm ss', Now) +
               ExtractFileExt(e.FileName));
-            e.Text.UnCollapsedLines.SaveToFile(NewFileName);
+            e.Text.Lines.SaveToFile(NewFileName);
             SetStatusbarMessage(Format(Lang[ID_AUTOSAVEDFILEAS], [e.FileName, NewFileName]));
           end;
       end;
@@ -5646,7 +5647,7 @@ begin
     // When searching using ctrl+click, the cursor is set properly too, so do NOT use WordAtMouse
     M := TMemoryStream.Create;
     try
-      e.Text.UnCollapsedLines.SaveToStream(M);
+      e.Text.Lines.SaveToStream(M);
       statement := CppParser.FindStatementOf(
         e.FileName,
         phrase, e.Text.CaretY, M);
@@ -6128,50 +6129,44 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 var
   I: integer;
+  FileList: TStringList;
 begin
-  if fFirstShow then begin
-    fFirstShow := false;
+  if not fFirstShow then
+    Exit;
 
-    // Below a possible fix for the disappearing of controls in MessageControl is given:
-    // Toggle visibility of bottom page control here.
-    // If we do this in OnShow, it messes with alignment options
-    OpenCloseMessageSheet(False);
+  fFirstShow := false;
 
-    // Open files passed to us (HAS to be done at FormShow)
-    ClassBrowser.BeginUpdate;
-    try
-      i := 1;
-      fShowTips := true;
-      while I <= ParamCount do begin
+  // Below a possible fix for the disappearing of controls in MessageControl is given:
+  // Toggle visibility of bottom page control here.
+  // If we do this in OnCreate, it messes with alignment options
+  OpenCloseMessageSheet(False);
 
-        // Skip the configuration redirect stuff
-        if ParamStr(i) = '-c' then
-          i := i + 2;
+  // Open files passed to us (HAS to be done at FormShow)
+  FileList := TStringList.Create;
+  try
+    I := 1;
+    fShowTips := true;
+    while I <= ParamCount do begin
 
-        // Open the files passed to Dev-C++
-        if FileExists(ParamStr(i)) then begin
-          if GetFileTyp(ParamStr(i)) = utPrj then begin
-            fShowTips := false; // don't show tips when opening files
-            OpenProject(ParamStr(i));
-            break; // only open 1 project
-          end else begin
-            fShowTips := false; // don't show tips when opening files
-            OpenFile(ParamStr(i));
-          end;
-        end;
-        inc(i);
-      end;
-    finally
-      ClassBrowser.EndUpdate;
+      // Skip the configuration redirect stuff
+      if ParamStr(i) = '-c' then
+        I := I + 2;
+
+      FileList.Add(ParamStr(i));
+      Inc(I);
     end;
 
-    // Update after opening files
-    UpdateAppTitle;
+    // Open them according to OpenFileList rules
+    OpenFileList(FileList);
+    if FileList.Count = 0 then
+      UpdateAppTitle;
 
     // do not show tips if Dev-C++ is launched with a file and only slow
     // when the form shows for the first time, not when going fullscreen too
-    if devData.ShowTipsOnStart and fShowTips then
+    if devData.ShowTipsOnStart and (FileList.Count = 0) then
       actShowTips.Execute;
+  finally
+    FileList.Free;
   end;
 end;
 

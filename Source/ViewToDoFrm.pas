@@ -171,7 +171,7 @@ begin
       e := MainForm.EditorList.Editors[i];
       if Assigned(e) then begin
         if e.FileName = Filename then
-          sl.Assign(e.Text.UnCollapsedLines)
+          sl.Assign(e.Text.Lines)
         else if FileExists(Filename) then
           sl.LoadFromFile(Filename);
       end;
@@ -349,13 +349,13 @@ begin
   if Assigned(e) then begin
     PToDoRec(Item.Data)^.IsDone := Item.Checked;
     if Item.Checked then begin
-      e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line] :=
-        StringReplace(e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line], 'TODO', 'DONE', []);
+      e.Text.Lines[PToDoRec(Item.Data)^.Line] :=
+        StringReplace(e.Text.Lines[PToDoRec(Item.Data)^.Line], 'TODO', 'DONE', []);
       if chkNoDone.Checked then
         BuildList;
     end else
-      e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line] :=
-        StringReplace(e.Text.UnCollapsedLines[PToDoRec(Item.Data)^.Line], 'DONE', 'TODO', []);
+      e.Text.Lines[PToDoRec(Item.Data)^.Line] :=
+        StringReplace(e.Text.Lines[PToDoRec(Item.Data)^.Line], 'DONE', 'TODO', []);
     e.Text.Modified := True;
     lv.Refresh;
   end;

@@ -410,7 +410,7 @@ end;
 
 procedure TEditor.ToggleBreakpoint(Line: integer);
 var
-  thisbreakpoint, DisplayLine: integer;
+  thisbreakpoint: integer;
 begin
   thisbreakpoint := HasBreakPoint(Line);
 
@@ -420,9 +420,8 @@ begin
     MainForm.Debugger.AddBreakPoint(Line, self);
 
   // Convert buffer to display position
-  DisplayLine := fText.UncollapsedLineToLine(Line);
-  fText.InvalidateGutterLine(DisplayLine);
-  fText.InvalidateLine(DisplayLine);
+  fText.InvalidateGutterLine(Line);
+  fText.InvalidateLine(Line);
 end;
 
 function TEditor.HasBreakPoint(Line: integer): integer;
@@ -441,20 +440,18 @@ end;
 procedure TEditor.EditorSpecialLineColors(Sender: TObject; Line: Integer; var Special: Boolean; var FG, BG: TColor);
 var
   pt: TPoint;
-  RealLine: integer;
 begin
-  RealLine := fText.LineToUncollapsedLine(Line);
-  if (RealLine = fActiveLine) then begin
+  if (Line = fActiveLine) then begin
     StrtoPoint(pt, devEditor.Syntax.Values[cABP]);
     BG := pt.X;
     FG := pt.Y;
     Special := TRUE;
-  end else if (HasBreakpoint(RealLine) <> -1) then begin
+  end else if (HasBreakpoint(Line) <> -1) then begin
     StrtoPoint(pt, devEditor.Syntax.Values[cBP]);
     BG := pt.X;
     FG := pt.Y;
     Special := TRUE;
-  end else if RealLine = fErrorLine then begin
+  end else if Line = fErrorLine then begin
     StrtoPoint(pt, devEditor.Syntax.Values[cErr]);
     BG := pt.X;
     FG := pt.Y;
@@ -464,18 +461,20 @@ end;
 
 procedure TEditor.DebugAfterPaint(ACanvas: TCanvas; AClip: TRect; FirstLine, LastLine: integer);
 var
-  X, Y, I, RealLine: integer;
+  X, Y, I, Line: integer;
 begin
+  // Get point where to draw marks
   X := (fText.Gutter.RealGutterWidth(fText.CharWidth) - fText.Gutter.RightOffset) div 2 - 3;
   Y := (fText.LineHeight - dmMain.GutterImages.Height) div 2 + fText.LineHeight * (FirstLine - fText.TopLine);
 
+  // The provided lines are actually rows...
   for I := FirstLine to LastLine do begin
-    RealLine := fText.LineToUncollapsedLine(I);
-    if fActiveLine = RealLine then // prefer active line over breakpoints
+    Line := fText.RowToLine(I);
+    if fActiveLine = Line then // prefer active line over breakpoints
       dmMain.GutterImages.Draw(ACanvas, X, Y, 1)
-    else if HasBreakpoint(RealLine) <> -1 then
+    else if HasBreakpoint(Line) <> -1 then
       dmMain.GutterImages.Draw(ACanvas, X, Y, 0)
-    else if fErrorLine = RealLine then
+    else if fErrorLine = Line then
       dmMain.GutterImages.Draw(ACanvas, X, Y, 2);
 
     Inc(Y, fText.LineHeight);
@@ -667,7 +666,7 @@ begin
     SynExporterHTML.Font := fText.Font;
     SynExporterHTML.Highlighter := fText.Highlighter;
 
-    SynExporterHTML.ExportAll(fText.UnCollapsedLines);
+    SynExporterHTML.ExportAll(fText.Lines);
     SynExporterHTML.SaveToFile(SaveFileName);
   finally
     SynExporterHTML.Free;
@@ -703,7 +702,7 @@ begin
     SynExporterRTF.Font := fText.Font;
     SynExporterRTF.Highlighter := fText.Highlighter;
 
-    SynExporterRTF.ExportAll(fText.UnCollapsedLines);
+    SynExporterRTF.ExportAll(fText.Lines);
     SynExporterRTF.SaveToFile(SaveFileName);
   finally
     SynExporterRTF.Free;
@@ -738,7 +737,7 @@ begin
     SynExporterTex.Font := fText.Font;
     SynExporterTex.Highlighter := fText.Highlighter;
 
-    SynExporterTex.ExportAll(fText.UnCollapsedLines);
+    SynExporterTex.ExportAll(fText.Lines);
     SynExporterTex.SaveToFile(SaveFileName);
   finally
     SynExporterTEX.Free;
@@ -890,7 +889,6 @@ end;
 procedure TEditor.SetCaretPos(Line, Col: integer);
 var
   Fold: TSynEditFoldRange;
-  CollapsedLine: integer;
 begin
   // Open up the closed folds around the focused line until we can see the line we're looking for
   repeat
@@ -898,10 +896,9 @@ begin
     if Assigned(Fold) then
       fText.Uncollapse(Fold);
   until not Assigned(Fold);
-  CollapsedLine := fText.UncollapsedLineToLine(Line);
 
   // Position the caret
-  fText.CaretXY := BufferCoord(Col, CollapsedLine);
+  fText.CaretXY := BufferCoord(Col, Line);
   fText.EnsureCursorPosVisible;
 end;
 
@@ -1297,7 +1294,7 @@ begin
 
   M := TMemoryStream.Create;
   try
-    fText.UnCollapsedLines.SaveToStream(M);
+    fText.Lines.SaveToStream(M);
 
     // Reparse whole file (not function bodies) if it has been modified
     // use stream, don't read from disk (not saved yet)
@@ -1519,7 +1516,7 @@ var
     // This piece of code changes the parser database, possibly making hints and code completion invalid...
     M := TMemoryStream.Create;
     try
-      fText.UnCollapsedLines.SaveToStream(M);
+      fText.Lines.SaveToStream(M);
       st := MainForm.CppParser.FindStatementOf(fFileName, s, p.Line, M);
     finally
       M.Free;
@@ -1661,16 +1658,14 @@ const
   OpenChars = ['{', '[', '('];
   CloseChars = ['}', ']', ')'];
 var
-  P: TBufferCoord;
-  S: AnsiString;
+  HighlightCharPos: TBufferCoord;
+  ComplementCharPos: TBufferCoord;
   Pix: TPoint;
-  textrect: TRect;
+  S: AnsiString;
   Attri: TSynHighlighterAttributes;
-  len: integer;
+  LineLength: integer;
 
-  procedure SetColors;
-  var
-    index: integer;
+  procedure SetColors(Point: TBufferCoord);
   begin
     // Draw using highlighting colors
     if TransientType = ttAfter then begin
@@ -1679,13 +1674,7 @@ var
 
       // Draw using normal colors
     end else begin
-      index := fText.RowColToCharIndex(P, false); // TODO: only compute inside first if?
-      if fText.SelAvail and (index > fText.SelStart) and (index < fText.SelEnd) then
-        begin // highlighted is inside selection
-        Canvas.Brush.Color := fText.SelectedColor.Background;
-        Canvas.Font.Color := fText.SelectedColor.Foreground;
-      end else if devEditor.HighCurrLine and (P.Line = fText.CaretY) then
-        begin // matching char is inside highlighted line
+      if devEditor.HighCurrLine and (Point.Line = fText.CaretY) then begin // matching char is inside highlighted line
         Canvas.Brush.Color := devEditor.HighColor;
         Canvas.Font.Color := Attri.Foreground;
       end else begin
@@ -1698,54 +1687,61 @@ var
     if Canvas.Brush.Color = clNone then
       Canvas.Brush.Color := fText.Highlighter.WhitespaceAttribute.Background;
   end;
-  procedure SetRect;
-  begin
-    Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(p));
-    textrect.Left := Pix.X;
-    textrect.Top := Pix.Y;
-    textrect.Bottom := textrect.Top + fText.LineHeight;
-    textrect.Right := textrect.Left + Canvas.TextWidth(S);
-  end;
+
 begin
-  if (not Assigned(fText.Highlighter)) or (not devEditor.Match) then
+  // Don't bother wasting time when we don't have to
+  if (not Assigned(fText.Highlighter)) or (not devEditor.Match) or fText.SelAvail then
     Exit;
 
+  HighlightCharPos.Line := -1;
+
   // Is there a bracket char before us?
-  len := Length(fText.LineText);
-  if (fText.CaretX - 1 > 0) and (fText.CaretX - 1 <= len) and (fText.LineText[fText.CaretX - 1] in AllChars) then
-    P := BufferCoord(fText.CaretX - 1, fText.CaretY)
+  LineLength := Length(fText.LineText);
+  if (fText.CaretX - 1 > 0) and (fText.CaretX - 1 <= LineLength) and (fText.LineText[fText.CaretX - 1] in AllChars) then
+    HighlightCharPos := BufferCoord(fText.CaretX - 1, fText.CaretY)
 
     // Or after us?
-  else if (fText.CaretX > 0) and (fText.CaretX <= len) and (fText.LineText[fText.CaretX] in AllChars) then
-    P := BufferCoord(fText.CaretX, fText.CaretY);
+  else if (fText.CaretX > 0) and (fText.CaretX <= LineLength) and (fText.LineText[fText.CaretX] in AllChars) then
+    HighlightCharPos := BufferCoord(fText.CaretX, fText.CaretY);
+
+  // Character not found. Exit.
+  if HighlightCharPos.Line = -1 then
+    Exit;
 
   // Is the OpenChar before/after us highlighted as a symbol (not a comment or something)?
-  if fText.GetHighlighterAttriAtRowCol(P, S, Attri) and (Attri = fText.Highlighter.SymbolAttribute) then begin
+  if not (fText.GetHighlighterAttriAtRowCol(HighlightCharPos, S, Attri) and (Attri = fText.Highlighter.SymbolAttribute))
+    then
+    Exit;
 
-    Canvas.Brush.Style := bsSolid;
-    Canvas.Font.Assign(fText.Font);
-    Canvas.Font.Style := Attri.Style;
+  // Find the corresponding bracket
+  ComplementCharPos := fText.GetMatchingBracketEx(HighlightCharPos);
+  if (ComplementCharPos.Char = 0) and (ComplementCharPos.Line = 0) then
+    Exit;
 
-    // Draw here using this color
-    SetRect;
-    SetColors;
+  // At this point we have found both characters. Check if both are visible
+  if Assigned(fText.FoldHidesLine(HighlightCharPos.Line)) or
+    Assigned(fText.FoldHidesLine(ComplementCharPos.Line)) then
+    Exit;
 
-    // Redraw bracket
-    ExtTextOut(Canvas.Handle, Pix.X, Pix.Y, ETO_OPAQUE, @textrect, PChar(S), Length(S), nil);
+  // Both are visible. Draw them
+  // First, draw bracket where caret is placed next to the caret
+  Canvas.Brush.Style := bsSolid;
+  Canvas.Font.Assign(fText.Font);
+  Canvas.Font.Style := Attri.Style;
 
-    // Draw corresponding bracket too
-    P := fText.GetMatchingBracketEx(P);
-    if (P.Char > 0) and (P.Line > 0) then begin
-      S := fText.Lines[P.Line - 1][P.Char];
+  // Draw the character the caret is at here using this color
+  SetColors(HighlightCharPos);
+  Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(HighlightCharPos));
+  S := fText.Lines[HighlightCharPos.Line - 1][HighlightCharPos.Char];
+  Canvas.TextOut(Pix.X, Pix.Y, S);
 
-      // Draw here using this color again
-      SetRect;
-      SetColors;
+  // Then draw complement
+  SetColors(ComplementCharPos);
+  Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(ComplementCharPos));
+  S := fText.Lines[ComplementCharPos.Line - 1][ComplementCharPos.Char];
+  Canvas.TextOut(Pix.X, Pix.Y, S);
 
-      // Mimic SynEdit drawing
-      ExtTextOut(Canvas.Handle, Pix.X, Pix.Y, ETO_OPAQUE, @textrect, PChar(S), Length(S), nil);
-    end;
-  end;
+  // Reset brush
   Canvas.Brush.Style := bsSolid;
 end;
 
@@ -1803,7 +1799,7 @@ begin
 
       // Save contents directly
       try
-        fText.UnCollapsedLines.SaveToFile(fFileName);
+        fText.Lines.SaveToFile(fFileName);
         fText.Modified := false;
       except
         MessageDlg(Format(Lang[ID_ERR_SAVEFILE], [fFileName]), mtError, [mbOk], 0);
@@ -1872,7 +1868,7 @@ begin
 
   // Try to save to disk
   try
-    fText.UnCollapsedLines.SaveToFile(SaveFileName);
+    fText.Lines.SaveToFile(SaveFileName);
     fText.Modified := False;
     fNew := False;
   except
