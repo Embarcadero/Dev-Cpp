@@ -203,6 +203,8 @@ type
 
   TSynEditorOptions = set of TSynEditorOption;
 
+  TSynFontSmoothMethod = (fsmNone, fsmAntiAlias, fsmClearType);
+
 const
   SYNEDIT_DEFAULT_OPTIONS = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey,
     eoScrollPastEol, eoShowScrollHint, eoSmartTabs, eoTabsToSpaces,
@@ -307,6 +309,7 @@ type
     fCharsInWindow: Integer;
     fCharWidth: Integer;
     fFontDummy: TFont;
+    fFontSmoothing: TSynFontSmoothMethod;
 {$IFDEF SYN_MBCSSUPPORT}
     fImeCount: Integer;
     fMBCSStepAside: Boolean;
@@ -579,6 +582,7 @@ type
     procedure InternalSetCaretXY(const Value: TBufferCoord); virtual;
     procedure SetCaretXY(const Value: TBufferCoord); virtual;
     procedure SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord); virtual;
+    procedure SetFontSmoothing(AValue: TSynFontSmoothMethod);
     procedure SetName(const Value: TComponentName); override;
     procedure SetReadOnly(Value: boolean); virtual;
     procedure SetWantReturns(Value: Boolean);
@@ -627,6 +631,7 @@ type
     property InternalCaretX: Integer write InternalSetCaretX;
     property InternalCaretY: Integer write InternalSetCaretY;
     property InternalCaretXY: TBufferCoord write InternalSetCaretXY;
+    property FontSmoothing: TSynFontSmoothMethod read fFontSmoothing write SetFontSmoothing;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -995,6 +1000,7 @@ type
     property OnSpecialLineColors;
     property OnStatusChange;
     property OnPaintTransient;
+    property FontSmoothing;
   end;
 
 implementation
@@ -3898,6 +3904,31 @@ begin
     Lines[CaretY - 1] := Value;
 end;
 
+procedure TCustomSynEdit.SetFontSmoothing(AValue: TSynFontSmoothMethod);
+const
+  NONANTIALIASED_QUALITY = 3;
+  ANTIALIASED_QUALITY = 4;
+  CLEARTYPE_QUALITY = 5;
+var
+  bMethod: Byte;
+  lf: TLogFont;
+begin
+  if fFontSmoothing <> AValue then begin
+    fFontSmoothing := AValue;
+    case fFontSmoothing of
+      fsmAntiAlias:
+        bMethod := ANTIALIASED_QUALITY;
+      fsmClearType:
+        bMethod := CLEARTYPE_QUALITY;
+    else // fsmNone also
+      bMethod := NONANTIALIASED_QUALITY;
+    end;
+    GetObject(Font.Handle, SizeOf(TLogFont), @lf);
+    lf.lfQuality := bMethod;
+    Font.Handle := CreateFontIndirect(lf);
+  end;
+end;
+
 procedure TCustomSynEdit.SetName(const Value: TComponentName);
 var
   TextToName: Boolean;
@@ -4383,6 +4414,9 @@ begin
         ScrollInfo.fMask := ScrollInfo.fMask or SIF_DISABLENOSCROLL;
       end;
 
+      if Visible then
+        SendMessage(Handle, WM_SETREDRAW, 0, 0);
+
       if (fScrollBars in [ssBoth, ssHorizontal]) then begin
         if eoScrollPastEol in Options then
           nMaxScroll := MaxScrollWidth
@@ -4453,6 +4487,12 @@ begin
           end;
         end else
           EnableScrollBar(Handle, SB_VERT, ESB_ENABLE_BOTH);
+
+        if Visible then
+          SendMessage(Handle, WM_SETREDRAW, -1, 0);
+        if fPaintLock = 0 then
+          Invalidate;
+
       end else
         ShowScrollBar(Handle, SB_VERT, False);
     end {endif fScrollBars <> ssNone}

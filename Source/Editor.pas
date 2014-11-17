@@ -325,6 +325,7 @@ begin
   fText.MaxScrollWidth := 4096; // bug-fix #600748
   fText.MaxUndo := 4096;
   fText.BorderStyle := bsNone;
+  fText.FontSmoothing := fsmClearType;
 
   fText.Gutter.LeftOffset := 4;
   fText.Gutter.RightOffset := 21;

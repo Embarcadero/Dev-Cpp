@@ -6028,7 +6028,7 @@ begin
   UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
 
   // Load the current compiler set (needs translations)
-  devCompilerSets.LoadSets;
+  devCompilerSets.LoadSets; // SLOW
 
   // Update toolbar
   UpdateCompilerList;
