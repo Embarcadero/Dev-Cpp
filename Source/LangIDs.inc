@@ -513,7 +513,13 @@ const
   ID_AB_UPDATE                          = 36015;
   ID_AB_LBLBLOG                         = 36016;
   ID_AB_BLOG                            = 36017;
-
+  ID_AB_POST4992                        = 36018;
+  ID_AB_REPOSITORY                      = 36019;
+  ID_AB_SUBREDDIT                       = 36020;
+  ID_AB_COMPILERS                       = 36021;
+  ID_AB_TDMGCC                          = 36022;
+  ID_AB_PRE4992                         = 36023;
+  
   // Code Inserts Edit
   ID_CIE_EDCAPTION                      = 37001;
   ID_CIE_ADDCAPTION                     = 37002;

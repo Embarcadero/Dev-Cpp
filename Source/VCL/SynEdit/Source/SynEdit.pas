@@ -1267,7 +1267,7 @@ begin
   fLines := TSynEditStringList.Create;
   fOrigLines := fLines;
   fPlugins := TList.Create;
-  with TSynEditStringList(fLines) do begin
+  with fLines do begin
     OnChange := LinesChanged;
     OnChanging := LinesChanging;
     OnCleared := ListCleared;
@@ -2005,13 +2005,11 @@ var
   vOldMode: TSynSelectionMode;
 begin
   Exclude(fStateFlags, sfLinesChanging);
-
-  // Update fold regions
-  ReScan;
-
   if HandleAllocated then begin
     UpdateScrollBars;
     vOldMode := fActiveSelectionMode;
+    if fUseCodeFolding then
+      ReScan;
     SetBlockBegin(CaretXY);
     fActiveSelectionMode := vOldMode;
     InvalidateRect(fInvalidateRect, False);
@@ -2454,7 +2452,7 @@ begin
       // draw each line if it is not hidden by a fold
       for cRow := aFirstRow to aLastRow do begin
         vLine := RowToLine(cRow);
-        if vLine > Lines.Count then
+        if (vLine > Lines.Count) and not (Lines.Count = 0) then
           break;
         vLineTop := (cRow - TopLine) * fTextHeight;
 
@@ -2522,7 +2520,7 @@ begin
   if fUseCodeFolding then begin
     for cRow := aFirstRow to aLastRow do begin
       vLine := RowToLine(cRow);
-      if vLine > Lines.Count then
+      if (vLine > Lines.Count) and not (Lines.Count = 0) then
         break;
 
       // Form a rectangle for the square the user can click on
@@ -3152,7 +3150,7 @@ var
     // Now loop through all the lines. The indices are valid for Lines.
     for cRow := aFirstRow to aLastRow do begin
       vLine := RowToLine(cRow);
-      if vLine > Lines.Count then
+      if (vLine > Lines.Count) and not (Lines.Count = 0) then
         break;
 
       // Get the expanded line.
@@ -3255,7 +3253,7 @@ var
         if vLine = 1 then
           fHighlighter.ResetRange
         else
-          fHighlighter.SetRange(TSynEditStringList(Lines).Ranges[vLine - 2]);
+          fHighlighter.SetRange(Lines.Ranges[vLine - 2]);
         fHighlighter.SetLine(sLine, vLine - 1);
         // Try to concatenate as many tokens as possible to minimize the count
         // of ExtTextOut calls necessary. This depends on the selection state
@@ -3668,7 +3666,7 @@ end;
 
 function TCustomSynEdit.GetDisplayY: Integer;
 begin
-  Result := CaretY; // nothing special to calculate?
+  Result := DisplayXY.Row; // account for folds
 end;
 
 function TCustomSynEdit.GetDisplayXY: TDisplayCoord;
@@ -3859,7 +3857,7 @@ begin
     else
       MaxVal := MaxScrollWidth - CharsInWindow + 1
   end else begin
-    MaxVal := TSynEditStringList(Lines).LengthOfLongestLine;
+    MaxVal := Lines.LengthOfLongestLine;
     if MaxVal > CharsInWindow then
       MaxVal := MaxVal - CharsInWindow + 1
     else
@@ -3950,7 +3948,7 @@ var
             TempString := Copy(Lines[BB.Line - 1], 1, BB.Char - 1) +
               Copy(Lines[BE.Line - 1], BE.Char, MaxInt);
             // Delete all lines in the selection range.
-            TSynEditStringList(Lines).DeleteLines(BB.Line, BE.Line - BB.Line);
+            Lines.DeleteLines(BB.Line, BE.Line - BB.Line);
             // Put the stuff that was outside of selection back in.
             if Options >= [eoScrollPastEol, eoTrimTrailingSpaces] then
               TempString := TrimTrailingSpaces(TempString);
@@ -4041,7 +4039,7 @@ var
       if P^ <> #0 then begin
         Str := sLeftSide + Copy(Value, 1, P - Start);
         ProperSetLine(CaretY - 1, Str);
-        TSynEditStringList(Lines).InsertLines(CaretY, CountLines(P));
+        Lines.InsertLines(CaretY, CountLines(P));
       end else begin
         Str := sLeftSide + Value + sRightSide;
         ProperSetLine(CaretY - 1, Str);
@@ -4333,7 +4331,7 @@ var
           if eoScrollPastEol in Options then
             nMaxScroll := MaxScrollWidth
           else
-            nMaxScroll := Max(TSynEditStringList(Lines).LengthOfLongestLine, 1);
+            nMaxScroll := Max(Lines.LengthOfLongestLine, 1);
 
           FHScrollBar.Min := 1;
           FHScrollBar.Max := nMaxScroll; // Qt handles values above MAX_SCROLL
@@ -4389,7 +4387,7 @@ begin
         if eoScrollPastEol in Options then
           nMaxScroll := MaxScrollWidth
         else
-          nMaxScroll := Max(TSynEditStringList(Lines).LengthOfLongestLine, 1);
+          nMaxScroll := Max(Lines.LengthOfLongestLine, 1);
         if nMaxScroll <= MAX_SCROLL then begin
           ScrollInfo.nMin := 1;
           ScrollInfo.nMax := nMaxScroll;
@@ -4680,7 +4678,7 @@ begin
       else
         // Simply set LeftChar property to the LengthOfLongestLine,
         // it would do the range checking and constrain the value if necessary
-        LeftChar := TSynEditStringList(Lines).LengthOfLongestLine;
+        LeftChar := Lines.LengthOfLongestLine;
     // Scrolls one char left / right
     SB_LINEDOWN: LeftChar := LeftChar + 1;
     SB_LINEUP: LeftChar := LeftChar - 1;
@@ -4696,7 +4694,7 @@ begin
         if eoScrollPastEol in Options then
           iMaxWidth := MaxScrollWidth
         else
-          iMaxWidth := Max(TSynEditStringList(Lines).LengthOfLongestLine, 1);
+          iMaxWidth := Max(Lines.LengthOfLongestLine, 1);
         if iMaxWidth > MAX_SCROLL then
           LeftChar := MulDiv(iMaxWidth, Msg.Pos, MAX_SCROLL)
         else
@@ -4875,15 +4873,15 @@ begin
   if Result = 0 then
     fHighlighter.ResetRange
   else
-    fHighlighter.SetRange(TSynEditStringList(Lines).Ranges[Result - 1]);
+    fHighlighter.SetRange(Lines.Ranges[Result - 1]);
 
   repeat
     fHighlighter.SetLine(Lines[Result], Result);
     fHighlighter.NextToEol;
     iRange := fHighlighter.GetRange;
-    if TSynEditStringList(Lines).Ranges[Result] = iRange then
+    if Lines.Ranges[Result] = iRange then
       Exit; // avoid the final Decrement
-    TSynEditStringList(Lines).Ranges[Result] := iRange;
+    Lines.Ranges[Result] := iRange;
     Inc(Result);
   until (Result = Lines.Count);
   Dec(Result);
@@ -4934,7 +4932,7 @@ begin
   InvalidateGutterLines(Index + 1, MaxInt);
 
   if (eoAutoSizeMaxScrollWidth in fOptions) then begin
-    L := TSynEditStringList(Lines).ExpandedStringLengths[Index];
+    L := Lines.ExpandedStringLengths[Index];
     if L > MaxScrollWidth then
       MaxScrollWidth := L;
   end;
@@ -4957,7 +4955,7 @@ begin
   InvalidateLines(Index + 1, vEndLine);
 
   if (eoAutoSizeMaxScrollWidth in fOptions) then begin
-    L := TSynEditStringList(Lines).ExpandedStringLengths[Index];
+    L := Lines.ExpandedStringLengths[Index];
     if L > MaxScrollWidth then
       MaxScrollWidth := L;
   end;
@@ -4973,7 +4971,7 @@ begin
     repeat
       fHighlighter.SetLine(Lines[i], i);
       fHighlighter.NextToEol;
-      TSynEditStringList(Lines).Ranges[i] := fHighlighter.GetRange;
+      Lines.Ranges[i] := fHighlighter.GetRange;
       Inc(i);
     until i >= Lines.Count;
   end;
@@ -5014,9 +5012,8 @@ begin
     inherited;
     Include(fStateFlags, sfDblClicked);
     MouseCapture := FALSE;
-  end;
-  // else
-  //   inherited; // do NOT send double click messages when clicking on the gutter
+  end else
+    inherited;
 end;
 
 function TCustomSynEdit.GetCanUndo: Boolean;
@@ -5553,7 +5550,7 @@ procedure TCustomSynEdit.ChainListCleared(Sender: TObject);
 begin
   if Assigned(fChainListCleared) then
     fChainListCleared(Sender);
-  TSynEditStringList(fOrigLines).OnCleared(Sender);
+  Lines.OnCleared(Sender);
 end;
 
 procedure TCustomSynEdit.ChainListDeleted(Sender: TObject; aIndex: integer;
@@ -5561,7 +5558,7 @@ procedure TCustomSynEdit.ChainListDeleted(Sender: TObject; aIndex: integer;
 begin
   if Assigned(fChainListDeleted) then
     fChainListDeleted(Sender, aIndex, aCount);
-  TSynEditStringList(fOrigLines).OnDeleted(Sender, aIndex, aCount);
+  fOrigLines.OnDeleted(Sender, aIndex, aCount);
 end;
 
 procedure TCustomSynEdit.ChainListInserted(Sender: TObject; aIndex: integer;
@@ -5569,7 +5566,7 @@ procedure TCustomSynEdit.ChainListInserted(Sender: TObject; aIndex: integer;
 begin
   if Assigned(fChainListInserted) then
     fChainListInserted(Sender, aIndex, aCount);
-  TSynEditStringList(fOrigLines).OnInserted(Sender, aIndex, aCount);
+  fOrigLines.OnInserted(Sender, aIndex, aCount);
 end;
 
 procedure TCustomSynEdit.ChainListPutted(Sender: TObject; aIndex: integer;
@@ -5577,21 +5574,21 @@ procedure TCustomSynEdit.ChainListPutted(Sender: TObject; aIndex: integer;
 begin
   if Assigned(fChainListPutted) then
     fChainListPutted(Sender, aIndex, aCount);
-  TSynEditStringList(fOrigLines).OnPutted(Sender, aIndex, aCount);
+  fOrigLines.OnPutted(Sender, aIndex, aCount);
 end;
 
 procedure TCustomSynEdit.ChainLinesChanging(Sender: TObject);
 begin
   if Assigned(fChainLinesChanging) then
     fChainLinesChanging(Sender);
-  TSynEditStringList(fOrigLines).OnChanging(Sender);
+  fOrigLines.OnChanging(Sender);
 end;
 
 procedure TCustomSynEdit.ChainLinesChanged(Sender: TObject);
 begin
   if Assigned(fChainLinesChanged) then
     fChainLinesChanged(Sender);
-  TSynEditStringList(fOrigLines).OnChange(Sender);
+  fOrigLines.OnChange(Sender);
 end;
 
 procedure TCustomSynEdit.ChainUndoRedoAdded(Sender: TObject);
@@ -5618,7 +5615,7 @@ begin
     Exit;
 
   //first put back the real methods
-  with TSynEditStringList(fLines) do begin
+  with fLines do begin
     OnCleared := fChainListCleared;
     OnDeleted := fChainListDeleted;
     OnInserted := fChainListInserted;
@@ -5699,7 +5696,7 @@ var
 begin
   Invalidate;
   if eoAutoSizeMaxScrollWidth in fOptions then begin
-    iLongestLineLength := TSynEditStringList(Lines).LengthOfLongestLine;
+    iLongestLineLength := Lines.LengthOfLongestLine;
     if iLongestLineLength > MaxScrollWidth then
       MaxScrollWidth := iLongestLineLength;
   end;
@@ -5708,7 +5705,7 @@ end;
 
 procedure TCustomSynEdit.SetLinesPointer(ASynEdit: TCustomSynEdit);
 begin
-  HookTextBuffer(TSynEditStringList(ASynEdit.Lines),
+  HookTextBuffer(ASynEdit.Lines,
     ASynEdit.UndoList, ASynEdit.RedoList);
 
   fChainedEditor := ASynEdit;
@@ -6352,7 +6349,7 @@ begin
               SetSelectedTextEmpty
             else begin
               Temp := LineText;
-              TabBuffer := TSynEditStringList(Lines).ExpandedStrings[CaretY - 1];
+              TabBuffer := Lines.ExpandedStrings[CaretY - 1];
               Len := Length(Temp);
               Caret := CaretXY;
               vTabTrim := 0;
@@ -7560,7 +7557,7 @@ begin
   Value := MinMax(Value, 1, 256);
   if (Value <> fTabWidth) then begin
     fTabWidth := Value;
-    TSynEditStringList(Lines).TabWidth := Value;
+    Lines.TabWidth := Value;
     Invalidate; // to redraw text containing tab chars
   end;
 end;
@@ -9134,7 +9131,7 @@ begin
     if PosY = 0 then
       Highlighter.ResetRange
     else
-      Highlighter.SetRange(TSynEditStringList(Lines).Ranges[PosY - 1]);
+      Highlighter.SetRange(Lines.Ranges[PosY - 1]);
     Highlighter.SetLine(Line, PosY);
     PosX := XY.Char;
     if (PosX > 0) and (PosX <= Length(Line)) then
@@ -10018,7 +10015,7 @@ var
     Line := 0;
     while Line < LinesToScan.Count do begin // index is valid for LinesToScan and fLines
       // If there is a collapsed fold over here, skip it
-      CollapsedFold := CollapsedFoldStartAtLine(Line+1); // only collapsed folds remain
+      CollapsedFold := CollapsedFoldStartAtLine(Line + 1); // only collapsed folds remain
       if Assigned(CollapsedFold) then begin
         Line := CollapsedFold.ToLine;
         Continue;

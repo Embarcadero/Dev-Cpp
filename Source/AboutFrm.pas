@@ -33,40 +33,50 @@ QStdCtrls, QButtons, QExtCtrls;
 
 type
   TAboutForm = class(TForm)
-    VersionLabel: TLabel;
+    lblVersion: TLabel;
     btnOk: TBitBtn;
-    CopyrightLabel: TLabel;
-    GroupBox1: TGroupBox;
-    LicenseText: TMemo;
-    GroupBox2: TGroupBox;
-    BloodLabel: TLabel;
-    BloodSite: TLabel;
-    MingwLabel: TLabel;
-    MingwSite: TLabel;
-    ForumLabel: TLabel;
-    ForumSite: TLabel;
-    MailLabel: TLabel;
-    MailSite: TLabel;
-    eMailLabel: TLabel;
-    eMailSite: TLabel;
-    BlogLabel: TLabel;
-    BlogSite: TLabel;
+    lblCopyright: TLabel;
+    grpLicense: TGroupBox;
+    txtLicense: TMemo;
+    grpLinks: TGroupBox;
+    lblBlood: TLabel;
+    lblBloodURL: TLabel;
+    lblMinGW: TLabel;
+    lblMinGWURL: TLabel;
+    lblDiscussion: TLabel;
+    lblDiscussionURL: TLabel;
+    lblMailing: TLabel;
+    lblMailingURL: TLabel;
+    lblResources: TLabel;
+    lblResourcesURL: TLabel;
+    lblBlog: TLabel;
+    lblBlogURL: TLabel;
     btnAuthors: TBitBtn;
     btnUpdateCheck: TBitBtn;
-    Timer1: TTimer;
-    Fish: TPanel;
+    timerFish: TTimer;
+    pnlFish: TPanel;
     FishImage: TImage;
-    Image1: TImage;
-    Label1: TLabel;
-    Bevel1: TBevel;
+    imgBanner: TImage;
+    lblDonateHint: TLabel;
+    bvNew: TBevel;
     imgDonate: TImage;
-    procedure LabelClick(Sender: TObject);
+    lblSubreddit: TLabel;
+    lblSubredditURL: TLabel;
+    lblRepository: TLabel;
+    lblRepositoryURL: TLabel;
+    lblTDM: TLabel;
+    lblTDMURL: TLabel;
+    bvCompiler: TBevel;
+    lblPost4992: TLabel;
+    lblCompilers: TLabel;
+    lblPre4992: TLabel;
+    procedure URLLabelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAuthorsClick(Sender: TObject);
     procedure btnUpdateCheckClick(Sender: TObject);
     procedure btnAuthorsDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
     procedure btnAuthorsDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure Timer1Timer(Sender: TObject);
+    procedure timerFishTimer(Sender: TObject);
     procedure FishImageClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure imgDonateClick(Sender: TObject);
@@ -93,33 +103,29 @@ begin
   Font.Size := devData.InterfaceFontSize;
 
   Caption := Lang[ID_AB_CAPTION];
-  GroupBox1.Caption := Lang[ID_AB_LICENSE];
-  GroupBox2.Caption := Lang[ID_AB_WEBCAP];
-  BloodLabel.Caption := Lang[ID_AB_LBLBLOODSITE];
-  MingwLabel.Caption := Lang[ID_AB_LBLMINGWSITE];
-  ForumLabel.Caption := Lang[ID_AB_LBLFORUM];
-  MailLabel.Caption := Lang[ID_AB_LBLMAIL];
-  EMailLabel.Caption := Lang[ID_AB_LBLEMAIL];
-  BlogLabel.Caption := Lang[ID_AB_LBLBLOG];
-  //BloodSite.Caption:=      Lang[ID_AB_BLOODSITE];
-  //MingwSite.Caption:=      Lang[ID_AB_MINGWSITE];
-  //ForumSite.Caption:=      Lang[ID_AB_FORUMS];
-  //MailSite.Caption:=       Lang[ID_AB_MAILLIST];
-  //eMailSite.Caption:=      Lang[ID_AB_AUTHOR];
-  //BlogSite.Caption:=       Lang[ID_AB_BLOG];
+  grpLicense.Caption := Lang[ID_AB_LICENSE];
+  grpLinks.Caption := Lang[ID_AB_WEBCAP];
+  lblPost4992.Caption := Lang[ID_AB_POST4992];
+  lblRepository.Caption := Lang[ID_AB_REPOSITORY];
+  lblSubreddit.Caption := lang[ID_AB_SUBREDDIT];
+  lblCompilers.Caption := Lang[ID_AB_COMPILERS];
+  lblMinGW.Caption := Lang[ID_AB_LBLMINGWSITE];
+  lblTDM.Caption := Lang[ID_AB_TDMGCC];
+  lblPre4992.Caption := Lang[ID_AB_PRE4992];
+  lblBlood.Caption := Lang[ID_AB_LBLBLOODSITE];
+  lblDiscussion.Caption := Lang[ID_AB_LBLFORUM];
+  lblMailing.Caption := Lang[ID_AB_LBLMAIL];
+  lblResources.Caption := Lang[ID_AB_LBLEMAIL];
   btnOk.Caption := Lang[ID_BTN_OK];
   btnUpdateCheck.Caption := Lang[ID_AB_UPDATE];
   btnAuthors.Caption := Lang[ID_BTN_AUTHOR];
 end;
 
-procedure TAboutForm.LabelClick(Sender: TObject);
+procedure TAboutForm.URLLabelClick(Sender: TObject);
 var
-  s: AnsiString;
+  S: AnsiString;
 begin
-  if pos('@', TLabel(Sender).Caption) <> 0 then
-    s := 'mailto:' + TLabel(Sender).Caption
-  else
-    s := TLabel(Sender).Caption;
+  S := TLabel(Sender).Caption;
   ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(s), nil, nil, SW_SHOWNORMAL);
 end;
 
@@ -131,10 +137,10 @@ begin
 
   // Use modified time, not the PE headers
   datestring := GetBuildTime(ParamStr(0));
-  VersionLabel.Caption := VersionLabel.Caption + DEVCPP_VERSION + #13#10 + 'Build time: ' + datestring;
+  lblVersion.Caption := lblVersion.Caption + DEVCPP_VERSION + #13#10 + 'Build time: ' + datestring;
 
   if FileExists(devData.Splash) then // TODO: check all folders?
-    Image1.Picture.LoadFromFile(devData.Splash);
+    imgBanner.Picture.LoadFromFile(devData.Splash);
 end;
 
 procedure TAboutForm.btnAuthorsClick(Sender: TObject);
@@ -168,28 +174,28 @@ end;
 procedure TAboutForm.btnAuthorsDragDrop(Sender, Source: TObject; X,
   Y: Integer);
 begin
-  Fish.Left := 0 - Fish.Width;
-  Fish.Top := Random(Height - Fish.Height - (Fish.Height div 3));
-  Fish.Tag := 0;
-  Timer1.Enabled := True;
+  pnlFish.Left := 0 - pnlFish.Width;
+  pnlFish.Top := Random(Height - pnlFish.Height - (pnlFish.Height div 3));
+  pnlFish.Tag := 0;
+  timerFish.Enabled := True;
 end;
 
-procedure TAboutForm.Timer1Timer(Sender: TObject);
+procedure TAboutForm.timerFishTimer(Sender: TObject);
 begin
-  if ((Fish.Tag = 0) and (Fish.Left > Width + 10)) or
-    ((Fish.Tag <> 1) and (Fish.Left < 0 - Fish.Width - 10)) then
-    Timer1.Enabled := False;
+  if ((pnlFish.Tag = 0) and (pnlFish.Left > Width + 10)) or
+    ((pnlFish.Tag <> 1) and (pnlFish.Left < 0 - pnlFish.Width - 10)) then
+    timerFish.Enabled := False;
 
-  if Fish.Tag = 0 then
-    Fish.Left := Fish.Left + 5
+  if pnlFish.Tag = 0 then
+    pnlFish.Left := pnlFish.Left + 5
   else
-    Fish.Left := Fish.Left - 5;
-  Fish.Top := Fish.Top + 1;
+    pnlFish.Left := pnlFish.Left - 5;
+  pnlFish.Top := pnlFish.Top + 1;
 end;
 
 procedure TAboutForm.FishImageClick(Sender: TObject);
 begin
-  Fish.Tag := not Fish.Tag;
+  pnlFish.Tag := not pnlFish.Tag;
 end;
 
 procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);

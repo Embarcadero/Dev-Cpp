@@ -1,10 +1,10 @@
 object AboutForm: TAboutForm
-  Left = 857
-  Top = 334
+  Left = 836
+  Top = 277
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'About Dev-C++ :-)'
-  ClientHeight = 546
+  ClientHeight = 662
   ClientWidth = 414
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,14 +18,14 @@ object AboutForm: TAboutForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 15
-  object VersionLabel: TLabel
-    Left = 215
+  object lblVersion: TLabel
+    Left = 214
     Top = 116
     Width = 42
     Height = 15
     Caption = 'Version '
   end
-  object CopyrightLabel: TLabel
+  object lblCopyright: TLabel
     Left = 8
     Top = 116
     Width = 190
@@ -38,7 +38,7 @@ object AboutForm: TAboutForm
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Image1: TImage
+  object imgBanner: TImage
     Left = 0
     Top = -43
     Width = 414
@@ -12189,21 +12189,21 @@ object AboutForm: TAboutForm
   end
   object btnOk: TBitBtn
     Left = 326
-    Top = 514
+    Top = 630
     Width = 75
     Height = 25
     Caption = '&OK'
     TabOrder = 5
     Kind = bkOK
   end
-  object GroupBox1: TGroupBox
+  object grpLicense: TGroupBox
     Left = 8
     Top = 144
     Width = 401
     Height = 121
     Caption = 'GNU General Public License : '
     TabOrder = 1
-    object LicenseText: TMemo
+    object txtLicense: TMemo
       Left = 8
       Top = 16
       Width = 385
@@ -12935,23 +12935,23 @@ object AboutForm: TAboutForm
       TabOrder = 0
     end
   end
-  object GroupBox2: TGroupBox
+  object grpLinks: TGroupBox
     Left = 8
     Top = 272
     Width = 401
-    Height = 233
+    Height = 346
     Caption = 'Web sites / email : '
     TabOrder = 2
-    object BloodLabel: TLabel
+    object lblBlood: TLabel
       Left = 16
-      Top = 24
+      Top = 266
       Width = 153
       Height = 15
       Caption = 'Bloodshed Software Website:'
     end
-    object BloodSite: TLabel
+    object lblBloodURL: TLabel
       Left = 184
-      Top = 24
+      Top = 266
       Width = 125
       Height = 13
       Cursor = crHandPoint
@@ -12962,18 +12962,18 @@ object AboutForm: TAboutForm
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
-      OnClick = LabelClick
+      OnClick = URLLabelClick
     end
-    object MingwLabel: TLabel
+    object lblMinGW: TLabel
       Left = 16
-      Top = 40
-      Width = 142
+      Top = 202
+      Width = 140
       Height = 15
-      Caption = 'Mingw compiler web site : '
+      Caption = 'MinGW Compiler Website:'
     end
-    object MingwSite: TLabel
+    object lblMinGWURL: TLabel
       Left = 184
-      Top = 40
+      Top = 202
       Width = 106
       Height = 13
       Cursor = crHandPoint
@@ -12984,40 +12984,40 @@ object AboutForm: TAboutForm
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
-      OnClick = LabelClick
+      OnClick = URLLabelClick
     end
-    object ForumLabel: TLabel
+    object lblDiscussion: TLabel
       Left = 16
-      Top = 56
+      Top = 284
       Width = 149
       Height = 15
-      Caption = 'Dev-C++ discussion forum :'
+      Caption = 'Dev-C++ Discussion Forum:'
     end
-    object ForumSite: TLabel
+    object lblDiscussionURL: TLabel
       Left = 184
-      Top = 56
-      Width = 156
+      Top = 284
+      Width = 161
       Height = 13
       Cursor = crHandPoint
-      Caption = 'http://www.bloodshed.net/forum'
+      Caption = 'http://www.bloodshed.net/forum/'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
       Font.Height = 11
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
-      OnClick = LabelClick
+      OnClick = URLLabelClick
     end
-    object MailLabel: TLabel
+    object lblMailing: TLabel
       Left = 16
-      Top = 72
-      Width = 146
+      Top = 302
+      Width = 147
       Height = 15
-      Caption = 'Dev-C++ users mailing list :'
+      Caption = 'Dev-C++ Users Mailing List:'
     end
-    object MailSite: TLabel
+    object lblMailingURL: TLabel
       Left = 184
-      Top = 72
+      Top = 302
       Width = 201
       Height = 13
       Cursor = crHandPoint
@@ -13028,40 +13028,40 @@ object AboutForm: TAboutForm
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
-      OnClick = LabelClick
+      OnClick = URLLabelClick
     end
-    object eMailLabel: TLabel
+    object lblResources: TLabel
       Left = 16
-      Top = 88
-      Width = 128
+      Top = 320
+      Width = 125
       Height = 15
-      Caption = 'Dev-C++ Resource Site :'
+      Caption = 'Dev-C++ Resource Site:'
     end
-    object eMailSite: TLabel
+    object lblResourcesURL: TLabel
       Left = 184
-      Top = 88
-      Width = 148
+      Top = 320
+      Width = 153
       Height = 13
       Cursor = crHandPoint
-      Caption = 'http://www.bloodshed.net/dev'
+      Caption = 'http://www.bloodshed.net/dev/'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
       Font.Height = 11
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
-      OnClick = LabelClick
+      OnClick = URLLabelClick
     end
-    object BlogLabel: TLabel
+    object lblBlog: TLabel
       Left = 16
-      Top = 120
-      Width = 137
+      Top = 76
+      Width = 27
       Height = 15
-      Caption = 'Post-4.9.9.2 development:'
+      Caption = 'Blog:'
     end
-    object BlogSite: TLabel
+    object lblBlogURL: TLabel
       Left = 184
-      Top = 120
+      Top = 76
       Width = 160
       Height = 13
       Cursor = crHandPoint
@@ -13072,27 +13072,27 @@ object AboutForm: TAboutForm
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsUnderline]
       ParentFont = False
-      OnClick = LabelClick
+      OnClick = URLLabelClick
     end
-    object Label1: TLabel
+    object lblDonateHint: TLabel
       Left = 16
-      Top = 152
+      Top = 102
       Width = 369
       Height = 15
       Alignment = taCenter
       AutoSize = False
       Caption = 'Please support Orwell Dev-C++ by making a donation:'
     end
-    object Bevel1: TBevel
+    object bvNew: TBevel
       Left = 16
-      Top = 112
+      Top = 178
       Width = 350
       Height = 2
       Shape = bsBottomLine
     end
     object imgDonate: TImage
       Left = 127
-      Top = 176
+      Top = 124
       Width = 147
       Height = 47
       Cursor = crHandPoint
@@ -13352,10 +13352,122 @@ object AboutForm: TAboutForm
         7474747474747474747474747400}
       OnClick = imgDonateClick
     end
+    object lblSubreddit: TLabel
+      Left = 16
+      Top = 58
+      Width = 54
+      Height = 15
+      Caption = 'Subreddit:'
+    end
+    object lblSubredditURL: TLabel
+      Left = 184
+      Top = 58
+      Width = 161
+      Height = 13
+      Cursor = crHandPoint
+      Caption = 'http://www.reddit.com/r/devcpp/'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = 11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsUnderline]
+      ParentFont = False
+      OnClick = URLLabelClick
+    end
+    object lblRepository: TLabel
+      Left = 16
+      Top = 40
+      Width = 59
+      Height = 15
+      Caption = 'Repository:'
+    end
+    object lblRepositoryURL: TLabel
+      Left = 184
+      Top = 40
+      Width = 177
+      Height = 13
+      Cursor = crHandPoint
+      Caption = 'https://sf.net/projects/orwelldevcpp/'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = 11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsUnderline]
+      ParentFont = False
+      OnClick = URLLabelClick
+    end
+    object lblTDM: TLabel
+      Left = 16
+      Top = 220
+      Width = 155
+      Height = 15
+      Caption = 'TDM-GCC Compiler Website:'
+    end
+    object lblTDMURL: TLabel
+      Left = 184
+      Top = 220
+      Width = 131
+      Height = 13
+      Cursor = crHandPoint
+      Caption = 'http://tdm-gcc.tdragon.net/'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = 11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsUnderline]
+      ParentFont = False
+      OnClick = URLLabelClick
+    end
+    object bvCompiler: TBevel
+      Left = 16
+      Top = 242
+      Width = 350
+      Height = 2
+      Shape = bsBottomLine
+    end
+    object lblPost4992: TLabel
+      Left = 16
+      Top = 24
+      Width = 44
+      Height = 15
+      Caption = '> 4.9.9.2'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsItalic]
+      ParentFont = False
+    end
+    object lblCompilers: TLabel
+      Left = 16
+      Top = 184
+      Width = 52
+      Height = 15
+      Caption = 'Compilers'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsItalic]
+      ParentFont = False
+    end
+    object lblPre4992: TLabel
+      Left = 16
+      Top = 248
+      Width = 106
+      Height = 15
+      Caption = '<= 4.9.9.2 (old stuff)'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsItalic]
+      ParentFont = False
+    end
   end
   object btnAuthors: TBitBtn
     Left = 235
-    Top = 514
+    Top = 630
     Width = 83
     Height = 25
     Caption = '&Authors'
@@ -13393,7 +13505,7 @@ object AboutForm: TAboutForm
   end
   object btnUpdateCheck: TBitBtn
     Left = 8
-    Top = 514
+    Top = 630
     Width = 185
     Height = 25
     Caption = '&Check for updates'
@@ -13427,7 +13539,7 @@ object AboutForm: TAboutForm
       BCBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBEBEBEBCBCBCBABABAB9
       B9B9B9B9B9BABABABCBCBCBEBEBEBFBFBFBFBFBFBFBFBFBFBFBF}
   end
-  object Fish: TPanel
+  object pnlFish: TPanel
     Left = -100
     Top = 40
     Width = 57
@@ -13663,10 +13775,10 @@ object AboutForm: TAboutForm
       OnClick = FishImageClick
     end
   end
-  object Timer1: TTimer
+  object timerFish: TTimer
     Enabled = False
     Interval = 20
-    OnTimer = Timer1Timer
+    OnTimer = timerFishTimer
     Left = 65512
     Top = 65512
   end
