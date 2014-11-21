@@ -163,8 +163,7 @@ type
   TSynEditCaretType = (ctVerticalLine, ctHorizontalLine, ctHalfBlock, ctBlock);
 
   TSynStateFlag = (sfCaretChanged, sfScrollbarChanged, sfLinesChanging,
-    sfIgnoreNextChar, sfCaretVisible, sfDblClicked, sfPossibleGutterClick,
-    sfWaitForDragging, sfGutterDragging);
+    sfIgnoreNextChar, sfCaretVisible, sfDblClicked, sfWaitForDragging);
 
   TSynStateFlags = set of TSynStateFlag;
 
@@ -2038,6 +2037,11 @@ begin
   if not PtInRect(GetClientRect, Point(X, Y)) then
     Exit;
 {$ENDIF}
+  if (X < fGutterWidth + 2) then begin
+    DoOnGutterClick(Button, X, Y);
+    Exit; // do NOT wait for MouseUp
+  end;
+
   TmpBegin := FBlockBegin;
   TmpEnd := FBlockEnd;
 
@@ -2110,13 +2114,6 @@ begin
     end;
   end;
 
-  if (X < fGutterWidth + 2) then begin
-    if Button = mbRight then
-      DoOnGutterClick(Button, X, Y)
-    else
-      Include(fStateFlags, sfPossibleGutterClick);
-  end;
-
   SetFocus;
 {$IFNDEF SYN_CLX}
   Windows.SetFocus(Handle);
@@ -2153,8 +2150,6 @@ begin
       P.Row := DisplayY;
     InternalCaretXY := DisplayToBufferPos(P);
     BlockEnd := CaretXY;
-    if (sfPossibleGutterClick in fStateFlags) and (FBlockBegin.Line <> CaretXY.Line) then
-      Include(fStateFlags, sfGutterDragging);
   end;
 end;
 
@@ -2216,9 +2211,7 @@ begin
   if (Button = mbRight) and (Shift = [ssRight]) and Assigned(PopupMenu) then
     exit;
   MouseCapture := False;
-  if (sfPossibleGutterClick in fStateFlags) and (X < fGutterWidth) and (Button <> mbRight) then begin
-    DoOnGutterClick(Button, X, Y)
-  end else if fStateFlags * [sfDblClicked, sfWaitForDragging] = [sfWaitForDragging] then begin
+  if fStateFlags * [sfDblClicked, sfWaitForDragging] = [sfWaitForDragging] then begin
     ComputeCaret(X, Y);
     if not (ssShift in Shift) then
       SetBlockBegin(CaretXY);
@@ -2226,8 +2219,6 @@ begin
     Exclude(fStateFlags, sfWaitForDragging);
   end;
   Exclude(fStateFlags, sfDblClicked);
-  Exclude(fStateFlags, sfPossibleGutterClick);
-  Exclude(fStateFlags, sfGutterDragging);
 end;
 
 procedure TCustomSynEdit.DoOnGutterClick(Button: TMouseButton; X, Y: integer);

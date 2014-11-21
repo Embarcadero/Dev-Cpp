@@ -64,14 +64,14 @@ uses
 type
   { This class provides a TWinControl-Object which supports only the
     needed Methods }
-  TKeyboardControl = class (TWinControl)
-    public
-      property OnKeyDown;
-      property OnKeyPress;
-      property OnMouseDown;
+  TKeyboardControl = class(TWinControl)
+  public
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnMouseDown;
   end;
 
-  TMouseCursorEvent =  procedure(Sender: TObject; const aLineCharPos: TBufferCoord;
+  TMouseCursorEvent = procedure(Sender: TObject; const aLineCharPos: TBufferCoord;
     var aCursor: TCursor) of object;
 
   TMethodList = class
@@ -88,49 +88,48 @@ type
     property Count: integer read GetCount;
   end;
 
-  TSynEditKbdHandler = class (TObject)
-    private
-      fKeyPressChain   : TMethodList;
-      fKeyDownChain    : TMethodList;
-      fKeyUpChain      : TMethodList;
-      fMouseDownChain  : TMethodList;
-      fMouseUpChain    : TMethodList;
-      fMouseCursorChain: TMethodList;
-      { avoid infinite recursiveness }
-      fInKeyPress      : Boolean;
-      fInKeyDown       : Boolean;
-      fInKeyUp         : Boolean;
-      fInMouseDown     : Boolean;
-      fInMouseUp       : Boolean;
-      fInMouseCursor   : Boolean;
-    public
-      constructor Create;
-      destructor Destroy; override;
+  TSynEditKbdHandler = class(TObject)
+  private
+    fKeyPressChain: TMethodList;
+    fKeyDownChain: TMethodList;
+    fKeyUpChain: TMethodList;
+    fMouseDownChain: TMethodList;
+    fMouseUpChain: TMethodList;
+    fMouseCursorChain: TMethodList;
+    { avoid infinite recursiveness }
+    fInKeyPress: Boolean;
+    fInKeyDown: Boolean;
+    fInKeyUp: Boolean;
+    fInMouseDown: Boolean;
+    fInMouseUp: Boolean;
+    fInMouseCursor: Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
 
-      procedure ExecuteKeyPress (Sender: TObject; var Key: Char);
-      procedure ExecuteKeyDown (Sender: TObject; var Key: Word; Shift: TShiftState);
-      procedure ExecuteKeyUp (Sender: TObject; var Key: Word; Shift: TShiftState);
-      procedure ExecuteMouseDown(Sender: TObject; Button: TMouseButton;
-        Shift: TShiftState; X, Y: Integer);
-      procedure ExecuteMouseUp(Sender: TObject; Button: TMouseButton;
-        Shift: TShiftState; X, Y: Integer);
-      procedure ExecuteMouseCursor(Sender: TObject; const aLineCharPos: TBufferCoord;
-        var aCursor: TCursor);
+    procedure ExecuteKeyPress(Sender: TObject; var Key: Char);
+    procedure ExecuteKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ExecuteKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ExecuteMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure ExecuteMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure ExecuteMouseCursor(Sender: TObject; const aLineCharPos: TBufferCoord;
+      var aCursor: TCursor);
 
-      procedure AddKeyDownHandler (aHandler : TKeyEvent);
-      procedure RemoveKeyDownHandler (aHandler : TKeyEvent);
-      procedure AddKeyUpHandler (aHandler : TKeyEvent);
-      procedure RemoveKeyUpHandler (aHandler : TKeyEvent);
-      procedure AddKeyPressHandler (aHandler : TKeyPressEvent);
-      procedure RemoveKeyPressHandler (aHandler : TKeyPressEvent);
-      procedure AddMouseDownHandler(aHandler: TMouseEvent);
-      procedure RemoveMouseDownHandler(aHandler: TMouseEvent);
-      procedure AddMouseUpHandler(aHandler: TMouseEvent);
-      procedure RemoveMouseUpHandler(aHandler: TMouseEvent);
-      procedure AddMouseCursorHandler(aHandler: TMouseCursorEvent);
-      procedure RemoveMouseCursorHandler(aHandler: TMouseCursorEvent);
+    procedure AddKeyDownHandler(aHandler: TKeyEvent);
+    procedure RemoveKeyDownHandler(aHandler: TKeyEvent);
+    procedure AddKeyUpHandler(aHandler: TKeyEvent);
+    procedure RemoveKeyUpHandler(aHandler: TKeyEvent);
+    procedure AddKeyPressHandler(aHandler: TKeyPressEvent);
+    procedure RemoveKeyPressHandler(aHandler: TKeyPressEvent);
+    procedure AddMouseDownHandler(aHandler: TMouseEvent);
+    procedure RemoveMouseDownHandler(aHandler: TMouseEvent);
+    procedure AddMouseUpHandler(aHandler: TMouseEvent);
+    procedure RemoveMouseUpHandler(aHandler: TMouseEvent);
+    procedure AddMouseCursorHandler(aHandler: TMouseCursorEvent);
+    procedure RemoveMouseCursorHandler(aHandler: TMouseCursorEvent);
   end;
-
 
 implementation
 
@@ -138,132 +137,132 @@ implementation
 
 procedure TSynEditKbdHandler.AddKeyDownHandler(aHandler: TKeyEvent);
 begin
-  fKeyDownChain.Add( TMethod(aHandler) );
+  fKeyDownChain.Add(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.AddKeyUpHandler(aHandler: TKeyEvent);
 begin
-  fKeyUpChain.Add( TMethod(aHandler) );
+  fKeyUpChain.Add(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.AddKeyPressHandler(aHandler: TKeyPressEvent);
 begin
-  fKeyPressChain.Add( TMethod(aHandler) );
+  fKeyPressChain.Add(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.AddMouseDownHandler(aHandler: TMouseEvent);
 begin
-  fMouseDownChain.Add( TMethod(aHandler) );
+  fMouseDownChain.Add(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.AddMouseUpHandler(aHandler: TMouseEvent);
 begin
-  fMouseUpChain.Add( TMethod(aHandler) );
+  fMouseUpChain.Add(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.AddMouseCursorHandler(aHandler: TMouseCursorEvent);
 begin
-  fMouseCursorChain.Add( TMethod(aHandler) );
+  fMouseCursorChain.Add(TMethod(aHandler));
 end;
 
 constructor TSynEditKbdHandler.Create;
-  begin
-    { Elements to handle KeyDown-Events }
-    fKeyDownChain := TMethodList.Create;
+begin
+  { Elements to handle KeyDown-Events }
+  fKeyDownChain := TMethodList.Create;
 
-    { Elements to handle KeyUp-Events }
-    fKeyUpChain := TMethodList.Create;
+  { Elements to handle KeyUp-Events }
+  fKeyUpChain := TMethodList.Create;
 
-    { Elements to handle KeyPress-Events }
-    fKeyPressChain := TMethodList.Create;
+  { Elements to handle KeyPress-Events }
+  fKeyPressChain := TMethodList.Create;
 
-    { Elements to handle MouseDown Events }
-    fMouseDownChain := TMethodList.Create;
+  { Elements to handle MouseDown Events }
+  fMouseDownChain := TMethodList.Create;
 
-    { Elements to handle MouseUp Events }
-    fMouseUpChain := TMethodList.Create;
+  { Elements to handle MouseUp Events }
+  fMouseUpChain := TMethodList.Create;
 
-    { Elements to handle MouseCursor Events }
-    fMouseCursorChain := TMethodList.Create;
-  end;
+  { Elements to handle MouseCursor Events }
+  fMouseCursorChain := TMethodList.Create;
+end;
 
 destructor TSynEditKbdHandler.Destroy;
-  begin
-    fKeyPressChain.Free;
-    fKeyDownChain.Free;
-    fKeyUpChain.Free;
-    fMouseDownChain.Free;
-    fMouseUpChain.Free;
-    fMouseCursorChain.Free;
+begin
+  fKeyPressChain.Free;
+  fKeyDownChain.Free;
+  fKeyUpChain.Free;
+  fMouseDownChain.Free;
+  fMouseUpChain.Free;
+  fMouseCursorChain.Free;
 
-    inherited Destroy;
-  end;
+  inherited Destroy;
+end;
 
-procedure TSynEditKbdHandler.ExecuteKeyDown (Sender: TObject; var Key: Word; Shift: TShiftState);
-  var
-    idx : Integer;
-  begin
-    if fInKeyDown then
-      exit;
-    fInKeyDown := true;
-    try
-      with fKeyDownChain do begin
-        for idx := Count - 1 downto 0 do begin
-          TKeyEvent(Items[idx])(Sender,Key,Shift);
-          if (Key = 0) then begin
-            fInKeyDown := false;
-            exit;
-          end;
+procedure TSynEditKbdHandler.ExecuteKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  idx: Integer;
+begin
+  if fInKeyDown then
+    exit;
+  fInKeyDown := true;
+  try
+    with fKeyDownChain do begin
+      for idx := Count - 1 downto 0 do begin
+        TKeyEvent(Items[idx])(Sender, Key, Shift);
+        if (Key = 0) then begin
+          fInKeyDown := false;
+          exit;
         end;
       end;
-    finally
-      fInKeyDown := false;
     end;
+  finally
+    fInKeyDown := false;
   end;
+end;
 
-procedure TSynEditKbdHandler.ExecuteKeyUp (Sender: TObject; var Key: Word; Shift: TShiftState);
-  var
-    idx : Integer;
-  begin
-    if fInKeyUp then
-      exit;
-    fInKeyUp := true;
-    try
-      with fKeyUpChain do begin
-        for idx := Count - 1 downto 0 do begin
-          TKeyEvent(Items[idx])(Sender,Key,Shift);
-          if (Key = 0) then begin
-            fInKeyUp := false;
-            exit;
-          end;
+procedure TSynEditKbdHandler.ExecuteKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  idx: Integer;
+begin
+  if fInKeyUp then
+    exit;
+  fInKeyUp := true;
+  try
+    with fKeyUpChain do begin
+      for idx := Count - 1 downto 0 do begin
+        TKeyEvent(Items[idx])(Sender, Key, Shift);
+        if (Key = 0) then begin
+          fInKeyUp := false;
+          exit;
         end;
       end;
-    finally
-      fInKeyUp := false;
     end;
+  finally
+    fInKeyUp := false;
   end;
+end;
 
-procedure TSynEditKbdHandler.ExecuteKeyPress (Sender: TObject; var Key: Char);
-  var
-    idx : Integer;
-  begin
-    if fInKeyPress then
-      exit;
-    fInKeyPress := true;
-    try
-      with fKeyPressChain do begin
-        for idx := Count - 1 downto 0 do begin
-          TKeyPressEvent(Items[idx])(Sender,Key);
-          if (Key = #0) then begin
-            fInKeyPress := false;
-            exit;
-          end;
+procedure TSynEditKbdHandler.ExecuteKeyPress(Sender: TObject; var Key: Char);
+var
+  idx: Integer;
+begin
+  if fInKeyPress then
+    exit;
+  fInKeyPress := true;
+  try
+    with fKeyPressChain do begin
+      for idx := Count - 1 downto 0 do begin
+        TKeyPressEvent(Items[idx])(Sender, Key);
+        if (Key = #0) then begin
+          fInKeyPress := false;
+          exit;
         end;
       end;
-    finally
-      fInKeyPress := false;
     end;
+  finally
+    fInKeyPress := false;
   end;
+end;
 
 procedure TSynEditKbdHandler.ExecuteMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
@@ -275,7 +274,7 @@ begin
   fInMouseDown := True;
   try
     for cHandler := fMouseDownChain.Count - 1 downto 0 do
-      TMouseEvent(fMouseDownChain[cHandler])( Sender, Button, Shift, X, Y );
+      TMouseEvent(fMouseDownChain[cHandler])(Sender, Button, Shift, X, Y);
   finally
     fInMouseDown := False;
   end;
@@ -291,7 +290,7 @@ begin
   fInMouseUp := True;
   try
     for cHandler := fMouseUpChain.Count - 1 downto 0 do
-      TMouseEvent(fMouseUpChain[cHandler])( Sender, Button, Shift, X, Y );
+      TMouseEvent(fMouseUpChain[cHandler])(Sender, Button, Shift, X, Y);
   finally
     fInMouseUp := False;
   end;
@@ -315,40 +314,40 @@ end;
 
 procedure TSynEditKbdHandler.RemoveKeyDownHandler(aHandler: TKeyEvent);
 begin
-  fKeyDownChain.Remove( TMethod(aHandler) );
+  fKeyDownChain.Remove(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.RemoveKeyUpHandler(aHandler: TKeyEvent);
 begin
-  fKeyUpChain.Remove( TMethod(aHandler) );
+  fKeyUpChain.Remove(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.RemoveKeyPressHandler(aHandler: TKeyPressEvent);
 begin
-  fKeyPressChain.Remove( TMethod(aHandler) );
+  fKeyPressChain.Remove(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.RemoveMouseDownHandler(aHandler: TMouseEvent);
 begin
-  fMouseDownChain.Remove( TMethod(aHandler) );
+  fMouseDownChain.Remove(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.RemoveMouseUpHandler(aHandler: TMouseEvent);
 begin
-  fMouseUpChain.Remove( TMethod(aHandler) );
+  fMouseUpChain.Remove(TMethod(aHandler));
 end;
 
 procedure TSynEditKbdHandler.RemoveMouseCursorHandler(aHandler: TMouseCursorEvent);
 begin
-  fMouseCursorChain.Remove( TMethod(aHandler) );
+  fMouseCursorChain.Remove(TMethod(aHandler));
 end;
 
 { TMethodList }
 
 procedure TMethodList.Add(aHandler: TMethod);
 begin
-  fData.Add( aHandler.Data );
-  fData.Add( aHandler.Code );
+  fData.Add(aHandler.Data);
+  fData.Add(aHandler.Code);
 end;
 
 constructor TMethodList.Create;
@@ -370,24 +369,23 @@ function TMethodList.GetItem(aIndex: integer): TMethod;
 begin
   aIndex := aIndex * 2;
   Result.Data := fData[aIndex];
-  Result.Code := fData[aIndex+1];
+  Result.Code := fData[aIndex + 1];
 end;
 
 procedure TMethodList.Remove(aHandler: TMethod);
 var
   cPos: integer;
 begin
-  cPos := fData.Count -2;
-  while cPos >= 0 do
-  begin
-    if (fData.List[cPos] = aHandler.Data) and (fData.List[cPos +1] = aHandler.Code) then
-    begin
-      fData.Delete( cPos );
-      fData.Delete( cPos );
+  cPos := fData.Count - 2;
+  while cPos >= 0 do begin
+    if (fData.List[cPos] = aHandler.Data) and (fData.List[cPos + 1] = aHandler.Code) then begin
+      fData.Delete(cPos);
+      fData.Delete(cPos);
       Exit;
     end;
-    Dec( cPos, 2 );
+    Dec(cPos, 2);
   end;
 end;
 
 end.
+
