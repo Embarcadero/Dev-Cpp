@@ -2138,7 +2138,7 @@ begin
       MouseCapture := False;
 {$ENDIF}
     end;
-  end else if (ssLeft in Shift) and MouseCapture then begin
+  end else if (ssLeft in Shift) and MouseCapture and (X > fGutter.Width) then begin
     // should we begin scrolling?
     ComputeScroll(X, Y);
     { compute new caret }
