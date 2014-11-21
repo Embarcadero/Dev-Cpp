@@ -776,8 +776,8 @@ type
     function FoldLineToRow(Line: Integer): Integer;
     function FoldRowToLine(Row: Integer): Integer;
     procedure FoldOnListCleared;
-    procedure FoldOnListDeleted(Index: Integer; Count: Integer);
-    procedure FoldOnListInserted(Index: Integer; Count: Integer);
+    procedure FoldOnListDeleted(Line: Integer; Count: Integer);
+    procedure FoldOnListInserted(Line: Integer; Count: Integer);
     property CodeFolding: TSynCodeFolding read fCodeFolding;
     property BlockBegin: TBufferCoord read GetBlockBegin write SetBlockBegin;
     property BlockEnd: TBufferCoord read GetBlockEnd write SetBlockEnd;
@@ -4946,7 +4946,7 @@ end;
 procedure TCustomSynEdit.ListDeleted(Sender: TObject; aIndex: Integer; aCount: integer);
 begin
   if UseCodeFolding then
-    FoldOnListDeleted(aIndex, aCount);
+    FoldOnListDeleted(aIndex + 1, aCount);
   if Assigned(fHighlighter) and (Lines.Count > 0) then
     ScanFrom(aIndex);
   InvalidateLines(aIndex + 1, MaxInt);
@@ -4959,7 +4959,7 @@ var
   vLastScan: integer;
 begin
   if UseCodeFolding then
-    FoldOnListInserted(Index, aCount);
+    FoldOnListInserted(Index + 1, aCount);
   if Assigned(fHighlighter) and (Lines.Count > 0) then begin
     vLastScan := Index;
     repeat
@@ -10266,21 +10266,23 @@ begin
     fAllFoldRanges.Delete(i);
 end;
 
-procedure TCustomSynEdit.FoldOnListDeleted(Index: Integer; Count: Integer);
+procedure TCustomSynEdit.FoldOnListDeleted(Line: Integer; Count: Integer);
 var
-  i: Integer;
+  I: Integer;
 begin
   // Delete collapsed inside selection
   for i := fAllFoldRanges.Count - 1 downto 0 do
     with fAllFoldRanges[i] do
       if Collapsed and not ParentCollapsed then
-        if (FromLine >= Index) and (FromLine < Index + Count) then // delete inside affectec area
+        if (FromLine = Line) and (Count = 1) then // open up because we are messing with the starting line
+          Uncollapse(fAllFoldRanges[i])
+        else if (FromLine >= Line - 1) and (FromLine < Line + Count) then // delete inside affectec area
           fAllFoldRanges.Delete(i)
-        else if (FromLine >= Index + Count) then // Move after affected area
+        else if (FromLine >= Line + Count) then // Move after affected area
           fAllFoldRanges[i].Move(-Count);
 end;
 
-procedure TCustomSynEdit.FoldOnListInserted(Index: Integer; Count: Integer);
+procedure TCustomSynEdit.FoldOnListInserted(Line: Integer; Count: Integer);
 var
   i: Integer;
 begin
@@ -10288,7 +10290,9 @@ begin
   for i := fAllFoldRanges.Count - 1 downto 0 do
     with fAllFoldRanges[i] do
       if Collapsed and not ParentCollapsed then
-        if (FromLine >= Index + Count) then // Move after affected area
+        if (FromLine = Line - 1) then // insertion starts at fold line
+          Uncollapse(fAllFoldRanges[i])
+        else if (FromLine >= Line) then // insertion of count lines above FromLine
           fAllFoldRanges[i].Move(Count);
 end;
 

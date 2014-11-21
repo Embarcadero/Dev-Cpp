@@ -502,7 +502,7 @@ var
   si: TStartupInfo;
   pi: TProcessInformation;
   nRead: DWORD;
-  aBuf: array[0..1024] of char;
+  aBuf: array[0..8192] of char;
   sa: TSecurityAttributes;
   hOutputReadTmp, hOutputRead, hOutputWrite, hInputWriteTmp, hInputRead,
     hInputWrite, hErrorWrite: THandle;

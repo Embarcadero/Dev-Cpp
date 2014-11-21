@@ -1350,7 +1350,7 @@ begin
   e := fEditorList.GetEditor;
   if Assigned(e) then begin
     Statusbar.Panels[0].Text := Format(Lang[ID_STATUSBARPLUS],
-      [e.Text.DisplayY,
+      [e.Text.CaretY,
       e.Text.DisplayX,
         e.Text.SelLength,
         e.Text.Lines.Count,
