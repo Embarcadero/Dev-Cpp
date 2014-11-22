@@ -1066,6 +1066,7 @@ begin
         FileList.Add(FileNameBuffer);
       end;
       OpenFileList(FileList);
+      Application.BringToFront;
     finally
       FileList.Free;
     end;
@@ -3913,8 +3914,7 @@ end;
 
 procedure TMainForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
 begin
-  if FileName <> '' then
-    SetStatusBarMessage(Format(Lang[ID_PARSINGFILE], [Filename]));
+  SetStatusBarMessage(Format(Lang[ID_PARSINGFILECOUNT], [Current, Total, Filename]));
   Application.ProcessMessages;
 end;
 

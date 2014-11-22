@@ -113,6 +113,8 @@ type
     fProjectIncludePaths: TStringList;
     fProjectFiles: TStringList;
     fFilesToScan: TStringList;
+    fFilesScanned: Integer;
+    fFilesScannedCount: Integer;
     fScannedFiles: TStringList;
     fFileIncludes: TStringList;
     fCacheContents: TStringList;
@@ -1034,11 +1036,11 @@ end;
 
 procedure TCppParser.HandlePreprocessor;
 var
-  DelimPos: integer;
+  DelimPos, Line: Integer;
   S, Name, Args, Value: AnsiString;
 begin
   if StartsStr('#include ', fTokenizer[fIndex]^.Text) then begin // start of new file
-    // format: #(spaces)include fullfilename:line
+    // format: #include fullfilename:line
     // Strip keyword
     S := Copy(fTokenizer[fIndex]^.Text, Length('#include ') + 1, MaxInt);
     DelimPos := LastPos(':', S);
@@ -1048,9 +1050,14 @@ begin
       fIsProjectFile := fProjectFiles.IndexOf(fCurrentFile) <> -1;
       fIsHeader := IsHfile(fCurrentFile);
 
-      // Mention progress to user
-      if Assigned(fOnTotalProgress) and not fLaterScanning then
-        fOnTotalProgress(Self, fCurrentFile, -1, -1);
+      // Mention progress to user if we enter a NEW file
+      Line := StrToIntDef(Copy(S, DelimPos + 1, MaxInt), -1);
+      if Line = 1 then begin
+        Inc(fFilesScanned);
+        Inc(fFilesScannedCount);
+        if Assigned(fOnTotalProgress) and not fLaterScanning then
+          fOnTotalProgress(Self, fCurrentFile, fFilesScannedCount, fFilesScanned + 1);
+      end;
     end;
   end else if StartsStr('#define ', fTokenizer[fIndex]^.Text) then begin
 
@@ -1813,13 +1820,16 @@ begin
   try
     // Support stopping of parsing when files closes unexpectedly
     I := 0;
+    fFilesScanned := 0;
+    fFilesScannedCount := fFilesToScan.Count;
     while I < fFilesToScan.Count do begin
       if Assigned(fOnTotalProgress) then
-        fOnTotalProgress(Self, fFilesToScan[i], fFilesToScan.Count, i);
+        fOnTotalProgress(Self, fFilesToScan[i], fFilesScannedCount, fFilesScanned + 1);
       if fScannedFiles.IndexOf(fFilesToScan[i]) = -1 then begin
         Parse(fFilesToScan[i], True, False);
       end;
       Inc(I);
+      Inc(fFilesScanned);
     end;
     fFilesToScan.Clear;
     PostProcessInheritance;

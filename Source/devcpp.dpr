@@ -143,7 +143,7 @@ begin
   CreateOptions;
 
   // Display it as soon as possible, and only if its worth viewing...
-  if (not devData.NoSplashScreen and devCodeCompletion.UseCacheFiles) or devData.First then
+  if (not devData.NoSplashScreen) or devData.First then
     SplashForm := TSplashForm.Create(nil);
 
   Application.CreateForm(TMainForm, MainForm);

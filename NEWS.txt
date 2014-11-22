@@ -5,7 +5,7 @@ Version 5.8.4 - *
 - Major reduction in flickering during typing.
 - Around 40-50% reduction in memory usage per open file.
 - Fixed devcppPortable not passing files with spaces in names to devcpp correctly.
-- Improved performance when using a file to open Dev-C++.
+- Improved performance when opening multiple files from explorer using Dev-C++.
 
 Version 5.8.3 - 10 November 2014
 

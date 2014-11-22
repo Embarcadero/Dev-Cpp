@@ -993,27 +993,27 @@ begin
     Attr := TSynHighlighterAttributes.Create(ElementList.Items[ElementList.ItemIndex]);
     Attr.Assign(cpp.Attribute[ElementList.ItemIndex]);
     with Attr do try
-        Foreground := cpForeground.Selected;
-        Background := cpBackground.Selected;
+      Foreground := cpForeground.Selected;
+      Background := cpBackground.Selected;
 
-        // Update default color
-        if SameText(Name, 'WhiteSpace') then begin
-          ffgColor := Foreground;
-          fbgColor := Background;
-        end;
-
-        Style := [];
-        if cbBold.checked then
-          Style := Style + [fsBold];
-        if cbItalic.Checked then
-          Style := Style + [fsItalic];
-        if cbUnderlined.Checked then
-          Style := Style + [fsUnderline];
-
-        cpp.Attribute[ElementList.ItemIndex].Assign(Attr);
-      finally
-        Free;
+      // Update default color
+      if SameText(Name, 'WhiteSpace') then begin
+        ffgColor := Foreground;
+        fbgColor := Background;
       end;
+
+      Style := [];
+      if cbBold.checked then
+        Style := Style + [fsBold];
+      if cbItalic.Checked then
+        Style := Style + [fsItalic];
+      if cbUnderlined.Checked then
+        Style := Style + [fsUnderline];
+
+      cpp.Attribute[ElementList.ItemIndex].Assign(Attr);
+    finally
+      Free;
+    end;
   end;
 
   cppEdit.Repaint;
@@ -1409,41 +1409,41 @@ var
 begin
   with TOpenDialog.Create(Self) do try
 
-      Filter := BuildFilter([FLT_HEADS]);
-      Options := Options + [ofAllowMultiSelect];
+    Filter := BuildFilter([FLT_HEADS]);
+    Options := Options + [ofAllowMultiSelect];
 
-      // Start in the include folder, if it's set
-      FileName := '';
-      if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.CppDir.Count > 0) then
-        InitialDir := devCompilerSets.CurrentSet.CppDir[0];
+    // Start in the include folder, if it's set
+    FileName := '';
+    if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.CppDir.Count > 0) then
+      InitialDir := devCompilerSets.CurrentSet.CppDir[0];
 
-      if Execute then begin
-        sl := TStringList.Create;
-        try
-          // Make them all relative
-          for I := 0 to Files.Count - 1 do begin
-            S := Files[i];
-            if Assigned(devCompilerSets.CurrentSet) then begin
-              for J := 0 to devCompilerSets.CurrentSet.CppDir.Count - 1 do
-                S := StringReplace(S, devCompilerSets.CurrentSet.CppDir[j] + pd, '', [rfReplaceAll]);
-            end;
-            sl.Add(s);
+    if Execute then begin
+      sl := TStringList.Create;
+      try
+        // Make them all relative
+        for I := 0 to Files.Count - 1 do begin
+          S := Files[i];
+          if Assigned(devCompilerSets.CurrentSet) then begin
+            for J := 0 to devCompilerSets.CurrentSet.CppDir.Count - 1 do
+              S := StringReplace(S, devCompilerSets.CurrentSet.CppDir[j] + pd, '', [rfReplaceAll]);
           end;
-
-          // Append ; to old part
-          if (Length(edIncludeFile.Text) > 0) and (edIncludeFile.Text[Length(edIncludeFile.Text)] <> ';') then
-            edIncludeFile.Text := edIncludeFile.Text + ';';
-
-          // Add all files, separated by ;
-          for I := 0 to sl.Count - 1 do
-            edIncludeFile.Text := edIncludeFile.Text + sl[i] + ';';
-        finally
-          sl.Free;
+          sl.Add(s);
         end;
+
+        // Append ; to old part
+        if (Length(edIncludeFile.Text) > 0) and (edIncludeFile.Text[Length(edIncludeFile.Text)] <> ';') then
+          edIncludeFile.Text := edIncludeFile.Text + ';';
+
+        // Add all files, separated by ;
+        for I := 0 to sl.Count - 1 do
+          edIncludeFile.Text := edIncludeFile.Text + sl[i] + ';';
+      finally
+        sl.Free;
       end;
-    finally
-      Free;
     end;
+  finally
+    Free;
+  end;
 end;
 
 procedure TEditorOptForm.btnCCCaddClick(Sender: TObject);

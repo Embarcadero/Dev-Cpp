@@ -762,7 +762,7 @@ type
     function IsEmpty: boolean;
     procedure CollapseAll;
     procedure UncollapseAll;
-    procedure Collapse(AFoldRange: TSynEditFoldRange);
+    procedure Collapse(FoldRange: TSynEditFoldRange);
     procedure Uncollapse(FoldRange: TSynEditFoldRange);
     function FoldStartAtLine(Line: Integer): TSynEditFoldRange;
     function CollapsedFoldStartAtLine(Line: Integer): TSynEditFoldRange;
@@ -2010,11 +2010,11 @@ var
   vOldMode: TSynSelectionMode;
 begin
   Exclude(fStateFlags, sfLinesChanging);
+  if fUseCodeFolding then
+    ReScan;
   if HandleAllocated then begin
     UpdateScrollBars;
     vOldMode := fActiveSelectionMode;
-    if fUseCodeFolding then
-      ReScan;
     SetBlockBegin(CaretXY);
     fActiveSelectionMode := vOldMode;
     InvalidateRect(fInvalidateRect, False);
@@ -9896,22 +9896,22 @@ begin
 {$ENDIF}
 end;
 
-procedure TCustomSynEdit.Collapse(AFoldRange: TSynEditFoldRange);
+procedure TCustomSynEdit.Collapse(FoldRange: TSynEditFoldRange);
 begin
-  with AFoldRange do begin
+  with FoldRange do begin
     LinesCollapsed := ToLine - FromLine;
     Collapsed := True;
 
     // Extract caret from fold
-    //if (fCaretY > FromLine) and (fCaretY <= ToLine) then
-    //  CaretXY := BufferCoord(1,FromLine);
+    if (fCaretY > FromLine) and (fCaretY <= ToLine) then
+      CaretXY := BufferCoord(Length(Lines[FromLine - 1]) + 1, FromLine);
   end;
 
   // Redraw the collapsed line
-  InvalidateLines(AFoldRange.FromLine, MaxInt);
+  InvalidateLines(FoldRange.FromLine, MaxInt);
 
   // Redraw fold mark
-  InvalidateGutterLines(AFoldRange.FromLine, MaxInt);
+  InvalidateGutterLines(FoldRange.FromLine, MaxInt);
 end;
 
 procedure TCustomSynEdit.CollapseAll;
@@ -10264,7 +10264,7 @@ begin
   // Delete collapsed inside selection
   for i := fAllFoldRanges.Count - 1 downto 0 do
     with fAllFoldRanges[i] do
-      if Collapsed and not ParentCollapsed then
+      if Collapsed or ParentCollapsed then
         if (FromLine = Line) and (Count = 1) then // open up because we are messing with the starting line
           Uncollapse(fAllFoldRanges[i])
         else if (FromLine >= Line - 1) and (FromLine < Line + Count) then // delete inside affectec area
@@ -10280,7 +10280,7 @@ begin
   // Delete collapsed inside selection
   for i := fAllFoldRanges.Count - 1 downto 0 do
     with fAllFoldRanges[i] do
-      if Collapsed and not ParentCollapsed then
+      if Collapsed or ParentCollapsed then
         if (FromLine = Line - 1) then // insertion starts at fold line
           Uncollapse(fAllFoldRanges[i])
         else if (FromLine >= Line) then // insertion of count lines above FromLine
