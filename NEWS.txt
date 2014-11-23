@@ -1,4 +1,4 @@
-Version 5.8.4 - *
+Version 5.8.4 - 23 November 2014
 
 - Huge rewrite of code folding implementation.
 - Major improvements in typing responsiveness.
@@ -6,6 +6,8 @@ Version 5.8.4 - *
 - Around 40-50% reduction in memory usage per open file.
 - Fixed devcppPortable not passing files with spaces in names to devcpp correctly.
 - Improved performance when opening multiple files from explorer using Dev-C++.
+- Code completion does not show up anymore for periods typed as part of numbers.
+- Added progress counter to parser messages in the status bar.
 
 Version 5.8.3 - 10 November 2014
 

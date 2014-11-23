@@ -565,10 +565,8 @@ begin
   // scModified is only fired when the modified state changes
   if scModified in Changes then begin
     if fText.Modified then begin
-      MainForm.SetStatusbarMessage(Lang[ID_MODIFIED]);
       UpdateCaption('[*] ' + ExtractFileName(fFileName));
     end else begin
-      MainForm.SetStatusbarMessage('');
       UpdateCaption(ExtractFileName(fFileName));
     end;
   end;
@@ -1289,8 +1287,7 @@ begin
 
   // Don't bother scanning inside strings or comments or defines
   if (fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX - 1, fText.CaretY), s, attr)) then
-    if (attr = fText.Highlighter.StringAttribute) or (attr = fText.Highlighter.CommentAttribute) or (attr.Name =
-      'Preprocessor') then
+    if attr <> fText.Highlighter.SymbolAttribute then
       Exit;
 
   M := TMemoryStream.Create;
@@ -1764,9 +1761,9 @@ begin
         if fText.SelAvail then begin
           if fText.IsPointInSelection(MousePos) then
             Result := hprSelection; // allow selection
-        end else if SameStr(HLAttr.Name, 'Identifier') then
+        end else if HLAttr.Name = 'Identifier' then
           Result := hprIdentifier // allow identifiers if no selection is present
-        else if SameStr(HLAttr.Name, 'Preprocessor') then
+        else if HLAttr.Name = 'Preprocessor' then
           Result := hprPreprocessor; // and preprocessor line if no selection is present
       end;
     end;

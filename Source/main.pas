@@ -4925,10 +4925,7 @@ begin
 
   // do this work only if this was the last file scanned
   ParseTime := GetTickCount - fParseStartTime;
-  if ParseTime > 5000 then // 5 sec
-    SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN], [ParseTime / 1000]) + ', ' + Lang[ID_DONEPARSINGHINT])
-  else
-    SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN], [ParseTime / 1000])); // divide later to preserve comma stuff
+  SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN], [ParseTime / 1000])); // divide later to preserve comma stuff
 end;
 
 procedure TMainForm.UpdateAppTitle;

@@ -251,6 +251,7 @@ function TEditorList.GetPreviousEditor(Editor: TEditor): TEditor;
 var
   I: integer;
   EditorPageControl: TPageControl;
+  PrevNaturalPage: TTabSheet;
   e: TEditor;
 begin
   result := nil;
@@ -275,16 +276,13 @@ begin
 
       // All history items are gone or this was the first tab to open which has no history
       // Select the editor that would appear naturally when closing this one
-      if EditorPageControl.PageCount > 1 then begin // we need more than only our own tab sheet
-        if ActivePageIndex = EditorPageControl.PageCount - 1 then
-          // we are the last editor, next one will be second to last editor
-          Result := GetEditor(ActivePageIndex - 1, EditorPageControl)
-        else // otherwise, select the next one
-          Result := GetEditor(ActivePageIndex + 1, EditorPageControl);
+      PrevNaturalPage := FindNextPage(Editor.TabSheet, False, True);
+      if Assigned(PrevNaturalPage) and (PrevNaturalPage <> Editor.TabSheet) then begin
+        Result := GetEditor(PrevNaturalPage.TabIndex, EditorPageControl);
         Exit;
       end;
 
-      // Otherwise, select the current editor in the other page control
+      // All editors in the current page control are gone. Try the other page control
       if fLayout = lstBoth then begin
         if EditorPageControl = LeftPageControl then begin
           Result := GetEditor(-1, RightPageControl);
@@ -307,8 +305,6 @@ begin
   BeginUpdate;
   try
     FreeAndNil(Editor);
-
-    // Update layout
     UpdateLayout;
   finally
     EndUpdate; // redraw once
@@ -345,16 +341,14 @@ begin
     if Editor.InProject and Assigned(MainForm.Project) then begin
       projindex := MainForm.Project.Units.IndexOf(Editor);
       if projindex <> -1 then
-        MainForm.Project.CloseUnit(projindex);
+        MainForm.Project.CloseUnit(projindex); // calls ForceCloseEditor
     end else begin
       dmMain.AddtoHistory(Editor.FileName);
       FreeAndNil(Editor);
+      UpdateLayout;
     end;
 
-    // Force layout update when creating, destroying or moving editors
-    UpdateLayout;
-
-    // Show new editor after forcing an layout update
+    // Show new editor after forcing a layout update
     if Assigned(PrevEditor) then
       PrevEditor.Activate;
   finally
