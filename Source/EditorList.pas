@@ -267,7 +267,7 @@ begin
 
       // Find the first tab in the history list that is still open
       for I := Editor.PreviousEditors.Count - 1 downto 0 do begin
-        e := GetEditorFromTag(integer(Editor.PreviousEditors[i]));
+        e := GetEditorFromTag(Integer(Editor.PreviousEditors[i]));
         if Assigned(e) then begin
           Result := e;
           Exit;
@@ -305,6 +305,8 @@ begin
   BeginUpdate;
   try
     FreeAndNil(Editor);
+
+    // Force layout update when creating, destroying or moving editors
     UpdateLayout;
   finally
     EndUpdate; // redraw once
@@ -345,6 +347,8 @@ begin
     end else begin
       dmMain.AddtoHistory(Editor.FileName);
       FreeAndNil(Editor);
+
+      // Force layout update when creating, destroying or moving editors
       UpdateLayout;
     end;
 

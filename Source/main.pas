@@ -3947,25 +3947,31 @@ begin
   end;
 
   // Fetch the file we want to go to
-  ToEditor := fEditorList.GetEditorFromFileName(ToFile);
-  if Assigned(ToEditor) then begin
+  ToEditor := fEditorList.FileIsOpen(ToFile);
+  if Assigned(ToEditor) then
+    ToEditor.Activate
+  else begin
+    // We need to open a new editor
+    ToEditor := fEditorList.GetEditorFromFileName(ToFile);
+    if Assigned(ToEditor) then begin
 
-    // Move the editors next to each other if possible
-    // Do not try to do so if they are visible in separate editors
-    if FromEditor.PageControl = ToEditor.PageControl then begin
+      // Move the editors next to each other if possible
+      // Do not try to do so if they are visible in separate editors
+      if FromEditor.PageControl = ToEditor.PageControl then begin
 
-      // Move source file to the left of the header file
-      if iscfile then begin
-        ToEditor.TabSheet.PageIndex := min(FromEditor.PageControl.PageCount - 1, FromEditor.TabSheet.PageIndex + 1);
-      end else begin
-        ToEditor.TabSheet.PageIndex := max(0, FromEditor.TabSheet.PageIndex - 1);
+        // Move source file to the left of the header file
+        if iscfile then begin
+          ToEditor.TabSheet.PageIndex := min(FromEditor.PageControl.PageCount - 1, FromEditor.TabSheet.PageIndex + 1);
+        end else begin
+          ToEditor.TabSheet.PageIndex := max(0, FromEditor.TabSheet.PageIndex);
+        end;
       end;
+      ToEditor.Activate;
+    end else if iscfile then begin
+      SetStatusBarMessage(Lang[ID_MSG_CORRESPONDINGHEADER]);
+    end else if ishfile then begin
+      SetStatusBarMessage(Lang[ID_MSG_CORRESPONDINGSOURCE]);
     end;
-    ToEditor.Activate;
-  end else if iscfile then begin
-    SetStatusBarMessage(Lang[ID_MSG_CORRESPONDINGHEADER]);
-  end else if ishfile then begin
-    SetStatusBarMessage(Lang[ID_MSG_CORRESPONDINGSOURCE]);
   end;
 end;
 
