@@ -1,5 +1,6 @@
 Version 5.8.4 - 27 November 2014
 
+- Significantly improved performance when selecting text.
 - Fixed parser error when parsing C-style cast of string constant.
 - Huge rewrite of code folding implementation.
 - Major improvements in typing responsiveness.

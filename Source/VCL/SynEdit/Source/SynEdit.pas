@@ -6142,7 +6142,7 @@ begin
     end else begin
       if vCaretRow < TopLine then
         TopLine := vCaretRow
-      else if vCaretRow > TopLine + (LinesInWindow - 1) then
+      else if (vCaretRow > TopLine + (LinesInWindow - 1)) and (LinesInWindow > 0) then
         TopLine := vCaretRow - (LinesInWindow - 1)
       else
         TopLine := TopLine;

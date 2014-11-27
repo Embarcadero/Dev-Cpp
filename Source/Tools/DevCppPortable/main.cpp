@@ -24,8 +24,20 @@ int main() {
 	// Free the strings pointed to by argv
 	LocalFree(ArgumentInput);
 	
+	// Run "devcpp.exe" from the current directory and NOT from the directory 
+	// from which files are dragged onto us for example
+	wchar_t CurrentDirectory[MAX_PATH];
+	GetModuleFileNameW(NULL,CurrentDirectory,MAX_PATH);
+	
 	// Attempt to execute
-	int Result = (INT_PTR)ShellExecuteW(NULL,L"open",L"devcpp.exe",ArgumentsToDev.c_str(),NULL,SW_SHOWNORMAL);
+	int Result = (INT_PTR)ShellExecuteW(
+		NULL, // no parent window
+		L"open", // open the file
+		L"devcpp.exe", // the file to open
+		ArgumentsToDev.c_str(), // extra parameters to pass
+		CurrentDirectory, // use the current directory
+		SW_SHOWNORMAL // activate and display window
+	);
 	if(Result <= 32) {
 		switch(Result) {
 			case ERROR_FILE_NOT_FOUND: {

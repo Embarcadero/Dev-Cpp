@@ -117,7 +117,7 @@ type
     procedure FunctionTipTimer(Sender: TObject);
     procedure HandleSymbolCompletion(var Key: Char);
     procedure HandleCodeCompletion(var Key: Char);
-    function HandpointAllowed(var mousepos: TBufferCoord): THandPointReason; // returns for what reason it is allowed
+    function HandpointAllowed(MousePos: TBufferCoord; ShiftState: TShiftState): THandPointReason;
     procedure SetFileName(const value: AnsiString);
     procedure OnMouseOverEvalReady(const evalvalue: AnsiString);
     function HasBreakPoint(Line: integer): integer;
@@ -1189,7 +1189,7 @@ var
 begin
   case (Key) of
     VK_CONTROL: begin
-        Reason := HandpointAllowed(p);
+        Reason := HandpointAllowed(p, Shift);
         if Reason <> hprNone then
           fText.Cursor := crHandPoint
         else
@@ -1285,9 +1285,11 @@ begin
   Inc(P.Y, fText.LineHeight + 2);
   fCompletionBox.Position := fText.ClientToScreen(P);
 
-  // Don't bother scanning inside strings or comments or defines
+  // Only scan when cursor is placed after a symbol, inside a word, or inside whitespace
   if (fText.GetHighlighterAttriAtRowCol(BufferCoord(fText.CaretX - 1, fText.CaretY), s, attr)) then
-    if attr <> fText.Highlighter.SymbolAttribute then
+    if (attr <> fText.Highlighter.SymbolAttribute) and
+      (attr <> fText.Highlighter.WhitespaceAttribute) and
+      (attr <> fText.Highlighter.IdentifierAttribute) then
       Exit;
 
   M := TMemoryStream.Create;
@@ -1542,9 +1544,8 @@ var
     fTabSheet.PageControl.Hint := '';
   end;
 begin
-
   // Leverage Ctrl-Clickability to determine if we can show any information
-  Reason := HandpointAllowed(p);
+  Reason := HandpointAllowed(p, Shift);
 
   // Get subject
   IsIncludeLine := False;
@@ -1743,7 +1744,7 @@ begin
   Canvas.Brush.Style := bsSolid;
 end;
 
-function TEditor.HandpointAllowed(var mousepos: TBufferCoord): THandPointReason;
+function TEditor.HandpointAllowed(MousePos: TBufferCoord; ShiftState: TShiftState): THandPointReason;
 var
   s: AnsiString;
   HLAttr: TSynHighlighterAttributes;
@@ -1759,7 +1760,8 @@ begin
       // Only allow Identifiers, Preprocessor directives, and selection
       if Assigned(HLAttr) then begin
         if fText.SelAvail then begin
-          if fText.IsPointInSelection(MousePos) then
+          // do not allow when dragging selection
+          if fText.IsPointInSelection(MousePos) and not (ssLeft in ShiftState) then
             Result := hprSelection; // allow selection
         end else if HLAttr.Name = 'Identifier' then
           Result := hprIdentifier // allow identifiers if no selection is present
