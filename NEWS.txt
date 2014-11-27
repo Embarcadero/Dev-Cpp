@@ -1,5 +1,6 @@
-Version 5.8.4 - 23 November 2014
+Version 5.8.4 - 27 November 2014
 
+- Fixed parser error when parsing C-style cast of string constant.
 - Huge rewrite of code folding implementation.
 - Major improvements in typing responsiveness.
 - Major reduction in flickering during typing.
