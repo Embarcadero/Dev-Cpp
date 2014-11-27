@@ -1263,12 +1263,12 @@ begin
   I := fIndex;
 
   // Skip over argument list
-  while (fIndex + 2 < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [';', ':', '{', '}']) do
+  while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [';', ':', '{', '}']) do
     Inc(fIndex);
 
   // Check if this is a prototype
   CurrClassID := GetCurrentClass;
-  if fTokenizer[fIndex]^.Text[1] in [';', '}'] then begin // prototype
+  if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] in [';', '}']) then begin // prototype
     IsDeclaration := True;
     if not fIsHeader and (CurrClassID = -1) then // in a CPP file
       IsValid := False; // not valid
@@ -1317,9 +1317,9 @@ begin
   end;
 
   // Don't parse the function's block now... It will be parsed when user presses ctrl+space inside it ;)
-  if (fTokenizer[fIndex]^.Text[1] = '{') then
+  if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '{') then
     fIndex := SkipBraces(fIndex) + 1 // add 1 so that '}' is not visible to parser
-  else if (fTokenizer[fIndex]^.Text[1] = ';') then
+  else if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ';') then
     Inc(fIndex);
   if I = fIndex then // if not moved ahead, something is wrong but don't get stuck ;)
     if fIndex < fTokenizer.Tokens.Count then

@@ -290,16 +290,21 @@ end;
 procedure TCppTokenizer.SkipAssignment;
 begin
   repeat
-    Inc(pCurrent);
     case pCurrent^ of
       '(': SkipPair('(', ')');
       '"': SkipDoubleQuotes;
       '''': SkipSingleQuote;
       '{': SkipPair('{', '}'); // support struct initializers
-      '/': if (pCurrent + 1)^ = '/' then
-          SkipToEOL
-        else if (pCurrent + 1)^ = '*' then
-          SkipCStyleComment;
+      '/': begin
+          if (pCurrent + 1)^ = '/' then
+            SkipToEOL
+          else if (pCurrent + 1)^ = '*' then
+            SkipCStyleComment
+          else
+            Inc(pCurrent);
+        end;
+    else
+      Inc(pCurrent);
     end;
   until pCurrent^ in [',', ';', ')', '}', #0];
 end;
@@ -740,6 +745,9 @@ var
   S: AnsiString;
   Command: AnsiString;
   bSkipBlocks: boolean;
+  {  I: integer;
+    DebugFile: TFileStream;
+    Buffer: AnsiString;}
 begin
   if StartAt = nil then
     Exit;
@@ -761,6 +769,18 @@ begin
     if S <> '' then
       AddToken(S, fCurrLine);
   until S = '';
+
+  // Save to debug
+  {DebugFile := TFileStream.Create('C:\' + fFileName + 'Tokens.txt', fmCreate);
+  try
+    for I := 0 to fTokenList.Count - 1 do begin
+      Buffer := IntToStr(PToken(fTokenList[i]).Line) + #9 + PToken(fTokenList[i]).Text + #13#10;
+
+      DebugFile.Write(Buffer[1], Length(Buffer));
+    end;
+  finally
+    DebugFile.Free;
+  end;}
 end;
 
 procedure TCppTokenizer.TokenizeStream(const FileName: AnsiString; Stream: TStream);

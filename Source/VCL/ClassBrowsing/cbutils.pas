@@ -254,10 +254,13 @@ begin
 end;
 
 function IsIncludeLine(const Line: AnsiString): boolean;
+var
+  TrimmedLine : AnsiString;
 begin
   Result := False;
-  if (Length(Line) > 0) and (Line[1] = '#') then begin // it's a preprocessor line
-    if StartsStr('include', TrimLeft(Copy(Line, 2, MaxInt))) then begin // the first word after # is 'include'
+  TrimmedLine := Trim(Line);
+  if (Length(TrimmedLine) > 0) and (TrimmedLine[1] = '#') then begin // it's a preprocessor line
+    if StartsStr('include', TrimLeft(Copy(TrimmedLine, 2, MaxInt))) then begin // the first word after # is 'include'
       Result := True;
     end;
   end;

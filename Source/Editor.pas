@@ -1636,7 +1636,7 @@ begin
       fText.Cursor := crIBeam;
 
       // Try to open the header
-      line := Trim(fText.Lines[p.Row - 1]);
+      line := fText.Lines[p.Row - 1];
       if MainForm.CppParser.IsIncludeLine(Line) then begin
         FileName := MainForm.CppParser.GetHeaderFileName(fFileName, line);
         e := MainForm.EditorList.GetEditorFromFileName(FileName);
