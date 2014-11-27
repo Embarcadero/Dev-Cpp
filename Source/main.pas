@@ -6152,8 +6152,10 @@ begin
     while I <= ParamCount do begin
 
       // Skip the configuration redirect stuff
-      if ParamStr(i) = '-c' then
+      if ParamStr(i) = '-c' then begin
         I := I + 2;
+        Continue;
+      end;
 
       FileList.Add(ParamStr(i));
       Inc(I);
