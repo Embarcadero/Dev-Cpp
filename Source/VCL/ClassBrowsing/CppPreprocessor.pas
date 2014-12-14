@@ -35,7 +35,8 @@ const
   OperatorChars: set of Char = ['+', '-', '*', '/', '!', '=', '<', '>', '&', '|', '^'];
   IdentChars: set of Char = ['A'..'Z', '0'..'9', 'a'..'z', '_', '*', '&', '~'];
   MacroIdentChars: set of Char = ['A'..'Z', 'a'..'z', '_'];
-  Operators: array[0..14] of string = ('*', '/', '+', '-', '<', '<=', '>', '>=', '==', '!=', '&', '^', '|', '&&', '||');
+  Operators: array[0..16] of string = ('*', '/', '+', '-', '<', '<=', '>', '>=', '==', '!=', '&', '^', '|', '&&', '||',
+    'and', 'or');
 
 type
   PFile = ^TFile;
@@ -654,6 +655,10 @@ var
             break;
           end;
 
+          // We have found a logical operator. Skip over it
+        end else if (Name = 'and') or (Name = 'or') then begin
+          SearchPos := Head; // Skip logical operators
+
           // We have found a regular define. Replace it by its value
         end else begin
 
@@ -841,15 +846,15 @@ var
           ResultValue := integer(LeftOpValue = RightOpValue)
         else if OperatorToken = '!=' then
           ResultValue := integer(LeftOpValue <> RightOpValue)
-        else if OperatorToken = '&' then
+        else if OperatorToken = '&' then // bitwise and
           ResultValue := integer(LeftOpValue and RightOpValue)
-        else if OperatorToken = '^' then
+        else if OperatorToken = '|' then // bitwise or
           ResultValue := integer(LeftOpValue or RightOpValue)
-        else if OperatorToken = '|' then
+        else if OperatorToken = '^' then // bitwise xor
           ResultValue := integer(LeftOpValue xor RightOpValue)
-        else if OperatorToken = '&&' then
+        else if (OperatorToken = '&&') or (OperatorToken = 'and') then
           ResultValue := integer(LeftOpValue and RightOpValue)
-        else if OperatorToken = '||' then
+        else if (OperatorToken = '||') or (OperatorToken = 'or') then
           ResultValue := integer(LeftOpValue or RightOpValue)
         else
           ResultValue := 0;
