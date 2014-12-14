@@ -117,7 +117,7 @@ type
     procedure FunctionTipTimer(Sender: TObject);
     procedure HandleSymbolCompletion(var Key: Char);
     procedure HandleCodeCompletion(var Key: Char);
-    function HandpointAllowed(MousePos: TBufferCoord; ShiftState: TShiftState): THandPointReason;
+    function HandpointAllowed(var MousePos: TBufferCoord; ShiftState: TShiftState): THandPointReason;
     procedure SetFileName(const value: AnsiString);
     procedure OnMouseOverEvalReady(const evalvalue: AnsiString);
     function HasBreakPoint(Line: integer): integer;
@@ -1744,7 +1744,7 @@ begin
   Canvas.Brush.Style := bsSolid;
 end;
 
-function TEditor.HandpointAllowed(MousePos: TBufferCoord; ShiftState: TShiftState): THandPointReason;
+function TEditor.HandpointAllowed(var MousePos: TBufferCoord; ShiftState: TShiftState): THandPointReason;
 var
   s: AnsiString;
   HLAttr: TSynHighlighterAttributes;

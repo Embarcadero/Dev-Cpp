@@ -112,9 +112,9 @@ type
     fIncludePaths: TStringList;
     fProjectIncludePaths: TStringList;
     fProjectFiles: TStringList;
-    fFilesToScan: TStringList;
-    fFilesScanned: Integer;
-    fFilesScannedCount: Integer;
+    fFilesToScan: TStringList; // list of base files to scan
+    fFilesScannedCount: Integer; // count of files that have been scanned
+    fFilesToScanCount: Integer; // count of files and files included in files that have to be scanned
     fScannedFiles: TStringList;
     fFileIncludes: TStringList;
     fCacheContents: TStringList;
@@ -1053,10 +1053,10 @@ begin
       // Mention progress to user if we enter a NEW file
       Line := StrToIntDef(Copy(S, DelimPos + 1, MaxInt), -1);
       if Line = 1 then begin
-        Inc(fFilesScanned);
         Inc(fFilesScannedCount);
+        Inc(fFilesToScanCount);
         if Assigned(fOnTotalProgress) and not fLaterScanning then
-          fOnTotalProgress(Self, fCurrentFile, fFilesScannedCount, fFilesScanned + 1);
+          fOnTotalProgress(Self, fCurrentFile, fFilesToScanCount, fFilesScannedCount + 1);
       end;
     end;
   end else if StartsStr('#define ', fTokenizer[fIndex]^.Text) then begin
@@ -1820,16 +1820,16 @@ begin
   try
     // Support stopping of parsing when files closes unexpectedly
     I := 0;
-    fFilesScanned := 0;
-    fFilesScannedCount := fFilesToScan.Count;
+    fFilesScannedCount := 0;
+    fFilesToScanCount := fFilesToScan.Count;
     while I < fFilesToScan.Count do begin
       if Assigned(fOnTotalProgress) then
-        fOnTotalProgress(Self, fFilesToScan[i], fFilesScannedCount, fFilesScanned + 1);
+        fOnTotalProgress(Self, fFilesToScan[i], fFilesToScanCount, fFilesScannedCount + 1); // report 1-based index
       if fScannedFiles.IndexOf(fFilesToScan[i]) = -1 then begin
         Parse(fFilesToScan[i], True, False);
       end;
       Inc(I);
-      Inc(fFilesScanned);
+      Inc(fFilesScannedCount);
     end;
     fFilesToScan.Clear;
     PostProcessInheritance;
@@ -1975,6 +1975,8 @@ begin
   if Assigned(fOnStartParsing) then
     fOnStartParsing(Self);
   try
+    fFilesToScanCount := 1;
+    fFilesScannedCount := 0;
     if not Assigned(Stream) then begin
       if CFile = '' then
         Parse(HFile, True, True) // headers should be parsed via include

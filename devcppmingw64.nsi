@@ -102,6 +102,7 @@ Section "Dev-C++ program files (required)" SectionMain
   
   ; Write required files
   File "devcpp.exe"
+  File "devcppPortable.exe"
   File "devcpp.map"
   File "packman.exe"
   File "Packman.map"

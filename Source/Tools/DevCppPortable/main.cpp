@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <Shlwapi.h>
 #include <string>
 using std::wstring;
 
@@ -26,9 +27,10 @@ int main() {
 	
 	// Run "devcpp.exe" from the current directory and NOT from the directory 
 	// from which files are dragged onto us for example
-	wchar_t CurrentDirectory[MAX_PATH];
-	GetModuleFileNameW(NULL,CurrentDirectory,MAX_PATH);
-	
+	wchar_t CurrentDirectory[32768]; // NTFS max length
+	GetModuleFileNameW(NULL,CurrentDirectory,32768); // get full file path including filename to devcppPortable.exe
+	PathRemoveFileSpecW(CurrentDirectory); // extract filename
+
 	// Attempt to execute
 	int Result = (INT_PTR)ShellExecuteW(
 		NULL, // no parent window
