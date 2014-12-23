@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, Spin;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, Spin, CBUtils;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -116,7 +116,7 @@ var
   Params: AnsiString;
   Dir: AnsiString;
   I, J: integer;
-  Line: AnsiString;
+  Line, Phrase: AnsiString;
   spacepos: integer;
   buffer: TStringList;
   addeditem: TListItem;
@@ -170,9 +170,10 @@ begin
 
     // Store info of function in Data pointer
     if Pos('(', addeditem.Caption) > 0 then
-      addeditem.Data := MainForm.CppParser.Locate(Copy(addeditem.Caption, 1, Pos('(', addeditem.Caption) - 1), True)
+      Phrase := Copy(addeditem.Caption, 1, Pos('(', addeditem.Caption) - 1)
     else
-      addeditem.Data := MainForm.CppParser.Locate(addeditem.Caption, True);
+      Phrase := addeditem.Caption;
+    addeditem.Data := MainForm.CppParser.FindStatementOf(Phrase, nil);
 
     // Dive remaining part based on spaces
     Line := TrimLeft(buffer[i]);
@@ -209,7 +210,7 @@ var
   Params: AnsiString;
   Dir: AnsiString;
   I, J, startcol: integer;
-  Line: AnsiString;
+  Line, Phrase: AnsiString;
   spacepos: integer;
   buffer: TStringList;
   addeditem: TListItem;
@@ -272,9 +273,10 @@ begin
 
       // Store info of function in Data pointer
       if Pos('(', addeditem.Caption) > 0 then
-        addeditem.Data := MainForm.CppParser.Locate(Copy(addeditem.Caption, 1, Pos('(', addeditem.Caption) - 1), True)
+        Phrase := Copy(addeditem.Caption, 1, Pos('(', addeditem.Caption) - 1)
       else
-        addeditem.Data := MainForm.CppParser.Locate(addeditem.Caption, True);
+        Phrase := addeditem.Caption;
+      addeditem.Data := MainForm.CppParser.FindStatementOf(Phrase, nil);
 
       // Divide remaining part based on spaces
       Line := TrimLeft(buffer[i]);
@@ -438,7 +440,8 @@ begin
     if Assigned(MainForm.Project) then
       assembly := assembly + ' "' + ExtractFileName(MainForm.Project.Executable) + '"'
     else
-      assembly := assembly + ' "' + ExtractFileName(ChangeFileExt(MainForm.EditorList.GetEditor.FileName, EXE_EXT)) + '"';
+      assembly := assembly + ' "' + ExtractFileName(ChangeFileExt(MainForm.EditorList.GetEditor.FileName, EXE_EXT)) +
+        '"';
     if not chkHideNotCalled.Checked then
       assembly := assembly + ' -z';
     if chkSuppressStatic.Checked then

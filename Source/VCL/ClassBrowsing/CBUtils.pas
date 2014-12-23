@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit cbutils;
+unit CBUtils;
 
 interface
 
@@ -38,6 +38,56 @@ type
   TFileIncludes = record
     BaseFile: AnsiString;
     IncludeFiles: AnsiString; // "file","file" etc
+  end;
+
+  TStatementKind = (
+    skClass,
+    skFunction,
+    skConstructor,
+    skDestructor,
+    skVariable,
+    skTypedef,
+    skEnum,
+    skPreprocessor,
+    skUnknown
+    );
+  TStatementKindSet = set of TStatementKind;
+
+  TStatementScope = (
+    ssGlobal,
+    ssLocal,
+    ssClassLocal
+    );
+
+  TStatementClassScope = (
+    scsPublic,
+    scsPrivate,
+    scsProtected,
+    scsNone
+    );
+
+  PStatement = ^TStatement;
+  TStatement = record
+    _Parent: PStatement;
+    _FullText: AnsiString;
+    _Type: AnsiString;
+    _Args: AnsiString;
+    _Command: AnsiString;
+    _Kind: TStatementKind;
+    _InheritsFromStatements: TList; // item below is converted to PStatements and stored here
+    _InheritsFromStatementsText: AnsiString; // temporary storage for classes inherited from
+    _Scope: TStatementScope;
+    _ClassScope: TStatementClassScope;
+    _IsDeclaration: boolean;
+    _DeclImplLine: integer;
+    _Line: integer;
+    _DeclImplFileName: AnsiString;
+    _FileName: AnsiString;
+    _Visible: boolean;
+    _Temporary: boolean;
+    _Loaded: boolean;
+    _InProject: boolean;
+    _InSystemHeader: boolean;
   end;
 
   TProgressEvent = procedure(Sender: TObject; const FileName: AnsiString; Total, Current: integer) of object;

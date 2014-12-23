@@ -34,12 +34,13 @@ requires
 
 contains
   IntList in 'IntList.pas',
+  StatementList in 'StatementList.pas',
   ClassBrowser in 'ClassBrowser.pas',
   CppParser in 'CppParser.pas',
   CppPreprocessor in 'CppPreprocessor.pas',
   CppTokenizer in 'CppTokenizer.pas',
   CodeCompletion in 'CodeCompletion.pas',
   CodeCompletionForm in 'CodeCompletionForm.pas' {CodeComplForm},
-  cbutils in 'cbutils.pas';
+  CBUtils in 'CBUtils.pas';
 
 end.

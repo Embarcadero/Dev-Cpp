@@ -23,7 +23,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Classes, SysUtils, IntList, Controls, ComCtrls, Graphics,
+  Windows, Classes, SysUtils, IntList, StatementList, Controls, ComCtrls, Graphics,
   CppParser, Forms, cbutils;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -103,7 +103,7 @@ type
     fUpdateCount: integer;
     fTabVisible: boolean;
     procedure SetParser(Value: TCppParser);
-    procedure AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
+    procedure AddMembers(Node: TTreeNode; ParentStatementNode: PStatementNode);
     procedure AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
       State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,
       DefaultDraw: Boolean);
@@ -236,8 +236,8 @@ procedure TClassBrowser.SetNodeImages(Node: TTreeNode; Statement: PStatement);
 var
   bInherited: boolean;
 begin
-  bInherited := fShowInheritedMembers and Assigned(Node.Parent) and (PStatement(Node.Parent.Data)^._ID <>
-    PStatement(Node.Data)^._ParentID);
+  bInherited := fShowInheritedMembers and Assigned(Node.Parent) and (PStatement(Node.Parent.Data) <>
+    PStatement(Node.Data)^._Parent);
 
   case Statement^._Kind of
     skClass: begin
@@ -274,67 +274,75 @@ begin
   Node.StateIndex := Node.ImageIndex;
 end;
 
-procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentIndex, ParentID: integer);
+procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentStatementNode: PStatementNode);
 var
-  I, iFrom: integer;
+  CurStatementNode, StatementNode: PStatementNode;
+  Statement, ParentStatement: PStatement;
   ParNode, NewNode: TTreeNode;
   bInherited: boolean;
-  inheritanceids: TIntList;
+  InheritanceStatements: TList;
 
-  procedure AddStatementNode(Index: integer);
+  procedure AddStatementNode(StatementNode: PStatementNode);
   var
-    tmp: integer;
+    FolderID: integer;
   begin
-    with PStatement(fParser.Statements[Index])^ do begin
-      tmp := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
-      if tmp <> -1 then
-        ParNode := GetNodeOfFolder(tmp)
+    with StatementNode.Data^ do begin
+      FolderID := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
+      if FolderID <> -1 then
+        ParNode := GetNodeOfFolder(FolderID)
       else
         ParNode := Node;
 
-      NewNode := Items.AddChildObject(ParNode, _ScopelessCmd, PStatement(fParser.Statements[Index]));
-      SetNodeImages(NewNode, PStatement(fParser.Statements[I]));
+      NewNode := Items.AddChildObject(ParNode, _Command, Statement);
+      SetNodeImages(NewNode, Statement);
       if _Kind = skClass then
-        AddMembers(NewNode, Index, _ID);
+        AddMembers(NewNode, StatementNode);
     end;
   end;
 begin
-  if (not fShowInheritedMembers) and (ParentIndex >= 0) then
-    iFrom := ParentIndex + 1 // amazing speed-up
-  else
-    iFrom := 0; // if showing inheritance, a big speed penalty
+  //  if (not fShowInheritedMembers) and (ParentIndex >= 0) then
+  //    iFrom := ParentIndex + 1 // amazing speed-up
+  //  else
+  //    iFrom := 0; // if showing inheritance, a big speed penalty
 
   // create folders that have this branch as parent
-  if ParentIndex <> -1 then
-    with PStatement(fParser.Statements[ParentIndex])^ do begin
+  if ParentStatementNode <> nil then begin
+    ParentStatement := ParentStatementNode.Data;
+    with ParentStatement^ do begin
       if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
         CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
-    end else begin
+    end;
+  end else begin
+    ParentStatement := nil;
     if HasSubFolder('') then
       CreateFolders('', Node);
   end;
 
-  inheritanceids := TIntList.Create;
+  InheritanceStatements := TList.Create;
   try
     // allow inheritance propagation, including MI
-    if fShowInheritedMembers and (ParentIndex <> -1) and (PStatement(fParser.Statements[ParentIndex])^._Kind = skClass)
-      then begin
-      fParser.GetInheritanceIDs(ParentIndex, inheritanceids);
-    end;
+    if fShowInheritedMembers and (ParentStatement <> nil) and (ParentStatement^._Kind = skClass) then
+      fParser.GetInheritanceStatements(ParentStatement, InheritanceStatements);
 
+    // Walk all the statements
     bInherited := False;
-    for I := iFrom to fParser.Statements.Count - 1 do begin
-      with PStatement(fParser.Statements[I])^ do begin
+    StatementNode := fParser.Statements.FirstNode;
+    while Assigned(StatementNode) do begin
+      Statement := StatementNode^.Data;
+      CurStatementNode := StatementNode; // remember current node
+      StatementNode := StatementNode^.NextNode; // step to next node up here BEFORE calls to continue
+      with Statement^ do begin
+        // Do not print statements marked invisible for the class browser
         if not _Visible or _Temporary then
           Continue;
 
         // Prevent infinite parent/child loops
-        if I = ParentIndex then
+        if Statement = ParentStatement then
           Continue;
 
         // Stop the current recurse when we run out of children
-        if _ParentID <> ParentID then begin
-          bInherited := fShowInheritedMembers and (inheritanceids.IndexOf(_ParentID) <> -1);
+        if _Parent <> ParentStatement then begin
+          bInherited := fShowInheritedMembers and (InheritanceStatements.IndexOf(_Parent) <> -1);
           if not bInherited then
             Continue;
         end;
@@ -343,25 +351,25 @@ begin
         case fShowFilter of
           sfAll: begin // sfAll means all open files. not the system headers
               if not _InSystemHeader then // do not show system headers
-                AddStatementNode(I);
+                AddStatementNode(CurStatementNode);
             end;
           sfSystemFiles: begin
               if _InSystemHeader and IsIncluded(_FileName) then
-                AddStatementNode(I); // only show system header stuff
+                AddStatementNode(CurStatementNode); // only show system header stuff
             end;
           sfCurrent: begin
               if not _InSystemHeader and IsIncluded(_FileName) then
-                AddStatementNode(I);
+                AddStatementNode(CurStatementNode);
             end;
           sfProject: begin
               if _InProject or bInherited then
-                AddStatementNode(I);
+                AddStatementNode(CurStatementNode);
             end;
         end;
       end;
     end;
   finally
-    inheritanceids.Free;
+    InheritanceStatements.Free;
   end;
 end;
 
@@ -388,7 +396,7 @@ begin
       ReadClassFolders;
 
       // Add everything recursively
-      AddMembers(nil, -1, -1);
+      AddMembers(nil, nil);
       Sort;
 
       // Remember selection
@@ -438,10 +446,10 @@ begin
     Node.Data := nil;
     fLastSelection := '';
     Exit;
-  end else if fParser.Statements.IndexOf(Node.Data) = -1 then begin
-    Node.Data := nil;
-    fLastSelection := '';
-    Exit;
+    //end else if fParser.Statements.IndexOf(Node.Data) = -1 then begin
+    //  Node.Data := nil;
+    //  fLastSelection := '';
+    //  Exit;
   end;
 
   if Node.ImageIndex = fImagesRecord.fGlobalsImg then begin
@@ -960,7 +968,7 @@ begin
 
     // draw function arguments to the right of the already drawn text
     NodeRect := Node.DisplayRect(true);
-    NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._ScopelessCmd) + 2;
+    NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._Command) + 2;
     fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
 
     fCnv.Font.Color := clGray;

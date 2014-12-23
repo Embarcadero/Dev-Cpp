@@ -1330,7 +1330,6 @@ object EditorOptForm: TEditorOptForm
     Top = 458
   end
   object CppParserCopy: TCppParser
-    BaseIndex = 0
     Enabled = True
     OnTotalProgress = CppParser1TotalProgress
     Tokenizer = CppTokenizerCopy

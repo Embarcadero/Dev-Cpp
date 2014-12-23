@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons;
+  Dialogs, StdCtrls, Buttons, CBUtils, StatementList;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -86,7 +86,7 @@ end;
 
 procedure TNewClassForm.FormShow(Sender: TObject);
 var
-  sl: TStrings;
+  sl: TStringList;
 begin
   LoadText;
 
@@ -107,7 +107,7 @@ begin
     (PStatement(MainForm.ClassBrowser.Selected.Data)^._Kind = skClass) then begin
 
     // If we are spawned from the class browser, set inheritcance to selected class
-    cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser.Selected.Data)^._ScopeCmd);
+    cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser.Selected.Data)^._Command);
     if cmbClass.ItemIndex <> -1 then
       chkInherit.Checked := True;
   end else begin
@@ -151,35 +151,36 @@ end;
 procedure TNewClassForm.btnBrowseCppClick(Sender: TObject);
 begin
   with TOpenDialog.Create(self) do try
-      if Sender = btnBrowseCpp then begin
-        FileName := ExtractFileName(txtCppFile.Text);
-        InitialDir := ExtractFilePath(txtCppFile.Text);
-        Filter := FLT_CPPS;
-        DefaultExt := 'cpp';
-      end else begin
-        FileName := ExtractFileName(txtHFile.Text);
-        InitialDir := ExtractFilePath(txtHFile.Text);
-        Filter := FLT_HEADS;
-        DefaultExt := 'h';
-      end;
-      if Execute then begin
-        if Sender = btnBrowseCpp then
-          txtCppFile.Text := FileName
-        else
-          txtHFile.Text := FileName;
-      end;
-    finally
-      Free;
+    if Sender = btnBrowseCpp then begin
+      FileName := ExtractFileName(txtCppFile.Text);
+      InitialDir := ExtractFilePath(txtCppFile.Text);
+      Filter := FLT_CPPS;
+      DefaultExt := 'cpp';
+    end else begin
+      FileName := ExtractFileName(txtHFile.Text);
+      InitialDir := ExtractFilePath(txtHFile.Text);
+      Filter := FLT_HEADS;
+      DefaultExt := 'h';
     end;
+    if Execute then begin
+      if Sender = btnBrowseCpp then
+        txtCppFile.Text := FileName
+      else
+        txtHFile.Text := FileName;
+    end;
+  finally
+    Free;
+  end;
 end;
 
 procedure TNewClassForm.btnCreateClick(Sender: TObject);
 var
+  Node: PStatementNode;
+  Statement, InheritStatement: PStatement;
   idx: integer;
   e, headere: TEditor;
   hfName: AnsiString;
   hFile: integer;
-  st: PStatement;
 begin
   // HEADER FILE IMPLEMENTATION
   if chkAddToProject.Checked then begin
@@ -219,17 +220,21 @@ begin
   // Add inherited piece ": public foo"
   if chkInherit.Checked and (txtIncFile.Text <> '') then begin
 
+    InheritStatement := nil;
+
     // Find class we inherit from
-    st := nil;
-    for idx := 0 to MainForm.CppParser.Statements.Count - 1 do begin
-      st := MainForm.CppParser.Statements[idx];
-      if (st^._Kind = skClass) and (st^._ScopelessCmd = cmbClass.Text) and
-        (MainForm.Project.Units.Indexof(MainForm.CppParser.GetDeclarationFileName(st)) <> -1) then
-        Break;
-      st := nil;
+    Node := MainForm.CppParser.Statements.FirstNode;
+    while Assigned(Node) do begin
+      Statement := Node^.Data;
+      if (Statement^._Kind = skClass) and (Statement^._Command = cmbClass.Text) and
+        (MainForm.Project.Units.Indexof(MainForm.CppParser.GetDeclarationFileName(Statement)) <> -1) then begin
+        InheritStatement := Statement;
+        break;
+      end;
+      Node := Node^.NextNode;
     end;
 
-    if Assigned(st) then
+    if Assigned(InheritStatement) then
       e.Text.Lines.Add('#include "' + txtIncFile.Text + '"')
     else
       e.Text.Lines.Add('#include <' + txtIncFile.Text + '>');

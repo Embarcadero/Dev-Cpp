@@ -21,14 +21,14 @@ unit CodeCompletion;
 
 interface
 
-uses 
+uses
 {$IFDEF WIN32}
   Windows, Classes, Forms, SysUtils, Controls, Graphics, CppParser,
-  cbutils, IntList;
+  cbutils, IntList, StatementList;
 {$ENDIF}
 {$IFDEF LINUX}
-  Xlib, Classes, QForms, SysUtils, QControls, QGraphics, CppParser,
-  U_IntList, QDialogs, Types;
+Xlib, Classes, QForms, SysUtils, QControls, QGraphics, CppParser,
+U_IntList, QDialogs, Types;
 {$ENDIF}
 
 type
@@ -55,14 +55,14 @@ type
     fIncludedFiles: TStringList;
     fIsIncludedCacheFileName: AnsiString;
     fIsIncludedCacheResult: boolean;
-    function ApplyClassFilter(Index, CurrentID: integer; InheritanceIDs: TIntList): boolean;
-    function ApplyMemberFilter(Index, CurrentID, ParentID: integer; InheritanceIDs: TIntList): boolean;
-    procedure GetCompletionFor(Phrase : AnsiString);
-    procedure FilterList(const Member : AnsiString);
+    function ApplyClassFilter(Statement, CurrentClass: PStatement; InheritanceStatements: TList): boolean;
+    function ApplyMemberFilter(Statement, CurrentClass, ParentClass: PStatement; InheritanceStatements: TList): boolean;
+    procedure GetCompletionFor(Phrase: AnsiString);
+    procedure FilterList(const Member: AnsiString);
     procedure SetPosition(Value: TPoint);
     procedure OnFormResize(Sender: TObject);
     function IsIncluded(const FileName: AnsiString): boolean;
-    function IsVisible : boolean;
+    function IsVisible: boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -71,7 +71,7 @@ type
     function SelectedStatement: PStatement;
     property CurrentStatement: PStatement read fCurrentStatement write fCurrentStatement;
   published
-    property ShowCount : integer read fShowCount write fShowCount;
+    property ShowCount: integer read fShowCount write fShowCount;
     property Parser: TCppParser read fParser write fParser;
     property Position: TPoint read fPos write SetPosition;
     property Color: TColor read fColor write fColor;
@@ -137,44 +137,47 @@ begin
   inherited Destroy;
 end;
 
-function TCodeCompletion.ApplyClassFilter(Index, CurrentID: integer; InheritanceIDs: TIntList): boolean;
+function TCodeCompletion.ApplyClassFilter(Statement, CurrentClass: PStatement; InheritanceStatements: TList): boolean;
 begin
   Result :=
     (
-    (PStatement(fParser.Statements[Index])^._Scope in [ssLocal, ssGlobal]) or // local or global var or
+    (Statement^._Scope in [ssLocal, ssGlobal]) or // local or global var or
     (
-    (PStatement(fParser.Statements[Index])^._Scope = ssClassLocal) and // class var
+    (Statement^._Scope = ssClassLocal) and // class var
     (
-    (PStatement(fParser.Statements[Index])^._ParentID = CurrentID) or // from current class
+    (Statement^._Parent = CurrentClass) or // from current class
     (
-    (InheritanceIDs.IndexOf(PStatement(fParser.Statements[Index])^._ParentID) <> -1) and
-    (PStatement(fParser.Statements[Index])^._ClassScope <> scsPrivate)
+    (InheritanceStatements.IndexOf(Statement^._Parent) <> -1) and
+    (Statement^._ClassScope <> scsPrivate)
     ) // or an inheriting class
     )
     )
     ) and
-    (IsIncluded(PStatement(fParser.Statements[Index])^._FileName) or
-     IsIncluded(PStatement(fParser.Statements[Index])^._DeclImplFileName));
+    (IsIncluded(Statement^._FileName) or
+    IsIncluded(Statement^._DeclImplFileName));
 end;
 
-function TCodeCompletion.ApplyMemberFilter(Index, CurrentID, ParentID: integer; InheritanceIDs: TIntList): boolean;
+function TCodeCompletion.ApplyMemberFilter(Statement, CurrentClass, ParentClass: PStatement; InheritanceStatements:
+  TList): boolean;
 var
   cs: set of TStatementClassScope;
 begin
-  Result := PStatement(fParser.Statements[Index])^._ParentID <> -1; // only members
-  if not Result then Exit;
+  Result := Statement^._Parent <> nil; // only members
+  if not Result then
+    Exit;
 
   // all members of current class
-  Result := Result and ((ParentID = CurrentID) and (PStatement(fParser.Statements[Index])^._ParentID = CurrentID));
+  Result := Result and ((ParentClass = CurrentClass) and (Statement^._Parent = ParentClass));
 
   // all public and published members of var's class
   Result := Result or
     (
-    (ParentID = PStatement(fParser.Statements[Index])^._ParentID) and
-    (not (PStatement(fParser.Statements[Index])^._ClassScope in [scsProtected, scsPrivate])) // or member of an inherited class
+    (ParentClass = Statement^._Parent) and
+    (not (Statement^._ClassScope in [scsProtected, scsPrivate]))
+    // or member of an inherited class
     );
 
-  if (CurrentID = -1) or (PStatement(fParser.Statements[Index])^._ParentID = CurrentID) then
+  if (CurrentClass = nil) or (Statement^._Parent = CurrentClass) then
     cs := [scsPrivate, scsProtected]
   else
     cs := [scsPrivate];
@@ -182,166 +185,170 @@ begin
   // all inherited class's non-private members
   Result := Result or
     (
-    (InheritanceIDs.IndexOf(PStatement(fParser.Statements[Index])^._ParentID) <> -1) and
-    (not (PStatement(fParser.Statements[Index])^._ClassScope in cs)) // or member of an inherited class
+    (InheritanceStatements.IndexOf(Statement^._Parent) <> -1) and
+    (not (Statement^._ClassScope in cs)) // or member of an inherited class
     );
 end;
 
-procedure TCodeCompletion.GetCompletionFor(Phrase : AnsiString);
+procedure TCodeCompletion.GetCompletionFor(Phrase: AnsiString);
 var
-	I: integer;
-	InheritanceIDs: TIntList;
-	CurrentID, ParentID: integer;
-	parent : PStatement;
+  Node: PStatementNode;
+  Statement: PStatement;
+  I: integer;
+  InheritanceStatements: TList;
+  ParentStatement: PStatement;
 begin
-	// Reset filter cache
-	fIsIncludedCacheFileName := '';
-	fIsIncludedCacheResult := false;
+  // Reset filter cache
+  fIsIncludedCacheFileName := '';
+  fIsIncludedCacheResult := false;
 
-	// Pulling off the same trick as in TCppParser.FindStatementOf, but ignore everything after last operator
-	InheritanceIDs := TIntList.Create;
-	try
-		// ID of current class
-		if Assigned(fCurrentStatement) then
-			CurrentID := fCurrentStatement^._ID
-		else
-			CurrentID := -1;
+  // Pulling off the same trick as in TCppParser.FindStatementOf, but ignore everything after last operator
+  InheritanceStatements := TList.Create;
+  try
+    I := fParser.FindLastOperator(Phrase);
+    if I = 0 then begin
 
-		I := fParser.FindLastOperator(Phrase);
-		if I = 0 then begin
+      // only add globals and members of the current class
 
-			// only add globals and members of the current class
+      // Also consider classes the current class inherits from
+      fParser.GetInheritanceStatements(fCurrentStatement, InheritanceStatements);
+      Node := fParser.Statements.FirstNode;
+      while Assigned(Node) do begin
+        Statement := Node^.Data;
+        if ApplyClassFilter(Statement, CurrentStatement, InheritanceStatements) then
+          fFullCompletionStatementList.Add(Statement);
+        Node := Node^.NextNode;
+      end;
 
-			// Also consider classes the current class inherits from
-			fParser.GetInheritanceIDs(fCurrentStatement,InheritanceIDs);
-			for I := 0 to fParser.Statements.Count - 1 do
-				if ApplyClassFilter(I, CurrentID, InheritanceIDs) then
-					fFullCompletionStatementList.Add(fParser.Statements[I]);
+    end else begin
 
-		end else begin
+      // Find last operator
+      Delete(Phrase, I, MaxInt);
 
-			// Find last operator
-			Delete(Phrase,I,MaxInt);
+      // Add statements of all the text before the last operator
+      ParentStatement := fParser.FindStatementOf(Phrase, fCurrentStatement);
+      if not Assigned(ParentStatement) then
+        Exit;
 
-			// Add statements of all the text before the last operator
-			parent := fParser.FindStatementOf(Phrase,fCurrentStatement);
-			if not Assigned(parent) then
-				Exit;
+      // Then determine which type it has (so we can use it as a parent ID)
+      if not (ParentStatement^._Kind = skClass) then begin // already found type
+        ParentStatement := fParser.FindTypeStatementOf(ParentStatement^._Type, fCurrentStatement);
+        if not Assigned(ParentStatement) then
+          Exit;
+      end;
+      // Then add members of the ClassIDs and InheritanceIDs
+      fParser.GetInheritanceStatements(ParentStatement, InheritanceStatements);
 
-			// Then determine which type it has (so we can use it as a parent ID)
-			if not (parent^._Kind = skClass) then begin // already found type
-				parent := fParser.FindTypeStatementOf(parent^._Type,fCurrentStatement);
-				if not Assigned(parent) then
-					Exit;
-			end;
-
-			ParentID := parent^._ID;
-			fParser.GetInheritanceIDs(parent,InheritanceIDs); // slow...
-
-			// Then add members of the ClassIDs and InheritanceIDs
-			for I := 0 to fParser.Statements.Count - 1 do
-				if ApplyMemberFilter(I, CurrentID, ParentID, InheritanceIDs) then
-					fFullCompletionStatementList.Add(fParser.Statements[I]);
-		end;
-	finally
-		InheritanceIDs.Free;
-	end;
+      Node := fParser.Statements.FirstNode;
+      while Assigned(Node) do begin
+        Statement := Node^.Data;
+        if ApplyMemberFilter(Statement, CurrentStatement, ParentStatement, InheritanceStatements) then
+          fFullCompletionStatementList.Add(Statement);
+        Node := Node^.NextNode;
+      end;
+    end;
+  finally
+    InheritanceStatements.Free;
+  end;
 end;
 
 function ListSort(Item1, Item2: Pointer): Integer;
 begin
-	// first take into account that parsed statements need to be higher
-	// in the list than loaded ones
-	if PStatement(Item1)^._Loaded and (not PStatement(Item2)^._Loaded) then
-		Result := 1
-	else if (not PStatement(Item1)^._Loaded) and PStatement(Item2)^._Loaded then
-		Result := -1
-	else // otherwise, sort by name
-		Result := CompareText(PStatement(Item1)^._ScopelessCmd, PStatement(Item2)^._ScopelessCmd);
+  // first take into account that parsed statements need to be higher
+  // in the list than loaded ones
+  if PStatement(Item1)^._Loaded and (not PStatement(Item2)^._Loaded) then
+    Result := 1
+  else if (not PStatement(Item1)^._Loaded) and PStatement(Item2)^._Loaded then
+    Result := -1
+  else // otherwise, sort by name
+    Result := CompareText(PStatement(Item1)^._Command, PStatement(Item2)^._Command);
 end;
 
-procedure TCodeCompletion.FilterList(const Member : AnsiString);
+procedure TCodeCompletion.FilterList(const Member: AnsiString);
 var
-	I: integer;
+  I: integer;
 begin
-	fCompletionStatementList.Clear;
-	if Member <> '' then begin // filter, case insensitive
-		fCompletionStatementList.Capacity := fFullCompletionStatementList.Count;
-		for I := 0 to fFullCompletionStatementList.Count - 1 do
-			if StartsText(Member, PStatement(fFullCompletionStatementList[I])^._ScopelessCmd) then
-				fCompletionStatementList.Add(fFullCompletionStatementList[I]);
-	end else
-		fCompletionStatementList.Assign(fFullCompletionStatementList);
-	fCompletionStatementList.Sort(@ListSort);
+  fCompletionStatementList.Clear;
+  if Member <> '' then begin // filter, case insensitive
+    fCompletionStatementList.Capacity := fFullCompletionStatementList.Count;
+    for I := 0 to fFullCompletionStatementList.Count - 1 do
+      if StartsText(Member, PStatement(fFullCompletionStatementList[I])^._Command) then
+        fCompletionStatementList.Add(fFullCompletionStatementList[I]);
+  end else
+    fCompletionStatementList.Assign(fFullCompletionStatementList);
+  fCompletionStatementList.Sort(@ListSort);
 end;
 
 procedure TCodeCompletion.Hide;
 begin
-	OnKeyPress := nil;
-	CodeComplForm.Hide;
+  OnKeyPress := nil;
+  CodeComplForm.Hide;
 
-	// Clear data, do not free pointed memory: data is owned by CppParser
-	fCompletionStatementList.Clear;
-	fFullCompletionStatementList.Clear;
-	CodeComplForm.lbCompletion.Items.BeginUpdate;
-	CodeComplForm.lbCompletion.Items.Clear;
-	CodeComplForm.lbCompletion.Items.EndUpdate;
-	fIncludedFiles.Clear; // is recreated anyway on reshow, so save some memory when hiding
+  // Clear data, do not free pointed memory: data is owned by CppParser
+  fCompletionStatementList.Clear;
+  fFullCompletionStatementList.Clear;
+  CodeComplForm.lbCompletion.Items.BeginUpdate;
+  CodeComplForm.lbCompletion.Items.Clear;
+  CodeComplForm.lbCompletion.Items.EndUpdate;
+  fIncludedFiles.Clear; // is recreated anyway on reshow, so save some memory when hiding
 end;
 
 procedure TCodeCompletion.Search(const Phrase, Filename: AnsiString);
 var
-	I : integer;
+  I: integer;
 begin
-	if fEnabled then begin
+  if fEnabled then begin
 
-		Screen.Cursor := crHourglass;
+    Screen.Cursor := crHourglass;
 
-		// only perform full new search if just invoked
-		if not CodeComplForm.Showing then begin
-			fParser.GetFileIncludes(Filename,fIncludedFiles);
-			GetCompletionFor(Phrase);
-		end;
+    // only perform full new search if just invoked
+    if not CodeComplForm.Showing then begin
+      fParser.GetFileIncludes(Filename, fIncludedFiles);
+      GetCompletionFor(Phrase);
+    end;
 
-		// Sort here by member
-		I := fParser.FindLastOperator(Phrase);
-		while (I > 0) and (I <= Length(Phrase)) and (Phrase[i] in ['.',':','-','>']) do
-			Inc(I);
+    // Sort here by member
+    I := fParser.FindLastOperator(Phrase);
+    while (I > 0) and (I <= Length(Phrase)) and (Phrase[i] in ['.', ':', '-', '>']) do
+      Inc(I);
 
-		// filter fFullCompletionStatementList to fCompletionStatementList
-		FilterList(Copy(Phrase,I,MaxInt));
+    // filter fFullCompletionStatementList to fCompletionStatementList
+    FilterList(Copy(Phrase, I, MaxInt));
 
-		if fCompletionStatementList.Count > 0 then begin
-			CodeComplForm.lbCompletion.Items.BeginUpdate;
-			CodeComplForm.lbCompletion.Items.Clear;
+    if fCompletionStatementList.Count > 0 then begin
+      CodeComplForm.lbCompletion.Items.BeginUpdate;
+      try
+        CodeComplForm.lbCompletion.Items.Clear;
 
-			// Only slow one hundred statements...
-			for I := 0 to min(fShowCount,fCompletionStatementList.Count - 1) do
-				CodeComplForm.lbCompletion.Items.AddObject('',fCompletionStatementList[I]);
+        // Only slow one hundred statements...
+        for I := 0 to min(fShowCount, fCompletionStatementList.Count - 1) do
+          CodeComplForm.lbCompletion.Items.AddObject('', fCompletionStatementList[I]);
+      finally
+        CodeComplForm.lbCompletion.Items.EndUpdate;
+      end;
 
-			CodeComplForm.lbCompletion.Items.EndUpdate;
+      CodeComplForm.Show;
+      CodeComplForm.lbCompletion.SetFocus;
+      if CodeComplForm.lbCompletion.Items.Count > 0 then
+        CodeComplForm.lbCompletion.ItemIndex := 0;
 
-			CodeComplForm.Show;
-			CodeComplForm.lbCompletion.SetFocus;
-			if CodeComplForm.lbCompletion.Items.Count > 0 then
-				CodeComplForm.lbCompletion.ItemIndex := 0;
+      fHideDelay := 0;
+    end else if fHideDelay = 0 then begin
+      CodeComplForm.lbCompletion.Items.Clear;
+      fHideDelay := 1;
+    end else begin
+      Hide;
+    end;
 
-			fHideDelay := 0;
-		end else if fHideDelay = 0 then begin
-			CodeComplForm.lbCompletion.Items.Clear;
-			fHideDelay := 1;
-		end else begin
-			Hide;
-		end;
-
-		Screen.Cursor := crDefault;
-	end;
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 function TCodeCompletion.SelectedStatement: PStatement;
 begin
   if fEnabled then begin
-    if (fCompletionStatementList.Count > CodeComplForm.lbCompletion.ItemIndex) and (CodeComplForm.lbCompletion.ItemIndex <> -1) then
+    if (fCompletionStatementList.Count > CodeComplForm.lbCompletion.ItemIndex) and (CodeComplForm.lbCompletion.ItemIndex
+      <> -1) then
       Result := PStatement(fCompletionStatementList[CodeComplForm.lbCompletion.ItemIndex])
     else begin
       if fCompletionStatementList.Count > 0 then
@@ -349,8 +356,7 @@ begin
       else
         Result := nil;
     end;
-  end
-  else
+  end else
     Result := nil;
 end;
 
@@ -379,19 +385,20 @@ end;
 
 function TCodeCompletion.IsIncluded(const FileName: AnsiString): boolean;
 begin
-	// Only do the slow check if the cache is invalid
-	if not SameStr(FileName,fIsIncludedCacheFileName) then begin
-		fIsIncludedCacheFileName := FileName;
-		fIsIncludedCacheResult := FastIndexOf(fIncludedFiles,FileName) <> -1;
-	end;
+  // Only do the slow check if the cache is invalid
+  if not SameStr(FileName, fIsIncludedCacheFileName) then begin
+    fIsIncludedCacheFileName := FileName;
+    fIsIncludedCacheResult := FastIndexOf(fIncludedFiles, FileName) <> -1;
+  end;
 
-	// Cache has been updated. Use it.
-	Result := fIsIncludedCacheResult;
+  // Cache has been updated. Use it.
+  Result := fIsIncludedCacheResult;
 end;
 
-function TCodeCompletion.IsVisible : boolean;
+function TCodeCompletion.IsVisible: boolean;
 begin
-	Result := fEnabled and CodeComplForm.Visible;
+  Result := fEnabled and CodeComplForm.Visible;
 end;
 
 end.
+

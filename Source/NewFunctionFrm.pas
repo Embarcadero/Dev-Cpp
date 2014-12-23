@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, CppParser;
+  Dialogs, StdCtrls, ExtCtrls, CppParser, CBUtils;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -81,7 +81,7 @@ end;
 
 procedure TNewFunctionForm.FormShow(Sender: TObject);
 var
-  sl: TStrings;
+  sl: TStringList;
 begin
   LoadText;
 
@@ -93,7 +93,7 @@ begin
     sl.Free;
   end;
 
-  cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser.Selected.Data)^._ScopeCmd);
+  cmbClass.ItemIndex := cmbClass.Items.IndexOf(PStatement(MainForm.ClassBrowser.Selected.Data)^._Command);
 
   txtType.SetFocus;
 end;
@@ -138,7 +138,7 @@ begin
   else
     VarScope := scsNone; // shut up compiler
   end;
-  Line := MainForm.CppParser.SuggestMemberInsertionLine(st^._ID, VarScope, AddScopeStr);
+  Line := MainForm.CppParser.SuggestMemberInsertionLine(st, VarScope, AddScopeStr);
   if Line = -1 then begin
     MessageDlg(Lang[ID_NEWVAR_MSG_NOLINE], mtError, [mbOk], 0);
     Exit;

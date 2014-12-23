@@ -26,7 +26,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
   SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
   SynEditCodeFolding, SynExportHTML, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils,
-  CodeToolTip;
+  CodeToolTip, CBUtils;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Classes, Graphics, QControls, QForms, QDialogs, CodeCompletion, CppParser,
@@ -1429,7 +1429,7 @@ begin
   fText.SelEnd := fText.RowColToCharIndex(fText.WordEnd);
 
   // ... by replacing the selection
-  fText.SelText := Statement^._ScopelessCmd + FuncAddOn + append;
+  fText.SelText := Statement^._Command + FuncAddOn + append;
 
   // Move caret inside the ()'s, only when the user has something to do there...
   if (FuncAddOn <> '') and (Statement^._Args <> '()') and (Statement^._Args <> '(void)') then begin

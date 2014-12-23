@@ -1021,6 +1021,7 @@ object MainForm: TMainForm
         ItemImages.InheritedVariableProtected = 9
         ItemImages.InheritedVariablePublic = 11
         ShowInheritedMembers = False
+        TabVisible = True
       end
     end
     object LeftDebugSheet: TTabSheet
@@ -2820,7 +2821,6 @@ object MainForm: TMainForm
     end
   end
   object CppParser: TCppParser
-    BaseIndex = 0
     Enabled = True
     OnTotalProgress = CppParserTotalProgress
     ParseLocalHeaders = False

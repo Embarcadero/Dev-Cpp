@@ -31,7 +31,7 @@ uses
   debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
   devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg,
-  CppPreprocessor;
+  CppPreprocessor, CBUtils, StatementList;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -3845,10 +3845,11 @@ begin
     except
       if MessageDlg(
         Format(Lang[ID_ENV_CACHEFAIL], [devDirs.Config, ExcludeTrailingBackslash(devDirs.Config) + 'Backup' + pd]),
-        mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+        mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 
         // Remove and backup the current configuration directory.
         RemoveOptionsDir(devDirs.Config);
+      end;
       TerminateProcess(GetCurrentProcess(), 1);
     end;
   end;
@@ -4260,15 +4261,9 @@ end;
 
 procedure TMainForm.actBrowserGotoImplUpdate(Sender: TObject);
 begin
-  if Assigned(ClassBrowser) and Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then
-
-    //check if node.data still in statements
-    if CppParser.Statements.IndexOf(ClassBrowser.Selected.Data) >= 0 then
-      TCustomAction(Sender).Enabled := (PStatement(ClassBrowser.Selected.Data)^._Kind <> skClass)
-    else begin
-      ClassBrowser.Selected.Data := nil;
-      TCustomAction(Sender).Enabled := False;
-    end else
+  if Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then
+    TCustomAction(Sender).Enabled := (PStatement(ClassBrowser.Selected.Data)^._Kind = skClass)
+  else
     TCustomAction(Sender).Enabled := False;
 end;
 
@@ -4279,33 +4274,18 @@ end;
 
 procedure TMainForm.actBrowserNewMemberUpdate(Sender: TObject);
 begin
-  if Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then begin
-
-    //check if node.data still in statements
-    if CppParser.Statements.IndexOf(ClassBrowser.Selected.Data) >= 0 then begin
-      TCustomAction(Sender).Enabled := (PStatement(ClassBrowser.Selected.Data)^._Kind = skClass);
-    end else begin
-      ClassBrowser.Selected.Data := nil;
-      TCustomAction(Sender).Enabled := False;
-    end;
-  end else begin
+  if Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then
+    TCustomAction(Sender).Enabled := (PStatement(ClassBrowser.Selected.Data)^._Kind = skClass)
+  else
     TCustomAction(Sender).Enabled := False;
-  end;
 end;
 
 procedure TMainForm.actBrowserNewVarUpdate(Sender: TObject);
 begin
-  if Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then begin
-    //check if node.data still in statements
-    if CppParser.Statements.IndexOf(ClassBrowser.Selected.Data) >= 0 then
-      TCustomAction(Sender).Enabled := (PStatement(ClassBrowser.Selected.Data)^._Kind = skClass)
-    else begin
-      ClassBrowser.Selected.Data := nil;
-      TCustomAction(Sender).Enabled := False;
-    end;
-  end else begin
+  if Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then
+    TCustomAction(Sender).Enabled := (PStatement(ClassBrowser.Selected.Data)^._Kind = skClass)
+  else
     TCustomAction(Sender).Enabled := False;
-  end;
 end;
 
 procedure TMainForm.actBrowserAddFolderUpdate(Sender: TObject);
@@ -5346,96 +5326,93 @@ end;
 
 procedure TMainForm.RebuildClassesToolbar;
 var
-  I: integer;
-  st: PStatement;
+  Node: PStatementNode;
+  Statement: PStatement;
   OldSelection: AnsiString;
 begin
   OldSelection := cmbClasses.Text;
 
   cmbClasses.Items.BeginUpdate;
-  cmbClasses.Clear;
-  cmbClasses.Items.Add('(globals)');
+  try
+    cmbClasses.Clear;
 
-  for I := 0 to CppParser.Statements.Count - 1 do begin
-    st := PStatement(CppParser.Statements[I]);
-    if st^._InProject and (st^._Kind = skClass) then // skClass equals struct + typedef + class
-      cmbClasses.Items.AddObject(st^._ScopelessCmd, Pointer(st^._ID));
+    // Add globals list
+    cmbClasses.Items.AddObject('(globals)', nil);
+
+    // Add all classes inside the current project
+    Node := CppParser.Statements.FirstNode;
+    while Assigned(Node) do begin
+      Statement := Node^.Data;
+      if Statement^._InProject and (Statement^._Kind = skClass) then // skClass equals struct + typedef struct + class
+        cmbClasses.Items.AddObject(Statement^._Command, Pointer(Statement));
+      Node := Node^.NextNode;
+    end;
+
+    // if we can't find the old selection anymore (-> -1), default to 0 (globals)
+    cmbClasses.ItemIndex := max(0, cmbClasses.Items.IndexOf(OldSelection));
+    cmbClassesChange(cmbClasses);
+  finally
+    cmbClasses.Items.EndUpdate;
   end;
-
-  cmbClasses.Items.EndUpdate;
-
-  // if we can't find the old selection anymore (-> -1), default to 0 (globals)
-  cmbClasses.ItemIndex := max(0, cmbClasses.Items.IndexOf(OldSelection));
-  cmbClassesChange(cmbClasses);
 end;
 
 procedure TMainForm.cmbClassesChange(Sender: TObject);
 var
-  I, ParentID: integer;
-  st: PStatement;
+  Node: PStatementNode;
+  Statement, ParentStatement: PStatement;
 begin
   cmbMembers.Items.BeginUpdate;
-  cmbMembers.Clear;
+  try
+    cmbMembers.Clear;
 
-  // Support '(globals)'
-  if cmbClasses.ItemIndex > 0 then
-    ParentID := Integer(cmbClasses.Items.Objects[cmbClasses.ItemIndex])
-  else if cmbClasses.ItemIndex = 0 then // '(globals)'
-    ParentID := -1
-  else begin // -1?
+    // Select what parent we need to display info for
+    if cmbClasses.ItemIndex > 0 then
+      ParentStatement := PStatement(cmbClasses.Items.Objects[cmbClasses.ItemIndex]) // any class
+    else if cmbClasses.ItemIndex = 0 then
+      ParentStatement := nil // '(globals)'
+    else
+      Exit; // -1?
+
+    // Show functions that belong to this scope or class/struct
+    Node := CppParser.Statements.FirstNode;
+    while Assigned(Node) do begin
+      Statement := Node^.Data;
+      if (Statement^._Parent = ParentStatement) and Statement^._InProject and (Statement^._Kind in [skConstructor,
+        skDestructor, skFunction]) then
+        cmbMembers.Items.AddObject(Statement^._Command + Statement^._Args + ' : ' + Statement^._Type,
+          Pointer(Statement));
+      Node := Node^.NextNode;
+    end;
+  finally
     cmbMembers.Items.EndUpdate;
-    Exit;
   end;
-
-  // If we selected a class
-  if (ParentID <> -1) and (PStatement(CppParser.Statements[CppParser.IndexOfStatement(ParentID)])^._Type = 'class') then
-    begin
-
-    // Don't allow variables of classes
-    for I := 0 to CppParser.Statements.Count - 1 do begin
-      st := PStatement(CppParser.Statements[I]);
-      if (st^._ParentID = ParentID) and st^._InProject and (st^._Kind in [skConstructor, skDestructor, skFunction]) then
-        cmbMembers.Items.AddObject(st^._ScopelessCmd + st^._Args + ' : ' + st^._Type, Pointer(I));
-    end;
-  end else begin
-
-    // Allow variables of (globals) and structs
-    for I := 0 to CppParser.Statements.Count - 1 do begin
-      st := PStatement(CppParser.Statements[I]);
-      if (st^._ParentID = ParentID) and st^._InProject and (st^._Type <> '') then // Skip defines too
-        cmbMembers.Items.AddObject(st^._ScopelessCmd + st^._Args + ' : ' + st^._Type, Pointer(I));
-    end;
-  end;
-
-  cmbMembers.Items.EndUpdate;
 end;
 
 procedure TMainForm.cmbMembersChange(Sender: TObject);
 var
-  I: integer;
-  st: PStatement;
+  Statement: PStatement;
+  Line: Integer;
   e: TEditor;
-  fname: AnsiString;
+  FileName: AnsiString;
 begin
   if cmbMembers.ItemIndex = -1 then // sometimes happens too?
     Exit;
 
-  I := Integer(cmbMembers.Items.Objects[cmbMembers.ItemIndex]);
-  st := PStatement(CppParser.Statements[I]);
-  if not Assigned(st) then
+  Statement := PStatement(cmbMembers.Items.Objects[cmbMembers.ItemIndex]);
+  if not Assigned(Statement) then
     Exit;
 
-  if st^._IsDeclaration then begin
-    I := st^._DeclImplLine;
-    fname := st^._DeclImplFileName;
+  if Statement^._IsDeclaration then begin
+    Line := Statement^._DeclImplLine;
+    FileName := Statement^._DeclImplFileName;
   end else begin
-    I := st^._Line;
-    fname := st^._FileName;
+    Line := Statement^._Line;
+    FileName := Statement^._FileName;
   end;
 
-  e := fEditorList.GetEditorFromFilename(fname);
+  e := fEditorList.GetEditorFromFilename(FileName);
   if Assigned(e) then begin
-    e.SetCaretPos(I, 1);
+    e.SetCaretPos(Line, 1);
     e.Activate;
   end;
 end;
