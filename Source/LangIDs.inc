@@ -991,6 +991,7 @@ const
   ID_COULDNOTFINDPROFDATA               = 62033;
   ID_INFONOTFOUND                       = 62034;
   ID_PARSINGFILECOUNT                   = 62035;
+  ID_DONEPARSINGINCOUNT                 = 62036;
 
   ID_BTN_OK                             = 63001;
   ID_BTN_CANCEL                         = 63002;

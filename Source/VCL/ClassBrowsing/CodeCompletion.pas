@@ -154,7 +154,7 @@ begin
     )
     ) and
     (IsIncluded(Statement^._FileName) or
-    IsIncluded(Statement^._DeclImplFileName));
+    IsIncluded(Statement^._DefinitionFileName));
 end;
 
 function TCodeCompletion.ApplyMemberFilter(Statement, CurrentClass, ParentClass: PStatement; InheritanceStatements:
@@ -232,7 +232,7 @@ begin
 
       // Then determine which type it has (so we can use it as a parent ID)
       if not (ParentStatement^._Kind = skClass) then begin // already found type
-        ParentStatement := fParser.FindTypeStatementOf(ParentStatement^._Type, fCurrentStatement);
+        ParentStatement := fParser.FindTypeDefinitionOf(ParentStatement^._Type, fCurrentStatement);
         if not Assigned(ParentStatement) then
           Exit;
       end;

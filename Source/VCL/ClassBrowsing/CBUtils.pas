@@ -68,29 +68,30 @@ type
 
   PStatement = ^TStatement;
   TStatement = record
-    _Parent: PStatement;
-    _FullText: AnsiString;
-    _Type: AnsiString;
-    _Args: AnsiString;
-    _Command: AnsiString;
-    _Kind: TStatementKind;
+    _Parent: PStatement; // parent class/struct/namespace
+    _HintText: AnsiString; // text to force display when using PrettyPrintStatement
+    _Type: AnsiString; // type "int"
+    _Command: AnsiString; // identifier/name of statement "foo"
+    _Args: AnsiString; // args "(int a,float b)"
+    _Kind: TStatementKind; // kind of statement class/variable/function/etc
     _InheritsFromStatements: TList; // item below is converted to PStatements and stored here
     _InheritsFromStatementsText: AnsiString; // temporary storage for classes inherited from
-    _Scope: TStatementScope;
-    _ClassScope: TStatementClassScope;
-    _IsDeclaration: boolean;
-    _DeclImplLine: integer;
-    _Line: integer;
-    _DeclImplFileName: AnsiString;
-    _FileName: AnsiString;
-    _Visible: boolean;
-    _Temporary: boolean;
-    _Loaded: boolean;
-    _InProject: boolean;
-    _InSystemHeader: boolean;
+    _Scope: TStatementScope; // global/local/classlocal
+    _ClassScope: TStatementClassScope; // protected/private/public
+    _HasDefinition: boolean; // definiton line/filename is valid
+    _Line: integer; // declaration
+    _DefinitionLine: integer; // definition
+    _FileName: AnsiString; // declaration
+    _DefinitionFileName: AnsiString; // definition
+    _Visible: boolean; // visible in class browser or not
+    _Temporary: boolean; // statements to be deleted after parsing
+    _Loaded: boolean; // statement from cache
+    _InProject: boolean; // statement in project
+    _InSystemHeader: boolean; // statement in system header (#include <>)
   end;
 
   TProgressEvent = procedure(Sender: TObject; const FileName: AnsiString; Total, Current: integer) of object;
+  TProgressEndEvent = procedure(Sender: TObject; Total: integer) of object;
 
   // These functions are about six times faster than the locale sensitive AnsiX() versions
 function StartsStr(const subtext, text: AnsiString): boolean;
@@ -305,7 +306,7 @@ end;
 
 function IsIncludeLine(const Line: AnsiString): boolean;
 var
-  TrimmedLine : AnsiString;
+  TrimmedLine: AnsiString;
 begin
   Result := False;
   TrimmedLine := Trim(Line);

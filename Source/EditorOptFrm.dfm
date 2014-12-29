@@ -1331,13 +1331,13 @@ object EditorOptForm: TEditorOptForm
   end
   object CppParserCopy: TCppParser
     Enabled = True
-    OnTotalProgress = CppParser1TotalProgress
+    OnTotalProgress = CppParserCopyTotalProgress
     Tokenizer = CppTokenizerCopy
     Preprocessor = CppPreprocessorCopy
     ParseLocalHeaders = True
     ParseGlobalHeaders = True
-    OnStartParsing = CppParser1StartParsing
-    OnEndParsing = CppParser1EndParsing
+    OnStartParsing = CppParserCopyStartParsing
+    OnEndParsing = CppParserCopyEndParsing
     Left = 40
     Top = 458
   end

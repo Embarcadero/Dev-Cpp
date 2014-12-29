@@ -313,8 +313,8 @@ type
     mnuBrowserViewMode: TMenuItem;
     mnuBrowserViewAll: TMenuItem;
     mnuBrowserViewCurrent: TMenuItem;
-    actBrowserGotoDecl: TAction;
-    actBrowserGotoImpl: TAction;
+    actBrowserGotoDeclaration: TAction;
+    actBrowserGotoDefinition: TAction;
     actBrowserNewClass: TAction;
     actBrowserNewMember: TAction;
     actBrowserNewVar: TAction;
@@ -652,10 +652,10 @@ type
     procedure EditorPageControlDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept:
       Boolean);
     procedure actGotoFunctionExecute(Sender: TObject);
-    procedure actBrowserGotoDeclUpdate(Sender: TObject);
-    procedure actBrowserGotoImplUpdate(Sender: TObject);
-    procedure actBrowserGotoDeclExecute(Sender: TObject);
-    procedure actBrowserGotoImplExecute(Sender: TObject);
+    procedure actBrowserGotoDeclarationUpdate(Sender: TObject);
+    procedure actBrowserGotoDefinitionUpdate(Sender: TObject);
+    procedure actBrowserGotoDeclarationExecute(Sender: TObject);
+    procedure actBrowserGotoDefinitionExecute(Sender: TObject);
     procedure actBrowserNewClassUpdate(Sender: TObject);
     procedure actBrowserNewMemberUpdate(Sender: TObject);
     procedure actBrowserNewVarUpdate(Sender: TObject);
@@ -694,7 +694,7 @@ type
     procedure DevCppDDEServerExecuteMacro(Sender: TObject; Msg: TStrings);
     procedure actShowTipsExecute(Sender: TObject);
     procedure CppParserStartParsing(Sender: TObject);
-    procedure CppParserEndParsing(Sender: TObject);
+    procedure CppParserEndParsing(Sender: TObject; Total: Integer);
     procedure actBrowserViewProjectExecute(Sender: TObject);
     procedure actAbortCompilationUpdate(Sender: TObject);
     procedure actAbortCompilationExecute(Sender: TObject);
@@ -1279,8 +1279,8 @@ begin
   actGotoImplEditor.Caption := Lang[ID_POP_GOTOIMPL];
 
   // Class Browser Popup
-  actBrowserGotoDecl.Caption := Lang[ID_POP_GOTODECL];
-  actBrowserGotoImpl.Caption := Lang[ID_POP_GOTOIMPL];
+  actBrowserGotoDeclaration.Caption := Lang[ID_POP_GOTODECL];
+  actBrowserGotoDefinition.Caption := Lang[ID_POP_GOTOIMPL];
   actBrowserNewClass.Caption := Lang[ID_POP_NEWCLASS];
   actBrowserNewMember.Caption := Lang[ID_POP_NEWMEMBER];
   actBrowserNewVar.Caption := Lang[ID_POP_NEWVAR];
@@ -3913,12 +3913,6 @@ begin
   end;
 end;
 
-procedure TMainForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
-begin
-  SetStatusBarMessage(Format(Lang[ID_PARSINGFILECOUNT], [Current, Total, Filename]));
-  Application.ProcessMessages;
-end;
-
 procedure TMainForm.CodeCompletionResize(Sender: TObject);
 begin
   devCodeCompletion.Width := CodeCompletion.Width;
@@ -4242,8 +4236,8 @@ begin
     if ShowModal = mrOK then begin
       st := PStatement(lvEntries.Selected.Data);
       if Assigned(st) then begin
-        if st^._IsDeclaration then
-          e.SetCaretPos(st^._DeclImplLine, 1)
+        if st^._HasDefinition then
+          e.SetCaretPos(st^._DefinitionLine, 1)
         else
           e.SetCaretPos(st^._Line, 1);
         e.Activate;
@@ -4254,17 +4248,14 @@ begin
   end;
 end;
 
-procedure TMainForm.actBrowserGotoDeclUpdate(Sender: TObject);
+procedure TMainForm.actBrowserGotoDeclarationUpdate(Sender: TObject);
 begin
   TAction(Sender).Enabled := Assigned(ClassBrowser.Selected);
 end;
 
-procedure TMainForm.actBrowserGotoImplUpdate(Sender: TObject);
+procedure TMainForm.actBrowserGotoDefinitionUpdate(Sender: TObject);
 begin
-  if Assigned(ClassBrowser.Selected) and Assigned(ClassBrowser.Selected.Data) then
-    TCustomAction(Sender).Enabled := (PStatement(ClassBrowser.Selected.Data)^._Kind = skClass)
-  else
-    TCustomAction(Sender).Enabled := False;
+  TAction(Sender).Enabled := Assigned(ClassBrowser.Selected);
 end;
 
 procedure TMainForm.actBrowserNewClassUpdate(Sender: TObject);
@@ -4298,37 +4289,41 @@ begin
   TCustomAction(Sender).Enabled := True;
 end;
 
-procedure TMainForm.actBrowserGotoDeclExecute(Sender: TObject);
+procedure TMainForm.actBrowserGotoDeclarationExecute(Sender: TObject);
 var
-  e: TEditor;
+  Editor: TEditor;
   Node: TTreeNode;
-  fname: AnsiString;
-  line: integer;
+  FileName: AnsiString;
+  Line: integer;
+  Statement: PStatement;
 begin
   Node := ClassBrowser.Selected;
-  fName := CppParser.GetDeclarationFileName(Node.Data);
-  line := CppParser.GetDeclarationLine(Node.Data);
-  e := fEditorList.GetEditorFromFileName(fname);
-  if Assigned(e) then begin
-    e.SetCaretPos(line, 1);
-    e.Activate;
+  Statement := PStatement(Node.Data);
+  FileName := Statement^._FileName;
+  Line := Statement^._Line;
+  Editor := fEditorList.GetEditorFromFileName(FileName);
+  if Assigned(Editor) then begin
+    Editor.SetCaretPos(Line, 1);
+    Editor.Activate;
   end;
 end;
 
-procedure TMainForm.actBrowserGotoImplExecute(Sender: TObject);
+procedure TMainForm.actBrowserGotoDefinitionExecute(Sender: TObject);
 var
-  e: TEditor;
+  Editor: TEditor;
   Node: TTreeNode;
-  fname: AnsiString;
-  line: integer;
+  FileName: AnsiString;
+  Line: integer;
+  Statement: PStatement;
 begin
   Node := ClassBrowser.Selected;
-  fName := CppParser.GetImplementationFileName(Node.Data);
-  line := CppParser.GetImplementationLine(Node.Data);
-  e := fEditorList.GetEditorFromFileName(fname);
-  if Assigned(e) then begin
-    e.SetCaretPos(line, 1);
-    e.Activate;
+  Statement := PStatement(Node.Data);
+  FileName := Statement^._DefinitionFileName;
+  Line := Statement^._DefinitionLine;
+  Editor := fEditorList.GetEditorFromFileName(FileName);
+  if Assigned(Editor) then begin
+    Editor.SetCaretPos(Line, 1);
+    Editor.Activate;
   end;
 end;
 
@@ -4897,9 +4892,15 @@ begin
   fParseStartTime := GetTickCount;
 end;
 
-procedure TMainForm.CppParserEndParsing(Sender: TObject);
+procedure TMainForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
+begin
+  SetStatusBarMessage(Format(Lang[ID_PARSINGFILECOUNT], [Current, Total, Filename]));
+  Application.ProcessMessages;
+end;
+
+procedure TMainForm.CppParserEndParsing(Sender: TObject; Total: Integer);
 var
-  ParseTime: Cardinal;
+  ParseTimeFloat, ParsingFrequency: Extended;
 begin
   Screen.Cursor := crDefault;
 
@@ -4910,8 +4911,15 @@ begin
   ClassBrowser.EndUpdate;
 
   // do this work only if this was the last file scanned
-  ParseTime := GetTickCount - fParseStartTime;
-  SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN], [ParseTime / 1000])); // divide later to preserve comma stuff
+  ParseTimeFloat := (GetTickCount - fParseStartTime) / 1000;
+  if Total > 1 then begin
+    if ParseTimeFloat <> 0 then
+      ParsingFrequency := Total / ParseTimeFloat
+    else
+      ParsingFrequency := 999;
+    SetStatusbarMessage(Format(Lang[ID_DONEPARSINGINCOUNT], [Total, ParseTimeFloat, ParsingFrequency]))
+  end else
+    SetStatusbarMessage(Format(Lang[ID_DONEPARSINGIN], [ParseTimeFloat]));
 end;
 
 procedure TMainForm.UpdateAppTitle;
@@ -5360,6 +5368,18 @@ procedure TMainForm.cmbClassesChange(Sender: TObject);
 var
   Node: PStatementNode;
   Statement, ParentStatement: PStatement;
+  procedure AddStatementKind(AddKind: TStatementKind);
+  begin
+    Node := CppParser.Statements.FirstNode;
+    while Assigned(Node) do begin
+      Statement := Node^.Data;
+      if (Statement^._Parent = ParentStatement) and Statement^._InProject and (Statement^._Kind = AddKind) then
+        cmbMembers.Items.AddObject(CppParser.StatementKindStr(AddKind) + ' ' + Statement^._Command + Statement^._Args +
+          ' : ' + Statement^._Type,
+          Pointer(Statement));
+      Node := Node^.NextNode;
+    end;
+  end;
 begin
   cmbMembers.Items.BeginUpdate;
   try
@@ -5374,15 +5394,9 @@ begin
       Exit; // -1?
 
     // Show functions that belong to this scope or class/struct
-    Node := CppParser.Statements.FirstNode;
-    while Assigned(Node) do begin
-      Statement := Node^.Data;
-      if (Statement^._Parent = ParentStatement) and Statement^._InProject and (Statement^._Kind in [skConstructor,
-        skDestructor, skFunction]) then
-        cmbMembers.Items.AddObject(Statement^._Command + Statement^._Args + ' : ' + Statement^._Type,
-          Pointer(Statement));
-      Node := Node^.NextNode;
-    end;
+    AddStatementKind(skConstructor);
+    AddStatementKind(skDestructor);
+    AddStatementKind(skFunction);
   finally
     cmbMembers.Items.EndUpdate;
   end;
@@ -5402,13 +5416,9 @@ begin
   if not Assigned(Statement) then
     Exit;
 
-  if Statement^._IsDeclaration then begin
-    Line := Statement^._DeclImplLine;
-    FileName := Statement^._DeclImplFileName;
-  end else begin
-    Line := Statement^._Line;
-    FileName := Statement^._FileName;
-  end;
+  // Go to definition if applicable
+  Line := Statement^._DefinitionLine;
+  FileName := Statement^._DefinitionFileName;
 
   e := fEditorList.GetEditorFromFilename(FileName);
   if Assigned(e) then begin
@@ -5642,13 +5652,13 @@ begin
       if Sender = e then begin // Ctrl+Click from current editor
 
         // Switching between declaration and definition
-        if (e.Text.CaretY = statement^._DeclImplLine) and SameStr(e.FileName, statement^._DeclImplFileName) then
-          begin // clicked on implementation
+        if (e.Text.CaretY = statement^._DefinitionLine) and SameFileName(e.FileName, statement^._DefinitionFileName) then
+          begin // clicked on declaration, move to definition
           filename := statement^._FileName;
           line := statement^._Line;
-        end else begin // clicked anywhere, go to implementation
-          filename := statement^._DeclImplFileName;
-          line := statement^._DeclImplLine;
+        end else begin // clicked anywhere, go to declaration
+          filename := statement^._DefinitionFileName;
+          line := statement^._DefinitionLine;
         end;
 
         // Menu item or mouse cursor
@@ -5659,8 +5669,8 @@ begin
           filename := statement^._FileName;
           line := statement^._Line;
         end else begin
-          filename := statement^._DeclImplFileName;
-          line := statement^._DeclImplLine;
+          filename := statement^._DefinitionFileName;
+          line := statement^._DefinitionLine;
         end;
       end;
 

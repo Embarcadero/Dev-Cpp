@@ -377,16 +377,20 @@ end;
 
 procedure TProfileAnalysisForm.lvFlatClick(Sender: TObject);
 var
-  It: TListItem;
-  P: TPoint;
+  MouseItem: TListItem;
+  MousePos: TPoint;
   e: TEditor;
+  Statement: PStatement;
+  ListView : TListView;
 begin
-  P := TListView(Sender).ScreenToClient(Mouse.CursorPos);
-  It := TListView(Sender).GetItemAt(P.X, P.Y);
-  if Assigned(It) and Assigned(It.Data) then begin
-    e := MainForm.EditorList.GetEditorFromFileName(MainForm.CppParser.GetImplementationFileName(PStatement(It.Data)));
+  ListView := TListView(Sender);
+  MousePos := ListView.ScreenToClient(Mouse.CursorPos);
+  MouseItem := ListView.GetItemAt(MousePos.X, MousePos.Y);
+  if Assigned(MouseItem) and Assigned(MouseItem.Data) then begin
+    Statement := PStatement(MouseItem.Data);
+    e := MainForm.EditorList.GetEditorFromFileName(Statement^._DefinitionFileName);
     if Assigned(e) then begin
-      e.SetCaretPos(MainForm.CppParser.GetImplementationLine(PStatement(It.Data)), 1);
+      e.SetCaretPos(Statement^._DefinitionLine, 1);
       e.Activate;
     end;
   end;

@@ -276,7 +276,7 @@ end;
 
 procedure TClassBrowser.AddMembers(Node: TTreeNode; ParentStatementNode: PStatementNode);
 var
-  CurStatementNode, StatementNode: PStatementNode;
+  CurStatementNode, StatementNode, StartNode: PStatementNode;
   Statement, ParentStatement: PStatement;
   ParNode, NewNode: TTreeNode;
   bInherited: boolean;
@@ -287,7 +287,7 @@ var
     FolderID: integer;
   begin
     with StatementNode.Data^ do begin
-      FolderID := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
+      FolderID := BelongsToFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText);
       if FolderID <> -1 then
         ParNode := GetNodeOfFolder(FolderID)
       else
@@ -300,17 +300,17 @@ var
     end;
   end;
 begin
-  //  if (not fShowInheritedMembers) and (ParentIndex >= 0) then
-  //    iFrom := ParentIndex + 1 // amazing speed-up
-  //  else
-  //    iFrom := 0; // if showing inheritance, a big speed penalty
+  if (not fShowInheritedMembers) and Assigned(ParentStatementNode) then
+    StartNode := ParentStatementNode.NextNode // only check for members AFTER the parent statement
+  else
+    StartNode := fParser.Statements.FirstNode; // if showing inheritance, a big speed penalty
 
   // create folders that have this branch as parent
   if ParentStatementNode <> nil then begin
     ParentStatement := ParentStatementNode.Data;
     with ParentStatement^ do begin
-      if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText) then
-        CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText, Node);
+      if HasSubFolder(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText) then
+        CreateFolders(ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText, Node);
     end;
   end else begin
     ParentStatement := nil;
@@ -326,7 +326,7 @@ begin
 
     // Walk all the statements
     bInherited := False;
-    StatementNode := fParser.Statements.FirstNode;
+    StatementNode := StartNode;
     while Assigned(StatementNode) do begin
       Statement := StatementNode^.Data;
       CurStatementNode := StatementNode; // remember current node
@@ -446,10 +446,6 @@ begin
     Node.Data := nil;
     fLastSelection := '';
     Exit;
-    //end else if fParser.Statements.IndexOf(Node.Data) = -1 then begin
-    //  Node.Data := nil;
-    //  fLastSelection := '';
-    //  Exit;
   end;
 
   if Node.ImageIndex = fImagesRecord.fGlobalsImg then begin
@@ -458,19 +454,13 @@ begin
   end;
 
   with PStatement(Node.Data)^ do begin
-    fLastSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText;
+    fLastSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText;
 
     if Assigned(fOnSelect) then
-      if (Button = mbLeft) and not (ssShift in Shift) then // need implementation
-        if _IsDeclaration then
-          fOnSelect(Self, _DeclImplFileName, _DeclImplLine)
-        else
-          fOnSelect(Self, _FileName, _Line)
-      else if (Button = mbLeft) and (ssShift in Shift) then // // need declaration
-        if _IsDeclaration then
-          fOnSelect(Self, _FileName, _Line)
-        else
-          fOnSelect(Self, _DeclImplFileName, _DeclImplLine);
+      if (Button = mbLeft) and not (ssShift in Shift) then // need definition
+        fOnSelect(Self, _DefinitionFileName, _DefinitionLine)
+      else if (Button = mbLeft) and (ssShift in Shift) then // need declaration
+        fOnSelect(Self, _FileName, _Line);
   end;
 end;
 
@@ -693,7 +683,7 @@ begin
   if Assigned(Node) then begin
     if Node.ImageIndex <> fImagesRecord.fGlobalsImg then
       with PStatement(Node.Data)^ do
-        fFolders[High(fFolders)].Under := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText
+        fFolders[High(fFolders)].Under := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText
     else
       fFolders[High(fFolders)].Under := #01#02 + Char(PFolders(Node.Data)^.Index);
   end;
@@ -802,7 +792,7 @@ begin
       if Assigned(Node) then begin
         if Selected.ImageIndex <> fImagesRecord.fGlobalsImg then
           with PStatement(Node.Data)^ do
-            PFolders(Selected.Data)^.Under := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText
+            PFolders(Selected.Data)^.Under := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText
         else
           PFolders(Selected.Data)^.Under := #01#02 + Char(PFolders(Node.Data)^.Index);
       end else
@@ -811,9 +801,9 @@ begin
     // drag node is statement
   else
     with PStatement(Selected.Data)^ do begin // dragged node is Statement, so Node is folder
-      RemoveFolderAssociation('', ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
+      RemoveFolderAssociation('', ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText);
       if Assigned(Node) then
-        AddFolderAssociation(Node.Text, ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText);
+        AddFolderAssociation(Node.Text, ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText);
     end;
 
   if Assigned(Selected) then
@@ -900,7 +890,7 @@ procedure TClassBrowser.ReSelect;
     for I := 0 to Node.Count - 1 do begin
       if Node[I].ImageIndex <> fImagesRecord.fGlobalsImg then
         with PStatement(Node[I].Data)^ do
-          OldSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText
+          OldSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText
       else
         OldSelection := PFolders(Node[I].Data)^.Under;
       if CompareStr(OldSelection, fLastSelection) = 0 then begin
@@ -921,7 +911,7 @@ begin
   for I := 0 to Items.Count - 1 do begin
     if Items[I].ImageIndex <> fImagesRecord.fGlobalsImg then
       with PStatement(Items[I].Data)^ do
-        OldSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _FullText
+        OldSelection := ExtractFileName(_Filename) + ':' + IntToStr(_Line) + ':' + _HintText
     else
       OldSelection := PFolders(Items[I].Data)^.Under;
     if CompareStr(OldSelection, fLastSelection) = 0 then begin

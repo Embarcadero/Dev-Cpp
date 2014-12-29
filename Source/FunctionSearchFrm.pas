@@ -70,6 +70,7 @@ procedure TFunctionSearchForm.txtSearchChange(Sender: TObject);
 var
   Node: PStatementNode;
   Statement: PStatement;
+  ScopeCommand: AnsiString;
 begin
   if not Assigned(fParser) then
     Exit;
@@ -89,12 +90,18 @@ begin
         Continue;
 
       // Inside the current file...
-      if not (Statement^._IsDeclaration and SameFileName(Statement^._DeclImplFileName, fFilename)) or (not
-        Statement^._IsDeclaration and SameFileName(Statement^._FileName, fFilename)) then
+      if not (Statement^._HasDefinition and SameFileName(Statement^._DefinitionFileName, fFilename)) or (not
+        Statement^._HasDefinition and SameFileName(Statement^._FileName, fFilename)) then
         Continue;
 
+      // Add parent name (Foo::Bar)
+      if Assigned(Statement^._Parent) then
+        ScopeCommand := Statement^._Parent^._Command + '::' + Statement^._Command
+      else
+        ScopeCommand := Statement^._Command;
+
       // Add it if it matches the search keyword or if no keyword has been typed yet
-      if (txtSearch.Text = '') or ContainsText(Statement^._Command, txtSearch.Text) then begin
+      if (txtSearch.Text = '') or ContainsText(ScopeCommand, txtSearch.Text) then begin
         with lvEntries.Items.Add do begin
           ImageIndex := -1;
           case Statement^._ClassScope of
@@ -103,9 +110,9 @@ begin
             scsPublic: StateIndex := 7;
           end;
           SubItems.Add(Statement^._Type);
-          SubItems.Add(Statement^._Command);
-          if Statement^._IsDeclaration then
-            SubItems.Add(IntToStr(Statement^._DeclImplLine))
+          SubItems.Add(ScopeCommand);
+          if Statement^._HasDefinition then
+            SubItems.Add(IntToStr(Statement^._DefinitionLine))
           else
             SubItems.Add(IntToStr(Statement^._Line));
           Data := Statement;

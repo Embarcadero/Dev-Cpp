@@ -898,7 +898,9 @@ begin
 
   // Position the caret
   fText.CaretXY := BufferCoord(Col, Line);
-  fText.EnsureCursorPosVisible;
+  if not fText.Focused then
+    fText.TopLine := Line; // TopLine is not set correctly if an editor is created and it has not yet received focus
+  fText.EnsureCursorPosVisibleEx(False); // scroll to line
 end;
 
 procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);

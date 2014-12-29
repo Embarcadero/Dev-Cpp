@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 824
-  Top = 324
+  Left = 261
+  Top = 314
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -1021,7 +1021,7 @@ object MainForm: TMainForm
         ItemImages.InheritedVariableProtected = 9
         ItemImages.InheritedVariablePublic = 11
         ShowInheritedMembers = False
-        TabVisible = True
+        TabVisible = False
       end
     end
     object LeftDebugSheet: TTabSheet
@@ -2401,17 +2401,17 @@ object MainForm: TMainForm
       OnExecute = actGotoFunctionExecute
       OnUpdate = actUpdateEmptyEditor
     end
-    object actBrowserGotoDecl: TAction
+    object actBrowserGotoDeclaration: TAction
       Category = 'ClassBrowser'
       Caption = 'Goto declaration'
-      OnExecute = actBrowserGotoDeclExecute
-      OnUpdate = actBrowserGotoDeclUpdate
+      OnExecute = actBrowserGotoDeclarationExecute
+      OnUpdate = actBrowserGotoDeclarationUpdate
     end
-    object actBrowserGotoImpl: TAction
+    object actBrowserGotoDefinition: TAction
       Category = 'ClassBrowser'
-      Caption = 'Goto implementation'
-      OnExecute = actBrowserGotoImplExecute
-      OnUpdate = actBrowserGotoImplUpdate
+      Caption = 'Goto definition'
+      OnExecute = actBrowserGotoDefinitionExecute
+      OnUpdate = actBrowserGotoDefinitionUpdate
     end
     object actBrowserNewClass: TAction
       Category = 'ClassBrowser'
@@ -2856,10 +2856,10 @@ object MainForm: TMainForm
     Left = 56
     Top = 100
     object mnuBrowserGotoDecl: TMenuItem
-      Action = actBrowserGotoDecl
+      Action = actBrowserGotoDeclaration
     end
     object mnuBrowserGotoImpl: TMenuItem
-      Action = actBrowserGotoImpl
+      Action = actBrowserGotoDefinition
       Default = True
     end
     object mnuBrowserSep1: TMenuItem

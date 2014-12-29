@@ -227,7 +227,7 @@ begin
     while Assigned(Node) do begin
       Statement := Node^.Data;
       if (Statement^._Kind = skClass) and (Statement^._Command = cmbClass.Text) and
-        (MainForm.Project.Units.Indexof(MainForm.CppParser.GetDeclarationFileName(Statement)) <> -1) then begin
+        (MainForm.Project.Units.Indexof(Statement^._DefinitionFileName) <> -1) then begin
         InheritStatement := Statement;
         break;
       end;
@@ -322,7 +322,7 @@ begin
   if cmbClass.Items.IndexOf(cmbClass.Text) <> -1 then begin
     st := PStatement(cmbClass.Items.Objects[cmbClass.Items.IndexOf(cmbClass.Text)]);
     if Assigned(st) then
-      txtIncFile.Text := ExtractFileName(MainForm.CppParser.GetDeclarationFileName(st))
+      txtIncFile.Text := ExtractFileName(st^._DefinitionFileName)
     else
       txtIncFile.Text := LowerCase(cmbClass.Text) + '.h';
   end else begin

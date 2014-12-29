@@ -196,9 +196,9 @@ type
     procedure btnCCCaddClick(Sender: TObject);
     procedure btnCCCdeleteClick(Sender: TObject);
     procedure chkCCCacheClick(Sender: TObject);
-    procedure CppParser1StartParsing(Sender: TObject);
-    procedure CppParser1EndParsing(Sender: TObject);
-    procedure CppParser1TotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
+    procedure CppParserCopyStartParsing(Sender: TObject);
+    procedure CppParserCopyEndParsing(Sender: TObject; Total: Integer);
+    procedure CppParserCopyTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
     procedure OnGutterClick(Sender: TObject; Button: TMouseButton; X, Y, Line: Integer; Mark: TSynEditMark);
     procedure cbHighCurrLineClick(Sender: TObject);
     procedure cbAutoSaveClick(Sender: TObject);
@@ -1579,17 +1579,17 @@ begin
   end;
 end;
 
-procedure TEditorOptForm.CppParser1StartParsing(Sender: TObject);
+procedure TEditorOptForm.CppParserCopyStartParsing(Sender: TObject);
 begin
   pbCCCache.Visible := True;
 end;
 
-procedure TEditorOptForm.CppParser1EndParsing(Sender: TObject);
+procedure TEditorOptForm.CppParserCopyEndParsing(Sender: TObject; Total: Integer);
 begin
   pbCCCache.Visible := False;
 end;
 
-procedure TEditorOptForm.CppParser1TotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
+procedure TEditorOptForm.CppParserCopyTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
 begin
   if Total <> -1 then
     pbCCCache.Max := Total;

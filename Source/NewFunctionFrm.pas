@@ -119,7 +119,7 @@ begin
   end;
 
   // We need a CPP file if we want to define it over there
-  MainForm.CppParser.GetSourcePair(MainForm.CppParser.GetDeclarationFileName(st), CppFname, fName);
+  MainForm.CppParser.GetSourcePair(st^._DefinitionFileName, CppFname, fName);
   if not chkInline.Checked and not FileExists(CppFname) then begin
     MessageDlg(Lang[ID_NEWVAR_MSG_NOIMPL], mtError, [mbOk], 0);
     Exit;
