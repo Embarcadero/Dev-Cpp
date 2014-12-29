@@ -62,7 +62,7 @@ typedef struct tagRECT {
 /*
 	Correct enum
 */
-enum EnumName { // ERROR: does not show in class browser
+enum EnumName {
 	A,
 	B,
 	C,

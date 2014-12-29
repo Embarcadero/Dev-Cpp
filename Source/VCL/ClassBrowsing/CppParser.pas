@@ -1805,7 +1805,6 @@ begin
   finally
     fSkipList.Clear; // remove data from memory, but reuse structures
     fCurrentClass.Clear;
-    fPendingDeclarations.Clear; // should be empty anyways
     fPreprocessor.Reset;
     fTokenizer.Reset;
     if (not ManualUpdate) and Assigned(fOnEndParsing) then
@@ -1823,6 +1822,7 @@ begin
   if Assigned(fOnBusy) then
     fOnBusy(Self);
 
+  fPendingDeclarations.Clear; // should be empty anyways
   fFilesToScan.Clear;
   if Assigned(fTokenizer) then
     fTokenizer.Reset;
@@ -1896,6 +1896,7 @@ begin
       Inc(I);
       Inc(fFilesScannedCount);
     end;
+    fPendingDeclarations.Clear; // should be empty anyways
     fFilesToScan.Clear;
     PostProcessInheritance;
   finally
@@ -2049,6 +2050,7 @@ begin
     end else
       Parse(FileName, True, True, Stream); // or from stream
     fFilesToScan.Clear;
+    fPendingDeclarations.Clear; // should be empty anyways
     ReProcessInheritance;
   finally
     if Assigned(fOnEndParsing) then
