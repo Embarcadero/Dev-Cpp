@@ -160,7 +160,8 @@ type
       boolean = True; Stream: TMemoryStream = nil);
     function StatementKindStr(Value: TStatementKind): AnsiString;
     function StatementClassScopeStr(Value: TStatementClassScope): AnsiString;
-    function FetchPendingDeclaration(const Command: AnsiString; Kind: TStatementKind; Parent: PStatement): PStatement;
+    function FetchPendingDeclaration(const Command, Args: AnsiString; Kind: TStatementKind; Parent: PStatement):
+      PStatement;
     function CheckIfCommandExists(const Command: AnsiString; Kind: TStatementKind; Parent: PStatement): PStatement;
     procedure Reset(KeepLoaded: boolean = True);
     procedure ClearIncludePaths;
@@ -307,11 +308,11 @@ begin
   Result := StartAt;
 end;
 
-function TCppParser.FetchPendingDeclaration(const Command: AnsiString; Kind: TStatementKind; Parent: PStatement):
+function TCppParser.FetchPendingDeclaration(const Command, Args: AnsiString; Kind: TStatementKind; Parent: PStatement):
   PStatement;
 var
   Statement: PStatement;
-  I : integer;
+  I: integer;
   HeaderFileName, SourceFileName: AnsiString;
 begin
   // It must be present in these files
@@ -325,11 +326,13 @@ begin
     if Statement^._Parent = Parent then begin
       if Statement^._Kind = Kind then begin
         if Statement^._Command = Command then begin
-          if SameFileName(Statement^._FileName, SourceFileName) or SameFileName(Statement^._FileName, HeaderFileName)
-            then begin // only if it belongs to the same file-pair
-            fPendingDeclarations.Delete(i); // remove it when we have found it
-            Result := Statement;
-            Exit;
+          if Statement^._Args = Args then begin
+            if SameFileName(Statement^._FileName, SourceFileName) or SameFileName(Statement^._FileName, HeaderFileName)
+              then begin // only if it belongs to the same file-pair
+              fPendingDeclarations.Delete(i); // remove it when we have found it
+              Result := Statement;
+              Exit;
+            end;
           end;
         end;
       end;
@@ -491,31 +494,17 @@ begin
 
   // Find a declaration/definition pair
   if FindDeclaration and IsDefinition then
-    Declaration := FetchPendingDeclaration(NewCommand, Kind, Parent)
+    Declaration := FetchPendingDeclaration(NewCommand, Args, Kind, Parent)
   else
     Declaration := nil;
 
   // We already have a statement with the same identifier...
   if Assigned(Declaration) then begin
 
-    // Functions receive special treatment...
-    if NewKind in [skFunction, skConstructor, skDestructor] then begin
-
-      // This could be a function definition/declaration pair of an existing statement
-      if (1=1){ and (ExistingStatement^._Args = Args)} then begin
-        Declaration^._DefinitionLine := Line;
-        Declaration^._DefinitionFileName := FileName;
-        Declaration^._HasDefinition := True;
-        Result := Declaration;
-
-        // Otherwise, assume overloading. Allow that.
-      end else
-        Result := AddToList;
-
-      // Other duplicate statements are to be ignored completely
-    end else begin
-      Result := Declaration;
-    end;
+    Declaration^._DefinitionLine := Line;
+    Declaration^._DefinitionFileName := FileName;
+    Declaration^._HasDefinition := True;
+    Result := Declaration;
 
     // No duplicates found. Proceed as usual
   end else begin
@@ -1888,13 +1877,13 @@ begin
     fFilesScannedCount := 0;
     fFilesToScanCount := fFilesToScan.Count;
     while I < fFilesToScan.Count do begin
+      Inc(fFilesScannedCount); // progress is mentioned before scanning begins
       if Assigned(fOnTotalProgress) then
-        fOnTotalProgress(Self, fFilesToScan[i], fFilesToScanCount, fFilesScannedCount); // report 1-based index
+        fOnTotalProgress(Self, fFilesToScan[i], fFilesToScanCount, fFilesScannedCount);
       if fScannedFiles.IndexOf(fFilesToScan[i]) = -1 then begin
         Parse(fFilesToScan[i], True, False);
       end;
       Inc(I);
-      Inc(fFilesScannedCount);
     end;
     fPendingDeclarations.Clear; // should be empty anyways
     fFilesToScan.Clear;

@@ -740,7 +740,7 @@ begin
 
       if (fOptions.Ver < 2) then begin
         fOptions.Ver := 2;
-        MessageDlg('The compiler settings format of Orwell Dev-C++ has changed.' + #13#10#13#10 +
+        MessageDlg('The compiler settings format of Dev-C++ has changed.' + #13#10#13#10 +
           'Please update your settings at Project >> Project Options >> Compiler and save your project.', MtInformation,
           [MbOK], 0);
       end;

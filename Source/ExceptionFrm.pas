@@ -539,7 +539,7 @@ begin
   EmailBody := EmailBody + memBugReport.Text;
 
   // And subject...
-  EmailSubject := 'Orwell Dev-C++ ' + DEVCPP_VERSION + ' bug report (' + IntToStr(DateTimeToUnix(Now)) + ')';
+  EmailSubject := 'Dev-C++ ' + DEVCPP_VERSION + ' bug report (' + IntToStr(DateTimeToUnix(Now)) + ')';
 
   // Send everything messages in fully encoded form
   for I := 0 to 255 do

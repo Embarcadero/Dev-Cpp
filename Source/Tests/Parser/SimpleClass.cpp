@@ -1,6 +1,8 @@
 class ProtoClass {
 	public:
 		ProtoClass();
+		ProtoClass(int a);
+		ProtoClass(int a, int b);
 		~ProtoClass();
 		void Foo() {
 		}
@@ -8,6 +10,14 @@ class ProtoClass {
 };
 
 ProtoClass::ProtoClass() {
+	
+}
+
+ProtoClass::ProtoClass(int a) {
+	
+}
+
+ProtoClass::ProtoClass(int a, int b) {
 	
 }
 
