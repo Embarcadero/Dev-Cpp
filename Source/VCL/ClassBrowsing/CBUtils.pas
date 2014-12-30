@@ -74,8 +74,7 @@ type
     _Command: AnsiString; // identifier/name of statement "foo"
     _Args: AnsiString; // args "(int a,float b)"
     _Kind: TStatementKind; // kind of statement class/variable/function/etc
-    _InheritsFromStatements: TList; // item below is converted to PStatements and stored here
-    _InheritsFromStatementsText: AnsiString; // temporary storage for classes inherited from
+    _InheritanceList: TList; // list of pstatements this one inherits from, can be nil
     _Scope: TStatementScope; // global/local/classlocal
     _ClassScope: TStatementClassScope; // protected/private/public
     _HasDefinition: boolean; // definiton line/filename is valid

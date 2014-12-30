@@ -97,7 +97,7 @@ object LangForm: TLangForm
     Width = 300
     Height = 275
     BevelOuter = bvNone
-    TabOrder = 3
+    TabOrder = 2
     Visible = False
     object Finish2: TLabel
       Left = 8
@@ -135,167 +135,6 @@ object LangForm: TLangForm
       WordWrap = True
     end
   end
-  object CachePanel: TPanel
-    Left = 260
-    Top = 0
-    Width = 300
-    Height = 275
-    BevelOuter = bvNone
-    TabOrder = 2
-    Visible = False
-    object CacheInfo1: TLabel
-      Left = 8
-      Top = 8
-      Width = 284
-      Height = 49
-      AutoSize = False
-      Caption = 
-        'To optimize code completion, it is recommended to create a cache' +
-        ' of frequently used headers.'
-      WordWrap = True
-    end
-    object CacheInfo2: TLabel
-      Left = 8
-      Top = 52
-      Width = 284
-      Height = 45
-      AutoSize = False
-      Caption = 
-        'It is possible add headers to cache later at Tools, Editor Optio' +
-        'ns, Class Browsing, Completion.'
-      WordWrap = True
-    end
-    object ProgressPanel: TPanel
-      Left = 0
-      Top = 100
-      Width = 300
-      Height = 175
-      BevelOuter = bvNone
-      TabOrder = 1
-      Visible = False
-      object ParseLabel: TLabel
-        Left = 8
-        Top = 84
-        Width = 284
-        Height = 47
-        AutoSize = False
-        Caption = 'Parsing files...'
-        WordWrap = True
-      end
-      object pbCCCache: TProgressBar
-        Left = 8
-        Top = 136
-        Width = 284
-        Height = 30
-        Smooth = True
-        TabOrder = 0
-      end
-    end
-    object BuildPanel: TPanel
-      Left = 0
-      Top = 100
-      Width = 300
-      Height = 175
-      BevelOuter = bvNone
-      TabOrder = 0
-      object YesCache: TRadioButton
-        Left = 16
-        Top = 8
-        Width = 268
-        Height = 17
-        Caption = 'Cache all headers (please be patient)'
-        TabOrder = 0
-      end
-      object NoCache: TRadioButton
-        Left = 16
-        Top = 152
-        Width = 268
-        Height = 17
-        Caption = 'Don'#39't cache anything'
-        TabOrder = 1
-      end
-      object AltCache: TRadioButton
-        Left = 16
-        Top = 32
-        Width = 268
-        Height = 17
-        Caption = 'Only cache these files and their includes:'
-        Checked = True
-        TabOrder = 2
-        TabStop = True
-      end
-      object AltFileList: TListBox
-        Left = 8
-        Top = 56
-        Width = 201
-        Height = 81
-        Columns = 2
-        ItemHeight = 15
-        Items.Strings = (
-          'assert.h'
-          'complex.h'
-          'ctype.h'
-          'errno.h'
-          'fenv.h'
-          'float.h'
-          'inttypes.h'
-          'limits.h'
-          'locale.h'
-          'math.h'
-          'setjmp.h'
-          'signal.h'
-          'stdarg.h'
-          'stddef.h'
-          'stdint.h'
-          'stdio.h'
-          'stdlib.h'
-          'string.h'
-          'time.h'
-          'wchar.h'
-          'wctype.h'
-          'windows.h'
-          'deque'
-          'list'
-          'map'
-          'queue'
-          'set'
-          'stack'
-          'vector'
-          'iostream'
-          'algorithm'
-          'string')
-        MultiSelect = True
-        TabOrder = 3
-      end
-      object ButtonAddFile: TButton
-        Left = 212
-        Top = 56
-        Width = 80
-        Height = 23
-        Caption = 'Add file'
-        TabOrder = 4
-        OnClick = ButtonAddFileClick
-      end
-      object ButtonRemove: TButton
-        Left = 212
-        Top = 112
-        Width = 80
-        Height = 23
-        Caption = 'Remove'
-        TabOrder = 5
-        OnClick = ButtonRemoveClick
-      end
-      object ButtonAddFolder: TButton
-        Left = 212
-        Top = 84
-        Width = 80
-        Height = 23
-        Caption = 'Add folder'
-        TabOrder = 6
-        OnClick = ButtonAddFolderClick
-      end
-    end
-  end
   object synExample: TSynEdit
     Left = 0
     Top = 0
@@ -306,7 +145,7 @@ object LangForm: TLangForm
     Font.Height = -13
     Font.Name = 'Courier New'
     Font.Style = []
-    TabOrder = 4
+    TabOrder = 3
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
     Gutter.Font.Height = -11
@@ -327,7 +166,7 @@ object LangForm: TLangForm
     Width = 300
     Height = 275
     BevelOuter = bvNone
-    TabOrder = 5
+    TabOrder = 4
     Visible = False
     object lblEditInfo: TLabel
       Left = 8

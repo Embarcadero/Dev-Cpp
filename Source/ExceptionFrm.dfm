@@ -1,10 +1,10 @@
 object ExceptionFrm: TExceptionFrm
-  Left = 886
-  Top = 432
+  Left = 1323
+  Top = 428
   BorderStyle = bsDialog
   Caption = 'Oops!'
-  ClientHeight = 300
-  ClientWidth = 500
+  ClientHeight = 340
+  ClientWidth = 600
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,7 +20,7 @@ object ExceptionFrm: TExceptionFrm
   object Shape1: TShape
     Left = 0
     Top = 0
-    Width = 500
+    Width = 600
     Height = 45
     Align = alTop
     Pen.Style = psClear
@@ -28,7 +28,7 @@ object ExceptionFrm: TExceptionFrm
   object lblError: TLabel
     Left = 94
     Top = 68
-    Width = 395
+    Width = 495
     Height = 53
     AutoSize = False
     Caption = 'lblError'
@@ -78,7 +78,7 @@ object ExceptionFrm: TExceptionFrm
   object Bevel2: TBevel
     Left = 0
     Top = 45
-    Width = 500
+    Width = 600
     Height = 2
     Align = alTop
   end
@@ -163,8 +163,8 @@ object ExceptionFrm: TExceptionFrm
   end
   object lblUpdateSuggest: TLabel
     Left = 0
-    Top = 254
-    Width = 500
+    Top = 294
+    Width = 600
     Height = 15
     Alignment = taCenter
     AutoSize = False
@@ -172,8 +172,8 @@ object ExceptionFrm: TExceptionFrm
   end
   object lblUpdateLink: TLabel
     Left = 100
-    Top = 274
-    Width = 300
+    Top = 314
+    Width = 400
     Height = 15
     Cursor = crHandPoint
     Alignment = taCenter
@@ -209,7 +209,7 @@ object ExceptionFrm: TExceptionFrm
     OnClick = btnSendClick
   end
   object btnContinue: TButton
-    Left = 300
+    Left = 400
     Top = 130
     Width = 92
     Height = 25
@@ -225,7 +225,7 @@ object ExceptionFrm: TExceptionFrm
     OnClick = btnContinueClick
   end
   object btnTerminate: TButton
-    Left = 400
+    Left = 500
     Top = 130
     Width = 92
     Height = 25
@@ -238,8 +238,8 @@ object ExceptionFrm: TExceptionFrm
   end
   object memBugReport: TMemo
     Left = 8
-    Top = 300
-    Width = 484
+    Top = 340
+    Width = 584
     Height = 182
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -257,8 +257,8 @@ object ExceptionFrm: TExceptionFrm
   object memUserReport: TMemo
     Left = 8
     Top = 160
-    Width = 484
-    Height = 40
+    Width = 584
+    Height = 60
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -274,9 +274,9 @@ object ExceptionFrm: TExceptionFrm
   end
   object memEmailReport: TMemo
     Left = 8
-    Top = 206
-    Width = 484
-    Height = 40
+    Top = 226
+    Width = 584
+    Height = 60
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -292,7 +292,7 @@ object ExceptionFrm: TExceptionFrm
   end
   object btnShowReport: TButton
     Left = 8
-    Top = 266
+    Top = 306
     Width = 75
     Height = 25
     Hint = 'Show bug report'

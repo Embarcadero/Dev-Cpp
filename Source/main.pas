@@ -3817,7 +3817,7 @@ begin
   CppParser.OnTotalProgress := CppParserTotalProgress;
 
   // Add the include dirs to the parser
-  if Assigned(devCompilerSets.CurrentSet) then
+  if Assigned(devCompilerSets.CurrentSet) then begin
     with devCompilerSets.CurrentSet do begin
       for I := 0 to CDir.Count - 1 do
         CppParser.AddIncludePath(CDir[I]);
@@ -3832,22 +3832,6 @@ begin
       CppParser.ResetDefines;
       for I := 0 to Defines.Count - 1 do
         CppParser.AddHardDefineByLine(Defines[i]); // predefined constants from -dM -E
-    end;
-
-  // This takes up about 99% of our time
-  if devCodeCompletion.UseCacheFiles then begin
-    try
-      Application.ProcessMessages;
-      CppParser.Load(devDirs.Config + DEV_COMPLETION_CACHE, devDirs.Exec);
-    except
-      if MessageDlg(
-        Format(Lang[ID_ENV_CACHEFAIL], [devDirs.Config, ExcludeTrailingBackslash(devDirs.Config) + 'Backup' + pd]),
-        mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-
-        // Remove and backup the current configuration directory.
-        RemoveOptionsDir(devDirs.Config);
-      end;
-      TerminateProcess(GetCurrentProcess(), 1);
     end;
   end;
 
@@ -4886,9 +4870,21 @@ begin
 end;
 
 procedure TMainForm.CppParserTotalProgress(Sender: TObject; const FileName: string; Total, Current: Integer);
+var
+  ShowStep: Integer;
 begin
-  SetStatusBarMessage(Format(Lang[ID_PARSINGFILECOUNT], [Current, Total, Filename]));
-  Application.ProcessMessages;
+  // Mention every 5% progress
+  ShowStep := Total div 20;
+
+  // For Total = 1, avoid division by zero
+  if ShowStep = 0 then
+    ShowStep := 1;
+
+  // Only show if needed (it's a very slow operation)
+  if (Current mod ShowStep = 0) or (Current = 1) then begin
+    SetStatusBarMessage(Format(Lang[ID_PARSINGFILECOUNT], [Current, Total, Filename]));
+    Application.ProcessMessages;
+  end;
 end;
 
 procedure TMainForm.CppParserEndParsing(Sender: TObject; Total: Integer);
@@ -6009,7 +6005,7 @@ begin
   UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
 
   // Load the current compiler set (needs translations)
-  devCompilerSets.LoadSets; // SLOW
+  devCompilerSets.LoadSets; // SLOWWWW
 
   // Update toolbar
   UpdateCompilerList;

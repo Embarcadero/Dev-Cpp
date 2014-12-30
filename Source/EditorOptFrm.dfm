@@ -924,49 +924,6 @@ object EditorOptForm: TEditorOptForm
         object tabCodeCompletion: TTabSheet
           Caption = 'Code Completion'
           ImageIndex = 1
-          object lblRefreshHint: TLabel
-            Left = 188
-            Top = 346
-            Width = 261
-            Height = 15
-            Alignment = taCenter
-            Caption = 'Please refresh the cache when updating Dev-C++'
-            WordWrap = True
-          end
-          object btnFileBrowse: TSpeedButton
-            Left = 381
-            Top = 310
-            Width = 23
-            Height = 22
-            Glyph.Data = {
-              36030000424D3603000000000000360000002800000010000000100000000100
-              18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
-              BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-              00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-              BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-              BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-              00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-              BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-              BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF0000000000000000
-              00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BF
-              BFBF000000BFBFBF0000005DCCFF5DCCFF5DCCFF000000BFBFBFBFBFBFBFBFBF
-              BFBFBFBFBFBFBFBFBF000000BFBFBFBFBFBFBFBFBFBFBFBF6868680000000000
-              00000000000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-              BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000000000
-              000000000000000000000000000000000000000000000000000000BFBFBFBFBF
-              BFBFBFBFBFBFBFBFBFBF00000000AEFF0096DB0096DB0096DB0096DB0096DB00
-              96DB0096DB0082BE000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-              00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-              BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF00AEFF00AEFF00AEFF00
-              AEFF00AEFF0096DB000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000005DCCFF
-              00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF00AEFF0096DB000000BFBFBFBFBF
-              BFBFBFBFBFBFBFBFBFBF0000005DCCFF00AEFF00AEFF5DCCFF5DCCFF5DCCFF5D
-              CCFF5DCCFF00AEFF000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBF686868BDEBFF
-              5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
-              BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
-              BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
-            OnClick = btnFileBrowseClick
-          end
           object lblCompletionColor: TLabel
             Left = 328
             Top = 108
@@ -981,49 +938,13 @@ object EditorOptForm: TEditorOptForm
             Height = 15
             Caption = 'Delay (ms):'
           end
-          object btnCCCadd: TButton
-            Left = 409
-            Top = 310
-            Width = 55
-            Height = 22
-            Caption = 'Add'
-            TabOrder = 0
-            OnClick = btnCCCaddClick
-          end
-          object btnCCCdelete: TButton
-            Left = 10
-            Top = 342
-            Width = 80
-            Height = 25
-            Caption = 'Clear'
-            TabOrder = 1
-            OnClick = btnCCCdeleteClick
-          end
-          object btnCCCrefresh: TButton
-            Left = 92
-            Top = 342
-            Width = 80
-            Height = 25
-            Caption = 'Refresh'
-            TabOrder = 2
-            OnClick = btnCCCrefreshClick
-          end
-          object chkCCCache: TCheckBox
-            Left = 8
-            Top = 176
-            Width = 457
-            Height = 17
-            Caption = 'Use code-completion cache'
-            TabOrder = 3
-            OnClick = chkCCCacheClick
-          end
           object chkEnableCompletion: TCheckBox
             Left = 8
             Top = 8
             Width = 457
             Height = 17
             Caption = 'Enable code-completion'
-            TabOrder = 4
+            TabOrder = 0
             OnClick = chkEnableCompletionClick
           end
           object cpCompletionBackground: TColorBox
@@ -1034,24 +955,7 @@ object EditorOptForm: TEditorOptForm
             DefaultColorColor = clWhite
             Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
             ItemHeight = 16
-            TabOrder = 5
-          end
-          object edIncludeFile: TEdit
-            Left = 8
-            Top = 310
-            Width = 370
-            Height = 23
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clGray
-            Font.Height = -12
-            Font.Name = 'Segoe UI'
-            Font.Style = []
-            ParentFont = False
-            TabOrder = 6
-            Text = 'Example: stdio.h;C:\myfile.h;'
-            OnChange = edIncludeFileChange
-            OnClick = edIncludeFileClick
-            OnKeyPress = edIncludeFileKeyPress
+            TabOrder = 1
           end
           object gbCBEngine: TGroupBox
             Left = 8
@@ -1059,7 +963,7 @@ object EditorOptForm: TEditorOptForm
             Width = 457
             Height = 65
             Caption = 'Engine behaviour'
-            TabOrder = 7
+            TabOrder = 2
             object chkCBParseLocalH: TCheckBox
               Left = 8
               Top = 20
@@ -1077,26 +981,6 @@ object EditorOptForm: TEditorOptForm
               TabOrder = 1
             end
           end
-          object lbCCC: TListBox
-            Left = 8
-            Top = 200
-            Width = 457
-            Height = 105
-            ItemHeight = 15
-            ParentShowHint = False
-            ShowHint = True
-            Sorted = True
-            TabOrder = 8
-          end
-          object pbCCCache: TProgressBar
-            Left = 8
-            Top = 370
-            Width = 457
-            Height = 20
-            Smooth = True
-            TabOrder = 9
-            Visible = False
-          end
           object tbCompletionDelay: TTrackBar
             Left = 16
             Top = 132
@@ -1108,7 +992,7 @@ object EditorOptForm: TEditorOptForm
             Frequency = 50
             Position = 1000
             ShowHint = False
-            TabOrder = 10
+            TabOrder = 3
             TickMarks = tmBoth
             OnChange = tbCompletionDelayChange
           end
@@ -1328,25 +1212,5 @@ object EditorOptForm: TEditorOptForm
     DefaultFilter = 'C++ Files (*.c,*.cpp,*.h,*.hpp)|*.c;*.cpp;*.h;*.hpp'
     Left = 5
     Top = 458
-  end
-  object CppParserCopy: TCppParser
-    Enabled = True
-    OnTotalProgress = CppParserCopyTotalProgress
-    Tokenizer = CppTokenizerCopy
-    Preprocessor = CppPreprocessorCopy
-    ParseLocalHeaders = True
-    ParseGlobalHeaders = True
-    OnStartParsing = CppParserCopyStartParsing
-    OnEndParsing = CppParserCopyEndParsing
-    Left = 40
-    Top = 458
-  end
-  object CppPreprocessorCopy: TCppPreprocessor
-    Left = 72
-    Top = 456
-  end
-  object CppTokenizerCopy: TCppTokenizer
-    Left = 104
-    Top = 456
   end
 end

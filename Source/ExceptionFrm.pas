@@ -645,10 +645,10 @@ end;
 procedure TExceptionFrm.btnShowReportClick(Sender: TObject);
 begin
   if btnShowReport.Caption = 'Hide report' then begin // up arrow
-    ClientHeight := 300;
+    ClientHeight := 340;
     btnShowReport.Caption := 'Show report';
   end else begin
-    ClientHeight := 488;
+    ClientHeight := 528;
     btnShowReport.Caption := 'Hide report';
   end;
 end;

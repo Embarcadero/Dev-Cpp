@@ -22,7 +22,7 @@ unit StatementList;
 interface
 
 uses
-  Classes, CBUtils, Forms;
+  Classes, CBUtils, Forms, SysUtils;
 
 type
   PStatementNode = ^TStatementNode;
@@ -126,7 +126,8 @@ end;
 procedure TStatementList.DisposeNode(Node: PStatementNode);
 begin
   if OwnsObjects then begin
-    PStatement(Node^.Data)._InheritsFromStatements.Free;
+    if Assigned(PStatement(Node^.Data)._InheritanceList) then
+      PStatement(Node^.Data)._InheritanceList.Free;
     Dispose(PStatement(Node^.Data));
   end;
   Dispose(Node);

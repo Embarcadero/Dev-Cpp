@@ -192,8 +192,6 @@ type
     fDelay: integer;
     fBackColor: integer;
     fEnabled: boolean;
-    fUseCacheFiles: boolean;
-    fCacheFiles: TStrings;
     fParseLocalHeaders: boolean;
     fParseGlobalHeaders: boolean;
   public
@@ -208,8 +206,6 @@ type
     property Delay: integer read fDelay write fDelay;
     property BackColor: integer read fBackColor write fBackColor;
     property Enabled: boolean read fEnabled write fEnabled;
-    property UseCacheFiles: boolean read fUseCacheFiles write fUseCacheFiles;
-    property CacheFiles: TStrings read fCacheFiles write fCacheFiles;
     property ParseLocalHeaders: boolean read fParseLocalHeaders write fParseLocalHeaders;
     property ParseGlobalHeaders: boolean read fParseGlobalHeaders write fParseGlobalHeaders;
   end;
@@ -2374,14 +2370,12 @@ end;
 constructor TdevCodeCompletion.Create;
 begin
   inherited Create;
-  fCacheFiles := TStringList.Create;
   SettoDefaults;
   LoadSettings;
 end;
 
 destructor TdevCodeCompletion.Destroy;
 begin
-  fCacheFiles.Free;
 end;
 
 procedure TdevCodeCompletion.LoadSettings;
@@ -2401,7 +2395,8 @@ begin
   fDelay := 180;
   fBackColor := clWindow;
   fEnabled := True;
-  fUseCacheFiles := False;
+  fParseLocalHeaders := True;
+  fParseGlobalHeaders := True;
 end;
 
 { TdevClassBrowsing }
