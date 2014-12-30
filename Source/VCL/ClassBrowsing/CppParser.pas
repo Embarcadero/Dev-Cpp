@@ -114,7 +114,7 @@ type
     function CheckForTypedefEnum: boolean;
     function CheckForTypedefStruct: boolean;
     function CheckForStructs: boolean;
-    function CheckForMethod(var sType, sName, sArgs: AnsiString): boolean;
+    function CheckForMethod(var sType, sName, sArgs: AnsiString): boolean; // caching of results
     function CheckForScope: boolean;
     function CheckForVar: boolean;
     function CheckForEnum: boolean;
@@ -3092,7 +3092,7 @@ var
   Node: PStatementNode;
   ParentWord, MemberWord, OperatorToken: AnsiString;
   InheritanceStatements: TList;
-  Statement, TypedefStatement, VariableStatement, CurrentClassParent: PStatement;
+  Statement, MemberStatement, TypedefStatement, VariableStatement, CurrentClassParent: PStatement;
 begin
   Result := nil;
 
@@ -3146,6 +3146,7 @@ begin
   try
     // Walk the chain of operators
     while (MemberWord <> '') do begin
+      MemberStatement := nil;
 
       // Get inheritance and inheritance of inheritance and (etc)
       InheritanceStatements.Clear;
@@ -3157,18 +3158,23 @@ begin
         Statement := Node^.Data;
         if Statement^._Parent = TypedefStatement then begin
           if SameStr(Statement^._Command, MemberWord) then begin
-            Result := Statement;
+            MemberStatement := Statement;
             break; // there can be only one with an equal name
           end;
         end else if (InheritanceStatements.IndexOf(Statement^._Parent) <> -1) then begin // try inheritance
           // hide private stuff?
-          if SameStr(Statement^._Command, memberword) then begin
-            Result := Statement;
+          if SameStr(Statement^._Command, MemberWord) then begin
+            MemberStatement := Statement;
             break;
           end;
         end;
         Node := Node^.PrevNode;
       end;
+
+      // Child not found. Stop searching
+      if not Assigned(MemberStatement) then
+        break;
+      Result := MemberStatement; // otherwise, continue
 
       // next operator
       Delete(Phrase, 1, Length(ParentWord) + Length(OperatorToken));
@@ -3184,12 +3190,12 @@ begin
 
       // At this point, we have a list of statements that conform to the a(operator)b demand.
       // Now make these statements "a(operator)b" the parents, so we can use them as filters again
-      if Result^._Kind = skClass then
-        TypedefStatement := Result // a class statement is equal to its type
+      if MemberStatement^._Kind = skClass then
+        TypedefStatement := MemberStatement // a class statement is equal to its type
       else
-        TypedefStatement := FindTypeDefinitionOf(Result^._Type, CurrentClass);
+        TypedefStatement := FindTypeDefinitionOf(MemberStatement^._Type, CurrentClass);
       if not Assigned(TypedefStatement) then
-        Exit;
+        break;
     end;
   finally
     InheritanceStatements.Free;

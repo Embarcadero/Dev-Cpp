@@ -131,7 +131,7 @@ type
     function SaveAs: boolean;
     procedure Activate;
     procedure GotoLine;
-    procedure SetCaretPos(Line, Col: integer);
+    procedure SetCaretPosAndActivate(Line, Col: integer); // needs to activate in order to place cursor properly
     procedure ExportToHTML;
     procedure ExportToRTF;
     procedure ExportToTEX;
@@ -326,7 +326,7 @@ begin
   fText.MaxUndo := 4096;
   fText.BorderStyle := bsNone;
   fText.FontSmoothing := fsmClearType;
-
+  
   fText.Gutter.LeftOffset := 4;
   fText.Gutter.RightOffset := 21;
   fText.Gutter.BorderStyle := gbsNone;
@@ -885,22 +885,19 @@ begin
   end;
 end;
 
-procedure TEditor.SetCaretPos(Line, Col: integer);
-var
-  Fold: TSynEditFoldRange;
+procedure TEditor.SetCaretPosAndActivate(Line, Col: integer);
 begin
   // Open up the closed folds around the focused line until we can see the line we're looking for
-  repeat
-    Fold := fText.CollapsedFoldAroundLine(line);
-    if Assigned(Fold) then
-      fText.Uncollapse(Fold);
-  until not Assigned(Fold);
+  fText.UncollapseAroundLine(Line);
+
+  // fText needs to be focused for TopLine and LinesInWindow to be correct
+  if not fText.Focused then
+    Self.Activate;
 
   // Position the caret
   fText.CaretXY := BufferCoord(Col, Line);
-  if not fText.Focused then
-    fText.TopLine := Line; // TopLine is not set correctly if an editor is created and it has not yet received focus
-  fText.EnsureCursorPosVisibleEx(False); // scroll to line
+  fText.TopLine := 1;
+  fText.EnsureCursorPosVisibleEx(True); // scroll to line
 end;
 
 procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);
@@ -1644,8 +1641,7 @@ begin
         FileName := MainForm.CppParser.GetHeaderFileName(fFileName, line);
         e := MainForm.EditorList.GetEditorFromFileName(FileName);
         if Assigned(e) then begin
-          e.SetCaretPos(1, 1);
-          e.Activate;
+          e.SetCaretPosAndActivate(1, 1);
         end;
       end else
         MainForm.actGotoImplDeclEditorExecute(self);

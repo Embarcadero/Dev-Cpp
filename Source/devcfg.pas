@@ -2308,9 +2308,9 @@ begin
       if Assigned(Highlighter) then begin
         StrtoPoint(pt, devEditor.Syntax.Values[cFld]);
         CodeFolding.FolderBarLinesColor := pt.y;
-        UseCodeFolding := true;
+        UseCodeFolding := True;
       end else begin
-        UseCodeFolding := false;
+        UseCodeFolding := False;
       end;
 
       if fMarginVis then

@@ -158,7 +158,7 @@ begin
   // Implement it in the class in the header file if needed
   e.Text.BeginUpdate;
   try
-    e.SetCaretPos(Line, 1); // uncollapse folds around this line
+    e.Text.UncollapseAroundLine(Line); // uncollapse folds around this line
     if chkInline.Checked then begin
       e.Text.Lines.Insert(Line, #9#9'}');
       if chkToDo.Checked then
@@ -178,7 +178,7 @@ begin
       end;
 
     // Mark modified and we're done editing the header file
-    e.SetCaretPos(Line + 1, 1);
+
     e.Text.Modified := True;
   finally
     e.Text.EndUpdate;
@@ -186,7 +186,7 @@ begin
 
   // Continue work on the source file if needed
   if chkInline.Checked or chkPure.Checked then begin
-    e.Activate; // activate it if we're not modifying the source file
+    e.SetCaretPosAndActivate(Line + 1, 1); // activate it if we're not modifying the source file
     Exit;
   end;
 
@@ -207,8 +207,7 @@ begin
     e.Text.Lines.Add('}');
 
     // Set caret and leave
-    e.SetCaretPos(e.Text.Lines.Count - 1, 1);
-    e.Activate;
+    e.SetCaretPosAndActivate(e.Text.Lines.Count - 1, 1);
     e.Text.Modified := True;
   finally
     e.Text.EndUpdate;

@@ -764,6 +764,7 @@ type
     procedure UncollapseAll;
     procedure Collapse(FoldRange: TSynEditFoldRange);
     procedure Uncollapse(FoldRange: TSynEditFoldRange);
+    procedure UncollapseAroundLine(Line: Integer);
     function FoldStartAtLine(Line: Integer): TSynEditFoldRange;
     function CollapsedFoldStartAtLine(Line: Integer): TSynEditFoldRange;
     function FoldEndAtLine(Line: Integer): TSynEditFoldRange;
@@ -3088,13 +3089,20 @@ var
         // For each uncollapsed visible fold, draw a line
         for i := 0 to fAllFoldRanges.Count - 1 do begin
           with fAllFoldRanges[i] do begin
-            if not Collapsed and not ParentCollapsed and (Indent > 0) then begin
+            // Uncollapsed (line visible), not on first level, and inside clip rect
+            if not Collapsed and not ParentCollapsed and (Indent > 0) and (FromLine < vLastLine) and (ToLine >
+              vFirstLine) then begin
 
               // Get starting and end points
               X := Indent * CharWidth + fTextOffset - 2;
-              Y := (LineToRow(FromLine + 1) - TopLine) * fTextHeight;
+              Y := Max(AClip.Top,(LineToRow(FromLine + 1) - TopLine) * fTextHeight); // limit inside clip rect
+
+              // Due to even line heights, we need to alternate between starting at pixel 1 or 2
+              if Y mod 2 = 0 then // even
+                Inc(Y);
+
               Canvas.MoveTo(X, Y);
-              Y := (LineToRow(ToLine) - TopLine) * fTextHeight;
+              Y := Min(AClip.Bottom,((LineToRow(ToLine) - TopLine) * fTextHeight)); // limit inside clip rect
               Canvas.LineTo(X, Y);
             end;
           end;
@@ -4405,9 +4413,6 @@ begin
         ScrollInfo.fMask := ScrollInfo.fMask or SIF_DISABLENOSCROLL;
       end;
 
-      if Visible then
-        SendMessage(Handle, WM_SETREDRAW, 0, 0);
-
       if (fScrollBars in [ssBoth, ssHorizontal]) then begin
         if eoScrollPastEol in Options then
           nMaxScroll := MaxScrollWidth
@@ -4478,12 +4483,6 @@ begin
           end;
         end else
           EnableScrollBar(Handle, SB_VERT, ESB_ENABLE_BOTH);
-
-        if Visible then
-          SendMessage(Handle, WM_SETREDRAW, -1, 0);
-        if fPaintLock = 0 then
-          Invalidate;
-
       end else
         ShowScrollBar(Handle, SB_VERT, False);
     end {endif fScrollBars <> ssNone}
@@ -9935,6 +9934,17 @@ begin
 
   // Redraw fold mark
   InvalidateGutterLines(FoldRange.FromLine, MaxInt);
+end;
+
+procedure TCustomSynEdit.UncollapseAroundLine(Line: Integer);
+var
+  Fold: TSynEditFoldRange;
+begin
+  repeat // Open up the closed folds around the focused line until we can see the line we're looking for
+    Fold := FoldHidesLine(line);
+    if Assigned(Fold) then
+      Uncollapse(Fold);
+  until not Assigned(Fold);
 end;
 
 procedure TCustomSynEdit.UncollapseAll;

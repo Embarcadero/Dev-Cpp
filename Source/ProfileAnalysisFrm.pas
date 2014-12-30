@@ -390,8 +390,7 @@ begin
     Statement := PStatement(MouseItem.Data);
     e := MainForm.EditorList.GetEditorFromFileName(Statement^._DefinitionFileName);
     if Assigned(e) then begin
-      e.SetCaretPos(Statement^._DefinitionLine, 1);
-      e.Activate;
+      e.SetCaretPosAndActivate(Statement^._DefinitionLine, 1);
     end;
   end;
 end;

@@ -3565,14 +3565,11 @@ begin
 
       // Position the caret
       // uncollapse folds if needed
-      e.SetCaretPos(Line, Col);
+      e.SetCaretPosAndActivate(Line, Col);
 
       // Then select the word we searched for
       e.Text.SetSelWord;
       e.Text.CaretXY := e.Text.BlockBegin;
-
-      // And show to the user
-      e.Activate;
     end;
   end;
 end;
@@ -3908,8 +3905,7 @@ var
 begin
   e := fEditorList.GetEditorFromFilename(FileName);
   if Assigned(e) then begin
-    e.SetCaretPos(Line, 1);
-    e.Activate;
+    e.SetCaretPosAndActivate(Line, 1);
   end;
 end;
 
@@ -4237,10 +4233,9 @@ begin
       st := PStatement(lvEntries.Selected.Data);
       if Assigned(st) then begin
         if st^._HasDefinition then
-          e.SetCaretPos(st^._DefinitionLine, 1)
+          e.SetCaretPosAndActivate(st^._DefinitionLine, 1)
         else
-          e.SetCaretPos(st^._Line, 1);
-        e.Activate;
+          e.SetCaretPosAndActivate(st^._Line, 1);
       end;
     end;
   finally
@@ -4303,8 +4298,7 @@ begin
   Line := Statement^._Line;
   Editor := fEditorList.GetEditorFromFileName(FileName);
   if Assigned(Editor) then begin
-    Editor.SetCaretPos(Line, 1);
-    Editor.Activate;
+    Editor.SetCaretPosAndActivate(Line, 1);
   end;
 end;
 
@@ -4322,8 +4316,7 @@ begin
   Line := Statement^._DefinitionLine;
   Editor := fEditorList.GetEditorFromFileName(FileName);
   if Assigned(Editor) then begin
-    Editor.SetCaretPos(Line, 1);
-    Editor.Activate;
+    Editor.SetCaretPosAndActivate(Line, 1);
   end;
 end;
 
@@ -5422,8 +5415,7 @@ begin
 
   e := fEditorList.GetEditorFromFilename(FileName);
   if Assigned(e) then begin
-    e.SetCaretPos(Line, 1);
-    e.Activate;
+    e.SetCaretPosAndActivate(Line, 1);
   end;
 end;
 
@@ -5677,8 +5669,7 @@ begin
       // Go to the location
       e := fEditorList.GetEditorFromFileName(filename);
       if Assigned(e) then begin
-        e.SetCaretPos(line, 1);
-        e.Activate;
+        e.SetCaretPosAndActivate(line, 1);
       end;
 
       SetStatusbarMessage('');
