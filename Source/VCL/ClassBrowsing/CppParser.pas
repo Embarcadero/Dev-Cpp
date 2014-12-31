@@ -2250,48 +2250,50 @@ begin
   Node := fStatementList.FirstNode;
   while Assigned(Node) do begin
     Statement := Node^.Data;
-    if Statement^._Kind in [skClass, skFunction, skConstructor, skDestructor] then begin
-      case Statement^._Kind of
-        skClass: begin
-            if SameFileName(Statement^._FileName, FileName) then
-              if (Statement^._Line <= Row) and (Statement^._Line > ClosestLine) then begin
-                ClosestStatement := Statement;
-                ClosestLine := Statement^._Line;
-                InsideBody := Statement^._Line < Row;
-              end;
-          end;
-        skFunction, skConstructor, skDestructor: begin
-            // Check definition
-            if Statement^._HasDefinition and SameFileName(Statement^._DefinitionFileName, Filename) then begin
-              if (Statement^._DefinitionLine <= Row) and (Statement^._DefinitionLine > ClosestLine) then begin
-                ClosestStatement := Statement;
-                ClosestLine := Statement^._DefinitionLine;
-                InsideBody := Statement^._Line < Row;
-              end;
+    case Statement^._Kind of
+      skClass: begin
+          if SameFileName(Statement^._FileName, FileName) then
+            if (Statement^._Line <= Row) and (Statement^._Line > ClosestLine) then begin
+              ClosestStatement := Statement;
+              ClosestLine := Statement^._Line;
+              InsideBody := Statement^._Line < Row;
             end;
+        end;
+      skFunction, skConstructor, skDestructor: begin
+          // Check definition
+          if Statement^._HasDefinition and SameFileName(Statement^._DefinitionFileName, Filename) then begin
+            if (Statement^._DefinitionLine <= Row) and (Statement^._DefinitionLine > ClosestLine) then begin
+              ClosestStatement := Statement;
+              ClosestLine := Statement^._DefinitionLine;
+              InsideBody := Statement^._Line < Row;
+            end;
+          end;
 
-            // Check declaration
-            if SameFileName(Statement^._FileName, Filename) then begin
-              if (Statement^._Line <= Row) and (Statement^._Line > ClosestLine) then begin
-                ClosestStatement := Statement;
-                ClosestLine := Statement^._Line;
-                InsideBody := True; // no body, so assume true
-              end;
+          // Check declaration
+          if SameFileName(Statement^._FileName, Filename) then begin
+            if (Statement^._Line <= Row) and (Statement^._Line > ClosestLine) then begin
+              ClosestStatement := Statement;
+              ClosestLine := Statement^._Line;
+              InsideBody := True; // no body, so assume true
             end;
           end;
-      end;
+        end;
     end;
     Node := Node^.NextNode;
   end;
 
   // We have found the function or class body we are in
   if Assigned(ClosestStatement) then begin
-    if (ClosestStatement^._Kind = skClass) then begin
+
+    // For classes, the line with the class keyword on it belongs to the parent
+    if ClosestStatement^._Kind = skClass then begin
       if not InsideBody then begin // Hovering above a class name
-        ParentStatement := nil
+        ParentStatement := ClosestStatement^._Parent;
       end else begin // inside class body
         ParentStatement := ClosestStatement; // class
       end;
+
+    // For functions, it does not
     end else begin // it's a function
       ParentStatement := ClosestStatement^._Parent; // class::function
     end;
