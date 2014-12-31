@@ -519,6 +519,8 @@ const
   ID_AB_COMPILERS                       = 36021;
   ID_AB_TDMGCC                          = 36022;
   ID_AB_PRE4992                         = 36023;
+  ID_AB_DONATE                          = 36024;
+  ID_AB_BLOGNAME                        = 36025;
   
   // Code Inserts Edit
   ID_CIE_EDCAPTION                      = 37001;

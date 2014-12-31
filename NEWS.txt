@@ -1,4 +1,4 @@
-Version 5.8.4 - 27 November 2014
+Version 5.9.0 - 31 December 2014
 
 - Significantly improved performance when selecting text.
 - Fixed parser error when parsing C-style cast of string constant.

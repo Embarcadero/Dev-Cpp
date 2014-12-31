@@ -107,7 +107,9 @@ begin
   grpLinks.Caption := Lang[ID_AB_WEBCAP];
   lblPost4992.Caption := Lang[ID_AB_POST4992];
   lblRepository.Caption := Lang[ID_AB_REPOSITORY];
-  lblSubreddit.Caption := lang[ID_AB_SUBREDDIT];
+  lblSubreddit.Caption := Lang[ID_AB_SUBREDDIT];
+  lblBlog.Caption := Lang[ID_AB_BLOGNAME];
+  lblDonateHint.Caption := Lang[ID_AB_DONATE];
   lblCompilers.Caption := Lang[ID_AB_COMPILERS];
   lblMinGW.Caption := Lang[ID_AB_LBLMINGWSITE];
   lblTDM.Caption := Lang[ID_AB_TDMGCC];
