@@ -1,4 +1,14 @@
-Version 5.9.0 - 31 December 2014
+Version 5.8.4 - 27 November 2014
+
+- Remodeled Help >> About window.
+- When looking up a piece of code by Ctrl+Clicking the destination line is centered.
+- Removed caching from Tools >> Editor Options.
+- Widened the exception window.
+- Removed caching from the first-time configuration window.
+- Improved parsing progress messages in the status bar.
+- Improved performance of the classes list toolbar.
+- Improved function declaration/definition switching.
+
 
 - Significantly improved performance when selecting text.
 - Fixed parser error when parsing C-style cast of string constant.

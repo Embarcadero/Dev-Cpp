@@ -196,7 +196,7 @@ var
   Statement: PStatement;
   I: integer;
   InheritanceStatements: TList;
-  ParentStatement: PStatement;
+  ParentStatement, ParentTypeStatement, CurrentStatementParent: PStatement;
 begin
   // Reset filter cache
   fIsIncludedCacheFileName := '';
@@ -215,12 +215,18 @@ begin
       Node := fParser.Statements.FirstNode;
       while Assigned(Node) do begin
         Statement := Node^.Data;
-        if ApplyClassFilter(Statement, CurrentStatement, InheritanceStatements) then
+        if ApplyClassFilter(Statement, fCurrentStatement, InheritanceStatements) then
           fFullCompletionStatementList.Add(Statement);
         Node := Node^.NextNode;
       end;
 
     end else begin
+
+      // Get parent of current statement
+      if Assigned(fCurrentStatement) then
+        CurrentStatementParent := fCurrentStatement^._Parent
+      else
+        CurrentStatementParent := nil;
 
       // Find last operator
       Delete(Phrase, I, MaxInt);
@@ -230,19 +236,22 @@ begin
       if not Assigned(ParentStatement) then
         Exit;
 
-      // Then determine which type it has (so we can use it as a parent ID)
-      if not (ParentStatement^._Kind = skClass) then begin // already found type
-        ParentStatement := fParser.FindTypeDefinitionOf(ParentStatement^._Type, fCurrentStatement);
-        if not Assigned(ParentStatement) then
-          Exit;
-      end;
+      // Then determine which type it has (so we can use it as a parent)
+      if ParentStatement^._Kind = skClass then // already found type
+        ParentTypeStatement := ParentStatement
+      else
+        ParentTypeStatement := fParser.FindTypeDefinitionOf(ParentStatement^._Type, CurrentStatementParent);
+      // TODO: should not be nil
+      if not Assigned(ParentTypeStatement) then
+        Exit;
+
       // Then add members of the ClassIDs and InheritanceIDs
-      fParser.GetInheritanceStatements(ParentStatement, InheritanceStatements);
+      fParser.GetInheritanceStatements(ParentTypeStatement, InheritanceStatements);
 
       Node := fParser.Statements.FirstNode;
       while Assigned(Node) do begin
         Statement := Node^.Data;
-        if ApplyMemberFilter(Statement, CurrentStatement, ParentStatement, InheritanceStatements) then
+        if ApplyMemberFilter(Statement, fCurrentStatement, ParentTypeStatement, InheritanceStatements) then
           fFullCompletionStatementList.Add(Statement);
         Node := Node^.NextNode;
       end;
@@ -252,16 +261,22 @@ begin
   end;
 end;
 
+// Return 1 to show Item2 above Item1, otherwise -1
+
 function ListSort(Item1, Item2: Pointer): Integer;
+var
+  Statement1, Statement2: PStatement;
 begin
-  // first take into account that parsed statements need to be higher
-  // in the list than loaded ones
-  if PStatement(Item1)^._Loaded and (not PStatement(Item2)^._Loaded) then
+  Statement1 := PStatement(Item1);
+  Statement2 := PStatement(Item2);
+
+  // Show local statements first
+  if (Statement1^._Scope in [ssGlobal]) and not (Statement2^._Scope in [ssGlobal]) then
     Result := 1
-  else if (not PStatement(Item1)^._Loaded) and PStatement(Item2)^._Loaded then
+  else if not (Statement1^._Scope in [ssGlobal]) and (Statement2^._Scope in [ssGlobal]) then
     Result := -1
   else // otherwise, sort by name
-    Result := CompareText(PStatement(Item1)^._Command, PStatement(Item2)^._Command);
+    Result := CompareText(Statement1^._Command, Statement2^._Command);
 end;
 
 procedure TCodeCompletion.FilterList(const Member: AnsiString);

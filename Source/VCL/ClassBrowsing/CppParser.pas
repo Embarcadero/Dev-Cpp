@@ -443,7 +443,6 @@ var
       _DefinitionFileName := FileName;
       _Visible := Visible; // sets visibility in class browser
       _Temporary := fLaterScanning; // true if it's added by a function body scan
-      _Loaded := False; // true if it's a cache file
       _InProject := fIsProjectFile;
       _InSystemHeader := fIsSystemHeader;
     end;
@@ -1977,11 +1976,8 @@ begin
   // screws up the information inside the source file
   GetSourcePair(FName, CFile, HFile);
   fInvalidatedStatements.Clear;
-  if not Assigned(Stream) then begin
-    InvalidateFile(CFile);
-    InvalidateFile(HFile);
-  end else
-    InvalidateFile(FileName);
+  InvalidateFile(CFile);
+  InvalidateFile(HFile);
 
   if InProject then begin
     if (CFile <> '') and (fProjectFiles.IndexOf(CFile) = -1) then
@@ -2293,7 +2289,7 @@ begin
         ParentStatement := ClosestStatement; // class
       end;
 
-    // For functions, it does not
+      // For functions, it does not
     end else begin // it's a function
       ParentStatement := ClosestStatement^._Parent; // class::function
     end;
@@ -2365,7 +2361,7 @@ begin
         AddStatement(
           ParentStatement,
           Filename,
-          ParentStatement^._Command + '* this', // override hint
+          '',
           ParentStatement^._Command + '*',
           'this',
           '',

@@ -84,7 +84,6 @@ type
     _DefinitionFileName: AnsiString; // definition
     _Visible: boolean; // visible in class browser or not
     _Temporary: boolean; // statements to be deleted after parsing
-    _Loaded: boolean; // statement from cache
     _InProject: boolean; // statement in project
     _InSystemHeader: boolean; // statement in system header (#include <>)
   end;

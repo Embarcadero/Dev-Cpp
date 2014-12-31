@@ -176,9 +176,6 @@ begin
     MakeEdit.Text := '';
     WindresEdit.Text := '';
     GprofEdit.Text := '';
-
-    // TODO: disable controls?
-    // Tried that. Enabled = False looks weird on page controls though
   end else begin
 
     // Apply the new set to the UI
