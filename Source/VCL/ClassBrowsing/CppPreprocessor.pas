@@ -63,8 +63,8 @@ type
     fCurrentIncludes: PFileIncludes;
     fPreProcIndex: integer;
     fIncludesList: TList;
-    fHardDefines: TList; // set by "cpp -dM -E -xc NUL"
-    fDefines: TList; // working set, editable
+    fHardDefines: TStringList; // set by "cpp -dM -E -xc NUL"
+    fDefines: TStringList; // working set, editable
     fIncludes: TList; // list of files we've stepped into. last one is current file, first one is source file
     fBranchResults: TIntList;
     // list of branch results (boolean). last one is current branch, first one is outermost branch
@@ -103,7 +103,7 @@ type
     procedure AddDefineByParts(const Name, Args, Value: AnsiString; HardCoded: boolean);
     procedure GetDefineParts(const Input: AnsiString; var Name, Args, Value: AnsiString);
     procedure AddDefineByLine(const Line: AnsiString; HardCoded: boolean);
-    function GetDefine(const Name: AnsiString): PDefine;
+    function GetDefine(const Name: AnsiString; var Index: integer): PDefine;
     procedure Reset;
     procedure ResetDefines;
     procedure SetScanOptions(ParseSystem, ParseLocal: boolean);
@@ -120,6 +120,8 @@ procedure Register;
 
 implementation
 
+uses IniFiles;
+
 procedure Register;
 begin
   RegisterComponents('Dev-C++', [TCppPreprocessor]);
@@ -129,8 +131,10 @@ constructor TCppPreprocessor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   fIncludes := TList.Create;
-  fHardDefines := TList.Create;
-  fDefines := TList.Create;
+  fHardDefines := TStringList.Create;
+  fDefines := TStringList.Create;
+  fDefines.Sorted := True;
+  fDefines.Duplicates := dupAccept; // duplicate defines should generate warning
   fBranchResults := TIntList.Create;
   fResult := TStringList.Create;
 end;
@@ -145,11 +149,11 @@ begin
   end;
   fIncludes.Free;
   for I := 0 to fHardDefines.Count - 1 do
-    Dispose(PDefine(fHardDefines[i]));
+    Dispose(PDefine(fHardDefines.Objects[i]));
   fHardDefines.Free;
   for I := 0 to fDefines.Count - 1 do
-    if not PDefine(fDefines[i])^.HardCoded then // has already been released
-      Dispose(PDefine(fDefines[i]));
+    if not PDefine(fDefines.Objects[i])^.HardCoded then // has already been released
+      Dispose(PDefine(fDefines.Objects[i]));
   fDefines.Free;
   fBranchResults.Free;
   fResult.Free;
@@ -416,18 +420,13 @@ begin
   Output := Trim(Output); // removes spaces between # and the first word
 end;
 
-function TCppPreprocessor.GetDefine(const Name: AnsiString): PDefine;
-var
-  I: integer;
+function TCppPreprocessor.GetDefine(const Name: AnsiString; var Index: integer): PDefine;
 begin
-  // Get the first define only. Multiple defines cause warnings now, so ignore them
-  for I := 0 to fDefines.Count - 1 do begin
-    if PDefine(fDefines[i])^.Name = Name then begin
-      result := PDefine(fDefines[i]);
-      Exit;
-    end;
-  end;
-  result := nil;
+  Index := fDefines.IndexOf(Name); // use sorted searching. is really fast
+  if Index <> -1 then
+    Result := PDefine(fDefines.Objects[Index])
+  else
+    Result := nil;
 end;
 
 procedure TCppPreprocessor.AddDefineByParts(const Name, Args, Value: AnsiString; HardCoded: boolean);
@@ -441,9 +440,9 @@ begin
   Item^.Value := Value;
   Item^.HardCoded := HardCoded;
   if HardCoded then
-    fHardDefines.Add(Item)
+    fHardDefines.AddObject(Name, Pointer(Item)) // uses TStringList too to be able to assign to fDefines easily
   else
-    fDefines.Add(Item);
+    fDefines.AddObject(Name, Pointer(Item)); // sort by name
 end;
 
 // input should omit the define word
@@ -515,11 +514,19 @@ var
 begin
   // Assign hard list to soft list
   for I := 0 to fDefines.Count - 1 do begin // remove memory first
-    if not PDefine(fDefines[i])^.HardCoded then // memory belongs to hardcoded list
-      Dispose(PDefine(fDefines[i]));
+    if not PDefine(fDefines.Objects[i])^.HardCoded then // memory belongs to hardcoded list
+      Dispose(PDefine(fDefines.Objects[i]));
   end;
-  fDefines.Clear;
-  fDefines.Assign(fHardDefines); // then assign
+
+  // Assign does clear too
+  fDefines.Duplicates := dupAccept;
+  fDefines.Sorted := False;
+  try
+    fDefines.Assign(fHardDefines); // then assign
+  finally
+    fDefines.Duplicates := dupAccept;
+    fDefines.Sorted := True; // sort once
+  end;
 end;
 
 procedure TCppPreprocessor.HandlePreprocessor(const Value: AnsiString);
@@ -545,20 +552,19 @@ end;
 
 procedure TCppPreprocessor.HandleUndefine(const Line: AnsiString);
 var
+  Define: PDefine;
   Name: AnsiString;
-  I: integer;
+  Index: integer;
 begin
   // Remove undef
   Name := TrimLeft(Copy(Line, Length('undef') + 1, MaxInt));
 
   // Remove from soft list only
-  for I := fDefines.Count - 1 downto 0 do begin
-    if PDefine(fDefines[i])^.Name = Name then begin
-      if not PDefine(fDefines[i])^.HardCoded then // memory belongs to hardcoded list
-        Dispose(PDefine(fDefines[i]));
-      fDefines.Delete(i);
-      break; // ignore overriden defines
-    end;
+  Define := GetDefine(Name, Index);
+  if Assigned(Define) then begin
+    if not Define^.HardCoded then // memory belongs to hardcoded list
+      Dispose(Define);
+    fDefines.Delete(Index);
   end;
 end;
 
@@ -566,7 +572,7 @@ procedure TCppPreprocessor.HandleBranch(const Line: AnsiString);
 var
   Name, IfLine: AnsiString;
   OldResult: boolean;
-  I: integer;
+  I, Dummy: integer;
 
   // Should start on top of the opening char
   function SkipBraces(const Line: AnsiString; var Index: integer; Step: integer = 1): boolean;
@@ -663,7 +669,7 @@ var
         end else begin
 
           // Does it exist in the database?
-          Define := GetDefine(Name);
+          Define := GetDefine(Name,Dummy);
           if not Assigned(Define) then begin
             InsertValue := '0';
           end else begin
@@ -742,7 +748,7 @@ var
         Delete(Line, Tail, Head - Tail + 1);
 
         // Evaludate and replace expression by 1 or 0 (true or false)
-        DefineResult := Assigned(GetDefine(S));
+        DefineResult := Assigned(GetDefine(S,Dummy));
         if (DefineResult and not InvertResult) or (not DefineResult and InvertResult) then
           Insert('1', Line, Tail)
         else
@@ -880,14 +886,14 @@ begin
       SetCurrentBranch(false) // so don't take this one either
     else begin
       Name := TrimLeft(Copy(Line, Length('ifdef') + 1, MaxInt));
-      SetCurrentBranch(Assigned(GetDefine(Name)));
+      SetCurrentBranch(Assigned(GetDefine(Name,Dummy)));
     end;
   end else if StartsStr('ifndef', Line) then begin
     if not GetCurrentBranch then // we are already inside an if that is NOT being taken
       SetCurrentBranch(false) // so don't take this one either
     else begin
       Name := TrimLeft(Copy(Line, Length('ifndef') + 1, MaxInt));
-      SetCurrentBranch(not Assigned(GetDefine(Name)));
+      SetCurrentBranch(not Assigned(GetDefine(Name,Dummy)));
     end;
   end else if StartsStr('if', Line) then begin
     if not GetCurrentBranch then // we are already inside an if that is NOT being taken

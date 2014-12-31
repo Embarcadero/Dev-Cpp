@@ -64,12 +64,21 @@ int Correct09;
 int Incorrect09;
 #endif
 
+// undef test 2
+#undef UndefA
+#undef UndefB
+#if defined(UndefA) or defined(UndefB)
+int Incorrect10;
+#else
+int Correct10;
+#endif
+
 // || test
 #define OrA
 #if defined(OrA) or defined(OrB)
-int Correct10;
+int Correct11;
 #else
-int Incorrect10;
+int Incorrect11;
 #endif
 
 int main(){

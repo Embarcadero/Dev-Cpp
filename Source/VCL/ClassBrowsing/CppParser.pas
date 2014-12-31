@@ -1070,7 +1070,7 @@ end;
 procedure TCppParser.HandlePreprocessor;
 var
   DelimPos, Line: Integer;
-  S, Name, Args, Value: AnsiString;
+  S, Name, Args, Value, HintText: AnsiString;
 begin
   if StartsStr('#include ', fTokenizer[fIndex]^.Text) then begin // start of new file
     // format: #include fullfilename:line
@@ -1101,10 +1101,19 @@ begin
     if Assigned(fPreprocessor) then
       fPreprocessor.GetDefineParts(S, Name, Args, Value);
 
+    // Generate custom hint
+    HintText := '#define';
+    if Name <> '' then
+      HintText := HintText + ' ' + Name;
+    if Args <> '' then
+      HintText := HintText + ' ' + Args;
+    if Value <> '' then
+      HintText := HintText + ' ' + Value;
+
     AddStatement(
       nil, // defines don't belong to any scope
       fCurrentFile,
-      '#define ' + Name + Args + ' ' + Value, // override hint
+      HintText, // override hint
       '', // define has no type
       Name,
       Args,
