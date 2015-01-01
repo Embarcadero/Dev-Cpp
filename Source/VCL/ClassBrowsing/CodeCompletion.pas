@@ -270,12 +270,20 @@ begin
   Statement1 := PStatement(Item1);
   Statement2 := PStatement(Item2);
 
-  // Show local statements first
-  if (Statement1^._Scope in [ssGlobal]) and not (Statement2^._Scope in [ssGlobal]) then
-    Result := 1
-  else if not (Statement1^._Scope in [ssGlobal]) and (Statement2^._Scope in [ssGlobal]) then
-    Result := -1
-  else // otherwise, sort by name
+  // Show stuff from local headers first
+  if (Statement1^._InSystemHeader) and (not Statement2^._InSystemHeader) then begin
+    Result := 1;
+  end else if (not Statement1^._InSystemHeader) and (Statement2^._InSystemHeader) then begin
+    Result := -1;
+
+    // Show local statements first
+  end else if (Statement1^._Scope in [ssGlobal]) and not (Statement2^._Scope in [ssGlobal]) then begin
+    Result := 1;
+  end else if not (Statement1^._Scope in [ssGlobal]) and (Statement2^._Scope in [ssGlobal]) then begin
+    Result := -1;
+
+    // otherwise, sort by name
+  end else
     Result := CompareText(Statement1^._Command, Statement2^._Command);
 end;
 

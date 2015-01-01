@@ -1159,12 +1159,14 @@ begin
 
   // Forward class/struct decl *or* typedef, e.g. typedef struct some_struct synonym1, synonym2;
   if (I < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = ';') then begin
+
+    // typdef struct Foo Bar
     if IsTypedef then begin
       OldType := fTokenizer[fIndex]^.Text;
       repeat
         // Add definition statement for the synonym
         if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';']) then begin
-          NewType := fTokenizer[fIndex + 1]^.Text;
+          NewType := fTokenizer[fIndex]^.Text;
           AddStatement(
             StructParent,
             fCurrentFile,
@@ -1183,6 +1185,11 @@ begin
         end;
         Inc(fIndex);
       until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] = ';');
+
+      // Forward declaration, struct Foo. Don't mention in class browser
+    end else begin
+      Inc(I); // step over ;
+      fIndex := I;
     end;
 
     // normal class/struct decl
@@ -2897,7 +2904,7 @@ begin
           Line,
           skVariable,
           ssLocal,
-          scsPrivate,
+          scsNone,
           False,
           False,
           True,
