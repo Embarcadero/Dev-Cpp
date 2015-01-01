@@ -958,20 +958,18 @@ begin
 
     // draw function arguments to the right of the already drawn text
     NodeRect := Node.DisplayRect(true);
-    NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._Command) + 2;
-    fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, st^._Args);
+    NodeRect.Left := NodeRect.Left + Sender.Canvas.TextWidth(st^._Command) + 5;
+    fCnv.TextOut(NodeRect.Left, NodeRect.Top + 2, st^._Args);
 
     fCnv.Font.Color := clGray;
     if st^._Type <> '' then
       typetext := st^._Type
-    else if st^._Kind in [skConstructor, skDestructor] then
-      typetext := fParser.StatementKindStr(st^._Kind)
     else
-      Exit; // done
+      typetext := fParser.StatementKindStr(st^._Kind);
 
     // Then draw node type to the right of the arguments
-    NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 2;
-    fCnv.TextOut(NodeRect.Left + 2, NodeRect.Top + 2, ': ' + typetext);
+    NodeRect.Left := NodeRect.Left + fCnv.TextWidth(st^._Args) + 3;
+    fCnv.TextOut(NodeRect.Left, NodeRect.Top + 2, ': ' + typetext);
   end;
 end;
 

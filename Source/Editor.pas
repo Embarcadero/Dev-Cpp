@@ -747,7 +747,7 @@ procedure TEditor.GotoLine;
 begin
   with TGotoLineForm.Create(nil) do try
     if ShowModal = mrOK then
-      SetCaretPos(Line.Value, 1);
+      SetCaretPosAndActivate(Line.Value, 1);
   finally
     Free;
   end;
@@ -811,7 +811,7 @@ begin
   fErrorLine := Line;
 
   // Set new error focus
-  SetCaretPos(fErrorLine, col);
+  SetCaretPosAndActivate(fErrorLine, col);
 
   // Redraw new error line
   fText.InvalidateGutterLine(fErrorLine);
@@ -821,7 +821,7 @@ end;
 procedure TEditor.GotoActiveBreakpoint;
 begin
   if fActiveLine <> -1 then
-    SetCaretPos(fActiveLine, 1);
+    SetCaretPosAndActivate(fActiveLine, 1);
 end;
 
 procedure TEditor.SetActiveBreakpointFocus(Line: integer);
@@ -836,7 +836,7 @@ begin
 
     // Put the caret at the active breakpoint
     fActiveLine := Line;
-    SetCaretPos(fActiveLine, 1);
+    SetCaretPosAndActivate(fActiveLine, 1);
 
     // Invalidate new active line
     fText.InvalidateGutterLine(fActiveLine);
