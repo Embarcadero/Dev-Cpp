@@ -3095,14 +3095,14 @@ var
 
               // Get starting and end points
               X := Indent * CharWidth + fTextOffset - 2;
-              Y := Max(AClip.Top,(LineToRow(FromLine + 1) - TopLine) * fTextHeight); // limit inside clip rect
+              Y := Max(AClip.Top, (LineToRow(FromLine + 1) - TopLine) * fTextHeight); // limit inside clip rect
 
               // Due to even line heights, we need to alternate between starting at pixel 1 or 2
               if Y mod 2 = 0 then // even
                 Inc(Y);
 
               Canvas.MoveTo(X, Y);
-              Y := Min(AClip.Bottom,((LineToRow(ToLine) - TopLine) * fTextHeight)); // limit inside clip rect
+              Y := Min(AClip.Bottom, ((LineToRow(ToLine) - TopLine) * fTextHeight)); // limit inside clip rect
               Canvas.LineTo(X, Y);
             end;
           end;
@@ -8980,10 +8980,11 @@ begin
   if (not HandleAllocated) or (Line < 1) or (Line > Lines.Count) or (not Visible) then
     Exit;
 
+  // invalidate text area of this line
+  if UseCodeFolding then
+    Line := LineToRow(Line);
+
   if (Line >= TopLine) and (Line <= TopLine + LinesInWindow) then begin
-    // invalidate text area of this line
-    if UseCodeFolding then
-      Line := LineToRow(Line);
     rcInval := Rect(fGutterWidth, fTextHeight * (Line - TopLine), ClientWidth, 0);
     rcInval.Bottom := rcInval.Top + fTextHeight;
 {$IFDEF SYN_CLX}

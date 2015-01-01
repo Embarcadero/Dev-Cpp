@@ -924,13 +924,8 @@ begin
     sType := TrimRight(sType); // should contain type "int"
     sName := TrimRight(sName); // should contain function name "foo::function"
     sArgs := TrimRight(sArgs); // should contain argument list "(int a)"
-
-    // TODO: check if this is function usage and skip if so?
-  end else begin
+  end else
     Result := false;
-    //while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['{','}',',',';']) do
-    //	Inc(fIndex)
-  end;
 end;
 
 function TCppParser.CheckForScope: boolean;
@@ -1131,7 +1126,7 @@ end;
 
 procedure TCppParser.HandleStructs(IsTypedef: boolean = False);
 var
-  S1, S2, Prefix, OldType, NewType: AnsiString;
+  S1, Prefix, OldType, NewType: AnsiString;
   I: integer;
   IsStruct, ClassLevelAdded: boolean;
   StructParent, LastStatement: PStatement;
@@ -1196,32 +1191,25 @@ begin
   end else begin
     if fTokenizer[fIndex]^.Text[1] <> '{' then begin
       S1 := '';
-      S2 := '';
       repeat
-        if not (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', ':']) then
-          S1 := S1 + fTokenizer[fIndex]^.Text + ' ';
-        if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] = '(') then
-          S2 := fTokenizer[fIndex]^.Text;
         if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', '{', ':']) then
           begin
-          if S2 = '' then
-            S2 := fTokenizer[fIndex]^.Text;
-          S1 := TrimRight(S1);
+          S1 := fTokenizer[fIndex]^.Text;
 
           // TODO: fix this the nice way
-          if (S1 = 'basic_string') and (S2 = 'basic_string') then begin
+        {  if (S1 = 'basic_string') and (S2 = 'basic_string') then begin
             S1 := 'string';
             S2 := 'string';
-          end;
+          end;  }
 
           if S1 <> '' then begin
             LastStatement := AddStatement(
               StructParent,
               fCurrentFile,
               '', // do not override hint
-              Prefix,
-              S2,
-              '',
+              Prefix, // type
+              S1, // command
+              '', // args
               fTokenizer[fIndex]^.Line,
               skClass,
               GetScope,
@@ -2515,57 +2503,66 @@ begin
 end;
 
 function TCppParser.PrettyPrintStatement(Statement: PStatement): AnsiString;
-var
+  function GetScopePrefix: AnsiString;
+  var
   ScopeStr: AnsiString;
+  begin
+    ScopeStr := StatementClassScopeStr(Statement^._ClassScope); // can be blank
+    if ScopeStr <> '' then
+      Result := ScopeStr + ' '
+    else
+      Result := '';
+  end;
+  function GetParentPrefix: AnsiString;
+  var
+    WalkStatement: PStatement;
+  begin
+    Result := '';
+    WalkStatement := Statement;
+    while Assigned(WalkStatement^._Parent) do begin
+      Result := Result + WalkStatement^._Parent^._Command + '::';
+      WalkStatement := WalkStatement^._Parent;
+    end;
+  end;
+  function GetArgsSuffix: AnsiString;
+  begin
+    if Statement^._Args <> '' then
+      Result := ' ' + Statement^._Args
+    else
+      Result := '';
+  end;
 begin
   Result := '';
   if Statement^._HintText <> '' then begin
     Result := Statement^._HintText;
   end else begin
-    ScopeStr := StatementClassScopeStr(Statement^._ClassScope); // can be blank
     case Statement^._Kind of
       skClass: begin
-          if ScopeStr <> '' then
-            Result := ScopeStr + ' '; // public
-          Result := Result + Statement^._Type + ' '; // class
+          Result := GetScopePrefix; // public
+          Result := Result + Statement^._Type + ' '; // class/struct/union
           Result := Result + Statement^._Command; // Foo
         end;
       skFunction,
         skVariable: begin
-          if ScopeStr <> '' then
-            Result := ScopeStr + ' '; // public
+          Result := GetScopePrefix; // public
           Result := Result + Statement^._Type + ' '; // void
-          if Assigned(Statement^._Parent) then begin
-            Result := Result + Statement^._Parent^._Command; // Foo
-            Result := Result + '::';
-          end;
+          Result := Result + GetParentPrefix; // A::B::C::
           Result := Result + Statement^._Command; // Bar
-          if Statement^._Args <> '' then
-            Result := Result + ' ' + Statement^._Args; // (int a)
+          Result := Result + GetArgsSuffix; // (int a)
         end;
       skConstructor: begin
-          if ScopeStr <> '' then
-            Result := ScopeStr + ' '; // public
+          Result := GetScopePrefix; // public
           Result := Result + 'constructor' + ' '; // constructor
-          if Assigned(Statement^._Parent) then begin
-            Result := Result + Statement^._Parent^._Command; // Foo
-            Result := Result + '::';
-          end;
+          Result := Result + GetParentPrefix; // A::B::C::
           Result := Result + Statement^._Command; // Bar
-          if Statement^._Args <> '' then
-            Result := Result + ' ' + Statement^._Args; // (int a)
+          Result := Result + GetArgsSuffix; // (int a)
         end;
       skDestructor: begin
-          if ScopeStr <> '' then
-            Result := ScopeStr + ' '; // public
+          Result := GetScopePrefix; // public
           Result := Result + 'destructor' + ' '; // destructor
-          if Assigned(Statement^._Parent) then begin
-            Result := Result + Statement^._Parent^._Command; // Foo
-            Result := Result + '::';
-          end;
+          Result := Result + GetParentPrefix; // A::B::C::
           Result := Result + Statement^._Command; // Bar
-          if Statement^._Args <> '' then
-            Result := Result + ' ' + Statement^._Args; // (int a)
+          Result := Result + GetArgsSuffix; // (int a)
         end;
       skTypedef: begin
           Result := 'skTypedef hint'; // should be set by HintText
