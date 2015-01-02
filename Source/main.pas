@@ -309,7 +309,6 @@ type
     mnuBrowserNewClass: TMenuItem;
     mnuBrowserNewMember: TMenuItem;
     mnuBrowserNewVariable: TMenuItem;
-    mnuBrowserSep3: TMenuItem;
     mnuBrowserViewMode: TMenuItem;
     mnuBrowserViewAll: TMenuItem;
     mnuBrowserViewCurrent: TMenuItem;
@@ -328,10 +327,7 @@ type
     N31: TMenuItem;
     actBrowserAddFolder: TAction;
     actBrowserRemoveFolder: TAction;
-    mnuBrowserAddFolder: TMenuItem;
-    mnuBrowserRemoveFolder: TMenuItem;
     actBrowserRenameFolder: TAction;
-    mnuBrowserRenameFolder: TMenuItem;
     actCloseAllButThis: TAction;
     CloseAll1: TMenuItem;
     Closeallexceptthis1: TMenuItem;
@@ -666,10 +662,6 @@ type
     procedure actBrowserViewAllExecute(Sender: TObject);
     procedure actBrowserViewCurrentExecute(Sender: TObject);
     procedure actProfileExecute(Sender: TObject);
-    procedure actBrowserAddFolderExecute(Sender: TObject);
-    procedure actBrowserRemoveFolderExecute(Sender: TObject);
-    procedure actBrowserAddFolderUpdate(Sender: TObject);
-    procedure actBrowserRenameFolderExecute(Sender: TObject);
     procedure actCloseAllButThisExecute(Sender: TObject);
     procedure actStepLineExecute(Sender: TObject);
     procedure lvBacktraceCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var
@@ -3844,7 +3836,6 @@ begin
   try
     ClassBrowser.ShowFilter := TShowFilter(devClassBrowsing.ShowFilter);
     ClassBrowser.ShowInheritedMembers := devClassBrowsing.ShowInheritedMembers;
-    ClassBrowser.ClassFoldersFile := DEV_CLASSFOLDERS_FILE;
     ClassBrowser.TabVisible := LeftPageControl.ActivePageIndex = 1;
   finally
     ClassBrowser.EndUpdate;
@@ -4258,11 +4249,6 @@ begin
     TCustomAction(Sender).Enabled := False;
 end;
 
-procedure TMainForm.actBrowserAddFolderUpdate(Sender: TObject);
-begin
-  TCustomAction(Sender).Enabled := Assigned(fProject);
-end;
-
 procedure TMainForm.actBrowserViewAllUpdate(Sender: TObject);
 begin
   TCustomAction(Sender).Enabled := True;
@@ -4472,40 +4458,6 @@ begin
     actRunExecute(nil);
   end else begin // If the data is there, open up the form
     RunEndProc;
-  end;
-end;
-
-procedure TMainForm.actBrowserAddFolderExecute(Sender: TObject);
-var
-  S: AnsiString;
-  Node: TTreeNode;
-begin
-  if ClassBrowser.FolderCount >= MAX_CUSTOM_FOLDERS then begin
-    MessageDlg(Format(Lang[ID_POP_MAXFOLDERS], [MAX_CUSTOM_FOLDERS]), mtError, [mbOk], 0);
-    Exit;
-  end;
-
-  Node := ClassBrowser.Selected;
-  S := 'New folder';
-  if InputQuery(Lang[ID_POP_ADDFOLDER], Lang[ID_MSG_ADDBROWSERFOLDER], S) and (S <> '') then
-    ClassBrowser.AddFolder(S, Node);
-end;
-
-procedure TMainForm.actBrowserRemoveFolderExecute(Sender: TObject);
-begin
-  if Assigned(ClassBrowser.Selected) and (ClassBrowser.Selected.ImageIndex = ClassBrowser.ItemImages.Globals) then
-    if MessageDlg(Lang[ID_MSG_REMOVEBROWSERFOLDER], mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-      ClassBrowser.RemoveFolder(ClassBrowser.Selected.Text);
-end;
-
-procedure TMainForm.actBrowserRenameFolderExecute(Sender: TObject);
-var
-  S: AnsiString;
-begin
-  if Assigned(ClassBrowser.Selected) and (ClassBrowser.Selected.ImageIndex = ClassBrowser.ItemImages.Globals) then begin
-    S := ClassBrowser.Selected.Text;
-    if InputQuery(Lang[ID_POP_RENAMEFOLDER], Lang[ID_MSG_RENAMEBROWSERFOLDER], S) and (S <> '') then
-      ClassBrowser.RenameFolder(ClassBrowser.Selected.Text, S);
   end;
 end;
 

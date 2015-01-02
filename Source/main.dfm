@@ -960,7 +960,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 374
+        Height = 373
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -995,7 +995,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 374
+        Height = 373
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
@@ -1031,7 +1031,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 374
+        Height = 373
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -2423,12 +2423,14 @@ object MainForm: TMainForm
     object actBrowserNewMember: TAction
       Category = 'ClassBrowser'
       Caption = 'New member function'
+      ImageIndex = 52
       OnExecute = actBrowserNewMemberExecute
       OnUpdate = actBrowserNewMemberUpdate
     end
     object actBrowserNewVar: TAction
       Category = 'ClassBrowser'
       Caption = 'New variable'
+      ImageIndex = 53
       OnExecute = actBrowserNewVarExecute
       OnUpdate = actBrowserNewVarUpdate
     end
@@ -2474,20 +2476,14 @@ object MainForm: TMainForm
     object actBrowserAddFolder: TAction
       Category = 'ClassBrowser'
       Caption = 'Add folder'
-      OnExecute = actBrowserAddFolderExecute
-      OnUpdate = actBrowserAddFolderUpdate
     end
     object actBrowserRemoveFolder: TAction
       Category = 'ClassBrowser'
       Caption = 'Remove folder'
-      OnExecute = actBrowserRemoveFolderExecute
-      OnUpdate = actBrowserAddFolderUpdate
     end
     object actBrowserRenameFolder: TAction
       Category = 'ClassBrowser'
       Caption = 'Rename folder'
-      OnExecute = actBrowserRenameFolderExecute
-      OnUpdate = actBrowserAddFolderUpdate
     end
     object actCloseAllButThis: TAction
       Category = 'File'
@@ -2875,18 +2871,6 @@ object MainForm: TMainForm
       Action = actBrowserNewVar
     end
     object N31: TMenuItem
-      Caption = '-'
-    end
-    object mnuBrowserAddFolder: TMenuItem
-      Action = actBrowserAddFolder
-    end
-    object mnuBrowserRemoveFolder: TMenuItem
-      Action = actBrowserRemoveFolder
-    end
-    object mnuBrowserRenameFolder: TMenuItem
-      Action = actBrowserRenameFolder
-    end
-    object mnuBrowserSep3: TMenuItem
       Caption = '-'
     end
     object mnuBrowserViewMode: TMenuItem
