@@ -960,7 +960,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 373
+        Height = 374
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -995,7 +995,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 373
+        Height = 374
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
@@ -1031,7 +1031,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 373
+        Height = 374
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1304,6 +1304,9 @@ object MainForm: TMainForm
       end
       object ToggleComment1: TMenuItem
         Action = actToggleComment
+      end
+      object actCommentInlineSel1: TMenuItem
+        Action = actToggleCommentInline
       end
       object N27: TMenuItem
         Caption = '-'
@@ -2378,6 +2381,13 @@ object MainForm: TMainForm
       ShortCut = 16575
       OnExecute = actToggleCommentExecute
       OnUpdate = actUpdateEmptyEditor
+    end
+    object actToggleCommentInline: TAction
+      Category = 'Edit'
+      Caption = 'Toggle Inline Comment'
+      ShortCut = 16570
+      OnExecute = actToggleCommentInlineExecute
+      OnUpdate = actToggleCommentInlineUpdate
     end
     object actIndent: TAction
       Category = 'Edit'

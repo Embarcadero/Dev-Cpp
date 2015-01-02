@@ -96,6 +96,7 @@ const
   ID_ITEM_MOVESELUP                     = 22011;
   ID_ITEM_MOVESELDOWN                   = 22012;
   ID_ITEM_SWAPEDITOR                    = 22013;
+  ID_ITEM_TOGGLECOMMENTINLINE           = 22014;
 
   // search menu
   ID_ITEM_FIND                          = 5001;

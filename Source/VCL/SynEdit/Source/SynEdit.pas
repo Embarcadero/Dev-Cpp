@@ -6287,6 +6287,8 @@ var
   vCaretRow: integer;
   vTabTrim: integer;
   Attr: TSynHighlighterAttributes;
+  StartPos: Integer;
+  EndPos: Integer;
 begin
   IncPaintLock;
   try
@@ -6890,6 +6892,53 @@ begin
             end;
           end;
           DoComment;
+        end;
+      ecCommentInline: // toggle inline comment
+        if not ReadOnly and SelAvail then begin
+          Temp := SelText;
+
+          // Check if the selection starts with /* after blanks
+          StartPos := -1;
+          I := 1;
+          while I <= Length(Temp) do begin
+            if Temp[I] in [#9, #32] then
+              Inc(I)
+            else if ((I + 1) <= Length(Temp)) and (Temp[i] = '/') and (Temp[i + 1] = '*') then begin
+              StartPos := I;
+              break;
+            end else
+              break;
+          end;
+
+          // Check if the selection ends with /* after blanks
+          EndPos := -1;
+          if StartPos <> -1 then begin
+            I := Length(Temp);
+            while I > 0 do begin
+              if Temp[I] in [#9, #32] then
+                Dec(I)
+              else if ((I - 1) > 0) and (Temp[i] = '/') and (Temp[i - 1] = '*') then begin
+                EndPos := I;
+                break;
+              end else
+                break;
+            end;
+          end;
+
+          // Keep selection
+          OrigBlockBegin := BlockBegin;
+          OrigBlockEnd := BlockEnd;
+
+          // Toggle based on current comment status
+          if (StartPos <> -1) and (EndPos <> -1) then begin
+            SelText := Copy(SelText, StartPos + 2, EndPos - StartPos - 3);
+            BlockBegin := OrigBlockBegin;
+            BlockEnd := BufferCoord(OrigBlockEnd.Char - 4, OrigBlockEnd.Line);
+          end else begin
+            SelText := '/*' + SelText + '*/';
+            BlockBegin := BufferCoord(OrigBlockBegin.Char,OrigBlockBegin.Line);
+            BlockEnd := BufferCoord(OrigBlockEnd.Char + 4, OrigBlockEnd.Line);
+          end;
         end;
       ecMatchBracket:
         FindMatchingBracket;

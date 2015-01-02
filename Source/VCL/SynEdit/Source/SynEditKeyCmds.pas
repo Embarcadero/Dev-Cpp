@@ -192,6 +192,7 @@ const
   ecComment         = 614;
   ecUncomment       = 615;
   ecToggleComment   = 616;
+  ecCommentInline   = 617;
   
   ecAutoCompletion  = 650;
 

@@ -534,6 +534,8 @@ type
     actOpenFolder1: TMenuItem;
     actGotoBreakPoint: TAction;
     Abortcompilation2: TMenuItem;
+    actToggleCommentInline: TAction;
+    actCommentInlineSel1: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure ToggleBookmarkClick(Sender: TObject);
@@ -784,6 +786,8 @@ type
     procedure PageControlPanelResize(Sender: TObject);
     procedure actOpenFolderExecute(Sender: TObject);
     procedure actGotoBreakPointExecute(Sender: TObject);
+    procedure actToggleCommentInlineExecute(Sender: TObject);
+    procedure actToggleCommentInlineUpdate(Sender: TObject);
   private
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
@@ -1153,6 +1157,7 @@ begin
   actComment.Caption := Lang[ID_ITEM_COMMENTSELECTION];
   actUncomment.Caption := Lang[ID_ITEM_UNCOMMENTSELECTION];
   actToggleComment.Caption := Lang[ID_ITEM_TOGGLECOMMENT];
+  actToggleCommentInline.Caption := Lang[ID_ITEM_TOGGLECOMMENTINLINE];
   actIndent.Caption := Lang[ID_ITEM_INDENTSELECTION];
   actUnindent.Caption := Lang[ID_ITEM_UNINDENTSELECTION];
   actCollapse.Caption := Lang[ID_ITEM_COLLAPSEALL];
@@ -6552,6 +6557,23 @@ begin
       e.Activate;
     end;
   end;
+end;
+
+procedure TMainForm.actToggleCommentInlineExecute(Sender: TObject);
+var
+  e: TEditor;
+begin
+  e := fEditorList.GetEditor;
+  if Assigned(e) then
+    e.Text.CommandProcessor(ecCommentInline, #0, nil);
+end;
+
+procedure TMainForm.actToggleCommentInlineUpdate(Sender: TObject);
+var
+  e: TEditor;
+begin
+  e := fEditorList.GetEditor;
+  TCustomAction(Sender).Enabled := Assigned(e) and e.Text.SelAvail;
 end;
 
 end.
