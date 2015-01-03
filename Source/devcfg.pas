@@ -500,10 +500,12 @@ type
     fToolbarCompilersY: integer;
 
     // file associations (see FileAssocs.pas)
-    fAssociateCpp: boolean;
     fAssociateC: boolean;
-    fAssociateHpp: boolean;
+    fAssociateCpp: boolean;
+    fAssociateCxx: boolean;
     fAssociateH: boolean;
+    fAssociateHpp: boolean;
+    fAssociateHxx: boolean;
     fAssociateDev: boolean;
     fAssociateRc: boolean;
     fAssociateTemplate: boolean;
@@ -613,10 +615,12 @@ type
     property ToolbarCompilersY: integer read fToolbarCompilersY write fToolbarCompilersY;
 
     // file associations
-    property AssociateCpp: boolean read fAssociateCpp write fAssociateCpp;
     property AssociateC: boolean read fAssociateC write fAssociateC;
-    property AssociateHpp: boolean read fAssociateHpp write fAssociateHpp;
+    property AssociateCpp: boolean read fAssociateCpp write fAssociateCpp;
+    property AssociateCxx: boolean read fAssociateCxx write fAssociateCxx;
     property AssociateH: boolean read fAssociateH write fAssociateH;
+    property AssociateHpp: boolean read fAssociateHpp write fAssociateHpp;
+    property AssociateHxx: boolean read fAssociateHxx write fAssociateHxx;
     property AssociateDev: boolean read fAssociateDev write fAssociateDev;
     property AssociateRc: boolean read fAssociateRc write fAssociateRc;
     property AssociateTemplate: boolean read fAssociateTemplate write fAssociateTemplate;
@@ -848,7 +852,7 @@ begin
   fFindCols := '75, 75, 120, 150';
   fCompCols := '75, 75, 120, 150';
   fMsgTabs := tpTop; // Top
-  fMRUMax := 10;
+  fMRUMax := 15;
   fMinOnRun := FALSE;
   fBackup := FALSE;
   fAutoOpen := 2; // Reopen
@@ -904,11 +908,13 @@ begin
   //read associations set by installer as defaults
   fAssociateC := getAssociation(0);
   fAssociateCpp := getAssociation(1);
-  fAssociateH := getAssociation(2);
-  fAssociateHpp := getAssociation(3);
-  fAssociateDev := getAssociation(4);
-  fAssociateRc := getAssociation(5);
-  fAssociateTemplate := getAssociation(6);
+  fAssociateCxx := getAssociation(2);
+  fAssociateH := getAssociation(3);
+  fAssociateHpp := getAssociation(4);
+  fAssociateHxx := getAssociation(5);
+  fAssociateDev := getAssociation(6);
+  fAssociateRc := getAssociation(7);
+  fAssociateTemplate := getAssociation(8);
   fCheckAssocs := false;
 
   fShowTipsOnStart := FALSE; // due to popular demand

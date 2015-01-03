@@ -26,16 +26,16 @@ uses
   Windows, SysUtils, Classes, Forms, Registry, ShlObj;
 {$ENDIF}
 {$IFDEF LINUX}
-  SysUtils, Classes, QForms;
+SysUtils, Classes, QForms;
 {$ENDIF}
 
 procedure RegisterFiletype(const extension, filetype, description, verb, serverapp, IcoNum: AnsiString);
 procedure RegisterDDEServer(const filetype, verb, topic, servername, macro: AnsiString);
-procedure CheckAssociations(FixAssocs : boolean);
+procedure CheckAssociations(FixAssocs: boolean);
 procedure Associate(Index: integer);
 procedure UnAssociate(Index: integer);
 function IsAssociated(Index: integer): boolean;
-function CheckFiletype(const extension, filetype, description,verb, serverapp: AnsiString): boolean;
+function CheckFiletype(const extension, filetype, description, verb, serverapp: AnsiString): boolean;
 
 var
   DDETopic: AnsiString;
@@ -43,17 +43,19 @@ var
 const
   // if you change anything here, update devcfg.pas, specifically devData...
   // and update MustAssociate(), Associate() and UnAssociate() below
-  AssociationsCount = 7;
+  AssociationsCount = 9;
   // field 1 is the extension (no dot)
   // field 2 is the description
   // field 3 is the icon number
   // field 4 is "" (empty) if you want DDE services for this extension
   // (if not empty, launches a new instance - nice for .dev files ;)
-  Associations: array[0..6, 0..3] of AnsiString = (
+  Associations: array[0..8, 0..3] of AnsiString = (
     ('c', 'C Source File', '4', ''),
     ('cpp', 'C++ Source File', '5', ''),
+    ('cxx', 'C++ Source File', '5', ''),
     ('h', 'C Header File', '6', ''),
     ('hpp', 'C++ Header File', '7', ''),
+    ('hxx', 'C++ Header File', '7', ''),
     ('dev', 'Dev-C++ Project File', '3', 'xxx'),
     ('rc', 'Resource Source File', '8', ''),
     ('template', 'Dev-C++ Template File', '1', ''));
@@ -81,11 +83,13 @@ begin
   case Index of
     0: Result := devData.AssociateC;
     1: Result := devData.AssociateCpp;
-    2: Result := devData.AssociateH;
-    3: Result := devData.AssociateHpp;
-    4: Result := devData.AssociateDev;
-    5: Result := devData.AssociateRc;
-    6: Result := devData.AssociateTemplate;
+    2: Result := devData.AssociateCxx;
+    3: Result := devData.AssociateH;
+    4: Result := devData.AssociateHpp;
+    5: Result := devData.AssociateHxx;
+    6: Result := devData.AssociateDev;
+    7: Result := devData.AssociateRc;
+    8: Result := devData.AssociateTemplate;
   else
     Result := False;
   end;
@@ -109,11 +113,13 @@ begin
   case Index of
     0: devData.AssociateC := False;
     1: devData.AssociateCpp := False;
-    2: devData.AssociateH := False;
-    3: devData.AssociateHpp := False;
-    4: devData.AssociateDev := False;
-    5: devData.AssociateRc := False;
-    6: devData.AssociateTemplate := False;
+    2: devData.AssociateCxx := False;
+    3: devData.AssociateH := False;
+    4: devData.AssociateHpp := False;
+    5: devData.AssociateHxx := False;
+    6: devData.AssociateDev := False;
+    7: devData.AssociateRc := False;
+    8: devData.AssociateTemplate := False;
   end;
   RefreshIcons;
 end;
@@ -138,11 +144,13 @@ begin
   case Index of
     0: devData.AssociateC := True;
     1: devData.AssociateCpp := True;
-    2: devData.AssociateH := True;
-    3: devData.AssociateHpp := True;
-    4: devData.AssociateDev := True;
-    5: devData.AssociateRc := True;
-    6: devData.AssociateTemplate := True;
+    2: devData.AssociateCxx := True;
+    3: devData.AssociateH := True;
+    4: devData.AssociateHpp := True;
+    5: devData.AssociateHxx := True;
+    6: devData.AssociateDev := True;
+    7: devData.AssociateRc := True;
+    8: devData.AssociateTemplate := True;
   end;
   RefreshIcons;
 end;
@@ -209,7 +217,7 @@ begin
   end;
 end;
 
-function CheckDDEServer(const filetype, verb, servername : AnsiString): boolean;
+function CheckDDEServer(const filetype, verb, servername: AnsiString): boolean;
 var
   reg: TRegistry;
   keystring: AnsiString;
@@ -261,7 +269,7 @@ begin
   end;
 end;
 
-procedure CheckAssociations(FixAssocs : boolean); // if true, write to registry too
+procedure CheckAssociations(FixAssocs: boolean); // if true, write to registry too
 var
   I: integer;
   DdeOK: array[0..AssociationsCount - 1] of boolean;
@@ -273,26 +281,27 @@ begin
       'open',
       Application.Exename + ' "%1"');
 
-	// Unsafe
-	if FixAssocs then // set registry to last known values
-		for I := 0 to AssociationsCount - 1 do
-			if (not Associated[I]) and MustAssociate(I) then
-				Associate(I);
+  // Unsafe
+  if FixAssocs then // set registry to last known values
+    for I := 0 to AssociationsCount - 1 do
+      if (not Associated[I]) and MustAssociate(I) then
+        Associate(I);
 
   for I := 0 to AssociationsCount - 1 do
     DdeOK[I] := (Associations[I, 3] <> '') or CheckDDEServer('DevCpp.' + Associations[I, 0],
       'open',
       Uppercase(ChangeFileExt(ExtractFilename(Application.Exename), EmptyStr)));
 
-	if FixAssocs then
-		for I := 0 to AssociationsCount - 1 do
-			if (not DdeOK[I]) and MustAssociate(I) then
-				RegisterDDEServer(
-					'DevCpp.' + Associations[I, 0],
-					'open',
-					DDETopic,
-					Uppercase(ChangeFileExt(ExtractFilename(Application.Exename), EmptyStr)),
-					'[Open("%1")]');
+  if FixAssocs then
+    for I := 0 to AssociationsCount - 1 do
+      if (not DdeOK[I]) and MustAssociate(I) then
+        RegisterDDEServer(
+          'DevCpp.' + Associations[I, 0],
+          'open',
+          DDETopic,
+          Uppercase(ChangeFileExt(ExtractFilename(Application.Exename), EmptyStr)),
+          '[Open("%1")]');
 end;
 
 end.
+
