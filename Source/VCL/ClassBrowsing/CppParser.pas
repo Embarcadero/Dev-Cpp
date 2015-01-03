@@ -99,14 +99,14 @@ type
     function GetLastCurrentClass: PStatement; // gets last item from lastt level
     function GetCurrentClassLevel: TList;
     function IsInCurrentClassLevel(const Command: AnsiString): PStatement;
-    procedure AddClassLevel(Statement: PStatement); // adds new level
-    procedure AddClassSynonym(Statement: PStatement); // adds to current level
+    procedure AddSoloClassLevel(Statement: PStatement); // adds new solo level
+    procedure AddMultiClassLevel(StatementList: TList); // adds new multi level
     procedure RemoveClassLevel; // removes level
     procedure CheckForSkipStatement;
     function SkipBraces(StartAt: integer): integer;
     function CheckForPreprocessor: boolean;
     function CheckForKeyword: boolean;
-    function CheckForMember: boolean;
+
     function CheckForTypedef: boolean;
     function CheckForTypedefEnum: boolean;
     function CheckForTypedefStruct: boolean;
@@ -117,7 +117,6 @@ type
     function CheckForEnum: boolean;
     function GetScope: TStatementScope;
     procedure HandlePreprocessor;
-    procedure HandleMember;
     procedure HandleOtherTypedefs;
     procedure HandleStructs(IsTypedef: boolean = False);
     procedure HandleMethod(const sType, sName, sArgs: AnsiString);
@@ -170,9 +169,7 @@ type
     function FindStatementOf(FileName, Phrase: AnsiString; Row: integer; Stream: TMemoryStream): PStatement; overload;
     function FindStatementOf(Phrase: AnsiString; CurrentClass: PStatement): PStatement; overload;
     function FindVariableOf(const Phrase: AnsiString; CurrentClass: PStatement): PStatement;
-    function FindTypeDefinitionOf(const aType: AnsiString; CurrentClass: PStatement; MaxSearchStatementNode:
-      PStatementNode =
-      nil): PStatement;
+    function FindTypeDefinitionOf(const aType: AnsiString; CurrentClass: PStatement): PStatement;
     function GetClass(const Phrase: AnsiString): AnsiString;
     function GetMember(const Phrase: AnsiString): AnsiString;
     function GetOperator(const Phrase: AnsiString): AnsiString;
@@ -535,7 +532,7 @@ begin
   end;
 end;
 
-procedure TCppParser.AddClassLevel(Statement: PStatement);
+procedure TCppParser.AddSoloClassLevel(Statement: PStatement);
 var
   NewLevel: TList;
 begin
@@ -553,18 +550,21 @@ begin
     fClassScope := scsPublic; // structs are public by default
 end;
 
-procedure TCppParser.AddClassSynonym(Statement: PStatement);
+procedure TCppParser.AddMultiClassLevel(StatementList: TList);
 var
-  CurrentLevel: TList;
+  Statement: PStatement;
+  ListCopy: TList;
 begin
-  // Append class list
-  if fCurrentClass.Count = 0 then begin
-    AddClassLevel(Statement);
-    Exit;
-  end;
+  // Add list to list
+  ListCopy := TList.Create;
+  ListCopy.Assign(StatementList);
+  fCurrentClass.Add(ListCopy);
 
-  CurrentLevel := fCurrentClass[fCurrentClass.Count - 1];
-  CurrentLevel.Add(Statement);
+  // Check scope of first one
+  if StatementList.Count > 0 then
+    Statement := StatementList[0]
+  else
+    Statement := nil;
 
   // Set new scope
   if Statement = nil then begin
@@ -778,11 +778,6 @@ begin
   SameStr(fTokenizer[fIndex]^.Text, 'while') or // skip to )
   SameStr(fTokenizer[fIndex]^.Text, 'xor') or // skip
   SameStr(fTokenizer[fIndex]^.Text, 'xor_eq'); // skip
-end;
-
-function TCppParser.CheckForMember: boolean;
-begin
-  Result := SameStr(fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)], '.');
 end;
 
 function TCppParser.CheckForTypedef: boolean;
@@ -1001,14 +996,6 @@ begin
   fIndex := fIndexBackup;
 end;
 
-procedure TCppParser.HandleMember;
-begin
-  repeat
-    Inc(fIndex);
-  until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';', '}']);
-  Inc(fIndex);
-end;
-
 procedure TCppParser.HandleOtherTypedefs;
 var
   NewType, OldType: AnsiString;
@@ -1126,27 +1113,19 @@ end;
 
 procedure TCppParser.HandleStructs(IsTypedef: boolean = False);
 var
-  S1, Prefix, OldType, NewType: AnsiString;
+  Command, Prefix, OldType, NewType: AnsiString;
   I: integer;
-  IsStruct, ClassLevelAdded: boolean;
-  StructParent, LastStatement: PStatement;
+  IsStruct: boolean;
+  FirstSynonym, LastStatement: PStatement;
+  SharedInheritance, NewClassLevel: TList;
 begin
   // Check if were dealing with a struct or union
   Prefix := fTokenizer[fIndex]^.Text;
   IsStruct := SameStr(Prefix, 'struct') or SameStr(Prefix, 'union');
   Inc(fIndex); //skip 'struct'
 
-  // True if class level for opening brace has been added
-  ClassLevelAdded := False;
-
   // Do not modifiy index initially
   I := fIndex;
-
-  // Current class can change while handling classes. Store it here
-  StructParent := GetLastCurrentClass;
-
-  // Remember last statement so we can set its inheritance/set it as the current class
-  LastStatement := nil;
 
   // Skip until the struct body starts
   while (I < fTokenizer.Tokens.Count) and not (fTokenizer[I]^.Text[1] in [';', '{']) do
@@ -1163,7 +1142,7 @@ begin
         if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';']) then begin
           NewType := fTokenizer[fIndex]^.Text;
           AddStatement(
-            StructParent,
+            GetLastCurrentClass,
             fCurrentFile,
             'typedef ' + Prefix + ' ' + OldType + ' ' + NewType, // override hint
             OldType,
@@ -1189,117 +1168,118 @@ begin
 
     // normal class/struct decl
   end else begin
-    if fTokenizer[fIndex]^.Text[1] <> '{' then begin
-      S1 := '';
-      repeat
-        if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', '{', ':']) then
-          begin
-          S1 := fTokenizer[fIndex]^.Text;
-
-          // TODO: fix this the nice way
-        {  if (S1 = 'basic_string') and (S2 = 'basic_string') then begin
-            S1 := 'string';
-            S2 := 'string';
-          end;  }
-
-          if S1 <> '' then begin
-            LastStatement := AddStatement(
-              StructParent,
-              fCurrentFile,
-              '', // do not override hint
-              Prefix, // type
-              S1, // command
-              '', // args
-              fTokenizer[fIndex]^.Line,
-              skClass,
-              GetScope,
-              fClassScope,
-              True,
-              False,
-              True,
-              TList.Create);
-            AddClassLevel(LastStatement);
-            ClassLevelAdded := True;
-          end;
-          S1 := '';
-        end;
-        Inc(fIndex);
-      until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [':', '{', ';']);
-    end;
-
-    // Walk to opening brace if we encountered inheritance statements
-    if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then begin
-      if Assigned(LastStatement) then
-        SetInheritance(fIndex, LastStatement); // set the _InheritsFromClasses value
-      while (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] <> '{') do // skip decl after ':'
-        Inc(fIndex);
-    end;
-
-    // Check for struct names after '}'
-    if IsStruct then begin
-
-      // Walk to closing brace
-      I := SkipBraces(fIndex);
-
-      // Skip something?
-      S1 := '';
-      if (I + 1 < fTokenizer.Tokens.Count) and not (fTokenizer[I + 1]^.Text[1] in [';', '}']) then
-        fSkipList.Add(I + 1);
-
-      // Add synonyms after }
-      if (I + 1 < fTokenizer.Tokens.Count) then begin
+    FirstSynonym := nil;
+    NewClassLevel := TList.Create;
+    try
+      if fTokenizer[fIndex]^.Text[1] <> '{' then begin
+        Command := '';
         repeat
-          Inc(I);
-
-          if not (fTokenizer[I]^.Text[1] in ['{', ',', ';']) then begin
-            if (fTokenizer[I]^.Text[1] = '_') and (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = '_') then begin
-              // skip possible gcc attributes
-              // start and end with 2 underscores (i.e. __attribute__)
-              // so, to avoid slow checks of strings, we just check the first and last letter of the token
-              // if both are underscores, we split
-              Break;
-            end else begin
-              if fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = ']' then // cut-off array brackets
-                S1 := S1 + Copy(fTokenizer[I]^.Text, 1, Pos('[', fTokenizer[I]^.Text) - 1) + ' '
-              else if fTokenizer[I]^.Text[1] in ['*', '&'] then // do not add spaces after pointer operator
-                S1 := S1 + fTokenizer[I]^.Text
-              else
-                S1 := S1 + fTokenizer[I]^.Text + ' ';
-            end;
-          end else begin
-            S1 := TrimRight(S1);
-            if S1 <> '' then begin
-              LastStatement := AddStatement(
-                StructParent,
+          if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', '{', ':']) then
+            begin
+            Command := fTokenizer[fIndex]^.Text;
+            if Command <> '' then begin
+              FirstSynonym := AddStatement(
+                GetLastCurrentClass,
                 fCurrentFile,
                 '', // do not override hint
-                Prefix,
-                S1,
-                '',
-                fTokenizer[I]^.Line,
+                Prefix, // type
+                Command, // command
+                '', // args
+                fTokenizer[fIndex]^.Line,
                 skClass,
                 GetScope,
                 fClassScope,
                 True,
                 False,
                 True,
-                nil);
-              if ClassLevelAdded then
-                AddClassSynonym(LastStatement)
-              else begin
-                AddClassLevel(LastStatement);
-                ClassLevelAdded := True;
+                TList.Create);
+              NewClassLevel.Add(FirstSynonym);
+            end;
+            Command := '';
+          end;
+          Inc(fIndex);
+        until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [':', '{', ';']);
+      end;
+
+      // Walk to opening brace if we encountered inheritance statements
+      if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then begin
+        if Assigned(FirstSynonym) then
+          SetInheritance(fIndex, FirstSynonym); // set the _InheritanceList value
+        while (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] <> '{') do // skip decl after ':'
+          Inc(fIndex);
+      end;
+
+      // Check for struct synonyms after '}'
+      if IsStruct then begin
+
+        // Walk to closing brace
+        I := SkipBraces(fIndex);
+
+        // Skip something?
+        if (I + 1 < fTokenizer.Tokens.Count) and not (fTokenizer[I + 1]^.Text[1] in [';', '}']) then
+          fSkipList.Add(I + 1);
+
+        // Add synonyms after }
+        if (I + 1 < fTokenizer.Tokens.Count) then begin
+          Command := '';
+          repeat
+            Inc(I);
+
+            if not (fTokenizer[I]^.Text[1] in ['{', ',', ';']) then begin
+              if (fTokenizer[I]^.Text[1] = '_') and (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = '_') then begin
+                // skip possible gcc attributes
+                // start and end with 2 underscores (i.e. __attribute__)
+                // so, to avoid slow checks of strings, we just check the first and last letter of the token
+                // if both are underscores, we split
+                Break;
+              end else begin
+                if fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = ']' then // cut-off array brackets
+                  Command := Command + Copy(fTokenizer[I]^.Text, 1, Pos('[', fTokenizer[I]^.Text) - 1) + ' '
+                else if fTokenizer[I]^.Text[1] in ['*', '&'] then // do not add spaces after pointer operator
+                  Command := Command + fTokenizer[I]^.Text
+                else
+                  Command := Command + fTokenizer[I]^.Text + ' ';
+              end;
+            end else begin
+              Command := TrimRight(Command);
+              if Command <> '' then begin
+                if Assigned(FirstSynonym) then begin
+                  SharedInheritance := TList.Create;
+                  SharedInheritance.Assign(FirstSynonym^._InheritanceList);
+                end else
+                  SharedInheritance := nil;
+                LastStatement := AddStatement(
+                  GetLastCurrentClass,
+                  fCurrentFile,
+                  '', // do not override hint
+                  Prefix,
+                  Command,
+                  '',
+                  fTokenizer[I]^.Line,
+                  skClass,
+                  GetScope,
+                  fClassScope,
+                  True,
+                  False,
+                  True,
+                  SharedInheritance); // all synonyms inherit from the same statements
+                NewClassLevel.Add(LastStatement);
+                Command := '';
               end;
             end;
-            S1 := '';
-          end;
-        until (I >= fTokenizer.Tokens.Count - 1) or (fTokenizer[I]^.Text[1] in ['{', ';']);
+          until (I >= fTokenizer.Tokens.Count - 1) or (fTokenizer[I]^.Text[1] in ['{', ';']);
+        end;
       end;
-    end;
 
-    // Step over {
-    if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '{') then
-      Inc(fIndex);
+      // Set current class level
+      AddMultiClassLevel(NewClassLevel);
+
+      // Step over {
+      if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '{') then
+        Inc(fIndex);
+    finally
+      NewClassLevel.Free;
+    end;
   end;
 end;
 
@@ -1363,23 +1343,40 @@ begin
     else
       FunctionKind := skFunction;
 
-    // If this is a class function, check for duplicates to form declaration/definition pairs
-    // If this is a global function, don't perform duplicate checks (allow overloading), even if we do not check arg lists
-    AddStatement(
-      FunctionClass,
-      fCurrentFile,
-      '', // do not override hint
-      sType,
-      ScopelessName,
-      sArgs,
-      fTokenizer[fIndex - 1]^.Line,
-      FunctionKind,
-      GetScope,
-      fClassScope,
-      True,
-      not IsDeclaration, // check for declarations when we find an definition of a function
-      not IsDeclaration,
-      nil);
+    // For function definitions, the parent class is given. Only use that as a parent
+    if not IsDeclaration then
+      AddStatement(
+        FunctionClass,
+        fCurrentFile,
+        '', // do not override hint
+        sType,
+        ScopelessName,
+        sArgs,
+        fTokenizer[fIndex - 1]^.Line,
+        FunctionKind,
+        GetScope,
+        fClassScope,
+        True,
+        not IsDeclaration, // check for declarations when we find an definition of a function
+        not IsDeclaration,
+        nil)
+
+      // For function declarations, any given statement can belong to multiple typedef names
+    else
+      AddChildStatements(
+        GetCurrentClassLevel,
+        fCurrentFile,
+        '', // do not override hint
+        sType,
+        ScopelessName,
+        sArgs,
+        fTokenizer[fIndex - 1]^.Line,
+        FunctionKind,
+        GetScope,
+        fClassScope,
+        True,
+        not IsDeclaration, // check for declarations when we find an definition of a function
+        not IsDeclaration);
   end;
 
   // Don't parse the function's block now... It will be parsed when user presses ctrl+space inside it ;)
@@ -1702,7 +1699,7 @@ var
   S1, S2, S3: AnsiString;
 begin
   if fTokenizer[fIndex]^.Text[1] = '{' then begin
-    AddClassLevel(nil);
+    AddSoloClassLevel(nil);
     Inc(fIndex);
   end else if fTokenizer[fIndex]^.Text[1] = '}' then begin
     RemoveClassLevel;
@@ -1711,8 +1708,6 @@ begin
     HandlePreprocessor;
   end else if CheckForKeyword then begin // includes template now
     HandleKeyword;
-  end else if CheckForMember then begin
-    HandleMember;
   end else if CheckForScope then begin
     HandleScope;
   end else if CheckForEnum then begin
@@ -2340,7 +2335,7 @@ begin
       fLaterScanning := True;
       repeat
         if fTokenizer[fIndex]^.Text[1] = '{' then begin
-          AddClassLevel(nil);
+          AddSoloClassLevel(nil);
           Inc(fIndex);
         end else if fTokenizer[fIndex]^.Text[1] = '}' then begin
           RemoveClassLevel;
@@ -2505,7 +2500,7 @@ end;
 function TCppParser.PrettyPrintStatement(Statement: PStatement): AnsiString;
   function GetScopePrefix: AnsiString;
   var
-  ScopeStr: AnsiString;
+    ScopeStr: AnsiString;
   begin
     ScopeStr := StatementClassScopeStr(Statement^._ClassScope); // can be blank
     if ScopeStr <> '' then
@@ -2603,8 +2598,7 @@ begin
   end;
 end;
 
-function TCppParser.FindTypeDefinitionOf(const aType: AnsiString; CurrentClass: PStatement; MaxSearchStatementNode:
-  PStatementNode = nil): PStatement;
+function TCppParser.FindTypeDefinitionOf(const aType: AnsiString; CurrentClass: PStatement): PStatement;
 var
   Node: PStatementNode;
   Statement: PStatement;
@@ -2630,33 +2624,22 @@ begin
     Delete(s, 1, position);
 
   // Seach them
-  if Assigned(MaxSearchStatementNode) then
-    Node := MaxSearchStatementNode // Prevent infinite loops for typedef recursion
-  else
-    Node := fStatementList.LastNode;
+  Node := fStatementList.LastNode;
   while Assigned(Node) do begin
     Statement := Node^.Data;
     if Statement^._Parent = CurrentClass then begin // TODO: type definitions can have scope too
       if Statement^._Kind = skClass then begin // these have type 'class'
         // We have found the statement of the type directly
         if SameStr(Statement^._Command, s) then begin
-          result := Statement; // 'class foo'
+          Result := Statement; // 'class foo'
           Exit;
         end;
-        {  end else if Statement^._Kind in [skVariable, skFunction] then begin
-            if SameStr(Statement^._Type, '') then begin
-              // We have found a variable with the same name, search for type
-              if SameStr(Statement^._Command, s) then begin
-                result := Statement;
-                Exit;
-              end;
-            end; }
       end else if Statement^._Kind = skTypedef then begin
         // We have found a variable with the same name, search for type
         if SameStr(Statement^._Command, s) then begin
-          result := FindTypeDefinitionOf(Statement^._Type, CurrentClass, Node);
-          if result = nil then // found end of typedef trail, return result
-            result := Statement;
+          Result := FindTypeDefinitionOf(Statement^._Type, CurrentClass);
+          if Result = nil then // found end of typedef trail, return result
+            Result := Statement;
           Exit;
         end;
       end;

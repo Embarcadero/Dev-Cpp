@@ -8,6 +8,12 @@ int main() {
 		a = 3;
 	}
 	
+	if(a < 3) {
+		b = false;
+	}
+	
+	b = a < 3;
+	
 	// String stuff
 	char buffer[256];
 }

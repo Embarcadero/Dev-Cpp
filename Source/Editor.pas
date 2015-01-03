@@ -896,7 +896,6 @@ begin
 
   // Position the caret
   fText.CaretXY := BufferCoord(Col, Line);
-  fText.TopLine := 1;
   fText.EnsureCursorPosVisibleEx(True); // scroll to line
 end;
 
