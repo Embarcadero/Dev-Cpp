@@ -35,3 +35,4 @@ typedef struct D3DXVECTOR3 : public D3DVECTOR
 
 class float3 : public D3DXVECTOR3 {
 };
+

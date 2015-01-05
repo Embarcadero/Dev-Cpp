@@ -1122,7 +1122,7 @@ begin
   // Check if were dealing with a struct or union
   Prefix := fTokenizer[fIndex]^.Text;
   IsStruct := SameStr(Prefix, 'struct') or SameStr(Prefix, 'union');
-  Inc(fIndex); //skip 'struct'
+  Inc(fIndex); //skip struct/class/union
 
   // Do not modifiy index initially
   I := fIndex;
@@ -1133,7 +1133,6 @@ begin
 
   // Forward class/struct decl *or* typedef, e.g. typedef struct some_struct synonym1, synonym2;
   if (I < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = ';') then begin
-
     // typdef struct Foo Bar
     if IsTypedef then begin
       OldType := fTokenizer[fIndex]^.Text;
@@ -1169,59 +1168,62 @@ begin
     // normal class/struct decl
   end else begin
     FirstSynonym := nil;
-    NewClassLevel := TList.Create;
-    try
-      if fTokenizer[fIndex]^.Text[1] <> '{' then begin
-        Command := '';
-        repeat
-          if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', '{', ':']) then
-            begin
-            Command := fTokenizer[fIndex]^.Text;
-            if Command <> '' then begin
-              FirstSynonym := AddStatement(
-                GetLastCurrentClass,
-                fCurrentFile,
-                '', // do not override hint
-                Prefix, // type
-                Command, // command
-                '', // args
-                fTokenizer[fIndex]^.Line,
-                skClass,
-                GetScope,
-                fClassScope,
-                True,
-                False,
-                True,
-                TList.Create);
-              NewClassLevel.Add(FirstSynonym);
-            end;
+
+    // Add class/struct name BEFORE opening brace
+    if fTokenizer[fIndex]^.Text[1] <> '{' then begin
+      repeat
+        if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', '{', ':']) then
+          begin
+          Command := fTokenizer[fIndex]^.Text;
+          if Command <> '' then begin
+            FirstSynonym := AddStatement(
+              GetLastCurrentClass,
+              fCurrentFile,
+              '', // do not override hint
+              Prefix, // type
+              Command, // command
+              '', // args
+              fTokenizer[fIndex]^.Line,
+              skClass,
+              GetScope,
+              fClassScope,
+              True,
+              False,
+              True,
+              TList.Create);
             Command := '';
           end;
-          Inc(fIndex);
-        until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [':', '{', ';']);
-      end;
+        end;
+        Inc(fIndex);
+      until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [':', '{', ';']);
+    end;
 
-      // Walk to opening brace if we encountered inheritance statements
-      if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then begin
-        if Assigned(FirstSynonym) then
-          SetInheritance(fIndex, FirstSynonym); // set the _InheritanceList value
-        while (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] <> '{') do // skip decl after ':'
-          Inc(fIndex);
-      end;
+    // Walk to opening brace if we encountered inheritance statements
+    if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then begin
+      if Assigned(FirstSynonym) then
+        SetInheritance(fIndex, FirstSynonym); // set the _InheritanceList value
+      while (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] <> '{') do // skip decl after ':'
+        Inc(fIndex);
+    end;
 
-      // Check for struct synonyms after '}'
-      if IsStruct then begin
+    // Check for struct synonyms after close brace
+    if IsStruct then begin
 
-        // Walk to closing brace
-        I := SkipBraces(fIndex);
+      // Walk to closing brace
+      I := SkipBraces(fIndex); // step onto closing brace
 
-        // Skip something?
-        if (I + 1 < fTokenizer.Tokens.Count) and not (fTokenizer[I + 1]^.Text[1] in [';', '}']) then
-          fSkipList.Add(I + 1);
+      // When encountering names again after struct body scanning, skip it
+      if (I + 1 < fTokenizer.Tokens.Count) and not (fTokenizer[I + 1]^.Text[1] in [';', '}']) then
+        fSkipList.Add(I + 1); // add first name to skip statement so that we can skip it until the next ;
 
-        // Add synonyms after }
-        if (I + 1 < fTokenizer.Tokens.Count) then begin
-          Command := '';
+      // Add class/struct synonyms after close brace
+      if (I + 1 < fTokenizer.Tokens.Count) and not (fTokenizer[I + 1]^.Text[1] in [';', '}']) then begin
+        Command := '';
+        NewClassLevel := TList.Create;
+        try
+          // Add synonym before opening brace
+          if Assigned(FirstSynonym) then
+            NewClassLevel.Add(FirstSynonym);
           repeat
             Inc(I);
 
@@ -1268,18 +1270,26 @@ begin
               end;
             end;
           until (I >= fTokenizer.Tokens.Count - 1) or (fTokenizer[I]^.Text[1] in ['{', ';']);
+
+          // Set current class level
+          AddMultiClassLevel(NewClassLevel);
+        finally
+          NewClassLevel.Free;
         end;
-      end;
 
-      // Set current class level
-      AddMultiClassLevel(NewClassLevel);
+        // Nothing worth mentioning after closing brace
+        // Proceed to set first synonym as current class
+      end else if Assigned(FirstSynonym) then
+        AddSoloClassLevel(FirstSynonym);
 
-      // Step over {
-      if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '{') then
-        Inc(fIndex);
-    finally
-      NewClassLevel.Free;
-    end;
+      // Classes do not have synonyms after the brace
+      // Proceed to set first synonym as current class
+    end else
+      AddSoloClassLevel(FirstSynonym);
+
+    // Step over {
+    if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '{') then
+      Inc(fIndex);
   end;
 end;
 
@@ -1713,14 +1723,14 @@ begin
   end else if CheckForEnum then begin
     HandleEnum;
   end else if CheckForTypedef then begin
-    if CheckForTypedefStruct then begin
+    if CheckForTypedefStruct then begin // typedef struct something
       Inc(fIndex); // skip 'typedef'
       HandleStructs(True)
-    end else if CheckForTypedefEnum then begin
+    end else if CheckForTypedefEnum then begin // typedef enum something
       Inc(fIndex); // skip 'typedef'
       HandleEnum;
     end else
-      HandleOtherTypedefs;
+      HandleOtherTypedefs; // typedef Foo Bar
   end else if CheckForStructs then begin
     HandleStructs(False);
   end else if CheckForMethod(S1, S2, S3) then begin
@@ -2515,7 +2525,7 @@ function TCppParser.PrettyPrintStatement(Statement: PStatement): AnsiString;
     Result := '';
     WalkStatement := Statement;
     while Assigned(WalkStatement^._Parent) do begin
-      Result := Result + WalkStatement^._Parent^._Command + '::';
+      Result := WalkStatement^._Parent^._Command + '::' + Result;
       WalkStatement := WalkStatement^._Parent;
     end;
   end;
@@ -2532,13 +2542,9 @@ begin
     Result := Statement^._HintText;
   end else begin
     case Statement^._Kind of
-      skClass: begin
-          Result := GetScopePrefix; // public
-          Result := Result + Statement^._Type + ' '; // class/struct/union
-          Result := Result + Statement^._Command; // Foo
-        end;
       skFunction,
-        skVariable: begin
+        skVariable,
+        skClass: begin
           Result := GetScopePrefix; // public
           Result := Result + Statement^._Type + ' '; // void
           Result := Result + GetParentPrefix; // A::B::C::
