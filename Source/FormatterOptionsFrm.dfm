@@ -46,7 +46,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
     Caption = '&OK'
     Default = True
     ModalResult = 1
-    TabOrder = 0
+    TabOrder = 1
     OnClick = btnOkClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -76,7 +76,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
     Cancel = True
     Caption = '&Cancel'
     ModalResult = 2
-    TabOrder = 1
+    TabOrder = 2
     OnClick = btnCancelClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -103,7 +103,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
     Width = 85
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 2
+    TabOrder = 3
     OnClick = btnHelpClick
     Kind = bkHelp
   end
@@ -117,7 +117,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
     Font.Height = -13
     Font.Name = 'Courier New'
     Font.Style = []
-    TabOrder = 3
+    TabOrder = 0
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
     Gutter.Font.Height = -11
@@ -188,7 +188,9 @@ object FormatterOptionsForm: TFormatterOptionsForm
       Top = 20
       Width = 145
       Height = 23
+      Style = csDropDownList
       ItemHeight = 15
+      ItemIndex = 0
       TabOrder = 0
       Text = '(do not modify)'
       OnChange = OptionChange
@@ -212,6 +214,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
       Top = 52
       Width = 145
       Height = 23
+      Style = csDropDownList
       ItemHeight = 15
       ItemIndex = 0
       TabOrder = 1
@@ -259,7 +262,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
       Width = 129
       Height = 17
       Caption = 'Namespaces'
-      TabOrder = 5
+      TabOrder = 6
       OnClick = OptionChange
     end
     object chkCases: TCheckBox
@@ -268,7 +271,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
       Width = 129
       Height = 17
       Caption = 'Cases'
-      TabOrder = 6
+      TabOrder = 5
       OnClick = OptionChange
     end
     object chkLabels: TCheckBox
