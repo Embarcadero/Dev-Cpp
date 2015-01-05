@@ -246,7 +246,7 @@ type
     procedure SaveSettings;
     procedure LoadSettings;
     function Validate: Boolean; // check if AStyle.exe can be found
-    function FormatNewFile(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString; // apply formatting
+    function FormatMemory(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString; // apply formatting
     function FormatFile(const FileName, OverrideCommand: AnsiString): AnsiString; // apply formatting
     function GetVersion: AnsiString;
   published
@@ -2529,7 +2529,7 @@ begin
   Result := True;
 end;
 
-function TdevFormatter.FormatNewFile(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString;
+function TdevFormatter.FormatMemory(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString;
 var
   FileName: AnsiString;
 begin

@@ -27,6 +27,7 @@ void GitPush() {
 int main() {
 	// Add source files
 	GitAdd("Source");
+	GitAdd("AStyle");
 	GitAdd("*.nsi");
 	GitAdd("NEWS.txt");
 	GitAdd("devcpp.ico");

@@ -174,7 +174,7 @@ object MainForm: TMainForm
         end
         object chkShortenPaths: TCheckBox
           Left = 4
-          Top = 130
+          Top = 132
           Width = 144
           Height = 17
           Action = actShortenCompPaths
