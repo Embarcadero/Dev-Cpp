@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -149,7 +149,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 156
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 396
-          Height = 119
+          Height = 118
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -410,7 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 49
+          Height = 48
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
@@ -449,7 +449,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 992
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -1608,8 +1608,22 @@ object MainForm: TMainForm
         Action = actPackageManager
       end
     end
+    object FormatMenu: TMenuItem
+      Caption = 'AStyle'
+      GroupIndex = 9
+      object FormatCurrentFile1: TMenuItem
+        Action = actFormatCurrentFile
+      end
+      object N46: TMenuItem
+        Caption = '-'
+      end
+      object actFormatOptions1: TMenuItem
+        Action = actFormatOptions
+      end
+    end
     object WindowMenu: TMenuItem
       Caption = '&Window'
+      GroupIndex = 9
       OnClick = actWindowMenuExecute
       object CloseAllItem: TMenuItem
         Action = actCloseAll
@@ -2291,6 +2305,7 @@ object MainForm: TMainForm
       OnUpdate = actUpdateProject
     end
     object actShowBars: TAction
+      Category = 'View'
       Caption = 'Show Toolbars'
       ShortCut = 32890
       OnExecute = actShowBarsExecute
@@ -2666,36 +2681,43 @@ object MainForm: TMainForm
       OnUpdate = actUpdateDebuggerRunning
     end
     object actMsgCut: TAction
+      Category = 'Messages'
       Caption = 'Cut'
       ShortCut = 16472
       OnExecute = actMsgCutExecute
     end
     object actMsgCopy: TAction
+      Category = 'Messages'
       Caption = 'Copy'
       ShortCut = 16451
       OnExecute = actMsgCopyExecute
     end
     object actMsgCopyAll: TAction
+      Category = 'Messages'
       Caption = 'Copy All'
       ShortCut = 24643
       OnExecute = actMsgCopyAllExecute
     end
     object actMsgPaste: TAction
+      Category = 'Messages'
       Caption = 'Paste'
       ShortCut = 16470
       OnExecute = actMsgPasteExecute
     end
     object actMsgSelAll: TAction
+      Category = 'Messages'
       Caption = 'Select All'
       ShortCut = 16449
       OnExecute = actMsgSelAllExecute
     end
     object actMsgSaveAll: TAction
+      Category = 'Messages'
       Caption = 'Save All'
       ShortCut = 16467
       OnExecute = actMsgSaveAllExecute
     end
     object actMsgClear: TAction
+      Category = 'Messages'
       Caption = 'Clear'
       OnExecute = actMsgClearExecute
     end
@@ -2790,6 +2812,18 @@ object MainForm: TMainForm
       Caption = 'Goto Breakpoint'
       OnExecute = actGotoBreakPointExecute
       OnUpdate = actUpdateDebuggerRunning
+    end
+    object actFormatCurrentFile: TAction
+      Category = 'AStyle'
+      Caption = 'Format Current File'
+      ShortCut = 49222
+      OnExecute = actFormatCurrentFileExecute
+      OnUpdate = actUpdateEmptyEditor
+    end
+    object actFormatOptions: TAction
+      Category = 'AStyle'
+      Caption = 'Formatting Options'
+      OnExecute = actFormatOptionsExecute
     end
   end
   object MessagePopup: TPopupMenu

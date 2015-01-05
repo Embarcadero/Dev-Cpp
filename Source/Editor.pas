@@ -301,11 +301,11 @@ begin
   end else
     fNew := True;
 
+  // Set constant options
   fText.Parent := fTabSheet;
   fText.Visible := True;
   fText.Align := alClient;
   fText.PopupMenu := MainForm.EditorPopup;
-  fText.WantTabs := True;
   fText.ShowHint := True;
   fText.OnStatusChange := EditorStatusChange;
   fText.OnReplaceText := EditorReplaceText;
@@ -322,14 +322,6 @@ begin
   fText.OnKeyDown := EditorKeyDown;
   fText.OnKeyUp := EditorKeyUp;
   fText.OnPaintTransient := EditorPaintTransient;
-  fText.MaxScrollWidth := 4096; // bug-fix #600748
-  fText.MaxUndo := 4096;
-  fText.BorderStyle := bsNone;
-  fText.FontSmoothing := fsmClearType;
-  
-  fText.Gutter.LeftOffset := 4;
-  fText.Gutter.RightOffset := 21;
-  fText.Gutter.BorderStyle := gbsNone;
 
   // Set the variable options
   devEditor.AssignEditor(fText, fFileName);
@@ -895,7 +887,7 @@ begin
     Self.Activate;
 
   // Position the caret
-  fText.CaretXY := BufferCoord(Col, Line);
+  fText.SetCaretXYEx(False, BufferCoord(Col, Line)); // prop CaretXY calls EnsureCursorPosVisibleEx(False)
   fText.EnsureCursorPosVisibleEx(True); // scroll to line
 end;
 
@@ -1158,6 +1150,10 @@ end;
 
 procedure TEditor.EditorKeyPress(Sender: TObject; var Key: Char);
 begin
+  // Don't offer completion functions for plain text files
+  if not Assigned(fText.Highlighter) then
+    Exit;
+
   // Doing this here instead of in EditorKeyDown to be able to delete some key messages
   HandleSymbolCompletion(Key);
 
@@ -1185,6 +1181,11 @@ var
     end;
   end;
 begin
+  // Don't offer completion functions for plain text files
+  if not Assigned(fText.Highlighter) then
+    Exit;
+
+  // See if we can undo what has been inserted by HandleSymbolCompletion
   case (Key) of
     VK_CONTROL: begin
         Reason := HandpointAllowed(p, Shift);

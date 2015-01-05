@@ -580,7 +580,6 @@ type
     procedure RedoItem;
     procedure InternalSetCaretXY(const Value: TBufferCoord); virtual;
     procedure SetCaretXY(const Value: TBufferCoord); virtual;
-    procedure SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord); virtual;
     procedure SetFontSmoothing(AValue: TSynFontSmoothMethod);
     procedure SetName(const Value: TComponentName); override;
     procedure SetReadOnly(Value: boolean); virtual;
@@ -635,6 +634,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Canvas;
+    procedure SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord); virtual;
     property SelStart: Integer read GetSelStart write SetSelStart;
     property SelEnd: Integer read GetSelEnd write SetSelEnd;
     property AlwaysShowCaret: Boolean read FAlwaysShowCaret

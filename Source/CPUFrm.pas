@@ -181,13 +181,16 @@ begin
   edFunc.Text := fAssembler.Strings[0];
 
   CodeList.BeginUpdate;
-  CodeList.Clear;
-  for I := 1 to fAssembler.Count - 1 do begin
-    CodeList.Lines.Add(fAssembler.Strings[i]);
-    if StartsStr('=>', fAssembler.Strings[i]) then
-      activeline := i + 1;
+  try
+    CodeList.Clear;
+    for I := 1 to fAssembler.Count - 1 do begin
+      CodeList.Lines.Add(fAssembler.Strings[i]);
+      if StartsStr('=>', fAssembler.Strings[i]) then
+        activeline := i + 1;
+    end;
+  finally
+    CodeList.EndUpdate;
   end;
-  CodeList.EndUpdate;
 
   // Free list for reuse
   fAssembler.Clear;
@@ -222,8 +225,7 @@ begin
   LoadText;
 
   // Make it look a bit like a regular editor
-  CodeList.Font.Assign(devEditor.Font);
-  CodeList.Highlighter := dmMain.GetHighlighter('main.cpp'); // use C++ highlighting
+  devEditor.AssignEditor(CodeList,'main.cpp');
 
   RadioATT.Checked := devData.UseATTSyntax;
   RadioIntel.Checked := not devData.UseATTSyntax;

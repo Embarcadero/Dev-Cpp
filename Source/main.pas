@@ -31,7 +31,7 @@ uses
   debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
   devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg,
-  CppPreprocessor, CBUtils, StatementList;
+  CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
@@ -536,6 +536,12 @@ type
     Abortcompilation2: TMenuItem;
     actToggleCommentInline: TAction;
     actCommentInlineSel1: TMenuItem;
+    FormatMenu: TMenuItem;
+    actFormatCurrentFile: TAction;
+    FormatCurrentFile1: TMenuItem;
+    actFormatOptions: TAction;
+    actFormatOptions1: TMenuItem;
+    N46: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure ToggleBookmarkClick(Sender: TObject);
@@ -788,6 +794,8 @@ type
     procedure actGotoBreakPointExecute(Sender: TObject);
     procedure actToggleCommentInlineExecute(Sender: TObject);
     procedure actToggleCommentInlineUpdate(Sender: TObject);
+    procedure actFormatCurrentFileExecute(Sender: TObject);
+    procedure actFormatOptionsExecute(Sender: TObject);
   private
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
@@ -1230,6 +1238,10 @@ begin
   actConfigdevShortcuts.Caption := Lang[ID_ITEM_SHORTCUTSCONFIG];
   actPackageCheck.Caption := Lang[ID_ITEM_UPDATECHECK];
   actPackageManager.Caption := Lang[ID_ITEM_PACKMAN];
+
+  // Formatter menu
+  actFormatCurrentFile.Caption := Lang[ID_FORMATTER_FORMATCURFILE];
+  actFormatOptions.Caption := Lang[ID_FORMATTER_MENU];
 
   // Window menu
   if devData.FullScreen then
@@ -4060,8 +4072,6 @@ end;
 
 procedure TMainForm.actConfigdevShortcutsExecute(Sender: TObject);
 begin
-  //if(devShortcuts.FileName[2] <> ':') then // if relative
-  //  devShortcuts.FileName := devdirs.Exec + devShortcuts.FileName;
   Shortcuts.Edit(
     Lang[ID_SC_CAPTION],
     Lang[ID_SC_HDRENTRY],
@@ -6574,6 +6584,38 @@ var
 begin
   e := fEditorList.GetEditor;
   TCustomAction(Sender).Enabled := Assigned(e) and e.Text.SelAvail;
+end;
+
+procedure TMainForm.actFormatCurrentFileExecute(Sender: TObject);
+var
+  e: TEditor;
+  OldCaret: TBufferCoord;
+begin
+  e := fEditorList.GetEditor;
+  if Assigned(e) then begin
+    OldCaret := e.Text.CaretXY;
+    if e.New then begin
+      devFormatter.FormatNewFile(e, devFormatter.FullCommand);
+    end else begin
+      FileMonitor.UnMonitor(e.FileName);
+      try
+        devFormatter.FormatFile(e.FileName, devFormatter.FullCommand);
+      finally
+        FileMonitor.Monitor(e.FileName);
+      end;
+    end;
+    e.Text.CaretXY := OldCaret;
+  end;
+end;
+
+procedure TMainForm.actFormatOptionsExecute(Sender: TObject);
+begin
+  with TFormatterOptionsForm.Create(Self) do try
+    if ShowModal = mrOk then begin
+    end;
+  finally
+    Free;
+  end;
 end;
 
 end.

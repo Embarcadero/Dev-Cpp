@@ -1267,3 +1267,23 @@ const
   ID_LOG_CLEANEDFILE                    = 78031;
   ID_LOG_NOCLEANFILE                    = 78032;
   ID_LOG_PROCESSINGUNKNOWN              = 78033;
+
+  ID_FORMATTER_FORMATCURFILE            = 79001;
+  ID_FORMATTER_MENU                     = 79002;
+  ID_FORMATTER_WINDOW                   = 79003;
+  ID_FORMATTER_NOTVALID                 = 79004;
+  ID_FORMATTER_OPTIONS                  = 79005;
+  ID_FORMATTER_BRACKET                  = 79006;
+  ID_FORMATTER_INDENT                   = 79007;
+  ID_FORMATTER_TABWIDTH                 = 79008;
+  ID_FORMATTER_INDENTPARTS              = 79009;
+  ID_FORMATTER_CLASSES                  = 79010;
+  ID_FORMATTER_SWITCHES                 = 79011;
+  ID_FORMATTER_CASES                    = 79012;
+  ID_FORMATTER_NAMESPACE                = 79013;
+  ID_FORMATTER_LABELS                   = 79014;
+  ID_FORMATTER_PREPROC                  = 79015;
+  ID_FORMATTER_COMMAND                  = 79016;
+  ID_FORMATTER_PREVIEW                  = 79017;
+  ID_FORMATTER_POWEREDBYFAIL            = 79018;
+  ID_FORMATTER_POWEREDBY                = 79019;

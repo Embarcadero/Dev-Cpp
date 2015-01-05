@@ -225,6 +225,46 @@ type
     property ShowInheritedMembers: boolean read fShowInheritedMembers write fShowInheritedMembers;
   end;
 
+  // Options for AStyle
+  TdevFormatter = class(TPersistent)
+  private
+    fBracketStyle: Integer;
+    fIndentStyle: Integer;
+    fTabWidth: Integer;
+    fIndentClasses: Boolean;
+    fIndentSwitches: Boolean;
+    fIndentCases: Boolean;
+    fIndentNamespaces: Boolean;
+    fIndentLabels: Boolean;
+    fIndentPreprocessor: Boolean;
+    fFullCommand: AnsiString; // includes customizations
+    fAStyleDir: AnsiString;
+    fAStyleFile: AnsiString;
+  public
+    constructor Create;
+    procedure SettoDefaults;
+    procedure SaveSettings;
+    procedure LoadSettings;
+    function Validate: Boolean; // check if AStyle.exe can be found
+    function FormatNewFile(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString; // apply formatting
+    function FormatFile(const FileName, OverrideCommand: AnsiString): AnsiString; // apply formatting
+    function GetVersion: AnsiString;
+  published
+    property BracketStyle: Integer read fBracketStyle write fBracketStyle;
+    property IndentStyle: Integer read fIndentStyle write fIndentStyle;
+    property TabWidth: Integer read fTabWidth write fTabWidth;
+    property IndentClasses: Boolean read fIndentClasses write fIndentClasses;
+    property IndentSwitches: Boolean read fIndentSwitches write fIndentSwitches;
+    property IndentCases: Boolean read fIndentCases write fIndentCases;
+    property IndentNamespaces: Boolean read fIndentNamespaces write fIndentNamespaces;
+    property IndentLabels: Boolean read fIndentLabels write fIndentLabels;
+    property IndentPreprocessor: Boolean read fIndentPreprocessor write fIndentPreprocessor;
+    property FullCommand: AnsiString read fFullCommand write fFullCommand;
+    property AStyleDir: AnsiString read fAStyleDir write fAStyleDir;
+    property AStyleFile: AnsiString read fAStyleFile write fAStyleFile;
+  end;
+
+  // List of programs to use for unknown file extensions
   TdevExternalPrograms = class(TPersistent)
   private
     fDummy: boolean;
@@ -677,6 +717,7 @@ var
   devCodeCompletion: TdevCodeCompletion = nil;
   devClassBrowsing: TdevClassBrowsing = nil;
   devExternalPrograms: TdevExternalPrograms = nil;
+  devFormatter: TdevFormatter = nil;
 
   ConfigMode: (CFG_APPDATA, CFG_PARAM, CFG_EXEFOLDER) = CFG_APPDATA;
 
@@ -749,6 +790,9 @@ begin
 
   if not Assigned(devExternalPrograms) then
     devExternalPrograms := TdevExternalPrograms.Create;
+
+  if not Assigned(devFormatter) then
+    devFormatter := TdevFormatter.Create;
 end;
 
 procedure SaveOptions;
@@ -760,6 +804,7 @@ begin
   devCodeCompletion.SaveSettings;
   devClassBrowsing.SaveSettings;
   devExternalPrograms.SaveSettings;
+  devFormatter.SaveSettings;
 end;
 
 procedure DestroyOptions;
@@ -771,6 +816,7 @@ begin
   devCodeCompletion.Free;
   devClassBrowsing.Free;
   devExternalPrograms.Free;
+  devFormatter.Free;
 end;
 
 procedure RemoveOptionsDir(const Directory: AnsiString);
@@ -2269,32 +2315,17 @@ begin
   with Editor do begin
     BeginUpdate;
     try
+      // Set text area properties
+      WantTabs := True;
+      MaxScrollWidth := 4096; // bug-fix #600748
+      MaxUndo := 4096;
+      BorderStyle := bsNone;
+      FontSmoothing := fsmClearType;
 
-      // Select a highlighter
+      // Select highlighter based on filename (a lot depends on this)
       Highlighter := dmMain.GetHighlighter(FileName);
-
       TabWidth := fTabSize;
       Font.Assign(fFont);
-
-      with Gutter do begin
-        Font.Assign(fGutterFont);
-        DigitCount := fGutterSize;
-        Visible := fShowGutter;
-        AutoSize := fGutterAuto;
-        ShowLineNumbers := fLineNumbers;
-        LeadingZeros := fLeadZero;
-        ZeroStart := fFirstisZero;
-
-        // Set gutter color
-        if Assigned(Highlighter) then begin
-          StrtoPoint(pt, fSyntax.Values[cGut]);
-          Color := pt.x;
-          Font.Color := pt.y;
-        end else begin // editor not colored, pick defaults
-          Color := clBtnFace;
-          Font.Color := clBlack;
-        end;
-      end;
 
       // Set selection color
       if Assigned(Highlighter) then begin
@@ -2306,7 +2337,7 @@ begin
         SelectedColor.Foreground := clWhite;
       end;
 
-      // Set folding bar color
+      // Set code folding
       if Assigned(Highlighter) then begin
         StrtoPoint(pt, devEditor.Syntax.Values[cFld]);
         CodeFolding.FolderBarLinesColor := pt.y;
@@ -2315,30 +2346,50 @@ begin
         UseCodeFolding := False;
       end;
 
+      // More stuff
       if fMarginVis then
         RightEdge := fMarginSize
       else
         RightEdge := 0;
-
       RightEdgeColor := fMarginColor;
-
       InsertCaret := TSynEditCaretType(fInsertCaret);
       OverwriteCaret := TSynEditCaretType(fOverwriteCaret);
-
       ScrollHintFormat := shfTopToBottom;
-
       if HighCurrLine and Assigned(Highlighter) then
         ActiveLineColor := HighColor
       else
         ActiveLineColor := clNone;
 
+      // Set gutter properties
+      with Gutter do begin
+        LeftOffset := 4;
+        RightOffset := 21;
+        BorderStyle := gbsNone;
+        Font.Assign(fGutterFont);
+        DigitCount := fGutterSize;
+        Visible := fShowGutter;
+        AutoSize := fGutterAuto;
+        ShowLineNumbers := fLineNumbers;
+        LeadingZeros := fLeadZero;
+        ZeroStart := fFirstisZero;
+        if Assigned(Highlighter) then begin
+          StrtoPoint(pt, fSyntax.Values[cGut]);
+          Color := pt.x;
+          Font.Color := pt.y;
+        end else begin // editor not colored, pick defaults
+          Color := clBtnFace;
+          Font.Color := clBlack;
+        end;
+      end;
+
+      // Set option enum
       Options := [
         eoAltSetsColumnMode, eoDisableScrollArrows,
         eoDragDropEditing, eoDropFiles, eoKeepCaretX, eoTabsToSpaces,
         eoRightMouseMovesCursor, eoScrollByOneLess, eoAutoSizeMaxScrollWidth
         ];
 
-      //Optional synedit options in devData
+      // Optional synedit options in devData
       if fAutoIndent then
         Options := Options + [eoAutoIndent];
       if fAddIndent then
@@ -2428,6 +2479,84 @@ procedure TdevClassBrowsing.SettoDefaults;
 begin
   fShowFilter := 2; // sfCurrent
   fShowInheritedMembers := False;
+end;
+
+{ TdevFormatter }
+
+constructor TdevFormatter.Create;
+begin
+  inherited Create;
+  SettoDefaults;
+  LoadSettings;
+end;
+
+procedure TdevFormatter.LoadSettings;
+begin
+  devData.ReadObject('Formatter', Self);
+end;
+
+procedure TdevFormatter.SaveSettings;
+begin
+  devData.WriteObject('Formatter', Self);
+end;
+
+procedure TdevFormatter.SettoDefaults;
+begin
+  fBracketStyle := 2; // Java
+  fIndentStyle := 2; // Tabs
+  fTabWidth := 4;
+  fIndentClasses := True;
+  fIndentSwitches := True;
+  fIndentCases := False;
+  fIndentNamespaces := True;
+  fIndentLabels := False;
+  fIndentPreprocessor := True;
+  fFullCommand := ''; // includes customizations
+  fAStyleDir := 'AStyle\';
+  fAStyleFile := 'AStyle.exe';
+end;
+
+function TdevFormatter.Validate: Boolean;
+begin
+  Result := False;
+
+  // Check if AStyle.exe is where it should be
+  if not DirectoryExists(devDirs.Exec + fAStyleDir) then
+    Exit;
+  if not FileExists(devDirs.Exec + fAStyleDir + fAStyleFile) then
+    Exit;
+
+  Result := True;
+end;
+
+function TdevFormatter.FormatNewFile(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString;
+var
+  FileName: AnsiString;
+begin
+  FileName := devDirs.Exec + fAStyleDir + 'main.cpp';
+  with Editor.Text do begin
+    Lines.SaveToFile(FileName);
+    FormatFile(FileName, OverrideCommand);
+    Lines.LoadFromFile(FileName);
+  end;
+end;
+
+function TdevFormatter.FormatFile(const FileName, OverrideCommand: AnsiString): AnsiString;
+var
+  RunCommand, WorkingDir: AnsiString;
+begin
+  WorkingDir := devDirs.Exec + fAStyleDir;
+  RunCommand := fAStyleFile + ' ' + OverrideCommand + ' "' + FileName + '"';
+  Result := RunAndGetOutput(WorkingDir + RunCommand, WorkingDir, nil, nil, False);
+end;
+
+function TdevFormatter.GetVersion: AnsiString;
+var
+  RunCommand, WorkingDir: AnsiString;
+begin
+  WorkingDir := devDirs.Exec + fAStyleDir;
+  RunCommand := fAStyleFile + ' --version';
+  Result := RunAndGetOutput(WorkingDir + RunCommand, WorkingDir, nil, nil, False);
 end;
 
 { TdevExternalPrograms }

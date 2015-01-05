@@ -1,5 +1,6 @@
-Version 5.8.4 - 27 November 2014
+Version 5.9.0 - 5 Januari 2015
 
+- Added AStyle integration.
 - Remodeled Help >> About window.
 - When looking up a piece of code by Ctrl+Clicking the destination line is centered.
 - Removed caching from Tools >> Editor Options.
