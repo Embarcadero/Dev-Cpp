@@ -55,7 +55,7 @@ of the provided compiler):
 	Otherwise upx will compress all icons and the file associations will point
 	to nonexisting (moved) icons within devcpp.exe
 	
-4. Image Map (severely outdated)
+4. Image Map (somewhat outdated)
 
 These are the descriptions of the indices of the menu images lists used in d
 Transparent color is selected as the left most pixel of the bottom row.

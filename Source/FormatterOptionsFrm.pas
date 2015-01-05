@@ -160,7 +160,6 @@ begin
   finally
     fCreating := False;
   end;
-  OptionChange(nil); // apply formatting once
 end;
 
 procedure TFormatterOptionsForm.LoadSampleText;

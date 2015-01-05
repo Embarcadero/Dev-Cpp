@@ -3385,7 +3385,6 @@ begin
 {$ENDIF}
     try
       PaintLines;
-      PaintFoldAttributes;
     finally
       fTextDrawer.EndDrawing;
     end;
@@ -3404,6 +3403,9 @@ begin
       Canvas.LineTo(nRightEdge, rcToken.Bottom + 1);
     end;
   end;
+
+  // This messes with pen colors, so draw after right margin has been drawn
+  PaintFoldAttributes;
 end;
 
 procedure TCustomSynEdit.PasteFromClipboard;
