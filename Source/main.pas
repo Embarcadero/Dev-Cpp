@@ -1226,6 +1226,7 @@ begin
   actClean.Caption := Lang[ID_ITEM_CLEAN];
   actProfile.Caption := Lang[ID_ITEM_PROFILE];
   actDebug.Caption := Lang[ID_ITEM_DEBUG];
+  actGotoBreakPoint.Caption := Lang[ID_ITEM_GOTOBREAKPOINT];
   actBreakPoint.Caption := Lang[ID_ITEM_TOGGLEBREAK];
   actDeleteProfile.Caption := Lang[ID_ITEM_DELPROFINFORMATION];
   actAbortCompilation.Caption := Lang[ID_ITEM_ABORTCOMP];
@@ -1286,6 +1287,9 @@ begin
   // Editor popup
   actGotoDeclEditor.Caption := Lang[ID_POP_GOTODECL];
   actGotoImplEditor.Caption := Lang[ID_POP_GOTOIMPL];
+  actCloseAllButThis.Caption := Lang[ID_POP_CLOSEALLBUTTHIS];
+  actOpenFolder.Caption := Lang[ID_POP_OPENCONTAINING];
+  actAddToDo.Caption := Lang[ID_POP_ADDTODOITEM];
 
   // Class Browser Popup
   actBrowserGotoDeclaration.Caption := Lang[ID_POP_GOTODECL];
@@ -5269,6 +5273,7 @@ begin
     end;
   end else
     idx := item.Tag;
+
   e := fEditorList.FileIsOpen(fProject.Units[idx2].FileName, TRUE);
   if Assigned(e) then
     fEditorList.CloseEditor(e);
@@ -6589,60 +6594,20 @@ end;
 procedure TMainForm.actFormatCurrentFileExecute(Sender: TObject);
 var
   e: TEditor;
-  OldCaretXY, OldBlockBegin, OldBlockEnd, OldAllBlockEnd: TBufferCoord;
-  OldText: AnsiString;
-
-  function GetEndOfFileBlock(Lines: TSynEditStringList): TBufferCoord;
-  begin
-    Result := BufferCoord(Length(Lines[Lines.Count - 1]) + 1, Lines.Count);
-  end;
+  OldCaretXY: TBufferCoord;
+  OldTopLine: integer;
 begin
   e := fEditorList.GetEditor;
   if Assigned(e) then begin
     // Save for undo list creation
+    OldTopLine := e.Text.TopLine;
     OldCaretXY := e.Text.CaretXY;
-    OldText := e.Text.Text;
-    OldBlockBegin := e.Text.BlockBegin;
-    OldBlockEnd := e.Text.BlockEnd;
-    OldAllBlockEnd := GetEndOfFileBlock(e.Text.Lines);
 
-    // Since we need to load a file from disk the editor will drop all undo items before this item.
-    // Therefore, we need to ensure that everything can be reverted to the old state
-    // This includes caret, selection and the old text. All undo information before that point is lost for now :(
     devFormatter.FormatMemory(e, devFormatter.FullCommand);
-    e.Text.BeginUndoBlock;
-    try
-      // Mimic paste operation
-      e.Text.UndoList.AddChange(
-        crDelete, // delete everything
-        BufferCoord(1, 1),
-        OldAllBlockEnd,
-        OldText,
-        smNormal);
-      e.Text.UndoList.AddChange(
-        crInsert, // insert new file
-        BufferCoord(1, 1),
-        GetEndOfFileBlock(e.Text.Lines),
-        '',
-        smNormal);
 
-      // Remember caret and selection
-      e.Text.UndoList.AddChange(
-        crSelection,
-        OldBlockBegin,
-        OldBlockEnd,
-        '',
-        smNormal);
-      e.Text.UndoList.AddChange(
-        crCaret,
-        OldCaretXY,
-        OldCaretXY,
-        '',
-        smNormal);
-    finally
-      e.Text.EndUndoBlock;
-    end;
-      e.Text.CaretXY := OldCaretXY;
+    // Attempt to not scroll view
+    e.Text.TopLine := OldTopLine;
+    e.Text.CaretXY := OldCaretXY;
   end;
 end;
 

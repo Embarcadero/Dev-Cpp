@@ -208,7 +208,8 @@ const
   ID_ITEM_NEXTINS                       = 10021;
   ID_ITEM_STEPINS                       = 10022;
   ID_ITEM_SKIPFUNCTION                  = 10023;
- 
+  ID_ITEM_GOTOBREAKPOINT                = 10024;
+  
   // unit popup
   ID_POP_REMOVE                         = 11001;
   ID_POP_RENAME                         = 11002;
@@ -233,6 +234,9 @@ const
   ID_POP_VIEWPROJECT                    = 12014;
   ID_POP_SHOWINHERITED                  = 12015;
   ID_POP_OPENWITH                       = 12016;
+  ID_POP_OPENCONTAINING                 = 12017;
+  ID_POP_CLOSEALLBUTTHIS                = 12018;
+  ID_POP_ADDTODOITEM                    = 12019;
 
   // message control
   ID_SHEET_COMP                         = 13001;

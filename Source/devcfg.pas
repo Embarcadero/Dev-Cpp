@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, ProjectTypes, Math, ShellAPI, ShlObj,
-  ComCtrls;
+  ComCtrls, SynEditTextBuffer;
 {$ENDIF}
 {$IFDEF LINUX}
 QDialogs, Classes, QGraphics, QSynEdit, CFGData, IniFiles, Math, prjtypes;
@@ -2532,12 +2532,24 @@ end;
 function TdevFormatter.FormatMemory(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString;
 var
   FileName: AnsiString;
+  DummyEditor: TSynEdit;
 begin
   FileName := devDirs.Exec + fAStyleDir + ExtractFileName(Editor.FileName);
   with Editor.Text do begin
+    // Format a copy of the file
     Lines.SaveToFile(FileName);
     FormatFile(FileName, OverrideCommand);
-    Lines.LoadFromFile(FileName);
+
+    // Load into dummy editor
+    DummyEditor := TSynEdit.Create(nil);
+    try
+      // Use replace selection trick to preserve undo list
+      DummyEditor.Lines.LoadFromFile(FileName);
+      SelectAll;
+      SelText := DummyEditor.Lines.Text; // do NOT use Lines.LoadFromFile which is not undo-able
+    finally
+      DummyEditor.Free;
+    end;
   end;
 end;
 
