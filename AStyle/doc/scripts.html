@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Artistic Style - Scripts</title>
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+    <h1>
+        Artistic Style Scripts</h1>
+
+    <p>
+        &nbsp;</p>
+    <p>
+        The following are scripts to support the Artistic Style program. They are in various computer languages for multiple
+        platforms.</p>
+    <p>
+        On Windows Vista the following scripts may be blocked to help protect the computer. You will get a Security Warning
+        message when trying to open or edit the extracted file. Right click on the file and select Properties. At the
+        bottom of the General tab is a Security option. Select "Unblock" to unblock the file. This can be done with either
+        the extracted or the zip file.</p>
+
+    <h3>
+        Scripts</h3>
+
+    <p>
+        <a href="http://astyle.svn.sourceforge.net/viewvc/astyle/trunk/AStyleDev/downloads/astyle-clean.py.zip"><strong>astyle-clean.py</strong></a>&nbsp;
+        is a <strong>Python script</strong> to clean a directory tree by moving Artistic Style backup files to a separate
+        directory. This allows Artistic Style to create backup files without cluttering your source directories. There
+        are four variables at the start of the script that need to be set for each application. The script will move or
+        copy backup files to a backup directory maintaining the original directory structure. New backup files will be
+        copied over the old so you will always have the most current backup.</p>
+    <p>
+        <a href="http://astyle.svn.sourceforge.net/viewvc/astyle/trunk/AStyleDev/downloads/astyle-clean.sh.zip"><strong>astyle-clean.sh</strong></a>&nbsp;
+        is a <strong>Linux shell script</strong> to clean a directory tree by moving Artistic Style backup files to a
+        separate directory. This allows Artistic Style to create backup files without cluttering your source directories.
+        There are four variables at the start of the script that need to be set for each application. The script will
+        move or copy backup files to a backup directory maintaining the original directory structure. New backup files
+        will be copied over the old so you will always have the most current backup.</p>
+    <p>
+        <a href="http://astyle.svn.sourceforge.net/viewvc/astyle/trunk/AStyleDev/downloads/astyle-clean.bat.zip"><strong>astyle-clean.bat</strong></a>&nbsp;
+        is a <strong>Windows batch file</strong> to clean a directory tree by moving Artistic Style backup files to a
+        separate directory. This allows Artistic Style to create backup files without cluttering your source directories.
+        There are four variables at the start of the script that need to be set for each application. The script will
+        move or copy backup files to a backup directory maintaining the original directory structure. New backup files
+        will be copied over the old so you will always have the most current backup.</p>
+    <p>
+        <a href="http://astyle.svn.sourceforge.net/viewvc/astyle/trunk/AStyleDev/downloads/astyle.pl.zip"><strong>astyle.pl</strong></a>&nbsp;
+        is a <strong>Mac Perl script</strong> to indent source files in TextWrangler and BBEdit using Artistic Style.
+        Selected text from the editor can be passed to Artistic Style and replaced with the reformatted text. Save the
+        script in the "Unix Filters" directory (you need to restart TextWrangler to see new scripts). Then simply highlight
+        the text you would like to indent, choose the script from the Shebang (<code>#!</code>) menu, and the text will
+        be immaculately formatted. You can add Artistic Style options to the "my $astyle" line in the script.</p>
+    <p>
+        <a href="http://astyle.svn.sourceforge.net/viewvc/astyle/trunk/AStyleDev/downloads/indent-commit.pl.zip"><strong>indent-commit.pl</strong></a>&nbsp;
+        is a <strong>Perl script</strong> to integrate Artistic Style with a CVS repository check-in. Before code is checked in,
+        Artistic Style is automatically called so that the repository files have a consistent style. This script was posted
+        on the web site several years ago and probably needs to be updated.</p>
+    <p>
+        <a href="http://astyle.svn.sourceforge.net/viewvc/astyle/trunk/AStyleDev/downloads/astyle-hooks.el.zip"><strong>astyle-hooks.el</strong></a>&nbsp;
+        is an <strong>Emacs Lisp script</strong> containing hooks to convert Emacs default styles to Artistic Style default
+        styles. There are hooks for C++, Java, and C# files. The C# hook requires the csharp-mode.el file from <a href="https://code.google.com/p/csharpmode/">
+            csharpmode</a> on Google Project Hosting. For best results Artistic Style should use the options &#8209;&#8209;min&#8209;conditional&#8209;indent=0
+        (&#8209;m0) and &#8209;&#8209;max&#8209;instatement&#8209;indent=50 (&#8209;M50). Emacs does not seem to have
+        an option equivalent to these. The formatting for Emacs and Artistic Style will not be identical but should be
+        reasonably close.</p>
+    <p>
+        &nbsp;</p>
+
+    <center style="margin-left: -0.4in;">
+        <a href="http://sourceforge.net/projects/astyle">
+            <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=2319&type=16" width="150" height="40" alt="[SourceForge.net]" /></a>
+    </center>
+
+    <p>
+        &nbsp;</p>
+
+    <!-- Piwik -->
+
+    <script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/astyle/" : "http://sourceforge.net/apps/piwik/astyle/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+    </script>
+
+    <noscript>
+        <p>
+            <img src="http://sourceforge.net/apps/piwik/astyle/piwik.php?idsite=1" style="border: 0" alt="" /></p>
+    </noscript>
+
+    <!-- End Piwik Tag -->
+
+</body>
+
+</html>
+

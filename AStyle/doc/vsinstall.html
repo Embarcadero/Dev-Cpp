@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>.NET Framework SDK</title>
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+    <h1>
+        Visual Studio 2010 C++ Express</h1>
+
+    <h2>
+        Install Instructions for .NET Framework SDK</h2>
+
+    <p>
+        &nbsp;</p>
+
+    <p>
+        Following are instructions for installing the .NET Framework SDK in Visual Studio 2010 Express and adding x64
+        platforms to an existing project in a manner similar to the more expensive Visual Studio editions.</p>
+    <p>
+        IMPORTANT: If Visual Studio 2010 Service Pack 1 is applied after the .NET Framework SDK install, an additional
+        update is
+        required to restore the Visual C++ compilers and libraries that may have been removed. Information is available
+        <a href="http://msdn.microsoft.com/en-us/visualc/gg697159" target="_blank" title="open new window">here</a>.</p>
+
+    <h4>
+        Installing .NET Framework SDK</h4>
+
+    <p>
+        64-bit tools are not available on the Visual Studio 2010 C++ Express Edition by default. To enable 64-bit targets,
+        install the .NET Framework SDK in addition to the Visual Studio 2010 Express Edition. Otherwise, the x64 solution
+        platform is not available and a warning will occur if you open a project containing a 64-bit target.</p>
+    <p>
+        Install the <a href="http://msdn.microsoft.com/en-us/windows/bb980924.aspx">Windows SDK</a> appropriate for your
+        operating system<a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=6b6c21d2-2006-4afa-9702-529fa782d63b&displaylang=en"></a>.
+        Use the "Install Now" link to get the SDK. You can
+        optionally install the Windows Performance Toolkit, Debugging Tools, and Application Verifier. The Help is also
+        optional.</p>
+    <p>
+        After installing this package the x64 configurations can be created.</p>
+
+    <h4>
+        Adding x64 to Project Files</h4>
+
+    <p>
+        Open a Win32 project. Open the Configuration Manager from the Build menu. In the Active Solution Platform select
+        New. For the New Platform select x64. Usually you will want to &#8220;Copy settings from Win32&#8221; and check
+        &#8220;Create new project platforms&#8221;.
+    </p>
+    <p>
+    </p>
+    <p>
+        Open the Properties from the Project menu. There is a new configuration property that needs to be set for the
+        linker to find the system libraries. Be sure the x64 platform is selected and change "Configuration Properties
+        &gt; General
+        &gt; Platform Toolset<strong>"</strong>, to <strong>Windows7.1SDK</strong>. Otherwise you will get linker errors
+        such as "LINK : fatal error LNK1104: cannot open file 'kernel32.lib'". This setting can also optionally be used
+        for the Win32 platform.</p>
+    <p>
+        The x64 configuration can now be compiled, but the compiles will place the files in the same directories as the
+        Win32 compiles. To correct this the x64 compiles should be placed in an x64 directory using the <strong>$(PlatformName)</strong>
+        macro.</p>
+    <p>
+        Add the $(PlatformName) macro to &#8220;Configuration Properties &gt; General &gt; Output directory&#8221; so the
+        entry becomes $(SolutionDir)<strong>$(PlatformName)\</strong>$(Configuration)\.</p>
+    <p>
+        Add the $(PlatformName) macro to &#8220;Configuration Properties&nbsp; &gt; General&gt; Intermediate Directory&#8221;
+        so the entry becomes <strong>$(PlatformName)\</strong>$(Configuration)\.</p>
+    <p>
+        Check the x64 Debug configuration &#8220;Configuration Properties &gt; Linker &gt; Debugging &gt; Generate Program Database File&#8221;
+        for $(ProjectDir)<strong>$(PlatformName)\</strong>$(ConfigurationName)\$(TargetName).pdb<strong>.</strong></p>
+    <p>
+        Compile the project. If there are compile errors you may need to add the <strong>$(PlatformName)</strong> macro
+        to other settings as well. For example, if there are user library files the macro may need to be added to
+        &#8220;Configuration Properties &gt; Linker &gt; General &gt; Additional Library Directories&#8221;.<strong></strong></p>
+    <p>
+    </p>
+    <p>
+        You should now be able to compile both Win32 and x64 platforms in a manner similar to the more expensive Visual
+        Studio editions.</p>
+    <p>
+        &nbsp;</p>
+
+    <!-- Piwik -->
+
+    <script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/astyle/" : "http://sourceforge.net/apps/piwik/astyle/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+    </script>
+
+    <noscript>
+        <p>
+            <img src="http://sourceforge.net/apps/piwik/astyle/piwik.php?idsite=1" style="border: 0" alt="" /></p>
+    </noscript>
+
+    <!-- End Piwik Tag -->
+
+</body>
+
+</html>
+

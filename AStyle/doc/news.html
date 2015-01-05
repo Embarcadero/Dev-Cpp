@@ -1,0 +1,440 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Artistic Style - News</title>
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+
+    <!-- the following styles are temporary for the survey -->
+
+    <style type="text/css">
+h3.survey { color:#FF0000; margin-top:0.4in; margin-left:-0.4in; }
+a.survey:link, a.survey:visited { color:#FF0000; text-decoration:underline; }
+a.survey:hover { color:#0000A0; text-decoration:underline; }
+
+    </style>
+
+    <!-- end of survey -->
+
+</head>
+
+<body>
+
+    <h1>
+        Artistic Style News</h1>
+
+    <p>
+        &nbsp;</p>
+
+    <h3>
+        Artistic Style 2.03&nbsp; (April 2013)</h3>
+
+    <p>
+        With a new Artistic Style release some unchanged source files will be formatted because of changes to Artistic
+        Style. You may want to format your source before making program changes in order to bring it up to date.</p>
+    <p>
+        A new option, "max-code-length=#" or "xC#", will limit the length of code on a line. A new option "break&#8209;after&#8209;logical",
+        or "xL", will modify a line break for conditionals. See the documentation for details.
+    </p>
+    <p>
+        A new option, "pad-first-paren-out" or "xd", will pad only the first paren in a series on the outside. See the
+        documentation for details.
+    </p>
+    <p>
+        A new option, "indent=force-tab-tab=#" or "xT#", will allow force tab indents with a tab length that is different
+        than the indent length. See the documentation for details.
+    </p>
+    <p>
+        The short option for delete-empty-lines has changed from "xd" to "xe".
+    </p>
+    <p>
+        The C++11 standard for range-based "for" loops, "enum" with a base type, 
+        and rvalue references is now supported. The formatting of rvalue references is determined from the existing &quot;align-pointer&quot; and 
+        &quot;align-reference&quot; options.</p>
+    <p>
+        Closing the ending angle brackets of templates is now allowed by the C++11 standard. A new option, &quot;close-templates&quot;
+        or "xy", will close the whitespace in the angle brackets of template definitions. Be sure your compiler supports
+        this before making the changes.
+    </p>
+    <p>
+        The C/C++ keyword 'extern "C"' in a preprocessor no longer causes an extra indent.
+    </p>
+    <p>
+        Formatting of C++/CLI managed pointers (the &#39;^&#39; character) has been added to the &quot;align-pointer&quot;
+        option.
+    </p>
+    <p>
+        &nbsp;The breaking of switch &quot;default&quot; statements has been fixed. The &quot;default&quot; statements that have been incorrectly 
+        broken will be fixed in this release.
+    </p>
+    <p>
+        The byte order mark (BOM) has been removed from ASLocalizer.cpp for all platforms. The encoding of the file is
+        UTF-8.
+        Many Windows editors can now recognize UTF-8 encoding without the BOM. Visual Studio has an option that needs 
+        to be set. With others. such as CodeBlocks, identification is automatic. On Linux, UTF-8 is the default 
+        encoding.</p>
+    <p>
+        Translations have been added for Dutch, Finnish, Italian, Japanese, Korean, Polish, Portuguese, Russian, Swedish,
+        and Ukrainian. The translations were done with an automated translation program, Google Translate, so they may
+        not be the best translation possible. The translations are at the end of ASLocalizer.cpp in the form of an English&#8209;Translation
+        pair. If you correct a translation, send the source as a bug report and it will be included in the next release.
+        To add a language, see "Internationalization" in the "General Information" section of the documentation. Send
+        the addition as a bug report and it will be included in the next release.
+    </p>
+    <p>
+        There is a new 
+        Linux makefile for the Clang Compiler. Clang is a free compiler can be installed as a package on many
+        Linux distributions. Some of its features are fast compiles, low memory use, expressive diagnostic messages,
+        and GCC compatibility. It includes a static analyzer tool that finds potential bugs in your source code. An experimental
+        version can be installed on a Windows platform. There 
+        is more information in the Install Information documentation.</p>
+    <p>
+        Visual Studio automatically creates an import library and an export file when you link a program that contains
+        exports. It will do this for even a static library if it contains a __declspec(dllexport) definition. The Artistic 
+        Style library (ASTYLE_LIB) build contains such exports which causes an import library and export file to be 
+        created when they may not be needed. A new preprocessor definition, ASTYLE_NO_VCX (no Visual Studio exports) 
+        can be declared to eliminate the files from the output. Use this only for static libraries or when the AStyle
+        source is included in the compile. Do NOT use this when compiled as a shared (dynamic) library. It is 
+        effective only for Visual Studio 2012. It will NOT work with previous versions. It has no effect with other 
+        compilers since they require a separate option to create the import library and export files.<o:p></o:p>
+    </p>
+    <p>
+        The executable included in the Windows distribution was compiled with
+        Visual Studio 2010 (platform toolset v100). Visual Studio 2012 
+        (platform toolset v110) contains dependencies on Windows API functions that exist only on Windows Vista, 
+        Windows 7, and Windows 8. This means that applications built with a Visual Studio 2012 C++ compiler 
+        would fail to load and execute on Windows XP. Artistic Style was therefore compiled with Visual Studio 2010 to
+        work on computers using Windows XP.
+    </p>
+    <p>
+        If you are using Windows Vista or higher, and have the Visual Studio 2012 compiler available, recompiling with
+        Visual Studio 2012 will probably result in faster execution. The Windows distribution has Visual Studio 2012 
+        project files available.
+    </p>
+    <p>
+        If you use a compiler other than Visual Studio, you can probably get better execution by compiling using the 
+        C++11 standards. Artistic Style uses a lot of string vectors and the new move semantics will probably result 
+        in faster execution. (To use C++11 on GCC and MinGW use the option --std=c++0x). This may change on future 
+        compiler releases.).
+    </p>
+    <p>
+        The "Developer Information" page has a new example and download for calling Artistic Style from a Python script.
+        It will run with both Python 2 and Python 3. Using Python 3 shows an example of formatting a Unicode string with
+        Artistic Style. Unicode strings must be encoded to UTF-8 before formatting and decoded back to Unicode afterward.
+        The example script shows the technique for doing this. It also shows how to set up the function pointers and allocate
+        memory in Python.
+            
+    <p>
+        If you use Visual Studio on Windows, it can now be used for Python development. <a href="https://pytools.codeplex.com/"
+            target="_blank" title="open new window">Python Tools for Visual Studio</a> (PTVS) is a free and open source
+        plug-in for Visual Studio 2010 that supports Python and Iron Python. Other interpreters such Jython can
+        be added. It can be easily switched between Python versions or different interpreters. But the best thing is the
+        Visual Studio debugging support using the .NET debugger and the normal Visual Studio debugger. It enables you
+        to set break points, step through functions, change the current statement, inspect local variables, and perform
+        other operations while debugging.
+        It is best to use it with a project file, a minor irritation for single page scripts. And there are some minor
+        bugs. But overall it works quite well.
+    </p>
+    <p>
+        Thanks to Christopher Sean Morrison, Keith OHara, louis6g, and J for their contributions.
+    
+    </p>
+
+    <h3>
+        Artistic Style 2.02&nbsp; (May 2011)</h3>
+
+    <p>
+        With a new Artistic Style release some unchanged source files will be formatted because of changes to Artistic
+        Style. You may want to format your source before making program changes in order to bring it up to date.</p>
+
+    <h4>
+        Release 2.02.1 - November 2011</h4>
+
+    <p>
+        This bug fix release is issued because of the length of time required for the some of the changes in the next
+        release (2.03). Bugs with the breaking of "case" statements and a crash with pointer to pointer (**) in align-pointer=type
+        have been fixed. The "case" statements that have been incorrectly broken will be fixed in this release. Pointers
+        and references are now processed for C# files. See the "Release Notes" for more information and additional changes.
+    </p>
+
+    <h4>
+        <strong>The following information is for the original 2.02 release.</strong></h4>
+
+    <h4>
+        Translations</h4>
+
+    <p>
+        A new program module and header, ASLocalizer.cpp and ASLocalizer.h, have been added. These are required for the
+        console build and are optional for the library builds. It contains language translations for several of the most
+        common users of Artistic Style. The method used was adapted from the Gnu "gettext" method.</p>
+    <p>
+        The translation to use is determined from the User Locale for Windows and the LANG environment variable for other
+        systems. The translation will be done automatically from these settings. If no translation is available it will
+        default to English.</p>
+    <p>
+        A new option, "ascii" or "I", will display the text in English regardless of your system settings. This option
+        must be input from the command line and not an option file. See the documentation for details.</p>
+    <p>
+        The translations were mostly done with an automated translation program, Google Translate, so they may not be
+        the best translation possible. The translations are at the end of ASLocalizer.cpp in the form of an English&#8209;Translation
+        pair. If you correct a translation, send the source as a bug report and it will be included in the next release.</p>
+    <p>
+        To add a language, add a new translation class to ASLocalizer.h. Add the English&#8209;Translation pair to the
+        constructor in ASLocalizer.cpp. Update the WinLangCode array, if necessary, and add the language code to the function
+        setTranslationClass(). The ASLocalizer.cpp program contains comments that give web pages for obtaining the LCIDs
+        and language codes. Send the source code as a bug report and it will be included in the next release.</p>
+
+    <h4>
+        Brackets</h4>
+
+    <p>
+        Since release 1.22 (April 2008) the predefined styles have increased from 5 to 12 and the bracket types have increased
+        from 4 to 6. Having two different ways of defining bracket styles has resulted in some confusion and unnecessary
+        duplication. This release starts a redesign of the bracket definitions to simplify the user interface. The predefined
+        styles and bracket types will be combined into a single option category.
+    </p>
+    <p>
+        The "Predefined Style" options have been renamed "Bracket Style" options. The "Bracket Options" have been depreciated
+        and will be removed in a future release. If you are using a "brackets=" option, you should start changing to one
+        of the "style=" options. There is a "style" option available for every "brackets" option.</p>
+    <p>
+        All "Bracket Style" options now default to 4 spaces per indent. If you were using a "Predefined Style" with a
+        default indent other than 4, you will need to add one of the "Tab Options" to maintain the same indentation. The
+        styles which used indents other than 4 were:</p>
+    <ul>
+        <li>Stroustrup - 5 spaces per indent. </li>
+        <li>Gnu - 2 spaces per indent. </li>
+        <li>Linux - 8 spaces per indent. </li>
+        <li>Horstmann - 3 spaces per indent.</li>
+    </ul>
+    <p>
+        There is a new "Bracket Style" option "style=pico" or "A11". It uses run-in brackets, like Horstmann style, and
+        attaches the closing bracket to the last line in the block. It sets the options "keep one line blocks" and "keep
+        one line statements". This is a very compact style and is a good style for small monitors.</p>
+    <p>
+        Another new "Bracket Style" option is "style=lisp" or "style=python" or "A12". It uses attached brackets, like
+        Java style, and attaches the closing bracket to the last line in the block. It sets the option "keep one line
+        statements". This style makes indentation the only way of distinguishing blocks of code, but has the advantage
+        of containing no uninformative lines. Like Pico, it is also a very compact style.</p>
+    <p>
+        The option "brackets=horstmann" has been removed. Instead use "style=horstmann" or "A9". The short option "g"
+        is now equivalent to the new "brackets=run-in". Run-in brackets are used for both Horstmann and Pico styles.</p>
+    <p>
+        The option "indent-brackets" and short option "B" have been removed. Instead use "style=whitesmith" or "style=banner".</p>
+    <p>
+        The option "indent-blocks" and short option "G" have been removed. Instead use "style=gnu".</p>
+    <p>
+        Two new options, "style=break" and "style=attach", have been added for Allman and Java bracket styles respectively.</p>
+
+    <h4>
+        Other Changes</h4>
+
+    <p>
+        To allow for future expansion the short options will now allow an "x" prefix to be used. New short options may
+        start with an "x" and will be followed by another character (e.g. "xa", "xb", "xc" ...). The current options,
+        with one exception, will still be valid.</p>
+    <p>
+        The short option for "delete-empty-lines" has been changed from "x" to "xd" to allow for the expansion of short
+        options.</p>
+    <p>
+        A new option "align-reference=" (-W#) allows references to be aligned separate from pointers. See the documentation
+        for details.</p>
+    <p>
+        Since computer screens are getting wider the maximum value for "max-instatement-indent" has been increased from
+        80 to 120.</p>
+    <p>
+        New options ignore&#8209;exclude&#8209;errors (&#8209;i) and ignore&#8209;exclude&#8209;errors&#8209;x (&#8209;xi)
+        will allow processing to continue if there are errors in the "exclude" options. This lets the excludes for several
+        projects to be entered in a single option file. The "ignore" options may be placed in the same option file as
+        the excludes. The ignore&#8209;exclude&#8209;errors option will display the unmatched excludes, ignore&#8209;exclude&#8209;errors&#8209;x
+        will not display them.</p>
+    <p>
+        Artistic Style can now format UTF-16 encoded files, both little and big endian. This encoding is the default for
+        Visual Studio Unicode files. The file is formatted by converting it to UTF&#8209;8 and then back to UTF&#8209;16.
+        The conversion process does not add a significant amount of time to the formatting. The UTF-16 file must be encoded
+        with a byte-order-mark (BOM) to be recognized. Again, this is the Visual Studio default.</p>
+    <p>
+        The Visual Studio project files now have a solution for both Win32 and x64 compiles. The x64 version will be needed
+        if you are using an Artistic Style DLL for Java or C# on a Windows&nbsp;7 platform. Or you may just prefer an
+        x64 console program. The executable included in the Windows distribution is still Win32. It will work on both
+        Win32 and x64 systems.</p>
+    <p>
+        If you use Visual Studio C++ Express the 2010 release has the ability to compile x64 code. But you must use Vista
+        or Windows&nbsp;7 and need to install the .NET Framework SDK. I have created a brief instruction page <a href="vsinstall.html"
+            target="_blank" title="open new window">here</a>. Note that a fix is required if you apply Service Pack&nbsp;1
+        after installing the .NET Framework SDK.</p>
+    <p>
+        The documentation contains a new section "Command-line Only" which lists commands that are not available from
+        an options file. The options were transferred from the "Other Options" section.</p>
+    <p>
+        Thanks to Milian Wolff, Johannes Martin, and Arne F?rlie, and Marvin Humphrey for their contributions. The UTF&#8209;8
+        and UTF&#8209;16 conversions were obtained from the SciTE source code editor.</p>
+
+    <h4>
+        Survey Results</h4>
+
+    <p>
+        The results of the survey posted last release are available at <a href="http://astyle.sourceforge.net/SurveyGeneralInfo.html"
+            target="survey" title="open new window">General Information</a> and <a href="http://astyle.sourceforge.net/SurveyOptions.html"
+                target="survey" title="open new window">Artistic Style Options</a>. Thanks to everyone who took the time
+        to complete it.</p>
+    <p>
+        Surveys give an indication of how many people are using an option or want certain features. This is information
+        that is not available in the bug reports.</p>
+    <p>
+        In the "Enhancements" group there were three items with multiple requests. The most frequent request by far was
+        to enforce a maximum line length. This is also the oldest request in the bug reports. Another item with multiple
+        requests was to disable/enable Artistic Style formatting on request within source files. This is the second oldest
+        request in the bug reports. A third item with multiple requests was to customize namespace brackets independent
+        of the requested bracket style. I will try to address these in the next release.</p>
+    <p>
+        Things that stand out to me in the multiple&#8209;choice sections:</p>
+    <ul>
+        <li>The predefined styles and brackets options were each used about 50% each. That will change with this release.</li>
+        <li>Over 50% of the survey uses Artistic Style for Windows. I have been working for a couple of years on a new program
+            based on wxWidgets. I will try to give this more priority in the future. </li>
+        <li>Over 75% of the survey uses Artistic Style to format entire projects.</li>
+        <li>About one&#8209;third of the Windows C++ users use Artistic Style for Managed C++.</li>
+        <li>The most popular option is add&#8209;brackets (60%), which was just recently added.</li>
+        <li>The attach&#8209;pointer options, in total (70%), are even more popular than add-brackets. They were also recently
+            added.</li>
+        <li>The preserve-date option is used by nearly one-third of the survey.</li>
+        <li>All of the options are used by someone in the survey, even the ones I thought were outdated. The bracket styles
+            that are not used are probably a result of not having enough response.</li>
+    </ul>
+
+    <h4>
+        Developers</h4>
+
+    <p>
+        The <a href="http://jimp03.zxq.net/" target="astyle" title="open new window">Artistic Style for Windows</a> program
+        contains a sample GUI using the new bracket style options. The old predefined styles are now the bracket styles.
+        The bracket options have been removed along with the indent&#8209;brackets and indent&#8209;blocks options. The
+        new bracket styles all use the same default indent of 4 spaces, therefore it is not necessary to set an indentation
+        from the bracket style. The new format is available for use with this release.</p>
+    <p>
+        &nbsp;</p>
+
+    <h3>
+        Artistic Style 2.01&nbsp; (November 2010)
+    </h3>
+
+    <p>
+        With a new Artistic Style release some unchanged source files will be formatted because of changes to Artistic
+        Style. You may want to format your source before making program changes in order to bring it up to date.</p>
+    <p>
+        A new feature at SourceForge is download maps that show a list of downloads by country. It is available from the
+        top menu at Develop &gt; Download Stats (Beta), and clicking on the "top country" area. The list of downloads
+        shows about 75% of Artistic Style downloads are from non English speaking countries. This release is the start
+        of the internationalization of Artistic Style.</p>
+    <p>
+        Artistic Style now sets the native local so that characters from the user&#8217;s native language will be recognized
+        in directory names and file names. Artistic Style for Windows has also been changed to use the native locale.
+        For Linux systems using UTF-8 locales, characters from any language will be recognized and any combination of
+        languages can be used. For Windows, only languages recognized by the native codepage can be used. For example,
+        the English locale (codepage 1252) also has French, German, Italian, Portuguese, Spanish, plus several other languages.
+        Other locals, such as Chinese and Japanese, only support one language. Unicode was not used due to the varying
+        degree of support by different compilers for console applications.</p>
+    <p>
+        The locale setting also affects the way numbers are displayed. Language translations may be provided in a future
+        release.&nbsp;
+    </p>
+    <p>
+        This is a major release (2.01) because of the internationalization and changes that will occur in the next couple
+        of releases. Future releases will contain a major change to the bracket options and a rewrite of the file access
+        method. Some of the requested changes require looking at blocks of code instead of single lines. The current program
+        has been patched to do this but a rewrite of the file input is needed. These are both major changes but with the
+        new test framework in place they should be manageable.</p>
+    <p>
+        There has been a change to the &#8209;&#8209;min&#8209;conditional&#8209;indent option. Instead of using the number
+        of spaces it now uses a code expressed in number of indents. This will allow the option to be set independently
+        of the spaces per indent. If you are using the default setting of two indents, or a setting of zero indents, there
+        is no change necessary to the input. Otherwise, check the documentation for the new codes.</p>
+    <p>
+        The --style=linux has been changed to ALWAYS use a minimum conditional indent of one-half the indent length. This
+        is in the style definition and cannot be changed. If you do not want this setting use the K&amp;R style instead.
+    </p>
+    <p>
+        The MFC macros BEGIN_DISPATCH_MAP, BEGIN_EVENT_MAP, and BEGIN_PROPPAGEIDS are now formatted.
+    </p>
+    <p>
+        Checksum verification has been added to source file output that will help assure that no code has been duplicated
+        or omitted. This is effective only in the debug configuration used for testing.</p>
+    <p>
+        The test framework has been changed from UnitTest++ to <a href="http://code.google.com/p/googletest/" target="_blank"
+            title="open new window">Google Test</a>, which is actively maintained, has a mock object framework (<a href="http://code.google.com/p/googlemock/"
+                target="_blank" title="open new window">Google Mock</a>), and good documentation. Regression and system
+        testing have been automated with Python scripts. Python has also been used for class verification checks and other
+        repetitive procedures.</p>
+    <p>
+        If you use Visual Studio C++ Express the 2010 release has the ability to create x64 code. But you must use Vista
+        or Windows 7 and need to install the .NET Framework SDK. I have created a brief instruction page <a href="vsinstall.html"
+            target="_blank" title="open new window">here</a>.</p>
+    <p>
+        Thanks to Matthew Woehlke, Chris Schwarz, Chang Jiang, and Arseny Solokha for their contributions.</p>
+
+    <h4>
+        Developers</h4>
+
+    <p>
+        On the library build of Artistic Style, the second argument of the fpError typedef and the javaErrorHandler declaration
+        has been changed from "char*" to "const char*". This could cause a compile error if not changed in the source
+        statements.</p>
+    <p>
+        There has been a change in the &#8209;&#8209;min&#8209;conditional&#8209;indent option. Instead of using number
+        of spaces to indent it now uses a code expressed in number of indents. In the past this option was a problem because
+        it was also affected by changes in indent length. With this release there is only one variable affected. The option
+        is not affected by changes in indent length. The minimum conditional indent length is computed automatically by
+        ASFormatter after all the options have been processed. Refer to the code in astyle_main.cpp to see how the option
+        is processed.</p>
+    <p>
+        The --style=linux has been changed to ALWAYS use a minimum conditional indent of one-half the indent length. The
+        option is set in the function fixOptionVariableConflicts.</p>
+    <p>
+        The use of locales affects only the command line build.</p>
+    <p>
+        &nbsp;</p>
+
+    <p>
+        <strong>Previous releases are available in the <a href="http://astyle.sourceforge.net/newsArchives.html">News Archives</a>.</strong></p>
+
+    <p>
+        &nbsp;</p>
+
+    <center style="margin-left: -0.4in;">
+        <a href="http://sourceforge.net/projects/astyle">
+            <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=2319&type=16" width="150" height="40" alt="[SourceForge.net]" /></a>
+    </center>
+
+    <p>
+        &nbsp;</p>
+
+    <!-- Piwik -->
+
+    <script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/astyle/" : "http://sourceforge.net/apps/piwik/astyle/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+    </script>
+
+    <noscript>
+        <p>
+            <img src="http://sourceforge.net/apps/piwik/astyle/piwik.php?idsite=1" style="border: 0" alt="" /></p>
+    </noscript>
+
+    <!-- End Piwik Tag -->
+
+</body>
+
+</html>
+

@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Artistic Style - Subversion</title>
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+    <h1>
+        Artistic Style Subversion Repository</h1>
+
+    <p>
+        &nbsp;</p>
+
+    <h3>
+        Artistic Style</h3>
+
+    <p>
+        The latest development source is in the Artistic Style repository at SourceForge. It can be checked out using
+        Subversion. The source code is under development and some changes take several weeks to complete. The intermediate
+        source files have not been through the extensive system tests that are done before each release. Use reasonable
+        precautions when using source code from the repository.</p>
+    <p>
+        The repository address is "https://astyle.svn.sourceforge.net/svnroot/astyle". The current version is in the "trunk/AStyle"
+        branch of the repository. The file and directory names in the repository are case sensitive.</p>
+    <p>
+        A sample checkout is:<br />
+        <strong>svn&nbsp; checkout&nbsp; "https://astyle.svn.sourceforge.net/svnroot/astyle/trunk/AStyle"&nbsp; "$HOME/astyle"</strong></p>
+    <p>
+        Note that the URLs used to access the repository will change when the project is upgraded to the Allura platform
+        by SourceForge. SourceForge should provide information on the new URLs.</p>
+    <p>
+        You can also <a href="http://astyle.svn.sourceforge.net/viewvc/astyle/">browse the subversion repository</a>. The current development release is in the "trunk" directory. This gives you a view into the current status of the project's code without actually checking-out the files.</p>
+    <p>
+        &nbsp;</p>
+
+    <h3>
+        Other Projects</h3>
+
+    <p>
+        Two additional Artistic Style projects are available in the repository. They are not maintained for the general
+        public but are available if you want them. You may have to create your own project files and scripts to use them.
+        These projects require the Artistic Style project above. They are an extension that requires the Artistic Style
+        source. All projects, and any additional source required, should be installed in the same top level folder.</p>
+
+    <h4>
+        AStyleDev</h4>
+
+    <p>
+        AStyleDev contains the development files that are made available in the "Developer Information" section. Refer
+        to that section for more information.</p>
+    <p>
+        A sample checkout is:<br />
+        svn&nbsp; checkout&nbsp; "https://astyle.svn.sourceforge.net/svnroot/astyle/trunk/AStyleDev"&nbsp; "$HOME/astyledev"</p>
+    <p>
+        Note that the URLs used to access the repository will change when the project is upgraded to the Allura platform
+        by SourceForge. SourceForge should provide information on the new URLs.</p>
+
+    <h4>
+        AStyleTest</h4>
+
+    <p>
+        AStyleTest contains the unit test programs and test scripts for Artistic Style.
+    </p>
+    <p>
+        A sample checkout is:<br />
+        svn&nbsp; checkout&nbsp; "https://astyle.svn.sourceforge.net/svnroot/astyle/trunk/AStyleTest"&nbsp; "$HOME/astyletest"</p>
+    <p>
+        Note that the URLs used to access the repository will change when the project is upgraded to the Allura platform
+        by SourceForge. SourceForge should provide information on the new URLs.</p>
+    <p>
+        In addition to the Artistic Style source the test program requires
+        <a href="http://code.google.com/p/googlemock/"
+            target="astyle" title="open new window">Google Mock</a>. This is the Google multi-platform framework for writing C++ 
+        unit tests. The main Artistic Style test project, AStyleTest, actually uses &quot;integration&quot; tests instead of 
+        &quot;unit&quot; tests. This type of testing can be effective for programs that were written without unit tests to begin 
+        with.</p>
+    <p>
+        An optional leak finder program can be added if you
+        are using Visual Studio. The <a href="https://vld.codeplex.com/" target="astyle"
+            title="open new window">Visual Leak Detector</a> should be installed in the default install directory
+        (C:\Program Files (x86)\Visual Leak Detector). You do NOT need to change the &quot;PATH&quot; environment variable.
+        It can be downloaded from the website or installed from standard versions of Visual Studio 2012 from the 
+        &quot;Tools &gt; Extensions and Updates&quot; menu.</p>
+    <p>
+        &nbsp;
+    </p>
+
+    <center style="margin-left: -0.4in;">
+        <a href="http://sourceforge.net/projects/astyle">
+            <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=2319&type=16" width="150" height="40" alt="[SourceForge.net]" /></a>
+    </center>
+
+    <p>
+        &nbsp;</p>
+
+    <!-- Piwik -->
+
+    <script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/astyle/" : "http://sourceforge.net/apps/piwik/astyle/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+    </script>
+
+    <noscript>
+        <p>
+            <img src="http://sourceforge.net/apps/piwik/astyle/piwik.php?idsite=1" style="border: 0" alt="" /></p>
+    </noscript>
+
+    <!-- End Piwik Tag -->
+
+</body>
+
+</html>
+

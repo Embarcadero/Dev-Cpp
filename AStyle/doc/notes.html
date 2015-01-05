@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Artistic Style - Release Notes</title>
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+    <h1>
+        Artistic Style Release Notes</h1>
+
+    <p>
+        &nbsp;</p>
+
+    <h3 id="_2.03">
+        Artistic Style 2.03&nbsp; (April 2013)</h3>
+
+    <ul>
+        <li>Add new option "indent=force-tab-x=#" (-xT#) to allow a tab length that different from the indent length (3430662).</li>
+        <li>Add new option, "pad-first-paren-out" (xd), to pad only the first paren in a series on the outside (3350356).</li>
+        <li>Add new option "max-code-length=#" (-xC#) to limit the length of code on a line. </li>
+        <li>Add new option "break-after-logical" (-xL) to modify a "max-code-length" line break for conditionals. </li>
+        <li>Add new option &quot;close-templates&quot; (-xy) to close whitespace in the angle brackets "&gt;" of template definitions.</li>
+        <li>Add formatting of C++ rvalue references (&amp;&amp;) using the existing &quot;align-pointer&quot; and &quot;align-reference&quot; options.</li>
+        <li>Add formatting of C++/CLI managed pointers (the "^" character) to the &quot;align-pointer&quot; option.</li>
+        <li>Add translations for Dutch, Finnish, Italian, Japanese, Korean, Polish, Portuguese, Russian, Swedish, and Ukrainian.
+        </li>
+        <li>Remove byte-order-mark from ASLocalizer.cpp.</li>
+        <li>Change the short option for delete-empty-lines from "xd" to "xe".</li>
+        <li>Change the ASTYLE_LIB option to remove __declspec for a Visual C static library when 
+            ASTYLE_NO_VCX is also declared. </li>
+        <li>Change to remove any space padding in&nbsp; a pointer to pointer (**).</li>
+        <li>Fix "break-elseifs" to format one-line "if" and "else" statements the same as when the option is not used. </li>
+        <li>Fix "break-elseifs" to break else-if statements when "keep-one-line-statements" also is requested. </li>
+        <li>Fix "break-elseifs" to correctly format comments preceding the else-if. </li>
+        <li>Fix C# not correctly identifying lambda expressions as a command-type bracket.</li>
+        <li>Fix C# preprocessor statements adding extra empty lines when "break-blocks" is used. </li>
+        <li>Fix C# padding "get" and "set" statements that are not headers when "break-blocks" is used. </li>
+        <li>Fix C# to recognize the "#line" statement. </li>
+        <li>Fix C++11 standard for range-based "for" loops (3458402, 3480095). </li>
+        <li>Fix C++11 standard for "enum" with a base type (3458402). </li>
+        <li>Fix C++11 standard for template closing angle brackets (no space required) (3495192). </li>
+        <li>Fix C/C++ keyword 'extern "C"' in a preprocessor causing an extra indent (1514844, 2953388, 2963382, 3093842,
+            <span>3467479)</span>. </li>
+        <li>Fix breaking after a switch "default" statement when "break-elseifs" is used without "keep-one-line-statements" (<span>3559365</span>). </li>
+        <li>Fix in-statement arrays to indent correctly when they exceed the "max-instatement-indent". </li>
+        <li>Fix quote continuation sometimes being processed as a preprocessor directive (3445475).</li>
+        <li>Fix formatting of some conditional statements on a continuation-line.</li>
+        <li>Fix Java formatting of generics with wildcards (3428140).</li>
+        <li>Fix formatting of pointers and references to work with the new "max-code-length" option. </li>
+        <li>Fix formatting of pointers and references after a template close.</li>
+        <li>Fix formatting of empty attached brackets (3505002).</li>
+        <li>Fix C comments beginning a line breaking if they follow a semi-colon (3502700).</li>
+        <li>Fix &quot;pad-header&quot; not padding &quot;return&quot; and &quot;throw&quot; statements (3509134).</li>
+        <li>Fix recognition problems with templates.</li>
+        <li>Fix "struct" return type being mistaken for a struct.</li>
+        <li>Fix "pad-oper" in java for-each loop.</li>
+        <li>Fix recognition of a macro multi-line comment (3414970).</li>
+        <li>Fix bracketTypeStack entries added by #if and #else if the # is separated from the word. </li>
+        <li>Fix C++ breaking a line on an access modifier in a one-line block when &quot;keep-one-line-blocks&quot; is used.</li>
+        <li>Fix memory leak when &quot;ascii&quot; option is used.</li>
+        <li>Fix memory leak when a preprocessor statement is used without a closing #endif.</li>
+        <li>Fix preprocessor directive to allow compiling with mingw-x64 compiler.</li>
+        <li>Fix redirection on Windows so it does not hang when Linux line ends are used (3514712).</li>
+        <li>Fix redirection on Linux to output the correct line ends (3514712).</li>
+        <li>Fix non-portable return value on locale name (3452574). </li>
+        <li>Fix assert errors caused by not checking the text length on the return from peekNextText().</li>
+        <li>Fix spelling of "depreciated" in help message (3454735).</li>
+        <li>Refactor to improve design and decomposition:
+            <ul>
+                <li>Fix warning messages from Visual Studio static code analysis.</li>
+                <li>Fix warning messages from cppcheck, except for constructor uninitialized variables (false positive). </li>
+                <li>Remove astyle_main.h dependency from ASLocalizer.h </li>
+                <li>Remove appendChar() from the inline functions.</li>
+                <li>Extract methods for pointer or reference alignment in ASFormatter. </li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3 id="_2.02">
+        Artistic Style 2.02.1&nbsp; (November 2011)</h3>
+
+    <ul>
+        <li>Add to C# the recognition of pointers and address-of operators. </li>
+        <li>Improve recognition of pointers and references (3,314,499, 3,298,204, and 2,990,608). </li>
+        <li>Improve alignment of a reference to a pointer (*&amp;).</li>
+        <li>Fix crash with "align-pointer=type" when pointer to pointer (**) starts a new line (3,431,431). </li>
+        <li>Fix breaking after a "case" statement when "break-elseifs" is used without "keep-one-line-statements" (3,421,577,
+            and 3,314,247). </li>
+        <li>Fix "pad-oper" used with "keep-one-line-statements" not padding operators in a one-line "case" statement. </li>
+        <li>Fix not recognizing a "pointer dereference" or "address of" that follows a comment (3,431,431). </li>
+        <li>Fix "break-blocks" used with "delete-empty-lines" not correctly breaking blocks on the first run. </li>
+        <li>Fix "pad-oper" not padding the alternate comparison operators "and" and "or" (3,342,373). </li>
+    </ul>
+
+    <h3>
+        Artistic Style 2.02&nbsp; (May 2011)</h3>
+
+    <ul>
+        <li>Add new program module, ASLocalizer, containing language translations.</li>
+        <li>Add new short option prefix "x" to allow for expansion of short options.</li>
+        <li>Add new command line only option "ascii" (-I). </li>
+        <li>Add new bracket style, "style=pico" (-A11). </li>
+        <li>Add new bracket style, "style=lisp" (-A12). </li>
+        <li>Add new option "align-reference=" (-W#) (3,136,744). </li>
+        <li>Add new options ignore-exclude-errors (-i) and ignore-exclude-errors-x (-xi) (3,259,910).</li>
+        <li>Add new option "style=break" for Allman style brackets. </li>
+        <li>Add new option "style=attach" for Java style brackets.</li>
+        <li>Add processing of UTF-16 files by converting to UTF-8 and back to UTF-16. </li>
+        <li>Add Microsoft C++ extensions for try-finally and try-except statements (3,222,216). </li>
+        <li>Add "override" and "sealed" modifiers (Visual C specific) to preCommandHeaders vector (3,167,978). </li>
+        <li>Add "case" and "default" to the list of formatters in ASFormatter (3,276,212).</li>
+        <li>Remove "indent-brackets" and "indent-blocks" from the valid options.</li>
+        <li>Remove "volatile" from headers and remove comparisons in ASBeautifier.</li>
+        <li>Change "delete-empty-lines" short option from "x" to "xd".</li>
+        <li>Change "max-instatement-indent" maximum value from 80 to 120 (3,255,930).</li>
+        <li>Change "brackets=horstman" to "brackets=run-in", used for both Horstmann and Pico styles.</li>
+        <li>Change C enumerations to allow in-statement indents (3,280,454). </li>
+        <li>Change functions setting the "indent-brackets" and "indent-blocks" variables from public to protected.</li>
+        <li>Change to indent lines beginning with an assignment operator (3,292,880). </li>
+        <li>Change to abort if UTF-32 files are detected.</li>
+        <li>Change "Cannot set native locale" error message from cout to cerr (3,139,873). </li>
+        <li>Fix Linux infinite loop when a directory name is entered instead of a file name. </li>
+        <li>Fix trying to process directories as files when a wildcard is used without recursive (3,134,108).</li>
+        <li>Fix processing a "const" variable as a "const" method when it follows a header (3,168,156). </li>
+        <li>Fix indentation of a one-line block that follows a header.</li>
+        <li>Fix breaking a preprocessor define that has code after a comment end (3,132,531). </li>
+        <li>Fix "pad-oper" padding a dereference that follows a C-style cast (3,259,713). </li>
+        <li>Fix "unpad-parens" not recognizing an xor (^) operator (3,285,639). </li>
+        <li>Fix "break-blocks" procedure for "case" and "default" headers.</li>
+        <li>Fix "add-brackets" adding brackets to the "while" of a "do-while" loop (3,267,880). </li>
+        <li>Fix "add-brackets" adding brackets to an empty statement. </li>
+        <li>Fix "pad-paren" used with "align-pointer=name" incorrectly adding an extra space.</li>
+        <li>Fix not clearing a flag when a "?" conditional is included in an "if" statement (2,989,638). </li>
+        <li>Fix incorrect indentation when "volatile" modifier is used (<span>3,279,856</span>). </li>
+        <li>Fix indentation for Microsoft "#pragma region" and "#pragma endregion" preprocessor directives.</li>
+        <li>Fix not printing a zero for formatted numbers.</li>
+        <li>Fix indentation of a class opening bracket followed by a class modifier on the same line when indent-namespaces
+            and indent-classes are used.</li>
+        <li>Refactor to aid debugging, improve speed, and improve the design and decomposition:
+            <ul>
+                <li>Extract method processProcessor() from beautify() in ASBeautifier. </li>
+                <li>Extract method computePreliminaryIndentation() from beautify() in ASBeautifier. </li>
+                <li>Extract method parseCurrentLine() from beautify() in ASBeautifier. </li>
+                <li>Remove unnecessary copies to outBuffer variable in ASBeautifier. </li>
+                <li>Add preCommandHeaders vector to ASBeautifier and remove the "const" modifier comparisons.</li>
+                <li>Change static vectors to member variables.</li>
+                <li>Add isDigit() function to avoid the assert statements in Visual C. </li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3 id="_2.01">
+        Artistic Style 2.01&nbsp; (November 2010)</h3>
+
+    <ul>
+        <li>Add recognition of language characters supported by the native locale.</li>
+        <li>Add formatting of numbers according to the native locale.</li>
+        <li>Add checksum verification to source file output. </li>
+        <li>Add formatting of MFC macros BEGIN_DISPATCH_MAP, BEGIN_EVENT_MAP, and BEGIN_PROPPAGEIDS.</li>
+        <li>Add error message if --recursive is used without a wildcard in the file name.</li>
+        <li>Add private (unusable) copy constructors for classes with dynamic allocation.</li>
+        <li>Add error message if the "cin" stream cannot be processed because a pipe is used.</li>
+        <li>Improve recognition of ARRAY_TYPE brackets.</li>
+        <li>Improve formatting of multi-line comments when the number of leading spaces must be changed. </li>
+        <li>Improve formatting of embedded SQL when the number of leading spaces must be changed. </li>
+        <li>Improve recognition of C++ templates.</li>
+        <li>Change --style=linux to always use a minimum conditional indent of one-half the indent length.</li>
+        <li>Change --pad-oper to pad operators in block parens.</li>
+        <li>Change to indent OpenMP pragmas with the code.</li>
+        <li>Change to display all (instead of one) option errors before abort.</li>
+        <li>Change the second argument of the fpError typedef from "char*" to "const char*".</li>
+        <li>Change Linux Makefiles to allow external values for CFLAGS and LDFLAGS.</li>
+        <li>Change all destructors to virtual.</li>
+        <li>Fix crash when --break-blocks is used and there is no closing bracket.</li>
+        <li>Fix deleting the previous line when a closing bracket follows a comment close.</li>
+        <li>Fix not recognizing text in quotes when identifying struct access modifiers.</li>
+        <li>Fix not popping the paren stack when a bracket precedes an end of line comment.</li>
+        <li>Fix not breaking a closing bracket when empty parens are enclosed in a single line block.</li>
+        <li>Fix indenting of C# anonymous statement closing bracket.</li>
+        <li>Fix recognition of C# non in-statement arrays.</li>
+        <li>Fix breaking single line blocks for C# abstract methods. </li>
+        <li>Fix not always clearing isNonInStatementArray flag.</li>
+        <li>Fix indenting "case" statements in a preprocessor definition when --indent-preprocessor is not requested.</li>
+        <li>Fix not recognizing the "volatile" type qualifier as a keyword.</li>
+        <li>Fix class initializers not being recognized as an in-statement indent.</li>
+        <li>Fix indenting Java abstract methods when "new" starts the line and brackets are broken.</li>
+        <li>Fix broken initializer lines (ending with comma) when there is more than one space after the type.</li>
+        <li>Fix --brackets=attach inserting a bracket inside comments following a preprocessor statement. </li>
+        <li>Fix --brackets=attach attaching an array bracket from a one line block to the previous line.</li>
+        <li>Fix --brackets=horstmann not breaking a comment line when the comment ends the line with a bracket.</li>
+        <li>Fix --pad-oper to recognize all * and &amp; operators within a function call.</li>
+        <li>Fix --unpad-paren to recognize * and &amp; operators within a function call.</li>
+        <li>Fix --pad-paren used with --delete-empty-lines causing a space to be added at end of line in some cases.</li>
+        <li>Fix --pad-paren padding a closing paren followed by a block paren.</li>
+        <li>Fix --add-brackets when a header is followed by a semi-colon.</li>
+        <li>Fix --align-pointer to pad or unpad pointers followed by parens or comments.</li>
+        <li>Fix --align-pointer to pad or unpad pointers following a scope resolution operator.</li>
+        <li>Fix --align-pointer to pad or unpad pointers that end the line.</li>
+        <li>Fix --align-pointer used with --pad-parens-out causing a space to be padded for each run. </li>
+        <li>Fix --break-blocks used with --delete-empty-lines causing an assert error when end of file is reached. </li>
+        <li>Fix --break-blocks used with --delete-empty-lines causing an assert error for some combinations of comment lines.</li>
+        <li>Fix --break-blocks used with --delete-empty-lines causing a duplicate line in some cases. </li>
+        <li>Fix --break-blocks used with --delete-empty-lines not always breaking opening blocks. </li>
+        <li>Fix --break-blocks used with --delete-empty-lines not always deleting empty lines for closing blocks. </li>
+        <li>Fix --break-blocks used with --fill-empty-lines not always correctly filling empty lines in a switch statement.
+        </li>
+        <li>Fix --unpad-paren used with --pad-paren-in not padding between opening parens when multiple parens are used.</li>
+        <li>Fix --pad-oper incorrectly padding a template with a default parameter.</li>
+        <li>Fix ASBeautifier findOperator() method to recognize a C# lambda (=&gt;) operator.</li>
+        <li>Fix ASFormatter nextLine() method to output an entire operator instead of individual characters.</li>
+        <li>Fix incorrectly identifying "*" as pointers in block parens.</li>
+        <li>Fix MinGW -Wshadow warnings.</li>
+        <li>Fix VS2010 "string subscript out of range" asserts. </li>
+        <li>Refactor:
+            <ul>
+                <li>Remove template definition for parseOptions() by using a vector reference instead of iterators as function arguments.</li>
+                <li>New ASOptions class to encapsulate global functions used by both the console and library builds. </li>
+                <li>Replace argc and argv in processOptions() with a vector to simplify test cases.</li>
+                <li>Replace IS_OPTION and IS_OPTIONS macros with ASOptions methods. </li>
+                <li>Replace GET_PARAM and GET_PARAMS macros with ASOptions methods. </li>
+                <li>Extract ASFormatter methods checkIfTemplateOpener() and isClosingHeader().</li>
+            </ul>
+        </li>
+    </ul>
+    <p>
+        &nbsp;</p>
+
+    <p>
+        <strong>Previous releases are available in the <a href="http://astyle.sourceforge.net/notesArchives.html">Release Notes Archives</a>.</strong></p>
+
+    <p>
+        &nbsp;</p>
+
+    <center style="margin-left: -0.4in;">
+        <a href="http://sourceforge.net/projects/astyle">
+            <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=2319&type=16" width="150" height="40" alt="[SourceForge.net]" /></a>
+    </center>
+
+    <p>
+        &nbsp;</p>
+
+    <!-- Piwik -->
+
+    <script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/astyle/" : "http://sourceforge.net/apps/piwik/astyle/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+    </script>
+
+    <noscript>
+        <p>
+            <img src="http://sourceforge.net/apps/piwik/astyle/piwik.php?idsite=1" style="border: 0" alt="" /></p>
+    </noscript>
+
+    <!-- End Piwik Tag -->
+
+</body>
+
+</html>
+
