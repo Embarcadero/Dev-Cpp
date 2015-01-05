@@ -2533,7 +2533,7 @@ function TdevFormatter.FormatMemory(Editor: TEditor; const OverrideCommand: Ansi
 var
   FileName: AnsiString;
 begin
-  FileName := devDirs.Exec + fAStyleDir + 'main.cpp';
+  FileName := devDirs.Exec + fAStyleDir + ExtractFileName(Editor.FileName);
   with Editor.Text do begin
     Lines.SaveToFile(FileName);
     FormatFile(FileName, OverrideCommand);

@@ -782,7 +782,6 @@ begin
 
     // Update the cursor
     fText.CaretXY := NewCursorPos;
-    fText.EnsureCursorPosVisible; // not needed?
 
     // prevent lots of repaints
   finally
