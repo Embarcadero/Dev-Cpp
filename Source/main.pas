@@ -6612,34 +6612,37 @@ begin
     devFormatter.FormatMemory(e, devFormatter.FullCommand);
     e.Text.BeginUndoBlock;
     try
+      // Mimic paste operation
+      e.Text.UndoList.AddChange(
+        crDelete, // delete everything
+        BufferCoord(1, 1),
+        OldAllBlockEnd,
+        OldText,
+        smNormal);
+      e.Text.UndoList.AddChange(
+        crInsert, // insert new file
+        BufferCoord(1, 1),
+        GetEndOfFileBlock(e.Text.Lines),
+        '',
+        smNormal);
+
+      // Remember caret and selection
       e.Text.UndoList.AddChange(
         crSelection,
         OldBlockBegin,
         OldBlockEnd,
         '',
         smNormal);
-     e.Text.UndoList.AddChange(
+      e.Text.UndoList.AddChange(
         crCaret,
         OldCaretXY,
         OldCaretXY,
         '',
         smNormal);
-      e.Text.UndoList.AddChange(
-        crDelete,
-        BufferCoord(1, 1),
-        OldBlockEnd,
-        OldText,
-        smNormal);
-      e.Text.UndoList.AddChange(
-        crInsert,
-        BufferCoord(1, 1),
-        GetEndOfFileBlock(e.Text.Lines),
-        '',
-        smNormal);
     finally
       e.Text.EndUndoBlock;
     end;
-    e.Text.CaretXY := OldCaretXY;
+      e.Text.CaretXY := OldCaretXY;
   end;
 end;
 
