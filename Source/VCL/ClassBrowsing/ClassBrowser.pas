@@ -340,11 +340,8 @@ begin
         ReSelect;
     end;
   finally
-    Items.EndUpdate;
+    Items.EndUpdate; // calls repaint when needed
   end;
-
-  // Always fully repaint.
-  Repaint;
 end;
 
 procedure TClassBrowser.OnNodeChanging(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -471,7 +468,7 @@ procedure TClassBrowser.AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TT
   TCustomDrawStage; var PaintImages, DefaultDraw: Boolean);
 var
   DrawRect: TRect;
-  DrawPoint : TPoint;
+  DrawPoint: TPoint;
   st: PStatement;
   bInherited: boolean;
   TypeText: AnsiString;
@@ -494,7 +491,7 @@ begin
 
     // Start drawing at top right corner of DisplayRect
     DrawRect := Node.DisplayRect(true);
-    DrawPoint := Point(DrawRect.Right,DrawRect.Top);
+    DrawPoint := Point(DrawRect.Right, DrawRect.Top);
 
     // Draw function arguments to the right of the already drawn text
     if st^._Args <> '' then begin
@@ -503,7 +500,7 @@ begin
       else
         fControlCanvas.Font.Color := clMaroon;
       fControlCanvas.TextOut(DrawPoint.X, DrawPoint.Y + 2, st^._Args); // center vertically
-      Inc(DrawPoint.X,fControlCanvas.TextWidth(st^._Args) + 3); // add some right padding
+      Inc(DrawPoint.X, fControlCanvas.TextWidth(st^._Args) + 3); // add some right padding
     end;
 
     if st^._Type <> '' then

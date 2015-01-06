@@ -6597,18 +6597,21 @@ var
   OldCaretXY: TBufferCoord;
   OldTopLine: integer;
 begin
-  e := fEditorList.GetEditor;
-  if Assigned(e) then begin
-    // Save for undo list creation
-    OldTopLine := e.Text.TopLine;
-    OldCaretXY := e.Text.CaretXY;
+  if devFormatter.Validate then begin
+    e := fEditorList.GetEditor;
+    if Assigned(e) then begin
+      // Save for undo list creation
+      OldTopLine := e.Text.TopLine;
+      OldCaretXY := e.Text.CaretXY;
 
-    devFormatter.FormatMemory(e, devFormatter.FullCommand);
+      devFormatter.FormatMemory(e, devFormatter.FullCommand);
 
-    // Attempt to not scroll view
-    e.Text.TopLine := OldTopLine;
-    e.Text.CaretXY := OldCaretXY;
-  end;
+      // Attempt to not scroll view
+      e.Text.TopLine := OldTopLine;
+      e.Text.CaretXY := OldCaretXY;
+    end;
+  end else
+    MessageDlg(Lang[ID_FORMATTER_NOTVALID], mtWarning, [mbOK], 0);
 end;
 
 procedure TMainForm.actFormatOptionsExecute(Sender: TObject);

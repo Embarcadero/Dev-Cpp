@@ -6,7 +6,7 @@ object MainForm: TMainForm
   AutoScroll = False
   Caption = 'Dev-C++'
   ClientHeight = 680
-  ClientWidth = 1000
+  ClientWidth = 999
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -35,7 +35,7 @@ object MainForm: TMainForm
   object SplitterBottom: TSplitter
     Left = 0
     Top = 474
-    Width = 1000
+    Width = 999
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -45,7 +45,7 @@ object MainForm: TMainForm
   object MessageControl: TPageControl
     Left = 0
     Top = 477
-    Width = 1000
+    Width = 999
     Height = 183
     ActivePage = DebugSheet
     Align = alBottom
@@ -174,7 +174,7 @@ object MainForm: TMainForm
         end
         object chkShortenPaths: TCheckBox
           Left = 4
-          Top = 132
+          Top = 139
           Width = 144
           Height = 17
           Action = actShortenCompPaths
@@ -185,7 +185,7 @@ object MainForm: TMainForm
       object CompResGroupBox: TPanel
         Left = 156
         Top = 0
-        Width = 836
+        Width = 835
         Height = 155
         Align = alClient
         BevelOuter = bvNone
@@ -216,13 +216,13 @@ object MainForm: TMainForm
       object DebugSendPanel: TPanel
         Left = 589
         Top = 0
-        Width = 403
+        Width = 402
         Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
-          403
+          402
           155)
         object lblSendCommandGdb: TLabel
           Left = 4
@@ -234,7 +234,7 @@ object MainForm: TMainForm
         object edGdbCommand: TComboBox
           Left = 136
           Top = 3
-          Width = 263
+          Width = 262
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           ItemHeight = 13
@@ -244,8 +244,8 @@ object MainForm: TMainForm
         object DebugOutput: TMemo
           Left = 4
           Top = 30
-          Width = 396
-          Height = 118
+          Width = 395
+          Height = 117
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -410,7 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 48
+          Height = 47
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
@@ -493,7 +493,7 @@ object MainForm: TMainForm
   object ToolbarDock: TControlBar
     Left = 0
     Top = 16
-    Width = 1000
+    Width = 999
     Height = 56
     Align = alTop
     AutoDock = False
@@ -883,7 +883,7 @@ object MainForm: TMainForm
   object Statusbar: TStatusBar
     Left = 0
     Top = 660
-    Width = 1000
+    Width = 999
     Height = 20
     Panels = <
       item
@@ -901,7 +901,7 @@ object MainForm: TMainForm
   object FullScreenPanel: TPanel
     Left = 0
     Top = 0
-    Width = 1000
+    Width = 999
     Height = 16
     Align = alTop
     BevelOuter = bvNone
@@ -911,10 +911,10 @@ object MainForm: TMainForm
     TabOrder = 5
     Visible = False
     DesignSize = (
-      1000
+      999
       16)
     object btnFullScrRevert: TSpeedButton
-      Left = 983
+      Left = 982
       Top = 0
       Width = 16
       Height = 16
@@ -1052,14 +1052,14 @@ object MainForm: TMainForm
   object PageControlPanel: TPanel
     Left = 196
     Top = 72
-    Width = 804
+    Width = 803
     Height = 402
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 6
     OnResize = PageControlPanelResize
     object EditorPageControlSplitter: TSplitter
-      Left = 804
+      Left = 803
       Top = 0
       Width = 0
       Height = 402
@@ -1070,7 +1070,7 @@ object MainForm: TMainForm
     object EditorPageControlLeft: TPageControl
       Left = 0
       Top = 0
-      Width = 804
+      Width = 803
       Height = 402
       Align = alClient
       HotTrack = True
@@ -1085,7 +1085,7 @@ object MainForm: TMainForm
       OnMouseMove = EditorPageControlMouseMove
     end
     object EditorPageControlRight: TPageControl
-      Left = 804
+      Left = 803
       Top = 0
       Width = 0
       Height = 402

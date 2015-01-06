@@ -1873,6 +1873,9 @@ begin
     Result := False;
   end;
 
+  // Update highlighter
+  devEditor.AssignEditor(fText,SaveFileName);
+
   // Update project information
   if Assigned(MainForm.Project) and Self.InProject then begin
     UnitIndex := MainForm.Project.Units.IndexOf(FileName); // index of *old* filename
