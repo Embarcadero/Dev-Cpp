@@ -5975,6 +5975,13 @@ begin
   // Load bookmarks, captions and hints
   LoadText;
 
+  // Load the current compiler set
+  UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
+  devCompilerSets.LoadSets; // SLOWWWW
+
+  // Update toolbar
+  UpdateCompilerList;
+
   // Try to fix the file associations. Needs write access to registry, which might cause exceptions to be thrown
   DDETopic := DevCppDDEServer.Name;
   if devData.CheckAssocs then begin
@@ -5990,13 +5997,6 @@ begin
   // Configure parser, code completion, class browser
   UpdateSplash(Lang[ID_LOAD_INITCLASSBROWSER]);
   UpdateClassBrowsing;
-
-  // Load the current compiler set
-  UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
-  devCompilerSets.LoadSets; // SLOWWWW
-
-  // Update toolbar
-  UpdateCompilerList;
 
   // Show the window to the user
   UpdateSplash(Lang[ID_LOAD_RESTOREWINDOW]);

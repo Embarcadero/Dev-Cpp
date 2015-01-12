@@ -1,9 +1,9 @@
 /*
 	Complicated typedef
 */
-typedef struct tagRECT {
+typedef struct tagREKT {
   LONG left;
   LONG top;
   LONG right;
   LONG bottom;
-} RECT,*PRECT,*NPRECT,*LPRECT;
+} REKT,*PREKT,*NPREKT,*LPREKT;
