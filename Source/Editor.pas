@@ -521,6 +521,9 @@ begin
   fFunctionTip.ReleaseHandle;
 end;
 
+// Handling this here instead of in PageControlChange because when switching between two active editors side by side
+// PageControlChange will not happen, but the editor will be entered and this will be executed
+
 procedure TEditor.EditorEnter(Sender: TObject);
 var
   I, x, y: integer;
@@ -1297,7 +1300,7 @@ begin
     // Reparse whole file (not function bodies) if it has been modified
     // use stream, don't read from disk (not saved yet)
     if fText.Modified then
-      MainForm.CppParser.ReParseFile(fFileName, InProject, False, True, M);
+      MainForm.CppParser.ParseFile(fFileName, InProject, False, True, M);
 
     // Scan the current function body
     fCompletionBox.CurrentStatement := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M);
@@ -1803,7 +1806,7 @@ begin
         Result := False;
       end;
 
-      MainForm.CppParser.ReParseFile(fFileName, InProject);
+      MainForm.CppParser.ParseFile(fFileName, InProject);
     end else if fNew then
       Result := SaveAs; // we need a file name, use dialog
 
@@ -1874,7 +1877,7 @@ begin
   end;
 
   // Update highlighter
-  devEditor.AssignEditor(fText,SaveFileName);
+  devEditor.AssignEditor(fText, SaveFileName);
 
   // Update project information
   if Assigned(MainForm.Project) and Self.InProject then begin
@@ -1890,7 +1893,7 @@ begin
   // Update class browser, redraw once
   MainForm.ClassBrowser.BeginUpdate;
   try
-    MainForm.CppParser.ReParseFile(SaveFileName, InProject);
+    MainForm.CppParser.ParseFile(SaveFileName, InProject);
     MainForm.ClassBrowser.CurrentFile := SaveFileName;
   finally
     MainForm.ClassBrowser.EndUpdate;

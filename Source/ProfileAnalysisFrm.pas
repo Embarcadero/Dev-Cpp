@@ -151,7 +151,7 @@ begin
 
   // Run a flat output
   buffer := TStringList.Create;
-  buffer.Text := RunAndGetOutput(devCompilerSets.CurrentSet.gprofName + Params, Dir, nil, nil, False);
+  buffer.Text := RunAndGetOutput(devCompilerSets.CompilationSet.gprofName + Params, Dir, nil, nil, False);
 
   i := 0;
 
@@ -245,7 +245,7 @@ begin
 
   // Run a graph output
   buffer := TStringList.Create;
-  buffer.Text := RunAndGetOutput(devCompilerSets.CurrentSet.gprofName + Params, Dir, nil, nil, False);
+  buffer.Text := RunAndGetOutput(devCompilerSets.CompilationSet.gprofName + Params, Dir, nil, nil, False);
 
   i := 0;
 
@@ -439,7 +439,7 @@ var
   assembly: AnsiString;
 begin
   if not chkCustom.Checked then begin
-    assembly := devCompilerSets.CurrentSet.gprofName;
+    assembly := devCompilerSets.CompilationSet.gprofName;
     if Assigned(MainForm.Project) then
       assembly := assembly + ' "' + ExtractFileName(MainForm.Project.Executable) + '"'
     else

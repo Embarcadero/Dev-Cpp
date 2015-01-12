@@ -52,7 +52,6 @@ type
     fFilesScannedCount: Integer; // count of files that have been scanned
     fFilesToScanCount: Integer; // count of files and files included in files that have to be scanned
     fScannedFiles: TStringList;
-    fFileIncludes: TStringList;
     fParseLocalHeaders: boolean;
     fParseGlobalHeaders: boolean;
     fProjectDir: AnsiString;
@@ -149,14 +148,14 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure ParseList;
-    procedure ReParseFile(const FileName: AnsiString; InProject: boolean; OnlyIfNotParsed: boolean = False; UpdateView:
+    procedure ParseFile(const FileName: AnsiString; InProject: boolean; OnlyIfNotParsed: boolean = False; UpdateView:
       boolean = True; Stream: TMemoryStream = nil);
     function StatementKindStr(Value: TStatementKind): AnsiString;
     function StatementClassScopeStr(Value: TStatementClassScope): AnsiString;
     function GetIncompleteClass(const Command: AnsiString): PStatement;
     function FetchPendingDeclaration(const Command, Args: AnsiString; Kind: TStatementKind; Parent: PStatement):
       PStatement;
-    procedure Reset(KeepLoaded: boolean = True);
+    procedure Reset;
     procedure ClearIncludePaths;
     procedure ClearProjectIncludePaths;
     procedure AddIncludePath(const Value: AnsiString);
@@ -174,7 +173,7 @@ type
     function GetMember(const Phrase: AnsiString): AnsiString;
     function GetOperator(const Phrase: AnsiString): AnsiString;
     function FindLastOperator(const Phrase: AnsiString): integer;
-    procedure GetInheritanceStatements(Statement: PStatement; List: TList);
+    procedure GetMultipleInheritanceStatements(Statement: PStatement; List: TList);
   published
     property Enabled: boolean read fEnabled write fEnabled;
     property OnUpdate: TNotifyEvent read fOnUpdate write fOnUpdate;
@@ -213,7 +212,6 @@ begin
   fScannedFiles := TStringList.Create;
   fIncludePaths := TStringList.Create;
   fProjectIncludePaths := TStringList.Create;
-  fFileIncludes := TStringList.Create;
   fProjectFiles := TStringList.Create;
   fInvalidatedStatements := TList.Create;
   fPendingDeclarations := TList.Create;
@@ -242,7 +240,6 @@ begin
   FreeAndNil(fScannedFiles);
   FreeAndNil(fIncludePaths);
   FreeAndNil(fProjectIncludePaths);
-  FreeAndNil(fFileIncludes);
 
   inherited Destroy;
 end;
@@ -1966,7 +1963,7 @@ begin
   Result := cbutils.IsSystemHeaderFile(FileName, fIncludePaths);
 end;
 
-procedure TCppParser.ReParseFile(const FileName: AnsiString; InProject: boolean; OnlyIfNotParsed: boolean = False;
+procedure TCppParser.ParseFile(const FileName: AnsiString; InProject: boolean; OnlyIfNotParsed: boolean = False;
   UpdateView: boolean = True; Stream: TMemoryStream = nil);
 var
   FName: AnsiString;
@@ -2037,17 +2034,13 @@ begin
   if Filename = '' then
     Exit;
 
-  // POSSIBLE PROBLEM:
-  // here we delete all the statements that belong to the specified file.
-  // what happens with the statements that have _ParentID on one of these???
-  // what happens with the statements that inherit from one of these???
-  // POSSIBLE WORKAROUND 1: invalidate the other file too (don't like it much...)
-
   // delete statements of file
   Node := fStatementList.FirstNode;
   while Assigned(Node) do begin
     Statement := Node^.Data;
-    NextNode := Node^.NextNode;
+    NextNode := Node^.NextNode; // parent classname is encountered first
+
+    // Is this statement part of this file? Remove
     if SameText(Statement^._FileName, FileName) or SameText(Statement^._DefinitionFileName, FileName) then begin
       if Statement^._Kind = skClass then // only classes have inheritance
         fInvalidatedStatements.Add(Statement);
@@ -2068,7 +2061,7 @@ begin
     Dispose(PFileIncludes(P));
 end;
 
-procedure TCppParser.GetInheritanceStatements(Statement: PStatement; List: TList);
+procedure TCppParser.GetMultipleInheritanceStatements(Statement: PStatement; List: TList);
 var
   I: integer;
 
@@ -2106,7 +2099,7 @@ begin
 
   // after reparsing a file, we have to reprocess inheritance,
   // because by invalidating the file, we might have deleted
-  // some IDs that were inherited by other, valid, statements.
+  // some Statements that were inherited by other, valid, statements.
   // we need to re-adjust the IDs now...
 
   if fInvalidatedStatements.Count = 0 then
@@ -2135,7 +2128,7 @@ begin
 
     // Reparse every file that contains invalidated IDs
     for I := 0 to sl.Count - 1 do
-      ReParseFile(sl[I], fProjectFiles.IndexOf(sl[I]) <> -1, False, False);
+      ParseFile(sl[I], fProjectFiles.IndexOf(sl[I]) <> -1, False, False);
   finally
     sl.Free;
   end;
@@ -2783,7 +2776,7 @@ begin
 
       // Get inheritance and inheritance of inheritance and (etc)
       InheritanceStatements.Clear;
-      GetInheritanceStatements(TypedefStatement, InheritanceStatements);
+      GetMultipleInheritanceStatements(TypedefStatement, InheritanceStatements);
 
       // Add members of this type
       Node := fStatementList.LastNode; // Start scanning backwards, because owner data is found there

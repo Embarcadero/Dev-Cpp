@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, SysUtils, Dialogs, StdCtrls, Controls, ComCtrls, Forms,
-  devrun, version, project, utils, ProjectTypes, Classes, Graphics;
+  devrun, version, project, utils, ProjectTypes, Classes, Graphics, devcfg;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, QDialogs, QStdCtrls, QComCtrls, QForms,
@@ -59,6 +59,7 @@ type
     fWarnCount: integer;
     fStartTime: cardinal;
     fShowOutputInfo: boolean;
+    fCompilerSet: TdevCompilerSet;
     procedure DoLogEntry(const msg: AnsiString);
     procedure DoOutput(const s1, s2, s3, s4: AnsiString);
     procedure DoResOutput(const s1, s2, s3, s4: AnsiString);
@@ -84,6 +85,7 @@ type
     property OnCompSuccess: TCompSuccessEvent read fOnCompSuccess write fOnCompSuccess;
     property OnRunEnd: TRunEndEvent read fOnRunEnd write fOnRunEnd;
     property SourceFile: AnsiString read fSourceFile write fSourceFile;
+    property CompilerSet: TdevCompilerSet read fCompilerSet write fCompilerSet;
     property RunParams: AnsiString read fRunParams write fRunParams; // only for nonproject compilations
     property MakeFile: AnsiString read GetMakeFile;
     property Target: TTarget read fTarget write fTarget;
@@ -122,7 +124,7 @@ type
 implementation
 
 uses
-  MultiLangSupport, devcfg, Macros, devExec, main, StrUtils;
+  MultiLangSupport, Macros, devExec, main, StrUtils;
 
 procedure TCompiler.DoLogEntry(const msg: AnsiString);
 begin
@@ -279,13 +281,13 @@ begin
   GetIncludesParams;
 
   if Pos(' -g3', fCompileParams) > 0 then begin
-    Writeln(F, 'CPP      = ' + devCompilerSets.CurrentSet.gppName + ' -D__DEBUG__');
-    Writeln(F, 'CC       = ' + devCompilerSets.CurrentSet.gccName + ' -D__DEBUG__');
+    Writeln(F, 'CPP      = ' + fCompilerSet.gppName + ' -D__DEBUG__');
+    Writeln(F, 'CC       = ' + fCompilerSet.gccName + ' -D__DEBUG__');
   end else begin
-    Writeln(F, 'CPP      = ' + devCompilerSets.CurrentSet.gppName);
-    Writeln(F, 'CC       = ' + devCompilerSets.CurrentSet.gccName);
+    Writeln(F, 'CPP      = ' + fCompilerSet.gppName);
+    Writeln(F, 'CC       = ' + fCompilerSet.gccName);
   end;
-  Writeln(F, 'WINDRES  = ' + devCompilerSets.CurrentSet.windresName);
+  Writeln(F, 'WINDRES  = ' + fCompilerSet.windresName);
   if (ObjResFile <> '') then begin
     Writeln(F, 'RES      = ' + GenMakePath1(ObjResFile));
     Writeln(F, 'OBJ      = ' + Objects + ' $(RES)');
@@ -520,74 +522,73 @@ var
   I, val: integer;
   option: TCompilerOption;
 begin
-  with devCompilerSets.CurrentSet do begin
+  // Force syntax checking when we have to
+  if fCheckSyntax then begin
+    fCompileParams := '-fsyntax-only';
+    fCppCompileParams := '-fsyntax-only';
+  end else begin
+    fCompileParams := '';
+    fCppCompileParams := '';
+  end;
 
-    // Force syntax checking when we have to
-    if fCheckSyntax then begin
-      fCompileParams := '-fsyntax-only';
-      fCppCompileParams := '-fsyntax-only';
-    end else begin
-      fCompileParams := '';
-      fCppCompileParams := '';
-    end;
+  // Walk all options
+  for I := 0 to fCompilerSet.OptionList.Count - 1 do begin
+    option := PCompilerOption(fCompilerSet.OptionList[I])^;
 
-    for I := 0 to OptionList.Count - 1 do begin
-
-      option := PCompilerOption(OptionList[I])^;
-
-      // consider project specific options for the compiler, else global compiler options
-      if (Assigned(fProject) and (I < Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and
-        (option.Value > 0)) then begin
-        if option.IsC then begin
-          if Assigned(option.Choices) then begin
-            if Assigned(fProject) then
-              val := CharToValue(fProject.Options.CompilerOptions[I + 1])
-            else
-              val := option.Value;
-            if (val > 0) and (val < option.Choices.Count) then
-              fCompileParams := fCompileParams + ' ' + option.Setting +
-                option.Choices.Values[option.Choices.Names[val]];
-          end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I + 1], 0) = 1)) or (not
-            Assigned(fProject)) then begin
-            fCompileParams := fCompileParams + ' ' + option.Setting;
-          end;
+    // consider project specific options for the compiler, else global compiler options
+    if (Assigned(fProject) and (I < Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and
+      (option.Value > 0)) then begin
+      if option.IsC then begin
+        if Assigned(option.Choices) then begin
+          if Assigned(fProject) then
+            val := CharToValue(fProject.Options.CompilerOptions[I + 1])
+          else
+            val := option.Value;
+          if (val > 0) and (val < option.Choices.Count) then
+            fCompileParams := fCompileParams + ' ' + option.Setting +
+              option.Choices.Values[option.Choices.Names[val]];
+        end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I + 1], 0) = 1)) or (not
+          Assigned(fProject)) then begin
+          fCompileParams := fCompileParams + ' ' + option.Setting;
         end;
-        if option.IsCpp then begin
-          if Assigned(option.Choices) then begin
-            if Assigned(fProject) then
-              val := CharToValue(fProject.Options.CompilerOptions[I + 1])
-            else
-              val := option.Value;
-            if (val > 0) and (val < option.Choices.Count) then
-              fCppCompileParams := fCppCompileParams + ' ' + option.Setting +
-                option.Choices.Values[option.Choices.Names[val]];
-          end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I + 1], 0) = 1)) or (not
-            Assigned(fProject)) then begin
-            fCppCompileParams := fCppCompileParams + ' ' + option.Setting;
-          end;
+      end;
+      if option.IsCpp then begin
+        if Assigned(option.Choices) then begin
+          if Assigned(fProject) then
+            val := CharToValue(fProject.Options.CompilerOptions[I + 1])
+          else
+            val := option.Value;
+          if (val > 0) and (val < option.Choices.Count) then
+            fCppCompileParams := fCppCompileParams + ' ' + option.Setting +
+              option.Choices.Values[option.Choices.Names[val]];
+        end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I + 1], 0) = 1)) or (not
+          Assigned(fProject)) then begin
+          fCppCompileParams := fCppCompileParams + ' ' + option.Setting;
         end;
       end;
     end;
+  end;
 
-    // Add custom commands inherited from Tools >> Compiler Options
+  // Add custom commands inherited from Tools >> Compiler Options
+  with fCompilerSet do begin
     if (Length(CompOpts) > 0) and AddtoComp then begin
       fCompileParams := fCompileParams + ' ' + CompOpts;
       fCppCompileParams := fCppCompileParams + ' ' + CompOpts;
     end;
-
-    // Add custom commands at the end so the advanced user can control everything
-    if Assigned(fProject) and (fTarget = ctProject) then begin
-      if Length(fProject.Options.CompilerCmd) > 0 then
-        fCompileParams := fCompileParams + ' ' + Trim(StringReplace(fProject.Options.CompilerCmd, '_@@_', ' ',
-          [rfReplaceAll]));
-      if Length(fProject.Options.CppCompilerCmd) > 0 then
-        fCppCompileParams := fCppCompileParams + ' ' + Trim(StringReplace(fProject.Options.CppCompilerCmd, '_@@_', ' ',
-          [rfReplaceAll]));
-    end;
-
-    fCompileParams := Trim(ParseMacros(fCompileParams));
-    fCppCompileParams := Trim(ParseMacros(fCppCompileParams));
   end;
+
+  // Add custom commands at the end so the advanced user can control everything
+  if Assigned(fProject) and (fTarget = ctProject) then begin
+    if Length(fProject.Options.CompilerCmd) > 0 then
+      fCompileParams := fCompileParams + ' ' + Trim(StringReplace(fProject.Options.CompilerCmd, '_@@_', ' ',
+        [rfReplaceAll]));
+    if Length(fProject.Options.CppCompilerCmd) > 0 then
+      fCppCompileParams := fCppCompileParams + ' ' + Trim(StringReplace(fProject.Options.CppCompilerCmd, '_@@_', ' ',
+        [rfReplaceAll]));
+  end;
+
+  fCompileParams := Trim(ParseMacros(fCompileParams));
+  fCppCompileParams := Trim(ParseMacros(fCppCompileParams));
 end;
 
 procedure TCompiler.CheckSyntax;
@@ -620,7 +621,7 @@ begin
         DoLogEntry(Lang[ID_LOG_COMPILINGFILE]);
         DoLogEntry('--------');
         DoLogEntry(Format(Lang[ID_LOG_SOURCEFILE], [fSourceFile]));
-        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [devCompilerSets.CurrentSet.Name]));
+        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [fCompilerSet.Name]));
         DoLogEntry('');
 
         // Gather commands to pass to gcc/g++
@@ -631,7 +632,7 @@ begin
         // Determine command line to execute
         case GetFileTyp(fSourceFile) of
           utResSrc: begin
-              s := devCompilerSets.CurrentSet.windresName;
+              s := fCompilerSet.windresName;
               if fCheckSyntax then
                 cmdline := Format(cResourceCmdLine, [s, fSourceFile, 'nul'])
               else
@@ -639,12 +640,11 @@ begin
 
               DoLogEntry(Lang[ID_LOG_PROCESSINGRES]);
               DoLogEntry('--------');
-              DoLogEntry(Format(Lang[ID_LOG_WINDRESNAME],
-                [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
+              DoLogEntry(Format(Lang[ID_LOG_WINDRESNAME], [IncludeTrailingPathDelimiter(fCompilerSet.BinDir[0]) + s]));
               DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
             end;
           utcSrc: begin
-              s := devCompilerSets.CurrentSet.gccName;
+              s := fCompilerSet.gccName;
               if fCheckSyntax then
                 cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCompileParams, fIncludesParams, fLibrariesParams])
               else
@@ -654,11 +654,11 @@ begin
               DoLogEntry(Lang[ID_LOG_PROCESSINGCSRC]);
               DoLogEntry('--------');
               DoLogEntry(Format(Lang[ID_LOG_GCCNAME],
-                [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
+                [IncludeTrailingPathDelimiter(fCompilerSet.BinDir[0]) + s]));
               DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
             end;
           utCppSrc: begin
-              s := devCompilerSets.CurrentSet.gppName;
+              s := fCompilerSet.gppName;
               if fCheckSyntax then
                 cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCppCompileParams, fCppIncludesParams,
                   fLibrariesParams])
@@ -669,11 +669,11 @@ begin
               DoLogEntry(Lang[ID_LOG_PROCESSINGCPPSRC]);
               DoLogEntry('--------');
               DoLogEntry(Format(Lang[ID_LOG_GPPNAME],
-                [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
+                [IncludeTrailingPathDelimiter(fCompilerSet.BinDir[0]) + s]));
               DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
             end;
           utcHead, utcppHead: begin // any header files
-              s := devCompilerSets.CurrentSet.gppName;
+              s := fCompilerSet.gppName;
               if fCheckSyntax then
                 cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCppCompileParams, fCppIncludesParams,
                   fLibrariesParams])
@@ -684,22 +684,21 @@ begin
               DoLogEntry(Lang[ID_LOG_PROCESSINGHEADER]);
               DoLogEntry('--------');
               DoLogEntry(Format(Lang[ID_LOG_GCCNAME],
-                [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
+                [IncludeTrailingPathDelimiter(fCompilerSet.BinDir[0]) + s]));
               DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
             end;
         else begin
-            s := devCompilerSets.CurrentSet.gppName;
+            s := fCompilerSet.gppName;
             if fCheckSyntax then
               cmdline := Format(cSyntaxCmdLine, [s, fSourceFile, fCppCompileParams, fCppIncludesParams,
                 fLibrariesParams])
             else
-              cmdline := Format(cHeaderCmdLine, [s, fSourceFile, fCompileParams, fIncludesParams,
-                fLibrariesParams]);
+              cmdline := Format(cHeaderCmdLine, [s, fSourceFile, fCompileParams, fIncludesParams, fLibrariesParams]);
 
             DoLogEntry(Lang[ID_LOG_PROCESSINGUNKNOWN]);
             DoLogEntry('--------');
             DoLogEntry(Format(Lang[ID_LOG_GCCNAME],
-              [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + s]));
+              [IncludeTrailingPathDelimiter(fCompilerSet.BinDir[0]) + s]));
             DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
           end;
         end;
@@ -713,16 +712,16 @@ begin
         DoLogEntry(Lang[ID_LOG_PROJECTCOMPILE]);
         DoLogEntry('--------');
         DoLogEntry(Format(Lang[ID_LOG_PROJECTFILE], [fProject.FileName]));
-        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [devCompilerSets.CurrentSet.Name]));
+        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [fCompilerSet.Name]));
         DoLogEntry('');
 
         BuildMakeFile;
-        cmdline := Format(cMakeLine, [devCompilerSets.CurrentSet.makeName, fMakeFile]);
+        cmdline := Format(cMakeLine, [fCompilerSet.makeName, fMakeFile]);
 
         DoLogEntry(Lang[ID_LOG_PROCESSINGMAKE]);
         DoLogEntry('--------');
-        DoLogEntry(Format(Lang[ID_LOG_MAKEFILEPROC],
-          [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + devCompilerSets.CurrentSet.MakeName]));
+        DoLogEntry(Format(Lang[ID_LOG_MAKEFILEPROC], [IncludeTrailingPathDelimiter(fCompilerSet.BinDir[0]) +
+          fCompilerSet.MakeName]));
         DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
         DoLogEntry('');
 
@@ -842,7 +841,7 @@ begin
         DoLogEntry(Lang[ID_LOG_CLEANINGFILE]);
         DoLogEntry('--------');
         DoLogEntry(Format(Lang[ID_LOG_SOURCEFILE], [fSourceFile]));
-        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [devCompilerSets.CurrentSet.Name]));
+        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [fCompilerSet.Name]));
         DoLogEntry('');
 
         FileName := '';
@@ -872,7 +871,7 @@ begin
         DoLogEntry(Lang[ID_LOG_CLEANINGPROJECT]);
         DoLogEntry('--------');
         DoLogEntry(Format(Lang[ID_LOG_PROJECTFILE], [fProject.FileName]));
-        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [devCompilerSets.CurrentSet.Name]));
+        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [fCompilerSet.Name]));
         DoLogEntry('');
 
         // Try to create a makefile that cleans for the whole project...
@@ -885,12 +884,12 @@ begin
           Exit;
         end;
 
-        cmdLine := Format(cCleanLine, [devCompilerSets.CurrentSet.makeName, fMakeFile]);
+        cmdLine := Format(cCleanLine, [fCompilerSet.makeName, fMakeFile]);
 
         DoLogEntry(Lang[ID_LOG_PROCESSINGMAKE]);
         DoLogEntry('--------');
-        DoLogEntry(Format(Lang[ID_LOG_MAKEFILEPROC],
-          [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + devCompilerSets.CurrentSet.MakeName]));
+        DoLogEntry(Format(Lang[ID_LOG_MAKEFILEPROC], [IncludeTrailingPathDelimiter(fCompilerSet.BinDir[0]) +
+          fCompilerSet.MakeName]));
         DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
         DoLogEntry('');
 
@@ -916,7 +915,7 @@ begin
         DoLogEntry(Lang[ID_LOG_REBUILDINGPROJECT]);
         DoLogEntry('--------');
         DoLogEntry(Format(Lang[ID_LOG_PROJECTFILE], [fProject.FileName]));
-        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [devCompilerSets.CurrentSet.Name]));
+        DoLogEntry(Format(Lang[ID_LOG_COMPILERNAME], [fCompilerSet.Name]));
         DoLogEntry('');
 
         // Try to create a makefile for the whole project...
@@ -929,12 +928,12 @@ begin
           Exit;
         end;
 
-        cmdLine := Format(cCleanLine, [devCompilerSets.CurrentSet.makeName, fMakeFile]);
+        cmdLine := Format(cCleanLine, [fCompilerSet.makeName, fMakeFile]);
 
         DoLogEntry(Lang[ID_LOG_PROCESSINGMAKE]);
         DoLogEntry('--------');
         DoLogEntry(Format(Lang[ID_LOG_MAKEFILEPROC],
-          [IncludeTrailingPathDelimiter(devCompilerSets.CurrentSet.BinDir[0]) + devCompilerSets.CurrentSet.MakeName]));
+          [IncludeTrailingPathDelimiter(fCompilerSet.BinDir[0]) + fCompilerSet.MakeName]));
         DoLogEntry(Format(Lang[ID_LOG_COMMAND], [cmdLine]));
         DoLogEntry('');
 
@@ -1009,7 +1008,6 @@ procedure TCompiler.ProcessOutput(const line: AnsiString);
 var
   OLine, OCol, OFile, OMsg, S: AnsiString;
   delim: integer;
-  CurrentSet: TdevCompilerSet;
 
   procedure GetFileName; // obtain delimiter AFTER (full) filename
   begin
@@ -1081,20 +1079,17 @@ var
       end;
     end;
   end;
-
 begin
-  CurrentSet := devCompilerSets.CurrentSet;
-
   OLine := '';
   OCol := '';
   OFile := '';
   OMsg := Trim(Line);
 
   // Ignore generic 'we are starting program x' messages
-  if (Pos(CurrentSet.gccName + ' ', Line) = 1) or
-    (Pos(CurrentSet.gppName + ' ', Line) = 1) or
-    (Pos(CurrentSet.makeName, Line) = 1) or // ignore all make errors for now
-  (Pos(CurrentSet.windresName + ' ', Line) = 1) or
+  if (Pos(fCompilerSet.gccName + ' ', Line) = 1) or
+    (Pos(fCompilerSet.gppName + ' ', Line) = 1) or
+    (Pos(fCompilerSet.makeName, Line) = 1) or // ignore all make errors for now
+  (Pos(fCompilerSet.windresName + ' ', Line) = 1) or
     (Pos(CLEAN_PROGRAM + ' ', Line) = 1) then
     Exit;
 
@@ -1148,16 +1143,13 @@ resourcestring
 var
   i, val: integer;
   option: TCompilerOption;
-  CurrentSet: TdevCompilerSet;
 begin
-  CurrentSet := devCompilerSets.CurrentSet;
-
   // Add libraries
-  fLibrariesParams := FormatList(CurrentSet.LibDir, cAppendStr);
+  fLibrariesParams := FormatList(fCompilerSet.LibDir, cAppendStr);
 
   // Add global compiler linker extras
-  if CurrentSet.AddtoLink and (Length(CurrentSet.LinkOpts) > 0) then
-    fLibrariesParams := fLibrariesParams + ' ' + CurrentSet.LinkOpts;
+  if fCompilerSet.AddtoLink and (Length(fCompilerSet.LinkOpts) > 0) then
+    fLibrariesParams := fLibrariesParams + ' ' + fCompilerSet.LinkOpts;
 
   // Add libs added via project
   if (fTarget = ctProject) and assigned(fProject) then begin
@@ -1176,8 +1168,8 @@ begin
   fLibrariesParams := Trim(fLibrariesParams);
 
   // Add project settings that need to be passed to the linker
-  for I := 0 to CurrentSet.OptionList.Count - 1 do begin
-    option := PCompilerOption(CurrentSet.OptionList[I])^;
+  for I := 0 to fCompilerSet.OptionList.Count - 1 do begin
+    option := PCompilerOption(fCompilerSet.OptionList[I])^;
     if (Assigned(fProject) and (I < Length(fProject.Options.CompilerOptions))) or (not Assigned(fProject) and
       (option.Value > 0)) then begin
       if option.IsLinker then
@@ -1203,12 +1195,9 @@ resourcestring
   cAppendStr = '%s -I"%s"';
 var
   i: integer;
-  CurrentSet: TdevCompilerSet;
 begin
-  CurrentSet := devCompilerSets.CurrentSet;
-
-  fIncludesParams := FormatList(CurrentSet.CDir, cAppendStr);
-  fCppIncludesParams := FormatList(CurrentSet.CppDir, cAppendStr);
+  fIncludesParams := FormatList(fCompilerSet.CDir, cAppendStr);
+  fCppIncludesParams := FormatList(fCompilerSet.CppDir, cAppendStr);
 
   if (fTarget = ctProject) and assigned(fProject) then
     for i := 0 to pred(fProject.Options.Includes.Count) do
@@ -1257,13 +1246,11 @@ var
   filename: AnsiString;
   I: integer;
   Done: boolean;
-  CurrentSet: TdevCompilerSet;
 begin
-  CurrentSet := devCompilerSets.CurrentSet;
   Done := false;
 
   // The compiler started to compile a new file
-  if StartsStr(CurrentSet.gppName + ' ', Line) or StartsStr(CurrentSet.gccName + ' ', Line) then begin
+  if StartsStr(fCompilerSet.gppName + ' ', Line) or StartsStr(fCompilerSet.gccName + ' ', Line) then begin
     filename := '';
     if Assigned(fProject) then begin
       for I := 0 to fProject.Units.Count - 1 do begin
@@ -1291,7 +1278,7 @@ begin
     end;
   end else if StartsStr(CLEAN_PROGRAM + ' ', Line) then begin // Cleaning obj files
     MainForm.pbCompilation.StepIt;
-  end else if StartsStr(CurrentSet.windresName + ' ', Line) and Assigned(fProject) then begin // Resource files
+  end else if StartsStr(fCompilerSet.windresName + ' ', Line) and Assigned(fProject) then begin // Resource files
     filename := ExtractFileName(fProject.Options.PrivateResource);
     if ContainsStr(Line, filename) then begin
       MainForm.pbCompilation.StepIt;

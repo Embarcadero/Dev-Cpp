@@ -261,7 +261,7 @@ begin
   try
     // allow inheritance propagation, including MI
     if fShowInheritedMembers and (ParentStatement <> nil) and (ParentStatement^._Kind = skClass) then
-      fParser.GetInheritanceStatements(ParentStatement, InheritanceStatements);
+      fParser.GetMultipleInheritanceStatements(ParentStatement, InheritanceStatements);
 
     // Walk all the statements
     bInherited := False;

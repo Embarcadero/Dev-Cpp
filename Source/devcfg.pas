@@ -155,13 +155,16 @@ type
   TdevCompilerSets = class(TPersistent)
   private
     fList: TList; // list of TdevCompilerSet
-    fCurrentIndex: integer;
-    function GetCurrentSet: TdevCompilerSet;
+    fDefaultIndex: integer;
+    function GetCompilationSet: TdevCompilerSet;
+    function GetCompilationSetIndex: Integer;
+    function GetDefaultSet: TdevCompilerSet; // returns regular current set
   public
     constructor Create;
     destructor Destroy; override;
 
     // sigle set management in memory
+//    procedure OnCompilerSetChanged(OldSet, NewSet: TdevCompilerSet);
     procedure LoadSet(Index: integer; const SetName: AnsiString = '');
     procedure SaveSet(Index: integer);
     function AddSet: TdevCompilerSet; overload; // add empty shell
@@ -179,8 +182,10 @@ type
     procedure ClearSets;
 
     // access to list
-    property CurrentSet: TdevCompilerSet read GetCurrentSet; // project aware
-    property CurrentIndex: integer read fCurrentIndex write fCurrentIndex; // project agnostic
+    property CompilationSet: TdevCompilerSet read GetCompilationSet;
+    property CompilationSetIndex: Integer read GetCompilationSetIndex;
+    property DefaultSet: TdevCompilerSet read GetDefaultSet;
+    property DefaultSetIndex: Integer read fDefaultIndex write fDefaultIndex;
     property Sets[index: integer]: TdevCompilerSet read GetSet; default;
   end;
 
@@ -748,33 +753,33 @@ begin
 
     // Obtain list of default compilers
     devCompilerSets.FindSets;
-    devCompilerSets.CurrentIndex := -1;
+    devCompilerSets.DefaultSetIndex := -1;
 
     // Pick a proper default
     if IsWindows64 then begin // TDM-GCC x64, MinGW32, ???
       for I := 0 to devCompilerSets.Count - 1 do begin
         if ContainsText(devCompilerSets[i].Name, 'TDM-GCC') then begin
-          devCompilerSets.CurrentIndex := i;
+          devCompilerSets.DefaultSetIndex := i;
           break;
         end;
       end;
 
       // Pick the 'release' build
-      if devCompilerSets.CurrentIndex = -1 then
-        devCompilerSets.CurrentIndex := 0;
+      if (devCompilerSets.DefaultSetIndex = -1) and (devCompilerSets.Count > 0) then
+        devCompilerSets.DefaultSetIndex := 0;
 
     end else begin // TDM-GCC x86, MinGW32, ???
       for I := 0 to devCompilerSets.Count - 1 do begin
         if ContainsText(devCompilerSets[i].Name, 'TDM-GCC') and ContainsText(devCompilerSets[i].Name, '32-bit') then
           begin
-          devCompilerSets.CurrentIndex := i;
+          devCompilerSets.DefaultSetIndex := i;
           break;
         end;
       end;
 
       // Again, pick the 'release' build
-      if devCompilerSets.CurrentIndex = -1 then
-        devCompilerSets.CurrentIndex := 0; // pick any
+      if (devCompilerSets.DefaultSetIndex = -1) and (devCompilerSets.Count > 0) then
+        devCompilerSets.DefaultSetIndex := 0; // pick any
     end;
     devCompilerSets.SaveSets; // save everything to disk
   end;
@@ -1780,6 +1785,7 @@ constructor TdevCompilerSets.Create;
 begin
   inherited;
   fList := TList.Create;
+  fDefaultIndex := -1;
 end;
 
 destructor TdevCompilerSets.Destroy;
@@ -1789,29 +1795,87 @@ begin
   inherited;
 end;
 
-function TdevCompilerSets.GetCurrentSet: TdevCompilerSet;
+function TdevCompilerSets.GetCompilationSet: TdevCompilerSet;
 var
-  index: integer;
+  Index: integer;
 begin
-  index := -1;
-  if Assigned(MainForm) then begin
-    case MainForm.GetCompileTarget of
-      ctNone:
-        index := fCurrentIndex;
-      ctFile:
-        index := fCurrentIndex;
-      ctProject:
-        index := MainForm.Project.Options.CompilerSet;
-    end;
-  end else
-    index := fCurrentIndex;
+  Index := GetCompilationSetIndex;
 
-  // range check...
+  // Range check...
   if (index >= 0) and (index < fList.Count) then
     result := TdevCompilerSet(fList[index])
   else
     result := nil;
 end;
+
+function TdevCompilerSets.GetCompilationSetIndex: Integer;
+begin
+  Result := -1;
+  if Assigned(MainForm) then begin
+    case MainForm.GetCompileTarget of
+      ctNone:
+        Result := fDefaultIndex;
+      ctFile:
+        Result := fDefaultIndex;
+      ctProject:
+        Result := MainForm.Project.Options.CompilerSet;
+    end;
+  end else
+    Result := fDefaultIndex;
+end;
+
+function TdevCompilerSets.GetDefaultSet: TdevCompilerSet;
+var
+  Index: integer;
+begin
+  Index := fDefaultIndex;
+
+  // Range check...
+  if (index >= 0) and (index < fList.Count) then
+    result := TdevCompilerSet(fList[index])
+  else
+    result := nil;
+end;
+{
+procedure TdevCompilerSets.OnCompilerSetChanged(OldSet, NewSet: TdevCompilerSet);
+var
+  I: Integer;
+  OldGCCPath, NewGCCPath: AnsiString;
+begin
+  // Get old gcc directory
+  if Assigned(OldSet) and (OldSet.BinDir.Count > 0) then
+    OldGCCPath := IncludeTrailingPathDelimiter(OldSet.BinDir[0]) + OldSet.gccName;
+
+  // Get new gcc directory
+  if Assigned(NewSet) and (NewSet.BinDir.Count > 0) then
+    NewGCCPath := IncludeTrailingPathDelimiter(NewSet.BinDir[0]) + NewSet.gccName;
+
+  // If not equal, rescan because it's a different compiler installation
+  if NewGCCPath = OldGCCPath then
+    Exit;
+
+  with MainForm do begin
+    CppParser.Reset;
+
+    // Set include paths
+    CppParser.ClearIncludePaths;
+    for I := 0 to NewSet.CDir.Count - 1 do
+      CppParser.AddIncludePath(NewSet.CDir[I]);
+    for I := 0 to NewSet.CppDir.Count - 1 do
+      CppParser.AddIncludePath(NewSet.CppDir[I]);
+    for I := 0 to NewSet.DefInclude.Count - 1 do // Add default include dirs last, just like gcc does
+      CppParser.AddIncludePath(NewSet.DefInclude[I]); // TODO: retrieve those directories in devcfg
+
+    // Set defines
+    CppParser.ResetDefines;
+    for I := 0 to NewSet.Defines.Count - 1 do
+      CppParser.AddHardDefineByLine(NewSet.Defines[i]); // predefined constants from -dM -E
+
+    // Rescan work
+    ScanActiveProject;
+  end;
+end;
+}
 
 procedure TdevCompilerSets.LoadSet(index: integer; const SetName: AnsiString = '');
 var
@@ -1971,9 +2035,10 @@ end;
 
 procedure TdevCompilerSets.LoadSets;
 var
-  I: integer;
+  I, SetToActivate: integer;
   sl: TStringList;
-  CompSet: TdevCompilerSet;
+  CurrentSet: TdevCompilerSet;
+  WasValid: Boolean;
 begin
   // Don't append, but replace
   ClearSets;
@@ -1984,25 +2049,26 @@ begin
     devData.ReadStrings('CompilerSets', sl);
 
     // Populate list
+    SetToActivate := -1;
     for I := 0 to sl.Count - 1 do
       if not SameStr(sl.Names[I], 'Current') then begin
         fList.Add(TdevCompilerSet.Create); // add empty shell
         LoadSet(StrToInt(sl.Names[I]), sl.Values[sl.Names[I]]); // backwards compatibility: save Name here and pass it
       end else
-        CurrentIndex := StrToInt(sl.Values[sl.Names[I]]);
+        SetToActivate := StrToIntDef(sl.Values[sl.Names[I]], -1);
 
-    // Only validate the current set
-    if (CurrentIndex >= 0) and (CurrentIndex < fList.Count) then begin
+    // Activate the set after everything has been loaded
+    DefaultSetIndex := SetToActivate;
 
-      // Ignore project compiler sets
-      CompSet := fList[CurrentIndex];
-      if not CompSet.Validate then begin
-        SaveSet(CurrentIndex);
+    // Validate and load the current set
+    CurrentSet := GetDefaultSet;
 
-        // Reset properties after validation
-        if CompSet.BinDir.Count > 0 then begin
-          CompSet.SetProperties(CompSet.BinDir[0], CompSet.gccName);
-        end;
+    // Check if it is usable
+    WasValid := CurrentSet.Validate;
+    if not WasValid then begin
+      SaveSet(DefaultSetIndex);
+      if CurrentSet.BinDir.Count > 0 then begin
+        CurrentSet.SetProperties(CurrentSet.BinDir[0], CurrentSet.gccName);
       end;
     end;
   finally
@@ -2038,9 +2104,9 @@ begin
   end;
 
   // Then current index
-  if fCurrentIndex >= fList.Count then
-    fCurrentIndex := -1;
-  devData.Write('CompilerSets', 'Current', fCurrentIndex);
+  if fDefaultIndex >= fList.Count then
+    fDefaultIndex := -1;
+  devData.Write('CompilerSets', 'Current', fDefaultIndex);
 end;
 
 procedure TdevCompilerSets.FindSets;

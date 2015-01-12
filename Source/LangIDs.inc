@@ -936,6 +936,8 @@ const
   ID_MSG_ATTACH                         = 60024;
   ID_MSG_CORRESPONDINGSOURCE            = 60025;
   ID_MSG_CORRESPONDINGHEADER            = 60026;
+  ID_MSG_PLEASEUPDATEPROJECT            = 60027;
+  ID_MSG_COMPILERNOTFOUND               = 60028;
 
   ID_ERR_OPENFILE                       = 61001;
   ID_ERR_SAVEFILE                       = 61002;

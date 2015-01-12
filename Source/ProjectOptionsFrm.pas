@@ -1096,8 +1096,8 @@ begin
       Options := Options + [ofAllowMultiSelect];
 
       // Start in the lib folder
-      if Assigned(devCompilerSets.CurrentSet) and (devCompilerSets.CurrentSet.LibDir.Count > 0) then
-        InitialDir := devCompilerSets.CurrentSet.LibDir[0];
+      if Assigned(devCompilerSets.CompilationSet) and (devCompilerSets.CompilationSet.LibDir.Count > 0) then
+        InitialDir := devCompilerSets.CompilationSet.LibDir[0];
 
       if Execute then begin
         for i := 0 to Files.Count - 1 do begin

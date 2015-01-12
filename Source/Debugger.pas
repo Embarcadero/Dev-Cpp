@@ -155,7 +155,7 @@ begin
   si.wShowWindow := SW_HIDE;
 
   // Use the GDB provided in the project if needed
-  CompilerSet := devCompilerSets.CurrentSet;
+  CompilerSet := devCompilerSets.CompilationSet;
 
   // Assume it's present in the first bin dir
   if CompilerSet.BinDir.Count > 0 then begin

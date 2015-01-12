@@ -1256,8 +1256,8 @@ var
 begin
   // Shorten compiler paths
   Result := Input;
-  if devData.ShortenCompPaths and Assigned(devCompilerSets.CurrentSet) then begin
-    with devCompilerSets.CurrentSet do begin
+  if devData.ShortenCompPaths and Assigned(devCompilerSets.CompilationSet) then begin
+    with devCompilerSets.CompilationSet do begin
       for I := 0 to BinDir.Count - 1 do
         Result := StringReplace(Result, BinDir[i], '%BinDir' + IntToStr(i) + '%', [rfReplaceAll]);
       for I := 0 to CppDir.Count - 1 do

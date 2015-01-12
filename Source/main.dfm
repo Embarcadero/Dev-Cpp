@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 261
-  Top = 314
+  Left = 260
+  Top = 318
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -60,8 +60,8 @@ object MainForm: TMainForm
       object CompilerOutput: TListView
         Left = 0
         Top = 0
-        Width = 992
-        Height = 154
+        Width = 991
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -104,8 +104,8 @@ object MainForm: TMainForm
       object ResourceOutput: TListView
         Left = 0
         Top = 0
-        Width = 992
-        Height = 154
+        Width = 991
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -149,7 +149,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 156
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
@@ -174,7 +174,7 @@ object MainForm: TMainForm
         end
         object chkShortenPaths: TCheckBox
           Left = 4
-          Top = 139
+          Top = 150
           Width = 144
           Height = 17
           Action = actShortenCompPaths
@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 395
-          Height = 117
+          Height = 116
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -410,7 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 47
+          Height = 46
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
@@ -448,8 +448,8 @@ object MainForm: TMainForm
       object FindOutput: TListView
         Left = 0
         Top = 0
-        Width = 992
-        Height = 154
+        Width = 991
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone

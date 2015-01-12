@@ -835,7 +835,6 @@ type
     function PrepareForCompile(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
     function PrepareForClean(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
     procedure LoadTheme;
-    procedure ScanActiveProject;
     procedure CheckForDLLProfiling;
     procedure ProjectWindowClose(Sender: TObject; var Action: TCloseAction);
     procedure BuildOpenWith;
@@ -843,10 +842,11 @@ type
     procedure PrepareDebugger;
     procedure ClearCompileMessages;
     procedure ClearMessageControl;
+    procedure UpdateClassBrowsing;
   public
-    function GetCompileTarget: TTarget;
+    procedure ScanActiveProject;
     procedure UpdateCompilerList;
-    procedure UpdateClassBrowser;
+    function GetCompileTarget: TTarget;
     procedure UpdateAppTitle;
     procedure OpenCloseMessageSheet(Open: boolean);
     procedure OpenFile(const FileName: AnsiString);
@@ -1546,7 +1546,7 @@ begin
 
   // Parse it after is has been shown so the user will not see random unpainted stuff for a while.
   if not Assigned(fProject) then
-    CppParser.ReParseFile(e.FileName, e.InProject, True);
+    CppParser.ParseFile(e.FileName, e.InProject, True);
 end;
 
 procedure TMainForm.OpenFileList(List: TStringList);
@@ -2393,7 +2393,7 @@ end;
 procedure TMainForm.actEditorOptionsExecute(Sender: TObject);
 var
   I: integer;
-  e, e2: TEditor;
+  e1, e2: TEditor;
 begin
   with TEditorOptForm.Create(Self) do try
     if ShowModal = mrOk then begin
@@ -2401,29 +2401,24 @@ begin
       // Apply editor options
       dmMain.UpdateHighlighter;
       for I := 0 to EditorList.PageCount - 1 do begin
-        e := EditorList.Editors[i];
-        if Assigned(e) then begin
-          devEditor.AssignEditor(e.Text, e.FileName);
-          e.InitCompletion;
+        e1 := EditorList.Editors[i];
+        if Assigned(e1) then begin
+          devEditor.AssignEditor(e1.Text, e1.FileName);
+          e1.InitCompletion;
         end;
       end;
 
       // Repaint current editor to show new colors
-      fEditorList.GetVisibleEditors(e, e2);
-      if Assigned(e) then
-        e.Text.Repaint;
+      fEditorList.GetVisibleEditors(e1, e2);
+      if Assigned(e1) then
+        e1.Text.Repaint;
       if Assigned(e2) then
         e2.Text.Repaint;
 
       // Only do a lengthy reparse if completion options have changed
       if taCompletion in AccessedTabs then begin
-        UpdateClassBrowser;
+        UpdateClassBrowsing;
         ScanActiveProject;
-
-        // if there is no active editor, clear the class-browser
-        e := fEditorList.GetEditor;
-        if not Assigned(e) and (ClassBrowser.ShowFilter = sfCurrent) then
-          ClassBrowser.Clear;
       end;
     end;
   finally
@@ -2650,9 +2645,10 @@ end;
 procedure TMainForm.actProjectOptionsExecute(Sender: TObject);
 begin
   if Assigned(fProject) then begin
-    fProject.ShowOptions;
-    UpdateAppTitle;
-    UpdateCompilerList;
+    if fProject.ShowOptions = mrOk then begin
+      UpdateAppTitle;
+      UpdateCompilerList;
+    end;
   end;
 end;
 
@@ -2790,6 +2786,7 @@ begin
   // Determine what to run
   fCompiler.Project := nil;
   fCompiler.SourceFile := '';
+  fCompiler.CompilerSet := devCompilerSets.CompilationSet;
   if ForcedCompileTarget <> ctInvalid then
     fCompiler.Target := ForcedCompileTarget
   else
@@ -2826,11 +2823,11 @@ begin
   end;
 
   // Set PATH variable (not overriden by SetCurrentDir)
-  if Assigned(devCompilerSets.CurrentSet) then begin // should NOT be false
-    if devCompilerSets.CurrentSet.BinDir.Count > 0 then
-      SetPath(devCompilerSets.CurrentSet.BinDir[0])
+  if Assigned(devCompilerSets.CompilationSet) then begin // should NOT be false
+    if devCompilerSets.CompilationSet.BinDir.Count > 0 then
+      SetPath(devCompilerSets.CompilationSet.BinDir[0])
     else begin
-      LogEntryProc(Format(Lang[ID_LOG_NOBINDIRABORT], [devCompilerSets.CurrentSet.Name]));
+      LogEntryProc(Format(Lang[ID_LOG_NOBINDIRABORT], [devCompilerSets.CompilationSet.Name]));
       Exit; // returns false
     end;
   end;
@@ -2838,6 +2835,7 @@ begin
   // Determine what to compile
   fCompiler.Project := nil;
   fCompiler.SourceFile := '';
+  fCompiler.CompilerSet := devCompilerSets.CompilationSet;
   if ForcedCompileTarget <> ctInvalid then
     fCompiler.Target := ForcedCompileTarget
   else
@@ -2898,11 +2896,11 @@ begin
   end;
 
   // Set PATH variable (not overriden by SetCurrentDir)
-  if Assigned(devCompilerSets.CurrentSet) then begin // should NOT be false
-    if devCompilerSets.CurrentSet.BinDir.Count > 0 then
-      SetPath(devCompilerSets.CurrentSet.BinDir[0])
+  if Assigned(devCompilerSets.CompilationSet) then begin // should NOT be false
+    if devCompilerSets.CompilationSet.BinDir.Count > 0 then
+      SetPath(devCompilerSets.CompilationSet.BinDir[0])
     else begin
-      LogEntryProc(Format(Lang[ID_LOG_NOBINDIRABORT], [devCompilerSets.CurrentSet.Name]));
+      LogEntryProc(Format(Lang[ID_LOG_NOBINDIRABORT], [devCompilerSets.CompilationSet.Name]));
       Exit; // returns false
     end;
   end;
@@ -2910,6 +2908,7 @@ begin
   // Determine what to compile
   fCompiler.Project := nil;
   fCompiler.SourceFile := '';
+  fCompiler.CompilerSet := devCompilerSets.CompilationSet;
   if ForcedCompileTarget <> ctInvalid then
     fCompiler.Target := ForcedCompileTarget
   else
@@ -3076,7 +3075,7 @@ begin
       end;
     ctFile: begin
         // Check if we enabled proper options
-        with devCompilerSets.CurrentSet do begin
+        with devCompilerSets.CompilationSet do begin
           DebugEnabled := GetOption('-g3') <> '0';
           StripEnabled := GetOption('-s') <> '0';
         end;
@@ -3086,13 +3085,13 @@ begin
           mbNo], 0) = mrYes) then begin
 
           // Enable debugging, disable stripping
-          with devCompilerSets.CurrentSet do begin
+          with devCompilerSets.CompilationSet do begin
             SetOption('-g3', '1');
             SetOption('-s', '0');
           end;
 
           // Save changes to compiler set
-          devCompilerSets.SaveSet(devCompilerSets.CurrentIndex);
+          devCompilerSets.SaveSet(devCompilerSets.CompilationSetIndex);
 
           fCompSuccessAction := csaDebug;
           actRebuildExecute(nil);
@@ -3128,7 +3127,7 @@ begin
   end;
 
   // Add library folders
-  with devCompilerSets.CurrentSet do begin
+  with devCompilerSets.CompilationSet do begin
     for I := 0 to LibDir.Count - 1 do
       fDebugger.SendCommand('dir', '"' + StringReplace(LibDir[i], '\', '/', [rfReplaceAll]) + '"');
 
@@ -3211,7 +3210,7 @@ end;
 procedure TMainForm.actCompileUpdate(Sender: TObject);
 begin
   TCustomAction(Sender).Enabled := (not fCompiler.Compiling) and (GetCompileTarget <> ctNone) and
-    Assigned(devCompilerSets.CurrentSet);
+    Assigned(devCompilerSets.CompilationSet);
 end;
 
 procedure TMainForm.actUpdateProject(Sender: TObject);
@@ -3258,10 +3257,10 @@ procedure TMainForm.actCompileRunUpdate(Sender: TObject);
 begin
   if Assigned(fProject) then
     TCustomAction(Sender).Enabled := (fProject.Options.typ <> dptStat) and (not fCompiler.Compiling) and
-      (GetCompileTarget <> ctNone) and Assigned(devCompilerSets.CurrentSet)
+      (GetCompileTarget <> ctNone) and Assigned(devCompilerSets.CompilationSet)
   else
     TCustomAction(Sender).Enabled := (not fCompiler.Compiling) and (GetCompileTarget <> ctNone) and
-      Assigned(devCompilerSets.CurrentSet)
+      Assigned(devCompilerSets.CompilationSet)
 end;
 
 procedure TMainForm.ToolbarDockClick(Sender: TObject);
@@ -3801,12 +3800,12 @@ begin
       cmbCompilers.Items.Add(devCompilerSets[i].Name);
 
     // Select current compiler
-    case GetCompileTarget of
-      ctNone, ctFile:
-        cmbCompilers.ItemIndex := devCompilerSets.CurrentIndex;
-      ctProject:
-        cmbCompilers.ItemIndex := fProject.Options.CompilerSet;
-    end;
+    cmbCompilers.ItemIndex := devCompilerSets.CompilationSetIndex;
+
+    // Mention change to compiler sets
+    //devCompilerSets.OnCompilerSetChanged(
+    //  devCompilerSets[fOldCompilerToolbarIndex],
+    //  devCompilerSets[cmbCompilers.ItemIndex]);
 
     // Remember current index
     fOldCompilerToolbarIndex := cmbCompilers.ItemIndex;
@@ -3815,11 +3814,12 @@ begin
   end;
 end;
 
-procedure TMainForm.UpdateClassBrowser;
+procedure TMainForm.UpdateClassBrowsing;
 var
   I: integer;
 begin
-  CppParser.Reset(False);
+  // Configure parser
+  CppParser.Reset;
   CppParser.Tokenizer := CppTokenizer;
   CppParser.Preprocessor := CppPreprocessor;
   CppParser.Enabled := devCodeCompletion.Enabled;
@@ -3829,16 +3829,16 @@ begin
   CppParser.OnEndParsing := CppParserEndParsing;
   CppParser.OnTotalProgress := CppParserTotalProgress;
 
-  // Add the include dirs to the parser
-  if Assigned(devCompilerSets.CurrentSet) then begin
-    with devCompilerSets.CurrentSet do begin
+  // Set options depending on the current compiler set
+  // TODO: do this every time OnCompilerSetChanged
+  if Assigned(devCompilerSets.DefaultSet) then
+    with devCompilerSets.DefaultSet do begin
+      CppParser.ClearIncludePaths;
       for I := 0 to CDir.Count - 1 do
         CppParser.AddIncludePath(CDir[I]);
       for I := 0 to CppDir.Count - 1 do
         CppParser.AddIncludePath(CppDir[I]);
-
-      // Add default include dirs last, just like gcc does
-      for I := 0 to DefInclude.Count - 1 do
+      for I := 0 to DefInclude.Count - 1 do // Add default include dirs last, just like gcc does
         CppParser.AddIncludePath(DefInclude[I]); // TODO: retrieve those directories in devcfg
 
       // Set defines
@@ -3846,8 +3846,8 @@ begin
       for I := 0 to Defines.Count - 1 do
         CppParser.AddHardDefineByLine(Defines[i]); // predefined constants from -dM -E
     end;
-  end;
 
+  // Configure code completion
   CodeCompletion.Color := devCodeCompletion.BackColor;
   CodeCompletion.Width := devCodeCompletion.Width;
   CodeCompletion.Height := devCodeCompletion.Height;
@@ -3862,6 +3862,7 @@ begin
     ClassBrowser.EndUpdate;
   end;
 
+  // Configure class browser actions
   actBrowserViewAll.Checked := ClassBrowser.ShowFilter = sfAll;
   actBrowserViewProject.Checked := ClassBrowser.ShowFilter = sfProject;
   actBrowserViewCurrent.Checked := ClassBrowser.ShowFilter = sfCurrent;
@@ -3875,7 +3876,7 @@ var
   e: TEditor;
 begin
   with CppParser do begin
-    Reset(true);
+    Reset;
     if Assigned(fProject) then begin
       ProjectDir := fProject.Directory;
       for I := 0 to fProject.Units.Count - 1 do
@@ -4431,7 +4432,7 @@ begin
       end;
     ctFile: begin
         // Check if we enabled proper options
-        with devCompilerSets.CurrentSet do begin
+        with devCompilerSets.CompilationSet do begin
           ProfilingEnabled := GetOption('-pg') <> '0';
           StripEnabled := GetOption('-s') <> '0';
         end;
@@ -4441,13 +4442,13 @@ begin
           0) = mrYes) then begin
 
           // Enable profiling, disable stripping
-          with devCompilerSets.CurrentSet do begin
+          with devCompilerSets.CompilationSet do begin
             SetOption('-pg', '1');
             SetOption('-s', '0');
           end;
 
           // Save changes to compiler set
-          devCompilerSets.SaveSet(devCompilerSets.CurrentIndex);
+          devCompilerSets.SaveSet(devCompilerSets.CompilationSetIndex);
 
           fCompSuccessAction := csaProfile;
           actRebuildExecute(nil);
@@ -5974,14 +5975,6 @@ begin
   // Load bookmarks, captions and hints
   LoadText;
 
-  UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
-
-  // Load the current compiler set (needs translations)
-  devCompilerSets.LoadSets; // SLOWWWW
-
-  // Update toolbar
-  UpdateCompilerList;
-
   // Try to fix the file associations. Needs write access to registry, which might cause exceptions to be thrown
   DDETopic := DevCppDDEServer.Name;
   if devData.CheckAssocs then begin
@@ -5994,10 +5987,18 @@ begin
     end;
   end;
 
+  // Configure parser, code completion, class browser
   UpdateSplash(Lang[ID_LOAD_INITCLASSBROWSER]);
+  UpdateClassBrowsing;
 
-  UpdateClassBrowser;
+  // Load the current compiler set
+  UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
+  devCompilerSets.LoadSets; // SLOWWWW
 
+  // Update toolbar
+  UpdateCompilerList;
+
+  // Show the window to the user
   UpdateSplash(Lang[ID_LOAD_RESTOREWINDOW]);
 
   // Showing for the first time? Maximize
@@ -6379,6 +6380,7 @@ var
       Exit;
     end;
 
+    // Notify project
     // Discard changes made to the old set...
     fProject.Options.CompilerSet := index;
     fProject.Options.CompilerOptions := devCompilerSets[index].OptionString;
@@ -6387,7 +6389,8 @@ var
 
   procedure ChangeNonProjectCompilerSet;
   begin
-    devCompilerSets.CurrentIndex := index;
+    // Notify compiler list
+    devCompilerSets.DefaultSetIndex := index;
     devCompilerSets.SaveSetList;
   end;
 begin
@@ -6412,6 +6415,11 @@ begin
   end else begin
     ChangeNonProjectCompilerSet;
   end;
+
+  // Mention change to compiler sets
+  //devCompilerSets.OnCompilerSetChanged(
+  //  devCompilerSets[fOldCompilerToolbarIndex],
+  //  devCompilerSets[index]);
 
   fOldCompilerToolbarIndex := index;
 end;

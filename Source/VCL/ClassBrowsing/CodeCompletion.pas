@@ -211,7 +211,7 @@ begin
       // only add globals and members of the current class
 
       // Also consider classes the current class inherits from
-      fParser.GetInheritanceStatements(fCurrentStatement, InheritanceStatements);
+      fParser.GetMultipleInheritanceStatements(fCurrentStatement, InheritanceStatements);
       Node := fParser.Statements.FirstNode;
       while Assigned(Node) do begin
         Statement := Node^.Data;
@@ -246,7 +246,7 @@ begin
         Exit;
 
       // Then add members of the ClassIDs and InheritanceIDs
-      fParser.GetInheritanceStatements(ParentTypeStatement, InheritanceStatements);
+      fParser.GetMultipleInheritanceStatements(ParentTypeStatement, InheritanceStatements);
 
       Node := fParser.Statements.FirstNode;
       while Assigned(Node) do begin

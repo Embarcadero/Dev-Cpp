@@ -173,7 +173,7 @@ begin
   ObjectOutput := '';
   HostApplication := '';
   SupportXPThemes := False;
-  CompilerSet := devCompilerSets.CurrentIndex;
+  CompilerSet := devCompilerSets.DefaultSetIndex;
   if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then
     CompilerOptions := devCompilerSets[CompilerSet].OptionString
   else

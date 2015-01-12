@@ -148,7 +148,7 @@ begin
   // Update names and current selection
   for I := 0 to cmbCompilerSetComp.Items.Count - 1 do
     devCompilerSets[i].Name := cmbCompilerSetComp.Items[i];
-  devCompilerSets.CurrentIndex := cmbCompilerSetComp.ItemIndex;
+  devCompilerSets.DefaultSetIndex := cmbCompilerSetComp.ItemIndex;
 
   // Save the current set to disk
   SaveSet(cmbCompilerSetComp.ItemIndex);
@@ -160,7 +160,7 @@ end;
 procedure TCompOptForm.LoadSet(Index: integer);
 begin
   // Load the new set from disk or clear
-  devCompilerSets.CurrentIndex := index;
+  devCompilerSets.DefaultSetIndex := index;
   if index = -1 then begin // erase all
     fBinDirCopy.Clear;
     fCDirCopy.Clear;
@@ -384,8 +384,8 @@ begin
     cmbCompilerSetComp.Items.Add(devCompilerSets[i].Name);
 
   fOldIndex := -1;
-  if devCompilerSets.CurrentIndex < cmbCompilerSetComp.Items.Count then
-    cmbCompilerSetComp.ItemIndex := devCompilerSets.CurrentIndex
+  if devCompilerSets.DefaultSetIndex < cmbCompilerSetComp.Items.Count then
+    cmbCompilerSetComp.ItemIndex := devCompilerSets.DefaultSetIndex
   else if cmbCompilerSetComp.Items.Count > 0 then
     cmbCompilerSetComp.ItemIndex := 0;
   cmbCompilerSetCompChange(nil);

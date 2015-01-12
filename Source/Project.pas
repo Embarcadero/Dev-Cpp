@@ -146,7 +146,7 @@ type
     procedure RebuildNodes;
     function ListUnitStr(Separator: char): AnsiString;
     procedure ExportToHTML;
-    procedure ShowOptions;
+    function ShowOptions: Integer;
     function AssignTemplate(const aFileName: AnsiString; aTemplate: TTemplate): boolean;
     function FolderNodeFromName(const name: AnsiString): TTreeNode;
     procedure CreateFolderNodes;
@@ -732,17 +732,13 @@ end;
 procedure TProject.LoadOptions;
 begin
   with finiFile do begin
-
     fName := ReadString('Project', 'name', '');
     fOptions.Icon := ReadString('Project', 'icon', '');
     fOptions.Ver := ReadInteger('Project', 'Ver', 0);
     if (fOptions.Ver > 0) then begin // ver > 0 is at least a v5 project
-
       if (fOptions.Ver < 2) then begin
         fOptions.Ver := 2;
-        MessageDlg('The compiler settings format of Dev-C++ has changed.' + #13#10#13#10 +
-          'Please update your settings at Project >> Project Options >> Compiler and save your project.', MtInformation,
-          [MbOK], 0);
+        MessageDlg(Lang[ID_MSG_PLEASEUPDATEPROJECT], MtInformation, [MbOK], 0);
       end;
 
       fOptions.typ := ReadInteger('Project', 'type', 0);
@@ -769,16 +765,12 @@ begin
       fFolders.CommaText := ReadString('Project', 'Folders', '');
       fOptions.IncludeVersionInfo := ReadBool('Project', 'IncludeVersionInfo', False);
       fOptions.SupportXPThemes := ReadBool('Project', 'SupportXPThemes', False);
-      fOptions.CompilerSet := ReadInteger('Project', 'CompilerSet', devCompilerSets.CurrentIndex);
-      if (fOptions.CompilerSet >= devCompilerSets.Count) then begin
-        MessageDlg('The compiler set you have selected for this project, no longer exists.'#13#10'It will be substituted by the global compiler set...', mtError, [mbOk], 0);
-        fOptions.CompilerSet := devCompilerSets.CurrentIndex; // TODO: translate
+      fOptions.CompilerSet := ReadInteger('Project', 'CompilerSet', devCompilerSets.DefaultSetIndex);
+      if fOptions.CompilerSet >= devCompilerSets.Count then begin // TODO: change from indices to names
+        MessageDlg(Lang[ID_MSG_COMPILERNOTFOUND], mtError, [mbOk], 0);
+        fOptions.CompilerSet := devCompilerSets.DefaultSetIndex;
       end;
-      if Assigned(devCompilerSets.CurrentSet) then
-        fOptions.CompilerOptions := ReadString('Project', 'CompilerSettings', devCompilerSets.CurrentSet.OptionString)
-      else
-        fOptions.CompilerOptions := ReadString('Project', 'CompilerSettings', '');
-
+      fOptions.CompilerOptions := ReadString('Project', 'CompilerSettings', '');
       fOptions.VersionInfo.Major := ReadInteger('VersionInfo', 'Major', 0);
       fOptions.VersionInfo.Minor := ReadInteger('VersionInfo', 'Minor', 1);
       fOptions.VersionInfo.Release := ReadInteger('VersionInfo', 'Release', 1);
@@ -1539,7 +1531,7 @@ begin
   end;
 end;
 
-procedure TProject.ShowOptions;
+function TProject.ShowOptions: Integer;
 var
   IconFileName: AnsiString;
 begin
@@ -1548,12 +1540,17 @@ begin
     // Apply current settings
     SetInterface(Self);
 
-    if ShowModal = mrOk then begin
+    // Tell the sender what the result was
+    Result := ShowModal;
+    if Result = mrOk then begin
 
       // Save new settings to RAM
       GetInterface(Self);
 
-      SetModified(TRUE); // don't save to disk yet
+      // Ask the user to save to disk when closing
+      SetModified(TRUE);
+
+      // Rebuild unit tree
       SortUnitsByPriority;
       RebuildNodes;
 
@@ -1564,7 +1561,7 @@ begin
         fOptions.Icon := IconFileName;
       end;
 
-      // update the project's main node caption
+      // Update the project's main node caption
       if edProjectName.Text <> '' then begin
         fName := edProjectName.Text;
         fNode.Text := fName;
