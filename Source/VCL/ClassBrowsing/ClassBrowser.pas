@@ -485,33 +485,37 @@ begin
     if bInherited then
       Sender.Canvas.Font.Color := clGray;
   end else if Stage = cdPostPaint then begin
-    st := Node.Data;
-    if not Assigned(st) then
-      Exit;
+    try
+      st := Node.Data;
+      if not Assigned(st) then
+        Exit;
 
-    // Start drawing at top right corner of DisplayRect
-    DrawRect := Node.DisplayRect(true);
-    DrawPoint := Point(DrawRect.Right, DrawRect.Top);
+      // Start drawing at top right corner of DisplayRect
+      DrawRect := Node.DisplayRect(true);
+      DrawPoint := Point(DrawRect.Right, DrawRect.Top);
 
-    // Draw function arguments to the right of the already drawn text
-    if st^._Args <> '' then begin
-      if bInherited then
-        fControlCanvas.Font.Color := clGray
+      // Draw function arguments to the right of the already drawn text
+      if st^._Args <> '' then begin
+        if bInherited then
+          fControlCanvas.Font.Color := clGray
+        else
+          fControlCanvas.Font.Color := clMaroon;
+        fControlCanvas.TextOut(DrawPoint.X, DrawPoint.Y + 2, st^._Args); // center vertically
+        Inc(DrawPoint.X, fControlCanvas.TextWidth(st^._Args) + 3); // add some right padding
+      end;
+
+      if st^._Type <> '' then
+        TypeText := st^._Type
       else
-        fControlCanvas.Font.Color := clMaroon;
-      fControlCanvas.TextOut(DrawPoint.X, DrawPoint.Y + 2, st^._Args); // center vertically
-      Inc(DrawPoint.X, fControlCanvas.TextWidth(st^._Args) + 3); // add some right padding
-    end;
+        TypeText := fParser.StatementKindStr(st^._Kind);
 
-    if st^._Type <> '' then
-      TypeText := st^._Type
-    else
-      TypeText := fParser.StatementKindStr(st^._Kind);
-
-    // Then draw node type to the right of the arguments
-    if TypeText <> '' then begin
-      fControlCanvas.Font.Color := clGray;
-      fControlCanvas.TextOut(DrawPoint.X, DrawPoint.Y + 2, ': ' + TypeText); // center vertically
+      // Then draw node type to the right of the arguments
+      if TypeText <> '' then begin
+        fControlCanvas.Font.Color := clGray;
+        fControlCanvas.TextOut(DrawPoint.X, DrawPoint.Y + 2, ': ' + TypeText); // center vertically
+      end;
+    except // stick head into sand method. sometimes during painting, the PStatement is invalid
+           // this is caused by repainting while the CppParser is busy.
     end;
   end;
 end;
