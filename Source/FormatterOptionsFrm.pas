@@ -202,7 +202,10 @@ begin
     chkPreprocessor.Checked := IndentPreprocessor;
 
     // Set full command
-    memFullCommand.Text := FullCommand;
+    if FullCommand <> '' then // if first run
+      memFullCommand.Text := FullCommand
+    else
+      memFullCommand.Text := GetFullCommand;
   end;
 end;
 

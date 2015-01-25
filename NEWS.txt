@@ -1,3 +1,7 @@
+Version 5.9.1 - * 
+
+- Fixed formatter options command line not showing up after first launch.
+
 Version 5.9.0 - 5 Januari 2015
 
 - Added AStyle integration.
