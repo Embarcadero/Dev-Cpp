@@ -796,6 +796,8 @@ type
     procedure actToggleCommentInlineUpdate(Sender: TObject);
     procedure actFormatCurrentFileExecute(Sender: TObject);
     procedure actFormatOptionsExecute(Sender: TObject);
+    procedure FindOutputSelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
   private
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
@@ -1340,10 +1342,11 @@ begin
   EvaluateInput.Width := EvalOutput.Width - len - 6;
 
   // Find Results Tab
-  FindOutput.Columns[0].Caption := Lang[ID_COL_LINE];
-  FindOutput.Columns[1].Caption := Lang[ID_COL_COL];
-  FindOutput.Columns[2].Caption := Lang[ID_COL_FILE];
-  FindOutput.Columns[3].Caption := Lang[ID_COL_MSG];
+  FindOutput.Columns[0].Caption := '';
+  FindOutput.Columns[1].Caption := Lang[ID_COL_LINE];
+  FindOutput.Columns[2].Caption := Lang[ID_COL_COL];
+  FindOutput.Columns[3].Caption := Lang[ID_COL_FILE];
+  FindOutput.Columns[4].Caption := Lang[ID_COL_MSG];
 
   // Left page control
   LeftProjectSheet.Caption := Lang[ID_LP_PROJECT];
@@ -1584,8 +1587,9 @@ var
   ListItem: TListItem;
 begin
   ListItem := FindOutput.Items.Add;
-  ListItem.Caption := line;
+  ListItem.Caption := '';
   ListItem.Data := Pointer(Length(keyword));
+  ListItem.SubItems.Add(line);
   ListItem.SubItems.Add(col);
   ListItem.SubItems.Add(filename);
   ListItem.SubItems.Add(msg);
@@ -3568,11 +3572,11 @@ var
 begin
   selected := FindOutPut.Selected;
   if Assigned(selected) and not SameStr(selected.Caption, '') then begin
-    Col := StrToIntDef(selected.SubItems[0], 1);
-    Line := StrToIntDef(selected.Caption, 1);
+    Col := StrToIntDef(selected.SubItems[1], 1);
+    Line := StrToIntDef(selected.SubItems[0], 1);
 
     // And open up
-    e := fEditorList.GetEditorFromFileName(selected.SubItems[1]);
+    e := fEditorList.GetEditorFromFileName(selected.SubItems[2]);
     if Assigned(e) then begin
 
       // Position the caret
@@ -6173,6 +6177,7 @@ end;
 procedure TMainForm.FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView; Item: TListItem; SubItem: Integer;
   State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 var
+  LineToDraw: AnsiString;
   boldstart, boldlen, i: integer;
   rect: TRect;
   oldbcolor, oldfcolor: TColor;
@@ -6190,19 +6195,19 @@ var
     Inc(rect.Left, sizerect.Right - sizerect.Left + 1); // 1 extra pixel for extra width caused by bold
   end;
 begin
-  if SubItem = 3 then begin
+  // Custom draw the found line
+  if SubItem = 4 then begin
 
     // shut up compiler warning...
     oldbcolor := 0;
     oldfcolor := 0;
 
-    boldstart := StrToIntDef(Item.SubItems[0], 1);
+    boldstart := StrToIntDef(Item.SubItems[1], 1);
     boldlen := Integer(Item.Data);
 
-    // Get rect of subitem
+    // Get rect of subitem of
     rect := Item.DisplayRect(drBounds);
-
-    for i := 0 to 2 do begin
+    for i := 0 to SubItem - 1 do begin
       rect.Left := rect.Left + Sender.Column[i].Width;
       rect.Right := rect.Right + Sender.Column[i].Width;
     end;
@@ -6216,25 +6221,28 @@ begin
       Sender.Canvas.FillRect(rect);
     end;
 
+    // Get text to draw
+    LineToDraw := Item.SubItems[SubItem - 1];
+
     // Make text appear 'native', like Windows would draw it
     OffsetRect(rect, 1, 1);
 
     // Draw part before bold highlight
-    Draw(Copy(Item.SubItems[2], 1, boldstart - 1));
+    Draw(Copy(LineToDraw, 1, boldstart - 1));
 
     // Enable bold
     Sender.Canvas.Font.Style := [fsBold];
     Sender.Canvas.Refresh;
 
     // Draw bold highlight
-    Draw(Copy(Item.SubItems[2], boldstart, boldlen));
+    Draw(Copy(LineToDraw, boldstart, boldlen));
 
     // Disable bold
     Sender.Canvas.Font.Style := [];
     Sender.Canvas.Refresh;
 
     // Draw part after bold highlight
-    Draw(Copy(Item.SubItems[2], boldstart + boldlen, Length(Item.SubItems[2]) - boldstart - boldlen + 1));
+    Draw(Copy(LineToDraw, boldstart + boldlen, Length(LineToDraw) - boldstart - boldlen + 1));
 
     if (cdsSelected in State) then begin
       Sender.Canvas.Brush.Color := oldbcolor;
@@ -6630,6 +6638,15 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure TMainForm.FindOutputSelectItem(Sender: TObject; Item: TListItem;
+  Selected: Boolean);
+begin
+  if Selected then
+    Item.Caption := '>'
+  else
+    Item.Caption := '';
 end;
 
 end.

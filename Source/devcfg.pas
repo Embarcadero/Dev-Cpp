@@ -2038,7 +2038,6 @@ var
   I, SetToActivate: integer;
   sl: TStringList;
   CurrentSet: TdevCompilerSet;
-  WasValid: Boolean;
 begin
   // Don't append, but replace
   ClearSets;
@@ -2064,8 +2063,7 @@ begin
     CurrentSet := GetDefaultSet;
 
     // Check if it is usable
-    WasValid := CurrentSet.Validate;
-    if not WasValid then begin
+    if Assigned(CurrentSet) and CurrentSet.Validate then begin
       SaveSet(DefaultSetIndex);
       if CurrentSet.BinDir.Count > 0 then begin
         CurrentSet.SetProperties(CurrentSet.BinDir[0], CurrentSet.gccName);

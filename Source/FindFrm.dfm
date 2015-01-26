@@ -5,7 +5,7 @@ object FindForm: TFindForm
   BorderStyle = bsDialog
   Caption = 'Find Text'
   ClientHeight = 330
-  ClientWidth = 305
+  ClientWidth = 330
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,7 +22,7 @@ object FindForm: TFindForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    305
+    330
     330)
   PixelsPerInch = 96
   TextHeight = 13
@@ -39,7 +39,7 @@ object FindForm: TFindForm
     OnClick = btnExecuteClick
   end
   object btnCancel: TButton
-    Left = 197
+    Left = 222
     Top = 300
     Width = 100
     Height = 25
@@ -53,7 +53,7 @@ object FindForm: TFindForm
   object FindTabs: TTabControl
     Left = 0
     Top = 0
-    Width = 305
+    Width = 330
     Height = 295
     Align = alTop
     TabOrder = 2
@@ -83,7 +83,7 @@ object FindForm: TFindForm
     object cboFindText: TComboBox
       Left = 8
       Top = 46
-      Width = 289
+      Width = 314
       Height = 21
       ItemHeight = 13
       TabOrder = 0
@@ -92,7 +92,7 @@ object FindForm: TFindForm
     object grpOptions: TGroupBox
       Left = 8
       Top = 118
-      Width = 140
+      Width = 152
       Height = 87
       Caption = '  Options:  '
       TabOrder = 2
@@ -122,9 +122,9 @@ object FindForm: TFindForm
       end
     end
     object grpDirection: TGroupBox
-      Left = 156
+      Left = 169
       Top = 118
-      Width = 140
+      Width = 152
       Height = 70
       Caption = '  Direction:  '
       TabOrder = 3
@@ -148,9 +148,9 @@ object FindForm: TFindForm
       end
     end
     object grpWhere: TGroupBox
-      Left = 156
+      Left = 169
       Top = 118
-      Width = 140
+      Width = 152
       Height = 87
       Caption = '  Where:  '
       TabOrder = 4
@@ -184,7 +184,7 @@ object FindForm: TFindForm
     object grpScope: TGroupBox
       Left = 8
       Top = 212
-      Width = 140
+      Width = 152
       Height = 70
       Caption = '  Scope:  '
       TabOrder = 5
@@ -208,9 +208,9 @@ object FindForm: TFindForm
       end
     end
     object grpOrigin: TGroupBox
-      Left = 156
+      Left = 169
       Top = 212
-      Width = 140
+      Width = 152
       Height = 70
       Caption = '  Origin:  '
       TabOrder = 6
@@ -236,7 +236,7 @@ object FindForm: TFindForm
     object cboReplaceText: TComboBox
       Left = 8
       Top = 88
-      Width = 289
+      Width = 314
       Height = 21
       ItemHeight = 13
       TabOrder = 1

@@ -449,11 +449,14 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
         Columns = <
+          item
+            Width = 15
+          end
           item
             Caption = 'Line'
             Width = 40
@@ -483,6 +486,7 @@ object MainForm: TMainForm
         OnDblClick = FindOutputDblClick
         OnDeletion = FindOutputDeletion
         OnKeyDown = FindOutputKeyDown
+        OnSelectItem = FindOutputSelectItem
       end
     end
     object CloseSheet: TTabSheet

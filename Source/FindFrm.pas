@@ -248,111 +248,112 @@ begin
     Include(fSearchOptions, ssoReplaceAll);
 
   MainForm.FindOutput.Items.BeginUpdate;
-
-  // Find the first one, then quit
-  if actiontype = faFind then begin
-    e := MainForm.EditorList.GetEditor;
-    if Assigned(e) then
-      Inc(findcount, Execute(e.Text, faFind));
-
-    // Replace first, find to next
-  end else if actiontype = faReplace then begin
-    e := MainForm.EditorList.GetEditor;
-
-    if Assigned(e) then begin
-      Inc(findcount, Execute(e.Text, faReplace));
-      if findcount > 0 then begin
-        Exclude(fSearchOptions, ssoReplace);
+  try
+    // Find the first one, then quit
+    if actiontype = faFind then begin
+      e := MainForm.EditorList.GetEditor;
+      if Assigned(e) then
         Inc(findcount, Execute(e.Text, faFind));
-      end;
-    end;
 
-    // Or find everything
-  end else begin
-
-    // Enumerate results in message view when finding in files
-    if actiontype = faFindFiles then
-      MainForm.FindOutput.Clear;
-
-    // loop through pagecontrol
-    if rbOpenFiles.Checked then begin
-
-      // loop through editors, add results to message control
-      for I := 0 to MainForm.EditorList.PageCount - 1 do begin
-        e := MainForm.EditorList[i];
-        if Assigned(e) then begin
-          fCurFile := e.FileName;
-
-          // Bring an editor up front if we use prompting
-          if (actiontype = faReplaceFiles) and (ssoPrompt in fSearchOptions) then
-            e.Activate;
-
-          Inc(findcount, Execute(e.Text, actiontype));
-        end;
-      end;
-
-      // loop through project
-    end else if rbProjectFiles.Checked then begin
-      for I := 0 to MainForm.Project.Units.Count - 1 do begin
-        e := MainForm.Project.Units[i].Editor;
-        fCurFile := MainForm.Project.Units[i].FileName;
-
-        // file is already open, use memory
-        if Assigned(e) then begin
-
-          // Bring an editor up front if we use prompting
-          if (actiontype = faReplaceFiles) and (ssoPrompt in fSearchOptions) then
-            e.Activate;
-
-          Inc(findcount, Execute(e.Text, actiontype));
-
-          // not open? load from disk
-        end else if FileExists(fCurFile) then begin
-
-          if (actiontype = faReplaceFiles) then begin
-
-            // we have to open an editor...
-            if ssoPrompt in fSearchOptions then begin
-              e := MainForm.EditorList.GetEditorFromFileName(fCurFile);
-              if Assigned(e) then begin
-                e.Activate;
-
-                Inc(findcount, Execute(e.Text, actiontype));
-
-                // Save and close
-                e.Save;
-                MainForm.Project.CloseUnit(MainForm.Project.Units.Indexof(e));
-              end;
-            end else begin
-
-              // Stealth replace
-              fTempSynEdit.Lines.LoadFromFile(fCurFile);
-              Inc(findcount, Execute(fTempSynEdit, actiontype));
-              fTempSynEdit.Lines.SaveToFile(fCurFile);
-            end;
-          end else begin
-
-            // Only finding...
-            fTempSynEdit.Lines.LoadFromFile(fCurFile);
-            Inc(findcount, Execute(fTempSynEdit, actiontype));
-          end;
-        end;
-      end;
-
-      // Don't loop, only pass single file
-    end else if rbCurFile.Checked then begin
+      // Replace first, find to next
+    end else if actiontype = faReplace then begin
       e := MainForm.EditorList.GetEditor;
 
       if Assigned(e) then begin
+        Inc(findcount, Execute(e.Text, faReplace));
+        if findcount > 0 then begin
+          Exclude(fSearchOptions, ssoReplace);
+          Inc(findcount, Execute(e.Text, faFind));
+        end;
+      end;
 
-        fCurFile := e.FileName;
+      // Or find everything
+    end else begin
 
-        Inc(findcount, Execute(e.Text, actiontype));
+      // Enumerate results in message view when finding in files
+      if actiontype = faFindFiles then
+        MainForm.FindOutput.Clear;
+
+      // loop through pagecontrol
+      if rbOpenFiles.Checked then begin
+
+        // loop through editors, add results to message control
+        for I := 0 to MainForm.EditorList.PageCount - 1 do begin
+          e := MainForm.EditorList[i];
+          if Assigned(e) then begin
+            fCurFile := e.FileName;
+
+            // Bring an editor up front if we use prompting
+            if (actiontype = faReplaceFiles) and (ssoPrompt in fSearchOptions) then
+              e.Activate;
+
+            Inc(findcount, Execute(e.Text, actiontype));
+          end;
+        end;
+
+        // loop through project
+      end else if rbProjectFiles.Checked then begin
+        for I := 0 to MainForm.Project.Units.Count - 1 do begin
+          e := MainForm.Project.Units[i].Editor;
+          fCurFile := MainForm.Project.Units[i].FileName;
+
+          // file is already open, use memory
+          if Assigned(e) then begin
+
+            // Bring an editor up front if we use prompting
+            if (actiontype = faReplaceFiles) and (ssoPrompt in fSearchOptions) then
+              e.Activate;
+
+            Inc(findcount, Execute(e.Text, actiontype));
+
+            // not open? load from disk
+          end else if FileExists(fCurFile) then begin
+
+            if (actiontype = faReplaceFiles) then begin
+
+              // we have to open an editor...
+              if ssoPrompt in fSearchOptions then begin
+                e := MainForm.EditorList.GetEditorFromFileName(fCurFile);
+                if Assigned(e) then begin
+                  e.Activate;
+
+                  Inc(findcount, Execute(e.Text, actiontype));
+
+                  // Save and close
+                  e.Save;
+                  MainForm.Project.CloseUnit(MainForm.Project.Units.Indexof(e));
+                end;
+              end else begin
+
+                // Stealth replace
+                fTempSynEdit.Lines.LoadFromFile(fCurFile);
+                Inc(findcount, Execute(fTempSynEdit, actiontype));
+                fTempSynEdit.Lines.SaveToFile(fCurFile);
+              end;
+            end else begin
+
+              // Only finding...
+              fTempSynEdit.Lines.LoadFromFile(fCurFile);
+              Inc(findcount, Execute(fTempSynEdit, actiontype));
+            end;
+          end;
+        end;
+
+        // Don't loop, only pass single file
+      end else if rbCurFile.Checked then begin
+        e := MainForm.EditorList.GetEditor;
+
+        if Assigned(e) then begin
+
+          fCurFile := e.FileName;
+
+          Inc(findcount, Execute(e.Text, actiontype));
+        end;
       end;
     end;
+  finally
+    MainForm.FindOutput.Items.EndUpdate;
   end;
-
-  MainForm.FindOutput.Items.EndUpdate;
 
   if actiontype = faFindFiles then begin
     MainForm.MessageControl.ActivePageIndex := 4; // Find Tab
