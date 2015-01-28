@@ -4082,14 +4082,18 @@ end;
 procedure TMainForm.actConfigdevShortcutsExecute(Sender: TObject);
 begin
   Shortcuts.Edit(
-    Lang[ID_SC_CAPTION],
-    Lang[ID_SC_HDRENTRY],
-    Lang[ID_SC_HDRSHORTCUT],
-    Lang[ID_BTN_OK],
-    Lang[ID_BTN_CANCEL],
-    Lang[ID_BTN_DEFAULT],
-    Lang[ID_SC_REPLACEHINT],
-    Lang[ID_SC_BUTTON]);
+    Lang[ID_SC_CAPTION], // window
+    Lang[ID_SC_HDRENTRY], // column 1
+    Lang[ID_SC_HDRSHORTCUT], // column 2
+    Lang[ID_SC_NEWTIP], // hint
+    Lang[ID_BTN_OK], // OK button
+    Lang[ID_BTN_CANCEL], // Cancel button
+    Lang[ID_SC_RESETALL], // Reset All button
+    Lang[ID_SC_RESETCURRENT], // Reset Current button
+    Lang[ID_SC_NEWREPLACEHINT], // messagebox text when replacing
+    Lang[ID_SC_CONFIRMALL], // messagebox text when setting to defaults
+    Lang[ID_SC_CONFIRMONE], // messagebox text when setting to defaults
+    Lang[ID_SC_BUTTON]); // Button/Misc
 end;
 
 procedure TMainForm.DateTimeMenuItemClick(Sender: TObject);

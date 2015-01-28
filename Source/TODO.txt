@@ -1,0 +1,10 @@
+- Add required headers and libraries for D3D11 development
+- Increase the amount of tests
+- Crash in TClassBrowser.AdvancedCustomDrawItem
+- When the current compiler changes, code should be reparsed because built-in defines of a compiler affect parsing
+- Implement conditional search
+- Change to singleton application to support opening of multiple files from explorer with 1 instance
+- Fix random positions of GUI items in MessageControl
+- Customisable highlighter reserved words
+- Messy painting of find results list
+- Add proxy support to webupdate

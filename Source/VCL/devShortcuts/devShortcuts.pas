@@ -45,12 +45,12 @@ type
     fOwner: TComponent;
     fFilename: TFileName;
     fShortcuts: TList;
-    function GetTopmostItemAncestor(Item: TMenuItem): AnsiString;
+    function GetItemDescription(Item: TMenuItem): AnsiString;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Load(List: TActionList);
-    procedure Edit(const WindowCaption, Column1, Column2, OK, Cancel, Default, ReplaceHint, Button: AnsiString);
+    procedure Edit(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent, ReplaceHint, ResetAllConfirm, ResetCurrentConfirm, Button: AnsiString);
     procedure Save;
   published
     property Filename: TFilename read fFilename write fFilename;
@@ -94,18 +94,21 @@ begin
   inherited;
 end;
 
-function TdevShortcuts.GetTopmostItemAncestor(Item: TMenuItem): AnsiString;
+function TdevShortcuts.GetItemDescription(Item: TMenuItem): AnsiString;
 var
-  CurMenu: TMenu;
+  ParentItem: TMenuItem;
 begin
-  Result := Item.GetParentMenu.Name;
-  CurMenu := Item.GetParentMenu;
-  if CurMenu is TMainMenu then
-    while Item <> nil do begin
-      if Item.Caption <> '' then
-        Result := Item.Caption;
-      Item := Item.Parent;
-    end
+  Result := StripHotkey(Item.Caption);
+  ParentItem := Item.Parent;
+  while ParentItem <> nil do begin
+    if ParentItem.Caption <> '' then // menu roots node have no caption
+      Result := StripHotkey(ParentItem.Caption) + ' > ' + Result
+    else begin
+      Result := ParentItem.GetParentMenu.Name + ' > ' + Result;
+      Exit;
+    end;
+    ParentItem := ParentItem.Parent;
+  end;
 end;
 
 procedure TdevShortcuts.Load(List: TActionList);
@@ -139,7 +142,7 @@ begin
           item := new(PShortcutItem);
           item^.Default := MenuItem.ShortCut;
           item^.Temporary := MenuItem.ShortCut;
-          item^.IniEntry := StripHotkey(GetTopmostItemAncestor(MenuItem)) + ':' + StripHotkey(MenuItem.Caption);
+          item^.IniEntry := GetItemDescription(MenuItem);
           item^.ListEntry := ''; // to be filled by form (translated)
           item^.MenuItem := MenuItem;
           item^.Action := TAction(MenuItem.Action);
@@ -208,28 +211,32 @@ begin
   end;
 end;
 
-procedure TdevShortcuts.Edit(const WindowCaption, Column1, Column2, OK, Cancel, Default, ReplaceHint, Button:
-  AnsiString);
+procedure TdevShortcuts.Edit(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent, ReplaceHint, ResetAllConfirm, ResetCurrentConfirm, Button: AnsiString);
 var
   I: integer;
   item: PShortcutItem;
 begin
   frmShortcutsEditor := TfrmShortcutsEditor.Create(Self);
   with frmShortcutsEditor do try
-    Clear;
-    LoadText(WindowCaption, Column1, Column2, OK, Cancel, Default, ReplaceHint, Button);
-      // translate on the fly, can't use devMultilanguage here...
+    // translate on the fly, can't use devMultilanguage here...
+    LoadText(WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent, ReplaceHint, ResetAllConfirm,
+      ResetCurrentConfirm);
 
     // Use the preloaded list, do not walk the Components list again
-    for I := 0 to fShortcuts.Count - 1 do begin
-      item := PShortcutItem(fShortcuts[i]);
-      if Assigned(item^.MenuItem) then
-        item^.ListEntry := StripHotkey(GetTopmostItemAncestor(item^.MenuItem) + ' >> ' + item^.MenuItem.Caption)
-      else if Assigned(item^.Action) then
-        item^.ListEntry := '(' + Button + ') >> ' + StripHotkey(item^.Action.Caption)
-      else
-        item^.ListEntry := '';
-      AddShortcut(item); // display translated caption
+    BeginUpdate;
+    try
+      for I := 0 to fShortcuts.Count - 1 do begin
+        item := PShortcutItem(fShortcuts[i]);
+        if Assigned(item^.MenuItem) then
+          item^.ListEntry := GetItemDescription(item^.MenuItem)
+        else if Assigned(item^.Action) then
+          item^.ListEntry := '(' + Button + ') > ' + StripHotkey(item^.Action.Caption)
+        else
+          item^.ListEntry := '';
+        AddShortcut(item); // display translated caption
+      end;
+    finally
+      EndUpdate; // repaint once
     end;
 
     if ShowModal = mrOK then

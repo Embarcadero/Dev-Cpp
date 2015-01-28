@@ -496,6 +496,12 @@ const
   ID_SC_OK                              = 34007;
   ID_SC_REPLACEHINT                     = 34008;
   ID_SC_BUTTON                          = 34009;
+  ID_SC_NEWREPLACEHINT                  = 34010;
+  ID_SC_NEWTIP                          = 34011;
+  ID_SC_CONFIRMALL                      = 34012;
+  ID_SC_CONFIRMONE                      = 34013;
+  ID_SC_RESETALL                        = 34014;
+  ID_SC_RESETCURRENT                    = 34015;
 
   // Tool edit form macros
   ID_ET_MACROS                          = 35001;

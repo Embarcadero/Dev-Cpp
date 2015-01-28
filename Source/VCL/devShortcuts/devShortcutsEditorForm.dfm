@@ -1,10 +1,10 @@
 object frmShortcutsEditor: TfrmShortcutsEditor
-  Left = 473
-  Top = 271
+  Left = 1468
+  Top = 423
   BorderStyle = bsDialog
   Caption = 'Configure Shortcuts'
-  ClientHeight = 470
-  ClientWidth = 380
+  ClientHeight = 520
+  ClientWidth = 470
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,17 +16,27 @@ object frmShortcutsEditor: TfrmShortcutsEditor
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
+  object lblTip: TLabel
+    Left = 10
+    Top = 454
+    Width = 450
+    Height = 26
+    AutoSize = False
+    Caption = 
+      'Click on an item and press the shortcut you desire. Press Esc or' +
+      ' Delete to clear the shortcut. Please avoid the use of Alt in sh' +
+      'ortcuts.'
+    WordWrap = True
+  end
   object lvShortcuts: TListView
-    Left = 0
-    Top = 0
-    Width = 380
-    Height = 433
-    BevelKind = bkFlat
-    BorderStyle = bsNone
+    Left = 8
+    Top = 8
+    Width = 454
+    Height = 440
     Columns = <
       item
         Caption = 'Menu entry'
-        Width = 255
+        Width = 325
       end
       item
         Caption = 'Shortcut assigned'
@@ -42,8 +52,8 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     OnKeyDown = lvShortcutsKeyDown
   end
   object btnCancel: TButton
-    Left = 290
-    Top = 440
+    Left = 380
+    Top = 490
     Width = 85
     Height = 25
     Caption = 'Cancel'
@@ -51,8 +61,8 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     TabOrder = 1
   end
   object btnOk: TButton
-    Left = 200
-    Top = 440
+    Left = 290
+    Top = 490
     Width = 85
     Height = 25
     Caption = 'OK'
@@ -60,13 +70,22 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     ModalResult = 1
     TabOrder = 2
   end
-  object btnDefault: TButton
+  object btnResetAll: TButton
     Left = 8
-    Top = 440
+    Top = 490
     Width = 85
     Height = 25
-    Caption = 'Defaults'
+    Caption = 'Reset All'
     TabOrder = 3
-    OnClick = btnDefaultClick
+    OnClick = btnResetAllClick
+  end
+  object btnResetCurrent: TButton
+    Left = 98
+    Top = 490
+    Width = 85
+    Height = 25
+    Caption = 'Reset Current'
+    TabOrder = 4
+    OnClick = btnResetCurrentClick
   end
 end

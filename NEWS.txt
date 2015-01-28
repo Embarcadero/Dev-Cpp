@@ -1,4 +1,8 @@
-Version 5.9.1 - * 
+Version 5.9.1 - 28 Januari 2015
+
+- Updated Tools >> Edit Shortcuts.
+- Removed Ctrl+Alt combination in default shortcuts to ensure that the AltGr button keeps functioning:
+http://blogs.msdn.com/b/oldnewthing/archive/2004/03/29/101121.aspx
 
 - Fixed formatter options command line not showing up after first launch.
 - Added source LaTeX of testing document DevTest.pdf.
