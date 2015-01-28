@@ -254,6 +254,7 @@ type
     function FormatMemory(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString; // apply formatting
     function FormatFile(const FileName, OverrideCommand: AnsiString): AnsiString; // apply formatting
     function GetVersion: AnsiString;
+    function GetFullCommand : AnsiString;
   published
     property BracketStyle: Integer read fBracketStyle write fBracketStyle;
     property IndentStyle: Integer read fIndentStyle write fIndentStyle;
@@ -2575,9 +2576,42 @@ begin
   fIndentNamespaces := True;
   fIndentLabels := False;
   fIndentPreprocessor := True;
-  fFullCommand := ''; // includes customizations
+  fFullCommand := GetFullCommand; // includes customizations
   fAStyleDir := 'AStyle\';
   fAStyleFile := 'AStyle.exe';
+end;
+
+function TdevFormatter.GetFullCommand : AnsiString;
+begin
+  Result := '';
+
+  // Add bracket style
+  if fBracketStyle > 0 then
+    Result := Result + ' -A' + IntToStr(fBracketStyle);
+
+  // Add indent style and tab width
+  case fIndentStyle of
+    1: Result := Result + ' --indent=spaces=' + IntToStr(fTabWidth);
+    2: Result := Result + ' --indent=tab=' + IntToStr(fTabWidth);
+    3: Result := Result + ' --indent=force-tab=' + IntToStr(fTabWidth);
+    4: Result := Result + ' --indent=force-tab-x=' + IntToStr(fTabWidth);
+  end;
+
+  // Add indentation options
+  if fIndentClasses then
+    Result := Result + ' --indent-classes';
+  if fIndentSwitches then
+    Result := Result + ' --indent-switches';
+  if fIndentCases then
+    Result := Result + ' --indent-cases';
+  if fIndentNamespaces then
+    Result := Result + ' --indent-namespaces';
+  if fIndentLabels then
+    Result := Result + ' --indent-labels';
+  if fIndentPreprocessor then
+    Result := Result + ' --indent-preprocessor';
+
+  Result := TrimLeft(Result);
 end;
 
 function TdevFormatter.Validate: Boolean;

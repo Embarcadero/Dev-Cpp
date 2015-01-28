@@ -202,10 +202,7 @@ begin
     chkPreprocessor.Checked := IndentPreprocessor;
 
     // Set full command
-    if FullCommand <> '' then // if first run
-      memFullCommand.Text := FullCommand
-    else
-      memFullCommand.Text := GetFullCommand;
+    memFullCommand.Text := FullCommand;
   end;
 end;
 
@@ -252,6 +249,8 @@ begin
   synExample.Lines.LoadFromFile(
     devDirs.Exec + devFormatter.AStyleDir + 'DummyInput.txt');
 end;
+
+// copy of TdevFormatter.GetFullCommand
 
 function TFormatterOptionsForm.GetFullCommand: AnsiString;
 begin
