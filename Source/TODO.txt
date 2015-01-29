@@ -8,3 +8,4 @@
 - Customisable highlighter reserved words
 - Messy painting of find results list
 - Add proxy support to webupdate
+- Unify look and feel of all windows
