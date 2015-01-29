@@ -1,7 +1,6 @@
 object CompOptForm: TCompOptForm
   Left = 551
   Top = 335
-  BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Compiler options'
   ClientHeight = 512
@@ -12,7 +11,7 @@ object CompOptForm: TCompOptForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = True
+  OldCreateOrder = False
   Position = poMainFormCenter
   ShowHint = True
   OnClose = FormClose
