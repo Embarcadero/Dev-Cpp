@@ -6182,9 +6182,9 @@ procedure TMainForm.FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView;
   State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 var
   LineToDraw: AnsiString;
-  boldstart, boldlen, i: integer;
-  rect: TRect;
-  oldbcolor, oldfcolor: TColor;
+  BoldStart, BoldLen, i: integer;
+  Rect: TRect;
+  OldBrushColor, OldFontColor: TColor;
 
   procedure Draw(const s: AnsiString);
   var
@@ -6199,27 +6199,27 @@ var
     Inc(rect.Left, sizerect.Right - sizerect.Left + 1); // 1 extra pixel for extra width caused by bold
   end;
 begin
-  // Custom draw the found line
+  // Draw the current line marker in bold
+  {if SubItem = 0 then begin
+    Sender.Canvas.Font.Style := [fsBold];
+    Sender.Canvas.Refresh;
+    DefaultDraw := True;
+
+  // Draw the find result in bold
+  end else}
   if SubItem = 4 then begin
 
-    // shut up compiler warning...
-    oldbcolor := 0;
-    oldfcolor := 0;
-
-    boldstart := StrToIntDef(Item.SubItems[1], 1);
-    boldlen := Integer(Item.Data);
-
-    // Get rect of subitem of
-    rect := Item.DisplayRect(drBounds);
+    // Get rect of subitem to draw
+    Rect := Item.DisplayRect(drBounds);
     for i := 0 to SubItem - 1 do begin
-      rect.Left := rect.Left + Sender.Column[i].Width;
-      rect.Right := rect.Right + Sender.Column[i].Width;
+      Rect.Left := Rect.Left + Sender.Column[i].Width;
+      Rect.Right := Rect.Right + Sender.Column[i].Width;
     end;
 
     // Draw blue highlight
+    OldBrushColor := Sender.Canvas.Brush.Color;
+    OldFontColor := Sender.Canvas.Font.Color;
     if (cdsSelected in State) then begin
-      oldbcolor := Sender.Canvas.Brush.Color;
-      oldfcolor := Sender.Canvas.Font.Color;
       Sender.Canvas.Brush.Color := clHighlight;
       Sender.Canvas.Font.Color := clWhite;
       Sender.Canvas.FillRect(rect);
@@ -6228,30 +6228,33 @@ begin
     // Get text to draw
     LineToDraw := Item.SubItems[SubItem - 1];
 
-    // Make text appear 'native', like Windows would draw it
-    OffsetRect(rect, 1, 1);
+    // Make text location appear 'native', like Windows would draw it
+    OffsetRect(Rect, 4, 2);
+
+    // Get location of bold part
+    BoldStart := StrToIntDef(Item.SubItems[1], 1);
+    BoldLen := Integer(Item.Data);
 
     // Draw part before bold highlight
-    Draw(Copy(LineToDraw, 1, boldstart - 1));
+    Draw(Copy(LineToDraw, 1, BoldStart - 1));
 
     // Enable bold
     Sender.Canvas.Font.Style := [fsBold];
     Sender.Canvas.Refresh;
 
     // Draw bold highlight
-    Draw(Copy(LineToDraw, boldstart, boldlen));
+    Draw(Copy(LineToDraw, BoldStart, BoldLen));
 
     // Disable bold
     Sender.Canvas.Font.Style := [];
     Sender.Canvas.Refresh;
 
     // Draw part after bold highlight
-    Draw(Copy(LineToDraw, boldstart + boldlen, Length(LineToDraw) - boldstart - boldlen + 1));
+    Draw(Copy(LineToDraw, BoldStart + BoldLen, MaxInt));
 
-    if (cdsSelected in State) then begin
-      Sender.Canvas.Brush.Color := oldbcolor;
-      Sender.Canvas.Font.Color := oldfcolor;
-    end;
+    // Restore colors
+    Sender.Canvas.Brush.Color := OldBrushColor;
+    Sender.Canvas.Font.Color := OldFontColor;
 
     DefaultDraw := false;
   end else

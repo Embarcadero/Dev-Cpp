@@ -47,7 +47,7 @@ object MainForm: TMainForm
     Top = 477
     Width = 999
     Height = 183
-    ActivePage = LogSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -149,13 +149,13 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 156
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           156
-          155)
+          154)
         object btnAbortCompilation: TSpeedButton
           Left = 4
           Top = 4
@@ -174,7 +174,7 @@ object MainForm: TMainForm
         end
         object chkShortenPaths: TCheckBox
           Left = 4
-          Top = 132
+          Top = 131
           Width = 144
           Height = 17
           Action = actShortenCompPaths
@@ -186,7 +186,7 @@ object MainForm: TMainForm
         Left = 156
         Top = 0
         Width = 835
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
@@ -194,7 +194,7 @@ object MainForm: TMainForm
           Left = 0
           Top = 0
           Width = 835
-          Height = 155
+          Height = 154
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -217,13 +217,13 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 402
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           402
-          155)
+          154)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -237,7 +237,7 @@ object MainForm: TMainForm
           Width = 262
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnKeyPress = edGdbCommandKeyPress
         end
@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 395
-          Height = 117
+          Height = 116
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -256,7 +256,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 589
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -264,7 +264,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           589
-          155)
+          154)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -402,7 +402,7 @@ object MainForm: TMainForm
           Width = 518
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 5
           OnKeyPress = EvaluateInputKeyPress
         end
@@ -410,7 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 46
+          Height = 45
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
@@ -449,7 +449,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -478,7 +478,7 @@ object MainForm: TMainForm
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
-        ShowHint = True
+        ShowHint = False
         TabOrder = 0
         ViewStyle = vsReport
         OnAdvancedCustomDraw = FindOutputAdvancedCustomDraw
@@ -1617,7 +1617,6 @@ object MainForm: TMainForm
       GroupIndex = 9
       object FormatCurrentFile1: TMenuItem
         Action = actFormatCurrentFile
-        ShortCut = 24646
       end
       object N46: TMenuItem
         Caption = '-'
@@ -2821,7 +2820,7 @@ object MainForm: TMainForm
     object actFormatCurrentFile: TAction
       Category = 'AStyle'
       Caption = 'Format Current File'
-      ShortCut = 49222
+      ShortCut = 24646
       OnExecute = actFormatCurrentFileExecute
       OnUpdate = actUpdateEmptyEditor
     end
