@@ -118,6 +118,8 @@ Section "Dev-C++ program files (required)" SectionMain
   File /nonfatal /r "Templates\*"
   SetOutPath $INSTDIR\Help
   File /nonfatal /r "Help\*"
+  SetOutPath $INSTDIR\AStyle
+  File /nonfatal /r "AStyle\*"
 SectionEnd
 
 Section "Icon files" SectionIcons
