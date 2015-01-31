@@ -217,13 +217,13 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 402
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           402
-          154)
+          155)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -256,7 +256,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 589
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -264,7 +264,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           589
-          154)
+          155)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -2820,7 +2820,7 @@ object MainForm: TMainForm
     object actFormatCurrentFile: TAction
       Category = 'AStyle'
       Caption = 'Format Current File'
-      ShortCut = 24646
+      ShortCut = 8262
       OnExecute = actFormatCurrentFileExecute
       OnUpdate = actUpdateEmptyEditor
     end

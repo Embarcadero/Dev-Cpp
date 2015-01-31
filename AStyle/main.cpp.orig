@@ -1,0 +1,26 @@
+#include <omp.h>
+#include <stdio.h>
+
+// not using iostream here due to output ordering issues
+
+// iostream tends to output each part between <<'s separately to the console, 
+// which can lead to random output if multiple threads are doing the same
+// thing.
+
+// printf will generally output the whole result string in one go, so results
+// of separate printf calls, even from different threads, will remain intact
+
+// Another fix, other than using printf, would be to give each thread its own 
+// place to store output temporarily (a stringstream), and then output the whole
+// result in one go.
+
+int main() {
+
+	#pragma omp parallel num_threads(2)
+	printf("Hi, I'm thread number %d!\n",omp_get_thread_num());
+
+	#pragma omp parallel for num_threads(2)
+	for(int i = 0;i < 20;i++) {
+		printf("\nThread number %d, executing iteration %d...",omp_get_thread_num(),i);		
+	}
+}
