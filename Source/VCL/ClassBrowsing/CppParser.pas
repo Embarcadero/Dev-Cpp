@@ -1315,7 +1315,7 @@ begin
   end else begin
 
     // Find the function body start after the inherited constructor
-    if fTokenizer[fIndex]^.Text[1] = ':' then
+    if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then
       while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}'])) do
         Inc(fIndex);
 
