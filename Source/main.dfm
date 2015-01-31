@@ -47,7 +47,7 @@ object MainForm: TMainForm
     Top = 477
     Width = 999
     Height = 183
-    ActivePage = LogSheet
+    ActivePage = DebugSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -149,13 +149,13 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 156
-        Height = 154
+        Height = 155
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           156
-          154)
+          155)
         object btnAbortCompilation: TSpeedButton
           Left = 4
           Top = 4
@@ -174,11 +174,11 @@ object MainForm: TMainForm
         end
         object chkShortenPaths: TCheckBox
           Left = 4
-          Top = 133
+          Top = 69
           Width = 144
           Height = 17
           Action = actShortenCompPaths
-          Anchors = [akLeft, akBottom]
+          Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
         end
       end
@@ -186,7 +186,7 @@ object MainForm: TMainForm
         Left = 156
         Top = 0
         Width = 835
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
@@ -194,7 +194,7 @@ object MainForm: TMainForm
           Left = 0
           Top = 0
           Width = 835
-          Height = 154
+          Height = 155
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 395
-          Height = 115
+          Height = 119
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -410,7 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 44
+          Height = 48
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
