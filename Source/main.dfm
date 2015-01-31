@@ -47,7 +47,7 @@ object MainForm: TMainForm
     Top = 477
     Width = 999
     Height = 183
-    ActivePage = DebugSheet
+    ActivePage = LogSheet
     Align = alBottom
     Images = dmMain.MenuImages_NewLook
     MultiLine = True
@@ -174,7 +174,7 @@ object MainForm: TMainForm
         end
         object chkShortenPaths: TCheckBox
           Left = 4
-          Top = 131
+          Top = 133
           Width = 144
           Height = 17
           Action = actShortenCompPaths
@@ -245,7 +245,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 395
-          Height = 116
+          Height = 115
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -410,7 +410,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 45
+          Height = 44
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
@@ -478,7 +478,7 @@ object MainForm: TMainForm
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
-        ShowHint = False
+        ShowHint = True
         TabOrder = 0
         ViewStyle = vsReport
         OnAdvancedCustomDraw = FindOutputAdvancedCustomDraw
