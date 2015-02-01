@@ -1,3 +1,7 @@
+Version 5.9.2 - 1 Februari 2015
+
+- Changed Format Current File shortcut from Shift+F to Alt+F.
+
 Version 5.9.1 - 31 Januari 2015
 
 - Updated Tools >> Edit Shortcuts.
