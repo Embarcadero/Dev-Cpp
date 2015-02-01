@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 260
-  Top = 318
+  Left = 975
+  Top = 440
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -61,7 +61,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +105,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -449,7 +449,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 154
+        Height = 155
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -2820,7 +2820,7 @@ object MainForm: TMainForm
     object actFormatCurrentFile: TAction
       Category = 'AStyle'
       Caption = 'Format Current File'
-      ShortCut = 8262
+      ShortCut = 32838
       OnExecute = actFormatCurrentFileExecute
       OnUpdate = actUpdateEmptyEditor
     end
