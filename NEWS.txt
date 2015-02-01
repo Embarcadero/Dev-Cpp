@@ -3,6 +3,7 @@ Version 5.9.2 - 1 Februari 2015
 - Changed Format Current File shortcut from Shift+F to Shift+Ctrl+A.
 - Removed/Changed all default Alt+(Key) shortcuts because they interfere with Alt menu navigation.
 - Assigned some new default shortcuts like Ctrl+B (Open Containing Folder) and F2 (Rename File).
+- Fixed Show Makefile being executable when no compiler set is configured.
 
 Version 5.9.1 - 31 Januari 2015
 

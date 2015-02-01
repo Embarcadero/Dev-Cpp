@@ -2150,7 +2150,7 @@ object MainForm: TMainForm
       Category = 'Project'
       Caption = 'Edit &Makefile'
       OnExecute = actProjectMakeFileExecute
-      OnUpdate = actUpdateProject
+      OnUpdate = actUpdateMakeFile
     end
     object actProjectSource: TAction
       Tag = 6

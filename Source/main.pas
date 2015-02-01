@@ -611,6 +611,7 @@ type
     procedure actMsgHideExecute(Sender: TObject);
     procedure actUpdatePageCount(Sender: TObject); // enable on pagecount> 0
     procedure actUpdateProject(Sender: TObject); // enable on fproject assigned
+    procedure actUpdateMakeFile(Sender: TObject); // enable on fproject assigned and compilation allowed
     procedure actUpdatePageorProject(Sender: TObject); // enable on either of above
     procedure actUpdateEmptyEditor(Sender: TObject); // enable on unempty editor
     procedure actUpdateDebuggerRunning(Sender: TObject); // enable when debugger running
@@ -3220,6 +3221,12 @@ end;
 procedure TMainForm.actUpdateProject(Sender: TObject);
 begin
   TCustomAction(Sender).Enabled := assigned(fProject);
+end;
+
+procedure TMainForm.actUpdateMakeFile(Sender: TObject);
+begin
+  TCustomAction(Sender).Enabled := assigned(fProject) and (not fCompiler.Compiling) and (GetCompileTarget <> ctNone) and
+    Assigned(devCompilerSets.CompilationSet);
 end;
 
 procedure TMainForm.actUpdateEmptyEditor(Sender: TObject);
