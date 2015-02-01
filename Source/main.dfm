@@ -1565,6 +1565,7 @@ object MainForm: TMainForm
       end
       object Abortcompilation2: TMenuItem
         Action = actGotoBreakPoint
+        ShortCut = 113
       end
       object oggleBreakpoint1: TMenuItem
         Action = actBreakPoint
@@ -1909,7 +1910,6 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = 'Save project as...'
       ImageIndex = 7
-      ShortCut = 32851
       OnExecute = actSaveProjectAsExecute
       OnUpdate = actUpdateProject
     end
@@ -1945,7 +1945,6 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = 'Close Project'
       ImageIndex = 11
-      ShortCut = 32855
       OnExecute = actCloseProjectExecute
       OnUpdate = actUpdateProject
     end
@@ -2143,7 +2142,7 @@ object MainForm: TMainForm
       Category = 'Project'
       Caption = '&Options...'
       ImageIndex = 27
-      ShortCut = 32848
+      ShortCut = 16456
       OnExecute = actProjectOptionsExecute
       OnUpdate = actUpdateProject
     end
@@ -2247,7 +2246,7 @@ object MainForm: TMainForm
       AutoCheck = True
       Caption = '&Full screen mode'
       ImageIndex = 38
-      ShortCut = 32891
+      ShortCut = 16506
       OnExecute = actFullScreenExecute
     end
     object actNext: TAction
@@ -2285,6 +2284,7 @@ object MainForm: TMainForm
       Tag = 2
       Category = 'Project'
       Caption = 'Re&name file'
+      ShortCut = 113
       OnExecute = actUnitRenameExecute
       OnUpdate = actUpdateProject
     end
@@ -2311,7 +2311,7 @@ object MainForm: TMainForm
     object actShowBars: TAction
       Category = 'View'
       Caption = 'Show Toolbars'
-      ShortCut = 32890
+      ShortCut = 16507
       OnExecute = actShowBarsExecute
     end
     object actBreakPoint: TAction
@@ -2630,7 +2630,7 @@ object MainForm: TMainForm
     object actHideFSBar: TAction
       Category = 'Window'
       Caption = 'Hide fullscreen bar'
-      ShortCut = 32889
+      ShortCut = 16505
       OnExecute = actHideFSBarExecute
     end
     object actCollapse: TAction
@@ -2790,6 +2790,7 @@ object MainForm: TMainForm
       Category = 'Help'
       Caption = 'actHelp'
       ImageIndex = 46
+      ShortCut = 112
       OnExecute = actHelpExecute
     end
     object actShortenCompPaths: TAction
@@ -2808,6 +2809,7 @@ object MainForm: TMainForm
       Category = 'File'
       Caption = 'Open Containing Folder'
       ImageIndex = 0
+      ShortCut = 16450
       OnExecute = actOpenFolderExecute
       OnUpdate = actUpdatePageCount
     end
@@ -2820,7 +2822,7 @@ object MainForm: TMainForm
     object actFormatCurrentFile: TAction
       Category = 'AStyle'
       Caption = 'Format Current File'
-      ShortCut = 32838
+      ShortCut = 24641
       OnExecute = actFormatCurrentFileExecute
       OnUpdate = actUpdateEmptyEditor
     end

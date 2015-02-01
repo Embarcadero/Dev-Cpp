@@ -63,7 +63,93 @@ of the provided compiler):
 	Otherwise upx will compress all icons and the file associations will point
 	to nonexisting (moved) icons within devcpp.exe
 	
-5. Image Map (somewhat outdated)
+5. Shortcut Map
+
+This is an up to date map of the default shortcuts of Dev-C++. All Ctrl+(Letter)
+combinations are in use, except for the following letters: UJKL. The Shift 
+modifier should be added to a shortcut to signify a multiplicated version
+of the regular shortcut. The use of Ctrl+Alt+(Key) or Shift+(Key) should be
+avoided.
+
+Misc.
+-----
+F1			Help
+			
+Alt+F4		Close
+Ctrl+Space	Open Code Completion
+
+Executing/Debugging
+-------------------
+F2			Goto Breakpoint
+F4			Toggle Breakpoint
+F5			Start Debug
+F6			Stop Debug/Regular
+F7			Next Line
+F8			Step Line
+F9			Compile
+F10			Start Regular
+F11			Compile and Run Regular
+F12			Rebuild
+
+Editing
+-------
+Ctrl+Z			Undo
+Ctrl+Y			Redo
+Ctrl+X			Cut
+Ctrl+C			Copy
+Ctrl+V			Paste
+Ctrl+A			Select All
+Ctrl+Q			Swap Header/Source
+Ctrl+.			Comment
+Ctrl+,			Uncomment
+Ctrl+/			Toggle Comment
+Ctrl+;			Toggle Inline Comment
+Ctrl+T			Add TODO
+Ctrl+D			Delete Line
+Ctrl+E			Duplicate Line
+Tab				Indent
+Shift+Tab 		Unindent
+Shift+Ctrl+Up	Move Selection Up
+Shift+Ctrl+Down	Move Selection Down
+Shift+Ctrl+A	Format Current File
+
+Searching
+---------
+Ctrl+F			Find
+Shift+Ctrl+F	Find in Files
+Ctrl+R			Replace
+Shift+Ctrl+R	Replace in Files
+Ctrl+G			Goto Line
+Shift+Ctrl+G	Goto Function
+Ctrl+I			Incremental Search
+Ctrl+M			Swap Editor
+F3				Search Again
+Shift+F3		Reverse Search Again
+
+Files
+-----
+Ctrl+N			New File
+Ctrl+O			Open File
+Ctrl+S			Save File
+Shift+Ctrl+S	Save All Files
+Ctrl+W			Close File
+Shift+Ctrl+W	Close All Files
+Ctrl+P			Print File
+Ctrl+B			Open Containing Folder
+
+View
+----
+Ctrl+F10		Hide Fullscreen Bar
+Ctrl+F11		Toggle Fullscreen
+Ctrl+F12		Toggle Fullscreen Bar
+Ctrl+Tab		Next Editor
+Shift+Ctrl+Tab	Previous Editor
+
+Project
+-------
+Ctrl+H			Project Options
+	
+6. Image Map (somewhat outdated)
 
 These are the descriptions of the indices of the menu images lists used in d
 Transparent color is selected as the left most pixel of the bottom row.
