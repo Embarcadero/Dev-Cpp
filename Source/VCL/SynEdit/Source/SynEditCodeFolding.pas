@@ -92,7 +92,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    function AddByParts(AParent: TSynEditFoldRange; AAllFold: TSynEditFoldRanges; AFromLine, AIndent: Integer;
+    function AddByParts(AParent: TSynEditFoldRange; AAllFold: TSynEditFoldRanges; AFromLine: Integer;
       AFoldRegion: TFoldRegionItem; AToLine: Integer = 0): TSynEditFoldRange;
     procedure AddObject(FoldRange: TSynEditFoldRange);
 
@@ -109,7 +109,6 @@ type
   private
     fFromLine: Integer; // Beginning line
     fToLine: Integer; // End line
-    fIndent: Integer; // Indent level (physcial)
     fLinesCollapsed: Integer; // Number of collapsed lines
     fSubFoldRanges: TSynEditFoldRanges; // Sub fold ranges
     fCollapsed: Boolean; // Is collapsed?
@@ -125,7 +124,6 @@ type
     property SubFoldRanges: TSynEditFoldRanges read fSubFoldRanges;
     property FromLine: Integer read fFromLine write fFromLine;
     property ToLine: Integer read fToLine write fToLine;
-    property Indent: Integer read fIndent write fIndent;
     property LinesCollapsed: Integer read fLinesCollapsed write fLinesCollapsed;
     property Collapsed: Boolean read fCollapsed write fCollapsed;
     property ParentCollapsed: Boolean read GetParentCollapsed;
@@ -158,7 +156,7 @@ begin
   inherited;
 end;
 
-function TSynEditFoldRanges.AddByParts(AParent: TSynEditFoldRange; AAllFold: TSynEditFoldRanges; AFromLine, AIndent:
+function TSynEditFoldRanges.AddByParts(AParent: TSynEditFoldRange; AAllFold: TSynEditFoldRanges; AFromLine:
   Integer; AFoldRegion: TFoldRegionItem; AToLine: Integer): TSynEditFoldRange;
 begin
   Result := TSynEditFoldRange.Create;
@@ -166,7 +164,6 @@ begin
     fParent := AParent;
     fFromLine := AFromLine;
     fToLine := AToLine;
-    fIndent := AIndent;
     fAllFoldRanges := AAllFold;
     fFoldRegion := AFoldRegion;
   end;

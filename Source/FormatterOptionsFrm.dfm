@@ -1,10 +1,10 @@
 object FormatterOptionsForm: TFormatterOptionsForm
-  Left = 1825
-  Top = 289
+  Left = 1331
+  Top = 551
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Formatter Options'
-  ClientHeight = 550
+  ClientHeight = 600
   ClientWidth = 600
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,12 +18,12 @@ object FormatterOptionsForm: TFormatterOptionsForm
   OnCreate = FormCreate
   DesignSize = (
     600
-    550)
+    600)
   PixelsPerInch = 96
   TextHeight = 15
   object lblPoweredBy: TLabel
     Left = 0
-    Top = 522
+    Top = 572
     Width = 321
     Height = 15
     Alignment = taCenter
@@ -32,14 +32,14 @@ object FormatterOptionsForm: TFormatterOptionsForm
   end
   object lblPreview: TLabel
     Left = 8
-    Top = 246
+    Top = 296
     Width = 44
     Height = 15
     Caption = 'Preview:'
   end
   object btnOk: TBitBtn
     Left = 330
-    Top = 518
+    Top = 568
     Width = 85
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -69,7 +69,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
   end
   object btnCancel: TBitBtn
     Left = 420
-    Top = 518
+    Top = 568
     Width = 85
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -99,7 +99,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
   end
   object btnHelp: TBitBtn
     Left = 510
-    Top = 518
+    Top = 568
     Width = 85
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -109,7 +109,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
   end
   object synExample: TSynEdit
     Left = 8
-    Top = 264
+    Top = 314
     Width = 584
     Height = 249
     Font.Charset = DEFAULT_CHARSET
@@ -139,7 +139,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
     Left = 8
     Top = 8
     Width = 584
-    Height = 233
+    Height = 263
     Caption = 'Options'
     TabOrder = 4
     object lblBracketStyle: TLabel
@@ -165,14 +165,14 @@ object FormatterOptionsForm: TFormatterOptionsForm
     end
     object lblCommand: TLabel
       Left = 16
-      Top = 124
+      Top = 154
       Width = 226
       Height = 15
       Caption = 'Final command (add customizations here):'
     end
     object bvCustom: TBevel
       Left = 20
-      Top = 116
+      Top = 146
       Width = 544
       Height = 2
     end
@@ -228,7 +228,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
         'Force Tab X')
     end
     object spinTabWidth: TSpinEdit
-      Left = 104
+      Left = 130
       Top = 84
       Width = 50
       Height = 24
@@ -294,11 +294,31 @@ object FormatterOptionsForm: TFormatterOptionsForm
     end
     object memFullCommand: TMemo
       Left = 16
-      Top = 144
+      Top = 174
       Width = 552
       Height = 81
       TabOrder = 9
       OnChange = CommandChange
+    end
+    object spinMaxLineLength: TSpinEdit
+      Left = 130
+      Top = 116
+      Width = 50
+      Height = 24
+      MaxValue = 200
+      MinValue = 50
+      TabOrder = 10
+      Value = 80
+      OnChange = OptionChange
+    end
+    object chkMaxLineLength: TCheckBox
+      Left = 16
+      Top = 120
+      Width = 112
+      Height = 17
+      Caption = 'Max line length:'
+      TabOrder = 11
+      OnClick = OptionChange
     end
   end
 end

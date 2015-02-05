@@ -73,7 +73,6 @@ type
     procedure URLLabelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAuthorsClick(Sender: TObject);
-    procedure btnUpdateCheckClick(Sender: TObject);
     procedure btnAuthorsDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
     procedure btnAuthorsDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure timerFishTimer(Sender: TObject);
@@ -160,11 +159,6 @@ const
 begin
   MessageBeep($F);
   MessageDlg(MessageText, MtInformation, [MbOK], 0);
-end;
-
-procedure TAboutForm.btnUpdateCheckClick(Sender: TObject);
-begin
-  MainForm.actUpdateCheckExecute(sender);
 end;
 
 procedure TAboutForm.btnAuthorsDragOver(Sender, Source: TObject; X,

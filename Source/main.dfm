@@ -1606,11 +1606,9 @@ object MainForm: TMainForm
       object N24: TMenuItem
         Caption = '-'
       end
-      object CheckforupdatesItem: TMenuItem
-        Action = actPackageCheck
-      end
       object PackageManagerItem: TMenuItem
         Action = actPackageManager
+        Caption = 'Package Manager'
       end
     end
     object FormatMenu: TMenuItem
@@ -2778,7 +2776,6 @@ object MainForm: TMainForm
       Category = 'Tools'
       Caption = '&Check for Packages'
       ImageIndex = 41
-      OnExecute = actUpdateCheckExecute
     end
     object actPackageManager: TAction
       Category = 'Tools'

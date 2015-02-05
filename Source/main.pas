@@ -323,7 +323,6 @@ type
     N29: TMenuItem;
     Profileanalysis1: TMenuItem;
     N24: TMenuItem;
-    CheckforupdatesItem: TMenuItem;
     N31: TMenuItem;
     actBrowserAddFolder: TAction;
     actBrowserRemoveFolder: TAction;
@@ -587,7 +586,6 @@ type
     procedure actUnitRenameExecute(Sender: TObject);
     procedure actUnitOpenExecute(Sender: TObject);
     procedure actUnitCloseExecute(Sender: TObject);
-    procedure actUpdateCheckExecute(Sender: TObject);
     procedure actAboutExecute(Sender: TObject);
     procedure actProjectNewExecute(Sender: TObject);
     procedure actProjectAddExecute(Sender: TObject);
@@ -886,7 +884,7 @@ uses
   NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
   ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
-  WindowListFrm, RemoveUnitFrm, ParamsFrm, WebUpdate, ProcessListFrm, SynEditHighlighter;
+  WindowListFrm, RemoveUnitFrm, ParamsFrm, ProcessListFrm, SynEditHighlighter;
 {$ENDIF}
 {$IFDEF LINUX}
 Xlib, IniFiles, QClipbrd, MultiLangSupport, version,
@@ -2559,13 +2557,6 @@ begin
     e := fEditorList.FileIsOpen(fProject.Units[integer(ProjectView.Selected.Data)].FileName, TRUE);
     if Assigned(e) then
       fEditorList.CloseEditor(e);
-  end;
-end;
-
-procedure TMainForm.actUpdateCheckExecute(Sender: TObject);
-begin
-  with TWebUpdateForm.Create(self) do begin
-    ShowModal;
   end;
 end;
 

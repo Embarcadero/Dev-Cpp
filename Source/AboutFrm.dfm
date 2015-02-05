@@ -13509,8 +13509,8 @@ object AboutForm: TAboutForm
     Width = 185
     Height = 25
     Caption = '&Check for updates'
+    Enabled = False
     TabOrder = 3
-    OnClick = btnUpdateCheckClick
     Glyph.Data = {
       36030000424D3603000000000000360000002800000010000000100000000100
       18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF

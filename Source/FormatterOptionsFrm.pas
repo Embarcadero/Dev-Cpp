@@ -58,6 +58,8 @@ type
     chkPreprocessor: TCheckBox;
     lblIndentParts: TLabel;
     memFullCommand: TMemo;
+    spinMaxLineLength: TSpinEdit;
+    chkMaxLineLength: TCheckBox;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -193,8 +195,14 @@ begin
     // Set indent style
     cmbIndentStyle.ItemIndex := IndentStyle;
 
-    // Set indentation options
+    // Set tab width
     spinTabWidth.Value := TabWidth;
+
+    // Set max line length
+    chkMaxLineLength.Checked := ModifyMaxLineLength;
+    spinMaxLineLength.Value := MaxLineLength;
+
+    // Set indentation options
     chkClasses.Checked := IndentClasses;
     chkSwitches.Checked := IndentSwitches;
     chkNamespace.Checked := IndentNamespaces;
@@ -215,8 +223,14 @@ begin
     // Set indent style
     IndentStyle := cmbIndentStyle.ItemIndex;
 
-    // Set indentation options (not really used)
+    // Set tab width
     TabWidth := spinTabWidth.Value;
+
+    // Set max line length
+    ModifyMaxLineLength := chkMaxLineLength.Checked;
+    MaxLineLength := spinMaxLineLength.Value;
+
+    // Set indentation options
     IndentClasses := chkClasses.Checked;
     IndentSwitches := chkSwitches.Checked;
     IndentNamespaces := chkNamespace.Checked;
@@ -267,6 +281,10 @@ begin
     3: Result := Result + ' --indent=force-tab=' + IntToStr(spinTabWidth.Value);
     4: Result := Result + ' --indent=force-tab-x=' + IntToStr(spinTabWidth.Value);
   end;
+
+  // Add line length
+  if chkMaxLineLength.Checked then
+    Result := Result + ' --max-code-length=' + IntToStr(spinMaxLineLength.Value);
 
   // Add indentation options
   if chkClasses.Checked then

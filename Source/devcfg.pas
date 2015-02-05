@@ -236,6 +236,8 @@ type
     fBracketStyle: Integer;
     fIndentStyle: Integer;
     fTabWidth: Integer;
+    fMaxLineLength: Integer;
+    fModifyMaxLineLength: Boolean;
     fIndentClasses: Boolean;
     fIndentSwitches: Boolean;
     fIndentCases: Boolean;
@@ -259,6 +261,8 @@ type
     property BracketStyle: Integer read fBracketStyle write fBracketStyle;
     property IndentStyle: Integer read fIndentStyle write fIndentStyle;
     property TabWidth: Integer read fTabWidth write fTabWidth;
+    property MaxLineLength: Integer read fMaxLineLength write fMaxLineLength;
+    property ModifyMaxLineLength: Boolean read fModifyMaxLineLength write fModifyMaxLineLength;
     property IndentClasses: Boolean read fIndentClasses write fIndentClasses;
     property IndentSwitches: Boolean read fIndentSwitches write fIndentSwitches;
     property IndentCases: Boolean read fIndentCases write fIndentCases;
@@ -2570,6 +2574,8 @@ begin
   fBracketStyle := 2; // Java
   fIndentStyle := 2; // Tabs
   fTabWidth := 4;
+  fModifyMaxLineLength := False;
+  fMaxLineLength := 80;
   fIndentClasses := True;
   fIndentSwitches := True;
   fIndentCases := False;
@@ -2596,6 +2602,10 @@ begin
     3: Result := Result + ' --indent=force-tab=' + IntToStr(fTabWidth);
     4: Result := Result + ' --indent=force-tab-x=' + IntToStr(fTabWidth);
   end;
+
+  // Add line length
+  if fModifyMaxLineLength then
+    Result := Result + ' --max-code-length=' + IntToStr(fMaxLineLength);
 
   // Add indentation options
   if fIndentClasses then
