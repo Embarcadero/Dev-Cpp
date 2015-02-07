@@ -22,13 +22,8 @@ unit devcfg;
 interface
 
 uses
-{$IFDEF WIN32}
   Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, ProjectTypes, Math, ShellAPI, ShlObj,
   ComCtrls, SynEditTextBuffer;
-{$ENDIF}
-{$IFDEF LINUX}
-QDialogs, Classes, QGraphics, QSynEdit, CFGData, IniFiles, Math, prjtypes;
-{$ENDIF}
 
 const
   BoolValYesNo: array[boolean] of AnsiString = ('No', 'Yes');
@@ -256,7 +251,7 @@ type
     function FormatMemory(Editor: TEditor; const OverrideCommand: AnsiString): AnsiString; // apply formatting
     function FormatFile(const FileName, OverrideCommand: AnsiString): AnsiString; // apply formatting
     function GetVersion: AnsiString;
-    function GetFullCommand : AnsiString;
+    function GetFullCommand: AnsiString;
   published
     property BracketStyle: Integer read fBracketStyle write fBracketStyle;
     property IndentStyle: Integer read fIndentStyle write fIndentStyle;
@@ -734,14 +729,8 @@ var
 implementation
 
 uses
-{$IFDEF WIN32}
   MultiLangSupport, DataFrm, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
   FileAssocs, TypInfo, DateUtils, Types;
-{$ENDIF}
-{$IFDEF LINUX}
-MultiLangSupport, SysUtils, StrUtils, QForms, QControls, version, utils, QSynEditMiscClasses,
-FileAssocs, Types;
-{$ENDIF}
 
 procedure CreateOptions;
 var
@@ -2587,7 +2576,7 @@ begin
   fAStyleFile := 'AStyle.exe';
 end;
 
-function TdevFormatter.GetFullCommand : AnsiString;
+function TdevFormatter.GetFullCommand: AnsiString;
 begin
   Result := '';
 

@@ -10,12 +10,12 @@ away.
 
 The the main executable devcpp.exe can be built using the following steps:
 
-	1) Compile and Install the following packages:
+	1) Compile and Install the following package(s):
 		Source\VCL\DevCpp.dpk
 		Source\VCL\SynEditPackages\SynEdit_<Delphi Version>.dpk
 		Source\VCL\ClassBrowsing\ClassBrowsing.dpk
 
-	2) Compile resources by running the following scripts:
+	2) Compile resources by running the following script(s):
 		Source\CompileResources.bat
 		
 	3) Open the project file devcpp.dpr. Your IDE should not produce any 
@@ -37,7 +37,6 @@ subfolder.
 	   program is run and the option "Pause console programs after return" is
 	   enabled in Environment Options. This file can be compiled using
 	   Source\Tools\ConsolePauser\ConsolePauser.dev
-	   
 	   
 	2) devcppPortable.exe. This file should be provided with all builds of
 	   Dev-C++ (also the nonportable ones) and should also be placed in the root
@@ -91,7 +90,6 @@ avoided.
 Misc.
 -----
 F1			Help
-			
 Alt+F4		Close
 Ctrl+Space	Open Code Completion
 
@@ -156,7 +154,6 @@ Ctrl+B			Open Containing Folder
 
 View
 ----
-Ctrl+F10		Hide Fullscreen Bar
 Ctrl+F11		Toggle Fullscreen
 Ctrl+F12		Toggle Fullscreen Bar
 Ctrl+Tab		Next Editor

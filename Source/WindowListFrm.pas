@@ -22,14 +22,8 @@ unit WindowListFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, Buttons, ExtCtrls, ComCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-  QStdCtrls, QButtons, QExtCtrls;
-{$ENDIF}
 
 type
   TWindowListForm = class(TForm)
@@ -40,7 +34,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure UnitListDblClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure UnitListKeyDown(Sender: TObject; var Key: Word;Shift: TShiftState);
+    procedure UnitListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure UnitListCompare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
@@ -53,77 +47,68 @@ type
 
 implementation
 
-uses 
-{$IFDEF WIN32}
+uses
   MultiLangSupport, devcfg;
-{$ENDIF}
-{$IFDEF LINUX}
-  Xlib, MultiLangSupport, devcfg;
-{$ENDIF}
 
 {$R *.dfm}
 
 procedure TWindowListForm.FormCreate(Sender: TObject);
 begin
-	// Set interface font
-	Font.Name := devData.InterfaceFont;
-	Font.Size := devData.InterfaceFontSize;
+  // Set interface font
+  Font.Name := devData.InterfaceFont;
+  Font.Size := devData.InterfaceFontSize;
 
-	Caption:=           Lang[ID_WL];
-	OkBtn.Caption :=    Lang[ID_BTN_OK];
-	CancelBtn.Caption:= Lang[ID_BTN_CANCEL];
+  Caption := Lang[ID_WL];
+  OkBtn.Caption := Lang[ID_BTN_OK];
+  CancelBtn.Caption := Lang[ID_BTN_CANCEL];
 end;
 
 procedure TWindowListForm.UnitListDblClick(Sender: TObject);
 begin
-	if UnitList.ItemIndex <> -1 then
-		ModalResult := mrOk;
+  if UnitList.ItemIndex <> -1 then
+    ModalResult := mrOk;
 end;
 
 procedure TWindowListForm.FormShow(Sender: TObject);
 begin
-	UnitList.SetFocus;
+  UnitList.SetFocus;
 end;
 
-procedure TWindowListForm.UnitListKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TWindowListForm.UnitListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-{$IFDEF WIN32}
-  if Key=vk_Return then
-{$ENDIF}
-{$IFDEF LINUX}
-  if Key = XK_RETURN then
-{$ENDIF}
+  if Key = VK_RETURN then
     UnitListDblClick(Sender);
 end;
 
-procedure TWindowListForm.FormClose(Sender: TObject;var Action: TCloseAction);
+procedure TWindowListForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-	Action := caFree;
+  Action := caFree;
 end;
 
-procedure TWindowListForm.UnitListCompare(Sender: TObject; Item1,Item2: TListItem; Data: Integer; var Compare: Integer);
+procedure TWindowListForm.UnitListCompare(Sender: TObject; Item1, Item2: TListItem; Data: Integer; var Compare:
+  Integer);
 begin
-	if SortedColumn = 0 then
-		Compare := AnsiCompareText(Item1.Caption, Item2.Caption)
-	else
-		Compare := AnsiCompareText(Item1.SubItems[SortedColumn-1], Item2.SubItems[SortedColumn-1]);
+  if SortedColumn = 0 then
+    Compare := AnsiCompareText(Item1.Caption, Item2.Caption)
+  else
+    Compare := AnsiCompareText(Item1.SubItems[SortedColumn - 1], Item2.SubItems[SortedColumn - 1]);
 
-	if Descending then
-		Compare := -Compare;
+  if Descending then
+    Compare := -Compare;
 end;
 
-procedure TWindowListForm.UnitListColumnClick(Sender: TObject;Column: TListColumn);
+procedure TWindowListForm.UnitListColumnClick(Sender: TObject; Column: TListColumn);
 begin
-	TListView(Sender).SortType := stNone;
+  TListView(Sender).SortType := stNone;
 
-	if Column.Index <> SortedColumn then begin
-		SortedColumn := Column.Index;
-		Descending := False;
-	end else
-		Descending := not Descending;
+  if Column.Index <> SortedColumn then begin
+    SortedColumn := Column.Index;
+    Descending := False;
+  end else
+    Descending := not Descending;
 
-	TListView(Sender).SortType := stText;
+  TListView(Sender).SortType := stText;
 end;
 
 end.
+

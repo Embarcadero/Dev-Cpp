@@ -22,14 +22,8 @@ unit AboutFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, SysUtils, Classes, version, Graphics, Controls, Forms, Dialogs,
   StdCtrls, Buttons, ExtCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QStdCtrls, QButtons, QExtCtrls;
-{$ENDIF}
 
 type
   TAboutForm = class(TForm)
@@ -86,12 +80,7 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   ShellAPI, devcfg, utils, MultiLangSupport, main;
-{$ENDIF}
-{$IFDEF LINUX}
-devcfg, MultiLangSupport, CheckForUpdate, main;
-{$ENDIF}
 
 {$R *.dfm}
 

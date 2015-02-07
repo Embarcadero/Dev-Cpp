@@ -21,13 +21,8 @@ unit devExec;
 
 interface
 
-uses 
-{$IFDEF WIN32}
+uses
   Windows, Classes, Forms, devcfg, utils;
-{$ENDIF}
-{$IFDEF LINUX}
-  Classes;
-{$ENDIF}
 
 type
   TExecThread = class(TThread)
@@ -59,11 +54,11 @@ type
   public
     class function devExecutor: TdevExecutor;
     procedure Reset;
-    procedure ExecuteAndWatch(sFileName, sParams, sPath: AnsiString; bVisible: boolean; iTimeOut: Cardinal; OnTermEvent: TNotifyEvent);
+    procedure ExecuteAndWatch(sFileName, sParams, sPath: AnsiString; bVisible: boolean; iTimeOut: Cardinal; OnTermEvent:
+      TNotifyEvent);
   published
     property Running: boolean read fIsRunning;
   end;
-
 
 function devExecutor: TdevExecutor;
 
@@ -148,9 +143,9 @@ end;
 
 procedure TdevExecutor.Reset;
 begin
-	if Assigned(fExec) then
-		TerminateProcess(fExec.Process, 0);
-	fIsRunning := False;
+  if Assigned(fExec) then
+    TerminateProcess(fExec.Process, 0);
+  fIsRunning := False;
 end;
 
 procedure TdevExecutor.TerminateEvent(Sender: TObject);

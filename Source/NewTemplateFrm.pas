@@ -22,16 +22,9 @@ unit NewTemplateFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, ExtCtrls, Buttons, ComCtrls,
   project, ImgList, ExtDlgs, IniFiles;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QCheckLst, QExtCtrls, QButtons, QComCtrls,
-  project, QImgList, IniFiles, Types;
-{$ENDIF}
 
 type
   TNewTemplateForm = class(TForm)

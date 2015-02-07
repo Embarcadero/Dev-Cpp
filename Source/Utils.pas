@@ -22,14 +22,8 @@ unit Utils;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
   Menus, Registry, Controls, ComCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-Classes, Sysutils, QForms, QDialogs, QSynEditHighlighter,
-QMenus, Types;
-{$ENDIF}
 
 type
   { File ID types }
@@ -165,12 +159,7 @@ function FastIndexOf(List: TStringlist; const S: AnsiString): integer; overload;
 implementation
 
 uses
-{$IFDEF WIN32}
   devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor, ShlObj, ActiveX;
-{$ENDIF}
-{$IFDEF LINUX}
-devcfg, version, QGraphics, StrUtils, MultiLangSupport, main, editor;
-{$ENDIF}
 
 function FastStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
 var
@@ -615,7 +604,7 @@ begin
       TerminateProcess(pi.hProcess, 1);
       Break;
     end;
-    if (not ReadFile(hOutputRead, aBuf, SizeOf(aBuf)-1, nRead, nil)) or (nRead = 0) then begin
+    if (not ReadFile(hOutputRead, aBuf, SizeOf(aBuf) - 1, nRead, nil)) or (nRead = 0) then begin
       if GetLastError = ERROR_BROKEN_PIPE then
         Break; // pipe done - normal exit path
     end;

@@ -22,17 +22,8 @@ unit DataFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   SysUtils, Classes, Menus, Controls, SynEditHighlighter, SynHighlighterCpp,
   CodeInsList, SynHighlighterRC, ImgList;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QMenus, QDialogs, QImgList, QControls,
-QSynEditExport, QSynExportHTML, QSynExportRTF,
-QSynEditHighlighter, QSynHighlighterCpp, QSynEditPrint,
-CodeIns, QSynHighlighterRC, QSynCompletionProposal,
-QSynEditMiscClasses, QSynEditSearch;
-{$ENDIF}
 
 type
   PMRUItem = ^TMRUItem;

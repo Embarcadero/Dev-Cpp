@@ -22,14 +22,8 @@ unit AddToDoFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   SysUtils, Classes, Graphics, Controls, Forms,
   StdCtrls, Spin, SynEditTextBuffer, SynEditTypes;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Classes, QGraphics, QControls, QForms,
-  QStdCtrls, QComCtrls, QSynEditTextBuffer, QSynEditTypes;
-{$ENDIF}
 
 type
   TAddToDoForm = class(TForm)
@@ -52,17 +46,17 @@ type
     { Public declarations }
   end;
 
-//var
-//  AddToDoForm: TAddToDoForm;
+  //var
+  //  AddToDoForm: TAddToDoForm;
 
 implementation
 
-uses 
+uses
   main, editor, devcfg, MultiLangSupport;
 
 {$R *.dfm}
 
-procedure TAddToDoForm.FormClose(Sender: TObject;var Action: TCloseAction);
+procedure TAddToDoForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
 end;
@@ -133,9 +127,9 @@ end;
 
 procedure TAddToDoForm.LoadText;
 begin
-	// Set interface font
-	Font.Name := devData.InterfaceFont;
-	Font.Size := devData.InterfaceFontSize;
+  // Set interface font
+  Font.Name := devData.InterfaceFont;
+  Font.Size := devData.InterfaceFontSize;
 
   Caption := Lang[ID_ADDTODO_MENUITEM];
   Label1.Caption := Lang[ID_ADDTODO_DESCRIPTION] + ':';
@@ -146,3 +140,4 @@ begin
 end;
 
 end.
+

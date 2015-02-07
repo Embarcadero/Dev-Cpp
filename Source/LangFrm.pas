@@ -22,14 +22,8 @@ unit LangFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, Buttons, ExtCtrls, Menus, FileCtrl, SynEdit, ToolWin, ComCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QStdCtrls, QButtons, QExtCtrls, QMenus, QComCtrls;
-{$ENDIF}
 
 type
   TLangForm = class(TForm)

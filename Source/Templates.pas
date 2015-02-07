@@ -77,12 +77,7 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   Windows, Forms, SysUtils, version, utils, Dialogs, MultiLangSupport;
-{$ENDIF}
-{$IFDEF LINUX}
-  QForms, SysUtils, version, utils, QDialogs, MultiLangSupport;
-{$ENDIF}
 
 resourcestring
  cTemplate = 'Template';

@@ -4,4 +4,5 @@ CursorRow=17
 TopLine=4
 LeftChar=1
 [Editors]
-Order=
+Order=0
+Focused=0

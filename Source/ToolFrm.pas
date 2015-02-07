@@ -22,14 +22,8 @@ unit ToolFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Menus, Graphics, Controls, Forms,
   StdCtrls, Buttons, ShellAPI;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QMenus, QGraphics, QControls, QForms,
-QStdCtrls, QButtons;
-{$ENDIF}
 
 type
   { Tool List }

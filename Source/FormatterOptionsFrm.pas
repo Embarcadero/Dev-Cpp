@@ -22,16 +22,9 @@ unit FormatterOptionsFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, Spin, Math,
   CompOptionsFrame, CompOptionsList, SynEdit, Editor;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QButtons, QStdCtrls, Inifiles, QExtCtrls, QComCtrls,
-CompOptionsFrame;
-{$ENDIF}
 
 type
   TFormatterOptionsForm = class(TForm)
@@ -80,12 +73,7 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
-{$ENDIF}
-{$IFDEF LINUX}
-Xlib, Main, version, devcfg, utils, MultiLangSupport, datamod;
-{$ENDIF}
 
 {$R *.dfm}
 
@@ -122,6 +110,7 @@ begin
   lblBracketStyle.Caption := Lang[ID_FORMATTER_BRACKET];
   lblIndentStyle.Caption := Lang[ID_FORMATTER_INDENT];
   lblTabWidth.Caption := Lang[ID_FORMATTER_TABWIDTH];
+  chkMaxLineLength.Caption := Lang[ID_FORMATTER_MAXLINELENGTH];
   lblIndentParts.Caption := Lang[ID_FORMATTER_INDENTPARTS];
   chkClasses.Caption := Lang[ID_FORMATTER_CLASSES];
   chkSwitches.Caption := Lang[ID_FORMATTER_SWITCHES];

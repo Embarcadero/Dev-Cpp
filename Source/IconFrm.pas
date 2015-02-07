@@ -22,14 +22,8 @@ unit IconFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Forms, 
   ImgList, ComCtrls, Buttons, StdCtrls, Controls, Dialogs, ExtDlgs;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Classes, QGraphics, QForms, 
-  QImgList, QComCtrls, QButtons, QStdCtrls, QControls, QDialogs;
-{$ENDIF}
 
 type
   TIconForm = class(TForm)

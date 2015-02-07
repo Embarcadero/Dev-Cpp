@@ -17,7 +17,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{$WARN SYMBOL_PLATFORM OFF}
 {$D+} // debugging in this unit
 {$OPTIMIZATION off } // and no optimization
 unit ExceptionFrm;
@@ -25,14 +24,8 @@ unit ExceptionFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StrUtils, StdCtrls, Buttons, ScktComp, ExtCtrls, ShellAPI, ComCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, StrUtils, QStdCtrls, QButtons, QExtCtrls, QComCtrls;
-{$ENDIF}
 
 type
   PUnitEntry = ^TUnitEntry;
@@ -136,29 +129,29 @@ const
   UserReportMsg = 'Please include a description of what you were doing before the error occurred...';
 const
   EmailReportMsg =
-    'Optionally, provide an email address to which the developer can send questions about the bug report...';
+    'Please provide an email address to which the developer can send questions about the bug report...';
 
 class procedure TEAnalyzer.EHandler(Sender: TObject; E: Exception);
 begin
   with TExceptionFrm.Create(Application.MainForm) do try
 
-      lblAddress.Caption := Format('0x%8.8x', [dword(ExceptAddr)]);
-      lblError.Caption := E.Message;
+    lblAddress.Caption := Format('0x%8.8x', [dword(ExceptAddr)]);
+    lblError.Caption := E.Message;
 
-      // Can't make this much more clear
-      memUserReport.Text := UserReportMsg;
-      memEmailReport.Text := EmailReportMsg;
+    // Can't make this much more clear
+    memUserReport.Text := UserReportMsg;
+    memEmailReport.Text := EmailReportMsg;
 
-      // Include memory report too?
-      memBugReport.Text :=
-        GetErrorReport + #13#10#13#10#13#10 +
-        GetMachineReport + #13#10#13#10#13#10 +
-        GetStackReport;
+    // Include memory report too?
+    memBugReport.Text :=
+      GetErrorReport + #13#10#13#10#13#10 +
+      GetMachineReport + #13#10#13#10#13#10 +
+      GetStackReport;
 
-      ShowModal;
-    finally
-      Free;
-    end;
+    ShowModal;
+  finally
+    Free;
+  end;
 end;
 
 { TfrmExceptionsAnalyzer }
@@ -363,9 +356,9 @@ begin
   if (sFunction <> '') and (sUnit <> '') and (sLine <> '') then // found all
     Result := Format('%8.8x (%8.8x): %s (%s - %s)'#13#10, [Address, MapAddress, sFunction, sUnit, sLine])
       //else if (sFunction <> '') and (sUnit <> '') then // couldn't find line
-    //	Result := Format('%8.8x (%8.8x): %s (%s)'#13#10,[Address, MapAddress, sFunction, sUnit])
-    //else if (sFunction <> '') then // couldn't find line, unit
-    //	Result := Format('%8.8x (%8.8x): %s'#13#10,[Address, MapAddress, sFunction])
+//	Result := Format('%8.8x (%8.8x): %s (%s)'#13#10,[Address, MapAddress, sFunction, sUnit])
+//else if (sFunction <> '') then // couldn't find line, unit
+//	Result := Format('%8.8x (%8.8x): %s'#13#10,[Address, MapAddress, sFunction])
   else // addresses only?
     Result := ''; //Format('%8.8x (%8.8x)'#13#10,[Address, MapAddress]);
 end;

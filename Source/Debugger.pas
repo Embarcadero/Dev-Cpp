@@ -22,14 +22,8 @@ unit Debugger;
 interface
 
 uses
-{$IFDEF WIN32}
   Sysutils, Windows, Messages, Forms, Classes, Controls,
   debugreader, version, editor, ComCtrls, Dialogs, MultiLangSupport;
-{$ENDIF}
-{$IFDEF LINUX}
-Sysutils, Classes, QDialogs, QControls,
-debugreader, version, editor, QComCtrls;
-{$ENDIF}
 
 type
 
@@ -162,7 +156,7 @@ begin
     GDBFile := CompilerSet.BinDir[0] + pd + CompilerSet.gdbName;
     GDBCommand := '"' + GDBFile + '"' + ' --annotate=2 --silent';
     if not CreateProcess(nil, PAnsiChar(GDBCommand), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
-      MessageDlg(Format(Lang[ID_ERR_ERRORLAUNCHINGGDB],[GDBFile,SysErrorMessage(GetLastError)]), mtError,
+      MessageDlg(Format(Lang[ID_ERR_ERRORLAUNCHINGGDB], [GDBFile, SysErrorMessage(GetLastError)]), mtError,
         [mbOK], 0);
       Executing := false;
       Exit;

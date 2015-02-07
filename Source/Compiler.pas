@@ -22,14 +22,8 @@ unit Compiler;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, SysUtils, Dialogs, StdCtrls, Controls, ComCtrls, Forms,
   devrun, version, project, utils, ProjectTypes, Classes, Graphics, devcfg;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, QDialogs, QStdCtrls, QComCtrls, QForms,
-devrun, version, project, utils, prjtypes, Classes, QGraphics;
-{$ENDIF}
 
 type
   TLogEntryEvent = procedure(const Msg: AnsiString) of object;

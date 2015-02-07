@@ -22,17 +22,10 @@ unit Editor;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
   SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
   SynEditCodeFolding, SynExportHTML, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils,
   CodeToolTip, CBUtils;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, Graphics, QControls, QForms, QDialogs, CodeCompletion, CppParser,
-QMenus, QImgList, QComCtrls, QStdCtrls, QExtCtrls, QSynEdit, QSynEditKeyCmds, version,
-QSynCompletionProposal, StrUtils, QSynEditTypes, QSynEditHighlighter, DevCodeToolTip, QSynAutoIndent, Types;
-{$ENDIF}
 
 type
   TEditor = class;
@@ -163,14 +156,8 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   main, project, MultiLangSupport, devcfg, utils,
   DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm, CodeCompletionForm, SynEditMiscClasses;
-{$ENDIF}
-{$IFDEF LINUX}
-Xlib, main, project, MultiLangSupport, devcfg, Search_Center, utils,
-datamod, GotoLineFrm, Macros;
-{$ENDIF}
 
 { TDebugGutter }
 

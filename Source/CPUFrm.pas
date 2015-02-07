@@ -22,14 +22,8 @@ unit CPUFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Math, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, SynEdit, SynEditTypes, ClipBrd, StrUtils, ComCtrls, ExtCtrls, Menus;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, QStdCtrls, QButtons, QSynEdit;
-{$ENDIF}
 
 type
   TCPUForm = class(TForm)

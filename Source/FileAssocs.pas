@@ -22,12 +22,7 @@ unit FileAssocs;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, SysUtils, Classes, Forms, Registry, ShlObj;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QForms;
-{$ENDIF}
 
 procedure RegisterFiletype(const extension, filetype, description, verb, serverapp, IcoNum: AnsiString);
 procedure RegisterDDEServer(const filetype, verb, topic, servername, macro: AnsiString);

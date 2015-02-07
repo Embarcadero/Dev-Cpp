@@ -22,14 +22,8 @@ unit RemoveUnitFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, Buttons, ExtCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QStdCtrls, QButtons, QExtCtrls;
-{$ENDIF}
 
 type
   TRemoveUnitForm = class(TForm)

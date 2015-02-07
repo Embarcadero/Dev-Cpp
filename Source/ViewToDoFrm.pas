@@ -22,14 +22,8 @@ unit ViewToDoFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, Menus;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, QStdCtrls, QComCtrls, QMenus;
-{$ENDIF}
 
 type
   PToDoRec = ^TToDoRec;
@@ -297,27 +291,17 @@ end;
 
 procedure TViewToDoForm.LoadText;
 begin
-
   // Set interface font
   Font.Name := devData.InterfaceFont;
   Font.Size := devData.InterfaceFontSize;
 
   Caption := Lang[ID_VIEWTODO_MENUITEM];
 
-{$IFDEF WIN32}
   lv.Column[0].Caption := Lang[ID_VIEWTODO_DONE];
   lv.Column[1].Caption := Lang[ID_ADDTODO_PRIORITY];
   lv.Column[2].Caption := Lang[ID_ADDTODO_DESCRIPTION];
   lv.Column[3].Caption := Lang[ID_VIEWTODO_FILENAME];
   lv.Column[4].Caption := Lang[ID_ADDTODO_USER];
-{$ENDIF}
-{$IFDEF LINUX}
-  lv.Columns[0].Caption := Lang[ID_VIEWTODO_DONE];
-  lv.Columns[1].Caption := Lang[ID_ADDTODO_PRIORITY];
-  lv.Columns[2].Caption := Lang[ID_ADDTODO_DESCRIPTION];
-  lv.Columns[3].Caption := Lang[ID_VIEWTODO_FILENAME];
-  lv.Columns[4].Caption := Lang[ID_ADDTODO_USER];
-{$ENDIF}
 
   chkNoDone.Caption := Lang[ID_VIEWTODO_NOSHOWDONE];
   btnClose.Caption := Lang[ID_BTN_CLOSE];

@@ -22,14 +22,8 @@ unit ProfileAnalysisFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, Spin, CBUtils;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, QStdCtrls, QComCtrls, QExtCtrls;
-{$ENDIF}
 
 type
   TProfileAnalysisForm = class(TForm)
@@ -86,14 +80,8 @@ var
 implementation
 
 uses
-{$IFDEF WIN32}
   devcfg, version, utils, main, ShellAPI, StrUtils, MultiLangSupport, CppParser,
   editor;
-{$ENDIF}
-{$IFDEF LINUX}
-devcfg, version, utils, main, StrUtils, MultiLangSupport, CppParser,
-editor, Types;
-{$ENDIF}
 
 {$R *.dfm}
 

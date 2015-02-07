@@ -22,12 +22,7 @@ unit devrun;
 interface
 
 uses
-{$IFDEF WIN32}
   Classes, Windows, Dialogs, utils;
-{$ENDIF}
-{$IFDEF LINUX}
-  Classes, QDialogs, utils;
-{$ENDIF}
 
 type
   TLineOutputEvent = procedure(Sender: TObject; const Line: AnsiString) of Object;

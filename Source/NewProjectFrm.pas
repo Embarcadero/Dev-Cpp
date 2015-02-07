@@ -17,20 +17,13 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{$WARN UNIT_PLATFORM OFF}
 unit NewProjectFrm;
 
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, ImgList, Buttons, ComCtrls, Templates, Inifiles;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QStdCtrls, QExtCtrls, QImgList, QButtons, QComCtrls, Templates, Inifiles;
-{$ENDIF}
 
 type
   TNewProjectForm = class(TForm)
@@ -67,14 +60,8 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   MultiLangSupport, utils, DataFrm, FileCtrl, devcfg, version,
   project, ProjectTypes;
-{$ENDIF}
-{$IFDEF LINUX}
-MultiLangSupport, utils, datamod, devcfg, version,
-project, prjtypes;
-{$ENDIF}
 
 {$R *.dfm}
 

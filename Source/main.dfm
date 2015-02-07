@@ -27,8 +27,8 @@ object MainForm: TMainForm
   TextHeight = 13
   object SplitterLeft: TSplitter
     Left = 193
-    Top = 72
-    Height = 402
+    Top = 56
+    Height = 418
     MinSize = 45
     ResizeStyle = rsUpdate
   end
@@ -496,7 +496,7 @@ object MainForm: TMainForm
   end
   object ToolbarDock: TControlBar
     Left = 0
-    Top = 16
+    Top = 0
     Width = 999
     Height = 56
     Align = alTop
@@ -902,44 +902,6 @@ object MainForm: TMainForm
     ParentFont = True
     UseSystemFont = False
   end
-  object FullScreenPanel: TPanel
-    Left = 0
-    Top = 0
-    Width = 999
-    Height = 16
-    Align = alTop
-    BevelOuter = bvNone
-    Caption = 
-      'Dev-C++ Fullscreen. Press F10 to toggle this bar, F11 to toggle ' +
-      'Toolbars or F12 to toggle Fullscreen.'
-    TabOrder = 5
-    Visible = False
-    DesignSize = (
-      999
-      16)
-    object btnFullScrRevert: TSpeedButton
-      Left = 982
-      Top = 0
-      Width = 16
-      Height = 16
-      Anchors = [akTop, akRight]
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Courier New'
-      Font.Style = [fsBold]
-      Glyph.Data = {
-        C6000000424DC60000000000000076000000280000000A0000000A0000000100
-        0400000000005000000000000000000000001000000010000000000000000000
-        80000080000000808000800000008000800080800000C0C0C000808080000000
-        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00DDDDDDDDDD77
-        7777D00DDDD00D777777D000DD000D777777DD000000DD777777DDD0000DDD77
-        7777DDD0000DDD777777DD000000DD777777D000DD000D777777D00DDDD00D77
-        7777DDDDDDDDDD777777}
-      ParentFont = False
-      OnClick = btnFullScrRevertClick
-    end
-  end
   object FileMonitor: TdevFileMonitor
     Left = 112
     Top = 152
@@ -949,9 +911,9 @@ object MainForm: TMainForm
   end
   object LeftPageControl: TPageControl
     Left = 0
-    Top = 72
+    Top = 56
     Width = 193
-    Height = 402
+    Height = 418
     ActivePage = LeftProjectSheet
     Align = alLeft
     Images = dmMain.ProjectImage_NewLook
@@ -964,7 +926,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 374
+        Height = 390
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -999,7 +961,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 374
+        Height = 390
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
@@ -1035,7 +997,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 374
+        Height = 390
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1055,18 +1017,18 @@ object MainForm: TMainForm
   end
   object PageControlPanel: TPanel
     Left = 196
-    Top = 72
+    Top = 56
     Width = 803
-    Height = 402
+    Height = 418
     Align = alClient
     BevelOuter = bvNone
-    TabOrder = 6
+    TabOrder = 5
     OnResize = PageControlPanelResize
     object EditorPageControlSplitter: TSplitter
       Left = 803
       Top = 0
       Width = 0
-      Height = 402
+      Height = 418
       Align = alRight
       ResizeStyle = rsUpdate
       Visible = False
@@ -1075,7 +1037,7 @@ object MainForm: TMainForm
       Left = 0
       Top = 0
       Width = 803
-      Height = 402
+      Height = 418
       Align = alClient
       HotTrack = True
       MultiLine = True
@@ -1092,7 +1054,7 @@ object MainForm: TMainForm
       Left = 803
       Top = 0
       Width = 0
-      Height = 402
+      Height = 418
       Align = alRight
       HotTrack = True
       MultiLine = True
@@ -2625,12 +2587,6 @@ object MainForm: TMainForm
       Caption = 'Goto Implementation'
       OnExecute = actGotoImplDeclEditorExecute
     end
-    object actHideFSBar: TAction
-      Category = 'Window'
-      Caption = 'Hide fullscreen bar'
-      ShortCut = 16505
-      OnExecute = actHideFSBarExecute
-    end
     object actCollapse: TAction
       Category = 'Edit'
       Caption = 'Collapse All'
@@ -2827,6 +2783,11 @@ object MainForm: TMainForm
       Category = 'AStyle'
       Caption = 'Formatting Options'
       OnExecute = actFormatOptionsExecute
+    end
+    object actRunTests: TAction
+      Caption = 'Run Tests'
+      ShortCut = 16497
+      OnExecute = actRunTestsExecute
     end
   end
   object MessagePopup: TPopupMenu

@@ -172,6 +172,7 @@ const
   ID_FULLSCREEN_MSG                     = 8006;
   ID_ITEM_CLOSEALLBUTTHIS               = 8007;
   ID_ITEM_LIST                          = 8008;
+  ID_FULLSCREEN_MSGNEW                  = 8009;
 
   // help menu
   ID_ITEM_ABOUT                         = 9001;
@@ -1299,3 +1300,4 @@ const
   ID_FORMATTER_PREVIEW                  = 79017;
   ID_FORMATTER_POWEREDBYFAIL            = 79018;
   ID_FORMATTER_POWEREDBY                = 79019;
+  ID_FORMATTER_MAXLINELENGTH            = 79020;

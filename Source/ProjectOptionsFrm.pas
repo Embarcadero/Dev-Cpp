@@ -17,24 +17,14 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{$WARN SYMBOL_PLATFORM OFF}
-{$WARN UNIT_PLATFORM OFF}
-
 unit ProjectOptionsFrm;
 
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
   ProjectTypes, Spin, ValEdit, CompOptionsFrame, ShellApi, Grids;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QStdCtrls, QExtCtrls, QButtons, QComCtrls, main, project,
-prjtypes, CompOptionsFrame, Types;
-{$ENDIF}
 
 type
   TProjectOptionsFrm = class(TForm)
@@ -203,12 +193,7 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   FileCtrl, devcfg, IconFrm, utils, MultiLangSupport, version, Math;
-{$ENDIF}
-{$IFDEF LINUX}
-devcfg, IconFrm, utils, MultiLangSupport, version;
-{$ENDIF}
 
 {$R *.dfm}
 
@@ -248,12 +233,7 @@ end;
 
 procedure TProjectOptionsFrm.BrowseClick(Sender: TObject);
 var
-{$IFDEF WIN32}
   NewItem: AnsiString;
-{$ENDIF}
-{$IFDEF LINUX}
-  NewItem: WideString;
-{$ENDIF}
 begin
   NewItem := Trim(edDirEntry.Text);
   if (NewItem <> '') and DirectoryExists(NewItem) then
@@ -474,11 +454,11 @@ begin
     // Load icon if possible
     IconTmp := GetRealPath(fProjectCopy.Options.Icon, fProjectCopy.Directory);
     if (IconTmp <> '') and FileExists(IconTmp) then try
-        IconPreview.Picture.LoadFromFile(fProjectCopy.Options.Icon);
-        Icon := IconTmp;
-      except
-        Icon := '';
-      end;
+      IconPreview.Picture.LoadFromFile(fProjectCopy.Options.Icon);
+      Icon := IconTmp;
+    except
+      Icon := '';
+    end;
     btnRemoveIcon.Enabled := Length(Icon) > 0;
 
     cntSrc := 0;
@@ -578,15 +558,15 @@ end;
 procedure TProjectOptionsFrm.btnIconLibClick(Sender: TObject);
 begin
   with TIconForm.Create(Self) do try
-      if ShowModal = mrOk then
-        if Selected <> '' then begin
-          fProjectCopy.Options.Icon := Selected;
-          IconPreview.Picture.LoadFromFile(Selected);
-          btnRemoveIcon.Enabled := Length(Selected) > 0;
-        end;
-    finally
-      Free;
-    end;
+    if ShowModal = mrOk then
+      if Selected <> '' then begin
+        fProjectCopy.Options.Icon := Selected;
+        IconPreview.Picture.LoadFromFile(Selected);
+        btnRemoveIcon.Enabled := Length(Selected) > 0;
+      end;
+  finally
+    Free;
+  end;
 end;
 
 procedure TProjectOptionsFrm.btnIconBrowseClick(Sender: TObject);
@@ -725,12 +705,7 @@ end;
 
 procedure TProjectOptionsFrm.BrowseExecutableOutDirClick(Sender: TObject);
 var
-{$IFDEF WIN32}
   Dir: AnsiString;
-{$ENDIF}
-{$IFDEF LINUX}
-  Dir: WideString;
-{$ENDIF}
 begin
   if fProjectCopy.Options.ExeOutput <> '' then
     Dir := ExpandFileto(fProjectCopy.Options.ExeOutput, fProjectCopy.Directory)
@@ -742,12 +717,7 @@ end;
 
 procedure TProjectOptionsFrm.BrowseLogDirClick(Sender: TObject);
 var
-{$IFDEF WIN32}
   Dir: AnsiString;
-{$ENDIF}
-{$IFDEF LINUX}
-  Dir: WideString;
-{$ENDIF}
 begin
   if fProjectCopy.Options.ObjectOutput <> '' then
     Dir := ExpandFileto(fProjectCopy.Options.ObjectOutput, fProjectCopy.Directory)
@@ -759,12 +729,7 @@ end;
 
 procedure TProjectOptionsFrm.btnLogOutputDirClick(Sender: TObject);
 var
-{$IFDEF WIN32}
   Dir: AnsiString;
-{$ENDIF}
-{$IFDEF LINUX}
-  Dir: WideString;
-{$ENDIF}
 begin
   if fProjectCopy.Options.LogOutput <> '' then
     Dir := ExpandFileto(fProjectCopy.Options.LogOutput, fProjectCopy.Directory)
@@ -852,12 +817,7 @@ begin
     'before the cleaning process.' + #13#10 + #13#10 +
     'You can change the Makefile''s behavior by defining the targets' + #13#10 +
     'that ''all'' and ''clean'' depend on.',
-{$IFDEF WIN32}
     'Information', MB_ICONINFORMATION);
-{$ENDIF}
-{$IFDEF LINUX}
-  'Information', [smbOK], smsInformation);
-{$ENDIF}
 end;
 
 procedure TProjectOptionsFrm.btnHelpClick(Sender: TObject);
@@ -1092,23 +1052,23 @@ var
   i: integer;
 begin
   with TOpenDialog.Create(Self) do try
-      Filter := BuildFilter([FLT_LIBRARIES]);
-      Options := Options + [ofAllowMultiSelect];
+    Filter := BuildFilter([FLT_LIBRARIES]);
+    Options := Options + [ofAllowMultiSelect];
 
-      // Start in the lib folder
-      if Assigned(devCompilerSets.CompilationSet) and (devCompilerSets.CompilationSet.LibDir.Count > 0) then
-        InitialDir := devCompilerSets.CompilationSet.LibDir[0];
+    // Start in the lib folder
+    if Assigned(devCompilerSets.CompilationSet) and (devCompilerSets.CompilationSet.LibDir.Count > 0) then
+      InitialDir := devCompilerSets.CompilationSet.LibDir[0];
 
-      if Execute then begin
-        for i := 0 to Files.Count - 1 do begin
-          S := ExtractRelativePath(fProjectCopy.Directory, Files[i]);
-          S := GenMakePath1(S);
-          edLinker.Lines.Add(S);
-        end;
+    if Execute then begin
+      for i := 0 to Files.Count - 1 do begin
+        S := ExtractRelativePath(fProjectCopy.Directory, Files[i]);
+        S := GenMakePath1(S);
+        edLinker.Lines.Add(S);
       end;
-    finally
-      Free;
     end;
+  finally
+    Free;
+  end;
 end;
 
 function TProjectOptionsFrm.DefaultBuildCommand(idx: integer): AnsiString;

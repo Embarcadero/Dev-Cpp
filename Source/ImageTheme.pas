@@ -29,13 +29,8 @@ unit ImageTheme;
 
 interface
 
-uses 
-{$IFDEF WIN32}
+uses
   Windows, SysUtils, Classes, Controls, Graphics, Contnrs;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Classes, QControls, QGraphics, Contnrs, QImgList;
-{$ENDIF}
 
 type
   TImageThemeClass = class of TCustomImageTheme;

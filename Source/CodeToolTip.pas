@@ -20,15 +20,10 @@
 unit CodeToolTip;
 
 interface
+
 uses
-{$IFDEF WIN32}
   SysUtils, Classes, Windows, Messages, Graphics, Controls, Forms,
   SynEdit, SynEditHighlighter, utils, CppParser;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, QDialogs, Classes, Xlib, QGraphics, QControls, QMenus, QForms, QStdCtrls,
-QSynEditKbdHandler, QSynEdit, QSynEditHighlighter, Types;
-{$ENDIF}
 
 type
   TCustomCodeToolTipButton = class(TPersistent)

@@ -22,14 +22,8 @@ unit FindFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, editor, SysUtils, Classes, Graphics, Controls, Forms,
   SynEdit, StdCtrls, SynEditTypes, SynEditSearch, Clipbrd, ComCtrls, Menus;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms,
-QSynEdit, QStdCtrls, QSynEditTypes;
-{$ENDIF}
 
 type
   TFindAction = (faFind, faFindFiles, faReplace, faReplaceFiles);
@@ -99,12 +93,7 @@ var
 implementation
 
 uses
-{$IFDEF WIN32}
   Main, Dialogs, MultiLangSupport, devcfg, utils, SynEditMiscClasses, Math;
-{$ENDIF}
-{$IFDEF LINUX}
-Xlib, Main, QDialogs, MultiLangSupport, devcfg;
-{$ENDIF}
 
 {$R *.dfm}
 

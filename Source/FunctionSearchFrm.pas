@@ -22,14 +22,8 @@ unit FunctionSearchFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, CppParser, ComCtrls, CBUtils, StatementList;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, QStdCtrls, QExtCtrls, CppParser, QComCtrls;
-{$ENDIF}
 
 type
   TFunctionSearchForm = class(TForm)
@@ -57,12 +51,7 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   MultiLangSupport, devcfg, utils;
-{$ENDIF}
-{$IFDEF LINUX}
-Xlib, MultiLangSupport, devcfg;
-{$ENDIF}
 
 {$R *.dfm}
 
@@ -131,12 +120,7 @@ begin
 
   // without this, the user has to press the down arrow twice to
   // move down the listview entries (only the first time!)...
-{$IFDEF WIN32}
   lvEntries.Perform(WM_KEYDOWN, VK_DOWN, 0);
-{$ENDIF}
-{$IFDEF LINUX}
-  lvEntries.Perform(WM_KEYDOWN, XK_DOWN, 0);
-{$ENDIF}
 end;
 
 procedure TFunctionSearchForm.txtSearchKeyPress(Sender: TObject; var Key: Char);

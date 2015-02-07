@@ -22,19 +22,11 @@ unit EditorOptFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, ExtCtrls, Spin,
   SynEdit, SynEditHighlighter, SynHighlighterCpp,
   Buttons, ClassBrowser, CppParser, CppTokenizer, StrUtils, Grids,
   CppPreprocessor;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, QComCtrls, QStdCtrls, QExtCtrls, ColorPickerButton,
-QSynEdit, QSynEditHighlighter, QSynHighlighterCpp, QCheckLst,
-QButtons, ClassBrowser, CppParser, CppTokenizer, StrUtils, Types;
-{$ENDIF}
 
 type
   // Keep history of what we have accessed (does not mean changed)
@@ -222,14 +214,8 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, DataFrm, IniFiles, editor,
   main;
-{$ENDIF}
-{$IFDEF LINUX}
-Xlib, MultiLangSupport, devcfg, version, utils, CodeIns, datamod, IniFiles, editor,
-main;
-{$ENDIF}
 
 {$R *.dfm}
 const

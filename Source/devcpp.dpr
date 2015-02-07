@@ -24,19 +24,17 @@ program devcpp;
 
 uses
   FastMM4 in 'FastMM4.pas',
-
-{$IFDEF WIN32}
-  Windows, Forms, sysUtils, SHFolder, Dialogs,
-{$ENDIF}
-{$IFDEF LINUX}
-  QForms, sysUtils, QDialogs,
-{$ENDIF}
-
+  Windows,
+  Forms,
+  sysUtils,
+  SHFolder,
+  Dialogs,
   main in 'main.pas' {MainForm},
   MultiLangSupport in 'MultiLangSupport.pas',
   SplashFrm in 'SplashFrm.pas' {SplashForm},
   Version in 'Version.pas',
   Utils in 'Utils.pas',
+  Tests in 'Tests.pas',
   LangFrm in 'LangFrm.pas' {LangForm},
   Project in 'Project.pas',
   Templates in 'Templates.pas',

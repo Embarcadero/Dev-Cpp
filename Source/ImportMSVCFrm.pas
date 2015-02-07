@@ -22,14 +22,8 @@ unit ImportMSVCFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Buttons, StdCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QButtons, QStdCtrls;
-{$ENDIF}
 
 type
   TImportMSVCForm = class(TForm)

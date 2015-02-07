@@ -22,14 +22,8 @@ unit SplashFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, ComCtrls, Version;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QExtCtrls, QComCtrls, Version;
-{$ENDIF}
 
 type
   TSplashForm = class(TForm)

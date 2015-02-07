@@ -22,12 +22,7 @@ unit ProjectTypes;
 interface
 
 uses
-{$IFDEF WIN32}
   Classes, editor, ComCtrls, Windows;
-{$ENDIF}
-{$IFDEF LINUX}
-Classes, editor, QComCtrls;
-{$ENDIF}
 
 const
   dptGUI = 0;

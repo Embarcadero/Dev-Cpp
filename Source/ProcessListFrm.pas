@@ -22,14 +22,8 @@ unit ProcessListFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ExtCtrls, MultiLangSupport;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QButtons, QExtCtrls, MultiLangSupport;
-{$ENDIF}
 
 type
   TProcessListForm = class(TForm)

@@ -17,22 +17,14 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{$WARN UNIT_PLATFORM OFF}
 unit CompOptionsFrm;
 
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, Spin, Math,
   CompOptionsFrame, CompOptionsList;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QButtons, QStdCtrls, Inifiles, QExtCtrls, QComCtrls,
-CompOptionsFrame;
-{$ENDIF}
 
 type
   TCompOptForm = class(TForm)
@@ -127,12 +119,7 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
-{$ENDIF}
-{$IFDEF LINUX}
-Xlib, Main, version, devcfg, utils, MultiLangSupport, datamod;
-{$ENDIF}
 
 {$R *.dfm}
 
@@ -354,17 +341,10 @@ begin
   btnDelInval.Enabled := lstDirs.Items.Count > 0;
 end;
 
-procedure TCompOptForm.edEntryKeyUp(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TCompOptForm.edEntryKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-{$IFDEF WIN32}
-  if key = vk_return then
+  if key = VK_RETURN then
     ButtonClick(btnAdd);
-{$ENDIF}
-{$IFDEF LINUX}
-  if key = XK_RETURN then
-    ButtonClick(btnAdd);
-{$ENDIF}
 end;
 
 procedure TCompOptForm.FormCreate(Sender: TObject);
@@ -461,24 +441,24 @@ begin
     Exit;
 
   with TOpenDialog.Create(Self) do try
-      Filter := FLT_ALLFILES;
+    Filter := FLT_ALLFILES;
 
-      // Start in the bin folder
-      if fBinDirCopy.Count > 0 then
-        InitialDir := fBinDirCopy[0]
-      else if devCompilerSets[cmbCompilerSetComp.ItemIndex].BinDir.Count > 0 then
-        InitialDir := devCompilerSets[cmbCompilerSetComp.ItemIndex].BinDir[0];
+    // Start in the bin folder
+    if fBinDirCopy.Count > 0 then
+      InitialDir := fBinDirCopy[0]
+    else if devCompilerSets[cmbCompilerSetComp.ItemIndex].BinDir.Count > 0 then
+      InitialDir := devCompilerSets[cmbCompilerSetComp.ItemIndex].BinDir[0];
 
-      // Select the current filename by default...
-      if Obj.Text <> '' then
-        FileName := IncludeTrailingPathDelimiter(InitialDir) + Obj.Text;
+    // Select the current filename by default...
+    if Obj.Text <> '' then
+      FileName := IncludeTrailingPathDelimiter(InitialDir) + Obj.Text;
 
-      // When accepted, replace
-      if Execute then
-        Obj.Text := ExtractFileName(FileName);
-    finally
-      Free;
-    end;
+    // When accepted, replace
+    if Execute then
+      Obj.Text := ExtractFileName(FileName);
+  finally
+    Free;
+  end;
 end;
 
 procedure TCompOptForm.cmbCompilerSetCompChange(Sender: TObject);
@@ -627,7 +607,7 @@ var
 begin
   dlgresult := MessageDlg(
     Format(Lang[ID_COPT_ADDCOMPILERS], [devDirs.Exec + 'MinGW32', devDirs.Exec + 'MinGW64']), mtConfirmation, [mbYes,
-      mbNo, mbCancel], 0);
+    mbNo, mbCancel], 0);
 
   if dlgresult = mrCancel then
     Exit;

@@ -17,27 +17,12 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-(*
- Changes: 12.5.1
- Programmer: Mike Berg
- Desc:  Modified to be a singleton pattern.  Any time the object is called
-        through the Lang function the object is auto-created if need be
-        and returned. works like devcfg.
- ToUse: The Strings prop is default so just call like Lang[ID_value];
-          - it works like a AnsiString list.
-*)
-
 unit MultiLangSupport;
 
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Dialogs, SysUtils, Classes;
-{$ENDIF}
-{$IFDEF LINUX}
-QDialogs, SysUtils, Classes;
-{$ENDIF}
 
 {$I LangIDs.inc}
 
@@ -74,12 +59,7 @@ function Lang: TdevMultiLangSupport;
 implementation
 
 uses
-{$IFDEF WIN32}
   LangFrm, Forms, utils, version, Controls, devcfg;
-{$ENDIF}
-{$IFDEF LINUX}
-LangFrm, QForms, utils, version, QControls, devcfg;
-{$ENDIF}
 
 var
   fLang: TdevMultiLangSupport = nil;

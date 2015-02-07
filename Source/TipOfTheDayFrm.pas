@@ -22,14 +22,8 @@ unit TipOfTheDayFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, Math, ShellAPI;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls, QComCtrls, QExtCtrls, XPMenu;
-{$ENDIF}
 
 type
   TTipOfTheDayForm = class(TForm)

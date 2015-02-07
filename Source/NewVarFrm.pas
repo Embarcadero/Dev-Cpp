@@ -22,14 +22,8 @@ unit NewVarFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, CBUtils, StatementList;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, QStdCtrls, QExtCtrls;
-{$ENDIF}
 
 type
   TNewVarForm = class(TForm)

@@ -22,14 +22,8 @@ unit NewFunctionFrm;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, CppParser, CBUtils;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, QStdCtrls, QExtCtrls, CppParser;
-{$ENDIF}
 
 type
   TNewFunctionForm = class(TForm)

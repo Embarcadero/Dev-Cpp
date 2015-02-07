@@ -22,29 +22,23 @@ unit CompOptionsFrame;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Grids, ValEdit, ComCtrls, ExtCtrls, CompOptionsList, project, utils, ProjectTypes, StdCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-  SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-  QGrids, QComCtrls, QExtCtrls, project, prjtypes;
-{$ENDIF}
 
 type
   TCompOptionsFrame = class(TFrame)
     tabs: TTabControl;
     vle: TCompOptionsList;
     procedure tabsChange(Sender: TObject);
-    procedure vleSetEditText(Sender: TObject; ACol, ARow: Integer;const Value: String);
+    procedure vleSetEditText(Sender: TObject; ACol, ARow: Integer; const Value: string);
   public
-    fCurrentIndex : integer;
+    fCurrentIndex: integer;
     procedure FillOptions;
   end;
 
 implementation
 
-uses 
+uses
   devcfg, multilangsupport;
 
 {$R *.dfm}
@@ -53,92 +47,92 @@ uses
 
 procedure TCompOptionsFrame.FillOptions;
 var
-	I : integer;
-	CompilerSet: TdevCompilerSet;
+  I: integer;
+  CompilerSet: TdevCompilerSet;
 begin
-	if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
-		Exit;
+  if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
+    Exit;
 
-	CompilerSet := devCompilerSets[fCurrentIndex];
-	for I := 0 to CompilerSet.OptionList.Count - 1 do
-		if tabs.Tabs.IndexOf(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]) = -1 then
-			tabs.Tabs.Add(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]);
+  CompilerSet := devCompilerSets[fCurrentIndex];
+  for I := 0 to CompilerSet.OptionList.Count - 1 do
+    if tabs.Tabs.IndexOf(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]) = -1 then
+      tabs.Tabs.Add(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]);
 
-	tabsChange(nil);
+  tabsChange(nil);
 end;
 
 procedure TCompOptionsFrame.tabsChange(Sender: TObject);
 var
-	I,J,idx : integer;
-	currenttab : AnsiString;
-	option : TCompilerOption;
-	CompilerSet: TdevCompilerSet;
+  I, J, idx: integer;
+  currenttab: AnsiString;
+  option: TCompilerOption;
+  CompilerSet: TdevCompilerSet;
 begin
-	if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
-		Exit;
+  if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
+    Exit;
 
-	vle.OnSetEditText := nil;
+  vle.OnSetEditText := nil;
 
-	vle.Strings.BeginUpdate;
-	vle.Strings.Clear;
+  vle.Strings.BeginUpdate;
+  vle.Strings.Clear;
 
-	currenttab := tabs.Tabs[tabs.TabIndex];
+  currenttab := tabs.Tabs[tabs.TabIndex];
 
-	CompilerSet := devCompilerSets[fCurrentIndex];
-	for I := 0 to CompilerSet.OptionList.Count - 1 do begin
-		option := PCompilerOption(CompilerSet.OptionList[I])^;
-		if SameStr(Lang[option.Section], currenttab) then begin
-			if Assigned(option.Choices) and (option.Value < option.Choices.Count) then
-				idx := vle.InsertRow(Lang[option.Name], option.Choices.Names[option.Value], True) // a,b,c,d
-			else
-				idx := vle.InsertRow(Lang[option.Name], BoolValYesNo[option.Value > 0], True); // No Yes
+  CompilerSet := devCompilerSets[fCurrentIndex];
+  for I := 0 to CompilerSet.OptionList.Count - 1 do begin
+    option := PCompilerOption(CompilerSet.OptionList[I])^;
+    if SameStr(Lang[option.Section], currenttab) then begin
+      if Assigned(option.Choices) and (option.Value < option.Choices.Count) then
+        idx := vle.InsertRow(Lang[option.Name], option.Choices.Names[option.Value], True) // a,b,c,d
+      else
+        idx := vle.InsertRow(Lang[option.Name], BoolValYesNo[option.Value > 0], True); // No Yes
 
-			vle.Strings.Objects[idx] := Pointer(I);
-			vle.ItemProps[idx].EditStyle := esPickList;
-			vle.ItemProps[idx].ReadOnly := true;
-			if Assigned(option.Choices) then begin
-				for j := 0 to option.Choices.Count - 1 do
-					vle.ItemProps[idx].PickList.Add(option.Choices.Names[J]);
-			end else begin
-				vle.ItemProps[idx].PickList.Add(BoolValYesNo[False]);
-				vle.ItemProps[idx].PickList.Add(BoolValYesNo[True]);
-			end;
-		end;
-	end;
-	vle.ColWidths[0] := vle.ClientWidth - 90;
-	vle.ColWidths[1] := 90;
-	vle.OnSetEditText := vleSetEditText;
+      vle.Strings.Objects[idx] := Pointer(I);
+      vle.ItemProps[idx].EditStyle := esPickList;
+      vle.ItemProps[idx].ReadOnly := true;
+      if Assigned(option.Choices) then begin
+        for j := 0 to option.Choices.Count - 1 do
+          vle.ItemProps[idx].PickList.Add(option.Choices.Names[J]);
+      end else begin
+        vle.ItemProps[idx].PickList.Add(BoolValYesNo[False]);
+        vle.ItemProps[idx].PickList.Add(BoolValYesNo[True]);
+      end;
+    end;
+  end;
+  vle.ColWidths[0] := vle.ClientWidth - 90;
+  vle.ColWidths[1] := 90;
+  vle.OnSetEditText := vleSetEditText;
 
-	vle.Strings.EndUpdate;
+  vle.Strings.EndUpdate;
 end;
 
-procedure TCompOptionsFrame.vleSetEditText(Sender: TObject; ACol,ARow: Integer; const Value: String);
+procedure TCompOptionsFrame.vleSetEditText(Sender: TObject; ACol, ARow: Integer; const Value: string);
 var
-	option : PCompilerOption;
-	I: integer;
-	CompilerSet: TdevCompilerSet;
+  option: PCompilerOption;
+  I: integer;
+  CompilerSet: TdevCompilerSet;
 begin
-	if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
-		Exit;
+  if (fCurrentIndex >= devCompilerSets.Count) or (fCurrentIndex < 0) then
+    Exit;
 
-	CompilerSet := devCompilerSets[fCurrentIndex];
+  CompilerSet := devCompilerSets[fCurrentIndex];
 
-	option := PCompilerOption(CompilerSet.OptionList[Integer(vle.Strings.Objects[ARow])]);
+  option := PCompilerOption(CompilerSet.OptionList[Integer(vle.Strings.Objects[ARow])]);
 
-	if SameStr(Value,'Yes') then
-		option^.Value := 1
-	else if SameStr(Value,'No') then
-		option^.Value := 0
-	else if Assigned(option^.Choices) then begin
-		for i := 0 to option^.Choices.Count - 1 do
-			if SameStr(Value,option^.Choices.Names[i]) then begin
-				option^.Value := i;
-				break;
-			end;
-	end;
+  if SameStr(Value, 'Yes') then
+    option^.Value := 1
+  else if SameStr(Value, 'No') then
+    option^.Value := 0
+  else if Assigned(option^.Choices) then begin
+    for i := 0 to option^.Choices.Count - 1 do
+      if SameStr(Value, option^.Choices.Names[i]) then begin
+        option^.Value := i;
+        break;
+      end;
+  end;
 
-	// update string too
-	CompilerSet.SetOption(option,ValueToChar[option^.Value]);
+  // update string too
+  CompilerSet.SetOption(option, ValueToChar[option^.Value]);
 end;
 
 end.

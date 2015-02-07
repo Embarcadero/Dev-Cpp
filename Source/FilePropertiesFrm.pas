@@ -17,22 +17,14 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{$WARN UNIT_PLATFORM OFF}
 unit FilePropertiesFrm;
 
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StrUtils, ExtCtrls, StdCtrls, SynEdit, utils,
   SynEditTypes, FileCtrl, Menus;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, StrUtils, QExtCtrls, QStdCtrls, QSynEdit,
-QSynEditTypes;
-{$ENDIF}
 
 type
   TFilePropertiesForm = class(TForm)
@@ -102,12 +94,7 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   SynEditHighlighter, main, MultiLangSupport, DataFrm, project, editor, devcfg;
-{$ENDIF}
-{$IFDEF LINUX}
-QSynEditHighlighter, main, MultiLangSupport, datamod, project, editor, devcfg;
-{$ENDIF}
 
 {$R *.dfm}
 
@@ -232,7 +219,7 @@ end;
 
 procedure TFilePropertiesForm.FormShow(Sender: TObject);
 var
-  e : TEditor;
+  e: TEditor;
 begin
   if fFilename = '' then begin
     e := MainForm.EditorList.GetEditor;

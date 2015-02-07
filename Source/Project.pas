@@ -22,15 +22,9 @@ unit Project;
 interface
 
 uses
-{$IFDEF WIN32}
   IniFiles, SysUtils, Dialogs, ComCtrls, Editor, Contnrs, SynExportHTML,
   Classes, Controls, version, Forms, Templates, ProjectTypes,
   Windows;
-{$ENDIF}
-{$IFDEF LINUX}
-IniFiles, SysUtils, QDialogs, QComCtrls, Editor, Contnrs,
-Classes, QControls, version, prjtypes, Templates, QForms;
-{$ENDIF}
 
 type
   TProjUnit = class;

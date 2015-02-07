@@ -22,14 +22,8 @@ unit EditorList;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, SysUtils, Dialogs, StdCtrls, Controls, ComCtrls, Forms, Editor, ExtCtrls,
   devrun, version, project, utils, ProjectTypes, Classes, Graphics, Math, Messages;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, QDialogs, QStdCtrls, QComCtrls, QForms,
-devrun, version, project, utils, prjtypes, Classes, QGraphics;
-{$ENDIF}
 
 type
   TLayoutShowType = (lstNone, lstLeft, lstRight, lstBoth);
@@ -74,6 +68,7 @@ type
     property PageCount: integer read GetPageCount;
     property Editors[Index: integer]: TEditor read GetForEachEditor; default;
     property FocusedPageControl: TPageControl read GetFocusedPageControl;
+    property Layout: TLayoutShowType read fLayout;
   end;
 
 implementation

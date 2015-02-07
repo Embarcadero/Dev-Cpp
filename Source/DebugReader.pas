@@ -22,14 +22,8 @@ unit DebugReader;
 interface
 
 uses
-{$IFDEF WIN32}
   Sysutils, Classes, Windows, StdCtrls,
   Dialogs, editor, ComCtrls, StrUtils, Forms;
-{$ENDIF}
-{$IFDEF LINUX}
-Sysutils, Classes, debugreader,
-version, QDialogs, QComCtrls, StrUtils, QForms;
-{$ENDIF}
 
 type
   TAnnotateType = (
@@ -151,7 +145,7 @@ type
     property BreakPointList: TList read fBreakPointList write fBreakPointList;
     property WatchVarList: TList read fWatchVarList write fWatchVarList;
     property DebugView: TTreeView read fDebugView write fDebugView;
-    property BreakPointFile : AnsiString read fBreakPointFile;
+    property BreakPointFile: AnsiString read fBreakPointFile;
   end;
 
 implementation
@@ -924,7 +918,7 @@ begin
         TSource:
           HandleSource
             //else
-        //	break;
+      //	break;
       end;
     until NextAnnotation = TEOF;
 

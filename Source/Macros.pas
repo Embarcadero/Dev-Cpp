@@ -29,12 +29,7 @@ function ParseMacros(Str: AnsiString): AnsiString;
 implementation
 
 uses
-{$IFDEF WIN32}
   Main, editor, Dialogs, Utils, Classes;
-{$ENDIF}
-{$IFDEF LINUX}
-Main, editor, QDialogs, Utils, Classes;
-{$ENDIF}
 
 procedure Replace(var Str: AnsiString; Old, New: AnsiString);
 begin

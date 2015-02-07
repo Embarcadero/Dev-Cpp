@@ -17,22 +17,14 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{$WARN UNIT_PLATFORM OFF}
 unit EnviroFrm;
 
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, ExtCtrls, ExtDlgs, Buttons,
   CheckLst, Grids, ValEdit, ComCtrls;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Variants, Classes, QGraphics, QControls, QForms,
-QDialogs, QStdCtrls, QComCtrls, QExtCtrls, QButtons,
-QCheckLst, QGrids;
-{$ENDIF}
 
 type
   TEnviroForm = class(TForm)
@@ -115,12 +107,7 @@ type
 implementation
 
 uses
-{$IFDEF WIN32}
   ShellAPI, Filectrl, devcfg, MultiLangSupport, version, DataFrm, utils, FileAssocs, ImageTheme, main;
-{$ENDIF}
-{$IFDEF LINUX}
-Xlib, devcfg, MultiLangSupport, version, datamod, utils, FileAssocs, ImageTheme;
-{$ENDIF}
 
 {$R *.dfm}
 
@@ -393,12 +380,12 @@ begin
   end;
 
   with TOpenDialog.Create(Self) do try
-      Filter := FLT_ALLFILES;
-      if Execute then
-        vleExternal.Cells[1, vleExternal.Row] := Filename;
-    finally
-      Free;
-    end;
+    Filter := FLT_ALLFILES;
+    if Execute then
+      vleExternal.Cells[1, vleExternal.Row] := Filename;
+  finally
+    Free;
+  end;
 end;
 
 procedure TEnviroForm.vleExternalValidate(Sender: TObject; ACol,

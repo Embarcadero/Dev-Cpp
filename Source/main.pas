@@ -24,7 +24,6 @@ unit main;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils, SynEditPrint,
   Project, editor, DateUtils, compiler, ActnList, ToolFrm, AppEvnts,
@@ -32,14 +31,6 @@ uses
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
   devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg, SynEditTextBuffer,
   CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm;
-{$ENDIF}
-{$IFDEF LINUX}
-SysUtils, Classes, QGraphics, QControls, QForms, QDialogs,
-QMenus, QStdCtrls, QComCtrls, QExtCtrls, QButtons, utils,
-project, editor, compiler, QActnList,
-debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
-devShortcuts, StrUtils, devFileMonitor, devMonitorTypes, Types;
-{$ENDIF}
 
 type
   TRunEndAction = (reaNone, reaProfile);
@@ -264,8 +255,6 @@ type
     DebugSheet: TTabSheet;
     actAddWatch: TAction;
     actEditWatch: TAction;
-    FullScreenPanel: TPanel;
-    btnFullScrRevert: TSpeedButton;
     actNextLine: TAction;
     actStepOver: TAction;
     actWatchItem: TAction;
@@ -416,7 +405,6 @@ type
     N15: TMenuItem;
     actGotoDeclEditor: TAction;
     actGotoImplEditor: TAction;
-    actHideFSBar: TAction;
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
     ProfileBtn: TToolButton;
@@ -541,6 +529,7 @@ type
     actFormatOptions: TAction;
     actFormatOptions1: TMenuItem;
     N46: TMenuItem;
+    actRunTests: TAction;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure ToggleBookmarkClick(Sender: TObject);
@@ -729,7 +718,6 @@ type
     procedure actMsgSaveAllExecute(Sender: TObject);
     procedure actDeleteProfileExecute(Sender: TObject);
     procedure actGotoImplDeclEditorExecute(Sender: TObject);
-    procedure actHideFSBarExecute(Sender: TObject);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled:
       Boolean);
     procedure ImportCBCprojectClick(Sender: TObject);
@@ -797,6 +785,7 @@ type
     procedure actFormatOptionsExecute(Sender: TObject);
     procedure FindOutputSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
+    procedure actRunTestsExecute(Sender: TObject);
   private
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
@@ -875,28 +864,15 @@ var
 implementation
 
 uses
-{$IFDEF WIN32}
   ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
   DataFrm, NewProjectFrm, AboutFrm, PrintFrm,
   CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
   SynEdit, Math, ImageTheme, SynEditKeyCmds,
-  Types, FindFrm, ProjectTypes, devExec,
+  Types, FindFrm, ProjectTypes, devExec, Tests,
   NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
   ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm, SplashFrm,
   WindowListFrm, RemoveUnitFrm, ParamsFrm, ProcessListFrm, SynEditHighlighter;
-{$ENDIF}
-{$IFDEF LINUX}
-Xlib, IniFiles, QClipbrd, MultiLangSupport, version,
-devcfg, datamod, NewProjectFrm, AboutFrm, PrintFrm,
-CompOptionsFrm, EditorOptfrm, Incrementalfrm, Search_Center, Envirofrm,
-QSynEdit, QSynEditTypes,
-debugfrm, Prjtypes, devExec,
-NewTemplateFm, FunctionSearchFm, NewMemberFm, NewVarFm, NewClassFm,
-ProfileAnalysisFm, FilePropertiesFm, AddToDoFm, ViewToDoFm,
-ImportMSVCFm, CPUFrm, FileAssocs, TipOfTheDayFm, Splash,
-WindowListFrm, ParamsFrm, WebUpdate, ProcessListFrm, ModifyVarFrm;
-{$ENDIF}
 
 {$R *.dfm}
 
@@ -1351,9 +1327,6 @@ begin
   LeftProjectSheet.Caption := Lang[ID_LP_PROJECT];
   LeftClassSheet.Caption := Lang[ID_LP_CLASSES];
   LeftDebugSheet.Caption := Lang[ID_SHEET_DEBUG];
-
-  // Misc.
-  FullScreenPanel.Caption := Format(Lang[ID_FULLSCREEN_MSG], [DEVCPP, DEVCPP_VERSION]);
 
   BuildBookMarkMenus;
   SetHints;
@@ -2344,7 +2317,6 @@ begin
     BorderStyle := bsNone;
     FullScreenModeItem.Caption := Lang[ID_ITEM_FULLSCRBACK];
     ToolbarDock.Visible := devData.ShowBars;
-    FullScreenPanel.Visible := TRUE;
 
     // set size to hide form menu
     // works with multi monitors now.
@@ -2353,6 +2325,10 @@ begin
       (Top + Monitor.WorkAreaRect.Top) - ClientOrigin.Y,
       Monitor.Width + (Width - ClientWidth),
       Monitor.Height + (Height - ClientHeight));
+
+    // Put hint in status bar
+    SetStatusbarMessage(Format(Lang[ID_FULLSCREEN_MSGNEW], [ShortCutToText(actFullScreen.ShortCut),
+      ShortCutToText(actShowBars.ShortCut)]));
   end else begin
 
     // Reset old window position
@@ -2363,7 +2339,6 @@ begin
     BorderStyle := bsSizeable;
     FullScreenModeItem.Caption := Lang[ID_ITEM_FULLSCRMODE];
     ToolbarDock.Visible := TRUE;
-    FullScreenPanel.Visible := FALSE;
   end;
 
   // Remember focus
@@ -2441,25 +2416,19 @@ var
 begin
   if not assigned(fProject) then
     exit;
-{$IFDEF WIN32}
   while ProjectView.SelectionCount > 0 do begin
     node := ProjectView.Selections[0];
-{$ENDIF}
-{$IFDEF LINUX}
-    while ProjectView.SelCount > 0 do begin
-      node := ProjectView.Selected[0];
-{$ENDIF}
-      if not assigned(node) or (node.Level < 1) then
-        Continue;
-      if node.Data = Pointer(-1) then
-        Continue;
+    if not assigned(node) or (node.Level < 1) then
+      Continue;
+    if node.Data = Pointer(-1) then
+      Continue;
 
-      idx := integer(node.Data);
+    idx := integer(node.Data);
 
-      if not fProject.RemoveEditor(idx, true) then
-        exit;
-    end;
+    if not fProject.RemoveEditor(idx, true) then
+      exit;
   end;
+end;
 
 procedure TMainForm.actUnitRenameExecute(Sender: TObject);
 var
@@ -3590,11 +3559,8 @@ end;
 
 procedure TMainForm.actShowBarsExecute(Sender: TObject);
 begin
-  if devData.FullScreen then begin
+  if devData.FullScreen then
     ToolbarDock.Visible := not ToolbarDock.Visible;
-    if ToolbarDock.Visible then
-      FullScreenPanel.Top := -2;
-  end;
 end;
 
 procedure TMainForm.FormContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
@@ -5396,35 +5362,20 @@ end;
 
 procedure TMainForm.CompilerOutputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-{$IFDEF WIN32}
   if Key = VK_RETURN then
-{$ENDIF}
-{$IFDEF LINUX}
-    if Key = XK_RETURN then
-{$ENDIF}
-      CompilerOutputDblClick(sender);
+    CompilerOutputDblClick(sender);
 end;
 
 procedure TMainForm.FindOutputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-{$IFDEF WIN32}
   if Key = VK_RETURN then
-{$ENDIF}
-{$IFDEF LINUX}
-    if Key = XK_RETURN then
-{$ENDIF}
-      FindOutputDblClick(sender);
+    FindOutputDblClick(sender);
 end;
 
 procedure TMainForm.DebugViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-{$IFDEF WIN32}
   if Key = VK_DELETE then
-{$ENDIF}
-{$IFDEF LINUX}
-    if Key = XK_DELETE then
-{$ENDIF}
-      actRemoveWatchExecute(sender);
+    actRemoveWatchExecute(sender);
 end;
 
 procedure TMainForm.DebugPopupPopup(Sender: TObject);
@@ -5651,15 +5602,6 @@ begin
     end else
       SetStatusbarMessage(Format(Lang[ID_INFONOTFOUND], [phrase]));
   end;
-end;
-
-procedure TMainForm.actHideFSBarExecute(Sender: TObject);
-begin
-  if devData.FullScreen then
-    if FullScreenPanel.Height <> 0 then
-      FullScreenPanel.Height := 0
-    else
-      FullScreenPanel.Height := 16;
 end;
 
 procedure TMainForm.FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var
@@ -6652,6 +6594,15 @@ begin
     Item.Caption := '>'
   else
     Item.Caption := '';
+end;
+
+procedure TMainForm.actRunTestsExecute(Sender: TObject);
+begin
+  with TTestClass.Create do try
+    TestAll;
+  finally
+    Free;
+  end;
 end;
 
 end.
