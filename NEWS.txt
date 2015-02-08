@@ -1,3 +1,11 @@
+Version 5.10 - *
+
+- Improved indent guides positioning.
+- Removed full screen information bar.
+- Added GUI option for maximum line length option to AStyle > Formatter Options.
+- Fixed parameter mismatch in Chinese translation.
+- Removed severely outdated web update functionality.
+
 Version 5.9.2 - 1 Februari 2015
 
 - Changed Format Current File shortcut from Shift+F to Shift+Ctrl+A.
