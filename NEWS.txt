@@ -5,6 +5,8 @@ Version 5.10 - *
 - Added GUI option for maximum line length option to AStyle > Formatter Options.
 - Fixed parameter mismatch in Chinese translation.
 - Removed severely outdated web update functionality.
+- Fixed memory leak in Edit > Unindent.
+- Improved behaviour of Edit > Toggle Comment.
 
 Version 5.9.2 - 1 Februari 2015
 

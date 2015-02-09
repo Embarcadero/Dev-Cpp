@@ -6280,7 +6280,8 @@ var
   OrigBlockEnd: TBufferCoord;
   OrigCaret: TBufferCoord;
   MoveDelim: TBufferCoord;
-  EndLine: integer;
+  BeginIndex: integer;
+  EndIndex: integer;
   StartOfBlock: TBufferCoord;
   bChangeScroll: boolean;
   moveBkm: boolean;
@@ -6889,13 +6890,14 @@ begin
           OrigBlockEnd := BlockEnd;
 
           // Ignore the last line the cursor is placed on
-          if OrigBlockEnd.Char = 1 then
-            EndLine := max(OrigBlockBegin.Line - 1, OrigBlockEnd.Line - 1)
+          BeginIndex := BlockBegin.Line - 1;
+          if BlockEnd.Char = 1 then
+            EndIndex := BlockEnd.Line - 2
           else
-            EndLine := OrigBlockEnd.Line - 1;
+            EndIndex := BlockEnd.Line - 1;
 
           // if everything is commented, then uncomment
-          for I := OrigBlockEnd.Line - 1 to EndLine do begin
+          for I := BeginIndex to EndIndex do begin
             if Pos('//', TrimLeft(Lines[i])) = 1 then begin
               DoUncomment;
               Exit;
@@ -8913,6 +8915,7 @@ begin
       x := x - TmpDelLen;
 
     FirstIndent := -1;
+    FullStrToDelete := nil;
     // Delete string
     if SomethingToDelete then begin
       FullStrToDelete := StrToDelete;
@@ -8957,6 +8960,10 @@ begin
       SetCaretAndSelection(OrgCaretPos, BB, BE);
     end;
     ActiveSelectionMode := OrgSelectionMode;
+    if FullStrToDelete <> nil then
+      StrDispose(FullStrToDelete)
+    else
+      StrDispose(StrToDelete);
   end;
 end;
 

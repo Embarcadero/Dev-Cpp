@@ -67,7 +67,7 @@ var
       if Assigned(PageControl) then
         // make sure property PageCount is correct
         Assert(PageControl.PageCount = StartCount + I);
-      ShowUpdate(5);
+      ShowUpdate(0);
     end;
   end;
   procedure CloseEditors(PageControl: TPageControl);
@@ -83,7 +83,7 @@ var
       MainForm.EditorList.CloseEditor(e);
       // make sure property PageCount is correct
       Assert(PageControl.PageCount = I);
-      ShowUpdate(5);
+      ShowUpdate(0);
     end;
   end;
   procedure CloseAllEditors;
@@ -95,7 +95,7 @@ var
   begin
     while PageControl.PageCount > 0 do begin
       MainForm.EditorList.SwapEditor(MainForm.EditorList.GetEditor(-1, PageControl));
-      ShowUpdate(5);
+      ShowUpdate(0);
     end;
   end;
   procedure ActivateEditors(PageControl: TPageControl);
@@ -108,7 +108,7 @@ var
       e.Activate;
       // Make sure property FocusedPageControl is correct
       Assert(MainForm.EditorList.FocusedPageControl = e.PageControl);
-      ShowUpdate(5);
+      ShowUpdate(0);
     end;
   end;
   procedure ZapEditors(GoForward: Boolean);
@@ -124,7 +124,7 @@ var
         MainForm.EditorList.SelectPrevPage;
       // Make sure PageControl focus does not change
       Assert(FocusedPageControl = MainForm.EditorList.FocusedPageControl);
-      ShowUpdate(5);
+      ShowUpdate(0);
     end;
   end;
   procedure CloseEditorsRandom;
@@ -139,7 +139,7 @@ var
       // if this fails the deleted editor will be acivated after closing
       Assert(e <> MainForm.EditorList.GetPreviousEditor(e));
       MainForm.EditorList.CloseEditor(e);
-      ShowUpdate(5);
+      ShowUpdate(0);
     end;
   end;
 begin
@@ -187,7 +187,7 @@ begin
     Assert(MainForm.EditorList.Layout = lstNone);
     Assert(MainForm.EditorList.FocusedPageControl = nil);
 
-    MainForm.SetStatusbarMessage('Test editor activating');
+    MainForm.SetStatusbarMessage('Editor activating');
     OpenEditors(EditorCount, MainForm.EditorList.LeftPageControl);
     Assert(MainForm.EditorList.PageCount = 1 * EditorCount);
     Assert(MainForm.EditorList.Layout = lstLeft);
@@ -198,7 +198,7 @@ begin
     Assert(MainForm.EditorList.Layout = lstNone);
     Assert(MainForm.EditorList.FocusedPageControl = nil);
 
-    MainForm.SetStatusbarMessage('Test editor swapping');
+    MainForm.SetStatusbarMessage('Editor swapping');
     OpenEditors(EditorCount, MainForm.EditorList.LeftPageControl);
     Assert(MainForm.EditorList.Layout = lstLeft);
     Assert(MainForm.EditorList.PageCount = 1 * EditorCount);
@@ -213,7 +213,7 @@ begin
     Assert(MainForm.EditorList.Layout = lstNone);
     Assert(MainForm.EditorList.PageCount = 0);
 
-    MainForm.SetStatusbarMessage('Test editor zapping');
+    MainForm.SetStatusbarMessage('Editor zapping');
     OpenEditors(EditorCount, MainForm.EditorList.LeftPageControl);
     OpenEditors(EditorCount, MainForm.EditorList.RightPageControl);
     Assert(MainForm.EditorList.Layout = lstBoth);
@@ -315,7 +315,7 @@ end;
 
 function TTestClass.TestEditor: Boolean;
 var
-  I, J, FoldCount, LineCount: Integer;
+  I, J, FoldCount, LineCount, LineLength, CommentCount, DupeCount, IndentCount: Integer;
   e: TEditor;
   procedure TypeText(const Text: AnsiString);
   var
@@ -323,18 +323,22 @@ var
   begin
     for I := 1 to Length(Text) do
       e.Text.CommandProcessor(ecChar, Text[i], nil);
-    ShowUpdate(10);
+    ShowUpdate(0);
   end;
   procedure CollapseUncollapse;
   begin
     e.Text.CollapseAll;
-    ShowUpdate(100);
+    ShowUpdate(50);
     e.Text.UncollapseAll;
-    ShowUpdate(100);
+    ShowUpdate(50);
   end;
 begin
   FoldCount := 5;
   LineCount := 10;
+  LineLength := 10;
+  CommentCount := 10;
+  DupeCount := 10;
+  IndentCount := 3;
   try
     MainForm.SetStatusbarMessage('Create new file');
     e := MainForm.EditorList.NewEditor('main.cpp', False, True, nil);
@@ -355,7 +359,7 @@ begin
     e.Text.CaretXY := BufferCoord(1, 1);
     for I := 1 to LineCount do begin
       e.Text.CommandProcessor(ecLineBreak, #0, nil);
-      ShowUpdate(10);
+      ShowUpdate(0);
     end;
     Assert(e.Text.Lines.Count = 2 * FoldCount + 1 + LineCount);
 
@@ -363,7 +367,7 @@ begin
     e.Text.CaretXY := BufferCoord(1, 1);
     for I := 1 to LineCount do begin
       e.Text.CommandProcessor(ecDeleteLine, #0, nil);
-      ShowUpdate(10);
+      ShowUpdate(0);
     end;
     Assert(e.Text.Lines.Count = 2 * FoldCount + 1);
 
@@ -373,13 +377,13 @@ begin
     MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
     while e.Text.UndoList.CanUndo do begin
       e.Text.Undo;
-      ShowUpdate(1);
+      ShowUpdate(0);
     end;
     Assert(e.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type wall of text');
     for I := Ord('a') to Ord('z') do begin
-      TypeText(StringOfChar(Chr(I), 40));
+      TypeText(StringOfChar(Chr(I), LineLength));
       e.Text.CommandProcessor(ecLineBreak, #0, nil);
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
@@ -389,7 +393,7 @@ begin
       e.Text.CaretXY := BufferCoord(1, 1);
       for J := 0 to e.Text.Lines.Count - 3 - I do
         e.Text.CommandProcessor(ecMoveSelDown, #0, nil);
-      ShowUpdate(1);
+      ShowUpdate(0);
     end;
 
     MainForm.SetStatusbarMessage('Move lines up');
@@ -397,13 +401,95 @@ begin
       e.Text.CaretXY := BufferCoord(1, e.Text.Lines.Count);
       for J := 0 to e.Text.Lines.Count - 1 - I do
         e.Text.CommandProcessor(ecMoveSelUp, #0, nil);
-      ShowUpdate(1);
+      ShowUpdate(0);
     end;
+
+    MainForm.SetStatusbarMessage('Comment');
+    e.Text.SelectAll;
+    for I := 1 to CommentCount do begin
+      e.Text.CommandProcessor(ecComment, #0, nil);
+      ShowUpdate(50);
+    end;
+    Assert(e.Text.Lines.Count = 26 + 1);
+
+    MainForm.SetStatusbarMessage('Uncomment');
+    e.Text.SelectAll;
+    for I := 1 to CommentCount do begin
+      e.Text.CommandProcessor(ecUncomment, #0, nil);
+      ShowUpdate(50);
+    end;
+    Assert(e.Text.Lines.Count = 26 + 1);
+
+    MainForm.SetStatusbarMessage('Toggle comment');
+    e.Text.SelectAll;
+    for I := 1 to CommentCount do begin
+      e.Text.CommandProcessor(ecToggleComment, #0, nil);
+      ShowUpdate(0);
+    end;
+    Assert(e.Text.Lines.Count = 26 + 1);
 
     MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
     while e.Text.UndoList.CanUndo do begin
       e.Text.Undo;
-      ShowUpdate(1);
+      ShowUpdate(0);
+    end;
+    Assert(e.Text.IsEmpty);
+
+    MainForm.SetStatusbarMessage('Type line of text');
+    for I := Ord('a') to Ord('z') do begin
+      TypeText(Chr(I));
+    end;
+    Assert(e.Text.Lines.Count = 1);
+
+    MainForm.SetStatusbarMessage('Duplicate lines');
+    for I := 1 to DupeCount do begin
+      e.Text.CommandProcessor(ecDuplicateLine, #0, nil);
+      ShowUpdate(50);
+    end;
+    Assert(e.Text.Lines.Count = 1 + DupeCount);
+
+    MainForm.SetStatusbarMessage('Delete lines');
+    for I := 1 to DupeCount do begin
+      e.Text.CommandProcessor(ecDeleteLine, #0, nil);
+      ShowUpdate(50);
+      Sleep(10);
+    end;
+    Assert(e.Text.Lines.Count = 1);
+
+    MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
+    while e.Text.UndoList.CanUndo do begin
+      e.Text.Undo;
+      ShowUpdate(0);
+    end;
+    Assert(e.Text.IsEmpty);
+
+    MainForm.SetStatusbarMessage('Type wall of text');
+    for I := Ord('a') to Ord('z') do begin
+      TypeText(StringOfChar(Chr(I), LineLength));
+      e.Text.CommandProcessor(ecLineBreak, #0, nil);
+    end;
+    Assert(e.Text.Lines.Count = 26 + 1);
+
+    MainForm.SetStatusbarMessage('Indent');
+    e.Text.SelectAll;
+    for I := 1 to IndentCount do begin
+      e.Text.CommandProcessor(ecBlockIndent, #0, nil);
+      ShowUpdate(50);
+    end;
+    Assert(e.Text.Lines.Count = 26 + 1);
+
+    MainForm.SetStatusbarMessage('Unindent');
+    e.Text.SelectAll;
+    for I := 1 to IndentCount do begin
+      e.Text.CommandProcessor(ecBlockUnindent, #0, nil);
+      ShowUpdate(50);
+    end;
+    Assert(e.Text.Lines.Count = 26 + 1);
+
+    MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
+    while e.Text.UndoList.CanUndo do begin
+      e.Text.Undo;
+      ShowUpdate(0);
     end;
     Assert(e.Text.IsEmpty);
 
@@ -418,8 +504,8 @@ end;
 
 function TTestClass.TestAll: Boolean;
 begin
-  Result :=  TestEditorList and
-  //  TestActions and
+  Result := //TestEditorList and
+    //  TestActions and
   //  TestCompilerOptions and
   TestEditor
     ;
