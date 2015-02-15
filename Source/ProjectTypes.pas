@@ -170,7 +170,7 @@ begin
   SupportXPThemes := False;
   CompilerSet := devCompilerSets.DefaultSetIndex;
   if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then
-    CompilerOptions := devCompilerSets[CompilerSet].OptionString
+    CompilerOptions := devCompilerSets[CompilerSet].INIOptions
   else
     CompilerOptions := '';
   VersionInfo := TProjVersionInfo.Create;

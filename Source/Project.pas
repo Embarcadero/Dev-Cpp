@@ -290,8 +290,9 @@ begin
   // Does the option exist?
   if devCompilerSets[fOptions.CompilerSet].FindOption(OptionString, OptionStruct, OptionIndex) then begin
     // Can it be found in the project options list?
-    if (OptionIndex + 1 <= Length(fOptions.CompilerOptions)) then
+    if (OptionIndex + 1 <= Length(fOptions.CompilerOptions)) then begin
       result := fOptions.CompilerOptions[OptionIndex + 1];
+    end;
   end;
 end;
 
@@ -303,10 +304,11 @@ begin
   // Does the option exist?
   if devCompilerSets[fOptions.CompilerSet].FindOption(OptionString, OptionStruct, OptionIndex) then begin
     // Can it be found in the project options list?
-    if (OptionIndex + 1 <= Length(fOptions.CompilerOptions)) and (fOptions.CompilerOptions[OptionIndex + 1] <> value)
-      then begin
-      fOptions.CompilerOptions[OptionIndex + 1] := Value;
-      SetModified(true);
+    if (OptionIndex + 1 <= Length(fOptions.CompilerOptions)) then begin
+      if (fOptions.CompilerOptions[OptionIndex + 1] <> value) then begin
+        fOptions.CompilerOptions[OptionIndex + 1] := Value;
+        SetModified(true);
+      end;
     end;
   end;
 end;

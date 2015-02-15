@@ -349,7 +349,7 @@ begin
 
     // Compiler tab
     if (cmbCompiler.ItemIndex < devCompilerSets.Count) and (cmbCompiler.ItemIndex >= 0) then
-      CompilerOptions := devCompilerSets[cmbCompiler.ItemIndex].OptionString;
+      CompilerOptions := devCompilerSets[cmbCompiler.ItemIndex].INIOptions;
     CompilerSet := cmbCompiler.ItemIndex;
 
     // Options tab
@@ -485,7 +485,7 @@ begin
     CompOptionsFrame1.Enabled := (devCompilerSets.Count > 0);
     fOldIndex := CompilerSet;
     if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then begin
-      devCompilerSets[CompilerSet].OptionString := fProjectCopy.Options.CompilerOptions;
+      devCompilerSets[CompilerSet].INIOptions := fProjectCopy.Options.CompilerOptions;
       CompOptionsFrame1.fCurrentIndex := cmbCompiler.ItemIndex;
       CompOptionsFrame1.FillOptions;
     end;

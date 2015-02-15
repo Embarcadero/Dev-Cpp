@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit devcfg;
+unit devCFG;
 
 interface
 
@@ -77,8 +77,7 @@ type
     flinkOpt: AnsiString;
 
     // Options
-    fOptionString: AnsiString; // options in INI format
-    fOptionList: TList; // options in usable memory format
+    fOptions: TList;
 
     // Initialization
     procedure SetProperties(const BinDir, BinFile: AnsiString);
@@ -87,9 +86,9 @@ type
     procedure SetUserInput;
     procedure SetOptions;
 
-    // Keeps string and list synchronized
-    procedure SetOptionString(const value: AnsiString);
-    procedure OptionListToString;
+    // Converts to and from memory format
+    function GetINIOptions: AnsiString;
+    procedure SetINIOptions(const value: AnsiString);
 
     // Validation
     function Validate: boolean; // returns true if valid
@@ -111,7 +110,6 @@ type
     function FindOption(const Option: AnsiString; var opt: PCompilerOption; var Index: integer): boolean;
     procedure SetOption(const Option: AnsiString; Value: Char); overload;
     procedure SetOption(Option: PCompilerOption; Value: char); overload;
-    procedure SetOption(Index: integer; Value: char); overload;
 
     // Obtain response from compiler
     function GetCompilerOutput(const BinDir, BinFile, Input: AnsiString): AnsiString;
@@ -136,8 +134,8 @@ type
     property Defines: TStringList read fDefines;
 
     // Options
-    property OptionList: TList read fOptionList write fOptionList;
-    property OptionString: AnsiString read fOptionString write SetOptionString;
+    property Options: TList read fOptions write fOptions;
+    property INIOptions: AnsiString read GetINIOptions write SetINIOptions;
 
     // User settings
     property AddtoComp: boolean read fCompAdd write fCompAdd;
@@ -724,8 +722,6 @@ var
   devExternalPrograms: TdevExternalPrograms = nil;
   devFormatter: TdevFormatter = nil;
 
-  ConfigMode: (CFG_APPDATA, CFG_PARAM, CFG_EXEFOLDER) = CFG_APPDATA;
-
 implementation
 
 uses
@@ -1046,7 +1042,7 @@ begin
   fCDir := TStringList.Create;
   fCppDir := TStringList.Create;
   fLibDir := TStringList.Create;
-  fOptionList := TList.Create;
+  fOptions := TList.Create;
 
   // Misc.
   fDefInclude := TStringList.Create;
@@ -1067,7 +1063,7 @@ begin
   fCDir := TStringList.Create;
   fCppDir := TStringList.Create;
   fLibDir := TStringList.Create;
-  fOptionList := TList.Create;
+  fOptions := TList.Create;
 
   // Misc.
   fDefInclude := TStringList.Create;
@@ -1100,12 +1096,12 @@ var
   I: integer;
 begin
   // delete options
-  for I := 0 to fOptionList.Count - 1 do begin
-    if Assigned(PCompilerOption(fOptionList[I])^.Choices) then
-      PCompilerOption(fOptionList[I])^.Choices.Free;
-    Dispose(PCompilerOption(fOptionList[I]));
+  for I := 0 to fOptions.Count - 1 do begin
+    if Assigned(PCompilerOption(fOptions[I])^.Choices) then
+      PCompilerOption(fOptions[I])^.Choices.Free;
+    Dispose(PCompilerOption(fOptions[I]));
   end;
-  fOptionList.Free;
+  fOptions.Free;
 
   // delete directories
   fBinDir.Free;
@@ -1156,7 +1152,7 @@ begin
   flinkOpt := input.fLinkOpt;
 
   // Option list
-  OptionString := input.fOptionString;
+  fOptions.Assign(input.Options);
 end;
 
 procedure TdevCompilerSet.SetProperties(const BinDir, BinFile: AnsiString);
@@ -1433,8 +1429,6 @@ begin
   AddOption(ID_COPT_MEM, ID_COPT_GRP_OUTPUT, True, True, False, 0, '-fverbose-asm', nil);
   AddOption(ID_COPT_ASSEMBLY, ID_COPT_GRP_OUTPUT, True, True, False, 0, '-S', nil);
   AddOption(ID_COPT_PIPES, ID_COPT_GRP_OUTPUT, True, True, False, 0, '-pipe', nil);
-
-  OptionListToString;
 end;
 
 procedure TdevCompilerSet.AddOption(Name, Section: integer; IsC, IsCpp, IsLinker: boolean; Value: integer; const
@@ -1451,7 +1445,7 @@ begin
   option^.Value := Value;
   option^.Setting := Setting;
   option^.Choices := Choices;
-  fOptionList.Add(option);
+  fOptions.Add(option);
 end;
 
 function TdevCompilerSet.GetOption(const Option: AnsiString): Char;
@@ -1470,37 +1464,31 @@ var
   I: integer;
 begin
   Result := False;
-  for I := 0 to fOptionList.Count - 1 do
-    if SameStr(PCompilerOption(fOptionList[I])^.Setting, Option) then begin
-      opt := PCompilerOption(fOptionList[I]);
+  for I := 0 to fOptions.Count - 1 do
+    if SameStr(PCompilerOption(fOptions[I])^.Setting, Option) then begin
+      opt := PCompilerOption(fOptions[I]);
       Index := I;
       Result := True;
       Break;
     end;
 end;
 
-procedure TdevCompilerSet.SetOptionString(const value: AnsiString);
+function TdevCompilerSet.GetINIOptions: AnsiString;
 var
   I: integer;
 begin
-  // set string
-  fOptionString := value;
-
-  // set list
-  for I := 0 to fOptionList.Count - 1 do
-    if I < Length(value) then // set option in list
-      PCompilerOption(fOptionList[I])^.Value := CharToValue(fOptionString[I + 1])
-    else
-      fOptionString := fOptionString + '0';
+  Result := '';
+  for I := 0 to fOptions.Count - 1 do
+    Result := Result + ValueToChar[PCompilerOption(fOptions[I])^.Value];
 end;
 
-procedure TdevCompilerSet.OptionListToString;
+procedure TdevCompilerSet.SetINIOptions(const value: AnsiString);
 var
   I: integer;
 begin
-  fOptionString := '';
-  for I := 0 to fOptionList.Count - 1 do
-    fOptionString := fOptionString + ValueToChar[PCompilerOption(fOptionList[I])^.Value];
+  for I := 0 to fOptions.Count - 1 do
+    if I < Length(value) then
+      PCompilerOption(fOptions[I])^.Value := CharToValue(value[I + 1]);
 end;
 
 procedure TdevCompilerSet.SetOption(const Option: AnsiString; Value: Char);
@@ -1509,22 +1497,12 @@ var
   OptionIndex: integer;
 begin
   if FindOption(Option, OptionStruct, OptionIndex) then
-    SetOption(OptionIndex, Value);
+    SetOption(Option, Value);
 end;
 
 procedure TdevCompilerSet.SetOption(Option: PCompilerOption; Value: char);
 begin
   Option^.Value := CharToValue(Value);
-  OptionListToString;
-end;
-
-procedure TdevCompilerSet.SetOption(Index: integer; Value: char);
-var
-  NewOptionString: AnsiString;
-begin
-  NewOptionString := fOptionString;
-  NewOptionString[Index + 1] := Value;
-  SetOptionString(NewOptionString);
 end;
 
 function TdevCompilerSet.GetCompilerOutput(const BinDir, BinFile, Input: AnsiString): AnsiString;
@@ -1760,8 +1738,6 @@ begin
   fwindresName := '';
   fgprofName := '';
 
-  fOptionString := '';
-
   fCompOpt := '';
   fLinkOpt := '';
   fCompAdd := false;
@@ -1909,7 +1885,7 @@ begin
     fgprofName := devData.ReadS(key, GPROF_PROGRAM);
 
     // Load the option in string format
-    OptionString := devData.ReadS(key, 'Options');
+    INIOptions := devData.ReadS(key, 'Options');
 
     // Extra parameters
     fCompOpt := devData.ReadS(key, 'CompOpt');
@@ -1965,7 +1941,7 @@ begin
     devData.Write(key, GPROF_PROGRAM, fgprofName);
 
     // Save option string
-    devData.Write(key, 'Options', fOptionString);
+    devData.Write(key, 'Options', INIOptions);
 
     // Save extra 'general' options
     devData.Write(key, 'CompOpt', fCompOpt);
@@ -2050,7 +2026,7 @@ begin
       end else
         SetToActivate := StrToIntDef(sl.Values[sl.Names[I]], -1);
 
-    // Activate the set after everything has been loaded
+    // Activate the current set after everything has been loaded
     DefaultSetIndex := SetToActivate;
 
     // Validate and load the current set
@@ -2731,7 +2707,6 @@ end;
 procedure TdevExternalPrograms.SetToDefaults;
 begin
   inherited;
-
 end;
 
 end.

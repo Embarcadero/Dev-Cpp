@@ -27,7 +27,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils, SynEditPrint,
   Project, editor, DateUtils, compiler, ActnList, ToolFrm, AppEvnts,
-  debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer,
+  debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer, SyncObjs,
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
   devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg, SynEditTextBuffer,
   CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm;
@@ -786,6 +786,7 @@ type
     procedure FindOutputSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure actRunTestsExecute(Sender: TObject);
+    procedure WMCopyData(var Message: TMessage); message WM_COPYDATA;
   private
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
@@ -793,7 +794,6 @@ type
     fReportToolWindow: TForm; // floating bottom tab control
     WindowPlacement: TWindowPlacement; // idem
     fFirstShow: boolean; // true for first WM_SHOW, false for others
-    fShowTips: boolean;
     fRunEndAction: TRunEndAction; // determines what to do when program execution finishes
     fCompSuccessAction: TCompSuccessAction; // determines what to do when compilation finishes
     fParseStartTime: Cardinal; // TODO: move to CppParser?
@@ -805,8 +805,10 @@ type
     fEditorList: TEditorList;
     fCurrentPageHint: AnsiString;
     fLogOutputRawData: TStringList;
+    fCriticalSection: TCriticalSection; // protects fFilesToOpen
+    fFilesToOpen: TStringList; // files to open on show
     procedure UpdateSplash(const LoadingText: AnsiString);
-    function ParseParams(s: AnsiString): AnsiString;
+    function ParseToolParams(s: AnsiString): AnsiString;
     procedure BuildBookMarkMenus;
     procedure SetHints;
     procedure MRUClick(Sender: TObject);
@@ -833,6 +835,7 @@ type
     procedure ClearCompileMessages;
     procedure ClearMessageControl;
     procedure UpdateClassBrowsing;
+    function ParseParameters(const Parameters: WideString): Integer;
   public
     procedure ScanActiveProject;
     procedure UpdateCompilerList;
@@ -867,7 +870,7 @@ uses
   ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
   DataFrm, NewProjectFrm, AboutFrm, PrintFrm,
   CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
-  SynEdit, Math, ImageTheme, SynEditKeyCmds,
+  SynEdit, Math, ImageTheme, SynEditKeyCmds, Instances,
   Types, FindFrm, ProjectTypes, devExec, Tests,
   NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
@@ -973,6 +976,8 @@ end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  fFilesToOpen.Free;
+  fCriticalSection.Free;
   fLogOutputRawData.Free;
   fTools.Free;
   AutoSaveTimer.Free;
@@ -1449,7 +1454,7 @@ begin // TODO: ask on SO
   idx := (Sender as TMenuItem).Tag;
 
   with fTools.ToolList[idx]^ do
-    ExecuteFile(ParseParams(Exec), ParseParams(Params), ParseParams(WorkDir), SW_SHOW);
+    ExecuteFile(ParseToolParams(Exec), ParseToolParams(Params), ParseToolParams(WorkDir), SW_SHOW);
 end;
 
 procedure TMainForm.OpenProject(const s: AnsiString);
@@ -1567,7 +1572,7 @@ begin
   ListItem.SubItems.Add(msg);
 end;
 
-function TMainForm.ParseParams(s: AnsiString): AnsiString;
+function TMainForm.ParseToolParams(s: AnsiString): AnsiString;
 resourcestring
   cEXEName = '<EXENAME>';
   cPrjName = '<PROJECTNAME>';
@@ -3743,7 +3748,7 @@ var
 begin
   for I := (ToolsMenu.IndexOf(PackageManagerItem) + 2) to ToolsMenu.Count - 1 do begin
     J := ToolsMenu.Items[I].tag;
-    ToolsMenu.Items[I].Enabled := FileExists(ParseParams(fTools.ToolList[J]^.Exec));
+    ToolsMenu.Items[I].Enabled := FileExists(ParseToolParams(fTools.ToolList[J]^.Exec));
     if not ToolsMenu.Items[I].Enabled then
       ToolsMenu.Items[I].Caption := fTools.ToolList[J]^.Title + ' (Tool not found)';
   end;
@@ -5809,6 +5814,10 @@ begin
     end;
   end;
 
+  // Create critical section to support a single instance
+  fCriticalSection := TCriticalSection.Create;
+  fFilesToOpen := TStringList.Create;
+
   UpdateSplash('Applying shortcuts...');
 
   // Apply shortcuts BEFORE TRANSLATING!!!
@@ -6026,8 +6035,7 @@ end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 var
-  I: integer;
-  FileList: TStringList;
+  FileCount: Integer;
 begin
   if not fFirstShow then
     Exit;
@@ -6040,34 +6048,19 @@ begin
   OpenCloseMessageSheet(False);
 
   // Open files passed to us (HAS to be done at FormShow)
-  FileList := TStringList.Create;
-  try
-    I := 1;
-    fShowTips := true;
-    while I <= ParamCount do begin
+  // This includes open file commands send to us via WMCopyData
+  FileCount := ParseParameters(GetCommandLine);
 
-      // Skip the configuration redirect stuff
-      if ParamStr(i) = '-c' then begin
-        I := I + 2;
-        Continue;
-      end;
+  // Open them according to OpenFileList rules
+  OpenFileList(fFilesToOpen);
+  if FileCount = 0 then
+    UpdateAppTitle;
+  fFilesToOpen.Clear;
 
-      FileList.Add(ParamStr(i));
-      Inc(I);
-    end;
-
-    // Open them according to OpenFileList rules
-    OpenFileList(FileList);
-    if FileList.Count = 0 then
-      UpdateAppTitle;
-
-    // do not show tips if Dev-C++ is launched with a file and only slow
-    // when the form shows for the first time, not when going fullscreen too
-    if devData.ShowTipsOnStart and (FileList.Count = 0) then
-      actShowTips.Execute;
-  finally
-    FileList.Free;
-  end;
+  // do not show tips if Dev-C++ is launched with a file and only slow
+  // when the form shows for the first time, not when going fullscreen too
+  if devData.ShowTipsOnStart and (FileCount = 0) then
+    actShowTips.Execute;
 end;
 
 procedure TMainForm.actSkipFunctionExecute(Sender: TObject);
@@ -6338,7 +6331,7 @@ var
     // Notify project
     // Discard changes made to the old set...
     fProject.Options.CompilerSet := index;
-    fProject.Options.CompilerOptions := devCompilerSets[index].OptionString;
+    fProject.Options.CompilerOptions := devCompilerSets[index].INIOptions;
     fProject.Modified := true;
   end;
 
@@ -6603,6 +6596,65 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure TMainForm.WMCopyData(var Message: TMessage);
+var
+  MessageData: AnsiString;
+begin
+  MessageData := GetSentStructData(Message);
+  if MessageData <> '' then begin
+    fCriticalSection.Acquire;
+    try
+      ParseParameters(MessageData); // not thread safe
+
+      // Ff the window has already opened, force open here
+      // Otherwise, these files get added to the big file of files to open
+      // when the main instance executes FormShow.
+      if not fFirstShow then begin
+        OpenFileList(fFilesToOpen);
+        fFilesToOpen.Clear;
+      end;
+      Application.BringToFront;
+    finally
+      fCriticalSection.Release;
+    end;
+  end;
+end;
+
+function TMainForm.ParseParameters(const Parameters: WideString): Integer;
+type
+  TPWideCharArray = array[0..0] of PWideChar;
+var
+  I, ParameterCount: Integer;
+  ParameterList: PPWideChar;
+  Item: WideString;
+begin
+  Result := 0;
+
+  // Convert string to list of items
+  ParameterList := CommandLineToArgvW(PWideChar(Parameters), ParameterCount);
+  if not Assigned(ParameterList) then
+    Exit;
+
+  // Walk the list
+  I := 1; // skip first one
+  while I < ParameterCount do begin
+    Item := TPWideCharArray(ParameterList^)[i];
+
+    // Skip the configuration redirect stuff
+    if Item = '-c' then begin
+      I := I + 2;
+      Continue;
+    end;
+
+    fFilesToOpen.Add(Item);
+    Inc(I);
+  end;
+  Result := fFilesToOpen.Count;
+
+  // Free list of pointers
+  LocalFree(Cardinal(ParameterList));
 end;
 
 end.

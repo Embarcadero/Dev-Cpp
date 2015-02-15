@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-unit devrun;
+unit devRun;
 
 interface
 
@@ -25,21 +25,21 @@ uses
   Classes, Windows, Dialogs, utils;
 
 type
-  TLineOutputEvent = procedure(Sender: TObject; const Line: AnsiString) of Object;
+  TLineOutputEvent = procedure(Sender: TObject; const Line: AnsiString) of object;
 
   TDevRun = class(TThread)
   private
-    CurrentLine: AnsiString;
-    FLineOutput: TLineOutputEvent;
+    fCurrentLine: AnsiString;
+    fLineOutput: TLineOutputEvent;
     fCheckAbort: TCheckAbortFunc;
   protected
     procedure CallLineOutputEvent;
     procedure Execute; override;
     procedure LineOutput(const Line: AnsiString);
   public
-    Command   : AnsiString;
-    Directory : AnsiString;
-    Output    : AnsiString;
+    Command: AnsiString;
+    Directory: AnsiString;
+    Output: AnsiString;
     property OnLineOutput: TLineOutputEvent read FLineOutput write FLineOutput;
     property OnCheckAbort: TCheckAbortFunc read FCheckAbort write FCheckAbort;
   end;
@@ -48,13 +48,13 @@ implementation
 
 procedure TDevRun.CallLineOutputEvent;
 begin
-    FLineOutput(Self, CurrentLine);
+  fLineOutput(Self, fCurrentLine);
 end;
 
 procedure TDevRun.LineOutput(const Line: AnsiString);
 begin
-  CurrentLine := Line;
-  if Assigned(FLineOutput) then
+  fCurrentLine := Line;
+  if Assigned(fLineOutput) then
     Synchronize(CallLineOutputEvent);
 end;
 

@@ -504,7 +504,7 @@ end;
 
 function TTestClass.TestAll: Boolean;
 begin
-  Result := //TestEditorList and
+  Result := TestEditorList and
     //  TestActions and
   //  TestCompilerOptions and
   TestEditor

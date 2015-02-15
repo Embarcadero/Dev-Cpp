@@ -54,9 +54,9 @@ begin
     Exit;
 
   CompilerSet := devCompilerSets[fCurrentIndex];
-  for I := 0 to CompilerSet.OptionList.Count - 1 do
-    if tabs.Tabs.IndexOf(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]) = -1 then
-      tabs.Tabs.Add(Lang[PCompilerOption(CompilerSet.OptionList[I])^.Section]);
+  for I := 0 to CompilerSet.Options.Count - 1 do
+    if tabs.Tabs.IndexOf(Lang[PCompilerOption(CompilerSet.Options[I])^.Section]) = -1 then
+      tabs.Tabs.Add(Lang[PCompilerOption(CompilerSet.Options[I])^.Section]);
 
   tabsChange(nil);
 end;
@@ -79,8 +79,8 @@ begin
   currenttab := tabs.Tabs[tabs.TabIndex];
 
   CompilerSet := devCompilerSets[fCurrentIndex];
-  for I := 0 to CompilerSet.OptionList.Count - 1 do begin
-    option := PCompilerOption(CompilerSet.OptionList[I])^;
+  for I := 0 to CompilerSet.Options.Count - 1 do begin
+    option := PCompilerOption(CompilerSet.Options[I])^;
     if SameStr(Lang[option.Section], currenttab) then begin
       if Assigned(option.Choices) and (option.Value < option.Choices.Count) then
         idx := vle.InsertRow(Lang[option.Name], option.Choices.Names[option.Value], True) // a,b,c,d
@@ -117,7 +117,7 @@ begin
 
   CompilerSet := devCompilerSets[fCurrentIndex];
 
-  option := PCompilerOption(CompilerSet.OptionList[Integer(vle.Strings.Objects[ARow])]);
+  option := PCompilerOption(CompilerSet.Options[Integer(vle.Strings.Objects[ARow])]);
 
   if SameStr(Value, 'Yes') then
     option^.Value := 1

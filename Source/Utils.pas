@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
-  Menus, Registry, Controls, ComCtrls;
+  Menus, Registry, Controls, ComCtrls, Messages;
 
 type
   { File ID types }

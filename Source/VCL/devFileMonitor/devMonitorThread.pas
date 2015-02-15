@@ -32,7 +32,7 @@ QDialogs, QStdCtrls, devMonitorTypes, SyncObjs;
 {$ENDIF}
 
 const
-  APPMSG_NOTIFYFILECHANGED = WM_USER + 2048;
+  WM_NOTIFYFILECHANGED = WM_USER + 1;
 
 type
   TdevMonitorThread = class(TThread)
@@ -206,7 +206,7 @@ var
   P: PAnsiChar;
 begin
   P := StrNew(PAnsiChar(fFilename));
-  PostMessage(TdevFileMonitor(fOwner).Handle, APPMSG_NOTIFYFILECHANGED, integer(fChangeType), LPARAM(P));
+  PostMessage(TdevFileMonitor(fOwner).Handle, WM_NOTIFYFILECHANGED, integer(fChangeType), LPARAM(P));
 end;
 
 end.

@@ -82,7 +82,7 @@ end;
 
 procedure TdevFileMonitor.SubClassWndProc(var Message: TMessage);
 begin
-  if Message.Msg = APPMSG_NOTIFYFILECHANGED then begin
+  if Message.Msg = WM_NOTIFYFILECHANGED then begin
     if Assigned(fNotifyChange) then begin
       fNotifyChange(Self, TDevMonitorChangeType(Message.WParam), PAnsiChar(Message.LParam));
       StrDispose(PAnsiChar(Message.LParam));
