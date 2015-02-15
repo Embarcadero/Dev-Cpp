@@ -140,22 +140,14 @@ begin
   SetLength(INIFileName, 0);
   SetLength(ExeFolder, 0);
 
-  // Make the caption look nice
-  Application.Initialize;
-  Application.Title := 'Dev-C++';
-
-  // Create and fill settings structures
+  // Load settings
   devData.ReadSelf;
   CreateOptions;
 
-  // Display it as soon as possible, and only if its worth viewing...
-  if (not devData.NoSplashScreen) or devData.First then
-    SplashForm := TSplashForm.Create(nil);
-
+  // Create main window
+  Application.Initialize;
+  Application.Title := 'Dev-C++';
   Application.CreateForm(TMainForm, MainForm);
-  if Assigned(SplashForm) then
-    SplashForm.Close;
-
   Application.Run;
 end.
 

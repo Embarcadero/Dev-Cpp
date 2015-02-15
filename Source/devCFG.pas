@@ -506,7 +506,6 @@ type
     fdblFiles: boolean; // double click opens files out of project manager
     fLangChange: boolean; // flag for language change
     fthemeChange: boolean; // did the theme change?
-    fNoSplashScreen: boolean; // disable splash screen
     fInterfaceFont: AnsiString; // UI font
     fInterfaceFontSize: integer; // UI font size
     fConsolePause: boolean; // pause console program after return
@@ -599,7 +598,6 @@ type
     property First: boolean read fFirst write fFirst;
     property Splash: AnsiString read fSplash write fSplash;
     property MRUMax: integer read fMRUMax write fMRUMax;
-    property NoSplashScreen: boolean read fNoSplashScreen write fNoSplashScreen;
     property ShortenCompPaths: boolean read fShortenCompPaths write fShortenCompPaths;
 
     //Execution
@@ -1850,6 +1848,8 @@ end;
 procedure TdevCompilerSets.LoadSet(index: integer; const SetName: AnsiString = '');
 var
   key: AnsiString;
+  I: Integer;
+  Item: TdevCompilerSet;
 
   procedure ReadDirList(list: TStringList; const entry: AnsiString);
   var
@@ -1900,8 +1900,22 @@ begin
     ReadDirList(fCppDir, 'Cpp');
 
     // Set properties for current gcc path
-    if fBinDir.Count > 0 then
-      SetProperties(fBinDir[0], fgccName);
+    if fBinDir.Count > 0 then begin
+      // Check if this directory has already been used to set properties
+      for I := 0 to devCompilerSets.Count - 2 do begin
+        Item := devCompilerSets[i];
+        if (Item.BinDir.Count > 0) and (Item.BinDir[0] = fBinDir[0]) and (Item.gccName = fgccName) then begin
+          fVersion := Item.fVersion;
+          fFolder := Item.fFolder;
+          fType := Item.fType;
+          fName := Item.fName;
+          fDumpMachine := Item.fDumpMachine;
+          //fDefInclude.Assign(Item.fDefInclude);
+          fDefines.Assign(Item.fDefines);
+        end else
+          SetProperties(fBinDir[0], fgccName); // read properties from disk
+      end;
+    end;
   end;
 end;
 

@@ -46,7 +46,6 @@ type
     rgbAutoOpen: TRadioGroup;
     gbDebugger: TGroupBox;
     cbWatchHint: TCheckBox;
-    cbNoSplashScreen: TCheckBox;
     gbProgress: TGroupBox;
     cbShowProgress: TCheckBox;
     cbAutoCloseProgress: TCheckBox;
@@ -177,7 +176,6 @@ begin
     Language := s;
     ThemeChange := cboTheme.Text <> devData.Theme;
     Theme := cboTheme.Text;
-    NoSplashScreen := cbNoSplashScreen.Checked;
     ShowProgress := cbShowProgress.Checked;
     AutoCloseProgress := cbAutoCloseProgress.Checked;
     WatchHint := cbWatchHint.Checked;
@@ -238,7 +236,6 @@ begin
   cbMultiLineTab.Caption := Lang[ID_ENV_MULTILINETABS];
   cbBackups.Caption := Lang[ID_ENV_BACKUPS];
   cbMinOnRun.Caption := Lang[ID_ENV_MINONRUN];
-  cbNoSplashScreen.Caption := Lang[ID_ENV_NOSPLASH];
   cbPauseConsole.Caption := Lang[ID_ENV_PAUSECONSOLE];
   cbCheckAssocs.Caption := Lang[ID_ENV_CHECKASSOCS];
 
@@ -305,7 +302,6 @@ begin
     cbMinOnRun.Checked := MinOnRun;
     cbShowBars.Checked := ShowBars;
     cbMultiLineTab.Checked := MultiLineTab;
-    cbNoSplashScreen.Checked := NoSplashScreen;
     cbPauseConsole.Checked := ConsolePause;
     cbCheckAssocs.Checked := CheckAssocs;
     cbWatchHint.Checked := WatchHint;

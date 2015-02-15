@@ -807,7 +807,6 @@ type
     fLogOutputRawData: TStringList;
     fCriticalSection: TCriticalSection; // protects fFilesToOpen
     fFilesToOpen: TStringList; // files to open on show
-    procedure UpdateSplash(const LoadingText: AnsiString);
     function ParseToolParams(s: AnsiString): AnsiString;
     procedure BuildBookMarkMenus;
     procedure SetHints;
@@ -3754,12 +3753,6 @@ begin
   end;
 end;
 
-procedure TMainForm.UpdateSplash(const LoadingText: AnsiString);
-begin
-  if Assigned(SplashForm) then
-    SplashForm.SetText(LoadingText);
-end;
-
 procedure TMainForm.UpdateCompilerList;
 var
   I: integer;
@@ -5761,8 +5754,6 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   fFirstShow := true;
 
-  UpdateSplash('Applying settings...');
-
   // Backup PATH variable
   devDirs.OriginalPath := GetEnvironmentVariable('PATH');
 
@@ -5818,15 +5809,11 @@ begin
   fCriticalSection := TCriticalSection.Create;
   fFilesToOpen := TStringList.Create;
 
-  UpdateSplash('Applying shortcuts...');
-
   // Apply shortcuts BEFORE TRANSLATING!!!
   with Shortcuts do begin
     Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
     Load(ActionList);
   end;
-
-  UpdateSplash('Applying UI settings...');
 
   // Accept file drags
   DragAcceptFiles(Self.Handle, true);
@@ -5898,8 +5885,6 @@ begin
   // PageControl settings
   fEditorList.SetPreferences(devData.MsgTabs, devData.MultiLineTab);
 
-  UpdateSplash('Loading misc. data...');
-
   // Create datamod
   dmMain := TdmMain.Create(Self);
   with dmMain do begin
@@ -5912,14 +5897,10 @@ begin
     LoadDataMod;
   end;
 
-  UpdateSplash('Loading icons...');
-
   // Create icon themes
   devImageThemes := TDevImageThemeFactory.Create;
   devImageThemes.LoadFromDirectory(devDirs.Themes);
   LoadTheme;
-
-  UpdateSplash('Loading translation...');
 
   // Set languages and other first time stuff
   if devData.First or (devData.Language = '') then
@@ -5927,14 +5908,11 @@ begin
   else
     Lang.Open(devData.Language);
 
-  UpdateSplash('Applying translation...');
-
   // Load bookmarks, captions and hints
   LoadText;
 
   // Load the current compiler set
-  UpdateSplash(Lang[ID_LOAD_COMPILERSET]);
-  devCompilerSets.LoadSets; // SLOWWWW
+  devCompilerSets.LoadSets;
 
   // Update toolbar
   UpdateCompilerList;
@@ -5943,7 +5921,6 @@ begin
   DDETopic := DevCppDDEServer.Name;
   if devData.CheckAssocs then begin
     try
-      UpdateSplash(Lang[ID_LOAD_FILEASSOC]);
       CheckAssociations(true); // check and fix
     except
       MessageBox(Application.Handle, PAnsiChar(Lang[ID_ENV_UACERROR]), PAnsiChar(Lang[ID_ERROR]), MB_OK);
@@ -5952,11 +5929,7 @@ begin
   end;
 
   // Configure parser, code completion, class browser
-  UpdateSplash(Lang[ID_LOAD_INITCLASSBROWSER]);
   UpdateClassBrowsing;
-
-  // Show the window to the user
-  UpdateSplash(Lang[ID_LOAD_RESTOREWINDOW]);
 
   // Showing for the first time? Maximize
   if devData.First then
