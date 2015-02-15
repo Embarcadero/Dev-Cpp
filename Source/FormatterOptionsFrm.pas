@@ -242,15 +242,19 @@ end;
 
 procedure TFormatterOptionsForm.CommandChange(Sender: TObject);
 var
-  AStyleOutput: AnsiString;
+  AStyleOutput, DummyFileName: AnsiString;
 begin
   if fCreating then
     Exit;
   // Apply to dummy file
-  AStyleOutput := devFormatter.FormatFile(
-    devDirs.Exec + devFormatter.AStyleDir + 'DummyInput.txt', memFullCommand.Text);
-  synExample.Lines.LoadFromFile(
-    devDirs.Exec + devFormatter.AStyleDir + 'DummyInput.txt');
+  DummyFileName := devDirs.Exec + devFormatter.AStyleDir + 'DummyInput.txt';
+  AStyleOutput := devFormatter.FormatFile(DummyFileName, memFullCommand.Text);
+
+  // Check if formatting finished correctly
+  if FileExists(DummyFileName) then begin
+    synExample.Lines.LoadFromFile(DummyFileName);
+  end else
+    synExample.Lines.Text := Format(Lang[ID_FORMATTER_LOADERROR], [DummyFileName]);
 end;
 
 // copy of TdevFormatter.GetFullCommand

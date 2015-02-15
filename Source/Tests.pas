@@ -283,26 +283,31 @@ begin
   try
     with TCompOptForm.Create(nil) do try
       Show;
-      // Delete all
+      MainForm.SetStatusbarMessage('Delete all compiler sets');
       while cmbCompilerSetComp.Items.Count > 0 do
         btnDelCompilerSet.Click;
 
-      // Readd auto
+      MainForm.SetStatusbarMessage('Add automagically');
       btnFindCompilers.Click;
 
-      // Rename all
+      MainForm.SetStatusbarMessage('Rename all compiler sets');
       for I := 0 to cmbCompilerSetComp.Items.Count - 1 do begin
         cmbCompilerSetComp.ItemIndex := I;
         btnRenameCompilerSet.Click;
       end;
 
-      // Add some
+      MainForm.SetStatusbarMessage('Add blank compiler set');
       for I := 1 to SetCount do
         btnAddBlankCompilerSet.Click;
+
+      MainForm.SetStatusbarMessage('Add filled compiler set');
       for I := 1 to SetCount do
         btnAddFilledCompilerSet.Click;
 
-      // Save
+      MainForm.SetStatusbarMessage('Set current compiler set');
+      cmbCompilerSetComp.ItemIndex := 0;
+
+      MainForm.SetStatusbarMessage('Save compiler options');
       btnOk.Click;
     finally
       Free;
@@ -317,6 +322,7 @@ function TTestClass.TestEditor: Boolean;
 var
   I, J, FoldCount, LineCount, LineLength, CommentCount, DupeCount, IndentCount: Integer;
   e: TEditor;
+
   procedure TypeText(const Text: AnsiString);
   var
     I: Integer;
@@ -325,22 +331,15 @@ var
       e.Text.CommandProcessor(ecChar, Text[i], nil);
     ShowUpdate(0);
   end;
-  procedure CollapseUncollapse;
-  begin
-    e.Text.CollapseAll;
-    ShowUpdate(50);
-    e.Text.UncollapseAll;
-    ShowUpdate(50);
-  end;
 begin
-  FoldCount := 5;
-  LineCount := 10;
+  FoldCount := 20;
+  LineCount := 20;
   LineLength := 10;
-  CommentCount := 10;
-  DupeCount := 10;
+  CommentCount := 20;
+  DupeCount := 20;
   IndentCount := 3;
   try
-    MainForm.SetStatusbarMessage('Create new file');
+    MainForm.SetStatusbarMessage('Create new files');
     e := MainForm.EditorList.NewEditor('main.cpp', False, True, nil);
     e.Activate;
 
@@ -372,7 +371,10 @@ begin
     Assert(e.Text.Lines.Count = 2 * FoldCount + 1);
 
     MainForm.SetStatusbarMessage('Test fold collapsing and uncollapsing');
-    CollapseUncollapse;
+    e.Text.CollapseAll;
+    ShowUpdate(50);
+    e.Text.UncollapseAll;
+    ShowUpdate(50);
 
     MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
     while e.Text.UndoList.CanUndo do begin
@@ -408,7 +410,7 @@ begin
     e.Text.SelectAll;
     for I := 1 to CommentCount do begin
       e.Text.CommandProcessor(ecComment, #0, nil);
-      ShowUpdate(50);
+      ShowUpdate(20);
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
 
@@ -416,7 +418,7 @@ begin
     e.Text.SelectAll;
     for I := 1 to CommentCount do begin
       e.Text.CommandProcessor(ecUncomment, #0, nil);
-      ShowUpdate(50);
+      ShowUpdate(20);
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
 
@@ -451,8 +453,7 @@ begin
     MainForm.SetStatusbarMessage('Delete lines');
     for I := 1 to DupeCount do begin
       e.Text.CommandProcessor(ecDeleteLine, #0, nil);
-      ShowUpdate(50);
-      Sleep(10);
+      ShowUpdate(20);
     end;
     Assert(e.Text.Lines.Count = 1);
 
@@ -474,7 +475,7 @@ begin
     e.Text.SelectAll;
     for I := 1 to IndentCount do begin
       e.Text.CommandProcessor(ecBlockIndent, #0, nil);
-      ShowUpdate(50);
+      ShowUpdate(20);
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
 
@@ -482,9 +483,47 @@ begin
     e.Text.SelectAll;
     for I := 1 to IndentCount do begin
       e.Text.CommandProcessor(ecBlockUnindent, #0, nil);
-      ShowUpdate(50);
+      ShowUpdate(20);
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
+
+    MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
+    while e.Text.UndoList.CanUndo do begin
+      e.Text.Undo;
+      ShowUpdate(0);
+    end;
+    Assert(e.Text.IsEmpty);
+
+    MainForm.SetStatusbarMessage('Type wall of text');
+    for I := Ord('a') to Ord('a') + 9 do begin
+      TypeText(StringOfChar(Chr(I), LineLength));
+      e.Text.CommandProcessor(ecLineBreak, #0, nil);
+    end;
+    Assert(e.Text.Lines.Count = 11);
+
+    MainForm.SetStatusbarMessage('Enable bookmarks');
+    for I := 1 to 9 do begin
+      e.Text.CaretXY := BufferCoord(1, I);
+      MainForm.ToggleBookmarksItem.Items[i - 1].Click;
+      Assert(MainForm.ToggleBookmarksItem.Items[i - 1].Checked);
+      ShowUpdate(20);
+    end;
+    Assert(e.Text.Lines.Count = 11);
+
+    MainForm.SetStatusbarMessage('Goto bookmarks');
+    for I := 9 downto 1 do begin
+      MainForm.GotoBookmarksItem.Items[i - 1].Click;
+      ShowUpdate(20);
+    end;
+    Assert(e.Text.Lines.Count = 11);
+
+    MainForm.SetStatusbarMessage('Disable bookmarks');
+    for I := 1 to 9 do begin
+      MainForm.ToggleBookmarksItem.Items[i - 1].Click;
+      Assert(not MainForm.ToggleBookmarksItem.Items[i - 1].Checked);
+      ShowUpdate(20);
+    end;
+    Assert(e.Text.Lines.Count = 11);
 
     MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
     while e.Text.UndoList.CanUndo do begin
@@ -504,11 +543,12 @@ end;
 
 function TTestClass.TestAll: Boolean;
 begin
-  Result := TestEditorList and
-    //  TestActions and
-  //  TestCompilerOptions and
-  TestEditor
-    ;
+  Result := //TestEditorList and
+  //  TestActions and
+  TestCompilerOptions
+    // and
+  //TestEditor
+  ;
 end;
 
 constructor TTestClass.Create;

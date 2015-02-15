@@ -360,18 +360,24 @@ begin
   fCppDirCopy := TStringList.Create;
 
   // fill compiler lists
-  for I := 0 to devCompilerSets.Count - 1 do
-    cmbCompilerSetComp.Items.Add(devCompilerSets[i].Name);
+  cmbCompilerSetComp.Items.BeginUpdate;
+  try
+    // Populate
+    for I := 0 to devCompilerSets.Count - 1 do
+      cmbCompilerSetComp.Items.Add(devCompilerSets[i].Name);
 
-  fOldIndex := -1;
-  if devCompilerSets.DefaultSetIndex < cmbCompilerSetComp.Items.Count then
-    cmbCompilerSetComp.ItemIndex := devCompilerSets.DefaultSetIndex
-  else if cmbCompilerSetComp.Items.Count > 0 then
-    cmbCompilerSetComp.ItemIndex := 0;
+    // Set current index
+    fOldIndex := -1;
+    if devCompilerSets.DefaultSetIndex < cmbCompilerSetComp.Items.Count then
+      cmbCompilerSetComp.ItemIndex := devCompilerSets.DefaultSetIndex
+    else if cmbCompilerSetComp.Items.Count > 0 then
+      cmbCompilerSetComp.ItemIndex := 0;
+  finally
+    cmbCompilerSetComp.Items.EndUpdate; // paint once
+  end;
+
+  // Load the current set
   cmbCompilerSetCompChange(nil);
-
-  cbCompAddClick(cbCompAdd);
-  cbLinkerAddClick(cbLinkerAdd);
 end;
 
 procedure TCompOptForm.LoadText;
@@ -390,10 +396,10 @@ begin
 
   // Directories, subtabs
   DirTabs.Tabs.Clear;
-  DirTabs.Tabs.Append(Lang[ID_COPT_BIN]);
-  DirTabs.Tabs.Append(Lang[ID_COPT_LIB]);
-  DirTabs.Tabs.Append(Lang[ID_COPT_INCC]);
-  DirTabs.Tabs.Append(Lang[ID_COPT_INCCPP]);
+  DirTabs.Tabs.Add(Lang[ID_COPT_BIN]);
+  DirTabs.Tabs.Add(Lang[ID_COPT_LIB]);
+  DirTabs.Tabs.Add(Lang[ID_COPT_INCC]);
+  DirTabs.Tabs.Add(Lang[ID_COPT_INCCPP]);
 
   // Buttons for all tabs
   btnReplace.Caption := Lang[ID_BTN_REPLACE];

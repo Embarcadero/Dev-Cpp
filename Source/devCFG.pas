@@ -96,7 +96,7 @@ type
     function ValidateExes: boolean; // idem
   public
     constructor Create; overload; // create empty shell
-    constructor Create(const folder: AnsiString); overload; // create, and let if configure itself
+    constructor Create(const CompilerFolder: AnsiString); overload; // create, and let if configure itself
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
 
@@ -1052,7 +1052,7 @@ begin
   SetOptions;
 end;
 
-constructor TdevCompilerSet.Create(const folder: AnsiString);
+constructor TdevCompilerSet.Create(const CompilerFolder: AnsiString);
 begin
   inherited Create;
 
@@ -1067,14 +1067,8 @@ begin
   fDefInclude := TStringList.Create;
   fDefines := TStringList.Create;
 
-  // If relative, append exe dir
-  if (Length(folder) < 2) or (folder[2] <> ':') then // if not absolute
-    fFolder := devDirs.Exec + folder
-  else
-    fFolder := folder;
-
   // Set properties, assume bin\gcc.exe exists (it is our helper)
-  SetProperties(fFolder + pd + 'bin', GCC_PROGRAM);
+  SetProperties(CompilerFolder + pd + 'bin', GCC_PROGRAM);
 
   // Depending on properties, set default exes
   SetExecutables;
@@ -1150,7 +1144,7 @@ begin
   flinkOpt := input.fLinkOpt;
 
   // Option list
-  fOptions.Assign(input.Options);
+  INIOptions := input.INIOptions;
 end;
 
 procedure TdevCompilerSet.SetProperties(const BinDir, BinFile: AnsiString);
@@ -1902,18 +1896,20 @@ begin
     // Set properties for current gcc path
     if fBinDir.Count > 0 then begin
       // Check if this directory has already been used to set properties
-      for I := 0 to devCompilerSets.Count - 2 do begin
-        Item := devCompilerSets[i];
-        if (Item.BinDir.Count > 0) and (Item.BinDir[0] = fBinDir[0]) and (Item.gccName = fgccName) then begin
-          fVersion := Item.fVersion;
-          fFolder := Item.fFolder;
-          fType := Item.fType;
-          fName := Item.fName;
-          fDumpMachine := Item.fDumpMachine;
-          //fDefInclude.Assign(Item.fDefInclude);
-          fDefines.Assign(Item.fDefines);
-        end else
-          SetProperties(fBinDir[0], fgccName); // read properties from disk
+      for I := 0 to devCompilerSets.Count - 1 do begin
+        if I <> index then begin
+          Item := devCompilerSets[i];
+          if (Item.BinDir.Count > 0) and (Item.BinDir[0] = fBinDir[0]) and (Item.gccName = fgccName) then begin
+            fVersion := Item.fVersion;
+            fFolder := Item.fFolder;
+            fType := Item.fType;
+            fName := Item.fName;
+            fDumpMachine := Item.fDumpMachine;
+            //fDefInclude.Assign(Item.fDefInclude);
+            fDefines.Assign(Item.fDefines);
+          end else
+            SetProperties(fBinDir[0], fgccName); // read properties from disk
+        end;
       end;
     end;
   end;

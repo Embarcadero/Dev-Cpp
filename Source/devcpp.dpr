@@ -31,7 +31,6 @@ uses
   Messages,
   main in 'main.pas' {MainForm},
   MultiLangSupport in 'MultiLangSupport.pas',
-  SplashFrm in 'SplashFrm.pas' {SplashForm},
   Version in 'Version.pas',
   Utils in 'Utils.pas',
   Tests in 'Tests.pas',
