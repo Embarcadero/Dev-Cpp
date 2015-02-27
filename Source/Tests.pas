@@ -22,7 +22,7 @@ unit Tests;
 interface
 
 uses
-  Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs,
+  Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs, NewProjectFrm, Project,
   Menus, Registry, Controls, ComCtrls, Math, ActnList, CompOptionsFrm, SynEditKeyCmds, SynEditTypes;
 
 type
@@ -281,8 +281,10 @@ var
 begin
   SetCount := 1;
   try
-    with TCompOptForm.Create(nil) do try
+    MainForm.SetStatusbarMessage('Open compiler options');
+    with TCompOptForm.Create(nil) do try // copy from actCompOptions
       Show;
+
       MainForm.SetStatusbarMessage('Delete all compiler sets');
       while cmbCompilerSetComp.Items.Count > 0 do
         btnDelCompilerSet.Click;
@@ -309,7 +311,9 @@ begin
 
       MainForm.SetStatusbarMessage('Save compiler options');
       btnOk.Click;
-    finally
+      //  MainForm.CheckForDLLProfiling; TODO: private
+      MainForm.UpdateCompilerList;
+    finally;
       Free;
     end;
     Result := True;
@@ -339,8 +343,10 @@ begin
   DupeCount := 20;
   IndentCount := 3;
   try
-    MainForm.SetStatusbarMessage('Create new files');
-    e := MainForm.EditorList.NewEditor('main.cpp', False, True, nil);
+    MainForm.SetStatusbarMessage('Create new file');
+    MainForm.actNewSource.Execute;
+    e := MainForm.EditorList.GetEditor;
+    //  e := MainForm.EditorList.NewEditor('main.cpp', False, True, nil);
     e.Activate;
 
     MainForm.SetStatusbarMessage('Add foldable code');
@@ -543,12 +549,7 @@ end;
 
 function TTestClass.TestAll: Boolean;
 begin
-  Result := //TestEditorList and
-  //  TestActions and
-  TestCompilerOptions
-    // and
-  //TestEditor
-  ;
+  Result := TestEditorList and TestEditor;
 end;
 
 constructor TTestClass.Create;

@@ -108,7 +108,7 @@ type
     property Directory: AnsiString read GetDirectory;
     property Executable: AnsiString read GetExecutableName;
     property Units: TUnitList read fUnits write fUnits;
-    property INIFile: TMemIniFile read fINIFile write fINIFile;
+//    property INIFile: TMemIniFile read fINIFile write fINIFile;
     property Modified: boolean read GetModified write SetModified;
     property MakeFileName: AnsiString read GetMakeFileName;
     constructor Create(const nFileName, nName: AnsiString);
@@ -872,6 +872,8 @@ begin
       DeleteKey('Project', 'Use_GPP');
     end;
   end;
+
+  fINIFile.UpdateFile; // force flush
 end;
 
 function TProject.SaveUnits: Boolean;
@@ -1191,9 +1193,6 @@ begin
     Exit;
   SaveOptions; // update other data, and save to disk
   SaveLayout; // save current opened files, and which is "active".
-
-  // Write to disk
-  finiFile.UpdateFile;
 
   // We have saved everything to disk, so mark unmodified
   SetModified(false);

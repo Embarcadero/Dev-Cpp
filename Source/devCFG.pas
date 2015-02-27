@@ -1903,7 +1903,8 @@ begin
             fVersion := Item.fVersion;
             fFolder := Item.fFolder;
             fType := Item.fType;
-            fName := Item.fName;
+            if fName = '' then
+              fName := Item.fName;
             fDumpMachine := Item.fDumpMachine;
             //fDefInclude.Assign(Item.fDefInclude);
             fDefines.Assign(Item.fDefines);

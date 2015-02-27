@@ -3069,7 +3069,7 @@ var
 
   procedure PaintFoldAttributes;
   var
-    i, TabSteps, LineIndent, LastNonBlank, X, Y: integer;
+    i, TabSteps, LineIndent, LastNonBlank, X, Y, cRow, vLine: integer;
     DottedPen, OldPen: HPEN;
     DottedPenDesc: LOGBRUSH;
   begin
@@ -3086,16 +3086,19 @@ var
       try
         OldPen := SelectObject(Canvas.Handle, DottedPen);
 
-        // Draw them for all lines
-        for i := vFirstLine to vLastLine do begin
+        // Now loop through all the lines. The indices are valid for Lines.
+        for cRow := aFirstRow to aLastRow do begin
+          vLine := RowToLine(cRow);
+          if (vLine > Lines.Count) and not (Lines.Count = 0) then
+            break;
 
           // Set vertical coord
-          Y := (LineToRow(I) - TopLine) * fTextHeight; // limit inside clip rect
-          if Y mod 2 = 0 then // even
+          Y := (vLine - TopLine) * fTextHeight; // limit inside clip rect
+          if (fTextHeight mod 2 = 1) and (vLine mod 2 = 0) then // even
             Inc(Y);
 
           // Get next nonblank line
-          LastNonBlank := i - 1;
+          LastNonBlank := vLine - 1;
           while (LastNonBlank + 1 < fLines.Count) and (TrimLeft(fLines[LastNonBlank]) = '') do
             Inc(LastNonBlank);
           LineIndent := GetLineIndent(fLines[LastNonBlank]);
@@ -6892,13 +6895,13 @@ begin
           // Ignore the last line the cursor is placed on
           BeginIndex := BlockBegin.Line - 1;
           if BlockEnd.Char = 1 then
-            EndIndex := BlockEnd.Line - 2
+            EndIndex := max(0,BlockEnd.Line - 2)
           else
             EndIndex := BlockEnd.Line - 1;
 
           // if everything is commented, then uncomment
           for I := BeginIndex to EndIndex do begin
-            if Pos('//', TrimLeft(Lines[i])) = 1 then begin
+            if Pos('//', TrimLeft(fLines[i])) = 1 then begin
               DoUncomment;
               Exit;
             end;

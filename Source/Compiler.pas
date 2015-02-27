@@ -274,7 +274,7 @@ begin
   GetLibrariesParams;
   GetIncludesParams;
 
-  if Pos(' -g3', fCompileParams) > 0 then begin
+  if (Pos(' -g3', fCompileParams) > 0) or (Pos('-g3', fCompileParams) = 1) then begin
     Writeln(F, 'CPP      = ' + fCompilerSet.gppName + ' -D__DEBUG__');
     Writeln(F, 'CC       = ' + fCompilerSet.gccName + ' -D__DEBUG__');
   end else begin

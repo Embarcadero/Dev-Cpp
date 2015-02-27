@@ -1,12 +1,16 @@
-Version 5.10 - *
+Version 5.10 - 16 Februari 2015
 
-- Improved indent guides positioning.
+- Improved startup speed.
+- Removed splash window.
+- Temporarily removed the web update window.
+- Rewrote the LangCheck tool that can be used to validate translation files.
+- Improved indent guides painting and positioning.
 - Removed full screen information bar.
 - Added GUI option for maximum line length option to AStyle > Formatter Options.
 - Fixed parameter mismatch in Chinese translation.
-- Removed severely outdated web update functionality.
 - Fixed memory leak in Edit > Unindent.
 - Improved behaviour of Edit > Toggle Comment.
+- Improved opening speed of Tools > Compiler Options.
 
 Version 5.9.2 - 1 Februari 2015
 

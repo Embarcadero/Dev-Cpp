@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 1034
-  Top = 442
+  Left = 1035
+  Top = 416
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -1094,7 +1094,7 @@ object MainForm: TMainForm
         object N5: TMenuItem
           Caption = '-'
         end
-        object Class1: TMenuItem
+        object NewClassItem: TMenuItem
           Action = actNewClass
         end
       end

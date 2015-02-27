@@ -1286,8 +1286,9 @@ begin
 
     // Reparse whole file (not function bodies) if it has been modified
     // use stream, don't read from disk (not saved yet)
-    if fText.Modified then
+    if fText.Modified then begin
       MainForm.CppParser.ParseFile(fFileName, InProject, False, True, M);
+    end;
 
     // Scan the current function body
     fCompletionBox.CurrentStatement := MainForm.CppParser.FindAndScanBlockAt(fFileName, fText.CaretY, M);

@@ -397,7 +397,7 @@ type
     ClearallWatchPop: TMenuItem;
     CompilerOutput: TListView;
     N5: TMenuItem;
-    Class1: TMenuItem;
+    NewClassItem: TMenuItem;
     DeleteProfilingInformation: TMenuItem;
     actDeleteProfile: TAction;
     GotoDefineEditor: TMenuItem;
@@ -1900,7 +1900,7 @@ procedure TMainForm.actNewProjectExecute(Sender: TObject);
 var
   s: AnsiString;
 begin
-  with TNewProjectForm.Create(Self) do try
+  with TNewProjectForm.Create(nil) do try
     rbCpp.Checked := devData.DefCpp;
     rbC.Checked := not rbCpp.Checked;
     if ShowModal = mrOk then begin
@@ -1922,7 +1922,7 @@ begin
       end;
 
       // Ask the user where he wants to save
-      with TSaveDialog.Create(Application) do try
+      with TSaveDialog.Create(nil) do try
         Filter := FLT_PROJECTS;
         InitialDir := devDirs.Default;
         FileName := edProjectName.Text + DEV_EXT; // guess initial name
@@ -1946,7 +1946,6 @@ begin
 
           // Save project preferences to disk. Don't force save all editors yet
           fProject.SaveOptions;
-          fProject.INIFile.UpdateFile; // force flush
         end;
       finally
         Free;
@@ -2362,7 +2361,7 @@ end;
 
 procedure TMainForm.actCompOptionsExecute(Sender: TObject);
 begin
-  with TCompOptForm.Create(Self) do try
+  with TCompOptForm.Create(nil) do try
     if ShowModal = mrOk then begin
       CheckForDLLProfiling;
       UpdateCompilerList;
@@ -2377,7 +2376,7 @@ var
   I: integer;
   e1, e2: TEditor;
 begin
-  with TEditorOptForm.Create(Self) do try
+  with TEditorOptForm.Create(nil) do try
     if ShowModal = mrOk then begin
 
       // Apply editor options
@@ -2560,8 +2559,6 @@ begin
     end;
 end;
 
-{ begin XXXKF changed }
-
 procedure TMainForm.actProjectAddExecute(Sender: TObject);
 var
   idx: integer;
@@ -2570,25 +2567,28 @@ begin
   if not Assigned(fProject) then
     Exit;
 
-  with TOpenDialog.Create(Self) do try
-
+  // Let the user point to a file
+  with TOpenDialog.Create(nil) do try
     Title := Lang[ID_NV_OPENADD];
     Filter := BuildFilter([FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]);
     Options := Options + [ofAllowMultiSelect];
 
+    // If sucessful, add to selected node
     if Execute then begin
       if Assigned(ProjectView.Selected) and (ProjectView.Selected.Data = Pointer(-1)) then
         FolderNode := ProjectView.Selected
       else
         FolderNode := fProject.Node;
 
-      for idx := 0 to pred(Files.Count) do begin
+      // Add all files
+      for idx := 0 to Files.Count-1 do begin
         fProject.AddUnit(Files[idx], FolderNode, false); // add under folder
         CppParser.AddFileToScan(Files[idx], true);
       end;
 
+      // Rebuild project tree and parse
       fProject.RebuildNodes;
-      CppParser.ParseList;
+      CppParser.ParseFileList;
     end;
   finally
     Free;
@@ -3133,7 +3133,7 @@ end;
 
 procedure TMainForm.actEnviroOptionsExecute(Sender: TObject);
 begin
-  with TEnviroForm.Create(Self) do try
+  with TEnviroForm.Create(nil) do try
     if ShowModal = mrOk then begin
       // Update pagecontrol
       EditorList.SetPreferences(devData.MsgTabs, devData.MultiLineTab);
@@ -3858,7 +3858,7 @@ begin
       end else
         ProjectDir := '';
     end;
-    ParseList;
+    ParseFileList;
   end;
 end;
 

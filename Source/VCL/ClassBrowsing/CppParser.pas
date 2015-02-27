@@ -125,7 +125,7 @@ type
     procedure HandleVar;
     procedure HandleEnum;
     function HandleStatement: boolean;
-    procedure Parse(const FileName: AnsiString; ManualUpdate: boolean = False; Stream: TMemoryStream = nil);
+    procedure InternalParse(const FileName: AnsiString; ManualUpdate: boolean = False; Stream: TMemoryStream = nil);
     procedure DeleteTemporaries;
     function FindFileIncludes(const Filename: AnsiString; DeleteIt: boolean = False): PFileIncludes;
   public
@@ -147,7 +147,7 @@ type
     function IsIncludeLine(const Line: AnsiString): boolean;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure ParseList;
+    procedure ParseFileList;
     procedure ParseFile(const FileName: AnsiString; InProject: boolean; OnlyIfNotParsed: boolean = False; UpdateView:
       boolean = True; Stream: TMemoryStream = nil);
     function StatementKindStr(Value: TStatementKind): AnsiString;
@@ -1742,7 +1742,8 @@ begin
   Result := fIndex < fTokenizer.Tokens.Count;
 end;
 
-procedure TCppParser.Parse(const FileName: AnsiString; ManualUpdate: boolean = False; Stream: TMemoryStream = nil);
+procedure TCppParser.InternalParse(const FileName: AnsiString; ManualUpdate: boolean = False; Stream: TMemoryStream =
+  nil);
 begin
   // Perform some validation before we start
   if not fEnabled then
@@ -1839,7 +1840,7 @@ begin
     fOnUpdate(Self);
 end;
 
-procedure TCppParser.ParseList;
+procedure TCppParser.ParseFileList;
 var
   I: integer;
 begin
@@ -1859,7 +1860,7 @@ begin
       if Assigned(fOnTotalProgress) then
         fOnTotalProgress(Self, fFilesToScan[i], fFilesToScanCount, fFilesScannedCount);
       if fScannedFiles.IndexOf(fFilesToScan[i]) = -1 then begin
-        Parse(fFilesToScan[i], True);
+        InternalParse(fFilesToScan[i], True);
       end;
       Inc(I);
     end;
@@ -2007,11 +2008,11 @@ begin
     fFilesScannedCount := 0;
     if not Assigned(Stream) then begin
       if CFile = '' then
-        Parse(HFile, True) // headers should be parsed via include
+        InternalParse(HFile, True) // headers should be parsed via include
       else
-        Parse(CFile, True); // headers should be parsed via include
+        InternalParse(CFile, True); // headers should be parsed via include
     end else
-      Parse(FileName, True, Stream); // or from stream
+      InternalParse(FileName, True, Stream); // or from stream
     fFilesToScan.Clear;
     fPendingDeclarations.Clear; // should be empty anyways
     ReProcessInheritance; // account for inherited statements that have dissappeared
@@ -2129,6 +2130,7 @@ begin
     // Reparse every file that contains invalidated IDs
     for I := 0 to sl.Count - 1 do
       ParseFile(sl[I], fProjectFiles.IndexOf(sl[I]) <> -1, False, False);
+    //InternalParse(sl[I], True, nil); // TODO: do not notify user
   finally
     sl.Free;
   end;

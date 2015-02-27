@@ -187,44 +187,46 @@ begin
   ImageList.Clear;
 
   ProjView.Items.BeginUpdate;
-  ProjView.Items.Clear;
+  try
+    ProjView.Items.Clear;
 
-  // Walk all items
-  for I := 0 to pred(fTemplates.Count) do begin
-    TemplateItem := TTemplate(fTemplates[I]);
+    // Walk all items
+    for I := 0 to pred(fTemplates.Count) do begin
+      TemplateItem := TTemplate(fTemplates[I]);
 
-    // Add a page for each unique category
-    if not HasPage(TemplateItem.Category) then
-      TabsMain.Tabs.Append(TemplateItem.Category);
+      // Add a page for each unique category
+      if not HasPage(TemplateItem.Category) then
+        TabsMain.Tabs.Append(TemplateItem.Category);
 
-    // Select a category
-    if TemplateItem.Category = '' then
-      TemplateItem.Category := Lang[ID_NP_PRJSHEET];
+      // Select a category
+      if TemplateItem.Category = '' then
+        TemplateItem.Category := Lang[ID_NP_PRJSHEET];
 
-    // Only add if we're viewing this category
-    if SameText(TemplateItem.Category, TabsMain.Tabs[TabsMain.TabIndex]) then begin
-      ListItem := ProjView.Items.Add;
-      ListItem.Caption := TemplateItem.Name;
-      ListItem.Data := pointer(I);
-      IconFileName := ValidateFile(TemplateItem.Icon, '', true);
-      if IconFileName <> '' then begin
+      // Only add if we're viewing this category
+      if SameText(TemplateItem.Category, TabsMain.Tabs[TabsMain.TabIndex]) then begin
+        ListItem := ProjView.Items.Add;
+        ListItem.Caption := TemplateItem.Name;
+        ListItem.Data := pointer(I);
+        IconFileName := ValidateFile(TemplateItem.Icon, '', true);
+        if IconFileName <> '' then begin
 
-        // Add icon to central dump and tell ListItem to use it
-        IconItem := TIcon.Create;
-        try
-          IconItem.LoadFromFile(IconFileName); // ValidateFile prepends path
-          ListItem.ImageIndex := ImageList.AddIcon(IconItem);
-          if ListItem.ImageIndex = -1 then
-            ListItem.ImageIndex := 0;
-        finally
-          IconItem.Free;
-        end;
-      end else
-        ListItem.ImageIndex := 0; // don't use an icon
+          // Add icon to central dump and tell ListItem to use it
+          IconItem := TIcon.Create;
+          try
+            IconItem.LoadFromFile(IconFileName); // ValidateFile prepends path
+            ListItem.ImageIndex := ImageList.AddIcon(IconItem);
+            if ListItem.ImageIndex = -1 then
+              ListItem.ImageIndex := 0;
+          finally
+            IconItem.Free;
+          end;
+        end else
+          ListItem.ImageIndex := 0; // don't use an icon
+      end;
     end;
+  finally
+    ProjView.Items.EndUpdate;
   end;
-
-  ProjView.Items.EndUpdate;
 end;
 
 procedure TNewProjectForm.TabsMainChange(Sender: TObject);
