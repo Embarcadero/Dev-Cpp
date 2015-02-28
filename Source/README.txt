@@ -109,6 +109,7 @@ F9			Compile
 F10			Start Regular
 F11			Compile and Run Regular
 F12			Rebuild
+Ctrl+F9		Syntax Check Current File
 
 Editing
 -------
