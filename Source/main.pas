@@ -6545,7 +6545,7 @@ end;
 
 procedure TMainForm.actFormatOptionsExecute(Sender: TObject);
 begin
-  with TFormatterOptionsForm.Create(Self) do try
+  with TFormatterOptionsForm.Create(nil) do try
     if ShowModal = mrOk then begin
     end;
   finally

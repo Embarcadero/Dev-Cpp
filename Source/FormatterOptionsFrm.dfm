@@ -1,7 +1,6 @@
 object FormatterOptionsForm: TFormatterOptionsForm
-  Left = 1331
-  Top = 551
-  BorderIcons = [biSystemMenu]
+  Left = 412
+  Top = 756
   BorderStyle = bsDialog
   Caption = 'Formatter Options'
   ClientHeight = 600
@@ -12,9 +11,11 @@ object FormatterOptionsForm: TFormatterOptionsForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = True
+  OldCreateOrder = False
   Position = poMainFormCenter
   ShowHint = True
+  OnActivate = FormActivate
+  OnClose = FormClose
   OnCreate = FormCreate
   DesignSize = (
     600

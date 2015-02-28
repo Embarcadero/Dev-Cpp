@@ -59,6 +59,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure OptionChange(Sender: TObject);
     procedure CommandChange(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormActivate(Sender: TObject);
   private
     fCreating: Boolean;
     fValid: Boolean;
@@ -298,6 +300,17 @@ begin
     Result := Result + ' --indent-preprocessor';
 
   Result := TrimLeft(Result);
+end;
+
+procedure TFormatterOptionsForm.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TFormatterOptionsForm.FormActivate(Sender: TObject);
+begin
+  ActiveControl := nil;
 end;
 
 end.
