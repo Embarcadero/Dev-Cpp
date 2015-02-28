@@ -276,8 +276,12 @@ begin
   end;
 
   // Add line length
-  if chkMaxLineLength.Checked then
-    Result := Result + ' --max-code-length=' + IntToStr(spinMaxLineLength.Value);
+  if chkMaxLineLength.Checked then begin
+    if spinMaxLineLength.Text <> '' then
+      Result := Result + ' --max-code-length=' + IntToStr(spinMaxLineLength.Value)
+    else
+      Result := Result + ' --max-code-length=' + IntToStr(spinMaxLineLength.MinValue);
+  end;
 
   // Add indentation options
   if chkClasses.Checked then

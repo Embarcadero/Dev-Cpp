@@ -2446,6 +2446,7 @@ object MainForm: TMainForm
       Category = 'Execute'
       Caption = '&Syntax Check Current File'
       ImageIndex = 49
+      ShortCut = 16504
       OnExecute = actSyntaxCheckFileExecute
       OnUpdate = actCompileUpdate
     end

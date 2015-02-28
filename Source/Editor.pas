@@ -624,8 +624,7 @@ var
 begin
   SynExporterHTML := TSynExporterHTML.Create(nil);
   try
-    with TSaveDialog.Create(Application) do try
-
+    with TSaveDialog.Create(nil) do try
       Filter := SynExporterHTML.DefaultFilter;
       Title := Lang[ID_NV_EXPORT];
       DefaultExt := HTML_EXT;
@@ -661,8 +660,7 @@ var
 begin
   SynExporterRTF := TSynExporterRTF.Create(nil);
   try
-    with TSaveDialog.Create(Application) do try
-
+    with TSaveDialog.Create(nil) do try
       Filter := SynExporterRTF.DefaultFilter;
       Title := Lang[ID_NV_EXPORT];
       DefaultExt := RTF_EXT;
@@ -697,7 +695,7 @@ var
 begin
   SynExporterTEX := TSynExporterTEX.Create(nil);
   try
-    with TSaveDialog.Create(Application) do try
+    with TSaveDialog.Create(nil) do try
       Filter := SynExporterTEX.DefaultFilter;
       Title := Lang[ID_NV_EXPORT];
       DefaultExt := TEX_EXT;
@@ -1677,9 +1675,13 @@ var
 
 begin
   // Don't bother wasting time when we don't have to
-  if (not Assigned(fText.Highlighter)) or (not devEditor.Match) or fText.SelAvail then
+  if not Assigned(fText.Highlighter) then // no highlighted file is viewed
     Exit;
-
+  if not devEditor.Match then // user has disabled match painting
+    Exit;
+  if fText.SelAvail then // not clear cut what to paint
+    Exit;
+  //Exit; // greatly reduces flicker
   HighlightCharPos.Line := -1;
 
   // Is there a bracket char before us?
@@ -1719,14 +1721,18 @@ begin
   // Draw the character the caret is at here using this color
   SetColors(HighlightCharPos);
   Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(HighlightCharPos));
-  S := fText.Lines[HighlightCharPos.Line - 1][HighlightCharPos.Char];
-  Canvas.TextOut(Pix.X, Pix.Y, S);
+  if Pix.X > fText.GutterWidth then begin // only draw if inside viewable area
+    S := fText.Lines[HighlightCharPos.Line - 1][HighlightCharPos.Char];
+    Canvas.TextOut(Pix.X, Pix.Y, S);
+  end;
 
   // Then draw complement
   SetColors(ComplementCharPos);
   Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(ComplementCharPos));
-  S := fText.Lines[ComplementCharPos.Line - 1][ComplementCharPos.Char];
-  Canvas.TextOut(Pix.X, Pix.Y, S);
+  if Pix.X > fText.GutterWidth then begin // only draw if inside viewable area
+    S := fText.Lines[ComplementCharPos.Line - 1][ComplementCharPos.Char];
+    Canvas.TextOut(Pix.X, Pix.Y, S);
+  end;
 
   // Reset brush
   Canvas.Brush.Style := bsSolid;
@@ -1809,7 +1815,7 @@ var
   SaveFileName: AnsiString;
 begin
   Result := True;
-  with TSaveDialog.Create(Application) do try
+  with TSaveDialog.Create(nil) do try
     Title := Lang[ID_NV_SAVEAS];
     Filter := BuildFilter([FLT_CS, FLT_CPPS, FLT_HEADS, FLT_RES]);
     Options := Options + [ofOverwritePrompt];

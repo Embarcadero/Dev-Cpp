@@ -2638,7 +2638,10 @@ begin
       end else if Statement^._Kind = skTypedef then begin
         // We have found a variable with the same name, search for type
         if SameStr(Statement^._Command, s) then begin
-          Result := FindTypeDefinitionOf(Statement^._Type, CurrentClass);
+          if not SameStr(s, Statement^._Type) then // prevent infinite loop
+            Result := FindTypeDefinitionOf(Statement^._Type, CurrentClass)
+          else
+            Result := Statement; // stop walking the trail here
           if Result = nil then // found end of typedef trail, return result
             Result := Statement;
           Exit;

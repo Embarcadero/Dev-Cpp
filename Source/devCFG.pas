@@ -2618,22 +2618,27 @@ var
   FileName: AnsiString;
   DummyEditor: TSynEdit;
 begin
+  // Store file backup in AStyle dir and format that file
   FileName := devDirs.Exec + fAStyleDir + ExtractFileName(Editor.FileName);
-  with Editor.Text do begin
-    // Format a copy of the file
-    Lines.SaveToFile(FileName);
-    FormatFile(FileName, OverrideCommand);
+  Editor.Text.Lines.SaveToFile(FileName);
+  FormatFile(FileName, OverrideCommand);
 
-    // Load into dummy editor
-    DummyEditor := TSynEdit.Create(nil);
+  // Load formatted file into dummy
+  DummyEditor := TSynEdit.Create(nil);
+  try
+    // Use replace selection trick to preserve undo list
+    DummyEditor.Lines.LoadFromFile(FileName);
+
+    // Use replace all functionality
+    Editor.Text.BeginUpdate;
     try
-      // Use replace selection trick to preserve undo list
-      DummyEditor.Lines.LoadFromFile(FileName);
-      SelectAll;
-      SelText := DummyEditor.Lines.Text; // do NOT use Lines.LoadFromFile which is not undo-able
+      Editor.Text.SelectAll;
+      Editor.Text.SelText := DummyEditor.Lines.Text; // do NOT use Lines.LoadFromFile which is not undo-able
     finally
-      DummyEditor.Free;
+      Editor.Text.EndUpdate; // repaint once
     end;
+  finally
+    DummyEditor.Free;
   end;
 end;
 

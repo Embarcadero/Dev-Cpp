@@ -134,6 +134,7 @@ object FormatterOptionsForm: TFormatterOptionsForm
       #9'}'
       '}')
     ReadOnly = True
+    FontSmoothing = fsmNone
   end
   object grpOptions: TGroupBox
     Left = 8

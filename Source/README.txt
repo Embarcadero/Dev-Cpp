@@ -10,7 +10,7 @@ away.
 
 The the main executable devcpp.exe can be built using the following steps:
 
-	1) Compile and Install the following package(s):
+	1) Compile and install the following package(s):
 		Source\VCL\DevCpp.dpk
 		Source\VCL\SynEditPackages\SynEdit_<Delphi Version>.dpk
 		Source\VCL\ClassBrowsing\ClassBrowsing.dpk
@@ -19,8 +19,12 @@ The the main executable devcpp.exe can be built using the following steps:
 		Source\CompileResources.bat
 		
 	3) Open the project file devcpp.dpr. Your IDE should not produce any 
-	   'Module Not Found' or 'Resource Not Found' when opening files, compiling
-	   files or running devcpp.exe.
+	   'Module Not Found' or 'Resource Not Found' errors when opening files, 
+	   compiling files or running devcpp.exe.
+
+	4) It is advisable to run CleanSource.bat before commiting work, when you get
+ 	   errors complaining about old versions of code or when you want to diff the
+	   source folder.
 
 This process has only been tested using Delphi 6 and Delphi 7. The code base
 should be compatible with more recent versions of Delphi, but there is no 
