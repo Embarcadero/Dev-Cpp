@@ -3280,6 +3280,7 @@ begin
   ClearCompileMessages;
   fCompiler.Target := ctProject;
   fCompiler.Project := fProject;
+  fCompiler.CompilerSet := devCompilerSets.CompilationSet;
   fCompiler.BuildMakeFile;
 
   // Show the results

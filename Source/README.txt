@@ -8,7 +8,7 @@ away.
 
 2. Compiling devcpp.exe
 
-The the main executable devcpp.exe can be built using the following steps:
+The main executable devcpp.exe can be built using the following steps:
 
 	1) Compile and install the following package(s):
 		Source\VCL\DevCpp.dpk
