@@ -1,12 +1,17 @@
 - Add required headers and libraries for D3D11 development
-- Increase the amount of tests
-- Crash in TClassBrowser.AdvancedCustomDrawItem
+- Increase the amount of automated and manual tests
 - When the current compiler changes, code should be reparsed because built-in defines of a compiler affect parsing
-- Implement conditional search
-- Customisable highlighter reserved words
 - Messy painting of find results list
 - Add proxy support to webupdate
 - Unify look and feel of all windows
 - Test TDM-GCC 4.9.x
 - Rename file
-- View Makefile crash
+
+- Implement conditional search
+https://sourceforge.net/p/orwelldevcpp/tickets/143/
+
+- Customisable highlighter reserved words
+https://sourceforge.net/p/orwelldevcpp/tickets/145/
+
+- Goto frame in CPU Window:
+https://sourceforge.net/p/orwelldevcpp/tickets/151/
