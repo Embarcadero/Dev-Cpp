@@ -5,7 +5,8 @@
 - Add proxy support to webupdate
 - Unify look and feel of all windows
 - Test TDM-GCC 4.9.x
-- Rename file
+- Rename file functionality (MoveFile)
+- Fix TClassBrowser.AdvancedCustomDrawItem crash
 
 - Implement conditional search
 https://sourceforge.net/p/orwelldevcpp/tickets/143/
