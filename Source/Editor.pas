@@ -946,11 +946,11 @@ var
 
   procedure HandleBraceCompletion;
   var
-    KeyWordBefore, Indent, MoreIndent: AnsiString;
+    LineBeforeCaret, Indent, MoreIndent: AnsiString;
     IndentCount, TabCount: integer;
   begin
     // Determine what word is before us
-    KeyWordBefore := Trim(Copy(fText.LineText, 1, fText.CaretX - 1));
+    LineBeforeCaret := Trim(Copy(fText.LineText, 1, fText.CaretX - 1));
 
     // Determine current indent
     IndentCount := fText.LeftSpacesEx(fText.LineText, True);
@@ -966,8 +966,8 @@ var
 
     // For case, do the following:
     //{ + enter + indent + tab + break; + enter + }
-    if StartsStr('case', KeyWordBefore) or
-      StartsStr('default', KeyWordBefore) then begin
+    if StartsStr('case', LineBeforeCaret) or
+      StartsStr('default', LineBeforeCaret) then begin
 
       // Get extra indentation string
       if eoTabsToSpaces in fText.Options then
@@ -981,12 +981,13 @@ var
 
       // For other valid block starts, do the following:
       // { + enter + indent + }
-    end else if EndsStr(')', KeyWordBefore) or
-      SameStr('', KeyWordBefore) or
-      EndsStr('else', KeyWordBefore) or
-      EndsStr('try', KeyWordBefore) or
-      EndsStr('catch', KeyWordBefore) or
-      EndsStr('do', KeyWordBefore) then begin
+    end else if EndsStr(')', LineBeforeCaret) or
+      SameStr('', LineBeforeCaret) or
+      EndsStr('else', LineBeforeCaret) or
+      EndsStr('try', LineBeforeCaret) or
+      EndsStr('catch', LineBeforeCaret) or
+      StartsStr('namespace', LineBeforeCaret) or
+      EndsStr('do', LineBeforeCaret) then begin
 
       InsertString('{' + #13#10 + Indent + '}', false);
       fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
@@ -995,11 +996,11 @@ var
       // For structs and derivatives, do the following:
       // { + enter + indent + }; <-- SAME EXCEPT FOR THE SEMICOLON
     end else if
-      StartsStr('struct', KeyWordBefore) or
-      StartsStr('union', KeyWordBefore) or
-      StartsStr('class', KeyWordBefore) or
-      StartsStr('enum', KeyWordBefore) or
-      StartsStr('typedef ', KeyWordBefore) then begin
+      StartsStr('struct', LineBeforeCaret) or
+      StartsStr('union', LineBeforeCaret) or
+      StartsStr('class', LineBeforeCaret) or
+      StartsStr('enum', LineBeforeCaret) or
+      StartsStr('typedef ', LineBeforeCaret) then begin
 
       InsertString('{' + #13#10 + Indent + '};', false);
       fText.CaretXY := BufferCoord(fText.CaretX + 1, fText.CaretY);
