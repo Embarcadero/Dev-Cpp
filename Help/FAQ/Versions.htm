@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../content.css" rel="stylesheet" type="text/css"/>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<script src="../main.js" type="text/javascript"></script>
+</head>
+<body>
+	<div class="Heading2"><b>Q:</b> What are the differences between the portable and setup version?</div>
+	<div class="Text"><b>A:</b> The only difference is that the portable version ships with an executable called "devcppPortable.exe" which tells Dev-C++ to store its configuration files in ".\config\" instead of in %APPDATA%. Dev-C++ will be executed the following way:
+	<div class="Code">devcpp.exe -c .\config &ltparameters passed to devcppPortable&gt</div>
+	<div class="Text">As a result of this, the Dev-C++ folder can be moved around and Dev-C++ will keep working.</div>
+	<br/>
+	<div class="Heading2"><b>Q:</b> Q: What are the differences between the 32bit and 64bit version?</div>
+	<div class="Text"><b>A:</b> The only difference is that the compiler that ships with the 64bit version can create 64bit programs. <b>All versions work on 32bit systems.</b> When using the 64bit version on 32bit systems, please make sure to compile for 32bit, or you won't be able to run your compiled programs. Check out the <div class="Link" onclick="OpenPage('Compiler','FAQ/Compiler.htm')">Compiler</div> section to find out how to do that.</div>
+</body>
+</html>

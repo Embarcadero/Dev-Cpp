@@ -1,0 +1,82 @@
+#
+#
+# Traducción ó Galego
+# Creado por Antonio Pequeño Baz
+# E-mail: webmaster@galaico.net
+# Web: http://traduccions.galaico.net
+# Para calquer suxerencia ou outra cousa mandarme un e-mail
+# Modificado mércores 18 de febreiro de 2004
+# Galego V1.02 15.03.2004 Dev-CPP 4.9.8.7
+#
+
+
+#
+# Important tips (appear first)
+#
+...o traductor de Dev-C++ ó galego é Anio_pke?<CR>Podes mandarme comentarios, suxerencias, erratas sobre a traducción ou outras cousas a:<CR><CR>        webmaster@galaico.net<CR><CR>Tamén podes ir a miña web e descargarte as últimas actúalizacións da traducción.<URL>http://traduccions.galaico.net<UDESC>
+
+...non deberías quita-las suxerencias do día?<CR><CR>As suxerencias que apareceren aquí dante información que non aparece en ningunha outra parte.<CR>Se as desactivas e queres velas máis tarde pode-lo facer en "Axuda / Suxerencia do día"...
+
+...podes cambia-lo tema das iconas e a lingua que elixiste o executar por primeira vez o programa?<CR><CR>Vai a Ferramentas / Opcións do Entorno / Interface e podes elexir outra lingua, un novo tema e máis opcións.
+
+...podes usar WebUpdate para manter o entorno Dev-C++ actualizado cós últimos erros solucionados e novas e mellores opcións?<CR><CR>Selecciona "Ferramentas / Actualizacións"
+
+...a páxina oficial de Dev-C++ ten foros onde intercambiar opinións e respostas sobre funcións, instruccións e todo o que queiras?<CR><CR>Pódelo ver tamén no menú de Axuda, en Acerca de Dev-C++ máis direccións de interese.<CR><CR>Podes ir á páxina facendo clic en <URL>http://www.bloodshed.net/dev/<UDESC>
+
+...a páxina oficial de Dev-C++ ten links hacia documentos de axuda sobre as linguas de programación C e C++?<CR><CR>Tamén ten links a MSDN e ás axudas do compilador Gcc.<CR><CR>Para ir directamente, faga clic en... <URL>http://www.bloodshed.net/dev/doc/index.html<UDESC>
+
+...podes insertar novos compiladores para compilar os teus códigos fonte?<CR><CR>Vai a Ferramentas / Opcións do Compilador e presionando o botón + engadirás un compilador.<CR><CR>Terás que configuralo nas pestanas de Directorios e Programas.<CR><CR>E xa estará casi todo listo para usar distintos compiladores.
+
+#
+# Code-completion tips
+#
+
+...a característica de autocompletar texto axudarache a incrementar a túa productividade ó suxerirte tódolos posibles comandos dispoñibles no contexto actual?<CR><CR>Para activar esta opción, vai a "Ferramentas / Opcións do Editor" e activa o Explorador de Clases e Autocompletar Código.
+
+...a característica de autocompletar código mostrase cando escribes ".", "->" ou "::" no editor despois dun tempo definido polo usuario?<CR><CR>Para definir este tempo vai a "Ferramentas / Opcións do Editor / Explorador de Clases / Autocompletar código".
+
+...podes mostra-la característica de autocompletar código presionando á vez "Ctrl" e "Space" no editor?<CR><CR>(Intenta presionando "Ctrl","Shift" e "Space" á vez mentras o cursor esté nos argumentos pasados a unha función...)
+
+...facendo Clic mentras presionas "Shift" nunha entrada do Explorador de Clases, lévate a unha declaración en vez de a unha implementación?<CR><CR>Por suposto, tamén podes usa-lo menú contextúal (¡e máis opcións!) para dita función.
+
+...podes engadir carpetas personais no Explorador de Clases para encontrar máis fácilmente o que buscas nos grandes proxectos? ¡Podes colocar unha ou varias dentro de outras carpetas personais!<CR><CR>Só facendo Clic có Botón Dereito no Explorador de Clases para traer ó menú contextúal...
+
+...podes oculta-lo Explorador de Proxectos/Clases?<CR><CR>Para iso vai a Ver /Explorador de Proxectos/Clases.<CR><CR>Se estivese oculto podes volvelo a poñer do mesmo modo.
+
+...a información do Explorador de Clases está gardada nun arquivo chamado "classfolders.dcf" na carpeta dos proxectos?<CR><CR>¡Se algo malo sucedese, simplemente borra dito arquivo e reabre o teu proxecto!
+
+...hai dous modos de visualización para o Explorador de Clases?<CR><CR>Un mostrate as clases, membros e funcións analizados do proxecto, e o outro a información importante ó arquivo mostrado no editor.<CR><CR>Simplemente, faga Clic có Botón Dereito no Explorador de Clases e selecciona "Modo vista..."
+
+#
+# Project Manager tips
+#
+
+...podes definir se terás que facer Clic Simple ou Doble Clic nun arquivo do Explorador de Proxectos para abrilo e mostralo no editor?<CR><CR>Para cambiar isto vai a "Ferramentas / Opcións do Entorno" e activa (ou desactiva) "Doble Clic para Abrir Arquivos do Explorador de Proxecto"...
+
+...podes crear carpetas personais(só as do nivel superior) no Explorador de Proxectos para organizar os teus arquivos mellor?<CR><CR>Para facer isto, faga Clic có Botón Dereito no Explorador de Proxecto para traer o menú contextúal á pantalla...
+
+...se creaste carpetas no Explorador de Proxectos, podes arrastrar e soltar arquivos nunha ou noutra carpeta para reorganizalos?
+
+#
+# File menu tips
+#
+
+...podes conseguir información sobre o arquivo no que estás traballando?<CR><CR>¡Selecciona "Arquivo / Propiedades" e conseguirás información sobre o seu tamaño, o número de liñas de código, de comentarios, vacías e dos arquivos incluidos!
+
+...podes garda-lo teu proxecto como unha plantilla?<CR><CR>Selecciona "Arquivo / Novo / Plantilla". Así conseguirás que o teu proxecto ó gardarse sexa unha plantilla e estará dispoñible cando selecciones "Arquivo / Novo / Proxecto".<CR><CR>¡Desta maneira terás unha base na que comezar, feita có teu toque!
+
+...podes importa-los teus Proxectos de MS Visual C++ a Dev-C++?<CR><CR>Simplemente selecciona "Arquivo / Importar proxecto de MS Visual C++".<CR><CR>¡Ó mellor tes que configurar as opcións do proxecto antes de importalo pero, o traballo de importar está logrado!
+
+...podes exportar código fonte a proxectos, a HTML ou a RTF?<CR><CR>Desta maneira podes subir os códigos a túa páxina web e compartilos con todo o mundo!<CR><CR>Simplemente faga Clic en "Arquivo / Exportar" e selecciona a túa opción...
+
+#
+# Edit menu tips
+#
+
+...podes engadir un comentario (ou quitalo) seleccionando un grupo de liñas e facendo Clic en "Edición / Engadir Comentario (Quitar Comentario)"?
+
+...podes poñer marxe (ou quitalo) seleccionando un grupo de liñas e facendo Clic en "Edición / Poñer marxe (Quitar marxe)"?
+
+...podes usar marcadores no editor para desplazarte ó longo do código rápidamente?<CR><CR>faga ou quita un marcador facendo Clic en "Edición / Activar Marcador" e seleccionando o número de marcador.<CR><CR>Podes ir a un marcador seleccionando o número en "Edición / Ir a Marcador".
+
+...hai un potente comando "Ir a Función" no menú "Buscar"?<CR><CR>Mostra tódalas funcións do arquivo, e escribindo parte do nome da función mostra a lista de argumentos. ¡Presiona Intro e irás á función inmediatamente!<CR><CR>Nota: Ten que estar activado o Explorador de Clases...

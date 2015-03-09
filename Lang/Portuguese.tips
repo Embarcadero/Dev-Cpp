@@ -1,0 +1,90 @@
+#
+# Author: Pedro C. Silva [pedro@dcc.uesb.br]
+# Thanks for everyone who helped me.
+# Suggestions or bugs, mail me.
+# 
+# Obrigado a todos que me ajudaram.
+# Sugestões ou bugs encontrados, mandem um email p/ mim.
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+...posso desabilitar essas dicas?<CR><CR>As dicas apresentadas aqui são informações não documentadas e você não as encontrarão em nenhum lugar.<CR>Se você as desabilitar e depois quiser vê-las mais tarde, selecione "Ajuda / Dica do dia"...
+
+...posso usar o vUpdate para manter o Dev-C++ atualizado com as últimas correções de bugs e novas funcionalidades?<CR><CR>Selecione "Ferramentas / Atualizações... / Pacotes..."
+
+#
+# Code-completion tips
+#
+...a complementação de código irá ajudar a aumentar a produtividade, sugerindo todos os possíveis comandos disponíveis no contexto atual?<CR><CR>Para habilitar a complementação de código, vá em "Ferramentas / Opções do Editor" e habilite a visualização de classes e a complementação de código.
+
+...a complementação de código é iniciada quando digitamos ".", "->" or "::" na janela do editor após um tempo definido pelo usuário?<CR><CR>Para definir este tempo vá em "Ferramentas / Opções do Editor / Visualização de Classes / Complementação".
+
+...posso iniciar a complementação de código pressionando "Ctrl+Space" em qualquer momento, na janela do editor?<CR><CR>(Tente pressionar "Ctrl+Shift+Space" quando o cursor estiver dentro do parêntesis de argumento de uma função...)
+
+...shift-clique na entrada do visualizador de classes, fornece a declaração ao invés da implementação?<CR>Com certeza, você pode também usar o menu de contexto para a mesma (e mais!) função...
+
+...posso adicionar diretórios customizados no visualizador de classes para localizar facilmente o que desejar, em grandes projetos? Você pode até aninhar os diretórios customizados!<CR><CR>Basta clicar com o botão direito no visualizador de classes para ter o menu contextual...
+
+...as informações dos diretórios customizados estão guardadas no arquivo "classfolders.dcf", no diretório raiz do projeto?<CR><CR>Se alguna coisa acontecer de errado, delete este arquivo e reabra o seu projeto!
+
+...existem dois modos de exibição do visualizador de classes?<CR>Um mostra todas as suas classes/membros/funções, analisadas do projeto, e o outro mostra *somente* informações relevantes do arquivo que está sendo editado atualmente.<CR><CR>Clique com o botão direito no visualizador de classes e selecione "Modo de Visualização"...
+
+#
+# Project Manager tips
+#
+...posso definir se terei que dar duplo-clique ou não, em um arquivo, no gerenciador de projetos, para abrí-lo num editor?<CR><CR>Para definir isto vá em "Ferramentas / Opções de Ambiente" e habilite (ou desabilite) "Duplo clique para abrir o gerenciador de arquivos de projetos"...
+
+...posso definir diretórios customizados (nível superior somente) no gerenciador de projetos para organizar melhor os arquivos?<CR><CR>Para isso, clique com o botão direito em um arquivo no gerenciador de projetos para exibir o menu contextual...
+
+...se você criou diretórios customizados no gerenciador de projetos, você pode arrastar && soltar arquivos para rearrumá-los?
+
+#
+# File menu tips
+#
+...posso obter informação sobre o arquivo que estou trabalhando?<CR><CR>Selecione "Arquivo / Propriedades" e você irá obter infromação sobre o tamanho do arquivo, número de linhas, linhas de comentários, linhas vazias e arquivos incluídos!
+
+...posso salvar o meu projeto como modelo?<CR><CR>Selecione "Arquivo / Novo / Modelo". Isto irá salvar o seu projeto como um modelo Dev-C++ e estará disponível quando você selecionar "Arquivo / Novo / Projeto".<CR>Desta forma você terá uma base para começar a programar, de acordo com seu gosto!
+
+...posso importar meus projetos do MS Visual C++ no Dev-C++?<CR><CR>Selecione "Arquivo / Importar / Importar projeto do MS Visual C++".<CR>Talvez você tenha que ajustar algumas opções do projeto após a importação, mas veja, já é algum progresso!
+
+...posso exportar um arquivo fonte ou todo um projeto para HTML ou RTF?<CR>Desta forma você pode publicar seus fontes em um website e compartilhá-los com o mundo!<CR><CR>Clique em "Arquivo / Exportar" e selecione o método desejado...
+
+#
+# Edit menu tips
+#
+...posso (des)comentar um conjunto de linhas selecionando-as e então clicando em "Editar / (Des)Comentar"?
+
+...posso (un)indentar um conjunto de linhas selecionando-as e então clicando em "Editar / (Un)Indentar"?
+
+...posso usar bookmarks no editor para me mover pelo código rapidamente?<CR><CR>Crie ou não um bookmark clicando em "Editar / Criar bookmarks" e selecionando o número do bookmark.<CR>Você pode ir para um conjunto de bookmarks clicando em "Editar / Ir para Goto bookmarks" e selecionando o número do bookmark.
+
+...existe uma função "Ir para" poderosa no menu Localizar?<CR><CR>Ela exibe todas as funções dos arquivos e ao digitar algumas partes do nome das funções, o filtro vai exbindo somente as funções relacionadas. Pressione enter e você irá pra esta função imediatamente!<CR>Nota: O Visualizador de Classes deve estar habilitado...

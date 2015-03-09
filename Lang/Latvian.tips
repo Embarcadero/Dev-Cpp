@@ -1,0 +1,85 @@
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#Translated by Aleksejs Zosims
+#E-mail: AZosims@rsdc.lv
+
+#
+# Important tips (appear first)
+#
+...ka nevajadzçtu atslçgt ðos padomus?<CR><CR>Ðeit esoðie padomi dos tev nedokumentçtu informâciju, kas nav atrodama nekur citur.<CR>Ja tu tos izslçgsi un vçlâk vçlçsies apskatît, paòem "Palîdzîba / Dienas padoms"...
+
+...ka vari izmantot vUpdate, lai apgâdâtu savu Dev-C++ vidi ar pçdçjiem kïûdu labojumiem un jaunâkajâm iespçjâm?<CR><CR>Paòem "Rîki / Meklçt Atjaunojumus/Packages..." 
+#
+# Code-completion tips
+#
+...ka koda pabeigðanas opcija var paaugstinât produktivitâti, iesakot visas paðreizçjajâ kontekstâ iespçjamâs komandas?<CR><CR>Lai ieslçgtu koda pabeigðanu, paòem "Rîki / Redaktora Opcijas" un ieslçdz klaðu pârlûku un koda pabeigðanu.
+
+...ka koda pabeigðanas opcija nostrâdâ pçc noteiktas aiztures, kad redaktora logâ ieraksta ".", "->" vai "::"?<CR><CR>Lai piereglçtu ðo aizturi, palabo "Rîki / Redaktora Opcijas / Klaðu pârlûkoðana / Pabeigðana".
+
+...ka koda pabeigðanu var izsaukt, nospieþot "Ctrl+Space", jebkurâ brîdî, kad esi redaktora logâ?<CR><CR>(Pamçìini nospiest "Ctrl+Shift+Space" atrodoties funkcijas argumentu iekavâs...)
+
+...ka turot "shift" un klikðíinot uz kâda ieraksta klaðu pârlûkâ, tevi pârceï uz deklarâciju nevis implementâciju?<CR><CR>Protams, var arî izmantot konteksta izvçlni ðim paðam (un daudziem citiem!) mçríiem...
+
+...ka var pievienot savas mapes klaðu pârlûkâ, lai bûtu vienkârðâk orientçties lielos projektos? Var pat ðîs mapes ievietot vienu otrâ!<CR><CR>Vienkârði noklikðíini labo pogu klaðu pârlûkâ, lai parâdîtos konteksta izvçlne...
+
+...ka klaðu pârlûka mapju informâcija glabâjas failâ "classfolders.dcf" projekta saknes mapç?<CR><CR>Ja kaut kas nojûk, tad vienkârði izdzçs ðo failu un vçlreiz atver projektu!
+
+...ka klaðu pârlûkâ ir divi skata veidi?<CR>Viens râda visas projektâ izbantotâs klases/memberus/funkcijas, bet otrs râda informâciju, kas attiecas *tikai* uz paðreiz labojamo failu.<CR><CR>Vienkârði veic labo klikðíi klaðu pârlûkâ un izvçlies "Skata veids"...
+
+#
+# Project Manager tips
+#
+...ka vari noteikt to, vai failu no projekta saraksta atver ar vienkârðo- vai ar dubult-klikðíi?<CR><CR>Lai nodefinçtu ðo lietu, paòem "Rîki / Vides Opcijas" un ieslçdz (vai izslçdz) punktu "Dubultklikðíis, lai atvçrtu Projekta Pârvaldes Failus"...
+
+...ka var nodefinçt savas mapes (tikai augðçjâ lîmenî) projekta vadîbas logâ, lai labâk organizçtu savus failus?<CR><CR>Lai to izdarîtu, noklikðíini labo pogu projekta vadîbas logâ, lai parâdîtos konteksta izvçlne...
+
+...ka, ja ir izveidotas savas mapes projekta vadîbas logâ, tâs var mainît ar vietâm vienkârði pârvelkot no vienas vietas uz otru?
+
+#
+# File menu tips
+#
+...ka var apskatît informâciju par failu, ar kuru ðobrîd strâdâ?<CR><CR>Paòem "Fails / Îpaðîbas" un iegûsi informâciju par faila izmçru, rindu skaitu, komentâru skaitu (rindâs), tukðo rindu skaitu, kâ arî par include failiem!
+
+...ka vari saglabât savu projektu kâ ðablonu?<CR><CR>Paòem "Fails / Jauns / Ðablons". Tâ saglabâsi savu projektu kâ Dev-C++ ðablonu, un ðis ðablons bûs pieejams, kad izvçlçsies "Fails / Jauns / Projekts".<CR>Tâdâ veidâ vari izveidot projektu sagataves, kas atbilst tavai gaumei!
+
+...ka vari importçt savus MS Visual C++ projektus?<CR><CR>Vienkârði izvçlies "Fails / Importçt / Importçt MS Visual C++ projektu".<CR>Var gadîties, ka pçc importçðanas nâksies nedaudz pielabot projekta paametrus... Bet galu galâ arî tas ir labi :)
+
+...ka vari eksportçt source failu vai visu projektu uz HTML vai RTF?<CR>Ðâdâ veidâ tu vari izvietot savu pirmkodu (source ;) ) weblapâ un dalîties informâcijâ ar visu pasauli!<CR><CR>Vienkârði noklikðíni "Fails / Eksportçt" un izvçlies eksportçðanas metodi...
+
+#
+# Edit menu tips
+#
+...ka vari ATkomentçt lîniju kopu, tâs aizzîmçjot un noklikðíinot "Labot / ATkomentçt"?
+
+...ka vari samazinât atkâpi lîniju grupai, tâs aizzîmçjot un noklikðíinot "Labot / Samazinât Atkâpi"?
+
+...ka vari lietot iezîmes redaktorâ, lai âtri pârvietotos pa kodu?<CR><CR>Ieslçdz vai izslçdz iezîmi, noklikðíinot "Labot / Pârslçgt Piezîmes" un paòemot iezîmes numuru.<CR>Lai aizietu uz iezîmi, noklikðíini "Labot / Iet uz Iezîmçm" un izvçles iezîmes numuru.
+
+...ka "Meklçt" izvçlnç atrodas jaudîgâ "Iet uz funkciju..." komanda?<CR><CR>Tâ parâda visas faila funkcijas un, ierakstot kâdu funkcijs vârda daïu, saraksts atfiltrç rezultâtus. Nospied "Enter" un tu nokïusi uzreiz pie ðis funkcijas!<CR>Piezîme: Klaðu pârlûkoðanai ir jâbût ieslçgtai...

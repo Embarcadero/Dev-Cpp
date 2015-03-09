@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Heading1">Debugging a source file</div>
+	<div class="Text">Debugging a source file can be done using the following steps:</div>
+	<ul>
+		<li>Create (Ctrl+N) or open (Ctrl+O) a source file.</li>
+		<li>At Tools >> Compiler Options, select a compiler set that supports debugging (-g3).</li>
+		<li>Click Debug (F5) to compile and debug the currently visible file.</li>
+		<li>Place a breakpoint by clicking on a line number or use F4 to pause your program and inspect it.</li>
+	</ul>
+	<div class="Heading1">Debugging a project</div>
+	<div class="Text">Debugging a project file can be done using the following steps:</div>
+	<ul>
+		<li>Create (Ctrl+N) or open (Ctrl+O) a project.</li>
+		<li>At Project >> Project Options >> Compiler, select a compiler set that supports debugging (-g3).</li>
+		<li>Click Debug (F5) to compile and debug the project.</li>
+		<li>Place a breakpoint by clicking on a line number or use F4 to pause your program and inspect it</li>
+	</ul>
+	<div class="Heading2">Tips</div>
+	<div class="Text">
+	<ul>
+		<li>When changing compiler sets, make sure to rebuild before debugging. Dev-C++ will only suggest doing so if a source file is newer the executable, but not when the compiler changes!</li>
+		<li>Optimization (-Ox) will, among other effects, change the order of execution and can remove code that yields no net change. This can be quite annoying when walking through code line by line. Consider debugging without optimization or use -Og to fix this.</li>
+		<a href="http://gcc.gnu.org/onlinedocs/gnat_ugn_unw/Debugging-Optimized-Code.html">http://gcc.gnu.org/onlinedocs/gnat_ugn_unw/Debugging-Optimized-Code.html</a>
+		<li>Adding debug information usually more than doubles compilation time. Consider disabling it to lower compilation times.</li>
+		<li>The strip flag (-s) will remove debugging information added by -g3. Consider disabling it.</li>
+		<li>Debugging information adds considerable size (an order of magnitude isn't out of the ordinary) to created programs. Consider disabling it to reduce file size.</li>
+	</ul>
+	</div>
+</body>
+</html>

@@ -549,6 +549,7 @@ end;
 
 function TTestClass.TestAll: Boolean;
 begin
+  // TODO: further automate other tests
   Result := TestEditorList and TestEditor;
 end;
 

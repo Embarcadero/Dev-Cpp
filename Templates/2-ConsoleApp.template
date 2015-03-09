@@ -1,0 +1,16 @@
+[Template]
+ver=1
+Name=Console Application
+Icon=ConsoleToo.ico
+Description=A console application (MS-DOS window)
+Category=Basic
+
+[Unit0]
+CName=main.c
+CppName=main.cpp
+C=consoleapp_c.txt
+Cpp=consoleapp_cpp.txt
+
+[Project]
+UnitCount=1
+Type=1

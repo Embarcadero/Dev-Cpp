@@ -1,0 +1,86 @@
+# Autor: Sorin Cãlinicã
+# Orice eroare de traducere vã rog sã o semnalaþi la
+# scalinica@go.ro
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+...nu ar trebui sã dezactivaþi aceste indicii?<CR><CR>Indiciile prezentate aici oferã informaþii nedocumentate în altã parte.<CR>Dacã le dezactivaþi ºi mai târziu doriþi reactivarea lor, selectaþi "Ajutor / Indiciul Zilei"...
+
+...puteþi utiliza vUpdate pentru a fi sigur cã mediul de programare Dev-C++ beneficiazã de ultimile retuºuri ºi de noile caracteristici?<CR><CR>Selectaþi "Instrumente / Noi Versiuni/Pachete..."
+
+#
+# Code-completion tips
+#
+...posibilitatea de întregire-cod vã ajutã sã vã creºteþi productivitatea prin sugerarea tuturor comenzilor disponibile în contextul curent?<CR><CR>Pentru a activa întregirea codului, mergeþi în "Instrumente / Opþiuni Editare" ºi bifaþi exploratorul de clase ºi întregire-cod.
+
+...posibilitatea de întregire-cod intrã în acþiune atunci când scrieþi ".", "->" sau "::" în fereastra de editare dupã un timp de aºteptare definit de utilizator?<CR><CR>Pentru a defini acest timp de aºteptare mergeþi în "Instrumente / Opþiuni Editare / Explorare Clase / Întregire".
+
+...puteþi beneficia de întregirea codului prin apãsarea în orice moment a combinaþiei de taste "Ctrl+Space" în fereastra de editare?<CR><CR>(Încercaþi combinaþia "Ctrl+Shift+Space" în timp ce cursorul se aflã în interiorul parantezelor unor argumente de funcþii...)
+
+...dând clic pe o intrare în exploratorul de clase, mergeþi direct la declaraþii în loc de implementare?<CR>Bineînþeles, puteþi folosi meniul contextual pentru mai multe funcþiuni...
+
+...puteþi folosi dosarele preferate în exploratorul de clase pentru a cãuta mai uºor prin proiectele de mari dimensiuni? Puteþi chiar sã creaþi o structurã de directoare proprie!<CR><CR>E suficient un clic-dreapta în exploratorul de clase pentru a activa meniul contextual...
+
+...informaþiile despre exploratorul de clase sunt pãstrate în fiºierul "classfolders.dcf" din directorul rãdãcinã al proiectului dvs?<CR><CR>Dacã apar nereguli e suficient sã ºtergeþi acest fiºier ºi sã redeschideþi proiectul!
+
+...existã douã moduri de afiºare a exploratorului de clase?<CR>Unul aratã toate clasele/membrii/funcþiile proiectului pe când celãlalt afiºeazã informaþii relevante doar pentru fiºierul aflat în editare.<CR><CR>E suficient sã daþi clic-dreapta pe exploratorul de clase ºi sã alegeþi "Mod de vizualizare..."
+
+#
+# Project Manager tips
+#
+...puteþi defini deshiderea cu simplu-clic sau cu dublu-clic a unui fiºier pentru editarea în managerul de proiecte?<CR><CR>Pentru acest lucru mergeþi în "Instrumente / Opþiuni mediu de programare" ºi activaþi (sau dezactivaþi) "Dublu Clic pentru a deschide Managerul de Fiºiere ale Proiectului"...
+
+...puteþi defini dosare preferate (doar pentru primul nivel) în mangerul de proiect pentru a vã organiza mai bine fiºierele?<CR><CR>Pentru acesta, daþi clic-dreapta pe un fiºier din managerul de proiecte pentru a deschide meniul contextual...
+
+...dacã aþi creat dosare personalizate în managerul de proiect puteþi folosi drag && drop pentru rearanjarea lor?
+
+#
+# File menu tips
+#
+...puteþi obþine informaþii despre fiºierul la care lucraþi?<CR><CR>Selectaþi "Fiºier / Proprietãþi" ºi veþi avea informaþii despre mãrimea fiºierului, numãrul de linii, linii comentate, linii vide ºi fiºiere incluse!
+
+...puteþi salva proiectul dvs ca ªablon?<CR><CR>Selectaþi "Fiºier / Nou / ªablon". Acest lucru va duce la salvarea proiectlui dvs ca ºablon Dev-C++ fãcându-l disponibil atunci când selectaþi "Fiºier / Nou / Proiect".<CR>În acest mod veþi avea o bazã de codare, conform gusturilor proprii!
+
+...puteþi importa proiectele dvs din MS Visual C++ în Dev-C++?<CR><CR>E suficient sã selectaþi "Fiºier / Import / Import proiect MS Visual C++".<CR>E nevoie de a pãcãli un pic opþiunile proiectului dupã efectuarea importului dar, nu uitaþi, aceastã facilitate se aflã încã în lucru!
+
+...puteþi exporta un fiºier sursã sau un întreg proiect în formatele HTML sau RTF?<CR>În acest mod puteþi face publice sursele dvs pe un site web arãtându-le lumii!<CR><CR>E suficient sã apãsaþi "Fiºier / Export" ºi apoi sã alegeþi metoda de export...
+
+#
+# Edit menu tips
+#
+...puteþi (de)comenta un set de linii prin selectarea lor ºi dând clic pe "Editare / (De)Comentare"?
+
+...puteþi (de)indenta un set de linii prin selectarea lor ºi dând clic pe "Editare / (De)Indentare"?
+
+...puteþi folosi marcaje la editare pentru o deplasare mai rapidã prin cod?<CR><CR>Activaþi sau dezactivaþi un marcaj dând clic pe "Editare / Activare marcaje" ºi selectând numãrul marcajului.<CR>Deplasaþi-vã printr-un set de marcaje dând clic pe "Editare / Poziþionare pe marcaje" ºi selectând numãrul marcajului.
+
+...existã o comandã puternicã "Poziþionare pe funcþia..." sub meniul "Cãutare"?<CR><CR>Vã aratã toate funcþiile fiºierelor ºi prin introducerea unei porþiuni din numele unei funcþii lista este filtratã. Apãsaþi Enter ºi veþi ajunge imediat la funcþia doritã!<CR>Notã: exploratorul de clase trebuie sã fie activat...

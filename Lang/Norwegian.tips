@@ -1,0 +1,85 @@
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+...at du ikke bør slå av disse tipsene?<CR><CR>De gir deg informasjon om udokumenterte egenskaper som du ikke vil finne andre steder.<CR>Hvis du slår dem av og allikevel vil se dem senere, velg "Hjelp / Dagens tip"...
+
+...du kan bruke WebUpdate til å holde Dev-C++ miljøet ditt oppdatert med de seneste feilrettinger og nye egenskaper?<CR><CR>Velg "Verktøy / Søk etter programoppdateringer..."
+
+#
+# Code-completion tips
+#
+...at bruk av automatisk fullføring av kode vil forbedre produktiviteten din ved å vise alle mulige kommandoer i den aktuelle sammenhengen?<CR><CR>For å aktivere automatisk fullføring av kode, gå til "Verktøy / IDE-innstillinger", og merk både "Bruk klasseoversikt" og "Bruk automatisk fullføring av kode".
+
+...at automatisk fullføring av kode blir aktivert ved å taste ".", "->" eller "::" i redigeringsvinduet, etter den brukerdefinerte forsinkelsen?<CR><CR>For å stille inn denne forsinkelsen, gå til "Verktøy / IDE-innstillinger / Klasseoversikt / Automatisk fullføring av kode".
+
+...at du kan aktivere automatisk fullføring av kode ved å trykke "Ctrl+Space" i redigeringsvinduet?<CR><CR>(Prøv å trykk "Ctrl+Shift+Space" mens cursoren er i en funksjons argumentliste...)
+
+...at du ved å holde Shift nede mens du velger en funksjon i klasseoversikten, hopper til deklarasjonen i stedet for implementeringen av funksjonen?<CR>Du kan selvfølgelig også bruke kontekstmenyen til dette (og mye mer!)...
+
+...at du kan lage dine egne foldere i klasseoversikten for å holde bedre styr på store prosjekter? Du kan til og med lage undergrupper!<CR><CR>Bare høyreklikk i klasseoversikten for å se kontekstmenyen...
+
+...at informasjon om klasseoversikten ligger i en fil kalt "classfolders.dcf" plassert i root-folderen i prosjektet ditt?<CR><CR>Hvis noe går galt og det ser rotete ut, bare slett denne filen og åpne prosjektet ditt på nytt!
+
+...at klasseoversikten har to moduser?<CR>En viser deg alle klasser/medlemmer/funksjoner som er funnet, og den andre viser deg kun relevant informasjon om den aktive filen.<CR><CR>Bare høyreklikk i klasseoversikten og velg "Vis...".
+
+#
+# Project Manager tips
+#
+...at du kan velge om du vil bruke enkelt- eller dobbeltklikk på en fil i prosjektoversikten for å åpne den i redigeringsvinduet?<CR><CR>For å stille inn dette gå til "Verktøy / Miljøinnstillinger" og slå på eller av "Dobbeltklikk i prosjektoversikten åpner filer"...
+
+...at du kan lage dine egne foldere i prosjektoversikten for å organisere filene dine?<CR><CR>Høyreklikk på en fil for å se kontekstmeyen...
+
+...at hvis du har laget dine egne foldere i prosjektoversikten så kan du bruke drag-and-drop for å arrangere dem?
+
+#
+# File menu tips
+#
+...at du kan få informasjon om den filen du arbeider på?<CR><CR>Velg "Filer / Egenskaper" og du vil få informasjon om filens størrelse, antall linjer, kommentarer, tomme linjer og inkluderte filer!...
+
+...at du kan lagre prosjektet ditt som en mal?<CR><CR>Velg "Fil / Ny / Mal". Projektet vil da bli lagret som en Dev-C++ mal og vil være tilgjengelig når du velger "Filer / Nytt / Prosjekt".<CR>På denne måten får du en egendefinert base å starte fra neste gang du lager et nytt prosjekt!...
+
+...at du kan importere prosjekter fra MS Visual C++ i Dev-C++? (Ikke .NET)<CR><CR>Velg "Fil / Importer / Importer MS Visual C++ prosjekt".<CR>Du må kanskje justere prosjektetet litt etter at du har importert det, men ikke glem at dette er fortsatt under utvikling :)...
+
+...at du kan eksportere en kildefil eller et helt prosjekt til HTML eller RTF?<CR>På denne måten kan du laste opp kildefiler til hjemmesiden din og dele dem med hele verden!<CR><CR>Velg "Fil / Eksporter" samt den ønskede eksporteringsmetoden...
+
+#
+# Edit menu tips
+#
+...at du kan utkommentere et sett linjer og dermed deaktivere koden? Bare marker de aktuelle linjene og trykk "Rediger / Sett inn kommentarkode"...
+
+...at du kan aktivere koden i et sett utkommenterte linjer? Bare marker dem og trykke "Rediger / Fjern kommentarkode".
+
+...at du kan rykke inn/ut et sett linjer ved å velge dem og trykke "Rediger / Innrykk el. Fjern innrykk"?
+
+...at du kan bruke bokmerker i redigeringsvinduet for å bevege deg hurtig frem og tilbake i koden din?<CR><CR>Sett eller fjern et bokmerke ved å trykke "Rediger / Sett/fjern bokmerke" og velg et bokmerke.<CR>Gå til et bokmerke ved å velge "Rediger / Gå til bokmerke" og velg bokmerket du vil gå til...
+
+...at det er en svært praktisk "Gå til funksjon" under Søkemenyen?<CR><CR>Den viser alle funksjonene i den aktive filen, og ved at taste inn en del av funksjonsnavnet blir listen mindre. Trykk Enter for å hoppe direkte til en funksjon.<CR><CR>NB!: Klasseoversikten må være aktivert...

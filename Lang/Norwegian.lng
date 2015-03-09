@@ -1,0 +1,1048 @@
+[lang]
+Lang=Norwegian (Norsk bokmål)
+Ver=12
+
+1=&Fil
+2=&Rediger
+3=&Søk
+4=&Vis
+5=&Prosjekt
+6=&Kompiler
+7=V&erktøy
+8=Vi&ndu
+9=&Hjelp
+10=&Debug
+
+
+1001=&Ny
+1002=&Prosjekt...
+1003=&Kildefil
+1004=&Ressursfil
+1005=&Mal...
+1006=&Class...
+1007=New
+
+
+2001=&Åpen prosjekt eller fil...
+2002=S&ist åpnede filer
+2003=Slett fil-&historie
+2004=La&gre
+2005=Lagre &som...
+2006=Lagre al&t
+2007=&Lukk
+2008=L&ukk prosjekt
+2009=Egenskaper
+2010=Lagre &prosjekt som...
+2011=&Eksporter
+2012=til &HTML
+2013=til &RTF
+2014=Prosjekt til HTM&L
+2015=to &Tex
+
+
+3001=&Importer
+3002=&Skriv ut...
+3003=Skriver&oppsett
+3004=&Avslutt
+
+
+4001=&Find Declaration
+4002=F&ind Definition
+4003=&Angre
+4004=&Gjenopprett
+4005=Klipp &ut
+4006=&Kopier
+4007=&Lim inn
+4008=&Merk alt
+4009=&Slett
+4010=Se&tt inn
+4011=Sett/fjern b&okmerke
+4012=Gå &til bokmerke
+4013=&Bokmerke
+4014=&Dato/tid
+4015=&Kommentar
+
+
+5001=&Søk...
+5002=S&øk i filer...
+5003=&Erstatt...
+5004=Sø&k igjen
+5005=&Gå til linje...
+5006=&Interaktivt søk
+5007=Gå &til funksjon...
+5008=Flytende prosjektvindu
+5009=Gå til &prosjektoversikt
+5010=Gå til &klasseoversikt
+5011=&Prosjektvindu
+5012=&Statuslinje
+5013=&Tilbakemeldinger fra kompilator
+5014=&Alltid synlig
+5015=K&un hvis nødvendig
+5016=&Verktøylinjer
+5017=Filer
+5018=Kompiler og kjør
+5019=Prosjekt
+5020=Alternativer
+5021=Spesiell
+5022=Rediger
+5023=Søk
+5024=Flytende &loggvindu
+
+
+6001=&Ny fil
+6002=&Legg til prosjektet
+6003=&Fjern fra prosjektet
+6004=&Rediger ressursfil...
+6005=Prosjekt&oppsett
+6006=Rediger &Makefile
+6007=Legg til ressursfil...
+6008=F&jern ressursfil...
+
+
+7001=&Kompiler
+7002=K&jør
+7003=K&ompiler og kjør
+7004=&Gjenoppbygg alt
+7005=R&ensk ut prosjekt
+7006=Ko&mpileringsresultater
+7007=&Sjekk syntaks
+7008=&Nullstill program 
+7009=Pro&file-analyse
+7010=&Avbryt kompilering
+7011=&Kompilatoroppsett
+7012=&Miljøinnstillinger
+7013=&IDE-innstillinger
+7014=Konfigurer &verktøylinjer
+7015=Rediger &snarveier
+7016=Delete Profiling Information
+
+
+8001=&Full skjerm
+8002=&Tilbake til normal
+8003=&Neste
+8004=F&orrige
+8005=&Lukk alle
+8006=%s versjon %s full skjerm. Trykk Skift+F12 for å slå verktøylinjer på/av, eller F12 for å gå tilbake til normalt vindu.
+8007=Lukk alle unntatt aktivt vindu
+8008=&Vindusliste...
+
+
+9001=&Om Dev-C++...
+9002=&Søk etter programoppdateringer...
+9003=&Konfigurer hjelpemenyen...
+9004=&Hjelp for Dev-C++
+
+
+10001=&Debug
+10002=&Sett/fjern breakpoint
+10003=&Neste trinn
+10004=&Fortsett
+10005=&Legg til overvåkning
+10006=&Overvåk variable
+10007=Stopp kjøring
+10008=&Rediger variable for overvåkning
+10009=&Fjerne overvåkning
+10010=Tr&innvis funksjon
+10011=Kjør frem til &markør
+10012=&Vis CPU-vindu
+10013=Legg til &prosess...
+10014=&Endre verdi
+10015=F&jern alle
+10016=Ny fil
+10017=Legg til fil...
+10018=Fjern fil...
+10019=Alternativer...
+10020=Rediger ressursfil
+
+
+11001=Fjern fil
+11002=Gi nytt navn
+11003=Lukk
+11004=Åpne
+11005=Åpne header
+
+
+12001=Gå til deklarasjon
+12002=Gå til implementering
+12003=Ny klasse
+12004=Ny medlemsfunksjon
+12005=Ny variabel
+12006=Vis..
+12007=Alle filer
+12008=Aktiv fil
+12009=Ny folder
+12010=Fjern folder
+12011=Gi folder nytt navn
+12012=Du kan ikke opprette mer enn %d foldere for et prosjekt...
+12013=Bruk farger
+12014=Prosjektfiler
+12015=Vis nedarvede medlemmer
+12016=Åpne med...
+
+
+13001=Kompilering
+13002=Ressurser
+13003=Kompilatorlogg
+13004=Søkeresultater
+13005=Lukk
+13006=Debug
+
+
+14001=&Slett
+14002=&Kopier
+14003=La&gre
+14004=&Åpne
+
+
+15001=Linje
+15002=Fil
+15003=Beskjed
+15004=Argumenter
+
+
+16001=Finn linje
+16002=Kolonne
+16003=Variabelnavn
+16004=Verdi
+16005=Informasjon:
+16006=Kompilatorlogg:
+16007=Antall feil:
+16008=Filstørrelse:
+
+
+17001=Overvåkte variable
+17002=Spor opp
+17003=Resultat
+17004=Send kommando til GDB:
+17005=Send
+
+
+18001=Ny
+18002=Sett inn
+18003=Sett/fjern
+18004=Gå til
+18005=Prosjektvindu
+18006=Debugvindu
+18007=Loggvindu
+
+
+19001=Åpne fil
+19002=Åpne enhet
+19003=Eksporter til
+19004=Lagre fil
+19005=Lagre prosjekt
+19006=Velg en hjelpefil
+
+
+20001=Ny variabel for overvåking
+20002=Skriv inn variabelnavn:
+20003=Rediger variabelovervåking
+20004=Nytt variabelnavn:
+20005=Endre verdi
+20006=Variabel som skal endres:
+20007=Ny verdi:
+
+
+21001=Prosjekt
+21002=Klasser
+
+
+22001=Sett inn kommentarkode
+22002=Fjern kommentarkode
+22003=Innrykk
+22004=Fjern innrykk
+22005=Skift mellom header/kilde
+22006=Collapse All
+22007=Uncollapse All
+
+
+23001=IDE-innstillinger
+23002=Generelt
+23003=Skrift
+23004=Syntaks
+23005=Kildekode
+23006=Automatisk fullføring av kode
+23007=Klasseoversikt
+23008=Autosave
+
+
+24001=Egendefinerte kodesekvenser
+24002=Standard kildekode
+24003=Files
+24004=Options
+24005=Symbol Completion
+
+
+25001=Skriv inn navn på ny syntaksinnstilling:
+25002=IDE-innstillinger:
+25003=Autoinnrykk
+25004=Innrykkmodus
+25005=Bruk innrykkstegn
+25006=Smart innrykk
+25007=Backspace fjerner inntrykk
+
+
+26001=Angre grupper
+26002=Avansert Home-tast
+26003=Markør etter EOF
+26004=Markør etter EOL
+26005=Dobbeltklikk merker linje
+26006=Finn tekst ved markør
+26007=Vis scrollbars hvis nødvendig
+26008=Halvsides scroll
+26009=Scroll hint
+26010=Bruk syntaksformatering
+26011=Lim inn filer som slippes
+26012=Innrykksstørrelse:
+26013=Høyre marg
+26014=Synlig
+26015=Bredde
+26016=Farge
+26017=Tekstmarkør
+26018=Innsettingsmarkør
+26019=Overskrivningsmarkør
+26020=Vertikal linje
+26021=Horisontal linje
+26022=Halv blokk
+26023=Blokk
+26024=Highlight current line
+26025=Trim trailing spaces
+26026=Enabled
+26027=Gutter width
+
+
+27001=Vis skjulte linjetegn
+27002=Vis redigeringshint
+27003=Marker matchende klammer/parenteser
+27004=Ensure that file ends with newline
+27005=Enabled
+27006=Sets to System HighlightText value
+27007=Sets to WhiteSpace value
+27008=Show function hints
+27009=It is also possible to edit text size by using Control+Scroll, just like in browsers!
+27010=Skrift for kildekode:
+27011=Skrifttype
+27012=Størrelse
+27013=Skrift for tekst
+27014=Venstre kolonne
+27015=Automatisk størrelse
+27016=Linjenummer
+27017=Vis ledene nuller
+27018=Start på null
+27019=Bruk brukervalgt font
+27020=Font for linjenummer
+27021=Forgrunn
+27022=Bakgrunn
+27023=Stil
+27024=Fet
+27025=Kursiv
+27026=Understreket
+27027=Fargeskjema
+27028=Type:
+27029=Lagre endret syntaksinnstilling
+27030=Kildekode
+27031=Menytekst
+27032=Plassering
+27033=Beskrivelse
+27034=Sett inn standard kildekode i tomme prosjekter
+27035=Cache for automatisk fullføring av kode
+27036=Filer i cache:
+27037=Bruk automatisk fullføring av kode
+27038=Forsinkelse (millisekund):
+27039=Bakgrunnsfarge:
+27040=Alternativer for klasseoversikt
+27041=Inkluder lokale filer fra #include referencer
+27042=Eksempel:
+27043=Engine innstillinger
+27044=Visningsinnstillinger
+27045=Bruk klasseoversikt
+27046=Inkluder globale filer fra #include referencer
+27047=Vis kun klasser fra den aktive fil
+27048=Interval:
+27049=Save all open files after each interval
+27050=Nytt prosjekt
+27051=Beskrivelse:
+27052=Enable symbol completion
+27053=Specific completion options
+27054=Complete braces '{}'
+27055=Complete parentheses '()'
+27056=Complete includes '<>' '""'
+27057=Complete square braces '[]'
+27058=Complete multiline comments '/**/'
+
+
+28001=Navn:
+28002=&C-prosjekt
+28003=C&++-prosjekt
+28004=&Bruk som standard språk
+28005=Diverse
+28006=Prosjektinnstillinger:
+
+
+29001=Fjern fra prosjekt
+29002=Velg fil som skal fjernes fra prosjektet:
+
+
+30001=Gå til linje ...
+30002=Ny linje:
+
+
+31001=Konfigurasjon av verktøylinjer
+31002=Aktive verktøylinjer:
+
+
+32001=Rediger verktøyemne
+32002=Tittel
+32003=Program
+32004=Folder
+32005=Parametre
+32006=Sett inn makro
+32007=Tilgengelige makroer
+
+
+33001=Ikon-bibliotek
+33002=Bruk valgt ikon
+33003=Bla igjennom
+
+
+34001=Rediger hurtigtaster
+34002=Klikk kommando, trykk deretter ønsket hurtigtast(er)
+34003=TIPS: Trykk Esc for å slette en hurtigtast...
+34004=Menylinje
+34005=Hurtigtast opprettet
+34006=Avbryt
+34007=OK
+
+
+35001=Gir standard katalog
+35002=Gir Dev-C++ katalog
+35003=Gir navnet på den kompilerte filen
+35004=Gir foldersti for det aktive prosjektet eller kildefil
+35005=Gir filnavnet på det aktive prosjektet eller kildefil
+35006=Gir prosjektets "navn"
+35007=Gir filnavnet på den aktive kildefil
+35008=Gir foldersti til den aktive kildefil
+35009=Gir en liste over kildefiler i det aktive prosjektet
+35010=Gir ordet nærmest markøren i den aktive tekstfilen
+35011=Gir Dev-C++ versjonsnummer
+
+
+36001=Om Dev-C++ :)
+36002=inseculous@users.sourceforge.net
+36003=GNU General Public License
+36004=Kontaktinformasjon
+36005=Bloodshed Software:
+36006=MinGW Compiler:
+36007=Dev-C++ Discussion Forum:
+36008=Dev-C++ users mailing list:
+36009=Utviklernes e-post:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.bloodshed.net/devcpp-ml.html
+36014=haiku@bloodshed.net
+36015=&Søk etter programoppdateringer
+36016=Post-4.9.9.2 Development:
+36017=http://orwellengine.blogspot.com
+
+
+37001=Rediger egendefinert kodesekvens
+37002=Legg til/rediger egendefinert kodesekvens
+37003=Menylinje for kodesekvens (Rediger / Sett inn)
+37004=Beskrivelse av kodesekvens
+37005=Menyplassering
+
+
+38001=Vindu for kompileringsfremdrift 
+38002=&Vis fremdrift under kompilering
+38003=&Lukk vindu etter kompilering
+38004=Ikke bruk oppstartsvidu
+38005=Miljøinnstillinger
+38006=Generelt
+38007=Filer/foldere
+38008=Automatisk åpning
+38009=C++ er standard ved nytt prosjekt
+38010=Vis verktøylinje i fullskjermmodus
+38011=Opprett sikkerhetskopier av filer
+38012=Minimer ved kjøring
+38013=Grensesnitt for fildialog
+38014=Windows 2000 (Sidebar)
+38015=Windows 9x
+38016=Windows 3.1
+38017=Språk:
+38018=Plassering av skilleark i loggvindu:
+38019=Maksimum antall historiske filer i filmeny
+38020=Standard brukerfolder
+38021=Folder for kompilert fil
+38022=Folder for ikon-bibliotek
+38023=Intro-bilde
+38024=Velg standard brukerfolder
+38025=Velg folder for kompilert fil
+38026=Velg folder for ikon-bibliotek
+38027=Alle prosjektfiler
+38028=Kun første prosjektfil
+38029=Ingen
+38030=Vis meny i fullskjermsmodus
+38031=Dobbeltklikk i prosjektoversikt åpner filer
+38032=Folder for språk
+38033=Tema:
+38034=Grensesnitt
+38035=Søk etter tekst
+38036=Søk
+38037=Søk i filer
+38038=&Søk etter tekst
+38039=Alternativer:
+38040=&Stor/liten bokstav
+38041=&Kun hele ord
+38042=Retning
+38043=&Filer i prosjekt
+38044=&Åpne filer
+38045=Søkeområde
+38046=&Globalt
+38047=&Kun valgte
+38048=Start fra
+38049=Fra markør
+38050=Søk i alle
+38051=Retning
+38052=Fremover
+38053=Bakover
+38054=Pause console programs after return
+38055=Opened files at previous closing
+
+
+39001=Erstatt tekst
+39002=Søk etter tekst:
+39003=Erstatt med:
+39004=Innstillinger:
+39005=&Store/små bokstaver
+39006=&Kun hele ord
+39007=&Spør før erstatt
+39008=Retning:
+39009=F&remover
+39010=&Bakover
+39011=Søkeområde:
+39012=&Globalt
+39013=&Kun valgte
+39014=Start fra:
+39015=&Fra markør
+39016=Alle o&mråder
+
+
+40001=Søk etter:
+40002=Type
+40003=Funksjon
+40004=Linje
+
+
+41001=Kompilatoroppsett
+41002=Kompilator
+41003=Foldere
+41004=Kildekode
+41005=Linker
+41006=Programmer
+41007=For more information about GCC's options, please visit
+
+
+42001=Binær
+42002=Bibliotekter
+42003=Inkluderte C-filer
+42004=Inkluderte C++-filer
+
+
+43001=C-kompilator:
+43002=C++-kompilator:
+43003=Kompilator:
+43004=Output
+
+
+44001=Støtte for alle ANSI standard C programmer
+44002=Støtte for noen tradisj. C pre-processorer
+44003=Skjul alle advarsler
+44004=Slå tilgangskontroll av
+44005=Aksepter $ i identifiers
+44006=Bruk heuristisk for hurtigere kompilering
+44007=Bruk kompilatoren Cygwin i stedet for MinGW
+44008=Legg til følgende kommandoer for kompilatoren når den kjøres:
+44009=Forsinkelse (ms):
+44010=Legg til forsinkelse for kompilering i millisekund, hvis Make klager over Make-filens tidsstempel.
+44011=Vis en feil per linje
+44012=Do not recognize asm, inline or typeof as a keyword (-fno-asm)
+44013=Check if pointer is null before accessing storage allocated (-fcheck-new)
+44014=Put uninitialized globals into the common segment (-fconserve-space)
+
+
+45001=Generering av kildekode:
+45002=Optimering:
+
+
+46001=Slå unntakshåndtering på
+46002=Bruk samme størrelse for Double og Float
+46003=Sett inn ekstra kommentarer i generert maskinkode
+46004=Optimer
+46005=Beste optimering
+46006=Utfør mindre optimeringer
+46007=Generering av Makefil:
+46008=Bruk hurtig, men unøyaktig dependency generering
+46009=Kode profilering:
+46010=Generer profil for analyse
+46011=Link et Objective C program
+46012=Generer debug-informasjon
+46013=Bruk ikke-standard systemstartfiler og biblioteker
+46014=Ikke generer konsollvindu
+46015=Legg følgende kommandoer til linkerens kommandlinje:
+46016=Ikke optimer
+46017=Optimer mer
+46018=Do not assemble, but output assembler code (-S)
+46019=Use pipes instead of temporary files during compilation (-pipe)
+
+
+47001=Her kan du endre programmene som brukes av Dev-C++. (Hvis du for eksempel ønsker å bruke en kryss-kompilator) :
+47002=Konfigurer følgende kompilatoroppsett:
+47003=Nytt kompilatoroppsett
+47004=Skriv inn navn på oppsettet
+47005=Du må ha minst ett kompilatoroppsett!
+47006=Er du sikker på du vil slette dette kompilatoroppsettet?
+47007=Endre navn på kompilatoroppsettet
+47008=Skriv inn nytt navn på oppsettet:
+47009=Videre optimering
+
+
+48001=Rediger hjelpemeny
+48002=Menytekst
+48003=Hjelpefil
+48004=Innstillinger for hjelpemeny
+48005=Ikon
+48006=Menyseksjon
+48007=Seksjon 1
+48008=Seksjon 2
+48009=Virker med popup-meny
+48010=Bla igjennom...
+48011=Kontekstsensitiv hjelp for valgt ord
+48012=Velg snarvei for F1
+48013=Show most warnings (-Wall)
+48014=Show some more warnings (-Wextra)
+48015=Check ISO C/C++/C++0x conformance (-pedantic)
+48016=Code Warnings
+48017=Only check the code for syntax errors (-fsyntax-only)
+48018=Make all warnings into errors (-Werror)
+48019=Abort compilation on first error (-Wfatal-errors)
+
+
+49001=Skriv ut fil
+49002=Parametre:
+49003=Sider:
+49004=&Farger
+49005=&Fremhev
+49006=&Tekstbrytning
+49007=&Linjenummer
+49008=Skriv ut linjenummer
+49009=Skriv ut linjenummer i margen
+49010=Antall kopier:
+49011=Skriv ut kun merket område
+49012=Don't Print Line Numbers
+
+
+50001=Søk etter programoppdateringer
+50002=Oppgave:
+50003=Resultat:
+50004=Ny versjon:
+50005=Nødvendig versjon for å bruke:
+50006=Beskrivelse:
+50007=Nedlastningssted (dobbelklikk for å laste ned):
+
+
+51001=Legg til oppgave...
+51002=Beskrivelse
+51003=Prioritet
+51004=Bruker
+
+
+52001=Oppgaveliste...
+52002=Filnavn
+52003=Ferdig
+52004=Bare oppgaver som ikke er markert som ferdige
+52005=Filter
+52006=Alle filer (i prosjektet eller ikke)
+52007=Kun åpne filer (i prosjektet eller ikke)
+52008=Alle prosjektfiler
+52009=Kun åpne prosjektfiler
+52010=Åpne ikke-prosjektfiler
+52011=Kun den aktive fil
+
+
+53001=Importer MS Visual C++ prosjekt
+53002=Velg Visual C++ prosjektfil
+53003=Innstillinger for import
+53004=Konfigurasjon av import
+53005=Dev-C++ prosjekt filnavn
+53006=MS Visual C++ prosjekt filen ble importert og konvertert til et DevC++ prosjekt. Vil du åpne det nå?
+53007=Kan ikke lokalisere målkonfigurasjon "%s" (dette er sannsynligvis en bug i Dev-C++)...
+
+
+54001=Import Code::Blocks project
+54002=Select Code::Blocks project file
+54003=Import options
+54004=Configuration to import
+54005=Dev-C++ project filename
+54006=The Code::Blocks project file has been imported and converted to a Dev-C++ project succesfully! Do you want to open it now?
+54007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
+
+
+55001=Prosjektinnstillinger
+55002=Generelt
+55003=Filer/foldere
+55004=Navn:
+55005=Ikon:
+55006=Bibliotek
+55007=Bla igjennom
+55008=Type:
+55009=Win32 GUI
+55010=Win32 konsoll
+55011=Win32 statisk bibliotek (DLL)
+55012=Win32 dynamisk bibliotek (DLL)
+55013=Kompiler som C++
+55014=Ytterligere innstillinger kommandolinje:
+55015=Kompilator:
+55016=Linkerinnstillinger/valgfrie bibliotek eller objektfiler:
+55017=Bibliotek-folder
+55018=Ressursfiler
+55019=Folder for inkluderte filer
+55020=Velg ikon
+55021=Inkluder i objektfil
+55022=Foldere for ressursfiler
+55023=Build innstillinger
+55024=Foldere
+55025=Folder for &eksekverbar fil
+55026=Folder for &objektfiler
+55027=B&ruk annet filnavn for eksekverbar fil
+55028=Legg til bibliotek/objekt
+55029=%d filer [%d kilde-filer, %d header-filer, %d ressurs-filer]
+
+
+56001=Navn:
+56002=Beskrivelse:
+56003=Kategori:
+56004=Nytt prosjektnavn:
+56005=Filer i mal:
+56006=Ekstra kompilatorinnstillinger:
+56007=Ekstra linkerinnstillinger:
+56008=Ikoner:
+56009=Informasjon om mal
+56010=Filer
+56011=Ekstra
+56012=Ikon for mal
+56013=Nytt prosjekt-ikon
+56014=Opprett
+56015=Ny mal fra prosjekt
+56016=Bruk prosjektets folder for inkluderte filer
+56017=Bruk prosjektets folder for biblioteker
+56018=Bruk prosjektets folder for ressursfiler
+
+
+57001=Returtype:
+57002=Variabel navn:
+57003=Implementer i:
+57004=Tilgangsområde
+57005=Opprett medlemsfunksjon for å LESE fra denne variabelen
+57006=Opprett medlemsfunksjon for å SKRIVE til denne variabelen
+57007=Navn:
+57008=Kommentarer:
+57009=Beskrivelse:
+57010=Stil:
+57011=Opprett
+57012=Avbryt
+57013=Ukjent klasse...
+57014=Kunne ikke finne filnavn for implementering...
+57015=Kunne ikke finne linjenummeret hvor koden skal settes inn...
+57016=Medlemsnavn:
+57017=Argumenter:
+57018=Klassenavn:
+57019=Nedarv fra annen klasse
+57020=Nedarving
+57021=Nedarv fra klasse:
+57022=Header filnavn:
+57023=Implementasjon filnavn:
+57024=Header filnavn:
+57025=Legg til det aktive prosjektet
+57026=Attributter
+
+
+58001=Filnavn
+58002=Prosjektnavn
+58003=Totalt antall linjer
+58004=Antall kodelinjer
+58005=Kommentarer
+58006=Inkluderte filer
+58007=Tomme linjer
+58008=Filstørrelse
+58009=Plassering
+58010=Makefil
+58011=Subfolder/fil
+58012=Filens dato/tidsstempel
+58013=Kompilatoroppsett
+
+
+59001=Profilanalyse
+59002=Ren tekstutskrift
+59003=Grafisk utskrift
+59004=Profiling Options
+59005=Function Hiding
+59006=Hide functions not called long enough
+59007=Hide statically linked file-local functions
+59008=Hide function called less than
+59009=times
+59010=Apply
+59011=Custom Commands
+59012=Use these commands instead:
+
+
+60001=Tekst ''%s'' ikke funnet
+60002=Fil %s kunne ikke åpnes
+60003=Erstatt ''%s'?
+60004=Fil: %s eksisterer allerede i %s
+60005=Er du sikker på at du vil lukke %s
+60006=Lagre endringer i %s?
+60007=Lukk %s og start et nytt prosjekt?
+60008=Døp om til:
+60009=Kompilering har allerede startet
+60010=Lagre endringer i %s?
+60011=Fil eksisterer i allrede, erstatt?
+60012=Legg til ny enhet til det aktive prosjektet?
+60013=Legg til ny ressurs til det aktive prosjektet?
+60014=Prosjektet ditt har ikke debug-informasjon inkludert. Vil du slå debugging på og bygge prosjektet ditt på nytt? 
+60015=Du har ikke slått på profiling og/eller debugging i kompilatoroppsettet. Vil du slå dem på nå og generere prosjektet på nytt?
+60016=Kjør prosjektet minst én gang så profil-informasjonen blir generert...
+60017=Skriv inn navn på ny folder:
+60018=Er du sikker på du vil fjerne denne folder?
+60019=Skriv inn nytt navn på folder:
+60020=Er du sikker på du vil lagre denne skrivebeskyttede filen?
+60021=Det oppsto en feil. Filen %s hadde ikke lese/skrive-tilgang, så den ble IKKE lagret...
+60022=Det oppsto en Access Violation (Segmentation Fault) i programmet ditt.
+60023=Kildefilen er nyere enn kompilert fil. Ønsker du å rekompilere?
+60024=Vennligst velg applikasjon som du ønsker koble opp mot:
+
+
+61001=Kan ikke åpne filen %s
+61002=Kan ikke lagre filen %s
+61003=Kan ikke gi nytt navn til filen %s
+61004=Søkefeltet kan ikke være tomt
+61005=prosjekt er ikke ekskverbart
+61006=prosjekt er ikke kompilert
+61007=Kildefil ikke kompilert
+61008=MAKE-fil ikke funnet.
+61009=Rengjøring lykkes ikke.
+61010=Mal kunne ikke tilknyttes prosjektet.
+61011=%s ressurs ikke funnet: %s - %s
+61012=Mal-fil %s finnes ikke, Ignorert.
+61013=Ingen mal tilknyttet.
+61014=Fil %s finnes ikke.
+61015=Ingen server-applikasjon spesifisert. Du kan sette den i "Kjør / Parametre".
+61016=Server-applikasjon kunne ikke finnes! Du kan endre den i "Kjør / Parametre".
+
+
+62001=Ikke navngitt
+62002=Skrivebeskyttet
+62003=Sett inn
+62004=Overskriv
+62005=Prosjekt %d
+62006=Angi et annet filnavn.
+62007=%d linjer i fil
+62008=Gi fil et nytt navn
+62009=Kjører %s
+62010=Kjøring avbrutt
+62011=bytes
+62012=Endret
+62013=Feil
+62014=Informasjon
+62015=Advarsel
+62016=Spørsmål
+62017=Kompilering gjennemført
+62018=Kompilering avbrutt av bruker
+62019=Line:%6d               Col:%6d               Sel:%6d               Lines:%6d               Length:%6d
+62020=Done parsing
+
+
+63001=&OK
+63002=&Avbryt
+63003=&Hjelp
+63004=&Standard
+63005=&Ja
+63006=&Nei
+63007=&Legg til
+63008=&Rediger
+63009=&Fjern
+63010=Sl&ett
+63011=&Lukk
+63012=&Takk til...
+63013=&Søk
+63014=&Erstatt
+63015=&Slett ugyldig
+63016=Erstatt &alt
+63017=Bla gjennom...
+63018=Fjern
+63019=Gi nytt navn
+63020=Importer
+63021=Vindusmodus
+63022=Fjern
+
+
+64001=CPU-vindu
+64002=Assembler-kode:
+64003=Funksjon:
+64004=Assembler-syntaks:
+64005=Registre:
+
+
+65001=Dagens tips
+65002=Visste du...
+65003=...at det ikke er noen tips å vise? :)
+65004=Ikke vis tips ved oppstart
+65005=Neste tips
+65006=Forrige tips
+
+
+66001=Fil-assosieringer
+66002=Fil-typer:
+66003=Bare kryss av hvilke fil-typer som skal registreres/avregistreres for det programmet som er assosiert med dem...
+66004=CVS-støtte
+66005=CVS programfil
+66006=Komprimeringsnivå (0-9)
+66007=Bruk SSH i stedet for RSH
+66008=Folder for maler
+66009=Velg folder for maler
+66010=Bruk XP-grensesnitt
+66011=Eksterne programer
+66012=Eksternt program
+66013=Fil-etternavn
+66014=Eksterne program for kjøring av filer:
+66015=Overvåk merket variabel
+66016=Rapporter feilmeldinger
+66017=Oversikt over debug-variable 
+66018=Alternativ konfigurasjonsfil
+66019=Bruk denne alternative konfigurasjonsfilen
+66020=Du kan endre konfigurasjonsfilen som skal brukes av applikasjonen.<CR>Den nye konfigurasjonsfilen vil *ikke* bli brukt i den gjeldende sesjonen. Eventuelle konfigurasjonsendringer du foretar i denne sesjonen vil bli lagret i den nåværende konfigurasjonsfilen.<CR><CR>Det bør derfor restarte applikasjonen nå slik at den starter opp med den nye konfigurasjonsfilen...
+66021=Dev-C++ was unable to set file associations.<CR><CR>This is known to be caused by using UAC on a normal non-admin user account.<CR><CR>Please disable UAC or run Dev-C++ as an admin if you want to change file associations using Dev-C++.<CR><CR>You might want to try the "Default Programs" feature in Windows Vista or 7.
+66022=UI font
+
+
+67001=Parametre...
+67002=Kompiler aktiv fil
+
+
+68001=Vindusliste
+68002=Velg vindu du vil redigere:
+
+
+69001=Aktiv fil...
+69002=Hele prosjektet...
+69003=Vennligst konfigurer CVS-støtte i Verktøy/Miljøinnstillinger...
+
+
+70001=Import-innstillinger
+70002=Repository
+70003=Globale innstillinger
+70004=Alternativer for utsjekking
+70005=Alternativer for Commit
+70006=Alternativer for oppdateringer
+70007=Alternativer for Diff
+70008=Logg-alternativer
+70009=CVS-utskrift
+70010=Import
+70011=Utsjekking
+70012=Utfør
+70013=Oppdater
+70014=Differanse
+70015=Logg
+70016=Import-folder
+70017=Handling
+70018=Forhandler
+70019=Frigi
+70020=Logg-beskjed
+70021=Modulnavn
+70022=Fil-etternavn
+70023=Utsjekking som
+70024=Utsjekkingsfolder
+70025=Bruk sub-foldere
+70026=Reset any sticky options
+70027=Lag manglende foldere
+70028=Fjern tomme foldere
+70029=Hopp over lokale endringer
+70030=Før dato
+70031=Utgave/gren/tag
+70032=Hvis ikke funnet, bruk den mest oppdaterte
+70033=Andre utgaver
+70034=Utfør en forenet/koordinert diff
+70035=Sammenlign lokale filer med den samme utgave/tag på nettverket
+70036=Sammenlign lokale filer med den en annen utgave/tag på nettverket
+70037=Sammenlign to utgaver på nettverket
+70038=Er dato
+70039=Logg standard gren
+70040=List bare RCS-filnavn
+70041=Ikke skriv ut tag-navn
+70042=Filter
+70043=Etter utgave/tag
+70044=Etter dato
+70045=Etter bruker
+70046=Repository
+70047=Detaljer
+70048=Tilgangsmetode
+70049=Bruker
+70050=Server
+70051=Katalog på server
+70052=Legg til
+70053=Fjern
+70054=Legg til alternativ
+70055=Fjern alternativ
+70056=Fjern filen fra disken også...
+
+
+71001=Parametre
+71002=Parametre som skal gis videre til programmet ditt:
+71003=Server-applikasjon:
+
+
+72001=Filer
+72002=Prosjektfiler:
+72003=Prosjektalternativer:
+72004=Generer debugg-informasjon
+72005=Generer profil-informasjon
+72006=NB! Disse innstillingene vil overstyre det globale kompilatoroppsettet og berører bare dette prosjektet.
+72007=Support for Windows XP grensesnitt
+72008=Fil-alternativer:
+72009=Inkluder i kompilering
+72010=Kompiler fil som C++
+72011=Versjons-informasjon
+72012=Inkluder versjons-informasjon i prosjektet
+72013=Versjons-detaljer
+72014=Main:
+72015=Minor:
+72016=Revisjon:
+72017=Build:
+72018=Språk:
+72019=Tilleggs-informasjon:
+72020=Overstyr build kommando
+72021=Eksekverbar fil
+72022=Inkluder i linking
+72023=Build prioritet:
+72024=Bruk fortløpende build-nummer ved kompilering
+72025=Bruk egendefinert MAKE-fil (ikke generer MAKE-fil, bruk denne)
+72026=Informasjon for å tilpasse MAKE-filen...
+72027=&Inkluder de følgende filene i MAKE-filen:
+72028=Sync product with file version
+72029=Default to C++ when creating new files
+
+
+73001=Strip kompilert fil
+73002=Generer instruksjoner for den følgende maskinen
+73003=Muliggjør bruk av prosessor-spesifikke innebygde funksjoner
+73004=Optimization level (-Ox)
+73005=Language standard (-std)
+73006=Compile with the following bit width (-mx)
+73007=Optimize less, while maintaining full compatibility (-mtune)
+
+
+74001=Compiler:
+74002=Status:
+74003=File:
+74004=Errors:
+74005=Warnings:

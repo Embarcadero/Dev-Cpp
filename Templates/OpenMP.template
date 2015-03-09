@@ -1,0 +1,19 @@
+[Template]
+ver=1
+Name=OpenMP
+Icon=File Management.ico
+Description=A OpenMP multithreading example
+Category=Console
+
+[Unit0]
+CName=main.c
+CppName=main.cpp
+C=OpenMP_c.txt
+Cpp=OpenMP_cpp.txt
+
+[Project]
+UnitCount=1
+Type=1
+Compiler=-fopenmp
+CppCompiler=-fopenmp
+Linker=-lgomp

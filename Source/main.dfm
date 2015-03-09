@@ -626,7 +626,7 @@ object MainForm: TMainForm
         ImageIndex = 49
         Style = tbsSeparator
       end
-      object ToolButton4: TToolButton
+      object StopBtn: TToolButton
         Left = 131
         Top = 0
         Action = actStopExecute
@@ -2786,7 +2786,9 @@ object MainForm: TMainForm
       OnExecute = actFormatOptionsExecute
     end
     object actRunTests: TAction
+      Category = 'Tests'
       Caption = 'Run Tests'
+      Enabled = False
       ShortCut = 16497
       OnExecute = actRunTestsExecute
     end

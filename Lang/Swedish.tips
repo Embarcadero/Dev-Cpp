@@ -1,0 +1,93 @@
+#
+# Denna fil är översatt av Kalle Wallin (cpp-trans@metalproject.net)
+# Om ni skulle råka hitta några fel eller oegentligheter, var god meddela detta via e-post.
+#
+# Detta är en Dagens tips-fil.
+# Ett tips per rad.
+#
+# Tomma rader, och kommentarrader (börjar med #) ignoreras
+#
+# Makron som kan användas:
+#	<CR>: 		radbrytning
+#	<URL>: 		inleder en URL-länk
+#	<UDESC>: 	inleder en URL-beskrivning
+#
+# Syntax (tipstexten är <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Exempel:
+#	...tipstips<CR><CR>fler rader...<URL>http://www.bloodshed.net/dev<UDESC>Tryck för att besöka Bloodsheds hemsida
+#
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Viktiga tips (visas först)
+#
+
+...du inte borde avaktivera dessa tips?<CR><CR>De tips du finner här ger dig odokumenterad information som du inte hittar någon annan stans.<CR>Om du avaktiverar dem och vill se dem vid ett senare tillfälle, välj "Hjälp/Dagens tips"...
+
+...du kan använda vUpdate för att se till att din Dev-C++-miljö alltid har de senaste bugg-fixarna och fräcka funktionerna?<CR><CR>Välj "Verktyg / Kontroll av uppdateringar/Paket..."
+
+#
+# Kodkomplettering
+#
+
+...kodkompletteringsfunktionen hjälper dig att öka din produktivitet genom att föreslå alla tillgängliga kommandon i det aktuella sammanhanget?<CR><CR>För att använda kodkomplettering, välj "Verktyg / Redigeringsalternativ" och slå på klassbläddraren och kodkomplettering.
+
+...kodkompletteringsfunktionen aktiveras när du skriver ".", "->" eller "::" i redigeringsfönstret efter en anpassningsbar tidsfördröjning?<CR><CR>Denna fördröjning anges under "Verktyg / Redigeringsalternativ / Klassbläddring / Komplettera".
+
+...du kan aktivera kodkompletteringsfunktionen genom att trycka "ctrl+mellanslag" när som helst i redigeringsfönstret?<CR><CR>(Prova att trycka "Ctrl+shift+mellanslag" när markören är inuti en funktionsparentes...)
+
+...genom att shift-klicka på ett objekt i klassbläddraren, kommer du till deklarationen i stället för implementationen?<CR>Givetvis kan du även använda kontextmenyn för denna funktion, samt ett flertal andra...
+
+...du kan lägga till egna mappar i klassbläddraren för att lättare hitta vad du letar efter? Du kan till och med ha undermappar till dessa!<CR><CR>Högerklicka helt enkelt i klassbläddraren för att få upp kontextmenyn...
+
+...informationen om egna mappar i klassbläddraren sparas i en fil som heter "classfolders.dcf" i ditt projekts rotkatalog?<CR><CR>Om något går fel och saker strular till sig behöver du bara radera denna fil och öppna ditt projekt på nytt!
+ 
+...det finns två visningslägen för klassbläddraren?<CR>Ett visar alla tolkade klasser/medlemmar/funktioner i projektet, och det andra visar enbart relevant information för filen du redigerar.<CR><CR>Högerklicka i klassbläddraren och välj "Visa..."
+
+#
+# Projekthantering
+#
+
+...om du vill kan du välja mellan att dubbelklicka eller enkelklicka på en fil i projekthanteraren för att öppna den för redigering?<CR><CR>Detta ställs in under "Verktyg / Miljöalternativ"...
+
+...du kan ha egna mappar (endast en nivå) i projekthanteraren för att ordna dina filer bättre?<CR><CR>Högerklicka helt sonika på en fil i projekthanteraren för att få upp kontextmenyn...
+
+...du kan dra och släppa filer mellan dina egna mappar i projekthanteraren?
+
+#
+# Arkivmenyn
+#
+
+...du kan få information om filen du arbetar med?<CR><CR>Välj "Arkiv / Egenskaper" eller högerklicka på filen och välj detsamma, så får du information om filens storlek, antal rader, kommentarer, tomma rader och inkluderade filer!
+
+...du kan spara ett projekt som en mall?<CR><CR>Välj "Arkiv / Nytt / Mall". Detta sparar ditt projekt som en Dev-C++-mall och finns tillgänglig under "Arkiv / Nytt / Projekt".<CR>På detta viset skapar du en grund att börja koda från, helt anpassad till din smak!
+
+...du kan importera dina MS Visual C++-projekt till Dev-C++?<CR><CR>Detta fins under "Arkiv / Importera".<CR>Du behöver förmodligen ändra projektinställningarna efter att ha importerat, men som bekant är det hela under uppbyggnad...
+ 
+...du kan exportera en källfil eller ett helt projekt till HTML eller RTF?<CR>På detta viset kan du ladda upp din kod till en websida och dela med dig av dem till hela världen!<CR><CR>Välj "Arkiv / Exportera" och välj hur du vill ha det...
+
+#
+# Redigeramenyn
+#
+
+...du kan (av)kommentera en grupp rader genom att markera dem och trycka på aktuellt alternativ i Redigeramenyn? 
+
+...du kan öka/minska indrag på en grupp rader genom att markera dem och trycka på aktuellt alternativ i Redigeramenyn?
+
+...du kan använda bokmärken i redigeraren för att hoppa runt snabbt i koden?<CR><CR>Växling av och hopp mellan bokmärken sker i Redigeramenyn.
+
+#
+# Sökmenyn
+#
+
+...det finns en kraftfull funktion i Sökmenyn som heter "Gå till funktion"?<CR><CR>Den visar alla funktioner i filen och genom att skriva en del av funktionsnamnet filtreras listan på detta. Tryck på retur för att omedelbart gå till vald funktion!<CR>OBS: fungerar endast om klassbläddring är aktiverat...

@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Directories Tab</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Text">Over here, you can tell Dev-C++ which directories to search for for purposes listed below.</div>
+	<br/>
+	<div class="Heading2">Binaries</div>
+	<div class="Text">These directories are searched in this order when executing the compiler, makefile processor, debugger, resource compiler, DLL wrapper and profiler. <b>At least one entry is required.</b> The filenames of these programs can be found <div class="Link" onclick="OpenPage('Settings','Dialog Windows/Compiler Options/Settings.htm')">here</div>.</div>
+	<br/>
+	<div class="Heading2">Libraries</div>
+	<div class="Text">These directories are passed to the linker to tell it which libraries to use, and to the debugger as a search directory using the dir command. Besides that, the first item in this list is the default directory used when adding lib files to a project. This list may be empty, in wich case default library directories of the current compiler set are used.</div>
+	<br/>
+	<div class="Heading2">C(++) Includes</div>
+	<div class="Text">These directories are passed to the compiler when performing C(++) file compilations. They are also used by the code completion engine to find system include headers.  The first item in the list is the default directory when adding header files to a cache. <b>When these lists are empty, code completion will not work, but compiling will.</b></div>
+</body>
+</html>

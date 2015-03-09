@@ -1,0 +1,16 @@
+[Template]
+ver=1
+Name=Windows Application
+Icon=Windows.ico
+Description=A standard Windows application
+Category=Basic
+
+[Unit0]
+CName=main.c
+CppName=main.cpp
+C=winapp_c.txt
+Cpp=winapp_c.txt
+
+[Project]
+UnitCount=1
+Type=0

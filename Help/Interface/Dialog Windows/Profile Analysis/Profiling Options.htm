@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Heading1">Function Hiding</div>
+	<div class="Heading2">Hide functions not called long enough.</div>
+	<div class="Text">Unticking this item adds '-z' to GPROF's command line. This will force GPROF to print data about every single function inside the executable.</div>
+	<br/>
+	<div class="Heading2">Hide statically linked file-local functions.</div>
+	<div class="Text">As static functions do not belong to the globals, they are not visible outside the function or file they were defined in. Time spent in them can therefore not be attributed to these globally unknown functions. The actual time spent is added to the function called before it by GPROF. This option will exclude time spent in these functions from the generated data. This option enables the '-s' command.</div>
+	<br/>
+	<div class="Heading2">Hide functions called less than x times</div>
+	<div class="Text">Exactly as the label tells you, function called less than X times will be omited. This options controls the '-m (value)' flag.</div>
+	<br/>
+	<div class="Heading1">Custom Commands</div>
+	<div class="Heading2">Use these commands instead</div>
+	<div class="Text">If you check this, Dev-C++ will use the commands you enter below instead. These command will be editted to what Dev is currently using if you haven't checked this option.</div>
+</body>
+</html>

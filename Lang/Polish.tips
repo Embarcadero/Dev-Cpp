@@ -1,0 +1,27 @@
+# Z angielskiego prze³o¿y³ Maciej Boniecki.
+# Adres poczty elektronicznej: cpp@poczta.onet.pl
+
+...nie powinieneœ wy³¹czaæ tych wskazówek?<CR><CR>Wskazówki prezentowane tutaj dostarcz¹ Ci nieudokumentowanych informacji, których nie znajdziesz nigdzie indziej.<CR>Je¿eli je wy³¹czysz zawsze mo¿esz je w³¹czyæ z powrotem wybieraj¹c "Pomoc / Wskazówka dnia"...
+...mo¿esz u¿ywaæ vUpdate aby na bie¿¹co instalowaæ aktualizacje dla œrodowiska Dev-C++ dziêki czemu bêdziesz móg³ wykorzystywaæ jego nowe mo¿liwoœci?<CR><CR>Wybierz "Narzêdzia / SprawdŸ czy s¹ nowe Uaktualnienia/Pakiety"
+
+...w³aœciwoœæ uzupe³niania kodu pomo¿e Ci zwiêkszyæ twoj¹ wydajnoœæ poprzez sugerowanie wszystkich mo¿liwych poleceñ dostêpnych w bie¿¹cym kontekœcie?<CR><CR>Aby w³¹czyæ uzupe³nianie kodu przejdŸ do "Narzêdzia / Opcje Edytora" i w³¹cz przegl¹darkê klas i uzupe³nianie kodu.
+...w³aœciwoœæ uzupe³niania kodu jest wywo³ywana kiedy wpiszesz ".", "->" lub "::" w oknie edytora po up³ywie zdefiniowanego przez u¿ytkownika opóŸnienia?<CR><CR>Aby zdefiniowaæ opóŸnienie przejdŸ do "Narzêdzia / Opcje Edytora / Przegl¹darka Klas / Uzupe³nianie Kodu".
+...mo¿esz wywo³aæ w³aœciwoœæ uzupe³niania kodu w ka¿dej chwili poprzez naciœniêcie "Ctrl+Space" w oknie edytora?<CR><CR>(Próbuj kombinacji "Ctrl+Shift+Space" kiedy kursor znajduje siê wewn¹trz nawiasów okr¹g³ych z argumentami funkcji...)
+...klikniêcie elementu w przegl¹darce klas z jednoczeœnie wciœniêtym klawiszem Shift przeniesie Cie do deklaracji zamiast implementacji?<CR>Oczywiœcie mo¿esz równie¿ u¿yc menu kontekstowego w którym znajdziesz te same (a nawet wiêcej!) funkcji...
+...mo¿esz dodawæ w³asne foldery w przegl¹darce klas aby ³atwiej móc znaleŸæ to czego szukasz w du¿ych projektach? Mo¿esz nawet zagnie¿dzaæ foldery!<CR><CR>Po prostu kliknij prawym przyciskiem myszy w przegl¹darce klas aby rozwin¹æ menu kontekstowe...
+...informacje o w³asnych folderach przegl¹darki klas s¹ przechowywane w pliku "classfolders.dcf" znajduj¹cym siê w katalogu g³ównym twojego projektu?<CR><CR>Je¿eli coœ pójdzie nie tak po prostu usuñ ten plik i otwórz ponownie twój projekt!
+...s¹ dwa tryby widoku dla przegl¹darki klas?<CR>Jeden pokazuje wszystkie klasy/metody/funkcje projektu, drugi zaœ pokazuje Ci stosowne informacje tylko dla obecnie edytowanego pliku.<CR><CR>Po prostu kliknij prawym przyciskiem w przegl¹darce klas i wybierz "Tryb widoku"...
+
+...mo¿esz zdefiniowaæ jeœli bêdziesz musia³ pojedyncze lub podwójne klikniêcie pliku w menad¿erze projektu aby otworzyæ go w edytorze?<CR><CR>Aby to zdefiniowaæ przejdŸ do "Narzêdzia / Opcje Œrodowiska" i w³¹cz (lub wy³¹cz) "Kliknij podwójnie aby otworzyæ pliki menad¿era projektów"...
+...mo¿esz zdefiniowaæ w³asne (tylko jednopoziomowe) foldery w menad¿erze projektów aby lepiej zorganizowaæ twoje pliki?<CR><CR>Aby to zrobiæ, kliknij prawym przyciskiem na pliku w menad¿erze projektów aby rozwin¹æ menu kontekstowe...
+...je¿eli stworzy³eœ w³asne foldery w menad¿erze projektów mo¿esz metod¹ przeci¹gnij && upuœæ porozmieszczaæ w nich pliki?
+
+...mo¿esz otrzymaæ informacje o pliku nad którym aktualnie pracujesz?<CR><CR>Wybierz "Plik / W³aœciwoœci" a otrzymasz informacje o rozmiarze pliku, iloœci linii, linii komentarza, pustych linii i do³¹czonych plików!
+...mo¿esz zapisaæ swój projekt jako szablon?<CR><CR>Wybierz "Plik / Nowy / Szablon". Spowoduje to zapisanie twojego projektu jako szablonu Dev-C++ który bêdzie dostêpny po wybraniu "Plik / Nowy / Projekt".<CR>Tym sposobem bêdziesz mia³ podstawy do rozpoczêcia programowania wed³ug w³asnego gustu!
+...mo¿esz importowaæ swoje projekty MS Visual C++ do Dev-C++?<CR><CR>Po prostu wybierz "Plik / Importuj / Importuj Projekt MS Visual C++".<CR>Bêdziesz musia³ czasami pozmieniaæ opcje projektu po importowaniu ale wa¿ne ¿e praca idzie naprzód!
+...mo¿esz wyeksportowaæ plik Ÿród³owy lub ca³y projekt do HTML'a lub RTF'a?<CR>Tym sposobem mo¿esz umieœciæ swoje Ÿród³a na stronie internetowej i dzieliæ siê nimi ze œwiatem!<CR><CR>Po prostu kliknij na "Plik / Eksportuj" i wybierz metodê eksportu...
+
+...mo¿esz dodaæ (usun¹æ) znaki komentarza w zbiorze wybranych linii poprzez klikniêcie na "Edycja / (Usuñ) Komentarz"?
+...mo¿esz dodaæ (usun¹æ) wciêcie w zbiorze wybranych linii poprzez klikniêcie na "Edycja / (Usuñ) Wciêcie"?
+...mo¿esz u¿ywaæ zak³adek w edytorze aby szybko przemieszczaæ siê po kodzie?<CR><CR>W³¹cz lub wy³¹cz zak³adkê poprzez klikniêcie na "Edycja / Prze³¹cz Zak³adki" i wybraniu numeru zak³adki.<CR>PrzejdŸ do zak³adki klikaj¹c na "Edycja / PrzejdŸ Do Zak³adek" i wybieraj¹c numer zak³adki.
+...w menu "Szukaj" znajduje siê bardzo potê¿ne polecenie "PrzejdŸ do funkcji"?<CR><CR>Wyœwietla wszystkie funkcje znajduj¹ce siê w pliku, podczas wpisywania nazwy funkcji lista ta jest filtrowana. Po wpisaniu nazwy funkcji naciœnij Enter aby natychmiast do niej przejœæ!<CR>Uwaga: przegl¹darka klas musi byæ w³¹czona...

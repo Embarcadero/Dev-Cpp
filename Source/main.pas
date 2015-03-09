@@ -464,7 +464,7 @@ type
     Abortcompilation1: TMenuItem;
     oggleBreakpoint1: TMenuItem;
     N18: TMenuItem;
-    ToolButton4: TToolButton;
+    StopBtn: TToolButton;
     ToolButton5: TToolButton;
     actRevSearchAgain: TAction;
     SearchAgainBackwards1: TMenuItem;

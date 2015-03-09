@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Heading1">Profiling a source file</div>
+	<div class="Text">Profiling a source file can be done using the following steps:</div>
+	<ul>
+		<li>Create (Ctrl+N) or open (Ctrl+O) a source file.</li>
+		<li>At Tools >> Compiler Options, select a compiler set that supports profiling (-pg).</li>
+		<li>Click Profile Analysis (next to the Debug button) to compile and profile the currently visible file.</li>
+		<li>When closing the created program, a timing analysis will open.</li>
+	</ul>
+	<div class="Heading1">Profiling a project</div>
+	<div class="Text">Profiling a project file can be done using the following steps:</div>
+	<ul>
+		<li>Create (Ctrl+N) or open (Ctrl+O) a source file.</li>
+		<li>At Tools >> Compiler Options, select a compiler set that supports profiling (-pg).</li>
+		<li>Click Profile Analysis (next to the Debug button) to compile and profile the project.</li>
+		<li>When closing the created program, a timing analysis will open.</li>
+	</ul>
+	<div class="Heading2">Tips</div>
+	<div class="Text">
+	<ul>
+		<li><b>Only functions that consume more than 0.01 second of CPU time will show up in the analysis.</b></li>
+		<li>When changing compiler sets, make sure to rebuild before profiling.</li>
+		<li>Optimization (-Ox) can remove code that yields no net change. One should be careful when profiling these kinds of code:
+		<div class="Code">tbefore = GetTime();<br/>
+                          DoSomething();<br/>
+                          tdiff = GetTime() - tbefore;<br/></div>
+		If the function DoSomething() does not affect output in any way and when other code is independent from it, the call to it can be removed by the compiler and tdiff will be zero! Consider printing something calculated inside DoSomething() after calculating tdiff. This way, other code will be dependent on DoSomething() because you print some result of it afterwards.</li>
+		<li>The strip flag (-s) will remove profiling information added by -pg. Consider disabling it.</li>
+	</ul>
+	</div>
+</body>
+</html>

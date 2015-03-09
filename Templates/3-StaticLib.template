@@ -1,0 +1,14 @@
+[Template]
+ver=1
+Name=Static Library
+Icon=StaticLib.ico
+Description=A static library (.a)
+Category=Basic
+
+[Unit0]
+CName=
+CppName=
+
+[Project]
+UnitCount=1
+Type=2

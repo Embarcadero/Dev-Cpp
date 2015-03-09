@@ -1,0 +1,29 @@
+[Template]
+ver=1
+Name=File Editor
+Icon=Editor.ico
+Description=A simple Win32 file editor
+Category=Win32
+
+[Unit0]
+CName=main.c
+CppName=main.cpp
+C=FileEditor_c.txt
+Cpp=FileEditor_c.txt
+
+[Unit1]
+CName=main.h
+CppName=main.h
+C=FileEditor_h.txt
+Cpp=FileEditor_h.txt
+
+[Unit2]
+CName=resource.rc
+CppName=resource.rc
+C=FileEditor_rc.txt
+Cpp=FileEditor_rc.txt
+
+[Project]
+UnitCount=3
+Type=0
+Icon=Editor.ico

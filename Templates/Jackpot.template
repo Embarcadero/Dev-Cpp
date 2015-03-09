@@ -1,0 +1,17 @@
+[Template]
+ver=1
+Name=Jackpot
+Icon=Games.ico
+Description=A number guessing game
+Category=Console
+
+[Unit0]
+CName=main.c
+CppName=main.cpp
+C=Jackpot_c.txt
+Cpp=Jackpot_cpp.txt
+
+[Project]
+UnitCount=1
+Type=1
+Icon=Games.ico

@@ -1,0 +1,126 @@
+#
+# This is a TipOfTheDay tips file.
+#
+# Keep each tip on one line.
+#
+
+
+#
+# Lines starting with '#' are comments and ignored
+#
+# Empty lines are also ignored.
+#
+
+
+#
+# You can use these macros in the text:
+#
+#	<CR>: 		insert a linefeed
+#
+#	<URL>: 		is followed by a URL link
+#
+#	<UDESC>: 	is followed by a URL description
+#
+#
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+#
+#
+# Example tip:
+#
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+#
+#
+# More macros will be added as needed...
+#
+
+
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+#
+# Note2: each tip can have no more than 255 chars.
+#
+# Note3: the macro <CR> counts as one character, not four.
+#
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip, so it does not count for the 255-chars limit.
+#
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+#
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+
+#
+# Estonian version translated by Leo Berg
+#
+# E-mail : dzejno@hotmail.com
+#
+
+
+#
+# Important tips (appear first)
+#
+
+...neid nõuandeid ei ole soovitatav välja lülitada?<CR><CR>Nendes antavad soovitused jagavad dokumenteerimata informatsiooni, mida ei ole võimalik kusaltgi mujalt leida.<CR>Kui need on välja lülitatud, saab neid hiljem uuesti sisse lülitada, valides menüüst "Spikker / Nõuanded".
+
+...programm vUpdate aitab hoida kasutatavat Dev-C++ keskkonda ajakohastatuna hiljutiste veaparanduste ja uute toredate lisanditega?<CR><CR>Vali menüüst "Tööriistad / Dev-C++ uuendused / Packages".
+
+
+#
+# Code-completion tips
+#
+
+...koodiabi täiendus aitab suurendada töö viljakust, soovitades kõiki võimalikke käske, mis on vastavas olukorras sobivad?<CR><CR>Koodiabi kasutamiseks vali menüüst "Tööriistad / Redaktori sätted" ja käivita klasside sirvija ning koodiabi.
+
+...koodiabi täiendus vallandub pärast kasutaja seatud ajavahemikku, kui redaktori aknasse trükitakse kas ".", "->" või "::"?<CR><CR>Selle ajavahemiku seadmiseks vali menüüst "Tööriistad / Redaktori sätted / Koodiabi".
+
+...koodiabi on võimalik käsitsi vallandada vajutades redaktori aknas suvalisel ajahetkel "Ctrl+Space"?<CR><CR>(Vaata, mis juhtub, kui vajutada "Ctrl+Shift+Space" siis, kui hiire kursor asub funktsiooni argumentide sulgudes...).
+
+...hoides all shift-klahvi ja vajutades samal ajal hiirega klasside sirvija mingil väljal, viiakse kasutaja vastava objekti definitsioonile, mitte seadmestamisele?<CR>Loomulikult saab selleks (ja paljudeks teisteks operatsioonideks) kasutada ka hüpikmenüüd.
+
+...klasside sirvijasse on võimalik lisada uusi kaustasid, et suurtes projektides paremini orienteeruda? Kaustadesse saab omakorda uusi alamkaustasid luua.<CR><CR>Parem hiireklõps klasside sirvijas avab vastava hüpikmenüü.
+
+...andmed kasside sirvijas loodud kaustade kohta hoitakse failis "classfolders.dcf" projekti peakaustas?<CR><CR>Kui midagi tõeliselt valesti läheb, saad esialgse olukorra taastada, kustutades eelnimetatud faili ning projekti uuesti avades!
+
+...on kaks viisi klasside sirvija andmete kuvamiseks?<CR>Üks neist näitab kõiki projekti klasse/liikmeid/funktsioone, teine kuvab ainult käesoleva faili jaoks olulist informatsiooni.<CR><CR>Parem hiireklõps klasside sirvijas ja vali "Vaateviis".
+
+
+#
+# Project Manager tips
+#
+
+...projekti aknas on võimalik valida, kas avada fail ühe või topeltklõpsuga?<CR><CR>Selle oleku muutmiseks vali menüüst "Tööriistad / Keskkonna sätted" ja muuda valiku "Topeltklõps projekti failide avamiseks" olek endale sobivaks.
+
+...projekti aknas on võimalik luua uusi kaustu projekti failide parema korrastatuse saavutamiseks?<CR><CR>Selleks tuleb avada projekti sirvijas paremklõpsuga hüpikmenüü.
+
+...projekti aknas saab failide paiknemist korrastada liigutades neid sobivatesse kaustadesse.
+
+
+#
+# File menu tips
+#
+
+...hetkel töödeldavate failide kohta saab leida infot?<CR><CR>Valides "Fail / Omadused" kuvatakse info faili suuruse, ridade arvu, kommentaaride, tühjade ridade ja lisatud failide kohta.
+
+...projekte saab salvestada mallideks?<CR><CR>Vali "Fail / Uus / Mall". Nii salvestatakse projekt Dev-C++ mallina, mida on võimalik kasutada, valides "Fail / Uus / Projekt".<CR>Nii saab luua oma maitsele vastava koodipõhja, millelt uut programmi alustada.
+
+...Dev-C++ võimaldab importida MS Visual C++ projekte?<CR><CR>Selleks vali "Fail / Sisesta / MS Visual C++ projekt".<CR>Võib juhtuda, et selle järel on tarvis veidi nokitseda projekti sätetega, kuna see osa on alles arendusjärgus.
+
+...lähtefaile on võimalik teisendada HTML ja RTF formaati?<CR>Nii saab lihtsalt faile internetti üles riputada ja maailmaga jagada.<CR><CR>Vali "Fail / Väljasta" ning formaat, millesse fail teisendada.
+
+
+#
+# Edit menu tips
+#
+
+...ridu saab kommenteerida ja samuti seda ka kaotada valides menüüst "Redigeerimine / Lisa/Eemalda kommentaarid"?
+
+...ridade taandust saab muuta valides menüüst "Redigeerimine / (Suurenda/Vähenda) taandust"?
+
+...kasutades järjehoidjaid on võimalik lähtekoodis lihtsalt ja kiiresti ringi liikuda?<CR><CR>Järjehoidja saab kasutusele võtta valides menüüst "Redigeerimine / Lisa/Eemalda järjehoidja" ning järjehoidja number.<CR>Järje saab üles leida valides "Redigeerimine / Mine järjehoidjale" ning järjehoidja number.
+
+..."Otsingu" menüü all on käsklus "Leia funktsioon"?<CR><CR>See kuvab kõik faili funktsioonid ja trükkides osa otsitava funktsiooni nimest valikute arv väheneb. Vajuta Enter, et koheselt vastav funktsioon leida.<CR><CR>NB! Klasside sirvija peab olema sisse lülitatud.

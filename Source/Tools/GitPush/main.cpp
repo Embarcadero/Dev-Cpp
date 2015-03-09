@@ -25,13 +25,22 @@ void GitPush() {
 }
 
 int main() {
-	// Add source files
-	GitAdd("Source");
+	// Add all folders
 	GitAdd("AStyle");
+	GitAdd("Help");
+	GitAdd("Icons");
+	GitAdd("Lang");
+	GitAdd("Source");
+	GitAdd("Templates");
 	GitAdd("*.nsi");
-	GitAdd("NEWS.txt");
+
+	// Add project icon
 	GitAdd("devcpp.ico");
 	
+	// Add useful text files
+	GitAdd("COPYING.txt");
+	GitAdd("NEWS.txt");
+		
 	// Add git files
 	GitAdd(".gitignore");
 	GitAdd("GitPush.exe"); // push self

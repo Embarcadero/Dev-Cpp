@@ -1,0 +1,57 @@
+# French Tips file
+
+#
+# Important tips (appear first)
+#
+
+...que vous devriez lire ces conseils ?<CR><CR>Ceux ci vous présenteront des informations utiles et pratiques.<CR>Si vous desirez ne plus les afficher au démarrage et que vous voulez y accèder plus tard, selectionner "Aide / Conseil du jour"...
+
+...que vous pouvez utiliser WebUpdate pour récupérer les dernières mises a jour ainsi que de nombreuses bibliothèque prêt a l'emploi pour Dev-C++ ?<CR><CR>Sélectionner "Outils / Nouvelles versions/packages"
+
+#
+# Code-completion tips
+#
+...que la complétion de code vous aidera à améliorer votre productivité en vous suggèrant toutes les commandes possibles disponible dans le contexte courant ? <CR><CR>Vérifier que dans "Outils / Options de l'Editeur", l'explorateur de classes et la complétion de code sont bien activés.
+
+...que la complétion de code est activée lorsque vous tappez ".", "->" ou "::" dans l'éditeur apres un court instant (paramètrable) ?<CR><CR>Pour définir le temps avant l'activation, allez dans "Outils / Options de l'Editeur / Explorateur de Classes / Complétion".
+
+...que vous pouvez activer la complétion de code en appuyant sur "Ctrl+Espace" à n'importe quel moment dans l'éditeur ?<CR><CR>(Essayez également d'appuyer sur "Ctrl+Maj+Espace" pendant que le curseur est placé entre les parenthèses d'une fonction à arguments)
+
+...qu'en cliquant tout en appuyant sur la touche MAJ sur une entrée de l'explorateur de classes, Dev-C++ vous emmenera directement sur la déclaration au lieu de l'implementation ?<CR>Bien sûr, vous pouvez aussi utiliser le menu contextuel en utilisant le clic droit...
+
+...que vous pouvez ajouter des répertoires dans l'explorateur de classes pour trouver plus rapidement ce que vous cherchez dans des gros projets ?<CR><CR>Pour cela faite un clic droit sur l'explorateur de classes.
+
+...que les informations de répertoire de l'explorateur de classes sont gardées dans le fichier "classfolders.dcf" situé dans le répertoire de votre projet ?<CR><CR>Si vous avez un problème avec ceux ci, effaçer ce fichier et réouvrer votre projet.
+
+...qu'il y a deux modes d'affichage pour l'explorateur de classes?<CR>L'une vous montre toutes les classes/membres/fonctions du projet, et l'autre *seulement* pour le fichier courant.<CR><CR>Pour changer de mode, effectuer un clic droit sur l'explorateur de classes et sélectionner "Mode"...
+
+#
+# Project Manager tips
+#
+...que vous pouviez définir si vous avez à cliquer ou double-cliquer sur un fichier de l'explorateur de projet pour l'ouvrir ?<CR><CR>Pour cela aller dans "Outils / Options d'Environnement" et cliquer sur "Double-cliquer pour ouvrir"...
+
+...que vous pouviez définir des répertoires dans l'explorateur de projet pour mieux organiser vos fichiers ?<CR><CR>Pour cela, effectuer un clic-droit sur un fichier de l'explorateur de projet, puis "Ajouter répertoire"...
+
+...que si vous avez créé des répertoires dans l'explorateur de projet, vous pouvez cliquer-glisser des fichiers pour les arranger ?
+
+#
+# File menu tips
+#
+...que vous pouvez obtenir des informations sur le fichier courant ?<CR><CR>Sélectionner "Fichier / Propriétés" pour récupérer la taille du fichier, le nombre de lignes, de commentaires, de lignes vides et de fichiers inclus !
+
+...que vous pouvez sauvegarder votre projet en tant que "template"?<CR><CR>Sélectionner "Fichier / Nouveau / Template". Ceci sauvegardera votre projet comme template Dev-C++ et sera disponible lorsque vous sélectionnerez "Fichier / Nouveau / Projet".<CR>Avec ceci vous aurez une base de travail à votre gout pour diffèrent projets !
+
+...que vous pouvez importer vos projets MS Visual C++ dans Dev-C++?<CR><CR>Sélectionner "Fichier / Importer / Importer projet MS Visual C++".<CR>
+
+...que vous pouvez exporter un fichier source ou un projet en HTML ou RTF ?<CR>Vous pourriez ainsi envoyer vos sources sur un site web et les partager avec le monde entier !<CR><CR>Cliquer sur "Fichier / Exporter" et faites votre choix...
+
+#
+# Edit menu tips
+#
+...que vous pouvez (dé)commenter un ensemble de lignes en les sélectionnant et en cliquant sur "Edition / Commentaire"?
+
+...que vous pouvez (dés)indenter un ensemble de lignes en les sélectionnant et en cliquant sur "Edition / (Dés)Indenter"?
+
+...que vous pouvez utiliser des signets dans l'editeur pour vous déplacer dans votre code rapidement ?<CR><CR>Pour déposer/retirer un signet sur la ligne courante, cliquer sur "Edition /  Basculer Signet" et sélectionner un numéro de signet.<CR>Pour aller à un signet, cliquer sur "Edition / Aller au Signet" et sélectionner le numéro du signet.
+
+...qu'il y a une commande pratique "Aller à la fonction..." dans le menu "Recherche" ?<CR><CR>Un dialogue vous affichera toutes les fonctions du fichier courant, et en tappant une partie d'un nom de fonction, la liste filtrera les réponses. Appuyer sur Entrée et vous irez à cette fonction immédiatement !<CR>Note: L'explorateur de classes doit être activé...

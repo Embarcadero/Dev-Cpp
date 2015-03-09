@@ -1,0 +1,83 @@
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+...you shouldn't disable these tips?<CR><CR>The tips presented here will give you undocumented information not found anywhere else.<CR>If you disable them and want to view them at a later time, select "Help / Tip of the day"...
+
+...you can use WebUpdate to keep your Dev-C++ enviroment up to date with the latest bug fixes and cool new features?<CR><CR>Select "Tools / Check for Updates / Packages..."
+
+#
+# Code-completion tips
+#
+...the code completion feature will help you increase your productivity by suggesting all possible commands available in the current context?<CR><CR>To enable code completion, go to "Tools / Editor Options" and enable the class browser and code completion.
+
+...the code completion feature is triggered when you type ".", "->" or "::" in the editor window after a user-defined time-out?<CR><CR>To define this time-out go to "Tools / Editor Options / Class Browser / Code completion".
+
+...you can trigger the code completion feature by pressing "Ctrl+Space" at any time in the editor window?<CR><CR>(Try pressing "Ctrl+Shift+Space" while the cursor is inside a function's arguments parenthesis...)
+
+...shift-clicking on an entry in the class browser, takes you to the declaration instead of the implementation?<CR>Of course, you can also use the context menu for the same (and more!) function...
+
+...you can add custom folders in the class browser to find easier what you 're looking for in big projects? You can even nest the custom folders!<CR><CR>Just right-click in the class browser to bring-up the context menu...
+
+...the class browser custom folders information is kept in a file named "classfolders.dcf" in your project's root directory?<CR><CR>If something goes wrong and things get messed-up, just delete this file and re-open your project!
+
+...there are two display modes for the class browser?<CR>One shows you all the parsed classes/members/functions of the project, and the other shows you the relevant information *only* for the currently editing file.<CR><CR>Just right-click in the class browser and select "View mode"...
+
+#
+# Project Manager tips
+#
+...you can define if you will have to single-click or double-click a file in the project manager to open it in an editor?<CR><CR>To define this go to "Tools / Environment Options" and enable (or disable) the "Double click to open project manager files"...
+
+...you can define custom (top-level only) folders in the project manager to organize your files better?<CR><CR>To do this, right click on a file in the project manager to bring-up the context menu...
+
+...if you have created custom folders in the project manager, you can drag && drop files to re-arrange them?
+
+#
+# File menu tips
+#
+...you can get information about the file you 're working on?<CR><CR>Select "File / Properties" and you will get information about the size of the file, the number of lines, line comments, empty lines and included files!
+
+...you can save your project as a template?<CR><CR>Select "File / New / Template". This will save your project as a Dev-C++ template and will be available when you select "File / New / Project".<CR>This way you will have a base to start coding on, based on your taste!
+
+...you can import your MS Visual C++ projects in Dev-C++?<CR><CR>Just select "File / Import / Import MS Visual C++ project".<CR>You may need to tweak a little the project options after importing but, hey, it's work in progress!
+
+...you can export a source file or a whole project to HTML or RTF?<CR>This way you can upload your sources to a website and share them with the world!<CR><CR>Just click on "File / Export" and select the export method...
+
+#
+# Edit menu tips
+#
+...you can (un)comment a set of lines by selecting them and clicking on "Edit / (Un)Comment"?
+
+...you can (un)indent a set of lines by selecting them and clicking on "Edit / (Un)Indent"?
+
+...you can use bookmarks in the editor to move around code quickly?<CR><CR>Set or unset a bookmark by clicking on "Edit / Toggle bookmarks" and selecting the bookmark number.<CR>Go to a set bookmark by clicking on "Edit / Goto bookmarks" and selecting the bookmark number.
+
+...there is a powerful "Goto function" command under the "Search" menu?<CR><CR>It displays all the file's functions and by typing some part of the function name, the list filters down. Press enter and you will go to this function immediately!<CR>Note: class browsing must be enabled...

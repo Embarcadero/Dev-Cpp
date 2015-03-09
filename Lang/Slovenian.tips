@@ -1,0 +1,100 @@
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#       <CR>:           insert a linefeed
+#       <URL>:          is followed by a URL link
+#       <UDESC>:        is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#       ( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#       ...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#        so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+
+#
+# Important tips (appear first)
+#
+...da ne bi smeli onemogoèiti te nasvete?<CR><CR>Nasveti predstavljeni tukaj vam bodo dale nedokumentirane informacije, ki niso najdene nikjer drugje<CR>Èe jih onemogoèite in jih želite kasneje spet omogoèiti, lahko to storite v meniju "Pomoè->Nasvet dneva"...
+
+
+...da lahko uporabite spletno posodabljanje, ki vam posodobi Dev-C++ z zadnjimi popravki in novimi zmožnosti?<CR><CR>Izberite "Orodja->Preveri za posodobitve/pakete..."
+
+
+#
+# Code-completion tips
+#
+...da vam zmožnost dovršitev kode, s predlaganjem vseh možnih ukazov, pomaga poveèat vašo produktivnost?<CR><CR>Da omogoèite dovršitev, pojdite v meni "Orodja->Možnosti urejevalnika" in omogoèite brskalnik po razredih in dovršitev kode.
+
+
+...da je zmožnost dovršitve kode sprožena, ko v oknu urejevalnika vpišete ".", "->" ali "::"?<CR><CR>Da doloèite èasovni zamik prikaza, pojdite v meni "Orodja->Možnosti urejevalnika->Brskanje po razredih->Dovršitev".
+
+
+...da lahko v oknu urejevalnika kadarkoli, s pritiskom "Ctrl+Space", sprožite zmožnost dovršitve?<CR><CR>(Poskusite pritisnit "Ctrl+Shift+Space", medtem ko je kurzor v oklepajih funkcije - kjer so parametri)
+
+
+...da s pritiskom shift+klik na vnos v brskalniku, skoèite na deklaracijo namesto na uvedbo?
+
+
+...da lahko v brskalniku po razredih dodate mape po meri in si s tem olajšate iskanje v velikih projektih? Mape lahko tudi gnezdite!<CR><CR>V brskalniku po razredih enostavno kliknite desno tipko in prikazal se bo meni...
+
+
+...da sta dva naèina prikazovanja brskalnika po razredih?<CR>Eden vam pokaže vse razèlenjene razrede/èlane/funkcije projekta, drugi pa vam pokaže pomembne informacije *samo* za datoteko, ki se trenutno ureja.<CR><CR>V brskalniku po razredih kliknite desni gumb in izberite "Naèin pogleda"...
+
+
+#
+# Project Manager tips
+#
+...da lahko doloèite, èe boste morali, za odprtje datoteke, klikniti dvakrat ali enkrat?<CR><CR>Da doloèite to, pojdite v "Orodja->Možnosti delovnega okolja" in omogoèite (ali onemogoèite) "Dvojni klik v Upravitelju projekta za odpiranje datotek"...
+
+
+...da lahko v upravitelju projekta doloèite mape po meri in tako bolje organizirate vaše datoteke?<CR><CR>To lahko naredite tako, da v upravitelju projekta kliknete na datoteko, kjer se vam bo pokazal meni...
+
+
+...da, èe ste v upravitelju projekta ustvarili mapo po meri, lahko povleèete in spustite datotek in jih tako razvrstite?
+
+
+#
+# File menu tips
+#
+...da lahko dobite informacije o datoteki s katero delate?<CR><CR>Izberite "Datoteka->Lastnosti" in dobili boste informacije o velikosti datoteke, število vrstic, vrstice komentarjev, prazne vrstice in vkljuèene datoteke!
+
+
+...da lahko shranite projekt kot predlogo?<CR><CR>Izberite "Datoteka->Novo->Predloga". To bo shranilo vaš projekt kot Dev-C++ predlogo in bo na voljo v meniju "Datoteka->Novo->Projekt".<CR>Tako boste lahko zaželi kodirat po vašem okusu!
+
+
+...da lahko v Dev-C++ uvozite vaše MS Visual C++ projekte?<CR><CR>Izberite "Datoteka->Uvozi->Uvozi MS Visual C++ projekt".<CR>Lahko, da boste morali malo dodatno nastaviti možnosti projekta, ker še zadeva ni izpopolnjena!
+
+
+...da lahko posamezno datoteko ali pa celotni izvozite v HTML ali RTF obliko?<CR>Tako lahko izvirno kodo enostavno naložite na spletno stran in jo delite z ostalim svetom!<CR><CR>Enostavno kliknite na "Datoteka->Izvozi" in izberite naèin izvoza...
+
+
+#
+# Edit menu tips
+#
+...da lahko (od-)komentirate veè vrstic naenkrat, tako, da jih oznaèite in kliknete na "Uredi->(Od-)Komentiraj"?
+
+
+...da lahko zmanjšate/poveèata zamik veè vrstic naenkrat, tako, da jih oznaèite in kliknete na "Uredi->(Poveèaj/Zmanjšaj) zamik"?
+
+
+...da lahko v urejevalniku uporabite zaznamke, kar vam omogoèa hitrejše pomikanje po kodi?<CR><CR>Nastavite ali odstranite zaznamek s klikom na "Uredi->Preklopi na zaznamke" in izbiro številke zaznamka.<CR>Pojdite na množico zaznamkov s klikom na "Uredi->Pojdi v zaznamke" in izbiro številke zaznamka.
+
+
+...da, v meniju "Iskanje" obstaja moèan ukaz "Pojdi v funkcijo"?<CR><CR>Ta prikaže vse funkcije datoteke in z vpisom dela funkcije, se seznam funkcij filtrira. Pritisnite enter in takoj se boste pomaknili v to!<CR>Opomba: brskanje po razredih mora biti omogoèeno...

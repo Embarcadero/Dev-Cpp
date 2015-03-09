@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Heading2"><b>Q:</b> I'm using the TDM-GCC x64 version and cache creation is taking longer than forever. What can I do?</div>
+	<div class="Text"><b>A:</b> Yes, it's taking very long, thanks to the huge amount of headers supplied by TDM-GCC x64. Of course, no single programmer will ever use them all. I suggest selecting the custom caching options or navigating to Tools >> Editor Options >> Class Browsing >> Completion. Add the headers <b>you</b> often use. You don't have to add everything manually fortunately. Adding windows.h for example will include the whole massive heap of Microsoft stuff referenced inside that file.</div>
+	<br/>
+	<div class="Heading2"><b>Q:</b> Programs created with Dev-C++ show the line "Process exited with return value X". What's going on?</div>
+	<div class="Text">This piece of text is shown when a console program ran via Dev-C++ exits. The host that runs your console program (ConsolePauser.exe) prints this code. <b>Dev-C++ does NOT add any code to your programs to print this.</b> This feature is quite useful because you can see console output before closing. You can remove it by unticking "Tools >> Environment Options >> General >> Pause console programs after return".</div>
+</body>
+</html>

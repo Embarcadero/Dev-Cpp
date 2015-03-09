@@ -1,0 +1,83 @@
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+...miért kellenek ezek a tippek?<CR><CR>A tippek sok nem dokumentált hasznos információt tartalmaznak amelyek máshol nem találhatóak meg.<CR>Ha kikapcsolja az indulási tippeket és késõbb szeretné megnézni a "Segítség / A nap tippje" menüvel teheti meg.
+
+...a vUpdate segítségével könnyedén hozzájuthat a Dev-C++ legfrissebb verzióihoz hibajavításaihoz?<CR><CR>Használja az "Eszközök / Frissítések/Csomagok Keresése" menüt.
+
+#
+# Code-completion tips
+#
+...a kódkiegészítés hatékonyan segít az adott környezetben lehetséges összes kódrészlet felfedésével?<CR><CR>A kódkiegészítést az "Eszközök / Szerkesztõ Beállításai" menübõl kapcsolhatja be az Osztály tallózás részben.
+
+...a kódkiegészítés a beállított késleltetés után elindul ,ha ".", "->", "::" -ot ír a forráskódba?<CR><CR>A késleltetési idõ az "Eszközök / Szerkesztõ Beállításai" menübõl az Osztály tallózás részben állítható be.
+
+...bármikor elindítható a kódkiegészítés a "CTRL-Space" billentyû kombinációval?<CR><CR>(Használja a "Ctrl+Shift+Space" kombinációt amikor a kurzol a függvény argumentumait tartalmazó zárójelek között áll...)
+
+..."Shift-double-click"-el az Osztály Lista panelon a kijelölt elem definíciójához juthat?<CR>Természetesen használhatja erre a célra (és még sok másra is) a jobbgombos menüt az Osztály Lista panelon...
+
+...az Osztály Listában létrehozhat könyvtárakat hogy a nagyobb projektekben is könnyedén megtalálja amit keres? Szeretné tudni hogyan!<CR><CR>Csak jobb-klikk az Osztály Lista panelen...
+
+...az Osztály Listában létrehozott könyvtárakról a "classfolders.dcf" fájl tárol információkat a projekt könyvtárban?<CR><CR>Ha valami nem megfelelõ a listában csak törölje ki ezt a fájlt, és nyissa meg újra a projektet!
+
+...az Osztály Lista panelnak két megjelenítési módja van?<CR>Az egyik az összes a projektben található osztályt/tagot/függvényt kilistáz, a második pedig csak az aktuálisan szerkesztett fájlra mutatja ugyanezeket az információkat.<CR><CR>A két mód között a jobboldal egérgomb kattintásával megjelenõ menübõl a "Nézet Mód" menüben válthat...
+
+#
+# Project Manager tips
+#
+...beállíthatja, hogy simpla vagy dupla kattintással lehessen a Projekt Menedzserbõl a fájlokat megnyitni?<CR><CR>A beállítás az "Eszközök / Környezeti Beállítások" menübõl érhetõ el...
+
+...a Projekt Menedzserben létrehozhat könyvtárakat (csak a legfelsõ szinten) a fájlok átláthatóbb elhelyezése érdekében?<CR><CR>Megteheti a Projekt Menedszerben a jobb-klikkel hívható menübõl (a legfelsõ szinten) a "Könyvtár Hozzáadása" menübõl.
+
+...ha új könyvtárat hoz létre,a fájlokat Drag&&Drop-val mozgathatja a könytárakba?
+
+#
+# File menu tips
+#
+...információt kaphat arról a fájlról amelyiken dolgozik?<CR><CR>Kiválasztva a "Fájl / Tulajdonságok" pontot, információt kap a fájl méretérõl, a sorok számáról, megjegyzések, üres sorok és az include utasítást tartalmazó sorok számáról!
+
+...lementheti a projektjét mint template?<CR><CR>Válassza ki a "Fájl / Új / Template" pontját. Ez lementi a projektet mint Dev-C++ template, amely elérhetõ lesz a "Fájl / Új / Projekt" pontban.<CR>Így lesz egy alapja, amelybõl kiindulhat, az ön ízlésének megfelelõen!
+
+...importálhat MS Visual C++ projekteket a Dev-C++ -be?<CR><CR>Csak válassza a "Fájl / Import / MS Visual C++ projekt importálás" pontot.<CR>Lehet, hogy egy kicsit módosítani kell a projekt beállításain az importálás után, de végülis ez a rész még fejlesztés alatt áll!
+
+...exportálhatja a forrás fájlt vagy a teljes projektet mint HTML vagy RTF formátumú fájl?<CR>Ezzel a lehetõséggel feltöltheti a forrásait egy website-ra, hogy megossza azt a világgal!<CR><CR>Egyszerûen válassza a "Fájl / Export" pontot és válassza ki az exportálás formátumát...
+
+#
+# Edit menu tips
+#
+...megváltoztathatja a sorok kommentezését, kiválasztva a sorokat, majd ráklikkelve a "Szerkesztés / Megjegyzés (be/ki)" pontra?
+
+...megváltoztathatja a sorok bekezdésének mértékét, kiválasztva a sorokat, és a "Szerkesztés / Bekezdés (be/ki)" ponttal?
+
+...használhat könyvjelzõket a szerkesztõben, hogy a forrásban gyorsan tudjon mozogni?<CR><CR>Be- vagy kikapcsolhatja a könyvjelzõt a "Szerkesztés / Könyvjelzõ elhelyezése" pontban, kiválasztva a könyvjelzõ számát.<CR>Egy adott könyvjelzõhöz ugorhat a "Szerkesztés / Könyvjelzõre ugrás" pontban, kiválasztva a könyvjelzõ számát.
+
+...létezik egy nagyszerû "Függvényre ugrás" parancs a "Keresés" menüben?<CR><CR>Megjeleníti a fájl összes függvényét, amely a megadott szövegrészlettel kezdõdik. Nyomja le az enter-t és azonnal a függvényhez kerül!<CR>Vigyázat: az osztály böngészésnek engedélyezve kell lennie ...

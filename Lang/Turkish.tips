@@ -1,0 +1,86 @@
+#
+# Güncelleme : 26.10.2004
+# Güncellemeyi yapan: Bülent COÞKUN
+# e-posta: bulent.coskun@e-kolay.net
+#
+# Günlük Ýpuçlarýný dosyasý
+# Her ipucunu bir satýrda tutunuz
+#
+# '#' ile baþlayan satýrlar açýklama satýrýdýr ve dikkate alýnmaz 
+# Boþ satýrlarda ayný þekilde dikkate alýnmaz.
+#
+# Metin içersinde þu makrolarý kullanabilirsiniz:
+# 	<CR>:		yeni satýr
+#	<URL>:		URL baðlantýsý
+#	<UDESC>:	URL baðlantýsýnýn açýklamasý
+#
+# Kullaným Ýfadesi ( ipucu metni için  <ipucu_metni> )
+# 	( <ipucu_metni> | <CR>* [ <URL>metin [ <UDESC>metin ] ]
+#
+# Örnek ipucu:
+#	...bir ipucu<CR><CR>baþka satýrlar...<URL>http://www.bloodshed.net/dev<UDESC>Bloodshed Software'i ziyaret ediniz
+#
+# Ýhtiyaç olduðuda dahafazla makro ilave edilecektir...
+#
+# Not1: eðer ve imi (&) kullanmak isterseniz ikitanesini beraber kullanýn (&&)
+# Not2: her bir ipucu için 255 karakter sýnýrý vardýr
+# Not3: <CR> makrosu 1 karekter sayýlýr, 4 deðil
+# Not4: <URL> ve <UDESC> makrolarý ile gelen satýrlar, ipucu olarak gösterilmediklerinden 
+#	bunlar 255 karakter limitinde sayýlmazlar.
+# Not5: <UDESC> Makrosu opsiyoneldir.  Eðer silinirse, <URL> link olarak görünecektir.
+# Not6: Eðer <UDESC> Makrosu varsa *mutlaka* <URL> makrosunu takip etmelidir.
+#
+
+#
+# Önemli Ýpuçlarý ( ilk görünen )
+#
+...bu ipuçlarýný kapatmak istermisiniz?<CR><CR>Ýpuçlarý baþka yerde bulamayan dökümante edilmemiþ bilgileri burada sunar.<CR>Eðer bunlarý kapatýp daha sonra görmek isterseniz, "Yardým / Günün Ýpucu" bölümünü seçiniz...
+...Dev-C++ ortamýnýn en son hata düzetmelerle ve yeni özelliklerle güncel kalmasýný WebUpdate ile yapabilirsiniz.<CR><CR>"Araçlar / Günceleme/ Paket kontrol yap..." seçeneðini seçiniz. 
+
+#
+# Kod-Tamamlama Ýpuçlarý
+#
+...Kod Tamamlama özelliði, mevcut içerik içerisindeki tüm ihtimali komutlarý tavisyelerde bulunarak sizin verimliðimizi arttýrýr.<CR><CR>Kod tamamlamayý aktif etmek için, "Araçlar / Editör Ayarlarý" bölümüne gidiniz ve sýnýf gezgini bölümünde kod tamamlamayý seçiniz.
+
+...Kod Tamamlama özelliði, siz editör içinde ".", "->" veya "::" yazdýðýnýzda berlilenen zaman aþým süresine göre tetiklenir.<CR><CR>Bu zaman aþýmý için "Araçlar / Editör Ayarlarý / Sýnýf Gezgini / Kod Tamamlama" bölümüne gidiniz.
+
+...Kod Tamamlama özelliðini editör penceresinde iken "Ctrl+Space" basarak tetikeyebilirsiniz.<CR><CR>( Ýmleç fonsiyon argüman parantezi içersinde iken "Ctrl+Shift+Space" tuþlarýna basmayý deneyizniz...)  
+
+...Sýnýf Gezgini elemanlarýnýn üzerinde shift-klik ile declerasyonun uygulamasýna gidilir.<CR> elbette, içerik menüsünde ayný fonkisyon ve de daha fazlasý için kullanýlabilir.
+
+...Büyük projeler için Sýnýf Gezgini içine özel diziler eklenerek aradýðýnýzý daha kolay bulabilirsiniz. Hatta, özel fonsiyonlarý içiçe yapabilirsiniz!<CR><CR>içerik menüsünü getirirken, sadece Sýnýf Gezgini içinde sað-klik yapýnýz. 
+
+...Sýnýf Gezgini Özel Dizinlerin bilgisi projenizin kök dizini içersinde "classfloders.dcf" isimli dosyada saklanýr.<CR><CR>Eðer herhangi birþey yanlýþ giderde bu dosya bozulursa, Sadece bu dosyayý silin ve projenizi tekrar açýn!
+
+...Sýnýf Gezgini için iki tane görüntü modu vardýr.<CR>Birincisi Proje içindeki tüm sýnýflarý/üyeleri/fonksiyonlarý ayrýþtýrýr ve diðer ise *sadece* o anda düzenlenen dosyanýn anlamalý bilgilerini gösterir.<CR><CR>Sadece Sýnýf Gezgini içersindeyken sað-klik ve "Görünüm Modu" nu seçiniz...
+
+#
+# Proje Yönetim Ýpuçlarý
+#
+...Proje Yöneticisi içindeki dosyanýn tek-klikle veya çift-klikle açýlacaðýný belirleyebilirsiniz.<CR><CR>Tanýmlama için "Araçlar /  Çevre Ayarlarý" bölününe gidiniz ve "Proje Yönetim Dosyalarýný açmak için çift týklayýn" seçiniz ( veya kaldýrýnýz )
+
+...Dosyalarýnýzý daha iyi organize ederken, Proje Yöneticisi içinde özel ( sadece üst-seviyede ) diziler tanýmlayabilirsiniz.<CR><CR>Bunu yapmak için, proje yöneticisi içinde sað klik ile içerik menüsü getrilir...
+
+...Eðer Proje Yöneticisi içinde özel diziler yaratýysanýz, sürükle && býrak ile bunlarý düzenleyebilirsiniz. 
+
+#
+# Dosya menü ipuçlarý
+#
+...Üzerinde çalýþtýðýnýz dosya hakkýnda bilgi alabilrisiniz.<CR><CR>"Dosya / Özellikler" Seçiniz ve buradan dosyanýn boyu,  satýr, satýr açýklamalarý, boþ satýrlar, dahil edilen dosyalarýn sayýlarýný görün.  
+
+... projenizi sablon olarak kaydedebilirsiniz.<CR><CR>"Dosya / Yeni / Þablon" seçiniz. Bu projenizi Dev-C++ sablonu olarak kaydeder ve "Dosya / Yeni / Proje" bölümünde mevcut olacaktýr.<CR>Bu yol ile kodlamaya beðendiniz bir þekilde baþlayabilirsiniz.
+
+...Dev-C++'a MS Visual C++ projeleri ithal edebilirsiniz.<CR><CR>Sadece "Dosya / Ýthal et / MS Visual C++ projesini Ýthal et" seçeneðini seçiniz.<CR>proje seçeneklerinde ufak tefek ayarlamalar yapmanýz gerekebilir fakat hey çalýþmalar devam ediyor!
+
+...Bütün Proje HTML veya RTF olarak ihraç edilebilir.<CR>Bu yolla kaynak kodlarýnýzý tüm dünya ile paylaþmak için bir web sitesine yükleyebilirsiniz!<CR><CR>Sadece "Dosya / Ýhraç" üzerine týklayýnýz ve ihtaç metodunu seçiniz...
+
+#
+# Düzenleme Menü Ýpuçlarý
+#
+...Seçtiðiniz satýrý "Düzen / Yorumla ( Kaldýr ) " ile Yorum haline getirebilir veya kaldýrabilirsiniz.
+
+...Seçtiðiniz satýrý "Düzen / Girintili ( Girintisiz )" ile girintilenebilir veya girintisiz kaldýrýlabilir.
+
+...Kod üzerinde dolaþmak için Yer imlerini kullanýnýz.<CR><CR>Yer imlerini yerleþtirmek ve kaldýrmak için "Düzen / Yer Ýmlerini Deðiþtirme" seçeneði üzerine týklayýp Yer imi numarasýný seçiniz.<CR>Yer imine gitmek için "Düzen / Yer Ýmlerine Git" seçeneðinden yer imi numarasýný seçiniz.
+...Güçlü bir "Ara" Menüsü içersinde "Fonksiyona Git" komutu bulunmaktadýr.<CR><CR>Bu tüm dosyalarýn fonksiyonlarýný görüntüler ve fonksiyonun adýnýn bir parçasýnýn yazýlasý ile liste süzülür. Fonsiyona hemen gitmek için enter'e basýnýz!<CR>Not: sýnýf gezme iþlevi açýk olmalýdýr.  
+

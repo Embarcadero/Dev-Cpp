@@ -1,0 +1,1048 @@
+[lang]
+Lang=Turkish
+Ver=3
+
+1=&Dosya
+2=&Düzen
+3=&Ara
+4=&Görünüm
+5=&Proje
+6=&Çalýþtýr
+7=&Araçlar
+8=&Pencere
+9=&Yardým
+10=&Hata Ayýklama
+
+
+1001=&Yeni
+1002=&Proje...
+1003=&Kaynak kodu dosyasý
+1004=&Resource Dosyasý
+1005=&Þablon...
+1006=&Class...
+1007=New
+
+
+2001=&Proje veya Dosya Aç...
+2002=&Yeniden aç
+2003=&Tarihçeyi Temizle
+2004=&Kaydet
+2005=&Farklý Kaydet...
+2006=&Hepsini Kaydet
+2007=&Kapat
+2008=Projeyi Kapat
+2009=Özellikler
+2010=Projeyi ... Olarak Kaydet
+2011=&Ihrac et
+2012=&HTML'e
+2013=&RTF'ye
+2014=&Proje HTML'e
+2015=to &Tex
+
+
+3001=&Ithal et
+3002=&Yazdýr
+3003=Yazýcý ayarlarý
+3004=&Çýkýþ
+
+
+4001=&Find Declaration
+4002=F&ind Definition
+4003=&Geri al
+4004=&Yeniden yap
+4005=&Kes
+4006=&Kopyala
+4007=&Yapýþtýr
+4008=&Tümünü Seç
+4009=&Sil
+4010=&Ekle
+4011=Yer &imlerini deðiþtirme
+4012=&Yer imlerine git
+4013=Yer imi
+4014=&Tarih/Saat
+4015=&Açýklama Baþlýðý
+
+
+5001=&Ara...
+5002=&Dosyalarda Ara...
+5003=Deðiþtir...
+5004=&Yeniden Ara
+5005=&Satýra Git...
+5006=&Artan Arama
+5007=&Fonksiyona Git...
+5008=Gezici Proje Yöneticisi
+5009=Proje &Yöneticisine Git
+5010=Sýnýf &Gezginine Git
+5011=&Proje/Sýnýf Gezgini
+5012=&Durum çubuðu
+5013=&Derleyici çýktýsý
+5014=&Her zaman görünür
+5015=&Sadece gerektiðinde
+5016=&Araç çubuklarý
+5017=Ana araç çubuðu
+5018=Derle ve Çalýþtýr
+5019=Proje
+5020=Ayarla
+5021=Özeller
+5022=Düzenle
+5023=Ara
+5024=Kayan &Rapor Penceresi
+
+
+6001=&Yeni ünite
+6002=&Projeye Ekle
+6003=&Projeden Sil
+6004=Resource Dosyasýný &Düzenle...
+6005=Proje &Ayarlarý
+6006=&Makefile'ý düzenle
+6007=Resource Dosyasý &Ekle...
+6008=Resource Dosyasýný &Kaldýr...
+
+
+7001=&Derle
+7002=&Çalýþtýr
+7003=Derle && Çalýþtýr
+7004=&Hepsini yenýden oluþtur
+7005=Temizle
+7006=Derleme Sonuçlarý
+7007=&Yazým Kontrolü
+7008=&Programý Resetle
+7009=Pro&fil Analizi
+7010=Derlemeyi durdur
+7011=&Derleyici Ayarlarý
+7012=&Çevre Ayarlarý
+7013=&Editör Ayarlarý
+7014=&Araçlarý düzenle
+7015=&Kýsayollarý düzenle
+7016=Delete Profiling Information
+
+
+8001=&Tam Ekran
+8002=&Normale dön
+8003=&Bir sonraki
+8004=&Bir önceki
+8005=&Hepsini kapat
+8006=%s versiyon %s Tam Ekran Modu. shift+F12'ye basýlarak araç çubuklarýný açýlabilir veyada F12 ile normal moda dönülebilir
+8007=Bu dýþýnda hepsini kapat
+8008=&Liste...
+
+
+9001=&Dev-C++ Hakkýnda...
+9002=&Güncelleme/Paket kontrolü yap...
+9003=Help Menüsünü kiþiselleþtir...
+9004=Dev-C++ Yardýmý
+
+
+10001=&Hata Ayýkla
+10002=&Breakpoint ekle/kaldýr
+10003=&Sonraki Adým
+10004=&Adým Atla
+10005=&Ýzleme ekle
+10006=Ý&zlenen deðiþkenler
+10007=Çalýþmayý durdur
+10008=Ýzlemeyi &düzenle
+10009=Ýzlemeyi &kaldýr
+10010=Ýçine &Adým
+10011=Ýmleçe kadar çalýþtýr
+10012=&CPU penceresini göster
+10013=Süreç'e ( Process ) baðlan
+10014=&Deðeri Deðiþtir
+10015=&Hepsini temizle
+10016=Yeni Dosya
+10017=Dosya Ekle...
+10018=Dosyayý Sil...
+10019=Ayarlar...
+10020=Resource dosyasýný düzenle
+
+
+11001=Dosyayý Sil
+11002=Dosyayý Yeniden Adlandýr
+11003=Kapat
+11004=Aç
+11005=Baþlýðý Aç
+
+
+12001=Deklarasyona Git
+12002=Ýmplementasyona Git
+12003=Yeni Sýnýf
+12004=Yeni Üye Fonksiyon
+12005=Yeni Deðiþken
+12006=Görünüm modu...
+12007=Bütün Dosyalar
+12008=Þu anki dosya
+12009=Klasör Ekle
+12010=Klasörü Sil
+12011=Klasörü Yeniden Adlandýr
+12012=Bir projede en fazla %d klasör yaratabilirsiniz...
+12013=Renk kullan
+12014=Proje dosyalarý
+12015=Miras alýnan üyeleri göster
+12016=... ile beraber aç
+
+
+13001=Derleyici
+13002=Kaynaklar
+13003=Derleme Mesajlarý
+13004=Arama sonuçlarý
+13005=Kapat
+13006=Hata ayýkla
+
+
+14001=&Temizle
+14002=&Kopyala
+14003=&Sakla
+14004=&Aç
+
+
+15001=Satýr
+15002=Ünite
+15003=Mesaj
+15004=Parametreler
+
+
+16001=Satýr Bul
+16002=Kol
+16003=Deðiþken Ýsmi
+16004=Deðer
+16005=Bilgi:
+16006=Derleme Mesajlarý:
+16007=Toplam Hata:
+16008=Çýktýnýn boyutu:
+
+
+17001=Ýzlenen Deðiþkenler
+17002=Geriizleme
+17003=Çýktý
+17004=GDB'ye komut gönder :
+17005=Gönder
+
+
+18001=Yeni
+18002=Ekle
+18003=Deðiþtir
+18004=Git
+18005=Proje Penceresi
+18006=Hata Ayýklama Penceresi
+18007=Rapor Penceresi
+
+
+19001=Dosya Aç
+19002=Ünite Aç
+19003=Ýhrac et
+19004=Dosyayý Kaydet
+19005=Projeyi Kaydet
+19006=Bir yardým dosyasý seçin
+
+
+20001=Yeni deðiþken izlemesi
+20002=Deðiþken Ýsmi:
+20003=Deðiþken izlemesini düzenle
+20004=Yeni Deðiþeken Ýsmi:
+20005=Deðeri Deðiþtir
+20006=Düzenlenecek Deðiþken:
+20007=Yeni Deðer:
+
+
+21001=Proje
+21002=Sýnýflar
+
+
+22001=Yorumla
+22002=Yorumlarý kaldýr
+22003=Girintili
+22004=Girintisiz
+22005=Baþlýða/Kaynaða git
+22006=Collapse All
+22007=Uncollapse All
+
+
+23001=Editör Ayarlarý
+23002=Genel
+23003=Görünüm
+23004=Yazým Kuralý
+23005=Kod
+23006=Kod-Tamamlama
+23007=Sýnýf Gezgini
+23008=Autosave
+
+
+24001=Eklemeler
+24002=Öntanýmlý source
+24003=Files
+24004=Options
+24005=Symbol Completion
+
+
+25001=Yeni yazým ayarlarýnýn ismini giriniz:
+25002=Editör Ayarlarý:
+25003=Otomatik Satýrbaþý
+25004=Ekleme modu
+25005=Tab Karakteri Kullan
+25006=Akýllý Tabs
+25007=Girintisizlere Geriboþluk
+
+
+26001=Grup Geri Al
+26002=Geliþtirilmiþ Home Tuþu
+26003=Ýmleç EOF Bassýn
+26004=Ýmleç EOL Bassýn
+26005=Hat Çift Klik 
+26006=Ýmleçten itibaren metin bul
+26007=Ýhtiyaca göre kaydýrma çubuklarý
+26008=Yarým Sayfa Kaymasý
+26009=Kayma Ýpucu
+26010=Yazýmkurallarýna göre Renklendir
+26011=Büyütülmüþ Dosyalarý Ekle
+26012=Tab Boyutu:
+26013=Sað Kenar Boþluðu
+26014=Görünür
+26015=Geniþlik
+26016=Renk
+26017=Düzeltme imi
+26018=Düzeltme imi ekle 
+26019=Düzeltme iminin üstüne yaz 
+26020=Düþey Hat
+26021=Dikey Hat
+26022=Yarým Block
+26023=Block
+26024=Highlight current line
+26025=Trim trailing spaces
+26026=Enabled
+26027=Gutter width
+
+
+27001=Gizli hat karakterlerini göster
+27002=Editor ipuçlarýný göster
+27003=Eþlenen küme/köþeli parantezleri vurgula
+27004=Ensure that file ends with newline
+27005=Enabled
+27006=Sets to System HighlightText value
+27007=Sets to WhiteSpace value
+27008=Show function hints
+27009=It is also possible to edit text size by using Control+Scroll, just like in browsers!
+27010=Editör YazýTipi:
+27011=YazýTipi
+27012=Boyut
+27013=Editör YazýTipi
+27014=CiltPayý
+27015=Otomatik Boyut
+27016=Satýr Numaralarý
+27017=Yolgösterici Sýfýrlarý Göster
+27018=Sýfýrlar Baþla
+27019=Özel YazýTipi Kullan
+27020=CiltPayý YazýTipi
+27021=Önplan
+27022=Arkaplan
+27023=Stiller
+27024=Kalýn
+27025=Yatýk
+27026=Altý çizili
+27027=Hýzlý Renk Ayarlarý
+27028=Tip :
+27029=Özel yazým ayarlarýný kaydet
+27030=Kod
+27031=Menü Yazýsý
+27032=Bölüm
+27033=Tanýmlama
+27034=Boþ Projenin Baþlangýç Dosyasýna Varsayýlan Codu Ekle
+27035=Kod-tamamlama tamponunu kullan
+27036=Kod-tamamlama
+27037=Kod-tamamlamayý aç
+27038=Gecikme (ms):
+27039=Arkaplan Rengi:
+27040=Sýnýf Gezgini Ayarlarý
+27041=#include'larda referansý olan yerel dosyalarý araþtýr
+27042=Örnek:
+27043=Motor Ayarlarý
+27044=Görünütü Ayarlarý
+27045=Sýnýf gezginini aktifleþtir
+27046=#include'larda referansý olan global dosyalarý araþtýr
+27047=Sadece aktif dosyanýn sýnýflarýný göster
+27048=Interval:
+27049=Save all open files after each interval
+27050=Yeni Proje
+27051=Tanýmlama:
+27052=Enable symbol completion
+27053=Specific completion options
+27054=Complete braces '{}'
+27055=Complete parentheses '()'
+27056=Complete includes '<>' '""'
+27057=Complete square braces '[]'
+27058=Complete multiline comments '/**/'
+
+
+28001=Ýsim:
+28002=&C Projesi
+28003=C&++ Projesi
+28004=&Öntanýmlý Dil Yap
+28005=Çeþitli
+28006=Proje Ayarlarý
+
+
+29001=Projeden Çýkar
+29002=Projeden çýkarýlacak dosyayý seçin :
+
+
+30001=Satýra Git ...
+30002=Yeni Satýr:
+
+
+31001=Araçlar Konfigurasyonu
+31002=Þu Anki Araçlar:
+
+
+32001=Araç nesnesini düzenle
+32002=Baþlýk
+32003=Program
+32004=Çalýþma Dizini
+32005=Parametreler
+32006=Makro Ekle
+32007=Kullanýlabilir makrolar
+
+
+33001=Ýkon Kütüphanesi
+33002=Seçili ikonu kullan
+33003=Araþtýr
+
+
+34001=Kýsayol Konfigurasyonu
+34002=Bir nesneyi seçiniz ve istedðiniz kýsayolu klavyeden giriniz
+34003=Ýpucu:"Escape"e basarak bir kýsayolu silebilirsiniz
+34004=Menu giriþi
+34005=Kýsayol atandý
+34006=Ýptal
+34007=Tamam
+
+
+35001=Öntanýmlý dizini döndürür
+35002=Dev-c++ çalýþma dizinini döndürür
+35003=Derlenmiþ dosya ismini döndürür
+35004=Þu anki proje veya kaynak kod dosyasýnýn path bilgisini döndürür.
+35005=Þu anki proje veya kaynak kod dosyasýnýn ismini döndürür.
+35006=Proje ismini döndürür
+35007=Þu anki kaynak kod dosyasýnýn, dosya adýný döndürür
+35008=Þu anki kaynak kod dosyasýnýn path bilgisini döndürür.
+35009=Þu anki projede bulunan dosyalarý bir boþluk karakteriyle ayrýlmýþ halde döndürür
+35010=Aktif editörde imlecin bulunduðu kelimeyi döndürür
+35011=Dev-C++ versiyon bilgisini döndürür
+
+
+36001=Dev-C++ Hakkýnda :)
+36002=inseculous@users.sourceforge.net
+36003=GNU General Public License
+36004=Ýletiþim bilgisi
+36005=Bloodshed Software Web Sitesi:
+36006=Mingw Derleyicisi Web Sitesi:
+36007=Dev-C++ Forumlarý:
+36008=Dev-C++ kullanýcý email listesi:
+36009=Yapýmcýlarýn e-maillarý:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.bloodshed.net/devcpp-ml.html
+36014=haiku@bloodshed.net
+36015=&Güncellemeleri Kontrol Et
+36016=Post-4.9.9.2 Development:
+36017=http://orwellengine.blogspot.com
+
+
+37001=Code insert entry düzenle
+37002=Code insert entry ekle
+37003=Menü Nesnesi Ýsmi
+37004=Nesne tanýmý
+37005=Menü Bölümü
+
+
+38001=Derleme Ýþlem Penceresi 
+38002=&Derleme esnasýnda göster
+38003=&Derlemeden sonra otomatik kapat
+38004=Baþlangýçta Açýlýþ Ekranýný Gösterme
+38005=Çevre Ayarlarý
+38006=Genel
+38007=Dosyalar && Dizinler
+38008=Otomatik Aç
+38009=Yeni Proje C++ için önayarlý
+38010=Tam Ekran Modunda Araç Çubuklarýný Göster
+38011=Backup Dosyalarý Oluþtur
+38012=Çalýþtýrma Esnasýnda Küçült
+38013=Aç/Kaydet Dialoðu Stili
+38014=Windows 2k
+38015=Windows 9x
+38016=Windows 3.1
+38017=Dil:
+38018=Mesaj Penceresi Sekmeleri:
+38019=Yeniden Aç menüsünde maksimum dosya sayýsý
+38020=Kullanýcý ön tanýmlý dizini
+38021=Çýktý Dizini
+38022=Ýkon Kütüphanesi Dizini
+38023=Açýlýþ Ekraný Resmi
+38024=Kullanýcý ön tanýmlý dizini seçin
+38025=Derleyici çýktýsý dizinini seçin
+38026=Ýkon kütüphanesi dizinini seçin
+38027=Bütün proje dosyalarý
+38028=Sadece ilk proje dosyasý
+38029=Hiçbirþey
+38030=Tam Ekrar Modunda Menüyü Göster
+38031=Proje Yönetim Dosyalarýný açmak için çift týklayýn
+38032=Dil dosyalarý dizini
+38033=Tema:
+38034=Arabirim
+38035=Yazý Bul
+38036=Ara
+38037=Dosyalarda Ara
+38038=&Aranacak yazý
+38039=Ayarlar:
+38040=&Küçük-Büyük Harf Duyarlý
+38041=&Sadece tam sözcükleri eþleþtir
+38042=Yön
+38043=&Projedeki Dosyalar
+38044=&Dosyalarý Aç
+38045=Kapsam
+38046=&Genel
+38047=&Sadece seçililer
+38048=Baþlangýç
+38049=Ýmleçten itibaren
+38050=Tüm Kapsam
+38051=Yön
+38052=Ýleri
+38053=Geri
+38054=Pause console programs after return
+38055=Opened files at previous closing
+
+
+39001=Metini Yenisi ile Deðiþtir
+39002=Bulunacak Metin:
+39003=Ýle Deðiþtir:
+39004=Ayarlar:
+39005=&Küçük/Büyük harf duyarlý
+39006=&Sadece tam kelimeleri eþleþtir
+39007=&Yerine koymada bilgi iste
+39008=Yön:
+39009=Ýleri
+39010=Geri
+39011=Kapsam:
+39012=&Genel
+39013=&Sadece seçili
+39014=Baþlangýç:
+39015=&Ýmleçten itibaren
+39016=&Tüm Kapsam
+
+
+40001=Aranacak:
+40002=Ýpucu
+40003=Fonksiyon
+40004=Satýr
+
+
+41001=Derleyici Ayarlarý
+41002=Derleyici
+41003=Dizinler
+41004=Kod 
+41005=Baðlayýcý ( Linker ) 
+41006=Programlar
+41007=For more information about GCC's options, please visit
+
+
+42001=Binaryler
+42002=Kütüphanler
+42003=C Includelarý
+42004=C++ Includelarý
+
+
+43001=C Derleyicisi:
+43002=C++ Derleyicisi:
+43003=Derleyici:
+43004=Output
+
+
+44001=Bütün ANSI standart C programlarýný destekle
+44002=Geleneksel C öniþlemcilerinin bazý bakýþaçýlarýný desteklemeye çalýþ 
+44003=Bütün uyarý mesajlarýný yasakla 
+44004=Bütün ulaþým kontrollerini kapat
+44005=Tanýmlýyýcýlardaki $'ý kabul et
+44006=Daha hýzlý derlemek için heuristics kullan
+44007=Mingw derleyicisi yerine Cygwin kullan
+44008=Derleyici çaðýrýrken komut satýrýna þunlarý ekle:
+44009=Derleme Gecikmesi
+44010=Eðer make komutu makefile zaman pulu ile ilgili bir sorunla karþýlaþýrsa milisaniyeler mertebesinde geçikme olur. 
+44011=Her satýrda bir hata görüntüle
+44012=Do not recognize asm, inline or typeof as a keyword (-fno-asm)
+44013=Check if pointer is null before accessing storage allocated (-fcheck-new)
+44014=Put uninitialized globals into the common segment (-fconserve-space)
+
+
+45001=Kod Generation:
+45002=Optimizasyon:
+
+
+46001=KuralDýþýDurum yakalmayý aktif hale getir
+46002=Double ve float için ayný boyu kullan
+46003=Oluþturulan Assebmly koduna fazladan açýklama bilgisi koy
+46004=Optimize
+46005=En iyi optimizasyon
+46006=Sayýlarýn küçük optimizasyonlarý gerçekleþtir
+46007=Makefile Üretim:
+46008=Hýzlý kullan fakat kusurlu baðlý olma bilgisi yaratýr
+46009=Kod Profili:
+46010=Analiz için Profil bilgisi yarat 
+46011=Nesenel C programý baðla ( Link )
+46012=HataAyýklama bilgisi hazýrla
+46013=Standart system baþlangýç dosyalarý veya kütüphanelerini kullanma
+46014=Konsol penceresi yaratma
+46015=Baðlayýcý ( Linker ) komutuna bunlarý ekle
+46016=Optimizasyonu kapat
+46017=Daha fazla optimizasyon
+46018=Do not assemble, but output assembler code (-S)
+46019=Use pipes instead of temporary files during compilation (-pipe)
+
+
+47001=Dev-C++ da kullanýlan dosya isimlerini deðiþtirmek istiyebilirsiniz ( örneðin; Çapraz derleyici kullandýðýnýzda ):
+47002=Derleyici takýmý ayarlarý:
+47003=Yeni derleyici takýmý
+47004=Yeni takýmýn ismini giriniz:
+47005=Sadece Derleyici ayarý kaldýysa silmezsin!
+47006=Bu derleyicinin ayarýný silmek istediðine eminmisin?
+47007=Derleyici takýmýný yeniden isimlendir
+47008=Takýmýn yeni ismi için isim giriniz:
+47009=Diðer Optimizasyonlar
+
+
+48001=Yardým Menüsü Editörü
+48002=Menü Text
+48003=Yardým Dosyasý
+48004=Yardým Dosyasý Ayarlarý
+48005=Ýkon
+48006=Menü Bölümü
+48007=Bölüm 1
+48008=Bölüm 2
+48009=Açýlýr Menüde Yardým 
+48010=Eylemler
+48011=Imlecin pozisyonundaki kelime için yardým dosyasýnda arama
+48012=F1 kýsayoluna atama
+48013=Show most warnings (-Wall)
+48014=Show some more warnings (-Wextra)
+48015=Check ISO C/C++/C++0x conformance (-pedantic)
+48016=Code Warnings
+48017=Only check the code for syntax errors (-fsyntax-only)
+48018=Make all warnings into errors (-Werror)
+48019=Abort compilation on first error (-Wfatal-errors)
+
+
+49001=Dosyayý Yazdýr
+49002=Parametreler:
+49003=Sayfalar:
+49004=&Renkler
+49005=&Renklendir
+49006=&Sözcük Dönüþü
+49007=&Satýr Numaralarý
+49008=Satýr Numaralarýný Yazdýr
+49009=Kenarda satýr numaralarýný bas
+49010=Kopya Sayýsý:
+49011=Sadece seçili bölümü yazdýr
+49012=Don't Print Line Numbers
+
+
+50001=Dev-C++ Güncellemelerini Kontrol Et
+50002=Görev:
+50003=Sonuçlar:
+50004=Yayýn Sürümü:
+50005=ile kullanýmda ihtiyaç duyulmuþ sürümler:
+50006=Yayýn tanýmlamasý:
+50007=Download Sitesi (Download etmek için çift týklayýn):
+
+
+51001=Görev Listesine Ekle
+51002=Tanýmlama
+51003=Öncelik
+51004=Kullanýcý
+
+
+52001=Görev Listesi...
+52002=Dosya Adý
+52003=Tamamlandý
+52004=Tamamlanmýþ görevleri gösterme
+52005=Filtre:
+52006=Tüm dosyalar (projede olanlar ve olmayanlar)
+52007=Sadece açýk dosyalar (projede olanlar ve olmayanlar)
+52008=Tüm proje dosyalarý
+52009=Sadece açýk proje dosyalarý
+52010=Açýk projede olmayan dosyalar
+52011=Sadece þu anki dosya
+
+
+53001=MS Visual C++ projesi Ýthal Et
+53002=Visual C++ proje dosyasýný seçin
+53003=Ýthal etme ayarlarý
+53004=Konfigürasyon ithal
+53005=Dev-C++ proje dosya ismi
+53006=MS Visual C++ proje dosyasý baþarý ile Dev-C++ projesi olarak ithal edildi! Yeni Dev-C++ projesini þimdi açmak ister misiniz?
+53007=Hedef konfigürasyon "%s", konumlandýrýlamaz (bu muhtelelen Dev-C++ daki bir böcek(bug) )...
+
+
+54001=Import Code::Blocks project
+54002=Select Code::Blocks project file
+54003=Import options
+54004=Configuration to import
+54005=Dev-C++ project filename
+54006=The Code::Blocks project file has been imported and converted to a Dev-C++ project succesfully! Do you want to open it now?
+54007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
+
+
+55001=Proje Ayarlarý
+55002=Genel
+55003=Dosyalar/Dizinler:
+55004=Ýsim:
+55005=Ýkon:
+55006=Kütüphane
+55007=Araþtýr
+55008=Ýpucu:
+55009=Win32 GUI
+55010=Win32 Konsol
+55011=Win32 Statik Kütüphane
+55012=Win32 DLL
+55013=C++ olarak derle
+55014=Eklenecek komut satýrý ayarlarý:
+55015=Derleyici:
+55016=Baðlayýcý Ayarlarý/Seçimli Kütüphaneler veya Nesne Dosyalarý:
+55017=Kütüphane Dizinleri:
+55018=Kaynak Dosyalarý
+55019=Include Dizinleri
+55020=Ýkon Seç
+55021=Object Dosyasý include et
+55022=Resource Dizinleri
+55023=Üretim ayarlarý
+55024=Dizinler
+55025=&Çalýþtýrýlabilir dosya çýktý dizini
+55026=&Obje dosyasý çýktý dizini
+55027=Çýkýþ Dosyaismini &geçersiz kýl
+55028=Kütüphane veya Nesne Ekle
+55029=%d dosyada [%d kaynakta, %d baþlýkta, %d kaynakta]
+
+
+56001=Ýsim:
+56002=Tanýmlama:
+56003=Kategori:
+56004=Yeni proje ismi:
+56005=Þablondaki dosyalar:
+56006=Derleyici ekstra ayarlarý:
+56007=Linker ekstra ayarlarý:
+56008=Ýkonlar:
+56009=Þablon bilgisi
+56010=Dosyalar
+56011=Ekstralar
+56012=Þablon ikonu
+56013=Yeni proje ikonu
+56014=Yarat
+56015=Projeden yeni þablon oluþtur
+56016=Projenin Include dizilerini kullan
+56017=Projenin Library ( Kütüphane ) dizilerini kullan
+56018=Projenin Resouce ( Kaynak ) dizilerini kullan
+
+
+57001=Return tipi:
+57002=Deðiþken Ýsmi:
+57003=Ýçinde Gerçekleþtirme:
+57004=Ulaþým kapsamý
+57005=Bu deðiþkenden OKUMA için bir üye fonsiyon yarat
+57006=Bu deðiþkene YAZMA için bir üye fonsiyon yarat
+57007=Ýsim:
+57008=Yorumlar
+57009=Tanýmlama:
+57010=Stil:
+57011=Yarat
+57012=Ýptal
+57013=Bilinmeyen Sýnýf...
+57014=Uygulama için dosya ismine karar verilemez...
+57015=Kod ekleme için satýr numarasýna karar verilemez...
+57016=Üye ismi:
+57017=Argümanlar:
+57018=Sýnýf ismi:
+57019=Baþka bir sýnýftan inherit et
+57020=Kalýtým
+57021=Sýnýftan kalýtým:
+57022=Baþlýk Dosya Ýsmi:
+57023=Ýmplementasyon dosya ismi:
+57024=Baþlýk Dosya Ýsmi:
+57025=Þu anki projeye ekle
+57026=Özellikler
+
+
+58001=Dosya Ýsmi
+58002=Projede
+58003=Toplam Satýr
+58004=Gerçek Kod Satýrlarý
+58005=Yorum Satýrlarý
+58006=Includelanmýþ dosyalar
+58007=Boþ satýrlar
+58008=Dosya boyutu
+58009=Mutlak
+58010=Makefile
+58011=Rölatif
+58012=Dosyanýn tarih/zaman pulu
+58013=Derleyici ayarlarý
+
+
+59001=Profil Çözümleme
+59002=Düz Çýkýþ
+59003=Çaðýrým grafiði
+59004=Profiling Options
+59005=Function Hiding
+59006=Hide functions not called long enough
+59007=Hide statically linked file-local functions
+59008=Hide function called less than
+59009=times
+59010=Apply
+59011=Custom Commands
+59012=Use these commands instead:
+
+
+60001=''%s'' bulunamadý
+60002=%s dosyasý açýlamadý
+60003=''%s' in yerine yenisini yazayým mý?
+60004=Dosya: %s , %s içinde zaten var
+60005=%s - Kapatmak istedðine emin misin?
+60006=%s - Deðiþiklikler kaydedilsin mi?
+60007=%s kapatýlsýn ve yeni proje açýlsýn mý?
+60008=Ýsmini Deðiþtir:
+60009=Zaten derleniyor
+60010=%s - Deðiþiklikler kaydedilsin mi?
+60011=Dosya zaten mevcut, üstüne yazýlsýn mý?
+60012=Projeye yeni ünite eklensin mi?
+60013=Projeye yeni resource eklensin mi?
+60014=Projenizde debugging bilgisi bulunmamakta, debugging bilgisini aktif hale getirmek ve projeyi yeniden build etmek ister misiniz?
+60015=Derleyici Ayarlarýnda profi ve/veya hata ayýklama bilgisi aktif edilmemiþ. Bunlarý aktif edip projeyi hemen derlemek istermisiniz?
+60016=Lütfen Profil bilgisi yaratýlmýþ projeyi en azýndan bir kere çalýþtýrýn...
+60017=Yeni dizinin ismini girin:
+60018=Bu klasörü kaldýrmak istediðinize emin misiniz?
+60019=Yeni dizin ismi:
+60020=%s dosyasý yazma korumalý olarak iþaretli. Yazýlabilir hale getirmek ister misiniz? Hayýrý seçerseniz, dosya kaydedilemeyecek...
+60021=Bir hata oluþtu. %s dosyasý yazýlabilir hale etirilemedi ve kaydedilemedi...
+60022=Programýnýz geçersiz iþlem (Segmentation Fault) yürüttü.
+60023=Kaynak kodunuz çalýþtýrýlanbilecekten daha yeni.Tekrar derlemek istermisiniz?
+60024=Lütfen baðlanmak istediðiniz uygulamayý seçiniz:
+
+
+61001=%s - Dosya açýlamýyor
+61002=%s - Dosya kaydedilemiyor
+61003=%s - Yeniden adlandýrýlamýyor
+61004=Boþ arama yapýlamaz
+61005=Proje çalýþtýrýlamaz
+61006=Proje derlenmemiþ
+61007=Kaynak kod dosyasý derlenmemiþ
+61008=Makefile bulunamadý
+61009=Temizleme baþarýsýz oldu
+61010=ÞAblon projeye yerleþtirilemiyor.
+61011=%s Resource bulunamadý: %s - %s
+61012=Þablon dosyasý %s bulunamadý. Atlanýyor.
+61013=Þablon atanmamýþ.
+61014=Dosya %s bulunamadý.
+61015=Ana Program tedarik edilmemiþ. Çalýþtýr Menusünden Parametrelerden atayabilirsiniz.
+61016=Ana Program bulunamadý ! Çalýþtýr Menusünden Parametrelerden deðiþtirebilirsiniz.
+
+
+62001=Ýsimsiz
+62002=Salt okunur
+62003=Ekle
+62004=Üstüne yaz
+62005=Proje%d
+62006=Lütfen baþka bir dosya adý giriniz.
+62007=Dosyada %d satýr
+62008=Dosyayý yeniden adlandýr
+62009=%s çalýþtýrýlýyor
+62010=Çalýþtýrma iptal edildi
+62011=bytes
+62012=Düzenlendi
+62013=Hata
+62014=Bilgi
+62015=Uyarý
+62016=Soru
+62017=Derleme baþarýlý
+62018=Derleme kullanýcý tarafýndan durduruldu.
+62019=Line:%6d               Col:%6d               Sel:%6d               Lines:%6d               Length:%6d
+62020=Done parsing
+
+
+63001=&Tamam
+63002=&Ýptal
+63003=&Yardým
+63004=&Öntanýmlý
+63005=&Evet
+63006=&Hayýr
+63007=&Ekle
+63008=&Düzenle
+63009=&Kaldýr
+63010=&Sil
+63011=&Kapat
+63012=&Yapýmcýlar
+63013=&Ara
+63014=&Deðiþtir
+63015=&Geçersizi Sil
+63016=&Hepsini deðiþtir
+63017=Araþtýr
+63018=Kaldýr
+63019=Yeniden adlandýr
+63020=Ýthal
+63021=Pencere Modu
+63022=Temiz
+
+
+64001=CPU Penceresi
+64002=Assembler kodu :
+64003=Fonksiyon :
+64004=Assembler Syntax :
+64005=Registerlar :
+
+
+65001=Günün ipucu
+65002=Biliyor musunuz...
+65003=...gösterecek ipucu yok?
+65004=Açýlýþta ipuçlarýný gösterme
+65005=Sonraki ipucu
+65006=Önceki ipucu
+
+
+66001=Dosya iliþkilendirme
+66002=Dosya Tipler:
+66003=Dev-C++ ile açýlmasýný istediðiniz dosya tiplerini seçiniz...
+66004=CVS Desteði
+66005=CVS Program Dosyasý
+66006=Sýkýþtýrma Seviyesi
+66007=RSH yerine SSH kullan
+66008=Sablonlar dizini
+66009=Þablonlarýn Dizinini Seç 
+66010=XP Temasýný Kullan
+66011=Harici programlar
+66012=Harici program
+66013=Uzantý
+66014=Uzantý program iliþkileri:
+66015=Fare altýndaki deðiþkinleri izle
+66016=Ýzleme hatalarýný raporla
+66017=Hata ayýlmama deðiþkenleri gezgini
+66018=Alternatif Konfigürasyon dosyasý
+66019=Bu alternatif konfigürasyon dosyasýný kullan
+66020=Uygulama tarafýndan kullanýlan konfigürasyon dosyasýný deðiþtirdiniz.<CR>Yeni konfigürasyon dosyasý mevcut oturum için kullanýlamayacaktýr.Bu oturumda yapýlan herhangi bir konfigürasyon deðiþkliði, hali hazýrda açýk olan konfigürasyon dosyasýna kaydedilecektir.<CR><CR>Tavisye edilen uygulamayý þimdi tekrar baþlatmanýzdýr, böylece yeni konfigürasyon dosyanýz kullanýlmaya baþlanýr...
+66021=Dev-C++ was unable to set file associations.<CR><CR>This is known to be caused by using UAC on a normal non-admin user account.<CR><CR>Please disable UAC or run Dev-C++ as an admin if you want to change file associations using Dev-C++.<CR><CR>You might want to try the "Default Programs" feature in Windows Vista or 7.
+66022=UI font
+
+
+67001=Parametreler...
+67002=Mevcut dosyayý Derle
+
+
+68001=Pencere Listesi
+68002=Düzenlemek istediðiniz pencereyi seçiniz:
+
+
+69001=Þu anki dosya...
+69002=Tüm proje...
+69003=Lütfen "Araçlar / Çevre Ayarlarý" menüsünde CVS ayarlarýný kontrol ediniz...
+
+
+70001=Ýthal Seçenekleri
+70002=Havuz
+70003=Genel Ayarlarý
+70004=Kontrol Ayarlarý
+70005=Teslimat Ayarlarý
+70006=Güncelleme Ayarlarý
+70007=Fark Ayarlarý
+70008=Günlük Ayarlarý
+70009=CVS Çýktýsý
+70010=Ýthal et
+70011=Kontrol
+70012=Teslimat
+70013=Güncelle
+70014=Fark
+70015=Günlük
+70016=Ýthal dizini
+70017=Eylem
+70018=Saðlayýcý
+70019=Yayýn
+70020=Günlük Mesajý
+70021=Modül ismi
+70022=Uzantý
+70023='e Göre Kontrol
+70024=Kontrol Dizini
+70025=Alt dizinlerin tümünü kapsa
+70026=Yapýþkan ayarlarýný sýfýrla
+70027=Kayýp dizinleri yarat
+70028=Boþ dizinleri kaldýr
+70029=Yerelde yapýlmýþ deðiþikliklerden vazgeç
+70030=Tarihden önce
+70031=Düzetmeler/dal/etiket
+70032=Eðer bulamazsan, en sonuncuyu al
+70033=Diðer düzeltmeler
+70034=Birleþtirilmiþ farklarý gerçekleþtir
+70035=Yerel dosyayý uzaktaki düzetme/etiket aynýsý ile karþýlaþtýr
+70036=Yerel dosyayý uzaktaki diðer düzetme ile karþýlaþtýr
+70037=Uzaktaki iki düzetmeyi karþýlaþtýr
+70038=Tarih
+70039=Varsayýlan dali günlükle
+70040=Sadece RCS Dosya isimlerini listele
+70041=Etiket isimlerini basma
+70042=Filitre
+70043=Gözden Geçirmeye/Etikete göre
+70044=Tarihe Göre
+70045=Kullanýcýya Göre
+70046=Havuz
+70047=Detaylar
+70048=Ulaþým metodu
+70049=Kullanýcý
+70050=Sunucu
+70051=Uzaktaki Dizin
+70052=Ekle
+70053=Kaldýr
+70054=Seçenekler Ekle
+70055=Seçenekler Kaldýr
+70056=Ayný zamanda aosyayý diskten de kaldýr...
+
+
+71001=Parametreler
+71002=Programýnýza yapýþtýrlacak parametreler:
+71003=Ana Program:
+
+
+72001=Dosyalar
+72002=Proje dosyalarý:
+72003=Proje seçenekleri:
+72004=Hata Ayýklama Bilgisi Yarat
+72005=Profil Bilgisi Yarat
+72006=NOT: Bu ayarlar genel derleyici seçeneklerinin sadece bu proje için geçersiz kýlacaktýr
+72007=Windows XP Temalarýný Destekle
+72008=Dosya seçenekleri:
+72009=Derlemeye dahil
+72010=Dosyayý C++ gibi derle
+72011=Sürüm bilgisi
+72012=Projede sürüm bilgisini içer
+72013=Sürüm Detaylarý
+72014=Ana:
+72015=Ýkincil:
+72016=Yayýn:
+72017=Üretim:
+72018=Dil:
+72019=Diðer bilgiler:
+72020=Ýnþa komutlarýný geçersizkýl
+72021=Çýkýþ dosyasý
+72022=Baðlama esnasýnda dahil et
+72023=Ýnþa Öncelliði:
+72024=Derleme esnasýnda üretim numarasýný otomatik-arttýrma 
+72025=kiþisel Makefile kullan ( Makefile yaratma, bunu kullan )
+72026=Makefile kiþiselleþtirmesi hakkýnda bilgi...
+72027=&Ekteki dosyalarý Makefile içine dahil et:
+72028=Sync product with file version
+72029=Default to C++ when creating new files
+
+
+73001=Exe yi yanýnlaþtýr
+73002=Belirtilen makine için komut üret
+73003=&Ekteki dosyalarý Makefile içine dahil et:
+73004=Optimization level (-Ox)
+73005=Language standard (-std)
+73006=Compile with the following bit width (-mx)
+73007=Optimize less, while maintaining full compatibility (-mtune)
+
+
+74001=Compiler:
+74002=Status:
+74003=File:
+74004=Errors:
+74005=Warnings:

@@ -1,0 +1,150 @@
+# Spanish.tips V05 Sep.11.2002
+# Maintainer: Ricardo Ortega
+# Favor remitir sugerencias y comentarios a ricardo@ortega.as
+
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+...no debería deshabilitar estas sugerencias?<CR><CR>Le mostrarán sugerencias y ayudas importantes.<CR><CR>Para activar las sugerencias vea "Ayuda / Sugerencia del día"...
+
+# Tips from Ricardo Ortega rortega@andinanet.net
+
+...Dev-CPP le permite crear programas C y C++ para Windows?<CR><CR>Seleccione Nuevo Proyecto y elija el lenguaje apropiado ...
+
+...Dev-CPP dispone de ayuda y programas de ejemplo pero puede descargar de internet más ayudas y ejemplos?<CR><CR>Use "Herramientas / Actualizar" y "Herramientas / Package Manager"
+
+...use vUpdate para mantener su entorno Dev-Cpp actualizado y ampliado?<CR><CR>Seleccione "Herramientas / Actualizaciones..."
+
+...Puede agregar más información al menú Ayuda?<CR><CR>Busque y descargue archivos .HLP, .CHM, .HTM o .PDF desde internet y use Ayuda Modificar ..."
+
+...con Dev-CPP puede crear programas multimedia?<CR><CR>Instale fácilmente Allegro, OpenGL, GDK, FDK, y otras librerías multimedia usando "Herramientas / Actualizar".
+
+...puedes ver a colores las líneas de tu programa?<CR><CR>Graba el archivo con la extensión correcta .C .CC .CPP para que se active el coloreo de sintaxis
+
+...puedes cambiar fácilmente los colores ?<CR><CR>Usa "Herramientas / Opciones del Editor / Sintaxis y elije Ajustes Rápidos del Color"
+
+...puedes hacer que Dev-CPP muestre un aspecto similar a Windows u Office XP?<CR><CR>Usa "Herramientas / Opciones del Entorno / Interfaz / Presentación Modo XP"
+
+...los archivos #include se llaman archivos de cabecera y no librerías?<CR><CR>En este programa se usa la palabra cabecera para referirse a los archivos de #include ...
+
+...puede ver u ocultar las ventanas de navegación de proyecto y clases (funciones)?<CR><CR>Use "Ver / Navegador de Proyecto/Clases".
+
+...los archivos #include son archivos de texto terminados en .h o .hpp?<CR><CR>Contienen constantes, prototipos, definiciones de clases y rara vez contienen código ...
+
+...los proyectos son grupos de archivos?<CR><CR>Un proyecto es la reunión de archivos fuente .C .CPP, .H, .ICO, .BMP, .RC. Toda la lista de archivos de un proyecto se guarda en los archivos .DEV
+
+...los archivos de librería terminan en extensión .LIB, .DLL, .RTL o .A?<CR><CR>Sirven para almacenar varias funciones o clases en lenguaje binario (objeto o ejecutable) resultado de un proceso de compilación y creación de librería ...
+
+...que este programa usa teclas bastante parecidas a Turbo-C/C++ Borland C/C++?<CR><CR>Aunque las teclas se pueden reasignar en Herramientas / Configurar teclas rápidas, recuerde que existen otros programas que usan el mismo juego de teclas, incluyendo programas como xwpe (linux), o RHIDE(dos, linux)
+
+...que este programa tiene incorporado un excelente depurador para seguir paso a paso la ejecución de su programa, observar (vigilar) variables y más?<CR><CR>No espere terminar su programa. Abra el menú Depuración y pruebe Depuración, paso a paso, vigilar variables y el resto de opciones...
+
+...Visita la página de Dev-CPP, intercambia opiniones y preguntas sobre funciones, instrucciones y demáss?<CR><CR>Usa el menú de Ayuda, Acerca de Dev-C++ más direcciones de interés.<CR><CR>Visita <URL>http://www.bloodshed.net/dev<UDESC>
+
+
+#
+# Code-completion tips
+#
+...la facilidad para auto completar código le ayudará a mejorar su productividad sugiriendo los comandos disponibles en el contexto actual?<CR><CR>Para habilitar Inserción de Código Automático use "Herramientas / Opciones del Editor" abra Navegador de Clases y active auto completar Código.
+
+...la facilidad para auto completar código se activa cuando Usted escribe ".", "->" o "::" en la ventana del editor luego de una pausa (retardo) configurable?<CR><CR>Para configurar la pausa use "Herramientas / Opciones del editor / Navegador de Clases / Auto completar código
+
+...Usted puede iniciar la facilidad para auto completar código presionando "Ctrl+Espacio" en la ventana del editor?<CR><CR>(Intente presionar "Ctrl+Shift+Espacio" cuando el cursor está dentro de los paréntesis de los argumentos de una función...)
+
+...la ventana Navegador de Clases(Funciones) le permite ver fácilmente todas las clases y funciones de su proyecto?<CR><CR>Abra la ficha pestaña Clases/Funciones para ver y navegar por su proyecto con más facilidad...
+
+...presionando la tecla shift (cambio) y el botón principal del ratón en una entrada del navegador de clases, le lleva a la declaración en vez de a la implementación?<CR><CR>Por supuesto, puede usar el menú contextual para eso y más...
+
+...Usted puede agregar carpetas personalizadas a su navegador de clases para localizar más fácilmente cosas en proyectos grandes?<CR><CR>Puede anidar las carpetas!<CR><CR>Use el menú contextual (botón derecho) en el navegador...
+
+...las carpetas personalizadas de clases se guardan en un archivo llamado "classfolders.dcf" en el directorio raíz de su proyecto?<CR><CR>Si algo va mal, simplemente borre este archivo y abra nuevamente su proyecto!
+
+...hay dos modos de despliegue para su navegador de clases?<CR><CR>Uno muestra todas las clases / miembros / funciones del proyecto, y el otro muestra información relevante *solo* para el archivo actual en la ventana del editor.<CR><CR>Use el menú contextual del navegador de clases y elija "Modo de Visualización"...
+
+#
+# Project Manager tips
+#
+...puede definir si usa un solo clic o doble clic sobre un archivo en el administrador de proyectos para abrirlo con el editor?<CR><CR>Elija "Herramientas / Opciones de Entorno" y revise "Doble clic para abrir archivos en el administrador de proyectos"...
+
+...Usted puede definir carpetas personalizadas (sólo en la parte superior del administrador de proyectos) para organizar mejor sus archivos?<CR><CR>Use el menú contextual del administrador de proyectos...
+
+...si Usted ha creado carpetas personalizadas en el administrador de proyectos, puede arrastrar y soltar archivos para reorganizarlos?
+
+#
+# File menu tips
+#
+...puede obtener información acerca del archivo en el cual está trabajando?<CR><CR>Use "Archivo / Propiedades" y obtendrá varios detalles del archivo, como tamaño, número de líneas, comentarios, líneas vacías, cabeceras, etc.!
+
+...puede grabar un proyecto como una plantilla?<CR><CR>Seleccione "Archivo / Nuevo / Plantilla".<CR>Esto grabará su proyecto como una plantilla para Dev-Cpp y estará disponible cuando seleccione "Archivo / Nuevo / Proyecto".<CR>De esta manera, tendrá una base de código inicial, a su gusto y/o necesidades!
+
+...puede importar sus proyectos de MS Visual C++ a Dev-Cpp?<CR><CR>Use "Archivo / Importar / Proyecto MS Visual C++".<CR>Es posible que se necesite reconfigurar algunas opciones del proyecto, pero seguiremos trabajando para que este cambio sea más fácil. Es un trabajo en proceso!
+
+...puede exportar un archivo fuente o todo un proyecto a formato HTML o RTF?<CR><CR>Así puede subir sus archivos fuente a un sitio web y compartirlos con el mundo!<CR><CR>Use "Archivo / Exportar" y elija el formato deseado...
+
+#
+# Edit menu tips
+#
+...puede poner o quitar los signos de comentario a un conjunto de líneas?<CR><CR>Seleccione las líneas deseadas y Use "Edición / Poner comentario" o "Quitar comentario".
+
+...puede colocar o quitar espacios al inicio de las líneas (indentar) para mejorar la presentación?<CR><CR>Use "Edición / Indentar" o "Quitar Indentación".
+
+...puede usar marcadores en el editor para moverse rápidamente por sus archivos fuente?<CR><CR>Ponga o quite una marca usando "Edición / Marcadores de Posición" elija el número de marcador.<CR><CR>Para ir a ese marcador use "Edición / Ir a Marcador" y elija el número deseado.
+
+...el programa tiene la opción de "Ir a función" bajo el menú Buscar?<CR><CR>Muestra todas las funciones del archivo y si usted escribe una parte del nombre de la función, la lista se filtra. Presione Enter y el editor le lleva a esa función!<CR>Nota: Debe activar navegación de clases(funciones)...
+
+...puede contactar al traductor al español y autor de varias de estas sugerencias?<CR><CR>Escriba a Ricardo Ortega en Quito, Ecuador<CR><URL>mailto:ricardo@ortega.as<UDESC>ricardo@ortega.as
+
+...Dev-CPP tiene muchas más cosas interesantes y gratis?<CR><CR>Use Herramientas Actualizar para revisar y descargar muchos extras.
+
+#
+# More tips by Fernando Muñoz Ledesma
+#
+
+...hay dos modos de pantalla completa?<CR><CR>Para ir al modo de pantalla completa presiona la tecla "F12" o selecciona "Ventana / Modo Pantalla Completa".<CR><CR>Para añadirle la Barra de Herramientas hay que presionar "Shift" y "F12".<CR><CR>Para volver al modo normal presionar "F12".
+
+...puedes utilizar teclas para acceder rápidamente a opciones importantes y que además puedes configurarlas?<CR><CR>Para ello ve a "Herramientas / Configurar Atajos Teclado".<CR><CR>Nota: Se pueden deshacer los cambios porque se guardan en el archivo "devshortcuts.cfg" en la carpeta principal.
+
+...el archivo "devcpp.ini" contiene toda la configuración de Dev-C++?<CR><CR>Así si sucediese algo malo en, por ejemplo, los colores para mostrar la sintaxis en el editor, puedes quitar lo que hay debajo de la clave "[Editor.Syntax]" o modificar alguna configuración simplemente.
+
+...puedes añadirle poderosas herramientas a Dev-C++?<CR><CR>Ve a "Herramientas / Configurar Herramientas / Añadir" y añadiendo el título, el programa, la carpeta de trabajo y los macros y parámetros que necesite,<CR>¡ y tendrás la nueva herramienta lista para su utilización con Dev-C++ !
+
+...puedes ver los resultados del compilador utilizando sólo el teclado?<CR><CR>Basta con que presiones "Alt"+"C" e irás a la pestaña compilador. Y para moverte al resto de las pestañas, con "Ctrl"+"Tab".<CR><CR>Recuerda que cuando llegues a la pestaña Cerrar, los resultados del compilador se ocultarán.
+
+...puedes compilar rápidamente tu código fuente o proyecto presionando "Ctrl"+"F9"?<CR><CR>¿ Sabías que puedes ejecutar tu programa presionando "Ctrl"+"F10"?<CR><CR>¿ Sabías que puedes hacer las dos anteriores presionando "F9"?<CR><CR>Son los atajos del teclado de Dev-C++.
+
+...cada usuario tiene su propia configuración?<CR><CR>Los archivos de configuración se guardarán en la carpeta de Application Data de cada usuario<CR><CR>Así podrás personalizar Dev-C++ sin preocuparte de que otros usuarios cambien tu configuración.<CR><CR>Esto es válido sólo para Windows 2000 y XP.
+
+...la sintaxis coloreada tiene varias configuraciones para adaptar más fácilmente el editor de Dev-C++?<CR><CR>Así puedes ver la sintaxis como en MS Visual C++, Borland, además de otras.<CR><CR>Elije la que más te guste en Herramientas / Opciones del editor / Sintaxis / Configuraciones.
+
+...puedes tener tu propia configuración de sintaxis coloreada?<CR><CR>Haz los ajustes en Herramientas / Opciones del editor / Sintaxis y dale al icono de guardar, que es el dibujo del disquette.<CR><CR>Tendrás que introducir un nombre y...<CR>          ¡Listo, ya tienes tu propia configuración!
+
+...existe un botón para cancelar la compilación?<CR><CR>Si por error le has dado a compilar pues cancelarla presionando el botón con letras rojas que dicen "Parar la compilación"<CR><CR>El botón se encuentra en los resultados de la compilación abajo a la izquierda, justo debajo del indicador del tamaño del archivo de salida.
+

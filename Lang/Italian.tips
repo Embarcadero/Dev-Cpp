@@ -1,0 +1,84 @@
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+..non dovresti disabilitare questi suggerimenti?<CR><CR>I suggerimenti qui presentati ti daranno informazioni non documentate altrove.<CR>Se li disabiliti e in seguito vuoi rivederli, scegli "Help / Suggerimenti"...
+
+..puoi usare vUpdate per mantenere Dev-C++ aggiornato con le ultime patch e le nuove features?<CR><CR>Scegli "Strumenti / Cerca Aggiornamenti / Packages..."
+
+#
+# Code-completion tips
+#
+..il completamento del codice aumenterà la tua produttività suggerendo i possibili comandi disponibili nel contesto corrente?<CR><CR>Per abilitarlo, vai su "Strumenti / Opzioni dell'editor", abilita il visualizzatore delle classi e il completamento del codice.
+
+..il completamento del codice è avviato quando scrivi ".", "->" o "::"  dopo un timeout personalizzabile?<CR><CR>Per definire il timeout vai su "Strumenti / Opzioni dell'Editor / Visualizzatore delle classi / Completamento del codice".
+
+..puoi avviare il completamento del codice premendo "Ctrl+Spazio" ?<CR><CR>(Prove a premere "Ctrl+Shift+Space" mentre il cursore è dentro le parentesi dei parametri di una funzione...)
+
+..premendo shift+Click in un item del visualizzatore di classi, porta alla dichiarazione invece che all'implementazione?<CR>Certo, puoi anche usare il menù contestuale per avere lo stesso risultato...
+
+..puoi aggiungere cartelle personalizzate nel visualizzatore di classi per trovare più facilmente quello che cerchi? Puoi anche creare una struttura a più livelli di
+cartelle personalizzate!<CR><CR>Fai click destro nel visualizzatore di classi per far apparire il menù contestuale...
+
+..le informazioni sulle cartelle personalizzate sono conservate in un file di nome "classfolders.dcf" nella directory radice del progetto?<CR><CR>Se qualcosa va male, semplicemente cancella questo file e riapri il progetto!
+
+..Ci sono due viste del visualizzatore di classi?<CR>Una mostra classi/membri/funzioni del progetto, e l'altra mostra le informazioni più rilevanti *esclusivamente* relative al file corrente.<CR><CR>Fai click destro e scegli "Vista"...
+
+#
+# Project Manager tips
+#
+..si può definire se aprire un file con un singolo od un doppio click?<CR><CR>Per far ciò vai su "Strumenti / Opzioni dell'ambiente" e abilita (o disabilita) il "Doppio click per aprire il file di progetto"...
+
+..puoi definire cartelle personalizzate (solo top-level) per organizzare meglio i files?<CR><CR>Per far ciò, fai click destro su un file per far apparire il menù contestuale...
+
+..se hai creato cartelle personalizzate , puoi fare il drag && drop dei files?
+
+#
+# File menu tips
+#
+..puoi avere informazioni sul file su cui stai lavorando?<CR><CR>Scegli "File / Proprietà" e avrai informazioni sulla dimensione del file, il numero di linee, linee di commento, linee vuote e file inclusi!
+
+..puoi salvare il tuo progetto come modello?<CR><CR>Scegli "File / Nuovo / Modello". Questo salverà il progetto come modello e sarà disponibile in  "File / Nuovo / Progetto".<CR>In questo modo avrai una base di tuo gradimento da cui partire!
+
+..Puoi importare un progetto MS Visual C++ in Dev-C++?<CR><CR>Scegli "File / Importa / Importa progetto MS Visual C++".<CR>Potresti avere bisogno di correggere un pò le opzioni di progetto, ma è ancora in lavorazione!
+
+..Puoi esportare un file o l'intero progetto in HTML o RTF?<CR>In questo modo puoi pubblicare i sorgenti su un sito web e condividerli con tutto il mondo!<CR><CR>Clicca su "File / Esporta" e scegli la modalità...
+
+#
+# Edit menu tips
+#
+..puoi (s)commentare un gruppo di linee selezionandole e cliccando su  "Modifica / Commenta (Togli Commento)"?
+
+..puoi (dis)indentare un gruppo di linee selezionadole e cliccando su "Modifica / Indenta(Togli Indentazione)"?
+
+..puoi usare i segnalibro nell'editor per spostarti velocemente nel codice?<CR><CR>Imposta (o togli) il segnalibro cliccando su "Modifica / Attiva/Disattiva Segnalibro" e selezionando il numero del segnalibro.<CR>Puoi andare ad un segnalibro cliccando su "Modifica / Vai al Segnalibro" e selezionando il numero del segnalibro.
+
+..c'è un potente comando "Vai alla funzione" nel menù "Cerca"?<CR><CR>Ciò mostra tutte le funzioni del file e digitando una parte del nome della funzione,la lista viene filtrata. Premi invio per andare immediatamente su questa funzione!<CR>Nota: il visualizzatore di classi deve essere abilitato...

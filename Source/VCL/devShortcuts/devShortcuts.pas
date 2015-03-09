@@ -50,7 +50,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Load(List: TActionList);
-    procedure Edit(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent, ReplaceHint, ResetAllConfirm, ResetCurrentConfirm, Button: AnsiString);
+    procedure Edit(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent, ReplaceHint,
+      ResetAllConfirm, ResetCurrentConfirm, Button: AnsiString);
     procedure Save;
   published
     property Filename: TFilename read fFilename write fFilename;
@@ -131,44 +132,46 @@ begin
 
     // Add all main menu items...
     for I := 0 to fOwner.ComponentCount - 1 do begin
-      if fOwner.Components[I] is TMenuItem then begin
-        MenuItem := TMenuItem(fOwner.Components[I]);
-        if (not MenuItem.IsLine) and (MenuItem.Count = 0) then begin // don't process foldouts and separators
+      // only accept menu items (not only the main menu, but popup menus too)
+      if not (fOwner.Components[I] is TMenuItem) then
+        Continue;
 
-          // Don't add if the main menu counterpart or their action has been added
-          if Assigned(MenuItem.Action) and (Actions.IndexOf(MenuItem.Action.Name) <> -1) then
-            Continue;
+      // don't process foldouts and separators and grayed/disabled menu items
+      MenuItem := TMenuItem(fOwner.Components[I]);
+      if MenuItem.IsLine or (MenuItem.Count <> 0) or (not MenuItem.Enabled) then
+        Continue;
 
-          item := new(PShortcutItem);
-          item^.Default := MenuItem.ShortCut;
-          item^.Temporary := MenuItem.ShortCut;
-          item^.IniEntry := GetItemDescription(MenuItem);
-          item^.ListEntry := ''; // to be filled by form (translated)
-          item^.MenuItem := MenuItem;
-          item^.Action := TAction(MenuItem.Action);
-          fShortcuts.Add(item);
-        end;
+      // Don't add if the main menu counterpart or their action has been added
+      if Assigned(MenuItem.Action) and (Actions.IndexOf(MenuItem.Action.Name) <> -1) then
+        Continue;
 
-        // Store action of main menu item, and don't create duplicates for popup menu items with the same action
-        if Assigned(MenuItem.Action) then
-          Actions.Add(MenuItem.Action.Name);
-      end;
+      item := new(PShortcutItem);
+      item^.Default := MenuItem.ShortCut;
+      item^.Temporary := MenuItem.ShortCut;
+      item^.IniEntry := GetItemDescription(MenuItem);
+      item^.ListEntry := ''; // to be filled by form (translated)
+      item^.MenuItem := MenuItem;
+      item^.Action := TAction(MenuItem.Action);
+      fShortcuts.Add(item);
+
+      // Store action of main menu item, and don't create duplicates for popup menu items with the same action
+      if Assigned(MenuItem.Action) then
+        Actions.Add(MenuItem.Action.Name);
     end;
 
     // Lastly, add actions without a menu item
     for I := 0 to List.ActionCount - 1 do begin
       Action := TAction(List.Actions[i]);
-      if Actions.IndexOf(Action.Name) = -1 then begin // forgot this action...
-
-        item := new(PShortcutItem);
-        item^.Default := Action.ShortCut;
-        item^.Temporary := Action.ShortCut;
-        item^.IniEntry := Action.Caption;
-        item^.ListEntry := ''; // to be filled by form (translated)
-        item^.MenuItem := nil;
-        item^.Action := Action;
-        fShortcuts.Add(item);
-      end;
+      if (Actions.IndexOf(Action.Name) <> -1) or (not Action.Enabled) then
+        Continue; // skip actions already added via menu item
+      item := new(PShortcutItem);
+      item^.Default := Action.ShortCut;
+      item^.Temporary := Action.ShortCut;
+      item^.IniEntry := Action.Caption;
+      item^.ListEntry := ''; // to be filled by form (translated)
+      item^.MenuItem := nil;
+      item^.Action := Action;
+      fShortcuts.Add(item);
     end;
   finally
     Actions.Free;
@@ -211,7 +214,8 @@ begin
   end;
 end;
 
-procedure TdevShortcuts.Edit(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent, ReplaceHint, ResetAllConfirm, ResetCurrentConfirm, Button: AnsiString);
+procedure TdevShortcuts.Edit(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent,
+  ReplaceHint, ResetAllConfirm, ResetCurrentConfirm, Button: AnsiString);
 var
   I: integer;
   item: PShortcutItem;

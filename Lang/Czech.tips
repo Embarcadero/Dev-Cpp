@@ -1,0 +1,115 @@
+#Autor pøekladu: Jan Ringoš, Tringi
+#E-mail: Tringi@mx-3.cz
+
+#Web: http://tringi.mx-3.cz
+#Tým: http://www.mx-3.cz
+
+#Za pøípadné chyby se omlouvám, ale nikdo není dokonalý.
+#Nejnovìjší soubory vždy naleznete na stránce http://tringi.mx-3.cz
+
+
+
+#Za pøípadné chyby se omlouvám, ale nikdo není dokonalý.
+#Nejnovìjší soubory vždy naleznete na výše uvedené stránce.
+
+
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#       <CR>:           insert a linefeed
+#       <URL>:          is followed by a URL link
+#       <UDESC>:        is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#       ( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#       ...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#        so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+
+#
+# Important tips (appear first)
+#
+...není dobré vypínat tipy?<CR><CR>Tipy, nabízené zde pøináší informace a triky, které nejsou zmínìné nikde jinde.<CR>Pokud tipy zrušíte, najdete je vždy v nabídce Nápovìda / Tip dne.
+
+
+...mùžete použít vUpdate k aktualizaci prostøedí Dev-C++. Nepøijdete pak o novinky, opravy chyb ani nové funkce.<CR><CR>Zvolte Nástroje / Zjistit updaty.
+
+
+...nejnovìjší verzi tohoto souboru s èeským pøekladem naleznete vždy nìkolik dní po vydání Dev-C++ na stránce Tringi netbase?<CR><CR>Pøejít na tuto stránku mùžete kliknutím na následující odkaz.<URL>http://tringi.mx-3.cz<UDESC>Tringi netbase (http://tringi.mx-3.cz)
+
+
+#
+# Code-completion tips
+#
+...vlastnost dokonèování vám mùže pomoci zvýšit produktivitu práce tak, že vám nabídne všechna možná øešení dostupná pro aktuální kontext?<CR><CR>Povolit dokonèování mùžete v nabídce Nástroje / Nastavení editoru na záložce Struktura kódu / Dokonèování.
+
+
+...dokonèování kódu se aktivuje po napsání ".", "->" nebo "::" po uplynutí nastavitelné doby?<CR><CR>Tuto prodlevu je možné nastavit v nabídce Nástroje / Nastavení editoru na záložce Struktura kódu / Dokonèování.
+
+
+...mùžete explicitnì vyvolat funkci dokonèování stiskem klávesy Ctrl a Mezerník kdekoliv v oknì editoru?<CR><CR>Také zkuste stisknout Ctrl-Shift-Mezerník kdykoliv je kurzor uvnitø závorek volání funkce...
+
+
+...pøidržením klávesy Shift pøi kliknutí do pøehledu tøíd pøesune editaci k deklaraci místo implementace?<CR>Samozøejmì je vše v kontextovém menu na pravém tlaèítku myši...
+
+
+...mùžete i v pøehledu tøíd vytváøet vlastní složky?<CR><CR>K usnadnìní orientace ve velkých projektech pak mùžete bìžným tažením myši rozlišit všechny objekty a promìnné.<CR><CR>Kontextové menu zobrazíte kliknutím pravým tlaèítkem myši...
+
+
+...je možné zvolit si ze dvou režimù zobrazení pøehledu tøíd? Jeden zobrazuje všechny zjištìné tøídy, èlenské funkce a promìnné v projektu a druhý pouze relevantní informace k danému souboru.<CR><CR>Kliknutím pravým tlaèítkem myši zobrazte kontextové menu a zvolte Zobrazit/Aktuální soubor.
+
+
+#
+# Project Manager tips
+#
+...mùžete zvolit zda chcete otevírat soubory ze Správce projektu jednoduchým kliknutím nebo dovjklikem?<CR><CR>Nastavit si tuto vlastnost mùžete v nabídce Nástroje / Nastavení prostøedí a povolte (nebo zrušte) volbu Dvojklik pro otevøení souboru.
+
+
+...si mùžete nastavit vlastní složky (pouze v jedné úrovni) k organizaci souborù ve správci projektu?<CR><CR>K usnadnìní orientace ve velkých projektech pak mùžete bìžným tažením myši rozlišit všechny soubory.<CR><CR>Kontextové menu zobrazíte kliknutím pravým tlaèítkem myši...
+
+
+#
+# File menu tips
+#
+...mùžete získat zajímavé informace o souboru se kterým právì pracujete.<CR><CR>Zvolte z menu Soubor položku Vlastnosti...
+
+
+...je možné uložit projekt jako šablonu?<CR><CR>Zvolte nabídku Soubor / Nový / Šablona. Tímto uložíte váš projekt jako šablonu Dev-C++ a mùžete nové projekty zaèínat na základì této šablony.
+
+
+...mùžete pøevést vaše projekty MS Visual C++ do Dev-C++?<CR><CR>Zvolte nabídku Soubor / Import / Importovat projekt MS Visual C++.<CR>Je ale nutné projekt upravit aby byl ve finální verzi spustitelný!
+
+
+...mùžete exportovat zdrojové kódy nebo celý projekt do HTML nebo RTF?<CR><CR>Je to nejvhodnìjší a nejrychlejší zpùsob jak uploadovat kódy na web.<CR><CR>Jednoduše kliknìte v nabídce Soubor na položku Export a zvolte metodu.
+
+
+#
+# Edit menu tips
+#
+...je možné snadno a rychle zakomentovat celý blok kódu volbou Editace/Zakomentovat?<CR><CR>Podobnì použijte funkci Odkomentovat.
+
+
+...je možné snadno a rychle odsadit celý blok kódu volbou Editace/Odsadit?<CR><CR>Podobnì použijte funkci k pøedsazení bloku.
+
+
+...k usnadnìní orientace v editoru mùžete použít záložky?<CR><CR>Nastavením záložky na nìkolik, èasto upravovaných, èástí kódu si ušetøíte èas ztracený rolováním textu.
+
+
+...je k dispozici funkce Pøejít na funkci v nabídce Hledat?<CR><CR>Zobrazí seznam všech funkcí v souboru a napsáním èásti názvu mùžete potøebnou funkci vyhledat. Klávesou ENTER pak pøímo pøejdete na tuto funkci<CR><CR>Poznámka: Funkce struktury kódu musí být povolena

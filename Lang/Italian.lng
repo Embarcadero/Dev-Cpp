@@ -1,0 +1,1048 @@
+[lang]
+Lang=Italian
+Ver=1
+
+1=&File
+2=&Modifica
+3=&Cerca
+4=&Visualizza
+5=&Progetto
+6=&Esegui
+7=&Strumenti
+8=F&inestra
+9=&Help
+10=&Debug
+
+
+1001=&Nuovo
+1002=&Progetto...
+1003=&File Sorgente
+1004=File delle &Risorse
+1005=&Modello...
+1006=&Class...
+1007=New
+
+
+2001=&Apri Progetto o File...
+2002=&Riapri
+2003=&Cancella Cronologia
+2004=&Salva
+2005=Salva &Come...
+2006=Sal&va Tutto
+2007=C&hiudi
+2008=Chiudi Progetto
+2009=Proprietà
+2010=Salva il Progetto come...
+2011=Esp&orta
+2012=in &HTML
+2013=in &RTF
+2014=&Progetto in HTML
+2015=to &Tex
+
+
+3001=&Importa
+3002=S&tampa
+3003=Impostazioni Stampa
+3004=&Esci
+
+
+4001=&Find Declaration
+4002=F&ind Definition
+4003=&Annulla
+4004=&Ripeti
+4005=Ta&glia
+4006=&Copia
+4007=&Incolla
+4008=&Seleziona Tutto
+4009=Ca&ncella
+4010=Ins&erisci
+4011=A&ttiva/Disattiva Segnalibro
+4012=&Vai al Segnalibro
+4013=Segnalibro
+4014=&Data/Ora
+4015=Intestazione di C&ommento
+
+
+5001=Trova...
+5002=Tro&va nei Files...
+5003=Sostituisci...
+5004=&Trova successivo
+5005=&Vai alla linea...
+5006=&Ricerca Incrementale
+5007=Vai &alla funzione...
+5008=Gestore Progetti fluttuante
+5009=Vai a &Gestione Progetti...
+5010=Vai al Visualizzatore &Classi...
+5011=&Progetto/Visualizzatore Classi
+5012=&Barra di stato
+5013=&Risultati Compilazione
+5014=&Sempre Visibile
+5015=S&olo quando richiesto
+5016=Ba&rra degli strumenti
+5017=Principale
+5018=Compila ed Esegui
+5019=Progetto
+5020=Opzioni
+5021=Speciali
+5022=Modifica
+5023=Cerca
+5024=Finestra &Report fluttuante
+
+
+6001=&Nuova unità
+6002=&Aggiungi al Progetto
+6003=&Rimuovi dal Progetto
+6004=&Modifica il File delle Risorse...
+6005=&Opzioni del Progetto
+6006=Modifica il &Makefile
+6007=A&ggiungi File delle Risorse...
+6008=Ri&muovi File delle Risorse...
+
+
+7001=&Compila
+7002=&Esegui
+7003=C&ompila && Esegui
+7004=&Riassembla Tutto
+7005=&Pulisci
+7006=&Listato Compilazione
+7007=&Verifica Sintassi
+7008=R&esetta il Programma
+7009=Analisi del Pro&filo
+7010=Ferma la Compilazione
+7011=&Opzioni di Compilazione
+7012=Op&zioni dell'Ambiente
+7013=Opzioni dell'&Editor
+7014=Configurazione degli &Strumenti
+7015=Configurazione &Tasti rapidi
+7016=Delete Profiling Information
+
+
+8001=&Schermo Intero
+8002=T&orna alla visualizzazione normale
+8003=&Prossimo
+8004=P&recedente
+8005=&Chiudi Tutto
+8006=%s versione %s schermo intero. Premere shift+F12 per attivare/disattivare le Toolbars o F12 per tornare alla visualizzazione normale.
+8007=Chiudi Tutto ecce&tto questo
+8008=&Lista...
+
+
+9001=&Informazioni su Dev-C++...
+9002=&Cerca Aggiornamenti...
+9003=P&ersonalizza il Menu di Help...
+9004=&Help di Dev-C++
+
+
+10001=&Debug
+10002=&Attiva/Disattiva Breakpoint
+10003=&Step Succ.
+10004=Step &Esterno
+10005=&Nuova Osservazione
+10006=&Osservazione Variabili
+10007=Ferma l'Esecuzione
+10008=&Modifica osservazione
+10009=&Elimina Osservazione
+10010=Step &Interno
+10011=Esegui dal &Cursore
+10012=Finestra C&PU
+10013=Intercetta il &processo
+10014=Modifica il &valore
+10015=&Pulisci tutto
+10016=Nuovo file
+10017=Aggiungi file...
+10018=Rimuovi file...
+10019=Opzioni...
+10020=Modifica file delle Risorse
+
+
+11001=Rimuovi file
+11002=Rinomina file
+11003=Chiudi
+11004=Apri
+11005=Apri Header
+
+
+12001=Vai alla dichiarazione
+12002=Vai alla definizione
+12003=Nuova classe
+12004=Nuova funzione membro
+12005=Nuova variabile
+12006=Visualizzazione...
+12007=Tutti i files
+12008=File corrente
+12009=Aggiungi cartella
+12010=Elimina cartella
+12011=Rinomina cartella
+12012=Non puoi creare più di %d cartelle in un progetto...
+12013=Usa colori
+12014=File di progetto
+12015=Mostra membri ereditati
+12016=Apri con...
+
+
+13001=Compilatore
+13002=Risorse
+13003=Log di Compilazione
+13004=Risultati Ricerca
+13005=Chiudi
+13006=Debug
+
+
+14001=P&ulisci
+14002=&Copia
+14003=&Nascondi
+14004=&Apri
+
+
+15001=Linea
+15002=Unità
+15003=Messaggio
+15004=Argomenti
+
+
+16001=Trova Linea
+16002=Colonna
+16003=Nome della Variabile
+16004=Valore
+16005=Informazione:
+16006=Log di Compilazione:
+16007=Totale Errori:
+16008=Dim. dell' Output:
+
+
+17001=Variabili in osservazione
+17002=Traccia
+17003=Output GDB
+17004=Invia comando a GDB :
+17005=Invia
+
+
+18001=Nuovo
+18002=Inserisci
+18003=Attiva/Disattiva
+18004=Vai a
+18005=Finestra di progetto
+18006=Finestra di debug
+18007=Finestra fluttuante
+
+
+19001=Apri il File
+19002=Apri l'unità
+19003=Esporta in
+19004=Salva il File
+19005=Salva il Progetto
+19006=Seleziona un File di Help
+
+
+20001=Nuova Osservazione Variabile
+20002=Inserisci Nome Variabile
+20003=Modifica Osservazione Variabile
+20004=Nome Nuova Variable:
+20005=Modifica il valore
+20006=Variabile da modificare:
+20007=Nuovo valore:
+
+
+21001=Progetto
+21002=Classi
+
+
+22001=Commenta
+22002=Togli Commento
+22003=Indenta
+22004=Togli indentazione
+22005=Visualizza header/sorgente
+22006=Collapse All
+22007=Uncollapse All
+
+
+23001=Opzioni dell'Editor
+23002=Generale
+23003=Mostra
+23004=Sintassi
+23005=Codice
+23006=Completamento Automatico
+23007=Visualizzatore di Classi
+23008=Autosave
+
+
+24001=Inserimenti
+24002=Sorgente Predefinito
+24003=Files
+24004=Options
+24005=Symbol Completion
+
+
+25001=Inserisci il nome delle nuove impostazioni personalizzate:
+25002=Opzioni dell'Editor:
+25003=Auto Indentazione
+25004=Modalità Inserimento
+25005=Carattere di Tabulazione
+25006=Tabulazioni intelligenti
+25007=Ritorno Carattere toglie il rientro
+
+
+26001=Annulla Gruppo
+26002=Tasto Home
+26003=Cursore a Fine File
+26004=Cursore a Fine Riga
+26005=Selezione Linea con doppio click
+26006=Trova il testo al Cursore
+26007=Barre Scorrimento quando necessarie
+26008=Scorrimento mezza Pagina
+26009=Suggerimento di Scorrimento 
+26010=Usa Sintassi Colorata
+26011=Inserisci Dropped Files
+26012=Dimensioni Tabulazione:
+26013=Margine Destro
+26014=Visibile
+26015=Larghezza
+26016=Colore
+26017=Cursore
+26018=Inserimento dal Cursore
+26019=Sovrascrivi dal Cursore
+26020=Linea Verticale
+26021=Linea Orizzontale
+26022=Mezzo Blocco
+26023=Blocco
+26024=Highlight current line
+26025=Trim trailing spaces
+26026=Enabled
+26027=Gutter width
+
+
+27001=Mostra cataratteri di linea nascosti
+27002=Mostra suggerimenti per l'editor
+27003=Evidenzia le parentesi corrispondenti
+27004=Ensure that file ends with newline
+27005=Enabled
+27006=Sets to System HighlightText value
+27007=Sets to WhiteSpace value
+27008=Show function hints
+27009=It is also possible to edit text size by using Control+Scroll, just like in browsers!
+27010=Carattere dell'Editor:
+27011=Carattere
+27012=Dimensione
+27013=Carattere dell'Editor
+27014=Margine
+27015=Dimensione Automatica
+27016=Numeri di Linea
+27017=Mostra Zeri a inizio riga
+27018=Inizia da Zero
+27019=Usa Caratteri Personalizzati
+27020=Carattere del Margine
+27021=Colore Testo
+27022=Colore Sfondo
+27023=Stili
+27024=Grassetto
+27025=Corsivo
+27026=Sottolineato
+27027=Impostazioni Presettate
+27028=Tipo:
+27029=Salva impostazioni personalizzate della sintassi
+27030=Codice
+27031=Testo del Menu
+27032=Sezione
+27033=Descrizione
+27034=Inserisci Codice di Default nel File iniziale del Progetto Generico
+27035=Usa la cache per il completamento automatico del codice
+27036=Completamento Automatico
+27037=Abilita Completamento Automatico
+27038=Ritardo (ms):
+27039=Colore di Sfondo:
+27040=Impostazioni del Visualizzatore di Classi
+27041=Scorri i file locali referenziati nelle #include
+27042=Esempio:
+27043=Opzioni del Motore
+27044=Opzioni di Visualizzazione
+27045=Abilita Visualizzatore di classi
+27046=Scorri i file globali referenziati nelle #include
+27047=Mostra solo le classi del file attivo
+27048=Interval:
+27049=Save all open files after each interval
+27050=Nuovo Progetto
+27051=Descrizione:
+27052=Enable symbol completion
+27053=Specific completion options
+27054=Complete braces '{}'
+27055=Complete parentheses '()'
+27056=Complete includes '<>' '""'
+27057=Complete square braces '[]'
+27058=Complete multiline comments '/**/'
+
+
+28001=Nome:
+28002=&C
+28003=C&++
+28004=&Linguaggio Predefinito
+28005=Varie
+28006=Opzioni del Progetto:
+
+
+29001=Rimuovi dal Progetto
+29002=Scegli il file da rimuovere dal progetto :
+
+
+30001=Vai alla riga ...
+30002=Nuova Riga:
+
+
+31001=Configurazione degli Strumenti
+31002=Strumenti Correnti:
+
+
+32001=Modifica Voce Strumento
+32002=Titolo
+32003=Programma
+32004=Cartella di Lavoro
+32005=Parametri
+32006=Inserisci Macro
+32007=Macro Disponibili
+
+
+33001=Libreria Icone
+33002=Usa l'icona selezionata
+33003=Sfoglia
+
+
+34001=Configura Tasti Rapidi
+34002=Clicca su un item e premi il tasto rapido che desideri!
+34003=Consiglio: premi "Escape" per eliminare un tasto rapido...
+34004=Voce Menu
+34005=Tasto Rapido assegnato
+34006=Cancella
+34007=OK
+
+
+35001=Restituisce la cartella di default
+35002=Restituisce la cartella di lavoro di Dev-C++
+35003=Restituisce il nome del file compilato
+35004=Restituisce il percorso del progetto corrente o del file sorgente
+35005=Restituisce il nome del file del progetto corrente project o del file sorgente
+35006=Restituisce il nome del progetto
+35007=Restituisce il nome del file del sorgente corrente
+35008=Restituisce il percorso del file sorgente corrente
+35009=Restituisce la lista dei file sorgente del progetto corrente
+35010=Restituisce la parola al cursore nella pagina attiva
+35011=Restituisce la versione di Dev-C++
+
+
+36001=Informazioni su Dev-C++ :)
+36002=inseculous@users.sourceforge.net
+36003=Licenza Generale Pubblica GNU
+36004=Come Contattarci
+36005=Sito Bloodshed Software:
+36006=Sito Compilatore Mingw:
+36007=Forum su Dev-C++:
+36008=Mailing List utenti di  Dev-C++:
+36009=E-Mail degli Autori:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.bloodshed.net/devcpp-ml.html
+36014=haiku@bloodshed.net
+36015=&Cerca Aggiornamenti
+36016=Post-4.9.9.2 Development:
+36017=http://orwellengine.blogspot.com
+
+
+37001=Modifica codice da inserire
+37002=Aggiungi codice da inserire
+37003=Intestazione Menu Item
+37004=Descrizione Item
+37005=Sezione del Menù
+
+
+38001=Stato Avanzamento Compilazione
+38002=&Mostra durante la Compilazione
+38003=&Chiudi dopo la Compilazione
+38004=Non mostrare lo splash screen all'avvio
+38005=Opzioni dell'Ambiente
+38006=Generale
+38007=Files && Cartelle
+38008=Apertura Automatica
+38009=Nuovo Progetto in C++
+38010=Mostra Toolbars a Schermo Intero
+38011=Crea File di Backup
+38012=Minimizza durante l'esecuzione
+38013=Stile dei Dialog Open/Save
+38014=Windows 2k (sidebar)
+38015=Windows 9x
+38016=Windows 3.1
+38017=Lingua:
+38018=Schede della finestra dei Messaggi:
+38019=N° massimo dei Files nel Menù Riapri
+38020=Cartella predefinita dell'utente
+38021=Cartella di Output
+38022=Percorso della Libreria delle icone
+38023=Immagine dello Splash Screen
+38024=Scegli la cartella utente predefinita
+38025=Scegli la cartella di output del Compilatore
+38026=Scegli la cartella della libreria delle Icone
+38027=Tutti i file del Progetto
+38028=Solo il primo file del progetto
+38029=Nessuno
+38030=Mostra il Menù a Schermo Intero
+38031=Doppio click per aprire il file di progetto
+38032=Cartella dei file dei linguaggi
+38033=Tema:
+38034=Interfaccia
+38035=Trova Testo
+38036=Trova
+38037=Cerca nei Files
+38038=&Testo da Cercare
+38039=Opzioni:
+38040=&Maiuscole/Minuscole
+38041=&Solo Parole Intere
+38042=Direzione
+38043=&Files del Progetto
+38044=&Files Aperti
+38045=Ambito
+38046=&Globale
+38047=&Solo Selezione
+38048=Origine
+38049=Dal Cursore
+38050=Ambito Globale
+38051=Direzione
+38052=Avanti
+38053=Indietro
+38054=Pause console programs after return
+38055=Opened files at previous closing
+
+
+39001=Sostituisci il testo
+39002=Testo da Cercare:
+39003=Sostituisci con:
+39004=Opzioni:
+39005=&Maiuscole/Minuscole
+39006=&Solo Parole Intere
+39007=&Chiedi conferma
+39008=Direzione:
+39009=Avant&i
+39010=&Indietro
+39011=Ambito:
+39012=&Globale
+39013=&Solo Selezione
+39014=Origine:
+39015=&Dal Cursor
+39016=&Ambito Globale
+
+
+40001=Cerca:
+40002=Tipo
+40003=Funzione
+40004=Linea
+
+
+41001=Opzioni di Compilazione
+41002=Compilatore
+41003=Cartelle
+41004=Generazione di Codice/Ottimizzazioni
+41005=Linker
+41006=Programmi
+41007=For more information about GCC's options, please visit
+
+
+42001=File Binari
+42002=Librerie
+42003=Include C
+42004=Include C++
+
+
+43001=Compilatore C:
+43002=Compilatore C++:
+43003=Compilatore:
+43004=Output
+
+
+44001=Supporto programmi ANSI standard C
+44002=Supporto aspetti dei preprocessori traditionali C
+44003=Inibisci i messaggi warning
+44004=Elimina controlli degli accessi
+44005=Accetta $ negli identificatori
+44006=Usa heuristics per compilare più velocemente
+44007=Usa Cygwin invece di Mingw
+44008=Aggiungi i cmandi seguenti in fase di compilazione:
+44009=Ritardo compilaz.
+44010=Abilita un ritardo in millisecondi relativamente al timestamp del MakeFile
+44011=Mostra un errore per linea
+44012=Do not recognize asm, inline or typeof as a keyword (-fno-asm)
+44013=Check if pointer is null before accessing storage allocated (-fcheck-new)
+44014=Put uninitialized globals into the common segment (-fconserve-space)
+
+
+45001=Generazione codice:
+45002=Ottimizzazione:
+
+
+46001=Abilita la gestione delle eccezioni
+46002=Usa la stessa dimensione per double e float
+46003=Informazioni extra nel codice assembler generato
+46004=Ottimizza
+46005=Ottimizzazione Migliore
+46006=Esegue un numero minore di ottimizzazioni
+46007=Generazione Makefile:
+46008=Usa generazione di dipendenza veloce ma imperfetta
+46009=Profile del Codice:
+46010=Genera informazioni di profilo per analisi
+46011=Link ad un programma C Objective
+46012=Genera le informazioni per il debug
+46013=Non usare file/librerie standard per avvio del sistema
+46014=Non aprire la console
+46015=Aggiungi questi comandi alla linea di comando del linker
+46016=&Non ottimizzare
+46017=Ottimizza di più
+46018=Do not assemble, but output assembler code (-S)
+46019=Use pipes instead of temporary files during compilation (-pipe)
+
+
+47001=Se vuoi cambiare i nomi dei programmi che sono usati in Dev-C++ (per esempio quando si usa un cross compiler) :
+47002=Set di compilazione da configurare:
+47003=Nuovo set di compilazione
+47004=Inserisci il nome del nuovo set
+47005=Non puoi cancellare l'ultimo set rimasto!
+47006=Sei sicuro di voler cancellare questo set?
+47007=Rinomina il set di compilazione
+47008=Inserisci il nuovo nome per il set:
+47009=Ulteriori Ottimizzazioni
+
+
+48001=Editor del Menù di Help
+48002=Testo del Menù
+48003=File di Help
+48004=Opzioni del Menù di Help
+48005=Icona
+48006=Sezione del Menù
+48007=Sezione 1
+48008=Sezione 2
+48009=Menù di Popup dell'Help
+48010=Cerca il file...
+48011=Cerca la parola nel file di help
+48012=Assegna il tasto rapido F1
+48013=Show most warnings (-Wall)
+48014=Show some more warnings (-Wextra)
+48015=Check ISO C/C++/C++0x conformance (-pedantic)
+48016=Code Warnings
+48017=Only check the code for syntax errors (-fsyntax-only)
+48018=Make all warnings into errors (-Werror)
+48019=Abort compilation on first error (-Wfatal-errors)
+
+
+49001=Stampa il File
+49002=Parametri:
+49003=Pagine:
+49004=&Colori
+49005=&Testo Evidenziato
+49006=&Ritorno a capo
+49007=&Numeri di riga
+49008=Stampa i Numeri di riga
+49009=Stampa i Numeri di riga nel margine
+49010=Numero di Copie:
+49011=Stampa solo la Selezione
+49012=Don't Print Line Numbers
+
+
+50001=Cerca Aggiornamenti di Dev-C++
+50002=Task:
+50003=Risultati:
+50004=Versione:
+50005=Versione Richiesta:
+50006=Descrizione della Release:
+50007=Sito Download (doppio click per scaricare):
+
+
+51001=Aggiungi alle Cose da Fare...
+51002=Descrizione
+51003=Priorità
+51004=Utente
+
+
+52001=Cose da Fare...
+52002=Nome del File
+52003=Concluso
+52004=Non mostrare le voci segnate come concluse
+52005=Filtro:
+52006=Tutti i files  (nel progetto e no)
+52007=Apri solo i files (nel progetto e no)
+52008=Tutti i files del progetto
+52009=Apri solo i files del progetto
+52010=Files aperti non del progetto
+52011=Solo il file corrente
+
+
+53001=&progetto MS Visual C++
+53002=Seleziona un file di progetto MS Visual C++
+53003=Opzioni di importazione
+53004=Configurazione da importare
+53005=Nome del file di progetto Dev-C++
+53006=Il file di progetto MS Visual C++ è stato importato e convertito con successo! Vuoi aprirlo ora?
+53007=Non riesco a trovare la configurazione "%s" (Probabile bug di Dev-C++). 
+
+
+54001=Import Code::Blocks project
+54002=Select Code::Blocks project file
+54003=Import options
+54004=Configuration to import
+54005=Dev-C++ project filename
+54006=The Code::Blocks project file has been imported and converted to a Dev-C++ project succesfully! Do you want to open it now?
+54007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
+
+
+55001=Opzioni di Progetto
+55002=Generale
+55003=Files/Cartelle
+55004=Nome:
+55005=Icona:
+55006=Libreria 
+55007=Sfoglia
+55008=Tipo:
+55009=Win32 GUI
+55010=Win32 Console
+55011=Win32 Libreria Statica
+55012=Win32 DLL
+55013=Compila come C++
+55014=Opzioni Additionali riga comando:
+55015=Compilatore:
+55016=Opzioni Linker /Librerie o Files Oggetto:
+55017=Cartella Librerie
+55018=File delle Risorse
+55019=Cartelle Include
+55020=Icona Selezionata
+55021=Includi un File Oggetto
+55022=Cartelle delle Risorse
+55023=Opzioni di costruzione
+55024=Cartelle
+55025=&Cartella di output dell'eseguibile
+55026=C&artella di output del file oggetto
+55027=&Sovrascrivi il nome del file di output
+55028=Aggiungi libreria o oggetto
+55029=%d files [%d sorgenti, %d headers, %d risorse]
+
+
+56001=Nome:
+56002=Descrizione:
+56003=Categoria:
+56004=Nome del progetto
+56005=Files del modello:
+56006=Opzioni extra del Compilatore:
+56007=Opzioni extra del Linker:
+56008=Icone:
+56009=Informazioni Modello
+56010=Files
+56011=Extra
+56012=Icona del Modello
+56013=Icona del Nuovo Progetto
+56014=Crea
+56015=Nuovo modello dal progetto
+56016=Usa cartelle Include di Progetto
+56017=Use cartelle Librerie di progetto
+56018=Use cartelle Risorse di progetto
+
+
+57001=tipo restituito:
+57002=Nome della variabile:
+57003=Implementa:
+57004=Modificatore di accesso
+57005=Crea funzione membro per leggere il valore di questa variabile
+57006=Crea funzione membro per impostare il valore questa variabile
+57007=Noma:
+57008=Commenti
+57009=Descrizione:
+57010=Stile:
+57011=Crea
+57012=Elimina
+57013=Classe sconosciuta...
+57014=Non riesco a determinare il nome del file per la definizione...
+57015=Non riesco a determinare il numero della linea in cui inserire...
+57016=Nome membro:
+57017=Argomenti:
+57018=Nome classe:
+57019=Eredita da altra classe
+57020=Ereditarietà
+57021=Eredita dalla classe:
+57022=Nome del file header:
+57023=Nome del file di implementazione:
+57024=Nome del file header:
+57025=Aggiungi al progetto corrente
+57026=Attributi
+
+
+58001=Nome del file
+58002=Nel progetto
+58003=Linee Totali
+58004=Linee di codice attuali
+58005=Linee di commento
+58006=Files inclusi
+58007=Linee vuote
+58008=Dimensione del File
+58009=Nome Assoluto
+58010=Makefile
+58011=Nome Relativo
+58012=Timestamp del file
+58013=Impostazioni compilatore 
+
+
+59001=Analisi del profilo
+59002=Output puntuale
+59003=Grafico delle chiamate
+59004=Profiling Options
+59005=Function Hiding
+59006=Hide functions not called long enough
+59007=Hide statically linked file-local functions
+59008=Hide function called less than
+59009=times
+59010=Apply
+59011=Custom Commands
+59012=Use these commands instead:
+
+
+60001=La stringa ''%s'' non è stata trovata
+60002=Il File %s non può essere aperto 
+60003=Sostituisco questa occorrenza ''%s'?
+60004=Il File: %s esiste già in %s
+60005=Sei sicuro di voler chiudere %s
+60006=Salvo le modifiche a %s?
+60007=Chiudo %s e apro il nuovo progetto?
+60008=Rinomina:
+60009=Già in compilazione
+60010=Salvo le modifiche a %s?
+60011=Il File esiste già, sovrascrivo?
+60012=Aggiungo la nuova unità al progetto corrente?
+60013=Aggiungo la nuova Risorsa al progetto corrente?
+60014=Il progetto non contiene informazioni per il debug, vuoi abilitare il debugging e ricostruire il progetto ?
+60015=Non hai abilitato le informazioni sul profilo e/o sul debug nelle opzioni del compilatore. Vuoi abilitarle e ricostruire il progetto ora?
+60016=Eseguire il progetto almeno una volta per generare le informazioni sul profilo ... 
+60017=Inserisci il nome della nuova cartella:
+60018=Sei sicuro di voler eliminare la cartella?
+60019=Inserisci il nome della nuova cartella:
+60020=Il file %s è di sola lettura. Vuoi marcarlo in scrittura? Se no, il file non verrà salvato...
+60021=C'è stato un errore. Il File %s non è stato marcato in scrittura e non è stato salvato...
+60022=Il programma ha causato una violazione di accesso (errore di segmentazione).
+60023=Il file sorgente è più recente dell'eseguibile. Vuoi ricompilare?
+60024=Selezionare l'applicazione da intercettare:
+
+
+61001=Non posso aprire il file %s
+61002=Non posso salvare il file %s
+61003=Non posso rinominare il file %s
+61004=Il campo Ricerca non può essere vuoto
+61005=Il Progetto non è eseguibile
+61006=Il Progetto non è compilato
+61007=File non compilato
+61008=Make file non trovato.
+61009=Clean Fallita
+61010=Il modello non può essere inserito nel progetto.
+61011=%s Risorsa non trovata: %s - %s
+61012=Il file modello %s non è stato trovato, Skipping.
+61013=Nessun modello assegnato.
+61014=Il File %s non è stato trovato.
+61015=Nessuna Applicazione Host fornita:puoi impostarla nel menù Esegui/Parametri
+61016=Applicazione host non trovata! Puoi cambiarla nel menù Esegui / Parametri
+
+
+62001=SenzaTitolo
+62002=Sola Lettura
+62003=Inserisci
+62004=Sovrascrivi
+62005=Progetto%d
+62006=Specificare un altro nome, prego.
+62007=%d Righe nel file
+62008=Rinomina il file
+62009=Esecuzione di %s
+62010=Esecuzione terminata
+62011=bytes
+62012=Modificato
+62013=Errore
+62014=Informazione
+62015=Avviso
+62016=Domanda
+62017=Compilazione terminata correttamente
+62018=Compilazione fermata dall'utente
+62019=Line:%6d               Col:%6d               Sel:%6d               Lines:%6d               Length:%6d
+62020=Done parsing
+
+
+63001=&Ok
+63002=&Annulla
+63003=A&iuto
+63004=&Default
+63005=&Si
+63006=&No
+63007=A&ggiungi
+63008=&Modifica
+63009=&Rimuovi
+63010=Ca&ncella
+63011=&Chiudi
+63012=&Autori
+63013=&Trova
+63014=&Sostituisci
+63015=&Cancella Invalida
+63016=Sostituisci &Tutto
+63017=Sfoglia
+63018=Rimuovi
+63019=Rinomina
+63020=Importa
+63021=Finestra Fluttuante
+63022=Clear
+
+
+64001=Finestra CPU
+64002=Codice Assembler :
+64003=Funzione :
+64004=Sintassi Assembler :
+64005=Registri :
+
+
+65001=Suggerimenti
+65002=Sapevi che...
+65003=...non ci sono suggerimenti da mostrare
+65004=Non mostrare i suggerimenti all'avvio
+65005=Successivo
+65006=Precedente
+
+
+66001=Associazioni dei file
+66002=Tipi di file:
+66003=Seleziona o de-seleziona i tipi di file per cui Dev-C++ verrà registrato come applicazione di default...
+66004=Supporto CVS
+66005=File CVS
+66006=Livello di Compressione
+66007=Usa SSH invece di RSH
+66008=Cartella Modelli
+66009=Scegli la Cartella dei Modelli
+66010=Usa tema di XP
+66011=Programmi esterni
+66012=Programma esterno
+66013=Estensione
+66014=Associazioni con i programmi esterni:
+66015=Osservazione variable sotto mouse
+66016=Rapporto errori
+66017=  Debug browser variabili
+66018=File alternativo di configurazione
+66019=Usa questo file alternativo di configurazione
+66020=Hai modificato il file di configurazione.<CR>Il nuovo file di configurazione *NON* sarà utilizzato nella sessione corrente. Ogni Modifica alla configurazione,sarà salvata nel file di configurazione *attualmente* aperto.<CR><CR>E' consigliabile riavviare l'applicazione,in modo da rendere effettive le modifiche apportate...
+66021=Dev-C++ was unable to set file associations.<CR><CR>This is known to be caused by using UAC on a normal non-admin user account.<CR><CR>Please disable UAC or run Dev-C++ as an admin if you want to change file associations using Dev-C++.<CR><CR>You might want to try the "Default Programs" feature in Windows Vista or 7.
+66022=UI font
+
+
+67001=Parametri...
+67002=Compila il file corrente
+
+
+68001=Lista delle Finestre
+68002=Seleziona la finestra che vuoi editare :
+
+
+69001=File Corrente...
+69002=Intero progetto...
+69003=Configura  il supporto CVS in "Strumenti / Opzioni d'ambiente"...
+
+
+70001=Opzioni di Importazione
+70002=Repository
+70003=Opzioni Generali
+70004=Opzioni di Controllo
+70005=Opzioni Commit
+70006=Opzioni di Aggiornamento
+70007=Opzioni di comparazione
+70008=Opzioni del Log
+70009=Uscita CVS
+70010=Importa
+70011=Controllo
+70012=Commit
+70013=Aggiorna
+70014=Compara
+70015=Log
+70016=Cartella di Importazione
+70017=Azione
+70018=Venditore
+70019=Release
+70020=Messaggio di Log
+70021=Nome Modulo
+70022=Estensione
+70023=Controlla come
+70024=Controlla la cartella
+70025=Ricorsione nelle sotto-cartelle
+70026=Reimposta tutte le opzioni
+70027=Crea cartelle mancanti
+70028=Rimuovi cartelle vuote
+70029=Elimina modifiche locali
+70030=Prima della data
+70031=Revisione/branch/tag
+70032=Se non trovi, prendi il più recente
+70033=Altre revisioni
+70034=Esegui comparazione unificata
+70035=Compara file locale con la stessa revisione/tag remota
+70036=Compara file locale con un'altra revisione remota
+70037=Compara due revisioni remote
+70038=Data
+70039=Logga il branch di default
+70040=Elenca solo i nomi di file RCS
+70041=Non stampare i nomi dei tag
+70042=Filtro
+70043=Per revisione/tag
+70044=Per data
+70045=Per utente
+70046=Repository
+70047=Dettagli
+70048=Metodo di accesso
+70049=Utente
+70050=Server
+70051=Cartella Remota
+70052=Aggiungi
+70053=Rimuovi
+70054=Aggiungi Opzioni
+70055=Rimuovi Opzioni
+70056=Cancella anche il file
+
+
+71001=Parametri
+71002=Parametri da passare al programma
+71003=Applicazione Host
+
+
+72001=Files
+72002=Files di progetto:
+72003=Opzioni di progetto:
+72004=Genera informazioni di debug
+72005=Genera informazioni di profilo
+72006=NOTA: Queste impostazioni sostituiranno le impostazioni di default solo per questo progetto.
+72007=Supporta temi di XP
+72008=Opzioni del File:
+72009=Includi nella compilazione
+72010=Compila come C++
+72011=Informazioni sulla Versione
+72012=Includi informazioni sulla versione nel progetto
+72013=Dettagli della versione
+72014=Maggiore:
+72015=Minore:
+72016=Release:
+72017=Build:
+72018=Linguaggio:
+72019=Informazione Addizionali:
+72020=Sovrascrivi opzioni di costruzione
+72021=File di Output
+72022=Includi nel link
+72023=Priorità di costruzione:
+72024=Incremento automatico numero di build
+72025=Usa Makefile personalizzato (non generare il Makefile)
+72026=Informazioni sulla personalizzazione del Makefile
+72027=&Includi i seguenti file nel Makefile
+72028=Sync product with file version
+72029=Default to C++ when creating new files
+
+
+73001=Comprimi l'eseguibile
+73002=Genera istruzioni per la seguente macchina
+73003=Abilita l'uso delle funzioni specifiche del processore
+73004=Optimization level (-Ox)
+73005=Language standard (-std)
+73006=Compile with the following bit width (-mx)
+73007=Optimize less, while maintaining full compatibility (-mtune)
+
+
+74001=Compiler:
+74002=Status:
+74003=File:
+74004=Errors:
+74005=Warnings:

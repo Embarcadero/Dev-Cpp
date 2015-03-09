@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Heading1">Compiling a source file</div>
+	<div class="Text">A special feature of Dev-C++ is the ability to compile (and run) single source files. This is done via the following steps:</div>
+	<ul>
+		<li>Create (Ctrl+N) or open (Ctrl+O) a source file.</li>
+		<li>Click Compile (F9) to compile the currently visible file.</li>
+		<li><i>Optionally, run the created executable (F10).</i></li>
+	</ul>
+	<div class="Text">This compilation will use the compiler set selected at Tools >> Compiler Options.</div>
+	<br/>
+	<div class="Heading1">Compiling a project</div>
+	<div class="Text">Compiling a project largely requires the same steps:</div>
+	<ul>
+		<li>Create (Ctrl+N) or open (Ctrl+O) a project.</li>
+		<li>Click Compile (F9) to apply changes made in a source file.</li>
+		<li>Click Rebuild (F12) to apply changes made in a header file or to recompile all files.</li>
+		<li><i>Optionally, run the created executable (F10).</i></li>
+	</ul>
+	<div class="Text">This compilation will use the compiler set selected at Tools >> Compiler Options, but unlike source file compilations, it will use the compiler <b>settings</b> located at Project >> Project Options >> Compiler.</div>
+	<br/>
+	<div class="Heading2">Tips</div>
+	<div class="Text">
+	<ul>
+		<li>For single file compilations, make sure to use proper file extensions. When not explicitly telling the compiler which standard to use (using the -std flag), use *.c to compile as C or *.cpp to compile as C++.</li>
+		<li>To reduce compilation output size, especially when using C++ headers, consider passing -s to the compiler. This can be done manually or via (Settings) >> Linker >> Strip executable. This option will remove any unused data from the output. A downside of this option is that debugging and profiling will not work anymore. An alternative but much less effective approach is to reduce the amount of included files.</li>
+		<li>To reduce compilation time, consider including less files. For example, when using a project, don't blindly include every file in every file!</li>
+		<li>To save one click in the compilation process, try out Compile & Run (F11). This will, obviously, compile and run your file or project immediately afterwards.</li>
+		<li>When changing a header file, make sure to recompile all source files that make use of it by rebuilding. Not doing so will lead to undefined executable behaviour: the code you're seeing will not be what will be executed because some source files are making use of outdated headers.</li>
+	</ul>
+	</div>
+</body>
+</html>
