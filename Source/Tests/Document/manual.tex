@@ -32,17 +32,27 @@ Perform the following tests using the files provided in the Explorer folder:
 Perform the following tests using the files provided in the Parser folder. Check if the class browser contains the correct information and hover above all identifiers to check if the parser provides the correct information.
 \begin{itemize}
     \item Correctly parse basic\textunderscore string.cpp.
-    \item Correctly parse Code.cpp.
-    \item Correctly parse float3.cpp.
+    \item Correctly parse Code.cpp. Check if a, b, c and d are parsed correctly.
+    \item Correctly parse float3.cpp. Check if all synonyms of D3DXVECTOR3 are equivalent. Check if float3 correctly inherits from D3DXVECTOR3.
     \item Correctly parse Function.cpp.
-    \item Correctly parse Include.cpp. Hover over all include lines.
-    \item Correctly parse OperatorTest.cpp.
+    \item Correctly parse Include.cpp. Hover over all include lines and check if the tooltip displays correct information.
+    \item Correctly parse OperatorTest.cpp. 
     \item Correctly parse Preprocessor.cpp. Check if all variables are called CorrectXX.
     \item Correctly parse SimpleClass.cpp.
-    \item Correctly parse stl\textunderscore vector.cpp.
-    \item Correctly parse string.cpp.
+    \clearpage
+    \item Correctly parse all C++ containers:
+    \begin{itemize}
+        \item Correctly parse basic\textunderscore string.h.
+        \item Correctly parse stl\textunderscore deque.h.
+        \item Correctly parse stl\textunderscore list.h.
+        \item Correctly parse stl\textunderscore map.h.
+        \item Correctly parse stl\textunderscore queue.h.
+        \item Correctly parse stl\textunderscore stack.h.
+        \item Correctly parse stl\textunderscore vector.h.
+    \end{itemize}
+    \item Correctly parse string.cpp. Check if basic\textunderscore string and string code completion works
     \item Correctly parse Struct.cpp.
-    \item Correctly parse Typedef.cpp.
+    \item Correctly parse Typedef.cpp. Check if all synonyms are parsed correctly.
     \item Correctly parse Variable.cpp.
 \end{itemize}
 
