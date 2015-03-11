@@ -1,4 +1,4 @@
-Version 5.10 - 16 Februari 2015
+Version 5.10 - 11 March 2015
 
 - Improved startup speed.
 - Removed splash window.
