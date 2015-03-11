@@ -3,7 +3,7 @@
 
 !define COMPILERNAME "No Compiler"
 !define COMPILERFOLDER ""
-!define DEVCPP_VERSION "5.9.2"
+!define DEVCPP_VERSION "5.10"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
 !define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
 
