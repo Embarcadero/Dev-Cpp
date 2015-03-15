@@ -1726,6 +1726,7 @@ begin
 
           // This item has a line number, proceed to set cursor properly
           CompilerOutput.Selected := CompilerOutput.Items[I];
+          CompilerOutput.Selected.MakeVisible(False);
           CompilerOutputDblClick(CompilerOutput);
           Exit;
         end;
@@ -1737,6 +1738,7 @@ begin
       if not SameStr(CompilerOutput.Items[I].Caption, '') then begin
         if StartsStr('[Warning]', CompilerOutput.Items[I].SubItems[2]) then begin
           CompilerOutput.Selected := CompilerOutput.Items[I];
+          CompilerOutput.Selected.MakeVisible(False);
           CompilerOutputDblClick(CompilerOutput);
           Exit;
         end;
@@ -1747,6 +1749,7 @@ begin
     for I := 0 to CompilerOutput.Items.Count - 1 do begin
       if not SameStr(CompilerOutput.Items[I].Caption, '') then begin
         CompilerOutput.Selected := CompilerOutput.Items[I];
+        CompilerOutput.Selected.MakeVisible(False);
         CompilerOutputDblClick(CompilerOutput);
         Exit;
       end;
@@ -1755,6 +1758,7 @@ begin
     // Then try to find a resource error
     if ResourceOutput.Items.Count > 0 then begin
       ResourceOutput.Selected := ResourceOutput.Items[0];
+      ResourceOutput.Selected.MakeVisible(False);
       CompilerOutputDblClick(ResourceOutput);
     end;
   end;
