@@ -644,6 +644,7 @@ object EditorOptForm: TEditorOptForm
         OnGutterClick = OnGutterClick
         OnSpecialLineColors = CppEditSpecialLineColors
         OnStatusChange = cppEditStatusChange
+        FontSmoothing = fsmNone
         RemovedKeystrokes = <
           item
             Command = ecDeleteLastChar
@@ -833,6 +834,7 @@ object EditorOptForm: TEditorOptForm
             TabWidth = 4
             WantTabs = True
             OnStatusChange = CodeInsStatusChange
+            FontSmoothing = fsmNone
             RemovedKeystrokes = <
               item
                 Command = ecContextHelp
@@ -897,6 +899,7 @@ object EditorOptForm: TEditorOptForm
             TabWidth = 4
             WantTabs = True
             OnStatusChange = CodeInsStatusChange
+            FontSmoothing = fsmNone
             RemovedKeystrokes = <
               item
                 Command = ecContextHelp

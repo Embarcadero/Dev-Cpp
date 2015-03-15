@@ -224,8 +224,6 @@ const
   cErrorLine = 11;
   cSelection = 15;
 
-  { ---------- Form Events ---------- }
-
 procedure TEditorOptForm.FormCreate(Sender: TObject);
 var
   AttrName: AnsiString;
@@ -303,58 +301,64 @@ begin
   end;
 
   // Colors, cont.
-  ElementList.Clear;
-  for I := 0 to cpp.AttrCount - 1 do begin
-    AttrName := cpp.Attribute[I].Name;
+  ElementList.Items.BeginUpdate;
+  try
+    ElementList.Clear;
+    for I := 0 to cpp.AttrCount - 1 do begin
+      AttrName := cpp.Attribute[I].Name;
 
-    if devEditor.Syntax.IndexOfName(AttrName) <> -1 then begin
-      Attribute := TSynHighlighterAttributes.Create(AttrName);
-      try
-        StrtoAttr(Attribute, devEditor.Syntax.Values[AttrName]);
-        cpp.Attribute[I].Assign(Attribute);
-      finally
-        Attribute.Free;
-      end;
-    end else
-      devEditor.Syntax.Append(AttrName);
+      if devEditor.Syntax.IndexOfName(AttrName) <> -1 then begin
+        Attribute := TSynHighlighterAttributes.Create(AttrName);
+        try
+          StrtoAttr(Attribute, devEditor.Syntax.Values[AttrName]);
+          cpp.Attribute[I].Assign(Attribute);
+        finally
+          Attribute.Free;
+        end;
+      end else
+        devEditor.Syntax.Append(AttrName);
 
-    // Add to list
-    ElementList.Items.Add(cpp.Attribute[I].Name);
+      // Add to list
+      ElementList.Items.Add(cpp.Attribute[I].Name);
+    end;
+
+    // selection color
+    if devEditor.Syntax.IndexofName(cSel) = -1 then
+      devEditor.Syntax.Append(cSel);
+    ElementList.Items.Append(cSel);
+
+    // gutter colors
+    if devEditor.Syntax.IndexofName(cGut) = -1 then
+      devEditor.Syntax.Append(cGut);
+    ElementList.Items.Append(cGut);
+
+    // breakpoint
+    if devEditor.Syntax.IndexOfName(cBP) = -1 then
+      devEditor.Syntax.Append(cBP);
+    ElementList.Items.Append(cBP);
+
+    // error line
+    if devEditor.Syntax.IndexOfName(cErr) = -1 then
+      devEditor.Syntax.Append(cErr);
+    ElementList.Items.Append(cErr);
+
+    // active breakpoint
+    if devEditor.Syntax.IndexOfName(cABP) = -1 then
+      devEditor.Syntax.Append(cABP);
+    ElementList.Items.Append(cABP);
+
+    // folding color
+    if devEditor.Syntax.IndexofName(cFld) = -1 then
+      devEditor.Syntax.Append(cFld);
+    ElementList.Items.Append(cFld);
+
+    ffgColor := cpp.WhitespaceAttribute.Foreground;
+    fbgColor := cpp.WhitespaceAttribute.Background;
+  finally
+    ElementList.Items.EndUpdate; // redraw once
   end;
 
-  // selection color
-  if devEditor.Syntax.IndexofName(cSel) = -1 then
-    devEditor.Syntax.Append(cSel);
-  ElementList.Items.Append(cSel);
-
-  // gutter colors
-  if devEditor.Syntax.IndexofName(cGut) = -1 then
-    devEditor.Syntax.Append(cGut);
-  ElementList.Items.Append(cGut);
-
-  // breakpoint
-  if devEditor.Syntax.IndexOfName(cBP) = -1 then
-    devEditor.Syntax.Append(cBP);
-  ElementList.Items.Append(cBP);
-
-  // error line
-  if devEditor.Syntax.IndexOfName(cErr) = -1 then
-    devEditor.Syntax.Append(cErr);
-  ElementList.Items.Append(cErr);
-
-  // active breakpoint
-  if devEditor.Syntax.IndexOfName(cABP) = -1 then
-    devEditor.Syntax.Append(cABP);
-  ElementList.Items.Append(cABP);
-
-  // folding color
-  if devEditor.Syntax.IndexofName(cFld) = -1 then
-    devEditor.Syntax.Append(cFld);
-  ElementList.Items.Append(cFld);
-
-  ffgColor := cpp.WhitespaceAttribute.Foreground;
-  fbgColor := cpp.WhitespaceAttribute.Background;
-
+  // Ensure UI is set correctly
   if ElementList.Items.Count > 0 then begin
     ElementList.ItemIndex := 0;
     ElementListClick(nil);
