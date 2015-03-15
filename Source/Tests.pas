@@ -51,7 +51,7 @@ end;
 
 function TTestClass.TestEditorList: Boolean;
 var
-  EditorCount: integer;
+  EditorCount, CloseEditorCount: integer;
   e: TEditor;
 
   procedure OpenEditors(Count: Integer; PageControl: TPageControl);
@@ -135,7 +135,8 @@ var
     while MainForm.EditorList.PageCount > 0 do begin
       I := RandomRange(0, MainForm.EditorList.PageCount - 1);
       e := MainForm.EditorList.Editors[I];
-      e.Activate;
+      if RandomRange(1, 5) = 1 then // test closing active editors too in 1/5 on cases
+        e.Activate;
       // if this fails the deleted editor will be acivated after closing
       Assert(e <> MainForm.EditorList.GetPreviousEditor(e));
       MainForm.EditorList.CloseEditor(e);
@@ -144,6 +145,7 @@ var
   end;
 begin
   EditorCount := 10;
+  CloseEditorCount := 50;
   try
     MainForm.SetStatusbarMessage('Open editors in the default page control (left)');
     OpenEditors(EditorCount, nil);
@@ -226,26 +228,26 @@ begin
     CloseAllEditors;
 
     MainForm.SetStatusbarMessage('Close random editors in the left page control');
-    OpenEditors(EditorCount, MainForm.EditorList.LeftPageControl);
+    OpenEditors(CloseEditorCount, MainForm.EditorList.LeftPageControl);
     Assert(MainForm.EditorList.Layout = lstLeft);
-    Assert(MainForm.EditorList.PageCount = 1 * EditorCount);
+    Assert(MainForm.EditorList.PageCount = CloseEditorCount);
     CloseEditorsRandom;
     Assert(MainForm.EditorList.Layout = lstNone);
     Assert(MainForm.EditorList.PageCount = 0);
 
     MainForm.SetStatusbarMessage('Close random editors in the right page control');
-    OpenEditors(EditorCount, MainForm.EditorList.RightPageControl);
+    OpenEditors(CloseEditorCount, MainForm.EditorList.RightPageControl);
     Assert(MainForm.EditorList.Layout = lstRight);
-    Assert(MainForm.EditorList.PageCount = 1 * EditorCount);
+    Assert(MainForm.EditorList.PageCount = CloseEditorCount);
     CloseEditorsRandom;
     Assert(MainForm.EditorList.Layout = lstNone);
     Assert(MainForm.EditorList.PageCount = 0);
 
     MainForm.SetStatusbarMessage('Close random editors in both page controls');
-    OpenEditors(EditorCount, MainForm.EditorList.LeftPageControl);
-    OpenEditors(EditorCount, MainForm.EditorList.RightPageControl);
+    OpenEditors(CloseEditorCount, MainForm.EditorList.LeftPageControl);
+    OpenEditors(CloseEditorCount, MainForm.EditorList.RightPageControl);
     Assert(MainForm.EditorList.Layout = lstBoth);
-    Assert(MainForm.EditorList.PageCount = 2 * EditorCount);
+    Assert(MainForm.EditorList.PageCount = 2 * CloseEditorCount);
     CloseEditorsRandom;
     Assert(MainForm.EditorList.Layout = lstNone);
     Assert(MainForm.EditorList.PageCount = 0);
