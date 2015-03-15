@@ -6901,12 +6901,12 @@ begin
 
           // if everything is commented, then uncomment
           for I := BeginIndex to EndIndex do begin
-            if Pos('//', TrimLeft(fLines[i])) = 1 then begin
-              DoUncomment;
+            if Pos('//', TrimLeft(fLines[i])) <> 1 then begin // not fully commented
+              DoComment; // comment everything
               Exit;
             end;
           end;
-          DoComment;
+          DoUncomment;
         end;
       ecCommentInline: // toggle inline comment
         if not ReadOnly and SelAvail then begin
