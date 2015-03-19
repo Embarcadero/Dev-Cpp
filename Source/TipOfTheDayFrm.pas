@@ -38,7 +38,6 @@ type
     Bevel1: TBevel;
     lblUrl: TLabel;
     btnRandom: TButton;
-    imgDonate: TImage;
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -47,7 +46,6 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lblUrlClick(Sender: TObject);
     procedure btnRandomClick(Sender: TObject);
-    procedure imgDonateClick(Sender: TObject);
   private
     { Private declarations }
     sl: TStringList;
@@ -64,14 +62,14 @@ type
 
 implementation
 
-uses 
+uses
   devcfg, MultiLangSupport;
 
 {$R *.dfm}
 
 procedure TTipOfTheDayForm.btnCloseClick(Sender: TObject);
 begin
-	Close;
+  Close;
 end;
 
 function TTipOfTheDayForm.ConvertMacros(const Str: AnsiString): AnsiString;
@@ -101,8 +99,7 @@ begin
     lblUrl.Caption := urldesc;
     HiddenUrl := url;
     lblUrl.Visible := True;
-  end
-  else
+  end else
     lblUrl.Visible := False;
 end;
 
@@ -112,43 +109,43 @@ var
   LangNoExt: AnsiString;
   ExtPos: integer;
 begin
-	LoadText;
-	chkNotAgain.Checked:=not devData.ShowTipsOnStart;
-	TipsCounter := devData.LastTip;
-	sl := TStringList.Create;
+  LoadText;
+  chkNotAgain.Checked := not devData.ShowTipsOnStart;
+  TipsCounter := devData.LastTip;
+  sl := TStringList.Create;
 
-	lblUrl.Visible := False;
-	LangNoExt := Lang.FileFromDescription(devData.Language);
-	ExtPos := Pos(ExtractFileExt(LangNoExt), LangNoExt);
-	Delete(LangNoExt, ExtPos, MaxInt);
-	S := devDirs.Lang + ExtractFileName(LangNoExt) + '.tips';
-	if not FileExists(S) then
-		S := devDirs.Lang + 'English.tips';
-	if not FileExists(S) then begin
-		btnNext.Enabled := False;
-		btnPrev.Enabled := False;
-		btnRandom.Enabled := False;
-	end else begin
-		LoadFromFile(S);
-		if (TipsCounter < 0) or (TipsCounter >= sl.Count) then
-			TipsCounter := 0;
-		if sl.Count > 0 then
-			lblTip.Caption := CurrentTip
-		else begin
-			btnNext.Enabled := False;
-			btnPrev.Enabled := False;
-		end;
-	end;
+  lblUrl.Visible := False;
+  LangNoExt := Lang.FileFromDescription(devData.Language);
+  ExtPos := Pos(ExtractFileExt(LangNoExt), LangNoExt);
+  Delete(LangNoExt, ExtPos, MaxInt);
+  S := devDirs.Lang + ExtractFileName(LangNoExt) + '.tips';
+  if not FileExists(S) then
+    S := devDirs.Lang + 'English.tips';
+  if not FileExists(S) then begin
+    btnNext.Enabled := False;
+    btnPrev.Enabled := False;
+    btnRandom.Enabled := False;
+  end else begin
+    LoadFromFile(S);
+    if (TipsCounter < 0) or (TipsCounter >= sl.Count) then
+      TipsCounter := 0;
+    if sl.Count > 0 then
+      lblTip.Caption := CurrentTip
+    else begin
+      btnNext.Enabled := False;
+      btnPrev.Enabled := False;
+    end;
+  end;
 
-	// For some reason, this fixes the panels' background color
-	Panel1.ParentBackground := False;
-	Panel1.ParentBackground := True;
-	Panel1.ParentBackground := False;
+  // For some reason, this fixes the panels' background color
+  Panel1.ParentBackground := False;
+  Panel1.ParentBackground := True;
+  Panel1.ParentBackground := False;
 end;
 
 procedure TTipOfTheDayForm.FormDestroy(Sender: TObject);
 begin
-	sl.Free;
+  sl.Free;
 end;
 
 function TTipOfTheDayForm.CurrentTip: AnsiString;
@@ -176,15 +173,15 @@ end;
 
 function TTipOfTheDayForm.RandomTip: AnsiString;
 var
-	newval : integer;
+  newval: integer;
 begin
-	Randomize;
-	repeat
-		// Make sure the same tip is never shown twice in a row
-		newval := RandomRange(0,sl.Count - 1);
-	until newval <> TipsCounter;
-	TipsCounter := newval;
-	Result := ConvertMacros(sl[TipsCounter]);
+  Randomize;
+  repeat
+    // Make sure the same tip is never shown twice in a row
+    newval := RandomRange(0, sl.Count - 1);
+  until newval <> TipsCounter;
+  TipsCounter := newval;
+  Result := ConvertMacros(sl[TipsCounter]);
 end;
 
 procedure TTipOfTheDayForm.btnNextClick(Sender: TObject);
@@ -224,9 +221,9 @@ end;
 procedure TTipOfTheDayForm.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-	devData.LastTip:=TipsCounter+1;
-	devData.ShowTipsOnStart:=not chkNotAgain.Checked;
-	Action := caFree;
+  devData.LastTip := TipsCounter + 1;
+  devData.ShowTipsOnStart := not chkNotAgain.Checked;
+  Action := caFree;
 end;
 
 procedure TTipOfTheDayForm.lblUrlClick(Sender: TObject);
@@ -237,8 +234,8 @@ end;
 procedure TTipOfTheDayForm.LoadText;
 begin
 
-	Font.Name := devData.InterfaceFont;
-	Font.Size := devData.InterfaceFontSize;
+  Font.Name := devData.InterfaceFont;
+  Font.Size := devData.InterfaceFontSize;
 
   Caption := Lang[ID_TIPS_CAPTION];
   lblTitle.Caption := Lang[ID_TIPS_DIDYOUKNOW];
@@ -249,14 +246,9 @@ begin
   btnClose.Caption := Lang[ID_BTN_CLOSE];
   btnRandom.Caption := lang[ID_TIPS_RANDOMTIP];
 
-	// Title uses a custom font
-	lblTitle.Font.Style := [fsBold];
-	lblTitle.Font.Size := 14;
-end;
-
-procedure TTipOfTheDayForm.imgDonateClick(Sender: TObject);
-begin
-	ShellExecute(GetDesktopWindow(), 'open', PAnsiChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil, SW_SHOWNORMAL);
+  // Title uses a custom font
+  lblTitle.Font.Style := [fsBold];
+  lblTitle.Font.Size := 14;
 end;
 
 end.

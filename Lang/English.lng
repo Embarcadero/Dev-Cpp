@@ -135,6 +135,7 @@ Ver=1
 9003=C&ustomize Help Menu...
 9004=&Help on Dev-C++
 9005=Package Manager...
+9006=Donate :)
 
 10001=&Debug
 10002=&Toggle Breakpoint
@@ -978,7 +979,7 @@ Ver=1
 64005=Registers:
 
 
-65001=Tip of the day
+65001=Tip Of The Day
 65002=Did you know...
 65003=...there are no tips to display?
 65004=Don't display tips at startup

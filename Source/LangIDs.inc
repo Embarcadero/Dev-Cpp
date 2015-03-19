@@ -180,7 +180,8 @@ const
   ID_ITEM_CUSTOM                        = 9003;
   ID_ITEM_HELPDEVCPP                    = 9004;
   ID_ITEM_PACKMAN                       = 9005;
-
+  ID_ITEM_DONATE                        = 9006;
+  
   //debug menu
   ID_ITEM_DEBUG                         = 10001;
   ID_ITEM_TOGGLEBREAK                   = 10002;

@@ -530,6 +530,8 @@ type
     actFormatOptions1: TMenuItem;
     N46: TMenuItem;
     actRunTests: TAction;
+    DonateItem: TMenuItem;
+    actDonate: TAction;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure ToggleBookmarkClick(Sender: TObject);
@@ -787,6 +789,7 @@ type
       Selected: Boolean);
     procedure actRunTestsExecute(Sender: TObject);
     procedure WMCopyData(var Message: TMessage); message WM_COPYDATA;
+    procedure actDonateExecute(Sender: TObject);
   private
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
@@ -1235,9 +1238,10 @@ begin
   ListItem.Caption := Lang[ID_ITEM_LIST];
 
   // Help menu
-  HelpMenuItem.Caption := Lang[ID_ITEM_HELPDEVCPP];
+  actHelp.Caption := Lang[ID_ITEM_HELPDEVCPP];
   actAbout.Caption := Lang[ID_ITEM_ABOUT];
   actShowTips.Caption := Lang[ID_TIPS_CAPTION];
+  actDonate.Caption := Lang[ID_ITEM_DONATE];
 
   // Debugging buttons
   actAddWatch.Caption := Lang[ID_ITEM_WATCHADD];
@@ -6633,6 +6637,13 @@ begin
 
   // Free list of pointers
   LocalFree(Cardinal(ParameterList));
+end;
+
+procedure TMainForm.actDonateExecute(Sender: TObject);
+begin
+  ShellExecute(GetDesktopWindow(), 'open',
+    PAnsiChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil,
+    SW_SHOWNORMAL);
 end;
 
 end.

@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 1035
-  Top = 416
+  Left = 243
+  Top = 504
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   AutoScroll = False
@@ -1631,6 +1631,9 @@ object MainForm: TMainForm
         Tag = 18
         Action = actAbout
       end
+      object DonateItem: TMenuItem
+        Action = actDonate
+      end
     end
   end
   object EditorPopup: TPopupMenu
@@ -2535,8 +2538,6 @@ object MainForm: TMainForm
     object actAbortCompilation: TAction
       Category = 'Execute'
       Caption = 'Abort compilation'
-      OnExecute = actAbortCompilationExecute
-      OnUpdate = actAbortCompilationUpdate
     end
     object actBrowserShowInherited: TAction
       Category = 'ClassBrowser'
@@ -2742,7 +2743,7 @@ object MainForm: TMainForm
     end
     object actHelp: TAction
       Category = 'Help'
-      Caption = 'actHelp'
+      Caption = 'Help'
       ImageIndex = 46
       ShortCut = 112
       OnExecute = actHelpExecute
@@ -2791,6 +2792,11 @@ object MainForm: TMainForm
       Enabled = False
       ShortCut = 16497
       OnExecute = actRunTestsExecute
+    end
+    object actDonate: TAction
+      Caption = 'Donate :)'
+      ImageIndex = 41
+      OnExecute = actDonateExecute
     end
   end
   object MessagePopup: TPopupMenu
