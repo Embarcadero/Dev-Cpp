@@ -43,7 +43,6 @@ int main() {
 		
 	// Add git files
 	GitAdd(".gitignore");
-	GitAdd("GitPush.exe"); // push self
 	
 	// commit with comment
 	GitCommit();
