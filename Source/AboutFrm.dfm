@@ -13198,6 +13198,7 @@ object AboutForm: TAboutForm
       Top = 100
       Width = 92
       Height = 26
+      Cursor = crHandPoint
       AutoSize = True
       Picture.Data = {
         07544269746D61708E0D0000424D8E0D00000000000036040000280000005C00
