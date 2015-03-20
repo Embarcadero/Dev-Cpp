@@ -61,7 +61,8 @@ type
     lblPost4992: TLabel;
     lblCompilers: TLabel;
     lblPre4992: TLabel;
-    Bevel1: TBevel;
+    bvCompilers: TBevel;
+    imgDonate: TImage;
     procedure URLLabelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAuthorsClick(Sender: TObject);
@@ -70,6 +71,7 @@ type
     procedure timerFishTimer(Sender: TObject);
     procedure FishImageClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure imgDonateClick(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -182,6 +184,13 @@ end;
 procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
+end;
+
+procedure TAboutForm.imgDonateClick(Sender: TObject);
+begin
+  ShellExecute(GetDesktopWindow(), 'open',
+    PAnsiChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil,
+    SW_SHOWNORMAL);
 end;
 
 end.
