@@ -109,12 +109,12 @@ begin
         Result := fRightPageControl
       end;
     lstBoth: begin
-        // Check if left is focused, otherwise assume right one is focused
-        ActivePage := fLeftPageControl.ActivePage;
+        // Check if right is focused, otherwise assume left one is focused
+        ActivePage := fRightPageControl.ActivePage;
         if TEditor(ActivePage.Tag).Text.Focused then
-          Result := fLeftPageControl
+          Result := fRightPageControl
         else
-          Result := fRightPageControl;
+          Result := fLeftPageControl; // no focus -> left one
       end;
     lstNone: begin
         Result := nil;
