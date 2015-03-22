@@ -181,6 +181,7 @@ const
   ID_ITEM_HELPDEVCPP                    = 9004;
   ID_ITEM_PACKMAN                       = 9005;
   ID_ITEM_DONATE                        = 9006;
+  ID_ITEM_TIP                           = 9007;
   
   //debug menu
   ID_ITEM_DEBUG                         = 10001;

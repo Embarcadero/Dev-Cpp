@@ -92,6 +92,7 @@ Ver=1
 5026=Compilers
 5027=Search Again Backwards
 
+
 6001=&New File
 6002=&Add To Project...
 6003=&Remove From Project...
@@ -120,6 +121,7 @@ Ver=1
 7016=Delete &Profiling Information
 7017=&Syntax Check Current File
 
+
 8001=&Full Screen Mode
 8002=&Back to Normal
 8003=&Next
@@ -130,12 +132,15 @@ Ver=1
 8008=&List...
 8009=Press %s to toggle fullscreen or %s to toggle toolbars
 
+
 9001=&About Dev-C++...
 9002=&Check For Packages...
 9003=C&ustomize Help Menu...
 9004=&Help on Dev-C++
 9005=Package Manager...
 9006=Donate :)
+9007=Tip Of The Day...
+
 
 10001=&Debug
 10002=&Toggle Breakpoint

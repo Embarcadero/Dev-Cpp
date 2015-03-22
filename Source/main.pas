@@ -1240,7 +1240,7 @@ begin
   // Help menu
   actHelp.Caption := Lang[ID_ITEM_HELPDEVCPP];
   actAbout.Caption := Lang[ID_ITEM_ABOUT];
-  actShowTips.Caption := Lang[ID_TIPS_CAPTION];
+  actShowTips.Caption := Lang[ID_ITEM_TIP];
   actDonate.Caption := Lang[ID_ITEM_DONATE];
 
   // Debugging buttons
