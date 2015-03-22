@@ -463,9 +463,9 @@ Ver=1
 35006=Returns the projects "name"
 35007=Returns the filename of the current source file
 35008=Returns the path of current source file
-35009=Returns a space seperated list of source files from the current project
+35009=Returns a space separated list of source files from the current project
 35010=Returns the word at the cursor in the active editor
-35011=Returns dev-c++ version
+35011=Returns Dev-C++ version
 
 
 36001=About Dev-C++ :)
@@ -477,7 +477,7 @@ Ver=1
 36007=Dev-C++ discussion forums:
 36008=Dev-C++ users mailing list:
 36009=Authors e-mail:
-36010=http://www.bloodshed.net
+36010=http://www.bloodshed.net1212
 36011=http://www.mingw.org
 36012=http://www.bloodshed.net/forum
 36013=http://www.bloodshed.net/devcpp-ml.html
@@ -874,7 +874,7 @@ Ver=1
 60018=Are you sure you want to remove this folder?
 60019=Enter the new folder name:
 60020=The file %s is marked as read-only. Do you want to mark it as read-write? If no, the file will not be saved...
-60021=An error occured. The file %s was not marked as read-write and it was not saved...
+60021=An error occurred. The file %s was not marked as read-write and it was not saved...
 60022=An Access Violation (Segmentation Fault) raised in your program.
 60023=Source file is more recent than executable.<CR><CR>Recompile?
 60024=Please select the application you want to attach to:
@@ -1011,7 +1011,7 @@ Ver=1
 66021=Dev-C++ was unable to set or check file associations.<CR><CR>This is known to be caused by using UAC in combination with a standard user account.<CR><CR>Please disable UAC or run Dev-C++ as an administrator if you want to change file associations. Relevant options can be found at Tools >> Environment Options >> File Associations.
 66022=UI font:
 66023=Dev-C++ was unable to load the code completion cache, which is corrupted or part of outdated settings files located at:<CR><CR>%s<CR><CR>Do you wish to backup and reset options? If so, please restart Dev-C++. Backups will be stored here:<CR><CR>%s
-66024=An error occured while trying to load the printer setup dialog.<CR><CR>You probably have no printer installed yet.
+66024=An error occurred while trying to load the printer setup dialog.<CR><CR>You probably have no printer installed yet.
 66025=Multiline tabs must be enabled when using vertical tabs.<CR><CR>Reverting to Top Tabs.
 
 
@@ -1121,7 +1121,7 @@ Ver=1
 72028=Sync product with file version
 72029=Default to C++ when creating new files
 72030=Reset to compiler set values?
-72031=Dev-C++ was unable to read executable version information options.<CR><CR>A common cause for this error is Data Execution Prevention (DEP).<CR><CR>Please add devcpp.exe to the whitelist of DEP at Control Panel >> System >> Advaned System Settings >> Advanced >> Performance >> DEP and try again.
+72031=Dev-C++ was unable to read executable version information options.<CR><CR>A common cause for this error is Data Execution Prevention (DEP).<CR><CR>Please add devcpp.exe to the whitelist of DEP at Control Panel >> System >> Advanced System Settings >> Advanced >> Performance >> DEP and try again.
 72032=Files:
 
 73001=Strip executable (-s)
@@ -1218,7 +1218,7 @@ Ver=1
 78026=Processing header file...
 78027=No binary directory provided in compiler set "%s". Aborted compilation.
 78028=Nothing to compile. Aborted compilation.
-78029=Cleaing project...
+78029=Cleaning project...
 78030=Cleaning file...
 78031=Deleted output file %s
 78032=No output files to delete.

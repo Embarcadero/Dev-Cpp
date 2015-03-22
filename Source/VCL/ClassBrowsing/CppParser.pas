@@ -799,10 +799,10 @@ function TCppParser.CheckForTypedefStruct: boolean;
 begin
   //we assume that typedef is the current index, so we check the next
   //should call CheckForTypedef first!!!
-  Result := (fIndex < fTokenizer.Tokens.Count - 1) and
+  Result := (fIndex < fTokenizer.Tokens.Count - 1) and (
     SameStr(fTokenizer[fIndex + 1]^.Text, 'struct') or
     SameStr(fTokenizer[fIndex + 1]^.Text, 'class') or
-    SameStr(fTokenizer[fIndex + 1]^.Text, 'union');
+    SameStr(fTokenizer[fIndex + 1]^.Text, 'union'));
 end;
 
 function TCppParser.CheckForStructs: boolean;

@@ -22,7 +22,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam,LPARAM lParam) {
 				case ID_COMPAREBUTTON: {
 					// Clear log
 					SetWindowText(LogBoxHandle,"");
-					
+
 					// Get reference language filename
 					LangFile englishfile;
 					char buffer[1024];
@@ -39,7 +39,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam,LPARAM lParam) {
 
 					// Open reference language
 					otherfile.OpenFile(buffer);
-					
+
 					// Compare them
 					LangCompare compare(englishfile,otherfile);
 					break;
@@ -52,17 +52,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam,LPARAM lParam) {
 			// Create fancy fonts
 			HDC hdc = GetDC(hwnd);
 			HFONT font1 = CreateFont(-MulDiv(10,GetDeviceCaps(hdc, LOGPIXELSY),72),0,0,0,0,0,
-			                        0,0,0,0,0,0,0,"Segoe UI");
+			                         0,0,0,0,0,0,0,"Segoe UI");
 			HFONT font2 = CreateFont(-MulDiv(10,GetDeviceCaps(hdc, LOGPIXELSY),72),0,0,0,0,0,
-			                        0,0,0,0,0,0,0,"Consolas");
-			                        
+			                         0,0,0,0,0,0,0,"Consolas");
+
 			// Create english
 			HWND EnglishFileText = CreateWindow("STATIC","English (Reference) File:",
 			                                    WS_CHILD|WS_VISIBLE,10,10,200,20,hwnd,(HMENU)ID_ENGLISHFILETEXT,
 			                                    GetModuleHandle(NULL),NULL);
 			SendMessage(EnglishFileText,WM_SETFONT,(WPARAM)font1,0);
 			HWND EnglishFileInput = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT",
-			                                       "test\\English.lng",
+			                                       "English.lng",
 			                                       WS_CHILD|WS_VISIBLE,10,30,610,26,hwnd,(HMENU)ID_ENGLISHFILEINPUT,
 			                                       GetModuleHandle(NULL),NULL);
 			SendMessage(EnglishFileInput,WM_SETFONT,(WPARAM)font1,0);
@@ -73,7 +73,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam,LPARAM lParam) {
 			                                  GetModuleHandle(NULL),NULL);
 			SendMessage(OtherFileText,WM_SETFONT,(WPARAM)font1,0);
 			HWND OtherFileInput = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT",
-			                                     "test\\Chinese.lng",
+			                                     "YourLanguage.lng",
 			                                     WS_CHILD|WS_VISIBLE,10,90,610,26,hwnd,(HMENU)ID_OTHERFILEINPUT,
 			                                     GetModuleHandle(NULL),NULL);
 			SendMessage(OtherFileInput,WM_SETFONT,(WPARAM)font1,0);
@@ -90,7 +90,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam,LPARAM lParam) {
 			                              (HMENU)ID_LOGBOX,
 			                              GetModuleHandle(NULL),NULL);
 			SendMessage(LogBoxHandle,WM_SETFONT,(WPARAM)font2,0);
-			
+
 			// Release handles
 			ReleaseDC(hwnd,hdc);
 			break;
@@ -104,8 +104,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam,LPARAM lParam) {
 }
 
 /* The 'main' function of Win32 GUI programs: this is where execution starts */
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int nCmdShow) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow) {
 	WNDCLASSEX wc; /* A properties struct of our window */
 	HWND hwnd; /* A 'HANDLE', hence the H, or a pointer to our window */
 	MSG msg; /* A temporary location for all messages */
