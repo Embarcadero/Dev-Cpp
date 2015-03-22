@@ -128,13 +128,14 @@ Ver=1
 8006=%s versió %s a pantalla completa. Pitgeu Alt+F10 per amagar o mostrar aquesta barra, Alt+F11 per amagar o mostrar la barra d'eines, o Alt+F12 per activar o desactivar aquest mode de pantalla completa.
 8007=Tanca-ho tot &excepte aquest
 8008=&Llista de finestres...
-
+8009=Pitgeu %s per canviar el mode de pantalla completa, o %s per les barres d'eines
 
 9001=&Quant a Dev-C++...
 9002=&Cerca paquets...
 9003=&Personalitza el menú d'ajuda...
 9004=&Ajuda de Dev-C++
 9005=Gestor de paquets...
+9006=Feu un donatiu :)
 
 10001=&Depura
 10002=Commuta punt d'&interrupció
@@ -1243,3 +1244,5 @@ Ver=1
 79017=Vista prèvia:
 79018=No s'ha trobat l'AStyle :(
 79019=Impulsat per %s :)
+79020=Màx. longitud de línia:
+79021=// No s'ha pogut trobar el fitxer de sortida de l'AStyle:<CR>// %s
