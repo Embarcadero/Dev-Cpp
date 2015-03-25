@@ -36,7 +36,8 @@ int main() {
 	// Add setup scripts
 	GitAdd("*.nsi");
 
-	// Add project icon
+	// Add project resources
+	GitAdd("devcpp.exe.manifest");
 	GitAdd("devcpp.ico");
 	
 	// Add useful text files
