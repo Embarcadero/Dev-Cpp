@@ -58,8 +58,6 @@ function FormatList(const sl: TStrings; formatstr: AnsiString): AnsiString;
 function IncludeQuoteIfSpaces(const s: AnsiString): AnsiString;
 function IncludeQuoteIfNeeded(const s: AnsiString): AnsiString;
 
-procedure LoadFilefromResource(const FileName: AnsiString; ms: TMemoryStream);
-
 function ValidateFile(const FileName: AnsiString; const WorkPath: AnsiString; const CheckDirs: boolean = FALSE):
   AnsiString;
 
@@ -695,33 +693,6 @@ begin
       result := devDirs.Templates + fName;
   end else
     result := '';
-end;
-
-procedure LoadFilefromResource(const FileName: AnsiString; ms: TMemoryStream);
-var
-  HResInfo: HRSRC;
-  hRes: THandle;
-  Buffer: PAnsiChar;
-  aName, Ext: AnsiString;
-begin
-  Ext := ExtractFileExt(FileName);
-  Ext := copy(ext, 2, length(ext));
-  aName := ChangeFileExt(ExtractFileName(FileName), '');
-  HResInfo := FindResource(HInstance, PAnsiChar(aName), PAnsiChar(Ext));
-  hres := LoadResource(HInstance, HResInfo);
-  if HRes = 0 then begin
-    MessageBox(Application.MainForm.Handle,
-      PAnsiChar(Format(Lang[ID_ERR_RESOURCE], [FileName, aName, Ext])),
-      PAnsiChar(Lang[ID_ERROR]), MB_OK or MB_ICONERROR);
-    exit;
-  end;
-
-  Buffer := LockResource(HRes);
-  ms.clear;
-  ms.WriteBuffer(Buffer[0], SizeofResource(HInstance, HResInfo));
-  ms.Seek(0, 0);
-  UnlockResource(HRes);
-  FreeResource(HRes);
 end;
 
 function GetShortName(const FileName: AnsiString): AnsiString;

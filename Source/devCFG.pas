@@ -802,14 +802,14 @@ end;
 
 procedure DestroyOptions;
 begin
-  // devData is freed last
-  devDirs.Free;
-  devCompilerSets.Free;
-  devEditor.Free;
-  devCodeCompletion.Free;
-  devClassBrowsing.Free;
-  devExternalPrograms.Free;
-  devFormatter.Free;
+  devData.Free;
+  FreeAndNil(devDirs);
+  FreeAndNil(devCompilerSets);
+  FreeAndNil(devEditor);
+  FreeAndNil(devCodeCompletion);
+  FreeAndNil(devClassBrowsing);
+  FreeAndNil(devExternalPrograms);
+  FreeAndNil(devFormatter);
 end;
 
 procedure RemoveOptionsDir(const Directory: AnsiString);
@@ -845,13 +845,13 @@ begin
 end;
 
 var
-  fdevData: TdevData = nil;
+  fdevDataSingleton: TdevData = nil;
 
 function devData: TdevData;
 begin
-  if not Assigned(fdevData) and not Application.Terminated then
-    fdevData := TdevData.Create;
-  result := fDevData; // assume constructor succeeded
+  if not Assigned(fdevDataSingleton) and not Application.Terminated then
+    fdevDataSingleton := TdevData.Create;
+  result := fdevDataSingleton; // assume constructor succeeded
 end;
 
 constructor TdevData.Create;
@@ -865,10 +865,10 @@ end;
 
 destructor TdevData.Destroy;
 begin
-  fdevData := nil;
   fWindowState.Free;
   fReportWindowState.Free;
   fProjectWindowState.Free;
+  fdevDataSingleton := nil;
   inherited;
 end;
 

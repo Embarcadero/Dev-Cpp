@@ -131,7 +131,7 @@ begin
     Lang.Open(Lang.Langs.Names[Selected]);
     devData.Language := Lang.FileFromDescription(Lang.Langs.Names[Selected]);
   end else begin
-    Lang.Open('English.lng'); // never happens...
+    Lang.Open('English.lng');
   end;
   LoadText;
 
@@ -163,6 +163,7 @@ begin
   Font.Name := devData.InterfaceFont;
   Font.Size := devData.InterfaceFontSize;
 
+  // Set demo caret
   synExample.CaretXY := BufferCoord(11, 5);
 
   // Interface themes

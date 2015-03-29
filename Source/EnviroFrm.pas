@@ -314,13 +314,16 @@ begin
 
     // List the languages
     cboLang.Items.BeginUpdate;
-    cboLang.Clear;
-    for I := 0 to Lang.Langs.Count - 1 do begin
-      sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[I]);
-      if SameText(Lang.CurrentLanguage, cboLang.Items[I]) then
-        cboLang.ItemIndex := sel;
+    try
+      cboLang.Clear;
+      for I := 0 to Lang.Langs.Count - 1 do begin
+        sel := cboLang.Items.Add(Lang.Langs.ValueFromIndex[I]);
+        if SameText(Lang.CurrentLanguage, cboLang.Items[I]) then
+          cboLang.ItemIndex := sel;
+      end;
+    finally
+      cboLang.Items.EndUpdate;
     end;
-    cboLang.Items.EndUpdate;
 
     // List the themes
     cboTheme.Items.Clear;

@@ -159,6 +159,7 @@ object LangForm: TLangForm
       #9'std::cout << "Hello world!\n";'
       #9'return 0;'
       '}')
+    FontSmoothing = fsmNone
   end
   object EditPanel: TPanel
     Left = 260

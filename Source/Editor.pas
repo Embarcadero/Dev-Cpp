@@ -343,10 +343,10 @@ begin
   DestroyCompletion;
 
   // Free everything
-  fFunctionTip.Free;
-  fText.Free;
-  fTabSheet.Free;
-  fPreviousEditors.Free;
+  FreeAndNil(fFunctionTip);
+  FreeAndNil(fText);
+  FreeAndNil(fTabSheet);
+  FreeAndNil(fPreviousEditors);
 
   // Move into TObject.Destroy...
   inherited;

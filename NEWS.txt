@@ -1,7 +1,8 @@
 Version 5.11 - *
 
+- Improved startup speed.
 - Fixed Abort Compilation button not working anymore.
-- Fixed crash in CheckForTypedefStruct.
+- Fixed crash in TCppParser.CheckForTypedefStruct.
 - Fixed some typos in the English translation (thanks to Hiro5).
 - Updated the Catalan translation (thanks to Hiro5).
 - Fixed some hickups in the build process of Dev-C++ itself.
