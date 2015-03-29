@@ -1630,43 +1630,44 @@ begin
     I := SkipBraces(fIndex);
 
     // Have we found the name?
-    if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = '}') then
+    if (I + 1 < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = '}') then
       if fTokenizer[I + 1]^.Text[1] <> ';' then
-        EnumName := EnumName + fTokenizer[I + 1]^.Text + ' ';
+        EnumName := fTokenizer[I + 1]^.Text;
   end else begin // enum NAME {...};
     while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in ['{', ';'])) do begin
       EnumName := EnumName + fTokenizer[fIndex]^.Text + ' ';
       Inc(fIndex);
     end;
+    EnumName := Trim(EnumName);
 
     // An opening brace must be present after NAME
     if (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] <> '{') then
       Exit;
-
-    // Skip opening brace
-    Inc(fIndex);
   end;
-  EnumName := Trim(EnumName);
 
   // Add statement for enum name too
-  AddStatement(
-    GetLastCurrentClass,
-    fCurrentFile,
-    '', // do not override hint
-    'enum',
-    EnumName,
-    Args,
-    fTokenizer[fIndex]^.Line,
-    skTypedef,
-    GetScope,
-    fClassScope,
-    False,
-    False,
-    True,
-    nil);
+  if EnumName <> '' then
+    AddStatement(
+      GetLastCurrentClass,
+      fCurrentFile,
+      '', // do not override hint
+      'enum',
+      EnumName,
+      Args,
+      fTokenizer[fIndex]^.Line,
+      skTypedef,
+      GetScope,
+      fClassScope,
+      False,
+      False,
+      True,
+      nil);
+
+  // Skip opening brace
+  Inc(fIndex);
 
   // Call every member "enum NAME ITEMNAME"
-  LastType := 'enum ' + Trim(EnumName);
+  LastType := TrimRight('enum ' + EnumName);
   repeat
     if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
       if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
@@ -1697,7 +1698,7 @@ begin
   until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']);
 
   // Step over closing brace
-  if fTokenizer[fIndex]^.Text[1] = '}' then
+  if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '}') then
     Inc(fIndex);
 end;
 
