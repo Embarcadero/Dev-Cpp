@@ -4,11 +4,9 @@
 - Messy painting of find results list
 - Add proxy support to webupdate
 - Unify look and feel of all windows
-- Test TDM-GCC 4.9.x
 - Rename file functionality (MoveFile)
 - Fix TClassBrowser.AdvancedCustomDrawItem crash
 - Same word highlight
-- Double click on compiler item when selection is available broken
 
 - Implement conditional search
 https://sourceforge.net/p/orwelldevcpp/tickets/143/

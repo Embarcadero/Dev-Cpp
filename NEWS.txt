@@ -1,5 +1,7 @@
-Version 5.11 - 29 March 2015
+Version 5.11 - *
 
+- Fixed crash related to double clicking on a compiler error when a selection was made.
+- Upgraded the default compiler to TDM-GCC 4.9.2.
 - Improved startup speed.
 - Fixed Abort Compilation button not working anymore.
 - Fixed crash in TCppParser.CheckForTypedefStruct.

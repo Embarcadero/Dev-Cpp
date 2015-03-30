@@ -873,9 +873,8 @@ begin
   if not fText.Focused then
     Self.Activate;
 
-  // Position the caret
-  fText.SetCaretXYEx(False, BufferCoord(Col, Line)); // prop CaretXY calls EnsureCursorPosVisibleEx(False)
-  fText.EnsureCursorPosVisibleEx(True); // scroll to line
+  // Position the caret, call EnsureCursorPosVisibleEx after setting block
+  fText.SetCaretXYCentered(True,BufferCoord(Col, Line));
 end;
 
 procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);

@@ -1,7 +1,7 @@
 ####################################################################
 # Startup
 
-!define COMPILERNAME "TDM-GCC 4.8.1"
+!define COMPILERNAME "TDM-GCC 4.9.2"
 !define COMPILERFOLDER "MinGW64"
 !define DEVCPP_VERSION "5.11"
 !define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"

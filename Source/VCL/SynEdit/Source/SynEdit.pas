@@ -580,6 +580,7 @@ type
     procedure RedoItem;
     procedure InternalSetCaretXY(const Value: TBufferCoord); virtual;
     procedure SetCaretXY(const Value: TBufferCoord); virtual;
+    procedure SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord); virtual;
     procedure SetFontSmoothing(AValue: TSynFontSmoothMethod);
     procedure SetName(const Value: TComponentName); override;
     procedure SetReadOnly(Value: boolean); virtual;
@@ -634,7 +635,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Canvas;
-    procedure SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord); virtual;
     property SelStart: Integer read GetSelStart write SetSelStart;
     property SelEnd: Integer read GetSelEnd write SetSelEnd;
     property AlwaysShowCaret: Boolean read FAlwaysShowCaret
@@ -685,7 +685,7 @@ type
     function GetPositionOfMouse(out aPos: TBufferCoord): Boolean;
     function GetWordAtRowCol(XY: TBufferCoord): string;
     procedure GotoBookMark(BookMark: Integer);
-    procedure GotoLineAndCenter(ALine: Integer);
+    procedure SetCaretXYCentered(ForceToMiddle: Boolean; const Value: TBufferCoord);
     function IdentChars: TSynIdentChars;
     procedure InvalidateGutter;
     procedure InvalidateGutterLine(aLine: integer);
@@ -3693,18 +3693,26 @@ begin
 end;
 
 procedure TCustomSynEdit.SetCaretXY(const Value: TBufferCoord);
-//there are two setCaretXY methods.  One Internal, one External.  The published
-//property CaretXY (re)sets the block as well
+begin
+  SetCaretXYCentered(False, Value);
+end;
+
+procedure TCustomSynEdit.SetCaretXYCentered(ForceToMiddle: Boolean; const Value: TBufferCoord);
 begin
   IncPaintLock;
   try
     Include(fStatusChanges, scSelection);
-    SetCaretXYEx(True, Value);
+    if ForceToMiddle then
+      SetCaretXYEx(False, Value) // do not call EnsureCursorPosVisible here
+    else
+      SetCaretXYEx(True, Value);
     if SelAvail then
       InvalidateSelection;
     fBlockBegin.Char := fCaretX;
     fBlockBegin.Line := fCaretY;
     fBlockEnd := fBlockBegin;
+    if ForceToMiddle then
+      EnsureCursorPosVisibleEx(True); // but here after block has been set
   finally
     DecPaintLock;
   end;
@@ -5521,32 +5529,11 @@ procedure TCustomSynEdit.GotoBookMark(BookMark: Integer);
 var
   iNewPos: TBufferCoord;
 begin
-  if (BookMark in [0..9]) and
-    assigned(fBookMarks[BookMark]) and
-    (fBookMarks[BookMark].Line <= fLines.Count) then begin
+  if (BookMark in [0..9]) and Assigned(fBookMarks[BookMark]) and (fBookMarks[BookMark].Line <= fLines.Count) then begin
     iNewPos.Char := fBookMarks[BookMark].Char;
     iNewPos.Line := fBookMarks[BookMark].Line;
-    //call it this way instead to make sure that the caret ends up in the middle
-    //if it is off screen (like Delphi does with bookmarks)
-    SetCaretXYEx(False, iNewPos);
-    EnsureCursorPosVisibleEx(True);
-    if SelAvail then
-      InvalidateSelection;
-    fBlockBegin.Char := fCaretX;
-    fBlockBegin.Line := fCaretY;
-    fBlockEnd := fBlockBegin;
+    SetCaretXYCentered(True, iNewPos);
   end;
-end;
-
-procedure TCustomSynEdit.GotoLineAndCenter(ALine: Integer);
-begin
-  SetCaretXYEx(False, BufferCoord(1, ALine));
-  if SelAvail then
-    InvalidateSelection;
-  fBlockBegin.Char := fCaretX;
-  fBlockBegin.Line := fCaretY;
-  fBlockEnd := fBlockBegin;
-  EnsureCursorPosVisibleEx(True);
 end;
 
 procedure TCustomSynEdit.SetBookMark(BookMark: Integer; X: Integer; Y: Integer);
@@ -6895,7 +6882,7 @@ begin
           // Ignore the last line the cursor is placed on
           BeginIndex := BlockBegin.Line - 1;
           if BlockEnd.Char = 1 then
-            EndIndex := max(0,BlockEnd.Line - 2)
+            EndIndex := max(0, BlockEnd.Line - 2)
           else
             EndIndex := BlockEnd.Line - 1;
 
