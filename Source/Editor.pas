@@ -1304,10 +1304,8 @@ end;
 
 procedure TEditor.DestroyCompletion;
 begin
-  if Assigned(fCompletionTimer) then
-    FreeAndNil(fCompletionTimer);
-  if Assigned(fFunctionTipTimer) then
-    FreeAndNil(fFunctionTipTimer);
+  FreeAndNil(fCompletionTimer);
+  FreeAndNil(fFunctionTipTimer);
 end;
 
 function TEditor.GetWordAtPosition(P: TBufferCoord; Purpose: TWordPurpose): AnsiString;

@@ -101,9 +101,9 @@ var
   LangFile: AnsiString;
 begin
   // Load file from languages directory
-  LangFile := ValidateFile('English.lng', devDirs.Lang);
+  LangFile := ValidateFile(Filename, devDirs.Lang);
   if LangFile = '' then begin
-    MessageDlg('Could not open language file ' + LangFile, mtError, [mbOK], 0);
+    MessageDlg('Could not open language file ' + Filename, mtError, [mbOK], 0);
     Exit;
   end;
 
