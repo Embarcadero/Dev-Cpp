@@ -1632,7 +1632,7 @@ begin
     // Have we found the name?
     if (I + 1 < fTokenizer.Tokens.Count) and (fTokenizer[I]^.Text[1] = '}') then
       if fTokenizer[I + 1]^.Text[1] <> ';' then
-        EnumName := fTokenizer[I + 1]^.Text;
+        EnumName := Trim(fTokenizer[I + 1]^.Text);
   end else begin // enum NAME {...};
     while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in ['{', ';'])) do begin
       EnumName := EnumName + fTokenizer[fIndex]^.Text + ' ';
