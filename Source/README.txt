@@ -14,9 +14,9 @@ The main executable devcpp.exe can be built using the following steps:
 	   'Module Not Found' or 'Resource Not Found' errors when opening files, 
 	   compiling files or running devcpp.exe.
 
-	4) It is advisable to run CleanSource.bat before commiting work, when you get
- 	   errors complaining about old versions of code or when you want to diff the
-	   source folder.
+	4) It is advisable to run CleanSource.bat before commiting work, when you
+	   get errors complaining about old versions of code or when you want to 
+	   diff the source folder.
 
 This process has only been tested using Delphi 6 and Delphi 7. The code base
 should be compatible with more recent versions of Delphi, but there is no 
@@ -25,8 +25,10 @@ guarantee anything will work.
 2. Compiling associated tools
 
 There are a couple of executables that need to be compiled and/or put in the
-right folder when building a release. These files can be found in the Tools
-subfolder.
+right folder when building a release. These files can be found in the 
+Source\Tools subfolder. Precompiled files are available in the Tools folder in
+the SourceForge repository. All three associated are required to be present by
+the setup scripts.
 
 	1) ConsolePauser.exe. This needs to be put in the root directory next to
 	   devcpp.exe. This executable is launched by devcpp.exe when a console 
