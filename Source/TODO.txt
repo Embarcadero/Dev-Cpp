@@ -1,12 +1,12 @@
 - Add required headers and libraries for D3D11 development
 - Increase the amount of automated and manual tests
 - When the current compiler changes, code should be reparsed because built-in defines of a compiler affect parsing
-- Messy painting of find results list
+- Fix messy painting of find results list
 - Add proxy support to webupdate
 - Unify look and feel of all windows
 - Rename file functionality (MoveFile)
 - Fix TClassBrowser.AdvancedCustomDrawItem crash
-- Same word highlight
+- Same word highlight when selected
 
 - Implement conditional search
 https://sourceforge.net/p/orwelldevcpp/tickets/143/

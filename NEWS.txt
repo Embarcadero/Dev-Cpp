@@ -1,4 +1,4 @@
-Version 5.11 - *
+Version 5.11 - 27 April 2015
 
 - Fixed crash related to double clicking on a compiler error when a selection was made.
 - Upgraded the default compiler to TDM-GCC 4.9.2.
