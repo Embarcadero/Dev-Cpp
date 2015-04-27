@@ -73,13 +73,10 @@ type
     procedure FontChange(Sender: TObject);
     procedure cmbIconsChange(Sender: TObject);
     procedure cmbFontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
-    function GetSelected: integer;
     procedure HandleLangPanel;
     procedure HandleEditPanel;
-  public
+    procedure UpdateLangList(List: TStrings);
     procedure LoadText; // call after selecting a language of course
-    procedure UpdateList(List: TStrings);
-    property Selected: integer read GetSelected;
   end;
 
 implementation
@@ -102,34 +99,35 @@ begin
   OkBtn.Caption := Lang[ID_LANGFORM_NEXT];
 end;
 
-procedure TLangForm.UpdateList(List: TStrings);
+procedure TLangForm.UpdateLangList(List: TStrings);
 var
   I, sel: integer;
 begin
   lbLanguages.Items.BeginUpdate;
-  lbLanguages.Clear;
-  for I := 0 to List.Count - 1 do begin
-    sel := lbLanguages.Items.Add(List.ValueFromIndex[I]);
-    if StartsText('english', lbLanguages.Items[sel]) then
-      lbLanguages.Selected[sel] := True;
+  try
+    lbLanguages.Clear;
+    for I := 0 to List.Count - 1 do begin
+      sel := lbLanguages.Items.Add(List.ValueFromIndex[I]);
+      if StartsText('english', lbLanguages.Items[sel]) then
+        lbLanguages.Selected[sel] := True;
+    end;
+  finally
+    lbLanguages.Items.EndUpdate;
   end;
-  lbLanguages.Items.EndUpdate;
-end;
-
-function TLangForm.GetSelected: integer;
-begin
-  result := lbLanguages.ItemIndex;
 end;
 
 procedure TLangForm.HandleLangPanel;
+var
+  SelectedLang: AnsiString;
 begin
   OkBtn.Tag := 1;
   LangPanel.Visible := false;
 
   // Update translation
-  if Selected <> -1 then begin
-    Lang.Open(Lang.Langs.Names[Selected]);
-    devData.Language := Lang.FileFromDescription(Lang.Langs.Names[Selected]);
+  if lbLanguages.ItemIndex <> -1 then begin
+    SelectedLang := Lang.Langs.Names[lbLanguages.ItemIndex];
+    Lang.Open(SelectedLang);
+    devData.Language := Lang.FileFromDescription(SelectedLang);
   end else begin
     Lang.Open('English.lng');
   end;
@@ -158,6 +156,8 @@ begin
 end;
 
 procedure TLangForm.FormShow(Sender: TObject);
+var
+  FontIndex: Integer;
 begin
   // Set interface font
   Font.Name := devData.InterfaceFont;
@@ -177,9 +177,15 @@ begin
 
   // Font options
   cmbFont.Items.Assign(Screen.Fonts);
-  cmbFont.ItemIndex := cmbFont.Items.IndexOf('Consolas');
-  if cmbFont.ItemIndex = -1 then
-    cmbFont.ItemIndex := cmbFont.Items.IndexOf('Courier New');
+  FontIndex := cmbFont.Items.IndexOf('Consolas');
+  if FontIndex = -1 then
+    FontIndex := cmbFont.Items.IndexOf('Courier New');
+  if FontIndex = -1 then
+    FontIndex := cmbFont.Items.IndexOf('Courier');
+  cmbFont.ItemIndex := FontIndex; // set ItemIndex once
+
+  // Populate language list
+  UpdateLangList(Lang.GetLangList);
   lbLanguages.SetFocus;
 end;
 

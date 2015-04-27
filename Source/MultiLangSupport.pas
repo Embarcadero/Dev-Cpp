@@ -174,7 +174,7 @@ end;
 
 procedure TdevMultiLangSupport.SelectLanguage;
 begin
-  with TLangForm.Create(Application.Mainform) do try
+  with TLangForm.Create(nil) do try
     ShowModal;
   finally
     Free;
