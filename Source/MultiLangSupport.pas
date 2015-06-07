@@ -63,7 +63,9 @@ var
 
 function Lang: TdevMultiLangSupport;
 begin
-  if not Assigned(fLangSingleton) and not Application.Terminated then
+  // TODO: for some reason, devDirs is not always assigned here
+  // before the first TdevMultiLangSupport call is made
+  if Assigned(devDirs) and not Assigned(fLangSingleton) and not Application.Terminated then
     fLangSingleton := TdevMultiLangSupport.Create;
   Result := fLangSingleton;
 end;

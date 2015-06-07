@@ -330,6 +330,8 @@ begin
 
   // Select editor to open when this one closes
   PrevEditor := GetPreviousEditor(Editor);
+  if PrevEditor = Editor then
+    PrevEditor := nil;
 
   BeginUpdate;
   try

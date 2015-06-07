@@ -2131,8 +2131,11 @@ begin
 
         // Hack fix, but works...
         fgdbName := GDB32_PROGRAM;
-        for I := 0 to fLibDir.Count - 1 do
-          fLibDir[i] := fLibDir[i] + '32';
+        for I := fLibDir.Count - 1 downto 0 do
+          if DirectoryExists(fLibDir[i] + '32') then
+            fLibDir[i] := fLibDir[i] + '32'
+          else
+            fLibDir.Delete(i);
       end;
 
       // Debug profile
