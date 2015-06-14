@@ -25,10 +25,10 @@ guarantee anything will work.
 2. Compiling associated tools
 
 There are a couple of executables that need to be compiled and/or put in the
-right folder when building a release. These files can be found in the 
-Source\Tools subfolder. Precompiled files are available in the Tools folder in
-the SourceForge repository. All three associated are required to be present by
-the setup scripts.
+right folder when building a full release. The source code of these files can be
+found in the Source\Tools subfolder. Precompiled versions are available in the
+Tools folder in the SourceForge repository. These three associated are required
+to be present by the setup scripts:
 
 	1) ConsolePauser.exe. This needs to be put in the root directory next to
 	   devcpp.exe. This executable is launched by devcpp.exe when a console 

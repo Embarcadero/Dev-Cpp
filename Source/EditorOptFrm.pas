@@ -324,33 +324,33 @@ begin
 
     // selection color
     if devEditor.Syntax.IndexofName(cSel) = -1 then
-      devEditor.Syntax.Append(cSel);
-    ElementList.Items.Append(cSel);
+      devEditor.Syntax.Add(cSel);
+    ElementList.Items.Add(cSel);
 
     // gutter colors
     if devEditor.Syntax.IndexofName(cGut) = -1 then
-      devEditor.Syntax.Append(cGut);
-    ElementList.Items.Append(cGut);
+      devEditor.Syntax.Add(cGut);
+    ElementList.Items.Add(cGut);
 
     // breakpoint
     if devEditor.Syntax.IndexOfName(cBP) = -1 then
-      devEditor.Syntax.Append(cBP);
-    ElementList.Items.Append(cBP);
+      devEditor.Syntax.Add(cBP);
+    ElementList.Items.Add(cBP);
 
     // error line
     if devEditor.Syntax.IndexOfName(cErr) = -1 then
-      devEditor.Syntax.Append(cErr);
-    ElementList.Items.Append(cErr);
+      devEditor.Syntax.Add(cErr);
+    ElementList.Items.Add(cErr);
 
     // active breakpoint
     if devEditor.Syntax.IndexOfName(cABP) = -1 then
-      devEditor.Syntax.Append(cABP);
-    ElementList.Items.Append(cABP);
+      devEditor.Syntax.Add(cABP);
+    ElementList.Items.Add(cABP);
 
     // folding color
     if devEditor.Syntax.IndexofName(cFld) = -1 then
-      devEditor.Syntax.Append(cFld);
-    ElementList.Items.Append(cFld);
+      devEditor.Syntax.Add(cFld);
+    ElementList.Items.Add(cFld);
 
     ffgColor := cpp.WhitespaceAttribute.Foreground;
     fbgColor := cpp.WhitespaceAttribute.Background;
@@ -912,8 +912,8 @@ var
   pt: TPoint;
   s: AnsiString;
 begin
-  if ElementList.ItemIndex < 0 then
-    exit;
+  if (ElementList.ItemIndex < 0) or (ElementList.ItemIndex >= ElementList.Items.Count) then
+    Exit;
 
   // Special additions not directly exposed by TSynHighlighter
   if ElementList.ItemIndex > pred(cpp.AttrCount) then begin

@@ -6245,8 +6245,14 @@ end;
 
 procedure TMainForm.FindOutputDeletion(Sender: TObject; Item: TListItem);
 begin
-  if Application.Terminated then
-    Exit; // form is being destroyed, don't use Lang which has been freed already...
+  // Form is being destroyed, don't use Lang which has been freed already
+  // TODO: however, for some reason Lang might already have been destroyed
+  // before Terminated is set to true. This causes the Lang singleton to be
+  // recreated, which in turn fails because it needs a valid devDirs, which
+  // has also already been deleted.
+  // FIX: check for Assigned(devDirs) here
+  if Application.Terminated or not Assigned(devDirs) then
+    Exit;
   if FindOutput.Items.Count > 1 then
     FindSheet.Caption := Lang[ID_SHEET_FIND] + ' (' + IntToStr(FindOutput.Items.Count - 1) + ')'
   else
@@ -6255,8 +6261,8 @@ end;
 
 procedure TMainForm.CompilerOutputDeletion(Sender: TObject; Item: TListItem);
 begin
-  if Application.Terminated then
-    Exit; // form is being destroyed
+  if Application.Terminated or not Assigned(devDirs) then
+    Exit;
   if CompilerOutput.Items.Count > 1 then
     CompSheet.Caption := Lang[ID_SHEET_COMP] + ' (' + IntToStr(CompilerOutput.Items.Count - 1) + ')'
   else
@@ -6265,8 +6271,8 @@ end;
 
 procedure TMainForm.ResourceOutputDeletion(Sender: TObject; Item: TListItem);
 begin
-  if Application.Terminated then
-    Exit; // form is being destroyed
+  if Application.Terminated or not Assigned(devDirs) then
+    Exit;
   if ResourceOutput.Items.Count > 1 then
     ResSheet.Caption := Lang[ID_SHEET_RES] + ' (' + IntToStr(ResourceOutput.Items.Count - 1) + ')'
   else

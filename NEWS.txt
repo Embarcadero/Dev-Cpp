@@ -1,7 +1,10 @@
-Version 5.12 - *
+Version 5.12 - 14 Juni 2015
 
-- Fixed a couple of common crashes.
-- 
+- Fixed use of invalid library directories when autodetecting 32bit GCC 4.9.2.
+- Fixed rare crash happening when closing an editor.
+- Fixed rare crash happening when closing Dev-C++.
+- Updated source code README.
+- Updated Italian language (thanks to Denis Renzi).
 
 Version 5.11 - 27 April 2015
 
