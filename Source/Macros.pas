@@ -24,19 +24,19 @@ interface
 uses
   SysUtils, devCfg, Version;
 
-function ParseMacros(Str: AnsiString): AnsiString;
+function ParseMacros(Str: String): String;
 
 implementation
 
 uses
   Main, editor, Dialogs, Utils, Classes;
 
-procedure Replace(var Str: AnsiString; Old, New: AnsiString);
+procedure Replace(var Str: String; Old, New: String);
 begin
   Str := StringReplace(Str, Old, New, [rfReplaceAll]);
 end;
 
-function ParseMacros(Str: AnsiString): AnsiString;
+function ParseMacros(Str: String): String;
 var
   e: TEditor;
 begin

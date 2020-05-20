@@ -115,7 +115,7 @@ end;
 
 procedure TToolEditForm.btnWorkDirClick(Sender: TObject);
 var
-  new: AnsiString;
+  new: String;
 begin
   if (Trim(edWorkDir.Text) <> '') and DirectoryExists(Trim(edWorkDir.Text)) then
     new := edWorkDir.Text

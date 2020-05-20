@@ -24,16 +24,16 @@ interface
 uses
   Windows, SysUtils, Classes, Forms, Registry, ShlObj;
 
-procedure RegisterFiletype(const extension, filetype, description, verb, serverapp, IcoNum: AnsiString);
-procedure RegisterDDEServer(const filetype, verb, topic, servername, macro: AnsiString);
+procedure RegisterFiletype(const extension, filetype, description, verb, serverapp, IcoNum: String);
+procedure RegisterDDEServer(const filetype, verb, topic, servername, macro: String);
 procedure CheckAssociations(FixAssocs: boolean);
 procedure Associate(Index: integer);
 procedure UnAssociate(Index: integer);
 function IsAssociated(Index: integer): boolean;
-function CheckFiletype(const extension, filetype, description, verb, serverapp: AnsiString): boolean;
+function CheckFiletype(const extension, filetype, description, verb, serverapp: String): boolean;
 
 var
-  DDETopic: AnsiString;
+  DDETopic: String;
 
 const
   // if you change anything here, update devcfg.pas, specifically devData...
@@ -44,7 +44,7 @@ const
   // field 3 is the icon number
   // field 4 is "" (empty) if you want DDE services for this extension
   // (if not empty, launches a new instance - nice for .dev files ;)
-  Associations: array[0..8, 0..3] of AnsiString = (
+  Associations: array[0..8, 0..3] of String = (
     ('c', 'C Source File', '4', ''),
     ('cpp', 'C++ Source File', '5', ''),
     ('cxx', 'C++ Source File', '5', ''),
@@ -151,11 +151,11 @@ begin
 end;
 
 function CheckFiletype(const extension, filetype, description,
-  verb, serverapp: AnsiString): boolean;
+  verb, serverapp: String): boolean;
 var
   reg: TRegistry;
-  keystring: AnsiString;
-  regdfile: AnsiString;
+  keystring: String;
+  regdfile: String;
 begin
   reg := TRegistry.Create;
   try
@@ -181,10 +181,10 @@ begin
 end;
 
 procedure RegisterFiletype(const extension, filetype, description,
-  verb, serverapp, IcoNum: AnsiString);
+  verb, serverapp, IcoNum: String);
 var
   reg: TRegistry;
-  keystring: AnsiString;
+  keystring: String;
 begin
   reg := TRegistry.Create;
   try
@@ -212,10 +212,10 @@ begin
   end;
 end;
 
-function CheckDDEServer(const filetype, verb, servername: AnsiString): boolean;
+function CheckDDEServer(const filetype, verb, servername: String): boolean;
 var
   reg: TRegistry;
-  keystring: AnsiString;
+  keystring: String;
 begin
   reg := TRegistry.Create;
   try
@@ -238,10 +238,10 @@ begin
 end;
 
 procedure RegisterDDEServer(const filetype, verb, topic, servername, macro:
-  AnsiString);
+  String);
 var
   reg: TRegistry;
-  keystring: AnsiString;
+  keystring: String;
 begin
   reg := TRegistry.Create;
   try

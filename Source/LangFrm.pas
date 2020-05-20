@@ -118,7 +118,7 @@ end;
 
 procedure TLangForm.HandleLangPanel;
 var
-  SelectedLang: AnsiString;
+  SelectedLang: String;
 begin
   OkBtn.Tag := 1;
   LangPanel.Visible := false;

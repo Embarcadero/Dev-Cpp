@@ -26,6 +26,10 @@ object NewTemplateForm: TNewTemplateForm
     TabOrder = 0
     object pgTemplate: TTabSheet
       Caption = 'Template info'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblName: TLabel
         Left = 8
         Top = 12
@@ -61,7 +65,6 @@ object NewTemplateForm: TNewTemplateForm
         Width = 225
         Height = 21
         AutoDropDown = True
-        ItemHeight = 13
         Sorted = True
         TabOrder = 2
         Text = 'cmbCateg'
@@ -73,7 +76,6 @@ object NewTemplateForm: TNewTemplateForm
         Width = 225
         Height = 21
         AutoDropDown = True
-        ItemHeight = 13
         Sorted = True
         TabOrder = 0
         Text = 'cmbName'
@@ -105,8 +107,6 @@ object NewTemplateForm: TNewTemplateForm
           Height = 24
           Hint = 'Select a icon from Dev-C++'#39's icon collection'
           Caption = 'Library'
-          TabOrder = 1
-          OnClick = btnLibClick
           Glyph.Data = {
             76010000424D7601000000000000760000002800000020000000100000000100
             04000000000000010000120B0000120B00001000000000000000000000000000
@@ -121,6 +121,8 @@ object NewTemplateForm: TNewTemplateForm
             55555555577777F7F5555555555550005555555555555777F555555555555090
             55555555555557F7F55555555555500055555555555557775555}
           NumGlyphs = 2
+          TabOrder = 1
+          OnClick = btnLibClick
         end
         object btnBrowse: TBitBtn
           Left = 208
@@ -129,8 +131,6 @@ object NewTemplateForm: TNewTemplateForm
           Height = 22
           Hint = 'Select a custom icon'
           Caption = 'Browse...'
-          TabOrder = 2
-          OnClick = btnBrowseClick
           Glyph.Data = {
             76010000424D7601000000000000760000002800000020000000100000000100
             04000000000000010000120B0000120B00001000000000000000000000000000
@@ -145,6 +145,8 @@ object NewTemplateForm: TNewTemplateForm
             55555575FFF75555555555700007555555555557777555555555555555555555
             5555555555555555555555555555555555555555555555555555}
           NumGlyphs = 2
+          TabOrder = 2
+          OnClick = btnBrowseClick
         end
         object btnRemove: TBitBtn
           Left = 208
@@ -154,8 +156,6 @@ object NewTemplateForm: TNewTemplateForm
           Hint = 'Do not use an icon for this project'
           Caption = 'Remove'
           Enabled = False
-          TabOrder = 3
-          OnClick = btnRemoveClick
           Glyph.Data = {
             36030000424D3603000000000000360000002800000010000000100000000100
             18000000000000030000120B0000120B00000000000000000000AAAAAAAAAAAA
@@ -183,11 +183,17 @@ object NewTemplateForm: TNewTemplateForm
             0000009EBAA8ABC1B4DDE7E17D8A83869F90434E4894ADA091AB9E0000000000
             00AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA00000000000000000000000000
             0000000000000000000000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA}
+          TabOrder = 3
+          OnClick = btnRemoveClick
         end
       end
     end
     object pgFiles: TTabSheet
       Caption = 'Files'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblFiles: TLabel
         Left = 8
         Top = 12
@@ -206,6 +212,10 @@ object NewTemplateForm: TNewTemplateForm
     end
     object pgExtras: TTabSheet
       Caption = 'Extras'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblCompiler: TLabel
         Left = 8
         Top = 12

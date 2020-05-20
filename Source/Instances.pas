@@ -24,8 +24,8 @@ interface
 uses
   Windows, Messages, Psapi, SysUtils, Forms, StrUtils, Classes;
 
-function GetSentStructData(Message: TMessage): AnsiString;
-procedure SendToPreviousInstance(Instance: THandle; const Data: AnsiString);
+function GetSentStructData(Message: TMessage): String;
+procedure SendToPreviousInstance(Instance: THandle; const Data: String);
 function GetPreviousInstanceCallback(Handle: THandle; Param: Integer): boolean; stdcall;
 function GetPreviousInstance: THandle;
 const
@@ -39,21 +39,21 @@ uses
 var
   PreviousInstance: THandle; // return value for GetPreviousInstanceCallback
 
-function GetSentStructData(Message: TMessage): AnsiString;
+function GetSentStructData(Message: TMessage): String;
 var
   DataStruct: PCopyDataStruct;
 begin
   DataStruct := PCopyDataStruct(Message.LParam);
   if Assigned(DataStruct) and (DataStruct^.dwData = SENDDATAID) then
-    Result := PAnsiChar(DataStruct^.lpData)
+    Result := PChar(DataStruct^.lpData)
   else
     Result := '';
 end;
 
-procedure SendToPreviousInstance(Instance: THandle; const Data: AnsiString);
+procedure SendToPreviousInstance(Instance: THandle; const Data: String);
 var
   DataStruct: TCopyDataStruct;
-  Buffer: PAnsiChar;
+  Buffer: PChar;
 begin
   // Convert string to char array
   Buffer := StrAlloc(Length(Data) + 1);
@@ -78,7 +78,7 @@ end;
 function GetPreviousInstanceCallback(Handle: THandle; Param: Integer): boolean; stdcall;
 var
   Buffer: array[0..511] of char;
-  WindowModuleName, WindowClassName, CompareFileName: AnsiString;
+  WindowModuleName, WindowClassName, CompareFileName: String;
   WindowModule, WindowProcess: THandle;
   ProcessID: Cardinal;
 begin
@@ -112,7 +112,7 @@ begin
     CloseHandle(WindowProcess); // not needed anymore
 
     // from the "same" application?
-    CompareFileName := PAnsiString(Param)^;
+    CompareFileName := PString(Param)^;
     if SameFileName(WindowModuleName, CompareFileName) then begin
       PreviousInstance := Handle;
 
@@ -125,7 +125,7 @@ end;
 function GetPreviousInstance: THandle;
 var
   UniqueMutex: THandle;
-  ThisModuleFileName: AnsiString;
+  ThisModuleFileName: String;
   Buffer: array[0..511] of char;
 begin
   Result := 0;
@@ -145,7 +145,7 @@ begin
     // Temporary fix: try to find the MainForm handle every 100ms
 
     while True do begin
-      if not EnumWindows(@GetPreviousInstanceCallback, Integer(PAnsiString(@ThisModuleFileName))) then begin
+      if not EnumWindows(@GetPreviousInstanceCallback, Integer(PString(@ThisModuleFileName))) then begin
         Result := PreviousInstance;
         Exit;
       end;

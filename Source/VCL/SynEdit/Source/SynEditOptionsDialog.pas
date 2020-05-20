@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditOptionsDialog.pas,v 1.25.2.1 2007/06/04 11:45:46 etrusco Exp $
+$Id: SynEditOptionsDialog.pas,v 1.21.2.5 2005/07/20 13:37:18 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -36,33 +36,13 @@ Known Issues:
 
 -------------------------------------------------------------------------------}
 
-{$IFNDEF QSYNEDITOPTIONSDIALOG}
 unit SynEditOptionsDialog;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  Qt,
-  Types,
-  QGraphics,
-  QControls,
-  QForms,
-  QDialogs,
-  QStdCtrls,
-  QComCtrls,
-  QExtCtrls,
-  QButtons,
-  QImgList,
-  QMenus,
-  QSynEdit,
-  QSynEditHighlighter,
-  QSynEditMiscClasses,
-  QSynEditKeyCmds,
-{$ELSE}
   Windows,
   Messages,
   Graphics,
@@ -75,28 +55,20 @@ uses
   Registry,
   ExtCtrls,
   Buttons,
-  {$IFDEF SYN_DELPHI_4_UP}
   ImgList,
-  {$ENDIF}
   Menus,
   SynEdit,
   SynEditHighlighter,
   SynEditMiscClasses,
   SynEditKeyCmds,
-{$ENDIF}
   Classes,
   SysUtils;
 
 type
-{$IFNDEF SYN_DELPHI_4_UP}
-  TLVSelectItemEvent = procedure(Sender: TObject; Item: TListItem;
-    Selected: Boolean) of object;
-{$ENDIF}
-
   TColorPopup = (cpGutter, cpRightEdge);
   
   TSynEditorOptionsUserCommand = procedure(AUserCommand: Integer;
-                                           var ADescription: String) of object;
+                                           var ADescription: string) of object;
 
   //NOTE: in order for the user commands to be recorded correctly, you must
   //      put the command itself in the object property.
@@ -257,11 +229,6 @@ type
     InChanging: Boolean;
     FExtended: Boolean;
 
-    {$IFNDEF SYN_COMPILER_4_UP}
-    FOldWndProc: TWndMethod;
-    procedure OverridingWndProc(var Message: TMessage);
-    {$ENDIF}
-
     function GetColor(Item : TMenuItem) : TColor;
     procedure GetData;
     procedure PutData;
@@ -270,9 +237,6 @@ type
   public
     eKeyShort2: TSynHotKey;
     eKeyShort1: TSynHotKey;
-    {$IFNDEF SYN_DELPHI_4_UP}
-    FOnSelectItem: TLVSelectItemEvent;
-    {$ENDIF}
 
     function Execute(EditOptions : TSynEditorOptionsContainer) : Boolean;
     property GetUserCommandNames: TSynEditorOptionsUserCommand read FUserCommand
@@ -295,7 +259,7 @@ type
     function GetExtended: Boolean;
     procedure SetExtended(const Value: Boolean);
   public
-    constructor Create(AOwner : TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function Execute(EditOptions : TSynEditorOptionsContainer) : Boolean;
     property Form: TfmEditorOptionsDialog read FForm;
@@ -328,7 +292,6 @@ type
     FKeystrokes: TSynEditKeyStrokes;
     FOptions: TSynEditorOptions;
     FSynGutter: TSynGutter;
-    FWordBreakChars: String;
     FColor: TColor;
     procedure SetBookMarks(const Value: TSynBookMarkOpt);
     procedure SetFont(const Value: TFont);
@@ -336,7 +299,7 @@ type
     procedure SetOptions(const Value: TSynEditorOptions);
     procedure SetSynGutter(const Value: TSynGutter);
   public
-    constructor Create(AOwner : TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Assign(Source : TPersistent); override;
     procedure AssignTo(Dest : TPersistent); override;
@@ -357,7 +320,6 @@ type
     property MaxUndo : Integer read FMaxUndo write FMaxUndo;
     property SelectedColor : TSynSelectedColor read FSelectedColor write FSelectedColor;
     property TabWidth : Integer read FTabWidth write FTabWidth;
-    property WordBreakChars : String read FWordBreakChars write FWordBreakChars;
     property Keystrokes : TSynEditKeyStrokes read FKeystrokes write SetKeystrokes;
   end;
 
@@ -366,11 +328,7 @@ implementation
 {$R *.dfm}
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditKeyConst;
-{$ELSE}
-  SynEditKeyConst;
-{$ENDIF}
+  Types, SynEditKeyConst;
 
 { TSynEditOptionsDialog }
 
@@ -447,7 +405,6 @@ begin
     Self.RightEdgeColor := TCustomSynEdit(Source).RightEdgeColor;
     Self.TabWidth := TCustomSynEdit(Source).TabWidth;
     Self.WantTabs := TCustomSynEdit(Source).WantTabs;
-//!!    Self.WordBreakChars := TSynEdit(Source).WordBreakChars;
   end else
     inherited;
 end;
@@ -504,7 +461,6 @@ begin
   RightEdgeColor := clSilver;
   TabWidth := 8;
   WantTabs := True;
-//!!  WordBreakChars:= '.,;:''"&!?$%#@<>[](){}^-=+-*/\|';
 end;
 
 destructor TSynEditorOptionsContainer.destroy;
@@ -585,8 +541,6 @@ begin
   //Line Spacing
   eLineSpacing.Text:= IntToStr(FSynEdit.ExtraLineSpacing);
   eTabWidth.Text:= IntToStr(FSynEdit.TabWidth);
-  //Break Chars
-//!!  eBreakchars.Text:= FSynEdit.WordBreakChars;
   //Bookmarks
   ckBookmarkKeys.Checked:= FSynEdit.BookMarkOptions.EnableKeys;
   ckBookmarkVisible.Checked:= FSynEdit.BookMarkOptions.GlyphsVisible;
@@ -665,8 +619,6 @@ begin
   //Line Spacing
   FSynEdit.ExtraLineSpacing:= StrToIntDef(eLineSpacing.Text, 0);
   FSynEdit.TabWidth:= StrToIntDef(eTabWidth.Text, 8);
-  //Break Chars
-//!!  FSynEdit.WordBreakChars:= eBreakchars.Text;
   //Bookmarks
   FSynEdit.BookMarkOptions.EnableKeys:= ckBookmarkKeys.Checked;
   FSynEdit.BookMarkOptions.GlyphsVisible:= ckBookmarkVisible.Checked;
@@ -726,13 +678,7 @@ var I : Integer;
     C : TColor;
     B : TBitmap;
 begin
-  {$IFDEF SYN_COMPILER_4_UP}
   KeyList.OnSelectItem := KeyListSelectItem;
-  {$ELSE}
-  FOldWndProc := KeyList.WindowProc;
-  KeyList.WindowProc := OverridingWndProc;
-  FOnSelectItem := KeyListSelectItem;
-  {$ENDIF}
 
   InChanging := False;
   B:= TBitmap.Create;
@@ -750,9 +696,7 @@ begin
       B.Canvas.Pen.Color:= clBlack;
       B.Canvas.Rectangle(0,0,16,16);
       ImageList1.Add(B, nil);
-{$IFDEF SYN_COMPILER_4_UP}
       ColorPopup.Items[I].ImageIndex:= ColorPopup.Items[I].Tag;
-{$ENDIF}
     end;
   finally
     B.Free;
@@ -830,7 +774,7 @@ end;
 procedure TfmEditorOptionsDialog.btnUpdateKeyClick(Sender: TObject);
 var Cmd          : Integer;
 {    KeyLoc       : Integer;
-    TmpCommand   : String;
+    TmpCommand   : string;
     OldShortcut  : TShortcut;
     OldShortcut2 : TShortcut;
 }
@@ -847,8 +791,12 @@ begin
   Cmd := Integer(cKeyCommand.Items.Objects[cKeyCommand.ItemIndex]);
 
   TSynEditKeyStroke(OldSelected.Data).Command:= Cmd;
-  TSynEditKeyStroke(OldSelected.Data).ShortCut := eKeyShort1.HotKey;
-  TSynEditKeyStroke(OldSelected.Data).ShortCut2:= eKeyShort2.HotKey;
+
+  if eKeyShort1.HotKey <> 0 then
+    TSynEditKeyStroke(OldSelected.Data).ShortCut := eKeyShort1.HotKey;
+
+  if eKeyShort2.HotKey <> 0 then
+    TSynEditKeyStroke(OldSelected.Data).ShortCut2:= eKeyShort2.HotKey;
 
   FillInKeystrokeInfo(TSynEditKeyStroke(OldSelected.Data), KeyList.Selected);
 end;
@@ -1005,15 +953,15 @@ end;
 
 procedure TfmEditorOptionsDialog.cKeyCommandKeyPress(Sender: TObject;
   var Key: Char);
-var WorkStr : String;
+var WorkStr : string;
     i       : Integer;
 begin
 //This would be better if componentized, but oh well...
-  WorkStr := AnsiUppercase(Copy(cKeyCommand.Text, 1, cKeyCommand.SelStart) + Key);
+  WorkStr := Uppercase(Copy(cKeyCommand.Text, 1, cKeyCommand.SelStart) + Key);
   i := 0;
   While i < cKeyCommand.Items.Count do
   begin
-    if pos(WorkStr, AnsiUppercase(cKeyCommand.Items[i])) = 1 then
+    if pos(WorkStr, Uppercase(cKeyCommand.Items[i])) = 1 then
     begin
       cKeyCommand.Text := cKeyCommand.Items[i];
       cKeyCommand.SelStart := length(WorkStr);
@@ -1049,31 +997,5 @@ begin
   end;
   InChanging := False;
 end;
-
-{$IFNDEF SYN_COMPILER_4_UP}
-procedure TfmEditorOptionsDialog.OverridingWndProc(var Message: TMessage);
-var
-  Item: TListItem;
-begin
-  FOldWndProc(Message);
-
-  if Message.Msg = CN_NOTIFY then
-    with TWMNotify(Message) do
-      if NMHdr.code = LVN_ITEMCHANGED then
-        with PNMListView(NMHdr)^ do
-        begin
-          Item := KeyList.Items[iItem];
-          if Assigned(FOnSelectItem) and (uChanged = LVIF_STATE) then
-          begin
-            if (uOldState and LVIS_SELECTED <> 0) and
-              (uNewState and LVIS_SELECTED = 0) then
-              FOnSelectItem(Self, Item, False)
-            else if (uOldState and LVIS_SELECTED = 0) and
-              (uNewState and LVIS_SELECTED <> 0) then
-              FOnSelectItem(Self, Item, True);
-          end;
-        end;
-end;
-{$ENDIF}
 
 end.

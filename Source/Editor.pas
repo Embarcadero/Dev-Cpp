@@ -25,9 +25,20 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
   SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
   SynEditCodeFolding, SynExportHTML, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils,
-  CodeToolTip, CBUtils;
+  CodeToolTip, CBUtils, System.UITypes;
 
 type
+  // TODO: Lift. Evaluate this protected workaround.
+  TCustomSynEditHelper = class helper for TCustomSynEdit
+  private
+    function GetStateFlags: TSynStateFlags;
+    procedure SetStateFlags(AStateFlags: TSynStateFlags);
+  public
+    property StateFlags: TSynStateFlags read GetStateFlags write SetStateFlags;
+    procedure SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord);
+    function LeftSpacesEx(const Line: string; WantTabs: Boolean; CalcAlways : Boolean = False): Integer;
+  end;
+
   TEditor = class;
   TDebugGutter = class(TSynEditPlugin)
   protected
@@ -64,15 +75,15 @@ type
   TEditor = class(TObject)
   private
     fInProject: boolean;
-    fFileName: AnsiString;
+    fFileName: String;
     fNew: boolean;
     fText: TSynEdit;
     fTabSheet: TTabSheet;
     fErrorLine: integer;
     fActiveLine: integer;
     fDebugGutter: TDebugGutter;
-    fCurrentWord: AnsiString;
-    fCurrentEvalWord: AnsiString;
+    fCurrentWord: String;
+    fCurrentEvalWord: String;
     fIgnoreCaretChange: boolean;
     fPreviousEditors: TList;
     fDblClickTime: Cardinal;
@@ -94,7 +105,7 @@ type
     procedure EditorDblClick(Sender: TObject);
     procedure EditorClick(Sender: TObject);
     procedure EditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
-    procedure EditorReplaceText(Sender: TObject; const aSearch, aReplace: AnsiString; Line, Column: integer; var Action:
+    procedure EditorReplaceText(Sender: TObject; const aSearch, aReplace: String; Line, Column: integer; var Action:
       TSynReplaceAction);
     procedure EditorDropFiles(Sender: TObject; x, y: integer; aFiles: TStrings);
     procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -104,21 +115,21 @@ type
     procedure EditorPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
     procedure EditorEnter(Sender: TObject);
     procedure CompletionKeyPress(Sender: TObject; var Key: Char);
-    procedure CompletionInsert(const append: AnsiString);
+    procedure CompletionInsert(const append: String);
     procedure CompletionTimer(Sender: TObject);
     function FunctionTipAllowed: boolean;
     procedure FunctionTipTimer(Sender: TObject);
     procedure HandleSymbolCompletion(var Key: Char);
     procedure HandleCodeCompletion(var Key: Char);
     function HandpointAllowed(var MousePos: TBufferCoord; ShiftState: TShiftState): THandPointReason;
-    procedure SetFileName(const value: AnsiString);
-    procedure OnMouseOverEvalReady(const evalvalue: AnsiString);
+    procedure SetFileName(const value: String);
+    procedure OnMouseOverEvalReady(const evalvalue: String);
     function HasBreakPoint(Line: integer): integer;
     procedure DebugAfterPaint(ACanvas: TCanvas; AClip: TRect; FirstLine, LastLine: integer);
     function GetPageControl: TPageControl;
     procedure SetPageControl(Value: TPageControl);
   public
-    constructor Create(const Filename: AnsiString; InProject, NewFile: boolean; ParentPageControl: TPageControl);
+    constructor Create(const Filename: String; InProject, NewFile: boolean; ParentPageControl: TPageControl);
     destructor Destroy; override;
     function Save: boolean;
     function SaveAs: boolean;
@@ -128,22 +139,22 @@ type
     procedure ExportToHTML;
     procedure ExportToRTF;
     procedure ExportToTEX;
-    procedure InsertString(Value: AnsiString; MoveCursor: boolean);
+    procedure InsertString(Value: String; MoveCursor: boolean);
     procedure SetErrorFocus(Col, Line: integer);
     procedure GotoActiveBreakpoint;
     procedure SetActiveBreakpointFocus(Line: integer);
     procedure RemoveBreakpointFocus;
-    procedure UpdateCaption(const NewCaption: AnsiString);
+    procedure UpdateCaption(const NewCaption: String);
     procedure InsertDefaultText;
     procedure ToggleBreakPoint(Line: integer);
-    function GetWordAtPosition(P: TBufferCoord; Purpose: TWordPurpose): AnsiString;
+    function GetWordAtPosition(P: TBufferCoord; Purpose: TWordPurpose): String;
     procedure IndentSelection;
     procedure UnindentSelection;
     procedure InitCompletion;
     procedure ShowCompletion;
     procedure DestroyCompletion;
     property PreviousEditors: TList read fPreviousEditors;
-    property FileName: AnsiString read fFileName write SetFileName;
+    property FileName: String read fFileName write SetFileName;
     property InProject: boolean read fInProject write fInProject;
     property New: boolean read fNew write fNew;
     property Text: TSynEdit read fText write fText;
@@ -242,9 +253,9 @@ end;
 
 { TEditor }
 
-constructor TEditor.Create(const Filename: AnsiString; InProject, NewFile: boolean; ParentPageControl: TPageControl);
+constructor TEditor.Create(const Filename: String; InProject, NewFile: boolean; ParentPageControl: TPageControl);
 var
-  s: AnsiString;
+  s: String;
   I: integer;
   e: TEditor;
 begin
@@ -366,7 +377,7 @@ begin
     fTabSheet.PageControl := Value;
 end;
 
-procedure TEditor.OnMouseOverEvalReady(const evalvalue: AnsiString);
+procedure TEditor.OnMouseOverEvalReady(const evalvalue: String);
 begin
   fText.Hint := fCurrentEvalWord + ' = ' + evalvalue;
   MainForm.Debugger.OnEvalReady := nil;
@@ -485,7 +496,7 @@ begin
   end;
 end;
 
-procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch, aReplace: AnsiString; Line, Column: integer; var
+procedure TEditor.EditorReplaceText(Sender: TObject; const aSearch, aReplace: String; Line, Column: integer; var
   Action: TSynReplaceAction);
 var
   pt: TPoint;
@@ -620,7 +631,7 @@ end;
 procedure TEditor.ExportToHTML;
 var
   SynExporterHTML: TSynExporterHTML;
-  SaveFileName: AnsiString;
+  SaveFileName: String;
 begin
   SynExporterHTML := TSynExporterHTML.Create(nil);
   try
@@ -656,7 +667,7 @@ end;
 procedure TEditor.ExportToRTF;
 var
   SynExporterRTF: TSynExporterRTF;
-  SaveFileName: AnsiString;
+  SaveFileName: String;
 begin
   SynExporterRTF := TSynExporterRTF.Create(nil);
   try
@@ -691,7 +702,7 @@ end;
 procedure TEditor.ExportToTEX;
 var
   SynExporterTEX: TSynExporterTEX;
-  SaveFileName: AnsiString;
+  SaveFileName: String;
 begin
   SynExporterTEX := TSynExporterTEX.Create(nil);
   try
@@ -733,18 +744,18 @@ begin
   end;
 end;
 
-procedure TEditor.InsertString(Value: AnsiString; MoveCursor: boolean);
+procedure TEditor.InsertString(Value: String; MoveCursor: boolean);
 var
   NewCursorPos: TBufferCoord;
   Char, Line, I: integer;
-  P: PAnsiChar;
+  P: PChar;
 begin
   // prevent lots of repaints
   fText.BeginUpdate;
   try
     NewCursorPos := fText.CaretXY;
     if MoveCursor then begin
-      P := PAnsiChar(value);
+      P := PChar(value);
       Char := fText.CaretX;
       Line := fText.CaretY;
       I := 0;
@@ -832,7 +843,7 @@ begin
   end;
 end;
 
-procedure TEditor.UpdateCaption(const NewCaption: AnsiString);
+procedure TEditor.UpdateCaption(const NewCaption: String);
 begin
   if Assigned(fTabSheet) then begin
     if NewCaption <> fTabSheet.Caption then begin
@@ -841,7 +852,7 @@ begin
   end;
 end;
 
-procedure TEditor.SetFileName(const value: AnsiString);
+procedure TEditor.SetFileName(const value: String);
 begin
   if value <> fFileName then begin
     fFileName := value;
@@ -864,6 +875,27 @@ begin
   end;
 end;
 
+function TCustomSynEditHelper.GetStateFlags: TSynStateFlags;
+begin
+  with Self do Result := StateFlags;
+end;
+
+procedure TCustomSynEditHelper.SetStateFlags(AStateFlags: TSynStateFlags);
+begin
+  with Self do StateFlags := AStateFlags;
+end;
+
+procedure TCustomSynEditHelper.SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord);
+begin
+  with Self do SetCaretXYEx(CallEnsureCursorPos,Value);  // Access strict protected property
+end;
+
+function TCustomSynEditHelper.LeftSpacesEx(const Line: string; WantTabs: Boolean; CalcAlways : Boolean = False): Integer;
+begin
+  with Self do Result := LeftSpacesEx(Line, WantTabs, CalcAlways);  // Access strict protected property
+end;
+
+
 procedure TEditor.SetCaretPosAndActivate(Line, Col: integer);
 begin
   // Open up the closed folds around the focused line until we can see the line we're looking for
@@ -874,14 +906,16 @@ begin
     Self.Activate;
 
   // Position the caret, call EnsureCursorPosVisibleEx after setting block
-  fText.SetCaretXYCentered(True,BufferCoord(Col, Line));
+  // TODO: Lift. Find fText.SetCaretXYCentered(True,BufferCoord(Col, Line)); equivalent
+  fText.SetCaretXYEx(True,BufferCoord(Col, Line));
 end;
 
 procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);
 begin
   // We received a key from the completion box...
   if fCompletionBox.Enabled then begin
-    if (Key in fText.IdentChars) then begin // Continue filtering
+    // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
+    if (Key in fText.AdditionalIdentChars) then begin // Continue filtering
       fText.SelText := Key;
       fCompletionBox.Search(GetWordAtPosition(fText.CaretXY, wpCompletion), fFileName);
     end else if Key = Char(VK_BACK) then begin
@@ -902,7 +936,7 @@ end;
 procedure TEditor.HandleSymbolCompletion(var Key: Char);
 var
   Attr: TSynHighlighterAttributes;
-  Token: AnsiString;
+  Token: String;
   HighlightPos: TBufferCoord;
 
   procedure HandleParentheseCompletion;
@@ -945,13 +979,14 @@ var
 
   procedure HandleBraceCompletion;
   var
-    LineBeforeCaret, Indent, MoreIndent: AnsiString;
+    LineBeforeCaret, Indent, MoreIndent: String;
     IndentCount, TabCount: integer;
   begin
     // Determine what word is before us
     LineBeforeCaret := Trim(Copy(fText.LineText, 1, fText.CaretX - 1));
 
     // Determine current indent
+    // TODO: Lift. Find LeftSpacesEx
     IndentCount := fText.LeftSpacesEx(fText.LineText, True);
 
     // Get indentation string
@@ -1152,7 +1187,7 @@ procedure TEditor.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftSta
 var
   p: TBufferCoord;
   DeletedChar, NextChar: Char;
-  S: AnsiString;
+  S: String;
   Reason: THandPointReason;
 
   procedure UndoSymbolCompletion;
@@ -1261,7 +1296,7 @@ procedure TEditor.ShowCompletion;
 var
   P: TPoint;
   M: TMemoryStream;
-  s: AnsiString;
+  s: String;
   attr: TSynHighlighterAttributes;
 begin
   fCompletionTimer.Enabled := False;
@@ -1307,10 +1342,10 @@ begin
   FreeAndNil(fFunctionTipTimer);
 end;
 
-function TEditor.GetWordAtPosition(P: TBufferCoord; Purpose: TWordPurpose): AnsiString;
+function TEditor.GetWordAtPosition(P: TBufferCoord; Purpose: TWordPurpose): String;
 var
   WordBegin, WordEnd, ParamBegin, ParamEnd, len: integer;
-  s: AnsiString;
+  s: String;
 begin
   result := '';
   if (p.Line >= 1) and (p.Line <= fText.Lines.Count) then begin
@@ -1326,7 +1361,8 @@ begin
         if (Purpose = wpEvaluation) and (s[WordEnd + 1] = '[') then begin
           if not FindComplement(s, '[', ']', WordEnd, 1) then
             break;
-        end else if (s[WordEnd + 1] in fText.IdentChars) then
+        // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
+        end else if (s[WordEnd + 1] in fText.AdditionalIdentChars) then
           Inc(WordEnd)
         else
           break;
@@ -1341,7 +1377,8 @@ begin
             break
           else
             Dec(WordBegin); // step over [
-        end else if (s[WordBegin] in fText.IdentChars) then begin
+        // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
+        end else if (s[WordBegin] in fText.AdditionalIdentChars) then begin
           Dec(WordBegin);
         end else if s[WordBegin] in ['.', ':', '~'] then begin // allow destructor signs
           Dec(WordBegin);
@@ -1389,10 +1426,10 @@ begin
     end;
 end;
 
-procedure TEditor.CompletionInsert(const append: AnsiString);
+procedure TEditor.CompletionInsert(const append: String);
 var
   Statement: PStatement;
-  FuncAddOn: AnsiString;
+  FuncAddOn: String;
 begin
   Statement := fCompletionBox.SelectedStatement;
   if not Assigned(Statement) then
@@ -1451,6 +1488,7 @@ begin
     // Don't let the editor change the caret
     fNewState := fText.StateFlags;
     Exclude(fNewState, sfWaitForDragging);
+    // TODO: Lift. Find out how to set the StatesFlag as it says read only.
     fText.StateFlags := fNewState;
 
     // Select the current line
@@ -1466,7 +1504,7 @@ end;
 
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
-  s: AnsiString;
+  s: String;
   p: TBufferCoord;
   st: PStatement;
   M: TMemoryStream;
@@ -1475,7 +1513,7 @@ var
 
   procedure ShowFileHint;
   var
-    FileName: AnsiString;
+    FileName: String;
   begin
     FileName := MainForm.CppParser.GetHeaderFileName(fFileName, s);
     if (FileName <> '') and FileExists(FileName) then
@@ -1609,7 +1647,7 @@ end;
 procedure TEditor.EditorMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   p: TDisplayCoord;
-  line, FileName: AnsiString;
+  line, FileName: String;
   e: TEditor;
 begin
   // if ctrl+clicked
@@ -1644,9 +1682,10 @@ var
   HighlightCharPos: TBufferCoord;
   ComplementCharPos: TBufferCoord;
   Pix: TPoint;
-  S: AnsiString;
+  S: String;
   Attri: TSynHighlighterAttributes;
   LineLength: integer;
+  OutIndex: Integer;
 
   procedure SetColors(Point: TBufferCoord);
   begin
@@ -1706,8 +1745,12 @@ begin
     Exit;
 
   // At this point we have found both characters. Check if both are visible
-  if Assigned(fText.FoldHidesLine(HighlightCharPos.Line)) or
-    Assigned(fText.FoldHidesLine(ComplementCharPos.Line)) then
+  // TODO: Lift. Is FoldHidesLine same as AllFoldRanges.FoldHidesLine?
+  {if Assigned(fText.AllFoldRanges.FoldHidesLine(HighlightCharPos.Line,OutIndex)) or
+    Assigned(fText.AllFoldRanges.FoldHidesLine(ComplementCharPos.Line,OutIndex)) then
+    Exit;}
+  if fText.AllFoldRanges.FoldHidesLine(HighlightCharPos.Line,OutIndex) or
+    fText.AllFoldRanges.FoldHidesLine(ComplementCharPos.Line,OutIndex) then
     Exit;
 
   // Both are visible. Draw them
@@ -1719,7 +1762,8 @@ begin
   // Draw the character the caret is at here using this color
   SetColors(HighlightCharPos);
   Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(HighlightCharPos));
-  if Pix.X > fText.GutterWidth then begin // only draw if inside viewable area
+  // TODO: Lift. Find fText.GutterWidth
+  if Pix.X > fText.Gutter.Width then begin // only draw if inside viewable area
     S := fText.Lines[HighlightCharPos.Line - 1][HighlightCharPos.Char];
     Canvas.TextOut(Pix.X, Pix.Y, S);
   end;
@@ -1727,7 +1771,8 @@ begin
   // Then draw complement
   SetColors(ComplementCharPos);
   Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(ComplementCharPos));
-  if Pix.X > fText.GutterWidth then begin // only draw if inside viewable area
+  // TODO: Lift. Find fText.GutterWidth
+  if Pix.X > fText.Gutter.Width then begin // only draw if inside viewable area
     S := fText.Lines[ComplementCharPos.Line - 1][ComplementCharPos.Char];
     Canvas.TextOut(Pix.X, Pix.Y, S);
   end;
@@ -1738,7 +1783,7 @@ end;
 
 function TEditor.HandpointAllowed(var MousePos: TBufferCoord; ShiftState: TShiftState): THandPointReason;
 var
-  s: AnsiString;
+  s: String;
   HLAttr: TSynHighlighterAttributes;
 begin
   Result := hprNone;
@@ -1810,7 +1855,7 @@ end;
 function TEditor.SaveAs: boolean;
 var
   UnitIndex: integer;
-  SaveFileName: AnsiString;
+  SaveFileName: String;
 begin
   Result := True;
   with TSaveDialog.Create(nil) do try

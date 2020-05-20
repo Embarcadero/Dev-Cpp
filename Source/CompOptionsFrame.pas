@@ -64,7 +64,7 @@ end;
 procedure TCompOptionsFrame.tabsChange(Sender: TObject);
 var
   I, J, idx: integer;
-  currenttab: AnsiString;
+  currenttab: String;
   option: TCompilerOption;
   CompilerSet: TdevCompilerSet;
 begin

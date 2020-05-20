@@ -129,8 +129,8 @@ end;
 
 procedure TNewVarForm.btnCreateClick(Sender: TObject);
 var
-  fName: AnsiString;
-  CppFname: AnsiString;
+  fName: String;
+  CppFname: String;
   Line: integer;
   GetSetLine: integer;
   e: TEditor;
@@ -138,7 +138,7 @@ var
   GetSetAddScopeStr: boolean;
   VarScope: TStatementClassScope;
   St: PStatement;
-  S: AnsiString;
+  S: String;
 begin
 
   // Check below shouldn't be needed

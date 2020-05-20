@@ -12,6 +12,7 @@ The Original Code is: SynEditPrintTypes.pas, released 2000-06-01.
 
 The Initial Author of the Original Code is Morten J. Skovrup.
 Portions written by Morten J. Skovrup are copyright 2000 Morten J. Skovrup.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.
@@ -26,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditPrintTypes.pas,v 1.5 2004/10/09 12:54:58 maelh Exp $
+$Id: SynEditPrintTypes.pas,v 1.4.2.3 2008/09/14 16:24:59 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -42,14 +43,12 @@ CONTENTS:
 -------------------------------------------------------------------------------}
 
 
-{$IFNDEF QSYNEDITPRINTTYPES}
 unit SynEditPrintTypes;
-{$ENDIF}
 
 interface
 
 uses
-  Classes, SysUtils;
+  SynUnicode, Classes, SysUtils;
 
 const
   DefLeft = 25; //Default left margin [mm]
@@ -74,7 +73,6 @@ type
     PageNumber: Integer; var Abort: Boolean) of object;
 //Event raised when a line is printed (can be used to generate Table of Contents)
   TPrintLineEvent = procedure(Sender: TObject; LineNumber, PageNumber: Integer) of object;
-  TSysCharSet = set of Char;
 type
   TWrapPos = class
   public
@@ -83,6 +81,7 @@ type
 
 function IntToRoman(Value: Integer): string;
 
+// TODO: BreakChars is ANSI only but SynEditPrint only uses Ansi chars and should be rewritten to use WordWrap of SynEdit anyway
 function WrapTextEx(const Line: string; BreakChars: TSysCharSet;
   MaxCol: Integer; AList: TList): Boolean;
 
@@ -109,7 +108,7 @@ begin
   while Pos <= Length(Line) do
   begin
     Found := (Pos - PreviousPos > MaxCol) and (WrapPos.Index <> 0);
-    if not Found and (Line[Pos] in BreakChars) then // We found a possible break
+    if not Found and (Line[Pos] <= High(Char)) and CharInSet(Char(Line[Pos]), BreakChars) then // We found a possible break
       WrapPos.Index := Pos;
 
     if Found then
@@ -209,7 +208,7 @@ begin
   while Value > 0 do
   begin
     Result := Result + 'I';
-    DEC(Value);
+    Dec(Value);
   end;
 end;
 

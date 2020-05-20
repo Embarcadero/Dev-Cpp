@@ -12,6 +12,7 @@ The Original Code is: SynEditKeyCmds.pas, released 2000-04-07.
 The Original Code is based on the mwKeyCmds.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Brad Stowers.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -27,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditKbdHandler.pas,v 1.10 2004/01/04 21:49:04 etrusco Exp $
+$Id: SynEditKbdHandler.pas,v 1.10.2.1 2004/08/31 12:55:17 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -35,29 +36,19 @@ located at http://SynEdit.SourceForge.net
 Known Issues:
 -------------------------------------------------------------------------------}
 
-{$IFNDEF QSYNEDITKBDHANDLER}
 unit SynEditKbdHandler;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  Types,
-  QGraphics,
-  QControls,
-  QForms,
-  QSynEditTypes,
-{$ELSE}
   Windows,
   Messages,
   Graphics,
   Controls,
   Forms,
   SynEditTypes,
-{$ENDIF}
   SysUtils,
   Classes;
 
@@ -71,24 +62,24 @@ type
     property OnMouseDown;
   end;
 
-  TMouseCursorEvent = procedure(Sender: TObject; const aLineCharPos: TBufferCoord;
+  TMouseCursorEvent =  procedure(Sender: TObject; const aLineCharPos: TBufferCoord;
     var aCursor: TCursor) of object;
 
   TMethodList = class
   private
     fData: TList;
-    function GetItem(aIndex: integer): TMethod;
-    function GetCount: integer;
+    function GetItem(Index: integer): TMethod;
+    function GetCount: Integer;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Add(aHandler: TMethod);
     procedure Remove(aHandler: TMethod);
-    property Items[aIndex: integer]: TMethod read GetItem; default;
-    property Count: integer read GetCount;
+    property Items[Index: Integer]: TMethod read GetItem; default;
+    property Count: Integer read GetCount;
   end;
 
-  TSynEditKbdHandler = class(TObject)
+  TSynEditKbdHandler = class (TObject)
   private
     fKeyPressChain: TMethodList;
     fKeyDownChain: TMethodList;
@@ -107,7 +98,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure ExecuteKeyPress(Sender: TObject; var Key: Char);
+    procedure ExecuteKeyPress(Sender: TObject; var Key: WideChar);
     procedure ExecuteKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ExecuteKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ExecuteMouseDown(Sender: TObject; Button: TMouseButton;
@@ -121,8 +112,8 @@ type
     procedure RemoveKeyDownHandler(aHandler: TKeyEvent);
     procedure AddKeyUpHandler(aHandler: TKeyEvent);
     procedure RemoveKeyUpHandler(aHandler: TKeyEvent);
-    procedure AddKeyPressHandler(aHandler: TKeyPressEvent);
-    procedure RemoveKeyPressHandler(aHandler: TKeyPressEvent);
+    procedure AddKeyPressHandler(aHandler: TKeyPressWEvent);
+    procedure RemoveKeyPressHandler(aHandler: TKeyPressWEvent);
     procedure AddMouseDownHandler(aHandler: TMouseEvent);
     procedure RemoveMouseDownHandler(aHandler: TMouseEvent);
     procedure AddMouseUpHandler(aHandler: TMouseEvent);
@@ -130,6 +121,7 @@ type
     procedure AddMouseCursorHandler(aHandler: TMouseCursorEvent);
     procedure RemoveMouseCursorHandler(aHandler: TMouseCursorEvent);
   end;
+
 
 implementation
 
@@ -145,7 +137,7 @@ begin
   fKeyUpChain.Add(TMethod(aHandler));
 end;
 
-procedure TSynEditKbdHandler.AddKeyPressHandler(aHandler: TKeyPressEvent);
+procedure TSynEditKbdHandler.AddKeyPressHandler(aHandler: TKeyPressWEvent);
 begin
   fKeyPressChain.Add(TMethod(aHandler));
 end;
@@ -204,19 +196,22 @@ var
 begin
   if fInKeyDown then
     exit;
-  fInKeyDown := true;
+  fInKeyDown := True;
   try
-    with fKeyDownChain do begin
-      for idx := Count - 1 downto 0 do begin
+    with fKeyDownChain do
+    begin
+      for idx := Count - 1 downto 0 do
+      begin
         TKeyEvent(Items[idx])(Sender, Key, Shift);
-        if (Key = 0) then begin
-          fInKeyDown := false;
+        if (Key = 0) then
+        begin
+          fInKeyDown := False;
           exit;
         end;
       end;
     end;
   finally
-    fInKeyDown := false;
+    fInKeyDown := False;
   end;
 end;
 
@@ -226,41 +221,47 @@ var
 begin
   if fInKeyUp then
     exit;
-  fInKeyUp := true;
+  fInKeyUp := True;
   try
-    with fKeyUpChain do begin
-      for idx := Count - 1 downto 0 do begin
-        TKeyEvent(Items[idx])(Sender, Key, Shift);
-        if (Key = 0) then begin
-          fInKeyUp := false;
+    with fKeyUpChain do
+    begin
+      for idx := Count - 1 downto 0 do
+      begin
+        TKeyEvent(Items[idx])(Sender,Key,Shift);
+        if (Key = 0) then
+        begin
+          fInKeyUp := False;
           exit;
         end;
       end;
     end;
   finally
-    fInKeyUp := false;
+    fInKeyUp := False;
   end;
 end;
 
-procedure TSynEditKbdHandler.ExecuteKeyPress(Sender: TObject; var Key: Char);
+procedure TSynEditKbdHandler.ExecuteKeyPress(Sender: TObject; var Key: WideChar);
 var
   idx: Integer;
 begin
   if fInKeyPress then
     exit;
-  fInKeyPress := true;
+  fInKeyPress := True;
   try
-    with fKeyPressChain do begin
-      for idx := Count - 1 downto 0 do begin
-        TKeyPressEvent(Items[idx])(Sender, Key);
-        if (Key = #0) then begin
-          fInKeyPress := false;
+    with fKeyPressChain do
+    begin
+      for idx := Count - 1 downto 0 do
+      begin
+        TKeyPressWEvent(Items[idx])(Sender, Key);
+        if (Key = #0) then
+        begin
+          fInKeyPress := False;
           exit;
         end;
       end;
     end;
   finally
-    fInKeyPress := false;
+    fInKeyPress := False;
   end;
 end;
 
@@ -322,7 +323,7 @@ begin
   fKeyUpChain.Remove(TMethod(aHandler));
 end;
 
-procedure TSynEditKbdHandler.RemoveKeyPressHandler(aHandler: TKeyPressEvent);
+procedure TSynEditKbdHandler.RemoveKeyPressHandler(aHandler: TKeyPressWEvent);
 begin
   fKeyPressChain.Remove(TMethod(aHandler));
 end;
@@ -360,25 +361,27 @@ begin
   fData.Free;
 end;
 
-function TMethodList.GetCount: integer;
+function TMethodList.GetCount: Integer;
 begin
   Result := fData.Count div 2;
 end;
 
-function TMethodList.GetItem(aIndex: integer): TMethod;
+function TMethodList.GetItem(Index: Integer): TMethod;
 begin
-  aIndex := aIndex * 2;
-  Result.Data := fData[aIndex];
-  Result.Code := fData[aIndex + 1];
+  Index := Index * 2;
+  Result.Data := fData[Index];
+  Result.Code := fData[Index + 1];
 end;
 
 procedure TMethodList.Remove(aHandler: TMethod);
 var
-  cPos: integer;
+  cPos: Integer;
 begin
   cPos := fData.Count - 2;
-  while cPos >= 0 do begin
-    if (fData.List[cPos] = aHandler.Data) and (fData.List[cPos + 1] = aHandler.Code) then begin
+  while cPos >= 0 do
+  begin
+    if (fData.List[cPos] = aHandler.Data) and (fData.List[cPos + 1] = aHandler.Code) then
+    begin
       fData.Delete(cPos);
       fData.Delete(cPos);
       Exit;
@@ -388,4 +391,3 @@ begin
 end;
 
 end.
-

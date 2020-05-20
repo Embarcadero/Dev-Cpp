@@ -9,7 +9,9 @@ WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
 the specific language governing rights and limitations under the License.
 
 The Original Code is: SynAutoCorrect.pas, released 2001-10-05.
-Author of this file is Aaron Chan. All Rights Reserved.
+Author of this file is Aaron Chan.
+Unicode translation by Maël Hörz.
+All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
 Contributors.txt file.
@@ -24,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynAutoCorrect.pas,v 1.13 2004/05/06 19:16:42 markonjezic Exp $
+$Id: SynAutoCorrect.pas,v 1.13.2.7 2008/09/14 16:24:57 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -89,31 +91,14 @@ located at http://SynEdit.SourceForge.net
       * New demo.
 }
 
-{$IFNDEF QSYNAUTOCORRECT}
 unit SynAutoCorrect;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_WIN32} //Borland translation of Qt doesn't include Char handling
   Windows,
-{$ELSE}
-  Libc,
-{$ENDIF}
-{$IFDEF SYN_CLX}
-  QGraphics,
-  QControls,
-  QForms,
-  QDialogs,
-  Types,
-  QSynEditMiscProcs,
-  QSynEditTypes,
-  QSynEditKeyCmds,
-  QSynEdit,
-{$ELSE}
   Registry,
   Messages,
   Graphics,
@@ -124,8 +109,8 @@ uses
   SynEditTypes,
   SynEditKeyCmds,
   SynEdit,
-  SynEditMiscClasses,   //TBetterRegistry
-{$ENDIF}
+  SynEditMiscClasses,
+  SynUnicode,
   Classes,
   SysUtils,
   IniFiles;
@@ -144,33 +129,34 @@ type
   private
     { Private declarations }
 
-    { Published properties and events. }
+    { Published properties and events }
     FEditor: TCustomSynEdit;
     FEnabled: Boolean;
     FItems: TStrings;
-    FItemSepChar: Char;
+    FItemSepChar: WideChar;
     FOptions: TAsSynAutoCorrectOptions;
 
     FOnAutoCorrect: TAutoCorrectEvent;
     FOnCorrected: TNotifyEvent;
 
-    { Private variables and methods. }
+    { Private variables and methods }
     FPrevLine: Integer;
 
-    function CorrectItemStart(EditLine, SearchString: string; StartPos: LongInt;
-      MatchCase, WholeWord: Boolean): LongInt;
+    function CorrectItemStart(EditLine, SearchString: string; StartPos: Integer;
+      MatchCase, WholeWord: Boolean): Integer;
     function FindAndCorrect(var EditLine: string; Original, Correction: string;
       var CurrentX: Integer): Boolean;
     function PreviousToken: string;
 
-    { Accessor methods. }
+    { Accessor methods }
     function GetItems: TStrings;
     procedure SetItems(const Value: TStrings);
   protected
     { Protected declarations }
-    procedure KeyboardHandler(Sender: TObject; AfterProcessing: boolean;
-      var Handled: boolean; var Command: TSynEditorCommand; var AChar: char;
-      Data: pointer; HandlerData: pointer); virtual;
+    procedure DefineProperties(Filer: TFiler); override;
+    procedure KeyboardHandler(Sender: TObject; AfterProcessing: Boolean;
+      var Handled: Boolean; var Command: TSynEditorCommand; var AChar: WideChar;
+      Data: Pointer; HandlerData: Pointer); virtual;
     procedure MouseDownHandler(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer); virtual;
     procedure Notification(AComponent: TComponent;
@@ -189,22 +175,20 @@ type
     procedure LoadFromINI(AFileName, ASection: string);
     procedure SaveToINI(AFileName, ASection: string);
 
-{$IFNDEF SYN_CLX}
     procedure LoadFromRegistry(ARoot: DWORD; AKey: string);
     procedure SaveToRegistry(ARoot: DWORD; AKey: string);
-{$ENDIF}
 
     function LoadFromList(AFileName: string): Boolean;
     procedure SaveToList(AFileName: string);
 
-    { Utility functions. }
+    { Utility functions }
     function HalfString(Str: string; GetFirstHalf: Boolean): string;
   public
     { Published declarations }
     property Enabled: Boolean read FEnabled write FEnabled default True;
     property Editor: TCustomSynEdit read FEditor write SetEditor;
     property Items: TStrings read GetItems write SetItems;
-    property ItemSepChar: Char read FItemSepChar write FItemSepChar default #9;
+    property ItemSepChar: WideChar read FItemSepChar write FItemSepChar default #9;
     property Options: TAsSynAutoCorrectOptions read FOptions write FOptions
       default [ascoIgnoreCase, ascoMaintainCase];
 
@@ -226,28 +210,14 @@ type
     property OnCorrected;
   end;
 
-var
-  AC_IdentChars: set of char;
-
 implementation
 
-const
-  FStrSepChar = '|';
 
 { TCustomSynAutoCorrect }
 
 constructor TCustomSynAutoCorrect.Create(AOwner: TComponent);
-var
-  i: char;
-
 begin
   inherited Create(AOwner);
-
-{$IFDEF SYN_WIN32}
-  for i := #33 to #255 do if IsCharAlphaNumeric(i) then Include(AC_IdentChars, i);
-{$ELSE}
-  for i := #33 to #255 do if isalpha(Ord(i)) <> 0 then Include(AC_IdentChars, i);
-{$ENDIF}
 
   FEnabled := True;
   FItems := TStringList.Create;
@@ -264,12 +234,13 @@ begin
   FItems.Free;
 end;
 
-{ Utilities. }
+
+{ Utility functions }
+
 function TCustomSynAutoCorrect.HalfString(Str: string;
   GetFirstHalf: Boolean): string;
 var
   i: Integer;
-
 begin
   i := LastDelimiter(FItemSepChar, Str);
   if i = 0 then i := Pred(MaxInt);
@@ -285,7 +256,6 @@ var
   i: Integer;
   Original, Correction: string;
   Reg: TIniFile;
-
 begin
   Reg := TIniFile.Create(AFileName);
   try
@@ -307,7 +277,6 @@ procedure TCustomSynAutoCorrect.SaveToIni(AFileName, ASection: string);
 var
   i: Integer;
   Reg: TIniFile;
-
 begin
   Reg := TIniFile.Create(AFileName);
   try
@@ -342,13 +311,11 @@ begin
   FItems.SaveToFile(AFileName);
 end;
 
-{$IFNDEF SYN_CLX}
 procedure TCustomSynAutoCorrect.LoadFromRegistry(ARoot: DWORD; AKey: string);
 var
   i: Integer;
   Original, Correction: string;
   Reg: TRegIniFile;
-
 begin
   Reg := TRegIniFile.Create('');
   try
@@ -374,7 +341,6 @@ procedure TCustomSynAutoCorrect.SaveToRegistry(ARoot: DWORD; AKey: string);
 var
   i: Integer;
   Reg: TRegIniFile;
-
 begin
   Reg := TRegIniFile.Create('');
   try
@@ -394,7 +360,6 @@ begin
     Reg.Free;
   end;
 end;
-{$ENDIF}
 
 procedure TCustomSynAutoCorrect.Add(AOriginal, ACorrection: string);
 begin
@@ -405,7 +370,6 @@ function TCustomSynAutoCorrect.AutoCorrectAll: Boolean;
 var
   i, cx: Integer;
   s, Original, Correction, CurrText: string;
-
 begin
   Result := False;
   if Assigned(Editor) then
@@ -425,37 +389,32 @@ begin
 end;
 
 function TCustomSynAutoCorrect.CorrectItemStart(EditLine, SearchString: string;
-  StartPos: LongInt; MatchCase, WholeWord: Boolean): LongInt;
+  StartPos: Integer; MatchCase, WholeWord: Boolean): Integer;
 var
   SearchCount, I: Integer;
-  C: Char;
-  CharMap: array [Char] of Char;
-  CurBuf, Buf: PChar;
+  CurBuf, Buf: PWideChar;
   BufLen: Integer;
 
-const
-  WordDelimiters: set of Char = [#0..#32];
-
-  function FindNextWordStart(var BufPtr: PChar): Boolean;
+  function FindNextWordStart(var BufPtr: PWideChar): Boolean;
   begin
-    while (SearchCount > 0) and not (BufPtr^ in WordDelimiters) do
+    while (SearchCount > 0) and not Editor.IsWordBreakChar(BufPtr^) do
     begin
       Inc(BufPtr, 1);
       Dec(SearchCount);
     end;
 
-    while (SearchCount > 0) and (BufPtr^ in WordDelimiters) do
+    while (SearchCount > 0) and Editor.IsWordBreakChar(BufPtr^) do
     begin
       Inc(BufPtr, 1);
       Dec(SearchCount);
     end;
 
-    Result := SearchCount >= 0;  
+    Result := SearchCount >= 0;
   end;
 
-  function ScanText(var BufPtr: PChar): Boolean;
+  function ScanText(var BufPtr: PWideChar): Boolean;
   var
-     FirstWord: Boolean;
+    FirstWord: Boolean;
   begin
     Result := False;
 
@@ -463,7 +422,7 @@ const
 
     if WholeWord then
     begin
-       while (SearchCount > 0) and (BufPtr^ in WordDelimiters) do
+       while (SearchCount > 0) and Editor.IsWordBreakChar(BufPtr^) do
        begin
          Inc(BufPtr, 1);
          Dec(SearchCount);
@@ -475,13 +434,13 @@ const
       if WholeWord and (FirstWord = False) then
         if not FindNextWordStart(BufPtr) then Break;
       I := 0;
-      while (CharMap[BufPtr[I]] = SearchString[I+1]) do
+      while (BufPtr[I] = SearchString[I + 1]) do
       begin
         Inc(I);
         if I >= Length(SearchString) then
         begin
-          if (not WholeWord) or (SearchCount = 0) or
-            (BufPtr[I] in WordDelimiters) then
+          if not WholeWord or (SearchCount = 0) or
+            Editor.IsWordBreakChar(BufPtr[I]) then
           begin
             Result := True;
             Exit;
@@ -497,8 +456,15 @@ const
 
 begin
   Result := -1;
+
+  if not MatchCase then
+  begin
+    EditLine := SynWideUpperCase(EditLine);
+    SearchString := SynWideUpperCase(SearchString);
+  end;
+
   BufLen := Length(EditLine);
-  Buf := PChar(EditLine);
+  Buf := PWideChar(EditLine);
 
   if BufLen > 0 then
   begin
@@ -507,27 +473,7 @@ begin
     if (SearchCount >= 0) and (SearchCount <= BufLen) and
       (StartPos + SearchCount <= BufLen) then
     begin
-      CurBuf := PChar( @Buf[StartPos] );
-      for C := Low(CharMap) to High(CharMap) do
-      {$IFDEF SYN_CLX}
-      begin
-        if not MatchCase then
-          CharMap[C] := UpCase(C)
-        else
-          CharMap[C] := C;
-      end;
-      {$ELSE}
-        CharMap[C] := C;
-      {$ENDIF}
-      if not MatchCase then
-      begin
-      {$IFDEF SYN_CLX}
-        SearchString := UpperCase(SearchString);
-      {$ELSE}
-        CharUpperBuff(PChar(@CharMap), SizeOf(CharMap));
-        CharUpperBuff(@SearchString[1], Length(SearchString));
-      {$ENDIF}
-      end;
+      CurBuf := PWideChar(@Buf[StartPos]);
       if not ScanText(CurBuf) then
         CurBuf := nil
       else
@@ -538,7 +484,12 @@ begin
     end;
   end;
 
-  CurBuf := nil;
+  CurBuf := nil;   
+end;
+
+procedure TCustomSynAutoCorrect.DefineProperties(Filer: TFiler);
+begin
+  inherited;
 end;
 
 procedure TCustomSynAutoCorrect.Delete(AIndex: Integer);
@@ -553,40 +504,39 @@ begin
     FItems[AIndex] := ANewOriginal + FItemSepChar + ANewCorrection;
 end;
 
-procedure TCustomSynAutoCorrect.KeyboardHandler(Sender: TObject; AfterProcessing: boolean;
-  var Handled: boolean; var Command: TSynEditorCommand; var AChar: char;
-  Data: pointer; HandlerData: pointer);
+procedure TCustomSynAutoCorrect.KeyboardHandler(Sender: TObject; AfterProcessing: Boolean;
+  var Handled: Boolean; var Command: TSynEditorCommand; var AChar: WideChar;
+  Data: Pointer; HandlerData: Pointer);
 var
   b: Boolean;
   i, cx: Integer;
   s, Original, Correction, CurrText: string;
-
 begin
-  if Enabled and (not AfterProcessing) and (not Handled) then
+  if Enabled and not AfterProcessing and not Handled then
   begin
     FPrevLine := Editor.CaretY;
     case Command of
       ecLineBreak, ecTab, ecChar:
-      begin
-        if (Command = ecChar) and (AChar in AC_IdentChars) then
-          Exit;
-        b := False;
-        s := PreviousToken;
-        if s <> '' then
         begin
-          cx := Editor.CaretX;
-          for i := 0 to Pred(FItems.Count) do
+          if (Command = ecChar) and not Editor.IsWordBreakChar(AChar) then
+            Exit;
+          b := False;
+          s := PreviousToken;
+          if s <> '' then
           begin
-            CurrText := FItems[i];
-            Original := HalfString(CurrText, True);
-            Correction := HalfString(CurrText, False);
-            b := b or FindAndCorrect(s, Original, Correction, cx);
+            cx := Editor.CaretX;
+            for i := 0 to Pred(FItems.Count) do
+            begin
+              CurrText := FItems[i];
+              Original := HalfString(CurrText, True);
+              Correction := HalfString(CurrText, False);
+              b := b or FindAndCorrect(s, Original, Correction, cx);
+            end;
+
+            if Assigned(OnCorrected) then
+              OnCorrected(Self);
           end;
-          
-          if Assigned(OnCorrected) then
-            OnCorrected( Self );
         end;
-      end;
     end; {endcase}
   end;
 end;
@@ -598,7 +548,6 @@ var
   b: Boolean;
   i, cx: Integer;
   s, Original, Correction, CurrText: string;
-
 begin
   if ascoCorrectOnMouseDown in FOptions then
   begin
@@ -628,7 +577,7 @@ begin
         Editor.Lines[Pred(FPrevLine)] := s;
         
         if Assigned(OnCorrected) then
-          OnCorrected( Self );
+          OnCorrected(Self);
       end;
     end;
   end;
@@ -637,18 +586,18 @@ end;
 function TCustomSynAutoCorrect.FindAndCorrect(var EditLine: string;
   Original, Correction: string; var CurrentX: Integer): Boolean;
 var
-  StartPos: LongInt;
+  StartPos: Integer;
   EndPos: Integer;
   FoundText, ReplaceDefText: string;
   p: TBufferCoord;
   Action: TAutoCorrectAction;
 
-  function FirstCapCase(S: string): string;
+  function FirstCapCase(s: string): string;
   begin
-    if S <> '' then
+    if s <> '' then
     begin
-      s := LowerCase(s);
-      s[1] := UpCase(s[1]);
+      s := SynWideLowerCase(s);
+      s[1] := SynWideUpperCase(s[1])[1];
     end;
 
     Result := s;
@@ -672,12 +621,12 @@ begin
         Correction := ReplaceDefText;
         FoundText := Copy(EditLine,StartPos+1,EndPos);
 
-        if FoundText = AnsiUpperCase(FoundText) then
-          Correction := AnsiUpperCase(Correction)
+        if FoundText = SynWideUpperCase(FoundText) then
+          Correction := SynWideUpperCase(Correction)
         else
         begin
-          if FoundText = AnsiLowerCase(FoundText) then
-            Correction := AnsiLowerCase(Correction)
+          if FoundText = SynWideLowerCase(FoundText) then
+            Correction := SynWideLowerCase(Correction)
           else
           begin
             if FoundText = FirstCapCase(FoundText) then
@@ -725,7 +674,7 @@ begin
           not (ascoIgnoreCase in FOptions), True);
       end;
     end;
-  end;
+  end;       
 end;
                       
 function TCustomSynAutoCorrect.GetItems: TStrings;
@@ -746,7 +695,6 @@ end;
 function TCustomSynAutoCorrect.PreviousToken: string;
 var
   i, cx: Integer;
-
 begin
   Result := Editor.LineText;
   cx := Editor.CaretX;
@@ -754,7 +702,7 @@ begin
 
   if i <= Length(Result) then
   begin
-    while (i > 0) and (Result[i] > ' ') do Dec(i);
+    while (i > 0) and not Editor.IsWordBreakChar(Result[i]) do Dec(i);
     Inc(i);
     Result := Copy(Result, i, cx - i);
   end
@@ -768,11 +716,9 @@ begin
   begin
     if Assigned(FEditor) then
     begin
-      Editor.RemoveMouseDownHandler( MouseDownHandler );
-      Editor.UnregisterCommandHandler( KeyboardHandler );
-{$IFDEF SYN_COMPILER_5_UP}
+      Editor.RemoveMouseDownHandler(MouseDownHandler);
+      Editor.UnregisterCommandHandler(KeyboardHandler);
       Editor.RemoveFreeNotification(Self);
-{$ENDIF}
     end;
 
     FEditor := Value;
@@ -780,8 +726,8 @@ begin
     if Assigned(FEditor) then
     begin
       Editor.FreeNotification(Self);
-      Editor.RegisterCommandHandler( KeyboardHandler, nil );
-      Editor.AddMouseDownHandler( MouseDownHandler );
+      Editor.RegisterCommandHandler(KeyboardHandler, nil);
+      Editor.AddMouseDownHandler(MouseDownHandler);
     end;
   end;
 end;

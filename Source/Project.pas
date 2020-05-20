@@ -24,7 +24,7 @@ interface
 uses
   IniFiles, SysUtils, Dialogs, ComCtrls, Editor, Contnrs, SynExportHTML,
   Classes, Controls, version, Forms, Templates, ProjectTypes,
-  Windows;
+  Windows, System.UITypes;
 
 type
   TProjUnit = class;
@@ -40,7 +40,7 @@ type
     destructor Destroy; override;
     function Add(aunit: TProjUnit): integer;
     procedure Remove(index: integer);
-    function IndexOf(const FileName: AnsiString): integer; overload;
+    function IndexOf(const FileName: String): integer; overload;
     function IndexOf(Editor: TEditor): integer; overload;
     property Items[index: integer]: TProjUnit read GetItem; default;
     property Count: integer read GetCount;
@@ -50,14 +50,14 @@ type
   private
     fParent: TProject;
     fEditor: TEditor;
-    fFileName: AnsiString;
+    fFileName: String;
     fNew: boolean;
     fNode: TTreeNode;
-    fFolder: AnsiString;
+    fFolder: String;
     fCompile: boolean;
     fCompileCpp: boolean;
     fOverrideBuildCmd: boolean;
-    fBuildCmd: AnsiString;
+    fBuildCmd: String;
     fLink: boolean;
     fPriority: integer;
     function GetModified: boolean;
@@ -67,16 +67,16 @@ type
     constructor Create(aOwner: TProject);
     destructor Destroy; override;
     property Editor: TEditor read fEditor write fEditor;
-    property FileName: AnsiString read fFileName write fFileName;
+    property FileName: String read fFileName write fFileName;
     property New: boolean read fNew write fNew;
     property Modified: boolean read GetModified write SetModified;
     property Node: TTreeNode read fNode write fNode;
     property Parent: TProject read fParent write fParent;
-    property Folder: AnsiString read fFolder write fFolder;
+    property Folder: String read fFolder write fFolder;
     property Compile: boolean read fCompile write fCompile;
     property CompileCpp: boolean read fCompileCpp write fCompileCpp;
     property OverrideBuildCmd: boolean read fOverrideBuildCmd write fOverrideBuildCmd;
-    property BuildCmd: AnsiString read fBuildCmd write fBuildCmd;
+    property BuildCmd: String read fBuildCmd write fBuildCmd;
     property Link: boolean read fLink write fLink;
     property Priority: integer read fPriority write fPriority;
     procedure Assign(Source: TProjUnit);
@@ -87,69 +87,69 @@ type
     fUnits: TUnitList;
     fOptions: TProjOptions;
     finiFile: TMemIniFile;
-    fFileName: AnsiString;
-    fName: AnsiString;
+    fFileName: String;
+    fName: String;
     fNode: TTreeNode;
     fModified: boolean;
     fFolders: TStringList;
     fFolderNodes: TObjectList;
-    function GetDirectory: AnsiString;
-    function GetExecutableName: AnsiString;
-    procedure SetFileName(const value: AnsiString);
+    function GetDirectory: String;
+    function GetExecutableName: String;
+    procedure SetFileName(const value: String);
     function GetModified: boolean;
-    function GetMakeFileName: AnsiString;
+    function GetMakeFileName: String;
     procedure SetModified(value: boolean);
     procedure SortUnitsByPriority;
   public
     property Options: TProjOptions read fOptions write fOptions;
-    property Name: AnsiString read fName write fName;
-    property FileName: AnsiString read fFileName write SetFileName;
+    property Name: String read fName write fName;
+    property FileName: String read fFileName write SetFileName;
     property Node: TTreeNode read fNode write fNode;
-    property Directory: AnsiString read GetDirectory;
-    property Executable: AnsiString read GetExecutableName;
+    property Directory: String read GetDirectory;
+    property Executable: String read GetExecutableName;
     property Units: TUnitList read fUnits write fUnits;
 //    property INIFile: TMemIniFile read fINIFile write fINIFile;
     property Modified: boolean read GetModified write SetModified;
-    property MakeFileName: AnsiString read GetMakeFileName;
-    constructor Create(const nFileName, nName: AnsiString);
+    property MakeFileName: String read GetMakeFileName;
+    constructor Create(const nFileName, nName: String);
     destructor Destroy; override;
-    function NewUnit(NewProject: boolean; ParentNode: TTreeNode; const CustomFileName: AnsiString = ''): integer;
-    function AddUnit(const InFileName: AnsiString; ParentNode: TTreeNode; Rebuild: Boolean): TProjUnit;
-    function GetFolderPath(Node: TTreeNode): AnsiString;
+    function NewUnit(NewProject: boolean; ParentNode: TTreeNode; const CustomFileName: String = ''): integer;
+    function AddUnit(const InFileName: String; ParentNode: TTreeNode; Rebuild: Boolean): TProjUnit;
+    function GetFolderPath(Node: TTreeNode): String;
     procedure UpdateFolders;
-    procedure AddFolder(const s: AnsiString);
+    procedure AddFolder(const s: String);
     function OpenUnit(index: integer): TEditor;
     procedure CloseUnit(index: integer);
-    procedure SaveUnitAs(i: integer; sFileName: AnsiString); // save single [UnitX]
+    procedure SaveUnitAs(i: integer; sFileName: String); // save single [UnitX]
     procedure SaveAll; // save [Project] and  all [UnitX]
     procedure LoadLayout; // load all [UnitX]
     procedure LoadUnitLayout(e: TEditor; Index: integer); // load single [UnitX] cursor positions
     procedure SaveLayout; // save all [UnitX]
     procedure SaveUnitLayout(e: TEditor; Index: integer); // save single [UnitX] cursor positions
     function MakeProjectNode: TTreeNode;
-    function MakeNewFileNode(const s: AnsiString; IsFolder: boolean; NewParent: TTreeNode): TTreeNode;
+    function MakeNewFileNode(const s: String; IsFolder: boolean; NewParent: TTreeNode): TTreeNode;
     procedure BuildPrivateResource(ForceSave: boolean = False);
     procedure LoadOptions;
     procedure SaveOptions;
     function SaveUnits: Boolean;
     procedure Open;
-    function FileAlreadyExists(const s: AnsiString): boolean;
+    function FileAlreadyExists(const s: String): boolean;
     function RemoveFolder(Node: TTreeNode): boolean;
     function RemoveEditor(index: integer; DoClose: boolean): boolean;
-    function GetUnitFromString(const s: AnsiString): integer;
+    function GetUnitFromString(const s: String): integer;
     procedure RebuildNodes;
-    function ListUnitStr(Separator: char): AnsiString;
+    function ListUnitStr(Separator: char): String;
     procedure ExportToHTML;
     function ShowOptions: Integer;
-    function AssignTemplate(const aFileName: AnsiString; aTemplate: TTemplate): boolean;
-    function FolderNodeFromName(const name: AnsiString): TTreeNode;
+    function AssignTemplate(const aFileName: String; aTemplate: TTemplate): boolean;
+    function FolderNodeFromName(const name: String): TTreeNode;
     procedure CreateFolderNodes;
     procedure UpdateNodeIndexes;
     procedure SetNodeValue(value: TTreeNode);
     procedure CheckProjectFileForUpdate;
     procedure IncrementBuildNumber;
-    function GetCompilerOption(const OptionString: AnsiString): Char;
-    procedure SetCompilerOption(const OptionString: AnsiString; Value: Char);
+    function GetCompilerOption(const OptionString: String): Char;
+    procedure SetCompilerOption(const OptionString: String; Value: Char);
     procedure SaveToLog;
   end;
 
@@ -246,7 +246,7 @@ end;
 
 { TProject }
 
-constructor TProject.Create(const nFileName, nName: AnsiString);
+constructor TProject.Create(const nFileName, nName: String);
 begin
   inherited Create;
   fNode := nil;
@@ -280,7 +280,7 @@ begin
   inherited;
 end;
 
-function TProject.GetCompilerOption(const OptionString: AnsiString): Char;
+function TProject.GetCompilerOption(const OptionString: String): Char;
 var
   OptionStruct: PCompilerOption;
   OptionIndex: integer;
@@ -296,7 +296,7 @@ begin
   end;
 end;
 
-procedure TProject.SetCompilerOption(const OptionString: AnsiString; value: char);
+procedure TProject.SetCompilerOption(const OptionString: String; value: char);
 var
   OptionStruct: PCompilerOption;
   OptionIndex: integer;
@@ -313,7 +313,7 @@ begin
   end;
 end;
 
-function TProject.GetMakeFileName: AnsiString;
+function TProject.GetMakeFileName: String;
 begin
   if fOptions.UseCustomMakefile then
     Result := fOptions.CustomMakefile
@@ -323,8 +323,8 @@ end;
 
 procedure TProject.SaveToLog;
 var
-  temp: AnsiString;
-  temp2: AnsiString;
+  temp: String;
+  temp2: String;
   i: integer;
   logfile: TextFile;
 begin
@@ -387,7 +387,7 @@ begin
   MainForm.ProjectView.FullExpand;
 end;
 
-function TProject.MakeNewFileNode(const s: AnsiString; IsFolder: boolean; NewParent: TTreeNode): TTreeNode;
+function TProject.MakeNewFileNode(const s: String; IsFolder: boolean; NewParent: TTreeNode): TTreeNode;
 begin
   MakeNewFileNode := MainForm.ProjectView.Items.AddChild(NewParent, s);
 
@@ -403,7 +403,7 @@ end;
 procedure TProject.BuildPrivateResource(ForceSave: boolean = False);
 var
   ResFile, Original: TStringList;
-  Res, Def, Icon: AnsiString;
+  Res, Def, Icon: String;
   comp, i: Integer;
 begin
   comp := 0;
@@ -541,10 +541,10 @@ begin
     fOptions.PrivateResource := ExtractRelativePath(Directory, Res);
   end else begin
     if FileExists(Res) then
-      DeleteFile(PAnsiChar(Res));
+      DeleteFile(PChar(Res));
     Res := ChangeFileExt(Res, RES_EXT);
     if FileExists(Res) then
-      DeleteFile(PAnsiChar(Res));
+      DeleteFile(PChar(Res));
     fOptions.PrivateResource := '';
   end;
   if FileExists(Res) then
@@ -579,7 +579,7 @@ begin
     ResFile.SaveToFile(Executable + '.Manifest');
     FileSetDate(Executable + '.Manifest', DateTimeToFileDate(Now)); // fix the "Clock skew detected" warning ;)
   end else if FileExists(Executable + '.Manifest') then
-    DeleteFile(PAnsiChar(Executable + '.Manifest'));
+    DeleteFile(PChar(Executable + '.Manifest'));
 
   // create private header file
   Res := ChangeFileExt(Res, H_EXT);
@@ -617,10 +617,10 @@ begin
   ResFile.Free;
 end;
 
-function TProject.NewUnit(NewProject: boolean; ParentNode: TTreeNode; const CustomFileName: AnsiString): integer;
+function TProject.NewUnit(NewProject: boolean; ParentNode: TTreeNode; const CustomFileName: String): integer;
 var
   NewUnit: TProjUnit;
-  s: AnsiString;
+  s: String;
 begin
   NewUnit := TProjUnit.Create(Self);
 
@@ -668,7 +668,7 @@ end;
 
 { begin XXXKF changed }
 
-function TProject.AddUnit(const InFileName: AnsiString; ParentNode: TTreeNode; Rebuild: Boolean): TProjUnit;
+function TProject.AddUnit(const InFileName: String; ParentNode: TTreeNode; Rebuild: Boolean): TProjUnit;
 var
   NewUnit: TProjUnit;
 begin
@@ -929,7 +929,7 @@ begin
   Result := True;
 end;
 
-function TProject.FolderNodeFromName(const name: AnsiString): TTreeNode;
+function TProject.FolderNodeFromName(const name: String): TTreeNode;
 var
   i: integer;
 begin
@@ -947,7 +947,7 @@ procedure TProject.CreateFolderNodes;
 var
   idx: integer;
   findnode, node: TTreeNode;
-  s: AnsiString;
+  s: String;
   I, C: integer;
 begin
   fFolderNodes.Clear;
@@ -1012,7 +1012,7 @@ begin
     with NewUnit do begin
       FileName := ExpandFileto(finifile.ReadString('Unit' + IntToStr(i + 1), 'FileName', ''), Directory);
       if not FileExists(FileName) then begin
-        MessageBox(Application.Handle, PAnsiChar(Format(Lang[ID_ERR_FILENOTFOUND], [FileName])), 'Error', MB_ICONERROR);
+        MessageBox(Application.Handle, PChar(Format(Lang[ID_ERR_FILENOTFOUND], [FileName])), 'Error', MB_ICONERROR);
         SetModified(TRUE);
       end else begin
 
@@ -1115,7 +1115,7 @@ var
   layIni: TIniFile;
   I: Integer;
   sl: TStringList;
-  S: AnsiString;
+  S: String;
   e, e2: TEditor;
 begin
   s := ChangeFileExt(Filename, '.layout');
@@ -1263,7 +1263,7 @@ begin
   SetModified(TRUE);
 end;
 
-function TProject.FileAlreadyExists(const s: AnsiString): boolean;
+function TProject.FileAlreadyExists(const s: String): boolean;
 begin
   if fUnits.IndexOf(s) > -1 then
     result := true
@@ -1302,7 +1302,7 @@ begin
   end;
 end;
 
-procedure TProject.SaveUnitAs(i: integer; sFileName: AnsiString);
+procedure TProject.SaveUnitAs(i: integer; sFileName: String);
 begin
   if (i < 0) or (i > pred(fUnits.Count)) then
     exit;
@@ -1323,14 +1323,14 @@ begin
   Modified := true;
 end;
 
-function TProject.GetUnitFromString(const s: AnsiString): integer;
+function TProject.GetUnitFromString(const s: String): integer;
 begin
   result := fUnits.Indexof(ExpandFileto(s, Directory));
 end;
 
-function TProject.GetExecutableName: AnsiString;
+function TProject.GetExecutableName: String;
 var
-  ExeFileName, ExePath: AnsiString;
+  ExeFileName, ExePath: String;
 begin
   // Determine filename ('hello.exe')
   if fOptions.OverrideOutput and (fOptions.OverridenOutput <> '') then begin
@@ -1354,12 +1354,12 @@ begin
   Result := GetRealPath(ExePath + ExeFileName);
 end;
 
-function TProject.GetDirectory: AnsiString;
+function TProject.GetDirectory: String;
 begin
   result := ExtractFilePath(FileName);
 end;
 
-function TProject.ListUnitStr(Separator: char): AnsiString;
+function TProject.ListUnitStr(Separator: char): String;
 var
   I: integer;
 begin
@@ -1368,7 +1368,7 @@ begin
     result := result + '"' + ExpandFileName(fUnits[I].FileName) + '"' + Separator;
 end;
 
-procedure TProject.SetFileName(const value: AnsiString);
+procedure TProject.SetFileName(const value: String);
 begin
   if fFileName <> value then begin
     fFileName := value;
@@ -1414,7 +1414,7 @@ begin
 end;
 
 procedure TProject.ExportToHTML;
-  function ConvertFilename(const Filename, FinalPath, Extension: AnsiString): AnsiString;
+  function ConvertFilename(const Filename, FinalPath, Extension: String): String;
   begin
     Result := ExtractRelativePath(Directory, Filename);
     Result := StringReplace(Result, '.', '_', [rfReplaceAll]);
@@ -1425,11 +1425,11 @@ procedure TProject.ExportToHTML;
 var
   I: integer;
   sl: TStringList;
-  fName, UnitName: AnsiString;
+  fName, UnitName: String;
   Size: integer;
-  SizeStr: AnsiString;
-  link: AnsiString;
-  BaseDir: AnsiString;
+  SizeStr: String;
+  link: String;
+  BaseDir: String;
   hFile: integer;
   SynExporterHTML: TSynExporterHTML;
 begin
@@ -1528,7 +1528,7 @@ end;
 
 function TProject.ShowOptions: Integer;
 var
-  IconFileName: AnsiString;
+  IconFileName: String;
 begin
   with TProjectOptionsFrm.Create(MainForm) do try
 
@@ -1552,7 +1552,7 @@ begin
       // Copy icon to project directoy
       IconFileName := ChangeFileExt(ExtractFileName(FileName), '.ico');
       if not SameText(IconFileName, fOptions.Icon) and (fOptions.Icon <> '') then begin
-        CopyFile(PAnsiChar(fOptions.Icon), PAnsiChar(ExpandFileto(IconFileName, Directory)), False);
+        CopyFile(PChar(fOptions.Icon), PChar(ExpandFileto(IconFileName, Directory)), False);
         fOptions.Icon := IconFileName;
       end;
 
@@ -1571,11 +1571,11 @@ begin
   end;
 end;
 
-function TProject.AssignTemplate(const aFileName: AnsiString; aTemplate: TTemplate): boolean;
+function TProject.AssignTemplate(const aFileName: String; aTemplate: TTemplate): boolean;
 var
   I: integer;
-  s, s2: AnsiString;
-  OriginalIcon, DestIcon: AnsiString;
+  s, s2: String;
+  OriginalIcon, DestIcon: String;
 begin
   result := TRUE;
   try
@@ -1607,7 +1607,7 @@ begin
       OriginalIcon := ValidateFile(fOptions.Icon, '', true);
       if OriginalIcon <> '' then begin // file found!
         DestIcon := ExpandFileTo(ExtractFileName(ChangeFileExt(FileName, '.ico')), Directory);
-        CopyFile(PAnsiChar(OriginalIcon), PAnsiChar(DestIcon), False);
+        CopyFile(PChar(OriginalIcon), PChar(DestIcon), False);
         fOptions.Icon := DestIcon;
       end else
         fOptions.Icon := '';
@@ -1755,7 +1755,7 @@ begin
   SetModified(TRUE);
 end;
 
-function TProject.GetFolderPath(Node: TTreeNode): AnsiString;
+function TProject.GetFolderPath(Node: TTreeNode): String;
 begin
   Result := '';
   if not Assigned(Node) then
@@ -1771,7 +1771,7 @@ begin
   Delete(Result, Length(Result), 1); // remove last '/'
 end;
 
-procedure TProject.AddFolder(const s: AnsiString);
+procedure TProject.AddFolder(const s: String);
 begin
   if fFolders.IndexOf(s) = -1 then begin
     fFolders.Add(s);
@@ -1784,7 +1784,7 @@ end;
 
 procedure TProject.CheckProjectFileForUpdate;
 var
-  oldRes: AnsiString;
+  oldRes: String;
   sl: TStringList;
   i, uCount: integer;
   cnvt: boolean;
@@ -1795,7 +1795,7 @@ begin
   // check if using old way to store resources and fix it
   oldRes := finifile.ReadString('Project', 'Resources', '');
   if oldRes <> '' then begin
-    CopyFile(PAnsiChar(Filename), PAnsiChar(FileName + '.bak'), False);
+    CopyFile(PChar(Filename), PChar(FileName + '.bak'), False);
     sl := TStringList.Create;
     try
       sl.Delimiter := ';';
@@ -1910,9 +1910,9 @@ begin
   result := IndexOf(editor.FileName);
 end;
 
-function TUnitList.IndexOf(const FileName: AnsiString): integer;
+function TUnitList.IndexOf(const FileName: String): integer;
 var
-  s1, s2: AnsiString;
+  s1, s2: String;
 begin
   for result := 0 to fList.Count - 1 do begin
     s1 := GetRealPath(TProjUnit(fList[result]).FileName, TProjUnit(fList[result]).fParent.Directory);

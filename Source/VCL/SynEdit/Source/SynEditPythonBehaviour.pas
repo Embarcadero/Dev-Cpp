@@ -11,6 +11,7 @@ the specific language governing rights and limitations under the License.
 The Original Code is: SynEditPythonBehaviour.pas, released 2000-06-23.
 The Original Code is based on odPythonBehaviour.pas by Olivier Deckmyn, part
 of the mwEdit component suite.
+Unicode translation by Maël Hörz.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
 Contributors.txt file.
@@ -25,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditPythonBehaviour.pas,v 1.5 2003/04/30 12:59:50 etrusco Exp $
+$Id: SynEditPythonBehaviour.pas,v 1.5.2.3 2008/09/14 16:24:59 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -41,26 +42,15 @@ The  SynEditPythonBehaviour unit provides a simple component implements editing 
 to a python source file. Python has a unusual way to mark blocks (like begin/end in pascal) : it
 uses indentation. So the rule is after a ":" and a line break, we have to indent once.
 }
-{$IFNDEF QSYNEDITPYTHONBEHAVIOUR}
 unit SynEditPythonBehaviour;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-  {$IFDEF SYN_CLX}
-  Qt, QGraphics, QControls, QForms, QDialogs,
-  QSynEdit,
-  QSynEditKeyCmds,
-  {$ELSE}
-  Windows, Messages, Graphics, Controls, Forms, Dialogs,
-  SynEdit,
-  SynEditKeyCmds,
-  {$ENDIF}
-  SysUtils,
-  Classes;
+  Windows, Messages, Graphics, Controls, Forms, Dialogs, SynEdit, SynEditKeyCmds,
+  SynUnicode, SysUtils, Classes;
 
 type
   TSynEditPythonBehaviour = class(TComponent)
@@ -71,7 +61,7 @@ type
     procedure SetEditor(Value: TSynEdit); virtual;
     procedure doProcessUserCommand(Sender: TObject; AfterProcessing: boolean;
       var Handled: boolean; var Command: TSynEditorCommand;
-      var AChar: Char; Data: Pointer; HandlerData: pointer); virtual;
+      var AChar: WideChar; Data: Pointer; HandlerData: Pointer); virtual;
   public
     constructor Create(aOwner: TComponent); override;
   published
@@ -82,27 +72,24 @@ type
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditStrConst;
-{$ELSE}
   SynEditStrConst;
-{$ENDIF}
 
 procedure TSynEditPythonBehaviour.SetEditor(Value: TSynEdit);
 begin
-  if FEditor <> Value then begin
+  if FEditor <> Value then
+  begin
     if (Editor <> nil) and not (csDesigning in ComponentState) then
-      Editor.UnregisterCommandHandler( doProcessUserCommand );
+      Editor.UnregisterCommandHandler(doProcessUserCommand);
     // Set the new editor
     FEditor := Value;
     if (Editor <> nil) and not (csDesigning in ComponentState) then
-      Editor.RegisterCommandHandler( doProcessUserCommand, nil );
+      Editor.RegisterCommandHandler(doProcessUserCommand, nil);
   end;
 end; 
 
 procedure TSynEditPythonBehaviour.doProcessUserCommand(Sender: TObject;
   AfterProcessing: boolean; var Handled: boolean;
-  var Command: TSynEditorCommand; var AChar: Char; Data: Pointer;
+  var Command: TSynEditorCommand; var AChar: WideChar; Data: Pointer;
   HandlerData: pointer);
 var
   iEditor: TCustomSynEdit;
@@ -114,13 +101,13 @@ begin
     iEditor := Sender as TCustomSynEdit;
     { CaretY should never be lesser than 2 right after ecLineBreak, so there's
     no need for a check }
-    iPrevLine := TrimRight( iEditor.Lines[ iEditor.CaretY -2 ] );
-    if (iPrevLine <> '') and (iPrevLine[ Length(iPrevLine) ] = ':') then
+    iPrevLine := WideTrimRight(iEditor.Lines[iEditor.CaretY - 2]);
+    if (iPrevLine <> '') and (iPrevLine[Length(iPrevLine)] = ':') then
     begin
       iEditor.UndoList.BeginBlock;
       try
         for cSpace := 1 to Indent do
-          iEditor.ExecuteCommand( ecChar, #32, nil );
+          iEditor.ExecuteCommand(ecChar, #32, nil);
       finally
         iEditor.UndoList.EndBlock;
       end;

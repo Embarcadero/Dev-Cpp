@@ -181,7 +181,7 @@ type
     procedure UpdateMakButtons;
     procedure LoadText;
     procedure InitVersionInfo;
-    function DefaultBuildCommand(idx: integer): AnsiString;
+    function DefaultBuildCommand(idx: integer): String;
     procedure SaveDirSettings;
   public
     fOldIndex: integer;
@@ -233,7 +233,7 @@ end;
 
 procedure TProjectOptionsFrm.BrowseClick(Sender: TObject);
 var
-  NewItem: AnsiString;
+  NewItem: String;
 begin
   NewItem := Trim(edDirEntry.Text);
   if (NewItem <> '') and DirectoryExists(NewItem) then
@@ -261,7 +261,7 @@ end;
 procedure TProjectOptionsFrm.ButtonClick(Sender: TObject);
 var
   idx: integer;
-  item: AnsiString;
+  item: String;
 begin
   item := TrimRight(edDirEntry.Text);
   case TComponent(Sender).Tag of
@@ -437,7 +437,7 @@ end;
 procedure TProjectOptionsFrm.SetInterface(Source: TProject);
 var
   I, cntSrc, cntHdr, cntRes, cntOther: integer;
-  IconTmp: AnsiString;
+  IconTmp: String;
 begin
   fProjectCopy := Source;
 
@@ -705,7 +705,7 @@ end;
 
 procedure TProjectOptionsFrm.BrowseExecutableOutDirClick(Sender: TObject);
 var
-  Dir: AnsiString;
+  Dir: String;
 begin
   if fProjectCopy.Options.ExeOutput <> '' then
     Dir := ExpandFileto(fProjectCopy.Options.ExeOutput, fProjectCopy.Directory)
@@ -717,7 +717,7 @@ end;
 
 procedure TProjectOptionsFrm.BrowseLogDirClick(Sender: TObject);
 var
-  Dir: AnsiString;
+  Dir: String;
 begin
   if fProjectCopy.Options.ObjectOutput <> '' then
     Dir := ExpandFileto(fProjectCopy.Options.ObjectOutput, fProjectCopy.Directory)
@@ -729,7 +729,7 @@ end;
 
 procedure TProjectOptionsFrm.btnLogOutputDirClick(Sender: TObject);
 var
-  Dir: AnsiString;
+  Dir: String;
 begin
   if fProjectCopy.Options.LogOutput <> '' then
     Dir := ExpandFileto(fProjectCopy.Options.LogOutput, fProjectCopy.Directory)
@@ -1048,7 +1048,7 @@ end;
 
 procedure TProjectOptionsFrm.btnAddLibClick(Sender: TObject);
 var
-  s: AnsiString;
+  s: String;
   i: integer;
 begin
   with TOpenDialog.Create(Self) do try
@@ -1071,9 +1071,9 @@ begin
   end;
 end;
 
-function TProjectOptionsFrm.DefaultBuildCommand(idx: integer): AnsiString;
+function TProjectOptionsFrm.DefaultBuildCommand(idx: integer): String;
 var
-  tfile, ofile: AnsiString;
+  tfile, ofile: String;
 begin
   Result := '';
   if not (GetFileTyp(fProjectCopy.Units[idx].FileName) in [utcSrc, utcppSrc]) then
@@ -1167,7 +1167,7 @@ end;
 
 procedure TProjectOptionsFrm.OptionsLinkClick(Sender: TObject);
 begin
-  ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
+  ShellExecute(GetDesktopWindow(), 'open', PChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TProjectOptionsFrm.FormClose(Sender: TObject; var Action: TCloseAction);

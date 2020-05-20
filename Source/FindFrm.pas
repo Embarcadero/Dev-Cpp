@@ -75,12 +75,12 @@ type
       Shift: TShiftState);
   private
     fSearchOptions: TSynSearchOptions;
-    fCurFile: AnsiString;
+    fCurFile: String;
     fTabIndex: integer;
     fSearchEngine: TSynEditSearch;
     fTempSynEdit: TSynEdit;
     procedure LoadText;
-    procedure FindAllAction(Sender: TObject; const aSearch, aReplace: AnsiString; Line, Column: integer; var Action:
+    procedure FindAllAction(Sender: TObject; const aSearch, aReplace: String; Line, Column: integer; var Action:
       TSynReplaceAction);
     function Execute(editor: TSynEdit; action: TFindAction): integer;
   public
@@ -185,8 +185,8 @@ begin
   end else begin
     MessageBox(
       Self.Handle,
-      PAnsiChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),
-      PAnsiChar(Lang[ID_INFO]),
+      PChar(Lang[ID_ERR_SEARCHCANNOTBEEMPTY]),
+      PChar(Lang[ID_INFO]),
       MB_ICONINFORMATION or MB_TOPMOST);
     cboFindText.SetFocus;
     Exit;
@@ -352,14 +352,14 @@ begin
   end else if findcount = 0 then begin
     MessageBox(
       Self.Handle,
-      PAnsiChar(Format(Lang[ID_MSG_TEXTNOTFOUND], [cboFindText.Text])),
-      PAnsiChar(Lang[ID_INFO]),
+      PChar(Format(Lang[ID_MSG_TEXTNOTFOUND], [cboFindText.Text])),
+      PChar(Lang[ID_INFO]),
       MB_ICONINFORMATION or MB_TOPMOST);
     cboFindText.SetFocus;
   end;
 end;
 
-procedure TFindForm.FindAllAction(Sender: TObject; const aSearch, aReplace: AnsiString; Line, Column: integer; var
+procedure TFindForm.FindAllAction(Sender: TObject; const aSearch, aReplace: String; Line, Column: integer; var
   Action: TSynReplaceAction);
 var
   p: TBufferCoord;

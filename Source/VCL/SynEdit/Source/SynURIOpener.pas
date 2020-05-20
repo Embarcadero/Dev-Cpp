@@ -10,6 +10,7 @@ the specific language governing rights and limitations under the License.
 
 The Original Code is: SynURIOpener.pas, released 2003-09-25.
 The Initial Author of this file is Maël Hörz.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.
@@ -32,40 +33,26 @@ located at http://SynEdit.SourceForge.net
 @abstract(Plugin for SynEdit to make links (URIs) clickable)
 @author(Maël Hörz)
 @created(2003)
-@lastmod(2003-10-08)
+@lastmod(2004-03-19)
 The SynURIOpener unit extends SynEdit to make links highlighted by SynURISyn
 clickable.
 
 http://www.mh-net.de.vu
 }
 
-{$IFNDEF QSYNURIOPENER}
 unit SynURIOpener;
-{$ENDIF}
 
 {$I SynEdit.inc}
               
 interface
 
 uses
-  {$IFDEF SYN_LINUX}
-  Xlib,
-  {$ELSE}
   Windows,
-  {$ENDIF}
-  {$IFDEF SYN_CLX}
-  Types,
-  Qt,
-  QControls,
-  QSynEditTypes,
-  QSynEdit,
-  QSynHighlighterURI,
-  {$ELSE}
   Controls,
   SynEditTypes,
   SynEdit,
   SynHighlighterURI,
-  {$ENDIF}
+  SynUnicode,
   Classes;
 
 type
@@ -79,17 +66,6 @@ type
 
     FURIHighlighter: TSynURISyn;
     FVisitedURIs: TStringList;
-    {$IFDEF SYN_LINUX}
-    FFtpClientCmd: string;
-    FGopherClientCmd: string;
-    FMailClientCmd: string;
-    FNewsClientCmd: string;
-    FNntpClientCmd: string;
-    FProsperoClientCmd: string;
-    FTelnetClientCmd: string;
-    FWaisClientCmd: string;
-    FWebBrowserCmd: string;
-    {$ENDIF}
     procedure OpenLink(URI: string; LinkType: Integer);
     function MouseInSynEdit: Boolean;
   protected
@@ -108,6 +84,7 @@ type
     procedure SetURIHighlighter(const Value: TSynURISyn);
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function VisitedURI(URI: string): Boolean;
   published
     property CtrlActivatesLinks: Boolean read FCtrlActivatesLinks
@@ -115,46 +92,16 @@ type
     property Editor: TCustomSynEdit read FEditor write SetEditor;
     property URIHighlighter: TSynURISyn read FURIHighlighter 
       write SetURIHighlighter;
-    {$IFDEF SYN_LINUX}
-    // examples how to set WebBrowserCmd; %s is the placeholder for the URI
-    // 'kfmclient openURL %s'
-    // 'mozilla %s'
-    // 'netscape %s'
-    // 'kfmclient exec %s' similar to Windows ShellExecute
-    //
-    // You should let the user set these properties as there is no command
-    // or environment variable valid/available on all UN*X-systems.
-    // It depends on what window-manager and browser is installed.
-    property FtpClientCmd: string read FFtpClientCmd write FFtpClientCmd;
-    property GopherClientCmd: string read FGopherClientCmd write FGopherClientCmd;
-    property MailClientCmd: string read FMailClientCmd write FMailClientCmd;
-    property NewsClientCmd: string read FNewsClientCmd write FNewsClientCmd;
-    property NntpClientCmd: string read FNntpClientCmd write FNntpClientCmd;
-    property ProsperoClientCmd: string read FProsperoClientCmd write FProsperoClientCmd;
-    property TelnetClientCmd: string read FTelnetClientCmd write FTelnetClientCmd;
-    property WaisClientCmd: string read FWaisClientCmd write FWaisClientCmd;
-    property WebBrowserCmd: string read FWebBrowserCmd write FWebBrowserCmd;
-    {$ENDIF}
   end;
 
 
 implementation
 
 uses
-  {$IFDEF SYN_LINUX}
-  Libc,
-  {$ELSE}
   ShellAPI,
-  {$ENDIF}
-  {$IFDEF SYN_CLX}
-  QForms,
-  QSynEditHighlighter,
-  QSynEditKeyConst,
-  {$ELSE}
   Forms,
   SynEditHighlighter,
   SynEditKeyConst,
-  {$ENDIF}
   SysUtils;
 
 type
@@ -171,15 +118,17 @@ begin
   FVisitedURIs.Sorted := True;
 end;
 
+destructor TSynURIOpener.Destroy;
+begin
+  FVisitedURIs.Free;
+  inherited;
+end;
+
 function TSynURIOpener.MouseInSynEdit: Boolean;
 var
   pt: TPoint;
 begin
-  {$IFDEF SYN_COMPILER_6_UP}
   pt := Mouse.CursorPos;
-  {$ELSE}
-  GetCursorPos(pt);
-  {$ENDIF}
   Result := PtInRect(FEditor.ClientRect, FEditor.ScreenToClient(pt))
 end;
 
@@ -204,17 +153,8 @@ begin
 end;
 
 function IsControlPressed: Boolean;
-{$IFDEF SYN_LINUX}
-var
-  keymap: TXQueryKeyMap;
-{$ENDIF}
 begin
-{$IFDEF SYN_LINUX}
-  XQueryKeymap(Xlib.PDisplay(QtDisplay), keymap);
-  Result := (Byte(keymap[4]) and $20 = $20);
-{$ELSE}
   Result := GetAsyncKeyState(VK_CONTROL) <> 0;
-{$ENDIF}
 end;
 
 procedure TSynURIOpener.NewMouseCursor(Sender: TObject;
@@ -294,10 +234,6 @@ begin
 end;
 
 procedure TSynURIOpener.OpenLink(URI: string; LinkType: Integer);
-{$IFDEF SYN_LINUX}
-var
-  CmdLine: string;
-{$ENDIF}
 begin
   FVisitedURIs.Add(URI);
 
@@ -307,31 +243,7 @@ begin
     tkWebLink:
        URI := 'http://' + URI;
   end;
-  {$IFDEF SYN_LINUX}
-  case TtkTokenKind(LinkType) of
-    tkFtpLink:
-      CmdLine := Format(FFtpClientCmd, [URI]);
-    tkGopherLink:
-      CmdLine := Format(FGopherClientCmd, [URI]);
-    tkMailtoLink:
-      CmdLine := Format(FMailClientCmd, [URI]);
-    tkNewsLink:
-      CmdLine := Format(FNewsClientCmd, [URI]);
-    tkNntpLink:
-      CmdLine := Format(FNntpClientCmd, [URI]);
-    tkProsperoLink:
-      CmdLine := Format(FProsperoClientCmd, [URI]);
-    tkTelnetLink:
-      CmdLine := Format(FTelnetClientCmd, [URI]);
-    tkWaisLink:
-      CmdLine := Format(FWaisClientCmd, [URI]);
-    tkWebLink, tkHttpLink, tkHttpsLink:
-      CmdLine := Format(FWebBrowserCmd, [URI]);
-  end;
-  Libc.system(PChar(CmdLine + ' &')); // add an ampersand to return immediately
-  {$ELSE}
   ShellExecute(0, nil, PChar(URI), nil, nil, 1{SW_SHOWNORMAL});
-  {$ENDIF}
 end;
 
 procedure TSynURIOpener.SetEditor(const Value: TCustomSynEdit);
@@ -384,7 +296,6 @@ begin
   Result := FVisitedURIs.Find(URI, Dummy);
 end;
 
-{$IFNDEF SYN_CLX}
 const
   IDC_LINK = MakeIntResource(32649);
 
@@ -395,6 +306,5 @@ initialization
   CursorHandle := LoadCursor(0, IDC_LINK);
   if CursorHandle <> 0 then
     Screen.Cursors[crHandPoint] := CursorHandle;
-{$ENDIF}
 
 end.

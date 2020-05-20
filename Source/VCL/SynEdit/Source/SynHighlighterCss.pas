@@ -15,7 +15,9 @@ ashley@ashleybrown.co.uk.
 The Original Code is based on the SynHighlighterHTML.pas, released 2000-04-10 - 
 this in turn was based on the hkHTMLSyn.pas file from the mwEdit component suite
 by Martin Waldenburg and other developers, the Initial Author of this file is
-Hideo Koiso. All Rights Reserved.
+Hideo Koiso.
+Unicode translation by Maël Hörz.
+All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
 Contributors.txt file.
@@ -49,53 +51,39 @@ http://www.ashleybrown.co.uk/
 ashley@ashleybrown.co.uk
 }
 
-{$IFNDEF QSYNHIGHLIGHTERCSS}
 unit SynHighlighterCSS;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QGraphics,
-  QSynEditTypes,
-  QSynEditHighlighter,
-  QSynHighlighterHashEntries,
-{$ELSE}
   Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynHighlighterHashEntries,
-{$ENDIF}
+  SynUnicode,
   SysUtils,
   Classes;
 
 type
-  TtkTokenKind = (tkComment, tkProperty, tkKey, tkNull,
-    tkSpace, tkString, tkSymbol, tkText, tkUndefProperty, tkValue, tkColor, tkNumber);
+  TtkTokenKind = (tkComment, tkProperty, tkSelector, tkSelectorAttrib, tkNull,
+    tkSpace, tkString, tkSymbol, tkText, tkUndefProperty, tkValue, tkColor,
+    tkNumber, tkImportant);
 
-  TRangeState = ( rsComment, rsKey, rsParam, rsText,
-    rsUnKnown, rsValue );
-
-  TProcTableProc = procedure of object;
+  TRangeState = (rsComment, rsSelector, rsDeclaration, rsUnknown, rsProperty,
+    rsValue, rsAttrib, rsParameter);
 
   TSynCssSyn = class(TSynCustomHighlighter)
   private
     fRange: TRangeState;
     fCommentRange: TRangeState;
-    fLine: PChar;
-    fProcTable: array[#0..#255] of TProcTableProc;
-    Run: Longint;
-    Temp: PChar;
-    fStringLen: Integer;
-    fToIdent: PChar;
-    fTokenPos: Integer;
+    fParameterRange: TRangeState;
     fTokenID: TtkTokenKind;
     fCommentAttri: TSynHighlighterAttributes;
     fPropertyAttri: TSynHighlighterAttributes;
-    fKeyAttri: TSynHighlighterAttributes;
+    fAttributeAttri: TSynHighlighterAttributes;
+    fSelectorAttri: TSynHighlighterAttributes;
     fSpaceAttri: TSynHighlighterAttributes;
     fStringAttri: TSynHighlighterAttributes;
     fColorAttri: TSynHighlighterAttributes;
@@ -104,19 +92,20 @@ type
     fTextAttri: TSynHighlighterAttributes;
     fValueAttri: TSynHighlighterAttributes;
     fUndefPropertyAttri: TSynHighlighterAttributes;
+    fImportantPropertyAttri: TSynHighlighterAttributes;
     fKeywords: TSynHashEntryList;
-    fLineNumber: Integer;
-
-    function KeyHash(ToHash: PChar): Integer;
-    function KeyComp(const aKey: string): Boolean;
-
     procedure DoAddKeyword(AKeyword: string; AKind: integer);
-    function IdentKind(MayBe: PChar): TtkTokenKind;
-    procedure MakeMethodTables;
-    procedure TextProc;
+    function HashKey(Str: PWideChar): Integer;
+    function IdentKind(MayBe: PWideChar): TtkTokenKind;
+    procedure SelectorProc;
+    procedure AttributeProc;
     procedure CommentProc;
     procedure BraceCloseProc;
     procedure BraceOpenProc;
+    procedure ParenOpenProc;
+    procedure ParenCloseProc;
+    procedure BracketOpenProc;
+    procedure BracketCloseProc;
     procedure CRProc;
     procedure SemiProc;
     procedure StartValProc;
@@ -128,12 +117,19 @@ type
     procedure StringProc;
     procedure HashProc;
     procedure SlashProc;
+    procedure GreaterProc;
+    procedure PlusProc;
+    procedure TildeProc;
+    procedure PipeProc;
+    procedure EqualProc;
+    procedure ExclamProc;
   protected
-    function GetIdentChars: TSynIdentChars; override;
     function GetSampleSource: string; override;
-    function IsFilterStored: boolean; override;
+    function IsFilterStored: Boolean; override;
+    procedure NextDeclaration;
   public
     class function GetLanguageName: string; override;
+    class function GetFriendlyLanguageName: string; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -141,15 +137,12 @@ type
     function GetEol: Boolean; override;
     function GetRange: Pointer; override;
     function GetTokenID: TtkTokenKind;
-    procedure SetLine(NewValue: string; LineNumber:Integer); override;
-    function GetToken: string; override;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
-    function GetTokenKind: integer; override;
-    function GetTokenPos: Integer; override;
+    function GetTokenKind: Integer; override;
+    function IsIdentChar(AChar: WideChar): Boolean; override;
     procedure Next; override;
     procedure SetRange(Value: Pointer); override;
     procedure ResetRange; override;
-    property IdentChars;
   published
     property CommentAttri: TSynHighlighterAttributes read fCommentAttri
       write fCommentAttri;
@@ -159,7 +152,10 @@ type
       write fColorAttri;
     property NumberAttri: TSynHighlighterAttributes read fNumberAttri
       write fNumberAttri;
-    property KeyAttri: TSynHighlighterAttributes read fKeyAttri write fKeyAttri;
+    property SelectorAttri: TSynHighlighterAttributes read fSelectorAttri
+      write fSelectorAttri;
+    property AttributeAttri: TSynHighlighterAttributes read fAttributeAttri
+      write fAttributeAttri;
     property SpaceAttri: TSynHighlighterAttributes read fSpaceAttri
       write fSpaceAttri;
     property StringAttri: TSynHighlighterAttributes read fStringAttri
@@ -172,218 +168,524 @@ type
       write fValueAttri;
     property UndefPropertyAttri: TSynHighlighterAttributes read fUndefPropertyAttri
       write fUndefPropertyAttri;
+    property ImportantPropertyAttri: TSynHighlighterAttributes read fImportantPropertyAttri
+      write fImportantPropertyAttri;
   end;
 
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditStrConst;
-{$ELSE}
   SynEditStrConst;
-{$ENDIF}
-
-var
-  mHashTable: array[#0..#255] of Integer;
 
 const
-  Properties: string =
-               'azimuth,background,background-attachment,background-color,background-image,'+
-               'background-position,background-repeat,border,border-collapse,border-color,'+
-               'border-spacing,border-style,border-top border-right border-bottom border-left,'+
-               'border-top-color border-right-color border-bottom-color border-left-color,'+
-               'border-top-style border-right-style border-bottom-style border-left-style,'+
-               'border-top-width border-right-width border-bottom-width border-left-width,'+
-               'border-width,bottom,caption-side,clear,clip,color,content,counter-increment,'+
-               'counter-reset,cue,cue-after,cue-before,cursor,direction,display,elevation,'+
-               'empty-cells,float,font,font-family,font-size,font-size-adjust,font-stretch,'+
-               'font-style,font-variant,font-weight,height,left,letter-spacing,line-height,'+
-               'list-style,list-style-image,list-style-position,list-style-type,margin,'+
-               'margin-top margin-right margin-bottom margin-left,marker-offset,marks,'+
-               'max-height,max-width,min-height,min-width,orphans,outline,outline-color,'+
-               'outline-style,outline-width,overflow,padding,padding-top,padding-right,'+
-               'padding-bottom padding-left,page,page-break-after,page-break-before,'+
-               'page-break-inside,pause,pause-after,pause-before,pitch,pitch-range,play-during,'+
-               'position,quotes,richness,right,size,speak,speak-header,speak-numeral,'+
-               'speak-punctuation,speech-rate,stress,table-layout,text-align,text-decoration,'+
-               'text-indent,text-shadow,text-transform,top,unicode-bidi,vertical-align,'+
-               'visibility,voice-family,volume,white-space,widows,width,word-spacing,z-index';
-
-procedure MakeIdentTable;
-var
-  i: Char;
-begin
-  for i := #0 to #255 do
-    case i of
-      'a'..'z', 'A'..'Z':
-        mHashTable[i] := (Ord(UpCase(i)) - 64);
-      '!':
-        mHashTable[i] := $7B;
-      '/':
-        mHashTable[i] := $7A;
-      else
-        mHashTable[Char(i)] := 0;
-    end;
-end;
+   Properties_CSS1 : string =
+                      'background'
+                     +',background-attachment'
+                     +',background-color'
+                     +',background-image'
+                     +',background-position'
+                     +',background-repeat'
+                     +',border'
+                     +',border-bottom'
+                     +',border-bottom-color'
+                     +',border-bottom-style'
+                     +',border-bottom-width'
+                     +',border-color'
+                     +',border-left'
+                     +',border-left-color'
+                     +',border-left-style'
+                     +',border-left-width'
+                     +',border-right'
+                     +',border-right-color'
+                     +',border-right-style'
+                     +',border-right-width'
+                     +',border-style'
+                     +',border-top'
+                     +',border-top-color'
+                     +',border-top-style'
+                     +',border-top-width'
+                     +',border-width'
+                     +',clear'
+                     +',color'
+                     +',display'
+                     +',float'
+                     +',font'
+                     +',font-family'
+                     +',font-size'
+                     +',font-style'
+                     +',font-variant'
+                     +',font-weight'
+                     +',height'
+                     +',letter-spacing'
+                     +',line-height'
+                     +',list-style'
+                     +',list-style-image'
+                     +',list-style-position'
+                     +',list-style-type'
+                     +',margin'
+                     +',margin-bottom'
+                     +',margin-left'
+                     +',margin-right'
+                     +',margin-top'
+                     +',padding'
+                     +',padding-bottom'
+                     +',padding-left'
+                     +',padding-right'
+                     +',padding-top'
+                     +',text-align'
+                     +',text-decoration'
+                     +',text-indent'
+                     +',text-transform'
+                     +',vertical-align'
+                     +',white-space'
+                     +',width'
+                     +',word-spacing';
+   Properties_CSS2 : string =
+                      'border-collapse'
+                     +',border-spacing'
+                     +',bottom'
+                     +',caption-side'
+                     +',clip'
+                     +',content'
+                     +',counter-increment'
+                     +',counter-reset'
+                     +',cursor'
+                     +',direction'
+                     +',empty-cells'
+                     +',left'
+                     +',max-height'
+                     +',max-width'
+                     +',min-height'
+                     +',min-width'
+                     +',orphans'
+                     +',outline'
+                     +',outline-color'
+                     +',outline-style'
+                     +',outline-width'
+                     +',overflow'
+                     +',page-break-after'
+                     +',page-break-before'
+                     +',page-break-inside'
+                     +',position'
+                     +',quotes'
+                     +',right'
+                     +',table-layout'
+                     +',top'
+                     +',unicode-bidi'
+                     +',visibility'
+                     +',widows'
+                     +',z-index';
+   Properties_CSS2_Aural : string =
+                      'azimuth'
+                     +',cue'
+                     +',cue-after'
+                     +',cue-before'
+                     +',elevation'
+                     +',pause'
+                     +',pause-after'
+                     +',pause-before'
+                     +',pitch'
+                     +',pitch-range'
+                     +',play-during'
+                     +',richness'
+                     +',speak'
+                     +',speak-header'
+                     +',speak-numeral'
+                     +',speak-punctuation'
+                     +',speech-rate'
+                     +',stress'
+                     +',voice-family'
+                     +',volume';
+   Properties_CSS3 : string =
+                      '@font-face'
+                     +',@font-feature-values'
+                     +',@keyframes'
+                     +',align-content'
+                     +',align-items'
+                     +',align-self'
+                     +',alignment-adjust'
+                     +',alignment-baseline'
+                     +',animation'
+                     +',animation-delay'
+                     +',animation-direction'
+                     +',animation-duration'
+                     +',animation-fill-mode'
+                     +',animation-iteration-count'
+                     +',animation-name'
+                     +',animation-play-state'
+                     +',animation-timing-function'
+                     +',appearance'
+                     +',backface-visibility'
+                     +',background-clip'
+                     +',background-origin'
+                     +',background-size'
+                     +',baseline-shift'
+                     +',bookmark-label'
+                     +',bookmark-level'
+                     +',bookmark-target'
+                     +',border-bottom-left-radius'
+                     +',border-bottom-right-radius'
+                     +',border-image'
+                     +',border-image-outset'
+                     +',border-image-repeat'
+                     +',border-image-slice'
+                     +',border-image-source'
+                     +',border-image-width'
+                     +',border-radius'
+                     +',border-top-left-radius'
+                     +',border-top-right-radius'
+                     +',box-align'
+                     +',box-decoration-break'
+                     +',box-direction'
+                     +',box-flex'
+                     +',box-flex-group'
+                     +',box-lines'
+                     +',box-ordinal-group'
+                     +',box-orient'
+                     +',box-pack'
+                     +',box-shadow'
+                     +',box-sizing'
+                     +',break-after'
+                     +',break-before'
+                     +',break-inside'
+                     +',color-profile'
+                     +',column-count'
+                     +',column-fill'
+                     +',column-gap'
+                     +',column-rule'
+                     +',column-rule-color'
+                     +',column-rule-style'
+                     +',column-rule-width'
+                     +',columns'
+                     +',column-span'
+                     +',column-width'
+                     +',crop'
+                     +',dominant-baseline'
+                     +',drop-initial-after-adjust'
+                     +',drop-initial-after-align'
+                     +',drop-initial-before-adjust'
+                     +',drop-initial-before-align'
+                     +',drop-initial-size'
+                     +',drop-initial-value'
+                     +',filter'
+                     +',fit'
+                     +',fit-position'
+                     +',float-offset'
+                     +',flex'
+                     +',flex-basis'
+                     +',flex-direction'
+                     +',flex-flow'
+                     +',flex-grow'
+                     +',flex-shrink'
+                     +',flex-wrap'
+                     +',font-size-adjust'
+                     +',font-feature-setting'
+                     +',font-kerning'
+                     +',font-language-override'
+                     +',font-synthesis'
+                     +',font-variant-alternates'
+                     +',font-variant-caps'
+                     +',font-variant-east-asian'
+                     +',font-variant-ligatures'
+                     +',font-variant-numeric'
+                     +',font-variant-position'
+                     +',font-stretch'
+                     +',grid-columns'
+                     +',grid-rows'
+                     +',hanging-punctuation'
+                     +',hyphenate-after'
+                     +',hyphenate-before'
+                     +',hyphenate-character'
+                     +',hyphenate-lines'
+                     +',hyphenate-resource'
+                     +',hyphens'
+                     +',icon'
+                     +',image-orientation'
+                     +',image-rendering'
+                     +',image-resolution'
+                     +',ime-mode'
+                     +',justify-content'
+                     +',inline-box-align'
+                     +',line-break'
+                     +',line-stacking'
+                     +',line-stacking-ruby'
+                     +',line-stacking-shift'
+                     +',line-stacking-strategy'
+                     +',mark'
+                     +',mark-after'
+                     +',mark-before'
+                     +',marks'
+                     +',marquee-direction'
+                     +',marquee-play-count'
+                     +',marquee-speed'
+                     +',marquee-style'
+                     +',mask'
+                     +',mask-type'
+                     +',move-to'
+                     +',nav-down'
+                     +',nav-index'
+                     +',nav-left'
+                     +',nav-right'
+                     +',nav-up'
+                     +',object-fit'
+                     +',object-position'
+                     +',opacity'
+                     +',order'
+                     +',outline-offset'
+                     +',overflow-style'
+                     +',overflow-x'
+                     +',overflow-y'
+                     +',overflow-wrap'
+                     +',page'
+                     +',page-policy'
+                     +',perspective'
+                     +',perspective-origin'
+                     +',phonemes'
+                     +',punctuation-trim'
+                     +',rendering-intent'
+                     +',resize'
+                     +',rest'
+                     +',rest-after'
+                     +',rest-before'
+                     +',rotation'
+                     +',rotation-point'
+                     +',ruby-align'
+                     +',ruby-overhang'
+                     +',ruby-position'
+                     +',ruby-span'
+                     +',size'
+                     +',string-set'
+                     +',tab-size'
+                     +',target'
+                     +',target-name'
+                     +',target-new'
+                     +',target-position'
+                     +',text-align-last'
+                     +',text-combine-horizontal'
+                     +',text-decoration-color'
+                     +',text-decoration-line'
+                     +',text-decoration-style'
+                     +',text-height'
+                     +',text-justify'
+                     +',text-orientation'
+                     +',text-outline'
+                     +',text-overflow'
+                     +',text-shadow'
+                     +',text-underline-position'
+                     +',text-wrap'
+                     +',transform'
+                     +',transform-origin'
+                     +',transform-style'
+                     +',transition'
+                     +',transition-delay'
+                     +',transition-duration'
+                     +',transition-property'
+                     +',transition-timing-function'
+                     +',voice-balance'
+                     +',voice-duration'
+                     +',voice-pitch'
+                     +',voice-pitch-range'
+                     +',voice-rate'
+                     +',voice-stress'
+                     +',voice-volume'
+                     +',word-break'
+                     +',word-wrap'
+                     +',writing-mode';
 
 { TSynCssSyn }
 
-function TSynCssSyn.KeyHash(ToHash: PChar): Integer;
+{$Q-}
+function TSynCssSyn.HashKey(Str: PWideChar): Integer;
 begin
   Result := 0;
-  While (ToHash^ In ['a'..'z', 'A'..'Z', '-']) do begin
-    Inc(Result, mHashTable[ToHash^]);
-    Inc(ToHash);
+  while CharInSet(Str^, ['a'..'z', 'A'..'Z', '_', '-']) do
+  begin
+    if Str^ <> '-' then
+    case Str^ of
+      '_': Inc(Result, 27);
+      '-': Inc(Result, 28);
+      else Inc(Result, Ord(SynWideUpperCase(Str^)[1]) - 64);
+    end;
+    Inc(Str);
   end;
-  While (ToHash^ In ['0'..'9']) do begin
-    Inc(Result, (Ord(ToHash^) - Ord('0')) );
-    Inc(ToHash);
+  while CharInSet(Str^, ['0'..'9']) do
+  begin
+    Inc(Result, Ord(Str^) - Ord('0'));
+    Inc(Str);
   end;
-  fStringLen := (ToHash - fToIdent);
+  fStringLen := Str - fToIdent;
 end;
+{$Q+}
 
-function TSynCssSyn.KeyComp(const aKey: string): Boolean;
+function TSynCssSyn.IdentKind(MayBe: PWideChar): TtkTokenKind;
 var
-  i: Integer;
+  Entry: TSynHashEntry;
 begin
-  Temp := fToIdent;
-  if (Length(aKey) = fStringLen) then begin
-    Result := True;
-    For i:=1 To fStringLen do begin
-      if (mHashTable[Temp^] <> mHashTable[aKey[i]]) then begin
-        Result := False;
-        Break;
+  fToIdent := MayBe;
+  Entry := fKeywords[HashKey(MayBe)];
+  while Assigned(Entry) do
+  begin
+    if Entry.KeywordLen > fStringLen then
+      break
+    else if Entry.KeywordLen = fStringLen then
+      if IsCurrentToken(Entry.Keyword) then
+      begin
+        Result := TtkTokenKind(Entry.Kind);
+        exit;
       end;
-      Inc(Temp);
-    end;
-  end else begin
-    Result := False;
+    Entry := Entry.Next;
   end;
+  Result := tkUndefProperty;
 end;
 
-procedure TSynCssSyn.DoAddKeyword(AKeyword: string; AKind: integer);
+procedure TSynCssSyn.DoAddKeyword(AKeyword: string; AKind: Integer);
 var
-  HashValue: integer;
+  HashValue: Integer;
 begin
-  HashValue := KeyHash(PChar(AKeyword));
+  HashValue := HashKey(PWideChar(AKeyword));
   fKeywords[HashValue] := TSynHashEntry.Create(AKeyword, AKind);
-end;
-
-procedure TSynCssSyn.MakeMethodTables;
-var
-  i: Char;
-begin
-  For i:=#0 To #255 do begin
-    case i of
-    #0:
-      fProcTable[i] := NullProc;
-    #10:
-      fProcTable[i] := LFProc;
-    #13:
-      fProcTable[i] := CRProc;
-    #1..#9, #11, #12, #14..#32:
-      fProcTable[i] := SpaceProc;
-    '"':
-      fProcTable[i] := StringProc;
-    '#':
-      fProcTable[i] := HashProc;
-    '{':
-      fProcTable[i] := BraceOpenProc;
-    '}':
-      fProcTable[i] := BraceCloseProc;
-    ':', ',':
-      fProcTable[i] := StartValProc;
-    ';':
-      fProcTable[i] := SemiProc;
-    '0'..'9', '.':
-      fProcTable[I] := NumberProc;
-    '/':
-      fProcTable[I] := SlashProc;
-    else
-      fProcTable[i] := IdentProc;
-    end;
-  end;
 end;
 
 constructor TSynCssSyn.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  fCaseSensitive := False;
+
   fKeywords := TSynHashEntryList.Create;
-  fCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrComment);
+  fCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrComment, SYNS_FriendlyAttrComment);
   AddAttribute(fCommentAttri);
 
-  fPropertyAttri := TSynHighlighterAttributes.Create('Property');
+  fPropertyAttri := TSynHighlighterAttributes.Create(SYNS_AttrProperty, SYNS_FriendlyAttrProperty);
   fPropertyAttri.Style := [fsBold];
   AddAttribute(fPropertyAttri);
 
-  fKeyAttri := TSynHighlighterAttributes.Create(SYNS_AttrReservedWord);
-  fKeyAttri.Style := [fsBold];
-  fKeyAttri.Foreground := $00ff0080;
-  AddAttribute(fKeyAttri);
+  fSelectorAttri := TSynHighlighterAttributes.Create(SYNS_AttrReservedWord, SYNS_FriendlyAttrReservedWord);
+  fSelectorAttri.Style := [fsBold];
+  fSelectorAttri.Foreground := $00ff0080;
+  AddAttribute(fSelectorAttri);
 
+  fAttributeAttri := TSynHighlighterAttributes.Create(SYNS_AttrAttribute, SYNS_FriendlyAttrAttribute);
+  fAttributeAttri.Style := [];
+  fAttributeAttri.Foreground := $00ff0080;
+  AddAttribute(fAttributeAttri);
 
-  fUndefPropertyAttri := TSynHighlighterAttributes.Create('Undefined Property');
+  fUndefPropertyAttri := TSynHighlighterAttributes.Create(
+    SYNS_AttrUndefinedProperty, SYNS_FriendlyAttrUndefinedProperty);
   fUndefPropertyAttri.Style := [fsBold];
   fUndefPropertyAttri.Foreground := $00ff0080;
   AddAttribute(fUndefPropertyAttri);
 
-  fSpaceAttri := TSynHighlighterAttributes.Create(SYNS_AttrSpace);
+  fImportantPropertyAttri := TSynHighlighterAttributes.Create(
+    'Important', 'Important Marker');
+  fImportantPropertyAttri.Style := [fsBold];
+  fImportantPropertyAttri.Foreground := clRed;
+  AddAttribute(fImportantPropertyAttri);
+
+  fSpaceAttri := TSynHighlighterAttributes.Create(SYNS_AttrSpace, SYNS_FriendlyAttrSpace);
   AddAttribute(fSpaceAttri);
 
-  fColorAttri := TSynHighlighterAttributes.Create(SYNS_AttrColor);
+  fColorAttri := TSynHighlighterAttributes.Create(SYNS_AttrColor, SYNS_FriendlyAttrColor);
   AddAttribute(fColorAttri);
 
-  fNumberAttri := TSynHighlighterAttributes.Create(SYNS_AttrNumber);
+  fNumberAttri := TSynHighlighterAttributes.Create(SYNS_AttrNumber, SYNS_FriendlyAttrNumber);
   AddAttribute(fNumberAttri);
 
-  fStringAttri := TSynHighlighterAttributes.Create(SYNS_AttrString);
+  fStringAttri := TSynHighlighterAttributes.Create(SYNS_AttrString, SYNS_FriendlyAttrString);
   AddAttribute(fStringAttri);
 
-  fSymbolAttri := TSynHighlighterAttributes.Create(SYNS_AttrSymbol);
+  fSymbolAttri := TSynHighlighterAttributes.Create(SYNS_AttrSymbol, SYNS_FriendlyAttrSymbol);
   AddAttribute(fSymbolAttri);
 
-  fTextAttri := TSynHighlighterAttributes.Create(SYNS_AttrText);
+  fTextAttri := TSynHighlighterAttributes.Create(SYNS_AttrText, SYNS_FriendlyAttrText);
   AddAttribute(fTextAttri);
 
-  fValueAttri := TSynHighlighterAttributes.Create(SYNS_AttrValue);
+  fValueAttri := TSynHighlighterAttributes.Create(SYNS_AttrValue, SYNS_FriendlyAttrValue);
   fValueAttri.Foreground := $00ff8000;
   AddAttribute(fValueAttri);
 
   SetAttributesOnChange(DefHighlightChange);
 
-  MakeMethodTables;
-  EnumerateKeywords(Ord(tkProperty), Properties, IdentChars, DoAddKeyword);
+  // TODO: differentiating tkProperty for CSS1, CSS2 & CSS3 highlighting
+  EnumerateKeywords(Ord(tkProperty), Properties_CSS1, IsIdentChar, DoAddKeyword);
+  EnumerateKeywords(Ord(tkProperty), Properties_CSS2, IsIdentChar, DoAddKeyword);
+  EnumerateKeywords(Ord(tkProperty), Properties_CSS2_Aural, IsIdentChar, DoAddKeyword);
+  EnumerateKeywords(Ord(tkProperty), Properties_CSS3, IsIdentChar, DoAddKeyword);
 
-  fRange := rsText;
+  fRange := rsSelector;
   fDefaultFilter := SYNS_FilterCSS;
 end;
 
 destructor TSynCssSyn.Destroy;
 begin
-  fKeywords.free;
+  fKeywords.Free;
   inherited Destroy;
 end;
 
-procedure TSynCssSyn.SetLine(NewValue: string; LineNumber:Integer);
+procedure TSynCssSyn.AttributeProc;
+
+  function IsStopChar: Boolean;
+  begin
+    case fLine[Run] of
+      #0..#31, ']', '~', '^', '$', '*', '|', '=':
+        Result := True;
+      else
+        Result := False;
+    end;
+  end;
+
 begin
-  fLine := PChar(NewValue);
-  Run := 0;
-  fLineNumber := LineNumber;
-  Next;
+  if IsStopChar then
+  begin
+    case fLine[Run] of
+      #0..#31, '{', '/': NextDeclaration;
+      ']': BracketCloseProc;
+      '~': TildeProc;
+      '|': PipeProc;
+      '=': EqualProc;
+    end;
+    Exit;
+  end;
+
+  fTokenID := tkSelectorAttrib;
+  while not IsStopChar do
+    Inc(Run);
 end;
 
 procedure TSynCssSyn.BraceCloseProc;
 begin
-  fRange := rsText;
+  fRange := rsSelector;
   fTokenId := tkSymbol;
   Inc(Run);
+end;
+
+procedure TSynCssSyn.BraceOpenProc;
+begin
+  Inc(Run);
+  fRange := rsDeclaration;
+  fTokenID := tkSymbol;
+end;
+
+procedure TSynCssSyn.BracketCloseProc;
+begin
+  fTokenID := tkSymbol;
+  fRange := rsSelector;
+  Inc(Run);
+end;
+
+procedure TSynCssSyn.BracketOpenProc;
+begin
+  Inc(Run);
+  fRange := rsAttrib;
+  fTokenID := tkSymbol;
 end;
 
 procedure TSynCssSyn.CommentProc;
 begin
   if fLine[Run] = #0 then
-    fTokenID := tkNull
-  else begin
+    NullProc
+  else
+  begin
     fTokenID := tkComment;
     repeat
       if (fLine[Run] = '*') and (fLine[Run + 1] = '/') then
@@ -393,15 +695,8 @@ begin
         break;
       end;
       inc(Run);
-    until fLine[Run] = #0;
+    until IsLineEnd(Run)
   end;
-end;
-
-procedure TSynCssSyn.BraceOpenProc;
-begin
-  Inc(Run);
-  fRange := rsParam;
-  fTokenID := tkSymbol;
 end;
 
 procedure TSynCssSyn.CRProc;
@@ -427,59 +722,81 @@ end;
 
 procedure TSynCssSyn.NumberProc;
 begin
-  inc(Run);
-  fTokenID := tkNumber;
-  while FLine[Run] in ['0'..'9', '.'] do
+  if (FLine[Run] = '-') and not CharInSet(FLine[Run + 1], ['0'..'9']) then
+    IdentProc
+  else
   begin
-    case FLine[Run] of
-      '.':
-        if FLine[Run + 1] = '.' then break;
-    end;
     inc(Run);
+    fTokenID := tkNumber;
+    while CharInSet(FLine[Run], ['0'..'9', '.']) do
+    begin
+      case FLine[Run] of
+        '.':
+          if FLine[Run + 1] = '.' then break;
+      end;
+      inc(Run);
+    end;
   end;
 end;
 
-function TSynCssSyn.IdentKind(MayBe: PChar): TtkTokenKind;
-var
-  Entry: TSynHashEntry;
+procedure TSynCssSyn.ParenCloseProc;
 begin
-  fToIdent := MayBe;
-  Entry := fKeywords[KeyHash(MayBe)];
-  while Assigned(Entry) do begin
-    if Entry.KeywordLen > fStringLen then
-      break
-    else if Entry.KeywordLen = fStringLen then
-      if KeyComp(Entry.Keyword) then begin
-        Result := TtkTokenKind(Entry.Kind);
-        exit;
-      end;
-    Entry := Entry.Next;
+  fRange := fParameterRange;
+  fTokenID := tkSymbol;
+  Inc(Run);
+end;
+
+procedure TSynCssSyn.ParenOpenProc;
+begin
+  Inc(Run);
+  fParameterRange := fRange;
+  fRange := rsParameter;
+  fTokenID := tkSymbol;
+end;
+
+procedure TSynCssSyn.PipeProc;
+begin
+  Inc(Run);
+  if fLine[Run] = '=' then
+  begin
+    Inc(Run);
+    fTokenID := tkSymbol;
   end;
-  Result := tkUndefProperty;
+end;
+
+procedure TSynCssSyn.PlusProc;
+begin
+  Inc(Run);
+  fTokenID := tkSymbol;
 end;
 
 procedure TSynCssSyn.IdentProc;
 begin
   case fRange of
-    rsKey:
+    rsProperty:
       begin
-        fRange := rsParam;
-        fTokenID := tkKey;
+        fRange := rsDeclaration;
+        fTokenID := tkSelector;
         Inc(Run, fStringLen);
       end;
-    rsValue:
+    rsValue, rsParameter:
       begin
-        fRange := rsParam;
         fTokenID := tkValue;
 
-        while not (fLine[Run] In [#0, #10, #13,  '}', ';', ',']) do
+        while not IsLineEnd(Run) and
+          not CharInSet(fLine[Run], ['(', ')', '}', ';', ',', ' ']) do
+        begin
           Inc(Run);
+        end;
+
+        if IsLineEnd(Run) or CharInSet(fLine[Run], ['}', ';']) then
+          fRange := rsDeclaration;
       end;
     else
       fTokenID := IdentKind((fLine + Run));
       repeat
         Inc(Run);
-      until (fLine[Run] In [#0..#32, ':', '"', '}', ';']);
+      until (fLine[Run] <= #32) or CharInSet(fLine[Run], [':', '"', '}', ';']);
   end;
 end;
 
@@ -492,47 +809,107 @@ end;
 procedure TSynCssSyn.NullProc;
 begin
   fTokenID := tkNull;
+  inc(Run);
 end;
 
-procedure TSynCssSyn.TextProc;
-const StopSet = [#0..#31, '{', '/'];
-begin
-  if fLine[Run] in (StopSet) then
+procedure TSynCssSyn.SelectorProc;
+
+  function IsStopChar: Boolean;
   begin
-    fProcTable[fLine[Run]];
-    exit;
+    case fLine[Run] of
+      #0..#31, '{', '/', '[', ']', '>', '+', '~':
+        Result := True;
+      else
+        Result := False;
+    end;
   end;
 
-  fTokenID := tkKey;
-  while not (fLine[Run] in StopSet) do Inc(Run);
+begin
+  if IsStopChar then
+  begin
+    case fLine[Run] of
+      #0..#31, '{', '/': NextDeclaration;
+      '[': BracketOpenProc;
+      ']': BracketCloseProc;
+      '>': GreaterProc;
+      '+': PlusProc;
+      '~': TildeProc;
+    end;
+    Exit;
+  end;
+
+  fTokenID := tkSelector;
+  while not IsStopChar do
+    Inc(Run);
+end;
+
+procedure TSynCssSyn.TildeProc;
+begin
+  Inc(Run);
+  if fLine[Run] = '=' then
+  begin
+    Inc(Run);
+    fTokenID := tkSymbol;
+  end;
 end;
 
 procedure TSynCssSyn.SpaceProc;
 begin
-  Inc(Run);
+  inc(Run);
   fTokenID := tkSpace;
-  while fLine[Run] <= #32 do
-  begin
-    if fLine[Run] in [#0, #9, #10, #13] then break;
-    Inc(Run);
-  end;
+  while (FLine[Run] <= #32) and not IsLineEnd(Run) do inc(Run);
 end;
 
 procedure TSynCssSyn.StringProc;
 begin
   fTokenID := tkString;
   Inc(Run);  // first '"'
-  while not (fLine[Run] in [#0, #10, #13, '"']) do Inc(Run);
+  while not (IsLineEnd(Run) or (fLine[Run] = '"')) do Inc(Run);
   if fLine[Run] = '"' then Inc(Run);  // last '"'
 end;
 
 procedure TSynCssSyn.HashProc;
+
+  function IsHexChar: Boolean;
+  begin
+    case fLine[Run] of
+      '0'..'9', 'A'..'F', 'a'..'f':
+        Result := True;
+      else
+        Result := False;
+    end;
+  end;
+
 begin
   fTokenID := tkColor;
   Inc(Run);  // '#'
-  while (fLine[Run] in ['0'..'9', 'A'..'F', 'a'..'f']) do Inc(Run);
+  while IsHexChar do Inc(Run);
 end;
 
+procedure TSynCssSyn.EqualProc;
+begin
+  Inc(Run);
+  fTokenID := tkSymbol;
+end;
+
+procedure TSynCssSyn.ExclamProc;
+begin
+  if (fLine[Run + 1] = 'i') and
+    (fLine[Run + 2] = 'm') and
+    (fLine[Run + 3] = 'p') and
+    (fLine[Run + 4] = 'o') and
+    (fLine[Run + 5] = 'r') and
+    (fLine[Run + 6] = 't') and
+    (fLine[Run + 7] = 'a') and
+    (fLine[Run + 8] = 'n') and
+    (fLine[Run + 9] = 't') then
+  begin
+    fTokenID := tkImportant;
+    Inc(Run, 10);
+  end
+  else
+    IdentProc;
+end;
 
 procedure TSynCssSyn.SlashProc;
 begin
@@ -543,24 +920,48 @@ begin
     fCommentRange := fRange;
     fRange := rsComment;
     inc(Run);
-    if not (fLine[Run] in [#0, #10, #13]) then
+    if not IsLineEnd(Run) then
       CommentProc;
   end
   else
     fTokenID := tkSymbol;
 end;
 
-
 procedure TSynCssSyn.Next;
 begin
   fTokenPos := Run;
   case fRange of
-    rsText:
-      TextProc;
+    rsSelector:
+      SelectorProc;
+    rsAttrib:
+      AttributeProc;
     rsComment:
       CommentProc;
     else
-      fProcTable[fLine[Run]];
+      NextDeclaration;
+  end;
+  inherited;
+end;
+
+procedure TSynCssSyn.NextDeclaration;
+begin
+  case fLine[Run] of
+    #0: NullProc;
+    #10: LFProc;
+    #13: CRProc;
+    #1..#9, #11, #12, #14..#32: SpaceProc;
+    '"': StringProc;
+    '#': HashProc;
+    '{': BraceOpenProc;
+    '}': BraceCloseProc;
+    '(': ParenOpenProc;
+    ')': ParenCloseProc;
+    ':', ',': StartValProc;
+    ';': SemiProc;
+    '0'..'9', '-', '.': NumberProc;
+    '/': SlashProc;
+    '!': ExclamProc;
+    else IdentProc;
   end;
 end;
 
@@ -568,7 +969,7 @@ function TSynCssSyn.GetDefaultAttribute(Index: integer): TSynHighlighterAttribut
 begin
   case Index of
     SYN_ATTR_COMMENT: Result := fCommentAttri;
-    SYN_ATTR_KEYWORD: Result := fKeyAttri;
+    SYN_ATTR_KEYWORD: Result := fSelectorAttri;
     SYN_ATTR_WHITESPACE: Result := fSpaceAttri;
     SYN_ATTR_STRING: Result := fStringAttri;
     else Result := nil;
@@ -577,15 +978,7 @@ end;
 
 function TSynCssSyn.GetEol: Boolean;
 begin
-  Result := fTokenId = tkNull;
-end;
-
-function TSynCssSyn.GetToken: string;
-var
-  len: Longint;
-begin
-  Len := (Run - fTokenPos);
-  SetString(Result, (FLine + fTokenPos), len);
+  Result := Run = fLineLen + 1;
 end;
 
 function TSynCssSyn.GetTokenID: TtkTokenKind;
@@ -598,12 +991,14 @@ begin
   case fTokenID of
     tkComment: Result := fCommentAttri;
     tkProperty: Result := fPropertyAttri;
-    tkKey: Result := fKeyAttri;
+    tkSelector: Result := fSelectorAttri;
+    tkSelectorAttrib: Result := fAttributeAttri;
     tkSpace: Result := fSpaceAttri;
     tkString: Result := fStringAttri;
     tkSymbol: Result := fSymbolAttri;
     tkText: Result := fTextAttri;
     tkUndefProperty: Result := fUndefPropertyAttri;
+    tkImportant: Result := fImportantPropertyAttri;
     tkValue: Result := fValueAttri;
     tkColor: Result := fColorAttri;
     tkNumber: Result := fNumberAttri;
@@ -616,9 +1011,10 @@ begin
   Result := Ord(fTokenId);
 end;
 
-function TSynCssSyn.GetTokenPos: Integer;
+procedure TSynCssSyn.GreaterProc;
 begin
-  Result := fTokenPos;
+  Inc(Run);
+  fTokenID := tkSymbol;
 end;
 
 function TSynCssSyn.GetRange: Pointer;
@@ -633,12 +1029,7 @@ end;
 
 procedure TSynCssSyn.ResetRange;
 begin
-  fRange:= rsText;
-end;
-
-function TSynCssSyn.GetIdentChars: TSynIdentChars;
-begin
-  Result := ['0'..'9', 'a'..'z', 'A'..'Z', '_', '-'];
+  fRange:= rsSelector;
 end;
 
 function TSynCssSyn.GetSampleSource: string;
@@ -658,9 +1049,21 @@ begin
   Result := fDefaultFilter <> SYNS_FilterCSS;
 end;
 
+function TSynCssSyn.IsIdentChar(AChar: WideChar): Boolean;
+begin
+  case AChar of
+    '_', '-', '0'..'9', 'A'..'Z', 'a'..'z':
+      Result := True;
+    else
+      Result := False;
+  end;
+end;
+
+class function TSynCssSyn.GetFriendlyLanguageName: string;
+begin
+  Result := SYNS_FriendlyLangCSS;
+end;
+
 initialization
-  MakeIdentTable;
-{$IFNDEF SYN_CPPB_1}
   RegisterPlaceableHighlighter(TSynCssSyn);
-{$ENDIF}
 end.

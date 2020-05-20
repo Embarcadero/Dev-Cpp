@@ -50,13 +50,13 @@ type
     { Private declarations }
     sl: TStringList;
     TipsCounter: integer;
-    HiddenUrl: AnsiString;
-    function ConvertMacros(const Str: AnsiString): AnsiString;
-    procedure LoadFromFile(const Filename: AnsiString);
-    function CurrentTip: AnsiString;
-    function NextTip: AnsiString;
-    function PreviousTip: AnsiString;
-    function RandomTip: AnsiString;
+    HiddenUrl: String;
+    function ConvertMacros(const Str: String): String;
+    procedure LoadFromFile(const Filename: String);
+    function CurrentTip: String;
+    function NextTip: String;
+    function PreviousTip: String;
+    function RandomTip: String;
     procedure LoadText;
   end;
 
@@ -72,11 +72,11 @@ begin
   Close;
 end;
 
-function TTipOfTheDayForm.ConvertMacros(const Str: AnsiString): AnsiString;
+function TTipOfTheDayForm.ConvertMacros(const Str: String): String;
 var
   idx: integer;
-  url: AnsiString;
-  urldesc: AnsiString;
+  url: String;
+  urldesc: String;
 begin
   // <CR> macro
   Result := StringReplace(Str, '<CR>', #10, [rfReplaceAll]);
@@ -105,8 +105,8 @@ end;
 
 procedure TTipOfTheDayForm.FormCreate(Sender: TObject);
 var
-  S: AnsiString;
-  LangNoExt: AnsiString;
+  S: String;
+  LangNoExt: String;
   ExtPos: integer;
 begin
   LoadText;
@@ -148,12 +148,12 @@ begin
   sl.Free;
 end;
 
-function TTipOfTheDayForm.CurrentTip: AnsiString;
+function TTipOfTheDayForm.CurrentTip: String;
 begin
   Result := ConvertMacros(sl[TipsCounter]);
 end;
 
-function TTipOfTheDayForm.NextTip: AnsiString;
+function TTipOfTheDayForm.NextTip: String;
 begin
   if TipsCounter < sl.Count - 1 then
     Inc(TipsCounter)
@@ -162,7 +162,7 @@ begin
   Result := ConvertMacros(sl[TipsCounter]);
 end;
 
-function TTipOfTheDayForm.PreviousTip: AnsiString;
+function TTipOfTheDayForm.PreviousTip: String;
 begin
   if TipsCounter > 0 then
     Dec(TipsCounter)
@@ -171,7 +171,7 @@ begin
   Result := ConvertMacros(sl[TipsCounter]);
 end;
 
-function TTipOfTheDayForm.RandomTip: AnsiString;
+function TTipOfTheDayForm.RandomTip: String;
 var
   newval: integer;
 begin
@@ -199,7 +199,7 @@ begin
   lblTip.Caption := RandomTip;
 end;
 
-procedure TTipOfTheDayForm.LoadFromFile(const Filename: AnsiString);
+procedure TTipOfTheDayForm.LoadFromFile(const Filename: String);
 var
   I: integer;
 begin
@@ -228,7 +228,7 @@ end;
 
 procedure TTipOfTheDayForm.lblUrlClick(Sender: TObject);
 begin
-  ShellExecute(0, 'open', PAnsiChar(HiddenUrl), '', '', SW_SHOWNORMAL);
+  ShellExecute(0, 'open', PChar(HiddenUrl), '', '', SW_SHOWNORMAL);
 end;
 
 procedure TTipOfTheDayForm.LoadText;

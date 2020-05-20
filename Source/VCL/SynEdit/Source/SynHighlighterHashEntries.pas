@@ -12,6 +12,7 @@ The Original Code is: SynHighlighterHashEntries.pas, released 2000-04-21.
 
 The Initial Author of this file is Michael Hieke.
 Portions created by Michael Hieke are Copyright 2000 Michael Hieke.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.
@@ -26,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterHashEntries.pas,v 1.5 2004/07/09 13:03:55 markonjezic Exp $
+$Id: SynHighlighterHashEntries.pas,v 1.5.2.3 2008/09/14 16:25:00 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -43,20 +44,15 @@ The classes in this unit can be used to use the hashing algorithm while still
 having the ability to change the set of keywords.
 }
 
-{$IFNDEF QSYNHIGHLIGHTERHASHENTRIES}
 unit SynHighlighterHashEntries;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditTypes,
-{$ELSE}
   SynEditTypes,
-{$ENDIF}
+  SynUnicode,
   Classes;
 
 type
@@ -95,13 +91,6 @@ type
     property Next: TSynHashEntry read fNext;
   end;
 
-
-{$IFNDEF SYN_COMPILER_4_UP}
-  {$IFNDEF SYN_CPPB_3}
-    {$DEFINE LIST_CLEAR_NOT_VIRTUAL}
-  {$ENDIF}
-{$ENDIF}
-
   { A list of keyword entries, stored as single-linked lists under the hashvalue
     of the keyword. }
   TSynHashEntryList = class(TList)
@@ -113,16 +102,11 @@ type
       order of keyword entries is maintained. }
     procedure Put(HashKey: Integer; Entry: TSynHashEntry);
   public
-{$IFDEF LIST_CLEAR_NOT_VIRTUAL}
     { Overridden destructor clears the list and frees all contained keyword
       entries. }
     destructor Destroy; override;
     { Clears the list and frees all contained keyword entries. }
     procedure DeleteEntries;
-{$ELSE}
-    { Clears the list and frees all contained keyword entries. }
-    procedure Clear; override;
-{$ENDIF}
   public
     { Type-safe access to the first keyword entry for a hashvalue. }
     property Items[Index: integer]: TSynHashEntry read Get write Put; default;
@@ -137,7 +121,7 @@ type
   keyword is considered any number of successive chars that are contained in
   Identifiers, with chars not contained in Identifiers before and after them. }
 procedure EnumerateKeywords(AKind: integer; KeywordList: string;
-  Identifiers: TSynIdentChars; AKeywordProc: TEnumerateKeywordEvent);
+  IsIdentChar: TCategoryMethod; AKeywordProc: TEnumerateKeywordEvent);
 
 implementation
 
@@ -145,22 +129,23 @@ uses
   SysUtils;
 
 procedure EnumerateKeywords(AKind: integer; KeywordList: string;
-  Identifiers: TSynIdentChars; AKeywordProc: TEnumerateKeywordEvent);
+  IsIdentChar: TCategoryMethod; AKeywordProc: TEnumerateKeywordEvent);
 var
-  pStart, pEnd: PChar;
+  pStart, pEnd: PWideChar;
   Keyword: string;
 begin
-  if Assigned(AKeywordProc) and (KeywordList <> '') then begin
-    pEnd := PChar(KeywordList);
+  if Assigned(AKeywordProc) and (KeywordList <> '') then
+  begin
+    pEnd := PWideChar(KeywordList);
     pStart := pEnd;
     repeat
       // skip over chars that are not in Identifiers
-      while (pStart^ <> #0) and not (pStart^ in Identifiers) do
+      while (pStart^ <> #0) and not IsIdentChar(pStart^) do
         Inc(pStart);
       if pStart^ = #0 then break;
       // find the last char that is in Identifiers
       pEnd := pStart + 1;
-      while (pEnd^ <> #0) and (pEnd^ in Identifiers) do
+      while (pEnd^ <> #0) and IsIdentChar(pEnd^) do
         Inc(pEnd);
       // call the AKeywordProc with the keyword
       SetString(Keyword, pStart, pEnd - pStart);
@@ -191,10 +176,12 @@ end;
 function TSynHashEntry.AddEntry(NewEntry: TSynHashEntry): TSynHashEntry;
 begin
   Result := Self;
-  if Assigned(NewEntry) then begin
-    if CompareText(NewEntry.Keyword, fKeyword) = 0 then
+  if Assigned(NewEntry) then
+  begin
+    if WideCompareText(NewEntry.Keyword, fKeyword) = 0 then
       raise Exception.CreateFmt('Keyword "%s" already in list', [fKeyword]);
-    if NewEntry.fKeyLen < fKeyLen then begin
+    if NewEntry.fKeyLen < fKeyLen then
+    begin
       NewEntry.fNext := Self;
       Result := NewEntry;
     end else if Assigned(fNext) then
@@ -206,7 +193,6 @@ end;
 
 { TSynHashEntryList }
 
-{$IFDEF LIST_CLEAR_NOT_VIRTUAL}
 destructor TSynHashEntryList.Destroy;
 begin
   DeleteEntries;
@@ -214,9 +200,6 @@ begin
 end;
 
 procedure TSynHashEntryList.DeleteEntries;
-{$ELSE}
-procedure TSynHashEntryList.Clear;
-{$ENDIF}
 var
   i: integer;
 begin

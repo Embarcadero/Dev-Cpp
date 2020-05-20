@@ -43,7 +43,7 @@ type
     fMonitors: array[0..MAXIMUM_WAIT_OBJECTS - 1] of THandle;
     fMonitorCount: integer;
     fChangeType: TdevMonitorChangeType;
-    fFilename: AnsiString;
+    fFilename: String;
     fShouldQuit: TEvent;
     procedure Notify;
     procedure CreateMonitors;
@@ -104,7 +104,7 @@ begin
 
       // Can we create a change notifier for it?
       ChangeID := FindFirstChangeNotification(
-        PAnsiChar(ExtractFilePath(fFileNames[I])),
+        PChar(ExtractFilePath(fFileNames[I])),
         False,
         FILE_NOTIFY_CHANGE_LAST_WRITE or FILE_NOTIFY_CHANGE_FILE_NAME // change contents or change filename
         );
@@ -203,9 +203,9 @@ end;
 
 procedure TdevMonitorThread.Notify;
 var
-  P: PAnsiChar;
+  P: PChar;
 begin
-  P := StrNew(PAnsiChar(fFilename));
+  P := StrNew(PChar(fFilename));
   PostMessage(TdevFileMonitor(fOwner).Handle, WM_NOTIFYFILECHANGED, integer(fChangeType), LPARAM(P));
 end;
 

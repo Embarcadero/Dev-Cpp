@@ -91,7 +91,7 @@ uses
 {$R *.res}
 
 var
-  AppData, INIFileName, ExeFolder: AnsiString;
+  AppData, INIFileName, ExeFolder: String;
   Buffer: array[0..MAX_PATH] of char;
   PrevInstance: THandle;
 begin
@@ -99,7 +99,7 @@ begin
   // If we are able to find a previous instance, activate that one instead
   PrevInstance := GetPreviousInstance;
   if PrevInstance <> 0 then begin
-    SendToPreviousInstance(PrevInstance, AnsiString(GetCommandLineW));
+    SendToPreviousInstance(PrevInstance, String(GetCommandLineW));
     Exit;
   end;
 
@@ -124,7 +124,7 @@ begin
     // default dir should be %APPDATA%\Dev-Cpp
     AppData := '';
     if SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, Buffer)) then
-      AppData := IncludeTrailingBackslash(AnsiString(Buffer));
+      AppData := IncludeTrailingBackslash(String(Buffer));
 
     // Store the INI file in %APPDATA% or if we are not allowed to do so, in the exe directory
     if (AppData <> '') and (DirectoryExists(AppData + 'Dev-Cpp') or CreateDir(AppData + 'Dev-Cpp')) then

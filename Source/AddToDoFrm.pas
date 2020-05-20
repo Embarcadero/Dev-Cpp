@@ -67,9 +67,9 @@ var
   I: integer;
   st: TBufferCoord;
   Line: integer;
-  LineText: AnsiString;
-  Hdr: AnsiString;
-  Prepend: AnsiString;
+  LineText: String;
+  Hdr: String;
+  Prepend: String;
 begin
   e := MainForm.EditorList.GetEditor;
   if not Assigned(e) then begin

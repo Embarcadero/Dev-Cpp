@@ -48,7 +48,7 @@ type
     procedure btnHelpClick(Sender: TObject);
     procedure edProjectNameChange(Sender: TObject);
   private
-    procedure AddTemplate(const FileName: AnsiString);
+    procedure AddTemplate(const FileName: String);
     procedure ReadTemplateDir;
   private
     fTemplates: TList;
@@ -81,7 +81,7 @@ begin
   fTemplates.Free;
 end;
 
-procedure TNewProjectForm.AddTemplate(const FileName: AnsiString);
+procedure TNewProjectForm.AddTemplate(const FileName: String);
 var
   Template: TTemplate;
 begin
@@ -165,7 +165,7 @@ begin
 end;
 
 procedure TNewProjectForm.UpdateView;
-  function HasPage(const value: AnsiString): boolean;
+  function HasPage(const value: String): boolean;
   var
     I: integer;
   begin
@@ -181,7 +181,7 @@ var
   TemplateItem: TTemplate;
   ListItem: TListItem;
   IconItem: TIcon;
-  IconFileName: AnsiString;
+  IconFileName: String;
 begin
   // Keep each icon in a separate image list
   ImageList.Clear;

@@ -23,21 +23,21 @@ interface
 
 uses
 {$IFDEF WIN32}
-  SysUtils, StrUtils, Classes;
+  SysUtils, StrUtils, Classes, System.AnsiStrings;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, StrUtils;
 {$ENDIF}
 
 const
-  HeaderExts: array[0..6] of AnsiString = ('.h', '.hpp', '.rh', '.hh', '.hxx', '.inl', '');
-  SourceExts: array[0..5] of AnsiString = ('.c', '.cpp', '.cc', '.cxx', '.c++', '.cp');
+  HeaderExts: array[0..6] of String = ('.h', '.hpp', '.rh', '.hh', '.hxx', '.inl', '');
+  SourceExts: array[0..5] of String = ('.c', '.cpp', '.cc', '.cxx', '.c++', '.cp');
 
 type
   PFileIncludes = ^TFileIncludes;
   TFileIncludes = record
-    BaseFile: AnsiString;
-    IncludeFiles: AnsiString; // "file","file" etc
+    BaseFile: String;
+    IncludeFiles: String; // "file","file" etc
   end;
 
   TStatementKind = (
@@ -69,10 +69,10 @@ type
   PStatement = ^TStatement;
   TStatement = record
     _Parent: PStatement; // parent class/struct/namespace
-    _HintText: AnsiString; // text to force display when using PrettyPrintStatement
-    _Type: AnsiString; // type "int"
-    _Command: AnsiString; // identifier/name of statement "foo"
-    _Args: AnsiString; // args "(int a,float b)"
+    _HintText: String; // text to force display when using PrettyPrintStatement
+    _Type: String; // type "int"
+    _Command: String; // identifier/name of statement "foo"
+    _Args: String; // args "(int a,float b)"
     _Kind: TStatementKind; // kind of statement class/variable/function/etc
     _InheritanceList: TList; // list of pstatements this one inherits from, can be nil
     _Scope: TStatementScope; // global/local/classlocal
@@ -80,61 +80,61 @@ type
     _HasDefinition: boolean; // definiton line/filename is valid
     _Line: integer; // declaration
     _DefinitionLine: integer; // definition
-    _FileName: AnsiString; // declaration
-    _DefinitionFileName: AnsiString; // definition
+    _FileName: String; // declaration
+    _DefinitionFileName: String; // definition
     _Visible: boolean; // visible in class browser or not
     _Temporary: boolean; // statements to be deleted after parsing
     _InProject: boolean; // statement in project
     _InSystemHeader: boolean; // statement in system header (#include <>)
   end;
 
-  TProgressEvent = procedure(Sender: TObject; const FileName: AnsiString; Total, Current: integer) of object;
+  TProgressEvent = procedure(Sender: TObject; const FileName: String; Total, Current: integer) of object;
   TProgressEndEvent = procedure(Sender: TObject; Total: integer) of object;
 
   // These functions are about six times faster than the locale sensitive AnsiX() versions
-function StartsStr(const subtext, text: AnsiString): boolean;
-function StartsText(const subtext, text: AnsiString): boolean;
+function StartsStr(const subtext, text: String): boolean;
+function StartsText(const subtext, text: String): boolean;
 
-function SameStr(const s1, s2: AnsiString): boolean;
-function SameText(const s1, s2: AnsiString): boolean;
+function SameStr(const s1, s2: String): boolean;
+function SameText(const s1, s2: String): boolean;
 
-function EndsStr(const subtext, text: AnsiString): boolean;
-function EndsText(const subtext, text: AnsiString): boolean;
+function EndsStr(const subtext, text: String): boolean;
+function EndsText(const subtext, text: String): boolean;
 
-function ContainsStr(const text, subtext: AnsiString): boolean;
-function ContainsText(const text, subtext: AnsiString): boolean;
+function ContainsStr(const text, subtext: String): boolean;
+function ContainsText(const text, subtext: String): boolean;
 
 // Same as StringReplace, but only replace first OldPattern (a lot faster)
-function ReplaceFirstStr(const S, OldPattern, NewPattern: AnsiString): AnsiString;
-function ReplaceFirstText(const S, OldPattern, NewPattern: AnsiString): AnsiString;
+function ReplaceFirstStr(const S, OldPattern, NewPattern: String): String;
+function ReplaceFirstText(const S, OldPattern, NewPattern: String): String;
 
 // Reverse Pos() function
-function LastPos(const SubStr, S: AnsiString): integer;
+function LastPos(const SubStr, S: String): integer;
 
 // Fast implementation of StringReplace which does not use AnsiX (MBCS ready) comparison
-function FastStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
+function FastStringReplace(const S, OldPattern, NewPattern: String; Flags: TReplaceFlags): String;
 
 // Fast implementation of IndexOf which does not use AnsiX comparison
-function FastIndexOf(List: TStrings; const S: AnsiString): integer; overload;
-function FastIndexOf(List: TStringlist; const S: AnsiString): integer; overload;
+function FastIndexOf(List: TStrings; const S: String): integer; overload;
+function FastIndexOf(List: TStringlist; const S: String): integer; overload;
 
 // Needed by Parser and Preprocessor (and class browser)
-function IsSystemHeaderFile(const FileName: AnsiString; IncludePaths: TStringList): boolean;
-function GetSystemHeaderFileName(const FileName: AnsiString; IncludePaths: TStringList): AnsiString; // <file.h>
-function GetLocalHeaderFileName(const RelativeTo, FileName: AnsiString; ProjectIncludePaths: TStringList): AnsiString;
+function IsSystemHeaderFile(const FileName: String; IncludePaths: TStringList): boolean;
+function GetSystemHeaderFileName(const FileName: String; IncludePaths: TStringList): String; // <file.h>
+function GetLocalHeaderFileName(const RelativeTo, FileName: String; ProjectIncludePaths: TStringList): String;
 // "file.h"
-function GetHeaderFileName(const RelativeTo, Line: AnsiString; IncludePaths, ProjectIncludePaths: TStringList):
-  AnsiString; // both
-function IsCfile(const Filename: AnsiString): boolean;
-function IsHfile(const Filename: AnsiString): boolean;
-procedure GetSourcePair(const FName: AnsiString; var CFile, HFile: AnsiString);
-function IsIncludeLine(const Line: AnsiString): boolean;
+function GetHeaderFileName(const RelativeTo, Line: String; IncludePaths, ProjectIncludePaths: TStringList):
+  String; // both
+function IsCfile(const Filename: String): boolean;
+function IsHfile(const Filename: String): boolean;
+procedure GetSourcePair(const FName: String; var CFile, HFile: String);
+function IsIncludeLine(const Line: String): boolean;
 
 implementation
 
-function FastStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
+function FastStringReplace(const S, OldPattern, NewPattern: String; Flags: TReplaceFlags): String;
 var
-  SearchStr, Patt, NewStr: AnsiString;
+  SearchStr, Patt, NewStr: String;
   Offset: Integer;
 begin
   if rfIgnoreCase in Flags then begin
@@ -162,7 +162,7 @@ begin
   end;
 end;
 
-function FastIndexOf(List: TStrings; const S: AnsiString): integer;
+function FastIndexOf(List: TStrings; const S: String): integer;
 begin
   with List do begin
     for Result := 0 to Count - 1 do
@@ -172,7 +172,7 @@ begin
   end;
 end;
 
-function FastIndexOf(List: TStringlist; const S: AnsiString): integer;
+function FastIndexOf(List: TStringlist; const S: String): integer;
 begin
   with List do begin
     if not List.Sorted then
@@ -182,59 +182,59 @@ begin
   end;
 end;
 
-function StartsStr(const subtext, text: AnsiString): boolean;
+function StartsStr(const subtext, text: String): boolean;
 begin
   Result := SameStr(subtext, Copy(text, 1, Length(subtext)));
 end;
 
-function StartsText(const subtext, text: AnsiString): boolean;
+function StartsText(const subtext, text: String): boolean;
 begin
   Result := SameText(subtext, Copy(text, 1, Length(subtext)));
 end;
 
-function SameStr(const s1, s2: AnsiString): boolean;
+function SameStr(const s1, s2: String): boolean;
 begin
   Result := (CompareStr(s1, s2) = 0);
 end;
 
-function SameText(const s1, s2: AnsiString): boolean;
+function SameText(const s1, s2: String): boolean;
 begin
   Result := (CompareText(s1, s2) = 0);
 end;
 
-function EndsStr(const subtext, text: AnsiString): boolean;
+function EndsStr(const subtext, text: String): boolean;
 var
   SubTextLocation: Integer;
 begin
   SubTextLocation := Length(text) - Length(subtext) + 1;
   if (SubTextLocation > 0) and (subtext <> '') then
-    Result := StrComp(Pointer(subtext), Pointer(@text[SubTextLocation])) = 0
+    Result := System.AnsiStrings.StrComp(Pointer(subtext), Pointer(@text[SubTextLocation])) = 0
   else
     Result := False;
 end;
 
-function EndsText(const subtext, text: AnsiString): boolean;
+function EndsText(const subtext, text: String): boolean;
 var
   SubTextLocation: Integer;
 begin
   SubTextLocation := Length(text) - Length(subtext) + 1;
   if (SubTextLocation > 0) and (subtext <> '') then
-    Result := StrIComp(Pointer(subtext), Pointer(@text[SubTextLocation])) = 0
+    Result := System.AnsiStrings.StrIComp(Pointer(subtext), Pointer(@text[SubTextLocation])) = 0
   else
     Result := False;
 end;
 
-function ContainsStr(const text, subtext: AnsiString): boolean;
+function ContainsStr(const text, subtext: String): boolean;
 begin
   Result := Pos(subtext, text) > 0;
 end;
 
-function ContainsText(const text, subtext: AnsiString): boolean;
+function ContainsText(const text, subtext: String): boolean;
 begin
   Result := Pos(UpperCase(subtext), UpperCase(text)) > 0;
 end;
 
-function ReplaceFirstStr(const S, OldPattern, NewPattern: AnsiString): AnsiString;
+function ReplaceFirstStr(const S, OldPattern, NewPattern: String): String;
 var
   Offset: Integer;
 begin
@@ -247,7 +247,7 @@ begin
   end;
 end;
 
-function ReplaceFirstText(const S, OldPattern, NewPattern: AnsiString): AnsiString;
+function ReplaceFirstText(const S, OldPattern, NewPattern: String): String;
 var
   Offset: Integer;
   UpperS, UpperOldPattern: string;
@@ -265,16 +265,16 @@ begin
   end;
 end;
 
-function LastPos(const SubStr, s: AnsiString): integer;
+function LastPos(const SubStr, s: String): integer;
 begin
   result := Pos(ReverseString(SubStr), ReverseString(S));
   if result <> 0 then
     result := ((Length(S) - Length(SubStr)) + 1) - result + 1;
 end;
 
-function IsSystemHeaderFile(const FileName: AnsiString; IncludePaths: TStringList): boolean;
+function IsSystemHeaderFile(const FileName: String; IncludePaths: TStringList): boolean;
 var
-  FilePath: AnsiString;
+  FilePath: String;
   I: integer;
 begin
   Result := false;
@@ -302,9 +302,9 @@ begin
   end;
 end;
 
-function IsIncludeLine(const Line: AnsiString): boolean;
+function IsIncludeLine(const Line: String): boolean;
 var
-  TrimmedLine: AnsiString;
+  TrimmedLine: String;
 begin
   Result := False;
   TrimmedLine := Trim(Line);
@@ -315,10 +315,10 @@ begin
   end;
 end;
 
-function GetLocalHeaderFileName(const RelativeTo, FileName: AnsiString; ProjectIncludePaths: TStringList): AnsiString;
+function GetLocalHeaderFileName(const RelativeTo, FileName: String; ProjectIncludePaths: TStringList): String;
 var
   I: integer;
-  Dir: AnsiString;
+  Dir: String;
 begin
   Result := FileName;
 
@@ -345,7 +345,7 @@ begin
   Result := FileName; // signifies failure
 end;
 
-function GetSystemHeaderFileName(const FileName: AnsiString; IncludePaths: TStringList): AnsiString;
+function GetSystemHeaderFileName(const FileName: String; IncludePaths: TStringList): String;
 var
   I: integer;
 begin
@@ -367,8 +367,8 @@ begin
   Result := FileName; // signifies failure
 end;
 
-function GetHeaderFileName(const RelativeTo, Line: AnsiString; IncludePaths, ProjectIncludePaths: TStringList):
-  AnsiString;
+function GetHeaderFileName(const RelativeTo, Line: String; IncludePaths, ProjectIncludePaths: TStringList):
+  String;
 var
   OpenTokenPos, CloseTokenPos: integer;
 begin
@@ -397,9 +397,9 @@ begin
   end;
 end;
 
-function IsCfile(const Filename: AnsiString): boolean;
+function IsCfile(const Filename: String): boolean;
 var
-  ext: AnsiString;
+  ext: String;
   i: integer;
 begin
   result := false;
@@ -412,9 +412,9 @@ begin
     end;
 end;
 
-function IsHfile(const Filename: AnsiString): boolean;
+function IsHfile(const Filename: String): boolean;
 var
-  ext: AnsiString;
+  ext: String;
   i: integer;
 begin
   result := false;
@@ -430,7 +430,7 @@ begin
     end;
 end;
 
-procedure GetSourcePair(const FName: AnsiString; var CFile, HFile: AnsiString);
+procedure GetSourcePair(const FName: String; var CFile, HFile: String);
 var
   i: integer;
 begin

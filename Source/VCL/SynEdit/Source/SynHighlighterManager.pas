@@ -27,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterManager.pas,v 1.7 2004/07/09 13:03:55 markonjezic Exp $
+$Id: SynHighlighterManager.pas,v 1.7.2.2 2008/03/01 18:32:02 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -43,9 +43,7 @@ Known Issues:
 Provides a component to manage many highlighters in a single project.
 }
 
-{$IFNDEF QSYNHIGHLIGHTERMANAGER}
 unit SynHighlighterManager;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
@@ -91,21 +89,7 @@ type
 implementation
 
 uses
-{$IFDEF SYN_COMPILER_6_UP}
   DesignIntf,
-{$ELSE}
-  DsgnIntf,
-{$ENDIF}
-{$IFDEF SYN_CLX}
-  Qt,
-  QForms,
-  QControls,
-  QStdCtrls,
-  QCheckLst,
-  Types,
-  QSynEditHighlighter,
-  QSynEditStrConst,
-{$ELSE}
   Windows,
   Forms,
   Controls,
@@ -113,7 +97,6 @@ uses
   CheckLst,
   SynEditHighlighter,
   SynEditStrConst,
-{$ENDIF}
   SysUtils;
 
 type
@@ -124,22 +107,13 @@ type
     btnOK: TButton;
     btnCancel: TButton;
     Highlight: TSynHighlighterList;
-    constructor Create(highlighters: TSynHighlighterList);
-      {$IFDEF SYN_COMPILER_4_UP}reintroduce;{$ENDIF}
+    constructor Create(highlighters: TSynHighlighterList); reintroduce;
     procedure   LoadForm;
     procedure   SelectAll(Sender: TObject);
     procedure   DeselectAll(Sender: TObject);
   end;
 
-  {$IFDEF SYN_COMPILER_4_UP}
-    {$IFDEF SYN_COMPILER_6_UP}
-      TDesignerClass = IDesigner;
-    {$ELSE}
-      TDesignerClass = IFormDesigner;
-    {$ENDIF}
-  {$ELSE}
-    TDesignerClass = TFormDesigner;
-  {$ENDIF}
+  TDesignerClass = IDesigner;
 
 { TSynHighlighterManager }
 
@@ -158,7 +132,7 @@ var
     for i := 0 to form.ComponentCount-1 do begin
       j := highlight.FindByClass(form.Components[i]);
       if j >= 0 then begin
-        j := synForm.clbHighlighters.Items.IndexOf(highlight[j].GetLanguageName);
+        j := synForm.clbHighlighters.Items.IndexOf(highlight[j].GetFriendlyLanguageName);
         if j >= 0 then
           synForm.clbHighlighters.Checked[j] := true;
       end;
@@ -258,7 +232,7 @@ var
     // in second.
     for i := 0 to synForm.clbHighlighters.Items.Count-1 do begin
       if not synForm.clbHighlighters.Checked[i] then begin // unchecked - remove
-        high := highlight.FindByName(synForm.clbHighlighters.Items[i]);
+        high := highlight.FindByFriendlyName(synForm.clbHighlighters.Items[i]);
         if high >= 0 then begin
           comp := FindHighlighterComp(highlight[high]);
           if comp >= 0 then
@@ -268,7 +242,7 @@ var
     end; //for
     for i := 0 to synForm.clbHighlighters.Items.Count-1 do begin
       if synForm.clbHighlighters.Checked[i] then begin // checked - add
-        high := highlight.FindByName(synForm.clbHighlighters.Items[i]);
+        high := highlight.FindByFriendlyName(synForm.clbHighlighters.Items[i]);
         if high >= 0 then begin
           if FindHighlighterComp(highlight[high]) < 0 then begin
             GetFreeCoordinates;
@@ -284,18 +258,10 @@ begin
   inherited;
   if (csDesigning in ComponentState) and (AOwner is TCustomForm) then begin
     form := TCustomForm(AOwner);
-{$IFDEF SYN_CLX}
-    dsgn := form.DesignerHook as TDesignerClass;
-{$ELSE}
     dsgn := form.Designer as TDesignerClass;
-{$ENDIF}
     highlight := GetPlaceableHighlighters;
     if highlight.Count = 0 then
-{$IFDEF SYN_CLX}
-      Application.MessageBox('No highlighters found!','Highlighter Manager', [smbOK], smsWarning)
-{$ELSE}
       Application.MessageBox('No highlighters found!','Highlighter Manager', MB_OK + MB_ICONEXCLAMATION)
-{$ENDIF}
     else
     begin
       synForm := TSynHighlighterForm.Create(highlight);
@@ -320,11 +286,7 @@ begin
   Width  := 410;
   Height := 243;
   Position := poScreenCenter;
-{$IFDEF SYN_CLX}
-  BorderStyle := fbsDialog;
-{$ELSE}
   BorderStyle := bsDialog;
-{$ENDIF}
 
   Highlight := highlighters;
   
@@ -459,7 +421,7 @@ var
 begin
   clbHighlighters.Clear;
   for i := 0 to Highlight.Count-1 do begin
-    clbHighlighters.Items.Add(Highlight[i].GetLanguageName); 
+    clbHighlighters.Items.Add(Highlight[i].GetFriendlyLanguageName); 
   end; //for
 end;
 

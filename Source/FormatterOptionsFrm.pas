@@ -69,7 +69,7 @@ type
     procedure LoadSampleText;
     procedure CreateScratchFile;
     procedure SaveSettings;
-    function GetFullCommand: AnsiString;
+    function GetFullCommand: String;
   end;
 
 implementation
@@ -94,8 +94,8 @@ begin
   if fValid then
     ShellExecute(
       0,
-      PAnsiChar('open'),
-      PAnsiChar(devDirs.Exec + devFormatter.AStyleDir + 'doc\astyle.html'),
+      PChar('open'),
+      PChar(devDirs.Exec + devFormatter.AStyleDir + 'doc\astyle.html'),
       nil,
       nil,
       SW_SHOWNORMAL);
@@ -158,7 +158,7 @@ end;
 procedure TFormatterOptionsForm.LoadSampleText;
 var
   e: TEditor;
-  FileName: AnsiString;
+  FileName: String;
 begin
   // Create a rough copy of the current file
   e := MainForm.EditorList.GetEditor;
@@ -244,7 +244,7 @@ end;
 
 procedure TFormatterOptionsForm.CommandChange(Sender: TObject);
 var
-  AStyleOutput, DummyFileName: AnsiString;
+  AStyleOutput, DummyFileName: String;
 begin
   if fCreating then
     Exit;
@@ -261,7 +261,7 @@ end;
 
 // copy of TdevFormatter.GetFullCommand
 
-function TFormatterOptionsForm.GetFullCommand: AnsiString;
+function TFormatterOptionsForm.GetFullCommand: String;
 begin
   Result := '';
 

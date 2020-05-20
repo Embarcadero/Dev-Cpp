@@ -53,20 +53,20 @@ type
     fCurrentStatement: PStatement;
     fHideDelay: integer; // allow empty list once, then hide when empty again
     fIncludedFiles: TStringList;
-    fIsIncludedCacheFileName: AnsiString;
+    fIsIncludedCacheFileName: String;
     fIsIncludedCacheResult: boolean;
     function ApplyClassFilter(Statement, CurrentClass: PStatement; InheritanceStatements: TList): boolean;
     function ApplyMemberFilter(Statement, CurrentClass, ParentClass: PStatement; InheritanceStatements: TList): boolean;
-    procedure GetCompletionFor(Phrase: AnsiString);
-    procedure FilterList(const Member: AnsiString);
+    procedure GetCompletionFor(Phrase: String);
+    procedure FilterList(const Member: String);
     procedure SetPosition(Value: TPoint);
     procedure OnFormResize(Sender: TObject);
-    function IsIncluded(const FileName: AnsiString): boolean;
+    function IsIncluded(const FileName: String): boolean;
     function IsVisible: boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Search(const Phrase, Filename: AnsiString);
+    procedure Search(const Phrase, Filename: String);
     procedure Hide;
     function SelectedStatement: PStatement;
     property CurrentStatement: PStatement read fCurrentStatement write fCurrentStatement;
@@ -190,7 +190,7 @@ begin
     );
 end;
 
-procedure TCodeCompletion.GetCompletionFor(Phrase: AnsiString);
+procedure TCodeCompletion.GetCompletionFor(Phrase: String);
 var
   Node: PStatementNode;
   Statement: PStatement;
@@ -287,7 +287,7 @@ begin
     Result := CompareText(Statement1^._Command, Statement2^._Command);
 end;
 
-procedure TCodeCompletion.FilterList(const Member: AnsiString);
+procedure TCodeCompletion.FilterList(const Member: String);
 var
   I: integer;
 begin
@@ -316,7 +316,7 @@ begin
   fIncludedFiles.Clear; // is recreated anyway on reshow, so save some memory when hiding
 end;
 
-procedure TCodeCompletion.Search(const Phrase, Filename: AnsiString);
+procedure TCodeCompletion.Search(const Phrase, Filename: String);
 var
   I: integer;
 begin
@@ -406,7 +406,7 @@ begin
   end;
 end;
 
-function TCodeCompletion.IsIncluded(const FileName: AnsiString): boolean;
+function TCodeCompletion.IsIncluded(const FileName: String): boolean;
 begin
   // Only do the slow check if the cache is invalid
   if not SameStr(FileName, fIsIncludedCacheFileName) then begin

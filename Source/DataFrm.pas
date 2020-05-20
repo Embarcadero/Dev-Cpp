@@ -23,12 +23,12 @@ interface
 
 uses
   SysUtils, Classes, Menus, Controls, SynEditHighlighter, SynHighlighterCpp,
-  CodeInsList, SynHighlighterRC, ImgList;
+  CodeInsList, SynHighlighterRC, ImgList, System.ImageList;
 
 type
   PMRUItem = ^TMRUItem;
   TMRUItem = record
-    FileName: AnsiString;
+    FileName: String;
     MenuItem: TMenuItem;
     Visible: boolean; // not all items in the list are shown
   end;
@@ -78,8 +78,8 @@ type
     procedure SetMRUMenu(value: TMenuItem);
   public
     procedure RebuildMRU;
-    procedure AddtoHistory(const s: AnsiString);
-    procedure RemoveFromHistory(const s: AnsiString);
+    procedure AddtoHistory(const s: String);
+    procedure RemoveFromHistory(const s: String);
     procedure ClearHistory;
     property MRUMenu: TMenuItem read fMRUMenu write SetMRUMenu;
     property MRUClick: TNotifyEvent read fMRUClick write fMRUClick;
@@ -90,7 +90,7 @@ type
     function GetNewFileNumber: integer;
     procedure InitHighlighterFirstTime(index: integer);
     procedure UpdateHighlighter;
-    function GetHighlighter(const FileName: AnsiString): TSynCustomHighlighter;
+    function GetHighlighter(const FileName: String): TSynCustomHighlighter;
   end;
 
 var
@@ -123,7 +123,7 @@ begin
 end;
 
 procedure TdmMain.InitHighlighterFirstTime(index: integer);
-  procedure AddSpecial(AttrName: AnsiString; Offset: integer);
+  procedure AddSpecial(AttrName: String; Offset: integer);
   var
     a: integer;
   begin
@@ -139,7 +139,7 @@ var
 begin
   offset := index * 1000;
   for i := 0 to pred(cpp.AttrCount) do begin
-    attr := TSynHighlighterAttributes.Create(cpp.Attribute[i].Name);
+    attr := TSynHighlighterAttributes.Create(cpp.Attribute[i].Name,cpp.Attribute[i].Name);
     try
       StrtoAttr(Attr, LoadStr(i + offset + 1));
       cpp.Attribute[i].Assign(Attr);
@@ -163,7 +163,7 @@ end;
 procedure TdmMain.UpdateHighlighter;
 var
   Attr: TSynHighlighterAttributes;
-  aName: AnsiString;
+  aName: String;
   a,
     idx: integer;
 begin
@@ -171,7 +171,7 @@ begin
     aName := cpp.Attribute[idx].Name;
     a := devEditor.Syntax.IndexOfName(aName);
     if a <> -1 then begin
-      Attr := TSynHighlighterAttributes.Create(aName);
+      Attr := TSynHighlighterAttributes.Create(aName,aName);
       try
         StrtoAttr(Attr, devEditor.Syntax.Values[aname]);
         cpp.Attribute[idx].Assign(attr);
@@ -193,9 +193,9 @@ begin
   end;
 end;
 
-function TdmMain.GetHighlighter(const FileName: AnsiString): TSynCustomHighlighter;
+function TdmMain.GetHighlighter(const FileName: String): TSynCustomHighlighter;
 var
-  ext: AnsiString;
+  ext: String;
   idx: integer;
   tmp: TStrings;
 begin
@@ -262,7 +262,7 @@ begin
   end;
 end;
 
-procedure TdmMain.AddtoHistory(const s: AnsiString);
+procedure TdmMain.AddtoHistory(const s: String);
 var
   I: integer;
   newitem: PMRUItem;
@@ -292,7 +292,7 @@ begin
   RebuildMRU;
 end;
 
-procedure TdmMain.RemoveFromHistory(const s: AnsiString);
+procedure TdmMain.RemoveFromHistory(const s: String);
 var
   I: integer;
 begin

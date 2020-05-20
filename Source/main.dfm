@@ -3,7 +3,6 @@ object MainForm: TMainForm
   Top = 504
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
-  AutoScroll = False
   Caption = 'Dev-C++'
   ClientHeight = 680
   ClientWidth = 999
@@ -61,7 +60,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -105,7 +104,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -155,7 +154,7 @@ object MainForm: TMainForm
         TabOrder = 0
         DesignSize = (
           156
-          155)
+          154)
         object btnAbortCompilation: TSpeedButton
           Left = 4
           Top = 4
@@ -186,7 +185,7 @@ object MainForm: TMainForm
         Left = 156
         Top = 0
         Width = 835
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
@@ -217,13 +216,13 @@ object MainForm: TMainForm
         Left = 589
         Top = 0
         Width = 402
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
           402
-          155)
+          154)
         object lblSendCommandGdb: TLabel
           Left = 4
           Top = 7
@@ -237,7 +236,6 @@ object MainForm: TMainForm
           Width = 262
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
           TabOrder = 0
           OnKeyPress = edGdbCommandKeyPress
         end
@@ -245,7 +243,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 30
           Width = 395
-          Height = 118
+          Height = 117
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
@@ -256,7 +254,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 589
-        Height = 155
+        Height = 154
         Align = alLeft
         BevelOuter = bvNone
         BiDiMode = bdLeftToRight
@@ -264,7 +262,7 @@ object MainForm: TMainForm
         TabOrder = 1
         DesignSize = (
           589
-          155)
+          154)
         object DDebugBtn: TSpeedButton
           Left = 4
           Top = 8
@@ -402,7 +400,6 @@ object MainForm: TMainForm
           Width = 518
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
           TabOrder = 5
           OnKeyPress = EvaluateInputKeyPress
         end
@@ -410,7 +407,7 @@ object MainForm: TMainForm
           Left = 4
           Top = 100
           Width = 578
-          Height = 47
+          Height = 46
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssBoth
@@ -449,7 +446,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 991
-        Height = 155
+        Height = 154
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsNone
@@ -515,10 +512,8 @@ object MainForm: TMainForm
       Width = 172
       Height = 24
       Caption = 'Main'
-      EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
-      Flat = True
       Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
@@ -571,15 +566,13 @@ object MainForm: TMainForm
       end
     end
     object tbCompile: TToolBar
-      Left = 464
+      Left = 462
       Top = 2
-      Width = 209
+      Width = 210
       Height = 24
       Caption = 'Compile and Run'
-      EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
-      Flat = True
       Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
@@ -651,15 +644,13 @@ object MainForm: TMainForm
       end
     end
     object tbProject: TToolBar
-      Left = 373
+      Left = 369
       Top = 2
-      Width = 78
+      Width = 80
       Height = 24
       Caption = 'Project'
-      EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
-      Flat = True
       Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
@@ -695,10 +686,8 @@ object MainForm: TMainForm
       Width = 47
       Height = 24
       Caption = 'Edit'
-      EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
-      Flat = True
       Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
@@ -718,13 +707,11 @@ object MainForm: TMainForm
     object tbSearch: TToolBar
       Left = 256
       Top = 2
-      Width = 104
+      Width = 100
       Height = 24
       Caption = 'Search'
-      EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
-      Flat = True
       Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
@@ -765,10 +752,8 @@ object MainForm: TMainForm
       Width = 71
       Height = 24
       Caption = 'Specials'
-      EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
-      Flat = True
       Images = dmMain.MenuImages_NewLook
       ParentShowHint = False
       ShowHint = True
@@ -794,13 +779,11 @@ object MainForm: TMainForm
     object tbClasses: TToolBar
       Left = 95
       Top = 30
-      Width = 700
+      Width = 207
       Height = 24
       Caption = 'tbClasses'
-      EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
-      Flat = True
       TabOrder = 7
       Wrapable = False
       object cmbClasses: TComboBox
@@ -816,7 +799,6 @@ object MainForm: TMainForm
         Font.Height = -11
         Font.Name = 'Courier New'
         Font.Style = []
-        ItemHeight = 14
         ItemIndex = 0
         ParentCtl3D = False
         ParentFont = False
@@ -841,7 +823,6 @@ object MainForm: TMainForm
         Font.Height = -11
         Font.Name = 'Courier New'
         Font.Style = []
-        ItemHeight = 14
         ParentCtl3D = False
         ParentFont = False
         Sorted = True
@@ -851,15 +832,13 @@ object MainForm: TMainForm
       end
     end
     object tbCompilers: TToolBar
-      Left = 686
+      Left = 685
       Top = 2
       Width = 250
       Height = 24
       Caption = 'tbCompilers'
-      EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
-      Flat = True
       TabOrder = 6
       Wrapable = False
       object cmbCompilers: TComboBox
@@ -875,7 +854,6 @@ object MainForm: TMainForm
         Font.Height = -11
         Font.Name = 'Courier New'
         Font.Style = []
-        ItemHeight = 14
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 0
@@ -926,7 +904,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 390
+        Height = 389
         Align = alClient
         Anchors = [akLeft, akTop, akBottom]
         BevelInner = bvNone
@@ -961,12 +939,12 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 390
+        Height = 389
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
         ReadOnly = True
-        Indent = 19
+        Indent = 0
         TabOrder = 0
         PopupMenu = BrowserPopup
         BorderStyle = bsNone
@@ -997,7 +975,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 185
-        Height = 390
+        Height = 389
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -2837,7 +2815,6 @@ object MainForm: TMainForm
   end
   object CppParser: TCppParser
     Enabled = True
-    OnTotalProgress = CppParserTotalProgress
     ParseLocalHeaders = False
     ParseGlobalHeaders = False
     OnStartParsing = CppParserStartParsing

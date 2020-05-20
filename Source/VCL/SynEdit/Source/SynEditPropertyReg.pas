@@ -11,6 +11,7 @@ the specific language governing rights and limitations under the License.
 The Original Code is: SynEditPropertyReg.pas, released 2000-04-07.
 The Original Code is based on mwEditPropertyReg.pas, part of the
 mwEdit component suite.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -26,7 +27,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditPropertyReg.pas,v 1.17 2004/05/07 12:53:13 markonjezic Exp $
+$Id: SynEditPropertyReg.pas,v 1.17.2.6 2008/09/14 16:24:59 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -34,26 +35,18 @@ located at http://SynEdit.SourceForge.net
 Known Issues:
 -------------------------------------------------------------------------------}
 
-{$IFNDEF QSYNEDITPROPERTYREG}
 unit SynEditPropertyReg;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_COMPILER_6_UP}
   DesignIntf,
   DesignEditors,
-  {$IFDEF SYN_KYLIX}
-  ClxEditors,
-  {$ELSE}
   VCLEditors,
-  {$ENDIF}
-{$ELSE}
-  DsgnIntf,
-{$ENDIF}
+  StrEdit,
+  SynUnicode,
   Classes;
 
 type
@@ -102,22 +95,6 @@ procedure Register;
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QDialogs,
-  QForms,
-  QGraphics,
-  QControls,
-  QSynEditKeyCmds,
-  QSynEditKeyCmdsEditor,
-  QSynEdit,
-  QSynEditPrint,
-  QSynEditPrintMargins,
-  QSynEditPrintMarginsDialog,
-  QSynCompletionProposal,
-  QSynMacroRecorder,
-  QSynAutoCorrect,
-  QSynAutoCorrectEditor,
-{$ELSE}
   Dialogs,
   Forms,
   Graphics,
@@ -132,7 +109,6 @@ uses
   SynMacroRecorder,
   SynAutoCorrect,
   SynAutoCorrectEditor,
-{$ENDIF}
   SysUtils;
 
 { TSynEditFontProperty }
@@ -148,13 +124,10 @@ begin
   try
     FontDialog.Font := TFont(GetOrdValue);
     FontDialog.HelpContext := hcDFontEditor;
-  {$IFDEF SYN_CLX}
-  {$ELSE}
     FontDialog.Options := FontDialog.Options + [fdShowHelp, fdForceFontExist,
        fdFixedPitchOnly];
-  {$ENDIF}
     if FontDialog.Execute then
-      SetOrdValue(Longint(FontDialog.Font));
+      SetOrdValue(NativeInt(FontDialog.Font));
   finally
     FontDialog.Free;
   end;
@@ -185,7 +158,7 @@ end;
 
 procedure TSynEditCommandProperty.SetValue(const Value: string);
 var
-  NewValue: longint;
+  NewValue: Integer;
 begin
   if IdentToEditorCommand(Value, NewValue) then
     SetOrdValue(NewValue)
@@ -206,7 +179,7 @@ begin
     if Dlg.ShowModal = mrOk then
     begin
       { SetOrdValue will operate on all selected propertiy values }
-      SetOrdValue(Longint(Dlg.Keystrokes));
+      SetOrdValue(NativeInt(Dlg.Keystrokes));
       Modified;
     end;
   finally
@@ -223,7 +196,7 @@ end;
 
 procedure TSynEditPrintMarginsProperty.Edit;
 var
-  SynEditPrintMarginsDlg : TSynEditPrintMarginsDlg;
+  SynEditPrintMarginsDlg: TSynEditPrintMarginsDlg;
 begin
   SynEditPrintMarginsDlg := TSynEditPrintMarginsDlg.Create(nil);
   try
@@ -238,7 +211,7 @@ end;
 function TSynEditPrintMarginsProperty.GetAttributes: TPropertyAttributes;
 begin
   Result := [paDialog, paSubProperties, paReadOnly, paSortList];
-end;
+end;                           
 
 procedure TSynAutoCorrectComponentEditor.Edit;
 var
@@ -292,35 +265,38 @@ begin
   GetAttributes := [paDialog, paReadOnly];
 end;
 
-function TAutoCorrectionProperty.GetValue: String;
+function TAutoCorrectionProperty.GetValue: string;
 begin
   GetValue := '(AutoCorrections)';
-end;
+end;                
 
 
 { Register }
 
 procedure Register;
 begin
+  RegisterPropertyEditor(TypeInfo(WideChar), nil,
+     '', TCharProperty);
+  RegisterPropertyEditor(TypeInfo(TStrings), nil,
+     '', TStringListProperty);
+
   RegisterPropertyEditor(TypeInfo(TFont), TCustomSynEdit,
      'Font', TSynEditFontProperty);
-  RegisterPropertyEditor(TypeInfo(TSynEditorCommand), TPersistent,
+  RegisterPropertyEditor(TypeInfo(TSynEditorCommand), nil,
      '', TSynEditCommandProperty);
-  RegisterPropertyEditor(TypeInfo(TSynEditKeystrokes), TPersistent,
+  RegisterPropertyEditor(TypeInfo(TSynEditKeystrokes), nil,
     '', TSynEditKeystrokesProperty);
   RegisterPropertyEditor(TypeInfo(TSynEditPrintMargins), TPersistent,
     '', TSynEditPrintMarginsProperty);
   RegisterPropertyEditor(TypeInfo(TStrings), TSynAutoCorrect,
     'Items', TAutoCorrectionProperty);
   RegisterComponentEditor(TSynAutoCorrect, TSynAutoCorrectComponentEditor);
-  {$IFDEF SYN_DELPHI_6_UP}
   RegisterPropertyEditor(TypeInfo(TShortCut), TSynCompletionProposal, '',
     TShortCutProperty);
   RegisterPropertyEditor(TypeInfo(TShortCut), TSynAutoComplete, '',
     TShortCutProperty);
   RegisterPropertyEditor(TypeInfo(TShortCut), TSynMacroRecorder, '',
     TShortCutProperty);
-  {$ENDIF}
 end;
 
 end.

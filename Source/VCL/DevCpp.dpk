@@ -3,6 +3,7 @@ package DevCpp;
 {$R *.res}
 {$R 'devFileMonitor\devFileMonitor.dcr'}
 {$R 'devShortcuts\devShortcuts.dcr'}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -13,17 +14,19 @@ package DevCpp;
 {$LOCALSYMBOLS ON}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS OFF}
-{$OPTIMIZATION ON}
+{$OPTIMIZATION OFF}
 {$OVERFLOWCHECKS OFF}
 {$RANGECHECKS OFF}
 {$REFERENCEINFO OFF}
 {$SAFEDIVIDE OFF}
-{$STACKFRAMES OFF}
+{$STACKFRAMES ON}
 {$TYPEDADDRESS OFF}
 {$VARSTRINGCHECKS ON}
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'Dev-C++ Components'}
 {$DESIGNONLY}
 {$IMPLICITBUILD ON}
@@ -41,5 +44,6 @@ contains
   devMonitorTypes in 'devFileMonitor\devMonitorTypes.pas',
   devShortcuts in 'devShortcuts\devShortcuts.pas',
   devShortcutsEditorForm in 'devShortcuts\devShortcutsEditorForm.pas' {frmdevShortcutsEditor};
+
 end.
 

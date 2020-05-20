@@ -173,7 +173,7 @@ var
   Statement, InheritStatement: PStatement;
   idx: integer;
   e, headere: TEditor;
-  hfName: AnsiString;
+  hfName: String;
   hFile: integer;
 begin
   // HEADER FILE IMPLEMENTATION

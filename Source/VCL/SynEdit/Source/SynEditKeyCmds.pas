@@ -27,28 +27,24 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditKeyCmds.pas,v 1.26 2007/01/23 07:19:38 etrusco Exp $
+$Id: SynEditKeyCmds.pas,v 1.23.2.4 2008/09/14 16:24:58 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
 
 Known Issues:
 -------------------------------------------------------------------------------}
+// TODO: introduce friendly Names for the Commands (EditorCommandStrs is not good enough for end-users)
 
-{$IFNDEF QSYNEDITKEYCMDS}
 unit SynEditKeyCmds;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QMenus,
-{$ELSE}
   Menus,
-{$ENDIF}
+  SynUnicode,
   Classes,
   SysUtils;
 
@@ -137,6 +133,7 @@ const
   ecLineSelect      = 233;  // Line selection mode
 
   ecMatchBracket    = 250;  // Go to matching bracket
+  ecCommentBlock    = 251;  // Comment Block
 
   ecGotoMarker0     = 301;  // Goto marker
   ecGotoMarker1     = 302;  // Goto marker
@@ -175,9 +172,7 @@ const
   ecLineBreak       = 509;  // Break line at current position, move caret to new line
   ecInsertLine      = 510;  // Break line at current position, leave caret
   ecChar            = 511;  // Insert a character at current position
-  ecDuplicateLine   = 512;  // Duplicate current line
-  ecMoveSelUp       = 513;  // Move selection up
-  ecMoveSelDown     = 514;  // Move selection down
+
   ecImeStr          = 550;  // Insert character(s) from IME
 
   ecUndo            = 601;  // Perform undo if available
@@ -189,11 +184,7 @@ const
   ecBlockUnindent   = 611;  // Unindent selection
   ecTab             = 612;  // Tab key
   ecShiftTab        = 613;  // Shift+Tab key
-  ecComment         = 614;
-  ecUncomment       = 615;
-  ecToggleComment   = 616;
-  ecCommentInline   = 617;
-  
+
   ecAutoCompletion  = 650;
 
   ecUpperCase       = 620; // apply to the current or previous word
@@ -206,16 +197,22 @@ const
 
   ecString          = 630;  //Insert a whole string
 
-  ecUserFirst       = 1001; // Start of user-defined commands
+  //++ CodeFolding
+  ecFoldAll         = 701;
+  ecUnfoldAll       = 702;
+  ecFoldNearest     = 705;
+  ecUnfoldNearest   = 706;
+  ecFoldLevel1      = 711;
+  ecFoldLevel2      = 712;
+  ecFoldLevel3      = 713;
+  ecUnfoldLevel1    = 721;
+  ecUnfoldLevel2    = 722;
+  ecUnfoldLevel3    = 723;
+  ecFoldRegions      = 731;
+  ecUnfoldRegions    = 732;
+  //-- CodeFolding
 
-  //### Code Folding ###
-  ecCollapse = ecUserFirst + 100;
-  ecUncollapse = ecUserFirst + 101;
-  ecCollapseLevel = ecUserFirst + 102;
-  ecUncollapseLevel = ecUserFirst + 103;
-  ecCollapseAll = ecUserFirst + 104;
-  ecUncollapseAll = ecUserFirst + 105;
-  //### End Code Folding ###
+  ecUserFirst       = 1001; // Start of user-defined commands
 
 type
   ESynKeyError = class(Exception);
@@ -239,15 +236,11 @@ type
     procedure SetShortCut(const Value: TShortCut);
     procedure SetShortCut2(const Value: TShortCut);
   protected
-{$IFDEF SYN_COMPILER_3_UP}
     function GetDisplayName: string; override;
-{$ENDIF}
   public
     procedure Assign(Source: TPersistent); override;
-{begin}                                                                         //ac 2000-07-05
     procedure LoadFromStream(AStream: TStream);
     procedure SaveToStream(AStream: TStream);
-{end}                                                                           //ac 2000-07-05
     // No duplicate checking is done if assignment made via these properties!
     property Key: word read FKey write SetKey;
     property Key2: word read FKey2 write SetKey2;
@@ -256,9 +249,9 @@ type
   published
     property Command: TSynEditorCommand read FCommand write SetCommand;
     property ShortCut: TShortCut read GetShortCut write SetShortCut
-      default 0;                                                                //mh 2000-11-07
+      default 0;
     property ShortCut2: TShortCut read GetShortCut2 write SetShortCut2
-      default 0;                                                                //mh 2000-11-07
+      default 0;
   end;
 
   TSynEditKeyStrokes = class(TCollection)
@@ -267,14 +260,15 @@ type
     function GetItem(Index: Integer): TSynEditKeyStroke;
     procedure SetItem(Index: Integer; Value: TSynEditKeyStroke);
   protected
-{$IFDEF SYN_COMPILER_3_UP}
     function GetOwner: TPersistent; override;
-{$ENDIF}
   public
     constructor Create(AOwner: TPersistent);
     function Add: TSynEditKeyStroke;
+//++ CodeFolding
     procedure AddKey(const ACmd: TSynEditorCommand; const AKey: word;
-       const AShift: TShiftState);
+       const AShift: TShiftState; const AKey2: word = 0;
+       const AShift2: TShiftState = []);
+//-- CodeFolding
     procedure Assign(Source: TPersistent); override;
     function FindCommand(Cmd: TSynEditorCommand): integer;
     function FindKeycode(Code: word; SS: TShiftState): integer;
@@ -282,9 +276,9 @@ type
       Code2: word; SS2: TShiftState): integer;
     function FindShortcut(SC: TShortcut): integer;
     function FindShortcut2(SC, SC2: TShortcut): integer;
-    procedure LoadFromStream(AStream: TStream);                                 //ac 2000-07-05
+    procedure LoadFromStream(AStream: TStream);
     procedure ResetDefaults;
-    procedure SaveToStream(AStream: TStream);                                   //ac 2000-07-05
+    procedure SaveToStream(AStream: TStream);
   public
     property Items[Index: Integer]: TSynEditKeyStroke read GetItem
       write SetItem; default;
@@ -296,42 +290,27 @@ function EditorCommandToDescrString(Cmd: TSynEditorCommand): string;
 function EditorCommandToCodeString(Cmd: TSynEditorCommand): string;
 procedure GetEditorCommandValues(Proc: TGetStrProc);
 procedure GetEditorCommandExtended(Proc: TGetStrProc);
-function IdentToEditorCommand(const Ident: string; var Cmd: longint): boolean;
-function EditorCommandToIdent(Cmd: longint; var Ident: string): boolean;
-function ConvertCodeStringToExtended(AString : String) : String;
-function ConvertExtendedToCodeString(AString : String) : String;
-function ConvertExtendedToCommand(AString : String) : TSynEditorCommand;
-function ConvertCodeStringToCommand(AString : String) : TSynEditorCommand;
-function IndexToEditorCommand(const AIndex: Integer) : Integer;
+function IdentToEditorCommand(const Ident: string; var Cmd: Integer): Boolean;
+function EditorCommandToIdent(Cmd: Integer; var Ident: string): Boolean;
+function ConvertCodeStringToExtended(AString: string): string;
+function ConvertExtendedToCodeString(AString: string): string;
+function ConvertExtendedToCommand(AString: string): TSynEditorCommand;
+function ConvertCodeStringToCommand(AString: string): TSynEditorCommand;
+function IndexToEditorCommand(const AIndex: Integer): Integer;
 
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  kTextDrawer,
-  Types,
-  Qt,
-  QSynEditKeyConst,
-  QSynEditStrConst;
-{$ELSE}
   Windows,
   SynEditKeyConst,
   SynEditStrConst;
-{$ENDIF}
 
 { Command mapping routines }
 
-{$IFDEF SYN_COMPILER_2}
-// This is defined in D3/C3 and up.
-type
-  TIdentMapEntry = record
-    Value: TSynEditorCommand;
-    Name: string;
-  end;
-{$ENDIF}
-
 const
-  EditorCommandStrs: array[0..100] of TIdentMapEntry = (
+//++ CodeFolding
+  EditorCommandStrs: array[0..112] of TIdentMapEntry = (
+//-- CodeFolding
     (Value: ecNone; Name: 'ecNone'),
     (Value: ecLeft; Name: 'ecLeft'),
     (Value: ecRight; Name: 'ecRight'),
@@ -380,7 +359,6 @@ const
     (Value: ecLineBreak; Name: 'ecLineBreak'),
     (Value: ecInsertLine; Name: 'ecInsertLine'),
     (Value: ecChar; Name: 'ecChar'),
-    (Value: ecDuplicateLine; Name: 'ecDuplicateLine'),
     (Value: ecImeStr; Name: 'ecImeStr'),
     (Value: ecUndo; Name: 'ecUndo'),
     (Value: ecRedo; Name: 'ecRedo'),
@@ -399,12 +377,13 @@ const
     (Value: ecTab; Name: 'ecTab'),
     (Value: ecShiftTab; Name: 'ecShiftTab'),
     (Value: ecMatchBracket; Name: 'ecMatchBracket'),
+    (Value: ecCommentBlock; Name: 'ecCommentBlock'),
     (Value: ecNormalSelect; Name: 'ecNormalSelect'),
     (Value: ecColumnSelect; Name: 'ecColumnSelect'),
     (Value: ecLineSelect; Name: 'ecLineSelect'),
     (Value: ecAutoCompletion; Name: 'ecAutoCompletion'),
     (Value: ecUserFirst; Name: 'ecUserFirst'),
-    (Value: ecContextHelp; Name: 'ecContextHelp'),				// jj 2001-07-19
+    (Value: ecContextHelp; Name: 'ecContextHelp'),
     (Value: ecGotoMarker0; Name: 'ecGotoMarker0'),
     (Value: ecGotoMarker1; Name: 'ecGotoMarker1'),
     (Value: ecGotoMarker2; Name: 'ecGotoMarker2'),
@@ -432,8 +411,21 @@ const
     (Value: ecUpperCaseBlock; Name: 'ecUpperCaseBlock'),
     (Value: ecLowerCaseBlock; Name: 'ecLowerCaseBlock'),
     (Value: ecToggleCaseBlock; Name: 'ecToggleCaseBlock'),
-    (Value: ecString; Name:'ecString'));
-
+//++ CodeFolding
+    (Value: ecString; Name:'ecString'),
+    (Value: ecFoldAll; Name:'ecFoldAll'),
+    (Value: ecUnfoldAll; Name:'ecUnfoldAll'),
+    (Value: ecFoldNearest; Name:'ecFoldNearest'),
+    (Value: ecUnfoldNearest; Name:'ecUnfoldNearest'),
+    (Value: ecFoldLevel1; Name:'ecFoldLevel1'),
+    (Value: ecFoldLevel2; Name:'ecFoldLevel2'),
+    (Value: ecFoldLevel3; Name:'ecFoldLevel3'),
+    (Value: ecUnfoldLevel1; Name:'ecUnfoldLevel1'),
+    (Value: ecUnfoldLevel2; Name:'ecUnfoldLevel2'),
+    (Value: ecUnfoldLevel3; Name:'ecUnfoldLevel3'),
+    (Value: ecFoldRegions; Name:'ecFoldRanges'),
+    (Value: ecUnfoldRegions; Name:'ecUnfoldRanges'));
+//-- CodeFolding
 procedure GetEditorCommandValues(Proc: TGetStrProc);
 var
   i: integer;
@@ -450,44 +442,14 @@ begin
     Proc(ConvertCodeStringToExtended(EditorCommandStrs[I].Name));
 end;
 
-function IdentToEditorCommand(const Ident: string; var Cmd: longint): boolean;
-{$IFDEF SYN_COMPILER_2}
-var
-  I: Integer;
-{$ENDIF}
+function IdentToEditorCommand(const Ident: string; var Cmd: Integer): boolean;
 begin
-{$IFDEF SYN_COMPILER_2}
-  Result := FALSE;
-  for I := Low(EditorCommandStrs) to High(EditorCommandStrs) do
-    if CompareText(EditorCommandStrs[I].Name, Ident) = 0 then
-    begin
-      Result := TRUE;
-      Cmd := EditorCommandStrs[I].Value;
-      break;
-    end;
-{$ELSE}
     Result := IdentToInt(Ident, Cmd, EditorCommandStrs);
-{$ENDIF}
 end;
 
-function EditorCommandToIdent(Cmd: longint; var Ident: string): boolean;
-{$IFDEF SYN_COMPILER_2}
-var
-  I: Integer;
-{$ENDIF}
+function EditorCommandToIdent(Cmd: Integer; var Ident: string): boolean;
 begin
-{$IFDEF SYN_COMPILER_2}
-  Result := FALSE;
-  for I := Low(EditorCommandStrs) to High(EditorCommandStrs) do
-    if EditorCommandStrs[I].Value = Cmd then
-    begin
-      Result := TRUE;
-      Ident := EditorCommandStrs[I].Name;
-      break;
-    end;
-{$ELSE}
   Result := IntToIdent(Cmd, Ident, EditorCommandStrs);
-{$ENDIF}
 end;
 
 function EditorCommandToDescrString(Cmd: TSynEditorCommand): string;
@@ -517,7 +479,6 @@ begin
     inherited Assign(Source);
 end;
 
-{$IFDEF SYN_COMPILER_3_UP}
 function TSynEditKeyStroke.GetDisplayName: string;
 begin
   Result := EditorCommandToCodeString(Command) + ' - ' + ShortCutToText(ShortCut);
@@ -526,15 +487,10 @@ begin
   if Result = '' then
     Result := inherited GetDisplayName;
 end;
-{$ENDIF}
 
 function TSynEditKeyStroke.GetShortCut: TShortCut;
 begin
-{$IFDEF SYN_CLX}
-  Result := QMenus.ShortCut(Key, Shift);
-{$ELSE}
   Result := Menus.ShortCut(Key, Shift);
-{$ENDIF}
 end;
 
 procedure TSynEditKeyStroke.SetCommand(const Value: TSynEditorCommand);
@@ -566,17 +522,13 @@ begin
   begin
     // Check for duplicate shortcut in the collection and disallow if there is.
     Dup := TSynEditKeyStrokes(Collection).FindShortcut2(Value, ShortCut2);
-    if (Dup <> -1) and (Collection.Items[Dup] <> Self) then
+    if (Dup <> -1) and (Dup <> Self.Index) then
       begin
       raise ESynKeyError.Create(SYNS_EDuplicateShortCut);
       end;
   end;
 
-{$IFDEF SYN_CLX}  //js 06-04-2002 use qmenus, not menus in clx
-  QMenus.ShortCutToKey(Value, NewKey, NewShift);
-{$ELSE}
   Menus.ShortCutToKey(Value, NewKey, NewShift);
-{$ENDIF}
 
   if (NewKey <> Key) or (NewShift <> Shift) then
   begin
@@ -608,15 +560,11 @@ begin
   begin
     // Check for duplicate shortcut in the collection and disallow if there is.
     Dup := TSynEditKeyStrokes(Collection).FindShortcut2(ShortCut, Value);
-    if (Dup <> -1) and (Collection.Items[Dup] <> Self) then
+    if (Dup <> -1) and (Dup <> Self.Index) then
       raise ESynKeyError.Create(SYNS_EDuplicateShortCut);
   end;
 
-{$IFDEF SYN_CLX}
-  QMenus.ShortCutToKey(Value, NewKey, NewShift);
-{$ELSE}
   Menus.ShortCutToKey(Value, NewKey, NewShift);
-{$ENDIF}
   if (NewKey <> Key2) or (NewShift <> Shift2) then
   begin
     Key2 := NewKey;
@@ -626,14 +574,9 @@ end;
 
 function TSynEditKeyStroke.GetShortCut2: TShortCut;
 begin
-{$IFDEF SYN_CLX}
-  Result := QMenus.ShortCut(Key2, Shift2);
-{$ELSE}
   Result := Menus.ShortCut(Key2, Shift2);
-{$ENDIF}
 end;
 
-{begin}                                                                         //ac 2000-07-05
 procedure TSynEditKeyStroke.LoadFromStream(AStream: TStream);
 begin
   with AStream do begin
@@ -655,7 +598,7 @@ begin
     Write(fCommand, SizeOf(fCommand));
   end;
 end;
-{end}                                                                           //ac 2000-07-05
+
 
 { TSynEditKeyStrokes }
 
@@ -664,8 +607,9 @@ begin
   Result := TSynEditKeyStroke(inherited Add);
 end;
 
+//++ CodeFolding
 procedure TSynEditKeyStrokes.AddKey(const ACmd: TSynEditorCommand; const AKey: word;
-  const AShift: TShiftState);
+  const AShift: TShiftState; const AKey2: word; const AShift2: TShiftState);
 var
   NewKeystroke: TSynEditKeyStroke;
 begin
@@ -673,12 +617,15 @@ begin
   try
     NewKeystroke.Key := AKey;
     NewKeystroke.Shift := AShift;
+    NewKeystroke.Key2 := AKey2;
+    NewKeystroke.Shift2 := AShift2;
     NewKeystroke.Command := ACmd;
   except
     NewKeystroke.Free;
     raise;
   end;
 end;
+//-- CodeFolding
 
 procedure TSynEditKeyStrokes.Assign(Source: TPersistent);
 var
@@ -692,7 +639,8 @@ begin
       with Add do
         Assign(TSynEditKeyStrokes(Source)[x]);
     end;
-  end else
+  end
+  else
     inherited Assign(Source);
 end;
 
@@ -774,14 +722,11 @@ begin
  Result := TSynEditKeyStroke(inherited GetItem(Index));
 end;
 
-{$IFDEF SYN_COMPILER_3_UP}
 function TSynEditKeyStrokes.GetOwner: TPersistent;
 begin
   Result := FOwner;
 end;
-{$ENDIF}
 
-{begin}                                                                         //ac 2000-07-05
 procedure TSynEditKeyStrokes.LoadFromStream(AStream: TStream);
 var
   Num: integer;
@@ -794,7 +739,6 @@ begin
     Dec(Num);
   end;
 end;
-{end}                                                                           //ac 2000-07-05
 
 procedure TSynEditKeyStrokes.ResetDefaults;
 begin
@@ -883,6 +827,18 @@ begin
   AddKey(ecColumnSelect, ord('C'), [ssCtrl,ssShift]);
   AddKey(ecLineSelect, ord('L'), [ssCtrl,ssShift]);
   AddKey(ecMatchBracket, ord('B'), [ssCtrl,ssShift]);
+//++ CodeFolding
+  AddKey(ecFoldAll, VK_OEM_MINUS, [ssCtrl, ssShift]);   {- _}
+  AddKey(ecUnfoldAll,  VK_OEM_PLUS, [ssCtrl, ssShift]); {= +}
+  AddKey(ecFoldNearest, VK_OEM_2, [ssCtrl]);  // Divide {'/'}
+  AddKey(ecUnfoldNearest, VK_OEM_2, [ssCtrl, ssShift]);
+  AddKey(ecFoldLevel1, ord('K'), [ssCtrl], Ord('1'), [ssCtrl]);
+  AddKey(ecFoldLevel2, ord('K'), [ssCtrl], Ord('2'), [ssCtrl]);
+  AddKey(ecFoldLevel3, ord('K'), [ssCtrl], Ord('3'), [ssCtrl]);
+  AddKey(ecUnfoldLevel1, ord('K'), [ssCtrl, ssShift], Ord('1'), [ssCtrl, ssShift]);
+  AddKey(ecUnfoldLevel2, ord('K'), [ssCtrl, ssShift], Ord('2'), [ssCtrl, ssShift]);
+  AddKey(ecUnfoldLevel3, ord('K'), [ssCtrl, ssShift], Ord('3'), [ssCtrl, ssShift]);
+//-- CodeFolding
 end;
 
 procedure TSynEditKeyStrokes.SetItem(Index: Integer; Value: TSynEditKeyStroke);
@@ -890,7 +846,6 @@ begin
  inherited SetItem(Index, Value);
 end;
 
-{begin}                                                                         //ac 2000-07-05
 procedure TSynEditKeyStrokes.SaveToStream(AStream: TStream);
 var
   i, Num: integer;
@@ -900,50 +855,54 @@ begin
   for i := 0 to Num - 1 do
     Items[i].SaveToStream(AStream);
 end;
-{end}                                                                           //ac 2000-07-05
 
-{begin}                                                                         //ddh 10/16/01 "English" Code Strings
-Function ConvertCodeStringToExtended(AString : String) : String;
-VAR i : integer;
-    WorkStr : String;
+function ConvertCodeStringToExtended(AString: string): string;
+var
+  i: integer;
+  WorkStr: string;
 begin
   if pos('ec', AString) = 1 then
   begin
-    delete(AString,1,2);
+    Delete(AString, 1, 2);
     WorkStr := '';
 
     for i := length(AString) downto 1 do
-      if (AString[i] in ['A'..'Z', '0'..'9']) and (i > 1) and
-         not(AString[i - 1] in ['A'..'Z', '0'..'9']) then
+      if CharInSet(AString[i], ['A'..'Z', '0'..'9']) and (i > 1) and
+         not CharInSet(AString[i - 1], ['A'..'Z', '0'..'9']) then
       begin
         WorkStr := ' ' + AString[i] + WorkStr
-      end else WorkStr := AString[i] + WorkStr;
+      end
+      else
+        WorkStr := AString[i] + WorkStr;
 
     trim(WorkStr);
 
     i := pos('Sel ', WorkStr);
     while i <> 0 do
     begin
-      Delete(WorkStr,i,Length('Sel '));
-      Insert('Select ',WorkStr,i);
+      Delete(WorkStr, i, Length('Sel '));
+      Insert('Select ', WorkStr, i);
       i := pos('Sel ', WorkStr);
     end;
 
     i := pos('Marker ', WorkStr);
     while i <> 0 do
     begin
-      Delete(WorkStr,i,Length('Marker '));
-      Insert('Bookmark ',WorkStr,i);
+      Delete(WorkStr, i, Length('Marker '));
+      Insert('Bookmark ', WorkStr,i);
       i := pos('Marker ', WorkStr);
     end;
 
-    Result := trim(WorkStr);
-  end else Result := AString;
+    Result := Trim(WorkStr);
+  end
+  else
+    Result := AString;
 end;
 
-Function ConvertExtendedToCodeString(AString : String) : String;
-VAR i : integer;
-    WorkStr : String;
+function ConvertExtendedToCodeString(AString: string): string;
+var
+  i: Integer;
+  WorkStr: string;
 begin
   if pos('ec', AString) = 1 then
   begin
@@ -974,7 +933,7 @@ begin
   end;
 
   i := pos(' ', WorkStr);
-  While i <> 0 do
+  while i <> 0 do
   begin
     delete(WorkStr,i,1);
     i := pos(' ', WorkStr);
@@ -983,18 +942,19 @@ begin
   Result := 'ec' + WorkStr;
 end;
 
-function IndexToEditorCommand(const AIndex: Integer) : Integer;
+function IndexToEditorCommand(const AIndex: Integer): Integer;
 begin
   Result := EditorCommandStrs[AIndex].Value;
 end;
 
-function ConvertExtendedToCommand(AString : String) : TSynEditorCommand;
+function ConvertExtendedToCommand(AString: string): TSynEditorCommand;
 begin
   Result := ConvertCodeStringToCommand(ConvertExtendedToCodeString(AString));
 end;
 
-function ConvertCodeStringToCommand(AString : String) : TSynEditorCommand;
-var I: Integer;
+function ConvertCodeStringToCommand(AString: string): TSynEditorCommand;
+var
+  I: Integer;
 begin
   Result := ecNone;
 
@@ -1007,8 +967,6 @@ begin
     end;
 end;
 
-
-{end}                                                                           //ddh 10/16/01 "English" code strings
 
 initialization
   RegisterIntegerConsts(TypeInfo(TSynEditorCommand), IdentToEditorCommand,

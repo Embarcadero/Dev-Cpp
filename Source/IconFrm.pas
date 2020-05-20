@@ -41,10 +41,10 @@ type
     procedure IconViewDblClick(Sender: TObject);
    private
     procedure LoadText;
-    function AddItem(const FileName: AnsiString): TListItem;
-    function GetSelected: AnsiString;
+    function AddItem(const FileName: String): TListItem;
+    function GetSelected: String;
    public
-    property Selected: AnsiString read GetSelected;
+    property Selected: String read GetSelected;
   end;
 
 { ** modify with browse ablity - include options to copy ico to directory}
@@ -83,7 +83,7 @@ end;
 procedure TIconForm.FormCreate(Sender: TObject);
 var
 	SRec: TSearchRec;
-	SFile: AnsiString;
+	SFile: String;
 begin
 	LoadText;
 	with IconView do try
@@ -108,7 +108,7 @@ begin
   ImageList.Clear;
 end;
 
-function TIconForm.GetSelected: AnsiString;
+function TIconForm.GetSelected: String;
 begin
   if assigned(IconView.Selected) then
    result:= IconView.Selected.SubItems[0]
@@ -116,11 +116,11 @@ begin
    result:= '';
 end;
 
-function TIconForm.AddItem(const FileName: AnsiString): TListItem;
+function TIconForm.AddItem(const FileName: String): TListItem;
 var
  icon: TIcon;
  Item: TListItem;
- fFile: AnsiString;
+ fFile: String;
 begin
   Item:= IconView.Items.Add;
   //full path is passed from FormCreate
@@ -137,7 +137,7 @@ begin
 end;
 
 procedure TIconForm.IconViewInfoTip(Sender: TObject; Item: TListItem;
-  var InfoTip: AnsiString);
+  var InfoTip: String);
 begin
   InfoTip:= Item.SubItems[0];
 end;

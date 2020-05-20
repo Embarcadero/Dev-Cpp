@@ -24,13 +24,13 @@ unit main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, System.UITypes,
   Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils, SynEditPrint,
   Project, editor, DateUtils, compiler, ActnList, ToolFrm, AppEvnts,
   debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer, SyncObjs,
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
   devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg, SynEditTextBuffer,
-  CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm;
+  CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm, System.Actions;
 
 type
   TRunEndAction = (reaNone, reaProfile);
@@ -668,7 +668,7 @@ type
     procedure actRunUpdate(Sender: TObject);
     procedure actCompileRunUpdate(Sender: TObject);
     procedure actCompileUpdate(Sender: TObject);
-    procedure FileMonitorNotifyChange(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: string);
+    procedure FileMonitorNotifyChange(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: String);
     procedure actFilePropertiesExecute(Sender: TObject);
     procedure actViewToDoListExecute(Sender: TObject);
     procedure actAddToDoExecute(Sender: TObject);
@@ -806,20 +806,20 @@ type
     fDebugger: TDebugger;
     fCompiler: TCompiler;
     fEditorList: TEditorList;
-    fCurrentPageHint: AnsiString;
+    fCurrentPageHint: String;
     fLogOutputRawData: TStringList;
     fCriticalSection: TCriticalSection; // protects fFilesToOpen
     fFilesToOpen: TStringList; // files to open on show
-    function ParseToolParams(s: AnsiString): AnsiString;
+    function ParseToolParams(s: String): String;
     procedure BuildBookMarkMenus;
     procedure SetHints;
     procedure MRUClick(Sender: TObject);
     procedure CodeInsClick(Sender: TObject);
     procedure ToolItemClick(Sender: TObject);
     procedure WMDropFiles(var msg: TMessage); message WM_DROPFILES;
-    procedure LogEntryProc(const Msg: AnsiString);
-    procedure CompOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
-    procedure CompResOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
+    procedure LogEntryProc(const Msg: String);
+    procedure CompOutputProc(const _Line, _Col, _Unit, _Message: String);
+    procedure CompResOutputProc(const _Line, _Col, _Unit, _Message: String);
     procedure CompEndProc;
     procedure CompSuccessProc;
     procedure RunEndProc;
@@ -844,23 +844,23 @@ type
     function GetCompileTarget: TTarget;
     procedure UpdateAppTitle;
     procedure OpenCloseMessageSheet(Open: boolean);
-    procedure OpenFile(const FileName: AnsiString);
+    procedure OpenFile(const FileName: String);
     procedure OpenFileList(List: TStringList);
-    procedure OpenProject(const s: AnsiString);
-    procedure GotoBreakpoint(const FileName: AnsiString; Line: integer);
+    procedure OpenProject(const s: String);
+    procedure GotoBreakpoint(const FileName: String; Line: integer);
     procedure RemoveActiveBreakpoints;
-    procedure AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
+    procedure AddFindOutputItem(const line, col, filename, msg, keyword: String);
     procedure EditorSaveTimer(sender: TObject);
-    procedure OnInputEvalReady(const evalvalue: AnsiString);
+    procedure OnInputEvalReady(const evalvalue: String);
     procedure SetStatusbarLineCol;
-    procedure SetStatusbarMessage(const msg: AnsiString);
+    procedure SetStatusbarMessage(const msg: String);
 
     // Hide variables
     property AutoSaveTimer: TTimer read fAutoSaveTimer write fAutoSaveTimer;
     property Project: TProject read fProject write fProject;
     property Debugger: TDebugger read fDebugger write fDebugger;
     property EditorList: TEditorList read fEditorList write fEditorList;
-    property CurrentPageHint: AnsiString read fCurrentPageHint write fCurrentPageHint;
+    property CurrentPageHint: String read fCurrentPageHint write fCurrentPageHint;
   end;
 
 var
@@ -996,7 +996,7 @@ end;
 procedure TMainForm.BuildBookMarkMenus;
 var
   idx: integer;
-  Text: AnsiString;
+  Text: String;
   Shortcutnumber: Word;
   GItem, TItem: TMenuItem;
 begin
@@ -1350,7 +1350,8 @@ begin
       e.Text.DisplayX,
         e.Text.SelLength,
         e.Text.Lines.Count,
-        e.Text.Lines.GetTextLength]);
+        // TODO: Lift. Is e.Text.Lines.GetTextLength the same as e.Text.Lines.Text.Length
+        e.Text.Lines.Text.Length]);
   end else begin
     StatusBar.Panels.BeginUpdate;
     try
@@ -1363,7 +1364,7 @@ begin
   end;
 end;
 
-procedure TMainForm.SetStatusbarMessage(const msg: AnsiString);
+procedure TMainForm.SetStatusbarMessage(const msg: String);
 begin
   Statusbar.Panels[2].Text := msg;
 end;
@@ -1428,7 +1429,7 @@ end;
 
 procedure TMainForm.MRUClick(Sender: TObject);
 var
-  s: AnsiString;
+  s: String;
 begin
   s := PMRUItem(dmMain.MRU[TMenuItem(Sender).Tag])^.FileName;
   if FileExists(s) then begin
@@ -1459,9 +1460,9 @@ begin // TODO: ask on SO
     ExecuteFile(ParseToolParams(Exec), ParseToolParams(Params), ParseToolParams(WorkDir), SW_SHOW);
 end;
 
-procedure TMainForm.OpenProject(const s: AnsiString);
+procedure TMainForm.OpenProject(const s: String);
 var
-  s2: AnsiString;
+  s2: String;
 begin
   if Assigned(fProject) then begin
     if fProject.Name = '' then
@@ -1498,7 +1499,7 @@ begin
   end;
 end;
 
-procedure TMainForm.OpenFile(const FileName: AnsiString);
+procedure TMainForm.OpenFile(const FileName: String);
 var
   e: TEditor;
 begin
@@ -1511,7 +1512,7 @@ begin
 
   // Issue an error if it doesn't exist
   if not FileExists(FileName) then begin
-    MessageBox(Application.Handle, PAnsiChar(Format(Lang[ID_ERR_FILENOTFOUND], [FileName])), PChar(Lang[ID_ERROR]),
+    MessageBox(Application.Handle, PChar(Format(Lang[ID_ERR_FILENOTFOUND], [FileName])), PChar(Lang[ID_ERROR]),
       MB_ICONHAND);
     Exit;
   end;
@@ -1561,7 +1562,7 @@ begin
   end;
 end;
 
-procedure TMainForm.AddFindOutputItem(const line, col, filename, msg, keyword: AnsiString);
+procedure TMainForm.AddFindOutputItem(const line, col, filename, msg, keyword: String);
 var
   ListItem: TListItem;
 begin
@@ -1574,7 +1575,7 @@ begin
   ListItem.SubItems.Add(msg);
 end;
 
-function TMainForm.ParseToolParams(s: AnsiString): AnsiString;
+function TMainForm.ParseToolParams(s: String): String;
 resourcestring
   cEXEName = '<EXENAME>';
   cPrjName = '<PROJECTNAME>';
@@ -1670,7 +1671,7 @@ begin
   Result := s;
 end;
 
-procedure TMainForm.CompOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
+procedure TMainForm.CompOutputProc(const _Line, _Col, _Unit, _Message: String);
 begin
   with CompilerOutput.Items.Add do begin
     Caption := _Line;
@@ -1683,7 +1684,7 @@ begin
   CompSheet.Caption := Lang[ID_SHEET_COMP] + ' (' + IntToStr(CompilerOutput.Items.Count) + ')'
 end;
 
-procedure TMainForm.CompResOutputProc(const _Line, _Col, _Unit, _Message: AnsiString);
+procedure TMainForm.CompResOutputProc(const _Line, _Col, _Unit, _Message: String);
 begin
   with ResourceOutput.Items.Add do begin
     Caption := _Line;
@@ -1795,9 +1796,9 @@ begin
   fRunEndAction := reaNone;
 end;
 
-procedure TMainForm.LogEntryProc(const Msg: AnsiString);
+procedure TMainForm.LogEntryProc(const Msg: String);
 var
-  BackSlashMsg: AnsiString;
+  BackSlashMsg: String;
 begin
   // Keep original, but use backslash everywhere
   BackSlashMsg := StringReplace(Msg, '/', '\', [rfReplaceAll]);
@@ -1905,7 +1906,7 @@ end;
 
 procedure TMainForm.actNewProjectExecute(Sender: TObject);
 var
-  s: AnsiString;
+  s: String;
 begin
   with TNewProjectForm.Create(nil) do try
     rbCpp.Checked := devData.DefCpp;
@@ -1946,7 +1947,7 @@ begin
           // Assign the selected template to it
           if not fProject.AssignTemplate(s, GetTemplate) then begin
             FreeAndNil(fProject);
-            MessageBox(Application.Handle, PAnsiChar(Lang[ID_ERR_TEMPLATE]), PAnsiChar(Lang[ID_ERROR]), MB_OK or
+            MessageBox(Application.Handle, PChar(Lang[ID_ERR_TEMPLATE]), PChar(Lang[ID_ERROR]), MB_OK or
               MB_ICONERROR);
             Exit;
           end;
@@ -2059,7 +2060,7 @@ end;
 
 procedure TMainForm.actCloseProjectExecute(Sender: TObject);
 var
-  s: AnsiString;
+  s: String;
 begin
   // Stop executing program
   actStopExecuteExecute(Self);
@@ -2443,7 +2444,7 @@ end;
 procedure TMainForm.actUnitRenameExecute(Sender: TObject);
 var
   I, ProjIndex: integer;
-  OldName, NewName, CurDir: AnsiString;
+  OldName, NewName, CurDir: String;
   e: TEditor;
 begin
   if not assigned(fProject) then
@@ -2637,7 +2638,7 @@ end;
 procedure TMainForm.actFindExecute(Sender: TObject);
 var
   e: TEditor;
-  s: AnsiString;
+  s: String;
 begin
   e := fEditorList.GetEditor;
   if Assigned(e) then begin
@@ -2659,7 +2660,7 @@ end;
 procedure TMainForm.actFindAllExecute(Sender: TObject);
 var
   e: TEditor;
-  s: AnsiString;
+  s: String;
 begin
   e := fEditorList.GetEditor;
   if Assigned(e) then begin
@@ -2681,7 +2682,7 @@ end;
 procedure TMainForm.actReplaceExecute(Sender: TObject);
 var
   e: TEditor;
-  s: AnsiString;
+  s: String;
 begin
   e := fEditorList.GetEditor;
   if Assigned(e) then begin
@@ -2703,7 +2704,7 @@ end;
 procedure TMainForm.actReplaceAllExecute(Sender: TObject);
 var
   e: TEditor;
-  s: AnsiString;
+  s: String;
 begin
   e := fEditorList.GetEditor;
   if Assigned(e) then begin
@@ -2995,7 +2996,7 @@ procedure TMainForm.actDebugExecute(Sender: TObject);
 var
   e: TEditor;
   i: integer;
-  filepath: AnsiString;
+  filepath: String;
   DebugEnabled, StripEnabled: boolean;
 begin
   case GetCompileTarget of
@@ -3205,7 +3206,8 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  TCustomAction(Sender).Enabled := Assigned(e) and not e.Text.IsEmpty;
+  // TODO: Lift. Is e.Text.IsEmpty the same as e.Text.Lines.Text.IsEmpty?
+  TCustomAction(Sender).Enabled := Assigned(e) and not e.Text.Lines.Text.IsEmpty;
 end;
 
 procedure TMainForm.actUpdateDebuggerRunning(Sender: TObject);
@@ -3405,7 +3407,7 @@ end;
 procedure TMainForm.actMsgSaveAllExecute(Sender: TObject);
 var
   i: integer;
-  fulloutput: AnsiString;
+  fulloutput: String;
   Stream: TFileStream;
   e: TEditor;
 begin
@@ -3586,7 +3588,7 @@ end;
 
 procedure TMainForm.actAddWatchExecute(Sender: TObject);
 var
-  s: AnsiString;
+  s: String;
   e: TEditor;
 begin
   s := '';
@@ -3641,7 +3643,7 @@ begin
     fEditorList[i].RemoveBreakpointFocus;
 end;
 
-procedure TMainForm.GotoBreakpoint(const FileName: AnsiString; Line: integer);
+procedure TMainForm.GotoBreakpoint(const FileName: String; Line: integer);
 var
   e: TEditor;
 begin
@@ -3889,7 +3891,7 @@ end;
 procedure TMainForm.actSwapHeaderSourceExecute(Sender: TObject);
 var
   FromEditor, ToEditor: TEditor;
-  CFile, HFile, ToFile: AnsiString;
+  CFile, HFile, ToFile: String;
   iscfile, ishfile: boolean;
 begin
   FromEditor := fEditorList.GetEditor;
@@ -3954,7 +3956,7 @@ var
   e: TEditor;
   i: integer;
   EditorSaveList: TList;
-  NewFileName: AnsiString;
+  NewFileName: String;
 begin
   EditorSaveList := TList.Create;
   try
@@ -4126,8 +4128,9 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if Assigned(e) then
-    e.Text.CommandProcessor(ecComment, #0, nil);
+  // TODO: Lift. Find ecComment. There is ecCommentBlock now but not the same?
+  {if Assigned(e) then
+    e.Text.CommandProcessor(ecComment, #0, nil); }
 end;
 
 procedure TMainForm.actUncommentExecute(Sender: TObject);
@@ -4135,8 +4138,9 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if Assigned(e) then
-    e.Text.CommandProcessor(ecUncomment, #0, nil);
+  // TODO: Lift. Find ecUnComment.
+{  if Assigned(e) then
+    e.Text.CommandProcessor(ecUncomment, #0, nil);  }
 end;
 
 procedure TMainForm.actToggleCommentExecute(Sender: TObject);
@@ -4144,8 +4148,9 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if Assigned(e) then
-    e.Text.CommandProcessor(ecToggleComment, #0, nil);
+  // TODO: Lift. Find ecToggleComment.
+{  if Assigned(e) then
+    e.Text.CommandProcessor(ecToggleComment, #0, nil);}
 end;
 
 procedure TMainForm.actIndentExecute(Sender: TObject);
@@ -4256,7 +4261,7 @@ procedure TMainForm.actBrowserGotoDeclarationExecute(Sender: TObject);
 var
   Editor: TEditor;
   Node: TTreeNode;
-  FileName: AnsiString;
+  FileName: String;
   Line: integer;
   Statement: PStatement;
 begin
@@ -4274,7 +4279,7 @@ procedure TMainForm.actBrowserGotoDefinitionExecute(Sender: TObject);
 var
   Editor: TEditor;
   Node: TTreeNode;
-  FileName: AnsiString;
+  FileName: String;
   Line: integer;
   Statement: PStatement;
 begin
@@ -4386,7 +4391,7 @@ end;
 procedure TMainForm.actProfileExecute(Sender: TObject);
 var
   ProfilingEnabled, StripEnabled: boolean;
-  path: AnsiString;
+  path: String;
   e: TEditor;
 begin
   case GetCompileTarget of
@@ -4493,7 +4498,7 @@ begin
   end;
 end;
 
-procedure TMainForm.FileMonitorNotifyChange(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: string);
+procedure TMainForm.FileMonitorNotifyChange(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: String);
 var
   e: TEditor;
   p: TBufferCoord;
@@ -4560,7 +4565,7 @@ end;
 
 procedure TMainForm.actProjectNewFolderExecute(Sender: TObject);
 var
-  fp, S: AnsiString;
+  fp, S: String;
 begin
   S := 'New folder';
   if InputQuery(Lang[ID_POP_ADDFOLDER], Lang[ID_MSG_ADDBROWSERFOLDER], S) and (S <> '') then begin
@@ -4594,7 +4599,7 @@ end;
 
 procedure TMainForm.actProjectRenameFolderExecute(Sender: TObject);
 var
-  S: AnsiString;
+  S: String;
 begin
   if Assigned(ProjectView.Selected) and (ProjectView.Selected.Data = Pointer(-1)) then begin
     S := ProjectView.Selected.Text;
@@ -4766,7 +4771,7 @@ end;
 
 procedure TMainForm.DevCppDDEServerExecuteMacro(Sender: TObject; Msg: TStrings);
 var
-  filename: AnsiString;
+  filename: String;
   i, n: Integer;
 begin
   if Msg.Count > 0 then begin
@@ -5188,7 +5193,7 @@ procedure TMainForm.BuildOpenWith;
 var
   idx, idx2: integer;
   item: TMenuItem;
-  ext, s, s1: AnsiString;
+  ext, s, s1: String;
 begin
   mnuOpenWith.Clear;
   if not assigned(fProject) then
@@ -5259,16 +5264,16 @@ begin
 
   if idx > -1 then // devcpp-based
     ShellExecute(0, 'open',
-      PAnsiChar(devExternalPrograms.ProgramName[idx]),
-      PAnsiChar(fProject.Units[idx2].FileName),
-      PAnsiChar(ExtractFilePath(fProject.Units[idx2].FileName)),
+      PChar(devExternalPrograms.ProgramName[idx]),
+      PChar(fProject.Units[idx2].FileName),
+      PChar(ExtractFilePath(fProject.Units[idx2].FileName)),
       SW_SHOW)
       // idx=-2 means we prompted the user for a program, but didn't select one
   else if idx <> -2 then // registry-based
     ShellExecute(0, 'open',
-      PAnsiChar(fProject.Units[idx2].FileName),
+      PChar(fProject.Units[idx2].FileName),
       nil,
-      PAnsiChar(ExtractFilePath(fProject.Units[idx2].FileName)),
+      PChar(ExtractFilePath(fProject.Units[idx2].FileName)),
       SW_SHOW);
 end;
 
@@ -5276,7 +5281,7 @@ procedure TMainForm.RebuildClassesToolbar;
 var
   Node: PStatementNode;
   Statement: PStatement;
-  OldSelection: AnsiString;
+  OldSelection: String;
 begin
   OldSelection := cmbClasses.Text;
 
@@ -5347,7 +5352,7 @@ var
   Statement: PStatement;
   Line: Integer;
   e: TEditor;
-  FileName: AnsiString;
+  FileName: String;
 begin
   if cmbMembers.ItemIndex = -1 then // sometimes happens too?
     Exit;
@@ -5434,7 +5439,7 @@ end;
 
 procedure TMainForm.actAttachProcessExecute(Sender: TObject);
 var
-  s: AnsiString;
+  s: String;
 begin
   PrepareDebugger;
   if assigned(fProject) then begin
@@ -5461,10 +5466,10 @@ end;
 procedure TMainForm.actModifyWatchExecute(Sender: TObject);
 var
   curnode: TTreeNode;
-  fullname: AnsiString;
-  value: AnsiString;
+  fullname: String;
+  value: String;
 
-  function GetNodeName(node: TTreeNode): AnsiString;
+  function GetNodeName(node: TTreeNode): String;
   var
     epos: integer;
   begin
@@ -5474,7 +5479,7 @@ var
       Result := Copy(node.Text, 1, epos - 1);
   end;
 
-  function GetNodeValue(node: TTreeNode): AnsiString;
+  function GetNodeValue(node: TTreeNode): String;
   var
     epos: integer;
   begin
@@ -5516,7 +5521,7 @@ end;
 
 procedure TMainForm.actDeleteProfileExecute(Sender: TObject);
 var
-  path: AnsiString;
+  path: String;
   e: TEditor;
 begin
   path := '';
@@ -5533,7 +5538,7 @@ begin
   end;
 
   if path <> '' then begin
-    if DeleteFile(PAnsiChar(path)) then begin
+    if DeleteFile(PChar(path)) then begin
       SetStatusbarMessage(Format(Lang[ID_DELETEDPROFDATA], [path]));
     end else
       SetStatusbarMessage(Format(Lang[ID_COULDNOTFINDPROFDATA], [path]));
@@ -5543,7 +5548,7 @@ end;
 procedure TMainForm.actGotoImplDeclEditorExecute(Sender: TObject);
 var
   statement: PStatement;
-  filename, phrase: AnsiString;
+  filename, phrase: String;
   line: integer;
   M: TMemoryStream;
   e: TEditor;
@@ -5663,7 +5668,7 @@ end;
 procedure TMainForm.CompilerOutputAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State:
   TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 var
-  lowersubitem: AnsiString;
+  lowersubitem: String;
 begin
   if StartsStr('[Warning] ', Item.SubItems[2]) then
     Sender.Canvas.Font.Color := TColor($0066FF) // Orange
@@ -5931,7 +5936,7 @@ begin
     try
       CheckAssociations(true); // check and fix
     except
-      MessageBox(Application.Handle, PAnsiChar(Lang[ID_ENV_UACERROR]), PAnsiChar(Lang[ID_ERROR]), MB_OK);
+      MessageBox(Application.Handle, PChar(Lang[ID_ENV_UACERROR]), PChar(Lang[ID_ERROR]), MB_OK);
       devData.CheckAssocs := false; // don't bother again
     end;
   end;
@@ -5952,7 +5957,7 @@ end;
 procedure TMainForm.EditorPageControlMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
   PageIndex: integer;
-  newhint: AnsiString;
+  newhint: String;
   e: TEditor;
   SenderPageControl: TPageControl;
 begin
@@ -5982,7 +5987,7 @@ begin
     e.ToggleBreakPoint(e.Text.CaretY);
 end;
 
-procedure TMainForm.OnInputEvalReady(const evalvalue: AnsiString);
+procedure TMainForm.OnInputEvalReady(const evalvalue: String);
 begin
   EvalOutput.Text := evalvalue;
   EvalOutput.Font.Color := clWindowText;
@@ -6095,20 +6100,20 @@ end;
 procedure TMainForm.FindOutputAdvancedCustomDrawSubItem(Sender: TCustomListView; Item: TListItem; SubItem: Integer;
   State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 var
-  LineToDraw: AnsiString;
+  LineToDraw: String;
   BoldStart, BoldLen, i: integer;
   Rect: TRect;
   OldBrushColor, OldFontColor: TColor;
 
-  procedure Draw(const s: AnsiString);
+  procedure Draw(const s: String);
   var
     sizerect: TRect;
   begin
-    DrawText(Sender.Canvas.Handle, PAnsiChar(s), Length(s), rect, DT_EXPANDTABS or DT_NOCLIP or DT_NOPREFIX);
+    DrawText(Sender.Canvas.Handle, PChar(s), Length(s), rect, DT_EXPANDTABS or DT_NOCLIP or DT_NOPREFIX);
 
     // Get text extent
     FillChar(sizerect, sizeof(sizerect), 0);
-    DrawText(Sender.Canvas.Handle, PAnsiChar(s), Length(s), sizerect, DT_CALCRECT or DT_EXPANDTABS or DT_NOCLIP or
+    DrawText(Sender.Canvas.Handle, PChar(s), Length(s), sizerect, DT_CALCRECT or DT_EXPANDTABS or DT_NOCLIP or
       DT_NOPREFIX);
     Inc(rect.Left, sizerect.Right - sizerect.Left + 1); // 1 extra pixel for extra width caused by bold
   end;
@@ -6364,8 +6369,9 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if Assigned(e) then
-    e.Text.CommandProcessor(ecDuplicateLine, #0, nil);
+  // TODO: Lift. Find ecDuplicateLine.
+{ if Assigned(e) then
+    e.Text.CommandProcessor(ecDuplicateLine, #0, nil);  }
 end;
 
 procedure TMainForm.actMoveSelUpExecute(Sender: TObject);
@@ -6373,8 +6379,9 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if Assigned(e) then
-    e.Text.CommandProcessor(ecMoveSelUp, #0, nil);
+  // TODO: Lift. Find ecMoveSelUp equivalent.
+{  if Assigned(e) then
+    e.Text.CommandProcessor(ecMoveSelUp, #0, nil);}
 end;
 
 procedure TMainForm.actMoveSelDownExecute(Sender: TObject);
@@ -6382,8 +6389,9 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if Assigned(e) then
-    e.Text.CommandProcessor(ecMoveSelDown, #0, nil);
+  // TODO: Lift. Find ecMoveSelDown equivalent.
+{  if Assigned(e) then
+    e.Text.CommandProcessor(ecMoveSelDown, #0, nil);   }
 end;
 
 procedure TMainForm.actCodeCompletionUpdate(Sender: TObject);
@@ -6405,7 +6413,7 @@ end;
 
 procedure TMainForm.actPackageManagerExecute(Sender: TObject);
 var
-  s: AnsiString;
+  s: String;
 begin
   s := IncludeTrailingBackslash(devDirs.Exec) + PACKMAN_PROGRAM;
   if FileExists(s) then
@@ -6492,20 +6500,20 @@ end;
 procedure TMainForm.actOpenFolderExecute(Sender: TObject);
 var
   e: TEditor;
-  Folder: AnsiString;
+  Folder: String;
 begin
   e := fEditorList.GetEditor;
   if Assigned(e) then begin
     Folder := ExtractFilePath(e.FileName);
     if Folder <> '' then
-      ShellExecute(Application.Handle, 'open', 'explorer.exe', PAnsiChar(Folder), nil, SW_SHOWNORMAL);
+      ShellExecute(Application.Handle, 'open', 'explorer.exe', PChar(Folder), nil, SW_SHOWNORMAL);
   end;
 end;
 
 procedure TMainForm.actGotoBreakPointExecute(Sender: TObject);
 var
   e: TEditor;
-  FileName: AnsiString;
+  FileName: String;
 begin
   FileName := fDebugger.BreakPointFile;
   if FileName <> '' then begin
@@ -6522,8 +6530,9 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  if Assigned(e) then
-    e.Text.CommandProcessor(ecCommentInline, #0, nil);
+  // TODO: Lift. Find ecCommentInline equivalent.
+{  if Assigned(e) then
+    e.Text.CommandProcessor(ecCommentInline, #0, nil);  }
 end;
 
 procedure TMainForm.actToggleCommentInlineUpdate(Sender: TObject);
@@ -6587,7 +6596,7 @@ end;
 
 procedure TMainForm.WMCopyData(var Message: TMessage);
 var
-  MessageData: AnsiString;
+  MessageData: String;
 begin
   MessageData := GetSentStructData(Message);
   if MessageData <> '' then begin
@@ -6647,7 +6656,7 @@ end;
 procedure TMainForm.actDonateExecute(Sender: TObject);
 begin
   ShellExecute(GetDesktopWindow(), 'open',
-    PAnsiChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil,
+    PChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil,
     SW_SHOWNORMAL);
 end;
 

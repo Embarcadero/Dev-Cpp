@@ -12,6 +12,7 @@ The Original Code is: SynHighlighterHP48.pas, released 2000-06-23.
 The Original Code is based on the cbHPSyn.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Cyrille de Brebisson.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -27,39 +28,32 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterHP48.pas,v 1.11.2.1 2007/04/19 06:49:20 etrusco Exp $
+$Id: SynHighlighterHP48.pas,v 1.10.2.9 2008/09/14 16:25:00 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
 
 Known Issues:
-  - small memory leak in TSpeedStringList has to be fixed
 -------------------------------------------------------------------------------}
 {
 @abstract(Provides SynEdit with a HP48 assembler syntax highlighter.)
 @author(Cyrille de Brebisson <cyrille_de-brebisson@aus.hp.com>, converted to SynEdit by David Muir <dhm@dmsoftware.co.uk>)
 @created(1998-12, converted to SynEdit 2000-06-23)
-@lastmod(2000-06-23)
+@lastmod(2012-09-12)
 The unit SynHighlighterHP48 provides SynEdit with a HP48 assembler highlighter.
 }
 
-{$IFNDEF QSYNHIGHLIGHTERHP48}
 unit SynHighlighterHP48;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QGraphics,
-  QSynEditHighlighter,
-{$ELSE}
   Windows,
   Graphics,
   SynEditHighlighter,
-{$ENDIF}
+  SynUnicode,
   SysUtils,
   Classes;
 
@@ -73,18 +67,18 @@ type
   protected
     FName: string;
     FSpeedList: TSpeedStringList;
-    fobject: tobject;
+    FObject: TObject;
     procedure SetName(const Value: string); virtual;
   public
     property Name: string read FName write SetName;
     constructor Create(name: string);
     destructor Destroy; override;
     property SpeedList: TSpeedStringList read FSpeedList write FSpeedList;
-    property pointer: tobject read fobject write fobject;
+    property Pointer: TObject read FObject write FObject;
   end;
 
   PSpeedListObjects = ^TSpeedListObjects;
-  TSpeedListObjects = array[0..MaxListSize] of TSpeedListObject;
+  TSpeedListObjects = array[0..0] of TSpeedListObject;
 
   TSpeedStringList = class
   private
@@ -94,33 +88,33 @@ type
     procedure SetInObject(Index: Integer; const Value: TObject);
   protected
     FOnChange: TNotifyEvent;
-    SumOfUsed: array[0..NbSubList - 1] of integer;
-    datasUsed: array[0..NbSubList - 1] of integer;
-    datas: array[0..NbSubList - 1] of PSpeedListObjects;
-    lengthDatas: array[0..NbSubList - 1] of integer;
+    SumOfUsed: array[0..NbSubList - 1] of Integer;
+    DatasUsed: array[0..NbSubList - 1] of Integer;
+    Datas: array[0..NbSubList - 1] of PSpeedListObjects;
+    LengthDatas: array[0..NbSubList - 1] of Integer;
     procedure Changed; virtual;
     function Get(Index: Integer): string; virtual;
     function GetObject(Index: Integer): TSpeedListObject;
-    function GetCount: integer;
+    function GetCount: Integer;
     function GetStringList: TStrings;
-    procedure SetStringList(const value: TStrings);
+    procedure SetStringList(const Value: TStrings);
   public
     procedure NameChange(const obj: TSpeedListObject; const NewName: string);
     procedure ObjectDeleted(const obj: TSpeedListObject);
 
     destructor Destroy; override;
-    constructor create;
+    constructor Create;
     function AddObj(const Value: TSpeedListObject): Integer;
     function Add(const Value: string): TSpeedListObject;
     procedure Clear;
-    function Find(const name: string): TSpeedListObject;
+    function Find(const Name: string): TSpeedListObject;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property Objects[Index: Integer]: TSpeedListObject read GetObject;
-    property inobject[Index: Integer]: TObject read GetInObject write SetInObject;
+    property InObject[Index: Integer]: TObject read GetInObject write SetInObject;
     property Strings[Index: Integer]: string read Get; default;
-    property count: integer read GetCount;
+    property Count: Integer read GetCount;
     property StringList: TStrings read GetStringList write SetStringList;
-    property text: string read GetText write SetText;
+    property Text: string read GetText write SetText;
   end;
 
   TtkTokenKind = (tkNull, tkAsmKey, tkAsm, tkAsmComment, tksAsmKey, tksAsm,
@@ -133,10 +127,6 @@ type
   private
     fTockenKind: TtkTokenKind;
     fRange: TRangeState;
-    fLine: string;
-    Run: LongInt;
-    fTokenPos: Integer;
-    fEol: Boolean;
     Attribs: array[TtkTokenKind] of TSynHighlighterAttributes;
     FRplKeyWords: TSpeedStringList;
     FAsmKeyWords: TSpeedStringList;
@@ -149,7 +139,7 @@ type
     function SpaceProc: TtkTokenKind;
     function ParOpenProc: TtkTokenKind;
     function RplComProc: TtkTokenKind;
-    function AsmComProc(c: char): TtkTokenKind;
+    function AsmComProc(c: WideChar): TtkTokenKind;
     function PersentProc: TtkTokenKind;
     function IdentProc: TtkTokenKind;
     function SlashProc: TtkTokenKind;
@@ -166,29 +156,28 @@ type
     function GetAttribCount: integer; override;
     function GetAttribute(idx: integer): TSynHighlighterAttributes; override;
     function IsFilterStored: Boolean; override;
+    function IsLineEnd(Run: Integer): Boolean; override;
   public
     class function GetLanguageName: string; override;
+    class function GetFriendlyLanguageName: string; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function GetDefaultAttribute(Index: integer): TSynHighlighterAttributes;
       override;
     function GetEol: Boolean; override;
-    procedure SetLine(NewValue: string; LineNumber: Integer); override;
-    function GetToken: string; override;
-    function GetTokenPos: Integer; override;
+    procedure DoSetLine(const Value: string; LineNumber: Integer); override;
     procedure Next; override;
 
+    function GetToken: string; override;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
     function GetTokenKind: integer; override;
 
     function GetRange: Pointer; override;
     procedure SetRange(Value: Pointer); override;
     procedure ResetRange; override;
-    {$IFNDEF SYN_CLX}
     function SaveToRegistry(RootKey: HKEY; Key: string): boolean; override;
     function LoadFromRegistry(RootKey: HKEY; Key: string): boolean; override;
-    {$ENDIF}
     procedure Assign(Source: TPersistent); override;
     property AsmKeyWords: TSpeedStringList read FAsmKeyWords;
     property SAsmFoField: TSpeedStringList read FSAsmNoField;
@@ -218,18 +207,10 @@ type
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditStrConst;
-{$ELSE}
+  WideStrUtils,
   SynEditStrConst;
-{$ENDIF}
 
 const
-  tkTokenName: array[TtkTokenKind] of string = (SYNS_AttrNull,
-    SYNS_AttrAsmKey, SYNS_AttrAsm, SYNS_AttrAsmComment,
-    SYNS_AttrSASMKey, SYNS_AttrSASM, SYNS_AttrSASMComment,
-    SYNS_AttrRplKey, SYNS_AttrRpl, SYNS_AttrRplComment);
-
   DefaultAsmKeyWords: string = '!RPL'#13#10'ENDCODE'#13#10'{'#13#10'}'#13#10 +
   'GOTO'#13#10'GOSUB'#13#10'GOSBVL'#13#10'GOVLNG'#13#10'GOLONG'#13#10'SKIP' +
     #13#10'SKIPYES' + #13#10'->'#13#10'SKUB'#13#10'SKUBL'#13#10'SKC'#13#10'SKNC'#13#10'SKELSE' +
@@ -282,7 +263,7 @@ end;
 
 destructor TSpeedListObject.destroy;
 begin
-  if FSpeedList <> nil then
+  if Assigned(FSpeedList) then
     FSpeedList.ObjectDeleted(Self);
   inherited destroy;
 end;
@@ -465,7 +446,8 @@ begin
   for i := 0 to DatasUsed[crc] - 1 do
     if Datas[crc][i] = Obj then begin
       for j := i + 1 to DatasUsed[crc] - 1 do
-        Datas[j - 1] := Datas[j];
+        if i > 0 then
+          Datas[i - 1] := Datas[i];
       for j := crc + 1 to High(Datas) do
         dec(SumOfUsed[j]);
       Obj.FSpeedList := nil;
@@ -511,11 +493,19 @@ end;
 
 constructor TSynHP48Syn.Create(AOwner: TComponent);
 var
-  i: TtkTokenKind;
   j, k: integer;
 begin
-  for i := low(TtkTokenKind) to High(TtkTokenKind) do
-    Attribs[i] := TSynHighlighterAttributes.Create(tkTokenName[i]);
+  Attribs[tkNull] := TSynHighlighterAttributes.Create(SYNS_AttrNull, SYNS_FriendlyAttrNull);
+  Attribs[tkAsmKey] := TSynHighlighterAttributes.Create(SYNS_AttrAsmKey, SYNS_FriendlyAttrAsmKey);
+  Attribs[tkAsm] := TSynHighlighterAttributes.Create(SYNS_AttrAsm, SYNS_FriendlyAttrAsm);
+  Attribs[tkAsmComment] := TSynHighlighterAttributes.Create(SYNS_AttrAsmComment, SYNS_FriendlyAttrAsmComment);
+  Attribs[tksAsmKey] := TSynHighlighterAttributes.Create(SYNS_AttrSASMKey, SYNS_FriendlyAttrSASMKey);
+  Attribs[tksAsm] := TSynHighlighterAttributes.Create(SYNS_AttrSASM, SYNS_FriendlyAttrSASM);
+  Attribs[tksAsmComment] := TSynHighlighterAttributes.Create(SYNS_AttrSASMComment, SYNS_FriendlyAttrSASMComment);
+  Attribs[tkRplKey] := TSynHighlighterAttributes.Create(SYNS_AttrRplKey, SYNS_FriendlyAttrRplKey);
+  Attribs[tkRpl] := TSynHighlighterAttributes.Create(SYNS_AttrRpl, SYNS_FriendlyAttrRpl);
+  Attribs[tkRplComment] := TSynHighlighterAttributes.Create(SYNS_AttrRplComment, SYNS_FriendlyAttrRplComment);
+
   inherited Create(AOwner);
   SetHighlightChange;
   FAsmKeyWords := TSpeedStringList.Create;
@@ -546,25 +536,17 @@ begin
   inherited Destroy;
 end; { Destroy }
 
-procedure TSynHP48Syn.SetLine(NewValue: string; LineNumber: Integer);
-begin
-  fLine := PChar(NewValue);
-  Run := 1;
-  fEol := False;
-  Next;
-end; { SetLine }
-
-function TSynHP48Syn.AsmComProc(c: char): TtkTokenKind;
+function TSynHP48Syn.AsmComProc(c: WideChar): TtkTokenKind;
 begin
   Result := tkAsmComment;
-  if (Run > Length(fLine)) then
+  if (Run > Length(fLineStr)) then
     Result := NullProc
   else
-    while Run <= Length(FLine) do
-      if ((run = 1) or (fLine[run - 1] <= ' ')) and
-        (fLine[Run] = '*') and
-        ((run < Length(fLine)) and (fLine[run + 1] = c)) and
-        ((run + 1 = Length(fLine)) or (fLine[run + 2] <= ' ')) then begin
+    while Run <= Length(fLineStr) do
+      if ((run = 1) or (fLineStr[run - 1] <= ' ')) and
+        (fLineStr[Run] = '*') and
+        ((run < Length(fLineStr)) and (fLineStr[run + 1] = c)) and
+        ((run + 1 = Length(fLineStr)) or (fLineStr[run + 2] <= ' ')) then begin
         inc(run, 2);
         fRange := rsAsm;
         break;
@@ -576,11 +558,11 @@ end;
 function TSynHP48Syn.RplComProc: TtkTokenKind;
 begin
   Result := tkRplComment;
-  if (Run > Length(fLine)) then
+  if (Run > Length(fLineStr)) then
     Result := NullProc
   else
-    while Run <= Length(FLine) do
-      if fLine[Run] = ')' then begin
+    while Run <= Length(fLineStr) do
+      if fLineStr[Run] = ')' then begin
         inc(run);
         fRange := rsRpl;
         break;
@@ -593,20 +575,21 @@ function TSynHP48Syn.SlashProc: TtkTokenKind;
 begin
   if fRange = rsRpl then
     Result := IdentProc
-  else if ((Run = 1) or (fLine[Run - 1] <= ' ')) and
-    (fLine[Run] = '/') and
-    (run < Length(fLine)) and
-    (fLine[run + 1] = '*') and
-    ((run + 1 = Length(fLine)) or (fLine[Run + 2] <= ' ')) then begin
+  else if ((Run = 1) or (fLineStr[Run - 1] <= ' ')) and
+    (fLineStr[Run] = '/') and
+    (run < Length(fLineStr)) and
+    (fLineStr[run + 1] = '*') and
+    ((run + 1 = Length(fLineStr)) or (fLineStr[Run + 2] <= ' ')) then begin
     inc(Run, 2);
     Result := tkAsmComment;
     fRange := rsComAsm2;
   end
-  else if (run < Length(fLine)) and (fLine[Run + 1] = '/') then begin
+  else if (run < Length(fLineStr)) and (fLineStr[Run + 1] = '/') then begin
     inc(Run, 2);
     Result := tkAsmComment;
-    while (run <= Length(fLine)) do
-      if FLine[Run] in [#10, #13] then begin
+    while (run <= Length(fLineStr)) do
+      if CharInSet(fLineStr[Run], [#10, #13]) then
+      begin
         inc(Run);
         break;
       end
@@ -620,19 +603,19 @@ end;
 function TSynHP48Syn.ParOpenProc: TtkTokenKind;
 begin
   if fRange = rsRpl then
-    if ((Run = 1) and ((Length(fLine) = 1) or (fLine[Run + 1] <= ' '))) or
-      ((fLine[Run - 1] <= ' ') and ((Length(fLine) = Run) or (fLine[Run + 1] <= ' '))) then begin
+    if ((Run = 1) and ((Length(fLineStr) = 1) or (fLineStr[Run + 1] <= ' '))) or
+      ((fLineStr[Run - 1] <= ' ') and ((Length(fLineStr) = Run) or (fLineStr[Run + 1] <= ' '))) then begin
       inc(Run);
       Result := tkRplComment;
       fRange := rsComRpl;
     end
     else
       Result := IdentProc
-  else if ((run = 1) or (fLine[run - 1] <= ' ')) and
-    (fline[Run] = '(') and
-    (run < Length(fLine)) and
-    (fLine[run + 1] = '*') and
-    ((run + 2 > Length(fLine)) or (fLine[run + 2] <= ' ')) then begin
+  else if ((run = 1) or (fLineStr[run - 1] <= ' ')) and
+    (fLineStr[Run] = '(') and
+    (run < Length(fLineStr)) and
+    (fLineStr[run + 1] = '*') and
+    ((run + 2 > Length(fLineStr)) or (fLineStr[run + 2] <= ' ')) then begin
     inc(Run, 2);
     Result := tkAsmComment;
     fRange := rsComAsm1;
@@ -646,8 +629,8 @@ begin
   if fRange = rsAsm then begin
     inc(Run);
     Result := tkAsmComment;
-    while (run <= Length(fLine)) do
-      case FLine[Run] of
+    while (run <= Length(fLineStr)) do
+      case fLineStr[Run] of
         #10, #13: begin
             inc(Run);
             break;
@@ -665,8 +648,8 @@ begin
   if fRange = rsRpl then begin
     inc(Run);
     Result := tkRplComment;
-    while (run <= Length(fLine)) do
-      case FLine[Run] of
+    while (run <= Length(fLineStr)) do
+      case fLineStr[Run] of
         #10, #13: begin
             inc(Run);
             break;
@@ -686,7 +669,7 @@ var
 begin
   i := Run;
   EndOfToken;
-  s := Copy(fLine, i, run - i);
+  s := Copy(fLineStr, i, run - i);
   if fRange = rsAsm then
     if FAsmKeyWords.Find(s) <> nil then
       if (s = '!RPL') or (s = 'ENDCODE') then begin
@@ -695,7 +678,7 @@ begin
       end
       else
         result := tkAsmKey
-    else if fLine[i] <> '*' then
+    else if fLineStr[i] <> '*' then
       result := tkAsm
     else
       result := tkAsmKey
@@ -732,21 +715,21 @@ end;
 function TSynHP48Syn.NullProc: TtkTokenKind;
 begin
   Result := tkNull;
-  fEol := True;
+  inc(Run);
 end;
 
 function TSynHP48Syn.SpaceProc: TtkTokenKind;
 begin
   inc(Run);
-  while (Run <= Length(FLine)) and (FLine[Run] in [#1..#32]) do
+  while (Run <= Length(fLineStr)) and CharInSet(fLineStr[Run], [#1..#32]) do
     inc(Run);
   result := GetTokenFromRange;
 end;
 
 function TSynHP48Syn.Next1: TtkTokenKind;
 begin
-  fTokenPos := Run;
-  if Run > Length(fLine) then
+  fTokenPos := Run - 1;
+  if Run > Length(fLineStr) then
     result := NullProc
   else if fRange = rsComRpl then
     result := RplComProc
@@ -760,15 +743,15 @@ begin
     result := sasmproc2
   else if frange = rssasm3 then
     result := sasmproc3
-  else if fLine[Run] in [#1..#32] then
+  else if CharInSet(fLineStr[Run], [#1..#32]) then
     result := SpaceProc
-  else if fLine[Run] = '(' then
+  else if fLineStr[Run] = '(' then
     result := ParOpenProc
-  else if fLine[Run] = '%' then
+  else if fLineStr[Run] = '%' then
     result := PersentProc
-  else if fLine[Run] = '/' then
+  else if fLineStr[Run] = '/' then
     result := SlashProc
-  else if (run = 1) and (fRange = rsRpl) and (fLine[1] = '*') then
+  else if (run = 1) and (fRange = rsRpl) and (fLineStr[1] = '*') then
     result := StarProc
   else
     result := IdentProc;
@@ -782,26 +765,12 @@ end;
 procedure TSynHP48Syn.Next;
 begin
   Next2(Next1);
+  inherited;
 end;
 
 function TSynHP48Syn.GetEol: Boolean;
 begin
-  Result := fEol;
-end;
-
-function TSynHP48Syn.GetToken: string;
-var
-  Len: LongInt;
-  a: PChar;
-begin
-  a := @(fLine[fTokenPos]);
-  Len := Run - fTokenPos;
-  SetString(Result, a, Len);
-end;
-
-function TSynHP48Syn.GetTokenPos: Integer;
-begin
-  Result := fTokenPos - 1;
+  Result := Run = fLineLen + 2;
 end;
 
 function TSynHP48Syn.GetRange: Pointer;
@@ -831,11 +800,10 @@ end;
 
 procedure TSynHP48Syn.EndOfToken;
 begin
-  while (Run <= Length(fLine)) and (FLine[Run] > ' ') do
+  while (Run <= Length(fLineStr)) and (fLineStr[Run] > ' ') do
     Inc(Run);
 end;
 
-{$IFNDEF SYN_CLX}
 function TSynHP48Syn.LoadFromRegistry(RootKey: HKEY; Key: string): boolean;
 var
   r: TBetterRegistry;
@@ -863,8 +831,8 @@ begin
   r := TBetterRegistry.Create;
   try
     r.RootKey := RootKey;
-    if r.OpenKey(Key, true) then begin
-      Result := true;
+    if r.OpenKey(Key, true) then
+    begin
       r.WriteString('AsmKeyWordList', AsmKeywords.Text);
       r.WriteString('RplKeyWordList', RplKeywords.Text);
       Result := inherited SaveToRegistry(RootKey, Key);
@@ -874,7 +842,6 @@ begin
   finally r.Free;
   end;
 end;
-{$ENDIF}
 
 procedure TSynHP48Syn.Assign(Source: TPersistent);
 var
@@ -932,26 +899,26 @@ var
   s: string;
 begin
   Result := tksAsmKey;
-  if run > Length(fLine) then
+  if run > Length(fLineStr) then
     exit;
-  if FLine[Run] = '*' then begin
+  if fLineStr[Run] = '*' then begin
     frange := rssasm3;
     result := tksAsmComment;
     exit;
   end;
-  if FLine[Run] >= ' ' then begin
+  if fLineStr[Run] >= ' ' then begin
     i := run;
-    while (run <= Length(fLine)) and (FLine[run] > ' ') do
+    while (run <= Length(fLineStr)) and (fLineStr[run] > ' ') do
       inc(run);
-    s := Copy(fLine, i, run - i);
+    s := Copy(fLineStr, i, run - i);
     if (s = 'RPL') or (s = 'ENDCODE') then begin
       frange := rsRpl;
       exit;
     end;
   end;
-  while (run <= Length(fLine)) and (FLine[run] <= ' ') and (FLine[run] <> #10) do
+  while (run <= Length(fLineStr)) and (fLineStr[run] <= ' ') and (fLineStr[run] <> #10) do
     inc(run);
-  if run <= Length(fLine) then
+  if run <= Length(fLineStr) then
     frange := rssasm2
   else
     frange := rssasm1;
@@ -963,30 +930,30 @@ var
   s: string;
 begin
   Result := tksAsm;
-  while (run <= Length(fLine)) and (FLine[run] <= ' ') and (fline[run] <> #10) do
+  while (run <= Length(fLineStr)) and (fLineStr[run] <= ' ') and (fLineStr[run] <> #10) do
     inc(run);
   if run > 30 then begin
     frange := rssasm3;
     exit;
   end;
   i := run;
-  while (run <= Length(fLine)) and (FLine[run] > ' ') do
+  while (run <= Length(fLineStr)) and (fLineStr[run] > ' ') do
     inc(run);
-  s := Copy(fLine, i, run - i);
+  s := Copy(fLineStr, i, run - i);
   if (s = 'ENDCODE') or (s = 'RPL') then begin
     frange := rsRpl;
     result := tksAsmKey;
   end
   else begin
     if FSAsmNoField.Find(s) = nil then begin
-      while (run <= Length(fLine)) and (FLine[run] <= ' ') and (FLine[run] <> #10) do
+      while (run <= Length(fLineStr)) and (fLineStr[run] <= ' ') and (fLineStr[run] <> #10) do
         inc(run);
-      while (run <= Length(fLine)) and (FLine[run] > ' ') do
+      while (run <= Length(fLineStr)) and (fLineStr[run] > ' ') do
         inc(run);
-      while (run <= Length(fLine)) and (FLine[run] <= ' ') and (FLine[run] <> #10) do
+      while (run <= Length(fLineStr)) and (fLineStr[run] <= ' ') and (fLineStr[run] <> #10) do
         inc(run);
     end;
-    if run <= Length(fLine) then
+    if run <= Length(fLineStr) then
       frange := rssasm3
     else
       frange := rssasm1;
@@ -996,9 +963,9 @@ end;
 function TSynHP48Syn.SasmProc3: TtkTokenKind;
 begin
   Result := tksAsmComment;
-  while (run <= Length(fLine)) and (FLine[run] <> #10) do
+  while (run <= Length(fLineStr)) and (fLineStr[run] <> #10) do
     inc(run);
-  if run <= Length(fLine) then inc(run);
+  if run <= Length(fLineStr) then inc(run);
   frange := rssasm1;
 end;
 
@@ -1017,8 +984,37 @@ begin
   Result := nil;
 end;
 
-{$IFNDEF SYN_CPPB_1}
+// reimplement functions to handle the non-standard use of 1-based Run
+// (instead of the standard 0-based Run)
+
+procedure TSynHP48Syn.DoSetLine(const Value: string;
+  LineNumber: Integer);
+begin
+  inherited;
+  Run := 1;
+  fOldRun := Run;
+end;
+
+function TSynHP48Syn.GetToken: string;
+var
+  Len: Integer;
+begin
+  Len := (Run - 1) - fTokenPos;
+  SetLength(Result, Len);
+  if Len > 0 then
+    WStrLCopy(@Result[1], fCasedLine + fTokenPos, Len);
+end;
+
+function TSynHP48Syn.IsLineEnd(Run: Integer): Boolean;
+begin
+  Result := (Run - 1 >= fLineLen) or (fLine[Run - 1] = #10) or (fLine[Run - 1] = #13);
+end;
+
+class function TSynHP48Syn.GetFriendlyLanguageName: string;
+begin
+  Result := SYNS_FriendlyLangHP48;
+end;
+
 initialization
   RegisterPlaceableHighlighter(TSynHP48Syn);
-{$ENDIF}
 end.

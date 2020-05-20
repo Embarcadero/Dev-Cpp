@@ -329,7 +329,7 @@ var
   I, J, FoldCount, LineCount, LineLength, CommentCount, DupeCount, IndentCount: Integer;
   e: TEditor;
 
-  procedure TypeText(const Text: AnsiString);
+  procedure TypeText(const Text: String);
   var
     I: Integer;
   begin
@@ -389,7 +389,8 @@ begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    Assert(e.Text.IsEmpty);
+    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty?
+    Assert(e.Text.Lines.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type wall of text');
     for I := Ord('a') to Ord('z') do begin
@@ -398,6 +399,9 @@ begin
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
 
+
+    // TODO: Lift. Figure out ecMoveSelDown
+    {
     MainForm.SetStatusbarMessage('Move lines down');
     for I := 0 to e.Text.Lines.Count - 1 do begin
       e.Text.CaretXY := BufferCoord(1, 1);
@@ -436,14 +440,15 @@ begin
       e.Text.CommandProcessor(ecToggleComment, #0, nil);
       ShowUpdate(0);
     end;
-    Assert(e.Text.Lines.Count = 26 + 1);
+    Assert(e.Text.Lines.Count = 26 + 1);   }
 
     MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
     while e.Text.UndoList.CanUndo do begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    Assert(e.Text.IsEmpty);
+    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty
+    Assert(e.Text.Lines.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type line of text');
     for I := Ord('a') to Ord('z') do begin
@@ -451,12 +456,14 @@ begin
     end;
     Assert(e.Text.Lines.Count = 1);
 
+    // TODO: Lift. Find eDuplicateLine
+    {
     MainForm.SetStatusbarMessage('Duplicate lines');
     for I := 1 to DupeCount do begin
       e.Text.CommandProcessor(ecDuplicateLine, #0, nil);
       ShowUpdate(50);
     end;
-    Assert(e.Text.Lines.Count = 1 + DupeCount);
+    Assert(e.Text.Lines.Count = 1 + DupeCount); }
 
     MainForm.SetStatusbarMessage('Delete lines');
     for I := 1 to DupeCount do begin
@@ -470,7 +477,8 @@ begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    Assert(e.Text.IsEmpty);
+    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty?
+    Assert(e.Text.Lines.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type wall of text');
     for I := Ord('a') to Ord('z') do begin
@@ -500,7 +508,8 @@ begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    Assert(e.Text.IsEmpty);
+    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty?
+    Assert(e.Text.Lines.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type wall of text');
     for I := Ord('a') to Ord('a') + 9 do begin
@@ -538,7 +547,8 @@ begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    Assert(e.Text.IsEmpty);
+    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty?
+    Assert(e.Text.Lines.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Close editor without saving');
     MainForm.EditorList.CloseEditor(e);

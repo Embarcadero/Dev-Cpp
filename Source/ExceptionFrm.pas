@@ -30,20 +30,20 @@ uses
 type
   PUnitEntry = ^TUnitEntry;
   TUnitEntry = record
-    Name: AnsiString;
+    Name: String;
     Start: dword;
     Len: integer;
   end;
 
   PFuncsEntry = ^TFuncsEntry;
   TFuncsEntry = record
-    Name: AnsiString;
+    Name: String;
     Address: dword;
   end;
 
   PLineEntry = ^TLineEntry;
   TLineEntry = record
-    Line: AnsiString;
+    Line: String;
     Address: dword;
     UnitIndex: dword;
   end;
@@ -83,34 +83,34 @@ type
     procedure memEmailReportExit(Sender: TObject);
     procedure btnShowReportClick(Sender: TObject);
   public
-    fPlatform: AnsiString;
-    fBuildTime: AnsiString;
-    fOSVersion: AnsiString;
-    fAdditionalInfo: AnsiString;
-    fProgramPath: AnsiString;
-    fComputerName: AnsiString;
-    fProgramVersion: AnsiString;
-    fTotalPhys: AnsiString;
-    fUsedPhys: AnsiString;
-    fFreePhys: AnsiString;
-    fTotalCache: AnsiString;
-    fUsedCache: AnsiString;
-    fFreeCache: AnsiString;
-    fTotalVirt: AnsiString;
-    fUsedVirt: AnsiString;
-    fFreeVirt: AnsiString;
-    fMemoryLoad: AnsiString;
+    fPlatform: String;
+    fBuildTime: String;
+    fOSVersion: String;
+    fAdditionalInfo: String;
+    fProgramPath: String;
+    fComputerName: String;
+    fProgramVersion: String;
+    fTotalPhys: String;
+    fUsedPhys: String;
+    fFreePhys: String;
+    fTotalCache: String;
+    fUsedCache: String;
+    fFreeCache: String;
+    fTotalVirt: String;
+    fUsedVirt: String;
+    fFreeVirt: String;
+    fMemoryLoad: String;
     fLines: TList;
     fUnits: TList;
     fFuncs: TList;
     function StackStop: dword;
-    procedure ReadMapFile(const Fname: AnsiString);
-    function AddressInfo(Address: Cardinal): AnsiString;
+    procedure ReadMapFile(const Fname: String);
+    function AddressInfo(Address: Cardinal): String;
     procedure GatherSystemInfo; // fill interface
-    function GetStackReport: AnsiString; // bug report text
-    function GetMemoryReport: AnsiString; // ...
-    function GetMachineReport: AnsiString;
-    function GetErrorReport: AnsiString;
+    function GetStackReport: String; // bug report text
+    function GetMemoryReport: String; // ...
+    function GetMachineReport: String;
+    function GetErrorReport: String;
   end;
 
   TEAnalyzer = class(TPersistent)
@@ -173,7 +173,7 @@ begin
   result := mbi.RegionSize + dword(mbi.BaseAddress);
 end;
 
-procedure TExceptionFrm.ReadMapFile(const Fname: AnsiString);
+procedure TExceptionFrm.ReadMapFile(const Fname: String);
 var
   pUn: PUnitEntry;
   pFun: PFuncsEntry;
@@ -182,7 +182,7 @@ var
   sl: TStringList;
   I: integer;
   idx: integer;
-  sUnitName, s: AnsiString;
+  sUnitName, s: String;
 begin
   if not FileExists(Fname) then
     Exit;
@@ -312,11 +312,11 @@ begin
   end;
 end;
 
-function TExceptionFrm.AddressInfo(Address: Cardinal): AnsiString;
+function TExceptionFrm.AddressInfo(Address: Cardinal): String;
 var
   I, iUnit: integer;
   MapAddress: dword;
-  sUnit, sFunction, sLine: AnsiString;
+  sUnit, sFunction, sLine: String;
 begin
   sUnit := '';
   sFunction := '';
@@ -363,7 +363,7 @@ begin
     Result := ''; //Format('%8.8x (%8.8x)'#13#10,[Address, MapAddress]);
 end;
 
-function TExceptionFrm.GetStackReport: AnsiString;
+function TExceptionFrm.GetStackReport: String;
 var
   {retaddr, }walker: ^pointer;
   max: Cardinal;
@@ -402,7 +402,7 @@ begin
   result := Trim(result);
 end;
 
-function TExceptionFrm.GetErrorReport: AnsiString;
+function TExceptionFrm.GetErrorReport: String;
 begin
   result := 'Error info' + #13#10
     + '----------' + #13#10
@@ -412,7 +412,7 @@ begin
     + 'Address     : ' + lblAddress.Caption;
 end;
 
-function TExceptionFrm.GetMachineReport: AnsiString;
+function TExceptionFrm.GetMachineReport: String;
 begin
   Result := 'Machine info' + #13#10
     + '------------' + #13#10
@@ -427,7 +427,7 @@ begin
   Result := Result + 'Computer Name : ' + fComputerName;
 end;
 
-function TExceptionFrm.GetMemoryReport: AnsiString;
+function TExceptionFrm.GetMemoryReport: String;
 begin
   Result := 'Memory Status'#13#10
     + '-------------'#13#10
@@ -513,7 +513,7 @@ var
   I: integer;
   //	SocketResult: integer;
   //	Buffer: array[0..1024] of Char;
-  Cmd, EmailBody, EmailSubject: AnsiString;
+  Cmd, EmailBody, EmailSubject: String;
 begin
   // Move focus to other button
   btnSend.Default := false;
@@ -608,7 +608,7 @@ end;
 
 procedure TExceptionFrm.lblUpdateLinkClick(Sender: TObject);
 begin
-  ShellExecute(GetDesktopWindow(), 'open', PAnsiChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
+  ShellExecute(GetDesktopWindow(), 'open', PChar(TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TExceptionFrm.memUserReportEnter(Sender: TObject);

@@ -29,12 +29,12 @@ type
   PToDoRec = ^TToDoRec;
   TToDoRec = record
     TokenIndex: integer;
-    Filename: AnsiString;
+    Filename: String;
     Line: integer;
     ToLine: integer;
-    User: AnsiString;
+    User: String;
     Priority: integer;
-    Description: AnsiString;
+    Description: String;
     IsDone: boolean;
   end;
 
@@ -62,12 +62,12 @@ type
   private
     fToDoList: TList;
     fSortColumn: integer;
-    function MatchesMask(SearchStr, MaskStr: AnsiString): boolean;
+    function MatchesMask(SearchStr, MaskStr: String): boolean;
     procedure LoadText;
     procedure BuildList;
     procedure AddFiles(Current, InProject, NotInProject, OpenOnly: boolean);
-    procedure AddToDo(Filename: AnsiString);
-    function BreakupToDo(Filename: AnsiString; sl: TStrings; Line: integer; Token: AnsiString; HasUser, HasPriority:
+    procedure AddToDo(Filename: String);
+    function BreakupToDo(Filename: String; sl: TStrings; Line: integer; Token: String; HasUser, HasPriority:
       boolean): integer;
   end;
 
@@ -77,14 +77,14 @@ uses main, editor, project, StrUtils, MultiLangSupport, devcfg;
 
 {$R *.dfm}
 
-function TViewToDoForm.BreakupToDo(Filename: AnsiString; sl: TStrings; Line: integer; Token: AnsiString; HasUser,
+function TViewToDoForm.BreakupToDo(Filename: String; sl: TStrings; Line: integer; Token: String; HasUser,
   HasPriority: boolean): integer;
 var
-  sUser: AnsiString;
+  sUser: String;
   iPriority: integer;
-  sDescription: AnsiString;
+  sDescription: String;
   Indent: integer;
-  S: AnsiString;
+  S: String;
   X, Y: integer;
   idx: integer;
   Done: boolean;
@@ -153,7 +153,7 @@ begin
   Result := Line;
 end;
 
-procedure TViewToDoForm.AddToDo(Filename: AnsiString);
+procedure TViewToDoForm.AddToDo(Filename: String);
 var
   sl: TStrings;
   I: integer;
@@ -395,7 +395,7 @@ procedure TViewToDoForm.BuildList;
 var
   I: integer;
   td: PToDoRec;
-  S: AnsiString;
+  S: String;
 begin
   lv.Items.BeginUpdate;
   lv.Items.Clear;
@@ -417,7 +417,7 @@ begin
   lv.Items.EndUpdate;
 end;
 
-function TViewToDoForm.MatchesMask(SearchStr, MaskStr: AnsiString): boolean;
+function TViewToDoForm.MatchesMask(SearchStr, MaskStr: String): boolean;
 var
   Matches: boolean;
   MaskIndex: integer;

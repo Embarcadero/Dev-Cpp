@@ -205,7 +205,7 @@ type
     procedure SaveCodeIns;
     procedure ClearCodeIns;
     procedure UpdateCIButtons;
-    procedure LoadSyntax(const Value: AnsiString);
+    procedure LoadSyntax(const Value: String);
     procedure FillSyntaxSets;
   public
     AccessedTabs: TEditorOptFormHistory;
@@ -226,7 +226,7 @@ const
 
 procedure TEditorOptForm.FormCreate(Sender: TObject);
 var
-  AttrName: AnsiString;
+  AttrName: String;
   Attribute: TSynHighlighterAttributes;
   I: integer;
 begin
@@ -308,7 +308,7 @@ begin
       AttrName := cpp.Attribute[I].Name;
 
       if devEditor.Syntax.IndexOfName(AttrName) <> -1 then begin
-        Attribute := TSynHighlighterAttributes.Create(AttrName);
+        Attribute := TSynHighlighterAttributes.Create(AttrName,AttrName);
         try
           StrtoAttr(Attribute, devEditor.Syntax.Values[AttrName]);
           cpp.Attribute[I].Assign(Attribute);
@@ -647,7 +647,7 @@ end;
 
 procedure TEditorOptForm.btnOkClick(Sender: TObject);
 var
-  s, aName: AnsiString;
+  s, aName: String;
   a, idx: integer;
 begin
   with devEditor do begin
@@ -779,7 +779,7 @@ begin
   end;
 
   // Save our code snippet even if we opted not to use it (user may want to keep it)
-  if not seDefault.IsEmpty then
+  if not seDefault.Lines.Text.IsEmpty then
     seDefault.Lines.SavetoFile(devDirs.Config + DEV_DEFAULTCODE_FILE)
   else
     DeleteFile(devDirs.Config + DEV_DEFAULTCODE_FILE);
@@ -910,7 +910,7 @@ procedure TEditorOptForm.StyleChange(Sender: TObject);
 var
   attr: TSynHighlighterAttributes;
   pt: TPoint;
-  s: AnsiString;
+  s: String;
 begin
   if (ElementList.ItemIndex < 0) or (ElementList.ItemIndex >= ElementList.Items.Count) then
     Exit;
@@ -920,7 +920,7 @@ begin
     pt.x := cpBackground.Selected;
     pt.y := cpForeground.Selected;
 
-    // use local AnsiString just to ease readability
+    // use local String just to ease readability
     s := ElementList.Items[ElementList.ItemIndex];
 
     // if either value is clnone set to Whitespace color values
@@ -947,7 +947,7 @@ begin
 
     // regular SynEdit attributes
   end else begin
-    Attr := TSynHighlighterAttributes.Create(ElementList.Items[ElementList.ItemIndex]);
+    Attr := TSynHighlighterAttributes.Create(ElementList.Items[ElementList.ItemIndex],ElementList.Items[ElementList.ItemIndex]);
     Attr.Assign(cpp.Attribute[ElementList.ItemIndex]);
     with Attr do try
       Foreground := cpForeground.Selected;
@@ -979,7 +979,7 @@ end;
 procedure TEditorOptForm.cppEditStatusChange(Sender: TObject;
   Changes: TSynStatusChanges);
 var
-  Token: AnsiString;
+  Token: String;
   attr: TSynHighlighterAttributes;
 begin
   if assigned(cppEdit.Highlighter) and
@@ -1071,7 +1071,7 @@ begin
 
     offset := cboQuickColor.ItemIndex * 1000;
     for i := 0 to pred(cpp.AttrCount) do begin
-      attr := TSynHighlighterAttributes.Create(cpp.Attribute[i].Name);
+      attr := TSynHighlighterAttributes.Create(cpp.Attribute[i].Name,cpp.Attribute[i].Name);
       try
         StrtoAttr(Attr, LoadStr(i + offset + 1));
         cpp.Attribute[i].Assign(Attr);
@@ -1266,7 +1266,7 @@ procedure TEditorOptForm.btnSaveSyntaxClick(Sender: TObject);
 var
   idx: integer;
   fINI: TIniFile;
-  S: AnsiString;
+  S: String;
   pt: TPoint;
 begin
   s := 'New syntax';
@@ -1302,7 +1302,7 @@ begin
   cboQuickColor.ItemIndex := cboQuickColor.Items.IndexOf(S);
 end;
 
-procedure TEditorOptForm.LoadSyntax(const Value: AnsiString);
+procedure TEditorOptForm.LoadSyntax(const Value: String);
 var
   idx: integer;
   fINI: TIniFile;
@@ -1312,7 +1312,7 @@ begin
   fINI := TIniFile.Create(devDirs.Config + Value + SYNTAX_EXT);
   try
     for idx := 0 to pred(Cpp.AttrCount) do begin
-      Attr := TSynHighlighterAttributes.Create(Cpp.Attribute[idx].Name);
+      Attr := TSynHighlighterAttributes.Create(Cpp.Attribute[idx].Name,Cpp.Attribute[idx].Name);
       try
         StrToAttr(Attr, fINI.ReadString('Editor.Custom', Cpp.Attribute[idx].Name,
           devEditor.Syntax.Values[Cpp.Attribute[idx].Name]));

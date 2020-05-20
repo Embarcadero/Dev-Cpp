@@ -41,11 +41,11 @@ type
     function GetNewEditorPageControl: TPageControl;
     procedure ShowLayout(Layout: TLayoutShowType);
   public
-    function NewEditor(const Filename: AnsiString; InProject, NewFile: boolean; PageControl: TPageControl = nil):
+    function NewEditor(const Filename: String; InProject, NewFile: boolean; PageControl: TPageControl = nil):
       TEditor;
-    function FileIsOpen(const FileName: AnsiString; ProjectOnly: boolean = FALSE): TEditor;
+    function FileIsOpen(const FileName: String; ProjectOnly: boolean = FALSE): TEditor;
     function GetEditor(PageIndex: integer = -1; PageControl: TPageControl = nil): TEditor;
-    function GetEditorFromFileName(const FileName: AnsiString): TEditor;
+    function GetEditorFromFileName(const FileName: String): TEditor;
     function GetEditorFromTag(tag: integer): TEditor;
     function GetPreviousEditor(Editor: TEditor): TEditor;
     procedure ForceCloseEditor(Editor: TEditor); // close, no questions asked
@@ -162,7 +162,7 @@ begin
   end;
 end;
 
-function TEditorList.NewEditor(const Filename: AnsiString; InProject, NewFile: boolean; PageControl: TPageControl =
+function TEditorList.NewEditor(const Filename: String; InProject, NewFile: boolean; PageControl: TPageControl =
   nil):
   TEditor;
 var
@@ -183,7 +183,7 @@ begin
   end;
 end;
 
-function TEditorList.FileIsOpen(const FileName: AnsiString; ProjectOnly: boolean = FALSE): TEditor;
+function TEditorList.FileIsOpen(const FileName: String; ProjectOnly: boolean = FALSE): TEditor;
 var
   e: TEditor;
   I: integer;
@@ -318,7 +318,8 @@ begin
     Exit;
 
   // Ask user if he wants to save
-  if Editor.Text.Modified and not Editor.Text.IsEmpty then begin
+  // TODO: Lift. Is Editor.Text.IsEmpty the same as Editor.Text.Lines.Text.IsEmpty
+  if Editor.Text.Modified and not Editor.Text.Lines.Text.IsEmpty then begin
     case MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE], [Editor.FileName]), mtConfirmation, mbYesNoCancel, 0) of
       mrYes:
         if not Editor.Save then
@@ -414,9 +415,9 @@ begin
   Result := True;
 end;
 
-function TEditorList.GetEditorFromFileName(const FileName: AnsiString): TEditor;
+function TEditorList.GetEditorFromFileName(const FileName: String): TEditor;
 var
-  FullFileName: AnsiString;
+  FullFileName: String;
   I: integer;
   e: TEditor;
 begin

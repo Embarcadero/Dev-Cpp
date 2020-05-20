@@ -24,7 +24,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, ExtCtrls, Buttons, ComCtrls,
-  project, ImgList, ExtDlgs, IniFiles;
+  project, ImgList, ExtDlgs, IniFiles, System.UITypes;
 
 type
   TNewTemplateForm = class(TForm)
@@ -70,8 +70,8 @@ type
     { Private declarations }
     Icons: array[0..1] of TIcon;
     IconFiles: array[0..1] of TFileName;
-    sIcon: AnsiString;
-    sProjIcon: AnsiString;
+    sIcon: String;
+    sProjIcon: String;
     procedure LoadText;
     procedure ReadCategories;
     procedure FillUnits;
@@ -113,7 +113,7 @@ end;
 
 procedure TNewTemplateForm.btnLibClick(Sender: TObject);
 var
-  IconFile: AnsiString;
+  IconFile: String;
 begin
   IconFile := '';
   with TIconForm.Create(Self) do try
@@ -142,7 +142,7 @@ end;
 
 procedure TNewTemplateForm.btnBrowseClick(Sender: TObject);
 var
-  IconFile: AnsiString;
+  IconFile: String;
 begin
   if dlgPic.Execute then begin
     IconFile := dlgPic.FileName;
@@ -277,7 +277,7 @@ procedure TNewTemplateForm.CreateTemplate;
 var
   tmpIni: TIniFile;
   I, C: integer;
-  S, filename: AnsiString;
+  S, filename: String;
 begin
   filename := devDirs.Templates + cmbName.Text + '.template';
   if FileExists(filename) then begin
@@ -293,7 +293,7 @@ begin
     WriteInteger('Template', 'ver', 1);
     WriteString('Template', 'Name', cmbName.Text);
     if IconFiles[0] <> '' then begin
-      CopyFile(PAnsiChar(IconFiles[0]), PAnsiChar(devDirs.Templates + cmbName.Text + '.ico'), False);
+      CopyFile(PChar(IconFiles[0]), PChar(devDirs.Templates + cmbName.Text + '.ico'), False);
       WriteString('Template', 'Icon', cmbName.Text + '.ico');
     end;
     WriteString('Template', 'Description', txtDescr.Text);
@@ -305,7 +305,7 @@ begin
         WriteString('Unit' + IntToStr(C), 'CppName', lstFiles.Items[I]);
         S := StringReplace(cmbName.Text + '_' + lstFiles.Items[I] + '.txt', ' ', '_', [rfReplaceAll]);
         WriteString('Unit' + IntToStr(C), 'Cpp', S);
-        CopyFile(PAnsiChar(TempProject.Units[I].FileName), PAnsiChar(devDirs.Templates + S), False);
+        CopyFile(PChar(TempProject.Units[I].FileName), PChar(devDirs.Templates + S), False);
         Inc(C);
       end;
 
@@ -328,7 +328,7 @@ begin
       WriteString('Project', 'ResourceIncludes', TempProject.Options.ResourceIncludes.DelimitedText);
 
     if IconFiles[1] <> '' then begin
-      CopyFile(PAnsiChar(IconFiles[1]), PAnsiChar(devDirs.Templates + cmbName.Text + '.project.ico'), False);
+      CopyFile(PChar(IconFiles[1]), PChar(devDirs.Templates + cmbName.Text + '.project.ico'), False);
       WriteString('Project', 'Icon', cmbName.Text + '.project.ico');
     end;
     MessageDlg('The new template has been created!'#10#10 +

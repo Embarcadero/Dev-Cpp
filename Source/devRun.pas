@@ -25,21 +25,21 @@ uses
   Classes, Windows, Dialogs, utils;
 
 type
-  TLineOutputEvent = procedure(Sender: TObject; const Line: AnsiString) of object;
+  TLineOutputEvent = procedure(Sender: TObject; const Line: String) of object;
 
   TDevRun = class(TThread)
   private
-    fCurrentLine: AnsiString;
+    fCurrentLine: String;
     fLineOutput: TLineOutputEvent;
     fCheckAbort: TCheckAbortFunc;
   protected
     procedure CallLineOutputEvent;
     procedure Execute; override;
-    procedure LineOutput(const Line: AnsiString);
+    procedure LineOutput(const Line: String);
   public
-    Command: AnsiString;
-    Directory: AnsiString;
-    Output: AnsiString;
+    Command: String;
+    Directory: String;
+    Output: String;
     property OnLineOutput: TLineOutputEvent read FLineOutput write FLineOutput;
     property OnCheckAbort: TCheckAbortFunc read FCheckAbort write FCheckAbort;
   end;
@@ -51,7 +51,7 @@ begin
   fLineOutput(Self, fCurrentLine);
 end;
 
-procedure TDevRun.LineOutput(const Line: AnsiString);
+procedure TDevRun.LineOutput(const Line: String);
 begin
   fCurrentLine := Line;
   if Assigned(fLineOutput) then

@@ -112,7 +112,7 @@ end;
 
 procedure TCPUForm.edFuncKeyPress(Sender: TObject; var Key: Char);
 var
-  propercmd: AnsiString;
+  propercmd: String;
 begin
   if MainForm.Debugger.Executing then begin
     if Key = Chr(VK_RETURN) then begin

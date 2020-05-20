@@ -80,7 +80,7 @@ object FilePropertiesForm: TFilePropertiesForm
   object lblTotalLines: TLabel
     Left = 20
     Top = 150
-    Width = 89
+    Width = 87
     Height = 15
     Caption = 'Total lines in file:'
   end
@@ -142,7 +142,7 @@ object FilePropertiesForm: TFilePropertiesForm
   object lblTimeStamp: TLabel
     Left = 20
     Top = 264
-    Width = 63
+    Width = 62
     Height = 15
     Caption = 'Timestamp:'
   end
@@ -252,7 +252,6 @@ object FilePropertiesForm: TFilePropertiesForm
     Width = 316
     Height = 23
     Style = csDropDownList
-    ItemHeight = 15
     TabOrder = 0
     OnClick = cmbFilesClick
   end

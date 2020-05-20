@@ -45,7 +45,7 @@ type
   public
     { Public declarations }
     fParser: TCppParser;
-    fFileName: AnsiString;
+    fFileName: String;
   end;
 
 implementation
@@ -59,7 +59,7 @@ procedure TFunctionSearchForm.txtSearchChange(Sender: TObject);
 var
   Node: PStatementNode;
   Statement: PStatement;
-  ScopeCommand: AnsiString;
+  ScopeCommand: String;
 begin
   if not Assigned(fParser) then
     Exit;

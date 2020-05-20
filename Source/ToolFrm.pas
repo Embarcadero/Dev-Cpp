@@ -30,10 +30,10 @@ type
 
   PToolItem = ^TToolItem;
   TToolItem = record
-    Title: AnsiString;
-    Exec: AnsiString;
-    WorkDir: AnsiString;
-    Params: AnsiString;
+    Title: String;
+    Exec: String;
+    WorkDir: String;
+    Params: String;
   end;
 
   TToolList = class
@@ -50,7 +50,7 @@ type
     procedure RemoveItem(index: integer);
     procedure LoadTools;
     procedure SaveTools;
-    function ParseString(const S: AnsiString): AnsiString;
+    function ParseString(const S: String): String;
 
     property Items[index: integer]: PToolItem read GetItem write SetItem; default;
     property Count: integer read GetCount;
@@ -161,7 +161,7 @@ var
     idx: integer;
   Item: PToolItem;
   Value,
-    section: AnsiString;
+    section: String;
 begin
   if not FileExists(devDirs.Config + DEV_TOOLS_FILE) then
     exit;
@@ -192,7 +192,7 @@ var
   Count,
     idx: integer;
   Value,
-    section: AnsiString;
+    section: String;
   item: PToolItem;
 begin
   if fList.Count = 0 then
@@ -237,7 +237,7 @@ begin
   end;
 end;
 
-function TToolList.ParseString(const s: AnsiString): AnsiString;
+function TToolList.ParseString(const s: String): String;
 begin
   result := StringReplace(s, devDirs.Exec, '<EXECPATH>', [rfReplaceAll]);
   result := StringReplace(Result, devDirs.Default, '<DEFAULT>', [rfReplaceAll]);

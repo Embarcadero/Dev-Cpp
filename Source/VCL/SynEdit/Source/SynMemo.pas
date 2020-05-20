@@ -12,6 +12,7 @@ The Original Code is: SynMemo.pas, released 2000-04-07.
 The Original Code is based on mwCustomEdit.pas by Martin Waldenburg, part of
 the mwEdit component suite.
 Portions created by Martin Waldenburg are Copyright (C) 1998 Martin Waldenburg.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -27,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynMemo.pas,v 1.15 2004/01/04 21:49:04 etrusco Exp $
+$Id: SynMemo.pas,v 1.15.2.3 2008/09/14 16:25:03 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -37,35 +38,24 @@ Known Issues:
   - EM_XXX messages aren't implemented on CLX, although this could be useful;
 -------------------------------------------------------------------------------}
 
-{$IFNDEF QSYNMEMO}
 unit SynMemo;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  Qt,
-  Types,
-  QSynEdit,
-  QSynEditTextBuffer,
-  QSynEditTypes,
-{$ELSE}
   RichEdit,
   Windows,
   Messages,
   SynEdit,
   SynEditTextBuffer,
   SynEditTypes,
-{$ENDIF}
   SysUtils,
   Classes;
 
 type
   TSynMemo = class(TSynEdit)
-{$IFNDEF SYN_CLX}
   private
     // EM_XXX see winuser.h (PSDK August 2001)
     procedure EMGetSel(var Message: TMessage); message EM_GETSEL;
@@ -198,41 +188,37 @@ type
     procedure EMSETEDITSTYLE(var Message: TMessage); message EM_SETEDITSTYLE;
     procedure EMGETEDITSTYLE(var Message: TMessage); message EM_GETEDITSTYLE;
     }
-{$ENDIF NOT SYN_CLX}
   end;
 
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditMiscProcs;
-{$ELSE}
+  AnsiStrings,
+  WideStrUtils,
+  SynUnicode,
   SynEditMiscProcs;
-{$ENDIF}
-
-{$IFNDEF SYN_CLX}
 
 { TSynMemo }
 
+// EM_GETSEL
+// wParam = (WPARAM) (LPDWORD) lpdwStart;      // receives starting position
+// lParam = (LPARAM) (LPDWORD) lpdwEnd;        // receives ending position
 procedure TSynMemo.EMGetSel(var Message: TMessage);
 var
   s, e: integer;
 begin
-  // EM_GETSEL
-  // wParam = (WPARAM) (LPDWORD) lpdwStart;      // receives starting position
-  // lParam = (LPARAM) (LPDWORD) lpdwEnd;        // receives ending position
   s := GetSelStart;
   e := GetSelEnd;
   if Message.wParam <> 0 then PDWORD(Message.wParam)^ := s;
   if Message.lParam <> 0 then PDWORD(Message.lParam)^ := e;
-  Message.result := MakeLong(s, e)
+  Message.Result := MakeLong(s, e)
 end;
 
+// EM_SETSEL
+// wParam = (WPARAM) (INT) nStart;             // starting position
+// lParam = (LPARAM) (INT) nEnd;               // ending position
 procedure TSynMemo.EMSetSel(var Message: TMessage);
 begin
-  // EM_SETSEL
-  // wParam = (WPARAM) (INT) nStart;             // starting position
-  // lParam = (LPARAM) (INT) nEnd;               // ending position
   SetSelStart(Message.wParam);
   SetSelEnd(Message.lParam);
 end;
@@ -244,7 +230,7 @@ end;
 
 procedure TSynMemo.EMGetModify(var Message: TMessage);
 begin
-  Message.result := integer(Modified);
+  Message.Result := Integer(Modified);
 end;
 
 procedure TSynMemo.EMGetLineCount(var Message: TMessage);
@@ -255,41 +241,41 @@ begin
 end;
 
 procedure TSynMemo.EMGetSelText(var Message: TMessage);
-var
-  s: string;
 begin
-  if Message.lParam <> 0 then begin
-    s := SelText;
-    StrLCopy(PChar(Message.lParam), PChar(s), length(s));
-    Message.Result := length(s);
-  end;
+  if Message.lParam <> 0 then
+  begin
+    if IsWindowUnicode(Handle) then
+      WStrLCopy(PWideChar(Message.lParam), PWideChar(SelText), Length(SelText))
+    else
+      AnsiStrings.StrLCopy(PAnsiChar(Message.lParam), PAnsiChar(AnsiString(SelText)), Length(SelText));
+    Message.Result := Length(SelText);
+  end;                          
 end;
 
+
+// EM_REPLACESEL
+// fCanUndo = (BOOL) wParam ;                  // flag that specifies whether replacement can be undone
+// lpszReplace = (LPCTSTR) lParam ;            // pointer to replacement text string
+// see PasteFromClipboard CF_TEXT - use common function ?
+// or use SetSelText/SetSelTextPrimitive (no undo)
 procedure TSynMemo.EMReplaceSel(var Message: TMessage);
 var
   StartOfBlock: TBufferCoord;
   EndOfBlock: TBufferCoord;
 begin
-  // EM_REPLACESEL
-  // fCanUndo = (BOOL) wParam ;                  // flag that specifies whether replacement can be undone
-  // lpszReplace = (LPCTSTR) lParam ;            // pointer to replacement text string
-  // see PasteFromClipboard CF_TEXT - use common function ?
-  // or use SetSelText/SetSelTextPrimitive (no undo)
-
   if ReadOnly then exit;
   DoOnPaintTransient(ttBefore);
   BeginUndoBlock;
   try
-    if SelAvail and (Message.WParam <> 0){???} then begin
+    if SelAvail and (Message.WParam <> 0){???} then
       UndoList.AddChange(crDelete, BlockBegin, BlockEnd, SelText, SelectionMode);
-    end;
     StartOfBlock := BlockBegin;
     EndOfBlock := BlockEnd;
     BlockBegin := StartOfBlock;
     BlockEnd := EndOfBlock;
     LockUndo;
     try
-      SelText := PChar(Message.lParam);
+      SelText := PWideChar(Message.lParam)
     finally
       UnlockUndo;
     end;
@@ -306,71 +292,82 @@ begin
   DoOnPaintTransient(ttAfter);
 end;
 
+// wParam = line number
+// lParam = line string (PAnsiChar/PWideChar)
+// no terminating #0
 procedure TSynMemo.EMGetLine(var Message: TMessage);
 var
-  dest: PChar;
+  DestAnsi, SourceAnsi: PAnsiChar;
+  DestWide, SourceWide: PWideChar;
 begin
-  //(WPARAM) wParam,      // line number
-  //(LPARAM) lParam       // line buffer (LPCTSTR)
-  // other than Editcontrol with terminating #0
-  if (Message.WParam >= 0) and (Message.WParam < Lines.Count) then begin
-    dest := PChar(Message.LParam);
-    StrLCopy(dest, PChar(Lines[Message.WParam]), PWord(Message.LParam)^);
-    Message.result := StrLen(dest);
-  end else begin
-    Message.result := 0;
-  end;
+  if (Integer(Message.WParam) < Lines.Count) then
+  begin
+    if IsWindowUnicode(Handle) then
+    begin
+      DestWide := PWideChar(Message.LParam);
+      SourceWide := PWideChar(Lines[Message.WParam]);
+      WStrLCopy(DestWide, SourceWide, PWord(Message.LParam)^);
+      Message.Result := WStrLen(DestWide);
+    end
+    else
+    begin
+      DestAnsi := PAnsiChar(Message.LParam);
+      SourceAnsi := PAnsiChar(AnsiString(Lines[Message.WParam]));
+      AnsiStrings.StrLCopy(DestAnsi, SourceAnsi, PWord(Message.LParam)^);
+      Message.Result := AnsiStrings.StrLen(DestAnsi);
+    end
+  end
+  else
+    Message.Result := 0;
 end;
 
+//(WPARAM) wParam,    // not used; must be zero
+//(LPARAM) lParam     // not used; must be zero
 procedure TSynMemo.EMCanUndo(var Message: TMessage);
 begin
-  //(WPARAM) wParam,    // not used; must be zero
-  //(LPARAM) lParam     // not used; must be zero
-  Message.Result := integer(CanUndo);
+  Message.Result := Integer(CanUndo);
 end;
 
+//(WPARAM) wParam,    // not used; must be zero
+//(LPARAM) lParam     // not used; must be zero
 procedure TSynMemo.EMUndo(var Message: TMessage);
 begin
-  //(WPARAM) wParam,    // not used; must be zero
-  //(LPARAM) lParam     // not used; must be zero
-  Message.Result := integer(CanUndo);
+  Message.Result := Integer(CanUndo);
   Undo;
 end;
 
+//(WPARAM) wParam,          // not used; must be zero
+//(LPARAM) lParam           // not used; must be zero
 procedure TSynMemo.EMGetFirstVisibleLine(var Message: TMessage);
 begin
-  //(WPARAM) wParam,          // not used; must be zero
-  //(LPARAM) lParam           // not used; must be zero
   Message.Result := TopLine;
 end;
 
+//(WPARAM) wParam,    // not used; must be zero
+//(LPARAM) lParam     // point coordinates
 procedure TSynMemo.EMCharFromPos(var Message: TMessage);
 var
   vPos: TBufferCoord;
-  i: integer;
+  i: Integer;
 begin
-  //(WPARAM) wParam,    // not used; must be zero
-  //(LPARAM) lParam     // point coordinates
-  // ???
   vPos := DisplayToBufferPos(PixelsToRowColumn(Message.LParamLo, Message.LParamHi));
 
   Dec(vPos.Line);
   if vPos.Line >= Lines.Count then 
     vPos.Char := 1
   else if vPos.Char > Length(Lines[vPos.Line]) then
-    vPos.Char := Length(Lines[vPos.Line]) +1; // ???
+    vPos.Char := Length(Lines[vPos.Line]) + 1; // ???
 
   i := vPos.Line;
-  while i > 0 do begin
+  while i > 0 do
+  begin
     dec(i);
-    inc(vPos.Char, length(Lines[i])+2);
+    inc(vPos.Char, Length(Lines[i]) + 2);
   end;
 
   //todo: this can't be right, CharIndex can easily overflow
   Message.Result := MakeLong(vPos.Char{CharIndex}, vPos.Line{Line zero based});
 end;
-
-{$ENDIF NOT SYN_CLX}
 
 end.
 

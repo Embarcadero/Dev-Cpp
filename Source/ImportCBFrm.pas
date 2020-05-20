@@ -48,20 +48,20 @@ type
     procedure txtDevChange(Sender: TObject);
     procedure btnBrowseDevClick(Sender: TObject);
     procedure btnImportClick(Sender: TObject);
-    procedure SetDevName(Value : AnsiString);
-    procedure WriteDev(Section, Key, Value: AnsiString);
-    procedure SetFilename(Value: AnsiString);
+    procedure SetDevName(Value : String);
+    procedure WriteDev(Section, Key, Value: String);
+    procedure SetFilename(Value: String);
     procedure WriteDefaultEntries;
   private
     { Private declarations }
     fSL: TStringList;
-    fFilename: AnsiString;
-    procedure ImportFile(Filename : AnsiString);
+    fFilename: String;
+    procedure ImportFile(Filename : String);
     procedure LoadText;
     procedure UpdateButtons;
   public
     { Public declarations }
-    function GetFilename: AnsiString;
+    function GetFilename: String;
   end;
 
 //var
@@ -120,13 +120,13 @@ begin
   UpdateButtons;
 end;
 
-procedure TImportCBForm.ImportFile(Filename: AnsiString);
+procedure TImportCBForm.ImportFile(Filename: String);
 begin
 	//SetPath(ExtractFilePath(FileName));
 	fSL.LoadFromFile(Filename);
 end;
 
-function TImportCBForm.GetFilename: AnsiString;
+function TImportCBForm.GetFilename: String;
 begin
   Result := fFilename;
 end;
@@ -155,12 +155,12 @@ begin
   btnCancel.Caption := Lang[ID_BTN_CANCEL];
 end;
 
-procedure TImportCBForm.SetDevName(Value: AnsiString);
+procedure TImportCBForm.SetDevName(Value: String);
 begin
   WriteDev('Project', 'Name', Value);
 end;
 
-procedure TImportCBForm.SetFilename(Value: AnsiString);
+procedure TImportCBForm.SetFilename(Value: String);
 begin
   WriteDev('Project', 'FileName', Value);
   fFilename := Value;
@@ -172,7 +172,7 @@ begin
   WriteDev('Project', 'IsCpp', '1'); // all MSVC projects are C++ (correct me if I 'm wrong)
 end;
 
-procedure TImportCBForm.WriteDev(Section, Key, Value: AnsiString);
+procedure TImportCBForm.WriteDev(Section, Key, Value: String);
 var
   fIni: TIniFile;
 begin
@@ -189,7 +189,7 @@ var
 	filepos : integer;
 	ending : integer;
 	i : integer;
-	filestring : AnsiString;
+	filestring : String;
 begin
 	if FileExists(fFilename) then begin
 		if MessageDlg(fFilename + ' already exists. Are you sure you want to overwrite it?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then

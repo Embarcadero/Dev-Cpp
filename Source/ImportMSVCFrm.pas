@@ -51,14 +51,14 @@ type
   private
     { Private declarations }
     fSL: TStringList;
-    fFilename: AnsiString;
-    fInvalidFiles: AnsiString;
+    fFilename: String;
+    fInvalidFiles: String;
     procedure LoadText;
-    procedure WriteDev(Section, Key, Value: AnsiString);
-    procedure ImportFile(Filename: AnsiString);
+    procedure WriteDev(Section, Key, Value: String);
+    procedure ImportFile(Filename: String);
     procedure WriteDefaultEntries;
-    procedure SetFilename(Value: AnsiString);
-    procedure SetDevName(Value: AnsiString);
+    procedure SetFilename(Value: String);
+    procedure SetDevName(Value: String);
     function ReadTargets(Targets: TStringList): boolean;
     function LocateTarget(var StartAt, EndAt: integer): boolean;
     function LocateSourceTarget(var StartAt, EndAt: integer): boolean;
@@ -66,13 +66,13 @@ type
     function ReadLinkerOptions(StartAt, EndAt: integer): boolean;
     procedure ReadSourceFiles(StartAt, EndAt: integer);
     procedure ReadProjectType;
-    function GetLineValue(StartAt, EndAt: integer; StartsWith: AnsiString): AnsiString;
-    function StripQuotesIfNecessary(s: AnsiString): AnsiString;
+    function GetLineValue(StartAt, EndAt: integer; StartsWith: String): String;
+    function StripQuotesIfNecessary(s: String): String;
     procedure UpdateButtons;
     function CheckVersion: boolean;
   public
     { Public declarations }
-    function GetFilename: AnsiString;
+    function GetFilename: String;
   end;
 
 //var
@@ -114,7 +114,7 @@ begin
 end;
 
 function TImportMSVCForm.GetLineValue(StartAt, EndAt: integer;
-  StartsWith: AnsiString): AnsiString;
+  StartsWith: String): String;
 var
   I: integer;
 begin
@@ -131,7 +131,7 @@ begin
   end;
 end;
 
-procedure TImportMSVCForm.ImportFile(Filename: AnsiString);
+procedure TImportMSVCForm.ImportFile(Filename: String);
 var
   Targets: TStringList;
 begin
@@ -204,9 +204,9 @@ function TImportMSVCForm.ReadCompilerOptions(StartAt,
 var
   I: integer;
   Options: TStringList;
-  sCompiler: AnsiString;
-  sDirs: AnsiString;
-  S: AnsiString;
+  sCompiler: String;
+  sDirs: String;
+  S: String;
 begin
   Result := False;
   sCompiler := '-D__GNUWIN32__ ';
@@ -311,9 +311,9 @@ function TImportMSVCForm.ReadLinkerOptions(StartAt,
 var
   I: integer;
   Options: TStringList;
-  sLibs: AnsiString;
-  sDirs: AnsiString;
-  S: AnsiString;
+  sLibs: String;
+  sDirs: String;
+  S: String;
 begin
   Result := False;
   sLibs := '';
@@ -368,9 +368,9 @@ procedure TImportMSVCForm.ReadSourceFiles(StartAt,
 var
   flds: TStringList;
   I, C: integer;
-  UnitName: AnsiString;
-  folder: AnsiString;
-  folders: AnsiString;
+  UnitName: String;
+  folder: String;
+  folders: String;
 begin
   fInvalidFiles := '';
   C := 0;
@@ -433,7 +433,7 @@ end;
 function TImportMSVCForm.ReadTargets(Targets: TStringList): boolean;
 var
   I: integer;
-  P: PAnsiChar;
+  P: PChar;
 begin
   Targets.Clear;
   Result := False;
@@ -444,7 +444,7 @@ begin
       Inc(I);
       repeat
         if StartsText('# Name', fSL[I]) then begin
-          P := PAnsiChar(Trim(Copy(fSL[I], 7, Length(fSL[I]) - 6)));
+          P := PChar(Trim(Copy(fSL[I], 7, Length(fSL[I]) - 6)));
           Targets.Add(AnsiExtractQuotedStr(P, '"'));
           Result := True;
         end;
@@ -456,23 +456,23 @@ begin
   end;
 end;
 
-procedure TImportMSVCForm.SetDevName(Value: AnsiString);
+procedure TImportMSVCForm.SetDevName(Value: String);
 begin
   WriteDev('Project', 'Name', Value);
 end;
 
-procedure TImportMSVCForm.SetFilename(Value: AnsiString);
+procedure TImportMSVCForm.SetFilename(Value: String);
 begin
   WriteDev('Project', 'FileName', Value);
   fFilename := Value;
 end;
 
-function TImportMSVCForm.StripQuotesIfNecessary(s: AnsiString): AnsiString;
+function TImportMSVCForm.StripQuotesIfNecessary(s: String): String;
 var
-  P: PAnsiChar;
+  P: PChar;
 begin
   if StartsText('"', s) and EndsText('"', s) then begin
-    P := PAnsiChar(S);
+    P := PChar(S);
     Result := AnsiExtractQuotedStr(P, '"');
   end
   else
@@ -485,7 +485,7 @@ begin
   WriteDev('Project', 'IsCpp', '1'); // all MSVC projects are C++ (correct me if I 'm wrong)
 end;
 
-procedure TImportMSVCForm.WriteDev(Section, Key, Value: AnsiString);
+procedure TImportMSVCForm.WriteDev(Section, Key, Value: String);
 var
   fIni: TIniFile;
 begin
@@ -501,7 +501,7 @@ procedure TImportMSVCForm.btnImportClick(Sender: TObject);
 var
   StartAt, EndAt: integer;
   SrcStartAt, SrcEndAt: integer;
-  sMsg: AnsiString;
+  sMsg: String;
 begin
   if FileExists(fFilename) then begin
     if MessageDlg(fFilename + ' exists. Are you sure you want to overwrite it?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
@@ -541,13 +541,13 @@ end;
 procedure TImportMSVCForm.ReadProjectType();
 var
   I: integer;
-  P: PAnsiChar;
+  P: PChar;
 begin
   I := 0;
   while I < fSL.Count do begin
     if StartsText('# TARGTYPE', fSL[I]) then begin
       // got it
-      P := PAnsiChar(Copy(fSL[I], Length(fSL[I]) - 5, 7));
+      P := PChar(Copy(fSL[I], Length(fSL[I]) - 5, 7));
       if (P = '0x0102' ) then // "Win32 (x86) Dynamic-Link Library"
         WriteDev('Project', 'Type', '3')
       else if( P = '0x0103' ) then // "Win32 (x86) Console Application"
@@ -581,7 +581,7 @@ begin
   UpdateButtons;
 end;
 
-function TImportMSVCForm.GetFilename: AnsiString;
+function TImportMSVCForm.GetFilename: String;
 begin
   Result := fFilename;
 end;

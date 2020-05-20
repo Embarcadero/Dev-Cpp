@@ -71,16 +71,16 @@ type
     fOnSelect: TMemberSelectEvent;
     fImagesRecord: TImagesRecord;
     fShowFilter: TShowFilter;
-    fCurrentFile: AnsiString;
-    fProjectDir: AnsiString;
+    fCurrentFile: String;
+    fProjectDir: String;
     fControlCanvas: TControlCanvas;
     fShowInheritedMembers: boolean;
     fIncludedFiles: TStringList;
-    fIsIncludedCacheFileName: AnsiString;
+    fIsIncludedCacheFileName: String;
     fIsIncludedCacheResult: boolean;
     fUpdateCount: integer;
     fTabVisible: boolean;
-    fLastSelection: AnsiString;
+    fLastSelection: String;
     procedure SetParser(Value: TCppParser);
     procedure AddMembers(Node: TTreeNode; ParentStatementNode: PStatementNode);
     procedure AdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
@@ -92,11 +92,11 @@ type
     procedure OnParserBusy(Sender: TObject);
     procedure SetNodeImages(Node: TTreeNode; Statement: PStatement);
     procedure Sort;
-    procedure SetCurrentFile(const Value: AnsiString);
+    procedure SetCurrentFile(const Value: String);
     procedure SetShowFilter(Value: TShowFilter);
     procedure SetShowInheritedMembers(Value: boolean);
     procedure SetTabVisible(Value: boolean);
-    function IsIncluded(const FileName: AnsiString): boolean;
+    function IsIncluded(const FileName: String): boolean;
     procedure ReSelect;
   public
     constructor Create(AOwner: TComponent); override;
@@ -121,8 +121,8 @@ type
     property OnSelect: TMemberSelectEvent read fOnSelect write fOnSelect;
     property Parser: TCppParser read fParser write SetParser;
     property ItemImages: TImagesRecord read fImagesRecord write fImagesRecord;
-    property CurrentFile: AnsiString read fCurrentFile write SetCurrentFile;
-    property ProjectDir: AnsiString read fProjectDir write fProjectDir;
+    property CurrentFile: String read fCurrentFile write SetCurrentFile;
+    property ProjectDir: String read fProjectDir write fProjectDir;
     property ShowInheritedMembers: boolean read fShowInheritedMembers write SetShowInheritedMembers;
     property TabVisible: boolean read fTabVisible write SetTabVisible;
   end;
@@ -404,7 +404,7 @@ begin
   else
     Result := Ord(PStatement(Node1.Data)^._Kind) - Ord(PStatement(Node2.Data)^._Kind);
   if Result = 0 then
-    Result := StrIComp(PAnsiChar(Node1.Text), PAnsiChar(Node2.Text));
+    Result := StrIComp(PChar(Node1.Text), PChar(Node2.Text));
 end;
 
 procedure TClassBrowser.Sort;
@@ -430,7 +430,7 @@ begin
   UpdateView;
 end;
 
-procedure TClassBrowser.SetCurrentFile(const Value: AnsiString);
+procedure TClassBrowser.SetCurrentFile(const Value: String);
 begin
   if Value = fCurrentFile then
     Exit;
@@ -471,7 +471,7 @@ var
   DrawPoint: TPoint;
   st: PStatement;
   bInherited: boolean;
-  TypeText: AnsiString;
+  TypeText: String;
 begin
   // Assume the node image is correct
   bInherited := fShowInheritedMembers and (Node.ImageIndex in [
@@ -520,7 +520,7 @@ begin
   end;
 end;
 
-function TClassBrowser.IsIncluded(const FileName: AnsiString): boolean;
+function TClassBrowser.IsIncluded(const FileName: String): boolean;
 begin
   // Only do the slow check if the cache is invalid
   if not SameStr(FileName, fIsIncludedCacheFileName) then begin

@@ -30,6 +30,10 @@ object EditorOptForm: TEditorOptForm
     OnChange = PagesMainChange
     object tabGeneral: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object grpMargin: TGroupBox
         Left = 264
         Top = 220
@@ -76,7 +80,6 @@ object EditorOptForm: TEditorOptForm
           Height = 22
           DefaultColorColor = cl3DLight
           Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
-          ItemHeight = 16
           TabOrder = 2
         end
       end
@@ -243,7 +246,6 @@ object EditorOptForm: TEditorOptForm
           Width = 100
           Height = 23
           Style = csDropDownList
-          ItemHeight = 15
           TabOrder = 0
           Items.Strings = (
             'Vertical Line'
@@ -257,7 +259,6 @@ object EditorOptForm: TEditorOptForm
           Width = 100
           Height = 23
           Style = csDropDownList
-          ItemHeight = 15
           TabOrder = 1
           Items.Strings = (
             'Vertical Line'
@@ -304,7 +305,6 @@ object EditorOptForm: TEditorOptForm
           Height = 22
           DefaultColorColor = 16777164
           Style = [cbStandardColors, cbIncludeDefault, cbCustomColor, cbPrettyNames]
-          ItemHeight = 16
           TabOrder = 1
         end
       end
@@ -318,7 +318,7 @@ object EditorOptForm: TEditorOptForm
         object lblTabSize: TLabel
           Left = 176
           Top = 32
-          Width = 46
+          Width = 44
           Height = 15
           Caption = 'Tab Size:'
         end
@@ -352,6 +352,10 @@ object EditorOptForm: TEditorOptForm
     end
     object tabDisplay: TTabSheet
       Caption = 'Fonts'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ScrollHint: TLabel
         Left = 0
         Top = 382
@@ -532,6 +536,10 @@ object EditorOptForm: TEditorOptForm
     end
     object tabSyntax: TTabSheet
       Caption = 'Colors'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblForeground: TLabel
         Left = 9
         Top = 182
@@ -602,6 +610,12 @@ object EditorOptForm: TEditorOptForm
         Font.Name = 'Courier New'
         Font.Style = []
         TabOrder = 3
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.ShowCollapsedLine = True
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
+        UseCodeFolding = False
         Gutter.AutoSize = True
         Gutter.BorderStyle = gbsNone
         Gutter.DigitCount = 2
@@ -617,7 +631,6 @@ object EditorOptForm: TEditorOptForm
         Gutter.GradientEndColor = clBackground
         HideSelection = True
         Highlighter = cpp
-        UseCodeFolding = True
         Lines.Strings = (
           '#include <iostream>'
           '#include <conio.h>'
@@ -722,7 +735,6 @@ object EditorOptForm: TEditorOptForm
         Width = 130
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
         TabOrder = 1
         OnSelect = cboQuickColorSelect
         Items.Strings = (
@@ -760,7 +772,6 @@ object EditorOptForm: TEditorOptForm
         Width = 110
         Height = 22
         Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
-        ItemHeight = 16
         TabOrder = 6
         OnChange = StyleChange
       end
@@ -770,13 +781,16 @@ object EditorOptForm: TEditorOptForm
         Width = 110
         Height = 22
         Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
-        ItemHeight = 16
         TabOrder = 7
         OnChange = StyleChange
       end
     end
     object tabCode: TTabSheet
       Caption = 'Snippets'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PagesSnippets: TPageControl
         Left = 0
         Top = 0
@@ -787,6 +801,10 @@ object EditorOptForm: TEditorOptForm
         TabOrder = 0
         object tabCPInserts: TTabSheet
           Caption = 'Inserts'
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object btnAdd: TButton
             Left = 384
             Top = 45
@@ -818,6 +836,12 @@ object EditorOptForm: TEditorOptForm
             Font.Style = []
             TabOrder = 2
             TabStop = False
+            CodeFolding.CollapsedLineColor = clGrayText
+            CodeFolding.FolderBarLinesColor = clGrayText
+            CodeFolding.ShowCollapsedLine = True
+            CodeFolding.IndentGuidesColor = clGray
+            CodeFolding.IndentGuides = True
+            UseCodeFolding = False
             Gutter.AutoSize = True
             Gutter.BorderStyle = gbsNone
             Gutter.Font.Charset = DEFAULT_CHARSET
@@ -829,7 +853,6 @@ object EditorOptForm: TEditorOptForm
             Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
             Highlighter = cpp
-            UseCodeFolding = True
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4
             WantTabs = True
@@ -864,6 +887,10 @@ object EditorOptForm: TEditorOptForm
         end
         object tabCPDefault: TTabSheet
           Caption = 'Default Insert'
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object cbDefaultCode: TCheckBox
             Left = 4
             Top = 2
@@ -884,6 +911,12 @@ object EditorOptForm: TEditorOptForm
             Font.Style = []
             TabOrder = 1
             TabStop = False
+            CodeFolding.CollapsedLineColor = clGrayText
+            CodeFolding.FolderBarLinesColor = clGrayText
+            CodeFolding.ShowCollapsedLine = True
+            CodeFolding.IndentGuidesColor = clGray
+            CodeFolding.IndentGuides = True
+            UseCodeFolding = False
             Gutter.AutoSize = True
             Gutter.BorderStyle = gbsNone
             Gutter.Font.Charset = DEFAULT_CHARSET
@@ -916,6 +949,10 @@ object EditorOptForm: TEditorOptForm
     end
     object tabCBCompletion: TTabSheet
       Caption = 'Completion'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PagesCompletion: TPageControl
         Left = 0
         Top = 0
@@ -927,6 +964,10 @@ object EditorOptForm: TEditorOptForm
         object tabCodeCompletion: TTabSheet
           Caption = 'Code Completion'
           ImageIndex = 1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object lblCompletionColor: TLabel
             Left = 328
             Top = 108
@@ -957,7 +998,6 @@ object EditorOptForm: TEditorOptForm
             Height = 22
             DefaultColorColor = clWhite
             Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
-            ItemHeight = 16
             TabOrder = 1
           end
           object gbCBEngine: TGroupBox
@@ -1003,6 +1043,10 @@ object EditorOptForm: TEditorOptForm
         object tabSymbolCompletion: TTabSheet
           Caption = 'Symbol Completion'
           ImageIndex = 2
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object grpSpecific: TGroupBox
             Left = 16
             Top = 40
@@ -1090,6 +1134,10 @@ object EditorOptForm: TEditorOptForm
     object tabAutosave: TTabSheet
       Caption = 'Autosave'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object cbAutoSave: TCheckBox
         Left = 8
         Top = 8
@@ -1116,7 +1164,7 @@ object EditorOptForm: TEditorOptForm
         object lblTimeStampExample: TLabel
           Left = 24
           Top = 296
-          Width = 47
+          Width = 48
           Height = 15
           Caption = 'Example:'
         end
@@ -1168,9 +1216,6 @@ object EditorOptForm: TEditorOptForm
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'OK'
-    ModalResult = 1
-    TabOrder = 1
-    OnClick = btnOkClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
       0400000000006801000000000000000000001000000000000000000000000000
@@ -1188,7 +1233,10 @@ object EditorOptForm: TEditorOptForm
       3338F38F000033333333333333A223333333333333338F830000333333333333
       333A333333333333333338330000333333333333333333333333333333333333
       0000}
+    ModalResult = 1
     NumGlyphs = 2
+    TabOrder = 1
+    OnClick = btnOkClick
   end
   object btnCancel: TBitBtn
     Left = 300
@@ -1196,9 +1244,10 @@ object EditorOptForm: TEditorOptForm
     Width = 85
     Height = 25
     Anchors = [akRight, akBottom]
+    Kind = bkCancel
+    NumGlyphs = 2
     TabOrder = 2
     OnClick = btnCancelClick
-    Kind = bkCancel
   end
   object btnHelp: TBitBtn
     Left = 390
@@ -1207,12 +1256,16 @@ object EditorOptForm: TEditorOptForm
     Height = 25
     Anchors = [akRight, akBottom]
     Enabled = False
+    Kind = bkHelp
+    NumGlyphs = 2
     TabOrder = 3
     OnClick = btnHelpClick
-    Kind = bkHelp
   end
   object cpp: TSynCppSyn
     DefaultFilter = 'C++ Files (*.c,*.cpp,*.h,*.hpp)|*.c;*.cpp;*.h;*.hpp'
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
     Left = 5
     Top = 458
   end

@@ -31,23 +31,23 @@ type
   private
     fLangList: TStringList;
     fLangListLoaded: Boolean;
-    fLangFile: AnsiString;
-    fCurLang: AnsiString;
+    fLangFile: String;
+    fCurLang: String;
     fStrings: TStringList;
     fDefaultLangStrings: TStringList;
-    function GetString(ID: integer): AnsiString;
-    function GetLangName: AnsiString;
+    function GetString(ID: integer): String;
+    function GetLangName: String;
     constructor Create;
   public
     destructor Destroy; override;
     procedure SelectLanguage;
     procedure CheckLanguageFiles;
-    procedure Open(const FileName: AnsiString);
-    procedure SetLang(const Lang: AnsiString);
+    procedure Open(const FileName: String);
+    procedure SetLang(const Lang: String);
     function GetLangList: TStringList;
-    function FileFromDescription(const Desc: AnsiString): AnsiString;
-    property Strings[index: integer]: AnsiString read GetString; default;
-    property CurrentLanguage: AnsiString read GetLangName;
+    function FileFromDescription(const Desc: String): String;
+    property Strings[index: integer]: String read GetString; default;
+    property CurrentLanguage: String read GetLangName;
     property Langs: TStringList read GetLangList;
   end;
 
@@ -70,7 +70,7 @@ end;
 
 constructor TdevMultiLangSupport.Create;
 var
-  DefaultLangFile: AnsiString;
+  DefaultLangFile: String;
 begin
   inherited;
   fLangList := TStringList.Create;
@@ -96,9 +96,9 @@ begin
   inherited;
 end;
 
-procedure TdevMultiLangSupport.Open(const Filename: AnsiString);
+procedure TdevMultiLangSupport.Open(const Filename: String);
 var
-  LangFile: AnsiString;
+  LangFile: String;
 begin
   // Load file from languages directory
   LangFile := ValidateFile(Filename, devDirs.Lang);
@@ -121,7 +121,7 @@ end;
 procedure TdevMultiLangSupport.CheckLanguageFiles;
 var
   I: integer;
-  s: AnsiString;
+  s: String;
   sl: TStringList;
 begin
   try
@@ -156,7 +156,7 @@ begin
   end;
 end;
 
-function TdevMultiLangSupport.GetString(ID: integer): AnsiString;
+function TdevMultiLangSupport.GetString(ID: integer): String;
 begin
   result := fStrings.Values[IntToStr(ID)];
   if Result = '' then
@@ -167,7 +167,7 @@ begin
     result := StringReplace(result, '<CR>', #13#10, [rfReplaceAll]);
 end;
 
-function TdevMultiLangSupport.GetLangName: AnsiString;
+function TdevMultiLangSupport.GetLangName: String;
 begin
   result := fCurLang;
 end;
@@ -181,7 +181,7 @@ begin
   end;
 end;
 
-procedure TdevMultiLangSupport.SetLang(const Lang: AnsiString);
+procedure TdevMultiLangSupport.SetLang(const Lang: String);
 var
   I: integer;
 begin
@@ -196,7 +196,7 @@ begin
     end;
 end;
 
-function TdevMultiLangSupport.FileFromDescription(const Desc: AnsiString): AnsiString;
+function TdevMultiLangSupport.FileFromDescription(const Desc: String): String;
 var
   i: integer;
 begin

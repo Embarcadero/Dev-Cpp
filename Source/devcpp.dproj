@@ -1,0 +1,328 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{0B6930FF-C1A8-45A0-B448-2D23D500E0F7}</ProjectGuid>
+        <MainSource>devcpp.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <TargetedPlatforms>38017</TargetedPlatforms>
+        <AppType>Application</AppType>
+        <FrameworkType>VCL</FrameworkType>
+        <ProjectVersion>18.8</ProjectVersion>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Base)'=='true') or '$(Base_Android64)'!=''">
+        <Base_Android64>true</Base_Android64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Android64)'!=''">
+        <Cfg_2_Android64>true</Cfg_2_Android64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSDevice64)'!=''">
+        <Cfg_2_iOSDevice64>true</Cfg_2_iOSDevice64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX64' and '$(Cfg_2)'=='true') or '$(Cfg_2_OSX64)'!=''">
+        <Cfg_2_OSX64>true</Cfg_2_OSX64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_E>false</DCC_E>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+        <DCC_N>true</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_ImageBase>00100000</DCC_ImageBase>
+        <DCC_DebugInformation>1</DCC_DebugInformation>
+        <DCC_IOChecking>false</DCC_IOChecking>
+        <DCC_OpenStringParams>false</DCC_OpenStringParams>
+        <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_MinStackSize>32768</DCC_MinStackSize>
+        <DCC_MaxStackSize>8388608</DCC_MaxStackSize>
+        <DCC_ExeOutput>..</DCC_ExeOutput>
+        <DCC_DcuOutput>Units</DCC_DcuOutput>
+        <DCC_UnitSearchPath>VCL\ClassBrowsing;VCL\devFileMonitor;VCL\devShortcuts;VCL\CompOptionsList;VCL\SynEdit\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DebugSourcePath>C:\Program Files (x86)\Dev-Cpp\Source\VCL\SynEdit\Source\;C:\Program Files (x86)\Dev-Cpp\Source\VCL\ClassBrowsing\;$(DebugSourcePath)</DebugSourcePath>
+        <DCC_UsePackage>vcl;rtl;vclactnband;vclx;vcldb;dbrtl;dbexpress;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;VclSmp;dbxcds;soaprtl;vclshlctrls;SynEdit_R7;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
+        <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
+        <SanitizedProjectName>devcpp</SanitizedProjectName>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;TMS.Web.IDE.ElementId;TMS.Web.Custom;System.Win;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_MajorVer>5</VerInfo_MajorVer>
+        <VerInfo_MinorVer>12</VerInfo_MinorVer>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=Bloodshed Software;FileDescription=Dev-C++ IDE;FileVersion=5.12.0.0;InternalName=devcpp.exe;LegalCopyright=Copyright Bloodshed Software;LegalTrademarks=;OriginalFilename=devcpp.exe;ProductName=Dev-C++;ProductVersion=5.0;Comments=Under the GNU General Public License</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Android64)'!=''">
+        <EnabledSysJars>android-support-v4.dex.jar;cloud-messaging.dex.jar;com-google-android-gms.play-services-ads-base.17.2.0.dex.jar;com-google-android-gms.play-services-ads-identifier.16.0.0.dex.jar;com-google-android-gms.play-services-ads-lite.17.2.0.dex.jar;com-google-android-gms.play-services-ads.17.2.0.dex.jar;com-google-android-gms.play-services-analytics-impl.16.0.8.dex.jar;com-google-android-gms.play-services-analytics.16.0.8.dex.jar;com-google-android-gms.play-services-base.16.0.1.dex.jar;com-google-android-gms.play-services-basement.16.2.0.dex.jar;com-google-android-gms.play-services-gass.17.2.0.dex.jar;com-google-android-gms.play-services-identity.16.0.0.dex.jar;com-google-android-gms.play-services-maps.16.1.0.dex.jar;com-google-android-gms.play-services-measurement-base.16.4.0.dex.jar;com-google-android-gms.play-services-measurement-sdk-api.16.4.0.dex.jar;com-google-android-gms.play-services-stats.16.0.1.dex.jar;com-google-android-gms.play-services-tagmanager-v4-impl.16.0.8.dex.jar;com-google-android-gms.play-services-tasks.16.0.1.dex.jar;com-google-android-gms.play-services-wallet.16.0.1.dex.jar;com-google-firebase.firebase-analytics.16.4.0.dex.jar;com-google-firebase.firebase-common.16.1.0.dex.jar;com-google-firebase.firebase-iid-interop.16.0.1.dex.jar;com-google-firebase.firebase-iid.17.1.1.dex.jar;com-google-firebase.firebase-measurement-connector.17.0.1.dex.jar;com-google-firebase.firebase-messaging.17.5.0.dex.jar;fmx.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar</EnabledSysJars>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <Icon_MainIcon>devcpp_Icon.ico</Icon_MainIcon>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <Icon_MainIcon>devcpp_Icon.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_OSX64)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <RcCompile Include="icons.rc">
+            <Form>icons.res</Form>
+        </RcCompile>
+        <RcCompile Include="DefaultFiles.rc">
+            <Form>DefaultFiles.res</Form>
+        </RcCompile>
+        <DCCReference Include="FastMM4.pas"/>
+        <DCCReference Include="main.pas">
+            <Form>MainForm</Form>
+        </DCCReference>
+        <DCCReference Include="MultiLangSupport.pas"/>
+        <DCCReference Include="Version.pas"/>
+        <DCCReference Include="Utils.pas"/>
+        <DCCReference Include="Tests.pas"/>
+        <DCCReference Include="LangFrm.pas">
+            <Form>LangForm</Form>
+        </DCCReference>
+        <DCCReference Include="Project.pas"/>
+        <DCCReference Include="Templates.pas"/>
+        <DCCReference Include="NewProjectFrm.pas">
+            <Form>NewProjectForm</Form>
+        </DCCReference>
+        <DCCReference Include="RemoveUnitFrm.pas">
+            <Form>RemoveUnitForm</Form>
+        </DCCReference>
+        <DCCReference Include="GotoLineFrm.pas">
+            <Form>GotoLineForm</Form>
+        </DCCReference>
+        <DCCReference Include="PrintFrm.pas">
+            <Form>PrintForm</Form>
+        </DCCReference>
+        <DCCReference Include="AboutFrm.pas">
+            <Form>AboutForm</Form>
+        </DCCReference>
+        <DCCReference Include="Compiler.pas"/>
+        <DCCReference Include="devrun.pas"/>
+        <DCCReference Include="ProjectOptionsFrm.pas">
+            <Form>ProjectOptionsForm</Form>
+        </DCCReference>
+        <DCCReference Include="ToolFrm.pas">
+            <Form>ToolFrom</Form>
+        </DCCReference>
+        <DCCReference Include="ToolEditFrm.pas">
+            <Form>ToolEditForm</Form>
+        </DCCReference>
+        <DCCReference Include="IconFrm.pas">
+            <Form>IconForm</Form>
+        </DCCReference>
+        <DCCReference Include="devcfg.pas"/>
+        <DCCReference Include="DataFrm.pas">
+            <Form>dmMain</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="EditorOptFrm.pas">
+            <Form>EditorOptForm</Form>
+        </DCCReference>
+        <DCCReference Include="CodeInsList.pas"/>
+        <DCCReference Include="IncrementalFrm.pas">
+            <Form>IncrementalForm</Form>
+        </DCCReference>
+        <DCCReference Include="FindFrm.pas">
+            <Form>FindForm</Form>
+        </DCCReference>
+        <DCCReference Include="Editor.pas"/>
+        <DCCReference Include="EnviroFrm.pas">
+            <Form>EnviroForm</Form>
+        </DCCReference>
+        <DCCReference Include="DebugReader.pas"/>
+        <DCCReference Include="Debugger.pas"/>
+        <DCCReference Include="EditorList.pas"/>
+        <DCCReference Include="CFGData.pas"/>
+        <DCCReference Include="ProjectTypes.pas"/>
+        <DCCReference Include="Macros.pas"/>
+        <DCCReference Include="devExec.pas"/>
+        <DCCReference Include="NewTemplateFrm.pas">
+            <Form>NewTemplateForm</Form>
+        </DCCReference>
+        <DCCReference Include="FunctionSearchFrm.pas">
+            <Form>FunctionSearchForm</Form>
+        </DCCReference>
+        <DCCReference Include="NewVarFrm.pas">
+            <Form>NewVarForm</Form>
+        </DCCReference>
+        <DCCReference Include="NewFunctionFrm.pas">
+            <Form>NewFunctionForm</Form>
+        </DCCReference>
+        <DCCReference Include="NewClassFrm.pas">
+            <Form>NewClassForm</Form>
+        </DCCReference>
+        <DCCReference Include="ProfileAnalysisFrm.pas">
+            <Form>ProfileAnalysisForm</Form>
+        </DCCReference>
+        <DCCReference Include="FilePropertiesFrm.pas">
+            <Form>FilePropertiesForm</Form>
+        </DCCReference>
+        <DCCReference Include="AddToDoFrm.pas">
+            <Form>AddToDoForm</Form>
+        </DCCReference>
+        <DCCReference Include="ViewToDoFrm.pas">
+            <Form>ViewToDoForm</Form>
+        </DCCReference>
+        <DCCReference Include="ImportMSVCFrm.pas">
+            <Form>ImportMSVCForm</Form>
+        </DCCReference>
+        <DCCReference Include="ImportCBFrm.pas">
+            <Form>ImportCBForm</Form>
+        </DCCReference>
+        <DCCReference Include="CPUFrm.pas">
+            <Form>CPUForm</Form>
+        </DCCReference>
+        <DCCReference Include="FileAssocs.pas"/>
+        <DCCReference Include="TipOfTheDayFrm.pas">
+            <Form>TipOfTheDayForm</Form>
+        </DCCReference>
+        <DCCReference Include="ExceptionFrm.pas">
+            <Form>ExceptionFrm</Form>
+        </DCCReference>
+        <DCCReference Include="WindowListFrm.pas">
+            <Form>WindowListForm</Form>
+        </DCCReference>
+        <DCCReference Include="ParamsFrm.pas">
+            <Form>ParamsForm</Form>
+        </DCCReference>
+        <DCCReference Include="CompOptionsFrame.pas">
+            <Form>CompOptionsFrame</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="CompOptionsFrm.pas">
+            <Form>CompOptionsForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormatterOptionsFrm.pas">
+            <Form>FormatterOptionsForm</Form>
+        </DCCReference>
+        <DCCReference Include="ProcessListFrm.pas">
+            <Form>ProcessListForm</Form>
+        </DCCReference>
+        <DCCReference Include="Tools\Packman\PackmanExitCodesU.pas"/>
+        <DCCReference Include="ImageTheme.pas"/>
+        <DCCReference Include="Instances.pas"/>
+        <None Include="LangIDs.inc">
+            <ContainerId>File</ContainerId>
+        </None>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">devcpp.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Android64">True</Platform>
+                <Platform value="iOSDevice64">True</Platform>
+                <Platform value="Linux64">True</Platform>
+                <Platform value="OSX64">True</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>

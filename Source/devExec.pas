@@ -27,9 +27,9 @@ uses
 type
   TExecThread = class(TThread)
   private
-    fFile: AnsiString;
-    fPath: AnsiString;
-    fParams: AnsiString;
+    fFile: String;
+    fPath: String;
+    fParams: String;
     fTimeOut: Cardinal;
     fProcess: Cardinal;
     fVisible: boolean;
@@ -37,9 +37,9 @@ type
   public
     procedure Execute; override;
   published
-    property FileName: AnsiString read fFile write fFile;
-    property Path: AnsiString read fPath write fPath;
-    property Params: AnsiString read fParams write fParams;
+    property FileName: String read fFile write fFile;
+    property Path: String read fPath write fPath;
+    property Params: String read fParams write fParams;
     property TimeOut: Cardinal read fTimeOut write fTimeOut;
     property Visible: boolean read fVisible write fVisible;
     property Process: Cardinal read fProcess;
@@ -55,7 +55,7 @@ type
   public
     destructor Destroy; override;
     procedure Reset;
-    procedure ExecuteAndWatch(sFileName, sParams, sPath: AnsiString; bVisible: boolean; iTimeOut: Cardinal; OnTermEvent:
+    procedure ExecuteAndWatch(sFileName, sParams, sPath: String; bVisible: boolean; iTimeOut: Cardinal; OnTermEvent:
       TNotifyEvent);
   published
     property Running: boolean read fIsRunning;
@@ -90,8 +90,8 @@ begin
     else
       wShowWindow := SW_HIDE;
   end;
-  if CreateProcess(nil, PAnsiChar('"' + fFile + '" ' + fParams), nil, nil, False, NORMAL_PRIORITY_CLASS, nil,
-    PAnsiChar(fPath),
+  if CreateProcess(nil, PChar('"' + fFile + '" ' + fParams), nil, nil, False, NORMAL_PRIORITY_CLASS, nil,
+    PChar(fPath),
     StartupInfo, ProcessInfo) then begin
     fProcess := ProcessInfo.hProcess;
     WaitForSingleObject(ProcessInfo.hProcess, fTimeOut);
@@ -123,7 +123,7 @@ begin
   inherited;
 end;
 
-procedure TdevExecutor.ExecuteAndWatch(sFileName, sParams, sPath: AnsiString;
+procedure TdevExecutor.ExecuteAndWatch(sFileName, sParams, sPath: String;
   bVisible: boolean; iTimeOut: Cardinal; OnTermEvent: TNotifyEvent);
 begin
   fIsRunning := True;

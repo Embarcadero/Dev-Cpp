@@ -27,15 +27,15 @@ uses
 type
   PCodeIns = ^TCodeIns;
   TCodeIns = record
-    Caption: AnsiString;
-    Line: AnsiString;
-    Desc: AnsiString;
+    Caption: String;
+    Line: String;
+    Desc: String;
     Sep: integer;
   end;
 
   TCodeInsList = class(TObject)
   private
-    fFile: AnsiString;
+    fFile: String;
     fList: TList;
     procedure SetItem(index: integer; Value: PCodeIns);
     function GetItem(index: integer): PCodeIns;
@@ -47,7 +47,7 @@ type
     procedure LoadCode;
     procedure SaveCode;
     function AddItem(Value: PCodeIns): integer;
-    procedure AddItemByValues(const menutext, description, code: AnsiString; section: integer);
+    procedure AddItemByValues(const menutext, description, code: String; section: integer);
     procedure Delete(index: integer);
     procedure Clear;
     property Items[index: integer]: PCodeins read GetItem write SetItem; default;
@@ -83,7 +83,7 @@ begin
   result := fList.Add(Value);
 end;
 
-procedure TCodeInsList.AddItemByValues(const menutext, description, code: AnsiString; section: integer);
+procedure TCodeInsList.AddItemByValues(const menutext, description, code: String; section: integer);
 var
   assembleditem: PCodeIns;
 begin
@@ -276,7 +276,7 @@ end;
 procedure TCodeInsList.SaveCode;
 var
   I: integer;
-  section: AnsiString;
+  section: String;
   item: PCodeIns;
 begin
   DeleteFile(fFile);

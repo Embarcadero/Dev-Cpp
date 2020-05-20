@@ -46,7 +46,7 @@ type
     procedure InsertItem(Index: Integer; const S: int64);
     procedure SetSorted(Value: Boolean);
   protected
-    procedure Error(const Msg: AnsiString; Data: Integer);
+    procedure Error(const Msg: String; Data: Integer);
     procedure Changed; virtual;
     procedure Changing; virtual;
     function Get(Index: Integer): int64;
@@ -70,9 +70,9 @@ type
     procedure Sort; virtual;
     procedure CustomSort(Compare: TIntListSortCompare); virtual;
 
-    procedure LoadFromFile(const FileName: AnsiString); virtual;
+    procedure LoadFromFile(const FileName: String); virtual;
     procedure LoadFromStream(Stream: TStream); virtual;
-    procedure SaveToFile(const FileName: AnsiString); virtual;
+    procedure SaveToFile(const FileName: String); virtual;
     procedure SaveToStream(Stream: TStream);
 
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
@@ -97,7 +97,7 @@ begin
   SetCapacity(0);
 end;
 
-procedure TIntList.Error(const Msg: AnsiString; Data: Integer);
+procedure TIntList.Error(const Msg: String; Data: Integer);
 
   function ReturnAddr: Pointer;
   asm
@@ -109,7 +109,7 @@ begin
 end;
 
 const
-  sDuplicateInt: AnsiString = 'Cannot add integer because if already exists';
+  sDuplicateInt: String = 'Cannot add integer because if already exists';
   sListIndexError = 'List index Error';
   SSortedListError = 'Cannont insert to sorted list';
 
@@ -374,7 +374,7 @@ begin
   CustomSort(IntListCompare);
 end;
 
-procedure TIntList.SaveToFile(const FileName: AnsiString);
+procedure TIntList.SaveToFile(const FileName: String);
 var
   Stream: TStream;
 begin
@@ -400,7 +400,7 @@ begin
   end;
 end;
 
-procedure TIntList.LoadFromFile(const FileName: AnsiString);
+procedure TIntList.LoadFromFile(const FileName: String);
 var
   Stream: TStream;
 begin

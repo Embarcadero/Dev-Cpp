@@ -94,12 +94,12 @@ end;
 
 procedure TNewFunctionForm.btnCreateClick(Sender: TObject);
 var
-  fName: AnsiString;
-  CppFname: AnsiString;
+  fName: String;
+  CppFname: String;
   Line: integer;
   e: TEditor;
   AddScopeStr: boolean;
-  S: AnsiString;
+  S: String;
   VarScope: TStatementClassScope;
   st: PStatement;
 begin

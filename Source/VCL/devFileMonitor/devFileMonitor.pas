@@ -45,8 +45,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Monitor(const FileName: AnsiString);
-    procedure UnMonitor(const FileName: AnsiString);
+    procedure Monitor(const FileName: String);
+    procedure UnMonitor(const FileName: String);
     procedure BeginUpdate;
     procedure EndUpdate;
   published
@@ -84,8 +84,8 @@ procedure TdevFileMonitor.SubClassWndProc(var Message: TMessage);
 begin
   if Message.Msg = WM_NOTIFYFILECHANGED then begin
     if Assigned(fNotifyChange) then begin
-      fNotifyChange(Self, TDevMonitorChangeType(Message.WParam), PAnsiChar(Message.LParam));
-      StrDispose(PAnsiChar(Message.LParam));
+      fNotifyChange(Self, TDevMonitorChangeType(Message.WParam), PChar(Message.LParam));
+      StrDispose(PChar(Message.LParam));
     end;
   end else
     WndProc(Message);
@@ -120,13 +120,13 @@ begin
     Activate;
 end;
 
-procedure TdevFileMonitor.Monitor(const FileName: AnsiString);
+procedure TdevFileMonitor.Monitor(const FileName: String);
 begin
   fFiles.Add(FileName);
   Refresh;
 end;
 
-procedure TdevFileMonitor.UnMonitor(const FileName: AnsiString);
+procedure TdevFileMonitor.UnMonitor(const FileName: String);
 var
   I: integer;
 begin

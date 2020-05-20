@@ -80,15 +80,15 @@ type
     fEmptyLines: integer;
     fIncludeLines: integer;
     fCommentLines: integer;
-    fFilename: AnsiString;
+    fFilename: String;
     fEdit: TSynEdit;
     procedure LoadText;
     procedure RightAlign(window: TEdit);
-    procedure CalculateFile(const Filename: AnsiString);
-    procedure ShowPropsFor(const Filename: AnsiString);
+    procedure CalculateFile(const Filename: String);
+    procedure ShowPropsFor(const Filename: String);
     procedure FillFiles;
   public
-    procedure SetFile(const Filename: AnsiString);
+    procedure SetFile(const Filename: String);
   end;
 
 implementation
@@ -100,10 +100,10 @@ uses
 
 { TFilePropertiesForm }
 
-procedure TFilePropertiesForm.CalculateFile(const Filename: AnsiString);
+procedure TFilePropertiesForm.CalculateFile(const Filename: String);
 var
   Attri: TSynHighlighterAttributes;
-  Current, Token: AnsiString;
+  Current, Token: String;
   I, J, hFile: integer;
 begin
   // Calculate size
@@ -230,10 +230,10 @@ begin
   ShowPropsFor(fFilename);
 end;
 
-procedure TFilePropertiesForm.ShowPropsFor(const Filename: AnsiString);
+procedure TFilePropertiesForm.ShowPropsFor(const Filename: String);
 var
   I: integer;
-  loopfilename: AnsiString;
+  loopfilename: String;
 begin
 
   fFileDate := 0;
@@ -254,7 +254,7 @@ begin
 
       // Get file name
       if Assigned(cmbFiles.Items.Objects[I]) then begin // only count project files
-        loopfilename := AnsiString(cmbFiles.Items.Objects[I]);
+        loopfilename := String(cmbFiles.Items.Objects[I]);
         if not SameStr('.dev', ExtractFileExt(loopfilename)) then begin
           try
             fEdit.Lines.LoadFromFile(loopfilename);
@@ -272,7 +272,7 @@ begin
     if fFileDate = 0 then
       edTimestamp.Text := '(Project file only) -'
     else
-      edTimestamp.Text := '(Project file only) ' + FormatDateTime(ShortDateFormat + ' hh:nn:ss',
+      edTimestamp.Text := '(Project file only) ' + FormatDateTime(FormatSettings.ShortDateFormat + ' hh:nn:ss',
         FileDateToDateTime(fFileDate));
 
     // Just show information about the selected file only
@@ -298,7 +298,7 @@ begin
     if fFileDate = 0 then
       edTimestamp.Text := '-'
     else
-      edTimestamp.Text := FormatDateTime(ShortDateFormat + ' hh:nn:ss', FileDateToDateTime(fFileDate));
+      edTimestamp.Text := FormatDateTime(FormatSettings.ShortDateFormat + ' hh:nn:ss', FileDateToDateTime(fFileDate));
   end;
 
   edTotalLines.Text := IntToStr(fTotalLines);
@@ -322,7 +322,7 @@ procedure TFilePropertiesForm.FillFiles;
 var
   I: integer;
   e: TEditor;
-  FullFileName, ShortFileName: AnsiString;
+  FullFileName, ShortFileName: String;
 begin
   cmbFiles.Items.BeginUpdate;
   cmbFiles.Clear;
@@ -364,10 +364,10 @@ end;
 
 procedure TFilePropertiesForm.cmbFilesClick(Sender: TObject);
 begin
-  ShowPropsFor(AnsiString(cmbFiles.Items.Objects[cmbFiles.ItemIndex]));
+  ShowPropsFor(String(cmbFiles.Items.Objects[cmbFiles.ItemIndex]));
 end;
 
-procedure TFilePropertiesForm.SetFile(const Filename: AnsiString);
+procedure TFilePropertiesForm.SetFile(const Filename: String);
 begin
   fFilename := Filename;
 end;

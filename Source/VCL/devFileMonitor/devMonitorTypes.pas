@@ -31,11 +31,11 @@ Classes;
 
 type
   TdevMonitorChangeType = (mctChanged, mctDeleted);
-  TdevMonitorChange = procedure(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: AnsiString) of object;
+  TdevMonitorChange = procedure(Sender: TObject; ChangeType: TdevMonitorChangeType; Filename: String) of object;
 
   PdevMonitorFile = ^TdevMonitorFile;
   TdevMonitorFile = record
-    FileName: AnsiString;
+    FileName: String;
     TimeStamp: integer;
   end;
 

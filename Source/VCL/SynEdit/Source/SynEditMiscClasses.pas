@@ -12,6 +12,7 @@ The Original Code is: SynEditMiscClasses.pas, released 2000-04-07.
 The Original Code is based on the mwSupportClasses.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Michael Hieke.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -27,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditMiscClasses.pas,v 1.40 2007/01/25 08:32:24 etrusco Exp $
+$Id: SynEditMiscClasses.pas,v 1.35.2.9 2008/09/17 13:59:12 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -35,31 +36,13 @@ located at http://SynEdit.SourceForge.net
 Known Issues:
 -------------------------------------------------------------------------------}
 
-{$IFNDEF QSYNEDITMISCCLASSES}
 unit SynEditMiscClasses;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  {$IFDEF SYN_LINUX}
-  Xlib,
-  {$ENDIF}
-  Types,
-  Qt,
-  QConsts,
-  QGraphics,
-  QControls,
-  QImgList,
-  QStdCtrls,
-  QMenus,
-  kTextDrawer,
-  QSynEditTypes,
-  QSynEditKeyConst,
-{$ELSE}
   Consts,
   Windows,
   Messages,
@@ -71,10 +54,8 @@ uses
   Registry,
   SynEditTypes,
   SynEditKeyConst,
-{$ENDIF}
-{$IFDEF SYN_COMPILER_4_UP}
+  SynUnicode,
   Math,
-{$ENDIF}
   Classes,
   SysUtils;
 
@@ -141,6 +122,7 @@ type
     procedure SetGradientStartColor(const Value: TColor);
     procedure SetGradientEndColor(const Value: TColor);
     procedure SetGradientSteps(const Value: Integer);
+    function GetWidth: integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -148,6 +130,9 @@ type
     procedure AutoSizeDigitCount(LinesCount: integer);
     function FormatLineNumber(Line: integer): string;
     function RealGutterWidth(CharWidth: integer): integer;
+ //++ DPI-Aware
+    procedure ChangeScale(M, D: Integer); virtual;
+//-- DPI-Aware
   published
     property AutoSize: boolean read fAutoSize write SetAutoSize default FALSE;
     property BorderStyle: TSynGutterBorderStyle read fBorderStyle
@@ -169,7 +154,7 @@ type
     property UseFontStyle: boolean read fUseFontStyle write SetUseFontStyle
       default True;
     property Visible: boolean read fVisible write SetVisible default TRUE;
-    property Width: integer read fWidth write SetWidth default 30;
+    property Width: integer read GetWidth write SetWidth default 30;
     property ZeroStart: boolean read fZeroStart write SetZeroStart
       default False;
     property LineNumberStart: Integer read fLineNumberStart write SetLineNumberStart default 1;
@@ -198,6 +183,9 @@ type
   public
     constructor Create(AOwner: TComponent);
     procedure Assign(Source: TPersistent); override;
+ //++ DPI-Aware
+    procedure ChangeScale(M, D: Integer); virtual;
+//-- DPI-Aware
   published
     property BookmarkImages: TImageList
       read fBookmarkImages write SetBookmarkImages;
@@ -231,6 +219,9 @@ type
     procedure Draw(aCanvas: TCanvas; aX, aY, aLineHeight: integer);
     property Width : integer read GetWidth;
     property Height : integer read GetHeight;
+ //++ DPI-Aware
+    procedure ChangeScale(M, D: Integer); virtual;
+//-- DPI-Aware
   published
     property Glyph: TBitmap read fGlyph write SetGlyph;
     property MaskColor: TColor read fMaskColor write SetMaskColor default clNone;
@@ -277,7 +268,7 @@ type
   end;
 
   { TSynInternalImage }
-  
+
   TSynInternalImage = class(TObject)
   private
     fImages : TBitmap;
@@ -293,23 +284,18 @@ type
     procedure Draw(ACanvas: TCanvas; Number, X, Y, LineHeight: integer);
     procedure DrawTransparent(ACanvas: TCanvas; Number, X, Y,
       LineHeight: integer; TransparentColor: TColor);
+ //++ DPI-Aware
+    procedure ChangeScale(M, D: Integer); virtual;
+//-- DPI-Aware
   end;
 
 { TSynHotKey }
 
 const
-  {$IFDEF SYN_CLX}
-  BorderWidth = 2;
-  {$ELSE}
   BorderWidth = 0;
-  {$ENDIF}
 
 type
-  {$IFDEF SYN_CLX}
-  TSynBorderStyle = bsNone..bsSingle;
-  {$ELSE}
   TSynBorderStyle = TBorderStyle;
-  {$ENDIF}
 
   THKModifier = (hkShift, hkCtrl, hkAlt);
   THKModifiers = set of THKModifier;
@@ -328,26 +314,16 @@ type
     procedure SetHotKey(const Value: TShortCut);
     procedure SetInvalidKeys(const Value: THKInvalidKeys);
     procedure SetModifiers(const Value: THKModifiers);
-    {$IFNDEF SYN_CLX}
     procedure WMGetDlgCode(var Message: TMessage); message WM_GETDLGCODE;
      procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
-    {$ENDIF}
   protected
-    {$IFNDEF SYN_CLX}
     procedure CreateParams(var Params: TCreateParams); override;
-    {$ENDIF}
-    {$IFDEF SYN_CLX}
-    function EventFilter(Sender: QObjectH; Event: QEventH): Boolean; override;
-    {$ENDIF}
     procedure DoExit; override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;
-    {$IFDEF SYN_CLX}
-    function WidgetFlags: Integer; override;
-    {$ENDIF}
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -362,92 +338,52 @@ type
   protected
     function GetPattern: string; virtual; abstract;
     procedure SetPattern(const Value: string); virtual; abstract;
-    function GetLength(aIndex: integer): integer; virtual; abstract;
-    function GetResult(aIndex: integer): integer; virtual; abstract;
-    function GetResultCount: integer; virtual; abstract;
+    function GetLength(Index: Integer): Integer; virtual; abstract;
+    function GetResult(Index: Integer): Integer; virtual; abstract;
+    function GetResultCount: Integer; virtual; abstract;
     procedure SetOptions(const Value: TSynSearchOptions); virtual; abstract;
   public
-    function FindAll(const NewText: string): integer; virtual; abstract;
-    function Replace(const aOccurrence, aReplacement: string): string; virtual; abstract;     
+    function FindAll(const NewText: string): Integer; virtual; abstract;
+    function Replace(const aOccurrence, aReplacement: string): string; virtual; abstract;
     property Pattern: string read GetPattern write SetPattern;
-    property ResultCount: integer read GetResultCount;
-    property Results[aIndex: integer]: integer read GetResult;
-    property Lengths[aIndex: integer]: integer read GetLength;
+    property ResultCount: Integer read GetResultCount;
+    property Results[Index: Integer]: Integer read GetResult;
+    property Lengths[Index: Integer]: Integer read GetLength;
     property Options: TSynSearchOptions write SetOptions;
   end;
 
-{$IFNDEF SYN_CLX}
-  {$IFNDEF SYN_COMPILER_4_UP}
   TBetterRegistry = class(TRegistry)
     function OpenKeyReadOnly(const Key: string): Boolean;
   end;
-  {$ELSE}
-  TBetterRegistry = TRegistry;
-  {$ENDIF}
-{$ENDIF}
 
-  TSynEditMark = class
-  protected
-    fOnChange: TNotifyEvent;
-    fLine, fChar, fImage: Integer;
-    fVisible: boolean;
-    fInternalImage: boolean;
-    fBookmarkNum: integer;
-    procedure SetChar(const Value: Integer); virtual;
-    procedure SetImage(const Value: Integer); virtual;
-    procedure SetLine(const Value: Integer); virtual;
-    procedure SetVisible(const Value: boolean);
-    procedure SetInternalImage(const Value: boolean);
-    function GetIsBookmark: boolean;
-  public
-    constructor Create();
-    property Line: integer read fLine write SetLine;
-    property Char: integer read fChar write SetChar;
-    property ImageIndex: integer read fImage write SetImage;
-    property BookmarkNumber: integer read fBookmarkNum write fBookmarkNum;
-    property Visible: boolean read fVisible write SetVisible;
-    property InternalImage: boolean read fInternalImage write SetInternalImage;
-    property IsBookmark: boolean read GetIsBookmark;
-    property OnChange: TNotifyEvent read fOnChange write fOnChange;
-  end;
+//++ DPI-Aware
+  procedure ResizeBitmap(Bitmap: TBitmap; const NewWidth,
+    NewHeight: integer);
+//-- DPI-Aware
 
-  TSynEditLineMarks = array[0..16] of TSynEditMark;
-
-  { A list of mark objects. Each object cause a litle picture to be drawn in the
-    gutter. }
-
-  { TSynEditMarkList }
-
-  TSynEditMarkList = class(TObject)
-  private
-    fItems: TList;
-    fOnChange: TNotifyEvent;
-    procedure DoChange;
-    function GetItem(Index: Integer): TSynEditMark;
-    function GetCount: Integer;
-    procedure InternalDelete(Index: Integer);
-  public
-    constructor Create;
-    destructor Destroy; override;
-    function Add(Item: TSynEditMark): Integer;
-    function Remove(Item: TSynEditMark): Integer;
-    procedure ClearLine(line: integer);
-    procedure Clear;
-    procedure GetMarksForLine(line: integer; out Marks: TSynEditLineMarks);
-  public
-    property Items[Index: Integer]: TSynEditMark read GetItem; default;
-    property Count: Integer read GetCount;
-    property OnChange: TNotifyEvent read fOnChange write fOnChange;
-  end;
 
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditMiscProcs;
-{$ELSE}
   SynEditMiscProcs;
-{$ENDIF}
+
+//++ DPI-Aware
+procedure ResizeBitmap(Bitmap: TBitmap; const NewWidth,
+  NewHeight: integer);
+var
+  buffer: TBitmap;
+begin
+  buffer := TBitmap.Create;
+  try
+    buffer.SetSize(NewWidth, NewHeight);
+    buffer.Canvas.StretchDraw(Rect(0, 0, NewWidth, NewHeight), Bitmap);
+    Bitmap.SetSize(NewWidth, NewHeight);
+    Bitmap.Canvas.Draw(0, 0, buffer);
+  finally
+    buffer.Free;
+  end;
+end;
+//-- DPI-Aware
 
 { TSynSelectedColor }
 
@@ -488,6 +424,16 @@ begin
 end;
 
 { TSynGutter }
+ //++ DPI-Aware
+procedure TSynGutter.ChangeScale(M, D: Integer);
+begin
+ fWidth := MulDiv(fWidth, M, D);
+ fLeftOffset := MulDiv(fLeftOffset, M, D);
+ fRightOffset := MulDiv(fRightOffset, M, D);
+ fFont.Height := MulDiv(fFont.Height, M, D);
+ if Assigned(fOnChange) then fOnChange(Self);
+end;
+//-- DPI-Aware
 
 constructor TSynGutter.Create;
 begin
@@ -526,7 +472,8 @@ procedure TSynGutter.Assign(Source: TPersistent);
 var
   Src: TSynGutter;
 begin
-  if Assigned(Source) and (Source is TSynGutter) then begin
+  if Assigned(Source) and (Source is TSynGutter) then 
+  begin
     Src := TSynGutter(Source);
     fFont.Assign(src.Font);
     fUseFontStyle := src.fUseFontStyle;
@@ -549,7 +496,8 @@ begin
     fGradientEndColor := Src.fGradientEndColor;
     fGradientSteps := Src.fGradientSteps;
     if Assigned(fOnChange) then fOnChange(Self);
-  end else
+  end 
+  else
     inherited;
 end;
 
@@ -581,7 +529,7 @@ begin
     Dec(Line)
   else if fLineNumberStart > 1 then
     Inc(Line, fLineNumberStart - 1);
-  Str(Line : fAutoSizeDigitCount, Result);
+  Result := Format('%*d', [fAutoSizeDigitCount, Line]);
   if fLeadingZeros then
     for i := 1 to fAutoSizeDigitCount - 1 do begin
       if (Result[i] <> ' ') then break;
@@ -770,7 +718,26 @@ begin
   end;
 end;
 
+function TSynGutter.GetWidth: integer;
+begin
+  if not Visible then
+    Result := 0
+  else
+    Result := fWidth;
+end;
+
 { TSynBookMarkOpt }
+
+//++ DPI-Aware
+procedure TSynBookMarkOpt.ChangeScale(M, D: Integer);
+Var
+  L : Integer;
+begin
+  L := (M div D) * D;    // Factor multiple of 100%
+  fLeftMargin := MulDiv(fLeftMargin, L, D);
+  fXoffset := MulDiv(fXoffset, L, D);
+end;
+//-- DPI-Aware
 
 constructor TSynBookMarkOpt.Create(AOwner: TComponent);
 begin
@@ -842,6 +809,17 @@ begin
 end;
 
 { TSynGlyph }
+
+//++ DPI-Aware
+procedure TSynGlyph.ChangeScale(M, D: Integer);
+Var
+  L : Integer;
+begin
+  L := (M div D) * D;    // Factor multiple of 100%
+  ResizeBitmap(fInternalGlyph, MulDiv(fInternalGlyph.Width, L, D), MulDiv(fInternalGlyph.Height, L, D));
+  ResizeBitmap(fGlyph, MulDiv(fGlyph.Width, L, D), MulDiv(fGlyph.Height, L, D));
+end;
+//-- DPI-Aware
 
 constructor TSynGlyph.Create(aModule: THandle; const aName: string; aMaskColor: TColor);
 begin
@@ -922,17 +900,7 @@ begin
     rcSrc := Rect(0, aY, vGlyph.Width, aY + aLineHeight);
   end;
 
-{$IFDEF SYN_CLX}
-  if vMaskColor = clNone then
-    vGlyph.Transparent := False
-  else begin
-    vGlyph.TransparentColor := vMaskColor;
-    vGlyph.Transparent := True;
-  end;
-  aCanvas.CopyRect(rcDest, vGlyph.Canvas, rcSrc);
-{$ELSE}
   aCanvas.BrushCopy(rcDest, vGlyph, rcSrc, vMaskColor);
-{$ENDIF}
 end;
 
 procedure TSynGlyph.SetGlyph(Value: TBitmap);
@@ -1101,6 +1069,7 @@ begin
   inherited Remove(TMethod(AEvent));
 end;
 
+
 { TSynInternalImage }
 
 type
@@ -1113,6 +1082,16 @@ type
 
 var
   InternalResources: TList;
+
+procedure TSynInternalImage.ChangeScale(M, D: Integer);
+Var
+  L: Integer;
+begin
+  L := (M div D) * D;    // Factor multiple of 100%
+  fWidth := MulDiv(fWidth, L, D);
+  ResizeBitmap(fImages, fWidth * fCount, MulDiv(fImages.Height, L, D));
+  fHeight := fImages.Height;
+end;
 
 constructor TSynInternalImage.Create(aModule: THandle; const Name: string; Count: integer);
 begin
@@ -1141,8 +1120,8 @@ begin
 
   { Search the list for the needed resource }
   for idx := 0 to InternalResources.Count - 1 do
-    if (TInternalResource (InternalResources[idx]).Name = UpperCase (Name)) then
-      with TInternalResource (InternalResources[idx]) do begin
+    if (TInternalResource(InternalResources[idx]).Name = UpperCase(Name)) then
+      with TInternalResource(InternalResources[idx]) do begin
         UsageCount := UsageCount + 1;
         Result := Bitmap;
         exit;
@@ -1150,14 +1129,14 @@ begin
 
   { There is no loaded resource in the list so let's create a new one }
   Result := TBitmap.Create;
-  Result.LoadFromResourceName( aModule, Name );
+  Result.LoadFromResourceName(aModule, Name);
 
   { Add the new resource to our list }
   newIntRes:= TInternalResource.Create;
   newIntRes.UsageCount := 1;
-  newIntRes.Name := UpperCase (Name);
+  newIntRes.Name := UpperCase(Name);
   newIntRes.Bitmap := Result;
-  InternalResources.Add (newIntRes);
+  InternalResources.Add(newIntRes);
 end;
 
 procedure TSynInternalImage.FreeBitmapFromInternalList;
@@ -1236,12 +1215,7 @@ begin
       rcSrc := Rect(Number * fWidth, Y, (Number + 1) * fWidth,
         Y + LineHeight);
     end;
-{$IFDEF SYN_CLX}
-    ACanvas.CopyMode := cmMergeCopy;
-    ACanvas.CopyRect(rcDest, fImages.Canvas, rcSrc);
-{$ELSE}
     ACanvas.BrushCopy(rcDest, fImages, rcSrc, TransparentColor);
-{$ENDIF}
   end;
 end;
 
@@ -1283,18 +1257,13 @@ begin
     Result := hcNone;
 end;
 
-function ShortCutToTextEx(Key: Word; Shift: TShiftState): WideString;
+function ShortCutToTextEx(Key: Word; Shift: TShiftState): string;
 begin
   if ssCtrl in Shift then Result := SmkcCtrl;
   if ssShift in Shift then Result := Result + SmkcShift;
   if ssAlt in Shift then Result := Result + SmkcAlt;
 
-  {$IFDEF SYN_CLX}
-  if Lo(Key) > Ord('Z') then
-    Result := Result + Chr(Key)
-  else
-  {$ENDIF}
-    Result := Result + ShortCutToText(TShortCut(Key));
+  Result := Result + ShortCutToText(TShortCut(Key));
   if Result = '' then
     Result := srNone;
 end;
@@ -1302,16 +1271,9 @@ end;
 constructor TSynHotKey.Create(AOwner: TComponent);
 begin
   inherited;
-  {$IFDEF SYN_CLX}
-  InputKeys := [ikAll];
-  {$ENDIF}
 
   BorderStyle := bsSingle;
-  {$IFNDEF SYN_CLX}
-  {$IFDEF SYN_COMPILER_7_UP}
   ControlStyle := ControlStyle + [csNeedsBorderPaint];
-  {$ENDIF}
-  {$ENDIF}
 
   FInvalidKeys := [hcNone, hcShift];
   FModifiers := [hkAlt];
@@ -1322,7 +1284,6 @@ begin
   TabStop := True;
 end;
 
-{$IFNDEF SYN_CLX}
 procedure TSynHotKey.CreateParams(var Params: TCreateParams);
 const
   BorderStyles: array[TSynBorderStyle] of DWORD = (0, WS_BORDER);
@@ -1341,7 +1302,6 @@ begin
     end;
   end;
 end;
-{$ENDIF}
 
 procedure TSynHotKey.DoExit;
 begin
@@ -1353,44 +1313,11 @@ begin
   end;
 end;
 
-{$IFDEF SYN_CLX}
-function TSynHotKey.EventFilter(Sender: QObjectH; Event: QEventH): Boolean;
-begin
-  Result := inherited EventFilter(Sender, Event);
-  case QEvent_type(Event) of
-    QEventType_FocusIn:
-      begin
-        Canvas.Font := Font;
-        CreateCaret(Self, 0, 1, Canvas.TextHeight('x') + 2);
-        SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
-        ShowCaret(Self);
-      end;
-    QEventType_FocusOut:
-      begin
-        DestroyCaret;
-      end;
-  end;
-end;
-{$ENDIF}
-
 procedure TSynHotKey.KeyDown(var Key: Word; Shift: TShiftState);
 var
   MaybeInvalidKey: THKInvalidKey;
   SavedKey: Word;
-  {$IFDEF SYN_LINUX}
-  Code: Byte;
-  {$ENDIF}
 begin
-  {$IFDEF SYN_LINUX}
-  // uniform Keycode: key has the same value wether Shift is pressed or not
-  if Key <= 255 then
-  begin
-    Code := XKeysymToKeycode(Xlib.PDisplay(QtDisplay), Key);
-    Key := XKeycodeToKeysym(Xlib.PDisplay(QtDisplay), Code, 0);
-    if Char(Key) in ['a'..'z'] then Key := Ord(UpCase(Char(Key)));
-  end;
-  {$ENDIF}
-  
   SavedKey := Key;
   FPressedOnlyModifiers := KeySameAsShiftState(Key, Shift);
 
@@ -1400,10 +1327,6 @@ begin
 
   if not FPressedOnlyModifiers then
   begin
-    {$IFDEF SYN_CLX}
-    if Lo(Key) > Ord('Z') then
-      Key := Lo(Key);
-    {$ENDIF}
     FHotKey := ShortCut(Key, Shift)
   end
   else
@@ -1416,33 +1339,19 @@ begin
   begin
     Text := ShortCutToTextEx(Key, Shift);
     Invalidate;
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   end;
 
   Key := SavedKey;
 end;
 
 procedure TSynHotKey.KeyUp(var Key: Word; Shift: TShiftState);
-{$IFDEF SYN_LINUX}
-var
-  Code: Byte;
-{$ENDIF}
 begin
-  {$IFDEF SYN_LINUX}
-  // uniform Keycode: key has the same value wether Shift is pressed or not
-  if Key <= 255 then
-  begin
-    Code := XKeysymToKeycode(Xlib.PDisplay(QtDisplay), Key);
-    Key := XKeycodeToKeysym(Xlib.PDisplay(QtDisplay), Code, 0);
-    if Char(Key) in ['a'..'z'] then Key := Ord(UpCase(Char(Key)));
-  end;
-  {$ENDIF}
-  
   if FPressedOnlyModifiers then
   begin
     Text := srNone;
     Invalidate;
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   end;
 end;
 
@@ -1459,16 +1368,11 @@ var
 begin
   r := ClientRect;
   
-  {$IFDEF SYN_CLX}
-  QClxDrawUtil_DrawWinPanel(Canvas.Handle, @r, Palette.ColorGroup(cgActive), True,
-    QBrushH(0));
-  {$ENDIF}
-
   Canvas.Brush.Style := bsSolid;
   Canvas.Brush.Color := Color;
   InflateRect(r, -BorderWidth, -BorderWidth);
   Canvas.FillRect(r);
-  Canvas.TextRect(r, BorderWidth + 1, BorderWidth + 1, Text);
+  TextRect(Canvas, r, BorderWidth + 1, BorderWidth + 1, Text);
 end;
 
 procedure TSynHotKey.SetBorderStyle(const Value: TSynBorderStyle);
@@ -1476,12 +1380,7 @@ begin
   if FBorderStyle <> Value then
   begin
     FBorderStyle := Value;
-{$IFDEF SYN_CLX}
-    Resize;
-    Invalidate;
-{$ELSE}
     RecreateWnd;
-{$ENDIF}
   end;
 end;
 
@@ -1501,7 +1400,7 @@ begin
   Text := ShortCutToTextEx(Key, Shift);
   Invalidate;
   if not Visible then
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
 end;
 
 procedure TSynHotKey.SetInvalidKeys(const Value: THKInvalidKeys);
@@ -1516,14 +1415,6 @@ begin
   SetHotKey(FHotKey);
 end;
 
-{$IFDEF SYN_CLX}
-function TSynHotKey.WidgetFlags: Integer;
-begin
-  Result := inherited WidgetFlags or Integer(WidgetFlags_WRepaintNoErase);
-end;
-{$ENDIF}
-
-{$IFNDEF SYN_CLX}
 procedure TSynHotKey.WMGetDlgCode(var Message: TMessage);
 begin
   Message.Result := DLGC_WANTTAB or DLGC_WANTARROWS;
@@ -1538,13 +1429,9 @@ procedure TSynHotKey.WMSetFocus(var Msg: TWMSetFocus);
 begin
   Canvas.Font := Font;
   CreateCaret(Handle, 0, 1, -Canvas.Font.Height + 2);
-  SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+  SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   ShowCaret(Handle);
 end;
-{$ENDIF}
-
-{$IFNDEF SYN_CLX}
-  {$IFNDEF SYN_COMPILER_4_UP}
 
 { TBetterRegistry }
 
@@ -1574,162 +1461,6 @@ begin
   end;
 end; { TBetterRegistry.OpenKeyReadOnly }
 
-  {$ENDIF SYN_COMPILER_4_UP}
-{$ENDIF SYN_CLX}
-
-{ TSynEditMark }
-
-function TSynEditMark.GetIsBookmark: boolean;
 begin
-  Result := (fBookmarkNum >= 0);
-end;
-
-procedure TSynEditMark.SetChar(const Value: Integer);
-begin
-  FChar := Value;
-end;
-
-procedure TSynEditMark.SetImage(const Value: Integer);
-begin
-  FImage := Value;
-  if fVisible and Assigned(fOnChange) then
-    fOnChange(Self);
-//    fEdit.InvalidateGutterLines(fLine, fLine);
-end;
-
-procedure TSynEditMark.SetInternalImage(const Value: boolean);
-begin
-  fInternalImage := Value;
-  if fVisible and Assigned(fOnChange) then
-    fOnChange(Self);
-end;
-
-procedure TSynEditMark.SetLine(const Value: Integer);
-begin
-  if (fLine <> Value) and fVisible and Assigned(fOnChange) then
-  begin
-    if fLine > 0 then
-      fOnChange(Self);
-    fLine := Value;
-    if fLine > 0 then
-      fOnChange(Self);
-  end
-  else
-    fLine := Value;
-end;
-
-procedure TSynEditMark.SetVisible(const Value: boolean);
-begin
-  if fVisible <> Value then
-  begin
-    fVisible := Value;
-    if Assigned(fOnChange) then
-      fOnChange(Self);
-  end;
-end;
-
-constructor TSynEditMark.Create;
-begin
-  inherited Create;
-  fBookmarkNum := -1;
-end;
-
-{ TSynEditMarkList }
-
-function TSynEditMarkList.Add(Item: TSynEditMark): Integer;
-begin
-  Result := fItems.Add(Item);
-  DoChange;
-end;
-
-procedure TSynEditMarkList.ClearLine(Line: integer);
-var
-  i: integer;
-  v_Changed: Boolean;
-begin
-  v_Changed := False;
-  for i := fItems.Count -1 downto 0 do
-    if not Items[i].IsBookmark and (Items[i].Line = Line) then
-    begin
-      InternalDelete(i);
-      v_Changed := True;
-    end;
-  if v_Changed then
-    DoChange;
-end;
-
-constructor TSynEditMarkList.Create;
-begin
-  inherited Create;
-  fItems := TList.Create;
-end;
-
-destructor TSynEditMarkList.Destroy;
-begin
-  Clear;
-  fItems.Free;
-  inherited Destroy;
-end;
-
-procedure TSynEditMarkList.InternalDelete(Index: Integer);
-begin
-  TObject(fItems[Index]).Free;
-  fItems.Delete(Index);
-end;
-
-procedure TSynEditMarkList.DoChange;
-begin
-  if Assigned(FOnChange) then
-    FOnChange(Self);
-end;
-
-function TSynEditMarkList.GetItem(Index: Integer): TSynEditMark;
-begin
-  result := TSynEditMark(fItems[Index]);
-end;
-
-procedure TSynEditMarkList.GetMarksForLine(line: integer;
-  out marks: TSynEditLineMarks);
-//Returns up to maxMarks book/gutter marks for a chosen line.
-var
-  v_MarkCount: integer;
-  i: integer;
-begin
-  FillChar(marks, SizeOf(marks), 0);
-  v_MarkCount := 0;
-  for i := 0 to fItems.Count - 1 do
-  begin
-    if Items[i].Line = line then
-    begin
-      marks[v_MarkCount] := Items[i];
-      Inc(v_MarkCount);
-      if v_MarkCount = Length(marks) then
-        break;
-    end;
-  end;
-end;
-
-function TSynEditMarkList.GetCount: Integer;
-begin
-  Result := fItems.Count;
-end;
-
-procedure TSynEditMarkList.Clear;
-begin
-  while fItems.Count <> 0 do
-  begin
-    InternalDelete(0);
-  end;
-  DoChange;
-end;
-
-function TSynEditMarkList.Remove(Item: TSynEditMark): Integer;
-begin
-  Result := fItems.IndexOf(Item);
-  InternalDelete(Result);
-  DoChange;
-end;
-
-begin
-  InternalResources.Free;
+  InternalResources := nil;
 end.

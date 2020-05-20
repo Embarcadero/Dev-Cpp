@@ -27,7 +27,7 @@ uses
 
 type
 
-  TEvalReadyEvent = procedure(const evalvalue: AnsiString) of object;
+  TEvalReadyEvent = procedure(const evalvalue: String) of object;
 
   TDebugger = class(TObject)
   private
@@ -44,7 +44,7 @@ type
     fWatchVarList: TList;
     fOnEvalReady: TEvalReadyEvent;
     fReader: TDebugReader;
-    function GetBreakPointFile: AnsiString;
+    function GetBreakPointFile: String;
   public
     constructor Create;
     destructor Destroy; override;
@@ -52,7 +52,7 @@ type
     // Play/pause
     procedure Start;
     procedure Stop;
-    procedure SendCommand(const command, params: AnsiString; viewinui: boolean = false);
+    procedure SendCommand(const command, params: String; viewinui: boolean = false);
 
     // breakpoints
     procedure AddBreakPoint(i: integer); overload;
@@ -64,7 +64,7 @@ type
     // watch var
     procedure AddWatchVar(i: integer); overload;
     procedure RemoveWatchVar(i: integer); overload;
-    procedure AddWatchVar(const namein: AnsiString); overload;
+    procedure AddWatchVar(const namein: String); overload;
     procedure RemoveWatchVar(nodein: TTreeNode); overload;
     procedure RefreshWatchVars;
     procedure DeleteWatchVars(deleteparent: boolean);
@@ -78,7 +78,7 @@ type
     property DebugView: TTreeView read fDebugView write fDebugView;
     property OnEvalReady: TEvalReadyEvent read fOnEvalReady write fOnEvalReady;
     property Reader: TDebugReader read fReader write fReader;
-    property BreakPointFile: AnsiString read GetBreakPointFile;
+    property BreakPointFile: String read GetBreakPointFile;
   end;
 
 implementation
@@ -117,7 +117,7 @@ var
   pi: TProcessInformation;
   si: TStartupInfo;
   sa: TSecurityAttributes;
-  GDBFile, GDBCommand: AnsiString;
+  GDBFile, GDBCommand: String;
   CompilerSet: TdevCompilerSet;
 begin
   Executing := true;
@@ -155,7 +155,7 @@ begin
   if CompilerSet.BinDir.Count > 0 then begin
     GDBFile := CompilerSet.BinDir[0] + pd + CompilerSet.gdbName;
     GDBCommand := '"' + GDBFile + '"' + ' --annotate=2 --silent';
-    if not CreateProcess(nil, PAnsiChar(GDBCommand), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
+    if not CreateProcess(nil, PChar(GDBCommand), nil, nil, true, CREATE_NEW_CONSOLE, nil, nil, si, pi) then begin
       MessageDlg(Format(Lang[ID_ERR_ERRORLAUNCHINGGDB], [GDBFile, SysErrorMessage(GetLastError)]), mtError,
         [mbOK], 0);
       Executing := false;
@@ -213,9 +213,9 @@ begin
   end;
 end;
 
-procedure TDebugger.SendCommand(const Command, Params: AnsiString; ViewInUI: boolean);
+procedure TDebugger.SendCommand(const Command, Params: String; ViewInUI: boolean);
 var
-  P: PAnsiChar;
+  P: PChar;
   nBytesWrote: DWORD;
 begin
   if Executing then begin
@@ -247,7 +247,7 @@ begin
   end;
 end;
 
-function TDebugger.GetBreakPointFile: AnsiString;
+function TDebugger.GetBreakPointFile: String;
 begin
   if Executing then
     Result := fReader.BreakPointFile
@@ -257,7 +257,7 @@ end;
 
 procedure TDebugger.AddBreakPoint(i: integer);
 var
-  filename: AnsiString;
+  filename: String;
 begin
   // "filename":linenum
   filename := StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName, '\', '/', [rfReplaceAll]);
@@ -266,7 +266,7 @@ end;
 
 procedure TDebugger.RemoveBreakPoint(i: integer);
 var
-  filename: AnsiString;
+  filename: String;
 begin
   // "filename":linenum
   filename := StringReplace(PBreakPoint(BreakPointList.Items[i])^.editor.FileName, '\', '/', [rfReplaceAll]);
@@ -334,7 +334,7 @@ begin
   SendCommand('undisplay', IntToStr(PWatchVar(WatchVarList.Items[i])^.gdbindex), true);
 end;
 
-procedure TDebugger.AddWatchVar(const namein: AnsiString);
+procedure TDebugger.AddWatchVar(const namein: String);
 var
   parentnode: TTreeNode;
   I: integer;

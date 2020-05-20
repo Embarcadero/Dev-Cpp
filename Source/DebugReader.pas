@@ -47,7 +47,7 @@ type
 
   PWatchVar = ^TWatchVar;
   TWatchVar = record
-    Name: AnsiString;
+    Name: String;
     gdbindex: integer;
     Node: TTreeNode;
   end;
@@ -60,16 +60,16 @@ type
 
   PTrace = ^TTrace;
   TTrace = record
-    funcname: AnsiString;
-    filename: AnsiString;
-    line: AnsiString;
+    funcname: String;
+    filename: String;
+    line: String;
   end;
 
   PRegister = ^TRegister;
   TRegister = record
-    name: AnsiString;
-    valuehex: AnsiString;
-    valuedec: AnsiString;
+    name: String;
+    valuehex: String;
+    valuedec: String;
   end;
 
   TDebugReader = class(TThread)
@@ -83,10 +83,10 @@ type
     fDebugView: TTreeView;
     fIndex: integer;
     fBreakPointLine: integer;
-    fBreakPointFile: AnsiString;
-    fOutput: AnsiString;
-    fEvalValue: AnsiString;
-    fSignal: AnsiString;
+    fBreakPointFile: String;
+    fOutput: String;
+    fEvalValue: String;
+    fSignal: String;
 
     // attempt to cut down on Synchronize calls
     dobacktraceready: boolean;
@@ -113,7 +113,7 @@ type
 
     // Evaluation tree output handlers
     procedure ProcessWatchOutput(WatchVar: PWatchVar);
-    function ProcessEvalOutput: AnsiString;
+    function ProcessEvalOutput: String;
     procedure ProcessDebugOutput;
 
     // synching with GUI
@@ -124,17 +124,17 @@ type
     procedure SkipToAnnotation; // skips until it finds #26#26 (GDB annotation for interfaces)
     function FindAnnotation(Annotation: TAnnotateType): boolean; // Finds the given annotation, returns false on EOF
     function GetNextAnnotation: TAnnotateType; // Returns the next annotation
-    function GetLastAnnotation(const text: AnsiString; curpos, len: integer): TAnnotateType;
+    function GetLastAnnotation(const text: String; curpos, len: integer): TAnnotateType;
     // Returns the last annotation in given string
     function PeekNextAnnotation: TAnnotateType;
     // Returns the next annotation, but does not modify current scanning positions
-    function GetNextWord: AnsiString; // copies the next word, stops when it finds chars 0..32
-    function GetNextLine: AnsiString;
+    function GetNextWord: String; // copies the next word, stops when it finds chars 0..32
+    function GetNextLine: String;
     // skips until enter sequence, skips ONE enter sequence, copies until next enter sequence
-    function GetNextFilledLine: AnsiString;
+    function GetNextFilledLine: String;
     // skips until enter sequence, skips enter sequences, copies until next enter sequence
-    function GetRemainingLine: AnsiString; // copies until enter sequence
-    function GetAnnotation(const s: AnsiString): TAnnotateType; // converts string to TAnnotateType
+    function GetRemainingLine: String; // copies until enter sequence
+    function GetAnnotation(const s: String): TAnnotateType; // converts string to TAnnotateType
   protected
     procedure Execute; override;
   public
@@ -145,7 +145,7 @@ type
     property BreakPointList: TList read fBreakPointList write fBreakPointList;
     property WatchVarList: TList read fWatchVarList write fWatchVarList;
     property DebugView: TTreeView read fDebugView write fDebugView;
-    property BreakPointFile: AnsiString read fBreakPointFile;
+    property BreakPointFile: String read fBreakPointFile;
   end;
 
 implementation
@@ -273,7 +273,7 @@ begin
   result := True;
 end;
 
-function TDebugReader.GetNextWord: AnsiString;
+function TDebugReader.GetNextWord: String;
 begin
   Result := '';
 
@@ -287,7 +287,7 @@ begin
   end;
 end;
 
-function TDebugReader.GetRemainingLine: AnsiString;
+function TDebugReader.GetRemainingLine: String;
 begin
   Result := '';
 
@@ -298,7 +298,7 @@ begin
   end;
 end;
 
-function TDebugReader.GetNextLine: AnsiString;
+function TDebugReader.GetNextLine: String;
 begin
   Result := '';
 
@@ -322,7 +322,7 @@ begin
   Result := GetRemainingLine;
 end;
 
-function TDebugReader.GetNextFilledLine: AnsiString;
+function TDebugReader.GetNextFilledLine: String;
 begin
   Result := '';
 
@@ -347,9 +347,9 @@ begin
   fIndex := IndexBackup;
 end;
 
-function TDebugReader.GetLastAnnotation(const text: AnsiString; curpos, len: integer): TAnnotateType;
+function TDebugReader.GetLastAnnotation(const text: String; curpos, len: integer): TAnnotateType;
 var
-  s: AnsiString;
+  s: String;
 begin
   // Walk back until end of #26's
   while (curpos > 0) and not (text[curpos] in [#26]) do
@@ -376,10 +376,10 @@ begin
   Result := GetAnnotation(GetNextWord);
 end;
 
-function TDebugReader.GetAnnotation(const s: AnsiString): TAnnotateType;
+function TDebugReader.GetAnnotation(const s: String): TAnnotateType;
 var
   IndexBackup: integer;
-  t: AnsiString;
+  t: String;
 begin
   if SameStr(s, 'pre-prompt') then
     result := TPrePrompt
@@ -482,7 +482,7 @@ end;
 
 procedure TDebugReader.ProcessWatchOutput(WatchVar: PWatchVar);
 var
-  S, NodeText: AnsiString;
+  S, NodeText: String;
   ParentNode: TTreeNode;
   ParentWasExpanded: boolean;
   I: integer;
@@ -534,10 +534,10 @@ begin
     WatchVar^.Node.Expand(false);
 end;
 
-function TDebugReader.ProcessEvalOutput: AnsiString;
+function TDebugReader.ProcessEvalOutput: String;
 var
   indent: integer;
-  NextLine: AnsiString;
+  NextLine: String;
   NextAnnotation: TAnnotateType;
 begin
   indent := 0;
@@ -612,7 +612,7 @@ end;
 
 procedure TDebugReader.HandleFrames;
 var
-  s: AnsiString;
+  s: String;
   trace: PTrace;
 begin
   s := GetNextLine;
@@ -717,7 +717,7 @@ end;
 
 procedure TDebugReader.HandleDisassembly;
 var
-  s: AnsiString;
+  s: String;
 begin
   if not Assigned(fDisassembly) then
     Exit;
@@ -741,7 +741,7 @@ end;
 
 procedure TDebugReader.HandleRegisters;
 var
-  s: AnsiString;
+  s: String;
   reg: PRegister;
   x: integer;
 begin
@@ -782,7 +782,7 @@ end;
 
 procedure TDebugReader.HandleError;
 var
-  s, WatchName: AnsiString;
+  s, WatchName: String;
   Tail, Head, I: integer;
   WatchVar: PWatchVar;
 begin
@@ -811,7 +811,7 @@ end;
 
 procedure TDebugReader.HandleDisplay;
 var
-  s, WatchName: AnsiString;
+  s, WatchName: String;
   I: integer;
   WatchVar: PWatchVar;
 begin
@@ -843,7 +843,7 @@ end;
 
 procedure TDebugReader.HandleSource;
 var
-  s: AnsiString;
+  s: String;
   DelimPos, I: integer;
 begin
   // source filename:line:offset:beg/middle/end:addr
@@ -932,7 +932,7 @@ end;
 
 procedure TDebugReader.Execute;
 var
-  tmp: AnsiString;
+  tmp: String;
   bytesread, totalbytesread: DWORD;
 const
   chunklen = 1000; // GDB usually sends 4K blocks, disassembly easily takes up to 20K

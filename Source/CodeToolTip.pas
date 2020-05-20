@@ -89,15 +89,15 @@ type
     FCurParamIndex: Integer;
     FLookupEditor: TCustomSynEdit;
     FMaxScanLength: Integer;
-    FOldFunction: AnsiString;
+    FOldFunction: String;
     FForceHide: boolean; // true if hidden by Esc
     FCustomSelIndex: Boolean; // user clicked up/down
     procedure SetSelIndex(Value: Integer);
     procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
   protected
-    function GetCommaIndex(P: PAnsiChar; Start, CurPos: Integer): Integer;
-    function FindClosestToolTip(const ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
+    function GetCommaIndex(P: PChar; Start, CurPos: Integer): Integer;
+    function FindClosestToolTip(const ToolTip: String; CommaIndex: Integer): String;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     function DummyPaint: integer; // obtain tooltip width
     procedure Paint; override;
@@ -108,7 +108,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Show;
-    procedure ActivateHint(Rect: TRect; const AHint: AnsiString); override;
+    procedure ActivateHint(Rect: TRect; const AHint: String); override;
     procedure ReleaseHandle;
     property ForceHide: boolean read FForceHide write FForceHide;
     property Options: TToolTipOptions read FOptions write FOptions;
@@ -154,7 +154,7 @@ end;
 
 // Returns name of function, so passing "foo(bar,bar,bar)" will return "foo"
 
-function GetPrototypeName(const S: AnsiString): AnsiString;
+function GetPrototypeName(const S: String): String;
 var
   WordEnd, WordStart: Integer;
 begin
@@ -275,7 +275,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TCodeToolTip.ActivateHint(Rect: TRect; const AHint: AnsiString);
+procedure TCodeToolTip.ActivateHint(Rect: TRect; const AHint: String);
 begin
   inherited;
   FActivated := True;
@@ -307,11 +307,11 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function TCodeToolTip.FindClosestToolTip(const ToolTip: AnsiString; CommaIndex: Integer): AnsiString;
+function TCodeToolTip.FindClosestToolTip(const ToolTip: String; CommaIndex: Integer): String;
 var
   I, K: Integer;
   NewIndex: Integer;
-  Str: AnsiString;
+  Str: String;
   LastCommaCnt: Integer;
 begin
 
@@ -343,7 +343,7 @@ end;
 
 // Return the comma count the cursor is placed *after*, so foo(aaa,bbb,ccc) with the cursor somewhere in b will return 1
 
-function TCodeToolTip.GetCommaIndex(P: PAnsiChar; Start, CurPos: Integer): Integer;
+function TCodeToolTip.GetCommaIndex(P: PChar; Start, CurPos: Integer): Integer;
 var
   I: Integer;
 
@@ -462,7 +462,7 @@ function TCodeToolTip.DummyPaint: integer;
 var
   ArgumentIndex, HighlightStart, BraceCount: Integer;
   CurPos: integer;
-  s: AnsiString;
+  s: String;
   InsideString: boolean;
   HLAttr: TSynHighlighterAttributes;
 begin
@@ -540,7 +540,7 @@ end;
 procedure TCodeToolTip.Paint;
 var
   ArgumentIndex, HighlightStart, WidthParam, BraceCount: Integer;
-  S: AnsiString;
+  S: String;
   CurPos: integer;
   InsideString: boolean;
   HLAttr: TSynHighlighterAttributes;
@@ -681,13 +681,13 @@ end;
 procedure TCodeToolTip.Show;
 var
   CurPos: Integer;
-  P: PAnsiChar;
+  P: PChar;
   I: Integer;
   nBraces: Integer;
-  S: AnsiString;
+  S: String;
   CaretPos: Integer;
   nCommas: Integer;
-  token: AnsiString;
+  token: String;
   HLAttr: TSynHighlighterAttributes;
   FuncStartXY: TBufferCoord;
 begin
@@ -697,7 +697,7 @@ begin
   CurPos := CaretPos;
 
   // get a pointer to the collapsed text
-  P := PAnsiChar(FEditor.Lines.Text);
+  P := PChar(FEditor.Lines.Text);
 
   nBraces := 0;
   nCommas := 0;

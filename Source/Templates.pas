@@ -26,28 +26,28 @@ uses
 
 type
   TTemplateUnit = record
-    CName: AnsiString;
-    CppName: AnsiString;
-    CText: AnsiString;
-    CppText: AnsiString;
+    CName: String;
+    CppName: String;
+    CText: String;
+    CppText: String;
   end;
 
   TTemplateRec = record
     CCaret: TPoint;
     CppCaret: TPoint;
     IsCPP: boolean;   // TRUE = C++ / FALSE = C
-    CText: AnsiString;
-    CppText: AnsiString;
+    CText: String;
+    CppText: String;
   end;
 
   TTemplate = class
   private
-   fFileName: AnsiString;
+   fFileName: String;
    fOptions: TProjOptions;
-   fDesc: AnsiString;
-   fCategory: AnsiString;
-   fName: AnsiString;
-   fIcon: AnsiString; // icon in project form
+   fDesc: String;
+   fCategory: String;
+   fName: String;
+   fIcon: String; // icon in project form
    fTemplate: TMemIniFile;
    fVersion: integer;
    function GetUnitCount: integer;
@@ -58,16 +58,16 @@ type
   public
    constructor Create;
    destructor Destroy; override;
-   procedure ReadTemplateFile(const FileName: AnsiString);
+   procedure ReadTemplateFile(const FileName: String);
    function AddUnit: integer;
    procedure RemoveUnit(const index: integer);
    function Save: boolean;
-   property Category: AnsiString read fCategory write fCategory;
-   property Description: AnsiString read fDesc write fDesc;
-   property FileName: AnsiString read fFileName write fFileName;
-   property Name: AnsiString read fName write fName;
+   property Category: String read fCategory write fCategory;
+   property Description: String read fDesc write fDesc;
+   property FileName: String read fFileName write fFileName;
+   property Name: String read fName write fName;
    property Options: TProjOptions read fOptions write fOptions;
-   property Icon: AnsiString read fIcon write fIcon;
+   property Icon: String read fIcon write fIcon;
    property UnitCount: integer read GetUnitCount;
    property Units[index: integer]: TTemplateUnit read GetUnit write SetUnit;
    property OldData: TTemplateRec read GetOldData write SetOldData;
@@ -98,7 +98,7 @@ begin
 	inherited;
 end;
 
-procedure TTemplate.ReadTemplateFile(const FileName: AnsiString);
+procedure TTemplate.ReadTemplateFile(const FileName: String);
 begin
   if assigned(fTemplate) then fTemplate.Free;
   if FileExists(FileName) then
@@ -109,8 +109,8 @@ begin
   else
    begin
      MessageBox(Application.mainform.handle,
-       PAnsiChar(Format(Lang[ID_ERR_TEMPFNF], [fFileName])),
-       PAnsiChar(Lang[ID_INFO]), MB_OK or MB_ICONINFORMATION);
+       PChar(Format(Lang[ID_ERR_TEMPFNF], [fFileName])),
+       PChar(Lang[ID_INFO]), MB_OK or MB_ICONINFORMATION);
      exit;
    end;
 
@@ -175,7 +175,7 @@ end;
 // need to actually save values. (basically TTemplate is readonly right now)
 function TTemplate.Save: boolean;
 var
- fName: AnsiString;
+ fName: String;
 begin
   result:= FALSE;
   try
@@ -196,7 +196,7 @@ end;
 
 function TTemplate.AddUnit: integer;
 var
- section: AnsiString;
+ section: String;
 begin
   if (fVersion> 0) and (assigned(fTemplate)) then
    begin
@@ -212,7 +212,7 @@ end;
 
 procedure TTemplate.RemoveUnit(const index: integer);
 var
- section: AnsiString;
+ section: String;
  count: integer;
 begin
   section:= 'Unit' +inttostr(index);
@@ -261,7 +261,7 @@ begin
   if not assigned(fTemplate) then
    begin
      MessageBox(Application.MainForm.Handle,
-      PAnsiChar(Lang[ID_ERR_NOTEMPLATE]), PAnsiChar(Lang[ID_INFO]), MB_OK or MB_ICONWARNING);
+      PChar(Lang[ID_ERR_NOTEMPLATE]), PChar(Lang[ID_INFO]), MB_OK or MB_ICONWARNING);
      exit;
    end;
 
@@ -281,7 +281,7 @@ end;
 
 function TTemplate.GetUnit(index: integer): TTemplateUnit;
 var
- section: AnsiString;
+ section: String;
 begin
   if not assigned(fTemplate) then
    begin
@@ -310,7 +310,7 @@ end;
 
 procedure TTemplate.SetUnit(index: integer; value: TTemplateUnit);
 var
-	section: AnsiString;
+	section: String;
 begin
 	if assigned(fTemplate) and (fVersion > 0) then begin
 		section:= 'Unit' +inttostr(index);
