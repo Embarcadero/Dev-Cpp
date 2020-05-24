@@ -59,7 +59,7 @@ type
 implementation
 
 uses
-  editor, main, MultiLangSupport, devcfg;
+  System.UITypes, editor, main, MultiLangSupport, devcfg;
 
 {$R *.dfm}
 

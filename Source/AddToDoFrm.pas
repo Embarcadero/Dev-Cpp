@@ -83,7 +83,7 @@ begin
   st.Char := 1;
 
   I := 1;
-  while (I <= Length(LineText)) and (LineText[I] in [#9, ' ']) do
+  while (I <= Length(LineText)) and CharInSet(LineText[I], [#9, ' ']) do
     Inc(I);
   Prepend := Copy(LineText, 1, I - 1);
 
@@ -119,7 +119,7 @@ end;
 
 procedure TAddToDoForm.txtUserKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in ['a'..'z', 'A'..'Z', '0'..'9', '_', #8, #13, #27]) then begin
+  if not CharInSet(Key, ['a'..'z', 'A'..'Z', '0'..'9', '_', #8, #13, #27]) then begin
     Key := #0;
     Exit;
   end;

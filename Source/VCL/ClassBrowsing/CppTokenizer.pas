@@ -23,25 +23,16 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Classes, SysUtils, StrUtils, ComCtrls, Math, cbutils;
+  Windows, Classes, SysUtils, StrUtils, ComCtrls, Math, cbutils, CharUtils;
 {$ENDIF}
 {$IFDEF LINUX}
 Classes, SysUtils, StrUtils, QComCtrls;
 {$ENDIF}
 
-const
-  LetterChars: set of Char = ['A'..'Z', 'a'..'z', '_', '*', '&', '~'];
-  DigitChars: set of Char = ['0'..'9'];
-  HexChars: set of Char = ['A'..'F', 'a'..'f', 'x', 'L'];
-  SpaceChars: set of Char = [' ', #9];
-  LineChars: set of Char = [#13, #10];
-  BlankChars: set of Char = [#0..#32];
-  OperatorChars: set of Char = ['+', '-', '/', '*', '[', ']', '=', '%', '!', '&', '|', '>', '<', '^', '!'];
-
 type
   PToken = ^TToken;
   TToken = record
-    Text: string[255];
+    Text: string;
     Line: integer;
   end;
 
@@ -103,7 +94,7 @@ procedure Register;
 implementation
 
 uses
-  DateUtils;
+  System.Character, DateUtils;
 
 procedure Register;
 begin
@@ -243,7 +234,7 @@ begin
     Inc(pCurrent);
     if pCurrent^ = '\' then
       Inc(pCurrent, 2); // skip escaped char
-  until pCurrent^ in ['"', #0];
+  until pCurrent^ in TSetOfChar(['"', #0]);
   Inc(pCurrent);
 end;
 
@@ -253,7 +244,7 @@ begin
     Inc(pCurrent);
     if pCurrent^ = '\' then
       Inc(pCurrent, 2); // skip escaped quote
-  until pCurrent^ in ['''', #0];
+  until pCurrent^ in TSetOfChar(['''', #0]);
   Inc(pCurrent);
 end;
 
@@ -280,7 +271,7 @@ begin
         SkipCStyleComment // skips over */
       else
         Inc(pCurrent);
-    end else if pCurrent^ in FailChars then begin
+    end else if pCurrent^ in TSetOfChar(FailChars) then begin
       Exit;
     end else
       Inc(pCurrent);
@@ -306,7 +297,7 @@ begin
     else
       Inc(pCurrent);
     end;
-  until pCurrent^ in [',', ';', ')', '}', #0];
+  until pCurrent^ in TSetOfChar([',', ';', ')', '}', #0]);
 end;
 
 procedure TCppTokenizer.SkipTemplateArgs;
@@ -396,7 +387,7 @@ var
 begin
   Offset := pCurrent;
 
-  if pCurrent^ in DigitChars then
+  if pCurrent^.IsDigit then
     while pCurrent^ in DigitChars + HexChars do
       Advance;
 
@@ -470,7 +461,7 @@ begin
             Inc(pCurrent);
             if pCurrent^ = '[' then
               Inc(tmp);
-          until pCurrent^ in [#0, ']'] + LineChars;
+          until pCurrent^ in TSetOfChar([#0, ']']) + LineChars;
           Dec(tmp);
         until tmp = 0;
         Inc(pCurrent);
@@ -519,7 +510,7 @@ begin
   SetString(Result, Offset, pCurrent - Offset);
   SimplifyArgs(Result);
   if (pCurrent^ = '.') or ((pCurrent^ = '-') and ((pCurrent + 1)^ = '>')) then // skip '.' and '->'
-    while not (pCurrent^ in [#0, '(', ';', '{', '}', ')'] + LineChars + SpaceChars) do
+    while not (pCurrent^ in TSetOfChar([#0, '(', ';', '{', '}', ')']) + LineChars + SpaceChars) do
       Inc(pCurrent);
   SkipToNextToken;
 end;

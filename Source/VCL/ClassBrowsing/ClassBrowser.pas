@@ -134,6 +134,9 @@ procedure Register;
 
 implementation
 
+uses
+  System.Types;
+
 procedure Register;
 begin
   RegisterComponents('Dev-C++', [TClassBrowser]);

@@ -23,20 +23,11 @@ interface
 
 uses
 {$IFDEF WIN32}
-  Windows, Classes, SysUtils, StrUtils, ComCtrls, Math, IntList, cbutils;
+  Windows, Classes, SysUtils, StrUtils, ComCtrls, Math, IntList, cbutils, CharUtils;
 {$ENDIF}
 {$IFDEF LINUX}
 Classes, SysUtils, StrUtils, QComCtrls;
 {$ENDIF}
-
-const
-  LineChars: set of Char = [#13, #10];
-  SpaceChars: set of Char = [' ', #9];
-  OperatorChars: set of Char = ['+', '-', '*', '/', '!', '=', '<', '>', '&', '|', '^'];
-  IdentChars: set of Char = ['A'..'Z', '0'..'9', 'a'..'z', '_', '*', '&', '~'];
-  MacroIdentChars: set of Char = ['A'..'Z', 'a'..'z', '_'];
-  Operators: array[0..16] of string = ('*', '/', '+', '-', '<', '<=', '>', '>=', '==', '!=', '&', '^', '|', '&&', '||',
-    'and', 'or');
 
 type
   PFile = ^TFile;
@@ -636,12 +627,12 @@ var
     while (SearchPos <= Length(Line)) do begin
 
       // We have found an identifier. It is not a number suffix. Try to expand it
-      if (Line[SearchPos] in MacroIdentChars) and ((SearchPos = 1) or not (Line[SearchPos - 1] in ['0'..'9'])) then begin
+      if (Line[SearchPos] in MacroIdentChars) and ((SearchPos = 1) or not (Line[SearchPos - 1] in DigitChars)) then begin
         Tail := SearchPos;
         Head := SearchPos;
 
         // Get identifier name (numbers are allowed, but not at the start
-        while (Head <= Length(Line)) and ((Line[Head] in MacroIdentChars) or (Line[Head] in ['0'..'9'])) do
+        while (Head <= Length(Line)) and ((Line[Head] in MacroIdentChars) or (Line[Head] in DigitChars)) do
           Inc(Head);
         Name := Copy(Line, Tail, Head - Tail);
         NameStart := Tail;
@@ -956,10 +947,10 @@ var
 begin
   Result := Input; // remove suffixes like L from integer values
   if Length(Input) > 0 then begin
-    if not (Result[1] in ['0'..'9']) then
+    if not (Result[1] in DigitChars) then
       Exit; // don't process names
     I := Length(Result);
-    while (I >= 0) and (Result[i] in ['A'..'Z', 'a'..'z']) do // find first alphabetical character at end
+    while (I >= 0) and (Result[i] in TSetOfChar(['A'..'Z', 'a'..'z'])) do // find first alphabetical character at end
       Dec(I);
     Delete(Result, I + 1, MaxInt); // remove from there
   end;

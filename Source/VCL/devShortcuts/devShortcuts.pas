@@ -45,13 +45,13 @@ type
     fOwner: TComponent;
     fFilename: TFileName;
     fShortcuts: TList;
-    function GetItemDescription(Item: TMenuItem): AnsiString;
+    function GetItemDescription(Item: TMenuItem): string;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Load(List: TActionList);
     procedure Edit(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent, ReplaceHint,
-      ResetAllConfirm, ResetCurrentConfirm, Button: AnsiString);
+      ResetAllConfirm, ResetCurrentConfirm, Button: string);
     procedure Save;
   published
     property Filename: TFilename read fFilename write fFilename;
@@ -95,7 +95,7 @@ begin
   inherited;
 end;
 
-function TdevShortcuts.GetItemDescription(Item: TMenuItem): AnsiString;
+function TdevShortcuts.GetItemDescription(Item: TMenuItem): string;
 var
   ParentItem: TMenuItem;
 begin
@@ -215,7 +215,7 @@ begin
 end;
 
 procedure TdevShortcuts.Edit(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent,
-  ReplaceHint, ResetAllConfirm, ResetCurrentConfirm, Button: AnsiString);
+  ReplaceHint, ResetAllConfirm, ResetCurrentConfirm, Button: string);
 var
   I: integer;
   item: PShortcutItem;

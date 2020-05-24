@@ -69,7 +69,8 @@ type
 
 implementation
 
-uses IniFiles, StrUtils, version, MultiLangSupport, devcfg, utils;
+uses
+  System.UITypes, IniFiles, StrUtils, version, MultiLangSupport, devcfg, utils;
 
 {$R *.dfm}
 

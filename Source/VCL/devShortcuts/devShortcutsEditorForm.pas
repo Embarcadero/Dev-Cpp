@@ -59,7 +59,7 @@ type
     function Count: integer;
     property ShortCuts[Index: integer]: PShortCutItem read GetShortCut;
     procedure LoadText(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent, ReplaceHint,
-      ResetAllConfirm, ResetCurrentConfirm: AnsiString);
+      ResetAllConfirm, ResetCurrentConfirm: string);
   end;
 
 var
@@ -68,12 +68,12 @@ var
 implementation
 
 uses
-  StrUtils;
+  System.UITypes, StrUtils;
 
 {$R *.dfm}
 
 procedure TfrmShortcutsEditor.LoadText(const WindowCaption, Column1, Column2, Tip, OK, Cancel, ResetAll, ResetCurrent,
-  ReplaceHint, ResetAllConfirm, ResetCurrentConfirm: AnsiString);
+  ReplaceHint, ResetAllConfirm, ResetCurrentConfirm: string);
 begin
   Caption := WindowCaption;
   lvShortcuts.Columns[0].Caption := Column1;

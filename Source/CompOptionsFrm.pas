@@ -119,7 +119,7 @@ type
 implementation
 
 uses
-  ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
+  System.UItypes, ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
 
 {$R *.dfm}
 
@@ -268,7 +268,7 @@ var
   NewItem: String;
 begin
   NewItem := Trim(edEntry.Text);
-  if (NewItem <> '') and DirectoryExists(edEntry.Text) then
+  if (NewItem <> '') and SysUtils.DirectoryExists(edEntry.Text) then
     NewItem := edEntry.Text
   else
     NewItem := devDirs.Default;
@@ -286,7 +286,7 @@ begin
     3: lstDirs.DeleteSelected;
     4:
       for idx := pred(lstDirs.Items.Count) downto 0 do
-        if not DirectoryExists(lstDirs.Items[idx]) then
+        if not SysUtils.DirectoryExists(lstDirs.Items[idx]) then
           lstDirs.Items.Delete(idx);
   end; { case }
   edEntry.Clear;

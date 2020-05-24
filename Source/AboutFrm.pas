@@ -79,7 +79,7 @@ type
 implementation
 
 uses
-  ShellAPI, devcfg, utils, MultiLangSupport, main;
+  System.UITypes, ShellAPI, devcfg, utils, MultiLangSupport, main;
 
 {$R *.dfm}
 

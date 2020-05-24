@@ -214,7 +214,7 @@ type
 implementation
 
 uses
-  shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, DataFrm, IniFiles, editor,
+  System.Types, shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, DataFrm, IniFiles, editor,
   main;
 
 {$R *.dfm}

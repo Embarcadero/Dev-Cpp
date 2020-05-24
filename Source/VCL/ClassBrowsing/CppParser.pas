@@ -446,7 +446,7 @@ begin
   // Move '*', '&' to type rather than cmd (it's in the way for code-completion)
   NewType := aType;
   NewCommand := Command;
-  while (Length(NewCommand) > 0) and (NewCommand[1] in ['*', '&']) do begin
+  while (Length(NewCommand) > 0) and CharInSet(NewCommand[1], ['*', '&']) do begin
     NewType := NewType + NewCommand[1];
     Delete(NewCommand, 1, 1); // remove first
   end;
@@ -616,10 +616,10 @@ begin
     // Assemble a list of statements in text form we inherit from
     repeat
       if not CheckForScopeKeyword(Index) then
-        if not (fTokenizer[Index]^.Text[1] in [',', ':', '(']) then
+        if not CharInSet(fTokenizer[Index]^.Text[1], [',', ':', '(']) then
           sl.Add(fTokenizer[Index]^.Text);
       Inc(Index);
-    until (Index >= fTokenizer.Tokens.Count) or (fTokenizer[Index]^.Text[1] in ['{', ';']);
+    until (Index >= fTokenizer.Tokens.Count) or CharInSet(fTokenizer[Index]^.Text[1], ['{', ';']);
 
     // Clear it. Assume it is assigned
     ClassStatement._InheritanceList.Clear;
@@ -677,7 +677,7 @@ begin
   if iSkip >= 0 then begin // skip to next ';'
     repeat
       Inc(fIndex);
-    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';']);
+    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] = ';');
     Inc(fIndex); //skip ';'
     fSkipList.Delete(iSkip);
   end;
@@ -822,10 +822,10 @@ begin
       //		{"info", 0, 0, 'i'},
       //    ...
       //  };
-      while (I < fTokenizer.Tokens.Count) and not (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] in [';', ':', '{',
+      while (I < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)], [';', ':', '{',
         '}', ',', ')', ']']) do
         Inc(I);
-      if (I < fTokenizer.Tokens.Count) and not (fTokenizer[I]^.Text[1] in ['{', ':']) then
+      if (I < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[I]^.Text[1], ['{', ':']) then
         Result := False;
     end;
   end;
@@ -857,7 +857,7 @@ begin
   fIndexBackup := fIndex;
 
   // Gather data for the string parts
-  while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['(', ';', ':', '{', '}', '#']) do
+  while (fIndex < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[fIndex]^.Text[1], ['(', ';', ':', '{', '}', '#']) do
     begin
 
     // Skip some compiler extensions BEFORE our function type
@@ -945,7 +945,7 @@ begin
     // Check the current and the next token
     for I := 0 to 1 do begin
       if CheckForKeyword or
-        (fTokenizer[fIndex]^.Text[1] in ['#', ',', ';', ':', '{', '}', '!', '/', '+', '-', '<', '>']) or
+        CharInSet(fTokenizer[fIndex]^.Text[1], ['#', ',', ';', ':', '{', '}', '!', '/', '+', '-', '<', '>']) or
         (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = '.') or
       ((Length(fTokenizer[fIndex]^.Text) > 1) and
         (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text) - 1] = '-') and
@@ -956,7 +956,7 @@ begin
         Exit; // fail
 
         // Could be a function pointer?
-      end else if (fTokenizer[fIndex]^.Text[1] in ['(']) then begin
+      end else if (fTokenizer[fIndex]^.Text[1] = '(') then begin
 
         // Quick fix: there must be a pointer operator in the first tiken
         if (fIndex + 1 >= fTokenizer.Tokens.Count) or
@@ -977,12 +977,12 @@ begin
 
   // Fail if we do not find a comma or a semicolon or a ( (inline constructor)
   while fIndex < fTokenizer.Tokens.Count do begin
-    if (fTokenizer[fIndex]^.Text[1] in ['#', '{', '}']) or CheckForKeyword then begin
+    if CharInSet(fTokenizer[fIndex]^.Text[1], ['#', '{', '}']) or CheckForKeyword then begin
       Break; // fail
     end else if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '(') and
       (fTokenizer[fIndex]^.Text[2] = '(') then begin // TODO: is this used to remove __attribute stuff?
       Break;
-    end else if fTokenizer[fIndex]^.Text[1] in [',', ';'] then begin
+    end else if CharInSet(fTokenizer[fIndex]^.Text[1], [',', ';']) then begin
       Result := True;
       Break;
     end;
@@ -1001,7 +1001,7 @@ begin
   Inc(fIndex);
 
   // Walk up to first new word (before first comma or ;)
-  while (fIndex + 1 < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex + 1]^.Text[1] in ['(', ',', ';'])) do begin
+  while (fIndex + 1 < fTokenizer.Tokens.Count) and (not CharInSet(fTokenizer[fIndex + 1]^.Text[1], ['(', ',', ';'])) do begin
     OldType := OldType + fTokenizer[fIndex]^.Text + ' ';
     Inc(fIndex);
   end;
@@ -1015,7 +1015,7 @@ begin
         (fTokenizer[fIndex + 0]^.Text[1] = '(') and
         (fTokenizer[fIndex + 1]^.Text[1] = '(') then begin
         break; // TODO: do NOT handle function pointer defines
-      end else if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
+      end else if not CharInSet(fTokenizer[fIndex]^.Text[1], [',', ';']) then begin
         NewType := NewType + fTokenizer[fIndex]^.Text + ' '
       end else begin
         NewType := TrimRight(NewType);
@@ -1125,7 +1125,7 @@ begin
   I := fIndex;
 
   // Skip until the struct body starts
-  while (I < fTokenizer.Tokens.Count) and not (fTokenizer[I]^.Text[1] in [';', '{']) do
+  while (I < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[I]^.Text[1], [';', '{']) do
     Inc(I);
 
   // Forward class/struct decl *or* typedef, e.g. typedef struct some_struct synonym1, synonym2;
@@ -1135,7 +1135,7 @@ begin
       OldType := fTokenizer[fIndex]^.Text;
       repeat
         // Add definition statement for the synonym
-        if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';']) then begin
+        if (fIndex + 1 < fTokenizer.Tokens.Count) and CharInSet(fTokenizer[fIndex + 1]^.Text[1], [',', ';']) then begin
           NewType := fTokenizer[fIndex]^.Text;
           AddStatement(
             GetLastCurrentClass,
@@ -1169,7 +1169,7 @@ begin
     // Add class/struct name BEFORE opening brace
     if fTokenizer[fIndex]^.Text[1] <> '{' then begin
       repeat
-        if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in [',', ';', '{', ':']) then
+        if (fIndex + 1 < fTokenizer.Tokens.Count) and CharInSet(fTokenizer[fIndex + 1]^.Text[1], [',', ';', '{', ':']) then
           begin
           Command := fTokenizer[fIndex]^.Text;
           if Command <> '' then begin
@@ -1192,7 +1192,7 @@ begin
           end;
         end;
         Inc(fIndex);
-      until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [':', '{', ';']);
+      until (fIndex >= fTokenizer.Tokens.Count) or CharInSet(fTokenizer[fIndex]^.Text[1], [':', '{', ';']);
     end;
 
     // Walk to opening brace if we encountered inheritance statements
@@ -1210,11 +1210,11 @@ begin
       I := SkipBraces(fIndex); // step onto closing brace
 
       // When encountering names again after struct body scanning, skip it
-      if (I + 1 < fTokenizer.Tokens.Count) and not (fTokenizer[I + 1]^.Text[1] in [';', '}']) then
+      if (I + 1 < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[I + 1]^.Text[1], [';', '}']) then
         fSkipList.Add(I + 1); // add first name to skip statement so that we can skip it until the next ;
 
       // Add class/struct synonyms after close brace
-      if (I + 1 < fTokenizer.Tokens.Count) and not (fTokenizer[I + 1]^.Text[1] in [';', '}']) then begin
+      if (I + 1 < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[I + 1]^.Text[1], [';', '}']) then begin
         Command := '';
         NewClassLevel := TList.Create;
         try
@@ -1224,7 +1224,7 @@ begin
           repeat
             Inc(I);
 
-            if not (fTokenizer[I]^.Text[1] in ['{', ',', ';']) then begin
+            if not CharInSet(fTokenizer[I]^.Text[1], ['{', ',', ';']) then begin
               if (fTokenizer[I]^.Text[1] = '_') and (fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = '_') then begin
                 // skip possible gcc attributes
                 // start and end with 2 underscores (i.e. __attribute__)
@@ -1234,7 +1234,7 @@ begin
               end else begin
                 if fTokenizer[I]^.Text[Length(fTokenizer[I]^.Text)] = ']' then // cut-off array brackets
                   Command := Command + Copy(fTokenizer[I]^.Text, 1, Pos('[', fTokenizer[I]^.Text) - 1) + ' '
-                else if fTokenizer[I]^.Text[1] in ['*', '&'] then // do not add spaces after pointer operator
+                else if CharInSet(fTokenizer[I]^.Text[1], ['*', '&']) then // do not add spaces after pointer operator
                   Command := Command + fTokenizer[I]^.Text
                 else
                   Command := Command + fTokenizer[I]^.Text + ' ';
@@ -1266,7 +1266,7 @@ begin
                 Command := '';
               end;
             end;
-          until (I >= fTokenizer.Tokens.Count - 1) or (fTokenizer[I]^.Text[1] in ['{', ';']);
+          until (I >= fTokenizer.Tokens.Count - 1) or CharInSet(fTokenizer[I]^.Text[1], ['{', ';']);
 
           // Set current class level
           AddMultiClassLevel(NewClassLevel);
@@ -1303,12 +1303,12 @@ begin
   I := fIndex;
 
   // Skip over argument list
-  while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [';', ':', '{', '}']) do
+  while (fIndex < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[fIndex]^.Text[1], [';', ':', '{', '}']) do
     Inc(fIndex);
 
   // Check if this is a prototype
   FunctionClass := GetLastCurrentClass;
-  if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] in [';', '}']) then begin // prototype
+  if (fIndex < fTokenizer.Tokens.Count) and CharInSet(fTokenizer[fIndex]^.Text[1], [';', '}']) then begin // prototype
     IsDeclaration := True;
     if not fIsHeader and not Assigned(FunctionClass) then // in a CPP file
       IsValid := False; // not valid
@@ -1316,11 +1316,11 @@ begin
 
     // Find the function body start after the inherited constructor
     if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then
-      while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}'])) do
+      while (fIndex < fTokenizer.Tokens.Count) and (not CharInSet(fTokenizer[fIndex]^.Text[1], [';', '{', '}'])) do
         Inc(fIndex);
 
     // Still a prototype
-    if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] in [';', '}']) then begin
+    if (fIndex < fTokenizer.Tokens.Count) and CharInSet(fTokenizer[fIndex]^.Text[1], [';', '}']) then begin
       IsDeclaration := True;
       if not fIsHeader and not Assigned(FunctionClass) then
         IsValid := False;
@@ -1393,7 +1393,7 @@ begin
     Inc(fIndex);
   if I = fIndex then // if not moved ahead, something is wrong but don't get stuck ;)
     if fIndex < fTokenizer.Tokens.Count then
-      if not (fTokenizer[fIndex]^.Text[1] in ['{', '}']) then
+      if not CharInSet(fTokenizer[fIndex]^.Text[1], ['{', '}']) then
         Inc(fIndex);
 end;
 
@@ -1464,7 +1464,7 @@ begin
     SameStr(fTokenizer[fIndex]^.Text, 'using') then begin
     repeat
       Inc(fIndex);
-    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';']);
+    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] = ';');
     Inc(fIndex); // step over
 
     // Skip to :
@@ -1473,7 +1473,7 @@ begin
 
     repeat
       Inc(fIndex);
-    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [':']);
+    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] = ':');
 
     // Skip to )
   end else if SameStr(fTokenizer[fIndex]^.Text, 'alignas') or
@@ -1487,7 +1487,7 @@ begin
 
     repeat
       Inc(fIndex);
-    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] in [')']);
+    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ')');
     Inc(fIndex); // step over
 
     // Skip to {
@@ -1498,14 +1498,14 @@ begin
 
     repeat
       Inc(fIndex);
-    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in ['{']);
+    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] = '{');
 
     // Skip to }
   end else if SameStr(fTokenizer[fIndex]^.Text, 'asm') then begin
 
     repeat
       Inc(fIndex);
-    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in ['}']);
+    until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] = '}');
     Inc(fIndex); // step over
   end;
 end;
@@ -1524,7 +1524,7 @@ begin
       IsFunctionPointer := Pos('*', fTokenizer[fIndex + 1]^.Text) > 0;
       if not IsFunctionPointer then
         break; // inline constructor
-    end else if (fIndex + 1 < fTokenizer.Tokens.Count) and (fTokenizer[fIndex + 1]^.Text[1] in ['(', ',', ';', ':', '}',
+    end else if (fIndex + 1 < fTokenizer.Tokens.Count) and CharInSet(fTokenizer[fIndex + 1]^.Text[1], ['(', ',', ';', ':', '}',
       '#']) then begin
       Break;
     end;
@@ -1554,7 +1554,7 @@ begin
     if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = ':') then begin
       repeat
         Inc(fIndex);
-      until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', '}']);
+      until (fIndex >= fTokenizer.Tokens.Count) or CharInSet(fTokenizer[fIndex]^.Text[1], [',', ';', '{', '}']);
     end;
 
     // Skip inline constructors,
@@ -1564,13 +1564,13 @@ begin
     // as
     // int a
     if (not IsFunctionPointer) and (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '(') then begin
-      while (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in [',', ';', '{', '}']) do
+      while (fIndex < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[fIndex]^.Text[1], [',', ';', '{', '}']) do
         Inc(fIndex);
     end;
 
     // Did we stop on top of the variable name?
     if fIndex < fTokenizer.Tokens.Count then begin
-      if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
+      if not CharInSet(fTokenizer[fIndex]^.Text[1], [',', ';']) then begin
         if IsFunctionPointer and (fIndex + 1 < fTokenizer.Tokens.Count) then begin
           S := fTokenizer[fIndex]^.Text;
           Cmd := Trim(Copy(S, 3, Length(S) - 3)); // (*foo) -> foo
@@ -1604,13 +1604,13 @@ begin
       end;
 
       // Step over the variable name
-      if not (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']) then
+      if not CharInSet(fTokenizer[fIndex]^.Text[1], [';', '{', '}']) then
         Inc(fIndex);
     end;
-  until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']);
+  until (fIndex >= fTokenizer.Tokens.Count) or CharInSet(fTokenizer[fIndex]^.Text[1], [';', '{', '}']);
 
   // Skip ; and ,
-  if (fIndex < fTokenizer.Tokens.Count) and not (fTokenizer[fIndex]^.Text[1] in ['{', '}']) then
+  if (fIndex < fTokenizer.Tokens.Count) and not CharInSet(fTokenizer[fIndex]^.Text[1], ['{', '}']) then
     Inc(fIndex);
 end;
 
@@ -1634,7 +1634,7 @@ begin
       if fTokenizer[I + 1]^.Text[1] <> ';' then
         EnumName := Trim(fTokenizer[I + 1]^.Text);
   end else begin // enum NAME {...};
-    while (fIndex < fTokenizer.Tokens.Count) and (not (fTokenizer[fIndex]^.Text[1] in ['{', ';'])) do begin
+    while (fIndex < fTokenizer.Tokens.Count) and (not CharInSet(fTokenizer[fIndex]^.Text[1], ['{', ';'])) do begin
       EnumName := EnumName + fTokenizer[fIndex]^.Text + ' ';
       Inc(fIndex);
     end;
@@ -1669,7 +1669,7 @@ begin
   // Call every member "enum NAME ITEMNAME"
   LastType := TrimRight('enum ' + EnumName);
   repeat
-    if not (fTokenizer[fIndex]^.Text[1] in [',', ';']) then begin
+    if not CharInSet(fTokenizer[fIndex]^.Text[1], [',', ';']) then begin
       if fTokenizer[fIndex]^.Text[Length(fTokenizer[fIndex]^.Text)] = ']' then begin //array; break args
         Cmd := Copy(fTokenizer[fIndex]^.Text, 1, Pos('[', fTokenizer[fIndex]^.Text) - 1);
         Args := Copy(fTokenizer[fIndex]^.Text, Pos('[', fTokenizer[fIndex]^.Text), Length(fTokenizer[fIndex]^.Text) -
@@ -1695,7 +1695,7 @@ begin
         nil);
     end;
     Inc(fIndex);
-  until (fIndex >= fTokenizer.Tokens.Count) or (fTokenizer[fIndex]^.Text[1] in [';', '{', '}']);
+  until (fIndex >= fTokenizer.Tokens.Count) or CharInSet(fTokenizer[fIndex]^.Text[1], [';', '{', '}']);
 
   // Step over closing brace
   if (fIndex < fTokenizer.Tokens.Count) and (fTokenizer[fIndex]^.Text[1] = '}') then
@@ -2610,7 +2610,7 @@ begin
   // Remove pointer stuff from type
   s := aType; // 'Type' is a keyword
   position := Length(s);
-  while (position > 0) and (s[position] in ['*', '&']) do
+  while (position > 0) and CharInSet(s[position], ['*', '&']) do
     Dec(position);
   if position <> Length(s) then
     Delete(s, position + 1, Length(s) - 1);

@@ -332,7 +332,7 @@ begin
 
     // Sort here by member
     I := fParser.FindLastOperator(Phrase);
-    while (I > 0) and (I <= Length(Phrase)) and (Phrase[i] in ['.', ':', '-', '>']) do
+    while (I > 0) and (I <= Length(Phrase)) and CharInSet(Phrase[i], ['.', ':', '-', '>']) do
       Inc(I);
 
     // filter fFullCompletionStatementList to fCompletionStatementList

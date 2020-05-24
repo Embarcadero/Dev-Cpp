@@ -193,7 +193,7 @@ type
 implementation
 
 uses
-  FileCtrl, devcfg, IconFrm, utils, MultiLangSupport, version, Math;
+  System.UITypes, FileCtrl, devcfg, IconFrm, utils, MultiLangSupport, version, Math;
 
 {$R *.dfm}
 
@@ -236,7 +236,7 @@ var
   NewItem: String;
 begin
   NewItem := Trim(edDirEntry.Text);
-  if (NewItem <> '') and DirectoryExists(NewItem) then
+  if (NewItem <> '') and SysUtils.DirectoryExists(NewItem) then
     newitem := edDirEntry.Text
   else
     newitem := fProjectCopy.Directory;
@@ -292,7 +292,7 @@ begin
     4: begin
         if lstDirList.Items.Count > 0 then
           for idx := lstDirList.Items.Count - 1 downto 0 do
-            if not DirectoryExists(lstDirList.Items[idx]) then begin
+            if not SysUtils.DirectoryExists(lstDirList.Items[idx]) then begin
               case SubTabs.TabIndex of
                 0: fProjectCopy.Options.Libs.Delete(idx);
                 1: fProjectCopy.Options.Includes.Delete(idx);

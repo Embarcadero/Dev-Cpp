@@ -168,7 +168,7 @@ implementation
 
 uses
   main, project, MultiLangSupport, devcfg, utils,
-  DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm, CodeCompletionForm, SynEditMiscClasses;
+  DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm, CodeCompletionForm, SynEditMiscClasses, CharUtils;
 
 { TDebugGutter }
 
@@ -915,7 +915,7 @@ begin
   // We received a key from the completion box...
   if fCompletionBox.Enabled then begin
     // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
-    if (Key in fText.AdditionalIdentChars) then begin // Continue filtering
+    if (Key in TSetOfChar(fText.AdditionalIdentChars)) then begin // Continue filtering
       fText.SelText := Key;
       fCompletionBox.Search(GetWordAtPosition(fText.CaretXY, wpCompletion), fFileName);
     end else if Key = Char(VK_BACK) then begin
@@ -923,7 +923,7 @@ begin
       fCompletionBox.Search(GetWordAtPosition(fText.CaretXY, wpCompletion), fFileName);
     end else if Key = Char(VK_ESCAPE) then begin
       fCompletionBox.Hide;
-    end else if (Key in [Char(VK_RETURN), '(']) then begin // Ending chars, don't insert
+    end else if CharInSet(Key, [Char(VK_RETURN), '(']) then begin // Ending chars, don't insert
       CompletionInsert('');
       fCompletionBox.Hide;
     end else begin
@@ -1362,7 +1362,7 @@ begin
           if not FindComplement(s, '[', ']', WordEnd, 1) then
             break;
         // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
-        end else if (s[WordEnd + 1] in fText.AdditionalIdentChars) then
+        end else if (s[WordEnd + 1] in TSetOfChar(fText.AdditionalIdentChars)) then
           Inc(WordEnd)
         else
           break;
@@ -1378,9 +1378,9 @@ begin
           else
             Dec(WordBegin); // step over [
         // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
-        end else if (s[WordBegin] in fText.AdditionalIdentChars) then begin
+        end else if (s[WordBegin] in TSetOfChar(fText.AdditionalIdentChars)) then begin
           Dec(WordBegin);
-        end else if s[WordBegin] in ['.', ':', '~'] then begin // allow destructor signs
+        end else if CharInSet(s[WordBegin], ['.', ':', '~']) then begin // allow destructor signs
           Dec(WordBegin);
         end else if (WordBegin > 1) and (s[WordBegin - 1] = '-') and (s[WordBegin] = '>') then begin
           Dec(WordBegin, 2);
@@ -1723,11 +1723,11 @@ begin
 
   // Is there a bracket char before us?
   LineLength := Length(fText.LineText);
-  if (fText.CaretX - 1 > 0) and (fText.CaretX - 1 <= LineLength) and (fText.LineText[fText.CaretX - 1] in AllChars) then
+  if (fText.CaretX - 1 > 0) and (fText.CaretX - 1 <= LineLength) and CharInSet(fText.LineText[fText.CaretX - 1], AllChars) then
     HighlightCharPos := BufferCoord(fText.CaretX - 1, fText.CaretY)
 
     // Or after us?
-  else if (fText.CaretX > 0) and (fText.CaretX <= LineLength) and (fText.LineText[fText.CaretX] in AllChars) then
+  else if (fText.CaretX > 0) and (fText.CaretX <= LineLength) and CharInSet(fText.LineText[fText.CaretX], AllChars) then
     HighlightCharPos := BufferCoord(fText.CaretX, fText.CaretY);
 
   // Character not found. Exit.

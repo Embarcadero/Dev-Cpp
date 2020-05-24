@@ -57,14 +57,14 @@ var
 begin
   if not Assigned(EditList) then
     Exit; // this can be the case at design time
-  if not ThemeServices.ThemesEnabled then
+  if not StyleServices.Enabled then
     Exit;
 
   if (ACol = 1) and (ARow >= FixedRows) and not (gdFocused in AState) and ItemProps[ARow - FixedRows].HasPickList then
     begin
     ARect.Left := ARect.Right - EditList.ButtonWidth;
-    Details := ThemeServices.GetElementDetails(tcDropDownButtonNormal);
-    ThemeServices.DrawElement(Canvas.Handle, Details, ARect);
+    Details := StyleServices.GetElementDetails(tcDropDownButtonNormal);
+    StyleServices.DrawElement(Canvas.Handle, Details, ARect);
   end;
 end;
 
@@ -77,7 +77,7 @@ begin
 
   if not Assigned(EditList) then
     Exit;
-  if not ThemeServices.ThemesEnabled then
+  if not StyleServices.Enabled then
     Exit;
 
   MouseToCell(X, Y, ACol, ARow);
@@ -91,7 +91,7 @@ end;
 
 function TCompOptionsList.MouseOverButton(X: Integer): Boolean;
 begin
-  if Assigned(EditList) and ThemeServices.ThemesEnabled then
+  if Assigned(EditList) and StyleServices.Enabled then
     Result := (UseRightToLeftAlignment and (X < EditList.ButtonWidth)) or
       (not UseRightToLeftAlignment and (X > ClientWidth - EditList.ButtonWidth))
   else

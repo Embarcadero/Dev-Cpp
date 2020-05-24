@@ -69,7 +69,7 @@ type
 implementation
 
 uses
-  main, CppParser, MultiLangSupport, version, editor, devcfg;
+  System.UITypes, main, CppParser, MultiLangSupport, version, editor, devcfg;
 
 {$R *.dfm}
 
@@ -330,7 +330,7 @@ end;
 
 procedure TNewClassForm.txtNameKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in ['_', 'a'..'z', 'A'..'Z', '0'..'9', #1..#31]) then begin
+  if not CharInSet(Key, ['_', 'a'..'z', 'A'..'Z', '0'..'9', #1..#31]) then begin
     Key := #0;
     Abort;
   end;

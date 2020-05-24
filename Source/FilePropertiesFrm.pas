@@ -122,7 +122,7 @@ begin
 
     // locate first non-space char in line
     J := 1;
-    while (J <= Length(Current)) and (Current[J] in [#9, #32]) do
+    while (J <= Length(Current)) and CharInSet(Current[J], [#9, #32]) do
       Inc(J);
 
     // take the token type of the first word of the line

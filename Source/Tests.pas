@@ -326,7 +326,7 @@ end;
 
 function TTestClass.TestEditor: Boolean;
 var
-  I, J, FoldCount, LineCount, LineLength, CommentCount, DupeCount, IndentCount: Integer;
+  I, FoldCount, LineCount, LineLength, CommentCount, DupeCount, IndentCount: Integer;
   e: TEditor;
 
   procedure TypeText(const Text: String);

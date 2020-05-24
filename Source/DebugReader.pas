@@ -151,7 +151,7 @@ type
 implementation
 
 uses
-  main, devcfg, CPUFrm, multilangsupport, debugger, utils, Controls, Math;
+  System.UItypes, main, devcfg, CPUFrm, multilangsupport, debugger, utils, Controls, Math;
 
 // macro for all the things that need to be done when we are finished parsing the current block
 
@@ -243,18 +243,18 @@ end;
 
 procedure TDebugReader.SkipSpaces;
 begin
-  while fOutput[fIndex] in [#9, #32] do
+  while CharInSet(fOutput[fIndex], [#9, #32]) do
     Inc(fIndex);
 end;
 
 procedure TDebugReader.SkipToAnnotation;
 begin
   // Walk up to the next annotation
-  while not (fOutput[fIndex] in [#26, #0]) do
+  while not CharInSet(fOutput[fIndex], [#26, #0]) do
     Inc(fIndex);
 
   // Crawl through the remaining ->'s
-  while fOutput[fIndex] in [#26] do
+  while CharInSet(fOutput[fIndex], [#26]) do
     Inc(fIndex);
 end;
 
@@ -281,7 +281,7 @@ begin
   SkipSpaces;
 
   // Skip until a space
-  while not (fOutput[fIndex] in [#0..#32]) do begin
+  while not CharInSet(fOutput[fIndex], [#0..#32]) do begin
     Result := Result + fOutput[fIndex];
     Inc(fIndex);
   end;
@@ -292,7 +292,7 @@ begin
   Result := '';
 
   // Return part of line still ahead of us
-  while not (fOutput[fIndex] in [#13, #10, #0]) do begin
+  while not CharInSet(fOutput[fIndex], [#13, #10, #0]) do begin
     Result := Result + fOutput[fIndex];
     Inc(fIndex);
   end;
@@ -303,7 +303,7 @@ begin
   Result := '';
 
   // Walk up to an enter sequence
-  while not (fOutput[fIndex] in [#13, #10, #0]) do
+  while not CharInSet(fOutput[fIndex], [#13, #10, #0]) do
     Inc(fIndex);
 
   // End of output. Exit
@@ -327,11 +327,11 @@ begin
   Result := '';
 
   // Walk up to an enter sequence
-  while not (fOutput[fIndex] in [#13, #10, #0]) do
+  while not CharInSet(fOutput[fIndex], [#13, #10, #0]) do
     Inc(fIndex);
 
   // Skip enter sequences (CRLF, CR, LF, etc.)
-  while (fOutput[fIndex] in [#13, #10, #0]) do
+  while CharInSet(fOutput[fIndex], [#13, #10, #0]) do
     Inc(fIndex);
 
   // Return next line
@@ -352,14 +352,14 @@ var
   s: String;
 begin
   // Walk back until end of #26's
-  while (curpos > 0) and not (text[curpos] in [#26]) do
+  while (curpos > 0) and not CharInSet(text[curpos], [#26]) do
     Dec(curpos);
 
   Inc(curpos);
 
   // Tiny rewrite of GetNextWord for special purposes
   s := '';
-  while (curpos <= len) and not (text[curpos] in [#0..#32]) do begin
+  while (curpos <= len) and not CharInSet(text[curpos], [#0..#32]) do begin
     s := s + text[curpos];
     Inc(curpos);
   end;

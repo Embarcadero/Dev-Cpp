@@ -56,7 +56,7 @@ function Lang: TdevMultiLangSupport;
 implementation
 
 uses
-  LangFrm, Forms, Utils, Version, Controls, devCFG;
+  System.UITypes, LangFrm, Forms, Utils, Version, Controls, devCFG;
 
 var
   fLangSingleton: TdevMultiLangSupport = nil;

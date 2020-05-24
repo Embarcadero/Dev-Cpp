@@ -86,7 +86,8 @@ uses
   ProcessListFrm in 'ProcessListFrm.pas' {ProcessListForm},
   PackmanExitCodesU in 'Tools\Packman\PackmanExitCodesU.pas',
   ImageTheme in 'ImageTheme.pas',
-  Instances in 'Instances.pas';
+  Instances in 'Instances.pas',
+  CharUtils in 'CharUtils.pas';
 
 {$R *.res}
 

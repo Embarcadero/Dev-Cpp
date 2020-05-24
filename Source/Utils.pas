@@ -45,6 +45,7 @@ type
   TLineOutputFunc = procedure(const Line: String) of object;
   TCheckAbortFunc = procedure(var AbortThread: boolean) of object;
 
+
 procedure FilesFromWildcard(Directory: String; const Mask: String; Files: TStringList; Subdirs, ShowDirs,
   Multitasking: Boolean);
 
@@ -151,13 +152,13 @@ function NewSelectDirectory(const Caption: string; const Root: WideString; var D
 function FastStringReplace(const S, OldPattern, NewPattern: String; Flags: TReplaceFlags): String;
 
 // Fast implementation of IndexOf which does not use AnsiX (MBCS ready) comparison
-function FastIndexOf(List: TStrings; const S: String): integer; overload;
-function FastIndexOf(List: TStringlist; const S: String): integer; overload;
+//function FastIndexOf(List: TStrings; const S: String): integer; overload;
+//function FastIndexOf(List: TStringlist; const S: String): integer; overload;
 
 implementation
 
 uses
-  devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor, ShlObj, ActiveX;
+  devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor, ShlObj, ActiveX, System.IOUtils, CharUtils;
 
 function FastStringReplace(const S, OldPattern, NewPattern: String; Flags: TReplaceFlags): String;
 var
@@ -189,25 +190,25 @@ begin
   end;
 end;
 
-function FastIndexOf(List: TStrings; const S: String): integer;
-begin
-  with List do begin
-    for Result := 0 to Count - 1 do
-      if CompareText(List[Result], S) = 0 then
-        Exit;
-    Result := -1;
-  end;
-end;
+//function FastIndexOf(List: TStrings; const S: String): integer;
+//begin
+//  with List do begin
+//    for Result := 0 to Count - 1 do
+//      if CompareText(List[Result], S) = 0 then
+//        Exit;
+//    Result := -1;
+//  end;
+//end;
 
-function FastIndexOf(List: TStringlist; const S: String): integer;
-begin
-  with List do begin
-    if not List.Sorted then
-      Result := FastIndexOf(TStrings(List), S)
-    else if not Find(S, Result) then
-      Result := -1;
-  end;
-end;
+//function FastIndexOf(List: TStringlist; const S: String): integer;
+//begin
+//  with List do begin
+//    if not List.Sorted then
+//      Result := FastIndexOf(TStrings(List), S)
+//    else if not Find(S, Result) then
+//      Result := -1;
+//  end;
+//end;
 
 function IsKeyDown(key: integer): boolean;
 begin
@@ -225,7 +226,7 @@ end;
 
 function CharToValue(c: char): integer;
 begin
-  if c in ['a'..'z'] then
+  if c in TSetOfChar(['a'..'z']) then
     result := integer(c) - integer('a') + 2
   else if (StrToIntDef(c, 0) = 1) then
     result := 1
@@ -397,7 +398,7 @@ end;
 
 function GetBuildTime(const Path: String): String;
 var
-  dateinteger: integer;
+//  dateinteger: integer;
   datedouble: TDateTime;
   //	handle : Cardinal;
   //	bytesread : DWORD;
@@ -405,8 +406,8 @@ var
   //	dos_header : _IMAGE_DOS_HEADER;
   //	pe_header  : _IMAGE_FILE_HEADER;
 begin
-  dateinteger := FileAge(path);
-  datedouble := FileDateToDateTime(dateinteger);
+  FileAge(path, datedouble);
+//  datedouble := FileDateToDateTime(dateinteger);
 
   //	handle := CreateFile(PChar(path),GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
   //	if handle <> INVALID_HANDLE_VALUE then begin
@@ -994,7 +995,7 @@ begin
   end;
 
   // Second, check if this is an absolute filename
-  if (Length(Result) < 4) or not ((LowerCase(Result)[1] in ['A'..'Z']) and (Result[2] = ':')) then begin
+  if (Length(Result) < 4) or not ((LowerCase(Result)[1] in TSetOfChar(['A'..'Z'])) and (Result[2] = ':')) then begin
     // It's not
     if Length(Directory) = 0 then begin
       if Assigned(MainForm.Project) then
@@ -1108,7 +1109,7 @@ var
 begin
   result := true;
   for i := 1 to length(s) do
-    if not (s[i] in ['0'..'9']) then begin
+    if not (s[i] in TSetOfChar(['0'..'9'])) then begin
       result := false;
       exit;
     end;

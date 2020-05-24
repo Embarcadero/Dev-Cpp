@@ -118,7 +118,7 @@ type
 implementation
 
 uses
-  MultiLangSupport, Macros, devExec, main, StrUtils;
+  System.UITypes, MultiLangSupport, Macros, devExec, main, StrUtils;
 
 procedure TCompiler.DoLogEntry(const msg: String);
 begin
@@ -950,7 +950,7 @@ begin
     fDevRun.OnLineOutput := OnLineOutput;
     fDevRun.OnCheckAbort := ThreadCheckAbort;
     fDevRun.FreeOnTerminate := True;
-    fDevRun.Resume;
+    fDevRun.Start;
 
     MainForm.UpdateAppTitle;
   end;

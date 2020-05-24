@@ -1165,7 +1165,7 @@ begin
   // Find version number
   Inc(DelimPos1, Length('gcc version '));
   DelimPos2 := DelimPos1;
-  while (DelimPos2 <= Length(output)) and not (output[DelimPos2] in [#0..#32]) do
+  while (DelimPos2 <= Length(output)) and not CharInSet(output[DelimPos2], [#0..#32]) do
     Inc(DelimPos2);
   fVersion := Copy(output, DelimPos1, DelimPos2 - DelimPos1);
 

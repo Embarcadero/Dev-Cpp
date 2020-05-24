@@ -123,7 +123,7 @@ implementation
 {$R *.dfm}
 
 uses
-  utils, devcfg, version, DateUtils;
+  utils, devcfg, version, DateUtils, System.UItypes;
 
 const
   UserReportMsg = 'Please include a description of what you were doing before the error occurred...';
@@ -536,7 +536,7 @@ begin
 
   // Send everything messages in fully encoded form
   for I := 0 to 255 do
-    if not (Chr(I) in ['a'..'z', 'A'..'Z', '0'..'9', '%']) then begin
+    if not CharInSet(Chr(I), ['a'..'z', 'A'..'Z', '0'..'9', '%']) then begin
       EmailBody := StringReplace(EmailBody, Chr(I), '%' + IntToHex(I, 2), [rfReplaceAll]);
       EmailSubject := StringReplace(EmailSubject, Chr(I), '%' + IntToHex(I, 2), [rfReplaceAll]);
     end;

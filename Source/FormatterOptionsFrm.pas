@@ -75,7 +75,7 @@ type
 implementation
 
 uses
-  ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
+  System.UITypes, ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
 
 {$R *.dfm}
 

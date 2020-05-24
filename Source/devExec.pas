@@ -25,6 +25,7 @@ uses
   Windows, Classes, Forms, devcfg, utils;
 
 type
+  {$M+}
   TExecThread = class(TThread)
   private
     fFile: String;
@@ -137,7 +138,7 @@ begin
     Visible := bVisible;
     OnTerminate := TerminateEvent;
     FreeOnTerminate := True;
-    Resume;
+    Start;
   end;
 end;
 

@@ -84,7 +84,7 @@ type
 implementation
 
 uses
-  main, devcfg, utils, cpufrm;
+  System.UItypes, main, devcfg, utils, cpufrm;
 
 constructor TDebugger.Create;
 begin
@@ -173,7 +173,7 @@ begin
   Reader.BreakpointList := BreakPointList;
   Reader.WatchVarList := WatchVarList;
   Reader.DebugView := DebugView;
-  Reader.Resume;
+  Reader.Start;
 
   MainForm.UpdateAppTitle;
 

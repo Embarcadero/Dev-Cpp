@@ -117,7 +117,7 @@ procedure TToolEditForm.btnWorkDirClick(Sender: TObject);
 var
   new: String;
 begin
-  if (Trim(edWorkDir.Text) <> '') and DirectoryExists(Trim(edWorkDir.Text)) then
+  if (Trim(edWorkDir.Text) <> '') and SysUtils.DirectoryExists(Trim(edWorkDir.Text)) then
     new := edWorkDir.Text
   else
     new := ExtractFilePath(edProgram.Text);

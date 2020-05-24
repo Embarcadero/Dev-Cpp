@@ -120,7 +120,7 @@ type
 implementation
 
 uses
-  devcfg;
+  System.Types, devcfg;
 
 // contains the up/down buttons
 // I tried to draw them using DrawFrameControl first,
@@ -166,13 +166,13 @@ begin
     // Skip blanks
     repeat
       Dec(WordEnd);
-    until (WordEnd = 0) or not (S[WordEnd] in [#32, #9, #13, #10]);
+    until (WordEnd = 0) or not CharInSet(S[WordEnd], [#32, #9, #13, #10]);
 
     // Then save the next word
     WordStart := WordEnd;
     repeat
       Dec(WordStart);
-    until (WordStart = 0) or (S[WordStart] in [#0..#32]); // This fixes an unsigned 0 - 1 range error
+    until (WordStart = 0) or CharInSet(S[WordStart], [#0..#32]); // This fixes an unsigned 0 - 1 range error
 
     Result := Copy(S, WordStart + 1, WordEnd - WordStart);
   end else
@@ -354,7 +354,7 @@ var
       Inc(i);
       if i > CurPos then
         Break;
-    until P[i] in [#0, #10, #13];
+    until CharInSet(P[i], [#0, #10, #13]);
   end;
 
   // skip c/c++ commentblocks
@@ -370,7 +370,7 @@ var
       Inc(i);
       if i > CurPos then
         Break;
-    until P[i] in [#0];
+    until CharInSet(P[i], [#0]);
   end;
 
   // skip strings! since it not unusual to
@@ -393,7 +393,7 @@ var
       Inc(i);
       if i > CurPos then
         Break;
-    until P[i] in [#0];
+    until CharInSet(P[i], [#0]);
   end;
 
 begin
@@ -724,7 +724,7 @@ begin
     end else if (P[CurPos] = '/') and (P[CurPos + 1] = '/') then begin
 
       // Walk up to an enter sequence
-      while (P[CurPos] <> #0) and not (P[CurPos] in [#13, #10]) do
+      while (P[CurPos] <> #0) and not CharInSet(P[CurPos], [#13, #10]) do
         Inc(curpos);
 
       // Skip ONE enter sequence (CRLF, CR, LF, etc.)
@@ -792,7 +792,7 @@ begin
   FFunctionStart := CurPos;
 
   // Skip blanks
-  while (CurPos > 1) and (P[CurPos - 1] in [#32, #9, #13, #10]) do
+  while (CurPos > 1) and CharInSet(P[CurPos - 1], [#32, #9, #13, #10]) do
     Dec(CurPos);
 
   // Get the name of the function we're about to show
