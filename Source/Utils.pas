@@ -490,12 +490,12 @@ var
   si: TStartupInfo;
   pi: TProcessInformation;
   nRead: DWORD;
-  aBuf: array[0..8192] of char;
+  aBuf: array[0..8192] of AnsiChar;
   sa: TSecurityAttributes;
   hOutputReadTmp, hOutputRead, hOutputWrite, hInputWriteTmp, hInputRead,
     hInputWrite, hErrorWrite: THandle;
-  FOutput: String;
-  CurrentLine: String;
+  FOutput: AnsiString;
+  CurrentLine: AnsiString;
   bAbort: boolean;
 begin
   FOutput := '';
@@ -608,10 +608,10 @@ begin
         Break; // pipe done - normal exit path
     end;
     aBuf[nRead] := #0;
-    FOutput := FOutput + PChar(@aBuf[0]);
+    FOutput := FOutput + PAnsiChar(@aBuf[0]);
 
     if Assigned(LineOutputFunc) then begin
-      CurrentLine := CurrentLine + PChar(@aBuf[0]);
+      CurrentLine := CurrentLine + PAnsiChar(@aBuf[0]);
       if CurrentLine[Length(CurrentLine)] = #10 then begin
         Delete(CurrentLine, Length(CurrentLine), 1);
         LineOutputFunc(CurrentLine);
