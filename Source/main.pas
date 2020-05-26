@@ -1350,8 +1350,7 @@ begin
       e.Text.DisplayX,
         e.Text.SelLength,
         e.Text.Lines.Count,
-        // TODO: Lift. Is e.Text.Lines.GetTextLength the same as e.Text.Lines.Text.Length
-        e.Text.Lines.Text.Length]);
+        e.Text.Text.Length]);
   end else begin
     StatusBar.Panels.BeginUpdate;
     try
@@ -3206,8 +3205,7 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  // TODO: Lift. Is e.Text.IsEmpty the same as e.Text.Lines.Text.IsEmpty?
-  TCustomAction(Sender).Enabled := Assigned(e) and not e.Text.Lines.Text.IsEmpty;
+  TCustomAction(Sender).Enabled := Assigned(e) and not e.Text.Text.IsEmpty;
 end;
 
 procedure TMainForm.actUpdateDebuggerRunning(Sender: TObject);
@@ -4128,9 +4126,8 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  // TODO: Lift. Find ecComment. There is ecCommentBlock now but not the same?
-  {if Assigned(e) then
-    e.Text.CommandProcessor(ecComment, #0, nil); }
+  if Assigned(e) then
+    e.Text.CommandProcessor(TSynEditEx.ecComment, #0, nil);
 end;
 
 procedure TMainForm.actUncommentExecute(Sender: TObject);
@@ -4138,9 +4135,8 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  // TODO: Lift. Find ecUnComment.
-{  if Assigned(e) then
-    e.Text.CommandProcessor(ecUncomment, #0, nil);  }
+  if Assigned(e) then
+    e.Text.CommandProcessor(TSynEditEx.ecUncomment, #0, nil);
 end;
 
 procedure TMainForm.actToggleCommentExecute(Sender: TObject);
@@ -6369,9 +6365,8 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  // TODO: Lift. Find ecDuplicateLine.
-{ if Assigned(e) then
-    e.Text.CommandProcessor(ecDuplicateLine, #0, nil);  }
+  if Assigned(e) then
+    e.Text.CommandProcessor(TSynEditEx.ecDuplicateLine, #0, nil);
 end;
 
 procedure TMainForm.actMoveSelUpExecute(Sender: TObject);
@@ -6379,9 +6374,8 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  // TODO: Lift. Find ecMoveSelUp equivalent.
-{  if Assigned(e) then
-    e.Text.CommandProcessor(ecMoveSelUp, #0, nil);}
+  if Assigned(e) then
+    e.Text.CommandProcessor(TSynEditEx.ecMoveSelUp, #0, nil);
 end;
 
 procedure TMainForm.actMoveSelDownExecute(Sender: TObject);
@@ -6389,9 +6383,8 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  // TODO: Lift. Find ecMoveSelDown equivalent.
-{  if Assigned(e) then
-    e.Text.CommandProcessor(ecMoveSelDown, #0, nil);   }
+  if Assigned(e) then
+    e.Text.CommandProcessor(TSynEditEx.ecMoveSelDown, #0, nil);
 end;
 
 procedure TMainForm.actCodeCompletionUpdate(Sender: TObject);

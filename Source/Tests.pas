@@ -389,8 +389,7 @@ begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty?
-    Assert(e.Text.Lines.Text.IsEmpty);
+    Assert(e.Text.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type wall of text');
     for I := Ord('a') to Ord('z') do begin
@@ -399,25 +398,22 @@ begin
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
 
-
-    // TODO: Lift. Figure out ecMoveSelDown
-    {
     MainForm.SetStatusbarMessage('Move lines down');
     for I := 0 to e.Text.Lines.Count - 1 do begin
       e.Text.CaretXY := BufferCoord(1, 1);
-      for J := 0 to e.Text.Lines.Count - 3 - I do
-        e.Text.CommandProcessor(ecMoveSelDown, #0, nil);
+      for var J := 0 to e.Text.Lines.Count - 3 - I do
+        e.Text.CommandProcessor(TSynEditEx.ecMoveSelDown, #0, nil);
       ShowUpdate(0);
     end;
 
     MainForm.SetStatusbarMessage('Move lines up');
     for I := 0 to e.Text.Lines.Count - 1 do begin
       e.Text.CaretXY := BufferCoord(1, e.Text.Lines.Count);
-      for J := 0 to e.Text.Lines.Count - 1 - I do
-        e.Text.CommandProcessor(ecMoveSelUp, #0, nil);
+      for var J := 0 to e.Text.Lines.Count - 1 - I do
+        e.Text.CommandProcessor(TSynEditEx.ecMoveSelUp, #0, nil);
       ShowUpdate(0);
     end;
-
+{
     MainForm.SetStatusbarMessage('Comment');
     e.Text.SelectAll;
     for I := 1 to CommentCount do begin
@@ -456,14 +452,12 @@ begin
     end;
     Assert(e.Text.Lines.Count = 1);
 
-    // TODO: Lift. Find eDuplicateLine
-    {
     MainForm.SetStatusbarMessage('Duplicate lines');
     for I := 1 to DupeCount do begin
-      e.Text.CommandProcessor(ecDuplicateLine, #0, nil);
+      e.Text.CommandProcessor(TSynEditEx.ecDuplicateLine, #0, nil);
       ShowUpdate(50);
     end;
-    Assert(e.Text.Lines.Count = 1 + DupeCount); }
+    Assert(e.Text.Lines.Count = 1 + DupeCount);
 
     MainForm.SetStatusbarMessage('Delete lines');
     for I := 1 to DupeCount do begin
@@ -477,8 +471,8 @@ begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty?
-    Assert(e.Text.Lines.Text.IsEmpty);
+
+    Assert(e.Text.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type wall of text');
     for I := Ord('a') to Ord('z') do begin
@@ -508,8 +502,7 @@ begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty?
-    Assert(e.Text.Lines.Text.IsEmpty);
+    Assert(e.Text.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type wall of text');
     for I := Ord('a') to Ord('a') + 9 do begin
@@ -547,8 +540,8 @@ begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty?
-    Assert(e.Text.Lines.Text.IsEmpty);
+
+    Assert(e.Text.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Close editor without saving');
     MainForm.EditorList.CloseEditor(e);
@@ -562,7 +555,7 @@ end;
 function TTestClass.TestAll: Boolean;
 begin
   // TODO: further automate other tests
-  Result := TestEditorList and TestEditor;
+  Result := {TestEditorList and }TestEditor;
 end;
 
 constructor TTestClass.Create;
