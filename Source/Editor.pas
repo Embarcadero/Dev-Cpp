@@ -25,18 +25,48 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
   SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
   SynEditCodeFolding, SynExportHTML, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils,
-  CodeToolTip, CBUtils, System.UITypes;
+  CodeToolTip, CBUtils, System.UITypes, System.Contnrs;
 
 type
-  // TODO: Lift. Evaluate this protected workaround.
   TCustomSynEditHelper = class helper for TCustomSynEdit
   private
     function GetStateFlags: TSynStateFlags;
     procedure SetStateFlags(AStateFlags: TSynStateFlags);
+    function GetPlugins: TObjectList;
+    function GetStatusChanges: TSynStatusChanges;
+    procedure SetStatusChanges(const Value: TSynStatusChanges);
+    function GetInternalfBlockBegin: TBufferCoord;
+    procedure SetInternalfBlockBegin(const Value: TBufferCoord);
+    function GetInternalfBlockEnd: TBufferCoord;
+    procedure SetInternalfBlockEnd(const Value: TBufferCoord);
   public
     property StateFlags: TSynStateFlags read GetStateFlags write SetStateFlags;
-    procedure SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord);
-    function LeftSpacesEx(const Line: string; WantTabs: Boolean; CalcAlways : Boolean = False): Integer;
+    function InternalLeftSpacesEx(const Line: string; WantTabs: Boolean; CalcAlways : Boolean = False): Integer;
+    property Plugins: TObjectList read GetPlugins;
+    property StatusChanges: TSynStatusChanges read GetStatusChanges write SetStatusChanges;
+    property InternalfBlockBegin: TBufferCoord read GetInternalfBlockBegin write SetInternalfBlockBegin;
+    property InternalfBlockEnd: TBufferCoord read GetInternalfBlockEnd write SetInternalfBlockEnd;
+  end;
+
+  TSynEditEx = class(TSynEdit)
+  public const
+    ecMoveSelDown = ecUserFirst - 1;
+    ecMoveSelUp = ecUserFirst - 2;
+    ecDuplicateLine = ecUserFirst - 3;
+    ecComment = ecUserFirst - 4;
+    ecUncomment = ecUserFirst - 5;
+    ecToggleComment = ecUserFirst - 6;
+    ecCommentInline = ecUserFirst - 7;
+  private
+    procedure InternalDoLinesDeleted(FirstLine, Count: integer);
+    procedure InternalDoLinesInserted(FirstLine, Count: integer);
+    procedure DoComment;
+    procedure DoUnComment;
+  protected
+    procedure ExecuteCommand(Command: TSynEditorCommand; AChar: WideChar; Data: pointer); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure SetCaretXYCentered(ForceToMiddle: Boolean; const Value: TBufferCoord);
   end;
 
   TEditor = class;
@@ -72,30 +102,12 @@ type
     scsFinished // keystroke that triggered insertion has completed
     );
 
-  TSynEditEx = class(TSynEdit)
-  public const
-    ecMoveSelDown = ecUserFirst - 1;
-    ecMoveSelUp = ecUserFirst - 2;
-    ecDuplicateLine = ecUserFirst - 3;
-    ecComment = ecUserFirst - 4;
-    ecUncomment = ecUserFirst - 5;
-  private
-    procedure InternalDoLinesDeleted(FirstLine, Count: integer);
-    procedure InternalDoLinesInserted(FirstLine, Count: integer);
-    procedure DoComment;
-    procedure DoUnComment;
-  protected
-    procedure ExecuteCommand(Command: TSynEditorCommand; AChar: WideChar; Data: pointer); override;
-  public
-    constructor Create(AOwner: TComponent); override;
-  end;
-
   TEditor = class(TObject)
   private
     fInProject: boolean;
     fFileName: String;
     fNew: boolean;
-    fText: TSynEdit;
+    fText: TSynEditEx;
     fTabSheet: TTabSheet;
     fErrorLine: integer;
     fActiveLine: integer;
@@ -175,7 +187,7 @@ type
     property FileName: String read fFileName write SetFileName;
     property InProject: boolean read fInProject write fInProject;
     property New: boolean read fNew write fNew;
-    property Text: TSynEdit read fText write fText;
+    property Text: TSynEditEx read fText write fText;
     property TabSheet: TTabSheet read fTabSheet write fTabSheet;
     property FunctionTip: TCodeToolTip read fFunctionTip;
     property CompletionBox: TCodeCompletion read fCompletionBox;
@@ -270,6 +282,10 @@ begin
 end;
 
 { TEditor }
+
+type
+  TSynEditPluginInternal = class(TSynEditPlugin)
+  end;
 
 constructor TEditor.Create(const Filename: String; InProject, NewFile: boolean; ParentPageControl: TPageControl);
 var
@@ -893,22 +909,52 @@ begin
   end;
 end;
 
+function TCustomSynEditHelper.GetInternalfBlockBegin: TBufferCoord;
+begin
+  with Self do Result := fBlockBegin;
+end;
+
+function TCustomSynEditHelper.GetInternalfBlockEnd: TBufferCoord;
+begin
+  with Self do Result := fBlockEnd;
+end;
+
+function TCustomSynEditHelper.GetPlugins: TObjectList;
+begin
+  with Self do Result := fPlugins;
+end;
+
 function TCustomSynEditHelper.GetStateFlags: TSynStateFlags;
 begin
-  with Self do Result := StateFlags;
+  with Self do Result := fStateFlags;
+end;
+
+function TCustomSynEditHelper.GetStatusChanges: TSynStatusChanges;
+begin
+  with Self do Result := fStatusChanges;
+end;
+
+procedure TCustomSynEditHelper.SetInternalfBlockBegin(const Value: TBufferCoord);
+begin
+  with Self do fBlockBegin := Value;
+end;
+
+procedure TCustomSynEditHelper.SetInternalfBlockEnd(const Value: TBufferCoord);
+begin
+  with Self do fBlockEnd := Value;
 end;
 
 procedure TCustomSynEditHelper.SetStateFlags(AStateFlags: TSynStateFlags);
 begin
-  with Self do StateFlags := AStateFlags;
+  with Self do fStateFlags := AStateFlags;
 end;
 
-procedure TCustomSynEditHelper.SetCaretXYEx(CallEnsureCursorPos: Boolean; Value: TBufferCoord);
+procedure TCustomSynEditHelper.SetStatusChanges(const Value: TSynStatusChanges);
 begin
-  with Self do SetCaretXYEx(CallEnsureCursorPos,Value);  // Access strict protected property
+  with Self do fStatusChanges := Value;
 end;
 
-function TCustomSynEditHelper.LeftSpacesEx(const Line: string; WantTabs: Boolean; CalcAlways : Boolean = False): Integer;
+function TCustomSynEditHelper.InternalLeftSpacesEx(const Line: string; WantTabs: Boolean; CalcAlways : Boolean = False): Integer;
 begin
   with Self do Result := LeftSpacesEx(Line, WantTabs, CalcAlways);  // Access strict protected property
 end;
@@ -923,8 +969,7 @@ begin
     Self.Activate;
 
   // Position the caret, call EnsureCursorPosVisibleEx after setting block
-  // TODO: Lift. Find fText.SetCaretXYCentered(True,BufferCoord(Col, Line)); equivalent
-  fText.SetCaretXYEx(True,BufferCoord(Col, Line));
+  fText.SetCaretXYCentered(True,BufferCoord(Col, Line));
 end;
 
 procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);
@@ -1003,8 +1048,7 @@ var
     LineBeforeCaret := Trim(Copy(fText.LineText, 1, fText.CaretX - 1));
 
     // Determine current indent
-    // TODO: Lift. Find LeftSpacesEx
-    IndentCount := fText.LeftSpacesEx(fText.LineText, True);
+    IndentCount := fText.InternalLeftSpacesEx(fText.LineText, True);
 
     // Get indentation string
     if eoTabsToSpaces in fText.Options then
@@ -1493,7 +1537,6 @@ procedure TEditor.EditorClick(Sender: TObject);
 var
   fTripleClickTime: Cardinal;
   fTripleClickMousePos: TBufferCoord;
-  fNewState: TSynStateFlags;
 begin
   fTripleClickTime := GetTickCount;
   fText.GetPositionOfMouse(fTripleClickMousePos);
@@ -1503,10 +1546,7 @@ begin
     (fTripleClickMousePos.Line = fDblClickMousePos.Line) then begin
 
     // Don't let the editor change the caret
-    fNewState := fText.StateFlags;
-    Exclude(fNewState, sfWaitForDragging);
-    // TODO: Lift. Find out how to set the StatesFlag as it says read only.
-    fText.StateFlags := fNewState;
+    fText.StateFlags := fText.StateFlags - [sfWaitForDragging];
 
     // Select the current line
     if fText.CaretY < fText.Lines.Count then begin
@@ -2078,106 +2118,176 @@ procedure TSynEditEx.ExecuteCommand(Command: TSynEditorCommand; AChar: WideChar;
 begin
   case Command of
     ecMoveSelDown:
-     if not ReadOnly and (Lines.Count > 0) and (BlockEnd.Line < Lines.Count) then begin
-       DoOnPaintTransient(ttBefore);
+      if not ReadOnly and (Lines.Count > 0) and (BlockEnd.Line < Lines.Count) then begin
+        DoOnPaintTransient(ttBefore);
 
-       // Backup caret and selection
-       var OrigBlockBegin := BlockBegin;
-       var OrigBlockEnd := BlockEnd;
+        // Backup caret and selection
+        var OrigBlockBegin := BlockBegin;
+        var OrigBlockEnd := BlockEnd;
 
-       // Delete line below selection
-       var s := Lines[OrigBlockEnd.Line]; // after end, 0 based
-       Lines.Delete(OrigBlockEnd.Line); // after end, 0 based
-       InternalDoLinesDeleted(OrigBlockEnd.Line, 1); // before start, 1 based
+        // Delete line below selection
+        var s := Lines[OrigBlockEnd.Line]; // after end, 0 based
+        Lines.Delete(OrigBlockEnd.Line); // after end, 0 based
+        InternalDoLinesDeleted(OrigBlockEnd.Line, 1); // before start, 1 based
 
-       // Insert line above selection
-       Lines.Insert(OrigBlockBegin.Line - 1, S);
-       InternalDoLinesInserted(OrigBlockBegin.Line, 1);
+        // Insert line above selection
+        Lines.Insert(OrigBlockBegin.Line - 1, S);
+        InternalDoLinesInserted(OrigBlockBegin.Line, 1);
 
-       // Restore caret and selection
-       SetCaretAndSelection(
-         BufferCoord(CaretX, CaretY + 1),
-         BufferCoord(1, OrigBlockBegin.Line + 1),
-         BufferCoord(Length(Lines[OrigBlockEnd.Line]) + 1, OrigBlockEnd.Line + 1));
+        // Restore caret and selection
+        SetCaretAndSelection(
+          BufferCoord(CaretX, CaretY + 1),
+          BufferCoord(1, OrigBlockBegin.Line + 1),
+          BufferCoord(Length(Lines[OrigBlockEnd.Line]) + 1, OrigBlockEnd.Line + 1));
 
-       // Retrieve start of line we moved down
-       var MoveDelim := BufferCoord(1, OrigBlockBegin.Line);
+        // Retrieve start of line we moved down
+        var MoveDelim := BufferCoord(1, OrigBlockBegin.Line);
 
-       // Support undo, implement as drag and drop
-       UndoList.BeginBlock;
-       try
-         UndoList.AddChange(crSelection,
-           OrigBlockBegin,
-           OrigBlockEnd,
-           '',
-           smNormal);
-         UndoList.AddChange(crDragDropInsert,
-           MoveDelim, // put at start of line me moved down
-           BlockEnd, // modified
-           SelText + #13#10 + S,
-           smNormal);
-       finally
-         UndoList.EndBlock;
-       end;
+        // Support undo, implement as drag and drop
+        UndoList.BeginBlock;
+        try
+          UndoList.AddChange(crSelection,
+            OrigBlockBegin,
+            OrigBlockEnd,
+            '',
+            smNormal);
+          UndoList.AddChange(crDragDropInsert,
+            MoveDelim, // put at start of line me moved down
+            BlockEnd, // modified
+            SelText + #13#10 + S,
+            smNormal);
+        finally
+          UndoList.EndBlock;
+        end;
 
-       DoOnPaintTransient(ttAfter);
-     end;
+        DoOnPaintTransient(ttAfter);
+      end;
 
-   ecMoveSelUp:
-     if not ReadOnly and (Lines.Count > 0) and (BlockBegin.Line > 1) then begin
-       DoOnPaintTransient(ttBefore);
+    ecMoveSelUp:
+      if not ReadOnly and (Lines.Count > 0) and (BlockBegin.Line > 1) then begin
+        DoOnPaintTransient(ttBefore);
 
-       // Backup caret and selection
-       var OrigBlockBegin := BlockBegin;
-       var OrigBlockEnd := BlockEnd;
+        // Backup caret and selection
+        var OrigBlockBegin := BlockBegin;
+        var OrigBlockEnd := BlockEnd;
 
-       // Delete line above selection
-       var s := Lines[OrigBlockBegin.Line - 2]; // before start, 0 based
-       Lines.Delete(OrigBlockBegin.Line - 2); // before start, 0 based
-       InternalDoLinesDeleted(OrigBlockBegin.Line - 1, 1); // before start, 1 based
+        // Delete line above selection
+        var s := Lines[OrigBlockBegin.Line - 2]; // before start, 0 based
+        Lines.Delete(OrigBlockBegin.Line - 2); // before start, 0 based
+        InternalDoLinesDeleted(OrigBlockBegin.Line - 1, 1); // before start, 1 based
 
-       // Insert line below selection
-       Lines.Insert(OrigBlockEnd.Line - 1, S);
-       InternalDoLinesInserted(OrigBlockEnd.Line, 1);
+        // Insert line below selection
+        Lines.Insert(OrigBlockEnd.Line - 1, S);
+        InternalDoLinesInserted(OrigBlockEnd.Line, 1);
 
-       // Restore caret and selection
-       SetCaretAndSelection(
-         BufferCoord(CaretX, CaretY - 1),
-         BufferCoord(1, OrigBlockBegin.Line - 1), // put start of selection at start of top line
-         BufferCoord(Length(Lines[OrigBlockEnd.Line - 2]) + 1, OrigBlockEnd.Line - 1));
-       // put end of selection at end of top line
+        // Restore caret and selection
+        SetCaretAndSelection(
+          BufferCoord(CaretX, CaretY - 1),
+          BufferCoord(1, OrigBlockBegin.Line - 1), // put start of selection at start of top line
+          BufferCoord(Length(Lines[OrigBlockEnd.Line - 2]) + 1, OrigBlockEnd.Line - 1));
+        // put end of selection at end of top line
 
-       // Retrieve end of line we moved up
-       var MoveDelim := BufferCoord(Length(Lines[OrigBlockEnd.Line - 1]) + 1, OrigBlockEnd.Line);
+        // Retrieve end of line we moved up
+        var MoveDelim := BufferCoord(Length(Lines[OrigBlockEnd.Line - 1]) + 1, OrigBlockEnd.Line);
 
-       // Support undo, implement as drag and drop
-       UndoList.BeginBlock;
-       try
-         // backup original selection
-         UndoList.AddChange(crSelection, OrigBlockBegin, OrigBlockEnd, '', smNormal);
-         UndoList.AddChange(crDragDropInsert,
-           BlockBegin, // modified
-           MoveDelim, // put at end of line me moved up
-           S + #13#10 + SelText,
-           smNormal);
-       finally
-         UndoList.EndBlock;
-       end;
+        // Support undo, implement as drag and drop
+        UndoList.BeginBlock;
+        try
+          // backup original selection
+          UndoList.AddChange(crSelection, OrigBlockBegin, OrigBlockEnd, '', smNormal);
+          UndoList.AddChange(crDragDropInsert,
+            BlockBegin, // modified
+            MoveDelim, // put at end of line me moved up
+            S + #13#10 + SelText,
+            smNormal);
+        finally
+          UndoList.EndBlock;
+        end;
 
-       DoOnPaintTransient(ttAfter);
-     end;
+        DoOnPaintTransient(ttAfter);
+      end;
 
-   ecDuplicateLine:
-     if not ReadOnly and (Lines.Count > 0) then begin
-       DoOnPaintTransient(ttBefore);
-       Lines.Insert(CaretY, Lines[CaretY - 1]);
-       InternalDoLinesInserted(CaretY + 1, 1);
-       UndoList.AddChange(crLineBreak, CaretXY, CaretXY, '', smNormal);
-       InternalCaretXY := BufferCoord(1, CaretY); // like seen in the Delphi editor
-       DoOnPaintTransient(ttAfter);
-     end;
-   ecComment: DoComment;
-   ecUncomment: DoUnComment;
+    ecDuplicateLine:
+      if not ReadOnly and (Lines.Count > 0) then begin
+        DoOnPaintTransient(ttBefore);
+        Lines.Insert(CaretY, Lines[CaretY - 1]);
+        InternalDoLinesInserted(CaretY + 1, 1);
+        UndoList.AddChange(crLineBreak, CaretXY, CaretXY, '', smNormal);
+        InternalCaretXY := BufferCoord(1, CaretY); // like seen in the Delphi editor
+        DoOnPaintTransient(ttAfter);
+      end;
+    ecComment: DoComment;
+    ecUncomment: DoUnComment;
+    ecToggleComment:
+      if not ReadOnly then begin
+        var OrigBlockBegin := BlockBegin;
+        var OrigBlockEnd := BlockEnd;
+
+        // Ignore the last line the cursor is placed on
+        var BeginIndex := BlockBegin.Line - 1;
+        var EndIndex: Integer;
+        if BlockEnd.Char = 1 then
+          EndIndex := max(0, BlockEnd.Line - 2)
+        else
+          EndIndex := BlockEnd.Line - 1;
+
+        // if everything is commented, then uncomment
+        for var I := BeginIndex to EndIndex do begin
+          if Pos('//', TrimLeft(Lines[i])) <> 1 then begin // not fully commented
+            DoComment; // comment everything
+            Exit;
+          end;
+        end;
+        DoUncomment;
+      end;
+
+      ecCommentInline: // toggle inline comment
+        if not ReadOnly and SelAvail then begin
+          var Temp := SelText;
+
+          // Check if the selection starts with /* after blanks
+          var StartPos := -1;
+          var I := 1;
+          while I <= Length(Temp) do begin
+            if Temp[I] in [#9, #32] then
+              Inc(I)
+            else if ((I + 1) <= Length(Temp)) and (Temp[i] = '/') and (Temp[i + 1] = '*') then begin
+              StartPos := I;
+              break;
+            end else
+              break;
+          end;
+
+          // Check if the selection ends with /* after blanks
+          var EndPos := -1;
+          if StartPos <> -1 then begin
+            I := Length(Temp);
+            while I > 0 do begin
+              if Temp[I] in [#9, #32] then
+                Dec(I)
+              else if ((I - 1) > 0) and (Temp[i] = '/') and (Temp[i - 1] = '*') then begin
+                EndPos := I;
+                break;
+              end else
+                break;
+            end;
+          end;
+
+          // Keep selection
+          var OrigBlockBegin := BlockBegin;
+          var OrigBlockEnd := BlockEnd;
+
+          // Toggle based on current comment status
+          if (StartPos <> -1) and (EndPos <> -1) then begin
+            SelText := Copy(SelText, StartPos + 2, EndPos - StartPos - 3);
+            BlockBegin := OrigBlockBegin;
+            BlockEnd := BufferCoord(OrigBlockEnd.Char - 4, OrigBlockEnd.Line);
+          end else begin
+            SelText := '/*' + SelText + '*/';
+            BlockBegin := BufferCoord(OrigBlockBegin.Char, OrigBlockBegin.Line);
+            BlockEnd := BufferCoord(OrigBlockEnd.Char + 4, OrigBlockEnd.Line);
+          end;
+        end;
   else
     inherited;
   end;
@@ -2194,11 +2304,10 @@ begin
     else if Marks[i].Line > FirstLine then
       Marks[i].Line := FirstLine;
 
-// Can't access to fPlugins field - needs to modify SyncEdit sources
-//  // plugins
-//  if fPlugins <> nil then
-//    for i := 0 to fPlugins.Count - 1 do
-//      TSynEditPlugin(fPlugins[i]).LinesDeleted(FirstLine, Count);
+  // plugins
+  if Plugins <> nil then
+    for i := 0 to Plugins.Count - 1 do
+      TSynEditPluginInternal(Plugins[i]).LinesDeleted(FirstLine, Count);
 end;
 
 procedure TSynEditEx.InternalDoLinesInserted(FirstLine, Count: integer);
@@ -2210,11 +2319,36 @@ begin
     if Marks[i].Line >= FirstLine then
       Marks[i].Line := Marks[i].Line + Count;
 
-// Can't access to fPlugins field - needs to modify SyncEdit sources
-//  // plugins
-//  if fPlugins <> nil then
-//    for i := 0 to fPlugins.Count - 1 do
-//      TSynEditPlugin(fPlugins[i]).LinesInserted(FirstLine, Count);
+  // plugins
+  if Plugins <> nil then
+    for i := 0 to Plugins.Count - 1 do
+      TSynEditPluginInternal(Plugins[i]).LinesInserted(FirstLine, Count);
+end;
+
+procedure TSynEditEx.SetCaretXYCentered(ForceToMiddle: Boolean; const Value: TBufferCoord);
+begin
+  IncPaintLock;
+  try
+    StatusChanges := StatusChanges + [scSelection];
+    if ForceToMiddle then
+      SetCaretXYEx(False, Value) // do not call EnsureCursorPosVisible here
+    else
+      SetCaretXYEx(True, Value);
+    if SelAvail then
+      InvalidateSelection;
+
+    var NewBufferCoord: TBufferCoord;
+    NewBufferCoord.Char := CaretX;
+    NewBufferCoord.Line := CaretY;
+
+    InternalfBlockBegin := NewBufferCoord;
+    InternalfBlockEnd := NewBufferCoord;
+
+    if ForceToMiddle then
+      EnsureCursorPosVisibleEx(True); // but here after block has been set
+  finally
+    DecPaintLock;
+  end;
 end;
 
 end.

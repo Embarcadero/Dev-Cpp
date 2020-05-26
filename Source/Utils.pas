@@ -490,6 +490,7 @@ var
   si: TStartupInfo;
   pi: TProcessInformation;
   nRead: DWORD;
+  // TODO:: LIFT. Change this to TBytes for example
   aBuf: array[0..8192] of AnsiChar;
   sa: TSecurityAttributes;
   hOutputReadTmp, hOutputRead, hOutputWrite, hInputWriteTmp, hInputRead,

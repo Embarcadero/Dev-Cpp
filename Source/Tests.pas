@@ -413,11 +413,11 @@ begin
         e.Text.CommandProcessor(TSynEditEx.ecMoveSelUp, #0, nil);
       ShowUpdate(0);
     end;
-{
+
     MainForm.SetStatusbarMessage('Comment');
     e.Text.SelectAll;
     for I := 1 to CommentCount do begin
-      e.Text.CommandProcessor(ecComment, #0, nil);
+      e.Text.CommandProcessor(TSynEditEx.ecComment, #0, nil);
       ShowUpdate(20);
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
@@ -425,7 +425,7 @@ begin
     MainForm.SetStatusbarMessage('Uncomment');
     e.Text.SelectAll;
     for I := 1 to CommentCount do begin
-      e.Text.CommandProcessor(ecUncomment, #0, nil);
+      e.Text.CommandProcessor(TSynEditEx.ecUncomment, #0, nil);
       ShowUpdate(20);
     end;
     Assert(e.Text.Lines.Count = 26 + 1);
@@ -433,18 +433,17 @@ begin
     MainForm.SetStatusbarMessage('Toggle comment');
     e.Text.SelectAll;
     for I := 1 to CommentCount do begin
-      e.Text.CommandProcessor(ecToggleComment, #0, nil);
+      e.Text.CommandProcessor(TSynEditEx.ecToggleComment, #0, nil);
       ShowUpdate(0);
     end;
-    Assert(e.Text.Lines.Count = 26 + 1);   }
+    Assert(e.Text.Lines.Count = 26 + 1);
 
     MainForm.SetStatusbarMessage('Undo all previous actions to end up with empty editor');
     while e.Text.UndoList.CanUndo do begin
       e.Text.Undo;
       ShowUpdate(0);
     end;
-    // TODO: Lift. Is e.Text.IsEmpty same as e.Text.Lines.Text.IsEmpty
-    Assert(e.Text.Lines.Text.IsEmpty);
+    Assert(e.Text.Text.IsEmpty);
 
     MainForm.SetStatusbarMessage('Type line of text');
     for I := Ord('a') to Ord('z') do begin

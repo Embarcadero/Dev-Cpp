@@ -4144,9 +4144,8 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  // TODO: Lift. Find ecToggleComment.
-{  if Assigned(e) then
-    e.Text.CommandProcessor(ecToggleComment, #0, nil);}
+  if Assigned(e) then
+    e.Text.CommandProcessor(TSynEditEx.ecToggleComment, #0, nil);
 end;
 
 procedure TMainForm.actIndentExecute(Sender: TObject);
@@ -6523,9 +6522,8 @@ var
   e: TEditor;
 begin
   e := fEditorList.GetEditor;
-  // TODO: Lift. Find ecCommentInline equivalent.
-{  if Assigned(e) then
-    e.Text.CommandProcessor(ecCommentInline, #0, nil);  }
+  if Assigned(e) then
+    e.Text.CommandProcessor(TSynEditEx.ecCommentInline, #0, nil);
 end;
 
 procedure TMainForm.actToggleCommentInlineUpdate(Sender: TObject);

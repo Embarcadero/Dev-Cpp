@@ -318,8 +318,7 @@ begin
     Exit;
 
   // Ask user if he wants to save
-  // TODO: Lift. Is Editor.Text.IsEmpty the same as Editor.Text.Lines.Text.IsEmpty
-  if Editor.Text.Modified and not Editor.Text.Lines.Text.IsEmpty then begin
+  if Editor.Text.Modified and not Editor.Text.Text.IsEmpty then begin
     case MessageDlg(Format(Lang[ID_MSG_ASKSAVECLOSE], [Editor.FileName]), mtConfirmation, mbYesNoCancel, 0) of
       mrYes:
         if not Editor.Save then
