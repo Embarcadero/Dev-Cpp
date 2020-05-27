@@ -1802,12 +1802,8 @@ begin
     Exit;
 
   // At this point we have found both characters. Check if both are visible
-  // TODO: Lift. Is FoldHidesLine same as AllFoldRanges.FoldHidesLine?
-  {if Assigned(fText.AllFoldRanges.FoldHidesLine(HighlightCharPos.Line,OutIndex)) or
-    Assigned(fText.AllFoldRanges.FoldHidesLine(ComplementCharPos.Line,OutIndex)) then
-    Exit;}
-  if fText.AllFoldRanges.FoldHidesLine(HighlightCharPos.Line,OutIndex) or
-    fText.AllFoldRanges.FoldHidesLine(ComplementCharPos.Line,OutIndex) then
+  if fText.AllFoldRanges.FoldHidesLine(HighlightCharPos.Line, OutIndex) or
+    fText.AllFoldRanges.FoldHidesLine(ComplementCharPos.Line, OutIndex) then
     Exit;
 
   // Both are visible. Draw them
@@ -1819,7 +1815,7 @@ begin
   // Draw the character the caret is at here using this color
   SetColors(HighlightCharPos);
   Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(HighlightCharPos));
-  // TODO: Lift. Find fText.GutterWidth
+
   if Pix.X > fText.Gutter.Width then begin // only draw if inside viewable area
     S := fText.Lines[HighlightCharPos.Line - 1][HighlightCharPos.Char];
     Canvas.TextOut(Pix.X, Pix.Y, S);
@@ -1828,7 +1824,7 @@ begin
   // Then draw complement
   SetColors(ComplementCharPos);
   Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(ComplementCharPos));
-  // TODO: Lift. Find fText.GutterWidth
+
   if Pix.X > fText.Gutter.Width then begin // only draw if inside viewable area
     S := fText.Lines[ComplementCharPos.Line - 1][ComplementCharPos.Char];
     Canvas.TextOut(Pix.X, Pix.Y, S);

@@ -490,13 +490,13 @@ var
   si: TStartupInfo;
   pi: TProcessInformation;
   nRead: DWORD;
-  // TODO:: LIFT. Change this to TBytes for example
-  aBuf: array[0..8192] of AnsiChar;
+//  aBuf: array[0..8192] of Byte;
+  aBuf: TBytes;
   sa: TSecurityAttributes;
   hOutputReadTmp, hOutputRead, hOutputWrite, hInputWriteTmp, hInputRead,
     hInputWrite, hErrorWrite: THandle;
-  FOutput: AnsiString;
-  CurrentLine: AnsiString;
+  FOutput: String;
+  CurrentLine: String;
   bAbort: boolean;
 begin
   FOutput := '';
@@ -596,6 +596,8 @@ begin
   end;
 
   bAbort := False;
+  SetLength(aBuf, 8192);
+  var BufStr: string := '';
   repeat
     // Ask our caller if he wants us to quit
     if Assigned(CheckAbortFunc) then
@@ -604,15 +606,16 @@ begin
       TerminateProcess(pi.hProcess, 1);
       Break;
     end;
-    if (not ReadFile(hOutputRead, aBuf, SizeOf(aBuf) - 1, nRead, nil)) or (nRead = 0) then begin
+    if (not ReadFile(hOutputRead, (@aBuf[0])^, SizeOf(aBuf) - 1, nRead, nil)) or (nRead = 0) then begin
       if GetLastError = ERROR_BROKEN_PIPE then
         Break; // pipe done - normal exit path
     end;
-    aBuf[nRead] := #0;
-    FOutput := FOutput + PAnsiChar(@aBuf[0]);
+//    aBuf[nRead] := 0;
+    BufStr := TEncoding.Default.GetString(aBuf, Low(aBuf), nRead);
+    FOutput := FOutput + BufStr;
 
     if Assigned(LineOutputFunc) then begin
-      CurrentLine := CurrentLine + PAnsiChar(@aBuf[0]);
+      CurrentLine := CurrentLine + BufStr;
       if CurrentLine[Length(CurrentLine)] = #10 then begin
         Delete(CurrentLine, Length(CurrentLine), 1);
         LineOutputFunc(CurrentLine);
