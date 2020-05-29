@@ -58,15 +58,17 @@ type
     ecToggleComment = ecUserFirst - 6;
     ecCommentInline = ecUserFirst - 7;
   private
+    FeoAddIndent: Boolean;
     procedure InternalDoLinesDeleted(FirstLine, Count: integer);
     procedure InternalDoLinesInserted(FirstLine, Count: integer);
     procedure DoComment;
     procedure DoUnComment;
-  protected
-    procedure ExecuteCommand(Command: TSynEditorCommand; AChar: WideChar; Data: pointer); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure SetCaretXYCentered(ForceToMiddle: Boolean; const Value: TBufferCoord);
+    procedure ExecuteCommand(Command: TSynEditorCommand; AChar: WideChar; Data: pointer); override;
+    procedure CommandProcessor(Command: TSynEditorCommand; AChar: Char; Data: Pointer); override;
+    property eoAddIndent: Boolean read FeoAddIndent write FeoAddIndent;
   end;
 
   TEditor = class;
@@ -976,8 +978,7 @@ procedure TEditor.CompletionKeyPress(Sender: TObject; var Key: Char);
 begin
   // We received a key from the completion box...
   if fCompletionBox.Enabled then begin
-    // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
-    if (Key in TSetOfChar(fText.AdditionalIdentChars)) then begin // Continue filtering
+    if fText.IsIdentChar(Key) then begin // Continue filtering
       fText.SelText := Key;
       fCompletionBox.Search(GetWordAtPosition(fText.CaretXY, wpCompletion), fFileName);
     end else if Key = Char(VK_BACK) then begin
@@ -1422,8 +1423,7 @@ begin
         if (Purpose = wpEvaluation) and (s[WordEnd + 1] = '[') then begin
           if not FindComplement(s, '[', ']', WordEnd, 1) then
             break;
-        // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
-        end else if (s[WordEnd + 1] in TSetOfChar(fText.AdditionalIdentChars)) then
+        end else if fText.IsIdentChar(s[WordEnd + 1]) then
           Inc(WordEnd)
         else
           break;
@@ -1438,8 +1438,7 @@ begin
             break
           else
             Dec(WordBegin); // step over [
-        // TODO: Lift. Find out of fText.IndentChars is the same as fText.AdditionalIdentChars
-        end else if (s[WordBegin] in TSetOfChar(fText.AdditionalIdentChars)) then begin
+        end else if fText.IsIdentChar(s[WordBegin]) then begin
           Dec(WordBegin);
         end else if CharInSet(s[WordBegin], ['.', ':', '~']) then begin // allow destructor signs
           Dec(WordBegin);
@@ -1995,9 +1994,69 @@ end;
 
 { TSynEditEx }
 
+procedure TSynEditEx.CommandProcessor(Command: TSynEditorCommand; AChar: Char; Data: Pointer);
+begin
+  if FeoAddIndent and (Command = ecLineBreak) and (not ReadOnly)  then
+  begin
+    var Temp := LineText;
+    var SpaceCount2 := 0;
+    var BackCounter := CaretY;
+    if eoAutoIndent in Options then begin
+      repeat
+        Dec(BackCounter);
+        Temp := Lines[BackCounter];
+        SpaceCount2 := InternalLeftSpacesEx(Temp, False);
+      until (BackCounter = 0) or (Temp <> '');
+    end;
+
+    inherited;
+
+    var Attr: TSynHighlighterAttributes;
+    if GetHighlighterAttriAtRowCol(BufferCoord(Length(Temp), CaretY - 1), Temp, Attr) then begin // only add indent to source files
+      if Attr <> Highlighter.CommentAttribute then begin // and outside of comments
+        if CharInSet(Temp[Length(Temp)], ['{', ':']) then begin // add more indent for these too
+          if not (eoTabsToSpaces in Options) then begin
+            Lines[CaretY - 1] := Lines[CaretY - 1] + #9;
+            Inc(SpaceCount2, 1);
+          end else begin
+            Lines[CaretY - 1] := Lines[CaretY - 1] + StringOfChar(' ', TabWidth);
+            Inc(SpaceCount2, TabWidth); // update caret counter
+          end;
+        end;
+      end;
+    end;
+    InternalCaretXY := BufferCoord(SpaceCount2 + 1, CaretY);
+    Exit;
+  end;
+
+  if (Command = ecChar) and FeoAddIndent and CharInSet(AChar, ['}']) then
+            // Remove TabWidth of indent of the current line when typing a }
+    if TrimLeft(Lines[CaretY - 1]) = '' then begin
+    // and the first nonblank char is this new }
+      var i := CaretX - 1;
+      var SpaceCount1 := 0; // buffer character count
+      var SpaceCount2 := 0; // display character count
+      while (i > 0) and (i <= Length(Lines[CaretY - 1])) and (SpaceCount2 < TabWidth) do begin
+        if Lines[CaretY - 1][i] = #9 then begin
+          Inc(SpaceCount1);
+          Inc(SpaceCount2, TabWidth);
+        end else if Lines[CaretY - 1][i] = #32 then begin
+          Inc(SpaceCount1);
+          Inc(SpaceCount2);
+        end;
+        Dec(i);
+      end;
+      Lines[CaretY - 1] := Copy(Lines[CaretY - 1], 1, i);
+      InternalCaretXY := BufferCoord(CaretX - SpaceCount1, CaretY);
+    end;
+
+  inherited;
+end;
+
 constructor TSynEditEx.Create(AOwner: TComponent);
 begin
   inherited;
+  FeoAddIndent := False;
 end;
 
 procedure TSynEditEx.DoComment;
@@ -2053,7 +2112,7 @@ procedure TSynEditEx.DoUnComment;
 var
   OrigBlockBegin, OrigBlockEnd, OrigCaret: TBufferCoord;
   EndLine, I, J: integer;
-  S: AnsiString;
+  S: string;
 begin
   if not ReadOnly then begin
     DoOnPaintTransient(ttBefore);
@@ -2073,7 +2132,7 @@ begin
         S := Lines[i];
         // Find // after blanks only
         J := 1;
-        while (J + 1 <= length(S)) and (S[j] in [#0..#32]) do
+        while (J + 1 <= length(S)) and CharInSet(S[j], [#0..#32]) do
           Inc(J);
         if (j + 1 <= length(S)) and (S[j] = '/') and (S[j + 1] = '/') then begin
           Delete(S, J, 2);
@@ -2245,7 +2304,7 @@ begin
           var StartPos := -1;
           var I := 1;
           while I <= Length(Temp) do begin
-            if Temp[I] in [#9, #32] then
+            if CharInSet(Temp[I], [#9, #32]) then
               Inc(I)
             else if ((I + 1) <= Length(Temp)) and (Temp[i] = '/') and (Temp[i + 1] = '*') then begin
               StartPos := I;
@@ -2259,7 +2318,7 @@ begin
           if StartPos <> -1 then begin
             I := Length(Temp);
             while I > 0 do begin
-              if Temp[I] in [#9, #32] then
+              if CharInSet(Temp[I], [#9, #32]) then
                 Dec(I)
               else if ((I - 1) > 0) and (Temp[i] = '/') and (Temp[i - 1] = '*') then begin
                 EndPos := I;

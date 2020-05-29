@@ -47,9 +47,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnResetCurrentClick(Sender: TObject);
   private
-    fReplaceHint: AnsiString;
-    fResetAllConfirm: AnsiString;
-    fResetCurrentConfirm: AnsiString;
+    fReplaceHint: string;
+    fResetAllConfirm: string;
+    fResetCurrentConfirm: string;
     function GetShortCut(Index: integer): PShortCutItem;
   public
     procedure BeginUpdate;

@@ -950,7 +950,7 @@ begin
     if not (Result[1] in DigitChars) then
       Exit; // don't process names
     I := Length(Result);
-    while (I >= 0) and (Result[i] in TSetOfChar(['A'..'Z', 'a'..'z'])) do // find first alphabetical character at end
+    while (I >= 0) and CharInSet(Result[i], ['A'..'Z', 'a'..'z']) do // find first alphabetical character at end
       Dec(I);
     Delete(Result, I + 1, MaxInt); // remove from there
   end;

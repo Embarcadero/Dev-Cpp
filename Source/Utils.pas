@@ -490,7 +490,6 @@ var
   si: TStartupInfo;
   pi: TProcessInformation;
   nRead: DWORD;
-//  aBuf: array[0..8192] of Byte;
   aBuf: TBytes;
   sa: TSecurityAttributes;
   hOutputReadTmp, hOutputRead, hOutputWrite, hInputWriteTmp, hInputRead,

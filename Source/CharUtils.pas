@@ -34,9 +34,6 @@ var
   HexChars: TSetOfChar;
   BlankChars: TSetOfChar;
 
-
-implementation
-
 const
   DefLineChars: TSysCharSet = [#13, #10];
   DefSpaceChars: TSysCharSet = [#32, #9];
@@ -49,6 +46,8 @@ const
   DefLetterChars: TSysCharSet = ['A'..'Z', 'a'..'z', '_', '*', '&', '~'];
   DefHexChars: TSysCharSet = ['A'..'F', 'a'..'f', 'x', 'L'];
   DefBlankChars: TSysCharSet = [#0..#32];
+
+implementation
 
 { TSetOfChar }
 

@@ -259,7 +259,7 @@ begin
       Inc(I);
 
     // find "Line numbers for "
-    while not SameStr(sl[I], 'Bound resource files') do begin
+    while (I < sl.Count - 1) and (not SameStr(sl[I], 'Bound resource files')) do begin
 
       // Check for a unit section start...
       CurrUnit := -1;
@@ -546,7 +546,7 @@ begin
 
   // Let PHP do the TLS/SMTP work
   try
-    Socket.Socket.SendText('POST ' + Cmd + ' HTTP/1.1' + #13#10 + 'Host: www.wilcobrouwer.nl:80' + #13#10#13#10);
+    Socket.Socket.SendText(AnsiString('POST ' + Cmd + ' HTTP/1.1' + #13#10 + 'Host: www.wilcobrouwer.nl:80' + #13#10#13#10));
     //if SocketResult > 0 then begin
     //	while SocketResult > 0 do begin
     //		FillChar(Buffer,SizeOf(Buffer),0);

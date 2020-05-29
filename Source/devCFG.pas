@@ -2440,9 +2440,8 @@ begin
       // Optional synedit options in devData
       if fAutoIndent then
         Options := Options + [eoAutoIndent];
-      // TODO: Lift. Find eoAddIndent
-      {if fAddIndent then
-        Options := Options + [eoAddIndent]; }
+      if (Editor is TSynEditEx) then
+        TSynEditEx(Editor).eoAddIndent := fAddIndent;
       if fEHomeKey then
         Options := Options + [eoEnhanceHomeKey];
       if fGroupUndo then

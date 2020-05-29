@@ -33,8 +33,8 @@ type
   TShortCutItem = record
     Default: TShortCut;
     Temporary: TShortCut; // we can't use UI strings to store temp shortcuts (not one to one), so use this instead
-    IniEntry: AnsiString; // name in ini file, use untranslated MenuItem.Caption
-    ListEntry: AnsiString; // name in editor form
+    IniEntry: string; // name in ini file, use untranslated MenuItem.Caption
+    ListEntry: string; // name in editor form
     MenuItem: TMenuItem; // apply Current to this
     Action: TAction; // OR this
   end;
@@ -116,7 +116,7 @@ procedure TdevShortcuts.Load(List: TActionList);
 var
   I, intvalue: integer;
   Fini: TIniFile;
-  value: AnsiString;
+  value: string;
   ShortCut: TShortCut;
   item: PShortcutItem;
   MenuItem: TMenuItem;
@@ -254,7 +254,7 @@ procedure TdevShortcuts.Save;
 var
   I: integer;
   Fini: TIniFile;
-  entry, value: AnsiString;
+  entry, value: string;
   item: PShortcutItem;
 begin
   if fFileName = '' then

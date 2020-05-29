@@ -234,7 +234,7 @@ begin
     Inc(pCurrent);
     if pCurrent^ = '\' then
       Inc(pCurrent, 2); // skip escaped char
-  until pCurrent^ in TSetOfChar(['"', #0]);
+  until CharInSet(pCurrent^, ['"', #0]);
   Inc(pCurrent);
 end;
 
@@ -244,7 +244,7 @@ begin
     Inc(pCurrent);
     if pCurrent^ = '\' then
       Inc(pCurrent, 2); // skip escaped quote
-  until pCurrent^ in TSetOfChar(['''', #0]);
+  until CharInSet(pCurrent^, ['''', #0]);
   Inc(pCurrent);
 end;
 
@@ -271,7 +271,7 @@ begin
         SkipCStyleComment // skips over */
       else
         Inc(pCurrent);
-    end else if pCurrent^ in TSetOfChar(FailChars) then begin
+    end else if CharInSet(pCurrent^, FailChars) then begin
       Exit;
     end else
       Inc(pCurrent);
@@ -297,7 +297,7 @@ begin
     else
       Inc(pCurrent);
     end;
-  until pCurrent^ in TSetOfChar([',', ';', ')', '}', #0]);
+  until CharInSet(pCurrent^, [',', ';', ')', '}', #0]);
 end;
 
 procedure TCppTokenizer.SkipTemplateArgs;
@@ -461,7 +461,7 @@ begin
             Inc(pCurrent);
             if pCurrent^ = '[' then
               Inc(tmp);
-          until pCurrent^ in TSetOfChar([#0, ']']) + LineChars;
+          until CharInSet(pCurrent^, [#0, ']'] + DefLineChars);
           Dec(tmp);
         until tmp = 0;
         Inc(pCurrent);
@@ -510,7 +510,7 @@ begin
   SetString(Result, Offset, pCurrent - Offset);
   SimplifyArgs(Result);
   if (pCurrent^ = '.') or ((pCurrent^ = '-') and ((pCurrent + 1)^ = '>')) then // skip '.' and '->'
-    while not (pCurrent^ in TSetOfChar([#0, '(', ';', '{', '}', ')']) + LineChars + SpaceChars) do
+    while not CharInSet(pCurrent^, [#0, '(', ';', '{', '}', ')'] + DefLineChars + DefSpaceChars) do
       Inc(pCurrent);
   SkipToNextToken;
 end;

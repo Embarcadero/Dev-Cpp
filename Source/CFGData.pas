@@ -66,7 +66,7 @@ type
     property INIFileName: String read GetIniFileName write SetIniFileName;
   end;
 
-function GetPropName(Instance: TPersistent; Index: Integer): String;
+function GetPropName(Instance: TPersistent; Index: Integer): TSymbolName;
 function GetPropCount(Instance: TPersistent): Integer;
 
 implementation
@@ -83,7 +83,7 @@ end;
 
 //Returns the property name of an instance at a certain index
 
-function GetPropName(Instance: TPersistent; Index: Integer): String;
+function GetPropName(Instance: TPersistent; Index: Integer): TSymbolName;
 var
   PropList: PPropList;
   PropInfo: PPropInfo;
@@ -133,13 +133,13 @@ end;
 procedure TConfigData.ReadObject(const Section: String; Obj: TPersistent);
 var
   I: integer;
-  PropName: String;
+  PropName: string;
 begin
   if not fini.SectionExists(Section) then
     Exit;
 
   for I := 0 to GetPropCount(Obj) - 1 do begin
-    PropName := GetPropName(Obj, I);
+    PropName := string(GetPropName(Obj, I));
 
     // Ignore properties which aren't listed in the INI (leave defaults)
     if (not fINI.ValueExists(Section, PropName)) and (not fINI.SectionExists(Section + '.' + PropName)) then
@@ -176,7 +176,7 @@ begin
   EraseSection(Section);
 
   for I := 0 to GetPropCount(Obj) - 1 do begin
-    PropName := GetPropName(Obj, I);
+    PropName := string(GetPropName(Obj, I));
     case PropType(Obj, PropName) of
 
       // 11 Jul 2002: mandrav: added double quotes around strings.
