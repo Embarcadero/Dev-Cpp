@@ -217,19 +217,13 @@ procedure TDebugger.SendCommand(const Command, Params: String; ViewInUI: boolean
 var
   P: PChar;
   nBytesWrote: DWORD;
+  Buff: TBytes;
 begin
   if Executing then begin
 
-    // Convert command to C string
-    if Length(params) > 0 then begin
-      GetMem(P, Length(command) + Length(params) + 3);
-      StrPCopy(P, command + ' ' + params + #10)
-    end else begin
-      GetMem(P, Length(command) + 2);
-      StrPCopy(P, command + #10);
-    end;
+    Buff := TEncoding.ANSI.GetBytes((command + ' ' + params).Trim) + [10];
 
-    if not WriteFile(fInputwrite, P^, strlen(P), nBytesWrote, nil) then
+    if not WriteFile(fInputwrite, (@Buff[Low(Buff)])^, Length(Buff), nBytesWrote, nil) then
       MessageDlg(Lang[ID_ERR_WRITEGDB], mtError, [mbOK], 0);
 
     if ViewInUI then
@@ -242,8 +236,6 @@ begin
 
         CommandChanged := false;
       end;
-
-    FreeMem(P);
   end;
 end;
 

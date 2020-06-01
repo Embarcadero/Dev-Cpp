@@ -63,12 +63,23 @@ type
     procedure InternalDoLinesInserted(FirstLine, Count: integer);
     procedure DoComment;
     procedure DoUnComment;
+
+  //code folding
+    // Utility functions
+    function HlGetLineRange(Lines: TStrings; Line : Integer) : Pointer;
+    function HlGetHighlighterAttriAtRowCol(const Lines : TStrings;
+      const Line: Integer; const Char: Integer): TSynHighlighterAttributes;
+    function HlGetHighlighterAttriAtRowColEx(const Lines : TStrings;
+      const Line, Char: Integer;  var Token: string;
+      var TokenType, Start: Integer; var Attri: TSynHighlighterAttributes): boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure SetCaretXYCentered(ForceToMiddle: Boolean; const Value: TBufferCoord);
     procedure ExecuteCommand(Command: TSynEditorCommand; AChar: WideChar; Data: pointer); override;
     procedure CommandProcessor(Command: TSynEditorCommand; AChar: Char; Data: Pointer); override;
     property eoAddIndent: Boolean read FeoAddIndent write FeoAddIndent;
+
+    procedure DoScanForFoldRanges(Sender: TObject; FoldRanges: TSynFoldRanges; LinesToScan: TStrings; FromLine : Integer; ToLine : Integer);
   end;
 
   TEditor = class;
@@ -2404,6 +2415,172 @@ begin
   finally
     DecPaintLock;
   end;
+end;
+
+function TSynEditEx.HlGetHighlighterAttriAtRowCol(const Lines: TStrings; const Line, Char: Integer): TSynHighlighterAttributes;
+var
+  Token: string;
+  TokenType, Start: Integer;
+begin
+  HlGetHighlighterAttriAtRowColEx(Lines, Line, Char, Token, TokenType, Start, Result);
+end;
+
+function TSynEditEx.HlGetHighlighterAttriAtRowColEx(const Lines: TStrings; const Line, Char: Integer; var Token: string; var TokenType, Start: Integer; var Attri: TSynHighlighterAttributes): boolean;
+var
+  LineText: string;
+begin
+  if not Assigned(Highlighter) then Exit(False);
+
+  if  (Line >= 0) and (Line < Lines.Count) then
+  begin
+    LineText := Lines[Line];
+    if Line = 0 then
+      Highlighter.ResetRange
+    else
+      Highlighter.SetRange(TSynEditStringList(Lines).Ranges[Line - 1]);
+    Highlighter.SetLine(LineText, Line);
+    if (Char > 0) and (Char <= Length(LineText)) then
+      while not Highlighter.GetEol do
+      begin
+        Start := Highlighter.GetTokenPos + 1;
+        Token := Highlighter.GetToken;
+        if (Char >= Start) and (Char < Start + Length(Token)) then
+        begin
+          Attri := Highlighter.GetTokenAttribute;
+          TokenType := Highlighter.GetTokenKind;
+          Result := True;
+          exit;
+        end;
+        Highlighter.Next;
+      end;
+  end;
+  Token := '';
+  Attri := nil;
+  Result := False;
+end;
+
+function TSynEditEx.HlGetLineRange(Lines: TStrings; Line: Integer): Pointer;
+begin
+  if (Line >= 0) and (Line < Lines.Count) then
+    Result := TSynEditStringList(Lines).Ranges[Line]
+  else
+    Result := nil;
+end;
+
+procedure TSynEditEx.DoScanForFoldRanges(Sender: TObject; FoldRanges: TSynFoldRanges; LinesToScan: TStrings; FromLine, ToLine: Integer);
+var
+  CurLine: String;
+  Line: Integer;
+
+  function LineHasChar(Line: Integer; character: char;
+  StartCol : Integer): boolean; // faster than Pos!
+  var
+    i: Integer;
+  begin
+    result := false;
+    for I := StartCol to Length(CurLine) do begin
+      if CurLine[i] = character then begin
+        // Char must have proper highlighting (ignore stuff inside comments...)
+        if HlGetHighlighterAttriAtRowCol(LinesToScan, Line, I) <> Highlighter.CommentAttribute then begin
+          result := true;
+          break;
+        end;
+      end;
+    end;
+  end;
+
+  function FindBraces(Line: Integer) : Boolean;
+  Var
+    Col : Integer;
+  begin
+    Result := False;
+
+    for Col := 1 to Length(CurLine) do
+    begin
+      // We've found a starting character
+      if CurLine[col] = '{' then
+      begin
+        // Char must have proper highlighting (ignore stuff inside comments...)
+        if HlGetHighlighterAttriAtRowCol(LinesToScan, Line, Col) <> Highlighter.CommentAttribute then
+        begin
+          // And ignore lines with both opening and closing chars in them
+          if not LineHasChar(Line, '}', col + 1) then begin
+            FoldRanges.StartFoldRange(Line + 1, 1);
+            Result := True;
+          end;
+          // Skip until a newline
+          break;
+        end;
+      end else if CurLine[col] = '}' then
+      begin
+        if HlGetHighlighterAttriAtRowCol(LinesToScan, Line, Col) <> Highlighter.CommentAttribute then
+        begin
+          // And ignore lines with both opening and closing chars in them
+          if not LineHasChar(Line, '{', col + 1) then begin
+            FoldRanges.StopFoldRange(Line + 1, 1);
+            Result := True;
+          end;
+          // Skip until a newline
+          break;
+        end;
+      end;
+    end; // for Col
+  end;
+
+  function FoldRegion(Line: Integer): Boolean;
+  Var
+    S : string;
+  begin
+    Result := False;
+    S := TrimLeft(CurLine);
+    if Uppercase(Copy(S, 1, 9)) = '//#REGION' then
+    begin
+      FoldRanges.StartFoldRange(Line + 1, FoldRegionType);
+      Result := True;
+    end
+    else if Uppercase(Copy(S, 1, 12)) = '//#ENDREGION' then
+    begin
+      FoldRanges.StopFoldRange(Line + 1, FoldRegionType);
+      Result := True;
+    end;
+  end;
+
+begin
+   if not Assigned(Highlighter) then Exit;
+
+  for Line := FromLine to ToLine do
+  begin
+    // Deal first with Multiline comments (Fold Type 2)
+    if Integer(HlGetLineRange(LinesToScan, Line)) = 1 then
+    begin
+      if Integer(HlGetLineRange(LinesToScan, Line - 1)) <> 1 then
+        FoldRanges.StartFoldRange(Line + 1, 2)
+      else
+        FoldRanges.NoFoldInfo(Line + 1);
+      Continue;
+    end
+    else if Integer(HlGetLineRange(LinesToScan, Line - 1)) = 1 then
+    begin
+      FoldRanges.StopFoldRange(Line + 1, 2);
+      Continue;
+    end;
+
+    CurLine := LinesToScan[Line];
+
+    // Skip empty lines
+    if CurLine = '' then begin
+      FoldRanges.NoFoldInfo(Line + 1);
+      Continue;
+    end;
+
+    // Find Fold regions
+    if FoldRegion(Line) then
+      Continue;
+
+    // Find an braces on this line  (Fold Type 1)
+    if not FindBraces(Line) then
+      FoldRanges.NoFoldInfo(Line + 1);
+  end; // while Line
 end;
 
 end.
