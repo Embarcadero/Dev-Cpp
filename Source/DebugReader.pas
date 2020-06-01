@@ -124,7 +124,7 @@ type
     procedure SkipToAnnotation; // skips until it finds #26#26 (GDB annotation for interfaces)
     function FindAnnotation(Annotation: TAnnotateType): boolean; // Finds the given annotation, returns false on EOF
     function GetNextAnnotation: TAnnotateType; // Returns the next annotation
-    function GetLastAnnotation(const text: String; curpos, len: integer): TAnnotateType;
+    function GetLastAnnotation(const text: TBytes; curpos, len: integer): TAnnotateType;
     // Returns the last annotation in given string
     function PeekNextAnnotation: TAnnotateType;
     // Returns the next annotation, but does not modify current scanning positions
@@ -347,20 +347,20 @@ begin
   fIndex := IndexBackup;
 end;
 
-function TDebugReader.GetLastAnnotation(const text: String; curpos, len: integer): TAnnotateType;
+function TDebugReader.GetLastAnnotation(const text: TBytes; curpos, len: integer): TAnnotateType;
 var
   s: String;
 begin
   // Walk back until end of #26's
-  while (curpos > 0) and not CharInSet(text[curpos], [#26]) do
+  while (curpos > 0) and (text[curpos] <> 26) do
     Dec(curpos);
 
   Inc(curpos);
 
   // Tiny rewrite of GetNextWord for special purposes
   s := '';
-  while (curpos <= len) and not CharInSet(text[curpos], [#0..#32]) do begin
-    s := s + text[curpos];
+  while (curpos <= len) and not (text[curpos] in [0..32]) do begin
+    s := s + Chr(text[curpos]);
     Inc(curpos);
   end;
 
@@ -932,23 +932,21 @@ end;
 
 procedure TDebugReader.Execute;
 var
-  tmp: String;
+  tmp: TBytes;
   bytesread, totalbytesread: DWORD;
 const
   chunklen = 1000; // GDB usually sends 4K blocks, disassembly easily takes up to 20K
 begin
-
   bytesread := 0;
   totalbytesread := 0;
-
   while not Terminated do begin
 
     // Add chunklen bytes to length, and set chunklen extra bytes to zero
-    SetLength(tmp, 1 + totalbytesread + chunklen);
-    FillChar(tmp[1 + totalbytesread], chunklen + 1, 0);
+    SetLength(tmp, totalbytesread + chunklen);
+    FillChar(tmp[totalbytesread], chunklen, 0);
 
     // ReadFile returns when there's something to read
-    if not ReadFile(fPipeRead, tmp[1 + totalbytesread], chunklen, bytesread, nil) or (bytesread = 0) then
+    if not ReadFile(fPipeRead, (@tmp[totalbytesread])^, chunklen, bytesread, nil) or (bytesread = 0) then
       break;
 
     Inc(totalbytesread, bytesread);
@@ -956,8 +954,9 @@ begin
     if not Terminated then begin
 
       // Assume fragments don't end nicely with TErrorBegin or TPrompt
-      if GetLastAnnotation(tmp, totalbytesread, 1 + totalbytesread + chunklen) in [TErrorBegin, TPrompt] then begin
-        fOutput := tmp;
+      fOutput := TEncoding.Default.GetString(tmp);
+      if GetLastAnnotation(Tmp, totalbytesread, totalbytesread + chunklen) in [TErrorBegin, TPrompt] then begin
+        fOutput := TEncoding.Default.GetString(tmp);
         ProcessDebugOutput;
 
         // Reset storage
@@ -965,6 +964,7 @@ begin
       end;
     end;
   end;
+
 end;
 
 end.

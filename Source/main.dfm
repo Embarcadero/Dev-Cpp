@@ -509,8 +509,10 @@ object MainForm: TMainForm
     object tbMain: TToolBar
       Left = 11
       Top = 2
-      Width = 172
+      Width = 169
       Height = 24
+      Align = alLeft
+      AutoSize = True
       Caption = 'Main'
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -566,10 +568,12 @@ object MainForm: TMainForm
       end
     end
     object tbCompile: TToolBar
-      Left = 462
+      Left = 455
       Top = 2
-      Width = 210
+      Width = 208
       Height = 24
+      Align = alLeft
+      AutoSize = True
       Caption = 'Compile and Run'
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -644,10 +648,12 @@ object MainForm: TMainForm
       end
     end
     object tbProject: TToolBar
-      Left = 369
+      Left = 365
       Top = 2
-      Width = 80
+      Width = 77
       Height = 24
+      Align = alLeft
+      AutoSize = True
       Caption = 'Project'
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -681,10 +687,12 @@ object MainForm: TMainForm
       end
     end
     object tbEdit: TToolBar
-      Left = 196
+      Left = 193
       Top = 2
-      Width = 47
+      Width = 46
       Height = 24
+      Align = alLeft
+      AutoSize = True
       Caption = 'Edit'
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -705,10 +713,12 @@ object MainForm: TMainForm
       end
     end
     object tbSearch: TToolBar
-      Left = 256
+      Left = 252
       Top = 2
       Width = 100
       Height = 24
+      Align = alLeft
+      AutoSize = True
       Caption = 'Search'
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -749,8 +759,10 @@ object MainForm: TMainForm
     object tbSpecials: TToolBar
       Left = 11
       Top = 30
-      Width = 71
+      Width = 69
       Height = 24
+      Align = alLeft
+      AutoSize = True
       Caption = 'Specials'
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -777,10 +789,12 @@ object MainForm: TMainForm
       end
     end
     object tbClasses: TToolBar
-      Left = 95
+      Left = 93
       Top = 30
-      Width = 207
+      Width = 700
       Height = 24
+      Align = alLeft
+      AutoSize = True
       Caption = 'tbClasses'
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -832,10 +846,12 @@ object MainForm: TMainForm
       end
     end
     object tbCompilers: TToolBar
-      Left = 685
+      Left = 676
       Top = 2
       Width = 250
       Height = 24
+      Align = alLeft
+      AutoSize = True
       Caption = 'tbCompilers'
       EdgeInner = esNone
       EdgeOuter = esNone

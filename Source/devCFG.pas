@@ -2389,9 +2389,12 @@ begin
       if Assigned(Highlighter) then begin
         StrtoPoint(pt, devEditor.Syntax.Values[cFld]);
         CodeFolding.FolderBarLinesColor := pt.y;
+        if Editor is TSynEditEx then
+          OnScanForFoldRanges := TSynEditEx(EDitor).DoScanForFoldRanges;
         UseCodeFolding := True;
       end else begin
         UseCodeFolding := False;
+        OnScanForFoldRanges := nil;
       end;
 
       // More stuff

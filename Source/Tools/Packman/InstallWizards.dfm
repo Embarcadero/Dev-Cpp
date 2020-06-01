@@ -1262,7 +1262,6 @@ object InstallWizard: TInstallWizard
         Top = 72
         Width = 359
         Height = 20
-        Min = 0
         Max = 4
         Smooth = True
         TabOrder = 0

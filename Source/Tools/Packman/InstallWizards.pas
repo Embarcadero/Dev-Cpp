@@ -101,7 +101,8 @@ var
 implementation
 
 uses
-  Bzip2, LibTar, ExtractionProgressDialog, Unzip, ziptypes;
+  // TODO: Lift. Fix Bzip2.
+  {Bzip2,} LibTar, ExtractionProgressDialog, Unzip, ziptypes;
 
 const
   PageCount = 5;
@@ -409,6 +410,8 @@ begin
     else
     begin
       { Extract the bzip2 compressed *.devpak file }
+      // TODO: Lift. Fix Bzip2.
+      {
       Bz2File := nil;
       Bz2 := nil;
       try
@@ -454,7 +457,7 @@ begin
       ExtractedFile.Free;
 
       Bz2.Free;
-      Bz2File.Free;
+      Bz2File.Free;   }
 
       { Now extract the *.tar file }
       Bz2File := TFileStream.Create(TarFile, fmOpenRead);

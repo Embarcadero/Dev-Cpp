@@ -16,7 +16,8 @@ uses
   VerifyForms in 'VerifyForms.pas' {VerifyForm},
   DetailsForms in 'DetailsForms.pas' {DetailsForm},
   AboutForms in 'AboutForms.pas' {AboutForm},
-  BZip2 in 'bzip2.pas',
+  // TODO: Lift. Fix bzip2.
+  //BZip2 in 'bzip2.pas',
   LibTar in 'LibTar.pas',
   ExtractionProgressDialog in 'ExtractionProgressDialog.pas' {ExtractionProgress},
   PackmanExitCodesU in 'PackmanExitCodesU.pas',
