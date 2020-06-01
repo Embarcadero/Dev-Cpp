@@ -61,7 +61,7 @@ begin
 
   for i := 0 to Dirs.Count - 1 do
       if not DirectoryExists(Dirs.Strings[i]) then
-          CreateDirectory(PAnsiChar(Dirs.Strings[i]), nil);
+          CreateDirectory(PChar(Dirs.Strings[i]), nil);
   Dirs.Free;
 end;
 
@@ -112,7 +112,7 @@ begin
 
       if not DirectoryExists(ExtractFileDir(TheFile.Dest)) then
           Mkdir(ExtractFileDir(TheFile.Dest));
-      CopyFile(PAnsiChar(TheFile.Source), PAnsiChar(TheFile.Dest), False);
+      CopyFile(PChar(TheFile.Source), PChar(TheFile.Dest), False);
 
       if (IMod = 0) or (i mod IMod = 0) then
           Application.ProcessMessages;

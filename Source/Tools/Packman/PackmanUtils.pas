@@ -109,10 +109,10 @@ begin
 
       with ISLink do
       begin
-          SetPath(PAnsiChar(Target));
-          SetWorkingDirectory(PAnsiChar(ExtractFilePath(Target)));
+          SetPath(PChar(Target));
+          SetWorkingDirectory(PChar(ExtractFilePath(Target)));
           if Length(Icon) > 0 then
-          SetIconLocation(PAnsiChar(Icon), 0);
+          SetIconLocation(PChar(Icon), 0);
       end;
 
       IPFile.Save(PWChar(WideString(FileName)), false);
@@ -145,13 +145,13 @@ var
   ffi: TVSFixedFileInfo;
 begin
   Result := '';
-  i := GetFileVersionInfoSize(PAnsiChar(FileName), i);
+  i := GetFileVersionInfoSize(PChar(FileName), i);
   if i = 0 then
     Exit;
 
   Buf := AllocMem(i);
   try
-    if not GetFileVersionInfo(PAnsiChar(FileName), 0, i, Buf) then
+    if not GetFileVersionInfo(PChar(FileName), 0, i, Buf) then
       Exit;
 
     pSize := SizeOf(P);

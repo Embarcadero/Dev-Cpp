@@ -5,8 +5,8 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, StdCtrls, ComCtrls, ExtCtrls, ToolWin, Buttons, devTabs,
-  ShellAPI, ImgList, IniFiles;
+  Dialogs, Menus, StdCtrls, ComCtrls, ExtCtrls, ToolWin, Buttons,
+  ShellAPI, ImgList, IniFiles, System.ImageList;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -31,9 +31,9 @@ type
     Panel2: TPanel;
     Label1: TLabel;
     SpeedButton1: TSpeedButton;
-    devPages1: TdevPages;
-    devPage1: TdevPage;
-    devPage2: TdevPage;
+    devPages1: TPageControl;
+    devPage1: TTabSheet;
+    devPage2: TTabSheet;
     FileList: TRichEdit;
     Label2: TLabel;
     PackageName: TEdit;
