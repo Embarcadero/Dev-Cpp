@@ -211,7 +211,8 @@ implementation
 
 uses
   main, project, MultiLangSupport, devcfg, utils,
-  DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm, CodeCompletionForm, SynEditMiscClasses, CharUtils;
+  DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm,
+  CodeCompletionForm, SynEditMiscClasses, CharUtils;
 
 { TDebugGutter }
 
@@ -1945,8 +1946,9 @@ begin
       end;
     end;
 
+
     // Set save box options
-    FileName := fFileName;
+    FileName := ExtractFileName(fFileName);
     if (fFileName <> '') then
       InitialDir := ExtractFilePath(fFileName)
     else if Assigned(MainForm.Project) then
