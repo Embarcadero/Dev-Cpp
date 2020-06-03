@@ -215,7 +215,6 @@ end;
 
 procedure TDebugger.SendCommand(const Command, Params: String; ViewInUI: boolean);
 var
-  P: PChar;
   nBytesWrote: DWORD;
   Buff: TBytes;
 begin
