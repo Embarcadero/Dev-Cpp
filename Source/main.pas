@@ -2160,6 +2160,11 @@ end;
 procedure TMainForm.actPrintExecute(Sender: TObject);
 var
   e: TEditor;
+  vColors,
+  vHighlight,
+  vWordWrap,
+  vLineNumbers,
+  vLineNumbersMargins : boolean;
 begin
   e := fEditorList.GetEditor;
   if not Assigned(e) then
@@ -2168,15 +2173,21 @@ begin
   with TPrintForm.Create(Self) do try
     if ShowModal = mrOk then begin
       with TSynEditPrint.Create(Self) do try
+        vColors := cbColors.Checked;
+        vHighlight := cbHighlight.Checked;
+        vWordWrap := cbWordWrap.Checked;
+        vLineNumbers := rbLN.Checked;
+        vLineNumbersMargins := rbLNMargin.Checked;
+
         SynEdit := e.Text;
         Copies := seCopies.Value;
-        Wrap := cbWordWrap.Checked;
-        Highlight := cbHighlight.Checked;
+        Wrap := vWordWrap;
+        Highlight := vHighlight;
         SelectedOnly := cbSelection.Checked;
-        Colors := cbColors.Checked;
-        LineNumbers := not rbNoLN.checked;
+        Colors := vColors;
+        LineNumbers := not rbLN.Checked;
         Highlighter := e.Text.Highlighter;
-        LineNumbersInMargin := rbLNMargin.Checked;
+        LineNumbersInMargin := vLineNumbersMargins;
         TabWidth := devEditor.TabSize;
         Title := ExtractFileName(e.FileName);
         Color := e.Text.Highlighter.WhitespaceAttribute.Background;
@@ -2185,11 +2196,11 @@ begin
         Free;
       end;
 
-      devData.PrintColors := cbColors.Checked;
-      devData.PrintHighlight := cbHighlight.Checked;
-      devData.PrintWordWrap := cbWordWrap.Checked;
-      devData.PrintLineNumbers := rbLN.Checked;
-      devData.PrintLineNumbersMargins := rbLNMargin.Checked;
+      devData.PrintColors := vColors;
+      devData.PrintHighlight := vHighlight;
+      devData.PrintWordWrap := vWordWrap;
+      devData.PrintLineNumbers := vLineNumbers;
+      devData.PrintLineNumbersMargins := vLineNumbersMargins;
     end;
   finally
     Close;
@@ -5947,6 +5958,9 @@ begin
 
   // We need this variable during the whole startup process
   devData.First := FALSE;
+
+  //test change hint color
+  application.HintColor := clCream;
 end;
 
 procedure TMainForm.EditorPageControlMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);

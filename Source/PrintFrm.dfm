@@ -14,7 +14,6 @@ object PrintForm: TPrintForm
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
-  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 15
@@ -24,8 +23,9 @@ object PrintForm: TPrintForm
     Width = 75
     Height = 24
     Caption = '&Cancel'
-    TabOrder = 1
     Kind = bkCancel
+    NumGlyphs = 2
+    TabOrder = 1
   end
   object btnOk: TBitBtn
     Left = 270
@@ -33,8 +33,9 @@ object PrintForm: TPrintForm
     Width = 75
     Height = 24
     Caption = '&OK'
-    TabOrder = 0
     Kind = bkOK
+    NumGlyphs = 2
+    TabOrder = 0
   end
   object grpParams: TGroupBox
     Left = 8

@@ -2796,7 +2796,7 @@ object MainForm: TMainForm
     end
   end
   object MessagePopup: TPopupMenu
-    Left = 203
+    Left = 227
     Top = 371
     object actMsgCut1: TMenuItem
       Action = actMsgCut
