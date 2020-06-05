@@ -174,6 +174,7 @@ begin
       ParentPageControl := GetNewEditorPageControl
     else
       ParentPageControl := PageControl;
+
     Result := TEditor.Create(FileName, InProject, NewFile, ParentPageControl);
 
     // Force layout update when creating, destroying or moving editors

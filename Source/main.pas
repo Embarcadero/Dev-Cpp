@@ -5123,6 +5123,8 @@ begin
 
   if assigned(fProject) then
     fProject.SetNodeValue(ProjectView.TopItem); // nodes needs to be recreated
+
+  fProject.Open;
 end;
 
 procedure TMainForm.ReportWindowClose(Sender: TObject; var Action: TCloseAction);
@@ -5170,6 +5172,8 @@ begin
       fProjectToolWindow.Show;
       if assigned(fProject) then
         fProject.SetNodeValue(ProjectView.TopItem); // nodes needs to be recreated
+
+      fProject.Open;
     end;
   end;
 end;
