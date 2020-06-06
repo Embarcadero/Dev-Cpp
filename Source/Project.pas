@@ -44,6 +44,7 @@ type
     function IndexOf(Editor: TEditor): integer; overload;
     property Items[index: integer]: TProjUnit read GetItem; default;
     property Count: integer read GetCount;
+    function Exists(aunit: TProjUnit): boolean;
   end;
 
   TProjUnit = class
@@ -391,6 +392,7 @@ function TProject.MakeNewFileNode(const s: String; IsFolder: boolean; NewParent:
 begin
   MakeNewFileNode := MainForm.ProjectView.Items.AddChild(NewParent, s);
 
+
   if IsFolder then begin
     MakeNewFileNode.SelectedIndex := 4;
     MakeNewFileNode.ImageIndex := 4;
@@ -628,7 +630,8 @@ begin
   if not Assigned(ParentNode) then
     ParentNode := Node; // project root node
 
-  with NewUnit do try
+  with NewUnit do
+  try
     // Find unused 'new' filename
     if Length(CustomFileName) = 0 then begin
       repeat
@@ -644,7 +647,7 @@ begin
     end;
 
     // Add
-    Result := fUnits.Add(NewUnit);
+      Result := fUnits.Add(NewUnit);
 
     // Set all properties
     FileName := s;
@@ -1006,23 +1009,33 @@ begin
   CheckProjectFileForUpdate;
 
   uCount := fIniFile.ReadInteger('Project', 'UnitCount', 0);
+
   CreateFolderNodes;
-  for i := 0 to pred(uCount) do begin
+
+  for i := 0 to pred(uCount) do
+  begin
     NewUnit := TProjUnit.Create(Self);
-    with NewUnit do begin
+
+    with NewUnit do
+    begin
       FileName := ExpandFileto(finifile.ReadString('Unit' + IntToStr(i + 1), 'FileName', ''), Directory);
-      if not FileExists(FileName) then begin
+
+      if not FileExists(FileName) then
+      begin
         MessageBox(Application.Handle, PChar(Format(Lang[ID_ERR_FILENOTFOUND], [FileName])), 'Error', MB_ICONERROR);
         SetModified(TRUE);
-      end else begin
-
+      end
+      else
+      begin
         Folder := finifile.ReadString('Unit' + IntToStr(i + 1), 'Folder', '');
         Compile := finifile.ReadBool('Unit' + IntToStr(i + 1), 'Compile', True);
+
         if finifile.ReadInteger('Unit' + IntToStr(i + 1), 'CompileCpp', 2) = 2 then
           // check if feature not present in this file
           CompileCpp := Self.Options.useGPP
         else
           CompileCpp := finifile.ReadBool('Unit' + IntToStr(i + 1), 'CompileCpp', False);
+
         Link := finifile.ReadBool('Unit' + IntToStr(i + 1), 'Link', True);
         Priority := finifile.ReadInteger('Unit' + IntToStr(i + 1), 'Priority', 1000);
         OverrideBuildCmd := finifile.ReadBool('Unit' + IntToStr(i + 1), 'OverrideBuildCmd', False);
@@ -1033,7 +1046,8 @@ begin
         fParent := self;
 
         Node := MakeNewFileNode(ExtractFileName(FileName), False, FolderNodeFromName(Folder));
-        Node.Data := pointer(fUnits.Add(NewUnit));
+        if not fUnits.Exists(NewUnit) then
+          Node.Data := pointer(fUnits.Add(NewUnit));
       end;
     end;
   end;
@@ -1062,7 +1076,7 @@ var
   layIni: TIniFile;
   TopLeft {, TopRight}: integer;
   sl: TStringList;
-  idx, currIdx: integer;
+  idx, currIdx, fIdx: integer;
 begin
   sl := TStringList.Create;
   try
@@ -1078,7 +1092,8 @@ begin
       layIni.Free;
     end;
 
-    for idx := 0 to sl.Count - 1 do begin
+    for idx := 0 to sl.Count - 1 do
+    begin
       currIdx := StrToIntDef(sl[idx], -1);
       OpenUnit(currIdx);
     end;
@@ -1281,7 +1296,9 @@ begin
     if FileName <> '' then begin
       try
         SetCurrentDir(Directory);
-        fEditor := MainForm.EditorList.NewEditor(ExpandFileName(FileName), true, false);
+        fEditor := MainForm.EditorList.FileIsOpen(ExpandFileName(FileName));
+        if fEditor = nil then
+          fEditor := MainForm.EditorList.NewEditor(ExpandFileName(FileName), true, false);
         LoadUnitLayout(fEditor, index);
         Result := fEditor;
       except
@@ -1707,13 +1724,17 @@ begin
 
     // Recreate everything
     CreateFolderNodes;
-    for idx := 0 to pred(fUnits.Count) do begin
+
+    for idx := 0 to pred(fUnits.Count) do
+    begin
       fUnits[idx].Node := MakeNewFileNode(ExtractFileName(fUnits[idx].FileName), False,
-        FolderNodeFromName(fUnits[idx].Folder));
+      FolderNodeFromName(fUnits[idx].Folder));
       fUnits[idx].Node.Data := pointer(idx);
     end;
+
     for idx := 0 to pred(fFolders.Count) do
       TTreeNode(fFolderNodes[idx]).AlphaSort(False);
+
     Node.AlphaSort(False);
 
     // expand nodes expanded before recreating the project tree
@@ -1725,7 +1746,9 @@ begin
           if oldPaths.IndexOf(GetFolderPath(tempnode)) >= 0 then
             tempnode.Expand(False);
       end;
-    FreeAndNil(oldPaths);
+    //FreeAndNil(oldPaths);
+
+    oldPaths.Free;
 
     fNode.Expand(False);
   finally
@@ -1883,7 +1906,23 @@ begin
   inherited;
 end;
 
+function TUnitList.Exists(aunit: TProjUnit): boolean;
+var I : integer;
+begin
+  result := false;
+  for I := 0 to fList.Count - 1 do
+    begin
+     If TProjUnit(fList[I]).FileName = aunit.FileName then
+     begin
+       result := true;
+       exit
+     end;
+    end;
+
+end;
+
 function TUnitList.Add(aunit: TProjUnit): integer;
+var I : integer;
 begin
   result := fList.Add(aunit);
 end;
