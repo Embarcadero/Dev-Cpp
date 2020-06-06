@@ -245,6 +245,7 @@ begin
   inherited Create(AOwner);
 
   FLookupEditor := TSynEdit.Create(Self);
+  FLookupEditor.Parent := Self;
 
   FOptions := [ttoHideOnEsc, ttoCurrentArgumentExtra, shoFindBestMatchingToolTip];
 

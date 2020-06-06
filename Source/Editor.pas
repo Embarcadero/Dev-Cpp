@@ -2068,7 +2068,7 @@ end;
 
 constructor TSynEditEx.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
   FeoAddIndent := False;
 end;
 
