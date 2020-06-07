@@ -24,7 +24,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, StdCtrls, Buttons, ComCtrls, ImgList, libTar, BZip2, IniFiles,
-  ExtDlgs, ToolWin, ExtCtrls, StrUtils;
+  ExtDlgs, ToolWin, ExtCtrls, StrUtils, System.ImageList;
 
 const SETUP_SECTION  = 'Setup';
 const FILES_SECTION  = 'Files';

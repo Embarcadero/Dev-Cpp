@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 289
   Top = 166
-  Caption = 'Dev-C++ Package Manager (version 2.2.6)'
+  Caption = 'Dev-C++ Package Manager (version 2.2.7)'
   ClientHeight = 359
   ClientWidth = 472
   Color = clBtnFace
@@ -253,10 +253,6 @@ object MainForm: TMainForm
       end
       object devPage2: TTabSheet
         Caption = 'Files'
-        ExplicitLeft = 0
-        ExplicitTop = 23
-        ExplicitWidth = 161
-        ExplicitHeight = 259
         object FileList: TRichEdit
           Left = 0
           Top = 0

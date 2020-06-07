@@ -70,9 +70,9 @@ TFileType = FILE;
 
 { Record for UNZIP }
 TYPE
-TSignatureType = ARRAY [ 0..3 ] OF char;
-BufType  = ARRAY [ 0..TFileBufferSize ] OF char;
-TDirType = ARRAY [ 0..TFileNameSize ] OF char;
+TSignatureType = ARRAY [ 0..3 ] OF Ansichar;
+BufType  = ARRAY [ 0..TFileBufferSize ] OF Ansichar;
+TDirType = ARRAY [ 0..TFileNameSize ] OF Ansichar;
 TZipRec  = RECORD
        buf : ^Buftype;          {please}         {buffer containing central dir}
        bufsize,                 {do not}         {size of buffer}
@@ -267,7 +267,7 @@ BEGIN
    DO BEGIN
        j := Ord ( s [i] );
        IF j IN [65..90]  { convert only 'A' .. 'Z' }
-        THEN s [i] := Chr ( j + 32 );
+        THEN s [i] := AnsiChar ( j + 32 );
    END;
    Lower := s;
 END;

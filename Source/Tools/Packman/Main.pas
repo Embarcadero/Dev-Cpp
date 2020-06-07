@@ -107,7 +107,7 @@ uses
 procedure TMainForm.Label5Click(Sender: TObject);
 begin
   if Length(PackageURL.Text) > 0 then
-      ShellExecute(GetDesktopWindow, nil, PAnsiChar(PackageURL.Text), nil, nil, 0);
+      ShellExecuteA(GetDesktopWindow, nil, PAnsiChar(PackageURL.Text), nil, nil, 0);
 end;
 
 procedure TMainForm.Exit1Click(Sender: TObject);

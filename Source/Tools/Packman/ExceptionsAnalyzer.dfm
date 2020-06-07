@@ -240,12 +240,15 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Height = 197
     ActivePage = tabMemory
     Style = tsFlatButtons
-    TabIndex = 2
     TabOrder = 2
     TabStop = False
     object tabProgram: TTabSheet
       Caption = 'Program'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 12
         Top = 16
@@ -278,6 +281,10 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     object tabMachine: TTabSheet
       Caption = 'Machine'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label2: TLabel
         Left = 12
         Top = 16
@@ -338,6 +345,10 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     object tabMemory: TTabSheet
       Caption = 'Memory'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label10: TLabel
         Left = 166
         Top = 144
@@ -532,6 +543,10 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     end
     object tabStackTrace: TTabSheet
       Caption = 'StackTrace'#169
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object memStackTrace: TMemo
         Left = 0
         Top = 0
@@ -554,6 +569,10 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     object tabFullReport: TTabSheet
       Caption = 'Bug report'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object memBugReport: TMemo
         Left = 0
         Top = 0
@@ -573,35 +592,5 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         TabOrder = 0
       end
     end
-  end
-  object XPMenu: TXPMenu
-    DimLevel = 30
-    GrayLevel = 10
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clMenuText
-    Font.Height = -11
-    Font.Name = 'Microsoft Sans Serif'
-    Font.Style = []
-    Color = clBtnFace
-    DrawMenuBar = False
-    IconBackColor = clBtnFace
-    MenuBarColor = clBtnFace
-    SelectColor = clHighlight
-    SelectBorderColor = clHighlight
-    SelectFontColor = clMenuText
-    DisabledColor = clInactiveCaption
-    SeparatorColor = clBtnFace
-    CheckedColor = clHighlight
-    IconWidth = 24
-    DrawSelect = True
-    UseSystemColors = True
-    UseDimColor = False
-    OverrideOwnerDraw = False
-    Gradient = False
-    FlatMenu = False
-    AutoDetect = True
-    Active = False
-    Left = 168
-    Top = 64
   end
 end

@@ -1,12 +1,12 @@
 program Packman;
 
 uses
-{$IFDEF WIN32}
+  {$IFDEF WIN32}
   Forms,
-{$ENDIF}
-{$IFDEF LINUX}
+  {$ENDIF }
+  {$IFDEF LINUX}
   QForms,
-{$ENDIF}
+  {$ENDIF }
   InstallWizards in 'InstallWizards.pas' {InstallWizard},
   InstallFiles in 'InstallFiles.pas',
   Installers in 'Installers.pas',
@@ -16,14 +16,10 @@ uses
   VerifyForms in 'VerifyForms.pas' {VerifyForm},
   DetailsForms in 'DetailsForms.pas' {DetailsForm},
   AboutForms in 'AboutForms.pas' {AboutForm},
-  // TODO: Lift. Fix bzip2.
-  //BZip2 in 'bzip2.pas',
   LibTar in 'LibTar.pas',
   ExtractionProgressDialog in 'ExtractionProgressDialog.pas' {ExtractionProgress},
   PackmanExitCodesU in 'PackmanExitCodesU.pas',
-  ExceptionsAnalyzer in 'ExceptionsAnalyzer.pas' {frmExceptionsAnalyzer},
-  Unzip in 'unzip\UNZIP.PAS',
-  ziptypes in 'unzip\ZIPTYPES.PAS';
+  ExceptionsAnalyzer in 'ExceptionsAnalyzer.pas' {frmExceptionsAnalyzer};
 
 {$R *.res}
 

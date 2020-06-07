@@ -876,6 +876,8 @@ object InstallWizard: TInstallWizard
       Left = 0
       Top = 0
       Caption = 'Welcome'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 0
         Top = 0
@@ -946,6 +948,8 @@ object InstallWizard: TInstallWizard
       Left = 0
       Top = 0
       Caption = 'Readme'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label5: TLabel
         Left = 0
         Top = 0
@@ -1029,6 +1033,8 @@ object InstallWizard: TInstallWizard
       Left = 0
       Top = 0
       Caption = 'Installing'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label6: TLabel
         Left = 56
         Top = 16
@@ -1363,6 +1369,8 @@ object InstallWizard: TInstallWizard
       Left = 0
       Top = 0
       Caption = 'Finished'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label20: TLabel
         Left = 64
         Top = 8
