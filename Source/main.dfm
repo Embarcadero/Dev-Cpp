@@ -84,6 +84,7 @@ object MainForm: TMainForm
         ColumnClick = False
         GridLines = True
         HideSelection = False
+        Items.ItemData = {}
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
@@ -128,6 +129,7 @@ object MainForm: TMainForm
         ColumnClick = False
         GridLines = True
         HideSelection = False
+        Items.ItemData = {}
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
@@ -472,6 +474,7 @@ object MainForm: TMainForm
           end>
         ColumnClick = False
         GridLines = True
+        Items.ItemData = {}
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
@@ -568,7 +571,7 @@ object MainForm: TMainForm
       end
     end
     object tbCompile: TToolBar
-      Left = 455
+      Left = 718
       Top = 2
       Width = 208
       Height = 24
@@ -648,7 +651,7 @@ object MainForm: TMainForm
       end
     end
     object tbProject: TToolBar
-      Left = 365
+      Left = 628
       Top = 2
       Width = 77
       Height = 24
@@ -846,7 +849,7 @@ object MainForm: TMainForm
       end
     end
     object tbCompilers: TToolBar
-      Left = 676
+      Left = 365
       Top = 2
       Width = 250
       Height = 24

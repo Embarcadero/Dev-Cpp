@@ -5110,33 +5110,28 @@ end;
 procedure TMainForm.ProjectWindowClose(Sender: TObject; var Action: TCloseAction);
 begin
   FloatingPojectManagerItem.Checked := False;
-  LeftPageControl.Visible := false;
-  (Sender as TForm).RemoveControl(LeftPageControl);
 
-  LeftPageControl.Left := 0;
-  LeftPageControl.Top := ToolbarDock.Height;
   LeftPageControl.Align := alLeft;
-  LeftPageControl.Visible := true;
-  InsertControl(LeftPageControl);
+  LeftPageControl.Parent := Self;
+
   fProjectToolWindow.Free;
   fProjectToolWindow := nil;
 
   if assigned(fProject) then
     fProject.SetNodeValue(ProjectView.TopItem); // nodes needs to be recreated
+
+  fProject.Open;
 end;
 
 procedure TMainForm.ReportWindowClose(Sender: TObject; var Action: TCloseAction);
 begin
   FloatingReportWindowItem.Checked := False;
-  MessageControl.Visible := false;
-  (Sender as TForm).RemoveControl(MessageControl);
 
-  MessageControl.Left := 0;
-  MessageControl.Top := SplitterBottom.Top;
   MessageControl.Align := alBottom;
-  MessageControl.Visible := true;
-  InsertControl(MessageControl);
+  MessageControl.Parent := Self;
+  MessageControl.Top := SplitterBottom.Top;
   Statusbar.Top := MessageControl.Top + MessageControl.Height;
+
   fReportToolWindow.Free;
   fReportToolWindow := nil;
 end;
@@ -5144,33 +5139,31 @@ end;
 procedure TMainForm.FloatingPojectManagerItemClick(Sender: TObject);
 begin
   FloatingPojectManagerItem.Checked := not FloatingPojectManagerItem.Checked;
+
   if Assigned(fProjectToolWindow) then
     fProjectToolWindow.Close
   else begin
     fProjectToolWindow := TForm.Create(self);
-    with fProjectToolWindow do begin
-      Caption := Lang[ID_TB_PROJECT];
-      Top := self.Top + LeftPageControl.Top;
-      Left := self.Left + LeftPageControl.Left;
-      Height := LeftPageControl.Height;
-      Width := LeftPageControl.Width;
-      FormStyle := fsStayOnTop;
-      OnClose := ProjectWindowClose;
-      BorderStyle := bsSizeable;
-      BorderIcons := [biSystemMenu];
-      LeftPageControl.Visible := false;
-      self.RemoveControl(LeftPageControl);
+    fProjectToolWindow.Caption := Lang[ID_TB_PROJECT];
+    fProjectToolWindow.FormStyle := fsStayOnTop;
+    fProjectToolWindow.OnClose := ProjectWindowClose;
+    fProjectToolWindow.BorderStyle := bsSizeable;
+    fProjectToolWindow.BorderIcons := [biSystemMenu];
+    var SPos := LeftPageControl.ClientToScreen(TPoint.Zero);
+    var LeftPageControlW := LeftPageControl.Width;
+    var LeftPageControlH := LeftPageControl.Height;
 
-      LeftPageControl.Left := 0;
-      LeftPageControl.Top := 0;
-      LeftPageControl.Align := alClient;
-      LeftPageControl.Visible := true;
-      fProjectToolWindow.InsertControl(LeftPageControl);
+    LeftPageControl.Parent := fProjectToolWindow;
+    LeftPageControl.Align := alClient;
 
-      fProjectToolWindow.Show;
-      if assigned(fProject) then
-        fProject.SetNodeValue(ProjectView.TopItem); // nodes needs to be recreated
-    end;
+    fProjectToolWindow.Show;
+    fProjectToolWindow.Left := SPos.X;
+    fProjectToolWindow.Top := SPos.Y;
+    fProjectToolWindow.ClientWidth := LeftPageControlW;
+    fProjectToolWindow.ClientHeight := LeftPageControlH;
+
+    if assigned(fProject) then
+      fProject.SetNodeValue(ProjectView.TopItem); // nodes needs to be recreated
   end;
 end;
 
@@ -5409,28 +5402,27 @@ begin
     OpenCloseMessageSheet(true);
     if MessageControl.ActivePage = CloseSheet then
       MessageControl.ActivePageIndex := 0;
+
     fReportToolWindow := TForm.Create(self);
-    with fReportToolWindow do begin
-      Caption := Lang[ID_TB_REPORT];
-      Top := self.Top + MessageControl.Top;
-      Left := self.Left + MessageControl.Left;
-      Height := MessageControl.Height;
-      Width := MessageControl.Width;
-      FormStyle := fsStayOnTop;
-      OnClose := ReportWindowClose;
-      BorderStyle := bsSizeable;
-      BorderIcons := [biSystemMenu];
-      MessageControl.Visible := false;
-      self.RemoveControl(MessageControl);
+    fReportToolWindow.Caption := Lang[ID_TB_REPORT];
+    fReportToolWindow.FormStyle := fsStayOnTop;
+    fReportToolWindow.OnClose := ReportWindowClose;
+    fReportToolWindow.BorderStyle := bsSizeable;
+    fReportToolWindow.BorderIcons := [biSystemMenu];
 
-      MessageControl.Left := 0;
-      MessageControl.Top := 0;
-      MessageControl.Align := alClient;
-      MessageControl.Visible := true;
-      fReportToolWindow.InsertControl(MessageControl);
+    var SPos := MessageControl.ClientToScreen(TPoint.Zero);
+    var MessageControlW := MessageControl.Width;
+    var MessageControlH := MessageControl.Height;
 
-      fReportToolWindow.Show;
-    end;
+    MessageControl.Parent := fReportToolWindow;
+    MessageControl.Align := TAlign.alClient;
+
+    fReportToolWindow.Show;
+
+    fReportToolWindow.Left := SPos.X;
+    fReportToolWindow.Top := SPos.Y;
+    fReportToolWindow.ClientWidth := MessageControlW;
+    fReportToolWindow.ClientHeight := MessageControlH;
   end;
 end;
 
@@ -6666,4 +6658,5 @@ begin
 end;
 
 end.
+
 
