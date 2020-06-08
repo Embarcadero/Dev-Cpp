@@ -1076,7 +1076,7 @@ var
   layIni: TIniFile;
   TopLeft {, TopRight}: integer;
   sl: TStringList;
-  idx, currIdx, fIdx: integer;
+  idx, currIdx: integer;
 begin
   sl := TStringList.Create;
   try
@@ -1922,7 +1922,6 @@ begin
 end;
 
 function TUnitList.Add(aunit: TProjUnit): integer;
-var I : integer;
 begin
   result := fList.Add(aunit);
 end;
