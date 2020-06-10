@@ -607,7 +607,7 @@ begin
         Cmd := Cmd + memBugReport.Lines[I] + '%0A';
     end;
     Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
-    ShellExecute(0, 'open', PAnsiChar(Cmd), nil, nil, SW_SHOWNORMAL);
+    ShellExecuteA(0, 'open', PAnsiChar(Cmd), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TfrmExceptionsAnalyzer.FormCreate(Sender: TObject);

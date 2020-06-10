@@ -146,8 +146,9 @@ TYPE
 
   // --- The TAR Archive CLASS
   TTarArchive = CLASS
+                private
+                  FStream: TStream;
                 PROTECTED
-                  FStream     : TStream;   // Internal Stream
                   FOwnsStream : BOOLEAN;   // True if FStream is owned by the TTarArchive instance
                   FBytesToGo  : INT64;     // Bytes until the next Header Record
                 PUBLIC
@@ -164,6 +165,7 @@ TYPE
 
                   PROCEDURE GetFilePos (VAR Current, Size : INT64);        // Current File Position
                   PROCEDURE SetFilePos (NewPos : INT64);                   // Set new Current File Position
+                  property Stream: TStream read FStream write FStream;
                 END;
 
   // --- The TAR Archive Writer CLASS

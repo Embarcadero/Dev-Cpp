@@ -88,23 +88,24 @@ object FileForm: TFileForm
       Top = 124
       Width = 75
       Height = 25
-      TabOrder = 1
       Kind = bkOK
+      NumGlyphs = 2
+      TabOrder = 1
     end
     object CancelBtn: TBitBtn
       Left = 136
       Top = 124
       Width = 75
       Height = 25
-      TabOrder = 2
       Kind = bkCancel
+      NumGlyphs = 2
+      TabOrder = 2
     end
     object edDest: TComboBox
       Left = 8
       Top = 88
       Width = 201
       Height = 21
-      ItemHeight = 13
       TabOrder = 3
       Text = '<app>\'
       Items.Strings = (

@@ -6,7 +6,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, InstallFiles, ExtCtrls, StdCtrls, Buttons, ShellAPI, ComCtrls,
-  Installers, PackmanExitCodesU;
+  Installers, PackmanExitCodesU, System.Zip;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -87,6 +87,8 @@ type
     procedure ChangeLabels;
     procedure StartInstall;
     procedure Progress(Sender: TObject; CurrentFile: TInstallFile; Progress, Max: Integer);
+
+    procedure OnUnZipProgress(Sender: TObject; FileName: string; Header: TZipHeader; Position: Int64);
   public
     DontShowError: Boolean;
     PMExitCode: TPackmanExitCode;
@@ -102,7 +104,7 @@ implementation
 
 uses
   // TODO: Lift. Fix Bzip2.
-  {Bzip2,} LibTar, ExtractionProgressDialog, Unzip, ziptypes;
+  {Bzip2,} LibTar, ExtractionProgressDialog;
 
 const
   PageCount = 5;
@@ -114,24 +116,6 @@ var
   app: TApplication;
 
 {$R *.dfm}
-
-PROCEDURE UnzipReport( Retcode : longint;Rec : pReportRec ); stdcall;
-begin
-  if rec^.Status = file_starting then
-  begin
-    bar.Min := 0;
-    bar.Max := rec^.Size;
-  end
-  else if rec^.Status = file_unzipping then
-    bar.Position := Retcode;
-  app.ProcessMessages;
-end;
-
-FUNCTION UnzipQuestion ( Rec : pReportRec ) : Boolean; stdcall;
-begin
-  Result := (MessageDlg('Do you want to overwrite "'
-    + rec^.FileName + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes);
-end;
 
 procedure GetZipNameAndVersion( var zipname, zipversion: AnsiString);
 //this proc gets a name of zip package i.e. glib-dev-2.4.7
@@ -219,7 +203,7 @@ begin
 
   for i := 0 to Dirs.Count - 1 do
       if not DirectoryExists(Dirs.Strings[i]) then
-          CreateDirectory(PAnsiChar(Dirs.Strings[i]), nil);
+          CreateDirectoryA(PAnsiChar(Dirs.Strings[i]), nil);
   Dirs.Free;
 end;
 
@@ -260,31 +244,6 @@ begin
   CloseFile(DevPak);
 end;
 
-function UnzipErrCodeToStr(errcode: Integer): AnsiString;
-begin
-  case errcode of
-    unzip_Ok             : Result := 'Ok';
-    unzip_CRCErr         : Result := 'CRC Error';
-    unzip_WriteErr       : Result := 'Write Error';
-    unzip_ReadErr        : Result := 'Read Error';
-    unzip_ZipFileErr     : Result := 'Zip File Error';
-    unzip_UserAbort      : Result := 'User Abort';
-    unzip_NotSupported   : Result := 'Not Supported';
-    unzip_Encrypted      : Result := 'Encrypted';
-    unzip_InUse          : Result := 'In Use';
-    unzip_InternalError  : Result := 'Internal Error';
-    unzip_NoMoreItems    : Result := 'No More Items';
-    unzip_FileError      : Result := 'File Error';
-    unzip_NotZipfile     : Result := 'Not Zip file';
-    unzip_HeaderTooLarge : Result := 'Header Too Large';
-    unzip_ZipFileOpenError : Result := 'Zip File Open Error';
-    unzip_SeriousError   : Result := 'Serious Error';
-    unzip_MissingParameter : Result := 'Missing Parameter';
-  else
-    Result := 'Unknown';
-  end;
-end;
-
 function TInstallWizard.SetFileName(AFileName: AnsiString): Boolean;
 const
   BufSize = 1024 * 64;
@@ -295,7 +254,7 @@ var
   BytesRead: LongInt;
 
   Bz2File: TFileStream;
-  Bz2: TBZDecompressionStream;
+//  Bz2: TBZDecompressionStream;
   Bz2Buf: array[0..BufSize - 1] of Char;
   Tar: TTarArchive;
   DirRec: TTarDirRec;
@@ -310,7 +269,7 @@ var
   DepErrors: TStringList;
 
   IsZip: Boolean;
-  ziprec: TZipRec;
+
   DevPakName, DevPakVer: AnsiString; //for generic zip or tar.bz2 devpaks
   unziperrCode: Integer;
 
@@ -387,10 +346,26 @@ begin
         bar := ExtractionProgress.ProgressBar1;
         app := Application;
 
-        unziperrCode := FileUnzip(PAnsiChar(AFileName),
+        try
+          //if file exist - override question?
+          //Result := (MessageDlg('Do you want to overwrite "' AFileName + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes);
+
+          TZipFile.ExtractZipFile(AFileName, ExtractDir, OnUnZipProgress);   //add progress event
+        except
+          raise Exception.Create('error extracting for zip file "'
+            + AFileName + '"');
+            cleanup;
+            Exit;
+        end;
+      finally
+        ExtractionProgress.Free;
+      end;
+    end
+
+   {old unzip     unziperrCode := FileUnzip(PAnsiChar(AFileName),
           PAnsiChar(ExtractDir), '*.*', UnzipReport, UnzipQuestion);
-        if unziperrCode < 0 then
-        begin
+      if unziperrCode < 0 then
+       begin
           MessageDlg('Unzip failed. Error ' + IntToStr(unziperrCode)
           + ': ' + UnzipErrCodeToStr(unziperrCode), mtError, [mbOK], 0);
           raise Exception.Create('error extracting for zip file "'
@@ -398,14 +373,14 @@ begin
         end;
       except
         ExtractionProgress.Free;
-        CloseZipFile(ziprec);
+      //todo  CloseZipFile(ziprec);
         PMExitCode := PACKMAN_EXITCODE_INVALID_FORMAT;
         cleanup;
         Exit;
       end;
       ExtractionProgress.Free;
-      CloseZipFile(ziprec);
-    end //if is zip
+      //CloseZipFile(ziprec);
+    end //if is zip }
     //is bzip2
     else
     begin
@@ -462,8 +437,8 @@ begin
       { Now extract the *.tar file }
       Bz2File := TFileStream.Create(TarFile, fmOpenRead);
       Tar := TTarArchive.Create(Bz2File);
-      ExtractionProgress.ProgressBar1.Max := Tar.FStream.Size * 2;
-      ExtractionProgress.ProgressBar1.Position := Tar.FStream.Position;
+      ExtractionProgress.ProgressBar1.Max := Tar.Stream.Size * 2;
+      ExtractionProgress.ProgressBar1.Position := Tar.Stream.Position;
 
       try
         while Tar.FindNext(DirRec) do
@@ -487,8 +462,8 @@ begin
             '.DevPackage') = 0) then
               PackageFile := FN;
 
-          ExtractionProgress.ProgressBar1.Position := Tar.FStream.Size +
-            Tar.FStream.Position;
+          ExtractionProgress.ProgressBar1.Position := Tar.Stream.Size +
+            Tar.Stream.Position;
           Application.ProcessMessages;
         end; //while
       except
@@ -544,7 +519,7 @@ begin
 
   if InstallInfo.Version > SupportedVersion then
   begin
-    Application.MessageBox(PAnsiChar('This version of Package Manager only' +
+    Application.MessageBox(PWideChar('This version of Package Manager only' +
       ' supports packages up to version ' + IntToStr(SupportedVersion) +
       '.' + #13#10 + 'The package you selected has version number ' +
       IntToStr(InstallInfo.Version) + '.' + #13#10#13#10 +
@@ -570,7 +545,7 @@ begin
   end;
   if DepErrors.Count > 0 then
   begin
-    Application.MessageBox(PAnsiChar('This package depends on some ' +
+    Application.MessageBox(PWideChar('This package depends on some ' +
      'other packages, which are not installed on your system.' + #13#10 +
      'Please install them first. The required depencies are:' + #13#10 +
      DepErrors.Text), 'Dependency Error', MB_ICONERROR);
@@ -634,6 +609,13 @@ begin
 
   if Notebook1.PageIndex = 3 then
       StartInstall;
+end;
+
+procedure TInstallWizard.OnUnZipProgress(Sender: TObject; FileName: string;
+  Header: TZipHeader; Position: Int64);
+begin
+  bar.Max :=  Header.UncompressedSize;
+  bar.Position := Position;
 end;
 
 procedure TInstallWizard.CancelClick(Sender: TObject);
@@ -783,20 +765,20 @@ end;
 
 procedure TInstallWizard.UrlLabelClick(Sender: TObject);
 begin
-  ShellExecute(GetDesktopWindow, nil, PAnsiChar(TLabel(Sender).Caption),
+  ShellExecuteA(GetDesktopWindow, nil, PAnsiChar(TLabel(Sender).Caption),
     nil, nil, 1);
 end;
 
 procedure TInstallWizard.Label22Click(Sender: TObject);
 begin
-  ShellExecute(Handle, nil, 'notepad.exe',
+  ShellExecuteA(Handle, nil, 'notepad.exe',
     PAnsiChar('"' + InstallInfo.ReadmeFile + '"'),
     nil, SW_MAXIMIZE);
 end;
 
 procedure TInstallWizard.Label23Click(Sender: TObject);
 begin
-  ShellExecute(Handle, nil, 'notepad.exe',
+  ShellExecuteA(Handle, nil, 'notepad.exe',
     PAnsiChar('"' + InstallInfo.LicenseFile + '"'),
     nil, SW_MAXIMIZE);
 end;

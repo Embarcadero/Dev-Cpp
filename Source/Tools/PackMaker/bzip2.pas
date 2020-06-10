@@ -51,7 +51,7 @@ type
     FStrmPos: Integer;
     FOnProgress: TNotifyEvent;
     FBZRec: TBZStreamRec;
-    FBuffer: array[Word] of Char;
+    FBuffer: array[Word] of AnsiChar;
   protected
     procedure Progress(Sender: TObject); dynamic;
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
