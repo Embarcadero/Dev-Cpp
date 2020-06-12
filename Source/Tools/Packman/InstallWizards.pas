@@ -249,13 +249,13 @@ const
   BufSize = 1024 * 64;
 var
   F: File;
-  Buf: array[0..3] of Char;
-  TempPath: array[0..MAX_PATH] of Char;
+  Buf: array[0..3] of AnsiChar;
+  TempPath: array[0..MAX_PATH] of AnsiChar;
   BytesRead: LongInt;
 
   Bz2File: TFileStream;
 //  Bz2: TBZDecompressionStream;
-  Bz2Buf: array[0..BufSize - 1] of Char;
+  Bz2Buf: array[0..BufSize - 1] of AnsiChar;
   Tar: TTarArchive;
   DirRec: TTarDirRec;
   TarFile: AnsiString;
@@ -321,7 +321,7 @@ begin
   if IsCompressed then
   begin
     FillChar(TempPath, SizeOf(TempPath) - 1, 0);
-    GetTempPath(SizeOf(TempPath) - 1, TempPath);
+    GetTempPathA(SizeOf(TempPath) - 1, TempPath);
 
     DevPakName := ChangeFileExt(ExtractFileName(AFileName), '');
     if ExtractFileExt(DevPakName) = '.tar' then
