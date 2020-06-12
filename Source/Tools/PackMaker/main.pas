@@ -159,7 +159,7 @@ var
 implementation
 
 uses
-  menufrm, filefrm, buildfrm, actionfrm;
+  menufrm, filefrm, buildfrm, actionfrm, Aboutfrm;
 
 {$R *.dfm}
 
@@ -224,12 +224,13 @@ end;
 
 procedure TMainForm.About1Click(Sender: TObject);
 begin
-  MessageDlg('Dev-C++ Package Maker' + #13#10 + #13#10 +
-             'Author : Colin Laplace and Hongli Lai' + #13#10 +
-             'Tar creation code : Stefan Heymann' + #13#10 +
-             'Bzip2 compression code : Julian Seward and Edison Mera Menéndez' + #13#10 + #13#10 +
-             'Copyright Bloodshed Software' + #13#10 +
-             'Under the GNU General Public License', mtInformation, [mbOK], 0);
+  frmAbout := TfrmAbout.Create(Self);
+
+  try
+     frmAbout.ShowModal;
+  finally
+     frmAbout.Free;
+  end;
 end;
 
 procedure TMainForm.ReadMeBtnClick(Sender: TObject);
