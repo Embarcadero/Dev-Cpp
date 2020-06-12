@@ -28,6 +28,9 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Image2: TImage;
     procedure Label7Click(Sender: TObject);
     procedure Label6Click(Sender: TObject);
     procedure Label9Click(Sender: TObject);
