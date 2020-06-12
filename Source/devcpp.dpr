@@ -1,13 +1,13 @@
 {
-    This file is part of Dev-C++
+    This file is part of Embarcadero Dev-C++
     Copyright (c) 2004 Bloodshed Software
 
-    Dev-C++ is free software; you can redistribute it and/or modify
+    Embarcadero Dev-C++ is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
 
-    Dev-C++ is distributed in the hope that it will be useful,
+    Embarcadero Dev-C++ is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -128,8 +128,8 @@ begin
       AppData := IncludeTrailingBackslash(String(Buffer));
 
     // Store the INI file in %APPDATA% or if we are not allowed to do so, in the exe directory
-    if (AppData <> '') and (DirectoryExists(AppData + 'Dev-Cpp') or CreateDir(AppData + 'Dev-Cpp')) then
-      devData.INIFileName := AppData + 'Dev-Cpp\' + INIFileName
+    if (AppData <> '') and (DirectoryExists(AppData + 'Embarcadero\Dev-Cpp') or CreateDir(AppData + 'Embarcadero\Dev-Cpp')) then
+      devData.INIFileName := AppData + 'Embarcadero\Dev-Cpp\' + INIFileName
     else
       // store it in the default portable config folder anyways...
       devData.INIFileName := ExeFolder + 'config\' + INIFileName;
@@ -146,7 +146,7 @@ begin
 
   // Create main window
   Application.Initialize;
-  Application.Title := 'Dev-C++';
+  Application.Title := 'Embarcadero Dev C++';
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.
