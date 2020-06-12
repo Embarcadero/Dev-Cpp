@@ -195,7 +195,10 @@ var
   Dirs: TStringList;
   i: Integer;
 begin
-  Dirs := TStringList.Create;
+  if not ForceDirectories(DirName) then
+    raise Exception.Create('error creating folder "'+ DirName + '"');
+
+ { Dirs := TStringList.Create;
   for i := 1 to Length(DirName) do
       if DirName[i] = '\' then
           Dirs.Add(Copy(DirName, 0, i - 1));
@@ -204,7 +207,7 @@ begin
   for i := 0 to Dirs.Count - 1 do
       if not DirectoryExists(Dirs.Strings[i]) then
           CreateDirectoryA(PAnsiChar(Dirs.Strings[i]), nil);
-  Dirs.Free;
+  Dirs.Free;}
 end;
 
 function ConvertSlashes(Path: AnsiString): AnsiString;
@@ -350,7 +353,7 @@ begin
           //if file exist - override question?
           //Result := (MessageDlg('Do you want to overwrite "' AFileName + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes);
 
-          TZipFile.ExtractZipFile(AFileName, ExtractDir, OnUnZipProgress);   //add progress event
+          TZipFile.ExtractZipFile(AFileName, ExtractDir, OnUnZipProgress);
         except
           raise Exception.Create('error extracting for zip file "'
             + AFileName + '"');
