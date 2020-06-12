@@ -1,11 +1,13 @@
 object RemoveUnitForm: TRemoveUnitForm
   Left = 687
   Top = 393
-  Width = 354
-  Height = 317
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Remove from project'
+  ClientHeight = 196
+  ClientWidth = 342
   Color = clBtnFace
+  Constraints.MinHeight = 90
+  Constraints.MinWidth = 180
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -15,31 +17,39 @@ object RemoveUnitForm: TRemoveUnitForm
   Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
-  DesignSize = (
-    338
-    279)
   PixelsPerInch = 96
   TextHeight = 13
   object UnitList: TListBox
     Left = 0
     Top = 0
-    Width = 338
-    Height = 251
-    Align = alCustom
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Width = 342
+    Height = 169
+    Align = alClient
     ItemHeight = 13
     MultiSelect = True
     TabOrder = 0
     OnKeyPress = UnitListKeyPress
   end
-  object DelBtn: TButton
-    Left = 132
-    Top = 252
-    Width = 75
-    Height = 25
-    Anchors = [akBottom]
-    Caption = 'Delete'
+  object paBottom: TPanel
+    Left = 0
+    Top = 169
+    Width = 342
+    Height = 27
+    Align = alBottom
+    BevelOuter = bvNone
     TabOrder = 1
-    OnClick = DelBtnClick
+    DesignSize = (
+      342
+      27)
+    object DelBtn: TButton
+      Left = 136
+      Top = 1
+      Width = 75
+      Height = 25
+      Anchors = [akTop]
+      Caption = 'Delete'
+      TabOrder = 0
+      OnClick = DelBtnClick
+    end
   end
 end

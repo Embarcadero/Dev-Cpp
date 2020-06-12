@@ -497,7 +497,8 @@ begin
 
   // Create a temporary editor for closed file searching
   fTempSynEdit := TSynEdit.Create(Self);
-
+  fTempSynEdit.Visible := False;
+  fTempSynEdit.Parent := Self;
   fTempSynEdit.WantTabs := devEditor.UseTabs;
   fTempSynEdit.TabWidth := devEditor.TabSize;
 end;

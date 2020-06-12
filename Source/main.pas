@@ -1923,7 +1923,10 @@ begin
 
         // Ask if the user wants to close the current one. If not, abort
         if MessageDlg(format(Lang[ID_MSG_CLOSECREATEPROJECT], [s]), mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-          actCloseProject.Execute
+        begin
+          actCloseProject.Execute;
+          if Assigned(fProject) then Exit;
+        end
         else
           Exit;
       end;
@@ -2185,13 +2188,14 @@ begin
         Highlight := vHighlight;
         SelectedOnly := cbSelection.Checked;
         Colors := vColors;
-        LineNumbers := not rbLN.Checked;
+        LineNumbers := rbLN.Checked or rbLNMargin.Checked;
         Highlighter := e.Text.Highlighter;
         LineNumbersInMargin := vLineNumbersMargins;
         TabWidth := devEditor.TabSize;
         Title := ExtractFileName(e.FileName);
-        Color := e.Text.Highlighter.WhitespaceAttribute.Background;
-        Print;
+        if Assigned(e.Text.Highlighter) and Assigned(e.Text.Highlighter.WhitespaceAttribute) then
+          Color := e.Text.Highlighter.WhitespaceAttribute.Background;
+        PrintEx;
       finally
         Free;
       end;
@@ -2837,8 +2841,15 @@ begin
       end;
     ctFile: begin
         e := fEditorList.GetEditor; // always succeeds if ctFile is returned
-        if not e.Save then
+        if not Assigned(e) then
+        begin
+          ProjectViewClick(nil);
+          e := fEditorList.GetEditor;
+        end;
+
+        if (not Assigned(e)) or (not e.Save) then
           Exit;
+
         fCompiler.SourceFile := e.FileName;
       end;
     ctProject: begin
@@ -3198,6 +3209,9 @@ procedure TMainForm.actCompileUpdate(Sender: TObject);
 begin
   TCustomAction(Sender).Enabled := (not fCompiler.Compiling) and (GetCompileTarget <> ctNone) and
     Assigned(devCompilerSets.CompilationSet);
+
+  if (Sender = actSyntaxCheckFile) and TCustomAction(Sender).Enabled then
+    TCustomAction(Sender).Enabled := (fEditorList.GetEditor <> nil) or Assigned(ProjectView.Selected);
 end;
 
 procedure TMainForm.actUpdateProject(Sender: TObject);
@@ -5112,6 +5126,7 @@ begin
   FloatingPojectManagerItem.Checked := False;
 
   LeftPageControl.Align := alLeft;
+  LeftPageControl.Visible := actProjectManager.Checked;
   LeftPageControl.Parent := Self;
 
   fProjectToolWindow.Free;
@@ -5154,6 +5169,7 @@ begin
 
     LeftPageControl.Parent := fProjectToolWindow;
     LeftPageControl.Align := alClient;
+    LeftPageControl.Visible := True;
 
     fProjectToolWindow.Show;
     fProjectToolWindow.Left := SPos.X;

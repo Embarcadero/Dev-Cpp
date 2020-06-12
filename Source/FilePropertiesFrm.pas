@@ -279,11 +279,12 @@ begin
   end else begin
 
     // Get file properties
-    try
-      fEdit.Lines.LoadFromFile(Filename);
-      CalculateFile(FileName);
-    except
-    end;
+    if FileExists(Filename) then
+      try
+        fEdit.Lines.LoadFromFile(Filename);
+        CalculateFile(FileName);
+      except
+      end;
 
     // Check if it is in our project
     if Assigned(MainForm.Project) and (MainForm.Project.Units.IndexOf(FileName) <> -1) then begin

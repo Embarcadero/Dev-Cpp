@@ -25,7 +25,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
   SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
   SynEditCodeFolding, SynExportHTML, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils,
-  CodeToolTip, CBUtils, System.UITypes, System.Contnrs;
+  CodeToolTip, CBUtils, System.UITypes, System.Contnrs, SynEditPrint;
 
 type
   TCustomSynEditHelper = class helper for TCustomSynEdit
@@ -81,6 +81,12 @@ type
 
     procedure DoScanForFoldRanges(Sender: TObject; FoldRanges: TSynFoldRanges; LinesToScan: TStrings; FromLine : Integer; ToLine : Integer);
   end;
+
+  TSynEditPrintHelper = class helper for TSynEditPrint
+  public
+    procedure PrintEx;
+  end;
+
 
   TEditor = class;
   TDebugGutter = class(TSynEditPlugin)
@@ -212,7 +218,7 @@ implementation
 uses
   main, project, MultiLangSupport, devcfg, utils,
   DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm,
-  CodeCompletionForm, SynEditMiscClasses, CharUtils;
+  CodeCompletionForm, SynEditMiscClasses, CharUtils, Vcl.Printers, SynEditPrintTypes;
 
 { TDebugGutter }
 
@@ -687,8 +693,10 @@ begin
       Filter := SynExporterHTML.DefaultFilter;
       Title := Lang[ID_NV_EXPORT];
       DefaultExt := HTML_EXT;
-      FileName := ChangeFileExt(fFileName, HTML_EXT);
       Options := Options + [ofOverwritePrompt];
+      FileName := ChangeFileExt(ExtractFileName(fFileName), HTML_EXT);
+      InitialDir := ExtractFilePath(fFileName);
+
 
       if Execute then
         SaveFileName := FileName
@@ -723,7 +731,8 @@ begin
       Filter := SynExporterRTF.DefaultFilter;
       Title := Lang[ID_NV_EXPORT];
       DefaultExt := RTF_EXT;
-      FileName := ChangeFileExt(fFileName, RTF_EXT);
+      FileName := ChangeFileExt(ExtractFileName(fFileName), RTF_EXT);
+      InitialDir := ExtractFilePath(fFileName);
       Options := Options + [ofOverwritePrompt];
 
       if Execute then
@@ -758,7 +767,8 @@ begin
       Filter := SynExporterTEX.DefaultFilter;
       Title := Lang[ID_NV_EXPORT];
       DefaultExt := TEX_EXT;
-      FileName := ChangeFileExt(fFileName, TEX_EXT);
+      FileName := ChangeFileExt(ExtractFileName(fFileName), TEX_EXT);
+      InitialDir := ExtractFilePath(fFileName);
       Options := Options + [ofOverwritePrompt];
 
       if Execute then
@@ -1880,7 +1890,6 @@ begin
   // We will be changing files. Stop monitoring
   MainForm.FileMonitor.BeginUpdate;
   try
-
     // Is this file read-only?
     if FileExists(fFileName) and (FileGetAttr(fFileName) and faReadOnly <> 0) then begin
 
@@ -2583,6 +2592,52 @@ begin
     if not FindBraces(Line) then
       FoldRanges.NoFoldInfo(Line + 1);
   end; // while Line
+end;
+
+
+{ TSynEditPrintHelper }
+
+procedure TSynEditPrintHelper.PrintEx;
+var
+  i, ii: Integer;
+begin
+  with Self do
+  begin
+    if fSelectedOnly and not fSelAvail then
+      exit;
+
+    FPrinting := True;
+    FAbort := False;
+    // The next part sets the document title that is used by the printer queue.
+    if FDocTitle <> '' then
+      Printer.Title := FDocTitle
+    else
+      Printer.Title := FTitle;
+    Printer.BeginDoc;
+    if not Printer.Printing then Exit;
+    try
+
+      PrintStatus(psBegin, 1, FAbort);
+      UpdatePages(Printer.Canvas);
+
+      var EndPage := FPageCount;
+      for ii:=1 to Copies do
+      begin
+        i := 1;
+        while (i <= EndPage) and (not FAbort) do begin
+          PrintPage(i);
+          if ((i < EndPage) or (ii<Copies)) and not FAbort then
+            Printer.NewPage;
+          i := i + 1;
+        end;
+      end;
+      if not FAbort then
+        PrintStatus(psEnd, EndPage, FAbort);
+    finally
+      Printer.EndDoc;
+      FPrinting := False;
+    end;
+  end;
 end;
 
 end.

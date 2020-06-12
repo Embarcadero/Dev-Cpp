@@ -29,6 +29,7 @@ type
   TRemoveUnitForm = class(TForm)
     UnitList: TListBox;
     DelBtn: TButton;
+    paBottom: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure UnitListKeyPress(Sender: TObject; var Key: Char);
