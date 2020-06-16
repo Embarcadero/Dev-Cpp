@@ -1,0 +1,84 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{3FC8294C-9FE8-49B9-9FF0-C33C59C18002}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="AbbreviaD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AbbreviaVCLD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AbbreviaVCLDDesign.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AbbreviaFMXDDesign.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\tests\AbbreviaUnitTests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="AbbreviaD">
+        <MSBuild Projects="AbbreviaD.dproj"/>
+    </Target>
+    <Target Name="AbbreviaD:Clean">
+        <MSBuild Projects="AbbreviaD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaD:Make">
+        <MSBuild Projects="AbbreviaD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AbbreviaVCLD">
+        <MSBuild Projects="AbbreviaVCLD.dproj"/>
+    </Target>
+    <Target Name="AbbreviaVCLD:Clean">
+        <MSBuild Projects="AbbreviaVCLD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaVCLD:Make">
+        <MSBuild Projects="AbbreviaVCLD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AbbreviaVCLDDesign">
+        <MSBuild Projects="AbbreviaVCLDDesign.dproj"/>
+    </Target>
+    <Target Name="AbbreviaVCLDDesign:Clean">
+        <MSBuild Projects="AbbreviaVCLDDesign.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaVCLDDesign:Make">
+        <MSBuild Projects="AbbreviaVCLDDesign.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AbbreviaFMXDDesign">
+        <MSBuild Projects="AbbreviaFMXDDesign.dproj"/>
+    </Target>
+    <Target Name="AbbreviaFMXDDesign:Clean">
+        <MSBuild Projects="AbbreviaFMXDDesign.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaFMXDDesign:Make">
+        <MSBuild Projects="AbbreviaFMXDDesign.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AbbreviaUnitTests">
+        <MSBuild Projects="..\..\..\tests\AbbreviaUnitTests.dproj"/>
+    </Target>
+    <Target Name="AbbreviaUnitTests:Clean">
+        <MSBuild Projects="..\..\..\tests\AbbreviaUnitTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaUnitTests:Make">
+        <MSBuild Projects="..\..\..\tests\AbbreviaUnitTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="AbbreviaD;AbbreviaVCLD;AbbreviaVCLDDesign;AbbreviaFMXDDesign;AbbreviaUnitTests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="AbbreviaD:Clean;AbbreviaVCLD:Clean;AbbreviaVCLDDesign:Clean;AbbreviaFMXDDesign:Clean;AbbreviaUnitTests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="AbbreviaD:Make;AbbreviaVCLD:Make;AbbreviaVCLDDesign:Make;AbbreviaFMXDDesign:Make;AbbreviaUnitTests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

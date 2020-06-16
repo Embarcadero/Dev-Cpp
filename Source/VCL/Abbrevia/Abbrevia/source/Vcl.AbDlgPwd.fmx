@@ -1,0 +1,104 @@
+object PassWordDlg: TPassWordDlg
+  Left = 216
+  Top = 443
+  Width = 394
+  Height = 153
+  ActiveControl = Edit1
+  Caption = 'Enter Password'
+  Font.Pitch = fpVariable
+  Position = poScreenCenter
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  object Bevel1: TPanel
+Position.X = 10.000000000000000000
+Position.Y = 10.000000000000000000
+    Width = 351
+    Height = 131
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+  end
+  object Label1: TLabel
+Position.X = 30.000000000000000000
+Position.Y = 20.000000000000000000
+    Width = 49
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Text = 'Password:'
+WordWrap = False
+AutoSize = True
+  end
+  object Label2: TLabel
+Position.X = 30.000000000000000000
+Position.Y = 80.000000000000000000
+    Width = 29
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Text = 'Verify:'
+WordWrap = False
+AutoSize = True
+  end
+  object OKBtn: TButton
+Position.X = 375.000000000000000000
+Position.Y = 10.000000000000000000
+    Width = 94
+    Height = 31
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Text = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 0
+  end
+  object CancelBtn: TButton
+Position.X = 375.000000000000000000
+Position.Y = 48.000000000000000000
+    Width = 94
+    Height = 31
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Cancel = True
+    Text = 'Cancel'
+    ModalResult = 2
+    TabOrder = 1
+  end
+  object Edit1: TEdit
+Position.X = 30.000000000000000000
+Position.Y = 40.000000000000000000
+    Width = 321
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+Password = True
+    TabOrder = 2
+    Text = 'Edit1'
+    OnChange = Edit1Change
+  end
+  object Edit2: TEdit
+Position.X = 30.000000000000000000
+Position.Y = 100.000000000000000000
+    Width = 321
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+Password = True
+    TabOrder = 3
+    Text = 'Edit2'
+    OnChange = Edit2Change
+  end
+end

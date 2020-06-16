@@ -1,0 +1,72 @@
+(* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is TurboPower Abbrevia
+ *
+ * The Initial Developer of the Original Code is
+ * TurboPower Software
+ *
+ * Portions created by the Initial Developer are Copyright (C) 1997-2002
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *
+ * ***** END LICENSE BLOCK ***** *)
+
+package AbbreviaVCLDDesign;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'TurboPack Abbrevia VCL Designtime Delphi package'}
+{$LIBSUFFIX '250'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  designide,
+  AbbreviaVCLD;
+
+contains
+  AbPeCol in '..\..\..\source\AbPeCol.pas',
+  AbDlgDir in '..\..\..\source\AbDlgDir.pas' {DirDlg},
+  Vcl.AbPeFn in '..\..\..\source\Vcl.AbPeFn.pas',
+  Vcl.AbReg in '..\..\..\source\Vcl.AbReg.pas',
+  Vcl.AbPeDir in '..\..\..\source\Vcl.AbPeDir.pas',
+  Vcl.AbPeVer in '..\..\..\source\Vcl.AbPeVer.pas' {AbAboutBox},
+  Vcl.AbDlgPwd in '..\..\..\source\Vcl.AbDlgPwd.pas' {PassWordDlg},
+  Vcl.AbPePass in '..\..\..\source\Vcl.AbPePass.pas';
+
+end.

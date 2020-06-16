@@ -1,0 +1,46 @@
+package AbbreviaFMXDDesign;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'TurboPack Abbrevia FMX Designtime Delphi package'}
+{$LIBSUFFIX '260'}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  AbbreviaD,
+  designide,
+  fmx;
+
+contains
+  FMX.AbPeFn in '..\..\..\source\FMX.AbPeFn.pas',
+  FMX.AbReg in '..\..\..\source\FMX.AbReg.pas',
+  FMX.AbPeDir in '..\..\..\source\FMX.AbPeDir.pas',
+  FMX.AbPeVer in '..\..\..\source\FMX.AbPeVer.pas' {AbAboutBox},
+  FMX.AbDlgPwd in '..\..\..\source\FMX.AbDlgPwd.pas' {PassWordDlg},
+  FMX.AbPePass in '..\..\..\source\FMX.AbPePass.pas';
+
+end.

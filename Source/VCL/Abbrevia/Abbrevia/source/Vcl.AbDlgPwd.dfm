@@ -1,0 +1,114 @@
+object PassWordDlg: TPassWordDlg
+  Left = 216
+  Top = 443
+  Width = 503
+  Height = 210
+  HorzScrollBar.Range = 469
+  VertScrollBar.Range = 141
+  ActiveControl = Edit1
+  Caption = 'Enter Password'
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = 14
+  Font.Name = 'MS Sans Serif'
+  Font.Pitch = fpVariable
+  Font.Style = []
+  OldCreateOrder = True
+  Position = poScreenCenter
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  PixelsPerInch = 120
+  TextHeight = 13
+  object Bevel1: TBevel
+    Left = 10
+    Top = 10
+    Width = 351
+    Height = 131
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Shape = bsFrame
+  end
+  object Label1: TLabel
+    Left = 30
+    Top = 20
+    Width = 49
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = '&Password:'
+    FocusControl = Edit1
+  end
+  object Label2: TLabel
+    Left = 30
+    Top = 80
+    Width = 29
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = '&Verify:'
+    FocusControl = Edit2
+  end
+  object OKBtn: TButton
+    Left = 375
+    Top = 10
+    Width = 94
+    Height = 31
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 0
+  end
+  object CancelBtn: TButton
+    Left = 375
+    Top = 48
+    Width = 94
+    Height = 31
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 1
+  end
+  object Edit1: TEdit
+    Left = 30
+    Top = 40
+    Width = 321
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    PasswordChar = '*'
+    TabOrder = 2
+    Text = 'Edit1'
+    OnChange = Edit1Change
+  end
+  object Edit2: TEdit
+    Left = 30
+    Top = 100
+    Width = 321
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    PasswordChar = '*'
+    TabOrder = 3
+    Text = 'Edit2'
+    OnChange = Edit2Change
+  end
+end
