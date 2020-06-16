@@ -31,8 +31,8 @@ const
 {$ENDIF}
 
   // exe properties
-  DEVCPP = 'Dev-C++';
-  DEVCPP_VERSION = '5.12';
+  DEVCPP = 'Embarcadero Dev-C++';
+  DEVCPP_VERSION = '5.5';
 
   // delimiters
   DEV_INTERNAL_OPEN = '$__DEV_INTERNAL_OPEN';
