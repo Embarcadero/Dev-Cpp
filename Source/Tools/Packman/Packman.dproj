@@ -98,6 +98,7 @@
         <DCC_DcuOutput>.\Lib</DCC_DcuOutput>
         <VerInfo_MinorVer>0</VerInfo_MinorVer>
         <VerInfo_Release>0</VerInfo_Release>
+        <DCC_UnitSearchPath>..\..\VCL\Abbrevia\Abbrevia\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <Icon_MainIcon>Packman_Icon.ico</Icon_MainIcon>

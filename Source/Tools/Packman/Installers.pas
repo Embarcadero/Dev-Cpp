@@ -49,20 +49,9 @@ begin
 end;
 
 procedure Mkdir(const DirName: AnsiString);
-var
-  Dirs: TStringList;
-  i: Integer;
 begin
-  Dirs := TStringList.Create;
-  for i := 1 to Length(DirName) do
-      if DirName[i] = '\' then
-          Dirs.Add(Copy(DirName, 0, i - 1));
-  Dirs.Add(DirName);
-
-  for i := 0 to Dirs.Count - 1 do
-      if not DirectoryExists(Dirs.Strings[i]) then
-          CreateDirectory(PChar(Dirs.Strings[i]), nil);
-  Dirs.Free;
+  if not ForceDirectories(DirName) then
+    raise Exception.Create('error creating folder "'+ DirName + '"');
 end;
 
 function TInstaller.Install: Boolean;

@@ -1,0 +1,247 @@
+(* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is TurboPower Abbrevia
+ *
+ * The Initial Developer of the Original Code is
+ * TurboPower Software
+ *
+ * Portions created by the Initial Developer are Copyright (C) 1997-2002
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Hichem BOUKSANI, John Riche, Roman Kassebaum
+ *
+ * ***** END LICENSE BLOCK ***** *)
+
+{*********************************************************}
+{* Abbrevia: AbResString.pas                             *}
+{*********************************************************}
+{* Abbrevia: Resource strings                            *}
+{*********************************************************}
+unit AbResString;
+
+interface
+
+resourcestring
+  AbErrZipInvalidS = 'Fichier non valide - N''est pas un fichier PKZip';
+  AbZipVersionNeededS = 'Impossible d''extraire le fichier - nouvelle version requise';
+  AbUnknownCompressionMethodS = 'Impossible d''extraire le fichier - méthode de compression non supportée';
+  AbNoExtractionMethodS = 'Impossible d''extraire le fichier - aucun support d''extraction fourni';
+  AbInvalidPasswordS = 'Impossible d''extraire le fichier - Mot de passe incorrect';
+  AbNoInsertionMethodS = 'Imossible d''insérer le fichier - aucun support d''insertion fourni';
+  AbInvalidFactorS = 'Facteur de réduction Invalide';
+  AbDuplicateNameS = 'Impossible d''insérer le fichier - Nom du fichier existe en double';
+  AbUnsupportedCompressionMethodS = 'Impossible d''insérer le fichier - méthode de compression non suppotée';
+  AbUserAbortS = 'Processus abandonné par l''utilisateur';
+  AbArchiveBusyS = 'Archivage en cours - ne peut traiter de nouvelles demandes'; 
+  AbLastDiskRequestS = 'Insérer la dernière disquette du jeu multi-disquettes';
+  AbDiskRequestS = 'Insérer une disquette'; 
+  AbImageRequestS = 'Nom du fichier image';
+  AbBadSpanStreamS = 'Archives multi-disquettes doivent être ouvertes comme fichiers de flux';
+  AbDiskNumRequestS = 'Insérer la disquette %d du jeu multi-disquettes';
+  AbImageNumRequestS = 'Insérer la disquette %d du jeu multi-disquettes';  
+  AbNoOverwriteSpanStreamS = 'Impossible de mettre à jour un jeu multi-disquettes existant';
+  AbNoSpannedSelfExtractS = 'Impossible de créer un fichier auto-extractible à partir d''une archive multi-disquettes';
+  AbBlankDiskS = 'Insérer une disquette vierge';
+  AbStreamFullS = 'Erreur d''écriture du flux';
+  AbNoSuchDirectoryS = 'Dossier inexistant';
+  AbInflateBlockErrorS = 'Décompression du bloc impossible';
+  AbBadStreamTypeS = 'Flux Invalide';
+  AbTruncateErrorS = 'Erreur de troncage du fichier ZIP';
+  AbZipBadCRCS = 'Echec du contrôle CRC';
+  AbZipBadStubS = 'La souche doit être un executable';
+  AbFileNotFoundS = 'Fichier inexistant';
+  AbInvalidLFHS = 'Entrée de l''entête du fichier local invalide'; 
+  AbNoArchiveS = 'L''archive n''existe pas - Nom de fichier non spécifié';
+  AbReadErrorS = 'Erreur de l''ecture de l''archive';
+  AbInvalidIndexS = 'L''indice de l''élément de l''archive est invalide'; 
+  AbInvalidThresholdS = 'Le seuil de la taille de l''archive est invalide'; 
+  AbUnhandledFileTypeS = 'Type d''archive non supporté'; 
+  AbSpanningNotSupportedS = 'Multi-disquette non supporté par ce type d''archive'; 
+  AbLogCreateErrorS = 'Erreur de création du fichier log';
+  AbMoveFileErrorS = 'Erreur de déplacement du fichier %s vers %s';
+  AbFileSizeTooBigS = 'Taille du fichier trop grande pour le type d''archive'; 
+
+  AbNoCabinetDllErrorS = 'Impossible de charger cabinet.dll';
+  AbFCIFileOpenErrorS = 'FCI impossible d''ouvrir le fichier';
+  AbFCIFileReadErrorS = 'FCI impossible de lire le fichier';
+  AbFCIFileWriteErrorS = 'FCI Ecriture impossible sur le fichier';
+  AbFCIFileCloseErrorS = 'FCI erreur de fermeture du fichier';
+  AbFCIFileSeekErrorS = 'FCI Erreur de recherche de fichier'; 
+  AbFCIFileDeleteErrorS = 'FCI erreur de suppression du fichier';
+  AbFCIAddFileErrorS = 'FCI impossible d''ajouter le fichier';
+  AbFCICreateErrorS = 'FCI impossible de créer le contexte';
+  AbFCIFlushCabinetErrorS = 'FCI impossible de vider le cabinet';
+  AbFCIFlushFolderErrorS = 'FCI Impossible de vider le dossier';
+  AbFDICopyErrorS = 'FDI impossible d''enumérer les fichiers'; 
+  AbFDICreateErrorS = 'FDI impossible de créer le contexte';
+  AbInvalidCabTemplateS = 'Modèle du fichier CAB invalide';
+  AbInvalidCabFileS = 'Fichier invalide - n''est pas un fichier cabinet';
+
+  AbZipStored = 'Stocké';
+  AbZipShrunk = 'Compacté'; 
+  AbZipReduced = 'Réduit';
+  AbZipImploded = 'Implosé';
+  AbZipTokenized = 'Divisé en plusieurs parties';
+  AbZipDeflated = 'Déflation'; 
+  AbZipDeflate64 = 'Déflation améliorée';
+  AbZipDCLImploded = 'DCL Implosé'; 
+  AbZipBzip2 = 'Bzip2';
+  AbZipLZMA = 'LZMA';
+  AbZipIBMTerse = 'IBM Terse';
+  AbZipLZ77 = 'IBM LZ77';
+  AbZipJPEG = 'JPEG';
+  AbZipWavPack = 'WavPack';
+  AbZipPPMd = 'PPMd';
+  AbZipUnknown = 'Inconnu (%d)';
+  AbZipBestMethod = 'Meilleure Méthode';
+
+  AbVersionFormatS = 'Version %s';
+  AbCompressedSizeFormatS = 'Taille compressée: %d';
+  AbUncompressedSizeFormatS = 'Taille non compressée: %d';
+  AbCompressionMethodFormatS = 'Méthode de compression: %s';
+  AbCompressionRatioFormatS = 'Ratio de compression: %2.0f%%';
+  AbCRCFormatS = 'CRC: %x';
+  AbReadOnlyS = 'r';
+  AbHiddenS = 'h';
+  AbSystemS = 's';
+  AbArchivedS = 'a';
+  AbEFAFormatS = 'Attribut du fichier externe: %s';
+  AbIFAFormatS = 'Type du fichier: %s';
+  AbTextS = 'Text';
+  AbBinaryS = 'Binaire';
+  AbEncryptionFormatS = 'Crypté: %s';
+  AbEncryptedS = 'Crypté';
+  AbNotEncryptedS = 'Non crypté';
+  AbUnknownS = 'Inconnu';
+  AbTimeStampFormatS = 'Heure: %s';
+  AbMadeByFormatS = 'Version utilisée: %f'; 
+  AbNeededFormatS = 'Version d''extraction: %f'; 
+  AbCommentFormatS = 'Commentaire: %s';
+  AbDefaultExtS = '*.zip';
+  AbFilterS = 'Archives PKZip (*.zip)|*.zip|Archives Auto extractibles (*.exe)|*.exe|Tous les fichiers (*.*)|*.*';
+  AbFileNameTitleS = 'Sélectionner un fichier';
+
+  AbOKS = 'OK';
+  AbCancelS = 'Annuler';
+  AbSelectDirectoryS = 'Sélectionner un Dossier';
+
+  AbEnterPasswordS = 'Saisir Mot de passe';
+  AbPasswordS = '&Mot de passe';
+  AbVerifyS = '&Vérifier';
+
+  AbCabExtS = '*.cab';
+  AbCabFilterS = 'Archives Cabinet (*.cab)|*.CAB|Tous les fichiers (*.*)|*.*';
+  AbLogExtS = '*.txt';
+  AbLogFilterS = 'Fichiers Text (*.txt)|*.TXT|Tous les fichiers (*.*)|*.*';
+  AbExeExtS = '*.exe';
+  AbExeFilterS = 'Fichiers Zip auto-extractibles (*.exe)|*.EXE|Tous les fichiers (*.*)|*.*';
+
+  AbVMSReadTooManyBytesS = VMS: Tentative de l''ecture de trop d''octets [%d]';
+  AbVMSInvalidOriginS = 'VMS: Origine invalide %d, doit être 0, 1, 2';
+  AbVMSErrorOpenSwapS = 'VMS: Impossible d''ouvrir le fichier d''échange %s';
+  AbVMSSeekFailS = 'VMS: Impossible de se déplacer dans le fichier d''échange %s';
+  AbVMSReadFailS = 'VMS: impossible de lire %d octets du fichier d''échange %s';
+  AbVMSWriteFailS = 'VMS: impossible d''écrire %d octets dans le fichier d''échange %s'; 
+  AbVMSWriteTooManyBytesS = 'VMS: tentative d''écrire trop d''octets [%d]';
+
+  AbBBSReadTooManyBytesS = 'BBS: tentative de lecture de trop d''octets [%d]';
+  AbBBSSeekOutsideBufferS = 'BBS: la nouvelle position est en dehors du buffer';
+  AbBBSInvalidOriginS = 'BBS: Valeur d''origine invalide';
+  AbBBSWriteTooManyBytesS = 'BBS: tentative d''écrire de trop d''octets [%d]';
+
+  AbSWSNotEndofStreamS = 'TabSlidingWindowStream.Write: Pas à la fin du flux';
+  AbSWSSeekFailedS = 'TabSlidingWindowStream.bsWriteChunk: échec de recherche';
+  AbSWSWriteFailedS = 'TabSlidingWindowStream.bsWriteChunk: échec d''écriture';
+  AbSWSInvalidOriginS = 'TabSlidingWindowStream.Seek: Origine incorrecte';
+  AbSWSInvalidNewOriginS = 'TabSlidingWindowStream.Seek: Nouvelle position incorrecte';
+
+  AbItemNameHeadingS = 'Nom';
+  AbPackedHeadingS = 'Compressé';
+  AbMethodHeadingS = 'Méthode';
+  AbRatioHeadingS = 'Ratio (%)';
+  AbCRCHeadingS = 'CRC32';
+  AbFileAttrHeadingS = 'Attribut';
+  AbFileFormatHeadingS = 'Format';
+  AbEncryptionHeadingS = 'Crypté';
+  AbTimeStampHeadingS = 'Heure';
+  AbFileSizeHeadingS = 'Taille';
+  AbVersionMadeHeadingS = 'Version Utilisée';
+  AbVersionNeededHeadingS = 'Version nécessaire';
+  AbPathHeadingS = 'Chemin';
+  AbPartialHeadingS = 'Partiel';
+  AbExecutableHeadingS = 'Exécutable';
+
+  AbCabMethod0S = 'Aucune';
+  AbCabMethod1S = 'MSZip';
+
+  AbLtAddS = ' Ajouté ';
+  AbLtDeleteS = ' Supprimé ';
+  AbLtExtractS = ' Extrait ';
+  AbLtFreshenS = ' Rafraichir ';
+  AbLtMoveS = ' Déplacé ';
+  AbLtReplaceS = ' Remplacé ';
+  AbLtStartS = ' Connexion ';
+
+  AbGzipInvalidS                   = 'Gzip Invalide';
+  AbGzipBadCRCS                    = 'Mauvais CRC'; 
+  AbGzipBadFileSizeS               = 'Taille du fichier erronée'; 
+
+  AbTarInvalidS                    = 'Tar invalide';
+  AbTarBadFileNameS                = 'Nom de fichier trop long';
+  AbTarBadLinkNameS                = 'Chemin du lien symbolique trop long';
+  AbTarBadOpS                      = 'Opération non supportée';
+  
+  AbUnhandledEntityS             = 'Entité non prise en charge';
+
+  { pre-defined "operating system" (really more FILE system) identifiers for the
+    Gzip header }
+  AbGzOsFat         = 'Système de fichier FAT (MS-DOS, OS/2, NT/Win32)';
+  AbGzOsAmiga       = 'Amiga';
+  AbGzOsVMS         = 'VMS (ou OpenVMS)';
+  AbGzOsUnix        = 'Unix';
+  AbGzOsVM_CMS      = 'VM/CMS';
+  AbGzOsAtari       = 'Atari TOS';
+  AbGzOsHPFS        = 'Système de fichier HPFS (OS/2, NT)';
+  AbGzOsMacintosh   = 'Macintosh';
+  AbGzOsZ_System    = 'Z-System';
+  AbGzOsCP_M        = 'CP/M';
+  AbGzOsTOPS_20     = 'TOPS-20';
+  AbGzOsNTFS        = 'Système de fichier NTFS (NT)';
+  AbGzOsQDOS        = 'QDOS';
+  AbGzOsAcornRISCOS = 'Acorn RISCOS';
+  AbGzOsVFAT        = 'Système de fichier VFAT (Win95, NT)';
+  AbGzOsMVS         = 'MVS';
+  AbGzOsBeOS        = 'BeOS (BeBox ou PowerMac)';
+  AbGzOsTandem      = 'Tandem/NSK';
+  AbGzOsTHEOS       = 'THEOS';
+  AbGzOsunknown     = 'Inconnu';
+  AbGzOsUndefined   = 'ID non défini par gzip'; 
+
+{!!.03 - Moved from AbCompnd.inc }
+{ Compound File specific error messages }
+resourcestring
+  AbCmpndIndexOutOfBounds   = 'Indice hors limite';
+  AbCmpndBusyUpdating       = 'Fichier composé est occupé par la mise à jour';
+  AbCmpndInvalidFile        = 'Fichier composé invalide';
+  AbCmpndFileNotFound       = 'Fichier/Dossier introuvable';
+  AbCmpndFolderNotEmpty     = 'Dossier n''est pas vide';
+  AbCmpndExceedsMaxFileSize = 'Taille du fichier dépasse la limite maximale'; 
+{!!.03 - End Moved }
+
+
+
+implementation
+
+end.

@@ -1,0 +1,22 @@
+;** MakeCAB split cab directive file
+
+;** Set up split formatting
+.Set CabinetName1=Split.cab		; Filename for first cabinet
+.Set CabinetNameTemplate=Split.c0*	; Split.c02, Split.c03, etc.
+.Set DiskDirectoryTemplate=.
+.Set MaxDiskSize=322560
+
+;** Store files compressed
+.Set Cabinet=On
+.Set Compress=On
+..\source\alice29.txt
+..\source\asyoulik.txt
+..\source\cp.htm
+..\source\fields.c
+..\source\grammar.lsp
+..\source\kennedy.xls
+..\source\lcet10.txt
+..\source\plrabn12.txt
+..\source\ptt5
+..\source\sum
+..\source\xargs.1

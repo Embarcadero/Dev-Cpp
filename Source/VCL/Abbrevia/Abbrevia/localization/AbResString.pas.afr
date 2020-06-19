@@ -1,0 +1,247 @@
+(* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is TurboPower Abbrevia
+ *
+ * The Initial Developer of the Original Code is
+ * TurboPower Software
+ *
+ * Portions created by the Initial Developer are Copyright (C) 1997-2002
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Henri Hakl, Roman Kassebaum
+ *
+ * ***** END LICENSE BLOCK ***** *)
+
+{*********************************************************}
+{* Abbrevia: AbResString.pas                             *}
+{*********************************************************}
+{* Abbrevia: Resource strings, Africaans localization    *}
+{*********************************************************}
+unit AbResString;
+
+interface
+
+resourcestring
+  AbErrZipInvalidS = 'Ongeldig - geen PKZIP bestaan nie';
+  AbZipVersionNeededS = 'Lêer kannie ontpak word nie - kry nuwer weergawe van PKZIP';
+  AbUnknownCompressionMethodS = 'Lêer kannie ontpak word nie - onbekende kompressiemetode'; 
+  AbNoExtractionMethodS = 'Lêer kannie ontpak word nie - geen ondersteunende metode'; 
+  AbInvalidPasswordS = 'Lêer kannie ontpak word nie - ongeldige paswoord'; 
+  AbNoInsertionMethodS = 'Lêer kannie bygevoeg word nie - byvoeging is nie ondersteun nie'; 
+  AbInvalidFactorS = 'Ongeldige reduksiefaktoor'; 
+  AbDuplicateNameS = 'Lêer kannie bygevoeg word nie - tweevoud by name gevind'; 
+  AbUnsupportedCompressionMethodS = 'Lêer kannie bygevoeg word nie - nie ondersteunde kompressiemetode'; 
+  AbUserAbortS = 'Proses is deur gebruiker onderbreek';
+  AbArchiveBusyS = 'Argief is besig - kan nuwe aanvrag nie bewerk nie'; 
+  AbLastDiskRequestS = 'Benodig laaste skyf van gedeelde argief'; 
+  AbDiskRequestS = 'Benodig skyf'; 
+  AbImageRequestS = 'Benodig naam';
+  AbBadSpanStreamS = 'Gedeelde argief moet als bestandsstroom geopen word'; 
+  AbDiskNumRequestS = 'Benodig skyf %d van gedeelde argief'; 
+  AbImageNumRequestS = 'Benodig segment %d van gedeelde argief';
+  AbNoOverwriteSpanStreamS = 'Kannie bestaande gedeelde argief verander nie'; 
+  AbNoSpannedSelfExtractS = 'Kannie selfontpakkende gedeelde argief maak nie'; 
+  AbBlankDiskS = 'Benodig leë skyf'; 
+  AbStreamFullS = 'Stroom skryffout'; 
+  AbNoSuchDirectoryS = 'Gids bestaan nie'; 
+  AbInflateBlockErrorS = 'Kannie blok ontpak nie'; 
+  AbBadStreamTypeS = 'Ongeldige stroom';
+  AbTruncateErrorS = 'Daar bestaan in afknottings fout in zip-lêer'; 
+  AbZipBadCRCS = 'CRC kontroole his misluk'; 
+  AbZipBadStubS = 'Stomp moet uitvoerbaar wees'; 
+  AbFileNotFoundS = 'Lêer nie gevind nie'; 
+  AbInvalidLFHS = 'Ongeldige lokaale lêer obskrif element';
+  AbNoArchiveS = 'Argief bestaan nie'; 
+  AbReadErrorS = 'Leesfout in argief'; 
+  AbInvalidIndexS = 'Ongeldige indeks van argiefelement'; 
+  AbInvalidThresholdS = 'Ongeldige drempel van argiefgroote';
+  AbUnhandledFileTypeS = 'Onbekende argieftype'; 
+  AbSpanningNotSupportedS = 'Argief deeling is nie ondersteun nie'; 
+  AbLogCreateErrorS = 'Fout gedurende protokol skepping'; 
+  AbMoveFileErrorS = 'Fout gedurende verplasing van lêer van %s na %s'; 
+  AbFileSizeTooBigS = 'Lêer is te groot vir argieftype'; 
+
+  AbNoCabinetDllErrorS = 'Kannie lêer cabinet.dll laai nie'; 
+  AbFCIFileOpenErrorS = 'FCI kannie lêer oopmaak nie'; 
+  AbFCIFileReadErrorS = 'FCI kannie lêer lees nie'; 
+  AbFCIFileWriteErrorS = 'FCI kannie lêer skryf nie'; 
+  AbFCIFileCloseErrorS = 'FCI kannie lêer toemaak nie'; 
+  AbFCIFileSeekErrorS = 'FCI kannie posisie verander nie'; 
+  AbFCIFileDeleteErrorS = 'FCI kannie lêer verwyder nie'; 
+  AbFCIAddFileErrorS = 'FCI kannie lêer byvoeg nie'; 
+  AbFCICreateErrorS = 'FCI kannie conteks skep nie'; 
+  AbFCIFlushCabinetErrorS = 'FCI kannie kabinet spoel nie'; 
+  AbFCIFlushFolderErrorS = 'FCI kannie gids spoel nie'; 
+  AbFDICopyErrorS = 'FDI kannie lêer opsom nie'; 
+  AbFDICreateErrorS = 'FDI kannie konteks skep nie'; 
+  AbInvalidCabTemplateS = 'Ongeldige kabinet sjabloon'; 
+  AbInvalidCabFileS = 'Ongeldiger lêer - geen kabinet bestaan nie'; 
+
+  AbZipStored = 'Opgeslagen';
+  AbZipShrunk = 'Gekrimp'; 
+  AbZipReduced = 'Verminder'; 
+  AbZipImploded = 'Geïmplodeerd';
+  AbZipTokenized = 'In simboole gepak'; 
+  AbZipDeflated = 'Gedeflationeerd';
+  AbZipDeflate64 = 'Uitgebreid gedeflationeerd';
+  AbZipDCLImploded = 'DCL geïmplodeerd';
+  AbZipBzip2 = 'Bzip2';
+  AbZipLZMA = 'LZMA';
+  AbZipIBMTerse = 'IBM Terse';
+  AbZipLZ77 = 'IBM LZ77';
+  AbZipJPEG = 'JPEG';
+  AbZipWavPack = 'WavPack';
+  AbZipPPMd = 'PPMd';
+  AbZipUnknown = 'Onbekend (%d)';
+  AbZipBestMethod = 'Beste metode'; 
+
+  AbVersionFormatS = 'Weergawe'; 
+  AbCompressedSizeFormatS = 'Gekomprimeerde groote: %d'; 
+  AbUncompressedSizeFormatS = 'Ongekomprimeerde groote: %d'; 
+  AbCompressionMethodFormatS = 'Kompressie metode: %s'; 
+  AbCompressionRatioFormatS = 'Kompressieverhouding: %2.0f%%'; 
+  AbCRCFormatS = 'CRC: %x';
+  AbReadOnlyS = 'r';
+  AbHiddenS = 'h';
+  AbSystemS = 's';
+  AbArchivedS = 'a';
+  AbEFAFormatS = 'Eksterne lêerattribute: %s';
+  AbIFAFormatS = 'Lêertype'; 
+  AbTextS = 'Teks'; 
+  AbBinaryS = 'Binêre'; 
+  AbEncryptionFormatS = 'Versleuteling: %s';
+  AbEncryptedS = 'Versleuteld';
+  AbNotEncryptedS = 'Nie versleuteld nie'; 
+  AbUnknownS = 'Onbekend';
+  AbTimeStampFormatS = 'Tydstempel: %s'; 
+  AbMadeByFormatS = 'Gemaak met weergawe: %f'; 
+  AbNeededFormatS = 'Weergawe benodig vir ontpakking: %f'; 
+  AbCommentFormatS = 'Opmerking: %s';
+  AbDefaultExtS = '*.zip';
+  AbFilterS = 'PKZIP argief (*.zip)|*.zip|Selfontpakkende Argief (*.exe)|*.exe|Alle Lêers (*.*)|*.*'; 
+  AbFileNameTitleS = 'Kies lêernaam';
+
+  AbOKS = 'OK';
+  AbCancelS = 'Verlaat'; 
+  AbSelectDirectoryS = 'Kies lêer'; 
+
+  AbEnterPasswordS = 'Voeg paswoord in'; 
+  AbPasswordS = '&Paswoord';
+  AbVerifyS = '&Verifiseer'; 
+
+  AbCabExtS = '*.cab';
+  AbCabFilterS = 'Kabinetsargiewe (*.cab)|*.CAB|Alle Lêers (*.*)|*.*'; 
+  AbLogExtS = '*.txt';
+  AbLogFilterS = 'Tekslêers (*.cab)|*.CAB|Alle Lêers (*.*)|*.*'; 
+  AbExeExtS = '*.exe';
+  AbExeFilterS = 'Selfontpakkende Zip Lêers (*.cab)|*.CAB|Alle Lêers (*.*)|*.*';
+
+  AbVMSReadTooManyBytesS = 'VMS: Te veel byte gelees';
+  AbVMSInvalidOriginS = 'VMS: Ongeldige oorsprong %d, moet 0, 1 or 2 wees';
+  AbVMSErrorOpenSwapS = 'VMS: Kannie wissellêer oopmaak nie'; 
+  AbVMSSeekFailS = 'VMS: Kannie wissellêer posisie verander nie'; 
+  AbVMSReadFailS = 'VMS: Kan %d byte in wissellêer nie lees nie'; 
+  AbVMSWriteFailS = 'VMS: Kan %d byte in wissellêer nie skryf nie'; 
+  AbVMSWriteTooManyBytesS = 'VMS: Aanvraag om te veel byte [%d] te skryf'; 
+
+  AbBBSReadTooManyBytesS = 'BBS: Aanvraag om te veel byte [%d] te lees'; 
+  AbBBSSeekOutsideBufferS = 'BBS: Nuwe posisie is buite die buffer'; 
+  AbBBSInvalidOriginS = 'BBS: Ongeldige oorsprongswaarde'; 
+  AbBBSWriteTooManyBytesS = 'BBS: Aanvrag om te veel byte [%d] te skryf'; 
+
+  AbSWSNotEndofStreamS = 'TabSlidingWindowStream.Write: Nie by stroom einde nie'; 
+  AbSWSSeekFailedS = 'TabSlidingWindowStream.bsWriteChunk: Posisioneering misluk'; 
+  AbSWSWriteFailedS = 'TabSlidingWindowStream.bsWriteCunk: Skryf misluk'; 
+  AbSWSInvalidOriginS = 'TabSlidingWindowStream.Seek: Ongeldige oorsprong'; 
+  AbSWSInvalidNewOriginS = 'TabSlidingWindowStream.Seek: Ongeldige nuwe posisie'; 
+
+  AbItemNameHeadingS = 'Naam';
+  AbPackedHeadingS = 'Gepak'; 
+  AbMethodHeadingS = 'Metode';
+  AbRatioHeadingS ='Besparing (%)';
+  AbCRCHeadingS = 'CRC32';
+  AbFileAttrHeadingS = 'Attribuut';
+  AbFileFormatHeadingS = 'Formaat';
+  AbEncryptionHeadingS = 'Versleuteld';
+  AbTimeStampHeadingS = 'Tydstempel';
+  AbFileSizeHeadingS = 'Groote'; 
+  AbVersionMadeHeadingS = 'Gebruikte weergawe'; 
+  AbVersionNeededHeadingS = 'Benodigde weergawe'; 
+  AbPathHeadingS = 'Pad';
+  AbPartialHeadingS = 'Partieel';
+  AbExecutableHeadingS = 'Uitvoerbaar';
+
+  AbCabMethod0S = 'Geen';
+  AbCabMethod1S = 'MSZip';
+
+  AbLtAddS = ' toegevoegd ';
+  AbLtDeleteS = ' gewist ';
+  AbLtExtractS = ' ontpakt ';
+  AbLtFreshenS = ' geaktualiseerd '; 
+  AbLtMoveS = ' verplaas '; 
+  AbLtReplaceS = ' vervang '; 
+  AbLtStartS = ' geprotocoleerd ';
+
+  AbGzipInvalidS                   = 'Ongeldige Gzip';
+  AbGzipBadCRCS                    = 'Ongeldige CRC';
+  AbGzipBadFileSizeS               = 'Ongeldige bestaandsgroote'; 
+
+  AbTarInvalidS                    = 'Tar ongeldig';
+  AbTarBadFileNameS                = 'Lêer naam te lang';
+  AbTarBadLinkNameS                = 'Skakel naam te lang';
+  AbTarBadOpS                      = 'Operasie nie ondersteun nie';
+  
+  AbUnhandledEntityS               = 'Nie behandelde entiteit'; 
+
+  { pre-defined "operating system" (really more FILE system) identifiers for the
+    Gzip header }
+  AbGzOsFat         = 'FAT Lêersisteem (MS-DOS, OS/2, NT/Win32)';
+  AbGzOsAmiga       = 'Amiga';
+  AbGzOsVMS         = 'VMS (of OpenVMS)';
+  AbGzOsUnix        = 'Unix';
+  AbGzOsVM_CMS      = 'VM/CMS';
+  AbGzOsAtari       = 'Atari TOS';
+  AbGzOsHPFS        = 'HPFS Lêersisteem (OS/2, NT)';
+  AbGzOsMacintosh   = 'Macintosh';
+  AbGzOsZ_System    = 'Z-System';
+  AbGzOsCP_M        = 'CP/M';
+  AbGzOsTOPS_20     = 'TOPS-20';
+  AbGzOsNTFS        = 'NTFS Lêersisteem (NT)';
+  AbGzOsQDOS        = 'QDOS';
+  AbGzOsAcornRISCOS = 'Acorn RISCOS';
+  AbGzOsVFAT        = 'VFAT Lêersisteem (Win95, NT)';
+  AbGzOsMVS         = 'MVS';
+  AbGzOsBeOS        = 'BeOS (BeBox of PowerMac)';
+  AbGzOsTandem      = 'Tandem/NSK';
+  AbGzOsTHEOS       = 'THEOS';
+  AbGzOsunknown     = 'onbekend';
+  AbGzOsUndefined   = 'ID is Gzip nie bekend nie';
+
+{!!.03 - Moved from AbCompnd.inc }
+{ Compound File specific error messages }
+resourcestring
+  AbCmpndIndexOutOfBounds   = 'Indeks buite toegelate bereik'; 
+  AbCmpndBusyUpdating       = 'Saamgestelde lêer word geaktualiseer'; 
+  AbCmpndInvalidFile        = 'Ongeldige saamgestelde lêer'; 
+  AbCmpndFileNotFound       = 'Lêer/gids nie gevind nie'; 
+  AbCmpndFolderNotEmpty     = 'Gids nie leeg nie'; 
+  AbCmpndExceedsMaxFileSize = 'Lêergroote oorskryf toegelate maksimum'; 
+{!!.03 - End Moved }
+
+
+
+implementation
+
+end.

@@ -1,0 +1,249 @@
+(* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is TurboPower Abbrevia
+ *
+ * The Initial Developer of the Original Code is
+ * TurboPower Software
+ *
+ * Portions created by the Initial Developer are Copyright (C) 1997-2002
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Durali Kiraz 2014-05-06
+ *
+ * ***** END LICENSE BLOCK ***** *)
+
+{*********************************************************}
+{* Abbrevia: AbResString.pas                             *}
+{*********************************************************}
+{* Abbrevia: Resource strings, Turkish localization      *}
+{*********************************************************}
+{* Encoded in Code Page 1252 (Windows Latin 5 Turkish)   *}
+{*********************************************************}
+unit AbResString;
+
+{$I AbDefine.inc}
+
+interface
+
+resourcestring
+  AbErrZipInvalidS = 'Geçersiz dosya - bir PKZip dosyasý deðil';
+  AbZipVersionNeededS = 'Dosya Ayýklanamýyor - daha yeni bir sürüm gerekli.';
+  AbUnknownCompressionMethodS = 'Dosya Ayýklanamýyor - desteklenmeyen sýkýþtýrma yöntemi';
+  AbNoExtractionMethodS = 'Dosya Ayýklanamýyor - saðlanan bir çýkarma desteði yok';
+  AbInvalidPasswordS = 'Dosya Ayýklanamýyor - geçersiz þifre';
+  AbNoInsertionMethodS = 'Dosya Eklenemiyor - saðlanan bir ekleme desteði yok';
+  AbInvalidFactorS = 'Geçersiz Faktörü azaltýn';
+  AbDuplicateNameS = 'Dosya Eklenemiyor - saklanan dosya adý çift';
+  AbUnsupportedCompressionMethodS = 'Dosya Eklenemiyor - desteklenmeyen sýkýþtýrma yöntemi';
+  AbUserAbortS = 'Süreç kullanýcý tarafýndan iptal edildi';
+  AbArchiveBusyS = 'Arþiv meþgul - yeni istekleri iþleyemiyor';
+  AbLastDiskRequestS = 'Yayýlmýþ disk setinde son diski yerleþtirin';
+  AbDiskRequestS = 'Disket takýn';
+  AbImageRequestS = 'Kalýp dosya adý';
+  AbBadSpanStreamS = 'Yayýlmýþ arþivler dosya akýþkanlarý gibi açýlmalýdýr';
+  AbDiskNumRequestS = 'Yayýlmýþ disk setinin %d numaralý diskini ekleyin';
+  AbImageNumRequestS = 'Yayýlmýþ dosya setinin aralýklý %d numaralý dosyasýný ekleyin ';
+  AbNoOverwriteSpanStreamS = 'Varolan Yayýlmýþ disk seti güncelleme yapýlamaz';
+  AbNoSpannedSelfExtractS = 'Bir kendi kendini ayýklayan(exe dosyasý) disk seti yapýlamaz';
+  AbBlankDiskS = 'Boþ bir disket ekle';
+  AbStreamFullS = 'Akýþkan yazma hatasý';
+  AbNoSuchDirectoryS = 'Klasör mevcut deðil';
+  AbInflateBlockErrorS = 'Bloðu Þiþiremezsin (connot inflate)';
+  AbBadStreamTypeS = 'Geçersiz Akýþkan';
+  AbTruncateErrorS = 'Zip dosyasý hata ile kesiliyor';
+  AbZipBadCRCS = 'Baþarýsýz CRC kontrolü';
+  AbZipBadStubS = 'Stub bir çalýþtýrýlabilir(exe) olmalý';
+  AbFileNotFoundS = 'Dosya bulunamadý';
+  AbInvalidLFHS = 'Geçersiz Yerel Dosya Baþlýðý giriþ';
+  AbNoArchiveS = 'Arþiv mevcut deðil - Dosyaadý boþ';
+  AbReadErrorS = 'Okuma hatasý arþivi';
+  AbInvalidIndexS = 'Geçersiz arþiv Öðe Endeksi';
+  AbInvalidThresholdS = 'Geçersiz arþiv boyutu eþiði';
+  AbUnhandledFileTypeS = 'Ýþlenmeyen Arþiv Türü';
+  AbSpanningNotSupportedS = 'Yayýlma bu Arþiv türü tarafýndan desteklenmiyor ';
+  AbLogCreateErrorS = 'Günlük Dosyasý oluþtururken hata';
+  AbMoveFileErrorS = '%s kaynaðýndan %s hedefine Dosya Taþýmada Hata';
+  AbFileSizeTooBigS = 'Dosya boyutu arþiv türü için çok büyük';
+
+  AbNoCabinetDllErrorS = 'cabinet.dll yüklenemedi';
+  AbFCIFileOpenErrorS = 'FCI dosya açýlamadý';
+  AbFCIFileReadErrorS = 'FCI dosya okunmadý';
+  AbFCIFileWriteErrorS = 'FCI dosya yazýlamadý';
+  AbFCIFileCloseErrorS = 'FCI dosya kapatmada hata';
+  AbFCIFileSeekErrorS = 'FCI dosya konumlanma hatasý';
+  AbFCIFileDeleteErrorS = 'FCI dosya silme hatasý';
+  AbFCIAddFileErrorS = 'FCI dosya eklenemedi';
+  AbFCICreateErrorS = 'FCI içeriði oluþturulamýyor';
+  AbFCIFlushCabinetErrorS = 'FCI kabini flush yapýlamýyor';
+  AbFCIFlushFolderErrorS = 'FCI klasörü flush yapýlamýyor';
+  AbFDICopyErrorS = 'FDI dosyalarý numaralandýrma yapýlamýyor';
+  AbFDICreateErrorS = 'FDI içeriði oluþturulamýyor';
+  AbInvalidCabTemplateS = 'Geçersiz cab dosya þablonu';
+  AbInvalidCabFileS = 'Geçersiz Dosya - bir kabin dosyasý deðil';
+
+  AbZipStored = 'Depolandý';
+  AbZipShrunk = 'Büzülmüþ';
+  AbZipReduced = 'Azaltýlmýþ';
+  AbZipImploded = 'Ýçine Çöktü';
+  AbZipTokenized = 'Simgeleþtirilmiþ';
+  AbZipDeflated = 'Ýnik';
+  AbZipDeflate64 = 'Geliþtirilmiþ Ýniklik';
+  AbZipDCLImploded = 'DCL Büzülmüþ';
+  AbZipBzip2 = 'Bzip2';
+  AbZipLZMA = 'LZMA';
+  AbZipIBMTerse = 'IBM Terse';
+  AbZipLZ77 = 'IBM LZ77';
+  AbZipJPEG = 'JPEG';
+  AbZipWavPack = 'WavPack';
+  AbZipPPMd = 'PPMd';
+  AbZipUnknown = 'Bilinmeyen (%d)';
+  AbZipBestMethod = 'En Ýyi Yöntem';
+
+  AbVersionFormatS = 'Sürüm %s';
+  AbCompressedSizeFormatS = 'Sýkýþtýrýlmýþ uzunluk: %d';
+  AbUncompressedSizeFormatS = 'Sýkýþtýrýlmamýþ uzunluk: %d';
+  AbCompressionMethodFormatS = 'Sýkýþtýrma Yöntemi: %s';
+  AbCompressionRatioFormatS = 'Sýkýþtýrma Oraný: %2.0f%%';
+  AbCRCFormatS = 'CRC: %x';
+  AbReadOnlyS = 'r';
+  AbHiddenS = 'h';
+  AbSystemS = 's';
+  AbArchivedS = 'a';
+  AbEFAFormatS = 'Harici Dosya Özellikleri: %s';
+  AbIFAFormatS = 'Dosya Türü: %s';
+  AbTextS = 'Text';
+  AbBinaryS = 'Binary';
+  AbEncryptionFormatS = 'Þifreleme: %s';
+  AbEncryptedS = 'Þifrelenmiþ';
+  AbNotEncryptedS = 'Þifreli Deðil';
+  AbUnknownS = 'Bilinmiyor';
+  AbTimeStampFormatS = 'Zaman Damgasý: %s';
+  AbMadeByFormatS = 'Sürümü Yapan: %f';
+  AbNeededFormatS = 'Ayýklamaya Gerekli Sürüm: %f';
+  AbCommentFormatS = 'Açýklama: %s';
+  AbDefaultExtS = '*.zip';
+  AbFilterS = 'PKZip Arþivleri (*.zip)|*.zip|Kendinden Ayýklanabilen Arþivler (*.exe)|*.exe|Tüm Dosyalar (*.*)|*.*';
+  AbFileNameTitleS = 'Dosya Adý Seç';
+
+  AbOKS = 'Tamam';
+  AbCancelS = 'Vazgeç';
+  AbSelectDirectoryS = 'Klasör Seç';
+
+  AbEnterPasswordS = 'Þifre Gir';
+  AbPasswordS = 'Þi&fre';
+  AbVerifyS = '&Doðrula';
+
+  AbCabExtS = '*.cab';
+  AbCabFilterS = 'Kabin Arþivleri (*.cab)|*.CAB|Tüm Dosyalar (*.*)|*.*';
+  AbLogExtS = '*.txt';
+  AbLogFilterS = 'Metin Dosyalarý (*.txt)|*.TXT|Tüm Dosyalar (*.*)|*.*';
+  AbExeExtS = '*.exe';
+  AbExeFilterS = 'Kendinden-Ayýklanabilen Zip Dosyalar (*.exe)|*.EXE|Tüm Dosyalar (*.*)|*.*';
+
+  AbVMSReadTooManyBytesS = 'VMS: çok bayt okuma isteði [%d]';
+  AbVMSInvalidOriginS = 'VMS: %d kökeni geçersiz. Geçerli deðerler 0, 1, 2 olmalýdýr';
+  AbVMSErrorOpenSwapS = 'VMS: %s takas dosyasý açýlamýyor';
+  AbVMSSeekFailS = 'VMS: %s takas dosyasýnda arama baþarýsýz oldu';
+  AbVMSReadFailS = 'VMS: %d bayt %s takas dosyasýndan okunurken baþarýsýz oldu';
+  AbVMSWriteFailS = 'VMS: %d bayt %s takas dosyasýndan yazýlýrken baþarýsýz oldu';
+  AbVMSWriteTooManyBytesS = 'VMS: çok fazla bayt yazma isteði [%d]';
+
+  AbBBSReadTooManyBytesS = 'BBS: çok fazla bayt okuma isteði [%d]';
+  AbBBSSeekOutsideBufferS = 'BBS: Yeni konum arabellek dýþýndadýr';
+  AbBBSInvalidOriginS = 'BBS: Geçersiz Köken deðeri';
+  AbBBSWriteTooManyBytesS = 'BBS: çok fazla bayt yazma isteði [%d]';
+
+  AbSWSNotEndofStreamS = 'TabSlidingWindowStream.Write: Akýþýn sonunda deðil';
+  AbSWSSeekFailedS = 'TabSlidingWindowStream.bsWriteChunk: Arama baþarýsýz oldu';
+  AbSWSWriteFailedS = 'TabSlidingWindowStream.bsWriteChunk: Yazma baþarýsýz oldu';
+  AbSWSInvalidOriginS = 'TabSlidingWindowStream.Seek: Geçersiz köken';
+  AbSWSInvalidNewOriginS = 'TabSlidingWindowStream.Seek: Geçersiz yeni konum';
+
+  AbItemNameHeadingS = 'Adý';
+  AbPackedHeadingS = 'Paketli';
+  AbMethodHeadingS = 'Yöntemi';
+  AbRatioHeadingS = 'Oraný (%)';
+  AbCRCHeadingS = 'CRC32';
+  AbFileAttrHeadingS = 'Nitelikler';
+  AbFileFormatHeadingS = 'Biçim';
+  AbEncryptionHeadingS = 'Þifrelenmiþ';
+  AbTimeStampHeadingS = 'Zaman Damgasý';
+  AbFileSizeHeadingS = 'Uzunluk';
+  AbVersionMadeHeadingS = 'Sürüm Yapýmý';
+  AbVersionNeededHeadingS = 'Sürüm Gerekli';
+  AbPathHeadingS = 'Yolu';
+  AbPartialHeadingS = 'Kýsmi';
+  AbExecutableHeadingS = 'Çalýþtýrýlabilir';
+  AbFileTypeHeadingS = 'Türü';
+  AbLastModifiedHeadingS = 'Deðiþtirilmiþ';
+
+  AbCabMethod0S = 'None';
+  AbCabMethod1S = 'MSZip';
+
+  AbLtAddS = ' eklendi ';
+  AbLtDeleteS = ' silindi ';
+  AbLtExtractS = ' ayýklandý ';
+  AbLtFreshenS = ' tazelendi ';
+  AbLtMoveS = ' taþýndý ';
+  AbLtReplaceS = ' deðiþtirildi ';
+  AbLtStartS = ' günlüklendi ';
+
+  AbGzipInvalidS = 'Geçersiz Gzip';
+  AbGzipBadCRCS = 'Bozuk CRC';
+  AbGzipBadFileSizeS = 'Bozuk Dosya Uzunluðu';
+
+  AbTarInvalidS = 'Geçersiz Tar';
+  AbTarBadFileNameS = 'Dosya adý çok uzun';
+  AbTarBadLinkNameS = 'Çok uzun sembolik baðlantý yolu';
+  AbTarBadOpS = 'Desteklenmeyen Operasyon';
+
+  AbUnhandledEntityS = 'Ýþlenmeyen Varlýk';
+
+  { pre-defined "operating system" (really more FILE system) identifiers for the
+    Gzip header }
+  AbGzOsFat = 'FAT Dosya Sistemi (MS-DOS, OS/2, NT/Win32)';
+  AbGzOsAmiga = 'Amiga';
+  AbGzOsVMS = 'VMS (veya OpenVMS)';
+  AbGzOsUnix = 'Unix';
+  AbGzOsVM_CMS = 'VM/CMS';
+  AbGzOsAtari = 'Atari TOS';
+  AbGzOsHPFS = 'HPFS Dosya Sistemi (OS/2, NT)';
+  AbGzOsMacintosh = 'Macintosh';
+  AbGzOsZ_System = 'Z-System';
+  AbGzOsCP_M = 'CP/M';
+  AbGzOsTOPS_20 = 'TOPS-20';
+  AbGzOsNTFS = 'NTFS Dosya Sistemi (NT)';
+  AbGzOsQDOS = 'QDOS';
+  AbGzOsAcornRISCOS = 'Acorn RISCOS';
+  AbGzOsVFAT = 'VFAT Dosya Sistemi (Win95, NT)';
+  AbGzOsMVS = 'MVS';
+  AbGzOsBeOS = 'BeOS (BeBox veya PowerMac)';
+  AbGzOsTandem = 'Tandem/NSK';
+  AbGzOsTHEOS = 'THEOS';
+  AbGzOsunknown = 'bilinmeyen';
+  AbGzOsUndefined = 'gzip tarafýndan tanýmsýz ID';
+
+{ Compound File specific error messages }
+resourcestring
+  AbCmpndIndexOutOfBounds = 'Endeks aralýðýn dýþýndadýr';
+  AbCmpndBusyUpdating = 'Bileþik dosya güncelleme ile meþgul';
+  AbCmpndInvalidFile = 'Geçersiz bileþik dosya';
+  AbCmpndFileNotFound = 'Dosya/Klasör bulunamadý';
+  AbCmpndFolderNotEmpty = 'Klasör boþ deðil';
+  AbCmpndExceedsMaxFileSize = 'Dosya boyutu izin verilen Azami deðeri aþýyor';
+
+implementation
+
+end.

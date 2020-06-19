@@ -1,0 +1,112 @@
+(* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is TurboPower Abbrevia
+ *
+ * The Initial Developer of the Original Code is
+ * TurboPower Software
+ *
+ * Portions created by the Initial Developer are Copyright (C) 1997-2002
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *
+ * ***** END LICENSE BLOCK ***** *)
+
+package AbbreviaD;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'TurboPack Abbrevia Runtime Delphi package'}
+{$LIBSUFFIX '260'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl;
+
+contains
+  AbArcTyp in '..\..\..\source\AbArcTyp.pas',
+  AbBase in '..\..\..\source\AbBase.pas',
+  AbBitBkt in '..\..\..\source\AbBitBkt.pas',
+  AbBrowse in '..\..\..\source\AbBrowse.pas',
+  AbBzip2 in '..\..\..\source\AbBzip2.pas',
+  AbBzip2Typ in '..\..\..\source\AbBzip2Typ.pas',
+  AbCabExt in '..\..\..\source\AbCabExt.pas',
+  AbCabKit in '..\..\..\source\AbCabKit.pas',
+  AbCabMak in '..\..\..\source\AbCabMak.pas',
+  AbCabTyp in '..\..\..\source\AbCabTyp.pas',
+  AbCBrows in '..\..\..\source\AbCBrows.pas',
+  AbCharset in '..\..\..\source\AbCharset.pas',
+  AbConst in '..\..\..\source\AbConst.pas',
+  AbCrtl in '..\..\..\source\AbCrtl.pas',
+  AbDfBase in '..\..\..\source\AbDfBase.pas',
+  AbDfCryS in '..\..\..\source\AbDfCryS.pas',
+  AbDfDec in '..\..\..\source\AbDfDec.pas',
+  AbDfEnc in '..\..\..\source\AbDfEnc.pas',
+  AbDfHufD in '..\..\..\source\AbDfHufD.pas',
+  AbDfInW in '..\..\..\source\AbDfInW.pas',
+  AbDfOutW in '..\..\..\source\AbDfOutW.pas',
+  AbDfPkMg in '..\..\..\source\AbDfPkMg.pas',
+  AbDfStrm in '..\..\..\source\AbDfStrm.pas',
+  AbDfXlat in '..\..\..\source\AbDfXlat.pas',
+  AbExcept in '..\..\..\source\AbExcept.pas',
+  AbFciFdi in '..\..\..\source\AbFciFdi.pas',
+  AbGzTyp in '..\..\..\source\AbGzTyp.pas',
+  AbLzma in '..\..\..\source\AbLzma.pas',
+  AbPPMd in '..\..\..\source\AbPPMd.pas',
+  AbResString in '..\..\..\source\AbResString.pas',
+  AbSelfEx in '..\..\..\source\AbSelfEx.pas',
+  AbSpanSt in '..\..\..\source\AbSpanSt.pas',
+  AbSWStm in '..\..\..\source\AbSWStm.pas',
+  AbTarTyp in '..\..\..\source\AbTarTyp.pas',
+  AbUnzOutStm in '..\..\..\source\AbUnzOutStm.pas',
+  AbUnzper in '..\..\..\source\AbUnzper.pas',
+  AbUnzPrc in '..\..\..\source\AbUnzPrc.pas',
+  AbUtils in '..\..\..\source\AbUtils.pas',
+  AbVMStrm in '..\..\..\source\AbVMStrm.pas',
+  AbWavPack in '..\..\..\source\AbWavPack.pas',
+  AbZBrows in '..\..\..\source\AbZBrows.pas',
+  AbZipExt in '..\..\..\source\AbZipExt.pas',
+  AbZipKit in '..\..\..\source\AbZipKit.pas',
+  AbZipper in '..\..\..\source\AbZipper.pas',
+  AbZipPrc in '..\..\..\source\AbZipPrc.pas',
+  AbZipTyp in '..\..\..\source\AbZipTyp.pas',
+  AbZLTyp in '..\..\..\source\AbZLTyp.pas',
+  AbLZMAStream in '..\..\..\source\AbLZMAStream.pas',
+  AbBytes in '..\..\..\source\AbBytes.pas';
+
+end.

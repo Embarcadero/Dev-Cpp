@@ -1,0 +1,118 @@
+object PassWordDlg: TPassWordDlg
+  Left = 216
+  Top = 443
+  ActiveControl = Edit1
+  Caption = 'Enter Password'
+  ClientHeight = 183
+  ClientWidth = 510
+  Position = ScreenCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop, iPhone, iPad]
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  Left = 216
+  Top = 443
+  DesignerMasterStyle = 0
+  object Bevel1: TPanel
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Position.X = 10.000000000000000000
+    Position.Y = 10.000000000000000000
+    Size.Width = 351.000000000000000000
+    Size.Height = 131.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Label1: TLabel
+    AutoSize = True
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Position.X = 30.000000000000000000
+    Position.Y = 20.000000000000000000
+    Size.Width = 56.000000000000000000
+    Size.Height = 16.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.WordWrap = False
+    Text = 'Password:'
+  end
+  object Label2: TLabel
+    AutoSize = True
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Position.X = 30.000000000000000000
+    Position.Y = 80.000000000000000000
+    Size.Width = 37.000000000000000000
+    Size.Height = 16.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.WordWrap = False
+    Text = 'Verify:'
+  end
+  object OKBtn: TButton
+    Default = True
+    ModalResult = 1
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Position.X = 375.000000000000000000
+    Position.Y = 10.000000000000000000
+    Size.Width = 94.000000000000000000
+    Size.Height = 31.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'OK'
+  end
+  object CancelBtn: TButton
+    Cancel = True
+    ModalResult = 2
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Position.X = 375.000000000000000000
+    Position.Y = 48.000000000000000000
+    Size.Width = 94.000000000000000000
+    Size.Height = 31.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Cancel'
+  end
+  object Edit1: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 2
+    Password = True
+    Text = 'Edit1'
+    Position.X = 30.000000000000000000
+    Position.Y = 40.000000000000000000
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Size.Width = 321.000000000000000000
+    Size.Height = 21.000000000000000000
+    Size.PlatformDefault = False
+    OnChange = Edit1Change
+  end
+  object Edit2: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 3
+    Password = True
+    Text = 'Edit2'
+    Position.X = 30.000000000000000000
+    Position.Y = 100.000000000000000000
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Size.Width = 321.000000000000000000
+    Size.Height = 21.000000000000000000
+    Size.PlatformDefault = False
+    OnChange = Edit2Change
+  end
+end

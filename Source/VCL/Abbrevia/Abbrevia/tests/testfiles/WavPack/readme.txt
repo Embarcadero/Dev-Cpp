@@ -1,0 +1,1 @@
+This directory needs the WavPack test data available from SourceForge's file download section.  Get Test Data\Abbrevia_WavPack_test_data.zip and extract it here.  If everything is correct there will be a wavpack.zip and a "source" directory with 29 .wav files.
