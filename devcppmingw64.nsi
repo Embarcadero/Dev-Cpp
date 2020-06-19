@@ -3,9 +3,9 @@
 
 !define COMPILERNAME "TDM-GCC 4.9.2"
 !define COMPILERFOLDER "MinGW64"
-!define DEVCPP_VERSION "5.11"
-!define FINALNAME "Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
-!define DISPLAY_NAME "Dev-C++ ${DEVCPP_VERSION}"
+!define DEVCPP_VERSION "5.5"
+!define FINALNAME "Embarcadero Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
+!define DISPLAY_NAME "Embarcadero Dev-C++ ${DEVCPP_VERSION}"
 
 !include "MUI2.nsh"
 
@@ -17,7 +17,7 @@ OutFile "${FINALNAME}"
 Caption "${DISPLAY_NAME}"
 
 LicenseData "copying.txt"
-InstallDir $PROGRAMFILES\Dev-Cpp
+InstallDir $PROGRAMFILES\Embarcadero\Dev-Cpp
 
 ####################################################################
 # Interface Settings
@@ -87,19 +87,21 @@ InstType "Safe";3
 ####################################################################
 # Files, by option section
 
-Section "Dev-C++ program files (required)" SectionMain
+Section "Embarcadero Dev-C++ program files (required)" SectionMain
   SectionIn 1 2 3 RO
   
   SetOutPath $INSTDIR
 
   ; Allways create an uninstaller
   WriteUninstaller "$INSTDIR\uninstall.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayName" "Dev-C++"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "UninstallString" "$INSTDIR\uninstall.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayVersion" "${DEVCPP_VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "DisplayIcon" "$INSTDIR\devcpp.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++" "Publisher" "Bloodshed Software"
   
+  # registering into windows reg (regedit)
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayName" "Dev-C++"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayVersion" "${DEVCPP_VERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayIcon" "$INSTDIR\devcpp.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "Publisher" "Embarcadero Tecnologies Inc."
+
   ; Write required files
   File "devcpp.exe"
   File "devcppPortable.exe"
@@ -120,6 +122,8 @@ Section "Dev-C++ program files (required)" SectionMain
   File /nonfatal /r "Help\*"
   SetOutPath $INSTDIR\AStyle
   File /nonfatal /r "AStyle\*"
+  
+  #CreateDirectory $APPDATA\Embarcadero\Dev-Cpp
 SectionEnd
 
 Section "Icon files" SectionIcons
@@ -287,10 +291,10 @@ Section "Create Start Menu shortcuts" SectionMenuLaunch
   ; always use all user start menu, normal users can delete these
   SetShellVarContext all 
   StrCpy $0 $SMPROGRAMS ; start menu Programs folder
-  CreateDirectory "$0\Bloodshed Dev-C++"
-  CreateShortCut "$0\Bloodshed Dev-C++\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
-  CreateShortCut "$0\Bloodshed Dev-C++\License.lnk" "$INSTDIR\copying.txt"
-  CreateShortCut "$0\Bloodshed Dev-C++\Uninstall Dev-C++.lnk" "$INSTDIR\uninstall.exe"
+  CreateDirectory "$0\Embarcadero Dev-C++"
+  CreateShortCut "$0\Embarcadero Dev-C++\Dev-C++.lnk" "$INSTDIR\devcpp.exe" "$INSTDIR\devcpp.ico"
+  CreateShortCut "$0\Embarcadero Dev-C++\License.lnk" "$INSTDIR\copying.txt"
+  CreateShortCut "$0\Embarcadero Dev-C++\Uninstall Dev-C++.lnk" "$INSTDIR\uninstall.exe" "$INSTDIR\devcpp.ico"
 SectionEnd
 
 Section "Create Desktop shortcut" SectionDesktopLaunch
@@ -298,7 +302,7 @@ Section "Create Desktop shortcut" SectionDesktopLaunch
   
   ; always use current user desktop, normal users can't delete all users' shortcuts
   SetShellVarContext current
-  CreateShortCut "$DESKTOP\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
+  CreateShortCut "$DESKTOP\Embarcadero Dev-C++.lnk" "$INSTDIR\devcpp.exe"
 SectionEnd
 
 SubSectionEnd
@@ -306,7 +310,7 @@ SubSectionEnd
 Section "Remove old configuration files" SectionConfig
   SectionIn 3
 
-  RMDir /r "$APPDATA\Dev-Cpp"
+  RMDir /r "$APPDATA\Embarcadero\Dev-Cpp"
   
   Delete "$INSTDIR\devcpp.ini"
   Delete "$INSTDIR\devcpp.cfg"
@@ -325,7 +329,7 @@ SectionEnd
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       "Various icons that you can use in your programs"
-#!insertmacro MUI_DESCRIPTION_TEXT ${SectionMinGW}       "The ${COMPILERNAME} compiler and associated tools, headers and libraries"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionMinGW}       "The ${COMPILERNAME} compiler and associated tools, headers and libraries"
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       "The Dev-C++ interface translated to different languages (other than English which is built-in)"
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      "Use Dev-C++ as the default application for opening these types of files"
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   "Create shortcuts to Dev-C++ in various folders"
@@ -338,10 +342,10 @@ SectionEnd
 Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
 
-  IfFileExists "C:\Dev-Cpp\devcpp.exe" 0 +2
+  IfFileExists "$INSTDIR\devcpp.exe" 0 +2
     SectionSetFlags ${SectionConfig} ${SF_SELECTED} # Remove old Dev-Cpp config files
 	
-  IfFileExists "$APPDATA\Dev-Cpp\devcpp.cfg" 0 +2 # deprecated config file
+  IfFileExists "$APPDATA\Embarcadero\Dev-Cpp\devcpp.cfg" 0 +2 # deprecated config file
     SectionSetFlags ${SectionConfig} ${SF_SELECTED}
 FunctionEnd
 
@@ -350,7 +354,7 @@ Function BackupAssoc
   ;$0 is an extension - for example ".dev"
 
   ;check if backup already exists
-  ReadRegStr $1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" "$0" 
+  ReadRegStr $1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp\Backup" "$0" 
   ;don't backup if backup exists in registry
   StrCmp $1 "" 0 no_assoc
 
@@ -359,7 +363,7 @@ Function BackupAssoc
   StrCmp $1 "DevCpp$0" no_assoc
 
   StrCmp $1 "" no_assoc
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" "$0" "$1"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp\Backup" "$0" "$1"
   no_assoc:
   
 FunctionEnd
@@ -369,7 +373,7 @@ Function un.RestoreAssoc
   ;$0 is an extension - for example ".dev"
 
   DeleteRegKey HKCR "$0"
-  ReadRegStr $1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++\Backup" "$0"
+  ReadRegStr $1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp\Backup" "$0"
   StrCmp $1 "" no_backup
     WriteRegStr HKCR "$0" "" "$1"
     Call un.RefreshShellIcons
@@ -413,7 +417,7 @@ FunctionEnd
 ####################################################################
 # uninstall
 
-UninstallText "This program will uninstall Dev-C++, continue?"
+UninstallText "This program will uninstall Embarcadero Dev-C++, continue?"
 ShowUninstDetails show
 
 Section "Uninstall"
@@ -423,15 +427,15 @@ Section "Uninstall"
 
   ; Remove start menu stuff, located in all users folder
   SetShellVarContext all 
-  Delete "$SMPROGRAMS\Bloodshed Dev-C++\Dev-C++.lnk"
-  Delete "$SMPROGRAMS\Bloodshed Dev-C++\License.lnk"
-  Delete "$SMPROGRAMS\Bloodshed Dev-C++\Uninstall Dev-C++.lnk"
-  RMDir "$SMPROGRAMS\Bloodshed Dev-C++"
+  Delete "$SMPROGRAMS\Embarcadero Dev-C++\Dev-C++.lnk"
+  Delete "$SMPROGRAMS\Embarcadero Dev-C++\License.lnk"
+  Delete "$SMPROGRAMS\Embarcadero Dev-C++\Uninstall Dev-C++.lnk"
+  RMDir "$SMPROGRAMS\Embarcadero Dev-C++"
   
   ; Remove desktop stuff, located in current user folder
   SetShellVarContext current
-  Delete "$QUICKLAUNCH\Dev-C++.lnk"
-  Delete "$DESKTOP\Dev-C++.lnk"
+  Delete "$QUICKLAUNCH\Embarcadero Dev-C++.lnk"
+  Delete "$DESKTOP\Embarcadero Dev-C++.lnk"
 
   ; Restore file associations
   StrCpy $0 ".dev"
@@ -486,12 +490,12 @@ Section "Uninstall"
   Call un.DeleteDirIfEmpty
 
   ; Remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-C++"
 
   IfSilent +2 ; Don't ask when running in silent mode
   MessageBox MB_YESNO "Do you want to remove all the remaining configuration files?" IDNO Done
 
-  RMDir /r "$APPDATA\Dev-Cpp"
+  RMDir /r "$APPDATA\Embarcadero\Dev-Cpp"
   
   Delete "$INSTDIR\devcpp.ini"
   Delete "$INSTDIR\devcpp.cfg"
