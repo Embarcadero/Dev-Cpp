@@ -100,11 +100,12 @@ Section "Embarcadero Dev-C++ program files (required)" SectionMain
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayVersion" "${DEVCPP_VERSION}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayIcon" "$INSTDIR\devcpp.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "Publisher" "Embarcadero Tecnologies Inc."
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "Publisher" "Embarcadero Technologies Inc."
 
   ; Write required files
   File "devcpp.exe"
   File "devcppPortable.exe"
+  File "devcpp.ico"
   File "devcpp.map"
   File "packman.exe"
   File "Packman.map"
@@ -123,7 +124,6 @@ Section "Embarcadero Dev-C++ program files (required)" SectionMain
   SetOutPath $INSTDIR\AStyle
   File /nonfatal /r "AStyle\*"
   
-  #CreateDirectory $APPDATA\Embarcadero\Dev-Cpp
 SectionEnd
 
 Section "Icon files" SectionIcons
@@ -292,7 +292,7 @@ Section "Create Start Menu shortcuts" SectionMenuLaunch
   SetShellVarContext all 
   StrCpy $0 $SMPROGRAMS ; start menu Programs folder
   CreateDirectory "$0\Embarcadero Dev-C++"
-  CreateShortCut "$0\Embarcadero Dev-C++\Dev-C++.lnk" "$INSTDIR\devcpp.exe" "$INSTDIR\devcpp.ico"
+  CreateShortCut "$0\Embarcadero Dev-C++\Dev-C++.lnk" "$INSTDIR\devcpp.exe"
   CreateShortCut "$0\Embarcadero Dev-C++\License.lnk" "$INSTDIR\copying.txt"
   CreateShortCut "$0\Embarcadero Dev-C++\Uninstall Dev-C++.lnk" "$INSTDIR\uninstall.exe" "$INSTDIR\devcpp.ico"
 SectionEnd
