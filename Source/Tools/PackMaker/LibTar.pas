@@ -22,7 +22,7 @@ TTarArchive Usage
 - Evaluate the DirRec for each file                  ListBox.Items.Add (DirRec.Name);
 - Read out the current file                          TA.ReadFile (DestFilename);
   (You can ommit this if you want to
-  read in the directory only)                        END;      
+  read in the directory only)                        END;
 - You're done                                      TA.Free;
 
 
@@ -185,7 +185,7 @@ TYPE
                  CONSTRUCTOR Create (TargetStream   : TStream);                            OVERLOAD;
                  CONSTRUCTOR Create (TargetFilename : STRING; Mode : INTEGER = fmCreate);  OVERLOAD;
                  DESTRUCTOR Destroy; OVERRIDE;                   // Writes End-Of-File Tag
-                 PROCEDURE AddFile   (Filename : STRING;        TarFilename : AnsiString = '');
+                 procedure AddFile(Filename: STRING; TarFilename: string = '');
                  PROCEDURE AddStream (Stream   : TStream;       TarFilename : AnsiString; FileDateGmt : TDateTime);
                  PROCEDURE AddString (Contents : RawByteString; TarFilename : AnsiString; FileDateGmt : TDateTime);
                  PROCEDURE AddDir          (Dirname            : AnsiString; DateGmt : TDateTime; MaxDirSize : INT64 = 0);
@@ -787,21 +787,24 @@ BEGIN
 END;
 
 
-PROCEDURE TTarWriter.AddFile   (Filename : STRING;  TarFilename : AnsiString = '');
+procedure TTarWriter.AddFile(Filename: STRING; TarFilename: string = '');
 VAR
-  S    : TFileStream;
-  Date : TDateTime;
+  S: TFileStream;
+  Date: TDateTime;
 BEGIN
-  Date := FileTimeGMT (Filename);
-  IF TarFilename = ''
-    THEN TarFilename := AnsiString (ConvertFilename (Filename))
-    ELSE TarFilename := AnsiString (ConvertFilename (string (TarFilename)));
-  S := TFileStream.Create (Filename, fmOpenRead OR fmShareDenyWrite);
+  Date := FileTimeGMT(TarFilename);
+
+  if TarFilename.IsEmpty then
+    TarFilename := ConvertFilename(ExtractFileName(Filename))
+  else
+    TarFilename := ConvertFilename(TarFilename);
+
+  S := TFileStream.Create(Filename, fmOpenRead OR fmShareDenyWrite);
   TRY
-    AddStream (S, TarFilename, Date);
+    AddStream(S, TarFilename, Date);
   FINALLY
     S.Free
-    END;
+  END;
 END;
 
 
@@ -969,4 +972,3 @@ END;
 
 
 END.
-

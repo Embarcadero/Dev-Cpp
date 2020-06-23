@@ -380,7 +380,7 @@ begin
 
   tarstr := ChangeFileExt(FileName, '.tar');
   tw := TTarWriter.Create(tarstr);
-  tw.AddFile(ExtractFileName(FileName));
+  tw.AddFile(FileName, ExtractFileName(FileName));
   for i := 0 to FileList.Count - 1 do begin
     if TFileItem(FileList[i]).IsDir then begin
       sl := TStringList.Create;
