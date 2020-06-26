@@ -432,7 +432,7 @@ begin
   tarfile.Destroy;
   if FileExists(tarstr) then
     DeleteFile(tarstr);
-  MessageDlg('Your Dev-C++ Package has been successfully created to ' +
+  MessageDlg('Your Embarcadero Dev-C++ Package has been successfully created to ' +
              ChangeFileExt(FileName, '.DevPak') +'. It is now ready for testing and distribution :)',
              mtInformation, [mbOK], 0);
 end;
