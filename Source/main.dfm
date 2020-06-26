@@ -3,7 +3,7 @@ object MainForm: TMainForm
   Top = 504
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
-  Caption = 'Dev-C++'
+  Caption = 'Embarcadero Dev-C++'
   ClientHeight = 680
   ClientWidth = 999
   Color = clBtnFace
@@ -56,6 +56,10 @@ object MainForm: TMainForm
     object CompSheet: TTabSheet
       Caption = 'Compiler'
       ImageIndex = 28
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object CompilerOutput: TListView
         Left = 0
         Top = 0
@@ -84,7 +88,6 @@ object MainForm: TMainForm
         ColumnClick = False
         GridLines = True
         HideSelection = False
-        Items.ItemData = {}
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
@@ -101,6 +104,10 @@ object MainForm: TMainForm
     object ResSheet: TTabSheet
       Caption = 'Resource'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ResourceOutput: TListView
         Left = 0
         Top = 0
@@ -129,7 +136,6 @@ object MainForm: TMainForm
         ColumnClick = False
         GridLines = True
         HideSelection = False
-        Items.ItemData = {}
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
@@ -146,6 +152,10 @@ object MainForm: TMainForm
     object LogSheet: TTabSheet
       Caption = 'Compile log'
       ImageIndex = 43
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object InfoGroupBox: TPanel
         Left = 0
         Top = 0
@@ -444,6 +454,10 @@ object MainForm: TMainForm
     object FindSheet: TTabSheet
       Caption = 'Find results'
       ImageIndex = 21
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object FindOutput: TListView
         Left = 0
         Top = 0
@@ -474,7 +488,6 @@ object MainForm: TMainForm
           end>
         ColumnClick = False
         GridLines = True
-        Items.ItemData = {}
         ReadOnly = True
         RowSelect = True
         ParentShowHint = False
@@ -492,6 +505,10 @@ object MainForm: TMainForm
     object CloseSheet: TTabSheet
       Caption = 'Close'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
   object ToolbarDock: TControlBar
@@ -954,11 +971,15 @@ object MainForm: TMainForm
     object LeftClassSheet: TTabSheet
       Caption = 'Classes'
       ImageIndex = -1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ClassBrowser: TClassBrowser
         Left = 0
         Top = 0
         Width = 185
-        Height = 389
+        Height = 390
         Align = alClient
         Color = clWhite
         Images = dmMain.ClassImages
@@ -990,11 +1011,15 @@ object MainForm: TMainForm
     object LeftDebugSheet: TTabSheet
       Caption = 'Debug'
       ImageIndex = -1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object DebugView: TTreeView
         Left = 0
         Top = 0
         Width = 185
-        Height = 389
+        Height = 390
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
