@@ -4,7 +4,7 @@
 !define COMPILERNAME "No Compiler"
 !define COMPILERFOLDER ""
 !define DEVCPP_VERSION "5.5"
-!define FINALNAME "Embarcadero Dev-Cpp ${DEVCPP_VERSION} ${COMPILERNAME} Setup.exe"
+!define FINALNAME "Embarcadero_Dev-Cpp_${DEVCPP_VERSION}_${COMPILERNAME}_Setup.exe"
 !define DISPLAY_NAME "Embarcadero Dev-C++ ${DEVCPP_VERSION}"
 
 !include "MUI2.nsh"
