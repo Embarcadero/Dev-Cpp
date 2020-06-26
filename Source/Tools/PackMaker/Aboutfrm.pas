@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls,
+  Vcl.Imaging.pngimage;
 
 type
   TfrmAbout = class(TForm)
@@ -22,6 +23,8 @@ type
     Label9: TLabel;
     Bevel2: TBevel;
     btnAcept: TBitBtn;
+    Label10: TLabel;
+    imgLogo: TImage;
     procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }

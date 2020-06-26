@@ -444,7 +444,7 @@ begin
       IntToStr(InstallInfo.Version) + '.' + #13#10#13#10 +
       'This means the package format has changed.' + #13#10 +
       'It is highly recommended to upgrade to the latest version of ' +
-      'Dev-C++ and Package Manager.'), 'Incompatible version', MB_ICONERROR);
+      'Embarcadero Dev-C++ and Package Manager.'), 'Incompatible version', MB_ICONERROR);
     Close;
     DontShowError := True;
     PMExitCode := PACKMAN_EXITCODE_VERSION_NOT_SUPPORTED;
@@ -647,7 +647,7 @@ end;
 procedure TInstallWizard.AboutBtnClick(Sender: TObject);
 begin
   Application.MessageBox(
-    'Dev-C++ Package Installation Wizard' + #13#10 +
+    'Embarcadero Dev-C++ Package Installation Wizard' + #13#10 +
     'Copyright (c) 2002 Hongli Lai' + #13#10 + #13#10 +
     'Licensed under the GNU General Public License.',
     'About', MB_ICONASTERISK);

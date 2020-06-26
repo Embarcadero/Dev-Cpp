@@ -79,7 +79,7 @@ var
 begin
   SHGetSpecialFolderLocation(0, CSIDL_PROGRAMS, PIDL);
   SHGetPathFromIDList(PIDL, InFolder);
-  Result := InFolder + '\Bloodshed Dev-C++';
+  Result := InFolder + '\Embarcadero Dev-C++';
 end;
 
 procedure CreateShortcut(FileName, Target: AnsiString; Icon: AnsiString);

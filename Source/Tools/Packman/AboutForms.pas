@@ -5,7 +5,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls, ShellAPI;
+  Dialogs, StdCtrls, Buttons, ExtCtrls, ShellAPI, Vcl.Imaging.pngimage;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -31,6 +31,8 @@ type
     Panel2: TPanel;
     Panel3: TPanel;
     Image2: TImage;
+    imgLogo: TImage;
+    Label10: TLabel;
     procedure Label7Click(Sender: TObject);
     procedure Label6Click(Sender: TObject);
     procedure Label9Click(Sender: TObject);

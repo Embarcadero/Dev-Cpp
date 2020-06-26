@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, version, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls;
+  StdCtrls, Buttons, ExtCtrls, Vcl.Imaging.pngimage;
 
 type
   TAboutForm = class(TForm)
@@ -62,7 +62,12 @@ type
     lblCompilers: TLabel;
     lblPre4992: TLabel;
     bvCompilers: TBevel;
-    imgDonate: TImage;
+    Bevel1: TBevel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    imgLogo: TImage;
+    Label4: TLabel;
     procedure URLLabelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAuthorsClick(Sender: TObject);

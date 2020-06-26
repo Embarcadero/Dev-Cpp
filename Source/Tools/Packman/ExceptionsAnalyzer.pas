@@ -659,7 +659,7 @@ end;
 
 initialization
   fEmail := 'dev-cpp-bugs@lists.sourceforge.net'; //'haiku@bloodshed.net;mandrav@supergoal.gr;h.lai@chello.nl';
-  fSubject := 'Dev-C++ bug report';
+  fSubject := 'Embarcadero Dev-C++ bug report';
   fReportEXEversion := True;
   fReportComputerName := False;
   fReportMachine := True;

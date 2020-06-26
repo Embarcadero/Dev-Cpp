@@ -414,7 +414,7 @@ procedure TMainForm.Help2Click(Sender: TObject);
 begin
   Application.MessageBox(
     'Package Manager is a tool to install and manage add-on ' + #13#10 +
-    'libraries for Dev-C++.' + #13#10#13#10 +
+    'libraries for Embarcadero Dev-C++.' + #13#10#13#10 +
     'To install a library, click on the Install button and select a' + #13#10 +
     '.DevPak file or .DevPackage file, and follow the instructions.' + #13#10 +
     'To uninstall an installed library, select it and click on the' + #13#10 +
