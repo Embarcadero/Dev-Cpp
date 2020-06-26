@@ -3,7 +3,7 @@ object MainForm: TMainForm
   Top = 221
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'Dev-C++ Package Maker v0.5'
+  Caption = 'Embarcadero Dev-C++ Package Maker v0.6'
   ClientHeight = 390
   ClientWidth = 602
   Color = clBtnFace

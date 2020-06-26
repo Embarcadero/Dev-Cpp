@@ -132,10 +132,8 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <VerInfo_MajorVer>1</VerInfo_MajorVer>
-        <VerInfo_MinorVer>0</VerInfo_MinorVer>
-        <VerInfo_Release>0</VerInfo_Release>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.2.8.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Release>8</VerInfo_Release>
         <DCC_Define>UseWin;$(DCC_Define)</DCC_Define>
         <DCC_ExeOutput>C:\Work\GitHub\bin\</DCC_ExeOutput>
     </PropertyGroup>
@@ -193,10 +191,10 @@
                     <Source Name="MainSource">Packman.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k260.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp260.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k270.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp270.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k270.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp270.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
@@ -703,6 +701,16 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="iPad_Launch2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="iPad_Launch768x1024">
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
@@ -711,6 +719,16 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_LaunchDark2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -813,6 +831,16 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="iPhone_Launch2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="iPhone_Launch320">
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
@@ -821,6 +849,16 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch3x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -865,6 +903,26 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_LaunchDark2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_LaunchDark3x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -913,6 +971,16 @@
                     </Platform>
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSLaunchScreen">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen</RemoteDir>
+                        <Operation>64</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen</RemoteDir>
+                        <Operation>64</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectiOSResource">

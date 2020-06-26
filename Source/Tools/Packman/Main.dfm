@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 289
   Top = 166
-  Caption = 'Dev-C++ Package Manager (version 2.2.7)'
+  Caption = 'Embarcadero Dev-C++ Package Manager (version 2.2.8)'
   ClientHeight = 359
   ClientWidth = 472
   Color = clBtnFace
@@ -120,20 +120,13 @@ object MainForm: TMainForm
       Height = 25
       Align = alTop
       BevelOuter = bvLowered
-      Color = 16711808
       TabOrder = 0
       object Label1: TLabel
         Left = 7
         Top = 6
-        Width = 94
+        Width = 78
         Height = 13
         Caption = 'Package Details'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
       end
       object SpeedButton1: TSpeedButton
         Left = 137
@@ -143,12 +136,6 @@ object MainForm: TMainForm
         Hint = 'Hide details panel.'
         Caption = '<<'
         Flat = True
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
         OnClick = SpeedButton1Click
       end
     end

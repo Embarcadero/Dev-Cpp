@@ -108,6 +108,10 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_MajorVer>1</VerInfo_MajorVer>
+        <VerInfo_MinorVer>0</VerInfo_MinorVer>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -151,6 +155,9 @@
         <DCCReference Include="actionfrm.pas">
             <Form>ActionForm</Form>
         </DCCReference>
+        <DCCReference Include="Aboutfrm.pas">
+            <Form>frmAbout</Form>
+        </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -172,8 +179,10 @@
                     <Source Name="MainSource">PackMaker.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k270.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp270.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k270.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp270.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
