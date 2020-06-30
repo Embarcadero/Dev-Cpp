@@ -296,7 +296,8 @@ begin
   Writeln(F, 'BIN      = ' + GenMakePath1(ExtractRelativePath(Makefile, fProject.Executable)));
   Writeln(F, 'CXXFLAGS = $(CXXINCS) ' + fCppCompileParams);
   Writeln(F, 'CFLAGS   = $(INCS) ' + fCompileParams);
-  Writeln(F, 'RM       = ' + CLEAN_PROGRAM + ' -f'); // TODO: use del or rm?
+//  Writeln(F, 'RD       = ' + CLEAN_PROGRAM + ' -f'); // TODO: use del or rm?
+  Writeln(F, 'DEL      = ' + CLEAN_PROGRAM); // TODO: use del or rm?
 
   // This needs to be put in before the clean command.
   if fProject.Options.typ = dptDyn then begin
@@ -448,9 +449,9 @@ begin
   Writeln(F, 'clean: clean-custom');
   case fProject.Options.typ of
     dptDyn:
-      Writeln(F, #9 + '${RM} $(OBJ) $(BIN) $(DEF) $(STATIC)');
+      Writeln(F, #9 + '${DEL} $(OBJ) $(BIN) $(DEF) $(STATIC) 2>nul');
   else
-    Writeln(F, #9 + '${RM} $(OBJ) $(BIN)');
+    Writeln(F, #9 + '${DEL} $(OBJ) $(BIN) 2>nul');
   end;
   Writeln(F);
 end;

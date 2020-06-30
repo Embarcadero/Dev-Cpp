@@ -96,7 +96,8 @@ const
   WINDRES_PROGRAM = 'windres.exe';
   GPROF_PROGRAM = 'gprof.exe';
   PACKMAN_PROGRAM = 'packman.exe';
-  CLEAN_PROGRAM = 'rm.exe'; // cannot use del, it doesn't have a quiet mode
+//  CLEAN_PROGRAM = 'rm.exe'; // cannot use del, it doesn't have a quiet mode
+  CLEAN_PROGRAM = 'del /f /q';
 
   // File dialog filters
   FLT_ALLFILES = 'All files (*.*)|*.*|';
