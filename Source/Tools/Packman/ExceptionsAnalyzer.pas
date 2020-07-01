@@ -599,7 +599,7 @@ begin
     ExecuteFile(IncludeTrailingBackslash(devDirs.Exec) + VROACH_PROGRAM, Cmd, '', SW_SHOW)
   end
   else begin }
-    Cmd := 'mailto:' + fEmail;
+ {   Cmd := 'mailto:' + fEmail;
     Cmd := Cmd + '?Subject=' + fSubject;
     Cmd := Cmd + '&Body=';
     if Trim(memBugReport.Lines.Text) <> '' then begin
@@ -607,7 +607,8 @@ begin
         Cmd := Cmd + memBugReport.Lines[I] + '%0A';
     end;
     Delete(Cmd, 1280, MaxInt); // there is problem with bigger strings in ShellExecute
-    ShellExecuteA(0, 'open', PAnsiChar(Cmd), nil, nil, SW_SHOWNORMAL);
+    ShellExecuteA(0, 'open', PAnsiChar(Cmd), nil, nil, SW_SHOWNORMAL);}
+	ShellExecuteA(0, 'open', PAnsiChar('https://github.com/Embarcadero/Dev-Cpp/issues'), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TfrmExceptionsAnalyzer.FormCreate(Sender: TObject);
@@ -658,7 +659,7 @@ begin
 end;
 
 initialization
-  fEmail := 'dev-cpp-bugs@lists.sourceforge.net'; //'haiku@bloodshed.net;mandrav@supergoal.gr;h.lai@chello.nl';
+  fEmail := '';//'dev-cpp-bugs@lists.sourceforge.net'; //'haiku@bloodshed.net;mandrav@supergoal.gr;h.lai@chello.nl';
   fSubject := 'Embarcadero Dev-C++ bug report';
   fReportEXEversion := True;
   fReportComputerName := False;
