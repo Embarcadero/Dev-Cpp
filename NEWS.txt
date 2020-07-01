@@ -1,3 +1,11 @@
+Version 5.5 - 1 July 2020
+
+- Upgraded Packman to use Abbrevia
+- Upgraded AStyle to 3.1
+- Upgraded project to Delphi 10.4
+- Project forked as Embarcadero Dev C++
+- Project Sponsored by Embarcadero Technologies, Inc.
+
 Version 5.12 - 14 Juni 2015
 
 - Fixed use of invalid library directories when autodetecting 32bit GCC 4.9.2.
