@@ -25,9 +25,6 @@ object ProjectOptionsFrm: TProjectOptionsFrm
     Height = 25
     Caption = '&OK'
     Default = True
-    ModalResult = 1
-    TabOrder = 0
-    OnClick = btnOkClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
       0400000000006801000000000000000000001000000000000000000000000000
@@ -45,7 +42,10 @@ object ProjectOptionsFrm: TProjectOptionsFrm
       3338F38F000033333333333333A223333333333333338F830000333333333333
       333A333333333333333338330000333333333333333333333333333333333333
       0000}
+    ModalResult = 1
     NumGlyphs = 2
+    TabOrder = 0
+    OnClick = btnOkClick
   end
   object btnCancel: TBitBtn
     Left = 350
@@ -53,18 +53,20 @@ object ProjectOptionsFrm: TProjectOptionsFrm
     Width = 85
     Height = 25
     Caption = '&Cancel'
+    Kind = bkCancel
+    NumGlyphs = 2
     TabOrder = 1
     OnClick = btnCancelClick
-    Kind = bkCancel
   end
   object btnHelp: TBitBtn
     Left = 440
     Top = 350
     Width = 85
     Height = 25
+    Kind = bkHelp
+    NumGlyphs = 2
     TabOrder = 2
     OnClick = btnHelpClick
-    Kind = bkHelp
   end
   object PageControl: TPageControl
     Left = 0
@@ -141,8 +143,6 @@ object ProjectOptionsFrm: TProjectOptionsFrm
           Height = 30
           Hint = 'Select a custom icon'
           Caption = 'Browse...'
-          TabOrder = 0
-          OnClick = btnIconBrowseClick
           Glyph.Data = {
             36030000424D3603000000000000360000002800000010000000100000000100
             18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -170,16 +170,16 @@ object ProjectOptionsFrm: TProjectOptionsFrm
             5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
             BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
             BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
+          TabOrder = 0
+          OnClick = btnIconBrowseClick
         end
         object btnIconLib: TBitBtn
           Left = 128
           Top = 21
           Width = 105
           Height = 30
-          Hint = 'Select a icon from Dev-C++'#39's icon collection'
+          Hint = 'Select a icon from Embarcadero Dev-C++'#39's icon collection'
           Caption = 'Library'
-          TabOrder = 1
-          OnClick = btnIconLibClick
           Glyph.Data = {
             36030000424D3603000000000000360000002800000010000000100000000100
             18000000000000030000120B0000120B00000000000000000000000000000000
@@ -207,6 +207,8 @@ object ProjectOptionsFrm: TProjectOptionsFrm
             E3AD87E3AD87E3AD87DB9565DB9565DB9565DB9565DB9565DB9565DB9565DB95
             65DB9565D0753600000068686800000000000000000000000000000000000000
             0000000000000000000000000000000000000000000000000000}
+          TabOrder = 1
+          OnClick = btnIconLibClick
         end
         object btnRemoveIcon: TBitBtn
           Left = 128
@@ -216,8 +218,6 @@ object ProjectOptionsFrm: TProjectOptionsFrm
           Hint = 'Do not use an icon for this project'
           Caption = 'Remove'
           Enabled = False
-          TabOrder = 2
-          OnClick = btnRemoveIconClick
           Glyph.Data = {
             36030000424D3603000000000000360000002800000010000000100000000100
             18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -245,6 +245,8 @@ object ProjectOptionsFrm: TProjectOptionsFrm
             BFBFBFBFBFBFBFBFBFBFBFBF000000BFBFBF000000BFBFBFBFBFBFBFBFBFBFBF
             BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF68686800
             0000686868BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
+          TabOrder = 2
+          OnClick = btnRemoveIconClick
         end
         object Panel1: TPanel
           Left = 38
@@ -315,6 +317,10 @@ object ProjectOptionsFrm: TProjectOptionsFrm
     end
     object tabFiles: TTabSheet
       Caption = 'Files'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lvFiles: TTreeView
         Left = 8
         Top = 8
@@ -460,14 +466,21 @@ object ProjectOptionsFrm: TProjectOptionsFrm
         HorzScrollBar.Visible = False
         VertScrollBar.Visible = False
         TabOrder = 0
+        ExplicitTop = 78
+        ExplicitWidth = 526
+        ExplicitHeight = 187
         inherited tabs: TTabControl
           Width = 526
           Height = 187
+          ExplicitWidth = 526
+          ExplicitHeight = 187
           inherited vle: TCompOptionsList
             Width = 518
             Height = 177
             DefaultColWidth = 215
             ParentShowHint = False
+            ExplicitWidth = 518
+            ExplicitHeight = 177
             ColWidths = (
               215
               215)
@@ -480,13 +493,16 @@ object ProjectOptionsFrm: TProjectOptionsFrm
         Width = 495
         Height = 23
         Style = csDropDownList
-        ItemHeight = 0
         TabOrder = 1
         OnChange = cmbCompilerChange
       end
     end
     object tabCompOpts: TTabSheet
       Caption = 'Options'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblAdditions: TLabel
         Left = 6
         Top = 6
@@ -552,8 +568,6 @@ object ProjectOptionsFrm: TProjectOptionsFrm
         Width = 148
         Height = 30
         Caption = 'Add Library or Object'
-        TabOrder = 3
-        OnClick = btnAddLibClick
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
           18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -581,10 +595,16 @@ object ProjectOptionsFrm: TProjectOptionsFrm
           5DCCFF5DCCFF000000000000000000000000000000000000BFBFBFBFBFBFBFBF
           BFBFBFBFBFBFBFBFBFBFBFBFBF000000000000000000BFBFBFBFBFBFBFBFBFBF
           BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
+        TabOrder = 3
+        OnClick = btnAddLibClick
       end
     end
     object tabFilesDir: TTabSheet
       Caption = 'Directories'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object SubTabs: TTabControl
         Left = 0
         Top = 0
@@ -798,6 +818,10 @@ object ProjectOptionsFrm: TProjectOptionsFrm
     end
     object tabOutputDir: TTabSheet
       Caption = 'Output'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblOverrideOutput: TLabel
         Left = 8
         Top = 234
@@ -910,7 +934,7 @@ object ProjectOptionsFrm: TProjectOptionsFrm
       object lblExeOutput: TLabel
         Left = 10
         Top = 24
-        Width = 148
+        Width = 149
         Height = 15
         Caption = '&Executable output directory:'
         FocusControl = edExeOutput
@@ -978,6 +1002,10 @@ object ProjectOptionsFrm: TProjectOptionsFrm
     end
     object tabMakefile: TTabSheet
       Caption = 'Makefile'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object btnCustomMakeBrowse: TSpeedButton
         Left = 490
         Top = 54
@@ -1265,6 +1293,10 @@ object ProjectOptionsFrm: TProjectOptionsFrm
     end
     object tabVersion: TTabSheet
       Caption = 'Version Info'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object chkVersionInfo: TCheckBox
         Left = 12
         Top = 8
@@ -1379,7 +1411,6 @@ object ProjectOptionsFrm: TProjectOptionsFrm
           Width = 209
           Height = 23
           Style = csDropDownList
-          ItemHeight = 0
           Sorted = True
           TabOrder = 4
         end

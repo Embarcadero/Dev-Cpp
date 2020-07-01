@@ -76,7 +76,7 @@ type
     procedure timerFishTimer(Sender: TObject);
     procedure FishImageClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure imgDonateClick(Sender: TObject);
+    procedure btnUpdateCheckClick(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -140,7 +140,8 @@ procedure TAboutForm.btnAuthorsClick(Sender: TObject);
 const
   MessageText =
     'Authors:'#13#10#13#10 +
-    '- Post-4.9.9.2 development: Johan Mes'#13#10 +
+    '- Post-5.12 development sponsored by Embarcadero'#13#10 +
+    '- 4.9.9.2 to 5.12 development: Johan Mes'#13#10 +
     '- Development: Colin Laplace, Mike Berg, Hongli Lai, Yiannis Mandravellos'#13#10 +
     '- Contributors: Peter Schraut, Marek Januszewski, Anonymous'#13#10 +
     '- MinGW compiler system: Mumit Khan, J.J. van der Heijden, Colin Hendrix and GNU developers'#13#10 +
@@ -157,6 +158,13 @@ procedure TAboutForm.btnAuthorsDragOver(Sender, Source: TObject; X,
   Y: Integer; State: TDragState; var Accept: Boolean);
 begin
   Accept := True;
+end;
+
+procedure TAboutForm.btnUpdateCheckClick(Sender: TObject);
+begin
+  ShellExecute(GetDesktopWindow(), 'open',
+    PChar('https://github.com/Embarcadero/Dev-Cpp'), nil, nil,
+    SW_SHOWNORMAL);
 end;
 
 procedure TAboutForm.btnAuthorsDragDrop(Sender, Source: TObject; X,
@@ -189,13 +197,6 @@ end;
 procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
-end;
-
-procedure TAboutForm.imgDonateClick(Sender: TObject);
-begin
-  ShellExecute(GetDesktopWindow(), 'open',
-    PChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil,
-    SW_SHOWNORMAL);
 end;
 
 end.

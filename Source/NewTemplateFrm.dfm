@@ -26,10 +26,6 @@ object NewTemplateForm: TNewTemplateForm
     TabOrder = 0
     object pgTemplate: TTabSheet
       Caption = 'Template info'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lblName: TLabel
         Left = 8
         Top = 12
@@ -105,7 +101,7 @@ object NewTemplateForm: TNewTemplateForm
           Top = 17
           Width = 113
           Height = 24
-          Hint = 'Select a icon from Dev-C++'#39's icon collection'
+          Hint = 'Select a icon from Embarcadero Dev-C++'#39's icon collection'
           Caption = 'Library'
           Glyph.Data = {
             76010000424D7601000000000000760000002800000020000000100000000100

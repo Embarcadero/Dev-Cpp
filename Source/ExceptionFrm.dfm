@@ -178,7 +178,7 @@ object ExceptionFrm: TExceptionFrm
     Cursor = crHandPoint
     Alignment = taCenter
     AutoSize = False
-    Caption = 'http://sourceforge.net/projects/orwelldevcpp/'
+    Caption = 'https://github.com/Embarcadero/Dev-Cpp'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
     Font.Height = -11
@@ -195,7 +195,7 @@ object ExceptionFrm: TExceptionFrm
     Hint = 
       'Sends a bug report to the application support team describing th' +
       'e error'
-    Caption = '&Send anonymous bug report'
+    Caption = '&Open an Issue with a bug report'
     Default = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText

@@ -3,7 +3,7 @@ object LangForm: TLangForm
   Top = 516
   BorderIcons = []
   BorderStyle = bsDialog
-  Caption = 'Dev-C++ first time configuration'
+  Caption = 'Embarcadero Dev-C++ first time configuration'
   ClientHeight = 320
   ClientWidth = 560
   Color = clBtnFace
@@ -25,8 +25,6 @@ object LangForm: TLangForm
     Height = 30
     Caption = '&Next'
     Default = True
-    TabOrder = 0
-    OnClick = OkBtnClick
     Glyph.Data = {
       36030000424D3603000000000000360000002800000010000000100000000100
       18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -54,6 +52,8 @@ object LangForm: TLangForm
       BFBFBFBFBFBF0000008FFF8F000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
       BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BFBFBFBF
       BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
+    TabOrder = 0
+    OnClick = OkBtnClick
   end
   object LangPanel: TPanel
     Left = 260
@@ -106,9 +106,9 @@ object LangForm: TLangForm
       Height = 73
       AutoSize = False
       Caption = 
-        'If you need help using Dev-C++, please refer to the Dev-C++ help' +
-        ' file in the Help menu or send the developer a message (he doesn' +
-        #39't mind!).'
+        'If you need help using Embarcadero Dev-C++, please refer to the ' +
+        'Embarcadero Dev-C++ help file in the Help menu or send the devel' +
+        'oper a message (he doesn'#39't mind!).'
       WordWrap = True
     end
     object Finish3: TLabel
@@ -119,8 +119,8 @@ object LangForm: TLangForm
       AutoSize = False
       Caption = 
         'You can also download packages (like libraries or tools) to use ' +
-        'with Dev-C++ using WebUpdate, which you will find in Tools menu ' +
-        '>> Check for Packages.'
+        'with Embarcadero Dev-C++ using WebUpdate, which you will find in' +
+        ' Tools menu >> Check for Packages.'
       WordWrap = True
     end
     object Finish1: TLabel
@@ -130,8 +130,8 @@ object LangForm: TLangForm
       Height = 45
       AutoSize = False
       Caption = 
-        'Dev-C++ has been configured successfully, you may now click OK t' +
-        'o proceed to its loading.'
+        'Embarcadero Dev-C++ has been configured successfully, you may no' +
+        'w click OK to proceed to its loading.'
       WordWrap = True
     end
   end
@@ -146,6 +146,14 @@ object LangForm: TLangForm
     Font.Name = 'Courier New'
     Font.Style = []
     TabOrder = 3
+    CodeFolding.GutterShapeSize = 11
+    CodeFolding.CollapsedLineColor = clGrayText
+    CodeFolding.FolderBarLinesColor = clGrayText
+    CodeFolding.IndentGuidesColor = clGray
+    CodeFolding.IndentGuides = True
+    CodeFolding.ShowCollapsedLine = False
+    CodeFolding.ShowHintMark = True
+    UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
     Gutter.Font.Height = -11
@@ -215,7 +223,6 @@ object LangForm: TLangForm
         Width = 201
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
         TabOrder = 0
         OnChange = cmbIconsChange
       end
@@ -225,7 +232,6 @@ object LangForm: TLangForm
         Width = 201
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
         TabOrder = 1
         OnChange = ColorChange
         Items.Strings = (
@@ -263,8 +269,6 @@ object LangForm: TLangForm
         BorderWidth = 5
         Caption = 'Main'
         DragKind = dkDock
-        EdgeBorders = []
-        Flat = True
         Images = dmMain.MenuImages_NewLook
         ParentShowHint = False
         ShowHint = True

@@ -13330,10 +13330,10 @@ object AboutForm: TAboutForm
     object lblRepositoryURL: TLabel
       Left = 184
       Top = 40
-      Width = 177
+      Width = 203
       Height = 13
       Cursor = crHandPoint
-      Caption = 'https://sf.net/projects/orwelldevcpp/'
+      Caption = 'https://github.com/Embarcadero/Dev-Cpp'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlue
       Font.Height = 11
@@ -13497,7 +13497,6 @@ object AboutForm: TAboutForm
     Width = 185
     Height = 25
     Caption = '&Check for updates'
-    Enabled = False
     Glyph.Data = {
       36030000424D3603000000000000360000002800000010000000100000000100
       18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
@@ -13526,6 +13525,7 @@ object AboutForm: TAboutForm
       BCBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBEBEBEBCBCBCBABABAB9
       B9B9B9B9B9BABABABCBCBCBEBEBEBFBFBFBFBFBFBFBFBFBFBFBF}
     TabOrder = 3
+    OnClick = btnUpdateCheckClick
   end
   object pnlFish: TPanel
     Left = -100

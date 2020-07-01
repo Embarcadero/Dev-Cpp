@@ -28,9 +28,6 @@ object EnviroForm: TEnviroForm
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
-    ModalResult = 1
-    TabOrder = 1
-    OnClick = btnOkClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
       0400000000006801000000000000000000001000000000000000000000000000
@@ -48,7 +45,10 @@ object EnviroForm: TEnviroForm
       3338F38F000033333333333333A223333333333333338F830000333333333333
       333A333333333333333338330000333333333333333333333333333333333333
       0000}
+    ModalResult = 1
     NumGlyphs = 2
+    TabOrder = 1
+    OnClick = btnOkClick
   end
   object btnCancel: TBitBtn
     Left = 300
@@ -56,8 +56,9 @@ object EnviroForm: TEnviroForm
     Width = 85
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 3
     Kind = bkCancel
+    NumGlyphs = 2
+    TabOrder = 3
   end
   object btnHelp: TBitBtn
     Left = 390
@@ -66,9 +67,10 @@ object EnviroForm: TEnviroForm
     Height = 25
     Anchors = [akRight, akBottom]
     Enabled = False
+    Kind = bkHelp
+    NumGlyphs = 2
     TabOrder = 2
     OnClick = btnHelpClick
-    Kind = bkHelp
   end
   object PagesMain: TPageControl
     Left = 0
@@ -249,7 +251,6 @@ object EnviroForm: TEnviroForm
         Width = 160
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
         TabOrder = 10
         Items.Strings = (
           'Top'
@@ -263,7 +264,6 @@ object EnviroForm: TEnviroForm
         Width = 160
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
         TabOrder = 11
       end
       object cboTheme: TComboBox
@@ -272,7 +272,6 @@ object EnviroForm: TEnviroForm
         Width = 160
         Height = 23
         Style = csDropDownList
-        ItemHeight = 15
         TabOrder = 12
       end
       object cbUIfont: TComboBox
@@ -554,7 +553,9 @@ object EnviroForm: TEnviroForm
         Width = 457
         Height = 31
         AutoSize = False
-        Caption = 'Current Options directory. Click the button to reset Dev-C++.'
+        Caption = 
+          'Current Options directory. Click the button to reset Embarcadero' +
+          ' Dev-C++.'
       end
       object edUserDir: TEdit
         Left = 16
@@ -628,7 +629,7 @@ object EnviroForm: TEnviroForm
       object lblExternal: TLabel
         Left = 8
         Top = 8
-        Width = 165
+        Width = 166
         Height = 15
         Caption = 'External programs associations:'
       end
@@ -679,7 +680,7 @@ object EnviroForm: TEnviroForm
       object lblAssocFileTypes: TLabel
         Left = 8
         Top = 8
-        Width = 55
+        Width = 53
         Height = 15
         Caption = 'File Types:'
       end
@@ -691,8 +692,8 @@ object EnviroForm: TEnviroForm
         Alignment = taCenter
         AutoSize = False
         Caption = 
-          'Just check or un-check for which file types Dev-C++ will be regi' +
-          'stered as the default application to open them...'
+          'Just check or un-check for which file types Embarcadero Dev-C++ ' +
+          'will be registered as the default application to open them...'
         WordWrap = True
       end
       object lstAssocFileTypes: TCheckListBox
