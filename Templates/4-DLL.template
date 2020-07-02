@@ -1,0 +1,25 @@
+[Template]
+ver=1
+Name=DLL
+Icon=DLL.ico
+Description=A Dynamic Link Library (DLL)
+Category=Basic
+
+[Unit0]
+CName=dllmain.c
+CppName=dllmain.cpp
+C=DLL_c.txt
+Cpp=Dll_cpp.txt
+
+[Unit1]
+CName=dll.h
+CppName=dll.h
+C=DLL_h.txt
+Cpp=Dll_hpp.txt
+
+[Project]
+UnitCount=2
+Type=3
+
+Compiler=-DBUILDING_DLL=1
+CppCompiler=-DBUILDING_DLL=1

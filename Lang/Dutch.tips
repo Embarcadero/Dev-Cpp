@@ -1,0 +1,91 @@
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+################################################################
+#							#
+# 	Nederlandse vertaling					#
+# 	door Jordi De Groof					#
+# 	E-mail: jordi.degroof@gmail.com				#
+# 	Als je nog fouten vindt of sugessties hebt, gelieve me te e-mailen	#
+# 	Vertaling beëindigd op 19 december 2004			#
+# 							#
+################################################################
+
+#
+# Important tips (appear first)
+#
+...je deze tips niet moet uitschakelen?<CR><CR>De hier gepresenteerde tips geven je ongedocumenteerde informatie die nergens anders te vinden is.<CR>Als je ze uitschakelt en ze op een later tijdstip wil terugzien, selecteer dan "Help/Tip van de Dag"
+
+...je WebUpdate kan gebruiken om Dev-C++ up-to-date te houden met de laatste bug fixes en coole nieuwe features?<CR><CR>Selecteer "Gereedschappen/Controleren op Updates..."
+
+#
+# Code-completion tips
+#
+...de code-aanvullen functie je productiviteit zal helpen toenemen door alle mogelijke commando?s in de huidige context te suggereren.<CR><CR>Om code-aanvullen in te schakelen, ga naar "Gereedschappen/Editor-opties" en schakel de klasse-browser en codevervolmaking in.
+
+...de code-aanvullen functie in actie schiet zodra je ".", "->" of "::" typt in het editor-venster na een door de gebruiker bepaalde time-out?<CR><CR>Om deze time-out te definiëren, ga naar "Gereedschappen/Editor-opties/Klasse browser/Vervolmaking".
+
+...je de code-aanvullen functie kan oproepen door "CTRL+Spatie" op eender welk ogenblik in te typen in het editor-venster?
+
+...SHIFT-klikken op een entry in de klasse-brower, je naar de declaratie i.p.v. de implementatie brengt?<CR>Je kan natuurlijk ook het context-menu gebruiken voor deze (en andere!) functie(s)...
+
+...je mappen kan aanmaken in de klasse-brower om gemakkelijker je weg te vinden in grote projecten? Je kan zelfs mappen nesten!!<CR><CR>Je moet gewoon rechtsklikken in de klasse-browser om het context-menu te tonen...
+
+...er twee verschillende display-modussen zijn in de klasse-browser?<CR>De ene toont al de geparste klassen/members/functie's, en de andere toont je de relevante informatie van het *huidige* bestand.<CR><CR>Je moet gewoon rechts-klikken in de klasse-brower en "Toon mode..." selecteren...
+
+#
+# Project Manager tips
+#
+...je kan definiëren of je moet enkel of dubbelklikken in de project manager om een bestand te openen in de editor.<CR><CR>Om dit te veranderen, ga naar "Gereedschappen/Omgevingsopties" en schakel "Dubbelklik om project manager bestanden te openen" in (of uit).
+
+...je mappen kan aanmaken in de project manager om gemakkelijker je weg te vinden in grote projecten? Je kan zelfs mappen nesten!!<CR><CR>Je moet gewoon rechtsklikken in de project manager om het context-menu te tonen...
+
+...je als je mappen hebt gemaakt in de project manager, je kan slepen && neerzetten om ze te herordenen?
+
+#
+# File menu tips
+#
+...je informatie kan krijgen over het bestand waarin je aan het werken bent?<CR><CR>Selecteer "Bestand/Eigenschappen" en je krijgt informatie over de grootte van het bestand, het aantal lijnen, het aantal lijnen met commentaar, lege lijnen, en geïnclude bestanden!
+
+...je je project als een sjabloon kan bewaren?<CR><CR>Selecteer "Bestand/Nieuw/Sjabloon". Dit zal je project bewaren als een sjabloon voor Dev-C++.<CR>Dit sjabloon kan je vinden als je "Bestand/Nieuw/Project" selecteert.<CR>Hierdoor zal je een basis hebben om je code van op te bouwen, aangepast aan jouw smaak!
+
+...je MS Visual C++-projecten kan importeren in Dev-C++?<CR><CR>Selecteer gewoon "Bestand/Importeren/Importeer MS Visual C++ project".<CR>Waarschijnlijk moet je de projectopties nog een beetje tweaken na het importeren, want het is nog werk in uitvoering.
+
+...je een bronbestand of een heel project kan exporteren naar HTML of RTF?<CR>Zo kan je je code makkelijk uploaden naar een website en delen met de wereld!<CR><CR>Klik gewoon op "Bestand/Exporteren" en selecteer de exportmethode...
+
+#
+# Edit menu tips
+#
+...je enkele lijnen ineens kan (on)becommentariëren door ze te selecteren en op "Bewerken/Commentaar (schrappen)" te klikken?
+
+...je de inspringing van enkele lijnen ineens kan vergroten/verkleinen door ze te selecteren en op "Bewerken/Vergroot (Verklein) inspringing" te klikken?
+
+...je bladwijzers kan gebruiken in de editor om snel door je code te kunnen bewegen?<CR><CR>Je kan een bladwijzer aanmaken door op "Bewerken/Creëer bladwijzer" te klikken en het nummer van de bladwijzer te kiezen.<CR>Om naar een bladwijzer te gaan moet je op "Bewerken/Ga naar bladwijzer" klikken en het nummer van de bladwijzer selecteren.
+
+...er een krachtige "Ga naar"-functie is die je kunt vinden onder het "Zoeken"-menu?<CR><CR>Het toont al de functies van een bestand, en door een deel van de functienaam in te typen, wordt de lijst gefilterd. Druk op enter en je gaat onmiddelijk naar die functie!<CR>Noot: de klasse browser moet ingeschakeld zijn...

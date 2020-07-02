@@ -1,0 +1,16 @@
+[Template]
+ver=1
+Name=Direct3D
+Icon=Pizza.ico
+Description=A basic Direct3D program
+Category=Multimedia
+
+[Unit0]
+CName=main.c
+CppName=main.cpp
+C=Direct3D.txt
+Cpp=Direct3D.txt
+
+[Project]
+UnitCount=1
+Type=0

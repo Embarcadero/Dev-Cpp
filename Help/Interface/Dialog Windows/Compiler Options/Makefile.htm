@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Makefile Tab</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Heading1">Makefile generation</div>
+	<div class="Heading2">Compile delay</div>
+	<div class="Text">A compile delay can be used when make complains that the makefile is newer than the current system time. This feature is a leftover from ancient Dev-C++ versions. I have not been able to reproduce this bug in versions since 4.9.9.3.</div>
+	<br/>
+	<div class="Heading2">Use fast but imperfect dependency generation</div>
+	<div class="Text">When this option is not selected, Dev-C++ will ask GCC which unmodified files need to be recompiled due to changes in their dependencies by using the -MM command of gcc (or g++ for C++ compilations). When this option is selected, only modified files will be recompiled. <b>This feature is currently broken, so please tick this option.</b></div>
+</body>
+</html>

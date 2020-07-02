@@ -1,0 +1,80 @@
+\clearpage
+\section{Manual tests}
+\subsection{Explorer}
+Perform the following tests using the files provided in the Explorer folder:
+\begin{itemize}
+    \item Open file using explorer file association.
+    \item Open project file using explorer file association.
+    \item Open multiple files using explorer file association.
+    
+    \item Open file using File, Open.
+    \item Open project file using File, Open.
+    \item Open multiple files using File, Open.
+    
+    \item Open file using dragging onto page control.
+    \item Open project file using dragging onto page control.
+    \item Open multiple files using dragging onto page control.
+    
+    \item Open file using dragging onto devcpp.exe.
+    \item Open project file using dragging onto devcpp.exe.
+    \item Open multiple files using dragging onto devcpp.exe.
+    
+    \item Open file using dragging onto devcppPortable.exe.
+    \item Open project file using dragging onto devcppPortable.exe.
+    \item Open multiple files using dragging onto devcppPortable.exe.
+    
+    \item Open file using dragging onto devcppPortable.exe from other disk/folder.
+    \item Open project file using dragging onto devcppPortable.exe from other disk/folder.
+    \item Open multiple files using dragging onto devcppPortable.exe from other disk/folder.
+\end{itemize}
+
+\subsection{Parser}
+Perform the following tests using the files provided in the Parser folder. Check if the class browser contains the correct information and hover above all identifiers to check if the parser provides the correct information.
+\begin{itemize}
+    \item Correctly parse basic\textunderscore string.cpp.
+    \item Correctly parse Code.cpp. Check if a, b, c and d are parsed correctly.
+    \item Correctly parse float3.cpp. Check if all synonyms of D3DXVECTOR3 are equivalent. Check if float3 correctly inherits from D3DXVECTOR3.
+    \item Correctly parse Function.cpp.
+    \item Correctly parse Include.cpp. Hover over all include lines and check if the tooltip displays correct information.
+    \item Correctly parse OperatorTest.cpp. 
+    \item Correctly parse Preprocessor.cpp. Check if all variables are called CorrectXX.
+    \item Correctly parse SimpleClass.cpp.
+    \clearpage
+    \item Correctly parse all C++ containers:
+    \begin{itemize}
+        \item Correctly parse basic\textunderscore string.h.
+        \item Correctly parse stl\textunderscore deque.h.
+        \item Correctly parse stl\textunderscore list.h.
+        \item Correctly parse stl\textunderscore map.h.
+        \item Correctly parse stl\textunderscore queue.h.
+        \item Correctly parse stl\textunderscore stack.h.
+        \item Correctly parse stl\textunderscore vector.h.
+    \end{itemize}
+    \item Correctly parse string.cpp. Check if basic\textunderscore string and string code completion works
+    \item Correctly parse Struct.cpp.
+    \item Correctly parse Typedef.cpp. Check if all synonyms are parsed correctly.
+    \item Correctly parse Variable.cpp.
+\end{itemize}
+
+\subsection{Project}
+\begin{itemize}
+    \item Open Project, TestProject.dev.
+    \item Add folder, and folders inside folder. Save, close, reopen. Check if both are still visible in their correct place.
+    \item Add file to deep folder.  Save, close, reopen. Check if it is still visible in their correct place.
+    \item Rename top most folder. Save, close, reopen. Check if content is still displayed as it was before.
+\end{itemize}
+
+\subsection{Compilers}
+\begin{itemize}
+    \item Remove all compiler sets. Reopen Dev-C++. Check if settings are remembered.
+    \item Auto-add compiler sets. Use the new current set to compile a single cpp file. Reopen Dev-C++. Check if settings are remembered.
+    \item Add empty set and configure manually. Use it to compile a single cpp file. Reopen Dev-C++. Check if settings are remembered.
+\end{itemize}
+
+\subsection{Versions}
+\begin{itemize}
+    \item Perform first-time configuration for the version without a compiler using devcpp.exe.
+    \item Perform first-time configuration for the version with a compiler using devcpp.exe.
+    \item Perform first-time configuration for the version without a compiler using devcppPortable.exe.
+    \item Perform first-time configuration for the version with a compiler using devcppPortable.exe.
+\end{itemize}

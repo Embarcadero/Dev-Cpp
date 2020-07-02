@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Heading2"><b>Q:</b> What compilers does Dev-C++ support?</div>
+	<div class="Text"><b>A:</b> Currently, any port of GCC to Windows is supported. This includes MinGW, MinGW-w64 and TDM-GCC. Clang should work too, but you'll have to port that to Windows yourself or find someone else who did it for you.</div>
+	<br/>
+	<div class="Heading2"><b>Q:</b> How do I add a compiler to Dev-C++?</div>
+	<div class="Text"><b>A:</b> All compiler settings are managed at Tools >> Compiler Options. One can add a set in the following ways:
+	<ul>
+		<li>Use "Add compiler set by folder" and point Dev-C++ to the folder where your compiler is installed. Dev-C++ will then attempt to configure it by asking the following program about the compiler folder layout:
+		<div class="Code">\bin\gcc.exe</div></li>
+		<li>Use "Add an empty set" and fill out the options yourself.</li>
+	</ul>
+	<br/>
+	<div class="Heading2"><b>Q:</b> I want to compile for 32-bit with my TDM-GCC x64 install. How do I do that?</div>
+	<div class="Text"><b>A:</b> The simplest way to do that is to select a preconfigured compiler set that will compile for 32bit. Go to Tools >> Compiler Options and check if the list contains any. If it does, select it and click OK. Repeat this step for each project at Project >> Project Options >> Compiler.<br/>
+	To manually create such a compiler set, you need to do two things:
+	<ul>
+		<li>Add '-m32' to the compiler command. Use "Compiler with the following pointer width" at "Settings >> Code Generation" or type it in a custom command at "General >> Add the following commands when calling the compiler".</li>
+		<li>Use different libraries. Go to Directories >> Libraries and replace the "(..)lib" directories with "(..)lib32".</div>
+	<br/>
+	<div class="Heading2"><b>Q:</b> I'm specifically compiling for 32bit or 64bit, but GCC is throwing errors at me!</div>
+	<div class="Text"><b>A:</b> If it looks like this:</div>
+	<div class="Code">skipping incompatible (directory)/libmingw32.a when searching for -lmingw32<br/>
+	                  skipping incompatible (directory)\libmingw32.a when searching for -lmingw32<br/>
+	                  skipping incompatible (directory)/libmoldname.a when searching for -lmoldname<br/>
+	                  skipping incompatible (directory)\libmoldname.a when searching for -lmoldname<br/>
+	                  ...</div>
+	<div class="Text">... then you need to change the library directory. Go to Tools >> Compiler Options >> (select the current compiler) >> Directories >> Libraries. There, use "(...)lib" folders for 64bit, or (...)lib32 for 32bit".</div>
+	<br/>
+</body>
+</html>

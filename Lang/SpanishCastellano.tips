@@ -1,0 +1,113 @@
+#
+#
+# Traducción al Español (Castellano)
+# Hecho por Fernando Muñoz Ledesma
+# E-mail: ledesmafernando@msn.com
+# Web: http://membres.lycos.fr/ledesma/
+# Para cualquier sugerencia o cosa mandarme un e-mail
+# Modificado miércoles 01 de octubre de 2003
+# 
+#
+
+
+#
+# Important tips (appear first)
+#
+...no deberías quitar las sugerencias del día?<CR><CR>Las sugerencias que apareceren aquí te darán información que no aparece en ninguna otra parte.<CR>Si las desactivas y quieres verlas más tarde puedes seleccionando "Ayuda / Sugerencia del día"...
+
+...puedes cambiar el tema de los iconos y el lenguaje que pusiste al ejecutar por primera vez el programa?<CR><CR>Ve a Herramientas / Opciones del Entorno / Interface y podrás elegir un nuevo lenguaje, un nuevo tema y más opciones.
+
+...puedes usar WebUpdate para mantener el entorno Dev-C++ actualizado con los últimos errores solucionados y nuevas y mejores opciones?<CR><CR>Selecciona "Herramientas / Actualizaciones"
+
+...el traductor de Dev-C++ a castellano es Fernando Muñoz Ledesma?<CR>Puedes mandarme comentarios, sugerencias, erratas sobre las traducciones u otras cosas a:<CR><CR>       ledesmafernando@msn.com<CR><CR>También puedes ir a mi web y descargarte las últimas actualizaciones del lenguaje y más.<CR><URL>http://membres.lycos.fr/ledesma/<UDESC>
+
+...la página oficial de Dev-C++ tiene foros donde intercambiar opiniones y respuestas sobre funciones, instrucciones y todo lo que quieras?<CR><CR>También puedes ver en él menú de Ayuda, en Acerca de Dev-C++ más direcciones de interés.<CR><CR>Puedes ir a la página haciendo clic en <URL>http://www.bloodshed.net/dev/<UDESC>
+
+...la página oficial de Dev-C++ tiene links hacia documentos de ayuda sobre los lenguajes de programación C y C++?<CR><CR>También tiene links a MSDN y a las ayudas del compilador Gcc.<CR><CR>Para ir directamente, haz clic en...<URL>http://www.bloodshed.net/dev/doc/index.html<UDESC>
+
+...puedes insertar nuevos compiladores para compilar tus códigos fuente?<CR><CR>Ve a Herramientas / Opciones del Compilador y presionando el botón + agregarás un compilador.<CR><CR>Tendrás que configurarlo en las pestañas de Directorios y Programas.<CR><CR>Y ya estará casi todo listo para usar distintos compiladores.
+
+#
+# Code-completion tips
+#
+
+...la característica de autocompletar texto te ayudará a incrementar tu productividad al sugerirte todos los posibles comandos disponibles en el contexto actual?<CR><CR>Para activar esta opción, ve a "Herramientas / Opciones del Editor" y activa el Explorador de Clases y Autocompletar Código.
+
+...la característica de autocompletar código se muestra cuando escribes ".", "->" o "::" en el editor después de un tiempo definido por el usuario?<CR><CR>Para definir este tiempo ve a "Herramientas / Opciones del Editor / Explorador de Clases / Autocompletar código".
+
+...puedes mostrar la característica de autocompletar código presionando a la vez "Ctrl" y "Space" en el editor?<CR><CR>(Intenta presionando "Ctrl","Shift" y "Space" a la vez mientras el cursor esté en los argumentos pasados a una función...)
+
+...haciendo Clic mientras presionas "Shift" en una entrada del Explorador de Clases, te lleva a una declaración en vez de a una implementación?<CR><CR>Por supuesto, también puedes usar el menú contextual (¡y más opciones!) para dicha función.
+
+...puedes añadir carpetas personales en el Explorador de Clases para encontrar más fácilmente lo que buscas en los granges proyectos? ¡Puedes colocar una o varias dentro de otras carpetas personales!<CR><CR>Sólo haciendo Clic con el Botón Derecho en el Explorador de Clases para traerte el menú contextual...
+
+...puedes ocultar el Explorador de Proyectos/Clases?<CR><CR>Para ello ve a Ver /Explorador de Proyectos/Clases.<CR><CR>Si estuviese oculto podrías volver a ponerlo de igual modo.
+
+...la información del Explorador de Clases está guardada en un archivo llamado "classfolders.dcf" en la carpeta de los proyectos?<CR><CR>¡Si algo malo sucediese, simplemente borra dicho archivo y reabre tu proyecto!
+
+...hay dos modos de visualización para el Explorador de Clases?<CR><CR>Uno te muestra las clases, miembros y funciones analizados del proyecto, y el otro la información relevante al archivo mostrado en el editor.<CR><CR>Simplemente, haz Clic con el Botón Derecho en el Explorador de Clases y selecciona "Modo vista..."
+
+#
+# Project Manager tips
+#
+
+...puedes definir si tendrás que hacer Clic Simple o Doble Clic en un archivo del Administrador de Proyecto para abrirlo y mostrarlo en el editor?<CR><CR>Para cambiar esto ve a "Herramientas / Opciones del Entorno" y activa (o desactiva) "Doble Clic para Abrir Archivos del Administrador de Proyecto"...
+
+...puedes crear carpetas personales(sólo las del nivel superior) en el Administrador de Proyecto para organizar tus archivos mejor?<CR><CR>Para hacer esto, haz Clic con el Botón Derecho en el Administrador de Proyecto para traerte el menú contextual a la pantalla...
+
+...si has creado carpetas en el Administrador de Proyecto, puedes arrastrar y soltar archivos en una u otra carpeta para reorganizarlos?
+
+#
+# File menu tips
+#
+
+...puedes conseguir información sobre el archivo en el que estás trabajando?<CR><CR>¡Selecciona "Archivo / Propiedades" y conseguirás información sobre su tamaño, el número de líneas de código, de comentarios, vacías y de los archivos incluidos!
+
+...puedes guardar tu proyecto como una plantilla?<CR><CR>Selecciona "Archivo / Nuevo / Plantilla". Así conseguirás que tu proyecto al guardarse sea una plantilla y estará disponible cuando selecciones "Archivo / Nuevo / Proyecto".<CR><CR>¡De esta manera tendrás una base en la que comenzar, hecha con tu toque!
+
+...puedes importar tus Proyectos de MS Visual C++ a Dev-C++?<CR><CR>Simplemente selecciona "Archivo / Importar proyecto de MS Visual C++".<CR><CR>¡A lo mejor tienes que configurar las opciones del proyecto antes de importarlo pero, el trabajo de importar está logrado!
+
+...puedes exportar código fuente o proyectos a HTML o a RTF?<CR><CR>De esta manera puedes subirte los códigos a tu página web y compartilos con todo el mundo!<CR><CR>Simplemente haz Clic en "Archivo / Exportar" y selecciona tú opción...
+
+#
+# Edit menu tips
+#
+
+...puedes agregar un comentario (o quitar el comentario) seleccionando un grupo de líneas y haciendo Clic en "Edición / Agregar Comentario (Quitar Comentario)"?
+
+...puedes poner margen (o quitar margen) seleccionando un grupo de líneas y haciendo Clic en "Edición / Poner margen (Quitar margen)"?
+
+...puedes usar marcadores en el editor para desplazarte a lo largo del código rápidamente?<CR><CR>Haz o quita un marcador haciendo Clic en "Edición / Activar Marcador" y seleccionando el número de marcador.<CR><CR>Puedes ir a un marcador seleccionando el número en "Edición / Ir a Marcador".
+
+...hay un potente comando "Ir a Función" en el menú "Buscar"?<CR><CR>Muestra todas las funciones del archivo, y escribiendo parte del nombre de la función muestra la lista de argumentos. ¡Presiona Enter e irás a la función inmediatamente!<CR><CR>Nota: Tiene que estar activado el Explorador de Clases...
+
+#
+# More tips by Fernando Muñoz Ledesma
+#
+
+...puedes encontrar un archivo de ayuda de Dev-C++ en Español?<CR><CR>Para descargarte un instalador con ayuda en Español ve a la dirección indicada después.<CR><CR>Elije el archivo help-installer.exe en<CR><URL>http://membres.lycos.fr/ledesma/help/<UDESC>
+
+...hay dos modos de pantalla completa?<CR><CR>Para ir al modo de pantalla completa presiona la tecla "F12" o selecciona "Ventana / Modo Pantalla Completa".<CR><CR>Para añadirle la Barra de Herramientas hay que presionar "Shift" y "F12".<CR><CR>Para volver al modo normal presionar "F12".
+
+...puedes utilizar teclas para acceder rápidamente a opciones importantes y que además puedes configurarlas?<CR><CR>Para ello ve a "Herramientas / Configurar Atajos Teclado".<CR><CR>Nota: Se pueden deshacer los cambios porque se guardan en el archivo "devshortcuts.cfg" en la carpeta principal.
+
+...el archivo "devcpp.ini" contiene toda la configuración de Dev-C++?<CR><CR>Así si sucediese algo malo en, por ejemplo, los colores para mostrar la sintaxis en el editor, puedes quitar lo que hay debajo de la clave "[Editor.Syntax]" o modificar alguna configuración simplemente.
+
+...puedes añadirle poderosas herramientas a Dev-C++?<CR><CR>Ve a "Herramientas / Configurar Herramientas / Añadir" y añadiendo el título, el programa, la carpeta de trabajo y los macros y parámetros que necesite,<CR>¡ y tendrás la nueva herramienta lista para su utilización con Dev-C++ !
+
+...puedes ver los resultados del compilador utilizando sólo el teclado?<CR><CR>Basta con que presiones "Alt"+"M" e irás a la pestaña compilador. Y para moverte al resto de las pestañas, con "Ctrl"+"Tab".<CR><CR>Recuerda que cuando llegues a la pestaña Cerrar, los resultados del compilador se ocultarán.
+
+...puedes compilar rápidamente tu código fuente o proyecto presionando "Ctrl"+"F9"?<CR><CR>¿ Sabías que puedes ejecutar tu programa presionando "Ctrl"+"F10"?<CR><CR>¿ Sabías que puedes hacer las dos anteriores presionando "F9"?<CR><CR>Son los atajos del teclado de Dev-C++.
+
+...cada usuario tiene su propia configuración?<CR><CR>Los archivos de configuración se guardarán en la carpeta de Application Data de cada usuario<CR><CR>Así podrás personalizar Dev-C++ sin preocuparte de que otros usuarios cambien tu configuración.<CR><CR>Esto es válido sólo para Windows 2000 y XP.
+
+...la sintaxis coloreada tiene varias configuraciones para adaptar más fácilmente el editor de Dev-C++?<CR><CR>Así puedes ver la sintaxis como en MS Visual C++, Borland, además de otras.<CR><CR>Elije la que más te guste en Herramientas / Opciones del editor / Sintaxis / Configuraciones.
+
+...puedes tener la tu propia configuración de la sintaxis coloreada?<CR><CR>Haz los ajustes en Herramientas / Opciones del editor / Sintaxis y dale al icono de guardar, que es el dibujo del disquette.<CR><CR>Tendrás que introducir un nombre y...<CR>          ¡Listo, ya tienes tu propia configuración!
+
+...existe un botón para cancelar la compilación?<CR><CR>Si por error le has dado a compilar pues cancelarla presionando el botón con letras rojas que dicen "Parar la compilación"<CR><CR>El botón se encuentra en los resultados de la compilación abajo a la izquierda, justo debajo del indicador del tamaño del archivo de salida.
+
+...puedes configurar el menú Insertar para tener trozos de código por defecto listos para incluir?<CR><CR>Así puedes introducir por ejemplo, un comentario con tu nombre en cada archivo que hagas persionando Insertar.<CR><CR>Para saber más sobre esto haz clic en siguiente, para ver la siguiente sugerencia.
+
+...en la pestaña Código dentro de Opciones del Editor puedes añadir una entrada con tu código para Insertar?<CR><CR>Haz esto dándole a añadir y poniendo el nombre y la descripción que desees y cuando lo tengas, escribe el trozo de código a incluir abajo donde pone código.<CR><CR>Pruébalo después presionando el botón Insertar.
+

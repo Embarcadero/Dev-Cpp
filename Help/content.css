@@ -1,0 +1,29 @@
+html {
+	font-family:"Segoe UI","MS Sans Serif",serif;
+}
+body {
+	margin:8px;
+}
+.Heading1 {
+	font-size:20pt;
+	margin-bottom:10px;
+}
+.Heading2 {
+	font-weight:bold;
+	font-size:14pt;
+}
+.Heading3 {
+	font-weight:bold;
+	font-size:12pt;
+}
+.Code {
+	margin:10px;
+	font-family:"Consolas","Courier New";
+	background-color:#DDDDDD;
+}
+.Link {
+	display:inline-block;
+	text-decoration:underline;
+	color:rgb(0,0,238); /* webkit link */
+	cursor:pointer;
+}

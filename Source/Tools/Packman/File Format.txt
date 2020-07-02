@@ -1,0 +1,120 @@
+                             Dev-C++ Package File Format
+                         Version 1 - March the 15th, 2002
+
+
+General Information
+-------------------
+The content of the package is described using a package description file,
+which has the extension .DevPackage.
+The file is really a simple INI file.
+
+
+Sections
+--------
+The .DevPackage file contains two sections:
+[Setup]
+This section contains information about the package, such as package name,
+version, description, readme, license, etc.
+
+[Files]
+This section contains information about files, and where they should be
+installed to.
+
+
+The [Setup] section
+-------------------
+This section *must* contain at least the following keys:
+Version		The package format's version number. A higher version number means
+		that this package is not compatible with older package managers.
+AppName		A name for the package. Example: MyApp
+AppVerName	The package's name and the version together. Example: MyApp version 1.0
+AppVersion	The package's version number. Example: 1.0
+MenuName	A name for a menu group for this package.
+
+The following keys are optional:
+Url		An URL to the library's website.
+Picture		A logo/picture/whatever that will be displayed.
+Description	A desription for the package.
+Readme		A filename to the Readme file, relative to the .DevPackage file.
+		Example: README.TXT
+License		A filename to the license file, relative to the .DevPackage file.
+		Example: COPYING.TXT
+Reboot		Wether the package requires a reboot or not in order to function properly.
+		The value can be either 1 (true) or 0 (false).
+Dependencies    A comma-seperated list of package names that this package depends on.
+
+
+The [Files] section
+-------------------
+Keys in the Files section are composed in the following format:
+Source=Destdir\[FileName][;Flags]
+
+Source (required):
+The name of the source file, relative to the .DevPackage file.
+This can be a directory, in which case all files inside that directory will be copied.
+
+Destdir (required):
+The destination directory. PLease note that Destdir must *always* end with a
+backslash (\). Otherwise it will be interpreted as FileName.
+
+FileName (optional):
+If this is specified, the copied file will be renamed to the specified filename.
+
+Flags (optional):
+An extra set of options.
+recursive	If Source is a directory, the installer will recurse into any
+		subdirectories and copy the files inside those subdirectories too.
+
+Constants:
+Sourcedir and Destdir can contain constants. A constant will be replaced to their
+literal value, depending on the user's configuration. The constants' names are not
+case sensitive.
+<app>		Dev-C++'s root directory (usually C:\Dev-C++).
+<src>		The source directory (the directory where the .DevPackage file is located).
+<win>		The system's Windows directory (usually C:\WINDOWS).
+<sys>		The system's Windows System directory (usually C:\WINDOWS\SYSTEM).
+
+
+Examples:
+Foo.txt=<app>\				Installs to C:\Dev-C++\Foo.txt
+Bar.h=<app>\include\FooBar.h		Installs to C:\Dev-C++\include\FooBar.h
+L33t.dll=<sys>\				Installs to C:\WINDOWS\System\L33t.dll
+WindowsSucks.exe=<win>\Explorer.exe	Installs to C:\WINDOWS\Explorer.exe
+BigFolder=C:\;recurive			Installs all files in BigFolder, including
+					all files inside any subfolders, to C:\
+
+
+The [Icons] section
+-------------------
+This section is ignored if MenuName (in the Setup section) is not given.
+
+Entries in this section describe what menu items should be created.
+Each entry has the following format:
+Name=Target[,Icon Filename]
+
+Target can contain constants as described in the Files section.
+
+
+Examples:
+
+[Setup]
+MenuName=GTK
+[Icons]
+Website=http://www.gtk.org/
+
+This will create the menu group "Start->Programs->Bloodshed Dev-C++->GTK",
+with 1 menu item, called Website, which points to http://www.gtk.org/
+
+
+[Setup]
+MenuName=FLTK
+[Icons]
+UI Designer=<app>\bin\Fluid.exe,<app>\Icons\Fluid.ico
+Website=http://www.fltk.org/
+
+Let's assume that Dev-C++ is installed in C:\Dev-C++.
+This will create the menu group "Start->Programs->Bloodshed Dev-C++->FLTK",
+with 2 menu items:
+- Website, which points to http://www.gtk.org/
+- UI Designer, which points to C:\Dev-C++\bin\fluid.exe, and use the icon
+               file C:\Dev-C++\Icons\Fluid.ico

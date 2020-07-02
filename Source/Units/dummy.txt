@@ -1,0 +1,1 @@
+Dummy file that ensures git commits this folder. Without this file, this folder becomes empty and git will not commit it, even though Delphi needs it for compilations.

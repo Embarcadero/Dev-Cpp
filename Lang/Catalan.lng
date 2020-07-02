@@ -1,0 +1,1248 @@
+[lang]
+Lang=Catalan (Català)
+Ver=1
+1=&Fitxer
+2=&Edita
+3=&Cerca
+4=&Visualitza
+5=&Projecte
+6=E&xecuta
+7=E&ines
+8=Fi&nestres
+9=A&juda
+10=&Depura
+
+
+1001=&Nou
+1002=&Projecte...
+1003=Fitxer &font
+1004=Fitxer de &recursos
+1005=P&lantilla...
+1006=&Classe...
+1007=Nou
+
+
+2001=&Obre...
+2002=Torna a o&brir
+2003=Neteja l'&historial
+2004=D&esa
+2005=Ano&mena i desa...
+2006=De&sa-ho tot
+2007=&Tanca
+2008=Tanca el pro&jecte
+2009=Propietats...
+2010=Anomena i desa el projecte...
+2011=E&xporta
+2012=a &HTML...
+2013=a &RTF...
+2014=Projecte a H&TML...
+2015=a &Tex...
+
+
+3001=Importa
+3002=&Imprimeix...
+3003=Configura la impressió...
+3004=S&urt
+
+
+4001=&Troba declaració
+4002=T&roba definició
+4003=&Desfés
+4004=&Refés
+4005=Re&talla
+4006=&Copia
+4007=&Enganxa
+4008=&Selecciona-ho tot
+4009=Es&borra
+4010=&Insereix
+4011=De&fineix els punts
+4012=&Vés als punts
+4013=Punt
+4014=Data/&Hora
+4015=Co&mentari de capçalera
+4016=Copia-ho tot
+4017=Neteja
+
+
+5001=&Cerca...
+5002=Cerca als &fitxers...
+5003=&Reemplaça...
+5004=&Torna a cercar
+5005=&Vés a la línia...
+5006=Cerca &incremental
+5007=Vés a la f&unció...
+5008=Gestor de projectes &flotant
+5009=Vés al gestor de &projectes
+5010=Vés al navegador de &classes
+5011=&Navegador de projectes i classes
+5012=Barra d'&estat
+5013=Sortida del &compilador
+5014=Sempre &visible
+5015=Només si és &necessari
+5016=&Barres d'eines
+5017=Principal
+5018=Compila i executa
+5019=Projecte
+5020=Ajuda
+5021=Insereix
+5022=Edita
+5023=Cerca
+5024=Finestra de &resultats flotant
+5025=Reemplaça als fitxers...
+5026=Compiladors
+5027=Cerca enrere altre cop
+
+6001=Fitxer &nou
+6002=&Afegeix al projecte...
+6003=&Treu del projecte...
+6004=&Edita el fitxer de recursos...
+6005=&Opcions del projecte...
+6006=Mostra el "&Makefile"
+6007=A&fegeix fitxer de recursos...
+6008=T&reu fitxer de recursos...
+
+
+7001=&Compila
+7002=&Executa
+7003=C&ompila i executa
+7004=&Reconstrueix-ho tot
+7005=&Neteja
+7006=Resu&ltats de compilació
+7007=Comprova la &sintaxi
+7008=Reinicia el pro&grama
+7009=Anàlisi del &perfil
+7010=&Interromp la compilació
+7011=Opcions de &compilació...
+7012=Opcions d'&entorn...
+7013=Opcions d'e&dició...
+7014=Configura les e&ines...
+7015=Configura les &dreceres...
+7016=Esborra informació del perfil
+7017=Comprova la &sintaxi al fitxer actual
+
+8001=Mode de pantalla &completa
+8002=Torna al mode &normal
+8003=&Següent
+8004=&Anterior
+8005=&Tanca-ho tot
+8006=%s versió %s a pantalla completa. Pitgeu Alt+F10 per amagar o mostrar aquesta barra, Alt+F11 per amagar o mostrar la barra d'eines, o Alt+F12 per activar o desactivar aquest mode de pantalla completa.
+8007=Tanca-ho tot &excepte aquest
+8008=&Llista de finestres...
+8009=Pitgeu %s per canviar el mode de pantalla completa, o %s per les barres d'eines
+
+9001=&Quant a Dev-C++...
+9002=&Cerca paquets...
+9003=&Personalitza el menú d'ajuda...
+9004=&Ajuda de Dev-C++
+9005=Gestor de paquets...
+9006=Feu un donatiu :)
+
+10001=&Depura
+10002=Commuta punt d'&interrupció
+10003=Línia &següent
+10004=&Continua
+10005=&Afegeix inspecció
+10006=Inspecciona &variables
+10007=&Atura l'execució
+10008=&Edita la inspecció
+10009=&Treu la inspecció
+10010=Lín&ia d'endins
+10011=Executa &fins al cursor
+10012=&Mostra finestra de CPU
+10013=Adjun&ta al procés...
+10014=&Modifica la inspecció
+10015=&Neteja-ho tot
+10016=Fitxer nou
+10017=Afegeix el fitxer...
+10018=Treu el fitxer...
+10019=Opcions...
+10020=Edita el fitxer de recursos
+10021=Instrucció següent
+10022=Instrucció d'endins
+10023=Omet la funció
+10024=Ves al punt d'interrupció
+
+
+11001=Treu el fitxer
+11002=Reanomena el fitxer...
+11003=Tanca
+11004=Obre
+11005=Obre capçalera
+
+
+12001=Vés a la declaració
+12002=Vés a la implementació
+12003=Classe nova
+12004=Funció membre nova
+12005=Variable nova
+12006=Mode de visualització
+12007=Tots els fitxers
+12008=Fitxer actual
+12009=Afegeix carpeta...
+12010=Treu la carpeta
+12011=Reanomena la carpeta...
+12012=No es poden crear més de %d carpetes en un projecte...
+12013=Empra colors
+12014=Fitxers del projecte
+12015=Mostra els membres heretats
+12016=Obre amb...
+12017=Obre la carpeta contenidora...
+12018=Tanca tots els altres
+12019=Afegeix element pendent...
+
+
+13001=Compilador
+13002=Recursos
+13003=Registre de compilació
+13004=Resultats de cerca
+13005=Tanca
+13006=Depura
+
+
+14001=&Neteja
+14002=&Copia
+14003=&Amaga
+14004=&Obre
+
+
+15001=Línia
+15002=Fitxer
+15003=Missatge
+15004=Arguments
+
+
+16001=Cerca la línia
+16002=Col.
+16003=Variable
+16004=Valor
+16005=Informació:
+16006=Registre de compilació:
+16007=Nombre d'errors:
+16008=Mida del compilat:
+16009=Nombre d'avisos:
+
+
+17001=Variables inspeccionades
+17002=Traça enrere
+17003=Sortida
+17004=Envia ordre al GDB:
+17005=Envia
+17006=Avalua:
+
+
+18001=Nou
+18002=Insereix
+18003=Defineix
+18004=Vés a
+18005=Finestra del projecte
+18006=Finestra de depuració
+18007=Finestra de resultats
+
+
+19001=Obre
+19002=Obre el fitxer
+19003=Exporta a
+19004=Desa el fitxer
+19005=Desa el projecte
+19006=Selecciona un fitxer d'ajuda
+19007=Anomena i desa
+
+
+20001=Nova inspecció de variable
+20002=Posa el nom de la variable (es recomana usar 'this->' per als membres de classe):
+20003=Modifica la inspecció de variable
+20004=Nou nom de variable:
+20005=Modifica el valor
+20006=Variable a modificar:
+20007=Nou valor:
+
+
+21001=Projecte
+21002=Classes
+
+
+22001=Comenta
+22002=Descomenta
+22003=Tabula
+22004=Destabula
+22005=Intercanvia capçalera i font
+22006=Plega-ho tot
+22007=Desplega-ho tot
+22008=Commuta comentari
+22009=Duplica línia
+22010=Esborra línia
+22011=Puja la selecció
+22012=Baixa la selecció
+22013=Mou a una altra vista
+22014=Commuta comentari en línia
+
+23001=Opcions d'edició
+23002=General
+23003=Tipus de lletra
+23004=Colors
+23005=Inserció de codi
+23006=Compleció de codi
+23007=Navegador de classes
+23008=Autodesament
+
+
+24001=Insercions
+24002=Codi font per defecte
+24003=Fitxers
+24004=Opcions
+24005=Compleció de símbols
+
+
+25001=Introduïu el nou nom d'opcions de sintaxi:
+25002=Miscel·lània
+25003=Autotabulació de {, } i :
+25004=Mode d'inserció
+25005=Empra el caràcter de tabulació
+25006=Tabulacions intel·ligents
+25007=Retrocés treu tabulacions
+
+
+26001=Desfés múltiple
+26002=Tecla d'Inici millorada
+26003=El cursor passa el final d'arxiu
+26004=El cursor passa el final de línia
+26005=Selecció de línia amb doble clic
+26006=Cerca el text al cursor per defecte
+26007=Barres de desplaçament condicionals
+26008=Desplaçament de mitja pàgina
+26009=Mostra núm. línies en desplaçament
+26010=Ressalta la sintaxi als següents tipus de fitxers:
+26011=Insereix fitxers arrossegats
+26012=Mida:
+26013=Marge dret
+26014=Visible
+26015=Amplada:
+26016=Color:
+26017=Cursor
+26018=Cursor d'inserció:
+26019=Cursor de sobreescriure:
+26020=Línia vertical
+26021=Línia horitzontal
+26022=Mig bloc
+26023=Bloc
+26024=Ressalta la línia actual
+26025=Treu espais de final de línia
+26026=Activat
+26027=Amplada d'enquadernació:
+26028=Auto tabulació
+26029=Afegeix tabulació a {, } i :
+26030=Pestanyes
+
+27001=Mostra símbols de caràcters ocults
+27002=Mostra consells en passar el ratolí
+27003=Ressalta obertura i tancament de claus
+27004=Assegura que el fitxer acabi amb nova línia
+27005=Activat
+27006=Assigna al valor del text ressaltat del sistema
+27007=Assigna al valor d'espai en blanc
+27008=Mostra consells de funcions
+27009=Consell: Utilitzeu Ctrl+Roda del ratolí per canviar la mida de text
+27010=Editor
+27011=Tipus de lletra:
+27012=Mida:
+27013=Lletra de l'editor
+27014=Marge esquerre
+27015=Mida automàtica
+27016=Números de línia
+27017=Mostra zeros a l'esquerra
+27018=Comença pel zero
+27019=Canvia tipus de lletra
+27020=Lletra del marge
+27021=Primer pla:
+27022=Fons:
+27023=Estils
+27024=Negreta
+27025=Cursiva
+27026=Subratllat
+27027=Combinació de colors:
+27028=Tipus:
+27029=Desa la combinació de colors
+27030=Codi
+27031=Text del menú
+27032=Secció
+27033=Descripció
+27034=Insereix aquest codi a cada fitxer nou en blanc:
+27035=Empra la memòria cau de compleció de codi:
+27036=Fitxers a la memòria cau:
+27037=Activa la compleció de codi
+27038=Retard:
+27039=Color de fons:
+27040=Desa només el fitxer visible actual
+27041=Escaneja fitxers locals referenciats dels #include "..."
+27042=Mostra:
+27043=Opcions del motor
+27044=Opcions de visualització
+27045=Activa el navegador de classes
+27046=Escaneja fitxers globals referenciats dels #include <...>
+27047=Activa l'autodesa de l'editor
+27048=Interval:
+27049=Desa tots els fitxers oberts en l'interval
+27050=Nou projecte
+27051=Descripció:
+27052=Activa compleció de símbol
+27053=Opcions específiques de compleció
+27054=Completa claus '{ }'
+27055=Completa parèntesis '( )'
+27056=Completa inclusions '< >' '" "'
+27057=Completa claudàtors '[ ]'
+27058=Completa comentaris multilínia '/* */'
+27059=Desa tots els fitxers del projecte
+27060=Sobreescriu el fitxer
+27061=Afegeix marca horària d'UNIX
+27062=Afegeix marca horària amb format
+27063=Noms de fitxers
+27064=Exemple de nom: %s
+27065=Segur que voleu netejar la memòria cau?
+27066=Actualitzeu la memòria cau quan actualitzeu Dev-C++
+27067=Esborra caràcter de tancament quan s'esborra el d'obertura
+27068=Completa cometes senzilles ''''
+27069=Completa cometes dobles '""'
+
+
+28001=Nom:
+28002=Projecte de &C
+28003=Projecte de C&++
+28004=Defineix com llenguatge per &defecte
+28005=Miscel·lània
+28006=Opcions del projecte
+
+
+29001=Treu del projecte
+29002=Seleccioneu el fitxer a treure del projecte:
+
+
+30001=Vés a la línia...
+30002=Nova línia:
+
+
+31001=Configuració d'Eines
+31002=Eines actuals:
+
+
+32001=Edita l'entrada d'Eina
+32002=Títol
+32003=Programa
+32004=Directori de treball
+32005=Paràmetres
+32006=Insereix una macro
+32007=Macros disponibles
+
+
+33001=Biblioteca d'icones
+33002=Empra la icona seleccionada
+33003=Navega
+
+
+34001=Dreceres de teclat
+34002=Feu clic a un element i pitgeu la drecera desitjada!
+34003=Consell: Premeu "Esc" per esborrar una drecera...
+34004=Acció
+34005=Drecera assignada
+34006=Cancel·la
+34007=D'acord
+34008=Aquesta drecera ja es fa servir per '%s'.<CR><CR>La voleu eliminar?
+34009=Botó/Misc.
+34010=Aquesta drecera ja està assignada a l'acció '%s'.<CR><CR>Voleu netejar aquesta acció i assignar la drecera a '%s'?
+34011=Feu clic a un element i premeu la drecera que voleu. Premeu Esc o Supr per netejar la drecera. Eviteu l'us de la combinació Ctrl+Alt per les dreceres si necessiteu utilitzar la tecla AltGr.
+34012=Segur que voleu reiniciar totes les dreceres d'accions?
+34013=Segur que voleu reiniciar la drecera de l'acció '%s'?
+34014=Reinicia tot
+34015=Reinicia selecció
+
+
+35001=Torna el directori predeterminat
+35002=Torna el directori de treball del Dev-C++
+35003=Torna el nom del fitxer compilat
+35004=Torna el camí al projecte actual o al fitxer de codi font
+35005=Torna el nom del fitxer del projecte actual o del codi font
+35006=Torna el nom del projecte
+35007=Torna el nom del fitxer de codi font actual
+35008=Torna el camí del fitxer de codi font actual
+35009=Torna una llista de fitxers de codi font del projecte separats per espais
+35010=Torna la paraula del cursor de la finestra activa
+35011=Torna la versió de Dev-C++
+
+
+36001=Quant a Dev-C++ :)
+36002=inseculous@users.sourceforge.net
+36003=Llicència pública general GNU
+36004=Informació de contacte
+36005=Web de Bloodshed Soft.:
+36006=Web del compilador MinGW:
+36007=Fòrum de discussió de Dev-C++:
+36008=Llista de correu de Dev-C++:
+36009=E-mail de l'autor:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.bloodshed.net/devcpp-ml.html
+36014=haiku@bloodshed.net
+36015=&Cerca actualitzacions
+36016=Desenvolupament post-4.9.9.2:
+36017=http://orwelldevcpp.blogspot.com
+36018=> 4.9.9.2
+36019=Repositori:
+36020=Subreddit:
+36021=Compiladors
+36022=Web del compilador TDM-GCC:
+36023=<= 4.9.9.2 (antic)
+36024=Doneu suport al Dev-C++ d'Orwell fent una donació:
+36025=Blog:
+
+
+37001=Edita l'entrada d'inserció de codi
+37002=Afegeix entrada d'inserció de codi
+37003=Text de l'element del menú
+37004=Descripció de l'element
+37005=Secció del menú
+
+
+38001=Finestra de progrés de compilació
+38002=&Mostra durant la compilació
+38003=&Tanca acabada la compilació
+38004=Sense pantalla de presentació inicial
+38005=Opcions d'entorn
+38006=General
+38007=Directoris
+38008=Obre automàticament del projecte
+38009=C++ per defecte en projecte nou
+38010=Mostra barres d'eines en pant. completa
+38011=Fes còpies de seguretat en obrir fitxers
+38012=Minimitza en l'execució
+38013=Estil dels diàlegs Obre i Desa
+38014=Windows 2k (barra lateral)
+38015=Windows 9x
+38016=Windows 3.1
+38017=Idioma:
+38018=Posició de pestanyes d'editor:
+38019=Fitxers al menú de recents:
+38020=Directori per defecte de l'usuari:
+38021=Directori de sortida
+38022=Camí de la biblioteca d'icones:
+38023=Imatge de la pantalla de presentació:
+38024=Selecciona el directori d'usuari
+38025=Selecciona el directori de sortida
+38026=Selecciona el directori d'icones
+38027=Tots els fitxers
+38028=Només el primer fitxer
+38029=Cap
+38030=Pestanyes multilínia
+38031=Doble clic obre fitxers del projecte
+38032=Camí dels fitxers d'idioma:
+38033=Tema:
+38034=Interfície
+38035=Cerca el text
+38036=Cerca
+38037=Cerca als fitxers:
+38038=&Text a cercar:
+38039=Opcions
+38040=&Majúsc./minúscules
+38041=&Paraules senceres
+38042=On
+38043=&Fitxers del projecte
+38044=Fitxers &oberts
+38045=Àmbit
+38046=&Global
+38047=Només la &selecció
+38048=Origen
+38049=Des del &cursor
+38050=&Tot l'àmbit
+38051=Direcció
+38052=Cap en&davant
+38053=Cap en&rere
+38054=Fes pausa en programes de consola
+38055=Fitxers oberts al tancament anterior
+38056=Reemplaça
+38057=Reemplaça als fitxers
+38058=Reemplaça amb:
+38059=Pregunta en reempl.
+38060=Fitxer actual
+38061=Comprova associacions de fitxers en iniciar
+38062=Part superior
+38063=Part inferior
+38064=Esquerra
+38065=Dreta
+38066=Esborra paràmetres i surt
+38067=Carpeta d'opcions actual. Feu clic al botó per reinicialitzar Dev-C++.
+
+40001=Cerca:
+40002=Tipus
+40003=Funció
+40004=Línia
+
+
+41001=Opcions de compilació
+41002=General
+41003=Directoris
+41004=Paràmetres
+41005=Enllaçador
+41006=Programes
+41007=Trobareu més informació dels paràmetres de GCC a
+41008=Makefile
+
+42001=Binaris
+42002=Biblioteques
+42003=Inclusions C
+42004=Inclusions C++
+
+
+43001=Opcions de C
+43002=Compilador C++
+43003=Compilador:
+43004=Sortida
+
+
+44001=Tolera tots els programes C estàndard ANSI (-ansi)
+44002=Imita preprocessadors C tradicionals (-traditional-cpp)
+44003=Inhibeix tots els missatges d'alerta (-w)
+44004=Desactiva totes les comprovacions d'accés (-fno-access-control)
+44005=Accepta $ als identificadors (-fdollar-in-identifiers)
+44006=Empra heurístics per compilar més ràpid (-fsave-memoized)
+44007=Empra Cygwin en lloc del compilador MinGW
+44008=Afegeix aquestes ordres en cridar el compilador:
+44009=Retard (ms):
+44010=Activa un retard en mil·lisegons per si el Make es queixa de les dates dels Makefiles
+44011=Mostra una errada per línia (-fmessage-length 0)
+44012=No reconeguis asm, inline ni typeof com a paraules clau (-fno-asm)
+44013=Comprova si el punter és nul abans d'accedir a l'emmagatzematge guardat (-fcheck-new)
+44014=Posa els globals sense iniciar al segment comú (-fconserve-space)
+
+
+45001=Generació de codi
+45002=Optimitza
+
+
+46001=Activa la manipulació d'excepcions (-fexceptions)
+46002=Empra 4 bytes per double i float (-fshort-double)
+46003=Comentaris addicionals al codi assemblador generat (-fverbose-asm)
+46004=Optimitza (-Ox)
+46005=Optimitza al màxim
+46006=Realitza unes quantes petites optimitzacions
+46007=Genera el Makefile
+46008=Genera dependència ràpida però imperfecta
+46009=Estadístiques de codi
+46010=Genera estadístiques de codi per analitzar-les (-pg)
+46011=Enllaça un programa Objective-C (-lobjc)
+46012=Genera informació de depuració (-g3)
+46013=Sense biblioteques del sistema estàndard (-nostdlib)
+46014=Sense finestra de consola (-mwindows)
+46015=Afegeix això a la línia d'ordres de l'enllaçador:
+46016=&Sense optimització
+46017=Optimitza més
+46018=Sense assemblar, però posa codi d'assemblar (-S)
+46019=Utilitza conductes en comptes de fitxers temporals durant la compilació (-pipe)
+
+
+47001=Aquí es poden canviar els noms de fitxers de programes que fa servir Dev-C++ (p. ex. si s'utilitza un compilador creuat):
+47002=Compilador a configurar
+47003=Nou compilador
+47004=Introduïu el nom nou de configuració:
+47005=No podeu esborrar l'últim compilador que queda!
+47006=Segur que voleu esborrar aquest compilador?
+47007=Canvia el nom del compilador
+47008=Introduïu el nom nou del compilador:
+47009=Més optimitzacions
+47010=Per uns millors resultats, forceu els compiladors a parlar anglès i poseu-los en els següents directoris:<CR><CR>32bit: %s<CR>64bit: %s<CR><CR>Voleu netejar la llista actual de compiladors?
+47011=Cerca i configura automàticament els compiladors
+47012=Afegeix un compilador en blanc
+47013=Esborra el compilador seleccionat
+47014=Canvia el nom del compilador seleccionat
+47015=Afegeix un compilador per directori
+
+
+48001=Editor del menú d'ajuda
+48002=Text del menú
+48003=Fitxer d'ajuda
+48004=Opcions del menú d'ajuda
+48005=Icona
+48006=Secció del menú
+48007=Secció 1
+48008=Secció 2
+48009=Menú d'ajuda contextual
+48010=Accions
+48011=Cerca al fitxer d'ajuda la paraula del cursor
+48012=Assigna la tecla F1
+48013=Mostra la majoria d'avisos (-Wall)
+48014=Mostra alguns avisos més (-Wextra)
+48015=Comprova conformitat ISO C/C++/C++0x (-pedantic)
+48016=Avisos
+48017=Només comprova errors de sintaxi al codi (-fsyntax-only)
+48018=Tracta els avisos com errors (-Werror)
+48019=Cancel·la compilació al primer error (-Wfatal-errors)
+
+
+49001=Imprimeix fitxer
+49002=Paràmetres:
+49003=Pàgines:
+49004=&Colors
+49005=&Ressaltat
+49006=&Ajusta les paraules
+49007=&Números de línia
+49008=Imprimeix números de línia
+49009=Imprimeix-los al marge
+49010=Nombre de còpies:
+49011=Imprimeix només la selecció
+49012=Imprimeix sense números de línia
+
+
+50001=Cerca actualització de Dev-C++
+50002=Tasca:
+50003=Resultats:
+50004=Versió de distribució:
+50005=Requereix la versió:
+50006=Descripció de la distribució:
+50007=Pàgina de baixada (doble clic per baixar):
+
+
+51001=Afegeix element pendent...
+51002=Descripció
+51003=Prioritat
+51004=Usuari
+
+
+52001=Llista de pendents (TODO)...
+52002=Nom del fitxer
+52003=Fet
+52004=No mostris els elements ja fets
+52005=Filtre:
+52006=Tots els fitxers (del projecte o no)
+52007=Només els fitxers oberts (del projecte o no)
+52008=Tots els fitxers del projecte
+52009=Només els fitxers oberts del projecte
+52010=Fitxers oberts fora del projecte
+52011=Només el fitxer actual
+
+
+53001=Importa projecte de MS Visual C++...
+53002=Selecciona el fitxer de projecte Visual C++
+53003=Opcions d'importació
+53004=Configuració a importar
+53005=Nom de fitxer de projecte Dev-C++
+53006=El fitxer de projecte MS Visual C++ s'ha importat i convertit a un projecte Dev-C++ correctament! El voleu obrir ara?
+53007=No s'ha trobat la configuració de destí "%s" (probablement és un error de Dev-C++)...
+
+
+54001=Importa projecte de Code::Blocks
+54002=Selecciona el fitxer de projecte Code::Blocks
+54003=Opcions d'importació
+54004=Configuració a importar
+54005=Nom de fitxer de projecte Dev-C++
+54006=El fitxer de projecte Code::Blocks s'ha importat i convertit al projecte Dev-C++ correctament! El voleu obrir ara?
+54007=No s'ha trobat la configuració de destí "%s" (probablement és un error de Dev-C++)...
+
+
+55001=Opcions del projecte
+55002=General
+55003=Directoris
+55004=Nom:
+55005=Icona
+55006=Biblioteca
+55007=Navega
+55008=Tipus
+55009=GUI Win32
+55010=Consola Win32
+55011=Llib. estàtica Win32
+55012=DLL Win32
+55013=Compilació C++
+55014=Opcions addicionals de la línia d'ordres:
+55015=Joc de compiladors base:
+55016=Opcions d'enllaçador/Fitxers objecte o Biblioteques opcionals:
+55017=Directoris de biblioteques
+55018=Fitxers de recursos
+55019=Directoris d'inclusió
+55020=Selecciona icona
+55021=Inclou un fitxer d'objecte
+55022=Directoris de recursos
+55023=Sortida
+55024=Directoris
+55025=Directori de sortida de l'&executable:
+55026=Directori de sortida del fitxer &objecte:
+55027=&Sobreescriu el fitxer de sortida:
+55028=Afegeix biblioteca/obj.
+55029=%d fitxers [%d font, %d capçaleres, %d recursos, %d altres fitxers]
+55030=Autodesa registre de compilador:
+55031=Compilador de C:
+55032=Personalitza (només s'aplica a aquest projecte):
+55033=Segur que voleu descartar la personalització?
+55034=Compilador de C++:
+55035=Enllaçador:
+
+56001=Nom:
+56002=Descripció:
+56003=Categoria:
+56004=Nou nom de projecte:
+56005=Fitxers a la plantilla:
+56006=Opcions addicionals del compilador:
+56007=Opcions addicionals de l'enllaçador:
+56008=Icones:
+56009=Info. de plantilla
+56010=Fitxers
+56011=Extres
+56012=Icona de plantilla
+56013=Nova icona del projecte
+56014=Crea
+56015=Nova plantilla del projecte
+56016=Empra els directoris d'inclusió del projecte
+56017=Empra els directoris de biblioteques del projecte
+56018=Empra els directoris de recursos del projecte
+56019=Biblioteca
+56020=Compilador de C:
+56021=Compilador de C++:
+56022=Enllaçador:
+
+57001=Tipus de retorn:
+57002=Nom:
+57003=Implementa en:
+57004=Àmbit d'accés
+57005=Crea funció membre per LLEGIR d'aquesta variable
+57006=Crea funció membre per ESCRIURE a aquesta variable
+57007=Nom:
+57008=Comentaris
+57009=Descripció:
+57010=Estil:
+57011=Crea
+57012=Cancel·la
+57013=Classe desconeguda...
+57014=No es pot determinar el nom de fitxer per la implementació...
+57015=No es pot determinar el número de línia per la inserció de codi...
+57016=Nom:
+57017=Paràmetres:
+57018=Nom:
+57019=Hereta d'una altra classe
+57020=Herència
+57021=Hereta de la classe:
+57022=Fitxer de capçalera:
+57023=Fitxer d'implementació:
+57024=Fitxer de capçalera:
+57025=Afegeix al projecte actual
+57026=Atributs
+57027=Crea Constructor
+57028=Crea Destructor
+
+
+58001=Nom del fitxer
+58002=Al projecte
+58003=Total de línies
+58004=Línies de codi
+58005=Línies de comentaris
+58006=Fitxers inclosos
+58007=Línies en blanc
+58008=Mida del fitxer
+58009=Absolut
+58010=Makefile
+58011=Relatiu
+58012=Data i hora del fitxer
+58013=Opcions de compilació
+58014=Propietats
+
+59001=Anàlisi del perfil
+59002=Sortida plana
+59003=Gràfica de crides
+59004=Opcions d'estadístiques
+59005=Ocultació de funcions
+59006=Amaga funcions no trucades el suficient
+59007=Amaga func. de fitxers enllaçats estàticam.
+59008=Amaga f. cridades menys de
+59009=cops
+59010=Aplica
+59011=Ordres personalitzades
+59012=Empra aquestes ordres:
+
+
+60001=No s'ha trobat la cadena ''%s''
+60002=No es pot obrir el fitxer %s
+60003=Voleu reemplaçar la coincidència de ''%s''?
+60004=El fitxer %s ja existeix a %s
+60005=Segur que voleu tancar %s?
+60006=Voleu desar els canvis a %s?
+60007=Voleu tancar %s i començar un nou projecte?
+60008=Canvia el nom a:
+60009=Ja està compilant
+60010=Voleu desar els canvis a %s?
+60011=El fitxer ja existeix. Voleu sobreescriure'l?
+60012=Voleu afegir un fitxer nou al projecte actual?
+60013=Voleu afegir un recurs nou al projecte actual?
+60014=No s'ha generat la informació de depuració (-g) o s'ha tret de l'executable (-s) a les opcions de compilació.<CR><CR>Voleu arreglar-ho ara?
+60015=No s'ha generat les estadístiques del perfil (-pg) o s'han tret de l'executable (-s) a les opcions de compilació.<CR><CR>Voleu arreglar-ho ara?
+60016=No s'ha trobat la informació de perfil que es crea en executar el fitxer o projecte. Voleu executar-ho ara?
+60017=Introduïu el nou nom de carpeta:
+60018=Segur que voleu esborrar aquesta carpeta?
+60019=Introduïu el nou nom de carpeta:
+60020=El fitxer %s té l'atribut de només lectura. Voleu permetre'n l'escriptura? Si no es fa, el fitxer no es podrà desar...
+60021=S'ha produït un error. El fitxer %s no és de lectura-escriptura i no s'ha desat...
+60022=S'ha produït una violació d'accés (error de segmentació) al vostre programa.
+60023=El fitxer de codi font és més recent que l'executable. Desitgeu reconstruir-lo?
+60024=Seleccioneu l'aplicació que voleu adjuntar-hi:
+60025=No s'ha pogut trobar el fitxer de codi font corresponent
+60026=No s'ha pogut trobar el fitxer de capçalera corresponent
+60027=Ha canviat el format d'opcions de compilació de Dev-C++.<CR><CR>Actualitzeu les opcions a Projecte >> Opcions del projecte >> Compilador i deseu el vostre projecte.
+60028=El joc de compilació que heu seleccionat per aquest projecte, ja no existeix.<CR>Es canviarà pel joc de compilació global.
+
+61001=No es pot obrir el fitxer %s
+61002=No es pot desar el fitxer %s
+61003=No es pot reanomenar el fitxer %s
+61004=El camp de cerca no pot estar en blanc
+61005=El projecte no és executable
+61006=El projecte no està compilat
+61007=Fitxer de codi font no compilat
+61008=No s'ha trobat el fitxer de Make.
+61009=Neteja fallida
+61010=No s'ha pogut ubicar la plantilla al projecte.
+61011=No s'ha trobat el recurs %s: %s - %s
+61012=No s'ha trobat el fitxer de plantilla %s, ometent-lo.
+61013=Sense plantilla assignada.
+61014=No s'ha trobat el fitxer %s.
+61015=No s'ha definit l'aplicació hoste. La podeu definir a Paràmetres del menú d'Execució.
+61016=No s'ha trobat l'aplicació hoste! La podeu canviar a Paràmetres del menú d'Execució.
+61017=El projecte no està compilat.<CR><CR>Voleu compilar-ho ara?
+61018=El fitxer de codi font no està compilat.<CR><CR>Voleu compilar-lo ara?
+61019=%s ha canviat. Voleu que es torni a llegir del disc?
+61020=%s ha canviat de nom o s'ha eliminat...
+61021=%s ha canviat de nom o s'ha eliminat. Voleu mantenir aquest fitxer en l'editor?
+61022=Error executant<CR><CR>%s<CR><CR>%s
+61023=Error executant el depurador: no s'ha proporcionat cap directori executable
+61024=Error en escriure al GDB
+
+
+62001=Sense títol
+62002=Només lectura
+62003=Insereix
+62004=Sobreescriu
+62005=Projecte%d
+62006=Especifiqueu un altre nom de fitxer.
+62007=%d línies al fitxer
+62008=Reanomena el fitxer
+62009=Executant %s...
+62010=Execució finalitzada
+62011=octets
+62012=Modificat
+62013=Error
+62014=Informació
+62015=Avís
+62016=Pregunta
+62017=Compilació amb èxit
+62018=Compilació interrompuda per l'usuari
+62019=Línia:%6d               Col.:%6d               Sel.:%6d               Línies:%6d               Mida:%6d
+62020=Anàlisi feta
+62021=S'han trobat %d coincidències
+62022=Anàlisi feta en %g segons
+62023=considereu afegir a la memòria cau alguns fitxers a 'Eines >> Opcions d'Editor >> Compleció de codi' per una millor velocitat d'anàlisi
+62024=Ha fallat la compilació després de %.2f segons
+62025=S'ha cancel·lat la compilació després de %.2f segons
+62026=S'ha compilat correctament en %.2f segons
+62027=amb avisos
+62028=amb errors
+62029=Analitzant "%s"
+62030=Fitxer "%s" autodesat
+62031=Fitxer "%s" autodesat com "%s"
+62032=Esborrat el fitxer de dades de perfil "%s"
+62033=No s'ha trobat el fitxer de perfil "%s"
+62034=No s'ha trobat informació per l'expressió "%s"
+62035=Analitzant el fitxer %d de %d: "%s"
+62036=S'han analitzat %d fitxers en %g segons (%.2f fitxers per segon)
+
+
+63001=D'&acord
+63002=&Cancel·la
+63003=A&juda
+63004=Per &defecte
+63005=&Sí
+63006=&No
+63007=&Afegeix
+63008=&Edita
+63009=&Treu
+63010=E&limina
+63011=&Tanca
+63012=&Autors
+63013=&Cerca
+63014=&Reemplaça
+63015=Treu els no vàli&ds
+63016=Reemplaça-ho &tot
+63017=Navega
+63018=Treu
+63019=Reanomena
+63020=Importa
+63021=Mode de finestra
+63022=Neteja
+63023=Refresca
+
+
+64001=Finestra de CPU
+64002=Codi d'assemblador:
+64003=Desassembla:
+64004=Sintaxi d'assemblador:
+64005=Registres:
+
+
+65001=Consell del dia
+65002=Sabíeu que...
+65003=...no hi ha consells per mostrar?
+65004=Sense consells en iniciar
+65005=Següent
+65006=Anterior
+65007=Aleatori
+
+
+66001=Associacions de fitxers
+66002=Tipus de fitxers:
+66003=Marqueu els tipus de fitxers que voleu que s'obrin per defecte amb Dev-C++...
+66004=Suport CVS
+66005=Fitxer de programa CVS:
+66006=Nivell de compressió:
+66007=Empra SSH en lloc de RSH
+66008=Directori de plantilles:
+66009=Seleccioneu el directori de plantilles
+66010=Empra tema d'XP
+66011=Programes externs
+66012=Programa extern
+66013=Extensió
+66014=Associacions de programes externs:
+66015=Inspecciona variable del cursor
+66016=Registra errors d'inspecció
+66017=Depura navegador de variables
+66018=Alterna fitxer de configuració
+66019=Utilitza aquest fitxer de configuració alternatiu
+66020=S'ha canviat el fitxer de configuració que utilitza l'aplicació.<CR>El nou fitxer de configuració *no* s'utilitzarà a la sessió actual. Qualsevol canvi de configuració que es faci a aquesta sessió, serà desat a l'*actual* fitxer de configuració obert.<CR><CR>Es recomana reiniciar l'aplicació ara, per començar a utilitzar el nou fitxer de configuració...
+66021=No s'ha pogut comprovar o fer l'associació de fitxers amb Dev-C++.<CR><CR>Això sol passar per utilitzar el Control de comptes d'usuaris amb un compte sense drets d'administrador.<CR><CR>Desactiveu el Control de comptes o executeu Dev-C++ com administrador si voleu canviar les associacions. Es poden trobar opcions rellevants a Eines >> Opcions d'entorn >> Associacions de fitxers.
+66022=Tipus de lletra UI:
+66023=Dev-C++ no ha pogut carregar la memòria cau de compleció de codi, que està malmesa o té fitxers de paràmetres antics ubicats a:<CR><CR>%s<CR><CR>Voleu fer una còpia de seguretat i reiniciar les opcions? Si ho feu, reinicieu Dev-C++. Les còpies es desaran aquí:<CR><CR>%s
+66024=S'ha produït un error en provar de carregar el diàleg de configuració d'impressora.<CR><CR>Probablement no teniu cap impressora instal·lada encara.
+66025=Ha d'estar activat les pestanyes multilínia quan s'utilitza les pestanyes verticals.<CR><CR>Establint les pestanyes a dalt.
+
+
+67001=Paràmetres...
+67002=Compila el fitxer actual
+
+
+68001=Llista de finestres
+68002=Seleccioneu la finestra que voleu editar:
+
+
+69001=Fitxer actual...
+69002=Tot el projecte...
+69003=Indiqueu on es troba cvs.exe a "Eines >> Opcions d'entorn >> Suport CVS" ...
+
+
+70001=Opcions d'importació
+70002=Repositori
+70003=Opcions globals
+70004=Opcions de revisió
+70005=Opcions de cometre
+70006=Opcions d'actualització
+70007=Opcions de llista de canvis
+70008=Opcions de registre
+70009=Sortida de CVS
+70010=Importa
+70011=Comprova
+70012=Comet
+70013=Actualitza
+70014=Llista de canvis
+70015=Registre
+70016=Directori d'importació
+70017=Acció
+70018=Proveïdor
+70019=Distribució
+70020=Missatge de registre
+70021=Nom del mòdul
+70022=Extensió
+70023=Revisa com
+70024=Directori de revisions
+70025=Inclou els subdirectoris
+70026=Restableix qualsevol opció molesta
+70027=Crea els directoris que faltin
+70028=Esborra directoris buits
+70029=Deixa els canvis fets localment
+70030=Abans de la data
+70031=Revisió/branca/etiqueta
+70032=Si no es troba, utilitza el més recent
+70033=Altres revisions
+70034=Fes una llista de canvis unificada
+70035=Compara el fitxer local amb la mateixa revisió/etiqueta remota
+70036=Compara el fitxer local amb una altra revisió remota
+70037=Compara dues revisions remotes
+70038=A data
+70039=Registra la branca per defecte
+70040=Llista només els fitxers RCS
+70041=No imprimeixis el nom d'etiquetes
+70042=Filtre
+70043=Per revisió/etiqueta
+70044=Per data
+70045=Per usuari
+70046=Repositori
+70047=Detalls
+70048=Mètode d'accés
+70049=Usuari
+70050=Servidor
+70051=Directori remot
+70052=Afegeix
+70053=Esborra
+70054=Afegeix opcions
+70055=Esborra opcions
+70056=Esborra el fitxer del disc també...
+
+
+71001=Paràmetres
+71002=Paràmetres a passar al vostre programa:
+71003=Aplicació hoste:
+
+
+72001=Fitxers
+72002=Fitxers del projecte:
+72003=Opcions del projecte
+72004=Genera informació de depuració
+72005=Genera informació d'estadístiques de perfil
+72006=AVÍS: Aquestes preferències prevalen sobre les opcions de compilació globals i només en aquest projecte.
+72007=Suporta temes d'XP
+72008=Opcions del fitxer
+72009=Inclou a la compilació
+72010=Compilació C++
+72011=Informació de versió
+72012=Inclou informació de versió al projecte:
+72013=Detalls de versió
+72014=Major:
+72015=Menor:
+72016=Distribució:
+72017=Compilació:
+72018=Idioma:
+72019=Informació addicional:
+72020=Substitueix l'ordre de compilació:
+72021=Fitxer de sortida:
+72022=Inclou en l'enllaçat
+72023=Prioritat de compilació:
+72024=Auto-incrementa el comptador de compilació
+72025=Utilitza aquest Makefile (sense generar-ne un, utilitza aquest):
+72026=Informació sobre configurar el Makefile...
+72027=&Inclou els següents fitxers al Makefile:
+72028=Sincronitza producte amb la versió de fitxer
+72029=C++ per defecte en crear arxius nous
+72030=Voleu reiniciar els valors del joc de compiladors?
+72031=Dev-C++ no ha pogut llegir les opcions d'informació de versió de l'executable.<CR><CR>La causa més normal d'aquest error és la Prevenció de l'Execució de Dades (DEP).<CR><CR>Afegiu devcpp.exe a la llista blanca del DEP al Panell de Control >> Sistema >> Paràmetres Avançats del Sistema >> Avançat >> Rendiment >> Prevenció de l'execució de dades, i torneu a provar.
+72032=Fitxers:
+
+73001=Neteja informació de l'executable (-s)
+73002=Optimitza per al següent maquinari (-march)
+73003=Activa l'ús d'instruccions específiques (-mx)
+73004=Nivell d'optimització (-Ox)
+73005=Idioma estàndard (-std)
+73006=Compila amb la següent amplada de punter (-mx)
+73007=Optimitza menys, mantenint compatibilitat completa (-mtune)
+
+
+74001=Compilador:
+74002=Estat:
+74003=Fitxer:
+74004=Errors:
+74005=Avisos:
+74006=Progrés de compilació
+
+
+75001=No existeixen els %s directoris següents:
+75002=%s directoris sense especificar.
+75003=S'han cercat els següents directoris de binaris:
+75004=Comproveu que el directori de binaris i els noms dels executables s'han configurat correctament a Eines >> Opcions de compilació >> Directoris/Programes.
+75005=Voleu que Dev-C++ els esborri i afegeixi els camins per defecte als camins vàlids?<CR><CR>Deixar aquests directoris portarà problemes durant la compilació.<CR><CR>Si no sabeu exactament el que feu, es recomana que feu clic a Sí.
+75006=No s'ha pogut trobar %s "%s".
+75007=el binari
+75008=la inclusió C
+75009=la inclusió C++
+75010=la biblioteca
+75011=el compilador C
+75012=el compilador C++
+75013=el depurador
+75014=el perfilador
+75015=el processador de makefile
+75016=el processador de recursos
+75017=l'embolcallador de DLL
+75018=S'han trobat els següents problemes mentre es validava el joc de compiladors "%s":
+
+
+76001=Seleccioneu el vostre tema:
+76002=Lletra:
+76003=Color:
+76004=Icones:
+76005=Podeu canviar els temes després a Eines >> Opcions d'edició >> Tipus de lletra/Colors.
+76006=Per optimitzar la compleció de codi, es recomana crear una memòria cau de les capçaleres usades més habitualment.
+76007=Podeu afegir després capçaleres a la memòria cau a Eines, Opcions d'edició, Compleció de codi.
+76008=Emmagatzema totes les capçaleres (pot trigar molt)
+76009=Emmagatzema aquestes capçaleres (recomanat):
+76010=No afegeixis res a la memòria cau
+76011=Afegeix fitxer
+76012=Afegeix carpeta
+76013=Esborra
+76014=Analitzant...
+76015=Dev-C++ s'ha configurat correctament.
+76016=Si necessiteu ajuda amb Dev-C++, mireu el fitxer d'ajuda de Dev-C++ al menú d'Ajuda o envieu un missatge al desenvolupador (no l'importa!).
+76017=També podeu baixar paquets (com biblioteques o eines) per utilitzar amb Dev-C++ per mitjà de WebUpdate, que trobareu al menú Eines >> Cerca paquets.
+76018=&Següent
+76019=Espereu, si us plau...
+76020=Desant...
+76021=Anàlisi completada en %g segons. Desant...
+
+
+77001=Carregant joc de compiladors...
+77002=Comprovant associació de fitxers...
+77003=Iniciant navegador de classes...
+77004=Restaurant mida de finestra...
+
+
+78001=Compilador
+78002=Construint el makefile...
+78003=Reconstruint el projecte sencer...
+78004=Processant el makefile...
+78005=- Fitxer del projecte: %s
+78006=- Nom de compilador: %s
+78007=- Fitxer: %s
+78008=- Fitxer de recursos: %s
+78009=- Processador del Makefile: %s
+78010=- Ordre: %s
+78011=Resultats de compilació...
+78012=- Errors: %d
+78013=- Advertències: %d
+78014=- Mida de sortida: %s
+78015=- Temps de compilació: %fs
+78016=- Fitxer de sortida: %s
+78017=Compilant fitxer únic...
+78018=- Fitxer: %s
+78019=Processant fitxer de recursos...
+78020=- Processador de recursos: %s
+78021=Processant fitxer de font C++...
+78022=- Compilador de C++: %s
+78023=Processant fitxer de font C...
+78024=- Compilador de C: %s
+78025=Compilant canvis del projecte...
+78026=Processant fitxer de capçalera...
+78027=No s'ha proporcionat cap directori de binaris en el joc de compilació "%s". Compilació cancel·lada.
+78028=Res per compilar. Compilació cancel·lada.
+78029=Netejant projecte...
+78030=Netejant fitxer...
+78031=Eliminat el fitxer de sortida %s
+78032=Cap fitxer de sortida per esborrar.
+78033=Processant tipus de fitxer desconegut...
+
+
+79001=Formata el fitxer actual
+79002=Opcions de formatació...
+79003=Opcions de formatació
+79004=No s'ha trobat l'executable AStyle. Assegureu-vos que AStyle es troba a "Dev-Cpp\AStyle\AStyle.exe".
+79005=Opcions
+79006=Estil de parèntesi:
+79007=Estil de tabulació:
+79008=Tabula amb:
+79009=Tabula els següents tipus de codi:
+79010=Classes
+79011=Els "switch"
+79012=Els "case"
+79013=Els "namespace"
+79014=Etiquetes
+79015=Preprocessador
+79016=Ordre final (afegeix personalització aquí):
+79017=Vista prèvia:
+79018=No s'ha trobat l'AStyle :(
+79019=Impulsat per %s :)
+79020=Màx. longitud de línia:
+79021=// No s'ha pogut trobar el fitxer de sortida de l'AStyle:<CR>// %s

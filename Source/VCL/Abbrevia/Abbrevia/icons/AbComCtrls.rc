@@ -1,0 +1,4 @@
+AbComCtrls_Lock     BITMAP "lock.bmp"
+AbComCtrls_Zip      BITMAP "compress.bmp"
+AbComCtrls_SortUp   BITMAP "sortup.bmp"
+AbComCtrls_SortDown BITMAP "sortdown.bmp"

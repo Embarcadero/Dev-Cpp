@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>General Tab</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Heading2">Name (editable)</div>
+	<div class="Text">Views the internal name of the project, which is only used for bookkeeping and the title bar.</div>
+	<br/>
+	<div class="Heading2">Filename</div>
+	<div class="Text">Shows the location of the project file.</div>
+	<br/>
+	<div class="Heading2">Output File</div>
+	<div class="Text">Shows the output location of the executable. The directory can be editted by Build Options >> Executable Output Directory and the filename can be edited at Override Output Filename.</div>
+	<br/>
+	<div class="Heading2">Files</div>
+	<div class="Text">Shows the amount of files inside the project (.cpp/.h/.rc).</div>
+	<br/>
+	<div class="Heading1">Icon</div>
+	<div class="Text">Dev-C++ can add an icon to the executable for you by adding the following piece of code to a resource file attached to your project:
+	<div class="Code">A ICON MOVEABLE PURE LOADONCALL DISCARDABLE "filename.ico"</div>
+	<div class="Text">This will be stored in a temporary resource file (projectname_private.rc) that is attached to the project at compile time.</div>
+	<div class="Heading2">Library</div>
+	<div class="Text">Opens up the \Icons folder which provides an antique set of ye-olde icons. One can of course add his own icons to that folder, so that they will show up here.</div>
+	<div class="Heading2">Browse</div>
+	<div class="Text">Opens up a File Browser to search through the file system for icon files.</div>
+	<div class="Heading2">Remove</div>
+	<div class="Text">Detaches the currently selected icon from the project. Does not delete the file itself.</div>
+	<br/>
+	<div class="Heading1">Type</div>
+	<div class="Text">Selecting a type here will determine what kind of output is produced:
+	<ul>
+		<li>Win32 GUI will add -mwindows to the compiler command to remove the cmd window.</li>
+		<li>Win32 Console will effectively do nothing special.</li>
+		<li>Win32 Static Lib will create a .a file.</li>
+		<li>Win32 DLL will create a DLL file.</li>
+	</ul>
+	<br/>
+	<div class="Heading2">Support Windows XP Themes</div>
+	<div class="Text">If enabled, Dev-C++ will add a Common Control 6 Manifest to the project to enable visual styles. Dev-C++ will add the following piece of code to a resource file attached to your project:</div>
+	<div class="Code">1 24 "projectname.exe.Manifest"</div>
+	<div class="Text">This will be stored in a temporary resource file (projectname_private.rc) that is attached to the project at compile time.</div>
+</body>
+</html>

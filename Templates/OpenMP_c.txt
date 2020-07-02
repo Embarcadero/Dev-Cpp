@@ -1,0 +1,17 @@
+#include <omp.h>
+#include <stdio.h>
+
+int main() {
+	
+	int i;
+
+	#pragma omp parallel num_threads(2)
+	printf("Hi, I'm thread number %d!\n",omp_get_thread_num());
+
+	#pragma omp parallel for num_threads(2)
+	for(i = 0;i < 20;i++) {
+		printf("\nThread number %d, executing iteration %d...",omp_get_thread_num(),i);		
+	}
+	
+	return 0;
+}

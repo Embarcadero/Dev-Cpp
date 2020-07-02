@@ -1,0 +1,1048 @@
+[lang]
+Lang=Slovenian (slovenšèina)
+Ver=1
+
+1=&Datoteka
+2=&Uredi
+3=&Iskanje
+4=&Pogled
+5=&Projekt
+6=I&zvrši
+7=&Orodja
+8=&Okno
+9=&Pomoè
+10=&Razhrošèevanje
+
+
+1001=&Nov
+1002=&Projekt...
+1003=&Izvorna datoteka
+1004=&Datoteka virov
+1005=&Predloga...
+1006=&Class...
+1007=New
+
+
+2001=&Odpri projekt ali datoteko...
+2002=Ponovno odp&ri
+2003=Poèi&sti zgodovino
+2004=&Shrani
+2005=Shrani &kot...
+2006=Shrani &vse
+2007=&Zapri
+2008=Zapri projekt
+2009=Lastnosti
+2010=Shrani projekt kot...
+2011=&Izvozi
+2012=v &HTML
+2013=v &RTF
+2014=&Projekt v HTML
+2015=to &Tex
+
+
+3001=&Uvozi
+3002=&Natisni
+3003=Nastavitve tiskanja
+3004=I&zhod
+
+
+4001=&Find Declaration
+4002=F&ind Definition
+4003=&Razveljavi
+4004=&Uveljavi
+4005=Iz&reži
+4006=&Kopiraj
+4007=&Prilepi
+4008=&Izberi vse
+4009=&Zbriši
+4010=&Vstavi
+4011=&Preklopi na zaznamke
+4012=&Pojdi v zaznamke
+4013=Zaznamek
+4014=&Datum/Èas
+4015=&Glava komentarja
+
+
+5001=Najdi...
+5002=Naj&di v datotekah...
+5003=Zamenjaj...
+5004=P&onovno najdi
+5005=&Pojdi v vrstico...
+5006=&Nadaljevanje iskanja
+5007=&Pojdi v funkcijo
+5008=Plavajoè Upravitelj projekta
+5009=Pojdi v Upravitelja projekta
+5010=Pojdi v &Brskalnik razredov
+5011=Brskalnik &Projekta/Razreda
+5012=Vr&stica stanja
+5013=&Izhod prevajalnika
+5014=&Vedno vidno
+5015=Sam&o, ko je potrebno
+5016=&Orodne vrstice
+5017=Glavno
+5018=Prevedi in zaženi
+5019=Projekt
+5020=Možnosti
+5021=Posebnosti
+5022=Uredi
+5023=Iskanje
+5024=Plavajoèe okno Po&roèila
+
+
+6001=&Nova datoteka
+6002=&Dodaj v projekt
+6003=Odst&rani iz projekta
+6004=&Uredi datoteko virov...
+6005=M&ožnosti projekta
+6006=Uredi &Make datoteko
+6007=&Dodaj datoteko virov...
+6008=O&dstrani datoteko virov...
+
+
+7001=&Prevedi
+7002=&Poženi
+7003=Pr&evedi in zaženi
+7004=Ponovno Zg&radi vse
+7005=&Poèisti
+7006=Re&zultat prevajanja
+7007=Preveri &skladnjo
+7008=&Ponastavi program
+7009=Analiza pro&fila
+7010=Prekini
+7011=Mož&nosti prevajalnika
+7012=Možnosti delo&vnega okolja
+7013=Možnosti ur&ejevalnika
+7014=Nastavi &Orodja
+7015=Nastavi &Bližnjice
+7016=Delete Profiling Information
+
+
+8001=&Celozaslonski naèin
+8002=&Nazaj v normalno
+8003=&Naslednje
+8004=&Prejšnje
+8005=&Zapri vse
+8006=%s razlièica %s celozaslonski naèin. Pritisnite shift+F12 za preklop orodne vrstice ali F12 za vrnitev v normalni naèin.
+8007=&Zapri vse razen te
+8008=&Spisek...
+
+
+9001=&O Dev-C++...
+9002=&Preveri za posodobitve/pakete...
+9003=&Prilagodi meni pomoèi...
+9004=&Pomoè o Dev-C++
+
+
+10001=&Razhrošèevanje
+10002=&Nastavi prekinitveno toèko
+10003=&Naslednji korak
+10004=&Nadaljuj
+10005=&Dodaj sledenje
+10006=S&ledenje spremenljivk
+10007=Ustavi izvrševanje
+10008=&Uredi sledenje
+10009=&Odstrani sledenje
+10010=Stopi &v
+10011=Zaženi do &kurzorja
+10012=&Pokaži CPU okno
+10013=&Pripni k procesu...
+10014=Spre&meni vrednost
+10015=&Poèisti vse
+10016=Nova datoteka
+10017=Dodaj datoteko...
+10018=Odstrani datoteko...
+10019=Možnosti...
+10020=Uredi datoteko virov
+
+
+11001=Odstrani datoteko
+11002=Preimenuj datoteko
+11003=Zapri
+11004=Odpri
+11005=Odpri glavo
+
+
+12001=Pojdi v deklaracijo
+12002=Pojdi v uvedbo
+12003=Nov razred
+12004=Nova funkcija èlana
+12005=Nova spremenljivka
+12006=Naèin pogleda...
+12007=Vse datoteke
+12008=Trenutna datoteka
+12009=Dodaj imenik
+12010=Odstrani imenik
+12011=Preimenuj imenik
+12012=Ne morete ustvariti veè kot %d imenikov v enem projektu...
+12013=Uporabi barve
+12014=Datoteke projekta
+12015=Pokaži dedne èlane
+12016=Odpri z...
+
+
+13001=Prevajalnik
+13002=Viri
+13003=Dnevnik prevajanja
+13004=Najdi rezultate
+13005=Zapri
+13006=Razhrošèevanje
+
+
+14001=&Poèisti
+14002=&Kopiraj
+14003=&Skrij
+14004=&Odpri
+
+
+15001=Vrstica
+15002=Datoteka
+15003=Sporoèilo
+15004=Argumenti
+
+
+16001=Najdi vrstico
+16002=Kolona
+16003=Ime spremenljivke
+16004=Vrednost
+16005=Informacije:
+16006=Dnevnik prevajanja:
+16007=Skupaj napak:
+16008=Velikost izhoda:
+
+
+17001=Sledene spremenljivke
+17002=Sledenje nazaj
+17003=Izhod
+17004=Pošlji ukaz v GDB :
+17005=Pošlji
+
+
+18001=Novo
+18002=Vstavi
+18003=Preklopi
+18004=Pojdi
+18005=Okno projekta
+18006=Okno razhrošèevalnika
+18007=Okno poroèila
+
+
+19001=Odpri datoteko
+19002=Odpri datoteko
+19003=Izvozi v
+19004=Shrani datoteko
+19005=Shrani projekt
+19006=Izberi datoteko s pomoèjo
+
+
+20001=Novo opazovanje spremenljivke
+20002=Vnesi ime spremenljivke:
+20003=Uredi opazovanje spremenljivke
+20004=Novo ime spremenljivke:
+20005=Spremeni vrednost
+20006=Spremeni spremenljivko:
+20007=Nova vrednost:
+
+
+21001=Projekt
+21002=Razredi
+
+
+22001=Komentiraj
+22002=Od-komentiraj
+22003=Poveèaj zamik
+22004=Zmanjšaj zamik
+22005=Zamenjaj glavo/izvor
+22006=Collapse All
+22007=Uncollapse All
+
+
+23001=Možnosti urejevalnika
+23002=Splošno
+23003=Prikazovalnik
+23004=Skladnja
+23005=Koda
+23006=Dovršitev
+23007=Brskanje po razredih
+23008=Autosave
+
+
+24001=Vstavki
+24002=Privzeti vir
+24003=Files
+24004=Options
+24005=Symbol Completion
+
+
+25001=Vnesite ime novih nastavitev skladnje:
+25002=Možnosti urejevalnika:
+25003=Samodejni zamik
+25004=Vstavljalni naèin
+25005=Uporabi znak tabulatorja
+25006=Pametni tabulatorji
+25007='Backspace' zamakne nazaj
+
+
+26001=Prezri skupinsko
+26002=Napredna Home tipka
+26003=Kurzor mimo konca datoteke
+26004=Kurzor mimo konca vrstice
+26005=Dvojni klik vrstice
+26006=Najdi besedilo pri kurzorju
+26007=Drsniki po potrebi
+26008=Pomik za pol strani
+26009=Namig pri premikanju
+26010=Uporabi poudarjanje skladnje
+26011=Vstavi ovržene datoteke
+26012=Velikost tabulatorja:
+26013=Desni rob
+26014=Vidno
+26015=Širina
+26016=Barva
+26017=Karet
+26018=Vstavi karet
+26019=Prepiši karet
+26020=Navpièna èrta
+26021=Vodoravna èrta
+26022=Polovièni blok
+26023=Blok
+26024=Highlight current line
+26025=Trim trailing spaces
+26026=Enabled
+26027=Gutter width
+
+
+27001=Pokaži znake skrite vrstice
+27002=Pokaži namige urejevalnika
+27003= Poudari ujemajoèe se oklepaje
+27004=Ensure that file ends with newline
+27005=Enabled
+27006=Sets to System HighlightText value
+27007=Sets to WhiteSpace value
+27008=Show function hints
+27009=It is also possible to edit text size by using Control+Scroll, just like in browsers!
+27010=Pisava urejevalnika:
+27011=Pisava
+27012=Velikost
+27013=Pisava urejevalnika
+27014=Žleb
+27015=Samodejna velikost
+27016=Številke vrstic
+27017=Prikaži vodilne nièle
+27018=Zaèni pri nièli
+27019=Uporabi privzeto pisavo
+27020=Pisava žleba
+27021=Ospredje
+27022=Ozadje
+27023=Stili
+27024=Krepko
+27025=Poševno
+27026=Podèrtano
+27027=Hitre nastavitve barv
+27028=Tip :
+27029=Shrani nastavitve obièajne skladnje
+27030=Koda
+27031=Besedilo menija
+27032=Odsek
+27033=Opis
+27034=Vnesi prevzeto kodo v zaèetno datoteko prazenega projekta
+27035=Uporabi predpomnilnik za dovršitev kode
+27036=Datoteke v predpomnilniku:
+27037=Omogoèi dovršitev kode
+27038=Zakasnitev (ms):
+27039=Barva ozadja:
+27040=Nastavitve brskalnika razredov
+27041=Preglej krajevne datoteke, ki so v #include
+27042=Primer:
+27043=Možnosti stroja
+27044=Možnosti pogleda
+27045=Omogoèi razredni brskalnik
+27046=Preglej globalne datoteke, ki so v #include 
+27047=Enable editor autosave
+27048=Interval:
+27049=Save all open files after each interval
+27050=Nov projekt
+27051=Opis:
+27052=Enable symbol completion
+27053=Specific completion options
+27054=Complete braces '{}'
+27055=Complete parentheses '()'
+27056=Complete includes '<>' '""'
+27057=Complete square braces '[]'
+27058=Complete multiline comments '/**/'
+
+
+28001=Ime:
+28002=&C projekt
+28003=C&++ projekt
+28004=&Ustvari privzeti jezik
+28005=Razno
+28006=Možnosti projekta:
+
+
+29001=Odstrani iz projekta
+29002=Izberite datoteko za odstranitev iz projekta :
+
+
+30001=Pojdi v vrstico...
+30002=Nova vrstica:
+
+
+31001=Nastavitve Orodij
+31002=Trenutna orodja:
+
+
+32001=Uredi vnos orodja
+32002=Naslov
+32003=Program
+32004=Delovni imenik
+32005=Parametri
+32006=Vstavi makro
+32007=Razpoložljivi makri
+
+
+33001=Knjižnica ikon
+33002=Uporabi izbrano ikono
+33003=Brskanje
+
+
+34001=Nastavi bližnjice
+34002= Kliknite na postavko in pritisnite želeno bližnjico!
+34003=Nasvet: pritisnite "Esc" za izbris bližnjice...
+34004=Menu entry
+34005=Bližnjica dodeljena
+34006=Preklièi
+34007=V redu
+
+
+35001=Vrne privzeti imenik
+35002=Vrne dev-c++ delovni imenik
+35003=Vrne ime prevedene datoteke
+35004=Vrne pot trenutnega projekta ali izvorne datoteke
+35005=Vrne ime datoteke trenutnega projekta ali izvorne datoteke
+35006=Vrne "ime" projektov
+35007=Vrne ime trenutne izvorne datoteke
+35008=Vrne pot trenutne izvorne datoteke
+35009=Vrne seznam izvornih datotek, loèen z presledki, iz trenutnega projekta
+35010=Vrne besedo pri kurzorju iz aktivnega urejevalnika
+35011=Vrne dev-c++ razlièico
+
+
+36001=O Dev-C++ :)
+36002=inseculous@users.sourceforge.net
+36003=Splošno dovoljenje GNU
+36004=Informacije o stikih
+36005=Bloodshed Software:
+36006=Prevajalnik Mingw:
+36007=Dev-C++ forumi:
+36008=Prevod programa:
+36009=E-pošte avtorjev:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.odprta-scena.com
+36014=haiku@bloodshed.net
+36015=&Preveri za posodobitve
+36016=Post-4.9.9.2 Development:
+36017=http://orwellengine.blogspot.com
+
+
+37001=Edit code insert entry
+37002=Add code insert entry
+37003=Menu Item Caption
+37004=Opis postavke
+37005=Oddelek Menija
+
+
+38001=Okno prevajalnega napredka
+38002=&Pokaži med prevajanjem
+38003=S&amodejno zapri po prevajanju
+38004=Ne prikaži predstavitveno okno ob zagonu
+38005=Možnosti delovnega okolja
+38006=Splošno
+38007=Datoteke in imeniki
+38008=Samodejno odpri
+38009=V Novem projektu privzeto na C++
+38010=Prikaži orodne vrstice v celo-zaslonskem naèinu
+38011=Ustvari varnostne kopije
+38012=Pomanjšaj ob zagonu
+38013=Slog oken Odpri/Shrani
+38014=Windows 2k (stranska vrstica)
+38015=Windows 9x
+38016=Windows 3.1
+38017=Jezik:
+38018=Jezièki okna sporoèil:
+38019=Najveè datotek v meniju Ponovno odpri
+38020=Uporabnikov privzeti imenik
+38021=Izhodni imenik
+38022=Pot do knjižnice ikon
+38023=Slika predstavitvenega okna
+38024=Izberi privzeti uporabniški imenik
+38025=Nastavi izhodni imenik prevajalnika
+38026=Izberi imenik z knjižnico ikon
+38027=Vse datoteke projekta
+38028=Samo prvo datoteko v projektu
+38029=Niè
+38030=Prikaži meni v celo-zaslonskem naèinu
+38031=Dvojni klik v Upravitelju projekta za odpiranje datotek 
+38032=Pot do jezikovnih datotek
+38033=Tema:
+38034=Vmesnik
+38035=Najdi besedilo
+38036=Najdi
+38037=Najdi v datotekah
+38038=&Iskano besedilo
+38039=Možnosti:
+38040=&Razlikuj med malimi in velikimi èrkami
+38041=&Samo cele besede
+38042=Kjer
+38043=&Datoteke v projektu
+38044=&Odpri datoteke
+38045=Obmoèje
+38046=&Globalno
+38047=&Samo izbrano
+38048=Izvor
+38049=Od kurzorja
+38050=Celotno obmoèje
+38051=Smer
+38052=Naprej
+38053=Nazaj
+38054=Pause console programs after return
+38055=Opened files at previous closing
+
+
+39001=Zamenjaj besedilo
+39002=Najdi besedilo:
+39003=Zamenjaj z:
+39004=Možnosti:
+39005=&Razlikuj med malimi in velikimi èrkami
+39006=&Samo cele besede
+39007=O&pozori pri zamenjavi
+39008=Smer:
+39009=Napre&j
+39010=&Nazaj
+39011=Obmoèje:
+39012=&Globalno
+39013=&Samo izbrano
+39014=Izvor:
+39015=&Od kurzorja
+39016=C&elotno obmoèje
+
+
+40001=Najdi:
+40002=Tip
+40003=Funkcija
+40004=Vrstica
+
+
+41001=Možnosti prevajalnika
+41002=Prevajalnik
+41003=Imeniki
+41004=Nastavitve
+41005=Povezovalnik
+41006=Programi
+41007=For more information about GCC's options, please visit
+
+
+42001=Binarne dat.
+42002=Knjižnice
+42003=C vkljuèitve
+42004=C++ vkljuèitve
+
+
+43001=C prevajalnik
+43002=C++ prevajalnik
+43003=Prevajalnik:
+43004=Output
+
+
+44001=Podpri vse ANSI standarde v C programih
+44002=Poskuša podpreti nekatere poglede obièajnih C pred-procesov
+44003=Zadrži vsa opozorila
+44004=Izklopi vsa preverjanje dostopa
+44005=Dovoli $ v oznakah
+44006=Uporabi znanost o metodah za hitrejše prevajanje
+44007=Uporabi Cygwin prevajalnik namesto Mingw
+44008=Dodaj naslednje ukaze ob klicu prevajalnika:
+44009=Zakasnitev
+44010=Omogoèa zakasnitev v milisekundah, èe se make pritožuje o èasu make datotek.
+44011=Prikaže eno napako na vrstico
+44012=Do not recognize asm, inline or typeof as a keyword (-fno-asm)
+44013=Check if pointer is null before accessing storage allocated (-fcheck-new)
+44014=Put uninitialized globals into the common segment (-fconserve-space)
+
+
+45001=Generacija kode
+45002=Optimizacija
+
+
+46001=Omogoèi obravnavo izjem
+46002=Uporabi enako velikost za tip double in float
+46003=Dodaj dodatne komentarje v ustvarjeni kodni zbirnika
+46004=Optimiziraj
+46005=Najboljša optimizacija
+46006=Opravi številne manjše optimizacije
+46007=Ustvarjanje make datoteke:
+46008=Uporabi hitro, ampak nepopolno generacijo odvisnosti 
+46009=Ustvari profil kode
+46010=Ustvari informacije profila kode za analizo
+46011=Poveži objektiven C program
+46012=Ustvari informacije za razhrošèevanje
+46013=Ne uporabi standardne sistemske zagonske datoteke ali knjižnice
+46014=Ne ustvari okno konzole
+46015=Dodaj te ukaze k ukazni vrstici povezovalnika
+46016=&Ne optimiziraj
+46017=Še bolj optimiziraj
+46018=Do not assemble, but output assembler code (-S)
+46019=Use pipes instead of temporary files during compilation (-pipe)
+
+
+47001=Mogoèe boste želeli spremeniti imena programov, ki so uporabljeni v Dev-C++ (na primer, ko uporabljate križni prevajalnik) :
+47002=Nastavitve prevajalnika:
+47003=Nove nastavitve prevajalnika
+47004=Vnesite ime novih nastavitev:
+47005=Ne morete zbrisat edinih preostalih nastavitev!
+47006=Ali ste preprièani, da želite zbrisat te nastavitve?
+47007=Preimenuj nastavitve prevajalnika
+47008=Vnesite novo ime za preimenovanje nastavitev:
+47009=Nadaljnje optimizacije
+
+
+48001=Urejevalnik menija pomoèi
+48002=Besedilo menija
+48003=Datoteka s pomoèjo
+48004=Možnosti menija pomoèi 
+48005=Ikona
+48006=Odsek menija 
+48007=Odsek 1
+48008=Odsek 2
+48009=On Help Popup Menu
+48010=Dejanja
+48011=V datoteki pomoèi najdi besedo pri kurzorju
+48012=Dodeli F1 bližnjico
+48013=Show most warnings (-Wall)
+48014=Show some more warnings (-Wextra)
+48015=Check ISO C/C++/C++0x conformance (-pedantic)
+48016=Code Warnings
+48017=Only check the code for syntax errors (-fsyntax-only)
+48018=Make all warnings into errors (-Werror)
+48019=Abort compilation on first error (-Wfatal-errors)
+
+
+49001=Natisni datoteko
+49002=Parametri:
+49003=Strani:
+49004=&Barve
+49005=&Poudari
+49006=&Ovijanje besed
+49007=&Številke vrstic
+49008=Natisni številke vrstic
+49009=Natisni številke vrstic na robu
+49010=Število kopij:
+49011=Natisni samo izbrano
+49012=Don't Print Line Numbers
+
+
+50001=Preveri za posodobitev Dev-C++
+50002=Opravilo:
+50003=zadetkov:
+50004=Razlièica izdaje:
+50005=Potrebna razlièica za uporabo z:
+50006=Opis izdaje:
+50007=Stran za prenos (dvojni-klik za prenos)
+
+
+51001=Dodaj opravek...
+51002=Opis
+51003=Prednost
+51004=Uporabnik
+
+
+52001=Spisek opravkov...
+52002=Ime datoteke
+52003=Konèano
+52004=Ne pokaži postavke, ki so oznaèene kot konèane
+52005=Filter:
+52006=Vse datoteke (v projektu ali pa ne)
+52007=Odpri samo datoteke (v projekti ali pa ne)
+52008=Vse projektne datoteke
+52009=Samo odprte datoteke projekta
+52010=Odprte datoteke ki niso v projektu
+52011=Samo trenutna datoteka
+
+
+53001=Uvozi MS Visual C++ projekt
+53002=Izberite Visual C++ projektno datoteko
+53003=Možnosti uvoza
+53004=Nastavitve za uvoz
+53005=Ime Dev-C++ projektne datoteke
+53006=MS Visual C++ projekta datoteka je bila uspešno uvožena in preoblikovana v Dev-C++ projekt! Ali jo želite zdaj odpreti ?
+53007=Ne najdem ciljnih nastavitev "%s" (to je verjetno hrošè v Dev-C++)...
+
+
+54001=Import Code::Blocks project
+54002=Select Code::Blocks project file
+54003=Import options
+54004=Configuration to import
+54005=Dev-C++ project filename
+54006=The Code::Blocks project file has been imported and converted to a Dev-C++ project succesfully! Do you want to open it now?
+54007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
+
+
+55001=Možnosti projekta 
+55002=Splošno
+55003=Imeniki
+55004=Ime:
+55005=Ikona:
+55006=Knjižnica
+55007=Prebrskaj
+55008=Tip:
+55009=Win32 GUI
+55010=Win32 konzola
+55011=Win32 Static Lib
+55012=Win32 DLL
+55013=Prevedi kot C++
+55014=Dodatne možnosti ukazne vrstice:
+55015=Prevajalnik:
+55016=Možnosti povezovalnika/Po izbiri knjižnice ali objektne datoteke:
+55017=Imeniki s knjižnicami
+55018=Datoteke virov
+55019=Vkljuèitveni imeniki
+55020=Izberi ikono
+55021=Vkljuèi objektno datoteko
+55022=Imeniki virov
+55023=Možnosti izgradnje
+55024=Imeniki
+55025=Izhodni imenik za &izvršilne datoteke
+55026=Izhodni imenik za &objektne datoteke
+55027=&Prepiši izhodno datoteko
+55028=Dodaj knjižnico ali objekt
+55029=%d datotek [%d izvornih, %d glav, %d virov]
+
+
+56001=Ime:
+56002=Opis:
+56003=Kategorija:
+56004=Novo ime projekta:
+56005=Datoteke v predlogi:
+56006=Dodatne možnosti prevajalnika:
+56007=Dodatne možnosti povezovalnika:
+56008=Ikone:
+56009=Informacije o predlogi
+56010=Datoteke
+56011=Dodatki
+56012=Ikona predloge
+56013=Nova ikona projekta
+56014=Ustvari
+56015=Nova predloga iz projekta
+56016=Uporabi projektov imenik z vkljuèitvami
+56017=Uporabi projektov imenik z knjižnicami
+56018=Uporabi projektov imenik z viri 
+
+
+57001=Vrnitvena vrsta:
+57002=Ime spremenljivke:
+57003=Uvedi v:
+57004=Dostopno obmoèje
+57005=Ustvari funkcijo èlana za BRANJE te spremenljivke
+57006=Ustvari funkcijo èlana za PISANJE v to spremenljivko
+57007=Ime:
+57008=Komentarji
+57009=Opis:
+57010=Stil:
+57011=Ustvari
+57012=Preklièi
+57013=Neznani razred...
+57014=Ne morem ugotoviti ime datoteke za uvedbo...
+57015=Ne morem ugotoviti številko vrstice za vstavljanje kode...
+57016=Ime èlana:
+57017=Argumenti:
+57018=Ime razreda:
+57019=Deduj iz drugega razreda
+57020=Dedovanje
+57021=Deduj iz razreda:
+57022=Ime datoteke z glavo:
+57023=Ime datoteke z uvedbo:
+57024=Ime datoteke z glavo:
+57025=Dodaj v trenutni projekt
+57026=Lastnosti
+
+
+58001=Ime datoteke
+58002=V projektu
+58003=Skupaj vrstic
+58004=Vrstice dejanske kode
+58005=Vrstice komentarjev
+58006=Vkljuèene datoteke
+58007=Prazne vrstice
+58008=Velikost datoteke
+58009=Absolutno
+58010=Make datoteka
+58011=Sorazmerno
+58012=Datum/Èas datoteke
+58013=Nastavitve prevajalnika
+
+
+59001=Analiza profila 
+59002=Enolièen izhod
+59003=Graf klicev 
+59004=Profiling Options
+59005=Function Hiding
+59006=Hide functions not called long enough
+59007=Hide statically linked file-local functions
+59008=Hide function called less than
+59009=times
+59010=Apply
+59011=Custom Commands
+59012=Use these commands instead:
+
+
+60001=Iskani niz "%s" ni najden
+60002=Ne morem opreti datoteke %s
+60003=Zamenjaj to pojavitev '%s'?
+60004=Datoteka: %s že obstaja v %s
+60005=Ali ste preprièani, da želite zapreti %s
+60006=Shranim spremembe v %s?
+60007=Zapri %s in zaèni nov projekt?
+60008=Preimenuj v:
+60009=Se že prevaja
+60010=Shranim spremembe v %s?
+60011=Datoteka že obstaja, prepišem?
+60012=Dodaj novo datoteko v trenutni projekt?
+60013=Dodaj nov Vir v trenutni projekt?
+60014=Vaš projekt nima informacij o razhrošèevanju. Ali želite omogoèiti razhrošèevanje in ponovno zgraditi projekt ?
+60015=Niste omogoèili zbiranje informacij o profilu in/ali informacije o razhrošèevanju v Možnostih prevajalnika. Ali jih želite omogoèiti zdaj in ponovno zgraditi projekt?
+60016=Prosim, zaženite projekt vsaj enkrat, tako da bodo ustvarjene zbrane informacije o profilu...
+60017=Vnesi novo ime imenika:
+60018=Ali str preprièani, da želite odstranit ta imenik?
+60019=Vnesite novo ime imenika:
+60020=Datoteka %s je oznaèena kot samo-za-branje. Ali jo želite oznaèit kot bralno-zapisljiva? Èe ne, datoteka ne bo shranjena...
+60021=Napaka se je pojavila. Datoteka %s ni oznaèena kot bralno-zapisljiva in ni bila shranjena...
+60022=V vašem programu je prišlo do izjeme kršitve.
+60023=Izvorna datoteka je novejša od iz izvršilne. Ali jo želite ponovno zgraditi ?
+60024=Prosim izberite aplikacijo, na katero se želite pripeti:
+
+
+61001=Ne morem odpreti datoteke %s
+61002=Ne morem shranit datoteke %s
+61003=Ne morem preimenovati datoteke %s
+61004=Iskalno polje ne sme biti prazno
+61005=Projekt ni izvršljiv
+61006=Projekt ni preveden
+61007=Izvorna datoteka ni prevedena
+61008=Make datoteka ni najdena.
+61009=Èišèenje spodletelo
+61010=Predloga ne more biti namešèena v projekt.
+61011=%s Vir ni najden: %s - %s
+61012=Datoteka s predlogo %s ni bila najdena, preskakujem.
+61013=Predloga ni dodeljena.
+61014=Datoteka %s ni najdena.
+61015=Noben gostitljni program ni doloèen. Nastavite ga lahko v meniju Izvrši->Parametri.
+61016=Gostitljni program ni najden! Spremenite ga lahko v meniju Izvrši->Parametri.
+
+
+62001=Brez naslova
+62002=Samo-Za-Branje
+62003=Vstavi
+62004=Prepiši
+62005=Projekt%d
+62006=Prosim, izberi drugo datoteko.
+62007=%d vrstic v datoteki
+62008=Preimenuj datoteko
+62009=Izvrševanje %s
+62010=Izvrševanje prekinjeno
+62011=bajtov
+62012=Spremenjeno
+62013=Napaka
+62014=Informacije
+62015=Opozorilo
+62016=Vprašanje
+62017=Prevajanje uspešno
+62018=Uporabnik je prekinil prevajanje
+62019=Line:%6d               Col:%6d               Sel:%6d               Lines:%6d               Length:%6d
+62020=Done parsing
+
+
+63001=&V redu
+63002=&Preklièi
+63003=&Pomoè
+63004=&Privzeto
+63005=&Da
+63006=&Ne
+63007=&Dodaj
+63008=&Uredi
+63009=&Odstrani
+63010=Z&briši
+63011=&Zapri
+63012=&Avtorji
+63013=&Najdi
+63014=&Zamenjaj
+63015=Napaèen &izbris
+63016=Zamenjaj &Vse
+63017=Brskanje
+63018=Odstrani
+63019=Preimenuj
+63020=Uvozi
+63021=Okenski naèin
+63022=Poèisti
+
+
+64001=CPU okno
+64002=Koda zbirnika:
+64003=Funkcija:
+64004=Skladnja zbirnika:
+64005=Registerji:
+
+
+65001=Nasvet dneva
+65002=Ali ste vedeli...
+65003=...ni nasvetov?
+65004=Ob zagonu ne prikaži nasvete
+65005=Naslednji
+65006=Prejšnji
+
+
+66001=Združevanje datotek
+66002=Vrste datotek:
+66003=Izberite za katere vrste datotek bo Dev-C++ registriran kot privzeti program za odpiranje le teh...
+66004=CVS podpora
+66005=CVS datoteka programa
+66006=Stopnja stiskanja
+66007=Uporabi SSH namesto RSH
+66008=Imenik s predlogami
+66009=Izberi imenik s predlogami
+66010=Uporabi XP temo
+66011=Zunanji programi
+66012=Zunanji program
+66013=Razširitev
+66014=Združevanje z zunanjim programom:
+66015=Opazuj spremenljivko pod miško
+66016=Obvesti o napakah pri opazovanju
+66017=  Brskalnik razhrošèevanja
+66018=  Alternativna datoteka nastavitev  
+66019=Uporabi to alternativno datoteko nastavitev 
+66020=Spremenili ste datoteko nastavitev.<CR>Nova datoteka nastavitev *ne bo* uporabljena v trenutni seji programa. Vse spremembe nastavitev bodo shranjene *trenutno* datoteko nastavitev.<CR><CR>Priporoèeno je, da sedaj ponovno zaženete program, tako, da se le ta zažene z novo datoteko nastavitev...
+66021=Dev-C++ was unable to set file associations.<CR><CR>This is known to be caused by using UAC on a normal non-admin user account.<CR><CR>Please disable UAC or run Dev-C++ as an admin if you want to change file associations using Dev-C++.<CR><CR>You might want to try the "Default Programs" feature in Windows Vista or 7.
+66022=UI font
+
+
+67001=Parametri...
+67002=Prevedi trenutno datoteko
+
+
+68001=Seznam oken
+68002=Izberi okno, ki ga želite urejati:
+
+
+69001=Trenutna datoteka...
+69002=Celotni projekt...
+69003=Prosim nastavite CVS podporo v "Orodja / Možnosti delovnega okolja"...
+
+
+70001=Možnosti uvoza
+70002=Shramba
+70003=Globalne možnosti
+70004=Možnosti prevzema
+70005=Možnosti udejanja
+70006=Možnosti posodobitve
+70007=Možnosti Diff 
+70008=Možnosti beleženja
+70009=CVS Izhod
+70010=Uvozi
+70011=Prevzem
+70012=Potrditev
+70013=Posodobi
+70014=Razlika
+70015=Dnevnik
+70016=Uvozi imenik
+70017=Dejanje
+70018=Prodajalec
+70019=Izdaja
+70020=Dnevnik
+70021=Ime modula
+70022=Razširitev
+70023=Prevzemi kot
+70024=Prevzemi imenik
+70025=Recurse into sub-directories
+70026=Reset any sticky options
+70027=Ustvari manjkajoèe imenike
+70028=Odstrani prazne imenike
+70029=Zavrzi krajevne spremembe 
+70030=Pred datumom
+70031=Revision/branch/tag
+70032=Èe ni najden, dobi zadnje 
+70033=Other revisions
+70034=Perform a unified diff
+70035=Compare local file with the same remote revision/tag
+70036=Compare local file with another remote revision
+70037=Compare two remote revisions
+70038=Je datum
+70039=Log the default branch
+70040=List only the RCS filenames
+70041=Ne izpiši imena oznaèevalcev
+70042=Filter
+70043=By revision/tag
+70044=Po datumu
+70045=Po uporabnikih
+70046=Shramba
+70047=Podrobnosti
+70048=Metoda dostopa
+70049=Uporabnik
+70050=Strežnik
+70051=Oddaljen imenik
+70052=Dodaj
+70053=Odstrani
+70054=Dodaj možnost
+70055=Odstrani možnost
+70056=Odstrani datoteko tudi z diska...
+
+
+71001=Parametri
+71002=Podaj parametre k programu:
+71003=Gostiteljni program:
+
+
+72001=Datoteke
+72002=Datoteke projekta:
+72003=Možnosti projekta:
+72004=Proizvedi informacije o razhrošèevanju
+72005=Ustvari informacije o zbranem profilu 
+72006=OPOMBA: Te nastavitve bodo, samo za to projekt, povozile globalne možnosti prevajalnika.
+72007=Podpri Windows XP teme
+72008=Možnosti datoteke:
+72009=Vkljuèi v prevajanje
+72010=Prevedi datoteko kot C++
+72011=Informacije o razlièici
+72012=V projekt vkljuèi informacije o razlièici
+72013=Podrobnosti razlièice
+72014=Veèja:
+72015=Manjša:
+72016=Izdaja:
+72017=Izgradnja:
+72018=Jezik:
+72019=Dodatne informacije:
+72020=Povozi ukaz izgradnje
+72021=Izhodna datoteka
+72022=Vkljuèi v povezovanje
+72023=Prioriteta izgradnje:
+72024=Pri prevajanju samodejno poveèaj številko izgradnje
+72025=Uporabi Make datoteko po meri (ne ustvari Make datoteko, uporabi to)
+72026=Informacije o prilagajanju Make datoteke...
+72027=&Vkljuèi naslednje datoteke v Make datoteko:
+72028=Sync product with file version
+72029=Default to C++ when creating new files
+
+
+73001=Oskubi izvršljivo datoteko 
+73002=Ustvari ukaze za naslednji stroj 
+73003=Omogoèi uporabo funkcij specifiène za procesor 
+73004=Optimization level (-Ox)
+73005=Language standard (-std)
+73006=Compile with the following bit width (-mx)
+73007=Optimize less, while maintaining full compatibility (-mtune)
+
+
+74001=Compiler:
+74002=Status:
+74003=File:
+74004=Errors:
+74005=Warnings:

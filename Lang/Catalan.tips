@@ -1,0 +1,84 @@
+#
+# Aquest és el fitxer dels consells del dia.
+# S'ha de mantenir cada consell en una línia.
+#
+# Les línies que comencen amb '#' són comentaris i són ignorades
+# Les línies buides també s'ignoren.
+#
+# Es poden utilitzar les següents macros al text:
+#	<CR>: 		afegeix un salt de línia
+#	<URL>: 		li segueix un enllaç URL
+#	<UDESC>: 	li segueix la descripció de l'enllaç URL
+#
+# Ús de sintaxi (el text del consell és <text_consell>):
+#	( <text_consell> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Consell d'exemple:
+#	...algun consell<CR><CR>més línies...<URL>http://www.bloodshed.net/dev<UDESC>Feu clic per visitar el programari de Bloodshed
+#
+# S'afegiran més macros quan es necessitin...
+#
+# Nota 1: Si es vol afegir el símbol (&), s'hauran de posar dos junts (&&).
+# Nota 2: Cada consell no ha de tindre més de 255 caràcters.
+# Nota 3: La macro <CR> compta com un caràcter, no quatre.
+# Nota 4: Amb les macros <URL> i <UDESC>, la resta de la línia no es mostra
+#	   com un consell, per tant no compta pel límit de 255 caràcters.
+# Nota 5: La macro <UDESC> és opcional. Si s'omet, <URL> es mostrarà com l'enllaç.
+# Nota 6: La macro <UDESC>, si existeix, *ha d'anar* després de la macro <URL>
+#
+
+#
+# Consells importants (apareixen primer)
+#
+...no hauríeu de desactivar aquests consells?<CR><CR>Els consells que aquí apareixen contenen informació no documentada enlloc més.<CR>Si les desactiveu i voleu veure-les més tard, seleccioneu "Ajuda / Consell del dia"...
+
+...podeu fer servir WebUpdate per mantenir l'entorn de Dev-C++ actualitzat, amb errors reparats i noves característiques?<CR><CR>Seleccioneu "Eines / Cerca actualitzacions i paquets..."
+
+#
+# Consells de compleció de codi
+#
+...la característica de compleció de codi us ajuda a incrementar la vostra productivitat suggerint-vos totes les comandes vàlides del context actual?<CR><CR>Per activar l'opció de compleció de codi, aneu a  "Eines / Opcions de l'editor" i activeu el navegador de classes i la compleció de codi.
+
+...la característica de compleció de codi s'activa quan escriviu ".", "->" o "::" a la finestra de l'editor després d'un temps d'espera predeterminat?<CR><CR>Per definir el temps d'espera aneu a "Eines / Opcions de l'editor / Navegador de classes / Compleció".
+
+...podeu activar la compleció de codi prement "Ctrl+Espai" en qualsevol moment dins l'àrea de l'editor?<CR><CR>(Proveu a prémer "Ctrl+Maj+Espai" amb el cursor dins els parèntesis d'arguments d'una funció...)
+
+...Majúscules+clic en una entrada del navegador de classes us durà a la declaració en lloc de la implementació?<CR>Evidentment, també podeu emprar el menú contextual per la mateixa funcionalitat, i més!
+
+...podeu afegir carpetes personalitzades al navegador de classes per trobar amb més facilitat el que cerqueu en projectes de gran dimensió? Fins i tot podeu crear un arbre de carpetes!<CR><CR>Només heu de fer clic amb el botó secundari del ratolí per fer aparèixer el menú contextual...
+
+...les carpetes personalitzades del navegador de classes es desen en un fitxer anomenat "classfolders.dcf" al directori arrel del vostre projecte?<CR><CR>Si teniu problemes i tot us queda barrejat, esborreu aquest fitxer i reobriu el projecte.
+
+...hi ha dues formes de visualitzar el navegador de classes?<CR>Una us mostra classes, membres i funcions identificades del projecte; l'altra, la informació rellevant *només* del fitxer que editeu.<CR><CR>Seleccioneu "Mode de visualització" al menú contextual...
+
+#
+# Consells del gestor de projecte
+#
+...podeu definir si voleu fer un sol clic o un doble clic en un fitxer del gestor de projectes per obrir-lo en un editor?<CR><CR>Per definir-ho, aneu a "Eines / Opcions de l'entorn" i activeu (o desactiveu) "Doble clic per obrir fitxers al gestor del projecte"...
+
+...podeu definir carpetes personalitzades (només al primer nivell) al gestor del projecte per organitzar millor els vostres fitxers?<CR><CR>Feu clic amb el botó secundari en un fitxer del gestor del projecte per fer aparèixer el menú contextual...
+
+...si heu creat carpetes personalitzades al gestor del projecte, podeu arrossegar els fitxers per reorganitzar-los?
+
+#
+# Consells del menú Fitxer
+#
+...podeu obtenir informació del fitxer en què treballeu?<CR><CR>Seleccioneu "Fitxer / Propietats" i obtindreu informació quant a la mida del fitxer, el nombre de línies, comentaris de línia, línies buides i fitxers inclosos!
+
+...podeu desar el vostre projecte com una plantilla?<CR><CR>Seleccioneu "Fitxer / Nou / Plantilla", que desarà el vostre projecte com una plantilla del Dev-C++ disponible quan seleccioneu "Fitxer / Nou / Projecte".<CR>D'aquesta manera podeu personalitzar com començar el codi al vostre gust!
+
+...podeu importar els vostres projectes del MS Visual C++ al Dev-C++?<CR><CR>Seleccioneu "Fitxer / Importa / Importa projecte del MS Visual C++".<CR>Potser necessitareu retocar les opcions del projecte després de la importació però, bé, s'està treballant en això!
+
+...podeu exportar un fitxer de codi font, o un projecte sencer, a HTML o RTF?<CR>Així podreu publicar el codi font a un lloc web i compartir-lo amb tot el món!<CR><CR>Seleccioneu a "Fitxer / Exporta" el format d'exportació...
+
+#
+# Consells del menú Edita
+#
+...podeu (des)comentar un grup de línies marcant-les i seleccionant "Edita / (Des)Comenta"?
+
+...podeu (des)tabular un grup de línies marcant-les i seleccionant "Edita / (Des)Tabula"?
+
+...podeu emprar punts a l'editor per desplaçar-vos ràpidament dins el codi?<CR><CR>Definiu els punts seleccionant "Edita / Defineix els punts" i triant un número.<CR>Aneu a un punt definit seleccionant "Edita / Vés als punts" i triant el número corresponent.
+
+...existeix una eficaç comanda "Vés a la funció" dins el menú "Cerca"?<CR><CR>Mostra totes les funcions del fitxer i, teclejant part del nom de la funció, el llistat es filtra. Premeu la tecla de retorn per anar-hi directament!<CR>Ara bé, cal que activeu la navegació de classes...
+

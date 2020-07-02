@@ -1,0 +1,4 @@
+- Parser\Function: conversion operators like "operator int" fail
+- Parser\Function: declaration does not link with definition if argument list text isn't exactly equal
+- Parser\Struct: enum does not show in class browser
+- Parsrer\SimpleClass: when hovering above classname left of function declaration, constructor hint is shown

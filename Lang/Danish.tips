@@ -1,0 +1,83 @@
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+...at du ikke bør slå disse tips fra?<CR><CR>De giver dig information om udokumenterede features, som ikke kan findes andre steder..<CR>Hvis du slår dem fra og alligevel vil se dem senere, vælg "Hjælp / Dagens tip"...
+
+...du kan bruge vUpdate til at holde dit Dev-C++ miljø up to date med de seneste bug fixes og nye features?<CR><CR>Vælg "værktøjer / Søg efter programopdateringer / Packages..."
+
+#
+# Code-completion tips
+#
+...at automatisk færddiggørelse af kode indstillingen vil forbedre din produktivitet, ved at vise alle mulige kommandoer inden for den aktive kontekst?<CR><CR>For at slå det til, gå til "Værktøjer / IDE indstillinger", og slå "klasse browsing" og "automatisk færddigørelse af kode" til.
+
+...at automatisk færddigørelse af kode bliver aktiveret ved at du taster ".", "->" eller "::" i editor vinduet, efter det bruger definerede time-out?<CR><CR>For at definere dette time-out, gå til "Værktøjer / IDE indstillinger / Klasse browser / Færdigørelse".
+
+...at du kan aktivere automatisk kode færddigørelse ved at trykke "Ctrl+Space" i editor vinduet?<CR><CR>(Prøv at trykke "Ctrl+Shift+Space" mens cursoren er inde i en funktions argument liste...)
+
+...at du ved at holde shift nede mens du vælger en funktion i klasse browseren, hopper til dens deklaration i stedet for dens implementering?<CR>Du kan selvfølgelig også bruge kontekst menuen til dette. (og meget mere!)
+
+...at du kan lave dine egne foldere i klasse browseren, for at holde bedre styr på store projekter? Du kan endda indlejre dem i hinanden!<CR><CR>Bare højre klik i klasse browseren for at frembringe kontekst menuen...
+
+...at klasse browser informationen ligger i en fil kaldet "classfolders.dcf" i dit projekts root katalog?<CR><CR>Hvis noget går galt og det hele ser rodet ud, bare slet filen og gen-åben dit projekt!
+
+...at der er to tilstande for klasse browseren?<CR>En viser dig alle fundne klasser/medlemmer/funktioner og en anden viser dig KUN relevant information for den aktive fil.<CR><CR>Bare højre klik i klasse browseren og vælg "vis"...
+
+#
+# Project Manager tips
+#
+...at du kan vælge om du vil bruge enkelt eller dobbelt klik på en fil i project manager for at åbne den i editoren?<CR><CR>For at indstille dette, gå til "Værktøjer / Miljø indstillinger" og slå "Dobbelt klik for at åbne project manager filer" til eller fra...
+
+...at du kan lave dine egne (kun top-level) mapper i project manager for at organisere dine filer?<CR><CR>Højre klik på en fil for at få kontekst menuen frem...
+
+...at hvis du har lavet dine egne foldere i project manager, så kan du bruge drag and drop for at omarrangere dem?
+
+#
+# File menu tips
+#
+...at du kan få information om den fil du arbejder med?<CR><CR>Vælg "Filer / Egenskaber" og du vil få information om filens størrelse, antal af linier, kommentarer, tomme linier og inkluderede filer!
+
+...at du kan gemme dit projekt som en skabelon?<CR><CR>Vælg "Filer / Ny / Skabelon". Dit projekt vil da blive gemt som en Dev-C++ skabelon og vil være tilgængelig når du vælger "Filer / Nyt / Projekt".<CR>På den måde har du en base at starte fra, næste gang du laver et nyt projekt!
+
+...at du kan importere MS Visual C++ projekter i Dev-C++? (Ikke .NET)<CR><CR>Vælg "Filer / Importer / Importer MS Visual C++ projekt".<CR>Du skal måske tweake projekt indstillingerne lidt efter du har importeret, men hey! det er stadig under udvikling :)
+
+...at du kan eksportere en source fil, eller et helt projekt til HTML eller RTF?<CR>På den måde kan du uploade source filer til din hjemmeside og dele dem med verden!<CR><CR>Vælg "Filer / Exporter" samt den ønskede eksporterings metode...
+
+#
+# Edit menu tips
+#
+...at du kan (ud)kommentere et sæt liner ved at vælge dem og trykke "Rediger / (Ud)kommenter"?
+
+...at du kan rykke et sæt liner ud/ind ved at vælge dem og trykke "Rediger / Ryk ud/ind"?
+
+...at du kan bruge bogmærker i editoren til at komme hurtigt rundt i koden?<CR><CR>Sæt eller fjern et bogmærke ved at trykke "Rediger / Skift bogmærker" og vælge et nummer.<CR>Gå til et bogmærke ved at vælge "Rediger / Gå til bogmærker" og vælg et nummer.
+
+...at der er en meget brugbar "Gå til funktion" under "Søg" menuen?<CR><CR>Den viser alle filens funktioner og ved at indtaste en del af funktions navnet, bliver listen mindre. Tryk enter for at hoppe til den funktion med det samme!<CR>OBS: klasse browsing skal være slået til...

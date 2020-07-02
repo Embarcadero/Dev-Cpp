@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{F9BE6A59-BDDF-49EA-8DBD-FFCEA9630B0C}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SynEditCR.cbproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SynEditCD.cbproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SynEditCR">
+        <MSBuild Projects="SynEditCR.cbproj"/>
+    </Target>
+    <Target Name="SynEditCR:Clean">
+        <MSBuild Projects="SynEditCR.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SynEditCR:Make">
+        <MSBuild Projects="SynEditCR.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="SynEditCD">
+        <MSBuild Projects="SynEditCD.cbproj"/>
+    </Target>
+    <Target Name="SynEditCD:Clean">
+        <MSBuild Projects="SynEditCD.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SynEditCD:Make">
+        <MSBuild Projects="SynEditCD.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SynEditCR;SynEditCD"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SynEditCR:Clean;SynEditCD:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SynEditCR:Make;SynEditCD:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -1,0 +1,71 @@
+html {
+	font-family:"Segoe UI","MS Sans Serif",serif;
+	font-size:12pt;
+	height:100%;
+}
+body {
+	margin:0;
+	padding:0;
+	height:100%;
+}
+iframe {
+	border:0;
+	margin:0;
+	padding:0;
+}
+#Container {
+	height:100%;
+}
+#TableOfContents {
+	float:left;
+	width:290px;
+	border-right:2px solid black;
+	height:100%;
+	background-color:#EEEEEE;
+	overflow:scroll;
+	overflow-x:hidden;
+	overflow-y:auto;
+}
+#ContentContainer {
+	margin-left:277px;
+	height:100%;
+	overflow:hidden; /* fix mysterious 2px white margin at bottom */
+}
+#Content {
+	width:100%;
+	height:100%;
+}
+h3 {
+	text-decoration:none;
+}
+blockquote {
+	margin-right:0px;
+}
+ul {
+	margin-left:15px;
+	padding-left:10px;
+}
+li {
+	padding-bottom:4px;
+	list-style:disc;
+	margin-left:-7px;
+}
+.ChildLi {
+	list-style:none;
+	margin-left:-10px;
+}
+#Footer {
+	position:absolute;
+	left:5px;
+	bottom:5px;
+	display:table;
+}
+#FooterText {
+	display:table-cell;
+	vertical-align:middle;
+	padding-left:10px;
+}
+.Hider {	
+	cursor:pointer;
+	font-family:"Consolas";
+}

@@ -1,0 +1,1048 @@
+[lang]
+Lang=Latvian
+Ver=1
+
+1=&Fails
+2=&Labot
+3=&Meklçt
+4=&Skats
+5=&Projekts
+6=&Darbinât
+7=&Rîki
+8=&Logs
+9=&Palîdzîba
+10=&Atkïûdot
+
+
+1001=&Jauns
+1002=&Projekts...
+1003=&Source fails
+1004=&Resursu fails
+1005=Ða&blons...
+1006=&Class...
+1007=New
+
+
+2001=&Atvçrt projektu vai failu...
+2002=&Atvçrt bijuðo
+2003=&Iztîrît vçsturi
+2004=&Saglabât
+2005=Saglabât &Kâ...
+2006=Saglabât visu
+2007=&Aizvçrt
+2008=Aizvçrt projektu
+2009=Îpaðîbas
+2010=Save Project as...
+2011=&Eksportçt
+2012=uz &HTML
+2013=uz &RTF
+2014=&Projektu uz HTML
+2015=to &Tex
+
+
+3001=&Importçt
+3002=&Drukât
+3003=Drukas uzstâdîjumi
+3004=Beigt darbu
+
+
+4001=&Find Declaration
+4002=F&ind Definition
+4003=&Atcelt
+4004=&Vçlreiz
+4005=Izgriezt
+4006=&Kopçt
+4007=&Ielîmçt
+4008=&Aizzîmçt visu
+4009=&Dzçst
+4010=&Ievietot
+4011=Pârslçgt Iezîmes
+4012=&Iet uz Iezîmçm
+4013=Iezîme
+4014=&Datums/Laiks
+4015=&Komentâra galva
+
+
+5001=Atrast...
+5002=Atrast failos...
+5003=Aizvietot...
+5004=&Meklçt vçlreiz
+5005=&Iet uz rindiòu...
+5006=&Pieaugoðâ meklçðana
+5007=Iet uz funkciju...
+5008=Peldoðais Projekta Pârvaldnieks
+5009=Iet uz Projekta Pârvaldnieku
+5010=Iet uz Klaðu Pârlûku
+5011=&Projekta/Klaðu Pârlûks
+5012=&Statusa josla
+5013=&Kompilatora izvade
+5014=&Vienmçr redzama
+5015=&Tikai, ja nepiecieðama
+5016=&Rîku joslas
+5017=Galvenâ
+5018=Kompilçt un Darbinât
+5019=Projekts
+5020=Opcijas
+5021=Papildus
+5022=Labot
+5023=Meklçt
+5024=Floating &Report Window
+
+
+6001=&Jauna vienîba
+6002=&Pievienot projektam
+6003=&Izmest no projekta
+6004=&Labot resursu failu...
+6005=Projekta Opcijas
+6006=Labot &Makefailu
+6007=Pievienot Resoursu Failu...
+6008=Izmest Resursu Failu...
+
+
+7001=&Kompilçt
+7002=&Darbinât
+7003=Kompilçt && Darbinât
+7004=&Pârbûvçt visu
+7005=Tîrît
+7006=Kompilçt rezultâtu
+7007=Pârbaudît sintaksi
+7008=Beigt programmu
+7009=Profila analîze
+7010=Pârtraukt kompilçðanu
+7011=&Kompilatora Opcijas
+7012=Vides Opcijas
+7013=&Redaktora Opcijas
+7014=Pielâgot &Rîkus
+7015=Pielâgot &Shortcuts
+7016=Delete Profiling Information
+
+
+8001=&Pilnâ ekrânâ
+8002=&Atpakaï normâlâ
+8003=&Nâkoðais
+8004=&Iepriekðçjais
+8005=&Aizvçrt visus
+8006=%s versija %s pilnâ logâ. Nospied shift+F12, lai pârslçgtu Rîku joslu, F12, lai atgrieztos normâlâ logâ.
+8007=Aizvçrt visus, bet ne ðo
+8008=&Saraksts...
+
+
+9001=&Par Dev-C++...
+9002=&Meklçt Atjaunojumus/Packages...
+9003=Pielâgot Palîdzîbas Izvçlni...
+9004=&Palîdzîba par Dev-C++
+
+
+10001=&Atkïûdot
+10002=&Pârslçgt Apstâðanâs vietu
+10003=&Nâkamais solis
+10004=&Pârkâpt
+10005=&Pielikt Inspektoru
+10006=&Inspicçt mainîgos
+10007=Pârtraukt izpildi
+10008=&Labot Inspektoru
+10009=&Izmest Inspektoru
+10010=Iedziïinâties
+10011=Darbinât lîdz &Kursoram
+10012=&Skatît Procesora Logu
+10013=A&ttach to process...
+10014=&Modify value
+10015=&Clear all
+10016=Jauns fails
+10017=Pievienot failu...
+10018=Izmest failu...
+10019=Opcijas...
+10020=Labot Resursu failu
+
+
+11001=Izmest failu
+11002=Pârsaukt failu
+11003=Aizvçrt
+11004=Atvçrt
+11005=Atvçrt Galvu
+
+
+12001=Iet uz deklarâciju
+12002=Iet uz implementâciju
+12003=Jauna klase
+12004=Jauna member funkcija
+12005=Jauns mainîgais
+12006=Skata veids...
+12007=Visi faili
+12008=Paðreizçjais fails
+12009=Pievienot mapi
+12010=Izmest mapi
+12011=Pârsaukt mapi
+12012=Tu nevari izveidot vairâk kâ %d mapes vienâ projektâ...
+12013=Lietot krâsas
+12014=Projekta faili
+12015=Râdît mantotos member'us
+12016=Open with...
+
+
+13001=Kompilators
+13002=Resursi
+13003=Kompilâcijas Pieraksti
+13004=Atrast Rezultâtus
+13005=Aizvçrt
+13006=Atkïûdot
+
+
+14001=Attîrît
+14002=&Kopçt
+14003=&Slçpt
+14004=&Atvçrt
+
+
+15001=Rinda
+15002=Vienîba
+15003=Ziòojums
+15004=Argumenti
+
+
+16001=Atrast Rindu
+16002=Kolonna
+16003=Mainîgâ Vârds
+16004=Vçrtîba
+16005=Informâcija:
+16006=Kompilâcijas Pieraksti:
+16007=Kopâ Kïûdas:
+16008=Izvades Lielums:
+
+
+17001=Inspicçtie Mainîgie
+17002=Trasçt
+17003=Izvade
+17004=Sûtît komandu uz GDB :
+17005=Sûtît
+
+
+18001=Jauns
+18002=Ielikt
+18003=Pârslçgt
+18004=Iet uz
+18005=Projekta Logs
+18006=Atkïûdoðanas Logs
+18007=Report Window
+
+
+19001=Atvçrt Failu
+19002=Atvçrt Vienîbu
+19003=Eksportçt uz
+19004=Saglabât Failu
+19005=Saglabât Projektu
+19006=Izvçlies Palîdzîbas Failu
+
+
+20001=Jauns Mainîgâ Inspektors
+20002=Mainîgâ Vârds:
+20003=Izmainît Mainîgâ Inspektoru
+20004=Jauns Mainîgâ Vârds:
+20005=Modify value
+20006=Variable to modify:
+20007=New value:
+
+
+21001=Projekts
+21002=Klases
+
+
+22001=AIZkomentçt
+22002=ATkomentçt
+22003=Palielinât Atkâpi
+22004=Samazinât Atkâpi
+22005=Apmainît galvu/source
+22006=Collapse All
+22007=Uncollapse All
+
+
+23001=Redaktora Opcijas
+23002=Vispârîgâs
+23003=Râdîðanas
+23004=Sintakses
+23005=Koda
+23006=Pabeigðanas
+23007=Klaðu pârlûkoðana
+23008=Autosave
+
+
+24001=Pievieno
+24002=Noklusçtâ Source
+24003=Files
+24004=Options
+24005=Symbol Completion
+
+
+25001=Ieraksti Jauno Sintakses Uzstâdîjumu Vârdu:
+25002=Redaktora Opcijas:
+25003=Automâtiskâs Atkâpes
+25004=Ievietoðanas Reþîms
+25005=Lietot Tab
+25006=Gudrie Tabi
+25007=Dzçðana Samazina Atkâpi
+
+
+26001=Grupas Atcelðana
+26002=Uzlabotais Home taustiòð
+26003=Kursors Aiz EOF
+26004=Kursors Aiz EOL
+26005=Dubultklikðíis uz Rindas
+26006=Atrast Tekstu pie Kursora
+26007=Ritjosla pçc vajadzîbas
+26008=Ritinât pa Puslapai
+26009=Rindu Numuri Ritinot
+26010=Izmantot Sintakses Akcentçðanu
+26011=Ievietot Nomestos Failus
+26012=Tabulâcijas Izmçrs:
+26013=Labâ Mala
+26014=Redzama
+26015=Platums
+26016=Krâsa
+26017=Teksta Kursors
+26018=Ievietoðanas Kursors
+26019=Pârrakstîðanas Kursors
+26020=Stabiòð
+26021=Horizontâla Lînija
+26022=Pustaisnstûris
+26023=Taisnstûris
+26024=Highlight current line
+26025=Trim trailing spaces
+26026=Enabled
+26027=Gutter width
+
+
+27001=Râdît slçptâs rindas zîmes
+27002=Râdît redaktora padomus
+27003=Izcelt sakrîtoðâs iekavas
+27004=Ensure that file ends with newline
+27005=Enabled
+27006=Sets to System HighlightText value
+27007=Sets to WhiteSpace value
+27008=Show function hints
+27009=It is also possible to edit text size by using Control+Scroll, just like in browsers!
+27010=Redaktora Fonts:
+27011=Fonts
+27012=Lielums
+27013=Redaktora Fonts
+27014=Gutter
+27015=Automâtisks Izmçrs
+27016=Rindu Numuri
+27017=Râdît 0 vienciparu skaitïiem
+27018=Sâkt no Nulles
+27019=Lietot Citu Fontu
+27020=Gutter Fonts
+27021=Priekðplâns
+27022=Fons
+27023=Stili
+27024=Bold
+27025=Italic
+27026=Pasvîtrots
+27027=Krâsu Âtrie Uzstâdîjumi
+27028=Tips:
+27029=Saglabât Savus Sintakses Uzstâdîjumus
+27030=Kods
+27031=Izvçlnes Teksts
+27032=Nodaïa
+27033=Apraksts
+27034=Ievieto Koda Noklusçto Vçrtîbu Projekta Source Failâ
+27035=Lietot koda-pabeigðanas buferi
+27036=Koda Pabeigðana
+27037=Ieslçgt Koda Pabeigðanu
+27038=Aizture (ms):
+27039=Fona krâsa:
+27040=Klaðu Pârlûka Uzstâdîjumi
+27041=Caurskatît #include norâdîtos lokâlos failus
+27042=Paraugs:
+27043=Dzinçja uzstâdîjumi
+27044=Skata Opcijas
+27045=Ieslçgt Klaðu Pârlûku
+27046=Caurskatît #include norâdîtos globâlos failus
+27047=Râdît tikai klases no aktîvâ faila
+27048=Interval:
+27049=Save all open files after each interval
+27050=Jauns Projekts
+27051=Apraksts:
+27052=Enable symbol completion
+27053=Specific completion options
+27054=Complete braces '{}'
+27055=Complete parentheses '()'
+27056=Complete includes '<>' '""'
+27057=Complete square braces '[]'
+27058=Complete multiline comments '/**/'
+
+
+28001=Vârds:
+28002=C Projekts
+28003=C++ Projekts
+28004=Pçc Noklusçjuma
+28005=Daþâdi
+28006=Projekta opcijas:
+
+
+29001=Izmest no Projekta
+29002=Izvçlies failu, kuru izmest no projekta:
+
+
+30001=Iet uz rindu ...
+30002=Jauna Rinda:
+
+
+31001=Rîku Pielâgoðana
+31002=Paðreizçjie Rîki
+
+
+32001=Labot Rîka Ierakstu
+32002=Virsraksts
+32003=Programma
+32004=Darba Mape
+32005=Parametri
+32006=Ielikt Makro
+32007=Pieejamie Makro
+
+
+33001=Ikonu Bibliotçka
+33002=Lietot paòemto Ikonu
+33003=Pârlûkot
+
+
+34001=Shortcutu Konfigurâcijas Forma
+34002=Noklikðíini uz vienîbas un nospied taustiòu kombinâciju!
+34003=Padoms: nospied "Escape", lai attîrîtu shortcutu...
+34004=Izvçlnes ieraksts
+34005=Pieðíirtais Shortcut
+34006=Atcelt
+34007=OK
+
+
+35001=Parâda noklusçto mapi
+35002=Parâda dev-c++ darba mapi
+35003=Parâda nokompilçtâ faila vârdu
+35004=Parâda ceïu uz vai nu paðreizçjo projekta vai source failu
+35005=Parâda paðreizçjâ projekta vai source faila vârdu
+35006=Parâda projekta "vârdu"
+35007=Parâda paðreizçjâ source faila vârdu
+35008=Parâda ceïu uz paðreizçjo source failu
+35009=Parâda source failu sarakstu, kurus satur paðreizçjais projekts
+35010=Parâda vârdu, kas ir pie kursora aktîvajâ redaktorâ
+35011=Parâda dev-c++ versiju
+
+
+36001=Par Dev-C++ :)
+36002=inseculous@users.sourceforge.net
+36003=GNU General Public License
+36004=Kontaktinformâcija
+36005=Bloodshed Software Weblapa:
+36006=Mingw Compiler Weblapa:
+36007=Dev-C++ diskusiju forumi:
+36008=Dev-C++ lietotâju sarakste:
+36009=Autora e-pasts:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.bloodshed.net/devcpp-ml.html
+36014=haiku@bloodshed.net
+36015=Meklçt atjauninâjumus
+36016=Post-4.9.9.2 Development:
+36017=http://orwellengine.blogspot.com
+
+
+37001=Labot koda ievietoðanas ierakstu
+37002=Pievienot koda ievietoðanas ierakstu
+37003=Izvçlnes Elementa Virsraksts
+37004=Elementa Apraksts
+37005=Izvçlnes Nodaïa
+
+
+38001=Compilation Progress Window 
+38002=&Show during compilation
+38003=&Auto close after compile
+38004=Nerâdît "splash screen"
+38005=Vides Opcijas
+38006=Vispârîgâs
+38007=Faili un Mapes
+38008=Automâtiski Atvçrt
+38009=Lietot C++ Jaunos Projektos
+38010=Râdît Rîkjoslu Pilnâ Ekrânâ
+38011=Izveidot Rezerves Kopijas
+38012=Minimizçt pie Darbinâðanas
+38013=Atvçrt/Saglabât Dialoga Stils
+38014=Windows 2000 (sânjosla)
+38015=Windows 9x
+38016=Windows 3.1
+38017=Valoda:
+38018=Ziòojumu Loga Ïipiòas:
+38019=Atvçrto Failu vçstures izmçrs 
+38020=Lietotâja Noklusçtâ Mape
+38021=Izvades Mape
+38022=Ceïð uz Ikonu Bibliotçku
+38023="Splash Screen" Attçls
+38024=Izvçlçties Noklusçto Lietotâja Mapi
+38025=Izvçlçties Kompilatora Izvades Mapi
+38026=Izvçlçties Ikonu Bibliotçkas Mapi
+38027=Visus Projekta Failus
+38028=Tikai Pirmo Projekta Failu
+38029=Nevienu
+38030=Râdît Izvçlni Pilnâ Ekrâna reþîmâ
+38031=Dubultklikðíis, lai atvçrtu Projekta Pârvaldes Failus
+38032=Ceïð uz Valodu Failiem
+38033=Tçma:
+38034=Interfeiss
+38035=Atrast Tekstu
+38036=Atrast
+38037=Atrast Failos
+38038=Meklçjamais Teksts
+38039=Opcijas:
+38040=Ar Reìistru
+38041=Tikai veselus vârdus
+38042=Virziens
+38043=Faili Projektâ
+38044=Atvçrt Failus
+38045=Apjoms
+38046=Globâls
+38047=Tikai izvçlçtie
+38048=Sâkums
+38049=No Kursora
+38050=Visu Apjomu
+38051=Virziens
+38052=Uz priekðu
+38053=Atpakaï
+38054=Pause console programs after return
+38055=Opened files at previous closing
+
+
+39001=Aizvietot Tekstu
+39002=Meklçt:
+39003=Aizvietot ar:
+39004=Opcijas:
+39005=Ar Reìistru
+39006=Tikai veselus vârdus
+39007=Brîdinât pirms Aizvietoðanas
+39008=Virziens:
+39009=Uz priekðu
+39010=Atpakaï
+39011=Apjoms:
+39012=Globâls
+39013=Tikai izvçlçtie
+39014=Sâkums:
+39015=No Kursora
+39016=Visu Apjomu
+
+
+40001=Meklçt:
+40002=Tipu
+40003=Funkciju
+40004=Rindu
+
+
+41001=Kompilatora Opcijas
+41002=Kompilators
+41003=Mapes
+41004=Koda Ìenerçðana/Optimizâcija
+41005=Linker
+41006=Programmas
+41007=For more information about GCC's options, please visit
+
+
+42001=Binârie faili
+42002=Bibliotçkas
+42003=C #includes
+42004=C++ #includes
+
+
+43001=C kompilators:
+43002=C++ kompilators:
+43003=Kompilators:
+43004=Output
+
+
+44001=Uzturçt visas ANSI standarta C programmas
+44002=Mçìinât uzturçt daþas tradicionâlo C preprocesoru iespçjas 
+44003=Apslâpçt visus brîdinâjuma paziòojumus
+44004=Atslçgt visas pieejas pârbaudes
+44005=Atïaut $ identifikatoros
+44006=Lietot heiristiku, lai nokompilçtu âtraâk
+44007=Izmantot Cygwin nevis Mingw kompilatoru
+44008=Pievienot ðîs komandas, kad izsauc kompilatoru:
+44009=Aizture
+44010=Ieslçdz aizturi (milisekundçs), ja MAKE sûdzas par makefaila laika iezîmi.
+44011=Displays one error per line (-fmessage-length 0)
+44012=Do not recognize asm, inline or typeof as a keyword (-fno-asm)
+44013=Check if pointer is null before accessing storage allocated (-fcheck-new)
+44014=Put uninitialized globals into the common segment (-fconserve-space)
+
+
+45001=Koda Ìenerçðana:
+45002=Optimizâcija:
+
+
+46001=Ieslçgt izòçmumgadîjumu apstrâdi
+46002=Lietot to paðu izmçru double un float
+46003=Pievienot papildus komentâru informâciju ìenerçtajâ Assemblera kodâ
+46004=Optimizçt
+46005=Labâkâ Optimizâcija
+46006=Veikt daþas niecîgas optimizâcijas
+46007=Makefaila ìenerçðana
+46008=Lietot âtru, bet nepilnîgu atkarîbu ìenerçðanu
+46009=Koda profilçðana:
+46010=Ìenerçt profilçðanas informâciju analîzei
+46011=Linkot Objektu C programmu
+46012=Ìenerçt atkïûdoðanas informâciju
+46013=Neizmantot standarta sistçmas sâkumfailus un bibliotçkas
+46014=Neveidot konsoles logu
+46015=Pievienot ðîs komandas linkera komandrindai
+46016=Neoptimizçt
+46017=Optimizçt vairâk
+46018=Do not assemble, but output assembler code (-S)
+46019=Use pipes instead of temporary files during compilation (-pipe)
+
+
+47001=Tu vari izmainît programmas failu vârdus, kurus lieto Dev-C++ (piemçram, lietojot starpkompilatoru):
+47002=Konfigurçjamo kompilatoru kopa:
+47003=Jauna kompilatoru kopa
+47004=Ievadi jaunâs kopas nosaukumu:
+47005=Nevar izdzçst pçdçjo kompilatoru kopu!
+47006=Vai tieðâm izdzçst ðo kompilatoru kopu?
+47007=Pârsaukt kompilatoru kopu
+47008=Ievadi jauno kopas nosaukumu:
+47009=Tâlâkâs optimizâcijas
+
+
+48001=Palîdzîbas Izvçlnes Redaktors
+48002=Izvçlnes Teksts
+48003=Palîdzîbas Fails
+48004=Palîdzîbas Izvçlnes Opcijas
+48005=Ikona
+48006=Izvçlnes Nodaïa
+48007=1 Nodaïa
+48008=2 Nodaïa
+48009=Uz Palîdzîbas Izvçlnes
+48010=Darbîbas
+48011=Meklçt palîdzîbas failâ vârdu, kas atrodas zem kursora
+48012=Pieðíirt F1 shortcut'u
+48013=Show most warnings (-Wall)
+48014=Show some more warnings (-Wextra)
+48015=Check ISO C/C++/C++0x conformance (-pedantic)
+48016=Code Warnings
+48017=Only check the code for syntax errors (-fsyntax-only)
+48018=Make all warnings into errors (-Werror)
+48019=Abort compilation on first error (-Wfatal-errors)
+
+
+49001=Drukât Failu
+49002=Parametri:
+49003=Lapas:
+49004=Krâsas
+49005=Akcentçt
+49006=Sadalît pa rindâm
+49007=Rindu numuri
+49008=Drukât Rindu Numurus
+49009=Drukât Rindu Numurus Robeþâ
+49010=Kopiju Skaits:
+49011=Drukât tikai aizzîmçto
+49012=Don't Print Line Numbers
+
+
+50001=Pârbaudît Dev-C++ Atjauninâjumus
+50002=Uzdevums:
+50003=Rezultâti:
+50004=Relîzes Versija:
+50005=Lietoðanai nepiecieðamâ versija:
+50006=Relîzes apraksts:
+50007=Lejupielâdes vieta (dubultklikðíis, lai lejupielâdçtu):
+
+
+51001=Pielikt Darâmo...
+51002=Apraksts
+51003=Prioritâte
+51004=Lietotâjs
+
+
+52001=Darâmo saraksts...
+52002=Faila vârds
+52003=Padarîts
+52004=Nerâdît padarîtos
+52005=Filtrs:
+52006=Visus failus (arî ne projekta)
+52007=Tikai atvçrtos failus (arî ne projektâ)
+52008=Visus projekta failus
+52009=Tikai atvçrtos projekta failus
+52010=Ne-projekta atvçrtos failus
+52011=Tikai paðreizçjo failu
+
+
+53001=Importçt MS Visual C++ projektu
+53002=Izvçlçties Visual C++ projekta failu
+53003=Importçðanas opcijas
+53004=Importçjamâ konfigurâcija
+53005=Dev-C++ projekta faila vârds
+53006=MS Visual C++ projekta fails ir veiksmîgi importçts un pârkonvertçts uz Dev-C++ projektu! Vai vçlies to tagad atvçrt?
+53007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
+
+
+54001=Import Code::Blocks project
+54002=Select Code::Blocks project file
+54003=Import options
+54004=Configuration to import
+54005=Dev-C++ project filename
+54006=The Code::Blocks project file has been imported and converted to a Dev-C++ project succesfully! Do you want to open it now?
+54007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
+
+
+55001=Projekta Opcijas
+55002=Vispârîgâs
+55003=Faili/Mapes
+55004=Vârds:
+55005=Ikona:
+55006=Bibliotçka
+55007=Pârlûkot
+55008=Tips:
+55009=Win32 GUI (LGI)
+55010=Win32 Konsole
+55011=Win32 Statiskâ Bibliotçka
+55012=Win32 DLL
+55013=Kompilçt kâ C++
+55014=Papildus Komandrindas opcijas:
+55015=Kompilators:
+55016=Linkera Opcijas/Papildus Bibliotçkas un Objektu faili:
+55017=Bibliotçku Mapes
+55018=Resursu faili
+55019=Include Mapes
+55020=Izvçlçties Ikonu
+55021=Pievienot Objektu Failu
+55022=Resursu Mapes
+55023=Bûvçðanas Opcijas
+55024=Mapes
+55025=Izpildes koda izvades mape
+55026=Objektu faila izvades mape
+55027=Ignorçt izvades faila vârdu
+55028=Pievienot Bibliotçku vai Objektu
+55029=%d failu [%d sources, %d hederi, %d resursi]
+
+
+56001=Vârds:
+56002=Apraksts:
+56003=Kategorija:
+56004=Jauns projekta vârds:
+56005=Faili ðablonâ:
+56006=Kompilatora papildus opcijas:
+56007=Linkera papildus opcijas:
+56008=Ikonas:
+56009=Informâcija par ðablonu
+56010=Faili
+56011=Ekstras
+56012=Ðablona ikona
+56013=Jauna projekta ikona
+56014=Izveidot
+56015=Jauns ðablons no projekta
+56016=Use project's Include directories
+56017=Use project's Library directories
+56018=Use project's Resource directories
+
+
+57001=Atgrieþamais tips:
+57002=Mainîgâ vârds:
+57003=Implementçt:
+57004=Piekïuves apmçrs:
+57005=Izveidot member funkciju, kas LASA no ðî mainîgâ
+57006=Izveidot member funkciju, kas RAKSTA ðajâ mainîgajâ
+57007=Vârds:
+57008=Komentâri
+57009=Apraksts:
+57010=Stils:
+57011=Izveidot
+57012=Atcelt
+57013=Nezinâma klase...
+57014=Nevaru noskaidrot faila vârdu implementâcijai...
+57015=Nevaru noskaidrot rindas numuru koda ievietoðanai...
+57016=Member vârds:
+57017=Argumenti:
+57018=Klases vârds:
+57019=Mantot no citas klases
+57020=Mantoðana
+57021=Mantot no klases:
+57022=Galvas faila vârds:
+57023=Implementâcijas faila vârds:
+57024=Galvas faila vârds:
+57025=Pievienot paðreizçjajam projektam
+57026=Atribûti
+
+
+58001=Faila vârds:
+58002=Projektâ
+58003=Rindu kopskaits
+58004=Faktiskais rindu skaits
+58005=Komentâru rindas
+58006=Include faili
+58007=Tukðas rindas
+58008=Faila izmçrs
+58009=Absolûts
+58010=Makefails
+58011=Relatîvs
+58012=Faila datuma/laika atzîme
+58013=Kompilatora uzstâdîjumi
+
+
+59001=Profila analîze
+59002=Plakanâ izvade
+59003=Izsaukumu grafs
+59004=Profiling Options
+59005=Function Hiding
+59006=Hide functions not called long enough
+59007=Hide statically linked file-local functions
+59008=Hide function called less than
+59009=times
+59010=Apply
+59011=Custom Commands
+59012=Use these commands instead:
+
+
+60001=Meklçtâ virkne ''%s'' nav atrasta
+60002=Nevar atvçrt failu %s
+60003=Vai aizvietot ðo ''%s' eksemplâru?
+60004=Fails: %s jau atrodas %s
+60005=Vai esi pârliecinâts, ka gribi aizvçrt %s
+60006=Vai saglabât %s izmaiòas?
+60007=Vai aizvçrt %s un sâkt jaunu projektu?
+60008=Pârsaukt par:
+60009=Jau kompilçjas
+60010=Vai saglabât %s izmaiòas?
+60011=Fails jau eksistç, pârrakstît?
+60012=Vai pievienot jaunu vienîbu paðreizçjajam projektam?
+60013=Vai pievienot jaunus Resursus paðreizçjajam projektam?
+60014=Projektam nav atkïûdoðanas informâcijas, vai ieslçgt atkïûdoðanu un pârbûvçt projektu?
+60015=Nav ieslçgta profilçðana un/vai atkïûdoðanas informâcija Kompilatora Opcijâs. Vai ieslçgt tâs un pârbûvçt projektu tagad?
+60016=Lûdzu, padarbini projektu vismaz vienreiz, lai varçtu savâkt profilçðanas informâciju...
+60017=Ievadi jaunas mapes vârdu:
+60018=Vai esi pârliecinâts, ka gribi izmest ðo mapi?
+60019=Ievadi jaunu mapes vârdu:
+60020=Fails %s ir apzîmçts kâ tikai-lasîðanai. Vai gribi to apzîmçt kâ lasît-rakstît? Ja, nç, tad fails netiks saglabâts...
+60021=Notika kïûda. Fails %s nebija apzîmçts lasît-rakstît un netika saglabâts...
+60022=Tava programma ir radîjusi Piekïuves Pârkâpumu (Segmentâcijas Kïûdu).
+60023=Source file is more recent than executable. Do you want to rebuild it?
+60024=Please select the application you want to attach to:
+
+
+61001=Nevar atvçt failu %s
+61002=Nevar saglabât failu %s
+61003=Nevar pârsaukt failu %s
+61004=Meklçðanas lauks nevar bût tukðs
+61005=Projekts nav darbinâms
+61006=Projekts nav nokompilçts
+61007=Source fails nav nokompilçts
+61008=Make fails nav atrasts.
+61009=Attîrîðana neizdevâs
+61010=Ðablonu nevarçja ievietot projektâ.
+61011=%s Resurss nav atrasts: %s - %s
+61012=Ðablona fails %s netika atrasts. Izlaiþam.
+61013=Nav pieðíirts ðablons
+61014=Fails %s nav atrasts.
+61015=Nav norâdîta uztveroðâ aplikâcija!
+61016=Netika atrasta uztveroðâ aplikâcija!  To var norâdît Darbinâðanas izvçlnç, Parametri.
+
+
+62001=Nenosaukts
+62002=TikaiLasît
+62003=Pievienot
+62004=Pârrakstît
+62005=Projekts%d
+62006=Lûdzu, norâdi citu faila vârdu.
+62007=%d rindas failâ
+62008=Pârsaukt failu
+62009=Darbinu %s
+62010=Darbinâðana pârtraukta
+62011=baiti
+62012=Labots
+62013=Kïûda
+62014=Informâcija
+62015=Brîdinâjums
+62016=Jautâjums
+62017=Kompilçðana veiksmîga
+62018=Lietotâjs pârtraucis kompilçðanu
+62019=Line:%6d               Col:%6d               Sel:%6d               Lines:%6d               Length:%6d
+62020=Done parsing
+
+
+63001=&Ok
+63002=&Atcelt
+63003=&Palîdzîba
+63004=No&klusçtâ
+63005=&Jâ
+63006=&Nç
+63007=Pie&vienot
+63008=&Labot
+63009=&Izmest
+63010=I&zdzçst
+63011=Aizvç&rt
+63012=&Autori
+63013=&Meklçt
+63014=&Aizvietot
+63015=Dzçst Nepareizos
+63016=Aizvietot &Visus
+63017=Pârlûkot
+63018=Izmest
+63019=Pârsaukt
+63020=Importçt
+63021=Loga Reþîms
+63022=Clear
+
+
+64001=Procesora Logs
+64002=Assemblera kods:
+64003=Funkcija:
+64004=Assemblera Sintakse:
+64005=Reìistri:
+
+
+65001=Dienas padoms
+65002=Vai zini...
+65003=...ka nav padomu, ko râdît?
+65004=Nerâdît padomus pie Dev-C++ startçðanas
+65005=Nâkoðais
+65006=Iepriekðçjais
+
+
+66001=Failu Asociâcijas
+66002=Failu Tipi:
+66003=Izvçlies failu tipus, kuriem Dev-C++ bûs primârâ rediìçðanas programma...
+66004=CVS Atbalsts
+66005=CVS Programmas Fails
+66006=Kompresijas Lîmenis
+66007=Lietot SSH nevis RSH
+66008=Ðablonu Katalogs
+66009=Izvçlçties Ðablonu Katalogu
+66010=Lietot XP Tçmu
+66011=External programs
+66012=External program
+66013=Extension
+66014=External program associations:
+66015=Watch variable under mouse
+66016=Report watch errors
+66017=  Debug variables browser 
+66018=  Alternate Configuration File  
+66019=Use this alternate configuration file
+66020=You changed the configuration file to be used by the application.<CR>The new configuration file will *not* be used in the current session. Any configuration changes you do in this session, will be saved in the *currently* open configuration file.<CR><CR>It is suggested that you restart the application now, so that it starts using the new configuration file...
+66021=Dev-C++ was unable to set file associations.<CR><CR>This is known to be caused by using UAC on a normal non-admin user account.<CR><CR>Please disable UAC or run Dev-C++ as an admin if you want to change file associations using Dev-C++.<CR><CR>You might want to try the "Default Programs" feature in Windows Vista or 7.
+66022=UI font
+
+
+67001=Parametri...
+67002=Kompilçt paðreizçjo failu
+
+
+68001=Logu Saraksts
+68002=Izvçlies labojamo logu:
+
+
+69001=Paðreizçjais fails...
+69002=Viss projekts...
+69003=Lûdzu uzstâdi CVS atbalstu "Rîki / Vides opcijas"...
+
+
+70001=Importa Opcijas
+70002=Repozitorijs
+70003=Globâlâs Opcijas
+70004=Checkout Opcijas
+70005=Commit Opcijas
+70006=Atjaunoðanas Opcijas
+70007=Diff Opcijas
+70008=Log Opcijas
+70009=CVS Izvaddati
+70010=Imporçt
+70011=Checkout
+70012=Commit
+70013=Atjaunot
+70014=Diff
+70015=Log
+70016=Importçðanas katalogs
+70017=Darbîbas
+70018=Raþotâjs
+70019=Relîze
+70020=Log paziòojums
+70021=Moduïa vârds
+70022=Paplaðinâjums
+70023=Checkout kâ
+70024=Checkout katalogs
+70025=Rekursîvi apakðdirektorijâs
+70026=Reset any sticky options
+70027=Izveidot trûkstoðos katalogus
+70028=Izdzçst tukðos katalogus
+70029=Ignorçt lokâlâs izmaòas
+70030=Pirms datuma
+70031=Revîzija/atzars/tag
+70032=Ja nav atrasts, dabût visjaunâko
+70033=Citas revîzijas
+70034=Veikt apvieenoto "diff"
+70035=Salîdzinât lokâlo failu ar to paðu revîziju/tagu
+70036=Salîdzinât lokâlo failu ar citu nelokâlo revîziju
+70037=Salîdzinât divas nelokâlas revîzijas
+70038=Vai datums
+70039=Reìistrçt noklusçto zaru
+70040=Râdît tikai RCS failu nosaukumus
+70041=Nedrukât tagu vârdus
+70042=Filtrçt
+70043=Pçc revîzijas/tagiem
+70044=Pçc datuma
+70045=Pçc lietotâja
+70046=Repozitorijs
+70047=Detaïas
+70048=Piekïuves metode
+70049=Lietotâjs
+70050=Serveris
+70051=Attâlinâtais katalogs
+70052=Pievienot
+70053=Izmest
+70054=Pielikt Opcijas
+70055=Noòemt Opcijas
+70056=Izmest arî no diska...
+
+
+71001=Parametri
+71002=Programmai padodamie parametri:
+71003=Uztveroðâ aplikâcija:
+
+
+72001=Faili
+72002=Projekta faili:
+72003=Projekta opcijas:
+72004=Veidot atkïûdoðanas informâciju
+72005=Veidot profilçðanas informâciju
+72006=PIEZÎME: Ðie uzstâdîjumi iedarbosies tikai ðajâ projektâ, ignorçjot globâlâs kompilatora opcijas.
+72007=Atbalstît windows XP Tçmas
+72008=Failu opcijas:
+72009=Iekïaut kompilçjot:
+72010=Kompilçt kâ C++ failu
+72011=Versijas informâcija
+72012=Iekïaut versijas informâciju projektâ
+72013=Versijas detaïas
+72014=Lielâs:
+72015=Mazâs:
+72016=Relîze:
+72017=Build:
+72018=Valoda:
+72019=papildus informâcija:
+72020=Ignorçt build komandu
+72021=Izejas fails
+72022=Iekïaut linkoðanâ
+72023=Build prioritâte:
+72024=Auto-increment build number on compile
+72025=Use custom Makefile (do not generate a Makefile, use this one)
+72026=Information about customizing the Makefile...
+72027=&Include the following files into the Makefile:
+72028=Sync product with file version
+72029=Default to C++ when creating new files
+
+
+73001=Strip executable (-s)
+73002=Optimize for the following machine (-march)
+73003=Enable use of specific instructions (-mx)
+73004=Optimization level (-Ox)
+73005=Language standard (-std)
+73006=Compile with the following bit width (-mx)
+73007=Optimize less, while maintaining full compatibility (-mtune)
+
+
+74001=Compiler:
+74002=Status:
+74003=File:
+74004=Errors:
+74005=Warnings:

@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Settings Tab</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../../content.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<div class="Text">Some easy to use settings can be toggled here. When an option is enabled by selecting anything other than "Yes", its command between braces is appended to the compiler and linker command if applicable. These commands are added before the commands in the General tab which means the commands set here can be overriden by the commands in the General tab.</div>
+	<br/>
+	<div class="Heading1">Specific Options</div>
+	<div class="Heading2">General information</div>
+	<div class="Text">For much more information about these options, please visit <a href="http://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html">GCC's option documentation</a>.</div>
+	<br/>
+	<div class="Heading2">C Options</div>
+	<div class="Text">Shown here are some C related options.</div>
+	<br/>
+	<div class="Heading2">Code Generation</div>
+	<div class="Text">Shown here are some optimization and architecture related options.</div>
+	<div class="Heading3">-march</div>
+	<div class="Text">Change this option to 32bit or 64bit to switch between compiling for these targets. When doing so, make sure to set the library directory correctly. The procedure that outlines is explained in the <div class="Link" onclick="OpenPage('Compiler','FAQ/Compiler.htm')">FAQ</div></div>
+	<br/>
+	<div class="Heading2">Warnings</div>
+	<div class="Text">Shown here are some warning and error related options.</div>
+	<br/>
+	<div class="Heading2">Profiling</div>
+	<div class="Text">Shown here are some profiling related options.</div>
+	<div class="Heading3">-pg</div>	
+	<div class="Text">This flag is required to perform profiling. Default "Profiling" compiler sets enable this option by default.</div>
+	<br/>
+	<div class="Heading2">Linker</div>
+<div class="Text">Shown here are some linking and debugging related options.</div>
+	<div class="Heading3">-g3</div>	
+	<div class="Text">This flag is required for breakpoints and debugging to work. Default "Debug" compiler sets enable this option by default.</div>
+	<br/>
+	<div class="Heading2">Output</div>
+	<div class="Text">Shown here are some output related options.</div>
+	<div class="Heading3">-S</div>	
+	<div class="Text">This flag tells the compiler to output assembler code instead of binary code. Open the output file with a text editor to view the assembler code.</div>
+	<div class="Heading3">-pipe</div>	
+	<div class="Text">If enabled, don't use the relatively slow hard drive (or solid state drive) when compiling, but perform compilation in memory. Use this option to speed up compilation if you have enough RAM.</div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+[Template]
+ver=1
+Name=Input Loop
+Icon=ConsoleToo.ico
+Description=A console with an input loop
+Category=Console
+
+[Unit0]
+CName=main.c
+CppName=main.c
+C=HelloInput_c.txt
+Cpp=HelloInput_cpp.txt
+
+[Project]
+UnitCount=1
+Type=1

@@ -1,0 +1,72 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{4FBB3CA0-F846-45F2-941F-FBAF2589C62E}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="AbbreviaCR.cbproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AbbreviaVCLC.cbproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AbbreviaVCLCDesign.cbproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AbbreviaFMXCDesign.cbproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="AbbreviaCR">
+        <MSBuild Projects="AbbreviaCR.cbproj"/>
+    </Target>
+    <Target Name="AbbreviaCR:Clean">
+        <MSBuild Projects="AbbreviaCR.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaCR:Make">
+        <MSBuild Projects="AbbreviaCR.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="AbbreviaVCLC">
+        <MSBuild Projects="AbbreviaVCLC.cbproj"/>
+    </Target>
+    <Target Name="AbbreviaVCLC:Clean">
+        <MSBuild Projects="AbbreviaVCLC.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaVCLC:Make">
+        <MSBuild Projects="AbbreviaVCLC.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="AbbreviaVCLCDesign">
+        <MSBuild Projects="AbbreviaVCLCDesign.cbproj"/>
+    </Target>
+    <Target Name="AbbreviaVCLCDesign:Clean">
+        <MSBuild Projects="AbbreviaVCLCDesign.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaVCLCDesign:Make">
+        <MSBuild Projects="AbbreviaVCLCDesign.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="AbbreviaFMXCDesign">
+        <MSBuild Projects="AbbreviaFMXCDesign.cbproj"/>
+    </Target>
+    <Target Name="AbbreviaFMXCDesign:Clean">
+        <MSBuild Projects="AbbreviaFMXCDesign.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AbbreviaFMXCDesign:Make">
+        <MSBuild Projects="AbbreviaFMXCDesign.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="AbbreviaCR;AbbreviaVCLC;AbbreviaVCLCDesign;AbbreviaFMXCDesign"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="AbbreviaCR:Clean;AbbreviaVCLC:Clean;AbbreviaVCLCDesign:Clean;AbbreviaFMXCDesign:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="AbbreviaCR:Make;AbbreviaVCLC:Make;AbbreviaVCLCDesign:Make;AbbreviaFMXCDesign:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

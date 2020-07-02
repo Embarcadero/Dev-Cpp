@@ -1,0 +1,1238 @@
+[lang]
+Lang=Czech (Èeština)
+Ver=1
+1=&Soubor
+2=Upr&avit
+3=&Hledat
+4=&Zobrazit
+5=&Projekt
+6=Pø&eklad
+7=&Nástroje
+8=&Okna
+9=Nápo&vìda
+10=La&dit
+
+
+1001=&Novı
+1002=&Projekt...
+1003=&Zdrojovı kód
+1004=&Definice zdrojù
+1005=Š&ablona...
+1006=&Tøída...
+1007=New
+
+
+2001=&Otevøít...
+2002=&Poslední
+2003=Smazat historii
+2004=&Uloit
+2005=Uloit j&ako...
+2006=Uloit &vše
+2007=&Zavøít
+2008=Zavøít projekt
+2009=Vlas&tnosti...
+2010=Uloit projekt jako...
+2011=&Export
+2012=do &HTML...
+2013=do &RTF...
+2014=&Celı projekt do HTML...
+2015=do &Texu...
+
+
+3001=&Import
+3002=Ti&sk
+3003=N&astavení tisku...
+3004=&Konec
+
+
+4001=Najít deklaraci
+4002=Najít definici
+4003=&Zpìt
+4004=Z&nova
+4005=V&yjmout
+4006=&Kopírovat
+4007=&Vloit
+4008=Vy&brat vše
+4009=&Smazat
+4010=Vloit
+4011=Zaloit
+4012=Pøejít na záloku
+4013=Záloka
+4014=&Datum/Èas
+4015=&Komentáø hlavièky
+4016=Kopírovat vše
+4017=Vyèistit
+
+
+5001=&Najít...
+5002=Najít v &souborech...
+5003=Na&hradit...
+5004=Najít &další
+5005=&Pøejít na øádek...
+5006=&Rychlé hledání
+5007=Pøejít na &funkci...
+5008=Plovoucí Správce Projektu
+5009=Pøejít na Správce Pro&jektu
+5010=Pøejít na Správce &Tøíd
+5011=Správce &projektu/tøíd
+5012=&Stavovı øádek
+5013=&Vıstup pøekladaèe
+5014=&Vdy viditelnı
+5015=&Pouze je-li tøeba
+5016=&Lišty tlaèítek
+5017=Hlavní lišta
+5018=Kompilace a spouštìní
+5019=Projekt
+5020=Dev-C++
+5021=Speciální
+5022=Editace
+5023=Hledání
+5024=Plovoucí informaèní okno
+5025=Nahradit v souborech...
+5026=Pøekladaèe
+5027=Najít pøedchozí
+
+6001=&Novı soubor
+6002=&Pøidat do projektu
+6003=&Odstranit z projektu
+6004=&Editovat zdroje projektu
+6005=&Vlastnosti projektu
+6006=&Makefile
+6007=Pøi&dat soubor se zdroji
+6008=Od&stranit soubor se zdroji
+
+
+7001=Pøeloit
+7002=&Spustit
+7003=&Pøeloit a spustit
+7004=Pøeloit vš&e
+7005=Vy&èistit
+7006=&Vıstup pøekladu
+7007=Kontrola synta&xe projektu
+7008=&Reset programu
+7009=Profilová &analıza
+7010=Pøerušit pøeklad
+7011=&Nastavení pøekladaèe
+7012=Nastavení &prostøedí
+7013=Nastavení &editoru
+7014=&Upravit nástroje
+7015=Nastavení klávesovıch &zkratek
+7016=Odstranit soubory profilace
+7017=Kontrola syntaxe souboru
+
+8001=&Celoobrazovkovı reim
+8002=&Zpìt do okna
+8003=&Následující
+8004=&Pøedchozí
+8005=&Zavøít vše
+8006=%s verze %s celoobrazovkovı reim. Stiskem Alt-F11 pøepnete zobrazení nástrojù, klávesou Alt+F12 se vrátíte do bìného reimu.
+8007=Zavøít vše mimo tohoto
+8008=&Seznam...
+8009=Stisknem %s pøepnete celoobrazovkovı reim, %s zobrazení a skrje nástroje.
+
+9001=&O Dev-C++...
+9002=&Zkontrolovat aktualizace...
+9003=&Upravit menu Nápovìdy...
+9004=&Nápovìda k Dev-C++
+9005=Správce balíèkù...
+9006=Podpora vıvoje
+
+10001=&Ladit
+10002=&Vloit bod zastavení
+10003=Další øádek
+10004=Pokraèovat
+10005=Nové hlí&dání
+10006=&Hlídat promìnné
+10007=&Zastavit ladìní
+10008=&Upravit hlídání
+10009=&Odstranit hlídání
+10010=Do funkce
+10011=Pokraèovat po &kurzor
+10012=CPU
+10013=Pøiø&adit k procesu...
+10014=&Modifikovat
+10015=Odstranit &všechny
+10016=Novı soubor
+10017=Vloit soubor...
+10018=Odstranit soubor...
+10019=Vlastnosti...
+10020=Upravit zdroje
+10021=Další instrukce
+10022=Dovnitø instrukce
+10023=Pøeskoèit funkci
+10024=Pøejít na bod zastavení
+
+11001=Odstranit soubor
+11002=Pøejmenovat soubor
+11003=Zavøít
+11004=Otevøít
+11005=Otevøít hlavièku
+
+
+12001=Pøejít na &deklaraci
+12002=Pøejít na &implementaci
+12003=Nová tøída
+12004=Nová &funkce
+12005=Nová &promìnná
+12006=&Zobrazení
+12007=&Všechny soubory
+12008=&Aktuální soubor
+12009=Pøidat &sloku
+12010=Odstranit sloku
+12011=Pøejmenovat sloku
+12012=Není moné vytvoøit více ne %d sloek v jednom projektu.
+12013=Barevnì rozlišovat
+12014=Soubory projektu
+12015=Podìdìné funkce/promìnné
+12016=Otevøít v...
+12017=Otevøít adresáø souboru
+12018=Zavøít vše vyjma tohoto
+12019=Vloit TODO...
+
+
+13001=Pøekladaè
+13002=Zdroje
+13003=Log pøekladu
+13004=Vısledky hledání
+13005=Skrıt
+13006=Ladìní
+
+
+14001=&Vymazat
+14002=&Kopírovat
+14003=&Schovat
+14004=&Otevøít
+
+
+15001=Øádek
+15002=Soubor
+15003=Informace
+15004=Argumenty
+
+
+16001=Hledat øádek
+16002=Sloupec
+16003=Název promìnné
+16004=Hodnota
+16005=Informace:
+16006=Záznam pøekladu:
+16007=Celkem chyb:
+16008=Velikost vıstupu:
+
+
+17001=Sledované promìnné
+17002=Trasování
+17003=Vıstup
+17004=Pøíkaz GDB:
+17005=Odeslat
+17006=Vyhodnotit:
+
+
+18001=Novı
+18002=Vloit
+18003=Zaloit
+18004=Pøejít
+18005=Okno projektu
+18006=Okno ladìní
+18007=Informaèní okno
+
+
+19001=Otevøít
+19002=Otevøít soubor
+19003=Exportovat do
+19004=Uloit soubor
+19005=Uloit projekt
+19006=Zvolte soubor s nápovìdou
+19007=Uloit jako
+
+
+20001=Nová hlídaná promìnná:
+20002=Zadejte název hlídané promìnné:
+20003=Modifikovat hlídanou promìnnou
+20004=Název nové hlídané promìnné:
+20005=Zmìnit hodnotu
+20006=Promìnná k úpravì:
+20007=Nová hodnota:
+
+
+21001=Projekt
+21002=Tøídy
+
+
+22001=Zakomentovat
+22002=Odkomentovat
+22003=Zvìtšit odsazení
+22004=Zmenšit odsazení
+22005=Pøepnout zdroj/hlavièky
+22006=Sbalit vše
+22007=Rozbalit vše
+22008=Zakomentovat/Odkomentovat
+22009=Duplikovat øádek
+22010=Smazat øádek
+22011=Posunout vıbìr nahoru
+22012=Posunout vıbìr dolù
+22013=Poslat vedle
+22014=Zakomentovat/Odkomentovat øádky
+
+
+23001=Vlastnosti editoru
+23002=Obecné
+23003=Písma
+23004=Zvırazòování
+23005=Úryvky
+23006=Dokonèování
+23007=Struktura kódu
+23008=Ukládání
+
+
+24001=Vloit
+24002=Vıchozí obsah
+24003=Soubor
+24004=Monosti
+24005=Dokonèování
+
+
+25001=Zadejte název pro toto schéma:
+25002=Vlastnosti editoru:
+25003=Automaticky zarovnat k { } a :
+25004=Vıchozí reim je vkládání
+25005=Pouívat znak TAB
+25006=Inteligentní odsazení
+25007=Backspace odsazuje zpìt
+
+
+26001=Zpìt po skupinách
+26002=Klávesa HOME respektuje odsazení
+26003=Kurzor mùe za konec souboru
+26004=Kurzor mùe za konec øádku
+26005=Dvojklikem vybrat celı øádek
+26006=Hledat text u kurzoru
+26007=Posuvníky jen jsou-li tøeba
+26008=Pùlstránkovı posun
+26009=Pozice v souboru na posuvníku
+26010=Zvıraznit syntaxi pro tyto typy souborù:
+26011=Vkládat upuštìné soubory
+26012=Šíøka:
+26013=Okrajová linka
+26014=Zobrazit
+26015=Pozice:
+26016=Barva:
+26017=Kurzor
+26018=Kurzor pro vkládání:
+26019=Kurzor pro pøepis:
+26020=Svislá èára
+26021=Vodorovná èára
+26022=Ètvereèek
+26023=Plnı obdélník
+26024=Vysvícení aktuálního øádku
+26025=Mazat mezery na koncích øádkù
+26026=Zobrazit
+26027=Šíøka okraje
+26028=Automaticky odsazovat
+26029=Automaticky zarovnat k { } a :
+26030=Odsazování
+
+27001=Zobrazit skryté znaky
+27002=Zobrazovat definice tipem pod myší
+27003=Vysvítit související závorky
+27004=Ukonèovat soubor novım øádkem
+27005=Povoleno
+27006=Nastavit na systémovou hodnotu HighlightText
+27007=Nastavit stejnì jako pro prázdné znaky
+27008=Zobrazovat signatury funkcí tipem
+27009=Tip: V editoru lze mìnit velikost textu pomocí CTRL a koleèka myši.
+27010=Písmo editoru:
+27011=Font
+27012=Velikost
+27013=Ukazka fontu
+27014=Písmo èíslování øádkù
+27015=Automatická velikost
+27016=Èíslovat øádky
+27017=Zobrazit úvodní nuly
+27018=Zaèít nulou
+27019=Pouít jinı font
+27020=Ukázka fontu
+27021=Popøedí
+27022=Pozadí
+27023=Styly
+27024=Tuèné
+27025=Kurzíva
+27026=Podtrené
+27027=Uloená schémata
+27028=Typ:
+27029=Uloit vlastní barevné schéma
+27030=Kód
+27031=Poloka menu
+27032=Sekce (èíslo)
+27033=Poznámka
+27034=Vloit do souboru kadého nového projektu
+27035=Pouít cache pro dokonèování
+27036=Soubory v cache
+27037=Povolit automatické dokonèování
+27038=Zpodìní:
+27039=Barva pozadí:
+27040=Uloit pouze právì viditelnı soubor
+27041=Procházet i lokální soubory vloené pomocí #include
+27042=Pøíklad
+27043=Základní
+27044=Zobrazení
+27045=Povolit zobrazení struktury kódu
+27046=Procházet i globální soubory vloené pomocí #include
+27047=Povolit automatické ukládání
+27048=Interval:
+27049=Uloit vdy všechny otevøené soubory
+27050=Novı projekt
+27051=Popis:
+27052=Povolit doplòování symbolù
+27053=Monosti
+27054=Doplòovat sloené závorky '{}'
+27055=Doplòovat kulaté závorky '()'
+27056=Doplòovat symboly include '<>' '""'
+27057=Doplòovat hranaté závorky '[]'
+27058=Doplòovat víceøádkové komentáøe '/**/'
+27059=Uloit všechny soubory projektu
+27060=Pøepsat soubory
+27061=Pøipojit èasovou znaèku UNIXu
+27062=Pøipojit formátovanou èasovou znaèku
+27063=Soubory
+27064=Pøíklad názvu: %s
+27065=Opravdu si pøejete vymazat cache?
+27066=Po aktualizaci Dev-C++ prosím obnovte cache.
+27067=Smazat uzavírací znak pøi smazání otevíracího znaku
+27068=Doplòovat jednoduché uvozovky ''''
+27069=Doplòovat dvojité uvozovky '""'
+
+28001=Název:
+28002=&C Projekt
+28003=C&++ Projekt
+28004=&Nastavit jako vıchozí
+28005=Rùzné
+28006=Vlastnosti projektu:
+
+
+29001=Odstranit z projektu
+29002=Zvolte soubor, kterı má bıt odstranìn z projektu:
+
+
+30001=Pøejít na øádek ...
+30002=Èíslo:
+
+
+31001=Nastavení nástrojù
+31002=Nástroje:
+
+
+32001=Úprava nástroje
+32002=Název
+32003=Program
+32004=Pracovní adresáø
+32005=Parametry
+32006=Vloit makro
+32007=Dostupná makra
+
+33001=Knihovna ikon
+33002=Pouít vybranou ikonu
+33003=Procházet
+
+
+34001=Nastavení klávesovıch zkratek
+34002=Kliknìte na poloku a stisknìte poadovanou zkratku:
+34003=Tip: Stisknutím ESC zrušíte nastavení kl. zkratky
+34004=Poloka menu
+34005=Klávesová zkratka
+34006=Zrušit
+34007=OK
+34008=Tato zkratka je ji pouívána pro akci '%s'.<CR><CR>Odstranit?
+34009=Button/Misc.
+34010=Tato zkratka je pouívána pro akci '%s'.<CR><CR>Chcete tuto zrušit a pouít zkratku pro akci '%s'?
+34011=Zvolte poloku a stisknìte poadovanou zkratku. Stiskem ESC nebo DELETE zkratku zrušíte. Vyhnìte se pouití CTRL+ALT pokud potøebujete vkládat znaky pod pravım ALTem.
+34012=Opravdu obnovit všechny pùvodní klávesové zkratky?
+34013=Opravdu obnovit pùvodní klávesovou zkratku pro akci '%s'?
+34014=Obnovit vše
+34015=Obnovit vybrané
+
+35001=Vrátí vıchozí adresáø
+35002=Vrátí pracovní adresáø dev-c++
+35003=Vrátí název pøeloeného souboru
+35004=Vrátí cestu k aktuálnímu projektu nebo zdrojovému kódu
+35005=Vrátí název souboru aktuálního projektu nebo zdorjového kódu
+35006=Vrátí název projektu
+35007=Vrátí název aktuálního zdrojového souboru
+35008=Vrátí cestu k aktuálnímu zdrojovému souboru
+35009=Vrátí mezerami oddìlenı seznam všech souborù v aktuálním projektu
+35010=Vrátí slovo na pozici kurzoru aktivního souboru
+35011=Vrátí verzi dev-c++
+
+
+36001=O Dev-C++ :)
+36002=inseculous@users.sourceforge.net
+36003=GNU General Public License
+36004=Kontakty
+36005=Bloodshed Software:
+36006=Kompilátor MinGW:
+36007=Diskuzní fórum o Dev-C++:
+36008=Maillist Dev-C++:
+36009=E-maily autorù:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.bloodshed.net/devcpp-ml.html
+36014=haiku@bloodshed.net
+36015=&Zkontrolovat nové verze
+36016=Post-4.9.9.2 Development:
+36017=http://orwelldevcpp.blogspot.com
+36018=Aktuální vıvoj verze 5 a vyšších
+36019=Repozitáø:
+36020=Subreddit:
+36021=Pøekladaèe
+36022=Stránky pøekladaèe TDM-GCC:
+36023=<= 4.9.9.2 (historie)
+36024=Podpoøte prosím Dev-C++ finanèním darem:
+36025=Blog:
+
+37001=Úprava poloky
+37002=Nová poloka
+37003=Název poloky
+37004=Popisek
+37005=Sekce nabídky
+
+
+38001=Prùbìh pøekladu
+38002=Zobrazit okno pøekladu
+38003=Automaticky zavøít
+38004=Nezobrazovat splash pøi startu programu
+38005=Vlastnosti prostøedí
+38006=Základní
+38007=Cesty
+38008=Automaticky otevírat
+38009=Vıchozí je C++ pro novı projekt
+38010=Zobrazit tlaèítka v celoobrazovkovém reimu
+38011=Vytváøet záloní soubory
+38012=Minimalizovat pøi spuštìní programu
+38013=Styl dialogù
+38014=Windows 2k
+38015=Windows 9x
+38016=Windows 3.1
+38017=Jazyk:
+38018=Záloky editorù:
+38019=Hloubka historie:
+38020=Vıchozí adresáø
+38021=Adresáø pro vıstupní soubory
+38022=Cesta k ikonám
+38023=Úvodní obrázek
+38024=Vyberte vıchozí sloku
+38025=Vyberte sloku kam bude smìrován vıstup
+38026=Vyberte sloku, kde jsou uloeny ikony
+38027=Všechny soubory projektu
+38028=Pouze první soubor
+38029=Nic
+38030=Zobrazit menu v celoobrazovkovém reimu
+38031=Dvojklik pro otevøení souboru
+38032=Cesta k souborùm s jazykem
+38033=Styl:
+38034=Rozhraní
+38035=Najít text
+38036=Najít
+38037=Najít všude
+38038=&Text k vyhledání
+38039=Monosti:
+38040=&Rozlišovat velikost
+38041=&Pouze celá slova
+38042=Smìr
+38043=&Soubory v projektu
+38044=&Otevøené soubory
+38045=Rozsah
+38046=&Globální
+38047=&Pouze vybrané
+38048=Pùvod
+38049=Od kurzoru
+38050=Celı rozsah
+38051=Smìr
+38052=Vpøed
+38053=Vzad
+38054=Nezavírat konzoli po skonèení programu
+38055=Soubory otevøené pøi zavøení
+38056=Nahradit
+38057=Nahradit všude
+38058=Nahradit za:
+38059=Dotázat se
+38060=Jen tento soubor
+38061=Kontrolovat asociace souborù pøi spuštìní
+38062=Nahoøe
+38063=Dole
+38064=Vlevo
+38065=Vpravo
+38066=Promazat a ukonèit
+38067=Adresáø s nastavením. Tlaèítkem nastavení Dev-C++ resetujete.
+
+40001=Hledat:
+40002=Typ
+40003=Funkce
+40004=Øádek
+
+
+41001=Vlastnosti pøekladaèe
+41002=Pøekladaè
+41003=Adresáøe
+41004=Parametry
+41005=Linker
+41006=Programy
+41007=Více informací o parametrech GCC naleznete v dokumentaci zde:
+41008=Makefile
+
+42001=Binární soubory
+42002=Knihovny
+42003=C Include soubory
+42004=C++ Include soubory
+
+
+43001=Jazyk C
+43002=Pøekladaè C++:
+43003=Pøekladaè:
+43004=Vıstup
+
+
+44001=Podporovat vlastnosti standardního ANSI C (-ansi)
+44002=Emulovat tradièní C preprocesory (-traditional-cpp)
+44003=Potlaèit všechna varování (-w)
+44004=Vypnout všechny kontroly pøístupu (-fno-access-control)
+44005=Akceptovat $ v identifikátorech (-fdollar-in-identifiers)
+44006=Pouít heuristiku pro rychlejší kompilaci (-fsave-memoized)
+44007=Pouít Cygwin místo MinGW pøekladaèe
+44008=Pøipojit následující parametry pøi &volání pøekladaèe:
+44009=Zpodìní
+44010=Povolit zpodìní (ms) pro odstranìní problémù pøi tvorbì makefile.
+44011=Zobrazit kadou chybu na samostatném øádku (-fmessage-length 0)
+44012=Nerozpoznávat asm, inline ani typeof jako klíèová slova (-fno-asm)
+44013=Kontrolovat ukazatel vùèi NULL pøi pøístupu k alokované pamìti (-fcheck-new)
+44014=Slouèit neinicializovaná globální data do spoleèného segmentu (-fconserve-space)
+
+
+45001=Instrukce
+45002=Optimalizace
+
+
+46001=Povolit handlování vıjimek (-fexceptions)
+46002=Pouít 4 bajty pro float i double (-fshort-double)
+46003=Komentovat generovanı kód assembleru (-fverbose-asm)
+46004=Základní optimalizace
+46005=Maximální optimalizace
+46006=Provádìt mnoství malıch optimalizací
+46007=Generátor makefile souborù
+46008=Vynechat detailní kontrolu závislostí
+46009=Profilování
+46010=Generovat informace k profilové analıze (-pg)
+46011=Linkovat program v Object C (-lobjc)
+46012=Generovat informace pro ladìní (-g3)
+46013=Nepouívat standardní knihovny (-nostdlib)
+46014=Nevytváøet program s oknem konzole (-mwindows)
+46015=Pøidat tyto parametry pøi volání &linkeru:
+46016=Neoptimalizovat
+46017=Støední optimalizace (doporuèeno)
+46018=Nesestavovat, pouze uloit kód v assembleru (-S)
+46019=Pøedávat data mezi procesy pøímo, neukládat doèasné soubory (-pipe)
+
+
+47001=Zde mùete zmìnit jednotlivé programy které jsou pouívány Dev-C++.
+47002=Sady konfigurací pøekladaèe:
+47003=Nová konfigurace
+47004=Zadejte název pro novou konfiguraci:
+47005=Nelze odstranit úplnì všechny pøednastavené konfigurace!
+47006=Opravdu chcete tuto konfiguraci odstranit?
+47007=Pøejmenovat
+47008=Zadejte novı název pro tuto konfiguraci:
+47009=Následná
+47010=Pro nejlepší vısledek pøepnìte pøekladaè do angliètiny a umistìte jej do následujících adresáøù:<CR><CR>32 bitovı: %s<CR>64 bitovı: %s<CR><CR>Vymazat nyní všechny sady konfigurací pøekladaèù?
+47011=Vyhledat a automaticky nakonfigurovat pøekladaèe
+47012=Pøidat prázdnou konfiguraci
+47013=Odstranit zvolenou konfiguraci
+47014=Pøejmenovat zvolenou konfiguraci
+47015=Pøidat pøekladaè podle adresáøe
+
+48001=Editor menu nápovìdy
+48002=Název poloky
+48003=Soubor s nápovìdou
+48004=Vlastnosti
+48005=Ikona
+48006=Sekce
+48007=Sekce 1
+48008=Sekce 2
+48009=Menu pøi nápovìdì
+48010=Hledat soubor
+48011=Prohledat soubor nápovìdy pro slovo na pozici kurzoru
+48012=Pøiøadit zkratku F1
+48013=Zobrazit nejdùleitìjší varování (-Wall)
+48014=Zobrazit další specifická varování (-Wextra)
+48015=Pøísnì hlídat dodrování ISO C/C++ standardù (-pedantic)
+48016=Varování
+48017=Pouze kontrolovat chyby syntaxe (-fsyntax-only)
+48018=Všechna varování jsou chybami (-Werror)
+48019=Zastavit pøeklad pøi první chybì (-Wfatal-errors)
+
+
+49001=Tisk souboru
+49002=Monosti
+49003=Stránky
+49004=&Barvy
+49005=&Zvıraznìní
+49006=Za&lamování slov
+49007=&Èísla øádkù
+49008=Tisknout èísla øádkù
+49009=Tisknout èísla øádkù v okraji
+49010=Poèet kopií:
+49011=Tisknout pouze vybranou oblast
+49012=Netisknout èísla øádkù
+
+
+50001=Hledat nové verze Dev-C++
+50002=Úloha:
+50003=Vısledky:
+50004=Verze vydání:
+50005=Vyadovaná verze:
+50006=Popis balíèku:
+50007=Server (dvojklikem stáhnete):
+
+
+51001=Vloit novou TODO poznámku
+51002=Popisek
+51003=Priorita
+51004=Zadavatel
+
+
+52001=Seznam TODO
+52002=Soubor
+52003=Hotovo
+52004=Nezobrazovat poloky oznaèeny jako Hotové
+52005=Filtr:
+52006=Všechny soubory
+52007=Pouze otevøené soubory
+52008=Všechny soubory projektu
+52009=Pouze otevøené soubory projektu
+52010=Otevøené soubory nepatøící k projektu
+52011=Pouze aktuální soubor
+
+
+53001=Importovat projekt MS &Visual C++
+53002=Zvolte &soubor projektu MS Visual C++
+53003=Volby importu
+53004=Konfigurace k importu
+53005=Soubor projektu Dev-C++
+53006=Soubor projektu MS Visual C++ byl úspìšnì importován a pøeveden na formát Dev-C++. Chcete jej nyní otevøít?
+53007=Nepodaøilo se najít cílovou konfiguraci "%s". Toto mùe bıt chyba v Dev-C++...
+
+
+54001=Importovat projekt Code::Blocks
+54002=Vyhledejte soubor projektu prostøedí Code::Blocks
+54003=Monosti importu
+54004=Konfigurace k importu
+54005=Název souboru projektu Dev-C++
+54006=Soubor projektu prostøedí Code::Blocks byl úspìšnì pøeveden na projekt Dev-C++. Pøejete si ho nyní otevøít?
+54007=Nepodaøilo se najít konfiguraci "%s" (pravdìpodobnì jde o chybu v Dev-C++)...
+
+
+55001=Vlastnosti projektu
+55002=Základní
+55003=Adresáøe
+55004=Název:
+55005=Ikona:
+55006=Knihovna
+55007=Procházet
+55008=Typ:
+55009=Windows API GUI Aplikace
+55010=Windows API Konzolová aplikace
+55011=Statická knihovna (.A)
+55012=Dynamicky Linkovaná Knihovna (DLL)
+55013=Pøekládat jako C++
+55014=Parametry pøíkazového øádku:
+55015=Pøekladaè:
+55016=Linker/Pøípadné další knihovny:
+55017=Knihovny
+55018=Zdrojové soubory
+55019=Vloené soubory Include
+55020=Zvolit ikonu
+55021=Pøipojit objektovı soubor
+55022=Zdroje
+55023=Cíle
+55024=Adresáøe
+55025=&Adresáø pro vıslednı spustitelnı soubor
+55026=A&dresáø pro objektové soubory
+55027=Název &vıstupního souboru
+55028=Pøipojit knihovnu
+55029=%d souborù [Kód: %d, Hlavièky: %d, Zdroje: %d, Ostatní: %d]
+55030=Ukládat záznam pøekladu
+55031=Jazyk C:
+55032=Pøizpùsobit (platí pouze pro tento projekt):
+55033=Zrušit všechna pøizpùsobení nastavení pøekladaèe pro tento projekt?
+55034=Jazyk C++:
+55035=Linker:
+
+56001=Název:
+56002=Popis:
+56003=Kategorie:
+56004=Název nového projektu:
+56005=Soubory v šablonì:
+56006=Další parametry kompilátoru:
+56007=Další parametry pro linker:
+56008=Ikony:
+56009=Informace
+56010=Soubory
+56011=Další
+56012=Ikona šablony
+56013=Nová ikona projektu
+56014=Vytvoøit
+56015=Nová šablona dle projektu
+56016=Pouít adresáøe pøipojenıch souborù (include) k projektu
+56017=Pouít adresáøe knihoven projektu
+56018=Pouít adresáøe zdrojovıch souborù projektu
+56019=Knihovna
+56020=Jazyk C:
+56021=Jazyk C++:
+56022=Linker:
+
+57001=Typ:
+57002=Název:
+57003=Implementuje:
+57004=Pøístup
+57005=Vytvoøit funkci pro ètení této promìnné
+57006=Vytvoøit funkci pro zápis do této promìnné
+57007=Název:
+57008=Komentáø
+57009=Popis:
+57010=Styl:
+57011=Vytvoøit
+57012=Zrušit
+57013=Neznámá tøída...
+57014=Nelze zjistit název souboru pro implementaci...
+57015=Nelze zjistit èíslo øádku pro vloení...
+57016=Jméno èlena:
+57017=Argumenty:
+57018=Název tøídy:
+57019=Odvodit z jiné tøídy
+57020=Dìdiènost
+57021=Odvodit ze tøídy:
+57022=Hlavièkovı soubor:
+57023=Soubor implementace:
+57024=Hlavièkovı soubor:
+57025=Pøidat k aktuálnímu projektu
+57026=Atributy
+57027=Vytvoøit konstruktor
+57028=Vytvoøit destruktor
+
+58001=Soubor:
+58002=Projekt
+58003=Celkem øádkù
+58004=Øádkù kódu
+58005=Øádkù komentáøù
+58006=Pøipojuje souborù
+58007=Prázdnıch øádkù
+58008=Velikost souboru
+58009=Úplná cesta
+58010=Makefile
+58011=Relativní
+58012=Datum a èas souburu
+58013=Nastavení pøekladaèe
+58014=Vlastnosti
+
+
+59001=Profilová analıza
+59002=Pøehled
+59003=Graf volání
+59004=Monosti
+59005=Skrıvání funkcí
+59006=Skrıt funkce nevolané dostateènì dlouho
+59007=Skrıt staticky linkované lokální funkce
+59008=Skrıt funkce volané ménì ne
+59009=krát
+59010=Pouít
+59011=Vlastní parametry
+59012=Pouít tento pøíkaz:
+
+
+60001=Hledanı text ''%s'' nebyl nalezen
+60002=Soubor %s nemùe bıt otevøen
+60003=Nahradit ''%s''?
+60004=Soubor %s ji existuje v %s
+60005=Opravdu chcete zavøít %s
+60006=Uloit zmìny v %s?
+60007=Uloit %s a zaèít novı projekt?
+60008=Pøejmenovat na:
+60009=Pøeklad právì probíhá
+60010=Uloit zmìny v %s?
+60011=Soubor ji existuje, pøepsat?
+60012=Pøidat novı soubor do aktuálního projektu?
+60013=Pøidat nové zdroje k aktuálnímu projektu?
+60014=Ladìní není povoleno(-g) a/nebo je aktivní oèišování vıstupu o ladicí a profilové informace (-s)<CR><CR>Pøepnout oba parametry do stavu pro ladìní?
+60015=Profilování není povoleno(-pg) a/nebo je aktivní oèišování vıstupu o ladicí a profilové informace (-s)<CR><CR>Pøepnout oba parametry do stavu pro profilování?
+60016=Chybí soubor s profilovım vıstupem. Je nutné projekt spustit aby se informace vytvoøily. Spustit nyní?
+60017=Zadejte název pro novou sloku:
+60018=Opravdu chcete odstranit tuto sloku?
+60019=Zadejte název pro novou sloku:
+60020=Soubor %s je pouze pro ètení. Chcete jeho atributy upravit aby do nìj bylo moné i zapisovat? Pokud ne, soubor nebude uloen.
+60021=Došlo k chybì. Soubor nebylo moné uloit protoe je pouze pro ètení.
+60022=Váš program vyvolal chybu segmentace (zápis nebo ètení z nepovolené èásti pamìti).
+60023=Zdrojovı kód byl aktualizován, chcete projekt znova pøeloit?
+60024=Nyní zvolte aplikaci k ní se pøipojit:
+60025=Nepodaøilo se najít korespondující zdrojovı soubor
+60026=Nepodaøilo se najít korespondující hlavièkovı soubor
+60027=Formát nastavení pøekladaèe pro Dev-C++ se zmìnil.<CR><CR>Aktualizujte nastavení svého projektu (Projekt >> Vlastnosti projektu >> Pøekladaè) a ulote ho.
+60028=Sada konfigurace pøekladaèe pouívaná tímto projektem ji není k dispozici.<BR>Bude nahrazena vıchozím nastavením pøekladaèe.
+
+
+61001=Nepodaøilo se otevøít soubor %s
+61002=Nepodaøilo se uloit soubor %s
+61003=Nepodaøilo se pøejmenovat soubor %s
+61004=Pole pro hledanı text nemùe bıt prázdné
+61005=Project není pøímo spustitelnı
+61006=Project není pøeloen
+61007=Soubor není pøeloen
+61008=Nelze nalézt makefile
+61009=Úplnı pøeklad selhal.
+61010=Šablona nemùe bıt umístìna v projektu.
+61011=Zdroj %s nebyl nalezen: %s - %s
+61012=Soubor šablony %s nebyl nalezen a bude ignorován.
+61013=Nepøiøadili jste ádnou šablonu.
+61014=Soubor %s nebyl nalezen.
+61015=Není pøidruena ádná hostitelská aplikace. Je moné ji nastavit v menu Pøeklad, Parametry.
+61016=Hostitelská aplikace nenalezena. Je moné ji nastavit v menu Pøeklad, Parametry.
+61019=%s se zmìnil. Naèíst znova?
+61020=%s byl pøejmenován nebo smazán...
+61021=%s byl pøejmenován nebo smazán. Ponechat otevøenı v editoru?
+61022=Chyba pøi spouštìní<CR><CR>%s<CR><CR>%s
+61023=Chyba pøi spouštìní GDB: adresáø spustitelného souboru chybí
+61024=Chyba pøi komunikaci s GDB
+
+
+62001=Bez názvu
+62002=Pouze ke ètení
+62003=Vkládání
+62004=Pøepisování
+62005=Projekt%d
+62006=Zvolte jinı název souboru.
+62007=%d øádkù v souboru
+62008=Pøejmenovat soubor
+62009=Spouští se %s
+62010=Provádìní ukonèeno
+62011=bajtù
+62012=Modifikováno
+62013=Chyba
+62014=Informace
+62015=Varování
+62016=Dotaz
+62017=Pøeklad dokonèen úspìšnì
+62018=Pøeklad pøerušen uivatelem
+62019=Øádek:%6d     Sloupec:%6d         Vıbìr:%6d           Øádkù:%6d           Velikost:%6d
+62020=Zpracování dokonèeno
+62021=Nalezeno %d
+62022=Zpracováno bìhem %g sekund
+62023=consider caching some files at 'Tools >> Editor Options >> Completion >> Code Completion' to improve parsing speed
+62024=Pøeklad selhal po %.2f sekundách
+62025=Pøeklad zastaven po %.2f sekundách
+62026=Pøeklad úspìšnì dokonèen bìhem %.2f sekund
+62027=s varováními
+62028=s chybami
+62029=Zpracovávání "%s"
+62030=Automaticky uloen soubor "%s"
+62031=Automaticky uloen soubor "%s" jako "%s"
+62032=Odstranìn soubor dat pro profilovou analızu "%s"
+62033=Nepodaøilo se najít soubor dat pro profilovou analızu "%s"
+62034=Nepodaøilo se najít informace pro vıraz "%s"
+62035=Zpracovává se soubor %d z %d: "%s"
+62036=Dokonèeno zpracování %d souborù za %g sekund (%.2f souborù za sekundu)
+
+
+
+63001=&OK
+63002=&Storno
+63003=&Nápovìda
+63004=&Vıchozí
+63005=&Ano
+63006=&Ne
+63007=&Pøidat
+63008=&Editovat
+63009=&Odstranit
+63010=S&mazat
+63011=&Zavøít
+63012=&Autoøi
+63013=Na&jít
+63014=Nah&radit
+63015=&Smazat neplatné
+63016=Nahradit &vše
+63017=Procházet
+63018=Odstranit
+63019=Pøejmenovat
+63020=Import
+63021=Okno
+63022=Smazat vše
+63023=Obnovit
+
+64001=CPU
+64002=Kód v assembleru:
+64003=Funkce:
+64004=Syntaxe assembleru:
+64005=Registry:
+
+
+65001=Tip dne
+65002=Víte, e...
+65003=... nejsou k dispozici ádné tipy pro zobrazení?
+65004=Nezobrazovat tipy pøi spuštìní.
+65005=Následující
+65006=Pøedchozí
+65007=Náhodnı
+
+66001=Pøípony
+66002=Typy souborù:
+66003=Zvolené soubory budou automaticky otevøeny prostøedím Dev-C++.
+66004=CVS podpora
+66005=CVS, soubor programu:
+66006=Úroveò komprese
+66007=Pouít SSH místo RSH
+66008=Cesta k šablonám
+66009=Zvolte adresáø se šablonami
+66010=Pouít XP styl
+66011=Asociace
+66012=Externí program
+66013=Pøípona
+66014=Asociace externího programu:
+66015=Sledovat promìnnou pod myší
+66016=Oznamovat chyby sledování
+66017=Ladìní promìnnıch
+66018=Alternativní soubor s nastavením
+66019=Pouít toto alternativní nastavení
+66020=Kofiguraèní soubor byl zmìnìn.<CR>Novı soubor však bude pouit a v následujícím spuštìní programu. Veškeré zmìny provedené v této instanci programu budou zapsány do aktuálního souboru s konfigurací.<CR><CR>Doporuèujeme restartovat program nyní...
+66021=Dev-C++ nemohlo nastavit asociace souborù.<CR><CR>Tento problém bıvá zpùsoben nedostateènımi uivatelskımi právy.<CR>Spuste Dev-C++ s právy administrátora, pøípadnì vypnìte UAC.<CR><CR>Dále lze pøiøazení typù souborù nastavit v ovládacím panelu "Vıchozí programy"
+66022=UI font
+66023=Dev-C++ nemohlo naèíst cache kompletace kódu, protoe je poškozená nebo souèástí starıch konfigurací. Soubory jsou umístìny zde:<CR><CR>%s<CR><CR>Zazálohovat a resetovat nastavení? Restartuje poté i Dev-C++. Zálohy budou uloeny zde:<CR><CR>%s
+66024=Pøi otevírání tiskového dialogu došlo k chybì.<CR><CR>Provìøte, zda máte nainstalovánu alespoò jednu tiskárnu.
+66025=Pro pouití vertikálních záloek je nutné povolit i víceøádkové záloky.<CR><CR>Bylo vráceno nastavení záloek nahoøe.
+
+
+67001=Parametry...
+67002=Pøeloit aktuální soubor
+
+
+68001=Seznam oken
+68002=Zvolte soubor, do kterého se chcete pøepnout:
+
+
+69001=Aktuální soubor...
+69002=Celı projekt...
+69003=Prosím nastavte podporu CVS v nabídce Nástroje / Nastavení prostøedí
+
+
+70001=Monosti importu
+70002=Repozitáø
+70003=Globální nastavení
+70004=Checkout Options
+70005=Commit Options
+70006=Update Options
+70007=Diff Options
+70008=Log Options
+70009=Vıstup CVS
+70010=Import
+70011=Checkout
+70012=Commit
+70013=Update
+70014=Diff
+70015=Log
+70016=Import directory
+70017=Action
+70018=Vendor
+70019=Release
+70020=Log message
+70021=Module name
+70022=Extension
+70023=Checkout as
+70024=Checkout directory
+70025=Recurse into sub-directories
+70026=Reset any sticky options
+70027=Create missing directories
+70028=Remove empty directories
+70029=Drop changes made locally
+70030=Before date
+70031=Revision/branch/tag
+70032=If not found, get the most recent
+70033=Other revisions
+70034=Perform a unified diff
+70035=Compare local file with the same remote revision/tag
+70036=Compare local file with another remote revision
+70037=Compare two remote revisions
+70038=Is date
+70039=Log the default branch
+70040=List only the RCS filenames
+70041=Don't print tag names
+70042=Filter
+70043=By revision/tag
+70044=By date
+70045=By user
+70046=Repository
+70047=Details
+70048=Access method
+70049=User
+70050=Server
+70051=Remote directory
+70052=Add
+70053=Remove
+70054=Add Options
+70055=Remove Options
+70056=Remove the file from disk also...
+
+
+71001=Parametry
+71002=Parametry k pøedání programu:
+71003=Hostitelská aplikace:
+
+
+72001=Soubory
+72002=Soubory projektu:
+72003=Vlastnosti projektu:
+72004=Generovat informace k ladìní
+72005=Generovat profilové informace
+72006=Poznámka: Tato nastavení mají vìtší váhu ne globální nastavení pøekladaèe a platí pouze pro tento projekt.
+72007=Pøipojit manifest Common Controls 6
+72008=Vlastnosti souboru:
+72009=Pøekládat
+72010=Pøekládat jako C++
+72011=Verze
+72012=Pøipojit informace o verzi k projektu
+72013=Detaily
+72014=Hlavní
+72015=Vedlejší
+72016=Vydání
+72017=Sestavení
+72018=Jazyk:
+72019=Další informace:
+72020=Upravit volání pøekladaèe
+72021=Vıstup:
+72022=Pouít pøi sestavování
+72023=Priorita:
+72024=Automaticky zvıšit èíslo sestavení pøi pøekladu
+72025=Pouít vlastní Makefile
+72026=Detaily k úpravám souborù Makefile...
+72027=&Pøipojit k Makefile následující soubory:
+72028=Synchronizovat èísla verzí
+72029=Vıchozí jazyk je C++ pro nové soubory
+72030=Obnovit pùvodní nastavení pøekladaèe?
+72031=Dev-C++ nemùe naèíst informace o verzi spustitelného souboru.<CR><CR>Obvykle toto zpùsobuje technologie Zabránìní spouštìní dat (DEP). Pøidejte prosím devcpp.exe mezi vıjimky v Ovládacích panelech >> Systém >> Upøesnit nastavení systému >> Upøesnit >> Vıkon >> Zabránìní spouštìní dat, a zkuste to znova.
+72032=Soubory:
+
+73001=Oèistit vıstup od nadbyteènıch informací (-s)
+73002=Generovat instrukce pro architekturu procesoru (-march)
+73003=Povolit pouití vektorovıch instrukcí (-mx)
+73004=Úroveò optimalizací (-Ox)
+73005=Standard jazyka (-std)
+73006=Šíøka ukazatele (32/64 bitová architektura) (-mx)
+73007=Vyváení instrukcí pro architekturu procesoru (-mtune)
+
+
+74001=Pøekladaè:
+74002=Stav:
+74003=Soubor:
+74004=Chyby:
+74005=Varování:
+74006=Prùbìh pøekladu
+
+
+75001=Následující adresáøe %s neexistují:
+75002=Nebyly specifikovány ádné adresáøe %s.
+75003=Prohledávaly se následující adresáøe:
+75004=Zkontrolujte zda jsou cesty i názvy souborù správnì nastaveny v menu Nástroje >> Nastavení pøekladaèe >> Adresáøe/Programy.
+75005=Má je Dev-C++ odstranit ze sady nastavení pøekladaèe a nahradit je vıchozími?<CR>Ponechání stávajících cest povede k problémùm bìhem pøekladu.<CR><CR>Nejste-li si jisti, jak tento problém napravit ruènì, doporuèujeme vybrat volbu Ano.
+75006=Nepodaøilo se najít %s: "%s".
+75007=binárních souborù
+75008=C include souborù
+75009=C++ include souborù
+75010=knihoven
+75011=pøekladaè jazyka C
+75012=pøekladaè jazyka C++
+75013=debugger
+75014=profilér
+75015=makefile procesor
+75016=procesor zdrojù
+75017=zapouzdøení DLL
+75018=Pøi kontrole nastavení sady pøekladaèe "%s" byly nalezeny následující problémy:
+
+76001=Zvolte si téma:
+76002=Písmo:
+76003=Barvy:
+76004=Ikony:
+76005=Tato nastavení lze pozdìji zmìnit v menu Nástroje >> Nastavení editoru >> Písma/Zvırazòování.
+76006=To optimize code completion, it is recommended to create a cache of frequently used headers.
+76007=It is possible add headers to cache later at Tools, Editor Options, Class Browsing, Completion.
+76008=Cache all headers (please be VERY patient)
+76009=Cache these headers (recommended):
+76010=Nepouívat cache pro ádné soubory
+76011=Pøidat soubor
+76012=Pøidat sloku
+76013=Odebrat
+76014=Zpracovávání...
+76015=Dev-C++ bylo úspìšnì nakonfigurováno.
+76016=If you need help using Dev-C++, please refer to the Dev-C++ help file in the Help menu or send the developer a message (he doesn't mind!).
+76017=You can also download packages (like libraries or tools) to use with Dev-C++ using WebUpdate, which you will find in Tools menu >> Check for Packages.
+76018=&Další
+76019=Prosím èekejte...
+76020=Ukládání...
+76021=Zpracování dokonèeno bìhem %g sekund. Ukládání...
+
+
+77001=Naèítá se sada nastavení pøekladaèe...
+77002=Kontrolují se asociace typù souborù...
+77003=Inicializuje se správce tøíd...
+77004=Obnovuje se velikost okna...
+
+
+78001=Pøekladaè
+78002=Pøíprava makefile...
+78003=Pøeklad celého projektu...
+78004=Provádìní makefile...
+78005=- Soubor projektu: %s
+78006=- Název pøekladaèe: %s
+78007=- Název souboru: %s
+78008=- Soubor zdrojù: %s
+78009=- Øídící program: %s
+78010=- Pøíkazovı øádek: %s
+78011=Vısledek pøekladu...
+78012=- Chyby: %d
+78013=- Varování: %d
+78014=- Velikost: %s
+78015=- Délka pøekladu: %fs
+78016=- Vıstup: %s
+78017=Pøeklad samostatného souboru...
+78018=- Název souboru: %s
+78019=Zpracování souboru se zdroji...
+78020=- Program: %s
+78021=Zpracování souboru jazyka C++...
+78022=- Pøekladaè jazyka C++: %s
+78023=Zpracování souboru jazyka  C...
+78024=- Pøekladaè jazyka C: %s
+78025=Pøeklad zmìnìnıch èástí projektu...
+78026=Zpracování hlavièkového souboru...
+78027=V sadì konfigurace pøekladaèe "%s" schází alespoò jeden adresáø binárních souborù. Zrušeno.
+78028=Pøerušeno. Nic k pøekladu.
+78029=Èištìní projektu...
+78030=Èištìní souboru...
+78031=Mazání vıstupního souboru %s
+78032=ádnı vıstupní soubor ke smazání.
+78033=Zpracování souboru neznámého typu...
+
+79001=Formátovat aktuální soubor
+79002=Nastavení formátování...
+79003=Nastavení formátování
+79004=Nepodaøilo se najít AStyle. Ovìøte prosím, zda soubor Dev-Cpp\AStyle\AStyle.exe existuje.
+79005=Monosti
+79006=Styl blokù:
+79007=Odsazování:
+79008=Šíøka odsazení:
+79009=Odsadit obsah následujících blokù:
+79010=Class
+79011=Switch
+79012=Case
+79013=Namespace
+79014=Návìští
+79015=Preprocessor
+79016=Vıslednı pøíkaz (vlastní parametry pøidávejte zde):
+79017=Náhled:
+79018=Nepodaøilo se najít AStyle
+79019=Funkci poskytuje %s
+79020=Max. délka øádku:
+79021=// Nepodaøilo se najít vıstupní soubor AStyle:<CR>// %s

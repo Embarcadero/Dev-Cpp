@@ -1,0 +1,106 @@
+#################################################
+#						#
+#	תרגום לעברית Hebrew Translation		#
+#	דוד יפה  David Yoffe				#
+#	דוא"ל E-mail: yoffedavid@yahoo.com		#
+#	אשמח לקבל תגובות.התירגום נחתם ביח' בניסן התשס"ה#
+#	Translation finished at 27/04/2005		#  
+#						#
+#################################################
+#How to add hebrew language support:
+#Verify this file name is: "Hebrew.tips", if not change it.
+#Verify 2 files: "Hebrew.lng", "Hebrew.tips" in your lang directory.
+#Windows users:   
+#Change the default Regional Settings in the control panel to show hebrew as default: 
+#open the control panel, and open "Regional Settings"
+#in the lower part of that dialog you will see a button which
+#displays "Set default" it will open a new dialog which will let 
+#you choose bewtween different encodings, choose Hebrew. 
+#
+#Linux users:		
+#Run wine with LC_CTYPE=he_IL, and set the fonts correctly.
+#If your distribution defines he_IL as UTF, you shuold set the locale to 
+#he_IL.ISO-8859-8. Refear to wine documentation for more information.
+#In any case of problems please refear to the wine mailing list
+#found at http://www.winehq.com
+#################################################
+#
+# This is a TipOfTheDay tips file.
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+...רצוי שלא תבטל טיפים אלו?<CR><CR>הטיפים המוצגים כאן מעניקים מידע שלא נמצא במסמכים אחרים<CR>אם ביטלת אותם וברצונך לראותם מאוחר יותר בחר "עזרה\הטיפ היומי"...
+
+...באפשרותך להשתמש בעדכונים מהאינטרנט כדי להשאיר את סביבת הפיתוח Dev-C++ מעודכנת בתיקונים ובתכונות חדשות?<CR><CR>בחר "כלים\בדוק לעדכונים\חבילות" ואח"כ לחץ על  "Alt+U"...
+
+#
+# Code-completion tips
+#
+...תכונת השלמת הקוד תעזור לך להגביר את יצרנותך על ידי הצעת כל הפקודות הזמינות באותו הקשר?<CR><CR>כדי לאפשר השלמת קוד פנה אל "כלים\אפשרויות עורך" ואפשר תצוגת מחלקה והשלמת קוד...
+
+...השלמת קוד מופעלת כאשר אתה מקליד<CR>"." , "->" , "::"<CR>בחלון עורך לאחר השהיה במיל"ש?<CR><CR>כדי להגדיר השהיה זאת פנה אל "כלים\אפשרויות עורך\תצוגת מחלקה\השלמת קוד"...
+
+...באפשרותך להפעיל את השלמת קוד על ידי לחיצה על  מקשי "Ctrl+Space" בחלון עורך?<CR><CR>(לחץ "Ctrl+Shift+Space" כשהסמן בתוך הסוגריים של הארגומנטים של הפונקציה...)
+
+...לחיצה  על shift+קליק בפריט בתצוגת המחלקה יציג את ההצהרה במקום ההגדרה של פריט זה?<CR>באפשרותך להשתמש בתפריט הקשר למטרה זאת ולאפשרויות נוספות  על ידי לחיצה על קליק ימני...
+
+...באפשרותך להוסיף תיקיות מותאמות אישית בתצוגת המחלקה כדי להתמצא ביתר קלות בפרויקטים גדולים?<CR><CR>לחץ קליק ימני בתצוגת המחלקה כדי להציג את תפריט ההקשר...
+
+...מידע התיקיות מותאמות אישית  שבתצוגת המחלקה נשמר בקובץ  "classfolders.dcf" בתיקיית השורש של הפרויקט?<CR><CR>אם משהו משתבש מחק קובץ זה ופתח את הפרוייקט מחדש...
+
+...יש 2 מצבי תצוגה בתצוגת המחלקה?<CR>האחד מציג את כל המחלקות\חברים\פונקציות של הפרויקט.השני מציג רק את המידע הרלונטי לקובץ שבעריכה באותו זמן.<CR><CR>לחץ קליק ימני בתצוגת המחלקות  ובחר ב"תצוגת מצב..."
+#
+# Project Manager tips
+#
+...באפשרותך להגדיר לחיצת קליק אחד או שני קליקים  בתצוגת הפרויקט לפתיחת קובץ בחלון עורך?<CR><CR>כדי להגדיר זאת פנה אל כלים\אפשרויות סביבה...
+
+...באפשרותך להגדיר תיקיות מותאמות אישית (רמת על בלבד) בתצוגת הפרוייקט כדי לארגן את הקבצים טוב יותר?<CR><CR>לחץ קליק ימני בתצוגת הפרוייקט  כדי להציג את תפריט ההקשר...
+
+...אם יצרת תיקיות מותאמות אישית בתצוגת הפרוייקט, באפשרותך לגרור ולשחרר קבצים כדי לארגנם מחדש...
+#
+# File menu tips
+#
+...באפשרותך לקבל מידע אודות קובץ בפרויקט?<CR><CR>בחר "קובץ\מאפיינים" ותראה מידע אודות גודל הקובץ, סה"כ שורות, שורות הערה, שורות ריקות, מספר קבצים כלולים ועוד...
+
+...באפשרותך לשמור את הפרויקט כתבנית?<CR><CR>בחר קובץ\חדש\פרויקט<CR>בדרך זאת יהיה לך בסיס להתחיל לפי טעמך...
+
+...באפשרותך לייבא פרויקט של MS Visual C++ לDev-C++? פנה אל קובץ\ייבוא\ייבא פרוייקט MS Visual C++ יתכן שתצטרך לכוונן מעט את אפשרויות הפרוייקט לאחר הייבוא...
+
+...באפשרותך לייצא קובץ מקור או את כל הפרויקט ל HTML או RTF? בדרך זאת תוכל להעלות קבצי מקור לאתר באינטרנט ולשתפם<CR><CR>פנה אל "קובץ\ייצוא" ובחר...
+#
+# Edit menu tips
+#
+...באפשרותך לרשום או לבטל כהערה קבוצת שורות על ידי בחירתם וקליק בעריכה\כהערה  או בטל כהערה...
+
+...באפשרותך להזיח או לבטל הזחה בקבוצת שורות על ידי בחירתם וקליק בעריכה\הזחה  או בטל הזחה...
+
+...באפשרותך להשתמש בסימניה בעורך כדי לעבור בקוד במהירות?<CR><CR>על ידי בחירת מיקום וקליק בעריכה\מתג סימניה ובחירת מספרה...
+
+...באפשרותך לראות את כל הפונקציות בקבצים בחיפוש\לך לפונקציה  גם בהקלדת שם חלקי שלה!<CR>הערה: כדי שאפשרות זאת תעבוד תצוגת המחלקה חייבת להיות מאופשרת (כלים\אפשרויות עורך\תצוגת מחלקה\אפשר תצוגת מחלקה)...

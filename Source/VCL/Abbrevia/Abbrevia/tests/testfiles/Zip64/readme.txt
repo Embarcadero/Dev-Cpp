@@ -1,0 +1,1 @@
+This directory needs the Zip64 test data available from SourceForge's file download section.  Get any files in the "Test Data\Zip64" folder and store them here, without extracting them.

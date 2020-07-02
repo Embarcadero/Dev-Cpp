@@ -1,0 +1,1048 @@
+[lang]
+Lang=Estonian
+Ver=2
+
+1=&Fail
+2=&Redigeerimine
+3=&Otsing
+4=&Vaade
+5=&Projekt
+6=&Käivitus
+7=&Tööriistad
+8=&Aken
+9=&Spikker
+10=Silumin&e
+
+
+1001=&Uus
+1002=&Projekt...
+1003=&Lähtefail
+1004=&Ressurssfail
+1005=&Mall...
+1006=&Class...
+1007=New
+
+
+2001=&Ava projekt või fail...
+2002=&Taasavamine
+2003=&Tühjenda nimekiri
+2004=&Salvesta
+2005=Salvesta &nimega...
+2006=Salvesta &kõik
+2007=Sulg&e
+2008=Sulge &projekt
+2009=&Omadused
+2010=Salvesta projekt ni&mega...
+2011=V&äljasta
+2012=&HTML kujule
+2013=&RTF kujule
+2014=&Projekt HTML kujule
+2015=to &Tex
+
+
+3001=S&isesta
+3002=P&rindi
+3003=Pri&nteri sätted
+3004=&Välju
+
+
+4001=&Find Declaration
+4002=F&ind Definition
+4003=T&ühista tegu
+4004=&Korda
+4005=&Lõika
+4006=K&opeeri
+4007=&Aseta
+4008=&Vali kõik
+4009=&Tühjenda valik
+4010=&Sisesta
+4011=Lisa/Eemalda &järjehoidja
+4012=&Mine järjehoidjale
+4013=Järjehoidja
+4014=Kuupäev/Kella&aeg
+4015=&Päiskommentaar
+
+
+5001=&Otsi...
+5002=Otsi &failidest...
+5003=Asenda...
+5004=&Leia järgmine
+5005=&Mine reale...
+5006=&Kasvav otsing
+5007=Leia f&unktsioon...
+5008=Liikuv p&rojekti aken
+5009=Mine &projekti aknale
+5010=Mine &klasside aknale
+5011=Projekti/Klasside &aken
+5012=&Olekuriba
+5013=Kompilaatori &väljund
+5014=&Alati nähtav
+5015=&Nähtav siis kui vaja
+5016=&Tööriistaribad
+5017=Põhiriba
+5018=Käivitusriba
+5019=Projektiriba
+5020=Spikririba
+5021=Lisariba
+5022=Redigeerimisriba
+5023=Otsinguriba
+5024=Liikuv t&eadete aken
+
+
+6001=&Uus fail
+6002=&Lisa projektile
+6003=&Eemalda projektist
+6004=Muuda &ressurssfaili...
+6005=&Projekti sätted
+6006=Muuda &MAKE faili
+6007=Li&sa ressurssfail...
+6008=Eemald&a ressurssfail...
+
+
+7001=K&ompileeri
+7002=K&äivita programm
+7003=Kompileeri &ja käivita
+7004=Kompileeri projekt &täielikult
+7005=&Puhasta
+7006=Kompileerimise t&ulemused
+7007=&Süntaksi kontroll
+7008=&Katkesta programmi käivitus
+7009=Profiili &analüüs
+7010=Katkesta
+7011=K&ompilaatori sätted
+7012=K&eskkonna sätted
+7013=&Redaktori sätted
+7014=&Tööriistade seadistamine
+7015=&Kiirklahvid
+7016=Delete Profiling Information
+
+
+8001=&Täisekraan
+8002=&Normaalolek
+8003=&Järgmine
+8004=&Eelmine
+8005=&Sulge kõik
+8006=%s versioon %s täisekraanil. Vajuta shift+F12 tööriistaribade sisse ja välja lülitamiseks või F12 normaaloleku taastamiseks.
+8007=S&ulge ülejäänud
+8008=&Nimekiri...
+
+
+9001=&Teave Dev-C++ kohta...
+9002=&Dev-C++ uuendused...
+9003=&Korrasta abifaile...
+9004=&Abi
+
+
+10001=&Silu
+10002=&Murdepunkt
+10003=&Astu edasi
+10004=&Jätka
+10005=&Lisa vaatleja
+10006=&Vaatle muutujaid
+10007=&Katkesta käivitus
+10008=M&uuda vaatlejat
+10009=&Eemalda vaatleja
+10010=As&tu sisse
+10011=K&äivita kursori asukohani
+10012=&Näita keskseadme akent
+10013=A&ttach to process...
+10014=&Modify value
+10015=&Clear all
+10016=Uus fail
+10017=Lisa fail...
+10018=Eemalda fail...
+10019=Sätted...
+10020=Muuda ressurssfaili
+
+
+11001=Eemalda fail
+11002=Muuda faili nimi
+11003=Sulge
+11004=Ava
+11005=Ava päis
+
+
+12001=Mine definitsioonile
+12002=Mine seadmestamile
+12003=Uus klass
+12004=Uus liikmesfunktsioon
+12005=Uus muutuja
+12006=Vaateviis...
+12007=Kõik failid
+12008=Käesolev fail
+12009=Lisa kaust
+12010=Eemalda kaust
+12011=Muuda kausta nimi
+12012=Ühes projektis ei ole võimalik teha rohkem kui %d kausta...
+12013=Kasuta värve
+12014=Projekti failid
+12015=Näita päritud liikmeid
+12016=Kasuta avamiseks...
+
+
+13001=Kompilaator
+13002=Ressurss
+13003=Kompileerimise info
+13004=Otsingu tulemused
+13005=Sulge
+13006=Silumine
+
+
+14001=Puhasta
+14002=&Kopeeri
+14003=&Peida
+14004=&Ava
+
+
+15001=Rida
+15002=Fail
+15003=Teade
+15004=Argumendid
+
+
+16001=Leia rida
+16002=Tulp
+16003=Muutuja nimi
+16004=Väärtus
+16005=Info:
+16006=Kompileerimise väljund:
+16007=Vigu kokku:
+16008=Väljutatu suurus:
+
+
+17001=Vaadeldud muutujad
+17002=Vaatlemine
+17003=Väljund
+17004=Saada GDB käsk:
+17005=Saada
+
+
+18001=Uus
+18002=Sisesta
+18003=Lisa
+18004=Leia
+18005=Projekti aken
+18006=Silumise aken
+18007=Teadete aken
+
+
+19001=Ava fail
+19002=Ava fail
+19003=Väljasta
+19004=Salvesta fail
+19005=Salvesta projekt
+19006=Ava abifail
+
+
+20001=Uus muutuja vaatleja
+20002=Sisesta muutuja nimi:
+20003=Muuda muutuja vaatlejat
+20004=Uus muutuja nimi:
+20005=Modify value
+20006=Variable to modify:
+20007=New value:
+
+
+21001=Projekt
+21002=Klassid
+
+
+22001=L&isa kommentaarid
+22002=E&emalda kommentaarid
+22003=S&uurenda taandust
+22004=V&ähenda taandust
+22005=Vaheta päis/sisu
+22006=Collapse All
+22007=Uncollapse All
+
+
+23001=Redaktori sätted
+23002=Üldised
+23003=Kuvamine
+23004=Süntaks
+23005=Kood
+23006=Koodiabi
+23007=Klasside aken
+23008=Autosave
+
+
+24001=Sisestused
+24002=Algkood
+24003=Files
+24004=Options
+24005=Symbol Completion
+
+
+25001=Sisesta uute süntaksi sätete nimi:
+25002=Redaktori sätted:
+25003=Automaatne taandus
+25004=Sisestamine
+25005=Kasuta tabulaatori märki
+25006=Targad taandused
+25007=Tagasilüke kaotab taanduse
+
+
+26001=Grupeeritud tühistamine
+26002=Tark HOME klahv
+26003=Kursor pärast faili lõppu
+26004=Kursor pärast rea lõppu
+26005=Topeltklõps rea valikuks
+26006=Otsingul kasuta tekstikursori sõna
+26007=Kerimisribad siis kui vaja
+26008=Kerimine poole lehe kaupa
+26009=Kerimisspikker
+26010=Kasuta süntaksi värvingut
+26011=Sisesta pillatud failid
+26012=Tabulaatori suurus:
+26013=Parem ääris
+26014=Nähtav
+26015=Laius
+26016=Värv
+26017=Tekstikursor
+26018=Sisestuskursor
+26019=Ülekirjutuskursor
+26020=Vertikaalne
+26021=Horisontaalne
+26022=Poolik plokk
+26023=Plokk
+26024=Highlight current line
+26025=Trim trailing spaces
+26026=Enabled
+26027=Gutter width
+
+
+27001=Näita peidetud märke
+27002=Näita redaktori spikreid
+27003=Värvi vastavad sulud
+27004=Ensure that file ends with newline
+27005=Enabled
+27006=Sets to System HighlightText value
+27007=Sets to WhiteSpace value
+27008=Show function hints
+27009=It is also possible to edit text size by using Control+Scroll, just like in browsers!
+27010=Redaktori kirjastiil:
+27011=Kirjastiil
+27012=Suurus
+27013=Valitud kirjastiil on selline!!!
+27014=Vasakääris
+27015=Automaatne suurus
+27016=Reanumbrid
+27017=Näita eelnevaid nulle
+27018=Alusta nullist
+27019=Võimalda kirjastiili muutmist
+27020=Valitud kirjastiil on selline!!!
+27021=Värv
+27022=Taustavärv
+27023=Stiilid
+27024=Paks
+27025=Kursiiv
+27026=Allajoonitud
+27027=Süntaksi kiirvalimine
+27028=Tüüp:
+27029=Uute süntaksi sätete salvestamine
+27030=Kood
+27031=Menüü tekst
+27032=Sektsioon
+27033=Kirjeldus
+27034=Sisesta algkood tühja projekti esimesse faili
+27035=Kasuta koodiabi peitmist teatud failidel
+27036=Peidetavad failid:
+27037=Kasuta koodiabi
+27038=Ajavahemik (ms):
+27039=Taustavärv:
+27040=Klasside sirvija sätted
+27041=Skanneeri kohalikke #INCLUDE abil kaasatud faile
+27042=Näidis:
+27043=Seadme sätted
+27044=Vaate sätted
+27045=Kasuta klasside sirvijat
+27046=Skanneeri üldiseid #INCLUDE abil kaasatud faile
+27047=Enable editor autosave
+27048=Interval:
+27049=Save all open files after each interval
+27050=Uus projekt
+27051=Kirjeldus:
+27052=Enable symbol completion
+27053=Specific completion options
+27054=Complete braces '{}'
+27055=Complete parentheses '()'
+27056=Complete includes '<>' '""'
+27057=Complete square braces '[]'
+27058=Complete multiline comments '/**/'
+
+
+28001=Nimi:
+28002=&C projekt
+28003=C&++ projekt
+28004=&Tee vaikimisi keeleks
+28005=Muud
+28006=Projekti sätted:
+
+
+29001=Eemalda projektist
+29002=Vali projektist eemaldatav fail:
+
+
+30001=Mine reale ...
+30002=Reanumber:
+
+
+31001=Tööriistade seadistamine
+31002=Praegu kasutusel olevad tööriistad:
+
+
+32001=Muuda tööriista
+32002=Tööriista nimi
+32003=Programm
+32004=Töötamiskaust
+32005=Parameetrid
+32006=Sisesta makro
+32007=Võimalikud makrod
+
+
+33001=Ikoonide kogu
+33002=Kasuta valitud ikooni
+33003=Otsi faile
+
+
+34001=Kiirklahvide seadistamine
+34002= Klõpsi nimetusel ja vajuta soovitav kiirklahv!
+34003=Vihje: vajuta ESC kiirklahvi kaotamiseks...
+34004=Menüükäsk
+34005=Vastav kiirklahv
+34006=Loobu
+34007=Sobib
+
+
+35001=Annab vaikimisi kasutatava kausta
+35002=Annab Dev-C++ töökausta
+35003=Annab kompileeritud failinime
+35004=Annab käesoleva projekti või faili asukoha
+35005=Annab käesoleva projekti või faili failinime
+35006=Annab projekti "nime"
+35007=Annab käesoleva faili failinime
+35008=Annab käesoleva faili asukoha
+35009=Annab käesoleva projekti kõik lähtefailid tühikuga eraldatuna
+35010=Annab redaktori aknas kursoril paikneva sõna
+35011=Annab Dev-C++ versiooni numbri
+
+
+36001=Teave Dev-C++ kohta
+36002=inseculous@users.sourceforge.net
+36003=GNU üldine avalik litsents
+36004=Kontakteerumisinformatsioon
+36005=Bloodshed Software internetis:
+36006=Mingw kompilaator internetis:
+36007=Dev-C++ foorum:
+36008=Dev-C++ kasutajate meililist:
+36009=Autorite e-mailid:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.bloodshed.net/devcpp-ml.html
+36014=haiku@bloodshed.net
+36015=&Dev-C++ uuendused
+36016=Post-4.9.9.2 Development:
+36017=http://orwellengine.blogspot.com
+
+
+37001=Muuda koodisisestusvälja
+37002=Lisa koodisisestusväli
+37003=Menüüvaliku pealkiri
+37004=Valiku kirjeldus
+37005=Menüüsektsioon
+
+
+38001=Kompileerimise arengu aken 
+38002=&Näita kompileerimise käigus
+38003=&Sulge pärast kompileerimist
+38004=Käivitamisel ära logo akent näita
+38005=Keskkonna sätted
+38006=Üldised
+38007=Failid ja kaustad
+38008=Automaatselt avatakse
+38009=Uus projekt on vaikimisi C++
+38010=Näita tööriistaribasid täisekraanil
+38011=Tee tagavarakoopiad
+38012=Projekti käivitamisel peida Dev-C++
+38013=Ava/Salvesta akna stiil
+38014=Windows 2k (küljeribaga)
+38015=Windows 9x
+38016=Windows 3.1
+38017=Keel:
+38018=Teadete akna sakkide paigutus:
+38019=Suurim failide arv taasavamise menüüs
+38020=Kasutaja vaikimisi kaust
+38021=Väljutatu kaust
+38022=Ikoonide kogu kaust
+38023=Pilt logo aknas
+38024=Vali kasutaja vaikimisi kaust
+38025=Vali kompilaatori väljutatu kaust
+38026=Vali ikoonide kogu kaust
+38027=Kõik projekti failid
+38028=Ainult esimene projekti fail
+38029=Mitte ühtegi faili
+38030=Näita menüüd täisekraanil
+38031=Topeltklõps projekti failide avamiseks
+38032=Keele failide kaust
+38033=Väljanägemine:
+38034=Töökeskkond
+38035=Otsing
+38036=Otsi
+38037=Otsi failidest
+38038=Otsitav tekst
+38039=Tingimused
+38040=Erista suur/väiketähti
+38041=Ainult terved sõnad
+38042=Täpsustamine
+38043=Projekti failidest
+38044=Avatud failidest
+38045=Piirkond
+38046=Üldine
+38047=Ainult valitud
+38048=Algus
+38049=Tekstikursorist
+38050=Kogu piirkonnast
+38051=Suund
+38052=Edasi
+38053=Tagasi
+38054=Pause console programs after return
+38055=Opened files at previous closing
+
+
+39001=Asenda
+39002=Otsitav tekst:
+39003=Asendustekst:
+39004=Tingimused
+39005=Erista suur/väiketähti
+39006=Ainult terved sõnad
+39007=Kinnita asendust
+39008=Suund
+39009=Edasi
+39010=Tagasi
+39011=Piirkond
+39012=Üldine
+39013=Ainult valitud
+39014=Algus
+39015=Tekstikursorist
+39016=Kogu piirkonnast
+
+
+40001=Otsitav:
+40002=Tüüp
+40003=Funktsioon
+40004=Rida
+
+
+41001=Kompilaatori sätted
+41002=Kompilaator
+41003=Kaustad
+41004=Sätted
+41005=Linkur
+41006=Programmid
+41007=For more information about GCC's options, please visit
+
+
+42001=Binaarsed
+42002=Kogud
+42003=C lisad
+42004=C++ lisad
+
+
+43001=C kompilaator
+43002=C++ kompilaator
+43003=Kompilaator:
+43004=Output
+
+
+44001=Toetus kõigile ANSI standardi C programmidele
+44002=Üritab toetada mõningaid C eeltöötleja aspekte
+44003=Ära näita hoiatusi
+44004=Kaota juurdepääsu kontroll
+44005=Aksepteeri $-märke
+44006=Kasuta uuendusi kiiremaks kompileerimiseks
+44007=Kasuta MinGW asemel Cygwin kompilaatorit
+44008=Lisa kompilaatorile järgmised käsud:
+44009=Ajavahemik
+44010=Kompilaator kasutab ajavahemikku juhul kui MAKE kaebab MAKE failide kohta.
+44011=Näita üks viga rea kohta
+44012=Do not recognize asm, inline or typeof as a keyword (-fno-asm)
+44013=Check if pointer is null before accessing storage allocated (-fcheck-new)
+44014=Put uninitialized globals into the common segment (-fconserve-space)
+
+
+45001=Koodi loomine
+45002=Optimeerimine
+
+
+46001=Kasuta veatöötlust
+46002=Kasuta sama suurusega DOUBLE ja FLOAT tüüpe
+46003=Lisa kokkuseatud koodile kommenteeritud infot
+46004=Optimeeri
+46005=Parim optimeerimine
+46006=Vii läbi väiksemaid optimeerimisi
+46007=MAKE faili loomine:
+46008=Kasuta kiiret, kuid ebatäiuslikku sõltkonna loomist
+46009=Koodi profiilimine
+46010=Loo analüüsimiseks profiilimisinfot
+46011=Koosta objektiivse C programm
+46012=Lisa silumise informatsioon
+46013=Ära kasuta süsteemi käivitusfaile ja kogusid
+46014=Ära loo konsooliakent
+46015=Lisa linkurile järgmised käsud
+46016=Ära optimeeri
+46017=Optimeeri rohkem
+46018=Do not assemble, but output assembler code (-S)
+46019=Use pipes instead of temporary files during compilation (-pipe)
+
+
+47001=Sa võid muuta Dev-C++ poolt kasutatavate programmide failinimesid (näiteks kui kasutad ristkompilaatoreid)
+47002=Konfigureeritav kompilaator:
+47003=Uute kompilaatori sätete lisamine
+47004=Sisesta uute sätete nimi:
+47005=Viimaseid kompilaatori sätteid ei saa kustutada!
+47006=Kas kustutada need kompilaatori sätted?
+47007=Nimeta kompilaatori sätted ümber
+47008=Uus nimi kompilaatori sätetele:
+47009=Edasine optimeerimine
+
+
+48001=Abifailide korrastamine
+48002=Menüü tekst
+48003=Faili nimi
+48004=Abifaili sätted
+48005=Ikoon
+48006=Menüüsektsioon
+48007=1. sektsioon
+48008=2. sektsioon
+48009=Paikneb abimenüüs
+48010=Toimingud
+48011=Otsi abifailist tekstikursoril paiknevat sõna
+48012=Kasuta avamiseks F1 klahvi
+48013=Show most warnings (-Wall)
+48014=Show some more warnings (-Wextra)
+48015=Check ISO C/C++/C++0x conformance (-pedantic)
+48016=Code Warnings
+48017=Only check the code for syntax errors (-fsyntax-only)
+48018=Make all warnings into errors (-Werror)
+48019=Abort compilation on first error (-Wfatal-errors)
+
+
+49001=Prindi fail
+49002=Parameetrid:
+49003=Lehed:
+49004=&Värvid
+49005=&Koodi esiletõstmine
+49006=&Reapoolitus
+49007=Rea&numbrid
+49008=Prindi reanumbrid
+49009=Prindi reanumbrid äärisel
+49010=Koopiate arv:
+49011= Prindi ainult valik
+49012=Don't Print Line Numbers
+
+
+50001=Otsi Dev-C++ Uuendusi
+50002=Ülesanded:
+50003=Tulemused:
+50004=Versioon:
+50005=Kasutamiseks vajalikud versioonid:
+50006=Väljaande kirjeldus:
+50007=Allalaadimissait (topeltklõps allalaadimiseks):
+
+
+51001=Lisa TODO teade...
+51002=Kirjeldus
+51003=Eelistatus
+51004=Kasutaja
+
+
+52001=TODO nimekiri...
+52002=Faili nimi
+52003=Tehtud
+52004=Ära näita tehtud teateid
+52005=Filtreeri:
+52006=Kõik failid (projektis ja sellest väljas)
+52007=Ainult avatud failid (projektis ja sellest väljas)
+52008=Kõik projektifailid
+52009=Ainult avatud projektifailid
+52010=Projekti mittekuuluvad avatud failid
+52011=Ainult käesolev fail
+
+
+53001=MS Visual C++ projekt
+53002=Vali sisestatav MS Visual C++ projekt
+53003=Sisestamise sätted
+53004=Sisestamise konfiguratsioon
+53005=Vastava Dev-C++ projekti nimi
+53006=MS Visual C++ projektifail on edukalt sisestatud ja teisendatud Dev-C++ projektiks! Kas soovid seda kohe avada?
+53007=Konfiguratsiooni "%s" laadimine ei õnnestu (Tõenäoliselt on see Dev-C++ viga)...
+
+
+54001=Import Code::Blocks project
+54002=Select Code::Blocks project file
+54003=Import options
+54004=Configuration to import
+54005=Dev-C++ project filename
+54006=The Code::Blocks project file has been imported and converted to a Dev-C++ project succesfully! Do you want to open it now?
+54007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
+
+
+55001=Projekti sätted
+55002=Üldised
+55003=Kaustad
+55004=Nimi:
+55005=Ikoon:
+55006=Kogu
+55007=Otsi faile
+55008=Tüüp:
+55009=Win32 GUI
+55010=Win32 Console
+55011=Win32 Static Lib
+55012=Win32 DLL
+55013=Kompileeri nagu C++
+55014=Lisatavad käsklused:
+55015=Kompilaator:
+55016=Linkuri sätted/lisakogud või objektfailid:
+55017=Kogude kaustad
+55018=Ressurssfailid
+55019=Lisade kaustad
+55020=Vali ikoon
+55021=Lisa objektfail
+55022=Ressursside kaustad
+55023=Koostamise sätted
+55024=Kaustad
+55025=&Projekti väljutatu kaust
+55026=&Objektfailide väljutatu kaust
+55027=&Väljutatud faili nimi
+55028=Lisa kogu või objekt
+55029=%d faili (%d lähte-, %d päis-, %d ressurssfaili)
+
+
+56001=Nimi:
+56002=Kirjeldus:
+56003=Kategooria:
+56004=Uue projekti nimi:
+56005=Mallis olevad failid:
+56006=Kompilaatori lisakäsud:
+56007=Linkuri lisakäsud:
+56008=Ikoonid:
+56009=Malli info
+56010=Failid
+56011=Lisad
+56012=Malli ikoon
+56013=Uue projekti ikoon
+56014=Loo
+56015=Uus mall projektist
+56016=Kasuta projekti lisade kaustasid
+56017=Kasuta projekti kogude kaustasid
+56018=Kasuta projekti ressursside kaustasid
+
+
+57001=Tagastatav tüüp:
+57002=Muutuja nimi:
+57003=Omav klass:
+57004=Olemus
+57005=Loo liikmesfunktsioon, mis loeks sellest muutujast
+57006=Loo liikmesfunktsioon, mis kirjutaks sellesse muutujasse
+57007=Nimi:
+57008=Kommentaarid
+57009=Kirjeldus:
+57010=Stiil:
+57011=Loo
+57012=Loobu
+57013=Tundmatu klass...
+57014=Ei suuda kindlaks teha seadmestamise failinime...
+57015=Ei suuda kindlaks teha sisestamiseks rea numbrit...
+57016=Liikme nimi:
+57017=Argumendid:
+57018=Klassi nimi:
+57019=Päri teisest klassist
+57020=Pärinevus
+57021=Päri klassist:
+57022=Päise failinimi:
+57023=Seadmestamise failinimi:
+57024=Päise failinimi:
+57025=Lisa käesolevale projektile
+57026=Omadused
+
+
+58001=Faili nimi
+58002=Projekt
+58003=Ridu kokku
+58004=Koodiga ridu
+58005=Kommentaaridega ridu
+58006=Lisatud faile
+58007=Tühje ridu
+58008=Faili suurus
+58009=Absoluutne
+58010=MAKE fail
+58011=Suhteline
+58012=Faili kuupäev/kellaaeg
+58013=Kompilaatori sätted
+
+
+59001=Profiili analüüs
+59002=Lame väljund
+59003=Kutsu graafikut
+59004=Profiling Options
+59005=Function Hiding
+59006=Hide functions not called long enough
+59007=Hide statically linked file-local functions
+59008=Hide function called less than
+59009=times
+59010=Apply
+59011=Custom Commands
+59012=Use these commands instead:
+
+
+60001=Otsitud sõna ''%s'' ei leitud
+60002=Faili %s ei õnnestunud avada
+60003=Kas asendada sõna ''%s'?
+60004=Fail %s on %s-s juba olemas
+60005=Kas tahad sulgeda %s
+60006=Salvestada muudatused kui %s?
+60007=Sulge %s ja alusta uut projekti?
+60008=Muuda nime:
+60009=Juba kompileeritakse
+60010=Salvestada muudatused kui %s?
+60011=Fail eksisteerib, kas kirjutada üle?
+60012=Lisada uus fail käesolevale projektile?
+60013=Lisada uus ressurssfail käesolevale projektile?
+60014=Sinu projektil puudub silumise info, kas soovid lülitada sisse silumise info ja programmi uuesti koostada ? 
+60015=Sinu projektil ei ole seatud profiili/silumise infot. Kas soovid need sisse lülitada ja programmi uuesti koostada?
+60016=Käivita programm vähemalt üks kord, et luua profiili info...
+60017=Sisesta uue kausta nimi:
+60018=Kas tahad seda kausta eemaldada?
+60019=Sisesta uue kausta nimi:
+60020=Fail %s on ainult lugemiseks. Kas soovid muuta seda kirjutatavaks? Kui ei, siis faili ei salvestata...
+60021=Tekkis viga. Fail %s ei ole märgitud loe-kirjuta failiks ja seda ei salvestatud...
+60022=Sinu programmis tekkis juurdepääsu rikkumise viga (lõigustamise viga).
+60023=Lähtefail on hilisem kui väljutatu. Kas soovid väljutatut uuesti koostada ?
+60024=Please select the application you want to attach to:
+
+
+61001=Faili %s avamine ebaõnnestus
+61002=Faili %s salvestamine ebaõnnestus
+61003=Faili %s ümber nimetamine ebaõnnestus
+61004=Otsingu väli ei saa olla tühi
+61005=Projekt ei ole käivitatav
+61006=Projekt ei ole kompileeritud
+61007=Lähtefail ei ole kompileeritud
+61008=MAKE faili ei õnnestunud leida.
+61009=Puhastamine ebaõnnestus
+61010=Malli ei saanud projektile lisada.
+61011=%s ressurssfaili ei leitud: %s - %s
+61012=Malli faili %s ei leitud, jäetakse vahele.
+61013=Malli ei seatud.
+61014=Faili %s ei leitud.
+61015=Ülemprogrammi pole tagatud. Seda saab teha menüüs "Käivitus / Parameetrid".
+61016=Ülemprogrammi ei leitud! Seda saab muuta menüüs "Käivitus / Parameetrid".
+
+
+62001=Nimetu
+62002=AinultLoetav
+62003=Sisestamine
+62004=Ülekirjutamine
+62005=Projekt%d
+62006=Palun vali failile teine nimi
+62007=Failis on %d rida
+62008=Muuda faili nime
+62009=%s käivitus
+62010=Käivitus peatatud
+62011=baiti
+62012=Muudetud
+62013=Viga
+62014=Informatsioon
+62015=Hoiatus
+62016=Küsimus
+62017=Kompileerimine edukalt lõpetatud
+62018=Kompileerimine kasutaja poolt katkestatud
+62019=Line:%6d               Col:%6d               Sel:%6d               Lines:%6d               Length:%6d
+62020=Done parsing
+
+
+63001=&Sobib
+63002=&Loobu
+63003=&Abi
+63004=&Tagasi
+63005=&Jah
+63006=&Ei
+63007=&Lisa
+63008=&Muuda
+63009=&Eemalda
+63010=&Kustuta
+63011=&Sulge
+63012=&Autorid
+63013=&Otsi
+63014=&Asenda
+63015=&Kustuta vale
+63016=Asenda &kõik
+63017=Otsi faile
+63018=Eemalda
+63019=Nimeta
+63020=Sisesta
+63021=Akna mood
+63022=Clear
+
+
+64001=Keskseadme aken
+64002=Masinkood:
+64003=Funktsioon:
+64004=Masinkoodi süntaks:
+64005=Registrid:
+
+
+65001=Nõuanded
+65002=Kas teadsite, et...
+65003=...ei ole ühtegi nõuannet, mida kuvada?
+65004=Ära näita nõuandeid programmi käivitamisel
+65005=Järgmine
+65006=Eelmine
+
+
+66001=Failide sidumine
+66002=Failitüübid:
+66003=Vali millised failid seotakse Dev-C++-ga ja mille avamiseks kasutatakse esmajärjekorras Dev-C++ programmi...
+66004=CVS toetus
+66005=CVS programmi fail
+66006=Pakkimise tase
+66007=Kasuta RSH asemel SSH
+66008=Mallide kaust
+66009=Vali mallide kaust
+66010=Windows XP väljanägemine
+66011=Välised programmid
+66012=Programm
+66013=Failitäiend
+66014=Väliste programmide sidumine:
+66015=Vaatle tekstikursori muutujat
+66016=Teavita vaatleja vigadest
+66017=  Siluri muutujate aken 
+66018=  Teine konfiguratsiooni fail  
+66019=Kasuta teist konfiguratsiooni faili
+66020=Programmi poolt kasutatavat konfiguratsiooni faili muudeti.<CR>Selle sessiooni käigus *uut* konfiguratsiooni faili ei kasutata. Selles sessioonis tehtavad konfiguratsiooni muudatused salvestatakse *hetkel* avatud konfiguratsiooni faili.<CR><CR>Soovitatav on programmi taaskäivitus, et hakata kasutama *uut* konfiguratsiooni faili...
+66021=Dev-C++ was unable to set file associations.<CR><CR>This is known to be caused by using UAC on a normal non-admin user account.<CR><CR>Please disable UAC or run Dev-C++ as an admin if you want to change file associations using Dev-C++.<CR><CR>You might want to try the "Default Programs" feature in Windows Vista or 7.
+66022=UI font
+
+
+67001=Parameetrid...
+67002=Kompileeri käesolev &fail
+
+
+68001=Avatud akende nimekiri
+68002=Vali aken mida soovid töödelda:
+
+
+69001=Käesolev &fail...
+69002=Kogu &projekt...
+69003=CVS vajab seadistamist, vali "Tööriistad / Keskkonna Sätted"...
+
+
+70001=Sisestamise sätted
+70002=Hoidla
+70003=Üldised sätted
+70004=Väljavalimise sätted
+70005=Üleandmise sätted
+70006=Uuendamise sätted
+70007=Võrdluse sätted
+70008=Logimise sätted
+70009=CVS väljund
+70010=Sisestamine
+70011=Väljavalimine
+70012=Üleandmine
+70013=Uuendamine
+70014=Võrdlemine
+70015=Logimine
+70016=Sisestamise kataloog
+70017=Toiming
+70018=Väljaandja
+70019=Väljaanne
+70020=Logimisteade
+70021=Mooduli nimi
+70022=Täiend
+70023=Vali kui
+70024=Väljavalimise kataloog
+70025=Taasta alamkataloogidesse
+70026=Sea vastuolulised sätted algkujule
+70027=Loo puuduvad kataloogid
+70028=Eemalda tühjad kataloogid
+70029=Kaota kohalikud muudatused
+70030=Enne kuupäeva
+70031=Parandus/Haru/Silt
+70032=Kui ei leia, vali kõige värskem
+70033=Muud parandused
+70034=Vii läbi ühendatud eristamine
+70035=Võrdle kohalikku faili kaugel väljas paranduse/sildiga
+70036=Võrdle kohalikku faili muude väljas asuvate parandustega
+70037=Võrdle kaht kaugel asuvat parandust
+70038=Kuupäev
+70039=Vaikimisi haru logimine
+70040=Näita ainult RCS faili nimesid
+70041=Ära prindi siltide nimesid
+70042=Filtreeri
+70043=Paranduse/Sildi järgi
+70044=Kuupäeva järgi
+70045=Kasutaja järgi
+70046=Hoidla
+70047=Detailid
+70048=Juurdepääsuviis
+70049=Kasutaja
+70050=Server
+70051=Välikataloog
+70052=Lisa
+70053=Eemalda
+70054=Lisamise sätted
+70055=Eemaldamise sätted
+70056=Eemalda fail ka kettalt...
+
+
+71001=Parameetrid
+71002=Programmile saadetavad parameetrid:
+71003=Ülemprogramm:
+
+
+72001=Failid
+72002=Projekti failid:
+72003=Projekti sätted:
+72004=Lisa silumise info
+72005=Lisa profiili info
+72006=NB! Käesolevas projektis eelistatakse neid sätteid üldistele kompilaatori sätetele.
+72007=Windows XP toetus
+72008=Failide sätted:
+72009=Lisa kompileerimisel
+72010=Kompileeri fail nagu C++
+72011=Versiooni info
+72012=Lisa projektile versiooni info
+72013=Versiooni detailid
+72014=Ülem:
+72015=Alam:
+72016=Väljaanne:
+72017=Koostamisarv:
+72018=Keel:
+72019=Lisainformatsioon:
+72020=Muuda kompileerimiskäslusi
+72021=Väljutatud faili nimi
+72022=Lisa linkurile
+72023=Kompileerimiseelis:
+72024=Suurenda automaatselt programmi koostamisarvu
+72025=Use custom Makefile (do not generate a Makefile, use this one)
+72026=Information about customizing the Makefile...
+72027=&Include the following files into the Makefile:
+72028=Sync product with file version
+72029=Default to C++ when creating new files
+
+
+73001=Strip executable (-s)
+73002=Optimize for the following machine (-march)
+73003=Enable use of specific instructions (-mx)
+73004=Optimization level (-Ox)
+73005=Language standard (-std)
+73006=Compile with the following bit width (-mx)
+73007=Optimize less, while maintaining full compatibility (-mtune)
+
+
+74001=Compiler:
+74002=Status:
+74003=File:
+74004=Errors:
+74005=Warnings:

@@ -1,0 +1,49 @@
+package DevCpp;
+
+{$R *.res}
+{$R 'devFileMonitor\devFileMonitor.dcr'}
+{$R 'devShortcuts\devShortcuts.dcr'}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS OFF}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS OFF}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Dev-C++ Components'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  vcl,
+  vclx,
+  designide,
+  rtl;
+
+contains
+  CompOptionsList in 'CompOptionsList\CompOptionsList.pas',
+  devFileMonitor in 'devFileMonitor\devFileMonitor.pas',
+  devMonitorThread in 'devFileMonitor\devMonitorThread.pas',
+  devMonitorTypes in 'devFileMonitor\devMonitorTypes.pas',
+  devShortcuts in 'devShortcuts\devShortcuts.pas',
+  devShortcutsEditorForm in 'devShortcuts\devShortcutsEditorForm.pas' {frmdevShortcutsEditor};
+
+end.
+

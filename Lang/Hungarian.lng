@@ -1,0 +1,1048 @@
+[lang]
+Lang=Hungarian
+Ver=1
+
+1=&Fájl
+2=&Szerkesztés
+3=&Keresés
+4=&Nézet
+5=&Projekt
+6=F&uttatás
+7=&Eszközök
+8=&Ablakok
+9=Se&gítség
+10=N&yomkövetés
+
+
+1001=&Új
+1002=&Projekt...
+1003=&Forrás Fájl
+1004=&Erõforrás Fájl
+1005=&Sablon...
+1006=&Class...
+1007=New
+
+
+2001=&Projekt v. Fájl Megnyitása...
+2002=&Korábbi Fájlok
+2003=&Lista Törlése
+2004=&Mentés
+2005=M&entés Másként...
+2006=M&indent Ment
+2007=&Bezár
+2008=Projekt Be&zárása
+2009=Tulajdonságok
+2010=Projekt Mentése Másként...
+2011=&Export
+2012=&HTML-be
+2013=&RTF-be
+2014=a &Projektet HTML-be
+2015=to &Tex
+
+
+3001=&Import
+3002=&Nyomtatás
+3003=Nyomtatási Beállítások
+3004=K&ilépés
+
+
+4001=&Find Declaration
+4002=F&ind Definition
+4003=Még&se
+4004=Mé&gis
+4005=&Kivágás
+4006=&Másolás
+4007=&Beillesztés
+4008=M&indet Kijelöl
+4009=&Törlés
+4010=B&eszúrás
+4011=Könyvjelzõ Elhelyezése
+4012=&Könyvjelzõre Ugrás
+4013=Könyvjelzõ
+4014=&Dátum/Idõ
+4015=&Szöveges Fejléc
+
+
+5001=Keresés...
+5002=&Keresés Fájlokban...
+5003=Csere...
+5004=&Tovább/Újra Keres
+5005=&Sorra Ugrás...
+5006=&Bõvített Keresés
+5007=Függvényre Ugrás...
+5008=Lebegõ Projekt Menedzser
+5009=Projekt &Menedzserre Ugrás
+5010=Osztály Listára Ugrás
+5011=&Projekt/Osztály Lista
+5012=&Státuszsor
+5013=&Fordító Kimenete
+5014=&Mindig Látható
+5015=&Csak ha szükséges
+5016=&Eszköszsorok
+5017=Fõ
+5018=Fordítás/Futtatás
+5019=Projekt
+5020=Beállítások
+5021=Speciális
+5022=Szerkesztés
+5023=Keresés
+5024=Lebegõ fordítási folyamat ablak
+
+
+6001=&Új Fájl
+6002=&Hozzáadás a Projekthez
+6003=&Törlés a Projektbõl
+6004=&Erõforrás Fájl Szerkesztése...
+6005=Projekt &Beállítások
+6006=&Makefile Szerkesztése
+6007=E&rõforrás Fájl Hozzáadása...
+6008=Erõ&forrás Fájl Törlése...
+
+
+7001=&Fordítás
+7002=F&uttatás
+7003=F&ordítás && Futtatás
+7004=&Mindent Újrafordít
+7005=&Törlés/Tisztítás
+7006=For&dítás Eredménye
+7007=&Szintaktika Ellenõrzés
+7008=&Program Leállítása
+7009=P&rofil Elemzés
+7010=Megszakítás
+7011=&Fordító Beállításai
+7012=&Környezeti Beállítások
+7013=&Szerkesztõ Beállításai
+7014=Eszközök Konfigurálása
+7015=Gyorsbillentyûk Konfigurálása
+7016=Delete Profiling Information
+
+
+8001=&Teljesképernyõs Mód
+8002=&Vissza a Normál Módhoz
+8003=&Következõ
+8004=&Elõzõ
+8005=&Mindet Bezár
+8006=%s-s verzió %s teljesképernyõs mód. shift+F12 lenyomásával az eszközsor megj. vagy F12-vel normál módbe visszatérhetsz.
+8007=Mindet Bezár (kivéve az aktívat)
+8008=&Lista...
+
+
+9001=&Dev-C++ Info...
+9002=&Frissítések/Csomagok Keresése...
+9003=Segítség Menü Testreszabása...
+9004=&Tartalomjegyzék(Dev-C++)
+
+
+10001=&Nyomkövetés
+10002=&Töréspont Elhelyezése
+10003=&Léptetés
+10004=&Folytatás
+10005=&Megfigyelés Hozzáadása
+10006=Vált&ozó Megfigyelése
+10007=&Végrehajtás Megállítása
+10008=M&egfigyelés Szerkesztése
+10009=Me&gfigyelés Törlése
+10010=Lé&ptetés (beugrással)
+10011=Futtatás a Kurzorig
+10012=&CPU Ablak
+10013=F&olyamathoz rendelés...
+10014=&Érték módosítása
+10015=Mindet törli
+10016=Új Fájl
+10017=Fájl Hozzáadása...
+10018=Fájl Törlése...
+10019=Beállítások...
+10020=Erõforrás Fájl Szerkesztése
+
+
+11001=Fájl Törlése
+11002=Fájl Átnevezése
+11003=Bezárás
+11004=Megnyitás
+11005=Header Megnyitása
+
+
+12001=Ugrás a Deklarációra
+12002=Ugrás a Megvalósításra
+12003=Új Osztály
+12004=Új Tagfügvény
+12005=Új Változó
+12006=Nézet Mód...
+12007=Minden Fájl
+12008=Aktuális Fájl
+12009=Könyvtár Hozzáadása
+12010=Könyvtár Törlése
+12011=Könyvtár Átnevezése
+12012=Nem lehet több mint %d könyvtár egy projektben...
+12013=Színek Használata
+12014=Projekt Fájlok
+12015=Örökölt Tagok Mutatása
+12016=Megnyitás ezzel..
+
+
+13001=Forditó üzenetei
+13002=Erõforrások
+13003=Fordító kimenete
+13004=Keresés eredménye
+13005=Bezár
+13006=Nyomkövetés
+
+
+14001=&Töröl
+14002=&Másol
+14003=&Elrejt
+14004=Me&gnyit
+
+
+15001=Sor
+15002=Fájl
+15003=Üzenet
+15004=Argumentumok
+
+
+16001=Keresett sor
+16002=Betûtõl
+16003=Változó neve
+16004=Érték
+16005=Információ
+16006=Forditó kimenete
+16007=Összes hiba:
+16008=Kimenet mérete:
+
+
+17001=Megfigyelt változók
+17002=Visszakeresés
+17003=Kimenet
+17004=Parancs a GDB-nek:
+17005=Küldés
+
+
+18001=Új...
+18002=Beilleszt
+18003=Elhelyez
+18004=Ugrás
+18005=Projekt Ablak
+18006=Nyomkövetõ Ablak
+18007=Fordítási folyamat Ablak
+
+
+19001=Fájl megnyitása
+19002=Fájl megnyitása
+19003=Exportálás
+19004=Fájl mentése
+19005=Projekt mentése
+19006=Segítség fájl kiválasztása
+
+
+20001=Új változó megfigyelés
+20002=Változó neve:
+20003=Változó megfigyelés módosítása
+20004=Új változó neve:
+20005=Érték módosítása
+20006=Módosítandó változó:
+20007=Új érték:
+
+
+21001=Projekt
+21002=Osztályok
+
+
+22001=Megjegyzés Be
+22002=Megjegyzés Ki
+22003=Bekezdés Be
+22004=Bekezdés Ki 
+22005=Cserél Header/Forrás
+22006=Collapse All
+22007=Uncollapse All
+
+
+23001=Szerkesztõ Beállításai
+23002=Általános
+23003=Kijelzõ
+23004=Szintaktika
+23005=Kód
+23006=Kiegészítés
+23007=Osztály tallózás
+23008=Autosave
+
+
+24001=Beillesztés
+24002=Forrás beillesztés
+24003=Files
+24004=Options
+24005=Symbol Completion
+
+
+25001=Színbeállítás neve:
+25002=Szerkesztõ beállításai
+25003=Automatikus bekezdés
+25004=Beszúrás mód
+25005=Tab használata
+25006=Rövid Tabok
+25007=Visszatörléssel bekezdés ki
+
+
+26001=Csoportos visszavonás
+26002=Módosított Home billentyû
+26003=Kurzor EOF után
+26004=Kurzor EOL után
+26005=Dupla kattintás sor kijelölés
+26006=Szöveg keresése a kurzortól
+26007=Görgetõsáv csak ha szükséges
+26008=Fél lap görgetés
+26009=Görgetéskor sorszám kijelzés
+26010=Szintaktikai kiemelés használata:
+26011=DnD fájlok beillesztése
+26012=Tab mérete:
+26013=Jobb margó
+26014=Látható
+26015=Szélesség:
+26016=Szín:
+26017=Kurzor alakja
+26018=Beillesztésnél :
+26019=Felülírásnál :
+26020=Függõleges vonal
+26021=Vizszintes vonal
+26022=Fél kocka
+26023=Kocka
+26024=Highlight current line
+26025=Trim trailing spaces
+26026=Enabled
+26027=Gutter width
+
+
+27001=Rejtett karakterek mutatása
+27002=Szerkesztõ útmutatás mutatása
+27003=Zárójelpárok kiemelése
+27004=Ensure that file ends with newline
+27005=Enabled
+27006=Sets to System HighlightText value
+27007=Sets to WhiteSpace value
+27008=Show function hints
+27009=It is also possible to edit text size by using Control+Scroll, just like in browsers!
+27010=Szerkesztõ betûkészlete
+27011=Betûkészlet:
+27012=Méret:
+27013=Szerkesztõ betûkészlete
+27014=Jelölõsáv
+27015=Autómatikus méretezés
+27016=Sorszámozás
+27017=Bevezetõ nullák mutatása
+27018=Nullával kezdve
+27019=Egyedi betûkészlet
+27020=Jelölõsáv betûkészlet
+27021=Elõtér:
+27022=Háttér:
+27023=Stílusok
+27024=Kövér
+27025=Dõlt
+27026=Aláhúzott
+27027=Színsémák:
+27028=Típus :
+27029=Egyéni színbeállítások mentése
+27030=Kód
+27031=Menü szöveg
+27032=Szekció
+27033=Leírás
+27034=Kód beillesztése a projekt kezdõ fájlba
+27035=Kódkiegészítés gyorsítás használata
+27036=Fájlok a gyorsítótárban:
+27037=Kódkiegészítés engedélyezése
+27038=Késleltetés (ms):
+27039=Háttér színe:
+27040=Osztály tallózó beállításai
+27041=Helyi #include-ok használata
+27042=Példa:
+27043=Tallózómotor beállításai
+27044=Nézet beállításai
+27045=Osztály tallózó engedélyezése
+27046=Globális #include-ok használata
+27047=Enable editor autosave
+27048=Interval:
+27049=Save all open files after each interval
+27050=Új projekt
+27051=Leírás:
+27052=Enable symbol completion
+27053=Specific completion options
+27054=Complete braces '{}'
+27055=Complete parentheses '()'
+27056=Complete includes '<>' '""'
+27057=Complete square braces '[]'
+27058=Complete multiline comments '/**/'
+
+
+28001=Név:
+28002=&C projekt
+28003=C&++ projekt
+28004=&Alapértelmezett nyelv készítése
+28005=Egyebek
+28006=Projekt beállítások
+
+
+29001=Törlés a projektbõl
+29002=A törölni kívánt fájl kiválasztása :
+
+
+30001=Sorra ugrás ...
+30002=Újsor :
+
+
+31001=Eszközök konfigurálása
+31002=Jelenlegi eszközök
+
+
+32001=Eszköz hozzáadása
+32002=Cimke:
+32003=Program :
+32004=Munka könyvtár :
+32005=Paraméterek :
+32006=Makró hozzáadása
+32007=Lehetséges makrók:
+
+
+33001=Ikon könyvtár
+33002=Kiválasztott ikon használata
+33003=Tallóz
+
+
+34001=Gyorsbillentyûk konfigurálása
+34002= Kattints egy sorra, és nyomd meg a kívánt billentyûket!
+34003=Tipp: nyomj "Escape"-et a törléshez...
+34004=Menük
+34005=Hozzárendelt billentyûk
+34006=Mégse
+34007=OK
+
+
+35001=Default könyvtár
+35002=dev-c++ munka könyvtár
+35003=Fordító kimeneti fájlnév
+35004=Az aktuális projekt vagy fájl útvonala
+35005=Az aktuális projekt vagy fájl neve
+35006=A projekt "neve"
+35007=Az aktuális fájl neve
+35008=Az aktuális fájl útvonala
+35009=Szóközzel elválasztott aktuális forrás fájlok listája
+35010=A kurzor alatt lévõ szó
+35011=dev-c++ verzió
+
+
+36001=A Dev-C++-ról :)
+36002=inseculous@users.sourceforge.net
+36003=GNU General Public License
+36004=Kapcsolattartás
+36005=Bloodshed Software Website:
+36006=Mingw Compiler Website:
+36007=Dev-C++ discussion forums:
+36008=Dev-C++ felhasz. levlista:
+36009=Készítõk e-mail címe:
+36010=http://www.bloodshed.net
+36011=http://www.mingw.org
+36012=http://www.bloodshed.net/forum
+36013=http://www.bloodshed.net/devcpp-ml.html
+36014=haiku@bloodshed.net
+36015=&Frissítések keresése
+36016=Post-4.9.9.2 Development:
+36017=http://orwellengine.blogspot.com
+
+
+37001=Edit code insert entry
+37002=Add code insert entry
+37003=Menü Elem Cimke
+37004=Elem Leírása
+37005=Menü Szekció
+
+
+38001=Fordítási folyamatot jelzõ ablak 
+38002=&Fordítás alatt legyen látható
+38003=Forítás után &automatikus bezárás
+38004=Indítókép letiltása
+38005=Környezeti beállítások
+38006=Általános
+38007=Fájlok és Könyvtárak
+38008=Autómatikus megnyitás
+38009=C++ az alapértelmezett projekt típus
+38010=Eszközsor teljesképernyõs módban
+38011=Backup fájlok készítése
+38012=Futtatáskor minimalizálás
+38013=Megnyit/Ment dialógus stílusa
+38014=Windows 2k (sidebar)
+38015=Windows 9x
+38016=Windows 3.1
+38017=Nyelv :
+38018=Üzenetablak fülek helye:
+38019=Max.fájlszám a Korábbi Fájlok menüben:
+38020=Felhasználói alapértelmezett könyvtár:
+38021=Fordító kimeneti könyvtára:
+38022=Ikon könyvtár:
+38023=Indítókép:
+38024=Felhasználói alapértelmezett könyvtár kiválasztása
+38025=Fordító kimeneti könyvtár kiválasztása
+38026=Ikon könyvtár kiválasztása
+38027=Összes projekt fájl
+38028=Csak az elsõ projekt fájl
+38029=Egyiksem
+38030=Menü teljesképernyõs módban 
+38031=Dupla kattintás a projekt menedzserbõl való megnyitáshoz
+38032=Nyelvfájlok könyvtár:
+38033=Téma:
+38034=Felület
+38035=Szöveg keresése:
+38036=Keresés
+38037=Keresés file-ban
+38038=&Keresendõ szöveg
+38039=Beállítások
+38040=K&is/nagybetû különbözik
+38041=K&eresés egész szóra
+38042=Hol
+38043=&Projektben
+38044=&Megnyitott File-okban
+38045=Keresési tartomány
+38046=&Teljes
+38047=&Kijelölt terület
+38048=Keresés indítása
+38049=K&urzortól
+38050=F&ile elejétõl
+38051=Keresési irány
+38052=&Elõrõl 
+38053=&Hátulról
+38054=Pause console programs after return
+38055=Opened files at previous closing
+
+
+39001=Csere szövegben
+39002=Szöveg keresése:
+39003=Csere ezzel:
+39004=Beállítások
+39005=K&is/nagybetû különbözik
+39006=K&eresés egész szóra
+39007=&Csere a kurzornál
+39008=Keresési irány
+39009=&Elõrõl
+39010=&Hátulról
+39011=Keresési tartomány
+39012=&Teljes
+39013=&Kijelölt terület
+39014=Keresés indítása
+39015=K&urzortól
+39016=F&ile elejétõl
+
+
+40001=Keresés:
+40002=Típus
+40003=Függvény
+40004=Sor
+
+
+41001=Fordító beállításai
+41002=Fordító
+41003=Könyvtárak
+41004=Beállítások
+41005=Linker
+41006=Programok
+41007=For more information about GCC's options, please visit
+
+
+42001=Bináris
+42002=Lib-ek
+42003=C Include file-ok
+42004=C++ Include file-ok
+
+
+43001=C fordító
+43002=C++ fordító
+43003=Fordító:
+43004=Output
+
+
+44001=ANSI C szabvány támogatása
+44002=Néhány hagyományos C elõfeldolgozó támogatása
+44003=Az összes figyelmeztetés kikapcsolása
+44004=Minden hozzáférés ellenõrzésének kikapcsolása
+44005=$ jel elfogadása azonosítóban
+44006=Heurisztika használata a gyorsabb fordításhoz
+44007=Cygwin fordító használata Mingw helyett
+44008=Következõ kapcsolók hozzáadása a fordító parancssorához:
+44009=   Késleltetés:
+44010=Engedélyezzük a késleltetést ms-ban, ha a make kifogásolja a makefile idõbélyegét.
+44011=Hibák megjelenítése soronként
+44012=Do not recognize asm, inline or typeof as a keyword (-fno-asm)
+44013=Check if pointer is null before accessing storage allocated (-fcheck-new)
+44014=Put uninitialized globals into the common segment (-fconserve-space)
+
+
+45001=Kód generálás
+45002=Optimalizálás
+
+
+46001=Kivételkezelés engedélyezése
+46002=A double és float legyen egyforma méretû
+46003=Extra megjegyzések használata az asm kódban
+46004=Optimalizálás
+46005=Legjobb optimalizálás
+46006=Kisebb optimalizálások végrehajtása
+46007=Makefile készítés
+46008=Gyors de nem tökéletes depedencia készítés
+46009=Kód profil
+46010=Profil info készítése elemzéshez
+46011=Linkelés mint Object C
+46012=Nyomkövetõ információ készítése
+46013=Ne használjon standard system fájlokat vagy könyvtárakat
+46014=Konzol ablak használatának tiltása
+46015=Következõ kapcsolók hozzáadása a linker parancssorához:
+46016=Nincs optimalizálás
+46017=További optimalizálás
+46018=Do not assemble, but output assembler code (-S)
+46019=Use pipes instead of temporary files during compilation (-pipe)
+
+
+47001=Itt változtathatod meg a Dev-C++ által használt programokat (pl. a használni kívánt fordítót) :
+47002=Fordítási módok
+47003=Új fordítási mód
+47004=Fordítási mód neve:
+47005=Ez a fordítási mód nem törölhetõ!
+47006=Biztosan törli ?
+47007=Fordítási mód átnevezés
+47008=A fordítási mód új neve:
+47009=További optimalizálás
+
+
+48001=Segítség Menü Szerkesztõ
+48002=Szöveg menü
+48003=Segítség Fájl
+48004=Segítség Menü Beállítások
+48005=Ikon:
+48006=Menü Szekciók
+48007=Szekciók 1
+48008=Szekciók 2
+48009=A segítség Popup Menüben jelenjen meg
+48010=Mûveletek
+48011=Kurzor alatti szó keresése ebben a segítség fájlban
+48012=F1 hozzárendelése
+48013=Show most warnings (-Wall)
+48014=Show some more warnings (-Wextra)
+48015=Check ISO C/C++/C++0x conformance (-pedantic)
+48016=Code Warnings
+48017=Only check the code for syntax errors (-fsyntax-only)
+48018=Make all warnings into errors (-Werror)
+48019=Abort compilation on first error (-Wfatal-errors)
+
+
+49001=Fájl nyomtatása
+49002=Beállítások
+49003=Oldalak
+49004=Színek
+49005=Kiemelés
+49006=Hosszú sorok tördelése
+49007=Sorok számozása
+49008=Sorszámozás nyomtatása
+49009=Sorszámozás nyomtatása a margóra
+49010=Másolatok száma:
+49011=Csak a kijelölés nyomtatása
+49012=Don't Print Line Numbers
+
+
+50001=Dev-C++ frissítések keresése
+50002=Folyamat:
+50003=Eredmény:
+50004=Kiadott verzió:
+50005=Szükséges verzió:
+50006=Leírás:
+50007=Download hely (dupla-klikk a letöltéshez):
+
+
+51001=To-Do elem hozzáadása...
+51002=Leírás
+51003=Prioritás
+51004=Felhasználó
+
+
+52001=To-Do lista...
+52002=Fájlnév
+52003=Kész
+52004=Ne mutassa az elkészült elemeket
+52005=Szürõ:
+52006=Minden fájl
+52007=Csak a megnyitott fájlok
+52008=Minden projekt fájl
+52009=Csak a megnyitott projekt fájlok
+52010=Megnyitott nem projekt fájlok
+52011=Csak az aktuális fájl
+
+
+53001=MS Visual C++ projekt importálás
+53002=Visual C++ projekt fájl kiválasztása
+53003=Beállítások 
+53004=Import konfiguráció
+53005=Dev-C++ projekt fájlnév
+53006=Az MS Visual C++ projekt sikeresen konvertálódott Dev-C++ projekt-é! Megakarja nyitni?
+53007=A %s cél konfiguráció nem található (lehet, hogy a DEV-C++ hibája miatt...)
+
+
+54001=Import Code::Blocks project
+54002=Select Code::Blocks project file
+54003=Import options
+54004=Configuration to import
+54005=Dev-C++ project filename
+54006=The Code::Blocks project file has been imported and converted to a Dev-C++ project succesfully! Do you want to open it now?
+54007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
+
+
+55001=Projekt Beállítások
+55002=Általános
+55003=Fájlok/Könyvtárak
+55004=Név:
+55005=Ikon
+55006=Gyûjtemény
+55007=Tallóz
+55008=Típus
+55009=Win32 GUI
+55010=Win32 Console
+55011=Win32 Static Lib
+55012=Win32 DLL
+55013=Fordítás mint C++ 
+55014=Parancssori Opciók
+55015=Fordító:
+55016=Linker  beállítások/opcionális lib-ek v. object fájlok:
+55017=Lib Könyvtárak
+55018=Erõforrás Fájlok
+55019=Include Könyvtárak
+55020=Ikon Kiválasztása
+55021=Object fájl beillesztése
+55022=Erõforrások Könyvtára
+55023=Build Beállítások
+55024=Könyvtárak
+55025=A generált futtatható fájlok helye:
+55026=A generált object fájlok helye:
+55027=A generált futtatható fájl nevének felülbírálása erre:
+55028=Lib v. Object Hozzáadás
+55029=%d fájl [%d forrás, %d header, %d erõforrásfájl]
+
+
+56001=Név:
+56002=Leírás:
+56003=Kategória:
+56004=Az új projekt neve:
+56005=Fájlok a template-ben:
+56006=Fordító extra opciói:
+56007=Linker extra opciói:
+56008=Ikonok
+56009=Template infó
+56010=Fájlok
+56011=Extrák
+56012=Template ikon
+56013=Új projekt ikon
+56014=Létrehozás
+56015=Template készítése a projektbõl 
+56016=Használd a projekt Include könyvtárait
+56017=Használd a projekt Library könyvtárait
+56018=Használd a projekt Erõforrás könyvtárait
+
+
+57001=Visszatérési típus:
+57002=Változó neve:
+57003=Megvalósítás ebben:
+57004=Láthatóság
+57005=Tag függvény létrehozása ennek változónak az OLVASÁSÁHOZ
+57006=Tag függvény létrehozása ennek változónak az ÍRÁSÁHOZ
+57007=Név:
+57008=Megjegyzés
+57009=Leírás:
+57010=Stílus:
+57011=Létrehoz
+57012=Mégsem
+57013=Ismeretlen osztály...
+57014=Nincs meghatározva a megvalósítási fájlnév...
+57015=Nincs meghatározva a kód behelyezésének a kezdõ sorszáma...
+57016=Tag neve:
+57017=Argumentumok:
+57018=Osztály neve:
+57019=Származtatás másik osztályból
+57020=Származtatás
+57021=Szülõ osztály:
+57022=Header fájlnév:
+57023=Megvalósítási fájlnév:
+57024=Header fájlnév:
+57025=Hozzáadás az aktuális projekthez
+57026=Attribútumok
+
+
+58001=Fájlnév
+58002=Projekt
+58003=Összes sor
+58004=Jelenlegi kódsorok
+58005=Megjegyzés sorok
+58006=Include-olt fájlok
+58007=Üres sorok
+58008=Fájl méret
+58009=Abszolút
+58010=Makefile
+58011=Relatív
+58012=Fájl dátum/idõ bélyeg
+58013=Fordító beállításai
+
+
+59001=Profil analízis
+59002=Kimeneti lista
+59003=Hívási struktúra
+59004=Profiling Options
+59005=Function Hiding
+59006=Hide functions not called long enough
+59007=Hide statically linked file-local functions
+59008=Hide function called less than
+59009=times
+59010=Apply
+59011=Custom Commands
+59012=Use these commands instead:
+
+
+60001=A keresett sztring ''%s'' nem található
+60002=A %s fájlt nem lehet megnyitni
+60003=Cseréli ezt ''%s''
+60004=A %s fájl már létezik %s-ben
+60005=Biztosan be akarja zárni %s fájt?
+60006=Menti a változtatásokat a %s-ban?
+60007=Bezárja az %s fájlt és létrehoz egy új projektet?
+60008=Átnevezés erre:
+60009=Fordítás folyamatban
+60010=Menti a változtatásokat az %s fájlban?
+60011=A fájl már létezik, felülírja?
+60012=Hozzáadja az új fájlt az aktuális projekthez?
+60013=Hozzáadja az új erõforrást az aktuális projekthez?
+60014=A projektje nem tartalmaz nyomkövetési információkat, szeretné engedélyezni a nyomkövetést, és újrafordítani a projektet? 
+60015=A fordító beállításaiban nincsennek engedélyezve a profil és/vagy nyomkövetési információk. Akarja engedélyezni és újrafordítani a projektet?
+60016=Legalább egyszer futassa a projektet a profil információ létrehozásához!
+60017=Írja be az új könyvtár nevét:
+60018=Biztosan törölni akarja ezt a könyvtárat?
+60019=Írja be az új könyvtár nevét:
+60020=A %s fájl csak olvasható.Akarja, hogy írható-olvasható legyen ? Ha nem akkor a fájlt nem mentse el!
+60021=Hiba történt. A %s fájl nem  írható-olvasható ezért nem sikerült menteni!
+60022=Hozzáférés megsértést (Segmentation Fault) okozott a program.
+60023=A forrás fájl újabb mint a futtatható állomány. Akarja újra fordítani?
+60024=Válassza ki a csatolni kívánt alkalmazást:
+
+
+61001=A %s fájl nem megnyitható
+61002=%s fájl nem menthetõ
+61003=%s fájlt nem lehet átnevezni
+61004=A keresési mezõ nem lehet üres
+61005=Projekt nem futtatható
+61006=Projekt nincs lefordítva
+61007=A forrás fájl nincs lefordítva
+61008=Make fájl nem található.
+61009=Object fájl tõrlése nem sikerült
+61010=Template nem helyezhetõ a projektbe.
+61011=%s Erõforrás nem taláható: %s - %s
+61012=Template fájl %s nem található, átugorva.
+61013=Nincs template hozzárendelve.
+61014=A fájl %s nem található.
+61015=Nincs alkalmazás megadva.Beállithat egyet a Futtatás menü Paraméter opciójában.
+61016=Alkalmazás nem található!Megváltoztathatja a Futtatás menü Paraméter opciójában.
+
+
+62001=Névtelen
+62002=Csak olvasható
+62003=Beszúrás
+62004=Felûlírás
+62005=Projekt%d
+62006=Kérlek adj meg másik fájlnevet.
+62007=%d soros fájl
+62008=Fájl átnevezése
+62009=%s indítása.
+62010= Feladat befejezve
+62011=bájtok
+62012=Módosítva
+62013=Hiba
+62014=Információ
+62015=Figyelmeztetés
+62016=Kérdés
+62017= Sikeres fordítás
+62018= Felhasználói megszakítás
+62019=Line:%6d               Col:%6d               Sel:%6d               Lines:%6d               Length:%6d
+62020=Done parsing
+
+
+63001=&Ok
+63002=&Mégse
+63003=&Segítség
+63004=&Alapállapot
+63005=&Igen
+63006=&Nem
+63007=&Hozzáad
+63008=&Szerkeszt
+63009=&Levesz
+63010=&Töröl
+63011=&Bezár
+63012=&Készítõk
+63013=&Keres
+63014=&Cserél
+63015=&Rossz Törlése
+63016=Ö&sszes Csere
+63017=Tallóz
+63018=Levesz
+63019=Átnevez
+63020=Import
+63021=Ablak Mód
+63022=Törlés
+
+
+64001=CPU Ablak
+64002=Assembler kód:
+64003=Fügvény:
+64004=Assembler szintaktika:
+64005=Regiszterek:
+
+
+65001=A nap tippje
+65002=Tudta, hogy...
+65003=...nincsennek megjeleníthetõ tippek?
+65004=Ne jelenítsen meg tippeket indításnál
+65005=Köv. tipp
+65006=Elõzõ tipp
+
+
+66001=Fájl típusok társítása
+66002=Fájl típusok:
+66003=Kapcsold be/ki a megfelelõ checkbox-ot a fájlok társításához...
+66004=CVS Támogatás
+66005=CVS Program helye:
+66006=Tömörítési szint:
+66007=SSH használata RSH helyett
+66008=Template-ek könyvtár:
+66009=Válassza ki a template-ek könyvtárát
+66010=Használja az XP témáját
+66011=Külsõ programok
+66012=Külsõ program
+66013=Kiterjesztés
+66014=Külsõ program hozzárendelése:
+66015=Kiértékelés rámutatással
+66016=Megfigyelési hibák kijelzése
+66017= Változók értékének nyomkövetése 
+66018=  Alternatív konfigurációs fájl 
+66019=Használja ezt az alternatív konfigurációs fájlt
+66020=Megváltoztatta az alkalmazás által használt konfigurációs fájlt.<CR>Az új konfigurációs fájl *nem* használható azonnal. Minden elõzõ változtatás a *jelenlegi* konfigurációs fájlba fog elmentõdni.<CR><CR>Indítsa újra a az alkalmazást az új konfigurációs fájl használatához...
+66021=Dev-C++ was unable to set file associations.<CR><CR>This is known to be caused by using UAC on a normal non-admin user account.<CR><CR>Please disable UAC or run Dev-C++ as an admin if you want to change file associations using Dev-C++.<CR><CR>You might want to try the "Default Programs" feature in Windows Vista or 7.
+66022=UI font
+
+
+67001=Paraméterek...
+67002=Aktuális fájl fordítása
+
+
+68001=Ablak Lista
+68002=Válaszd ki a szerkeszteni kívánt ablakot
+
+
+69001=Aktuális Fájl...
+69002=Teljes Projekt...
+69003=Konfigurálja a CVS támogatást a "Eszközök / Környezeti beállítások" pontban...
+
+
+70001=Import beállításai
+70002=Repository
+70003=Globális beállítások
+70004=Checkout beállításai
+70005=Commit beállításai
+70006=Update beállításai
+70007=Diff beállításai
+70008=Log beállításai
+70009=CVS kimenete
+70010=Import
+70011=Checkout
+70012=Commit
+70013=Update
+70014=Diff
+70015=Log
+70016=Import könyvtára
+70017=Típus
+70018=Kiadó
+70019=Kiadás
+70020=Log üzenet
+70021=Modul neve
+70022=Kiterjesztés
+70023=Checkout mint
+70024=Checkout könyvtára
+70025=Rekurzívan az alkönyvtárakra
+70026=Megmaradó beállítások törlése
+70027=Hiányzó könyvtárak létrehozása
+70028=Üres könyvtárak törlése
+70029=Helyi változtatások eldobása
+70030=Régebbiek mint
+70031=Revízió/ág/tag
+70032=Ha nem található, a legújabbat
+70033=További revíziók
+70034=Unified diff formátum
+70035=Helyi fájl összehasonlítása a hasonló reviziójú/tagú távoli fájlal
+70036=Helyi fájl összehasonlítása egy másik távoli revízióval
+70037=Két távoli revizió összehasonlítása
+70038=Dátum
+70039=Alapértelmezett ág logolása
+70040=Csak az RCS fájlnevek kiírása
+70041=Ne írja ki a tag neveket
+70042=Szûrõ
+70043=Revízió/tag szerint
+70044=Dátum szerint
+70045=Felhasználó szerint
+70046=Repository
+70047=Részletek
+70048=Hozzáférés módja
+70049=Felhasználó
+70050=Szerver
+70051=Távoli könyvtár
+70052=Hozzáad
+70053=Töröl
+70054=Add beállításai
+70055=Remove beállításai
+70056=A fájl törlése a lemezrõl is...
+
+
+71001=Paraméterek
+71002=A programnak átadandó paraméterek:
+71003=Paramétert szolgáltató alkalmazás:
+
+
+72001=Fájlok
+72002=Projekt fájlok:
+72003=Projekt opciók:
+72004=Nyomkövetési információ elõállítása
+72005=Végrehajtási információ elõállítása
+72006=FIGYELEM: Ezek a beállítások felülbírálják a globális fordító opciókat ebben a projektben.
+72007=Windows XP témák támogatása
+72008=Fájl opciók
+72009=Szerepeljen a fordításban
+72010=Fájl fordítása mint C++ fájl
+72011=Verzió információ
+72012=Verzió információ a projektben
+72013=Részletes verzió
+72014=Fõ verzió:
+72015=Al verzió:
+72016=Kiadás:
+72017=Fordítás:
+72018=Nyelv:
+72019=További információ:
+72020=Fordítási parancs felülbírálása
+72021=Kimeneti fájl
+72022=Hozzáadás a linkeléshez
+72023=Fordítási prioritás:
+72024=Fordításkor a "build number" automatikus növelése
+72025=Egyedi Makefile használata (ne generáljon Makefile-t, ezt használja)
+72026=Információ a Makefile készítéséhez...
+72027=&A következõ fájl(ok) hozzáadása a Makefile-hoz:
+72028=Sync product with file version
+72029=Default to C++ when creating new files
+
+
+73001=Exe fájl sztrippelése
+73002=Optimalizálás a következõ géptipusra
+73003=Processzor spec. utasításkészletének használata 
+73004=Optimization level (-Ox)
+73005=Language standard (-std)
+73006=Compile with the following bit width (-mx)
+73007=Optimize less, while maintaining full compatibility (-mtune)
+
+
+74001=Compiler:
+74002=Status:
+74003=File:
+74004=Errors:
+74005=Warnings:

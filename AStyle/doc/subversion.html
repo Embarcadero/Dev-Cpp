@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Artistic Style - Subversion</title>
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+    <h1>Artistic Style Subversion Repository</h1>
+
+    <p>
+        &nbsp;</p>
+
+    <h3>Artistic Style</h3>
+
+    <p>
+        The latest development source is in the Artistic Style repository at SourceForge. It can be checked out using
+        Subversion. The source code is under development and some changes take several weeks to complete. The intermediate
+        source files have not been through the extensive system tests that are done before each release. Use reasonable
+        precautions when using source code from the repository.</p>
+    <p>
+        The current version is in the "trunk/AStyle" branch of the repository. The file and directory names are case 
+        sensitive.</p>
+    <p>
+        A sample checkout is:<br />
+        <strong>svn&nbsp; checkout&nbsp; "https://svn.code.sf.net/p/astyle/code/trunk/AStyle"&nbsp; 
+            "$HOME/astyle"</strong></p>
+    <p>
+        You can also <a href="https://sourceforge.net/p/astyle/code/HEAD/tree/" target="_blank" title="open new window">browse
+            the subversion repository</a>. The current development release is in the "trunk" directory. This gives you
+        a view into the current status of the project's code without actually checking-out the files.</p>
+    <p>
+        &nbsp;</p>
+
+    <h3>Other Projects</h3>
+
+    <p>
+        Two additional Artistic Style projects are available in the repository. They are not maintained for the general
+        public, but are available if you want them. You may have to create your own project files and scripts to use 
+        them.</p>
+    <p>
+        All projects, and any additional source required, should be installed in the same top level folder. A sample file
+        directory containing ALL the projects should look as follows. The project dependencies are described 
+        below.</p>
+    <pre>    Projects
+        AStyle
+        AStyleDev
+        AStyleTest
+        AStyleWx
+        AStyleWxTest
+        googlemock
+        googletest</pre>
+
+    <h4>AStyleDev</h4>
+
+    <p>
+        AStyleDev contains the development files that are made available in the "Developer Information" section. Refer
+        to that section for more information.</p>
+    <p>
+        These projects require the Artistic Style project to compile.</p>
+    <p>
+        A sample checkout is:<br />
+        <strong>svn&nbsp; checkout&nbsp; "https://svn.code.sf.net/p/astyle/code/trunk/AStyleDev"&nbsp; "$HOME/astyledev"
+        </strong></p>
+
+    <h4>AStyleTest</h4>
+
+    <p>
+        AStyleTest contains the unit test programs and test scripts for Artistic Style. There are over 2500 tests in the
+        main test program.</p>
+    <p>
+        This project requires the Artistic Style project to compile.
+        In addition, the test program requires Google Mock and Google Test described below.</p>
+    <p>
+        The main test project, AStyleTest, can be run in Visual Studio using the graphical Visual Studio Test 
+        Explorer. The procedure is described below.</p>
+    <p>
+        A sample checkout is:<br />
+        <strong>svn&nbsp; checkout&nbsp; "https://svn.code.sf.net/p/astyle/code/trunk/AStyleTest"&nbsp; "$HOME/astyletest"
+        </strong></p>
+
+    <h4>AStyleWx</h4>
+
+    <p>
+        AStyleWx contains a GUI test program for Artistic Style that uses the wxWidgets C++ library.</p>
+    <p>
+        This project requires the Artistic Style project to compile. 
+        Files for download are made available in the 
+        <a href="https://sourceforge.net/projects/astylewx.astyle.p/" target="_blank" title="open new window">Artistic Style
+            Wx</a> subproject. The download contains all files needed to compile the project. The subproject can be accessed
+        from the Artistic Style SourceForge pages.</p>
+    <p>
+        A sample checkout is:<br />
+        <strong>svn&nbsp; checkout&nbsp; "https://svn.code.sf.net/p/astyle/code/trunk/AStyleWx&quot;&nbsp; "$HOME/astylewx&quot;
+        </strong></p>
+
+    <h4>AStyleWxTest</h4>
+
+    <p>
+        AStyleTest contains the unit test programs and test scripts for AStyleWx.&nbsp; </p>
+    <p>
+        This project requires the AStyleWx project to compile. In addition, the test program requires Google Mock and
+        Google Test described below.</p>
+    <p>
+        A sample checkout is:<br />
+        <strong>svn&nbsp; checkout&nbsp; "https://svn.code.sf.net/p/astyle/code/trunk/AStyleWxTest"&nbsp; "$HOME/astylewxtest"
+        </strong></p>
+
+    <h4>Google Mock and Google Test</h4>
+
+    <p>
+        Google Test and Google Mock is the Google multi-platform framework for writing C++ unit tests.
+        It is available on <a href="https://github.com/google/googletest" target="_blank" title="open new window">GitHub</a>
+        and can be downloaded as a zip file by pressing the green &quot;clone or download&quot; button and selecting 
+        &quot;Download ZIP&quot;. The default is to download the master development branch. The latest stable release
+        can be obtained by using the drop-down box labeled &quot;Branch: master&quot;, selecting the &quot;tags&quot;
+        tab, and then selecting the latest release. The selected release can then be downloaded using the &quot;clone
+        or download&quot; button. Download the latest release for googletest and googlemock from the repository.</p>
+    <p>
+        The Artistic Style project files are set up to use googletest and googlemock installed in the top level folder
+        as indicated above. The library compile for googlemock includes googletest. The library compile for googletest
+        includes only googletest. The AStyle test programs have their own project files for compiling the test platform.
+        There are also compile project files in the downloaded google modules if you want to use them. They create a static
+        library file that is linked to the test program. The google downloads contain instructions for using the 
+        package. </p>
+
+    <h4>Visual Studio Test Explorer</h4>
+
+    <p>
+        Some of the test projects can be run in Visual Studio Community using Visual Studio Test Explorer.
+        If there is a <strong>.gta.runsettings</strong> file in the solution directory for a test project,
+        the test will run in the Test Explorer.</p>
+    <p>
+        The &quot;Google Test Adapter&quot; extension must be installed from the Tools &gt; &quot;Extensions
+        and Updates&quot; menu. After restarting Visual Studio the test window is activated from the Test
+        &gt; Window &gt; &quot;Test Explorer&quot; menu option. After compiling, the tests will appear in
+        the test window. Then they may be run from the &quot;Test Explorer&quot; window or from the Test menu
+        options.</p>
+    <p>
+        Test Explorer may be used for other test projects. The tests can also be run as a command line program by using
+        the standard debug or run button on the menu or toolbar.</p>
+
+    <p>
+        &nbsp;</p>
+
+    <p style="margin-left: -0.4in; text-align: center;">
+        <a href="http://sourceforge.net/projects/astyle">
+            <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=2319&type=16" alt="" /></a></p>
+
+    <p>
+        &nbsp;</p>
+
+</body>
+
+</html>
+

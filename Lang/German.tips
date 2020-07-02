@@ -1,0 +1,92 @@
+#
+# This is a TipOfTheDay tips file.
+# German version
+# translated from english by Thomas Kurz, H. Roessner
+# thomas.kurz@gmx.at
+# h.roessner@gmx.de
+#
+# Keep each tip on one line.
+#
+# Lines starting with '#' are comments and ignored
+# Empty lines are also ignored.
+#
+# You can use these macros in the text:
+#	<CR>: 		insert a linefeed
+#	<URL>: 		is followed by a URL link
+#	<UDESC>: 	is followed by a URL description
+#
+# Usage syntax (the text of the tip is <tip_text>):
+#	( <tip_text> | <CR> )* [ <URL>text [ <UDESC>text ] ]
+#
+# Example tip:
+#	...some tip<CR><CR>more lines...<URL>http://www.bloodshed.net/dev<UDESC>Click to visit Bloodshed Software
+#
+# More macros will be added as needed...
+#
+# Note1: if you want to use an ampersand (&), put two together (&&).
+# Note2: each tip can have no more than 255 chars.
+# Note3: the macro <CR> counts as one character, not four.
+# Note4: with macros <URL> and <UDESC>, the rest of the line is not displayed as a tip,
+#	 so it does not count for the 255-chars limit.
+# Note5: Macro <UDESC> is optional. If ommited, <URL> will be printed as the link.
+# Note6: Macro <UDESC> if exists *must* follow the macro <URL>
+#
+
+#
+# Important tips (appear first)
+#
+
+...diese Tips nicht deaktiviert werden sollten? ;-)<CR><CR>Diese Tips enthalten undokumentierte Informationen, die sonst nirgends zu finden sind.<CR>Sind sie deaktiviert kann man sie später mit "Hilfe / Tip des Tages" anzeigen...
+
+...WebUpdate dazu benutzt werden kann um Dev-C++ mit Bugfixes und Funktionen auf dem neusten Stand zu halten?<CR><CR>Wähle "Werkzeuge / Auf Updates/Pakete prüfen..."
+
+#
+# Code-completion tips
+#
+...die Code-Vervollständigung hilft die Produktivität zu steigern, indem sie alle im aktuellen Kontext verfügbaren Befehle vorschlägt?<CR><CR>Zum Aktivieren der Code-Vervollständigung öffne "Werkzeuge / Editor Optionen" und aktiviere den Klassen-Browser und die Code-Vervollständigung.
+
+...die Code-Vervollständigung nach einer benutzerdefinierten Wartezeit ausgelöst wird, wenn im Editor Fenster ".", "->" oder "::" getippt wird?<CR><CR>Um die Wartezeit zu definieren, öffne "Werkzeuge / Editor Optionen / Klassen-Browser / Code-Vervollständigung". 
+
+...die Code-Vervollständigung jederzeit durch drücken von "Strg+Leertaste" im Editor Fenster aufgerufen werden kann?<CR><CR>(Versuche "Strg+Umschalt+Leertaste" zu drücken während der Cursor innerhalb der runden Klammern eines Funktions-Argumentes steht...)
+
+...Umschalt-Klicken auf einen Eintrag im Klassen-Browser die Deklaration statt der Implementierung öffnet?<CR><CR>Natürlich kann auch das Kontext Menü für dieselbe Funktion (und mehr!) genutzt werden...
+
+...benutzerdefinierte Ordner zum Klassen-Browser hinzugefügt werden können, um die Klassen zu organisieren und in großen Projekten einfacher zu finden?<CR>Die Ordner können sogar verschachtelt werden!<CR><CR>Die Funktionen finden Sie im Kontext Menü (Rechts-Klicken)...
+
+...die Informationen über die benutzerdefinierten Ordner im Klassen-Browser in der Datei "classfolders.dcf" im Wurzelverzeichnis des Projektes gespeichert werden?<CR><CR>Wenn etwas schief geht und alles durcheinander kommt, löschen Sie einfach diese Datei und öffnen das Projekt neu!
+
+...es zwei Anzeige Modi für den Klassen-Browser gibt?<CR>Einer zeigt alle bestimmten Klassen/Member/Funktionen des Projektes und der andere nur die relevanten Informationen der gerade editierten Datei.<CR><CR>Rechts-Klicken im Klassen-Browser und "Ansicht..." auswählen...
+
+#
+# Project Manager tips
+#
+
+...man definieren kann, ob sich eine Datei im Editor durch Einfach- oder Doppel-Klick im Projektmanager öffnet?<CR><CR>Um das Verhalten festzulegen öffne "Werkzeuge / Umgebungs Optionen / Allgemein" und aktiviere (oder deaktiviere) "Projektmanager-Dateien mit Doppelklick öffnen"...
+
+...man benutzerdefinierte Ordner (nur eine Ebene) im Projektmanager definieren kann, um die Dateien in großen Projekten besser zu organisieren?<CR><CR>Rechts-Klicken auf einer Datei im Projektmanager um das Kontext Menü zu öffnen...
+
+...die Dateien im Projektmanager mit Drag && Drop verschoben werden können, wenn es benutzerdefinierte Ordner gibt?
+
+#
+# File menu tips
+#
+...Informationen über die Datei, an der gearbeitet wird, verfügbar sind?<CR><CR>"Datei / Eigenschaften" zeigt Informationen über die Größe der Datei, Anzahl der Zeilen, Kommentarzeilen, Leerzeilen und #include Dateien!
+
+...ein Projekt als Vorlage gespeichert werden kann? <CR><CR>"Datei / Neu / Vorlage..." speichert das Projekt mit einstellbaren Optionen und es ist später über Datei / Neu / Projekt..." als Dev-C++ Vorlage verfügbar.<CR>Auf diesem Weg kann man einen Programmrumpf nach seinem eigenen Geschmack erstellen!
+
+... MS Visual C++ Projekte importiert werden können?<CR><CR>Wähle "Datei / Import / MS Visual C++ Projekt importieren".<CR>Es kann notwendig sein, einige Projekt-Optionen nach dem Import anzupassen, aber, hey, es ist noch in Arbeit!
+
+...eine Quelldatei oder ein ganzes Projekt nach HTML oder RTF exportiert werden kann?<CR><CR>So kann man die Quellen in eine Internet Seite einbauen und sie mit der ganzen Welt teilen!<CR>"Datei / Export" und die gewählte Methode macht die ganze Arbeit...
+
+#
+# Edit menu tips
+#
+
+...ausgewählte Zeilen auskommentiert werden indem man "Bearbeiten / Kommentar" wählt?<CR><CR>Umgekehrt kann ein Kommentar auch mit "Bearbeiten / Kommentar aufheben" entfernt werden.
+
+...ausgewählte Zeilen eingerückt werden indem man "Bearbeiten / Einrücken" wählt?<CR><CR>Umgekehrt kann eine Einrückung auch mit "Bearbeiten / Einrückung aufheben" entfernt werden.
+
+...Lesezeichen ein schnelles Bewegen innerhalb des Programmes ermöglichen?<CR><CR>Setzen oder Löschen eines Lesezeichens erfolgt durch "Bearbeiten / Lesezeichen setzen" und der Auswahl der Nummer des Lesezeichens.<CR>Um zu einem Lesezeichen zu springen wählt man analog "Bearbeiten / Gehe zu Lesezeichen" und die Nummer des Lesezeichens.
+
+...im "Suchen" Menü ein leistungsfähiger "Gehe zu Funktion..." Befehl vorhanden ist?<CR><CR>Er zeigt alle Funktionen der Datei an und durch eintippen eines Teils des Funktionsnamens wird die Liste gefiltert. Drücke "Enter" und der Editor springt sofort zu der ausgewählten Funktion!<CR><CR>P.S.: Der Klassen-Browser muß aktiviert sein...
+
