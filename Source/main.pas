@@ -789,7 +789,6 @@ type
       Selected: Boolean);
     procedure actRunTestsExecute(Sender: TObject);
     procedure WMCopyData(var Message: TMessage); message WM_COPYDATA;
-    procedure actDonateExecute(Sender: TObject);
   private
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
@@ -6663,13 +6662,6 @@ begin
 
   // Free list of pointers
   LocalFree(Cardinal(ParameterList));
-end;
-
-procedure TMainForm.actDonateExecute(Sender: TObject);
-begin
-  ShellExecute(GetDesktopWindow(), 'open',
-    PChar('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7FD675DNV8KKJ'), nil, nil,
-    SW_SHOWNORMAL);
 end;
 
 end.

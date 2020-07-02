@@ -1628,6 +1628,7 @@ object MainForm: TMainForm
       end
       object DonateItem: TMenuItem
         Action = actDonate
+        Visible = False
       end
     end
   end
@@ -2793,7 +2794,6 @@ object MainForm: TMainForm
     object actDonate: TAction
       Caption = 'Donate :)'
       ImageIndex = 41
-      OnExecute = actDonateExecute
     end
   end
   object MessagePopup: TPopupMenu
