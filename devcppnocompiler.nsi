@@ -96,7 +96,7 @@ Section "Embarcadero Dev-C++ program files (required)" SectionMain
   WriteUninstaller "$INSTDIR\uninstall.exe"
   
   # registering into windows reg (regedit)
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayName" "Dev-C++"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayName" "Embarcadero Dev-C++"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayVersion" "${DEVCPP_VERSION}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Embarcadero Dev-Cpp" "DisplayIcon" "$INSTDIR\devcpp.exe"
@@ -141,9 +141,9 @@ SectionEnd
 
 ####################################################################
 # File association
-SubSection "Associate C and C++ files to Dev-C++" SectionAssocs
+SubSection "Associate C and C++ files to Embarcadero Dev-C++" SectionAssocs
 
-Section "Associate .dev files to Dev-C++"
+Section "Associate .dev files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".dev"
@@ -157,7 +157,7 @@ Section "Associate .dev files to Dev-C++"
   Call RefreshShellIcons
 SectionEnd
 
-Section "Associate .c files to Dev-C++"
+Section "Associate .c files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".c"
@@ -171,7 +171,7 @@ Section "Associate .c files to Dev-C++"
   Call RefreshShellIcons
 SectionEnd
 
-Section "Associate .cpp files to Dev-C++"
+Section "Associate .cpp files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".cpp"
@@ -185,7 +185,7 @@ Section "Associate .cpp files to Dev-C++"
   Call RefreshShellIcons
 SectionEnd
 
-Section "Associate .h files to Dev-C++"
+Section "Associate .h files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".h"
@@ -199,7 +199,7 @@ Section "Associate .h files to Dev-C++"
   Call RefreshShellIcons
 SectionEnd
 
-Section "Associate .hpp files to Dev-C++"
+Section "Associate .hpp files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".hpp"
@@ -213,7 +213,7 @@ Section "Associate .hpp files to Dev-C++"
   Call RefreshShellIcons
 SectionEnd
 
-Section "Associate .rc files to Dev-C++"
+Section "Associate .rc files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".rc"
@@ -227,7 +227,7 @@ Section "Associate .rc files to Dev-C++"
   Call RefreshShellIcons
 SectionEnd
 
-Section "Associate .devpak files to Dev-C++"
+Section "Associate .devpak files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".devpak"
@@ -242,7 +242,7 @@ Section "Associate .devpak files to Dev-C++"
   Call RefreshShellIcons
 SectionEnd
 
-Section "Associate .devpackage files to Dev-C++"
+Section "Associate .devpackage files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".devpackage"
@@ -257,7 +257,7 @@ Section "Associate .devpackage files to Dev-C++"
   Call RefreshShellIcons
 SectionEnd
 
-Section "Associate .template files to Dev-C++"
+Section "Associate .template files to Embarcadero Dev-C++"
   SectionIn 1 3
 
   StrCpy $0 ".template"
@@ -319,11 +319,11 @@ SectionEnd
 # TODO: Create language tables that describe installation components using LangString
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        "The Dev-C++ IDE (Integrated Development Environment), package manager and templates"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionMain}        "The Embarcadero Dev-C++ IDE (Integrated Development Environment), package manager and templates"
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionIcons}       "Various icons that you can use in your programs"
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       "The Dev-C++ interface translated to different languages (other than English which is built-in)"
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      "Use Dev-C++ as the default application for opening these types of files"
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   "Create shortcuts to Dev-C++ in various folders"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionLangs}       "The Embarcadero Dev-C++ interface translated to different languages (other than English which is built-in)"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionAssocs}      "Use Embarcadero Dev-C++ as the default application for opening these types of files"
+!insertmacro MUI_DESCRIPTION_TEXT ${SectionShortcuts}   "Create shortcuts to Embarcadero Dev-C++ in various folders"
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionConfig}      "Remove all leftover configuration files from previous installs"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
