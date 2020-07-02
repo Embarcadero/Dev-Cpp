@@ -473,7 +473,7 @@ Ver=1
 35011=Returns Dev-C++ version
 
 
-36001=About Dev-C++ :)
+36001=About Embarcadero Dev-C++ :)
 36002=inseculous@users.sourceforge.net
 36003=GNU General Public License
 36004=Contact Information
@@ -488,7 +488,7 @@ Ver=1
 36013=http://www.bloodshed.net/devcpp-ml.html
 36014=haiku@bloodshed.net
 36015=&Check for updates
-36016=Post-4.9.9.2 Development:
+36016=4.9.9.2 to 5.12 Development:
 36017=http://orwelldevcpp.blogspot.com
 36018=> 4.9.9.2
 36019=Repository:
@@ -643,7 +643,7 @@ Ver=1
 46019=Use pipes instead of temporary files during compilation (-pipe)
 
 
-47001=You may want to change the programs filenames that are used in Dev-C++ (for example when using a cross compiler):
+47001=You may want to change the programs filenames that are used in Embarcadero Dev-C++ (for example when using a cross compiler):
 47002=Compiler set to configure
 47003=New compiler set
 47004=Enter the new set name:
@@ -885,7 +885,7 @@ Ver=1
 60024=Please select the application you want to attach to:
 60025=Could not find corresponding source file
 60026=Could not find corresponding header file
-60027=The compiler settings format of Dev-C++ has changed.<CR><CR>Please update your settings at Project >> Project Options >> Compiler and save your project.
+60027=The compiler settings format of Embarcadero Dev-C++ has changed.<CR><CR>Please update your settings at Project >> Project Options >> Compiler and save your project.
 60028=The compiler set you have selected for this project, no longer exists.<CR>It will be substituted by the global compiler set.
 
 61001=Cannot open file %s
@@ -995,7 +995,7 @@ Ver=1
 
 66001=File Associations
 66002=File Types:
-66003=Just check or un-check for which file types Dev-C++ will be registered as the default application to open them...
+66003=Just check or un-check for which file types Embarcadero Dev-C++ will be registered as the default application to open them...
 66004=CVS Support
 66005=CVS program file:
 66006=Compression level:
@@ -1013,9 +1013,9 @@ Ver=1
 66018=Alternate Configuration File
 66019=Use this alternate configuration file
 66020=You changed the configuration file to be used by the application.<CR>The new configuration file will *not* be used in the current session. Any configuration changes you do in this session, will be saved in the *currently* open configuration file.<CR><CR>It is suggested that you restart the application now, so that it starts using the new configuration file...
-66021=Dev-C++ was unable to set or check file associations.<CR><CR>This is known to be caused by using UAC in combination with a standard user account.<CR><CR>Please disable UAC or run Dev-C++ as an administrator if you want to change file associations. Relevant options can be found at Tools >> Environment Options >> File Associations.
+66021=Embarcadero Dev-C++ was unable to set or check file associations.<CR><CR>This is known to be caused by using UAC in combination with a standard user account.<CR><CR>Please disable UAC or run Dev-C++ as an administrator if you want to change file associations. Relevant options can be found at Tools >> Environment Options >> File Associations.
 66022=UI font:
-66023=Dev-C++ was unable to load the code completion cache, which is corrupted or part of outdated settings files located at:<CR><CR>%s<CR><CR>Do you wish to backup and reset options? If so, please restart Dev-C++. Backups will be stored here:<CR><CR>%s
+66023=Embarcadero Dev-C++ was unable to load the code completion cache, which is corrupted or part of outdated settings files located at:<CR><CR>%s<CR><CR>Do you wish to backup and reset options? If so, please restart Dev-C++. Backups will be stored here:<CR><CR>%s
 66024=An error occurred while trying to load the printer setup dialog.<CR><CR>You probably have no printer installed yet.
 66025=Multiline tabs must be enabled when using vertical tabs.<CR><CR>Reverting to Top Tabs.
 
@@ -1030,7 +1030,7 @@ Ver=1
 
 69001=Current file...
 69002=Whole project...
-69003=Please point Dev-C++ to cvs.exe in "Tools >> Environment Options >> CVS Support" ...
+69003=Please point Embarcadero Dev-C++ to cvs.exe in "Tools >> Environment Options >> CVS Support" ...
 
 
 70001=Import Options
@@ -1150,7 +1150,7 @@ Ver=1
 75002=No %s directories have been specified.
 75003=The following binary directories have been searched:
 75004=Please check if your binary directory and the executable names are set correctly at Tools >> Compiler Options >> Directories/Programs.
-75005=Would you like Dev-C++ to remove them for you and add the default paths to the valid paths?<CR><CR>Leaving those directories will lead to problems during compilation.<CR><CR>Unless you know exactly what you're doing, it is recommended that you click Yes.
+75005=Would you like Embarcadero Dev-C++ to remove them for you and add the default paths to the valid paths?<CR><CR>Leaving those directories will lead to problems during compilation.<CR><CR>Unless you know exactly what you're doing, it is recommended that you click Yes.
 75006=Cannot find the %s "%s".
 75007=binary
 75008=C include
@@ -1180,9 +1180,9 @@ Ver=1
 76012=Add folder
 76013=Remove
 76014=Parsing...
-76015=Dev-C++ has been configured successfully.
-76016=If you need help using Dev-C++, please refer to the Dev-C++ help file in the Help menu or send the developer a message (he doesn't mind!).
-76017=You can also download packages (like libraries or tools) to use with Dev-C++ using WebUpdate, which you will find in Tools menu >> Check for Packages.
+76015=Embarcadero Dev-C++ has been configured successfully.
+76016=If you need help using Embarcadero Dev-C++, please refer to the Embarcadero Dev-C++ help file in the Help menu or send the developer a message (he doesn't mind!).
+76017=You can also download packages (like libraries or tools) to use with Embarcadero Dev-C++ using WebUpdate, which you will find in Tools menu >> Check for Packages.
 76018=&Next
 76019=Please wait...
 76020=Saving...
