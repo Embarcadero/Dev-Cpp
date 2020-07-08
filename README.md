@@ -1,7 +1,7 @@
 # Embarcadero Dev-C++
 A fast, portable, simple, and free C/C++ IDE
 
-Embarcadero Dev-C++ is a new and improved fork (sponsored by Embarcadero) of Bloodshed Dev-C++ and Orwell Dev-C++. It is a full-featured Integrated Development Environment (IDE) for the C/C++ programming language. It uses Mingw port of GCC (GNU Compiler Collection) as it's compiler. Embarcadero Dev-C++ can also be used in combination with Cygwin or any other GCC based compiler. Embarcadero Dev-C++ is built in the latest version of Embarcadero Delphi. Embarcadero Dev-C++ has a low memory footprint because it is a native Windows application and does not use Electron.
+Embarcadero Dev-C++ is a new and improved fork (sponsored by Embarcadero) of Bloodshed Dev-C++ and Orwell Dev-C++. It is a full-featured Integrated Development Environment (IDE) and code editor for the C/C++ programming language. It uses Mingw port of GCC (GNU Compiler Collection) as it's compiler. Embarcadero Dev-C++ can also be used in combination with Cygwin or any other GCC based compiler. Embarcadero Dev-C++ is built in the latest version of Embarcadero Delphi. Embarcadero Dev-C++ has a low memory footprint because it is a native Windows application and does not use Electron.
 
 Download the latest release:
 https://github.com/Embarcadero/Dev-Cpp/releases
