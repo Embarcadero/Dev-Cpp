@@ -92,6 +92,12 @@ Version 5.50 - 1 July 2020
 "Abbrevia is a compression toolkit for Delphi and C++Builder."
 https://github.com/TurboPack/Abbrevia
 
+"Monokai Theme"
+<https://github.com/rbardini/devcpp-monokai>
+
+"Monokai Fresh Theme"
+<https://github.com/sspathare97/devcpp-monokai_fresh>
+
 # Original Dev-C++ Developers
 
 Find out more about the original developers of Bloodshed Dev-C++:
