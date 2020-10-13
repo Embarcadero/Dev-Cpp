@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg12"
+   sodipodi:docname="apps_golly.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs16">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter858"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.2"
+         id="feGaussianBlur860" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter866"
+       x="-0.024"
+       width="1.048"
+       y="-0.024"
+       height="1.048">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.36"
+         id="feGaussianBlur868" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview14"
+     showgrid="false"
+     inkscape:zoom="2.63"
+     inkscape:cx="24"
+     inkscape:cy="100.04563"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12" />
+  <rect
+     id="rect840"
+     ry="8"
+     rx="8"
+     y="20"
+     x="16"
+     height="160"
+     width="160"
+     style="opacity:0.2;fill:#000000;stroke-width:4;filter:url(#filter858)" />
+  <rect
+     style="fill:#fadd00;stroke-width:4"
+     width="160"
+     height="160"
+     x="16"
+     y="16"
+     rx="8"
+     ry="8"
+     id="rect2" />
+  <path
+     inkscape:connector-curvature="0"
+     style="opacity:0.1;stroke-width:4;filter:url(#filter866)"
+     d="M 28,30 V 42 H 40 V 30 Z m 16,0 V 42 H 56 V 30 Z m 16,0 V 42 H 72 V 30 Z m 16,0 V 42 H 88 V 30 Z m 16,0 v 12 h 12 V 30 Z m 16,0 v 12 h 12 V 30 Z m 28,0 v 12 h 12 V 30 Z m 16,0 v 12 h 12 V 30 Z M 28,46 V 58 H 40 V 46 Z m 16,0 V 58 H 56 V 46 Z m 16,0 V 58 H 72 V 46 Z m 16,0 V 58 H 88 V 46 Z m 16,0 v 12 h 12 V 46 Z m 16,0 v 12 h 12 V 46 Z m 28,0 v 12 h 12 V 46 Z m 16,0 v 12 h 12 V 46 Z m -16,16 v 12 h 12 V 62 Z m 16,0 v 12 h 12 V 62 Z M 28,74 V 86 H 40 V 74 Z m 16,0 V 86 H 56 V 74 Z m 92,4 v 12 h 12 V 78 Z m 16,0 v 12 h 12 V 78 Z M 28,90 v 12 H 40 V 90 Z m 16,0 v 12 H 56 V 90 Z m 92,4 v 12 h 12 V 94 Z m 16,0 v 12 h 12 V 94 Z M 28,106 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 92,4 v 12 h 12 v -12 z m 16,0 v 12 h 12 V 110 Z M 28,122 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m -16,16 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 28,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 V 138 Z M 28,154 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 28,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z"
+     id="path8" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#234fa7;stroke-width:4"
+     d="M 28,28 V 40 H 40 V 28 Z m 16,0 V 40 H 56 V 28 Z m 16,0 V 40 H 72 V 28 Z m 16,0 V 40 H 88 V 28 Z m 16,0 v 12 h 12 V 28 Z m 16,0 v 12 h 12 V 28 Z m 28,0 v 12 h 12 V 28 Z m 16,0 v 12 h 12 V 28 Z M 28,44 V 56 H 40 V 44 Z m 16,0 V 56 H 56 V 44 Z m 16,0 V 56 H 72 V 44 Z m 16,0 V 56 H 88 V 44 Z m 16,0 v 12 h 12 V 44 Z m 16,0 v 12 h 12 V 44 Z m 28,0 v 12 h 12 V 44 Z m 16,0 v 12 h 12 V 44 Z m -16,16 v 12 h 12 V 60 Z m 16,0 v 12 h 12 V 60 Z M 28,72 V 84 H 40 V 72 Z m 16,0 V 84 H 56 V 72 Z m 92,4 v 12 h 12 V 76 Z m 16,0 v 12 h 12 V 76 Z M 28,88 v 12 H 40 V 88 Z m 16,0 v 12 H 56 V 88 Z m 92,4 v 12 h 12 V 92 Z m 16,0 v 12 h 12 V 92 Z M 28,104 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 92,4 v 12 h 12 v -12 z m 16,0 v 12 h 12 V 108 Z M 28,120 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m -16,16 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 28,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 V 136 Z M 28,152 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 28,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z m 16,0 v 12 h 12 v -12 z"
+     id="path10" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 24 16 C 19.568 16 16 19.568 16 24 L 16 25 C 16 20.568 19.568 17 24 17 L 168 17 C 172.432 17 176 20.568 176 25 L 176 24 C 176 19.568 172.432 16 168 16 L 24 16 z "
+     id="path4" />
+</svg>

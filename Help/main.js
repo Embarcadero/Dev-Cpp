@@ -1,5 +1,5 @@
-var ShowButton = "[+] ";
-var HideButton = "[-] ";
+var ShowButton = "► ";
+var HideButton = "▼ ";
 
 var TableOfContents = [
 	"Functional Help",[

@@ -24,7 +24,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, ExtCtrls, Buttons, ComCtrls,
-  project, ImgList, ExtDlgs, IniFiles, System.UITypes;
+  project, ImgList, ExtDlgs, IniFiles, System.UITypes,DataFrm;
 
 type
   TNewTemplateForm = class(TForm)
@@ -86,7 +86,7 @@ type
 implementation
 
 uses
-  utils, IconFrm, devcfg, version, Templates, main, MultiLangSupport;
+  utils, IconFrm, devcfg, version, Templates, main, MultiLangSupport, ProjectTypes;
 
 {$R *.dfm}
 
@@ -315,7 +315,7 @@ begin
     WriteString('Project', 'Compiler', StringReplace(memCompiler.Text, #13#10, '_@@_', [rfReplaceAll]));
     WriteString('Project', 'CppCompiler', StringReplace(memCppCompiler.Text, #13#10, '_@@_', [rfReplaceAll]));
     WriteString('Project', 'Linker', StringReplace(memLinker.Text, #13#10, '_@@_', [rfReplaceAll]));
-    WriteString('Project', 'CompilerSettings', TempProject.Options.CompilerOptions);
+    WriteString('Project', 'CompilerSettings', TempProject.Options.CompilerOptions.ToString);
     WriteInteger('Project', 'CompilerSet', TempProject.Options.CompilerSet);
     WriteBool('Project', 'IncludeVersionInfo', TempProject.Options.IncludeVersionInfo);
     WriteBool('Project', 'SupportXPThemes', TempProject.Options.SupportXPThemes);

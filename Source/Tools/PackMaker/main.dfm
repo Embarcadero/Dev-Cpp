@@ -233,6 +233,7 @@ object MainForm: TMainForm
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -1132,6 +1133,9 @@ object MainForm: TMainForm
         ShortCut = 112
         OnClick = About1Click
       end
+    end
+    object ApperanceMenu: TMenuItem
+      Caption = '&Apperance'
     end
   end
   object ImageList: TImageList

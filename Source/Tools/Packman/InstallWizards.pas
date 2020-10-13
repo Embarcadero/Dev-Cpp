@@ -6,7 +6,7 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, InstallFiles, ExtCtrls, StdCtrls, Buttons, ShellAPI, ComCtrls,
-  Installers, PackmanExitCodesU, System.Zip;
+  Installers, PackmanExitCodesU, System.Zip, Vcl.Imaging.pngimage;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -104,7 +104,7 @@ var
 implementation
 
 uses
-  LibTar, ExtractionProgressDialog, System.IOUtils, AbUnzper, AbArcTyp;
+  LibTar, ExtractionProgressDialog, System.IOUtils, AbUnzper, AbArcTyp, Main;
 
 const
   PageCount = 5;

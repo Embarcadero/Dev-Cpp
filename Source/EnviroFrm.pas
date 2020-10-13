@@ -24,7 +24,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, ExtCtrls, ExtDlgs, Buttons,
-  CheckLst, Grids, ValEdit, ComCtrls;
+  CheckLst, Grids, ValEdit, ComCtrls, vcl.Themes, Vcl.BaseImageCollection,
+  Vcl.ImageCollection, Vcl.VirtualImage, System.ImageList, Vcl.ImgList;
 
 type
   TEnviroForm = class(TForm)
@@ -78,14 +79,19 @@ type
     lblAssocFileTypes: TLabel;
     lblAssocDesc: TLabel;
     lstAssocFileTypes: TCheckListBox;
-    UIfontlabel: TLabel;
-    cbUIfont: TComboBox;
-    cbUIfontsize: TComboBox;
     cbPauseConsole: TCheckBox;
     cbCheckAssocs: TCheckBox;
     edOptionsDir: TEdit;
     lblOptionsDir: TLabel;
     btnResetDev: TButton;
+    TabAppearance: TTabSheet;
+    LblStyle: TLabel;
+    UIfontlabel: TLabel;
+    cbUIfont: TComboBox;
+    cbUIfontsize: TComboBox;
+    ListBoxStyle: TListBox;
+    lblSize: TLabel;
+    VirtualImageTheme: TVirtualImage;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -99,6 +105,9 @@ type
     procedure cbUIfontsizeChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnResetDevClick(Sender: TObject);
+    procedure ListBoxStyleClick(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -106,7 +115,8 @@ type
 implementation
 
 uses
-  System.UITypes, ShellAPI, Filectrl, devcfg, MultiLangSupport, version, DataFrm, utils, FileAssocs, ImageTheme, main;
+  System.UITypes, ShellAPI, Filectrl, devcfg, MultiLangSupport, version, DataFrm, utils, FileAssocs, ImageTheme, main,
+  StrUtils;
 
 {$R *.dfm}
 
@@ -175,12 +185,18 @@ begin
     LangChange := s <> Language;
     Language := s;
     ThemeChange := cboTheme.Text <> devData.Theme;
-    Theme := cboTheme.Text;
+    Theme := 'NewLook'; //cboTheme.Text;
     ShowProgress := cbShowProgress.Checked;
     AutoCloseProgress := cbAutoCloseProgress.Checked;
     WatchHint := cbWatchHint.Checked;
     InterfaceFont := cbUIFont.Text;
     InterfaceFontSize := StrToIntDef(cbUIfontsize.Text, 9);
+
+    //Set Delphi Style
+    StyleChange := ListBoxStyle.ItemIndex <> devData.Style;
+    Style := ListBoxStyle.ItemIndex;
+    if Style > 0 then
+      TStyleManager.TrySetStyle(cDelphiStyle[Style]);
   end;
 
   MainForm.Font.Name := devData.InterfaceFont;
@@ -209,6 +225,11 @@ begin
   end;
 
   devExternalPrograms.Programs.Assign(vleExternal.Strings);
+end;
+
+procedure TEnviroForm.ListBoxStyleClick(Sender: TObject);
+begin
+  VirtualImageTheme.ImageIndex := ListBoxStyle.ItemIndex;
 end;
 
 procedure TEnviroForm.LoadText;
@@ -258,9 +279,11 @@ begin
   cboTabsTop.Items[3] := Lang[ID_ENV_RIGHT];
 
   lblLang.Caption := Lang[ID_ENV_LANGUAGE];
-  lblTheme.Caption := Lang[ID_ENV_THEME];
+  LblStyle.Caption := Lang[ID_ENV_THEME];
   lblmsgTabs.Caption := Lang[ID_ENV_MSGTABS];
   lblMRU.Caption := Lang[ID_ENV_MRU];
+  UIfontlabel.Caption := Lang[ID_LANGFORM_FONT];
+  lblSize.Caption  :=  Lang[ID_EOPT_SIZE];
 
   lblOptionsDir.Caption := Lang[ID_ENV_OPTIONSDIRHINT];
   btnResetDev.Caption := Lang[ID_ENV_RESETDEV];
@@ -282,6 +305,11 @@ begin
   // associations tab
   lblAssocFileTypes.Caption := Lang[ID_ENV_FASSTYPES];
   lblAssocDesc.Caption := Lang[ID_ENV_FASSDESC];
+end;
+
+procedure TEnviroForm.SpeedButton2Click(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TEnviroForm.btnHelpClick(Sender: TObject);
@@ -326,9 +354,13 @@ begin
     end;
 
     // List the themes
-    cboTheme.Items.Clear;
-    devImageThemes.GetThemeTitles(cboTheme.Items);
-    cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
+    //cboTheme.Items.Clear;
+    //devImageThemes.GetThemeTitles(cboTheme.Items);
+    //cboTheme.ItemIndex := devImageThemes.IndexOf(devImageThemes.CurrentTheme.Title);
+
+    //Style Delphi
+    ListBoxStyle.ItemIndex := Style;
+    VirtualImageTheme.ImageIndex := ListBoxStyle.ItemIndex;
 
     // Add all font families and select the current one
     cbUIfont.Items.Assign(Screen.Fonts);
@@ -401,6 +433,11 @@ begin
   vleExternal.ItemProps[ARow - 1].EditStyle := esEllipsis;
 end;
 
+procedure TEnviroForm.btnCancelClick(Sender: TObject);
+begin
+  Close;
+end;
+
 procedure TEnviroForm.btnExtAddClick(Sender: TObject);
 begin
   vleExternal.InsertRow('', '', True);
@@ -455,6 +492,7 @@ begin
   // Quit without saving
   TerminateProcess(GetCurrentProcess, 0);
 end;
+
 
 end.
 

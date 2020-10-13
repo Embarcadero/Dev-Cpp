@@ -23,7 +23,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, Menus, FileCtrl, SynEdit, ToolWin, ComCtrls;
+  StdCtrls, Buttons, ExtCtrls, Menus, FileCtrl, SynEdit, ToolWin, ComCtrls, Themes,
+  svgColor, Vcl.VirtualImage;
 
 type
   TLangForm = class(TForm)
@@ -33,12 +34,12 @@ type
     grpLanguages: TGroupBox;
     lblLangInfo: TLabel;
     grpThemes: TGroupBox;
-    cmbIcons: TComboBox;
+    cmbTheme: TComboBox;
     FinishPanel: TPanel;
     Finish2: TLabel;
     Finish3: TLabel;
     cmbColors: TComboBox;
-    lblIcons: TLabel;
+    lblTheme: TLabel;
     lblColor: TLabel;
     Finish1: TLabel;
     synExample: TSynEdit;
@@ -46,37 +47,19 @@ type
     lblEditInfo: TLabel;
     lblFont: TLabel;
     cmbFont: TComboBox;
-    tbExample: TToolBar;
-    NewFileBtn: TToolButton;
-    OpenBtn: TToolButton;
-    SaveUnitBtn: TToolButton;
-    SaveAllBtn: TToolButton;
-    CloseBtn: TToolButton;
-    PrintBtn: TToolButton;
-    UndoBtn: TToolButton;
-    RedoBtn: TToolButton;
-    FindBtn: TToolButton;
-    ReplaceBtn: TToolButton;
-    FindNextBtn: TToolButton;
-    GotoLineBtn: TToolButton;
-    CompileBtn: TToolButton;
-    RunBtn: TToolButton;
-    CompileAndRunBtn: TToolButton;
-    RebuildAllBtn: TToolButton;
-    DebugBtn: TToolButton;
-    ProfileBtn: TToolButton;
-    ProfilingInforBtn: TToolButton;
+    VirtualImageTheme: TVirtualImage;
     procedure OkBtnClick(Sender: TObject);
     procedure ColorChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FontChange(Sender: TObject);
-    procedure cmbIconsChange(Sender: TObject);
+    procedure cmbThemeChange(Sender: TObject);
     procedure cmbFontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
     procedure HandleLangPanel;
     procedure HandleEditPanel;
     procedure UpdateLangList(List: TStrings);
-    procedure LoadText; // call after selecting a language of course
+    procedure LoadText;
+    procedure FormCreate(Sender: TObject); // call after selecting a language of course
   end;
 
 implementation
@@ -91,7 +74,7 @@ begin
   grpThemes.Caption := Lang[ID_LANGFORM_SELECTTHEME];
   lblFont.Caption := Lang[ID_LANGFORM_FONT];
   lblColor.Caption := Lang[ID_LANGFORM_COLOR];
-  lblIcons.Caption := Lang[ID_LANGFORM_ICONS];
+  lblTheme.Caption := Lang[ID_LANGFORM_ICONS];
   lblEditInfo.Caption := Lang[ID_LANGFORM_THEMCHANGEHINT];
   Finish1.Caption := Lang[ID_LANGFORM_FINISH1];
   Finish2.Caption := Lang[ID_LANGFORM_FINISH2];
@@ -143,8 +126,11 @@ begin
   OkBtn.ModalResult := mrOK;
   EditPanel.Visible := false;
   FinishPanel.Visible := true;
-  devData.ThemeChange := true;
-  devData.Theme := cmbIcons.Items[cmbIcons.ItemIndex];
+  //devData.ThemeChange := true;
+  //devData.Theme := cmbIcons.Items[cmbIcons.ItemIndex];
+  devData.Theme := 'NewLook';
+  devData.Style := cmbTheme.ItemIndex;
+  devData.StyleChange := True;
 end;
 
 procedure TLangForm.OkBtnClick(Sender: TObject);
@@ -167,8 +153,8 @@ begin
   synExample.CaretXY := BufferCoord(11, 5);
 
   // Interface themes
-  devImageThemes.GetThemeTitles(cmbIcons.Items);
-  cmbIcons.ItemIndex := 0; // new look
+  cmbTheme.ItemIndex := devData.Style;
+  VirtualImageTheme.ImageIndex := devData.Style;
 
   // Editor colors
   cmbColors.ItemIndex := 1; // Classic Plus
@@ -177,9 +163,9 @@ begin
 
   // Font options
   cmbFont.Items.Assign(Screen.Fonts);
-  FontIndex := cmbFont.Items.IndexOf('Consolas');
+  FontIndex := cmbFont.Items.IndexOf('Source Code Pro');
   if FontIndex = -1 then
-    FontIndex := cmbFont.Items.IndexOf('Courier New');
+    FontIndex := cmbFont.Items.IndexOf('Consolas');
   if FontIndex = -1 then
     FontIndex := cmbFont.Items.IndexOf('Courier');
   cmbFont.ItemIndex := FontIndex; // set ItemIndex once
@@ -208,6 +194,10 @@ begin
     devEditor.HighColor := clBlack
   else if cmbColors.Text = 'PlasticCodeWrap' then
     devEditor.HighColor := clBlack
+  else if cmbColors.Text = 'Monokai' then
+    devEditor.HighColor := clBlack
+  else if cmbColors.Text = 'Monokai Fresh' then
+    devEditor.HighColor := clBlack
   else
     devEditor.HighColor := $FFFFCC; // Light Turquoise
 
@@ -226,14 +216,21 @@ begin
   Action := caFree;
 end;
 
-procedure TLangForm.cmbIconsChange(Sender: TObject);
+procedure TLangForm.FormCreate(Sender: TObject);
 begin
-  if cmbIcons.ItemIndex = 1 then
+  //if devData.Style <> 0 then
+    TStyleManager.TrySetStyle(cDelphiStyle[devData.Style]);
+end;
+
+procedure TLangForm.cmbThemeChange(Sender: TObject);
+begin
+  {if cmbIcons.ItemIndex = 1 then
     tbExample.Images := dmMain.MenuImages_Gnome
   else if cmbIcons.ItemIndex = 2 then
     tbExample.Images := dmMain.MenuImages_Blue
   else
-    tbExample.Images := dmMain.MenuImages_NewLook;
+    tbExample.Images := dmMain.MenuImages_NewLook;}
+  VirtualImageTheme.ImageIndex := cmbTheme.ItemIndex;
 end;
 
 procedure TLangForm.cmbFontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);

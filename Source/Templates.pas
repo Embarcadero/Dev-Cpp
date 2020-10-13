@@ -58,7 +58,7 @@ type
   public
    constructor Create;
    destructor Destroy; override;
-   procedure ReadTemplateFile(const FileName: String);
+   procedure ReadTemplateFile(const FileName: String; const TypeImage: string = 'svg');
    function AddUnit: integer;
    procedure RemoveUnit(const index: integer);
    function Save: boolean;
@@ -98,7 +98,7 @@ begin
 	inherited;
 end;
 
-procedure TTemplate.ReadTemplateFile(const FileName: String);
+procedure TTemplate.ReadTemplateFile(const FileName: String; const TypeImage: string = 'svg');
 begin
   if assigned(fTemplate) then fTemplate.Free;
   if FileExists(FileName) then
@@ -114,6 +114,7 @@ begin
      exit;
    end;
 
+
   with fTemplate do
    begin
      fVersion:= ReadInteger(cTemplate, 'Ver', 2);
@@ -122,7 +123,7 @@ begin
 
      // template info
      fDesc:= ReadString(cTemplate, 'Description', '');
-     fIcon:= ReadString(cTemplate, 'Icon', '');
+     fIcon:= ReadString(cTemplate, TypeImage, '');
      fCategory:= ReadString(cTemplate, 'Category', '');
      if fCategory = '' then
        fCategory:= ReadString(cTemplate, 'Catagory', ''); // support the old format too
@@ -131,7 +132,7 @@ begin
      // read old style
      if (fVersion <= 0) then
       begin
-        fOptions.Icon:= ReadString(cProject, 'Icon', '');
+        fOptions.Icon:= ReadString(cProject, TypeImage, '');
         if ReadBool(cProject, 'Console', FALSE) then
          fOptions.typ:= dptCon
         else
@@ -148,7 +149,7 @@ begin
       end
      else // read new style
       begin
-        fOptions.Icon:= ReadString(cProject, 'Icon', '');
+        fOptions.Icon:= ReadString(cProject, TypeImage, '');
         fOptions.typ:= ReadInteger(cProject, 'Type', 0); // default = gui
         fOptions.Objfiles.DelimitedText := ReadString(cProject, 'ObjFiles', '');
         fOptions.Includes.DelimitedText:= ReadString(cProject, 'Includes', '');

@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg48"
+   sodipodi:docname="system_calendar.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata54">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs52">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter903"
+       x="-0.0456"
+       width="1.0912"
+       y="-0.050666667"
+       height="1.1013333">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.04"
+         id="feGaussianBlur905" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter919"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.48"
+         id="feGaussianBlur921" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter936"
+       x="-0.027428571"
+       width="1.0548571"
+       y="-0.192"
+       height="1.384">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.28"
+         id="feGaussianBlur938" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter944"
+       x="-0.015"
+       width="1.03"
+       y="-0.06"
+       height="1.12">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1"
+         id="feGaussianBlur946" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview50"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="96"
+     inkscape:cy="114.4759"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg48" />
+  <path
+     style="opacity:0.2;fill:#000000;stroke-width:4;filter:url(#filter903)"
+     d="m 24,28 c -4.432,0 -8,3.568 -8,8 V 67.599609 68 164 c 0,4.432 3.568,8 8,8 h 144 c 4.432,0 8,-3.568 8,-8 V 68 67.599609 36 c 0,-4.432 -3.568,-8 -8,-8 z"
+     id="path886"
+     inkscape:connector-curvature="0" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path4"
+     d="M 16,63.6 V 160 c 0,4.432 3.568,8 8,8 h 144 c 4.432,0 8,-3.568 8,-8 V 63.6 Z"
+     style="fill:#e4e4e4;stroke-width:4" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path6"
+     d="M 176,66 V 34 c 0,-4.432 -3.568,-8 -8,-8 H 24 c -4.432,0 -8,3.568 -8,8 v 32 z"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter944)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path8"
+     d="M 176,64 V 32 c 0,-4.432 -3.568,-8 -8,-8 H 24 c -4.432,0 -8,3.568 -8,8 v 32 z"
+     style="fill:#f54b3e;stroke-width:4" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 24 24 C 19.568 24 16 27.568 16 32 L 16 33 C 16 28.568 19.568 25 24 25 L 168 25 C 172.432 25 176 28.568 176 33 L 176 32 C 176 27.568 172.432 24 168 24 L 24 24 z "
+     id="path10" />
+  <rect
+     id="rect12"
+     y="104"
+     x="132"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect14"
+     y="104"
+     x="68"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect16"
+     y="104"
+     x="36"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect18"
+     y="136"
+     x="100"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect20"
+     y="136"
+     x="132"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect22"
+     y="136"
+     x="68"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect24"
+     y="136"
+     x="36"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect26"
+     y="72"
+     x="100"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect28"
+     y="72"
+     x="132"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect30"
+     y="72"
+     x="68"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <rect
+     id="rect32"
+     y="72"
+     x="36"
+     height="24"
+     width="24"
+     style="opacity:0.2;stroke-width:4" />
+  <circle
+     id="circle34"
+     r="12"
+     cy="118"
+     cx="112"
+     style="opacity:0.1;stroke-width:4;filter:url(#filter919)" />
+  <circle
+     id="circle36"
+     r="12"
+     cy="116"
+     cx="112"
+     style="fill:#f54b3e;stroke-width:4" />
+  <path
+     style="opacity:0.2;stroke-width:4;filter:url(#filter936)"
+     d="M 48 38 A 8 8 0 0 0 40 46 A 8 8 0 0 0 48 54 A 8 8 0 0 0 56 46 A 8 8 0 0 0 48 38 z M 144 38 A 8 8 0 0 0 136 46 A 8 8 0 0 0 144 54 A 8 8 0 0 0 152 46 A 8 8 0 0 0 144 38 z "
+     id="circle38" />
+  <circle
+     id="circle40"
+     r="8"
+     cy="44"
+     cx="48"
+     style="fill:#ffffff;stroke-width:4" />
+  <circle
+     id="circle44"
+     r="8"
+     cy="44"
+     cx="144"
+     style="fill:#ffffff;stroke-width:4" />
+</svg>

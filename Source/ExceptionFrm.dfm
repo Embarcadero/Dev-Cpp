@@ -5,7 +5,8 @@ object ExceptionFrm: TExceptionFrm
   Caption = 'Oops!'
   ClientHeight = 340
   ClientWidth = 600
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -259,6 +260,7 @@ object ExceptionFrm: TExceptionFrm
     Top = 160
     Width = 584
     Height = 60
+    Ctl3D = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -266,6 +268,7 @@ object ExceptionFrm: TExceptionFrm
     Font.Style = []
     Lines.Strings = (
       'memUserReport')
+    ParentCtl3D = False
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 3
@@ -277,6 +280,7 @@ object ExceptionFrm: TExceptionFrm
     Top = 226
     Width = 584
     Height = 60
+    Ctl3D = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -284,6 +288,7 @@ object ExceptionFrm: TExceptionFrm
     Font.Style = []
     Lines.Strings = (
       'memUserReport')
+    ParentCtl3D = False
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 4

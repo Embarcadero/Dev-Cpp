@@ -75,7 +75,7 @@ type
 implementation
 
 uses
-  System.UITypes, ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
+  System.IOUtils, System.UITypes, ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
 
 {$R *.dfm}
 
@@ -173,8 +173,7 @@ end;
 
 procedure TFormatterOptionsForm.CreateScratchFile;
 begin
-  synExample.Lines.SaveToFile(
-    devDirs.Exec + devFormatter.AStyleDir + 'DummyInput.txt');
+  synExample.Lines.SaveToFile(TPath.Combine(TPath.GetTempPath,'DummyInput.txt')); // devDirs.Exec + devFormatter.AStyleDir
 end;
 
 procedure TFormatterOptionsForm.LoadSettings;
@@ -249,7 +248,7 @@ begin
   if fCreating then
     Exit;
   // Apply to dummy file
-  DummyFileName := devDirs.Exec + devFormatter.AStyleDir + 'DummyInput.txt';
+  DummyFileName := TPath.Combine(TPath.GetTempPath,'DummyInput.txt'); //devDirs.Exec + devFormatter.AStyleDir
   AStyleOutput := devFormatter.FormatFile(DummyFileName, memFullCommand.Text);
 
   // Check if formatting finished correctly

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg14"
+   sodipodi:docname="apps_datovka.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata20">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs18">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter857"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.2"
+         id="feGaussianBlur859" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter873"
+       x="-0.050182593"
+       width="1.1003652"
+       y="-0.045999349"
+       height="1.0919987">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.839974"
+         id="feGaussianBlur875" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview16"
+     showgrid="false"
+     inkscape:zoom="2.45"
+     inkscape:cx="24"
+     inkscape:cy="72.979592"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14" />
+  <rect
+     style="opacity:0.2;stroke-width:4;filter:url(#filter857)"
+     width="160"
+     height="160"
+     x="16"
+     y="20"
+     rx="48"
+     ry="48"
+     id="rect2" />
+  <rect
+     style="fill:#00539b;stroke-width:4"
+     width="160"
+     height="160"
+     x="16"
+     y="16"
+     rx="48"
+     ry="48"
+     id="rect4" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 64 16 C 37.408 16 16 37.408 16 64 L 16 65 C 16 38.408 37.408 17 64 17 L 128 17 C 154.592 17 176 38.408 176 65 L 176 64 C 176 37.408 154.592 16 128 16 L 64 16 z "
+     id="path6" />
+  <path
+     inkscape:connector-curvature="0"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter873)"
+     d="m 68.415368,50 -6.156252,36 h 29.5 L 94.001304,72 112.0013,98 86.001304,122 87.92318,110 H 58.157552 l -6.156248,36 H 83.805992 C 115.75752,144.52946 135.42019,125.954 139.32943,100.35156 142.77546,77.78278 133.49787,52.602456 97.821616,50 Z"
+     id="path8" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#ffcb05;stroke-width:4"
+     d="m 68.415368,48 -6.156252,36 h 29.5 L 94.001304,70 112.0013,96 86.001304,120 87.92318,108 H 58.157552 l -6.156248,36 H 83.805992 C 115.75752,142.52946 135.42019,123.954 139.32943,98.351564 142.77546,75.78278 133.49787,50.602456 97.821616,48 Z"
+     id="path10" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 68.414062 48 L 62.257812 84 L 62.429688 84 L 68.414062 49 L 97.820312 49 C 128.7358 51.255174 139.78649 70.462172 139.95117 90.234375 C 140.1546 70.114186 129.257 50.293194 97.820312 48 L 68.414062 48 z M 110.3125 97.5625 L 86.75 119.30469 L 86 124 L 86.1875 123.82617 L 86.75 120.30469 L 110.3125 98.5625 L 111.57812 100.39062 L 112 100 L 110.3125 97.5625 z M 58.15625 108 L 52 144 L 52.171875 144 L 58.15625 109 L 87.761719 109 L 87.921875 108 L 58.15625 108 z "
+     id="path12" />
+</svg>

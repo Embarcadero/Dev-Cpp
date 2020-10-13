@@ -515,7 +515,7 @@ var
   //	Buffer: array[0..1024] of Char;
   Cmd, EmailBody, EmailSubject: String;
 begin
-{  // Move focus to other button
+  {// Move focus to other button
   btnSend.Default := false;
   btnContinue.Default := true;
 
@@ -559,7 +559,7 @@ begin
   except
     btnSend.Caption := 'Error sending bug report. Lol.';
     Exit;
-  end;                      }
+  end;}
 
   ShellExecute(GetDesktopWindow(), 'open', PChar('https://github.com/Embarcadero/Dev-Cpp/issues'), nil, nil, SW_SHOWNORMAL);
 

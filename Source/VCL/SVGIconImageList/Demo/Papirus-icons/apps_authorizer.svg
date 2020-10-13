@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg18"
+   sodipodi:docname="apps_authorizer.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata24">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs22">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter857"
+       x="-0.054"
+       width="1.108"
+       y="-0.0432"
+       height="1.0864">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.88"
+         id="feGaussianBlur859" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter873"
+       x="-0.068"
+       width="1.136"
+       y="-0.037090909"
+       height="1.0741818">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.36"
+         id="feGaussianBlur875" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview20"
+     showgrid="false"
+     inkscape:zoom="3.77"
+     inkscape:cx="96"
+     inkscape:cy="86.76205"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg18" />
+  <rect
+     id="rect2"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="8"
+     rx="8"
+     y="-160"
+     x="-180"
+     height="128"
+     width="160"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter857)" />
+  <rect
+     id="rect4"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="8"
+     rx="8"
+     y="-160"
+     x="-176"
+     height="128"
+     width="160"
+     style="fill:#8e8e8e;stroke-width:4" />
+  <rect
+     id="rect6"
+     ry="4"
+     rx="4"
+     y="160"
+     x="76"
+     height="8"
+     width="40"
+     style="opacity:0.5;stroke-width:4" />
+  <rect
+     id="rect8"
+     ry="8"
+     rx="8"
+     y="32"
+     x="44"
+     height="120"
+     width="104"
+     style="opacity:0.5;stroke-width:4" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 40 16 C 35.568 16 32 19.568 32 24 L 32 25 C 32 20.568 35.568 17 40 17 L 152 17 C 156.432 17 160 20.568 160 25 L 160 24 C 160 19.568 156.432 16 152 16 L 40 16 z "
+     id="path10" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path12"
+     d="M 88,52 V 93.406248 C 78.422524,96.792388 72.014252,105.84156 72,116 c 0,13.25483 10.745168,24 24,24 13.25483,0 24,-10.74517 24,-24 -0.0108,-10.1613 -6.41982,-19.214468 -16,-22.601564 V 76 h 16 V 60 h -16 v -8 z m 8,56 c 4.41828,0 8,3.58172 8,8 0,4.41828 -3.58172,8 -8,8 -4.418276,0 -8,-3.58172 -8,-8 0,-4.41828 3.581724,-8 8,-8 z"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter873)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path14"
+     d="M 88,48 V 89.406248 C 78.422524,92.792388 72.014252,101.84156 72,112 c 0,13.25483 10.745168,24 24,24 13.25483,0 24,-10.74517 24,-24 -0.0108,-10.1613 -6.41982,-19.214468 -16,-22.601564 V 72 h 16 V 56 h -16 v -8 z m 8,56 c 4.41828,0 8,3.58172 8,8 0,4.41828 -3.58172,8 -8,8 -4.418276,0 -8,-3.58172 -8,-8 0,-4.41828 3.581724,-8 8,-8 z"
+     style="fill:#ffffff;stroke-width:4" />
+</svg>

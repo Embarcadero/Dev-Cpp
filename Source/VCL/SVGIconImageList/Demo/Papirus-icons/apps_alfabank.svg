@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg14"
+   sodipodi:docname="apps_alfabank.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata20">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs18">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter848"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.2"
+         id="feGaussianBlur850" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter846"
+       x="-0.059999837"
+       width="1.1199997"
+       y="-0.040000072"
+       height="1.0800001">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.4999959"
+         id="feGaussianBlur848" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview16"
+     showgrid="false"
+     inkscape:zoom="2.86"
+     inkscape:cx="76.242498"
+     inkscape:cy="47.04895"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14" />
+  <rect
+     id="rect2"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="8"
+     rx="8"
+     y="-176"
+     x="-180"
+     height="160"
+     width="160"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter848)" />
+  <rect
+     id="rect4"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="8"
+     rx="8"
+     y="-176"
+     x="-176"
+     height="160"
+     width="160"
+     style="fill:#d62c21;fill-opacity:1;stroke-width:4" />
+  <path
+     inkscape:connector-curvature="0"
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="m 24,16 c -4.432,0 -8,3.568 -8,8 v 1 c 0,-4.432 3.568,-8 8,-8 h 144 c 4.432,0 8,3.568 8,8 v -1 c 0,-4.432 -3.568,-8 -8,-8 z"
+     id="path6" />
+  <path
+     id="path828"
+     d="m 95.863281,52.001953 a 6.0006,6.0006 0 0 0 -5.367187,3.609375 l -23,53.000002 11.007812,4.77734 L 83.445312,102 h 24.322268 l 4.6914,11.30078 11.08204,-4.60156 -22,-53.000001 A 6.0006,6.0006 0 0 0 95.863281,52.001953 Z M 95.876953,73.353516 102.78711,90 H 88.652344 Z M 66,130 v 12 h 60 v -12 z"
+     style="opacity:0.2;fill:#000000;fill-opacity:1;stroke:none;stroke-width:4.51312399;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter846)"
+     inkscape:connector-curvature="0" />
+  <path
+     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4.51312399;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 95.863281 50.001953 A 6.0006 6.0006 0 0 0 90.496094 53.611328 L 67.496094 106.61133 L 78.503906 111.38867 L 83.445312 100 L 107.76758 100 L 112.45898 111.30078 L 123.54102 106.69922 L 101.54102 53.699219 A 6.0006 6.0006 0 0 0 95.863281 50.001953 z M 95.876953 71.353516 L 102.78711 88 L 88.652344 88 L 95.876953 71.353516 z M 66 128 L 66 140 L 126 140 L 126 128 L 66 128 z "
+     id="path824" />
+</svg>

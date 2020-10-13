@@ -6,7 +6,8 @@ object PrintForm: TPrintForm
   Caption = 'Print file'
   ClientHeight = 194
   ClientWidth = 432
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -23,7 +24,7 @@ object PrintForm: TPrintForm
     Width = 75
     Height = 24
     Caption = '&Cancel'
-    Kind = bkCancel
+    ModalResult = 2
     NumGlyphs = 2
     TabOrder = 1
   end
@@ -33,7 +34,7 @@ object PrintForm: TPrintForm
     Width = 75
     Height = 24
     Caption = '&OK'
-    Kind = bkOK
+    ModalResult = 1
     NumGlyphs = 2
     TabOrder = 0
   end

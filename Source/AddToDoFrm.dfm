@@ -53,9 +53,11 @@ object AddToDoForm: TAddToDoForm
     Top = 140
     Width = 113
     Height = 24
+    Ctl3D = False
     MaxLength = 1
     MaxValue = 9
     MinValue = 1
+    ParentCtl3D = False
     TabOrder = 1
     Value = 1
   end
@@ -65,7 +67,6 @@ object AddToDoForm: TAddToDoForm
     Width = 75
     Height = 25
     Caption = 'OK'
-    Default = True
     TabOrder = 3
     OnClick = btnOKClick
   end
@@ -74,16 +75,18 @@ object AddToDoForm: TAddToDoForm
     Top = 172
     Width = 75
     Height = 25
-    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 4
+    OnClick = btnCancelClick
   end
   object txtUser: TEdit
     Left = 132
     Top = 140
     Width = 153
-    Height = 23
+    Height = 21
+    Ctl3D = False
+    ParentCtl3D = False
     TabOrder = 2
     Text = 'txtUser'
     OnKeyPress = txtUserKeyPress

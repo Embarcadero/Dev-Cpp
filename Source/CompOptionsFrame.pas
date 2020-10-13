@@ -132,7 +132,7 @@ begin
   end;
 
   // update string too
-  CompilerSet.SetOption(option, ValueToChar[option^.Value]);
+  CompilerSet.SetOption(option, option^.Value);
 end;
 
 end.

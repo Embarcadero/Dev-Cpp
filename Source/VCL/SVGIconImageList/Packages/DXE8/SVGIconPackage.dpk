@@ -1,0 +1,52 @@
+package SVGIconPackage;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'SVG Package for Ethea SVGIcon Components'}
+{$LIBSUFFIX '_DXE8'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  xmlrtl,
+  vcl;
+
+contains
+  SVG in '..\..\svg\SVG.pas',
+  SVGColor in '..\..\Svg\SVGColor.pas',
+  SVGCommon in '..\..\Svg\SVGCommon.pas',
+  SVGPaint in '..\..\Svg\SVGPaint.pas',
+  SVGParse in '..\..\Svg\SVGParse.pas',
+  SVGPath in '..\..\Svg\SVGPath.pas',
+  XmlLite in '..\..\Svg\XmlLite.pas',
+  SVGStyle in '..\..\Svg\SVGStyle.pas',
+  SVGTypes in '..\..\Svg\SVGTypes.pas',
+  GDIPKerning in '..\..\Svg\GDIPKerning.pas',
+  GDIPOBJ2 in '..\..\Svg\GDIPOBJ2.pas',
+  GDIPPathText in '..\..\Svg\GDIPPathText.pas';
+
+end.

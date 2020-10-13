@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg20"
+   sodipodi:docname="apps_opera_mini.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata26">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs24">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter859"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.2"
+         id="feGaussianBlur861" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter875"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.76"
+         id="feGaussianBlur877" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview22"
+     showgrid="false"
+     inkscape:zoom="2.86"
+     inkscape:cx="96"
+     inkscape:cy="96"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg20" />
+  <path
+     d="m 96,16.000004 a 80,80 0 0 0 -80,80 A 80,80 0 0 0 96,176 a 80,80 0 0 0 80,-79.999996 80,80 0 0 0 -80,-80 z m 0,32 a 36,48 0 0 1 36,48 A 36,48 0 0 1 96,144 36,48 0 0 1 60,96.000004 a 36,48 0 0 1 36,-48 z"
+     id="path841"
+     inkscape:connector-curvature="0"
+     style="opacity:0.2;fill:#000000;stroke-width:4;filter:url(#filter859)" />
+  <path
+     style="fill:#e74c3c;stroke-width:4"
+     inkscape:connector-curvature="0"
+     id="path2"
+     d="m 96,12.000004 a 80,80 0 0 0 -80,80 A 80,80 0 0 0 96,172 a 80,80 0 0 0 80,-79.999996 80,80 0 0 0 -80,-80 z m 0,32 a 36,48 0 0 1 36,48 A 36,48 0 0 1 96,140 36,48 0 0 1 60,92.000004 a 36,48 0 0 1 36,-48 z" />
+  <circle
+     style="opacity:0;stroke-width:8"
+     id="circle4"
+     r="80"
+     cy="92.000008"
+     cx="96" />
+  <circle
+     style="opacity:0;stroke-width:8"
+     id="circle6"
+     r="80"
+     cy="92.000008"
+     cx="96" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="m 95.998047,12.000004 a 80,80 0 0 0 -79.998047,80 80,80 0 0 0 0.02148,0.408203 80,80 0 0 1 79.976563,-79.408203 H 96 a 80,80 0 0 1 79.97656,79.582031 80,80 0 0 0 0.0215,-0.582031 80,80 0 0 0 -79.99805,-80 z M 131.93555,93.695316 A 36,48 0 0 1 96,140 36,48 0 0 1 60.064453,94.304692 36,48 0 0 0 60,96.000004 a 36,48 0 0 0 0.01953,0.50391 36,48 0 0 1 0.04492,-1.199222 A 36,48 0 0 0 96,141 a 36,48 0 0 0 35.93555,-46.304684 36,48 0 0 1 0.0508,1.818358 36,48 0 0 0 0.0137,-0.51367 36,48 0 0 0 -0.0644,-2.304688 z"
+     id="path8"
+     inkscape:connector-curvature="0" />
+  <circle
+     id="circle12"
+     r="44"
+     cy="144"
+     cx="144"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter875)" />
+  <circle
+     id="circle14"
+     r="44"
+     cy="140"
+     cx="144"
+     style="fill:#439f46;stroke-width:4" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path16"
+     d="m 162,158 v -36 m -36,0 18,20 18,-20 m -36,36 v -36"
+     style="fill:none;stroke:#ffffff;stroke-width:11.99923992;stroke-linecap:round;stroke-linejoin:round" />
+</svg>

@@ -5,7 +5,8 @@ object NewClassForm: TNewClassForm
   Caption = 'New class'
   ClientHeight = 338
   ClientWidth = 444
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -65,7 +66,7 @@ object NewClassForm: TNewClassForm
     Left = 88
     Top = 8
     Width = 348
-    Height = 21
+    Height = 19
     TabOrder = 0
     OnChange = txtNameChange
     OnKeyPress = txtNameKeyPress
@@ -104,7 +105,6 @@ object NewClassForm: TNewClassForm
       Width = 293
       Height = 21
       Enabled = False
-      ItemHeight = 13
       TabOrder = 1
       OnChange = cmbClassChange
     end
@@ -115,7 +115,6 @@ object NewClassForm: TNewClassForm
       Height = 21
       Style = csDropDownList
       Enabled = False
-      ItemHeight = 13
       TabOrder = 0
       Items.Strings = (
         'private'
@@ -126,7 +125,7 @@ object NewClassForm: TNewClassForm
       Left = 124
       Top = 64
       Width = 293
-      Height = 21
+      Height = 19
       Enabled = False
       TabOrder = 2
     end
@@ -135,7 +134,7 @@ object NewClassForm: TNewClassForm
     Left = 132
     Top = 224
     Width = 277
-    Height = 21
+    Height = 19
     TabOrder = 6
     OnChange = txtCppFileChange
   end
@@ -143,7 +142,7 @@ object NewClassForm: TNewClassForm
     Left = 132
     Top = 252
     Width = 277
-    Height = 21
+    Height = 19
     TabOrder = 7
     OnChange = txtCppFileChange
   end
@@ -163,7 +162,6 @@ object NewClassForm: TNewClassForm
     Width = 75
     Height = 25
     Caption = 'Create'
-    Default = True
     ModalResult = 1
     TabOrder = 9
     OnClick = btnCreateClick
@@ -173,7 +171,6 @@ object NewClassForm: TNewClassForm
     Top = 308
     Width = 75
     Height = 25
-    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 10
@@ -191,7 +188,7 @@ object NewClassForm: TNewClassForm
     Left = 88
     Top = 32
     Width = 348
-    Height = 21
+    Height = 19
     TabOrder = 1
   end
   object chkConstruct: TCheckBox

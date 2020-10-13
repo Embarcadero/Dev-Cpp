@@ -5,7 +5,8 @@ object NewFunctionForm: TNewFunctionForm
   Caption = 'New member function'
   ClientHeight = 270
   ClientWidth = 444
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -62,7 +63,7 @@ object NewFunctionForm: TNewFunctionForm
     Left = 88
     Top = 8
     Width = 348
-    Height = 21
+    Height = 19
     TabOrder = 0
     OnChange = txtTypeChange
   end
@@ -70,7 +71,7 @@ object NewFunctionForm: TNewFunctionForm
     Left = 88
     Top = 32
     Width = 348
-    Height = 21
+    Height = 19
     TabOrder = 1
     OnChange = txtTypeChange
   end
@@ -78,7 +79,7 @@ object NewFunctionForm: TNewFunctionForm
     Left = 88
     Top = 56
     Width = 348
-    Height = 21
+    Height = 19
     TabOrder = 2
   end
   object btnCreate: TButton
@@ -87,7 +88,6 @@ object NewFunctionForm: TNewFunctionForm
     Width = 75
     Height = 25
     Caption = 'Create'
-    Default = True
     ModalResult = 1
     TabOrder = 7
     OnClick = btnCreateClick
@@ -97,7 +97,6 @@ object NewFunctionForm: TNewFunctionForm
     Top = 240
     Width = 75
     Height = 25
-    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 8
@@ -108,7 +107,6 @@ object NewFunctionForm: TNewFunctionForm
     Width = 348
     Height = 21
     AutoDropDown = True
-    ItemHeight = 13
     Sorted = True
     TabOrder = 3
     Items.Strings = (

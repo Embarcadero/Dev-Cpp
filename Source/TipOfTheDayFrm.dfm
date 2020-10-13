@@ -6,7 +6,8 @@ object TipOfTheDayForm: TTipOfTheDayForm
   Caption = 'Tip Of The Day'
   ClientHeight = 263
   ClientWidth = 424
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11

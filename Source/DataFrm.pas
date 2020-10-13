@@ -23,7 +23,9 @@ interface
 
 uses
   SysUtils, Classes, Menus, Controls, SynEditHighlighter, SynHighlighterCpp,
-  CodeInsList, SynHighlighterRC, ImgList, System.ImageList;
+  CodeInsList, SynHighlighterRC, ImgList, System.ImageList,
+  Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
+  SVGIconImageListBase, SVGIconImageList;
 
 type
   PMRUItem = ^TMRUItem;
@@ -44,6 +46,13 @@ type
     MenuImages_Blue: TImageList;
     ProjectImage_Blue: TImageList;
     ClassImages: TImageList;
+    ImageThemeColection: TImageCollection;
+    SVGImageListMenuStyle: TSVGIconImageList;
+    SVGImageListProjectStyle: TSVGIconImageList;
+    SVGImageListClassStyle: TSVGIconImageList;
+    SVGImageListMessageStyle: TSVGIconImageList;
+    SVGIconImageWelcomeScreen: TSVGIconImageList;
+    EMBTImageCollection: TImageCollection;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
   private
@@ -96,6 +105,9 @@ type
 var
   dmMain: TdmMain;
 
+const
+  cDelphiStyle: array[0..3] of string = ('Windows','Windows10','Windows10 SlateGray','Windows10 Blue Whale');
+  cSVGColor: array[0..3] of string = ('None','clGrayText','clMoneyGreen','clSkyBlue');
 implementation
 
 uses

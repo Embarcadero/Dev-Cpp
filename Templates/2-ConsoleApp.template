@@ -2,6 +2,7 @@
 ver=1
 Name=Console Application
 Icon=ConsoleToo.ico
+svg=ConsoleToo.svg
 Description=A console application (MS-DOS window)
 Category=Basic
 

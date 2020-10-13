@@ -6,7 +6,8 @@ object LangForm: TLangForm
   Caption = 'Embarcadero Dev-C++ first time configuration'
   ClientHeight = 320
   ClientWidth = 560
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -15,6 +16,7 @@ object LangForm: TLangForm
   OldCreateOrder = False
   Position = poMainFormCenter
   OnClose = FormClose
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 15
@@ -25,33 +27,9 @@ object LangForm: TLangForm
     Height = 30
     Caption = '&Next'
     Default = True
-    Glyph.Data = {
-      36030000424D3603000000000000360000002800000010000000100000000100
-      18000000000000030000120B0000120B00000000000000000000BFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBF000000009836000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF00000000A13900A13900983600
-      0000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      0000008FFF8F00C54600B03F00B03F009836000000BFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000008FFF8F00C54600B03F00
-      B03F009836000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBF0000008FFF8F00C54600B03F00B03F009836000000BFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000008FFF8F00
-      B03F00B03F00A139009836000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBF00000000B03F00B03F00B03F00A1390098360000
-      00BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF00000000B03F00
-      B03F00B03F00B03F00A139000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBF00000000C54600B03F00B03F00B03F00A139000000BFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF00000000C54600C54600B03F00
-      B03F00B03F000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      0000008FFF8F00DD0000C54600C54600C546000000BFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF0000008FFF8F00DD0000C54600
-      0000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBF0000008FFF8F000000BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF000000BFBFBFBF
-      BFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBFBF}
+    ImageIndex = 39
+    ImageName = 'iconsnew-34'
+    Images = dmMain.SVGImageListMenuStyle
     TabOrder = 0
     OnClick = OkBtnClick
   end
@@ -86,8 +64,17 @@ object LangForm: TLangForm
         Top = 20
         Width = 250
         Height = 181
+        Ctl3D = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
         ItemHeight = 15
+        ParentCtl3D = False
+        ParentFont = False
         TabOrder = 0
+        StyleElements = [seClient, seBorder]
       end
     end
   end
@@ -148,7 +135,7 @@ object LangForm: TLangForm
     TabOrder = 3
     CodeFolding.CollapsedLineColor = clGrayText
     CodeFolding.FolderBarLinesColor = clGrayText
-    CodeFolding.ShowCollapsedLine = False
+    CodeFolding.ShowCollapsedLine = True
     CodeFolding.IndentGuidesColor = clGray
     CodeFolding.IndentGuides = True
     UseCodeFolding = False
@@ -191,15 +178,15 @@ object LangForm: TLangForm
       Left = 16
       Top = 12
       Width = 268
-      Height = 205
+      Height = 212
       Caption = 'Select your theme:'
       TabOrder = 0
-      object lblIcons: TLabel
+      object lblTheme: TLabel
         Left = 8
         Top = 104
-        Width = 31
+        Width = 39
         Height = 15
-        Caption = 'Icons:'
+        Caption = 'Theme:'
       end
       object lblColor: TLabel
         Left = 8
@@ -215,14 +202,30 @@ object LangForm: TLangForm
         Height = 15
         Caption = 'Font:'
       end
-      object cmbIcons: TComboBox
+      object VirtualImageTheme: TVirtualImage
+        Left = 3
+        Top = 135
+        Width = 383
+        Height = 103
+        ImageCollection = dmMain.ImageThemeColection
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 0
+        ImageName = 'Windows Classic'
+      end
+      object cmbTheme: TComboBox
         Left = 56
         Top = 102
         Width = 201
         Height = 23
         Style = csDropDownList
         TabOrder = 0
-        OnChange = cmbIconsChange
+        OnChange = cmbThemeChange
+        Items.Strings = (
+          'Windows Classic'
+          'Windows 10'
+          'Slate Gray'
+          'Blue Whale')
       end
       object cmbColors: TComboBox
         Left = 56
@@ -242,7 +245,10 @@ object LangForm: TLangForm
           'Matrix'
           'Obsidian'
           'GSS Hacker'
-          'Obvilion')
+          'Obvilion'
+          'PlasticCodeWrap'
+          'Monokai'
+          'Monokai Fresh')
       end
       object cmbFont: TComboBox
         Left = 56
@@ -256,123 +262,6 @@ object LangForm: TLangForm
         TabOrder = 2
         OnChange = FontChange
         OnDrawItem = cmbFontDrawItem
-      end
-      object tbExample: TToolBar
-        Left = 8
-        Top = 130
-        Width = 250
-        Height = 64
-        Align = alNone
-        AutoSize = True
-        BorderWidth = 5
-        Caption = 'Main'
-        DragKind = dkDock
-        Images = dmMain.MenuImages_NewLook
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 3
-        object NewFileBtn: TToolButton
-          Left = 0
-          Top = 0
-          Caption = '&Source File'
-          ImageIndex = 1
-        end
-        object OpenBtn: TToolButton
-          Left = 23
-          Top = 0
-          ImageIndex = 4
-        end
-        object SaveUnitBtn: TToolButton
-          Left = 46
-          Top = 0
-          ImageIndex = 6
-        end
-        object SaveAllBtn: TToolButton
-          Left = 69
-          Top = 0
-          ImageIndex = 8
-        end
-        object CloseBtn: TToolButton
-          Left = 92
-          Top = 0
-          ImageIndex = 9
-        end
-        object PrintBtn: TToolButton
-          Left = 115
-          Top = 0
-          ImageIndex = 10
-        end
-        object UndoBtn: TToolButton
-          Left = 138
-          Top = 0
-          ImageIndex = 13
-        end
-        object RedoBtn: TToolButton
-          Left = 161
-          Top = 0
-          ImageIndex = 14
-        end
-        object FindBtn: TToolButton
-          Left = 184
-          Top = 0
-          ImageIndex = 21
-        end
-        object ReplaceBtn: TToolButton
-          Left = 207
-          Top = 0
-          ImageIndex = 22
-          Wrap = True
-        end
-        object FindNextBtn: TToolButton
-          Left = 0
-          Top = 22
-          ImageIndex = 44
-        end
-        object GotoLineBtn: TToolButton
-          Left = 23
-          Top = 22
-          ImageIndex = 24
-        end
-        object CompileBtn: TToolButton
-          Left = 46
-          Top = 22
-          ImageIndex = 28
-        end
-        object RunBtn: TToolButton
-          Left = 69
-          Top = 22
-          ImageIndex = 31
-        end
-        object CompileAndRunBtn: TToolButton
-          Left = 92
-          Top = 22
-          ImageIndex = 33
-        end
-        object RebuildAllBtn: TToolButton
-          Left = 115
-          Top = 22
-          ImageIndex = 30
-        end
-        object DebugBtn: TToolButton
-          Left = 138
-          Top = 22
-          ImageIndex = 32
-        end
-        object ProfileBtn: TToolButton
-          Left = 161
-          Top = 22
-          ImageIndex = 43
-        end
-        object ProfilingInforBtn: TToolButton
-          Left = 184
-          Top = 22
-          ImageIndex = 47
-        end
-        object InsertBtn: TToolButton
-          Left = 207
-          Top = 22
-          ImageIndex = 18
-        end
       end
     end
   end

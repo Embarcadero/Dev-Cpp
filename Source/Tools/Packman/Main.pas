@@ -6,7 +6,9 @@ uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, StdCtrls, ComCtrls, ExtCtrls, ToolWin, Buttons,
-  ShellAPI, ImgList, IniFiles, System.ImageList;
+  ShellAPI, ImgList, IniFiles, System.ImageList, Vcl.BaseImageCollection,
+  Vcl.ImageCollection, Vcl.VirtualImageList, SVGIconImageList,
+  SVGIconImageListBase, SVGIconVirtualImageList, SVGIconImageCollection, SVGColor;
 {$ENDIF}
 {$IFDEF LINUX}
   SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -45,7 +47,6 @@ type
     PackageURL: TEdit;
     BitBtn1: TBitBtn;
     InstallBtn: TToolButton;
-    ToolbarImages: TImageList;
     ExitBtn: TToolButton;
     ToolButton1: TToolButton;
     AboutBtn: TToolButton;
@@ -58,7 +59,6 @@ type
     OpenDialog1: TOpenDialog;
     PopupMenu1: TPopupMenu;
     Copy1: TMenuItem;
-    MenuImages: TImageList;
     Verify1: TMenuItem;
     Remove1: TMenuItem;
     VerifyBtn: TToolButton;
@@ -69,6 +69,12 @@ type
     Help2: TMenuItem;
     N5: TMenuItem;
     HelpButton: TToolButton;
+    StylesMenu: TMenuItem;
+    VirtualImageList: TVirtualImageList;
+    ImageCollection: TImageCollection;
+    SVGImageCollection: TSVGIconImageCollection;
+    SVGVirtualImageList: TSVGIconVirtualImageList;
+    SVGImageList: TSVGIconImageList;
     procedure Label5Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure View1Click(Sender: TObject);
@@ -86,12 +92,21 @@ type
     procedure Verify1Click(Sender: TObject);
     procedure About1Click(Sender: TObject);
     procedure Help2Click(Sender: TObject);
+    procedure OnStyleClick(Sender: TObject);
   private
+    FStyleName: String;
+    procedure AddStylesToMenu;
     procedure AppHint(Sender: TObject);
     procedure Reload;
+    procedure SetStyle(SelStyleName: string);
+    procedure ReadDevCStyle(styleparam: string);
+    procedure SetColorIconTheme;
   public
     { Public declarations }
   end;
+  const
+    cDelphiStyle: array[0..3] of string = ('Windows', 'Windows10','Windows10 SlateGray','Windows10 Blue Whale');
+    cSVGColor: array[0..3] of string = ('None', 'clGrayText','clMoneyGreen','clSkyBlue'); //
 
 var
   MainForm: TMainForm;
@@ -100,7 +115,7 @@ implementation
 
 uses
   InstallWizards, PackmanUtils, RemoveForms, VerifyForms, AboutForms,
-  PackmanExitCodesU;
+  PackmanExitCodesU, Vcl.Themes; //, Config;
 
 {$R *.dfm}
 
@@ -108,6 +123,13 @@ procedure TMainForm.Label5Click(Sender: TObject);
 begin
   if Length(PackageURL.Text) > 0 then
       ShellExecuteA(GetDesktopWindow, nil, PAnsiChar(PackageURL.Text), nil, nil, 0);
+end;
+
+procedure TMainForm.OnStyleClick(Sender: TObject);
+  var SelStyleName : string;
+begin
+  SelStyleName :=  TMenuItem(Sender).Caption.Replace('&', '');
+  SetStyle(SelStyleName);
 end;
 
 procedure TMainForm.Exit1Click(Sender: TObject);
@@ -163,13 +185,18 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
-  FileName: AnsiString;
+  FileName: String;
   OptionAuto: Boolean;
   OptionUninstall: Boolean;
   OptionQuiet: Boolean;
-  OptionReqVersion: AnsiString;
+  OptionStyle: Boolean;
+  OptionReqVersion: String;
   i: Integer;
+  //StyleName: string;
+  StyleParam:string;
 begin
+  AddStylesToMenu;
+
   Randomize;
   Application.OnHint := AppHint;
 
@@ -183,6 +210,7 @@ begin
 
   OptionAuto := False;
   OptionUninstall := False;
+  OptionStyle := False;
   OptionQuiet := False;
   FileName := '';
   OptionReqVersion := '';
@@ -196,6 +224,8 @@ begin
       OptionUninstall := True
     else if CompareText(ParamStr(i), '/quiet') = 0 then
       OptionQuiet := True
+    else if CompareText(ParamStr(i), '/style') = 0 then
+      OptionStyle := True
     else if (CompareText(ParamStr(i), '/version') = 0)
       and (i + 1 <= ParamCount) then
     begin
@@ -254,10 +284,20 @@ begin
         Halt(PACKMAN_EXITCODE_NO_ERROR);
     end;
   end
+  else if OptionStyle then
+  begin
+    StyleParam := FileName;
+  end
   else if OptionAuto then
     Halt(PACKMAN_EXITCODE_FILE_NOT_FOUND);
 
   Reload;
+
+  ReadDevCStyle(StyleParam);
+  //if FStyleName = '' then
+    //FStyleName := ConfigPackman.GetStyle;
+  //SetStyle(StyleName);
+  //MessageDlg(FStyleName, mtInformation, [mbOK], 0);
 end;
 
 procedure TMainForm.PackagesSelectItem(Sender: TObject; Item: TListItem;
@@ -410,6 +450,22 @@ begin
   end;
 end;
 
+procedure TMainForm.AddStylesToMenu;
+var
+  Style: string;
+  Item : TMenuItem;
+begin
+  for Style in TStyleManager.StyleNames do begin
+    Item := TMenuItem.Create(MainMenu1);
+    Item.Caption := Style;
+    Item.OnClick := OnStyleClick;
+    if TStyleManager.ActiveStyle.Name = Style then
+      Item.Checked := TRUE;
+    StylesMenu.Add(Item);
+  end;
+
+end;
+
 procedure TMainForm.Help2Click(Sender: TObject);
 begin
   Application.MessageBox(
@@ -420,6 +476,82 @@ begin
     'To uninstall an installed library, select it and click on the' + #13#10 +
     'Remove button.',
     'Help', MB_ICONINFORMATION);
+end;
+
+procedure TMainForm.SetStyle(SelStyleName: string);
+begin
+  if TStyleManager.TrySetStyle(SelStyleName) then begin
+    for var i := 0 to StylesMenu.Count - 1 do
+      StylesMenu.Items[i].Checked := StylesMenu.Items[i].Caption.Replace('&', '').Equals(SelStyleName);
+
+    //ConfigPackman.SetStyle(SelStyleName);
+  end;
+end;
+
+procedure TMainForm.ReadDevCStyle(styleparam: string);
+var
+  Style: Integer;
+  StyleName: string;
+  IconColor:string;
+begin
+    if styleparam = '' then
+      Style := 0
+    else
+    begin
+      try
+        Style := StrToInt(styleparam);
+      except
+      end;
+    end;
+    case Style of
+      0: begin
+        StyleName := 'Windows';
+        SetColorIconTheme;
+        end;
+      1: begin
+        StyleName := 'Windows10';
+        IconColor := 'clGrayText';
+      end;
+      2: begin
+        StyleName := 'Windows10 SlateGray';
+        IconColor := 'clMoneyGreen';
+      end;
+      3: begin
+        StyleName := 'Windows10 Blue Whale';
+        IconColor := 'clSkyBlue';
+      end;
+      else begin
+        StyleName := 'Windows10';
+        IconColor := 'clGrayText';
+      end;
+    end;
+
+  TStyleManager.TrySetStyle(StyleName);
+  if Style > 0 then
+  begin
+    SVGVirtualImageList.FixedColor := StringToColor(cSVGColor[Style]);
+    SVGImageList.FixedColor := StringToColor(cSVGColor[Style]);
+  end;
+end;
+
+procedure TMainForm.SetColorIconTheme;
+begin
+        ToolBar1.Images := VirtualImageList;
+        Packages.LargeImages := ListImages;
+        InstallBtn.ImageIndex := 0;
+        VerifyBtn.ImageIndex := 10;
+        RemoveBtn.ImageIndex := 1;
+        HelpButton.ImageIndex := 4;
+        AboutBtn.ImageIndex := 2;
+        ExitBtn.ImageIndex := 8;
+        MainMenu1.images := VirtualImageList;
+        InstallPackage1.ImageIndex :=  0;
+        Verify1.ImageIndex := 10;
+        Remove1.ImageIndex := 1;
+        ReloadDatabase1.ImageIndex := 11;
+        Exit1.ImageIndex := 8;
+        Help2.ImageIndex := 4;
+        About1.ImageIndex := 9;
 end;
 
 end.

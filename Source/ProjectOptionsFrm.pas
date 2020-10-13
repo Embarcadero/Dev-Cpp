@@ -24,7 +24,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
-  ProjectTypes, Spin, ValEdit, CompOptionsFrame, ShellApi, Grids;
+  ProjectTypes, Spin, ValEdit, CompOptionsFrame, ShellApi, Grids,DataFrm;
 
 type
   TProjectOptionsFrm = class(TForm)
@@ -73,7 +73,6 @@ type
     dlgMakeInclude: TOpenDialog;
     InfoMakeBtn: TSpeedButton;
     edOverridenOutput: TEdit;
-    chkOverrideOutput: TCheckBox;
     tabFiles: TTabSheet;
     lvFiles: TTreeView;
     grpUnitOptions: TGroupBox;
@@ -137,6 +136,7 @@ type
     OptionsLink: TLabel;
     chkDefCpp: TCheckBox;
     lblCompilerHint: TLabel;
+    chkOverrideOutput: TCheckBox;
     procedure ListClick(Sender: TObject);
     procedure EditChange(SEnder: TObject);
     procedure ButtonClick(Sender: TObject);

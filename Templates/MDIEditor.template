@@ -2,6 +2,7 @@
 ver=1
 Name=MDI Editor
 Icon=Windows.ico
+svg=MDI.svg
 Description=A Win32 MDI file editor
 Category=Win32
 

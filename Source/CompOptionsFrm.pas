@@ -612,7 +612,7 @@ var
   dlgresult, I: integer;
 begin
   dlgresult := MessageDlg(
-    Format(Lang[ID_COPT_ADDCOMPILERS], [devDirs.Exec + 'MinGW32', devDirs.Exec + 'MinGW64']), mtConfirmation, [mbYes,
+    Format(Lang[ID_COPT_ADDCOMPILERS], [devDirs.Exec + 'TDM-GCC-64\x86_64-w64-mingw32', devDirs.Exec + 'TDM-GCC-64']), mtConfirmation, [mbYes,
     mbNo, mbCancel], 0);
 
   if dlgresult = mrCancel then

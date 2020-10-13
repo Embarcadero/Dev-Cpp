@@ -30,7 +30,7 @@ unit ImageTheme;
 interface
 
 uses
-  Windows, SysUtils, Classes, Controls, Graphics, Contnrs;
+  Windows, SysUtils, Classes, Controls, Graphics, Contnrs, VirtualImageList;
 
 type
   TImageThemeClass = class of TCustomImageTheme;
@@ -82,19 +82,18 @@ type
   public
     constructor Create; override;
   end;
-  
+
 
   TNewLookImageTheme = class(TDevImageTheme)
   public
     constructor Create; override;
   end;
 
-  
+
   TBlueImageTheme = class(TDevImageTheme)
   public
     constructor Create; override;
   end;
-
 
   TCustomImageThemeFactory = class
   private
@@ -394,6 +393,7 @@ begin
 
   FTitle := 'Blue';
 end;
+
 
 //----------------- TCustomImageThemeFactory ---------------------------------------------------------------------------
 

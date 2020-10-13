@@ -1,11 +1,12 @@
 object ProcessListForm: TProcessListForm
   Left = 511
   Top = 339
-  Width = 425
-  Height = 137
   BorderIcons = []
   Caption = 'Attach to process'
-  Color = clBtnFace
+  ClientHeight = 98
+  ClientWidth = 409
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -29,16 +30,20 @@ object ProcessListForm: TProcessListForm
     Top = 64
     Width = 75
     Height = 25
+    Caption = 'OK'
+    ModalResult = 1
+    NumGlyphs = 2
     TabOrder = 0
-    Kind = bkOK
   end
   object CancelBtn: TBitBtn
     Left = 326
     Top = 64
     Width = 75
     Height = 25
+    Caption = 'Cancel'
+    ModalResult = 2
+    NumGlyphs = 2
     TabOrder = 1
-    Kind = bkCancel
   end
   object ProcessCombo: TComboBox
     Left = 16
@@ -46,7 +51,6 @@ object ProcessListForm: TProcessListForm
     Width = 385
     Height = 23
     Style = csDropDownList
-    ItemHeight = 15
     TabOrder = 2
   end
 end

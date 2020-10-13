@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg18"
+   sodipodi:docname="google_android_wear.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata24">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs22">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter853"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.04"
+         id="feGaussianBlur855" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter881"
+       x="-0.072"
+       width="1.144"
+       y="-0.036"
+       height="1.072">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.4"
+         id="feGaussianBlur883" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview20"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="96"
+     inkscape:cy="95.625294"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg18" />
+  <rect
+     id="rect2"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="76"
+     rx="76"
+     y="-172"
+     x="-176"
+     height="152"
+     width="152"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter853)" />
+  <rect
+     id="rect4"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="76"
+     rx="76"
+     y="-172"
+     x="-172"
+     height="152"
+     width="152"
+     style="fill:#09a2ec;stroke-width:4" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path6"
+     d="m 64,20 c -4.432,0 -8,3.568 -8,8 v 16 c 0,4.432 3.568,8 8,8 h 64 c 4.432,0 8,-3.568 8,-8 V 28 c 0,-4.432 -3.568,-8 -8,-8 z m 0,40 c -4.432,0 -8,3.568 -8,8 v 64 c 0,4.432 3.568,8 8,8 h 64 c 4.432,0 8,-3.568 8,-8 V 68 c 0,-4.432 -3.568,-8 -8,-8 z m 0,88 c -4.432,0 -8,3.568 -8,8 v 16 c 0,4.432 3.568,8 8,8 h 64 c 4.432,0 8,-3.568 8,-8 v -16 c 0,-4.432 -3.568,-8 -8,-8 z"
+     style="opacity:0.2;fill-rule:evenodd;stroke-width:4;filter:url(#filter881)" />
+  <rect
+     id="rect8"
+     ry="8"
+     rx="8"
+     y="16"
+     x="56"
+     height="32"
+     width="80"
+     style="fill:#e4e4e4;stroke-width:4" />
+  <rect
+     id="rect10"
+     ry="8"
+     rx="8"
+     y="144"
+     x="56"
+     height="32"
+     width="80"
+     style="fill:#e4e4e4;stroke-width:4" />
+  <rect
+     id="rect12"
+     ry="8"
+     rx="8"
+     y="56"
+     x="56"
+     height="80"
+     width="80"
+     style="fill:#e4e4e4;stroke-width:4" />
+  <path
+     style="opacity:0.2;fill:#ffffff;fill-rule:evenodd;stroke-width:4"
+     d="M 64 16 C 59.568 16 56 19.568 56 24 L 56 25 C 56 20.568 59.568 17 64 17 L 128 17 C 132.432 17 136 20.568 136 25 L 136 24 C 136 19.568 132.432 16 128 16 L 64 16 z M 64 56 C 59.568 56 56 59.568 56 64 L 56 65 C 56 60.568 59.568 57 64 57 L 128 57 C 132.432 57 136 60.568 136 65 L 136 64 C 136 59.568 132.432 56 128 56 L 64 56 z M 64 144 C 59.568 144 56 147.568 56 152 L 56 153 C 56 148.568 59.568 145 64 145 L 128 145 C 132.432 145 136 148.568 136 153 L 136 152 C 136 147.568 132.432 144 128 144 L 64 144 z "
+     id="path14" />
+</svg>

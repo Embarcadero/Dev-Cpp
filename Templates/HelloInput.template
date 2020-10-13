@@ -2,6 +2,7 @@
 ver=1
 Name=Input Loop
 Icon=ConsoleToo.ico
+svg=ConsoleToo.svg
 Description=A console with an input loop
 Category=Console
 

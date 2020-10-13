@@ -2,6 +2,7 @@
 ver=1
 Name=Static Library
 Icon=StaticLib.ico
+svg=StaticLib.svg
 Description=A static library (.a)
 Category=Basic
 

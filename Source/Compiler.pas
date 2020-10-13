@@ -205,7 +205,7 @@ end;
 procedure TCompiler.WriteMakeHeader(var F: TextFile);
 begin
   Writeln(F, '# Project: ' + fProject.Name);
-  Writeln(F, '# Makefile created by Dev-C++ ' + DEVCPP_VERSION);
+  Writeln(F, '# Makefile created by Embarcadero Dev-C++ ' + DEVCPP_VERSION);
   Writeln(F);
   if fCheckSyntax then begin
     Writeln(F, '# This Makefile is written for syntax check!');
@@ -536,13 +536,13 @@ begin
       if option.IsC then begin
         if Assigned(option.Choices) then begin
           if Assigned(fProject) then
-            val := CharToValue(fProject.Options.CompilerOptions[I + 1])
+            val := fProject.Options.CompilerOptions[I]
           else
             val := option.Value;
           if (val > 0) and (val < option.Choices.Count) then
             fCompileParams := fCompileParams + ' ' + option.Setting +
               option.Choices.Values[option.Choices.Names[val]];
-        end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I + 1], 0) = 1)) or (not
+        end else if (Assigned(fProject) and (fProject.Options.CompilerOptions[I] = 1)) or (not
           Assigned(fProject)) then begin
           fCompileParams := fCompileParams + ' ' + option.Setting;
         end;
@@ -550,13 +550,13 @@ begin
       if option.IsCpp then begin
         if Assigned(option.Choices) then begin
           if Assigned(fProject) then
-            val := CharToValue(fProject.Options.CompilerOptions[I + 1])
+            val := fProject.Options.CompilerOptions[I]
           else
             val := option.Value;
           if (val > 0) and (val < option.Choices.Count) then
             fCppCompileParams := fCppCompileParams + ' ' + option.Setting +
               option.Choices.Values[option.Choices.Names[val]];
-        end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I + 1], 0) = 1)) or (not
+        end else if (Assigned(fProject) and (fProject.Options.CompilerOptions[I] = 1)) or (not
           Assigned(fProject)) then begin
           fCppCompileParams := fCppCompileParams + ' ' + option.Setting;
         end;
@@ -1170,13 +1170,13 @@ begin
       if option.IsLinker then
         if Assigned(option.Choices) then begin
           if Assigned(fProject) then
-            val := CharToValue(fProject.Options.CompilerOptions[I + 1])
+            val := fProject.Options.CompilerOptions[I]
           else
             val := option.Value;
           if (val > 0) and (val < option.Choices.Count) then
             fLibrariesParams := fLibrariesParams + ' ' + option.Setting +
               option.Choices.Values[option.Choices.Names[val]];
-        end else if (Assigned(fProject) and (StrToIntDef(fProject.Options.CompilerOptions[I + 1], 0) = 1)) or (not
+        end else if (Assigned(fProject) and (fProject.Options.CompilerOptions[I] = 1)) or (not
           Assigned(fProject)) then
           fLibrariesParams := fLibrariesParams + ' ' + option.Setting;
     end;

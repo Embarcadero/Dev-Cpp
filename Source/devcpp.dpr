@@ -20,15 +20,15 @@
 program devcpp;
 {$R 'icons.res' 'icons.rc'}
 {$R 'DefaultFiles.res' 'DefaultFiles.rc'}
-{%File 'LangIDs.inc'}
 
 uses
-  FastMM4 in 'FastMM4.pas',
+  FastMM5 in 'FastMM5.pas',
   Windows,
   Forms,
   sysUtils,
   SHFolder,
   Messages,
+  System.IOUtils,
   main in 'main.pas' {MainForm},
   MultiLangSupport in 'MultiLangSupport.pas',
   Version in 'Version.pas',
@@ -87,15 +87,31 @@ uses
   PackmanExitCodesU in 'Tools\Packman\PackmanExitCodesU.pas',
   ImageTheme in 'ImageTheme.pas',
   Instances in 'Instances.pas',
-  CharUtils in 'CharUtils.pas';
+  CharUtils in 'CharUtils.pas',
+  ConsoleAppHostFrm in 'ConsoleAppHostFrm.pas' {ConsoleAppHost},
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.res}
 
 var
   AppData, INIFileName, ExeFolder: String;
-  Buffer: array[0..MAX_PATH] of char;
   PrevInstance: THandle;
 begin
+  // Configure memory manager
+  {$IFDEF FASTMM_DEBUG_MODE}
+    FastMM_LogToFileEvents := FastMM_LogToFileEvents + [mmetUnexpectedMemoryLeakDetail, mmetUnexpectedMemoryLeakSummary];
+    FastMM_MessageBoxEvents := FastMM_MessageBoxEvents + [mmetUnexpectedMemoryLeakSummary];
+    if FastMM_LoadDebugSupportLibrary then
+    begin
+      FastMM_EnterDebugMode;
+    end else
+    begin
+      MessageBox(0, FastMM_DebugSupportLibraryNotAvailableError, FastMM_DebugSupportLibraryNotAvailableError_Caption, MB_OK or MB_ICONERROR or MB_TASKMODAL or MB_DEFAULT_DESKTOP_ONLY);
+      Halt(217);
+    end;
+  {$ENDIF}
+
   // Check for previous instances (only allow once instance)
   // If we are able to find a previous instance, activate that one instead
   PrevInstance := GetPreviousInstance;
@@ -103,6 +119,10 @@ begin
     SendToPreviousInstance(PrevInstance, String(GetCommandLineW));
     Exit;
   end;
+
+  devData.IsPortable := TPath.GetFileNameWithoutExtension(ParamStr(0)).EndsWith('portable', True)
+                        or FindCmdLineSwitch('portable', True)
+                        or FindCmdLineSwitch('-portable', True);
 
   // Read INI filename
   INIFileName := ChangeFileExt(ExtractFileName(Application.ExeName), INI_EXT);
@@ -121,24 +141,19 @@ begin
     else
       devData.INIFileName := IncludeTrailingBackslash(ParamStr(2)) + INIFileName;
   end else begin
-
     // default dir should be %APPDATA%\Dev-Cpp
-    AppData := '';
-    if SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, Buffer)) then
-      AppData := IncludeTrailingBackslash(String(Buffer));
+    AppData := IncludeTrailingBackslash(GetHomePath);
 
     // Store the INI file in %APPDATA% or if we are not allowed to do so, in the exe directory
-    if (AppData <> '') and (DirectoryExists(AppData + 'Embarcadero\Dev-Cpp') or CreateDir(AppData + 'Embarcadero\Dev-Cpp')) then
+    if (not devData.IsPortable) and ((AppData <> '') and (DirectoryExists(AppData + 'Embarcadero\Dev-Cpp') or CreateDir(AppData + 'Embarcadero\Dev-Cpp'))) then
       devData.INIFileName := AppData + 'Embarcadero\Dev-Cpp\' + INIFileName
     else
+    begin
       // store it in the default portable config folder anyways...
       devData.INIFileName := ExeFolder + 'config\' + INIFileName;
+      TDirectory.CreateDirectory(TPath.GetDirectoryName(devData.INIFileName));
+    end;
   end;
-
-  // free ansistrings...
-  SetLength(AppData, 0);
-  SetLength(INIFileName, 0);
-  SetLength(ExeFolder, 0);
 
   // Load settings
   devData.ReadSelf;

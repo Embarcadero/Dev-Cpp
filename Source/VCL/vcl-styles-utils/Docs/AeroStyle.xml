@@ -1,0 +1,1548 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!--
+
+    Windows Vista Aero Style Guide Definition
+
+    Created:    06-23-2005    Microsoft
+
+-->
+
+<visualstyleguide>
+    <!-- 
+    // 
+    // Those XML schema files have a matching .H file 
+    // that contains the symbol prefix for each class, part and state
+    //
+    -->
+    <!-- Base types -->
+    <symbolfile>vssym32.xml</symbolfile>
+    <!-- Style classes and types -->
+    <symbolfile>vsstyle.xml</symbolfile>
+
+    <!--
+    //
+    // Globals
+    //
+    --> 
+    <globals>
+        <EdgeDkShadowColor> 100 100 100</EdgeDkShadowColor>
+        <EdgeFillColor>     220 220 220</EdgeFillColor>
+        <EdgeHighLightColor>244 247 252</EdgeHighLightColor>
+        <EdgeLightColor>    180 180 180</EdgeLightColor>
+        <EdgeShadowColor>   180 180 180</EdgeShadowColor>
+        <GlowColor>         255 255 255</GlowColor>
+    </globals>
+
+    <!--
+    //
+    // System Metrics
+    //
+    -->
+    <sysmetrics>
+        <!-- Colors -->
+        <ActiveBorder>           ##Globals.EdgeLightColor    </ActiveBorder>
+        <ActiveCaption>          153 180 209                 </ActiveCaption>
+        <AppWorkSpace>           171 171 171                 </AppWorkSpace>
+        <Background>               0   0   0                 </Background>
+        <Btnface>                240 240 240                 </Btnface>
+        <BtnHighlight>           255 255 255                 </BtnHighlight>
+        <BtnShadow>              160 160 160                 </BtnShadow>
+        <BtnText>                  0   0   0                 </BtnText>
+        <ButtonAlternateFace>      0   0   0                 </ButtonAlternateFace>
+        <CaptionText>              0   0   0                 </CaptionText>
+        <DkShadow3d>             105 105 105                 </DkShadow3d>
+        <GradientActiveCaption>  185 209 234                 </GradientActiveCaption>
+        <GradientInactiveCaption>215 228 242                 </GradientInactiveCaption>
+        <GrayText>               109 109 109                 </GrayText>
+        <Highlight>               51 153 255                 </Highlight>
+        <HighlightText>          255 255 255                 </HighlightText>
+        <HotTracking>              0 102 204                 </HotTracking>
+        <InfoBk>                 255 255 225                 </InfoBk>
+        <InfoText>                 0   0   0                 </InfoText>
+        <InactiveBorder>         ##Globals.EdgeHighLightColor</InactiveBorder>
+        <InactiveCaption>        191 205 219                 </InactiveCaption>
+        <InactiveCaptionText>     67  78  84                 </InactiveCaptionText>
+        <Light3d>                227 227 227                 </Light3d>
+        <Menu>                   ##Sysmetrics.BtnFace        </Menu>
+        <MenuBar>                ##Sysmetrics.BtnFace        </MenuBar>
+        <MenuHilight>            ##Sysmetrics.Highlight      </MenuHilight>
+        <MenuText>               ##Sysmetrics.BtnText        </MenuText>
+        <Scrollbar>              200 200 200                 </Scrollbar>
+        <Window>                 255 255 255                 </Window>
+        <WindowFrame>            100 100 100                 </WindowFrame>
+        <WindowText>               0   0   0                 </WindowText>
+
+        <!-- Fonts -->
+        <CaptionFont>     Segoe UI, 9, Quality:ClearType</CaptionFont>
+        <IconTitleFont>   ##Sysmetrics.MenuFont         </IconTitleFont>
+        <MenuFont>        Segoe UI, 9, Quality:ClearType</MenuFont>
+        <MsgBoxFont>      ##Sysmetrics.MenuFont         </MsgBoxFont>
+        <SmallCaptionFont>Segoe UI, 9, Quality:ClearType</SmallCaptionFont>
+        <StatusFont>      ##Sysmetrics.MenuFont         </StatusFont>
+
+        <!-- Metrics -->
+        <CaptionBarWidth>   21</CaptionBarWidth>
+        <CaptionBarHeight>  21</CaptionBarHeight>
+        <MenuBarWidth>      19</MenuBarWidth>
+        <MenuBarHeight>     19</MenuBarHeight>
+        <ScrollbarHeight>   17</ScrollbarHeight>
+        <ScrollbarWidth>    17</ScrollbarWidth>
+        <SizingBorderWidth> 1 </SizingBorderWidth>
+        <SMCaptionBarHeight>17</SMCaptionBarHeight>
+        <SMCaptionBarWidth> 17</SMCaptionBarWidth>
+        <PaddedBorderWidth> 4 </PaddedBorderWidth>
+    </sysmetrics>
+
+    <!--
+    //
+    // Class Data
+    //
+    -->
+
+    <!-- 
+    //
+    //    Aero Wizard Style, implemented by AeroWizard
+    //
+    -->
+    <class name="AeroWizardStyle">
+        <part name="Titlebar">
+            <caption>
+                <Font>##Sysmetrics.CaptionFont</Font>
+                <ClassicValue type="Font">CaptionFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="HeaderArea">
+            <caption>
+                <Font>##TextStyle.MainInstruction.Font</Font>
+                <TextColor>##TextStyle.MainInstruction.TextColor</TextColor>
+                <ClassicValue type="TextColor">##TextStyle.MainInstruction.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.MainInstruction.ClassicFont</ClassicValue>
+            </caption>
+            <colorhints>
+                <FillColorHint>255 255 255</FillColorHint>
+                <ClassicValue type="FillColorHint">threedface</ClassicValue>
+            </colorhints>
+        </part>
+        <part name="Button">
+            <caption>
+                <Font>##TextStyle.ControlLabel.Font</Font>
+                <TextColor>##TextStyle.ControlLabel.TextColor</TextColor>
+                <ClassicValue type="TextColor">##TextStyle.ControlLabel.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.ControlLabel.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="ContentArea">
+            <caption>
+                <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+                <Font>##TextStyle.BodyText.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+            <colorhints>
+                <FillColorHint>255 255 255</FillColorHint>
+                <ClassicValue type="FillColorHint">threedface</ClassicValue>
+            </colorhints>
+        </part>
+        <!-- part name="CommandArea"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Button Style, implemented by Button
+    //
+    -->
+    <class name="ButtonStyle">
+        <part name="Checkbox">
+            <colorhints>
+                <AccentColorHint>54 89 152</AccentColorHint>
+                <BorderColorHint>142 143 143</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="CommandLink" -->
+        <part name="Groupbox">
+            <colorhints>
+                <BorderColorHint>213 223 229</BorderColorHint>
+            </colorhints>
+        </part>
+        <part name="Pushbutton">
+            <colorhints>
+                <AccentColorHint>54 89 152</AccentColorHint>
+                <BorderColorHint>142 143 143</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+            <state name="Defaulted">
+                <colorhints>
+                    <AccentColorHint>4 204 255</AccentColorHint>
+                </colorhints>
+            </state>
+        </part>
+        <part name="Radiobutton">
+            <colorhints>
+                <AccentColorHint>54 89 152</AccentColorHint>
+                <BorderColorHint>142 143 143</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="CommandLinkGlyph"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    ComboBox Style, implemented by ComboBox
+    //
+    -->
+    <class name="ComboboxStyle">
+        <colorhints>
+            <BorderColorHint>171 173 179</BorderColorHint>
+        </colorhints>
+        <part name="DropDownButton">
+            <colorhints>
+                <BorderColorHint>102 102 102</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="DropDownButtonRight">
+            <colorhints>
+                <BorderColorHint>102 102 102</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="DropDownButtonLeft">
+            <colorhints>
+                <BorderColorHint>102 102 102</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="ReadOnly">
+            <colorhints>
+                <BorderColorHint>102 102 102</BorderColorHint>
+                <FillColorHint>216 216 216</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="Border"></part-->
+        <!-- part name="CueBanner"></part-->
+    </class>
+    
+    <!-- 
+    //
+    // Control Panel Style, implemented by ControlPanel
+    //
+    -->
+    <class name="ControlPanelStyle">
+    
+        <!-- Static text in Control Panel content pane -->
+        <part name="ContentPaneLabel">
+            <caption>
+                <TextColor>##TextStyle.Label.TextColor</TextColor>
+                <Font>##TextStyle.Label.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.Label.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.Label.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        
+        <!-- Static text in Control Panel navigation pane -->
+        <part name="NavigationPaneLabel">
+            <caption>
+                <TextColor>21 28 85</TextColor>
+                <Font>##TextStyle.BodyTitle.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.BodyTitle.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyTitle.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        
+        <!-- Instruction text in Control Panel content pane -->
+        <part name="Title">
+            <caption>
+                <TextColor>##TextStyle.MainInstruction.TextColor</TextColor>
+                <Font>##TextStyle.MainInstruction.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.MainInstruction.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.MainInstruction.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+
+        <!-- Static text in Control Panel content pane -->
+        <part name="BodyText">
+            <caption>
+                <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+                <Font>##TextStyle.BodyText.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        
+        <!-- Static bold text in Control Panel content pane -->
+        <part name="BodyTitle">
+            <caption>
+                <TextColor>##TextStyle.BodyTitle.TextColor</TextColor>
+                <Font>##TextStyle.BodyTitle.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.BodyTitle.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyTitle.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+
+        <!-- Help link text in Control Panel content pane -->
+        <part name="HelpLink">
+            <caption>
+                <TextColor>##TextStyle.HyperlinkText.TextColor</TextColor>
+                <Font>##TextStyle.HyperlinkText.Font</Font>
+                <ClassicValue type="TextColor">HotLight</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Hot">
+                <caption>
+                    <TextColor>##TextStyle.HyperlinkText.Hot.TextColor</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Hot.Font</Font>
+                    <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Hot.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Hot.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Pressed">
+                <caption>
+                    <TextColor>##TextStyle.HyperlinkText.Pressed.TextColor</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Pressed.Font</Font>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Pressed.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Disabled">
+                 <caption>
+                    <TextColor>##TextStyle.HyperlinkText.Disabled.TextColor</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Disabled.Font</Font>
+                    <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Disabled.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Disabled.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+        </part>
+        
+        <!-- Content link text in Control Panel content pane -->
+        <part name="ContentLink">
+            <caption>
+                <TextColor>##TextStyle.HyperlinkText.TextColor</TextColor>
+                <Font>##TextStyle.HyperlinkText.Font</Font>
+                <ClassicValue type="TextColor">HotLight</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Hot">
+                <caption>
+                    <TextColor>##TextStyle.HyperlinkText.Hot.TextColor</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Hot.Font</Font>
+                    <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Hot.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Hot.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Pressed">
+                <caption>
+                    <TextColor>##TextStyle.HyperlinkText.Pressed.TextColor</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Pressed.Font</Font>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Pressed.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Disabled">
+                 <caption>
+                    <TextColor>##TextStyle.HyperlinkText.Disabled.TextColor</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Disabled.Font</Font>
+                    <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Disabled.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Disabled.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+        </part>
+        
+        <!-- Navigation link text in Control Panel navigation pane -->
+        <part name="TaskLink">
+            <caption>
+                <TextColor>21 28 85</TextColor>
+                <Font>##TextStyle.HyperlinkText.Font</Font>
+                <ClassicValue type="TextColor">HotLight</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Hot">
+                <caption>
+                    <TextColor>7 74 229</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Hot.Font</Font>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Hot.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Pressed">
+                <caption>
+                    <TextColor>7 74 229</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Pressed.Font</Font>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Pressed.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Disabled">
+                <!-- Caution disabled navigation link text color must show over the NavigationPane Fill -->
+                <caption>
+                    <TextColor>128 128 128</TextColor>
+                    <Font>##TextStyle.HyperlinkText.Disabled.Font</Font>
+                    <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Disabled.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Disabled.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Page">
+                <caption>
+                    <TextColor>21 28 85</TextColor>
+                    <Font>Segoe UI, 9, Bold, Quality:ClearType</Font>
+                    <ClassicValue type="TextColor">WindowText</ClassicValue>
+                    <ClassicValue type="Font">MenuFont;;bold</ClassicValue>
+                </caption>
+            </state>
+        </part>
+
+        <!-- Section title link text in Control Panel content pane -->
+        <part name="SectionTitleLink">
+            <caption>
+                <TextColor>0 110 18</TextColor>
+                <Font>Segoe UI, 12, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">HotLight</ClassicValue>
+                <ClassicValue type="Font">CaptionFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">CaptionFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Hot">
+                <caption>
+                    <TextColor>0 174 29</TextColor>
+                    <Font>Segoe UI, 12, Underline, Quality:ClearType</Font>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">CaptionFont;;;underline</ClassicValue>
+                </caption>
+            </state>
+        </part>
+        
+        <!-- Grouping label text in Control Panel content pane -->
+        <part name="GroupText">
+            <caption>
+                <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+                <Font>##TextStyle.BodyText.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        
+        <!-- Control Panel content pane -->
+        <part name="ContentPane">
+            <colorhints>
+                <FillColorHint>255 255 255</FillColorHint>
+                <ClassicValue type="FillColorHint">window</ClassicValue>
+            </colorhints>
+        </part>
+        
+        <!-- Control Panel content pane divider line -->
+        <part name="ContentPaneLine">
+            <colorhints>
+                <FillColorHint>204 204 204</FillColorHint>
+                <ClassicValue type="FillColorHint">buttonshadow</ClassicValue>
+            </colorhints>
+        </part>
+        
+        <!-- Control Panel banner background -->
+        <part name="BannerArea">
+            <colorhints>
+                <FillColorHint>255 255 198</FillColorHint>
+                <ClassicValue type="FillColorHint">window</ClassicValue>
+            </colorhints>
+        </part>
+        
+        <!-- Control Panel navigation pane -->
+        <part name="NavigationPane">
+            <colorhints>
+                <FillColorHint>86 147 138</FillColorHint>
+                <ClassicValue type="FillColorHint">window</ClassicValue>
+            </colorhints>
+        </part>
+        
+        <!-- Control Panel navigation pane divider line -->
+        <part name="NavigationPaneLine">
+            <colorhints>
+                <FillColorHint>101 162 150</FillColorHint>
+                <ClassicValue type="FillColorHint">buttonshadow</ClassicValue>
+            </colorhints>
+        </part>
+        
+        <!-- Control Panel command button area used with large content panes -->
+        <part name="LargeCommandArea">
+            <colorhints>
+                <FillColorHint>240 240 240</FillColorHint>
+                <ClassicValue type="FillColorHint">window</ClassicValue>
+            </colorhints>
+        </part>
+        
+        <!-- Control Panel command button area used with small content panes -->
+        <part name="SmallCommandArea">
+            <colorhints>
+                <FillColorHint>255 255 255</FillColorHint>
+                <ClassicValue type="FillColorHint">window</ClassicValue>
+            </colorhints>
+        </part>
+        
+        <!-- Control Panel pushbuttons -->
+        <part name="Button">
+            <caption>
+                <TextColor>##TextStyle.ControlLabel.TextColor</TextColor>
+                <Font>##TextStyle.ControlLabel.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.ControlLabel.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.ControlLabel.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+
+        <!-- Message text in Control Panel content pane -->
+        <part name="MessageText">
+            <caption>
+                <TextColor>0 0 0</TextColor>
+                <Font>##TextStyle.MainInstruction.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.MainInstruction.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.MainInstruction.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+    </class>
+    
+    <!-- 
+    //
+    //    DatePicker Style, implemented by DatePicker
+    //
+    -->
+    <class name="DatePickerStyle">
+        <part name="ShowCalendarButtonRight">
+            <colorhints>
+                <BorderColorHint>130 135 144</BorderColorHint>
+                <FillColorHint>255 255 255</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="ShowNoneCheckbox"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    DragDrop Style, implemented by DragDrop
+    //
+    -->
+    <class name="DragDropStyle">
+        <part name="Copy">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>0 103 205</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Move">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>0 103 205</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="UpdateMetaData">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>0 103 205</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="CreateLink">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>0 103 205</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Warning">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>249 199 0</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="None">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>227 49 49</FillColorHint>
+            </colorhints>
+        </part>
+    </class>
+
+    <!-- 
+    //
+    //    Edit Style, implemented by Edit
+    //
+    -->
+    <class name="EditStyle">
+        <colorhints>
+            <BorderColorHint>171 173 179</BorderColorHint>
+            <FillColorHint>255 255 255</FillColorHint>
+        </colorhints>
+        <!-- part name="Background"></part-->
+        <!-- part name="Edittext"></part-->
+        <!-- part name="Password"></part-->
+        <!-- part name="EditBorder_NoScroll"></part-->
+        <!-- part name="EditBorder_HScroll"></part-->
+        <!-- part name="EditBorder_VScroll"></part-->
+        <!-- part name="EditBorder_HVScroll"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    ExplorerBar Style, implemented by ExplorerBar
+    //
+    -->
+    <class name="ExplorerBarStyle">
+        <part name="HeaderBackground">
+            <colorhints>
+                <FillColorHint>140 140 140</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="HeaderClose"></part-->
+        <!-- part name="HeaderPin"></part-->
+        <!-- part name="IEBarMenu"></part-->
+        <!-- part name="NormalGroupBackground"></part-->
+        <!-- part name="NormalGroupCollapse"></part-->
+        <!-- part name="NormalGroupExpand"></part-->
+        <!-- part name="NormalGroupHead"></part-->
+        <!-- part name="SpecialGroupBackground"></part-->
+        <!-- part name="SpecialGroupCollapse"></part-->
+        <!-- part name="SpecialGroupExpand"></part-->
+        <!-- part name="SpecialGroupHead"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Flyout Style, implemented by Flyout
+    //
+    -->
+    <class name="FlyoutStyle">
+         <part name="Header">
+            <caption>
+                <TextColor>0 0 0</TextColor>
+                <Font>Segoe UI, 10, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="Body">
+            <caption>
+                <TextColor>87 87 87</TextColor>
+                <Font>##TextStyle.BodyText.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Emphasized">
+                <caption>
+                    <TextColor>0 0 0</TextColor>
+                    <ClassicValue type="TextColor">##TextStyle.Label.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.Label.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+        </part>
+        <part name="Label">
+            <caption>
+                <TextColor>##TextStyle.Label.TextColor</TextColor>
+                <Font>##TextStyle.Label.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.Label.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.Label.ClassicFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">##TextStyle.Label.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.Label.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Selected">
+            </state>
+            <state name="Emphasized">
+                <TextColor>19 112 171</TextColor>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+            </state>
+            <state name="Disabled">
+                <TextColor>##SysMetrics.GrayText</TextColor>
+                <ClassicValue type="TextColor">GrayText</ClassicValue>
+            </state>
+        </part>
+        <part name="Link">
+            <caption>
+                <TextColor>0 102 204</TextColor>
+                <Font>##TextStyle.HyperlinkText.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Normal.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Normal.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Hover">
+                <caption>
+                    <Font>##TextStyle.HyperlinkText.Hot.Font</Font>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Hot.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+        </part>
+        <part name="LinkHeader">
+            <caption>
+                <TextColor>##Flyoutstyle.Link.TextColor</TextColor>
+                <Font>##FlyoutStyle.Header.Font</Font>
+                <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Normal.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">##TextStyle.HyperlinkText.Normal.ClassicTextColor</ClassicValue>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Normal.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Hover">
+                <caption>
+                    <Font>##FlyoutStyle.Header.Font</Font>
+                    <ClassicValue type="Font">##TextStyle.HyperlinkText.Hot.ClassicFont</ClassicValue>
+                </caption>
+            </state>
+        </part>
+        <part name="Window">
+            <colorhints>
+                <FillColorHint>255 255 255</FillColorHint>
+                <BorderSize>0</BorderSize> 
+            </colorhints>
+        </part>
+        <part name="LinkArea">
+            <colorhints>
+                <FillColorHint>241 245 251</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="Divider"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Header Style, implemented by Header
+    //
+    -->
+    <class name="HeaderStyle">
+        <part name="HeaderItem">
+            <colorhints>
+                <AccentColorHint>102 188 225</AccentColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="HeaderDropDown">
+            <colorhints>
+                <AccentColorHint>191 191 191</AccentColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="HeaderOverflow">
+            <colorhints>
+                <AccentColorHint>191 191 191</AccentColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="HeaderSortArrow"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    ListBox Style, implemented by ListBox
+    //
+    -->
+    <class name="ListboxStyle">
+        <colorhints>
+            <FillColorHint>255 255 255</FillColorHint>
+            <BorderColorHint>130 135 144</BorderColorHint>
+            <AccentColorHint>54 89 152</AccentColorHint>
+        </colorhints>
+        <!-- part name="Border_HScroll"></part-->
+        <!-- part name="Border_HVScroll"></part-->
+        <!-- part name="Border_NoScroll"></part-->
+        <!-- part name="Border_VScroll"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Listview Style, implemented by Listview 
+    //
+    -->
+    <class name="ListViewStyle">
+        <part name="GroupHeader">
+            <colorhints>
+                <AccentColorHint>185 229 242</AccentColorHint>
+                <FillColorHint>94 131 191</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="GroupHeaderLine"></part-->
+        <!-- part name="ExpandButton"></part-->
+        <!-- part name="CollapseButton"></part-->
+        <!-- part name="ColumnDetail"></part-->
+    </class>
+    <!-- 
+    // Listitem implements the Explorer selection visuals,
+    // use SetWindowTheme(hWndListView, L"Explorer") to get
+    // this new appearance in your listview
+    -->
+    <!--class name="Explorer::Listview" inherits="Listview">
+        <part name="Listitem"></part>
+    </class-->
+
+    <!-- 
+    //
+    //    Menu Style, implemented by Menu
+    //
+    -->
+    <class name="MenuStyle">
+        <part name="BarBackground">
+            <colorhints>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="PopupBackground">
+            <colorhints>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="PopupGutter">
+            <colorhints>
+                <FillColorHint>240 240 240</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="BarItem"></part-->
+        <!-- part name="PopupBorders"></part-->
+        <!-- part name="PopupCheck"></part-->
+        <!-- part name="PopupCheckBackground"></part-->
+        <!-- part name="PopupItem"></part-->
+        <!-- part name="PopupSeparator"></part-->
+        <!-- part name="PopupSubmenu"></part-->
+        <!-- part name="SystemClose"></part-->
+        <!-- part name="SystemMaximize"></part-->
+        <!-- part name="SystemMinimize"></part-->
+        <!-- part name="SystemRestore"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Navigation class
+    //
+    //    This class has only bitmaps for now, so doesn't implement any style.
+    //    Use DrawThemeBackground() or GetThemeBitmap() to retrieve the bitmaps.
+    //
+    -->
+    <!--class name="Navigation"-->
+        <!-- part name="BackButton"></part-->
+        <!-- part name="ForwardButton"></part-->
+        <!-- part name="MenuButton"></part-->
+    <!--/class-->
+
+    <!--
+    //
+    //    Progress Style, implemented by Progress
+    //
+    -->
+    <class name="ProgressStyle">
+        <part name="TransparentBar">
+            <colorhints>
+                <BorderColorHint>104 104 104</BorderColorHint>
+                <FillColorHint>255 255 255</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Fill">
+            <colorhints>
+                <FillColorHint>82 215 99</FillColorHint>
+            </colorhints>
+            <state name="Error">
+                <colorhints>
+                    <FillColorHint>228 0 33</FillColorHint>
+                </colorhints>
+            </state>
+            <state name="Paused">
+                <colorhints>
+                    <FillColorHint>220 212 0</FillColorHint>
+                </colorhints>
+            </state>
+            <state name="Partial">
+                <colorhints>
+                    <FillColorHint>0 148 173</FillColorHint>
+                </colorhints>
+            </state>
+        </part>
+        <!-- Bar and BarVert have been deprecated -->
+        <!-- part name="Bar"></part-->
+        <!-- part name="BarVert"></part-->
+        <!-- Chunk and ChunkVert have been deprecated -->
+        <!-- part name="Chunk"></part-->
+        <!-- part name="ChunkVert"></part-->
+        <!-- part name="FillVert"></part-->
+        <!-- part name="MoveOverlay"></part-->
+        <!-- part name="MoveOverlayVert"></part-->
+        <!-- part name="PulseOverlay"></part-->
+        <!-- part name="PulseOverlayVert"></part-->
+        <!-- part name="TransparentBarVert"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Rebar Style, implemented by Rebar
+    //
+    -->
+    <class name="RebarStyle">
+        <colorhints>
+            <FillColorHint>233 237 249</FillColorHint>
+        </colorhints>
+        <part name="Gripper">
+            <colorhints>
+                <FillColorHint>128 131 137</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Chevron">
+            <colorhints>
+                <FillColorHint>0 0 0</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="Background"></part-->
+        <!-- part name="Band"></part-->
+        <!-- part name="GripperVert"></part-->
+        <!-- part name="ChevronVert"></part-->
+        <!-- part name="Splitter"></part-->
+        <!-- part name="SplitterVert"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Themed Experiences
+    //
+    //    Communications::Rebar implements a communication toolbar background
+    //    Media::Rebar implements a Media toolbar background, coordinated with the MediaStyle
+    //
+    //    Use SetWindowTheme(hWndRebar, L"Communications") (or "Media") to apply
+    //    those styles to your rebar, and use SetWindowTheme(hWnd, L"Alternate") on the toolbar
+    //    to get white text instead of the default color.
+    //
+    -->
+    
+    <!-- 
+    //
+    //    Media Gradient Colors
+    //
+    -->
+    <class name="MediaStyle">
+        <colorhints>
+            <FillColorHint>238 243 250</FillColorHint>
+            <AccentColorHint>207 218 231</AccentColorHint>
+        </colorhints>
+    </class>
+
+    <!-- 
+    //
+    //    Communications Gradient Colors
+    //
+    -->
+    
+    <class name="CommunicationsStyle">
+        <part name="Tab">
+            <state name="Normal">
+                <colorhints>
+                    <FillColorHint>10 76 134</FillColorHint>
+                    <AccentColorHint>59 145 232</AccentColorHint>
+                    <ClassicValue type="FillColorHint">ButtonShadow</ClassicValue>
+                    <ClassicValue type="AccentColorHint">ButtonFace</ClassicValue>
+                </colorhints>
+            </state>
+            <state name="Hot">
+                <colorhints>
+                   <FillColorHint>56 151 234</FillColorHint>
+                   <AccentColorHint>148 201 254</AccentColorHint>
+                   <ClassicValue type="FillColorHint">ButtonFace</ClassicValue>
+                   <ClassicValue type="AccentColorHint">ButtonHighlight</ClassicValue>
+                </colorhints>
+             </state>
+             <state name="Selected">
+                 <colorhints>
+                     <FillColorHint>1 37 69</FillColorHint>
+                     <AccentColorHint>18 87 157</AccentColorHint>
+                     <ClassicValue type="FillColorHint">ButtonShadow</ClassicValue>
+                     <ClassicValue type="AccentColorHint">ButtonFace</ClassicValue>
+                </colorhints>
+             </state>
+
+        </part>
+    </class>
+    
+
+    <!-- 
+    //
+    //    Scrollbar Style, implemented by Scrollbar
+    //
+    -->
+    <class name="ScrollbarStyle">
+        <part name="ArrowBtn">
+            <colorhints>
+                <FillColorHint>244 244 244</FillColorHint>
+                <BorderColorHint>130 135 144</BorderColorHint>
+            </colorhints>
+        </part>
+        <part name="LowerTrackHorz">
+            <colorhints>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="LowerTrackVert">
+            <colorhints>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="SizeBox">
+            <colorhints>
+                <FillColorHint>120 120 120</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="ThumbBtnHorz">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>171 175 218</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="ThumbBtnVert">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>171 175 218</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="UpperTrackHorz">
+            <colorhints>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="UpperTrackVert">
+            <colorhints>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="GripperHorz"></part-->
+        <!-- part name="GripperVert"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Spin Style, implemented by Spin
+    //
+    -->
+    <class name="SpinStyle">
+        <part name="Down">
+            <colorhints>
+                <BorderColorHint>130 135 144</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="DownHorz">
+            <colorhints>
+                <BorderColorHint>130 135 144</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Up">
+            <colorhints>
+                <BorderColorHint>130 135 144</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="UpHorz">
+            <colorhints>
+                <BorderColorHint>130 135 144</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+    </class>
+
+    <!-- 
+    //
+    //    Status Style, implemented by Status
+    //
+    -->
+    <class name="StatusStyle">
+        <part name="Gripper">
+            <colorhints>
+                <FillColorHint>119 119 192</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Pane">
+            <colorhints>
+                <FillColorHint>119 119 92</FillColorHint>
+            </colorhints>
+        </part>
+        <colorhints>
+            <FillColorHint>177 183 187</FillColorHint>
+        </colorhints>
+        <!-- part name="GripperPane"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Tab Style, implemented by Tab
+    //
+    -->
+    <class name="TabStyle">
+        <part name="Body">
+            <colorhints>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="AeroWizardBody">
+            <colorhints>
+                <FillColorHint>255 255 255</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Pane">
+            <colorhints>
+                <BorderColorHint>145 155 156</BorderColorHint>
+                <FillColorHint>247 247 249</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="TabItem">
+            <colorhints>
+                <AccentColorHint>255 200 60</AccentColorHint>
+                <BorderColorHint>146 146 146</BorderColorHint>
+                <FillColorHint>240 241 245</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="TabItemBothEdge"></part-->
+        <!-- part name="TabItemLeftEdge"></part-->
+        <!-- part name="TabItemRightEdge"></part-->
+        <!-- part name="TopTabItem"></part-->
+        <!-- part name="TopTabItemBothEdge"></part-->
+        <!-- part name="TopTabItemLeftEdge"></part-->
+        <!-- part name="TopTabItemRightEdge"></part-->
+    </class>
+
+    <!-- 
+      //
+      //    Task Dialog Style, implemented by TaskDialog
+      //
+      -->
+    <class name="TaskDialogStyle">
+        <part name="MainInstructionPane">
+            <Font>##TextStyle.MainInstruction.Font</Font>
+            <TextColor>##TextStyle.MainInstruction.TextColor</TextColor>
+            <ClassicValue type="Font">##TextStyle.MainInstruction.ClassicFont</ClassicValue>
+            <ClassicValue type="TextColor">##TextStyle.MainInstruction.ClassicTextColor</ClassicValue>
+        </part>
+        <part name="ContentPane">
+            <Font>##TextStyle.BodyText.Font</Font>
+            <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+            <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+        </part>
+        <part name="ExpandedContent">
+            <Font>##TextStyle.BodyText.Font</Font>
+            <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+            <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+        </part>
+        <part name="ButtonSection">
+            <Font>##TextStyle.BodyText.Font</Font>
+            <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+            <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+        </part>
+        <part name="ExpandoText">
+            <Font>##TextStyle.BodyText.Font</Font>
+            <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+            <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+        </part>
+        <part name="ExpandedFooterArea">
+            <Font>##TextStyle.BodyText.Font</Font>
+            <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+            <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+        </part>
+        <part name="VerificationText">
+            <Font>##TextStyle.BodyText.Font</Font>
+            <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+            <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+        </part>
+        <part name="FootnotePane">
+            <Font>##TextStyle.BodyText.Font</Font>
+            <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+            <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+        </part>
+        <part name="RadioButtonPane">
+            <Caption>
+                <Font>##TextStyle.BodyText.Font</Font>
+                <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+            </Caption>
+        </part>
+      <!-- part name="PrimaryPanel"></part-->
+      <!-- part name="MainIcon"></part-->
+      <!-- part name="CommandLinkPane"></part-->
+      <!-- part name="SecondaryPanel"></part-->
+      <!-- part name="ControlPane"></part-->
+      <!-- part name="ButtonWrapper"></part-->
+      <!-- part name="ExpandoButton"></part-->
+      <!-- part name="FootnoteSeparator"></part-->
+      <!-- part name="ProgressBar"></part-->
+      <!-- part name="ImageAlignment"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Abstract Text Style class
+    //
+    -->
+    <class name="TextStyle">
+        <part name="MainInstruction">
+            <caption>
+                <TextColor>0 51 153</TextColor>
+                <Font>Segoe UI, 12, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">CaptionFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="Instruction">
+            <caption>
+                <TextColor>0 51 153</TextColor>
+                <Font>Segoe UI, 9, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">MenuFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="BodyTitle">
+            <caption>
+                <TextColor>0 0 0</TextColor>
+                <Font>Segoe UI, 9, Bold, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">MenuFont;;bold</ClassicValue>
+            </caption>
+        </part>
+        <part name="BodyText">
+            <caption>
+                <TextColor>0 0 0</TextColor>
+                <Font>Segoe UI, 9, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">MenuFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="SecondaryText">
+            <caption>
+                <TextColor>0 0 0</TextColor>
+                <Font>Segoe UI, 9, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">MenuFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="HyperLinkText">
+            <caption>
+                <TextColor>0 102 204</TextColor>
+                <Font>Segoe UI, 9, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">MenuFont</ClassicValue>
+            </caption>
+            <state name="Normal">
+                <caption>
+                    <ClassicValue type="TextColor">WindowText</ClassicValue>
+                    <ClassicValue type="Font">MenuFont</ClassicValue>
+                </caption>
+            </state>
+            <state name="Hot">
+                <caption>
+                    <TextColor>51 153 255</TextColor>
+                    <Font>Segoe UI, 9, Underline, Quality:ClearType</Font>
+                    <ClassicValue type="TextColor">HotLight</ClassicValue>
+                    <ClassicValue type="Font">MenuFont;;;underline</ClassicValue>
+                </caption>
+            </state>
+            <state name="Pressed">
+                <caption>
+                    <TextColor>51 153 255</TextColor>
+                    <Font>Segoe UI, 9, Underline, Quality:ClearType</Font>
+                    <ClassicValue type="TextColor">WindowText</ClassicValue>
+                    <ClassicValue type="Font">MenuFont;;;underline</ClassicValue>
+                </caption>
+            </state>
+            <state name="Disabled">
+                <caption>
+                    <TextColor>126 133 156</TextColor>
+                    <Font>Segoe UI, 9, Quality:ClearType</Font>
+                    <ClassicValue type="TextColor">GrayText</ClassicValue>
+                    <ClassicValue type="Font">MenuFont</ClassicValue>
+                </caption>
+            </state>
+        </part>
+        <part name="Expanded">
+            <caption>
+                <TextColor>0 0 0</TextColor>
+                <Font>Segoe UI, 9, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">MenuFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="Label">
+            <caption>
+                <TextColor>0 0 0</TextColor>
+                <Font>Segoe UI, 9, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">MenuFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="ControlLabel">
+            <caption>
+                <TextColor>0 102 204</TextColor>
+                <Font>Segoe UI, 9, Quality:ClearType</Font>
+                <ClassicValue type="TextColor">WindowText</ClassicValue>
+                <ClassicValue type="Font">MenuFont</ClassicValue>
+            </caption>
+            <state name="Disabled">
+                <TextColor>126, 133, 156</TextColor>
+                <ClassicValue type="TextColor">GrayText</ClassicValue>
+            </state>
+        </part>
+    </class>
+
+    <!-- 
+    //
+    //    Toolbar Style, implemented by Toolbar
+    //
+    -->
+    <class name="ToolbarStyle">
+        <part name="Button">
+            <colorhints>
+                <BorderColorHint>130 135 144</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Separator">
+            <colorhints>
+                <FillColorHint>130 135 144</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="DropdownButton">
+            <colorhints>
+                <BorderColorHint>130 135 144</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="SplitButton">
+            <colorhints>
+                <BorderColorHint>119 119 92</BorderColorHint>
+                <FillColorHint>240 241 245</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="SplitButtonDropdown">
+            <colorhints>
+                <BorderColorHint>119 119 92</BorderColorHint>
+                <FillColorHint>240 241 245</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="SeparatorVert"></part-->
+        <!-- part name="DropdownButtonGlyph"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Tooltip Style, implemented by Tooltip
+    //
+    -->
+    <class name="TooltipStyle">
+        <part name="Standard">
+            <caption>
+                <Font>##TextStyle.BodyText.Font</Font>
+                <TextColor>87 87 87</TextColor>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="StandardTitle">
+            <caption>
+                <Font>##TextStyle.BodyTitle.Font</Font>
+                <TextColor>87 87 87</TextColor>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        <part name="Balloon">
+            <caption>
+                <Font>##TextStyle.BodyText.Font</Font>
+                <TextColor>##TextStyle.BodyText.TextColor</TextColor>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+            <colorhints>
+                <BorderColorHint>130 135 144</BorderColorHint>
+                <FillColorHint>233 233 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="BalloonTitle">
+            <caption>
+                <Font>##TextStyle.MainInstruction.Font</Font>
+                <TextColor>##TextStyle.MainInstruction.TextColor</TextColor>
+                <ClassicValue type="TextColor">##TextStyle.BodyText.ClassicTextColor</ClassicValue>
+                <ClassicValue type="Font">##TextStyle.BodyText.ClassicFont</ClassicValue>
+            </caption>
+        </part>
+        <!-- part name="Close"></part-->
+        <!-- part name="BalloonStem"></part-->
+        <!-- part name="Wrench"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Trackbar Style, implemented by Trackbar
+    //
+    -->
+    <class name="TrackBarStyle">
+        <part name="Thumb">
+            <colorhints>
+                <AccentColorHint>71 196 70</AccentColorHint>
+                <BorderColorHint>118 118 118</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="Track">
+            <colorhints>
+                <BorderColorHint>118 118 118</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="ThumbBottom"></part-->
+        <!-- part name="ThumbLeft"></part-->
+        <!-- part name="ThumbRight"></part-->
+        <!-- part name="ThumbTop"></part-->
+        <!-- part name="ThumbVert"></part-->
+        <!-- part name="Tics"></part-->
+        <!-- part name="TicsVert"></part-->
+        <!-- part name="TrackVert"></part-->
+    </class>
+
+    <!-- 
+    //
+    //    Treeview Style, implemented by Treeview
+    //
+    -->
+    <class name="TreeViewStyle">
+        <part name="Glyph">
+            <colorhints>
+                <AccentColorHint>71 196 70</AccentColorHint>
+                <BorderColorHint>118 118 118</BorderColorHint>
+                <FillColorHint>244 244 244</FillColorHint>
+            </colorhints>
+        </part>
+        <colorhints>
+            <AccentColorHint>71 196 70</AccentColorHint>
+            <BorderColorHint>118 118 118</BorderColorHint>
+            <FillColorHint>244 244 244</FillColorHint>
+        </colorhints>
+    </class>
+    <!-- Treeitem implements the Explorer selection visuals -->
+    <!--class name="Explorer::Treeview" inherits="Treeview">
+        <part name="TreeItem"></part>
+    </class-->
+
+    <!-- 
+    //
+    //    Window Style, implemented by Window
+    //
+    //    Note: CompositedWindow::Window is a subclass of Window that is used by external applications 
+    //    that want to draw their own captions when compositing.  It defines Caption and MaxCaption 
+    //    parts for use with DrawThemeText(Ex). It is not meant to be used directly with DrawThemeBackground 
+    //    as it currently only contains text color information.
+    // 
+    -->
+    <class name="WindowStyle">
+        <part name="Caption">
+            <colorhints>
+                <BorderColorHint>215 228 242</BorderColorHint>
+                <FillColorHint>185 209 234</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="CloseButton">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>228 93 61</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="HelpButton">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>177 183 187</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="MaxButton">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>177 183 187</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="MaxCaption">
+            <colorhints>
+                <FillColorHint>0 0 0</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="MDICloseButton">
+            <colorhints>
+                <BorderColorHint>118 118 118</BorderColorHint>
+                <FillColorHint>240 241 245</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="MDIRestoreButton">
+            <colorhints>
+                <BorderColorHint>118 118 118</BorderColorHint>
+                <FillColorHint>240 241 245</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="MinButton">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>177 183 187</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="MinCaption">
+            <colorhints>
+                <FillColorHint>192 200 217</FillColorHint>
+            </colorhints>
+        </part>
+        <part name="RestoreButton">
+            <colorhints>
+                <BorderColorHint>255 255 255</BorderColorHint>
+                <FillColorHint>177 183 187</FillColorHint>
+            </colorhints>
+        </part>
+        <!-- part name="CaptionSizingTemplate"></part-->
+        <!-- part name="Dialog"></part-->
+        <!-- part name="FrameBottom"></part-->
+        <!-- part name="FrameLeft"></part-->
+        <!-- part name="FrameRight"></part-->
+        <!-- part name="MDIMinButton"></part-->
+        <!-- part name="SmallCaption"></part-->
+        <!-- part name="SmallCaptionSizingTemplate"></part-->
+        <!-- part name="SmallCloseButton"></part-->
+        <!-- part name="SmallFrameBottom"></part-->
+        <!-- part name="SmallFrameLeft"></part-->
+        <!-- part name="SmallFrameRight"></part-->
+    </class>
+
+</visualstyleguide>
+

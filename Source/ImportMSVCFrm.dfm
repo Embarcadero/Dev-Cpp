@@ -5,7 +5,8 @@ object ImportMSVCForm: TImportMSVCForm
   Caption = 'Import MS Visual C++(tm) project'
   ClientHeight = 221
   ClientWidth = 365
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -32,13 +33,14 @@ object ImportMSVCForm: TImportMSVCForm
     Width = 23
     Height = 23
     Caption = '...'
+    Flat = True
     OnClick = btnBrowseClick
   end
   object txtVC: TEdit
     Left = 8
     Top = 24
     Width = 328
-    Height = 21
+    Height = 19
     TabOrder = 0
     Text = 'txtVC'
     OnChange = txtDevChange
@@ -70,6 +72,7 @@ object ImportMSVCForm: TImportMSVCForm
       Width = 23
       Height = 23
       Caption = '...'
+      Flat = True
       OnClick = btnBrowseDevClick
     end
     object cmbConf: TComboBox
@@ -78,14 +81,13 @@ object ImportMSVCForm: TImportMSVCForm
       Width = 321
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
       TabOrder = 0
     end
     object txtDev: TEdit
       Left = 16
       Top = 84
       Width = 297
-      Height = 21
+      Height = 19
       TabOrder = 1
       Text = 'txtDev'
       OnChange = txtDevChange
@@ -97,7 +99,6 @@ object ImportMSVCForm: TImportMSVCForm
     Width = 75
     Height = 25
     Caption = 'Import'
-    Default = True
     TabOrder = 2
     OnClick = btnImportClick
   end
@@ -106,7 +107,6 @@ object ImportMSVCForm: TImportMSVCForm
     Top = 188
     Width = 75
     Height = 25
-    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 3

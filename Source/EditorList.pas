@@ -256,6 +256,7 @@ begin
 
   // Determine what to view next
   EditorPageControl := Editor.PageControl;
+  if assigned(EditorPageControl) then
   with EditorPageControl do begin
 
     // If we are closing the active tab, open the tab that was opened when this tab was created
@@ -325,15 +326,17 @@ begin
         if not Editor.Save then
           Exit;
       mrCancel:
+      begin
         Exit; // stop closing
+      end;
     end;
   end;
-
+  
   // Select editor to open when this one closes
-  PrevEditor := GetPreviousEditor(Editor);
+  PrevEditor := GetPreviousEditor(Editor);    
+  
   if PrevEditor = Editor then
     PrevEditor := nil;
-
   BeginUpdate;
   try
     // We're allowed to close...
@@ -341,15 +344,16 @@ begin
     if Editor.InProject and Assigned(MainForm.Project) then begin
       projindex := MainForm.Project.Units.IndexOf(Editor);
       if projindex <> -1 then
+      begin
         MainForm.Project.CloseUnit(projindex); // calls ForceCloseEditor
+      end;
     end else begin
       dmMain.AddtoHistory(Editor.FileName);
       FreeAndNil(Editor);
-
       // Force layout update when creating, destroying or moving editors
       UpdateLayout;
     end;
-
+    
     // Show new editor after forcing a layout update
     if Assigned(PrevEditor) then
       PrevEditor.Activate;
@@ -374,6 +378,7 @@ begin
     while fRightPageControl.PageCount > 0 do
       if not CloseEditor(GetEditor(0, fRightPageControl)) then
         Exit;
+
   finally
     EndUpdate;
   end;

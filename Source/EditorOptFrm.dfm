@@ -5,7 +5,8 @@ object EditorOptForm: TEditorOptForm
   Caption = 'Editor Options'
   ClientHeight = 492
   ClientWidth = 484
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -25,32 +26,30 @@ object EditorOptForm: TEditorOptForm
     Top = 0
     Width = 485
     Height = 455
-    ActivePage = tabGeneral
+    ActivePage = tabSyntax
     TabOrder = 0
     OnChange = PagesMainChange
     object tabGeneral: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object grpMargin: TGroupBox
         Left = 264
         Top = 220
         Width = 201
-        Height = 90
+        Height = 92
         Caption = '  Right Margin  '
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 2
         object lblMarginWidth: TLabel
           Left = 8
-          Top = 43
+          Top = 41
           Width = 32
           Height = 15
           Caption = 'Width'
         end
         object lblMarginColor: TLabel
           Left = 99
-          Top = 43
+          Top = 41
           Width = 29
           Height = 15
           Caption = 'Color'
@@ -75,7 +74,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cpMarginColor: TColorBox
           Left = 96
-          Top = 58
+          Top = 59
           Width = 97
           Height = 22
           DefaultColorColor = cl3DLight
@@ -89,6 +88,8 @@ object EditorOptForm: TEditorOptForm
         Width = 456
         Height = 190
         Caption = '  Editor Options  '
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 0
         object cbFunctionHint: TCheckBox
           Left = 241
@@ -223,8 +224,10 @@ object EditorOptForm: TEditorOptForm
         Left = 9
         Top = 220
         Width = 248
-        Height = 90
+        Height = 92
         Caption = '  Caret  '
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 1
         object lblInsertCaret: TLabel
           Left = 8
@@ -235,7 +238,7 @@ object EditorOptForm: TEditorOptForm
         end
         object lblOverCaret: TLabel
           Left = 8
-          Top = 39
+          Top = 41
           Width = 83
           Height = 15
           Caption = 'Overwrite caret:'
@@ -255,7 +258,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cboOverwriteCaret: TComboBox
           Left = 136
-          Top = 36
+          Top = 38
           Width = 100
           Height = 23
           Style = csDropDownList
@@ -268,7 +271,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cbMatch: TCheckBox
           Left = 8
-          Top = 63
+          Top = 65
           Width = 233
           Height = 17
           Caption = 'Highlight matching symbols'
@@ -281,10 +284,12 @@ object EditorOptForm: TEditorOptForm
         Width = 201
         Height = 84
         Caption = 'Highlight current line'
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 4
         object cbHighlightColor: TLabel
           Left = 99
-          Top = 35
+          Top = 32
           Width = 29
           Height = 15
           Caption = 'Color'
@@ -300,7 +305,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cpHighColor: TColorBox
           Left = 96
-          Top = 50
+          Top = 51
           Width = 97
           Height = 22
           DefaultColorColor = 16777164
@@ -314,6 +319,8 @@ object EditorOptForm: TEditorOptForm
         Width = 248
         Height = 84
         Caption = '  Tabs  '
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 3
         object lblTabSize: TLabel
           Left = 176
@@ -324,7 +331,7 @@ object EditorOptForm: TEditorOptForm
         end
         object seTabSize: TSpinEdit
           Left = 176
-          Top = 52
+          Top = 51
           Width = 57
           Height = 24
           MaxValue = 64
@@ -352,10 +359,6 @@ object EditorOptForm: TEditorOptForm
     end
     object tabDisplay: TTabSheet
       Caption = 'Fonts'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ScrollHint: TLabel
         Left = 0
         Top = 382
@@ -369,25 +372,26 @@ object EditorOptForm: TEditorOptForm
       end
       object grpGutter: TGroupBox
         Left = 9
-        Top = 160
+        Top = 155
         Width = 456
-        Height = 185
+        Height = 189
         Caption = '  Gutter  '
         TabOrder = 1
         DesignSize = (
           456
-          185)
+          189)
         object lblGutterFont: TLabel
           Left = 8
-          Top = 91
+          Top = 95
           Width = 27
           Height = 15
           Anchors = [akLeft, akRight, akBottom]
           Caption = 'Font:'
+          ExplicitTop = 91
         end
         object lblGutterWidth: TLabel
           Left = 360
-          Top = 33
+          Top = 38
           Width = 89
           Height = 14
           Anchors = [akLeft, akRight, akBottom]
@@ -397,7 +401,7 @@ object EditorOptForm: TEditorOptForm
         end
         object lblGutterFontSize: TLabel
           Left = 360
-          Top = 91
+          Top = 93
           Width = 20
           Height = 15
           Anchors = [akLeft, akRight, akBottom]
@@ -455,7 +459,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cboGutterFont: TComboBox
           Left = 12
-          Top = 107
+          Top = 113
           Width = 341
           Height = 66
           AutoComplete = False
@@ -467,7 +471,7 @@ object EditorOptForm: TEditorOptForm
         end
         object edGutterSize: TSpinEdit
           Left = 360
-          Top = 107
+          Top = 112
           Width = 80
           Height = 24
           MaxValue = 999
@@ -478,7 +482,7 @@ object EditorOptForm: TEditorOptForm
         end
         object edGutterWidth: TSpinEdit
           Left = 360
-          Top = 49
+          Top = 57
           Width = 80
           Height = 24
           MaxValue = 999
@@ -491,7 +495,7 @@ object EditorOptForm: TEditorOptForm
         Left = 9
         Top = 3
         Width = 456
-        Height = 109
+        Height = 111
         Caption = '  Editor Font  '
         TabOrder = 0
         object lblEditorSize: TLabel
@@ -510,7 +514,7 @@ object EditorOptForm: TEditorOptForm
         end
         object cboEditorFont: TComboBox
           Left = 12
-          Top = 32
+          Top = 37
           Width = 341
           Height = 66
           AutoComplete = False
@@ -523,7 +527,7 @@ object EditorOptForm: TEditorOptForm
         end
         object edEditorSize: TSpinEdit
           Left = 360
-          Top = 32
+          Top = 36
           Width = 80
           Height = 24
           MaxValue = 999
@@ -536,10 +540,6 @@ object EditorOptForm: TEditorOptForm
     end
     object tabSyntax: TTabSheet
       Caption = 'Colors'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lblForeground: TLabel
         Left = 9
         Top = 182
@@ -555,7 +555,7 @@ object EditorOptForm: TEditorOptForm
         Caption = 'Background:'
       end
       object lblSpeed: TLabel
-        Left = 9
+        Left = 11
         Top = 366
         Width = 107
         Height = 15
@@ -567,33 +567,10 @@ object EditorOptForm: TEditorOptForm
         Width = 23
         Height = 23
         Hint = 'Save color theme'
-        Glyph.Data = {
-          36030000424D3603000000000000360000002800000010000000100000000100
-          18000000000000030000CE0E0000D80E0000000000000000000000FF0000FF00
-          00FF0000FF0000FF0000000000000000000000000000FF0000FF0000FF0000FF
-          0000FF0000FF0000FF0000FF0000FF0000FF0000FF00000000666148A89F77DD
-          DDDD9B9A8F00000000000000FF0000FF0000FF0000FF0000FF0000FF0000FF00
-          00FF0000FF00000000A89F77A89F77E9E9E9B2B0A7D5D4D29392894848480000
-          0000FF0000FF0000FF0000FF0000FF0000FF00000000B9B294A89F77756E534A
-          473AACA47EDADAD5E0E0E0B4B4B476736500000000FF0000FF0000FF0000FF00
-          00FF00000000A89F77A89F77756E53F3F3F3F1F1F1E7E7E7E1E1E1B4B2A96661
-          48635E464A463400000000FF0000FF00000000B2AA87F0EFE8EBE9E0A89F7763
-          5E46ADABA4EAEAEAE4E4E4646360A89F77A89F7700000000000000FF0000FF00
-          000000EBE9E0FFFFFFFFFFFFF5F4F0A89F77A89F77635E465A574B787255A89F
-          77A89F7700000000FF0000FF00000000B2AA87F2F1EBFFFFFFFFFFFFFFFFFFF5
-          F4F0EBE9E0A89F77A89F77756E53756E5300000000000000FF0000FF00000000
-          EBE9E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7F6F2EBE9E0A89F77A89F
-          7700000000FF0000FF000000008D8A78F2F1EBFFFFFFFFFFFFFFFFFFFFFFFFFF
-          FFFFFFFFFFFFFFFFFFFFFFF0EFE800000000000000FF0000FF00000000B9B294
-          DFDCCFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEEECE40000
-          0000FF0000FF0000FF0000FF00000000000000C9C4AED5D1BFFFFFFFFFFFFFFF
-          FFFFFFFFFFFFFFFFF9F8F500000000000000FF0000FF0000FF0000FF0000FF00
-          00FF00000000000000C9C4AED5D1BFD5D1BFFFFFFFF4F3EEA89F7700000000FF
-          0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF00000000000000D5
-          D1BFC5C1A8EDECE400000000000000FF0000FF0000FF0000FF0000FF0000FF00
-          00FF0000FF0000FF0000FF0000FF00000000000000A89F7700000000FF0000FF
-          0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000
-          FF0000FF0000000000000000FF0000FF0000FF0000FF0000FF00}
+        ImageIndex = 6
+        ImageName = 'iconsnew-04'
+        Images = dmMain.SVGImageListMenuStyle
+        Flat = True
         ParentShowHint = False
         ShowHint = True
         OnClick = btnSaveSyntaxClick
@@ -604,6 +581,8 @@ object EditorOptForm: TEditorOptForm
         Width = 329
         Height = 343
         Align = alCustom
+        Ctl3D = False
+        ParentCtl3D = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -677,7 +656,8 @@ object EditorOptForm: TEditorOptForm
         Left = 7
         Top = 7
         Width = 130
-        Height = 169
+        Height = 167
+        Ctl3D = False
         ImeName = 'CN'#177'??i(CN'#177'U)'
         IntegralHeight = True
         ItemHeight = 15
@@ -690,7 +670,10 @@ object EditorOptForm: TEditorOptForm
           'String'
           'Symbol'
           'WhiteSpace'
-          'Directives')
+          'Directives'
+          'Monokai'
+          'Monokai Fresh')
+        ParentCtl3D = False
         TabOrder = 0
         OnClick = ElementListClick
       end
@@ -698,43 +681,53 @@ object EditorOptForm: TEditorOptForm
         Left = 15
         Top = 275
         Width = 110
-        Height = 73
+        Height = 77
         Caption = '  Style:  '
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 2
         object cbBold: TCheckBox
           Left = 8
-          Top = 15
+          Top = 17
           Width = 100
           Height = 17
           Caption = 'Bold'
+          Ctl3D = False
+          ParentCtl3D = False
           TabOrder = 0
           OnClick = StyleChange
         end
         object cbItalic: TCheckBox
           Left = 8
-          Top = 32
+          Top = 35
           Width = 100
           Height = 17
           Caption = 'Italic'
+          Ctl3D = False
+          ParentCtl3D = False
           TabOrder = 1
           OnClick = StyleChange
         end
         object cbUnderlined: TCheckBox
           Left = 8
-          Top = 50
+          Top = 54
           Width = 100
           Height = 17
           Caption = 'Underlined'
+          Ctl3D = False
+          ParentCtl3D = False
           TabOrder = 2
           OnClick = StyleChange
         end
       end
       object cboQuickColor: TComboBox
-        Left = 32
-        Top = 386
-        Width = 130
+        Left = 40
+        Top = 387
+        Width = 133
         Height = 23
         Style = csDropDownList
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 1
         OnSelect = cboQuickColorSelect
         Items.Strings = (
@@ -748,21 +741,27 @@ object EditorOptForm: TEditorOptForm
           'Obsidian'
           'GSS Hacker'
           'Obvilion'
-          'PlasticCodeWrap')
+          'PlasticCodeWrap'
+          'Monokai'
+          'Monokai Fresh')
       end
       object edSyntaxExt: TEdit
-        Left = 180
+        Left = 182
         Top = 386
         Width = 285
-        Height = 23
+        Height = 21
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 4
       end
       object cbSyntaxHighlight: TCheckBox
-        Left = 175
+        Left = 182
         Top = 360
         Width = 300
         Height = 17
         Caption = 'Use Syntax Highlighting'
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 5
         OnClick = cbSyntaxHighlightClick
       end
@@ -772,6 +771,8 @@ object EditorOptForm: TEditorOptForm
         Width = 110
         Height = 22
         Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 6
         OnChange = StyleChange
       end
@@ -781,16 +782,14 @@ object EditorOptForm: TEditorOptForm
         Width = 110
         Height = 22
         Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 7
         OnChange = StyleChange
       end
     end
     object tabCode: TTabSheet
       Caption = 'Snippets'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PagesSnippets: TPageControl
         Left = 0
         Top = 0
@@ -801,10 +800,6 @@ object EditorOptForm: TEditorOptForm
         TabOrder = 0
         object tabCPInserts: TTabSheet
           Caption = 'Inserts'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object btnAdd: TButton
             Left = 384
             Top = 45
@@ -829,6 +824,8 @@ object EditorOptForm: TEditorOptForm
             Width = 469
             Height = 211
             Align = alBottom
+            Ctl3D = False
+            ParentCtl3D = False
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -13
@@ -875,11 +872,13 @@ object EditorOptForm: TEditorOptForm
             Width = 369
             Height = 137
             ColCount = 3
+            Ctl3D = False
             DefaultColWidth = 115
             DefaultRowHeight = 18
             FixedCols = 0
             RowCount = 2
             Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goTabs, goAlwaysShowEditor]
+            ParentCtl3D = False
             ScrollBars = ssVertical
             TabOrder = 3
             OnSelectCell = lvCodeInsSelectCell
@@ -887,16 +886,14 @@ object EditorOptForm: TEditorOptForm
         end
         object tabCPDefault: TTabSheet
           Caption = 'Default Insert'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object cbDefaultCode: TCheckBox
             Left = 4
             Top = 2
             Width = 461
             Height = 17
             Caption = 'Insert Default Code into Empty Projects'
+            Ctl3D = False
+            ParentCtl3D = False
             TabOrder = 0
           end
           object seDefault: TSynEdit
@@ -904,6 +901,8 @@ object EditorOptForm: TEditorOptForm
             Top = 24
             Width = 468
             Height = 331
+            Ctl3D = False
+            ParentCtl3D = False
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -13
@@ -949,25 +948,17 @@ object EditorOptForm: TEditorOptForm
     end
     object tabCBCompletion: TTabSheet
       Caption = 'Completion'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PagesCompletion: TPageControl
         Left = 0
         Top = 0
         Width = 477
         Height = 425
-        ActivePage = tabCodeCompletion
+        ActivePage = tabSymbolCompletion
         Align = alClient
         TabOrder = 0
         object tabCodeCompletion: TTabSheet
           Caption = 'Code Completion'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object lblCompletionColor: TLabel
             Left = 328
             Top = 108
@@ -988,6 +979,8 @@ object EditorOptForm: TEditorOptForm
             Width = 457
             Height = 17
             Caption = 'Enable code-completion'
+            Ctl3D = False
+            ParentCtl3D = False
             TabOrder = 0
             OnClick = chkEnableCompletionClick
           end
@@ -998,6 +991,8 @@ object EditorOptForm: TEditorOptForm
             Height = 22
             DefaultColorColor = clWhite
             Style = [cbStandardColors, cbCustomColor, cbPrettyNames]
+            Ctl3D = False
+            ParentCtl3D = False
             TabOrder = 1
           end
           object gbCBEngine: TGroupBox
@@ -1013,6 +1008,8 @@ object EditorOptForm: TEditorOptForm
               Width = 345
               Height = 17
               Caption = 'Scan local files referenced in #include'#39's'
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 0
             end
             object chkCBParseGlobalH: TCheckBox
@@ -1021,6 +1018,8 @@ object EditorOptForm: TEditorOptForm
               Width = 345
               Height = 17
               Caption = 'Scan global files referenced in #include'#39's'
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 1
             end
           end
@@ -1029,8 +1028,10 @@ object EditorOptForm: TEditorOptForm
             Top = 132
             Width = 297
             Height = 37
+            Ctl3D = False
             Max = 2000
             Min = 1
+            ParentCtl3D = False
             ParentShowHint = False
             Frequency = 50
             Position = 1000
@@ -1043,71 +1044,83 @@ object EditorOptForm: TEditorOptForm
         object tabSymbolCompletion: TTabSheet
           Caption = 'Symbol Completion'
           ImageIndex = 2
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object grpSpecific: TGroupBox
             Left = 16
             Top = 40
             Width = 273
             Height = 201
             Caption = 'Specific completion options'
+            Ctl3D = False
+            ParentCtl3D = False
             TabOrder = 1
             object cbParenth: TCheckBox
               Left = 16
-              Top = 48
+              Top = 50
               Width = 240
               Height = 17
               Caption = 'Complete parentheses '#39'()'#39
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 1
             end
             object cbBraces: TCheckBox
               Left = 16
-              Top = 24
+              Top = 26
               Width = 240
               Height = 17
               Caption = 'Complete braces '#39'{}'#39
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 0
             end
             object cbInclude: TCheckBox
               Left = 16
-              Top = 72
+              Top = 74
               Width = 240
               Height = 17
               Caption = 'Complete includes '#39'<>'#39
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 2
             end
             object cbComments: TCheckBox
               Left = 16
-              Top = 120
+              Top = 122
               Width = 240
               Height = 17
               Caption = 'Complete multiline comments '#39'/**/'#39
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 4
             end
             object cbArray: TCheckBox
               Left = 16
-              Top = 96
+              Top = 98
               Width = 240
               Height = 17
               Caption = 'Complete square braces '#39'[]'#39
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 3
             end
             object cbSingleQuotes: TCheckBox
               Left = 16
-              Top = 144
+              Top = 146
               Width = 240
               Height = 17
               Caption = 'Complete single quotes '#39#39#39#39
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 5
             end
             object cbDoubleQuotes: TCheckBox
               Left = 16
-              Top = 168
+              Top = 170
               Width = 240
               Height = 17
               Caption = 'Complete double quotes '#39'""'#39
+              Ctl3D = False
+              ParentCtl3D = False
               TabOrder = 6
             end
           end
@@ -1117,6 +1130,8 @@ object EditorOptForm: TEditorOptForm
             Width = 465
             Height = 17
             Caption = 'Enable symbol completion'
+            Ctl3D = False
+            ParentCtl3D = False
             TabOrder = 0
             OnClick = cbSymbolCompleteClick
           end
@@ -1126,6 +1141,8 @@ object EditorOptForm: TEditorOptForm
             Width = 449
             Height = 17
             Caption = 'Delete completed symbols as pairs'
+            Ctl3D = False
+            ParentCtl3D = False
             TabOrder = 2
           end
         end
@@ -1134,16 +1151,14 @@ object EditorOptForm: TEditorOptForm
     object tabAutosave: TTabSheet
       Caption = 'Autosave'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object cbAutoSave: TCheckBox
         Left = 8
         Top = 8
         Width = 457
         Height = 17
         Caption = 'Enable editor autosave'
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 0
         OnClick = cbAutoSaveClick
       end
@@ -1153,6 +1168,8 @@ object EditorOptForm: TEditorOptForm
         Width = 457
         Height = 385
         Caption = ' Options '
+        Ctl3D = False
+        ParentCtl3D = False
         TabOrder = 1
         object SaveInterval: TLabel
           Left = 16
@@ -1169,7 +1186,7 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Example:'
         end
         object MinutesDelay: TTrackBar
-          Left = 144
+          Left = 151
           Top = 24
           Width = 297
           Height = 40
@@ -1185,7 +1202,7 @@ object EditorOptForm: TEditorOptForm
           Left = 16
           Top = 80
           Width = 239
-          Height = 97
+          Height = 100
           Caption = 'Files'
           Items.Strings = (
             'Save only the currently visible file'
@@ -1195,9 +1212,9 @@ object EditorOptForm: TEditorOptForm
         end
         object NameOptions: TRadioGroup
           Left = 16
-          Top = 188
+          Top = 190
           Width = 239
-          Height = 97
+          Height = 100
           Caption = 'Filenames'
           Items.Strings = (
             'Overwrite file'
@@ -1216,25 +1233,8 @@ object EditorOptForm: TEditorOptForm
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'OK'
-    Glyph.Data = {
-      DE010000424DDE01000000000000760000002800000024000000120000000100
-      0400000000006801000000000000000000001000000000000000000000000000
-      80000080000000808000800000008000800080800000C0C0C000808080000000
-      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
-      3333333333333333333333330000333333333333333333333333F33333333333
-      00003333344333333333333333388F3333333333000033334224333333333333
-      338338F3333333330000333422224333333333333833338F3333333300003342
-      222224333333333383333338F3333333000034222A22224333333338F338F333
-      8F33333300003222A3A2224333333338F3838F338F33333300003A2A333A2224
-      33333338F83338F338F33333000033A33333A222433333338333338F338F3333
-      0000333333333A222433333333333338F338F33300003333333333A222433333
-      333333338F338F33000033333333333A222433333333333338F338F300003333
-      33333333A222433333333333338F338F00003333333333333A22433333333333
-      3338F38F000033333333333333A223333333333333338F830000333333333333
-      333A333333333333333338330000333333333333333333333333333333333333
-      0000}
+    Images = dmMain.SVGImageListMenuStyle
     ModalResult = 1
-    NumGlyphs = 2
     TabOrder = 1
     OnClick = btnOkClick
   end
@@ -1244,7 +1244,8 @@ object EditorOptForm: TEditorOptForm
     Width = 85
     Height = 25
     Anchors = [akRight, akBottom]
-    Kind = bkCancel
+    Caption = 'Cancel'
+    ModalResult = 2
     NumGlyphs = 2
     TabOrder = 2
     OnClick = btnCancelClick
@@ -1255,8 +1256,8 @@ object EditorOptForm: TEditorOptForm
     Width = 85
     Height = 25
     Anchors = [akRight, akBottom]
+    Caption = '&Help'
     Enabled = False
-    Kind = bkHelp
     NumGlyphs = 2
     TabOrder = 3
     OnClick = btnHelpClick

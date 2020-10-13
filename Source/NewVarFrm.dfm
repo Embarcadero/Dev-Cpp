@@ -5,7 +5,8 @@ object NewVarForm: TNewVarForm
   Caption = 'New variable'
   ClientHeight = 374
   ClientWidth = 444
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -56,7 +57,7 @@ object NewVarForm: TNewVarForm
     Left = 88
     Top = 8
     Width = 348
-    Height = 21
+    Height = 19
     TabOrder = 0
     OnChange = txtTypeChange
   end
@@ -64,7 +65,7 @@ object NewVarForm: TNewVarForm
     Left = 88
     Top = 32
     Width = 348
-    Height = 21
+    Height = 19
     TabOrder = 1
     OnChange = txtTypeChange
   end
@@ -74,7 +75,6 @@ object NewVarForm: TNewVarForm
     Width = 75
     Height = 25
     Caption = 'Create'
-    Default = True
     ModalResult = 1
     TabOrder = 4
     OnClick = btnCreateClick
@@ -84,7 +84,6 @@ object NewVarForm: TNewVarForm
     Top = 344
     Width = 75
     Height = 25
-    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 5
@@ -95,7 +94,6 @@ object NewVarForm: TNewVarForm
     Width = 348
     Height = 21
     AutoDropDown = True
-    ItemHeight = 13
     Sorted = True
     TabOrder = 2
     Items.Strings = (
@@ -132,7 +130,7 @@ object NewVarForm: TNewVarForm
       Left = 84
       Top = 16
       Width = 333
-      Height = 21
+      Height = 19
       TabOrder = 1
       OnChange = txtTypeChange
       OnKeyUp = txtReadFuncKeyUp
@@ -165,7 +163,7 @@ object NewVarForm: TNewVarForm
       Left = 84
       Top = 16
       Width = 333
-      Height = 21
+      Height = 19
       TabOrder = 1
       OnChange = txtTypeChange
       OnKeyUp = txtWriteFuncKeyUp

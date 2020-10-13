@@ -1,0 +1,19 @@
+[Template]
+ver=1
+Name=Project3
+Icon=Project3.ico
+svg=Project3.svg
+Description=This is a custom project.
+Category=Multimedia
+[Project]
+UnitCount=0
+Type=0
+IsCpp=1
+Compiler=
+CppCompiler=
+Linker=
+CompilerSettings=0
+CompilerSet=-1
+IncludeVersionInfo=0
+SupportXPThemes=0
+Icon=Project3.project.ico

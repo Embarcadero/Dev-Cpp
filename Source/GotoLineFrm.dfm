@@ -7,7 +7,8 @@ object GotoLineForm: TGotoLineForm
   Caption = 'Go to line...'
   ClientHeight = 79
   ClientWidth = 246
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -45,7 +46,6 @@ object GotoLineForm: TGotoLineForm
     Width = 75
     Height = 25
     Caption = '&OK'
-    Default = True
     ModalResult = 1
     TabOrder = 1
   end

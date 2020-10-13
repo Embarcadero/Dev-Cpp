@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg18"
+   sodipodi:docname="apps_note_crypt_pro.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata24">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs22">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter857"
+       x="-0.054"
+       width="1.108"
+       y="-0.0432"
+       height="1.0864">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.88"
+         id="feGaussianBlur859" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter876"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.96"
+         id="feGaussianBlur878" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter896"
+       x="-0.052001"
+       width="1.104002"
+       y="-0.044570694"
+       height="1.0891414">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.04002"
+         id="feGaussianBlur898" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview20"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="96"
+     inkscape:cy="96"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg18" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path2"
+     d="m 40,20 c -4.432,0 -8,3.568 -8,8 v 144 c 0,4.432 3.568,8 8,8 h 112 c 4.432,0 8,-3.568 8,-8 V 68 l -44,-4 -4,-44 z"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter857)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path4"
+     d="m 40,16 c -4.432,0 -8,3.568 -8,8 v 144 c 0,4.432 3.568,8 8,8 h 112 c 4.432,0 8,-3.568 8,-8 V 64 l -44,-4 -4,-44 z"
+     style="fill:#04a5f3;stroke-width:4" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 40 16 C 35.568 16 32 19.568 32 24 L 32 25 C 32 20.568 35.568 17 40 17 L 112 17 L 159 64 L 160 64 L 112 16 L 40 16 z "
+     id="path6" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path8"
+     d="m 112,18 v 40 c 0,4.4184 3.58172,8 8,8 h 40 z"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter876)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path10"
+     d="m 112,16 v 40 c 0,4.4184 3.58172,8 8,8 h 40 z"
+     style="fill:#a5d4f9;stroke-width:4" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path12"
+     d="m 96,89.997953 c -8.864,0 -16,7.2864 -16,16.249997 v 7.752 h -4 c -2.216,0 -4,1.784 -4,4 v 24 c 0,2.216 1.784,4 4,4 h 40 c 2.216,0 4,-1.784 4,-4 v -24 c 0,-2.216 -1.784,-4 -4,-4 h -4 v -7.75 c 0,-8.959997 -7.136,-16.247997 -16,-16.247997 z m 0,8 c 4.432,0 8,3.567997 8,7.999997 v 8 H 88 v -8 c 0,-4.432 3.568,-7.999997 8,-7.999997 z"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter896)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path14"
+     d="m 96,87.998 c -8.864,0 -16,7.2864 -16,16.25 V 112 h -4 c -2.216,0 -4,1.784 -4,4 v 24 c 0,2.216 1.784,4 4,4 h 40 c 2.216,0 4,-1.784 4,-4 v -24 c 0,-2.216 -1.784,-4 -4,-4 h -4 v -7.75 c 0,-8.96 -7.136,-16.248 -16,-16.248 z m 0,8 c 4.432,0 8,3.568 8,8 v 8 H 88 v -8 c 0,-4.432 3.568,-8 8,-8 z"
+     style="fill:#ffffff;stroke-width:4" />
+</svg>

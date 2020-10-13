@@ -2,6 +2,7 @@
 ver=1
 Name=Direct3D
 Icon=Pizza.ico
+svg=Direct3D.svg
 Description=A basic Direct3D program
 Category=Multimedia
 

@@ -149,8 +149,8 @@ type
     procedure SetNodeValue(value: TTreeNode);
     procedure CheckProjectFileForUpdate;
     procedure IncrementBuildNumber;
-    function GetCompilerOption(const OptionString: String): Char;
-    procedure SetCompilerOption(const OptionString: String; Value: Char);
+    function GetCompilerOption(const OptionString: String): Integer;
+    procedure SetCompilerOption(const OptionString: String; Value: Integer);
     procedure SaveToLog;
   end;
 
@@ -281,23 +281,23 @@ begin
   inherited;
 end;
 
-function TProject.GetCompilerOption(const OptionString: String): Char;
+function TProject.GetCompilerOption(const OptionString: String): Integer;
 var
   OptionStruct: PCompilerOption;
   OptionIndex: integer;
 begin
-  Result := '0';
+  Result := 0;
 
   // Does the option exist?
   if devCompilerSets[fOptions.CompilerSet].FindOption(OptionString, OptionStruct, OptionIndex) then begin
     // Can it be found in the project options list?
-    if (OptionIndex + 1 <= Length(fOptions.CompilerOptions)) then begin
-      result := fOptions.CompilerOptions[OptionIndex + 1];
+    if (OptionIndex <= Length(fOptions.CompilerOptions)) then begin
+      result := fOptions.CompilerOptions[OptionIndex];
     end;
   end;
 end;
 
-procedure TProject.SetCompilerOption(const OptionString: String; value: char);
+procedure TProject.SetCompilerOption(const OptionString: String; value: Integer);
 var
   OptionStruct: PCompilerOption;
   OptionIndex: integer;
@@ -305,9 +305,9 @@ begin
   // Does the option exist?
   if devCompilerSets[fOptions.CompilerSet].FindOption(OptionString, OptionStruct, OptionIndex) then begin
     // Can it be found in the project options list?
-    if (OptionIndex + 1 <= Length(fOptions.CompilerOptions)) then begin
-      if (fOptions.CompilerOptions[OptionIndex + 1] <> value) then begin
-        fOptions.CompilerOptions[OptionIndex + 1] := Value;
+    if (OptionIndex <= Length(fOptions.CompilerOptions)) then begin
+      if (fOptions.CompilerOptions[OptionIndex] <> value) then begin
+        fOptions.CompilerOptions[OptionIndex] := Value;
         SetModified(true);
       end;
     end;
@@ -769,7 +769,7 @@ begin
         MessageDlg(Lang[ID_MSG_COMPILERNOTFOUND], mtError, [mbOk], 0);
         fOptions.CompilerSet := devCompilerSets.DefaultSetIndex;
       end;
-      fOptions.CompilerOptions := ReadString('Project', 'CompilerSettings', '');
+      fOptions.CompilerOptions := TArray<Integer>.FromString(ReadString('Project', 'CompilerSettings', ''));
       fOptions.VersionInfo.Major := ReadInteger('VersionInfo', 'Major', 0);
       fOptions.VersionInfo.Minor := ReadInteger('VersionInfo', 'Minor', 1);
       fOptions.VersionInfo.Release := ReadInteger('VersionInfo', 'Release', 1);
@@ -779,7 +779,7 @@ begin
       fOptions.VersionInfo.CompanyName := ReadString('VersionInfo', 'CompanyName', '');
       fOptions.VersionInfo.FileVersion := ReadString('VersionInfo', 'FileVersion', '0.1');
       fOptions.VersionInfo.FileDescription := ReadString('VersionInfo', 'FileDescription',
-        'Developed using the Dev-C++ IDE');
+        'Developed using the Embarcadero Dev-C++ IDE');
       fOptions.VersionInfo.InternalName := ReadString('VersionInfo', 'InternalName', '');
       fOptions.VersionInfo.LegalCopyright := ReadString('VersionInfo', 'LegalCopyright', '');
       fOptions.VersionInfo.LegalTrademarks := ReadString('VersionInfo', 'LegalTrademarks', '');
@@ -845,7 +845,7 @@ begin
     WriteBool('Project', 'IncludeVersionInfo', fOptions.IncludeVersionInfo);
     WriteBool('Project', 'SupportXPThemes', fOptions.SupportXPThemes);
     WriteInteger('Project', 'CompilerSet', fOptions.CompilerSet);
-    WriteString('Project', 'CompilerSettings', fOptions.CompilerOptions);
+    WriteString('Project', 'CompilerSettings', fOptions.CompilerOptions.ToString);
 
     WriteInteger('VersionInfo', 'Major', fOptions.VersionInfo.Major);
     WriteInteger('VersionInfo', 'Minor', fOptions.VersionInfo.Minor);

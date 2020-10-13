@@ -20,6 +20,11 @@ Ver=1
 1005=&Project Template...
 1006=&Class...
 1007=New
+1008=New Document
+1009=Open Document
+1010=Change Theme
+1011=Change Font
+1012=Change Language
 
 
 2001=&Open...
@@ -492,7 +497,7 @@ Ver=1
 36017=http://orwelldevcpp.blogspot.com
 36018=> 5.12
 36019=Repository:
-36020=Subreddit:
+36020=Blog:
 36021=Compilers
 36022=TDM-GCC Compiler Website:
 36023=<= 4.9.9.2 (old stuff)
@@ -887,6 +892,7 @@ Ver=1
 60026=Could not find corresponding header file
 60027=The compiler settings format of Embarcadero Dev-C++ has changed.<CR><CR>Please update your settings at Project >> Project Options >> Compiler and save your project.
 60028=The compiler set you have selected for this project, no longer exists.<CR>It will be substituted by the global compiler set.
+60029=File %s contains international characters. Do you wish to save this file in UTF8 encoding? If you choose "NO", the international characters will be lost.
 
 61001=Cannot open file %s
 61002=Cannot save file %s
@@ -1169,7 +1175,7 @@ Ver=1
 76001=Select your theme:
 76002=Font:
 76003=Color:
-76004=Icons:
+76004=Theme:
 76005=You can later change themes at Tools >> Editor Options >> Fonts/Colors.
 76006=To optimize code completion, it is recommended to create a cache of frequently used headers.
 76007=It is possible add headers to cache later at Tools, Editor Options, Class Browsing, Completion.

@@ -30,7 +30,17 @@ uses
   debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer, SyncObjs,
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
   devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg, SynEditTextBuffer,
-  CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm, System.Actions;
+  CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm, System.Actions,
+  vcl.Themes, SVGColor, Vcl.Imaging.pngimage, Vcl.WinXCtrls, Vcl.WinXPanels,
+  Vcl.Styles.Hooks,
+  Vcl.Styles.Utils.Menus, //Style Popup and Shell Menus (class #32768)
+  Vcl.Styles.Utils.Forms, //Style dialogs box (class #32770)
+  Vcl.Styles.Utils.StdCtrls, //Style buttons, static, and so on
+  Vcl.Styles.Utils.ComCtrls, //Style SysTreeView32, SysListView32
+  Vcl.Styles.Utils.ScreenTips, //Style the tooltips_class32 class
+  Vcl.Styles.Utils.SysControls,
+  Vcl.Styles.Utils.SysStyleHook, Vcl.VirtualImage
+  ;
 
 type
   TRunEndAction = (reaNone, reaProfile);
@@ -371,7 +381,6 @@ type
     LeftProjectSheet: TTabSheet;
     ProjectView: TTreeView;
     LeftClassSheet: TTabSheet;
-    ClassBrowser: TClassBrowser;
     AddWatchBtn: TButton;
     FloatingPojectManagerItem: TMenuItem;
     actSaveProjectAs: TAction;
@@ -532,6 +541,59 @@ type
     actRunTests: TAction;
     DonateItem: TMenuItem;
     actDonate: TAction;
+    tsConsole: TTabSheet;
+    pcConsoleHost: TPageControl;
+    PopupMenu1: TPopupMenu;
+    MainPanel: TPanel;
+    PanelLeft: TPanel;
+    ImageBackGround: TImage;
+    PanelRight: TPanel;
+    ButtonNewDocument: TButton;
+    ButtonOpenDocument: TButton;
+    ButtonOptions: TButton;
+    ButtonChangeTheme: TButton;
+    ButtonChangeFont: TButton;
+    ButtonChangeLanguage: TButton;
+    ImageLogo: TImage;
+    LabelWelcome: TLabel;
+    LabelVersion: TLabel;
+    LabelNumVersion: TLabel;
+    LabelView: TLabel;
+    LabelDocumentation: TLabel;
+    LabelHotkeys: TLabel;
+    LabelOpen: TLabel;
+    LabelSave: TLabel;
+    LabelZoom: TLabel;
+    LabelRun: TLabel;
+    LabelCompile: TLabel;
+    LabelClear: TLabel;
+    LabelDescOpen: TStaticText;
+    LabelDescSave: TStaticText;
+    LabelDescZoom: TStaticText;
+    LabelDescRun: TStaticText;
+    LabelDescCompile: TStaticText;
+    LabelDescClear: TStaticText;
+    RichEdit1: TRichEdit;
+    RichEdit2: TRichEdit;
+    RichEdit3: TRichEdit;
+    RichEdit4: TRichEdit;
+    SpeedButton0: TSpeedButton;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    SpeedButton4: TSpeedButton;
+    RichEdit0: TRichEdit;
+    ClassBrowser: TClassBrowser;
+    Panel1: TPanel;
+    SpeedButton5: TSpeedButton;
+    SpeedButton6: TSpeedButton;
+    actCMD: TAction;
+    actPowerShell: TAction;
+    ConsolePopupMenu: TPopupMenu;
+    CloseCMDMNU: TMenuItem;
+    actConsoleClose: TAction;
+    ImageEmbarcadero: TVirtualImage;
+    LabelSponsor: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure ToggleBookmarkClick(Sender: TObject);
@@ -789,7 +851,32 @@ type
       Selected: Boolean);
     procedure actRunTestsExecute(Sender: TObject);
     procedure WMCopyData(var Message: TMessage); message WM_COPYDATA;
+    procedure FormResize(Sender: TObject);
+    procedure ButtonChangeThemeClick(Sender: TObject);
+    procedure RichEdit0Click(Sender: TObject);
+    procedure SpeedButton0Click(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure SpeedButton3Click(Sender: TObject);
+    procedure SpeedButton4Click(Sender: TObject);
+    procedure LabelDocumentationClick(Sender: TObject);
+    procedure SpeedButton0DblClick(Sender: TObject);
+    procedure SpeedButton1DblClick(Sender: TObject);
+    procedure SpeedButton2DblClick(Sender: TObject);
+    procedure SpeedButton3DblClick(Sender: TObject);
+    procedure SpeedButton4DblClick(Sender: TObject);
+    procedure EditorPageControlDrawTab(Control: TCustomTabControl;
+      TabIndex: Integer; const Rect: TRect; Active: Boolean);
+    procedure EditorPageControlMouseUp(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure EditorPageControlMouseLeave(Sender: TObject);
+    procedure actCMDExecute(Sender: TObject);
+    procedure actPowerShellExecute(Sender: TObject);
+    procedure actConsoleCloseExecute(Sender: TObject);
   private
+    FCloseButtonMouseDownTab: TCloseTabSheet;
+    FCloseButtonShowPushed: Boolean;
+
     fPreviousHeight: integer; // stores MessageControl height to be able to restore to previous height
     fTools: TToolController; // tool list controller
     fProjectToolWindow: TForm; // floating left tab control
@@ -827,7 +914,6 @@ type
     function PrepareForRun(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
     function PrepareForCompile(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
     function PrepareForClean(ForcedCompileTarget: TTarget = ctInvalid): Boolean;
-    procedure LoadTheme;
     procedure CheckForDLLProfiling;
     procedure ProjectWindowClose(Sender: TObject; var Action: TCloseAction);
     procedure BuildOpenWith;
@@ -837,7 +923,28 @@ type
     procedure ClearMessageControl;
     procedure UpdateClassBrowsing;
     function ParseParameters(const Parameters: WideString): Integer;
+    //procedure Delphi Style
+    procedure LoadStyle;
+    procedure LoadThemeStyle;
+    procedure LoadTheme;
+
+    //Procedure New Screen
+    procedure GetProjectHistory;
+    procedure AddFileRTB(RBName: TRichEdit; aFileName: string; aDirection: string);
+    procedure OpenFileProject(s: string);
+    procedure ResizeWelcomeComponent;
+
+    procedure PageControlCloseButtonDrawTab(Control: TCustomTabControl; TabIndex: Integer;
+      const Rect: TRect; Active: Boolean);
+    procedure PageControlCloseButtonMouseDown(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure PageControlCloseButtonMouseMove(Sender: TObject;
+      Shift: TShiftState; X, Y: Integer);
+    procedure PageControlCloseButtonMouseLeave(Sender: TObject);
+    procedure PageControlCloseButtonMouseUp(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
+    procedure CloseTabProc(Sender: TObject);
     procedure ScanActiveProject;
     procedure UpdateCompilerList;
     function GetCompileTarget: TTarget;
@@ -865,29 +972,31 @@ type
 var
   MainForm: TMainForm;
 
+
 implementation
 
 uses
-  ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
+  System.Threading, System.Math, ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
   DataFrm, NewProjectFrm, AboutFrm, PrintFrm,
   CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
-  SynEdit, Math, ImageTheme, SynEditKeyCmds, Instances,
+  SynEdit, ImageTheme, SynEditKeyCmds, Instances,
   Types, FindFrm, ProjectTypes, devExec, Tests,
   NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
   ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm,
-  WindowListFrm, RemoveUnitFrm, ParamsFrm, ProcessListFrm, SynEditHighlighter;
+  WindowListFrm, RemoveUnitFrm, ParamsFrm, ProcessListFrm, SynEditHighlighter,
+  ConsoleAppHostFrm;
 
 {$R *.dfm}
 
 procedure TMainForm.LoadTheme;
 begin
-  if devImageThemes.IndexOf(devData.Theme) = -1 then
-    devData.Theme := devImageThemes.Themes[0].Title; // 0 = New look (see ImageTheme.pas)
+  //if devImageThemes.IndexOf(devData.Theme) = -1 then
+    //devData.Theme := devImageThemes.Themes[0].Title; // 0 = New look (see ImageTheme.pas)
 
   // make sure the theme in question is in the list
-  if devImageThemes.IndexOf(devData.Theme) <> -1 then begin
-    devImageThemes.ActivateTheme(devData.Theme);
+  //if devImageThemes.IndexOf(devData.Theme) <> -1 then begin
+    //devImageThemes.ActivateTheme(devData.Theme);
 
     with devImageThemes do begin
       // Misc items images
@@ -917,8 +1026,23 @@ begin
       BrowserPopup.Images := CurrentTheme.MenuImages;
       DebugPopup.Images := CurrentTheme.MenuImages;
       EditorPopup.Images := CurrentTheme.MenuImages;
+
+      //Set Welcome Screen
+      //ButtonNewDocument.Images := CurrentTheme.MenuImages;
+      ButtonNewDocument.ImageIndex := -1;
+      //ButtonNewDocument.ImageAlignment := TImageAlignment(0);
+      //ButtonOpenDocument.Images :=  CurrentTheme.MenuImages;
+      ButtonOpenDocument.ImageIndex := -1; //4
+      //ButtonOpenDocument.ImageAlignment := TImageAlignment(0);
+      //ButtonOptions.Images := CurrentTheme.MenuImages;
+      ButtonOptions.ImageIndex := -1; //37
+      //ButtonOptions.ImageAlignment := TImageAlignment(0);
+      ButtonChangeTheme.ImageIndex := -1;
+      ButtonChangeFont.ImageIndex := -1;
+      ButtonChangeLanguage.ImageIndex := -1;
     end;
-  end;
+    LoadStyle;
+  //end;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1334,6 +1458,14 @@ begin
   LeftClassSheet.Caption := Lang[ID_LP_CLASSES];
   LeftDebugSheet.Caption := Lang[ID_SHEET_DEBUG];
 
+  //Welcome Screen
+  ButtonNewDocument.Caption := Lang[ID_ITEM_NEWDOCUMENT];
+  ButtonOpenDocument.Caption :=  Lang[ID_ITEM_OPENDOCUMENT];
+  ButtonOptions.Caption :=  Lang[ID_EOPT_OPTIONS];
+  ButtonChangeTheme.Caption :=  Lang[ID_ITEM_CHANGETHEME];
+  ButtonChangeFont.Caption := Lang[ID_ITEM_CHANGEFONT];
+  ButtonChangeLanguage.Caption := Lang[ID_ITEM_CHANGELANGUAGE];
+
   BuildBookMarkMenus;
   SetHints;
 end;
@@ -1403,7 +1535,9 @@ begin
   // Switch between open and close
   with MessageControl do
     if Open then
-      Height := fPreviousHeight // remember height
+    begin
+      Height := fPreviousHeight; // remember height
+    end
     else begin
       Height := Height - CompSheet.Height; // only show the tab captions
       ActivePageIndex := -1;
@@ -1430,13 +1564,8 @@ var
   s: String;
 begin
   s := PMRUItem(dmMain.MRU[TMenuItem(Sender).Tag])^.FileName;
-  if FileExists(s) then begin
-    if GetFileTyp(s) = utPrj then
-      OpenProject(s)
-    else
-      OpenFile(s);
-  end else
-    MessageDlg(Format(Lang[ID_ERR_RENAMEDDELETED], [s]), mtInformation, [mbOK], 0);
+
+  OpenFileProject(s);
 end;
 
 procedure TMainForm.CodeInsClick(Sender: TObject);
@@ -1488,6 +1617,7 @@ begin
       UpdateAppTitle;
       UpdateCompilerList;
       ScanActiveProject;
+      MainPanel.Visible := False;
     end else begin
       fProject.Free;
       fProject := nil;
@@ -1524,6 +1654,7 @@ begin
     dmMain.RemoveFromHistory(FileName);
   end;
   e.Activate;
+  MainPanel.Visible := False;
 
   // Parse it after is has been shown so the user will not see random unpainted stuff for a while.
   if not Assigned(fProject) then
@@ -1551,7 +1682,9 @@ begin
     fEditorList.BeginUpdate;
     try
       for I := 0 to List.Count - 1 do
+      begin
         OpenFile(List[I]); // open all files
+      end;
     finally
       fEditorList.EndUpdate;
     end;
@@ -1866,7 +1999,10 @@ begin
 
       // Activate it
       if Assigned(e) then
+      begin
         e.Activate;
+        MainPanel.Visible := False;
+      end;
     end;
   end;
 end;
@@ -1879,10 +2015,14 @@ begin
     Exit;
   if ProjectView.Selected.Data <> Pointer(-1) then
     OpenUnit
-  else begin
+  else
+  begin
     e := fEditorList.GetEditor;
     if Assigned(e) then
+    begin
       e.Activate;
+      MainPanel.Visible := False;
+    end;
   end;
 end;
 
@@ -1896,10 +2036,10 @@ begin
       exit;
     end;
   end;
-
   NewEditor := fEditorList.NewEditor('', False, True);
   NewEditor.InsertDefaultText;
   NewEditor.Activate;
+  MainPanel.Visible := False;
 end;
 
 procedure TMainForm.actNewProjectExecute(Sender: TObject);
@@ -1957,6 +2097,7 @@ begin
           fProject.SaveOptions;
         end;
       finally
+        MainPanel.Visible := False;
         Free;
       end;
     end;
@@ -1983,7 +2124,11 @@ begin
 
     // Open all provided files
     if Execute then
+    begin
       OpenFileList(TStringList(Files));
+
+      MainPanel.Visible := False;
+    end;
   finally
     Free;
   end;
@@ -2047,6 +2192,12 @@ begin
   e := fEditorList.GetEditor;
   if Assigned(e) then
     fEditorList.CloseEditor(e);
+
+  if fEditorList.PageCount = 0 then
+  begin
+    MainPanel.Visible := True;
+    GetProjectHistory;
+  end;
 end;
 
 procedure TMainForm.actCloseAllExecute(Sender: TObject);
@@ -2054,6 +2205,8 @@ begin
   ClassBrowser.BeginUpdate;
   try
     fEditorList.CloseAll; // PageControlChange triggers other UI updates
+    MainPanel.Visible := True;
+    GetProjectHistory;
   finally
     ClassBrowser.EndUpdate;
   end;
@@ -2122,8 +2275,55 @@ begin
       ClassBrowser.EndUpdate;
     end;
   finally
+    MainPanel.Visible := True;
+    GetProjectHistory;
     FileMonitor.EndUpdate;
   end;
+end;
+
+procedure TMainForm.actPowerShellExecute(Sender: TObject);
+begin
+  var ConsoleFrameProc: TProc<TConsoleAppHost, Boolean> :=
+    procedure (AFrame: TConsoleAppHost; AIsSuccess: Boolean)
+    begin
+      if AIsSuccess then
+      begin
+        var NewTab := TTabSheet.Create(pcConsoleHost);
+        NewTab.PageControl := pcConsoleHost;
+        NewTab.Assign(AFrame);
+      end
+      else
+        for var i := 0 to pcConsoleHost.PageCount - 1 do
+          if pcConsoleHost.Pages[i].Tag = NativeInt(AFrame) then
+          begin
+            pcConsoleHost.Pages[i].Free;
+            Break;
+          end;
+    end;
+  TConsoleAppHost.NewHost('powershell', 'PowerShell', ConsoleFrameProc, 20);
+end;
+
+procedure TMainForm.actCMDExecute(Sender: TObject);
+begin
+  var ConsoleFrameProc: TProc<TConsoleAppHost, Boolean> :=
+    procedure (AFrame: TConsoleAppHost; AIsSuccess: Boolean)
+    begin
+      if AIsSuccess then
+      begin
+        var NewTab := TTabSheet.Create(pcConsoleHost);
+        NewTab.PageControl := pcConsoleHost;
+        NewTab.Assign(AFrame);
+      end
+      else
+        for var i := 0 to pcConsoleHost.PageCount - 1 do
+          if pcConsoleHost.Pages[i].Tag = NativeInt(AFrame) then
+          begin
+            pcConsoleHost.Pages[i].Free;
+            Break;
+          end;
+    end;
+  TConsoleAppHost.NewHost('cmd', 'Command line', ConsoleFrameProc, 20);
+ // TConsoleAppHost.NewHost('wt', 'Windows Terminal', ConsoleFrameProc, 20);
 end;
 
 procedure TMainForm.actExportHTMLExecute(Sender: TObject);
@@ -2371,13 +2571,37 @@ begin
 end;
 
 procedure TMainForm.actNextExecute(Sender: TObject);
+var
+  e: TEditor;
+  PageIndex: integer;
 begin
-  EditorList.SelectNextPage;
+  e := fEditorList.GetEditor;
+  PageIndex := e.PageControl.ActivePageIndex;
+  if (PageIndex >= 0) and (PageIndex < e.PageControl.PageCount - 1) then
+  begin
+    if Assigned(e) then
+    begin
+      PageIndex := PageIndex + 1;
+      e.PageControl.ActivePageIndex := PageIndex;
+    end;
+  end;
 end;
 
 procedure TMainForm.actPrevExecute(Sender: TObject);
+var
+  e: TEditor;
+  PageIndex: integer;
 begin
-  EditorList.SelectPrevPage;
+  e := fEditorList.GetEditor;
+  PageIndex := e.PageControl.ActivePageIndex;
+  if (PageIndex > 0) and (PageIndex <= e.PageControl.PageCount - 1) then
+  begin
+    if Assigned(e) then
+    begin
+      PageIndex := PageIndex - 1;
+      e.PageControl.ActivePageIndex := PageIndex;
+    end;
+  end;
 end;
 
 procedure TMainForm.actCompOptionsExecute(Sender: TObject);
@@ -2398,7 +2622,8 @@ var
   e1, e2: TEditor;
 begin
   with TEditorOptForm.Create(nil) do try
-    if ShowModal = mrOk then begin
+    ShowModal;
+    //if ShowModal = mrOk then begin
 
       // Apply editor options
       dmMain.UpdateHighlighter;
@@ -2422,7 +2647,7 @@ begin
         UpdateClassBrowsing;
         ScanActiveProject;
       end;
-    end;
+    //end;
   finally
     Free;
   end;
@@ -2431,6 +2656,11 @@ end;
 procedure TMainForm.actConfigToolsExecute(Sender: TObject);
 begin
   fTools.Edit;
+end;
+
+procedure TMainForm.actConsoleCloseExecute(Sender: TObject);
+begin
+  pcConsoleHost.Pages[pcConsoleHost.ActivePageIndex].Free;
 end;
 
 procedure TMainForm.actUnitRemoveExecute(Sender: TObject);
@@ -3022,16 +3252,16 @@ begin
   case GetCompileTarget of
     ctProject: begin
         // Check if we enabled proper options
-        DebugEnabled := fProject.GetCompilerOption('-g3') <> '0';
-        StripEnabled := fProject.GetCompilerOption('-s') <> '0';
+        DebugEnabled := fProject.GetCompilerOption('-g3') <> 0;
+        StripEnabled := fProject.GetCompilerOption('-s') <> 0;
 
         // Ask the user if he wants to enable debugging...
         if (not DebugEnabled or StripEnabled) and (MessageDlg(Lang[ID_MSG_NODEBUGSYMBOLS], mtConfirmation, [mbYes,
           mbNo], 0) = mrYes) then begin
 
           // Enable debugging, disable stripping
-          fProject.SetCompilerOption('-g3', '1');
-          fProject.SetCompilerOption('-s', '0');
+          fProject.SetCompilerOption('-g3', 1);
+          fProject.SetCompilerOption('-s', 0);
 
           fCompSuccessAction := csaDebug;
           actRebuildExecute(nil);
@@ -3073,8 +3303,8 @@ begin
     ctFile: begin
         // Check if we enabled proper options
         with devCompilerSets.CompilationSet do begin
-          DebugEnabled := GetOption('-g3') <> '0';
-          StripEnabled := GetOption('-s') <> '0';
+          DebugEnabled := GetOption('-g3') <> 0;
+          StripEnabled := GetOption('-s') <> 0;
         end;
 
         // Ask the user if he wants to enable debugging...
@@ -3083,8 +3313,8 @@ begin
 
           // Enable debugging, disable stripping
           with devCompilerSets.CompilationSet do begin
-            SetOption('-g3', '1');
-            SetOption('-s', '0');
+            SetOption('-g3', 1);
+            SetOption('-s', 0);
           end;
 
           // Save changes to compiler set
@@ -3160,8 +3390,17 @@ begin
 end;
 
 procedure TMainForm.actEnviroOptionsExecute(Sender: TObject);
+var
+  TabIndex: integer;
 begin
+  TabIndex := 0;
+  if (Sender = ButtonChangeTheme) or (Sender = ButtonChangeFont) then
+    TabIndex := 4;
+  if (Sender = ButtonChangeLanguage) then
+    TabIndex := 0;
+
   with TEnviroForm.Create(nil) do try
+    PagesMain.TabIndex := TabIndex;
     if ShowModal = mrOk then begin
       // Update pagecontrol
       EditorList.SetPreferences(devData.MsgTabs, devData.MultiLineTab);
@@ -3177,12 +3416,23 @@ begin
       end;
 
       // Load new icons, also only if we have to
-      if devData.ThemeChange then
-        Loadtheme;
+      //if devData.ThemeChange then
+        //Loadtheme;
       Shortcuts.Filename := devDirs.Config + DEV_SHORTCUTS_FILE;
 
       // Rebuild recent file list (max count could have changed
       dmMain.RebuildMRU;
+      //Load Delphi Style
+      if devData.StyleChange then
+      begin
+        if devData.Style > 0 then
+        begin
+          LoadThemeStyle;
+          LoadStyle;
+        end
+        else
+          Loadtheme;
+      end;
     end;
   finally
     Close;
@@ -3298,6 +3548,76 @@ begin
   TrackPopupMenu(ToolbarsItem.Handle, TPM_LEFTALIGN or TPM_LEFTBUTTON,
     pt.x, pt.y, 0, Self.Handle, nil);
   Handled := TRUE;
+end;
+
+procedure TMainForm.SpeedButton0Click(Sender: TObject);
+var
+  s: string;
+begin
+  s := PMRUItem(dmMain.MRU.Items[RichEdit0.Tag])^.FileName;
+  OpenFileProject(s);
+  MainPanel.Visible := False;
+end;
+
+procedure TMainForm.SpeedButton0DblClick(Sender: TObject);
+begin
+  Exit;
+end;
+
+procedure TMainForm.SpeedButton1Click(Sender: TObject);
+var
+  s: string;
+begin
+  s := PMRUItem(dmMain.MRU.Items[RichEdit1.Tag])^.FileName;
+  OpenFileProject(s);
+  MainPanel.Visible := False;
+end;
+
+procedure TMainForm.SpeedButton1DblClick(Sender: TObject);
+begin
+  Exit;
+end;
+
+procedure TMainForm.SpeedButton2Click(Sender: TObject);
+var
+  s: string;
+begin
+  s := PMRUItem(dmMain.MRU.Items[RichEdit2.Tag])^.FileName;
+  OpenFileProject(s);
+  MainPanel.Visible := False;
+end;
+
+procedure TMainForm.SpeedButton2DblClick(Sender: TObject);
+begin
+  Exit;
+end;
+
+procedure TMainForm.SpeedButton3Click(Sender: TObject);
+var
+  s: string;
+begin
+  s := PMRUItem(dmMain.MRU.Items[RichEdit3.Tag])^.FileName;
+  OpenFileProject(s);
+  MainPanel.Visible := False;
+end;
+
+procedure TMainForm.SpeedButton3DblClick(Sender: TObject);
+begin
+  Exit;
+end;
+
+procedure TMainForm.SpeedButton4Click(Sender: TObject);
+var
+  s: string;
+begin
+  s := PMRUItem(dmMain.MRU.Items[RichEdit4.Tag])^.FileName;
+  OpenFileProject(s);
+  MainPanel.Visible := False;
+end;
+
+procedure TMainForm.SpeedButton4DblClick(Sender: TObject);
+begin
+        Exit;
 end;
 
 procedure TMainForm.SplitterBottomMoved(Sender: TObject);
@@ -4054,7 +4374,6 @@ begin
 
     // Set classbrowser to current file
     ClassBrowser.CurrentFile := '';
-
     // Set compiler selector to current file
     UpdateCompilerList;
 
@@ -4136,8 +4455,29 @@ begin
       if Assigned(e) then
         fEditorList.CloseEditor(e);
     end;
-  end else // see if it's a drag operation
-    SenderPageControl.Pages[SenderPageControl.ActivePageIndex].BeginDrag(False);
+  end
+  else // see if it's a drag operation
+  begin
+    var I: Integer;
+    var PageControl: TPageControl;
+    var TabSheet: TCloseTabSheet;
+    PageControl := Sender as TPageControl;
+
+    if Button = mbLeft then
+    begin
+      for I := 0 to PageControl.PageCount - 1 do
+      begin
+        if not (PageControl.Pages[i] is TCloseTabSheet) then Continue;
+        TabSheet:=PageControl.Pages[i] as TCloseTabSheet;
+        if PtInRect(TabSheet.FCloseButtonRect, Point(X, Y)) then
+        begin
+          PageControlCloseButtonMouseDown(Sender, Button, Shift, X, Y);
+          Exit;
+        end;
+      end;
+      SenderPageControl.Pages[SenderPageControl.ActivePageIndex].BeginDrag(False);
+    end;
+  end;
 end;
 
 procedure TMainForm.actNewTemplateUpdate(Sender: TObject);
@@ -4416,16 +4756,16 @@ begin
   case GetCompileTarget of
     ctProject: begin
         // Check if we enabled proper options
-        ProfilingEnabled := fProject.GetCompilerOption('-pg') <> '0';
-        StripEnabled := fProject.GetCompilerOption('-s') <> '0';
+        ProfilingEnabled := fProject.GetCompilerOption('-pg') <> 0;
+        StripEnabled := fProject.GetCompilerOption('-s') <> 0;
 
         // Ask the user if he wants to enable profiling
         if (not ProfilingEnabled or StripEnabled) and (MessageDlg(Lang[ID_MSG_NOPROFILE], mtConfirmation, [mbYes, mbNo],
           0) = mrYes) then begin
 
           // Enable profiling, disable stripping
-          fProject.SetCompilerOption('-pg', '1');
-          fProject.SetCompilerOption('-s', '0');
+          fProject.SetCompilerOption('-pg', 1);
+          fProject.SetCompilerOption('-s', 0);
 
           fCompSuccessAction := csaProfile;
           actRebuildExecute(nil);
@@ -4435,8 +4775,8 @@ begin
     ctFile: begin
         // Check if we enabled proper options
         with devCompilerSets.CompilationSet do begin
-          ProfilingEnabled := GetOption('-pg') <> '0';
-          StripEnabled := GetOption('-s') <> '0';
+          ProfilingEnabled := GetOption('-pg') <> 0;
+          StripEnabled := GetOption('-s') <> 0;
         end;
 
         // Ask the user if he wants to enable profiling
@@ -4445,8 +4785,8 @@ begin
 
           // Enable profiling, disable stripping
           with devCompilerSets.CompilationSet do begin
-            SetOption('-pg', '1');
-            SetOption('-s', '0');
+            SetOption('-pg', 1);
+            SetOption('-s', 0);
           end;
 
           // Save changes to compiler set
@@ -4739,7 +5079,7 @@ begin
   if (fProject.Options.typ in [dptDyn, dptStat]) then begin
 
     // Check if profiling is enabled
-    prof := fProject.GetCompilerOption('-pg') <> '0';
+    prof := fProject.GetCompilerOption('-pg') <> 0;
 
     // Check for the existence of "-lgmon" in project's linker options
     if prof and (Pos('-lgmon', fProject.Options.LinkerCmd) = 0) then begin
@@ -5241,6 +5581,11 @@ begin
   end;
 end;
 
+procedure TMainForm.ButtonChangeThemeClick(Sender: TObject);
+begin
+  actEnviroOptionsExecute(sender);
+end;
+
 procedure TMainForm.mnuOpenWithClick(Sender: TObject);
 var
   idx, idx2: integer;
@@ -5669,6 +6014,11 @@ begin
   end;
 end;
 
+procedure TMainForm.FormResize(Sender: TObject);
+begin
+  ResizeWelcomeComponent;
+end;
+
 procedure TMainForm.ImportCBCprojectClick(Sender: TObject);
 begin
   with TImportCBForm.Create(Self) do begin
@@ -5776,6 +6126,7 @@ begin
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
+
 begin
   fFirstShow := true;
 
@@ -5922,11 +6273,6 @@ begin
     LoadDataMod;
   end;
 
-  // Create icon themes
-  devImageThemes := TDevImageThemeFactory.Create;
-  devImageThemes.LoadFromDirectory(devDirs.Themes);
-  LoadTheme;
-
   // Set languages and other first time stuff
   if devData.First or (devData.Language = '') then
     Lang.SelectLanguage
@@ -5953,6 +6299,20 @@ begin
     end;
   end;
 
+  //Set Delphi Style default
+  // Create icon themes
+  devImageThemes := TDevImageThemeFactory.Create;
+  devImageThemes.LoadFromDirectory(devDirs.Themes);
+  if devdata.Style > 0 then
+  begin
+    LoadThemeStyle;
+    LoadStyle;
+  end
+  else
+  begin
+    LoadTheme;
+  end;
+
   // Configure parser, code completion, class browser
   UpdateClassBrowsing;
 
@@ -5967,6 +6327,15 @@ begin
 
   //test change hint color
   application.HintColor := clCream;
+
+  GetProjectHistory;
+
+  EditorPageControlLeft.TabWidth := 175;
+  EditorPageControlLeft.OwnerDraw := True;
+  EditorPageControlRight.TabWidth := 175;
+  EditorPageControlRight.OwnerDraw := True;
+
+  FCloseButtonMouseDownTab := nil;
 end;
 
 procedure TMainForm.EditorPageControlMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -5976,6 +6345,8 @@ var
   e: TEditor;
   SenderPageControl: TPageControl;
 begin
+  PageControlCloseButtonMouseMove(Sender, Shift, X, Y);
+
   SenderPageControl := TPageControl(Sender);
   PageIndex := SenderPageControl.IndexOfTabAt(X, Y);
   if PageIndex <> -1 then begin
@@ -6062,6 +6433,8 @@ begin
   // when the form shows for the first time, not when going fullscreen too
   if devData.ShowTipsOnStart and (FileCount = 0) then
     actShowTips.Execute;
+
+  ResizeWelcomeComponent;
 end;
 
 procedure TMainForm.actSkipFunctionExecute(Sender: TObject);
@@ -6299,6 +6672,15 @@ begin
     ResSheet.Caption := Lang[ID_SHEET_RES];
 end;
 
+procedure TMainForm.RichEdit0Click(Sender: TObject);
+var
+  s: string;
+begin
+  s := PMRUItem(dmMain.MRU.Items[RichEdit0.Tag])^.FileName;
+  OpenFileProject(s);
+  MainPanel.Visible := False;
+end;
+
 procedure TMainForm.actStopExecuteUpdate(Sender: TObject);
 begin
   if Assigned(fProject) then
@@ -6426,10 +6808,12 @@ end;
 procedure TMainForm.actPackageManagerExecute(Sender: TObject);
 var
   s: String;
+  StyleS: String;
 begin
+  StyleS := IntToStr(devData.Style);
   s := IncludeTrailingBackslash(devDirs.Exec) + PACKMAN_PROGRAM;
   if FileExists(s) then
-    ExecuteFile(s, '', IncludeTrailingBackslash(devDirs.Exec), SW_SHOW);
+    ExecuteFile(s, '/style '+StyleS, IncludeTrailingBackslash(devDirs.Exec), SW_SHOW);
 end;
 
 procedure TMainForm.actHelpExecute(Sender: TObject);
@@ -6470,6 +6854,11 @@ begin
   fCompiler.CheckSyntax;
 end;
 
+procedure TMainForm.LabelDocumentationClick(Sender: TObject);
+begin
+  OpenHelpFile('index.htm');
+end;
+
 procedure TMainForm.LeftPageControlChange(Sender: TObject);
 begin
   ClassBrowser.TabVisible := LeftPageControl.ActivePage = LeftClassSheet;
@@ -6506,7 +6895,8 @@ end;
 
 procedure TMainForm.PageControlPanelResize(Sender: TObject);
 begin
-  fEditorList.OnPanelResize(Sender);
+  if MainForm.Visible then
+    fEditorList.OnPanelResize(Sender);
 end;
 
 procedure TMainForm.actOpenFolderExecute(Sender: TObject);
@@ -6651,7 +7041,13 @@ begin
 
     // Skip the configuration redirect stuff
     if Item = '-c' then begin
-      I := I + 2;
+      Inc(i, 2);
+      Continue;
+    end;
+
+    if WideSameText(Item, 'portable') or WideSameText(Item, '-portable') then
+    begin
+      Inc(i);
       Continue;
     end;
 
@@ -6662,6 +7058,383 @@ begin
 
   // Free list of pointers
   LocalFree(Cardinal(ParameterList));
+end;
+
+procedure TMainForm.LoadStyle;
+begin
+  TStyleManager.TrySetStyle(cDelphiStyle[devData.Style]);
+  LabelNumVersion.Font.Color := clRed;
+  case devData.Style of
+    2,3: ImageEmbarcadero.ImageIndex := 1;
+  else
+    ImageEmbarcadero.ImageIndex := 0;
+  end;
+end;
+
+procedure TMainForm.LoadThemeStyle;
+begin
+      dmMain.SVGImageListMenuStyle.DisabledGrayScale := False;
+      dmMain.SVGImageListMenuStyle.FixedColor := StringToColor(cSVGColor[devData.Style]);
+      dmMain.SVGImageListMessageStyle.FixedColor := StringToColor(cSVGColor[devData.Style]);
+      dmMain.SVGIconImageWelcomeScreen.FixedColor := StringToColor(cSVGColor[devData.Style]);
+
+      // Misc items images
+      ActionList.Images := dmMain.SVGImageListMenuStyle;
+      MainMenu.Images := dmMain.SVGImageListMenuStyle;
+      MessageControl.Images := dmMain.SVGImageListMessageStyle; //dmMain.SVGImageListMenuStyle;
+
+      // Set toolbar images
+      tbMain.Images := dmMain.SVGImageListMenuStyle;
+      tbCompile.Images := dmMain.SVGImageListMenuStyle;
+      tbProject.Images := dmMain.SVGImageListMenuStyle;
+      tbClasses.Images := dmMain.SVGImageListMenuStyle;
+      tbedit.Images := dmMain.SVGImageListMenuStyle;
+      tbSearch.Images := dmMain.SVGImageListMenuStyle;
+      tbSpecials.Images := dmMain.SVGImageListMenuStyle;
+      tbCompilers.Images := dmMain.SVGImageListMenuStyle;
+
+      // Set left control images
+      ProjectView.Images := dmMain.SVGImageListProjectStyle;
+      ClassBrowser.Images := dmMain.SVGImageListClassStyle;
+      DebugView.Images := dmMain.SVGImageListMenuStyle;
+
+      // Set left control and editor popup images
+      ProjectPopup.Images := dmMain.SVGImageListMenuStyle;
+      UnitPopup.Images := dmMain.SVGImageListMenuStyle;
+      FolderPopup.Images := dmMain.SVGImageListMenuStyle;
+      BrowserPopup.Images := dmMain.SVGImageListMenuStyle;
+      DebugPopup.Images := dmMain.SVGImageListMenuStyle;
+      EditorPopup.Images := dmMain.SVGImageListMenuStyle;
+
+      ButtonNewDocument.Images := dmMain.SVGIconImageWelcomeScreen;
+      ButtonNewDocument.ImageIndex := 0;
+      ButtonNewDocument.ImageAlignment := TImageAlignment(2);
+      ButtonOpenDocument.Images := dmMain.SVGIconImageWelcomeScreen;
+      ButtonOpenDocument.ImageIndex := 1;
+      ButtonOpenDocument.ImageAlignment := TImageAlignment(2);
+      ButtonOptions.Images := dmMain.SVGIconImageWelcomeScreen;
+      ButtonOptions.ImageIndex := 2;
+      ButtonOptions.ImageAlignment := TImageAlignment(2);
+end;
+
+procedure TMainForm.GetProjectHistory;
+var
+  Direction: String;
+  FileName:String;
+  I: Integer;
+begin
+  RichEdit0.Text := '';
+  RichEdit1.Text := '';
+  RichEdit2.Text := '';
+  RichEdit3.Text := '';
+  RichEdit4.Text := '';
+  for I := 0 to dmMain.MRU.Count - 1 do
+  begin
+    Direction := PMRUItem(dmMain.MRU.Items[I])^.FileName;
+    FileName := ExtractFileName(Direction);
+    case I of
+      0 : begin
+            AddFileRTB(RichEdit0, FileName, Direction);
+            RichEdit0.Visible := True;
+            SpeedButton0.Visible := True;
+          end;
+      1 : begin
+            AddFileRTB(RichEdit1, FileName, Direction);
+            RichEdit1.Visible := True;
+            SpeedButton1.Visible := True;
+          end;
+      2 :  begin
+            AddFileRTB(RichEdit2, FileName, Direction);
+            RichEdit2.Visible := True;
+            SpeedButton2.Visible := True;
+          end;
+      3 : begin
+            AddFileRTB(RichEdit3, FileName, Direction);
+            RichEdit3.Visible := True;
+            SpeedButton3.Visible := True;
+          end;
+      4 : begin
+            AddFileRTB(RichEdit4, FileName, Direction);
+            RichEdit4.Visible := True;
+            SpeedButton4.Visible := True;
+          end;
+    end;
+  end;
+end;
+
+procedure TMainForm.AddFileRTB(RBName: TRichEdit; aFileName: string; aDirection: string);
+begin
+  with RBName do
+  begin
+    SelStart := GetTextLen;
+    SelAttributes.Size := 11;
+    SelAttributes.Style := [fsBold];
+    SelText := aFileName + #13#10;
+    SelAttributes.Size := 9;
+    SelText := aDirection;
+  end;
+end;
+
+procedure TMainForm.OpenFileProject(s: string);
+begin
+  if FileExists(s) then begin
+    if GetFileTyp(s) = utPrj then
+      OpenProject(s)
+    else
+      OpenFile(s);
+  end else
+    MessageDlg(Format(Lang[ID_ERR_RENAMEDDELETED], [s]), mtInformation, [mbOK], 0);
+end;
+
+procedure TMainForm.ResizeWelcomeComponent;
+begin
+  MainPanel.Height := PageControlPanel.Height;
+  MainPanel.Width := PageControlPanel.Width;
+  PanelLeft.Height := PageControlPanel.Height div 2;
+  PanelLeft.Width := PageControlPanel.Width div 2;
+  ImageBackGround.Height := PageControlPanel.Height div 2;
+  ImageBackGround.Width := PageControlPanel.Width div 2;
+  ImageLogo.Left := (PageControlPanel.Width div 4) - (ImageLogo.Width div 2);
+  LabelWelcome.Left := (PageControlPanel.Width div 4) - (LabelWelcome.Width div 2);
+  LabelSponsor.Top := Max(LabelClear.Top+LabelClear.Height+25,(PageControlPanel.Height - 60) - ImageEmbarcadero.Height - LabelSponsor.Height);
+  LabelSponsor.Left := 50;
+  ImageEmbarcadero.Top := Max(LabelClear.Top+LabelClear.Height+LabelSponsor.Height+25,(PageControlPanel.Height - 60) - ImageEmbarcadero.Height);
+  ImageEmbarcadero.Left := 60;
+  LabelVersion.Left := (PageControlPanel.Width div 4) - (LabelVersion.Width) + 10;
+  LabelNumVersion.Left := (PageControlPanel.Width div 4) + 13;
+  LabelView.Left := (PageControlPanel.Width div 4) - (LabelView.Width + 30);
+  LabelDocumentation.Left := (PageControlPanel.Width div 4) - 23;
+  LabelHotkeys.Left := (PageControlPanel.Width div 4) - (LabelHotkeys.Width div 2);
+  LabelOpen.Left := (PageControlPanel.Width div 4) - 35;
+  LabelSave.Left := (PageControlPanel.Width div 4) - 33;
+  LabelZoom.Left := (PageControlPanel.Width div 4) - 38;
+  LabelRun.Left := (PageControlPanel.Width div 4) - 28;
+  LabelCompile.Left := (PageControlPanel.Width div 4) - 50;
+  LabelClear.left := (PageControlPanel.Width div 4) - 34;
+  LabelDescOpen.Left := (PageControlPanel.Width div 4) + 18;
+  LabelDescSave.Left := (PageControlPanel.Width div 4) + 18;
+  LabelDescZoom.Left := (PageControlPanel.Width div 4) + 18;
+  LabelDescRun.Left := (PageControlPanel.Width div 4) + 18;
+  LabelDescCompile.Left := (PageControlPanel.Width div 4) + 18;
+  LabelDescClear.Left := (PageControlPanel.Width div 4) + 18;
+  ButtonNewDocument.Left := Max(50, (PanelRight.Width div 2) - ButtonNewDocument.Width - (ButtonOpenDocument.Width div 2) - 65);
+  ButtonOpenDocument.Left := ButtonNewDocument.Left + ButtonNewDocument.Width + 25;
+  ButtonOptions.Left := ButtonOpenDocument.Left + ButtonOpenDocument.Width + 25;
+  ButtonChangeTheme.Left := ButtonNewDocument.Left;
+  ButtonChangeFont.Left := ButtonChangeTheme.Left + ButtonChangeTheme.Width + 25;
+  ButtonChangeLanguage.Left := ButtonChangeFont.Left + ButtonChangeFont.Width + 25;
+  RichEdit0.Left := ButtonNewDocument.Left;
+  SpeedButton0.Left := ButtonNewDocument.Left;
+  RichEdit1.Left := ButtonNewDocument.Left;
+  SpeedButton1.Left := ButtonNewDocument.Left;
+  RichEdit2.Left := ButtonNewDocument.Left;
+  SpeedButton2.Left := ButtonNewDocument.Left;
+  RichEdit3.Left := ButtonNewDocument.Left;
+  SpeedButton3.Left := ButtonNewDocument.Left;
+  RichEdit4.Left := ButtonNewDocument.Left;
+  SpeedButton4.Left := ButtonNewDocument.Left;
+end;
+
+// https://stackoverflow.com/questions/2201850/how-to-implement-a-close-button-for-a-ttabsheet-of-a-tpagecontrol
+procedure TMainForm.CloseTabProc(Sender: TObject);
+begin
+  actCloseExecute(Sender);
+end;
+
+procedure TMainForm.PageControlCloseButtonDrawTab(Control: TCustomTabControl;
+  TabIndex: Integer; const Rect: TRect; Active: Boolean);
+var
+  CloseBtnSize: Integer;
+  PageControl: TPageControl;
+  TabSheet: TCloseTabSheet;
+  TabCaption: TPoint;
+  CloseBtnRect: TRect;
+  //CloseBtnDrawState: Cardinal;
+  //CloseBtnDrawDetails: TThemedElementDetails;
+begin
+  PageControl := Control as TPageControl;
+  TabCaption.Y := Rect.Top + 3;
+
+  if Active then
+  begin
+    CloseBtnRect.Top := Rect.Top + 4;
+    CloseBtnRect.Right := Rect.Right - 5 - 25;
+    TabCaption.X := Rect.Left + 6;
+  end
+  else
+  begin
+    CloseBtnRect.Top := Rect.Top + 3;
+    CloseBtnRect.Right := Rect.Right - 5 - 25;
+    TabCaption.X := Rect.Left + 3;
+  end;
+  if PageControl.Pages[TabIndex] is TCloseTabSheet then
+  begin
+    TabSheet:=PageControl.Pages[TabIndex] as TCloseTabSheet;
+    CloseBtnSize := 14;
+
+    CloseBtnRect.Bottom := CloseBtnRect.Top + CloseBtnSize;
+    CloseBtnRect.Left := CloseBtnRect.Right - CloseBtnSize;
+    TabSheet.FCloseButtonRect := CloseBtnRect;
+
+    PageControl.Canvas.Brush.Style := bsSolid;
+    if Active then
+      begin
+          PageControl.Canvas.Brush.Color := StyleServices.GetStyleColor(scTreeView);
+      end
+    else
+      PageControl.Canvas.Brush.Color := StyleServices.GetStyleColor(scGenericBackground);
+
+    PageControl.Canvas.FillRect(Rect);
+    PageControl.Canvas.Font.Color := StyleServices.GetStyleFontColor(sfButtonTextNormal);
+    PageControl.Canvas.TextOut(TabCaption.X, TabCaption.Y,
+            PageControl.Pages[TabIndex].Caption);
+
+    PageControl.Canvas.Pen.Color := StyleServices.GetStyleColor(scGenericBackground);
+    PageControl.Canvas.Pen.Width := 1;
+    PageControl.Canvas.Brush.Color := StyleServices.GetStyleColor(scGenericBackground);
+    PageControl.Canvas.Brush.Style := bsSolid;
+    PageControl.Canvas.Polygon([Point(CloseBtnRect.Left-4+25, CloseBtnRect.Top-4), Point(CloseBtnRect.Right+4+25, CloseBtnRect.Top-4), Point(CloseBtnRect.Right+4+25, CloseBtnRect.Bottom+4)]);
+
+    PageControl.Canvas.Pen.Color := StyleServices.GetStyleColor(scButtonDisabled);
+    PageControl.Canvas.Brush.Color := StyleServices.GetStyleColor(scButtonDisabled);
+    PageControl.Canvas.Ellipse(CloseBtnRect);
+
+    PageControl.Canvas.Pen.Width := 1;
+    PageControl.Canvas.Pen.Color := StyleServices.GetStyleFontColor(sfButtonTextNormal);
+
+    PageControl.Canvas.MoveTo(CloseBtnRect.Left+3, CloseBtnRect.Top+3);
+    PageControl.Canvas.LineTo(CloseBtnRect.Right-2, CloseBtnRect.Bottom-2);
+
+    PageControl.Canvas.MoveTo(CloseBtnRect.Left+3, CloseBtnRect.Bottom-3);
+    PageControl.Canvas.LineTo(CloseBtnRect.Right-2, CloseBtnRect.Top+2);
+
+ {   if not StyleServices.Enabled then
+    begin
+      if (FCloseButtonMouseDownTab = TabSheet) and FCloseButtonShowPushed then
+        CloseBtnDrawState := DFCS_CAPTIONCLOSE + DFCS_PUSHED
+      else
+        CloseBtnDrawState := DFCS_CAPTIONCLOSE;
+
+      //Windows.DrawFrameControl(PageControl.Canvas.Handle,
+      //  TabSheet.FCloseButtonRect, DFC_CAPTION, CloseBtnDrawState);
+    end
+    else
+    begin
+      Dec(TabSheet.FCloseButtonRect.Left);
+
+      if (FCloseButtonMouseDownTab = TabSheet) and FCloseButtonShowPushed then
+        CloseBtnDrawDetails := StyleServices.GetElementDetails(twCloseButtonPushed)
+      else
+        CloseBtnDrawDetails := StyleServices.GetElementDetails(twCloseButtonNormal);
+
+      //StyleServices.DrawElement(PageControl.Canvas.Handle, CloseBtnDrawDetails,
+      //          TabSheet.FCloseButtonRect);
+    end;   }
+  end;{ else begin
+    PageControl.Canvas.Brush.Style := bsSolid;
+    if Active then
+      PageControl.Canvas.Brush.Color := StyleServices.GetStyleColor(scButtonPressed)
+    else
+      PageControl.Canvas.Brush.Color := StyleServices.GetStyleColor(scButtonDisabled);
+    PageControl.Canvas.FillRect(Rect);
+    PageControl.Canvas.Font.Color := StyleServices.GetStyleFontColor(sfButtonTextNormal);
+    PageControl.Canvas.TextOut(TabCaption.X, TabCaption.Y,
+                 PageControl.Pages[TabIndex].Caption);
+  end;}
+end;
+
+procedure TMainForm.PageControlCloseButtonMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  I: Integer;
+  PageControl: TPageControl;
+  TabSheet: TCloseTabSheet;
+begin
+  PageControl := Sender as TPageControl;
+
+  if Button = mbLeft then
+  begin
+    for I := 0 to PageControl.PageCount - 1 do
+    begin
+      if not (PageControl.Pages[i] is TCloseTabSheet) then Continue;
+      TabSheet:=PageControl.Pages[i] as TCloseTabSheet;
+      if PtInRect(TabSheet.FCloseButtonRect, Point(X, Y)) then
+      begin
+        FCloseButtonMouseDownTab := TabSheet;
+        FCloseButtonShowPushed := True;
+        PageControl.Repaint;
+      end;
+    end;
+  end;
+end;
+
+procedure TMainForm.PageControlCloseButtonMouseLeave(Sender: TObject);
+var
+  PageControl: TPageControl;
+begin
+  PageControl := Sender as TPageControl;
+  FCloseButtonShowPushed := False;
+  PageControl.Repaint;
+end;
+
+procedure TMainForm.PageControlCloseButtonMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+var
+  PageControl: TPageControl;
+  Inside: Boolean;
+begin
+  PageControl := Sender as TPageControl;
+
+  if (ssLeft in Shift) and Assigned(FCloseButtonMouseDownTab) then
+  begin
+    Inside := PtInRect(FCloseButtonMouseDownTab.FCloseButtonRect, Point(X, Y));
+
+    if FCloseButtonShowPushed <> Inside then
+    begin
+      FCloseButtonShowPushed := Inside;
+      PageControl.Repaint;
+    end;
+  end;
+end;
+
+procedure TMainForm.PageControlCloseButtonMouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  PageControl: TPageControl;
+begin
+  PageControl := Sender as TPageControl;
+
+  if (Button = mbLeft) and Assigned(FCloseButtonMouseDownTab) then
+  begin
+    if PtInRect(FCloseButtonMouseDownTab.FCloseButtonRect, Point(X, Y)) then
+    begin
+      TTask.Run(procedure begin
+        TThread.Synchronize(nil, procedure begin
+          //FCloseButtonMouseDownTab.DoClose;
+          //FCloseButtonMouseDownTab := nil;
+          actCloseExecute(Sender);
+          PageControl.Repaint;
+        end);
+      end);
+    end;
+  end;
+end;
+
+procedure TMainForm.EditorPageControlDrawTab(Control: TCustomTabControl;
+  TabIndex: Integer; const Rect: TRect; Active: Boolean);
+begin
+  PageControlCloseButtonDrawTab(Control, TabIndex, Rect, Active);
+end;
+
+procedure TMainForm.EditorPageControlMouseLeave(Sender: TObject);
+begin
+  PageControlCloseButtonMouseLeave(Sender);
+end;
+
+procedure TMainForm.EditorPageControlMouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  PageControlCloseButtonMouseUp(Sender, Button, Shift, X, Y);
 end;
 
 end.

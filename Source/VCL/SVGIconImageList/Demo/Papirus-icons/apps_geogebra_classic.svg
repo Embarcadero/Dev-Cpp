@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg48"
+   sodipodi:docname="apps_geogebra_classic.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata54">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs52">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter936"
+       x="-0.023454545"
+       width="1.0469091"
+       y="-0.024571429"
+       height="1.0491429">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.72"
+         id="feGaussianBlur938" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter968"
+       x="-0.0234"
+       width="1.0468"
+       y="-0.024631579"
+       height="1.0492632">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.56"
+         id="feGaussianBlur970" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter984"
+       x="-0.046532788"
+       width="1.0930656"
+       y="-0.049269554"
+       height="1.0985391">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.8080237"
+         id="feGaussianBlur986" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview50"
+     showgrid="false"
+     inkscape:zoom="2.45"
+     inkscape:cx="24"
+     inkscape:cy="89.306122"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg48" />
+  <ellipse
+     style="opacity:0.2;stroke-width:4;filter:url(#filter984)"
+     cx="40.672001"
+     cy="131.02"
+     rx="79.332001"
+     ry="59.279999"
+     transform="matrix(0.84603999,-0.53311944,0.43955441,0.89821597,0,0)"
+     id="ellipse4" />
+  <ellipse
+     style="fill:#6e6e6e;stroke-width:4"
+     cx="42.439999"
+     cy="127.616"
+     rx="79.332001"
+     ry="59.279999"
+     transform="matrix(0.84603999,-0.53311944,0.43955441,0.89821597,0,0)"
+     id="ellipse6" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 115.3125 24.03125 A 58.531112 79.8881 50.459792 0 0 65.945312 38.75 A 58.531112 79.8881 50.459792 0 0 20.097656 112.97852 A 58.531112 79.8881 50.459792 0 1 65.945312 39.75 A 58.531112 79.8881 50.459792 0 1 115.3125 25.03125 A 58.531112 79.8881 50.459792 0 1 159.11719 50.703125 A 58.531112 79.8881 50.459792 0 1 163.89062 74.441406 A 58.531112 79.8881 50.459792 0 1 163.89844 74.625 A 58.531112 79.8881 50.459792 0 0 159.11719 49.703125 A 58.531112 79.8881 50.459792 0 0 115.3125 24.03125 z "
+     id="path10" />
+  <path
+     style="opacity:0.2;stroke-width:4;filter:url(#filter936)"
+     d="M 92,14 C 78.704,14 68,24.704 68,38 68,51.296 78.704,62 92,62 105.296,62 116,51.296 116,38 116,24.704 105.296,14 92,14 Z m 68,40 c -13.296,0 -24,10.704 -24,24 0,13.296 10.704,24 24,24 13.296,0 24,-10.704 24,-24 0,-13.296 -10.704,-24 -24,-24 z M 32,62 C 18.704,62 8,72.704 8,86 8,99.296 18.704,110 32,110 45.296,110 56,99.296 56,86 56,72.704 45.296,62 32,62 Z m 92,56 c -13.296,0 -24,10.704 -24,24 0,13.296 10.704,24 24,24 13.296,0 24,-10.704 24,-24 0,-13.296 -10.704,-24 -24,-24 z m -72,16 c -13.296,0 -24,10.704 -24,24 0,13.296 10.704,24 24,24 13.296,0 24,-10.704 24,-24 0,-13.296 -10.704,-24 -24,-24 z"
+     id="rect2"
+     inkscape:connector-curvature="0" />
+  <path
+     style="fill:#3e3e3e;stroke-width:4"
+     d="M 92 12 C 78.704 12 68 22.704 68 36 C 68 49.296 78.704 60 92 60 C 105.296 60 116 49.296 116 36 C 116 22.704 105.296 12 92 12 z M 160 52 C 146.704 52 136 62.704 136 76 C 136 89.296 146.704 100 160 100 C 173.296 100 184 89.296 184 76 C 184 62.704 173.296 52 160 52 z M 32 60 C 18.704 60 8 70.704 8 84 C 8 97.296 18.704 108 32 108 C 45.296 108 56 97.296 56 84 C 56 70.704 45.296 60 32 60 z M 124 116 C 110.704 116 100 126.704 100 140 C 100 153.296 110.704 164 124 164 C 137.296 164 148 153.296 148 140 C 148 126.704 137.296 116 124 116 z M 52 132 C 38.704 132 28 142.704 28 156 C 28 169.296 38.704 180 52 180 C 65.296 180 76 169.296 76 156 C 76 142.704 65.296 132 52 132 z "
+     id="rect14" />
+  <path
+     style="opacity:0.2;stroke-width:4;filter:url(#filter968)"
+     d="m 92,22 c -8.864,0 -16,7.136 -16,16 0,8.864 7.136,16 16,16 8.864,0 16,-7.136 16,-16 0,-8.864 -7.136,-16 -16,-16 z m 68,40 c -8.864,0 -16,7.136 -16,16 0,8.864 7.136,16 16,16 8.864,0 16,-7.136 16,-16 0,-8.864 -7.136,-16 -16,-16 z M 32,70 c -8.864,0 -16,7.136 -16,16 0,8.864 7.136,16 16,16 8.864,0 16,-7.136 16,-16 0,-8.864 -7.136,-16 -16,-16 z m 92,56 c -8.864,0 -16,7.136 -16,16 0,8.864 7.136,16 16,16 8.864,0 16,-7.136 16,-16 0,-8.864 -7.136,-16 -16,-16 z m -72,16 c -8.864,0 -16,7.136 -16,16 0,8.864 7.136,16 16,16 8.864,0 16,-7.136 16,-16 0,-8.864 -7.136,-16 -16,-16 z"
+     id="rect16"
+     inkscape:connector-curvature="0" />
+  <path
+     style="fill:#6666ff;stroke-width:4"
+     d="M 92 20 C 83.136 20 76 27.136 76 36 C 76 44.864 83.136 52 92 52 C 100.864 52 108 44.864 108 36 C 108 27.136 100.864 20 92 20 z M 160 60 C 151.136 60 144 67.136 144 76 C 144 84.864 151.136 92 160 92 C 168.864 92 176 84.864 176 76 C 176 67.136 168.864 60 160 60 z M 32 68 C 23.136 68 16 75.136 16 84 C 16 92.864 23.136 100 32 100 C 40.864 100 48 92.864 48 84 C 48 75.136 40.864 68 32 68 z M 124 124 C 115.136 124 108 131.136 108 140 C 108 148.864 115.136 156 124 156 C 132.864 156 140 148.864 140 140 C 140 131.136 132.864 124 124 124 z M 52 140 C 43.136 140 36 147.136 36 156 C 36 164.864 43.136 172 52 172 C 60.864 172 68 164.864 68 156 C 68 147.136 60.864 140 52 140 z "
+     id="rect18" />
+</svg>

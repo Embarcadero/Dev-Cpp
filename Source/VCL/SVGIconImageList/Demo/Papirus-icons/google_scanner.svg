@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg22"
+   sodipodi:docname="google_scanner.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata28">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs26">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter856"
+       x="-0.050666667"
+       width="1.1013333"
+       y="-0.0456"
+       height="1.0912">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.04"
+         id="feGaussianBlur858" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter876"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.8"
+         id="feGaussianBlur878" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview24"
+     showgrid="false"
+     inkscape:zoom="3.52"
+     inkscape:cx="96"
+     inkscape:cy="96"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg22" />
+  <rect
+     id="rect2"
+     transform="scale(-1,1)"
+     ry="8"
+     rx="8"
+     y="20"
+     x="-168"
+     height="160"
+     width="144"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter856)" />
+  <rect
+     id="rect4"
+     transform="scale(-1,1)"
+     ry="8"
+     rx="8"
+     y="16"
+     x="-168"
+     height="160"
+     width="144"
+     style="fill:#e4e4e4;stroke-width:4" />
+  <rect
+     id="rect6"
+     transform="scale(-1,1)"
+     ry="0"
+     rx="0"
+     y="32"
+     x="-152"
+     height="112"
+     width="112"
+     style="fill:#4fc3f7;stroke-width:4" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 32 16 C 27.568 16 24 19.568 24 24 L 24 25 C 24 20.568 27.568 17 32 17 L 160 17 C 164.432 17 168 20.568 168 25 L 168 24 C 168 19.568 164.432 16 160 16 L 32 16 z "
+     id="path8" />
+  <circle
+     id="circle10"
+     r="40"
+     cy="84"
+     cx="96"
+     style="fill:#319df4;stroke-width:4" />
+  <circle
+     id="circle12"
+     r="40"
+     cy="72"
+     cx="108"
+     style="fill:#0b82e3;stroke-width:4" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path14"
+     d="M 95.570312,32 C 88.450908,39.212852 84,49.063236 84,60 c 0,22.091388 17.90861,40 40,40 10.90844,0 20.78386,-4.380348 28,-11.460936 V 32 Z"
+     style="fill:#094fb4;fill-rule:evenodd;stroke-width:4" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path16"
+     d="m 124,42.000032 a 20,20 0 0 0 -20,20 20,20 0 0 0 20,20 20,20 0 0 0 20,-20 20,20 0 0 0 -20,-20 z m 0,8 a 12,12 0 0 1 12,12 12,12 0 0 1 -12,12 12,12 0 0 1 -12,-12 12,12 0 0 1 12,-12 z"
+     style="opacity:0.2;fill-rule:evenodd;stroke-width:4;filter:url(#filter876)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path18"
+     d="m 124,40.000032 a 20,20 0 0 0 -20,20 20,20 0 0 0 20,20 20,20 0 0 0 20,-20 20,20 0 0 0 -20,-20 z m 0,8 a 12,12 0 0 1 12,12 12,12 0 0 1 -12,12 12,12 0 0 1 -12,-12 12,12 0 0 1 12,-12 z"
+     style="fill:#ffffff;fill-rule:evenodd;stroke-width:4" />
+</svg>

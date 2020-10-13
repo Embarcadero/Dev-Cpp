@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1.1"
+   id="svg20"
+   sodipodi:docname="apps_my_vodafone.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata26">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs24">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter857"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.2"
+         id="feGaussianBlur859" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter854"
+       x="-0.056292635"
+       width="1.1125853"
+       y="-0.041836885"
+       height="1.0836738">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.0640633"
+         id="feGaussianBlur856" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview22"
+     showgrid="false"
+     inkscape:zoom="2.49"
+     inkscape:cx="-37.857851"
+     inkscape:cy="123.97203"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg20">
+    <inkscape:grid
+       type="xygrid"
+       id="grid832" />
+  </sodipodi:namedview>
+  <circle
+     id="circle2"
+     r="80"
+     cy="100"
+     cx="96"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter857)" />
+  <circle
+     style="opacity:1;fill:#ff4747;fill-opacity:1;stroke:none;stroke-width:7.25230885;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="path830"
+     cx="96"
+     cy="96"
+     r="80" />
+  <path
+     inkscape:connector-curvature="0"
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 96,16 A 80,80 0 0 0 16,96 80,80 0 0 0 16.019531,96.472656 80,80 0 0 1 96,17 80,80 0 0 1 175.97461,96.513672 80,80 0 0 0 176,96 80,80 0 0 0 96,16 Z"
+     id="path8" />
+  <path
+     id="path840"
+     d="M 127.73438,23.593912 C 86.098896,23.989333 52,55.666572 52,93.01774 c 0,27.67215 19.697862,49.02991 44,48.98242 24.44453,0 44,-19.03152 44,-42.574219 0,-24.39706 -15.47731,-38.068616 -35.83984,-41.818357 0.27185,-15.949248 12.30554,-29.711848 26.19726,-32.746094 a 80,80 0 0 0 -2.62304,-1.267578 z"
+     style="opacity:0.2;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.99893498;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter854)"
+     inkscape:connector-curvature="0" />
+  <path
+     inkscape:connector-curvature="0"
+     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:3.99893498;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 127.73438,21.593991 C 86.098896,21.989412 52,53.666651 52,91.017819 c 0,27.672151 19.697862,49.029911 44,48.982421 24.44453,0 44,-19.03152 44,-42.574218 0,-24.397062 -15.47731,-38.068618 -35.83984,-41.818359 0.27185,-15.949248 12.30554,-29.711848 26.19726,-32.746094 a 80,80 0 0 0 -2.62304,-1.267578 z"
+     id="rect826" />
+</svg>

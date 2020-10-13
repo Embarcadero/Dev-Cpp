@@ -6,7 +6,8 @@ object FindForm: TFindForm
   Caption = 'Find Text'
   ClientHeight = 330
   ClientWidth = 330
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -44,7 +45,6 @@ object FindForm: TFindForm
     Width = 100
     Height = 25
     Anchors = [akLeft, akBottom]
-    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 1
@@ -85,7 +85,6 @@ object FindForm: TFindForm
       Top = 46
       Width = 314
       Height = 21
-      ItemHeight = 13
       TabOrder = 0
       OnKeyUp = cboFindTextKeyUp
     end
@@ -156,7 +155,7 @@ object FindForm: TFindForm
       TabOrder = 4
       object rbProjectFiles: TRadioButton
         Left = 8
-        Top = 18
+        Top = 20
         Width = 121
         Height = 17
         Caption = 'Files in Project'
@@ -166,7 +165,7 @@ object FindForm: TFindForm
       end
       object rbOpenFiles: TRadioButton
         Left = 8
-        Top = 42
+        Top = 41
         Width = 121
         Height = 17
         Caption = 'Open Files'
@@ -238,7 +237,6 @@ object FindForm: TFindForm
       Top = 88
       Width = 314
       Height = 21
-      ItemHeight = 13
       TabOrder = 1
       OnKeyUp = cboReplaceTextKeyUp
     end

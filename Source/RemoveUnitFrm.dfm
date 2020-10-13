@@ -5,9 +5,10 @@ object RemoveUnitForm: TRemoveUnitForm
   Caption = 'Remove from project'
   ClientHeight = 196
   ClientWidth = 342
-  Color = clBtnFace
+  Color = clWindow
   Constraints.MinHeight = 90
   Constraints.MinWidth = 180
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11

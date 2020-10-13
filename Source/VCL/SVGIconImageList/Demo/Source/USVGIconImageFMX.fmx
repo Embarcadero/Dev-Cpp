@@ -1,0 +1,57 @@
+object SVGIconImageForm: TSVGIconImageForm
+  Left = 0
+  Top = 0
+  Caption = 
+    'SVGIcon Image Demo - Copyright (c) Ethea S.r.l. - Apache 2.0 Ope' +
+    'n Source License'
+  ClientHeight = 228
+  ClientWidth = 201
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object SVGIconImage: TSVGIconImage
+    MultiResBitmap.Height = 16
+    MultiResBitmap.Width = 16
+    MultiResBitmap = <
+      item
+        Opacity = 1.000000000000000000
+        Size = 182
+        IconName = 'low-priority'
+        SVGText = 
+          '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0' +
+          ' 48 48" enable-background="new 0 0 48 48">    <path fill="#4CAF5' +
+          '0" d="M21.2,44.8l-18-18c-1.6-1.6-1.6-4.1,0-5.7l18-18c1.6-1.6,4.1' +
+          '-1.6,5.7,0l18,18c1.6,1.6,1.6,4.1,0,5.7l-18,18 C25.3,46.4,22.7,46' +
+          '.4,21.2,44.8z"/>    <g fill="#FFEB3B">        <polygon points="2' +
+          '4,33.4 17,25 31,25"/>        <rect x="22" y="14.8" width="4" hei' +
+          'ght="12.3"/>    </g></svg>'
+      end>
+    Align = Client
+    DisableInterpolation = True
+    Size.Width = 201.000000000000000000
+    Size.Height = 182.000000000000000000
+    Size.PlatformDefault = False
+    OnResize = SVGIconImageResize
+    BitmapSize = 201
+  end
+  object Panel1: TPanel
+    Align = Bottom
+    Position.Y = 182.000000000000000000
+    Size.Width = 201.000000000000000000
+    Size.Height = 46.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object Button: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 89.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Next Icon...'
+      OnClick = ButtonClick
+    end
+  end
+end

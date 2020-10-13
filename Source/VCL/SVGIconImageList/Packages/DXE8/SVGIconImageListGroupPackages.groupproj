@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{43558AC6-3EF5-4323-9448-1656FF056E82}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SVGIconPackage.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SVGIconImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="dclSVGIconImageList.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SVGIconPackage">
+        <MSBuild Projects="SVGIconPackage.dproj"/>
+    </Target>
+    <Target Name="SVGIconPackage:Clean">
+        <MSBuild Projects="SVGIconPackage.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SVGIconPackage:Make">
+        <MSBuild Projects="SVGIconPackage.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SVGIconImageList">
+        <MSBuild Projects="SVGIconImageList.dproj"/>
+    </Target>
+    <Target Name="SVGIconImageList:Clean">
+        <MSBuild Projects="SVGIconImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SVGIconImageList:Make">
+        <MSBuild Projects="SVGIconImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclSVGIconImageList">
+        <MSBuild Projects="dclSVGIconImageList.dproj"/>
+    </Target>
+    <Target Name="dclSVGIconImageList:Clean">
+        <MSBuild Projects="dclSVGIconImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclSVGIconImageList:Make">
+        <MSBuild Projects="dclSVGIconImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SVGIconPackage;SVGIconImageList;dclSVGIconImageList"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SVGIconPackage:Clean;SVGIconImageList:Clean;dclSVGIconImageList:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SVGIconPackage:Make;SVGIconImageList:Make;dclSVGIconImageList:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

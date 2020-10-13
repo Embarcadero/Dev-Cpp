@@ -20,7 +20,12 @@ Ver=1
 1004=Archivo de &Recurso
 1005=Pla&ntilla...
 1006=&Class...
-1007=New
+1007=Nuevo
+1008=Nuevo Documento
+1009=Abrir Documento
+1010=Cambiar Tema
+1011=Cambiar Fuente
+1012=Cambiar Lenguaje
 
 
 2001=&Abrir Proyecto o Archivo
@@ -263,13 +268,13 @@ Ver=1
 23005=Código
 23006=Auto Completar Código
 23007=Navegador de Clases(Funciones)
-23008=Autosave
+23008=Autoguardado
 
 
 24001=Inserciones
 24002=Fuente por omisión
-24003=Files
-24004=Options
+24003=Archivos
+24004=Opciones
 24005=Symbol Completion
 
 

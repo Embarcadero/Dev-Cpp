@@ -3,18 +3,21 @@
 
 !define COMPILERNAME "No Compiler"
 !define COMPILERFOLDER ""
-!define DEVCPP_VERSION "5.5"
+!define DEVCPP_VERSION "6.0"
 !define FINALNAME "Embarcadero_Dev-Cpp_${DEVCPP_VERSION}_${COMPILERNAME}_Setup.exe"
 !define DISPLAY_NAME "Embarcadero Dev-C++ ${DEVCPP_VERSION}"
 
 !include "MUI2.nsh"
-
+!include FontReg.nsh
+!include FontName.nsh
+!include WinMessages.nsh
 ####################################################################
 # Installer Attributes
 
 Name "${DISPLAY_NAME}"
 OutFile "${FINALNAME}"
 Caption "${DISPLAY_NAME}"
+RequestExecutionLevel admin
 
 LicenseData "copying.txt"
 InstallDir $PROGRAMFILES\Embarcadero\Dev-Cpp
@@ -126,6 +129,19 @@ Section "Embarcadero Dev-C++ program files (required)" SectionMain
   File /nonfatal /r "Help\*"
   SetOutPath $INSTDIR\AStyle
   File /nonfatal /r "AStyle\*"
+  SetOutPath $INSTDIR\Fonts
+  File /nonfatal "Fonts\*"
+  
+SectionEnd
+
+####################################################################
+# Fonts
+Section "Fonts"
+    SectionIn 1 3
+	StrCpy $FONT_DIR $FONTS	
+	!insertmacro InstallTTFFont "Fonts\Heebo-Regular.ttf"
+	!insertmacro InstallTTFFont "Fonts\SourceCodePro-Regular.ttf"
+	SendMessage ${HWND_BROADCAST} ${WM_FONTCHANGE} 0 0 /TIMEOUT=5000
 SectionEnd
 
 Section "Icon files" SectionIcons
@@ -478,6 +494,7 @@ Section "Uninstall"
   RMDir /r "$INSTDIR\Packages"
   RMDir /r "$INSTDIR\Templates"
   RMDir /r "$INSTDIR\Astyle"
+  RMDir /r "$INSTDIR\Fonts"
 
   StrCpy $0 "$INSTDIR"
   Call un.DeleteDirIfEmpty

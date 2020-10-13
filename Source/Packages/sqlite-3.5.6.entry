@@ -1,0 +1,13 @@
+[Setup]
+AppName=SQLite3
+AppVersion=3.5.6
+Description=SQLite is a small C library in the public domain that implements a simple, self-contained, zero-configuration SQL database engine suitable for embedding in programs. The C API is usable under C++.
+Url=http://www.sqlite.org
+
+[Files]
+bin\sqlite3.dll
+bin\sqlite3.exe
+include\sqlite3.h
+include\sqlite3ext.h
+lib\libsqlite3.a
+lib\libsqlite3dll.a

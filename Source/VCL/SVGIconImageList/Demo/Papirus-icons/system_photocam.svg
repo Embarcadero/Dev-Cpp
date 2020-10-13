@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg28"
+   sodipodi:docname="system_photocam.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata34">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs32">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter869"
+       x="-0.0432"
+       width="1.0864"
+       y="-0.054"
+       height="1.108">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.88"
+         id="feGaussianBlur871" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter885"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.76"
+         id="feGaussianBlur887" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter901"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.96"
+         id="feGaussianBlur903" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview30"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="96"
+     inkscape:cy="96"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg28" />
+  <rect
+     id="rect4"
+     ry="4"
+     rx="4"
+     y="28"
+     x="28"
+     height="16"
+     width="28"
+     style="fill:#4f4f4f;stroke-width:4" />
+  <rect
+     id="rect2"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="8"
+     rx="8"
+     y="-176"
+     x="-168"
+     height="160"
+     width="128"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter869)" />
+  <rect
+     id="rect6"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="8"
+     rx="8"
+     y="-176"
+     x="-164"
+     height="160"
+     width="128"
+     style="fill:#4f4f4f;stroke-width:4" />
+  <circle
+     id="circle8"
+     r="52"
+     cy="100"
+     cx="96"
+     style="opacity:0.4;stroke-width:4" />
+  <circle
+     id="circle10"
+     transform="scale(1,-1)"
+     r="44"
+     cy="-102"
+     cx="96"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter885)" />
+  <circle
+     style="fill:#009587;stroke-width:4"
+     id="circle12"
+     transform="scale(1,-1)"
+     r="44"
+     cy="-100"
+     cx="96" />
+  <circle
+     id="circle14"
+     r="8"
+     cy="56"
+     cx="156"
+     style="opacity:0.4;stroke-width:4" />
+  <circle
+     id="circle16"
+     r="24"
+     cy="102"
+     cx="96"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter901)" />
+  <circle
+     style="fill:#66bfb7;stroke-width:4"
+     id="circle18"
+     r="24"
+     cy="100"
+     cx="96" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 24 36 C 19.568 36 16 39.568 16 44 L 16 45 C 16 40.568 19.568 37 24 37 L 168 37 C 172.432 37 176 40.568 176 45 L 176 44 C 176 39.568 172.432 36 168 36 L 24 36 z "
+     id="path20" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 96 56 A 44 44 0 0 0 52 100 A 44 44 0 0 0 52.019531 100.42773 A 44 44 0 0 1 96 57 A 44 44 0 0 1 139.98047 100.60156 A 44 44 0 0 0 140 100 A 44 44 0 0 0 96 56 z "
+     id="path22" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 96 76 A 24 24 0 0 0 72 100 A 24 24 0 0 0 72.017578 100.50977 A 24 24 0 0 1 96 77 A 24 24 0 0 1 119.97656 100.52148 A 24 24 0 0 0 120 100 A 24 24 0 0 0 96 76 z "
+     id="path24" />
+</svg>

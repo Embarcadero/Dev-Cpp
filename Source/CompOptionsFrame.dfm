@@ -21,11 +21,13 @@ object CompOptionsFrame: TCompOptionsFrame
       Height = 510
       Align = alClient
       BorderStyle = bsNone
+      Ctl3D = False
       DefaultRowHeight = 22
       DisplayOptions = [doKeyColFixed]
       DropDownRows = 40
       FixedCols = 1
       Options = [goEditing, goAlwaysShowEditor]
+      ParentCtl3D = False
       ScrollBars = ssNone
       TabOrder = 0
       OnSetEditText = vleSetEditText

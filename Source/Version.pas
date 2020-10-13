@@ -32,7 +32,7 @@ const
 
   // exe properties
   DEVCPP = 'Embarcadero Dev-C++';
-  DEVCPP_VERSION = '5.5';
+  DEVCPP_VERSION = '6.0';
 
   // delimiters
   DEV_INTERNAL_OPEN = '$__DEV_INTERNAL_OPEN';

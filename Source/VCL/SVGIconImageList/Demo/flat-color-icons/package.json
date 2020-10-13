@@ -1,0 +1,23 @@
+{
+  "name": "flat-color-icons",
+  "version": "1.0.2",
+  "description": "Icons8 has been colored",
+  "main": "index.html",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/icons8/flat-color-icons"
+  },
+  "keywords": [
+    "icons",
+    "material",
+    "flat",
+    "color",
+    "Icons8"
+  ],
+  "author": "Icons8",
+  "license": "MIT OR Good-Boy",
+  "bugs": {
+    "url": "https://github.com/icons8/flat-color-icons/issues"
+  },
+  "homepage": "https://github.com/icons8/flat-color-icons"
+}

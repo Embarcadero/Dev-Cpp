@@ -1,13 +1,14 @@
 object ViewToDoForm: TViewToDoForm
   Left = 486
   Top = 308
-  Width = 604
-  Height = 282
   BorderStyle = bsSizeToolWin
   Caption = 'To-Do list'
-  Color = clBtnFace
+  ClientHeight = 243
+  ClientWidth = 588
+  Color = clWindow
   Constraints.MinHeight = 136
   Constraints.MinWidth = 394
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -21,7 +22,7 @@ object ViewToDoForm: TViewToDoForm
   OnShow = FormShow
   DesignSize = (
     588
-    244)
+    243)
   PixelsPerInch = 96
   TextHeight = 15
   object lblFilter: TLabel
@@ -78,7 +79,6 @@ object ViewToDoForm: TViewToDoForm
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    Cancel = True
     Caption = 'Close'
     TabOrder = 1
     OnClick = btnCloseClick
@@ -100,7 +100,6 @@ object ViewToDoForm: TViewToDoForm
     Height = 23
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
-    ItemHeight = 15
     TabOrder = 3
     OnChange = cmbFilterChange
     Items.Strings = (

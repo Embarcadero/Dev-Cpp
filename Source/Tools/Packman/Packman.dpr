@@ -19,7 +19,10 @@ uses
   LibTar in 'LibTar.pas',
   ExtractionProgressDialog in 'ExtractionProgressDialog.pas' {ExtractionProgress},
   PackmanExitCodesU in 'PackmanExitCodesU.pas',
-  ExceptionsAnalyzer in 'ExceptionsAnalyzer.pas' {frmExceptionsAnalyzer};
+  ExceptionsAnalyzer in 'ExceptionsAnalyzer.pas' {frmExceptionsAnalyzer},
+  Vcl.Themes,
+  Vcl.Styles,
+  Config in 'Config.pas';
 
 {$R *.res}
 

@@ -27,9 +27,6 @@ uses
 
 const
   BoolValYesNo: array[boolean] of String = ('No', 'Yes');
-  ValueToChar: array[0..27] of char = ('0', '1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-    'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-    's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
 type
   // the comments are an example of the record
@@ -66,7 +63,7 @@ type
     fVersion: String; // "4.7.1"
     fType: String; // "TDM-GCC", "MinGW"
     fName: String; // "TDM-GCC 4.7.1 Release"
-    fFolder: String; // MinGW64, MinGW32
+    fFolder: String; // TDM-GCC-64, MinGW64, MinGW32
     fDefInclude: TStringList; // default include dir
     fDefines: TStringList; // list of predefined constants
 
@@ -87,8 +84,8 @@ type
     procedure SetOptions;
 
     // Converts to and from memory format
-    function GetINIOptions: String;
-    procedure SetINIOptions(const value: String);
+    function GetINIOptions: TCompilerOptionsValues;
+    procedure SetINIOptions(const value: TCompilerOptionsValues);
 
     // Validation
     function Validate: boolean; // returns true if valid
@@ -106,10 +103,10 @@ type
     // Option utils
     procedure AddOption(Name, Section: integer; IsC, IsCpp, IsLinker: boolean; Value: integer; const Setting:
       String; Choices: TStringList);
-    function GetOption(const Option: String): Char;
+    function GetOption(const Option: String): Integer;
     function FindOption(const Option: String; var opt: PCompilerOption; var Index: integer): boolean;
-    procedure SetOption(const Option: String; Value: Char); overload;
-    procedure SetOption(Option: PCompilerOption; Value: char); overload;
+    procedure SetOption(const Option: String; Value: Integer); overload;
+    procedure SetOption(Option: PCompilerOption; Value: Integer); overload;
 
     // Obtain response from compiler
     function GetCompilerOutput(const BinDir, BinFile, Input: String): String;
@@ -135,7 +132,7 @@ type
 
     // Options
     property Options: TList read fOptions write fOptions;
-    property INIOptions: String read GetINIOptions write SetINIOptions;
+    property INIOptions: TCompilerOptionsValues read GetINIOptions write SetINIOptions;
 
     // User settings
     property AddtoComp: boolean read fCompAdd write fCompAdd;
@@ -510,6 +507,8 @@ type
     fInterfaceFontSize: integer; // UI font size
     fConsolePause: boolean; // pause console program after return
     fShortenCompPaths: boolean; // shorten compiler paths in compiler log
+    fStyle: integer; // Delphi Style
+    fStyleChange: boolean;
 
     // TWindowPlacement parts
     fWindowState: TWindowState;
@@ -586,12 +585,16 @@ type
     // Floating windows
     fProjectFloat: boolean;
     fMessageFloat: boolean;
+
+    FIsPortable: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
     procedure SettoDefaults; override;
     property LangChange: boolean read fLangChange write fLangChange;
     property ThemeChange: boolean read fThemeChange write fThemeChange;
+    property IsPortable: Boolean read FIsPortable write FIsPortable;
+    property StyleChange: boolean read fStyleChange write fStyleChange;
   published
     property Language: String read fLang write fLang;
     property Theme: String read fTheme write fTheme;
@@ -599,6 +602,7 @@ type
     property Splash: String read fSplash write fSplash;
     property MRUMax: integer read fMRUMax write fMRUMax;
     property ShortenCompPaths: boolean read fShortenCompPaths write fShortenCompPaths;
+    property Style: integer read FStyle write FStyle;
 
     //Execution
     property MinOnRun: boolean read fMinOnRun write fMinOnRun;
@@ -720,11 +724,13 @@ var
   devExternalPrograms: TdevExternalPrograms = nil;
   devFormatter: TdevFormatter = nil;
 
+  TDM_GCC_64_Folder: string = 'TDM-GCC-64';
+
 implementation
 
 uses
   MultiLangSupport, DataFrm, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
-  FileAssocs, TypInfo, DateUtils, Types;
+  FileAssocs, TypInfo, DateUtils, Types, System.IOUtils;
 
 procedure CreateOptions;
 var
@@ -906,6 +912,8 @@ begin
   fdblFiles := FALSE;
   fConsolePause := TRUE;
   fShortenCompPaths := False;
+  fStyle := 0;
+  fTheme := 'NewLook';
 
   // TODO: retrieve directly from visual editor
   fToolbarMain := TRUE;
@@ -936,12 +944,12 @@ begin
   // Office 2007 / Vista support
   osinfo.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
   GetVersionEx(osinfo);
-  if (Screen.Fonts.IndexOf('Segoe UI') <> -1) and (osinfo.dwMajorVersion >= 6) then begin
-    fInterfaceFontSize := 9;
-    fInterfaceFont := 'Segoe UI';
+  if (Screen.Fonts.IndexOf('Heebo') <> -1) and (osinfo.dwMajorVersion >= 6) then begin
+    fInterfaceFontSize := 10;
+    fInterfaceFont := 'Heebo';
   end else begin
     fInterfaceFontSize := 8;
-    fInterfaceFont := 'MS Sans Serif';
+    fInterfaceFont := 'Roboto';
   end;
 
   //read associations set by installer as defaults
@@ -986,6 +994,8 @@ begin
   // Floating windows
   fMessageFloat := false;
   fProjectFloat := false;
+
+  FIsPortable := False;
 end;
 
 { TWindowState }
@@ -1270,7 +1280,7 @@ begin
   fCompOpt := '';
 
   // MinGW32 requires special treatment
-  if ContainsStr(fName, 'MinGW') then
+  if ContainsStr(fName, 'MinGW') or ContainsStr(fName, 'TDC-GCC') then
     fLinkOpt := '-static-libstdc++ -static-libgcc'
   else
     fLinkOpt := '-static-libgcc';
@@ -1290,81 +1300,142 @@ begin
   sl := TStringList.Create;
   sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
   sl.Add('This CPU=native');
-  sl.Add('i386=i386');
-  sl.Add('i486=i486');
-  sl.Add('i586=i586');
-  sl.Add('i686=i686');
-  sl.Add('Pentium=pentium');
-  sl.Add('Pentium MMX=pentium-mmx');
-  sl.Add('Pentium Pro=pentiumpro');
-  sl.Add('Pentium 2=pentium2');
-  sl.Add('Pentium 3=pentium3');
-  sl.Add('Pentium 4=pentium4');
-  sl.Add('Conroe=core2');
-  sl.Add('Nehalem=corei7');
-  sl.Add('Sandy=corei7-avx');
-  sl.Add('K6=k6');
-  sl.Add('K6-2=k6-2');
-  sl.Add('K6-3=k6-3');
-  sl.Add('Athlon=athlon');
-  sl.Add('Athlon Tbird=athlon-tbird');
-  sl.Add('Athlon 4=athlon-4');
-  sl.Add('Athlon XP=athlon-xp');
-  sl.Add('Athlon MP=athlon-mp');
-  sl.Add('K8=k8');
-  sl.Add('K8 Rev.E=k8-sse3');
-  sl.Add('K10=barcelona');
-  sl.Add('Bulldozer=bdver1');
+  sl.Add('x86-64: A generic CPU with 64-bit extensions=x86-64');
+  sl.Add('i386: Original Intel i386 CPU=i386');
+  sl.Add('i486: Intel i486 CPU. (No scheduling is implemented for this chip.)=i486');
+  sl.Add('i586: Intel Pentium CPU with no MMX support.=i586');
+  sl.Add('pentium: Intel Pentium CPU with no MMX support.=pentium');
+  sl.Add('lakemont: Intel Lakemont MCU, based on Intel Pentium CPU.=lakemont');
+  sl.Add('pentium-mmx: Intel Pentium MMX CPU, based on Pentium core with MMX instruction set support.=pentium-mmx');
+  sl.Add('pentiumpro: Intel Pentium Pro CPU.=pentiumpro');
+  sl.Add('i686: When used with -march, the Pentium Pro instruction set is used, so the code runs on all i686 family chips. When used with -mtune, it has the same meaning as ‘generic’.=i686');
+  sl.Add('pentium2: Intel Pentium II CPU, based on Pentium Pro core with MMX instruction set support.=pentium2');
+  sl.Add('pentium3: Intel Pentium III CPU, based on Pentium Pro core with MMX and SSE instruction set support.=pentium3');
+  sl.Add('pentium3m: Intel Pentium III CPU, based on Pentium Pro core with MMX and SSE instruction set support.=pentium3m');
+  sl.Add('pentium-m: Intel Pentium M; low-power version of Intel Pentium III CPU with MMX, SSE and SSE2 instruction set support. Used by Centrino notebooks.=pentium-m');
+  sl.Add('pentium4: Intel Pentium 4 CPU with MMX, SSE and SSE2 instruction set support.=pentium4');
+  sl.Add('pentium4m: Intel Pentium 4 CPU with MMX, SSE and SSE2 instruction set support.=pentium4m');
+  sl.Add('prescott: Improved version of Intel Pentium 4 CPU with MMX, SSE, SSE2 and SSE3 instruction set support.=prescott');
+  sl.Add('nocona: Improved version of Intel Pentium 4 CPU with 64-bit extensions, MMX, SSE, SSE2 and SSE3 instruction set support.=nocona');
+  sl.Add('core2: Intel Core 2 CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support.=core2');
+  sl.Add('nehalem: Intel Nehalem CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2 and POPCNT instruction set support.=nehalem');
+  sl.Add('westmere: Intel Westmere CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AES and PCLMUL instruction set support.=westmere');
+  sl.Add('sandybridge: Intel Sandy Bridge CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AES and PCLMUL instruction set support.=sandybridge');
+  sl.Add('ivybridge: Intel Ivy Bridge CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AES, PCLMUL, FSGSBASE, RDRND and F16C instruction set support.=ivybridge');
+  sl.Add('haswell: Intel Haswell CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2 and F16C instruction set support.=haswell');
+  sl.Add('broadwell: Intel Broadwell CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX and PREFETCHW instruction set support.=broadwell');
+  sl.Add('skylake: Intel Skylake CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC and ' + 'XSAVES instruction set support.=skylake');
+  sl.Add('bonnell: Intel Bonnell CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support.=bonnell');
+  sl.Add('silvermont: Intel Silvermont CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AES, PCLMUL and RDRND instruction set support.=silvermont');
+  sl.Add('goldmont: Intel Goldmont CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AES, PCLMUL, RDRND, XSAVE, XSAVEOPT and FSGSBASE instruction set support.=goldmont');
+  sl.Add('goldmont-plus: Intel Goldmont Plus CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AES, PCLMUL, RDRND, XSAVE, XSAVEOPT, FSGSBASE, PTWRITE, RDPID, SGX and UMIP instruction set support.=goldmont-plus');
+  sl.Add('tremont: Intel Tremont CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AES, PCLMUL, RDRND, XSAVE, XSAVEOPT, FSGSBASE, PTWRITE, RDPID, SGX, UMIP, GFNI-SSE, CLWB and ENCLV instruction set support.=tremont');
+  sl.Add('knl: Intel Knight’s Landing CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, AVX512F, AVX512PF, ' + 'AVX512ER and AVX512CD instruction set support.=knl');
+  sl.Add('knm: Intel Knights Mill CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, AVX512F, AVX512PF, AVX512ER, ' + 'AVX512CD, AVX5124VNNIW, AVX5124FMAPS and AVX512VPOPCNTDQ instruction set support.=knm');
+  sl.Add('avx512: Intel Skylake Server CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, PKU, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC, XSAVES, ' + 'AVX512F, CLWB, AVX512VL, AVX512BW, AVX512DQ and AVX512CD instruction set support.=skylake-avx512');
+  sl.Add('cannonlake: Intel Cannonlake Server CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, PKU, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC, XSAVES, ' + 'AVX512F, AVX512VL, AVX512BW, AVX512DQ, AVX512CD, AVX512VBMI, AVX512IFMA, SHA and UMIP instruction set support.=cannonlake');
+  sl.Add('icelake-client: Intel Icelake Client CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, PKU, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC, XSAVES, ' + 'AVX512F, AVX512VL, AVX512BW, AVX512DQ, AVX512CD, AVX512VBMI, AVX512IFMA, SHA, CLWB, UMIP, RDPID, GFNI, AVX512VBMI2, AVX512VPOPCNTDQ, AVX512BITALG, AVX512VNNI, VPCLMULQDQ, VAES instruction set support.=icelake-client');
+  sl.Add('icelake-server: Intel Icelake Server CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, PKU, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC, XSAVES, ' + 'AVX512F, AVX512VL, AVX512BW, AVX512DQ, AVX512CD, AVX512VBMI, AVX512IFMA, SHA, CLWB, UMIP, RDPID, GFNI, AVX512VBMI2, AVX512VPOPCNTDQ, AVX512BITALG, AVX512VNNI, VPCLMULQDQ, VAES, PCONFIG and WBNOINVD instruction set support.=icelake-server');
+  sl.Add('cascadelake: Intel Cascadelake CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, PKU, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC, XSAVES, ' + 'AVX512F, CLWB, AVX512VL, AVX512BW, AVX512DQ, AVX512CD and AVX512VNNI instruction set support.=cascadelake');
+  sl.Add('cooperlake: Intel cooperlake CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, PKU, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC, XSAVES, ' + 'AVX512F, CLWB, AVX512VL, AVX512BW, AVX512DQ, AVX512CD, AVX512VNNI and AVX512BF16 instruction set support.=cooperlake');
+  sl.Add('tigerlake: Intel Tigerlake CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, PKU, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC, XSAVES, ' + 'AVX512F, AVX512VL, AVX512BW, AVX512DQ, AVX512CD, AVX512VBMI, AVX512IFMA, SHA, CLWB, UMIP, RDPID, GFNI, AVX512VBMI2, AVX512VPOPCNTDQ, AVX512BITALG, AVX512VNNI, ' + 'VPCLMULQDQ, VAES, PCONFIG, WBNOINVD, MOVDIRI, MOVDIR64B and AVX512VP2INTERSECT instruction set support.=tigerlake');
+  sl.Add('sapphirerapids: Intel sapphirerapids CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, PKU, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, BMI, BMI2, F16C, RDSEED, ADCX, PREFETCHW, CLFLUSHOPT, XSAVEC, ' + 'XSAVES, AVX512F, CLWB, AVX512VL, AVX512BW, AVX512DQ, AVX512CD, AVX512VNNI, AVX512BF16, MOVDIRI, MOVDIR64B, AVX512VP2INTERSECT, ENQCMD, CLDEMOTE, PTWRITE, WAITPKG, SERIALIZE and TSXLDTRK instruction set support.=sapphirerapids');
+  sl.Add('alderlake: Intel Alderlake CPU with 64-bit extensions, MOVBE, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AVX2, AES, PCLMUL, FSGSBASE, RDRND, FMA, CLDEMOTE, PTWRITE, WAITPKG and SERIALIZE instruction set support.=alderlake');
+  sl.Add('k6: AMD K6 CPU with MMX instruction set support.=k6');
+  sl.Add('k6-2: Improved versions of AMD K6 CPU with MMX and 3DNow! instruction set support.=k6-2');
+  sl.Add('k6-3: Improved versions of AMD K6 CPU with MMX and 3DNow! instruction set support.=k6-3');
+  sl.Add('athlon: AMD Athlon CPU with MMX, 3dNOW!, enhanced 3DNow! and SSE prefetch instructions support.=athlon');
+  sl.Add('athlon-tbird: AMD Athlon CPU with MMX, 3dNOW!, enhanced 3DNow! and SSE prefetch instructions support.=athlon-tbird');
+  sl.Add('athlon-4: Improved AMD Athlon CPU with MMX, 3DNow!, enhanced 3DNow! and full SSE instruction set support.=athlon-4');
+  sl.Add('athlon-xp: Improved AMD Athlon CPU with MMX, 3DNow!, enhanced 3DNow! and full SSE instruction set support.=athlon-xp');
+  sl.Add('athlon-mp: Improved AMD Athlon CPU with MMX, 3DNow!, enhanced 3DNow! and full SSE instruction set support.=athlon-mp');
+  sl.Add('k8: Processors based on the AMD K8 core with x86-64 instruction set support, including the AMD Opteron, Athlon 64, and Athlon 64 FX processors. (This supersets MMX, SSE, SSE2, 3DNow!, enhanced 3DNow! and 64-bit instruction set extensions.)=k8');
+  sl.Add('opteron: Processors based on the AMD K8 core with x86-64 instruction set support, including the AMD Opteron, Athlon 64, and Athlon 64 FX processors. (This supersets MMX, SSE, SSE2, 3DNow!, enhanced 3DNow! and ' + '64-bit instruction set extensions.)=opteron');
+  sl.Add('athlon64: Processors based on the AMD K8 core with x86-64 instruction set support, including the AMD Opteron, Athlon 64, and Athlon 64 FX processors. (This supersets MMX, SSE, SSE2, 3DNow!, enhanced 3DNow! and ' + '64-bit instruction set extensions.)=athlon64');
+  sl.Add('athlon-fx: Processors based on the AMD K8 core with x86-64 instruction set support, including the AMD Opteron, Athlon 64, and Athlon 64 FX processors. (This supersets MMX, SSE, SSE2, 3DNow!, enhanced 3DNow! and ' + '64-bit instruction set extensions.)=athlon-fx');
+  sl.Add('k8-sse3: Improved versions of AMD K8 cores with SSE3 instruction set support.=k8-sse3');
+  sl.Add('opteron-sse3: Improved versions of AMD K8 cores with SSE3 instruction set support.=opteron-sse3');
+  sl.Add('athlon64-sse3: Improved versions of AMD K8 cores with SSE3 instruction set support.=athlon64-sse3');
+  sl.Add('amdfam10: CPUs based on AMD Family 10h cores with x86-64 instruction set support. (This supersets MMX, SSE, SSE2, SSE3, SSE4A, 3DNow!, enhanced 3DNow!, ABM and 64-bit instruction set extensions.)=amdfam10');
+  sl.Add('barcelona: CPUs based on AMD Family 10h cores with x86-64 instruction set support. (This supersets MMX, SSE, SSE2, SSE3, SSE4A, 3DNow!, enhanced 3DNow!, ABM and 64-bit instruction set extensions.)=barcelona');
+  sl.Add('bdver1: CPUs based on AMD Family 15h cores with x86-64 instruction set support. (This supersets FMA4, AVX, XOP, LWP, AES, PCLMUL, CX16, MMX, SSE, SSE2, SSE3, SSE4A, SSSE3, SSE4.1, SSE4.2, ABM and 64-bit instruction set extensions.)=bdver1');
+  sl.Add('bdver2: AMD Family 15h core based CPUs with x86-64 instruction set support. (This supersets BMI, TBM, F16C, FMA, FMA4, AVX, XOP, LWP, AES, PCLMUL, CX16, MMX, SSE, SSE2, SSE3, SSE4A, SSSE3, SSE4.1, SSE4.2, ABM and ' + '64-bit instruction set extensions.)=bdver2');
+  sl.Add('bdver3: AMD Family 15h core based CPUs with x86-64 instruction set support. (This supersets BMI, TBM, F16C, FMA, FMA4, FSGSBASE, AVX, XOP, LWP, AES, PCLMUL, CX16, MMX, SSE, SSE2, SSE3, SSE4A, SSSE3, SSE4.1, ' + 'SSE4.2, ABM and 64-bit instruction set extensions.)=bdver3');
+  sl.Add('bdver4: AMD Family 15h core based CPUs with x86-64 instruction set support. (This supersets BMI, BMI2, TBM, F16C, FMA, FMA4, FSGSBASE, AVX, AVX2, XOP, LWP, AES, PCLMUL, CX16, MOVBE, MMX, SSE, SSE2, SSE3, SSE4A, ' + 'SSSE3, SSE4.1, SSE4.2, ABM and 64-bit instruction set extensions.)=bdver4');
+  sl.Add('znver1: AMD Family 17h core based CPUs with x86-64 instruction set support. (This supersets BMI, BMI2, F16C, FMA, FSGSBASE, AVX, AVX2, ADCX, RDSEED, MWAITX, SHA, CLZERO, AES, PCLMUL, CX16, MOVBE, MMX, SSE, SSE2, ' + 'SSE3, SSE4A, SSSE3, SSE4.1, SSE4.2, ABM, XSAVEC, XSAVES, CLFLUSHOPT, POPCNT, and 64-bit instruction set extensions.)=znver1');
+  sl.Add('znver2: AMD Family 17h core based CPUs with x86-64 instruction set support. (This supersets BMI, BMI2, CLWB, F16C, FMA, FSGSBASE, AVX, AVX2, ADCX, RDSEED, MWAITX, SHA, CLZERO, AES, PCLMUL, CX16, MOVBE, MMX, SSE, SSE2, ' + 'SSE3, SSE4A, SSSE3, SSE4.1, SSE4.2, ABM, XSAVEC, XSAVES, CLFLUSHOPT, POPCNT, RDPID, WBNOINVD, and 64-bit instruction set extensions.)=znver2');
+  sl.Add('btver1: CPUs based on AMD Family 14h cores with x86-64 instruction set support. (This supersets MMX, SSE, SSE2, SSE3, SSSE3, SSE4A, CX16, ABM and 64-bit instruction set extensions.)=btver1');
+  sl.Add('btver2: CPUs based on AMD Family 16h cores with x86-64 instruction set support. This includes MOVBE, F16C, BMI, AVX, PCLMUL, AES, SSE4.2, SSE4.1, CX16, ABM, SSE4A, SSSE3, SSE3, SSE2, SSE, MMX and 64-bit instruction set extensions.=btver2');
+  sl.Add('winchip-c6: IDT WinChip C6 CPU, dealt in same way as i486 with additional MMX instruction set support.=winchip-c6');
+  sl.Add('winchip2: IDT WinChip 2 CPU, dealt in same way as i486 with additional MMX and 3DNow! instruction set support.=winchip2');
+  sl.Add('c3: VIA C3 CPU with MMX and 3DNow! instruction set support. (No scheduling is implemented for this chip.)=c3');
+  sl.Add('c3-2: VIA C3-2 (Nehemiah/C5XL) CPU with MMX and SSE instruction set support. (No scheduling is implemented for this chip.)=c3-2');
+  sl.Add('c7: VIA C7 (Esther) CPU with MMX, SSE, SSE2 and SSE3 instruction set support. (No scheduling is implemented for this chip.)=c7');
+  sl.Add('samuel-2: VIA Eden Samuel 2 CPU with MMX and 3DNow! instruction set support. (No scheduling is implemented for this chip.)=samuel-2');
+  sl.Add('nehemiah: VIA Eden Nehemiah CPU with MMX and SSE instruction set support. (No scheduling is implemented for this chip.)=nehemiah');
+  sl.Add('esther: VIA Eden Esther CPU with MMX, SSE, SSE2 and SSE3 instruction set support. (No scheduling is implemented for this chip.)=esther');
+  sl.Add('eden-x2: VIA Eden X2 CPU with x86-64, MMX, SSE, SSE2 and SSE3 instruction set support. (No scheduling is implemented for this chip.)=eden-x2');
+  sl.Add('eden-x4: VIA Eden X4 CPU with x86-64, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX and AVX2 instruction set support. (No scheduling is implemented for this chip.)=eden-x4');
+  sl.Add('nano: Generic VIA Nano CPU with x86-64, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support. (No scheduling is implemented for this chip.)=nano');
+  sl.Add('nano-1000: VIA Nano 1xxx CPU with x86-64, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support. (No scheduling is implemented for this chip.)=nano-1000');
+  sl.Add('nano-2000: VIA Nano 2xxx CPU with x86-64, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support. (No scheduling is implemented for this chip.)=nano-2000');
+  sl.Add('nano-3000: VIA Nano 3xxx CPU with x86-64, MMX, SSE, SSE2, SSE3, SSSE3 and SSE4.1 instruction set support. (No scheduling is implemented for this chip.)=nano-3000');
+  sl.Add('nano-x2: VIA Nano Dual Core CPU with x86-64, MMX, SSE, SSE2, SSE3, SSSE3 and SSE4.1 instruction set support. (No scheduling is implemented for this chip.)=nano-x2');
+  sl.Add('nano-x4: VIA Nano Quad Core CPU with x86-64, MMX, SSE, SSE2, SSE3, SSSE3 and SSE4.1 instruction set support. (No scheduling is implemented for this chip.)=nano-x4');
+  sl.Add('geode: AMD Geode embedded processor with MMX and 3DNow! instruction set support.=geode');
+
   AddOption(ID_COPT_ARCH, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-march=', sl);
 
   // Optimization
-  sl := TStringList.Create;
-  sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
-  sl.Add('This CPU=native');
-  sl.Add('i386=i386');
-  sl.Add('i486=i486');
-  sl.Add('i586=i586');
-  sl.Add('i686=i686');
-  sl.Add('Pentium=pentium');
-  sl.Add('Pentium MMX=pentium-mmx');
-  sl.Add('Pentium Pro=pentiumpro');
-  sl.Add('Pentium 2=pentium2');
-  sl.Add('Pentium 3=pentium3');
-  sl.Add('Pentium 4=pentium4');
-  sl.Add('Conroe=core2');
-  sl.Add('Nehalem=corei7');
-  sl.Add('Sandy=corei7-avx');
-  sl.Add('K6=k6');
-  sl.Add('K6-2=k6-2');
-  sl.Add('K6-3=k6-3');
-  sl.Add('Athlon=athlon');
-  sl.Add('Athlon Tbird=athlon-tbird');
-  sl.Add('Athlon 4=athlon-4');
-  sl.Add('Athlon XP=athlon-xp');
-  sl.Add('Athlon MP=athlon-mp');
-  sl.Add('K8=k8');
-  sl.Add('K8 Rev.E=k8-sse3');
-  sl.Add('K10=barcelona');
-  sl.Add('Bulldozer=bdver1');
-  AddOption(ID_COPT_TUNE, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-mtune=', sl);
+  var sl2 := TStringList.Create;
+  sl2.Assign(sl);
+  sl2.Insert(2, 'generic: Produce code optimized for the most common IA32/AMD64/EM64T processors=generic');
+  sl2.Insert(3, 'intel: Produce code optimized for the most current Intel processors, which are Haswell and Silvermont for this version of GCC=intel');
+
+  AddOption(ID_COPT_TUNE, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-mtune=', sl2);
 
   // Built-in processor functions
   sl := TStringList.Create;
   sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
-  sl.Add('MMX=mmx');
-  sl.Add('3D Now=3dnow');
-  sl.Add('SSE=sse');
-  sl.Add('SSE2=sse2');
-  sl.Add('SSE3=sse3');
-  sl.Add('SSSE3=ssse3');
-  sl.Add('SSE4=sse4');
-  sl.Add('SSE4A=sse4a');
-  sl.Add('SSE4.1=sse4.1');
-  sl.Add('SSE4.2=sse4.2');
-  sl.Add('AVX=avx');
-  sl.Add('FMA4=fma4');
-  sl.Add('XOP=xop');
-  sl.Add('AES=aes');
+  sl.Add('cmov: CMOV instruction.=cmov');
+  sl.Add('mmx: MMX instructions.=mmx');
+  sl.Add('m3dnow: 3DNow=3dnow');
+  sl.Add('m3dnowa: 3DNow=3dnowa');
+  sl.Add('popcnt: POPCNT instruction.=popcnt');
+  sl.Add('sse: SSE instructions.=sse');
+  sl.Add('sse2: SSE2 instructions.=sse2');
+  sl.Add('sse3: SSE3 instructions.=sse3');
+  sl.Add('ssse3: SSSE3 instructions.=ssse3');
+  sl.Add('sse4.1: SSE4.1 instructions.=sse4.1');
+  sl.Add('sse4.2: SSE4.2 instructions.=sse4.2');
+  sl.Add('avx: AVX instructions.=avx');
+  sl.Add('avx2: AVX2 instructions.=avx2');
+  sl.Add('sse4a: SSE4A instructions.=sse4a');
+  sl.Add('fma4: FMA4 instructions.=fma4');
+  sl.Add('xop: XOP instructions.=xop');
+  sl.Add('fma: FMA instructions.=fma');
+  sl.Add('avx512f: AVX512F instructions.=avx512f');
+  sl.Add('bmi: BMI instructions.=bmi');
+  sl.Add('bmi2: BMI2 instructions.=bmi2');
+  sl.Add('aes: AES instructions.=aes');
+  sl.Add('pclmul: PCLMUL instructions.=pclmul');
+  sl.Add('avx512vl: AVX512VL instructions.=avx512vl');
+  sl.Add('avx512bw: AVX512BW instructions.=avx512bw');
+  sl.Add('avx512dq: AVX512DQ instructions.=avx512dq');
+  sl.Add('avx512cd: AVX512CD instructions.=avx512cd');
+  sl.Add('avx512er: AVX512ER instructions.=avx512er');
+  sl.Add('avx512pf: AVX512PF instructions.=avx512pf');
+  sl.Add('avx512vbmi: AVX512VBMI instructions.=avx512vbmi');
+  sl.Add('avx512ifma: AVX512IFMA instructions.=avx512ifma');
+  sl.Add('avx5124vnniw: AVX5124VNNIW instructions.=avx5124vnniw');
+  sl.Add('avx5124fmaps: AVX5124FMAPS instructions.=avx5124fmaps');
+  sl.Add('avx512vpopcntdq: AVX512VPOPCNTDQ instructions.=avx512vpopcntdq');
+  sl.Add('avx512vbmi2: AVX512VBMI2 instructions.=avx512vbmi2');
+  sl.Add('gfni: GFNI instructions.=gfni');
+  sl.Add('vpclmulqdq: VPCLMULQDQ instructions.=vpclmulqdq');
+  sl.Add('avx512vnni: AVX512VNNI instructions.=avx512vnni');
+  sl.Add('avx512bitalg: AVX512BITALG instructions.');
+
   AddOption(ID_COPT_BUILTINPROC, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-m', sl);
 
   // Optimization
@@ -1396,6 +1467,10 @@ begin
   sl.Add('GNU C99=gnu99');
   sl.Add('GNU C++=gnu++98');
   sl.Add('GNU C++11=gnu++11');
+  sl.Add('GNU C++14=gnu++14');
+  sl.Add('GNU C++17=gnu++17');
+  sl.Add('GNU C++2a=gnu++2a');
+
   AddOption(ID_COPT_STD, ID_COPT_GRP_CODEGEN, True, True, False, 0, '-std=', sl);
 
   // Warnings
@@ -1440,15 +1515,15 @@ begin
   fOptions.Add(option);
 end;
 
-function TdevCompilerSet.GetOption(const Option: String): Char;
+function TdevCompilerSet.GetOption(const Option: String): Integer;
 var
   OptionStruct: PCompilerOption;
   OptionIndex: integer;
 begin
   if FindOption(Option, OptionStruct, OptionIndex) then
-    result := ValueToChar[OptionStruct^.Value]
+    result := OptionStruct^.Value
   else
-    result := '0';
+    result := 0;
 end;
 
 function TdevCompilerSet.FindOption(const Option: String; var opt: PCompilerOption; var Index: integer): boolean;
@@ -1465,25 +1540,24 @@ begin
     end;
 end;
 
-function TdevCompilerSet.GetINIOptions: String;
+function TdevCompilerSet.GetINIOptions: TCompilerOptionsValues;
 var
   I: integer;
 begin
-  Result := '';
+  Result := [];
   for I := 0 to fOptions.Count - 1 do
-    Result := Result + ValueToChar[PCompilerOption(fOptions[I])^.Value];
+    Result := Result + [PCompilerOption(fOptions[I])^.Value];
 end;
 
-procedure TdevCompilerSet.SetINIOptions(const value: String);
+procedure TdevCompilerSet.SetINIOptions(const value: TArray<Integer>);
 var
   I: integer;
 begin
   for I := 0 to fOptions.Count - 1 do
-    if I < Length(value) then
-      PCompilerOption(fOptions[I])^.Value := CharToValue(value[I + 1]);
+    PCompilerOption(fOptions[I])^.Value := value.OptionValue[I];
 end;
 
-procedure TdevCompilerSet.SetOption(const Option: String; Value: Char);
+procedure TdevCompilerSet.SetOption(const Option: String; Value: Integer);
 var
   OptionStruct: PCompilerOption;
   OptionIndex: integer;
@@ -1492,9 +1566,9 @@ begin
     SetOption(Option, Value);
 end;
 
-procedure TdevCompilerSet.SetOption(Option: PCompilerOption; Value: char);
+procedure TdevCompilerSet.SetOption(Option: PCompilerOption; Value: Integer);
 begin
-  Option^.Value := CharToValue(Value);
+  Option^.Value := Value;
 end;
 
 function TdevCompilerSet.GetCompilerOutput(const BinDir, BinFile, Input: String): String;
@@ -1632,6 +1706,22 @@ begin
           AddUnique(fCDir, devDirs.fExec + 'MinGW32' + pd + 'include');
         if badinccpp <> '' then
           AddUnique(fCppDir, devDirs.fExec + 'MinGW32' + 'include');
+
+      end else if ContainsStr(fName, 'TDM-GCC-64') then begin
+
+        // Add defaults
+        if (badbin <> '') or (fBinDir.Count = 0) then
+          AddUnique(fBinDir, devDirs.fExec + 'TDM-GCC-64\bin');
+        if badlib <> '' then begin
+          if ContainsStr(fName, 'TDM-GCC') and ContainsStr(fName, '32-bit') then
+            AddUnique(fLibDir, devDirs.fExec + 'TDM-GCC-64' + pd + 'x86_64-w64-mingw32' + pd + 'lib32')
+          else
+            AddUnique(fLibDir, devDirs.fExec + 'TDM-GCC-64' + pd + 'x86_64-w64-mingw32' + pd + 'lib');
+        end;
+        if badinc <> '' then
+          AddUnique(fCDir, devDirs.fExec + 'TDM-GCC-64' + 'x86_64-w64-mingw32' + pd + 'include');
+        if badinccpp <> '' then
+          AddUnique(fCppDir, devDirs.fExec + 'TDM-GCC-64' + pd + 'x86_64-w64-mingw32' + pd + 'include');
 
       end else begin
 
@@ -1879,7 +1969,7 @@ begin
     fgprofName := devData.ReadS(key, GPROF_PROGRAM);
 
     // Load the option in string format
-    INIOptions := devData.ReadS(key, 'Options');
+    INIOptions := TCompilerOptionsValues.FromString(devData.ReadS(key, 'Options'));
 
     // Extra parameters
     fCompOpt := devData.ReadS(key, 'CompOpt');
@@ -1952,7 +2042,7 @@ begin
     devData.Write(key, GPROF_PROGRAM, fgprofName);
 
     // Save option string
-    devData.Write(key, 'Options', INIOptions);
+    devData.Write(key, 'Options', INIOptions.ToString);
 
     // Save extra 'general' options
     devData.Write(key, 'CompOpt', fCompOpt);
@@ -2095,14 +2185,16 @@ var
   option: PCompilerOption;
   index, I: integer;
 begin
-  // Assume 64bit compilers are put in the MinGW64 folder
-  if DirectoryExists(devDirs.Exec + 'MinGW64' + pd) then begin
+  // Assume 64bit compilers are put in the TDM-GCC (MinGW64) folder
+  TDM_GCC_64_Folder := TPath.Combine(devDirs.Exec, TDM_GCC_64_Folder);
+
+  if TDirectory.Exists(TDM_GCC_64_Folder) then begin
 
     // we only require GCC.exe to be present
-    if FileExists(devDirs.Exec + 'MinGW64' + pd + 'bin' + pd + GCC_PROGRAM) then begin
+    if TFile.Exists(TPath.Combine(TPath.Combine(TDM_GCC_64_Folder, 'bin'), GCC_PROGRAM)) then begin
 
       // Default, release profile
-      BaseSet := AddSet(devDirs.Exec + 'MinGW64');
+      BaseSet := AddSet(TDM_GCC_64_Folder);
       BaseName := BaseSet.Name;
       with BaseSet do begin
         Name := BaseName + ' 64-bit Release';
@@ -2112,14 +2204,14 @@ begin
       with AddSet(BaseSet) do begin
         Name := BaseName + ' 64-bit Debug';
         if FindOption('-g3', option, index) then
-          SetOption(option, '1');
+          SetOption(option, 1);
       end;
 
       // Profiling profile
       with AddSet(BaseSet) do begin
         Name := BaseName + ' 64-bit Profiling';
         if FindOption('-pg', option, index) then
-          SetOption(option, '1');
+          SetOption(option, 1);
       end;
 
       // Default, 32bit release profile
@@ -2127,7 +2219,7 @@ begin
       with BaseSet do begin
         Name := BaseName + ' 32-bit Release';
         if FindOption('-', option, index) then // -m is used my -mINSTRUCTIONSET, so use - instead
-          SetOption(option, '1');
+          SetOption(option, 1);
 
         // Hack fix, but works...
         fgdbName := GDB32_PROGRAM;
@@ -2142,44 +2234,18 @@ begin
       with AddSet(BaseSet) do begin
         Name := BaseName + ' 32-bit Debug';
         if FindOption('-g3', option, index) then
-          SetOption(option, '1');
+          SetOption(option, 1);
       end;
 
       // Profiling profile
       with AddSet(BaseSet) do begin
         Name := BaseName + ' 32-bit Profiling';
         if FindOption('-pg', option, index) then
-          SetOption(option, '1');
+          SetOption(option, 1);
       end;
     end;
   end;
 
-  // And assume 32bit compilers are put in the MinGW32 folder
-  if DirectoryExists(devDirs.Exec + 'MinGW32' + pd) then begin
-    if FileExists(devDirs.Exec + 'MinGW32' + pd + 'bin' + pd + 'gcc.exe') then begin
-
-      // Default, release profile
-      BaseSet := AddSet(devDirs.Exec + 'MinGW32');
-      BaseName := BaseSet.Name;
-      with BaseSet do begin
-        Name := BaseName + ' 32-bit Release';
-      end;
-
-      // Debug profile
-      with AddSet(BaseSet) do begin
-        Name := BaseName + ' 32-bit Debug';
-        if FindOption('-g3', option, index) then
-          SetOption(option, '1');
-      end;
-
-      // Profiling profile
-      with AddSet(BaseSet) do begin
-        Name := BaseName + ' 32-bit Profiling';
-        if FindOption('-pg', option, index) then
-          SetOption(option, '1');
-      end;
-    end;
-  end;
 end;
 
 procedure TdevCompilerSets.ClearSets;
@@ -2215,11 +2281,19 @@ begin
   fTemp := fExec + TEMPLATE_DIR;
   fThemes := fExec + THEME_DIR;
 
-  // Get my documents folder
-  if SHGetSpecialFolderPath(Application.Handle, DocumentsPath, CSIDL_MYDOCUMENTS, false) then
-    fDefault := DocumentsPath
+  if devData.IsPortable then
+  begin
+    fDefault := TPath.Combine(fExec, 'Projects');
+    TDirectory.CreateDirectory(fDefault);
+  end
   else
-    fDefault := fExec;
+  begin
+    // Get my documents folder
+    if SHGetSpecialFolderPath(Application.Handle, DocumentsPath, CSIDL_MYDOCUMENTS, false) then
+      fDefault := DocumentsPath
+    else
+      fDefault := fExec;
+  end;
 end;
 
 procedure TdevDirs.LoadSettings;
@@ -2326,6 +2400,8 @@ begin
   // Display
   fFont.name := 'Consolas';
   fFont.Size := 10;
+  //fFont.name := 'Source Code Pro';
+  //fFont.Size := 10;
 
   // Display #2
   fShowGutter := TRUE;
@@ -2336,6 +2412,8 @@ begin
   fLeadZero := FALSE;
   fGutterFont.Name := 'Consolas';
   fGutterFont.Size := 10;
+  //fGutterFont.name := 'Source Code Pro';
+  //fGutterFont.Size := 10;
   fGutterSize := 1;
 
   // Autosave
@@ -2625,7 +2703,7 @@ var
   DummyEditor: TSynEdit;
 begin
   // Store file backup in AStyle dir and format that file
-  FileName := devDirs.Exec + fAStyleDir + ExtractFileName(Editor.FileName);
+  FileName := TPath.Combine(TPath.GetTempPath,ExtractFileName(Editor.FileName)); //devDirs.Exec + fAStyleDir
   Editor.Text.Lines.SaveToFile(FileName);
   FormatFile(FileName, OverrideCommand);
 
@@ -2654,7 +2732,7 @@ var
 begin
   WorkingDir := devDirs.Exec + fAStyleDir;
   RunCommand := fAStyleFile + ' ' + OverrideCommand + ' "' + FileName + '"';
-  Result := RunAndGetOutput(WorkingDir + RunCommand, WorkingDir, nil, nil, False);
+  Result := RunAndGetOutput(WorkingDir + RunCommand, TPath.GetTempPath, nil, nil, False);
 end;
 
 function TdevFormatter.GetVersion: String;
@@ -2663,7 +2741,7 @@ var
 begin
   WorkingDir := devDirs.Exec + fAStyleDir;
   RunCommand := fAStyleFile + ' --version';
-  Result := RunAndGetOutput(WorkingDir + RunCommand, WorkingDir, nil, nil, False);
+  Result := RunAndGetOutput(WorkingDir + RunCommand, TPath.GetTempPath, nil, nil, False);
 end;
 
 { TdevExternalPrograms }

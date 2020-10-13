@@ -9,7 +9,10 @@ uses
   filefrm in 'filefrm.pas' {FileForm},
   buildfrm in 'buildfrm.pas' {BuildForm},
   actionfrm in 'actionfrm.pas' {ActionForm},
-  Aboutfrm in 'Aboutfrm.pas' {frmAbout};
+  Aboutfrm in 'Aboutfrm.pas' {frmAbout},
+  Config in 'Config.pas',
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.res}
 

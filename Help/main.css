@@ -1,6 +1,6 @@
 html {
-	font-family:"Segoe UI","MS Sans Serif",serif;
-	font-size:12pt;
+	font-family:"Heebo","Segoe UI","MS Sans Serif",serif;
+	font-size:10pt;
 	height:100%;
 }
 body {
@@ -21,7 +21,7 @@ iframe {
 	width:290px;
 	border-right:2px solid black;
 	height:100%;
-	background-color:#EEEEEE;
+	background-color:#FFFFF;
 	overflow:scroll;
 	overflow-x:hidden;
 	overflow-y:auto;
@@ -30,6 +30,7 @@ iframe {
 	margin-left:277px;
 	height:100%;
 	overflow:hidden; /* fix mysterious 2px white margin at bottom */
+    font-weight:bold;
 }
 #Content {
 	width:100%;
@@ -59,6 +60,7 @@ li {
 	left:5px;
 	bottom:5px;
 	display:table;
+    color:rgb(255,0,31);
 }
 #FooterText {
 	display:table-cell;

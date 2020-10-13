@@ -38,6 +38,11 @@ const
   ID_ITEM_NEWTEMPLATE                   = 1005;
   ID_ITEM_NEWCLASS                      = 1006;
   ID_HINT_NEW                           = 1007;
+  ID_ITEM_NEWDOCUMENT                   = 1008;
+  ID_ITEM_OPENDOCUMENT                  = 1009;
+  ID_ITEM_CHANGETHEME                   = 1010;
+  ID_ITEM_CHANGEFONT                    = 1011;
+  ID_ITEM_CHANGELANGUAGE                = 1012;
 
   ID_ITEM_OPEN                          = 2001;
   ID_SUB_REOPEN                         = 2002;
@@ -947,6 +952,7 @@ const
   ID_MSG_CORRESPONDINGHEADER            = 60026;
   ID_MSG_PLEASEUPDATEPROJECT            = 60027;
   ID_MSG_COMPILERNOTFOUND               = 60028;
+  ID_MSG_FILESAVEENCODING               = 60029;
 
   ID_ERR_OPENFILE                       = 61001;
   ID_ERR_SAVEFILE                       = 61002;

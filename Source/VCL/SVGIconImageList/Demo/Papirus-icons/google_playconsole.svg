@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg32"
+   sodipodi:docname="google_playconsole.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata38">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs36">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter871"
+       x="-0.0456"
+       width="1.0912"
+       y="-0.050666667"
+       height="1.1013333">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.04"
+         id="feGaussianBlur873" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter887"
+       x="-0.0375"
+       width="1.075"
+       y="-0.066666667"
+       height="1.1333333">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.5"
+         id="feGaussianBlur889" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview34"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="96"
+     inkscape:cy="84.856889"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg32" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path2"
+     d="M 176,164 V 36 c 0,-4.432 -3.568,-8 -8,-8 H 24 c -4.432,0 -8,3.568 -8,8 v 128 c 0,4.432 3.568,8 8,8 h 144 c 4.432,0 8,-3.568 8,-8 z"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter871)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path4"
+     d="M 176,160 V 32 c 0,-4.432 -3.568,-8 -8,-8 H 24 c -4.432,0 -8,3.568 -8,8 v 128 c 0,4.432 3.568,8 8,8 h 144 c 4.432,0 8,-3.568 8,-8 z"
+     style="fill:#6992a8;stroke-width:4" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 24 24 C 19.568 24 16 27.568 16 32 L 16 33 C 16 28.568 19.568 25 24 25 L 168 25 C 172.432 25 176 28.568 176 33 L 176 32 C 176 27.568 172.432 24 168 24 L 24 24 z "
+     id="path6" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path8"
+     d="m 44,120 32,-40 32,24 40,-32"
+     style="fill:none;stroke:#ffffff;stroke-width:8" />
+  <g
+     id="g18"
+     transform="matrix(4,0,0,4,0,2)"
+     style="opacity:0.2;filter:url(#filter887)">
+    <circle
+       id="circle10"
+       r="3"
+       cy="30"
+       cx="11" />
+    <circle
+       id="circle12"
+       r="3"
+       cy="20"
+       cx="19" />
+    <circle
+       id="circle14"
+       r="3"
+       cy="26"
+       cx="27" />
+    <circle
+       id="circle16"
+       r="3"
+       cy="18"
+       cx="37" />
+  </g>
+  <g
+     id="g28"
+     style="fill:#394951"
+     transform="scale(4)">
+    <circle
+       id="circle20"
+       r="3"
+       cy="30"
+       cx="11"
+       style="fill:#394951" />
+    <circle
+       id="circle22"
+       r="3"
+       cy="20"
+       cx="19"
+       style="fill:#394951" />
+    <circle
+       id="circle24"
+       r="3"
+       cy="26"
+       cx="27"
+       style="fill:#394951" />
+    <circle
+       id="circle26"
+       r="3"
+       cy="18"
+       cx="37"
+       style="fill:#394951" />
+  </g>
+</svg>

@@ -62,10 +62,11 @@ begin
 
   if (ACol = 1) and (ARow >= FixedRows) and not (gdFocused in AState) and ItemProps[ARow - FixedRows].HasPickList then
     begin
-    ARect.Left := ARect.Right - EditList.ButtonWidth;
-    Details := StyleServices.GetElementDetails(tcDropDownButtonNormal);
-    StyleServices.DrawElement(Canvas.Handle, Details, ARect);
-  end;
+      ARect.Left := ARect.Right - EditList.ButtonWidth;
+      Details := StyleServices.GetElementDetails(tcDropDownButtonNormal);
+      // this line causes some elements not to draw
+      //StyleServices.DrawElement(Canvas.Handle, Details, ARect);
+    end;
 end;
 
 procedure TCompOptionsList.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);

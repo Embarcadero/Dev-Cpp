@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls, MultiLangSupport;
+  Dialogs, StdCtrls, Buttons, ExtCtrls, MultiLangSupport,DataFrm;
 
 type
   TProcessListForm = class(TForm)

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg34"
+   sodipodi:docname="system_radio.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata40">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs38">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter880"
+       x="-0.0432"
+       width="1.0864"
+       y="-0.054"
+       height="1.108">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.88"
+         id="feGaussianBlur882" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter896"
+       x="-0.0336"
+       width="1.0672"
+       y="-0.084"
+       height="1.168">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.56"
+         id="feGaussianBlur898" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter912"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.48"
+         id="feGaussianBlur914" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview36"
+     showgrid="false"
+     inkscape:zoom="4.04"
+     inkscape:cx="96"
+     inkscape:cy="96"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg34" />
+  <rect
+     width="160"
+     height="128"
+     x="-176"
+     y="36"
+     rx="8"
+     ry="8"
+     transform="scale(-1,1)"
+     id="rect862"
+     style="opacity:0.2;fill:#000000;stroke-width:4;filter:url(#filter880)" />
+  <rect
+     style="fill:#4c636b;stroke-width:4"
+     id="rect4"
+     transform="scale(-1,1)"
+     ry="8"
+     rx="8"
+     y="32"
+     x="-176"
+     height="128"
+     width="160" />
+  <circle
+     style="opacity:0.2;stroke-width:4"
+     id="circle6"
+     r="40"
+     cy="96"
+     cx="68" />
+  <path
+     style="fill:#ee5858;stroke-width:4"
+     inkscape:connector-curvature="0"
+     id="path8"
+     d="m 39.7156,67.716 a 40,40 0 0 0 -2.65716,2.99968 l 14.2692,14.2692 a 20,20 0 0 0 2.53012,25.1576 20,20 0 0 0 25.1684,2.54116 l 14.2856,14.2856 a 40,40 0 0 0 2.97208,-2.6848 40,40 0 0 0 2.65716,-2.99968 L 84.6718,107.01556 A 20,20 0 0 0 82.14168,81.85796 20,20 0 0 0 56.97328,79.3168 L 42.68768,65.0312 a 40,40 0 0 0 -2.9724,2.684 z" />
+  <circle
+     id="circle10"
+     r="12"
+     cy="98"
+     cx="68"
+     style="opacity:0.1;stroke-width:4;filter:url(#filter912)" />
+  <circle
+     style="fill:#f3c4c4;stroke-width:4"
+     id="circle12"
+     r="12"
+     cy="96"
+     cx="68" />
+  <g
+     id="g22"
+     transform="matrix(4,0,0,4,-4,0)">
+    <rect
+       style="opacity:0.2"
+       id="rect14"
+       ry="1"
+       rx="1"
+       y="16"
+       x="30"
+       height="2"
+       width="12" />
+    <rect
+       style="opacity:0.2"
+       id="rect16"
+       ry="1"
+       rx="1"
+       y="20"
+       x="30"
+       height="2"
+       width="12" />
+    <rect
+       style="opacity:0.2"
+       id="rect18"
+       ry="1"
+       rx="1"
+       y="24"
+       x="30"
+       height="2"
+       width="12" />
+    <rect
+       style="opacity:0.2"
+       id="rect20"
+       ry="1"
+       rx="1"
+       y="28"
+       x="30"
+       height="2"
+       width="12" />
+  </g>
+  <path
+     inkscape:connector-curvature="0"
+     id="path24"
+     d="m 132,134 a 8,8 0 0 0 -8,8 8,8 0 0 0 8,8 8,8 0 0 0 8,-8 8,8 0 0 0 -8,-8 z m 24,0 a 8,8 0 0 0 -8,8 8,8 0 0 0 8,8 8,8 0 0 0 8,-8 8,8 0 0 0 -8,-8 z"
+     style="opacity:0.1;stroke-width:4;filter:url(#filter896)" />
+  <circle
+     style="fill:#58c4ee;stroke-width:4"
+     id="circle26"
+     r="8"
+     cy="140"
+     cx="156" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 24 32 C 19.568 32 16 35.568 16 40 L 16 41 C 16 36.568 19.568 33 24 33 L 168 33 C 172.432 33 176 36.568 176 41 L 176 40 C 176 35.568 172.432 32 168 32 L 24 32 z "
+     id="path28" />
+  <circle
+     style="fill:#58c4ee;stroke-width:4"
+     id="circle30"
+     r="8"
+     cy="140"
+     cx="132" />
+</svg>

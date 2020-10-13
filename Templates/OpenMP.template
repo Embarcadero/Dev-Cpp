@@ -2,6 +2,7 @@
 ver=1
 Name=OpenMP
 Icon=File Management.ico
+svg=File Management.svg
 Description=A OpenMP multithreading example
 Category=Console
 

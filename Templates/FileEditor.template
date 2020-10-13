@@ -2,6 +2,7 @@
 ver=1
 Name=File Editor
 Icon=Editor.ico
+svg=Editor.svg
 Description=A simple Win32 file editor
 Category=Win32
 

@@ -2,6 +2,7 @@
 ver=1
 Name=OpenGL
 Icon=Pizza.ico
+svg=Pizza.svg
 Description=A basic OpenGL program
 Category=Multimedia
 

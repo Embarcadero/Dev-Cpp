@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Buttons, Macros;
+  Dialogs, StdCtrls, ExtCtrls, Buttons, Macros, DataFrm;
 
 type
   TToolEditForm = class(TForm)

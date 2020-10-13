@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg16"
+   sodipodi:docname="system_mic.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata22">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs20">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter847"
+       x="-0.0456"
+       width="1.0912"
+       y="-0.050666667"
+       height="1.1013333">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.28"
+         id="feGaussianBlur849" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter863"
+       x="-0.0528"
+       width="1.1056"
+       y="-0.044"
+       height="1.088">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.76"
+         id="feGaussianBlur865" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview18"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="96"
+     inkscape:cy="74.779841"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg16" />
+  <rect
+     id="rect2"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="40"
+     rx="40"
+     y="-136"
+     x="-114"
+     height="80"
+     width="96"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter863)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path4"
+     d="m 44,72 a 8,8 0 0 0 -8,8 v 10 c 0,25.43242 22.579964,46.25962 52,49.50781 V 164 H 56 a 8,8 0 0 0 -8,8 8,8 0 0 0 8,8 h 80 a 8,8 0 0 0 8,-8 8,8 0 0 0 -8,-8 H 104 V 139.50781 C 133.42004,136.25962 156,115.43242 156,90 V 80 a 8,8 0 0 0 -8,-8 8,8 0 0 0 -8,8 v 7.335936 C 140,107.64794 120.376,124 96,124 71.624,124 52,107.64794 52,87.335936 V 80 a 8,8 0 0 0 -8,-8 z"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter847)" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path6"
+     d="m 44,68 a 8,8 0 0 0 -8,8 v 10 c 0,25.43242 22.579964,46.25962 52,49.50781 V 160 H 56 a 8,8 0 0 0 -8,8 8,8 0 0 0 8,8 h 80 a 8,8 0 0 0 8,-8 8,8 0 0 0 -8,-8 H 104 V 135.50781 C 133.42004,132.25962 156,111.43242 156,86 V 76 a 8,8 0 0 0 -8,-8 8,8 0 0 0 -8,8 v 7.335936 C 140,103.64794 120.376,120 96,120 71.624,120 52,103.64794 52,83.335936 V 76 a 8,8 0 0 0 -8,-8 z"
+     style="fill:#4f4f4f;stroke-width:4" />
+  <rect
+     id="rect8"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="40"
+     rx="40"
+     y="-136"
+     x="-112"
+     height="80"
+     width="96"
+     style="fill:#8e8e8e;stroke-width:4" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 44 68 A 8 8 0 0 0 36 76 L 36 77 A 8 8 0 0 1 44 69 A 8 8 0 0 1 52 77 L 52 76 A 8 8 0 0 0 44 68 z M 148 68 A 8 8 0 0 0 140 76 L 140 77 A 8 8 0 0 1 148 69 A 8 8 0 0 1 156 77 L 156 76 A 8 8 0 0 0 148 68 z M 52 83.335938 L 52 84.335938 C 52 104.64794 71.624 121 96 121 C 120.376 121 140 104.64794 140 84.335938 L 140 83.335938 C 140 103.64794 120.376 120 96 120 C 71.624 120 52 103.64794 52 83.335938 z M 56 160 A 8 8 0 0 0 48 168 A 8 8 0 0 0 48.025391 168.38477 A 8 8 0 0 1 56 161 L 88 161 L 88 160 L 56 160 z M 104 160 L 104 161 L 136 161 A 8 8 0 0 1 143.97461 168.46289 A 8 8 0 0 0 144 168 A 8 8 0 0 0 136 160 L 104 160 z "
+     id="path10" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 96 16 C 73.84 16 56 33.84 56 56 L 56 57 C 56 34.84 73.84 17 96 17 C 118.16 17 136 34.84 136 57 L 136 56 C 136 33.84 118.16 16 96 16 z "
+     id="path12" />
+</svg>

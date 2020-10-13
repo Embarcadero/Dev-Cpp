@@ -2,6 +2,7 @@
 ver=1
 Name=DLL
 Icon=DLL.ico
+svg=DLL.svg
 Description=A Dynamic Link Library (DLL)
 Category=Basic
 

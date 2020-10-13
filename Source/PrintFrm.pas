@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, MultiLangSupport, Spin;
+  StdCtrls, Buttons, MultiLangSupport, Spin,DataFrm;
 
 type
   TPrintForm = class(TForm)

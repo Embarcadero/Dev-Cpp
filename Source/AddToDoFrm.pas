@@ -39,6 +39,7 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure txtUserKeyPress(Sender: TObject; var Key: Char);
+    procedure btnCancelClick(Sender: TObject);
   private
     { Private declarations }
     procedure LoadText;
@@ -59,6 +60,11 @@ uses
 procedure TAddToDoForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
+end;
+
+procedure TAddToDoForm.btnCancelClick(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TAddToDoForm.btnOKClick(Sender: TObject);

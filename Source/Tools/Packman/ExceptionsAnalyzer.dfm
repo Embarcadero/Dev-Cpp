@@ -5,18 +5,19 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
   Caption = 'Oops!'
   ClientHeight = 369
   ClientWidth = 465
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Heebo'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 17
   object Shape1: TShape
     Left = 0
     Top = 0
@@ -26,7 +27,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Pen.Style = psClear
   end
   object lblError: TLabel
-    Left = 84
+    Left = 87
     Top = 68
     Width = 373
     Height = 53
@@ -68,10 +69,10 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     ParentFont = False
   end
   object lblAddress: TLabel
-    Left = 84
+    Left = 87
     Top = 52
-    Width = 48
-    Height = 13
+    Width = 53
+    Height = 17
     Caption = 'lblAddress'
   end
   object lblErrorTitle: TLabel
@@ -90,7 +91,7 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
   object btnSend: TSpeedButton
     Left = 96
     Top = 130
-    Width = 83
+    Width = 89
     Height = 25
     Caption = '&Send bug report'
     ParentShowHint = False
@@ -238,129 +239,119 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     Top = 168
     Width = 449
     Height = 197
-    ActivePage = tabMemory
+    ActivePage = tabProgram
     Style = tsFlatButtons
     TabOrder = 2
     TabStop = False
     object tabProgram: TTabSheet
       Caption = 'Program'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitTop = 27
+      ExplicitHeight = 166
       object Label1: TLabel
         Left = 12
         Top = 16
-        Width = 66
-        Height = 13
+        Width = 71
+        Height = 17
         Caption = 'Program path:'
       end
       object lblProgramPath: TLabel
-        Left = 100
+        Left = 104
         Top = 16
-        Width = 71
-        Height = 13
+        Width = 78
+        Height = 17
         Caption = 'lblProgramPath'
       end
       object Label3: TLabel
         Left = 12
         Top = 36
-        Width = 79
-        Height = 13
+        Width = 85
+        Height = 17
         Caption = 'Program version:'
       end
       object lblProgramVersion: TLabel
-        Left = 100
+        Left = 104
         Top = 36
-        Width = 84
-        Height = 13
+        Width = 93
+        Height = 17
         Caption = 'lblProgramVersion'
       end
     end
     object tabMachine: TTabSheet
       Caption = 'Machine'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label2: TLabel
         Left = 12
         Top = 16
-        Width = 41
-        Height = 13
+        Width = 47
+        Height = 17
         Caption = 'Platform:'
       end
       object lblPlatform: TLabel
         Left = 100
         Top = 16
-        Width = 48
-        Height = 13
+        Width = 56
+        Height = 17
         Caption = 'lblPlatform'
       end
       object Label5: TLabel
         Left = 12
         Top = 36
-        Width = 55
-        Height = 13
+        Width = 57
+        Height = 17
         Caption = 'OS version:'
       end
       object lblOSversion: TLabel
         Left = 100
         Top = 36
-        Width = 59
-        Height = 13
+        Width = 63
+        Height = 17
         Caption = 'lblOSversion'
       end
       object Label7: TLabel
         Left = 12
         Top = 56
-        Width = 69
-        Height = 13
+        Width = 75
+        Height = 17
         Caption = 'Additional info:'
       end
       object lblAdditionalInfo: TLabel
         Left = 100
         Top = 56
-        Width = 74
-        Height = 13
+        Width = 81
+        Height = 17
         Caption = 'lblAdditionalInfo'
       end
       object Label9: TLabel
         Left = 12
         Top = 76
-        Width = 77
-        Height = 13
+        Width = 83
+        Height = 17
         Caption = 'Computer name:'
       end
       object lblComputerName: TLabel
         Left = 100
         Top = 76
-        Width = 83
-        Height = 13
+        Width = 91
+        Height = 17
         Caption = 'lblComputerName'
       end
     end
     object tabMemory: TTabSheet
       Caption = 'Memory'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label10: TLabel
         Left = 166
         Top = 144
-        Width = 63
-        Height = 13
+        Width = 68
+        Height = 17
         Caption = 'Memory load:'
       end
       object lblMemoryLoad: TLabel
         Left = 238
         Top = 144
-        Width = 71
-        Height = 13
+        Width = 77
+        Height = 17
         Caption = 'lblMemoryLoad'
       end
       object GroupBox1: TGroupBox
@@ -373,8 +364,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label4: TLabel
           Left = 4
           Top = 24
-          Width = 27
-          Height = 13
+          Width = 29
+          Height = 17
           Caption = 'Total:'
         end
         object lblTotalPhys: TLabel
@@ -390,8 +381,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label8: TLabel
           Left = 4
           Top = 44
-          Width = 32
-          Height = 13
+          Width = 33
+          Height = 17
           Caption = 'In use:'
         end
         object lblUsedPhys: TLabel
@@ -407,8 +398,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label11: TLabel
           Left = 4
           Top = 80
-          Width = 24
-          Height = 13
+          Width = 25
+          Height = 17
           Caption = 'Free:'
         end
         object lblFreePhys: TLabel
@@ -432,8 +423,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label6: TLabel
           Left = 12
           Top = 24
-          Width = 27
-          Height = 13
+          Width = 29
+          Height = 17
           Caption = 'Total:'
         end
         object lblTotalVirt: TLabel
@@ -449,8 +440,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label12: TLabel
           Left = 12
           Top = 44
-          Width = 32
-          Height = 13
+          Width = 33
+          Height = 17
           Caption = 'In use:'
         end
         object lblUsedVirt: TLabel
@@ -466,8 +457,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label14: TLabel
           Left = 12
           Top = 80
-          Width = 24
-          Height = 13
+          Width = 25
+          Height = 17
           Caption = 'Free:'
         end
         object lblFreeVirt: TLabel
@@ -491,8 +482,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label16: TLabel
           Left = 12
           Top = 24
-          Width = 27
-          Height = 13
+          Width = 29
+          Height = 17
           Caption = 'Total:'
         end
         object lblTotalCache: TLabel
@@ -508,8 +499,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label18: TLabel
           Left = 12
           Top = 44
-          Width = 32
-          Height = 13
+          Width = 33
+          Height = 17
           Caption = 'In use:'
         end
         object lblUsedCache: TLabel
@@ -525,8 +516,8 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
         object Label20: TLabel
           Left = 12
           Top = 80
-          Width = 24
-          Height = 13
+          Width = 25
+          Height = 17
           Caption = 'Free:'
         end
         object lblFreeCache: TLabel
@@ -543,15 +534,11 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     end
     object tabStackTrace: TTabSheet
       Caption = 'StackTrace'#169
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object memStackTrace: TMemo
         Left = 0
         Top = 0
         Width = 441
-        Height = 166
+        Height = 162
         Align = alClient
         Font.Charset = GREEK_CHARSET
         Font.Color = clWindowText
@@ -569,15 +556,11 @@ object frmExceptionsAnalyzer: TfrmExceptionsAnalyzer
     object tabFullReport: TTabSheet
       Caption = 'Bug report'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object memBugReport: TMemo
         Left = 0
         Top = 0
         Width = 441
-        Height = 166
+        Height = 162
         Align = alClient
         Font.Charset = GREEK_CHARSET
         Font.Color = clWindowText

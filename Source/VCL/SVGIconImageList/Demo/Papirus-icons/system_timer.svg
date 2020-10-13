@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192"
+   height="192"
+   version="1"
+   id="svg44"
+   sodipodi:docname="system_timer.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata50">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs48">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter897"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.2"
+         id="feGaussianBlur899" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter913"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.2253878"
+         id="feGaussianBlur915" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter941"
+       x="-0.048"
+       width="1.096"
+       y="-0.048"
+       height="1.096">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.4"
+         id="feGaussianBlur943" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter949"
+       x="-0.024"
+       width="1.048"
+       y="-0.024"
+       height="1.048">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.28"
+         id="feGaussianBlur951" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter965"
+       x="-0.048006001"
+       width="1.096012"
+       y="-0.047994"
+       height="1.095988">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.63992001"
+         id="feGaussianBlur967" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     id="namedview46"
+     showgrid="false"
+     inkscape:zoom="3.06"
+     inkscape:cx="96"
+     inkscape:cy="96"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg44" />
+  <rect
+     id="rect2"
+     transform="rotate(-45)"
+     ry="8"
+     rx="8"
+     y="43.32"
+     x="-25.4"
+     height="48"
+     width="48"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter913)" />
+  <rect
+     style="fill:#597123;stroke-width:4"
+     id="rect4"
+     transform="rotate(-45)"
+     ry="8"
+     rx="8"
+     y="41.919998"
+     x="-23.959999"
+     height="48"
+     width="48" />
+  <path
+     style="opacity:0.1;fill:#ffffff;stroke-width:4"
+     d="M 46.632812 15.929688 C 44.587852 15.929688 42.543762 16.71429 40.976562 18.28125 L 18.351562 40.90625 C 16.685444 42.572369 15.990478 44.772533 16.113281 46.943359 C 16.227486 45.109714 16.941534 43.316279 18.351562 41.90625 L 40.976562 19.28125 C 42.543762 17.71429 44.587852 16.929688 46.632812 16.929688 C 48.676812 16.929688 50.725062 17.71445 52.289062 19.28125 L 74.921875 41.90625 C 76.330571 43.315163 77.045074 45.104605 77.160156 46.935547 C 77.281871 44.766558 76.586886 42.571518 74.921875 40.90625 L 52.289062 18.28125 C 50.725062 16.71445 48.676812 15.929687 46.632812 15.929688 z "
+     id="path6" />
+  <rect
+     id="rect8"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="80"
+     rx="80"
+     y="-176"
+     x="-180"
+     height="160"
+     width="160"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter897)" />
+  <rect
+     style="fill:#96ba42;stroke-width:4"
+     id="rect10"
+     transform="matrix(0,-1,-1,0,0,0)"
+     ry="80"
+     rx="80"
+     y="-176"
+     x="-176"
+     height="160"
+     width="160" />
+  <path
+     style="opacity:0.2;fill:#ffffff;stroke-width:4"
+     d="M 96 16 C 51.68 16 16 51.68 16 96 C 16 96.116813 16.005368 96.231684 16.007812 96.347656 C 16.356433 52.330881 51.897996 17 96 17 C 140.102 17 175.64357 52.330881 175.99219 96.347656 C 175.99459 96.231684 176 96.11681 176 96 C 176 51.68 140.32 16 96 16 z "
+     id="path12" />
+  <circle
+     id="circle14"
+     r="60"
+     cy="98"
+     cx="96"
+     style="opacity:0.2;stroke-width:4;filter:url(#filter941)" />
+  <circle
+     style="fill:#ffffff;stroke-width:4"
+     id="circle16"
+     r="60"
+     cy="96"
+     cx="96" />
+  <rect
+     style="fill:#f45246;stroke-width:4"
+     id="rect18"
+     transform="rotate(30)"
+     ry="8"
+     rx="8"
+     y="-12.88"
+     x="123.16"
+     height="56"
+     width="16" />
+  <g
+     id="g28"
+     transform="matrix(4,0,0,4,0,2)"
+     style="opacity:0.1;filter:url(#filter949)">
+    <circle
+       id="circle20"
+       r="2"
+       cy="36"
+       cx="24" />
+    <circle
+       id="circle22"
+       r="2"
+       cy="12"
+       cx="24" />
+    <circle
+       id="circle24"
+       transform="rotate(90)"
+       r="2"
+       cy="-12"
+       cx="24" />
+    <circle
+       id="circle26"
+       transform="rotate(90)"
+       r="2"
+       cy="-36"
+       cx="24" />
+  </g>
+  <ellipse
+     ry="16"
+     rx="15.996"
+     cy="98"
+     cx="96"
+     style="opacity:0.1;stroke-width:4;filter:url(#filter965)"
+     id="ellipse30" />
+  <circle
+     style="fill:#4d4d4d;stroke-width:4"
+     r="16"
+     cy="96"
+     cx="96"
+     id="ellipse32" />
+  <g
+     style="fill:#4d4d4d"
+     id="g40"
+     transform="scale(4)">
+    <circle
+       id="circle32"
+       r="2"
+       cy="36"
+       cx="24" />
+    <circle
+       id="circle34"
+       r="2"
+       cy="12"
+       cx="24" />
+    <circle
+       id="circle36"
+       transform="rotate(90)"
+       r="2"
+       cy="-12"
+       cx="24" />
+    <circle
+       id="circle38"
+       transform="rotate(90)"
+       r="2"
+       cy="-36"
+       cx="24" />
+  </g>
+</svg>

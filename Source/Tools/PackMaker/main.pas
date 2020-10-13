@@ -24,7 +24,9 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, StdCtrls, Buttons, ComCtrls, ImgList, libTar, BZip2, IniFiles,
-  ExtDlgs, ToolWin, ExtCtrls, StrUtils, System.ImageList;
+  ExtDlgs, ToolWin, ExtCtrls, StrUtils, System.ImageList,
+  System.Generics.Defaults, System.Generics.Collections, System.Types,
+  System.UITypes;
 
 const SETUP_SECTION  = 'Setup';
 const FILES_SECTION  = 'Files';
@@ -116,6 +118,8 @@ type
     Label1: TLabel;
     edStartMenu: TEdit;
     N3: TMenuItem;
+    ApperanceMenu: TMenuItem;
+    procedure FormDestroy(Sender: TObject);
     procedure ExitItemClick(Sender: TObject);
     procedure About1Click(Sender: TObject);
     procedure ReadMeBtnClick(Sender: TObject);
@@ -138,11 +142,14 @@ type
     function GetSelectedIcon : TIconItem;
     function GetSelectedFile : TFileItem;
     procedure GetDirFiles(s : string; var sl : TStringList);
+    procedure SetStyle(SelStyleName: string);
+    procedure AddStylesToMenu;
+    procedure OnStyleClick(Sender: TObject);
   public
     FileName : string;
     IniFile  : TIniFile;
-    FileList : TList;
-    IconList : TList;
+    FileList : TObjectList<TFileItem>;
+    IconList : TObjectList<TIconItem>;
 
     procedure WriteDevPackFile;
     procedure ReadDevPackFile;
@@ -159,7 +166,7 @@ var
 implementation
 
 uses
-  menufrm, filefrm, buildfrm, actionfrm, Aboutfrm;
+  menufrm, filefrm, buildfrm, actionfrm, Aboutfrm, Config, Vcl.Themes;
 
 {$R *.dfm}
 
@@ -215,6 +222,13 @@ begin
      FindClose(SearchRec);
      end;
   end;
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+  Clear;
+  FileList.Free;
+  IconList.Free;
 end;
 
 procedure TMainForm.ExitItemClick(Sender: TObject);
@@ -306,10 +320,13 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  AddStylesToMenu;
+  SetStyle(ConfigPackMaker.GetStyle);
+
   FileName := '';
   IniFile := nil;
-  FileList := TList.Create;
-  IconList := TList.Create;
+  FileList := TObjectList<TFileItem>.Create;
+  IconList := TObjectList<TIconItem>.Create;
 
   //if parameter given - try to open it as a file
   if ParamCount > 0 then
@@ -704,6 +721,38 @@ begin
   IniFile := TIniFile.Create(devpakfile);
   if FileExists(devpakfile) then
       ReadDevPackFile;
+end;
+
+procedure TMainForm.AddStylesToMenu;
+var
+  Style: string;
+  Item : TMenuItem;
+begin
+  for Style in TStyleManager.StyleNames do begin
+    Item := TMenuItem.Create(MainMenu);
+    Item.Caption := Style;
+    Item.OnClick := OnStyleClick;
+    if TStyleManager.ActiveStyle.Name = Style then
+      Item.Checked := TRUE;
+    ApperanceMenu.Add(Item);
+  end;
+end;
+
+procedure TMainForm.OnStyleClick(Sender: TObject);
+  var SelStyleName : string;
+begin
+  SelStyleName :=  TMenuItem(Sender).Caption.Replace('&', '');
+  SetStyle(SelStyleName);
+end;
+
+procedure TMainForm.SetStyle(SelStyleName: string);
+begin
+  if TStyleManager.TrySetStyle(SelStyleName) then begin
+    for var i := 0 to ApperanceMenu.Count - 1 do
+      ApperanceMenu.Items[i].Checked := ApperanceMenu.Items[i].Caption.Replace('&', '').Equals(SelStyleName);
+
+    ConfigPackMaker.SetStyle(SelStyleName);
+  end;
 end;
 
 end.

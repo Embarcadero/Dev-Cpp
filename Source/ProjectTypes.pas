@@ -58,6 +58,8 @@ type
     SyncProduct: boolean;
   end;
 
+  TCompilerOptionsValues = TArray<Integer>;
+
   TProjOptions = class(TPersistent) // allow deep copies
   public
     constructor Create;
@@ -89,15 +91,26 @@ type
     IncludeVersionInfo: boolean;
     SupportXPThemes: boolean;
     CompilerSet: integer;
-    CompilerOptions: String;
+    CompilerOptions: TCompilerOptionsValues;
     VersionInfo: TProjVersionInfo;
     CmdLineArgs: String;
   end;
 
+
+  TCompilerOptionsValuesHelper = record helper for TCompilerOptionsValues
+  private
+    function GetOptionValue(const Index: Integer): Integer;
+  public
+    function ToString: string;
+    property OptionValue[const Index: Integer]: Integer read GetOptionValue;
+    class function FromString(const AStr: string): TArray<Integer>;
+  end;
+
+
 implementation
 
 uses
-  devcfg;
+  devcfg, SysUtils;
 
 constructor TProjVersionInfo.Create;
 begin
@@ -172,7 +185,7 @@ begin
   if (CompilerSet < devCompilerSets.Count) and (CompilerSet >= 0) then
     CompilerOptions := devCompilerSets[CompilerSet].INIOptions
   else
-    CompilerOptions := '';
+    CompilerOptions := [];
   VersionInfo := TProjVersionInfo.Create;
   IncludeVersionInfo := False;
 end;
@@ -223,6 +236,43 @@ begin
   CompilerOptions := input.CompilerOptions;
   VersionInfo.Assign(input.VersionInfo);
   CmdLineArgs := input.CmdLineArgs;
+end;
+
+{ TCompilerOptionsHelper }
+
+class function TCompilerOptionsValuesHelper.FromString(const AStr: string): TArray<Integer>;
+begin
+  Result := [];
+  if AStr.IndexOf(';')>-1 then
+  begin
+    // read compiler options with a ; delimiter
+    for var OV in AStr.Split([';']) do
+      Result := Result + [StrToIntDef(OV.Trim, 0)];
+  end
+  else
+  begin
+    // read compiler options that have no delimiter
+    for var OV in AStr do
+      Result := Result + [StrToIntDef(OV, 0)];
+  end;
+end;
+
+function TCompilerOptionsValuesHelper.GetOptionValue(const Index: Integer): Integer;
+begin
+  if (Index > High(Self)) or (Index < Low(Self)) then
+    Result := 0
+  else
+    Result := Self[Index];
+end;
+
+function TCompilerOptionsValuesHelper.ToString: string;
+begin
+  Result := '';
+  for var OV in Self do
+    if Result = '' then
+      Result := OV.ToString
+    else
+      Result := Result + ';' + OV.ToString;
 end;
 
 end.

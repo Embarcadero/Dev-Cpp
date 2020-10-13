@@ -1,5 +1,5 @@
 10_DevCpp ICON "images\associations\ide.ico"
-1_DevCpp ICON "images\associations\ide2.ico"
+1_DevCpp ICON "images\associations\ide.ico"
 2_DevCpp ICON "images\associations\dev.ico"
 3_CSource ICON "images\associations\c.ico"
 4_CppSource ICON "images\associations\cpp.ico"

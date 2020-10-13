@@ -2,6 +2,7 @@
 ver=1
 Name=Jackpot
 Icon=Games.ico
+svg=Games.svg
 Description=A number guessing game
 Category=Console
 

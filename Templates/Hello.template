@@ -2,6 +2,7 @@
 ver=1
 Name=Hello World
 Icon=Communication.ico
+svg=Communication.svg
 Description=A classic Hello World program
 Category=Console
 

@@ -2,11 +2,19 @@ html {
 	font-family:"Segoe UI","MS Sans Serif",serif;
 }
 body {
-	margin:8px;
+    background-image:url("graphic.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+	margin:200px;
+    margin-top:30px;
+    background-color:DDDDDD;
+    
 }
 .Heading1 {
-	font-size:20pt;
-	margin-bottom:10px;
+	font-size:18pt;
+	margin-bottom:20px;
+    font-weight:bold
 }
 .Heading2 {
 	font-weight:bold;
@@ -14,10 +22,10 @@ body {
 }
 .Heading3 {
 	font-weight:bold;
-	font-size:12pt;
+	font-size:10pt;
 }
 .Code {
-	margin:10px;
+	margin:50px;
 	font-family:"Consolas","Courier New";
 	background-color:#DDDDDD;
 }

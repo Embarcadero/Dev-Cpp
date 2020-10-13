@@ -5,7 +5,8 @@ object FilePropertiesForm: TFilePropertiesForm
   Caption = 'File properties'
   ClientHeight = 333
   ClientWidth = 436
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -156,7 +157,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Left = 350
     Top = 186
     Width = 65
-    Height = 23
+    Height = 21
     ReadOnly = True
     TabOrder = 8
   end
@@ -164,7 +165,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Left = 146
     Top = 148
     Width = 65
-    Height = 23
+    Height = 21
     ReadOnly = True
     TabOrder = 4
   end
@@ -172,7 +173,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Left = 146
     Top = 186
     Width = 65
-    Height = 23
+    Height = 21
     ReadOnly = True
     TabOrder = 5
   end
@@ -180,7 +181,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Left = 146
     Top = 224
     Width = 65
-    Height = 23
+    Height = 21
     ReadOnly = True
     TabOrder = 6
   end
@@ -188,7 +189,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Left = 350
     Top = 148
     Width = 65
-    Height = 23
+    Height = 21
     ReadOnly = True
     TabOrder = 7
   end
@@ -196,7 +197,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Left = 350
     Top = 224
     Width = 65
-    Height = 23
+    Height = 21
     ReadOnly = True
     TabOrder = 9
   end
@@ -204,7 +205,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Left = 176
     Top = 262
     Width = 238
-    Height = 23
+    Height = 21
     ReadOnly = True
     TabOrder = 10
   end
@@ -240,9 +241,7 @@ object FilePropertiesForm: TFilePropertiesForm
     Top = 304
     Width = 75
     Height = 25
-    Cancel = True
     Caption = 'OK'
-    Default = True
     TabOrder = 11
     OnClick = btnOKClick
   end

@@ -5,7 +5,8 @@ object ImportCBForm: TImportCBForm
   Caption = 'Import Code::Blocks project'
   ClientHeight = 221
   ClientWidth = 365
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -38,7 +39,7 @@ object ImportCBForm: TImportCBForm
     Left = 8
     Top = 24
     Width = 328
-    Height = 21
+    Height = 19
     TabOrder = 0
     Text = 'txtCB'
     OnChange = txtDevChange
@@ -78,14 +79,13 @@ object ImportCBForm: TImportCBForm
       Width = 321
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
       TabOrder = 0
     end
     object txtDev: TEdit
       Left = 16
       Top = 84
       Width = 297
-      Height = 21
+      Height = 19
       TabOrder = 1
       Text = 'txtDev'
       OnChange = txtDevChange
@@ -106,7 +106,6 @@ object ImportCBForm: TImportCBForm
     Top = 188
     Width = 75
     Height = 25
-    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 3

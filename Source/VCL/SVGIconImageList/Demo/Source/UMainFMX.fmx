@@ -1,0 +1,395 @@
+object SVGIconImageListForm: TSVGIconImageListForm
+  Left = 0
+  Top = 0
+  Caption = 
+    'SVGIcon ImageList Demo - Copyright (c) Ethea S.r.l. - Apache 2.0' +
+    ' Open Source License'
+  ClientHeight = 517
+  ClientWidth = 513
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Panel1: TPanel
+    Align = Bottom
+    Position.Y = 407.000000000000000000
+    Size.Width = 513.000000000000000000
+    Size.Height = 110.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object NextButton: TButton
+      Position.X = 104.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 89.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'Next Image...'
+      OnClick = NextButtonClick
+    end
+    object RandomButton: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 48.000000000000000000
+      Size.Width = 105.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Text = 'Build from files...'
+      OnClick = RandomButtonClick
+    end
+    object IconsLabel: TLabel
+      Position.X = 122.000000000000000000
+      Position.Y = 44.000000000000000000
+      Size.Width = 97.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Icons:'
+      TabOrder = 4
+    end
+    object CurrentLabel: TLabel
+      Position.X = 122.000000000000000000
+      Position.Y = 60.000000000000000000
+      Size.Width = 97.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Current:'
+      TabOrder = 5
+    end
+    object AutoSizeCheckBox: TCheckBox
+      IsChecked = True
+      Position.X = 8.000000000000000000
+      Position.Y = 88.000000000000000000
+      TabOrder = 7
+      Text = 'AutoSize'
+      OnChange = AutoSizeCheckBoxChange
+    end
+    object PrevButton: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 89.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Prev.Image...'
+      OnClick = PrevButtonClick
+    end
+    object ShowEditorButton: TButton
+      Position.X = 416.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 89.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Show Editor...'
+      OnClick = ShowEditorButtonClick
+    end
+    object SpinBox1: TSpinBox
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 8
+      Cursor = crIBeam
+      DecimalDigits = 0
+      Max = 1200.000000000000000000
+      Value = 32.000000000000000000
+      Position.X = 208.000000000000000000
+      Position.Y = 16.000000000000000000
+      OnChange = SpinBox1Change
+    end
+    object GrayScaleCheckBox: TCheckBox
+      Position.X = 121.000000000000000000
+      Position.Y = 88.000000000000000000
+      TabOrder = 6
+      Text = 'GrayScale'
+      OnChange = GrayScaleCheckBoxChange
+    end
+  end
+  object ImageView: TListBox
+    Align = Left
+    Position.Y = 113.000000000000000000
+    Size.Width = 161.000000000000000000
+    Size.Height = 294.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    DisableFocusEffect = True
+    ItemHeight = 32.000000000000000000
+    ItemWidth = 150.000000000000000000
+    Images = SVGIconImageList
+    DefaultItemStyles.ItemStyle = ''
+    DefaultItemStyles.GroupHeaderStyle = ''
+    DefaultItemStyles.GroupFooterStyle = ''
+    Viewport.Width = 157.000000000000000000
+    Viewport.Height = 290.000000000000000000
+    object ListBoxItem1: TListBoxItem
+      AutoTranslate = False
+      ImageIndex = 0
+      Size.Width = 150.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'ListBoxItem1'
+    end
+    object ListBoxItem2: TListBoxItem
+      ImageIndex = 1
+      Position.Y = 32.000000000000000000
+      Size.Width = 150.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'ListBoxItem2'
+    end
+    object ListBoxItem3: TListBoxItem
+      ImageIndex = 2
+      Position.Y = 64.000000000000000000
+      Size.Width = 150.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'ListBoxItem3'
+    end
+  end
+  object TopPanel: TPanel
+    Align = Top
+    Size.Width = 513.000000000000000000
+    Size.Height = 113.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    object Glyph2: TGlyph
+      Align = Left
+      Size.Width = 137.000000000000000000
+      Size.Height = 113.000000000000000000
+      Size.PlatformDefault = False
+      ImageIndex = 2
+      Images = SVGIconImageList
+    end
+    object Glyph1: TGlyph
+      Align = Left
+      Position.X = 137.000000000000000000
+      Size.Width = 96.000000000000000000
+      Size.Height = 113.000000000000000000
+      Size.PlatformDefault = False
+      ImageIndex = 3
+      Images = SVGIconImageList
+    end
+  end
+  object Glyph: TGlyph
+    Align = Client
+    Size.Width = 352.000000000000000000
+    Size.Height = 294.000000000000000000
+    Size.PlatformDefault = False
+    ImageIndex = 4
+    Images = SVGIconImageList
+  end
+  object OpenDialog: TOpenDialog
+    Filter = 'Scalable Vector Graphics (*.svg)|*.svg'
+    Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 76
+    Top = 326
+  end
+  object SVGIconImageList: TSVGIconImageList
+    Source = <
+      item
+        MultiResBitmap = <
+          item
+            Size = 16
+          end>
+        IconName = 'business'
+        Opacity = 1.000000000000000000
+        SVGText = 
+          '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0' +
+          ' 48 48" enable-background="new 0 0 48 48">'#13#10'    <g fill="#263238' +
+          '">'#13#10'        <path d="M11,44H9c-0.6,0-1-0.4-1-1v-2h4v2C12,43.6,11' +
+          '.6,44,11,44z"/>'#13#10'        <path d="M39,44h-2c-0.6,0-1-0.4-1-1v-2h' +
+          '4v2C40,43.6,39.6,44,39,44z"/>'#13#10'    </g>'#13#10'    <path fill="#37474F' +
+          '" d="M27,7h-6c-1.7,0-3,1.3-3,3v3h2v-3c0-0.6,0.4-1,1-1h6c0.6,0,1,' +
+          '0.4,1,1v3h2v-3C30,8.3,28.7,7,27,7z"/>'#13#10'    <path fill="#78909C" ' +
+          'd="M40,43H8c-2.2,0-4-1.8-4-4V15c0-2.2,1.8-4,4-4h32c2.2,0,4,1.8,4' +
+          ',4v24C44,41.2,42.2,43,40,43z"/>'#13#10'</svg>'#13#10
+      end
+      item
+        MultiResBitmap = <
+          item
+            Size = 16
+          end>
+        IconName = 'business_contact'
+        Opacity = 1.000000000000000000
+        SVGText = 
+          '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0' +
+          ' 48 48" enable-background="new 0 0 48 48">'#13#10'    <path fill="#673' +
+          'AB7" d="M40,7H8c-2.2,0-4,1.8-4,4v26c0,2.2,1.8,4,4,4h5v-1.3c-0.6-' +
+          '0.3-1-1-1-1.7c0-1.1,0.9-2,2-2s2,0.9,2,2 c0,0.7-0.4,1.4-1,1.7V41h' +
+          '18v-1.3c-0.6-0.3-1-1-1-1.7c0-1.1,0.9-2,2-2s2,0.9,2,2c0,0.7-0.4,1' +
+          '.4-1,1.7V41h5c2.2,0,4-1.8,4-4V11 C44,8.8,42.2,7,40,7z"/>'#13#10'    <g' +
+          ' fill="#D1C4E9">'#13#10'        <circle cx="24" cy="18" r="4"/>'#13#10'     ' +
+          '   <path d="M31,28c0,0-1.9-4-7-4c-5.1,0-7,4-7,4v2h14V28z"/>'#13#10'   ' +
+          ' </g>'#13#10'</svg>'#13#10
+      end
+      item
+        MultiResBitmap = <
+          item
+            Size = 113
+          end>
+        IconName = 'businessman'
+        Opacity = 1.000000000000000000
+        SVGText = 
+          '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0' +
+          ' 48 48" enable-background="new 0 0 48 48">'#13#10'    <polygon fill="#' +
+          'FF9800" points="24,37 19,31 19,25 29,25 29,31"/>'#13#10'    <g fill="#' +
+          'FFA726">'#13#10'        <circle cx="33" cy="19" r="2"/>'#13#10'        <circ' +
+          'le cx="15" cy="19" r="2"/>'#13#10'    </g>'#13#10'    <path fill="#FFB74D" d' +
+          '="M33,13c0-7.6-18-5-18,0c0,1.1,0,5.9,0,7c0,5,4,9,9,9s9-4,9-9C33,' +
+          '18.9,33,14.1,33,13z"/>'#13#10'    <path fill="#424242" d="M24,4c-6.1,0' +
+          '-10,4.9-10,11c0,0.8,0,2.3,0,2.3l2,1.7v-5l12-4l4,4v5l2-1.7c0,0,0-' +
+          '1.5,0-2.3c0-4-1-8-6-9l-1-2 H24z"/>'#13#10'    <g fill="#784719">'#13#10'    ' +
+          '    <circle cx="28" cy="19" r="1"/>'#13#10'        <circle cx="20" cy=' +
+          '"19" r="1"/>'#13#10'    </g>'#13#10'    <polygon fill="#fff" points="24,43 1' +
+          '9,31 24,32 29,31"/>'#13#10'    <polygon fill="#D32F2F" points="23,35 2' +
+          '2.3,39.5 24,43.5 25.7,39.5 25,35 26,34 24,32 22,34"/>'#13#10'    <path' +
+          ' fill="#546E7A" d="M29,31L29,31l-5,12l-5-12c0,0-11,2-11,13h32C40' +
+          ',33,29,31,29,31z"/>'#13#10'</svg>'#13#10
+      end
+      item
+        MultiResBitmap = <
+          item
+            Size = 96
+          end>
+        IconName = 'businesswoman'
+        Opacity = 1.000000000000000000
+        SVGText = 
+          '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0' +
+          ' 48 48" enable-background="new 0 0 48 48">'#13#10'    <rect x="16" y="' +
+          '15" fill="#BF360C" width="16" height="18"/>'#13#10'    <path fill="#78' +
+          '909C" d="M40,44H8c0-11,11-13,11-13h10C29,31,40,33,40,44z"/>'#13#10'   ' +
+          ' <path fill="#FF9800" d="M24,37c-2.2,0-5-6-5-6v-6h10v6C29,31,26.' +
+          '2,37,24,37z"/>'#13#10'    <path fill="#FFB74D" d="M33,14c0-7.6-18-5-18' +
+          ',0c0,1.1,0,5.9,0,7c0,5,4,9,9,9s9-4,9-9C33,19.9,33,15.1,33,14z"/>' +
+          #13#10'    <path fill="#FF5722" d="M24,4C17.9,4,9,7.4,9,27.3l7,4.7V19' +
+          'l12-7l4,5v15l7-6c0-4-0.7-20-11-20l-1-2H24z"/>'#13#10'    <path fill="#' +
+          'FFB74D" d="M24,38c-4.4,0-5-7-5-7s2.5,4,5,4s5-4,5-4S28.4,38,24,38' +
+          'z"/>'#13#10'    <circle fill="#784719" cx="28" cy="21" r="1"/>'#13#10'    <c' +
+          'ircle fill="#784719" cx="20" cy="21" r="1"/>'#13#10'</svg>'#13#10
+      end
+      item
+        MultiResBitmap = <
+          item
+            Size = 294
+          end>
+        IconName = 'calculator'
+        Opacity = 1.000000000000000000
+        SVGText = 
+          '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0' +
+          ' 48 48" enable-background="new 0 0 48 48">'#13#10'    <path fill="#616' +
+          '161" d="M40,16H8v24c0,2.2,1.8,4,4,4h24c2.2,0,4-1.8,4-4V16z"/>'#13#10' ' +
+          '   <path fill="#424242" d="M36,4H12C9.8,4,8,5.8,8,8v9h32V8C40,5.' +
+          '8,38.2,4,36,4z"/>'#13#10'    <path fill="#9CCC65" d="M36,14H12c-0.6,0-' +
+          '1-0.4-1-1V8c0-0.6,0.4-1,1-1h24c0.6,0,1,0.4,1,1v5C37,13.6,36.6,14' +
+          ',36,14z"/>'#13#10'    <g fill="#33691E">'#13#10'        <rect x="33" y="10" ' +
+          'width="2" height="2"/>'#13#10'        <rect x="29" y="10" width="2" he' +
+          'ight="2"/>'#13#10'    </g>'#13#10'    <path fill="#FF5252" d="M36,23h-3c-0.6' +
+          ',0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C37,22.6,36.6' +
+          ',23,36,23z"/>'#13#10'    <g fill="#E0E0E0">'#13#10'        <path d="M15,23h-' +
+          '3c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C16,22.' +
+          '6,15.6,23,15,23z"/>'#13#10'        <path d="M22,23h-3c-0.6,0-1-0.4-1-1' +
+          'v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C23,22.6,22.6,23,22,23z"/' +
+          '>'#13#10'        <path d="M29,23h-3c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-' +
+          '1h3c0.6,0,1,0.4,1,1v2C30,22.6,29.6,23,29,23z"/>'#13#10'        <path d' +
+          '="M15,29h-3c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,' +
+          '1v2C16,28.6,15.6,29,15,29z"/>'#13#10'        <path d="M22,29h-3c-0.6,0' +
+          '-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C23,28.6,22.6,2' +
+          '9,22,29z"/>'#13#10'        <path d="M29,29h-3c-0.6,0-1-0.4-1-1v-2c0-0.' +
+          '6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C30,28.6,29.6,29,29,29z"/>'#13#10'     ' +
+          '   <path d="M15,35h-3c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,' +
+          '0,1,0.4,1,1v2C16,34.6,15.6,35,15,35z"/>'#13#10'        <path d="M22,35' +
+          'h-3c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C23,3' +
+          '4.6,22.6,35,22,35z"/>'#13#10'        <path d="M29,35h-3c-0.6,0-1-0.4-1' +
+          '-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C30,34.6,29.6,35,29,35z' +
+          '"/>'#13#10'        <path d="M15,41h-3c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,' +
+          '1-1h3c0.6,0,1,0.4,1,1v2C16,40.6,15.6,41,15,41z"/>'#13#10'        <path' +
+          ' d="M22,41h-3c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,' +
+          '1,1v2C23,40.6,22.6,41,22,41z"/>'#13#10'        <path d="M29,41h-3c-0.6' +
+          ',0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C30,40.6,29.6' +
+          ',41,29,41z"/>'#13#10'    </g>'#13#10'    <g fill="#BDBDBD">'#13#10'        <path d' +
+          '="M36,29h-3c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,' +
+          '1v2C37,28.6,36.6,29,36,29z"/>'#13#10'        <path d="M36,35h-3c-0.6,0' +
+          '-1-0.4-1-1v-2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C37,34.6,36.6,3' +
+          '5,36,35z"/>'#13#10'        <path d="M36,41h-3c-0.6,0-1-0.4-1-1v-2c0-0.' +
+          '6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v2C37,40.6,36.6,41,36,41z"/>'#13#10'    <' +
+          '/g>'#13#10'</svg>'#13#10
+      end
+      item
+        MultiResBitmap = <
+          item
+          end>
+        IconName = 'calendar'
+        Opacity = 1.000000000000000000
+        SVGText = 
+          '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0' +
+          ' 48 48" enable-background="new 0 0 48 48">'#13#10'    <path fill="#CFD' +
+          '8DC" d="M5,38V14h38v24c0,2.2-1.8,4-4,4H9C6.8,42,5,40.2,5,38z"/>'#13 +
+          #10'    <path fill="#F44336" d="M43,10v6H5v-6c0-2.2,1.8-4,4-4h30C41' +
+          '.2,6,43,7.8,43,10z"/>'#13#10'    <g fill="#B71C1C">'#13#10'        <circle c' +
+          'x="33" cy="10" r="3"/>'#13#10'        <circle cx="15" cy="10" r="3"/>'#13 +
+          #10'    </g>'#13#10'    <g fill="#B0BEC5">'#13#10'        <path d="M33,3c-1.1,0' +
+          '-2,0.9-2,2v5c0,1.1,0.9,2,2,2s2-0.9,2-2V5C35,3.9,34.1,3,33,3z"/>'#13 +
+          #10'        <path d="M15,3c-1.1,0-2,0.9-2,2v5c0,1.1,0.9,2,2,2s2-0.9' +
+          ',2-2V5C17,3.9,16.1,3,15,3z"/>'#13#10'    </g>'#13#10'    <g fill="#90A4AE">'#13 +
+          #10'        <rect x="13" y="20" width="4" height="4"/>'#13#10'        <re' +
+          'ct x="19" y="20" width="4" height="4"/>'#13#10'        <rect x="25" y=' +
+          '"20" width="4" height="4"/>'#13#10'        <rect x="31" y="20" width="' +
+          '4" height="4"/>'#13#10'        <rect x="13" y="26" width="4" height="4' +
+          '"/>'#13#10'        <rect x="19" y="26" width="4" height="4"/>'#13#10'       ' +
+          ' <rect x="25" y="26" width="4" height="4"/>'#13#10'        <rect x="31' +
+          '" y="26" width="4" height="4"/>'#13#10'        <rect x="13" y="32" wid' +
+          'th="4" height="4"/>'#13#10'        <rect x="19" y="32" width="4" heigh' +
+          't="4"/>'#13#10'        <rect x="25" y="32" width="4" height="4"/>'#13#10'   ' +
+          '     <rect x="31" y="32" width="4" height="4"/>'#13#10'    </g>'#13#10'</svg' +
+          '>'#13#10
+      end>
+    Destination = <
+      item
+        Layers = <
+          item
+            Name = 'business'
+          end>
+      end
+      item
+        Layers = <
+          item
+            Name = 'business_contact'
+          end>
+      end
+      item
+        Layers = <
+          item
+            Name = 'businessman'
+            SourceRect.Right = 113.000000000000000000
+            SourceRect.Bottom = 113.000000000000000000
+          end>
+      end
+      item
+        Layers = <
+          item
+            Name = 'businesswoman'
+            SourceRect.Right = 96.000000000000000000
+            SourceRect.Bottom = 96.000000000000000000
+          end>
+      end
+      item
+        Layers = <
+          item
+            Name = 'calculator'
+            SourceRect.Right = 294.000000000000000000
+            SourceRect.Bottom = 294.000000000000000000
+          end>
+      end
+      item
+        Layers = <
+          item
+            Name = 'calendar'
+            SourceRect.Right = 32.000000000000000000
+            SourceRect.Bottom = 32.000000000000000000
+          end>
+      end>
+    Left = 72
+    Top = 264
+  end
+end

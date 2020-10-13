@@ -1,10 +1,11 @@
 object ProfileAnalysisForm: TProfileAnalysisForm
   Left = 992
   Top = 474
-  Width = 649
-  Height = 531
   Caption = 'Profile analysis'
-  Color = clBtnFace
+  ClientHeight = 492
+  ClientWidth = 633
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -21,7 +22,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
     Left = 0
     Top = 0
     Width = 633
-    Height = 493
+    Height = 492
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Parsing profiling results - Please wait...'
@@ -30,7 +31,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
       Left = 0
       Top = 0
       Width = 633
-      Height = 493
+      Height = 492
       ActivePage = tabFlat
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
@@ -45,15 +46,16 @@ object ProfileAnalysisForm: TProfileAnalysisForm
         Caption = 'Flat output'
         object Splitter2: TSplitter
           Left = 0
-          Top = 323
+          Top = 322
           Width = 625
           Height = 8
           Cursor = crVSplit
           Align = alBottom
+          ExplicitTop = 323
         end
         object memFlat: TMemo
           Left = 0
-          Top = 331
+          Top = 330
           Width = 625
           Height = 132
           Align = alBottom
@@ -72,7 +74,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
           Left = 0
           Top = 0
           Width = 625
-          Height = 323
+          Height = 322
           Align = alClient
           Columns = <
             item
@@ -126,15 +128,16 @@ object ProfileAnalysisForm: TProfileAnalysisForm
         ImageIndex = 1
         object Splitter1: TSplitter
           Left = 0
-          Top = 323
+          Top = 322
           Width = 625
           Height = 8
           Cursor = crVSplit
           Align = alBottom
+          ExplicitTop = 323
         end
         object memGraph: TMemo
           Left = 0
-          Top = 331
+          Top = 330
           Width = 625
           Height = 132
           Align = alBottom
@@ -153,7 +156,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
           Left = 0
           Top = 0
           Width = 625
-          Height = 323
+          Height = 322
           Align = alClient
           Columns = <
             item
@@ -282,7 +285,7 @@ object ProfileAnalysisForm: TProfileAnalysisForm
             Left = 16
             Top = 48
             Width = 289
-            Height = 23
+            Height = 21
             Enabled = False
             TabOrder = 1
             Text = 'editCustom'

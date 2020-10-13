@@ -5,7 +5,8 @@ object FunctionSearchForm: TFunctionSearchForm
   Caption = 'Goto function...'
   ClientHeight = 377
   ClientWidth = 469
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -67,7 +68,7 @@ object FunctionSearchForm: TFunctionSearchForm
     Left = 84
     Top = 4
     Width = 379
-    Height = 23
+    Height = 21
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 1
     OnChange = txtSearchChange

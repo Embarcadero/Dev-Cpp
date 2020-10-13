@@ -1,0 +1,133 @@
+object IconPicker: TIconPicker
+  Left = 0
+  Top = 0
+  Caption = 'FMX - SVG Icon Picker'
+  ClientHeight = 587
+  ClientWidth = 548
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Preview: TGroupBox
+    Position.X = 8.000000000000000000
+    Position.Y = 296.000000000000000000
+    Size.Width = 537.000000000000000000
+    Size.Height = 281.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Preview'
+    TabOrder = 4
+    object Image16x16: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 7.000000000000000000
+      Position.Y = 24.000000000000000000
+      Size.Width = 16.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Image32x32: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 25.000000000000000000
+      Position.Y = 24.000000000000000000
+      Size.Width = 32.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Image64x64: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 59.000000000000000000
+      Position.Y = 24.000000000000000000
+      Size.Width = 64.000000000000000000
+      Size.Height = 64.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Image90x90: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 126.000000000000000000
+      Position.Y = 24.000000000000000000
+      Size.Width = 90.000000000000000000
+      Size.Height = 90.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Image120x120: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 219.000000000000000000
+      Position.Y = 24.000000000000000000
+      Size.Width = 120.000000000000000000
+      Size.Height = 120.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Image100x100: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 347.000000000000000000
+      Position.Y = 24.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 100.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
+  object Label1: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 19.000000000000000000
+    Text = 'Path'
+    TabOrder = 2
+  end
+  object edtPath: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 3
+    Text = 'D:\ETHEA\SVGIconImageList\Demo\flat-color-icons\svg\'
+    Position.X = 8.000000000000000000
+    Position.Y = 36.000000000000000000
+    Size.Width = 353.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Label2: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 63.000000000000000000
+    Text = 'File Name'
+    TabOrder = 0
+  end
+  object edtFileName: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 1
+    Text = 'about.svg'
+    Position.X = 8.000000000000000000
+    Position.Y = 80.000000000000000000
+    Size.Width = 217.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Memo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Position.X = 8.000000000000000000
+    Position.Y = 112.000000000000000000
+    Size.Width = 529.000000000000000000
+    Size.Height = 185.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    OnExit = MemoExit
+    Viewport.Width = 525.000000000000000000
+    Viewport.Height = 181.000000000000000000
+  end
+  object LoadButton: TButton
+    Position.X = 288.000000000000000000
+    Position.Y = 80.000000000000000000
+    TabOrder = 6
+    Text = 'LoadButton'
+    OnClick = LoadButtonClick
+  end
+end

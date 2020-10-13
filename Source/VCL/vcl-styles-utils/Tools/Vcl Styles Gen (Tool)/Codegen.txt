@@ -1,0 +1,7 @@
+var
+ s : string;
+begin
+  for s in TDirectory.GetFiles('C:\Users\Public\Documents\RAD Studio\Projects\XE2\vcl-styles-utils\Vcl Styles Gen\Output','*.png') do
+   Memo1.Lines.Add(TIdURI.URLEncode('http://dl.dropbox.com/u/12733424/Blog/Vcl Utils/Styles/'+ExtractFileName(s)));
+
+end;

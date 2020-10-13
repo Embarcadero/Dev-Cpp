@@ -2,6 +2,7 @@
 ver=1
 Name=Empty Project
 Icon=Empty.ico
+svg=Empty.svg
 Description=An empty project
 Catagory=Basic
 

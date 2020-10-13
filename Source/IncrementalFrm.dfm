@@ -8,7 +8,8 @@ object IncrementalForm: TIncrementalForm
   Caption = 'Incremental Search'
   ClientHeight = 25
   ClientWidth = 282
-  Color = clBtnFace
+  Color = clWindow
+  Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -64,9 +65,9 @@ object IncrementalForm: TIncrementalForm
   end
   object Edit: TEdit
     Left = 0
-    Top = 0
-    Width = 233
-    Height = 24
+    Top = 2
+    Width = 231
+    Height = 22
     Color = clBtnFace
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText

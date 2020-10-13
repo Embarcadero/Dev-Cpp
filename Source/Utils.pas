@@ -102,8 +102,6 @@ function IsNumeric(const s: String): boolean;
 
 function CountChar(const s: String; c: Char): integer;
 
-function CharToValue(c: char): integer;
-
 procedure OpenHelpFile(const HelpFileName: String);
 
 function ProgramHasConsole(const Path: String): boolean;
@@ -154,6 +152,7 @@ function FastStringReplace(const S, OldPattern, NewPattern: String; Flags: TRepl
 // Fast implementation of IndexOf which does not use AnsiX (MBCS ready) comparison
 //function FastIndexOf(List: TStrings; const S: String): integer; overload;
 //function FastIndexOf(List: TStringlist; const S: String): integer; overload;
+
 
 implementation
 
@@ -222,16 +221,6 @@ begin
   // IsWow64Process not available in Delphi 7, so using this instead
   GetEnvironmentVariable('PROGRAMFILES', buffer, 1024);
   result := EndsStr(' (x86)', String(buffer));
-end;
-
-function CharToValue(c: char): integer;
-begin
-  if c in TSetOfChar(['a'..'z']) then
-    result := integer(c) - integer('a') + 2
-  else if (StrToIntDef(c, 0) = 1) then
-    result := 1
-  else
-    result := 0;
 end;
 
 function GetPrettyLine(hwnd: TListView; i: integer): String;

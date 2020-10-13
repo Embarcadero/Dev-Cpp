@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, version, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, Vcl.Imaging.pngimage;
+  StdCtrls, Buttons, ExtCtrls, Vcl.Imaging.pngimage,DataFrm;
 
 type
   TAboutForm = class(TForm)
@@ -67,7 +67,8 @@ type
     Label2: TLabel;
     Label3: TLabel;
     imgLogo: TImage;
-    Label4: TLabel;
+    lblForkBy: TLabel;
+    paBanner: TPanel;
     procedure URLLabelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAuthorsClick(Sender: TObject);
@@ -77,6 +78,7 @@ type
     procedure FishImageClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnUpdateCheckClick(Sender: TObject);
+    procedure btnOkClick(Sender: TObject);
   private
     procedure LoadText;
   end;
@@ -134,6 +136,17 @@ begin
 
   if FileExists(devData.Splash) then // TODO: check all folders?
     imgBanner.Picture.LoadFromFile(devData.Splash);
+
+  var f: Double := 1;
+  if Assigned(imgBanner.Picture) then
+    f := imgBanner.Picture.Height / imgBanner.Picture.Width;
+
+  imgBanner.Width := paBanner.Width;
+  imgBanner.Height := Round(paBanner.Width * f);
+  imgBanner.Stretch := True;
+  imgBanner.Left := 0;
+  imgBanner.Top := - Round(imgBanner.Height * 0.14);
+  lblForkBy.Top := Round(imgLogo.Top * 0.95);
 end;
 
 procedure TAboutForm.btnAuthorsClick(Sender: TObject);
@@ -158,6 +171,11 @@ procedure TAboutForm.btnAuthorsDragOver(Sender, Source: TObject; X,
   Y: Integer; State: TDragState; var Accept: Boolean);
 begin
   Accept := True;
+end;
+
+procedure TAboutForm.btnOkClick(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TAboutForm.btnUpdateCheckClick(Sender: TObject);

@@ -229,6 +229,7 @@ var
   AttrName: String;
   Attribute: TSynHighlighterAttributes;
   I: integer;
+  FontIndex: Integer;
 begin
   LoadText;
 
@@ -284,11 +285,30 @@ begin
 
     // Fonts
     LoadFonts; // fill dropdowns
-    cboEditorFont.ItemIndex := cboEditorFont.Items.IndexOf(Font.Name);
-    edEditorSize.Value := Font.Size;
+
+    //cboEditorFont.Items.Assign(Screen.Fonts);
+    FontIndex := cboEditorFont.Items.IndexOf(devEditor.Font.Name);
+    if FontIndex = -1 then
+      FontIndex := cboEditorFont.Items.IndexOf('Source Code Pro');
+    if FontIndex = -1 then
+      FontIndex := cboEditorFont.Items.IndexOf('Consolas');
+    if FontIndex = -1 then
+      FontIndex := cboEditorFont.Items.IndexOf('Courier');
+    cboEditorFont.ItemIndex := FontIndex;
+
+    edEditorSize.Value := devEditor.Font.Size;
     cbGutterFnt.Checked := Gutterfnt;
-    cboGutterFont.ItemIndex := cboGutterFont.Items.IndexOf(Gutterfont.Name);
+    FontIndex := cboGutterFont.Items.IndexOf(devEditor.Gutterfont.Name);
     edGutterSize.Value := GutterFont.Size;
+
+    //cboGutterFont.Items.Assign(Screen.Fonts);
+    if FontIndex = -1 then
+      FontIndex := cboGutterFont.Items.IndexOf('Source Code Pro');
+    if FontIndex = -1 then
+      FontIndex := cboGutterFont.Items.IndexOf('Consolas');
+    if FontIndex = -1 then
+      FontIndex := cboGutterFont.Items.IndexOf('Courier');
+    cboGutterFont.ItemIndex := FontIndex;
 
     // Colors
     FillSyntaxSets; // Load color themes
@@ -682,11 +702,11 @@ begin
     SyntaxExt := edSyntaxExt.Text;
     TabSize := seTabSize.Value;
 
-    Font.Name := cboEditorFont.Text;
-    Font.Size := edEditorSize.Value;
+    devEditor.Font.Name := cboEditorFont.Text;
+    devEditor.Font.Size := edEditorSize.Value;
 
-    Gutterfont.Name := cboGutterFont.Text;
-    GutterFont.Size := edGutterSize.Value;
+    devEditor.Gutterfont.Name := cboGutterFont.Text;
+    devEditor.GutterFont.Size := edGutterSize.Value;
 
     Gutterfnt := cbGutterFnt.Checked;
     GutterAuto := cbGutterAuto.Checked;
@@ -808,6 +828,7 @@ begin
 
   SaveOptions;
   dmMain.LoadDataMod;
+  Close;
 end;
 
 procedure TEditorOptForm.btnHelpClick(Sender: TObject);
@@ -1064,7 +1085,7 @@ var
   i: integer;
   attr: TSynHighlighterAttributes;
 begin
-  if cboQuickColor.ItemIndex > 10 then begin // 10 == number of built-in styles
+  if cboQuickColor.ItemIndex > 12 then begin // 12 == number of built-in styles
     // custom style; load from disk
     LoadSyntax(cboQuickColor.Items[cboQuickColor.ItemIndex]);
   end else begin
