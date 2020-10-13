@@ -32,15 +32,73 @@ Main Features include:
 
 Supported Operating System:
 
+- Windows 7
+- Windows 8.1
 - Windows 10
 
-Screenshot:
+# Dev C++ Release Notes
+
+Version 6.0 - 12 October 2020
+
+- Upgraded TDM-GCC to 32/64 9.2.0.
+- Upgraded compiler flags to reflect GCC 9.2.0 including c++17 and c++2a.
+- Upgraded FastMM4 to FastMM5.
+- Moved TDM-GCC to TDM-GCC-64 from MingW64.
+- Added CMD and PowerShell console tabs.
+- Added Windows 10, Windows 10 Slate Gray, and Windows 10 Blue Whale High DPI Styles
+- Added new high DPI SVG icon set for the new Styles through the SVGIconImageList project.
+- Added dialog styles through VCL Style Utils project.
+- Added custom draw editor tabs and close buttons.
+- Added saving and loading of UTF-8 characters.
+- Updated Chinese language files and installer.
+- Fixed crashes in AStyle dialog and unsaved formatting.
+- Moved config file to My Documents\Embarcadero\Dev-Cpp
+- Added new Welcome screen with shortcuts.
+- Updated documentation theming.
+- Added Heebo and Source Code Pro fonts for the interface and editor.
+- Added Monokai and Monokai Fresh editor color schemes.
+- Updated Packman with new Windows 10 Styles.
+
+Version 5.50 - 1 July 2020
+
+- Upgraded Packman to use Abbrevia
+- Upgraded AStyle to 3.1
+- Upgraded project to Delphi 10.4
+- Project forked as Embarcadero Dev C++
+- Project Sponsored by Embarcadero Technologies, Inc.
+
+
+# Dev C++ Screenshot:
 
 ![Dev C++ Screenshot](https://raw.githubusercontent.com/Embarcadero/Dev-Cpp/master/Source/Images/screenshot800x600.png)
+
+# Dev C++ Third Party Libraries
+
+"SynEdit is a syntax highlighting edit control, not based on the Windows common controls. SynEdit is compatible with both Delphi and C++ Builder."
+<https://github.com/TurboPack/SynEdit>
+
+"FastMM is a fast replacement memory manager for Embarcadero Delphi applications that scales well across multiple threads and CPU cores."
+<https://github.com/pleriche/FastMM5>
+
+"VCL Styles Utils is a Delphi library which extend the RAD Studio VCL Styles."
+<https://github.com/RRUZ/vcl-styles-utils>
+
+"DDetours is a library allowing you to hook Delphi and Windows API functions."
+<https://github.com/MahdiSafsafi/DDetours>
+
+"Components to simplify use of SVG images (resize, fixedcolor, grayscale...). "
+<https://github.com/EtheaDev/SVGIconImageList>
+
+"Abbrevia is a compression toolkit for Delphi and C++Builder."
+https://github.com/TurboPack/Abbrevia
+
+# Original Dev-C++ Developers
 
 Find out more about the original developers of Bloodshed Dev-C++:
 
 <https://www.bloodshed.net/devcpp.html>
+
+# Built In Delphi
 
 Find out more information about Embarcadero Delphi:
 
