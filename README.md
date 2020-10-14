@@ -8,7 +8,7 @@ Download the latest release:
 
 Main Features include:
 
-- TDM-GCC 4.9.2 32/64bit
+- TDM-GCC 9.2.0 32/64bit
 - Support GCC-based compilers
 - Integrated debugging (using GDB)
 - GPROF profiling
