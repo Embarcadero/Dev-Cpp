@@ -72,7 +72,15 @@ Version 5.50 - 1 July 2020
 
 ![Dev C++ Screenshot](https://raw.githubusercontent.com/Embarcadero/Dev-Cpp/master/Source/Images/screenshot800x600.png)
 
+# Dev C++ Bundled Compiler
+
+tdm-gcc: GCC compiler, Windows-friendly.
+<https://jmeubank.github.io/tdm-gcc/>
+
 # Dev C++ Third Party Libraries
+
+"Artistic Style is a source code indenter, formatter, and beautifier for the C, C++, C++/CLI, Objective‑C, C# and Java programming languages."
+<http://astyle.sourceforge.net/>
 
 "SynEdit is a syntax highlighting edit control, not based on the Windows common controls. SynEdit is compatible with both Delphi and C++ Builder."
 <https://github.com/TurboPack/SynEdit>
