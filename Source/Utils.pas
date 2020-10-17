@@ -50,6 +50,7 @@ procedure FilesFromWildcard(Directory: String; const Mask: String; Files: TStrin
   Multitasking: Boolean);
 
 function ExecuteFile(const FileName, Params, DefaultDir: String; ShowCmd: Integer): THandle;
+function ExecuteFileAsAdmin(const FileName, Params, DefaultDir: String; ShowCmd: Integer): THandle;
 function RunAndGetOutput(const Cmd, WorkDir: String; LineOutputFunc: TLineOutputFunc; CheckAbortFunc:
   TCheckAbortFunc; ShowReturnValue: Boolean = True): String;
 
@@ -418,7 +419,7 @@ procedure OpenHelpFile(const HelpFileName: String);
 var
   abshelp: String;
 begin // TODO: fix iframe opening problem
-  abshelp := ReplaceFirstStr(devDirs.Help, '%path%\', devDirs.Exec) + HelpFileName;
+  abshelp := '"'+ReplaceFirstStr(devDirs.Help, '%path%\', devDirs.Exec) + HelpFileName+'"';
   ShellExecute(GetDesktopWindow(), 'open', PChar(abshelp), nil, nil, SW_SHOWNORMAL);
 end;
 
@@ -467,6 +468,13 @@ end;
 function ExecuteFile(const FileName, Params, DefaultDir: String; ShowCmd: Integer): THandle;
 begin
   Result := ShellExecute(Application.MainForm.Handle, nil,
+    PChar(FileName), PChar(Params),
+    PChar(DefaultDir), ShowCmd);
+end;
+
+function ExecuteFileAsAdmin(const FileName, Params, DefaultDir: String; ShowCmd: Integer): THandle;
+begin
+  Result := ShellExecute(Application.MainForm.Handle, 'runas',
     PChar(FileName), PChar(Params),
     PChar(DefaultDir), ShowCmd);
 end;

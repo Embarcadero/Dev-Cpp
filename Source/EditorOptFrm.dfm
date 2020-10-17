@@ -670,9 +670,7 @@ object EditorOptForm: TEditorOptForm
           'String'
           'Symbol'
           'WhiteSpace'
-          'Directives'
-          'Monokai'
-          'Monokai Fresh')
+          'Directives')
         ParentCtl3D = False
         TabOrder = 0
         OnClick = ElementListClick
@@ -743,7 +741,8 @@ object EditorOptForm: TEditorOptForm
           'Obvilion'
           'PlasticCodeWrap'
           'Monokai'
-          'Monokai Fresh')
+          'Monokai Fresh'
+          'Visual Studio Dark')
       end
       object edSyntaxExt: TEdit
         Left = 182

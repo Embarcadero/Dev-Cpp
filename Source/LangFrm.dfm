@@ -248,7 +248,8 @@ object LangForm: TLangForm
           'Obvilion'
           'PlasticCodeWrap'
           'Monokai'
-          'Monokai Fresh')
+          'Monokai Fresh'
+          'Visual Studio Dark')
       end
       object cmbFont: TComboBox
         Left = 56

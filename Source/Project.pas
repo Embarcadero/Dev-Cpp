@@ -1475,7 +1475,7 @@ begin
   sl := TStringList.Create;
   try
     sl.Add('<html>');
-    sl.Add('<head><title>Dev-C++ project: ' + Self.Name + '</title></head>');
+    sl.Add('<head><title>Embarcadero Dev-C++ project: ' + Self.Name + '</title></head>');
     sl.Add('<body bgcolor=#FFFFFF>');
     sl.Add('<h2>Project: ' + Self.Name + '</h2>');
     sl.Add('<b>Index of files:</b>');
@@ -1516,7 +1516,7 @@ begin
 
     sl.Add('</table>');
     sl.Add('<hr width="80%"/>');
-    sl.Add('<p align="center"><font size="1">Exported by <a href="http://www.bloodshed.net/dev">' + DEVCPP + '</a> v' +
+    sl.Add('<p align="center"><font size="1">Exported by <a href="https://github.com/Embarcadero/Dev-Cpp">' + DEVCPP + '</a> v' +
       DEVCPP_VERSION + '</font></p>');
     sl.Add('</body>');
     sl.Add('</html>');

@@ -115,9 +115,8 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <DCC_ExeOutput>C:\Dev-Cpp\</DCC_ExeOutput>
-        <VerInfo_MinorVer>0</VerInfo_MinorVer>
-        <VerInfo_Keys>CompanyName=Embarcadero;FileDescription=$(MSBuildProjectName);FileVersion=6.0.0.0;InternalName=Devcpp;LegalCopyright=;LegalTrademarks=;OriginalFilename=Embarcadero Devcpp;ProductName=$(MSBuildProjectName);ProductVersion=6.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <DCC_UnitSearchPath>VCL\TChromeTabs;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <VerInfo_MinorVer>1</VerInfo_MinorVer>
+        <VerInfo_Keys>CompanyName=Embarcadero;FileDescription=$(MSBuildProjectName);FileVersion=6.1.0.0;InternalName=Devcpp;LegalCopyright=;LegalTrademarks=;OriginalFilename=Embarcadero Devcpp;ProductName=$(MSBuildProjectName);ProductVersion=6.1.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <Icon_MainIcon>..\devcpp.ico</Icon_MainIcon>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
     </PropertyGroup>

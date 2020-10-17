@@ -198,6 +198,8 @@ begin
     devEditor.HighColor := clBlack
   else if cmbColors.Text = 'Monokai Fresh' then
     devEditor.HighColor := clBlack
+  else if cmbColors.Text = 'Visual Studio Dark' then
+    devEditor.HighColor := clBlack
   else
     devEditor.HighColor := $FFFFCC; // Light Turquoise
 

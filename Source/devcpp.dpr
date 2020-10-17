@@ -141,10 +141,10 @@ begin
     else
       devData.INIFileName := IncludeTrailingBackslash(ParamStr(2)) + INIFileName;
   end else begin
-    // default dir should be %APPDATA%\Dev-Cpp
-    AppData := IncludeTrailingBackslash(GetHomePath);
+    // default dir should be C:\Users\<username>\Documents\Embarcadero\Dev-Cpp
+    AppData := IncludeTrailingBackslash(TPath.GetDocumentsPath);
 
-    // Store the INI file in %APPDATA% or if we are not allowed to do so, in the exe directory
+    // Store the INI file in C:\Users\<username>\Documents or if we are not allowed to do so, in the exe directory
     if (not devData.IsPortable) and ((AppData <> '') and (DirectoryExists(AppData + 'Embarcadero\Dev-Cpp') or CreateDir(AppData + 'Embarcadero\Dev-Cpp'))) then
       devData.INIFileName := AppData + 'Embarcadero\Dev-Cpp\' + INIFileName
     else

@@ -6813,7 +6813,7 @@ begin
   StyleS := IntToStr(devData.Style);
   s := IncludeTrailingBackslash(devDirs.Exec) + PACKMAN_PROGRAM;
   if FileExists(s) then
-    ExecuteFile(s, '/style '+StyleS, IncludeTrailingBackslash(devDirs.Exec), SW_SHOW);
+    ExecuteFileAsAdmin(s, '/style '+StyleS, IncludeTrailingBackslash(devDirs.Exec), SW_SHOW);
 end;
 
 procedure TMainForm.actHelpExecute(Sender: TObject);
