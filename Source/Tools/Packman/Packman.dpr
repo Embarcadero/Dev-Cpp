@@ -1,6 +1,7 @@
 program Packman;
 
 uses
+  FastMM5 in 'FastMM5.pas',
   {$IFDEF WIN32}
   Forms,
   {$ENDIF }

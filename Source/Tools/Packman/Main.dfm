@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 289
   Top = 166
-  Caption = 'Embarcadero Dev-C++ Package Manager (version 2.2.9)'
+  Caption = 'Embarcadero Dev-C++ Package Manager (version 2.3.0)'
   ClientHeight = 523
   ClientWidth = 867
   Color = clBtnFace
@@ -136,55 +136,74 @@ object MainForm: TMainForm
       end
       object SpeedButton1: TSpeedButton
         Left = 137
-        Top = 2
+        Top = 1
         Width = 23
-        Height = 21
+        Height = 23
         Hint = 'Hide details panel.'
+        Align = alRight
         Caption = '<<'
         Flat = True
         OnClick = SpeedButton1Click
+        ExplicitTop = 2
+        ExplicitHeight = 21
       end
     end
     object devPages1: TPageControl
       Left = 0
       Top = 25
       Width = 161
-      Height = 282
+      Height = 433
       ActivePage = devPage1
-      Align = alTop
+      Align = alClient
       TabOrder = 1
       object devPage1: TTabSheet
         Caption = 'General'
         object Label2: TLabel
+          AlignWithMargins = True
           Left = 8
           Top = 8
-          Width = 73
+          Width = 142
           Height = 14
+          Margins.Left = 8
+          Margins.Top = 8
+          Align = alTop
           Caption = 'Package name:'
           Enabled = False
+          ExplicitWidth = 73
         end
         object Label3: TLabel
+          AlignWithMargins = True
           Left = 8
           Top = 56
-          Width = 83
+          Width = 142
           Height = 14
+          Margins.Left = 8
+          Align = alTop
           Caption = 'Package version:'
           Enabled = False
+          ExplicitWidth = 83
         end
         object Label4: TLabel
+          AlignWithMargins = True
           Left = 8
           Top = 104
-          Width = 57
+          Width = 142
           Height = 14
+          Margins.Left = 8
+          Align = alTop
           Caption = 'Description:'
           Enabled = False
+          ExplicitWidth = 57
         end
         object Label5: TLabel
+          AlignWithMargins = True
           Left = 8
-          Top = 176
-          Width = 42
+          Top = 319
+          Width = 142
           Height = 13
           Cursor = crHandPoint
+          Margins.Left = 8
+          Align = alTop
           Caption = 'Website:'
           Enabled = False
           Font.Charset = DEFAULT_CHARSET
@@ -195,50 +214,66 @@ object MainForm: TMainForm
           ParentFont = False
           Visible = False
           OnClick = Label5Click
+          ExplicitWidth = 42
         end
         object PackageName: TEdit
+          AlignWithMargins = True
           Left = 8
-          Top = 24
-          Width = 145
+          Top = 28
+          Width = 142
           Height = 22
+          Margins.Left = 8
+          Align = alTop
           Enabled = False
           ReadOnly = True
           TabOrder = 0
         end
         object PackageVersion: TEdit
+          AlignWithMargins = True
           Left = 8
-          Top = 72
-          Width = 145
+          Top = 76
+          Width = 142
           Height = 22
+          Margins.Left = 8
+          Align = alTop
           Enabled = False
           ReadOnly = True
           TabOrder = 1
         end
         object PackageDescription: TMemo
+          AlignWithMargins = True
           Left = 8
-          Top = 120
-          Width = 145
-          Height = 49
+          Top = 124
+          Width = 142
+          Height = 189
+          Margins.Left = 8
+          Align = alTop
           Enabled = False
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 2
         end
         object PackageURL: TEdit
+          AlignWithMargins = True
           Left = 8
-          Top = 192
-          Width = 145
+          Top = 338
+          Width = 142
           Height = 22
+          Margins.Left = 8
+          Align = alTop
           Enabled = False
           ReadOnly = True
           TabOrder = 3
           Visible = False
         end
         object BitBtn1: TBitBtn
+          AlignWithMargins = True
           Left = 8
-          Top = 224
-          Width = 145
+          Top = 366
+          Width = 142
           Height = 25
+          Margins.Left = 8
+          Align = alTop
           Caption = 'Show Picture'
           Enabled = False
           TabOrder = 4
@@ -247,15 +282,11 @@ object MainForm: TMainForm
       end
       object devPage2: TTabSheet
         Caption = 'Files'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object FileList: TRichEdit
           Left = 0
           Top = 0
           Width = 153
-          Height = 253
+          Height = 404
           Align = alClient
           Enabled = False
           Font.Charset = ANSI_CHARSET

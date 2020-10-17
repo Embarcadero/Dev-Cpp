@@ -3,7 +3,7 @@
         <ProjectGuid>{37393A3F-8AC9-4AFD-97BB-1DCEB0ABB949}</ProjectGuid>
         <MainSource>Packman.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -56,7 +56,7 @@
         <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_ExeOutput>..\..</DCC_ExeOutput>
-        <DCC_UnitSearchPath>..\..\VCL\SVGIconImageList;..\..\VCL\SVGIconImageList\Svg;..\..\VCL\SVGIconImageList\GDIP;..\..\VCL\SVGIconImageList\Source;..\..\VCL\Abbrevia\Abbrevia\source;..\Vcl;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\VCL\SVGIconImageList;..\..\VCL\SVGIconImageList\Svg;..\..\VCL\SVGIconImageList\Source;..\..\VCL\Abbrevia\Abbrevia\source;..\..\VCL\vcl-styles-utils\Common;..\..\VCL\DDetours\Source;..\..;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_UsePackage>vcl;rtl;vclx;VclSmp;$(DCC_UsePackage)</DCC_UsePackage>
         <SanitizedProjectName>Packman</SanitizedProjectName>
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
@@ -96,8 +96,10 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <VerInfo_Release>9</VerInfo_Release>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.2.9.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Release>0</VerInfo_Release>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.3.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_MinorVer>3</VerInfo_MinorVer>
+        <Icon_MainIcon>devcpp.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -111,12 +113,12 @@
         <VerInfo_Release>9</VerInfo_Release>
         <DCC_Define>UseWin;$(DCC_Define)</DCC_Define>
         <DCC_ExeOutput>C:\Work\GitHub\bin\</DCC_ExeOutput>
-        <DCC_UnitSearchPath>..\..\VCL\SVGIconImageList;..\..\VCL\SVGIconImageList\Svg;..\..\VCL\SVGIconImageList\GDIP;..\..\VCL\SVGIconImageList\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="FastMM5.pas"/>
         <DCCReference Include="InstallWizards.pas">
             <Form>InstallWizard</Form>
         </DCCReference>
