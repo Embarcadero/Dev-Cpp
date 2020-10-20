@@ -45,6 +45,7 @@ object frmShortcutsEditor: TfrmShortcutsEditor
     ColumnClick = False
     ReadOnly = True
     RowSelect = True
+    ParentColor = True
     TabOrder = 0
     ViewStyle = vsReport
     OnCustomDrawItem = lvShortcutsCustomDrawItem

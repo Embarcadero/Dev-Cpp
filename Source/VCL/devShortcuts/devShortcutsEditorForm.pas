@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, ComCtrls, StdCtrls, Menus, devShortcuts;
+  Dialogs, ExtCtrls, ComCtrls, StdCtrls, Menus, devShortcuts, Vcl.Themes;
 {$ENDIF}
 {$IFDEF LINUX}
 SysUtils, Variants, Classes, QGraphics, QControls, QForms,
@@ -193,9 +193,9 @@ begin
   with Sender.Canvas do begin
     if not (cdsSelected in State) then begin
       if Item.Index mod 2 = 0 then
-        Brush.Color := clWhite
+        Brush.Color := lvShortcuts.Color
       else
-        Brush.Color := $E0E0E0;
+        Brush.Color := StyleServices.GetStyleColor(scGenericBackground);
     end;
   end;
 end;
