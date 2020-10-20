@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Classes, SysUtils, IntList, StatementList, Controls, ComCtrls, Graphics,
-  CppParser, Forms, cbutils;
+  CppParser, Forms, Vcl.Themes, cbutils;
 {$ENDIF}
 {$IFDEF LINUX}
 Classes, SysUtils, QControls, QComCtrls, QForms, QGraphics,
@@ -502,7 +502,16 @@ begin
         if bInherited then
           fControlCanvas.Font.Color := clGray
         else
-          fControlCanvas.Font.Color := clMaroon;
+          begin
+            var TextColor := clMaroon;
+            case StyleServices.GetStyleFontColor(sfTabTextActiveNormal) of
+              16777215: TextColor := clMoneyGreen; // Slate Gray
+              14803425: TextColor := clSkyBlue; // Blue Whale
+            end;
+            fControlCanvas.Font.Color := TextColor;
+          end;
+
+        fControlCanvas.Brush.Color := StyleServices.GetStyleColor(scTreeView);
         fControlCanvas.TextOut(DrawPoint.X, DrawPoint.Y + 2, st^._Args); // center vertically
         Inc(DrawPoint.X, fControlCanvas.TextWidth(st^._Args) + 3); // add some right padding
       end;
@@ -515,6 +524,7 @@ begin
       // Then draw node type to the right of the arguments
       if TypeText <> '' then begin
         fControlCanvas.Font.Color := clGray;
+        fControlCanvas.Brush.Color := StyleServices.GetStyleColor(scTreeView);
         fControlCanvas.TextOut(DrawPoint.X, DrawPoint.Y + 2, ': ' + TypeText); // center vertically
       end;
     except // stick head into sand method. sometimes during painting, the PStatement is invalid
