@@ -147,7 +147,7 @@ begin
     const DevCppDir = 'Embarcadero\Dev-Cpp';
 
     // Store the INI file in %APPDATA% or if we are not allowed to do so, in the exe directory
-    if (not devData.IsPortable) and ((AppData <> '') and (DirectoryExists(AppData + DevCppDir) or CreateDir(AppData + DevCppDir))) then
+    if (not devData.IsPortable) and ((AppData <> '') and (DirectoryExists(AppData + DevCppDir) or ForceDirectories(AppData + DevCppDir))) then
       devData.INIFileName := AppData + DevCppDir + INIFileName
     else
     begin
@@ -155,7 +155,7 @@ begin
         AppData := IncludeTrailingBackslash(TPath.GetDocumentsPath);
 
         // Store the INI file in C:\Users\<username>\Documents or if we are not allowed to do so, in the exe directory
-        if (not devData.IsPortable) and ((AppData <> '') and (DirectoryExists(AppData + DevCppDir) or CreateDir(AppData + DevCppDir))) then
+        if (not devData.IsPortable) and ((AppData <> '') and (DirectoryExists(AppData + DevCppDir) or ForceDirectories(AppData + DevCppDir))) then
           devData.INIFileName := AppData + DevCppDir + INIFileName
         else
         begin
