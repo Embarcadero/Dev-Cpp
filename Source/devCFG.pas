@@ -1563,7 +1563,7 @@ var
   OptionIndex: integer;
 begin
   if FindOption(Option, OptionStruct, OptionIndex) then
-    SetOption(Option, Value);
+    SetOption(OptionStruct, Value);
 end;
 
 procedure TdevCompilerSet.SetOption(Option: PCompilerOption; Value: Integer);
