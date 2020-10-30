@@ -2278,7 +2278,7 @@ begin
       ClassBrowser.EndUpdate;
     end;
   finally
-    MainPanel.Visible := True;
+    if not Assigned(fProject) then MainPanel.Visible := True;
     GetProjectHistory;
     FileMonitor.EndUpdate;
   end;
