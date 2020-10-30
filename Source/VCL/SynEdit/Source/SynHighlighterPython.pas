@@ -59,7 +59,7 @@ uses
 //++ CodeFolding
   Classes,
   SynEditCodeFolding, 
-  SynRegExpr;
+  RegularExpressions;
 //-- CodeFolding
 
 const
@@ -98,7 +98,7 @@ type
     fSpaceAttri: TSynHighlighterAttributes;
     fErrorAttri: TSynHighlighterAttributes;
 //++ CodeFolding
-    BlockOpenerRE : TRegExpr;
+    BlockOpenerRE : TRegEx;
 //-- CodeFolding
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
     procedure SymbolProc;
@@ -360,10 +360,9 @@ begin
   FKeywords.Assign (GetKeywordIdentifiers);
 
 //++ CodeFolding
-  BlockOpenerRE := TRegExpr.Create;
-  BlockOpenerRE.Expression := // ':\s*(#.*)?$';
+  BlockOpenerRE.Create(
      '^(def|class|while|for|if|else|elif|try|except|with'+
-     '|(async[ \t]+def)|(async[ \t]+with)|(async[ \t]+for))\b';
+     '|(async[ \t]+def)|(async[ \t]+with)|(async[ \t]+for))\b');
 //-- CodeFolding
 
   fRange := rsUnknown;
@@ -415,9 +414,6 @@ end; { Create }
 destructor TSynPythonSyn.Destroy;
 begin
   FKeywords.Free;
-//++ CodeFolding
-  BlockOpenerRE.Free;
-//-- CodeFolding
   inherited;
 end;
 
@@ -1263,18 +1259,19 @@ begin
     Indent := LeftSpaces;
 
     // find fold openers
-    if BlockOpenerRE.Exec(LeftTrimmedLine) then
-    begin
-      if BlockOpenerRE.Match[1] = 'class' then
-        FoldType := ClassDefType
-      else if Pos('def', BlockOpenerRE.Match[1]) >= 1 then
-        FoldType := FunctionDefType
-      else
-        FoldType := 1;
+    with BlockOpenerRE.Match(LeftTrimmedLine) do
+      if Success then
+      begin
+        if Groups[1].Value = 'class' then
+          FoldType := ClassDefType
+        else if Pos('def', Groups[1].Value) >= 1 then
+          FoldType := FunctionDefType
+        else
+          FoldType := 1;
 
-      FoldRanges.StartFoldRange(Line + 1, FoldType, Indent);
-      Continue;
-    end;
+        FoldRanges.StartFoldRange(Line + 1, FoldType, Indent);
+        Continue;
+      end;
 
     FoldRanges.StopFoldRange(Line + 1, 1, Indent)
   end;

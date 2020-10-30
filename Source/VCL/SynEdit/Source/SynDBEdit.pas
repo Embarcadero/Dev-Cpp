@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -12,7 +12,7 @@ The Original Code is: SynDBEdit.pas, released 2000-05-05.
 The Original Code is based on DBmwEdit.pas by Vladimir Kuznetsov, part of
 the mwEdit component suite.
 Portions created by Vladimir Kuznetsov are Copyright (C) 1999 Vladimir Kuznetsov.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -48,6 +48,7 @@ uses
   Controls,
   DbCtrls,
   SynEdit,
+  SynEditTypes,
   SynEditKeyCmds,
   SysUtils,
   Classes,
@@ -153,7 +154,6 @@ type
     property InsertCaret;
     property InsertMode;
     property Keystrokes;
-    property MaxScrollWidth;
     property MaxUndo;
     property Options;
     property OverwriteCaret;
@@ -314,7 +314,13 @@ begin
   try
     BlobStream := FDataLink.DataSet.CreateBlobStream(FDataLink.Field, bmRead);
     Lines.BeginUpdate;
-    Lines.LoadFromStream(BlobStream, TEncoding.Default);
+    if ((FDataLink.Field is  TBlobField) and
+	    (TBlobField(FDataLink.Field).BlobType in [ftWideMemo,ftWideString]))
+    then
+      Lines.LoadFromStream(BlobStream, TEncoding.Unicode)
+    else
+      //For UTF8 use: System.SysUtils.TEncoding.UTF8
+      Lines.LoadFromStream(BlobStream, TEncoding.Default);
     Lines.EndUpdate;
     BlobStream.Free;
     Modified := False;

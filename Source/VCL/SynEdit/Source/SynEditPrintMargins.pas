@@ -353,7 +353,7 @@ begin
     PRight := PrinterInfo.PrintableWidth - PrinterInfo.PixFromRight(FRight);
   end;
   if LineNumbers and (not LineNumbersInMargin) then
-    PLeft := PLeft + TextWidth(ACanvas, IntToStr(MaxLineNum) + ': ');
+    PLeft := PLeft + ACanvas.TextWidth(IntToStr(MaxLineNum) + ': ');
   PTop := PrinterInfo.PixFromTop(FTop);
   PBottom := PrinterInfo.PrintableHeight - PrinterInfo.PixFromBottom(FBottom);
   PHeader := PrinterInfo.PixFromTop(FHeader);

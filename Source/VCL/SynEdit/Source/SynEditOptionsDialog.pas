@@ -62,7 +62,7 @@ uses
   SynEditMiscClasses,
   SynEditKeyCmds,
   Classes,
-  SysUtils;
+  SysUtils, System.ImageList;
 
 type
   TColorPopup = (cpGutter, cpRightEdge);
@@ -139,7 +139,6 @@ type
     gbOptions: TGroupBox;
     ckAutoIndent: TCheckBox;
     ckDragAndDropEditing: TCheckBox;
-    ckAutoSizeMaxWidth: TCheckBox;
     ckHalfPageScroll: TCheckBox;
     ckEnhanceEndKey: TCheckBox;
     ckScrollByOneLess: TCheckBox;
@@ -213,8 +212,6 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure btnGutterColorMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure cKeyCommandExit(Sender: TObject);
-    procedure cKeyCommandKeyPress(Sender: TObject; var Key: Char);
     procedure cKeyCommandKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure KeyListChanging(Sender: TObject; Item: TListItem;
@@ -328,7 +325,9 @@ implementation
 {$R *.dfm}
 
 uses
-  Types, SynEditKeyConst;
+  Types,
+  SynEditKeyConst,
+  SynEditMiscProcs;
 
 { TSynEditOptionsDialog }
 
@@ -399,7 +398,6 @@ begin
     Self.HideSelection := TCustomSynEdit(Source).HideSelection;
     Self.InsertCaret := TCustomSynEdit(Source).InsertCaret;
     Self.OverwriteCaret := TCustomSynEdit(Source).OverwriteCaret;
-    Self.MaxScrollWidth := TCustomSynEdit(Source).MaxScrollWidth;
     Self.MaxUndo := TCustomSynEdit(Source).MaxUndo;
     Self.RightEdge := TCustomSynEdit(Source).RightEdge;
     Self.RightEdgeColor := TCustomSynEdit(Source).RightEdgeColor;
@@ -425,7 +423,6 @@ begin
     TCustomSynEdit(Dest).HideSelection := Self.HideSelection;
     TCustomSynEdit(Dest).InsertCaret := Self.InsertCaret;
     TCustomSynEdit(Dest).OverwriteCaret := Self.OverwriteCaret;
-    TCustomSynEdit(Dest).MaxScrollWidth := Self.MaxScrollWidth;
     TCustomSynEdit(Dest).MaxUndo := Self.MaxUndo;
     TCustomSynEdit(Dest).RightEdge := Self.RightEdge;
     TCustomSynEdit(Dest).RightEdgeColor := Self.RightEdgeColor;
@@ -445,7 +442,7 @@ begin
   FSelectedColor.Foreground:= clHighlightText;
   FSelectedColor.Background:= clHighlight;
   FFont:= TFont.Create;
-  FFont.Name:= 'Courier New';
+  FFont.Name:= DefaultFontName;
   FFont.Size:= 8;
   Color:= clWindow;
   Keystrokes.ResetDefaults;
@@ -549,7 +546,6 @@ begin
   labFont.Caption:= labFont.Font.Name + ' ' + IntToStr(labFont.Font.Size) + 'pt';
   //Options
   ckAutoIndent.Checked:= eoAutoIndent in FSynEdit.Options;
-  ckAutoSizeMaxWidth.Checked:= eoAutoSizeMaxScrollWidth in FSynEdit.Options;
   ckDragAndDropEditing.Checked:= eoDragDropEditing in FSynEdit.Options;
   ckWantTabs.Checked:= FSynEdit.WantTabs;
   ckSmartTabs.Checked:= eoSmartTabs in FSynEdit.Options;
@@ -628,7 +624,6 @@ begin
   FSynEdit.WantTabs:= ckWantTabs.Checked;
   vOptions := FSynEdit.Options; //Keep old values for unsupported options
   SetFlag(eoAutoIndent, ckAutoIndent.Checked);
-  SetFlag(eoAutoSizeMaxScrollWidth, ckAutoSizeMaxWidth.Checked);
   SetFlag(eoDragDropEditing, ckDragAndDropEditing.Checked);
   SetFlag(eoSmartTabs, ckSmartTabs.Checked);
   SetFlag(eoAltSetsColumnMode, ckAltSetsColumnMode.Checked);
@@ -804,6 +799,7 @@ end;
 procedure TfmEditorOptionsDialog.btnAddKeyClick(Sender: TObject);
 var Item : TListItem;
 begin
+  if cKeyCommand.ItemIndex < 0 then Exit;
   Item:= KeyList.Items.Add;
   Item.Data:= FSynEdit.Keystrokes.Add;
   Item.Selected:= True;
@@ -933,44 +929,7 @@ begin
       TmpString := TmpString + ' ' + ShortCutToText(ShortCut2);
 
     AItem.SubItems.Add(TmpString);
-
   end;
-
-end;
-
-procedure TfmEditorOptionsDialog.cKeyCommandExit(Sender: TObject);
-VAR TmpIndex : Integer;
-begin
-  TmpIndex := cKeyCommand.Items.IndexOf(cKeyCommand.Text);
-  if TmpIndex = -1 then
-  begin
-    if FExtended then
-      cKeyCommand.ItemIndex := cKeyCommand.Items.IndexOf(ConvertCodeStringToExtended('ecNone'))
-    else cKeyCommand.ItemIndex := cKeyCommand.Items.IndexOf('ecNone');
-  end else cKeyCommand.ItemIndex := TmpIndex;  //need to force it incase they just typed something in
-
-end;
-
-procedure TfmEditorOptionsDialog.cKeyCommandKeyPress(Sender: TObject;
-  var Key: Char);
-var WorkStr : string;
-    i       : Integer;
-begin
-//This would be better if componentized, but oh well...
-  WorkStr := Uppercase(Copy(cKeyCommand.Text, 1, cKeyCommand.SelStart) + Key);
-  i := 0;
-  While i < cKeyCommand.Items.Count do
-  begin
-    if pos(WorkStr, Uppercase(cKeyCommand.Items[i])) = 1 then
-    begin
-      cKeyCommand.Text := cKeyCommand.Items[i];
-      cKeyCommand.SelStart := length(WorkStr);
-      cKeyCommand.SelLength := Length(cKeyCommand.Text) - cKeyCommand.SelStart;
-      Key := #0;
-      break;
-    end else inc(i);
-  end;
-
 end;
 
 procedure TfmEditorOptionsDialog.cKeyCommandKeyUp(Sender: TObject;

@@ -131,6 +131,9 @@ procedure SynDrawGradient(const ACanvas: TCanvas; const AStartColor, AEndColor: 
 
 function DeleteTypePrefixAndSynSuffix(S: string): string;
 
+// In Windows Vista or later use the Consolas font
+function DefaultFontName: string;
+
 implementation
 
 uses
@@ -840,6 +843,15 @@ begin
       ACanvas.FillRect(PaintRect);
     end;
   end;
+end;
+
+
+function DefaultFontName: string;
+begin
+    if CheckWin32Version(6) then
+      Result := 'Consolas'
+    else
+      Result := 'Courier New';
 end;
 
 end.

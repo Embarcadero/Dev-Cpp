@@ -252,7 +252,7 @@ begin
     Result := True;
     for i := 1 to fStringLen do
     begin
-      if SynWideLowerCase(Temp^)[1] <> SynWideLowerCase(Token[i])[1] then
+      if SysUtils.AnsiLowerCase(Temp^)[1] <> SysUtils.AnsiLowerCase(Token[i])[1] then
       begin
         Result := False;
         break;

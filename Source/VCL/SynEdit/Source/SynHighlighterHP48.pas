@@ -207,7 +207,6 @@ type
 implementation
 
 uses
-  WideStrUtils,
   SynEditStrConst;
 
 const
@@ -1002,7 +1001,7 @@ begin
   Len := (Run - 1) - fTokenPos;
   SetLength(Result, Len);
   if Len > 0 then
-    WStrLCopy(@Result[1], fCasedLine + fTokenPos, Len);
+    StrLCopy(@Result[1], fCasedLine + fTokenPos, Len);
 end;
 
 function TSynHP48Syn.IsLineEnd(Run: Integer): Boolean;

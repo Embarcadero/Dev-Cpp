@@ -99,6 +99,7 @@ uses
   Forms,
   Graphics,
   Controls,
+  SynEditTypes,
   SynEditKeyCmds,
   SynEditKeyCmdsEditor,
   SynEdit,

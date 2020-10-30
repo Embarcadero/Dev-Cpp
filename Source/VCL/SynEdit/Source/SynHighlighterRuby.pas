@@ -173,7 +173,7 @@ begin
   First := 0;
   Last := fKeywords.Count - 1;
   Result := False;
-  Token := SynWideUpperCase(AKeyword);
+  Token := SysUtils.AnsiUpperCase(AKeyword);
 
   while First <= Last do
   begin
@@ -199,7 +199,7 @@ begin
   First := 0;
   Last := fSecondKeys.Count - 1;
   Result := False;
-  Token := SynWideUpperCase(aToken);
+  Token := SysUtils.AnsiUpperCase(aToken);
   while First <= Last do
   begin
     I := (First + Last) shr 1;
@@ -688,7 +688,7 @@ begin
     begin
       Value.BeginUpdate;
       for i := 0 to Value.Count - 1 do
-        Value[i] := SynWideUpperCase(Value[i]);
+        Value[i] := SysUtils.AnsiUpperCase(Value[i]);
       Value.EndUpdate;
     end;
   fSecondKeys.Assign(Value);

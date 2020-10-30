@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -10,7 +10,7 @@ the specific language governing rights and limitations under the License.
 
 The Original Code is: SynAutoCorrect.pas, released 2001-10-05.
 Author of this file is Aaron Chan.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -255,9 +255,9 @@ procedure TCustomSynAutoCorrect.LoadFromIni(AFileName, ASection: string);
 var
   i: Integer;
   Original, Correction: string;
-  Reg: TIniFile;
+  Reg: TMemIniFile;
 begin
-  Reg := TIniFile.Create(AFileName);
+  Reg := TMemIniFile.Create(AFileName);
   try
     FItems.Clear;
     with Reg do
@@ -276,9 +276,9 @@ end;
 procedure TCustomSynAutoCorrect.SaveToIni(AFileName, ASection: string);
 var
   i: Integer;
-  Reg: TIniFile;
+  Reg: TMemIniFile;
 begin
-  Reg := TIniFile.Create(AFileName);
+  Reg := TMemIniFile.Create(AFileName);
   try
     with Reg do
     begin
@@ -292,6 +292,7 @@ begin
       end;
     end;
   finally
+    Reg.UpdateFile;
     Reg.Free;
   end;
 end;
@@ -459,8 +460,8 @@ begin
 
   if not MatchCase then
   begin
-    EditLine := SynWideUpperCase(EditLine);
-    SearchString := SynWideUpperCase(SearchString);
+    EditLine := SysUtils.AnsiUpperCase(EditLine);
+    SearchString := SysUtils.AnsiUpperCase(SearchString);
   end;
 
   BufLen := Length(EditLine);
@@ -596,8 +597,8 @@ var
   begin
     if s <> '' then
     begin
-      s := SynWideLowerCase(s);
-      s[1] := SynWideUpperCase(s[1])[1];
+      s := SysUtils.AnsiLowerCase(s);
+      s[1] := SysUtils.AnsiUpperCase(s[1])[1];
     end;
 
     Result := s;
@@ -621,12 +622,12 @@ begin
         Correction := ReplaceDefText;
         FoundText := Copy(EditLine,StartPos+1,EndPos);
 
-        if FoundText = SynWideUpperCase(FoundText) then
-          Correction := SynWideUpperCase(Correction)
+        if FoundText = SysUtils.AnsiUpperCase(FoundText) then
+          Correction := SysUtils.AnsiUpperCase(Correction)
         else
         begin
-          if FoundText = SynWideLowerCase(FoundText) then
-            Correction := SynWideLowerCase(Correction)
+          if FoundText = SysUtils.AnsiLowerCase(FoundText) then
+            Correction := SysUtils.AnsiLowerCase(Correction)
           else
           begin
             if FoundText = FirstCapCase(FoundText) then

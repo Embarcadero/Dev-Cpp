@@ -50,10 +50,6 @@ uses
   SysUtils,
   Classes;
 
-var
-  // Accumulate/hide whitespace at EOL (at end of wrapped rows, actually)
-  OldWhitespaceBehaviour: Boolean = False;
-
 const
   MaxIndex = MaxInt div 16;
 
@@ -232,7 +228,9 @@ procedure TSynWordWrapPlugin.GrowLines(aMinSize: integer);
 const
   vStepSize = 256;
 begin
-  Assert(aMinSize > 0);
+  if aMinSize <= 0  then
+    aMinSize := 1;
+
   if aMinSize > fLineCapacity then
   begin
     aMinSize := aMinSize + vStepSize - (aMinSize mod vStepSize);
@@ -245,7 +243,8 @@ procedure TSynWordWrapPlugin.GrowRows(aMinSize: integer);
 const
   vStepSize = 512;
 begin
-  Assert(aMinSize > 0);
+  if aMinSize <= 0  then
+    aMinSize := 1;
   if aMinSize > fRowCapacity then
   begin
     aMinSize := aMinSize + vStepSize - (aMinSize mod vStepSize);
@@ -403,8 +402,8 @@ begin
   // ****** First parse the new string using an auxiliar array *****
   vLine := TSynEditStringList(Editor.Lines).ExpandedStrings[aIndex];
   vLine := Editor.ExpandAtWideGlyphs(vLine);
-  // Pre-allocate a buffer for rowlengths
-  vMaxNewRows := ((Length(vLine) - 1) div fMinRowLength) + 1;
+  // Pre-allocate a buffer for rowlengths - at least one row
+  vMaxNewRows := Max(((Length(vLine) - 1) div fMinRowLength) + 1, 1);
   vTempRowLengths := AllocMem(vMaxNewRows * SizeOf(TRowLength));
   try
     vLineRowCount := 0;
@@ -413,35 +412,17 @@ begin
     vLineEnd := vRowBegin + Length(vLine);
     while vRowEnd < vLineEnd do
     begin
-      if OldWhitespaceBehaviour and CharInSet(vRowEnd^, [#32, #9]) then
+      vRowMinEnd := vRowBegin + fMinRowLength;
+      vRunner := vRowEnd - 1;
+      while vRunner > vRowMinEnd do
       begin
-        repeat
-          Inc(vRowEnd);
-        until not CharInSet(vRowEnd^, [#32, #9]);
-      end
-      else
-      begin
-        vRowMinEnd := vRowBegin + fMinRowLength;
-        vRunner := vRowEnd;
-        while vRunner > vRowMinEnd do
+        if Editor.IsWordBreakChar(vRunner^) then
         begin
-          if Editor.IsWordBreakChar(vRunner^) then
-          begin
-            vRowEnd := vRunner;
-            break;
-          end;
-          Dec(vRunner);
+          vRowEnd := vRunner + 1;
+          break;
         end;
+        Dec(vRunner);
       end;
-      // Check TRowLength overflow
-      if OldWhitespaceBehaviour and (vRowEnd - vRowBegin > High(TRowLength)) then
-      begin
-        vRowEnd := vRowBegin + High(TRowLength);
-        vRowMinEnd := vRowEnd - (High(TRowLength) mod Editor.TabWidth);
-        while (vRowEnd^ = #9) and (vRowEnd > vRowMinEnd) do
-          Dec(vRowEnd);
-      end;
-
       // do not cut wide glyphs in half
       if vRowEnd > vRowBegin then
       begin
@@ -545,35 +526,17 @@ begin
     vLineEnd := vRowBegin + Length(vLine);
     while vRowEnd < vLineEnd do
     begin
-      if OldWhitespaceBehaviour and CharInSet(vRowEnd^, [#32, #9]) then
+      vRowMinEnd := vRowBegin + fMinRowLength;
+      vRunner := vRowEnd - 1;
+      while vRunner > vRowMinEnd do
       begin
-        repeat
-          Inc(vRowEnd);
-        until not CharInSet(vRowEnd^, [#32, #9]);
-      end
-      else
-      begin
-        vRowMinEnd := vRowBegin + fMinRowLength;
-        vRunner := vRowEnd;
-        while vRunner > vRowMinEnd do
+        if Editor.IsWordBreakChar(vRunner^) then
         begin
-          if Editor.IsWordBreakChar(vRunner^) then
-          begin
-            vRowEnd := vRunner;
-            break;
-          end;
-          Dec(vRunner);
+          vRowEnd := vRunner + 1;
+          break;
         end;
+        Dec(vRunner);
       end;
-
-      if OldWhitespaceBehaviour and (vRowEnd - vRowBegin > High(TRowLength)) then
-      begin
-        vRowEnd := vRowBegin + High(TRowLength);
-        vRowMinEnd := vRowEnd - (High(TRowLength) mod Editor.TabWidth);
-        while (vRowEnd^ = #9) and (vRowEnd > vRowMinEnd) do
-          Dec(vRowEnd);
-      end;
-
       // do not cut wide glyphs in half
       if vRowEnd > vRowBegin then
       begin

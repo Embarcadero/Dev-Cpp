@@ -31,7 +31,6 @@ interface
 
 uses
   System.SysUtils, System.Classes,
-  Vcl.BaseImageCollection, //if you are compiling with older version than 10.3 remove this line
   SVGIconImageCollection;
 
 type

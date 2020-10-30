@@ -40,7 +40,6 @@ uses
   System.Actions,
   System.ImageList, //if you are compiling with older version than XE7 remove this line
   SVGIconImageListBase, SVGIconImageCollection, SVGIconVirtualImageList,
-  {$IFDEF D10_3+}Vcl.VirtualImageList,{$ENDIF}
   UDataModule;
 
 type
@@ -303,7 +302,7 @@ begin
     LStyleName := SelectThemeRadioGroup.Items[SelectThemeRadioGroup.ItemIndex];
     {$IFDEF DXE+}
     TStyleManager.TrySetStyle(LStyleName);
-    //UpdateIconFontsColorByStyle(IconFontsImageList); TODO
+    ImageDataModule.SVGIconImageCollection.Change;
     {$ELSE}
     SelectThemeRadioGroup.Visible := False;
     {$ENDIF}

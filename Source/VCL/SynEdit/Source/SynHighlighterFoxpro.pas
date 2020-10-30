@@ -1522,26 +1522,26 @@ end;
 
 procedure TSynFoxproSyn.PointProc;
 begin
-  if ((SynWideUpperCase(FLine[Run + 1]) = 'T') or      {.t.}
-    (SynWideUpperCase(FLine[Run + 1]) = 'F')) and     {.f.}
+  if ((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'T') or      {.t.}
+    (SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'F')) and     {.f.}
     (FLine[Run + 2] = '.') then
   begin
     inc(Run, 3);
     fTokenID := tkSymbol;
   end
-  else if (((SynWideUpperCase(FLine[Run + 1]) = 'A') and
-    (SynWideUpperCase(FLine[Run + 2]) = 'N') and
-    (SynWideUpperCase(FLine[Run + 3]) = 'D')) or   {.and.}
-    ((SynWideUpperCase(FLine[Run + 1]) = 'N') and
-    (SynWideUpperCase(FLine[Run + 2]) = 'O') and
-    (SynWideUpperCase(FLine[Run + 3]) = 'T'))) and   {.not.}
+  else if (((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'A') and
+    (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'N') and
+    (SysUtils.AnsiUpperCase(FLine[Run + 3]) = 'D')) or   {.and.}
+    ((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'N') and
+    (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'O') and
+    (SysUtils.AnsiUpperCase(FLine[Run + 3]) = 'T'))) and   {.not.}
     (FLine[Run + 4] = '.') then
   begin
     inc(Run, 5);
     fTokenID := tkSymbol;
   end
-  else if (SynWideUpperCase(FLine[Run + 1]) = 'O') and
-    (SynWideUpperCase(FLine[Run + 2]) = 'R') and
+  else if (SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'O') and
+    (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'R') and
     (FLine[Run + 3] = '.') then  {.or.}
   begin
     inc(Run, 4);
@@ -1606,7 +1606,7 @@ end;
 
 procedure TSynFoxproSyn.StarProc;
 begin
-  if (Run = 0) or (WideTrim(Copy(fLine, 1, Run)) = '') then
+  if (Run = 0) or (Trim(Copy(fLine, 1, Run)) = '') then
   begin                        {Foxpro Comments}
     inc(Run);
     fTokenID := tkComment;

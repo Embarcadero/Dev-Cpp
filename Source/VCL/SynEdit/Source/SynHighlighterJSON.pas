@@ -39,7 +39,11 @@ uses
   SynEditTypes,
   SynEditHighlighter,
   SynUnicode,
-  SysUtils, Classes;
+  //++ CodeFolding
+  SynEditCodeFolding,
+  //++ CodeFolding
+  SysUtils,
+  Classes;
 
 type
   TtkTokenKind = (tkString, tkReserved, tkNull, tkNumber, tkSpace,
@@ -48,7 +52,9 @@ type
   TRangeState = (rsUnknown, rsAttribute, rsObjectValue, rsArrayValue);
 
 type
-  TSynJSONSyn = class(TSynCustomHighLighter)
+//++ CodeFolding
+  TSynJSONSyn = class(TSynCustomCodeFoldingHighlighter)
+//-- CodeFolding
   private
     FRange: TRangeState;
     FTokenID: TtkTokenKind;
@@ -91,6 +97,10 @@ type
     procedure Next; override;
     procedure SetRange(Value: Pointer); override;
     procedure ResetRange; override;
+//++ CodeFolding
+    procedure ScanForFoldRanges(FoldRanges: TSynFoldRanges;
+      LinesToScan: TStrings; FromLine: Integer; ToLine: Integer); override;
+//-- CodeFolding
   published
     property AttributeAttri: TSynHighlighterAttributes read FAttributeAttri
       write FAttributeAttri;
@@ -467,6 +477,87 @@ procedure TSynJSONSyn.ResetRange;
 begin
   FRange := rsUnknown;
 end;
+
+//++ CodeFolding
+procedure TSynJSONSyn.ScanForFoldRanges(FoldRanges: TSynFoldRanges;
+  LinesToScan: TStrings; FromLine, ToLine: Integer);
+var
+  CurLine: String;
+  Line: Integer;
+
+  function LineHasChar(Line: Integer; character: char;
+  StartCol : Integer): boolean; // faster than Pos!
+  var
+    i: Integer;
+  begin
+    result := false;
+    for I := StartCol to Length(CurLine) do begin
+      if CurLine[i] = character then begin
+        // Char must have proper highlighting (ignore stuff inside comments...)
+        if GetHighlighterAttriAtRowCol(LinesToScan, Line, I) <> CommentAttribute then begin
+          result := true;
+          break;
+        end;
+      end;
+    end;
+  end;
+
+  function FindBraces(Line: Integer; OpenBrace, CloseBrace: char; FoldType: integer) : Boolean;
+  Var
+    Col : Integer;
+  begin
+    Result := False;
+
+    for Col := 1 to Length(CurLine) do
+    begin
+      // We've found a starting character
+      if CurLine[col] = OpenBrace then
+      begin
+        // Char must have proper highlighting (ignore stuff inside comments...)
+        if GetHighlighterAttriAtRowCol(LinesToScan, Line, Col) <> CommentAttribute then
+        begin
+          // And ignore lines with both opening and closing chars in them
+          if not LineHasChar(Line, CloseBrace, col + 1) then begin
+            FoldRanges.StartFoldRange(Line + 1, FoldType);
+            Result := True;
+          end;
+          // Skip until a newline
+          break;
+        end;
+      end else if CurLine[col] = CloseBrace then
+      begin
+        if GetHighlighterAttriAtRowCol(LinesToScan, Line, Col) <> CommentAttribute then
+        begin
+          // And ignore lines with both opening and closing chars in them
+          if not LineHasChar(Line, OpenBrace, col + 1) then begin
+            FoldRanges.StopFoldRange(Line + 1, FoldType);
+            Result := True;
+          end;
+          // Skip until a newline
+          break;
+        end;
+      end;
+    end; // for Col
+  end;
+
+begin
+  for Line := FromLine to ToLine do
+  begin
+    CurLine := LinesToScan[Line];
+
+    // Skip empty lines
+    if CurLine = '' then begin
+      FoldRanges.NoFoldInfo(Line + 1);
+      Continue;
+    end;
+
+    // Find an braces on this line  (Fold Type 1)
+    if not FindBraces(Line, '{', '}', 1) then
+      if not FindBraces(Line, '[', ']', 2) then
+        FoldRanges.NoFoldInfo(Line + 1);
+  end; // while Line
+end;
+//-- CodeFolding
 
 procedure TSynJSONSyn.SetRange(Value: Pointer);
 begin

@@ -121,6 +121,9 @@ type
     DeleteButton: TButton;
     CategoryEdit: TEdit;
     CategoryLabel: TLabel;
+    SVGErrorStaticText: TStaticText;
+    AntiAliasColorLabel: TLabel;
+    AntialiasColorComboBox: TColorBox;
     procedure FormCreate(Sender: TObject);
     procedure ApplyButtonClick(Sender: TObject);
     procedure ClearAllButtonClick(Sender: TObject);
@@ -150,13 +153,19 @@ type
     procedure GrayScaleCheckBoxClick(Sender: TObject);
     procedure FixedColorComboBoxSelect(Sender: TObject);
     procedure FixedColorItemComboBoxSelect(Sender: TObject);
+    procedure AntialiasColorComboBoxSelect(Sender: TObject);
     procedure GrayScaleItemCheckBoxClick(Sender: TObject);
     procedure ReformatXMLButtonClick(Sender: TObject);
     procedure CategoryListBoxClick(Sender: TObject);
     procedure SetCategoriesButtonClick(Sender: TObject);
     procedure DeleteButtonClick(Sender: TObject);
     procedure CategoryEditExit(Sender: TObject);
+    procedure SVGTextExit(Sender: TObject);
+    procedure SVGTextEnter(Sender: TObject);
+    procedure SVGTextKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
+    FOldSVGText: string;
     FOpenDialog: TOpenPictureDialogSvg;
     FSelectedCategory: string;
     FSourceList, FEditingList: TSVGIconImageList;
@@ -173,6 +182,7 @@ type
     procedure UpdateSizeGUI;
     procedure AddNewItem;
     procedure DeleteSelectedItems;
+    procedure ResetError;
   public
     property Modified: Boolean read FModified;
     property SVGIconImageList: TSVGIconImageList read FEditingList;
@@ -292,6 +302,7 @@ begin
         FSourceList.Size := 64; //Force 64 pixel size for image collection icons
         FSourceList.GrayScale := AImageCollection.GrayScale;
         FSourceList.FixedColor := AImageCollection.FixedColor;
+        FSourceList.AntiAliasColor := AImageCollection.AntiAliasColor;
         ImageListGroupBox.Visible := False;
         FSourceList.SVGIconItems.Assign(AImageCollection.SVGIconItems);
         FEditingList.Assign(FSourceList);
@@ -307,6 +318,7 @@ begin
           AImageCollection.SVGIconItems.Assign(LEditor.FEditingList.SVGIconItems);
           AImageCollection.GrayScale := GrayScaleCheckBox.Checked;
           AImageCollection.FixedColor := FixedColorComboBox.Selected;
+          AImageCollection.AntiAliasColor := AntialiasColorComboBox.Selected;
         finally
           Screen.Cursor := crDefault;
         end;
@@ -399,6 +411,7 @@ begin
     ImageListGroup.Caption := Format(FTotIconsLabel, [FEditingList.Count]);
     GrayScaleCheckBox.Checked := SVGIconImageList.GrayScale;
     FixedColorComboBox.Selected := SVGIconImageList.FixedColor;
+    AntialiasColorComboBox.Selected := SVGIconImageList.AntiAliasColor;
     OpacitySpinEdit.Value := SVGIconImageList.Opacity;
     if LIsItemSelected then
     begin
@@ -538,7 +551,7 @@ begin
         finally
         end;
       end;
-      BuildList(ImageView.ItemIndex);
+      BuildList(ImageView.Items[ImageView.ItemIndex].ImageIndex);
     finally
       FEditingList.EndUpdate;
       Screen.Cursor := crDefault;
@@ -606,11 +619,59 @@ begin
 end;
 
 procedure TSVGIconImageListEditor.SVGTextChange(Sender: TObject);
+var
+  LOldText: string;
 begin
   if FUpdating then Exit;
-  SelectedIcon.SVGText := SVGText.Lines.Text;
-  IconImage.Invalidate;
+  LOldText := SelectedIcon.SVGText;
+  try
+    SelectedIcon.SVGText := SVGText.Lines.Text;
+    ResetError;
+    IconImage.Repaint;
+    UpdateGUI;
+  except
+    on E: Exception do
+    begin
+      SVGErrorStaticText.Caption := E.Message;
+      SVGErrorStaticText.Hint := E.Message;
+      SelectedIcon.SVGText := '';
+      FEditingList.RecreateBitmaps;
+      IconImage.Repaint;
+      ImageView.Invalidate;
+    end;
+  end;
+end;
+
+procedure TSVGIconImageListEditor.ResetError;
+begin
+  SVGErrorStaticText.Caption := '';
+  SVGErrorStaticText.Hint := '';
+end;
+
+procedure TSVGIconImageListEditor.SVGTextEnter(Sender: TObject);
+begin
+  FOldSVGText := SVGText.Lines.Text;
+end;
+
+procedure TSVGIconImageListEditor.SVGTextExit(Sender: TObject);
+begin
+  ResetError;
   UpdateGUI;
+end;
+
+procedure TSVGIconImageListEditor.SVGTextKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  LSelStart: Integer;
+begin
+  if (Key = VK_ESCAPE) or ((upcase(Char(Key)) = 'Z') and (ssCtrl in Shift)) then
+  begin
+    LSelStart := SVGText.SelStart;
+    SVGText.Lines.Text := FOldSVGText;
+    SVGText.SelStart := LSelStart;
+    SVGText.SelLength := 0;
+    SelectedIcon.SVGText := FOldSVGText;
+  end;
 end;
 
 procedure TSVGIconImageListEditor.BuildList(Selected: Integer);
@@ -636,11 +697,11 @@ end;
 procedure TSVGIconImageListEditor.DeleteSelectedItems;
 var
   LIndex: Integer;
-  Selected: Integer;
+  LSelectedImageIndex: Integer;
 begin
   Screen.Cursor := crHourGlass;
   try
-    Selected := ImageView.ItemIndex;
+    LSelectedImageIndex := ImageView.Items[ImageView.ItemIndex].ImageIndex;
     FEditingList.BeginUpdate;
     try
       for LIndex := ImageView.Items.Count - 1 downto 0 do
@@ -650,7 +711,7 @@ begin
       FEditingList.EndUpdate;
     end;
     FChanged := True;
-    BuildList(Selected);
+    BuildList(LSelectedImageIndex);
   finally
     Screen.Cursor := crDefault;
   end;
@@ -663,18 +724,17 @@ end;
 
 procedure TSVGIconImageListEditor.DeleteButtonClick(Sender: TObject);
 var
-  LIndex: Integer;
+  LSelectedImageIndex: Integer;
 begin
   FEditingList.BeginUpdate;
   try
-    LIndex := ImageView.ItemIndex;
-    FEditingList.SVGIconItems.Delete(ImageView.Items[LIndex].ImageIndex);
+    LSelectedImageIndex := ImageView.Items[ImageView.ItemIndex].ImageIndex;
+    FEditingList.SVGIconItems.Delete(ImageView.Items[ImageView.ItemIndex].ImageIndex);
   finally
     FEditingList.EndUpdate;
   end;
   FChanged := True;
-  if ImageView.Items.Count > 1 then
-    BuildList(ImageView.Items[LIndex-1].ImageIndex);
+  BuildList(LSelectedImageIndex);
 end;
 
 procedure TSVGIconImageListEditor.FixedColorComboBoxSelect(Sender: TObject);
@@ -684,6 +744,20 @@ begin
     if FixedColorComboBox.ItemIndex >= 0 then
     begin
       FEditingList.FixedColor := FixedColorComboBox.Selected;
+      UpdateGUI;
+    end;
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TSVGIconImageListEditor.AntialiasColorComboBoxSelect(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    if AntialiasColorComboBox.ItemIndex >= 0 then
+    begin
+      FEditingList.AntiAliasColor := AntialiasColorComboBox.Selected;
       UpdateGUI;
     end;
   finally
@@ -725,6 +799,8 @@ begin
   FModified := False;
   SVGText.Font.Name := 'Courier New';
   Caption := Format(Caption, [SVGIconImageListVersion]);
+  SVGErrorStaticText.Font.Color := clRed;
+  SVGErrorStaticText.Font.Style := [fsBold];
 end;
 
 procedure TSVGIconImageListEditor.Apply;

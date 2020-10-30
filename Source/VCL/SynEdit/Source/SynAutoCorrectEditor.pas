@@ -107,8 +107,8 @@ begin
   begin
     s := Items[Index];
     Canvas.FillRect(Rect);
-    TextOut(Canvas, Rect.Left + 2, Rect.Top, SynAutoCorrect.HalfString(s, True));
-    TextOut(Canvas, Rect.Left + (lbxItems.ClientWidth div 2) + 2, Rect.Top,
+    Canvas.TextOut(Rect.Left + 2, Rect.Top, SynAutoCorrect.HalfString(s, True));
+    Canvas.TextOut(Rect.Left + (lbxItems.ClientWidth div 2) + 2, Rect.Top,
         SynAutoCorrect.HalfString(s, False));
     FormPaint(nil);
   end;

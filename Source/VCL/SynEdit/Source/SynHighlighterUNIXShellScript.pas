@@ -189,7 +189,7 @@ begin
   First := 0;
   Last := High(ShellScriptKeys);
   Result := False;
-  Token := SynWideLowerCase(AKeyword);
+  Token := SysUtils.AnsiLowerCase(AKeyword);
 
   while First <= Last do
   begin
@@ -213,7 +213,7 @@ begin
   First := 0;
   Last := High(ShellScriptSecondKeys);
   Result := False;
-  Token := SynWideLowerCase(AToken);
+  Token := SysUtils.AnsiLowerCase(AToken);
   while First <= Last do
   begin
     I := (First + Last) shr 1;

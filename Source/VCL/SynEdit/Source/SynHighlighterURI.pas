@@ -25,11 +25,6 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterURI.pas,v 1.16.2.9 2008/09/14 16:25:03 maelh Exp $
-
-You may retrieve the latest version of SynEdit from the SynEdit home page,
-located at http://SynEdit.SourceForge.net
-
 -------------------------------------------------------------------------------}
 {
 @abstract(Provides an URI syntax highlighter for SynEdit)
@@ -73,6 +68,7 @@ unit SynHighlighterURI;
 interface
 
 uses
+  Windows,
   Graphics,
   SynEditTypes,
   SynEditHighlighter,
@@ -414,7 +410,7 @@ end;
 
 function TSynURISyn.IsIdentChar(AChar: WideChar): Boolean;
 begin
-  Result := SynIsCharAlphaNumeric(AChar);
+  Result := IsCharAlphaNumeric(AChar);
 end;
 
 procedure TSynURISyn.SetAlreadyVisitedURIFunc(Value: TAlreadyVisitedURIFunc);
@@ -542,7 +538,7 @@ end;
 
 function TSynURISyn.IsAlphaNum(AChar: WideChar): Boolean;
 begin
-  Result := SynIsCharAlphaNumeric(AChar);
+  Result := IsCharAlphaNumeric(AChar);
 end;
 
 function TSynURISyn.IsMark(AChar: WideChar): Boolean;

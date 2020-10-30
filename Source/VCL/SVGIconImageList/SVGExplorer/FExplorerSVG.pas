@@ -38,6 +38,10 @@ uses
   SVGIconImage, Vcl.WinXCtrls, System.Actions, Vcl.ActnList, Vcl.Menus,
   SVGIconImageListBase;
 
+resourcestring
+  CONFIRM_DELETE_FILE = 'Do you really want to delete file "%s"?';
+  LOAD_IMAGES_TIME = 'Load %d Images in %d msec.';
+
 type
   TfmExplorerSVG = class(TForm)
     paDir: TPanel;
@@ -106,7 +110,9 @@ implementation
 
 uses
   SVGIconUtils
-  , UITypes;
+  , SVGInterfaces
+  , UITypes
+  , D2DSVGFactory;
 
 {$R *.dfm}
 
@@ -124,7 +130,7 @@ var
 begin
   LFileName := IncludeTrailingPathDelimiter(DirSelection.Directory)+
     SVGIconImageList.Names[ImageView.Selected.ImageIndex]+'.svg';
-  if MessageDlg(Format('Do you really want to delete file "%s"?',[LFileName]),
+  if MessageDlg(Format(CONFIRM_DELETE_FILE,[LFileName]),
     mtWarning, [mbNo, mbYes], 0, mbNo) = mrYes then
   begin
     Screen.Cursor := crHourGlass;
@@ -151,8 +157,23 @@ begin
 end;
 
 procedure TfmExplorerSVG.FormCreate(Sender: TObject);
+
+  function GetSVGEngineDescription: string;
+  begin
+    Result := '';
+  {$IF DEFINED(PreferNativeSvgSupport)}
+    if WinSvgSupported then
+      Result := 'Windows Direct-2D SVG-Engine'
+    else
+    {$ELSEIF DEFINED(Cairo_SVGEngine)}
+      Result := 'Cairo SVG-Engine';
+    {$ELSEIF DEFINED(Delphi_SVGEngine)}
+      Result := 'Delphi (TSVG) SVG-Engine';
+  {$ENDIF}
+  end;
+
 begin
-  Caption := Application.Title;
+  Caption := Application.Title + ' - ' + GetSVGEngineDescription;
   fpaPreviewSize := paPreview.Width;
 
   //Increase performance during drawing of SVG Image
@@ -246,8 +267,7 @@ begin
     SVGIconImageList.LoadFromFiles(LFiles, False);
     UpdateListView;
     LStop := GetTickCount;
-    LTime := Format('Load %d Images in %d msec.',
-      [LFiles.Count, LStop - LStart]);
+    LTime := Format(LOAD_IMAGES_TIME, [LFiles.Count, LStop - LStart]);
     PerformanceStatusBar.SimpleText := LTime;
     if LFiles.Count > 0 then
     begin

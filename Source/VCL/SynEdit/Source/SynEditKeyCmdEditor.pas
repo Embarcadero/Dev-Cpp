@@ -27,11 +27,6 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditKeyCmdEditor.pas,v 1.10.2.1 2004/08/31 12:55:17 maelh Exp $
-
-You may retrieve the latest version of this file at the SynEdit home page,
-located at http://SynEdit.SourceForge.net
-
 Known Issues:
 -------------------------------------------------------------------------------}
 
@@ -52,11 +47,11 @@ uses
   StdCtrls,
   ComCtrls,
   ExtCtrls,
+  SynEditTypes,
   SynEditKeyCmds,
   SynEditMiscClasses,
   SysUtils,
   Classes;
-
 
 type
   TSynEditKeystrokeEditorForm = class(TForm)
@@ -71,12 +66,8 @@ type
 
     procedure FormShow(Sender: TObject);
     procedure bntClearKeyClick(Sender: TObject);
-    procedure cmbCommandKeyPress(Sender: TObject; var Key: Char);
-    procedure cmbCommandExit(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
   private
     FExtended: Boolean;
     procedure SetCommand(const Value: TSynEditorCommand);
@@ -139,22 +130,12 @@ begin
 end;
 
 function TSynEditKeystrokeEditorForm.GetCommand: TSynEditorCommand;
-var
-  NewCmd: Integer;
 begin
-  cmbCommand.ItemIndex := cmbCommand.Items.IndexOf(cmbCommand.Text);
   if cmbCommand.ItemIndex <> -1 then
   begin
-    NewCmd := TSynEditorCommand(Integer(cmbCommand.Items.Objects[cmbCommand.ItemIndex]));
-  end else if not IdentToEditorCommand(cmbCommand.Text, NewCmd) then
-  begin
-     try
-       NewCmd := StrToInt(cmbCommand.Text);
-     except
-       NewCmd := ecNone;
-     end;
-  end;
-  Result := NewCmd;
+    Result := TSynEditorCommand(Integer(cmbCommand.Items.Objects[cmbCommand.ItemIndex]));
+  end else
+    Result := ecNone;
 end;
 
 function TSynEditKeystrokeEditorForm.GetKeystroke: TShortcut;
@@ -176,37 +157,6 @@ end;
 procedure TSynEditKeystrokeEditorForm.SetKeystroke2(const Value: TShortcut);
 begin
   hkKeystroke2.Hotkey := Value;
-end;
-
-procedure TSynEditKeystrokeEditorForm.cmbCommandKeyPress(Sender: TObject;
-  var Key: Char);
-var WorkStr : String;
-    i       : Integer;
-begin
-//This would be better if componentized, but oh well...
-  WorkStr := AnsiUppercase(Copy(cmbCommand.Text, 1, cmbCommand.SelStart) + Key);
-  i := 0;
-  While i < cmbCommand.Items.Count do
-  begin
-    if pos(WorkStr, AnsiUppercase(cmbCommand.Items[i])) = 1 then
-    begin
-      cmbCommand.Text := cmbCommand.Items[i];
-      cmbCommand.SelStart := length(WorkStr);
-      cmbCommand.SelLength := Length(cmbCommand.Text) - cmbCommand.SelStart;
-      Key := #0;
-      break;
-    end else inc(i);
-  end;
-end;
-
-procedure TSynEditKeystrokeEditorForm.cmbCommandExit(Sender: TObject);
-VAR TmpIndex : Integer;
-begin
-  TmpIndex := cmbCommand.Items.IndexOf(cmbCommand.Text);
-  if TmpIndex = -1 then
-  begin
-     cmbCommand.ItemIndex := cmbCommand.Items.IndexOf(ConvertCodeStringToExtended('ecNone'));
-  end else cmbCommand.ItemIndex := TmpIndex;  //need to force it incase they just typed something in
 end;
 
 procedure TSynEditKeystrokeEditorForm.btnOKClick(Sender: TObject);
@@ -252,12 +202,6 @@ begin
     Modifiers := [];
     TabOrder := 2;
   end;
-end;
-
-procedure TSynEditKeystrokeEditorForm.FormKeyDown(Sender: TObject;
-  var Key: Word; Shift: TShiftState);
-begin
-  // if this event is not present CLX will complain
 end;
 
 end.

@@ -155,6 +155,8 @@ begin
   try
     Status := GPGraphics.SetSmoothingMode(SmoothingModeAntiAlias);
     OutputDebugString(PChar('SetSmoothingMode ' + IntToStr(Ord(Status))));
+    Status := GPGraphics.SetPixelOffsetMode(PixelOffsetModeHalf);
+    OutputDebugString(PChar('PixelOffsetModeHalf ' + IntToStr(Ord(Status))));
 
     GPRectF.X := 0;
     GPRectF.Y := 0;

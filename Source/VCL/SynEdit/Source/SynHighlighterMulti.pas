@@ -243,31 +243,16 @@ implementation
 uses
   Graphics,
   SynEditMiscProcs,
-  SynRegExpr,
   SynEditStrConst,
+  RegularExpressions,
   SysUtils;
 
 procedure CheckExpression(const Expr: string);
 var
-  Parser: TRegExpr;
+  Parser: TRegEx;
 begin
-  Parser := TRegExpr.Create;
-  try
-    Parser.Expression := Expr;
-    try
-      Parser.Compile;
-    except
-      on E: ERegExpr do
-      begin
-        if E.ErrorCode < 1000 then
-          E.Message := Format('"%s" is not a valid Regular Expression.'#13'Error (pos %d): %s',
-            [Expr, E.CompilerErrorPos, Copy(Parser.ErrorMsg(E.ErrorCode), 16, MaxInt)]);
-        raise;
-      end;
-    end;
-  finally
-    Parser.Free;
-  end;
+  // will raise an exception if the expression is incorrect
+  Parser := TRegEx.Create(Expr, [roNotEmpty, roCompiled]);
 end;
 
 { TMarker }
@@ -853,7 +838,8 @@ end;
 
 procedure TSynMultiSyn.DoSetLine(const Value: string; LineNumber: Integer);
 var
-  iParser: TRegExpr;
+  iParser: TRegEx;
+  Match : TMatch;
   iScheme: TScheme;
   iExpr: string;
   iLine: string;
@@ -862,60 +848,63 @@ var
 begin
   ClearMarkers;
 
-  iParser := TRegExpr.Create;
-  try
-    iEaten := 0;
-    iLine := Value;
-    if CurrScheme >= 0
-    then
-      iScheme := fSchemes[CurrScheme]
-    else
-      iScheme := nil;
-    while iLine <> '' do
-      if iScheme <> nil then
+  iEaten := 0;
+  iLine := Value;
+  if CurrScheme >= 0
+  then
+    iScheme := fSchemes[CurrScheme]
+  else
+    iScheme := nil;
+  while iLine <> '' do
+    if iScheme <> nil then
+    begin
+      if iScheme.CaseSensitive then
+        iParser.Create(iScheme.EndExpr, [roNotEmpty, roCompiled])
+      else
+        iParser.Create(iScheme.EndExpr, [roNotEmpty, roIgnoreCase, roCompiled]);
+      Match := iParser.Match(iLine);
+
+      if Match.Success then
       begin
-        iParser.Expression := iScheme.EndExpr;
-        iParser.ModifierI := not iScheme.CaseSensitive;
-        if iParser.Exec(iLine) then
-        begin
-          iExpr := Copy(Value, iParser.MatchPos[0] + iEaten, iParser.MatchLen[0]);
-          DoCheckMarker(iScheme, iParser.MatchPos[0] + iEaten, iParser.MatchLen[0],
-            iExpr, False, LineNumber, Value);
-          Delete(iLine, 1, iParser.MatchPos[0] - 1 + iParser.MatchLen[0]);
-          Inc(iEaten, iParser.MatchPos[0] - 1 + iParser.MatchLen[0]);
-          iScheme := nil;
-        end
-        else
-          break;
+        iExpr := Copy(Value, Match.Index + iEaten, Match.Length);
+        DoCheckMarker(iScheme, Match.Index + iEaten, Match.Length,
+          iExpr, False, LineNumber, Value);
+        Delete(iLine, 1, Match.Index - 1 + Match.Length);
+        Inc(iEaten, Match.Index - 1 + Match.Length);
+        iScheme := nil;
       end
       else
+        break;
+    end
+    else
+    begin
+      for i := 0 to Schemes.Count - 1 do
       begin
-        for i := 0 to Schemes.Count - 1 do
+        iScheme := Schemes[i];
+        if (iScheme.StartExpr = '') or (iScheme.EndExpr = '') or
+          (iScheme.Highlighter = nil) or (not iScheme.Highlighter.Enabled) then
         begin
-          iScheme := Schemes[i];
-          if (iScheme.StartExpr = '') or (iScheme.EndExpr = '') or
-            (iScheme.Highlighter = nil) or (not iScheme.Highlighter.Enabled) then
-          begin
-            continue;
-          end;
-          iParser.Expression := iScheme.StartExpr;
-          iParser.ModifierI := not iScheme.CaseSensitive;
-          if iParser.Exec(iLine) then begin
-            iExpr := Copy(Value, iParser.MatchPos[0] + iEaten, iParser.MatchLen[0]);
-            DoCheckMarker(iScheme, iParser.MatchPos[0] + iEaten, iParser.MatchLen[0],
-              iExpr, True, LineNumber, Value);
-            Delete(iLine, 1, iParser.MatchPos[0] - 1 + iParser.MatchLen[0]);
-            Inc(iEaten, iParser.MatchPos[0] - 1 + iParser.MatchLen[0]);
-            break;
-          end;
-        end; {for}
-        if i >= Schemes.Count then
-          break;
-      end; {else}
+          continue;
+        end;
+        if iScheme.CaseSensitive then
+          iParser.Create(iScheme.StartExpr, [roNotEmpty, roCompiled])
+        else
+          iParser.Create(iScheme.StartExpr, [roNotEmpty, roIgnoreCase, roCompiled]);
+        Match := iParser.Match(iLine);
 
-  finally
-    iParser.Free;
-  end;
+        if Match.Success then
+        begin
+          iExpr := Copy(Value, Match.Index + iEaten, Match.Length);
+          DoCheckMarker(iScheme, Match.Index + iEaten, Match.Length,
+            iExpr, True, LineNumber, Value);
+          Delete(iLine, 1, Match.Index - 1 + Match.Length);
+          Inc(iEaten, Match.Index - 1 + Match.Length);
+          break;
+        end;
+      end; {for}
+      if i >= Schemes.Count then
+        break;
+    end; {else}
 
   fLineStr := Value;
   fLine := PWideChar(fLineStr);
@@ -976,7 +965,7 @@ end;
 function TScheme.ConvertExpression(const Value: string): string;
 begin
   if not CaseSensitive then
-    Result := SynWideUpperCase(Value)
+    Result := SysUtils.AnsiUpperCase(Value)
   else
     Result := Value;
 end;

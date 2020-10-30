@@ -76,6 +76,7 @@ const
   SYNS_AttrComment              =  'Comment';
   SYNS_AttrCondition            =  'Condition';
   SYNS_AttrConditionalComment   =  'ConditionalComment';
+  SYNS_AttrConsoleOutput        =  'ConsoleOutput';
   SYNS_AttrDataType             =  'DataType';
   SYNS_AttrDebugLines           =  'DebuggingLines';
   SYNS_AttrDefaultPackage       =  'DefaultPackages';
@@ -132,6 +133,7 @@ const
   SYNS_AttrPredefined           =  'Predefined';
   SYNS_AttrPreprocessor         =  'Preprocessor';
   SYNS_AttrProcessingInstr      =  'ProcessingInstruction';
+  SYNS_AttrProcName             =  'ProcName';
   SYNS_AttrProperty             =  'Property';
   SYNS_AttrQuad                 =  'Quad';
   SYNS_AttrQualifier            =  'Qualifier';
@@ -287,6 +289,7 @@ resourcestring
   SYNS_FriendlyAttrComment              =  'Comment';
   SYNS_FriendlyAttrCondition            =  'Condition';
   SYNS_FriendlyAttrConditionalComment   =  'Conditional Comment';
+  SYNS_FriendlyAttrConsoleOutput        =  'Console output';
   SYNS_FriendlyAttrConstant             =  'Constant';
   SYNS_FriendlyAttrDataType             =  'Data Type';
   SYNS_FriendlyAttrDebugLines           =  'Debugging Lines';
@@ -344,6 +347,7 @@ resourcestring
   SYNS_FriendlyAttrPredefined           =  'Predefined';
   SYNS_FriendlyAttrPreprocessor         =  'Preprocessor';
   SYNS_FriendlyAttrProcessingInstr      =  'Processing Instruction';
+  SYNS_FriendlyAttrProcName             =  'Procedure name';
   SYNS_FriendlyAttrProperty             =  'Property';
   SYNS_FriendlyAttrQuad                 =  'Quad';
   SYNS_FriendlyAttrQualifier            =  'Qualifier';

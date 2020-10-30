@@ -34,26 +34,17 @@ located at http://SynEdit.SourceForge.net
 
 -------------------------------------------------------------------------------}
 
-{$IFNDEF QLLVM_IR}
 unit SynHighlighterLLVM;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QGraphics,
-  QSynEditTypes,
-  QSynEditHighlighter,
-  QSynUnicode,
-{$ELSE}
   Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynUnicode,
-{$ENDIF}
   SysUtils,
   Classes;
 
@@ -159,11 +150,7 @@ type
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditStrConst;
-{$ELSE}
   SynEditStrConst;
-{$ENDIF}
 
 const
   // as this language is case-insensitive keywords *must* be in lowercase
@@ -182,7 +169,7 @@ const
     'indirectbr', 'initialexec', 'inlinehint', 'inreg', 'insertelement', 
     'insertvalue', 'intel_ocl_bicc', 'inteldialect', 'internal', 'inttoptr', 
     'invoke', 'label', 'landingpad', 'linker_private', 'linker_private_weak', 
-    'linker_private_weak_def_auto', 'linkonce', 'linkonce_odr', 
+    'linker_private_weak_def_auto', 'linkonce', 'linkonce_odr',
     'linkonce_odr_auto_hide', 'load', 'localdynamic', 'localexec', 'lshr',
     'malloc', 'max', 'metadata', 'min', 'minsize', 'module', 'monotonic', 
     'msp430_intrcc', 'mul', 'naked', 'nand', 'ne', 'nest', 'ninf', 'nnan', 

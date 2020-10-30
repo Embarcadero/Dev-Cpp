@@ -504,7 +504,7 @@ begin
     case Str^ of
       '_': Inc(Result, 27);
       '-': Inc(Result, 28);
-      else Inc(Result, Ord(SynWideUpperCase(Str^)[1]) - 64);
+      else Inc(Result, Ord(SysUtils.AnsiUpperCase(Str^)[1]) - 64);
     end;
     Inc(Str);
   end;

@@ -28,11 +28,6 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditTextBuffer.pas,v 1.14 2011/12/28 09:24:20 Egg Exp $
-
-You may retrieve the latest version of this file at the SynEdit home page,
-located at http://SynEdit.SourceForge.net
-
 Known Issues:
 -------------------------------------------------------------------------------}
 //todo: Avoid calculating expanded string unncessarily (just calculate expandedLength instead).
@@ -60,11 +55,7 @@ type
 
   PSynEditStringRec = ^TSynEditStringRec;
   TSynEditStringRec = record
-    {$IFDEF OWN_UnicodeString_MEMMGR}
-    FString: PWideChar; // "array of WideChar";
-    {$ELSE}
     FString: string;
-    {$ENDIF OWN_UnicodeString_MEMMGR}
     fObject: TObject;
     fRange: TSynEditRange;
     fExpandedLength: Integer;
@@ -92,26 +83,26 @@ type
 
   TExpandAtWideGlyphsFunc = function (const S: string): string of object;
 
-  TSynEditFileFormat = (sffDos, sffUnix, sffMac, sffUnicode); // DOS: CRLF, UNIX: LF, Mac: CR, Unicode: LINE SEPARATOR
-
   TSynEditStringList = class(TStrings)
   private
     fList: PSynEditStringRecList;
     fCount: integer;
     fCapacity: integer;
     fFileFormat: TSynEditFileFormat;
-    fAppendNewLineAtEOF: Boolean;
     fConvertTabsProc: TConvertTabsProcEx;
     fIndexOfLongestLine: integer;
     fTabWidth: integer;
-    FExpandAtWideGlyphsFunc: TExpandAtWideGlyphsFunc;
-    FCharIndexesAreValid : Boolean;
+    fExpandAtWideGlyphsFunc: TExpandAtWideGlyphsFunc;
+    fCharIndexesAreValid : Boolean;
+    fDetectUTF8: Boolean;
+    fUTF8CheckLen: Integer;
     fOnChange: TNotifyEvent;
     fOnChanging: TNotifyEvent;
     fOnCleared: TNotifyEvent;
     fOnDeleted: TStringListChangeEvent;
     fOnInserted: TStringListChangeEvent;
     fOnPutted: TStringListChangeEvent;
+    fOnInfoLoss: TSynInfoLossEvent;
     function ExpandString(Index: integer): string;
     function GetExpandedString(Index: integer): string;
     function GetExpandedStringLength(Index: integer): integer;
@@ -120,17 +111,11 @@ type
     procedure Grow;
     procedure InsertItem(Index: integer; const S: string);
     procedure PutRange(Index: integer; ARange: TSynEditRange);
-    procedure SetFileFormat(const Value: TSynEditFileFormat);
-    {$IFDEF OWN_UnicodeString_MEMMGR}
-    procedure SetListString(Index: Integer; const S: string);
-    {$ENDIF OWN_UnicodeString_MEMMGR}
   protected
-    FStreaming: Boolean;
     function Get(Index: Integer): string; override;
     function GetCapacity: integer; override;
     function GetCount: integer; override;
     function GetObject(Index: integer): TObject; override;
-    function GetTextStr: string; override;
     procedure Put(Index: integer; const S: string); override;
     procedure PutObject(Index: integer; AObject: TObject); override;
     procedure SetCapacity(NewCapacity: integer); override;
@@ -150,22 +135,23 @@ type
     procedure InsertLines(Index, NumLines: integer);
     procedure InsertStrings(Index: integer; NewStrings: TStrings);
     procedure InsertText(Index: integer; NewText: string);
+    procedure LoadFromStream(Stream: TStream; Encoding: TEncoding); override;
     procedure SaveToStream(Stream: TStream; Encoding: TEncoding); override;
     function GetSeparatedText(Separators: string): string;
-    procedure SetTextStr(const Value: string); override;
-    procedure LoadFromStream(Stream: TStream); override;
     procedure FontChanged;
     function LineCharLength(Index : Integer) : Integer;
     function LineCharIndex(Index : Integer) : Integer;
+    procedure SetTextAndFileFormat(const Value: string);
+    procedure SetEncoding(const Value: TEncoding); override;
 
-    property AppendNewLineAtEOF: Boolean read fAppendNewLineAtEOF write fAppendNewLineAtEOF;
-
-    property FileFormat: TSynEditFileFormat read fFileFormat write SetFileFormat;
+    property FileFormat: TSynEditFileFormat read fFileFormat write fFileFormat;
     property ExpandedStrings[Index: integer]: string read GetExpandedString;
     property ExpandedStringLengths[Index: integer]: integer read GetExpandedStringLength;
     property LengthOfLongestLine: Integer read GetLengthOfLongestLine;
     property Ranges[Index: integer]: TSynEditRange read GetRange write PutRange;
     property TabWidth: integer read fTabWidth write SetTabWidth;
+    property UTF8CheckLen: Integer read fUTF8CheckLen write fUTF8CheckLen;
+    property DetectUTF8: Boolean read fDetectUTF8 write fDetectUTF8;
     property OnChange: TNotifyEvent read fOnChange write fOnChange;
     property OnChanging: TNotifyEvent read fOnChanging write fOnChanging;
     property OnCleared: TNotifyEvent read fOnCleared write fOnCleared;
@@ -173,23 +159,22 @@ type
     property OnInserted: TStringListChangeEvent read fOnInserted
       write fOnInserted;
     property OnPutted: TStringListChangeEvent read fOnPutted write fOnPutted;
+    property OnInfoLoss: TSynInfoLossEvent read fOnInfoLoss write fOnInfoLoss;
   end;
 
   ESynEditStringList = class(Exception);
 
-  TSynChangeReason = (crInsert, crPaste, crDragDropInsert,
-    // Note: several undo entries can be chained together via the ChangeNumber
-    // see also TCustomSynEdit.[Begin|End]UndoBlock methods
-    crDeleteAfterCursor, crDelete,
+  // Note: several undo entries can be chained together via the ChangeNumber
+  // see also TCustomSynEdit.[Begin|End]UndoBlock methods
+  TSynChangeReason = (crInsert,
+    crDelete, crSilentDelete,
     crLineBreak, crIndent, crUnindent,
-    crSilentDelete, crSilentDeleteAfterCursor,
     crAutoCompleteBegin, crAutoCompleteEnd,
     crPasteBegin, crPasteEnd, // for pasting, since it might do a lot of operations
-    crSpecial1Begin, crSpecial1End,
-    crSpecial2Begin, crSpecial2End,
+    crSpecialBegin, crSpecialEnd,
     crCaret,      // just restore the Caret, allowing better Undo behavior
     crSelection,  // restore Selection
-    crNothing,
+    crNothing,    // can be used to break group undo
     crGroupBreak,
     crDeleteAll,
     crWhiteSpaceAdd // for undo/redo of adding a character past EOL and repositioning the caret
@@ -281,10 +266,13 @@ end;
 constructor TSynEditStringList.Create(AExpandAtWideGlyphsFunc: TExpandAtWideGlyphsFunc);
 begin
   inherited Create;
-  FExpandAtWideGlyphsFunc := AExpandAtWideGlyphsFunc;
-  SetFileFormat(sffDos);
+  fExpandAtWideGlyphsFunc := AExpandAtWideGlyphsFunc;
+  fFileFormat := sffDos;
   fIndexOfLongestLine := -1;
   TabWidth := 8;
+  fUTF8CheckLen := -1;
+  Options := Options - [soWriteBOM, soTrailingLineBreak];
+  fDetectUTF8 := True;
 end;
 
 destructor TSynEditStringList.Destroy;
@@ -292,15 +280,10 @@ begin
   fOnChange := nil;
   fOnChanging := nil;
   inherited Destroy;
-  {$IFDEF OWN_UnicodeString_MEMMGR}
-  fOnCleared := nil;
-  Clear;
-  {$ELSE}
   if fCount <> 0 then
     Finalize(fList^[0], fCount);
   fCount := 0;
   SetCapacity(0);
-  {$ENDIF OWN_UnicodeString_MEMMGR}
 end;
 
 function TSynEditStringList.Add(const S: string): integer;
@@ -328,11 +311,7 @@ begin
       for i := 0 to Strings.Count - 1 do begin
         with fList^[fCount] do begin
           Pointer(fString) := nil;
-          {$IFDEF OWN_UnicodeString_MEMMGR}
-          SetListString(fCount, Strings[i]);
-          {$ELSE}
           fString := Strings[i];
-          {$ENDIF OWN_UnicodeString_MEMMGR}
           fObject := Strings.Objects[i];
           fRange := NullRange;
           fExpandedLength := -1;
@@ -348,22 +327,16 @@ begin
   end;
 end;
 
+procedure TSynEditStringList.SetEncoding(const Value: TEncoding);
+begin
+  inherited;
+end;
+
 procedure TSynEditStringList.Clear;
-{$IFDEF OWN_UnicodeString_MEMMGR}
-var
-  I: Integer;
-{$ENDIF OWN_UnicodeString_MEMMGR}
 begin
   if fCount <> 0 then begin
     BeginUpdate;
-    {$IFDEF OWN_UnicodeString_MEMMGR}
-    for I := 0 to FCount - 1 do
-      with FList[I] do
-        if TDynWideCharArray(FString) <> nil then
-          TDynWideCharArray(FString) := nil;
-    {$ELSE}
     Finalize(fList^[0], fCount);
-    {$ENDIF OWN_UnicodeString_MEMMGR}
     fCount := 0;
     SetCapacity(0);
     if Assigned(fOnCleared) then
@@ -378,18 +351,11 @@ begin
   if (Index < 0) or (Index >= fCount) then
     ListIndexOutOfBounds(Index);
   BeginUpdate;
-  {$IFDEF OWN_UnicodeString_MEMMGR}
-  SetListString(Index, '');
-  {$ELSE}
   Finalize(fList^[Index]);
-  {$ENDIF OWN_UnicodeString_MEMMGR}
   Dec(fCount);
   if Index < fCount then begin
     System.Move(fList^[Index + 1], fList^[Index],
       (fCount - Index) * SynEditStringRecSize);
-    {$IFDEF OWN_UnicodeString_MEMMGR}
-    Pointer(FList[fCount].fString) := nil; // avoid freeing the string, the address is now used in another element
-    {$ENDIF OWN_UnicodeString_MEMMGR}
   end;
   fIndexOfLongestLine := -1;
   if Assigned(fOnDeleted) then
@@ -400,9 +366,6 @@ end;
 procedure TSynEditStringList.DeleteLines(Index, NumLines: Integer);
 var
   LinesAfter: integer;
-{$IFDEF OWN_UnicodeString_MEMMGR}
-  I: Integer;
-{$ENDIF OWN_UnicodeString_MEMMGR}
 begin
   if NumLines > 0 then begin
     if (Index < 0) or (Index >= fCount) then
@@ -410,14 +373,7 @@ begin
     LinesAfter := fCount - (Index + NumLines);
     if LinesAfter < 0 then
       NumLines := fCount - Index;
-    {$IFDEF OWN_UnicodeString_MEMMGR}
-    for I := Index to Index + NumLines - 1 do
-      with FList[I] do
-        if TDynWideCharArray(FString) <> nil then
-          TDynWideCharArray(FString) := nil;
-    {$ELSE}
     Finalize(fList^[Index], NumLines);
-    {$ENDIF OWN_UnicodeString_MEMMGR}
 
     if LinesAfter > 0 then begin
       BeginUpdate;
@@ -458,11 +414,7 @@ var
   HasTabs: Boolean;
 begin
   with fList^[Index] do
-    {$IFDEF OWN_UnicodeString_MEMMGR}
-    if Length(TDynWideCharArray(FString)) = 0 then
-    {$ELSE}
     if Length(FString) = 0 then
-    {$ENDIF}
     begin
       Result := '';
       Exclude(fFlags, sfExpandedLengthUnknown);
@@ -473,7 +425,7 @@ begin
     else
     begin
       Result := fConvertTabsProc(fstring, fTabWidth, HasTabs);
-      fExpandedLength := Length(FExpandAtWideGlyphsFunc(Result));
+      fExpandedLength := Length(fExpandAtWideGlyphsFunc(Result));
       Exclude(fFlags, sfExpandedLengthUnknown);
       Exclude(fFlags, sfHasTabs);
       Exclude(fFlags, sfHasNoTabs);
@@ -485,28 +437,9 @@ begin
 end;
 
 function TSynEditStringList.Get(Index: integer): string;
-{$IFDEF OWN_UnicodeString_MEMMGR}
-var
-  Len: Integer;
-{$ENDIF OWN_UnicodeString_MEMMGR}
 begin
   if Cardinal(Index)<Cardinal(fCount) then
-    {$IFDEF OWN_UnicodeString_MEMMGR}
-    with FList[Index] do
-    begin
-      Len := Length(TDynWideCharArray(FString));
-      if Len > 0 then
-      begin
-        SetLength(Result, Len - 1); // exclude #0
-        if Result <> '' then
-          System.Move(FString^, Result[1], Len * SizeOf(WideChar));
-      end
-      else
-        Result := '';
-    end
-    {$ELSE}
     Result := fList^[Index].fString
-    {$ENDIF OWN_UnicodeString_MEMMGR}
   else
     Result := '';
 end;
@@ -516,7 +449,7 @@ var
   i, n : Integer;
   p : PSynEditStringRec;
 begin
-  FCharIndexesAreValid:=True;
+  fCharIndexesAreValid:=True;
   if fCount=0 then Exit;
   p:=@fList^[0];
   n:=0;
@@ -537,7 +470,7 @@ end;
 function TSynEditStringList.LineCharIndex(Index : Integer) : Integer;
 begin
   if Cardinal(Index)<Cardinal(fCount) then begin
-    if not FCharIndexesAreValid then
+    if not fCharIndexesAreValid then
       UpdateCharIndexes;
     Result:=fList^[Index].fCharIndex;
   end else Result:=0;
@@ -682,32 +615,6 @@ begin
   end;
 end;
 
-function TSynEditStringList.GetTextStr: string;
-var
-  LB: string;
-begin
-  if not FStreaming then
-  begin
-    Result := GetSeparatedText(sLineBreak);
-  end
-  else
-  begin
-    case FileFormat of
-      sffDos:
-        LB := WideCRLF;
-      sffUnix:
-        LB := WideLF;
-      sffMac:
-        LB := WideCR;
-      sffUnicode:
-        LB := WideLineSeparator;
-    end;
-    Result := GetSeparatedText(LB);
-    if AppendNewLineAtEOF then
-      Result := Result + LB;
-  end;
-end;
-
 procedure TSynEditStringList.Grow;
 var
   Delta: Integer;
@@ -744,11 +651,7 @@ begin
   with fList^[Index] do
   begin
     Pointer(fString) := nil;
-    {$IFDEF OWN_UnicodeString_MEMMGR}
-    SetListString(Index, S);
-    {$ELSE}
     fString := S;
-    {$ENDIF OWN_UnicodeString_MEMMGR}
     fObject := nil;
     fRange := NullRange;
     fExpandedLength := -1;
@@ -826,18 +729,64 @@ begin
   end;
 end;
 
-procedure TSynEditStringList.LoadFromStream(Stream: TStream);
+procedure TSynEditStringList.LoadFromStream(Stream: TStream; Encoding: TEncoding);
+var
+  Size: Integer;
+  Buffer: TBytes;
 begin
-  FStreaming := True;
-  inherited;
-  FStreaming := False;
+  BeginUpdate;
+  try
+    Size := Stream.Size - Stream.Position;
+    SetLength(Buffer, Size);
+    Stream.Read(Buffer, 0, Size);
+    Size := TEncoding.GetBufferEncoding(Buffer, Encoding, DefaultEncoding);
+    WriteBOM := Size > 0; // Keep WriteBom in case the stream is saved
+    // If the encoding is ANSI and DetectUtf8 is True try to Detect UTF8
+    if (Encoding = TEncoding.ANSI) and DetectUTF8 and IsUTF8(Buffer, Size) then
+      Encoding := TEncoding.UTF8;
+    SetEncoding(Encoding); // Keep Encoding in case the stream is saved
+    SetTextAndFileFormat(Encoding.GetString(Buffer, Size, Length(Buffer) - Size));
+  finally
+    EndUpdate;
+  end;
 end;
 
 procedure TSynEditStringList.SaveToStream(Stream: TStream; Encoding: TEncoding);
+Var
+  Cancel: Boolean;
+  OldLineBreak: string;
+  S: string;
+  Buffer, Preamble: TBytes;
 begin
-  FStreaming := True;
-  inherited;
-  FStreaming := False;
+  if Encoding = nil then
+    Encoding := DefaultEncoding;
+
+  OldLineBreak := LineBreak;
+  try
+    LineBreak := LineBreakFromFileFormat(fFileFormat);
+    S := GetTextStr;
+  finally
+    LineBreak := OldLineBreak;
+  end;
+
+  Cancel := False;
+  if (Encoding = TEncoding.ANSI) and Assigned(fOnInfoLoss) and not IsAnsiOnly(S) then
+  begin
+    fOnInfoLoss(Encoding, Cancel);
+    if Cancel then
+      Exit;
+    if Encoding <> TEncoding.ANSI then
+      SetEncoding(Encoding);
+  end;
+
+  Buffer := Encoding.GetBytes(S);
+  if WriteBOM then
+  begin
+    Preamble := Encoding.GetPreamble;
+    if Length(Preamble) > 0 then
+      Stream.WriteBuffer(Preamble, Length(Preamble));
+  end;
+  Stream.WriteBuffer(Buffer, Length(Buffer));
 end;
 
 procedure TSynEditStringList.Put(Index: integer; const S: string);
@@ -853,11 +802,7 @@ begin
       Include(fFlags, sfExpandedLengthUnknown);
       Exclude(fFlags, sfHasTabs);
       Exclude(fFlags, sfHasNoTabs);
-      {$IFDEF OWN_UnicodeString_MEMMGR}
-        SetListString(Index, S);
-      {$ELSE}
       fString := S;
-      {$ENDIF OWN_UnicodeString_MEMMGR}
     end;
     if Assigned(fOnPutted) then
       fOnPutted( Self, Index, 1 );
@@ -884,61 +829,12 @@ begin
 end;
 
 procedure TSynEditStringList.SetCapacity(NewCapacity: integer);
-{$IFDEF OWN_UnicodeString_MEMMGR}
-var
-  I : integer;
-{$ENDIF OWN_UnicodeString_MEMMGR}
 begin
   if NewCapacity < Count then
     EListError.Create( SInvalidCapacity );
   ReallocMem(fList, NewCapacity * SynEditStringRecSize);
-  {$IFDEF OWN_UnicodeString_MEMMGR}
-  for I := fCount to NewCapacity - 1 do
-    Pointer(fList[I].fString) := nil;  // so that it does not get freed
-  {$ENDIF OWN_UnicodeString_MEMMGR}
   fCapacity := NewCapacity;
 end;
-
-procedure TSynEditStringList.SetFileFormat(const Value: TSynEditFileFormat);
-begin
-  fFileFormat := Value;
-  case FileFormat of
-    sffDos:
-      LineBreak := WideCRLF;
-    sffUnix:
-      LineBreak := WideLF;
-    sffMac:
-      LineBreak := WideCR;
-    sffUnicode:
-      LineBreak := WideLineSeparator;
-  end;
-end;
-
-{$IFDEF OWN_UnicodeString_MEMMGR}
-procedure TSynEditStringList.SetListString(Index: Integer; const S: string);
-var
-  Len: Integer;
-  A: TDynWideCharArray;
-begin
-  with FList[Index] do
-  begin
-    Pointer(A) := TDynWideCharArray(FString);
-    if A <> nil then
-      A := nil; // free memory
-
-    Len := Length(S);
-    if Len > 0 then
-    begin
-      SetLength(A, Len + 1); // include #0
-      System.Move(S[1], A[0], Len * SizeOf(WideChar));
-      A[Len] := #0;
-    end;
-
-    FString := PWideChar(A);
-    Pointer(A) := nil; // do not release the array on procedure exit
-  end;
-end;
-{$ENDIF OWN_UnicodeString_MEMMGR}
 
 procedure TSynEditStringList.SetTabWidth(Value: integer);
 var
@@ -957,7 +853,7 @@ begin
   end;
 end;
 
-procedure TSynEditStringList.SetTextStr(const Value: string);
+procedure TSynEditStringList.SetTextAndFileFormat(const Value: string);
 var
   S: string;
   Size: Integer;
@@ -978,7 +874,7 @@ begin
       while (P <= Pmax) do
       begin
         Start := P;
-        while (P^ <> WideCR) and (P^ <> WideLF) and (P^ <> WideLineSeparator) and (P <= Pmax) do
+        while not (Ord(P^) in [0, $A, $D]) and (P^ <> WideLineSeparator) do
         begin
           Inc(P);
         end;
@@ -1004,7 +900,7 @@ begin
         end;
       end;
       // keep the old format of the file
-      if not AppendNewLineAtEOF and
+      if not TrailingLineBreak and
         (CharInSet(Value[Size], [#10, #13]) or (Value[Size] = WideLineSeparator))
       then
         InsertItem(fCount, '');
@@ -1026,7 +922,7 @@ end;
 
 procedure TSynEditStringList.SetUpdateState(Updating: Boolean);
 begin
-  FCharIndexesAreValid:=False;
+  fCharIndexesAreValid:=False;
   if Updating then begin
     if Assigned(fOnChanging) then
       fOnChanging(Self);

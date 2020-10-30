@@ -149,7 +149,7 @@ begin
   WasText := FALSE;
   AStrings.Clear;
   try
-    Src := TWideFileStream.Create(AFile, fmOpenRead or fmShareDenyWrite);
+    Src := TFileStream.Create(AFile, fmOpenRead or fmShareDenyWrite);
     try
       Dest := TMemoryStream.Create;
       try
@@ -180,7 +180,7 @@ begin
     try
       AStrings.SaveToStream(Src);
       Src.Seek(0, soFromBeginning);
-      Dest := TWideFileStream.Create(AFile, fmCreate);
+      Dest := TFileStream.Create(AFile, fmCreate);
       try
         ObjectTextToResource(Src, Dest);
       finally

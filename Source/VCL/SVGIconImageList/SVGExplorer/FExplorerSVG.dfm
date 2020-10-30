@@ -235,7 +235,6 @@ object fmExplorerSVG: TfmExplorerSVG
       Margins.Right = 10
       Margins.Bottom = 10
       AutoSize = False
-      Proportional = False
       ImageList = SVGIconImageList
       Align = alTop
       OnMouseDown = SVGIconImageMouseDown

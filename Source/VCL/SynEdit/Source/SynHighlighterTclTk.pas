@@ -249,7 +249,7 @@ begin
   if ACaseSensitive then
     Token := AKeyword
   else
-    Token := SynWideLowerCase(AKeyword);
+    Token := SysUtils.AnsiLowerCase(AKeyword);
   while First <= Last do
   begin
     I := (First + Last) shr 1;
@@ -689,7 +689,7 @@ begin
     begin
       Value.BeginUpdate;
       for i := 0 to Value.Count - 1 do
-        Value[i] := SynWideUpperCase(Value[i]);
+        Value[i] := SysUtils.AnsiUpperCase(Value[i]);
       Value.EndUpdate;
     end;
   fKeyWords.Assign(Value);
@@ -704,7 +704,7 @@ begin
     begin
       Value.BeginUpdate;
       for i := 0 to Value.Count - 1 do
-        Value[i] := SynWideUpperCase(Value[i]);
+        Value[i] := SysUtils.AnsiUpperCase(Value[i]);
       Value.EndUpdate;
     end;
   fSecondKeys.Assign(Value);

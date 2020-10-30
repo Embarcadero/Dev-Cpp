@@ -8,10 +8,6 @@
   WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
   the specific language governing rights and limitations under the License.
 
-  The Original Code is SynEditWordWrap.pas by Flávio Etrusco, released 2003-12-11.
-  Unicode translation by Maël Hörz.
-  All Rights Reserved.
-
   Contributors to the SynEdit and mwEdit projects are listed in the
   Contributors.txt file.
 
@@ -37,7 +33,7 @@ unit SynEditCodeFolding;
    Converting existing highlighters
    ================================
 
-   To Implement code folding a Highlighter must inherit from
+   To support code folding a Highlighter must inherit from
    TSynCustomCodeFoldingHighlighter and implement one abstact procedure
    ScanForFoldRanges(FoldRanges: TSynFoldRanges;
       LinesToScan: TStrings; FromLine: Integer; ToLine: Integer);
@@ -45,9 +41,9 @@ unit SynEditCodeFolding;
       FoldRanges.StartFoldRange
       FoldRanges.StopFoldRange
       FoldRanges.NoFoldInfo
-   It is called after the standard highlighter scanning has taken place
-   so one can use the Range information stored inside LinesToScan, which is
-   a TSynEditStringList, to avoid duplicating effort.
+   ScanForFoldRanges is called after the standard highlighter scanning has taken
+   place so one can use the Range information stored inside LinesToScan, which
+   is  a TSynEditStringList, to avoid duplicating effort.
 
    Initally two hightlighters have been converted SynHighlighterJScript and
    SynHighlighterPython, to serve as examples of adding code folding suppot to
@@ -90,7 +86,7 @@ unit SynEditCodeFolding;
 
    Improvements
    ============
-   Although the code folding infrastructure is fairly complete improvements
+   Although the code folding infrastructure is fairly complete, improvements
    can be made in providing the use with more painting options
    (folding hints etc.)
 
@@ -178,21 +174,28 @@ type
     destructor Destroy; override;
 
     {utility routines}
-    function FoldStartAtLine(Line: Integer; out Index: Integer): Boolean;
-    function CollapsedFoldStartAtLine(Line: Integer; out Index: Integer): Boolean;
-    function FoldEndAtLine(Line: Integer; out Index: Integer)  : Boolean;
+    function FoldStartAtLine(Line: Integer): Boolean; overload;
+    function FoldStartAtLine(Line: Integer; out Index: Integer): Boolean; overload;
+    function CollapsedFoldStartAtLine(Line: Integer): Boolean; overload;
+    function CollapsedFoldStartAtLine(Line: Integer; out Index: Integer): Boolean; overload;
+    function FoldEndAtLine(Line: Integer)  : Boolean; overload;
+    function FoldEndAtLine(Line: Integer; out Index: Integer)  : Boolean; overload;
     function FoldAroundLineEx(Line: Integer; WantCollapsed, AcceptFromLine,
       AcceptToLine: Boolean; out Index: Integer): Boolean;
-    function CollapsedFoldAroundLine(Line: Integer; out Index: Integer): Boolean;
-    function FoldAroundLine(Line: Integer; out Index: Integer) : Boolean;
-    function FoldHidesLine(Line: Integer; out Index: Integer) : Boolean;
-    function FoldExtendsLine(Line: Integer; out Index: Integer) : Boolean;
+    function CollapsedFoldAroundLine(Line: Integer): Boolean; overload;
+    function CollapsedFoldAroundLine(Line: Integer; out Index: Integer): Boolean; overload;
+    function FoldAroundLine(Line: Integer) : Boolean; overload;
+    function FoldAroundLine(Line: Integer; out Index: Integer) : Boolean; overload;
+    function FoldHidesLine(Line: Integer) : Boolean; overload;
+    function FoldHidesLine(Line: Integer; out Index: Integer) : Boolean; overload;
     function FoldsAtLevel(Level : integer) : TArray<Integer>;
     function FoldsOfType(aType : integer) : TArray<Integer>;
 
     {Scanning support}
-    procedure StoreCollapsedState;
-    procedure RestoreCollapsedState;
+    procedure StoreCollapsedState; overload;
+    procedure RestoreCollapsedState; overload;
+    procedure StoreCollapsedState(Stream: TStream); overload;
+    procedure RestoreCollapsedState(Stream: TStream); overload;
     procedure StartScanning;
     function  StopScanning(Lines : TStrings) : Boolean; // Returns True of Ranges were updated
     procedure AddLineInfo(ALine: Integer; AFoldType: Integer;
@@ -221,26 +224,48 @@ type
     property Ranges: TList<TSynFoldRange> read fRanges;
   end;
 
+  TSynCodeFoldingChangeEvent = procedure(Sender: TObject) of object;
+
   TSynCodeFolding = class(TPersistent)
     { Class to store and expose to the designer Code Folding properties }
   private
     fIndentGuides: Boolean;
-    fShowCollapsedLine: Boolean;
     fCollapsedLineColor: TColor;
     fFolderBarLinesColor: TColor;
     fIndentGuidesColor: TColor;
+    fShowCollapsedLine: Boolean;
+    fShowHintMark : Boolean;
+    fGutterShapeSize :  Integer;
+    fOnChange : TSynCodeFoldingChangeEvent;
+    procedure SetIndentGuides(const Value: Boolean);
+    procedure SetCollapsedLineColor(const Value: TColor);
+    procedure SetFolderBarLinesColor(const Value: TColor);
+    procedure SetIndentGuidesColor(const Value: TColor);
+    procedure SetShowCollapsedLine(const Value: Boolean);
+    procedure SetShowHintMark(const Value: Boolean);
+    procedure SetGutterShapeSize(const Value: Integer);
+    function GetGutterShapeSize: Integer;
   public
     constructor Create;
+    procedure Assign(Source: TPersistent); override;
+    procedure ChangeScale(M, D: Integer); virtual;
+    property OnChange: TSynCodeFoldingChangeEvent read fOnChange write fOnChange;
   published
+    // Size of the gutter shapes in pixels at 96 PPI - had to be odd number
+    property  GutterShapeSize: Integer read GetGutterShapeSize
+      write SetGutterShapeSize default 11;
     property CollapsedLineColor: TColor read fCollapsedLineColor
-      write fCollapsedLineColor;
+      write SetCollapsedLineColor default clGrayText;
     property FolderBarLinesColor: TColor read fFolderBarLinesColor
-      write fFolderBarLinesColor;
-    property ShowCollapsedLine: Boolean read fShowCollapsedLine
-      write fShowCollapsedLine;
+      write SetFolderBarLinesColor default clGrayText;
     property IndentGuidesColor: TColor read fIndentGuidesColor
-      write fIndentGuidesColor;
-    property IndentGuides: Boolean read fIndentGuides write fIndentGuides;
+      write SetIndentGuidesColor default clGray;
+    property IndentGuides: Boolean read fIndentGuides write SetIndentGuides
+      default True;
+    property ShowCollapsedLine: Boolean read fShowCollapsedLine
+      write SetShowCollapsedLine default False;
+    property ShowHintMark: Boolean read fShowHintMark
+      write SetShowHintMark default True;
   end;
 
   TSynCustomCodeFoldingHighlighter = class(TSynCustomHighlighter)
@@ -260,6 +285,10 @@ type
     // Called after Highlighter ranges have been set
     procedure ScanForFoldRanges(FoldRanges: TSynFoldRanges;
       LinesToScan: TStrings; FromLine: Integer; ToLine: Integer); virtual; abstract;
+    // Called immediately after FoldRanges have been recreated
+    // Override only if some finetuning of the FoldRanges is need.
+    procedure AdjustFoldRanges(FoldRanges: TSynFoldRanges;
+      LinesToScan: TStrings); virtual;
   end;
 
   Const
@@ -268,15 +297,30 @@ type
 implementation
 
 Uses
-  SynEditTextBuffer,
-  System.Math;
+  Winapi.Windows,
+  System.Math,
+  SynEditTextBuffer;
 
 { TSynEditFoldRanges }
+
+function TSynFoldRanges.CollapsedFoldAroundLine(Line: Integer): Boolean;
+Var
+  Index: Integer;
+begin
+  Result := CollapsedFoldAroundLine(Line, Index);
+end;
 
 function TSynFoldRanges.CollapsedFoldAroundLine(Line: Integer;
   out Index: Integer): Boolean;
 begin
   Result := FoldAroundLineEx(Line, True, False, False, Index);
+end;
+
+function TSynFoldRanges.CollapsedFoldStartAtLine(Line: Integer): Boolean;
+Var
+  Index: Integer;
+begin
+  Result := CollapsedFoldStartAtLine(Line, Index);
 end;
 
 function TSynFoldRanges.CollapsedFoldStartAtLine(Line: Integer;
@@ -313,6 +357,13 @@ begin
   fCollapsedState.Free;
   fFoldInfoList.Free;
   inherited;
+end;
+
+function TSynFoldRanges.FoldAroundLine(Line: Integer): Boolean;
+Var
+  Index: Integer;
+begin
+  Result := FoldAroundLine(Line, Index);
 end;
 
 function TSynFoldRanges.FoldAroundLine(Line: Integer;
@@ -363,10 +414,18 @@ begin
         Break; // sorted by line. don't bother scanning further
 end;
 
-function TSynFoldRanges.FoldExtendsLine(Line: Integer;
-  out Index: Integer): Boolean;
+function TSynFoldRanges.FoldEndAtLine(Line: Integer): Boolean;
+Var
+  Index: Integer;
 begin
-  Result := FoldAroundLineEx(Line, True, True, True, Index);
+   Result := FoldEndAtLine(Line, Index);
+end;
+
+function TSynFoldRanges.FoldHidesLine(Line: Integer): Boolean;
+Var
+  Index: Integer;
+begin
+  Result := FoldHidesLine(Line, Index);
 end;
 
 function TSynFoldRanges.FoldHidesLine(Line: Integer;
@@ -487,7 +546,17 @@ begin
   end;
 end;
 
+function TSynFoldRanges.FoldStartAtLine(Line: Integer): Boolean;
+Var
+  Index: Integer;
+begin
+  Result := FoldStartAtLine(Line, Index);
+end;
+
 function TSynFoldRanges.FoldStartAtLine(Line: Integer; out Index: Integer): Boolean;
+{
+  If Result is False it Returns the First Index with Line greater than Line
+}
 begin
   Result := fRanges.BinarySearch(TSynFoldRange.Create(Line), Index);
 end;
@@ -588,27 +657,19 @@ begin
       end else
          break;
 
-  if not fRangesNeedFixing then
-    // No need to recreate just adjust Ranges
-    for i := fRanges.Count - 1 downto 0 do
-      with fRanges.List[i] do
-        if (FromLine > aIndex + aCount)
-        then
-           // Move after affected area
-           fRanges.List[i].Move(-aCount)
-        else if (FromLine > aIndex) or
-           ((ToLine > aIndex) and (ToLine <= aIndex + aCount))
-        then begin
-          if CodeFoldingMode = cfmStandard then
-            // Should not happpen given that fRangesNeedFixing is False
-            raise TSynCodeFoldingException.Create('Error in TSynFoldRanges.LinesDeleted')
-          else begin
-            fRangesNeedFixing := True;
-            break
-          end;
-        end else if (ToLine > aIndex + aCount)
-        then
-          Dec(fRanges.List[i].ToLine, aCount);
+  for i := fRanges.Count - 1 downto 0 do
+    with fRanges.List[i] do
+      if (FromLine > aIndex + aCount) then
+        // Move after affected area
+        Ranges.List[i].Move(-aCount)
+      else if FromLine > aIndex then
+      begin
+        fRangesNeedFixing := True;
+        fRanges.Delete(i);
+      end else if ToLine > aIndex + aCount then
+        Dec(fRanges.List[i].ToLine, aCount)
+      else if ToLine > aIndex then
+        Dec(fRanges.List[i].ToLine, ToLine - aIndex)
 end;
 
 function TSynFoldRanges.LinesInserted(aIndex, aCount: Integer): Integer;
@@ -753,7 +814,19 @@ begin
   fRangesNeedFixing := False;
 end;
 
-procedure TSynFoldRanges.ReStoreCollapsedState;
+procedure TSynFoldRanges.RestoreCollapsedState(Stream: TStream);
+Var
+  Size, Line, Index : integer;
+begin
+  Size := Stream.Size;
+  while Stream.Position < Size do begin
+    Stream.ReadData(Line);
+    if FoldStartAtLine(Line, Index) then
+      fRanges.List[Index].Collapsed := True;
+  end;
+end;
+
+procedure TSynFoldRanges.RestoreCollapsedState;
 Var
   i, Index : integer;
 begin
@@ -794,6 +867,15 @@ begin
   end;
 end;
 
+procedure TSynFoldRanges.StoreCollapsedState(Stream: TStream);
+Var
+  FoldRange : TSynFoldRange;
+begin
+  for FoldRange in fRanges do
+    if FoldRange.Collapsed then
+       Stream.WriteData(FoldRange.FromLine);
+end;
+
 procedure TSynFoldRanges.StoreCollapsedState;
 Var
   FoldRange : TSynFoldRange;
@@ -830,13 +912,44 @@ begin
   Inc(ToLine, Count);
 end;
 
+procedure TSynCodeFolding.Assign(Source: TPersistent);
+begin
+ if Source is TSynCodeFolding then
+ begin
+   fIndentGuides := TSynCodeFolding(Source).fIndentGuides;
+   fCollapsedLineColor := TSynCodeFolding(Source).fCollapsedLineColor;
+   fFolderBarLinesColor := TSynCodeFolding(Source).fFolderBarLinesColor;
+   fIndentGuidesColor := TSynCodeFolding(Source).fIndentGuidesColor;
+   fShowCollapsedLine := TSynCodeFolding(Source).fShowCollapsedLine;
+   fShowHintMark := TSynCodeFolding(Source).fShowHintMark;
+   fGutterShapeSize := TSynCodeFolding(Source).fGutterShapeSize;
+ end
+ else
+   inherited Assign(Source);
+end;
+
+procedure TSynCodeFolding.ChangeScale(M, D: Integer);
+begin
+  fGutterShapeSize := MulDiv(fGutterShapeSize, M, D);
+end;
+
 constructor TSynCodeFolding.Create;
 begin
   fIndentGuides := True;
-  fShowCollapsedLine := True;
   fCollapsedLineColor := clGrayText;
   fFolderBarLinesColor := clGrayText;
   fIndentGuidesColor := clGray;
+  fShowCollapsedLine := False;
+  fShowHintMark := True;
+  fGutterShapeSize := 11;
+end;
+
+function TSynCodeFolding.GetGutterShapeSize: Integer;
+{ Always returns an odd number }
+begin
+  Result := fGutterShapeSize;
+  if not Odd(Result) then
+    Dec(Result);
 end;
 
 { TSynFoldRanges.TLineFoldInfo }
@@ -851,6 +964,12 @@ begin
 end;
 
 { TSynCustomCodeFoldingHighlighter }
+
+procedure TSynCustomCodeFoldingHighlighter.AdjustFoldRanges(
+  FoldRanges: TSynFoldRanges; LinesToScan: TStrings);
+begin
+  // Do nothing
+end;
 
 function TSynCustomCodeFoldingHighlighter.GetHighlighterAttriAtRowCol(
   const Lines: TStrings; const Line: Integer;
@@ -917,5 +1036,67 @@ function TSynCustomCodeFoldingHighlighter.TabWidth(
 begin
   Result := TSynEditStringList(LinesToScan).TabWidth;
 end;
+
+{ TSynCodeFolding }
+
+procedure TSynCodeFolding.SetCollapsedLineColor(const Value: TColor);
+begin
+  if fCollapsedLineColor <> Value then begin
+    fCollapsedLineColor := Value;
+    if Assigned(fOnChange) then fOnChange(Self);
+  end;
+end;
+
+procedure TSynCodeFolding.SetFolderBarLinesColor(const Value: TColor);
+begin
+  if fFolderBarLinesColor <> Value then begin
+    fFolderBarLinesColor := Value;
+    if Assigned(fOnChange) then fOnChange(Self);
+  end;
+end;
+
+procedure TSynCodeFolding.SetGutterShapeSize(const Value: Integer);
+Var
+  NewValue: Integer;
+begin
+  NewValue := Value;
+  if fGutterShapeSize <> NewValue then begin
+    fGutterShapeSize := NewValue;
+    if Assigned(fOnChange) then fOnChange(Self);
+  end;
+end;
+
+procedure TSynCodeFolding.SetIndentGuides(const Value: Boolean);
+begin
+  if fIndentGuides <> Value then begin
+    fIndentGuides := Value;
+    if Assigned(fOnChange) then fOnChange(Self);
+  end;
+end;
+
+procedure TSynCodeFolding.SetIndentGuidesColor(const Value: TColor);
+begin
+  if fIndentGuidesColor <> Value then begin
+    fIndentGuidesColor := Value;
+    if Assigned(fOnChange) then fOnChange(Self);
+  end;
+end;
+
+procedure TSynCodeFolding.SetShowHintMark(const Value: Boolean);
+begin
+  if fShowHintMark <> Value then begin
+    fShowHintMark := Value;
+    if Assigned(fOnChange) then fOnChange(Self);
+  end;
+end;
+
+procedure TSynCodeFolding.SetShowCollapsedLine(const Value: Boolean);
+begin
+  if fShowCollapsedLine <> Value then begin
+    fShowCollapsedLine := Value;
+    if Assigned(fOnChange) then fOnChange(Self);
+  end;
+end;
+
 
 end.

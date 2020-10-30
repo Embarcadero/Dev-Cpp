@@ -43,21 +43,22 @@ unit SynEditMiscClasses;
 interface
 
 uses
-  Consts,
   Windows,
   Messages,
+  Registry,
+  Consts,
+  SysUtils,
+  Classes,
+  Math,
   Graphics,
   Controls,
   Forms,
   StdCtrls,
   Menus,
-  Registry,
+  ImgList,
   SynEditTypes,
   SynEditKeyConst,
-  SynUnicode,
-  Math,
-  Classes,
-  SysUtils;
+  SynUnicode;
 
 type
   TSynSelectedColor = class(TPersistent)
@@ -90,6 +91,7 @@ type
     fZeroStart: boolean;
     fLeftOffset: integer;
     fRightOffset: integer;
+    fRightMargin: integer;
     fOnChange: TNotifyEvent;
     fCursor: TCursor;
     fVisible: boolean;
@@ -109,6 +111,7 @@ type
     procedure SetLeadingZeros(const Value: boolean);
     procedure SetLeftOffset(Value: integer);
     procedure SetRightOffset(Value: integer);
+    procedure SetRightMargin(Value: integer);
     procedure SetShowLineNumbers(const Value: boolean);
     procedure SetUseFontStyle(Value: boolean);
     procedure SetVisible(Value: boolean);
@@ -149,6 +152,8 @@ type
       default 16;
     property RightOffset: integer read fRightOffset write SetRightOffset
       default 2;
+    property RightMargin: integer read fRightMargin write SetRightMargin
+      default 2;
     property ShowLineNumbers: boolean read fShowLineNumbers
       write SetShowLineNumbers default FALSE;
     property UseFontStyle: boolean read fUseFontStyle write SetUseFontStyle
@@ -167,7 +172,7 @@ type
 
   TSynBookMarkOpt = class(TPersistent)
   private
-    fBookmarkImages: TImageList;
+    fBookmarkImages: TCustomImageList;
     fDrawBookmarksFirst: boolean;
     fEnableKeys: Boolean;
     fGlyphsVisible: Boolean;
@@ -175,7 +180,7 @@ type
     fOwner: TComponent;
     fXoffset: integer;
     fOnChange: TNotifyEvent;
-    procedure SetBookmarkImages(const Value: TImageList);
+    procedure SetBookmarkImages(const Value: TCustomImageList);
     procedure SetDrawBookmarksFirst(Value: boolean);
     procedure SetGlyphsVisible(Value: Boolean);
     procedure SetLeftMargin(Value: Integer);
@@ -187,7 +192,7 @@ type
     procedure ChangeScale(M, D: Integer); virtual;
 //-- DPI-Aware
   published
-    property BookmarkImages: TImageList
+    property BookmarkImages: TCustomImageList
       read fBookmarkImages write SetBookmarkImages;
     property DrawBookmarksFirst: boolean read fDrawBookmarksFirst
       write SetDrawBookmarksFirst default True;
@@ -276,8 +281,6 @@ type
     fHeight : Integer;
     fCount  : Integer;
 
-    function CreateBitmapFromInternalList(aModule: THandle; const Name: string): TBitmap;
-    procedure FreeBitmapFromInternalList;
   public
     constructor Create(aModule: THandle; const Name: string; Count: integer);
     destructor Destroy; override;
@@ -327,6 +330,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property Font;
+    property Color;
     property BorderStyle: TSynBorderStyle read FBorderStyle write SetBorderStyle
       default bsSingle;
     property HotKey: TShortCut read FHotKey write SetHotKey default $0041; { Alt+A }
@@ -365,22 +370,33 @@ type
 implementation
 
 uses
+  Winapi.Wincodec,
   SynEditMiscProcs;
 
 //++ DPI-Aware
-procedure ResizeBitmap(Bitmap: TBitmap; const NewWidth,
-  NewHeight: integer);
+procedure ResizeBitmap(Bitmap: TBitmap; const NewWidth, NewHeight: integer);
 var
-  buffer: TBitmap;
+  Factory: IWICImagingFactory;
+  Scaler: IWICBitmapScaler;
+  Source : TWICImage;
 begin
-  buffer := TBitmap.Create;
+  //Bitmap.AlphaFormat := afDefined;
+  Source := TWICImage.Create;
   try
-    buffer.SetSize(NewWidth, NewHeight);
-    buffer.Canvas.StretchDraw(Rect(0, 0, NewWidth, NewHeight), Bitmap);
-    Bitmap.SetSize(NewWidth, NewHeight);
-    Bitmap.Canvas.Draw(0, 0, buffer);
+    Source.Assign(Bitmap);
+    Factory := TWICImage.ImagingFactory;
+    Factory.CreateBitmapScaler(Scaler);
+    try
+      Scaler.Initialize(Source.Handle, NewWidth, NewHeight,
+        WICBitmapInterpolationModeHighQualityCubic);
+      Source.Handle := IWICBitmap(Scaler);
+    finally
+      Scaler := nil;
+      Factory := nil;
+    end;
+    Bitmap.Assign(Source);
   finally
-    buffer.Free;
+    Source.Free;
   end;
 end;
 //-- DPI-Aware
@@ -427,11 +443,12 @@ end;
  //++ DPI-Aware
 procedure TSynGutter.ChangeScale(M, D: Integer);
 begin
- fWidth := MulDiv(fWidth, M, D);
- fLeftOffset := MulDiv(fLeftOffset, M, D);
- fRightOffset := MulDiv(fRightOffset, M, D);
- fFont.Height := MulDiv(fFont.Height, M, D);
- if Assigned(fOnChange) then fOnChange(Self);
+  fWidth := MulDiv(fWidth, M, D);
+  fLeftOffset := MulDiv(fLeftOffset, M, D);
+  fRightOffset := MulDiv(fRightOffset, M, D);
+  fRightMargin := MulDiv(fRightMargin, M, D);
+  fFont.Height := Round(fFont.Height * M / D);
+  if Assigned(fOnChange) then fOnChange(Self);
 end;
 //-- DPI-Aware
 
@@ -439,7 +456,7 @@ constructor TSynGutter.Create;
 begin
   inherited Create;
   fFont := TFont.Create;
-  fFont.Name := 'Courier New';
+  fFont.Name := DefaultFontName;
   fFont.Size := 8;
   fFont.Style := [];
   fUseFontStyle := True;
@@ -452,6 +469,7 @@ begin
   fDigitCount := 4;
   fAutoSizeDigitCount := fDigitCount;
   fRightOffset := 2;
+  fRightMargin := 2;
   fBorderColor := clWindow;
   fBorderStyle := gbsMiddle;
   fLineNumberStart := 1;
@@ -485,7 +503,11 @@ begin
     fZeroStart := Src.fZeroStart;
     fLeftOffset := Src.fLeftOffset;
     fDigitCount := Src.fDigitCount;
-    fRightOffset := Src.fRightOffset;
+//++  Code Folding
+    // Do not change RightOffset since it varies with Code Folding
+    //fRightOffset := Src.fRightOffset;
+//--  Code Folding
+    fRightMargin := Src.fRightMargin;
     fAutoSize := Src.fAutoSize;
     fAutoSizeDigitCount := Src.fAutoSizeDigitCount;
     fLineNumberStart := Src.fLineNumberStart;
@@ -542,7 +564,9 @@ begin
   if not fVisible then
     Result := 0
   else if fShowLineNumbers then
-    Result := fLeftOffset + fRightOffset + fAutoSizeDigitCount * CharWidth + 2
+    Result := fLeftOffset + fRightOffset + fAutoSizeDigitCount * CharWidth + fRightMargin
+  else if fAutoSize then
+    Result := fLeftOffset + fRightOffset + fRightMargin
   else
     Result := fWidth;
 end;
@@ -605,6 +629,15 @@ begin
   Value := Max(0, Value);
   if fRightOffset <> Value then begin
     fRightOffset := Value;
+    if Assigned(fOnChange) then fOnChange(Self);
+  end;
+end;
+
+procedure TSynGutter.SetRightMargin(Value: integer);
+begin
+  Value := Max(0, Value);
+  if fRightMargin <> Value then begin
+    fRightMargin := Value;
     if Assigned(fOnChange) then fOnChange(Self);
   end;
 end;
@@ -730,12 +763,9 @@ end;
 
 //++ DPI-Aware
 procedure TSynBookMarkOpt.ChangeScale(M, D: Integer);
-Var
-  L : Integer;
 begin
-  L := (M div D) * D;    // Factor multiple of 100%
-  fLeftMargin := MulDiv(fLeftMargin, L, D);
-  fXoffset := MulDiv(fXoffset, L, D);
+  fLeftMargin := MulDiv(fLeftMargin, M, D);
+  fXoffset := MulDiv(fXoffset, M, D);
 end;
 //-- DPI-Aware
 
@@ -767,7 +797,7 @@ begin
     inherited Assign(Source);
 end;
 
-procedure TSynBookMarkOpt.SetBookmarkImages(const Value: TImageList);
+procedure TSynBookMarkOpt.SetBookmarkImages(const Value: TCustomImageList);
 begin
   if fBookmarkImages <> Value then begin
     fBookmarkImages := Value;
@@ -812,12 +842,10 @@ end;
 
 //++ DPI-Aware
 procedure TSynGlyph.ChangeScale(M, D: Integer);
-Var
-  L : Integer;
 begin
-  L := (M div D) * D;    // Factor multiple of 100%
-  ResizeBitmap(fInternalGlyph, MulDiv(fInternalGlyph.Width, L, D), MulDiv(fInternalGlyph.Height, L, D));
-  ResizeBitmap(fGlyph, MulDiv(fGlyph.Width, L, D), MulDiv(fGlyph.Height, L, D));
+  ResizeBitmap(fInternalGlyph, MulDiv(fInternalGlyph.Width, M, D), MulDiv(fInternalGlyph.Height, M, D));
+  if not fGlyph.Empty then
+    ResizeBitmap(fGlyph, MulDiv(fGlyph.Width, M, D), MulDiv(fGlyph.Height, M, D));
 end;
 //-- DPI-Aware
 
@@ -1080,101 +1108,29 @@ type
       Bitmap     : TBitmap;
   end;
 
-var
-  InternalResources: TList;
-
 procedure TSynInternalImage.ChangeScale(M, D: Integer);
-Var
-  L: Integer;
 begin
-  L := (M div D) * D;    // Factor multiple of 100%
-  fWidth := MulDiv(fWidth, L, D);
-  ResizeBitmap(fImages, fWidth * fCount, MulDiv(fImages.Height, L, D));
+  if M = D then Exit;
+
+  fWidth := MulDiv(fWidth, M, D);
+  ResizeBitmap(fImages, fWidth * fCount, MulDiv(fImages.Height, M, D));
   fHeight := fImages.Height;
 end;
 
 constructor TSynInternalImage.Create(aModule: THandle; const Name: string; Count: integer);
 begin
   inherited Create;
-  fImages := CreateBitmapFromInternalList( aModule, Name );
+  fImages := TBitmap.Create;
+  fImages.LoadFromResourceName(aModule, Name);
   fWidth := (fImages.Width + Count shr 1) div Count;
   fHeight := fImages.Height;
   fCount := Count;
-  end;
+end;
 
 destructor TSynInternalImage.Destroy;
 begin
-  FreeBitmapFromInternalList;
+  fImages.Free;
   inherited Destroy;
-end;
-
-function TSynInternalImage.CreateBitmapFromInternalList(aModule: THandle;
-  const Name: string): TBitmap;
-var
-  idx: Integer;
-  newIntRes: TInternalResource;
-begin
-  { There is no list until now }
-  if (InternalResources = nil) then
-    InternalResources := TList.Create;
-
-  { Search the list for the needed resource }
-  for idx := 0 to InternalResources.Count - 1 do
-    if (TInternalResource(InternalResources[idx]).Name = UpperCase(Name)) then
-      with TInternalResource(InternalResources[idx]) do begin
-        UsageCount := UsageCount + 1;
-        Result := Bitmap;
-        exit;
-      end;
-
-  { There is no loaded resource in the list so let's create a new one }
-  Result := TBitmap.Create;
-  Result.LoadFromResourceName(aModule, Name);
-
-  { Add the new resource to our list }
-  newIntRes:= TInternalResource.Create;
-  newIntRes.UsageCount := 1;
-  newIntRes.Name := UpperCase(Name);
-  newIntRes.Bitmap := Result;
-  InternalResources.Add(newIntRes);
-end;
-
-procedure TSynInternalImage.FreeBitmapFromInternalList;
-var
-  idx: Integer;
-  intRes: TInternalResource;
-  function FindImageInList: Integer;
-  begin
-    for Result := 0 to InternalResources.Count - 1 do
-      if (TInternalResource (InternalResources[Result]).Bitmap = fImages) then
-        exit;
-    Result := -1;
-  end;
-begin
-  { Search the index of our resource in the list }
-  idx := FindImageInList;
-
-  { Ey, what's this ???? }
-  if (idx = -1) then
-    exit;
-
-  { Decrement the usagecount in the object. If there are no more users
-    remove the object from the list and free it }
-  intRes := TInternalResource (InternalResources[idx]);
-  with intRes do begin
-    UsageCount := UsageCount - 1;
-    if (UsageCount = 0) then begin
-      Bitmap.Free;
-      InternalResources.Delete (idx);
-      intRes.Free;
-    end;
-  end;
-
-  { If there are no more entries in the list free it }
-  if (InternalResources.Count = 0) then begin
-    InternalResources.Free;
-    InternalResources := nil;
-  end;
 end;
 
 procedure TSynInternalImage.Draw(ACanvas: TCanvas;
@@ -1339,7 +1295,7 @@ begin
   begin
     Text := ShortCutToTextEx(Key, Shift);
     Invalidate;
-    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
   end;
 
   Key := SavedKey;
@@ -1351,7 +1307,7 @@ begin
   begin
     Text := srNone;
     Invalidate;
-    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
   end;
 end;
 
@@ -1372,7 +1328,8 @@ begin
   Canvas.Brush.Color := Color;
   InflateRect(r, -BorderWidth, -BorderWidth);
   Canvas.FillRect(r);
-  TextRect(Canvas, r, BorderWidth + 1, BorderWidth + 1, Text);
+  Canvas.Font := Font;
+  Canvas.TextRect(r, BorderWidth + 1, BorderWidth + 1, Text);
 end;
 
 procedure TSynHotKey.SetBorderStyle(const Value: TSynBorderStyle);
@@ -1400,7 +1357,7 @@ begin
   Text := ShortCutToTextEx(Key, Shift);
   Invalidate;
   if not Visible then
-    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
 end;
 
 procedure TSynHotKey.SetInvalidKeys(const Value: THKInvalidKeys);
@@ -1429,7 +1386,7 @@ procedure TSynHotKey.WMSetFocus(var Msg: TWMSetFocus);
 begin
   Canvas.Font := Font;
   CreateCaret(Handle, 0, 1, -Canvas.Font.Height + 2);
-  SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
+  SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
   ShowCaret(Handle);
 end;
 
@@ -1461,6 +1418,4 @@ begin
   end;
 end; { TBetterRegistry.OpenKeyReadOnly }
 
-begin
-  InternalResources := nil;
 end.

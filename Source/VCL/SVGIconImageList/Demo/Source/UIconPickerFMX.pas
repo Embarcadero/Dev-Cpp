@@ -92,6 +92,7 @@ begin
   GPGraphics := TGPGraphics.Create(GPBitmap);
   try
     GPGraphics.SetSmoothingMode(SmoothingModeAntiAlias);
+    GPGraphics.SetPixelOffsetMode(PixelOffsetModeHalf);
     GPRectF.X := 0;
     GPRectF.Y := 0;
     GPRectF.Width := ABitmap.Width;

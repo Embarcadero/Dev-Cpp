@@ -102,11 +102,8 @@ type
       order of keyword entries is maintained. }
     procedure Put(HashKey: Integer; Entry: TSynHashEntry);
   public
-    { Overridden destructor clears the list and frees all contained keyword
-      entries. }
-    destructor Destroy; override;
     { Clears the list and frees all contained keyword entries. }
-    procedure DeleteEntries;
+    procedure Clear; override;
   public
     { Type-safe access to the first keyword entry for a hashvalue. }
     property Items[Index: integer]: TSynHashEntry read Get write Put; default;
@@ -193,13 +190,7 @@ end;
 
 { TSynHashEntryList }
 
-destructor TSynHashEntryList.Destroy;
-begin
-  DeleteEntries;
-  inherited Destroy;
-end;
-
-procedure TSynHashEntryList.DeleteEntries;
+procedure TSynHashEntryList.Clear ;
 var
   i: integer;
 begin

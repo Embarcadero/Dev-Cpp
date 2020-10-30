@@ -42,7 +42,8 @@ interface
 
 uses
   SynEditTypes,
-  SynRegExpr,
+  RegularExpressions,
+  RegularExpressionsCore,
   SynEditMiscClasses,
   SynUnicode,
   Classes;
@@ -50,9 +51,10 @@ uses
 type
   TSynEditRegexSearch = class(TSynEditSearchCustom)
   private
-    fRegex: TRegExpr;
-    fPositions: TList;
-    fLengths: TList;
+    RegEx : TRegEx;
+    fMatchCollection: TMatchCollection;
+    fOptions : TRegExOptions;
+    fPattern: String;
   protected
     function GetPattern: string; override;
     procedure SetPattern(const Value: string); override;
@@ -62,92 +64,96 @@ type
     function GetResultCount: Integer; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     function FindAll(const NewText: string): Integer; override;
     function Replace(const aOccurrence, aReplacement: string): string; override;
   end;
 
+  ESynRegEx = ERegularExpressionError;
+
 implementation
 
 uses
+  RegularExpressionsAPI,
   Consts;
+
+
+type
+  { TPerlRegExHelper }
+
+  TPerlRegExHelper = class helper for TPerlRegEx
+    procedure SetAdditionalPCREOptions(PCREOptions : Integer);
+  end;
+
+procedure TPerlRegExHelper.SetAdditionalPCREOptions(PCREOptions: Integer);
+begin
+  with Self do FPCREOptions := FPCREOptions or PCREOptions;
+end;
+
+type
+  TRegExHelper = record helper for TRegEx
+  public
+    procedure SetAdditionalPCREOptions(PCREOptions : Integer);
+  end;
+
+procedure TRegExHelper.SetAdditionalPCREOptions(PCREOptions: Integer);
+begin
+  with Self do FRegEx.SetAdditionalPCREOptions(PCREOptions);
+end;
 
 { TSynEditRegexSearch }
 
 constructor TSynEditRegexSearch.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  fRegex := TRegExpr.Create;
-  fPositions := TList.Create;
-  fLengths := TList.Create;
-end;
-
-destructor TSynEditRegexSearch.Destroy;
-begin
-  inherited;
-  fRegex.Free;
-  fPositions.Free;
-  fLengths.Free;
+  fOptions := [roNotEmpty];
 end;
 
 function TSynEditRegexSearch.FindAll(const NewText: string): Integer;
-
-  procedure AddResult(const aPos, aLength: Integer);
-  begin
-    fPositions.Add(Pointer(aPos));
-    fLengths.Add(Pointer(aLength));
-  end;
-
 begin
-  fPositions.Clear;
-  fLengths.Clear;
-  if fRegex.Exec(NewText) then
-  begin
-    AddResult(fRegex.MatchPos[0], fRegex.MatchLen[0]);
-    Result := 1;
-    while fRegex.ExecNext do
-    begin
-      AddResult(fRegex.MatchPos[0], fRegex.MatchLen[0]);
-      Inc(Result);
-    end;
-  end
-  else
-    Result := 0;
+  fMatchCollection :=  RegEx.Matches(NewText);
+  Result := fMatchCollection.Count;
 end;
 
 function TSynEditRegexSearch.Replace(const aOccurrence, aReplacement: string): string;
 begin
-  Result := fRegex.Replace(aOccurrence, aReplacement, True);
-end;   
+  Result := RegEx.Replace(aOccurrence, aReplacement);
+end;
 
 function TSynEditRegexSearch.GetLength(Index: Integer): Integer;
 begin
-  Result := Integer(fLengths[Index]);
+  Result := fMatchCollection[Index].Length;
 end;
 
 function TSynEditRegexSearch.GetPattern: string;
 begin
-  Result := fRegex.Expression;
+  Result := fPattern;
 end;
 
 function TSynEditRegexSearch.GetResult(Index: Integer): Integer;
 begin
-  Result := Integer(fPositions[Index]);
+  Result := fMatchCollection[Index].Index;
 end;
 
 function TSynEditRegexSearch.GetResultCount: Integer;
 begin
-  Result := fPositions.Count;
+  Result := fMatchCollection.Count;
 end;
 
 procedure TSynEditRegexSearch.SetOptions(const Value: TSynSearchOptions);
 begin
-  fRegex.ModifierI := not(ssoMatchCase in Value);
+  if ssoMatchCase in Value then
+    fOptions := [roNotEmpty]
+  else
+    fOptions := [roNotEmpty, roIgnoreCase];
+  RegEx := TRegEx.Create(fPattern, fOptions);
+  RegEx.SetAdditionalPCREOptions(PCRE_UCP);
 end;
 
 procedure TSynEditRegexSearch.SetPattern(const Value: string);
 begin
-  fRegex.Expression := Value;
+  fPattern := Value;
+  RegEx := TRegEx.Create(fPattern, fOptions);
+  RegEx.SetAdditionalPCREOptions(PCRE_UCP);
 end;
 
 end.

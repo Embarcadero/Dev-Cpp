@@ -36,7 +36,11 @@ interface
 uses
   Classes
   , DesignIntf
-  , DesignEditors;
+  , DesignEditors
+  , VCLEditors
+  , Vcl.ImgList
+  , Vcl.Graphics
+  , System.Types;
 
 type
   TSVGIconImageListCompEditor = class(TComponentEditor)
@@ -90,17 +94,33 @@ type
     function GetValue: string; override;
   end;
 
+  TSVGImageIndexPropertyEditor = class(TIntegerProperty, ICustomPropertyListDrawing)
+  public
+    function GetAttributes: TPropertyAttributes; override;
+    procedure GetValues(Proc: TGetStrProc); override;
+    function GetImageListAt(Index: Integer): TCustomImageList; virtual;
+    // ICustomPropertyListDrawing
+    procedure ListMeasureHeight(const Value: string; ACanvas: TCanvas;
+      var AHeight: Integer);
+    procedure ListMeasureWidth(const Value: string; ACanvas: TCanvas;
+      var AWidth: Integer);
+    procedure ListDrawValue(const Value: string; ACanvas: TCanvas;
+      const ARect: TRect; ASelected: Boolean);
+  end;
+
 procedure Register;
 
 implementation
 
 uses
   SysUtils
+  , System.UITypes
   , Winapi.ShellApi
   , Winapi.Windows
   , SVGIconImage
   , SVGIconImageListBase
   , SVGIconImageList
+  , SVGIconItems
   , SVGIconVirtualImageList
   , SVGIconImageCollection
   , SVGIconImageListEditorUnit
@@ -158,7 +178,6 @@ begin
   Result := 'SVGImages';
 end;
 
-
 { TSVGIconCollectionListProperty }
 
 procedure TSVGIconCollectionListProperty.Edit;
@@ -179,8 +198,6 @@ function TSVGIconCollectionListProperty.GetValue: string;
 begin
   Result := 'SVGImageCollection';
 end;
-
-
 
 { TSVGTextProperty }
 
@@ -233,6 +250,8 @@ begin
   RegisterPropertyEditor(TypeInfo(TSVGIconItems), TSVGIconImageCollection, 'SVGIconItems', TSVGIconCollectionListProperty);
   RegisterPropertyEditor(TypeInfo(string), TSVGIconItem, 'SVGText', TSVGTextProperty);
   RegisterPropertyEditor(TypeInfo(string), TSVGIconImage, 'SVGText', TSVGTextProperty);
+  RegisterPropertyEditor(TypeInfo(System.UITypes.TImageIndex), TSVGIconImage, 'ImageIndex',
+    TSVGImageIndexPropertyEditor);
 end;
 
 { TSVGIconImageCollectionCompEditor }
@@ -337,6 +356,73 @@ end;
 function TSVGIconImageCompEditor.GetVerbCount: Integer;
 begin
   Result := 2;
+end;
+
+{ TSVGImageIndexPropertyEditor }
+
+function TSVGImageIndexPropertyEditor.GetImageListAt(Index: Integer): TCustomImageList;
+var
+  LComponent: TPersistent;
+begin
+  Result := nil;
+  LComponent := GetComponent(Index);
+  if LComponent is TSVGIconImage then
+    Result := TSVGIconImage(LComponent).ImageList;
+end;
+
+function TSVGImageIndexPropertyEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paMultiSelect, paValueList, paRevertable];
+end;
+
+procedure TSVGImageIndexPropertyEditor.GetValues(Proc: TGetStrProc);
+var
+  ImgList: TCustomImageList;
+  I: Integer;
+begin
+  ImgList := GetImageListAt(0);
+  if Assigned(ImgList) then
+    for I := 0 to ImgList.Count -1 do
+      Proc(IntToStr(I));
+end;
+
+procedure TSVGImageIndexPropertyEditor.ListDrawValue(const Value: string;
+  ACanvas: TCanvas; const ARect: TRect; ASelected: Boolean);
+var
+  ImgList: TCustomImageList;
+  X: Integer;
+begin
+  ImgList := GetImageListAt(0);
+  ACanvas.FillRect(ARect);
+  X := ARect.Left + 2;
+  if Assigned(ImgList) then
+  begin
+    ImgList.Draw(ACanvas, X, ARect.Top + 2, StrToInt(Value));
+    Inc(X, ImgList.Width);
+  end;
+  ACanvas.TextOut(X + 3, ARect.Top + 1, Value);
+end;
+
+procedure TSVGImageIndexPropertyEditor.ListMeasureHeight(const Value: string;
+  ACanvas: TCanvas; var AHeight: Integer);
+var
+  ImgList: TCustomImageList;
+begin
+  ImgList := GetImageListAt(0);
+  AHeight := ACanvas.TextHeight(Value) + 2;
+  if Assigned(ImgList) and (ImgList.Height + 4 > AHeight) then
+    AHeight := ImgList.Height + 4;
+end;
+
+procedure TSVGImageIndexPropertyEditor.ListMeasureWidth(const Value: string;
+  ACanvas: TCanvas; var AWidth: Integer);
+var
+  ImgList: TCustomImageList;
+begin
+  ImgList := GetImageListAt(0);
+  AWidth := ACanvas.TextWidth(Value) + 4;
+  if Assigned(ImgList) then
+    Inc(AWidth, ImgList.Width);
 end;
 
 end.

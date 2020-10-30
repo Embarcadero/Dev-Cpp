@@ -131,7 +131,6 @@ type
 implementation
 
 uses
-  WideStrUtils,
   SynEditStrConst;
 
 procedure TSynAWKSyn.MakeSyntaxList;
@@ -231,7 +230,7 @@ begin
   while CharInSet(fLine[i], ['a'..'z', 'A'..'Z']) do
     Inc(i);
   SetLength(s, i - Run);
-  WStrLCopy(PWideChar(s), fLine + Run, i - Run);
+  StrLCopy(PWideChar(s), fLine + Run, i - Run);
   Run := i;
   if AWKSyntaxList.Find(s, idx) and (AWKSyntaxList.Strings[idx] = s) then
   begin

@@ -353,7 +353,8 @@ begin
   for i := 1 to Length(S) do
   begin
     inc(j);
-    CountOfAvgGlyphs := Ceil(TextWidth(FCanvas, S[i]) / fCharWidth);
+    // Introduce a small tolerance Issue 54
+    CountOfAvgGlyphs := Ceil(FCanvas.TextWidth(S[i]) / fCharWidth - 0.04);
 
     if j + CountOfAvgGlyphs > Length(Result) then
       SetLength(Result, Length(Result) + 128);
@@ -467,7 +468,7 @@ begin
   FMaxWidth := FMargins.PRight - FMargins.PLeft;
   AStr := '';
   FMaxCol := 0;
-  while TextWidth(FCanvas, AStr) < FMaxWidth do
+  while FCanvas.TextWidth(AStr) < FMaxWidth do
   begin
     AStr := AStr + 'W';
     FMaxCol := FMaxCol + 1;
@@ -476,9 +477,9 @@ begin
   {FTestString is used to Calculate MaxWidth when prewiewing and printing -
    else the length is not calculated correctly when prewiewing and the
    zoom is different from 0.25,0.5,1,2,4 (as for example 1.20) - WHY???}
-//  fTestString := UnicodeStringOfChar('W', FMaxCol);
-  AStr := UnicodeStringOfChar('W', FMaxCol);
-  FMaxWidth := TextWidth(FCanvas, AStr);
+//  fTestString := StringofChar('W', FMaxCol);
+  AStr := StringofChar('W', FMaxCol);
+  FMaxWidth := FCanvas.TextWidth(AStr);
   FPageCount := 1;
   PageLine := TPageLine.Create;
   PageLine.FirstLine := 0;
@@ -519,7 +520,7 @@ begin
       PageLine.FirstLine := i;
       FPages.Add(PageLine);
     end;
-    StrWidth := TextWidth(FCanvas, Text);
+    StrWidth := FCanvas.TextWidth(Text);
     {Check for wrap}
     if Wrap and (StrWidth > FMaxWidth) then begin                          
       AList := TList.Create;
@@ -565,7 +566,7 @@ begin
   FCanvas.Brush.Color := FDefaultBG; 
   FCanvas.Font.Style := [];
   FCanvas.Font.Color := clBlack;
-  SynUnicode.TextOut(FCanvas, FMargins.PLeft - TextWidth(FCanvas, AStr), FYPos, AStr);
+  FCanvas.TextOut(FMargins.PLeft - FCanvas.TextWidth(AStr), FYPos, AStr);
   RestoreCurrentFont;
 end;
 
@@ -631,7 +632,7 @@ end;
 
 function TSynEditPrint.ClipLineToRect(S: string; R: TRect): string;
 begin
- while TextWidth(FCanvas, S) > FMaxWidth do
+ while FCanvas.TextWidth(S) > FMaxWidth do
     SetLength(S, Length(S) - 1);
 
   Result := S;
@@ -663,7 +664,8 @@ var
     for i := 0 to Length(Text) - 1 do
     begin
       Size := GetTextSize(FCanvas.Handle, @Text[i + 1], 1);
-      FETODist[i] := Ceil(Size.cx / CharWidth) * CharWidth;
+      // Introduce a small tolerance (#54)
+      FETODist[i] := Ceil(Size.cx / CharWidth - 0.04) * CharWidth;
     end;
   end;
   
@@ -813,7 +815,7 @@ var
   StrWidth: Integer;
 begin
   if FLineNumbers then WriteLineNumber;
-  StrWidth := TextWidth(FCanvas, Text);
+  StrWidth := FCanvas.TextWidth(Text);
   {Note that MaxWidth is calculated, using FTestString found in CalcPages -
    else the length is not calculated correctly when prewiewing and the
    zoom is different from 0.25,0.5,1,2,4 (as for example 1.20) - WHY???

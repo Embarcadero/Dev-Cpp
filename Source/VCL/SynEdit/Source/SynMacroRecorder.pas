@@ -53,7 +53,6 @@ uses
   SynEditPlugins,
   SynEditTypes,
   SynUnicode,
-  WideStrUtils,
   Classes;
 
 resourcestring
@@ -683,7 +682,7 @@ begin
     S.Text := Value;
     for i := 0 to S.Count - 1 do
     begin
-      cmdStr := WideTrim(S[i]);
+      cmdStr := Trim(S[i]);
       p := Pos(' ', cmdStr);
       if p = 0 then p := Length(cmdStr) + 1;
       Cmd := ecNone;
@@ -744,7 +743,7 @@ end;
 procedure TSynBasicEvent.InitEventParameters(aStr: string);
 begin
   // basic events have no parameters but can contain an optional repeat count
-  RepeatCount := StrToIntDef(WideTrim(aStr), 1);
+  RepeatCount := StrToIntDef(Trim(aStr), 1);
 end;
 
 procedure TSynBasicEvent.Initialize(aCmd: TSynEditorCommand; aChar: WideChar;
@@ -797,7 +796,7 @@ begin
   else
     Key := ' ';
   Delete(aStr, 1, 1); // if possible delete the first character
-  RepeatCount := StrToIntDef(WideTrim(aStr), 1);
+  RepeatCount := StrToIntDef(Trim(aStr), 1);
 end;
 
 procedure TSynCharEvent.Initialize(aCmd: TSynEditorCommand; aChar: WideChar;
@@ -848,7 +847,7 @@ var
 begin
   inherited;
   // aStr should be (x, y) with optional repeat count whitespace separated
-  aStr := WideTrim(aStr);
+  aStr := Trim(aStr);
   i := Pos(',', aStr);
   o := Pos('(', aStr);
   c := Pos(')', aStr);
@@ -858,13 +857,13 @@ begin
     valStr := Copy(aStr, o + 1, i - o - 1);
     x := StrToIntDef(valStr, 1);
     Delete(aStr, 1, i);
-    aStr := WideTrim(aStr);
+    aStr := Trim(aStr);
     c := Pos(')', aStr);
     valStr := Copy(aStr, 1, c - 1);
     y := StrToIntDef(valStr, 1);
     Position := BufferCoord(x, y);
     Delete(aStr, 1, c);
-    aStr := WideTrim(aStr);
+    aStr := Trim(aStr);
     RepeatCount := StrToIntDef(aStr, 1);
   end;
 end;
@@ -905,7 +904,7 @@ var
   Ident: string;
 begin
   EditorCommandToIdent(ecString, Ident);
-  Result := Ident + ' ' + WideQuotedStr(Value, #39);
+  Result := Ident + ' ' + AnsiQuotedStr(Value, #39);
   if RepeatCount > 1 then
     Result := Result + ' ' + IntToStr(RepeatCount);
 end;
@@ -917,11 +916,11 @@ var
 begin                      
   // aStr = 'test' with optional whitespace separated repeat count
   o := Pos('''', aStr);
-  c := WideLastDelimiter('''', aStr);
+  c := LastDelimiter('''', aStr);
   valStr := Copy(aStr, o + 1, c - o - 1);
-  Value := UnicodeStringReplace(valStr, '''''', '''', [rfReplaceAll]);
+  Value := StringReplace(valStr, '''''', '''', [rfReplaceAll]);
   Delete(aStr, 1, c);
-  RepeatCount := StrToIntDef(WideTrim(aStr), 1);
+  RepeatCount := StrToIntDef(Trim(aStr), 1);
 end;
 
 procedure TSynStringEvent.Initialize(aCmd: TSynEditorCommand; aChar: WideChar;
@@ -974,7 +973,7 @@ begin
   GetMem(Buff, l * sizeof(WideChar));
   try
     FillMemory(Buff, l, 0);
-    WStrCopy(Buff, PWideChar(Value));
+    StrCopy(Buff, PWideChar(Value));
     aStream.Write(Buff^, l * sizeof(WideChar));
   finally
     FreeMem(Buff);

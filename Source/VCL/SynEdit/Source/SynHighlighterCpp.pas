@@ -106,6 +106,99 @@ type
     function AltFunc(Index: Integer): TtkTokenKind;
     function KeyWordFunc(Index: Integer): TtkTokenKind;
     function FuncAsm(Index: Integer): TtkTokenKind;
+
+{    function FuncAlignas(Index: Integer): TtkTokenKind;
+    function FuncAlignof(Index: Integer): TtkTokenKind;
+    function FuncAnd(Index: Integer): TtkTokenKind;
+    function FuncAnd95eq(Index: Integer): TtkTokenKind;
+    function FuncAuto(Index: Integer): TtkTokenKind;
+    function FuncBitand(Index: Integer): TtkTokenKind;
+    function FuncBitor(Index: Integer): TtkTokenKind;
+    function FuncBool(Index: Integer): TtkTokenKind;
+    function FuncBreak(Index: Integer): TtkTokenKind;
+    function FuncCase(Index: Integer): TtkTokenKind;
+    function FuncCatch(Index: Integer): TtkTokenKind;
+    function FuncChar(Index: Integer): TtkTokenKind;
+    function FuncChar1695t(Index: Integer): TtkTokenKind;
+    function FuncChar3295t(Index: Integer): TtkTokenKind;
+    function FuncChar895t(Index: Integer): TtkTokenKind;
+    function FuncClass(Index: Integer): TtkTokenKind;
+    function FuncCo95await(Index: Integer): TtkTokenKind;
+    function FuncCo95return(Index: Integer): TtkTokenKind;
+    function FuncCo95yield(Index: Integer): TtkTokenKind;
+    function FuncCompl(Index: Integer): TtkTokenKind;
+    function FuncConcept(Index: Integer): TtkTokenKind;
+    function FuncConst(Index: Integer): TtkTokenKind;
+    function FuncConst95cast(Index: Integer): TtkTokenKind;
+    function FuncConsteval(Index: Integer): TtkTokenKind;
+    function FuncConstexpr(Index: Integer): TtkTokenKind;
+    function FuncConstinit(Index: Integer): TtkTokenKind;
+    function FuncContinue(Index: Integer): TtkTokenKind;
+    function FuncDecltype(Index: Integer): TtkTokenKind;
+    function FuncDefault(Index: Integer): TtkTokenKind;
+    function FuncDelete(Index: Integer): TtkTokenKind;
+    function FuncDo(Index: Integer): TtkTokenKind;
+    function FuncDouble(Index: Integer): TtkTokenKind;
+    function FuncDynamic95cast(Index: Integer): TtkTokenKind;
+    function FuncElse(Index: Integer): TtkTokenKind;
+    function FuncEnum(Index: Integer): TtkTokenKind;
+    function FuncExplicit(Index: Integer): TtkTokenKind;
+    function FuncExport(Index: Integer): TtkTokenKind;
+    function FuncExtern(Index: Integer): TtkTokenKind;
+    function FuncFalse(Index: Integer): TtkTokenKind;
+    function FuncFloat(Index: Integer): TtkTokenKind;
+    function FuncFor(Index: Integer): TtkTokenKind;
+    function FuncFriend(Index: Integer): TtkTokenKind;
+    function FuncGoto(Index: Integer): TtkTokenKind;
+    function FuncIf(Index: Integer): TtkTokenKind;
+    function FuncInline(Index: Integer): TtkTokenKind;
+    function FuncInt(Index: Integer): TtkTokenKind;
+    function FuncLong(Index: Integer): TtkTokenKind;
+    function FuncMutable(Index: Integer): TtkTokenKind;
+    function FuncNamespace(Index: Integer): TtkTokenKind;
+    function FuncNew(Index: Integer): TtkTokenKind;
+    function FuncNoexcept(Index: Integer): TtkTokenKind;
+    function FuncNot(Index: Integer): TtkTokenKind;
+    function FuncNot95eq(Index: Integer): TtkTokenKind;
+    function FuncNullptr(Index: Integer): TtkTokenKind;
+    function FuncOperator(Index: Integer): TtkTokenKind;
+    function FuncOr(Index: Integer): TtkTokenKind;
+    function FuncOr95eq(Index: Integer): TtkTokenKind;
+    function FuncPrivate(Index: Integer): TtkTokenKind;
+    function FuncProtected(Index: Integer): TtkTokenKind;
+    function FuncPublic(Index: Integer): TtkTokenKind;
+    function FuncRegister(Index: Integer): TtkTokenKind;
+    function FuncReinterpret95cast(Index: Integer): TtkTokenKind;
+    function FuncReturn(Index: Integer): TtkTokenKind;
+    function FuncShort(Index: Integer): TtkTokenKind;
+    function FuncSigned(Index: Integer): TtkTokenKind;
+    function FuncSizeof(Index: Integer): TtkTokenKind;
+    function FuncStatic(Index: Integer): TtkTokenKind;
+    function FuncStatic95assert(Index: Integer): TtkTokenKind;
+    function FuncStatic95cast(Index: Integer): TtkTokenKind;
+    function FuncStruct(Index: Integer): TtkTokenKind;
+    function FuncSwitch(Index: Integer): TtkTokenKind;
+    function FuncTemplate(Index: Integer): TtkTokenKind;
+    function FuncThis(Index: Integer): TtkTokenKind;
+    function FuncThread95local(Index: Integer): TtkTokenKind;
+    function FuncThrow(Index: Integer): TtkTokenKind;
+    function FuncTrue(Index: Integer): TtkTokenKind;
+    function FuncTry(Index: Integer): TtkTokenKind;
+    function FuncTypedef(Index: Integer): TtkTokenKind;
+    function FuncTypeid(Index: Integer): TtkTokenKind;
+    function FuncTypename(Index: Integer): TtkTokenKind;
+    function FuncUnion(Index: Integer): TtkTokenKind;
+    function FuncUnsigned(Index: Integer): TtkTokenKind;
+    function FuncUsing(Index: Integer): TtkTokenKind;
+    function FuncVirtual(Index: Integer): TtkTokenKind;
+    function FuncVoid(Index: Integer): TtkTokenKind;
+    function FuncVolatile(Index: Integer): TtkTokenKind;
+    function FuncWchar95t(Index: Integer): TtkTokenKind;
+    function FuncWhile(Index: Integer): TtkTokenKind;
+    function FuncXor(Index: Integer): TtkTokenKind;
+    function FuncXor95eq(Index: Integer): TtkTokenKind;     }
+
+
     function HashKey(Str: PWideChar): Cardinal;
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
     procedure InitIdent;
@@ -206,44 +299,83 @@ uses
   SynEditStrConst;
 
 const
+  KeyWords: array[0..90] of WideString = (
+    'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 'bitor',
+    'bool', 'break', 'case', 'catch', 'char', 'char16_t', 'char32_t', 'char8_t',
+    'class', 'co_await', 'co_return', 'co_yield', 'compl', 'concept', 'const',
+    'const_cast', 'consteval', 'constexpr', 'constinit', 'continue', 'decltype',
+    'default', 'delete', 'do', 'double', 'dynamic_cast', 'else', 'enum',
+    'explicit', 'export', 'extern', 'false', 'float', 'for', 'friend', 'goto',
+    'if', 'inline', 'int', 'long', 'mutable', 'namespace', 'new', 'noexcept',
+    'not', 'not_eq', 'nullptr', 'operator', 'or', 'or_eq', 'private',
+    'protected', 'public', 'register', 'reinterpret_cast', 'return', 'short',
+    'signed', 'sizeof', 'static', 'static_assert', 'static_cast', 'struct',
+    'switch', 'template', 'this', 'thread_local', 'throw', 'true', 'try',
+    'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual',
+    'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq'
+  );
+
+  KeyIndices: array[0..330] of Integer = (
+    -1, -1, -1, -1, -1, -1, -1, -1, 58, -1, -1, -1, -1, -1, -1, -1, -1, -1, 34,
+    13, 11, -1, 6, 53, -1, -1, 23, -1, -1, -1, -1, -1, -1, -1, -1, 80, 50, 22,
+    45, -1, -1, -1, -1, -1, -1, 21, -1, -1, 55, -1, 83, -1, -1, 82, -1, 35, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, 51, -1, -1, -1, -1, -1, 18, 20, -1, -1,
+    17, -1, -1, -1, -1, -1, -1, -1, 72, 90, 26, 43, -1, 37, -1, 25, -1, -1, -1,
+    36, -1, -1, -1, 79, -1, 16, -1, -1, -1, 41, -1, -1, 88, -1, -1, -1, -1, -1,
+    -1, 2, 48, -1, 86, 74, -1, -1, 5, -1, -1, -1, -1, 52, -1, -1, 69, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, 61, 60, -1, -1, 46, -1, -1, -1, -1, 38,
+    -1, -1, 54, 76, -1, 49, -1, -1, -1, -1, -1, -1, -1, -1, 7, -1, 12, -1, -1,
+    -1, -1, -1, -1, 47, -1, -1, 24, 87, 70, -1, -1, -1, 73, -1, -1, -1, -1, -1,
+    63, -1, -1, -1, -1, -1, -1, 65, -1, -1, -1, 30, 44, -1, 56, 77, -1, -1, -1,
+    -1, -1, -1, -1, 71, -1, -1, -1, -1, -1, -1, -1, 59, 57, -1, -1, -1, 42, -1,
+    -1, 29, 0, -1, -1, -1, -1, 3, -1, -1, 62, -1, -1, -1, -1, -1, -1, 10, -1,
+    -1, -1, -1, 4, -1, 19, -1, -1, -1, 64, -1, -1, 89, -1, 28, 85, -1, -1, -1,
+    -1, -1, -1, -1, 68, -1, -1, -1, -1, -1, -1, -1, -1, 39, -1, -1, -1, 75, 84,
+    -1, -1, -1, -1, 67, 27, 9, -1, -1, 8, 1, -1, 15, -1, -1, 78, -1, 32, -1, -1,
+    81, -1, -1, -1, -1, -1, -1, -1, -1, -1, 31, -1, 66, -1, 14, -1, 40, -1, -1,
+    -1, -1, -1, -1, 33, -1, -1
+  );
+
+{
+const
   KeyWords: array[0..94] of string = (
-    '__asm', '__automated', '__cdecl', '__classid', '__closure', '__declspec', 
-    '__dispid', '__except', '__export', '__fastcall', '__finally', '__import', 
-    '__int16', '__int32', '__int64', '__int8', '__pascal', '__property', 
-    '__published', '__rtti', '__stdcall', '__thread', '__try', '_asm', '_cdecl', 
-    '_export', '_fastcall', '_import', '_pascal', '_stdcall', 'asm', 'auto', 
-    'bool', 'break', 'case', 'catch', 'cdecl', 'char', 'class', 'const', 
-    'const_cast', 'continue', 'default', 'delete', 'do', 'double', 
-    'dynamic_cast', 'else', 'enum', 'explicit', 'extern', 'false', 'float', 
-    'for', 'friend', 'goto', 'if', 'inline', 'int', 'interface', 'long', 
-    'mutable', 'namespace', 'new', 'operator', 'pascal', 'private', 'protected', 
-    'public', 'register', 'reinterpret_cast', 'return', 'short', 'signed', 
-    'sizeof', 'static', 'static_cast', 'struct', 'switch', 'template', 'this', 
-    'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 
-    'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while' 
+    '__asm', '__automated', '__cdecl', '__classid', '__closure', '__declspec',
+    '__dispid', '__except', '__export', '__fastcall', '__finally', '__import',
+    '__int16', '__int32', '__int64', '__int8', '__pascal', '__property',
+    '__published', '__rtti', '__stdcall', '__thread', '__try', '_asm', '_cdecl',
+    '_export', '_fastcall', '_import', '_pascal', '_stdcall', 'asm', 'auto',
+    'bool', 'break', 'case', 'catch', 'cdecl', 'char', 'class', 'const',
+    'const_cast', 'continue', 'default', 'delete', 'do', 'double',
+    'dynamic_cast', 'else', 'enum', 'explicit', 'extern', 'false', 'float',
+    'for', 'friend', 'goto', 'if', 'inline', 'int', 'interface', 'long',
+    'mutable', 'namespace', 'new', 'operator', 'pascal', 'private', 'protected',
+    'public', 'register', 'reinterpret_cast', 'return', 'short', 'signed',
+    'sizeof', 'static', 'static_cast', 'struct', 'switch', 'template', 'this',
+    'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union',
+    'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while'
   );
 
   KeyIndices: array[0..342] of Integer = (
-    -1, 34, -1, -1, 57, 72, -1, 39, -1, 9, -1, 86, -1, -1, -1, -1, -1, -1, -1, 
-    -1, -1, 88, -1, 12, 66, -1, -1, -1, -1, -1, 42, -1, -1, -1, -1, -1, 56, 51, 
-    40, 87, 77, -1, -1, -1, -1, 64, -1, -1, -1, -1, -1, -1, -1, -1, -1, 28, 41, 
-    -1, 63, 6, -1, -1, -1, -1, -1, -1, -1, -1, 55, 65, 0, -1, -1, -1, -1, -1, 
-    -1, 26, 83, -1, 38, 92, -1, -1, 93, 33, -1, -1, -1, -1, -1, -1, -1, 35, -1, 
-    -1, -1, -1, -1, -1, -1, 79, 27, -1, -1, -1, 43, -1, -1, 20, -1, -1, 31, -1, 
-    -1, -1, -1, -1, 89, -1, -1, -1, -1, 59, -1, 58, -1, -1, 46, -1, -1, 3, -1, 
-    -1, 17, -1, 54, -1, 45, -1, -1, -1, -1, -1, -1, 53, -1, -1, -1, 1, -1, -1, 
-    -1, -1, 44, 90, 32, -1, -1, -1, -1, -1, -1, 91, 13, -1, -1, -1, 60, -1, -1, 
-    -1, -1, -1, 49, -1, -1, -1, -1, -1, -1, 75, -1, -1, 76, -1, -1, -1, -1, 30, 
-    68, 23, 82, -1, 15, -1, -1, 2, -1, 70, -1, -1, -1, 73, 18, -1, -1, -1, -1, 
-    -1, 47, 24, 52, 14, 84, -1, -1, -1, -1, -1, 25, -1, -1, -1, 80, 69, -1, -1, 
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 21, -1, 19, -1, -1, -1, 
-    -1, -1, -1, 74, -1, -1, -1, 29, -1, -1, -1, 67, -1, 7, -1, -1, -1, 50, 61, 
-    -1, -1, -1, 4, -1, 94, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-    81, -1, -1, -1, -1, -1, 10, 16, -1, -1, 36, 37, -1, -1, -1, 8, -1, 22, -1, 
-    -1, -1, -1, 78, 62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-    -1, -1, -1, -1, 71, -1, -1, -1, 5, -1, -1, -1, -1, -1, -1, -1, 11, -1, 48, 
-    -1 
-  );
+    -1, 34, -1, -1, 57, 72, -1, 39, -1, 9, -1, 86, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, 88, -1, 12, 66, -1, -1, -1, -1, -1, 42, -1, -1, -1, -1, -1, 56, 51,
+    40, 87, 77, -1, -1, -1, -1, 64, -1, -1, -1, -1, -1, -1, -1, -1, -1, 28, 41,
+    -1, 63, 6, -1, -1, -1, -1, -1, -1, -1, -1, 55, 65, 0, -1, -1, -1, -1, -1,
+    -1, 26, 83, -1, 38, 92, -1, -1, 93, 33, -1, -1, -1, -1, -1, -1, -1, 35, -1,
+    -1, -1, -1, -1, -1, -1, 79, 27, -1, -1, -1, 43, -1, -1, 20, -1, -1, 31, -1,
+    -1, -1, -1, -1, 89, -1, -1, -1, -1, 59, -1, 58, -1, -1, 46, -1, -1, 3, -1,
+    -1, 17, -1, 54, -1, 45, -1, -1, -1, -1, -1, -1, 53, -1, -1, -1, 1, -1, -1,
+    -1, -1, 44, 90, 32, -1, -1, -1, -1, -1, -1, 91, 13, -1, -1, -1, 60, -1, -1,
+    -1, -1, -1, 49, -1, -1, -1, -1, -1, -1, 75, -1, -1, 76, -1, -1, -1, -1, 30,
+    68, 23, 82, -1, 15, -1, -1, 2, -1, 70, -1, -1, -1, 73, 18, -1, -1, -1, -1,
+    -1, 47, 24, 52, 14, 84, -1, -1, -1, -1, -1, 25, -1, -1, -1, 80, 69, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 21, -1, 19, -1, -1, -1,
+    -1, -1, -1, 74, -1, -1, -1, 29, -1, -1, -1, 67, -1, 7, -1, -1, -1, 50, 61,
+    -1, -1, -1, 4, -1, 94, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    81, -1, -1, -1, -1, -1, 10, 16, -1, -1, 36, 37, -1, -1, -1, 8, -1, 22, -1,
+    -1, -1, -1, 78, 62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, 71, -1, -1, -1, 5, -1, -1, -1, -1, -1, -1, -1, 11, -1, 48,
+    -1
+  ); }
 
 {$Q-}
 function TSynCppSyn.HashKey(Str: PWideChar): Cardinal;
@@ -251,10 +383,10 @@ begin
   Result := 0;
   while IsIdentChar(Str^) do
   begin
-    Result := Result * 179 + Ord(Str^) * 44;
+    Result := Result * 967 + Ord(Str^) * 308;
     inc(Str);
   end;
-  Result := Result mod 343;
+  Result := Result mod 331;
   fStringLen := Str - fToIdent;
 end;
 {$Q+}
@@ -271,6 +403,33 @@ begin
     Result := tkIdentifier;
 end;
 
+//{$Q-}
+//function TSynCppSyn.HashKey(Str: PWideChar): Cardinal;
+//begin
+//  Result := 0;
+//  while IsIdentChar(Str^) do
+//  begin
+//    Result := Result * 179 + Ord(Str^) * 44;
+//    inc(Str);
+//  end;
+//  Result := Result mod 343;
+//  fStringLen := Str - fToIdent;
+//end;
+//{$Q+}
+
+//function TSynCppSyn.IdentKind(MayBe: PWideChar): TtkTokenKind;
+//var
+//  Key: Cardinal;
+//begin
+//  fToIdent := MayBe;
+//  Key := HashKey(MayBe);
+//  if Key <= High(fIdentFuncTable) then
+//    Result := fIdentFuncTable[Key](KeyIndices[Key])
+//  else
+//    Result := tkIdentifier;
+//end;
+
+
 procedure TSynCppSyn.InitIdent;
 var
   i: Integer;
@@ -282,6 +441,98 @@ begin
   fIdentFuncTable[70] := FuncAsm;
   fIdentFuncTable[191] := FuncAsm;
   fIdentFuncTable[189] := FuncAsm;
+
+  {fIdentFuncTable[230] := FuncAlignas;
+  fIdentFuncTable[295] := FuncAlignof;
+  fIdentFuncTable[115] := FuncAnd;
+  fIdentFuncTable[235] := FuncAnd95eq;
+  fIdentFuncTable[250] := FuncAsm;
+  fIdentFuncTable[122] := FuncAuto;
+  fIdentFuncTable[22] := FuncBitand;
+  fIdentFuncTable[166] := FuncBitor;
+  fIdentFuncTable[294] := FuncBool;
+  fIdentFuncTable[291] := FuncBreak;
+  fIdentFuncTable[245] := FuncCase;
+  fIdentFuncTable[20] := FuncCatch;
+  fIdentFuncTable[168] := FuncChar;
+  fIdentFuncTable[19] := FuncChar1695t;
+  fIdentFuncTable[319] := FuncChar3295t;
+  fIdentFuncTable[297] := FuncChar895t;
+  fIdentFuncTable[101] := FuncClass;
+  fIdentFuncTable[76] := FuncCo95await;
+  fIdentFuncTable[72] := FuncCo95return;
+  fIdentFuncTable[252] := FuncCo95yield;
+  fIdentFuncTable[73] := FuncCompl;
+  fIdentFuncTable[45] := FuncConcept;
+  fIdentFuncTable[37] := FuncConst;
+  fIdentFuncTable[26] := FuncConst95cast;
+  fIdentFuncTable[178] := FuncConsteval;
+  fIdentFuncTable[91] := FuncConstexpr;
+  fIdentFuncTable[86] := FuncConstinit;
+  fIdentFuncTable[290] := FuncContinue;
+  fIdentFuncTable[261] := FuncDecltype;
+  fIdentFuncTable[229] := FuncDefault;
+  fIdentFuncTable[201] := FuncDelete;
+  fIdentFuncTable[315] := FuncDo;
+  fIdentFuncTable[302] := FuncDouble;
+  fIdentFuncTable[328] := FuncDynamic95cast;
+  fIdentFuncTable[18] := FuncElse;
+  fIdentFuncTable[55] := FuncEnum;
+  fIdentFuncTable[95] := FuncExplicit;
+  fIdentFuncTable[89] := FuncExport;
+  fIdentFuncTable[151] := FuncExtern;
+  fIdentFuncTable[279] := FuncFalse;
+  fIdentFuncTable[321] := FuncFloat;
+  fIdentFuncTable[105] := FuncFor;
+  fIdentFuncTable[226] := FuncFriend;
+  fIdentFuncTable[87] := FuncGoto;
+  fIdentFuncTable[202] := FuncIf;
+  fIdentFuncTable[38] := FuncInline;
+  fIdentFuncTable[146] := FuncInt;
+  fIdentFuncTable[175] := FuncLong;
+  fIdentFuncTable[116] := FuncMutable;
+  fIdentFuncTable[157] := FuncNamespace;
+  fIdentFuncTable[36] := FuncNew;
+  fIdentFuncTable[66] := FuncNoexcept;
+  fIdentFuncTable[127] := FuncNot;
+  fIdentFuncTable[23] := FuncNot95eq;
+  fIdentFuncTable[154] := FuncNullptr;
+  fIdentFuncTable[48] := FuncOperator;
+  fIdentFuncTable[204] := FuncOr;
+  fIdentFuncTable[222] := FuncOr95eq;
+  fIdentFuncTable[8] := FuncPrivate;
+  fIdentFuncTable[221] := FuncProtected;
+  fIdentFuncTable[143] := FuncPublic;
+  fIdentFuncTable[142] := FuncRegister;
+  fIdentFuncTable[238] := FuncReinterpret95cast;
+  fIdentFuncTable[190] := FuncReturn;
+  fIdentFuncTable[256] := FuncShort;
+  fIdentFuncTable[197] := FuncSigned;
+  fIdentFuncTable[317] := FuncSizeof;
+  fIdentFuncTable[289] := FuncStatic;
+  fIdentFuncTable[270] := FuncStatic95assert;
+  fIdentFuncTable[130] := FuncStatic95cast;
+  fIdentFuncTable[180] := FuncStruct;
+  fIdentFuncTable[213] := FuncSwitch;
+  fIdentFuncTable[84] := FuncTemplate;
+  fIdentFuncTable[184] := FuncThis;
+  fIdentFuncTable[119] := FuncThread95local;
+  fIdentFuncTable[283] := FuncThrow;
+  fIdentFuncTable[155] := FuncTrue;
+  fIdentFuncTable[205] := FuncTry;
+  fIdentFuncTable[300] := FuncTypedef;
+  fIdentFuncTable[99] := FuncTypeid;
+  fIdentFuncTable[35] := FuncTypename;
+  fIdentFuncTable[305] := FuncUnion;
+  fIdentFuncTable[53] := FuncUnsigned;
+  fIdentFuncTable[50] := FuncUsing;
+  fIdentFuncTable[284] := FuncVirtual;
+  fIdentFuncTable[262] := FuncVoid;
+  fIdentFuncTable[118] := FuncVolatile;
+  fIdentFuncTable[179] := FuncWchar95t;
+  fIdentFuncTable[108] := FuncWhile;
+  fIdentFuncTable[259] := FuncXor;
+  fIdentFuncTable[85] := FuncXor95eq;       }
 
   for i := Low(fIdentFuncTable) to High(fIdentFuncTable) do
     if @fIdentFuncTable[i] = nil then
@@ -496,7 +747,7 @@ end;
 
 procedure TSynCppSyn.DirectiveProc;
 begin
-  if WideTrim(fLine)[1] <> '#' then // '#' is not first char on the line, treat it as an invalid char
+  if Trim(fLine)[1] <> '#' then // '#' is not first char on the line, treat it as an invalid char
   begin
     fTokenID := tkUnknown;
     Inc(Run);

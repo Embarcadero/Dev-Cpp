@@ -41,7 +41,6 @@ interface
 uses
   // SynEdit components
   SynEdit,
-  SynMemo,
   SynDBEdit,
   SynEditStrConst,
   SynEditHighlighter,
@@ -129,7 +128,7 @@ implementation
 procedure Register;
 begin
 // SynEdit main components
-  RegisterComponents(SYNS_ComponentsPage, [TSynEdit, TSynMemo]);
+  RegisterComponents(SYNS_ComponentsPage, [TSynEdit]);
 
   RegisterComponents(SYNS_ComponentsPage, [TDBSynEdit]);
 

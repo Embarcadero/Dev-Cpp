@@ -45,6 +45,7 @@ uses
   Windows,
   Menus,
   SynEdit,
+  SynEditTypes,
   SynEditKeyCmds,
   SynUnicode,
   Classes;
@@ -142,7 +143,6 @@ implementation
 uses
   Types,
   Forms,
-  SynEditTypes,
   SynEditMiscProcs,
   SynEditStrConst,
   SysUtils;

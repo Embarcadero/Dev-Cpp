@@ -61,7 +61,6 @@ type
     FSVGItems: TSVGIconItems;
   protected
     function GetSVGIconItems: TSVGIconItems; override;
-    //procedure SetSVGIconItems(const Value: TSVGIconItems); override;
     procedure ReadImageData(Stream: TStream);
     procedure WriteImageData(Stream: TStream);
     procedure DefineProperties(Filer: TFiler); override;
@@ -72,7 +71,8 @@ type
     destructor Destroy; override;
     function Add(const ASVG: ISVG; const AIconName: string;
        const AGrayScale: Boolean = False;
-       const AFixedColor: TColor = SVG_INHERIT_COLOR): Integer;
+       const AFixedColor: TColor = SVG_INHERIT_COLOR;
+       const AAntiAliasColor: TColor = clBtnFace): Integer;
     procedure Delete(const Index: Integer);
     procedure Remove(const Name: string);
     procedure ClearIcons; override;
@@ -87,11 +87,12 @@ type
     property OnChange;
     //New properties
     property SVGIconItems;
-    property Opacity: Byte read FOpacity write SetOpacity default 255;
-    property FixedColor: TColor read FFixedColor write SetFixedColor default SVG_INHERIT_COLOR;
-    property GrayScale: Boolean read FGrayScale write SetGrayScale default False;
-    property DisabledGrayScale: Boolean read FDisabledGrayScale write SetDisabledGrayScale default True;
-    property DisabledOpacity: Byte read FDisabledOpacity write SetDisabledOpacity default 125;
+    property Opacity;
+    property FixedColor;
+    property AntiAliasColor;
+    property GrayScale;
+    property DisabledGrayScale;
+    property DisabledOpacity;
     /// <summary>
     /// Enable and disable scaling with form
     /// </summary>
@@ -115,7 +116,8 @@ uses
 
 function TSVGIconImageList.Add(const ASVG: ISVG;
   const AIconName: string; const AGrayScale: Boolean = False;
-  const AFixedColor: TColor = SVG_INHERIT_COLOR): Integer;
+  const AFixedColor: TColor = SVG_INHERIT_COLOR;
+  const AAntiAliasColor: TColor = clBtnFace): Integer;
 var
   Item: TSVGIconItem;
 begin
@@ -125,6 +127,7 @@ begin
     Item.SVG := ASVG;
     Item.IconName := AIconName;
     Item.FixedColor := AFixedColor;
+    Item.AntiAliasColor := AAntiAliasColor;
     Item.GrayScale := AGrayScale;
   finally
     FSVGItems.EndUpdate;
@@ -323,7 +326,8 @@ begin
     for C := 0 to FSVGItems.Count - 1 do
     begin
       LItem := FSVGItems[C];
-      LBitmap := LItem.GetBitmap(Width, Height, FFixedColor, FOpacity, FGrayScale);
+      LBitmap := LItem.GetBitmap(Width, Height, FFixedColor, FOpacity,
+        FGrayScale, FAntiAliasColor);
       try
         ImageList_Add(Handle, LBitmap.Handle, 0);
       finally
@@ -397,7 +401,7 @@ end;
 
 function TSVGIconImageList.GetSVGIconItems: TSVGIconItems;
 begin
-  Result := fSVGItems;
+  Result := FSVGItems;
 end;
 
 procedure TSVGIconImageList.WriteImageData(Stream: TStream);

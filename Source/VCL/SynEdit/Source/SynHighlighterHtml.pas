@@ -29,8 +29,6 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynHighlighterHtml.pas,v 1.24.3 2012/09/13 12:05:00 codehunterworks Exp $
-
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
 
@@ -51,7 +49,6 @@ interface
 {$I SynEdit.inc}
 
 uses
-  WideStrUtils,
   Graphics,
   SynEditTypes,
   SynEditHighlighter,
@@ -943,7 +940,7 @@ begin
       end
       else
         for i := Low(EscapeAmps) To High(EscapeAmps) do
-          if (WStrLComp((fLine + Run), EscapeAmps[i], WStrLen(EscapeAmps[i])) = 0) then
+          if (AnsiStrLComp((fLine + Run), EscapeAmps[i], Length(EscapeAmps[i])) = 0) then
           begin
             fAndCode := i;
             fRange := rsAmpersand;
@@ -987,7 +984,7 @@ begin
   Low(EscapeAmps)..High(EscapeAmps):
     begin
       fTokenID := tkAmpersand;
-      Inc(Run, WStrLen(EscapeAmps[fAndCode]));
+      Inc(Run, Length(EscapeAmps[fAndCode]));
     end;
     else begin
       if (fLine[Run + 1] = '#') then

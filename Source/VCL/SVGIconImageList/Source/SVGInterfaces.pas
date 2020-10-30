@@ -68,10 +68,28 @@ implementation
 {$INCLUDE SVGIconImageList.inc}
 
 Uses
-  {$IFDEF PreferNativeSvgSupport}
-  D2DSVGFactory,
-  {$ENDIF}
-  PasSVGFactory;
+// If you want to use the Cairo Engine, you have to unpack and copy the corresponding 
+// librsvg dlls from Cairo/Dlls into the executable folder of your application.
+
+{$IF DEFINED(Cairo_SVGEngine) and DEFINED(Delphi_SVGEngine)}
+  {$MESSAGE FATAL 'You must define only one engine (Cairo_SVGEngine or Delphi_SVGEngine) into SVGIconImageList.inc)'}
+{$ENDIF}
+{$IF NOT DEFINED(Cairo_SVGEngine) and NOT DEFINED(Delphi_SVGEngine)}
+  {$MESSAGE FATAL 'You must define at least Cairo_SVGEngine or Delphi_SVGEngine into SVGIconImageList.inc)'}
+{$ENDIF}
+
+{$IF DEFINED(Delphi_SVGEngine)}
+  {$MESSAGE HINT 'Use Delphi (TSVG) SVG-Engine'}
+  PasSVGFactory
+{$ELSEIF DEFINED(Cairo_SVGEngine)}
+  {$MESSAGE HINT 'Use Cairo SVG-Engine'}
+  CairoSVGFactory
+{$ENDIF}
+{$IFDEF PreferNativeSvgSupport}
+  {$MESSAGE HINT 'but Prefer Windows Direct-2D SVG-Engine if available'}
+  , D2DSVGFactory
+{$ENDIF}
+  ;
 
 Var
  FGlobalSVGFactory: ISVGFactory;
@@ -85,7 +103,11 @@ begin
       FGlobalSVGFactory := GetD2DSVGFactory
     else
     {$ENDIF}
+    {$IF DEFINED(Delphi_SVGEngine)}
       FGlobalSVGFactory := GetPasSVGFactory;
+    {$ELSEIF DEFINED(Cairo_SVGEngine)}
+      FGlobalSVGFactory := GetCairoSVGFactory;
+    {$ENDIF}
   end;
   Result := FGlobalSVGFactory;
 end;

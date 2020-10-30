@@ -50,7 +50,7 @@ interface
 
 uses
   Windows, Messages, Graphics, Controls, Forms, Dialogs, SynEdit, SynEditKeyCmds,
-  SynUnicode, SysUtils, Classes;
+  SynUnicode, SysUtils, Classes, SynEditTypes;
 
 type
   TSynEditPythonBehaviour = class(TComponent)
@@ -101,7 +101,7 @@ begin
     iEditor := Sender as TCustomSynEdit;
     { CaretY should never be lesser than 2 right after ecLineBreak, so there's
     no need for a check }
-    iPrevLine := WideTrimRight(iEditor.Lines[iEditor.CaretY - 2]);
+    iPrevLine := TrimRight(iEditor.Lines[iEditor.CaretY - 2]);
     if (iPrevLine <> '') and (iPrevLine[Length(iPrevLine)] = ':') then
     begin
       iEditor.UndoList.BeginBlock;

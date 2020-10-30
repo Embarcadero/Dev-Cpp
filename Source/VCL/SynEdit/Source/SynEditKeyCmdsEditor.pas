@@ -240,7 +240,6 @@ begin
 
       if AddKeyStroke then
       begin
-
         with KeyCmdList.Items.Add do
         begin
           if FExtended then

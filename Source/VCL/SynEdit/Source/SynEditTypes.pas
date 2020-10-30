@@ -28,8 +28,6 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditTypes.pas,v 1.13.2.2 2012/09/17 14:17:25 CodehunterWorks Exp $
-
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
 
@@ -43,6 +41,11 @@ unit SynEditTypes;
 interface
 
 uses
+  Types,
+  Math,
+  {$IF CompilerVersion <= 32}
+  Controls,
+  {$IFEND}
   SysUtils;
 
 const
@@ -56,57 +59,69 @@ const
 type
   ESynError = class(Exception);
 
+  // DOS: CRLF, UNIX: LF, Mac: CR, Unicode: LINE SEPARATOR
+  TSynEditFileFormat = (sffDos, sffUnix, sffMac, sffUnicode);
+
   TSynSearchOption = (ssoMatchCase, ssoWholeWord, ssoBackwards,
     ssoEntireScope, ssoSelectedOnly, ssoReplace, ssoReplaceAll, ssoPrompt);
   TSynSearchOptions = set of TSynSearchOption;
 
   TCategoryMethod = function(AChar: WideChar): Boolean of object;
 
-  TKeyPressWEvent = procedure(Sender: TObject; var Key: WideChar) of object;
+  TSynEditorCommand = type word;
+
+  THookedCommandEvent = procedure(Sender: TObject; AfterProcessing: Boolean;
+    var Handled: Boolean; var Command: TSynEditorCommand; var AChar: WideChar;
+    Data: pointer; HandlerData: pointer) of object;
+
+  TSynInfoLossEvent = procedure (var Encoding: TEncoding; Cancel: Boolean) of object;
 
   PSynSelectionMode = ^TSynSelectionMode;
   TSynSelectionMode = (smNormal, smLine, smColumn);
 
-  PBorlandSelectionMode = ^TBorlandSelectionMode;
-  TBorlandSelectionMode = (
-    bsmInclusive, // selects inclusive blocks. Borland IDE shortcut: Ctrl+O+I
-    bsmLine,      // selects line blocks. Borland IDE shortcut: Ctrl+O+L
-    bsmColumn,    // selects column blocks. Borland IDE shortcut: Ctrl+O+C
-    bsmNormal     // selects normal Block. Borland IDE shortcut: Ctrl+O+K
-  );
-
-  //todo: better field names. CharIndex and LineIndex?
   TBufferCoord = record
     Char: integer;
     Line: integer;
-    {$IFDEF SYN_COMPILER_10_UP}
     class operator Equal(a, b: TBufferCoord): Boolean;
-    {$ENDIF}
-  end;
-
-  // Codehunter patch: added TBufferBlock
-  TBufferBlock = record
-    BeginLine,
-    BeginChar,
-    EndLine,
-    EndChar: Integer;
-    {$IFDEF SYN_COMPILER_10_UP}
-    class operator Equal(a, b: TBufferBlock): Boolean;
-    {$ENDIF}
+    class operator NotEqual(a, b: TBufferCoord): Boolean;
+    class operator LessThan(a, b: TBufferCoord): Boolean;
+    class operator LessThanOrEqual(a, b: TBufferCoord): Boolean;
+    class operator GreaterThan(a, b: TBufferCoord): Boolean;
+    class operator GreaterThanOrEqual(a, b: TBufferCoord): Boolean;
+    class function Min(a, b: TBufferCoord): TBufferCoord; static;
+    class function Max(a, b: TBufferCoord): TBufferCoord; static;
   end;
 
   TDisplayCoord = record
     Column: integer;
     Row: integer;
-    {$IFDEF SYN_COMPILER_10_UP}
     class operator Equal(a, b: TDisplayCoord): Boolean;
-    {$ENDIF}
+    class operator NotEqual(a, b: TDisplayCoord): Boolean;
+    class operator LessThan(a, b: TDisplayCoord): Boolean;
+    class operator LessThanOrEqual(a, b: TDisplayCoord): Boolean;
+    class operator GreaterThan(a, b: TDisplayCoord): Boolean;
+    class operator GreaterThanOrEqual(a, b: TDisplayCoord): Boolean;
+    class function Min(a, b: TDisplayCoord): TDisplayCoord; static;
+    class function Max(a, b: TDisplayCoord): TDisplayCoord; static;
   end;
+
+  (*  Helper methods for TControl - for backwward compatibility *)
+  {$IF CompilerVersion <= 32}
+  TControlHelper = class helper for TControl
+  public
+    function CurrentPPI: Integer;
+    function FCurrentPPI: Integer;
+  end;
+  {$IFEND}
+
 
 function DisplayCoord(AColumn, ARow: Integer): TDisplayCoord;
 function BufferCoord(AChar, ALine: Integer): TBufferCoord;
+function LineBreakFromFileFormat(FileFormat: TSynEditFileFormat): string;
 
 implementation
+Uses
+  SynUnicode;
 
 function DisplayCoord(AColumn, ARow: Integer): TDisplayCoord;
 begin
@@ -120,8 +135,6 @@ begin
   Result.Line := ALine;
 end;
 
-{$IFDEF SYN_COMPILER_10_UP}
-
 { TBufferCoord }
 
 class operator TBufferCoord.Equal(a, b: TBufferCoord): Boolean;
@@ -129,12 +142,53 @@ begin
   Result := (a.Char = b.Char) and (a.Line = b.Line);
 end;
 
-{ TBufferBlock }
-
-class operator TBufferBlock.Equal(a, b: TBufferBlock): Boolean;
+class operator TBufferCoord.GreaterThan(a, b: TBufferCoord): Boolean;
 begin
-  Result := (a.BeginLine = b.BeginLine) and (a.BeginChar = b.BeginChar) and
-    (a.EndLine = b.EndLine) and (a.EndChar = b.EndChar);
+  Result :=  (b.Line < a.Line)
+    or ((b.Line = a.Line) and (b.Char < a.Char))
+end;
+
+class operator TBufferCoord.GreaterThanOrEqual(a, b: TBufferCoord): Boolean;
+begin
+  Result :=  (b.Line < a.Line)
+    or ((b.Line = a.Line) and (b.Char <= a.Char))
+end;
+
+class operator TBufferCoord.LessThan(a, b: TBufferCoord): Boolean;
+begin
+  Result :=  (b.Line > a.Line)
+    or ((b.Line = a.Line) and (b.Char > a.Char))
+end;
+
+class operator TBufferCoord.LessThanOrEqual(a, b: TBufferCoord): Boolean;
+begin
+  Result :=  (b.Line > a.Line)
+    or ((b.Line = a.Line) and (b.Char >= a.Char))
+end;
+
+class function TBufferCoord.Max(a, b: TBufferCoord): TBufferCoord;
+begin
+  if (b.Line < a.Line)
+    or ((b.Line = a.Line) and (b.Char < a.Char))
+  then
+    Result := a
+  else
+    Result := b;
+end;
+
+class function TBufferCoord.Min(a, b: TBufferCoord): TBufferCoord;
+begin
+  if (b.Line < a.Line)
+    or ((b.Line = a.Line) and (b.Char < a.Char))
+  then
+    Result := b
+  else
+    Result := a;
+end;
+
+class operator TBufferCoord.NotEqual(a, b: TBufferCoord): Boolean;
+begin
+  Result := (a.Char <> b.Char) or (a.Line <> b.Line);
 end;
 
 { TDisplayCoord }
@@ -144,7 +198,80 @@ begin
   Result := (a.Row = b.Row) and (a.Column = b.Column);
 end;
 
-{$ENDIF}
+class operator TDisplayCoord.GreaterThan(a, b: TDisplayCoord): Boolean;
+begin
+  Result :=  (b.Row < a.Row)
+    or ((b.Row = a.Row) and (b.Column < a.Column))
+end;
+
+class operator TDisplayCoord.GreaterThanOrEqual(a, b: TDisplayCoord): Boolean;
+begin
+  Result :=  (b.Row < a.Row)
+    or ((b.Row = a.Row) and (b.Column <= a.Column))
+end;
+
+class operator TDisplayCoord.LessThan(a, b: TDisplayCoord): Boolean;
+begin
+  Result :=  (b.Row > a.Row)
+    or ((b.Row = a.Row) and (b.Column > a.Column))
+end;
+
+class operator TDisplayCoord.LessThanOrEqual(a, b: TDisplayCoord): Boolean;
+begin
+  Result :=  (b.Row > a.Row)
+    or ((b.Row = a.Row) and (b.Column >= a.Column))
+end;
+
+class function TDisplayCoord.Max(a, b: TDisplayCoord): TDisplayCoord;
+begin
+  if (b.Row < a.Row)
+    or ((b.Row = a.Row) and (b.Column < a.Column))
+  then
+    Result := a
+  else
+    Result := b;
+end;
+
+class function TDisplayCoord.Min(a, b: TDisplayCoord): TDisplayCoord;
+begin
+  if (b.Row < a.Row)
+    or ((b.Row = a.Row) and (b.Column < a.Column))
+  then
+    Result := b
+  else
+    Result := a;
+end;
+
+class operator TDisplayCoord.NotEqual(a, b: TDisplayCoord): Boolean;
+begin
+  Result := (a.Row <> b.Row) or (a.Column <> b.Column);
+end;
+
+function LineBreakFromFileFormat(FileFormat: TSynEditFileFormat): string;
+begin
+  case FileFormat of
+    sffDos: Result := WideCRLF;
+    sffUnix: Result := WideLF;
+    sffMac: Result := WideCR;
+    sffUnicode: Result := WideLineSeparator;
+  end;
+end;
+
+{$IF CompilerVersion <= 32}
+{ TControlHelper }
+
+function TControlHelper.CurrentPPI: Integer;
+begin
+  Result := Screen.PixelsPerInch;
+end;
+
+function TControlHelper.FCurrentPPI: Integer;
+begin
+  Result := Screen.PixelsPerInch;
+end;
+{$IFEND}
+
+
 
 end.
 

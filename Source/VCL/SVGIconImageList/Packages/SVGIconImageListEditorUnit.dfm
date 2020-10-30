@@ -22,14 +22,13 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
   TextHeight = 15
   object BottomSplitter: TSplitter
     Left = 0
-    Top = 377
+    Top = 398
     Width = 784
     Height = 4
     Cursor = crVSplit
     Align = alBottom
     AutoSnap = False
     MinSize = 200
-    ExplicitTop = 398
   end
   object paTop: TPanel
     Left = 0
@@ -127,10 +126,9 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
           Left = 186
           Top = 1
           Width = 4
-          Height = 313
+          Height = 136
           AutoSnap = False
           MinSize = 150
-          ExplicitHeight = 136
         end
         object ImageListGroup: TGroupBox
           Left = 190
@@ -238,7 +236,7 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
             Left = 0
             Top = 0
             Width = 185
-            Height = 179
+            Height = 169
             Align = alClient
             Caption = 'Images/Categories'
             TabOrder = 0
@@ -246,7 +244,7 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
               Left = 2
               Top = 17
               Width = 181
-              Height = 160
+              Height = 150
               Align = alClient
               ItemHeight = 15
               TabOrder = 0
@@ -255,15 +253,15 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
           end
           object PropertiesGroupBox: TGroupBox
             Left = 0
-            Top = 179
+            Top = 158
             Width = 185
-            Height = 134
+            Height = 159
             Align = alBottom
             Caption = 'Global properties'
             TabOrder = 1
             object FixedColorLabel: TLabel
               Left = 6
-              Top = 20
+              Top = 19
               Width = 63
               Height = 15
               AutoSize = False
@@ -271,18 +269,27 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
               Transparent = True
             end
             object OpacityLabel: TLabel
-              Left = 8
-              Top = 88
+              Left = 6
+              Top = 105
               Width = 80
               Height = 15
               AutoSize = False
               Caption = 'Opacity (255-0)'
               Transparent = True
             end
+            object AntiAliasColorLabel: TLabel
+              Left = 6
+              Top = 62
+              Width = 99
+              Height = 15
+              AutoSize = False
+              Caption = 'Antialias Color'
+              Transparent = True
+            end
             object FixedColorComboBox: TColorBox
               Left = 6
-              Top = 37
-              Width = 139
+              Top = 36
+              Width = 147
               Height = 22
               DefaultColorColor = clDefault
               NoneColorColor = clNone
@@ -292,24 +299,36 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
               OnSelect = FixedColorComboBoxSelect
             end
             object GrayScaleCheckBox: TCheckBox
-              Left = 8
-              Top = 65
+              Left = 73
+              Top = 128
               Width = 85
               Height = 17
               Caption = 'GrayScale'
-              TabOrder = 1
+              TabOrder = 3
               OnClick = GrayScaleCheckBoxClick
             end
             object OpacitySpinEdit: TSpinEdit
-              Left = 7
-              Top = 103
-              Width = 81
+              Left = 5
+              Top = 122
+              Width = 64
               Height = 24
               MaxValue = 255
               MinValue = 0
               TabOrder = 2
               Value = 0
               OnChange = OpacitySpinEditChange
+            end
+            object AntialiasColorComboBox: TColorBox
+              Left = 6
+              Top = 79
+              Width = 147
+              Height = 22
+              DefaultColorColor = clDefault
+              NoneColorColor = clNone
+              Selected = clNone
+              Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
+              TabOrder = 1
+              OnSelect = AntialiasColorComboBoxSelect
             end
           end
         end
@@ -369,6 +388,16 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
       Caption = '&Help'
       TabOrder = 3
       OnClick = HelpButtonClick
+    end
+    object SVGErrorStaticText: TStaticText
+      Left = 6
+      Top = 3
+      Width = 406
+      Height = 30
+      Anchors = [akLeft, akTop, akRight]
+      AutoSize = False
+      TabOrder = 4
+      Transparent = False
     end
   end
   object paIcon: TPanel
@@ -501,6 +530,9 @@ object SVGIconImageListEditor: TSVGIconImageListEditor
         ScrollBars = ssBoth
         TabOrder = 6
         OnChange = SVGTextChange
+        OnEnter = SVGTextEnter
+        OnExit = SVGTextExit
+        OnKeyDown = SVGTextKeyDown
       end
       object FixedColorItemComboBox: TColorBox
         Left = 415

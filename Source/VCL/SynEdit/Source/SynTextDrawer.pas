@@ -232,7 +232,7 @@ type
     procedure EndDrawing; virtual;
     procedure TextOut(X, Y: Integer; Text: PWideChar; Length: Integer); virtual;
     procedure ExtTextOut(X, Y: Integer; Options: TTextOutOptions; ARect: TRect;
-      Text: PWideChar; Length: Integer); virtual;
+      Text: PWideChar; Length: Integer; UseLigatures: Boolean = False); virtual;
     function TextExtent(const Text: string): TSize; overload;
     function TextExtent(Text: PWideChar; Count: Integer): TSize; overload;
     function TextWidth(const Text: string): Integer; overload;
@@ -257,7 +257,7 @@ type
 function GetFontsInfoManager: TheFontsInfoManager;
 
 function UniversalExtTextOut(DC: HDC; X, Y: Integer; Options: TTextOutOptions;
-  Rect: TRect; Str: PWideChar; Count: Integer; ETODist: PIntegerArray): Boolean;
+  Rect: TRect; Str: PWideChar; Count: Integer; ETODist: PIntegerArray; UseLigatures: Boolean = False): Boolean;
 
 implementation
 
@@ -287,13 +287,15 @@ end;
 //
 // See here for details: http://groups.google.com/group/microsoft.public.win32.programmer.international/browse_thread/thread/77cd596f2b96dc76/146300208098285c?lnk=st&q=font+substitution+problem#146300208098285c
 function UniversalExtTextOut(DC: HDC; X, Y: Integer; Options: TTextOutOptions;
-  Rect: TRect; Str: PWideChar; Count: Integer; ETODist: PIntegerArray): Boolean;
+  Rect: TRect; Str: PWideChar; Count: Integer; ETODist: PIntegerArray; UseLigatures: Boolean = False): Boolean;
 {$IFDEF SYN_UNISCRIBE}
 const
   SSAnalyseFlags = SSA_GLYPHS or SSA_FALLBACK or SSA_LINK;
   SpaceString: string = ' ';
 {$ENDIF}
 var
+  Glyphs: array of WideChar;
+  CharPlaceInfo: TGCPResults;
   TextOutFlags: DWORD;
 {$IFDEF SYN_UNISCRIBE}
   GlyphBufferSize: Integer;
@@ -331,7 +333,7 @@ begin
     // value for GlyphBufferSize (see documentation of cGlyphs parameter of
     // ScriptStringAnalyse function)
     GlyphBufferSize := (3 * Count) div 2 + 16;
-    
+
     Result := Succeeded(ScriptStringAnalyse(DC, Str, Count, GlyphBufferSize, -1,
       SSAnalyseFlags, 0, nil, nil, Pointer(ETODist), nil, nil, @saa));
     Result := Result and Succeeded(ScriptStringOut(saa, X, Y, TextOutFlags,
@@ -341,6 +343,22 @@ begin
   else
 {$ENDIF}
   begin
+    if UseLigatures and (Str <> nil)  and (Str^ <>  WideNull) then
+    begin
+      TextOutFlags := TextOutFlags or ETO_GLYPH_INDEX;
+      ZeroMemory(@CharPlaceInfo, SizeOf(CharPlaceInfo));
+      CharPlaceInfo.lStructSize := SizeOf(CharPlaceInfo);
+      SetLength(Glyphs, Length(Str));
+      CharPlaceInfo.lpGlyphs := @Glyphs[0];
+      CharPlaceInfo.nGlyphs := Length(Glyphs);
+      if GetCharacterPlacement(DC, PChar(str), Length(str), 0, CharPlaceInfo, GCP_LIGATE) <> 0 then
+        Result := ExtTextOutW(DC, X, Y, TextOutFlags, @Rect, Pointer(Glyphs), Length(Glyphs),
+          Pointer(ETODist))
+      else
+        Result := ExtTextOutW(DC, X, Y, TextOutFlags, @Rect, Str, Count,
+        Pointer(ETODist));
+    end
+    else
     Result := ExtTextOutW(DC, X, Y, TextOutFlags, @Rect, Str, Count,
       Pointer(ETODist));
   end;
@@ -902,7 +920,7 @@ begin
 end;
 
 procedure TheTextDrawer.ExtTextOut(X, Y: Integer; Options: TTextOutOptions;
-  ARect: TRect; Text: PWideChar; Length: Integer);
+  ARect: TRect; Text: PWideChar; Length: Integer; UseLigatures: Boolean = False);
 
   procedure InitETODist(CharWidth: Integer);
   var
@@ -927,37 +945,20 @@ procedure TheTextDrawer.ExtTextOut(X, Y: Integer; Options: TTextOutOptions;
     tm: TTextMetricA;
   begin
     if Length <= 0 then Exit;
-    
+
     LastChar := Ord(Text[Length - 1]);
     CharWidth := FETODist[Length - 1];
     RealCharWidth := CharWidth;
-    if Win32PlatformIsUnicode then
+    if GetCachedABCWidth(LastChar, CharInfo) then
     begin
-      if GetCachedABCWidth(LastChar, CharInfo) then
-      begin
-        RealCharWidth := CharInfo.abcA + Integer(CharInfo.abcB);
-        if CharInfo.abcC >= 0 then
-          Inc(RealCharWidth, CharInfo.abcC);
-      end
-      else if LastChar < Ord(High(AnsiChar)) then
-      begin
-        GetTextMetricsA(FDC, tm);
-        RealCharWidth := tm.tmAveCharWidth + tm.tmOverhang;
-      end;
+      RealCharWidth := CharInfo.abcA + Integer(CharInfo.abcB);
+      if CharInfo.abcC >= 0 then
+        Inc(RealCharWidth, CharInfo.abcC);
     end
-    else if WideChar(LastChar) <= High(AnsiChar) then
+    else if LastChar < Ord(High(AnsiChar)) then
     begin
-      if GetCharABCWidthsA(FDC, LastChar, LastChar, CharInfo) then
-      begin
-        RealCharWidth := CharInfo.abcA + Integer(CharInfo.abcB);
-        if CharInfo.abcC >= 0 then
-          Inc(RealCharWidth, CharInfo.abcC);
-      end
-      else if LastChar < Ord(High(AnsiChar)) then
-      begin
-        GetTextMetricsA(FDC, tm);
-        RealCharWidth := tm.tmAveCharWidth + tm.tmOverhang;
-      end;
+      GetTextMetricsA(FDC, tm);
+      RealCharWidth := tm.tmAveCharWidth + tm.tmOverhang;
     end;
     if RealCharWidth > CharWidth then
       Inc(ARect.Right, RealCharWidth - CharWidth);
@@ -967,7 +968,7 @@ procedure TheTextDrawer.ExtTextOut(X, Y: Integer; Options: TTextOutOptions;
 begin
   InitETODist(GetCharWidth);
   AdjustLastCharWidthAndRect;
-  UniversalExtTextOut(FDC, X, Y, Options, ARect, Text, Length, FETODist);
+  UniversalExtTextOut(FDC, X, Y, Options, ARect, Text, Length, FETODist, UseLigatures);
 end;
 
 procedure TheTextDrawer.ReleaseTemporaryResources;
@@ -977,7 +978,7 @@ end;
 
 function TheTextDrawer.TextExtent(const Text: string): TSize;
 begin
-  Result := SynUnicode.TextExtent(FStockBitmap.Canvas, Text);
+  Result := FStockBitmap.Canvas.TextExtent(Text);
 end;
 
 function TheTextDrawer.TextExtent(Text: PWideChar; Count: Integer): TSize;
@@ -994,13 +995,13 @@ begin
       if c<=High(FCharWidthCache) then begin
          Result:=FCharWidthCache[c];
          if Result=0 then begin
-            Result:=SynUnicode.TextExtent(FStockBitmap.Canvas, Text).cX;
+            Result:=FStockBitmap.Canvas.TextExtent(Text).cX;
             FCharWidthCache[c]:=Result;
          end;
          Exit;
       end;
    end;
-   Result := SynUnicode.TextExtent(FStockBitmap.Canvas, Text).cX;
+   Result := FStockBitmap.Canvas.TextExtent(Text).cX;
 end;
 
 function TheTextDrawer.TextWidth(Text: PWideChar; Count: Integer): Integer;

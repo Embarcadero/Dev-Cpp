@@ -77,6 +77,7 @@ type
     property Height;
     property Size;
     property FixedColor;
+    property AntiAliasColor;
     property GrayScale;
     property DisabledGrayScale;
     property DisabledOpacity;
@@ -184,7 +185,7 @@ var
   C: Integer;
   LItem: TSVGIconItem;
   BitMap: TBitmap;
-  LFixedColor: TColor;
+  LFixedColor, LAntiAliasColor: TColor;
   LGrayScale: Boolean;
 begin
   if not Assigned(FImageCollection) or
@@ -200,6 +201,10 @@ begin
       LFixedColor := FImageCollection.FixedColor
     else
       LFixedColor := FFixedColor;
+    if FImageCollection.AntiAliasColor <> clBtnFace then
+      LAntiAliasColor := FImageCollection.AntiAliasColor
+    else
+      LAntiAliasColor := FAntiAliasColor;
     if FGrayScale or FImageCollection.GrayScale then
       LGrayscale := True
     else
@@ -207,7 +212,8 @@ begin
     for C := 0 to FImageCollection.SVGIconItems.Count - 1 do
     begin
       LItem := FImageCollection.SVGIconItems[C];
-      Bitmap := LItem.GetBitmap(Width, Height, LFixedColor, FOpacity, LGrayScale);
+      Bitmap := LItem.GetBitmap(Width, Height, LFixedColor, FOpacity,
+        LGrayScale, LAntiAliasColor);
       try
         ImageList_Add(Handle, Bitmap.Handle, 0);
       finally

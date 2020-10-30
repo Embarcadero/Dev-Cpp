@@ -270,7 +270,7 @@ begin
     LStyleName := SelectThemeRadioGroup.Items[SelectThemeRadioGroup.ItemIndex];
     if TStyleManager.ActiveStyle.Name <> LStyleName then
       TStyleManager.TrySetStyle(LStyleName);
-    //UpdateIconFontsColorByStyle(IconFontsImageList); TODO
+    ImageDataModule.SVGIconImageCollection.Change;
     UpdateGUI(False);
   finally
     Screen.Cursor := crDefault;

@@ -48,7 +48,7 @@ uses
   SvgInterfaces;
 
 const
-  SVGIconImageListVersion = '2.1.0';
+  SVGIconImageListVersion = '2.2.0';
   DEFAULT_SIZE = 16;
 
 type
@@ -63,6 +63,7 @@ type
     FSVGItemsUpdateMessageID: Integer;
     FOpacity: Byte;
     FFixedColor: TColor;
+    FAntiAliasColor: TColor;
     FGrayScale: Boolean;
     FDisabledGrayScale: Boolean;
     FDisabledOpacity: Byte;
@@ -83,6 +84,7 @@ type
     procedure SetNames(Index: Integer; const Value: string); virtual;
     procedure SetSize(const Value: Integer);
     procedure SetFixedColor(const Value: TColor);
+    procedure SetAntiAliasColor(const Value: TColor);
     procedure SetGrayScale(const Value: Boolean);
     procedure SetDisabledGrayScale(const Value: Boolean);
     procedure SetDisabledOpacity(const Value: Byte);
@@ -143,6 +145,7 @@ type
     property Height: Integer read GetHeight write SetHeight stored StoreHeight default DEFAULT_SIZE;
     property Size: Integer read GetSize write SetSize stored StoreSize default DEFAULT_SIZE;
     property FixedColor: TColor read FFixedColor write SetFixedColor default SVG_INHERIT_COLOR;
+    property AntiAliasColor: TColor read FAntiAliasColor write SetAntiAliasColor default clBtnFace;
     property GrayScale: Boolean read FGrayScale write SetGrayScale default False;
     property DisabledGrayScale: Boolean read FDisabledGrayScale write SetDisabledGrayScale default True;
     property DisabledOpacity: Byte read FDisabledOpacity write SetDisabledOpacity default 125;
@@ -178,6 +181,7 @@ begin
       Height := TSVGIconImageListBase(Source).Height;
       FOpacity := TSVGIconImageListBase(Source).FOpacity;
       FFixedColor := TSVGIconImageListBase(Source).FFixedColor;
+      FAntiAliasColor := TSVGIconImageListBase(Source).FAntiAliasColor;
       FGrayScale := TSVGIconImageListBase(Source).FGrayScale;
       DoAssign(Source);
     finally
@@ -212,6 +216,7 @@ begin
   Height := DEFAULT_SIZE;
   FOpacity := 255;
   FFixedColor := SVG_INHERIT_COLOR;
+  FAntiAliasColor := clBtnFace;
   FGrayScale := False;
   {$IFDEF HiDPISupport}
   FScaled := True;
@@ -457,15 +462,18 @@ procedure TSVGIconImageListBase.SetFixedColor(const Value: TColor);
 begin
   if FFixedColor <> Value then
   begin
-    BeginUpdate;
-    try
-      FFixedColor := Value;
-      if FFixedColor <> SVG_INHERIT_COLOR then
-        FGrayScale := False;
-      Change;
-    finally
-      EndUpdate;
-    end;
+    FFixedColor := Value;
+    if FFixedColor <> SVG_INHERIT_COLOR then
+      FGrayScale := False;
+    Change;
+  end;
+end;
+
+procedure TSVGIconImageListBase.SetAntiAliasColor(const Value: TColor);
+begin
+  if FAntiAliasColor <> Value then
+  begin
+    FAntiAliasColor := Value;
   end;
 end;
 
@@ -473,15 +481,10 @@ procedure TSVGIconImageListBase.SetGrayScale(const Value: Boolean);
 begin
   if FGrayScale <> Value then
   begin
-    BeginUpdate;
-    try
-      FGrayScale := Value;
-      if FGrayScale then
-        FixedColor := SVG_INHERIT_COLOR;
-      Change;
-    finally
-      EndUpdate;
-    end;
+    FGrayScale := Value;
+    if FGrayScale then
+      FFixedColor := SVG_INHERIT_COLOR;
+    Change;
   end;
 end;
 

@@ -2,7 +2,7 @@
     <PropertyGroup>
         <Base>True</Base>
         <AppType>Package</AppType>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <FrameworkType>VCL</FrameworkType>
         <MainSource>SynEditDR.dpk</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -59,11 +59,14 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <SanitizedProjectName>SynEditDR</SanitizedProjectName>
+        <DCC_BpiOutput>..\cpp\$(Platform)\$(Config)</DCC_BpiOutput>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_Description>TurboPack SynEdit Delphi runtime package</DCC_Description>
+        <DCC_HppOutput>..\cpp\$(Platform)\$(Config)</DCC_HppOutput>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_ObjOutput>..\cpp\$(Platform)\$(Config)</DCC_ObjOutput>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
         <DCC_WriteableConstants>true</DCC_WriteableConstants>
         <DllSuffix>260</DllSuffix>
@@ -121,7 +124,6 @@
         <DCCReference Include="vcldb.dcp"/>
         <DCCReference Include="vclx.dcp"/>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="..\..\..\Source\SynTextDrawer.pas"/>
         <DCCReference Include="..\..\..\Source\SynAutoCorrect.pas"/>
         <DCCReference Include="..\..\..\Source\SynAutoCorrectEditor.pas">
             <Form>frmAutoCorrectEditor</Form>
@@ -130,8 +132,12 @@
         <DCCReference Include="..\..\..\Source\SynDBEdit.pas"/>
         <DCCReference Include="..\..\..\Source\SynEdit.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditAutoComplete.pas"/>
+        <DCCReference Include="..\..\..\Source\SynEditCodeFolding.pas"/>
+        <DCCReference Include="..\..\..\Source\SynEditDataObject.pas"/>
+        <DCCReference Include="..\..\..\Source\SynEditDragDrop.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditExport.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditHighlighter.pas"/>
+        <DCCReference Include="..\..\..\Source\SynEditHighlighterOptions.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditKbdHandler.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditKeyCmdEditor.pas">
             <Form>SynEditKeystrokeEditorForm</Form>
@@ -147,7 +153,6 @@
             <Form>fmEditorOptionsDialog</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\Source\SynEditPlugins.pas"/>
-        <DCCReference Include="..\..\..\Source\SynEditWordWrap.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditPrint.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditPrinterInfo.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditPrintHeaderFooter.pas"/>
@@ -163,6 +168,7 @@
         <DCCReference Include="..\..\..\Source\SynEditStrConst.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditTextBuffer.pas"/>
         <DCCReference Include="..\..\..\Source\SynEditTypes.pas"/>
+        <DCCReference Include="..\..\..\Source\SynEditWordWrap.pas"/>
         <DCCReference Include="..\..\..\Source\SynExportHTML.pas"/>
         <DCCReference Include="..\..\..\Source\SynExportRTF.pas"/>
         <DCCReference Include="..\..\..\Source\SynExportTeX.pas"/>
@@ -177,8 +183,12 @@
         <DCCReference Include="..\..\..\Source\SynHighlighterCPM.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterCpp.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterCS.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterCss.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterDfm.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterDml.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterDOT.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterDWS.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterEiffel.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterFortran.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterFoxpro.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterGalaxy.pas"/>
@@ -194,7 +204,9 @@
         <DCCReference Include="..\..\..\Source\SynHighlighterInno.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterJava.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterJScript.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterJSON.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterKix.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterLDraw.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterM3.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterModelica.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterMsg.pas"/>
@@ -205,6 +217,7 @@
         <DCCReference Include="..\..\..\Source\SynHighlighterProgress.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterPython.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterRC.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterRexx.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterRuby.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterSDD.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterSml.pas"/>
@@ -214,30 +227,20 @@
         <DCCReference Include="..\..\..\Source\SynHighlighterTeX.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterUNIXShellScript.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterUnreal.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterURI.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterVB.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterVBScript.pas"/>
+        <DCCReference Include="..\..\..\Source\SynHighlighterVrml97.pas"/>
         <DCCReference Include="..\..\..\Source\SynHighlighterXML.pas"/>
         <DCCReference Include="..\..\..\Source\SynMacroRecorder.pas"/>
-        <DCCReference Include="..\..\..\Source\SynMemo.pas"/>
-        <DCCReference Include="..\..\..\Source\SynRegExpr.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterCss.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterLDraw.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterURI.pas"/>
-        <DCCReference Include="..\..\..\Source\SynURIOpener.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterDOT.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterDWS.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterVrml97.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterEiffel.pas"/>
+        <DCCReference Include="..\..\..\Source\SynTextDrawer.pas"/>
         <DCCReference Include="..\..\..\Source\SynUnicode.pas">
             <Form>$IFNDEF CPUX64</Form>
         </DCCReference>
+        <DCCReference Include="..\..\..\Source\SynURIOpener.pas"/>
         <DCCReference Include="..\..\..\Source\SynUsp10.pas">
             <Form>$ENDIF</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\Source\SynEditHighlighterOptions.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterJSON.pas"/>
-        <DCCReference Include="..\..\..\Source\SynHighlighterRexx.pas"/>
-        <DCCReference Include="..\..\..\Source\SynEditCodeFolding.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -370,16 +373,8 @@
             </Deployment>
             <ModelSupport>False</ModelSupport>
             <Platforms>
-                <Platform value="Android">False</Platform>
-                <Platform value="Android64">False</Platform>
-                <Platform value="Linux64">False</Platform>
-                <Platform value="OSX32">False</Platform>
-                <Platform value="OSX64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">True</Platform>
-                <Platform value="iOSDevice32">False</Platform>
-                <Platform value="iOSDevice64">False</Platform>
-                <Platform value="iOSSimulator">False</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

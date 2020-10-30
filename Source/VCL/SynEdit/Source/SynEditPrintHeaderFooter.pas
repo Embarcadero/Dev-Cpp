@@ -300,7 +300,7 @@ var
     Macro: string;
   begin
     Result := True;
-    Macro := SynWideUpperCase(Copy(FText, Start, Run - Start + 1));
+    Macro := SysUtils.AnsiUpperCase(Copy(FText, Start, Run - Start + 1));
     if Macro = '$PAGENUM$' then
     begin
       if Roman then
@@ -348,7 +348,7 @@ var
 begin
   Result := '';
   AStr := FText;
-  if WideTrim(AStr) = '' then
+  if Trim(AStr) = '' then
     Exit;
   // parse the line
   Len := Length(AStr);
@@ -645,10 +645,10 @@ begin
     GetTextMetrics(ACanvas.Handle, TextMetric);
     with TLineInfo(FLineInfo[CurLine - 1]), TextMetric do
     begin
-      LineHeight := Max(LineHeight, TextHeight(ACanvas, 'W'));
+      LineHeight := Max(LineHeight, ACanvas.TextHeight('W'));
       MaxBaseDist := Max(MaxBaseDist, tmHeight - tmDescent);
     end;
-    FFrameHeight := Max(FFrameHeight, FOrgHeight + TextHeight(ACanvas, 'W'));
+    FFrameHeight := Max(FFrameHeight, FOrgHeight + ACanvas.TextHeight('W'));
   end;
   FFrameHeight := FFrameHeight + 2 * FMargins.PHFInternalMargin;
 end;
@@ -781,8 +781,8 @@ begin
     with FMargins do begin
       X := PLeftHFTextIndent;
       case TheAlignment of
-        taRightJustify: X := PRightHFTextIndent - TextWidth(ACanvas, AStr);
-        taCenter: X := (PLeftHFTextIndent + PRightHFTextIndent - TextWidth(ACanvas, AStr)) div 2;
+        taRightJustify: X := PRightHFTextIndent - ACanvas.TextWidth(AStr);
+        taCenter: X := (PLeftHFTextIndent + PRightHFTextIndent - ACanvas.TextWidth(AStr)) div 2;
       end;
     end;
       {Aligning at base line - Fonts can have different size in headers and footers}

@@ -50,6 +50,8 @@ unit SynUsp10;
 
 interface
 
+{$IFDEF CPUX86}
+
 uses
   Windows;
 
@@ -2169,7 +2171,11 @@ function ScriptApplyDigitSubstitution(
 var
   Usp10IsInstalled: Boolean;
 
+{$ENDIF}
+
 implementation
+
+{$IFDEF CPUX86}
 
 uses
   SysUtils;
@@ -2641,5 +2647,7 @@ initialization
 
 finalization
   if Usp10DllModule <> 0 then FreeLibrary(Usp10DllModule);
+
+{$ENDIF}
 
 end.

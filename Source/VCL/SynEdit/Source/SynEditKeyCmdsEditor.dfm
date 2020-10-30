@@ -2,15 +2,16 @@ object SynEditKeystrokesEditorForm: TSynEditKeystrokesEditorForm
   Left = 300
   Top = 241
   BorderIcons = [biSystemMenu, biMaximize]
-  AutoScroll = False
   Caption = 'Keystroke Editor'
   ClientHeight = 319
   ClientWidth = 382
+  Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
+  OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   OnResize = FormResize
@@ -54,9 +55,6 @@ object SynEditKeystrokesEditorForm: TSynEditKeystrokesEditorForm
         Height = 232
         Align = alClient
         BorderStyle = bsNone
-        ColumnClick = False
-        OnClick = KeyCmdListClick
-        OnDblClick = btnEditClick
         Columns = <
           item
             Caption = 'Command'
@@ -66,9 +64,12 @@ object SynEditKeystrokesEditorForm: TSynEditKeystrokesEditorForm
             Caption = 'Keystroke'
             Width = 101
           end>
+        ColumnClick = False
         HideSelection = False
         TabOrder = 0
         ViewStyle = vsReport
+        OnClick = KeyCmdListClick
+        OnDblClick = btnEditClick
       end
     end
     object btnAdd: TButton

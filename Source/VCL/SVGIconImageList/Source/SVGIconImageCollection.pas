@@ -41,8 +41,8 @@ uses
   , System.UITypes
   , System.Classes
   , WinApi.Windows
-{$IFDEF D10_3+}
   , Vcl.Graphics
+{$IFDEF D10_3+}
   , Vcl.BaseImageCollection
 {$ENDIF}
   , SvgInterfaces
@@ -64,9 +64,11 @@ type
     FSVGItems: TSVGIconItems;
     FFixedColor: TColor;
     FGrayScale: Boolean;
+    FAntiAliasColor: TColor;
     procedure SetSVGIconItems(const Value: TSVGIconItems);
     procedure SetFixedColor(const Value: TColor);
     procedure SetGrayScale(const Value: Boolean);
+    procedure SetAntiAliasColor(const Value: TColor);
 
   protected
     {$IFDEF D10_3+}
@@ -81,12 +83,16 @@ type
     procedure DefineProperties(Filer: TFiler); override;
 
   public
+    procedure SetColors(AFixedColor: TColor; AAntiAliasColor: TColor = clBtnFace);
     {$IFDEF D10_3+}
     function IsIndexAvailable(AIndex: Integer): Boolean; override;
     function GetIndexByName(const AName: String): Integer; override;
     function GetNameByIndex(AIndex: Integer): String; override;
     function GetBitmap(AIndex: Integer; AWidth, AHeight: Integer): TBitmap; override;
     procedure Draw(ACanvas: TCanvas; ARect: TRect; AIndex: Integer; AProportional: Boolean = False); override;
+    {$ELSE}
+    procedure Change;
+    procedure Draw(ACanvas: TCanvas; ARect: TRect; AIndex: Integer; AProportional: Boolean = False);
     {$ENDIF}
 
     constructor Create(AOwner: TComponent); override;
@@ -111,6 +117,7 @@ type
   published
     property SVGIconItems: TSVGIconItems read FSVGItems write SetSVGIconItems;
     property FixedColor: TColor read FFixedColor write SetFixedColor default SVG_INHERIT_COLOR;
+    property AntiAliasColor: TColor read FAntiAliasColor write SetAntiAliasColor default clBtnFace;
     property GrayScale: Boolean read FGrayScale write SetGrayScale default False;
   end;
 
@@ -169,6 +176,7 @@ begin
   inherited;
   FSVGItems := TSVGIconItems.Create(Self);
   FFixedColor := SVG_INHERIT_COLOR;
+  FAntiAliasColor := clBtnFace;
   FGrayScale := False;
 end;
 
@@ -295,6 +303,31 @@ begin
   Delete(IndexOf(Name));
 end;
 
+procedure TSVGIconImageCollection.SetAntiAliasColor(const Value: TColor);
+begin
+  if FAntiAliasColor <> Value then
+  begin
+    FSVGItems.BeginUpdate;
+    try
+      FAntiAliasColor := Value;
+    finally
+      FSVGItems.EndUpdate;
+    end;
+  end;
+end;
+
+procedure TSVGIconImageCollection.SetColors(AFixedColor,
+  AAntiAliasColor: TColor);
+begin
+  FSVGItems.BeginUpdate;
+  try
+    FixedColor := AFixedColor;
+    AntiAliasColor := AAntiAliasColor;
+  finally
+    FSVGItems.EndUpdate;
+  end;
+end;
+
 procedure TSVGIconImageCollection.SetFixedColor(const Value: TColor);
 begin
   if FFixedColor <> Value then
@@ -383,10 +416,19 @@ end;
 function TSVGIconImageCollection.GetBitmap(AIndex: Integer; AWidth, AHeight: Integer): TBitmap;
 begin
   if (AIndex >= 0) and (AIndex < FSVGItems.Count ) then
-    Result := FSVGItems[AIndex].GetBitmap(AWidth, AHeight, FFixedColor, 255, FGrayScale)
+    Result := FSVGItems[AIndex].GetBitmap(AWidth, AHeight, FFixedColor, 255,
+      FGrayScale, FAntiAliasColor)
   else
     Result := nil;
 end;
+
+{$ELSE}
+procedure TSVGIconImageCollection.Change;
+begin
+  FSVGItems.BeginUpdate;
+  FSVGItems.EndUpdate;
+end;
+{$ENDIF}
 
 procedure TSVGIconImageCollection.Draw(ACanvas: TCanvas; ARect: TRect; AIndex: Integer;
   AProportional: Boolean = False);
@@ -408,6 +450,5 @@ begin
 
   LSVG.PaintTo(ACanvas.Handle, TRectF.Create(ARect), AProportional);
 end;
-{$ENDIF}
 
 end.

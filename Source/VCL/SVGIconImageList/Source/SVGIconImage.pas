@@ -40,10 +40,8 @@ uses
   , Winapi.Messages
   , System.SysUtils
   , System.Types
-{$IFDEF D10_4+}
-  , System.UITypes
-{$ENDIF}
   , System.Classes
+  , System.UITypes
   , Vcl.Controls
   , Vcl.Graphics
   , Vcl.ImgList
@@ -62,16 +60,22 @@ type
     FOpacity: Byte;
     FFileName: TFileName;
     FImageList: TCustomImageList;
-    FImageIndex: Integer;
+    FImageIndex: System.UITypes.TImageIndex;
+    FImageChangeLink: TChangeLink;
+    FFixedColor: TColor;
+    FGrayScale: Boolean;
     procedure SetCenter(Value: Boolean);
     procedure SetProportional(Value: Boolean);
     procedure SetOpacity(Value: Byte);
     procedure SetFileName(const Value: TFileName);
-    procedure SetImageIndex(const Value: Integer);
+    procedure SetImageIndex(const Value: System.UITypes.TImageIndex);
     procedure SetStretch(const Value: Boolean);
     procedure SetScale(const Value: Double);
     procedure SetImageList(const Value: TCustomImageList);
     procedure SetAutoSizeImage(const Value: Boolean);
+    procedure ImageListChange(Sender: TObject);
+    procedure SetFixedColor(const Value: TColor);
+    procedure SetGrayScale(const Value: Boolean);
   private
     function GetSVGText: string;
     procedure SetSVGText(const AValue: string);
@@ -103,9 +107,11 @@ type
     property Opacity: Byte read FOpacity write SetOpacity default 255;
     property Scale: Double read FScale write SetScale stored StoreScale;
     property ImageList: TCustomImageList read FImageList write SetImageList;
-    property ImageIndex: Integer read FImageIndex write SetImageIndex default -1;
+    property ImageIndex: System.UITypes.TImageIndex read FImageIndex write SetImageIndex default -1;
     property FileName: TFileName read FFileName write SetFileName;
     property SVGText: string read GetSVGText write SetSVGText stored UsingSVGText;
+    property FixedColor: TColor read FFixedColor write SetFixedColor default SVG_INHERIT_COLOR;
+    property GrayScale: Boolean read FGrayScale write SetGrayScale default False;
     property Enabled;
     property Visible;
     property Constraints;
@@ -183,11 +189,16 @@ begin
   FOpacity := 255;
   FScale := 1;
   FImageIndex := -1;
+  FFixedColor := SVG_INHERIT_COLOR;
+  FGrayScale := False;
   ParentBackground := True;
+  FImageChangeLink := TChangeLink.Create;
+  FImageChangeLink.OnChange := ImageListChange;
 end;
 
 destructor TSVGIconImage.Destroy;
 begin
+  FImageChangeLink.Free;
   inherited;
 end;
 
@@ -217,6 +228,12 @@ begin
     Result := SVGIconItems.Items[FImageIndex].SVGText
   else
     Result := FSVG.Source;
+end;
+
+procedure TSVGIconImage.ImageListChange(Sender: TObject);
+begin
+  if Sender = FImageList then
+    Invalidate;
 end;
 
 function TSVGIconImage.SVGIconItems: TSVGIconItems;
@@ -249,6 +266,8 @@ begin
   if not LSVG.IsEmpty then
   begin
     LSVG.Opacity := FOpacity / 255;
+    LSVG.FixedColor := FFixedColor;
+    LSVG.GrayScale := FGrayScale;
     LSVG.PaintTo(Canvas.Handle, TRectF.Create(TPointF.Create(0, 0), Width, Height), FProportional);
     LSVG.Opacity := 1;
   end;
@@ -385,7 +404,29 @@ begin
   LoadFromFile(Value);
 end;
 
-procedure TSVGIconImage.SetImageIndex(const Value: Integer);
+procedure TSVGIconImage.SetFixedColor(const Value: TColor);
+begin
+  if Value <> FFixedColor then
+  begin
+    FFixedColor := Value;
+    if FFixedColor <> SVG_INHERIT_COLOR then
+      FGrayScale := False;
+    Repaint;
+  end;
+end;
+
+procedure TSVGIconImage.SetGrayScale(const Value: Boolean);
+begin
+  if Value <> FGrayScale then
+  begin
+    FGrayScale := Value;
+    if FGrayScale then
+      FixedColor := SVG_INHERIT_COLOR;
+    Repaint;
+  end;
+end;
+
+procedure TSVGIconImage.SetImageIndex(const Value: System.UITypes.TImageIndex);
 begin
   if FImageIndex = Value then
     Exit;
@@ -396,8 +437,14 @@ end;
 
 procedure TSVGIconImage.SetImageList(const Value: TCustomImageList);
 begin
+  if FImageList <> nil then FImageList.UnRegisterChanges(FImageChangeLink);
   FImageList := Value;
-  SVGText := '';
+  if FImageList <> nil then
+  begin
+    FImageList.RegisterChanges(FImageChangeLink);
+    FImageList.FreeNotification(Self);
+    SVGText := '';
+  end;
 end;
 
 constructor TSVGGraphic.Create;

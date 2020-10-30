@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -12,14 +12,12 @@ The Original Code is: SynEditHighlighter.pas, released 2000-04-07.
 The Original Code is based on mwHighlighter.pas by Martin Waldenburg, part of
 the mwEdit component suite.
 Portions created by Martin Waldenburg are Copyright (C) 1998 Martin Waldenburg.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 Options property added by CodehunterWorks
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
 Contributors.txt file.
-
-$Id: SynEditHighlighter.pas,v 1.9.1 2012/09/12 08:17:19 CodehunterWorks Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -78,8 +76,8 @@ type
       OldStyle: Boolean): Boolean; virtual;
     function LoadFromRegistry(Reg: TBetterRegistry): Boolean;
     function SaveToRegistry(Reg: TBetterRegistry): Boolean;
-    function LoadFromFile(Ini: TIniFile): Boolean;
-    function SaveToFile(Ini: TIniFile): Boolean;
+    function LoadFromFile(Ini: TCustomIniFile): Boolean;
+    function SaveToFile(Ini: TCustomIniFile): Boolean;
   public
     procedure SetColors(Foreground, Background: TColor);
     property FriendlyName: string read fFriendlyName;
@@ -199,6 +197,8 @@ type
     procedure EnumUserSettings(Settings: TStrings); virtual;
     function LoadFromRegistry(RootKey: HKEY; Key: string): Boolean; virtual;
     function SaveToRegistry(RootKey: HKEY; Key: string): Boolean; virtual;
+    function LoadFromIniFile(AIni: TCustomIniFile): Boolean;
+    function SaveToIniFile(AIni: TCustomIniFile): Boolean;
     function LoadFromFile(AFileName: string): Boolean;
     function SaveToFile(AFileName: string): Boolean;
     procedure HookAttrChangeEvent(ANotifyEvent: TNotifyEvent);
@@ -261,7 +261,6 @@ implementation
 
 uses
   SynEditMiscProcs,
-  WideStrUtils,
   SynEditStrConst;
 
 { THighlighterList }
@@ -683,7 +682,7 @@ begin
     Result := False;
 end;
 
-function TSynHighlighterAttributes.LoadFromFile(Ini : TIniFile): boolean;
+function TSynHighlighterAttributes.LoadFromFile(Ini: TCustomIniFile): Boolean;
 var
   S: TStringList;
 begin
@@ -707,7 +706,7 @@ begin
   end;
 end;
 
-function TSynHighlighterAttributes.SaveToFile(Ini : TIniFile): boolean;
+function TSynHighlighterAttributes.SaveToFile(Ini: TCustomIniFile): Boolean;
 begin
   Ini.WriteInteger(Name, 'Background', Background);
   Ini.WriteInteger(Name, 'Foreground', Foreground);
@@ -793,27 +792,32 @@ var
 begin
   if (Source <> nil) and (Source is TSynCustomHighlighter) then
   begin
-    Src := TSynCustomHighlighter(Source);
-    for i := 0 to AttrCount - 1 do
-    begin
-      // assign first attribute with the same name
-      AttriName := Attribute[i].Name;
-      for j := 0 to Src.AttrCount - 1 do
+    BeginUpdate;
+    try
+      Src := TSynCustomHighlighter(Source);
+      for i := 0 to AttrCount - 1 do
       begin
-        SrcAttri := Src.Attribute[j];
-        if AttriName = SrcAttri.Name then
+        // assign first attribute with the same name
+        AttriName := Attribute[i].Name;
+        for j := 0 to Src.AttrCount - 1 do
         begin
-          Attribute[i].Assign(SrcAttri);
-          break;
+          SrcAttri := Src.Attribute[j];
+          if AttriName = SrcAttri.Name then
+          begin
+            Attribute[i].Assign(SrcAttri);
+            break;
+          end;
         end;
       end;
+      // assign the sample source text only if same or descendant class
+      if Src is ClassType then
+        SampleSource := Src.SampleSource;
+      //fWordBreakChars := Src.WordBreakChars; //TODO: does this make sense anyway?
+      DefaultFilter := Src.DefaultFilter;
+      Enabled := Src.Enabled;
+    finally
+      EndUpdate;
     end;
-    // assign the sample source text only if same or descendant class
-    if Src is ClassType then
-      SampleSource := Src.SampleSource;
-    //fWordBreakChars := Src.WordBreakChars; //TODO: does this make sense anyway?
-    DefaultFilter := Src.DefaultFilter;
-    Enabled := Src.Enabled;
   end
   else
     inherited Assign(Source);
@@ -875,17 +879,11 @@ end;
 
 function TSynCustomHighlighter.LoadFromFile(AFileName : String): boolean;
 var
-  AIni: TIniFile;
-  i: Integer;
+  AIni: TMemIniFile;
 begin
-  AIni := TIniFile.Create(AFileName);
+  AIni := TMemIniFile.Create(AFileName);
   try
-    with AIni do
-    begin
-      Result := True;
-      for i := 0 to AttrCount - 1 do
-        Result := Attribute[i].LoadFromFile(AIni) and Result;
-    end;
+    Result := LoadFromIniFile(AIni);
   finally
     AIni.Free;
   end;
@@ -893,17 +891,11 @@ end;
 
 function TSynCustomHighlighter.SaveToFile(AFileName : String): boolean;
 var
-  AIni: TIniFile;
-  i: integer;
+  AIni: TMemIniFile;
 begin
-  AIni := TIniFile.Create(AFileName);
+  AIni := TMemIniFile.Create(AFileName);
   try
-    with AIni do
-    begin
-      Result := True;
-      for i := 0 to AttrCount - 1 do
-        Result := Attribute[i].SaveToFile(AIni) and Result;
-    end;
+    Result := SaveToIniFile(AIni);
   finally
     AIni.Free;
   end;
@@ -986,7 +978,7 @@ begin
   Len := ExpandedRun - fExpandedTokenPos;
   SetLength(Result, Len);
   if Len > 0 then
-    WStrLCopy(@Result[1], fExpandedLine + fExpandedTokenPos, Len);
+    StrLCopy(@Result[1], fExpandedLine + fExpandedTokenPos, Len);
 end;
 
 class function TSynCustomHighlighter.GetFriendlyLanguageName: string;
@@ -1027,7 +1019,7 @@ begin
   Len := Run - fTokenPos;
   SetLength(Result, Len);
   if Len > 0 then
-    WStrLCopy(@Result[1], fCasedLine + fTokenPos, Len);
+    StrLCopy(@Result[1], fCasedLine + fTokenPos, Len);
 end;
 
 function TSynCustomHighlighter.GetTokenPos: Integer;
@@ -1111,8 +1103,8 @@ end;
 function TSynCustomHighlighter.IsWordBreakChar(AChar: WideChar): Boolean;
 begin
   case AChar of
-    '.', ',', ';', ':', '"', '''', '´', '`', '°', '^', '!', '?', '&',
-    '$', '@', '§', '%', '#', '~', '[', ']', '(', ')', '{', '}', '<', '>',
+    '.', ',', ';', ':', '"', '''', 'Â´', '`', 'Â°', '^', '!', '?', '&',
+    '$', '@', 'Â§', '%', '#', '~', '[', ']', '(', ')', '{', '}', '<', '>',
     '-', '=', '+', '*', '/', '\', '|':
       Result := True;
     else
@@ -1123,6 +1115,31 @@ begin
        Result := False;
       end;
     end;
+  end;
+end;
+
+function TSynCustomHighlighter.SaveToIniFile(AIni: TCustomIniFile): Boolean;
+var
+  i: Integer;
+begin
+  with AIni do
+  begin
+    Result := True;
+    for i := 0 to AttrCount - 1 do
+      Result := Attribute[i].SaveToFile(AIni) and Result;
+  end;
+  AIni.UpdateFile;
+end;
+
+function TSynCustomHighlighter.LoadFromIniFile(AIni: TCustomIniFile): Boolean;
+var
+  i: Integer;
+begin
+  with AIni do
+  begin
+    Result := True;
+    for i := 0 to AttrCount - 1 do
+      Result := Attribute[i].LoadFromFile(AIni) and Result;
   end;
 end;
 
@@ -1208,7 +1225,7 @@ procedure TSynCustomHighlighter.DoSetLine(const Value: string; LineNumber: Integ
   begin
     // segregated here so case-insensitive highlighters don't have to pay the overhead
     // of the exception frame for the release of the temporary string
-    dest := SynWideLowerCase(value);
+    dest := SysUtils.AnsiLowerCase(value);
   end;
 
 begin

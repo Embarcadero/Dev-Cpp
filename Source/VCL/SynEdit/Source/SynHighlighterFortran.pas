@@ -424,41 +424,41 @@ end;
 
 procedure TSynFortranSyn.PointProc;
 begin
-  if (((SynWideUpperCase(FLine[Run + 1]) = 'G') and CharInSet(SynWideUpperCase(FLine[Run + 2])[1], ['E', 'T'])) {.ge. .gt.}
-       or ((SynWideUpperCase(FLine[Run + 1]) = 'L') and CharInSet(SynWideUpperCase(FLine[Run + 2])[1], ['E', 'T'])) {.le. .lt.}
-       or ((SynWideUpperCase(FLine[Run + 1]) = 'N') and (SynWideUpperCase(FLine[Run + 2]) = 'E')) {.ne.}
-       or ((SynWideUpperCase(FLine[Run + 1]) = 'E') and (SynWideUpperCase(FLine[Run + 2]) = 'Q')) {.eq.}
-       or ((SynWideUpperCase(FLine[Run + 1]) = 'O') and (SynWideUpperCase(FLine[Run + 2]) = 'R'))){.or.}
+  if (((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'G') and CharInSet(SysUtils.AnsiUpperCase(FLine[Run + 2])[1], ['E', 'T'])) {.ge. .gt.}
+       or ((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'L') and CharInSet(SysUtils.AnsiUpperCase(FLine[Run + 2])[1], ['E', 'T'])) {.le. .lt.}
+       or ((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'N') and (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'E')) {.ne.}
+       or ((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'E') and (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'Q')) {.eq.}
+       or ((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'O') and (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'R'))){.or.}
      and (FLine[Run + 3] = '.') then
     begin
       inc(Run, 4);
       fTokenID := tkSymbol;
     end
-  else if (((SynWideUpperCase(FLine[Run + 1]) = 'A')
-              and (SynWideUpperCase(FLine[Run + 2]) = 'N')
-              and (SynWideUpperCase(FLine[Run + 3]) = 'D'))    {.and.}
-           or ((SynWideUpperCase(FLine[Run + 1]) = 'N')
-              and (SynWideUpperCase(FLine[Run + 2]) = 'O')
-              and (SynWideUpperCase(FLine[Run + 3]) = 'T')))    {.not.}
+  else if (((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'A')
+              and (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'N')
+              and (SysUtils.AnsiUpperCase(FLine[Run + 3]) = 'D'))    {.and.}
+           or ((SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'N')
+              and (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'O')
+              and (SysUtils.AnsiUpperCase(FLine[Run + 3]) = 'T')))    {.not.}
           and (FLine[Run + 4] = '.') then
     begin
       inc(Run, 5);
       fTokenID := tkSymbol;
     end
-  else if (SynWideUpperCase(FLine[Run + 1]) = 'T')
-          and (SynWideUpperCase(FLine[Run + 2]) = 'R')
-          and (SynWideUpperCase(FLine[Run + 3]) = 'U')
-          and (SynWideUpperCase(FLine[Run + 4]) = 'E')
+  else if (SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'T')
+          and (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'R')
+          and (SysUtils.AnsiUpperCase(FLine[Run + 3]) = 'U')
+          and (SysUtils.AnsiUpperCase(FLine[Run + 4]) = 'E')
           and (FLine[Run + 5] = '.') then  {.true.}
     begin
       inc(Run, 6);
       fTokenID := tkSymbol;
     end
-  else if (SynWideUpperCase(FLine[Run + 1]) = 'F')
-          and (SynWideUpperCase(FLine[Run + 2]) = 'A')
-          and (SynWideUpperCase(FLine[Run + 3]) = 'L')
-          and (SynWideUpperCase(FLine[Run + 4]) = 'S')
-          and (SynWideUpperCase(FLine[Run + 5]) = 'E')
+  else if (SysUtils.AnsiUpperCase(FLine[Run + 1]) = 'F')
+          and (SysUtils.AnsiUpperCase(FLine[Run + 2]) = 'A')
+          and (SysUtils.AnsiUpperCase(FLine[Run + 3]) = 'L')
+          and (SysUtils.AnsiUpperCase(FLine[Run + 4]) = 'S')
+          and (SysUtils.AnsiUpperCase(FLine[Run + 5]) = 'E')
           and (FLine[Run + 6] = '.') then  {.false.}
     begin
       inc(Run, 7);

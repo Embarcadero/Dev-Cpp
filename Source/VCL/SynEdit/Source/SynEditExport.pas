@@ -260,7 +260,7 @@ begin
     fFont.Assign(Value)
   else
   begin
-    fFont.Name := 'Courier New';
+    fFont.Name := DefaultFontName;
     fFont.Size := 10;
     fFont.Color := clWindowText;
     fFont.Style := [];
@@ -287,25 +287,6 @@ begin
   Clipboard.Open;
   try
     Clipboard.Clear;
-
-    // set ANSI text only on Win9X, WinNT automatically creates ANSI from Unicode
-    if Win32Platform <> VER_PLATFORM_WIN32_NT then
-    begin
-      Mem := GlobalAlloc(GMEM_MOVEABLE or GMEM_DDESHARE, SLen + 1);
-      if Mem <> 0 then
-      begin
-        P := GlobalLock(Mem);
-        try
-          if P <> nil then
-          begin
-            Move(PAnsiChar(AnsiString(Text))^, P^, SLen + 1);
-            Clipboard.SetAsHandle(CF_TEXT, Mem);
-          end;
-        finally
-          GlobalUnlock(Mem);
-        end;
-      end;
-    end;
 
     // set unicode text, this also works on Win9X, even if the clipboard-viewer
     // can't show it, Word 2000+ can paste it including the unicode only characters
@@ -506,7 +487,7 @@ function TSynCustomExporter.ReplaceReservedChars(AToken: string): string;
 var
   I, ISrc, IDest, SrcLen, DestLen: Integer;
   Replace: string;
-  c: WideChar;                                                                      //mh 2000-10-10
+  c: WideChar;
 begin
   if AToken <> '' then
   begin
@@ -554,7 +535,7 @@ procedure TSynCustomExporter.SaveToFile(const FileName: string);
 var
   Stream: TStream;
 begin
-  Stream := TWideFileStream.Create(FileName, fmCreate);
+  Stream := TFileStream.Create(FileName, fmCreate);
   try
     SaveToStream(Stream);
   finally
