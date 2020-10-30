@@ -144,25 +144,18 @@ begin
     // default dir should be %APPDATA%\Embarcadero\Dev-Cpp
     AppData := IncludeTrailingBackslash(TPath.GetHomePath);
 
-    const DevCppDir = 'Embarcadero\Dev-Cpp';
+    const DevCppDir = 'Embarcadero\Dev-Cpp\';
 
     // Store the INI file in %APPDATA% or if we are not allowed to do so, in the exe directory
     if (not devData.IsPortable) and ((AppData <> '') and (DirectoryExists(AppData + DevCppDir) or ForceDirectories(AppData + DevCppDir))) then
-      devData.INIFileName := AppData + DevCppDir + INIFileName
+    begin
+      devData.INIFileName := TPath.Combine(TPath.Combine(AppData,DevCppDir),INIFileName);
+    end
     else
     begin
-        // default dir should be C:\Users\<username>\Documents\Embarcadero\Dev-Cpp
-        AppData := IncludeTrailingBackslash(TPath.GetDocumentsPath);
-
-        // Store the INI file in C:\Users\<username>\Documents or if we are not allowed to do so, in the exe directory
-        if (not devData.IsPortable) and ((AppData <> '') and (DirectoryExists(AppData + DevCppDir) or ForceDirectories(AppData + DevCppDir))) then
-          devData.INIFileName := AppData + DevCppDir + INIFileName
-        else
-        begin
-          // store it in the default portable config folder anyways...
-          devData.INIFileName := ExeFolder + 'config\' + INIFileName;
-          TDirectory.CreateDirectory(TPath.GetDirectoryName(devData.INIFileName));
-        end;
+      // store it in the default portable config folder anyways...
+      devData.INIFileName := ExeFolder + 'config\' + INIFileName;
+      TDirectory.CreateDirectory(TPath.GetDirectoryName(devData.INIFileName));
     end;
   end;
 

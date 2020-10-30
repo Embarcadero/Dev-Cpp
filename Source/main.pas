@@ -31,7 +31,7 @@ uses
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
   devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg, SynEditTextBuffer,
   CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm, System.Actions,
-  vcl.Themes, SVGColor, Vcl.Imaging.pngimage, Vcl.WinXCtrls, Vcl.WinXPanels,
+  vcl.Themes, SVGColor, Vcl.Imaging.pngimage, Vcl.WinXCtrls, Vcl.WinXPanels, Vcl.ExtDlgs,
   Vcl.Styles.Hooks,
   Vcl.Styles.Utils.Menus, //Style Popup and Shell Menus (class #32768)
   Vcl.Styles.Utils.Forms, //Style dialogs box (class #32770)
@@ -931,7 +931,7 @@ type
     //Procedure New Screen
     procedure GetProjectHistory;
     procedure AddFileRTB(RBName: TRichEdit; aFileName: string; aDirection: string);
-    procedure OpenFileProject(s: string);
+    procedure OpenFileProject(s: string; AEncoding: TEncoding = nil);
     procedure ResizeWelcomeComponent;
 
     procedure PageControlCloseButtonDrawTab(Control: TCustomTabControl; TabIndex: Integer;
@@ -950,8 +950,8 @@ type
     function GetCompileTarget: TTarget;
     procedure UpdateAppTitle;
     procedure OpenCloseMessageSheet(Open: boolean);
-    procedure OpenFile(const FileName: String);
-    procedure OpenFileList(List: TStringList);
+    procedure OpenFile(const FileName: String; AEncoding: TEncoding = nil);
+    procedure OpenFileList(List: TStringList; AEncoding: TEncoding = nil);
     procedure OpenProject(const s: String);
     procedure GotoBreakpoint(const FileName: String; Line: integer);
     procedure RemoveActiveBreakpoints;
@@ -1627,7 +1627,7 @@ begin
   end;
 end;
 
-procedure TMainForm.OpenFile(const FileName: String);
+procedure TMainForm.OpenFile(const FileName: String; AEncoding: TEncoding = nil);
 var
   e: TEditor;
 begin
@@ -1646,7 +1646,7 @@ begin
   end;
 
   // Open the file in an editor
-  e := fEditorList.NewEditor(FileName, False, False);
+  e := fEditorList.NewEditor(FileName, False, False, nil, AEncoding);
   if Assigned(fProject) then begin
     if (not SameFileName(fProject.FileName, FileName)) and (fProject.GetUnitFromString(FileName) = -1) then
       dmMain.RemoveFromHistory(FileName);
@@ -1661,7 +1661,7 @@ begin
     CppParser.ParseFile(e.FileName, e.InProject, True);
 end;
 
-procedure TMainForm.OpenFileList(List: TStringList);
+procedure TMainForm.OpenFileList(List: TStringList; AEncoding: TEncoding = nil);
 var
   I: integer;
 begin
@@ -1683,7 +1683,7 @@ begin
     try
       for I := 0 to List.Count - 1 do
       begin
-        OpenFile(List[I]); // open all files
+        OpenFile(List[I], AEncoding); // open all files
       end;
     finally
       fEditorList.EndUpdate;
@@ -2117,7 +2117,7 @@ end;
 
 procedure TMainForm.actOpenExecute(Sender: TObject);
 begin
-  with TOpenDialog.Create(Self) do try
+  with TOpenTextFileDialog.Create(Self) do try
     Filter := BuildFilter([FLT_PROJECTS, FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]);
     Title := Lang[ID_NV_OPENFILE];
     Options := Options + [ofAllowMultiSelect];
@@ -2125,7 +2125,10 @@ begin
     // Open all provided files
     if Execute then
     begin
-      OpenFileList(TStringList(Files));
+      var LEncIndex := EncodingIndex;
+      var LEncoding := StandardEncodingFromName(Encodings[LEncIndex]);
+
+      OpenFileList(TStringList(Files), LEncoding);
 
       MainPanel.Visible := False;
     end;
@@ -3878,7 +3881,7 @@ begin
   if Assigned(selection) then begin
     Line := StrToIntDef(selection.Caption, 1);
     Col := StrToIntDef(selection.SubItems[0], 1);
-    errorfiletab := fEditorList.GetEditorFromFileName(selection.SubItems[1]);
+    errorfiletab := fEditorList.GetEditorFromFileName(selection.SubItems[1], TEncoding.Default);
 
     if Assigned(errorfiletab) then begin
       errorfiletab.SetErrorFocus(Col, Line);
@@ -3899,7 +3902,7 @@ begin
     Line := StrToIntDef(selected.SubItems[0], 1);
 
     // And open up
-    e := fEditorList.GetEditorFromFileName(selected.SubItems[2]);
+    e := fEditorList.GetEditorFromFileName(selected.SubItems[2], TEncoding.Default);
     if Assigned(e) then begin
 
       // Position the caret
@@ -3993,7 +3996,7 @@ begin
   RemoveActiveBreakpoints;
 
   // Then active the current line in the current file
-  e := fEditorList.GetEditorFromFileName(StringReplace(FileName, '/', '\', [rfReplaceAll]));
+  e := fEditorList.GetEditorFromFileName(StringReplace(FileName, '/', '\', [rfReplaceAll]), TEncoding.Default);
   if Assigned(e) then begin
     e.SetActiveBreakpointFocus(Line);
     e.Activate;
@@ -4218,7 +4221,7 @@ procedure TMainForm.ClassBrowserSelect(Sender: TObject; Filename: TFileName; Lin
 var
   e: TEditor;
 begin
-  e := fEditorList.GetEditorFromFilename(FileName);
+  e := fEditorList.GetEditorFromFilename(FileName, TEncoding.Default);
   if Assigned(e) then begin
     e.SetCaretPosAndActivate(Line, 1);
   end;
@@ -4258,7 +4261,7 @@ begin
     ToEditor.Activate
   else begin
     // We need to open a new editor
-    ToEditor := fEditorList.GetEditorFromFileName(ToFile);
+    ToEditor := fEditorList.GetEditorFromFileName(ToFile, TEncoding.Default);
     if Assigned(ToEditor) then begin
 
       // Move the editors next to each other if possible
@@ -4628,7 +4631,7 @@ begin
   Statement := PStatement(Node.Data);
   FileName := Statement^._FileName;
   Line := Statement^._Line;
-  Editor := fEditorList.GetEditorFromFileName(FileName);
+  Editor := fEditorList.GetEditorFromFileName(FileName, TEncoding.Default);
   if Assigned(Editor) then begin
     Editor.SetCaretPosAndActivate(Line, 1);
   end;
@@ -4646,7 +4649,7 @@ begin
   Statement := PStatement(Node.Data);
   FileName := Statement^._DefinitionFileName;
   Line := Statement^._DefinitionLine;
-  Editor := fEditorList.GetEditorFromFileName(FileName);
+  Editor := fEditorList.GetEditorFromFileName(FileName, TEncoding.Default);
   if Assigned(Editor) then begin
     Editor.SetCaretPosAndActivate(Line, 1);
   end;
@@ -4870,7 +4873,7 @@ begin
           Application.Restore;
           if MessageDlg(Format(Lang[ID_ERR_FILECHANGED], [Filename]), mtConfirmation, [mbYes, mbNo], 0) = mrYes then
             begin
-            e := fEditorList.GetEditorFromFileName(Filename);
+            e := fEditorList.GetEditorFromFileName(Filename, TEncoding.Default);
             if Assigned(e) then begin
               p := e.Text.CaretXY;
               e.Text.Lines.LoadFromFile(Filename);
@@ -6330,9 +6333,9 @@ begin
 
   GetProjectHistory;
 
-  EditorPageControlLeft.TabWidth := 175;
+  //EditorPageControlLeft.TabWidth := 175;
   EditorPageControlLeft.OwnerDraw := True;
-  EditorPageControlRight.TabWidth := 175;
+  //EditorPageControlRight.TabWidth := 175;
   EditorPageControlRight.OwnerDraw := True;
 
   FCloseButtonMouseDownTab := nil;
@@ -7175,13 +7178,13 @@ begin
   end;
 end;
 
-procedure TMainForm.OpenFileProject(s: string);
+procedure TMainForm.OpenFileProject(s: string; AEncoding: TEncoding = nil);
 begin
   if FileExists(s) then begin
     if GetFileTyp(s) = utPrj then
       OpenProject(s)
     else
-      OpenFile(s);
+      OpenFile(s, AEncoding);
   end else
     MessageDlg(Format(Lang[ID_ERR_RENAMEDDELETED], [s]), mtInformation, [mbOK], 0);
 end;

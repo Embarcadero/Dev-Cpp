@@ -3,7 +3,7 @@
         <ProjectGuid>{0B6930FF-C1A8-45A0-B448-2D23D500E0F7}</ProjectGuid>
         <MainSource>devcpp.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>

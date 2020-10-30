@@ -41,11 +41,11 @@ type
     function GetNewEditorPageControl: TPageControl;
     procedure ShowLayout(Layout: TLayoutShowType);
   public
-    function NewEditor(const Filename: String; InProject, NewFile: boolean; PageControl: TPageControl = nil):
+    function NewEditor(const Filename: String; InProject, NewFile: boolean; PageControl: TPageControl = nil; AEncoding: TEncoding = nil):
       TEditor;
     function FileIsOpen(const FileName: String; ProjectOnly: boolean = FALSE): TEditor;
     function GetEditor(PageIndex: integer = -1; PageControl: TPageControl = nil): TEditor;
-    function GetEditorFromFileName(const FileName: String): TEditor;
+    function GetEditorFromFileName(const FileName: String; AEncoding: TEncoding = nil): TEditor;
     function GetEditorFromTag(tag: integer): TEditor;
     function GetPreviousEditor(Editor: TEditor): TEditor;
     procedure ForceCloseEditor(Editor: TEditor); // close, no questions asked
@@ -163,7 +163,7 @@ begin
 end;
 
 function TEditorList.NewEditor(const Filename: String; InProject, NewFile: boolean; PageControl: TPageControl =
-  nil):
+  nil; AEncoding: TEncoding = nil):
   TEditor;
 var
   ParentPageControl: TPageControl;
@@ -175,7 +175,7 @@ begin
     else
       ParentPageControl := PageControl;
 
-    Result := TEditor.Create(FileName, InProject, NewFile, ParentPageControl);
+    Result := TEditor.Create(FileName, InProject, NewFile, ParentPageControl, AEncoding);
 
     // Force layout update when creating, destroying or moving editors
     UpdateLayout;
@@ -420,7 +420,7 @@ begin
   Result := True;
 end;
 
-function TEditorList.GetEditorFromFileName(const FileName: String): TEditor;
+function TEditorList.GetEditorFromFileName(const FileName: String; AEncoding: TEncoding = nil): TEditor;
 var
   FullFileName: String;
   I: integer;
@@ -464,7 +464,7 @@ begin
 
   // Else, just open from disk
   if FileExists(FullFileName) then
-    Result := NewEditor(FullFileName, False, False);
+    Result := NewEditor(FullFileName, False, False, nil, AEncoding);
 end;
 
 function TEditorList.GetEditorFromTag(tag: integer): TEditor;

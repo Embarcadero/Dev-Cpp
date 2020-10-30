@@ -292,10 +292,6 @@ object MainForm: TMainForm
     object LogSheet: TTabSheet
       Caption = 'Compile log'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object InfoGroupBox: TPanel
         Left = 0
         Top = 0
@@ -364,10 +360,6 @@ object MainForm: TMainForm
     object DebugSheet: TTabSheet
       Caption = 'Debugging'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DebugSendPanel: TPanel
         Left = 589
         Top = 0
@@ -1085,10 +1077,6 @@ object MainForm: TMainForm
     object LeftClassSheet: TTabSheet
       Caption = 'Classes'
       ImageIndex = -1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ClassBrowser: TClassBrowser
         Left = 0
         Top = 0
@@ -1124,10 +1112,6 @@ object MainForm: TMainForm
     object LeftDebugSheet: TTabSheet
       Caption = 'Debug'
       ImageIndex = -1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DebugView: TTreeView
         Left = 0
         Top = 0

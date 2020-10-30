@@ -23,7 +23,7 @@ interface
 
 uses
   Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, ProjectTypes, Math, ShellAPI, ShlObj,
-  ComCtrls, System.UITypes, SynEditTextBuffer;
+  ComCtrls, System.UITypes, Vcl.Themes, SynEditTextBuffer;
 
 const
   BoolValYesNo: array[boolean] of String = ('No', 'Yes');
@@ -2443,10 +2443,10 @@ begin
     try
       // Set text area properties
       WantTabs := True;
-      MaxScrollWidth := 4096; // bug-fix #600748
+      //MaxScrollWidth := 4096; // bug-fix #600748
       MaxUndo := 4096;
       BorderStyle := bsNone;
-      FontSmoothing := fsmClearType;
+      Font.Quality := TFontQuality.fqClearType; //FontSmoothing := fsmClearType;
 
       // Select highlighter based on filename (a lot depends on this)
       Highlighter := dmMain.GetHighlighter(FileName);
@@ -2459,8 +2459,8 @@ begin
         SelectedColor.Background := pt.X;
         SelectedColor.Foreground := pt.Y;
       end else begin // editor not colored, pick defaults
-        SelectedColor.Background := clNavy;
-        SelectedColor.Foreground := clWhite;
+        SelectedColor.Background := clNavy; //StyleServices.GetStyleColor(scGenericBackground);// clNavy;
+        SelectedColor.Foreground := clWhite; //StyleServices.GetStyleFontColor(sfWindowTextNormal); // clWhite
       end;
 
       // Set code folding
@@ -2506,8 +2506,8 @@ begin
           Color := pt.x;
           Font.Color := pt.y;
         end else begin // editor not colored, pick defaults
-          Color := clBtnFace;
-          Font.Color := clBlack;
+          Color := clBtnFace;// StyleServices.GetStyleColor(scGenericBackground); //clBtnFace;
+          Font.Color := clBlack; //StyleServices.GetStyleFontColor(sfWindowTextNormal); //clBlack;
         end;
       end;
 
@@ -2515,7 +2515,7 @@ begin
       Options := [
         eoAltSetsColumnMode, eoDisableScrollArrows,
         eoDragDropEditing, eoDropFiles, eoKeepCaretX, eoTabsToSpaces,
-        eoRightMouseMovesCursor, eoScrollByOneLess, eoAutoSizeMaxScrollWidth
+        eoRightMouseMovesCursor, eoScrollByOneLess, eoShowLigatures {eoAutoSizeMaxScrollWidth}
         ];
 
       // Optional synedit options in devData

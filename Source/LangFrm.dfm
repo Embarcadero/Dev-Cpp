@@ -132,12 +132,9 @@ object LangForm: TLangForm
     Font.Height = -13
     Font.Name = 'Courier New'
     Font.Style = []
+    Font.Quality = fqClearTypeNatural
     TabOrder = 3
-    CodeFolding.CollapsedLineColor = clGrayText
-    CodeFolding.FolderBarLinesColor = clGrayText
     CodeFolding.ShowCollapsedLine = True
-    CodeFolding.IndentGuidesColor = clGray
-    CodeFolding.IndentGuides = True
     UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
@@ -152,7 +149,6 @@ object LangForm: TLangForm
       #9'std::cout << "Hello world!\n";'
       #9'return 0;'
       '}')
-    FontSmoothing = fsmNone
   end
   object EditPanel: TPanel
     Left = 260

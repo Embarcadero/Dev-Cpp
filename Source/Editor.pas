@@ -25,7 +25,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
   SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
   SynEditCodeFolding, SynExportHTML, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils,
-  CodeToolTip, CBUtils, System.UITypes, System.Contnrs, SynEditPrint;
+  CodeToolTip, CBUtils, System.UITypes, System.Contnrs, SynEditPrint, Vcl.ExtDlgs;
 
 type
   TCloseTabSheet = class(TTabSheet)
@@ -198,9 +198,9 @@ type
     procedure DebugAfterPaint(ACanvas: TCanvas; AClip: TRect; FirstLine, LastLine: integer);
     function GetPageControl: TPageControl;
     procedure SetPageControl(Value: TPageControl);
-    procedure UpdateEncoding(const FileName: string);
+    function UpdateEncoding(const FileName: string; AEncoding: TEncoding = nil): TEncoding;
   public
-    constructor Create(const Filename: String; InProject, NewFile: boolean; ParentPageControl: TPageControl);
+    constructor Create(const Filename: String; InProject, NewFile: boolean; ParentPageControl: TPageControl; AEncoding: TEncoding);
     destructor Destroy; override;
     function Save: boolean;
     function SaveAs: boolean;
@@ -235,6 +235,8 @@ type
     property PageControl: TPageControl read GetPageControl write SetPageControl;
     property EncodingCorrection: TSymbolCorrectionEncoding read fEncodingCorrection write fEncodingCorrection;
   end;
+  const
+    CTAB_PADDING = '               ';
 
 implementation
 
@@ -342,13 +344,118 @@ begin
   LinesDeletedList(MainForm.FindOutput.Items);
 end;
 
+{ Encoding }
+
+function IsStrUTF8(const Tex : AnsiString): boolean;
+begin
+  result := (Tex <> '') and (UTF8Decode(Tex) <> '');
+end;
+
+function UTF8FileBOM(const FileName: string): boolean;
+var
+  txt: file;
+  bytes: array[0..2] of byte;
+  amt: integer;
+begin
+
+  FileMode := fmOpenRead;
+  AssignFile(txt, FileName);
+  Reset(txt, 1);
+
+  try
+    BlockRead(txt, bytes, 3, amt);
+    result := (amt=3) and (bytes[0] = $EF) and (bytes[1] = $BB) and (bytes[2] = $BF);
+  finally
+    CloseFile(txt);
+  end;
+
+end;
+
+function FileMayBeUTF8(FileName: WideString): Boolean;
+var
+ Stream: TMemoryStream;
+ BytesRead: integer;
+ ArrayBuff: array[0..127] of byte;
+ PreviousByte: byte;
+ i: integer;
+ YesSequences, NoSequences: integer;
+
+begin
+   if not FileExists(FileName) then
+     Exit;
+   YesSequences := 0;
+   NoSequences := 0;
+   Stream := TMemoryStream.Create;
+   try
+     Stream.LoadFromFile(FileName);
+     repeat
+
+     {read from the TMemoryStream}
+
+       BytesRead := Stream.Read(ArrayBuff, High(ArrayBuff) + 1);
+           {Do the work on the bytes in the buffer}
+       if BytesRead > 1 then
+         begin
+           for i := 1 to BytesRead-1 do
+             begin
+               PreviousByte := ArrayBuff[i-1];
+               if ((ArrayBuff[i] and $c0) = $80) then
+                 begin
+                   if ((PreviousByte and $c0) = $c0) then
+                     begin
+                       inc(YesSequences)
+                     end
+                   else
+                     begin
+                       if ((PreviousByte and $80) = $0) then
+                         inc(NoSequences);
+                     end;
+                 end;
+             end;
+         end;
+     until (BytesRead < (High(ArrayBuff) + 1));
+//Below, >= makes ASCII files = UTF-8, which is no problem.
+//Simple > would catch only UTF-8;
+     Result := (YesSequences >= NoSequences);
+
+   finally
+     Stream.Free;
+   end;
+end;
+
+
+type
+  TSynEditStringListEx = class(TSynEditStringList);
+
+// similar functions "IsWideCharMappableToAnsi, IsUnicodeStringMappableToAnsi)
+// are placed in the module SynUnicode.pas. But those functions, without WC_NO_BEST_FIT_CHARS flag,
+// return incorrect results sometimes
+function _IsWideCharMappableToAnsi(const WC: WideChar): Boolean;
+var
+  UsedDefaultChar: BOOL;
+begin
+  WideCharToMultiByte(DefaultSystemCodePage, WC_NO_BEST_FIT_CHARS, PWideChar(@WC), 1, nil, 0, nil,
+    @UsedDefaultChar);
+  Result := not UsedDefaultChar;
+end;
+
+function _IsUnicodeStringMappableToAnsi(const WS: UnicodeString): Boolean;
+var
+  UsedDefaultChar: BOOL;
+begin
+  WideCharToMultiByte(DefaultSystemCodePage, WC_NO_BEST_FIT_CHARS, PWideChar(WS), Length(WS), nil, 0,
+    nil, @UsedDefaultChar);
+  Result := not UsedDefaultChar;
+end;
+
+
 { TEditor }
 
 type
   TSynEditPluginInternal = class(TSynEditPlugin)
   end;
 
-constructor TEditor.Create(const Filename: String; InProject, NewFile: boolean; ParentPageControl: TPageControl);
+constructor TEditor.Create(const Filename: String; InProject, NewFile: boolean; ParentPageControl: TPageControl; AEncoding: TEncoding);
 var
   s: String;
   I: integer;
@@ -374,7 +481,7 @@ begin
 
   // Create a new tab
   fTabSheet := TCloseTabSheet.Create(ParentPageControl);
-  fTabSheet.Caption := ExtractFileName(fFilename); // UntitlexX or main.cpp
+  fTabSheet.Caption := ExtractFileName(fFilename) + CTAB_PADDING; // UntitlexX or main.cpp
   fTabSheet.PageControl := ParentPageControl;
   fTabSheet.Tag := integer(Self); // Define an index for each tab
   fTabSheet.TabVisible := True;
@@ -385,7 +492,22 @@ begin
 
   // Load the file using Lines
   if not NewFile and FileExists(FileName) then begin
-    fText.Lines.LoadFromFile(FileName);
+
+    if (AEncoding = nil) then
+    begin
+      var IsUTF8 := UTF8FileBOM(FileName);
+
+      if not IsUTF8 then
+        IsUTF8 := FileMayBeUTF8(FileName);
+
+      if IsUTF8 then
+      begin
+        AEncoding := TEncoding.UTF8;
+       //TSynEditStringListEx(fText.Lines).SetEncoding(AEncoding);
+      end;
+    end;
+
+    fText.Lines.LoadFromFile(FileName, AEncoding);
     fNew := False;
 
     // Save main.cpp as main.123456789.cpp
@@ -958,61 +1080,40 @@ procedure TEditor.UpdateCaption(const NewCaption: String);
 begin
   if Assigned(fTabSheet) then begin
     if NewCaption <> fTabSheet.Caption then begin
-      fTabSheet.Caption := NewCaption;
+      fTabSheet.Caption := NewCaption + CTAB_PADDING;
     end;
   end;
 end;
 
-type
-  TSynEditStringListEx = class(TSynEditStringList);
-
-// similar functions "IsWideCharMappableToAnsi, IsUnicodeStringMappableToAnsi)
-// are placed in the module SynUnicode.pas. But those functions, without WC_NO_BEST_FIT_CHARS flag,
-// return incorrect results sometimes
-function _IsWideCharMappableToAnsi(const WC: WideChar): Boolean;
+function TEditor.UpdateEncoding(const FileName: string; AEncoding: TEncoding = nil): TEncoding;
 var
-  UsedDefaultChar: BOOL;
+  LLines: TSynEditStringListEx;
+  I: Integer;
 begin
-  WideCharToMultiByte(DefaultSystemCodePage, WC_NO_BEST_FIT_CHARS, PWideChar(@WC), 1, nil, 0, nil,
-    @UsedDefaultChar);
-  Result := not UsedDefaultChar;
-end;
-
-function _IsUnicodeStringMappableToAnsi(const WS: UnicodeString): Boolean;
-var
-  UsedDefaultChar: BOOL;
-begin
-  WideCharToMultiByte(DefaultSystemCodePage, WC_NO_BEST_FIT_CHARS, PWideChar(WS), Length(WS), nil, 0,
-    nil, @UsedDefaultChar);
-  Result := not UsedDefaultChar;
-end;
-
-
-procedure TEditor.UpdateEncoding(const FileName: string);
-var
-  lines: TSynEditStringListEx;
-  i: Integer;
-begin
-  lines := TSynEditStringListEx(fText.Lines);
+  Result := AEncoding;
+  LLines := TSynEditStringListEx(fText.Lines);
 
   if (fEncodingCorrection =  sceNever)
       or not fText.Modified
-      or (lines.Encoding.CodePage = CP_UTF8) then exit;
+      or (LLines.Encoding.CodePage = CP_UTF8) then Exit;
 
   if fEncodingCorrection = sceFixedUTF8 then
     begin
-      lines.SetEncoding(TEncoding.UTF8);
-      exit;
+      LLines.SetEncoding(TEncoding.UTF8);
+      Result := TEncoding.UTF8;
+      Exit;
     end;
 
-  for I := 0 to Lines.Count-1 do
-    if _IsUnicodeStringMappableToAnsi(lines[i]) then
+  for I := 0 to LLines.Count-1 do
+    if IsStrUTF8(LLines[i]) then
+    //if _IsUnicodeStringMappableToAnsi(LLines[i]) then
       begin
         if (fEncodingCorrection = sceAuto)
             or (MessageDlg(Format(Lang[ID_MSG_FILESAVEENCODING], [FileName]),
                                 mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
-          lines.SetEncoding(TEncoding.UTF8);
-        break;
+          LLines.SetEncoding(TEncoding.UTF8);
+          Result := TEncoding.UTF8;
+        Break;
       end;
 end;
 
@@ -1673,7 +1774,7 @@ begin
     (fTripleClickMousePos.Line = fDblClickMousePos.Line) then begin
 
     // Don't let the editor change the caret
-    fText.StateFlags := fText.StateFlags - [sfWaitForDragging];
+    fText.StateFlags := fText.StateFlags - [sfOleDragSource];
 
     // Select the current line
     if fText.CaretY < fText.Lines.Count then begin
@@ -2036,12 +2137,27 @@ function TEditor.SaveAs: boolean;
 var
   UnitIndex: integer;
   SaveFileName: String;
+  LEncIndex: Integer;
+  LEncoding: TEncoding;
 begin
   Result := True;
-  with TSaveDialog.Create(nil) do try
+  with TSaveTextFileDialog.Create(nil) do try
     Title := Lang[ID_NV_SAVEAS];
     Filter := BuildFilter([FLT_CS, FLT_CPPS, FLT_HEADS, FLT_RES]);
     Options := Options + [ofOverwritePrompt];
+
+    if fText.Lines.Encoding=TEncoding.UTF8 then
+      EncodingIndex := 4;
+    if fText.Lines.Encoding=TEncoding.UTF7 then
+      EncodingIndex := 5;
+    if fText.Lines.Encoding=TEncoding.BigEndianUnicode then
+      EncodingIndex := 3;
+    if fText.Lines.Encoding=TEncoding.Unicode then
+      EncodingIndex := 2;
+    if fText.Lines.Encoding=TEncoding.ASCII then
+      EncodingIndex := 1;
+    if fText.Lines.Encoding=TEncoding.ANSI then
+      EncodingIndex := 0;
 
     // select appropriate filter
     if GetFileTyp(fFileName) in [utcHead, utcppHead] then begin
@@ -2072,8 +2188,14 @@ begin
 
     // Open the save box
     if Execute then
+    begin
+      LEncIndex := EncodingIndex;
+      LEncoding := StandardEncodingFromName(Encodings[LEncIndex]);
+
       SaveFileName := FileName // prevent collision between TEditor.FileName and Dialog.FileName
-    else begin
+    end
+    else
+    begin
       Result := False;
       Exit;
     end;
@@ -2086,8 +2208,7 @@ begin
 
   // Try to save to disk
   try
-    UpdateEncoding(fFileName);
-    fText.Lines.SaveToFile(SaveFileName);
+    fText.Lines.SaveToFile(SaveFileName, UpdateEncoding(SaveFileName, LEncoding));
     fText.Modified := False;
     fNew := False;
   except
@@ -2104,7 +2225,7 @@ begin
     if UnitIndex <> -1 then
       MainForm.Project.SaveUnitAs(UnitIndex, SaveFileName); // save as new filename
   end else
-    fTabSheet.Caption := ExtractFileName(SaveFileName);
+    fTabSheet.Caption := ExtractFileName(SaveFileName) + CTAB_PADDING;
 
   // Update window captions
   MainForm.UpdateAppTitle;
@@ -2336,7 +2457,7 @@ begin
             OrigBlockEnd,
             '',
             smNormal);
-          UndoList.AddChange(crDragDropInsert,
+          UndoList.AddChange(crInsert, //crDragDropInsert,
             MoveDelim, // put at start of line me moved down
             BlockEnd, // modified
             SelText + #13#10 + S,
@@ -2380,7 +2501,7 @@ begin
         try
           // backup original selection
           UndoList.AddChange(crSelection, OrigBlockBegin, OrigBlockEnd, '', smNormal);
-          UndoList.AddChange(crDragDropInsert,
+          UndoList.AddChange(crInsert, //crDragDropInsert,
             BlockBegin, // modified
             MoveDelim, // put at end of line me moved up
             S + #13#10 + SelText,

@@ -24,6 +24,7 @@ object ExceptionFrm: TExceptionFrm
     Width = 600
     Height = 45
     Align = alTop
+    Brush.Color = clBtnFace
     Pen.Style = psClear
   end
   object lblError: TLabel
