@@ -1,3 +1,17 @@
+Version 6.1 - 2 November 2020
+
+ - Updated: C++ keyword highlighting. Added some C++20 keywords.
+ - Updated: Font ligature support.
+ - Updated: SVGIconImageList dependency
+ - Updated: SynEdit dependency.
+ - Updated: Text file loading and saving dialogs with Encodings.
+ - Added: Visual Studio Dark theme.
+ - Fixed: Automatic Tab widths.
+ - Fixed: Launching help from directory with spaces.
+ - Fixed: Welcome screen issue when canceling closing.
+ - Fixed: Shortcuts Form dark styling.
+ - Fixed: Crash in Issue #26.
+
 Version 6.0 - 12 October 2020
 
 - Upgraded TDM-GCC to 32/64 9.2.0.
