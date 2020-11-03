@@ -85,12 +85,9 @@ object FormatterOptionsForm: TFormatterOptionsForm
     Font.Height = -13
     Font.Name = 'Courier New'
     Font.Style = []
+    Font.Quality = fqClearTypeNatural
     TabOrder = 0
-    CodeFolding.CollapsedLineColor = clGrayText
-    CodeFolding.FolderBarLinesColor = clGrayText
     CodeFolding.ShowCollapsedLine = True
-    CodeFolding.IndentGuidesColor = clGray
-    CodeFolding.IndentGuides = True
     UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
@@ -108,7 +105,6 @@ object FormatterOptionsForm: TFormatterOptionsForm
       #9'}'
       '}')
     ReadOnly = True
-    FontSmoothing = fsmNone
   end
   object grpOptions: TGroupBox
     Left = 8
