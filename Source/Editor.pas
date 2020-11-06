@@ -2262,6 +2262,11 @@ begin
 
     inherited;
 
+    if SpaceCount2 > 0 then begin
+      //Lines[CaretY] := Copy(Lines[BackCounter], 1, SpaceCount2); // copy previous indent
+      if not (eoTabsToSpaces in Options) then
+        SpaceCount2 := SpaceCount2-(TabWidth-1); // Workaround to fix #55
+    end;
     var Attr: TSynHighlighterAttributes;
     if GetHighlighterAttriAtRowCol(BufferCoord(Length(Temp), CaretY - 1), Temp, Attr) then begin // only add indent to source files
       if Attr <> Highlighter.CommentAttribute then begin // and outside of comments
