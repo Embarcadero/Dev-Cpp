@@ -155,8 +155,6 @@ type
     fCurrentEvalWord: String;
     fIgnoreCaretChange: boolean;
     fPreviousEditors: TList;
-    fDblClickTime: Cardinal;
-    fDblClickMousePos: TBufferCoord;
     fCompletionTimer: TTimer;
     fCompletionBox: TCodeCompletion;
     fCompletionInitialPosition: TBufferCoord;
@@ -172,8 +170,6 @@ type
     procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure EditorDblClick(Sender: TObject);
-    procedure EditorClick(Sender: TObject);
     procedure EditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
     procedure EditorReplaceText(Sender: TObject; const aSearch, aReplace: String; Line, Column: integer; var Action:
       TSynReplaceAction);
@@ -346,9 +342,9 @@ end;
 
 { Encoding }
 
-function IsStrUTF8(const Tex : AnsiString): boolean;
+function IsStrUTF8(const Text: AnsiString): boolean;
 begin
-  result := (Tex <> '') and (UTF8Decode(Tex) <> '');
+  result := (Text <> '') and (UTF8Decode(Text) <> Text);
 end;
 
 function UTF8FileBOM(const FileName: string): boolean;
@@ -506,8 +502,8 @@ begin
        //TSynEditStringListEx(fText.Lines).SetEncoding(AEncoding);
       end;
     end;
-
     fText.Lines.LoadFromFile(FileName, AEncoding);
+
     fNew := False;
 
     // Save main.cpp as main.123456789.cpp
@@ -518,8 +514,8 @@ begin
   end else
   begin
     // Initialize Lines
-    var EmptyStream := TStringStream.Create('');
-    fText.Lines.LoadFromStream(EmptyStream);
+    var EmptyStream := TStringStream.Create('', devEditor.GetNewDocEncoding);
+    fText.Lines.LoadFromStream(EmptyStream, devEditor.GetNewDocEncoding);
     EmptyStream.Free;
 
     fNew := True;
@@ -534,8 +530,6 @@ begin
   fText.OnStatusChange := EditorStatusChange;
   fText.OnReplaceText := EditorReplaceText;
   fText.OnDropFiles := EditorDropFiles;
-  fText.OnDblClick := EditorDblClick;
-  fText.OnClick := EditorClick;
   fText.OnMouseUp := EditorMouseUp;
   fText.OnMouseMove := EditorMouseMove;
   fText.OnGutterClick := EditorGutterClick;
@@ -1103,6 +1097,9 @@ begin
       Result := TEncoding.UTF8;
       Exit;
     end;
+
+  if Assigned(LLines.Encoding) and (LLines.Encoding <> TEncoding.Default) then
+    Exit;
 
   for I := 0 to LLines.Count-1 do
     if IsStrUTF8(LLines[i]) then
@@ -1755,38 +1752,6 @@ begin
   end;
 end;
 
-procedure TEditor.EditorDblClick(Sender: TObject);
-begin
-  fDblClickTime := GetTickCount;
-  fText.GetPositionOfMouse(fDblClickMousePos);
-end;
-
-procedure TEditor.EditorClick(Sender: TObject);
-var
-  fTripleClickTime: Cardinal;
-  fTripleClickMousePos: TBufferCoord;
-begin
-  fTripleClickTime := GetTickCount;
-  fText.GetPositionOfMouse(fTripleClickMousePos);
-  if (fTripleClickTime > fDblClickTime) and
-    (fTripleClickTime - GetDoubleClickTime < fDblClickTime) and
-    (fTripleClickMousePos.Char = fDblClickMousePos.Char) and
-    (fTripleClickMousePos.Line = fDblClickMousePos.Line) then begin
-
-    // Don't let the editor change the caret
-    fText.StateFlags := fText.StateFlags - [sfOleDragSource];
-
-    // Select the current line
-    if fText.CaretY < fText.Lines.Count then begin
-      fText.BlockBegin := BufferCoord(1, fText.CaretY);
-      fText.BlockEnd := BufferCoord(1, fText.CaretY + 1);
-    end else begin
-      fText.BlockBegin := BufferCoord(1, fText.CaretY);
-      fText.BlockEnd := BufferCoord(Length(fText.Lines[fText.CaretY - 1]) + 1, fText.CaretY);
-    end;
-  end;
-end;
-
 procedure TEditor.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
   s: String;
@@ -2020,8 +1985,7 @@ begin
     Exit;
 
   // Is the OpenChar before/after us highlighted as a symbol (not a comment or something)?
-  if not (fText.GetHighlighterAttriAtRowCol(HighlightCharPos, S, Attri) and (Attri = fText.Highlighter.SymbolAttribute))
-    then
+  if not (fText.GetHighlighterAttriAtRowCol(HighlightCharPos, S, Attri) and (Attri = fText.Highlighter.SymbolAttribute)) then
     Exit;
 
   // Find the corresponding bracket
@@ -2041,8 +2005,8 @@ begin
   Canvas.Font.Style := Attri.Style;
 
   // Draw the character the caret is at here using this color
-  SetColors(HighlightCharPos);
   Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(HighlightCharPos));
+  SetColors(HighlightCharPos); // SetColors must be after BufferToDisplayPos as BufferToDisplayPos reset Canvas
 
   if Pix.X > fText.Gutter.Width then begin // only draw if inside viewable area
     S := fText.Lines[HighlightCharPos.Line - 1][HighlightCharPos.Char];
@@ -2050,8 +2014,8 @@ begin
   end;
 
   // Then draw complement
-  SetColors(ComplementCharPos);
   Pix := fText.RowColumnToPixels(fText.BufferToDisplayPos(ComplementCharPos));
+  SetColors(ComplementCharPos); // SetColors must be after BufferToDisplayPos as BufferToDisplayPos reset Canvas
 
   if Pix.X > fText.Gutter.Width then begin // only draw if inside viewable area
     S := fText.Lines[ComplementCharPos.Line - 1][ComplementCharPos.Char];
@@ -2262,11 +2226,6 @@ begin
 
     inherited;
 
-    if SpaceCount2 > 0 then begin
-      //Lines[CaretY] := Copy(Lines[BackCounter], 1, SpaceCount2); // copy previous indent
-      if not (eoTabsToSpaces in Options) then
-        SpaceCount2 := SpaceCount2-(TabWidth-1); // Workaround to fix #55
-    end;
     var Attr: TSynHighlighterAttributes;
     if GetHighlighterAttriAtRowCol(BufferCoord(Length(Temp), CaretY - 1), Temp, Attr) then begin // only add indent to source files
       if Attr <> Highlighter.CommentAttribute then begin // and outside of comments
@@ -2280,8 +2239,8 @@ begin
           end;
         end;
       end;
+      InternalCaretXY := BufferCoord(SpaceCount2 + 1, CaretY);
     end;
-    InternalCaretXY := BufferCoord(SpaceCount2 + 1, CaretY);
     Exit;
   end;
 
@@ -2313,6 +2272,14 @@ constructor TSynEditEx.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FeoAddIndent := False;
+
+  var DeleteLineIndex := Keystrokes.FindCommand(ecDeleteLine);
+  if DeleteLineIndex <> -1 then
+    Keystrokes.Delete(DeleteLineIndex);
+
+  DeleteLineIndex := Keystrokes.FindCommand(ecDeleteEOL);
+  if DeleteLineIndex <> -1 then
+    Keystrokes.Delete(DeleteLineIndex);
 end;
 
 procedure TSynEditEx.DoComment;

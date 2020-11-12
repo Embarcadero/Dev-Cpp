@@ -23,7 +23,7 @@ interface
 
 uses
   Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, ProjectTypes, Math, ShellAPI, ShlObj,
-  ComCtrls, System.UITypes, Vcl.Themes, SynEditTextBuffer;
+  ComCtrls, System.UITypes, Vcl.Themes, SynEditTextBuffer, System.SysUtils;
 
 const
   BoolValYesNo: array[boolean] of String = ('No', 'Yes');
@@ -322,6 +322,7 @@ type
     fUseSyn: boolean; // use syntax highlighting
     fSynExt: String; // semi-colon seperated list of highlight ext's
     fFont: TFont; // Editor Font
+    fShowLigatures: Boolean; //Font ligatures
     fGutterFont: TFont; // Gutter font
     fInsertCaret: integer; // Editor insert caret
     fOverwriteCaret: integer; // Editor overwrite caret
@@ -380,6 +381,7 @@ type
     fDoubleQuoteComplete: boolean;
     fCompleteSymbols: boolean;
     fDeleteSymbolPairs: boolean;
+    fNewDocEncoding: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -388,6 +390,9 @@ type
     procedure LoadSettings;
 
     procedure AssignEditor(editor: TSynEdit; const FileName: String);
+
+    function GetNewDocEncoding: TEncoding;
+
   published
     property AutoIndent: boolean read fAutoIndent write fAutoIndent;
     property AddIndent: boolean read fAddIndent write fAddIndent;
@@ -405,6 +410,7 @@ type
     property SpecialChars: boolean read fSpecialChar write fSpecialChar;
     property ShowFunctionTip: boolean read fShowFunctionTip write fShowFunctionTip;
     property TrimTrailingSpaces: boolean read fTrimTrailingSpaces write fTrimTrailingSpaces;
+    property NewDocEncoding: string read fNewDocEncoding write fNewDocEncoding;
 
     property TabSize: integer read fTabSize write fTabSize;
     property MarginVis: boolean read fMarginVis write fMarginVis;
@@ -414,6 +420,7 @@ type
     property OverwriteCaret: integer read fOverwriteCaret write fOverwriteCaret;
     property InsDropFiles: boolean read fInsDropFiles write fInsDropFiles;
     property Font: TFont read fFont write fFont;
+    property ShowLigatures: Boolean read fShowLigatures write fShowLigatures;
 
     // Gutter options
     property GutterVis: boolean read fShowGutter write fShowGutter;
@@ -729,8 +736,8 @@ var
 implementation
 
 uses
-  MultiLangSupport, DataFrm, SysUtils, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
-  FileAssocs, TypInfo, DateUtils, Types, System.IOUtils;
+  MultiLangSupport, DataFrm, StrUtils, Forms, main, compiler, Controls, version, utils, SynEditMiscClasses,
+  FileAssocs, TypInfo, DateUtils, Types, System.IOUtils, Vcl.ExtDlgs;
 
 procedure CreateOptions;
 var
@@ -2346,6 +2353,11 @@ begin
   inherited;
 end;
 
+function TdevEditor.GetNewDocEncoding: TEncoding;
+begin
+  Result := StandardEncodingFromName(fNewDocEncoding);
+end;
+
 procedure TdevEditor.LoadSettings;
 begin
   devData.ReadObject('Editor', Self);
@@ -2379,7 +2391,8 @@ begin
   fParserHints := TRUE; // Editor hints
   fShowFunctionTip := TRUE;
   fTrimTrailingSpaces := FALSE;
-
+  fNewDocEncoding := DefaultEncodingNames[0]; //ANSI
+  
   // Caret
   fInsertCaret := 0;
   fOverwriteCaret := 3;
@@ -2402,6 +2415,7 @@ begin
   fFont.Size := 10;
   //fFont.name := 'Source Code Pro';
   //fFont.Size := 10;
+  fShowLigatures := True;
 
   // Display #2
   fShowGutter := TRUE;
@@ -2515,7 +2529,7 @@ begin
       Options := [
         eoAltSetsColumnMode, eoDisableScrollArrows,
         eoDragDropEditing, eoDropFiles, eoKeepCaretX, eoTabsToSpaces,
-        eoRightMouseMovesCursor, eoScrollByOneLess, eoShowLigatures {eoAutoSizeMaxScrollWidth}
+        eoRightMouseMovesCursor, eoScrollByOneLess {eoAutoSizeMaxScrollWidth}
         ];
 
       // Optional synedit options in devData
@@ -2547,6 +2561,9 @@ begin
         Options := Options + [eoShowSpecialChars];
       if fTrimTrailingSpaces then
         Options := Options + [eoTrimTrailingSpaces];
+      if fShowLigatures then
+        Options := Options + [eoShowLigatures];
+
     finally
       EndUpdate;
     end;

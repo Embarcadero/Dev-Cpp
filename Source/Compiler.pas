@@ -118,7 +118,7 @@ type
 implementation
 
 uses
-  System.UITypes, MultiLangSupport, Macros, devExec, main, StrUtils;
+  System.UITypes, MultiLangSupport, Macros, devExec, main, StrUtils, System.IOUtils;
 
 procedure TCompiler.DoLogEntry(const msg: String);
 begin
@@ -171,8 +171,10 @@ begin
   // Create OBJ output directory
   SetCurrentDir(fProject.Directory); // .dev file location
   if fProject.Options.ObjectOutput <> '' then
-    if not DirectoryExists(fProject.Options.ObjectOutput) then
-      CreateDir(fProject.Options.ObjectOutput);
+    TDirectory.CreateDirectory(fProject.Options.ObjectOutput);
+
+  if not fProject.Options.ExeOutput.IsEmpty then
+    TDirectory.CreateDirectory(fProject.Options.ExeOutput);
 
   // Should not return custom filename
   fMakefile := fProject.MakeFileName;
@@ -283,8 +285,8 @@ begin
   end;
   Writeln(F, 'WINDRES  = ' + fCompilerSet.windresName);
   if (ObjResFile <> '') then begin
-    Writeln(F, 'RES      = ' + GenMakePath1(ObjResFile));
-    Writeln(F, 'OBJ      = ' + Objects + ' $(RES)');
+    Writeln(F, 'RES      = ' + GenMakePath1(ExtractRelativePath(fProject.FileName, ObjResFile)));
+    Writeln(F, 'OBJ      = ' + Objects + ' $(RES)' );
     Writeln(F, 'LINKOBJ  = ' + LinkObjects + ' $(RES)');
   end else begin
     Writeln(F, 'OBJ      = ' + Objects);

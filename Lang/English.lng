@@ -1257,3 +1257,5 @@ Ver=1
 79019=Powered by %s
 79020=Max. line length:
 79021=// Could not find the AStyle output file:<CR>// %s
+79022=Use font ligatures is available
+79023=New Document Encoding:
