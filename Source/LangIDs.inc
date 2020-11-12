@@ -1310,3 +1310,6 @@ const
   ID_FORMATTER_POWEREDBY                = 79019;
   ID_FORMATTER_MAXLINELENGTH            = 79020;
   ID_FORMATTER_LOADERROR                = 79021;
+
+  ID_EOPT_LIGATURE                      = 79022;
+  ID_EOPT_NEWDOCENCODING                = 79023;

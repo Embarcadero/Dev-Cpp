@@ -26,14 +26,14 @@ object EditorOptForm: TEditorOptForm
     Top = 0
     Width = 485
     Height = 455
-    ActivePage = tabSyntax
+    ActivePage = tabGeneral
     TabOrder = 0
     OnChange = PagesMainChange
     object tabGeneral: TTabSheet
       Caption = 'General'
       object grpMargin: TGroupBox
         Left = 264
-        Top = 220
+        Top = 235
         Width = 201
         Height = 92
         Caption = '  Right Margin  '
@@ -86,11 +86,18 @@ object EditorOptForm: TEditorOptForm
         Left = 9
         Top = 3
         Width = 456
-        Height = 190
+        Height = 222
         Caption = '  Editor Options  '
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 0
+        object lbNewDocEncoding: TLabel
+          Left = 8
+          Top = 190
+          Width = 139
+          Height = 15
+          Caption = 'New Document Encoding:'
+        end
         object cbFunctionHint: TCheckBox
           Left = 241
           Top = 166
@@ -219,10 +226,18 @@ object EditorOptForm: TEditorOptForm
           Caption = 'Show Special Line Chars'
           TabOrder = 6
         end
+        object cbNewDocEncoding: TComboBox
+          Left = 182
+          Top = 186
+          Width = 267
+          Height = 23
+          Style = csDropDownList
+          TabOrder = 16
+        end
       end
       object grpCaret: TGroupBox
         Left = 9
-        Top = 220
+        Top = 235
         Width = 248
         Height = 92
         Caption = '  Caret  '
@@ -231,7 +246,7 @@ object EditorOptForm: TEditorOptForm
         TabOrder = 1
         object lblInsertCaret: TLabel
           Left = 8
-          Top = 16
+          Top = 17
           Width = 61
           Height = 15
           Caption = 'Insert caret:'
@@ -280,7 +295,7 @@ object EditorOptForm: TEditorOptForm
       end
       object grpHighCurLine: TGroupBox
         Left = 264
-        Top = 332
+        Top = 338
         Width = 201
         Height = 84
         Caption = 'Highlight current line'
@@ -315,7 +330,7 @@ object EditorOptForm: TEditorOptForm
       end
       object grpTabs: TGroupBox
         Left = 9
-        Top = 332
+        Top = 338
         Width = 248
         Height = 84
         Caption = '  Tabs  '
@@ -495,9 +510,12 @@ object EditorOptForm: TEditorOptForm
         Left = 9
         Top = 3
         Width = 456
-        Height = 111
+        Height = 141
         Caption = '  Editor Font  '
         TabOrder = 0
+        DesignSize = (
+          456
+          141)
         object lblEditorSize: TLabel
           Left = 360
           Top = 16
@@ -535,6 +553,17 @@ object EditorOptForm: TEditorOptForm
           TabOrder = 1
           Value = 10
           OnChange = edEditorSizeChange
+        end
+        object cbLigatures: TCheckBox
+          Left = 8
+          Top = 114
+          Width = 345
+          Height = 15
+          Anchors = [akLeft, akTop, akRight]
+          Caption = 'Use font ligatures is available'
+          Checked = True
+          State = cbChecked
+          TabOrder = 2
         end
       end
     end
@@ -785,10 +814,6 @@ object EditorOptForm: TEditorOptForm
     end
     object tabCode: TTabSheet
       Caption = 'Snippets'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PagesSnippets: TPageControl
         Left = 0
         Top = 0
@@ -799,10 +824,6 @@ object EditorOptForm: TEditorOptForm
         TabOrder = 0
         object tabCPInserts: TTabSheet
           Caption = 'Inserts'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object btnAdd: TButton
             Left = 384
             Top = 45
@@ -885,10 +906,6 @@ object EditorOptForm: TEditorOptForm
         end
         object tabCPDefault: TTabSheet
           Caption = 'Default Insert'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object cbDefaultCode: TCheckBox
             Left = 4
             Top = 2
@@ -947,10 +964,6 @@ object EditorOptForm: TEditorOptForm
     end
     object tabCBCompletion: TTabSheet
       Caption = 'Completion'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PagesCompletion: TPageControl
         Left = 0
         Top = 0
@@ -962,10 +975,6 @@ object EditorOptForm: TEditorOptForm
         object tabCodeCompletion: TTabSheet
           Caption = 'Code Completion'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object lblCompletionColor: TLabel
             Left = 328
             Top = 108
@@ -1051,10 +1060,6 @@ object EditorOptForm: TEditorOptForm
         object tabSymbolCompletion: TTabSheet
           Caption = 'Symbol Completion'
           ImageIndex = 2
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object grpSpecific: TGroupBox
             Left = 16
             Top = 40
@@ -1162,10 +1167,6 @@ object EditorOptForm: TEditorOptForm
     object tabAutosave: TTabSheet
       Caption = 'Autosave'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object cbAutoSave: TCheckBox
         Left = 8
         Top = 8

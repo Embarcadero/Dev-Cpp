@@ -154,6 +154,9 @@ type
     cbDeleteCompleted: TCheckBox;
     cbSingleQuotes: TCheckBox;
     cbDoubleQuotes: TCheckBox;
+    cbLigatures: TCheckBox;
+    lbNewDocEncoding: TLabel;
+    cbNewDocEncoding: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure SetGutter;
     procedure ElementListClick(Sender: TObject);
@@ -214,7 +217,7 @@ type
 implementation
 
 uses
-  System.Types, shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, DataFrm, IniFiles, editor,
+  System.Types, Vcl.ExtDlgs, shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, DataFrm, IniFiles, editor,
   main;
 
 {$R *.dfm}
@@ -231,6 +234,9 @@ var
   I: integer;
   FontIndex: Integer;
 begin
+  for var EncName in DefaultEncodingNames do
+    cbNewDocEncoding.Items.Add(EncName);
+
   LoadText;
 
   with devEditor do begin
@@ -282,6 +288,7 @@ begin
     cbHighCurrLine.Checked := HighCurrLine;
     cpHighColor.Selected := HighColor;
     cpHighColor.Enabled := cbHighCurrLine.Checked;
+    cbNewDocEncoding.ItemIndex := cbNewDocEncoding.Items.IndexOf(NewDocEncoding);
 
     // Fonts
     LoadFonts; // fill dropdowns
@@ -295,6 +302,8 @@ begin
     if FontIndex = -1 then
       FontIndex := cboEditorFont.Items.IndexOf('Courier');
     cboEditorFont.ItemIndex := FontIndex;
+
+    cbLigatures.Checked := ShowLigatures;
 
     edEditorSize.Value := devEditor.Font.Size;
     cbGutterFnt.Checked := Gutterfnt;
@@ -561,6 +570,7 @@ begin
   cbFunctionHint.Caption := Lang[ID_EOPT_CLOSEBRACE];
   ScrollHint.Caption := Lang[ID_EOPT_CTRLSCROLLHINT];
   cbSyntaxHighlight.Caption := Lang[ID_EOPT_USESYNTAX];
+  lbNewDocEncoding.Caption := Lang[ID_EOPT_NEWDOCENCODING];
 
   grpMargin.Caption := Lang[ID_EOPT_MARGIN];
   cbMarginVis.Caption := Lang[ID_EOPT_GENERICENABLED];
@@ -597,6 +607,7 @@ begin
   grpEditorFont.Caption := Lang[ID_EOPT_EDFONT];
   lblEditorFont.Caption := Lang[ID_EOPT_FONT];
   lblEditorSize.Caption := Lang[ID_EOPT_SIZE];
+  cbLigatures.Caption := Lang[ID_EOPT_LIGATURE];
 
   grpGutter.Caption := Lang[ID_EOPT_GUTTER];
   cbGutterVis.Caption := Lang[ID_EOPT_VISIBLE];
@@ -687,6 +698,7 @@ begin
     SpecialChars := cbSpecialChars.Checked;
     ShowFunctionTip := cbFunctionHint.Checked;
     TrimTrailingSpaces := cbTrimTrailingSpaces.Checked;
+    NewDocEncoding := cbNewDocEncoding.Text;
 
     MarginVis := cbMarginVis.Checked;
     MarginSize := edMarginWidth.Value;
@@ -716,6 +728,8 @@ begin
     LeadZero := cbLeadZero.Checked;
     FirstLineZero := cbFirstZero.Checked;
     InsDropFiles := cbDropFiles.Checked;
+
+    ShowLigatures := cbLigatures.Checked;
 
     ParserHints := cbParserHints.Checked;
 
