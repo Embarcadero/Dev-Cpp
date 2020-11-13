@@ -3,7 +3,7 @@
 
 !define COMPILERNAME "No Compiler"
 !define COMPILERFOLDER ""
-!define DEVCPP_VERSION "6.1"
+!define DEVCPP_VERSION "6.2"
 !define FINALNAME "Embarcadero_Dev-Cpp_${DEVCPP_VERSION}_${COMPILERNAME}_Setup.exe"
 !define DISPLAY_NAME "Embarcadero Dev-C++ ${DEVCPP_VERSION}"
 

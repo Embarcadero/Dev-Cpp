@@ -567,12 +567,6 @@ type
     LabelRun: TLabel;
     LabelCompile: TLabel;
     LabelClear: TLabel;
-    LabelDescOpen: TStaticText;
-    LabelDescSave: TStaticText;
-    LabelDescZoom: TStaticText;
-    LabelDescRun: TStaticText;
-    LabelDescCompile: TStaticText;
-    LabelDescClear: TStaticText;
     RichEdit1: TRichEdit;
     RichEdit2: TRichEdit;
     RichEdit3: TRichEdit;
@@ -594,6 +588,12 @@ type
     actConsoleClose: TAction;
     ImageEmbarcadero: TVirtualImage;
     LabelSponsor: TLabel;
+    PanelDescOpen: TPanel;
+    PanelDescSave: TPanel;
+    PanelDescZoom: TPanel;
+    PanelDescRun: TPanel;
+    PanelDescCompile: TPanel;
+    PanelDescClear: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure ToggleBookmarkClick(Sender: TObject);
@@ -7068,7 +7068,7 @@ begin
   TStyleManager.TrySetStyle(cDelphiStyle[devData.Style]);
   LabelNumVersion.Font.Color := clRed;
   case devData.Style of
-    2,3: ImageEmbarcadero.ImageIndex := 1;
+    2, 3, 4, 5, 6: ImageEmbarcadero.ImageIndex := 1;
   else
     ImageEmbarcadero.ImageIndex := 0;
   end;
@@ -7214,12 +7214,12 @@ begin
   LabelRun.Left := (PageControlPanel.Width div 4) - 28;
   LabelCompile.Left := (PageControlPanel.Width div 4) - 50;
   LabelClear.left := (PageControlPanel.Width div 4) - 34;
-  LabelDescOpen.Left := (PageControlPanel.Width div 4) + 18;
-  LabelDescSave.Left := (PageControlPanel.Width div 4) + 18;
-  LabelDescZoom.Left := (PageControlPanel.Width div 4) + 18;
-  LabelDescRun.Left := (PageControlPanel.Width div 4) + 18;
-  LabelDescCompile.Left := (PageControlPanel.Width div 4) + 18;
-  LabelDescClear.Left := (PageControlPanel.Width div 4) + 18;
+  PanelDescOpen.Left := (PageControlPanel.Width div 4) + 18;
+  PanelDescSave.Left := (PageControlPanel.Width div 4) + 18;
+  PanelDescZoom.Left := (PageControlPanel.Width div 4) + 18;
+  PanelDescRun.Left := (PageControlPanel.Width div 4) + 18;
+  PanelDescCompile.Left := (PageControlPanel.Width div 4) + 18;
+  PanelDescClear.Left := (PageControlPanel.Width div 4) + 18;
   ButtonNewDocument.Left := Max(50, (PanelRight.Width div 2) - ButtonNewDocument.Width - (ButtonOpenDocument.Width div 2) - 65);
   ButtonOpenDocument.Left := ButtonNewDocument.Left + ButtonNewDocument.Width + 25;
   ButtonOptions.Left := ButtonOpenDocument.Left + ButtonOpenDocument.Width + 25;

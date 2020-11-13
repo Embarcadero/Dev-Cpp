@@ -106,8 +106,8 @@ var
   dmMain: TdmMain;
 
 const
-  cDelphiStyle: array[0..3] of string = ('Windows','Windows10','Windows10 SlateGray','Windows10 Blue Whale');
-  cSVGColor: array[0..3] of string = ('None','clGrayText','clMoneyGreen','clSkyBlue');
+  cDelphiStyle: array[0..8] of string = ('Windows','Windows10','Windows10 SlateGray','Windows10 Blue Whale','Windows10 BlackPearl','Glossy','Calypso','Flat UI Light','Material Patterns Blue');
+  cSVGColor: array[0..8] of string = ('None','clGrayText','clMoneyGreen','clSkyBlue','clGrayText','clGrayText','clGrayText','clGrayText','clGrayText');
 implementation
 
 uses

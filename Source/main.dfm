@@ -1621,7 +1621,7 @@ object MainForm: TMainForm
           Top = 309
           Width = 18
           Height = 16
-          Caption = '6.1'
+          Caption = '6.2'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clRed
           Font.Height = -13
@@ -4305,83 +4305,77 @@ object MainForm: TMainForm
           Font.Style = []
           ParentFont = False
         end
-        object LabelDescOpen: TStaticText
+        object PanelDescOpen: TPanel
           Left = 245
           Top = 384
           Width = 69
           Height = 19
-          Alignment = taCenter
-          AutoSize = False
-          BorderStyle = sbsSingle
+          BevelOuter = bvNone
           Caption = 'Ctr + O'
           Color = clBtnShadow
-          ParentColor = False
+          ParentBackground = False
           TabOrder = 0
+          StyleElements = [seFont, seBorder]
         end
-        object LabelDescClear: TStaticText
-          Left = 245
-          Top = 522
-          Width = 69
-          Height = 19
-          Alignment = taCenter
-          AutoSize = False
-          BorderStyle = sbsSingle
-          Caption = 'Ctr + W'
-          Color = clBtnShadow
-          ParentColor = False
-          TabOrder = 1
-        end
-        object LabelDescCompile: TStaticText
-          Left = 245
-          Top = 497
-          Width = 69
-          Height = 19
-          Alignment = taCenter
-          AutoSize = False
-          BorderStyle = sbsSingle
-          Caption = 'F9'
-          Color = clBtnShadow
-          ParentColor = False
-          TabOrder = 2
-        end
-        object LabelDescRun: TStaticText
-          Left = 245
-          Top = 470
-          Width = 69
-          Height = 19
-          Alignment = taCenter
-          AutoSize = False
-          BorderStyle = sbsSingle
-          Caption = 'F10'
-          Color = clBtnShadow
-          ParentColor = False
-          TabOrder = 3
-        end
-        object LabelDescSave: TStaticText
+        object PanelDescSave: TPanel
           Left = 245
           Top = 413
           Width = 69
           Height = 19
-          Alignment = taCenter
-          AutoSize = False
-          BorderStyle = sbsSingle
+          BevelOuter = bvNone
           Caption = 'Ctr + S'
           Color = clBtnShadow
-          ParentColor = False
-          TabOrder = 4
+          ParentBackground = False
+          TabOrder = 1
+          StyleElements = [seFont, seBorder]
         end
-        object LabelDescZoom: TStaticText
+        object PanelDescZoom: TPanel
           Left = 245
           Top = 442
           Width = 69
           Height = 19
-          Alignment = taCenter
-          AutoSize = False
-          BorderStyle = sbsSingle
+          BevelOuter = bvNone
           Caption = 'Ctr + Scroll'
           Color = clBtnShadow
-          ParentColor = False
+          ParentBackground = False
+          TabOrder = 2
+          StyleElements = [seFont, seBorder]
+        end
+        object PanelDescRun: TPanel
+          Left = 245
+          Top = 470
+          Width = 69
+          Height = 19
+          BevelOuter = bvNone
+          Caption = 'F10'
+          Color = clBtnShadow
+          ParentBackground = False
+          TabOrder = 3
+          StyleElements = [seFont, seBorder]
+        end
+        object PanelDescCompile: TPanel
+          Left = 245
+          Top = 497
+          Width = 69
+          Height = 19
+          BevelOuter = bvNone
+          Caption = 'F9'
+          Color = clBtnShadow
+          ParentBackground = False
+          TabOrder = 4
+          StyleElements = [seFont, seBorder]
+        end
+        object PanelDescClear: TPanel
+          Left = 245
+          Top = 522
+          Width = 69
+          Height = 19
+          BevelOuter = bvNone
+          Caption = 'Ctr + W'
+          Color = clBtnShadow
+          ParentBackground = False
           TabOrder = 5
+          StyleElements = [seFont, seBorder]
         end
       end
       object PanelRight: TPanel

@@ -221,7 +221,12 @@ object LangForm: TLangForm
           'Windows Classic'
           'Windows 10'
           'Slate Gray'
-          'Blue Whale')
+          'Blue Whale'
+          'Black Pearl'
+          'Glossy'
+          'Calypso'
+          'Flat UI Light'
+          'Material Pattens Blue')
       end
       object cmbColors: TComboBox
         Left = 56

@@ -91,7 +91,16 @@ type
     cbUIfontsize: TComboBox;
     ListBoxStyle: TListBox;
     lblSize: TLabel;
-    VirtualImageTheme: TVirtualImage;
+    Panel1: TPanel;
+    Button1: TButton;
+    ComboBox1: TComboBox;
+    CheckBox1: TCheckBox;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    Button2: TButton;
+    Button3: TButton;
+    RadioGroup1: TRadioGroup;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -229,7 +238,10 @@ end;
 
 procedure TEnviroForm.ListBoxStyleClick(Sender: TObject);
 begin
-  VirtualImageTheme.ImageIndex := ListBoxStyle.ItemIndex;
+  Panel1.StyleName := cDelphiStyle[ListBoxStyle.ItemIndex];
+  Panel1.Repaint;
+  for var I := 0 to Panel1.ControlCount-1 do
+   Panel1.Controls[i].Repaint;
 end;
 
 procedure TEnviroForm.LoadText;
@@ -360,7 +372,7 @@ begin
 
     //Style Delphi
     ListBoxStyle.ItemIndex := Style;
-    VirtualImageTheme.ImageIndex := ListBoxStyle.ItemIndex;
+    ListBoxStyleClick(Self);
 
     // Add all font families and select the current one
     cbUIfont.Items.Assign(Screen.Fonts);

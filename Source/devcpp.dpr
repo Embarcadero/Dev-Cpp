@@ -96,7 +96,7 @@ uses
 
 var
   AppData, INIFileName, ExeFolder: String;
-  PrevInstance: THandle;
+//  PrevInstance: THandle;
 begin
   // Configure memory manager
   {$IFDEF FASTMM_DEBUG_MODE}
@@ -114,11 +114,11 @@ begin
 
   // Check for previous instances (only allow once instance)
   // If we are able to find a previous instance, activate that one instead
-  PrevInstance := GetPreviousInstance;
+  {PrevInstance := GetPreviousInstance;
   if PrevInstance <> 0 then begin
     SendToPreviousInstance(PrevInstance, String(GetCommandLineW));
     Exit;
-  end;
+  end;}
 
   devData.IsPortable := TPath.GetFileNameWithoutExtension(ParamStr(0)).EndsWith('portable', True)
                         or FindCmdLineSwitch('portable', True)

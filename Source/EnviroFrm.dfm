@@ -603,16 +603,6 @@ object EnviroForm: TEnviroForm
         Height = 15
         Caption = 'Size'
       end
-      object VirtualImageTheme: TVirtualImage
-        Left = 0
-        Top = 143
-        Width = 505
-        Height = 250
-        ImageCollection = dmMain.ImageThemeColection
-        ImageWidth = 0
-        ImageHeight = 0
-        ImageIndex = -1
-      end
       object cbUIfont: TComboBox
         Left = 138
         Top = 87
@@ -661,10 +651,98 @@ object EnviroForm: TEnviroForm
           'Windows Classic'
           'Windows 10'
           'Slate Gray'
-          'Blue Whale')
+          'Blue Whale'
+          'Black Pearl'
+          'Glossy'
+          'Calypso'
+          'Flat UI Light'
+          'Material Pattens Blue')
         ParentCtl3D = False
         TabOrder = 2
         OnClick = ListBoxStyleClick
+      end
+      object Panel1: TPanel
+        Left = 0
+        Top = 143
+        Width = 476
+        Height = 249
+        DoubleBuffered = True
+        ParentBackground = False
+        ParentDoubleBuffered = False
+        TabOrder = 3
+        object Button1: TButton
+          Left = 158
+          Top = 16
+          Width = 75
+          Height = 25
+          Caption = 'Button1'
+          TabOrder = 0
+        end
+        object ComboBox1: TComboBox
+          Left = 158
+          Top = 95
+          Width = 145
+          Height = 23
+          TabOrder = 1
+          Text = 'ComboBox1'
+        end
+        object CheckBox1: TCheckBox
+          Left = 158
+          Top = 58
+          Width = 97
+          Height = 17
+          Caption = 'CheckBox1'
+          TabOrder = 2
+        end
+        object PageControl1: TPageControl
+          Left = 1
+          Top = 1
+          Width = 136
+          Height = 247
+          ActivePage = TabSheet1
+          Align = alLeft
+          TabOrder = 3
+          ExplicitHeight = 159
+          object TabSheet1: TTabSheet
+            Caption = 'TabSheet1'
+            ExplicitWidth = 92
+            ExplicitHeight = 129
+          end
+          object TabSheet2: TTabSheet
+            Caption = 'TabSheet2'
+            ImageIndex = 1
+            ExplicitWidth = 93
+            ExplicitHeight = 129
+          end
+        end
+        object Button2: TButton
+          Left = 239
+          Top = 16
+          Width = 75
+          Height = 25
+          Caption = 'Button2'
+          Enabled = False
+          TabOrder = 4
+        end
+        object Button3: TButton
+          Left = 320
+          Top = 16
+          Width = 75
+          Height = 25
+          Caption = 'Button3'
+          TabOrder = 5
+        end
+        object RadioGroup1: TRadioGroup
+          Left = 154
+          Top = 136
+          Width = 185
+          Height = 97
+          Caption = 'RadioGroup1'
+          Items.Strings = (
+            'Item 1'
+            'Item 2')
+          TabOrder = 6
+        end
       end
     end
   end
