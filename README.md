@@ -38,6 +38,19 @@ Supported Operating System:
 
 # Dev C++ Release Notes
 
+Version 6.2 - 13 November 2020
+
+ - Added: 5 new UI styles. Windows 10 Black Pearl, Glossy, Calypso, Flat UI Light, Material Patterns Blue
+ - Added: Default encoding for new documents option.
+ - Added: New setting to enable and disable font ligature support.
+ - Updated: Welcome screen hotkey backgrounds.
+ - Updated: Allow multiple instances of Dev-C++ to run simaltaniously.
+ - Fixed: Error on AStyle Formatting Config Form
+ - Fixed: Double clicking text now selects the current line.
+ - Fixed: Auto Indent to {} and : now works correctly.
+ - Fixed: CTRL-Y will not delete the current line if there is nothing left to redo.
+ - Fixed: Buggy behaviour when highlighting matching braces.
+
 Version 6.1 - 2 November 2020
 
  - Updated: C++ keyword highlighting. Added some C++20 keywords.
@@ -82,16 +95,16 @@ Version 5.50 - 1 July 2020
 - Project Sponsored by Embarcadero Technologies, Inc.
 
 
-# Dev C++ Screenshot:
+# Screenshot:
 
 ![Dev C++ Screenshot](https://raw.githubusercontent.com/Embarcadero/Dev-Cpp/master/Source/Images/screenshot800x600.png)
 
-# Dev C++ Bundled Compiler
+# Bundled Compiler
 
 tdm-gcc: GCC compiler, Windows-friendly.
 <https://jmeubank.github.io/tdm-gcc/>
 
-# Dev C++ Third Party Libraries
+# Third Party Libraries
 
 "Artistic Style is a source code indenter, formatter, and beautifier for the C, C++, C++/CLI, Objective‑C, C# and Java programming languages."
 <http://astyle.sourceforge.net/>
