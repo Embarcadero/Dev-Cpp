@@ -4,7 +4,7 @@ Version 6.2 - 13 November 2020
  - Added: Default encoding for new documents option.
  - Added: New setting to enable and disable font ligature support.
  - Updated: Welcome screen hotkey backgrounds.
- - Updated: Allow multiple instances of Dev-C++ to run simaltaniously.
+ - Updated: Allow multiple instances of Dev-C++ to run simultaneously.
  - Fixed: Error on AStyle Formatting Config Form
  - Fixed: Double clicking text now selects the current line.
  - Fixed: Auto Indent to {} and : now works correctly.
