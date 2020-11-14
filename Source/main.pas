@@ -2574,37 +2574,13 @@ begin
 end;
 
 procedure TMainForm.actNextExecute(Sender: TObject);
-var
-  e: TEditor;
-  PageIndex: integer;
 begin
-  e := fEditorList.GetEditor;
-  PageIndex := e.PageControl.ActivePageIndex;
-  if (PageIndex >= 0) and (PageIndex < e.PageControl.PageCount - 1) then
-  begin
-    if Assigned(e) then
-    begin
-      PageIndex := PageIndex + 1;
-      e.PageControl.ActivePageIndex := PageIndex;
-    end;
-  end;
+  EditorList.SelectNextPage;
 end;
 
 procedure TMainForm.actPrevExecute(Sender: TObject);
-var
-  e: TEditor;
-  PageIndex: integer;
 begin
-  e := fEditorList.GetEditor;
-  PageIndex := e.PageControl.ActivePageIndex;
-  if (PageIndex > 0) and (PageIndex <= e.PageControl.PageCount - 1) then
-  begin
-    if Assigned(e) then
-    begin
-      PageIndex := PageIndex - 1;
-      e.PageControl.ActivePageIndex := PageIndex;
-    end;
-  end;
+  EditorList.SelectPrevPage;
 end;
 
 procedure TMainForm.actCompOptionsExecute(Sender: TObject);
