@@ -2208,8 +2208,11 @@ begin
   ClassBrowser.BeginUpdate;
   try
     fEditorList.CloseAll; // PageControlChange triggers other UI updates
-    MainPanel.Visible := True;
-    GetProjectHistory;
+    if fEditorList.PageCount = 0 then
+    begin
+      MainPanel.Visible := True;
+      GetProjectHistory;
+    end;
   finally
     ClassBrowser.EndUpdate;
   end;
