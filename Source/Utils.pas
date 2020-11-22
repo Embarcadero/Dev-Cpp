@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
-  Menus, Registry, Controls, ComCtrls, Messages, System.AnsiStrings;
+  Menus, Registry, Controls, ComCtrls, Messages, System.AnsiStrings, Vcl.ExtDlgs;
 
 type
   { File ID types }
@@ -154,11 +154,17 @@ function FastStringReplace(const S, OldPattern, NewPattern: String; Flags: TRepl
 //function FastIndexOf(List: TStrings; const S: String): integer; overload;
 //function FastIndexOf(List: TStringlist; const S: String): integer; overload;
 
+type
+  TOpenTextFileDialogHelper = class helper for TOpenTextFileDialog
+    procedure DoShow(Sender: TObject);
+    procedure FixStyle;
+  end;
+
 
 implementation
 
 uses
-  devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor, ShlObj, ActiveX, System.IOUtils, CharUtils;
+  devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor, ShlObj, ActiveX, System.IOUtils, CharUtils, Vcl.Styles.Utils.SysControls, Winapi.CommCtrl, Vcl.Themes;
 
 function FastStringReplace(const S, OldPattern, NewPattern: String; Flags: TReplaceFlags): String;
 var
@@ -1230,6 +1236,25 @@ begin
     end;
     Result := StringReplace(Result, devDirs.Exec, '%Dev-Cpp%\', [rfReplaceAll]);
   end;
+end;
+
+{ TOpenTextFileDialogHelper }
+procedure TOpenTextFileDialogHelper.DoShow(Sender: TObject);
+begin
+  with Self do
+    TSysStyleManager.AddControlDirectly(FComboBox.Handle, WC_COMBOBOX);
+end;
+
+procedure TOpenTextFileDialogHelper.FixStyle;
+begin
+  if Assigned(TStyleManager.ActiveStyle) then
+    with Self do
+    begin
+      OnShow := DoShow;
+      FLabel.StyleName := TStyleManager.ActiveStyle.Name;
+      FLabel.Transparent := True;
+      FPanel.ParentBackground := False;
+    end;
 end;
 
 end.

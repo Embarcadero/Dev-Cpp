@@ -2118,6 +2118,7 @@ end;
 procedure TMainForm.actOpenExecute(Sender: TObject);
 begin
   with TOpenTextFileDialog.Create(Self) do try
+    FixStyle;
     Filter := BuildFilter([FLT_PROJECTS, FLT_CS, FLT_CPPS, FLT_RES, FLT_HEADS]);
     Title := Lang[ID_NV_OPENFILE];
     Options := Options + [ofAllowMultiSelect];

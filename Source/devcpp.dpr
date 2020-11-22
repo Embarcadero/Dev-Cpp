@@ -98,6 +98,36 @@ var
   AppData, INIFileName, ExeFolder: String;
 //  PrevInstance: THandle;
 begin
+   if (ParamCount > 1) and ParamStr(1).Equals('INTERNAL_DEL') then
+   begin
+//     {$I-}
+     AllocConsole;
+     try
+       WriteLn('Start deleting...');
+       for var i := 2 to ParamCount do
+         if TFile.Exists(ParamStr(i)) then
+         begin
+           Write('Deleting: ' + ParamStr(i));
+           try
+             TFile.Delete(ParamStr(i));
+             WriteLn(' Ok');
+           except
+             on E: exception do
+               WriteLn(' fail: ' + E.Message);
+           end;
+         end
+         else
+           WriteLn('File not found: ' + ParamStr(i));
+     finally
+       WriteLn('Deleting complete...');
+       WriteLn('');
+       FreeConsole;
+     end;
+//     {$I+}
+     Exit;
+   end;
+
+
   // Configure memory manager
   {$IFDEF FASTMM_DEBUG_MODE}
     FastMM_LogToFileEvents := FastMM_LogToFileEvents + [mmetUnexpectedMemoryLeakDetail, mmetUnexpectedMemoryLeakSummary];
