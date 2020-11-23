@@ -97,7 +97,7 @@ const
   GPROF_PROGRAM = 'gprof.exe';
   PACKMAN_PROGRAM = 'packman.exe';
 //  CLEAN_PROGRAM = 'rm.exe'; // cannot use del, it doesn't have a quiet mode
-  CLEAN_PROGRAM = 'del /f /q';
+//  CLEAN_PROGRAM = 'del /f /q';
 
   // File dialog filters
   FLT_ALLFILES = 'All files (*.*)|*.*|';
@@ -124,7 +124,12 @@ const
   GPROF_CMD_GENFLAT = '-p';
   GPROF_CMD_GENMAP = '-q';
 
+var
+  CLEAN_PROGRAM: string;
+
 implementation
 
+initialization
+  CLEAN_PROGRAM := ParamStr(0) + ' INTERNAL_DEL';
 end.
 

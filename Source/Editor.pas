@@ -237,7 +237,7 @@ type
 implementation
 
 uses
-  main, project, MultiLangSupport, devcfg, utils,
+  main, project, MultiLangSupport, devcfg, utils, Vcl.Themes,
   DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm,
   CodeCompletionForm, SynEditMiscClasses, CharUtils, Vcl.Printers, SynEditPrintTypes;
 
@@ -2106,6 +2106,8 @@ var
 begin
   Result := True;
   with TSaveTextFileDialog.Create(nil) do try
+    FixStyle;
+
     Title := Lang[ID_NV_SAVEAS];
     Filter := BuildFilter([FLT_CS, FLT_CPPS, FLT_HEADS, FLT_RES]);
     Options := Options + [ofOverwritePrompt];
