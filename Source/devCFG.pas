@@ -987,7 +987,7 @@ begin
   fShowCPUSignal := true;
   fCPURegisterCol1 := 70;
   fCPURegisterCol2 := 104;
-  fCPURegisterCol3 := 10;
+  fCPURegisterCol3 := 104;
 
   // Search stuff
   fCaseSensitive := false;

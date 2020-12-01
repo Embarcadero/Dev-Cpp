@@ -763,9 +763,9 @@ begin
     s := TrimLeft(s);
 
     // Cut hex value from 1 to first tab
-    x := Pos(#9, s);
+    x := Pos(' ', s);                                 // was #9
     reg^.valuehex := Copy(s, 1, x - 1);
-    Delete(s, 1, x); // delete tab too
+    Delete(s, 1, x); // delete tab too                // space not tab, but still ok
     s := TrimLeft(s);
 
     // Remaining part contains decimal value
