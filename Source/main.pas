@@ -1478,10 +1478,13 @@ begin
   if Assigned(e) then begin
     Statusbar.Panels[0].Text := Format(Lang[ID_STATUSBARPLUS],
       [e.Text.CaretY,
-      e.Text.DisplayX,
-        e.Text.SelLength,
-        e.Text.Lines.Count,
-        e.Text.Text.Length]);
+       e.Text.DisplayX,
+       e.Text.SelLength,
+       e.Text.Lines.Count,
+       e.Text.Text.Length]) + ' ';
+
+    Statusbar.Canvas.Font.Assign(Statusbar.Font);
+    Statusbar.Panels[0].Width := Statusbar.Canvas.TextWidth(Statusbar.Panels[0].Text);
   end else begin
     StatusBar.Panels.BeginUpdate;
     try
