@@ -3421,7 +3421,7 @@ begin
       end;
     end;
   finally
-    Close;
+    Free;          //    Close;
   end;
 end;
 
