@@ -612,7 +612,6 @@ type
     procedure actSaveAsExecute(Sender: TObject);
     procedure actSaveAllExecute(Sender: TObject);
     procedure actCloseExecute(Sender: TObject);
-    procedure actCloseEditor(Sender: TObject; CurrentEditor:TEditor = nil);
     procedure actCloseAllExecute(Sender: TObject);
     procedure actCloseProjectExecute(Sender: TObject);
     procedure actExportHTMLExecute(Sender: TObject);
@@ -1479,10 +1478,13 @@ begin
   if Assigned(e) then begin
     Statusbar.Panels[0].Text := Format(Lang[ID_STATUSBARPLUS],
       [e.Text.CaretY,
-      e.Text.DisplayX,
-        e.Text.SelLength,
-        e.Text.Lines.Count,
-        e.Text.Text.Length]);
+       e.Text.DisplayX,
+       e.Text.SelLength,
+       e.Text.Lines.Count,
+       e.Text.Text.Length]) + ' ';
+
+    Statusbar.Canvas.Font.Assign(Statusbar.Font);
+    Statusbar.Panels[0].Width := Statusbar.Canvas.TextWidth(Statusbar.Panels[0].Text);
   end else begin
     StatusBar.Panels.BeginUpdate;
     try
@@ -2190,21 +2192,11 @@ begin
   end;
 end;
 
-
 procedure TMainForm.actCloseExecute(Sender: TObject);
-begin
-  actCloseEditor(Sender);
-end;
-
-
-procedure TMainForm.actCloseEditor(Sender: TObject; CurrentEditor:TEditor = nil);
 var
   e: TEditor;
 begin
-  if CurrentEditor = nil then
-    e := fEditorList.GetEditor
-  else
-    e := CurrentEditor;
+  e := fEditorList.GetEditor;
   if Assigned(e) then
     fEditorList.CloseEditor(e);
 
@@ -7343,7 +7335,6 @@ var
   I: Integer;
   PageControl: TPageControl;
   TabSheet: TCloseTabSheet;
-  e: TEditor;
 begin
   PageControl := Sender as TPageControl;
 
@@ -7358,10 +7349,8 @@ begin
         FCloseButtonMouseDownTab := TabSheet;
         FCloseButtonShowPushed := True;
         PageControl.Repaint;
-        e := fEditorList.GetEditor(I,PageControl);    // determine editor window being closed
       end;
     end;
-    actCloseEditor(Sender, e);
   end;
 end;
 
@@ -7400,22 +7389,21 @@ var
   PageControl: TPageControl;
 begin
   PageControl := Sender as TPageControl;
-//
-//  if (Button = mbLeft) and Assigned(FCloseButtonMouseDownTab) then
-//  begin
-//    if PtInRect(FCloseButtonMouseDownTab.FCloseButtonRect, Point(X, Y)) then
-//    begin
-//      //TTask.Run(procedure begin
-//        //TThread.Synchronize(nil, procedure begin
-//          //FCloseButtonMouseDownTab.DoClose;
-//          //FCloseButtonMouseDownTab := nil;
-//          actCloseExecute(Sender);
-//          PageControl.Repaint;
-//        //end);
-//      //end);
-//    end;
-//  end;
-  PageControl.Repaint;
+
+  if (Button = mbLeft) and Assigned(FCloseButtonMouseDownTab) then
+  begin
+    if PtInRect(FCloseButtonMouseDownTab.FCloseButtonRect, Point(X, Y)) then
+    begin
+      TTask.Run(procedure begin
+        TThread.Synchronize(nil, procedure begin
+          //FCloseButtonMouseDownTab.DoClose;
+          //FCloseButtonMouseDownTab := nil;
+          actCloseExecute(Sender);
+          PageControl.Repaint;
+        end);
+      end);
+    end;
+  end;
 end;
 
 procedure TMainForm.EditorPageControlDrawTab(Control: TCustomTabControl;
