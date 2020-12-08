@@ -984,7 +984,8 @@ uses
   NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
   ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm,
-  WindowListFrm, RemoveUnitFrm, ParamsFrm, ProcessListFrm, SynEditHighlighter,
+  WindowListFrm, RemoveUnitFrm, ParamsFrm, ProcessListFrm,  SynEditHighlighter,
+  Vcl.Styles.Utils.SystemMenu, IOUtils,
   ConsoleAppHostFrm;
 
 {$R *.dfm}
@@ -1095,6 +1096,11 @@ begin
     devData.ReportWindowState.GetPlacement(fReportToolWindow.Handle);
 
   SaveOptions;
+
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
+      MainForm.Visible := false;
+      TStyleManager.TrySetStyle('Windows10');
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
 
   Action := caFree;
 end;
@@ -6298,6 +6304,36 @@ begin
   begin
     LoadTheme;
   end;
+
+//  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
+
+begin
+	var
+	  LVclStylesSystemMenu : TVclStylesSystemMenu;
+
+	  LVclStylesSystemMenu:=TVclStylesSystemMenu.Create(Self);
+	  LVclStylesSystemMenu.MenuCaption:='Choose a VCL Style';
+end;
+
+begin
+	var
+	  f, s, t:  string;
+	var
+	  LFiles :  TStringDynArray;
+
+	  s:='C:\Users\Perseus\Documents\GitHub\Dev-Cpp\Source\VCL\vcl-styles-utils\Demos\Styles';
+
+	  for f in TDirectory.GetFiles(s, '*.vsf') do begin
+	   t := TPath.GetFileNameWithoutExtension(f);
+	   if TStyleManager.IsValidStyle(f) then
+		  if TStyleManager.Style[ t ] = nil then 
+			 TStyleManager.LoadFromFile(f);
+	  end;
+
+	  TStyleManager.TrySetStyle('Windows10 SlateGray');
+end;
+
+//  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
 
   // Configure parser, code completion, class browser
   UpdateClassBrowsing;
