@@ -376,7 +376,7 @@ const
   ID_EOPT_AUTOINDENT2                   = 26028;
   ID_EOPT_ADDINDENT                     = 26029;
   ID_EOPT_TABS                          = 26030;
-  
+
   ID_EOPT_SPECIALCHARS                  = 27001;
   ID_EOPT_PARSERHINTS                   = 27002;
   ID_EOPT_MATCH                         = 27003;
@@ -385,12 +385,14 @@ const
   ID_EOPT_HINTHIGHLIGHT                 = 27006;
   ID_EOPT_HINTWHITESPACE                = 27007;
   ID_EOPT_CLOSEBRACE                    = 27008;
+  ID_EOPT_NEWDOCENCODING                = 27070;
 
   // Display Tab
   ID_EOPT_CTRLSCROLLHINT                = 27009;
   ID_EOPT_EDFONT                        = 27010;
   ID_EOPT_FONT                          = 27011;
   ID_EOPT_SIZE                          = 27012;
+  ID_EOPT_LIGATURE                      = 27071;
   ID_EOPT_EDITORPRE                     = 27013;
   ID_EOPT_GUTTER                        = 27014;
   ID_EOPT_GUTTERAUTO                    = 27015;
@@ -410,7 +412,6 @@ const
   ID_EOPT_SPEED                         = 27027;
   ID_EOPT_ELEMENTS                      = 27028;
   ID_EOPT_SAVESYNTAX                    = 27029;
-
 
   // Code Tab -- Inserts
   ID_EOPT_CICODE                        = 27030;
@@ -1310,6 +1311,3 @@ const
   ID_FORMATTER_POWEREDBY                = 79019;
   ID_FORMATTER_MAXLINELENGTH            = 79020;
   ID_FORMATTER_LOADERROR                = 79021;
-
-  ID_EOPT_LIGATURE                      = 79022;
-  ID_EOPT_NEWDOCENCODING                = 79023;

@@ -1553,6 +1553,7 @@ procedure TEditor.InitCompletion;
 begin
   fCompletionBox := MainForm.CodeCompletion;
   fCompletionBox.Enabled := devCodeCompletion.Enabled;
+  fCompletionBox.Color := devCodeCompletion.BackColor;
 
   if devEditor.ShowFunctionTip then begin
     if not Assigned(fFunctionTipTimer) then

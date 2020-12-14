@@ -341,6 +341,12 @@ begin
         try
           StrtoAttr(Attribute, devEditor.Syntax.Values[AttrName]);
           cpp.Attribute[I].Assign(Attribute);
+
+          if SameText(cpp.Attribute[I].Name, 'WhiteSpace') or SameText(cpp.Attribute[I].Name, 'Space') then begin
+            cpCompletionBackground.NoneColorColor := cpp.Attribute[I].Background;
+            cpCompletionBackground.DefaultColorColor := cpp.Attribute[I].Background;
+          end;
+
         finally
           Attribute.Free;
         end;
@@ -406,7 +412,14 @@ begin
   chkCBParseLocalH.Checked := devCodeCompletion.ParseLocalHeaders;
   chkCBParseGlobalH.Checked := devCodeCompletion.ParseGlobalHeaders;
   tbCompletionDelay.Position := devCodeCompletion.Delay;
-  cpCompletionBackground.Selected := devCodeCompletion.BackColor;
+
+  cpCompletionBackground.Items.InsertObject(1, 'Default', TObject(cpCompletionBackground.DefaultColorColor));
+
+  if cpCompletionBackground.DefaultColorColor = devCodeCompletion.BackColor then
+    cpCompletionBackground.ItemIndex := 1
+  else
+    cpCompletionBackground.Selected := devCodeCompletion.BackColor;
+
   chkEnableCompletionClick(nil);
 
   // Symbol Completion
@@ -438,7 +451,6 @@ begin
   // Set defaults of color buttons, don't want all system colors too
   cpMarginColor.Items.InsertObject(1, 'Default', TObject(cpMarginColor.DefaultColorColor));
   cpHighColor.Items.InsertObject(1, 'Default', TObject(cpHighColor.DefaultColorColor));
-  cpCompletionBackground.Items.InsertObject(1, 'Default', TObject(cpCompletionBackground.DefaultColorColor));
 end;
 
 procedure TEditorOptForm.cboEditorFontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State:
@@ -823,7 +835,11 @@ begin
   with devCodeCompletion do begin
     Enabled := chkEnableCompletion.Checked;
     Delay := tbCompletionDelay.Position;
-    BackColor := cpCompletionBackground.Selected;
+    if cpCompletionBackground.ItemIndex = 1 then
+      BackColor := cpCompletionBackground.DefaultColorColor
+    else
+      BackColor := cpCompletionBackground.Selected;
+
     ParseLocalHeaders := chkCBParseLocalH.Checked;
     ParseGlobalHeaders := chkCBParseGlobalH.Checked;
   end;
@@ -989,9 +1005,13 @@ begin
       Background := cpBackground.Selected;
 
       // Update default color
-      if SameText(Name, 'WhiteSpace') then begin
+      if SameText(Attr.Name, 'WhiteSpace') or SameText(Attr.Name, 'Space') then begin
         ffgColor := Foreground;
         fbgColor := Background;
+
+        cpCompletionBackground.NoneColorColor := Background;
+        cpCompletionBackground.DefaultColorColor := Background;
+        cpCompletionBackground.Items.Objects[1] := TObject(Background);
       end;
 
       Style := [];
@@ -1106,10 +1126,17 @@ begin
 
     offset := cboQuickColor.ItemIndex * 1000;
     for i := 0 to pred(cpp.AttrCount) do begin
-      attr := TSynHighlighterAttributes.Create(cpp.Attribute[i].Name,cpp.Attribute[i].Name);
+      attr := TSynHighlighterAttributes.Create(cpp.Attribute[i].Name, cpp.Attribute[i].Name);
       try
         StrtoAttr(Attr, LoadStr(i + offset + 1));
         cpp.Attribute[i].Assign(Attr);
+
+        if SameText(Attr.Name, 'WhiteSpace') or SameText(Attr.Name, 'Space') then begin
+          cpCompletionBackground.NoneColorColor := Attr.Background;
+          cpCompletionBackground.DefaultColorColor := Attr.Background;
+          cpCompletionBackground.Items.Objects[1] := TObject(Attr.Background);
+        end;
+
       finally
         Attr.Free;
       end;

@@ -2563,7 +2563,6 @@ begin
         Options := Options + [eoTrimTrailingSpaces];
       if fShowLigatures then
         Options := Options + [eoShowLigatures];
-
     finally
       EndUpdate;
     end;
@@ -2596,7 +2595,7 @@ begin
   fWidth := 320;
   fHeight := 240;
   fDelay := 180;
-  fBackColor := clWindow;
+  fBackColor := clDefault;
   fEnabled := True;
   fParseLocalHeaders := True;
   fParseGlobalHeaders := True;
