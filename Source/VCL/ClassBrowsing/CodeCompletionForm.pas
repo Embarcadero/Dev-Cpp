@@ -24,7 +24,7 @@ interface
 uses
 {$IFDEF WIN32}
   Windows, Classes, Graphics, Forms, StdCtrls, Controls,
-  CodeCompletion, CppParser, CBUtils;
+  CodeCompletion, CppParser, CBUtils, Winapi.Messages, Vcl.ExtCtrls;
 {$ENDIF}
 {$IFDEF LINUX}
 Xlib, SysUtils, Classes, QGraphics, QForms, QStdCtrls, QControls,
@@ -34,6 +34,7 @@ CodeCompletion, CppParser, QGrids, QDialogs, Types;
 type
   TCodeComplForm = class(TForm)
     lbCompletion: TListBox;
+    Bevel1: TBevel;
     procedure FormShow(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
     procedure lbCompletionDblClick(Sender: TObject);
@@ -42,6 +43,9 @@ type
   private
     { Private declarations }
     fOwner: TCodeCompletion;
+
+  protected
+    procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
   public
     constructor Create(AOwner: TComponent); override;
     procedure CreateParams(var Params: TCreateParams); override;
@@ -58,6 +62,8 @@ procedure TCodeComplForm.FormShow(Sender: TObject);
 begin
   Width := fOwner.Width;
   Height := fOwner.Height;
+  Color := fOwner.Color;
+  lbCompletion.Color := fOwner.Color;
   lbCompletion.DoubleBuffered := true; // performance hit, but reduces flicker a lit
 end;
 
@@ -70,7 +76,7 @@ procedure TCodeComplForm.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
 
-  Params.Style := Params.Style or WS_SIZEBOX;
+//  Params.Style := Params.Style or WS_SIZEBOX;
 end;
 
 constructor TCodeComplForm.Create(AOwner: TComponent);
@@ -149,6 +155,44 @@ procedure TCodeComplForm.lbCompletionKeyPress(Sender: TObject; var Key: Char);
 begin
   if Assigned(fOwner.OnKeyPress) then
     fOwner.OnKeyPress(self, Key);
+end;
+
+procedure TCodeComplForm.WMNCHitTest(var Message: TWMNCHitTest);
+var
+  D: Integer;
+  P: TPoint;
+begin
+
+  D := GetSystemMetrics(SM_CXSIZEFRAME);
+
+  P := Self.ScreenToClient(Message.Pos);
+
+  if P.Y < D then
+  begin
+    if P.X < D then
+      Message.Result := HTTOPLEFT
+    else if P.X > ClientWidth - D then
+      Message.Result := HTTOPRIGHT
+    else
+      Message.Result := HTTOP;
+  end
+  else if P.Y > ClientHeight - D then
+  begin
+    if P.X < D then
+      Message.Result := HTBOTTOMLEFT
+    else if P.X > ClientWidth - D then
+      Message.Result := HTBOTTOMRIGHT
+    else
+      Message.Result := HTBOTTOM;
+  end
+  else
+  begin
+    if P.X < D then
+      Message.Result := HTLEFT
+    else if P.X > ClientWidth - D then
+      Message.Result := HTRIGHT
+  end;
+
 end;
 
 end.

@@ -3,9 +3,27 @@ object CodeComplForm: TCodeComplForm
   Top = 305
   BorderIcons = []
   BorderStyle = bsNone
-  ClientHeight = 286
+  ClientHeight = 230
   ClientWidth = 472
-  Color = clBtnFace
+  Color = clDefault
+  CustomTitleBar.Enabled = True
+  CustomTitleBar.SystemHeight = False
+  CustomTitleBar.ShowCaption = False
+  CustomTitleBar.ShowIcon = False
+  CustomTitleBar.SystemColors = False
+  CustomTitleBar.SystemButtons = False
+  CustomTitleBar.BackgroundColor = clWhite
+  CustomTitleBar.ForegroundColor = 65793
+  CustomTitleBar.InactiveBackgroundColor = clWhite
+  CustomTitleBar.InactiveForegroundColor = 10066329
+  CustomTitleBar.ButtonForegroundColor = 65793
+  CustomTitleBar.ButtonBackgroundColor = clWhite
+  CustomTitleBar.ButtonHoverForegroundColor = 65793
+  CustomTitleBar.ButtonHoverBackgroundColor = 16053492
+  CustomTitleBar.ButtonPressedForegroundColor = 65793
+  CustomTitleBar.ButtonPressedBackgroundColor = 15395562
+  CustomTitleBar.ButtonInactiveForegroundColor = 10066329
+  CustomTitleBar.ButtonInactiveBackgroundColor = clWhite
   Constraints.MinHeight = 128
   Constraints.MinWidth = 256
   Font.Charset = DEFAULT_CHARSET
@@ -14,17 +32,37 @@ object CodeComplForm: TCodeComplForm
   Font.Name = 'Courier New'
   Font.Style = []
   FormStyle = fsStayOnTop
+  GlassFrame.Enabled = True
+  GlassFrame.Top = 1
   KeyPreview = True
   OldCreateOrder = False
+  StyleElements = [seFont]
   OnDeactivate = FormDeactivate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 16
-  object lbCompletion: TListBox
+  object Bevel1: TBevel
     Left = 0
     Top = 0
     Width = 472
-    Height = 286
+    Height = 230
+    Align = alClient
+    Shape = bsFrame
+    ExplicitLeft = 208
+    ExplicitTop = 88
+    ExplicitWidth = 50
+    ExplicitHeight = 50
+  end
+  object lbCompletion: TListBox
+    AlignWithMargins = True
+    Left = 5
+    Top = 5
+    Width = 462
+    Height = 220
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
     Style = lbOwnerDrawFixed
     AutoComplete = False
     Align = alClient
@@ -37,11 +75,15 @@ object CodeComplForm: TCodeComplForm
     Font.Height = -13
     Font.Name = 'Courier New'
     Font.Style = []
-    ItemHeight = 16
     ParentFont = False
     TabOrder = 0
+    StyleElements = [seFont, seBorder]
     OnDblClick = lbCompletionDblClick
     OnDrawItem = lbCompletionDrawItem
     OnKeyPress = lbCompletionKeyPress
+    ExplicitLeft = 8
+    ExplicitTop = -2
+    ExplicitWidth = 466
+    ExplicitHeight = 224
   end
 end
