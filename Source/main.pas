@@ -612,6 +612,7 @@ type
     procedure actSaveAsExecute(Sender: TObject);
     procedure actSaveAllExecute(Sender: TObject);
     procedure actCloseExecute(Sender: TObject);
+    procedure actCloseExecuteByTab(Sender: TObject; CloseEditor:TEditor = nil);
     procedure actCloseAllExecute(Sender: TObject);
     procedure actCloseProjectExecute(Sender: TObject);
     procedure actExportHTMLExecute(Sender: TObject);
@@ -2193,10 +2194,18 @@ begin
 end;
 
 procedure TMainForm.actCloseExecute(Sender: TObject);
+begin
+  actCloseExecuteByTab(Sender);
+end;
+
+procedure TMainForm.actCloseExecuteByTab(Sender: TObject; CloseEditor:TEditor = nil);
 var
   e: TEditor;
 begin
-  e := fEditorList.GetEditor;
+  if CloseEditor = nil then
+    e := fEditorList.GetEditor
+  else
+    e := CloseEditor;
   if Assigned(e) then
     fEditorList.CloseEditor(e);
 
@@ -4451,7 +4460,7 @@ begin
 
     if Button = mbLeft then
     begin
-      for I := 0 to PageControl.PageCount - 1 do
+      for I := PageControl.PageCount - 1 downto 0 do            // tabs can disappear 
       begin
         if not (PageControl.Pages[i] is TCloseTabSheet) then Continue;
         TabSheet:=PageControl.Pages[i] as TCloseTabSheet;
@@ -7335,12 +7344,13 @@ var
   I: Integer;
   PageControl: TPageControl;
   TabSheet: TCloseTabSheet;
+  e: TEditor;
 begin
   PageControl := Sender as TPageControl;
 
   if Button = mbLeft then
   begin
-    for I := 0 to PageControl.PageCount - 1 do
+    for I := PageControl.PageCount - 1 downto 0 do            // tabs can disappear
     begin
       if not (PageControl.Pages[i] is TCloseTabSheet) then Continue;
       TabSheet:=PageControl.Pages[i] as TCloseTabSheet;
@@ -7349,6 +7359,8 @@ begin
         FCloseButtonMouseDownTab := TabSheet;
         FCloseButtonShowPushed := True;
         PageControl.Repaint;
+        e := fEditorList.GetEditor(I,PageControl);            // determine tab being closed
+        actCloseExecuteByTab(Sender, e);
       end;
     end;
   end;
@@ -7398,7 +7410,7 @@ begin
         TThread.Synchronize(nil, procedure begin
           //FCloseButtonMouseDownTab.DoClose;
           //FCloseButtonMouseDownTab := nil;
-          actCloseExecute(Sender);
+          //actCloseExecute(Sender);                //  can close wrong tab
           PageControl.Repaint;
         end);
       end);
