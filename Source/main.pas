@@ -1097,6 +1097,13 @@ begin
 
   SaveOptions;
 
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
+  //      This is a cheat.    Also don't hard-code 'Windows10'.
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
+      MainForm.Visible := false;
+      TStyleManager.TrySetStyle('Windows10');
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
+
   Action := caFree;
 end;
 
@@ -3417,6 +3424,10 @@ begin
 
       // Rebuild recent file list (max count could have changed
       dmMain.RebuildMRU;
+    end;
+  finally
+    Close;
+  end;
       //Load Delphi Style
       if devData.StyleChange then
       begin
@@ -3428,10 +3439,6 @@ begin
         else
           Loadtheme;
       end;
-    end;
-  finally
-    Close;
-  end;
 end;
 
 procedure TMainForm.actUpdatePageCount(Sender: TObject);
