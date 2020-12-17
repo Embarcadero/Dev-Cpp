@@ -7207,18 +7207,22 @@ begin
   LabelView.Left := (PageControlPanel.Width div 4) - (LabelView.Width + 30);
   LabelDocumentation.Left := (PageControlPanel.Width div 4) - 23;
   LabelHotkeys.Left := (PageControlPanel.Width div 4) - (LabelHotkeys.Width div 2);
-  LabelOpen.Left := (PageControlPanel.Width div 4) - 35;
-  LabelSave.Left := (PageControlPanel.Width div 4) - 33;
-  LabelZoom.Left := (PageControlPanel.Width div 4) - 38;
-  LabelRun.Left := (PageControlPanel.Width div 4) - 28;
-  LabelCompile.Left := (PageControlPanel.Width div 4) - 50;
-  LabelClear.left := (PageControlPanel.Width div 4) - 34;
-  PanelDescOpen.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescSave.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescZoom.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescRun.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescCompile.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescClear.Left := (PageControlPanel.Width div 4) + 18;
+
+  var  adj := 45;
+  LabelOpen   .Left     := (PageControlPanel.Width div 4) - adj - LabelOpen   .width;
+  LabelSave   .Left     := (PageControlPanel.Width div 4) - adj - LabelSave   .width;
+  LabelZoom   .Left     := (PageControlPanel.Width div 4) - adj - LabelZoom   .width;
+  LabelRun    .Left     := (PageControlPanel.Width div 4) - adj - LabelRun    .width;
+  LabelCompile.Left     := (PageControlPanel.Width div 4) - adj - LabelCompile.width;
+  LabelClear  .left     := (PageControlPanel.Width div 4) - adj - LabelClear  .width;
+
+  PanelDescOpen   .Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescSave   .Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescZoom   .Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescRun    .Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescCompile.Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescClear  .Left := (PageControlPanel.Width div 4) + adj;
+
   ButtonNewDocument.Left := Max(50, (PanelRight.Width div 2) - ButtonNewDocument.Width - (ButtonOpenDocument.Width div 2) - 65);
   ButtonOpenDocument.Left := ButtonNewDocument.Left + ButtonNewDocument.Width + 25;
   ButtonOptions.Left := ButtonOpenDocument.Left + ButtonOpenDocument.Width + 25;
