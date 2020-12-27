@@ -656,7 +656,7 @@ object EnviroForm: TEnviroForm
           'Glossy'
           'Calypso'
           'Flat UI Light'
-          'Material Pattens Blue')
+          'Material Patterns Blue')
         ParentCtl3D = False
         TabOrder = 2
         OnClick = ListBoxStyleClick

@@ -612,6 +612,7 @@ type
     procedure actSaveAsExecute(Sender: TObject);
     procedure actSaveAllExecute(Sender: TObject);
     procedure actCloseExecute(Sender: TObject);
+    procedure actCloseExecuteByTab(Sender: TObject; CloseEditor:TEditor = nil);
     procedure actCloseAllExecute(Sender: TObject);
     procedure actCloseProjectExecute(Sender: TObject);
     procedure actExportHTMLExecute(Sender: TObject);
@@ -1095,6 +1096,13 @@ begin
     devData.ReportWindowState.GetPlacement(fReportToolWindow.Handle);
 
   SaveOptions;
+
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
+  //      This is a cheat.    Also don't hard-code 'Windows10'.
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
+      MainForm.Visible := false;
+      TStyleManager.TrySetStyle('Windows10');
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
 
   Action := caFree;
 end;
@@ -2193,10 +2201,18 @@ begin
 end;
 
 procedure TMainForm.actCloseExecute(Sender: TObject);
+begin
+  actCloseExecuteByTab(Sender);
+end;
+
+procedure TMainForm.actCloseExecuteByTab(Sender: TObject; CloseEditor:TEditor = nil);
 var
   e: TEditor;
 begin
-  e := fEditorList.GetEditor;
+  if CloseEditor = nil then
+    e := fEditorList.GetEditor
+  else
+    e := CloseEditor;
   if Assigned(e) then
     fEditorList.CloseEditor(e);
 
@@ -3408,6 +3424,10 @@ begin
 
       // Rebuild recent file list (max count could have changed
       dmMain.RebuildMRU;
+    end;
+  finally
+    Close;
+  end;
       //Load Delphi Style
       if devData.StyleChange then
       begin
@@ -3419,10 +3439,6 @@ begin
         else
           Loadtheme;
       end;
-    end;
-  finally
-    Close;
-  end;
 end;
 
 procedure TMainForm.actUpdatePageCount(Sender: TObject);
@@ -4451,7 +4467,7 @@ begin
 
     if Button = mbLeft then
     begin
-      for I := 0 to PageControl.PageCount - 1 do
+      for I := PageControl.PageCount - 1 downto 0 do            // tabs can disappear 
       begin
         if not (PageControl.Pages[i] is TCloseTabSheet) then Continue;
         TabSheet:=PageControl.Pages[i] as TCloseTabSheet;
@@ -7191,18 +7207,22 @@ begin
   LabelView.Left := (PageControlPanel.Width div 4) - (LabelView.Width + 30);
   LabelDocumentation.Left := (PageControlPanel.Width div 4) - 23;
   LabelHotkeys.Left := (PageControlPanel.Width div 4) - (LabelHotkeys.Width div 2);
-  LabelOpen.Left := (PageControlPanel.Width div 4) - 35;
-  LabelSave.Left := (PageControlPanel.Width div 4) - 33;
-  LabelZoom.Left := (PageControlPanel.Width div 4) - 38;
-  LabelRun.Left := (PageControlPanel.Width div 4) - 28;
-  LabelCompile.Left := (PageControlPanel.Width div 4) - 50;
-  LabelClear.left := (PageControlPanel.Width div 4) - 34;
-  PanelDescOpen.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescSave.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescZoom.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescRun.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescCompile.Left := (PageControlPanel.Width div 4) + 18;
-  PanelDescClear.Left := (PageControlPanel.Width div 4) + 18;
+
+  var  adj := 45;
+  LabelOpen   .Left     := (PageControlPanel.Width div 4) - adj - LabelOpen   .width;
+  LabelSave   .Left     := (PageControlPanel.Width div 4) - adj - LabelSave   .width;
+  LabelZoom   .Left     := (PageControlPanel.Width div 4) - adj - LabelZoom   .width;
+  LabelRun    .Left     := (PageControlPanel.Width div 4) - adj - LabelRun    .width;
+  LabelCompile.Left     := (PageControlPanel.Width div 4) - adj - LabelCompile.width;
+  LabelClear  .left     := (PageControlPanel.Width div 4) - adj - LabelClear  .width;
+
+  PanelDescOpen   .Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescSave   .Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescZoom   .Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescRun    .Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescCompile.Left := (PageControlPanel.Width div 4) + adj;
+  PanelDescClear  .Left := (PageControlPanel.Width div 4) + adj;
+
   ButtonNewDocument.Left := Max(50, (PanelRight.Width div 2) - ButtonNewDocument.Width - (ButtonOpenDocument.Width div 2) - 65);
   ButtonOpenDocument.Left := ButtonNewDocument.Left + ButtonNewDocument.Width + 25;
   ButtonOptions.Left := ButtonOpenDocument.Left + ButtonOpenDocument.Width + 25;
@@ -7335,12 +7355,13 @@ var
   I: Integer;
   PageControl: TPageControl;
   TabSheet: TCloseTabSheet;
+  e: TEditor;
 begin
   PageControl := Sender as TPageControl;
 
   if Button = mbLeft then
   begin
-    for I := 0 to PageControl.PageCount - 1 do
+    for I := PageControl.PageCount - 1 downto 0 do            // tabs can disappear
     begin
       if not (PageControl.Pages[i] is TCloseTabSheet) then Continue;
       TabSheet:=PageControl.Pages[i] as TCloseTabSheet;
@@ -7349,6 +7370,8 @@ begin
         FCloseButtonMouseDownTab := TabSheet;
         FCloseButtonShowPushed := True;
         PageControl.Repaint;
+        e := fEditorList.GetEditor(I,PageControl);            // determine tab being closed
+        actCloseExecuteByTab(Sender, e);
       end;
     end;
   end;
@@ -7398,7 +7421,7 @@ begin
         TThread.Synchronize(nil, procedure begin
           //FCloseButtonMouseDownTab.DoClose;
           //FCloseButtonMouseDownTab := nil;
-          actCloseExecute(Sender);
+          //actCloseExecute(Sender);                //  can close wrong tab
           PageControl.Repaint;
         end);
       end);
