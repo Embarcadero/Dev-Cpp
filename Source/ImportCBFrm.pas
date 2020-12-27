@@ -70,7 +70,7 @@ type
 implementation
 
 uses
-  System.UITypes, IniFiles, StrUtils, version, MultiLangSupport, devcfg, utils;
+  System.UITypes, IniFiles, StrUtils, version, MultiLangSupport, utils;
 
 {$R *.dfm}
 

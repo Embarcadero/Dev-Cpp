@@ -374,6 +374,10 @@ object EditorOptForm: TEditorOptForm
     end
     object tabDisplay: TTabSheet
       Caption = 'Fonts'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ScrollHint: TLabel
         Left = 0
         Top = 382
@@ -569,6 +573,10 @@ object EditorOptForm: TEditorOptForm
     end
     object tabSyntax: TTabSheet
       Caption = 'Colors'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblForeground: TLabel
         Left = 9
         Top = 182
@@ -814,6 +822,10 @@ object EditorOptForm: TEditorOptForm
     end
     object tabCode: TTabSheet
       Caption = 'Snippets'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PagesSnippets: TPageControl
         Left = 0
         Top = 0
@@ -824,6 +836,10 @@ object EditorOptForm: TEditorOptForm
         TabOrder = 0
         object tabCPInserts: TTabSheet
           Caption = 'Inserts'
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object btnAdd: TButton
             Left = 384
             Top = 45
@@ -906,6 +922,10 @@ object EditorOptForm: TEditorOptForm
         end
         object tabCPDefault: TTabSheet
           Caption = 'Default Insert'
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object cbDefaultCode: TCheckBox
             Left = 4
             Top = 2
@@ -964,6 +984,10 @@ object EditorOptForm: TEditorOptForm
     end
     object tabCBCompletion: TTabSheet
       Caption = 'Completion'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PagesCompletion: TPageControl
         Left = 0
         Top = 0
@@ -975,6 +999,10 @@ object EditorOptForm: TEditorOptForm
         object tabCodeCompletion: TTabSheet
           Caption = 'Code Completion'
           ImageIndex = 1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object lblCompletionColor: TLabel
             Left = 328
             Top = 108
@@ -1060,6 +1088,10 @@ object EditorOptForm: TEditorOptForm
         object tabSymbolCompletion: TTabSheet
           Caption = 'Symbol Completion'
           ImageIndex = 2
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object grpSpecific: TGroupBox
             Left = 16
             Top = 40
@@ -1167,6 +1199,10 @@ object EditorOptForm: TEditorOptForm
     object tabAutosave: TTabSheet
       Caption = 'Autosave'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object cbAutoSave: TCheckBox
         Left = 8
         Top = 8

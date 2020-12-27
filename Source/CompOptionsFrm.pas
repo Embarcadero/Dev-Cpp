@@ -119,7 +119,7 @@ type
 implementation
 
 uses
-  System.UItypes, ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
+  System.UItypes, ShellAPI, FileCtrl, version, devcfg, utils, MultiLangSupport;
 
 {$R *.dfm}
 

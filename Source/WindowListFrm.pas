@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, DataFrm;
+  StdCtrls, Buttons, ExtCtrls, ComCtrls;
 
 type
   TWindowListForm = class(TForm)

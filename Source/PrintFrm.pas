@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, MultiLangSupport, Spin,DataFrm;
+  StdCtrls, Buttons, Spin;
 
 type
   TPrintForm = class(TForm)
@@ -47,8 +47,8 @@ type
 
 implementation
 
-uses 
-  devcfg;
+uses
+  MultiLangSupport, devcfg;
 
 {$R *.dfm}
 

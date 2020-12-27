@@ -22,8 +22,8 @@ unit Tests;
 interface
 
 uses
-  Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs, NewProjectFrm, Project,
-  Menus, Registry, Controls, ComCtrls, Math, ActnList, CompOptionsFrm, SynEditKeyCmds, SynEditTypes;
+  Windows, Classes, Sysutils, Dateutils, ShellAPI, Dialogs,
+  Menus, Registry, Controls, ComCtrls, Math, ActnList, SynEditKeyCmds, SynEditTypes;
 
 type
   TTestClass = class
@@ -41,7 +41,7 @@ type
 implementation
 
 uses
-  Main, EditorList, Editor, Version;
+  VCL.Forms, CompOptionsFrm, Main, EditorList, Editor;
 
 procedure TTestClass.ShowUpdate(Delay: Integer);
 begin

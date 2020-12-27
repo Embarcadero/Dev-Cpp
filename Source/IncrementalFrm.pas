@@ -72,7 +72,7 @@ implementation
 {$R *.dfm}
 
 uses
-  main, MultilangSupport;
+  MultilangSupport;
 
 procedure TIncrementalForm.SetEditor(value: TSynEdit);
 begin

@@ -143,6 +143,10 @@ object NewTemplateForm: TNewTemplateForm
     end
     object pgFiles: TTabSheet
       Caption = 'Files'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblFiles: TLabel
         Left = 8
         Top = 12
@@ -161,6 +165,10 @@ object NewTemplateForm: TNewTemplateForm
     end
     object pgExtras: TTabSheet
       Caption = 'Extras'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblCompiler: TLabel
         Left = 8
         Top = 12

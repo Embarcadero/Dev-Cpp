@@ -875,6 +875,10 @@ object ProjectOptionsFrm: TProjectOptionsFrm
     end
     object tabVersion: TTabSheet
       Caption = 'Version Info'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object chkVersionInfo: TCheckBox
         Left = 12
         Top = 8

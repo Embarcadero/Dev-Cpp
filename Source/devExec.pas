@@ -22,7 +22,7 @@ unit devExec;
 interface
 
 uses
-  Windows, Classes, Forms, devcfg, utils;
+  Windows, Classes;
 
 type
   {$M+}
@@ -67,7 +67,7 @@ function devExecutor: TdevExecutor;
 implementation
 
 uses
-  main;
+  Forms;
 
 { TExecThread }
 

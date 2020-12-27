@@ -22,7 +22,7 @@ unit FileAssocs;
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms, Registry, ShlObj;
+  Windows, Forms, SysUtils, Classes, Registry, ShlObj;
 
 procedure RegisterFiletype(const extension, filetype, description, verb, serverapp, IcoNum: String);
 procedure RegisterDDEServer(const filetype, verb, topic, servername, macro: String);

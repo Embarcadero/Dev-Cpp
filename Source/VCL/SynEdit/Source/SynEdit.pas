@@ -1996,7 +1996,6 @@ end;
 procedure TCustomSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState;
   X, Y: Integer);
 var
-  bWasSel: Boolean;
   TmpBegin, TmpEnd: TBufferCoord;
   P : TPoint;
   // Ole drag drop
@@ -2009,12 +2008,8 @@ begin
   TmpBegin := FBlockBegin;
   TmpEnd := FBlockEnd;
 
-  bWasSel := False;
   if (Button = mbLeft) and ((Shift + [ssDouble]) = [ssLeft, ssDouble]) then
   begin
-    if SelAvail then
-      //remember selection state, as it will be cleared later
-      bWasSel := True;
     if (FClickCount > 0)
        and (Abs(fMouseDownX - X) < GetSystemMetrics(SM_CXDRAG))
        and (Abs(fMouseDownY - Y) < GetSystemMetrics(SM_CYDRAG))

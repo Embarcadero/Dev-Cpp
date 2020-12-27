@@ -69,10 +69,6 @@ object CompOptForm: TCompOptForm
     TabOrder = 0
     object tabCompiler: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         476
         375)

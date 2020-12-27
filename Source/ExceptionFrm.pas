@@ -508,12 +508,12 @@ begin
 end;
 
 procedure TExceptionFrm.btnSendClick(Sender: TObject);
-var
-  Socket: TClientSocket;
-  I: integer;
+//var
+  //  Socket: TClientSocket;
+  //  I: integer;
   //	SocketResult: integer;
   //	Buffer: array[0..1024] of Char;
-  Cmd, EmailBody, EmailSubject: String;
+  //  Cmd, EmailBody, EmailSubject: String;
 begin
   {// Move focus to other button
   btnSend.Default := false;

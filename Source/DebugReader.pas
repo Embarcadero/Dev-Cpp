@@ -23,7 +23,7 @@ interface
 
 uses
   Sysutils, Classes, Windows, StdCtrls,
-  Dialogs, editor, ComCtrls, StrUtils, Forms;
+  Dialogs, editor, ComCtrls, StrUtils;
 
 type
   TAnnotateType = (
@@ -151,7 +151,7 @@ type
 implementation
 
 uses
-  System.UItypes, main, devcfg, CPUFrm, multilangsupport, debugger, utils, Controls, Math;
+  System.UItypes, main, devcfg, Forms, CPUFrm, multilangsupport, debugger, utils, Controls, Math;
 
 // macro for all the things that need to be done when we are finished parsing the current block
 
