@@ -5,6 +5,14 @@ The main executable devcpp.exe can be built using the following steps:
 	1) Install
 		VCL Style - Windows10BlueWhale from GetIt in the IDE.
 		https://getitnow.embarcadero.com/VCLStyle-Windows10BlueWhale-1.0/
+		VCL Style - Calypso from GetIt in the IDE.
+		https://getitnow.embarcadero.com/VCLStyle-Calypso-1.0/
+		VCL Style - FlatUILight from GetIt in the IDE.
+		https://getitnow.embarcadero.com/VCLStyle-FlatUILight-1.0/
+		VCL Style - MaterialPatternsBlue from GetIt in the IDE.
+		https://getitnow.embarcadero.com/VCLStyle-MaterialPatternsBlue-1.0/
+		VCL Style - Windows10BlackPearl from GetIt in the IDE.
+		https://getitnow.embarcadero.com/VCLStyle-Windows10BlackPearl-1.0/
 	1) Compile and install the following package(s):
 		Source\VCL\DevCpp.dpk
 		Source\VCL\SynEdit\Packages\Sydney\Delphi\SynEditDelphi.groupproj

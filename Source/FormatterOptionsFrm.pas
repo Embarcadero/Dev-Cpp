@@ -24,7 +24,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Buttons, StdCtrls, Inifiles, ExtCtrls, ComCtrls, Spin, Math,
-  CompOptionsFrame, CompOptionsList, SynEdit, Editor;
+  CompOptionsList, SynEdit;
 
 type
   TFormatterOptionsForm = class(TForm)
@@ -75,7 +75,7 @@ type
 implementation
 
 uses
-  System.IOUtils, System.UITypes, ShellAPI, Main, FileCtrl, version, devcfg, utils, MultiLangSupport, DataFrm;
+  System.IOUtils, System.UITypes, Editor, ShellAPI, Main, FileCtrl, devcfg, MultiLangSupport;
 
 {$R *.dfm}
 

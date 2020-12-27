@@ -57,7 +57,7 @@ type
 implementation
 
 uses
-  SysUtils, IniFiles, devCFG, Utils, version, MultiLangSupport;
+  SysUtils, IniFiles, devCFG, Utils, version;
 
 { TCodeInsList }
 

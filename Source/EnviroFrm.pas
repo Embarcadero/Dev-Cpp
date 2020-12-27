@@ -24,7 +24,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, ExtCtrls, ExtDlgs, Buttons,
-  CheckLst, Grids, ValEdit, ComCtrls, vcl.Themes, Vcl.BaseImageCollection,
+  CheckLst, Grids, ValEdit, ComCtrls, Vcl.BaseImageCollection,
   Vcl.ImageCollection, Vcl.VirtualImage, System.ImageList, Vcl.ImgList;
 
 type
@@ -124,7 +124,7 @@ type
 implementation
 
 uses
-  System.UITypes, ShellAPI, Filectrl, devcfg, MultiLangSupport, version, DataFrm, utils, FileAssocs, ImageTheme, main,
+  System.UITypes, VCL.Themes, ShellAPI, Filectrl, devcfg, MultiLangSupport, version, DataFrm, utils, FileAssocs, main,
   StrUtils;
 
 {$R *.dfm}

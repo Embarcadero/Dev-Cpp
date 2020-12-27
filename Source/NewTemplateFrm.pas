@@ -24,7 +24,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, ExtCtrls, Buttons, ComCtrls,
-  project, ImgList, ExtDlgs, IniFiles, System.UITypes,DataFrm;
+  project, ImgList, ExtDlgs, IniFiles, System.UITypes;
 
 type
   TNewTemplateForm = class(TForm)

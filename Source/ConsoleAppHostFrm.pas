@@ -118,8 +118,8 @@ begin
   var WindowPlacement: PWindowPlacement := nil;
   if (GetWindowPlacement(AWnd, WindowPlacement) and (WindowPlacement.showCmd <> SW_HIDE)) then Exit(True);
 
-  var ThreadHandle: DWORD := 0;
-  var ThreadProcessID: Cardinal := 0;
+  var ThreadHandle: DWORD;
+  var ThreadProcessID: Cardinal;
 
   try
     ThreadHandle := OpenThread($0800, FALSE, GetWindowThreadProcessId(AWnd));

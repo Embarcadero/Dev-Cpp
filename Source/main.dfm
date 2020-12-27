@@ -196,6 +196,10 @@ object MainForm: TMainForm
     OnChange = MessageControlChange
     object CompSheet: TTabSheet
       Caption = 'Compiler'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object CompilerOutput: TListView
         Left = 0
         Top = 0
@@ -240,6 +244,10 @@ object MainForm: TMainForm
     object ResSheet: TTabSheet
       Caption = 'Resource'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ResourceOutput: TListView
         Left = 0
         Top = 0
@@ -514,6 +522,10 @@ object MainForm: TMainForm
     object FindSheet: TTabSheet
       Caption = 'Find results'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object FindOutput: TListView
         Left = 0
         Top = 0
@@ -604,6 +616,10 @@ object MainForm: TMainForm
     object CloseSheet: TTabSheet
       Caption = 'Close'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
   object ToolbarDock: TControlBar

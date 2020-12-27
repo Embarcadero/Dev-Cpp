@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, SynEdit, utils,
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, SynEdit,
   SynEditTypes, FileCtrl, Menus;
 
 type

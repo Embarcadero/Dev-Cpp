@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons,DataFrm;
+  Dialogs, StdCtrls, Buttons;
 
 type
   TParamsForm = class(TForm)

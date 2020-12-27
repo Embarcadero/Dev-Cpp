@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, Menus, FileCtrl, SynEdit, ToolWin, ComCtrls, Themes,
+  StdCtrls, Buttons, ExtCtrls, Menus, FileCtrl, SynEdit, ToolWin, ComCtrls,
   svgColor, Vcl.VirtualImage;
 
 type
@@ -65,7 +65,7 @@ type
 implementation
 
 uses
-  MultiLangSupport, DataFrm, devcfg, utils, main, version, ImageTheme, SynEditTypes;
+  MultiLangSupport, Themes, DataFrm, devcfg, utils, SynEditTypes;
 
 {$R *.dfm}
 

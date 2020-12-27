@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Buttons, Macros, DataFrm;
+  Dialogs, StdCtrls, ExtCtrls, Buttons;
 
 type
   TToolEditForm = class(TForm)
@@ -63,7 +63,7 @@ type
 implementation
 
 uses
-  FileCtrl, MultiLangSupport, devcfg, utils, main;
+  FileCtrl, MultiLangSupport, devcfg, utils, main, Macros;
 
 {$R *.dfm}
 

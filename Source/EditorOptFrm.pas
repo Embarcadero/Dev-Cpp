@@ -217,7 +217,7 @@ type
 implementation
 
 uses
-  System.Types, Vcl.ExtDlgs, shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, DataFrm, IniFiles, editor,
+  System.Types, Vcl.ExtDlgs, shlobj, MultiLangSupport, devcfg, version, utils, math, CommCtrl, DateUtils, CodeInsList, DataFrm, IniFiles,
   main;
 
 {$R *.dfm}

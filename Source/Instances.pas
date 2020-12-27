@@ -22,7 +22,7 @@ unit Instances;
 interface
 
 uses
-  Windows, Messages, Psapi, SysUtils, Forms, StrUtils, Classes;
+  Windows, Messages, Psapi, SysUtils, StrUtils, Classes;
 
 function GetSentStructData(Message: TMessage): String;
 procedure SendToPreviousInstance(Instance: THandle; const Data: String);
@@ -34,7 +34,7 @@ const
 implementation
 
 uses
-  main, Dialogs;
+  main, VCL.Dialogs, VCL.Forms;
 
 var
   PreviousInstance: THandle; // return value for GetPreviousInstanceCallback

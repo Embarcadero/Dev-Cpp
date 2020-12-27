@@ -25,13 +25,13 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, System.UITypes,
-  Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, utils, SynEditPrint,
+  Menus, StdCtrls, ComCtrls, ToolWin, ExtCtrls, Buttons, SynEditPrint,
   Project, editor, DateUtils, compiler, ActnList, ToolFrm, AppEvnts,
   debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer, SyncObjs,
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
-  devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg, SynEditTextBuffer,
-  CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm, System.Actions,
-  vcl.Themes, SVGColor, Vcl.Imaging.pngimage, Vcl.WinXCtrls, Vcl.WinXPanels, Vcl.ExtDlgs,
+  devShortcuts, CommCtrl, SynEditTextBuffer,
+  CppPreprocessor, CBUtils, StatementList, System.Actions,
+  SVGColor, Vcl.Imaging.pngimage, Vcl.WinXCtrls, Vcl.WinXPanels, Vcl.ExtDlgs,
   Vcl.Styles.Hooks,
   Vcl.Styles.Utils.Menus, //Style Popup and Shell Menus (class #32768)
   Vcl.Styles.Utils.Forms, //Style dialogs box (class #32770)
@@ -976,11 +976,11 @@ var
 implementation
 
 uses
-  System.Threading, System.Math, ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
-  DataFrm, NewProjectFrm, AboutFrm, PrintFrm,
+  System.Threading, System.Math, vcl.Themes, ShellAPI, IniFiles, Clipbrd, MultiLangSupport, version,
+  DataFrm, NewProjectFrm, AboutFrm, PrintFrm, debugreader,
   CompOptionsFrm, EditorOptFrm, IncrementalFrm, EnviroFrm,
-  SynEdit, ImageTheme, SynEditKeyCmds, Instances,
-  Types, FindFrm, ProjectTypes, devExec, Tests,
+  SynEdit, ImageTheme, SynEditKeyCmds, Instances, FormatterOptionsFrm,
+  Types, FindFrm, ProjectTypes, devExec, devCfg, Utils, Tests,
   NewTemplateFrm, FunctionSearchFrm, NewFunctionFrm, NewVarFrm, NewClassFrm,
   ProfileAnalysisFrm, FilePropertiesFrm, AddToDoFrm, ViewToDoFrm,
   ImportMSVCFrm, ImportCBFrm, CPUFrm, FileAssocs, TipOfTheDayFrm,

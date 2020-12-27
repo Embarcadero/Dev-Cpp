@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Grids, ValEdit, ComCtrls, ExtCtrls, CompOptionsList, project, utils, ProjectTypes, StdCtrls;
+  Grids, ValEdit, ComCtrls, ExtCtrls, CompOptionsList, StdCtrls;
 
 type
   TCompOptionsFrame = class(TFrame)
@@ -39,7 +39,7 @@ type
 implementation
 
 uses
-  devcfg, multilangsupport;
+  devcfg, utils, multilangsupport;
 
 {$R *.dfm}
 

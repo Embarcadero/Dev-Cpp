@@ -24,7 +24,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Forms, 
   ImgList, ComCtrls, Buttons, StdCtrls, Controls, Dialogs, ExtDlgs,
-  System.ImageList,DataFrm;
+  System.ImageList;
 
 type
   TIconForm = class(TForm)
@@ -52,7 +52,7 @@ type
 
 implementation
 
-uses Version, MultiLangSupport, devcfg, utils;
+uses MultiLangSupport, devcfg, utils;
 
 {$R *.dfm}
 

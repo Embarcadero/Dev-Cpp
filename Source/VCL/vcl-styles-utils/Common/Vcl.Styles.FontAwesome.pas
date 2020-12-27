@@ -848,13 +848,13 @@ end;
 type
   TCustomActivityIndicatorShadow = class(TCustomControl)
   private
-    FAnimate: Boolean;
-    FIndicatorColor: TActivityIndicatorColor;
-    FIndicatorSize: TActivityIndicatorSize;
-    FIndicatorType: TActivityIndicatorType;
-    FFrameDelay: Word;
-    FFrameIndex: Integer;
-    FTimer: TTimer;
+//    FAnimate: Boolean;
+//    FIndicatorColor: TActivityIndicatorColor;
+//    FIndicatorSize: TActivityIndicatorSize;
+//    FIndicatorType: TActivityIndicatorType;
+//    FFrameDelay: Word;
+//    FFrameIndex: Integer;
+//    FTimer: TTimer;
     FFrameList: TImageList;
     FFrameCount: Integer;
     FFrameSize: Integer;

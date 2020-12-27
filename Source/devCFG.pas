@@ -23,7 +23,7 @@ interface
 
 uses
   Dialogs, Windows, Classes, Graphics, SynEdit, editor, CFGData, IniFiles, ProjectTypes, Math, ShellAPI, ShlObj,
-  ComCtrls, System.UITypes, Vcl.Themes, SynEditTextBuffer, System.SysUtils;
+  ComCtrls, System.UITypes, SynEditTextBuffer, System.SysUtils;
 
 const
   BoolValYesNo: array[boolean] of String = ('No', 'Yes');

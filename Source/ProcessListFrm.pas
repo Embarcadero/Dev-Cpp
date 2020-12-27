@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls, MultiLangSupport,DataFrm;
+  Dialogs, StdCtrls, Buttons, ExtCtrls;
 
 type
   TProcessListForm = class(TForm)
@@ -47,7 +47,7 @@ var
 implementation
 
 uses 
-  tlhelp32, devcfg;
+  tlhelp32, MultiLangSupport, devcfg;
 
 {$R *.dfm}
 

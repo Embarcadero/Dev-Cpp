@@ -23,8 +23,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, main, project,
-  ProjectTypes, Spin, ValEdit, CompOptionsFrame, ShellApi, Grids,DataFrm;
+  ExtDlgs, StdCtrls, ExtCtrls, Buttons, ComCtrls, project,
+  Spin, ValEdit, CompOptionsFrame, ShellApi, Grids;
 
 type
   TProjectOptionsFrm = class(TForm)
@@ -193,7 +193,7 @@ type
 implementation
 
 uses
-  System.UITypes, FileCtrl, devcfg, IconFrm, utils, MultiLangSupport, version, Math;
+  System.UITypes, FileCtrl, devcfg, IconFrm, main, utils, MultiLangSupport, version, Math;
 
 {$R *.dfm}
 

@@ -172,7 +172,7 @@
         <DCCReference Include="IconFrm.pas">
             <Form>IconForm</Form>
         </DCCReference>
-        <DCCReference Include="devcfg.pas"/>
+        <DCCReference Include="devCFG.pas"/>
         <DCCReference Include="DataFrm.pas">
             <Form>dmMain</Form>
             <DesignClass>TDataModule</DesignClass>

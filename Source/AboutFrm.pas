@@ -22,8 +22,8 @@ unit AboutFrm;
 interface
 
 uses
-  Windows, SysUtils, Classes, version, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, Vcl.Imaging.pngimage,DataFrm;
+  Windows, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  StdCtrls, Buttons, ExtCtrls, Vcl.Imaging.pngimage;
 
 type
   TAboutForm = class(TForm)
@@ -86,7 +86,7 @@ type
 implementation
 
 uses
-  System.UITypes, ShellAPI, devcfg, utils, MultiLangSupport, main;
+  System.UITypes, ShellAPI, version, devcfg, utils, MultiLangSupport;
 
 {$R *.dfm}
 

@@ -22,8 +22,8 @@ unit EditorList;
 interface
 
 uses
-  Windows, SysUtils, Dialogs, StdCtrls, Controls, ComCtrls, Forms, Editor, ExtCtrls,
-  devrun, version, project, utils, ProjectTypes, Classes, Graphics, Math, Messages;
+  Windows, SysUtils, Dialogs, StdCtrls, Controls, ComCtrls, Editor, ExtCtrls,
+  ProjectTypes, Classes, Graphics, Math, Messages;
 
 type
   TLayoutShowType = (lstNone, lstLeft, lstRight, lstBoth);

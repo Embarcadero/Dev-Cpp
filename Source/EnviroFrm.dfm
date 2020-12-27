@@ -301,6 +301,10 @@ object EnviroForm: TEnviroForm
       Caption = 'Directories'
       ParentShowHint = False
       ShowHint = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblUserDir: TLabel
         Left = 8
         Top = 80
@@ -489,6 +493,10 @@ object EnviroForm: TEnviroForm
     end
     object tabExternal: TTabSheet
       Caption = 'External Programs'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         476
         395)
@@ -544,6 +552,10 @@ object EnviroForm: TEnviroForm
       Caption = 'File Associations'
       ParentShowHint = False
       ShowHint = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         476
         395)
@@ -581,6 +593,10 @@ object EnviroForm: TEnviroForm
     object TabAppearance: TTabSheet
       Caption = 'Appearance'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LblStyle: TLabel
         Left = 5
         Top = 14
@@ -705,12 +721,16 @@ object EnviroForm: TEnviroForm
           ExplicitHeight = 159
           object TabSheet1: TTabSheet
             Caption = 'TabSheet1'
+            ExplicitLeft = 0
+            ExplicitTop = 0
             ExplicitWidth = 92
             ExplicitHeight = 129
           end
           object TabSheet2: TTabSheet
             Caption = 'TabSheet2'
             ImageIndex = 1
+            ExplicitLeft = 0
+            ExplicitTop = 0
             ExplicitWidth = 93
             ExplicitHeight = 129
           end

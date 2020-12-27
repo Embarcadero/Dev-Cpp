@@ -22,8 +22,8 @@ unit Editor;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, CodeCompletion, CppParser, SynExportTeX,
-  SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds, version,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Dialogs, CodeCompletion, CppParser, SynExportTeX,
+  SynEditExport, SynExportRTF, Menus, ImgList, ComCtrls, StdCtrls, ExtCtrls, SynEdit, SynEditKeyCmds,
   SynEditCodeFolding, SynExportHTML, SynEditTextBuffer, Math, StrUtils, SynEditTypes, SynEditHighlighter, DateUtils,
   CodeToolTip, CBUtils, System.UITypes, System.Contnrs, SynEditPrint, Vcl.ExtDlgs;
 
@@ -237,9 +237,9 @@ type
 implementation
 
 uses
-  main, project, MultiLangSupport, devcfg, utils, Vcl.Themes,
+  Forms, version, main, project, MultiLangSupport, devcfg, utils,
   DataFrm, GotoLineFrm, Macros, debugreader, IncrementalFrm,
-  CodeCompletionForm, SynEditMiscClasses, CharUtils, Vcl.Printers, SynEditPrintTypes;
+  CodeCompletionForm, SynEditMiscClasses, Vcl.Printers, SynEditPrintTypes;
 
 { TCloseTabSheet }
 constructor TCloseTabSheet.Create(AOwner:TComponent);
@@ -344,7 +344,7 @@ end;
 
 function IsStrUTF8(const Text: AnsiString): boolean;
 begin
-  result := (Text <> '') and (UTF8Decode(Text) <> Text);
+  result := (Text <> '') and (UTF8ToWideString(Text) <> Text);
 end;
 
 function UTF8FileBOM(const FileName: string): boolean;
@@ -378,7 +378,7 @@ var
 
 begin
    if not FileExists(FileName) then
-     Exit;
+     Exit(False);
    YesSequences := 0;
    NoSequences := 0;
    Stream := TMemoryStream.Create;

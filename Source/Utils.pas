@@ -22,7 +22,7 @@ unit Utils;
 interface
 
 uses
-  Windows, Classes, Sysutils, Dateutils, Forms, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
+  Windows, Classes, Sysutils, Dateutils, ShellAPI, Dialogs, SynEdit, SynEditHighlighter,
   Menus, Registry, Controls, ComCtrls, Messages, System.AnsiStrings, Vcl.ExtDlgs;
 
 type
@@ -164,7 +164,7 @@ type
 implementation
 
 uses
-  devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor, ShlObj, ActiveX, System.IOUtils, CharUtils, Vcl.Styles.Utils.SysControls, Winapi.CommCtrl, Vcl.Themes;
+  VCL.Forms, devcfg, version, Graphics, StrUtils, MultiLangSupport, main, editor, ShlObj, ActiveX, CharUtils, Vcl.Styles.Utils.SysControls, Winapi.CommCtrl, Vcl.Themes;
 
 function FastStringReplace(const S, OldPattern, NewPattern: String; Flags: TReplaceFlags): String;
 var
