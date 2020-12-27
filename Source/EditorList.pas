@@ -74,7 +74,7 @@ type
 implementation
 
 uses
-  System.UItypes, main, MultiLangSupport, DataFrm;
+  System.UItypes, main, project, MultiLangSupport, DataFrm;
 
 function TEditorList.GetPageCount: integer;
 begin
