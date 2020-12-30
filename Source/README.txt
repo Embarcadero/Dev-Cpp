@@ -1,5 +1,7 @@
 1. Compiling devcpp.exe
 
+To build devcpp a recent Delphi version is required (10.4 and onwards).
+
 The main executable devcpp.exe can be built using the following steps:
 
 	1) Install
@@ -21,10 +23,6 @@ The main executable devcpp.exe can be built using the following steps:
 	4) It is advisable to run CleanSource.bat before commiting work, when you
 	   get errors complaining about old versions of code or when you want to 
 	   diff the source folder.
-
-This process has only been tested using Delphi 6 and Delphi 7. The code base
-should be compatible with more recent versions of Delphi, but there is no 
-guarantee anything will work.
 
 2. Compiling associated tools
 
