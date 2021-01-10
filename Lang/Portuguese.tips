@@ -4,7 +4,7 @@
 # Suggestions or bugs, mail me.
 # 
 # Obrigado a todos que me ajudaram.
-# Sugestões ou bugs encontrados, mandem um email p/ mim.
+# SugestÃµes ou bugs encontrados, mandem um email p/ mim.
 #
 # This is a TipOfTheDay tips file.
 # Keep each tip on one line.
@@ -37,54 +37,54 @@
 #
 # Important tips (appear first)
 #
-...posso desabilitar essas dicas?<CR><CR>As dicas apresentadas aqui são informações não documentadas e você não as encontrarão em nenhum lugar.<CR>Se você as desabilitar e depois quiser vê-las mais tarde, selecione "Ajuda / Dica do dia"...
+...posso desabilitar essas dicas?<CR><CR>As dicas apresentadas aqui sÃ£o informaÃ§Ãµes nÃ£o documentadas e vocÃª nÃ£o as encontrarÃ£o em nenhum lugar.<CR>Se vocÃª as desabilitar e depois quiser vÃª-las mais tarde, selecione "Ajuda / Dica do dia"...
 
-...posso usar o vUpdate para manter o Dev-C++ atualizado com as últimas correções de bugs e novas funcionalidades?<CR><CR>Selecione "Ferramentas / Atualizações... / Pacotes..."
+...posso usar o vUpdate para manter o Dev-C++ atualizado com as Ãºltimas correÃ§Ãµes de bugs e novas funcionalidades?<CR><CR>Selecione "Ferramentas / AtualizaÃ§Ãµes... / Pacotes..."
 
 #
 # Code-completion tips
 #
-...a complementação de código irá ajudar a aumentar a produtividade, sugerindo todos os possíveis comandos disponíveis no contexto atual?<CR><CR>Para habilitar a complementação de código, vá em "Ferramentas / Opções do Editor" e habilite a visualização de classes e a complementação de código.
+...a complementaÃ§Ã£o de cÃ³digo irÃ¡ ajudar a aumentar a produtividade, sugerindo todos os possÃ­veis comandos disponÃ­veis no contexto atual?<CR><CR>Para habilitar a complementaÃ§Ã£o de cÃ³digo, vÃ¡ em "Ferramentas / OpÃ§Ãµes do Editor" e habilite a visualizaÃ§Ã£o de classes e a complementaÃ§Ã£o de cÃ³digo.
 
-...a complementação de código é iniciada quando digitamos ".", "->" or "::" na janela do editor após um tempo definido pelo usuário?<CR><CR>Para definir este tempo vá em "Ferramentas / Opções do Editor / Visualização de Classes / Complementação".
+...a complementaÃ§Ã£o de cÃ³digo Ã© iniciada quando digitamos ".", "->" or "::" na janela do editor apÃ³s um tempo definido pelo usuÃ¡rio?<CR><CR>Para definir este tempo vÃ¡ em "Ferramentas / OpÃ§Ãµes do Editor / VisualizaÃ§Ã£o de Classes / ComplementaÃ§Ã£o".
 
-...posso iniciar a complementação de código pressionando "Ctrl+Space" em qualquer momento, na janela do editor?<CR><CR>(Tente pressionar "Ctrl+Shift+Space" quando o cursor estiver dentro do parêntesis de argumento de uma função...)
+...posso iniciar a complementaÃ§Ã£o de cÃ³digo pressionando "Ctrl+Space" em qualquer momento, na janela do editor?<CR><CR>(Tente pressionar "Ctrl+Shift+Space" quando o cursor estiver dentro do parÃªntesis de argumento de uma funÃ§Ã£o...)
 
-...shift-clique na entrada do visualizador de classes, fornece a declaração ao invés da implementação?<CR>Com certeza, você pode também usar o menu de contexto para a mesma (e mais!) função...
+...shift-clique na entrada do visualizador de classes, fornece a declaraÃ§Ã£o ao invÃ©s da implementaÃ§Ã£o?<CR>Com certeza, vocÃª pode tambÃ©m usar o menu de contexto para a mesma (e mais!) funÃ§Ã£o...
 
-...posso adicionar diretórios customizados no visualizador de classes para localizar facilmente o que desejar, em grandes projetos? Você pode até aninhar os diretórios customizados!<CR><CR>Basta clicar com o botão direito no visualizador de classes para ter o menu contextual...
+...posso adicionar diretÃ³rios customizados no visualizador de classes para localizar facilmente o que desejar, em grandes projetos? VocÃª pode atÃ© aninhar os diretÃ³rios customizados!<CR><CR>Basta clicar com o botÃ£o direito no visualizador de classes para ter o menu contextual...
 
-...as informações dos diretórios customizados estão guardadas no arquivo "classfolders.dcf", no diretório raiz do projeto?<CR><CR>Se alguna coisa acontecer de errado, delete este arquivo e reabra o seu projeto!
+...as informaÃ§Ãµes dos diretÃ³rios customizados estÃ£o guardadas no arquivo "classfolders.dcf", no diretÃ³rio raiz do projeto?<CR><CR>Se alguna coisa acontecer de errado, delete este arquivo e reabra o seu projeto!
 
-...existem dois modos de exibição do visualizador de classes?<CR>Um mostra todas as suas classes/membros/funções, analisadas do projeto, e o outro mostra *somente* informações relevantes do arquivo que está sendo editado atualmente.<CR><CR>Clique com o botão direito no visualizador de classes e selecione "Modo de Visualização"...
+...existem dois modos de exibiÃ§Ã£o do visualizador de classes?<CR>Um mostra todas as suas classes/membros/funÃ§Ãµes, analisadas do projeto, e o outro mostra *somente* informaÃ§Ãµes relevantes do arquivo que estÃ¡ sendo editado atualmente.<CR><CR>Clique com o botÃ£o direito no visualizador de classes e selecione "Modo de VisualizaÃ§Ã£o"...
 
 #
 # Project Manager tips
 #
-...posso definir se terei que dar duplo-clique ou não, em um arquivo, no gerenciador de projetos, para abrí-lo num editor?<CR><CR>Para definir isto vá em "Ferramentas / Opções de Ambiente" e habilite (ou desabilite) "Duplo clique para abrir o gerenciador de arquivos de projetos"...
+...posso definir se terei que dar duplo-clique ou nÃ£o, em um arquivo, no gerenciador de projetos, para abrÃ­-lo num editor?<CR><CR>Para definir isto vÃ¡ em "Ferramentas / OpÃ§Ãµes de Ambiente" e habilite (ou desabilite) "Duplo clique para abrir o gerenciador de arquivos de projetos"...
 
-...posso definir diretórios customizados (nível superior somente) no gerenciador de projetos para organizar melhor os arquivos?<CR><CR>Para isso, clique com o botão direito em um arquivo no gerenciador de projetos para exibir o menu contextual...
+...posso definir diretÃ³rios customizados (nÃ­vel superior somente) no gerenciador de projetos para organizar melhor os arquivos?<CR><CR>Para isso, clique com o botÃ£o direito em um arquivo no gerenciador de projetos para exibir o menu contextual...
 
-...se você criou diretórios customizados no gerenciador de projetos, você pode arrastar && soltar arquivos para rearrumá-los?
+...se vocÃª criou diretÃ³rios customizados no gerenciador de projetos, vocÃª pode arrastar && soltar arquivos para rearrumÃ¡-los?
 
 #
 # File menu tips
 #
-...posso obter informação sobre o arquivo que estou trabalhando?<CR><CR>Selecione "Arquivo / Propriedades" e você irá obter infromação sobre o tamanho do arquivo, número de linhas, linhas de comentários, linhas vazias e arquivos incluídos!
+...posso obter informaÃ§Ã£o sobre o arquivo que estou trabalhando?<CR><CR>Selecione "Arquivo / Propriedades" e vocÃª irÃ¡ obter infromaÃ§Ã£o sobre o tamanho do arquivo, nÃºmero de linhas, linhas de comentÃ¡rios, linhas vazias e arquivos incluÃ­dos!
 
-...posso salvar o meu projeto como modelo?<CR><CR>Selecione "Arquivo / Novo / Modelo". Isto irá salvar o seu projeto como um modelo Dev-C++ e estará disponível quando você selecionar "Arquivo / Novo / Projeto".<CR>Desta forma você terá uma base para começar a programar, de acordo com seu gosto!
+...posso salvar o meu projeto como modelo?<CR><CR>Selecione "Arquivo / Novo / Modelo". Isto irÃ¡ salvar o seu projeto como um modelo Dev-C++ e estarÃ¡ disponÃ­vel quando vocÃª selecionar "Arquivo / Novo / Projeto".<CR>Desta forma vocÃª terÃ¡ uma base para comeÃ§ar a programar, de acordo com seu gosto!
 
-...posso importar meus projetos do MS Visual C++ no Dev-C++?<CR><CR>Selecione "Arquivo / Importar / Importar projeto do MS Visual C++".<CR>Talvez você tenha que ajustar algumas opções do projeto após a importação, mas veja, já é algum progresso!
+...posso importar meus projetos do MS Visual C++ no Dev-C++?<CR><CR>Selecione "Arquivo / Importar / Importar projeto do MS Visual C++".<CR>Talvez vocÃª tenha que ajustar algumas opÃ§Ãµes do projeto apÃ³s a importaÃ§Ã£o, mas veja, jÃ¡ Ã© algum progresso!
 
-...posso exportar um arquivo fonte ou todo um projeto para HTML ou RTF?<CR>Desta forma você pode publicar seus fontes em um website e compartilhá-los com o mundo!<CR><CR>Clique em "Arquivo / Exportar" e selecione o método desejado...
+...posso exportar um arquivo fonte ou todo um projeto para HTML ou RTF?<CR>Desta forma vocÃª pode publicar seus fontes em um website e compartilhÃ¡-los com o mundo!<CR><CR>Clique em "Arquivo / Exportar" e selecione o mÃ©todo desejado...
 
 #
 # Edit menu tips
 #
-...posso (des)comentar um conjunto de linhas selecionando-as e então clicando em "Editar / (Des)Comentar"?
+...posso (des)comentar um conjunto de linhas selecionando-as e entÃ£o clicando em "Editar / (Des)Comentar"?
 
-...posso (un)indentar um conjunto de linhas selecionando-as e então clicando em "Editar / (Un)Indentar"?
+...posso (un)indentar um conjunto de linhas selecionando-as e entÃ£o clicando em "Editar / (Un)Indentar"?
 
-...posso usar bookmarks no editor para me mover pelo código rapidamente?<CR><CR>Crie ou não um bookmark clicando em "Editar / Criar bookmarks" e selecionando o número do bookmark.<CR>Você pode ir para um conjunto de bookmarks clicando em "Editar / Ir para Goto bookmarks" e selecionando o número do bookmark.
+...posso usar bookmarks no editor para me mover pelo cÃ³digo rapidamente?<CR><CR>Crie ou nÃ£o um bookmark clicando em "Editar / Criar bookmarks" e selecionando o nÃºmero do bookmark.<CR>VocÃª pode ir para um conjunto de bookmarks clicando em "Editar / Ir para Goto bookmarks" e selecionando o nÃºmero do bookmark.
 
-...existe uma função "Ir para" poderosa no menu Localizar?<CR><CR>Ela exibe todas as funções dos arquivos e ao digitar algumas partes do nome das funções, o filtro vai exbindo somente as funções relacionadas. Pressione enter e você irá pra esta função imediatamente!<CR>Nota: O Visualizador de Classes deve estar habilitado...
+...existe uma funÃ§Ã£o "Ir para" poderosa no menu Localizar?<CR><CR>Ela exibe todas as funÃ§Ãµes dos arquivos e ao digitar algumas partes do nome das funÃ§Ãµes, o filtro vai exbindo somente as funÃ§Ãµes relacionadas. Pressione enter e vocÃª irÃ¡ pra esta funÃ§Ã£o imediatamente!<CR>Nota: O Visualizador de Classes deve estar habilitado...

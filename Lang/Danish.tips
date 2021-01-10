@@ -30,54 +30,54 @@
 #
 # Important tips (appear first)
 #
-...at du ikke bør slå disse tips fra?<CR><CR>De giver dig information om udokumenterede features, som ikke kan findes andre steder..<CR>Hvis du slår dem fra og alligevel vil se dem senere, vælg "Hjælp / Dagens tip"...
+...at du ikke bÃ¸r slÃ¥ disse tips fra?<CR><CR>De giver dig information om udokumenterede features, som ikke kan findes andre steder..<CR>Hvis du slÃ¥r dem fra og alligevel vil se dem senere, vÃ¦lg "HjÃ¦lp / Dagens tip"...
 
-...du kan bruge vUpdate til at holde dit Dev-C++ miljø up to date med de seneste bug fixes og nye features?<CR><CR>Vælg "værktøjer / Søg efter programopdateringer / Packages..."
+...du kan bruge vUpdate til at holde dit Dev-C++ miljÃ¸ up to date med de seneste bug fixes og nye features?<CR><CR>VÃ¦lg "vÃ¦rktÃ¸jer / SÃ¸g efter programopdateringer / Packages..."
 
 #
 # Code-completion tips
 #
-...at automatisk færddiggørelse af kode indstillingen vil forbedre din produktivitet, ved at vise alle mulige kommandoer inden for den aktive kontekst?<CR><CR>For at slå det til, gå til "Værktøjer / IDE indstillinger", og slå "klasse browsing" og "automatisk færddigørelse af kode" til.
+...at automatisk fÃ¦rddiggÃ¸relse af kode indstillingen vil forbedre din produktivitet, ved at vise alle mulige kommandoer inden for den aktive kontekst?<CR><CR>For at slÃ¥ det til, gÃ¥ til "VÃ¦rktÃ¸jer / IDE indstillinger", og slÃ¥ "klasse browsing" og "automatisk fÃ¦rddigÃ¸relse af kode" til.
 
-...at automatisk færddigørelse af kode bliver aktiveret ved at du taster ".", "->" eller "::" i editor vinduet, efter det bruger definerede time-out?<CR><CR>For at definere dette time-out, gå til "Værktøjer / IDE indstillinger / Klasse browser / Færdigørelse".
+...at automatisk fÃ¦rddigÃ¸relse af kode bliver aktiveret ved at du taster ".", "->" eller "::" i editor vinduet, efter det bruger definerede time-out?<CR><CR>For at definere dette time-out, gÃ¥ til "VÃ¦rktÃ¸jer / IDE indstillinger / Klasse browser / FÃ¦rdigÃ¸relse".
 
-...at du kan aktivere automatisk kode færddigørelse ved at trykke "Ctrl+Space" i editor vinduet?<CR><CR>(Prøv at trykke "Ctrl+Shift+Space" mens cursoren er inde i en funktions argument liste...)
+...at du kan aktivere automatisk kode fÃ¦rddigÃ¸relse ved at trykke "Ctrl+Space" i editor vinduet?<CR><CR>(PrÃ¸v at trykke "Ctrl+Shift+Space" mens cursoren er inde i en funktions argument liste...)
 
-...at du ved at holde shift nede mens du vælger en funktion i klasse browseren, hopper til dens deklaration i stedet for dens implementering?<CR>Du kan selvfølgelig også bruge kontekst menuen til dette. (og meget mere!)
+...at du ved at holde shift nede mens du vÃ¦lger en funktion i klasse browseren, hopper til dens deklaration i stedet for dens implementering?<CR>Du kan selvfÃ¸lgelig ogsÃ¥ bruge kontekst menuen til dette. (og meget mere!)
 
-...at du kan lave dine egne foldere i klasse browseren, for at holde bedre styr på store projekter? Du kan endda indlejre dem i hinanden!<CR><CR>Bare højre klik i klasse browseren for at frembringe kontekst menuen...
+...at du kan lave dine egne foldere i klasse browseren, for at holde bedre styr pÃ¥ store projekter? Du kan endda indlejre dem i hinanden!<CR><CR>Bare hÃ¸jre klik i klasse browseren for at frembringe kontekst menuen...
 
-...at klasse browser informationen ligger i en fil kaldet "classfolders.dcf" i dit projekts root katalog?<CR><CR>Hvis noget går galt og det hele ser rodet ud, bare slet filen og gen-åben dit projekt!
+...at klasse browser informationen ligger i en fil kaldet "classfolders.dcf" i dit projekts root katalog?<CR><CR>Hvis noget gÃ¥r galt og det hele ser rodet ud, bare slet filen og gen-Ã¥ben dit projekt!
 
-...at der er to tilstande for klasse browseren?<CR>En viser dig alle fundne klasser/medlemmer/funktioner og en anden viser dig KUN relevant information for den aktive fil.<CR><CR>Bare højre klik i klasse browseren og vælg "vis"...
+...at der er to tilstande for klasse browseren?<CR>En viser dig alle fundne klasser/medlemmer/funktioner og en anden viser dig KUN relevant information for den aktive fil.<CR><CR>Bare hÃ¸jre klik i klasse browseren og vÃ¦lg "vis"...
 
 #
 # Project Manager tips
 #
-...at du kan vælge om du vil bruge enkelt eller dobbelt klik på en fil i project manager for at åbne den i editoren?<CR><CR>For at indstille dette, gå til "Værktøjer / Miljø indstillinger" og slå "Dobbelt klik for at åbne project manager filer" til eller fra...
+...at du kan vÃ¦lge om du vil bruge enkelt eller dobbelt klik pÃ¥ en fil i project manager for at Ã¥bne den i editoren?<CR><CR>For at indstille dette, gÃ¥ til "VÃ¦rktÃ¸jer / MiljÃ¸ indstillinger" og slÃ¥ "Dobbelt klik for at Ã¥bne project manager filer" til eller fra...
 
-...at du kan lave dine egne (kun top-level) mapper i project manager for at organisere dine filer?<CR><CR>Højre klik på en fil for at få kontekst menuen frem...
+...at du kan lave dine egne (kun top-level) mapper i project manager for at organisere dine filer?<CR><CR>HÃ¸jre klik pÃ¥ en fil for at fÃ¥ kontekst menuen frem...
 
-...at hvis du har lavet dine egne foldere i project manager, så kan du bruge drag and drop for at omarrangere dem?
+...at hvis du har lavet dine egne foldere i project manager, sÃ¥ kan du bruge drag and drop for at omarrangere dem?
 
 #
 # File menu tips
 #
-...at du kan få information om den fil du arbejder med?<CR><CR>Vælg "Filer / Egenskaber" og du vil få information om filens størrelse, antal af linier, kommentarer, tomme linier og inkluderede filer!
+...at du kan fÃ¥ information om den fil du arbejder med?<CR><CR>VÃ¦lg "Filer / Egenskaber" og du vil fÃ¥ information om filens stÃ¸rrelse, antal af linier, kommentarer, tomme linier og inkluderede filer!
 
-...at du kan gemme dit projekt som en skabelon?<CR><CR>Vælg "Filer / Ny / Skabelon". Dit projekt vil da blive gemt som en Dev-C++ skabelon og vil være tilgængelig når du vælger "Filer / Nyt / Projekt".<CR>På den måde har du en base at starte fra, næste gang du laver et nyt projekt!
+...at du kan gemme dit projekt som en skabelon?<CR><CR>VÃ¦lg "Filer / Ny / Skabelon". Dit projekt vil da blive gemt som en Dev-C++ skabelon og vil vÃ¦re tilgÃ¦ngelig nÃ¥r du vÃ¦lger "Filer / Nyt / Projekt".<CR>PÃ¥ den mÃ¥de har du en base at starte fra, nÃ¦ste gang du laver et nyt projekt!
 
-...at du kan importere MS Visual C++ projekter i Dev-C++? (Ikke .NET)<CR><CR>Vælg "Filer / Importer / Importer MS Visual C++ projekt".<CR>Du skal måske tweake projekt indstillingerne lidt efter du har importeret, men hey! det er stadig under udvikling :)
+...at du kan importere MS Visual C++ projekter i Dev-C++? (Ikke .NET)<CR><CR>VÃ¦lg "Filer / Importer / Importer MS Visual C++ projekt".<CR>Du skal mÃ¥ske tweake projekt indstillingerne lidt efter du har importeret, men hey! det er stadig under udvikling :)
 
-...at du kan eksportere en source fil, eller et helt projekt til HTML eller RTF?<CR>På den måde kan du uploade source filer til din hjemmeside og dele dem med verden!<CR><CR>Vælg "Filer / Exporter" samt den ønskede eksporterings metode...
+...at du kan eksportere en source fil, eller et helt projekt til HTML eller RTF?<CR>PÃ¥ den mÃ¥de kan du uploade source filer til din hjemmeside og dele dem med verden!<CR><CR>VÃ¦lg "Filer / Exporter" samt den Ã¸nskede eksporterings metode...
 
 #
 # Edit menu tips
 #
-...at du kan (ud)kommentere et sæt liner ved at vælge dem og trykke "Rediger / (Ud)kommenter"?
+...at du kan (ud)kommentere et sÃ¦t liner ved at vÃ¦lge dem og trykke "Rediger / (Ud)kommenter"?
 
-...at du kan rykke et sæt liner ud/ind ved at vælge dem og trykke "Rediger / Ryk ud/ind"?
+...at du kan rykke et sÃ¦t liner ud/ind ved at vÃ¦lge dem og trykke "Rediger / Ryk ud/ind"?
 
-...at du kan bruge bogmærker i editoren til at komme hurtigt rundt i koden?<CR><CR>Sæt eller fjern et bogmærke ved at trykke "Rediger / Skift bogmærker" og vælge et nummer.<CR>Gå til et bogmærke ved at vælge "Rediger / Gå til bogmærker" og vælg et nummer.
+...at du kan bruge bogmÃ¦rker i editoren til at komme hurtigt rundt i koden?<CR><CR>SÃ¦t eller fjern et bogmÃ¦rke ved at trykke "Rediger / Skift bogmÃ¦rker" og vÃ¦lge et nummer.<CR>GÃ¥ til et bogmÃ¦rke ved at vÃ¦lge "Rediger / GÃ¥ til bogmÃ¦rker" og vÃ¦lg et nummer.
 
-...at der er en meget brugbar "Gå til funktion" under "Søg" menuen?<CR><CR>Den viser alle filens funktioner og ved at indtaste en del af funktions navnet, bliver listen mindre. Tryk enter for at hoppe til den funktion med det samme!<CR>OBS: klasse browsing skal være slået til...
+...at der er en meget brugbar "GÃ¥ til funktion" under "SÃ¸g" menuen?<CR><CR>Den viser alle filens funktioner og ved at indtaste en del af funktions navnet, bliver listen mindre. Tryk enter for at hoppe til den funktion med det samme!<CR>OBS: klasse browsing skal vÃ¦re slÃ¥et til...

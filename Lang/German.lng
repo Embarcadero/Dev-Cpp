@@ -8,7 +8,7 @@ Ver=1
 3=&Suchen
 4=&Ansicht
 5=&Projekt
-6=Ausführ&en
+6=AusfÃ¼hr&en
 7=&Werkzeuge
 8=&Fenster
 9=&Hilfe
@@ -23,20 +23,20 @@ Ver=1
 1006=&Klasse...
 1007=Neu
 1008=Neues Dokument
-1009=Dokument öffnen
-1010=Thema ändern
-1011=Schriftart ändern
-1012=Sprache ändern
+1009=Dokument Ã¶ffnen
+1010=Thema Ã¤ndern
+1011=Schriftart Ã¤ndern
+1012=Sprache Ã¤ndern
 
 
-2001=Pr&ojekt oder Datei öffnen...
-2002=&Neu öffnen
-2003=Ges&chichte löschen
+2001=Pr&ojekt oder Datei Ã¶ffnen...
+2002=&Neu Ã¶ffnen
+2003=Ges&chichte lÃ¶schen
 2004=&Speichern
 2005=Speichern &unter...
 2006=&Alles Speichern
-2007=S&chließen
-2008=Projekt schließen
+2007=S&chlieÃŸen
+2008=Projekt schlieÃŸen
 2009=Eigenschaften
 2010=Speichere Projekt als...
 2011=&Exportieren
@@ -54,14 +54,14 @@ Ver=1
 
 4001=&Finde Deklaration
 4002=F&inde Definition
-4003=&Rückgängig
+4003=&RÃ¼ckgÃ¤ngig
 4004=Wiede&rholen
 4005=&Ausschneiden
 4006=&Kopieren
-4007=&Einfügen
-4008=Alle&s auswählen
-4009=&Löschen
-4010=E&infügen
+4007=&EinfÃ¼gen
+4008=Alle&s auswÃ¤hlen
+4009=&LÃ¶schen
+4010=E&infÃ¼gen
 4011=Lesezeichen an/a&us
 4012=&Gehe zu Lesezeichen
 4013=Lesezeichen
@@ -85,13 +85,13 @@ Ver=1
 5012=&Statuszeile
 5013=&Compiler-Ausgabe
 5014=Immer sichtb&ar
-5015=&Nur wenn nötig
+5015=&Nur wenn nÃ¶tig
 5016=Werkzeugleis&ten
 5017=Standardleiste
-5018=Kompilieren und Ausführen
+5018=Kompilieren und AusfÃ¼hren
 5019=Projekt
 5020=Hilfe
-5021=Einfügen
+5021=EinfÃ¼gen
 5022=Bearbeiten
 5023=Suchen
 5024=Berichtfenster abdocken
@@ -99,79 +99,79 @@ Ver=1
 
 
 6001=&Neue Datei
-6002=Zum Projekt &hinzufügen
+6002=Zum Projekt &hinzufÃ¼gen
 6003=Aus Projekt entfe&rnen
 6004=Ressourc&en Datei bearbeiten...
 6005=Projekt &Optionen
 6006=&Make-Datei bearbeiten
-6007=Ressourcen &Datei hinzufügen...
+6007=Ressourcen &Datei hinzufÃ¼gen...
 6008=Ressourcen Datei ent&fernen...
 
 
 7001=&Kompilieren
-7002=Ausfüh&ren
-7003=K&ompilieren + Ausführen
+7002=AusfÃ¼h&ren
+7003=K&ompilieren + AusfÃ¼hren
 7004=Alles e&rneuern
 7005=Berichte + Logs leeren
 7006=Ko&mpilierungs-Ergebnisse
-7007=&Syntax Überprüfung
-7008=&Programm zurücksetzen
+7007=&Syntax ÃœberprÃ¼fung
+7008=&Programm zurÃ¼cksetzen
 7009=Pro&fil Analyse
 7010=Abbrechen
 7011=&Compiler
 7012=&Umgebung
 7013=&Editor
-7014=&Werkzeugmenü
+7014=&WerkzeugmenÃ¼
 7015=&Tastenkombination
-7016=Profiling Informationen löschen
+7016=Profiling Informationen lÃ¶schen
 
 
 8001=&Vollbild
-8002=&Zurück zu Normal
-8003=&Nächstes
+8002=&ZurÃ¼ck zu Normal
+8003=&NÃ¤chstes
 8004=V&orheriges
-8005=Alle S&chließen
-8006=%s Version %s Vollbild. Alt+F10 = Titelleiste, Alt+F11 = Werkzeugleiste Alt+F12 für Fenstermodus.
-8007=&Schließe alles ohne dieses
+8005=Alle S&chlieÃŸen
+8006=%s Version %s Vollbild. Alt+F10 = Titelleiste, Alt+F11 = Werkzeugleiste Alt+F12 fÃ¼r Fenstermodus.
+8007=&SchlieÃŸe alles ohne dieses
 8008=&Liste...
 
 
-9001=Ü&ber Dev-C++...
-9002=Auf &Pakete prüfen...
-9003=Hilfe-Menü &anpassen...
+9001=Ãœ&ber Dev-C++...
+9002=Auf &Pakete prÃ¼fen...
+9003=Hilfe-MenÃ¼ &anpassen...
 9004=Dev-C++ &Hilfe
 
 
 10001=&Fehlersuche
 10002=Hal&tepunkt an/aus
-10003=&Nächster Schritt
+10003=&NÃ¤chster Schritt
 10004=Fortsetzen
 10005=W&atch hinzuf.
 10006=&Watch Variablen
-10007=Ausführung stoppen
+10007=AusfÃ¼hrung stoppen
 10008=Watch b&earbeiten
 10009=Watch entfe&rnen
 10010=Springe &in
-10011=Ausführen bis &Cursor
+10011=AusfÃ¼hren bis &Cursor
 10012=&CPU-Fenster
-10013=&Zum Prozess hinzufügen...
+10013=&Zum Prozess hinzufÃ¼gen...
 10014=Wert &modifizieren
-10015=&Lösche alles
+10015=&LÃ¶sche alles
 10016=Neue Datei
-10017=Datei hinzufügen...
+10017=Datei hinzufÃ¼gen...
 10018=Datei entfernen...
 10019=Optionen...
 10020=Ressourcen Datei bearbeiten
-10021=Nächste Anweisung
+10021=NÃ¤chste Anweisung
 10022=Spring in Anweisung
-10023=Funktion überspringen
+10023=Funktion Ã¼berspringen
 
 
 11001=Datei entfernen
 11002=Datei umbenennen
-11003=Schließen
-11004=Öffnen
-11005=Header öffnen
+11003=SchlieÃŸen
+11004=Ã–ffnen
+11005=Header Ã¶ffnen
 
 
 12001=Gehe zu Deklaration
@@ -182,28 +182,28 @@ Ver=1
 12006=Ansicht...
 12007=Alle Dateien
 12008=aktuelle Datei
-12009=Ordner hinzufügen
+12009=Ordner hinzufÃ¼gen
 12010=Ordner entfernen
 12011=Ordner umbenennen
-12012=Sie können nicht mehr als %d Ordner in einem Projekt anlegen...
+12012=Sie kÃ¶nnen nicht mehr als %d Ordner in einem Projekt anlegen...
 12013=Farben nutzen
 12014=Projekt-Dateien
 12015=Zeige geerbte Member
-12016=Öffnen mit...
+12016=Ã–ffnen mit...
 
 
 13001=Compiler
 13002=Ressourcen
 13003=Linker
 13004=Suchergebnisse
-13005=Schließen
+13005=SchlieÃŸen
 13006=Debugger
 
 
-14001=&Löschen
+14001=&LÃ¶schen
 14002=&Kopieren
 14003=&Verbergen
-14004=Ö&ffnen
+14004=Ã–&ffnen
 
 
 15001=Zeile
@@ -219,11 +219,11 @@ Ver=1
 16005=Information:
 16006=Linker und Make:
 16007=Fehler insgesamt:
-16008=Dateigröße:
+16008=DateigrÃ¶ÃŸe:
 16008=Warnungen insgesamt:
 
 
-17001=Überwachte Variablen
+17001=Ãœberwachte Variablen
 17002=Ablaufverfolgung
 17003=Ausgabe
 17004=Sende Kommando zu GDB:
@@ -232,7 +232,7 @@ Ver=1
 
 
 18001=Neu
-18002=Einfügen
+18002=EinfÃ¼gen
 18003=Umschalten
 18004=Gehe zu
 18005=Projekt-Fenster
@@ -240,20 +240,20 @@ Ver=1
 18007=Bericht-Fenster
 
 
-19001=Datei öffnen
-19002=Datei öffnen
+19001=Datei Ã¶ffnen
+19002=Datei Ã¶ffnen
 19003=Exportieren
 19004=Datei speichern
 19005=Projekt speichern
-19006=Hilfedatei auswählen
+19006=Hilfedatei auswÃ¤hlen
 
 
 20001=Neuer Variablen Watch
 20002=Variablen Name eingeben:
-20003=Variablen Watch ändern
+20003=Variablen Watch Ã¤ndern
 20004=Neuer Variablen Name:
-20005=Wert ändern
-20006=Variable zum ändern:
+20005=Wert Ã¤ndern
+20006=Variable zum Ã¤ndern:
 20007=Neuer Wert:
 
 
@@ -275,7 +275,7 @@ Ver=1
 23003=Schriften
 23004=Farben
 23005=Schnelltext
-23006=Code Vervollständigung
+23006=Code VervollstÃ¤ndigung
 23007=Klassenbrowser
 23008=Autosave
 
@@ -284,37 +284,37 @@ Ver=1
 24002=Textvorgabe
 24003=Dateien
 24004=Optionen
-24005=Symbol-Vervollständigung
+24005=Symbol-VervollstÃ¤ndigung
 
 
 25001=Name der neuen Syntax Einstellungen:
 25002=Verschiedenes
-25003=Automatischer Einzug für {  } :
-25004=Einfügemodus ist Standard 
+25003=Automatischer Einzug fÃ¼r {  } :
+25004=EinfÃ¼gemodus ist Standard 
 25005=Tab-Zeichen benutzen
 25006=intelligente Tabs
-25007=Rücktaste hebt Einzug auf
+25007=RÃ¼cktaste hebt Einzug auf
 
 
-26001=Rückgängig zusammenfassen
+26001=RÃ¼ckgÃ¤ngig zusammenfassen
 26002=Pos1-Taste setzt Zeiger nach Einzug
 26003=Cursor nach Dateiende
 26004=Cursor nach Zeilenende
 26005=Doppelklick markiert Zeile
 26006=Text ab Zeigerposition suchen
-26007=Bildlaufleisten nur wenn nötig
+26007=Bildlaufleisten nur wenn nÃ¶tig
 26008=Halbseitiger Bildlauf
 26009=Bildlauf mit Zeilennummer
-26010=Syntaxhervorhebung für folgende Dateitypen
-26011=Dateien mit Maus einfügen
+26010=Syntaxhervorhebung fÃ¼r folgende Dateitypen
+26011=Dateien mit Maus einfÃ¼gen
 26012=Tabulatorschritt:
 26013=Rechter Rand
 26014=Sichtbar
 26015=Breite
 26016=Farbe
 26017=Textzeiger
-26018=Einfügen
-26019=Überschreiben
+26018=EinfÃ¼gen
+26019=Ãœberschreiben
 26020=Vertikale Linie
 26021=Horizontale Linie
 26022=Halber Block
@@ -333,15 +333,15 @@ Ver=1
 27006=HighlightText auf Vorgabe setzen
 27007=WhiteSpace setzen
 27008=Infos zu Funktionen
-27009=Es ist möglich die Schriftgröße mit Strng+Bild rauf/runter zu ändern, wie im Browser!
+27009=Es ist mÃ¶glich die SchriftgrÃ¶ÃŸe mit Strng+Bild rauf/runter zu Ã¤ndern, wie im Browser!
 27010=Editor
 27011=Schrift
-27012=Größe
+27012=GrÃ¶ÃŸe
 27013=Editor Schrift
 27014=Rand
-27015=Automatische Größe
+27015=Automatische GrÃ¶ÃŸe
 27016=Zeilennummern
-27017=Führende Nullen zeigen
+27017=FÃ¼hrende Nullen zeigen
 27018=Mit Null anfangen
 27019=Eigene Schrift benutzen
 27020=Rand-Schriftart
@@ -355,14 +355,14 @@ Ver=1
 27028=Typ:
 27029=Speichere eigene Syntaxeinstellungen
 27030=Code
-27031=Menü Text
+27031=MenÃ¼ Text
 27032=Untergruppe
 27033=Beschreibung
-27034=Folgenden Code in jede neue leere Quelldatei einfügen
-27035=Cache für Code-Vervollständigung nutzen
+27034=Folgenden Code in jede neue leere Quelldatei einfÃ¼gen
+27035=Cache fÃ¼r Code-VervollstÃ¤ndigung nutzen
 27036=Dateien im Cache:
-27037=Code-Vervollständigung einschalten
-27038=Verzögerung (ms):
+27037=Code-VervollstÃ¤ndigung einschalten
+27038=VerzÃ¶gerung (ms):
 27039=Hintergrundfarbe:
 27040=Nur aktuell sichtbare Datei sichern
 27041=Lokale Suche nach Dateien in #include ""
@@ -376,20 +376,20 @@ Ver=1
 27049=Alle offenen Dateien speichern
 27050=Neues Projekt
 27051=Beschreibung:
-27052=Symbol Vervollständigung aktivieren
-27053=Besondere Vervollständigungsoptionen
+27052=Symbol VervollstÃ¤ndigung aktivieren
+27053=Besondere VervollstÃ¤ndigungsoptionen
 27054=geschweifte Klammern '{}'
 27055=runde Klammern'()'
 27056=include '<> + " " '
 27057=eckige Klammern '[]'
 27058=mehrzeilige Kommentare '/**/'
 27059=Alle Projektdateien sichern
-27060=Datei überschreiben
-27061=UNIX Zeitstempel anhängen
-27062=Formatierten Zeitstempel anhängen
+27060=Datei Ã¼berschreiben
+27061=UNIX Zeitstempel anhÃ¤ngen
+27062=Formatierten Zeitstempel anhÃ¤ngen
 27063=Dateinamen
 27064=Beispiel: %s
-27065=Sicher, daß Sie den Cache löschen wollen?
+27065=Sicher, daÃŸ Sie den Cache lÃ¶schen wollen?
 27066=Bitte den Cache neuanlegen wenn Dev-C++ aktualisiert wurde!
 
 
@@ -402,7 +402,7 @@ Ver=1
 
 
 29001=Aus Projekt entfernen
-29002=Zu entfernende Datei auswählen:
+29002=Zu entfernende Datei auswÃ¤hlen:
 
 
 30001=Gehe zu Zeile...
@@ -418,38 +418,38 @@ Ver=1
 32003=Programm
 32004=Arbeitsverzeichnis
 32005=Parameter
-32006=Makro einfügen
-32007=Verfügbare Makros
+32006=Makro einfÃ¼gen
+32007=VerfÃ¼gbare Makros
 
 
 33001=Icon-Bibliothek
-33002=Ausgewähltes Icon benutzen
+33002=AusgewÃ¤hltes Icon benutzen
 33003=Durchsuchen
 
 
 34001=Konfiguriere Tastenkombination
-34002=Eintrag anklicken und gewünschte Tastenkombination eingeben!
-34003=Tip: Drücke "Escape" zum Löschen einer Tastenkombination...
-34004=Menü Eintrag
+34002=Eintrag anklicken und gewÃ¼nschte Tastenkombination eingeben!
+34003=Tip: DrÃ¼cke "Escape" zum LÃ¶schen einer Tastenkombination...
+34004=MenÃ¼ Eintrag
 34005=Tastenkombination zugewiesen
 34006=Abbruch
 34007=OK
 
 
-35001=Rückgabe Standardverzeichnis
-35002=Rückgabe Dev-C++ Arbeitsverzeichnis
-35003=Rückgabe Dateiname des Kompilat
-35004=Rückgabe Pfad der aktuellen Projekt- oder Quelldatei
-35005=Rückgabe Dateiname des aktuellen Projekt oder Quellkode
-35006=Rückgabe Projektnamen
-35007=Rückgabe Name der aktuellen Quelldatei
-35008=Rückgabe Pfad zur aktuellen Quelldatei
-35009=Rückgabe einer durch Leerzeichen getrennten Liste der Projekt-Quelldateien
-35010=Rückgabe des Wortes an Zeigerposition im aktiven Editor
-35011=Rückgabe Dev-C++ Version
+35001=RÃ¼ckgabe Standardverzeichnis
+35002=RÃ¼ckgabe Dev-C++ Arbeitsverzeichnis
+35003=RÃ¼ckgabe Dateiname des Kompilat
+35004=RÃ¼ckgabe Pfad der aktuellen Projekt- oder Quelldatei
+35005=RÃ¼ckgabe Dateiname des aktuellen Projekt oder Quellkode
+35006=RÃ¼ckgabe Projektnamen
+35007=RÃ¼ckgabe Name der aktuellen Quelldatei
+35008=RÃ¼ckgabe Pfad zur aktuellen Quelldatei
+35009=RÃ¼ckgabe einer durch Leerzeichen getrennten Liste der Projekt-Quelldateien
+35010=RÃ¼ckgabe des Wortes an Zeigerposition im aktiven Editor
+35011=RÃ¼ckgabe Dev-C++ Version
 
 
-36001=Über Dev-C++ :)
+36001=Ãœber Dev-C++ :)
 36002=inseculous@users.sourceforge.net
 36003=GNU General Public License
 36004=Kontakt Information
@@ -463,31 +463,31 @@ Ver=1
 36012=http://www.bloodshed.net/forum
 36013=http://www.bloodshed.net/devcpp-ml.html
 36014=haiku@bloodshed.net
-36015=Auf &Updates prüfen
+36015=Auf &Updates prÃ¼fen
 36016=Post-4.9.9.2 Development:
 36017=http://orwellengine.blogspot.com
 
 
-37001=Code Einfügung bearbeiten
-37002=Code Einfügung hinzufügen
-37003=Menüpunkt Überschrift
-37004=Menüpunkt Beschreibung
-37005=Menü Gruppe
+37001=Code EinfÃ¼gung bearbeiten
+37002=Code EinfÃ¼gung hinzufÃ¼gen
+37003=MenÃ¼punkt Ãœberschrift
+37004=MenÃ¼punkt Beschreibung
+37005=MenÃ¼ Gruppe
 
 
 38001=Fortschrittsanzeige bei Kompilation 
-38002=Während der Kompilation
-38003=Nach Kompilation schließen
+38002=WÃ¤hrend der Kompilation
+38003=Nach Kompilation schlieÃŸen
 38004=Kein Startbild
 38005=Umgebungsoptionen
 38006=Allgemein
 38007=Verzeichnisse
-38008=Automatisch öffnen
-38009=Standard für neues C++-Projekt
+38008=Automatisch Ã¶ffnen
+38009=Standard fÃ¼r neues C++-Projekt
 38010=Werkzeugleisten im Vollbildmodus zeigen
-38011=Sicherung erstellen vor "Öffne.."
-38012=Bei Ausführung minimieren
-38013=Öffnen/Speichern Dialog-Stil
+38011=Sicherung erstellen vor "Ã–ffne.."
+38012=Bei AusfÃ¼hrung minimieren
+38013=Ã–ffnen/Speichern Dialog-Stil
 38014=Windows 2k (Seitenleiste)
 38015=Windows 9x
 38016=Windows 3.1
@@ -498,15 +498,15 @@ Ver=1
 38021=Ausgabeverzeichnis
 38022=Pfad der Icon-Bibliothek
 38023=Startbild
-38024=Standardverzeichnis wählen
-38025=Ausgabeverzeichnis wählen
-38026=Icon-Bibliotheksverzeichnis wählen
+38024=Standardverzeichnis wÃ¤hlen
+38025=Ausgabeverzeichnis wÃ¤hlen
+38026=Icon-Bibliotheksverzeichnis wÃ¤hlen
 38027=Alle Projektdateien
 38028=Nur erste Projektdatei
 38029=Keine
 38030=Benutze mehrzeilige Tabulatoren
-38031=Projektdateien mit Doppelklick öffnen
-38032=Pfad für Sprachdateien
+38031=Projektdateien mit Doppelklick Ã¶ffnen
+38032=Pfad fÃ¼r Sprachdateien
 38033=Thema:
 38034=Schnittstelle
 38035=Suchtext
@@ -514,11 +514,11 @@ Ver=1
 38037=In Dateien suchen
 38038=Zu suchender &Text
 38039=Optionen:
-38040=Groß/Klein&schr.?
-38041=Nur ganze &Wörter
+38040=GroÃŸ/Klein&schr.?
+38041=Nur ganze &WÃ¶rter
 38042=Wo
 38043=&Dateien im Projekt
-38044=&geöffnete Dateien
+38044=&geÃ¶ffnete Dateien
 38045=Bereich
 38046=&Gesamte Datei
 38047=&Markierung
@@ -526,16 +526,16 @@ Ver=1
 38049=Ab Cursor
 38050=Textbeginn
 38051=Richtung
-38052=Vorwärts
-38053=Rückwärts
+38052=VorwÃ¤rts
+38053=RÃ¼ckwÃ¤rts
 38054=Konsolenprogramme am Ende pausieren
-38055=Vorherig geöffnete Dateien
+38055=Vorherig geÃ¶ffnete Dateien
 38056=Ersetzt
 38057=Ersetze in Datei
 38058=Ersetze mit:
-38059=Nachfragen für Ersetzen
+38059=Nachfragen fÃ¼r Ersetzen
 38060=Aktuelle Datei
-38061=Überprüfe Dateizuordnungen beim Start
+38061=ÃœberprÃ¼fe Dateizuordnungen beim Start
 
 
 40001=Suche nach:
@@ -550,7 +550,7 @@ Ver=1
 41004=Einstellungen
 41005=Linker
 41006=Programme
-41007=Für mehr Informationen über GCC's Optionen, besuchen Sie bitte
+41007=FÃ¼r mehr Informationen Ã¼ber GCC's Optionen, besuchen Sie bitte
 
 
 42001=Programmdateien
@@ -565,18 +565,18 @@ Ver=1
 43004=Ausgabe
 
 
-44001=Alle ANSI-C Programme unterstützen (-ansi)
-44002=Imitiere herkömmliche C-Präprozessoren (-traditional-cpp)
-44003=Alle Warnmeldungen unterdrücken (-w)
+44001=Alle ANSI-C Programme unterstÃ¼tzen (-ansi)
+44002=Imitiere herkÃ¶mmliche C-PrÃ¤prozessoren (-traditional-cpp)
+44003=Alle Warnmeldungen unterdrÃ¼cken (-w)
 44004=Alle Zugangskontrollen abschalten (-fno-access-control)
 44005=$ in Bezeichnern zulassen (-fdollar-in-identifiers)
 44006=Heuristiken zum schnelleren kompilieren nutzen (-fsave-memoized)
 44007=Cygwin anstelle des Mingw Compiler benutzen
-44008=Folgende Befehle beim Compiler-Aufruf hinzufügen:
-44009=Verzögerung
-44010=Erlaubt eine Verzögerung in ms, wenn Make sich über den Zeitstempel der Makedatei beklagt.
+44008=Folgende Befehle beim Compiler-Aufruf hinzufÃ¼gen:
+44009=VerzÃ¶gerung
+44010=Erlaubt eine VerzÃ¶gerung in ms, wenn Make sich Ã¼ber den Zeitstempel der Makedatei beklagt.
 44011=Zeige einen Fehler pro Zeile (-fmessage-length 0)
-44012=Ignoriere Asm, Inline oder Typeof als Schlüsselworte (-fno-asm)
+44012=Ignoriere Asm, Inline oder Typeof als SchlÃ¼sselworte (-fno-asm)
 44013=Auf Null-Pointer testen vor Zugriff auf angeforderten Speicher (-fcheck-new)
 44014=Nicht initiierte globale Variablen ins Common Segment (-fconserve-space)
 
@@ -586,57 +586,57 @@ Ver=1
 
 
 46001=Ausnahmebehandlung einschalten (-fexceptions)
-46002=Gleiche Größe für Double und Float (-fshort-double)
-46003=Zusätzliche Kommentare im Assembler-Code (-fverbose-asm)
+46002=Gleiche GrÃ¶ÃŸe fÃ¼r Double und Float (-fshort-double)
+46003=ZusÃ¤tzliche Kommentare im Assembler-Code (-fverbose-asm)
 46004=Optimiere (-Ox)
 46005=Beste Optimierung
 46006=Kleinere Optimierungen
 46007=Makefile Erzeugung 
-46008=Schnelle aber ungenaue Abhängigkeiten
+46008=Schnelle aber ungenaue AbhÃ¤ngigkeiten
 46009=Profiling
 46010=Erzeuge Auslastungsinfo zur Analyse (-pg)
 46011=Linkt ein Objective-C Programm (-lobjc)
 46012=Fehlersuchinformationen erstellen (-g3)
 46013=Keine Standard-Bibliotheken benutzen (-nostdlib)
 46014=Kein Konsolenfenster erzeugen (-mwindows)
-46015=Folgende Befehle für Linker-Kommandozeile
+46015=Folgende Befehle fÃ¼r Linker-Kommandozeile
 46016=&Nicht optimieren
 46017=Mehr optimieren
 46018=Assembler-Quellkode statt Objekt erstellen (-S)
-46019=Nutze Pipes statt tmp-Dateien für die Kompilierung (-pipe)
+46019=Nutze Pipes statt tmp-Dateien fÃ¼r die Kompilierung (-pipe)
 
 
-47001=Sie möchten vielleicht die in Dev-C++ genutzten Dateinamen ändern (z.B. bei Benutzung eines Cross-Compilers):
+47001=Sie mÃ¶chten vielleicht die in Dev-C++ genutzten Dateinamen Ã¤ndern (z.B. bei Benutzung eines Cross-Compilers):
 47002=Compiler-Satz konfigurieren
 47003=Neuer Compiler-Satz
 47004=Neuen Compiler-Satz benennen:
-47005=Sie können den einzigen Compiler-Satz nicht löschen !
-47006=Wollen Sie diesen Compiler-Satz wirklich löschen ?
+47005=Sie kÃ¶nnen den einzigen Compiler-Satz nicht lÃ¶schen !
+47006=Wollen Sie diesen Compiler-Satz wirklich lÃ¶schen ?
 47007=Compiler-Satz umbenennen
 47008=Neuer Name:
 47009=Weitere Optimierungen
-47010=Sie sollten nach Möglichkeit die englische Version der Compiler benutzen und sie in folgende Verzeichnisse kopieren:<CR><CR>32bit: %s<CR>64bit: %s<CR><CR>Aktuelle Liste der Compiler löschen?
+47010=Sie sollten nach MÃ¶glichkeit die englische Version der Compiler benutzen und sie in folgende Verzeichnisse kopieren:<CR><CR>32bit: %s<CR>64bit: %s<CR><CR>Aktuelle Liste der Compiler lÃ¶schen?
 47011=Compiler suchen und automatisch einstellen
 47012=Neuen Compiler-Satz hinzu
-47013=Ausgewählten Compiler-Satz löschen 
-47014=Ausgewählten Compiler-Satz umbenennen
+47013=AusgewÃ¤hlten Compiler-Satz lÃ¶schen 
+47014=AusgewÃ¤hlten Compiler-Satz umbenennen
 
 
-48001=Hilfemenü-Editor
-48002=Menü Text
+48001=HilfemenÃ¼-Editor
+48002=MenÃ¼ Text
 48003=Hilfedatei
-48004=Hilfemenü Optionen
+48004=HilfemenÃ¼ Optionen
 48005=Icon
-48006=Menü Gruppe
+48006=MenÃ¼ Gruppe
 48007=Gruppe 1
 48008=Gruppe 2
-48009=Hilfe Kontextmenü
+48009=Hilfe KontextmenÃ¼
 48010=Aktionen
 48011=Suche in der Hilfe-Datei nach dem Wort an Zeigerposition
 48012=F1 als Schnelltaste zuweisen
 48013=Zeige alle Warnungen (-Wall)
-48014=Zeige zusätzliche Warnungen (-Wextra)
-48015=Prüfe ISO C/C++/C++0x Konformität (-pedantic)
+48014=Zeige zusÃ¤tzliche Warnungen (-Wextra)
+48015=PrÃ¼fe ISO C/C++/C++0x KonformitÃ¤t (-pedantic)
 48016=Warnungen
 48017=Nur auf syntaktische Fehler untersuchen (-fsyntax-only)
 48018=Alle Warnungen als Fehler behandeln (-Werror)
@@ -663,19 +663,19 @@ Ver=1
 50004=Release Version:
 50005=erforderliche Version:
 50006=Beschreibung des Release:
-50007=Download Seite (Doppelklick für Download):
+50007=Download Seite (Doppelklick fÃ¼r Download):
 
 
-51001=To-Do Eintrag hinzufügen...
+51001=To-Do Eintrag hinzufÃ¼gen...
 51002=Beschreibung
-51003=Priorität
+51003=PrioritÃ¤t
 51004=Benutzer
 
 
 52001=To-Do Liste...
 52002=Dateiname
 52003=Erledigt
-52004=als 'Erledigt' markierte Einträge verbergen
+52004=als 'Erledigt' markierte EintrÃ¤ge verbergen
 52005=Filter:
 52006=Alle Dateien (im Projekt und sonstige)
 52007=Nur offene Dateien (im Projekt und sonstige)
@@ -686,20 +686,20 @@ Ver=1
 
 
 53001=MS Visual C++-Projekt importieren
-53002=Visual C++-Projektdatei auswählen
+53002=Visual C++-Projektdatei auswÃ¤hlen
 53003=Import-Einstellungen
 53004=zu importierende Konfiguration
-53005=Dateiname für Dev-C++ Projekt
-53006=Die MS Visual C++-Projektdatei wurde importiert und erfolgreich zu einem Dev-C++ Projekt konvertiert! Jetzt öffnen ?
+53005=Dateiname fÃ¼r Dev-C++ Projekt
+53006=Die MS Visual C++-Projektdatei wurde importiert und erfolgreich zu einem Dev-C++ Projekt konvertiert! Jetzt Ã¶ffnen ?
 53007=Zielkonfiguration "%s" nicht gefunden (das ist evtl. ein Fehler in Dev-C++)...
 
 
 54001=Code::Blocks Projekt importieren
-54002=Code::Blocks Projektdatei wählen
+54002=Code::Blocks Projektdatei wÃ¤hlen
 54003=Import-Einstellungen
 54004=zu importierende Konfiguration
-54005=Dateiname für Dev-C++ Projekt
-54006=Die Code::Blocks Projektdatei wurde erfolgreich importiert und konvertiert! Jetzt öffnen?
+54005=Dateiname fÃ¼r Dev-C++ Projekt
+54006=Die Code::Blocks Projektdatei wurde erfolgreich importiert und konvertiert! Jetzt Ã¶ffnen?
 54007=Zielkonfiguration "%s" nicht gefunden (das ist evtl. ein Fehler in Dev-C++)...
 
 
@@ -716,20 +716,20 @@ Ver=1
 55011=Win32 statische Bibliothek
 55012=Win32 DLL
 55013=Als C++ kompilieren
-55014=Zusätzliche Kommandozeilen Optionen:
+55014=ZusÃ¤tzliche Kommandozeilen Optionen:
 55015=Compiler:
 55016=Linker Optionen/Optionale Bibliotheken oder Objektdateien:
 55017=Bibliotheken
 55018=Ressourcen
 55019=Includes
-55020=Icon wählen
+55020=Icon wÃ¤hlen
 55021=Objektdatei einbinden
 55022=Ressourcen-Verzeichnisse
 55023=Build Optionen
 55024=Verzeichnisse
-55025=Ausgab&everzeichnis für ausführbare Dateien
-55026=Ausgabeverzeichnis für &Objektdateien
-55027=Überschreibe Ausgabe-Dateiname
+55025=Ausgab&everzeichnis fÃ¼r ausfÃ¼hrbare Dateien
+55026=Ausgabeverzeichnis fÃ¼r &Objektdateien
+55027=Ãœberschreibe Ausgabe-Dateiname
 55028=Bibliothek/Objekt dafczu
 55029=%d Dateien [%d Quellen, %d Header, %d Ressourcen]
 55030=Compiler Log automatisch sichern
@@ -756,7 +756,7 @@ Ver=1
 56018=Ressourcen-Verzeichnisse des Projektes nutzen
 
 
-57001=Rückgabe Typ:
+57001=RÃ¼ckgabe Typ:
 57002=Variablen Name:
 57003=Implementiert in:
 57004=Zugriffsbereich
@@ -770,7 +770,7 @@ Ver=1
 57012=Abbrechen
 57013=Unbekannte Klasse...
 57014=Dateiname der Implementation nicht bestimmbar...
-57015=Zeilennummer für Codeeinfügung nicht bestimmbar...
+57015=Zeilennummer fÃ¼r CodeeinfÃ¼gung nicht bestimmbar...
 57016=Member-Name:
 57017=Argumente:
 57018=Klassen-Name:
@@ -780,7 +780,7 @@ Ver=1
 57022=Header Dateiname:
 57023=Implementation Dateiname:
 57024=Header Dateiname:
-57025=Aktuellem Projekt hinzufügen
+57025=Aktuellem Projekt hinzufÃ¼gen
 57026=Attribute
 57027=Konstruktor erstellen
 57028=Destruktor erstellen
@@ -793,7 +793,7 @@ Ver=1
 58005=Kommentar-Zeilen
 58006=Inkludierte Dateien
 58007=Leere Zeilen
-58008=Dateigröße
+58008=DateigrÃ¶ÃŸe
 58009=Absolut
 58010=Make Datei
 58011=Relativ
@@ -816,76 +816,76 @@ Ver=1
 
 
 60001=Suchtext ''%s'' nicht gefunden
-60002=Die Datei %s konnte nicht geöffnet werden
+60002=Die Datei %s konnte nicht geÃ¶ffnet werden
 60003=''%s'' hier ersetzen?
 60004=Die Datei %s existiert bereits in %s
-60005=Sind Sie sicher, daß Sie %s schließen wollen?
-60006=Änderungen an %s speichern?
-60007=%s Schließen und ein neues Projekt starten?
+60005=Sind Sie sicher, daÃŸ Sie %s schlieÃŸen wollen?
+60006=Ã„nderungen an %s speichern?
+60007=%s SchlieÃŸen und ein neues Projekt starten?
 60008=Umbenennen nach:
 60009=kompiliere bereits
-60010=Änderungen an %s speichern?
-60011=Datei existiert bereits, überschreiben?
-60012=Neue Datei zum Projekt hinzufügen?
-60013=Neue Ressource zum Projekt hinzufügen?
+60010=Ã„nderungen an %s speichern?
+60011=Datei existiert bereits, Ã¼berschreiben?
+60012=Neue Datei zum Projekt hinzufÃ¼gen?
+60013=Neue Ressource zum Projekt hinzufÃ¼gen?
 60014=Keine Debug-Informationen vorhanden.  Jetzt das Projekt passend neu erzeugen?
 60015=Keine Profiling Informationen vorhanden. Jetzt das Projekt passend neu erzeugen?
 60016=Bitte das Projekt einmal laufen lassen um das Profilinfo zu erzeugen...
 60017=Geben Sie die neuen Ordnernamen ein:
 60018=Sind Sie sicher den Ordner entfernen zu wollen?
 60019=Geben Sie den neuen Ordnernamen ein:
-60020=Die Datei %s ist schreibgeschützt. Schreibschutz entfernen? Wenn nicht, wird die Datei nicht gesichert...
-60021=Ein Fehler ist aufgetreten. Die Datei %s war schreibgeschützt und wurde nicht gesichert...
+60020=Die Datei %s ist schreibgeschÃ¼tzt. Schreibschutz entfernen? Wenn nicht, wird die Datei nicht gesichert...
+60021=Ein Fehler ist aufgetreten. Die Datei %s war schreibgeschÃ¼tzt und wurde nicht gesichert...
 60022=Eine Zugriffsverletzung (Segmentation Fault) trat in Ihrem Programm auf.
-60023=Quelldatei ist jünger als die EXE-Datei. Neu erzeugen ?
-60024=Anzuhängende Anwendung wählen:
+60023=Quelldatei ist jÃ¼nger als die EXE-Datei. Neu erzeugen ?
+60024=AnzuhÃ¤ngende Anwendung wÃ¤hlen:
 60025=Keine passende Quell-Datei gefunden
 60026=Keine passende Header-Datei gefunden
 
 
-61001=Kann %s nicht öffnen
+61001=Kann %s nicht Ã¶ffnen
 61002=Kann %s nicht speichern
 61003=Kann %s nicht umbenennen
 61004=Suchtext darf nicht leer sein
-61005=Projekt ist nicht ausführbar
+61005=Projekt ist nicht ausfÃ¼hrbar
 61006=Projekt ist nicht kompiliert
 61007=Quelldatei ist nicht kompiliert
 61008=Make Datei nicht gefunden.
-61009=Aufräumen gescheitert
-61010=Vorlage konnte nicht ins Projekt eingefügt werden.
+61009=AufrÃ¤umen gescheitert
+61010=Vorlage konnte nicht ins Projekt eingefÃ¼gt werden.
 61011=%s Ressource nicht gefunden: %s - %s
 61012=Vorlagendatei %s nicht gefunden. Wird ausgelassen.
 61013=Keine Vorlage zugewiesen.
 61014=Datei %s nicht gefunden.
-61015=Keine Host Anwendung angegeben. Sie können sie im Menü 'Ausführen >> Parameter' festlegen.
-61016=Host Anwendung nicht gefunden ! Sie können es im Menü 'Ausführen >> Parameter' ändern.
+61015=Keine Host Anwendung angegeben. Sie kÃ¶nnen sie im MenÃ¼ 'AusfÃ¼hren >> Parameter' festlegen.
+61016=Host Anwendung nicht gefunden ! Sie kÃ¶nnen es im MenÃ¼ 'AusfÃ¼hren >> Parameter' Ã¤ndern.
 61017=Projekt noch nicht kompiliert.<CR><CR>Jetzt kompilieren?
 61018=Quelldatei noch nicht kompiliert.<CR><CR>Jetzt kompilieren?
 
 
 62001=Unbenannt
 62002=Nur Lesen
-62003=Einfügen
-62004=Überschreiben
+62003=EinfÃ¼gen
+62004=Ãœberschreiben
 62005=Projekt%d
 62006=Bitte geben Sie einen anderen Dateinamen an.
 62007=%d Zeilen in Datei
 62008=Datei umbenennen
-62009=Führe %s aus
-62010=Ausführung beendet
+62009=FÃ¼hre %s aus
+62010=AusfÃ¼hrung beendet
 62011=Bytes
-62012=Verändert
+62012=VerÃ¤ndert
 62013=Fehler
 62014=Information
 62015=Warnung
 62016=Frage
 62017=Kompilierung erfolgreich
 62018=Kompilierung durch Benutzer abgebrochen
-62019=Zeile:%6d               Spalte:%6d               Auswahl:%6d               Zeilen:%6d               Länge:%6d
+62019=Zeile:%6d               Spalte:%6d               Auswahl:%6d               Zeilen:%6d               LÃ¤nge:%6d
 62020=Gliederung beendet
 62021=%d Treffer
 62022=Gliederung in %g Sekunden beendet
-62023=einige Dateien dem Cache zufügen unter 'Werkzeuge >> Editor >> Code-Vervollständigung' für höhere Geschwindigkeit beim Aufgliedern.
+62023=einige Dateien dem Cache zufÃ¼gen unter 'Werkzeuge >> Editor >> Code-VervollstÃ¤ndigung' fÃ¼r hÃ¶here Geschwindigkeit beim Aufgliedern.
 
 
 63001=&Ok
@@ -894,15 +894,15 @@ Ver=1
 63004=Stan&dard
 63005=&Ja
 63006=&Nein
-63007=&Hinzufügen
+63007=&HinzufÃ¼gen
 63008=B&earbeiten
 63009=Entfe&rnen
-63010=&Löschen
-63011=S&chließen
+63010=&LÃ¶schen
+63011=S&chlieÃŸen
 63012=&Autoren
 63013=&Suchen
 63014=E&rsetzen
-63015=Un&gültige lösch.
+63015=Un&gÃ¼ltige lÃ¶sch.
 63016=Ersetze &Alles
 63017=Durchsuchen
 63018=Entfernen
@@ -923,19 +923,19 @@ Ver=1
 65002=Wussten Sie schon...
 65003=...keine Tips vorhanden?
 65004=Keine Tips beim Start
-65005=Nächster
+65005=NÃ¤chster
 65006=Vorheriger
 
 
 66001=Datei Zuordnung
 66002=Dateitypen:
-66003=Für welche Dateitypen soll Dev-C++ als Standardanwendung registriert werden ?
-66004=CVS Unterstützung
+66003=FÃ¼r welche Dateitypen soll Dev-C++ als Standardanwendung registriert werden ?
+66004=CVS UnterstÃ¼tzung
 66005=CVS Programm-Datei
 66006=Kompressions-Level
 66007=SSH statt RSH benutzen
 66008=Vorlagen-Verzeichnis
-66009=Vorlagen-Verzeichnis wählen
+66009=Vorlagen-Verzeichnis wÃ¤hlen
 66010=XP-Thema nutzen
 66011=Externe Programme
 66012=Externes Programm
@@ -946,11 +946,11 @@ Ver=1
 66017=Fehlersuch-Variablen Browser 
 66018=Konfigurations-Datei wechseln 
 66019=Gewechselte Konfiguratios-Datei nutzen
-66020=Sie haben die Konfiguratios-Datei dieser Anwendung geändert.<CR>Diese neue Datei wird in der aktuellen Sitzung *nicht* benutzt. Alle Änderungen dieser Sitzung an der Konfigurations-Datei werden in die gegenwärtige Datei geschrieben.<CR><CR>Es ist empfehlenswert, die Anwendung neu zu starten, um die neue Konfiguration zu nutzen...
-66021=Dev-C++ konnte die Dateizuordnung nicht anlegen<CR><CR>Die Verwendung der UAC bei einen normalen Benutzerkonto führt bekanntermaßen dazu.<CR><CR>Bitte schalten Sie UAC ab oder starten Sie Dev-C++ als Administrator, falls Sie die Zuordnung erstellen wollen.<CR><CR>Erforderliche Einstellungen finden Sie unter "Werkzeuge >> Umgebung >> Dateizuordnung".
+66020=Sie haben die Konfiguratios-Datei dieser Anwendung geÃ¤ndert.<CR>Diese neue Datei wird in der aktuellen Sitzung *nicht* benutzt. Alle Ã„nderungen dieser Sitzung an der Konfigurations-Datei werden in die gegenwÃ¤rtige Datei geschrieben.<CR><CR>Es ist empfehlenswert, die Anwendung neu zu starten, um die neue Konfiguration zu nutzen...
+66021=Dev-C++ konnte die Dateizuordnung nicht anlegen<CR><CR>Die Verwendung der UAC bei einen normalen Benutzerkonto fÃ¼hrt bekanntermaÃŸen dazu.<CR><CR>Bitte schalten Sie UAC ab oder starten Sie Dev-C++ als Administrator, falls Sie die Zuordnung erstellen wollen.<CR><CR>Erforderliche Einstellungen finden Sie unter "Werkzeuge >> Umgebung >> Dateizuordnung".
 66022=UI font
-66023=Dev-C++ konnte den Code-Vervollständigungs-Cache nicht laden. Entweder beschädigt oder veraltet oder Teil einer veralteten Voreinstellung unter:<CR><CR>%s<CR><CR>Sollen die Einstellungen gesichert und zurück gesetzt werden? Falls ja, bitte Dev-C++ neu starten. Sicherung erstellt in:<CR><CR>%s
-66024=Fehler beim Start der Druckeinstellungen.<CR><CR>Möglicherweise kein Drucker installiert.
+66023=Dev-C++ konnte den Code-VervollstÃ¤ndigungs-Cache nicht laden. Entweder beschÃ¤digt oder veraltet oder Teil einer veralteten Voreinstellung unter:<CR><CR>%s<CR><CR>Sollen die Einstellungen gesichert und zurÃ¼ck gesetzt werden? Falls ja, bitte Dev-C++ neu starten. Sicherung erstellt in:<CR><CR>%s
+66024=Fehler beim Start der Druckeinstellungen.<CR><CR>MÃ¶glicherweise kein Drucker installiert.
 
 
 67001=Parameter...
@@ -958,26 +958,26 @@ Ver=1
 
 
 68001=Fensterliste
-68002=Fenster zum Bearbeiten wählen:
+68002=Fenster zum Bearbeiten wÃ¤hlen:
 
 
 69001=Aktuelle Datei...
 69002=Ganzes Projekt...
-69003=Bitte konfigurieren Sie die CVS-Unterstützung in "Werkzeuge >> Umgebung"...
+69003=Bitte konfigurieren Sie die CVS-UnterstÃ¼tzung in "Werkzeuge >> Umgebung"...
 
 
 70001=Import Optionen
 70002=Repository
 70003=Globale Optionen
 70004=Auscheck Optionen
-70005=Ausführung Optionen
+70005=AusfÃ¼hrung Optionen
 70006=Update Optionen
 70007=Diff Optionen
 70008=Log Optionen
 70009=CVS-Ausgabe
 70010=Import
 70011=Auschecken
-70012=Ausführen
+70012=AusfÃ¼hren
 70013=Update
 70014=Diff
 70015=Log
@@ -991,15 +991,15 @@ Ver=1
 70023=Auschecken als
 70024=Auscheck Verzeichnis
 70025=Unterverzeichnisse einbeziehen
-70026=Alle Optionen zurücksetzen
+70026=Alle Optionen zurÃ¼cksetzen
 70027=Erzeuge fehlende Verzeichnisse
 70028=Entferne leere Verzeichnisse
-70029=Änderungen lokal halten
+70029=Ã„nderungen lokal halten
 70030=Vor Datum
 70031=Revision/Zweig/Tag
 70032=Wenn nicht gefunden, nimm die letzte
 70033=Andere Revisionen
-70034=Vereintes diff ausführen
+70034=Vereintes diff ausfÃ¼hren
 70035=Vergleiche lokale Datei mit gleicher(m) remote Revision/Tag
 70036=Vergleiche lokale Datei mit anderen remote Revisionen
 70037=Vergleiche zwei remote Revisionen
@@ -1017,15 +1017,15 @@ Ver=1
 70049=Benutzer
 70050=Server
 70051=Remote Verzeichnis
-70052=Hinzufügen
+70052=HinzufÃ¼gen
 70053=Entfernen
-70054=Optionen hinzufügen
+70054=Optionen hinzufÃ¼gen
 70055=Optionen entfernen
 70056=Datei physisch entfernen...
 
 
 71001=Parameter
-71002=Übergabe-Parameter für Ihr Programm:
+71002=Ãœbergabe-Parameter fÃ¼r Ihr Programm:
 71003=Host Anwendung:
 
 
@@ -1034,8 +1034,8 @@ Ver=1
 72003=Projekt Optionen:
 72004=Erzeuge Fehlersuch-Informationen
 72005=Erzeuge Profiling-Informationen
-72006=Beachte: Diese Einstellungen überschreiben für dieses Projekt die globalen Compiler-Optionen.
-72007=Windows XP Themen unterstützen
+72006=Beachte: Diese Einstellungen Ã¼berschreiben fÃ¼r dieses Projekt die globalen Compiler-Optionen.
+72007=Windows XP Themen unterstÃ¼tzen
 72008=Datei Optionen:
 72009=In Kompilierung einbeziehen
 72010=Kompiliere Datei als C++
@@ -1047,29 +1047,29 @@ Ver=1
 72016=Release:
 72017=Build:
 72018=Sprache:
-72019=Zusätzliche Informationen:
-72020=Überschreibe Build Kommando
+72019=ZusÃ¤tzliche Informationen:
+72020=Ãœberschreibe Build Kommando
 72021=Ausgabedatei
 72022=Ins Linken einbeziehen
-72023=Build Priorität:
-72024=beim Kompilieren automatisch erhöhen
+72023=Build PrioritÃ¤t:
+72024=beim Kompilieren automatisch erhÃ¶hen
 72025=Nutze eigenes Makefile (kein Makefile erzeugen)
-72026=Informationen über Anpassungen des Makefile...
-72027=&Folgende Datei ins Makefile einschließen:
+72026=Informationen Ã¼ber Anpassungen des Makefile...
+72027=&Folgende Datei ins Makefile einschlieÃŸen:
 72028=Produktversion gleich Dateiversion
 72029=C++ als Standard bei neuen Dateien
-72030=Compiler-Einstellungen des Projektes auf Vorgabe zurücksetzen?
-72031=Dev-C++ konnte die Einstellungen für Versionsinformationen zur Exe nicht lesen.<CR><CR>Häufige Ursache ist die 'Datenausführungsverhinderung' (DEP).<CR><CR>Bitte fügen Sie devcpp.exe zu den Ausnahmen der DEP hinzu, unter Systemsteuerung >> System >> Erweiterte Systemeinstellungen >> Erweitert >> Leistung >> Datenausführungsverhinderung und versuchen es erneut.
+72030=Compiler-Einstellungen des Projektes auf Vorgabe zurÃ¼cksetzen?
+72031=Dev-C++ konnte die Einstellungen fÃ¼r Versionsinformationen zur Exe nicht lesen.<CR><CR>HÃ¤ufige Ursache ist die 'DatenausfÃ¼hrungsverhinderung' (DEP).<CR><CR>Bitte fÃ¼gen Sie devcpp.exe zu den Ausnahmen der DEP hinzu, unter Systemsteuerung >> System >> Erweiterte Systemeinstellungen >> Erweitert >> Leistung >> DatenausfÃ¼hrungsverhinderung und versuchen es erneut.
 
 
 
 73001=Symbole & Relokationen entfernen (-s)
-73002=Instruktionen für folgende CPU erzeugen (-march)
+73002=Instruktionen fÃ¼r folgende CPU erzeugen (-march)
 73003=Prozessor-spezifische Erweiterungen nutzen  (-mx)
 73004=Optimierungslevel (-Ox)
 73005=Sprachstandard (-std)
-73006=Adressgröße (-m32/64)
-73007=Geringe Komprimierung um Kompatibilität zu wahren (-mtune)
+73006=AdressgrÃ¶ÃŸe (-m32/64)
+73007=Geringe Komprimierung um KompatibilitÃ¤t zu wahren (-mtune)
 
 
 74001=Compiler:
@@ -1082,7 +1082,7 @@ Ver=1
 
 75001=Die folgenden %s Verzeichnisse existieren nicht:
 75002=%s Verzeichnisse wurden nicht bekannt gemacht.
-75003=Die folgenden Verzeichnisse für Exe-Dateien wurden durchsucht:
-75004=Bitte prüfen Sie ob Ihr Verzeichnis für Executables und deren Namen richtig sind unter Werkzeuge >> Compiler >> Verzeichnisse/Programme.
-75005=Möchten Sie, daß Dev-C++ diese für Sie entfernt und den Vorgabe-Pfad einsetzt?<CR><CR>Die Einträge zu belassen könnte zu Problemen beim Kompilieren.<CR><CR>Sofern Sie nicht genau wissen was Sie tun, sollten Sie Ja anklicken.
+75003=Die folgenden Verzeichnisse fÃ¼r Exe-Dateien wurden durchsucht:
+75004=Bitte prÃ¼fen Sie ob Ihr Verzeichnis fÃ¼r Executables und deren Namen richtig sind unter Werkzeuge >> Compiler >> Verzeichnisse/Programme.
+75005=MÃ¶chten Sie, daÃŸ Dev-C++ diese fÃ¼r Sie entfernt und den Vorgabe-Pfad einsetzt?<CR><CR>Die EintrÃ¤ge zu belassen kÃ¶nnte zu Problemen beim Kompilieren.<CR><CR>Sofern Sie nicht genau wissen was Sie tun, sollten Sie Ja anklicken.
 75006=Konnte %s "%s" nicht finden.

@@ -204,7 +204,7 @@ var
   I: integer;
 begin
   try
-    sl.LoadFromFile(Filename);
+    sl.LoadFromFile(Filename, TEncoding.UTF8);
     I := 0;
     while I < sl.Count do begin
       if Trim(sl[I]) = '' then

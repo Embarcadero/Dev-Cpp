@@ -57,3 +57,6 @@ __history/
 MinGW64
 devcpp.exe
 __recovery
+/Source/Linux64
+/Source/OSX64
+/devcpp

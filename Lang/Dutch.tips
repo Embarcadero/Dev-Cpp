@@ -33,7 +33,7 @@
 # 	door Jordi De Groof					#
 # 	E-mail: jordi.degroof@gmail.com				#
 # 	Als je nog fouten vindt of sugessties hebt, gelieve me te e-mailen	#
-# 	Vertaling beëindigd op 19 december 2004			#
+# 	Vertaling beÃ«indigd op 19 december 2004			#
 # 							#
 ################################################################
 
@@ -49,7 +49,7 @@
 #
 ...de code-aanvullen functie je productiviteit zal helpen toenemen door alle mogelijke commando?s in de huidige context te suggereren.<CR><CR>Om code-aanvullen in te schakelen, ga naar "Gereedschappen/Editor-opties" en schakel de klasse-browser en codevervolmaking in.
 
-...de code-aanvullen functie in actie schiet zodra je ".", "->" of "::" typt in het editor-venster na een door de gebruiker bepaalde time-out?<CR><CR>Om deze time-out te definiëren, ga naar "Gereedschappen/Editor-opties/Klasse browser/Vervolmaking".
+...de code-aanvullen functie in actie schiet zodra je ".", "->" of "::" typt in het editor-venster na een door de gebruiker bepaalde time-out?<CR><CR>Om deze time-out te definiÃ«ren, ga naar "Gereedschappen/Editor-opties/Klasse browser/Vervolmaking".
 
 ...je de code-aanvullen functie kan oproepen door "CTRL+Spatie" op eender welk ogenblik in te typen in het editor-venster?
 
@@ -62,7 +62,7 @@
 #
 # Project Manager tips
 #
-...je kan definiëren of je moet enkel of dubbelklikken in de project manager om een bestand te openen in de editor.<CR><CR>Om dit te veranderen, ga naar "Gereedschappen/Omgevingsopties" en schakel "Dubbelklik om project manager bestanden te openen" in (of uit).
+...je kan definiÃ«ren of je moet enkel of dubbelklikken in de project manager om een bestand te openen in de editor.<CR><CR>Om dit te veranderen, ga naar "Gereedschappen/Omgevingsopties" en schakel "Dubbelklik om project manager bestanden te openen" in (of uit).
 
 ...je mappen kan aanmaken in de project manager om gemakkelijker je weg te vinden in grote projecten? Je kan zelfs mappen nesten!!<CR><CR>Je moet gewoon rechtsklikken in de project manager om het context-menu te tonen...
 
@@ -71,7 +71,7 @@
 #
 # File menu tips
 #
-...je informatie kan krijgen over het bestand waarin je aan het werken bent?<CR><CR>Selecteer "Bestand/Eigenschappen" en je krijgt informatie over de grootte van het bestand, het aantal lijnen, het aantal lijnen met commentaar, lege lijnen, en geïnclude bestanden!
+...je informatie kan krijgen over het bestand waarin je aan het werken bent?<CR><CR>Selecteer "Bestand/Eigenschappen" en je krijgt informatie over de grootte van het bestand, het aantal lijnen, het aantal lijnen met commentaar, lege lijnen, en geÃ¯nclude bestanden!
 
 ...je je project als een sjabloon kan bewaren?<CR><CR>Selecteer "Bestand/Nieuw/Sjabloon". Dit zal je project bewaren als een sjabloon voor Dev-C++.<CR>Dit sjabloon kan je vinden als je "Bestand/Nieuw/Project" selecteert.<CR>Hierdoor zal je een basis hebben om je code van op te bouwen, aangepast aan jouw smaak!
 
@@ -82,10 +82,10 @@
 #
 # Edit menu tips
 #
-...je enkele lijnen ineens kan (on)becommentariëren door ze te selecteren en op "Bewerken/Commentaar (schrappen)" te klikken?
+...je enkele lijnen ineens kan (on)becommentariÃ«ren door ze te selecteren en op "Bewerken/Commentaar (schrappen)" te klikken?
 
 ...je de inspringing van enkele lijnen ineens kan vergroten/verkleinen door ze te selecteren en op "Bewerken/Vergroot (Verklein) inspringing" te klikken?
 
-...je bladwijzers kan gebruiken in de editor om snel door je code te kunnen bewegen?<CR><CR>Je kan een bladwijzer aanmaken door op "Bewerken/Creëer bladwijzer" te klikken en het nummer van de bladwijzer te kiezen.<CR>Om naar een bladwijzer te gaan moet je op "Bewerken/Ga naar bladwijzer" klikken en het nummer van de bladwijzer selecteren.
+...je bladwijzers kan gebruiken in de editor om snel door je code te kunnen bewegen?<CR><CR>Je kan een bladwijzer aanmaken door op "Bewerken/CreÃ«er bladwijzer" te klikken en het nummer van de bladwijzer te kiezen.<CR>Om naar een bladwijzer te gaan moet je op "Bewerken/Ga naar bladwijzer" klikken en het nummer van de bladwijzer selecteren.
 
 ...er een krachtige "Ga naar"-functie is die je kunt vinden onder het "Zoeken"-menu?<CR><CR>Het toont al de functies van een bestand, en door een deel van de functienaam in te typen, wordt de lijst gefilterd. Druk op enter en je gaat onmiddelijk naar die functie!<CR>Noot: de klasse browser moet ingeschakeld zijn...

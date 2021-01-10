@@ -33,53 +33,53 @@
 #
 # Important tips (appear first)
 #
-...ka nevajadzçtu atslçgt ğos padomus?<CR><CR>Ğeit esoğie padomi dos tev nedokumentçtu informâciju, kas nav atrodama nekur citur.<CR>Ja tu tos izslçgsi un vçlâk vçlçsies apskatît, paòem "Palîdzîba / Dienas padoms"...
+...ka nevajadzÃ§tu atslÃ§gt Ã°os padomus?<CR><CR>Ãeit esoÃ°ie padomi dos tev nedokumentÃ§tu informÃ¢ciju, kas nav atrodama nekur citur.<CR>Ja tu tos izslÃ§gsi un vÃ§lÃ¢k vÃ§lÃ§sies apskatÃ®t, paÃ²em "PalÃ®dzÃ®ba / Dienas padoms"...
 
-...ka vari izmantot vUpdate, lai apgâdâtu savu Dev-C++ vidi ar pçdçjiem kïûdu labojumiem un jaunâkajâm iespçjâm?<CR><CR>Paòem "Rîki / Meklçt Atjaunojumus/Packages..." 
+...ka vari izmantot vUpdate, lai apgÃ¢dÃ¢tu savu Dev-C++ vidi ar pÃ§dÃ§jiem kÃ¯Ã»du labojumiem un jaunÃ¢kajÃ¢m iespÃ§jÃ¢m?<CR><CR>PaÃ²em "RÃ®ki / MeklÃ§t Atjaunojumus/Packages..." 
 #
 # Code-completion tips
 #
-...ka koda pabeigğanas opcija var paaugstinât produktivitâti, iesakot visas pağreizçjajâ kontekstâ iespçjamâs komandas?<CR><CR>Lai ieslçgtu koda pabeigğanu, paòem "Rîki / Redaktora Opcijas" un ieslçdz klağu pârlûku un koda pabeigğanu.
+...ka koda pabeigÃ°anas opcija var paaugstinÃ¢t produktivitÃ¢ti, iesakot visas paÃ°reizÃ§jajÃ¢ kontekstÃ¢ iespÃ§jamÃ¢s komandas?<CR><CR>Lai ieslÃ§gtu koda pabeigÃ°anu, paÃ²em "RÃ®ki / Redaktora Opcijas" un ieslÃ§dz klaÃ°u pÃ¢rlÃ»ku un koda pabeigÃ°anu.
 
-...ka koda pabeigğanas opcija nostrâdâ pçc noteiktas aiztures, kad redaktora logâ ieraksta ".", "->" vai "::"?<CR><CR>Lai piereglçtu ğo aizturi, palabo "Rîki / Redaktora Opcijas / Klağu pârlûkoğana / Pabeigğana".
+...ka koda pabeigÃ°anas opcija nostrÃ¢dÃ¢ pÃ§c noteiktas aiztures, kad redaktora logÃ¢ ieraksta ".", "->" vai "::"?<CR><CR>Lai piereglÃ§tu Ã°o aizturi, palabo "RÃ®ki / Redaktora Opcijas / KlaÃ°u pÃ¢rlÃ»koÃ°ana / PabeigÃ°ana".
 
-...ka koda pabeigğanu var izsaukt, nospieşot "Ctrl+Space", jebkurâ brîdî, kad esi redaktora logâ?<CR><CR>(Pamçìini nospiest "Ctrl+Shift+Space" atrodoties funkcijas argumentu iekavâs...)
+...ka koda pabeigÃ°anu var izsaukt, nospieÃ¾ot "Ctrl+Space", jebkurÃ¢ brÃ®dÃ®, kad esi redaktora logÃ¢?<CR><CR>(PamÃ§Ã¬ini nospiest "Ctrl+Shift+Space" atrodoties funkcijas argumentu iekavÃ¢s...)
 
-...ka turot "shift" un klikğíinot uz kâda ieraksta klağu pârlûkâ, tevi pârceï uz deklarâciju nevis implementâciju?<CR><CR>Protams, var arî izmantot konteksta izvçlni ğim pağam (un daudziem citiem!) mçríiem...
+...ka turot "shift" un klikÃ°Ã­inot uz kÃ¢da ieraksta klaÃ°u pÃ¢rlÃ»kÃ¢, tevi pÃ¢rceÃ¯ uz deklarÃ¢ciju nevis implementÃ¢ciju?<CR><CR>Protams, var arÃ® izmantot konteksta izvÃ§lni Ã°im paÃ°am (un daudziem citiem!) mÃ§rÃ­iem...
 
-...ka var pievienot savas mapes klağu pârlûkâ, lai bûtu vienkârğâk orientçties lielos projektos? Var pat ğîs mapes ievietot vienu otrâ!<CR><CR>Vienkârği noklikğíini labo pogu klağu pârlûkâ, lai parâdîtos konteksta izvçlne...
+...ka var pievienot savas mapes klaÃ°u pÃ¢rlÃ»kÃ¢, lai bÃ»tu vienkÃ¢rÃ°Ã¢k orientÃ§ties lielos projektos? Var pat Ã°Ã®s mapes ievietot vienu otrÃ¢!<CR><CR>VienkÃ¢rÃ°i noklikÃ°Ã­ini labo pogu klaÃ°u pÃ¢rlÃ»kÃ¢, lai parÃ¢dÃ®tos konteksta izvÃ§lne...
 
-...ka klağu pârlûka mapju informâcija glabâjas failâ "classfolders.dcf" projekta saknes mapç?<CR><CR>Ja kaut kas nojûk, tad vienkârği izdzçs ğo failu un vçlreiz atver projektu!
+...ka klaÃ°u pÃ¢rlÃ»ka mapju informÃ¢cija glabÃ¢jas failÃ¢ "classfolders.dcf" projekta saknes mapÃ§?<CR><CR>Ja kaut kas nojÃ»k, tad vienkÃ¢rÃ°i izdzÃ§s Ã°o failu un vÃ§lreiz atver projektu!
 
-...ka klağu pârlûkâ ir divi skata veidi?<CR>Viens râda visas projektâ izbantotâs klases/memberus/funkcijas, bet otrs râda informâciju, kas attiecas *tikai* uz pağreiz labojamo failu.<CR><CR>Vienkârği veic labo klikğíi klağu pârlûkâ un izvçlies "Skata veids"...
+...ka klaÃ°u pÃ¢rlÃ»kÃ¢ ir divi skata veidi?<CR>Viens rÃ¢da visas projektÃ¢ izbantotÃ¢s klases/memberus/funkcijas, bet otrs rÃ¢da informÃ¢ciju, kas attiecas *tikai* uz paÃ°reiz labojamo failu.<CR><CR>VienkÃ¢rÃ°i veic labo klikÃ°Ã­i klaÃ°u pÃ¢rlÃ»kÃ¢ un izvÃ§lies "Skata veids"...
 
 #
 # Project Manager tips
 #
-...ka vari noteikt to, vai failu no projekta saraksta atver ar vienkârğo- vai ar dubult-klikğíi?<CR><CR>Lai nodefinçtu ğo lietu, paòem "Rîki / Vides Opcijas" un ieslçdz (vai izslçdz) punktu "Dubultklikğíis, lai atvçrtu Projekta Pârvaldes Failus"...
+...ka vari noteikt to, vai failu no projekta saraksta atver ar vienkÃ¢rÃ°o- vai ar dubult-klikÃ°Ã­i?<CR><CR>Lai nodefinÃ§tu Ã°o lietu, paÃ²em "RÃ®ki / Vides Opcijas" un ieslÃ§dz (vai izslÃ§dz) punktu "DubultklikÃ°Ã­is, lai atvÃ§rtu Projekta PÃ¢rvaldes Failus"...
 
-...ka var nodefinçt savas mapes (tikai augğçjâ lîmenî) projekta vadîbas logâ, lai labâk organizçtu savus failus?<CR><CR>Lai to izdarîtu, noklikğíini labo pogu projekta vadîbas logâ, lai parâdîtos konteksta izvçlne...
+...ka var nodefinÃ§t savas mapes (tikai augÃ°Ã§jÃ¢ lÃ®menÃ®) projekta vadÃ®bas logÃ¢, lai labÃ¢k organizÃ§tu savus failus?<CR><CR>Lai to izdarÃ®tu, noklikÃ°Ã­ini labo pogu projekta vadÃ®bas logÃ¢, lai parÃ¢dÃ®tos konteksta izvÃ§lne...
 
-...ka, ja ir izveidotas savas mapes projekta vadîbas logâ, tâs var mainît ar vietâm vienkârği pârvelkot no vienas vietas uz otru?
+...ka, ja ir izveidotas savas mapes projekta vadÃ®bas logÃ¢, tÃ¢s var mainÃ®t ar vietÃ¢m vienkÃ¢rÃ°i pÃ¢rvelkot no vienas vietas uz otru?
 
 #
 # File menu tips
 #
-...ka var apskatît informâciju par failu, ar kuru ğobrîd strâdâ?<CR><CR>Paòem "Fails / Îpağîbas" un iegûsi informâciju par faila izmçru, rindu skaitu, komentâru skaitu (rindâs), tukğo rindu skaitu, kâ arî par include failiem!
+...ka var apskatÃ®t informÃ¢ciju par failu, ar kuru Ã°obrÃ®d strÃ¢dÃ¢?<CR><CR>PaÃ²em "Fails / ÃpaÃ°Ã®bas" un iegÃ»si informÃ¢ciju par faila izmÃ§ru, rindu skaitu, komentÃ¢ru skaitu (rindÃ¢s), tukÃ°o rindu skaitu, kÃ¢ arÃ® par include failiem!
 
-...ka vari saglabât savu projektu kâ ğablonu?<CR><CR>Paòem "Fails / Jauns / Ğablons". Tâ saglabâsi savu projektu kâ Dev-C++ ğablonu, un ğis ğablons bûs pieejams, kad izvçlçsies "Fails / Jauns / Projekts".<CR>Tâdâ veidâ vari izveidot projektu sagataves, kas atbilst tavai gaumei!
+...ka vari saglabÃ¢t savu projektu kÃ¢ Ã°ablonu?<CR><CR>PaÃ²em "Fails / Jauns / Ãablons". TÃ¢ saglabÃ¢si savu projektu kÃ¢ Dev-C++ Ã°ablonu, un Ã°is Ã°ablons bÃ»s pieejams, kad izvÃ§lÃ§sies "Fails / Jauns / Projekts".<CR>TÃ¢dÃ¢ veidÃ¢ vari izveidot projektu sagataves, kas atbilst tavai gaumei!
 
-...ka vari importçt savus MS Visual C++ projektus?<CR><CR>Vienkârği izvçlies "Fails / Importçt / Importçt MS Visual C++ projektu".<CR>Var gadîties, ka pçc importçğanas nâksies nedaudz pielabot projekta paametrus... Bet galu galâ arî tas ir labi :)
+...ka vari importÃ§t savus MS Visual C++ projektus?<CR><CR>VienkÃ¢rÃ°i izvÃ§lies "Fails / ImportÃ§t / ImportÃ§t MS Visual C++ projektu".<CR>Var gadÃ®ties, ka pÃ§c importÃ§Ã°anas nÃ¢ksies nedaudz pielabot projekta paametrus... Bet galu galÃ¢ arÃ® tas ir labi :)
 
-...ka vari eksportçt source failu vai visu projektu uz HTML vai RTF?<CR>Ğâdâ veidâ tu vari izvietot savu pirmkodu (source ;) ) weblapâ un dalîties informâcijâ ar visu pasauli!<CR><CR>Vienkârği noklikğíni "Fails / Eksportçt" un izvçlies eksportçğanas metodi...
+...ka vari eksportÃ§t source failu vai visu projektu uz HTML vai RTF?<CR>ÃÃ¢dÃ¢ veidÃ¢ tu vari izvietot savu pirmkodu (source ;) ) weblapÃ¢ un dalÃ®ties informÃ¢cijÃ¢ ar visu pasauli!<CR><CR>VienkÃ¢rÃ°i noklikÃ°Ã­ni "Fails / EksportÃ§t" un izvÃ§lies eksportÃ§Ã°anas metodi...
 
 #
 # Edit menu tips
 #
-...ka vari ATkomentçt lîniju kopu, tâs aizzîmçjot un noklikğíinot "Labot / ATkomentçt"?
+...ka vari ATkomentÃ§t lÃ®niju kopu, tÃ¢s aizzÃ®mÃ§jot un noklikÃ°Ã­inot "Labot / ATkomentÃ§t"?
 
-...ka vari samazinât atkâpi lîniju grupai, tâs aizzîmçjot un noklikğíinot "Labot / Samazinât Atkâpi"?
+...ka vari samazinÃ¢t atkÃ¢pi lÃ®niju grupai, tÃ¢s aizzÃ®mÃ§jot un noklikÃ°Ã­inot "Labot / SamazinÃ¢t AtkÃ¢pi"?
 
-...ka vari lietot iezîmes redaktorâ, lai âtri pârvietotos pa kodu?<CR><CR>Ieslçdz vai izslçdz iezîmi, noklikğíinot "Labot / Pârslçgt Piezîmes" un paòemot iezîmes numuru.<CR>Lai aizietu uz iezîmi, noklikğíini "Labot / Iet uz Iezîmçm" un izvçles iezîmes numuru.
+...ka vari lietot iezÃ®mes redaktorÃ¢, lai Ã¢tri pÃ¢rvietotos pa kodu?<CR><CR>IeslÃ§dz vai izslÃ§dz iezÃ®mi, noklikÃ°Ã­inot "Labot / PÃ¢rslÃ§gt PiezÃ®mes" un paÃ²emot iezÃ®mes numuru.<CR>Lai aizietu uz iezÃ®mi, noklikÃ°Ã­ini "Labot / Iet uz IezÃ®mÃ§m" un izvÃ§les iezÃ®mes numuru.
 
-...ka "Meklçt" izvçlnç atrodas jaudîgâ "Iet uz funkciju..." komanda?<CR><CR>Tâ parâda visas faila funkcijas un, ierakstot kâdu funkcijs vârda daïu, saraksts atfiltrç rezultâtus. Nospied "Enter" un tu nokïusi uzreiz pie ğis funkcijas!<CR>Piezîme: Klağu pârlûkoğanai ir jâbût ieslçgtai...
+...ka "MeklÃ§t" izvÃ§lnÃ§ atrodas jaudÃ®gÃ¢ "Iet uz funkciju..." komanda?<CR><CR>TÃ¢ parÃ¢da visas faila funkcijas un, ierakstot kÃ¢du funkcijs vÃ¢rda daÃ¯u, saraksts atfiltrÃ§ rezultÃ¢tus. Nospied "Enter" un tu nokÃ¯usi uzreiz pie Ã°is funkcijas!<CR>PiezÃ®me: KlaÃ°u pÃ¢rlÃ»koÃ°anai ir jÃ¢bÃ»t ieslÃ§gtai...

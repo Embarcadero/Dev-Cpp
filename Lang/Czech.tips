@@ -1,16 +1,16 @@
-#Autor pøekladu: Jan Ringoš, Tringi
+#Autor pÅ™ekladu: Jan RingoÂš, Tringi
 #E-mail: Tringi@mx-3.cz
 
 #Web: http://tringi.mx-3.cz
-#Tım: http://www.mx-3.cz
+#TÃ½m: http://www.mx-3.cz
 
-#Za pøípadné chyby se omlouvám, ale nikdo není dokonalı.
-#Nejnovìjší soubory vdy naleznete na stránce http://tringi.mx-3.cz
+#Za pÅ™Ã­padnÃ© chyby se omlouvÃ¡m, ale nikdo nenÃ­ dokonalÃ½.
+#NejnovÄ›jÂšÃ­ soubory vÂdy naleznete na strÃ¡nce http://tringi.mx-3.cz
 
 
 
-#Za pøípadné chyby se omlouvám, ale nikdo není dokonalı.
-#Nejnovìjší soubory vdy naleznete na vıše uvedené stránce.
+#Za pÅ™Ã­padnÃ© chyby se omlouvÃ¡m, ale nikdo nenÃ­ dokonalÃ½.
+#NejnovÄ›jÂšÃ­ soubory vÂdy naleznete na vÃ½Âše uvedenÃ© strÃ¡nce.
 
 
 #
@@ -46,70 +46,70 @@
 #
 # Important tips (appear first)
 #
-...není dobré vypínat tipy?<CR><CR>Tipy, nabízené zde pøináší informace a triky, které nejsou zmínìné nikde jinde.<CR>Pokud tipy zrušíte, najdete je vdy v nabídce Nápovìda / Tip dne.
+...nenÃ­ dobrÃ© vypÃ­nat tipy?<CR><CR>Tipy, nabÃ­zenÃ© zde pÅ™inÃ¡ÂšÃ­ informace a triky, kterÃ© nejsou zmÃ­nÄ›nÃ© nikde jinde.<CR>Pokud tipy zruÂšÃ­te, najdete je vÂdy v nabÃ­dce NÃ¡povÄ›da / Tip dne.
 
 
-...mùete pouít vUpdate k aktualizaci prostøedí Dev-C++. Nepøijdete pak o novinky, opravy chyb ani nové funkce.<CR><CR>Zvolte Nástroje / Zjistit updaty.
+...mÅ¯Âete pouÂÃ­t vUpdate k aktualizaci prostÅ™edÃ­ Dev-C++. NepÅ™ijdete pak o novinky, opravy chyb ani novÃ© funkce.<CR><CR>Zvolte NÃ¡stroje / Zjistit updaty.
 
 
-...nejnovìjší verzi tohoto souboru s èeskım pøekladem naleznete vdy nìkolik dní po vydání Dev-C++ na stránce Tringi netbase?<CR><CR>Pøejít na tuto stránku mùete kliknutím na následující odkaz.<URL>http://tringi.mx-3.cz<UDESC>Tringi netbase (http://tringi.mx-3.cz)
+...nejnovÄ›jÂšÃ­ verzi tohoto souboru s ÄeskÃ½m pÅ™ekladem naleznete vÂdy nÄ›kolik dnÃ­ po vydÃ¡nÃ­ Dev-C++ na strÃ¡nce Tringi netbase?<CR><CR>PÅ™ejÃ­t na tuto strÃ¡nku mÅ¯Âete kliknutÃ­m na nÃ¡sledujÃ­cÃ­ odkaz.<URL>http://tringi.mx-3.cz<UDESC>Tringi netbase (http://tringi.mx-3.cz)
 
 
 #
 # Code-completion tips
 #
-...vlastnost dokonèování vám mùe pomoci zvıšit produktivitu práce tak, e vám nabídne všechna moná øešení dostupná pro aktuální kontext?<CR><CR>Povolit dokonèování mùete v nabídce Nástroje / Nastavení editoru na záloce Struktura kódu / Dokonèování.
+...vlastnost dokonÄovÃ¡nÃ­ vÃ¡m mÅ¯Âe pomoci zvÃ½Âšit produktivitu prÃ¡ce tak, Âe vÃ¡m nabÃ­dne vÂšechna moÂnÃ¡ Å™eÂšenÃ­ dostupnÃ¡ pro aktuÃ¡lnÃ­ kontext?<CR><CR>Povolit dokonÄovÃ¡nÃ­ mÅ¯Âete v nabÃ­dce NÃ¡stroje / NastavenÃ­ editoru na zÃ¡loÂce Struktura kÃ³du / DokonÄovÃ¡nÃ­.
 
 
-...dokonèování kódu se aktivuje po napsání ".", "->" nebo "::" po uplynutí nastavitelné doby?<CR><CR>Tuto prodlevu je moné nastavit v nabídce Nástroje / Nastavení editoru na záloce Struktura kódu / Dokonèování.
+...dokonÄovÃ¡nÃ­ kÃ³du se aktivuje po napsÃ¡nÃ­ ".", "->" nebo "::" po uplynutÃ­ nastavitelnÃ© doby?<CR><CR>Tuto prodlevu je moÂnÃ© nastavit v nabÃ­dce NÃ¡stroje / NastavenÃ­ editoru na zÃ¡loÂce Struktura kÃ³du / DokonÄovÃ¡nÃ­.
 
 
-...mùete explicitnì vyvolat funkci dokonèování stiskem klávesy Ctrl a Mezerník kdekoliv v oknì editoru?<CR><CR>Také zkuste stisknout Ctrl-Shift-Mezerník kdykoliv je kurzor uvnitø závorek volání funkce...
+...mÅ¯Âete explicitnÄ› vyvolat funkci dokonÄovÃ¡nÃ­ stiskem klÃ¡vesy Ctrl a MezernÃ­k kdekoliv v oknÄ› editoru?<CR><CR>TakÃ© zkuste stisknout Ctrl-Shift-MezernÃ­k kdykoliv je kurzor uvnitÅ™ zÃ¡vorek volÃ¡nÃ­ funkce...
 
 
-...pøidrením klávesy Shift pøi kliknutí do pøehledu tøíd pøesune editaci k deklaraci místo implementace?<CR>Samozøejmì je vše v kontextovém menu na pravém tlaèítku myši...
+...pÅ™idrÂenÃ­m klÃ¡vesy Shift pÅ™i kliknutÃ­ do pÅ™ehledu tÅ™Ã­d pÅ™esune editaci k deklaraci mÃ­sto implementace?<CR>SamozÅ™ejmÄ› je vÂše v kontextovÃ©m menu na pravÃ©m tlaÄÃ­tku myÂši...
 
 
-...mùete i v pøehledu tøíd vytváøet vlastní sloky?<CR><CR>K usnadnìní orientace ve velkıch projektech pak mùete bìnım taením myši rozlišit všechny objekty a promìnné.<CR><CR>Kontextové menu zobrazíte kliknutím pravım tlaèítkem myši...
+...mÅ¯Âete i v pÅ™ehledu tÅ™Ã­d vytvÃ¡Å™et vlastnÃ­ sloÂky?<CR><CR>K usnadnÄ›nÃ­ orientace ve velkÃ½ch projektech pak mÅ¯Âete bÄ›ÂnÃ½m taÂenÃ­m myÂši rozliÂšit vÂšechny objekty a promÄ›nnÃ©.<CR><CR>KontextovÃ© menu zobrazÃ­te kliknutÃ­m pravÃ½m tlaÄÃ­tkem myÂši...
 
 
-...je moné zvolit si ze dvou reimù zobrazení pøehledu tøíd? Jeden zobrazuje všechny zjištìné tøídy, èlenské funkce a promìnné v projektu a druhı pouze relevantní informace k danému souboru.<CR><CR>Kliknutím pravım tlaèítkem myši zobrazte kontextové menu a zvolte Zobrazit/Aktuální soubor.
+...je moÂnÃ© zvolit si ze dvou reÂimÅ¯ zobrazenÃ­ pÅ™ehledu tÅ™Ã­d? Jeden zobrazuje vÂšechny zjiÂštÄ›nÃ© tÅ™Ã­dy, ÄlenskÃ© funkce a promÄ›nnÃ© v projektu a druhÃ½ pouze relevantnÃ­ informace k danÃ©mu souboru.<CR><CR>KliknutÃ­m pravÃ½m tlaÄÃ­tkem myÂši zobrazte kontextovÃ© menu a zvolte Zobrazit/AktuÃ¡lnÃ­ soubor.
 
 
 #
 # Project Manager tips
 #
-...mùete zvolit zda chcete otevírat soubory ze Správce projektu jednoduchım kliknutím nebo dovjklikem?<CR><CR>Nastavit si tuto vlastnost mùete v nabídce Nástroje / Nastavení prostøedí a povolte (nebo zrušte) volbu Dvojklik pro otevøení souboru.
+...mÅ¯Âete zvolit zda chcete otevÃ­rat soubory ze SprÃ¡vce projektu jednoduchÃ½m kliknutÃ­m nebo dovjklikem?<CR><CR>Nastavit si tuto vlastnost mÅ¯Âete v nabÃ­dce NÃ¡stroje / NastavenÃ­ prostÅ™edÃ­ a povolte (nebo zruÂšte) volbu Dvojklik pro otevÅ™enÃ­ souboru.
 
 
-...si mùete nastavit vlastní sloky (pouze v jedné úrovni) k organizaci souborù ve správci projektu?<CR><CR>K usnadnìní orientace ve velkıch projektech pak mùete bìnım taením myši rozlišit všechny soubory.<CR><CR>Kontextové menu zobrazíte kliknutím pravım tlaèítkem myši...
+...si mÅ¯Âete nastavit vlastnÃ­ sloÂky (pouze v jednÃ© Ãºrovni) k organizaci souborÅ¯ ve sprÃ¡vci projektu?<CR><CR>K usnadnÄ›nÃ­ orientace ve velkÃ½ch projektech pak mÅ¯Âete bÄ›ÂnÃ½m taÂenÃ­m myÂši rozliÂšit vÂšechny soubory.<CR><CR>KontextovÃ© menu zobrazÃ­te kliknutÃ­m pravÃ½m tlaÄÃ­tkem myÂši...
 
 
 #
 # File menu tips
 #
-...mùete získat zajímavé informace o souboru se kterım právì pracujete.<CR><CR>Zvolte z menu Soubor poloku Vlastnosti...
+...mÅ¯Âete zÃ­skat zajÃ­mavÃ© informace o souboru se kterÃ½m prÃ¡vÄ› pracujete.<CR><CR>Zvolte z menu Soubor poloÂku Vlastnosti...
 
 
-...je moné uloit projekt jako šablonu?<CR><CR>Zvolte nabídku Soubor / Novı / Šablona. Tímto uloíte váš projekt jako šablonu Dev-C++ a mùete nové projekty zaèínat na základì této šablony.
+...je moÂnÃ© uloÂit projekt jako Âšablonu?<CR><CR>Zvolte nabÃ­dku Soubor / NovÃ½ / ÂŠablona. TÃ­mto uloÂÃ­te vÃ¡Âš projekt jako Âšablonu Dev-C++ a mÅ¯Âete novÃ© projekty zaÄÃ­nat na zÃ¡kladÄ› tÃ©to Âšablony.
 
 
-...mùete pøevést vaše projekty MS Visual C++ do Dev-C++?<CR><CR>Zvolte nabídku Soubor / Import / Importovat projekt MS Visual C++.<CR>Je ale nutné projekt upravit aby byl ve finální verzi spustitelnı!
+...mÅ¯Âete pÅ™evÃ©st vaÂše projekty MS Visual C++ do Dev-C++?<CR><CR>Zvolte nabÃ­dku Soubor / Import / Importovat projekt MS Visual C++.<CR>Je ale nutnÃ© projekt upravit aby byl ve finÃ¡lnÃ­ verzi spustitelnÃ½!
 
 
-...mùete exportovat zdrojové kódy nebo celı projekt do HTML nebo RTF?<CR><CR>Je to nejvhodnìjší a nejrychlejší zpùsob jak uploadovat kódy na web.<CR><CR>Jednoduše kliknìte v nabídce Soubor na poloku Export a zvolte metodu.
+...mÅ¯Âete exportovat zdrojovÃ© kÃ³dy nebo celÃ½ projekt do HTML nebo RTF?<CR><CR>Je to nejvhodnÄ›jÂšÃ­ a nejrychlejÂšÃ­ zpÅ¯sob jak uploadovat kÃ³dy na web.<CR><CR>JednoduÂše kliknÄ›te v nabÃ­dce Soubor na poloÂku Export a zvolte metodu.
 
 
 #
 # Edit menu tips
 #
-...je moné snadno a rychle zakomentovat celı blok kódu volbou Editace/Zakomentovat?<CR><CR>Podobnì pouijte funkci Odkomentovat.
+...je moÂnÃ© snadno a rychle zakomentovat celÃ½ blok kÃ³du volbou Editace/Zakomentovat?<CR><CR>PodobnÄ› pouÂijte funkci Odkomentovat.
 
 
-...je moné snadno a rychle odsadit celı blok kódu volbou Editace/Odsadit?<CR><CR>Podobnì pouijte funkci k pøedsazení bloku.
+...je moÂnÃ© snadno a rychle odsadit celÃ½ blok kÃ³du volbou Editace/Odsadit?<CR><CR>PodobnÄ› pouÂijte funkci k pÅ™edsazenÃ­ bloku.
 
 
-...k usnadnìní orientace v editoru mùete pouít záloky?<CR><CR>Nastavením záloky na nìkolik, èasto upravovanıch, èástí kódu si ušetøíte èas ztracenı rolováním textu.
+...k usnadnÄ›nÃ­ orientace v editoru mÅ¯Âete pouÂÃ­t zÃ¡loÂky?<CR><CR>NastavenÃ­m zÃ¡loÂky na nÄ›kolik, Äasto upravovanÃ½ch, ÄÃ¡stÃ­ kÃ³du si uÂšetÅ™Ã­te Äas ztracenÃ½ rolovÃ¡nÃ­m textu.
 
 
-...je k dispozici funkce Pøejít na funkci v nabídce Hledat?<CR><CR>Zobrazí seznam všech funkcí v souboru a napsáním èásti názvu mùete potøebnou funkci vyhledat. Klávesou ENTER pak pøímo pøejdete na tuto funkci<CR><CR>Poznámka: Funkce struktury kódu musí bıt povolena
+...je k dispozici funkce PÅ™ejÃ­t na funkci v nabÃ­dce Hledat?<CR><CR>ZobrazÃ­ seznam vÂšech funkcÃ­ v souboru a napsÃ¡nÃ­m ÄÃ¡sti nÃ¡zvu mÅ¯Âete potÅ™ebnou funkci vyhledat. KlÃ¡vesou ENTER pak pÅ™Ã­mo pÅ™ejdete na tuto funkci<CR><CR>PoznÃ¡mka: Funkce struktury kÃ³du musÃ­ bÃ½t povolena

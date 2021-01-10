@@ -1,80 +1,80 @@
 
-# CompilaciÛn: Dev-C++ IDE_5.4.2 RC5
-# TraducciÛn al EspaÒol (Colombia)
-# Hecha por Roberto Herrera GutiÈrrez
+# Compilaci√≥n: Dev-C++ IDE_5.4.2 RC5
+# Traducci√≥n al Espa√±ol (Colombia)
+# Hecha por Roberto Herrera Guti√©rrez
 # E-mail: jarod_2012_rad@yahoo.com
 # Para cualquier inquietud o sugerencia mandarme un e-mail
 # Creado y modificado el 26 de Abril del 2013
 
 # Este es un documento de sugerencias diarias.
-# Escriba cada sugerencia en una sola lÌnea.
+# Escriba cada sugerencia en una sola l√≠nea.
 
-# Las lÌneas que comienzan con '#' son comentarios y se ignoran.
-# TambiÈn se ignoran las lÌneas vacÌas.
+# Las l√≠neas que comienzan con '#' son comentarios y se ignoran.
+# Tambi√©n se ignoran las l√≠neas vac√≠as.
 
 # Puede utilizar estas macros en el texto:
-# <CR>: Insertar un salto de lÌnea.
+# <CR>: Insertar un salto de l√≠nea.
 # <URL>: Es seguido por un enlace a una URL.
-# <UDESC>: Es seguido por una descripciÛn de una URL.
+# <UDESC>: Es seguido por una descripci√≥n de una URL.
 
-# UtilizaciÛn la sintaxis (el texto de la sugerencia es <sugerencia_texto>):
+# Utilizaci√≥n la sintaxis (el texto de la sugerencia es <sugerencia_texto>):
 # (<sugerencia_texto> | <CR>) * [<URL> Texto [<UDESC> texto]]
 
 # Sugerencia de Ejemplo:
-# ...Alguna sugerencia<CR><CR>m·s lÌneas... <URL>http://www.bloodshed.net/dev<UDESC>Clic para visitar Bloodshed Software.
+# ...Alguna sugerencia<CR><CR>m√°s l√≠neas... <URL>http://www.bloodshed.net/dev<UDESC>Clic para visitar Bloodshed Software.
 
-# Se agregar·n m·s macros cuando sea necesario...
+# Se agregar√°n m√°s macros cuando sea necesario...
 
-# Nota 1: si quieres usar un sÌmbolo de uniÛn (&), poner dos juntos (&&).
-# Nota 2: cada sugerencia puede tener m·s de 255 caracteres.
-# Nota 3: las macros <CR> se agregan como un car·cter, y no como cuatro.
-# Nota 4: con macros <URL> y <UDESC>, el resto de la lÌnea no se muestra como una sugerencia, por lo que no se tienen en cuenta para el lÌmite de 255 caracteres.
-# Nota 5: La macro <UDESC> es opcional. Si no se incluye, <URL> se imprimir· en el enlace.
+# Nota 1: si quieres usar un s√≠mbolo de uni√≥n (&), poner dos juntos (&&).
+# Nota 2: cada sugerencia puede tener m√°s de 255 caracteres.
+# Nota 3: las macros <CR> se agregan como un car√°cter, y no como cuatro.
+# Nota 4: con macros <URL> y <UDESC>, el resto de la l√≠nea no se muestra como una sugerencia, por lo que no se tienen en cuenta para el l√≠mite de 255 caracteres.
+# Nota 5: La macro <UDESC> es opcional. Si no se incluye, <URL> se imprimir√° en el enlace.
 # Nota 6: La macro <UDESC> si existe *debe ir seguida* la macro <URL>
 
 # Important tips (appear first)
 
-...no deberÌas desactivar las sugerencias del dÌa?<CR><CR>Las sugerencias que aparecen aquÌ te dar·n informaciÛn que no aparece en ninguna otra parte.<CR>Si las desactivas y quieres verlas en otro momento, seleccione "Ayuda/Sugerencia del dÌa...
+...no deber√≠as desactivar las sugerencias del d√≠a?<CR><CR>Las sugerencias que aparecen aqu√≠ te dar√°n informaci√≥n que no aparece en ninguna otra parte.<CR>Si las desactivas y quieres verlas en otro momento, seleccione "Ayuda/Sugerencia del d√≠a...
 
-...puedes cambiar el tema de los iconos y el lenguaje que pusiste al ejecutar por primera vez el programa?<CR><CR>Ve a Herramientas/Opciones del Entorno/Principal y podr·s elegir un nuevo lenguaje, un nuevo tema y otras opciones m·s.
+...puedes cambiar el tema de los iconos y el lenguaje que pusiste al ejecutar por primera vez el programa?<CR><CR>Ve a Herramientas/Opciones del Entorno/Principal y podr√°s elegir un nuevo lenguaje, un nuevo tema y otras opciones m√°s.
 
-...puedes usar WebUpdate para mantener el entorno Dev-C++ actualizado con los ˙ltimos errores solucionados, nuevas y mejores caracterÌsticas?<CR><CR>Selecciona "Herramientas/Buscar Actualizaciones..."
+...puedes usar WebUpdate para mantener el entorno Dev-C++ actualizado con los √∫ltimos errores solucionados, nuevas y mejores caracter√≠sticas?<CR><CR>Selecciona "Herramientas/Buscar Actualizaciones..."
 
-...el traductor de Dev-C++ a castellano es Fernando MuÒoz Ledesma?<CR>Puedes mandarme comentarios, sugerencias, erratas sobre las traducciones u otras cosas a:<CR><CR>       ledesmafernando@msn.com<CR><CR>TambiÈn puedes ir a mi web y descargarte las ˙ltimas actualizaciones del lenguaje y m·s.<CR><URL>http://membres.lycos.fr/ledesma/<UDESC>
+...el traductor de Dev-C++ a castellano es Fernando Mu√±oz Ledesma?<CR>Puedes mandarme comentarios, sugerencias, erratas sobre las traducciones u otras cosas a:<CR><CR>       ledesmafernando@msn.com<CR><CR>Tambi√©n puedes ir a mi web y descargarte las √∫ltimas actualizaciones del lenguaje y m√°s.<CR><URL>http://membres.lycos.fr/ledesma/<UDESC>
 
-...la p·gina oficial de Dev-C++ tiene foros donde intercambiar opiniones y respuestas sobre funciones, instrucciones y todo lo que quieras?<CR><CR>TambiÈn puedes ver en Èl men˙ de Ayuda, en Acerca de Dev-C++ m·s direcciones de interÈs.<CR><CR>Puedes ir a la p·gina haciendo Clic en <URL>http://www.bloodshed.net/dev/<UDESC>
+...la p√°gina oficial de Dev-C++ tiene foros donde intercambiar opiniones y respuestas sobre funciones, instrucciones y todo lo que quieras?<CR><CR>Tambi√©n puedes ver en √©l men√∫ de Ayuda, en Acerca de Dev-C++ m√°s direcciones de inter√©s.<CR><CR>Puedes ir a la p√°gina haciendo Clic en <URL>http://www.bloodshed.net/dev/<UDESC>
 
-...la p·gina oficial de Dev-C++ tiene links hacia documentos de ayuda sobre los lenguajes de programaciÛn C y C++?<CR><CR>TambiÈn tiene links a MSDN y a las ayudas del compilador GCC.<CR><CR>Para ir directamente, haz Clic en...<URL>http://www.bloodshed.net/dev/doc/index.html<UDESC>
+...la p√°gina oficial de Dev-C++ tiene links hacia documentos de ayuda sobre los lenguajes de programaci√≥n C y C++?<CR><CR>Tambi√©n tiene links a MSDN y a las ayudas del compilador GCC.<CR><CR>Para ir directamente, haz Clic en...<URL>http://www.bloodshed.net/dev/doc/index.html<UDESC>
 
-...puedes insertar nuevos compiladores para compilar tus cÛdigos fuente?<CR><CR>Ve a Herramientas / Opciones del Compilador y presionando el botÛn + agregar·s un compilador.<CR><CR>Tendr·s que configurarlo en las pestaÒas de Directorios y Programas.<CR><CR>Y ya estar· casi todo listo para usar distintos compiladores.
+...puedes insertar nuevos compiladores para compilar tus c√≥digos fuente?<CR><CR>Ve a Herramientas / Opciones del Compilador y presionando el bot√≥n + agregar√°s un compilador.<CR><CR>Tendr√°s que configurarlo en las pesta√±as de Directorios y Programas.<CR><CR>Y ya estar√° casi todo listo para usar distintos compiladores.
 
 #
 # Code-completion tips
 #
 
-...la caracterÌstica de autocompletar texto te ayudar· a incrementar tu productividad al sugerirte todos los posibles comandos disponibles en el contexto actual?<CR><CR>Para activar esta opciÛn, ve a "Herramientas / Opciones del Editor" y activa el Explorador de Clases y Autocompletar CÛdigo.
+...la caracter√≠stica de autocompletar texto te ayudar√° a incrementar tu productividad al sugerirte todos los posibles comandos disponibles en el contexto actual?<CR><CR>Para activar esta opci√≥n, ve a "Herramientas / Opciones del Editor" y activa el Explorador de Clases y Autocompletar C√≥digo.
 
-...la caracterÌstica de autocompletar texto se muestra cuando escribes ".", "->" o "::" en el editor despuÈs de un tiempo definido por el usuario?<CR><CR>Para definir este tiempo ve a "Herramientas/Opciones del Editor/Autocompletado y habilitar el autocompletado de texto".
+...la caracter√≠stica de autocompletar texto se muestra cuando escribes ".", "->" o "::" en el editor despu√©s de un tiempo definido por el usuario?<CR><CR>Para definir este tiempo ve a "Herramientas/Opciones del Editor/Autocompletado y habilitar el autocompletado de texto".
 
-...puedes mostrar la caracterÌstica de autocompletar texto presionando a la vez "Ctrl" y "Space" en el editor?<CR><CR>(Intente presionando "Ctrl+Shift+Space" a la vez mientras el cursor estÈ dentro de los argumentos entre parÈntesis de una funciÛn...)
+...puedes mostrar la caracter√≠stica de autocompletar texto presionando a la vez "Ctrl" y "Space" en el editor?<CR><CR>(Intente presionando "Ctrl+Shift+Space" a la vez mientras el cursor est√© dentro de los argumentos entre par√©ntesis de una funci√≥n...)
 
-...haciendo Clic mientras presionas "Shift" en una entrada del Explorador de Clases, te lleva a una declaraciÛn en vez de a una implementaciÛn?<CR><CR>Por supuesto, tambiÈn puedes usar el men˙ contextual (°y m·s opciones!) para dicha funciÛn.
+...haciendo Clic mientras presionas "Shift" en una entrada del Explorador de Clases, te lleva a una declaraci√≥n en vez de a una implementaci√≥n?<CR><CR>Por supuesto, tambi√©n puedes usar el men√∫ contextual (¬°y m√°s opciones!) para dicha funci√≥n.
 
-...puedes agregar carpetas personales en el Explorador de Clases para encontrar m·s f·cilmente lo que buscas en grandes proyectos? °Puedes colocar una o varias dentro de otras carpetas personales!<CR><CR>Simplemente haciendo Clic con el BotÛn Derecho en el Explorador de Clases para traer el men˙ contextual...
+...puedes agregar carpetas personales en el Explorador de Clases para encontrar m√°s f√°cilmente lo que buscas en grandes proyectos? ¬°Puedes colocar una o varias dentro de otras carpetas personales!<CR><CR>Simplemente haciendo Clic con el Bot√≥n Derecho en el Explorador de Clases para traer el men√∫ contextual...
 
-...la informaciÛn del Explorador de Clases est· guardada en un archivo llamado "classfolders.dcf" en la carpeta de los proyectos?<CR><CR>°Si algo malo sucediese, simplemente borra dicho archivo y reabre tu proyecto!
+...la informaci√≥n del Explorador de Clases est√° guardada en un archivo llamado "classfolders.dcf" en la carpeta de los proyectos?<CR><CR>¬°Si algo malo sucediese, simplemente borra dicho archivo y reabre tu proyecto!
 
-...hay dos modos de visualizaciÛn para el Explorador de Clases?<CR><CR>Uno te muestra las clases, miembros y funciones analizados del proyecto, y el otro la informaciÛn relevante al archivo mostrado en el editor.<CR><CR>Simplemente, haz Clic con el BotÛn Derecho en el Explorador de Clases y selecciona "Modo de visualizaciÛn"...
+...hay dos modos de visualizaci√≥n para el Explorador de Clases?<CR><CR>Uno te muestra las clases, miembros y funciones analizados del proyecto, y el otro la informaci√≥n relevante al archivo mostrado en el editor.<CR><CR>Simplemente, haz Clic con el Bot√≥n Derecho en el Explorador de Clases y selecciona "Modo de visualizaci√≥n"...
 
-...puedes ocultar el Explorador de Proyectos/Clases?<CR><CR>Para ello ve a Ver/Explorador de Proyectos/Clases.<CR><CR>Si estuviese oculto podrÌas volver a ponerlo de igual modo.
+...puedes ocultar el Explorador de Proyectos/Clases?<CR><CR>Para ello ve a Ver/Explorador de Proyectos/Clases.<CR><CR>Si estuviese oculto podr√≠as volver a ponerlo de igual modo.
 
 #
 # Project Manager tips
 #
 
-...puedes definir si tendr·s que hacer Clic Simple o Doble Clic en un archivo del Administrador de Proyecto para abrirlo y mostrarlo en el editor?<CR><CR>Para cambiar esto ve a "Herramientas/Opciones del Entorno" y activa (o desactiva) "Doble Clic para abrir los archivos del Administrador de Proyecto"...
+...puedes definir si tendr√°s que hacer Clic Simple o Doble Clic en un archivo del Administrador de Proyecto para abrirlo y mostrarlo en el editor?<CR><CR>Para cambiar esto ve a "Herramientas/Opciones del Entorno" y activa (o desactiva) "Doble Clic para abrir los archivos del Administrador de Proyecto"...
 
-...puedes crear carpetas personales (sÛlo las del nivel superior) en el Administrador de Proyecto para organizar tus archivos mejor?<CR><CR>Para hacer esto, haz Clic con el BotÛn Derecho en el Administrador de Proyecto para traerte el men˙ contextual a la pantalla...
+...puedes crear carpetas personales (s√≥lo las del nivel superior) en el Administrador de Proyecto para organizar tus archivos mejor?<CR><CR>Para hacer esto, haz Clic con el Bot√≥n Derecho en el Administrador de Proyecto para traerte el men√∫ contextual a la pantalla...
 
 ...si ha creado carpetas personales en el Administrador de Proyecto, puedes arrastrar y soltar archivos en una u otra carpeta para reorganizarlos?
 
@@ -82,49 +82,49 @@
 # File menu tips
 #
 
-...puedes obtener informaciÛn sobre el archivo en el que est·s trabajando?<CR><CR>°Selecciona "Archivo/Propiedades" y obtendr· informaciÛn sobre el tamaÒo del archivo, el n˙mero de lÌneas de cÛdigo, lÌneas de comentarios, lÌneas vacÌas y de los archivos incluidos!
+...puedes obtener informaci√≥n sobre el archivo en el que est√°s trabajando?<CR><CR>¬°Selecciona "Archivo/Propiedades" y obtendr√° informaci√≥n sobre el tama√±o del archivo, el n√∫mero de l√≠neas de c√≥digo, l√≠neas de comentarios, l√≠neas vac√≠as y de los archivos incluidos!
 
-...puedes guardar tu proyecto como una plantilla?<CR><CR>Selecciona "Archivo/Nuevo/Plantilla...". AsÌ conseguir·s que tu proyecto al guardarse sea una plantilla y estar· disponible cuando selecciones "Archivo/Nuevo/Proyecto".<CR><CR>°De esta manera tendr·s una base en la que comenzar, hecha a su gusto!
+...puedes guardar tu proyecto como una plantilla?<CR><CR>Selecciona "Archivo/Nuevo/Plantilla...". As√≠ conseguir√°s que tu proyecto al guardarse sea una plantilla y estar√° disponible cuando selecciones "Archivo/Nuevo/Proyecto".<CR><CR>¬°De esta manera tendr√°s una base en la que comenzar, hecha a su gusto!
 
-...puedes importar tus Proyectos de MS Visual C++ a Dev-C++?<CR><CR>Simplemente selecciona "Archivo/Importar proyecto de MS Visual C++".<CR><CR>°A lo mejor tienes que configurar las opciones del proyecto antes de importarlo pero, el trabajo de importar est· logrado!
+...puedes importar tus Proyectos de MS Visual C++ a Dev-C++?<CR><CR>Simplemente selecciona "Archivo/Importar proyecto de MS Visual C++".<CR><CR>¬°A lo mejor tienes que configurar las opciones del proyecto antes de importarlo pero, el trabajo de importar est√° logrado!
 
-...puedes exportar un cÛdigo fuente o un proyectos a HTML o a RTF?<CR><CR>De esta manera puedes subirte los cÛdigos a tu p·gina web y compartirlos con todo el mundo!<CR><CR>Simplemente haz Clic en "Archivo/Exportar" y seleccione el mÈtodo de exportaciÛn... 
+...puedes exportar un c√≥digo fuente o un proyectos a HTML o a RTF?<CR><CR>De esta manera puedes subirte los c√≥digos a tu p√°gina web y compartirlos con todo el mundo!<CR><CR>Simplemente haz Clic en "Archivo/Exportar" y seleccione el m√©todo de exportaci√≥n... 
 
 #
 # Edit menu tips
 #
 
-...puedes agregar un comentario (o quitar el comentario) seleccionando un grupo de lÌneas y haciendo Clic en "EdiciÛn/Agregar Comentario (Quitar Comentario)"?
+...puedes agregar un comentario (o quitar el comentario) seleccionando un grupo de l√≠neas y haciendo Clic en "Edici√≥n/Agregar Comentario (Quitar Comentario)"?
 
-...puedes poner margen (o quitar margen) seleccionando un grupo de lÌneas y haciendo Clic en "EdiciÛn/Poner margen (Quitar margen)"?
+...puedes poner margen (o quitar margen) seleccionando un grupo de l√≠neas y haciendo Clic en "Edici√≥n/Poner margen (Quitar margen)"?
 
-...puedes utilizar marcadores en el editor para desplazarte a lo largo del cÛdigo r·pidamente?<CR><CR>AÒade o quita un marcador haciendo Clic en "EdiciÛn/AÒadir (O Quitar) Marcador" y seleccionando el n˙mero de marcador.<CR><CR>Puedes ir a un marcador seleccionando el n˙mero en "EdiciÛn/Ir a Marcador".
+...puedes utilizar marcadores en el editor para desplazarte a lo largo del c√≥digo r√°pidamente?<CR><CR>A√±ade o quita un marcador haciendo Clic en "Edici√≥n/A√±adir (O Quitar) Marcador" y seleccionando el n√∫mero de marcador.<CR><CR>Puedes ir a un marcador seleccionando el n√∫mero en "Edici√≥n/Ir a Marcador".
 
-...hay un potente comando "Ir a FunciÛn" en el men˙ "Buscar"?<CR><CR>Muestra todas las funciones del archivo, y escribiendo parte del nombre de la funciÛn muestra la lista de argumentos. °Presiona Enter e ir·s a la funciÛn inmediatamente!<CR><CR>Nota: Tiene que estar habilitado el Explorador de Clases...
+...hay un potente comando "Ir a Funci√≥n" en el men√∫ "Buscar"?<CR><CR>Muestra todas las funciones del archivo, y escribiendo parte del nombre de la funci√≥n muestra la lista de argumentos. ¬°Presiona Enter e ir√°s a la funci√≥n inmediatamente!<CR><CR>Nota: Tiene que estar habilitado el Explorador de Clases...
 
 #
 # More tips
 #
 
-...hay dos modos de pantalla completa?<CR><CR>Para ir al modo de pantalla completa presiona las teclas "Alt+F12" o selecciona "Ventana/Modo Pantalla Completa".<CR><CR>Para aÒadirle la Barra de Herramientas hay que presionar "Alt+F11".<CR><CR>Para volver al modo normal presionar "Alt+F12".
+...hay dos modos de pantalla completa?<CR><CR>Para ir al modo de pantalla completa presiona las teclas "Alt+F12" o selecciona "Ventana/Modo Pantalla Completa".<CR><CR>Para a√±adirle la Barra de Herramientas hay que presionar "Alt+F11".<CR><CR>Para volver al modo normal presionar "Alt+F12".
 
-...puedes utilizar teclas para acceder r·pidamente a opciones importantes y que adem·s puedes configurarlas?<CR><CR>Para ello ve a "Herramientas/Configurar Atajos Teclado".<CR><CR>Nota: Se pueden deshacer los cambios porque se guardan en el archivo "shortcuts.ini" en la carpeta configuraciones.
+...puedes utilizar teclas para acceder r√°pidamente a opciones importantes y que adem√°s puedes configurarlas?<CR><CR>Para ello ve a "Herramientas/Configurar Atajos Teclado".<CR><CR>Nota: Se pueden deshacer los cambios porque se guardan en el archivo "shortcuts.ini" en la carpeta configuraciones.
 
-...el archivo "devcpp.ini" contiene toda la configuraciÛn de Dev-C++?<CR><CR>AsÌ si sucediese algo malo en, por ejemplo, los colores para mostrar la sintaxis en el editor, puedes quitar lo que hay debajo de la clave "[Editor.Syntax]" o simplemente modificar alguna configuraciÛn.
+...el archivo "devcpp.ini" contiene toda la configuraci√≥n de Dev-C++?<CR><CR>As√≠ si sucediese algo malo en, por ejemplo, los colores para mostrar la sintaxis en el editor, puedes quitar lo que hay debajo de la clave "[Editor.Syntax]" o simplemente modificar alguna configuraci√≥n.
 
-...puedes aÒadirle poderosas herramientas a Dev-C++?<CR><CR>Ve a "Herramientas/Configurar Herramientas/AÒadir" y aÒadiendo el tÌtulo, el programa, la carpeta de trabajo y los macros y par·metros que necesite,<CR>° y tendr·s la nueva herramienta lista para su utilizaciÛn con Dev-C++ !
+...puedes a√±adirle poderosas herramientas a Dev-C++?<CR><CR>Ve a "Herramientas/Configurar Herramientas/A√±adir" y a√±adiendo el t√≠tulo, el programa, la carpeta de trabajo y los macros y par√°metros que necesite,<CR>¬° y tendr√°s la nueva herramienta lista para su utilizaci√≥n con Dev-C++ !
 
-...puedes compilar r·pidamente tu cÛdigo fuente o proyecto presionando "F9"?<CR><CR>ø SabÌas que puedes ejecutar tu programa presionando "F10"?<CR><CR>ø SabÌas que puedes hacer las dos anteriores presionando "F11"?<CR><CR>Son los atajos del teclado de Dev-C++.
+...puedes compilar r√°pidamente tu c√≥digo fuente o proyecto presionando "F9"?<CR><CR>¬ø Sab√≠as que puedes ejecutar tu programa presionando "F10"?<CR><CR>¬ø Sab√≠as que puedes hacer las dos anteriores presionando "F11"?<CR><CR>Son los atajos del teclado de Dev-C++.
 
-...cada usuario tiene su propia configuraciÛn?<CR><CR>Los archivos de configuraciÛn se guardar·n en la carpeta de Application Data de cada usuario<CR><CR>AsÌ podr·s personalizar Dev-C++ sin preocuparte de que otros usuarios cambien tu configuraciÛn.<CR><CR>Esto es v·lido sÛlo para Windows 2000 y XP.
+...cada usuario tiene su propia configuraci√≥n?<CR><CR>Los archivos de configuraci√≥n se guardar√°n en la carpeta de Application Data de cada usuario<CR><CR>As√≠ podr√°s personalizar Dev-C++ sin preocuparte de que otros usuarios cambien tu configuraci√≥n.<CR><CR>Esto es v√°lido s√≥lo para Windows 2000 y XP.
 
-...la sintaxis coloreada tiene varias configuraciones para adaptar m·s f·cilmente el editor de Dev-C++?<CR><CR>AsÌ puedes ver la sintaxis como en MS Visual C++, Borland, adem·s de otras.<CR><CR>Elije la que m·s te guste en Herramientas/Opciones del editor/Sintaxis/Pre-Configuraciones.
+...la sintaxis coloreada tiene varias configuraciones para adaptar m√°s f√°cilmente el editor de Dev-C++?<CR><CR>As√≠ puedes ver la sintaxis como en MS Visual C++, Borland, adem√°s de otras.<CR><CR>Elije la que m√°s te guste en Herramientas/Opciones del editor/Sintaxis/Pre-Configuraciones.
 
-...puedes tener la tu propia configuraciÛn de la sintaxis coloreada?<CR><CR>Haz los ajustes en Herramientas/Opciones del editor/Sintaxis y dale al icono de guardar, que es el dibujo del disquette.<CR><CR>Tendr·s que introducir un nombre y...<CR>          °Listo, ya tienes tu propia configuraciÛn!
+...puedes tener la tu propia configuraci√≥n de la sintaxis coloreada?<CR><CR>Haz los ajustes en Herramientas/Opciones del editor/Sintaxis y dale al icono de guardar, que es el dibujo del disquette.<CR><CR>Tendr√°s que introducir un nombre y...<CR>          ¬°Listo, ya tienes tu propia configuraci√≥n!
 
-...existe un botÛn para cancelar la compilaciÛn?<CR><CR>Si por error le has dado a compilar pues cancelarla presionando el botÛn que dicen "Abortar compilaciÛn"<CR><CR>El botÛn se encuentra en los resultados de la compilaciÛn abajo a la izquierda, justo debajo del indicador del tamaÒo del archivo de salida.
+...existe un bot√≥n para cancelar la compilaci√≥n?<CR><CR>Si por error le has dado a compilar pues cancelarla presionando el bot√≥n que dicen "Abortar compilaci√≥n"<CR><CR>El bot√≥n se encuentra en los resultados de la compilaci√≥n abajo a la izquierda, justo debajo del indicador del tama√±o del archivo de salida.
 
-...puedes configurar el men˙ Insertar para tener trozos de cÛdigo por defecto listos para incluir?<CR><CR>AsÌ puedes introducir por ejemplo, un comentario con tu nombre en cada archivo que hagas presionando Insertar.<CR><CR>Para saber m·s sobre esto haz Clic en siguiente, para ver la siguiente sugerencia.
+...puedes configurar el men√∫ Insertar para tener trozos de c√≥digo por defecto listos para incluir?<CR><CR>As√≠ puedes introducir por ejemplo, un comentario con tu nombre en cada archivo que hagas presionando Insertar.<CR><CR>Para saber m√°s sobre esto haz Clic en siguiente, para ver la siguiente sugerencia.
 
-...en la pestaÒa CÛdigo dentro de Opciones del Editor puedes aÒadir una entrada con tu cÛdigo para Insertar?<CR><CR>Haz esto poniendo el nombre y la descripciÛn que desees y cuando lo tengas presiona aÒadir y, escribe el trozo de cÛdigo a incluir en el cuadro de abajo.
+...en la pesta√±a C√≥digo dentro de Opciones del Editor puedes a√±adir una entrada con tu c√≥digo para Insertar?<CR><CR>Haz esto poniendo el nombre y la descripci√≥n que desees y cuando lo tengas presiona a√±adir y, escribe el trozo de c√≥digo a incluir en el cuadro de abajo.
 

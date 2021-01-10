@@ -31,70 +31,70 @@
 #
 # Important tips (appear first)
 #
-...da ne bi smeli onemogoèiti te nasvete?<CR><CR>Nasveti predstavljeni tukaj vam bodo dale nedokumentirane informacije, ki niso najdene nikjer drugje<CR>Èe jih onemogoèite in jih želite kasneje spet omogoèiti, lahko to storite v meniju "Pomoè->Nasvet dneva"...
+...da ne bi smeli onemogoÃ¨iti te nasvete?<CR><CR>Nasveti predstavljeni tukaj vam bodo dale nedokumentirane informacije, ki niso najdene nikjer drugje<CR>Ãˆe jih onemogoÃ¨ite in jih Âželite kasneje spet omogoÃ¨iti, lahko to storite v meniju "PomoÃ¨->Nasvet dneva"...
 
 
-...da lahko uporabite spletno posodabljanje, ki vam posodobi Dev-C++ z zadnjimi popravki in novimi zmožnosti?<CR><CR>Izberite "Orodja->Preveri za posodobitve/pakete..."
+...da lahko uporabite spletno posodabljanje, ki vam posodobi Dev-C++ z zadnjimi popravki in novimi zmoÂžnosti?<CR><CR>Izberite "Orodja->Preveri za posodobitve/pakete..."
 
 
 #
 # Code-completion tips
 #
-...da vam zmožnost dovršitev kode, s predlaganjem vseh možnih ukazov, pomaga poveèat vašo produktivnost?<CR><CR>Da omogoèite dovršitev, pojdite v meni "Orodja->Možnosti urejevalnika" in omogoèite brskalnik po razredih in dovršitev kode.
+...da vam zmoÂžnost dovrÂšitev kode, s predlaganjem vseh moÂžnih ukazov, pomaga poveÃ¨at vaÂšo produktivnost?<CR><CR>Da omogoÃ¨ite dovrÂšitev, pojdite v meni "Orodja->MoÂžnosti urejevalnika" in omogoÃ¨ite brskalnik po razredih in dovrÂšitev kode.
 
 
-...da je zmožnost dovršitve kode sprožena, ko v oknu urejevalnika vpišete ".", "->" ali "::"?<CR><CR>Da doloèite èasovni zamik prikaza, pojdite v meni "Orodja->Možnosti urejevalnika->Brskanje po razredih->Dovršitev".
+...da je zmoÂžnost dovrÂšitve kode sproÂžena, ko v oknu urejevalnika vpiÂšete ".", "->" ali "::"?<CR><CR>Da doloÃ¨ite Ã¨asovni zamik prikaza, pojdite v meni "Orodja->MoÂžnosti urejevalnika->Brskanje po razredih->DovrÂšitev".
 
 
-...da lahko v oknu urejevalnika kadarkoli, s pritiskom "Ctrl+Space", sprožite zmožnost dovršitve?<CR><CR>(Poskusite pritisnit "Ctrl+Shift+Space", medtem ko je kurzor v oklepajih funkcije - kjer so parametri)
+...da lahko v oknu urejevalnika kadarkoli, s pritiskom "Ctrl+Space", sproÂžite zmoÂžnost dovrÂšitve?<CR><CR>(Poskusite pritisnit "Ctrl+Shift+Space", medtem ko je kurzor v oklepajih funkcije - kjer so parametri)
 
 
-...da s pritiskom shift+klik na vnos v brskalniku, skoèite na deklaracijo namesto na uvedbo?
+...da s pritiskom shift+klik na vnos v brskalniku, skoÃ¨ite na deklaracijo namesto na uvedbo?
 
 
-...da lahko v brskalniku po razredih dodate mape po meri in si s tem olajšate iskanje v velikih projektih? Mape lahko tudi gnezdite!<CR><CR>V brskalniku po razredih enostavno kliknite desno tipko in prikazal se bo meni...
+...da lahko v brskalniku po razredih dodate mape po meri in si s tem olajÂšate iskanje v velikih projektih? Mape lahko tudi gnezdite!<CR><CR>V brskalniku po razredih enostavno kliknite desno tipko in prikazal se bo meni...
 
 
-...da sta dva naèina prikazovanja brskalnika po razredih?<CR>Eden vam pokaže vse razèlenjene razrede/èlane/funkcije projekta, drugi pa vam pokaže pomembne informacije *samo* za datoteko, ki se trenutno ureja.<CR><CR>V brskalniku po razredih kliknite desni gumb in izberite "Naèin pogleda"...
+...da sta dva naÃ¨ina prikazovanja brskalnika po razredih?<CR>Eden vam pokaÂže vse razÃ¨lenjene razrede/Ã¨lane/funkcije projekta, drugi pa vam pokaÂže pomembne informacije *samo* za datoteko, ki se trenutno ureja.<CR><CR>V brskalniku po razredih kliknite desni gumb in izberite "NaÃ¨in pogleda"...
 
 
 #
 # Project Manager tips
 #
-...da lahko doloèite, èe boste morali, za odprtje datoteke, klikniti dvakrat ali enkrat?<CR><CR>Da doloèite to, pojdite v "Orodja->Možnosti delovnega okolja" in omogoèite (ali onemogoèite) "Dvojni klik v Upravitelju projekta za odpiranje datotek"...
+...da lahko doloÃ¨ite, Ã¨e boste morali, za odprtje datoteke, klikniti dvakrat ali enkrat?<CR><CR>Da doloÃ¨ite to, pojdite v "Orodja->MoÂžnosti delovnega okolja" in omogoÃ¨ite (ali onemogoÃ¨ite) "Dvojni klik v Upravitelju projekta za odpiranje datotek"...
 
 
-...da lahko v upravitelju projekta doloèite mape po meri in tako bolje organizirate vaše datoteke?<CR><CR>To lahko naredite tako, da v upravitelju projekta kliknete na datoteko, kjer se vam bo pokazal meni...
+...da lahko v upravitelju projekta doloÃ¨ite mape po meri in tako bolje organizirate vaÂše datoteke?<CR><CR>To lahko naredite tako, da v upravitelju projekta kliknete na datoteko, kjer se vam bo pokazal meni...
 
 
-...da, èe ste v upravitelju projekta ustvarili mapo po meri, lahko povleèete in spustite datotek in jih tako razvrstite?
+...da, Ã¨e ste v upravitelju projekta ustvarili mapo po meri, lahko povleÃ¨ete in spustite datotek in jih tako razvrstite?
 
 
 #
 # File menu tips
 #
-...da lahko dobite informacije o datoteki s katero delate?<CR><CR>Izberite "Datoteka->Lastnosti" in dobili boste informacije o velikosti datoteke, število vrstic, vrstice komentarjev, prazne vrstice in vkljuèene datoteke!
+...da lahko dobite informacije o datoteki s katero delate?<CR><CR>Izberite "Datoteka->Lastnosti" in dobili boste informacije o velikosti datoteke, Âštevilo vrstic, vrstice komentarjev, prazne vrstice in vkljuÃ¨ene datoteke!
 
 
-...da lahko shranite projekt kot predlogo?<CR><CR>Izberite "Datoteka->Novo->Predloga". To bo shranilo vaš projekt kot Dev-C++ predlogo in bo na voljo v meniju "Datoteka->Novo->Projekt".<CR>Tako boste lahko zaželi kodirat po vašem okusu!
+...da lahko shranite projekt kot predlogo?<CR><CR>Izberite "Datoteka->Novo->Predloga". To bo shranilo vaÂš projekt kot Dev-C++ predlogo in bo na voljo v meniju "Datoteka->Novo->Projekt".<CR>Tako boste lahko zaÂželi kodirat po vaÂšem okusu!
 
 
-...da lahko v Dev-C++ uvozite vaše MS Visual C++ projekte?<CR><CR>Izberite "Datoteka->Uvozi->Uvozi MS Visual C++ projekt".<CR>Lahko, da boste morali malo dodatno nastaviti možnosti projekta, ker še zadeva ni izpopolnjena!
+...da lahko v Dev-C++ uvozite vaÂše MS Visual C++ projekte?<CR><CR>Izberite "Datoteka->Uvozi->Uvozi MS Visual C++ projekt".<CR>Lahko, da boste morali malo dodatno nastaviti moÂžnosti projekta, ker Âše zadeva ni izpopolnjena!
 
 
-...da lahko posamezno datoteko ali pa celotni izvozite v HTML ali RTF obliko?<CR>Tako lahko izvirno kodo enostavno naložite na spletno stran in jo delite z ostalim svetom!<CR><CR>Enostavno kliknite na "Datoteka->Izvozi" in izberite naèin izvoza...
+...da lahko posamezno datoteko ali pa celotni izvozite v HTML ali RTF obliko?<CR>Tako lahko izvirno kodo enostavno naloÂžite na spletno stran in jo delite z ostalim svetom!<CR><CR>Enostavno kliknite na "Datoteka->Izvozi" in izberite naÃ¨in izvoza...
 
 
 #
 # Edit menu tips
 #
-...da lahko (od-)komentirate veè vrstic naenkrat, tako, da jih oznaèite in kliknete na "Uredi->(Od-)Komentiraj"?
+...da lahko (od-)komentirate veÃ¨ vrstic naenkrat, tako, da jih oznaÃ¨ite in kliknete na "Uredi->(Od-)Komentiraj"?
 
 
-...da lahko zmanjšate/poveèata zamik veè vrstic naenkrat, tako, da jih oznaèite in kliknete na "Uredi->(Poveèaj/Zmanjšaj) zamik"?
+...da lahko zmanjÂšate/poveÃ¨ata zamik veÃ¨ vrstic naenkrat, tako, da jih oznaÃ¨ite in kliknete na "Uredi->(PoveÃ¨aj/ZmanjÂšaj) zamik"?
 
 
-...da lahko v urejevalniku uporabite zaznamke, kar vam omogoèa hitrejše pomikanje po kodi?<CR><CR>Nastavite ali odstranite zaznamek s klikom na "Uredi->Preklopi na zaznamke" in izbiro številke zaznamka.<CR>Pojdite na množico zaznamkov s klikom na "Uredi->Pojdi v zaznamke" in izbiro številke zaznamka.
+...da lahko v urejevalniku uporabite zaznamke, kar vam omogoÃ¨a hitrejÂše pomikanje po kodi?<CR><CR>Nastavite ali odstranite zaznamek s klikom na "Uredi->Preklopi na zaznamke" in izbiro Âštevilke zaznamka.<CR>Pojdite na mnoÂžico zaznamkov s klikom na "Uredi->Pojdi v zaznamke" in izbiro Âštevilke zaznamka.
 
 
-...da, v meniju "Iskanje" obstaja moèan ukaz "Pojdi v funkcijo"?<CR><CR>Ta prikaže vse funkcije datoteke in z vpisom dela funkcije, se seznam funkcij filtrira. Pritisnite enter in takoj se boste pomaknili v to!<CR>Opomba: brskanje po razredih mora biti omogoèeno...
+...da, v meniju "Iskanje" obstaja moÃ¨an ukaz "Pojdi v funkcijo"?<CR><CR>Ta prikaÂže vse funkcije datoteke in z vpisom dela funkcije, se seznam funkcij filtrira. Pritisnite enter in takoj se boste pomaknili v to!<CR>Opomba: brskanje po razredih mora biti omogoÃ¨eno...

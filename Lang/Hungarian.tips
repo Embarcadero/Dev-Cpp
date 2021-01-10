@@ -30,54 +30,54 @@
 #
 # Important tips (appear first)
 #
-...miért kellenek ezek a tippek?<CR><CR>A tippek sok nem dokumentált hasznos információt tartalmaznak amelyek máshol nem találhatóak meg.<CR>Ha kikapcsolja az indulási tippeket és késõbb szeretné megnézni a "Segítség / A nap tippje" menüvel teheti meg.
+...miÃ©rt kellenek ezek a tippek?<CR><CR>A tippek sok nem dokumentÃ¡lt hasznos informÃ¡ciÃ³t tartalmaznak amelyek mÃ¡shol nem talÃ¡lhatÃ³ak meg.<CR>Ha kikapcsolja az indulÃ¡si tippeket Ã©s kÃ©sÅ‘bb szeretnÃ© megnÃ©zni a "SegÃ­tsÃ©g / A nap tippje" menÃ¼vel teheti meg.
 
-...a vUpdate segítségével könnyedén hozzájuthat a Dev-C++ legfrissebb verzióihoz hibajavításaihoz?<CR><CR>Használja az "Eszközök / Frissítések/Csomagok Keresése" menüt.
+...a vUpdate segÃ­tsÃ©gÃ©vel kÃ¶nnyedÃ©n hozzÃ¡juthat a Dev-C++ legfrissebb verziÃ³ihoz hibajavÃ­tÃ¡saihoz?<CR><CR>HasznÃ¡lja az "EszkÃ¶zÃ¶k / FrissÃ­tÃ©sek/Csomagok KeresÃ©se" menÃ¼t.
 
 #
 # Code-completion tips
 #
-...a kódkiegészítés hatékonyan segít az adott környezetben lehetséges összes kódrészlet felfedésével?<CR><CR>A kódkiegészítést az "Eszközök / Szerkesztõ Beállításai" menübõl kapcsolhatja be az Osztály tallózás részben.
+...a kÃ³dkiegÃ©szÃ­tÃ©s hatÃ©konyan segÃ­t az adott kÃ¶rnyezetben lehetsÃ©ges Ã¶sszes kÃ³drÃ©szlet felfedÃ©sÃ©vel?<CR><CR>A kÃ³dkiegÃ©szÃ­tÃ©st az "EszkÃ¶zÃ¶k / SzerkesztÅ‘ BeÃ¡llÃ­tÃ¡sai" menÃ¼bÅ‘l kapcsolhatja be az OsztÃ¡ly tallÃ³zÃ¡s rÃ©szben.
 
-...a kódkiegészítés a beállított késleltetés után elindul ,ha ".", "->", "::" -ot ír a forráskódba?<CR><CR>A késleltetési idõ az "Eszközök / Szerkesztõ Beállításai" menübõl az Osztály tallózás részben állítható be.
+...a kÃ³dkiegÃ©szÃ­tÃ©s a beÃ¡llÃ­tott kÃ©sleltetÃ©s utÃ¡n elindul ,ha ".", "->", "::" -ot Ã­r a forrÃ¡skÃ³dba?<CR><CR>A kÃ©sleltetÃ©si idÅ‘ az "EszkÃ¶zÃ¶k / SzerkesztÅ‘ BeÃ¡llÃ­tÃ¡sai" menÃ¼bÅ‘l az OsztÃ¡ly tallÃ³zÃ¡s rÃ©szben Ã¡llÃ­thatÃ³ be.
 
-...bármikor elindítható a kódkiegészítés a "CTRL-Space" billentyû kombinációval?<CR><CR>(Használja a "Ctrl+Shift+Space" kombinációt amikor a kurzol a függvény argumentumait tartalmazó zárójelek között áll...)
+...bÃ¡rmikor elindÃ­thatÃ³ a kÃ³dkiegÃ©szÃ­tÃ©s a "CTRL-Space" billentyÅ± kombinÃ¡ciÃ³val?<CR><CR>(HasznÃ¡lja a "Ctrl+Shift+Space" kombinÃ¡ciÃ³t amikor a kurzol a fÃ¼ggvÃ©ny argumentumait tartalmazÃ³ zÃ¡rÃ³jelek kÃ¶zÃ¶tt Ã¡ll...)
 
-..."Shift-double-click"-el az Osztály Lista panelon a kijelölt elem definíciójához juthat?<CR>Természetesen használhatja erre a célra (és még sok másra is) a jobbgombos menüt az Osztály Lista panelon...
+..."Shift-double-click"-el az OsztÃ¡ly Lista panelon a kijelÃ¶lt elem definÃ­ciÃ³jÃ¡hoz juthat?<CR>TermÃ©szetesen hasznÃ¡lhatja erre a cÃ©lra (Ã©s mÃ©g sok mÃ¡sra is) a jobbgombos menÃ¼t az OsztÃ¡ly Lista panelon...
 
-...az Osztály Listában létrehozhat könyvtárakat hogy a nagyobb projektekben is könnyedén megtalálja amit keres? Szeretné tudni hogyan!<CR><CR>Csak jobb-klikk az Osztály Lista panelen...
+...az OsztÃ¡ly ListÃ¡ban lÃ©trehozhat kÃ¶nyvtÃ¡rakat hogy a nagyobb projektekben is kÃ¶nnyedÃ©n megtalÃ¡lja amit keres? SzeretnÃ© tudni hogyan!<CR><CR>Csak jobb-klikk az OsztÃ¡ly Lista panelen...
 
-...az Osztály Listában létrehozott könyvtárakról a "classfolders.dcf" fájl tárol információkat a projekt könyvtárban?<CR><CR>Ha valami nem megfelelõ a listában csak törölje ki ezt a fájlt, és nyissa meg újra a projektet!
+...az OsztÃ¡ly ListÃ¡ban lÃ©trehozott kÃ¶nyvtÃ¡rakrÃ³l a "classfolders.dcf" fÃ¡jl tÃ¡rol informÃ¡ciÃ³kat a projekt kÃ¶nyvtÃ¡rban?<CR><CR>Ha valami nem megfelelÅ‘ a listÃ¡ban csak tÃ¶rÃ¶lje ki ezt a fÃ¡jlt, Ã©s nyissa meg Ãºjra a projektet!
 
-...az Osztály Lista panelnak két megjelenítési módja van?<CR>Az egyik az összes a projektben található osztályt/tagot/függvényt kilistáz, a második pedig csak az aktuálisan szerkesztett fájlra mutatja ugyanezeket az információkat.<CR><CR>A két mód között a jobboldal egérgomb kattintásával megjelenõ menübõl a "Nézet Mód" menüben válthat...
+...az OsztÃ¡ly Lista panelnak kÃ©t megjelenÃ­tÃ©si mÃ³dja van?<CR>Az egyik az Ã¶sszes a projektben talÃ¡lhatÃ³ osztÃ¡lyt/tagot/fÃ¼ggvÃ©nyt kilistÃ¡z, a mÃ¡sodik pedig csak az aktuÃ¡lisan szerkesztett fÃ¡jlra mutatja ugyanezeket az informÃ¡ciÃ³kat.<CR><CR>A kÃ©t mÃ³d kÃ¶zÃ¶tt a jobboldal egÃ©rgomb kattintÃ¡sÃ¡val megjelenÅ‘ menÃ¼bÅ‘l a "NÃ©zet MÃ³d" menÃ¼ben vÃ¡lthat...
 
 #
 # Project Manager tips
 #
-...beállíthatja, hogy simpla vagy dupla kattintással lehessen a Projekt Menedzserbõl a fájlokat megnyitni?<CR><CR>A beállítás az "Eszközök / Környezeti Beállítások" menübõl érhetõ el...
+...beÃ¡llÃ­thatja, hogy simpla vagy dupla kattintÃ¡ssal lehessen a Projekt MenedzserbÅ‘l a fÃ¡jlokat megnyitni?<CR><CR>A beÃ¡llÃ­tÃ¡s az "EszkÃ¶zÃ¶k / KÃ¶rnyezeti BeÃ¡llÃ­tÃ¡sok" menÃ¼bÅ‘l Ã©rhetÅ‘ el...
 
-...a Projekt Menedzserben létrehozhat könyvtárakat (csak a legfelsõ szinten) a fájlok átláthatóbb elhelyezése érdekében?<CR><CR>Megteheti a Projekt Menedszerben a jobb-klikkel hívható menübõl (a legfelsõ szinten) a "Könyvtár Hozzáadása" menübõl.
+...a Projekt Menedzserben lÃ©trehozhat kÃ¶nyvtÃ¡rakat (csak a legfelsÅ‘ szinten) a fÃ¡jlok Ã¡tlÃ¡thatÃ³bb elhelyezÃ©se Ã©rdekÃ©ben?<CR><CR>Megteheti a Projekt Menedszerben a jobb-klikkel hÃ­vhatÃ³ menÃ¼bÅ‘l (a legfelsÅ‘ szinten) a "KÃ¶nyvtÃ¡r HozzÃ¡adÃ¡sa" menÃ¼bÅ‘l.
 
-...ha új könyvtárat hoz létre,a fájlokat Drag&&Drop-val mozgathatja a könytárakba?
+...ha Ãºj kÃ¶nyvtÃ¡rat hoz lÃ©tre,a fÃ¡jlokat Drag&&Drop-val mozgathatja a kÃ¶nytÃ¡rakba?
 
 #
 # File menu tips
 #
-...információt kaphat arról a fájlról amelyiken dolgozik?<CR><CR>Kiválasztva a "Fájl / Tulajdonságok" pontot, információt kap a fájl méretérõl, a sorok számáról, megjegyzések, üres sorok és az include utasítást tartalmazó sorok számáról!
+...informÃ¡ciÃ³t kaphat arrÃ³l a fÃ¡jlrÃ³l amelyiken dolgozik?<CR><CR>KivÃ¡lasztva a "FÃ¡jl / TulajdonsÃ¡gok" pontot, informÃ¡ciÃ³t kap a fÃ¡jl mÃ©retÃ©rÅ‘l, a sorok szÃ¡mÃ¡rÃ³l, megjegyzÃ©sek, Ã¼res sorok Ã©s az include utasÃ­tÃ¡st tartalmazÃ³ sorok szÃ¡mÃ¡rÃ³l!
 
-...lementheti a projektjét mint template?<CR><CR>Válassza ki a "Fájl / Új / Template" pontját. Ez lementi a projektet mint Dev-C++ template, amely elérhetõ lesz a "Fájl / Új / Projekt" pontban.<CR>Így lesz egy alapja, amelybõl kiindulhat, az ön ízlésének megfelelõen!
+...lementheti a projektjÃ©t mint template?<CR><CR>VÃ¡lassza ki a "FÃ¡jl / Ãšj / Template" pontjÃ¡t. Ez lementi a projektet mint Dev-C++ template, amely elÃ©rhetÅ‘ lesz a "FÃ¡jl / Ãšj / Projekt" pontban.<CR>Ãgy lesz egy alapja, amelybÅ‘l kiindulhat, az Ã¶n Ã­zlÃ©sÃ©nek megfelelÅ‘en!
 
-...importálhat MS Visual C++ projekteket a Dev-C++ -be?<CR><CR>Csak válassza a "Fájl / Import / MS Visual C++ projekt importálás" pontot.<CR>Lehet, hogy egy kicsit módosítani kell a projekt beállításain az importálás után, de végülis ez a rész még fejlesztés alatt áll!
+...importÃ¡lhat MS Visual C++ projekteket a Dev-C++ -be?<CR><CR>Csak vÃ¡lassza a "FÃ¡jl / Import / MS Visual C++ projekt importÃ¡lÃ¡s" pontot.<CR>Lehet, hogy egy kicsit mÃ³dosÃ­tani kell a projekt beÃ¡llÃ­tÃ¡sain az importÃ¡lÃ¡s utÃ¡n, de vÃ©gÃ¼lis ez a rÃ©sz mÃ©g fejlesztÃ©s alatt Ã¡ll!
 
-...exportálhatja a forrás fájlt vagy a teljes projektet mint HTML vagy RTF formátumú fájl?<CR>Ezzel a lehetõséggel feltöltheti a forrásait egy website-ra, hogy megossza azt a világgal!<CR><CR>Egyszerûen válassza a "Fájl / Export" pontot és válassza ki az exportálás formátumát...
+...exportÃ¡lhatja a forrÃ¡s fÃ¡jlt vagy a teljes projektet mint HTML vagy RTF formÃ¡tumÃº fÃ¡jl?<CR>Ezzel a lehetÅ‘sÃ©ggel feltÃ¶ltheti a forrÃ¡sait egy website-ra, hogy megossza azt a vilÃ¡ggal!<CR><CR>EgyszerÅ±en vÃ¡lassza a "FÃ¡jl / Export" pontot Ã©s vÃ¡lassza ki az exportÃ¡lÃ¡s formÃ¡tumÃ¡t...
 
 #
 # Edit menu tips
 #
-...megváltoztathatja a sorok kommentezését, kiválasztva a sorokat, majd ráklikkelve a "Szerkesztés / Megjegyzés (be/ki)" pontra?
+...megvÃ¡ltoztathatja a sorok kommentezÃ©sÃ©t, kivÃ¡lasztva a sorokat, majd rÃ¡klikkelve a "SzerkesztÃ©s / MegjegyzÃ©s (be/ki)" pontra?
 
-...megváltoztathatja a sorok bekezdésének mértékét, kiválasztva a sorokat, és a "Szerkesztés / Bekezdés (be/ki)" ponttal?
+...megvÃ¡ltoztathatja a sorok bekezdÃ©sÃ©nek mÃ©rtÃ©kÃ©t, kivÃ¡lasztva a sorokat, Ã©s a "SzerkesztÃ©s / BekezdÃ©s (be/ki)" ponttal?
 
-...használhat könyvjelzõket a szerkesztõben, hogy a forrásban gyorsan tudjon mozogni?<CR><CR>Be- vagy kikapcsolhatja a könyvjelzõt a "Szerkesztés / Könyvjelzõ elhelyezése" pontban, kiválasztva a könyvjelzõ számát.<CR>Egy adott könyvjelzõhöz ugorhat a "Szerkesztés / Könyvjelzõre ugrás" pontban, kiválasztva a könyvjelzõ számát.
+...hasznÃ¡lhat kÃ¶nyvjelzÅ‘ket a szerkesztÅ‘ben, hogy a forrÃ¡sban gyorsan tudjon mozogni?<CR><CR>Be- vagy kikapcsolhatja a kÃ¶nyvjelzÅ‘t a "SzerkesztÃ©s / KÃ¶nyvjelzÅ‘ elhelyezÃ©se" pontban, kivÃ¡lasztva a kÃ¶nyvjelzÅ‘ szÃ¡mÃ¡t.<CR>Egy adott kÃ¶nyvjelzÅ‘hÃ¶z ugorhat a "SzerkesztÃ©s / KÃ¶nyvjelzÅ‘re ugrÃ¡s" pontban, kivÃ¡lasztva a kÃ¶nyvjelzÅ‘ szÃ¡mÃ¡t.
 
-...létezik egy nagyszerû "Függvényre ugrás" parancs a "Keresés" menüben?<CR><CR>Megjeleníti a fájl összes függvényét, amely a megadott szövegrészlettel kezdõdik. Nyomja le az enter-t és azonnal a függvényhez kerül!<CR>Vigyázat: az osztály böngészésnek engedélyezve kell lennie ...
+...lÃ©tezik egy nagyszerÅ± "FÃ¼ggvÃ©nyre ugrÃ¡s" parancs a "KeresÃ©s" menÃ¼ben?<CR><CR>MegjelenÃ­ti a fÃ¡jl Ã¶sszes fÃ¼ggvÃ©nyÃ©t, amely a megadott szÃ¶vegrÃ©szlettel kezdÅ‘dik. Nyomja le az enter-t Ã©s azonnal a fÃ¼ggvÃ©nyhez kerÃ¼l!<CR>VigyÃ¡zat: az osztÃ¡ly bÃ¶ngÃ©szÃ©snek engedÃ©lyezve kell lennie ...

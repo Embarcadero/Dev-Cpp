@@ -1,5 +1,5 @@
-# Autor: Sorin Cãlinicã
-# Orice eroare de traducere vã rog sã o semnalaşi la
+# Autor: Sorin CÃ£linicÃ£
+# Orice eroare de traducere vÃ£ rog sÃ£ o semnalaÅŸi la
 # scalinica@go.ro
 #
 # This is a TipOfTheDay tips file.
@@ -33,54 +33,54 @@
 #
 # Important tips (appear first)
 #
-...nu ar trebui sã dezactivaşi aceste indicii?<CR><CR>Indiciile prezentate aici oferã informaşii nedocumentate în altã parte.<CR>Dacã le dezactivaşi ºi mai târziu dorişi reactivarea lor, selectaşi "Ajutor / Indiciul Zilei"...
+...nu ar trebui sÃ£ dezactivaÅŸi aceste indicii?<CR><CR>Indiciile prezentate aici oferÃ£ informaÅŸii nedocumentate Ã®n altÃ£ parte.<CR>DacÃ£ le dezactivaÅŸi Âºi mai tÃ¢rziu doriÅŸi reactivarea lor, selectaÅŸi "Ajutor / Indiciul Zilei"...
 
-...puteşi utiliza vUpdate pentru a fi sigur cã mediul de programare Dev-C++ beneficiazã de ultimile retuºuri ºi de noile caracteristici?<CR><CR>Selectaşi "Instrumente / Noi Versiuni/Pachete..."
+...puteÅŸi utiliza vUpdate pentru a fi sigur cÃ£ mediul de programare Dev-C++ beneficiazÃ£ de ultimile retuÂºuri Âºi de noile caracteristici?<CR><CR>SelectaÅŸi "Instrumente / Noi Versiuni/Pachete..."
 
 #
 # Code-completion tips
 #
-...posibilitatea de întregire-cod vã ajutã sã vã creºteşi productivitatea prin sugerarea tuturor comenzilor disponibile în contextul curent?<CR><CR>Pentru a activa întregirea codului, mergeşi în "Instrumente / Opşiuni Editare" ºi bifaşi exploratorul de clase ºi întregire-cod.
+...posibilitatea de Ã®ntregire-cod vÃ£ ajutÃ£ sÃ£ vÃ£ creÂºteÅŸi productivitatea prin sugerarea tuturor comenzilor disponibile Ã®n contextul curent?<CR><CR>Pentru a activa Ã®ntregirea codului, mergeÅŸi Ã®n "Instrumente / OpÅŸiuni Editare" Âºi bifaÅŸi exploratorul de clase Âºi Ã®ntregire-cod.
 
-...posibilitatea de întregire-cod intrã în acşiune atunci când scrieşi ".", "->" sau "::" în fereastra de editare dupã un timp de aºteptare definit de utilizator?<CR><CR>Pentru a defini acest timp de aºteptare mergeşi în "Instrumente / Opşiuni Editare / Explorare Clase / Întregire".
+...posibilitatea de Ã®ntregire-cod intrÃ£ Ã®n acÅŸiune atunci cÃ¢nd scrieÅŸi ".", "->" sau "::" Ã®n fereastra de editare dupÃ£ un timp de aÂºteptare definit de utilizator?<CR><CR>Pentru a defini acest timp de aÂºteptare mergeÅŸi Ã®n "Instrumente / OpÅŸiuni Editare / Explorare Clase / Ãntregire".
 
-...puteşi beneficia de întregirea codului prin apãsarea în orice moment a combinaşiei de taste "Ctrl+Space" în fereastra de editare?<CR><CR>(Încercaşi combinaşia "Ctrl+Shift+Space" în timp ce cursorul se aflã în interiorul parantezelor unor argumente de funcşii...)
+...puteÅŸi beneficia de Ã®ntregirea codului prin apÃ£sarea Ã®n orice moment a combinaÅŸiei de taste "Ctrl+Space" Ã®n fereastra de editare?<CR><CR>(ÃncercaÅŸi combinaÅŸia "Ctrl+Shift+Space" Ã®n timp ce cursorul se aflÃ£ Ã®n interiorul parantezelor unor argumente de funcÅŸii...)
 
-...dând clic pe o intrare în exploratorul de clase, mergeşi direct la declaraşii în loc de implementare?<CR>Bineînşeles, puteşi folosi meniul contextual pentru mai multe funcşiuni...
+...dÃ¢nd clic pe o intrare Ã®n exploratorul de clase, mergeÅŸi direct la declaraÅŸii Ã®n loc de implementare?<CR>BineÃ®nÅŸeles, puteÅŸi folosi meniul contextual pentru mai multe funcÅŸiuni...
 
-...puteşi folosi dosarele preferate în exploratorul de clase pentru a cãuta mai uºor prin proiectele de mari dimensiuni? Puteşi chiar sã creaşi o structurã de directoare proprie!<CR><CR>E suficient un clic-dreapta în exploratorul de clase pentru a activa meniul contextual...
+...puteÅŸi folosi dosarele preferate Ã®n exploratorul de clase pentru a cÃ£uta mai uÂºor prin proiectele de mari dimensiuni? PuteÅŸi chiar sÃ£ creaÅŸi o structurÃ£ de directoare proprie!<CR><CR>E suficient un clic-dreapta Ã®n exploratorul de clase pentru a activa meniul contextual...
 
-...informaşiile despre exploratorul de clase sunt pãstrate în fiºierul "classfolders.dcf" din directorul rãdãcinã al proiectului dvs?<CR><CR>Dacã apar nereguli e suficient sã ºtergeşi acest fiºier ºi sã redeschideşi proiectul!
+...informaÅŸiile despre exploratorul de clase sunt pÃ£strate Ã®n fiÂºierul "classfolders.dcf" din directorul rÃ£dÃ£cinÃ£ al proiectului dvs?<CR><CR>DacÃ£ apar nereguli e suficient sÃ£ ÂºtergeÅŸi acest fiÂºier Âºi sÃ£ redeschideÅŸi proiectul!
 
-...existã douã moduri de afiºare a exploratorului de clase?<CR>Unul aratã toate clasele/membrii/funcşiile proiectului pe când celãlalt afiºeazã informaşii relevante doar pentru fiºierul aflat în editare.<CR><CR>E suficient sã daşi clic-dreapta pe exploratorul de clase ºi sã alegeşi "Mod de vizualizare..."
+...existÃ£ douÃ£ moduri de afiÂºare a exploratorului de clase?<CR>Unul aratÃ£ toate clasele/membrii/funcÅŸiile proiectului pe cÃ¢nd celÃ£lalt afiÂºeazÃ£ informaÅŸii relevante doar pentru fiÂºierul aflat Ã®n editare.<CR><CR>E suficient sÃ£ daÅŸi clic-dreapta pe exploratorul de clase Âºi sÃ£ alegeÅŸi "Mod de vizualizare..."
 
 #
 # Project Manager tips
 #
-...puteşi defini deshiderea cu simplu-clic sau cu dublu-clic a unui fiºier pentru editarea în managerul de proiecte?<CR><CR>Pentru acest lucru mergeşi în "Instrumente / Opşiuni mediu de programare" ºi activaşi (sau dezactivaşi) "Dublu Clic pentru a deschide Managerul de Fiºiere ale Proiectului"...
+...puteÅŸi defini deshiderea cu simplu-clic sau cu dublu-clic a unui fiÂºier pentru editarea Ã®n managerul de proiecte?<CR><CR>Pentru acest lucru mergeÅŸi Ã®n "Instrumente / OpÅŸiuni mediu de programare" Âºi activaÅŸi (sau dezactivaÅŸi) "Dublu Clic pentru a deschide Managerul de FiÂºiere ale Proiectului"...
 
-...puteşi defini dosare preferate (doar pentru primul nivel) în mangerul de proiect pentru a vã organiza mai bine fiºierele?<CR><CR>Pentru acesta, daşi clic-dreapta pe un fiºier din managerul de proiecte pentru a deschide meniul contextual...
+...puteÅŸi defini dosare preferate (doar pentru primul nivel) Ã®n mangerul de proiect pentru a vÃ£ organiza mai bine fiÂºierele?<CR><CR>Pentru acesta, daÅŸi clic-dreapta pe un fiÂºier din managerul de proiecte pentru a deschide meniul contextual...
 
-...dacã aşi creat dosare personalizate în managerul de proiect puteşi folosi drag && drop pentru rearanjarea lor?
+...dacÃ£ aÅŸi creat dosare personalizate Ã®n managerul de proiect puteÅŸi folosi drag && drop pentru rearanjarea lor?
 
 #
 # File menu tips
 #
-...puteşi obşine informaşii despre fiºierul la care lucraşi?<CR><CR>Selectaşi "Fiºier / Proprietãşi" ºi veşi avea informaşii despre mãrimea fiºierului, numãrul de linii, linii comentate, linii vide ºi fiºiere incluse!
+...puteÅŸi obÅŸine informaÅŸii despre fiÂºierul la care lucraÅŸi?<CR><CR>SelectaÅŸi "FiÂºier / ProprietÃ£ÅŸi" Âºi veÅŸi avea informaÅŸii despre mÃ£rimea fiÂºierului, numÃ£rul de linii, linii comentate, linii vide Âºi fiÂºiere incluse!
 
-...puteşi salva proiectul dvs ca ªablon?<CR><CR>Selectaşi "Fiºier / Nou / ªablon". Acest lucru va duce la salvarea proiectlui dvs ca ºablon Dev-C++ fãcându-l disponibil atunci când selectaşi "Fiºier / Nou / Proiect".<CR>În acest mod veşi avea o bazã de codare, conform gusturilor proprii!
+...puteÅŸi salva proiectul dvs ca Âªablon?<CR><CR>SelectaÅŸi "FiÂºier / Nou / Âªablon". Acest lucru va duce la salvarea proiectlui dvs ca Âºablon Dev-C++ fÃ£cÃ¢ndu-l disponibil atunci cÃ¢nd selectaÅŸi "FiÂºier / Nou / Proiect".<CR>Ãn acest mod veÅŸi avea o bazÃ£ de codare, conform gusturilor proprii!
 
-...puteşi importa proiectele dvs din MS Visual C++ în Dev-C++?<CR><CR>E suficient sã selectaşi "Fiºier / Import / Import proiect MS Visual C++".<CR>E nevoie de a pãcãli un pic opşiunile proiectului dupã efectuarea importului dar, nu uitaşi, aceastã facilitate se aflã încã în lucru!
+...puteÅŸi importa proiectele dvs din MS Visual C++ Ã®n Dev-C++?<CR><CR>E suficient sÃ£ selectaÅŸi "FiÂºier / Import / Import proiect MS Visual C++".<CR>E nevoie de a pÃ£cÃ£li un pic opÅŸiunile proiectului dupÃ£ efectuarea importului dar, nu uitaÅŸi, aceastÃ£ facilitate se aflÃ£ Ã®ncÃ£ Ã®n lucru!
 
-...puteşi exporta un fiºier sursã sau un întreg proiect în formatele HTML sau RTF?<CR>În acest mod puteşi face publice sursele dvs pe un site web arãtându-le lumii!<CR><CR>E suficient sã apãsaşi "Fiºier / Export" ºi apoi sã alegeşi metoda de export...
+...puteÅŸi exporta un fiÂºier sursÃ£ sau un Ã®ntreg proiect Ã®n formatele HTML sau RTF?<CR>Ãn acest mod puteÅŸi face publice sursele dvs pe un site web arÃ£tÃ¢ndu-le lumii!<CR><CR>E suficient sÃ£ apÃ£saÅŸi "FiÂºier / Export" Âºi apoi sÃ£ alegeÅŸi metoda de export...
 
 #
 # Edit menu tips
 #
-...puteşi (de)comenta un set de linii prin selectarea lor ºi dând clic pe "Editare / (De)Comentare"?
+...puteÅŸi (de)comenta un set de linii prin selectarea lor Âºi dÃ¢nd clic pe "Editare / (De)Comentare"?
 
-...puteşi (de)indenta un set de linii prin selectarea lor ºi dând clic pe "Editare / (De)Indentare"?
+...puteÅŸi (de)indenta un set de linii prin selectarea lor Âºi dÃ¢nd clic pe "Editare / (De)Indentare"?
 
-...puteşi folosi marcaje la editare pentru o deplasare mai rapidã prin cod?<CR><CR>Activaşi sau dezactivaşi un marcaj dând clic pe "Editare / Activare marcaje" ºi selectând numãrul marcajului.<CR>Deplasaşi-vã printr-un set de marcaje dând clic pe "Editare / Pozişionare pe marcaje" ºi selectând numãrul marcajului.
+...puteÅŸi folosi marcaje la editare pentru o deplasare mai rapidÃ£ prin cod?<CR><CR>ActivaÅŸi sau dezactivaÅŸi un marcaj dÃ¢nd clic pe "Editare / Activare marcaje" Âºi selectÃ¢nd numÃ£rul marcajului.<CR>DeplasaÅŸi-vÃ£ printr-un set de marcaje dÃ¢nd clic pe "Editare / PoziÅŸionare pe marcaje" Âºi selectÃ¢nd numÃ£rul marcajului.
 
-...existã o comandã puternicã "Pozişionare pe funcşia..." sub meniul "Cãutare"?<CR><CR>Vã aratã toate funcşiile fiºierelor ºi prin introducerea unei porşiuni din numele unei funcşii lista este filtratã. Apãsaşi Enter ºi veşi ajunge imediat la funcşia doritã!<CR>Notã: exploratorul de clase trebuie sã fie activat...
+...existÃ£ o comandÃ£ puternicÃ£ "PoziÅŸionare pe funcÅŸia..." sub meniul "CÃ£utare"?<CR><CR>VÃ£ aratÃ£ toate funcÅŸiile fiÂºierelor Âºi prin introducerea unei porÅŸiuni din numele unei funcÅŸii lista este filtratÃ£. ApÃ£saÅŸi Enter Âºi veÅŸi ajunge imediat la funcÅŸia doritÃ£!<CR>NotÃ£: exploratorul de clase trebuie sÃ£ fie activat...

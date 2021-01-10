@@ -1,16 +1,16 @@
 [lang]
-Lang=Danish 
+Lang=Danish (Dansk)
 Ver=1
 
 1=&Filer
 2=&Rediger
-3=&Søg
+3=&SÃ¸g
 4=&IDE vinduer
 5=&Projekt
 6=&Kompiler
-7=&Værktøjer
+7=&VÃ¦rktÃ¸jer
 8=V&induer
-9=&Hjælp
+9=&HjÃ¦lp
 10=&Debug
 
 
@@ -22,14 +22,14 @@ Ver=1
 1006=&Class...
 1007=New
 1008=Nyt dokument
-1009=Åbn dokument
+1009=Ã…bn dokument
 1010=Skift tema
 1011=Skift skrifttype
 1012=Skift sprog
 
 
-2001=&Åben projekt eller fil...
-2002=G&en-åben
+2001=&Ã…ben projekt eller fil...
+2002=G&en-Ã¥ben
 2003=&Slet historie
 2004=&Gem
 2005=Gem s&om...
@@ -47,7 +47,7 @@ Ver=1
 
 3001=&Importer
 3002=&Udskriv
-3003=U&dskrift opsætning
+3003=U&dskrift opsÃ¦tning
 3004=A&fslut
 
 
@@ -57,132 +57,132 @@ Ver=1
 4004=&Genskab
 4005=K&lip
 4006=&Kopier
-4007=&Sæt ind
-4008=&Vælg Alt
+4007=&SÃ¦t ind
+4008=&VÃ¦lg Alt
 4009=S&let
-4010=&Indsæt
-4011=Skift b&ogmærker
-4012=Gå &til bogmærker
-4013=&Bogmærke
+4010=&IndsÃ¦t
+4011=Skift b&ogmÃ¦rker
+4012=GÃ¥ &til bogmÃ¦rker
+4013=&BogmÃ¦rke
 4014=&Dato/Tid
 4015=Ko&mmentar hoved
 
 
-5001=&Søg...
-5002=S&øg i filer...
+5001=&SÃ¸g...
+5002=S&Ã¸g i filer...
 5003=&Erstat...
-5004=Sø&g igen
-5005=&Gå til linie...
-5006=&Inkrementerbar Søgning
-5007=Gå &til funktion...
-5008="Løs" project manager
-5009=Gå til project &Manager
-5010=Gå to klasse &browser
+5004=SÃ¸&g igen
+5005=&GÃ¥ til linie...
+5006=&Inkrementerbar SÃ¸gning
+5007=GÃ¥ &til funktion...
+5008="LÃ¸s" project manager
+5009=GÃ¥ til project &Manager
+5010=GÃ¥ to klasse &browser
 5011=&Projekt/Klasse browser
 5012=&Statusbar
 5013=&Kompiler resultat
 5014=&Altid synlig
-5015=K&un hvis nødvendigt
-5016=&Værktøjslinier
+5015=K&un hvis nÃ¸dvendigt
+5016=&VÃ¦rktÃ¸jslinier
 5017=Hoved
-5018=Kompiler og kør
+5018=Kompiler og kÃ¸r
 5019=Projekt
 5020=Indstillinger
 5021=Special
 5022=Rediger
-5023=Søg
-5024="Løst" rapport vindue
+5023=SÃ¸g
+5024="LÃ¸st" rapport vindue
 
 
 6001=&Ny enhed
-6002=&Tilføj til projekt
+6002=&TilfÃ¸j til projekt
 6003=&Fjern fra projekt
 6004=&Rediger ressource fil...
 6005=Projekt &indstillinger
 6006=Rediger &makefil
-6007=T&ilføj ressource fil...
+6007=T&ilfÃ¸j ressource fil...
 6008=F&jern ressource fil...
 
 
 7001=&Kompiler
-7002=K&ør
-7003=K&ompiler && kør
+7002=K&Ã¸r
+7003=K&ompiler && kÃ¸r
 7004=&Genbyg alt
-7005=R&engør projekt
+7005=R&engÃ¸r projekt
 7006=Ko&mpilerings resultater
 7007=&Syntaks check
 7008=&Nulstil program 
 7009=Pro&file analyse
 7010=Abryd kompilering
 7011=&Kompiler indstillinger
-7012=&Miljø indstillinger
+7012=&MiljÃ¸ indstillinger
 7013=&IDE indstillinger
-7014=Konfigurer &værktøjer
+7014=Konfigurer &vÃ¦rktÃ¸jer
 7015=Konfigurer &genveje
 7016=Delete Profiling Information
 
 
-8001=&Fuldskærm
+8001=&FuldskÃ¦rm
 8002=&Tilbage til normal
-8003=&Næste
+8003=&NÃ¦ste
 8004=F&orrige
 8005=&Luk alt
-8006=%s version %s fuldskærm. Tryk shift+F12 for at slå værktøjslinier til/fra eller F12 for at gå tilbage til normal.
+8006=%s version %s fuldskÃ¦rm. Tryk shift+F12 for at slÃ¥ vÃ¦rktÃ¸jslinier til/fra eller F12 for at gÃ¥ tilbage til normal.
 8007=Luk alle undtagen den aktive
 8008=&Liste...
 
 
 9001=&Om Dev-C++...
-9002=&Søg efter program opdateringer...
-9003=&Konfigurer hjælpe menuen...
-9004=&Hjælp til Dev-C++
+9002=&SÃ¸g efter program opdateringer...
+9003=&Konfigurer hjÃ¦lpe menuen...
+9004=&HjÃ¦lp til Dev-C++
 
 
 10001=&Debug
 10002=&Skift breakpoint
-10003=&Næste skridt
+10003=&NÃ¦ste skridt
 10004=S&pring over
-10005=&Tilføj variabel overvågning
-10006=&Overvåg variabel
-10007=Stop kørsel
-10008=&Editer variabel overvågning
-10009=&Fjerne variable overvågning
+10005=&TilfÃ¸j variabel overvÃ¥gning
+10006=&OvervÃ¥g variabel
+10007=Stop kÃ¸rsel
+10008=&Editer variabel overvÃ¥gning
+10009=&Fjerne variable overvÃ¥gning
 10010=Step &ind i funktion
-10011=Kør til &Cursor
+10011=KÃ¸r til &Cursor
 10012=&Se CPU vindue
 10013=A&ttach to process...
 10014=&Modify value
 10015=&Clear all
 10016=Ny file
-10017=Tilføj fil...
+10017=TilfÃ¸j fil...
 10018=Fjern fil...
 10019=Indstillinger...
 10020=Rediger Ressource fil
 
 
 11001=Fjern fil
-11002=Omdøb fil
+11002=OmdÃ¸b fil
 11003=Luk
-11004=Åben
-11005=Åben Header
+11004=Ã…ben
+11005=Ã…ben Header
 
 
-12001=Gå til dekleration
-12002=Gå til implementering
+12001=GÃ¥ til dekleration
+12002=GÃ¥ til implementering
 12003=Ny klasse
 12004=Ny medlems funktion
 12005=Ny variabel
 12006=Vis..
 12007=Alle filer
-12008=Nuværende fil
+12008=NuvÃ¦rende fil
 12009=Ny folder
 12010=Fjern folder
-12011=Omdøb folder
+12011=OmdÃ¸b folder
 12012=Du kan ikke oprette mere end %d foldere i et projekt...
 12013=Brug farver
 12014=Projekt filer
 12015=Vis nedarvede medlemmer
-12016=Åben med...
+12016=Ã…ben med...
 
 
 13001=Kompiler
@@ -196,7 +196,7 @@ Ver=1
 14001=&Slet
 14002=&Kopier
 14003=&Gem
-14004=&Åben
+14004=&Ã…ben
 
 
 15001=Linie
@@ -208,14 +208,14 @@ Ver=1
 16001=Find linie
 16002=Kolonne
 16003=Variabel navn
-16004=Værdi
+16004=VÃ¦rdi
 16005=Information:
 16006=Kompiler kog:
 16007=Fejl i alt:
-16008=Fil størrelse:
+16008=Fil stÃ¸rrelse:
 
 
-17001=Overvågede variable
+17001=OvervÃ¥gede variable
 17002=Backtrace
 17003=Output
 17004=Send kommando til GDB :
@@ -223,25 +223,25 @@ Ver=1
 
 
 18001=Ny
-18002=Indsæt
+18002=IndsÃ¦t
 18003=Skift
-18004=Gå til
+18004=GÃ¥ til
 18005=Projekt vindue
 18006=Debug vindue
 18007=Rapport vindue
 
 
-19001=Åben fil
-19002=Åben enhed
+19001=Ã…ben fil
+19002=Ã…ben enhed
 19003=Exporter til
 19004=Gem fil
 19005=Gem projekt
-19006=Vælg en hjælpe fil
+19006=VÃ¦lg en hjÃ¦lpe fil
 
 
-20001=Ny variabel overvågning
+20001=Ny variabel overvÃ¥gning
 20002=Indtast variabel navn:
-20003=Rediger variabel overvåger
+20003=Rediger variabel overvÃ¥ger
 20004=Nyt variabel navn:
 20005=Modify value
 20006=Variable to modify:
@@ -266,7 +266,7 @@ Ver=1
 23003=Visuelle
 23004=Syntaks
 23005=Kode
-23006=Færdiggørelse
+23006=FÃ¦rdiggÃ¸relse
 23007=Klasse browsing
 23008=Autosave
 
@@ -278,7 +278,7 @@ Ver=1
 24005=Symbol Completion
 
 
-25001=Skriv navn på ny syntaks indstilling:
+25001=Skriv navn pÃ¥ ny syntaks indstilling:
 25002=Editor indstillinger:
 25003=Auto Indent
 25004=Insert Mode
@@ -293,13 +293,13 @@ Ver=1
 26004=Cursor Past EOL
 26005=Double Click Line
 26006=Find tekst ved Cursor
-26007=Vis scrollbars hvis nødvendigt
+26007=Vis scrollbars hvis nÃ¸dvendigt
 26008=Halv sides scroll
 26009=Scroll Hint
-26010=Brug syntaks fremhævning
+26010=Brug syntaks fremhÃ¦vning
 26011=Insert Dropped Files
 26012=Tab Size:
-26013=Højre margen
+26013=HÃ¸jre margen
 26014=Synlig
 26015=Bredde
 26016=Farve
@@ -327,10 +327,10 @@ Ver=1
 27009=It is also possible to edit text size by using Control+Scroll, just like in browsers!
 27010=Editor font:
 27011=Font
-27012=Størrelse
+27012=StÃ¸rrelse
 27013=Editor font
 27014=Gutter
-27015=Automatisk størrelse
+27015=Automatisk stÃ¸rrelse
 27016=Linie numre
 27017=Hvis ledene nuller
 27018=Start ved nul
@@ -344,15 +344,15 @@ Ver=1
 27026=Understreget
 27027=Farve skema
 27028=Type :
-27029=Gem ændret syntaks indstilling
+27029=Gem Ã¦ndret syntaks indstilling
 27030=Kode
 27031=Menu tekst
 27032=Sektion
 27033=Beskrivelse
-27034=Indsæt standard kode i tomme projekters første source fil
-27035=Cache automatisk færdiggørelse af kode
-27036=Automatisk færdiggørelse af kode
-27037=Slå automatisk færdiggørelse af kode til
+27034=IndsÃ¦t standard kode i tomme projekters fÃ¸rste source fil
+27035=Cache automatisk fÃ¦rdiggÃ¸relse af kode
+27036=Automatisk fÃ¦rdiggÃ¸relse af kode
+27037=SlÃ¥ automatisk fÃ¦rdiggÃ¸relse af kode til
 27038=Forsinkelse (ms):
 27039=Baggrunds farve:
 27040=Klasse browser indstillinger
@@ -360,7 +360,7 @@ Ver=1
 27042=Eksempel:
 27043=Engine indstillinger
 27044=View indstillinger
-27045=Slå klasse browser til
+27045=SlÃ¥ klasse browser til
 27046=Inkluder globale filer fra #include referencer
 27047=Vis kun klasser fra den aktive fil
 27048=Interval:
@@ -379,30 +379,30 @@ Ver=1
 28001=Navn:
 28002=&C Projekt
 28003=C&++ Projekt
-28004=&Gør til standard sprog
+28004=&GÃ¸r til standard sprog
 28005=Diverse
 28006=Projekt indstillinger:
 
 
 29001=Fjern fra projekt
-29002=Vælg fil der skal fjernes fra projektet:
+29002=VÃ¦lg fil der skal fjernes fra projektet:
 
 
-30001=Gå til linie ...
+30001=GÃ¥ til linie ...
 30002=Ny linie:
 
 
-31001=Værktøjs konfiguration
-31002=Nuværende værktøjer:
+31001=VÃ¦rktÃ¸js konfiguration
+31002=NuvÃ¦rende vÃ¦rktÃ¸jer:
 
 
-32001=Rediger værktøjs emne
+32001=Rediger vÃ¦rktÃ¸js emne
 32002=Titel
 32003=Program
 32004=Katalog
 32005=Parametre
-32006=Indsæt makro
-32007=Tilgængelige makroer
+32006=IndsÃ¦t makro
+32007=TilgÃ¦ngelige makroer
 
 
 33001=Ikon bibliotek
@@ -411,7 +411,7 @@ Ver=1
 
 
 34001=Konfigurer genveje
-34002=Klik på et emne og tryk derefter på de ønskede genvejs taster
+34002=Klik pÃ¥ et emne og tryk derefter pÃ¥ de Ã¸nskede genvejs taster
 34003=Tip: tryk "Escape" for at slette en genvej...
 34004=Menu entry
 34005=Genvej opretted
@@ -421,14 +421,14 @@ Ver=1
 
 35001=Giver standard kataloget
 35002=Giver dev-c++ katalog
-35003=Giver navnet på den kompilerede fil
+35003=Giver navnet pÃ¥ den kompilerede fil
 35004=Giver path'en til enten det aktive projekt eller source fil
-35005=Giver filnavnet på enten det aktive projekt eller source fil
+35005=Giver filnavnet pÃ¥ enten det aktive projekt eller source fil
 35006=Giver projektets "navn"
-35007=Giver filnavnet på den aktive source fil
+35007=Giver filnavnet pÃ¥ den aktive source fil
 35008=Giver path'en til den aktive source fil
 35009=Giver en space separeret liste af source files i det aktive projekt
-35010=Giver ordet nærmest cursoren i den aktive editor
+35010=Giver ordet nÃ¦rmest cursoren i den aktive editor
 35011=Giver dev-c++ versionsnummeret
 
 
@@ -446,13 +446,13 @@ Ver=1
 36012=http://www.bloodshed.net/forum
 36013=http://www.bloodshed.net/devcpp-ml.html
 36014=haiku@bloodshed.net
-36015=&Søg efter program opdateringer
+36015=&SÃ¸g efter program opdateringer
 36016=Post-4.9.9.2 Development:
 36017=http://orwellengine.blogspot.com
 
 
-37001=Rediger kode indsætnings entry
-37002=Tilføj kode indsætnings entry
+37001=Rediger kode indsÃ¦tnings entry
+37002=TilfÃ¸j kode indsÃ¦tnings entry
 37003=Menu emne overskrivt
 37004=Emne beskrivelse
 37005=Menu sektion
@@ -461,34 +461,34 @@ Ver=1
 38001=Kompilerings status vindue
 38002=&Hvis under kompilering
 38003=Luk automatisk efter kompilering
-38004=Ingen opstarts skærm
-38005=Miljø indstillinger
+38004=Ingen opstarts skÃ¦rm
+38005=MiljÃ¸ indstillinger
 38006=Generalt
 38007=Filer && Kataloger
-38008=Automatisk åbning
+38008=Automatisk Ã¥bning
 38009=C++ er standard ved nyt projekt
-38010=Vis værktøjslinier i fuldskærm
+38010=Vis vÃ¦rktÃ¸jslinier i fuldskÃ¦rm
 38011=Opret backup Filer
-38012=Minimimer ved kørsel
-38013=Åben/Gem dialog Stil
+38012=Minimimer ved kÃ¸rsel
+38013=Ã…ben/Gem dialog Stil
 38014=Windows 2k (sidebar)
 38015=Windows 9x
 38016=Windows 3.1
 38017=Sprog:
 38018=Besked vindue tabs:
-38019=Maksimum filer i gen-åben menu
+38019=Maksimum filer i gen-Ã¥ben menu
 38020=Brugers standard katalog
 38021=Output katalog
 38022=Ikon bibliotek katalog
 38023=Intro billede
-38024=Vælg standard bruger katalog
-38025=Vælg kompiler output katalog
-38026=Vælg ikon bibliotek katalog
+38024=VÃ¦lg standard bruger katalog
+38025=VÃ¦lg kompiler output katalog
+38026=VÃ¦lg ikon bibliotek katalog
 38027=Alle projekt filer
-38028=Kun første projekt fil
+38028=Kun fÃ¸rste projekt fil
 38029=Ingen
-38030=Vis menu i fuldskærm
-38031=Dobbelt klik for at åbne project manager filer
+38030=Vis menu i fuldskÃ¦rm
+38031=Dobbelt klik for at Ã¥bne project manager filer
 38032=Sprog fil katalog
 38033=Tema:
 38034=Interface
@@ -501,7 +501,7 @@ Ver=1
 38041=&Kun hele ord
 38042=Retning
 38043=&Filer i projekt
-38044=&Åbne filer
+38044=&Ã…bne filer
 38045=Scope
 38046=&Global
 38047=&Kun valgte
@@ -521,7 +521,7 @@ Ver=1
 39004=Indstillinger:
 39005=&Case sensitiv
 39006=&Kun hele ord
-39007=&Spørg inden erstat
+39007=&SpÃ¸rg inden erstat
 39008=Retning:
 39009=F&remad
 39010=&Tilbage
@@ -533,7 +533,7 @@ Ver=1
 39016=F&ulde scope
 
 
-40001=Søg efter:
+40001=SÃ¸g efter:
 40002=Type
 40003=Funktion
 40004=Linie
@@ -548,7 +548,7 @@ Ver=1
 41007=For more information about GCC's options, please visit
 
 
-42001=Binære
+42001=BinÃ¦re
 42002=Libraries
 42003=C Includes
 42004=C++ Includes
@@ -560,16 +560,16 @@ Ver=1
 43004=Output
 
 
-44001=Understøt alle ANSI standard C programmer
-44002=Forsøg at understøtte nogle aspekter af traditionelle C pre-processorer
+44001=UnderstÃ¸t alle ANSI standard C programmer
+44002=ForsÃ¸g at understÃ¸tte nogle aspekter af traditionelle C pre-processorer
 44003=Skjul alle advarsler
-44004=Slå access checking fra
+44004=SlÃ¥ access checking fra
 44005=Accepter $ i identifiers
 44006=Brug heuristics for at kompilere hurtigere
 44007=Brug Cygwin i stedet for Mingw kompileren
-44008=Tilføj følgende kommandoer til kompileren når den kaldes:
+44008=TilfÃ¸j fÃ¸lgende kommandoer til kompileren nÃ¥r den kaldes:
 44009=Kompilerings forsinkelse
-44010=Tilføjer en millisekund baseret forsinkelse, hvis make brokker sig over make filens timestamp
+44010=TilfÃ¸jer en millisekund baseret forsinkelse, hvis make brokker sig over make filens timestamp
 44011=Displays one error per line (-fmessage-length 0)
 44012=Do not recognize asm, inline or typeof as a keyword (-fno-asm)
 44013=Check if pointer is null before accessing storage allocated (-fcheck-new)
@@ -580,12 +580,12 @@ Ver=1
 45002=Optimering:
 
 
-46001=Slå exception handling til
-46002=Brug samme størrelse for double og float
-46003=Indsæt ekstra kommentar information i genereret maskinkode
+46001=SlÃ¥ exception handling til
+46002=Brug samme stÃ¸rrelse for double og float
+46003=IndsÃ¦t ekstra kommentar information i genereret maskinkode
 46004=Optimer
 46005=Bedste optimering
-46006=Udfør mindre optimeringer
+46006=UdfÃ¸r mindre optimeringer
 46007=Makefil generering:
 46008=Brug hurtig, men uakkurat dependency generering
 46009=Kode profiling:
@@ -594,36 +594,36 @@ Ver=1
 46012=Generer debug information
 46013=Brug ikke standard system startup filer og libraries
 46014=Generer ikke et konsol vindue
-46015=Tilføj følgende kommandoer til linkerens command-line
+46015=TilfÃ¸j fÃ¸lgende kommandoer til linkerens command-line
 46016=Optimer ikke
 46017=Optimer mere
 46018=Do not assemble, but output assembler code (-S)
 46019=Use pipes instead of temporary files during compilation (-pipe)
 
 
-47001=Du vil måske ændre navnene på program filnaven der bruges af Dev-C++. (For eksempel hvis du bruger en cross compiler) :
-47002=Konfigurer følgende compiler opsætning:
-47003=Ny compiler opsætning
-47004=Indtast navn på opsætning
-47005=Du skal have mindst en compiler opsætning!
-47006=Er du sikker på du vil slette denne compiler opsætning?
-47007=Omdøb compiler opsætning
-47008=Indtast nyt navn på opsætning:
+47001=Du vil mÃ¥ske Ã¦ndre navnene pÃ¥ program filnaven der bruges af Dev-C++. (For eksempel hvis du bruger en cross compiler) :
+47002=Konfigurer fÃ¸lgende compiler opsÃ¦tning:
+47003=Ny compiler opsÃ¦tning
+47004=Indtast navn pÃ¥ opsÃ¦tning
+47005=Du skal have mindst en compiler opsÃ¦tning!
+47006=Er du sikker pÃ¥ du vil slette denne compiler opsÃ¦tning?
+47007=OmdÃ¸b compiler opsÃ¦tning
+47008=Indtast nyt navn pÃ¥ opsÃ¦tning:
 47009=Flere optimeringer
 
 
-48001=Hjælpe menu editor
+48001=HjÃ¦lpe menu editor
 48002=Menu tekst
-48003=Hjælpe fil
-48004=Hjælpe menu indstillinger
+48003=HjÃ¦lpe fil
+48004=HjÃ¦lpe menu indstillinger
 48005=Ikon
 48006=Menu sektion
 48007=Sektion 1
 48008=Sektion 2
 48009=Virker med popup menu
 48010=Browse efter fil...
-48011=Kontekst sensitiv hjælp for ord ved cursor position
-48012=Vælg genvej for F1
+48011=Kontekst sensitiv hjÃ¦lp for ord ved cursor position
+48012=VÃ¦lg genvej for F1
 48013=Show most warnings (-Wall)
 48014=Show some more warnings (-Wextra)
 48015=Check ISO C/C++/C++0x conformance (-pedantic)
@@ -637,7 +637,7 @@ Ver=1
 49002=Parametre:
 49003=Sider:
 49004=&Farver
-49005=&Fremhæv
+49005=&FremhÃ¦v
 49006=&Word wrap
 49007=&Linie numre
 49008=Udskriv linie numre
@@ -647,16 +647,16 @@ Ver=1
 49012=Don't Print Line Numbers
 
 
-50001=Søg efter program opdateringer
+50001=SÃ¸g efter program opdateringer
 50002=Opgave:
 50003=Resultat:
 50004=Ny Version:
-50005=Krævet version for at bruge:
+50005=KrÃ¦vet version for at bruge:
 50006=Beskrivelse:
 50007=Download sted (dobbelt-klik for at downloade):
 
 
-51001=Tilføj To-Do emne...
+51001=TilfÃ¸j To-Do emne...
 51002=Beskrivelse
 51003=Prioritet
 51004=Bruger
@@ -664,23 +664,23 @@ Ver=1
 
 52001=To-Do liste...
 52002=Filnavn
-52003=Færdig
-52004=Hvis ikke emner markeret som færdige
+52003=FÃ¦rdig
+52004=Hvis ikke emner markeret som fÃ¦rdige
 52005=Filter
 52006=Alle filer (i projektet eller ej)
-52007=Kun åbne filer (i projektet eller ej)
+52007=Kun Ã¥bne filer (i projektet eller ej)
 52008=Alle projekt filer
-52009=Kun åbne projekt filer
-52010=Åbne ikke-projekt filer
+52009=Kun Ã¥bne projekt filer
+52010=Ã…bne ikke-projekt filer
 52011=Kun den aktive fil
 
 
 53001=Importer MS Visual C++ projekt
-53002=Vælg Visual C++ projekt fil
+53002=VÃ¦lg Visual C++ projekt fil
 53003=Importerings indstillinger
 53004=Konfiguration af importering
 53005=Dev-C++ projekt filnavn
-53006=MS Visual C++ projekt filen er blevet importeret og konverteret til et DevC++ projekt. Vil du åbne det nu?
+53006=MS Visual C++ projekt filen er blevet importeret og konverteret til et DevC++ projekt. Vil du Ã¥bne det nu?
 53007=Cannot locate target configuration "%s" (this is probably a bug in Dev-C++)...
 
 
@@ -712,7 +712,7 @@ Ver=1
 55017=Library kataloger
 55018=Ressource filer
 55019=Include kataloger
-55020=Vælg Ikon
+55020=VÃ¦lg Ikon
 55021=Inkluder i object fil
 55022=Ressource kataloger
 55023=Build indstillinger
@@ -720,7 +720,7 @@ Ver=1
 55025=&Output katalog for eksekverbar fil
 55026=&Object fil output katalog
 55027=B&rug andet output filnavn
-55028=Tilføj bibliotek eller object
+55028=TilfÃ¸j bibliotek eller object
 55029=%d filer [%d source, %d headere, %d resourcer]
 
 
@@ -748,7 +748,7 @@ Ver=1
 57002=Variabel navn:
 57003=Implementer i:
 57004=Tilgangs scope
-57005=Opret medlems funktion til at LÆSE fra denne variabel
+57005=Opret medlems funktion til at LÃ†SE fra denne variabel
 57006=Opret medlems funktion til at SKRIVE til denne variabel
 57007=Navn:
 57008=Kommentarer:
@@ -758,7 +758,7 @@ Ver=1
 57012=Afbryd
 57013=Ukendt klasse...
 57014=Kunne ikke finde et filnavn for implementeringen...
-57015=Kunne ikke finde linie nummeret hvor koden skal indsættes...
+57015=Kunne ikke finde linie nummeret hvor koden skal indsÃ¦ttes...
 57016=Medlems navn:
 57017=Argumenter:
 57018=Klasse navn:
@@ -768,7 +768,7 @@ Ver=1
 57022=Header filnavn:
 57023=Implementation filnavn:
 57024=Header filnavn:
-57025=Tilføj til nuværende projekt
+57025=TilfÃ¸j til nuvÃ¦rende projekt
 57026=Attributter
 
 
@@ -779,7 +779,7 @@ Ver=1
 58005=Kommentarer
 58006=Inkluderede filer
 58007=Tomme linier
-58008=Fil størrelse
+58008=Fil stÃ¸rrelse
 58009=Absolut
 58010=Makefil
 58011=Relativ
@@ -802,66 +802,66 @@ Ver=1
 
 
 60001=Tekst ''%s'' ikke fundet
-60002=Fil %s kunne ikke åbnes
+60002=Fil %s kunne ikke Ã¥bnes
 60003=Erstat ''%s'?
 60004=Fil: %s eksisterer allerede i in %s
-60005=Er du sikker på du vil lukke %s
-60006=Gem ændringer i %s?
+60005=Er du sikker pÃ¥ du vil lukke %s
+60006=Gem Ã¦ndringer i %s?
 60007=Luk %s og start et nyt projekt?
-60008=Omdøb til:
+60008=OmdÃ¸b til:
 60009=Kompilering allerede igang
 60010=Gem rettelser til %s?
 60011=Fil eksisterer i forvejen, overskriv?
-60012=Tilføj ny enhed til det nuværende projekt?
-60013=Tilføj ny ressource til nuværende projekt?
-60014=Dit projekt har ikke debug information inkluderet. Vil du slå debugging til og bygge dit projekt igen? 
-60015=Du har ikke slået profiling og/eller debugging til i kompiler options. Vil du slå dem til nu og bygge projektet igen?
-60016=Kør venligst projektet mindst en gang så profiling information bliver genereret...
-60017=Indtast navn på ny folder:
-60018=Er du sikker på du vil fjerne denne folder?
-60019=Indtast nyt navn på folder:
-60020=Er du sikker på du vil gemme denne read only fil?
-60021=Der opstod en fejl. Filen %s var ikke markeret som read-write, så den blev IKKE gemt...
+60012=TilfÃ¸j ny enhed til det nuvÃ¦rende projekt?
+60013=TilfÃ¸j ny ressource til nuvÃ¦rende projekt?
+60014=Dit projekt har ikke debug information inkluderet. Vil du slÃ¥ debugging til og bygge dit projekt igen? 
+60015=Du har ikke slÃ¥et profiling og/eller debugging til i kompiler options. Vil du slÃ¥ dem til nu og bygge projektet igen?
+60016=KÃ¸r venligst projektet mindst en gang sÃ¥ profiling information bliver genereret...
+60017=Indtast navn pÃ¥ ny folder:
+60018=Er du sikker pÃ¥ du vil fjerne denne folder?
+60019=Indtast nyt navn pÃ¥ folder:
+60020=Er du sikker pÃ¥ du vil gemme denne read only fil?
+60021=Der opstod en fejl. Filen %s var ikke markeret som read-write, sÃ¥ den blev IKKE gemt...
 60022=Der opstod en Access Violation (Segmentation Fault) i dit program.
 60023=Source filen er nyere end exe filen. Vil du bygge den igen?
 60024=Please select the application you want to attach to:
 
 
-61001=Kan ikke åbne fil %s
+61001=Kan ikke Ã¥bne fil %s
 61002=Kan ikke gemme fil %s
-61003=Kan ikke omdøbe fil %s
-61004=Søgnings felt kan ikke være blankt
+61003=Kan ikke omdÃ¸be fil %s
+61004=SÃ¸gnings felt kan ikke vÃ¦re blankt
 61005=Projekt er ikke ekskverbart
 61006=Projekt er ikke kompileret
 61007=Source fil ikke kompileret
 61008=Make fil ikke fundet.
-61009=Rengøring lykkedes ikke.
+61009=RengÃ¸ring lykkedes ikke.
 61010=Skabelon kunne ikke tilknyttes projektet.
 61011=%s Ressource ikke fundet: %s - %s
 61012=Skabelon fil %s findes ikke, Ignoreret.
 61013=Ingen skabelon tilknyttet.
 61014=Fil %s findes ikke.
-61015=Ingen server application specificeret. Du kan sætte den i "Kør / Parametre".
-61016=Server applikation kunne ikke findes! Du kan ændre den i "Kør / Parametre".
+61015=Ingen server application specificeret. Du kan sÃ¦tte den i "KÃ¸r / Parametre".
+61016=Server applikation kunne ikke findes! Du kan Ã¦ndre den i "KÃ¸r / Parametre".
 
 
 62001=Unavngivet
 62002=Skrivebeskyttet
-62003=Indsæt
+62003=IndsÃ¦t
 62004=Overskriv
 62005=Projekt%d
 62006=Angiv venligst et andet filnavn.
 62007=%d Linier i fil
-62008=Omdøb fil
+62008=OmdÃ¸b fil
 62009=Eksekverer %s
 62010=Eksekvering afbrudt
 62011=bytes
-62012=Ændret
+62012=Ã†ndret
 62013=Fejl
 62014=Information
 62015=Advarsel
-62016=Spørgsmål
-62017=Kompilering gennemført
+62016=SpÃ¸rgsmÃ¥l
+62017=Kompilering gennemfÃ¸rt
 62018=Kompilering afbrudt af bruger
 62019=Line:%6d               Col:%6d               Sel:%6d               Lines:%6d               Length:%6d
 62020=Done parsing
@@ -869,11 +869,11 @@ Ver=1
 
 63001=&Ok
 63002=&Afbryd
-63003=&Hjælp
+63003=&HjÃ¦lp
 63004=&Standard
 63005=&Ja
 63006=&Nej
-63007=&Tilføj
+63007=&TilfÃ¸j
 63008=&Rediger
 63009=&Fjern
 63010=Sl&et
@@ -885,7 +885,7 @@ Ver=1
 63016=Erstat &Alt
 63017=Browse
 63018=Fjern
-63019=Omdøb
+63019=OmdÃ¸b
 63020=Importer
 63021=Vindue tilstand
 63022=Clear
@@ -902,26 +902,26 @@ Ver=1
 65002=Vidste du...
 65003=...at der ikke er nogen tips at vise? :)
 65004=Vis ikke tips ved opstart
-65005=Næste tip
+65005=NÃ¦ste tip
 65006=Forrige tip
 
 
 66001=Fil associeringer
 66002=Fil typer:
 66003=Bare kryds af vilke fil typer der skal registreres/afregistreres for det program der er associeret med dem...
-66004=CVS understøttelse
+66004=CVS understÃ¸ttelse
 66005=CVS program fil
 66006=Paknings niveau
 66007=Brug SSH i stedet for RSH
 66008=Templates katalog
-66009=Vælg template katalog
+66009=VÃ¦lg template katalog
 66010=Brug XP tema
 66011=Eksterne programmer
 66012=Eksternt program
 66013=Efternavn
 66014=Eksterne program associationer
 66015=Se variabel under mus
-66016=Rapporter fejl under overvågning af variable
+66016=Rapporter fejl under overvÃ¥gning af variable
 66017=Debug variable browser
 66018=  Alternate Configuration File  
 66019=Use this alternate configuration file
@@ -931,16 +931,16 @@ Ver=1
 
 
 67001=Parametre...
-67002=Kompiler nuværende fil
+67002=Kompiler nuvÃ¦rende fil
 
 
 68001=Vindue liste
-68002=Vælge vindue du vil editere:
+68002=VÃ¦lge vindue du vil editere:
 
 
-69001=Nuværende fil...
+69001=NuvÃ¦rende fil...
 69002=Hele projektet...
-69003=Konfigurer venligst CVS understøttelse i "Værktøjer / Miljø indstillinger"...
+69003=Konfigurer venligst CVS understÃ¸ttelse i "VÃ¦rktÃ¸jer / MiljÃ¸ indstillinger"...
 
 
 70001=Import Options
@@ -1010,9 +1010,9 @@ Ver=1
 72002=Projekt filer:
 72003=Projekt indstillinger:
 72004=Generer debug information
-72005=Generer performance målings information
+72005=Generer performance mÃ¥lings information
 72006=OBS! Disse indstillinger vil blive brugt i stedet for de globale kompilerings indstillinger for dette projekt.
-72007=Understøt Windows XP temaer
+72007=UnderstÃ¸t Windows XP temaer
 72008=Fil indstillinger:
 72009=Inkluder i kompilering
 72010=Kompiler fil som C++
@@ -1029,7 +1029,7 @@ Ver=1
 72021=Output fil
 72022=Inkluder ved linkning
 72023=Build prioritet:
-72024=Gør build nummer større automatisk ved hver kompilering
+72024=GÃ¸r build nummer stÃ¸rre automatisk ved hver kompilering
 72025=Use custom Makefile (do not generate a Makefile, use this one)
 72026=Information about customizing the Makefile...
 72027=&Include the following files into the Makefile:
@@ -1051,3 +1051,112 @@ Ver=1
 74003=File:
 74004=Errors:
 74005=Warnings:
+74006=Compile Progress
+
+
+75001=The following %s directories don't exist:
+75002=No %s directories have been specified.
+75003=The following binary directories have been searched:
+75004=Please check if your binary directory and the executable names are set correctly at Tools >> Compiler Options >> Directories/Programs.
+75005=Would you like Embarcadero Dev-C++ to remove them for you and add the default paths to the valid paths?<CR><CR>Leaving those directories will lead to problems during compilation.<CR><CR>Unless you know exactly what you're doing, it is recommended that you click Yes.
+75006=Cannot find the %s "%s".
+75007=binary
+75008=C include
+75009=C++ include
+75010=library
+75011=C compiler
+75012=C++ compiler
+75013=debugger
+75014=profiler
+75015=makefile processor
+75016=resource processor
+75017=DLL wrapper
+75018=The following problems were found during validation of compiler set "%s":
+
+
+76001=VÃ¦lg dit tema:
+76002=Skrifttype:
+76003=Farve:
+76004=Tema:
+76005=Du kan senere Ã¦ndre tema i VÃ¦rktÃ¸jer >> Editor indstillinger >> Skrifttyper/Farver.
+76006=To optimize code completion, it is recommended to create a cache of frequently used headers.
+76007=It is possible add headers to cache later at Tools, Editor Options, Class Browsing, Completion.
+76008=Cache all headers (please be VERY patient)
+76009=Cache these headers (recommended):
+76010=Don't cache anything
+76011=Add file
+76012=Add folder
+76013=Remove
+76014=Parsing...
+76015=Embarcadero Dev-C++ has been configured successfully.
+76016=If you need help using Embarcadero Dev-C++, please refer to the Embarcadero Dev-C++ help file in the Help menu or send the developer a message (he doesn't mind!).
+76017=You can also download packages (like libraries or tools) to use with Embarcadero Dev-C++ using WebUpdate, which you will find in Tools menu >> Check for Packages.
+76018=&Next
+76019=Please wait...
+76020=Saving...
+76021=Done parsing in %g seconds. Saving...
+
+
+77001=Loading compiler set...
+77002=Checking file associations...
+77003=Initializing class browser...
+77004=Restoring window size...
+
+
+78001=Compiler
+78002=Building makefile...
+78003=Rebuilding whole project...
+78004=Processing makefile...
+78005=- Project Filename: %s
+78006=- Compiler Name: %s
+78007=- Filename: %s
+78008=- Resource File: %s
+78009=- Makefile Processor: %s
+78010=- Command: %s
+78011=Compilation results...
+78012=- Errors: %d
+78013=- Warnings: %d
+78014=- Output Size: %s
+78015=- Compilation Time: %fs
+78016=- Output Filename: %s
+78017=Compiling single file...
+78018=- Filename: %s
+78019=Processing resource file...
+78020=- Resource Processor: %s
+78021=Processing C++ source file...
+78022=- C++ Compiler: %s
+78023=Processing C source file...
+78024=- C Compiler: %s
+78025=Compiling project changes...
+78026=Processing header file...
+78027=No binary directory provided in compiler set "%s". Aborted compilation.
+78028=Nothing to compile. Aborted compilation.
+78029=Cleaning project...
+78030=Cleaning file...
+78031=Deleted output file %s
+78032=No output files to delete.
+78033=Processing unknown file type...
+
+
+79001=Format Current File
+79002=Formatting Options...
+79003=Formatting Options
+79004=Cannot find AStyle executable. Please make sure AStyle is located at Dev-Cpp\AStyle\AStyle.exe.
+79005=Options
+79006=Bracket style:
+79007=Indent style:
+79008=Tab width:
+79009=Indent the following kinds of code:
+79010=Classes
+79011=Switches
+79012=Cases
+79013=Namespaces
+79014=Labels
+79015=Preprocessor
+79016=Final command (add customizations here):
+79017=Preview:
+79018=Could not find AStyle
+79019=Powered by %s
+79020=Max. line length:
+79021=// Could not find the AStyle output file:<CR>// %s
+
