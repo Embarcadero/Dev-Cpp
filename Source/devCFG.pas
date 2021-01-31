@@ -34,6 +34,7 @@ type
   TCompilerOption = record
     Name: integer; // language table index of "Generate debugging info"
     Section: integer; // language table index of "C options"
+    IsMake: boolean;
     IsC: boolean;
     IsCpp: boolean; // True (C++ option?) - can be both C and C++ option...
     IsLinker: boolean; // Is it a linker param
@@ -267,6 +268,9 @@ type
   // List of programs to use for unknown file extensions
   TdevExternalPrograms = class(TPersistent)
   private
+    fGenericCMD1: String;
+    fGenericCMD2: String;
+    fGenericCMD3: String;
     fDummy: boolean;
     fPrograms: TStrings;
     function GetProgramName(Index: integer): String;
@@ -283,6 +287,9 @@ type
   published
     property Dummy: boolean read fDummy write fDummy;
     property Programs: TStrings read fPrograms write fPrograms;
+    property GenericCMD1: String read fGenericCMD1 write fGenericCMD1;
+    property GenericCMD2: String read fGenericCMD2 write fGenericCMD2;
+    property GenericCMD3: String read fGenericCMD3 write fGenericCMD3;
   end;
 
   // global directories
@@ -1499,6 +1506,16 @@ begin
   AddOption(ID_COPT_WIN32, ID_COPT_LINKERTAB, True, True, True, 0, '-mwindows', nil);
   AddOption(ID_COPT_STRIP, ID_COPT_LINKERTAB, False, False, True, 0, '-s', nil);
 
+  // Make
+  sl := TStringList.Create;
+  sl.Add(''); // /!\ Must contain a starting empty value in order to do not have always to pass the parameter
+  sl.Add('1 Thread=1');
+  for var CPUNumber := 2 to System.CPUCount do begin
+    sl.Add(CPUNumber.ToString + ' Threads=' + CPUNumber.ToString);
+  end;
+  sl.Add('Auto=');
+  AddOption(ID_MAKEOPT_JOBS, ID_COPT_GRP_MAKE, False, False, False, 0, '-j', sl);
+
   // Output
   AddOption(ID_COPT_MEM, ID_COPT_GRP_OUTPUT, True, True, False, 0, '-fverbose-asm', nil);
   AddOption(ID_COPT_ASSEMBLY, ID_COPT_GRP_OUTPUT, True, True, False, 0, '-S', nil);
@@ -2205,6 +2222,8 @@ begin
       BaseName := BaseSet.Name;
       with BaseSet do begin
         Name := BaseName + ' 64-bit Release';
+        if FindOption('-j', option, index) then
+          SetOption(option, System.CPUCount);
       end;
 
       // Debug profile
@@ -2212,6 +2231,8 @@ begin
         Name := BaseName + ' 64-bit Debug';
         if FindOption('-g3', option, index) then
           SetOption(option, 1);
+        if FindOption('-j', option, index) then
+          SetOption(option, 0);
       end;
 
       // Profiling profile
@@ -2219,6 +2240,8 @@ begin
         Name := BaseName + ' 64-bit Profiling';
         if FindOption('-pg', option, index) then
           SetOption(option, 1);
+        if FindOption('-j', option, index) then
+          SetOption(option, 0);
       end;
 
       // Default, 32bit release profile
@@ -2235,6 +2258,8 @@ begin
             fLibDir[i] := fLibDir[i] + '32'
           else
             fLibDir.Delete(i);
+        if FindOption('-j', option, index) then
+          SetOption(option, System.CPUCount);
       end;
 
       // Debug profile
@@ -2242,6 +2267,8 @@ begin
         Name := BaseName + ' 32-bit Debug';
         if FindOption('-g3', option, index) then
           SetOption(option, 1);
+        if FindOption('-j', option, index) then
+          SetOption(option, 0);
       end;
 
       // Profiling profile
@@ -2249,6 +2276,8 @@ begin
         Name := BaseName + ' 32-bit Profiling';
         if FindOption('-pg', option, index) then
           SetOption(option, 1);
+        if FindOption('-j', option, index) then
+          SetOption(option, 0);
       end;
     end;
   end;
@@ -2822,6 +2851,10 @@ end;
 
 procedure TdevExternalPrograms.SetToDefaults;
 begin
+  fGenericCMD1 := '';
+  fGenericCMD2 := '';
+  fGenericCMD3 := '';
+
   inherited;
 end;
 

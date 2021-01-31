@@ -573,7 +573,7 @@ object MainForm: TMainForm
         Style = tsButtons
         TabOrder = 0
       end
-      object Panel1: TPanel
+      object ConsolePanel: TPanel
         Left = 0
         Top = 0
         Width = 33
@@ -581,7 +581,7 @@ object MainForm: TMainForm
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 1
-        object SpeedButton5: TSpeedButton
+        object CMDSpeedButton: TSpeedButton
           Left = 0
           Top = 0
           Width = 33
@@ -589,7 +589,7 @@ object MainForm: TMainForm
           Action = actCMD
           Align = alTop
         end
-        object SpeedButton6: TSpeedButton
+        object PSSpeedButton: TSpeedButton
           Left = 0
           Top = 33
           Width = 33
@@ -598,6 +598,41 @@ object MainForm: TMainForm
           Align = alTop
           ExplicitLeft = 7
           ExplicitTop = 64
+        end
+        object G1SpeedButton: TSpeedButton
+          Tag = 1
+          Left = 0
+          Top = 66
+          Width = 33
+          Height = 33
+          Action = actGeneric1CMD
+          Align = alTop
+          PopupMenu = GenericCMDPopupMenu
+          ExplicitLeft = 7
+          ExplicitTop = 105
+        end
+        object G2SpeedButton: TSpeedButton
+          Tag = 2
+          Left = 0
+          Top = 99
+          Width = 33
+          Height = 33
+          Action = actGeneric2CMD
+          Align = alTop
+          PopupMenu = GenericCMDPopupMenu
+          ExplicitLeft = -6
+          ExplicitTop = 92
+        end
+        object G3SpeedButton: TSpeedButton
+          Tag = 3
+          Left = 0
+          Top = 132
+          Width = 33
+          Height = 33
+          Action = actGeneric3CMD
+          Align = alTop
+          PopupMenu = GenericCMDPopupMenu
+          ExplicitTop = 131
         end
       end
     end
@@ -1621,7 +1656,7 @@ object MainForm: TMainForm
           Top = 309
           Width = 18
           Height = 16
-          Caption = '6.2'
+          Caption = '6.3'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clRed
           Font.Height = -13
@@ -6427,6 +6462,24 @@ object MainForm: TMainForm
       Caption = 'Close'
       OnExecute = actConsoleCloseExecute
     end
+    object actGeneric1CMD: TAction
+      Tag = 1
+      Caption = '$1'
+      OnExecute = actGeneric1CMDExecute
+    end
+    object actGeneric2CMD: TAction
+      Tag = 2
+      Caption = '$2'
+      OnExecute = actGeneric2CMDExecute
+    end
+    object actGeneric3CMD: TAction
+      Tag = 3
+      Caption = '$3'
+      OnExecute = actGeneric3CMDExecute
+    end
+    object actGenericSet: TAction
+      Caption = 'Set'
+    end
   end
   object MessagePopup: TPopupMenu
     Left = 11
@@ -6611,6 +6664,20 @@ object MainForm: TMainForm
     Top = 323
     object CloseCMDMNU: TMenuItem
       Action = actConsoleClose
+    end
+  end
+  object OpenConsoleDialog: TOpenDialog
+    DefaultExt = 'exe'
+    Filter = 'Executables (*.exe)|*.EXE'
+    Left = 60
+    Top = 275
+  end
+  object GenericCMDPopupMenu: TPopupMenu
+    Left = 76
+    Top = 379
+    object SetCMDMNU: TMenuItem
+      Caption = 'Set'
+      OnClick = SetCMDMNUClick
     end
   end
 end

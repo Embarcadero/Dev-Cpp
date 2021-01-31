@@ -650,6 +650,7 @@ const
   ID_COPT_GRP_CPP                       = 43002;
   ID_COPT_GRP_COMP                      = 43003;
   ID_COPT_GRP_OUTPUT                    = 43004;
+  ID_COPT_GRP_MAKE                      = 43005;
 
   // free to 725 for new groups
   ID_COPT_ANSIC                         = 44001;
@@ -1191,7 +1192,7 @@ const
   ID_POPT_RESETPROJECTCOMPILER          = 72030;
   ID_POPT_LANGUAGEDEP                   = 72031;
   ID_POPT_FILES                         = 72032;
-  
+
   // New compiler options
   ID_COPT_STRIP                         = 73001;
   ID_COPT_ARCH                          = 73002;
@@ -1200,6 +1201,9 @@ const
   ID_COPT_STD                           = 73005;
   ID_COPT_PTRWIDTH                      = 73006;
   ID_COPT_TUNE                          = 73007;
+
+  // New make option
+  ID_MAKEOPT_JOBS                       = 73008;
 
   // Compile progress window
   ID_CMPRPG_COMPILER                    = 74001;
@@ -1250,7 +1254,7 @@ const
   ID_LANGFORM_WAIT                      = 76019;
   ID_LANGFORM_SAVING                    = 76020;
   ID_LANGFORM_DONEPARSINGSAVING         = 76021;
-  
+
   ID_LOAD_COMPILERSET                   = 77001;
   ID_LOAD_FILEASSOC                     = 77002;
   ID_LOAD_INITCLASSBROWSER              = 77003;

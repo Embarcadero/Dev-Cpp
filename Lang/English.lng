@@ -607,6 +607,7 @@ Ver=1
 43002=C++ compiler
 43003=Compiler:
 43004=Output
+43005=Make
 
 
 44001=Support all ANSI standard C programs (-ansi)
@@ -1145,6 +1146,7 @@ Ver=1
 73005=Language standard (-std)
 73006=Compile with the following pointer width (-mx)
 73007=Optimize less, while maintaining full compatibility (-mtune)
+73008=Concurrent compilation processes (-j)
 
 
 74001=Compiler:

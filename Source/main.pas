@@ -578,9 +578,9 @@ type
     SpeedButton4: TSpeedButton;
     RichEdit0: TRichEdit;
     ClassBrowser: TClassBrowser;
-    Panel1: TPanel;
-    SpeedButton5: TSpeedButton;
-    SpeedButton6: TSpeedButton;
+    ConsolePanel: TPanel;
+    CMDSpeedButton: TSpeedButton;
+    PSSpeedButton: TSpeedButton;
     actCMD: TAction;
     actPowerShell: TAction;
     ConsolePopupMenu: TPopupMenu;
@@ -594,6 +594,16 @@ type
     PanelDescRun: TPanel;
     PanelDescCompile: TPanel;
     PanelDescClear: TPanel;
+    G1SpeedButton: TSpeedButton;
+    G2SpeedButton: TSpeedButton;
+    G3SpeedButton: TSpeedButton;
+    actGeneric1CMD: TAction;
+    actGeneric2CMD: TAction;
+    actGeneric3CMD: TAction;
+    OpenConsoleDialog: TOpenDialog;
+    GenericCMDPopupMenu: TPopupMenu;
+    actGenericSet: TAction;
+    SetCMDMNU: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure ToggleBookmarkClick(Sender: TObject);
@@ -874,6 +884,10 @@ type
     procedure actCMDExecute(Sender: TObject);
     procedure actPowerShellExecute(Sender: TObject);
     procedure actConsoleCloseExecute(Sender: TObject);
+    procedure actGeneric1CMDExecute(Sender: TObject);
+    procedure actGeneric2CMDExecute(Sender: TObject);
+    procedure actGeneric3CMDExecute(Sender: TObject);
+    procedure SetCMDMNUClick(Sender: TObject);
   private
     FCloseButtonMouseDownTab: TCloseTabSheet;
     FCloseButtonShowPushed: Boolean;
@@ -934,6 +948,8 @@ type
     procedure AddFileRTB(RBName: TRichEdit; aFileName: string; aDirection: string);
     procedure OpenFileProject(s: string; AEncoding: TEncoding = nil);
     procedure ResizeWelcomeComponent;
+
+    procedure ExecuteGenericConsole(Sender: TObject);
 
     procedure PageControlCloseButtonDrawTab(Control: TCustomTabControl; TabIndex: Integer;
       const Rect: TRect; Active: Boolean);
@@ -1154,6 +1170,31 @@ begin
 
   CloneMenu(ToggleBookmarksItem, TogglebookmarksPopItem);
   CloneMenu(GotoBookmarksItem, GotobookmarksPopItem);
+end;
+
+procedure TMainForm.SetCMDMNUClick(Sender: TObject);
+var
+  LCommandLine: String;
+begin
+  case TSpeedButton(((Sender as TMenuItem).GetParentMenu as TPopupMenu).PopupComponent).Tag of
+    1: LCommandLine := devExternalPrograms.GenericCMD1;
+    2: LCommandLine := devExternalPrograms.GenericCMD2;
+    3: LCommandLine := devExternalPrograms.GenericCMD3;
+  end;
+
+  if OpenConsoleDialog.Execute then begin
+    case TSpeedButton(((Sender as TMenuItem).GetParentMenu as TPopupMenu).PopupComponent).Tag of
+      1: begin
+        devExternalPrograms.GenericCMD1 := OpenConsoleDialog.FileName;
+      end;
+      2: begin
+        devExternalPrograms.GenericCMD2 := OpenConsoleDialog.FileName;
+      end;
+      3: begin
+        devExternalPrograms.GenericCMD3 := OpenConsoleDialog.FileName;
+      end;
+    end;
+  end;
 end;
 
 procedure TMainForm.SetHints;
@@ -6912,6 +6953,75 @@ begin
     if Folder <> '' then
       ShellExecute(Application.Handle, 'open', 'explorer.exe', PChar(Folder), nil, SW_SHOWNORMAL);
   end;
+end;
+
+procedure TMainForm.ExecuteGenericConsole(Sender: TObject);
+var
+  LCommandLine: String;
+begin
+  case TAction(Sender).Tag of
+    1: LCommandLine := devExternalPrograms.GenericCMD1;
+    2: LCommandLine := devExternalPrograms.GenericCMD2;
+    3: LCommandLine := devExternalPrograms.GenericCMD3;
+  end;
+
+  if LCommandLine='' then begin
+    if OpenConsoleDialog.Execute then begin
+      case TAction(Sender).Tag of
+        1: begin
+          devExternalPrograms.GenericCMD1 := OpenConsoleDialog.FileName;
+          LCommandLine := devExternalPrograms.GenericCMD1;
+        end;
+        2: begin
+          devExternalPrograms.GenericCMD2 := OpenConsoleDialog.FileName;
+          LCommandLine := devExternalPrograms.GenericCMD2;
+        end;
+        3: begin
+          devExternalPrograms.GenericCMD3 := OpenConsoleDialog.FileName;
+          LCommandLine := devExternalPrograms.GenericCMD3;
+        end;
+      end;
+
+    end;
+  end;
+
+  if LCommandLine<>'' then begin
+
+    var ConsoleFrameProc: TProc<TConsoleAppHost, Boolean> :=
+      procedure (AFrame: TConsoleAppHost; AIsSuccess: Boolean)
+      begin
+        if AIsSuccess then
+        begin
+          var NewTab := TTabSheet.Create(pcConsoleHost);
+          NewTab.PageControl := pcConsoleHost;
+          NewTab.Assign(AFrame);
+        end
+        else
+          for var i := 0 to pcConsoleHost.PageCount - 1 do
+            if pcConsoleHost.Pages[i].Tag = NativeInt(AFrame) then
+            begin
+              pcConsoleHost.Pages[i].Free;
+              Break;
+            end;
+      end;
+
+    TConsoleAppHost.NewHost(LCommandLine, TAction(Sender).Caption, ConsoleFrameProc, 20);
+  end;
+end;
+
+procedure TMainForm.actGeneric1CMDExecute(Sender: TObject);
+begin
+  ExecuteGenericConsole(Sender);
+end;
+
+procedure TMainForm.actGeneric2CMDExecute(Sender: TObject);
+begin
+  ExecuteGenericConsole(Sender);
+end;
+
+procedure TMainForm.actGeneric3CMDExecute(Sender: TObject);
+begin
+  ExecuteGenericConsole(Sender);
 end;
 
 procedure TMainForm.actGotoBreakPointExecute(Sender: TObject);
