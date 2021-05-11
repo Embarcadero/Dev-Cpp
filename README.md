@@ -6,6 +6,12 @@ Embarcadero Dev-C++ is a new and improved fork (sponsored by Embarcadero) of Blo
 Download the latest release:
 <https://github.com/Embarcadero/Dev-Cpp/releases>
 
+Keystone Features:
+ - C++17/C++20 (partial) support.
+ - Unicode support.
+ - Parallel Compilation support.
+ - Windows 7/8/10 support.
+
 Main Features include:
 
 - TDM-GCC 9.2.0 32/64bit
