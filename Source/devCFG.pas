@@ -222,7 +222,7 @@ type
   end;
 
   // Options for AStyle
-  TdevFormatter = class(TPersistent)
+  TdevFormatterAStyle = class(TPersistent)
   private
     fBracketStyle: Integer;
     fIndentStyle: Integer;
@@ -263,6 +263,51 @@ type
     property FullCommand: String read fFullCommand write fFullCommand;
     property AStyleDir: String read fAStyleDir write fAStyleDir;
     property AStyleFile: String read fAStyleFile write fAStyleFile;
+  end;
+
+  // Options for Clang-Format
+  TdevFormatterClang = class(TPersistent)
+  private
+    fBasedOnStyle: Integer;
+    fBracketAlignmentStyle: Integer;
+
+    fModifyIndentWidth: Boolean;
+    fIndentWidth: Integer;
+
+    fBracedListStyle: Boolean;
+
+    fModifyTabWidth: Boolean;
+    fTabWidth: Integer;
+
+    fModifyColumnLimit: Boolean;
+    fColumnLimit: integer;
+
+    fFullCommand: String; // includes customizations
+    fClangDir: String;
+    fClangFile: String;
+  public
+    constructor Create;
+    procedure SettoDefaults;
+    procedure SaveSettings;
+    procedure LoadSettings;
+    function Validate: Boolean; // check if clang-format.exe can be found
+    function FormatMemory(Editor: TEditor; const OverrideCommand: String): String; // apply formatting
+    function FormatFile(const FileName, OverrideCommand: String): String; // apply formatting
+    function GetVersion: String;
+    function GetFullCommand: String;
+  published
+    property BasedOnStyle: Integer read fBasedOnStyle write fBasedOnStyle;
+    property BracketAlignmentStyle: Integer read fBracketAlignmentStyle write fBracketAlignmentStyle;
+    property ModifyIndentWidth: Boolean read fModifyIndentWidth write fModifyIndentWidth;
+    property IndentWidth: Integer read fIndentWidth write fIndentWidth;
+    property BracedListStyle: Boolean read fBracedListStyle write fBracedListStyle;
+    property ModifyTabWidth: Boolean read fModifyTabWidth write fModifyTabWidth;
+    property TabWidth: Integer read fTabWidth write fTabWidth;
+    property ModifyColumnLimit: Boolean read fModifyColumnLimit write fModifyColumnLimit;
+    property ColumnLimit: Integer read fColumnLimit write fColumnLimit;
+    property FullCommand: String read fFullCommand write fFullCommand;
+    property ClangDir: String read fClangDir write fClangDir;
+    property ClangFile: String read fClangFile write fClangFile;
   end;
 
   // List of programs to use for unknown file extensions
@@ -736,7 +781,8 @@ var
   devCodeCompletion: TdevCodeCompletion = nil;
   devClassBrowsing: TdevClassBrowsing = nil;
   devExternalPrograms: TdevExternalPrograms = nil;
-  devFormatter: TdevFormatter = nil;
+  devFormatterAStyle: TdevFormatterAStyle = nil;
+  devFormatterClang: TdevFormatterClang = nil;
 
   TDM_GCC_64_Folder: string = 'TDM-GCC-64';
 
@@ -804,8 +850,10 @@ begin
   if not Assigned(devExternalPrograms) then
     devExternalPrograms := TdevExternalPrograms.Create;
 
-  if not Assigned(devFormatter) then
-    devFormatter := TdevFormatter.Create;
+  if not Assigned(devFormatterAStyle) then
+    devFormatterAStyle := TdevFormatterAStyle.Create;
+  if not Assigned(devFormatterClang) then
+    devFormatterClang := TdevFormatterClang.Create;
 end;
 
 procedure SaveOptions;
@@ -817,7 +865,8 @@ begin
   devCodeCompletion.SaveSettings;
   devClassBrowsing.SaveSettings;
   devExternalPrograms.SaveSettings;
-  devFormatter.SaveSettings;
+  devFormatterAStyle.SaveSettings;
+  devFormatterClang.SaveSettings;
 end;
 
 procedure DestroyOptions;
@@ -829,7 +878,8 @@ begin
   FreeAndNil(devCodeCompletion);
   FreeAndNil(devClassBrowsing);
   FreeAndNil(devExternalPrograms);
-  FreeAndNil(devFormatter);
+  FreeAndNil(devFormatterAStyle);
+  FreeAndNil(devFormatterClang);
 end;
 
 procedure RemoveOptionsDir(const Directory: String);
@@ -2655,26 +2705,26 @@ begin
   fShowInheritedMembers := False;
 end;
 
-{ TdevFormatter }
+{ TdevFormatterAStyle }
 
-constructor TdevFormatter.Create;
+constructor TdevFormatterAStyle.Create;
 begin
   inherited Create;
   SettoDefaults;
   LoadSettings;
 end;
 
-procedure TdevFormatter.LoadSettings;
+procedure TdevFormatterAStyle.LoadSettings;
 begin
-  devData.ReadObject('Formatter', Self);
+  devData.ReadObject('FormatterAStyle', Self);
 end;
 
-procedure TdevFormatter.SaveSettings;
+procedure TdevFormatterAStyle.SaveSettings;
 begin
-  devData.WriteObject('Formatter', Self);
+  devData.WriteObject('FormatterAStyle', Self);
 end;
 
-procedure TdevFormatter.SettoDefaults;
+procedure TdevFormatterAStyle.SettoDefaults;
 begin
   fBracketStyle := 2; // Java
   fIndentStyle := 2; // Tabs
@@ -2692,7 +2742,7 @@ begin
   fAStyleFile := 'AStyle.exe';
 end;
 
-function TdevFormatter.GetFullCommand: String;
+function TdevFormatterAStyle.GetFullCommand: String;
 begin
   Result := '';
 
@@ -2729,7 +2779,7 @@ begin
   Result := TrimLeft(Result);
 end;
 
-function TdevFormatter.Validate: Boolean;
+function TdevFormatterAStyle.Validate: Boolean;
 begin
   Result := False;
 
@@ -2742,7 +2792,7 @@ begin
   Result := True;
 end;
 
-function TdevFormatter.FormatMemory(Editor: TEditor; const OverrideCommand: String): String;
+function TdevFormatterAStyle.FormatMemory(Editor: TEditor; const OverrideCommand: String): String;
 var
   FileName: String;
   DummyEditor: TSynEdit;
@@ -2771,7 +2821,7 @@ begin
   end;
 end;
 
-function TdevFormatter.FormatFile(const FileName, OverrideCommand: String): String;
+function TdevFormatterAStyle.FormatFile(const FileName, OverrideCommand: String): String;
 var
   RunCommand, WorkingDir: String;
 begin
@@ -2780,12 +2830,153 @@ begin
   Result := RunAndGetOutput(WorkingDir + RunCommand, TPath.GetTempPath, nil, nil, False);
 end;
 
-function TdevFormatter.GetVersion: String;
+function TdevFormatterAStyle.GetVersion: String;
 var
   RunCommand, WorkingDir: String;
 begin
   WorkingDir := devDirs.Exec + fAStyleDir;
   RunCommand := fAStyleFile + ' --version';
+  Result := RunAndGetOutput(WorkingDir + RunCommand, TPath.GetTempPath, nil, nil, False);
+end;
+
+{ TdevFormatter }
+
+constructor TdevFormatterClang.Create;
+begin
+  inherited Create;
+  SettoDefaults;
+  LoadSettings;
+end;
+
+procedure TdevFormatterClang.LoadSettings;
+begin
+  devData.ReadObject('FormatterClang', Self);
+end;
+
+procedure TdevFormatterClang.SaveSettings;
+begin
+  devData.WriteObject('FormatterClang', Self);
+end;
+
+procedure TdevFormatterClang.SettoDefaults;
+begin
+  fBasedOnStyle := 1;
+  fBracketAlignmentStyle := 0;
+
+  fModifyIndentWidth := false;
+  fIndentWidth := 4;
+
+  fBracedListStyle := false;
+
+  fModifyTabWidth := false;
+  fTabWidth := 4;
+
+  fModifyColumnLimit := false;
+  fColumnLimit := 80;
+
+  fFullCommand := GetFullCommand; // includes customizations
+  fClangDir := 'ClangFormat\';
+  fClangFile := 'clang-format.exe';
+end;
+
+function TdevFormatterClang.GetFullCommand: String;
+begin
+  Result := '--style="{';
+
+  // Add based style
+  case fBasedOnStyle of
+    1: Result := Result + 'BasedOnStyle: LLVM, ';
+    2: Result := Result + 'BasedOnStyle: Google, ';
+    3: Result := Result + 'BasedOnStyle: Chromium, ';
+    4: Result := Result + 'BasedOnStyle: Mozilla, ';
+    5: Result := Result + 'BasedOnStyle: WebKit, ';
+    6: Result := Result + 'BasedOnStyle: Microsoft, ';
+    7: Result := Result + 'BasedOnStyle: GNU, ';
+  end;
+
+  // Add Bracket Alignment Style
+  case fBracketAlignmentStyle of
+    1: Result := Result + 'AlignAfterOpenBracket: Align, ';
+    2: Result := Result + 'AlignAfterOpenBracket: DontAlign, ';
+    3: Result := Result + 'AlignAfterOpenBracket: AlwaysBreak, ';
+  end;
+
+  // Add IndentWidth
+  if fModifyIndentWidth then
+    Result := Result + 'IndentWidth: ' + IntToStr(fIndentWidth) + ', ';
+
+  //Add Braced List Style
+  if fBracedListStyle then
+    Result := Result + 'Cpp11BracedListStyle: true, ';
+
+  //Add Tab Width
+  if fModifyTabWidth then
+    Result := Result + 'TabWidth: ' + IntToStr(fTabWidth) + ', ';
+
+  //Add Column Limit
+  if fModifyColumnLimit then
+    Result := Result + 'ColumnLimit: ' + IntToStr(fColumnLimit) + ', ';
+
+  Result := Result + 'Language: Cpp}"';
+end;
+
+function TdevFormatterClang.Validate: Boolean;
+begin
+  Result := False;
+
+  // Check if AStyle.exe is where it should be
+  if not DirectoryExists(devDirs.Exec + fClangDir) then
+    Exit;
+  if not FileExists(devDirs.Exec + fClangDir + fClangFile) then
+    Exit;
+
+  Result := True;
+end;
+
+function TdevFormatterClang.FormatMemory(Editor: TEditor; const OverrideCommand: String): String;
+var
+  FileName, Formatted: String;
+  DummyEditor: TSynEdit;
+begin
+  // Store file backup in temporary directory
+  FileName := TPath.Combine(TPath.GetTempPath,ExtractFileName(Editor.FileName));
+  Editor.Text.Lines.SaveToFile(FileName);
+  Formatted := FormatFile(FileName, OverrideCommand);
+
+  // Load formatted file into dummy
+  DummyEditor := TSynEdit.Create(nil);
+  try
+    // Use replace selection trick to preserve undo list
+    DummyEditor.Lines.LoadFromFile(FileName);
+
+    // Use replace all functionality
+    Editor.Text.BeginUpdate;
+    try
+      Editor.Text.SelectAll;
+      Editor.Text.SelText := Formatted; // do NOT use Lines.LoadFromFile which is not undo-able
+    finally
+      Editor.Text.EndUpdate; // repaint once
+    end;
+  finally
+    DummyEditor.Free;
+  end;
+end;
+
+function TdevFormatterClang.FormatFile(const FileName, OverrideCommand: String): String;
+var
+  RunCommand, WorkingDir: String;
+begin
+  WorkingDir := devDirs.Exec + fClangDir;
+  RunCommand := fClangFile + ' ' + OverrideCommand + ' "' + FileName + '"';
+  Result := RunAndGetOutput(WorkingDir + RunCommand, TPath.GetTempPath, nil, nil, False);
+end;
+
+function TdevFormatterClang.GetVersion: String;
+var
+  RunCommand, WorkingDir: String;
+begin
+  WorkingDir := devDirs.Exec + fClangDir;
+  RunCommand := fClangFile + ' --version';
   Result := RunAndGetOutput(WorkingDir + RunCommand, TPath.GetTempPath, nil, nil, False);
 end;
 

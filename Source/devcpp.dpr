@@ -82,7 +82,6 @@ uses
   ParamsFrm in 'ParamsFrm.pas' {ParamsForm},
   CompOptionsFrame in 'CompOptionsFrame.pas' {CompOptionsFrame: TFrame},
   CompOptionsFrm in 'CompOptionsFrm.pas' {CompOptionsForm},
-  FormatterOptionsFrm in 'FormatterOptionsFrm.pas' {FormatterOptionsForm},
   ProcessListFrm in 'ProcessListFrm.pas' {ProcessListForm},
   PackmanExitCodesU in 'Tools\Packman\PackmanExitCodesU.pas',
   ImageTheme in 'ImageTheme.pas',
@@ -90,7 +89,9 @@ uses
   CharUtils in 'CharUtils.pas',
   ConsoleAppHostFrm in 'ConsoleAppHostFrm.pas' {ConsoleAppHost},
   Vcl.Themes,
-  Vcl.Styles;
+  Vcl.Styles,
+  AStyleFormatterOptionsFrm in 'AStyleFormatterOptionsFrm.pas' {AStyleFormatterOptionsForm},
+  ClangFormatterOptionsFrm in 'ClangFormatterOptionsFrm.pas' {ClangFormatterOptionsForm};
 
 {$R *.res}
 

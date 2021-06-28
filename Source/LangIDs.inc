@@ -29,6 +29,7 @@ const
   ID_MNU_WINDOW                         = 8;
   ID_MNU_HELP                           = 9;
   ID_MNU_DEBUG                          = 10;
+  ID_MNU_FORMATTING                     = 11;
 
   // file menu
   ID_SUB_NEW                            = 1001;
@@ -1297,7 +1298,7 @@ const
   ID_FORMATTER_FORMATCURFILE            = 79001;
   ID_FORMATTER_MENU                     = 79002;
   ID_FORMATTER_WINDOW                   = 79003;
-  ID_FORMATTER_NOTVALID                 = 79004;
+  ID_FORMATTER_ASTYLE_NOTVALID          = 79004;
   ID_FORMATTER_OPTIONS                  = 79005;
   ID_FORMATTER_BRACKET                  = 79006;
   ID_FORMATTER_INDENT                   = 79007;
@@ -1311,7 +1312,15 @@ const
   ID_FORMATTER_PREPROC                  = 79015;
   ID_FORMATTER_COMMAND                  = 79016;
   ID_FORMATTER_PREVIEW                  = 79017;
-  ID_FORMATTER_POWEREDBYFAIL            = 79018;
+  ID_FORMATTER_ASTYLE_POWEREDBYFAIL     = 79018;
   ID_FORMATTER_POWEREDBY                = 79019;
   ID_FORMATTER_MAXLINELENGTH            = 79020;
-  ID_FORMATTER_LOADERROR                = 79021;
+  ID_FORMATTER_ASTYLE_LOADERROR         = 79021;
+  ID_FORMATTER_CLANG_NOTVALID           = 79022;
+  ID_FORMATTER_CLANG_POWEREDBYFAIL      = 79023;
+  ID_FORMATTER_CLANG_LOADERROR           = 79024;
+  ID_FORMATTER_BASEDONSTYLE             = 79025;
+  ID_FORMATTER_BRACKETALIGNMENTSTYLE    = 79026;
+  ID_FORMATTER_INDENTWIDTH              = 79027;
+  ID_FORMATTER_BRACEDLISTSTYLE          = 79028;
+  ID_FORMATTER_COLUMNLIMIT              = 79029;
