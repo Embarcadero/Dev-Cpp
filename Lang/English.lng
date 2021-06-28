@@ -11,6 +11,7 @@ Ver=1
 8=&Window
 9=&Help
 10=&Debug
+11=&Formatting
 
 
 1001=&New
@@ -1262,3 +1263,11 @@ Ver=1
 79019=Powered by %s
 79020=Max. line length:
 79021=// Could not find the AStyle output file:<CR>// %s
+79022=Cannot find clang-format executable. Please make sure clang-format is located at Dev-Cpp\ClangFormat\clang-format.exe.
+79023=Could not find clang-format
+79024=// Could not find the clang-format output file:<CR>// %s
+79025=Based on style:
+79026=Bracket Alignment Style:
+79027=Indent width:
+79028=Braced List Style
+79029=Column Limit:

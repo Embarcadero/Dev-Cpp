@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{0B6930FF-C1A8-45A0-B448-2D23D500E0F7}</ProjectGuid>
         <MainSource>devcpp.dpr</MainSource>
@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>19.1</ProjectVersion>
+        <ProjectVersion>19.2</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -254,9 +254,6 @@
         <DCCReference Include="CompOptionsFrm.pas">
             <Form>CompOptionsForm</Form>
         </DCCReference>
-        <DCCReference Include="FormatterOptionsFrm.pas">
-            <Form>FormatterOptionsForm</Form>
-        </DCCReference>
         <DCCReference Include="ProcessListFrm.pas">
             <Form>ProcessListForm</Form>
         </DCCReference>
@@ -266,6 +263,14 @@
         <DCCReference Include="CharUtils.pas"/>
         <DCCReference Include="ConsoleAppHostFrm.pas">
             <Form>ConsoleAppHost</Form>
+        </DCCReference>
+        <DCCReference Include="AStyleFormatterOptionsFrm.pas">
+            <Form>AStyleFormatterOptionsForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="ClangFormatterOptionsFrm.pas">
+            <Form>ClangFormatterOptionsForm</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <None Include="LangIDs.inc">
             <ContainerId>File</ContainerId>
@@ -302,7 +307,7 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="..\..\bin\devcpp.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Dev-Cpp\devcpp.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>devcpp.exe</RemoteName>
                         <Overwrite>true</Overwrite>
@@ -465,6 +470,16 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon192">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
