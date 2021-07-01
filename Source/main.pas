@@ -3296,6 +3296,8 @@ begin
   finally
     Free;
   end;
+  if devFormatterClang.ExecFromOpt then
+    actClangFormatCurrentFileExecute(Sender);
 end;
 
 procedure TMainForm.actCleanExecute(Sender: TObject);
