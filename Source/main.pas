@@ -3290,6 +3290,7 @@ end;
 
 procedure TMainForm.actClangFormatOptionsExecute(Sender: TObject);
 begin
+  devFormatterClang.ExecFromOpt := false;
   with TClangFormatterOptionsForm.Create(nil) do try
     if ShowModal = mrOk then begin
     end;

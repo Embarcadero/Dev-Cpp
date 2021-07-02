@@ -79,19 +79,17 @@ uses
 
 procedure TClangFormatterOptionsForm.btnCancelClick(Sender: TObject);
 begin
-  devFormatterClang.ExecFromOpt := false;
   Close;
 end;
 
 procedure TClangFormatterOptionsForm.btnExecuteClick(Sender: TObject);
 begin
   devFormatterClang.ExecFromOpt := true;
-  Close;
+  SaveSettings;
 end;
 
 procedure TClangFormatterOptionsForm.btnOkClick(Sender: TObject);
 begin
-  devFormatterClang.ExecFromOpt := false;
   SaveSettings;
 end;
 
@@ -155,6 +153,7 @@ begin
     LoadSettings;
   finally
     fCreating := False;
+    CommandChange(Sender);
   end;
 end;
 
