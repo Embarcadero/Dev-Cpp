@@ -285,6 +285,7 @@ type
     fFullCommand: String; // includes customizations
     fClangDir: String;
     fClangFile: String;
+    fExecFromOpt: Boolean;
   public
     constructor Create;
     procedure SettoDefaults;
@@ -308,6 +309,7 @@ type
     property FullCommand: String read fFullCommand write fFullCommand;
     property ClangDir: String read fClangDir write fClangDir;
     property ClangFile: String read fClangFile write fClangFile;
+    property ExecFromOpt: Boolean read fExecFromOpt write fExecFromOpt;
   end;
 
   // List of programs to use for unknown file extensions
@@ -2924,7 +2926,7 @@ function TdevFormatterClang.Validate: Boolean;
 begin
   Result := False;
 
-  // Check if AStyle.exe is where it should be
+  // Check if ClangFormet.exe is where it should be
   if not DirectoryExists(devDirs.Exec + fClangDir) then
     Exit;
   if not FileExists(devDirs.Exec + fClangDir + fClangFile) then

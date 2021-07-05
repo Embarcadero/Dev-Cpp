@@ -26,7 +26,7 @@ object ClangFormatterOptionsForm: TClangFormatterOptionsForm
   object lblPoweredBy: TLabel
     Left = 0
     Top = 539
-    Width = 321
+    Width = 232
     Height = 15
     Alignment = taCenter
     AutoSize = False
@@ -253,5 +253,18 @@ object ClangFormatterOptionsForm: TClangFormatterOptionsForm
       TabOrder = 9
       OnClick = OptionChange
     end
+  end
+  object BtnExecute: TBitBtn
+    Left = 238
+    Top = 537
+    Width = 85
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = 'E&xecute'
+    Images = dmMain.SVGImageListMessageStyle
+    ModalResult = 1
+    NumGlyphs = 2
+    TabOrder = 5
+    OnClick = btnExecuteClick
   end
 end

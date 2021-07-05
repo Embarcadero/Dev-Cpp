@@ -3290,12 +3290,15 @@ end;
 
 procedure TMainForm.actClangFormatOptionsExecute(Sender: TObject);
 begin
+  devFormatterClang.ExecFromOpt := false;
   with TClangFormatterOptionsForm.Create(nil) do try
     if ShowModal = mrOk then begin
     end;
   finally
     Free;
   end;
+  if devFormatterClang.ExecFromOpt then
+    actClangFormatCurrentFileExecute(Sender);
 end;
 
 procedure TMainForm.actCleanExecute(Sender: TObject);

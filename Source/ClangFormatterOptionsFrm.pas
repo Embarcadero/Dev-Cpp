@@ -31,6 +31,7 @@ type
     btnOk: TBitBtn;
     btnCancel: TBitBtn;
     btnHelp: TBitBtn;
+    btnExecute: TBitBtn;
     lblBracketAlignmentStyle: TLabel;
     cmbBracketAlignmentStyle: TComboBox;
     synExample: TSynEdit;
@@ -52,6 +53,7 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
+    procedure btnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure OptionChange(Sender: TObject);
     procedure CommandChange(Sender: TObject);
@@ -78,6 +80,12 @@ uses
 procedure TClangFormatterOptionsForm.btnCancelClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TClangFormatterOptionsForm.btnExecuteClick(Sender: TObject);
+begin
+  devFormatterClang.ExecFromOpt := true;
+  SaveSettings;
 end;
 
 procedure TClangFormatterOptionsForm.btnOkClick(Sender: TObject);
@@ -145,6 +153,7 @@ begin
     LoadSettings;
   finally
     fCreating := False;
+    CommandChange(Sender);
   end;
 end;
 
@@ -250,7 +259,8 @@ begin
 
   // Check if formatting finished correctly
   if FileExists(DummyFileName) then begin
-    synExample.Lines.LoadFromFile(DummyFileName);
+    synExample.Lines.Text := ClangOutput;
+    synExample.Lines.SaveToFile(DummyFileName);
   end else
     synExample.Lines.Text := Format(Lang[ID_FORMATTER_CLANG_LOADERROR], [DummyFileName]);
 end;
