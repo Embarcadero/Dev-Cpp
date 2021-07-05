@@ -89,6 +89,7 @@ type
   protected
     fCompileParams: String;
     fCppCompileParams: String;
+    fMakeParams: String;
     fLibrariesParams: String;
     fIncludesParams: String;
     fCppIncludesParams: String;
@@ -523,9 +524,11 @@ begin
   if fCheckSyntax then begin
     fCompileParams := '-fsyntax-only';
     fCppCompileParams := '-fsyntax-only';
+    fMakeParams := '';
   end else begin
     fCompileParams := '';
     fCppCompileParams := '';
+    fMakeParams := '';
   end;
 
   // Walk all options
@@ -563,6 +566,24 @@ begin
           fCppCompileParams := fCppCompileParams + ' ' + option.Setting;
         end;
       end;
+       if (not option.IsC) AND (not option.IsCpp) AND (not option.IsLinker) then begin
+        if option.Setting='-j' then
+        begin
+          if Assigned(option.Choices) then begin
+            if Assigned(fProject) then
+              val := fProject.Options.CompilerOptions[I]
+            else
+              val := option.Value;
+            if (val > 0) and (val < option.Choices.Count) then
+              fMakeParams := fMakeParams + ' ' + option.Setting +
+                option.Choices.Values[option.Choices.Names[val]];
+          end else if (Assigned(fProject) and (fProject.Options.CompilerOptions[I] = 1)) or (not
+            Assigned(fProject)) then begin
+            fMakeParams := fMakeParams + ' ' + option.Setting + option.Choices.Values[option.Choices.Names[val]];
+          end;
+        end;
+      end;
+
     end;
   end;
 
@@ -586,6 +607,7 @@ begin
 
   fCompileParams := Trim(ParseMacros(fCompileParams));
   fCppCompileParams := Trim(ParseMacros(fCppCompileParams));
+  fMakeParams := Trim(ParseMacros(fMakeParams));
 end;
 
 procedure TCompiler.CheckSyntax;
@@ -606,7 +628,7 @@ resourcestring
   // gcc, input, output, compileparams, includeparams, librariesparams
   cSourceCmdLine = '%s "%s" -o "%s" %s %s %s';
   // make, makefile
-  cMakeLine = '%s -f "%s" all';
+  cMakeLine = '%s %s -f "%s" all';
 var
   cmdline: String;
   s: String;
@@ -713,7 +735,7 @@ begin
         DoLogEntry('');
 
         BuildMakeFile;
-        cmdline := Format(cMakeLine, [fCompilerSet.makeName, fMakeFile]);
+        cmdline := Format(cMakeLine, [fCompilerSet.makeName, fMakeParams, fMakeFile]);
 
         DoLogEntry(Lang[ID_LOG_PROCESSINGMAKE]);
         DoLogEntry('--------');

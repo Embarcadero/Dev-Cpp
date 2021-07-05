@@ -30,7 +30,7 @@ uses
   debugger, ClassBrowser, CodeCompletion, CppParser, CppTokenizer, SyncObjs,
   StrUtils, SynEditTypes, devFileMonitor, devMonitorTypes, DdeMan, EditorList,
   devShortcuts, debugreader, ExceptionFrm, CommCtrl, devcfg, SynEditTextBuffer,
-  CppPreprocessor, CBUtils, StatementList, FormatterOptionsFrm, System.Actions,
+  CppPreprocessor, CBUtils, StatementList, AStyleFormatterOptionsFrm, ClangFormatterOptionsFrm, System.Actions,
   vcl.Themes, SVGColor, Vcl.Imaging.pngimage, Vcl.WinXCtrls, Vcl.WinXPanels, Vcl.ExtDlgs,
   Vcl.Styles.Hooks,
   Vcl.Styles.Utils.Menus, //Style Popup and Shell Menus (class #32768)
@@ -533,11 +533,6 @@ type
     actToggleCommentInline: TAction;
     actCommentInlineSel1: TMenuItem;
     FormatMenu: TMenuItem;
-    actFormatCurrentFile: TAction;
-    FormatCurrentFile1: TMenuItem;
-    actFormatOptions: TAction;
-    actFormatOptions1: TMenuItem;
-    N46: TMenuItem;
     actRunTests: TAction;
     DonateItem: TMenuItem;
     actDonate: TAction;
@@ -578,9 +573,9 @@ type
     SpeedButton4: TSpeedButton;
     RichEdit0: TRichEdit;
     ClassBrowser: TClassBrowser;
-    Panel1: TPanel;
-    SpeedButton5: TSpeedButton;
-    SpeedButton6: TSpeedButton;
+    ConsolePanel: TPanel;
+    CMDSpeedButton: TSpeedButton;
+    PSSpeedButton: TSpeedButton;
     actCMD: TAction;
     actPowerShell: TAction;
     ConsolePopupMenu: TPopupMenu;
@@ -594,6 +589,26 @@ type
     PanelDescRun: TPanel;
     PanelDescCompile: TPanel;
     PanelDescClear: TPanel;
+    G1SpeedButton: TSpeedButton;
+    G2SpeedButton: TSpeedButton;
+    G3SpeedButton: TSpeedButton;
+    actGeneric1CMD: TAction;
+    actGeneric2CMD: TAction;
+    actGeneric3CMD: TAction;
+    OpenConsoleDialog: TOpenDialog;
+    GenericCMDPopupMenu: TPopupMenu;
+    actGenericSet: TAction;
+    SetCMDMNU: TMenuItem;
+    miAStyle: TMenuItem;
+    miClangFormat: TMenuItem;
+    miAStyleFormatFile: TMenuItem;
+    miAStyleOptions: TMenuItem;
+    miClangFormatFile: TMenuItem;
+    miClangFormatOptions: TMenuItem;
+    actAStyleFormatCurrentFile: TAction;
+    actAStyleFormatOptions: TAction;
+    actClangFormatCurrentFile: TAction;
+    actClangFormatOptions: TAction;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
     procedure ToggleBookmarkClick(Sender: TObject);
@@ -874,6 +889,14 @@ type
     procedure actCMDExecute(Sender: TObject);
     procedure actPowerShellExecute(Sender: TObject);
     procedure actConsoleCloseExecute(Sender: TObject);
+    procedure actGeneric1CMDExecute(Sender: TObject);
+    procedure actGeneric2CMDExecute(Sender: TObject);
+    procedure actGeneric3CMDExecute(Sender: TObject);
+    procedure SetCMDMNUClick(Sender: TObject);
+    procedure actAStyleFormatCurrentFileExecute(Sender: TObject);
+    procedure actClangFormatCurrentFileExecute(Sender: TObject);
+    procedure actAStyleFormatOptionsExecute(Sender: TObject);
+    procedure actClangFormatOptionsExecute(Sender: TObject);
   private
     FCloseButtonMouseDownTab: TCloseTabSheet;
     FCloseButtonShowPushed: Boolean;
@@ -934,6 +957,8 @@ type
     procedure AddFileRTB(RBName: TRichEdit; aFileName: string; aDirection: string);
     procedure OpenFileProject(s: string; AEncoding: TEncoding = nil);
     procedure ResizeWelcomeComponent;
+
+    procedure ExecuteGenericConsole(Sender: TObject);
 
     procedure PageControlCloseButtonDrawTab(Control: TCustomTabControl; TabIndex: Integer;
       const Rect: TRect; Active: Boolean);
@@ -1156,6 +1181,31 @@ begin
   CloneMenu(GotoBookmarksItem, GotobookmarksPopItem);
 end;
 
+procedure TMainForm.SetCMDMNUClick(Sender: TObject);
+var
+  LCommandLine: String;
+begin
+  case TSpeedButton(((Sender as TMenuItem).GetParentMenu as TPopupMenu).PopupComponent).Tag of
+    1: LCommandLine := devExternalPrograms.GenericCMD1;
+    2: LCommandLine := devExternalPrograms.GenericCMD2;
+    3: LCommandLine := devExternalPrograms.GenericCMD3;
+  end;
+
+  if OpenConsoleDialog.Execute then begin
+    case TSpeedButton(((Sender as TMenuItem).GetParentMenu as TPopupMenu).PopupComponent).Tag of
+      1: begin
+        devExternalPrograms.GenericCMD1 := OpenConsoleDialog.FileName;
+      end;
+      2: begin
+        devExternalPrograms.GenericCMD2 := OpenConsoleDialog.FileName;
+      end;
+      3: begin
+        devExternalPrograms.GenericCMD3 := OpenConsoleDialog.FileName;
+      end;
+    end;
+  end;
+end;
+
 procedure TMainForm.SetHints;
 var
   idx: integer;
@@ -1210,6 +1260,7 @@ begin
   ProjectMenu.Caption := Lang[ID_MNU_PROJECT];
   ExecuteMenu.Caption := Lang[ID_MNU_EXECUTE];
   ToolsMenu.Caption := Lang[ID_MNU_TOOLS];
+  FormatMenu.Caption := Lang[ID_MNU_FORMATTING];
   WindowMenu.Caption := Lang[ID_MNU_WINDOW];
   HelpMenu.Caption := Lang[ID_MNU_HELP];
 
@@ -1355,8 +1406,10 @@ begin
   actPackageManager.Caption := Lang[ID_ITEM_PACKMAN];
 
   // Formatter menu
-  actFormatCurrentFile.Caption := Lang[ID_FORMATTER_FORMATCURFILE];
-  actFormatOptions.Caption := Lang[ID_FORMATTER_MENU];
+  actAStyleFormatCurrentFile.Caption := Lang[ID_FORMATTER_FORMATCURFILE];
+  actAStyleFormatOptions.Caption := Lang[ID_FORMATTER_MENU];
+  actClangFormatCurrentFile.Caption := Lang[ID_FORMATTER_FORMATCURFILE];
+  actClangFormatOptions.Caption := Lang[ID_FORMATTER_MENU];
 
   // Window menu
   if devData.FullScreen then
@@ -3212,6 +3265,39 @@ begin
   fCompiler.RebuildAll;
 end;
 
+procedure TMainForm.actClangFormatCurrentFileExecute(Sender: TObject);
+var
+  e: TEditor;
+  OldCaretXY: TBufferCoord;
+  OldTopLine: integer;
+begin
+  if devFormatterClang.Validate then begin
+    e := fEditorList.GetEditor;
+    if Assigned(e) then begin
+      // Save for undo list creation
+      OldTopLine := e.Text.TopLine;
+      OldCaretXY := e.Text.CaretXY;
+
+      devFormatterClang.FormatMemory(e, devFormatterClang.FullCommand);
+
+      // Attempt to not scroll view
+      e.Text.TopLine := OldTopLine;
+      e.Text.CaretXY := OldCaretXY;
+    end;
+  end else
+    MessageDlg(Lang[ID_FORMATTER_CLANG_NOTVALID], mtWarning, [mbOK], 0);
+end;
+
+procedure TMainForm.actClangFormatOptionsExecute(Sender: TObject);
+begin
+  with TClangFormatterOptionsForm.Create(nil) do try
+    if ShowModal = mrOk then begin
+    end;
+  finally
+    Free;
+  end;
+end;
+
 procedure TMainForm.actCleanExecute(Sender: TObject);
 begin
   actStopExecuteExecute(nil);
@@ -3947,6 +4033,39 @@ begin
     end;
     if s <> '' then
       fDebugger.AddWatchVar(s);
+  end;
+end;
+
+procedure TMainForm.actAStyleFormatCurrentFileExecute(Sender: TObject);
+var
+  e: TEditor;
+  OldCaretXY: TBufferCoord;
+  OldTopLine: integer;
+begin
+  if devFormatterAStyle.Validate then begin
+    e := fEditorList.GetEditor;
+    if Assigned(e) then begin
+      // Save for undo list creation
+      OldTopLine := e.Text.TopLine;
+      OldCaretXY := e.Text.CaretXY;
+
+      devFormatterAStyle.FormatMemory(e, devFormatterAStyle.FullCommand);
+
+      // Attempt to not scroll view
+      e.Text.TopLine := OldTopLine;
+      e.Text.CaretXY := OldCaretXY;
+    end;
+  end else
+    MessageDlg(Lang[ID_FORMATTER_ASTYLE_NOTVALID], mtWarning, [mbOK], 0);
+end;
+
+procedure TMainForm.actAStyleFormatOptionsExecute(Sender: TObject);
+begin
+  with TAStyleFormatterOptionsForm.Create(nil) do try
+    if ShowModal = mrOk then begin
+    end;
+  finally
+    Free;
   end;
 end;
 
@@ -6914,6 +7033,75 @@ begin
   end;
 end;
 
+procedure TMainForm.ExecuteGenericConsole(Sender: TObject);
+var
+  LCommandLine: String;
+begin
+  case TAction(Sender).Tag of
+    1: LCommandLine := devExternalPrograms.GenericCMD1;
+    2: LCommandLine := devExternalPrograms.GenericCMD2;
+    3: LCommandLine := devExternalPrograms.GenericCMD3;
+  end;
+
+  if LCommandLine='' then begin
+    if OpenConsoleDialog.Execute then begin
+      case TAction(Sender).Tag of
+        1: begin
+          devExternalPrograms.GenericCMD1 := OpenConsoleDialog.FileName;
+          LCommandLine := devExternalPrograms.GenericCMD1;
+        end;
+        2: begin
+          devExternalPrograms.GenericCMD2 := OpenConsoleDialog.FileName;
+          LCommandLine := devExternalPrograms.GenericCMD2;
+        end;
+        3: begin
+          devExternalPrograms.GenericCMD3 := OpenConsoleDialog.FileName;
+          LCommandLine := devExternalPrograms.GenericCMD3;
+        end;
+      end;
+
+    end;
+  end;
+
+  if LCommandLine<>'' then begin
+
+    var ConsoleFrameProc: TProc<TConsoleAppHost, Boolean> :=
+      procedure (AFrame: TConsoleAppHost; AIsSuccess: Boolean)
+      begin
+        if AIsSuccess then
+        begin
+          var NewTab := TTabSheet.Create(pcConsoleHost);
+          NewTab.PageControl := pcConsoleHost;
+          NewTab.Assign(AFrame);
+        end
+        else
+          for var i := 0 to pcConsoleHost.PageCount - 1 do
+            if pcConsoleHost.Pages[i].Tag = NativeInt(AFrame) then
+            begin
+              pcConsoleHost.Pages[i].Free;
+              Break;
+            end;
+      end;
+
+    TConsoleAppHost.NewHost(LCommandLine, TAction(Sender).Caption, ConsoleFrameProc, 20);
+  end;
+end;
+
+procedure TMainForm.actGeneric1CMDExecute(Sender: TObject);
+begin
+  ExecuteGenericConsole(Sender);
+end;
+
+procedure TMainForm.actGeneric2CMDExecute(Sender: TObject);
+begin
+  ExecuteGenericConsole(Sender);
+end;
+
+procedure TMainForm.actGeneric3CMDExecute(Sender: TObject);
+begin
+  ExecuteGenericConsole(Sender);
+end;
+
 procedure TMainForm.actGotoBreakPointExecute(Sender: TObject);
 var
   e: TEditor;
@@ -6952,30 +7140,65 @@ var
   OldCaretXY: TBufferCoord;
   OldTopLine: integer;
 begin
-  if devFormatter.Validate then begin
-    e := fEditorList.GetEditor;
-    if Assigned(e) then begin
-      // Save for undo list creation
-      OldTopLine := e.Text.TopLine;
-      OldCaretXY := e.Text.CaretXY;
+  if Sender = miAStyleFormatFile then
+  begin
+    if devFormatterAStyle.Validate then begin
+      e := fEditorList.GetEditor;
+      if Assigned(e) then begin
+        // Save for undo list creation
+        OldTopLine := e.Text.TopLine;
+        OldCaretXY := e.Text.CaretXY;
 
-      devFormatter.FormatMemory(e, devFormatter.FullCommand);
+        devFormatterAStyle.FormatMemory(e, devFormatterAStyle.FullCommand);
 
-      // Attempt to not scroll view
-      e.Text.TopLine := OldTopLine;
-      e.Text.CaretXY := OldCaretXY;
-    end;
-  end else
-    MessageDlg(Lang[ID_FORMATTER_NOTVALID], mtWarning, [mbOK], 0);
+        // Attempt to not scroll view
+        e.Text.TopLine := OldTopLine;
+        e.Text.CaretXY := OldCaretXY;
+      end;
+    end else
+      MessageDlg(Lang[ID_FORMATTER_ASTYLE_NOTVALID], mtWarning, [mbOK], 0);
+  end;
+
+  if Sender = miClangFormatFile then
+  begin
+    if devFormatterClang.Validate then begin
+      e := fEditorList.GetEditor;
+      if Assigned(e) then begin
+        // Save for undo list creation
+        OldTopLine := e.Text.TopLine;
+        OldCaretXY := e.Text.CaretXY;
+
+        devFormatterClang.FormatMemory(e, devFormatterClang.FullCommand);
+
+        // Attempt to not scroll view
+        e.Text.TopLine := OldTopLine;
+        e.Text.CaretXY := OldCaretXY;
+      end;
+    end else
+      MessageDlg(Lang[ID_FORMATTER_CLANG_NOTVALID], mtWarning, [mbOK], 0);
+  end;
 end;
 
 procedure TMainForm.actFormatOptionsExecute(Sender: TObject);
 begin
-  with TFormatterOptionsForm.Create(nil) do try
-    if ShowModal = mrOk then begin
+  if Sender = miAStyleFormatFile then
+  begin
+    with TAStyleFormatterOptionsForm.Create(nil) do try
+      if ShowModal = mrOk then begin
+      end;
+    finally
+      Free;
     end;
-  finally
-    Free;
+  end;
+
+  if Sender = miClangFormatFile then
+  begin
+    with TClangFormatterOptionsForm.Create(nil) do try
+      if ShowModal = mrOk then begin
+      end;
+    finally
+      Free;
+    end;
   end;
 end;
 

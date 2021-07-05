@@ -6,6 +6,12 @@ Embarcadero Dev-C++ is a new and improved fork (sponsored by Embarcadero) of Blo
 Download the latest release:
 <https://github.com/Embarcadero/Dev-Cpp/releases>
 
+Keystone Features:
+ - C++17/C++20 (partial) support.
+ - Unicode support.
+ - Parallel Compilation support.
+ - Windows 7/8/10 support.
+
 Main Features include:
 
 - TDM-GCC 9.2.0 32/64bit
@@ -37,6 +43,17 @@ Supported Operating System:
 - Windows 10
 
 # Dev C++ Release Notes
+
+Version 6.3 - 30 January 2021
+
+ - Added: Parallel compilation enabled by default for release builds through MAKE Jobs.
+ - Added: 3 Buttons for setting up custom shell command line tabs.
+ - Updated: Code completion and menues for dark themes.
+ - Updated: CTRL-TAB editor tab selection wrapping.
+ - Fixed: Make clean file deletion issue.
+ - Fixed: Status bar not showing all text.
+ - Fixed: Debug/CPU Window hex column issue.
+ - Fixed: Closing tabs in editor side by side view.
 
 Version 6.2 - 13 November 2020
 

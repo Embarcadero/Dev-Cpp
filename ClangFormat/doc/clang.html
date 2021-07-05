@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0044)https://clang.llvm.org/docs/ClangFormat.html -->
+<html xmlns="http://www.w3.org/1999/xhtml"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style lang="en" type="text/css" id="dark-mode-custom-style"></style><style lang="en" type="text/css" id="dark-mode-native-style"></style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    
+    <title>ClangFormat — Clang 13 documentation</title>
+    <link rel="stylesheet" href="./clang_files/haiku.css" type="text/css">
+    <link rel="stylesheet" href="./clang_files/pygments.css" type="text/css">
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="./clang_files/documentation_options.js.download"></script>
+    <script type="text/javascript" src="./clang_files/jquery.js.download"></script>
+    <script type="text/javascript" src="./clang_files/underscore.js.download"></script>
+    <script type="text/javascript" src="./clang_files/doctools.js.download"></script>
+    <script type="text/javascript" src="./clang_files/language_data.js.download"></script>
+    <link rel="index" title="Index" href="https://clang.llvm.org/docs/genindex.html">
+    <link rel="search" title="Search" href="https://clang.llvm.org/docs/search.html">
+    <link rel="next" title="Clang-Format Style Options" href="https://clang.llvm.org/docs/ClangFormatStyleOptions.html">
+    <link rel="prev" title="ClangCheck" href="https://clang.llvm.org/docs/ClangCheck.html"> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="https://clang.llvm.org/docs/index.html">
+          <span>Clang 13 documentation</span></a></h1>
+        <h2 class="heading"><span>ClangFormat</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&nbsp;&nbsp;<a href="https://clang.llvm.org/docs/ClangCheck.html">ClangCheck</a>
+        &nbsp;&nbsp;::&nbsp;&nbsp;
+        <a class="uplink" href="https://clang.llvm.org/docs/index.html">Contents</a>
+        &nbsp;&nbsp;::&nbsp;&nbsp;
+        <a href="https://clang.llvm.org/docs/ClangFormatStyleOptions.html">Clang-Format Style Options</a>&nbsp;&nbsp;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="clangformat">
+<h1>ClangFormat<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#clangformat" title="Permalink to this headline">¶</a></h1>
+<p><cite>ClangFormat</cite> describes a set of tools that are built on top of
+<a class="reference internal" href="https://clang.llvm.org/docs/LibFormat.html"><span class="doc">LibFormat</span></a>. It can support your workflow in a variety of ways including a
+standalone tool and editor integrations.</p>
+<div class="section" id="standalone-tool">
+<h2>Standalone Tool<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#standalone-tool" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">clang-format</strong> is located in <cite>clang/tools/clang-format</cite> and can be used
+to format C/C++/Java/JavaScript/Objective-C/Protobuf/C# code.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>clang-format -help
+<span class="go">OVERVIEW: A tool to format C/C++/Java/JavaScript/Objective-C/Protobuf/C# code.</span>
+
+<span class="go">If no arguments are specified, it formats the code from standard input</span>
+<span class="go">and writes the result to the standard output.</span>
+<span class="go">If &lt;file&gt;s are given, it reformats the files. If -i is specified</span>
+<span class="go">together with &lt;file&gt;s, the files are edited in-place. Otherwise, the</span>
+<span class="go">result is written to the standard output.</span>
+
+<span class="go">USAGE: clang-format [options] [&lt;file&gt; ...]</span>
+
+<span class="go">OPTIONS:</span>
+
+<span class="go">Clang-format options:</span>
+
+<span class="go">  --Werror                   - If set, changes formatting warnings to errors</span>
+<span class="go">  --Wno-error=&lt;value&gt;        - If set don't error out on the specified warning type.</span>
+<span class="go">    =unknown                 -   If set, unknown format options are only warned about.</span>
+<span class="go">                                 This can be used to enable formatting, even if the</span>
+<span class="go">                                 configuration contains unknown (newer) options.</span>
+<span class="go">                                 Use with caution, as this might lead to dramatically</span>
+<span class="go">                                 differing format depending on an option being</span>
+<span class="go">                                 supported or not.</span>
+<span class="go">  --assume-filename=&lt;string&gt; - Override filename used to determine the language.</span>
+<span class="go">                               When reading from stdin, clang-format assumes this</span>
+<span class="go">                               filename to determine the language.</span>
+<span class="go">  --cursor=&lt;uint&gt;            - The position of the cursor when invoking</span>
+<span class="go">                               clang-format from an editor integration</span>
+<span class="go">  --dry-run                  - If set, do not actually make the formatting changes</span>
+<span class="go">  --dump-config              - Dump configuration options to stdout and exit.</span>
+<span class="go">                               Can be used with -style option.</span>
+<span class="go">  --fallback-style=&lt;string&gt;  - The name of the predefined style used as a</span>
+<span class="go">                               fallback in case clang-format is invoked with</span>
+<span class="go">                               -style=file, but can not find the .clang-format</span>
+<span class="go">                               file to use.</span>
+<span class="go">                               Use -fallback-style=none to skip formatting.</span>
+<span class="go">  --ferror-limit=&lt;uint&gt;      - Set the maximum number of clang-format errors to</span>
+<span class="go">                               emit before stopping (0 = no limit). Used only</span>
+<span class="go">                               with --dry-run or -n</span>
+<span class="go">  -i                         - Inplace edit &lt;file&gt;s, if specified.</span>
+<span class="go">  --length=&lt;uint&gt;            - Format a range of this length (in bytes).</span>
+<span class="go">                               Multiple ranges can be formatted by specifying</span>
+<span class="go">                               several -offset and -length pairs.</span>
+<span class="go">                               When only a single -offset is specified without</span>
+<span class="go">                               -length, clang-format will format up to the end</span>
+<span class="go">                               of the file.</span>
+<span class="go">                               Can only be used with one input file.</span>
+<span class="go">  --lines=&lt;string&gt;           - &lt;start line&gt;:&lt;end line&gt; - format a range of</span>
+<span class="go">                               lines (both 1-based).</span>
+<span class="go">                               Multiple ranges can be formatted by specifying</span>
+<span class="go">                               several -lines arguments.</span>
+<span class="go">                               Can't be used with -offset and -length.</span>
+<span class="go">                               Can only be used with one input file.</span>
+<span class="go">  -n                         - Alias for --dry-run</span>
+<span class="go">  --offset=&lt;uint&gt;            - Format a range starting at this byte offset.</span>
+<span class="go">                               Multiple ranges can be formatted by specifying</span>
+<span class="go">                               several -offset and -length pairs.</span>
+<span class="go">                               Can only be used with one input file.</span>
+<span class="go">  --output-replacements-xml  - Output replacements as XML.</span>
+<span class="go">  --sort-includes            - If set, overrides the include sorting behavior</span>
+<span class="go">                               determined by the SortIncludes style flag</span>
+<span class="go">  --style=&lt;string&gt;           - Coding style, currently supports:</span>
+<span class="go">                                 LLVM, Google, Chromium, Mozilla, WebKit.</span>
+<span class="go">                               Use -style=file to load style configuration from</span>
+<span class="go">                               .clang-format file located in one of the parent</span>
+<span class="go">                               directories of the source file (or current</span>
+<span class="go">                               directory for stdin).</span>
+<span class="go">                               Use -style="{key: value, ...}" to set specific</span>
+<span class="go">                               parameters, e.g.:</span>
+<span class="go">                                 -style="{BasedOnStyle: llvm, IndentWidth: 8}"</span>
+<span class="go">  --verbose                  - If set, shows the list of processed files</span>
+
+<span class="go">Generic Options:</span>
+
+<span class="go">  --help                     - Display available options (--help-hidden for more)</span>
+<span class="go">  --help-list                - Display list of available options (--help-list-hidden for more)</span>
+<span class="go">  --version                  - Display the version of this program</span>
+</pre></div>
+</div>
+<p>When the desired code formatting style is different from the available options,
+the style can be customized using the <code class="docutils literal notranslate"><span class="pre">-style="{key:</span> <span class="pre">value,</span> <span class="pre">...}"</span></code> option or
+by putting your style configuration in the <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> or <code class="docutils literal notranslate"><span class="pre">_clang-format</span></code>
+file in your project’s directory and using <code class="docutils literal notranslate"><span class="pre">clang-format</span> <span class="pre">-style=file</span></code>.</p>
+<p>An easy way to create the <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> file is:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">clang-format -style=llvm -dump-config &gt; .clang-format</span>
+</pre></div>
+</div>
+<p>Available style options are described in <a class="reference internal" href="https://clang.llvm.org/docs/ClangFormatStyleOptions.html"><span class="doc">Clang-Format Style Options</span></a>.</p>
+</div>
+<div class="section" id="vim-integration">
+<h2>Vim Integration<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#vim-integration" title="Permalink to this headline">¶</a></h2>
+<p>There is an integration for <strong class="program">vim</strong> which lets you run the
+<strong class="program">clang-format</strong> standalone tool on your current buffer, optionally
+selecting regions to reformat. The integration has the form of a <cite>python</cite>-file
+which can be found under <cite>clang/tools/clang-format/clang-format.py</cite>.</p>
+<p>This can be integrated by adding the following to your <cite>.vimrc</cite>:</p>
+<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span>map <span class="p">&lt;</span>C<span class="p">-</span>K<span class="p">&gt;</span> :<span class="k">pyf</span> <span class="p">&lt;</span><span class="nb">path</span><span class="p">-</span><span class="k">to</span><span class="p">-</span>this<span class="p">-</span><span class="k">file</span><span class="p">&gt;</span>/clang<span class="p">-</span>format.<span class="k">py</span><span class="p">&lt;</span><span class="k">cr</span><span class="p">&gt;</span>
+imap <span class="p">&lt;</span>C<span class="p">-</span>K<span class="p">&gt;</span> <span class="p">&lt;</span><span class="k">c</span><span class="p">-</span><span class="k">o</span><span class="p">&gt;</span>:<span class="k">pyf</span> <span class="p">&lt;</span><span class="nb">path</span><span class="p">-</span><span class="k">to</span><span class="p">-</span>this<span class="p">-</span><span class="k">file</span><span class="p">&gt;</span>/clang<span class="p">-</span>format.<span class="k">py</span><span class="p">&lt;</span><span class="k">cr</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>The first line enables <strong class="program">clang-format</strong> for NORMAL and VISUAL mode, the
+second line adds support for INSERT mode. Change “C-K” to another binding if
+you need <strong class="program">clang-format</strong> on a different key (C-K stands for Ctrl+k).</p>
+<p>With this integration you can press the bound key and clang-format will
+format the current line in NORMAL and INSERT mode or the selected region in
+VISUAL mode. The line or region is extended to the next bigger syntactic
+entity.</p>
+<p>It operates on the current, potentially unsaved buffer and does not create
+or save any files. To revert a formatting, just undo.</p>
+<p>An alternative option is to format changes when saving a file and thus to
+have a zero-effort integration into the coding workflow. To do this, add this to
+your <cite>.vimrc</cite>:</p>
+<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="p">!</span> Formatonsave<span class="p">()</span>
+  <span class="k">let</span> <span class="k">l</span>:formatdiff <span class="p">=</span> <span class="m">1</span>
+  <span class="k">pyf</span> <span class="p">~</span><span class="sr">/llvm/</span>tools<span class="sr">/clang/</span>tools<span class="sr">/clang-format/</span>clang<span class="p">-</span>format.<span class="k">py</span>
+<span class="k">endfunction</span>
+autocmd <span class="nb">BufWritePre</span> *.<span class="k">h</span><span class="p">,</span>*.<span class="k">cc</span><span class="p">,</span>*.cpp <span class="k">call</span> Formatonsave<span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="emacs-integration">
+<h2>Emacs Integration<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#emacs-integration" title="Permalink to this headline">¶</a></h2>
+<p>Similar to the integration for <strong class="program">vim</strong>, there is an integration for
+<strong class="program">emacs</strong>. It can be found at <cite>clang/tools/clang-format/clang-format.el</cite>
+and used by adding this to your <cite>.emacs</cite>:</p>
+<div class="highlight-common-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">load</span> <span class="s">"&lt;path-to-clang&gt;/tools/clang-format/clang-format.el"</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">global-set-key</span> <span class="nv">[C-M-tab]</span> <span class="ss">'clang-format-region</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This binds the function <cite>clang-format-region</cite> to C-M-tab, which then formats the
+current line or selected region.</p>
+</div>
+<div class="section" id="bbedit-integration">
+<h2>BBEdit Integration<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#bbedit-integration" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">clang-format</strong> cannot be used as a text filter with BBEdit, but works
+well via a script. The AppleScript to do this integration can be found at
+<cite>clang/tools/clang-format/clang-format-bbedit.applescript</cite>; place a copy in
+<cite>~/Library/Application Support/BBEdit/Scripts</cite>, and edit the path within it to
+point to your local copy of <strong class="program">clang-format</strong>.</p>
+<p>With this integration you can select the script from the Script menu and
+<strong class="program">clang-format</strong> will format the selection. Note that you can rename the
+menu item by renaming the script, and can assign the menu item a keyboard
+shortcut in the BBEdit preferences, under Menus &amp; Shortcuts.</p>
+</div>
+<div class="section" id="clion-integration">
+<h2>CLion Integration<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#clion-integration" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">clang-format</strong> is integrated into <a class="reference external" href="https://www.jetbrains.com/clion/">CLion</a> as an alternative code formatter. CLion turns it on
+automatically when there is a <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> file under the project root.
+Code style rules are applied as you type, including indentation,
+auto-completion, code generation, and refactorings.</p>
+<p><strong class="program">clang-format</strong> can also be enabled without a <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> file.
+In this case, CLion prompts you to create one based on the current IDE settings
+or the default LLVM style.</p>
+</div>
+<div class="section" id="visual-studio-integration">
+<h2>Visual Studio Integration<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#visual-studio-integration" title="Permalink to this headline">¶</a></h2>
+<p>Download the latest Visual Studio extension from the <a class="reference external" href="https://llvm.org/builds/">alpha build site</a>. The default key-binding is Ctrl-R,Ctrl-F.</p>
+</div>
+<div class="section" id="visual-studio-code-integration">
+<h2>Visual Studio Code Integration<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#visual-studio-code-integration" title="Permalink to this headline">¶</a></h2>
+<p>Get the latest Visual Studio Code extension from the <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=xaver.clang-format">Visual Studio Marketplace</a>. The default key-binding is Alt-Shift-F.</p>
+</div>
+<div class="section" id="script-for-patch-reformatting">
+<h2>Script for patch reformatting<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#script-for-patch-reformatting" title="Permalink to this headline">¶</a></h2>
+<p>The python script <cite>clang/tools/clang-format/clang-format-diff.py</cite> parses the
+output of a unified diff and reformats all contained lines with
+<strong class="program">clang-format</strong>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: clang-format-diff.py [-h] [-i] [-p NUM] [-regex PATTERN] [-style STYLE]</span>
+
+<span class="go">Reformat changed lines in diff. Without -i option just output the diff that</span>
+<span class="go">would be introduced.</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">  -h, --help      show this help message and exit</span>
+<span class="go">  -i              apply edits to files instead of displaying a diff</span>
+<span class="go">  -p NUM          strip the smallest prefix containing P slashes</span>
+<span class="go">  -regex PATTERN  custom pattern selecting file paths to reformat</span>
+<span class="go">  -style STYLE    formatting style to apply (LLVM, Google, Chromium, Mozilla,</span>
+<span class="go">                  WebKit)</span>
+</pre></div>
+</div>
+<p>So to reformat all the lines in the latest <strong class="program">git</strong> commit, just do:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git diff -U0 --no-color HEAD^ | clang-format-diff.py -i -p1</span>
+</pre></div>
+</div>
+<p>With Mercurial/<strong class="program">hg</strong>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">hg diff -U0 --color=never | clang-format-diff.py -i -p1</span>
+</pre></div>
+</div>
+<p>In an SVN client, you can do:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">svn diff --diff-cmd=diff -x -U0 | clang-format-diff.py -i</span>
+</pre></div>
+</div>
+<p>The option <cite>-U0</cite> will create a diff without context lines (the script would format
+those as well).</p>
+<p>These commands use the file paths shown in the diff output
+so they will only work from the root of the repository.</p>
+</div>
+<div class="section" id="current-state-of-clang-format-for-llvm">
+<h2>Current State of Clang Format for LLVM<a class="headerlink" href="https://clang.llvm.org/docs/ClangFormat.html#current-state-of-clang-format-for-llvm" title="Permalink to this headline">¶</a></h2>
+<p>The following table <a class="reference internal" href="https://clang.llvm.org/docs/ClangFormattedStatus.html"><span class="doc">Clang Formatted Status</span></a> shows the current status of clang-formatting for the entire LLVM source tree.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&nbsp;&nbsp;<a href="https://clang.llvm.org/docs/ClangCheck.html">ClangCheck</a>
+        &nbsp;&nbsp;::&nbsp;&nbsp;
+        <a class="uplink" href="https://clang.llvm.org/docs/index.html">Contents</a>
+        &nbsp;&nbsp;::&nbsp;&nbsp;
+        <a href="https://clang.llvm.org/docs/ClangFormatStyleOptions.html">Clang-Format Style Options</a>&nbsp;&nbsp;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        © Copyright 2007-2021, The Clang Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  
+<iframe frameborder="0" scrolling="no" style="background-color: transparent; border: 0px; display: none;" src="./clang_files/saved_resource.html"></iframe><div id="GOOGLE_INPUT_CHEXT_FLAG" input="" input_stat="{&quot;tlang&quot;:true,&quot;tsbc&quot;:true,&quot;pun&quot;:true,&quot;mk&quot;:true,&quot;ss&quot;:true}" style="display: none;"></div></body></html>

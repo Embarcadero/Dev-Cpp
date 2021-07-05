@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>19.1</ProjectVersion>
+        <ProjectVersion>19.2</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -102,7 +102,7 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
-        <VerInfo_Keys>CompanyName=Embarcadero Technologies, Inc.;FileDescription=Embarcadero Dev C++;FileVersion=6.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=Embarcadero Dev C++;ProductVersion=6.2.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Embarcadero Technologies, Inc.;FileDescription=Embarcadero Dev C++;FileVersion=6.3.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=Embarcadero Dev C++;ProductVersion=6.3.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <Icon_MainIcon>..\devcpp.ico</Icon_MainIcon>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
     </PropertyGroup>
@@ -116,7 +116,7 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <DCC_ExeOutput>C:\Dev-Cpp\</DCC_ExeOutput>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
-        <VerInfo_Keys>CompanyName=Embarcadero;FileDescription=$(MSBuildProjectName);FileVersion=6.2.0.0;InternalName=Devcpp;LegalCopyright=;LegalTrademarks=;OriginalFilename=Embarcadero Devcpp;ProductName=$(MSBuildProjectName);ProductVersion=6.2.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Embarcadero;FileDescription=$(MSBuildProjectName);FileVersion=6.3.0.0;InternalName=Devcpp;LegalCopyright=;LegalTrademarks=;OriginalFilename=Embarcadero Devcpp;ProductName=$(MSBuildProjectName);ProductVersion=6.3.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <Icon_MainIcon>..\devcpp.ico</Icon_MainIcon>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
     </PropertyGroup>
@@ -254,9 +254,6 @@
         <DCCReference Include="CompOptionsFrm.pas">
             <Form>CompOptionsForm</Form>
         </DCCReference>
-        <DCCReference Include="FormatterOptionsFrm.pas">
-            <Form>FormatterOptionsForm</Form>
-        </DCCReference>
         <DCCReference Include="ProcessListFrm.pas">
             <Form>ProcessListForm</Form>
         </DCCReference>
@@ -266,6 +263,14 @@
         <DCCReference Include="CharUtils.pas"/>
         <DCCReference Include="ConsoleAppHostFrm.pas">
             <Form>ConsoleAppHost</Form>
+        </DCCReference>
+        <DCCReference Include="AStyleFormatterOptionsFrm.pas">
+            <Form>AStyleFormatterOptionsForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="ClangFormatterOptionsFrm.pas">
+            <Form>ClangFormatterOptionsForm</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <None Include="LangIDs.inc">
             <ContainerId>File</ContainerId>
@@ -302,7 +307,7 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="..\..\bin\devcpp.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Dev-Cpp\devcpp.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>devcpp.exe</RemoteName>
                         <Overwrite>true</Overwrite>
@@ -465,6 +470,16 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon192">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
