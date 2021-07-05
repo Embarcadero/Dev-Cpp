@@ -490,7 +490,7 @@ Ver=1
 36007=Dev-C++ discussion forums:
 36008=Dev-C++ users mailing list:
 36009=Dev-C++ Resource Site:
-36010=http://www.bloodshed.net1212
+36010=http://www.bloodshed.net
 36011=http://www.mingw.org
 36012=http://www.bloodshed.net/forum
 36013=http://www.bloodshed.net/devcpp-ml.html
@@ -1263,6 +1263,7 @@ Ver=1
 79019=Powered by %s
 79020=Max. line length:
 79021=// Could not find the AStyle output file:<CR>// %s
+
 79022=Cannot find clang-format executable. Please make sure clang-format is located at Dev-Cpp\ClangFormat\clang-format.exe.
 79023=Could not find clang-format
 79024=// Could not find the clang-format output file:<CR>// %s
