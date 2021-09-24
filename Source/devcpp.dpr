@@ -198,6 +198,7 @@ begin
   Application.Initialize;
   Application.Title := 'Embarcadero Dev C++';
   Application.CreateForm(TMainForm, MainForm);
+  Application.MainFormOnTaskBar := True;
   Application.Run;
 end.
 
