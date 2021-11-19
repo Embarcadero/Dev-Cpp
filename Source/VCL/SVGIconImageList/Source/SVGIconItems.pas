@@ -395,6 +395,7 @@ begin
   System.Messaging.TMessageManager.DefaultManager.SendMessage(Self,
     TSVGItemsUpdateMessage.Create);
 
+  {$IFNDEF D11+}
   {$IFDEF D10_3+}
   if Owner is TSVGIconImageCollection then
   begin
@@ -403,8 +404,10 @@ begin
     else
       System.Messaging.TMessageManager.DefaultManager.SendMessage(nil,
         TImageCollectionChangedMessage.Create(TSVGIconImageCollection(Owner),
-          Item.Index, TSVGIconItem(Item).IconName));
+          Item.Index,
+          TSVGIconItem(Item).IconName));
   end;
+  {$ENDIF}
   {$ENDIF}
 end;
 
