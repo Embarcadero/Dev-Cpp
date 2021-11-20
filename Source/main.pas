@@ -3474,9 +3474,9 @@ begin
     ctNone:
       Exit;
     ctFile:
-      fDebugger.SendCommand('run', fCompiler.RunParams);
+      fDebugger.SendCommand('start', fCompiler.RunParams);                    // was 'run'
     ctProject:
-      fDebugger.SendCommand('run', fProject.Options.CmdLineArgs);
+      fDebugger.SendCommand('start', fProject.Options.CmdLineArgs);           // was 'run'
   end;
 end;
 
