@@ -1364,6 +1364,14 @@ begin
   fTokenID := tkString;
   repeat
 
+    if fRange = rsStringR then begin
+       if fLine[Run + 1] = #00 then begin
+          inc(Run);
+          fRange := rsMultiStringR;
+          Exit;
+       end;
+    end
+    else
     if fLine[Run] = '\' then begin
       case fLine[Run + 1] of
         #34, '\':
@@ -1376,13 +1384,6 @@ begin
           end;
       end;
     end;
-
-    if fRange = rsStringR then
-       if fLine[Run + 1] = #00 then begin
-          inc(Run);
-          fRange := rsMultiStringR;
-          Exit;
-       end;
 
     inc(Run);
   until IsLineEnd(Run) or (fLine[Run] = #34);
