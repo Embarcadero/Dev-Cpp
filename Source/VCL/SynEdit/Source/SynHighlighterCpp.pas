@@ -1348,6 +1348,15 @@ begin
   end;
 end;
 
+//        Raw string recognition starts with R"(                 fRange ->  rsStringR
+//  Multiline string recognition starts with "/" at end of line  fRange ->  rsMultilineString
+//
+//  Multiline raw string recognition occurs meeting #00 at end of line before closing )"
+//                                                               fRange ->  rsStringR
+//
+//                   Multiline case, at the end of line, revert  fRange ->  rsUnknown
+//                  Raw string case, at the end of line, revert  fRange ->  rsStringR
+
 procedure TSynCppSyn.PreStringProc;
 begin
   if ( fLine[Run+1] = '"' ) and ( fLine[Run+2] = '(' ) then begin
