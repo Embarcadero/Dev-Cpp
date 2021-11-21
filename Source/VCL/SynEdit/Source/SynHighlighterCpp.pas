@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -12,7 +12,7 @@ The Original Code is: SynHighlighterCpp.pas, released 2000-04-10.
 The Original Code is based on the dcjCppSyn.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Michael Trier.
-Unicode translation by Maël Hörz.
+Unicode translation by Maï¿½l Hï¿½rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -76,7 +76,7 @@ type
     xtkXorAssign);
 
   TRangeState = (rsUnknown, rsAnsiC, rsAnsiCAsm, rsAnsiCAsmBlock, rsAsm,
-    rsAsmBlock, rsDirective, rsDirectiveComment, rsString34, rsString39,
+    rsAsmBlock, rsDirective, rsDirectiveComment, rsString34, rsString39, rsStringR, rsMultiStringR,
     rsMultiLineString, rsMultiLineDirective);
 
   PIdentFuncTableFunc = ^TIdentFuncTableFunc;
@@ -226,6 +226,7 @@ type
     procedure OrSymbolProc;
     procedure PlusProc;
     procedure PointProc;
+    procedure PreStringProc;
     procedure QuestionProc;
     procedure RoundCloseProc;
     procedure RoundOpenProc;
@@ -1347,10 +1348,22 @@ begin
   end;
 end;
 
+procedure TSynCppSyn.PreStringProc;
+begin
+  if ( fLine[Run+1] = '"' ) and ( fLine[Run+2] = '(' ) then begin
+     inc(Run);
+     fRange := rsStringR;
+     StringProc;
+  end
+  else
+    IdentProc;
+end;
+
 procedure TSynCppSyn.StringProc;
 begin
   fTokenID := tkString;
   repeat
+
     if fLine[Run] = '\' then begin
       case fLine[Run + 1] of
         #34, '\':
@@ -1363,6 +1376,14 @@ begin
           end;
       end;
     end;
+
+    if fRange = rsStringR then
+       if fLine[Run + 1] = #00 then begin
+          inc(Run);
+          fRange := rsMultiStringR;
+          Exit;
+       end;
+
     inc(Run);
   until IsLineEnd(Run) or (fLine[Run] = #34);
   if FLine[Run] = #34 then
@@ -1391,9 +1412,20 @@ begin
       end;
   end;
 
-  fRange := rsUnknown;
+  if fRange  = rsMultiStringR then
+        fRange := rsStringR
+  else
+        fRange := rsUnknown;
 
   repeat
+    if fRange = rsStringR then begin
+        if fLine[Run + 1] = #00 then begin
+                             Inc(Run);
+                             fRange := rsMultiStringR;
+                             Exit;
+        end
+    end
+    else
     case FLine[Run] of
       #0, #10, #13: Break;
       '\':
@@ -1453,9 +1485,10 @@ begin
   fTokenPos := Run;
   case fRange of
     rsAnsiC, rsAnsiCAsm,
-    rsAnsiCAsmBlock, rsDirectiveComment: AnsiCProc;
-    rsMultiLineDirective: DirectiveEndProc;
-    rsMultilineString: StringEndProc;
+    rsAnsiCAsmBlock, rsDirectiveComment : AnsiCProc;
+    rsMultiLineDirective                : DirectiveEndProc;
+    rsMultilineString                   : StringEndProc;
+    rsMultiStringR                      : StringEndProc;
   else
     begin
       case fLine[Run] of
@@ -1471,7 +1504,8 @@ begin
         '=': EqualProc;
         '>': GreaterProc;
         '?': QuestionProc;
-        'A'..'Z', 'a'..'z', '_': IdentProc;
+        'R': PreStringProc;
+        'A'..'Q', 'S'..'Z', 'a'..'z', '_': IdentProc;
         #10: LFProc;
         '<': LowerProc;
         '-': MinusProc;
