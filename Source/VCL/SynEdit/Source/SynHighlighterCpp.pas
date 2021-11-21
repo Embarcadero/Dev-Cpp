@@ -1352,7 +1352,7 @@ end;
 //  Multiline string recognition starts with "/" at end of line  fRange ->  rsMultilineString
 //
 //  Multiline raw string recognition occurs meeting #00 at end of line before closing )"
-//                                                               fRange ->  rsStringR
+//                                                               fRange ->  rsMultiStringR
 //
 //                   Multiline case, at the end of line, revert  fRange ->  rsUnknown
 //                  Raw string case, at the end of line, revert  fRange ->  rsStringR
