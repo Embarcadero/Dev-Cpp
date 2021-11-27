@@ -76,7 +76,7 @@ type
     xtkXorAssign);
 
   TRangeState = (rsUnknown, rsAnsiC, rsAnsiCAsm, rsAnsiCAsmBlock, rsAsm,
-    rsAsmBlock, rsDirective, rsDirectiveComment, rsString34, rsString39, rsStringR, rsMultiStringR,
+    rsAsmBlock, rsDirective, rsDirectiveComment, rsString34, rsString39, rsStringRaw, rsMultilineStringRaw,
     rsMultiLineString, rsMultiLineDirective);
 
   PIdentFuncTableFunc = ^TIdentFuncTableFunc;
@@ -1348,20 +1348,21 @@ begin
   end;
 end;
 
-//        Raw string recognition starts with R"(                 fRange ->  rsStringR
+//        Raw string recognition starts with R"(                 fRange ->  rsStringRaw
 //  Multiline string recognition starts with "/" at end of line  fRange ->  rsMultilineString
 //
 //  Multiline raw string recognition occurs meeting #00 at end of line before closing )"
-//                                                               fRange ->  rsMultiStringR
+//                                                               fRange ->  rsMultilineStringRaw
 //
+//  At the end of every line, drop multiline string assumption.
 //                   Multiline case, at the end of line, revert  fRange ->  rsUnknown
-//                  Raw string case, at the end of line, revert  fRange ->  rsStringR
+//                  Raw string case, at the end of line, revert  fRange ->  rsStringRaw
 
 procedure TSynCppSyn.PreStringProc;
 begin
-  if ( fLine[Run+1] = '"' ) and ( fLine[Run+2] = '(' ) then begin
+  if ( fLine[Run+1] = '"' ) and ( fLine[Run+2] = '(' ) then begin             // after 'R'
      inc(Run);
-     fRange := rsStringR;
+     fRange := rsStringRaw;
      StringProc;
   end
   else
@@ -1373,10 +1374,10 @@ begin
   fTokenID := tkString;
   repeat
 
-    if fRange = rsStringR then begin
+    if fRange = rsStringRaw then begin
        if fLine[Run + 1] = #00 then begin
           inc(Run);
-          fRange := rsMultiStringR;
+          fRange := rsMultiLineStringRaw;
           Exit;
        end;
     end
@@ -1422,17 +1423,17 @@ begin
       end;
   end;
 
-  if fRange  = rsMultiStringR then
-        fRange := rsStringR
+  if fRange  = rsMultilineStringRaw then              // drop multiline assumption at eol
+        fRange := rsStringRaw
   else
         fRange := rsUnknown;
 
   repeat
-    if fRange = rsStringR then begin
+    if fRange = rsStringRaw then begin
         if fLine[Run + 1] = #00 then begin
-                             Inc(Run);
-                             fRange := rsMultiStringR;
-                             Exit;
+                Inc(Run);
+                fRange := rsMultilineStringRaw;
+                Exit;
         end
     end
     else
@@ -1498,7 +1499,7 @@ begin
     rsAnsiCAsmBlock, rsDirectiveComment : AnsiCProc;
     rsMultiLineDirective                : DirectiveEndProc;
     rsMultilineString                   : StringEndProc;
-    rsMultiStringR                      : StringEndProc;
+    rsMultilineStringRaw                : StringEndProc;
   else
     begin
       case fLine[Run] of
