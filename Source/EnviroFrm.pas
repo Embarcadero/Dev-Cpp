@@ -238,6 +238,7 @@ end;
 
 procedure TEnviroForm.ListBoxStyleClick(Sender: TObject);
 begin
+  TStyleManager.TrySetStyle(cDelphiStyle[ListBoxStyle.ItemIndex]);
   Panel1.StyleName := cDelphiStyle[ListBoxStyle.ItemIndex];
   Panel1.Repaint;
   for var I := 0 to Panel1.ControlCount-1 do
@@ -493,6 +494,8 @@ end;
 
 procedure TEnviroForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  if self.ModalResult <> mrOk then
+    TStyleManager.TrySetStyle(cDelphiStyle[devData.Style]);
   Action := caFree;
 end;
 

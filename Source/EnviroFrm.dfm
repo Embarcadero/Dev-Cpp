@@ -702,17 +702,12 @@ object EnviroForm: TEnviroForm
           ActivePage = TabSheet1
           Align = alLeft
           TabOrder = 3
-          ExplicitHeight = 159
           object TabSheet1: TTabSheet
             Caption = 'TabSheet1'
-            ExplicitWidth = 92
-            ExplicitHeight = 129
           end
           object TabSheet2: TTabSheet
             Caption = 'TabSheet2'
             ImageIndex = 1
-            ExplicitWidth = 93
-            ExplicitHeight = 129
           end
         end
         object Button2: TButton
