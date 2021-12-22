@@ -603,17 +603,6 @@ object EnviroForm: TEnviroForm
         Height = 15
         Caption = 'Size'
       end
-      object viThemePreview: TVirtualImage
-        Left = 0
-        Top = 150
-        Width = 476
-        Height = 249
-        ImageCollection = dmMain.AppearanceThemeCollection
-        ImageWidth = 0
-        ImageHeight = 0
-        ImageIndex = -1
-        ImageName = 'Windows Classic'
-      end
       object cbUIfont: TComboBox
         Left = 138
         Top = 87
@@ -674,7 +663,7 @@ object EnviroForm: TEnviroForm
       end
       object Panel1: TPanel
         Left = 0
-        Top = 150
+        Top = 143
         Width = 476
         Height = 249
         DoubleBuffered = True
@@ -713,12 +702,17 @@ object EnviroForm: TEnviroForm
           ActivePage = TabSheet1
           Align = alLeft
           TabOrder = 3
+          ExplicitHeight = 159
           object TabSheet1: TTabSheet
             Caption = 'TabSheet1'
+            ExplicitWidth = 92
+            ExplicitHeight = 129
           end
           object TabSheet2: TTabSheet
             Caption = 'TabSheet2'
             ImageIndex = 1
+            ExplicitWidth = 93
+            ExplicitHeight = 129
           end
         end
         object Button2: TButton
