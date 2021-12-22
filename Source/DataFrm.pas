@@ -25,7 +25,7 @@ uses
   SysUtils, Classes, Menus, Controls, SynEditHighlighter, SynHighlighterCpp,
   CodeInsList, SynHighlighterRC, ImgList, System.ImageList,
   Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
-  SVGIconImageListBase, SVGIconImageList, SynEditCodeFolding;
+  SVGIconImageListBase, SVGIconImageList;
 
 type
   PMRUItem = ^TMRUItem;
@@ -53,7 +53,6 @@ type
     SVGImageListMessageStyle: TSVGIconImageList;
     SVGIconImageWelcomeScreen: TSVGIconImageList;
     EMBTImageCollection: TImageCollection;
-    AppearanceThemeCollection: TImageCollection;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
   private

@@ -101,7 +101,6 @@ type
     Button2: TButton;
     Button3: TButton;
     RadioGroup1: TRadioGroup;
-    viThemePreview: TVirtualImage;
     procedure BrowseClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -239,21 +238,10 @@ end;
 
 procedure TEnviroForm.ListBoxStyleClick(Sender: TObject);
 begin
-  if devData.Style = 0 then
-  begin
-    Panel1.Visible := false;
-    viThemePreview.Visible := true;
-    viThemePreview.ImageIndex := ListBoxStyle.ItemIndex;
-  end
-  else
-  begin
-    Panel1.Visible := true;
-    viThemePreview.Visible := false;
-    Panel1.StyleName := cDelphiStyle[ListBoxStyle.ItemIndex];
-    Panel1.Repaint;
-    for var I := 0 to Panel1.ControlCount-1 do
-     Panel1.Controls[i].Repaint;
-    end;
+  Panel1.StyleName := cDelphiStyle[ListBoxStyle.ItemIndex];
+  Panel1.Repaint;
+  for var I := 0 to Panel1.ControlCount-1 do
+   Panel1.Controls[i].Repaint;
 end;
 
 procedure TEnviroForm.LoadText;
