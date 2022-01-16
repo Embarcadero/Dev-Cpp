@@ -40,7 +40,9 @@ CONTENTS:
   Class retrieving info about selected printer and paper size.
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITPRINTERINFO}
 unit SynEditPrinterInfo;
+{$ENDIF}
 
 {$I SynEdit.inc}
 

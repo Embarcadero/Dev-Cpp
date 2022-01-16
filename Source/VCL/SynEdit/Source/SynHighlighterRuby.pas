@@ -76,22 +76,22 @@ type
 type
   TSynRubySyn = class(TSynCustomHighlighter)
   private
-    fRange: TRangeState;
+    FRange: TRangeState;
 {$IFDEF SYN_HEREDOC}
-    fHeredocLength: Byte;
-    fHeredocChecksum: Word;
+    FHeredocLength: Byte;
+    FHeredocChecksum: Word;
 {$ENDIF}
     FTokenID: TtkTokenKind;
-    fStringAttri: TSynHighlighterAttributes;
-    fSymbolAttri: TSynHighlighterAttributes;
-    fKeyAttri: TSynHighlighterAttributes;
-    fSecondKeyAttri: TSynHighlighterAttributes;
-    fNumberAttri: TSynHighlighterAttributes;
-    fCommentAttri: TSynHighlighterAttributes;
-    fSpaceAttri: TSynHighlighterAttributes;
-    fIdentifierAttri: TSynHighlighterAttributes;
-    fKeyWords: TStrings;
-    fSecondKeys: TStrings;
+    FStringAttri: TSynHighlighterAttributes;
+    FSymbolAttri: TSynHighlighterAttributes;
+    FKeyAttri: TSynHighlighterAttributes;
+    FSecondKeyAttri: TSynHighlighterAttributes;
+    FNumberAttri: TSynHighlighterAttributes;
+    FCommentAttri: TSynHighlighterAttributes;
+    FSpaceAttri: TSynHighlighterAttributes;
+    FIdentifierAttri: TSynHighlighterAttributes;
+    FKeyWords: TUnicodeStrings;
+    FSecondKeys: TUnicodeStrings;
     procedure BraceOpenProc;
     procedure PointCommaProc;
     procedure CRProc;
@@ -108,46 +108,46 @@ type
 {$IFDEF SYN_HEREDOC}
     procedure HeredocProc;
 {$ENDIF}
-    procedure SetSecondKeys(const Value: TStrings);
+    procedure SetSecondKeys(const Value: TUnicodeStrings);
   protected
-    function GetSampleSource: string; override;
+    function GetSampleSource: UnicodeString; override;
     function IsFilterStored: Boolean; override;
     procedure NextProcedure;
   public
     class function GetLanguageName: string; override;
-    class function GetFriendlyLanguageName: string; override;
+    class function GetFriendlyLanguageName: UnicodeString; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function GetDefaultAttribute(Index: integer): TSynHighlighterAttributes;
+    function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes;
       override;
     function GetEol: Boolean; override;
     function GetRange: Pointer; override;
     function GetTokenID: TtkTokenKind;
-    function IsKeyword(const AKeyword: string): boolean; override;
-    function IsSecondKeyWord(aToken: string): Boolean;
+    function IsKeyword(const AKeyword: UnicodeString): boolean; override;
+    function IsSecondKeyWord(aToken: UnicodeString): Boolean;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
-    function GetTokenKind: integer; override;
+    function GetTokenKind: Integer; override;
     procedure Next; override;
     procedure SetRange(Value: Pointer); override;
     procedure ResetRange; override;
   published
-    property CommentAttri: TSynHighlighterAttributes read fCommentAttri
-      write fCommentAttri;
-    property IdentifierAttri: TSynHighlighterAttributes read fIdentifierAttri
-      write fIdentifierAttri;
-    property KeyAttri: TSynHighlighterAttributes read fKeyAttri write fKeyAttri;
-    property SecondKeyAttri: TSynHighlighterAttributes read fSecondKeyAttri
-      write fSecondKeyAttri;
-    property SecondKeyWords: TStrings read fSecondKeys write SetSecondKeys;
-    property NumberAttri: TSynHighlighterAttributes read fNumberAttri
-      write fNumberAttri;
-    property SpaceAttri: TSynHighlighterAttributes read fSpaceAttri
-      write fSpaceAttri;
-    property StringAttri: TSynHighlighterAttributes read fStringAttri
-      write fStringAttri;
-    property SymbolAttri: TSynHighlighterAttributes read fSymbolAttri
-      write fSymbolAttri;
+    property CommentAttri: TSynHighlighterAttributes read FCommentAttri
+      write FCommentAttri;
+    property IdentifierAttri: TSynHighlighterAttributes read FIdentifierAttri
+      write FIdentifierAttri;
+    property KeyAttri: TSynHighlighterAttributes read FKeyAttri write FKeyAttri;
+    property SecondKeyAttri: TSynHighlighterAttributes read FSecondKeyAttri
+      write FSecondKeyAttri;
+    property SecondKeyWords: TUnicodeStrings read FSecondKeys write SetSecondKeys;
+    property NumberAttri: TSynHighlighterAttributes read FNumberAttri
+      write FNumberAttri;
+    property SpaceAttri: TSynHighlighterAttributes read FSpaceAttri
+      write FSpaceAttri;
+    property StringAttri: TSynHighlighterAttributes read FStringAttri
+      write FStringAttri;
+    property SymbolAttri: TSynHighlighterAttributes read FSymbolAttri
+      write FSymbolAttri;
   end;
 
 implementation
@@ -158,31 +158,31 @@ uses
 
 const
   RubyKeysCount = 43;
-  RubyKeys: array[1..RubyKeysCount] of string = (
+  RubyKeys: array[1..RubyKeysCount] of UnicodeString = (
     'alias', 'attr', 'begin', 'break', 'case', 'class', 'def', 'do', 'else',
     'elsif', 'end', 'ensure', 'exit', 'extend', 'false', 'for', 'gets', 'if',
     'in', 'include', 'load', 'loop', 'module', 'next', 'nil', 'not', 'print',
     'private', 'public', 'puts', 'raise', 'redo', 'require', 'rescue', 'retry',
     'return', 'self', 'then', 'true', 'unless', 'when', 'while', 'yield');
 
-function TSynRubySyn.IsKeyword(const AKeyword: string): Boolean;
+function TSynRubySyn.IsKeyword(const AKeyword: UnicodeString): Boolean;
 var
   First, Last, I, Compare: Integer;
-  Token: string;
+  Token: UnicodeString;
 begin
   First := 0;
-  Last := fKeywords.Count - 1;
+  Last := FKeyWords.Count - 1;
   Result := False;
-  Token := SysUtils.AnsiUpperCase(AKeyword);
+  Token := SynWideUpperCase(AKeyword);
 
   while First <= Last do
   begin
     I := (First + Last) shr 1;
-    Compare := WideCompareStr(fKeywords[I], Token);
+    Compare := WideCompareStr(FKeyWords[I], Token);
     if Compare = 0 then
     begin
       Result := True;
-      break;
+      Break;
     end
     else if Compare < 0 then
       First := I + 1
@@ -191,23 +191,23 @@ begin
   end;
 end; { IsKeyWord }
 
-function TSynRubySyn.IsSecondKeyWord(aToken: string): Boolean;
+function TSynRubySyn.IsSecondKeyWord(aToken: UnicodeString): Boolean;
 var
   First, Last, I, Compare: Integer;
-  Token: string;
+  Token: UnicodeString;
 begin
   First := 0;
-  Last := fSecondKeys.Count - 1;
+  Last := FSecondKeys.Count - 1;
   Result := False;
-  Token := SysUtils.AnsiUpperCase(aToken);
+  Token := SynWideUpperCase(aToken);
   while First <= Last do
   begin
     I := (First + Last) shr 1;
-    Compare := WideCompareStr(fSecondKeys[i], Token);
+    Compare := WideCompareStr(FSecondKeys[i], Token);
     if Compare = 0 then
     begin
       Result := True;
-      break;
+      Break;
     end
     else if Compare < 0 then
       First := I + 1
@@ -218,96 +218,98 @@ end; { IsSecondKeyWord }
 
 constructor TSynRubySyn.Create(AOwner: TComponent);
 var
-  i: integer;
+  i: Integer;
 begin
   inherited Create(AOwner);
 
-  fCaseSensitive := False;
+  FCaseSensitive := False;
 
-  fKeyWords := TStringList.Create;
-  TStringList(fKeyWords).Sorted := True;
-  TStringList(fKeyWords).Duplicates := dupIgnore;
-  fSecondKeys := TStringList.Create;
-  TStringList(fSecondKeys).Sorted := True;
-  TStringList(fSecondKeys).Duplicates := dupIgnore;
+  FKeyWords := TUnicodeStringList.Create;
+  TUnicodeStringList(FKeyWords).Sorted := True;
+  TUnicodeStringList(FKeyWords).Duplicates := dupIgnore;
+  FSecondKeys := TUnicodeStringList.Create;
+  TUnicodeStringList(FSecondKeys).Sorted := True;
+  TUnicodeStringList(FSecondKeys).Duplicates := dupIgnore;
   if not (csDesigning in ComponentState) then
     for i := 1 to RubyKeysCount do
-      fKeyWords.Add(RubyKeys[i]);
+      FKeyWords.Add(RubyKeys[i]);
 
-  fCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrComment, SYNS_FriendlyAttrComment);
-  fCommentAttri.Foreground := clMaroon;
-  AddAttribute(fCommentAttri);
-  fIdentifierAttri := TSynHighlighterAttributes.Create(SYNS_AttrIdentifier, SYNS_FriendlyAttrIdentifier);
-  AddAttribute(fIdentifierAttri);
-  fKeyAttri := TSynHighlighterAttributes.Create(SYNS_AttrReservedWord, SYNS_FriendlyAttrReservedWord);
-  fKeyAttri.Foreground := clBlue;
-  AddAttribute(fKeyAttri);
-  fSecondKeyAttri := TSynHighlighterAttributes.Create(SYNS_AttrSecondReservedWord, SYNS_FriendlyAttrSecondReservedWord);
-  AddAttribute(fSecondKeyAttri);
-  fNumberAttri := TSynHighlighterAttributes.Create(SYNS_AttrNumber, SYNS_FriendlyAttrNumber);
-  fNumberAttri.Foreground := clGreen;
-  AddAttribute(fNumberAttri);
-  fSpaceAttri := TSynHighlighterAttributes.Create(SYNS_AttrSpace, SYNS_FriendlyAttrSpace);
-  AddAttribute(fSpaceAttri);
-  fStringAttri := TSynHighlighterAttributes.Create(SYNS_AttrString, SYNS_FriendlyAttrString);
-  fStringAttri.Foreground := clPurple;
-  AddAttribute(fStringAttri);
-  fSymbolAttri := TSynHighlighterAttributes.Create(SYNS_AttrSymbol, SYNS_FriendlyAttrSymbol);
-  fSymbolAttri.Foreground := clBlue;
-  AddAttribute(fSymbolAttri);
+  FCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrComment, SYNS_FriendlyAttrComment);
+  FCommentAttri.Foreground := clMaroon;
+  AddAttribute(FCommentAttri);
+  FIdentifierAttri := TSynHighlighterAttributes.Create(SYNS_AttrIdentifier, SYNS_FriendlyAttrIdentifier);
+  AddAttribute(FIdentifierAttri);
+  FKeyAttri := TSynHighlighterAttributes.Create(SYNS_AttrReservedWord, SYNS_FriendlyAttrReservedWord);
+  FKeyAttri.Foreground := clBlue;
+  AddAttribute(FKeyAttri);
+  FSecondKeyAttri := TSynHighlighterAttributes.Create(SYNS_AttrSecondReservedWord, SYNS_FriendlyAttrSecondReservedWord);
+  AddAttribute(FSecondKeyAttri);
+  FNumberAttri := TSynHighlighterAttributes.Create(SYNS_AttrNumber, SYNS_FriendlyAttrNumber);
+  FNumberAttri.Foreground := clGreen;
+  AddAttribute(FNumberAttri);
+  FSpaceAttri := TSynHighlighterAttributes.Create(SYNS_AttrSpace, SYNS_FriendlyAttrSpace);
+  AddAttribute(FSpaceAttri);
+  FStringAttri := TSynHighlighterAttributes.Create(SYNS_AttrString, SYNS_FriendlyAttrString);
+  FStringAttri.Foreground := clPurple;
+  AddAttribute(FStringAttri);
+  FSymbolAttri := TSynHighlighterAttributes.Create(SYNS_AttrSymbol, SYNS_FriendlyAttrSymbol);
+  FSymbolAttri.Foreground := clBlue;
+  AddAttribute(FSymbolAttri);
   SetAttributesOnChange(DefHighlightChange);
 
-  fRange := rsUnknown;
-  fDefaultFilter := SYNS_FilterRuby;
+  FRange := rsUnknown;
+  FDefaultFilter := SYNS_FilterRuby;
 end; { Create }
 
 destructor TSynRubySyn.Destroy;
 begin
-  fKeyWords.Free;
-  fSecondKeys.Free;
+  FKeyWords.Free;
+  FSecondKeys.Free;
   inherited Destroy;
 end; { Destroy }
 
 procedure TSynRubySyn.BraceOpenProc;
 begin
-  inc(Run);
-  fTokenID := tkSymbol;
+  Inc(Run);
+  FTokenID := tkSymbol;
 end;
 
 procedure TSynRubySyn.PointCommaProc;
 begin
-  inc(Run);
-  fTokenID := tkSymbol;
+  Inc(Run);
+  FTokenID := tkSymbol;
 end;
 
 procedure TSynRubySyn.CRProc;
 begin
-  fTokenID := tkSpace;
+  FTokenID := tkSpace;
   case FLine[Run + 1] of
-    #10: inc(Run, 2);
-  else inc(Run);
+    #10:
+      Inc(Run, 2);
+    else
+      Inc(Run);
   end;
 end;
 
 procedure TSynRubySyn.IdentProc;
 begin
-  while IsIdentChar(fLine[Run]) do inc(Run);
+  while IsIdentChar(FLine[Run]) do Inc(Run);
   if IsKeyWord(GetToken) then
   begin
-    fTokenId := tkKey;
+    FTokenID := tkKey;
     Exit;
   end
-  else fTokenId := tkIdentifier;
+  else FTokenID := tkIdentifier;
   if IsSecondKeyWord(GetToken) then
-    fTokenId := tkSecondKey
+    FTokenID := tkSecondKey
   else
-    fTokenId := tkIdentifier;
+    FTokenID := tkIdentifier;
 end;
 
 procedure TSynRubySyn.LFProc;
 begin
-  fTokenID := tkSpace;
-  inc(Run);
+  FTokenID := tkSpace;
+  Inc(Run);
 end;
 
 procedure TSynRubySyn.LowerProc;
@@ -321,7 +323,7 @@ begin
 {$IFDEF SYN_HEREDOC}
   if FLine[Run + 1] = '<' then
   begin
-    fTokenID := tkSymbol;
+    FTokenID := tkSymbol;
 
     SkipRun := 0;
     QuoteChar := #0;
@@ -342,7 +344,7 @@ begin
 
     if IsIdentChar(FLine[Run + SkipRun + 2]) then
     begin
-      inc(Run, 2);
+      Inc(Run, 2);
 
       i := Run;
       while IsIdentChar(FLine[SkipRun + i]) do Inc(i);
@@ -350,41 +352,41 @@ begin
 
       if Len > 255 then
       begin
-        fTokenID := tkUnknown;
+        FTokenID := tkUnknown;
         Exit;
       end;
 
       if (QuoteChar <> #0) and (FLine[Run + SkipRun + Len] <> QuoteChar) then
       begin
-        fTokenID := tkUnknown;
+        FTokenID := tkUnknown;
         Exit;
       end;
 
       if IndentedHeredoc then
-        fRange := rsIndentedHeredoc
+        FRange := rsIndentedHeredoc
       else
-        fRange := rsHeredoc;
-      fHeredocLength := Len;
-      fHeredocChecksum := CalcFCS(FLine[Run + SkipRun], Len);
+        FRange := rsHeredoc;
+      FHeredocLength := Len;
+      FHeredocChecksum := CalcFCS(FLine[Run + SkipRun], Len);
 
       Inc(Run, SkipRun + Len);
-      fTokenID := tkString;
+      FTokenID := tkString;
     end
     else
-      inc(Run, 2);
+      Inc(Run, 2);
   end
   else
 {$ENDIF}
   begin
-    inc(Run);
-    fTokenID := tkSymbol;
+    Inc(Run);
+    FTokenID := tkSymbol;
   end;
 end;
 
 procedure TSynRubySyn.NullProc;
 begin
-  fTokenID := tkNull;
-  inc(Run);
+  FTokenID := tkNull;
+  Inc(Run);
 end;
 
 procedure TSynRubySyn.NumberProc;
@@ -400,22 +402,23 @@ procedure TSynRubySyn.NumberProc;
   end;
 
 begin
-  inc(Run);
-  fTokenID := tkNumber;
+  Inc(Run);
+  FTokenID := tkNumber;
   while IsNumberChar do
   begin
     case FLine[Run] of
       '.':
-        if FLine[Run + 1] = '.' then break;
+        if FLine[Run + 1] = '.' then
+          Break;
     end;
-    inc(Run);
+    Inc(Run);
   end;
 end;
 
 procedure TSynRubySyn.RoundOpenProc;
 begin
-  inc(Run);
-  fTokenId := tkSymbol;
+  Inc(Run);
+  FTokenID := tkSymbol;
 end;
 
 procedure TSynRubySyn.SlashProc;
@@ -423,23 +426,24 @@ begin
   case FLine[Run] of
     '/':
       begin
-        inc(Run);
-        fTokenId := tkSymbol;
+        Inc(Run);
+        FTokenID := tkSymbol;
       end;
     '*':
       begin
-        inc(Run);
-        fTokenId := tkSymbol;
+        Inc(Run);
+        FTokenID := tkSymbol;
       end;
   else
     begin
-      fTokenID := tkComment;
+      FTokenID := tkComment;
       while FLine[Run] <> #0 do
       begin
         case FLine[Run] of
-          #10, #13: break;
+          #10, #13:
+            Break;
         end;
-        inc(Run);
+        Inc(Run);
       end;
     end;
   end;
@@ -447,9 +451,9 @@ end;
 
 procedure TSynRubySyn.SpaceProc;
 begin
-  inc(Run);
-  fTokenID := tkSpace;
-  while (FLine[Run] <= #32) and not IsLineEnd(Run) do inc(Run);
+  Inc(Run);
+  FTokenID := tkSpace;
+  while (FLine[Run] <= #32) and not IsLineEnd(Run) do Inc(Run);
 end;
 
 procedure TSynRubySyn.StringProc;
@@ -472,23 +476,24 @@ begin
 //until the matching close symbol is found. Otherwise the string is read until
 //the next occurrence of the same delimiter.
 
-  fTokenID := tkString;
+  FTokenID := tkString;
   QuoteChar := FLine[Run];      // either " or '
   if (FLine[Run + 1] = QuoteChar) and (FLine[Run + 2] = QuoteChar)
-    then inc(Run, 2);
+    then Inc(Run, 2);
   repeat
     case FLine[Run] of
-      #0, #10, #13: break;
+      #0, #10, #13:
+        Break;
     end;
-    inc(Run);
+    Inc(Run);
   until FLine[Run] = QuoteChar;
-  if FLine[Run] <> #0 then inc(Run);
+  if FLine[Run] <> #0 then Inc(Run);
 end;
 
 procedure TSynRubySyn.UnknownProc;
 begin
-  inc(Run);
-  fTokenID := tkUnknown;
+  Inc(Run);
+  FTokenID := tkUnknown;
 end;
 
 {$IFDEF SYN_HEREDOC}
@@ -502,7 +507,7 @@ procedure TSynRubySyn.HeredocProc;
       #13: CRProc;
     else
       repeat
-        inc(Run);
+        Inc(Run);
       until IsLineEnd(Run);
     end;
   end;
@@ -510,23 +515,23 @@ procedure TSynRubySyn.HeredocProc;
 var
   i : Integer;
 begin
-  if IsLineEnd(Run) and (fTokenPos = Run) then
+  if IsLineEnd(Run) and (FTokenPos = Run) then
   begin
     NextProcedure;
     Exit;
   end;
-  fTokenID := tkString;
+  FTokenID := tkString;
 
-  if fRange = rsIndentedHeredoc then
+  if FRange = rsIndentedHeredoc then
     while FLine[Run] in [WideChar(#9), WideChar(#32)] do Inc(Run);
 
-  if ((Run = 0) and (fRange = rsHeredoc)) or (fRange = rsIndentedHeredoc) then
+  if ((Run = 0) and (FRange = rsHeredoc)) or (FRange = rsIndentedHeredoc) then
   begin
     i := 0;
 
     while not IsLineEnd(FLine[Run + i]) do
     begin
-      if i > fHeredocLength then
+      if i > FHeredocLength then
       begin
         SkipToEOL;
         Exit;
@@ -534,15 +539,15 @@ begin
       Inc(i);
     end;
 
-    if i <> fHeredocLength then
+    if i <> FHeredocLength then
     begin
       SkipToEOL;
       Exit;
     end;
 
-    if (CalcFCS(FLine[Run], i) = fHeredocChecksum) then
+    if (CalcFCS(FLine[Run], i) = FHeredocChecksum) then
     begin
-      fRange := rsUnknown;
+      FRange := rsUnknown;
       Run := Run + i;
       Exit;
     end;
@@ -554,9 +559,9 @@ end;
 
 procedure TSynRubySyn.Next;
 begin
-  fTokenPos := Run;
+  FTokenPos := Run;
 {$IFDEF SYN_HEREDOC}
-  if fRange in [rsHeredoc, rsIndentedHeredoc] then
+  if FRange in [rsHeredoc, rsIndentedHeredoc] then
     HeredocProc
   else
 {$ENDIF}
@@ -584,14 +589,14 @@ begin
   end;
 end;
 
-function TSynRubySyn.GetDefaultAttribute(Index: integer): TSynHighlighterAttributes;
+function TSynRubySyn.GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes;
 begin
   case Index of
-    SYN_ATTR_COMMENT: Result := fCommentAttri;
-    SYN_ATTR_IDENTIFIER: Result := fIdentifierAttri;
-    SYN_ATTR_KEYWORD: Result := fKeyAttri;
-    SYN_ATTR_STRING: Result := fStringAttri;
-    SYN_ATTR_WHITESPACE: Result := fSpaceAttri;
+    SYN_ATTR_COMMENT: Result := FCommentAttri;
+    SYN_ATTR_IDENTIFIER: Result := FIdentifierAttri;
+    SYN_ATTR_KEYWORD: Result := FKeyAttri;
+    SYN_ATTR_STRING: Result := FStringAttri;
+    SYN_ATTR_WHITESPACE: Result := FSpaceAttri;
   else
     Result := nil;
   end;
@@ -599,7 +604,7 @@ end;
 
 function TSynRubySyn.GetEol: Boolean;
 begin
-  Result := Run = fLineLen + 1;
+  Result := Run = FLineLen + 1;
 end;
 
 function TSynRubySyn.GetRange: Pointer;
@@ -609,53 +614,53 @@ var
 {$ENDIF}
 begin
 {$IFDEF SYN_HEREDOC}
-  RangePointer.Range := Ord(fRange);
+  RangePointer.Range := Ord(FRange);
   RangePointer.Length := 0;
   RangePointer.Checksum := 0;
-  if fRange in [rsHeredoc, rsIndentedHeredoc] then
+  if FRange in [rsHeredoc, rsIndentedHeredoc] then
   begin
-    RangePointer.Length := fHeredocLength;
-    RangePointer.Checksum := fHeredocChecksum;
+    RangePointer.Length := FHeredocLength;
+    RangePointer.Checksum := FHeredocChecksum;
   end;
   Result := RangePointer.Ptr;
 {$ELSE}
-  Result := Pointer(fRange);
+  Result := Pointer(FRange);
 {$ENDIF}
 end;
 
 function TSynRubySyn.GetTokenID: TtkTokenKind;
 begin
-  Result := fTokenId;
+  Result := FTokenID;
 end;
 
 function TSynRubySyn.GetTokenAttribute: TSynHighlighterAttributes;
 begin
-  case fTokenID of
-    tkComment: Result := fCommentAttri;
-    tkIdentifier: Result := fIdentifierAttri;
-    tkKey: Result := fKeyAttri;
-    tkSecondKey: Result := fSecondKeyAttri;
-    tkNumber: Result := fNumberAttri;
-    tkSpace: Result := fSpaceAttri;
-    tkString: Result := fStringAttri;
-    tkSymbol: Result := fSymbolAttri;
-    tkUnknown: Result := fSymbolAttri;
+  case FTokenID of
+    tkComment: Result := FCommentAttri;
+    tkIdentifier: Result := FIdentifierAttri;
+    tkKey: Result := FKeyAttri;
+    tkSecondKey: Result := FSecondKeyAttri;
+    tkNumber: Result := FNumberAttri;
+    tkSpace: Result := FSpaceAttri;
+    tkString: Result := FStringAttri;
+    tkSymbol: Result := FSymbolAttri;
+    tkUnknown: Result := FSymbolAttri;
   else
     Result := nil;
   end;
 end;
 
-function TSynRubySyn.GetTokenKind: integer;
+function TSynRubySyn.GetTokenKind: Integer;
 begin
-  Result := Ord(fTokenId);
+  Result := Ord(FTokenID);
 end;
 
 procedure TSynRubySyn.ResetRange;
 begin
-  fRange := rsUnknown;
+  FRange := rsUnknown;
 {$IFDEF SYN_HEREDOC}
-  fHeredocLength := 0;
-  fHeredocChecksum := 0;
+  FHeredocLength := 0;
+  FHeredocChecksum := 0;
 {$ENDIF}
 end;
 
@@ -667,20 +672,20 @@ var
 begin
 {$IFDEF SYN_HEREDOC}
   RangePointer := TRangePointer(Value);
-  fRange := TRangeState(RangePointer.Range);
-  fHeredocLength := 0;
-  fHeredocChecksum := 0;
-  if fRange in [rsHeredoc, rsIndentedHeredoc] then
+  FRange := TRangeState(RangePointer.Range);
+  FHeredocLength := 0;
+  FHeredocChecksum := 0;
+  if FRange in [rsHeredoc, rsIndentedHeredoc] then
   begin
-    fHeredocLength := RangePointer.Length;
-    fHeredocChecksum := RangePointer.Checksum;
+    FHeredocLength := RangePointer.Length;
+    FHeredocChecksum := RangePointer.Checksum;
   end;
 {$ELSE}
-  fRange := TRangeState(Value);
+  FRange := TRangeState(Value);
 {$ENDIF}
 end;
 
-procedure TSynRubySyn.SetSecondKeys(const Value: TStrings);
+procedure TSynRubySyn.SetSecondKeys(const Value: TUnicodeStrings);
 var
   i: Integer;
 begin
@@ -688,16 +693,16 @@ begin
     begin
       Value.BeginUpdate;
       for i := 0 to Value.Count - 1 do
-        Value[i] := SysUtils.AnsiUpperCase(Value[i]);
+        Value[i] := SynWideUpperCase(Value[i]);
       Value.EndUpdate;
     end;
-  fSecondKeys.Assign(Value);
+  FSecondKeys.Assign(Value);
   DefHighLightChange(nil);
 end;
 
 function TSynRubySyn.IsFilterStored: Boolean;
 begin
-  Result := fDefaultFilter <> SYNS_FilterRuby;
+  Result := FDefaultFilter <> SYNS_FilterRuby;
 end;
 
 class function TSynRubySyn.GetLanguageName: string;
@@ -705,7 +710,7 @@ begin
   Result := SYNS_LangRuby;
 end;
 
-function TSynRubySyn.GetSampleSource: string;
+function TSynRubySyn.GetSampleSource: UnicodeString;
 begin
   Result :=
     '# Factorial'+#13#10+
@@ -719,11 +724,13 @@ begin
     'print fact(ARGV[0].to_i), "\n"';
 end;
 
-class function TSynRubySyn.GetFriendlyLanguageName: string;
+class function TSynRubySyn.GetFriendlyLanguageName: UnicodeString;
 begin
   Result := SYNS_FriendlyLangRuby;
 end;
 
 initialization
+{$IFNDEF SYN_CPPB_1}
   RegisterPlaceableHighlighter(TSynRubySyn);
+{$ENDIF}
 end.

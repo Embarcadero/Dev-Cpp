@@ -41,7 +41,11 @@ interface
 uses
   // SynEdit components
   SynEdit,
+  SynMemo,
+  SynEditDocumentManager,
+  {$IFNDEF SYN_DELPHI_PE}
   SynDBEdit,
+  {$ENDIF}
   SynEditStrConst,
   SynEditHighlighter,
   SynEditMiscClasses,
@@ -49,7 +53,7 @@ uses
   SynEditExport,
   SynExportHTML,
   SynExportRTF,
-  SynExportTeX,      
+  SynExportTeX,
   SynHighlighterMulti,
   SynCompletionProposal,
   SynEditPythonBehaviour,
@@ -59,28 +63,38 @@ uses
   SynAutoCorrect,
   SynEditSearch,
   SynEditRegexSearch,
+  {$IFDEF SYN_COMPILER_4_UP}
   SynHighlighterManager,
+  {$ENDIF}
   SynEditOptionsDialog,
   SynHighlighterADSP21xx,
   SynHighlighterAsm,
   SynHighlighterAWK,
-  SynHighlighterBaan, 
+  SynHighlighterBaan,
   SynHighlighterBat,
   SynHighlighterCAC,
   SynHighlighterCache,
-  SynHighlighterCobol,   
+  SynHighlighterCobol,
   SynHighlighterCpp,
   SynHighlighterCS,
   SynHighlighterCss,
   SynHighlighterDfm,
   SynHighlighterDml,
   SynHighlighterDOT,
+  {$ifdef SYN_DELPHI_2010_UP}
+  SynHighlighterAsmMASM,
+  {$endif}
+  {$ifdef SYN_DELPHI_2009_UP}
   SynHighlighterDWS,
+  {$endif}
+  SynHighlighterECMAScript,
   SynHighlighterEiffel,
   SynHighlighterFortran,
   SynHighlighterFoxpro,
   SynHighlighterGalaxy,
-  SynHighlighterGeneral, 
+  SynHighlighterGeneral,
+  SynHighlighterGo,
+  SynHighlighterGLSL,
   SynHighlighterHaskell,
   SynHighlighterHC11,
   SynHighlighterHP48, 
@@ -128,10 +142,13 @@ implementation
 procedure Register;
 begin
 // SynEdit main components
-  RegisterComponents(SYNS_ComponentsPage, [TSynEdit]);
+  RegisterComponents(SYNS_ComponentsPage, [TSynEdit, TSynMemo]);
 
+{$IFNDEF SYN_DELPHI_PE}
   RegisterComponents(SYNS_ComponentsPage, [TDBSynEdit]);
+{$ENDIF}
 
+{$IFDEF SYN_COMPILER_6_UP}
   GroupDescendentsWith(TSynCustomHighlighter, TSynEdit);
   GroupDescendentsWith(TSynEditSearchCustom, TSynEdit);
   GroupDescendentsWith(TSynCustomExporter, TSynEdit);
@@ -146,32 +163,41 @@ begin
   GroupDescendentsWith(TSynHighlighterManager, TSynEdit);
   GroupDescendentsWith(TSynEditOptionsDialog, TSynEdit);
   GroupDescendentsWith(TSynURIOpener, TSynEdit);
+{$ENDIF}
 
 // SynEdit extra components
   RegisterComponents(SYNS_ComponentsPage, [TSynExporterHTML, TSynExporterRTF,
     TSynExporterTeX, TSynEditPythonBehaviour, TSynMultiSyn,
     TSynCompletionProposal, TSynAutoComplete, TSynMacroRecorder,
     TSynEditPrint, TSynEditPrintPreview, TSynAutoCorrect,
-    TSynEditSearch, TSynEditRegexSearch, TSynEditOptionsDialog, TSynURIOpener]);
+    TSynEditSearch, TSynEditRegexSearch, TSynEditOptionsDialog, TSynURIOpener,
+    TSynEditDocumentManager]);
+{$IFDEF SYN_COMPILER_4_UP}
   RegisterComponents(SYNS_ComponentsPage, [TSynHighlighterManager]);
+{$ENDIF}
 
 // SynEdit highlighters
   RegisterComponents(SYNS_HighlightersPage, [
     //classic
     TSynCppSyn, TSynEiffelSyn, TSynFortranSyn, TSynGeneralSyn, TSynJavaSyn,
-    TSynM3Syn, TSynPasSyn, TSynVBSyn, TSynCobolSyn, TSynCSSyn,
+    TSynM3Syn, TSynPasSyn, TSynVBSyn, TSynCobolSyn, TSynCSSyn, TSynGoSyn,
     // internet
     TSynCssSyn, TSynHTMLSyn, TSynJScriptSyn, TSynPHPSyn, TSynVBScriptSyn,
-    TSynXMLSyn, TSynJSONSyn, TSynVrml97Syn,
+    TSynXMLSyn, TSynJSONSyn, TSynVrml97Syn, TSynECMAScriptSyn,
     //interpreted
     TSynAWKSyn, TSynBATSyn,
+    {$ifdef SYN_DELPHI_2009_UP}
     TSynDWSSyn,
-    TSynKixSyn, TSynPerlSyn, TSynPythonSyn,
+    {$endif}
+    TSynKixSyn, TSynPerlSyn, TSynPythonSyn, TSynGLSLSyn,
     TSynTclTkSyn, TSynGWScriptSyn, TSynRubySyn, TSynUNIXShellScriptSyn,
     //database
     TSynCACSyn, TSynCacheSyn, TSynFoxproSyn, TSynSQLSyn, TSynSDDSyn,
     //assembler
     TSynADSP21xxSyn, TSynAsmSyn, TSynHC11Syn, TSynHP48Syn, TSynSTSyn,
+    {$ifdef SYN_DELPHI_2010_UP}
+    TSynAsmMASMSyn,
+    {$endif}
     //data modeling
     TSynDmlSyn, TSynModelicaSyn, TSynSMLSyn,
     //data

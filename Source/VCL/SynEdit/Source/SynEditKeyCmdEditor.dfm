@@ -14,6 +14,7 @@ object SynEditKeystrokeEditorForm: TSynEditKeystrokeEditorForm
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -66,11 +67,12 @@ object SynEditKeystrokeEditorForm: TSynEditKeystrokeEditorForm
     end
     object cmbCommand: TComboBox
       Left = 65
-      Top = 14
+      Top = 10
       Width = 186
       Height = 21
-      Style = csDropDownList
       TabOrder = 0
+      OnExit = cmbCommandExit
+      OnKeyPress = cmbCommandKeyPress
     end
     object btnCancel: TButton
       Left = 177

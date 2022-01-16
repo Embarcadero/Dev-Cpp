@@ -88,7 +88,7 @@ type
     FTokenPositionsList: TLongIntList;
     fIdentFuncTable: array[0..150] of function: TIdTokenKind of object;
     function KeyHash(ToHash: PWideChar): Integer;
-    function KeyComp(aKey: string): Boolean;
+    function KeyComp(aKey: UnicodeString): Boolean;
     function Func49: TIdTokenKind;
     function Func60: TIdTokenKind;
     function Func67: TIdTokenKind;
@@ -123,7 +123,7 @@ type
     procedure SetRunPos(Value: Integer);
     procedure MakeMethodTables;
     function GetRunId: TIdTokenKind;
-    function GetRunToken: string;
+    function GetRunToken: UnicodeString;
   protected
   public
     constructor Create;
@@ -133,10 +133,11 @@ type
     property IgnoreComments: Boolean read fIgnoreComments write fIgnoreComments;
     property Origin: PWideChar read fOrigin write SetOrigin;
     property RunPos: Integer read Run write SetRunPos;
-    function NextToken: string;
+    function NextToken: UnicodeString;
     function EOF: Boolean;
     property RunId: TIdTokenKind read GetRunId;
-    property RunToken: string read GetRunToken;
+    property RunToken: UnicodeString read GetRunToken;
+  published
   end;
 
 implementation
@@ -194,7 +195,7 @@ begin
   fStringLen := ToHash - fToIdent;
 end; { KeyHash }
 
-function TGenLex.KeyComp(aKey: string): Boolean;
+function TGenLex.KeyComp(aKey: UnicodeString): Boolean;
 var
   I: Integer;
   Temp: PWideChar;
@@ -570,7 +571,7 @@ begin
   Result := fFuncTable[Char(fOrigin[Running])];
 end;
 
-function TGenLex.GetRunToken: string;
+function TGenLex.GetRunToken: UnicodeString;
 var
   StartPos, EndPos, StringLen: Integer;
 begin
@@ -595,7 +596,7 @@ begin
   Inc(Run);
 end;
 
-function TGenLex.NextToken: string;
+function TGenLex.NextToken: UnicodeString;
 var
   StartPos, EndPos, Len: LongInt;
 begin

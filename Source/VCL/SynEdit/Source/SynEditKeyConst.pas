@@ -35,7 +35,9 @@ located at http://SynEdit.SourceForge.net
 Known Issues:
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITKEYCONST}
 unit SynEditKeyConst;
+{$ENDIF}
 
 { This unit provides a translation of DELPHI and CLX key constants to
   more readable SynEdit constants }

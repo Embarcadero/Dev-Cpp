@@ -82,7 +82,9 @@ CONTENTS:
 
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITPRINTMARGINS}
 unit SynEditPrintMargins;
+{$ENDIF}
 {$M+}
 
 {$I SynEdit.inc }
@@ -353,7 +355,7 @@ begin
     PRight := PrinterInfo.PrintableWidth - PrinterInfo.PixFromRight(FRight);
   end;
   if LineNumbers and (not LineNumbersInMargin) then
-    PLeft := PLeft + ACanvas.TextWidth(IntToStr(MaxLineNum) + ': ');
+    PLeft := PLeft + TextWidth(ACanvas, IntToStr(MaxLineNum) + ': ');
   PTop := PrinterInfo.PixFromTop(FTop);
   PBottom := PrinterInfo.PrintableHeight - PrinterInfo.PixFromBottom(FBottom);
   PHeader := PrinterInfo.PixFromTop(FHeader);

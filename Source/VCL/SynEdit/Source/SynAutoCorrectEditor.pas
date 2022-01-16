@@ -36,15 +36,24 @@ Known Issues:
 // TODO: use TntUnicode to enable unicode input
 
 
+{$IFNDEF QSYNAUTOCORRECTEDITOR}
 unit SynAutoCorrectEditor;
+{$ENDIF}
 
 interface
 
 {$I SynEdit.inc}
 
 uses
+  {$IFDEF SYN_COMPILER_17_UP}
+  Types,
+  {$ENDIF}
   Windows,  Messages, Graphics, Controls, Forms, Dialogs, ExtCtrls, StdCtrls,
-  Buttons, Registry, SynAutoCorrect, SynUnicode, SysUtils, Classes;
+  Buttons, Registry,
+  SynAutoCorrect,
+  SynUnicode,
+  SysUtils,
+  Classes;
 
 type
   TfrmAutoCorrectEditor = class(TForm)
@@ -67,8 +76,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormPaint(Sender: TObject);
   private
-    procedure lbxItemsDrawItemCLX(Sender: TObject; Index: Integer;
-      Rect: TRect; State: TOwnerDrawState; var Handled: Boolean);
     procedure lbxItemsDrawItem(Control: TWinControl; Index: Integer;
       Rect: TRect; State: TOwnerDrawState);
   public
@@ -89,38 +96,26 @@ implementation
 
 {$R *.dfm}
 
-uses
-  Types;
-
 procedure TfrmAutoCorrectEditor.FormShow(Sender: TObject);
 begin
   lbxItems.Items.Assign(SynAutoCorrect.Items);
   Invalidate;
 end;
 
-procedure TfrmAutoCorrectEditor.lbxItemsDrawItemCLX(Sender: TObject;
-  Index: Integer; Rect: TRect; State: TOwnerDrawState; var Handled: Boolean);
+procedure TfrmAutoCorrectEditor.lbxItemsDrawItem(Control: TWinControl;
+  Index: Integer; Rect: TRect; State: TOwnerDrawState);
 var
-  s: string;
+  s: UnicodeString;
 begin
   with lbxItems do
   begin
     s := Items[Index];
     Canvas.FillRect(Rect);
-    Canvas.TextOut(Rect.Left + 2, Rect.Top, SynAutoCorrect.HalfString(s, True));
-    Canvas.TextOut(Rect.Left + (lbxItems.ClientWidth div 2) + 2, Rect.Top,
+    TextOut(Canvas, Rect.Left + 2, Rect.Top, SynAutoCorrect.HalfString(s, True));
+    TextOut(Canvas, Rect.Left + (lbxItems.ClientWidth div 2) + 2, Rect.Top,
         SynAutoCorrect.HalfString(s, False));
     FormPaint(nil);
   end;
-end;
-
-procedure TfrmAutoCorrectEditor.lbxItemsDrawItem(Control: TWinControl;
-  Index: Integer; Rect: TRect; State: TOwnerDrawState);
-var
-  Dummy: Boolean;
-begin
-  Dummy := True;
-  lbxItemsDrawItemCLX(Control, Index, Rect, State, Dummy);
 end;
 
 procedure TfrmAutoCorrectEditor.btnAddClick(Sender: TObject);
@@ -150,6 +145,7 @@ begin
   if lbxItems.ItemIndex < 0 then
   begin
     MessageBox(0, PChar(SPleaseSelectItem), PChar(SError), MB_ICONERROR or MB_OK);
+
     Exit;
   end;
 

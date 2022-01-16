@@ -720,7 +720,7 @@ object MainForm: TMainForm
       end
     end
     object tbCompile: TToolBar
-      Left = 414
+      Left = 677
       Top = 2
       Width = 256
       Height = 24
@@ -803,7 +803,7 @@ object MainForm: TMainForm
       end
     end
     object tbProject: TToolBar
-      Left = 306
+      Left = 569
       Top = 2
       Width = 95
       Height = 24
@@ -994,7 +994,7 @@ object MainForm: TMainForm
       end
     end
     object tbCompilers: TToolBar
-      Left = 683
+      Left = 306
       Top = 2
       Width = 250
       Height = 24

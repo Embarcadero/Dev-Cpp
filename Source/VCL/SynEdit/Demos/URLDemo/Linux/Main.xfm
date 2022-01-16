@@ -1,0 +1,72 @@
+object Form1: TForm1
+  Left = 206
+  Top = 196
+  Width = 696
+  Height = 491
+  ActiveControl = SynEdit1
+  Caption = 'URL Demo'
+  Color = clBackground
+  PixelsPerInch = 75
+  TextHeight = 18
+  TextWidth = 5
+  object SynEdit1: TSynEdit
+    Left = 0
+    Top = 0
+    Width = 696
+    Height = 491
+    Align = alClient
+    Font.Color = clBlack
+    Font.Height = 13
+    Font.Name = 'adobe-courier'
+    Font.Pitch = fpVariable
+    Font.Style = []
+    TabOrder = 0
+    Gutter.Font.Color = clBlack
+    Gutter.Font.Height = 8
+    Gutter.Font.Name = 'Courier New'
+    Gutter.Font.Pitch = fpVariable
+    Gutter.Font.Style = []
+    Highlighter = SynURISyn1
+    Lines.WideStrings =
+      'This project demonstrates how to use SynURIOpener to make links ' +
+      'clickable.'#13#10#13#10'SynURIOpener has *Cmd properties that need only to' +
+      ' be set under Linux.'#13#10'The *Cmd-strings are executed when a link ' +
+      'is clicked or Ctrl+clicked,'#13#10'depending on CtrlActivatesLinks-pro' +
+      'perty.'#13#10#13#10'In this demo we focus on KDE, but in your program you ' +
+      'should let the user '#13#10'choose what command to use as there is no ' +
+      'environment variable '#13#10'valid/available on all UN*X-systems. '#13#10'As' +
+      ' well, Linux-users prefer to make their own decision.'#13#10#13#10'Example' +
+      's how to set *Cmd-properties, where %s is the placeholder for th' +
+      'e URI:'#13#10'--------------------------------------------------------' +
+      '---------------------'#13#10'''kfmclient openURL %s'''#13#10'''mozilla %s'''#13#10'''ne' +
+      'tscape %s'''#13#10'''kfmclient exec %s'' similar to Windows ShellExecute'#13 +
+      #10#13#10'Kylix has a problem with executing Libc.system()-calls while ' +
+      'in debugging-mode.'#13#10'Therefore this demo includes the unit LibExe' +
+      'c.pas from Andreas Hausladen'#13#10'that fixes this issue.'#13#10'More unoff' +
+      'icial Kylix patches can be found at http://www.kylix-patch.de.vu' +
+      '/'#13#10#13#10'Some test links:'#13#10'----------------'#13#10'(not all real ones, jus' +
+      't to check if correct app starts)'#13#10#13#10'http://www.somewhere.org'#13#10'f' +
+      'tp://superhost.org/downloads/gems.zip'#13#10'www.w3c.org'#13#10'mailto:big@l' +
+      'ebowski.edu'#13#10'douglas@adams.lod'#13#10'news:comp.lang.pascal.borland'
+  end
+  object SynURIOpener1: TSynURIOpener
+    Editor = SynEdit1
+    URIHighlighter = SynURISyn1
+    FtpClientCmd = 'kfmclient exec %s'
+    GopherClientCmd = 'kfmclient exec %s'
+    MailClientCmd = 'kfmclient exec %s'
+    NewsClientCmd = 'kfmclient exec %s'
+    NntpClientCmd = 'kfmclient exec %s'
+    ProsperoClientCmd = 'kfmclient exec %s'
+    TelnetClientCmd = 'kfmclient exec %s'
+    WaisClientCmd = 'kfmclient exec %s'
+    WebBrowserCmd = 'kfmclient exec %s'
+    Left = 600
+    Top = 40
+  end
+  object SynURISyn1: TSynURISyn
+    DefaultFilter = 'All Files (*.*)|*.*'
+    Left = 600
+    Top = 8
+  end
+end

@@ -16,6 +16,8 @@ All Rights Reserved.
 Contributors to the SynEdit and mwEdit projects are listed in the
 Contributors.txt file.
 
+$Id: SynEditHighlighterOptions.pas,v 1.0.2 25.10.2012 11:16:19 CodehunterWorks Exp $
+
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
 
@@ -64,14 +66,14 @@ procedure TSynEditHighlighterOptions.Assign(Source: TPersistent);
 begin
   if Source.InheritsFrom(TSynEditHighlighterOptions) then begin
     with TSynEditHighlighterOptions(Source) do begin
-      FAutoDetectEnabled:= AutoDetectEnabled;
-      FAutoDetectMatchExpression:= AutoDetectMatchExpression;
-      FAutoDetectLineLimit:= AutoDetectLineLimit;
-      FDefaultExtension:= DefaultExtension;
-      FLineCommentarStart:= LineCommentarStart;
-      FLineCommentarEnd:= LineCommentarEnd;
-      FTitle:= Title;
-      FVisible:= Visible;
+      FAutoDetectEnabled := AutoDetectEnabled;
+      FAutoDetectMatchExpression := AutoDetectMatchExpression;
+      FAutoDetectLineLimit := AutoDetectLineLimit;
+      FDefaultExtension := DefaultExtension;
+      FLineCommentarStart := LineCommentarStart;
+      FLineCommentarEnd := LineCommentarEnd;
+      FTitle := Title;
+      FVisible := Visible;
     end;
   end;
 end;
@@ -80,14 +82,14 @@ procedure TSynEditHighlighterOptions.AssignTo(Dest: TPersistent);
 begin
   if Dest.InheritsFrom(TSynEditHighlighterOptions) then begin
     with TSynEditHighlighterOptions(Dest) do begin
-      AutoDetectEnabled:= FAutoDetectEnabled;
-      AutoDetectMatchExpression:= FAutoDetectMatchExpression;
-      AutoDetectLineLimit:= FAutoDetectLineLimit;
-      DefaultExtension:= FDefaultExtension;
-      LineCommentarStart:= FLineCommentarStart;
-      LineCommentarEnd:= FLineCommentarEnd;
-      Title:= FTitle;
-      Visible:= FVisible;
+      AutoDetectEnabled := FAutoDetectEnabled;
+      AutoDetectMatchExpression := FAutoDetectMatchExpression;
+      AutoDetectLineLimit := FAutoDetectLineLimit;
+      DefaultExtension := FDefaultExtension;
+      LineCommentarStart := FLineCommentarStart;
+      LineCommentarEnd := FLineCommentarEnd;
+      Title := FTitle;
+      Visible := FVisible;
     end;
   end;
 end;

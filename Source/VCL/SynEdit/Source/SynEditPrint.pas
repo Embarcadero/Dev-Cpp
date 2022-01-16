@@ -82,7 +82,9 @@ CONTENTS:
     PrintRange(StartPage,EndPage) : Prints the specified page-range (both inclusive)
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITPRINT}
 unit SynEditPrint;
+{$ENDIF}
 
 {$M+}
 {$I SynEdit.inc}
@@ -90,6 +92,9 @@ unit SynEditPrint;
 interface
 
 uses
+  {$IFDEF SYN_COMPILER_17_UP}
+  UITypes,
+  {$ENDIF}
   Windows,
   Graphics,
   Printers,
@@ -113,15 +118,15 @@ type
   //The actual print controller object
   TSynEditPrint = class(TComponent)
   private
-    FCopies: Integer;                                                           
+    FCopies: Integer;
     FFooter: TFooter;
     FHeader: THeader;
-    FLines: TStrings;
+    FLines: TUnicodeStrings;
     FMargins: TSynEditPrintMargins;
     FPageCount: Integer;
     FFont: TFont;
-    FTitle: string;
-    FDocTitle: string;
+    FTitle: UnicodeString;
+    FDocTitle: UnicodeString;                                                      
     FPrinterInfo: TSynEditPrinterInfo;
     FPages: TList;
     FCanvas: TCanvas;
@@ -145,29 +150,24 @@ type
     FDefaultBG: TColor;
     FPageOffset: Integer;
     FRangesOK: Boolean;
-    FMaxWidth: integer;
+    FMaxWidth: Integer;
     FMaxCol: Integer;
     FPagesCounted: Boolean;
     FLineNumbersInMargin: Boolean;
-    FTabWidth: integer;
-    fFontColor: TColor;                                                         
-    fSelectedOnly: Boolean;                                                     
-    fSelAvail: Boolean;
-    fSelMode: TSynSelectionMode;
-    fBlockBegin: TBufferCoord;
-    fBlockEnd: TBufferCoord;
+    FTabWidth: Integer;
+    FFontColor: TColor;
+    FSelectedOnly: Boolean;
+    FSelAvail: Boolean;
+    FSelMode: TSynSelectionMode;
+    FBlockBegin: TBufferCoord;
+    FBlockEnd: TBufferCoord;
     FETODist: PIntArray;
     procedure CalcPages;
-    procedure SetLines(const Value: TStrings);
-    procedure SetFont(const Value: TFont);
-    procedure SetCharWidth(const Value: Integer);
-    procedure SetMaxLeftChar(const Value: Integer);
     procedure PrintPage(Num: Integer);
-    procedure WriteLine(const Text: string);
+    procedure WriteLine(const Text: UnicodeString);
     procedure WriteLineNumber;
-    procedure HandleWrap(const Text: string; MaxWidth: Integer);
-    procedure TextOut(const Text: string; AList: TList);
-    procedure SetHighlighter(const Value: TSynCustomHighlighter);
+    procedure HandleWrap(const Text: UnicodeString; MaxWidth: Integer);
+    procedure TextOut(const Text: UnicodeString; AList: TList);
     procedure RestoreCurrentFont;
     procedure SaveCurrentFont;
     procedure SetPixelsPrInch;
@@ -178,14 +178,19 @@ type
     procedure SetFooter(const Value: TFooter);
     procedure SetHeader(const Value: THeader);
     procedure SetMargins(const Value: TSynEditPrintMargins);
-    function ClipLineToRect(S: string; R: TRect): string;
-    function ExpandAtWideGlyphs(const S: string): string;
+    procedure SetHighlighter(const Value: TSynCustomHighlighter);
+    procedure SetLines(const Value: TUnicodeStrings);
+    procedure SetFont(const Value: TFont);
+    procedure SetCharWidth(const Value: Integer);
+    procedure SetMaxLeftChar(const Value: Integer);
+    function ClipLineToRect(S: UnicodeString; R: TRect): UnicodeString;
+    function ExpandAtWideGlyphs(const S: UnicodeString): UnicodeString;
   protected
     procedure DefineProperties(Filer: TFiler); override;
     property MaxLeftChar: Integer read FMaxLeftChar write SetMaxLeftChar;
     property CharWidth: Integer read FCharWidth write SetCharWidth;
-    procedure PrintStatus(Status: TSynPrintStatus; PageNumber: integer;
-      var Abort: boolean); virtual;
+    procedure PrintStatus(Status: TSynPrintStatus; PageNumber: Integer;
+      var Abort: Boolean); virtual;
     procedure PrintLine(LineNumber, PageNumber: Integer); virtual;
   public
     constructor Create(AOwner: TComponent); override;
@@ -201,17 +206,17 @@ type
     procedure LoadFromStream(AStream: TStream);
     procedure SaveToStream(AStream: TStream);
   published
-    property Copies: integer read FCopies write FCopies;
+    property Copies: Integer read FCopies write FCopies;
     property Header: THeader read FHeader write SetHeader;
     property Footer: TFooter read FFooter write SetFooter;
     property Margins: TSynEditPrintMargins read FMargins write SetMargins;
-    property Lines: TStrings read FLines write SetLines;
+    property Lines: TUnicodeStrings read FLines write SetLines;
     property Font: TFont read FFont write SetFont;
-    property Title: string read FTitle write FTitle;
-    property DocTitle: string read FDocTitle write FDocTitle;
+    property Title: UnicodeString read FTitle write FTitle;
+    property DocTitle: UnicodeString read FDocTitle write FDocTitle;               
     property Wrap: Boolean read FWrap write FWrap default True;
     property Highlight: Boolean read FHighlight write FHighlight default True;
-    property SelectedOnly: Boolean read FSelectedOnly write FSelectedOnly       
+    property SelectedOnly: Boolean read FSelectedOnly write FSelectedOnly
       default False;
     property Colors: Boolean read FColors write FColors default False;
     property LineNumbers: Boolean read FLineNumbers write FLineNumbers
@@ -225,14 +230,14 @@ type
       write SetHighlighter;
     property LineNumbersInMargin: Boolean read FLineNumbersInMargin
       write FLineNumbersInMargin default False;
-    property TabWidth: integer read fTabWidth write fTabWidth;                  
+    property TabWidth: Integer read fTabWidth write fTabWidth;
     property Color: TColor read fDefaultBG write fDefaultBG;                    
   end;
 
 implementation
 
 uses
-  Math, UITypes;
+  Math;
 
 { TSynEditPrint }
 
@@ -242,7 +247,7 @@ begin
   FCopies := 1;
   FFooter := TFooter.Create;
   FHeader := THeader.Create;
-  FLines := TStringList.Create;
+  FLines := TUnicodeStringList.Create;
   FMargins := TSynEditPrintMargins.Create;
   FPrinterInfo := TSynEditPrinterInfo.Create;
   FFont := TFont.Create;
@@ -281,13 +286,16 @@ end;
 procedure TSynEditPrint.DefineProperties(Filer: TFiler);
 begin
   inherited;
+{$IFNDEF UNICODE}
+  UnicodeDefineProperties(Filer, Self);
+{$ENDIF}
 end;
 
-procedure TSynEditPrint.SetLines(const Value: TStrings);
+procedure TSynEditPrint.SetLines(const Value: TUnicodeStrings);
 var
   i, j: Integer;
   ConvertTabsProc: TConvertTabsProc;
-  TmpString: string;
+  TmpString: UnicodeString;
 begin
   ConvertTabsProc := GetBestConvertTabsProc(FTabWidth);
   with FLines do
@@ -299,7 +307,7 @@ begin
       begin
         TmpString := ConvertTabsProc(Value[i], FTabWidth);
         j := Pos(#9, TmpString);
-        While j > 0 do
+        while j > 0 do
         begin
           TmpString[j] := ' ';
           j := Pos(#9, TmpString);
@@ -342,7 +350,7 @@ end;
 // are usually wider than latin glpyhs)
 // This is only to simplify paint-operations and has nothing to do with
 // multi-byte chars.
-function TSynEditPrint.ExpandAtWideGlyphs(const S: string): string;
+function TSynEditPrint.ExpandAtWideGlyphs(const S: UnicodeString): UnicodeString;
 var
   i, j, CountOfAvgGlyphs: Integer;
 begin
@@ -352,9 +360,8 @@ begin
   SetLength(Result, Length(S) * 2); // speed improvement
   for i := 1 to Length(S) do
   begin
-    inc(j);
-    // Introduce a small tolerance Issue 54
-    CountOfAvgGlyphs := Ceil(FCanvas.TextWidth(S[i]) / fCharWidth - 0.04);
+    Inc(j);
+    CountOfAvgGlyphs := Ceil(TextWidth(FCanvas, S[i]) / fCharWidth);
 
     if j + CountOfAvgGlyphs > Length(Result) then
       SetLength(Result, Length(Result) + 128);
@@ -363,8 +370,8 @@ begin
     while CountOfAvgGlyphs > 1 do
     begin
       Result[j] := FillerChar;
-      inc(j);
-      dec(CountOfAvgGlyphs);
+      Inc(j);
+      Dec(CountOfAvgGlyphs);
     end;
 
     Result[j] := S[i];
@@ -381,7 +388,7 @@ var
   TmpTextMetrics: TTextMetric;
 begin
 //  FDefaultBG := FCanvas.Brush.Color;                                          
-  fFontColor := FFont.Color;
+  FFontColor := FFont.Color;
   FCanvas.Font.Assign(FFont);
   if not FPrinting then
   begin
@@ -402,7 +409,7 @@ begin
   CalcPages;
   FHeader.InitPrint(FCanvas, FPageCount, FTitle, FMargins);
   FFooter.InitPrint(FCanvas, FPageCount, FTitle, FMargins);
-  FSynOK := Highlight and Assigned(FHighLighter) and (FLines.Count > 0);
+  FSynOK := Highlight and Assigned(FHighlighter) and (FLines.Count > 0);
 end;
 
 procedure TSynEditPrint.SetPixelsPrInch;
@@ -425,7 +432,7 @@ begin
   if not FRangesOK and Assigned(FHighlighter) and (Lines.Count > 0) then
   begin
     FHighlighter.ResetRange;
-    FLines.Objects[0] := fHighlighter.GetRange;
+    FLines.Objects[0] := FHighlighter.GetRange;
     i := 1;
     while i < Lines.Count do
     begin
@@ -441,7 +448,7 @@ end;
 // Calculates the total number of pages
 procedure TSynEditPrint.CalcPages;
 var
-  AStr, Text: string;
+  AStr, Text: UnicodeString;
   StrWidth: Integer;
   i, j: Integer;
   AList: TList;
@@ -458,8 +465,8 @@ var
   end;
 
 var
-  iStartLine, iEndLine: integer;
-  iSelStart, iSelLen: integer;
+  iStartLine, iEndLine: Integer;
+  iSelStart, iSelLen: Integer;
 begin
   InitRanges;
   for i := 0 to FPages.Count - 1 do
@@ -468,7 +475,7 @@ begin
   FMaxWidth := FMargins.PRight - FMargins.PLeft;
   AStr := '';
   FMaxCol := 0;
-  while FCanvas.TextWidth(AStr) < FMaxWidth do
+  while TextWidth(FCanvas, AStr) < FMaxWidth do
   begin
     AStr := AStr + 'W';
     FMaxCol := FMaxCol + 1;
@@ -477,9 +484,9 @@ begin
   {FTestString is used to Calculate MaxWidth when prewiewing and printing -
    else the length is not calculated correctly when prewiewing and the
    zoom is different from 0.25,0.5,1,2,4 (as for example 1.20) - WHY???}
-//  fTestString := StringofChar('W', FMaxCol);
-  AStr := StringofChar('W', FMaxCol);
-  FMaxWidth := FCanvas.TextWidth(AStr);
+//  fTestString := UnicodeStringOfChar('W', FMaxCol);
+  AStr := UnicodeStringOfChar('W', FMaxCol);
+  FMaxWidth := TextWidth(FCanvas, AStr);
   FPageCount := 1;
   PageLine := TPageLine.Create;
   PageLine.FirstLine := 0;
@@ -487,8 +494,8 @@ begin
   YPos := FMargins.PTop;
   if SelectedOnly then
   begin
-    iStartLine := fBlockBegin.Line -1;
-    iEndLine := fBlockEnd.Line -1;
+    iStartLine := FBlockBegin.Line -1;
+    iEndLine := FBlockEnd.Line -1;
   end
   else begin
     iStartLine := 0;
@@ -496,16 +503,16 @@ begin
   end;
   for i := iStartLine to iEndLine do
   begin
-    if not fSelectedOnly or (fSelMode = smLine) then
+    if not FSelectedOnly or (FSelMode = smLine) then
       Text := Lines[i]
     else
     begin
-      if (fSelMode = smColumn) or (i = fBlockBegin.Line -1) then
-        iSelStart := fBlockBegin.Char
+      if (FSelMode = smColumn) or (i = FBlockBegin.Line -1) then
+        iSelStart := FBlockBegin.Char
       else
         iSelStart := 1;
-      if (fSelMode = smColumn) or (i = fBlockEnd.Line -1) then
-        iSelLen := fBlockEnd.Char  - iSelStart
+      if (FSelMode = smColumn) or (i = FBlockEnd.Line -1) then
+        iSelLen := FBlockEnd.Char  - iSelStart
       else
         iSelLen := MaxInt;
       Text := Copy( Lines[i], iSelStart, iSelLen );
@@ -520,7 +527,7 @@ begin
       PageLine.FirstLine := i;
       FPages.Add(PageLine);
     end;
-    StrWidth := FCanvas.TextWidth(Text);
+    StrWidth := TextWidth(FCanvas, Text);
     {Check for wrap}
     if Wrap and (StrWidth > FMaxWidth) then begin                          
       AList := TList.Create;
@@ -559,20 +566,20 @@ end;
   the linenumbers should not be placed in the margin) }
 procedure TSynEditPrint.WriteLineNumber;
 var
-  AStr: string;
+  AStr: UnicodeString;
 begin
   SaveCurrentFont;
   AStr := IntToStr(FLineNumber + FLineOffset) + ': ';
   FCanvas.Brush.Color := FDefaultBG; 
   FCanvas.Font.Style := [];
   FCanvas.Font.Color := clBlack;
-  FCanvas.TextOut(FMargins.PLeft - FCanvas.TextWidth(AStr), FYPos, AStr);
+  SynUnicode.TextOut(FCanvas, FMargins.PLeft - TextWidth(FCanvas, AStr), FYPos, AStr);
   RestoreCurrentFont;
 end;
 
-procedure TSynEditPrint.HandleWrap(const Text: string; MaxWidth: Integer);
+procedure TSynEditPrint.HandleWrap(const Text: UnicodeString; MaxWidth: Integer);
 var
-  AStr: string;
+  AStr: UnicodeString;
   AList: TList;
   j: Integer;
 
@@ -630,32 +637,32 @@ begin
   FCanvas.Font.Assign(FOldFont);
 end;
 
-function TSynEditPrint.ClipLineToRect(S: string; R: TRect): string;
+function TSynEditPrint.ClipLineToRect(S: UnicodeString; R: TRect): UnicodeString;
 begin
- while FCanvas.TextWidth(S) > FMaxWidth do
+ while TextWidth(FCanvas, S) > FMaxWidth do
     SetLength(S, Length(S) - 1);
 
   Result := S;
 end;
 
 //Does the actual printing
-procedure TSynEditPrint.TextOut(const Text: string; AList: TList);
+procedure TSynEditPrint.TextOut(const Text: UnicodeString; AList: TList);
 var
-  Token: string;
+  Token: UnicodeString;
   TokenPos: Integer;
   Attr: TSynHighlighterAttributes;
   AColor: TColor;
   TokenStart: Integer;
   LCount: Integer;
   Handled: Boolean;
-  aStr: string;
+  aStr: UnicodeString;
   i, WrapPos, OldWrapPos: Integer;
-  Lines: TStringList;
+  Lines: TUnicodeStringList;
   ClipRect: TRect;
-  sLine, sLineExpandedAtWideGlyphs: string;
+  sLine, sLineExpandedAtWideGlyphs: UnicodeString;
   ExpandedPos: Integer;
 
-  procedure InitETODist(CharWidth: Integer; const Text: string);
+  procedure InitETODist(CharWidth: Integer; const Text: UnicodeString);
   var
     Size: TSize;
     i: Integer;
@@ -664,12 +671,11 @@ var
     for i := 0 to Length(Text) - 1 do
     begin
       Size := GetTextSize(FCanvas.Handle, @Text[i + 1], 1);
-      // Introduce a small tolerance (#54)
-      FETODist[i] := Ceil(Size.cx / CharWidth - 0.04) * CharWidth;
+      FETODist[i] := Ceil(Size.cx / CharWidth) * CharWidth;
     end;
   end;
-  
-  procedure ClippedTextOut(X, Y: Integer; Text: string);
+
+  procedure ClippedTextOut(X, Y: Integer; Text: UnicodeString);
   begin
     Text := ClipLineToRect(Text, ClipRect);
     InitETODist(FCharWidth, Text);
@@ -679,7 +685,7 @@ var
 
   procedure SplitToken;
   var
-    AStr: string;
+    AStr: UnicodeString;
     Last: Integer;
     FirstPos: Integer;
     TokenEnd: Integer;
@@ -718,11 +724,11 @@ begin
     Token := '';
     TokenStart := 0;
     LCount := 0;
-    while not FHighLighter.GetEol do
+    while not FHighlighter.GetEol do
     begin
-      Token := FHighLighter.GetToken;
-      TokenPos := FHighLighter.GetTokenPos;
-      Attr := FHighLighter.GetTokenAttribute;
+      Token := FHighlighter.GetToken;
+      TokenPos := FHighlighter.GetTokenPos;
+      Attr := FHighlighter.GetTokenAttribute;
       if Assigned(Attr) then
       begin
         FCanvas.Font.Style := Attr.Style;
@@ -739,13 +745,13 @@ begin
         end
         else
         begin
-          FCanvas.Font.Color := fFontColor;                                     
+          FCanvas.Font.Color := FFontColor;
           FCanvas.Brush.Color := FDefaultBG;
         end;
       end
       else
       begin
-        FCanvas.Font.Color := fFontColor;                                       
+        FCanvas.Font.Color := FFontColor;
         FCanvas.Brush.Color := FDefaultBG;
       end;
       Handled := False;
@@ -772,16 +778,16 @@ begin
       end;
       if not Handled then
       begin
-        ExpandedPos := FHighLighter.PosToExpandedPos(TokenPos - TokenStart);
+        ExpandedPos := FHighlighter.PosToExpandedPos(TokenPos - TokenStart);
         ClippedTextOut(FMargins.PLeft + ExpandedPos * FCharWidth, FYPos, Token);
       end;
-      FHighLighter.Next;
+      FHighlighter.Next;
     end;
     RestoreCurrentFont;
   end
   else
   begin
-    Lines := TStringList.Create;
+    Lines := TUnicodeStringList.Create;
     try
       OldWrapPos := 0;
       if Assigned(AList) then
@@ -810,12 +816,12 @@ begin
   end
 end;
 
-procedure TSynEditPrint.WriteLine(const Text: string);
+procedure TSynEditPrint.WriteLine(const Text: UnicodeString);
 var
   StrWidth: Integer;
 begin
   if FLineNumbers then WriteLineNumber;
-  StrWidth := FCanvas.TextWidth(Text);
+  StrWidth := TextWidth(FCanvas, Text);
   {Note that MaxWidth is calculated, using FTestString found in CalcPages -
    else the length is not calculated correctly when prewiewing and the
    zoom is different from 0.25,0.5,1,2,4 (as for example 1.20) - WHY???
@@ -831,7 +837,7 @@ procedure TSynEditPrint.PrintPage(Num: Integer);
 //Prints a page
 var
   i, iEnd: Integer;
-  iSelStart, iSelLen: integer;
+  iSelStart, iSelLen: Integer;
 begin
   PrintStatus(psNewPage, Num, FAbort);
   if not FAbort then
@@ -852,17 +858,17 @@ begin
       for i := TPageLine(FPages[Num - 1]).FirstLine to iEnd do
       begin
         FLineNumber := i + 1;
-        if (not fSelectedOnly or ((i >= fBlockBegin.Line - 1) and (i <= fBlockEnd.Line - 1))) then begin
-          if (not fSelectedOnly or (fSelMode = smLine)) then
+        if (not FSelectedOnly or ((i >= FBlockBegin.Line - 1) and (i <= FBlockEnd.Line - 1))) then begin
+          if (not FSelectedOnly or (FSelMode = smLine)) then
             WriteLine(Lines[i])
           else
           begin
-            if (fSelMode = smColumn) or (i = fBlockBegin.Line -1) then
-              iSelStart := fBlockBegin.Char
+            if (FSelMode = smColumn) or (i = FBlockBegin.Line -1) then
+              iSelStart := FBlockBegin.Char
             else
               iSelStart := 1;
-            if (fSelMode = smColumn) or (i = fBlockEnd.Line -1) then
-              iSelLen := fBlockEnd.Char  - iSelStart
+            if (FSelMode = smColumn) or (i = FBlockEnd.Line -1) then
+              iSelLen := FBlockEnd.Char  - iSelStart
             else
               iSelLen := MaxInt;
             WriteLine( Copy( Lines[i], iSelStart, iSelLen ) );
@@ -902,8 +908,8 @@ procedure TSynEditPrint.PrintRange(StartPage, EndPage: Integer);
 var
   i, ii: Integer;
 begin
-  if fSelectedOnly and not fSelAvail then
-    exit;
+  if FSelectedOnly and not FSelAvail then
+    Exit;
 
   FPrinting := True;
   FAbort := False;
@@ -942,7 +948,7 @@ begin
 end;
 
 procedure TSynEditPrint.PrintStatus(Status: TSynPrintStatus;
-  PageNumber: integer; var Abort: boolean);
+  PageNumber: Integer; var Abort: Boolean);
 //Fires the OnPrintStatus event
 begin
   Abort := False;
@@ -993,10 +999,10 @@ begin
   Font := Value.Font;
   FTabWidth := Value.TabWidth;
   Lines := Value.Lines;
-  fSelAvail := Value.SelAvail;
-  fBlockBegin := Value.BlockBegin;
-  fBlockEnd := Value.BlockEnd;
-  fSelMode := Value.SelectionMode;
+  FSelAvail := Value.SelAvail;
+  FBlockBegin := Value.BlockBegin;
+  FBlockEnd := Value.BlockEnd;
+  FSelMode := Value.SelectionMode;
 end;
 
 procedure TSynEditPrint.LoadFromStream(AStream: TStream);

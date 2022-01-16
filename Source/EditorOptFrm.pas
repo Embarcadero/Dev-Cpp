@@ -26,7 +26,7 @@ uses
   Dialogs, ComCtrls, StdCtrls, ExtCtrls, Spin,
   SynEdit, SynEditHighlighter, SynHighlighterCpp,
   Buttons, ClassBrowser, CppParser, CppTokenizer, StrUtils, Grids,
-  CppPreprocessor;
+  CppPreprocessor, SynEditCodeFolding;
 
 type
   // Keep history of what we have accessed (does not mean changed)

@@ -31,6 +31,8 @@ located at http://SynEdit.SourceForge.net
 
 unit SynHighlighterJSON;
 
+{$I SynEdit.inc}
+
 interface
 
 uses
@@ -39,11 +41,7 @@ uses
   SynEditTypes,
   SynEditHighlighter,
   SynUnicode,
-  //++ CodeFolding
-  SynEditCodeFolding,
-  //++ CodeFolding
-  SysUtils,
-  Classes;
+  SysUtils, Classes;
 
 type
   TtkTokenKind = (tkString, tkReserved, tkNull, tkNumber, tkSpace,
@@ -52,9 +50,7 @@ type
   TRangeState = (rsUnknown, rsAttribute, rsObjectValue, rsArrayValue);
 
 type
-//++ CodeFolding
-  TSynJSONSyn = class(TSynCustomCodeFoldingHighlighter)
-//-- CodeFolding
+  TSynJSONSyn = class(TSynCustomHighLighter)
   private
     FRange: TRangeState;
     FTokenID: TtkTokenKind;
@@ -80,27 +76,23 @@ type
     procedure SymbolProc;
     procedure UnknownProc;
   protected
-    function GetSampleSource: string; override;
+    function GetSampleSource: UnicodeString; override;
     function IsFilterStored: Boolean; override;
   public
     class function GetLanguageName: string; override;
-    class function GetFriendlyLanguageName: string; override;
+    class function GetFriendlyLanguageName: UnicodeString; override;
   public
     constructor Create(AOwner: TComponent); override;
-    function GetDefaultAttribute(Index: integer): TSynHighlighterAttributes;
+    function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes;
       override;
     function GetEol: Boolean; override;
     function GetRange: Pointer; override;
     function GetTokenID: TtkTokenKind;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
-    function GetTokenKind: integer; override;
+    function GetTokenKind: Integer; override;
     procedure Next; override;
     procedure SetRange(Value: Pointer); override;
     procedure ResetRange; override;
-//++ CodeFolding
-    procedure ScanForFoldRanges(FoldRanges: TSynFoldRanges;
-      LinesToScan: TStrings; FromLine: Integer; ToLine: Integer); override;
-//-- CodeFolding
   published
     property AttributeAttri: TSynHighlighterAttributes read FAttributeAttri
       write FAttributeAttri;
@@ -120,6 +112,7 @@ implementation
 
 uses
   SynEditStrConst;
+
 
 { TSynJSONSyn }
 
@@ -347,7 +340,12 @@ end;
 
 procedure TSynJSONSyn.StringProc;
 
-  function IsHex(Digit: Char): Boolean;
+  function IsHex(Digit: AnsiChar): Boolean; overload;
+  begin 
+    Result := CharInSet(Digit, ['0'..'9', 'A'..'F', 'a'..'f']); 
+  end; 
+
+  function IsHex(Digit: WideChar): Boolean; overload;
   begin
     Result := CharInSet(Digit, ['0'..'9', 'A'..'F', 'a'..'f']);
   end;
@@ -400,7 +398,7 @@ end;
 
 procedure TSynJSONSyn.Next;
 begin
-  fTokenPos := Run;
+  FTokenPos := Run;
   case FLine[Run] of
     #0: NullProc;
     #1..#9, #11, #12, #14..#32: SpaceProc;
@@ -423,7 +421,7 @@ begin
   inherited;
 end;
 
-function TSynJSONSyn.GetDefaultAttribute(Index: integer): TSynHighlighterAttributes;
+function TSynJSONSyn.GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes;
 begin
   case Index of
     SYN_ATTR_KEYWORD: Result := FReservedAttri;
@@ -438,7 +436,7 @@ end;
 
 function TSynJSONSyn.GetEol: Boolean;
 begin
-  Result := Run = fLineLen + 1;
+  Result := Run = FLineLen + 1;
 end;
 
 function TSynJSONSyn.GetRange: Pointer;
@@ -468,7 +466,7 @@ begin
   end;
 end;
 
-function TSynJSONSyn.GetTokenKind: integer;
+function TSynJSONSyn.GetTokenKind: Integer;
 begin
   Result := Ord(FTokenID);
 end;
@@ -477,87 +475,6 @@ procedure TSynJSONSyn.ResetRange;
 begin
   FRange := rsUnknown;
 end;
-
-//++ CodeFolding
-procedure TSynJSONSyn.ScanForFoldRanges(FoldRanges: TSynFoldRanges;
-  LinesToScan: TStrings; FromLine, ToLine: Integer);
-var
-  CurLine: String;
-  Line: Integer;
-
-  function LineHasChar(Line: Integer; character: char;
-  StartCol : Integer): boolean; // faster than Pos!
-  var
-    i: Integer;
-  begin
-    result := false;
-    for I := StartCol to Length(CurLine) do begin
-      if CurLine[i] = character then begin
-        // Char must have proper highlighting (ignore stuff inside comments...)
-        if GetHighlighterAttriAtRowCol(LinesToScan, Line, I) <> CommentAttribute then begin
-          result := true;
-          break;
-        end;
-      end;
-    end;
-  end;
-
-  function FindBraces(Line: Integer; OpenBrace, CloseBrace: char; FoldType: integer) : Boolean;
-  Var
-    Col : Integer;
-  begin
-    Result := False;
-
-    for Col := 1 to Length(CurLine) do
-    begin
-      // We've found a starting character
-      if CurLine[col] = OpenBrace then
-      begin
-        // Char must have proper highlighting (ignore stuff inside comments...)
-        if GetHighlighterAttriAtRowCol(LinesToScan, Line, Col) <> CommentAttribute then
-        begin
-          // And ignore lines with both opening and closing chars in them
-          if not LineHasChar(Line, CloseBrace, col + 1) then begin
-            FoldRanges.StartFoldRange(Line + 1, FoldType);
-            Result := True;
-          end;
-          // Skip until a newline
-          break;
-        end;
-      end else if CurLine[col] = CloseBrace then
-      begin
-        if GetHighlighterAttriAtRowCol(LinesToScan, Line, Col) <> CommentAttribute then
-        begin
-          // And ignore lines with both opening and closing chars in them
-          if not LineHasChar(Line, OpenBrace, col + 1) then begin
-            FoldRanges.StopFoldRange(Line + 1, FoldType);
-            Result := True;
-          end;
-          // Skip until a newline
-          break;
-        end;
-      end;
-    end; // for Col
-  end;
-
-begin
-  for Line := FromLine to ToLine do
-  begin
-    CurLine := LinesToScan[Line];
-
-    // Skip empty lines
-    if CurLine = '' then begin
-      FoldRanges.NoFoldInfo(Line + 1);
-      Continue;
-    end;
-
-    // Find an braces on this line  (Fold Type 1)
-    if not FindBraces(Line, '{', '}', 1) then
-      if not FindBraces(Line, '[', ']', 2) then
-        FoldRanges.NoFoldInfo(Line + 1);
-  end; // while Line
-end;
-//-- CodeFolding
 
 procedure TSynJSONSyn.SetRange(Value: Pointer);
 begin
@@ -574,7 +491,7 @@ begin
   Result := SYNS_LangJSON;
 end;
 
-function TSynJSONSyn.GetSampleSource: string;
+function TSynJSONSyn.GetSampleSource: UnicodeString;
 begin
   Result :=
     '{'#13#10 +
@@ -605,11 +522,13 @@ begin
     '}';
 end;
 
-class function TSynJSONSyn.GetFriendlyLanguageName: string;
+class function TSynJSONSyn.GetFriendlyLanguageName: UnicodeString;
 begin
   Result := SYNS_FriendlyLangJSON;
 end;
 
 initialization
+{$IFNDEF SYN_CPPB_1}
   RegisterPlaceableHighlighter(TSynJSONSyn);
+{$ENDIF}
 end.

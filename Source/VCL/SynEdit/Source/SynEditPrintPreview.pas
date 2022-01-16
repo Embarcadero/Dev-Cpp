@@ -44,7 +44,9 @@ CONTENTS:
   before the preview is shown, and when the printer is changed)
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITPRINTPREVIEW}
 unit SynEditPrintPreview;
+{$ENDIF}
 
 {$I SynEdit.inc}
 
@@ -52,7 +54,12 @@ unit SynEditPrintPreview;
 interface
 
 uses
+  {$IFDEF SYN_COMPILER_7}
   Themes,
+  {$ENDIF}
+  {$IFDEF SYN_COMPILER_17_UP}
+  Types,
+  {$ENDIF}
   Windows,
   Controls,
   Messages,
@@ -66,6 +73,21 @@ type
 //Event raised when page is changed in preview
   TPreviewPageEvent = procedure(Sender: TObject; PageNumber: Integer) of object;
   TSynPreviewScale = (pscWholePage, pscPageWidth, pscUserScaled);
+
+  {$IFNDEF SYN_COMPILER_4_UP}
+  TWMMouseWheel = record
+    Msg: Cardinal;
+    Keys: SmallInt;
+    WheelDelta: SmallInt;
+    case Integer of
+      0: (
+        XPos: Smallint;
+        YPos: Smallint);
+      1: (
+        Pos: TSmallPoint;
+        Result: Longint);
+  end;
+  {$ENDIF}
 
   TSynEditPrintPreview = class(TCustomControl)
   protected
@@ -94,7 +116,8 @@ type
     procedure WMHScroll(var Msg: TWMHScroll); message WM_HSCROLL;
     procedure WMSize(var Msg: TWMSize); message WM_SIZE;
     procedure WMVScroll(var Msg: TWMVScroll); message WM_VSCROLL;
-    procedure WMMouseWheel(var Message: TWMMouseWheel); message WM_MOUSEWHEEL;
+    procedure WMMouseWheel(var Message: TWMMouseWheel); message
+      {$IFDEF SYN_COMPILER_3_UP} WM_MOUSEWHEEL {$ELSE} $020A {$ENDIF};
     procedure PaintPaper;
     function GetPageCount: Integer;
   protected
@@ -150,7 +173,7 @@ type
 implementation
 
 uses
-  Types, SynEditStrConst;
+  SynEditStrConst;
 
 const
   MARGIN_X = 12; // margin width left and right of page
@@ -162,7 +185,9 @@ const
 constructor TSynEditPrintPreview.Create(AOwner: TComponent);
 begin
   inherited;
+{$IFDEF SYN_COMPILER_7_UP}
   ControlStyle := ControlStyle + [csNeedsBorderPaint];
+{$ENDIF}
   FBorderStyle := bsSingle;
   FScaleMode := pscUserScaled;
   FScalePercent := 100;
@@ -283,7 +308,8 @@ begin
     end;
     if (NULLREGION <> ExtSelectClipRgn(Handle, rgnPaper, RGN_DIFF)) then
       FillRect(rcClip);
-      // paper shadow
+
+    // paper shadow
     Brush.Color := clDkGray;
     with rcPaper do begin
       for i := 1 to SHADOW_SIZE do
@@ -291,6 +317,7 @@ begin
           Point(Right + i, Top + i)]);
     end;
       // paint paper background
+
     SelectClipRgn(Handle, rgnPaper);
     Brush.Color := FPageBG;
     with rcPaper do
@@ -514,8 +541,8 @@ begin
     FScaleMode := Value;
     FScrollPosition := Point(0, 0);
     SizeChanged;
-    if Assigned(FOnScaleChange) then                                            // JD 2002-01-9
-      FOnScaleChange(Self);                                                     // JD 2002-01-9
+    if Assigned(FOnScaleChange) then
+      FOnScaleChange(Self);
     Invalidate;
   end;
 end;
@@ -530,8 +557,8 @@ begin
     Invalidate;
   end else
     ScaleMode := pscUserScaled;
-  if Assigned(FOnScaleChange) then                                              // JD 2002-01-9
-    FOnScaleChange(Self);                                                       // JD 2002-01-9
+  if Assigned(FOnScaleChange) then
+    FOnScaleChange(Self);
 end;
 
 procedure TSynEditPrintPreview.WMEraseBkgnd(var Msg: TWMEraseBkgnd);
@@ -608,11 +635,21 @@ begin
                 ScrollHint.Visible := TRUE;
               end;
               s := Format(SYNS_PreviewScrollInfoFmt, [FPageNumber]);
+{$IFDEF SYN_COMPILER_3_UP}
               rc := ScrollHint.CalcHintRect(200, s, nil);
+{$ELSE}
+              rc := Rect(0, 0, TextWidth(ScrollHint.Canvas, s) + 6,
+                TextHeight(ScrollHint.Canvas, s) + 4);
+{$ENDIF}
               pt := ClientToScreen(Point(ClientWidth - rc.Right - 4, 10));
               OffsetRect(rc, pt.x, pt.y);
               ScrollHint.ActivateHint(rc, s);
+{$IFDEF SYN_COMPILER_3}
               SendMessage(ScrollHint.Handle, WM_NCPAINT, 1, 0);
+{$ENDIF}
+{$IFNDEF SYN_COMPILER_3_UP}
+              ScrollHint.Invalidate;
+{$ENDIF}
               ScrollHint.Update;
             end;
           end;
@@ -647,6 +684,10 @@ begin
 end;
 
 procedure TSynEditPrintPreview.WMMouseWheel(var Message: TWMMouseWheel);
+{$IFNDEF SYN_COMPILER_3_UP}
+const
+  WHEEL_DELTA = 120;
+{$ENDIF}
 var
   bCtrl: Boolean;
 

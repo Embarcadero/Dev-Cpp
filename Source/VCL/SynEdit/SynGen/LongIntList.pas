@@ -43,9 +43,6 @@ uses
   StdCtrls, 
   ExtCtrls;
 
-const
-  MaxListSize = MaxInt div 16;
-
 type
   PLongIntArray = ^TLongIntArray;
   TLongIntArray = array[0..MaxListSize] of LongInt;

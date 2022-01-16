@@ -43,12 +43,15 @@ CONTENTS:
 -------------------------------------------------------------------------------}
 
 
+{$IFNDEF QSYNEDITPRINTTYPES}
 unit SynEditPrintTypes;
+{$ENDIF}
 
 interface
 
 uses
-  SynUnicode, Classes, SysUtils;
+  SynUnicode,
+  Classes, SysUtils;
 
 const
   DefLeft = 25; //Default left margin [mm]
@@ -82,13 +85,13 @@ type
 function IntToRoman(Value: Integer): string;
 
 // TODO: BreakChars is ANSI only but SynEditPrint only uses Ansi chars and should be rewritten to use WordWrap of SynEdit anyway
-function WrapTextEx(const Line: string; BreakChars: TSysCharSet;
+function WrapTextEx(const Line: UnicodeString; BreakChars: TSysCharSet;
   MaxCol: Integer; AList: TList): Boolean;
 
 implementation
 
 //Returns wrapping positions in AList.
-function WrapTextEx(const Line: string; BreakChars: TSysCharSet;
+function WrapTextEx(const Line: UnicodeString; BreakChars: TSysCharSet;
   MaxCol: Integer; AList: TList): Boolean;
 var
   WrapPos: TWrapPos;

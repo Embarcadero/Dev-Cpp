@@ -621,7 +621,6 @@ object EditorOptForm: TEditorOptForm
         TabOrder = 3
         CodeFolding.ShowCollapsedLine = True
         UseCodeFolding = False
-        Gutter.AutoSize = True
         Gutter.BorderStyle = gbsNone
         Gutter.DigitCount = 2
         Gutter.Font.Charset = DEFAULT_CHARSET
@@ -629,11 +628,25 @@ object EditorOptForm: TEditorOptForm
         Gutter.Font.Height = -12
         Gutter.Font.Name = 'Courier New'
         Gutter.Font.Style = []
-        Gutter.LeftOffset = 4
-        Gutter.RightOffset = 21
         Gutter.ShowLineNumbers = True
-        Gutter.Width = 32
         Gutter.GradientEndColor = clBackground
+        Gutter.Bands = <
+          item
+            Kind = gbkMarks
+            Visible = True
+            Width = 13
+          end
+          item
+            Kind = gbkLineNumbers
+          end
+          item
+            Kind = gbkFold
+          end
+          item
+            Kind = gbkMargin
+            Visible = True
+            Width = 3
+          end>
         HideSelection = True
         Highlighter = cpp
         Lines.Strings = (
@@ -663,10 +676,6 @@ object EditorOptForm: TEditorOptForm
         OnSpecialLineColors = CppEditSpecialLineColors
         OnStatusChange = cppEditStatusChange
         RemovedKeystrokes = <
-          item
-            Command = ecDeleteLastChar
-            ShortCut = 8200
-          end
           item
             Command = ecLineBreak
             ShortCut = 8205
@@ -860,16 +869,30 @@ object EditorOptForm: TEditorOptForm
             TabStop = False
             CodeFolding.ShowCollapsedLine = True
             UseCodeFolding = False
-            Gutter.AutoSize = True
             Gutter.BorderStyle = gbsNone
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
             Gutter.Font.Height = -12
             Gutter.Font.Name = 'Courier New'
             Gutter.Font.Style = []
-            Gutter.LeftOffset = 4
-            Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
+            Gutter.Bands = <
+              item
+                Kind = gbkMarks
+                Visible = True
+                Width = 13
+              end
+              item
+                Kind = gbkLineNumbers
+              end
+              item
+                Kind = gbkFold
+              end
+              item
+                Kind = gbkMargin
+                Visible = True
+                Width = 3
+              end>
             Highlighter = cpp
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4
@@ -933,16 +956,30 @@ object EditorOptForm: TEditorOptForm
             TabStop = False
             CodeFolding.ShowCollapsedLine = True
             UseCodeFolding = False
-            Gutter.AutoSize = True
             Gutter.BorderStyle = gbsNone
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
             Gutter.Font.Height = -12
             Gutter.Font.Name = 'Courier New'
             Gutter.Font.Style = []
-            Gutter.LeftOffset = 4
-            Gutter.RightOffset = 21
             Gutter.ShowLineNumbers = True
+            Gutter.Bands = <
+              item
+                Kind = gbkMarks
+                Visible = True
+                Width = 13
+              end
+              item
+                Kind = gbkLineNumbers
+              end
+              item
+                Kind = gbkFold
+              end
+              item
+                Kind = gbkMargin
+                Visible = True
+                Width = 3
+              end>
             Highlighter = cpp
             Options = [eoAutoIndent, eoHideShowScrollbars, eoKeepCaretX, eoSmartTabs, eoTabIndent, eoTrimTrailingSpaces]
             TabWidth = 4

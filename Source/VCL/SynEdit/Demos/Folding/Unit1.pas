@@ -3,260 +3,286 @@ unit Unit1;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.Menus, Vcl.StdActns,
-  Vcl.ActnList, System.Actions, Vcl.ActnPopup, Vcl.ToolWin, Vcl.ActnMan,
-  Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.PlatformDefaultStyleActnCtrls, SynEditPrint,
-  SynEditPythonBehaviour, SynHighlighterPython, SynHighlighterJScript,
-  SynEditHighlighter, SynHighlighterCpp, SynEditCodeFolding;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.Menus,
+  Vcl.StdActns, Vcl.ActnList, System.Actions, Vcl.ActnPopup, Vcl.ToolWin,
+  Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.PlatformDefaultStyleActnCtrls,
+  SynEditPrint, SynEditPythonBehaviour, SynHighlighterPython,
+  SynEditCodeFolding, SynHighlighterJScript, SynEditHighlighter,
+  SynHighlighterCpp, SynHighlighterDWS, SynHighlighterPas, SynHighlighterXML;
 
 type
-  TForm1 = class(TForm)
-    ActionManager1: TActionManager;
-    ActionMainMenuBar1: TActionMainMenuBar;
-    PopupActionBar1: TPopupActionBar;
-    FileOpen1: TFileOpen;
-    FileSaveAs1: TFileSaveAs;
-    FilePrintSetup1: TFilePrintSetup;
-    FilePageSetup1: TFilePageSetup;
-    FileExit1: TFileExit;
-    DialogPrintDlg1: TPrintDlg;
-    EditCut1: TEditCut;
-    EditCopy1: TEditCopy;
-    EditPaste1: TEditPaste;
-    EditSelectAll1: TEditSelectAll;
-    EditUndo1: TEditUndo;
-    EditDelete1: TEditDelete;
-    Cut1: TMenuItem;
-    Copy1: TMenuItem;
-    Paste1: TMenuItem;
-    SynEdit1: TSynEdit;
-    DialogFontEdit1: TFontEdit;
-    ActSave: TAction;
-    SynEditPrint1: TSynEditPrint;
-    actGutterLines: TAction;
-    SynCppSyn1: TSynCppSyn;
-    SynJScriptSyn1: TSynJScriptSyn;
-    SynPythonSyn1: TSynPythonSyn;
-    SynEditPythonBehaviour1: TSynEditPythonBehaviour;
-    actCPP: TAction;
-    actJavaScript: TAction;
-    actPython: TAction;
-    actCodeFolding: TAction;
-    actFoldAll: TAction;
-    actUnFoldAll: TAction;
-    actFoldNearest: TAction;
-    actFoldRegions: TAction;
-    actFoldLevel1: TAction;
-    actFoldLevel2: TAction;
-    actFoldLevel3: TAction;
-    actUnfoldNearest: TAction;
-    actUnfoldRegions: TAction;
-    actUnfoldLevel1: TAction;
-    actUnfoldLevel2: TAction;
-    actUnfoldLevel3: TAction;
+  TFormFoldingDemo = class(TForm)
+    ActionCodeFolding: TAction;
+    ActionCPP: TAction;
+    ActionDialogFontEdit: TFontEdit;
+    ActionDialogPrintDlg: TPrintDlg;
+    ActionDWS: TAction;
+    ActionEditCopy: TEditCopy;
+    ActionEditCut: TEditCut;
+    ActionEditDelete: TEditDelete;
+    ActionEditPaste: TEditPaste;
+    ActionEditSelectAll: TEditSelectAll;
+    ActionEditUndo: TEditUndo;
+    ActionFileExit: TFileExit;
+    ActionFileOpen: TFileOpen;
+    ActionFilePageSetup: TFilePageSetup;
+    ActionFilePrintSetup: TFilePrintSetup;
+    ActionFileSaveAs: TFileSaveAs;
+    ActionFoldAll: TAction;
+    ActionFoldLevel1: TAction;
+    ActionFoldLevel2: TAction;
+    ActionFoldLevel3: TAction;
+    ActionFoldNearest: TAction;
+    ActionFoldRegions: TAction;
+    ActionFoldShapeSize: TAction;
+    ActionGutterLines: TAction;
+    ActionJavaScript: TAction;
+    ActionMainMenuBar: TActionMainMenuBar;
+    ActionManager: TActionManager;
+    ActionPascal: TAction;
+    ActionPython: TAction;
+    ActionSave: TAction;
+    ActionShowCollapsedLines: TAction;
+    ActionShowCollapsedMarks: TAction;
+    ActionUnFoldAll: TAction;
+    ActionUnfoldLevel1: TAction;
+    ActionUnfoldLevel2: TAction;
+    ActionUnfoldLevel3: TAction;
+    ActionUnfoldNearest: TAction;
+    ActionUnfoldRegions: TAction;
+    ActionXML: TAction;
+    MenuItemCopy: TMenuItem;
+    MenuItemCut: TMenuItem;
+    MenuItemFold: TMenuItem;
+    MenuItemFoldAll: TMenuItem;
+    MenuItemFoldLevel1: TMenuItem;
+    MenuItemFoldLevel2: TMenuItem;
+    MenuItemFoldLevel3: TMenuItem;
+    MenuItemFoldNearest: TMenuItem;
+    MenuItemFoldRanges: TMenuItem;
+    MenuItemPaste: TMenuItem;
+    MenuItemUnfold: TMenuItem;
+    MenuItemUnfoldAll: TMenuItem;
+    MenuItemUnfoldLevel1: TMenuItem;
+    MenuItemUnfoldLevel2: TMenuItem;
+    MenuItemUnfoldLevel3: TMenuItem;
+    MenuItemUnfoldNearest: TMenuItem;
+    MenuItemUnfoldRanges: TMenuItem;
     N1: TMenuItem;
     N2: TMenuItem;
-    Fold1: TMenuItem;
-    All1: TMenuItem;
-    Nearest1: TMenuItem;
-    Ranges1: TMenuItem;
     N3: TMenuItem;
-    Level11: TMenuItem;
-    Level21: TMenuItem;
-    Level31: TMenuItem;
-    Unfold1: TMenuItem;
-    All2: TMenuItem;
-    Nearest2: TMenuItem;
-    Ranges2: TMenuItem;
     N4: TMenuItem;
-    Level12: TMenuItem;
-    Level22: TMenuItem;
-    Level32: TMenuItem;
-    actShowCollapsedMarks: TAction;
-    actShowCollapsedLines: TAction;
-    actFoldShapeSize: TAction;
-    procedure FileOpen1Accept(Sender: TObject);
-    procedure FileSaveAs1Accept(Sender: TObject);
-    procedure ActSaveExecute(Sender: TObject);
-    procedure DialogPrintDlg1Accept(Sender: TObject);
-    procedure DialogFontEdit1FontDialogApply(Sender: TObject; Wnd: HWND);
-    procedure actGutterLinesExecute(Sender: TObject);
-    procedure actCPPExecute(Sender: TObject);
-    procedure actJavaScriptExecute(Sender: TObject);
-    procedure actPythonExecute(Sender: TObject);
-    procedure actCodeFoldingExecute(Sender: TObject);
+    PopupActionBar: TPopupActionBar;
+    PythonBehaviour: TSynEditPythonBehaviour;
+    SynCppSyn: TSynCppSyn;
+    SynDWSSyn: TSynDWSSyn;
+    SynEdit: TSynEdit;
+    SynEditPrint: TSynEditPrint;
+    SynJScriptSyn: TSynJScriptSyn;
+    SynPasSyn: TSynPasSyn;
+    SynPythonSyn: TSynPythonSyn;
+    SynXMLSyn: TSynXMLSyn;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure ActionCodeFoldingExecute(Sender: TObject);
+    procedure ActionCPPExecute(Sender: TObject);
+    procedure ActionDialogFontEditBeforeExecute(Sender: TObject);
+    procedure ActionDialogPrintDlgAccept(Sender: TObject);
+    procedure ActionDWSExecute(Sender: TObject);
+    procedure ActionFileOpenAccept(Sender: TObject);
+    procedure ActionFileSaveAsAccept(Sender: TObject);
+    procedure ActionFoldExecute(Sender: TObject);
+    procedure ActionFoldShapeSizeExecute(Sender: TObject);
+    procedure ActionFoldUpdate(Sender: TObject);
+    procedure ActionGutterLinesExecute(Sender: TObject);
+    procedure ActionJavaScriptExecute(Sender: TObject);
+    procedure ActionManagerUpdate(Action: TBasicAction; var Handled: Boolean);
+    procedure ActionPascalExecute(Sender: TObject);
+    procedure ActionPythonExecute(Sender: TObject);
+    procedure ActionSaveExecute(Sender: TObject);
+    procedure ActionShowCollapsedLinesExecute(Sender: TObject);
+    procedure ActionShowCollapsedMarksExecute(Sender: TObject);
+    procedure ActionXMLExecute(Sender: TObject);
+    procedure SynEditGutterGetText(Sender: TObject; aLine: Integer;
+      var aText: string);
     procedure ScanForFoldRanges(Sender: TObject; TopFoldRanges:
       TSynFoldRanges; LinesToScan: TStrings; FromLine: Integer;
       ToLine: Integer);
-    procedure DialogFontEdit1BeforeExecute(Sender: TObject);
-    procedure actFoldExecute(Sender: TObject);
-    procedure actFoldUpdate(Sender: TObject);
-    procedure ActionManager1Update(Action: TBasicAction; var Handled: Boolean);
-    procedure actShowCollapsedLinesExecute(Sender: TObject);
-    procedure actShowCollapsedMarksExecute(Sender: TObject);
-    procedure actFoldShapeSizeExecute(Sender: TObject);
+    procedure SynEditStatusChange(Sender: TObject; Changes: TSynStatusChanges);
   private
-    { Private declarations }
-    Highlighters : TStringList;
+    FHighlighters: TStringList;
+    FOldCaretY: Integer;
   public
-    { Public declarations }
-    FileName : String;
+    FileName: string;
   end;
 
 var
-  Form1: TForm1;
+  FormFoldingDemo: TFormFoldingDemo;
 
 implementation
 
 uses
   SynEditTextBuffer,
   SynEditTypes,
-  uHighlighterProcs, SynEditKeyCmds;
+  SynEditKeyCmds,
+  uHighlighterProcs;
 
 {$R *.dfm}
 
-procedure TForm1.actCodeFoldingExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionCodeFoldingExecute(Sender: TObject);
 begin
-  SynEdit1.UseCodeFolding := actCodeFolding.Checked;
+  SynEdit.UseCodeFolding := ActionCodeFolding.Checked;
 end;
 
-procedure TForm1.actCPPExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionCPPExecute(Sender: TObject);
 begin
-  SynEditPythonBehaviour1.Editor := nil;
-  SynEdit1.OnScanForFoldRanges := ScanForFoldRanges;
-  SynEdit1.Highlighter := SynCppSyn1;
+  PythonBehaviour.Editor := nil;
+  SynEdit.OnScanForFoldRanges := ScanForFoldRanges;
+  SynEdit.Highlighter := SynCppSyn;
 end;
 
-procedure TForm1.actFoldExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionDWSExecute(Sender: TObject);
 begin
-  SynEdit1.ExecuteCommand(TAction(Sender).Tag, ' ', nil);
+  PythonBehaviour.Editor := nil;
+  SynEdit.OnScanForFoldRanges := nil;
+  SynEdit.Highlighter := SynDwsSyn;
 end;
 
-procedure TForm1.actFoldShapeSizeExecute(Sender: TObject);
-Var
-  S : String;
+procedure TFormFoldingDemo.ActionFoldExecute(Sender: TObject);
+begin
+  SynEdit.ExecuteCommand(TAction(Sender).Tag, ' ', nil);
+end;
+
+procedure TFormFoldingDemo.ActionFoldShapeSizeExecute(Sender: TObject);
+var
+  S: string;
   Size : Integer;
 begin
-  Size := SynEdit1.CodeFolding.GutterShapeSize;
+  Size := SynEdit.CodeFolding.GutterShapeSize;
   S := InputBox('New Gutter Square Size', 'New size in pixels (odd number):', IntToStr(Size));
   if TryStrToInt(S, Size) then
-    SynEdit1.CodeFolding.GutterShapeSize := Size;
+    SynEdit.CodeFolding.GutterShapeSize := Size;
 end;
 
-procedure TForm1.actFoldUpdate(Sender: TObject);
+procedure TFormFoldingDemo.ActionFoldUpdate(Sender: TObject);
 begin
-  TAction(Sender).Enabled := SynEdit1.UseCodeFolding;
+  TAction(Sender).Enabled := SynEdit.UseCodeFolding;
 end;
 
-procedure TForm1.actGutterLinesExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionGutterLinesExecute(Sender: TObject);
 begin
-  Synedit1.Gutter.ShowLineNumbers := actGutterLines.Checked;
+  SynEdit.Gutter.ShowLineNumbers := ActionGutterLines.Checked;
 end;
 
-procedure TForm1.ActionManager1Update(Action: TBasicAction;
+procedure TFormFoldingDemo.ActionManagerUpdate(Action: TBasicAction;
   var Handled: Boolean);
 begin
-  actCodeFolding.Checked := SynEdit1.UseCodeFolding;
-  actShowCollapsedMarks.Checked := SynEdit1.CodeFolding.ShowCollapsedLine;
-  actShowCollapsedMarks.Checked := SynEdit1.CodeFolding.ShowHintMark;
+  ActionCodeFolding.Checked := SynEdit.UseCodeFolding;
+  ActionShowCollapsedMarks.Checked := SynEdit.CodeFolding.ShowCollapsedLine;
+  ActionShowCollapsedMarks.Checked := SynEdit.CodeFolding.ShowHintMark;
 end;
 
-procedure TForm1.actJavaScriptExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionXMLExecute(Sender: TObject);
 begin
-  SynEditPythonBehaviour1.Editor := nil;
-  SynEdit1.OnScanForFoldRanges := nil;
-  SynEdit1.Highlighter := SynJScriptSyn1;
+  PythonBehaviour.Editor := nil;
+  SynEdit.OnScanForFoldRanges := nil;
+  SynEdit.Highlighter := SynXMLSyn;
 end;
 
-procedure TForm1.actPythonExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionJavaScriptExecute(Sender: TObject);
 begin
-  SynEditPythonBehaviour1.Editor := Synedit1;
-  SynEditPythonBehaviour1.Editor := nil;
-  SynEdit1.Highlighter := SynPythonSyn1;
+  PythonBehaviour.Editor := nil;
+  SynEdit.OnScanForFoldRanges := nil;
+  SynEdit.Highlighter := SynJScriptSyn;
 end;
 
-procedure TForm1.ActSaveExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionPythonExecute(Sender: TObject);
+begin
+  PythonBehaviour.Editor := SynEdit;
+  PythonBehaviour.Editor := nil;
+  SynEdit.Highlighter := SynPythonSyn;
+end;
+
+procedure TFormFoldingDemo.ActionSaveExecute(Sender: TObject);
 begin
   if FileName = '' then
-    FileSaveAs1.Execute
+    ActionFileSaveAs.Execute
   else
-    SynEdit1.Lines.SaveToFile(FileName);
+    SynEdit.Lines.SaveToFile(FileName);
 end;
 
-procedure TForm1.actShowCollapsedLinesExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionShowCollapsedLinesExecute(Sender: TObject);
 begin
-  SynEdit1.CodeFolding.ShowCollapsedLine := TAction(Sender).Checked;
+  SynEdit.CodeFolding.ShowCollapsedLine := TAction(Sender).Checked;
 end;
 
-procedure TForm1.DialogFontEdit1BeforeExecute(Sender: TObject);
+procedure TFormFoldingDemo.ActionDialogFontEditBeforeExecute(Sender: TObject);
 begin
-  DialogFontEdit1.Dialog.Font := SynEdit1.Font;
+  ActionDialogFontEdit.Dialog.Font := SynEdit.Font;
 end;
 
-procedure TForm1.DialogFontEdit1FontDialogApply(Sender: TObject; Wnd: HWND);
+procedure TFormFoldingDemo.ActionDialogPrintDlgAccept(Sender: TObject);
 begin
- SynEdit1.Font.Assign(DialogFontEdit1.Dialog.Font);
+  SynEditPrint.SynEdit := SynEdit;
+  SynEditPrint.Print;
 end;
 
-procedure TForm1.DialogPrintDlg1Accept(Sender: TObject);
+procedure TFormFoldingDemo.ActionFileOpenAccept(Sender: TObject);
 begin
-  SynEditPrint1.SynEdit := SynEdit1;
-  SynEditPrint1.Print;
-end;
-
-procedure TForm1.FileOpen1Accept(Sender: TObject);
-begin
-  FileName := FileOpen1.Dialog.FileName;
-  SynEdit1.Lines.LoadFromFile(FileName);
-  SynEdit1.Highlighter := GetHighlighterFromFileExt(Highlighters, ExtractFileExt(FileName));
-  if SynEdit1.Highlighter = SynPythonSyn1 then
-    SynEditPythonBehaviour1.Editor := SynEdit1
+  FileName := ActionFileOpen.Dialog.FileName;
+  SynEdit.Lines.LoadFromFile(FileName);
+  SynEdit.Highlighter := GetHighlighterFromFileExt(FHighlighters, ExtractFileExt(FileName));
+  if SynEdit.Highlighter = SynPythonSyn then
+    PythonBehaviour.Editor := SynEdit
   else
-    SynEditPythonBehaviour1.Editor := nil;
-  if SynEdit1.Highlighter = SynCppSyn1 then
-    SynEdit1.OnScanForFoldRanges := ScanForFoldRanges
+    PythonBehaviour.Editor := nil;
+  if SynEdit.Highlighter = SynCppSyn then
+    SynEdit.OnScanForFoldRanges := ScanForFoldRanges
   else
-    SynEdit1.OnScanForFoldRanges := nil;
-  SynEdit1.UseCodeFolding := actCodeFolding.Checked;
+    SynEdit.OnScanForFoldRanges := nil;
+  SynEdit.UseCodeFolding := ActionCodeFolding.Checked;
+
+  if (SynEdit.Highlighter = SynPythonSyn) or (SynEdit.Highlighter = SynCppSyn) then
+    SynEdit.TabWidth := 4
+  else
+    SynEdit.TabWidth := 2;
 end;
 
-procedure TForm1.FileSaveAs1Accept(Sender: TObject);
+procedure TFormFoldingDemo.ActionFileSaveAsAccept(Sender: TObject);
 begin
-  FileName := FileSaveAs1.Dialog.FileName;
-  SynEdit1.Lines.SaveToFile(FileName);
+  FileName := ActionFileSaveAs.Dialog.FileName;
+  SynEdit.Lines.SaveToFile(FileName);
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TFormFoldingDemo.FormCreate(Sender: TObject);
 begin
-  Highlighters := TStringList.Create;
-  GetHighlighters(Self, Highlighters, False);
-  FileOpen1.Dialog.Filter :=  GetHighlightersFilter(Highlighters);
-  FileOpen1.Dialog.InitialDir := ExtractFilePath(Application.ExeName);
-  FileSaveAs1.Dialog.Filter :=  FileOpen1.Dialog.Filter;
+  FHighlighters := TStringList.Create;
+  GetHighlighters(Self, FHighlighters, False);
+  ActionFileOpen.Dialog.Filter :=  GetHighlightersFilter(FHighlighters);
+  ActionFileOpen.Dialog.InitialDir := ExtractFilePath(Application.ExeName);
+  ActionFileSaveAs.Dialog.Filter := ActionFileOpen.Dialog.Filter;
 
-  actFoldAll.Tag := ecFoldAll;
-  actFoldNearest.Tag := ecFoldNearest;
-  actFoldRegions.Tag := ecFoldRegions;
-  actFoldLevel1.Tag := ecFoldLevel1;
-  actFoldLevel2.Tag := ecFoldLevel2;
-  actFoldLevel3.Tag := ecFoldLevel3;
-  actUnFoldAll.Tag := ecUnfoldAll;
-  actUnfoldNearest.Tag := ecUnfoldNearest;
-  actUnfoldRegions.Tag := ecUnfoldRegions;
-  actUnfoldLevel1.Tag := ecUnfoldLevel1;
-  actUnfoldLevel2.Tag := ecUnfoldLevel2;
-  actUnfoldLevel3.Tag :=  ecUnfoldLevel3;
+  ActionFoldAll.Tag := ecFoldAll;
+  ActionFoldNearest.Tag := ecFoldNearest;
+  ActionFoldRegions.Tag := ecFoldRegions;
+  ActionFoldLevel1.Tag := ecFoldLevel1;
+  ActionFoldLevel2.Tag := ecFoldLevel2;
+  ActionFoldLevel3.Tag := ecFoldLevel3;
+  ActionUnFoldAll.Tag := ecUnfoldAll;
+  ActionUnfoldNearest.Tag := ecUnfoldNearest;
+  ActionUnfoldRegions.Tag := ecUnfoldRegions;
+  ActionUnfoldLevel1.Tag := ecUnfoldLevel1;
+  ActionUnfoldLevel2.Tag := ecUnfoldLevel2;
+  ActionUnfoldLevel3.Tag :=  ecUnfoldLevel3;
 end;
 
-procedure TForm1.FormDestroy(Sender: TObject);
+procedure TFormFoldingDemo.FormDestroy(Sender: TObject);
 begin
- Highlighters.Free;
+  FHighlighters.Free;
 end;
 
-procedure TForm1.ScanForFoldRanges(Sender: TObject;
+procedure TFormFoldingDemo.ScanForFoldRanges(Sender: TObject;
   TopFoldRanges: TSynFoldRanges; LinesToScan: TStrings; FromLine,
   ToLine: Integer);
 var
@@ -268,8 +294,8 @@ var
     Token : string;
     Attr : TSynHighlighterAttributes;
   begin
-    Result := SynEdit1.GetHighlighterAttriAtRowCol(BufferCoord(Col, Line + 1), Token, Attr) and
-      (Attr = SynCppSyn1.CommentAttribute);
+    Result := SynEdit.GetHighlighterAttriAtRowCol(BufferCoord(Col, Line + 1), Token, Attr) and
+      (Attr = SynCppSyn.CommentAttribute);
   end;
 
   function LineHasChar(Line: Integer; character: char;
@@ -290,7 +316,7 @@ var
   end;
 
   function FindBraces(Line: Integer) : Boolean;
-  Var
+  var
     Col : Integer;
   begin
     Result := False;
@@ -328,23 +354,23 @@ var
     end; // for Col
   end;
 
-function FoldRegion(Line: Integer): Boolean;
-Var
-  S : string;
-begin
-  Result := False;
-  S := TrimLeft(CurLine);
-  if Uppercase(Copy(S, 1, 14)) = '#PRAGMA REGION' then
+  function FoldRegion(Line: Integer): Boolean;
+  var
+    S : string;
   begin
-    TopFoldRanges.StartFoldRange(Line + 1, FoldRegionType);
-    Result := True;
-  end
-  else if Uppercase(Copy(S, 1, 17)) = '#PRAGMA ENDREGION' then
-  begin
-    TopFoldRanges.StopFoldRange(Line + 1, FoldRegionType);
-    Result := True;
+    Result := False;
+    S := TrimLeft(CurLine);
+    if Uppercase(Copy(S, 1, 14)) = '#PRAGMA REGION' then
+    begin
+      TopFoldRanges.StartFoldRange(Line + 1, FoldRegionType);
+      Result := True;
+    end
+    else if Uppercase(Copy(S, 1, 17)) = '#PRAGMA ENDREGION' then
+    begin
+      TopFoldRanges.StopFoldRange(Line + 1, FoldRegionType);
+      Result := True;
+    end;
   end;
-end;
 
 begin
   for Line := FromLine to ToLine do
@@ -382,9 +408,44 @@ begin
   end; // while Line
 end;
 
-procedure TForm1.actShowCollapsedMarksExecute(Sender: TObject);
+procedure TFormFoldingDemo.SynEditGutterGetText(Sender: TObject; aLine: Integer;
+  var aText: string);
 begin
-  SynEdit1.CodeFolding.ShowHintMark := TAction(Sender).Checked;
+  if aLine = TSynEdit(Sender).CaretY then
+    Exit;
+
+  if aLine mod 10 <> 0 then
+    if aLine mod 5 <> 0 then
+      aText := '·'
+    else
+      aText := '-';
+end;
+
+procedure TFormFoldingDemo.SynEditStatusChange(Sender: TObject;
+  Changes: TSynStatusChanges);
+Var
+  NewCaretY: Integer;
+begin
+  if (scCaretY in Changes) and SynEdit.Gutter.Visible
+    and SynEdit.Gutter.ShowLineNumbers then
+  begin
+    NewCaretY := SynEdit.CaretY;
+    SynEdit.InvalidateGutterLine(FOldCaretY);
+    SynEdit.InvalidateGutterLine(NewCaretY);
+    FOldCaretY := NewCaretY;
+  end;
+end;
+
+procedure TFormFoldingDemo.ActionShowCollapsedMarksExecute(Sender: TObject);
+begin
+  SynEdit.CodeFolding.ShowHintMark := TAction(Sender).Checked;
+end;
+
+procedure TFormFoldingDemo.ActionPascalExecute(Sender: TObject);
+begin
+  PythonBehaviour.Editor := nil;
+  SynEdit.OnScanForFoldRanges := nil;
+  SynEdit.Highlighter := SynPasSyn;
 end;
 
 end.

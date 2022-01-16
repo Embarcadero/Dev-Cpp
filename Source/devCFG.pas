@@ -2641,7 +2641,7 @@ begin
       if fTrimTrailingSpaces then
         Options := Options + [eoTrimTrailingSpaces];
       if fShowLigatures then
-        Options := Options + [eoShowLigatures];
+        //Options := Options + [eoShowLigatures];
     finally
       EndUpdate;
     end;

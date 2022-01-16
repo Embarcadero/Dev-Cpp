@@ -34,7 +34,9 @@ located at http://SynEdit.SourceForge.net
 Known Issues:
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITWILDCARDSEARCH}
 unit SynEditWildcardSearch;
+{$ENDIF}
 
 {$I SynEdit.inc}
 
@@ -43,6 +45,7 @@ interface
 uses
   SynEdit,
   SynEditTypes,
+  SynRegExpr,
   SynEditRegexSearch,
   Classes;
 
@@ -76,7 +79,7 @@ uses
 constructor TSynEditWildcardSearch.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  fPattern := '';
+  FPattern := '';
 end;
 
 destructor TSynEditWildcardSearch.Destroy;
@@ -121,7 +124,7 @@ end;
 
 procedure TSynEditWildcardSearch.SetPattern(const Value: UnicodeString);
 begin
-  fPattern := Value;
+  FPattern := Value;
   // Convert into a real regular expression and assign it
   inherited SetPattern(WildCardToRegExpr(Value));
 end;

@@ -141,7 +141,23 @@ object LangForm: TLangForm
     Gutter.Font.Height = -11
     Gutter.Font.Name = 'Courier New'
     Gutter.Font.Style = []
-    Gutter.RightOffset = 21
+    Gutter.Bands = <
+      item
+        Kind = gbkMarks
+        Visible = True
+        Width = 13
+      end
+      item
+        Kind = gbkLineNumbers
+      end
+      item
+        Kind = gbkFold
+      end
+      item
+        Kind = gbkMargin
+        Visible = True
+        Width = 3
+      end>
     Lines.Strings = (
       '#include <iostream>'
       ''

@@ -41,13 +41,18 @@ CONTENTS:
   a picture that can help with understanding the different values.
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITPRINTMARGINSDIALOG}
 unit SynEditPrintMarginsDialog;
+{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
+  {$IFDEF SYN_COMPILER_17_UP}
+  UITypes,
+  {$ENDIF}
   Windows,
   Graphics,
   Forms,
@@ -67,18 +72,18 @@ type
     OKBtn: TButton;
     CancelBtn: TButton;
     Image1: TImage;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
+    LabelLeft: TLabel;
+    LabelRight: TLabel;
+    LabelTop: TLabel;
+    LabelBottom: TLabel;
+    LabelUnits: TLabel;
+    LabelHeader: TLabel;
+    LabelFooter: TLabel;
+    LabelInternalMargin: TLabel;
+    LabelLeftIndent: TLabel;
     CBMirrorMargins: TCheckBox;
-    Label10: TLabel;
-    Label11: TLabel;
+    LabelRightIndent: TLabel;
+    LabelGutter: TLabel;
     EditLeft: TEdit;
     EditRight: TEdit;
     EditTop: TEdit;
@@ -106,9 +111,6 @@ type
 implementation
 
 {$R *.dfm}
-
-uses
-  UITypes;
 
 { TSynEditPrintMarginsDlg }
 
@@ -184,4 +186,3 @@ begin
 end;
 
 end.
-

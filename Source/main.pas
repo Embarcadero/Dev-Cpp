@@ -3486,7 +3486,6 @@ begin
     TabIndex := 4;
   if (Sender = ButtonChangeLanguage) then
     TabIndex := 0;
-
   with TEnviroForm.Create(nil) do try
     PagesMain.TabIndex := TabIndex;
     if ShowModal = mrOk then begin

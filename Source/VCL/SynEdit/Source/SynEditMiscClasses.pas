@@ -12,7 +12,7 @@ The Original Code is: SynEditMiscClasses.pas, released 2000-04-07.
 The Original Code is based on the mwSupportClasses.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Michael Hieke.
-Unicode translation by Maël Hörz.
+Unicode translation by Maï¿½l Hï¿½rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -36,87 +36,95 @@ located at http://SynEdit.SourceForge.net
 Known Issues:
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITMISCCLASSES}
 unit SynEditMiscClasses;
+{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
+  Consts,
   Windows,
   Messages,
-  Registry,
-  Consts,
-  SysUtils,
-  Classes,
-  Math,
   Graphics,
   Controls,
   Forms,
   StdCtrls,
   Menus,
-  ImgList,
+  Registry,
   SynEditTypes,
   SynEditKeyConst,
-  SynUnicode;
+  SynUnicode,
+{$IFDEF SYN_COMPILER_4_UP}
+  Math,
+{$ENDIF}
+  Classes,
+  SysUtils;
 
 type
   TSynSelectedColor = class(TPersistent)
   private
-    fBG: TColor;
-    fFG: TColor;
-    fOnChange: TNotifyEvent;
+    FBG: TColor;
+    FFG: TColor;
+    FOnChange: TNotifyEvent;
     procedure SetBG(Value: TColor);
     procedure SetFG(Value: TColor);
   public
     constructor Create;
     procedure Assign(Source: TPersistent); override;
   published
-    property Background: TColor read fBG write SetBG default clHighLight;
-    property Foreground: TColor read fFG write SetFG default clHighLightText;
-    property OnChange: TNotifyEvent read fOnChange write fOnChange;
+    property Background: TColor read FBG write SetBG default clHighLight;
+    property Foreground: TColor read FFG write SetFG default clHighLightText;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
   TSynGutterBorderStyle = (gbsNone, gbsMiddle, gbsRight);
 
   TSynGutter = class(TPersistent)
   private
-    fFont: TFont;
-    fColor: TColor;
-    fBorderColor: TColor;
-    fWidth: integer;
-    fShowLineNumbers: boolean;
-    fDigitCount: integer;
-    fLeadingZeros: boolean;
-    fZeroStart: boolean;
-    fLeftOffset: integer;
-    fRightOffset: integer;
-    fRightMargin: integer;
-    fOnChange: TNotifyEvent;
-    fCursor: TCursor;
-    fVisible: boolean;
-    fUseFontStyle: boolean;
-    fAutoSize: boolean;
-    fAutoSizeDigitCount: integer;
-    fBorderStyle: TSynGutterBorderStyle;
-    fLineNumberStart: Integer;
-    fGradient: Boolean;
-    fGradientStartColor: TColor;
-    fGradientEndColor: TColor;
-    fGradientSteps: Integer;
-    procedure SetAutoSize(const Value: boolean);
+    FFont: TFont;
+    FColor: TColor;
+    FBorderColor: TColor;
+    FWidth: Integer;
+    FShowLineNumbers: Boolean;
+    FShowModification: Boolean;
+    FDigitCount: Integer;
+    FLeadingZeros: Boolean;
+    FZeroStart: Boolean;
+    FLeftOffset: Integer;
+    FRightOffset: Integer;
+    FRightMargin: integer;
+    FOnChange: TNotifyEvent;
+    FCursor: TCursor;
+    FVisible: Boolean;
+    FUseFontStyle: Boolean;
+    FAutoSize: Boolean;
+    FAutoSizeDigitCount: Integer;
+    FBorderStyle: TSynGutterBorderStyle;
+    FLineNumberStart: Integer;
+    FGradient: Boolean;
+    FGradientStartColor: TColor;
+    FGradientEndColor: TColor;
+    FGradientSteps: Integer;
+    FModificationBarWidth: Integer;
+    FModificationColorModified: TColor;
+    FModificationColorSaved: TColor;
+    procedure SetAutoSize(const Value: Boolean);
     procedure SetBorderColor(const Value: TColor);
     procedure SetColor(const Value: TColor);
-    procedure SetDigitCount(Value: integer);
-    procedure SetLeadingZeros(const Value: boolean);
-    procedure SetLeftOffset(Value: integer);
-    procedure SetRightOffset(Value: integer);
+    procedure SetDigitCount(Value: Integer);
+    procedure SetLeadingZeros(const Value: Boolean);
+    procedure SetLeftOffset(Value: Integer);
+    procedure SetRightOffset(Value: Integer);
     procedure SetRightMargin(Value: integer);
-    procedure SetShowLineNumbers(const Value: boolean);
-    procedure SetUseFontStyle(Value: boolean);
-    procedure SetVisible(Value: boolean);
-    procedure SetWidth(Value: integer);
-    procedure SetZeroStart(const Value: boolean);
+    procedure SetShowLineNumbers(const Value: Boolean);
+    procedure SetShowModification(const Value: Boolean);
+    procedure SetUseFontStyle(Value: Boolean);
+    procedure SetVisible(Value: Boolean);
+    procedure SetWidth(Value: Integer);
+    procedure SetZeroStart(const Value: Boolean);
     procedure SetFont(Value: TFont);
     procedure OnFontChange(Sender: TObject);
     procedure SetBorderStyle(const Value: TSynGutterBorderStyle);
@@ -125,113 +133,127 @@ type
     procedure SetGradientStartColor(const Value: TColor);
     procedure SetGradientEndColor(const Value: TColor);
     procedure SetGradientSteps(const Value: Integer);
-    function GetWidth: integer;
+    function GetWidth: Integer;
+    procedure SetModificationColorModified(const Value: TColor);
+    procedure SetModificationColorSaved(const Value: TColor);
+    procedure SetModificationBarWidth(const Value: Integer);
   public
     constructor Create;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
-    procedure AutoSizeDigitCount(LinesCount: integer);
-    function FormatLineNumber(Line: integer): string;
-    function RealGutterWidth(CharWidth: integer): integer;
- //++ DPI-Aware
+    procedure AutoSizeDigitCount(LinesCount: Integer);
+    function FormatLineNumber(Line: Integer): string;
+    function RealGutterWidth(CharWidth: Integer): Integer;
+//++ DPI-Aware
     procedure ChangeScale(M, D: Integer); virtual;
 //-- DPI-Aware
   published
-    property AutoSize: boolean read fAutoSize write SetAutoSize default FALSE;
-    property BorderStyle: TSynGutterBorderStyle read fBorderStyle
+    property AutoSize: Boolean read FAutoSize write SetAutoSize default FALSE;
+    property BorderStyle: TSynGutterBorderStyle read FBorderStyle
       write SetBorderStyle default gbsMiddle;
-    property Color: TColor read fColor write SetColor default clBtnFace;
-    property BorderColor: TColor read fBorderColor write SetBorderColor default clWindow;
-    property Cursor: TCursor read fCursor write fCursor default crDefault;
-    property DigitCount: integer read fDigitCount write SetDigitCount
+    property Color: TColor read FColor write SetColor default clBtnFace;
+    property BorderColor: TColor read FBorderColor write SetBorderColor default clWindow;
+    property Cursor: TCursor read FCursor write FCursor default crDefault;
+    property DigitCount: Integer read FDigitCount write SetDigitCount
       default 4;
-    property Font: TFont read fFont write SetFont;
-    property LeadingZeros: boolean read fLeadingZeros write SetLeadingZeros
+    property Font: TFont read FFont write SetFont;
+    property LeadingZeros: Boolean read FLeadingZeros write SetLeadingZeros
       default FALSE;
-    property LeftOffset: integer read fLeftOffset write SetLeftOffset
+    property LeftOffset: Integer read FLeftOffset write SetLeftOffset
       default 16;
-    property RightOffset: integer read fRightOffset write SetRightOffset
+    property ModificationBarWidth: Integer read FModificationBarWidth
+      write SetModificationBarWidth default 4;
+    property ModificationColorModified: TColor read FModificationColorModified
+      write SetModificationColorModified default clYellow;
+    property ModificationColorSaved: TColor read FModificationColorSaved
+      write SetModificationColorSaved default clLime;
+    property RightOffset: Integer read FRightOffset write SetRightOffset
       default 2;
-    property RightMargin: integer read fRightMargin write SetRightMargin
+    property RightMargin: integer read FRightMargin write SetRightMargin
       default 2;
-    property ShowLineNumbers: boolean read fShowLineNumbers
+    property ShowLineNumbers: Boolean read FShowLineNumbers
       write SetShowLineNumbers default FALSE;
-    property UseFontStyle: boolean read fUseFontStyle write SetUseFontStyle
+    property ShowModification: Boolean read FShowModification
+      write SetShowModification default FALSE;
+    property UseFontStyle: Boolean read FUseFontStyle write SetUseFontStyle
       default True;
-    property Visible: boolean read fVisible write SetVisible default TRUE;
-    property Width: integer read GetWidth write SetWidth default 30;
-    property ZeroStart: boolean read fZeroStart write SetZeroStart
+    property Visible: Boolean read FVisible write SetVisible default TRUE;
+    property Width: Integer read GetWidth write SetWidth default 30;
+    property ZeroStart: Boolean read FZeroStart write SetZeroStart
       default False;
-    property LineNumberStart: Integer read fLineNumberStart write SetLineNumberStart default 1;
-    property Gradient: Boolean read fGradient write SetGradient default False;
-    property GradientStartColor: TColor read fGradientStartColor write SetGradientStartColor default clWindow;
-    property GradientEndColor: TColor read fGradientEndColor write SetGradientEndColor default clBtnFace;
-    property GradientSteps: Integer read fGradientSteps write SetGradientSteps default 48;
-    property OnChange: TNotifyEvent read fOnChange write fOnChange;
+    property LineNumberStart: Integer read FLineNumberStart write SetLineNumberStart default 1;
+    property Gradient: Boolean read FGradient write SetGradient default False;
+    property GradientStartColor: TColor read FGradientStartColor write SetGradientStartColor default clWindow;
+    property GradientEndColor: TColor read FGradientEndColor write SetGradientEndColor default clBtnFace;
+    property GradientSteps: Integer read FGradientSteps write SetGradientSteps default 48;
+
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
   TSynBookMarkOpt = class(TPersistent)
   private
-    fBookmarkImages: TCustomImageList;
-    fDrawBookmarksFirst: boolean;
-    fEnableKeys: Boolean;
-    fGlyphsVisible: Boolean;
-    fLeftMargin: Integer;
-    fOwner: TComponent;
-    fXoffset: integer;
-    fOnChange: TNotifyEvent;
-    procedure SetBookmarkImages(const Value: TCustomImageList);
-    procedure SetDrawBookmarksFirst(Value: boolean);
+    FBookmarkImages: TImageList;
+    FDrawBookmarksFirst: Boolean;
+    FEnableKeys: Boolean;
+    FGlyphsVisible: Boolean;
+    FLeftMargin: Integer;
+    FOwner: TComponent;
+    FXoffset: Integer;
+    FOnChange: TNotifyEvent;
+    procedure SetBookmarkImages(const Value: TImageList);
+    procedure SetDrawBookmarksFirst(Value: Boolean);
     procedure SetGlyphsVisible(Value: Boolean);
     procedure SetLeftMargin(Value: Integer);
-    procedure SetXOffset(Value: integer);
+    procedure SetXOffset(Value: Integer);
   public
     constructor Create(AOwner: TComponent);
     procedure Assign(Source: TPersistent); override;
- //++ DPI-Aware
+//++ DPI-Aware
     procedure ChangeScale(M, D: Integer); virtual;
 //-- DPI-Aware
   published
-    property BookmarkImages: TCustomImageList
-      read fBookmarkImages write SetBookmarkImages;
-    property DrawBookmarksFirst: boolean read fDrawBookmarksFirst
+    property BookmarkImages: TImageList
+      read FBookmarkImages write SetBookmarkImages;
+    property DrawBookmarksFirst: Boolean read FDrawBookmarksFirst
       write SetDrawBookmarksFirst default True;
     property EnableKeys: Boolean
-      read fEnableKeys write fEnableKeys default True;
+      read FEnableKeys write FEnableKeys default True;
     property GlyphsVisible: Boolean
-      read fGlyphsVisible write SetGlyphsVisible default True;
-    property LeftMargin: Integer read fLeftMargin write SetLeftMargin default 2;
-    property Xoffset: integer read fXoffset write SetXOffset default 12;
-    property OnChange: TNotifyEvent read fOnChange write fOnChange;
+      read FGlyphsVisible write SetGlyphsVisible default True;
+    property LeftMargin: Integer read FLeftMargin write SetLeftMargin default 2;
+    property XOffset: Integer read FXoffset write SetXOffset default 12;
+
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
   TSynGlyph = class(TPersistent)
   private
-    fVisible: boolean;
-    fInternalGlyph, fGlyph: TBitmap;
-    fInternalMaskColor, fMaskColor: TColor;
-    fOnChange: TNotifyEvent;
+    FVisible: Boolean;
+    FInternalGlyph, FGlyph: TBitmap;
+    FInternalMaskColor, FMaskColor: TColor;
+    FOnChange: TNotifyEvent;
     procedure SetGlyph(Value: TBitmap);
     procedure GlyphChange(Sender: TObject);
     procedure SetMaskColor(Value: TColor);
-    procedure SetVisible(Value: boolean);
-    function GetWidth : integer;
-    function GetHeight : integer;
+    procedure SetVisible(Value: Boolean);
+    function GetWidth : Integer;
+    function GetHeight : Integer;
   public
     constructor Create(aModule: THandle; const aName: string; aMaskColor: TColor);
     destructor Destroy; override;
     procedure Assign(aSource: TPersistent); override;
-    procedure Draw(aCanvas: TCanvas; aX, aY, aLineHeight: integer);
-    property Width : integer read GetWidth;
-    property Height : integer read GetHeight;
- //++ DPI-Aware
+    procedure Draw(aCanvas: TCanvas; aX, aY, aLineHeight: Integer);
+    property Width : Integer read GetWidth;
+    property Height : Integer read GetHeight;
+//++ DPI-Aware
     procedure ChangeScale(M, D: Integer); virtual;
 //-- DPI-Aware
   published
-    property Glyph: TBitmap read fGlyph write SetGlyph;
-    property MaskColor: TColor read fMaskColor write SetMaskColor default clNone;
-    property Visible: boolean read fVisible write SetVisible default True;
-    property OnChange: TNotifyEvent read fOnChange write fOnChange;
+    property Glyph: TBitmap read FGlyph write SetGlyph;
+    property MaskColor: TColor read FMaskColor write SetMaskColor default clNone;
+    property Visible: Boolean read FVisible write SetVisible default True;
+
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
   { TSynMethodChain }
@@ -276,18 +298,21 @@ type
 
   TSynInternalImage = class(TObject)
   private
-    fImages : TBitmap;
-    fWidth  : Integer;
-    fHeight : Integer;
-    fCount  : Integer;
+    FImages : TBitmap;
+    FWidth  : Integer;
+    FHeight : Integer;
+    FCount  : Integer;
 
+    function CreateBitmapFromInternalList(aModule: THandle; const Name: string): TBitmap;
+    procedure FreeBitmapFromInternalList;
   public
-    constructor Create(aModule: THandle; const Name: string; Count: integer);
+    constructor Create(aModule: THandle; const Name: string; Count: Integer);
     destructor Destroy; override;
-    procedure Draw(ACanvas: TCanvas; Number, X, Y, LineHeight: integer);
+
+    procedure Draw(ACanvas: TCanvas; Number, X, Y, LineHeight: Integer); overload;
     procedure DrawTransparent(ACanvas: TCanvas; Number, X, Y,
-      LineHeight: integer; TransparentColor: TColor);
- //++ DPI-Aware
+      LineHeight: Integer; TransparentColor: TColor); overload;
+//++ DPI-Aware
     procedure ChangeScale(M, D: Integer); virtual;
 //-- DPI-Aware
   end;
@@ -321,17 +346,15 @@ type
      procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
   protected
-    procedure CreateParams(var Params: TCreateParams); override;
     procedure DoExit; override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;
+    procedure CreateParams(var Params: TCreateParams); override;
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property Font;
-    property Color;
     property BorderStyle: TSynBorderStyle read FBorderStyle write SetBorderStyle
       default bsSingle;
     property HotKey: TShortCut read FHotKey write SetHotKey default $0041; { Alt+A }
@@ -341,25 +364,29 @@ type
 
   TSynEditSearchCustom = class(TComponent)
   protected
-    function GetPattern: string; virtual; abstract;
-    procedure SetPattern(const Value: string); virtual; abstract;
+    function GetPattern: UnicodeString; virtual; abstract;
+    procedure SetPattern(const Value: UnicodeString); virtual; abstract;
     function GetLength(Index: Integer): Integer; virtual; abstract;
     function GetResult(Index: Integer): Integer; virtual; abstract;
     function GetResultCount: Integer; virtual; abstract;
     procedure SetOptions(const Value: TSynSearchOptions); virtual; abstract;
   public
-    function FindAll(const NewText: string): Integer; virtual; abstract;
-    function Replace(const aOccurrence, aReplacement: string): string; virtual; abstract;
-    property Pattern: string read GetPattern write SetPattern;
+    function FindAll(const NewText: UnicodeString): Integer; virtual; abstract;
+    function Replace(const aOccurrence, aReplacement: UnicodeString): UnicodeString; virtual; abstract;
+    property Pattern: UnicodeString read GetPattern write SetPattern;
     property ResultCount: Integer read GetResultCount;
     property Results[Index: Integer]: Integer read GetResult;
     property Lengths[Index: Integer]: Integer read GetLength;
     property Options: TSynSearchOptions write SetOptions;
   end;
 
+  {$IFNDEF SYN_COMPILER_4_UP}
   TBetterRegistry = class(TRegistry)
     function OpenKeyReadOnly(const Key: string): Boolean;
   end;
+  {$ELSE}
+  TBetterRegistry = TRegistry;
+  {$ENDIF}
 
 //++ DPI-Aware
   procedure ResizeBitmap(Bitmap: TBitmap; const NewWidth,
@@ -370,33 +397,32 @@ type
 implementation
 
 uses
-  Winapi.Wincodec,
   SynEditMiscProcs;
 
 //++ DPI-Aware
-procedure ResizeBitmap(Bitmap: TBitmap; const NewWidth, NewHeight: integer);
+procedure ResizeBitmap(Bitmap: TBitmap; const NewWidth,
+  NewHeight: integer);
 var
-  Factory: IWICImagingFactory;
-  Scaler: IWICBitmapScaler;
-  Source : TWICImage;
+  buffer: TBitmap;
 begin
-  //Bitmap.AlphaFormat := afDefined;
-  Source := TWICImage.Create;
+  buffer := TBitmap.Create;
   try
-    Source.Assign(Bitmap);
-    Factory := TWICImage.ImagingFactory;
-    Factory.CreateBitmapScaler(Scaler);
-    try
-      Scaler.Initialize(Source.Handle, NewWidth, NewHeight,
-        WICBitmapInterpolationModeHighQualityCubic);
-      Source.Handle := IWICBitmap(Scaler);
-    finally
-      Scaler := nil;
-      Factory := nil;
-    end;
-    Bitmap.Assign(Source);
+    {$IFDEF SYN_COMPILER_12_UP}
+    buffer.SetSize(NewWidth, NewHeight);
+    {$ELSE}
+    buffer.Width := NewWidth;
+    buffer.Height := NewHeight;
+    {$ENDIF}
+    buffer.Canvas.StretchDraw(Rect(0, 0, NewWidth, NewHeight), Bitmap);
+    {$IFDEF SYN_COMPILER_12_UP}
+    buffer.SetSize(NewWidth, NewHeight);
+    {$ELSE}
+    buffer.Width := NewWidth;
+    buffer.Height := NewHeight;
+    {$ENDIF}
+    Bitmap.Canvas.Draw(0, 0, buffer);
   finally
-    Source.Free;
+    buffer.Free;
   end;
 end;
 //-- DPI-Aware
@@ -406,8 +432,8 @@ end;
 constructor TSynSelectedColor.Create;
 begin
   inherited Create;
-  fBG := clHighLight;
-  fFG := clHighLightText;
+  FBG := clHighLight;
+  FFG := clHighLightText;
 end;
 
 procedure TSynSelectedColor.Assign(Source: TPersistent);
@@ -416,73 +442,78 @@ var
 begin
   if (Source <> nil) and (Source is TSynSelectedColor) then begin
     Src := TSynSelectedColor(Source);
-    fBG := Src.fBG;
-    fFG := Src.fFG;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FBG := Src.FBG;
+    FFG := Src.FFG;
+    if Assigned(FOnChange) then FOnChange(Self);
   end else
     inherited Assign(Source);
 end;
 
 procedure TSynSelectedColor.SetBG(Value: TColor);
 begin
-  if (fBG <> Value) then begin
-    fBG := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if (FBG <> Value) then begin
+    FBG := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynSelectedColor.SetFG(Value: TColor);
 begin
-  if (fFG <> Value) then begin
-    fFG := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if (FFG <> Value) then begin
+    FFG := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 { TSynGutter }
- //++ DPI-Aware
+//++ DPI-Aware
 procedure TSynGutter.ChangeScale(M, D: Integer);
 begin
-  fWidth := MulDiv(fWidth, M, D);
-  fLeftOffset := MulDiv(fLeftOffset, M, D);
-  fRightOffset := MulDiv(fRightOffset, M, D);
-  fRightMargin := MulDiv(fRightMargin, M, D);
-  fFont.Height := Round(fFont.Height * M / D);
-  if Assigned(fOnChange) then fOnChange(Self);
+ fWidth := MulDiv(fWidth, M, D);
+ fLeftOffset := MulDiv(fLeftOffset, M, D);
+ fRightOffset := MulDiv(fRightOffset, M, D);
+ fFont.Height := MulDiv(fFont.Height, M, D);
+ if Assigned(fOnChange) then fOnChange(Self);
 end;
 //-- DPI-Aware
+
 
 constructor TSynGutter.Create;
 begin
   inherited Create;
-  fFont := TFont.Create;
-  fFont.Name := DefaultFontName;
-  fFont.Size := 8;
-  fFont.Style := [];
-  fUseFontStyle := True;
-  fFont.OnChange := OnFontChange;
+  FFont := TFont.Create;
+  FFont.Name := 'Courier New';
+  FFont.Size := 8;
+  FFont.Style := [];
+  FUseFontStyle := True;
+  FFont.OnChange := OnFontChange;
 
-  fColor := clBtnFace;
-  fVisible := TRUE;
-  fWidth := 30;
-  fLeftOffset := 16;
-  fDigitCount := 4;
-  fAutoSizeDigitCount := fDigitCount;
-  fRightOffset := 2;
-  fRightMargin := 2;
-  fBorderColor := clWindow;
-  fBorderStyle := gbsMiddle;
-  fLineNumberStart := 1;
-  fZeroStart := False;
-  fGradient := False;
-  fGradientStartColor := clWindow;
-  fGradientEndColor := clBtnFace;
-  fGradientSteps := 48;
+  FColor := clBtnFace;
+  FVisible := TRUE;
+  FWidth := 30;
+  FLeftOffset := 16;
+  FDigitCount := 4;
+  FAutoSizeDigitCount := FDigitCount;
+  FRightOffset := 2;
+  FRightMargin := 2;
+  FBorderColor := clWindow;
+  FBorderStyle := gbsMiddle;
+  FLineNumberStart := 1;
+  FZeroStart := False;
+  FGradient := False;
+  FGradientStartColor := clWindow;
+  FGradientEndColor := clBtnFace;
+  FGradientSteps := 48;
+
+  FShowModification := FALSE;
+  FModificationBarWidth := 4;
+  FModificationColorModified := clYellow;
+  FModificationColorSaved := clLime;
 end;
 
 destructor TSynGutter.Destroy;
 begin
-  fFont.Free;
+  FFont.Free;
   inherited Destroy;
 end;
 
@@ -493,143 +524,149 @@ begin
   if Assigned(Source) and (Source is TSynGutter) then 
   begin
     Src := TSynGutter(Source);
-    fFont.Assign(src.Font);
-    fUseFontStyle := src.fUseFontStyle;
-    fColor := Src.fColor;
-    fVisible := Src.fVisible;
-    fWidth := Src.fWidth;
-    fShowLineNumbers := Src.fShowLineNumbers;
-    fLeadingZeros := Src.fLeadingZeros;
-    fZeroStart := Src.fZeroStart;
-    fLeftOffset := Src.fLeftOffset;
-    fDigitCount := Src.fDigitCount;
-//++  Code Folding
-    // Do not change RightOffset since it varies with Code Folding
-    //fRightOffset := Src.fRightOffset;
-//--  Code Folding
-    fRightMargin := Src.fRightMargin;
-    fAutoSize := Src.fAutoSize;
-    fAutoSizeDigitCount := Src.fAutoSizeDigitCount;
-    fLineNumberStart := Src.fLineNumberStart;
-    fBorderColor := Src.fBorderColor;
-    fBorderStyle := Src.fBorderStyle;
-    fGradient := Src.fGradient;
-    fGradientStartColor := Src.fGradientStartColor;
-    fGradientEndColor := Src.fGradientEndColor;
-    fGradientSteps := Src.fGradientSteps;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FFont.Assign(src.Font);
+    FUseFontStyle := src.FUseFontStyle;
+    FColor := Src.FColor;
+    FVisible := Src.FVisible;
+    FWidth := Src.FWidth;
+    FShowLineNumbers := Src.FShowLineNumbers;
+    FLeadingZeros := Src.FLeadingZeros;
+    FZeroStart := Src.FZeroStart;
+    FLeftOffset := Src.FLeftOffset;
+    FDigitCount := Src.FDigitCount;
+    FRightOffset := Src.FRightOffset;
+    FRightMargin := Src.FRightMargin;
+    FAutoSize := Src.FAutoSize;
+    FAutoSizeDigitCount := Src.FAutoSizeDigitCount;
+    FLineNumberStart := Src.FLineNumberStart;
+    FBorderColor := Src.FBorderColor;
+    FBorderStyle := Src.FBorderStyle;
+    FGradient := Src.FGradient;
+    FGradientStartColor := Src.FGradientStartColor;
+    FGradientEndColor := Src.FGradientEndColor;
+    FGradientSteps := Src.FGradientSteps;
+    if Assigned(FOnChange) then FOnChange(Self);
   end 
   else
     inherited;
 end;
 
-procedure TSynGutter.AutoSizeDigitCount(LinesCount: integer);
+procedure TSynGutter.AutoSizeDigitCount(LinesCount: Integer);
 var
-  nDigits: integer;
+  nDigits: Integer;
 begin
-  if fVisible and fAutoSize and fShowLineNumbers then 
+  if FVisible and FAutoSize and FShowLineNumbers then
   begin
-    if fZeroStart then
+    if FZeroStart then
       Dec(LinesCount)
-    else if fLineNumberStart > 1 then
-      Inc(LinesCount, fLineNumberStart - 1);
+    else if FLineNumberStart > 1 then
+      Inc(LinesCount, FLineNumberStart - 1);
 
-    nDigits := Max(Length(IntToStr(LinesCount)), fDigitCount);
-    if fAutoSizeDigitCount <> nDigits then begin
-      fAutoSizeDigitCount := nDigits;
-      if Assigned(fOnChange) then fOnChange(Self);
+    nDigits := Max(Length(IntToStr(LinesCount)), FDigitCount);
+    if FAutoSizeDigitCount <> nDigits then begin
+      FAutoSizeDigitCount := nDigits;
+      if Assigned(FOnChange) then FOnChange(Self);
     end;
   end else
-    fAutoSizeDigitCount := fDigitCount;
+    FAutoSizeDigitCount := FDigitCount;
 end;
 
-function TSynGutter.FormatLineNumber(Line: integer): string;
+function TSynGutter.FormatLineNumber(Line: Integer): string;
 var
-  i: integer;
+  i: Integer;
 begin
-  if fZeroStart then
+  if FZeroStart then
     Dec(Line)
-  else if fLineNumberStart > 1 then
-    Inc(Line, fLineNumberStart - 1);
-  Result := Format('%*d', [fAutoSizeDigitCount, Line]);
-  if fLeadingZeros then
-    for i := 1 to fAutoSizeDigitCount - 1 do begin
-      if (Result[i] <> ' ') then break;
+  else if FLineNumberStart > 1 then
+    Inc(Line, FLineNumberStart - 1);
+  Result := Format('%*d', [FAutoSizeDigitCount, Line]);
+  if FLeadingZeros then
+    for i := 1 to FAutoSizeDigitCount - 1 do
+    begin
+      if (Result[i] <> ' ') then
+        Break;
       Result[i] := '0';
     end;
 end;
 
-function TSynGutter.RealGutterWidth(CharWidth: integer): integer;
+function TSynGutter.RealGutterWidth(CharWidth: Integer): Integer;
 begin
-  if not fVisible then
+  if not FVisible then
     Result := 0
-  else if fShowLineNumbers then
-    Result := fLeftOffset + fRightOffset + fAutoSizeDigitCount * CharWidth + fRightMargin
-  else if fAutoSize then
-    Result := fLeftOffset + fRightOffset + fRightMargin
   else
-    Result := fWidth;
+  begin
+    if FShowLineNumbers then
+      Result := FLeftOffset + FRightOffset + FAutoSizeDigitCount * CharWidth + FRightMargin
+    else if FAutoSize then
+      Result := FLeftOffset + FRightOffset + FRightMargin
+    else
+      Result := FWidth;
+
+    // take modification indicator into account
+    if FShowModification then
+      Result := Result + FModificationBarWidth;
+  end;
 end;
 
-procedure TSynGutter.SetAutoSize(const Value: boolean);
+procedure TSynGutter.SetAutoSize(const Value: Boolean);
 begin
-  if fAutoSize <> Value then begin
-    fAutoSize := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FAutoSize <> Value then begin
+    FAutoSize := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynGutter.SetColor(const Value: TColor);
 begin
-  if fColor <> Value then begin
-    fColor := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FColor <> Value then begin
+    FColor := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynGutter.SetFont(Value: TFont);
 begin
-  fFont.Assign(Value);
+  FFont.Assign(Value);
 end;
 
 procedure TSynGutter.OnFontChange(Sender: TObject);
 begin
-  if Assigned(fOnChange) then fOnChange(Self);
+  if Assigned(FOnChange) then FOnChange(Self);
 end;
 
-procedure TSynGutter.SetDigitCount(Value: integer);
+procedure TSynGutter.SetDigitCount(Value: Integer);
 begin
   Value := MinMax(Value, 2, 12);
-  if fDigitCount <> Value then begin
-    fDigitCount := Value;
-    fAutoSizeDigitCount := fDigitCount;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FDigitCount <> Value then begin
+    FDigitCount := Value;
+    FAutoSizeDigitCount := FDigitCount;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynGutter.SetLeadingZeros(const Value: boolean);
+procedure TSynGutter.SetLeadingZeros(const Value: Boolean);
 begin
-  if fLeadingZeros <> Value then begin
-    fLeadingZeros := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FLeadingZeros <> Value then begin
+    FLeadingZeros := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynGutter.SetLeftOffset(Value: integer);
-begin
-  Value := Max(0, Value);
-  if fLeftOffset <> Value then begin
-    fLeftOffset := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
-  end;
-end;
-
-procedure TSynGutter.SetRightOffset(Value: integer);
+procedure TSynGutter.SetLeftOffset(Value: Integer);
 begin
   Value := Max(0, Value);
-  if fRightOffset <> Value then begin
-    fRightOffset := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FLeftOffset <> Value then begin
+    FLeftOffset := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
+  end;
+end;
+
+procedure TSynGutter.SetRightOffset(Value: Integer);
+begin
+  Value := Max(0, Value);
+  if FRightOffset <> Value then begin
+    FRightOffset := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
@@ -642,142 +679,180 @@ begin
   end;
 end;
 
-procedure TSynGutter.SetShowLineNumbers(const Value: boolean);
+procedure TSynGutter.SetShowLineNumbers(const Value: Boolean);
 begin
-  if fShowLineNumbers <> Value then begin
-    fShowLineNumbers := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FShowLineNumbers <> Value then begin
+    FShowLineNumbers := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynGutter.SetUseFontStyle(Value: boolean);
+procedure TSynGutter.SetShowModification(const Value: Boolean);
 begin
-  if fUseFontStyle <> Value then begin
-    fUseFontStyle := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FShowModification <> Value then begin
+    FShowModification := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynGutter.SetVisible(Value: boolean);
+procedure TSynGutter.SetUseFontStyle(Value: Boolean);
 begin
-  if fVisible <> Value then begin
-    fVisible := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FUseFontStyle <> Value then begin
+    FUseFontStyle := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynGutter.SetWidth(Value: integer);
+procedure TSynGutter.SetVisible(Value: Boolean);
+begin
+  if FVisible <> Value then begin
+    FVisible := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
+  end;
+end;
+
+procedure TSynGutter.SetWidth(Value: Integer);
 begin
   Value := Max(0, Value);
-  if fWidth <> Value then begin
-    fWidth := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FWidth <> Value then begin
+    FWidth := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynGutter.SetZeroStart(const Value: boolean);
+procedure TSynGutter.SetZeroStart(const Value: Boolean);
 begin
-  if fZeroStart <> Value then begin
-    fZeroStart := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FZeroStart <> Value then begin
+    FZeroStart := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynGutter.SetBorderStyle(const Value: TSynGutterBorderStyle);
 begin
-  fBorderStyle := Value;
-  if Assigned(fOnChange) then fOnChange(Self);
+  FBorderStyle := Value;
+  if Assigned(FOnChange) then FOnChange(Self);
 end;
 
 procedure TSynGutter.SetLineNumberStart(const Value: Integer);
 begin
-  if Value <> fLineNumberStart then
+  if Value <> FLineNumberStart then
   begin
-    fLineNumberStart := Value;
-    if fLineNumberStart < 0 then
-      fLineNumberStart := 0;
-    if fLineNumberStart = 0 then
-      fZeroStart := True
+    FLineNumberStart := Value;
+    if FLineNumberStart < 0 then
+      FLineNumberStart := 0;
+    if FLineNumberStart = 0 then
+      FZeroStart := True
     else
-      fZeroStart := False;
-    if Assigned(fOnChange) then fOnChange(Self);
+      FZeroStart := False;
+    if Assigned(FOnChange) then FOnChange(Self);
+  end;
+end;
+
+procedure TSynGutter.SetModificationBarWidth(const Value: Integer);
+begin
+  if FModificationBarWidth <> Value then
+  begin
+    FModificationBarWidth := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
+  end;
+end;
+
+procedure TSynGutter.SetModificationColorModified(const Value: TColor);
+begin
+  if FModificationColorModified <> Value then
+  begin
+    FModificationColorModified := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
+  end;
+end;
+
+procedure TSynGutter.SetModificationColorSaved(const Value: TColor);
+begin
+  if FModificationColorSaved <> Value then
+  begin
+    FModificationColorSaved := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynGutter.SetBorderColor(const Value: TColor);
 begin
-  if fBorderColor <> Value then 
+  if FBorderColor <> Value then
   begin
-    fBorderColor := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FBorderColor := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynGutter.SetGradient(const Value: Boolean);
 begin
-  if Value <> fGradient then
+  if Value <> FGradient then
   begin
-    fGradient := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FGradient := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynGutter.SetGradientEndColor(const Value: TColor);
 begin
-  if Value <> fGradientEndColor then
+  if Value <> FGradientEndColor then
   begin
-    fGradientEndColor := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FGradientEndColor := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynGutter.SetGradientStartColor(const Value: TColor);
 begin
-  if Value <> fGradientStartColor then
+  if Value <> FGradientStartColor then
   begin
-    fGradientStartColor := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FGradientStartColor := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynGutter.SetGradientSteps(const Value: Integer);
 begin
-  if Value <> fGradientSteps then
+  if Value <> FGradientSteps then
   begin
-    fGradientSteps := Value;
-    if fGradientSteps < 2 then
-      fGradientSteps := 2;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FGradientSteps := Value;
+    if FGradientSteps < 2 then
+      FGradientSteps := 2;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-function TSynGutter.GetWidth: integer;
+function TSynGutter.GetWidth: Integer;
 begin
   if not Visible then
     Result := 0
   else
-    Result := fWidth;
+    Result := FWidth;
 end;
 
 { TSynBookMarkOpt }
 
 //++ DPI-Aware
 procedure TSynBookMarkOpt.ChangeScale(M, D: Integer);
+Var
+  L : Integer;
 begin
-  fLeftMargin := MulDiv(fLeftMargin, M, D);
-  fXoffset := MulDiv(fXoffset, M, D);
+  L := (M div D) * D;    // Factor multiple of 100%
+  fLeftMargin := MulDiv(fLeftMargin, L, D);
+  fXoffset := MulDiv(fXoffset, L, D);
 end;
 //-- DPI-Aware
 
 constructor TSynBookMarkOpt.Create(AOwner: TComponent);
 begin
   inherited Create;
-  fDrawBookmarksFirst := TRUE;
-  fEnableKeys := True;
-  fGlyphsVisible := True;
-  fLeftMargin := 2;
-  fOwner := AOwner;
-  fXOffset := 12;
+  FDrawBookmarksFirst := TRUE;
+  FEnableKeys := True;
+  FGlyphsVisible := True;
+  FLeftMargin := 2;
+  FOwner := AOwner;
+  FXoffset := 12;
 end;
 
 procedure TSynBookMarkOpt.Assign(Source: TPersistent);
@@ -786,55 +861,55 @@ var
 begin
   if (Source <> nil) and (Source is TSynBookMarkOpt) then begin
     Src := TSynBookMarkOpt(Source);
-    fBookmarkImages := Src.fBookmarkImages;
-    fDrawBookmarksFirst := Src.fDrawBookmarksFirst;
-    fEnableKeys := Src.fEnableKeys;
-    fGlyphsVisible := Src.fGlyphsVisible;
-    fLeftMargin := Src.fLeftMargin;
-    fXoffset := Src.fXoffset;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FBookmarkImages := Src.FBookmarkImages;
+    FDrawBookmarksFirst := Src.FDrawBookmarksFirst;
+    FEnableKeys := Src.FEnableKeys;
+    FGlyphsVisible := Src.FGlyphsVisible;
+    FLeftMargin := Src.FLeftMargin;
+    FXoffset := Src.FXoffset;
+    if Assigned(FOnChange) then FOnChange(Self);
   end else
     inherited Assign(Source);
 end;
 
-procedure TSynBookMarkOpt.SetBookmarkImages(const Value: TCustomImageList);
+procedure TSynBookMarkOpt.SetBookmarkImages(const Value: TImageList);
 begin
-  if fBookmarkImages <> Value then begin
-    fBookmarkImages := Value;
-    if Assigned(fBookmarkImages) then fBookmarkImages.FreeNotification(fOwner);
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FBookmarkImages <> Value then begin
+    FBookmarkImages := Value;
+    if Assigned(FBookmarkImages) then FBookmarkImages.FreeNotification(FOwner);
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynBookMarkOpt.SetDrawBookmarksFirst(Value: boolean);
+procedure TSynBookMarkOpt.SetDrawBookmarksFirst(Value: Boolean);
 begin
-  if Value <> fDrawBookmarksFirst then begin
-    fDrawBookmarksFirst := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if Value <> FDrawBookmarksFirst then begin
+    FDrawBookmarksFirst := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynBookMarkOpt.SetGlyphsVisible(Value: Boolean);
 begin
-  if fGlyphsVisible <> Value then begin
-    fGlyphsVisible := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FGlyphsVisible <> Value then begin
+    FGlyphsVisible := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
 procedure TSynBookMarkOpt.SetLeftMargin(Value: Integer);
 begin
-  if fLeftMargin <> Value then begin
-    fLeftMargin := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FLeftMargin <> Value then begin
+    FLeftMargin := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynBookMarkOpt.SetXOffset(Value: integer);
+procedure TSynBookMarkOpt.SetXOffset(Value: Integer);
 begin
-  if fXOffset <> Value then begin
-    fXOffset := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+  if FXoffset <> Value then begin
+    FXoffset := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
@@ -842,10 +917,12 @@ end;
 
 //++ DPI-Aware
 procedure TSynGlyph.ChangeScale(M, D: Integer);
+Var
+  L : Integer;
 begin
-  ResizeBitmap(fInternalGlyph, MulDiv(fInternalGlyph.Width, M, D), MulDiv(fInternalGlyph.Height, M, D));
-  if not fGlyph.Empty then
-    ResizeBitmap(fGlyph, MulDiv(fGlyph.Width, M, D), MulDiv(fGlyph.Height, M, D));
+  L := (M div D) * D;    // Factor multiple of 100%
+  ResizeBitmap(fInternalGlyph, MulDiv(fInternalGlyph.Width, L, D), MulDiv(fInternalGlyph.Height, L, D));
+  ResizeBitmap(fGlyph, MulDiv(fGlyph.Width, L, D), MulDiv(fGlyph.Height, L, D));
 end;
 //-- DPI-Aware
 
@@ -855,25 +932,25 @@ begin
 
   if aName <> '' then
   begin
-    fInternalGlyph := TBitmap.Create;
-    fInternalGlyph.LoadFromResourceName(aModule, aName);
-    fInternalMaskColor := aMaskColor;
+    FInternalGlyph := TBitmap.Create;
+    FInternalGlyph.LoadFromResourceName(aModule, aName);
+    FInternalMaskColor := aMaskColor;
   end
   else
-    fInternalMaskColor := clNone;
+    FInternalMaskColor := clNone;
 
-  fVisible := True;
-  fGlyph := TBitmap.Create;
-  fGlyph.OnChange := GlyphChange;
-  fMaskColor := clNone;
+  FVisible := True;
+  FGlyph := TBitmap.Create;
+  FGlyph.OnChange := GlyphChange;
+  FMaskColor := clNone;
 end;
 
 destructor TSynGlyph.Destroy;
 begin
-  if Assigned(fInternalGlyph) then
-    FreeAndNil(fInternalGlyph);
+  if Assigned(FInternalGlyph) then
+    FreeAndNil(FInternalGlyph);
 
-  fGlyph.Free;
+  FGlyph.Free;
 
   inherited Destroy;
 end;
@@ -885,32 +962,32 @@ begin
   if Assigned(aSource) and (aSource is TSynGlyph) then
   begin
     vSrc := TSynGlyph(aSource);
-    fInternalGlyph := vSrc.fInternalGlyph;
-    fInternalMaskColor := vSrc.fInternalMaskColor;
-    fVisible := vSrc.fVisible;
-    fGlyph := vSrc.fGlyph;
-    fMaskColor := vSrc.fMaskColor;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FInternalGlyph := vSrc.FInternalGlyph;
+    FInternalMaskColor := vSrc.FInternalMaskColor;
+    FVisible := vSrc.FVisible;
+    FGlyph := vSrc.FGlyph;
+    FMaskColor := vSrc.FMaskColor;
+    if Assigned(FOnChange) then FOnChange(Self);
   end
   else
     inherited;
 end;
 
-procedure TSynGlyph.Draw(aCanvas: TCanvas; aX, aY, aLineHeight: integer);
+procedure TSynGlyph.Draw(aCanvas: TCanvas; aX, aY, aLineHeight: Integer);
 var
   rcSrc, rcDest : TRect;
   vGlyph : TBitmap;
   vMaskColor : TColor;
 begin
-  if not fGlyph.Empty then
+  if not FGlyph.Empty then
   begin
-    vGlyph := fGlyph;
-    vMaskColor := fMaskColor;
+    vGlyph := FGlyph;
+    vMaskColor := FMaskColor;
   end
-  else if Assigned(fInternalGlyph) then
+  else if Assigned(FInternalGlyph) then
   begin
-    vGlyph := fInternalGlyph;
-    vMaskColor := fInternalMaskColor;
+    vGlyph := FInternalGlyph;
+    vMaskColor := FInternalMaskColor;
   end
   else
     Exit;
@@ -933,50 +1010,50 @@ end;
 
 procedure TSynGlyph.SetGlyph(Value: TBitmap);
 begin
-  fGlyph.Assign(Value);
+  FGlyph.Assign(Value);
 end;
 
 procedure TSynGlyph.GlyphChange(Sender: TObject);
 begin
-  if Assigned(fOnChange) then fOnChange(Self);
+  if Assigned(FOnChange) then FOnChange(Self);
 end;
 
 procedure TSynGlyph.SetMaskColor(Value: TColor);
 begin
-  if fMaskColor <> Value then
+  if FMaskColor <> Value then
   begin
-    fMaskColor := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FMaskColor := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-procedure TSynGlyph.SetVisible(Value: boolean);
+procedure TSynGlyph.SetVisible(Value: Boolean);
 begin
-  if fVisible <> Value then
+  if FVisible <> Value then
   begin
-    fVisible := Value;
-    if Assigned(fOnChange) then fOnChange(Self);
+    FVisible := Value;
+    if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
 
-function TSynGlyph.GetWidth : integer;
+function TSynGlyph.GetWidth : Integer;
 begin
-  if not fGlyph.Empty then
-    Result := fGlyph.Width
+  if not FGlyph.Empty then
+    Result := FGlyph.Width
   else
-  if Assigned(fInternalGlyph) then
-    Result := fInternalGlyph.Width
+  if Assigned(FInternalGlyph) then
+    Result := FInternalGlyph.Width
   else
     Result := 0;
 end;
 
-function TSynGlyph.GetHeight : integer;
+function TSynGlyph.GetHeight : Integer;
 begin
-  if not fGlyph.Empty then
-    Result := fGlyph.Height
+  if not FGlyph.Empty then
+    Result := FGlyph.Height
   else
-  if Assigned(fInternalGlyph) then
-    Result := fInternalGlyph.Height
+  if Assigned(FInternalGlyph) then
+    Result := FInternalGlyph.Height
   else
     Result := 0;
 end;
@@ -1108,72 +1185,148 @@ type
       Bitmap     : TBitmap;
   end;
 
-procedure TSynInternalImage.ChangeScale(M, D: Integer);
-begin
-  if M = D then Exit;
+var
+  InternalResources: TList;
 
-  fWidth := MulDiv(fWidth, M, D);
-  ResizeBitmap(fImages, fWidth * fCount, MulDiv(fImages.Height, M, D));
+//++ DPI-Aware
+procedure TSynInternalImage.ChangeScale(M, D: Integer);
+Var
+  L: Integer;
+begin
+  L := (M div D) * D;    // Factor multiple of 100%
+  fWidth := MulDiv(fWidth, L, D);
+  ResizeBitmap(fImages, fWidth * fCount, MulDiv(fImages.Height, L, D));
   fHeight := fImages.Height;
 end;
+//-- DPI-Aware
 
-constructor TSynInternalImage.Create(aModule: THandle; const Name: string; Count: integer);
+constructor TSynInternalImage.Create(aModule: THandle; const Name: string;
+  Count: Integer);
 begin
   inherited Create;
-  fImages := TBitmap.Create;
-  fImages.LoadFromResourceName(aModule, Name);
-  fWidth := (fImages.Width + Count shr 1) div Count;
-  fHeight := fImages.Height;
-  fCount := Count;
+  FImages := CreateBitmapFromInternalList(aModule, Name);
+  FWidth := (FImages.Width + Count shr 1) div Count;
+  FHeight := FImages.Height;
+  FCount := Count;
 end;
 
 destructor TSynInternalImage.Destroy;
 begin
-  fImages.Free;
+  FreeBitmapFromInternalList;
   inherited Destroy;
 end;
 
+function TSynInternalImage.CreateBitmapFromInternalList(aModule: THandle;
+  const Name: string): TBitmap;
+var
+  idx: Integer;
+  newIntRes: TInternalResource;
+begin
+  { There is no list until now }
+  if (InternalResources = nil) then
+    InternalResources := TList.Create;
+
+  { Search the list for the needed resource }
+  for idx := 0 to InternalResources.Count - 1 do
+    if (TInternalResource(InternalResources[idx]).Name = UpperCase(Name)) then
+      with TInternalResource(InternalResources[idx]) do begin
+        UsageCount := UsageCount + 1;
+        Result := Bitmap;
+        Exit;
+      end;
+
+  { There is no loaded resource in the list so let's create a new one }
+  Result := TBitmap.Create;
+  Result.LoadFromResourceName(aModule, Name);
+
+  { Add the new resource to our list }
+  newIntRes:= TInternalResource.Create;
+  newIntRes.UsageCount := 1;
+  newIntRes.Name := UpperCase(Name);
+  newIntRes.Bitmap := Result;
+  InternalResources.Add(newIntRes);
+end;
+
+procedure TSynInternalImage.FreeBitmapFromInternalList;
+var
+  idx: Integer;
+  intRes: TInternalResource;
+  function FindImageInList: Integer;
+  begin
+    for Result := 0 to InternalResources.Count - 1 do
+      if (TInternalResource (InternalResources[Result]).Bitmap = FImages) then
+        Exit;
+    Result := -1;
+  end;
+begin
+  { Search the index of our resource in the list }
+  idx := FindImageInList;
+
+  { Ey, what's this ???? }
+  if (idx = -1) then
+    Exit;
+
+  { Decrement the usagecount in the object. If there are no more users
+    remove the object from the list and free it }
+  intRes := TInternalResource (InternalResources[idx]);
+  with intRes do begin
+    UsageCount := UsageCount - 1;
+    if (UsageCount = 0) then begin
+      Bitmap.Free;
+      InternalResources.Delete (idx);
+      intRes.Free;
+    end;
+  end;
+
+  { If there are no more entries in the list free it }
+  if (InternalResources.Count = 0) then begin
+    InternalResources.Free;
+    InternalResources := nil;
+  end;
+end;
+
 procedure TSynInternalImage.Draw(ACanvas: TCanvas;
-  Number, X, Y, LineHeight: integer);
+  Number, X, Y, LineHeight: Integer);
 var
   rcSrc, rcDest: TRect;
 begin
-  if (Number >= 0) and (Number < fCount) then
+  if (Number >= 0) and (Number < FCount) then
   begin
-    if LineHeight >= fHeight then begin
-      rcSrc := Rect(Number * fWidth, 0, (Number + 1) * fWidth, fHeight);
-      Inc(Y, (LineHeight - fHeight) div 2);
-      rcDest := Rect(X, Y, X + fWidth, Y + fHeight);
+    if LineHeight >= FHeight then begin
+      rcSrc := Rect(Number * FWidth, 0, (Number + 1) * FWidth, FHeight);
+      Inc(Y, (LineHeight - FHeight) div 2);
+      rcDest := Rect(X, Y, X + FWidth, Y + FHeight);
     end else begin
-      rcDest := Rect(X, Y, X + fWidth, Y + LineHeight);
-      Y := (fHeight - LineHeight) div 2;
-      rcSrc := Rect(Number * fWidth, Y, (Number + 1) * fWidth,
+      rcDest := Rect(X, Y, X + FWidth, Y + LineHeight);
+      Y := (FHeight - LineHeight) div 2;
+      rcSrc := Rect(Number * FWidth, Y, (Number + 1) * FWidth,
         Y + LineHeight);
     end;
-    ACanvas.CopyRect(rcDest, fImages.Canvas, rcSrc);
+    ACanvas.CopyRect(rcDest, FImages.Canvas, rcSrc);
   end;
 end;
 
 procedure TSynInternalImage.DrawTransparent(ACanvas: TCanvas; Number, X, Y,
-  LineHeight: integer; TransparentColor: TColor);
+  LineHeight: Integer; TransparentColor: TColor);
 var
   rcSrc, rcDest: TRect;
 begin
-  if (Number >= 0) and (Number < fCount) then
+  if (Number >= 0) and (Number < FCount) then
   begin
-    if LineHeight >= fHeight then begin
-      rcSrc := Rect(Number * fWidth, 0, (Number + 1) * fWidth, fHeight);
-      Inc(Y, (LineHeight - fHeight) div 2);
-      rcDest := Rect(X, Y, X + fWidth, Y + fHeight);
+    if LineHeight >= FHeight then begin
+      rcSrc := Rect(Number * FWidth, 0, (Number + 1) * FWidth, FHeight);
+      Inc(Y, (LineHeight - FHeight) div 2);
+      rcDest := Rect(X, Y, X + FWidth, Y + FHeight);
     end else begin
-      rcDest := Rect(X, Y, X + fWidth, Y + LineHeight);
-      Y := (fHeight - LineHeight) div 2;
-      rcSrc := Rect(Number * fWidth, Y, (Number + 1) * fWidth,
+      rcDest := Rect(X, Y, X + FWidth, Y + LineHeight);
+      Y := (FHeight - LineHeight) div 2;
+      rcSrc := Rect(Number * FWidth, Y, (Number + 1) * FWidth,
         Y + LineHeight);
     end;
-    ACanvas.BrushCopy(rcDest, fImages, rcSrc, TransparentColor);
+    ACanvas.BrushCopy(rcDest, FImages, rcSrc, TransparentColor);
   end;
 end;
+
 
 { TSynHotKey }
 
@@ -1213,7 +1366,7 @@ begin
     Result := hcNone;
 end;
 
-function ShortCutToTextEx(Key: Word; Shift: TShiftState): string;
+function ShortCutToTextEx(Key: Word; Shift: TShiftState): UnicodeString;
 begin
   if ssCtrl in Shift then Result := SmkcCtrl;
   if ssShift in Shift then Result := Result + SmkcShift;
@@ -1229,7 +1382,9 @@ begin
   inherited;
 
   BorderStyle := bsSingle;
+  {$IFDEF SYN_COMPILER_7_UP}
   ControlStyle := ControlStyle + [csNeedsBorderPaint];
+  {$ENDIF}
 
   FInvalidKeys := [hcNone, hcShift];
   FModifiers := [hkAlt];
@@ -1249,9 +1404,9 @@ begin
   with Params do
   begin
     WindowClass.Style := WindowClass.Style and not ClassStylesOff;
-    Style := Style or BorderStyles[fBorderStyle] or WS_CLIPCHILDREN;
+    Style := Style or BorderStyles[FBorderStyle] or WS_CLIPCHILDREN;
 
-    if NewStyleControls and Ctl3D and (fBorderStyle = bsSingle) then
+    if NewStyleControls and Ctl3D and (FBorderStyle = bsSingle) then
     begin
       Style := Style and not WS_BORDER;
       ExStyle := ExStyle or WS_EX_CLIENTEDGE;
@@ -1273,7 +1428,20 @@ procedure TSynHotKey.KeyDown(var Key: Word; Shift: TShiftState);
 var
   MaybeInvalidKey: THKInvalidKey;
   SavedKey: Word;
+  {$IFDEF SYN_LINUX}
+  Code: Byte;
+  {$ENDIF}
 begin
+  {$IFDEF SYN_LINUX}
+  // uniform Keycode: key has the same value wether Shift is pressed or not
+  if Key <= 255 then
+  begin
+    Code := XKeysymToKeycode(Xlib.PDisplay(QtDisplay), Key);
+    Key := XKeycodeToKeysym(Xlib.PDisplay(QtDisplay), Code, 0);
+    if AnsiChar(Key) in ['a'..'z'] then Key := Ord(UpCase(AnsiChar(Key)));
+  end;
+  {$ENDIF}
+  
   SavedKey := Key;
   FPressedOnlyModifiers := KeySameAsShiftState(Key, Shift);
 
@@ -1295,19 +1463,33 @@ begin
   begin
     Text := ShortCutToTextEx(Key, Shift);
     Invalidate;
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   end;
 
   Key := SavedKey;
 end;
 
 procedure TSynHotKey.KeyUp(var Key: Word; Shift: TShiftState);
+{$IFDEF SYN_LINUX}
+var
+  Code: Byte;
+{$ENDIF}
 begin
+  {$IFDEF SYN_LINUX}
+  // uniform Keycode: key has the same value wether Shift is pressed or not
+  if Key <= 255 then
+  begin
+    Code := XKeysymToKeycode(Xlib.PDisplay(QtDisplay), Key);
+    Key := XKeycodeToKeysym(Xlib.PDisplay(QtDisplay), Code, 0);
+    if AnsiChar(Key) in ['a'..'z'] then Key := Ord(UpCase(AnsiChar(Key)));
+  end;
+  {$ENDIF}
+  
   if FPressedOnlyModifiers then
   begin
     Text := srNone;
     Invalidate;
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   end;
 end;
 
@@ -1328,8 +1510,7 @@ begin
   Canvas.Brush.Color := Color;
   InflateRect(r, -BorderWidth, -BorderWidth);
   Canvas.FillRect(r);
-  Canvas.Font := Font;
-  Canvas.TextRect(r, BorderWidth + 1, BorderWidth + 1, Text);
+  TextRect(Canvas, r, BorderWidth + 1, BorderWidth + 1, Text);
 end;
 
 procedure TSynHotKey.SetBorderStyle(const Value: TSynBorderStyle);
@@ -1357,7 +1538,7 @@ begin
   Text := ShortCutToTextEx(Key, Shift);
   Invalidate;
   if not Visible then
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
 end;
 
 procedure TSynHotKey.SetInvalidKeys(const Value: THKInvalidKeys);
@@ -1386,9 +1567,12 @@ procedure TSynHotKey.WMSetFocus(var Msg: TWMSetFocus);
 begin
   Canvas.Font := Font;
   CreateCaret(Handle, 0, 1, -Canvas.Font.Height + 2);
-  SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+  SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   ShowCaret(Handle);
 end;
+
+
+{$IFNDEF SYN_COMPILER_4_UP}
 
 { TBetterRegistry }
 
@@ -1418,4 +1602,8 @@ begin
   end;
 end; { TBetterRegistry.OpenKeyReadOnly }
 
+{$ENDIF SYN_COMPILER_4_UP}
+
+begin
+  InternalResources := nil;
 end.

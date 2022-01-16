@@ -35,13 +35,21 @@ located at http://SynEdit.SourceForge.net
 Known Issues:
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEDITKEYCMDSEDITOR}
 unit SynEditKeyCmdsEditor;
+{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
+  {$IFDEF SYN_COMPILER_15_UP}
+  Types,
+  {$ENDIF}
+  {$IFDEF SYN_COMPILER_17_UP}
+  UITypes,
+  {$ENDIF}
   Windows,
   Messages,
   Graphics,
@@ -101,8 +109,6 @@ implementation
 {$R *.dfm}
 
 uses
-  Types,
-  UITypes,
   SynEditKeyCmdEditor,
   SynEditStrConst;
 
@@ -116,7 +122,7 @@ end;
 
 destructor TSynEditKeystrokesEditorForm.Destroy;
 begin
-  if Assigned(FKeyStrokes) then FKeystrokes.Free;
+  if Assigned(FKeystrokes) then FKeystrokes.Free;
   inherited Destroy;
 end;
 
@@ -131,7 +137,7 @@ end;
 
 procedure TSynEditKeystrokesEditorForm.UpdateKeystrokesList;
 var
-  x: integer;
+  x: Integer;
 begin
   KeyCmdList.Items.BeginUpdate;
   try
@@ -240,6 +246,7 @@ begin
 
       if AddKeyStroke then
       begin
+
         with KeyCmdList.Items.Add do
         begin
           if FExtended then
@@ -306,28 +313,13 @@ var
         // Some other kind of exception, we don't deal with it...
       end;
     end;
-(*
-      if ShowModal = mrOK then
-      begin
-
-        try
-        except
-          on ESynKeyError do
-            begin
-              // Shortcut already exists in the collection!
-              MessageDlg(Format(SYNS_DuplicateShortcutMsg2,
-                [Menus.ShortCutToText(Keystroke)]), mtError, [mbOK], 0);
-            end;
-          // Some other kind of exception, we don't deal with it...
-        end;
-*)
   end;
 begin
   SelItem := KeyCmdList.Selected;
   if SelItem = NIL then
   begin
     MessageBeep(1);
-    exit;
+    Exit;
   end;
   AForm := TSynEditKeystrokeEditorForm.Create(Self);
   with AForm do
@@ -373,7 +365,7 @@ begin
   if SelItem = nil then
   begin
     MessageBeep(1);
-    exit;
+    Exit;
   end;
   FKeystrokes[SelItem.Index].Free;
   KeyCmdList.Items.Delete(SelItem.Index);
@@ -393,7 +385,9 @@ end;
 
 procedure TSynEditKeystrokesEditorForm.FormCreate(Sender: TObject);
 begin
+  {$IFDEF SYN_COMPILER_3_UP}
   KeyCmdList.RowSelect := True;
+  {$ENDIF}
 end;
 
 procedure TSynEditKeystrokesEditorForm.btnOKClick(Sender: TObject);

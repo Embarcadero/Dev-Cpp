@@ -41,7 +41,9 @@ Known Issues:
   We'll have to wait for LaTeX 3.)
 -------------------------------------------------------------------------------}
 
+{$IFNDEF QSYNEXPORTTEX}
 unit SynExportTeX;
+{$ENDIF}
 
 {$I SynEdit.inc}
 
@@ -58,8 +60,8 @@ uses
 type
   TSynExporterTeX = class(TSynCustomExporter)
   private
-    fMargin: integer;
-    fLastAttri: TSynHighlighterAttributes;
+    FMargin: Integer;
+    FLastAttri: TSynHighlighterAttributes;
     function AttriToCommand(Attri: TSynHighlighterAttributes;
       UniqueAttriName: string): string;
     function AttriToCommandCallback(Highlighter: TSynCustomHighlighter;
@@ -73,9 +75,9 @@ type
     function GetNewCommands: string;
     function MakeValidName(Name: string): string;
   protected
-    fCreateTeXFragment: boolean;
-    fTabWidth: integer;
-    fPageStyleEmpty: boolean;
+    FCreateTeXFragment: Boolean;
+    FTabWidth: Integer;
+    FPageStyleEmpty: Boolean;
     
     // overriding these abstract methods (though they are never called for this
     // specific highlighter) to prevent abstract instance warnings
@@ -88,23 +90,23 @@ type
       ForegroundChanged: Boolean; FontStylesChanged: TFontStyles); override;
 
     procedure FormatNewLine; override;
-    procedure FormatToken(Token: string); override;
-    function GetFooter: string; override;
+    procedure FormatToken(Token: UnicodeString); override;
+    function GetFooter: UnicodeString; override;
     function GetFormatName: string; override;
-    function GetHeader: string; override;
-    function ReplaceReservedChar(AChar: WideChar): string; override;
+    function GetHeader: UnicodeString; override;
+    function ReplaceReservedChar(AChar: WideChar): UnicodeString; override;
     procedure SetTokenAttribute(Attri: TSynHighlighterAttributes); override;
     function UseBom: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     function SupportedEncodings: TSynEncodings; override;
   published
-    property Margin: integer read fMargin write fMargin default 2;
-    property TabWidth: integer read fTabWidth write fTabWidth default 2;
+    property Margin: Integer read FMargin write FMargin default 2;
+    property TabWidth: Integer read FTabWidth write FTabWidth default 2;
     property Color;
-    property CreateTeXFragment: boolean read fCreateTeXFragment
-      write fCreateTeXFragment default false;
-    property PageStyleEmpty: boolean read fPageStyleEmpty write fPageStyleEmpty
+    property CreateTeXFragment: Boolean read FCreateTeXFragment
+      write FCreateTeXFragment default false;
+    property PageStyleEmpty: Boolean read FPageStyleEmpty write FPageStyleEmpty
       default false;
     property DefaultFilter;
     property Encoding;
@@ -128,11 +130,16 @@ uses
 // different (for example a comma).
 function DotDecSepFormat(const Format: string; const Args: array of const): string;
 var
-  pSettings: TFormatSettings;
+{$IFDEF UNICODE}
+  OldDecimalSeparator: WideChar;
+{$ELSE}
+  OldDecimalSeparator: AnsiChar;
+{$ENDIF}
 begin
-  pSettings := FormatSettings;
-  pSettings.DecimalSeparator := '.';
-  Result := SysUtils.Format(Format, Args, pSettings);
+  OldDecimalSeparator := {$IFDEF SYN_COMPILER_15_UP}FormatSettings.{$ENDIF}DecimalSeparator;
+  {$IFDEF SYN_COMPILER_15_UP}FormatSettings.{$ENDIF}DecimalSeparator := '.';
+  Result := SysUtils.Format(Format, Args);
+  {$IFDEF SYN_COMPILER_15_UP}FormatSettings.{$ENDIF}DecimalSeparator := OldDecimalSeparator;
 end;
 
 function ColorToTeX(AColor: TColor): string;
@@ -155,10 +162,10 @@ end;
 constructor TSynExporterTeX.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  fMargin := 2;
-  fTabWidth := 2;
-  fPageStyleEmpty := false;
-  fDefaultFilter := SYNS_FilterTeX;
+  FMargin := 2;
+  FTabWidth := 2;
+  FPageStyleEmpty := False;
+  FDefaultFilter := SYNS_FilterTeX;
   FEncoding := seAnsi;
 end;
 
@@ -238,11 +245,11 @@ begin
     Result := True;
 end;
 
-procedure TSynExporterTeX.FormatToken(Token: string);
+procedure TSynExporterTeX.FormatToken(Token: UnicodeString);
 var
   CommandName: string;
 begin
-  CommandName := GetCommandName(Highlighter, fLastAttri);
+  CommandName := GetCommandName(Highlighter, FLastAttri);
   AddData('\' + CommandName + '{' + Token + '}');
 end;
 
@@ -274,9 +281,9 @@ begin
   EnumHighlighterAttris(Highlighter, False, CommandNameCallback, [Attri, @Result]);
 end;
 
-function TSynExporterTeX.GetFooter: string;
+function TSynExporterTeX.GetFooter: UnicodeString;
 begin
-  if not fCreateTeXFragment then
+  if not FCreateTeXFragment then
     Result := SLineBreak + '\end{ttfamily}' + SLineBreak + '\end{document}'
   else
     Result := SLineBreak + '\end{ttfamily}';
@@ -287,7 +294,7 @@ begin
   Result := SYNS_ExporterFormatTeX;
 end;
 
-function TSynExporterTeX.GetHeader: string;
+function TSynExporterTeX.GetHeader: UnicodeString;
 const
   TeXHeader   = '\documentclass[a4paper, %dpt]{article}' + SLineBreak +
                 '\usepackage[a4paper, margin=%dcm]{geometry}' + SLineBreak +
@@ -296,8 +303,13 @@ const
                 '\usepackage{alltt}' + SLineBreak +
                 '\usepackage{times}' + SLineBreak +
                 '\usepackage{ulem}' + SLineBreak +
+{$IFDEF WIN32}
                 // It is recommennded to use AnsiNew on Windows
                 '\usepackage[ansinew]{inputenc}' + SLineBreak +
+{$ELSE}
+                // and Latin1 on UNIX Systems, see also DE FAQ 8.5.3
+                '\usepackage[latin1]{inputenc}' + SLineBreak +
+{$ENDIF}
                 '%s' + SLineBreak; // New Commands
   TeXHeader2  = '%% Generated by SynEdit TeX exporter' + SLineBreak + SLineBreak +
                 '\begin{document}';
@@ -307,14 +319,14 @@ const
 var
   PageStyle: string;
 begin
-  if not fCreateTeXFragment then
+  if not FCreateTeXFragment then
   begin
-    if fPageStyleEmpty then
+    if FPageStyleEmpty then
       PageStyle := SLineBreak + EmptyPage
     else
       PageStyle := '';
     Result := Format(TeXHeader + SLineBreak + SLineBreak,
-      [Font.Size, fMargin, GetNewCommands]);
+      [Font.Size, FMargin, GetNewCommands]);
     Result := Result + '\title{' + Title + '}' + SLineBreak + TeXHeader2 +
       SLineBreak + PageStyle;
   end;
@@ -338,7 +350,7 @@ var
   tw: string;
   Commands: string;
 begin
-  tw := DotDecSepFormat(f, [fTabWidth * 0.6]);
+  tw := DotDecSepFormat(f, [FTabWidth * 0.6]);
   Result := Format(FixedCommands, [tw]);
 
   EnumHighlighterAttris(Highlighter, True, AttriToCommandCallback, [@Commands]);
@@ -360,7 +372,7 @@ begin
     Delete(Result, i, 1);
 end;
 
-function TSynExporterTeX.ReplaceReservedChar(AChar: WideChar): string;
+function TSynExporterTeX.ReplaceReservedChar(AChar: WideChar): UnicodeString;
 begin
   case AChar of
     '{': Result := '\{';
@@ -386,7 +398,7 @@ end;
 
 procedure TSynExporterTeX.SetTokenAttribute(Attri: TSynHighlighterAttributes);
 begin
-  fLastAttri := Attri;
+  FLastAttri := Attri;
 end;
 
 function TSynExporterTeX.SupportedEncodings: TSynEncodings;

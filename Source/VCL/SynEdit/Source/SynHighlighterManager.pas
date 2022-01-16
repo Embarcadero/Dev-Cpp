@@ -89,7 +89,11 @@ type
 implementation
 
 uses
+{$IFDEF SYN_COMPILER_6_UP}
   DesignIntf,
+{$ELSE}
+  DsgnIntf,
+{$ENDIF}
   Windows,
   Forms,
   Controls,
@@ -107,13 +111,22 @@ type
     btnOK: TButton;
     btnCancel: TButton;
     Highlight: TSynHighlighterList;
-    constructor Create(highlighters: TSynHighlighterList); reintroduce;
+    constructor Create(highlighters: TSynHighlighterList);
+      {$IFDEF SYN_COMPILER_4_UP}reintroduce;{$ENDIF}
     procedure   LoadForm;
     procedure   SelectAll(Sender: TObject);
     procedure   DeselectAll(Sender: TObject);
   end;
 
-  TDesignerClass = IDesigner;
+  {$IFDEF SYN_COMPILER_4_UP}
+    {$IFDEF SYN_COMPILER_6_UP}
+      TDesignerClass = IDesigner;
+    {$ELSE}
+      TDesignerClass = IFormDesigner;
+    {$ENDIF}
+  {$ELSE}
+    TDesignerClass = TFormDesigner;
+  {$ENDIF}
 
 { TSynHighlighterManager }
 

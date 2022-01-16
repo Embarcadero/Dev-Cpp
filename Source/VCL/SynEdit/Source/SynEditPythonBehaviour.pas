@@ -42,31 +42,37 @@ The  SynEditPythonBehaviour unit provides a simple component implements editing 
 to a python source file. Python has a unusual way to mark blocks (like begin/end in pascal) : it
 uses indentation. So the rule is after a ":" and a line break, we have to indent once.
 }
+{$IFNDEF QSYNEDITPYTHONBEHAVIOUR}
 unit SynEditPythonBehaviour;
+{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-  Windows, Messages, Graphics, Controls, Forms, Dialogs, SynEdit, SynEditKeyCmds,
-  SynUnicode, SysUtils, Classes, SynEditTypes;
+  Windows, Messages, Graphics, Controls, Forms, Dialogs,
+  SynEdit,
+  SynEditKeyCmds,
+  SynUnicode,
+  SysUtils,
+  Classes;
 
 type
   TSynEditPythonBehaviour = class(TComponent)
   private
     FEditor: TSynEdit;
-    fIndent: integer;
+    FIndent: Integer;
   protected
     procedure SetEditor(Value: TSynEdit); virtual;
-    procedure doProcessUserCommand(Sender: TObject; AfterProcessing: boolean;
-      var Handled: boolean; var Command: TSynEditorCommand;
+    procedure doProcessUserCommand(Sender: TObject; AfterProcessing: Boolean;
+      var Handled: Boolean; var Command: TSynEditorCommand;
       var AChar: WideChar; Data: Pointer; HandlerData: Pointer); virtual;
   public
     constructor Create(aOwner: TComponent); override;
   published
     property Editor: TSynEdit read FEditor write SetEditor;
-    property Indent: integer read fIndent write fIndent default 4;
+    property Indent: Integer read FIndent write FIndent default 4;
   end;
 
 implementation
@@ -88,20 +94,20 @@ begin
 end; 
 
 procedure TSynEditPythonBehaviour.doProcessUserCommand(Sender: TObject;
-  AfterProcessing: boolean; var Handled: boolean;
+  AfterProcessing: Boolean; var Handled: Boolean;
   var Command: TSynEditorCommand; var AChar: WideChar; Data: Pointer;
-  HandlerData: pointer);
+  HandlerData: Pointer);
 var
   iEditor: TCustomSynEdit;
-  iPrevLine: string;
-  cSpace: integer;
+  iPrevLine: UnicodeString;
+  cSpace: Integer;
 begin
   if (Command = ecLineBreak) and AfterProcessing then
   begin
     iEditor := Sender as TCustomSynEdit;
     { CaretY should never be lesser than 2 right after ecLineBreak, so there's
     no need for a check }
-    iPrevLine := TrimRight(iEditor.Lines[iEditor.CaretY - 2]);
+    iPrevLine := WideTrimRight(iEditor.Lines[iEditor.CaretY - 2]);
     if (iPrevLine <> '') and (iPrevLine[Length(iPrevLine)] = ':') then
     begin
       iEditor.UndoList.BeginBlock;
@@ -118,8 +124,7 @@ end;
 constructor TSynEditPythonBehaviour.Create(aOwner: TComponent);
 begin
   inherited Create(AOwner);
-  fIndent := 4;
+  FIndent := 4;
 end;
 
 end.
-
