@@ -9,7 +9,7 @@ Download the latest release:
 Keystone Features:
  - C++17/C++20 (partial) support.
  - Unicode support.
- - Parallel Compilation support.
+ - Parallel Compilation support.   Read about throughput here : https://www.cppstories.com/2021/par-devcpp/
  - Windows 7/8/10 support.
 
 Main Features include:
