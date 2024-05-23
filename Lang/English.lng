@@ -11,7 +11,7 @@ Ver=1
 8=&Window
 9=&Help
 10=&Debug
-11=&Formatting
+11=F&ormatting
 
 
 1001=&New
@@ -357,7 +357,7 @@ Ver=1
 27010=Editor
 27011=Font:
 27012=Size:
-27012=Use font ligatures is available
+27071=Use font ligatures is available
 27013=Editor Font
 27014=Gutter
 27015=Auto size
