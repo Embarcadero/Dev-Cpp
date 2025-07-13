@@ -47,9 +47,9 @@ unit cairolib;
 
 interface
 
-{$IFDEF MSWINDOWS}
+{$ifdef WIN32}
 uses windows;
-{$ENDIF}
+{$endif}
 
 {$ifdef UNIX}
 uses x, xlib, xrender, freetypeh;

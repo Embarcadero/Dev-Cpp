@@ -29,7 +29,6 @@
 { Kiriakos Vlahos (Replacement of MSXLML with XMLite)              }
 { Kiriakos Vlahos (Refactoring parsing)                            }
 { Kiriakos Vlahos (Refactoring parsing Font)                       }
-{ Kiriakos Vlahos (Increase performances using Dictionary)         }
 {                                                                  }
 { This Software is distributed on an "AS IS" basis, WITHOUT        }
 { WARRANTY OF ANY KIND, either express or implied.                 }
@@ -108,7 +107,7 @@ type
     procedure Delete(Index: Integer);
     function Remove(Item: TSVGObject): Integer;
     function IndexOf(Item: TSVGObject): Integer;
-    function FindByID(const Name: string): TSVGObject; virtual;
+    function FindByID(const Name: string): TSVGObject;
     procedure CalculateMatrices;
     function ObjectBounds(IncludeStroke: Boolean = False;
       ApplyTranform: Boolean = False): TRectF; virtual;
@@ -279,7 +278,6 @@ end;
     FFileName: string;
     FGrayscale: Boolean;
     FFixedColor: TColor;
-    FIdDict: TDictionary<string, TSVGObject>;
 
     procedure SetViewBox(const Value: TRectF);
 
@@ -306,7 +304,6 @@ end;
 
     procedure DeReferenceUse;
     function GetStyleValue(const Name, Key: string): string;
-    function FindByID(const Name: string): TSVGObject; override;
 
     procedure LoadFromText(const Text: string);
     procedure LoadFromFile(const FileName: string);
@@ -332,7 +329,6 @@ end;
     property ViewBox: TRectF read FViewBox write SetViewBox;
     property Grayscale: boolean read FGrayscale write SetGrayscale;
     property FixedColor: TColor read FFixedColor write SetFixedColor;
-    property IdDict : TDictionary<string, TSVGObject> read FIdDict;
 
     class function Features: TSVGElementFeatures; override;
   end;
@@ -431,9 +427,9 @@ end;
 
   TSVGPath = class(TSVGShape)
   private
-    function SeparateValues(const ACommand: Char; const S: string; CommandList:
-        TList<Char>; ValueList: TList<TFloat>): Boolean;
-    procedure Split(const S: string; CommandList: TList<Char>;  ValueList: TList<TFloat>);
+    procedure PrepareMoveLineCurveArc(const ACommand: Char; SL: TStrings);
+    procedure SeparateValues(const ACommand: Char; const S: string; Values: TStrings);
+    function Split(const S: string): TStrings;
   protected
     procedure ConstructPath; override;
   public
@@ -539,8 +535,6 @@ end;
   public
     destructor Destroy; override;
     procedure Clear; override;
-    function ReadInAttr(SVGAttr: TSVGAttribute; const AttrValue: string): Boolean; override;
-
     property ClipPath: TGPGraphicsPath read GetClipPath;
 
     class function Features: TSVGElementFeatures; override;
@@ -2090,7 +2084,6 @@ begin
   Graphics := TGPGraphics.Create(DC);
   try
     Graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-    Graphics.SetPixelOffsetMode(PixelOffsetModeHalf);
     PaintTo(Graphics, Bounds, Rects, RectCount);
   finally
     Graphics.Free;
@@ -2105,7 +2098,6 @@ begin
   Graphics := TGPGraphics.Create(MetaFile);
   try
     Graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-    Graphics.SetPixelOffsetMode(PixelOffsetModeHalf);
     PaintTo(Graphics, Bounds, Rects, RectCount);
   finally
     Graphics.Free;
@@ -2145,28 +2137,17 @@ begin
   FillChar(FInitialMatrix, SizeOf(FInitialMatrix), 0);
   FGrayscale  := False;
   FFixedColor := SVG_INHERIT_COLOR;
-  FIdDict := TDictionary<string, TSVGObject>.Create;
 end;
 
 destructor TSVG.Destroy;
 begin
   FreeAndNil(FStyles);
-  FreeAndNil(FidDict);
   inherited;
 end;
 
 class function TSVG.Features: TSVGElementFeatures;
 begin
   Result := [sefMayHaveChildren, sefChildrenNeedPainting];
-end;
-
-function TSVG.FindByID(const Name: string): TSVGObject;
-begin
-   if not FIdDict.TryGetValue(Name, Result) then
-   begin
-     Result := inherited FindById(Name);
-     FIdDict.Add(Name, Result);
-   end;
 end;
 
 procedure TSVG.Clear;
@@ -2177,8 +2158,6 @@ begin
 
   if Assigned(FStyles) then
     FStyles.Clear;
-  if Assigned(FIdDict) then
-    FIdDict.Clear;
 
   FillChar(FViewBox, SizeOf(FViewBox), 0);
   FillChar(FInitialMatrix, SizeOf(FInitialMatrix), 0);
@@ -2389,7 +2368,6 @@ begin
     Graphics := TGPGraphics.Create(Bitmap);
     try
       Graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-      Graphics.SetPixelOffsetMode(PixelOffsetModeHalf);
       R := FittedRect(MakeRect(0.0, 0.0, Width, Height), FWidth, FHeight);
       PaintTo(Graphics, R, nil, 0);
     finally
@@ -2416,7 +2394,6 @@ begin
     Graphics := TGPGraphics.Create(Bitmap);
     try
       Graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-      Graphics.SetPixelOffsetMode(PixelOffsetModeHalf);
       R := FittedRect(MakeRect(0.0, 0, Size, Size), Width, Height);
       PaintTo(Graphics, R, nil, 0);
     finally
@@ -2438,12 +2415,13 @@ begin
   ViewBoxMatrix := TAffineMatrix.CreateTranslation(-FViewBox.Left, -FViewBox.Top);
   BoundsMatrix := TAffineMatrix.CreateTranslation(FRootBounds.X, FRootBounds.Y);
 
+  // The -1 below is for fixing #14. There may well be a better way.
   if (FViewBox.Width > 0) and (FRootBounds.Width > 0) then
-    ScaleX := (FRootBounds.Width) / FViewBox.Width
+    ScaleX := (FRootBounds.Width - 1) / FViewBox.Width
   else
     ScaleX := 1;
   if (FViewBox.Height > 0) and (FRootBounds.Height > 0) then
-    ScaleY := (FRootBounds.Height)/ FViewBox.Height
+    ScaleY := (FRootBounds.Height - 1)/ FViewBox.Height
   else
     ScaleY := 1;
   ScaleMatrix := TAffineMatrix.CreateScaling(ScaleX, ScaleY);
@@ -2989,19 +2967,46 @@ begin
   end;
 end;
 
-function TSVGPath.SeparateValues(const ACommand: Char;
-  const S: string; CommandList: TList<Char>;  ValueList: TList<TFloat>): Boolean;
+procedure TSVGPath.PrepareMoveLineCurveArc(const ACommand: Char; SL: TStrings);
+var
+  C: Integer;
+  D: Integer;
+  Command: Char;
+begin
+  case ACommand of
+    'M': Command := 'L';
+    'm': Command := 'l';
+  else
+    Command := ACommand;
+  end;
+
+  case Command of
+    'A', 'a':                     D := 7;
+    'C', 'c':                     D := 6;
+    'S', 's', 'Q', 'q':           D := 4;
+    'T', 't', 'M', 'm', 'L', 'l': D := 2;
+    'H', 'h', 'V', 'v':           D := 1;
+  else
+    D := 0;
+  end;
+
+  if (D = 0) or (SL.Count = D + 1) or ((SL.Count - 1) mod D = 1) then
+    Exit;
+
+  for C := SL.Count - D downto (D + 1) do
+  begin
+    if (C - 1) mod D = 0 then
+      SL.Insert(C, Command);
+  end;
+end;
+
+procedure TSVGPath.SeparateValues(const ACommand: Char;
+  const S: string; Values: TStrings);
 var
   I, NumStart: Integer;
   HasDot: Boolean;
   HasExp: Boolean;
-  OldCount: Integer;
-  AddedCount: Integer;
-  ExpectedValueCount: Integer;
-  RepeatCommand: Char;
 begin
-  OldCount := ValueList.Count;
-
   HasDot := False;
   HasExp := False;
   NumStart := 1;
@@ -3013,7 +3018,7 @@ begin
         begin
           if HasDot or HasExp then
           begin
-            ValueList.Add(StrToTFloat(Copy(S, NumStart, I - NumStart)));
+            Values.Add(Copy(S, NumStart, I - NumStart));
             NumStart := I;
             HasExp := False;
           end;
@@ -3025,7 +3030,7 @@ begin
           if I > NumStart then
           begin
             if not HasExp or (UpCase(S[I-1]) <> 'E') then begin
-              ValueList.Add(StrToTFloat(Copy(S, NumStart, I-NumStart)));
+              Values.Add(Copy(S, NumStart, I-NumStart));
               HasDot := False;
               HasExp := False;
               NumStart := I;
@@ -3034,11 +3039,11 @@ begin
         end;
       'E', 'e':
         HasExp := True;
-      ' ', ',', #9, #$A, #$D:
+      ' ', #9, #$A, #$D:
         begin
           if I > NumStart then
           begin
-            ValueList.Add(StrToTFloat(Copy(S, NumStart, I-NumStart)));
+            Values.Add(Copy(S, NumStart, I-NumStart));
             HasDot := False;
             HasExp := False;
           end;
@@ -3049,75 +3054,70 @@ begin
 
   if S.Length  + 1 > NumStart then
   begin
-    ValueList.Add(StrToTFloat(Copy(S, NumStart, S.Length + 1 - NumStart)));
+    Values.Add(Copy(S, NumStart, S.Length + 1 - NumStart));
   end;
 
-  AddedCount := ValueList.Count - OldCount;
+  Values.Insert(0, ACommand);
 
-  case AnsiChar(ACommand) of
-    'A', 'a':                     ExpectedValueCount := 7;
-    'C', 'c':                     ExpectedValueCount := 6;
-    'S', 's', 'Q', 'q':           ExpectedValueCount := 4;
-    'T', 't', 'M', 'm', 'L', 'l': ExpectedValueCount := 2;
-    'H', 'h', 'V', 'v':           ExpectedValueCount := 1;
-  else
-    ExpectedValueCount := 0;
-  end;
-
-  Result := ((ExpectedValueCount = 0) and (AddedCount = 0)) or
-    ((AddedCount >= ExpectedValueCount) and (AddedCount mod ExpectedValueCount = 0));
-
-  if Result then
+  if Values.Count > 0 then
   begin
-    CommandList.Add(ACommand);
-    if AddedCount > ExpectedValueCount then
+    if ACommand.IsInArray(['M', 'm', 'L', 'l', 'H', 'h', 'V', 'v',
+      'C', 'c', 'S', 's', 'Q', 'q', 'T', 't', 'A', 'a']) then
     begin
-      case ACommand of
-        'M': RepeatCommand := 'L';
-        'm': RepeatCommand := 'l';
-      else
-        RepeatCommand := ACommand;
+      PrepareMoveLineCurveArc(ACommand, Values);
+    end
+    else if (ACommand = 'Z') or (ACommand = 'z') then
+    begin
+      while Values.Count > 1 do
+      begin
+        Values.Delete(1);
       end;
-      for I := 2 to AddedCount div ExpectedValueCount do
-        CommandList.Add(RepeatCommand);
     end;
   end;
 end;
 
-procedure TSVGPath.Split(const S: string; CommandList: TList<Char>;  ValueList: TList<TFloat>);
+function TSVGPath.Split(const S: string): TStrings;
 var
   Part: string;
+  SL: TStrings;
   Found: Integer;
   StartIndex: Integer;
   SLength: Integer;
 const
-  IDs: TSysCharSet = ['M', 'm', 'L', 'l', 'H', 'h', 'V', 'v',
-    'C', 'c', 'S', 's', 'Q', 'q', 'T', 't', 'A', 'a', 'Z', 'z'];
+  IDs: array [0..19] of Char = ('M', 'm', 'L', 'l', 'H', 'h', 'V', 'v',
+    'C', 'c', 'S', 's', 'Q', 'q', 'T', 't', 'A', 'a', 'Z', 'z');
 begin
-  StartIndex := 1;
+  Result := TStringList.Create;
+
+  StartIndex := 0;
   SLength := Length(S);
-  while StartIndex <= SLength do
-  begin
-    if not (AnsiChar(S[StartIndex]) in IDs) then Exit;  // invalid path
-    Found := StartIndex + 1;
-    while (Found <= SLength) and not (AnsiChar(S[Found]) in IDs) do
-      Inc(Found);
-    Part := Trim(Copy(S, StartIndex + 1, Found - StartIndex -1));
-    if not SeparateValues(S[StartIndex], Part, CommandList, ValueList) then
-      Break;
-    StartIndex := Found;
+  SL := TStringList.Create;
+  try
+    while StartIndex < SLength do
+    begin
+      Found := S.IndexOfAny(IDs, StartIndex + 1);
+      if Found = -1 then
+      begin
+        Found := SLength;
+      end;
+      Part := S.Substring(StartIndex + 1, Found - StartIndex - 1).Trim;
+      SL.Clear;
+      SeparateValues(S[StartIndex + 1], Part, SL);
+      Result.AddStrings(SL);
+      StartIndex := Found;
+    end;
+  finally
+    SL.Free;
   end;
 end;
 
 function TSVGPath.ReadInAttr(SVGAttr: TSVGAttribute;
   const AttrValue: string): Boolean;
 var
+  S: string;
+  SL: TStrings;
   C: Integer;
-  Command: Char;
-  VListPos: Integer;
-
-  CommandList: TList<Char>;
-  ValueList: TList<TFloat>;
+  P: PChar;
 
   Element: TSVGPathElement;
   LastElement: TSVGPathElement;
@@ -3125,56 +3125,60 @@ begin
   Result := True;
   if SVGAttr = saD then
   begin
-    if AttrValue.Length = 0 then
-      Exit;
-  end else
-  begin
-    Result := inherited;
-    Exit;
-  end;
-
-  CommandList := TList<Char>.Create;
-  ValueList := TList<TFloat>.Create;
-  try
-    Split(AttrValue, CommandList, ValueList);
-
-    LastElement := nil;
-    VListPos := 0;
-
-    for C := 0 to CommandList.Count-1 do
+    if AttrValue.Length > 0 then
     begin
-      Command := CommandList[C];
-
-      case AnsiChar(Command) of
-        'M', 'm': Element := TSVGPathMove.Create(Self);
-
-        'L', 'l': Element := TSVGPathLine.Create(Self);
-
-        'H', 'h', 'V', 'v': Element := TSVGPathLine.Create(Self);
-
-        'C', 'c': Element := TSVGPathCurve.Create(Self);
-
-        'S', 's', 'Q', 'q': Element := TSVGPathCurve.Create(Self);
-
-        'T', 't': Element := TSVGPathCurve.Create(Self);
-
-        'A', 'a': Element := TSVGPathEllipticArc.Create(Self);
-
-        'Z', 'z': Element := TSVGPathClose.Create(Self);
-
-      else
-        Element := nil;
-      end;
-
-      if Assigned(Element) then
+      SetString(S, PChar(AttrValue), AttrValue.Length); // UniqueString
+      P := PChar(S);
+      while P^ <> #0 do
       begin
-        Element.Read(Command, ValueList, VListPos, LastElement);
-        LastElement := Element;
+        if P^ = ',' then
+          P^ := ' ';
+        Inc(P);
       end;
     end;
+  end else
+    Result := inherited;
+
+  if S = '' then Exit;
+
+  SL := Split(S);
+
+  try
+    C := 0;
+    LastElement := nil;
+
+    if SL.Count > 0 then
+      repeat
+        case SL[C][1] of
+          'M', 'm': Element := TSVGPathMove.Create(Self);
+
+          'L', 'l': Element := TSVGPathLine.Create(Self);
+
+          'H', 'h', 'V', 'v': Element := TSVGPathLine.Create(Self);
+
+          'C', 'c': Element := TSVGPathCurve.Create(Self);
+
+          'S', 's', 'Q', 'q': Element := TSVGPathCurve.Create(Self);
+
+          'T', 't': Element := TSVGPathCurve.Create(Self);
+
+          'A', 'a': Element := TSVGPathEllipticArc.Create(Self);
+
+          'Z', 'z': Element := TSVGPathClose.Create(Self);
+
+        else
+          Element := nil;
+        end;
+
+        if Assigned(Element) then
+        begin
+          Element.Read(SL, C, LastElement);
+          LastElement := Element;
+        end;
+        Inc(C);
+      until C = SL.Count;
   finally
-    CommandList.Free;
-    ValueList.Free;
+    SL.Free;
   end;
 end;
 
@@ -4093,15 +4097,6 @@ begin
   if not Assigned(FClipPath) then
     ConstructClipPath;
   Result := FClipPath;
-end;
-
-function TSVGClipPath.ReadInAttr(SVGAttr: TSVGAttribute;
-  const AttrValue: string): Boolean;
-begin
-  Result := inherited;
-  if FID <> '' then
-    if not Root.IdDict.ContainsKey(FID) then
-      Root.IdDict.Add(FID, Self);
 end;
 
 {$ENDREGION}

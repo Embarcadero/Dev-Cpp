@@ -16,7 +16,7 @@
   {$DEFINE CAIRO_HAS_FT_FONT}
 {$ENDIF}
 
-{$ifdef MSWINDOWS}
+{$ifdef WIN32}
   {$define CAIRO_HAS_WIN32_SURFACE}
   {$define CAIRO_HAS_WIN32_FONT}
 {$endif}

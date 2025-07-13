@@ -18,6 +18,9 @@ function RenderTarget: ID2D1DCRenderTarget;
 // Support functions
 function WinSvgSupported: Boolean;
 
+resourcestring
+  D2D_ERROR_PARSING_SVG_TEXT = 'Error parsing SVG Text: %s';
+
 implementation
 
 Uses
@@ -30,13 +33,10 @@ Uses
   System.UITypes,
   System.UIConsts,
   System.SysUtils,
-  System.Classes,
-  System.RegularExpressions;
+  System.Classes;
 
 resourcestring
-  D2D_ERROR_NOT_AVAILABLE    = 'Windows SVG support is not available';
-  D2D_ERROR_PARSING_SVG_TEXT = 'Error parsing SVG Text: %s';
-  D2D_ERROR_UNSUPPORTED_SVG  = '<style> or <text> elements and class="" attributes are not supported by Windows SVG';
+  SvgNotSupported = 'Windows SVG support is not available';
 
 type
 
@@ -70,9 +70,6 @@ type
     procedure LoadFromSource;
     procedure SourceFromStream(Stream: TStream);
     procedure SvgFromStream(Stream: TStream);
-    {$IFDEF CheckForUnsupportedSvg}
-    procedure CheckForUnsupportedSvg;
-    {$ENDIF}
   public
     constructor Create;
   end;
@@ -87,19 +84,7 @@ type
     class function RT: ID2D1DCRenderTarget; static;
   end;
 
-{$INCLUDE SVGIconImageList.inc}
-
 { TD2DSVG }
-
-{$IFDEF CheckForUnsupportedSvg}
-procedure TD2DSVG.CheckForUnsupportedSvg;
-const
-  cRegEx = '(\<(style|text)|class=\")';
-begin
-  if TRegEx.IsMatch(FSource, cRegEx, [roIgnoreCase]) then
-    raise Exception.CreateRes(@D2D_ERROR_UNSUPPORTED_SVG);
-end;
-{$ENDIF}
 
 procedure TD2DSVG.Clear;
 Const
@@ -152,7 +137,7 @@ begin
       fSvgDoc.SetViewportSize(D2D1SizeF(fWidth, fHeight));
   end
   else
-    raise Exception.CreateRes(@D2D_ERROR_NOT_AVAILABLE);
+    raise Exception.CreateRes(@SvgNotSupported);
 end;
 
 procedure TD2DSVG.LoadFromFile(const FileName: string);
@@ -173,10 +158,6 @@ var
 begin
   fSvgDoc := nil;
   if fSource = '' then Exit;
-
-{$IFDEF CheckForUnsupportedSvg}
-  CheckForUnsupportedSvg;
-{$ENDIF}
 
   try
     MStream := TMemoryStream.Create;

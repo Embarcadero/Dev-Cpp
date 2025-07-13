@@ -28,7 +28,6 @@
  *)
 
 unit cairo;
-
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
@@ -37,7 +36,7 @@ unit cairo;
 
 interface
 uses sysutils, classes, cairolib
-{$IFDEF MSWINDOWS}
+{$IFDEF WIN32}
 , windows
 {$ENDIF}
 {$IFDEF CAIRO_HAS_RSVG_FUNCTIONS}
@@ -2860,4 +2859,3 @@ begin
 end;
 
 end.
-

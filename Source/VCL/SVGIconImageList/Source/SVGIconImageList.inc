@@ -130,7 +130,24 @@
   {$DEFINE D10_2+}
   {$DEFINE D10_3+}
   {$DEFINE D10_4+}
-  {$DEFINE D11+}
+{$ENDIF}
+
+// Delphi 12
+{$IFDEF VER360}
+  {$DEFINE D2010+}
+  {$DEFINE DXE+}
+  {$DEFINE DXE2+}
+  {$DEFINE DXE3+}
+  {$DEFINE DXE4+}
+  {$DEFINE DXE5+}
+  {$DEFINE DXE6+}
+  {$DEFINE DXE7+}
+  {$DEFINE DXE8+}
+  {$DEFINE D10_0+}
+  {$DEFINE D10_1+}
+  {$DEFINE D10_2+}
+  {$DEFINE D10_3+}
+  {$DEFINE D10_4+}
 {$ENDIF}
 
 {$IFDEF D10_3+}
@@ -139,14 +156,8 @@
 
 //Prefer Engine Direct2D by Kiriakos Vlahos
 //if supported by Windows Platform (from Windows Creators update)
-{.$DEFINE PreferNativeSvgSupport}
+{$DEFINE PreferNativeSvgSupport}
 {.$DEFINE GPUSupport}
-{$IFDEF PreferNativeSvgSupport}
-  // Throw an exception if the SVG contains text elements or class attributes
-  // which are not supported by Windows SVG. Since it costs some performance,
-  // you should only turn it on during debugging or if it's absolutely necessary.
-  {.$DEFINE CheckForUnsupportedSvg}
-{$ENDIF}
 
 //if PreferNativeSvgSupport not active or not available:
 //use Delphi Engine TSVG by Martin Walter (included into SVG folder)

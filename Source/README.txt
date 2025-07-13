@@ -4,9 +4,17 @@ To build devcpp a recent Delphi version is required (10.4 and onwards).
 
 The main executable devcpp.exe can be built using the following steps:
 
-	1) Install
-		VCL Style - Windows10BlueWhale from GetIt in the IDE.
-		https://getitnow.embarcadero.com/VCLStyle-Windows10BlueWhale-1.0/
+	1) Install VCL Style Files:
+		You need to install the following package(s) by "Tools" - "GetIt Package Manager..." in the IDE.
+		Search them using the search box in the upper right corner:
+		VCL Style - Calypso 2.0
+		VCL Style - FlatUILight 2.0
+		VCL Style - Windows10BlackPearl 2.0
+		VCL Style - Windows10BlueWhale 2.0
+		
+		VCL Windows Style - Material Patterns Blue 2.0(https://getitnow.embarcadero.com/vcl-windows-style-material-patterns-blue/), Unfortunately, you can't search and install it in Delphi IDE, so you can only delete the line when compiling errors.
+		
+		
 	1) Compile and install the following package(s):
 		Source\VCL\DevCpp.dpk
 		Source\VCL\SynEdit\Packages\Sydney\Delphi\SynEditDelphi.groupproj
@@ -15,6 +23,8 @@ The main executable devcpp.exe can be built using the following steps:
 
 	2) Compile resources by running the following script(s):
 		Source\CompileResources.bat
+		Source\VCL\vcl-styles-utils\Common\CompileResources.bat
+		Source\VCL\vcl-styles-utils\Common\CompileResources_zip.bat
 		
 	3) Open the project file devcpp.dpr. Your IDE should not produce any 
 	   'Module Not Found' or 'Resource Not Found' errors when opening files, 

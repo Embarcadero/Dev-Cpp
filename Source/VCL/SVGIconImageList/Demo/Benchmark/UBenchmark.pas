@@ -1,25 +1,18 @@
-{-----------------------------------------------------------------------------
- Unit Name: UBenchmark
- Author:    Lübbe Onken
- Purpose:   Main form for SVG Factories Benchmark
- History:
------------------------------------------------------------------------------}
 unit UBenchmark;
 
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
-  System.ImageList, //if you are compiling with older version than XE7 remove this line
-  Vcl.ImgList,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, System.ImageList,
+  Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection,
   SVGInterfaces,
-  SVGIconImageCollection, SVGIconImage, Vcl.Samples.Spin, Vcl.ExtCtrls,
-  SVGIconImageListBase, SVGIconVirtualImageList;
+  SVGIconImageCollection, SVGIconImage, Vcl.Samples.Spin;
 
 type
   TfrmBenchmark = class(TForm)
     SVGIconImageCollection: TSVGIconImageCollection;
+    imlIcons: TVirtualImageList;
     memOutput: TMemo;
     btnClear: TButton;
     btnLoad: TButton;
@@ -28,38 +21,19 @@ type
     btnRunBenchmark: TButton;
     speLoops: TSpinEdit;
     lblLoops: TLabel;
-    pnlButtons: TPanel;
-    chkGrayScale: TCheckBox;
-    chkFixedColor: TCheckBox;
-    splHorizontal: TSplitter;
-    pnlLoops: TPanel;
-    grpFactory: TRadioGroup;
-    chkDrawVisible: TCheckBox;
-    SVGIconVirtualImageList: TSVGIconVirtualImageList;
     procedure btnClearClick(Sender: TObject);
     procedure btnLoadClick(Sender: TObject);
-    procedure btnRunBenchmarkClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure grpFactoryClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure btnRunBenchmarkClick(Sender: TObject);
   private
-    FSvgSource  : string;
+    FImageStream: TMemoryStream;
     FStartTick  : Int64;
     FLastTick   : Int64;
-    FLine       : string;
-    FInBenchmark: boolean;
-
-    function GetFactoryName: string;
-    procedure SetFactory(AIndex: integer);
-
-    procedure BenchmarkLoad;
-    procedure BenchmarkGrayScale;
-    procedure BenchmarkFixedColor;
-    procedure BenchmarkDraw;
-
-    procedure LogTicks(var AMessage: string; ATick: Int64);
-    procedure PrepareBenchmark(ACaption: string);
-    procedure ReloadImage;
-    procedure RunBenchmark(AIndex: integer);
+    procedure LogTicks(var AMessage: string; const ASuffix: string; ATick: Int64);
+    procedure RunBenchmark(AFactoryName: string; AFactory: ISVGFactory);
+  public
+    { Public-Deklarationen }
   end;
 
 var
@@ -71,97 +45,15 @@ uses
   CairoSVGFactory,
   D2DSVGFactory,
   PasSVGFactory,
-  System.IOUtils,
-  System.Math,
-  System.StrUtils,
-  System.TypInfo,
   System.Types;
 
 {$R *.dfm}
 
 
-type
-  TCanvasImage = class(TSVGIconImage) // Just to have something to paint on
-  public
-    property Canvas;
-  end;
-
-procedure TfrmBenchmark.BenchmarkDraw;
-
-  procedure DrawOnCanvas(ACanvas: TCanvas);
-  var
-    I    : integer;
-    LStep: real;
-    LSize: real;
-    LRect: TRect;
-  begin
-    LStep := Min(ACanvas.ClipRect.Width, ACanvas.ClipRect.Height) / speLoops.Value;
-    LSize := 0;
-
-    for I := 1 to speLoops.Value do
-      begin
-        LSize := LSize + LStep;
-        LRect := TRect.Create(0, 0, Round(LSize), Round(LSize));
-
-        SvgIconImageCollection.Draw(ACanvas, LRect, 0, true);
-      end;
-  end;
-
-var
-  LBitmap: TBitmap;
-begin
-  // Benchmark Draw
-  if chkDrawVisible.Checked then
-    DrawOnCanvas(TCanvasImage(SVGIconImage).Canvas)
-  else
-    begin
-      LBitmap := TBitmap.Create;
-      try
-        LBitmap.Width := SvgIconImage.Height;
-        LBitmap.Width := SvgIconImage.Width;
-
-        DrawOnCanvas(LBitmap.Canvas);
-      finally
-        LBitmap.Free;
-      end;
-    end;
-end;
-
-procedure TfrmBenchmark.BenchmarkFixedColor;
-begin
-  SVGIconImageCollection.FixedColor := clLime;
-end;
-
-procedure TfrmBenchmark.BenchmarkGrayScale;
-begin
-  SVGIconImageCollection.GrayScale := true;
-end;
-
-procedure TfrmBenchmark.BenchmarkLoad;
-var
-  I   : integer;
-  LSvg: ISvg;
-begin
-  SVGIconImageCollection.SVGIconItems.BeginUpdate;
-  try
-    SVGIconImageCollection.SVGIconItems.Clear;
-    SVGIconImageCollection.FixedColor := clDefault;
-    SVGIconImageCollection.GrayScale := false;
-
-    for I := 1 to speLoops.Value do
-      begin
-        LSvg := GlobalSvgFactory.NewSvg;
-        LSvg.Source := FSvgSource;
-        SVGIconImageCollection.Add(LSvg, '');
-      end;
-  finally
-    SVGIconImageCollection.SVGIconItems.EndUpdate;
-  end;
-end;
-
 procedure TfrmBenchmark.btnClearClick(Sender: TObject);
 begin
   memOutput.Clear;
+  SVGIconImageCollection.ClearIcons;
 end;
 
 procedure TfrmBenchmark.btnLoadClick(Sender: TObject);
@@ -170,172 +62,101 @@ var
 begin
   if OpenDialog.Execute then
     begin
-      FSvgSource := TFile.ReadAllText(OpenDialog.FileName);
-
-      PrepareBenchmark('Factory    |  Load  |  Draw  | Total');
-
-      LSvg := GlobalSvgFactory.NewSvg;
-      LSvg.Source := FSvgSource;
-      LogTicks(FLine, FLastTick);
+      FImageStream.LoadFromFile(OpenDialog.FileName);
+      FImageStream.Position := 0;
 
       SVGIconImageCollection.SVGIconItems.Clear;
+      LSvg := GlobalSvgFactory.NewSvg;
+      LSvg.LoadFromStream(FImageStream);
       SVGIconImageCollection.Add(LSvg, '');
       SVGIconImage.ImageIndex := 0;
-
-      LogTicks(FLine, FLastTick);
-      LogTicks(FLine, FStartTick);
     end;
 end;
 
 procedure TfrmBenchmark.btnRunBenchmarkClick(Sender: TObject);
-var
-  LLine: string;
 begin
-  if (FSvgSource = '') then
+  if (FImageStream.Size = 0) then
     memOutput.Lines.Add('Please load a SVG image first')
   else
     begin
-      FInBenchmark := true;
-      try
-        SVGIconImage.ImageIndex := -1;
+      SVGIconImage.ImageIndex := -1;
 
-        LLine := 'Factory    |  Load  |  Draw  ';
-        if chkGrayScale.Checked then
-          LLine := LLine + '|  Gray  |  Draw  ';
-        if chkFixedColor.Checked then
-          LLine := LLine + '|  Fixed |  Draw  ';
-        LLine := LLine + '|  Total';
+      memOutput.Lines.Add(Format('Factory    | Load %3d | Draw %3d |   Total  |', [speLoops.Value, speLoops.Value]));
+      RunBenchmark('Direct 2D', GetD2DSVGFactory);
+      RunBenchmark('Pascal', GetPasSVGFactory);
+      RunBenchmark('Cairo', GetCairoSVGFactory);
 
-        memOutput.Lines.Add('');
-        memOutput.Lines.Add(Format('Benchmark: Repeat %d times. Draw %svisible.', [speLoops.Value, IfThen(chkDrawVisible.Checked, '', 'in')]));
-
-        memOutput.Lines.Add(LLine);
-        RunBenchmark(0);
-        RunBenchmark(1);
-        RunBenchmark(2);
-
-        SVGIconImage.ImageIndex := 0;
-      finally
-        FInBenchmark := false;
-      end;
+      SVGIconImage.ImageIndex := 0;
     end;
 end;
 
 procedure TfrmBenchmark.FormCreate(Sender: TObject);
 begin
-  Caption := Application.Title;
-  FInBenchmark := false;
-  grpFactory.Items.Add('Pascal');
-  grpFactory.Items.Add('Direct 2D');
-  grpFactory.Items.Add('Cairo');
-  SetFactory(0);
+  FImageStream := TMemoryStream.Create;
 end;
 
-function TfrmBenchmark.GetFactoryName: string;
+procedure TfrmBenchmark.FormDestroy(Sender: TObject);
 begin
-  if grpFactory.ItemIndex > -1 then
-    Result := grpFactory.Items[grpFactory.ItemIndex]
-  else
-    Result := '';
+  FImageStream.Free;
 end;
 
-procedure TfrmBenchmark.grpFactoryClick(Sender: TObject);
-begin
-  if not FInBenchmark then
-    begin
-      SetFactory(grpFactory.ItemIndex);
-      ReloadImage;
-    end;
-end;
-
-procedure TfrmBenchmark.LogTicks(var AMessage: string; ATick: Int64);
+procedure TfrmBenchmark.LogTicks(var AMessage: string; const ASuffix: string; ATick: Int64);
 var
   LCurrentTick: Int64;
 begin
   LCurrentTick := GetTickCount;
-  AMessage := Format('%s | %6d', [AMessage, LCurrentTick - ATick]);
+  AMessage := Format('%s | %8d%s', [AMessage, LCurrentTick - ATick, ASuffix]);
   memOutput.Lines[memOutput.Lines.Count - 1] := AMessage;
   FLastTick := LCurrentTick;
 end;
 
-procedure TfrmBenchmark.PrepareBenchmark(ACaption: string);
-begin
-  if ACaption <> '' then
-    memOutput.Lines.Add(ACaption);
+type
+  TCanvasImage = class(TSVGIconImage)
+  public
+    property Canvas;
+  end;
 
-  FLine := Format('%-10s', [GetFactoryName]);
-  memOutput.Lines.Add(FLine);
+procedure TfrmBenchmark.RunBenchmark(AFactoryName: string; AFactory: ISVGFactory);
+var
+  LSvg : ISvg;
+  I    : integer;
+  LStep: real;
+  LSize: real;
+  LRect: TRect;
+  LLine: string;
+begin
+  LLine := Format('%-10s', [AFactoryName]);
+  memOutput.Lines.Add(LLine);
 
   FStartTick := GetTickCount;
   FLastTick := FStartTick;
-end;
 
-procedure TfrmBenchmark.ReloadImage;
-var
-  LSvg: ISvg;
-begin
-  if FSvgSource <> '' then
-    begin
-      PrepareBenchmark('Factory    |  Load  |  Draw  | Total');
-
-      LSvg := GlobalSvgFactory.NewSvg;
-      LSvg.Source := FSvgSource;
-      LogTicks(FLine, FLastTick);
-
-      SVGIconImage.ImageIndex := -1;
-      SVGIconImageCollection.SVGIconItems.Clear;
-      SVGIconImageCollection.Add(LSvg, '');
-      SVGIconImage.ImageIndex := 0;
-      LogTicks(FLine, FLastTick);
-      LogTicks(FLine, FStartTick);
-    end;
-end;
-
-procedure TfrmBenchmark.RunBenchmark(AIndex: integer);
-
-  procedure Benchmark(AProc: TPRoc);
-  begin
-    if Assigned(AProc) then
+  SVGIconImageCollection.SVGIconItems.BeginUpdate;
+  try
+    SVGIconImageCollection.SVGIconItems.Clear;
+    for I := 1 to speLoops.Value do
       begin
-        AProc;
-        LogTicks(FLine, FLastTick);
+        LSvg := AFactory.NewSvg;
+        FImageStream.Position := 0;
+        LSvg.LoadFromStream(FImageStream);
+        SVGIconImageCollection.Add(LSvg, '');
       end;
+  finally
+    SVGIconImageCollection.SVGIconItems.EndUpdate;
   end;
 
-begin
-  SetFactory(AIndex);
+  LogTicks(LLine, '', FLastTick);
 
-  PrepareBenchmark('');
-
-  Benchmark(BenchmarkLoad);
-  Benchmark(BenchmarkDraw);
-
-  if chkGrayScale.Checked then
+  LStep := SvgIconImage.Height / 100;
+  LSize := 0;
+  for I := 1 to speLoops.Value do
     begin
-      Benchmark(BenchmarkGrayScale);
-      Benchmark(BenchmarkDraw);
+      LSize := LSize + LStep;
+      LRect := TRect.Create(0, 0, Round(LSize), Round(LSize));
+      SvgIconImageCollection.Draw(TCanvasImage(SVGIconImage).Canvas, LRect, 0);
     end;
-
-  if chkFixedColor.Checked then
-    begin
-      Benchmark(BenchmarkFixedColor);
-      Benchmark(BenchmarkDraw);
-    end;
-
-  LogTicks(FLine, FStartTick);
-end;
-
-procedure TfrmBenchmark.SetFactory(AIndex: integer);
-begin
-  case AIndex of
-    0:
-      SetGlobalSvgFactory(GetPasSVGFactory);
-    1:
-      SetGlobalSvgFactory(GetD2DSVGFactory);
-    2:
-      SetGlobalSvgFactory(GetCairoSVGFactory);
-  end;
-  grpFactory.ItemIndex := AIndex;
+  LogTicks(LLine, '', FLastTick);
+  LogTicks(LLine, ' |', FStartTick);
 end;
 
 end.

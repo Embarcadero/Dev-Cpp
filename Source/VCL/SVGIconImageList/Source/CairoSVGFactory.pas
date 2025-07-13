@@ -38,13 +38,10 @@ type
   private const
     cEmptySvg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
   private
-    FSource    : string;
-    FSvgObject : IRSVGObject;
-    FWidth     : Single;
-    FHeight    : Single;
-    FFixedColor: TColor;
-    FGrayScale : Boolean;
-    FOpacity   : Single;
+    FSource   : string;
+    FSvgObject: IRSVGObject;
+    FHeight   : Single;
+    FWidth    : Single;
     // property access methods
     function GetWidth: Single;
     function GetHeight: Single;
@@ -59,15 +56,12 @@ type
     // procedures and functions
     function IsEmpty: Boolean;
     procedure Clear;
-    procedure PaintTo(DC: HDC; R: TRectF; KeepAspectRatio: Boolean = True);
-    procedure LoadFromSource(const ASource: string);
-    procedure LoadFromFile(const AFileName: string);
+    procedure SaveToStream(AStream: TStream);
+    procedure SaveToFile(const AFileName: string);
+    procedure LoadFromSource;
     procedure LoadFromStream(AStream: TStream);
-    procedure SaveToFile(const AFileName: string); overload;
-    procedure SaveToStream(AStream: TStream); overload;
-    procedure SaveToStream(AStream: TStream; const ASource: string); overload;
-    procedure SourceFromStream(AStream: TStream);
-    procedure SvgFromStream(AStream: TStream);
+    procedure LoadFromFile(const AFileName: string);
+    procedure PaintTo(DC: HDC; R: TRectF; KeepAspectRatio: Boolean = True);
   public
     constructor Create;
   end;
@@ -99,19 +93,16 @@ end;
 constructor TCairoSVG.Create;
 begin
   FSvgObject := TRSVGObject.Create;
-  FFixedColor := TColors.SysDefault; // clDefault
-  FGrayScale := false;
-  FOpacity := 1.0;
 end;
 
 function TCairoSVG.GetFixedColor: TColor;
 begin
-  Result := FFixedColor;
+
 end;
 
 function TCairoSVG.GetGrayScale: Boolean;
 begin
-  Result := FGrayScale;
+
 end;
 
 function TCairoSVG.GetHeight: Single;
@@ -121,7 +112,7 @@ end;
 
 function TCairoSVG.GetOpacity: Single;
 begin
-  Result := FOpacity;
+
 end;
 
 function TCairoSVG.GetSource: string;
@@ -151,34 +142,33 @@ begin
   end;
 end;
 
-procedure TCairoSVG.LoadFromSource(const ASource: string);
+procedure TCairoSVG.LoadFromSource;
 var
-  LMemoryStream: TMemoryStream;
+  LStream: TMemoryStream;
 begin
-  if ASource = '' then
+  if FSource = '' then
     Clear;
 
-  LMemoryStream := TMemoryStream.Create;
+  LStream := TMemoryStream.Create;
   try
-    SaveToStream(LMemoryStream, ASource);
-    LMemoryStream.Position := 0;
-    SvgFromStream(LMemoryStream);
+    SaveToStream(LStream);
+    LStream.Position := 0;
+    LoadFromStream(LStream);
   finally
-    LMemoryStream.Free;
+    LStream.Free;
   end;
 end;
 
 procedure TCairoSVG.LoadFromStream(AStream: TStream);
-Var
-  LStreamPos: Int64;
 begin
-  // read and save the Source
-  LStreamPos := AStream.Position;
-  SourceFromStream(AStream);
-  // Restore Position
-  AStream.Position := LStreamPos;
-  // Now create the SVG
-  SvgFromStream(AStream);
+  try
+    FSvgObject := TRSVGObject.Create(AStream);
+    FHeight := FSvgObject.Dimensions.height;
+    FWidth := FSvgObject.Dimensions.width;
+  except
+    on E: Exception do
+      raise Exception.CreateFmt(CAIRO_ERROR_PARSING_SVG_TEXT, [E.Message]);
+  end;
 end;
 
 procedure TCairoSVG.PaintTo(DC: HDC; R: TRectF; KeepAspectRatio: Boolean);
@@ -224,32 +214,27 @@ begin
   end;
 end;
 
-procedure TCairoSVG.SaveToStream(AStream: TStream; const ASource: string);
+procedure TCairoSVG.SaveToStream(AStream: TStream);
 var
   LBuffer: TBytes;
 begin
-  LBuffer := TEncoding.UTF8.GetBytes(ASource);
+  LBuffer := TEncoding.UTF8.GetBytes(FSource);
   AStream.WriteBuffer(LBuffer, Length(LBuffer))
-end;
-
-procedure TCairoSVG.SaveToStream(AStream: TStream);
-begin
-  SaveToStream(AStream, FSource);
 end;
 
 procedure TCairoSVG.SetFixedColor(const AColor: TColor);
 begin
-  // TODO: Implement recoloring
+
 end;
 
 procedure TCairoSVG.SetGrayScale(const IsGrayScale: Boolean);
 begin
-  // TODO: Implement recoloring
+
 end;
 
 procedure TCairoSVG.SetOpacity(const AOpacity: Single);
 begin
-  // TODO: Implement setting opacity
+
 end;
 
 procedure TCairoSVG.SetSource(const ASource: string);
@@ -257,31 +242,8 @@ begin
   if FSource <> ASource then
     begin
       FSource := ASource;
-      LoadFromSource(ASource);
+      LoadFromSource;
     end;
-end;
-
-procedure TCairoSVG.SourceFromStream(AStream: TStream);
-var
-  LSize  : Integer;
-  LBuffer: TBytes;
-begin
-  LSize := AStream.Size - AStream.Position;
-  SetLength(LBuffer, LSize);
-  AStream.Read(LBuffer, 0, LSize);
-  FSource := TEncoding.UTF8.GetString(LBuffer);
-end;
-
-procedure TCairoSVG.SvgFromStream(AStream: TStream);
-begin
-  try
-    FSvgObject := TRSVGObject.Create(AStream);
-    FHeight := FSvgObject.Dimensions.height;
-    FWidth := FSvgObject.Dimensions.width;
-  except
-    on E: Exception do
-      raise Exception.CreateFmt(CAIRO_ERROR_PARSING_SVG_TEXT, [E.Message]);
-  end;
 end;
 
 end.

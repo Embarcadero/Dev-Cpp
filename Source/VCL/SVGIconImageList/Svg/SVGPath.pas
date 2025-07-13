@@ -23,13 +23,9 @@ unit SVGPath;
 interface
 
 uses
-  Winapi.Windows,
-  Winapi.GDIPOBJ,
-  System.Types,
-  System.Classes,
-  System.Generics.Collections,
-  SVGTypes,
-  SVG;
+  Winapi.Windows, Winapi.GDIPOBJ,
+  System.Types, System.Classes,
+  SVGTypes, SVG;
 
 type
   TSVGPathElement = class(TSVGObject)
@@ -43,7 +39,7 @@ type
   public
     function GetBounds: TRectF; virtual; abstract;
     procedure AddToPath(Path: TGPGraphicsPath); virtual; abstract;
-    procedure Read(Command: Char; ValueList: TList<TFloat>;  var Position: Integer;
+    procedure Read(SL: TStrings; var Position: Integer;
       Previous: TSVGPathElement); virtual;
 
     procedure PaintToGraphics(Graphics: TGPGraphics); override;
@@ -59,7 +55,7 @@ type
   public
     function GetBounds: TRectF; override;
     procedure AddToPath(Path: TGPGraphicsPath); override;
-    procedure Read(Command: Char; ValueList: TList<TFloat>;  var Position: Integer;
+    procedure Read(SL: TStrings; var Position: Integer;
       Previous: TSVGPathElement); override;
   end;
 
@@ -67,7 +63,7 @@ type
   public
     function GetBounds: TRectF; override;
     procedure AddToPath(Path: TGPGraphicsPath); override;
-    procedure Read(Command: Char; ValueList: TList<TFloat>;  var Position: Integer;
+    procedure Read(SL: TStrings; var Position: Integer;
       Previous: TSVGPathElement); override;
   end;
 
@@ -82,7 +78,7 @@ type
   public
     function GetBounds: TRectF; override;
     procedure AddToPath(Path: TGPGraphicsPath); override;
-    procedure Read(Command: Char; ValueList: TList<TFloat>;  var Position: Integer;
+    procedure Read(SL: TStrings; var Position: Integer;
       Previous: TSVGPathElement); override;
 
     property Control1X: TFloat read FControl1X write FControl1X;
@@ -103,7 +99,7 @@ type
   public
     function GetBounds: TRectF; override;
     procedure AddToPath(Path: TGPGraphicsPath); override;
-    procedure Read(Command: Char; ValueList: TList<TFloat>;  var Position: Integer;
+    procedure Read(SL: TStrings; var Position: Integer;
       Previous: TSVGPathElement); override;
 
     property RX: TFloat read FRX write FRX;
@@ -119,7 +115,7 @@ type
   public
     function GetBounds: TRectF; override;
     procedure AddToPath(Path: TGPGraphicsPath); override;
-    procedure Read(Command: Char; ValueList: TList<TFloat>;  var Position: Integer;
+    procedure Read(SL: TStrings; var Position: Integer;
       Previous: TSVGPathElement); override;
   end;
 
@@ -151,8 +147,8 @@ begin
   end;
 end;
 
-procedure TSVGPathElement.Read(Command: Char; ValueList: TList<TFloat>;
-  var Position: Integer; Previous: TSVGPathElement);
+procedure TSVGPathElement.Read(SL: TStrings; var Position: Integer;
+  Previous: TSVGPathElement);
 begin
   if Assigned(Previous) then
   begin
@@ -185,14 +181,16 @@ begin
   Path.StartFigure;
 end;
 
-procedure TSVGPathMove.Read(Command: Char; ValueList: TList<TFloat>;
-  var Position: Integer; Previous: TSVGPathElement);
+procedure TSVGPathMove.Read(SL: TStrings; var Position: Integer;
+  Previous: TSVGPathElement);
 begin
   inherited;
-  FStopX := ValueList[Position];
-  FStopY := ValueList[Position + 1];
+  if not TryStrToTFloat(SL[Position + 1], FStopX) then
+    FStopX := 0;
+  if not TryStrToTFloat(SL[Position + 2], FStopY) then
+    FStopY := 0;
 
-  if Command = 'm' then
+  if SL[Position] = 'm' then
   begin
     FStopX := FStartX + FStopX;
     FStopY := FStartY + FStopY;
@@ -217,36 +215,46 @@ begin
   Path.AddLine(FStartX, FStartY, FStopX, FStopY);
 end;
 
-procedure TSVGPathLine.Read(Command: Char; ValueList: TList<TFloat>;
-  var Position: Integer; Previous: TSVGPathElement);
+procedure TSVGPathLine.Read(SL: TStrings; var Position: Integer;
+  Previous: TSVGPathElement);
+var
+  Command: string;
 begin
   inherited;
 
+  Command := SL[Position];
   if (Command = 'L') or (Command = 'l') then
   begin
-    FStopX := ValueList[Position];
-    FStopY := ValueList[Position + 1];
+    if not TryStrToTFloat(SL[Position + 1], FStopX) then
+      FStopX := 0;
+    if not TryStrToTFloat(SL[Position + 2], FStopY) then
+      FStopY := 0;
 
-    if Command = 'l' then
+    if SL[Position] = 'l' then
     begin
       FStopX := FStartX + FStopX;
       FStopY := FStartY + FStopY;
     end;
 
     Inc(Position, 2);
-  end
-  else if (Command = 'H') or (Command = 'h') then
+  end;
+
+  if (Command = 'H') or (Command = 'h') then
   begin
-    FStopX := ValueList[Position];
+    if not TryStrToTFloat(SL[Position + 1], FStopX) then
+      FStopX := 0;
 
     if Command = 'h' then
       FStopX := FStartX + FStopX;
     FStopY := FStartY;
     Inc(Position);
-  end
-  else if (Command = 'V') or (Command = 'v') then
+  end;
+
+
+  if (Command = 'V') or (Command = 'v') then
   begin
-    FStopY := ValueList[Position];
+    if not TryStrToTFloat(SL[Position + 1], FStopY) then
+      FStopY := 0;
 
     if Command = 'v' then
       FStopY := FStartY + FStopY;
@@ -289,19 +297,22 @@ begin
     FControl2X, FControl2Y, FStopX, FStopY);
 end;
 
-procedure TSVGPathCurve.Read(Command: Char; ValueList: TList<TFloat>;
-  var Position: Integer; Previous: TSVGPathElement);
+procedure TSVGPathCurve.Read(SL: TStrings; var Position: Integer;
+  Previous: TSVGPathElement);
+var
+  Command: string;
 begin
   inherited;
 
+  Command := SL[Position];
   if (Command = 'C') or (Command = 'c') then
   begin
-    FControl1X := ValueList[Position];
-    FControl1Y := ValueList[Position + 1];
-    FControl2X := ValueList[Position + 2];
-    FControl2Y := ValueList[Position + 3];
-    FStopX := ValueList[Position + 4];
-    FStopY := ValueList[Position + 5];
+    TryStrToTFloat(SL[Position + 1], FControl1X);
+    TryStrToTFloat(SL[Position + 2], FControl1Y);
+    TryStrToTFloat(SL[Position + 3], FControl2X);
+    TryStrToTFloat(SL[Position + 4], FControl2Y);
+    TryStrToTFloat(SL[Position + 5], FStopX);
+    TryStrToTFloat(SL[Position + 6], FStopY);
     Inc(Position, 6);
 
     if Command = 'c' then
@@ -313,13 +324,16 @@ begin
       FStopX := FStartX + FStopX;
       FStopY := FStartY + FStopY;
     end;
-  end
-  else if (Command = 'S') or (Command = 's') then
+  end;
+
+  if (Command = 'S') or (Command = 's') then
   begin
-    FControl2X := ValueList[Position];
-    FControl2Y := ValueList[Position + 1];
-    FStopX := ValueList[Position + 2];
-    FStopY := ValueList[Position + 3];
+    FControl1X := FStartX;
+    FControl1Y := FStartY;
+    TryStrToTFloat(SL[Position + 1], FControl2X);
+    TryStrToTFloat(SL[Position + 2], FControl2Y);
+    TryStrToTFloat(SL[Position + 3], FStopX);
+    TryStrToTFloat(SL[Position + 4], FStopY);
     Inc(Position, 4);
 
     if Previous is TSVGPathCurve then
@@ -335,13 +349,14 @@ begin
       FStopX := FStartX + FStopX;
       FStopY := FStartY + FStopY;
     end;
-  end
-  else if (Command = 'Q') or (Command = 'q') then
+  end;
+
+  if (Command = 'Q') or (Command = 'q') then
   begin
-    FControl1X := ValueList[Position];
-    FControl1Y := ValueList[Position + 1];
-    FStopX := ValueList[Position + 2];
-    FStopY := ValueList[Position + 3];
+    TryStrToTFloat(SL[Position + 1], FControl1X);
+    TryStrToTFloat(SL[Position + 2], FControl1Y);
+    TryStrToTFloat(SL[Position + 3], FStopX);
+    TryStrToTFloat(SL[Position + 4], FStopY);
     FControl2X := FControl1X;
     FControl2Y := FControl1Y;
     Inc(Position, 4);
@@ -364,13 +379,14 @@ begin
     FControl1Y := 2 * FControl1Y / 3 + FStartY / 3;
     FControl2X := 2 * FControl2X / 3 + FStopX / 3;
     FControl2Y := 2 * FControl2Y / 3 + FStopY / 3;
-  end
-  else if (Command = 'T') or (Command = 't') then
+  end;
+
+  if (Command = 'T') or (Command = 't') then
   begin
     FControl1X := FStartX;
     FControl1Y := FStartY;
-    FStopX := ValueList[Position];
-    FStopY := ValueList[Position + 1];
+    TryStrToTFloat(SL[Position + 1], FStopX);
+    TryStrToTFloat(SL[Position + 2], FStopY);
     Inc(Position, 2);
 
     if Previous is TSVGPathCurve then
@@ -516,10 +532,10 @@ begin
   //
   // Step 4 : Compute the angleStart (angle1) and the angleExtent (dangle)
   //
-  ux := (x1 - CX1);
-  uy := (y1 - CY1);
-  vx := (-x1 - CX1);
-  vy := (-y1 - CY1);
+  ux := (x1 - CX1) / LRX;
+  uy := (y1 - CY1) / LRY;
+  vx := (-x1 - CX1) / LRX;
+  vy := (-y1 - CY1) / LRY;
 
   // Compute the angle start
   n := (ux * ux) + (uy * uy);
@@ -568,20 +584,22 @@ begin
   end;
 end;
 
-procedure TSVGPathEllipticArc.Read(Command: Char; ValueList: TList<TFloat>;
-  var Position: Integer; Previous: TSVGPathElement);
+procedure TSVGPathEllipticArc.Read(SL: TStrings; var Position: Integer; Previous: TSVGPathElement);
+var
+  Command: string;
 begin
   inherited;
 
+  Command := SL[Position];
   if (Command = 'A') or (Command = 'a') then
   begin
-    FRX := ValueList[Position];
-    FRY := ValueList[Position + 1];
-    FXRot := ValueList[Position + 2];
-    FLarge := Trunc(ValueList[Position + 3]);
-    FSweep := Trunc(ValueList[Position + 4]);
-    FStopX := ValueList[Position + 5];
-    FStopY := ValueList[Position + 6];
+    TryStrToTFloat(SL[Position + 1], FRX);
+    TryStrToTFloat(SL[Position + 2], FRY);
+    TryStrToTFloat(SL[Position + 3], FXRot);
+    TryStrToInt(SL[Position + 4], FLarge);
+    TryStrToInt(SL[Position + 5], FSweep);
+    TryStrToTFloat(SL[Position + 6], FStopX);
+    TryStrToTFloat(SL[Position + 7], FStopY);
     Inc(Position, 7);
 
     FRX := Abs(FRX);
@@ -628,8 +646,8 @@ begin
   Result.Height := 0;
 end;
 
-procedure TSVGPathClose.Read(Command: Char; ValueList: TList<TFloat>;
-  var Position: Integer; Previous: TSVGPathElement);
+procedure TSVGPathClose.Read(SL: TStrings; var Position: Integer;
+  Previous: TSVGPathElement);
 var
   LastMoveTo: TSVGPathMove;
 begin
