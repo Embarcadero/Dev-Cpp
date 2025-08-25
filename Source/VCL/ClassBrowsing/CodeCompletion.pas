@@ -118,7 +118,7 @@ begin
 
   fWidth := 320;
   fHeight := 240;
-  fColor := clWindow;
+  fColor := clWhite;
   fEnabled := True;
   fOnlyGlobals := False;
   fShowCount := 100; // keep things fast
@@ -424,4 +424,5 @@ begin
 end;
 
 end.
+
 
