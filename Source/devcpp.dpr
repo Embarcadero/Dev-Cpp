@@ -86,7 +86,6 @@ uses
   PackmanExitCodesU in 'Tools\Packman\PackmanExitCodesU.pas',
   ImageTheme in 'ImageTheme.pas',
   Instances in 'Instances.pas',
-  CharUtils in 'CharUtils.pas',
   ConsoleAppHostFrm in 'ConsoleAppHostFrm.pas' {ConsoleAppHost},
   Vcl.Themes,
   Vcl.Styles,
