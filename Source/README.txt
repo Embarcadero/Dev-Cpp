@@ -2,6 +2,10 @@
 
 To build devcpp a recent Delphi version is required (10.4 and onwards).
 
+Alternatively the VCL libraries can be built and installed as DPM packages
+(Delphi 11 and later), which also installs the design-time packages into the
+IDE: run Source\dpm-setup.cmd, or see BUILDING-DPM.md for the steps.
+
 The main executable devcpp.exe can be built using the following steps:
 
 	1) Install

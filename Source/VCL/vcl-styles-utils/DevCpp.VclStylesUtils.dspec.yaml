@@ -1,0 +1,89 @@
+# DPM package spec - VCL Styles Utils, as vendored in Dev-C++.
+# Upstream: https://github.com/RRUZ/vcl-styles-utils
+#
+# Only the units devcpp.exe reaches (Vcl.Styles.Hooks / Vcl.Styles.Utils.* and
+# their dependencies) are packaged; the rest of Common\ needs files that are
+# not vendored here (..\source\vcl\*.inc).
+#
+# Package projects live in Packages\RAD Studio <ver>\ and are maintained with
+#   dpm prepare DevCpp.VclStylesUtils.dspec.yaml
+min dpm client version: 1.0.0
+metadata:
+  id: DevCpp.VclStylesUtils
+  version: 6.3.0
+  description: VCL Styles Utils (style hooks for system controls and dialogs), as vendored in Dev-C++.
+  authors:
+    - Rodrigo Ruz V.
+  projectUrl: https://github.com/RRUZ/vcl-styles-utils
+  repositoryUrl: https://github.com/Embarcadero/Dev-Cpp
+  license: MPL-1.1
+  tags:
+    - devcpp
+    - vcl
+    - styles
+  frameworks:
+    - vcl
+targetPlatforms:
+  - compiler: delphi11.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 11.0
+  - compiler: delphi12.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 12.0
+  - compiler: delphi13.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 13.0
+templates:
+  - name: default
+    dependencies:
+      - id: DevCpp.DDetours
+        version: "[6.3.0,)"
+    source:
+      - src: ./Common/Vcl.Styles.FontAwesome.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Hooks.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.ComCtrls.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.Forms.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.Graphics.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.Menus.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.Misc.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.ScreenTips.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.StdCtrls.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.SysControls.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.Utils.SysStyleHook.pas
+        dest: Common
+      - src: ./Common/Vcl.Styles.UxTheme.pas
+        dest: Common
+      - src: ./Common/VCL.Styles.Utils.inc
+        dest: Common
+      # MPL 1.1 text
+      - src: ./MPL-1.1.txt
+        dest: licenses
+      # AwesomeFont.RC is compiled to AwesomeFont.RES by the package project
+      # (RcCompile), so no binary .res needs to be committed.
+      - src: ./Common/AwesomeFont.RC
+        dest: Common
+      - src: ./Common/fontawesome.ttf
+        dest: Common
+      # The package project writes AwesomeFont.res (and its version .res) into
+      # the .dcu folder, lib\Win32, so consumers can link it. That folder must
+      # already exist when the resource compiler runs, and a package project
+      # may not declare msbuild targets to create it, so ship a file into it.
+      - src: ./Common/AwesomeFont.RC
+        dest: lib/Win32
+      - src: ./Packages/$packageFolder$/*
+        dest: Packages/$packageFolder$
+    build:
+      - project: ./Packages/$packageFolder$/DevCpp.VclStylesUtilsR.dproj

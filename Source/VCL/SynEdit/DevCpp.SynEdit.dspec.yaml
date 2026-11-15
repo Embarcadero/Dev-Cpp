@@ -1,0 +1,77 @@
+# DPM package spec - SynEdit, as vendored (and modified) in Dev-C++.
+# Upstream: https://github.com/SynEdit/SynEdit
+#
+# This is Dev-C++'s own copy with unscoped unit names (SynEditTypes, ...),
+# so it is not interchangeable with the SynEdit packages on the public DPM
+# feed. Unit lists match Packages\Sydney\Delphi\SynEditDR/DD.dpk;
+# SynEditWildcardSearch, SynHighlighterLLVM and SynHighlighterWebIDL are not
+# in those packages and are not used by Dev-C++, so they are left out.
+#
+# Package projects live in Packages\RAD Studio <ver>\ and are maintained with
+#   dpm prepare DevCpp.SynEdit.dspec.yaml
+min dpm client version: 1.0.0
+metadata:
+  id: DevCpp.SynEdit
+  version: 6.3.0
+  description: SynEdit syntax highlighting editor, as vendored in Dev-C++.
+  authors:
+    - SynEdit project contributors
+  projectUrl: https://github.com/SynEdit/SynEdit
+  repositoryUrl: https://github.com/Embarcadero/Dev-Cpp
+  license: MPL-1.1 OR GPL-2.0-or-later
+  tags:
+    - devcpp
+    - vcl
+    - editor
+    - synedit
+  frameworks:
+    - vcl
+targetPlatforms:
+  - compiler: delphi11.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 11.0
+  - compiler: delphi12.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 12.0
+  - compiler: delphi13.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 13.0
+templates:
+  - name: default
+    source:
+      - src: ./Source/*.pas
+        dest: Source
+        exclude:
+          - SynEditWildcardSearch.pas
+          - SynHighlighterLLVM.pas
+          - SynHighlighterWebIDL.pas
+      - src: ./Source/*.dfm
+        dest: Source
+      - src: ./Source/*.inc
+        dest: Source
+      - src: ./Source/SynEdit.res
+        dest: Source
+      - src: ./Source/SynEditReg.dcr
+        dest: Source
+      # Dual licensed: MPL 1.1 or GPL v2 or later (GPL text from the repository root).
+      - src: ./MPL-1.1.txt
+        dest: licenses
+      - src: ../../../LICENSE
+        dest: licenses
+      # DPM only puts lib\<platform> on a consuming project's search path, so
+      # the forms and resources the units link ({$R *.dfm}, {$R SynEdit.res})
+      # must also sit beside the .dcu files.
+      - src: ./Source/*.dfm
+        dest: lib/Win32
+      - src: ./Source/SynEdit.res
+        dest: lib/Win32
+      - src: ./Packages/$packageFolder$/*
+        dest: Packages/$packageFolder$
+    build:
+      - project: ./Packages/$packageFolder$/DevCpp.SynEditR.dproj
+    design:
+      - project: ./Packages/$packageFolder$/DevCpp.SynEditD.dproj
+        platforms: [win32]

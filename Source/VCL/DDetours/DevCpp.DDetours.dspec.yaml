@@ -1,0 +1,44 @@
+# DPM package spec - DDetours (API hooking library), as vendored in Dev-C++.
+# Upstream: https://github.com/MahdiSafsafi/DDetours (v2.2 snapshot).
+# Required by DevCpp.VclStylesUtils (Vcl.Styles.Hooks).
+#
+# Package projects live in packages\RAD Studio <ver>\ and are maintained with
+#   dpm prepare DevCpp.DDetours.dspec.yaml
+min dpm client version: 1.0.0
+metadata:
+  id: DevCpp.DDetours
+  version: 6.3.0
+  description: DDetours 2.2 API hooking library, as vendored in Dev-C++.
+  authors:
+    - Mahdi Safsafi
+  projectUrl: https://github.com/MahdiSafsafi/DDetours
+  repositoryUrl: https://github.com/Embarcadero/Dev-Cpp
+  license: MPL-2.0
+  tags:
+    - devcpp
+    - hooking
+targetPlatforms:
+  - compiler: delphi11.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 11.0
+  - compiler: delphi12.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 12.0
+  - compiler: delphi13.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 13.0
+templates:
+  - name: default
+    source:
+      - src: ./Source/*.pas
+        dest: Source
+      - src: ./Source/*.inc
+        dest: Source
+      - src: ./LICENSE
+      - src: ./packages/$packageFolder$/*
+        dest: packages/$packageFolder$
+    build:
+      - project: ./packages/$packageFolder$/DevCpp.DDetoursR.dproj
