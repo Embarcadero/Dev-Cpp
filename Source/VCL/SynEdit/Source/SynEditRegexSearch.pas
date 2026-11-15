@@ -77,6 +77,9 @@ uses
   Consts;
 
 
+{$IF CompilerVersion < 35.0}
+// Delphi 10.4 and earlier: no public way to add raw PCRE options, so reach
+// into the private fields. Delphi 11 forbids this but adds TRegEx.AddRawOptions.
 type
   { TPerlRegExHelper }
 
@@ -99,6 +102,7 @@ procedure TRegExHelper.SetAdditionalPCREOptions(PCREOptions: Integer);
 begin
   with Self do FRegEx.SetAdditionalPCREOptions(PCREOptions);
 end;
+{$IFEND}
 
 { TSynEditRegexSearch }
 
@@ -146,14 +150,22 @@ begin
   else
     fOptions := [roNotEmpty, roIgnoreCase];
   RegEx := TRegEx.Create(fPattern, fOptions);
+  {$IF CompilerVersion >= 35.0}
+  RegEx.AddRawOptions(PCRE_UCP);
+  {$ELSE}
   RegEx.SetAdditionalPCREOptions(PCRE_UCP);
+  {$IFEND}
 end;
 
 procedure TSynEditRegexSearch.SetPattern(const Value: string);
 begin
   fPattern := Value;
   RegEx := TRegEx.Create(fPattern, fOptions);
+  {$IF CompilerVersion >= 35.0}
+  RegEx.AddRawOptions(PCRE_UCP);
+  {$ELSE}
   RegEx.SetAdditionalPCREOptions(PCRE_UCP);
+  {$IFEND}
 end;
 
 end.
