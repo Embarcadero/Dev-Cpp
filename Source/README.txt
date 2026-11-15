@@ -11,7 +11,12 @@ The main executable devcpp.exe can be built using the following steps:
 		Source\VCL\DevCpp.dpk
 		Source\VCL\SynEdit\Packages\Sydney\Delphi\SynEditDelphi.groupproj
 		Source\VCL\ClassBrowsing\ClassBrowsing.dpk
-		Source\VCL\SVGIconImageList\Packages\D10_4\SVGIconImageListGroupPackages.groupproj
+		Source\VCL\SVGIconImageList\Packages\D10_4\SVGIconPackage.dpk
+		Source\VCL\SVGIconImageList\Packages\D10_4\SVGIconImageList.dpk
+		Source\VCL\SVGIconImageList\Packages\D10_4\dclSVGIconImageList.dpk
+	   Open the SVGIconImageList packages one by one, in this order; their
+	   .dproj files are not in the repository, so the group project next to
+	   them cannot load them. The IDE creates the project files.
 
 	2) Compile resources by running the following script(s):
 		Source\CompileResources.bat
