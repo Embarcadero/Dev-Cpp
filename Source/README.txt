@@ -4,9 +4,13 @@ To build devcpp a recent Delphi version is required (10.4 and onwards).
 
 The main executable devcpp.exe can be built using the following steps:
 
-	1) Install
-		VCL Style - Windows10BlueWhale from GetIt in the IDE.
-		https://getitnow.embarcadero.com/VCLStyle-Windows10BlueWhale-1.0/
+	1) Install the VCL styles devcpp.dproj embeds. Close RAD Studio and run:
+		Source\InstallStyles.cmd -AcceptEulas
+	   It installs the missing ones from GetIt with GetItCmd (accepting
+	   their licence agreements), for the newest Delphi installed; add
+	   -Delphi 12.0 (for example) to choose the version. Or install them
+	   from GetIt in the IDE: Calypso, Flat UI Light, Material Patterns
+	   Blue, Windows10 BlackPearl and Windows10 BlueWhale.
 	1) Compile and install the following package(s):
 		Source\VCL\DevCpp.dpk
 		Source\VCL\SynEdit\Packages\Sydney\Delphi\SynEditDelphi.groupproj
