@@ -15,9 +15,12 @@ The main executable devcpp.exe can be built using the following steps:
 		Source\VCL\ClassBrowsing\ClassBrowsing.dpk
 		Source\VCL\SVGIconImageList\Packages\D10_4\SVGIconImageListGroupPackages.groupproj
 
-	2) Compile resources by running the following script(s):
+	2) Compile resources by running the following script(s) from a RAD
+	   Studio command prompt:
 		Source\CompileResources.bat
-		
+	   It also compiles VCL\vcl-styles-utils\Common\AwesomeFont.res, which
+	   the vcl-styles-utils units link.
+
 	3) Open the project file devcpp.dpr. Your IDE should not produce any 
 	   'Module Not Found' or 'Resource Not Found' errors when opening files, 
 	   compiling files or running devcpp.exe.
