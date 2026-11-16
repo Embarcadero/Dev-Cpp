@@ -7290,7 +7290,7 @@ end;
 
 procedure TMainForm.LoadStyle;
 begin
-  TStyleManager.TrySetStyle(cDelphiStyle[devData.Style]);
+  TStyleManager.TrySetStyle(DelphiStyleName(devData.Style));
   LabelNumVersion.Font.Color := clRed;
   case devData.Style of
     2, 3, 4, 5, 6: ImageEmbarcadero.ImageIndex := 1;

@@ -221,7 +221,7 @@ end;
 procedure TLangForm.FormCreate(Sender: TObject);
 begin
   //if devData.Style <> 0 then
-    TStyleManager.TrySetStyle(cDelphiStyle[devData.Style]);
+    TStyleManager.TrySetStyle(DelphiStyleName(devData.Style));
 end;
 
 procedure TLangForm.cmbThemeChange(Sender: TObject);

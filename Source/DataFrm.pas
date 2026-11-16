@@ -109,12 +109,41 @@ var
 const
   cDelphiStyle: array[0..8] of string = ('Windows','Windows10','Windows10 SlateGray','Windows10 Blue Whale','Windows10 BlackPearl','Glossy','Calypso','Flat UI Light','Material Patterns Blue');
   cSVGColor: array[0..8] of string = ('None','clGrayText','clMoneyGreen','clSkyBlue','clGrayText','clGrayText','clGrayText','clGrayText','clGrayText');
+
+// The name to pass to TStyleManager for cDelphiStyle[Index].
+function DelphiStyleName(Index: Integer): string;
+
 implementation
 
 uses
-  devcfg, utils, version, math, MultiLangSupport;
+  devcfg, utils, version, math, MultiLangSupport, Themes;
 
 {$R *.dfm}
+
+function DelphiStyleName(Index: Integer): string;
+const
+  // GetIt's VCLStyle-MaterialPatternsBlue-1.0 installs MaterialPattensBlue.vsf, whose style is
+  // named 'Material Pattens Blue'; 2.0 installs MaterialPatternsBlue.vsf, named 'Material Patterns
+  // Blue'. devcpp.dproj embeds 2.0 (GetIt for Delphi 12 and later offers only 2.0), but accept an
+  // executable built with 1.0 embedded.
+  cOldMaterialPatternsBlue = 'Material Pattens Blue';
+
+  function IsStyleAvailable(const Name: string): Boolean;
+  var
+    S: string;
+  begin
+    for S in TStyleManager.StyleNames do
+      if SameText(S, Name) then
+        Exit(True);
+    Result := False;
+  end;
+
+begin
+  Result := cDelphiStyle[Index];
+  if (Result = cDelphiStyle[High(cDelphiStyle)]) and not IsStyleAvailable(Result)
+    and IsStyleAvailable(cOldMaterialPatternsBlue) then
+    Result := cOldMaterialPatternsBlue;
+end;
 
 { TdmMain }
 
