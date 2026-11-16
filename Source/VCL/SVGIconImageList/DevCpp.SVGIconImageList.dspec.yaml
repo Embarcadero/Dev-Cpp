@@ -1,0 +1,115 @@
+# DPM package spec - SVGIconImageList (VCL), as vendored in Dev-C++.
+# Upstream: https://github.com/EtheaDev/SVGIconImageList
+#
+# One runtime package holds what upstream splits into SVGIconPackage (Svg\)
+# and SVGIconImageList (Source\); the design package holds the editors and
+# the Register unit. Unit lists match Packages\D10_4. FMX and the optional
+# Cairo/Image32/Skia factories are not included.
+#
+# Package projects live in Packages\RAD Studio <ver>\ and are maintained with
+#   dpm prepare DevCpp.SVGIconImageList.dspec.yaml
+min dpm client version: 1.0.0
+metadata:
+  id: DevCpp.SVGIconImageList
+  version: 6.3.0
+  description: SVGIconImageList VCL components (TSVGIconImageList and friends), as vendored in Dev-C++.
+  authors:
+    - Ethea S.r.l.
+    - Carlo Barazzetta
+  projectUrl: https://github.com/EtheaDev/SVGIconImageList
+  repositoryUrl: https://github.com/Embarcadero/Dev-Cpp
+  license: Apache-2.0
+  tags:
+    - devcpp
+    - vcl
+    - svg
+    - imagelist
+  frameworks:
+    - vcl
+targetPlatforms:
+  - compiler: delphi11.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 11.0
+  - compiler: delphi12.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 12.0
+  - compiler: delphi13.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 13.0
+templates:
+  - name: default
+    source:
+      # --- runtime: SVG engine (upstream SVGIconPackage) ---
+      - src: ./Svg/SVG.pas
+        dest: Svg
+      - src: ./Svg/SVGColor.pas
+        dest: Svg
+      - src: ./Svg/SVGCommon.pas
+        dest: Svg
+      - src: ./Svg/SVGPaint.pas
+        dest: Svg
+      - src: ./Svg/SVGParse.pas
+        dest: Svg
+      - src: ./Svg/SVGPath.pas
+        dest: Svg
+      - src: ./Svg/XmlLite.pas
+        dest: Svg
+      - src: ./Svg/SVGStyle.pas
+        dest: Svg
+      - src: ./Svg/SVGTypes.pas
+        dest: Svg
+      - src: ./Svg/GDIPKerning.pas
+        dest: Svg
+      - src: ./Svg/GDIPOBJ2.pas
+        dest: Svg
+      - src: ./Svg/GDIPPathText.pas
+        dest: Svg
+      # --- runtime: image list components (upstream SVGIconImageList) ---
+      - src: ./Source/SVGIconImage.pas
+        dest: Source
+      - src: ./Source/SVGIconImageList.pas
+        dest: Source
+      - src: ./Source/SVGIconUtils.pas
+        dest: Source
+      - src: ./Source/SVGIconImageCollection.pas
+        dest: Source
+      - src: ./Source/SVGIconItems.pas
+        dest: Source
+      - src: ./Source/SVGIconVirtualImageList.pas
+        dest: Source
+      - src: ./Source/SVGIconImageListBase.pas
+        dest: Source
+      - src: ./Source/D2DSVGFactory.pas
+        dest: Source
+      - src: ./Source/Winapi.D2DMissing.pas
+        dest: Source
+      - src: ./Source/PasSVGFactory.pas
+        dest: Source
+      - src: ./Source/SVGInterfaces.pas
+        dest: Source
+      - src: ./Source/SVGIconImageList.inc
+        dest: Source
+      # --- design: editors and registration (upstream dclSVGIconImageList) ---
+      - src: ./Packages/SVGIconImageRegister.pas
+        dest: Packages
+      - src: ./Packages/SVGIconImageListEditorUnit.pas
+        dest: Packages
+      - src: ./Packages/SVGIconImageListEditorUnit.dfm
+        dest: Packages
+      - src: ./Packages/SVGTextPropertyEditorUnit.pas
+        dest: Packages
+      - src: ./Packages/SVGTextPropertyEditorUnit.dfm
+        dest: Packages
+      - src: ./Packages/SVGIconImageListNew.dcr
+        dest: Packages
+      - src: ./LICENSE
+      - src: ./Packages/$packageFolder$/*
+        dest: Packages/$packageFolder$
+    build:
+      - project: ./Packages/$packageFolder$/DevCpp.SVGIconImageListR.dproj
+    design:
+      - project: ./Packages/$packageFolder$/DevCpp.SVGIconImageListD.dproj
+        platforms: [win32]

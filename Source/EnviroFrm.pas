@@ -206,7 +206,7 @@ begin
     StyleChange := ListBoxStyle.ItemIndex <> devData.Style;
     Style := ListBoxStyle.ItemIndex;
     if Style > 0 then
-      TStyleManager.TrySetStyle(cDelphiStyle[Style]);
+      TStyleManager.TrySetStyle(DelphiStyleName(Style));
   end;
 
   MainForm.Font.Name := devData.InterfaceFont;
@@ -249,7 +249,7 @@ begin
   begin
     Panel1.Visible := true;
     viThemePreview.Visible := false;
-    Panel1.StyleName := cDelphiStyle[ListBoxStyle.ItemIndex];
+    Panel1.StyleName := DelphiStyleName(ListBoxStyle.ItemIndex);
     Panel1.Repaint;
     for var I := 0 to Panel1.ControlCount-1 do
      Panel1.Controls[i].Repaint;

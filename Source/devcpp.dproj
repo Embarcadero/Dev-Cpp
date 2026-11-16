@@ -114,7 +114,7 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <DCC_ExeOutput>C:\Dev-Cpp\</DCC_ExeOutput>
+        <DCC_ExeOutput>..</DCC_ExeOutput>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
         <VerInfo_Keys>CompanyName=Embarcadero;FileDescription=$(MSBuildProjectName);FileVersion=6.3.0.0;InternalName=Devcpp;LegalCopyright=;LegalTrademarks=;OriginalFilename=Embarcadero Devcpp;ProductName=$(MSBuildProjectName);ProductVersion=6.3.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <Icon_MainIcon>..\devcpp.ico</Icon_MainIcon>
@@ -260,7 +260,6 @@
         <DCCReference Include="Tools\Packman\PackmanExitCodesU.pas"/>
         <DCCReference Include="ImageTheme.pas"/>
         <DCCReference Include="Instances.pas"/>
-        <DCCReference Include="CharUtils.pas"/>
         <DCCReference Include="ConsoleAppHostFrm.pas">
             <Form>ConsoleAppHost</Form>
         </DCCReference>

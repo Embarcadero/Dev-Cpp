@@ -1,0 +1,60 @@
+# DPM package spec - Dev-C++ class browsing components
+# (TCppParser, TCppTokenizer, TCppPreprocessor, TClassBrowser, TCodeCompletion)
+#
+# Package projects live in packages\RAD Studio <ver>\ and are maintained with
+#   dpm prepare DevCpp.ClassBrowsing.dspec.yaml
+min dpm client version: 1.0.0
+metadata:
+  id: DevCpp.ClassBrowsing
+  version: 6.3.0
+  description: Dev-C++ C/C++ parser, class browser and code completion VCL components.
+  authors:
+    - Bloodshed Software
+    - Dev-C++ contributors
+  projectUrl: https://github.com/Embarcadero/Dev-Cpp
+  repositoryUrl: https://github.com/Embarcadero/Dev-Cpp
+  license: GPL-2.0-or-later
+  tags:
+    - devcpp
+    - vcl
+    - parser
+  frameworks:
+    - vcl
+# devcpp.exe is Win32-only and these units guard their uses clauses with
+# {$IFDEF WIN32}, so Win64 is not offered.
+targetPlatforms:
+  - compiler: delphi11.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 11.0
+  - compiler: delphi12.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 12.0
+  - compiler: delphi13.0
+    platforms: [win32]
+    variables:
+      packageFolder: RAD Studio 13.0
+templates:
+  - name: default
+    source:
+      - src: ./*.pas
+      - src: ./*.dfm
+      - src: ./*.dcr
+      # GPL v2 text from the repository root
+      - src: ../../../LICENSE
+        dest: licenses
+      # DPM only puts lib\<platform> on a consuming project's search path, so
+      # forms the units link with {$R *.dfm} must also sit beside the .dcu files.
+      - src: ./*.dfm
+        dest: lib/Win32
+      - src: ./packages/$packageFolder$/*
+        dest: packages/$packageFolder$
+    build:
+      - project: ./packages/$packageFolder$/DevCpp.ClassBrowsingR.dproj
+    # The component units carry their own Register procedures, so the
+    # design package contains the units (as Source\VCL\DevCpp.dpk does)
+    # rather than requiring the runtime package.
+    design:
+      - project: ./packages/$packageFolder$/DevCpp.ClassBrowsingD.dproj
+        platforms: [win32]

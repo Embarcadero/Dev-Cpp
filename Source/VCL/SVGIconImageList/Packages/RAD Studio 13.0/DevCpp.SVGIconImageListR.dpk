@@ -1,0 +1,63 @@
+package DevCpp.SVGIconImageListR;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'SVGIconImageList (Dev-C++, runtime)'}
+{$LIBSUFFIX AUTO}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  vclwinx,
+  xmlrtl;
+
+contains
+  SVG in '..\..\Svg\SVG.pas',
+  SVGColor in '..\..\Svg\SVGColor.pas',
+  SVGCommon in '..\..\Svg\SVGCommon.pas',
+  SVGPaint in '..\..\Svg\SVGPaint.pas',
+  SVGParse in '..\..\Svg\SVGParse.pas',
+  SVGPath in '..\..\Svg\SVGPath.pas',
+  XmlLite in '..\..\Svg\XmlLite.pas',
+  SVGStyle in '..\..\Svg\SVGStyle.pas',
+  SVGTypes in '..\..\Svg\SVGTypes.pas',
+  GDIPKerning in '..\..\Svg\GDIPKerning.pas',
+  GDIPOBJ2 in '..\..\Svg\GDIPOBJ2.pas',
+  GDIPPathText in '..\..\Svg\GDIPPathText.pas',
+  SVGIconImage in '..\..\Source\SVGIconImage.pas',
+  SVGIconImageList in '..\..\Source\SVGIconImageList.pas',
+  SVGIconUtils in '..\..\Source\SVGIconUtils.pas',
+  SVGIconImageCollection in '..\..\Source\SVGIconImageCollection.pas',
+  SVGIconItems in '..\..\Source\SVGIconItems.pas',
+  SVGIconVirtualImageList in '..\..\Source\SVGIconVirtualImageList.pas',
+  SVGIconImageListBase in '..\..\Source\SVGIconImageListBase.pas',
+  D2DSVGFactory in '..\..\Source\D2DSVGFactory.pas',
+  Winapi.D2DMissing in '..\..\Source\Winapi.D2DMissing.pas',
+  PasSVGFactory in '..\..\Source\PasSVGFactory.pas',
+  SVGInterfaces in '..\..\Source\SVGInterfaces.pas';
+end.
