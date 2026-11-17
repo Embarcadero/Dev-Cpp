@@ -1123,10 +1123,31 @@ begin
   SaveOptions;
 
   //  --  --  --  --  --  --  --  --  --  --  --  --  --
-  //      This is a cheat.    Also don't hard-code 'Windows10'.
+  //  A workaround for Delphi 10.4 (and perhaps earlier): not needed from Delphi 11.
+  //
+  //  On Delphi 10.4, switching from a VCL style to the system style ("Windows",
+  //  the classic look) leaves the style engine holding a hook for each styled
+  //  control. TWinControl.Destroy tells the engine that a control has gone
+  //  (snControlDestroyed) only when the active style has the sfHandleMessages
+  //  flag, and the system style doesn't have it. So the engine never hears about
+  //  the controls destroyed after the switch, and keeps their entries in
+  //  TStyleEngine.FControls.
+  //  At exit, its finalization frees through them, and Dev-C++ ends with "Runtime error 216".
+  //
+  //  Switching back to a VCL style before the forms are destroyed avoids it.
+  //
+  //  Delphi 11 releases all the style hooks at the switch itself
+  //  (snReleaseAllStyleHooks, in TStyleManager.SetStyle), so none are left at
+  //  exit. Any VCL style would do here.
   //  --  --  --  --  --  --  --  --  --  --  --  --  --
+  //
+  //  Original comment : This is a cheat. Also not ideal to hard-code 'Windows10'.
+  //
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --
+  {$IF CompilerVersion < 35}                      // before Delphi 11
       MainForm.Visible := false;
       TStyleManager.TrySetStyle('Windows10');
+  {$IFEND}
   //  --  --  --  --  --  --  --  --  --  --  --  --  --
 
   Action := caFree;
